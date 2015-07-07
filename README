@@ -1,0 +1,10 @@
+This is your new Play application
+=================================
+
+This file will be packaged with your application, when using `activator dist`.
+
+
+To run from the main directory:
+  user@box path/spatial-faceting$ activator run
+
+Then go to localhost:9000 in your browser to play with the app

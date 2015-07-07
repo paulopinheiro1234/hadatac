@@ -1,0 +1,55 @@
+ @(selection : String)
+ 
+   <p>
+       <B>Options</B>: 
+	   @if(selection == "PlatformModelsH") {
+          	<a href="@routes.Platform.index()" class="btn btn-warning" role="button">Platform Model<br>Hierarchy</a>
+       } else {
+          	<a href="@routes.Platform.index()" class="btn btn-primary" role="button">Platform Model<br>Hierarchy</a>
+       }
+	   @if(selection == "Platforms") {
+       		<a href="@routes.PlatformList.index()" class="btn btn-warning" role="button">Platform<br>List</a>
+       } else {
+       		<a href="@routes.PlatformList.index()" class="btn btn-primary" role="button">Platform<br>List</a>
+       }
+	   @if(selection == "InstrumentModelsH") {
+       		<a href="@routes.Instrument.index()" class="btn btn-warning" role="button">Instrument Model<br>Hierarchy</a>
+       } else {
+       		<a href="@routes.Instrument.index()" class="btn btn-primary" role="button">Instrument Model<br>Hierarchy</a>
+       }
+	   @if(selection == "Instruments") {
+       		<a href="@routes.InstrumentList.index()" class="btn btn-warning" role="button">Instrument<br>List</a>
+       } else {
+       		<a href="@routes.InstrumentList.index()" class="btn btn-primary" role="button">Instrument<br>List</a>
+       }
+	   @if(selection == "DetectorsH") {
+       		<a href="@routes.Detector.index()" class="btn btn-warning" role="button">Detector Model<br>Hierarchy</a>
+       } else {
+       		<a href="@routes.Detector.index()" class="btn btn-primary" role="button">Detector Model<br>Hierarchy</a>
+       }
+	   @if(selection == "Detectors") {
+       		<a href="@routes.DetectorList.index()" class="btn btn-warning" role="button">Detector<br>List</a>
+       } else {
+       		<a href="@routes.DetectorList.index()" class="btn btn-primary" role="button">Detector<br>List</a>
+       }
+	   @if(selection == "EntitiesH") {
+       		<a href="@routes.Entity.index()" class="btn btn-warning" role="button">Entity<br>Hierarchy</a>
+       } else {
+       		<a href="@routes.Entity.index()" class="btn btn-primary" role="button">Entity<br>Hierarchy</a>
+       }
+	   @if(selection == "CharacteristicsH") {
+       		<a href="@routes.Characteristic.index()" class="btn btn-warning" role="button">Characteristic<br>Hierarchy</a>
+       } else {
+       		<a href="@routes.Characteristic.index()" class="btn btn-primary" role="button">Characteristic<br>Hierarchy</a>
+       }
+	   @if(selection == "UnitsH") {
+       		<a href="@routes.Unit.index()" class="btn btn-warning" role="button">Unit<br>Hierarchy</a>
+       } else {
+       		<a href="@routes.Unit.index()" class="btn btn-primary" role="button">Unit<br>Hierarchy</a>
+       }
+	   @if(selection == "Agents") {
+       		<a href="@routes.Agent.index()" class="btn btn-warning" role="button">Agent<br>Network</a>
+       } else {
+       		<a href="@routes.Agent.index()" class="btn btn-primary" role="button">Agent<br>Network</a>
+       }
+    </p>

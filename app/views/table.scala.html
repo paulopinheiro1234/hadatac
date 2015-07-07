@@ -1,0 +1,31 @@
+@(documentMap : models.QueryResults)
+
+    <h2 class="sub-header">Results</h2>
+    <div class="table-responsive">
+        <table class="table table-striped">
+            <thead>
+              <tr>
+                <th>Document</th>
+              </tr>
+            </thead>
+
+            <tbody>
+                @for(document <- documentMap.the_docs) {
+                <tr>
+                        <td>
+                        @for(characteristic <- document.characteristic){
+                				<p>characteristic: @characteristic<p>
+                		}
+                        
+                		@for((field, value) <- document.fields){
+                            <p>@field: @value</p>
+                    	}
+                    	</td>
+                </tr>
+                }
+            </tbody>
+
+        </table>
+    </div>
+
+
