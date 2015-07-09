@@ -1,0 +1,17 @@
+@(triple : models.TripleDocument)
+
+@defining(triple.generateID()) {itemID =>
+<div class="panel-heading" role="tab" id="heading@itemID">
+    <h4 class="panel-title">
+        <a class="collapsed" role="button" data-toggle="collapse" data-parent="#accordion" href="#@itemID" aria-expanded="false" aria-controls="@itemID">
+            @triple.get("detModelName")</a></h4>
+        
+</div>
+<div id="@itemID" class="panel-collapse collapse" role="tabpanel" aria-labelledby="heading@itemID">
+    <div class="panel-body">
+        <p><b>@triple.get("detModelName") </b> (manufactured by: @triple.get("maker") )</p>
+        <p>For measuring @triple.get("chara")</p>
+        <p>Description: @triple.get("desc")</p>
+    </div>
+</div>
+}

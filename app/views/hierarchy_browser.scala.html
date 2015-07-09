@@ -1,4 +1,6 @@
-@(documentMap : String, category : String)
+@( documentMap : Map[String,models.SparqlQueryResults],
+   documentHierarchy : Map[String,String],
+   category : String)
 
 @import helper._
 
@@ -6,18 +8,147 @@
     <div class="container-fluid">
       
       <div class="row">
-        @*<div class="col-sm-9 col-md-10 main">*@
+        <div class="col-sm-9 col-md-10 main">
 		  @metadata_navigation(category)
-		  <div class="table-responsive">
-			 <div id="query" data-results="@documentMap"></div>
-			 <div id="body"></div>
-    		 @*<link type="text/css" rel="stylesheet" href="http://mbostock.github.io/d3/talk/20111018/style.css"/>*@
-			 <script type="text/javascript" src="http://mbostock.github.io/d3/talk/20111018/d3/d3.js"></script>
-    		 <script type="text/javascript" src="http://mbostock.github.io/d3/talk/20111018/d3/d3.layout.js"></script>
-    		 <script type="text/javascript" src="/assets/javascripts/treeRenderer.js"></script>  					   
-    		 <link type="text/css" rel="stylesheet" href="/assets/stylesheets/treeRenderer.css"/>   					   
-    	  </div>
-      </div>
+            <ul class="nav nav-tabs">
+                @for((thingType, query_results) <- documentMap){
+                    <li><a data-toggle="tab" href="#@thingType">View as Table</a></li>
+                }
+                @for((thingType, tree_results) <- documentHierarchy){
+                    <li><a data-toggle="tab" href="#@thingType">View as Hierarchy</a></li>
+                }
+            </ul>
+            <div class = "tab-content">
+            @for((thingType, query_results) <- documentMap) {
+                @thingType match{
+                    case "InstrumentModels" => { 
+                        <div id="@thingType" class="tab-pane fade in">
+                            <div><p>(click for more information)</p></div>
+                                <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
+                                    <div class="panel panel-default">
+                                        @for(triple <- query_results.triples_list){
+                                            @instrument_model_entry(triple) 
+                                        }
+                                    </div>
+                                </div>
+                        </div>
+                    }
+                    case "Instruments" => { 
+                        <div id="@thingType" class="tab-pane fade in">
+                            <div><p>(click for more information)</p></div>
+                                <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
+                                    <div class="panel panel-default">
+                                        @for(triple <- query_results.triples_list){
+                                            @instrument_entry(triple) 
+                                        }
+                                    </div>
+                                </div>
+                        </div>
+                    }
+                    case "DetectorModels" => { 
+                        <div id="@thingType" class="tab-pane fade in">
+                            <div><p>(click for more information)</p></div>
+                                <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
+                                    <div class="panel panel-default">
+                                        @for(triple <- query_results.triples_list){
+                                            @*@detector_model_entry(triple) *@
+                                            @placeholder_entry(triple)
+                                        }
+                                    </div>
+                                </div>
+                        </div>
+                    }
+                    case "Detectors" => { 
+                        <div id="@thingType" class="tab-pane fade in">
+                            <div><p>(click for more information)</p></div>
+                                <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
+                                    <div class="panel panel-default">
+                                        @for(triple <- query_results.triples_list){
+                                            @detector_entry(triple) 
+                                        }
+                                    </div>
+                                </div>
+                        </div>
+                    }
+                    case "PlatformModels" => { 
+                        <div id="@thingType" class="tab-pane fade in">
+                            <div><p>(click for more information)</p></div>
+                                <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
+                                    <div class="panel panel-default">
+                                        @for(triple <- query_results.triples_list){
+                                            @platform_model_entry(triple) 
+                                        }
+                                    </div>
+                                </div>
+                        </div>
+                    }
+                    case "Platforms" => { 
+                        <div id="@thingType" class="tab-pane fade in">
+                            <div><p>(click for more information)</p></div>
+                                <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
+                                    <div class="panel panel-default">
+                                        @for(triple <- query_results.triples_list){
+                                            @*@platform_entry(triple) *@
+                                            @placeholder_entry(triple)
+                                        }
+                                    </div>
+                                </div>
+                        </div>
+                    }
+                    case "Entities" => { 
+                        <div id="@thingType" class="tab-pane fade in">
+                            <div><p>(click for more information)</p></div>
+                                <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
+                                    <div class="panel panel-default">
+                                        @for(triple <- query_results.triples_list){
+                                            @*@entity_entry(triple) *@
+                                            @placeholder_entry(triple)
+                                        }
+                                    </div>
+                                </div>
+                        </div>
+                    }
+                    case "Characteristics" => { 
+                        <div id="@thingType" class="tab-pane fade in">
+                            <div><p>(click for more information)</p></div>
+                                <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
+                                    <div class="panel panel-default">
+                                        @for(triple <- query_results.triples_list){
+                                            @*@characteristic_entry(triple) *@
+                                            @placeholder_entry(triple)
+                                        }
+                                    </div>
+                                </div>
+                        </div>
+                    }
+                    case "Units" => { 
+                        <div id="@thingType" class="tab-pane fade in">
+                            <div><p>(click for more information)</p></div>
+                                <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
+                                    <div class="panel panel-default">
+                                        @for(triple <- query_results.triples_list){
+                                            @*@unit_entry(triple) *@
+                                            @placeholder_entry(triple)
+                                        }
+                                    </div>
+                                </div>
+                        </div>
+                    }
+                    case _ => {
+                    }
+                }
+            }
+            @for((thingType, tree_results) <- documentHierarchy){
+                <div id="@thingType" class="tab-pane fade in">
+                    <div id="query" data-results="@tree_results"></div>
+                    <div id="body"></div>
+                        <script type="text/javascript" src="/hadatac/assets/javascripts/d3.js"></script>
+                        <script type="text/javascript" src="/hadatac/assets/javascripts/d3.layout.js"></script>
+                        <script type="text/javascript" src="/hadatac/assets/javascripts/treeRenderer.js"></script>
+                    <link type="text/css" rel="stylesheet" href="/hadatac/assets/stylesheets/treeRenderer.css"/>
+                </div>
+            }
+          </div>
     </div>
 
 }

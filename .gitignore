@@ -10,3 +10,51 @@
 
 # virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
 hs_err_pid*
+
+# general
+*~
+*.log
+tmp
+dump
+ 
+# Eclipse
+.settings
+.cache
+.project
+.classpath
+.scala_dependencies
+bin
+ 
+# SBT
+dist
+project/boot
+project/target
+project/plugins/target
+target
+.target
+ 
+# Play
+logs
+RUNNING_PID
+
+# Ignore Play! working directory #
+bin/
+/db
+.eclipse
+/lib/
+/logs/
+logs
+/modules
+project/project
+project/target
+/target
+target/
+target
+tmp/
+test-result
+server.pid
+*.iml
+*.eml
+/dist/
+.cache
+.sbtserver/

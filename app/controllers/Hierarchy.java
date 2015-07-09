@@ -12,13 +12,14 @@ import models.FacetsWithCategories;
 import models.SparqlQuery;
 import models.SparqlQueryResults;
 import models.TreeQuery;
+import models.TreeQueryResults;
 import play.data.DynamicForm;
 import play.data.Form;
 import play.mvc.Controller;
 import play.mvc.Result;
 import views.formdata.FacetFormData;
 import views.html.hierarchy_faceting;
-import views.html.instrument_browser;
+import views.html.error_page;
 
 
 public class Hierarchy extends Controller {
@@ -49,7 +50,7 @@ public class Hierarchy extends Controller {
         		} catch (IllegalStateException | IOException e1) {
         			e1.printStackTrace();
         		}
-        		SparqlQueryResults query_results = new SparqlQueryResults(query_json);
+        		SparqlQueryResults query_results = new SparqlQueryResults(query_json, tabName);
         		query_results_list.put(tabName, query_results);
         	}
         }// /for tabname in types of entities
@@ -90,7 +91,7 @@ public class Hierarchy extends Controller {
         		} catch (IllegalStateException | IOException e1) {
         			e1.printStackTrace();
         		}
-        		SparqlQueryResults query_results = new SparqlQueryResults(query_json);
+        		SparqlQueryResults query_results = new SparqlQueryResults(query_json, tabName);
         		query_results_list.put(tabName, query_results);
         	}
         }// /for tabname in types of entities

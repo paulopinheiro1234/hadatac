@@ -1,0 +1,18 @@
+@(triple : models.TripleDocument)
+
+@defining(triple.get("sn")) {itemID =>
+<div class="panel panel-default">
+    <div class="panel-heading" role="tab" id="heading@itemID">
+        <h4 class="panel-title">
+            <a class="collapsed" role="button" data-toggle="collapse" data-parent="#accordion" href="#@itemID" aria-expanded="false" aria-controls="@itemID">
+                @triple.get("detName")</a></h4>
+            
+    </div>
+    <div id="@itemID" class="panel-collapse collapse" role="tabpanel" aria-labelledby="heading@itemID">
+        <div class="panel-body">
+            <p><b>@triple.get("detName") </b> (type: @triple.get("detModelName") )</p>
+            <p>serial number @itemID</p>
+        </div>
+    </div>
+</div>
+}

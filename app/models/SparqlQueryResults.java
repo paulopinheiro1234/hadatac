@@ -12,14 +12,16 @@ public class SparqlQueryResults extends QueryResults {
     public ArrayList<TripleDocument> triples_list = new ArrayList<TripleDocument>();
     
     public ArrayList<String> vars = new ArrayList<String>();
+    private int numVars;
+    
     public SparqlQueryResults () {} 
 
     // This constructor assumes that json is a well-formed JSON string
     //  which also conforms to the SPARQL 1.1 Query Results JSON format:
     //  http://www.w3.org/TR/sparql11-results-json/ 
-    public SparqlQueryResults (String json) {
+    public SparqlQueryResults (String json, String tabName) {
         this.json = json;
-        //System.out.println("SparqlQueryResults input {{{{" + json + "}}}}");
+        //if(tabName.equals("InstrumentModels")) System.out.println(json);
         // create an ObjectMapper instance.
         ObjectMapper mapper = new ObjectMapper();
         // use the ObjectMapper to read the json string and create a tree
@@ -46,12 +48,12 @@ public class SparqlQueryResults extends QueryResults {
 		}// /try/catch
 		
 		Iterator<JsonNode> parseResults = bindings.iterator();
-		vars.size();
+		numVars = vars.size();
 		
 		try {
 		    while (parseResults.hasNext()){
 				JsonNode doc = parseResults.next();
-				TripleDocument triple = new TripleDocument(doc, vars);
+				TripleDocument triple = new TripleDocument(doc, vars, tabName);
 				//System.out.println(triple);
 				triples_list.add(triple);
 			}

@@ -1,6 +1,6 @@
-// @SOURCE:/Users/paulopinheiro/Documents/workspace/metadata-browser/conf/routes
+// @SOURCE:/home/tetherless/hadatac-browser/conf/routes
 // @HASH:95d974d2a4e305b5b74da2b4b23242f3885cc6ea
-// @DATE:Tue Jul 07 15:05:19 EDT 2015
+// @DATE:Wed Jul 08 15:01:55 EDT 2015
 
 import Routes.{prefix => _prefix, defaultPrefix => _defaultPrefix}
 import play.core._
