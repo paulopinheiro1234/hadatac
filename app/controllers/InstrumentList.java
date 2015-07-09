@@ -37,7 +37,7 @@ public class InstrumentList extends Controller {
                 try {
                     query_json = query_submit.executeQuery(tabName);
                 } catch (IllegalStateException | IOException e1) {
-                    return notFound(error_page.render(e1.toString(), "Instruments"));
+                    return internalServerError(error_page.render(e1.toString(), "Instruments"));
                     //e1.printStackTrace();
                 }
                 TreeQueryResults query_results = new TreeQueryResults(query_json, false);
@@ -46,7 +46,7 @@ public class InstrumentList extends Controller {
                 try {
                     query_json = query_submit.executeQuery(tabName);
                 } catch (IllegalStateException | IOException e1) {
-                    return notFound(error_page.render(e1.toString(), "Instruments"));
+                    return internalServerError(error_page.render(e1.toString(), "Instruments"));
                     //e1.printStackTrace();
                 }
                 //System.out.println(query_json);
@@ -75,7 +75,7 @@ public class InstrumentList extends Controller {
                 try {
                     query_json = query_submit.executeQuery(tabName);
                 } catch (IllegalStateException | IOException e1) {
-                    return notFound(error_page.render(e1.toString(), "Instruments"));
+                    return internalServerError(error_page.render(e1.toString(), "Instruments"));
                     //e1.printStackTrace();
                 }
                 TreeQueryResults query_results = new TreeQueryResults(query_json, false);
@@ -84,7 +84,7 @@ public class InstrumentList extends Controller {
                 try {
                     query_json = query_submit.executeQuery(tabName);
                 } catch (IllegalStateException | IOException e1) {
-                    return notFound(error_page.render(e1.toString(), "Instruments"));
+                    return internalServerError(error_page.render(e1.toString(), "Instruments"));
                     //e1.printStackTrace();
                 }
                 //System.out.println(query_json);

@@ -25,28 +25,27 @@ public class Entity extends Controller {
 
     	TreeMap<String, SparqlQueryResults> query_results_list = new TreeMap<String, SparqlQueryResults>();
         TreeMap<String, String> hierarchy_results_list = new TreeMap<String, String>();
-        for (String tabName : query_submit.thingTypes){
+        for (String tabName : tabsToQuery){
             String query_json = null;
             if (tabName.endsWith("H")) {
-                System.out.println("Entities.java is requesting: " + tabName);
+                System.out.println("Entity.java is requesting: " + tabName);
                 try {
                     query_json = query_submit.executeQuery(tabName);
-                } catch (IllegalStateException | IOException e1) {
-                    return notFound(error_page.render(e1.toString()));
+                    TreeQueryResults query_results = new TreeQueryResults(query_json, true);
+                    hierarchy_results_list.put(tabName, query_results.getQueryResult().replace("\n", " "));
+                } catch (IllegalStateException | IOException | NullPointerException e1) {
+                    return internalServerError(error_page.render(e1.toString(), "EntitiesH"));
                     //e1.printStackTrace();
                 }
-                TreeQueryResults query_results = new TreeQueryResults(query_json, false);
-                hierarchy_results_list.put(tabName, query_results.getQueryResult().replace("\n", " "));
             } else {
                 try {
                     query_json = query_submit.executeQuery(tabName);
-                } catch (IllegalStateException | IOException e1) {
-                    return notFound(error_page.render(e1.toString()));
+                    SparqlQueryResults query_results = new SparqlQueryResults(query_json, tabName);
+                    query_results_list.put(tabName, query_results);
+                } catch (IllegalStateException | IOException | NullPointerException e1) {
+                    return internalServerError(error_page.render(e1.toString(), "EntitiesH"));
                     //e1.printStackTrace();
                 }
-                //System.out.println(query_json);
-                SparqlQueryResults query_results = new SparqlQueryResults(query_json, tabName);
-                query_results_list.put(tabName, query_results);
             }// /else
         }
         System.out.println("Entity index() was called!");
@@ -62,28 +61,28 @@ public class Entity extends Controller {
 
     	TreeMap<String, SparqlQueryResults> query_results_list = new TreeMap<String, SparqlQueryResults>();
         TreeMap<String, String> hierarchy_results_list = new TreeMap<String, String>();
-        for (String tabName : query_submit.thingTypes){
+        for (String tabName : tabsToQuery){
             String query_json = null;
-            if (tabName.endsWith("H")) {
-                System.out.println("Entities.java is requesting: " + tabName);
+                if (tabName.endsWith("H")) {
+                System.out.println("Entity.java is requesting: " + tabName);
                 try {
                     query_json = query_submit.executeQuery(tabName);
+                    TreeQueryResults query_results = new TreeQueryResults(query_json, false);
+                    hierarchy_results_list.put(tabName, query_results.getQueryResult().replace("\n", " "));
                 } catch (IllegalStateException | IOException e1) {
-                    return notFound(error_page.render(e1.toString()));
+                    return internalServerError(error_page.render(e1.toString(), "EntitiesH"));
                     //e1.printStackTrace();
                 }
-                TreeQueryResults query_results = new TreeQueryResults(query_json, false);
-                hierarchy_results_list.put(tabName, query_results.getQueryResult().replace("\n", " "));
             } else {
                 try {
                     query_json = query_submit.executeQuery(tabName);
+                    SparqlQueryResults query_results = new SparqlQueryResults(query_json, tabName);
+                    query_results_list.put(tabName, query_results);
                 } catch (IllegalStateException | IOException e1) {
-                    return notFound(error_page.render(e1.toString()));
+                    return internalServerError(error_page.render(e1.toString(), "EntitiesH"));
                     //e1.printStackTrace();
                 }
                 //System.out.println(query_json);
-                SparqlQueryResults query_results = new SparqlQueryResults(query_json, tabName);
-                query_results_list.put(tabName, query_results);
             }// /else
         }
         System.out.println("Entity postIndex() was called!");

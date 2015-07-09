@@ -40,7 +40,7 @@ public class PlatformList extends Controller {
                     TreeQueryResults query_results = new TreeQueryResults(query_json, false);
                     hierarchy_results_list.put(tabName, query_results.getQueryResult().replace("\n", " "));
                 } catch (IllegalStateException | IOException | NullPointerException e1) {
-                    return notFound(error_page.render(e1.toString(), "Platforms"));
+                    return internalServerError(error_page.render(e1.toString(), "Platforms"));
                     //e1.printStackTrace();
                 }
             } else {
@@ -49,7 +49,7 @@ public class PlatformList extends Controller {
                     SparqlQueryResults query_results = new SparqlQueryResults(query_json, tabName);
                     query_results_list.put(tabName, query_results);
                 } catch (IllegalStateException | IOException | NullPointerException e1) {
-                    return notFound(error_page.render(e1.toString(), "Platforms"));
+                    return internalServerError(error_page.render(e1.toString(), "Platforms"));
                     //e1.printStackTrace();
                 }
             }// /else
@@ -78,7 +78,7 @@ public class PlatformList extends Controller {
                     TreeQueryResults query_results = new TreeQueryResults(query_json, false);
                     hierarchy_results_list.put(tabName, query_results.getQueryResult().replace("\n", " "));
                 } catch (IllegalStateException | IOException | NullPointerException e1) {
-                    return notFound(error_page.render(e1.toString(), "Platforms"));
+                    return internalServerError(error_page.render(e1.toString(), "Platforms"));
                     //e1.printStackTrace();
                 }
             } else {
@@ -87,7 +87,7 @@ public class PlatformList extends Controller {
                     SparqlQueryResults query_results = new SparqlQueryResults(query_json, tabName);
                     query_results_list.put(tabName, query_results);
                 } catch (IllegalStateException | IOException | NullPointerException e1) {
-                    return notFound(error_page.render(e1.toString(), "Platforms"));
+                    return internalServerError(error_page.render(e1.toString(), "Platforms"));
                     //e1.printStackTrace();
                 }
             }// /else

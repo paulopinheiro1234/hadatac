@@ -29,7 +29,7 @@ public class DetectorList extends Controller {
         TreeMap<String, SparqlQueryResults> query_results_list = new TreeMap<String, SparqlQueryResults>();
         TreeMap<String, String> hierarchy_results_list = new TreeMap<String, String>();
         // This needs to be fixed to handle the tree rendering for Detectors!
-        for (String tabName : query_submit.thingTypes){
+        for (String tabName : tabsToQuery){
             String query_json = null;
             if (tabName.endsWith("H")) {
                 System.out.println("DetectorList.java is requesting: " + tabName);
@@ -38,7 +38,7 @@ public class DetectorList extends Controller {
                     TreeQueryResults query_results = new TreeQueryResults(query_json, false);
                     hierarchy_results_list.put(tabName, query_results.getQueryResult().replace("\n", " "));
                 } catch (IllegalStateException | IOException | NullPointerException e1) {
-                    return notFound(error_page.render(e1.toString(),"Detectors"));
+                    return internalServerError(error_page.render(e1.toString(),"Detectors"));
                     //e1.printStackTrace();
                 }
             } else {
@@ -47,7 +47,7 @@ public class DetectorList extends Controller {
                     SparqlQueryResults query_results = new SparqlQueryResults(query_json, tabName);
                     query_results_list.put(tabName, query_results);
                 } catch (IllegalStateException | IOException | NullPointerException e1) {
-                    return notFound(error_page.render(e1.toString(), "Detectors"));
+                    return internalServerError(error_page.render(e1.toString(), "Detectors"));
                     //e1.printStackTrace();
                 }
             }
@@ -69,7 +69,7 @@ public class DetectorList extends Controller {
         TreeMap<String, SparqlQueryResults> query_results_list = new TreeMap<String, SparqlQueryResults>();
         TreeMap<String, String> hierarchy_results_list = new TreeMap<String, String>();
         // This needs to be fixed to handle the tree rendering for Detectors!
-        for (String tabName : query_submit.thingTypes){
+        for (String tabName : tabsToQuery){
             String query_json = null;
             if (tabName.endsWith("H")) {
                 System.out.println("DetectorList.java is requesting: " + tabName);
@@ -78,7 +78,7 @@ public class DetectorList extends Controller {
                     TreeQueryResults query_results = new TreeQueryResults(query_json, false);
                     hierarchy_results_list.put(tabName, query_results.getQueryResult().replace("\n", " "));
                 } catch (IllegalStateException | IOException | NullPointerException e1) {
-                    return notFound(error_page.render(e1.toString(),"Detectors"));
+                    return internalServerError(error_page.render(e1.toString(),"Detectors"));
                     //e1.printStackTrace();
                 }
             } else {
@@ -87,7 +87,7 @@ public class DetectorList extends Controller {
                     SparqlQueryResults query_results = new SparqlQueryResults(query_json, tabName);
                     query_results_list.put(tabName, query_results);
                 } catch (IllegalStateException | IOException | NullPointerException e1) {
-                    return notFound(error_page.render(e1.toString(), "Detectors"));
+                    return internalServerError(error_page.render(e1.toString(), "Detectors"));
                     //e1.printStackTrace();
                 }
             }// /else

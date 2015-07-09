@@ -22,11 +22,11 @@ public class Detector extends Controller {
     	//Get query using http.GetSparqlQuery
         SparqlQuery query = new SparqlQuery();
         GetSparqlQuery query_submit = new GetSparqlQuery(query);
-        String[] tabsToQuery = {"DetectorModels", "DetectorsH"}; 
+        String[] tabsToQuery = {"DetectorModels", "DetectorModelsH"}; 
 
     	TreeMap<String, SparqlQueryResults> query_results_list = new TreeMap<String, SparqlQueryResults>();
         TreeMap<String, String> hierarchy_results_list = new TreeMap<String, String>();
-        for (String tabName : query_submit.thingTypes){
+        for (String tabName : tabsToQuery){
             String query_json = null;
             if (tabName.endsWith("H")) {
                 System.out.println("DetectorList.java is requesting: " + tabName);
@@ -35,7 +35,7 @@ public class Detector extends Controller {
                     TreeQueryResults query_results = new TreeQueryResults(query_json, false);
                     hierarchy_results_list.put(tabName, query_results.getQueryResult().replace("\n", " "));
                 } catch (IllegalStateException | IOException | NullPointerException e1) {
-                    return notFound(error_page.render(e1.toString(),"DetectorsH"));
+                    return internalServerError(error_page.render(e1.toString(),"DetectorModelsH"));
                     //e1.printStackTrace();
                 }
             } else {
@@ -44,13 +44,13 @@ public class Detector extends Controller {
                     SparqlQueryResults query_results = new SparqlQueryResults(query_json, tabName);
                     query_results_list.put(tabName, query_results);
                 } catch (IllegalStateException | IOException | NullPointerException e1) {
-                    return notFound(error_page.render(e1.toString(), "DetectorsH"));
+                    return internalServerError(error_page.render(e1.toString(), "DetectorModelsH"));
                     //e1.printStackTrace();
                 }
             }
         }// /for
         System.out.println("Detector index() was called!");
-        return ok(hierarchy_browser.render(query_results_list, hierarchy_results_list, "DetectorsH"));
+        return ok(hierarchy_browser.render(query_results_list, hierarchy_results_list, "DetectorModelsH"));
     }// /index()
 
 
@@ -59,11 +59,11 @@ public class Detector extends Controller {
      	//Get query using http.GetSparqlQuery
         SparqlQuery query = new SparqlQuery();
         GetSparqlQuery query_submit = new GetSparqlQuery(query);
-        String[] tabsToQuery = {"DetectorModels", "DetectorsH"}; 
+        String[] tabsToQuery = {"DetectorModels", "DetectorModelsH"}; 
 
 	TreeMap<String, SparqlQueryResults> query_results_list = new TreeMap<String, SparqlQueryResults>();
         TreeMap<String, String> hierarchy_results_list = new TreeMap<String, String>();
-        for (String tabName : query_submit.thingTypes){
+        for (String tabName : tabsToQuery){
             String query_json = null;
             if (tabName.endsWith("H")) {
                 System.out.println("DetectorList.java is requesting: " + tabName);
@@ -72,7 +72,7 @@ public class Detector extends Controller {
                     TreeQueryResults query_results = new TreeQueryResults(query_json, false);
                     hierarchy_results_list.put(tabName, query_results.getQueryResult().replace("\n", " "));
                 } catch (IllegalStateException | IOException | NullPointerException e1) {
-                    return notFound(error_page.render(e1.toString(),"DetectorsH"));
+                    return internalServerError(error_page.render(e1.toString(),"DetectorModelsH"));
                     //e1.printStackTrace();
                 }
             } else {
@@ -81,13 +81,13 @@ public class Detector extends Controller {
                     SparqlQueryResults query_results = new SparqlQueryResults(query_json, tabName);
                     query_results_list.put(tabName, query_results);
                 } catch (IllegalStateException | IOException | NullPointerException e1) {
-                    return notFound(error_page.render(e1.toString(), "DetectorsH"));
+                    return internalServerError(error_page.render(e1.toString(), "DetectorModelsH"));
                     //e1.printStackTrace();
                 }
             }// /else
         }// /for
         System.out.println("Detector postIndex() was called!");
-        return ok(hierarchy_browser.render(query_results_list, hierarchy_results_list, "DetectorsH"));       
+        return ok(hierarchy_browser.render(query_results_list, hierarchy_results_list, "DetectorModelsH"));       
     }// /postIndex()
 
 }

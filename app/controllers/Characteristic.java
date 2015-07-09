@@ -31,10 +31,10 @@ public class Characteristic extends Controller {
                 System.out.println("Characteristic.java is requesting: " + tabName);
                 try {
                     query_json = query_submit.executeQuery(tabName);
-                    TreeQueryResults query_results = new TreeQueryResults(query_json, false);
+                    TreeQueryResults query_results = new TreeQueryResults(query_json, true);
                     hierarchy_results_list.put(tabName, query_results.getQueryResult().replace("\n", " "));
                 } catch (IllegalStateException | IOException | NullPointerException e1) {
-                    return notFound(error_page.render(e1.toString(), "CharacteristicsH"));
+                    return internalServerError(error_page.render(e1.toString(), "CharacteristicsH"));
                     //e1.printStackTrace();
                 }
             } else {
@@ -43,7 +43,7 @@ public class Characteristic extends Controller {
                     SparqlQueryResults query_results = new SparqlQueryResults(query_json, tabName);
                     query_results_list.put(tabName, query_results);
                 } catch (IllegalStateException | IOException | NullPointerException e1) {
-                    return notFound(error_page.render(e1.toString(), "CharacteristicsH"));
+                    return internalServerError(error_page.render(e1.toString(), "CharacteristicsH"));
                     //e1.printStackTrace();
                 }
             }// /else
@@ -68,10 +68,10 @@ public class Characteristic extends Controller {
                 System.out.println("Characteristic.java is requesting: " + tabName);
                 try {
                     query_json = query_submit.executeQuery(tabName);
-                    TreeQueryResults query_results = new TreeQueryResults(query_json, false);
+                    TreeQueryResults query_results = new TreeQueryResults(query_json, true);
                     hierarchy_results_list.put(tabName, query_results.getQueryResult().replace("\n", " "));
                 } catch (IllegalStateException | IOException | NullPointerException e1) {
-                    return notFound(error_page.render(e1.toString(), "CharacteristicsH"));
+                    return internalServerError(error_page.render(e1.toString(), "CharacteristicsH"));
                     //e1.printStackTrace();
                 }
             } else {
@@ -80,7 +80,7 @@ public class Characteristic extends Controller {
                     SparqlQueryResults query_results = new SparqlQueryResults(query_json, tabName);
                     query_results_list.put(tabName, query_results);
                 } catch (IllegalStateException | IOException | NullPointerException e1) {
-                    return notFound(error_page.render(e1.toString(), "CharacteristicsH"));
+                    return internalServerError(error_page.render(e1.toString(), "CharacteristicsH"));
                     //e1.printStackTrace();
                 }
             }// /else

@@ -31,22 +31,22 @@ public class Unit extends Controller {
                 System.out.println("Unit.java is requesting: " + tabName);
                 try {
                     query_json = query_submit.executeQuery(tabName);
-                } catch (IllegalStateException | IOException e1) {
-                    return notFound(error_page.render(e1.toString()));
+                    TreeQueryResults query_results = new TreeQueryResults(query_json, true);
+                    hierarchy_results_list.put(tabName, query_results.getQueryResult().replace("\n", " "));
+                } catch (IllegalStateException | IOException | NullPointerException e1) {
+                    return internalServerError(error_page.render(e1.toString(), "UnitsH"));
                     //e1.printStackTrace();
                 }
-                TreeQueryResults query_results = new TreeQueryResults(query_json, false);
-                hierarchy_results_list.put(tabName, query_results.getQueryResult().replace("\n", " "));
             } else {
                 try {
                     query_json = query_submit.executeQuery(tabName);
-                } catch (IllegalStateException | IOException e1) {
-                    return notFound(error_page.render(e1.toString()));
+                    SparqlQueryResults query_results = new SparqlQueryResults(query_json, tabName);
+                    query_results_list.put(tabName, query_results);
+                } catch (IllegalStateException | IOException | NullPointerException e1) {
+                    return internalServerError(error_page.render(e1.toString(), "UnitsH"));
                     //e1.printStackTrace();
                 }
                 //System.out.println(query_json);
-                SparqlQueryResults query_results = new SparqlQueryResults(query_json, tabName);
-                query_results_list.put(tabName, query_results);
             }// /else
         }// /for tabName
         System.out.println("Unit index() was called!");
@@ -69,22 +69,22 @@ public class Unit extends Controller {
                 System.out.println("Unit.java is requesting: " + tabName);
                 try {
                     query_json = query_submit.executeQuery(tabName);
-                } catch (IllegalStateException | IOException e1) {
-                    return notFound(error_page.render(e1.toString()));
+                    TreeQueryResults query_results = new TreeQueryResults(query_json, true);
+                    hierarchy_results_list.put(tabName, query_results.getQueryResult().replace("\n", " "));
+                } catch (IllegalStateException | IOException | NullPointerException e1) {
+                    return internalServerError(error_page.render(e1.toString(), "UnitsH"));
                     //e1.printStackTrace();
                 }
-                TreeQueryResults query_results = new TreeQueryResults(query_json, false);
-                hierarchy_results_list.put(tabName, query_results.getQueryResult().replace("\n", " "));
             } else {
                 try {
                     query_json = query_submit.executeQuery(tabName);
-                } catch (IllegalStateException | IOException e1) {
-                    return notFound(error_page.render(e1.toString()));
+                    SparqlQueryResults query_results = new SparqlQueryResults(query_json, tabName);
+                    query_results_list.put(tabName, query_results);
+                } catch (IllegalStateException | IOException | NullPointerException e1) {
+                    return internalServerError(error_page.render(e1.toString(), "UnitsH"));
                     //e1.printStackTrace();
                 }
                 //System.out.println(query_json);
-                SparqlQueryResults query_results = new SparqlQueryResults(query_json, tabName);
-                query_results_list.put(tabName, query_results);
             }// /else
         }// /for tabName
         System.out.println("Unit postIndex() was called!");

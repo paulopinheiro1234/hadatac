@@ -29,7 +29,7 @@ public class TripleDocument{
 	            }
 	            else {
 	                variable = "[NULL]";
-	                System.out.println("Error getting " + vars.get(i) + " from results " + resultType);
+	                //System.out.println("Error getting " + vars.get(i) + " from results " + resultType);
 	            }
 	        }// /catch
 	        this.items.put(vars.get(i), variable);
@@ -43,8 +43,9 @@ public class TripleDocument{
 	
 	public boolean has(String key){
 	    boolean b = false;
-	    if(this.items.get(key) != null)
+	    if(!(this.items.get(key).equals("[NULL]"))){
 	        b = true;
+	    }
 	    return b;
 	}
 

@@ -1,4 +1,20 @@
 @(triple : models.TripleDocument)
+@*****************************
+  hasURI    | (not used)
+  rdfs:subClassOf   | (not used)
+  rdfs:label    | instModelName
+  vstoi:hasMaker    | maker
+  rdfs:comment  | desc
+  hasImage  | *add*
+  vstoi:numAttachedDetectors    | *add*
+  vstoi:maxDetachableDetectors    | *add*
+  vstoi:maxLoggedMeasurements    | *add*
+  vstoi:minOperatingTemperature    | minTemp
+  vstoi:maxOperatingTemperature    | maxTemp
+  vstoi:hasOperatingTemperatureUnit    | tempUnit
+  vstoi:hasWebDocumentation    | docLink
+
+*****************************@
 
 @defining(triple.generateID()) {itemID =>
 <div class="panel-heading" role="tab" id="heading@itemID">
@@ -9,8 +25,14 @@
 </div>
 <div id="@itemID" class="panel-collapse collapse" role="tabpanel" aria-labelledby="heading@itemID">
     <div class="panel-body">
-        <p><b>@triple.get("instModelName") </b> (manufactured by: @triple.get("maker") )</p>
+        <p><b>@triple.get("instModelName") </b>
+        @if(triple.has("maker")){
+            (manufactured by: <a href="@triple.get("page")">@triple.get("maker")</a> )</p>
+        }</br>
         <p>Description: @triple.get("desc")</p>
+        @if(triple.has("docLink")){
+            <a href="@triple.get("docLink")">See Online Documentation</a>
+        }
     </div>
 </div>
 }

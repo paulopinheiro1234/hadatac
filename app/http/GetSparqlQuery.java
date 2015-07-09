@@ -46,7 +46,9 @@ public class GetSparqlQuery {
     public GetSparqlQuery (SparqlQuery query) {
         //addSparqlUrls();
         addThingTypes();
-        this.collection = "http://jeffersontest.tw.rpi.edu/solr4/store/sparql";
+        //this.collection = "http://jeffersontest.tw.rpi.edu/solr4/store/sparql";
+        this.collection = "https://jeffersonsecure.tw.rpi.edu/solrdf/store/sparql";
+        
         for (String tabName : thingTypes ){
             this.sparql_query = new StringBuffer();
             this.sparql_query.append(collection);
@@ -85,7 +87,7 @@ public class GetSparqlQuery {
     //    all thingType queries to their own separate pages.
     public GetSparqlQuery (SparqlQuery query, String tabName) {
         //this.collection = "http://jeffersontest.tw.rpi.edu/solr4/store/sparql";
-	this.collection = "https://jeffersonsecure.tw.rpi.edu/solrdf/store/sparql";
+	    this.collection = "https://jeffersonsecure.tw.rpi.edu/solrdf/store/sparql";
         this.sparql_query = new StringBuffer();
         this.sparql_query.append(collection);
         this.sparql_query.append("?q=");
@@ -119,7 +121,7 @@ public class GetSparqlQuery {
         thingTypes[8] = "EntitiesH";
         thingTypes[9] = "OrganizationsH";
         thingTypes[10] = "PeopleH";
-        thingTypes[11] = "DetectorsH";
+        thingTypes[11] = "DetectorModelsH";
         thingTypes[12] = "CharacteristicsH";
         thingTypes[13] = "PlatformModelsH";
         thingTypes[14] = "UnitsH";
@@ -144,14 +146,15 @@ public class GetSparqlQuery {
                 break;
             case "PlatformModels" : 
                 q = "PREFIX rdfs:<http://www.w3.org/2000/01/rdf-schema#>" + 
+                    "PREFIX foaf:<http://xmlns.com/foaf/0.1/>" + 
                     "PREFIX owl: <http://www.w3.org/2002/07/owl#>" + 
                     "PREFIX vstoi: <http://jefferson.tw.rpi.edu/ontology/vstoi#>" +
                     "SELECT ?platModelName ?maker ?desc WHERE {" +
                     "    ?platModel rdfs:subClassOf+" + 
                     "    <http://jefferson.tw.rpi.edu/ontology/vstoi#Platform>  ." + 
                     "    ?platModel rdfs:label ?platModelName ." + 
-                    "    OPTIONAL { ?platModel vstoi:hasMaker ?m } ." +
-                    "               ?m vstoi:hasMaker ?maker } ." + 
+                    "    OPTIONAL { ?platModel vstoi:hasMaker ?m ." +
+                    "               ?m foaf:name ?maker } ." + 
                     "    OPTIONAL { ?platModel rdfs:comment ?desc } ." + 
                     "}";
                 break;
@@ -173,13 +176,18 @@ public class GetSparqlQuery {
                     "PREFIX foaf:<http://xmlns.com/foaf/0.1/>" + 
                     "PREFIX owl: <http://www.w3.org/2002/07/owl#>" + 
                     "PREFIX vstoi: <http://jefferson.tw.rpi.edu/ontology/vstoi#>" +
-                    "SELECT ?instModelName ?maker ?desc WHERE {" +
+                    "SELECT ?instModelName ?maker ?desc ?page ?minTemp ?maxTemp ?tempUnit ?docLink WHERE {" +
                     "    ?instModel rdfs:subClassOf+" + 
                     "    <http://jefferson.tw.rpi.edu/ontology/vstoi#Instrument>  ." + 
                     "    ?instModel rdfs:label ?instModelName ." + 
                     "    OPTIONAL { ?instModel vstoi:hasMaker ?m ." +
+                    "               ?m foaf:homepage ?page ." +
                     "               ?m foaf:name ?maker } ." +
+                    "    OPTIONAL { ?instModel vstoi:minOperatingTemperature ?minTemp ." +
+                    "               ?instModel vstoi:maxOperatingTemperature ?maxTemp ." +
+                    "               ?instModel vstoi:hasOperatingTemperatureUnit ?tempUnit } ." +
                     "    OPTIONAL { ?instModel rdfs:comment ?desc } ." + 
+                    "    OPTIONAL { ?instModel vstoi:hasWebDocumentation ?docLink } ." + 
                     "}";
                 break;
             case "Detectors" : 
@@ -197,15 +205,16 @@ public class GetSparqlQuery {
                 break;
             case "DetectorModels" : 
                 q = "PREFIX rdfs:<http://www.w3.org/2000/01/rdf-schema#>" + 
+                    "PREFIX foaf:<http://xmlns.com/foaf/0.1/>" + 
                     "PREFIX owl: <http://www.w3.org/2002/07/owl#>" + 
                     "PREFIX vstoi: <http://jefferson.tw.rpi.edu/ontology/vstoi#>" +
                     "PREFIX vsto: <http://jefferson.tw.rpi.edu/ontology/vsto-instrument#>" +
-                    "SELECT ?detModelName ?maker ?desc ?chara WHERE {" +
+                    "SELECT ?detModelName ?maker ?desc WHERE {" +
                     "    ?detModel rdfs:subClassOf+" + 
                     "    <http://jefferson.tw.rpi.edu/ontology/vstoi#Detector>  ." + 
                     "    ?detModel rdfs:label ?detModelName ." + 
-                    "    OPTIONAL { ?detModel vsto:hasMeasuredCharacteristic ?chara } ." +
-                    "    OPTIONAL { ?detModel vstoi:hasMaker ?maker } ." + 
+                    "    OPTIONAL { ?detModel vstoi:hasMaker ?m ." +
+                    "               ?m foaf:name ?maker } ." + 
                     "    OPTIONAL { ?detModel rdfs:comment ?desc } ." + 
                     "}";
                 break;
@@ -259,7 +268,7 @@ public class GetSparqlQuery {
             		"  OPTIONAL { ?agent foaf:member ?member . } " +
             		"}";
                 break;
-            case "DetectorsH" : 
+            case "DetectorModelsH" : 
                 q = "PREFIX rdfs:<http://www.w3.org/2000/01/rdf-schema#>" + 
                     "PREFIX owl: <http://www.w3.org/2002/07/owl#>" + 
                 	"SELECT ?modelName ?superModelName WHERE { " + 
@@ -320,12 +329,12 @@ public class GetSparqlQuery {
         try {
         	HttpClient client = new DefaultHttpClient();
         	HttpGet request = new HttpGet(list_of_queries.get(tab).toString().replace(" ", "%20"));
-        	//System.out.println(tab + " : " + list_of_queries.get(tab));
+        	System.out.println(tab + " : " + list_of_queries.get(tab));
         	request.setHeader("Accept", "application/sparql-results+json");
         	HttpResponse response = client.execute(request);
             StringWriter writer = new StringWriter();
             IOUtils.copy(response.getEntity().getContent(), writer, "utf-8");
-            //System.out.println("response: " + response);    
+            System.out.println("response: " + response);    
             return writer.toString();
         } finally
         {
