@@ -1,0 +1,32 @@
+.panel-group {
+    height: 550px;
+    overflow-y: auto;
+}
+
+.info-box{
+    width:300px;
+    height:250px;
+    float:right;
+    border-style:dashed;
+    border-color:#ccc;
+    color:#333;
+}
+
+.thumbnail{
+    float:left;
+}
+
+.hidetip{
+    display:none;
+}
+
+.infobox{
+    position:fixed;
+    width:400px;
+    height:550px;
+    overflow-y:auto;
+    top:150px;
+    right:50px;
+    border-style:dashed;
+    border-color:#ccc
+}

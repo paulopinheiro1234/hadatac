@@ -176,7 +176,7 @@ public class GetSparqlQuery {
                     "PREFIX foaf:<http://xmlns.com/foaf/0.1/>" + 
                     "PREFIX owl: <http://www.w3.org/2002/07/owl#>" + 
                     "PREFIX vstoi: <http://jefferson.tw.rpi.edu/ontology/vstoi#>" +
-                    "SELECT ?instModelName ?maker ?desc ?page ?minTemp ?maxTemp ?tempUnit ?docLink WHERE {" +
+                    "SELECT ?instModelName ?maker ?desc ?page ?minTemp ?maxTemp ?tempUnit ?docLink ?numAtt ?numDet ?maxLog WHERE {" +
                     "    ?instModel rdfs:subClassOf+" + 
                     "    <http://jefferson.tw.rpi.edu/ontology/vstoi#Instrument>  ." + 
                     "    ?instModel rdfs:label ?instModelName ." + 
@@ -187,6 +187,9 @@ public class GetSparqlQuery {
                     "               ?instModel vstoi:maxOperatingTemperature ?maxTemp ." +
                     "               ?instModel vstoi:hasOperatingTemperatureUnit ?tempUnit } ." +
                     "    OPTIONAL { ?instModel rdfs:comment ?desc } ." + 
+                    "    OPTIONAL { ?instModel vstoi:numAttachedDetectors ?numAtt } ." +
+                    "    OPTIONAL { ?instModel vstoi:maxDetachableDetectors ?numDet } ." +
+                    "    OPTIONAL { ?instModel vstoi:maxLoggedMeasurements ?maxLog } ." +
                     "    OPTIONAL { ?instModel vstoi:hasWebDocumentation ?docLink } ." + 
                     "}";
                 break;

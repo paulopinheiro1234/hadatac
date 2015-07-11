@@ -15,6 +15,7 @@ var force = d3.layout.force()
 var drag = force.drag()
     .on("dragstart", dragstart);
 
+// This is the tooltip!
 var tip = d3.tip()
   .attr('class', 'd3-tip')
   .offset([-10, 0])
@@ -25,6 +26,7 @@ var tip = d3.tip()
            "<strong>website:</strong> <span style='color:black'>" + " " + "</span><br>";  
            
   })
+
 
 var svg = d3.select("body").append("svg")
     .attr("width", width)
@@ -57,8 +59,17 @@ node = node.data(graph.nodes)
     .attr("r", 12)
     .style("fill", function(d) { return color(d.group); })
     .on("dblclick", dblclick)
-    .on('mouseover', tip.show)
-    .on('mouseout', tip.hide)
+    //.on('mouseover', tip.show)
+    //.on('mouseout', tip.hide)
+    .on('mouseover', function(d,i){
+	var content =
+           "<strong>Name:</strong> <span style='color:black'>" + d.name + "</span><br>" +
+           "<strong>Description:</strong> <span style='color:black'>" + " " + "</span><br>" + 
+           "<strong>e-Mail:</strong> <span style='color:black'>" + d.email + "</span><br>"  +
+           "<strong>website:</strong> <span style='color:black'>" + " " + "</span><br>";  
+	document.getElementById("info").innerHTML = content;
+	//document.getElementById("info").removeClass("hidetip");
+    })
     .call(drag);
 
 node.append("text")
