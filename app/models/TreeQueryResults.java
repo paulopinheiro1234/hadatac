@@ -79,7 +79,7 @@ public class TreeQueryResults extends QueryResults{
 		    		}
 		    	}
 		    }
-            //System.out.println("model Name = <"+ modelN + " , " + superN + ">"); 
+            System.out.println("model Name = <"+ modelN + " , " + superN + ">"); 
 		}
 		//System.out.println("JSON RESULTANTE: <" + newTree.toJson(0) + ">");
     }// /public TreeQueryResults

@@ -24,7 +24,7 @@
                         <div><p>(click for more information)</p></div>
                             <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
                                 <div class="panel panel-default">
-                                    @for(triple <- query_results.triples_list){
+                                    @for((k, triple) <- query_results.triples_list){
                                         @instrument_model_entry(triple) 
                                     }
                                 </div>
@@ -51,6 +51,7 @@
         }
         </div>
       </div>
+    </div>
     </div>
     </div>
 }

@@ -135,13 +135,15 @@ public class GetSparqlQuery {
                 q = "PREFIX rdfs:<http://www.w3.org/2000/01/rdf-schema#> " + 
                     "PREFIX owl: <http://www.w3.org/2002/07/owl#> " + 
                     "PREFIX vstoi: <http://jefferson.tw.rpi.edu/ontology/vstoi#> " + 
-                    "SELECT ?platName ?platModelName ?sn WHERE {" +
+                    "SELECT ?name ?modelName ?sn ?lat ?lng WHERE {" +
                     "    ?platModel rdfs:subClassOf+" + 
                     "    <http://jefferson.tw.rpi.edu/ontology/vstoi#Platform>  ." + 
                     "    ?plat a ?platModel ." +
-                    "    ?platModel rdfs:label ?platModelName ." +
-                    "    ?plat rdfs:label ?platName ." + 
-                    "    ?plat vstoi:hasSerialNumber ?sn ." + 
+                    "    ?platModel rdfs:label ?modelName ." +
+                    "    ?plat rdfs:label ?name ." + 
+                    "    OPTIONAL {?plat vstoi:hasSerialNumber ?sn } ." + 
+                    "    OPTIONAL { ?platModel vstoi:hasX ?lat ." +
+                    "               ?platModel vstoi:hasY ?lng } ." +
                     "}";
                 break;
             case "PlatformModels" : 
@@ -162,13 +164,13 @@ public class GetSparqlQuery {
                 q = "PREFIX rdfs:<http://www.w3.org/2000/01/rdf-schema#>" +
                     "PREFIX owl: <http://www.w3.org/2002/07/owl#>" +
                     "PREFIX vstoi: <http://jefferson.tw.rpi.edu/ontology/vstoi#>" +
-                    "SELECT ?instName ?instModelName ?sn WHERE {" +
+                    "SELECT ?inst ?name ?modelName ?sn WHERE {" +
                     " ?instModel rdfs:subClassOf+" +
                     " <http://jefferson.tw.rpi.edu/ontology/vstoi#Instrument> ." +
                     " ?inst a ?instModel ." +
-                    " ?inst rdfs:label ?instName ." +
+                    " ?inst rdfs:label ?name ." +
                     " OPTIONAL { ?inst vstoi:hasSerialNumber ?sn } ." +
-                    " ?instModel rdfs:label ?instModelName ." +
+                    " ?instModel rdfs:label ?modelName ." +
                     "}";
                 break;
             case "InstrumentModels" : 
@@ -176,10 +178,10 @@ public class GetSparqlQuery {
                     "PREFIX foaf:<http://xmlns.com/foaf/0.1/>" + 
                     "PREFIX owl: <http://www.w3.org/2002/07/owl#>" + 
                     "PREFIX vstoi: <http://jefferson.tw.rpi.edu/ontology/vstoi#>" +
-                    "SELECT ?instModelName ?maker ?desc ?page ?minTemp ?maxTemp ?tempUnit ?docLink ?numAtt ?numDet ?maxLog WHERE {" +
+                    "SELECT ?modelName ?maker ?desc ?page ?minTemp ?maxTemp ?tempUnit ?docLink ?numAtt ?numDet ?maxLog WHERE {" +
                     "    ?instModel rdfs:subClassOf+" + 
                     "    <http://jefferson.tw.rpi.edu/ontology/vstoi#Instrument>  ." + 
-                    "    ?instModel rdfs:label ?instModelName ." + 
+                    "    ?instModel rdfs:label ?modelName ." + 
                     "    OPTIONAL { ?instModel vstoi:hasMaker ?m ." +
                     "               ?m foaf:homepage ?page ." +
                     "               ?m foaf:name ?maker } ." +
@@ -212,13 +214,15 @@ public class GetSparqlQuery {
                     "PREFIX owl: <http://www.w3.org/2002/07/owl#>" + 
                     "PREFIX vstoi: <http://jefferson.tw.rpi.edu/ontology/vstoi#>" +
                     "PREFIX vsto: <http://jefferson.tw.rpi.edu/ontology/vsto-instrument#>" +
-                    "SELECT ?detModelName ?maker ?desc WHERE {" +
+                    "SELECT ?modelName ?maker ?desc ?page ?docLink WHERE {" +
                     "    ?detModel rdfs:subClassOf+" + 
                     "    <http://jefferson.tw.rpi.edu/ontology/vstoi#Detector>  ." + 
-                    "    ?detModel rdfs:label ?detModelName ." + 
+                    "    ?detModel rdfs:label ?modelName ." + 
                     "    OPTIONAL { ?detModel vstoi:hasMaker ?m ." +
-                    "               ?m foaf:name ?maker } ." + 
+                    "               ?m foaf:name ?maker ." + 
+                    "               ?m foaf:homepage ?page } ." + 
                     "    OPTIONAL { ?detModel rdfs:comment ?desc } ." + 
+                    "    OPTIONAL { ?instModel vstoi:hasWebDocumentation ?docLink } ." + 
                     "}";
                 break;
             case "Entities" : 
@@ -232,7 +236,7 @@ public class GetSparqlQuery {
                     "}";
                 break;
             case "InstrumentModelsH" : 
-                q = "PREFIX rdfs:<http://www.w3.org/2000/01/rdf-schema#>" + 
+                    q = "PREFIX rdfs:<http://www.w3.org/2000/01/rdf-schema#>" + 
                     "PREFIX owl: <http://www.w3.org/2002/07/owl#>" + 
                 	"SELECT ?modelName ?superModelName WHERE { " + 
                     "   ?model rdfs:subClassOf* <http://jefferson.tw.rpi.edu/ontology/vstoi#Instrument> . " + 
@@ -240,6 +244,26 @@ public class GetSparqlQuery {
                 	"   OPTIONAL { ?model rdfs:label ?modelName }  " + 
                 	"   OPTIONAL { ?superModel rdfs:label ?superModelName }  " +
                 	"}";
+                /*q = "PREFIX rdfs:<http://www.w3.org/2000/01/rdf-schema#>" + 
+                    "PREFIX foaf:<http://xmlns.com/foaf/0.1/>" + 
+                    "PREFIX owl: <http://www.w3.org/2002/07/owl#>" + 
+                    "PREFIX vstoi: <http://jefferson.tw.rpi.edu/ontology/vstoi#>" +
+                    "SELECT ?modelName ?superModelName ?maker ?desc ?page ?minTemp ?maxTemp ?tempUnit ?docLink ?numAtt ?numDet ?maxLog WHERE {" +
+                    "   ?model rdfs:subClassOf* <http://jefferson.tw.rpi.edu/ontology/vstoi#Instrument> . " + 
+                    "   ?model rdfs:subClassOf ?superModel .  " + 
+                    "   ?model rdfs:label ?modelName ." + 
+                    "   OPTIONAL { ?model vstoi:hasMaker ?m ." +
+                    "              ?m foaf:homepage ?page ." +
+                    "              ?m foaf:name ?maker } ." +
+                    "   OPTIONAL { ?model vstoi:minOperatingTemperature ?minTemp ." +
+                    "              ?model vstoi:maxOperatingTemperature ?maxTemp ." +
+                    "              ?model vstoi:hasOperatingTemperatureUnit ?tempUnit } ." +
+                    "   OPTIONAL { ?model rdfs:comment ?desc } ." + 
+                    "   OPTIONAL { ?model vstoi:numAttachedDetectors ?numAtt } ." +
+                    "   OPTIONAL { ?model vstoi:maxDetachableDetectors ?numDet } ." +
+                    "   OPTIONAL { ?model vstoi:maxLoggedMeasurements ?maxLog } ." +
+                    "   OPTIONAL { ?model vstoi:hasWebDocumentation ?docLink } ." + 
+                    "}";*/
                 break;
             case "EntitiesH" : 
                 q = "PREFIX rdfs:<http://www.w3.org/2000/01/rdf-schema#>" + 

@@ -13,21 +13,20 @@
   vstoi:maxOperatingTemperature    | maxTemp
   vstoi:hasOperatingTemperatureUnit    | tempUnit
   vstoi:hasWebDocumentation    | docLink
-
 *****************************@
 
 @defining(triple.generateID()) {itemID =>
 <div class="panel-heading" role="tab" id="heading@itemID">
     <h4 class="panel-title">
         <a class="collapsed" role="button" data-toggle="collapse" data-parent="#accordion" href="#@itemID" aria-expanded="false" aria-controls="@itemID">
-            @triple.get("instModelName")</a></h4>
+            @triple.get("modelName")</a></h4>
         
 </div>
 <div id="@itemID" class="panel-collapse collapse" role="tabpanel" aria-labelledby="heading@itemID">
     <div class="panel-body">
-        <h4>@triple.get("instModelName") </h4>
+        <h4>@triple.get("modelName") </h4>
         <img class="thumbnail" src="/hadatac/assets/images/placeholder200.png">
-        <div class="info-box">
+        <div class="table-info">
             <b>Technical Details</b>
             @if(triple.has("minTemp")){
                 <p>Operational between @triple.get("minTemp") and @triple.get("maxTemp") @triple.get("tempUnit").</p>

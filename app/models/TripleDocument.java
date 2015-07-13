@@ -8,12 +8,14 @@ import com.fasterxml.jackson.databind.JsonNode;
 public class TripleDocument{
 	public TreeMap<String,String> items = new TreeMap<String,String>();
 	public String resultType;
+	private ArrayList<String> vars;
 	private int numVars;
 	
 	public TripleDocument() {}
 	
 	public TripleDocument(JsonNode node, ArrayList<String> vars, String resultType) {
 	    this.resultType = resultType;
+	    this.vars = vars;
 	    this.numVars = vars.size();
 	    String variable;
 	    for( int i = 0; i < this.numVars; i++){
@@ -42,10 +44,7 @@ public class TripleDocument{
 	}
 	
 	public boolean has(String key){
-	    boolean b = false;
-	    if(!(this.items.get(key).equals("[NULL]"))){
-	        b = true;
-	    }
+	    boolean b = this.vars.contains(key);
 	    return b;
 	}
 

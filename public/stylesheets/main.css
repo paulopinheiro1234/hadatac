@@ -3,7 +3,7 @@
     overflow-y: auto;
 }
 
-.info-box{
+.table-info{
     width:300px;
     height:250px;
     float:right;
@@ -22,11 +22,11 @@
 
 .infobox{
     position:fixed;
-    width:400px;
+    width:340px;
     height:550px;
     overflow-y:auto;
     top:150px;
-    right:50px;
+    right:30px;
     border-style:dashed;
     border-color:#ccc
 }
