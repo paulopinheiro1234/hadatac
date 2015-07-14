@@ -8,6 +8,7 @@ import java.util.TreeMap;
 import models.SparqlQuery;
 import models.SparqlQueryResults;
 import models.TreeQueryResults;
+import models.BundledResults;
 import play.mvc.Controller;
 import play.mvc.Result;
 import views.html.hierarchy_browser;
@@ -20,36 +21,20 @@ public class Platform extends Controller {
     public static Result index() {
         SparqlQuery query = new SparqlQuery();
         GetSparqlQuery query_submit = new GetSparqlQuery(query);
-	    String[] tabsToQuery = {"PlatformModels", "PlatformModelsH"}; 
-
-    	TreeMap<String, SparqlQueryResults> query_results_list = new TreeMap<String, SparqlQueryResults>();
-        TreeMap<String, String> hierarchy_results_list = new TreeMap<String, String>();
-        for (String tabName : tabsToQuery){
-            String query_json = null;
-            if (tabName.endsWith("H")) {
-                System.out.println("Platform.java is requesting: " + tabName);
-                try {
-                    query_json = query_submit.executeQuery(tabName);
-                    TreeQueryResults query_results = new TreeQueryResults(query_json, false);
-                    hierarchy_results_list.put(tabName, query_results.getQueryResult().replace("\n", " "));
-                } catch (IllegalStateException | IOException | NullPointerException e1) {
-                    return internalServerError(error_page.render(e1.toString(), "PlatformModelsH"));
-                    //e1.printStackTrace();
-                }
-            } else {
-                try {
-                    query_json = query_submit.executeQuery(tabName);
-                    SparqlQueryResults query_results = new SparqlQueryResults(query_json, tabName);
-                    query_results_list.put(tabName, query_results);
-                } catch (IllegalStateException | IOException | NullPointerException e1) {
-                    return internalServerError(error_page.render(e1.toString(), "PlatformModelsH"));
-                    //e1.printStackTrace();
-                }
-            }// /else
-        }// /for tabName
+        BundledResults theResults;
+	    String tabName = "PlatformModels";
+    	String query_json = null;
+        System.out.println("Platform.java is requesting: " + tabName);
+        try {
+            query_json = query_submit.executeQuery(tabName);
+            //System.out.println("query_json = " + query_json);
+            theResults = new BundledResults(query_json, false);
+        } catch (IllegalStateException | IOException | NullPointerException e1) {
+            return internalServerError(error_page.render(e1.toString(), tabName));
+            //e1.printStackTrace();
+        }
         System.out.println("Platform index() was called!");
-        //String tree_query_result = tq.getQueryResult().replace("\n", " ");
-        return ok(hierarchy_browser.render(query_results_list, hierarchy_results_list, "PlatformModelsH"));
+        return ok(hierarchy_browser.render(theResults, tabName));
     }// /index()
 
 
@@ -57,36 +42,20 @@ public class Platform extends Controller {
     public static Result postIndex() {
         SparqlQuery query = new SparqlQuery();
         GetSparqlQuery query_submit = new GetSparqlQuery(query);
-	    String[] tabsToQuery = {"PlatformModels", "PlatformModelsH"}; 
-
-    	TreeMap<String, SparqlQueryResults> query_results_list = new TreeMap<String, SparqlQueryResults>();
-        TreeMap<String, String> hierarchy_results_list = new TreeMap<String, String>();
-        for (String tabName : tabsToQuery){
-            String query_json = null;
-            if (tabName.endsWith("H")) {
-                System.out.println("Platform.java is requesting: " + tabName);
-                try {
-                    query_json = query_submit.executeQuery(tabName);
-                    TreeQueryResults query_results = new TreeQueryResults(query_json, false);
-                    hierarchy_results_list.put(tabName, query_results.getQueryResult().replace("\n", " "));
-                } catch (IllegalStateException | IOException | NullPointerException e1) {
-                    return internalServerError(error_page.render(e1.toString(), "PlatformModelsH"));
-                    //e1.printStackTrace();
-                }
-            } else {
-                try {
-                    query_json = query_submit.executeQuery(tabName);
-                    SparqlQueryResults query_results = new SparqlQueryResults(query_json, tabName);
-                    query_results_list.put(tabName, query_results);
-                } catch (IllegalStateException | IOException | NullPointerException e1) {
-                    return internalServerError(error_page.render(e1.toString(), "PlatformModelsH"));
-                    //e1.printStackTrace();
-                }
-            }// /else
-        }// /for tabName
+        BundledResults theResults;
+	    String tabName = "PlatformModels";
+    	String query_json = null;
+        System.out.println("Platform.java is requesting: " + tabName);
+        try {
+            query_json = query_submit.executeQuery(tabName);
+            //System.out.println("query_json = " + query_json);
+            theResults = new BundledResults(query_json, false);
+        } catch (IllegalStateException | IOException | NullPointerException e1) {
+            return internalServerError(error_page.render(e1.toString(), tabName));
+            //e1.printStackTrace();
+        }
         System.out.println("Platform postIndex() was called!");
-        //String tree_query_result = tq.getQueryResult().replace("\n", " ");
-        return ok(hierarchy_browser.render(query_results_list, hierarchy_results_list, "PlatformModelsH"));
+        return ok(hierarchy_browser.render(theResults, tabName));
     }// /postIndex()
 
 }

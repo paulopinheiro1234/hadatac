@@ -2,7 +2,7 @@
  
    <p>
        <B>Options</B>: 
-	   @if(selection == "PlatformModelsH") {
+	   @if(selection == "PlatformModels") {
           	<a href="@routes.Platform.index()" class="btn btn-warning" role="button">Platform Model<br>Hierarchy</a>
        } else {
           	<a href="@routes.Platform.index()" class="btn btn-primary" role="button">Platform Model<br>Hierarchy</a>
@@ -12,7 +12,7 @@
        } else {
        		<a href="@routes.PlatformList.index()" class="btn btn-primary" role="button">Platform<br>List</a>
        }
-	   @if(selection == "InstrumentModelsH") {
+	   @if(selection == "InstrumentModels") {
        		<a href="@routes.Instrument.index()" class="btn btn-warning" role="button">Instrument Model<br>Hierarchy</a>
        } else {
        		<a href="@routes.Instrument.index()" class="btn btn-primary" role="button">Instrument Model<br>Hierarchy</a>
@@ -22,7 +22,7 @@
        } else {
        		<a href="@routes.InstrumentList.index()" class="btn btn-primary" role="button">Instrument<br>List</a>
        }
-	   @if(selection == "DetectorModelsH") {
+	   @if(selection == "DetectorModels") {
        		<a href="@routes.Detector.index()" class="btn btn-warning" role="button">Detector Model<br>Hierarchy</a>
        } else {
        		<a href="@routes.Detector.index()" class="btn btn-primary" role="button">Detector Model<br>Hierarchy</a>
@@ -32,17 +32,17 @@
        } else {
        		<a href="@routes.DetectorList.index()" class="btn btn-primary" role="button">Detector<br>List</a>
        }
-	   @if(selection == "EntitiesH") {
+	   @if(selection == "Entities") {
        		<a href="@routes.Entity.index()" class="btn btn-warning" role="button">Entity<br>Hierarchy</a>
        } else {
        		<a href="@routes.Entity.index()" class="btn btn-primary" role="button">Entity<br>Hierarchy</a>
        }
-	   @if(selection == "CharacteristicsH") {
+	   @if(selection == "Characteristics") {
        		<a href="@routes.Characteristic.index()" class="btn btn-warning" role="button">Characteristic<br>Hierarchy</a>
        } else {
        		<a href="@routes.Characteristic.index()" class="btn btn-primary" role="button">Characteristic<br>Hierarchy</a>
        }
-	   @if(selection == "UnitsH") {
+	   @if(selection == "Units") {
        		<a href="@routes.Unit.index()" class="btn btn-warning" role="button">Unit<br>Hierarchy</a>
        } else {
        		<a href="@routes.Unit.index()" class="btn btn-primary" role="button">Unit<br>Hierarchy</a>

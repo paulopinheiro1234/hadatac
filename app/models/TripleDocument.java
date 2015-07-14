@@ -7,14 +7,14 @@ import com.fasterxml.jackson.databind.JsonNode;
 
 public class TripleDocument{
 	public TreeMap<String,String> items = new TreeMap<String,String>();
-	public String resultType;
+	//public String resultType;
 	private ArrayList<String> vars;
 	private int numVars;
 	
 	public TripleDocument() {}
 	
-	public TripleDocument(JsonNode node, ArrayList<String> vars, String resultType) {
-	    this.resultType = resultType;
+	public TripleDocument(JsonNode node, ArrayList<String> vars) {
+	    //this.resultType = resultType;
 	    this.vars = vars;
 	    this.numVars = vars.size();
 	    String variable;
@@ -23,14 +23,16 @@ public class TripleDocument{
 	        try {
 	            if(node.get(vars.get(i)).hasNonNull("value"))
 	                variable = node.get(vars.get(i)).get("value").asText();
+	                if(variable.contains("#"))
+	                    variable = prettyFromURI(variable);
 	                //System.out.println("read: " + vars.get(i) + " = " + variable);
 	        } catch (NullPointerException e){
 	            if(vars.get(i).equals("sn")) {
 	                variable = generateID();
-	                System.out.println(resultType + " is missing a serial number! " + variable + " generated as placeholder");
+	                //System.out.println(resultType + " is missing a serial number! " + variable + " generated as placeholder");
 	            }
 	            else {
-	                variable = "[NULL]";
+	                variable = "";
 	                //System.out.println("Error getting " + vars.get(i) + " from results " + resultType);
 	            }
 	        }// /catch
@@ -46,6 +48,21 @@ public class TripleDocument{
 	public boolean has(String key){
 	    boolean b = this.vars.contains(key);
 	    return b;
+	}
+	
+	private static String prettyFromURI (String origURI) {
+		if (!origURI.contains("#"))
+			return origURI;
+		String pretty = origURI.substring(origURI.indexOf('#') + 1);
+		String prettyFinal = "" + pretty.charAt(0);
+		for (int pos = 1; pos < pretty.length(); pos++) {
+			if (Character.isLowerCase(pretty.charAt(pos - 1)) && Character.isUpperCase(pretty.charAt(pos))) {
+				prettyFinal = prettyFinal + " " + pretty.charAt(pos);
+			} else {
+				prettyFinal = prettyFinal + pretty.charAt(pos);
+			}
+		}
+		return prettyFinal;
 	}
 
     // The accordion menus for results are composed of two div elements

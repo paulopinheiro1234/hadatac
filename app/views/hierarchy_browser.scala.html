@@ -1,6 +1,11 @@
-@( documentMap : Map[String,models.SparqlQueryResults],
-   documentHierarchy : Map[String,String],
+@( results : models.BundledResults,
    category : String)
+
+@*****************************
+	public TreeMap<String,TripleDocument> sparqlResults;
+    public String treeResults;
+    public String json;
+*****************************@
 
 @import helper._
 
@@ -10,135 +15,75 @@
         <div class="col-sm-9 col-md-10 main">
 		  @metadata_navigation(category)
             <ul class="nav nav-tabs">
-                @for((thingType, query_results) <- documentMap){
-                    <li class="active"><a data-toggle="tab" href="#@thingType">View as Table</a></li>
-                }
-                @for((thingType, tree_results) <- documentHierarchy){
-                    <li><a data-toggle="tab" href="#@thingType">View as Hierarchy</a></li>
-                }
+                <li class="active"><a data-toggle="tab" href="#table">View as Table</a></li>
+                @if(results.treeResults != null){ <li><a data-toggle="tab" href="#tree">View as Hierarchy</a></li> }
             </ul>
             <div class = "tab-content">
             @*<div id="info" class="infobox"></div>*@
-            @for((thingType, query_results) <- documentMap) {
-                @thingType match{
-                    case "InstrumentModels" => { 
-                        <div id="@thingType" class="tab-pane fade in active">
-                            <div><p>(click for more information)</p></div>
-                                <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
-                                    <div class="panel panel-default">
-                                        @for((k, triple) <- query_results.triples_list){
-                                            @instrument_model_entry(triple) 
-                                        }
-                                    </div>
-                                </div>
+
+            <div id="table" class="tab-pane fade in active">
+                <div><p>(click for more information)</p></div>
+                    <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
+                        <div class="panel panel-default">
+                        @category match{
+                            case "InstrumentModels" => {
+                                @for((k, triple) <- results.sparqlResults){
+                                    @instrument_model_entry(triple) 
+                                }
+                            }
+                            case "Instruments" => { 
+                                @for((k, triple) <- results.sparqlResults){
+                                    @instrument_entry(triple) 
+                                }
+                            }
+                            case "DetectorModels" => { 
+                                @for((k, triple) <- results.sparqlResults){
+                                    @detector_model_entry(triple)
+                                }
+                            }
+                            case "Detectors" => { 
+                                @for((k, triple) <- results.sparqlResults){
+                                    @detector_entry(triple) 
+                                }
+                            }
+                            case "PlatformModels" => { 
+                                @for((k, triple) <- results.sparqlResults){
+                                    @platform_model_entry(triple) 
+                                }
+                            }
+                            case "Platforms" => { 
+                                @for((k, triple) <- results.sparqlResults){
+                                    @platform_entry(triple)
+                                }
+                            }
+                            case "Entities" => { 
+                                @for((k, triple) <- results.sparqlResults){
+                                    @*@entity_entry(triple) *@
+                                    @placeholder_entry(triple)
+                                }
+                            }
+                            case "Characteristics" => { 
+                                @for((k, triple) <- results.sparqlResults){
+                                    @*@characteristic_entry(triple) *@
+                                    @placeholder_entry(triple)
+                                }
+                            }
+                            case "Units" => { 
+                                @for((k, triple) <- results.sparqlResults){
+                                    @*@unit_entry(triple) *@
+                                    @placeholder_entry(triple)
+                                }
+                            }
+                            case _ => {
+                            }
+                        }
                         </div>
-                    }
-                    case "Instruments" => { 
-                        <div id="@thingType" class="tab-pane fade in active">
-                            <div><p>(click for more information)</p></div>
-                                <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
-                                    <div class="panel panel-default">
-                                        @for((k, triple) <- query_results.triples_list){
-                                            @instrument_entry(triple) 
-                                        }
-                                    </div>
-                                </div>
-                        </div>
-                    }
-                    case "DetectorModels" => { 
-                        <div id="@thingType" class="tab-pane fade in">
-                            <div><p>(click for more information)</p></div>
-                                <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
-                                    <div class="panel panel-default">
-                                        @for((k, triple) <- query_results.triples_list){
-                                            @detector_model_entry(triple)
-                                        }
-                                    </div>
-                                </div>
-                        </div>
-                    }
-                    case "Detectors" => { 
-                        <div id="@thingType" class="tab-pane fade in active">
-                            <div><p>(click for more information)</p></div>
-                                <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
-                                    <div class="panel panel-default">
-                                        @for((k, triple) <- query_results.triples_list){
-                                            @detector_entry(triple) 
-                                        }
-                                    </div>
-                                </div>
-                        </div>
-                    }
-                    case "PlatformModels" => { 
-                        <div id="@thingType" class="tab-pane fade in">
-                            <div><p>(click for more information)</p></div>
-                                <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
-                                    <div class="panel panel-default">
-                                        @for((k, triple) <- query_results.triples_list){
-                                            @platform_model_entry(triple) 
-                                        }
-                                    </div>
-                                </div>
-                        </div>
-                    }
-                    case "Platforms" => { 
-                        <div id="@thingType" class="tab-pane fade in active">
-                            <div><p>(click for more information)</p></div>
-                                <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
-                                    <div class="panel panel-default">
-                                        @for((k, triple) <- query_results.triples_list){
-                                            @platform_entry(triple)
-                                        }
-                                    </div>
-                                </div>
-                        </div>
-                    }
-                    case "Entities" => { 
-                        <div id="@thingType" class="tab-pane fade in">
-                            <div><p>(click for more information)</p></div>
-                                <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
-                                    <div class="panel panel-default">
-                                        @for((k, triple) <- query_results.triples_list){
-                                            @*@entity_entry(triple) *@
-                                            @placeholder_entry(triple)
-                                        }
-                                    </div>
-                                </div>
-                        </div>
-                    }
-                    case "Characteristics" => { 
-                        <div id="@thingType" class="tab-pane fade in">
-                            <div><p>(click for more information)</p></div>
-                                <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
-                                    <div class="panel panel-default">
-                                        @for((k, triple) <- query_results.triples_list){
-                                            @*@characteristic_entry(triple) *@
-                                            @placeholder_entry(triple)
-                                        }
-                                    </div>
-                                </div>
-                        </div>
-                    }
-                    case "Units" => { 
-                        <div id="@thingType" class="tab-pane fade in">
-                            <div><p>(click for more information)</p></div>
-                                <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
-                                    <div class="panel panel-default">
-                                        @for((k, triple) <- query_results.triples_list){
-                                            @*@unit_entry(triple) *@
-                                            @placeholder_entry(triple)
-                                        }
-                                    </div>
-                                </div>
-                        </div>
-                    }
-                    case _ => {
-                    }
-                }
-            }
-            @for((thingType, tree_results) <- documentHierarchy){
-                <div id="@thingType" class="tab-pane fade in">
-                    <div id="query" data-results="@tree_results"></div>
+                    </div>
+                </div>
+
+            @if(results.treeResults != null){
+                <div id="tree" class="tab-pane fade in">
+                    <div id="query" data-results="@results.treeResults"></div>
                     <div id="body"></div>
                         <script type="text/javascript" src="/hadatac/assets/javascripts/d3.js"></script>
                         <script type="text/javascript" src="/hadatac/assets/javascripts/d3.layout.js"></script>
@@ -146,33 +91,7 @@
                     <link type="text/css" rel="stylesheet" href="/hadatac/assets/stylesheets/treeRenderer.css"/>
                 </div>
             }
+            
           </div>
     </div>
-}
-
-@infobox_filler(col_name:String, item_name:String) = @{
-    var col:models.SparqlQueryResults = documentMap get col_name
-    var triple:models.TripleDocument = col.triples_list.get(item_name)
-
-    <h4>triple.get("modelName") </h4>
-    if(triple.has("maker")){
-        <p>manufactured by: triple.get("maker")</p>
-    }
-    <p>Description: triple.get("desc")</p>
-    if(triple.has("docLink")){
-        <p>See Online Documentation</p>
-    }
-    <b>Technical Details</b>
-    if(triple.has("minTemp")){
-        <p>Operational between triple.get("minTemp") and triple.get("maxTemp") triple.get("tempUnit").</p>
-    }
-    if(triple.has("numAtt")){
-        <p>Number of attached detectors: triple.get("numAtt")</p>
-    }
-    if(triple.has("numDet")){
-        <p>Number of detachable detectors: triple.get("numDet")</p>
-    }
-    if(triple.has("maxLog")){
-        <p>Maximum measurements logged: triple.get("maxLog")</p>
-    }
 }
