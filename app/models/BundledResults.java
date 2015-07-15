@@ -8,7 +8,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class BundledResults{
-	public TreeMap<String,TripleDocument> sparqlResults;
+    public TreeMap<String,TripleDocument> sparqlResults;
     public String treeResults;
     public String json;
     

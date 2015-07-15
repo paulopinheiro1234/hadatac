@@ -64,6 +64,7 @@ public class TripleDocument{
 		}
 		return prettyFinal;
 	}
+	
 
     // The accordion menus for results are composed of two div elements
     //   that must have corresponding names that are unique for each entry.

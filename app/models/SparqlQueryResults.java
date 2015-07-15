@@ -54,7 +54,7 @@ public class SparqlQueryResults extends QueryResults {
 		try {
 		    while (parseResults.hasNext()){
 				JsonNode doc = parseResults.next();
-				TripleDocument triple = new TripleDocument(doc, vars, tabName);
+				TripleDocument triple = new TripleDocument(doc, vars);
 				//System.out.println(triple);
 				// One of the fields in the TripleDocument should function as a primary key for rendering purposes
 				if (triple.has("sn")) { triples_list.put(triple.get("sn"),triple); }
