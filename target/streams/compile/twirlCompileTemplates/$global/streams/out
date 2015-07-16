@@ -1,4 +1,0 @@
-[0m[[31merror[0m] [0m/home/tetherless/hadatac-browser/app/views/instrument_browser (old).scala.html:1: Invalid template name [instrument_browser (old).scala.html][0m
-[0m[[31merror[0m] [0m@( documentMap : Map[String,models.SparqlQueryResults],[0m
-[0m[[31merror[0m] [0m^[0m
-[0m[[31merror[0m] [0m(compile:[31mtwirlCompileTemplates[0m) Twirl compilation failed[0m

@@ -91,9 +91,8 @@
                         <script type="text/javascript">
                             d3.selectAll(".node")
                                 .on('mouseover', function (d,i){
-                                    var item = d.name.replace(/\s+/g, '');
+                                    var item = d.name.replace(/\W/g, '');
                                     var stuff = document.getElementById(item).textContent;
-                                    console.log(stuff);
                                     var infobox = document.getElementById('info');
                                     infobox.textContent = stuff;
                                 

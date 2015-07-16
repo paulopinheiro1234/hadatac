@@ -6,9 +6,6 @@ import java.io.IOException;
 import java.util.TreeMap;
 
 import models.SparqlQuery;
-import models.SparqlQueryResults;
-//import models.TreeQuery;
-import models.TreeQueryResults;
 import models.BundledResults;
 import play.mvc.Controller;
 import play.mvc.Result;

@@ -1,10 +1,12 @@
-var query_res = document.getElementById('query');
+var query_res = document.getElementById('query'); 
 var results = query_res.dataset.results;
 
 var m = [20, 120, 20, 120],
     w = 1280 - m[1] - m[3],
     h = 800 - m[0] - m[2],
     i = 0,
+    border = 3,
+    bordercolor = 'lightsteelgray',
     root;
 
 var tree = d3.layout.tree()
@@ -16,6 +18,7 @@ var diagonal = d3.svg.diagonal()
 var vis = d3.select("#body").append("svg:svg")
     .attr("width", w + m[1] + m[3])
     .attr("height", h + m[0] + m[2])
+    .attr("style", "outline: thin solid lightsteelblue;")
   .append("svg:g")
     .attr("transform", "translate(" + m[3] + "," + m[0] + ")");
 
@@ -32,7 +35,7 @@ var vis = d3.select("#body").append("svg:svg")
     }
   }
 
-  // Initialize the display to show a few nodes.
+  // Initialize the display to show a few nodes.call scala template method from javascript
   //root.children.forEach(toggleAll);
   //toggle(root.children[1]);
   //toggle(root.children[1].children[2]);
@@ -41,6 +44,7 @@ var vis = d3.select("#body").append("svg:svg")
 
   update(root);
 //});
+
 
 function update(source) {
   var duration = d3.event && d3.event.altKey ? 5000 : 500;
@@ -142,6 +146,3 @@ function toggle(d) {
     d._children = null;
   }
 }
-
-
-

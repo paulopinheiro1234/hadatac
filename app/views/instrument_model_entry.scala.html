@@ -18,13 +18,13 @@
 @defining(triple.generateID()) {itemID =>
 <div class="panel-heading" role="tab" id="heading@itemID">
     <h4 class="panel-title">
-    @defining(triple.get("modelName").replaceAll("\\s+","")) {cleanName =>
-        <a class="collapsed" role="button" data-toggle="collapse" data-parent="#accordion" href="#@cleanName" aria-expanded="false" aria-controls="@itemID">
+    @defining(triple.get("modelName").replaceAll("[\\W]|_", "")) {cleanName =>
+        <a class="collapsed" role="button" data-toggle="collapse" data-parent="#accordion" href="#@cleanName" aria-expanded="false" aria-controls="@cleanName">
             @triple.get("modelName")</a></h4>
         
         
 </div>
-<div id="@cleanName" class="panel-collapse collapse" role="tabpanel" aria-labelledby="heading@itemID">
+<div id="@cleanName" class="panel-collapse collapse" role="tabpanel" aria-labelledby="heading@cleanName">
     }
     <div class="panel-body">
         <h4>@triple.get("modelName") </h4>

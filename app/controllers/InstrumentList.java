@@ -8,8 +8,6 @@ import java.util.TreeMap;
 
 import models.FacetsWithCategories;
 import models.SparqlQuery;
-import models.SparqlQueryResults;
-import models.TreeQueryResults;
 import models.BundledResults;
 import play.data.DynamicForm;
 import play.data.Form;
@@ -21,8 +19,6 @@ import views.html.error_page;
 
 public class InstrumentList extends Controller {
 
-    public static SparqlQueryResults query_results = new SparqlQueryResults();
-    
     // for /metadata HTTP GET requests
     public static Result index() {
         SparqlQuery query = new SparqlQuery();
