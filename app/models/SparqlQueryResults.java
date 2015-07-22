@@ -2,12 +2,13 @@ package models;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Map;
 import java.util.TreeMap;
 import java.util.Iterator;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-public class BundledResults{
+public class SparqlQueryResults{
     public TreeMap<String,TripleDocument> sparqlResults;
     public String treeResults;
     public String json;
@@ -16,9 +17,9 @@ public class BundledResults{
     private int numVars;
     private TreeNode newTree;
     
-	public BundledResults() {}
+	public SparqlQueryResults() {}
 
-	public BundledResults(String json_result, boolean usingURIs){
+	public SparqlQueryResults(String json_result, boolean usingURIs){
         this.json = json_result;
         //System.out.println(this.json);
         // create an ObjectMapper instance.
@@ -114,19 +115,31 @@ public class BundledResults{
                 //System.out.println(triple);
                 // One of the fields in the TripleDocument should function as a primary key for rendering purposes
                 if (doc.has("sn")) { this.sparqlResults.put(triple.get("sn"),triple); }
-                else {
-                    if (doc.has("modelName")) {
-                        //System.out.println(triple.get("modelName") + " : " + triple);
-                        this.sparqlResults.put(triple.get("modelName"),triple);
-                    }
-                    else this.sparqlResults.put(triple.generateID(), triple);
-                }
-			//System.out.println(the_docs.size());
+                else if (doc.has("modelName")) { this.sparqlResults.put(triple.get("modelName"),triple); }
+                else if (doc.has("sp")) { this.sparqlResults.put(triple.get("sp"),triple); }
+                else this.sparqlResults.put(triple.generateID(), triple);
             } catch (Exception e){
 			    e.printStackTrace();
 		    }
 		}// /try/catch
 	}// /constructor
+	
+	public TripleDocument getTriple (String key){
+	    TripleDocument item = this.sparqlResults.get(key);
+	    return item;
+	}
+	
+	public ArrayList<TripleDocument> getMatching (String prop, String value){
+        ArrayList<TripleDocument> results = new ArrayList<TripleDocument>();
+        TripleDocument doc;
+        for (Map.Entry<String, TripleDocument> entry : this.sparqlResults.entrySet()) {
+            doc = entry.getValue();
+            if(doc.get(prop).equals(value)) {
+                results.add(doc);
+            }
+        }
+        return results;
+	}
 
     private static String prettyFromURI (String origURI) {
 		if (!origURI.contains("#"))

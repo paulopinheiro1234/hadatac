@@ -5,27 +5,27 @@ import java.util.ArrayList;
 import java.util.Random;
 import com.fasterxml.jackson.databind.JsonNode;
 
-public class TripleDocument{
+public class OtMTripleDocument{
 	public TreeMap<String,String> items = new TreeMap<String,String>();
+	public TreeMap<String,ArrayList<String>> otmItems = new TreeMap<String,ArrayList<String>>();
 	//public String resultType;
 	private ArrayList<String> vars;
 	private int numVars;
 	
-	public TripleDocument() {}
+	public OtMTripleDocument() {}
 	
-    public TripleDocument(JsonNode node, ArrayList<String> vars) {
-        //this.resultType = resultType;
-        this.vars = vars;
-        this.numVars = vars.size();
-        String variable;
-        for( int i = 0; i < this.numVars; i++){
-            variable = "";
-            try {
-                if(node.get(vars.get(i)).hasNonNull("value"))
-                    variable = node.get(vars.get(i)).get("value").asText();
-                    if(variable.contains("#"))
-                        if(!variable.contains("URI"))
-                            variable = prettyFromURI(variable);
+	public OtMTripleDocument(JsonNode node, ArrayList<String> vars) {
+	    //this.resultType = resultType;
+	    this.vars = vars;
+	    this.numVars = vars.size();
+	    String variable;
+	    for( int i = 0; i < this.numVars; i++){
+	        variable = "";
+	        try {
+	            if(node.get(vars.get(i)).hasNonNull("value"))
+	                variable = node.get(vars.get(i)).get("value").asText();
+	                if(variable.contains("#"))
+	                    variable = prettyFromURI(variable);
                     if(isDouble(variable)){
                         variable = toNum(Double.parseDouble(variable));
                     }
@@ -50,11 +50,8 @@ public class TripleDocument{
 	}
 	
 	public boolean has(String key){
-	    if (!this.vars.contains(key))
-	        return false;
-	    else if (this.items.get(key).equals(""))
-	        return false;
-	    else return true;
+	    boolean b = this.vars.contains(key);
+	    return b;
 	}
 	
 	private static String prettyFromURI (String origURI) {

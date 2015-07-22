@@ -6,7 +6,7 @@ import java.io.IOException;
 import java.util.TreeMap;
 
 import models.SparqlQuery;
-import models.BundledResults;
+import models.SparqlQueryResults;
 import play.mvc.Controller;
 import play.mvc.Result;
 import views.html.hierarchy_browser;
@@ -19,14 +19,14 @@ public class Characteristic extends Controller {
     public static Result index() {
         SparqlQuery query = new SparqlQuery();
         GetSparqlQuery query_submit = new GetSparqlQuery(query);
-        BundledResults theResults;
+        SparqlQueryResults theResults;
         String tabName = "Characteristics";
         String query_json = null;
         System.out.println("Characteristic.java is requesting: " + tabName);
         try {
             query_json = query_submit.executeQuery(tabName);
             //System.out.println("query_json = " + query_json);
-            theResults = new BundledResults(query_json, true);
+            theResults = new SparqlQueryResults(query_json, true);
         } catch (IllegalStateException | IOException | NullPointerException e1) {
             return internalServerError(error_page.render(e1.toString(), tabName));
             //e1.printStackTrace();
@@ -40,14 +40,14 @@ public class Characteristic extends Controller {
     public static Result postIndex() {
         SparqlQuery query = new SparqlQuery();
         GetSparqlQuery query_submit = new GetSparqlQuery(query);
-        BundledResults theResults;
+        SparqlQueryResults theResults;
         String tabName = "Characteristics";
         String query_json = null;
         System.out.println("Characteristic.java is requesting: " + tabName);
         try {
             query_json = query_submit.executeQuery(tabName);
             //System.out.println("query_json = " + query_json);
-            theResults = new BundledResults(query_json, true);
+            theResults = new SparqlQueryResults(query_json, true);
         } catch (IllegalStateException | IOException | NullPointerException e1) {
             return internalServerError(error_page.render(e1.toString(), tabName));
             //e1.printStackTrace();

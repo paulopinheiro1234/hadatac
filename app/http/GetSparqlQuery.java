@@ -30,7 +30,7 @@ public class GetSparqlQuery {
     public StringBuffer sparql_query = new StringBuffer();
     public TreeMap<String, StringBuffer> list_of_queries = new TreeMap<String, StringBuffer>();
     public String collection;
-    private int numThings = 11;
+    private int numThings = 12;
     public String[] thingTypes = new String[numThings];
     
     public GetSparqlQuery () {} 
@@ -121,6 +121,7 @@ public class GetSparqlQuery {
         thingTypes[8] = "PeopleH";
         thingTypes[9] = "Characteristics";
         thingTypes[10] = "Units";
+	thingTypes[11] = "SensingPerspectives";
     }
     
     public String querySelector(String tabName){
@@ -159,13 +160,14 @@ public class GetSparqlQuery {
                 q = "PREFIX rdfs:<http://www.w3.org/2000/01/rdf-schema#>" +
                     "PREFIX owl: <http://www.w3.org/2002/07/owl#>" +
                     "PREFIX vstoi: <http://jefferson.tw.rpi.edu/ontology/vstoi#>" +
-                    "SELECT ?detName ?detModelName ?sn WHERE {" +
-                    " ?detModel rdfs:subClassOf+" +
+                    "SELECT ?detURI ?name ?modelName ?inst ?sn WHERE {" +
+                    " ?model rdfs:subClassOf+" +
                     " <http://jefferson.tw.rpi.edu/ontology/vstoi#Detector> ." +
-                    " ?det a ?detModel ." +
-                    " ?det rdfs:label ?detName ." +
-                    " OPTIONAL { ?det vstoi:hasSerialNumber ?sn } ." +
-                    " ?detModel rdfs:label ?detModelName ." +
+                    " ?model rdfs:label ?modelName ." + 
+                    " ?detURI a ?model ." +
+                    " ?detURI rdfs:label ?name ." +
+                    " OPTIONAL { ?detURI vstoi:hasSerialNumber ?sn } ." +
+                    " OPTIONAL { ?detURI vstoi:isInstrumentAttachment ?inst } ." +
                     "}";
                 break;
             case "InstrumentModels" : 
@@ -173,7 +175,7 @@ public class GetSparqlQuery {
                     "PREFIX foaf:<http://xmlns.com/foaf/0.1/>" + 
                     "PREFIX owl: <http://www.w3.org/2002/07/owl#>" + 
                     "PREFIX vstoi: <http://jefferson.tw.rpi.edu/ontology/vstoi#>" +
-                    "SELECT ?modelName ?superModelName ?maker ?desc ?page ?minTemp ?maxTemp ?tempUnit ?docLink ?numAtt ?numDet ?maxLog WHERE {" +
+                    "SELECT ?model ?modelName ?superModelName ?maker ?desc ?page ?minTemp ?maxTemp ?tempUnit ?docLink ?numAtt ?numDet ?maxLog WHERE {" +
                     "   ?model rdfs:subClassOf* <http://jefferson.tw.rpi.edu/ontology/vstoi#Instrument> . " + 
                     "   ?model rdfs:label ?modelName ." + 
                     "   OPTIONAL { ?model rdfs:subClassOf ?superModel .  " + 
@@ -273,6 +275,24 @@ public class GetSparqlQuery {
                 	//"   OPTIONAL { ?model rdfs:label ?modelName }  " + 
                 	//"   OPTIONAL { ?superModel rdfs:label ?superModelName }  " +
                 	"}";
+                break;
+            case "SensingPerspectives" : 
+                q = "PREFIX rdfs:<http://www.w3.org/2000/01/rdf-schema#>" +
+                    "PREFIX owl: <http://www.w3.org/2002/07/owl#>" +
+                    "PREFIX vstoi: <http://jefferson.tw.rpi.edu/ontology/vstoi#>" +
+                    "SELECT ?sp ?ofModelName ?chara ?accpercent ?accrtwo ?outputres ?maxresponse ?timeunit ?low ?high WHERE {" +
+                    //" ?sp a vstoi:SensingPerspective . " +
+                    " ?sp vstoi:perspectiveOf ?ofModel . " +
+                    " ?ofModel rdfs:label ?ofModelName . " +
+                    " ?sp vstoi:hasPerspectiveCharacteristic ?chara ." +
+                    " OPTIONAL { ?sp vstoi:hasAccuracyPercentage ?accpercent } ." +
+                    " OPTIONAL { ?sp vstoi:hasAccuracyR2 ?accrtwo } ." +
+                    " OPTIONAL { ?sp vstoi:hasOutputResolution ?outputres } ." +
+                    " OPTIONAL { ?sp vstoi:hasMaxResponseTime ?maxresponse ." +
+                    "            ?sp vstoi:hasResponseTimeUnit ?timeunit } ." +
+                    " OPTIONAL { ?sp vstoi:hasLowRangeValue ?low ." +
+                    "            ?sp vstoi:hasHighRangeValue ?high } ." +
+                    "}";
                 break;
             default :
             	q = "";

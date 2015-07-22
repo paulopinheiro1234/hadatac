@@ -1,4 +1,4 @@
-@( results : models.BundledResults,
+@( results : models.SparqlQueryResults,
    category : String)
 
 @*****************************
@@ -33,11 +33,6 @@
                             case "Instruments" => { 
                                 @for((k, triple) <- results.sparqlResults){
                                     @instrument_entry(triple) 
-                                }
-                            }
-                            case "DetectorModels" => { 
-                                @for((k, triple) <- results.sparqlResults){
-                                    @detector_model_entry(triple)
                                 }
                             }
                             case "Detectors" => { 
@@ -92,9 +87,9 @@
                             d3.selectAll(".node")
                                 .on('mouseover', function (d,i){
                                     var item = d.name.replace(/\W/g, '');
-                                    var stuff = document.getElementById(item).textContent;
+                                    var stuff = document.getElementById(item).innerHTML;
                                     var infobox = document.getElementById('info');
-                                    infobox.textContent = stuff;
+                                    infobox.innerHTML = stuff;
                                 
                                 });
                                 

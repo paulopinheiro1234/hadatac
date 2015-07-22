@@ -3,7 +3,7 @@
     overflow-y: auto;
 }
 
-.table-info{
+.tech-details{
     width:300px;
     height:250px;
     float:right;
@@ -28,5 +28,6 @@
     top:150px;
     right:30px;
     border-style:solid;
-    border-color:#ccc
+    border-color:#ccc;
+    background-color:#fff;
 }

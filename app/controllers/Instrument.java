@@ -6,7 +6,7 @@ import java.io.IOException;
 import java.util.TreeMap;
 
 import models.SparqlQuery;
-import models.BundledResults;
+import models.SparqlQueryResults;
 import play.mvc.Controller;
 import play.mvc.Result;
 import views.html.hierarchy_browser;
@@ -19,14 +19,14 @@ public class Instrument extends Controller {
     public static Result index() {
         SparqlQuery query = new SparqlQuery();
         GetSparqlQuery query_submit = new GetSparqlQuery(query);
-        BundledResults theResults;
+        SparqlQueryResults theResults;
         String tabName = "InstrumentModels";
         String query_json = null;
         System.out.println("Instrument.java is requesting: " + tabName);
         try {
             query_json = query_submit.executeQuery(tabName);
             //System.out.println("query_json = " + query_json);
-            theResults = new BundledResults(query_json, false);
+            theResults = new SparqlQueryResults(query_json, false);
         } catch (IllegalStateException | IOException | NullPointerException e1) {
             return internalServerError(error_page.render(e1.toString(), tabName));
             //e1.printStackTrace();
@@ -40,7 +40,7 @@ public class Instrument extends Controller {
     public static Result postIndex() {        
         SparqlQuery query = new SparqlQuery();
         GetSparqlQuery query_submit = new GetSparqlQuery(query);
-        BundledResults theResults;
+        SparqlQueryResults theResults;
         String tabName = "InstrumentModels";
         //TreeMap<String, SparqlQueryResults> query_results_list = new TreeMap<String, SparqlQueryResults>();
         //TreeMap<String, String> hierarchy_results_list = new TreeMap<String, String>();
@@ -48,7 +48,7 @@ public class Instrument extends Controller {
         System.out.println("Instrument.java is requesting: " + tabName);
         try {
             query_json = query_submit.executeQuery(tabName);
-            theResults = new BundledResults(query_json, false);
+            theResults = new SparqlQueryResults(query_json, false);
         } catch (IllegalStateException | IOException | NullPointerException e1) {
             return internalServerError(error_page.render(e1.toString(), tabName));
             //e1.printStackTrace();

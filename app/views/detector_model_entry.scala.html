@@ -1,4 +1,6 @@
-@(triple : models.TripleDocument)
+@(triple : models.TripleDocument,
+  p_list : List[models.TripleDocument])
+  
 @*****************************
   hasURI    | (not used)
   rdfs:subClassOf   | (not used)
@@ -8,7 +10,8 @@
   rdfs:comment  | desc
   hasImage  | *add*
   vstoi:hasWebDocumentation    | docLink
-*****************************@
+******************************@ 
+
 
 @defining(triple.generateID()) {itemID =>
 <div class="panel-heading" role="tab" id="heading@itemID">
@@ -21,7 +24,7 @@
 <div id="@cleanName" class="panel-collapse collapse" role="tabpanel" aria-labelledby="heading@cleanName">
     }
     <div class="panel-body">
-        <h4>@triple.get("modelName") </h4>
+        <h3>@triple.get("modelName") </h3>
         <img class="thumbnail" src="/hadatac/assets/images/placeholder200.png">
         @if(triple.has("maker")){
             <p>manufactured by: <a href="@triple.get("page")" target="_blank">@triple.get("maker")</a></p>
@@ -30,7 +33,10 @@
         @if(triple.has("docLink")){
             <a href="@triple.get("docLink")" target="_blank">See Online Documentation</a>
         }
- 
+        <h4>Sensing Perspectives:</h4>
+        @for(p <- p_list){
+            @sensingperspective_entry(p)
+        }
     </div>
 </div>
 }
