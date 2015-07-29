@@ -7,7 +7,7 @@
     width:300px;
     height:250px;
     float:right;
-    border-style:dashed;
+    border-style:solid;
     border-color:#ccc;
     color:#333;
 }
@@ -30,4 +30,12 @@
     border-style:solid;
     border-color:#ccc;
     background-color:#fff;
+}
+
+.perspective{
+    margin-left:270px;
+    border-style:solid;
+    border-width:1px;
+    border-color:#ccc;
+    text-indent:20px;
 }

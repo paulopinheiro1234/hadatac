@@ -4,7 +4,7 @@
   hasURI    | detURI
     | modelName
   rdfs:label    | name
-  vstoi:isInstrumentAttachment (label)   | inst
+  vstoi:isInstrumentAttachment (label)   | instName
   vstoi:hasSerialNumber    | sn
 *****************************@
 
@@ -20,12 +20,12 @@
             <p><b>@triple.get("name") </b> (type: @triple.get("modelName") )</p>
             @defining(triple.get("detURI")) {theuri =>
             <form>
-                <input type="text" value="@theuri">
+                <input type="text" size="80" value="@theuri">
             </form>
             }
             <p>serial number @itemID</p>
-            @if(triple.has("inst")){
-                <p>This Detector is permanently attached to @triple.get("inst").</p>
+            @if(triple.has("instName")){
+                <p>This Detector is permanently attached to @triple.get("instName") (sn: @triple.get("instSN")).</p>
             }
         </div>
     </div>

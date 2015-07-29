@@ -8,8 +8,8 @@ import java.util.Iterator;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-public class SparqlQueryResults{
-    public TreeMap<String,TripleDocument> sparqlResults;
+public class OtMSparqlQueryResults{
+    public TreeMap<String,OtMTripleDocument> sparqlResults;
     public String treeResults;
     public String json;
     
@@ -17,9 +17,9 @@ public class SparqlQueryResults{
     private int numVars;
     private TreeNode newTree;
     
-	public SparqlQueryResults() {}
+	public OtMSparqlQueryResults() {}
 
-	public SparqlQueryResults(String json_result, boolean usingURIs){
+	public OtMSparqlQueryResults(String json_result, boolean usingURIs){
         this.json = json_result;
         //System.out.println(this.json);
         // create an ObjectMapper instance.
@@ -52,28 +52,38 @@ public class SparqlQueryResults{
 		numVars = vars.size();
 		
 		// build TreeQueryResults:
-        if(vars.contains("modelName") && vars.contains("superModelName"))
+        if(vars.contains("id") && vars.contains("superId"))
             buildTreeQueryResults(bindings, usingURIs);
 		else this.treeResults = "";    
 		
         // NOW BUILD THE SPARQLQUERYRESULTS:
-        this.sparqlResults = new TreeMap<String,TripleDocument>();
+        this.sparqlResults = new TreeMap<String,OtMTripleDocument>();
         while (parseResults.hasNext()){
             try {
                 JsonNode doc = parseResults.next();
-                TripleDocument triple = new TripleDocument(doc, vars);
+                OtMTripleDocument triple;
+                OtMTripleDocument active = getTriple(doc.get("id").get("value").asText());
+                if (active == null){
+                    triple = new OtMTripleDocument(doc, vars);
+                }
+                else {
+                    triple = active;
+                    triple.addDoc(doc);
+                }
                 //System.out.println(triple);
-                // One of the fields in the TripleDocument should function as a primary key for rendering purposes
-                if (doc.has("sn")) { this.sparqlResults.put(triple.get("sn"),triple); }
-                else if (doc.has("modelName")) { this.sparqlResults.put(triple.get("modelName"),triple); }
-                else if (doc.has("sp")) { this.sparqlResults.put(triple.get("sp"),triple); }
-                else this.sparqlResults.put(triple.generateID(), triple);
+                // The ID field in OtMTriple should be an ArrayList with exactly one thing in it
+                if (doc.has("id"))
+                    this.sparqlResults.put(triple.get("id").get(0),triple);
+                else
+                    this.sparqlResults.put(triple.generateID(), triple);
             } catch (Exception e){
 			    e.printStackTrace();
 		    }
-		}// /try/catch
+		}// /while
 	}// /constructor
 	
+	// This is the same as SparqlQueryResults regardless of whether the
+	//    properties are one-to-one or one-to-many
 	private void buildTreeQueryResults(JsonNode bindings, boolean usingURIs){
         this.newTree = null;
         Iterator<JsonNode> elements = bindings.elements();
@@ -83,11 +93,11 @@ public class SparqlQueryResults{
             modelN = "";
 		    superN = "";
             JsonNode binding = elements.next();
-            JsonNode modelNameNode = binding.findPath("modelName");
+            JsonNode modelNameNode = binding.findPath("id");
             if (modelNameNode != null && modelNameNode.get("value") != null) {
                 modelN = modelNameNode.get("value").asText();
             }
-		    JsonNode superNameNode = binding.findPath("superModelName");
+		    JsonNode superNameNode = binding.findPath("superId");
             if (superNameNode != null && superNameNode.get("value") != null) {
                 superN = superNameNode.get("value").asText();
             }
@@ -128,22 +138,22 @@ public class SparqlQueryResults{
             this.treeResults = newTree.toJson(0);
 	}// /buildTreeQueryResults
 	
-	public TripleDocument getTriple (String key){
-	    TripleDocument item = this.sparqlResults.get(key);
+	public OtMTripleDocument getTriple (String key){
+	    OtMTripleDocument item = this.sparqlResults.get(key);
 	    return item;
 	}
 	
-	public ArrayList<TripleDocument> getMatching (String prop, String value){
+	/*public ArrayList<OtMTripleDocument> getMatching (String prop, String value){
         ArrayList<TripleDocument> results = new ArrayList<TripleDocument>();
         TripleDocument doc;
-        for (Map.Entry<String, TripleDocument> entry : this.sparqlResults.entrySet()) {
+        for (Map.Entry<String, OtMTripleDocument> entry : this.sparqlResults.entrySet()) {
             doc = entry.getValue();
             if(doc.get(prop).equals(value)) {
                 results.add(doc);
             }
         }
         return results;
-	}
+	}*/
 
     private static String prettyFromURI (String origURI) {
 		if (!origURI.contains("#"))

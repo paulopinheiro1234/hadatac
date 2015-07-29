@@ -16,7 +16,7 @@
 		  @metadata_navigation(category)
             <ul class="nav nav-tabs">
                 <li class="active"><a data-toggle="tab" href="#table">View as Table</a></li>
-                @if(results.treeResults != null){ <li><a data-toggle="tab" href="#tree">View as Hierarchy</a></li> }
+                @if(results.treeResults != ""){ <li><a data-toggle="tab" href="#tree">View as Hierarchy</a></li> }
             </ul>
             <div class = "tab-content">
 
@@ -58,14 +58,12 @@
                             }
                             case "Characteristics" => { 
                                 @for((k, triple) <- results.sparqlResults){
-                                    @*@characteristic_entry(triple) *@
-                                    @placeholder_entry(triple)
+                                    @characteristic_entry(triple)
                                 }
                             }
                             case "Units" => { 
                                 @for((k, triple) <- results.sparqlResults){
-                                    @*@unit_entry(triple) *@
-                                    @placeholder_entry(triple)
+                                    @unit_entry(triple)
                                 }
                             }
                             case _ => {

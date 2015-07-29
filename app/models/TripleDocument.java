@@ -24,8 +24,10 @@ public class TripleDocument{
                 if(node.get(vars.get(i)).hasNonNull("value"))
                     variable = node.get(vars.get(i)).get("value").asText();
                     if(variable.contains("#"))
-                        if(!variable.contains("URI"))
+                        if(!vars.get(i).contains("URI")){
                             variable = prettyFromURI(variable);
+                            //System.out.println(variable);
+                        }
                     if(isDouble(variable)){
                         variable = toNum(Double.parseDouble(variable));
                     }
@@ -43,6 +45,16 @@ public class TripleDocument{
             this.items.put(vars.get(i), variable);
         }// /for
     }// constructor
+	
+    public void addItem(String key, String value){
+        if(value.contains("#"))
+            if(!value.contains("URI"))
+                value = prettyFromURI(value);
+            if(isDouble(value)){
+                value = toNum(Double.parseDouble(value));
+            }
+        this.items.put(key, value);
+    }
 	
 	// The Scala table generators use this method to access the triple's fields
 	public String get(String key){

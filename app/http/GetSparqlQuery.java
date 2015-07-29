@@ -132,27 +132,28 @@ public class GetSparqlQuery {
                 q = "PREFIX rdfs:<http://www.w3.org/2000/01/rdf-schema#> " + 
                     "PREFIX owl: <http://www.w3.org/2002/07/owl#> " + 
                     "PREFIX vstoi: <http://jefferson.tw.rpi.edu/ontology/vstoi#> " + 
-                    "SELECT ?name ?modelName ?sn ?lat ?lng WHERE {" +
+                    "PREFIX hasneto: <http://jefferson.tw.rpi.edu/ontology/hasneto.owl#> " + 
+                    "SELECT ?platURI ?name ?modelName ?sn ?lat ?lng WHERE {" +
                     "    ?platModel rdfs:subClassOf+" + 
                     "    <http://jefferson.tw.rpi.edu/ontology/vstoi#Platform>  ." + 
-                    "    ?plat a ?platModel ." +
+                    "    ?platURI a ?platModel ." +
                     "    ?platModel rdfs:label ?modelName ." +
-                    "    ?plat rdfs:label ?name ." + 
-                    "    OPTIONAL {?plat vstoi:hasSerialNumber ?sn } ." + 
-                    "    OPTIONAL { ?platModel vstoi:hasX ?lat ." +
-                    "               ?platModel vstoi:hasY ?lng } ." +
+                    "    ?platURI rdfs:label ?name ." + 
+                    "    OPTIONAL { ?platURI vstoi:hasSerialNumber ?sn } ." + 
+                    "    OPTIONAL { ?platModel hasneto:hasFirstCoordinate ?lat ." +
+                    "               ?platModel hasneto:hasSecondCoordinate ?lng } ." +
                     "}";
                 break;
             case "Instruments" : 
                 q = "PREFIX rdfs:<http://www.w3.org/2000/01/rdf-schema#>" +
                     "PREFIX owl: <http://www.w3.org/2002/07/owl#>" +
                     "PREFIX vstoi: <http://jefferson.tw.rpi.edu/ontology/vstoi#>" +
-                    "SELECT ?inst ?name ?modelName ?sn WHERE {" +
+                    "SELECT ?instURI ?name ?modelName ?sn WHERE {" +
                     " ?instModel rdfs:subClassOf+" +
                     " <http://jefferson.tw.rpi.edu/ontology/vstoi#Instrument> ." +
-                    " ?inst a ?instModel ." +
-                    " ?inst rdfs:label ?name ." +
-                    " OPTIONAL { ?inst vstoi:hasSerialNumber ?sn } ." +
+                    " ?instURI a ?instModel ." +
+                    " ?instURI rdfs:label ?name ." +
+                    " OPTIONAL { ?instURI vstoi:hasSerialNumber ?sn } ." +
                     " ?instModel rdfs:label ?modelName ." +
                     "}";
                 break;
@@ -160,14 +161,16 @@ public class GetSparqlQuery {
                 q = "PREFIX rdfs:<http://www.w3.org/2000/01/rdf-schema#>" +
                     "PREFIX owl: <http://www.w3.org/2002/07/owl#>" +
                     "PREFIX vstoi: <http://jefferson.tw.rpi.edu/ontology/vstoi#>" +
-                    "SELECT ?detURI ?name ?modelName ?inst ?sn WHERE {" +
+                    "SELECT ?detURI ?name ?modelName ?instName ?sn ?instSN WHERE {" +
                     " ?model rdfs:subClassOf+" +
                     " <http://jefferson.tw.rpi.edu/ontology/vstoi#Detector> ." +
                     " ?model rdfs:label ?modelName ." + 
                     " ?detURI a ?model ." +
                     " ?detURI rdfs:label ?name ." +
                     " OPTIONAL { ?detURI vstoi:hasSerialNumber ?sn } ." +
-                    " OPTIONAL { ?detURI vstoi:isInstrumentAttachment ?inst } ." +
+                    " OPTIONAL { ?detURI vstoi:isInstrumentAttachment ?inst ." +
+                    "            ?inst rdfs:label ?instName  ." +                    
+                    "            ?inst vstoi:hasSerialNumber ?instSN } ." +
                     "}";
                 break;
             case "InstrumentModels" : 
@@ -196,12 +199,13 @@ public class GetSparqlQuery {
             case "Entities" : 
                 q = "PREFIX rdfs:<http://www.w3.org/2000/01/rdf-schema#>" + 
                     "PREFIX owl: <http://www.w3.org/2002/07/owl#>" + 
-                	"SELECT ?modelName ?superModelName WHERE { " + 
-                    "   ?modelName rdfs:subClassOf* <http://ecoinformatics.org/oboe/oboe.1.0/oboe-core.owl#Entity> . " + 
-                	"   ?modelName rdfs:subClassOf ?superModelName .  " + 
-                	//"   OPTIONAL { ?model rdfs:label ?modelName }  " + 
-                	//"   OPTIONAL { ?superModel rdfs:label ?superModelName }  " +
-                	"}";
+                    "PREFIX oboe: <http://ecoinformatics.org/oboe/oboe.1.0/oboe-core.owl#>" + 
+                    "SELECT ?id ?superId ?chara WHERE { " + 
+                    "   ?id rdfs:subClassOf* oboe:Entity . " + 
+                    "   ?id rdfs:subClassOf ?superId .  " + 
+                    //"   OPTIONAL { ?ent rdfs:label ?id . } " + 
+                    "   OPTIONAL { ?id oboe:hasCharacteristic ?chara . } " +
+                    "}";
                 break;
             case "OrganizationsH" : 
             	q = "PREFIX prov: <http://www.w3.org/ns/prov#> " + 
@@ -233,11 +237,11 @@ public class GetSparqlQuery {
                 	"    ?model rdfs:subClassOf ?superModel .  " + 
                 	"    OPTIONAL { ?model rdfs:label ?modelName }  " + 
                 	"    OPTIONAL { ?superModel rdfs:label ?superModelName }  " +
-                    "    OPTIONAL { ?detModel vstoi:hasMaker ?m ." +
+                    "    OPTIONAL { ?model vstoi:hasMaker ?m ." +
                     "               ?m foaf:name ?maker ." + 
                     "               ?m foaf:homepage ?page } ." + 
-                    "    OPTIONAL { ?detModel rdfs:comment ?desc } ." + 
-                    "    OPTIONAL { ?instModel vstoi:hasWebDocumentation ?docLink } ." + 
+                    "    OPTIONAL { ?model rdfs:comment ?desc } ." + 
+                    "    OPTIONAL { ?model vstoi:hasWebDocumentation ?docLink } ." + 
                 	"}";
                 break;
             case "Characteristics" : 
@@ -269,12 +273,13 @@ public class GetSparqlQuery {
             case "Units" : 
                 q = "PREFIX rdfs:<http://www.w3.org/2000/01/rdf-schema#>" + 
                     "PREFIX owl: <http://www.w3.org/2002/07/owl#>" + 
-                	"SELECT ?modelName ?superModelName WHERE { " + 
-                    "   ?modelName rdfs:subClassOf* <http://ecoinformatics.org/oboe/oboe.1.0/oboe-core.owl#Standard> . " + 
-                	"   ?modelName rdfs:subClassOf ?superModelName .  " + 
-                	//"   OPTIONAL { ?model rdfs:label ?modelName }  " + 
-                	//"   OPTIONAL { ?superModel rdfs:label ?superModelName }  " +
-                	"}";
+                    "PREFIX oboe: <http://ecoinformatics.org/oboe/oboe.1.0/oboe-core.owl#>" + 
+                    "SELECT ?modelName ?superModelName ?chara WHERE { " + 
+                    "   ?modelName rdfs:subClassOf* oboe:Standard . " + 
+                    "   ?modelName rdfs:subClassOf ?superModelName .  " + 
+                    "   OPTIONAL { ?modelName oboe:standardFor ?m .  " + 
+                    "              ?m oboe:ofCharacteristic ?chara } . " +
+                    "}";
                 break;
             case "SensingPerspectives" : 
                 q = "PREFIX rdfs:<http://www.w3.org/2000/01/rdf-schema#>" +
