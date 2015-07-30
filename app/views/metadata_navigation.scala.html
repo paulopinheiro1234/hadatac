@@ -1,6 +1,6 @@
  @(selection : String)
  
-   <p>
+   <div class="navbar-collapse collapse navbar-secondary">
        <B>Options</B>: 
 	   @if(selection == "PlatformModels") {
           	<a href="@routes.Platform.index()" class="btn btn-warning" role="button">Platform Model<br>Hierarchy</a>
@@ -52,4 +52,4 @@
        } else {
        		<a href="@routes.Agent.index()" class="btn btn-primary" role="button">Agent<br>Network</a>
        }
-    </p>
+    </div>

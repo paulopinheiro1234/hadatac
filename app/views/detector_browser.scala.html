@@ -12,10 +12,10 @@
 @import helper._
 
 @main("Hierarchies") {
-    <div class="container-fluid">
+    @metadata_navigation(category)
+    <div class="container-fluid container-spaced">
       <div class="row">
         <div class="col-sm-9 col-md-10 main">
-		  @metadata_navigation(category)
             <ul class="nav nav-tabs">
                 <li class="active"><a data-toggle="tab" href="#table">View as Table</a></li>
                 @if(results.treeResults != null){ <li><a data-toggle="tab" href="#tree">View as Hierarchy</a></li> }

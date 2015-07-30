@@ -20,7 +20,7 @@
     <div class="panel-body">
         <h4>@triple.get("name") </h4> 
         <img class="thumbnail" src="/hadatac/assets/images/placeholder200.png">
-        <p>(type: @triple.get("modelName") )</p>
+        <p>(model name: @triple.get("modelName") )</p>
         @defining(triple.get("platURI")) {theuri =>
             <form>
                 <input type="text" size="80" value="@theuri">

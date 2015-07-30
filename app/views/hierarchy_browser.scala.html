@@ -10,15 +10,15 @@
 @import helper._
 
 @main("Hierarchies") {
-    <div class="container-fluid">
+    @metadata_navigation(category)
+    <div class="container-fluid container-spaced">
       <div class="row">
-        <div class="col-sm-9 col-md-10 main">
-		  @metadata_navigation(category)
+            <div class="col-sm-9 col-md-10 main">
             <ul class="nav nav-tabs">
                 <li class="active"><a data-toggle="tab" href="#table">View as Table</a></li>
                 @if(results.treeResults != ""){ <li><a data-toggle="tab" href="#tree">View as Hierarchy</a></li> }
             </ul>
-            <div class = "tab-content">
+            <div class="tab-content">
 
             <div id="table" class="tab-pane fade in active">
                 <div><p>(click for more information)</p></div>
