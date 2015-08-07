@@ -1,0 +1,33 @@
+@()
+
+@import helper._
+
+@main("Load Ontologies") {
+    <div class="container-fluid">
+      
+      <div class="row">
+
+        <div class="col-md-8 col-md-offset-1">
+
+
+	<h4>Loading ontology dependencies into HADataC's metadata store...</h4>
+
+<!--        <div id="confirmation">
+	  <button id="callConfirm">Confirm!</button>
+	  <div id="dialog" title="Confirmation Required">
+	    Are you sure about loading ontology dependencies into HADataC's medata store? ?
+	  </div>
+        </div>
+	<div id="status-box">(STATUS)</div>
+-->
+        <div id="done-box">
+           <h4>Done!</h4>
+           Press OK button to return to HADataC's main page <a href="@routes.Portal.index()" class="btn btn-warning" role="button">Ok</a>
+        </div>
+
+	</div>
+
+      </div>
+    </div>
+
+}

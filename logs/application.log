@@ -1,6 +1,65 @@
-2015-07-09 14:37:33,509 - [INFO] - from play in play-fork-run-akka.actor.default-dispatcher-7 
-Listening for HTTP on /0:0:0:0:0:0:0:0:9000
+2015-08-07 18:06:46,350 [INFO] from play.api.libs.concurrent.ActorSystemProvider in pool-4-thread-2 - Starting application default Akka system: application
+2015-08-07 18:06:46,424 [INFO] from play.core.server.NettyServer$ in pool-4-thread-2 - Listening for HTTP on /0:0:0:0:0:0:0:0:9000
+2015-08-07 18:07:00,168 [INFO] from application in ForkJoinPool-1-worker-1 - Creating Pool for datasource 'default'
+2015-08-07 18:07:00,673 [INFO] from play.api.db.DefaultDBApi in ForkJoinPool-1-worker-1 - Database [default] connected at jdbc:h2:mem:play
+2015-08-07 18:07:01,329 [ERROR] from application in New I/O worker #1 - 
 
-2015-07-09 14:37:38,819 - [INFO] - from play in play-internal-execution-context-1 
-Application started (Dev)
-
+! @6n44hdki4 - Internal server error, for (GET) [/hadatac/] ->
+ 
+play.api.db.evolutions.InvalidDatabaseRevision: Database 'default' needs evolution![An SQL script need to be run on your database.]
+	at play.api.db.evolutions.ApplicationEvolutions$$anonfun$play$api$db$evolutions$ApplicationEvolutions$$runEvolutions$1.apply$mcV$sp(ApplicationEvolutions.scala:76) ~[play-jdbc-evolutions_2.11-2.4.0.jar:2.4.0]
+	at play.api.db.evolutions.ApplicationEvolutions.withLock(ApplicationEvolutions.scala:98) ~[play-jdbc-evolutions_2.11-2.4.0.jar:2.4.0]
+	at play.api.db.evolutions.ApplicationEvolutions.play$api$db$evolutions$ApplicationEvolutions$$runEvolutions(ApplicationEvolutions.scala:49) ~[play-jdbc-evolutions_2.11-2.4.0.jar:2.4.0]
+	at play.api.db.evolutions.ApplicationEvolutions$$anonfun$start$1.apply(ApplicationEvolutions.scala:42) ~[play-jdbc-evolutions_2.11-2.4.0.jar:2.4.0]
+	at play.api.db.evolutions.ApplicationEvolutions$$anonfun$start$1.apply(ApplicationEvolutions.scala:42) ~[play-jdbc-evolutions_2.11-2.4.0.jar:2.4.0]
+	at scala.collection.immutable.List.foreach(List.scala:381) ~[scala-library-2.11.6.jar:na]
+	at play.api.db.evolutions.ApplicationEvolutions.start(ApplicationEvolutions.scala:42) ~[play-jdbc-evolutions_2.11-2.4.0.jar:2.4.0]
+	at play.api.db.evolutions.ApplicationEvolutions.<init>(ApplicationEvolutions.scala:149) ~[play-jdbc-evolutions_2.11-2.4.0.jar:2.4.0]
+	at play.api.db.evolutions.ApplicationEvolutionsProvider.get$lzycompute(EvolutionsModule.scala:53) ~[play-jdbc-evolutions_2.11-2.4.0.jar:2.4.0]
+	at play.api.db.evolutions.ApplicationEvolutionsProvider.get(EvolutionsModule.scala:53) ~[play-jdbc-evolutions_2.11-2.4.0.jar:2.4.0]
+	at play.api.db.evolutions.ApplicationEvolutionsProvider.get(EvolutionsModule.scala:44) ~[play-jdbc-evolutions_2.11-2.4.0.jar:2.4.0]
+	at com.google.inject.internal.ProviderInternalFactory.provision(ProviderInternalFactory.java:81) ~[guice-4.0.jar:na]
+	at com.google.inject.internal.BoundProviderFactory.provision(BoundProviderFactory.java:72) ~[guice-4.0.jar:na]
+	at com.google.inject.internal.ProviderInternalFactory.circularGet(ProviderInternalFactory.java:61) ~[guice-4.0.jar:na]
+	at com.google.inject.internal.BoundProviderFactory.get(BoundProviderFactory.java:62) ~[guice-4.0.jar:na]
+	at com.google.inject.internal.ProviderToInternalFactoryAdapter$1.call(ProviderToInternalFactoryAdapter.java:46) ~[guice-4.0.jar:na]
+	at com.google.inject.internal.InjectorImpl.callInContext(InjectorImpl.java:1103) ~[guice-4.0.jar:na]
+	at com.google.inject.internal.ProviderToInternalFactoryAdapter.get(ProviderToInternalFactoryAdapter.java:40) ~[guice-4.0.jar:na]
+	at com.google.inject.internal.SingletonScope$1.get(SingletonScope.java:145) ~[guice-4.0.jar:na]
+	at com.google.inject.internal.InternalFactoryToProviderAdapter.get(InternalFactoryToProviderAdapter.java:41) ~[guice-4.0.jar:na]
+	at com.google.inject.internal.InternalInjectorCreator$1.call(InternalInjectorCreator.java:205) ~[guice-4.0.jar:na]
+	at com.google.inject.internal.InternalInjectorCreator$1.call(InternalInjectorCreator.java:199) ~[guice-4.0.jar:na]
+	at com.google.inject.internal.InjectorImpl.callInContext(InjectorImpl.java:1092) ~[guice-4.0.jar:na]
+	at com.google.inject.internal.InternalInjectorCreator.loadEagerSingletons(InternalInjectorCreator.java:199) ~[guice-4.0.jar:na]
+	at com.google.inject.internal.InternalInjectorCreator.injectDynamically(InternalInjectorCreator.java:180) ~[guice-4.0.jar:na]
+	at com.google.inject.internal.InternalInjectorCreator.build(InternalInjectorCreator.java:110) ~[guice-4.0.jar:na]
+	at com.google.inject.Guice.createInjector(Guice.java:96) ~[guice-4.0.jar:na]
+	at com.google.inject.Guice.createInjector(Guice.java:73) ~[guice-4.0.jar:na]
+	at com.google.inject.Guice.createInjector(Guice.java:62) ~[guice-4.0.jar:na]
+	at play.api.inject.guice.GuiceBuilder.injector(GuiceInjectorBuilder.scala:126) ~[play_2.11-2.4.0.jar:2.4.0]
+	at play.api.inject.guice.GuiceApplicationBuilder.build(GuiceApplicationBuilder.scala:93) ~[play_2.11-2.4.0.jar:2.4.0]
+	at play.api.inject.guice.GuiceApplicationLoader.load(GuiceApplicationLoader.scala:21) ~[play_2.11-2.4.0.jar:2.4.0]
+	at play.core.server.DevServerStart$$anonfun$mainDev$1$$anon$1$$anonfun$get$1$$anonfun$apply$1$$anonfun$1$$anonfun$2.apply(DevServerStart.scala:153) ~[play-server_2.11-2.4.0.jar:2.4.0]
+	at play.core.server.DevServerStart$$anonfun$mainDev$1$$anon$1$$anonfun$get$1$$anonfun$apply$1$$anonfun$1$$anonfun$2.apply(DevServerStart.scala:150) ~[play-server_2.11-2.4.0.jar:2.4.0]
+	at play.utils.Threads$.withContextClassLoader(Threads.scala:21) ~[play_2.11-2.4.0.jar:2.4.0]
+	at play.core.server.DevServerStart$$anonfun$mainDev$1$$anon$1$$anonfun$get$1$$anonfun$apply$1$$anonfun$1.apply(DevServerStart.scala:150) ~[play-server_2.11-2.4.0.jar:2.4.0]
+	at play.core.server.DevServerStart$$anonfun$mainDev$1$$anon$1$$anonfun$get$1$$anonfun$apply$1$$anonfun$1.apply(DevServerStart.scala:121) ~[play-server_2.11-2.4.0.jar:2.4.0]
+	at scala.Option.map(Option.scala:146) ~[scala-library-2.11.6.jar:na]
+	at play.core.server.DevServerStart$$anonfun$mainDev$1$$anon$1$$anonfun$get$1$$anonfun$apply$1.apply(DevServerStart.scala:121) ~[play-server_2.11-2.4.0.jar:2.4.0]
+	at play.core.server.DevServerStart$$anonfun$mainDev$1$$anon$1$$anonfun$get$1$$anonfun$apply$1.apply(DevServerStart.scala:119) ~[play-server_2.11-2.4.0.jar:2.4.0]
+	at scala.util.Success.flatMap(Try.scala:230) ~[scala-library-2.11.6.jar:na]
+	at play.core.server.DevServerStart$$anonfun$mainDev$1$$anon$1$$anonfun$get$1.apply(DevServerStart.scala:119) ~[play-server_2.11-2.4.0.jar:2.4.0]
+	at play.core.server.DevServerStart$$anonfun$mainDev$1$$anon$1$$anonfun$get$1.apply(DevServerStart.scala:111) ~[play-server_2.11-2.4.0.jar:2.4.0]
+	at scala.concurrent.impl.Future$PromiseCompletingRunnable.liftedTree1$1(Future.scala:24) ~[scala-library-2.11.6.jar:na]
+	at scala.concurrent.impl.Future$PromiseCompletingRunnable.run(Future.scala:24) ~[scala-library-2.11.6.jar:na]
+	at java.util.concurrent.ForkJoinTask$RunnableExecuteAction.exec(ForkJoinTask.java:1402) ~[na:1.8.0_40]
+	at java.util.concurrent.ForkJoinTask.doExec(ForkJoinTask.java:289) ~[na:1.8.0_40]
+	at java.util.concurrent.ForkJoinPool$WorkQueue.runTask(ForkJoinPool.java:1056) ~[na:1.8.0_40]
+	at java.util.concurrent.ForkJoinPool.runWorker(ForkJoinPool.java:1689) ~[na:1.8.0_40]
+	at java.util.concurrent.ForkJoinWorkerThread.run(ForkJoinWorkerThread.java:157) ~[na:1.8.0_40]
+2015-08-07 18:07:06,084 [INFO] from application in ForkJoinPool-1-worker-1 - Creating Pool for datasource 'default'
+2015-08-07 18:07:06,086 [INFO] from play.api.db.DefaultDBApi in ForkJoinPool-1-worker-1 - Database [default] connected at jdbc:h2:mem:play
+2015-08-07 18:07:06,186 [INFO] from play.api.libs.concurrent.ActorSystemProvider in ForkJoinPool-1-worker-1 - Starting application default Akka system: application
+2015-08-07 18:07:06,294 [INFO] from play.api.Play$ in ForkJoinPool-1-worker-1 - Application started (Dev)
+2015-08-07 18:07:30,311 [INFO] from play.api.libs.concurrent.ActorSystemProvider in pool-4-thread-2 - Shutdown application default Akka system: application
+2015-08-07 18:07:30,343 [INFO] from application in pool-4-thread-2 - Shutting down connection pool.

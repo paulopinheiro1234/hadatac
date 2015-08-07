@@ -16,7 +16,7 @@ import play.data.Form;
 import play.mvc.Controller;
 import play.mvc.Result;
 import views.formdata.FacetFormData;
-import views.html.index;
+import views.html.index_browser;
 
 public class Application extends Controller {
 
@@ -95,7 +95,7 @@ public class Application extends Controller {
         
         //return ok("cool");
         Form<FacetFormData> fd = Form.form(FacetFormData.class).fill(facet_form);
-        return ok(index.render(username, fd, field_facets, query_facets,
+        return ok(index_browser.render(username, fd, field_facets, query_facets,
                 range_facets, pivot_facets, cluster_facets, 
                 query_results_list, final_query)); 
     }
@@ -157,7 +157,7 @@ public class Application extends Controller {
         
         //return ok("cool");
         Form<FacetFormData> fd = Form.form(FacetFormData.class).fill(facet_form);
-        return ok(index.render(username, fd, field_facets, query_facets,
+        return ok(index_browser.render(username, fd, field_facets, query_facets,
                 range_facets, pivot_facets, cluster_facets, 
                 query_results_list, final_query)); 
 

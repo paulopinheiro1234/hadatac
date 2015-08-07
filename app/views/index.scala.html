@@ -1,47 +1,27 @@
-@(  username: String,
-    facetForm: Form[views.formdata.FacetFormData],
-    fieldFacets: models.FacetsWithCategories,
-    queryFacets: models.FacetsWithCategories,
-    rangeFacets: models.FacetsWithCategories,
-    pivotFacets: models.FacetsWithCategories,
-    clusterFacets: models.FacetsWithCategories,
-    documentMap : Map[String, models.SpatialQueryResults],
-    final_query : String)
 
+@main(Messages("playauthenticate.index.title")) {
+      <!-- Main jumbotron for a primary marketing message or call to action -->
+      <div class="jumbotron">
+        <h1>@Messages("playauthenticate.index.intro")</h1>
+        <p>@Messages("playauthenticate.index.intro_2") <br/>@Messages("playauthenticate.index.intro_3")</p>
+      </div>
 
-@import helper._
-
-@main("Simple Faceted Search") {
-    <div class="container-fluid">
-      
+      <!-- Example row of columns -->
       <div class="row">
-        <div class="col-sm-3 col-md-2 sidebar">
-          @form(routes.Application.postIndex()) {
-            @fieldset(facetForm, fieldFacets, queryFacets, rangeFacets, pivotFacets, clusterFacets)
-        }
+        <div class="col-xs-6 col-sm-4">
+          <h2>@Messages("playauthenticate.index.heading")</h2>
+           <p>Cupcake ipsum dolor sit amet. Pastry pie powder biscuit bear claw. Jelly-o chocolate bar sweet roll sugar plum chocolate. Biscuit brownie chupa chups macaroon ice cream halvah sugar plum oat cake ice cream.</p>
+          <p><a class="btn" href="#">@Messages("playauthenticate.index.details") &raquo;</a></p>
         </div>
-        <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
-          <h1 class="page-header">Faceted Search</h1>
-          <h2>@username</h2>
-		  <h4>@final_query</h4>
-		  <div class="row placeholders"></div>
-		  <ul class="nav nav-tabs">
-		    @for((collection, query_results) <- documentMap) {
-		  		<li><a data-toggle="tab" href="#@collection">@collection</a></li>
-		    }
-		  </ul>
-          <div class="row placeholders"></div>
-          <div class = "tab-content">
-          	@for((collection, query_results) <- documentMap) {
-          		
-          			<div id="@collection" class="tab-pane fade in">
-          				@table(query_results)
-          			</div>
-          		
-          	}
-          </div>
+        <div class="col-xs-6 col-sm-4">
+          <h2>@Messages("playauthenticate.index.heading")</h2>
+           <p>Applicake macaroon caramels gummi bears pastry. Cake liquorice carrot cake chocolate lollipop dessert. Halvah fruitcake marshmallow pie gummi bears pie marzipan.</p>
+          <p><a class="btn" href="#">@Messages("playauthenticate.index.details") &raquo;</a></p>
+       </div>
+        <div class="col-xs-6 col-sm-4">
+          <h2>@Messages("playauthenticate.index.heading")</h2>
+          <p>Wafer halvah jujubes lollipop liquorice jelly-o pastry. Pie halvah toffee. Candy canes donut sugar plum. Chocolate cake powder tart liquorice cotton candy pudding sweet.</p>
+          <p><a class="btn" href="#">@Messages("playauthenticate.index.details") &raquo;</a></p>
         </div>
       </div>
-    </div>
-
-}
+    }

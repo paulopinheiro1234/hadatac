@@ -1,0 +1,51 @@
+.panel-group {
+    height: 550px;
+    overflow-y: auto;
+}
+
+.tech-details{
+    width:300px;
+    height:250px;
+    float:right;
+    border-style:solid;
+    border-color:#ccc;
+    color:#333;
+}
+
+.thumbnail{
+    float:left;
+}
+
+.hidetip{
+    display:none;
+}
+
+.navbar-secondary{
+    position:fixed;
+    background-color:#fff;
+    z-index:10;
+}
+
+.container-spaced{
+    margin-top:50px;
+}
+
+.infobox{
+    position:fixed;
+    width:340px;
+    height:550px;
+    overflow-y:auto;
+    top:160px;
+    right:10px;
+    border-style:solid;
+    border-color:#ccc;
+    background-color:#fff;
+}
+
+.perspective{
+    margin-left:270px;
+    border-style:solid;
+    border-width:1px;
+    border-color:#ccc;
+    text-indent:20px;
+}

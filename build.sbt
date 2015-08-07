@@ -1,16 +1,20 @@
-name := """hadatac-browser"""
+organization := "org.hadatac"
+
+name := "hadatac"
+
+scalaVersion := "2.11.6"
 
 version := "1.0-SNAPSHOT"
 
-lazy val root = (project in file(".")).enablePlugins(PlayJava)
-
-scalaVersion := "2.11.1"
-
-libraryDependencies ++= Seq(
-  javaJdbc,
-  javaEbean,
+val appDependencies = Seq(
+  "be.objectify"  %% "deadbolt-java"     % "2.4.0",
+  "com.feth"      %% "play-authenticate" % "0.7.0-SNAPSHOT",
+  "org.postgresql"    %  "postgresql"        % "9.4-1201-jdbc41",
   cache,
   javaWs,
+  javaJdbc,
+  "org.webjars" % "bootstrap" % "3.2.0",
+  "org.easytesting" % "fest-assert" % "1.4" % "test",
   "com.fasterxml.jackson.core" % "jackson-core" % "2.5.1",
   "com.fasterxml.jackson.core" % "jackson-databind" % "2.5.1",
   "com.fasterxml.jackson.core" % "jackson-annotations" % "2.5.1",
@@ -19,5 +23,12 @@ libraryDependencies ++= Seq(
   "org.apache.httpcomponents" % "fluent-hc" % "4.3.6"
 )
 
+// add resolver for deadbolt and easymail snapshots
+resolvers += Resolver.sonatypeRepo("snapshots")
 
-fork in run := true
+lazy val root = project.in(file("."))
+  .enablePlugins(PlayJava, PlayEbean)
+  .settings(
+    libraryDependencies ++= appDependencies
+  )
+
