@@ -73,7 +73,7 @@ public class Global extends GlobalSettings {
 	}
 
 	private void initialData() {
-		if (SecurityRole.find.findRowCount() == 0) {
+		if (SecurityRole.existsSolr() == false) {
 			for (final String roleName : Arrays
 					.asList(controllers.AuthApplication.USER_ROLE)) {
 				final SecurityRole role = new SecurityRole();

@@ -17,9 +17,13 @@ public class MyUserServicePlugin extends UserServicePlugin {
 
 	@Override
 	public Object save(final AuthUser authUser) {
+		return saveSolr(authUser);
+	}
+	
+	public Object saveSolr(final AuthUser authUser) {
 		final boolean isLinked = User.existsByAuthUserIdentity(authUser);
 		if (!isLinked) {
-			return User.create(authUser).id;
+			return User.create(authUser).id_s;
 		} else {
 			// we have this user already, so return null
 			return null;
@@ -32,7 +36,7 @@ public class MyUserServicePlugin extends UserServicePlugin {
 		// ...and dont forget to sync the cache when users get deactivated/deleted
 		final User u = User.findByAuthUserIdentity(identity);
 		if(u != null) {
-			return u.id;
+			return u.id_s;
 		} else {
 			return null;
 		}

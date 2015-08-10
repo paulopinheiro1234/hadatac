@@ -250,7 +250,12 @@ public class MyUsernamePasswordAuthProvider
 	@Override
 	protected String generateVerificationRecord(
 			final MyUsernamePasswordAuthUser user) {
-		return generateVerificationRecord(User.findByAuthUserIdentity(user));
+		return generateVerificationRecordSolr(user);
+	}
+	
+	protected String generateVerificationRecordSolr(
+			final MyUsernamePasswordAuthUser user) {
+		return generateVerificationRecord(User.findByAuthUserIdentitySolr(user));
 	}
 
 	protected String generateVerificationRecord(final User user) {

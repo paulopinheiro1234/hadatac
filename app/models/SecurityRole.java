@@ -15,29 +15,34 @@
  */
 package models;
 
-import javax.persistence.Entity;
-import javax.persistence.Id;
+import java.util.UUID;
 
-import play.db.ebean.Model;
+import org.apache.solr.client.solrj.SolrClient;
+import org.apache.solr.client.solrj.SolrQuery;
+import org.apache.solr.client.solrj.beans.Field;
+import org.apache.solr.client.solrj.impl.HttpSolrClient;
+import org.apache.solr.client.solrj.response.QueryResponse;
+import org.apache.solr.common.SolrDocument;
+import org.apache.solr.common.SolrDocumentList;
+
 import be.objectify.deadbolt.core.models.Role;
 
 /**
  * @author Steve Chaloner (steve@objectify.be)
  */
-@Entity
-public class SecurityRole extends Model implements Role {
+public class SecurityRole implements Role {
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
 
-	@Id
 	public Long id;
+	
+	@Field("id")
+	public String id_s;
 
+	@Field("role_name")
 	public String roleName;
-
-	public static final Finder<Long, SecurityRole> find = new Finder<Long, SecurityRole>(
-			Long.class, SecurityRole.class);
 
 	@Override
 	public String getName() {
@@ -45,6 +50,88 @@ public class SecurityRole extends Model implements Role {
 	}
 
 	public static SecurityRole findByRoleName(String roleName) {
-		return find.where().eq("roleName", roleName).findUnique();
+		return findByRoleNameSolr(roleName);
+	}
+	
+	public static boolean existsSolr() {
+		SolrClient solrClient = new HttpSolrClient("http://localhost:8983/solr/security_role");
+    	SolrQuery solrQuery = new SolrQuery("*:*");
+    	
+    	try {
+			QueryResponse queryResponse = solrClient.query(solrQuery);
+			solrClient.close();
+			SolrDocumentList list = queryResponse.getResults();
+			if (list.size() > 0) {
+				return true;
+			}
+		} catch (Exception e) {
+			System.out.println("[ERROR] SecurityRole.findByIdSolr - Exception message: " + e.getMessage());
+		}
+    	
+    	return false;
+	}
+	
+	public static SecurityRole findByIdSolr(String id) {
+		SecurityRole role = null;
+		SolrClient solrClient = new HttpSolrClient("http://localhost:8983/solr/security_role");
+    	SolrQuery solrQuery = new SolrQuery("id:" + id);
+    	
+    	try {
+			QueryResponse queryResponse = solrClient.query(solrQuery);
+			solrClient.close();
+			SolrDocumentList list = queryResponse.getResults();
+			if (list.size() == 1) {
+				role = convertSolrDocumentToSecurityRole(list.get(0));
+			}
+		} catch (Exception e) {
+			System.out.println("[ERROR] SecurityRole.findByIdSolr - Exception message: " + e.getMessage());
+		}
+    	
+    	return role;
+	}
+	
+	public static SecurityRole findByRoleNameSolr(String roleName) {
+		SecurityRole role = null;
+		SolrClient solrClient = new HttpSolrClient("http://localhost:8983/solr/security_role");
+    	SolrQuery solrQuery = new SolrQuery("role_name:" + roleName);
+    	
+    	try {
+			QueryResponse queryResponse = solrClient.query(solrQuery);
+			solrClient.close();
+			SolrDocumentList list = queryResponse.getResults();
+			if (list.size() == 1) {
+				role = convertSolrDocumentToSecurityRole(list.get(0));
+			}
+		} catch (Exception e) {
+			System.out.println("[ERROR] SecurityRole.findByRoleNameSolr - Exception message: " + e.getMessage());
+		}
+    	
+    	return role;
+	}
+	
+	public void save() {
+		SolrClient solrClient = new HttpSolrClient("http://localhost:8983/solr/security_role");
+		
+		//super.save();
+		
+		if (this.id_s == null) {
+			this.id_s = UUID.randomUUID().toString();
+		}
+        
+        try {
+        	solrClient.addBean(this);
+			solrClient.commit();
+			solrClient.close();
+		} catch (Exception e) {
+			System.out.println("[ERROR] SecurityRole.save - Exception message: " + e.getMessage());
+		}
+	}
+	
+	private static SecurityRole convertSolrDocumentToSecurityRole(SolrDocument doc) {
+		SecurityRole role = new SecurityRole();
+		role.id_s = doc.getFieldValue("id").toString();
+		role.roleName = doc.getFieldValue("role_name").toString();
+		
+		return role;
 	}
 }
