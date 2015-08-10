@@ -88,7 +88,6 @@ public class User extends AppModel implements Subject {
 	}
 	
 	public List<String> getSecurityRoleId() {
-		System.out.println("! User.getSecurityRoleId");
 		List<String> list = new ArrayList<String>();
 		Iterator<SecurityRole> roleIterator = roles.iterator();
 		while (roleIterator.hasNext()) {
