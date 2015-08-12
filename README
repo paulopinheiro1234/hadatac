@@ -1,10 +1,6 @@
-This is your new Play application
-=================================
+#HADataC - Human-Aware Data Collection Framework
 
-This file will be packaged with your application, when using `activator dist`.
+## What it on that repoitory?
 
-
-To run from the main directory:
-  user@box path/spatial-faceting$ activator run
-
-Then go to localhost:9000 in your browser to play with the app
+hadatac.console: Web applcation
+hadatac.solr-hadatac: Solr collections for data and metadata
