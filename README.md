@@ -2,5 +2,5 @@
 
 ## What is it on this repository?
 
-* hadatac.console: Web applcation
-* hadatac.solr-hadatac: Solr collections for data and metadata
+* hadatac.console: Web application
+* hadatac.solr: Solr collections for data and metadata
