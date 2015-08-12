@@ -1,0 +1,42 @@
+@(triple : models.TripleDocument,
+  p_list : List[models.TripleDocument])
+  
+@*****************************
+  hasURI    | (not used)
+  rdfs:subClassOf   | (not used)
+  rdfs:label    | modelName
+  vstoi:hasMaker    | maker
+  (?maker) foaf:page    | page
+  rdfs:comment  | desc
+  hasImage  | *add*
+  vstoi:hasWebDocumentation    | docLink
+******************************@ 
+
+
+@defining(triple.generateID()) {itemID =>
+<div class="panel-heading" role="tab" id="heading@itemID">
+    <h4 class="panel-title">
+    @defining(triple.get("modelName").replaceAll("[\\W]|_", "")) {cleanName =>
+        <a class="collapsed" role="button" data-toggle="collapse" data-parent="#accordion" href="#@cleanName" aria-expanded="false" aria-controls="@cleanName">
+            @triple.get("modelName")</a></h4>
+        
+</div>
+<div id="@cleanName" class="panel-collapse collapse" role="tabpanel" aria-labelledby="heading@cleanName">
+    }
+    <div class="panel-body">
+        <h3>@triple.get("modelName") </h3>
+        <img class="thumbnail" src="/hadatac/assets/images/placeholder200.png">
+        @if(triple.has("maker")){
+            <p>manufactured by: <a href="@triple.get("page")" target="_blank">@triple.get("maker")</a></p>
+        }
+        <p>Description: @triple.get("desc")</p>
+        @if(triple.has("docLink")){
+            <a href="@triple.get("docLink")" target="_blank">See Online Documentation</a>
+        }
+        <h4>Sensing Perspectives:</h4>
+        @for(p <- p_list){
+            @sensingperspective_entry(p)
+        }
+    </div>
+</div>
+}

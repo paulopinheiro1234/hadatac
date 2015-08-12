@@ -1,0 +1,62 @@
+@()
+
+@import helper._
+@import be.objectify.deadbolt.java.views.html._
+@import be.objectify.deadbolt.core.utils.TemplateUtils._
+
+@main("HADataC: Human-Aware Data Collection Framework") {
+    <div class="container-fluid">
+      <div class="row">
+          <div class="col-md-1 col-xs-0"></div>
+          <div class="col-md-8 col-xs-0">
+             <h3><font color="darkBlue">HADataC: Human-Aware Data Collection Framework</font></h3>
+             </ul>
+          </div>
+          <div class="col-md-1 col-xs-0"></div>
+      </div>
+      <div class="row">
+        <div class="col-md-1 col-xs-0"></div>
+        <div class="col-md-3 col-xs-2">
+           <h4>Data Search/Download</h4>  
+           <a href="" class="btn btn-primary btn-block" role="button">Faceted Search of Data Collections</a>
+           <a href="@routes.Application.index()" class="btn btn-primary btn-block" role="button">Faceted Search of Measurements</a>
+           <a href="@routes.Spatial.index()" class="btn btn-primary btn-block" role="button">Spatial Search of Measurements</a>
+           <a href="@routes.Metadata.index()" class="btn btn-primary btn-block" role="button">Browse Metadata</a>
+           <a href="" class="btn btn-primary btn-block" role="button">Collaboration Insight</a>
+        </div>
+@*        @subjectPresent() {
+          @defining(AuthApplication.getLocalUser(session())) { user =>
+*@
+          <div class="col-md-3 col-xs-2">
+              <h4>Data Upload</h4>  
+              <a href="" class="btn btn-primary btn-block" role="button">Create CCSV from CSV</a>
+              <a href="" class="btn btn-primary btn-block" role="button">Upload CCSV</a>
+              <a href="" class="btn btn-primary btn-block" role="button">Delete Data Collection</a>
+              <a href="" class="btn btn-primary btn-block" role="button">Set Data Collection access permission</a>
+           </div>
+           <div class="col-md-2 col-xs-2">
+              <h4>KB Management</h4>  
+              <a href="@routes.Management.cleanTS()" class="btn btn-primary btn-block" role="button">Clean KB</a>
+              <a href="@routes.Management.loadOntTS()" class="btn btn-primary btn-block" role="button">Upload Ontologies</a>
+              <a href="@routes.Management.loadKbTS()" class="btn btn-primary btn-block" role="button">Upload Facts</a>
+              <a href="" class="btn btn-primary btn-block" role="button">Manage Users</a>
+           </div>
+@*           }
+        }
+*@
+        <div class="col-md-1 col-xs-0"></div>
+      </div>
+    </div>
+    <div class="row">
+       <div class="col-md-1 col-xs-0"></div>
+       <div class="col-md-8 col-xs-0">
+             <h4>Terminology:</h4>
+             <ul>
+               <li>CCSV: contextualized common separated value</li>
+               <li>CSV: common separated value</li>
+               <li>KB: knowledge base</li>
+             </ul>
+        </div>
+       <div class="col-md-1 col-xs-0"></div>
+    </div>
+}

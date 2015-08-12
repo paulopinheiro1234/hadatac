@@ -1,0 +1,90 @@
+@(title: String, nav: String = "")(content: Html)
+
+@import be.objectify.deadbolt.java.views.html._
+@import be.objectify.deadbolt.core.utils.TemplateUtils._
+
+<!DOCTYPE html>
+
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>@title</title>
+        <script type="text/javascript" src="@routes.Assets.versioned("lib/jquery/jquery.js")"></script>
+        <script type="text/javascript" src="@routes.Assets.versioned("lib/bootstrap/js/bootstrap.js")"></script>
+        <script type="text/javascript" src="@routes.AuthApplication.jsRoutes" defer="defer"></script>
+
+        <link rel="stylesheet" href="@routes.Assets.versioned("lib/bootstrap/css/bootstrap.css")">
+        <link href="@routes.Assets.versioned("css/main.css")" rel="stylesheet">
+
+	<!--
+        <link rel="stylesheet" type="text/css" href="/hadatac/assets/stylesheets/main.css">
+        <link rel="stylesheet" media="screen" href="@routes.Assets.versioned("stylesheets/bootstrap.min.css")">
+        <link rel="stylesheet" href="@routes.Assets.versioned("stylesheets/dashboard.css")">
+        <link rel="shortcut icon" type="image/png" href="@routes.Assets.versioned("images/favicon.png")">
+        -->
+    </head>
+    <body>
+        <nav class="navbar navbar-inverse navbar-fixed-top">
+          <div class="container-fluid">
+            <div class="navbar-header">
+              <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+              </button>
+              <a class="navbar-brand" href="@routes.Portal.index()">Jefferson Project</a>
+            </div>
+            <div id="navbar" class="navbar-collapse collapse">
+              <ul class="nav navbar-nav">
+                <li><a href="@routes.Application.index()">Faceted Search</a></li>
+                <li><a href="@routes.Spatial.index()">Spatial Search</a></li>
+                <li><a href="@routes.Metadata.index()">Metadata Browser</a></li>
+                @subjectNotPresent() {
+                   <li class="@("active".when(nav == "signup"))"><a href="@routes.AuthApplication.signup()">@Messages("playauthenticate.navigation.signup")</a></li>
+                }
+              </ul>
+
+              @subjectPresentOr() {
+                  <ul class="nav navbar-nav navbar-right">
+                  @defining(AuthApplication.getLocalUser(session())) { user =>
+                     <li class="dropdown">
+                         <a href="#" class="dropdown-toggle" data-toggle="dropdown"><i class="glyphicon glyphicon-user"></i> @user.name <span class="caret"></span></a>
+                         <ul class="dropdown-menu" role="menu">
+                            <li class="@("active".when(nav == "profile"))"><a href="@routes.AuthApplication.profile()">@Messages("playauthenticate.navigation.profile")</a></li>
+                            <!-- <li><a href="@routes.Account.link()">@Messages("playauthenticate.navigation.link_more")</a></li>  -->
+                            <!-- <li class="divider"></li>  -->
+                            <li><a href="@com.feth.play.module.pa.controllers.routes.Authenticate.logout()"><i class="icon-off"></i> @Messages("playauthenticate.navigation.logout")</a></li>
+                         </ul>
+                     </li>
+                  }
+                  </ul>
+              } {
+                  <a href="@routes.AuthApplication.login()" class=" navbar-right btn btn-default navbar-btn @("disabled".when(nav == "login"))">@Messages("playauthenticate.navigation.login")</a>
+              }
+
+			 
+	      <!--
+              <form class="navbar-form navbar-right" action="/login" method="post">
+            		<div class="form-group">
+              			<input type="text" name="username" placeholder="Username" class="form-control">
+            		</div>
+            		<div class="form-group">
+              			<input type="password" name="password" placeholder="Password" class="form-control">
+            		</div>
+            		<button type="submit" class="btn btn-success">Sign in</button>
+          	  </form>  -->
+            </div>
+          </div>
+        </nav>
+
+        @content
+        <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+        <!-- <script src="/hadatac/assets/javascripts/jquery.min.js"></script>  -->
+        <!-- <script src="@routes.Assets.versioned("javascripts/bootstrap.min.js")"></script>  -->
+        <!-- <script src="../../hadatac/assets/js/ie10-viewport-bug-workaround.js"></script>  -->
+    </body>
+</html>

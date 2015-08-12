@@ -1,0 +1,23 @@
+@( documentMap : String, category : String)
+
+@import helper._
+
+@main("Agent Graph") {
+    <div class="container-fluid">
+      
+      <div class="row">
+        @*<div class="col-sm-9 col-md-10 main">*@
+		  @metadata_navigation(category)
+		  <div class="table-responsive">
+			 <div id="query" data-results="@documentMap"></div>
+			 <div id="info" class="infobox"></div>
+			 <div id="body"></div>
+             <script src="/hadatac/assets/javascripts/d3.min.js"></script>
+             <script src="/hadatac/assets/javascripts/d3.tip.v0.6.3.js"></script>
+    		 <script type="text/javascript" src="/hadatac/assets/javascripts/forceFieldRenderer.js"></script>  					   
+    		 <link type="text/css" rel="stylesheet" href="/hadatac/assets/stylesheets/forceFieldRenderer.css"/>   					   
+    	  </div>
+      </div>
+    </div>
+
+}

@@ -1,0 +1,32 @@
+@(triple : models.TripleDocument)
+@*****************************
+  hasURI    | platURI
+  rdfs:subClassOf   | (not used)
+  rdfs:label    | name
+  isA:    | modelName
+  vstoi:hasX  | lat
+  vstoi:hasY  | lng
+  hasQRcode  | *add*
+*****************************@
+
+@defining(triple.get("sn")) {itemID =>
+<div class="panel-heading" role="tab" id="heading@itemID">
+    <h4 class="panel-title">
+        <a class="collapsed" role="button" data-toggle="collapse" data-parent="#accordion" href="#@itemID" aria-expanded="false" aria-controls="@itemID">
+            @triple.get("name")</a></h4>
+        
+</div>
+<div id="@itemID" class="panel-collapse collapse" role="tabpanel" aria-labelledby="heading@itemID">
+    <div class="panel-body">
+        <h4>@triple.get("name") </h4> 
+        <img class="thumbnail" src="/hadatac/assets/images/placeholder200.png">
+        <p>(model name: @triple.get("modelName") )</p>
+        @defining(triple.get("platURI")) {theuri =>
+            <form>
+                <input type="text" size="80" value="@theuri">
+            </form>
+        }
+        <p>located at (@triple.get("lat"), @triple.get("lng")) | serial number @itemID</p>
+    </div>
+</div>
+}

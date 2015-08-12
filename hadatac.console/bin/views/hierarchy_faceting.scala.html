@@ -1,0 +1,38 @@
+@( documentMap : Map[String, models.SparqlQueryResults],
+   documentHierarchy: Map[String, String],
+   final_query : String)
+
+@import helper._
+@import play.api.libs.json._
+
+@main("Hierarchy Faceted Search") {
+    <div class="container-fluid">
+      
+      <div class="row">
+        <div class="col-sm-9 col-md-10 main">
+          <h3 class="page-header">Metadata Browser</h3>
+		  <ul class="nav nav-tabs">
+		    @for((thingType, query_results) <- documentMap) {
+    		    <li><a data-toggle="tab" href="#@thingType">@thingType</a></li>
+		    }
+		    @for((thingType, hierarchy_results) <- documentHierarchy) {
+    		    <li><a data-toggle="tab" href="#@thingType">@thingType</a></li>
+		    }
+		  </ul>
+          <div class = "tab-content">
+            @for((thingType, query_results) <- documentMap) {
+      			<div id="@thingType" class="tab-pane fade in">
+      				@metadata_table(query_results)
+      			</div>
+      		}
+            @for((thingType, hierarchy_results) <- documentHierarchy) {
+      			<div id="@thingType" class="tab-pane fade in">
+  					@metadata_hierarchy(hierarchy_results)
+      			</div>
+      		}
+          </div>
+        </div>
+      </div>
+    </div>
+
+}

@@ -1,0 +1,18 @@
+@( stackTrace : String,
+   category : String)
+
+@import helper._
+
+@main("Oops!"){
+    <div class="container-fluid">
+      
+      <div class="row">
+        <div class="col-sm-9 col-md-10 main">
+            @metadata_navigation(category)
+            <h4>Error :(</h4>
+            <div class="row placeholders"></div>
+            <p>@stackTrace</p>
+        </div>
+      </div>
+    </div>
+}
