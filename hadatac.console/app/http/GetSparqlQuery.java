@@ -47,7 +47,7 @@ public class GetSparqlQuery {
         //addSparqlUrls();
         addThingTypes();
         //this.collection = "http://jeffersontest.tw.rpi.edu/solr4/store/sparql";
-        this.collection = "https://jeffersonsecure.tw.rpi.edu/solrdf/store/sparql";
+        this.collection = "http://localhost:7574/solr/store/sparql";
         
         for (String tabName : thingTypes ){
             this.sparql_query = new StringBuffer();
@@ -87,7 +87,7 @@ public class GetSparqlQuery {
     //    all thingType queries to their own separate pages.
     public GetSparqlQuery (SparqlQuery query, String tabName) {
         //this.collection = "http://jeffersontest.tw.rpi.edu/solr4/store/sparql";
-	    this.collection = "https://jeffersonsecure.tw.rpi.edu/solrdf/store/sparql";
+    	this.collection = "http://localhost:7574/solr/store/sparql";
         this.sparql_query = new StringBuffer();
         this.sparql_query.append(collection);
         this.sparql_query.append("?q=");

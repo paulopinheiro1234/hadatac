@@ -76,14 +76,15 @@ public class GetSolrQuery {
     	//TODO Replace this method with something that dynamically checks the SOLR database for all collections
     	//This will require a string formatting approach, and for a password to be asked for at the start of use (to access lidarsonar)
     	
-    	collection_urls.put("collection1", "http://jeffersontest.tw.rpi.edu/solr/collection1/select?wt=json");
-    	collection_urls.put("collection2", "http://jeffersontest.tw.rpi.edu/solr/collection2/select?wt=json");
-    	collection_urls.put("datasets", "http://jeffersontest.tw.rpi.edu/solr/datasets/select?wt=json");
+    	//collection_urls.put("collection1", "http://jeffersontest.tw.rpi.edu/solr/collection1/select?wt=json");
+    	//collection_urls.put("collection2", "http://jeffersontest.tw.rpi.edu/solr/collection2/select?wt=json");
+    	//collection_urls.put("datasets", "http://jeffersontest.tw.rpi.edu/solr/datasets/select?wt=json");
     	//collection_urls.put("metadata", "http://jeffersontest.tw.rpi.edu/solr/metadata/select?wt=json");
-    	collection_urls.put("wikimapia", "http://jeffersontest.tw.rpi.edu/solr/wikimapia/select?wt=json");
+    	//collection_urls.put("wikimapia", "http://jeffersontest.tw.rpi.edu/solr/wikimapia/select?wt=json");
     	String lidarsonar = String.format("http://%s:%s@jeffersontest.tw.rpi.edu/solr/lidarsonar/select?wt=json", 
     			                           play.mvc.Controller.session("username"), play.mvc.Controller.session("password"));
-    	collection_urls.put("lidarsonar", lidarsonar);
+    	//collection_urls.put("lidarsonar", lidarsonar);
+    	collection_urls.put("measurement", "http://localhost:8983/solr/measurement/select?wt=json");
     }// /addCollectionUrls()
     
     //Preconditions: The GetSolrQuery object has been initialized by a Query object
@@ -105,6 +106,7 @@ public class GetSolrQuery {
                 	StringBuffer spatial_query = new StringBuffer();
                 	String json = new String();
                 	String polygon_string = new String();
+                	/*
                 	try {
                 		spatial_query.append("http://jeffersontest.tw.rpi.edu/solr/wikimapia/select?q=location_name");
                 		spatial_query.append(URLEncoder.encode(":\"", "UTF-8"));
@@ -116,6 +118,7 @@ public class GetSolrQuery {
                 	} catch (Exception e){
                 		e.printStackTrace();
                 	}
+                	*/
                 	try
                     {
                     	HttpClient client = new DefaultHttpClient();
