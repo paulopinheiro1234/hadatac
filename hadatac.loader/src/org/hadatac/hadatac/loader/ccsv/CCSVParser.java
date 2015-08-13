@@ -19,6 +19,10 @@ import com.hp.hpl.jena.rdf.model.ResourceFactory;
 
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVRecord;
+import org.apache.solr.client.solrj.SolrClient;
+import org.apache.solr.client.solrj.SolrServerException;
+import org.apache.solr.client.solrj.impl.HttpSolrClient;
+import org.apache.solr.common.SolrInputDocument;
 import org.hadatac.hadatac.loader.entity.Characteristic;
 import org.hadatac.hadatac.loader.entity.DataCollection;
 import org.hadatac.hadatac.loader.entity.Dataset;
@@ -26,6 +30,7 @@ import org.hadatac.hadatac.loader.entity.Deployment;
 import org.hadatac.hadatac.loader.entity.Entity;
 import org.hadatac.hadatac.loader.entity.HADataC;
 import org.hadatac.hadatac.loader.entity.Measurement;
+import org.hadatac.hadatac.loader.entity.MeasurementType;
 import org.hadatac.hadatac.loader.entity.Unit;
 import org.hadatac.hadatac.loader.util.FileFactory;
 import org.hadatac.hadatac.loader.util.SparqlQuery;
@@ -96,10 +101,11 @@ public class CCSVParser {
 		Deployment deployment;
 		DataCollection dataCollection;
 		Dataset dataset;
-		Measurement measurement;
+		MeasurementType measurement;
 		Characteristic characteristic;
 		Unit unit;
 		Entity entity;
+		Measurement m;
 		
 		String preamble;
 		String queryString;
@@ -165,6 +171,8 @@ public class CCSVParser {
 		
 		int count = 0;
 		
+		SolrClient solrClient = new HttpSolrClient("http://localhost:8983/solr/measurement");
+		
 		System.out.println("uri,timestamp,value,unit,unit_uri,entity,entity_uri,characteristic,characteristic_uri,location,elevation,dataset_uri");
 		
 		try (QueryExecution qexec = QueryExecutionFactory.create(query, model)) {
@@ -194,7 +202,7 @@ public class CCSVParser {
 						entity = hadatac.getEntityFromMeasurement(measurementPreamble.getURI());
 						unit = hadatac.getUnit(unitPreamble.getURI());
 					} else {
-						measurement = new Measurement(measurementPreamble);
+						measurement = new MeasurementType(measurementPreamble);
 					
 						//System.out.println("! before hasCharacteristic");
 						if (hadatac.hasCharacteristic(characteristicPreamble.getURI())) {
@@ -222,6 +230,21 @@ public class CCSVParser {
 						hadatac.addMeasurement(measurement.getLocalName(), measurement);
 					}
 					
+					m = new Measurement();
+					m.setUri(hadatac.getMeasurementURI(measurement.getLocalName()) + "/" + count);
+					if (soln.getLiteral("tsColumn") != null) { m.setTimestamp(record.get(soln.getLiteral("tsColumn").getInt())); }
+					if (!record.get(soln.getLiteral("valueColumn").getInt()).equals("")) { m.setValue(Float.parseFloat(record.get(soln.getLiteral("valueColumn").getInt()))); }
+					m.setUnit(unit.getLabel());
+					m.setUnit_uri(unit.getUri());
+					m.setEntity(entity.getLabel());
+					m.setEntity_uri(entity.getUri());
+					m.setCharacteristic(characteristic.getLabel());
+					m.setCharacteristic_uri(characteristic.getUri());
+					if (soln.getLiteral("ltColumn") != null) { m.setLatlong(record.get(soln.getLiteral("ltColumn").getInt())); }
+					if (soln.getLiteral("dpColumn") != null) { m.setElevation(Float.parseFloat(record.get(soln.getLiteral("dpColumn").getInt()))); }
+					m.setDataset_uri(soln.getResource("ds").getLocalName());
+					
+					/*
 					System.out.print(hadatac.getMeasurementURI(measurement.getLocalName()) + "/" + count + ","); // uri
 					if (soln.getLiteral("tsColumn") != null) { System.out.print(record.get(soln.getLiteral("tsColumn").getInt()) + ","); } else { System.out.print(","); } //timestamp
 					System.out.print(record.get(soln.getLiteral("valueColumn").getInt()) + ","); //value
@@ -235,12 +258,24 @@ public class CCSVParser {
 					if (soln.getLiteral("dpColumn") != null) { System.out.print(record.get(soln.getLiteral("dpColumn").getInt()) + ","); } else { System.out.print(","); } // elevation
 					System.out.print(soln.getResource("ds").getLocalName()); //dataset_uri
                     System.out.println("");
+                    */
+                    
+                    try {
+            			solrClient.addBean(m);
+            		} catch (Exception e) {
+            			System.out.println("[ERROR] solrClient.addBean - Exception message: " + e.getMessage());
+            		}
 				}
 				count++;
 			}
-			
 			files.closeFile("csv", "r");
 		}
+		try {
+			solrClient.commit();
+		} catch (SolrServerException e) {
+			System.out.println("[ERROR] solrClient.commit - Exception message: " + e.getMessage());
+		}
+		solrClient.close();
 		
 		return 0;
 	}

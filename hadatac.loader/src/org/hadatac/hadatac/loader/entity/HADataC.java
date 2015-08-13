@@ -12,7 +12,7 @@ public class HADataC {
 	private DataCollection dataCollection;
 	private Deployment deployment;
 	
-	private HashMap<String, Measurement> measurements;
+	private HashMap<String, MeasurementType> measurements;
 	private HashMap<String, Characteristic> characteristics;
 	private HashMap<String, Unit> units;
 	private HashMap<String, Entity> entities;
@@ -21,13 +21,13 @@ public class HADataC {
 		super();
 		this.node = node;
 		
-		measurements = new HashMap<String, Measurement>();
+		measurements = new HashMap<String, MeasurementType>();
 		characteristics = new HashMap<String, Characteristic>();
 		units = new HashMap<String, Unit>();
 		entities = new HashMap<String, Entity>();
 	}
 	
-	public void addMeasurement(String uri, Measurement measurement) {
+	public void addMeasurement(String uri, MeasurementType measurement) {
 		measurements.put(uri, measurement);
 	}
 	
@@ -35,7 +35,7 @@ public class HADataC {
 		return measurements.containsKey(uri);
 	}
 	
-	public Measurement getMeasurement(String uri) {
+	public MeasurementType getMeasurement(String uri) {
 		return measurements.get(uri);
 	}
 	
