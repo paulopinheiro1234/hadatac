@@ -103,16 +103,16 @@ public class GetSparqlQuery {
     // (Until I make a more dynamic implementation for this....)
     // IDEA: a config file that we can parse into Thing + query, with methods to check it dynamically?
     public void addThingTypes(){
-        thingTypes[0] = "Platforms";
-        thingTypes[1] = "PlatformModels";
-        thingTypes[2] = "Instruments";
-        thingTypes[3] = "InstrumentModels";
-        thingTypes[4] = "Detectors";
-        thingTypes[5] = "DetectorModels";
-        thingTypes[6] = "Entities";
-        thingTypes[7] = "OrganizationsH";
-        thingTypes[8] = "PeopleH";
-        thingTypes[9] = "Characteristics";
+        thingTypes[0]  = "Platforms";
+        thingTypes[1]  = "PlatformModels";
+        thingTypes[2]  = "Instruments";
+        thingTypes[3]  = "InstrumentModels";
+        thingTypes[4]  = "Detectors";
+        thingTypes[5]  = "DetectorModels";
+        thingTypes[6]  = "Entities";
+        thingTypes[7]  = "OrganizationsH";
+        thingTypes[8]  = "PeopleH";
+        thingTypes[9]  = "Characteristics";
         thingTypes[10] = "Units";
 	    thingTypes[11] = "SensingPerspectives";
     }
