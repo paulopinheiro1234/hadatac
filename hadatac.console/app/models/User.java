@@ -12,6 +12,7 @@ import com.feth.play.module.pa.user.NameIdentity;
 import com.feth.play.module.pa.user.FirstLastNameIdentity;
 
 import models.TokenAction.Type;
+import play.Play;
 import play.data.format.Formats;
 import play.data.validation.Constraints;
 
@@ -162,8 +163,8 @@ public class User extends AppModel implements Subject {
 	}
 	
 	private static List<User> getAuthUserFindSolr(
-			final AuthUserIdentity identity) {
-		SolrClient solrClient = new HttpSolrClient("http://localhost:8983/solr/user");
+		final AuthUserIdentity identity) {
+		SolrClient solrClient = new HttpSolrClient(Play.application().configuration().getString("hadatac.solr.users") + "/user");
 		String query = "active:true AND provider_user_id:" + identity.getId() + " AND provider_key:" + identity.getProvider();
     	SolrQuery solrQuery = new SolrQuery(query);
     	List<User> users = new ArrayList<User>();
@@ -220,7 +221,7 @@ public class User extends AppModel implements Subject {
 	}
 	
 	public static User findByIdSolr(final String id) {
-		SolrClient solrClient = new HttpSolrClient("http://localhost:8983/solr/users");
+		SolrClient solrClient = new HttpSolrClient(Play.application().configuration().getString("hadatac.solr.users") + "/users");
     	SolrQuery solrQuery = new SolrQuery("id:" + id);
     	User user = null;
     	
@@ -308,7 +309,7 @@ public class User extends AppModel implements Subject {
 	}
 	
 	public void save() {
-		SolrClient solrClient = new HttpSolrClient("http://localhost:8983/solr/users");
+		SolrClient solrClient = new HttpSolrClient(Play.application().configuration().getString("hadatac.solr.users") + "/users");
         
         try {
 			solrClient.addBean(this);
@@ -375,7 +376,7 @@ public class User extends AppModel implements Subject {
 	}
 	
 	private static List<User> getEmailUserFindSolr(final String email, final String providerKey) {
-		SolrClient solrClient = new HttpSolrClient("http://localhost:8983/solr/users");
+		SolrClient solrClient = new HttpSolrClient(Play.application().configuration().getString("hadatac.solr.users") + "/users");
 		String query = "email:" + email + " AND active:true";
     	SolrQuery solrQuery = new SolrQuery(query);
     	List<User> users = new ArrayList<User>();

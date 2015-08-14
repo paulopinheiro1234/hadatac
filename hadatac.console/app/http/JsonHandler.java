@@ -11,13 +11,14 @@ import java.util.Map;
 
 import org.apache.commons.io.IOUtils;
 
+import play.Play;
+
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class JsonHandler {
     
-    //private String field_count_url = "http://localhost:8983/solr/datasets/browse?q=*%3A*&wt=json&facet=true&rows=0";
-	private String field_count_url = "http://jeffersontest.tw.rpi.edu/solr/datasets/browse?q=*%3A*&wt=json&facet=true&rows=0";
+	private String field_count_url = Play.application().configuration().getString("hadatac.solr.data") + "/datasets/browse?q=*%3A*&wt=json&facet=true&rows=0";
     public Map<String, HashMap<String, String>> categories_facets_and_counts = new HashMap<String, HashMap<String, String>>();
     public Map<String, ArrayList<String>> categories_and_facets = new HashMap<String, ArrayList<String>>();
 

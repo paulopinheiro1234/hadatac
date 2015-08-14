@@ -25,6 +25,7 @@ import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
 
+import play.Play;
 import be.objectify.deadbolt.core.models.Role;
 
 /**
@@ -54,7 +55,7 @@ public class SecurityRole implements Role {
 	}
 	
 	public static boolean existsSolr() {
-		SolrClient solrClient = new HttpSolrClient("http://localhost:8983/solr/security_role");
+		SolrClient solrClient = new HttpSolrClient(Play.application().configuration().getString("hadatac.solr.users") + "/security_role");
     	SolrQuery solrQuery = new SolrQuery("*:*");
     	
     	try {
@@ -73,7 +74,7 @@ public class SecurityRole implements Role {
 	
 	public static SecurityRole findByIdSolr(String id) {
 		SecurityRole role = null;
-		SolrClient solrClient = new HttpSolrClient("http://localhost:8983/solr/security_role");
+		SolrClient solrClient = new HttpSolrClient(Play.application().configuration().getString("hadatac.solr.users") + "/security_role");
     	SolrQuery solrQuery = new SolrQuery("id:" + id);
     	
     	try {
@@ -92,7 +93,7 @@ public class SecurityRole implements Role {
 	
 	public static SecurityRole findByRoleNameSolr(String roleName) {
 		SecurityRole role = null;
-		SolrClient solrClient = new HttpSolrClient("http://localhost:8983/solr/security_role");
+		SolrClient solrClient = new HttpSolrClient(Play.application().configuration().getString("hadatac.solr.users") + "/security_role");
     	SolrQuery solrQuery = new SolrQuery("role_name:" + roleName);
     	
     	try {
@@ -110,7 +111,7 @@ public class SecurityRole implements Role {
 	}
 	
 	public void save() {
-		SolrClient solrClient = new HttpSolrClient("http://localhost:8983/solr/security_role");
+		SolrClient solrClient = new HttpSolrClient(Play.application().configuration().getString("hadatac.solr.users") + "/security_role");
 		
 		//super.save();
 		

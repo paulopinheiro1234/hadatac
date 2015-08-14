@@ -4,14 +4,9 @@ import java.io.IOException;
 import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
-import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.Scanner;
 import java.util.TreeMap;
-import java.util.ArrayList;
 
-
-import models.Query;
 import models.SparqlQuery;
 
 import org.apache.commons.io.IOUtils;
@@ -22,8 +17,7 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.impl.client.HttpClients;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import play.Play;
 
 public class GetSparqlQuery {
 
@@ -35,7 +29,6 @@ public class GetSparqlQuery {
     
     public GetSparqlQuery () {} 
 
-    
     //list_of_queries contains all the queries to execute
     //this.sparql_query will be a query to return all documents in the last collection of
     //collection_urls.
@@ -46,8 +39,8 @@ public class GetSparqlQuery {
     public GetSparqlQuery (SparqlQuery query) {
         //addSparqlUrls();
         addThingTypes();
-        //this.collection = "http://jeffersontest.tw.rpi.edu/solr4/store/sparql";
-        this.collection = "https://jeffersonsecure.tw.rpi.edu/solrdf/store/sparql";
+
+        this.collection = Play.application().configuration().getString("hadatac.solr.triplestore") + "store/sparql";
         
         for (String tabName : thingTypes ){
             this.sparql_query = new StringBuffer();
@@ -87,7 +80,7 @@ public class GetSparqlQuery {
     //    all thingType queries to their own separate pages.
     public GetSparqlQuery (SparqlQuery query, String tabName) {
         //this.collection = "http://jeffersontest.tw.rpi.edu/solr4/store/sparql";
-	    this.collection = "https://jeffersonsecure.tw.rpi.edu/solrdf/store/sparql";
+	this.collection = Play.application().configuration().getString("hadatac.solr.triplestore") + "/store/sparql";
         this.sparql_query = new StringBuffer();
         this.sparql_query.append(collection);
         this.sparql_query.append("?q=");
@@ -121,7 +114,7 @@ public class GetSparqlQuery {
         thingTypes[8] = "PeopleH";
         thingTypes[9] = "Characteristics";
         thingTypes[10] = "Units";
-	thingTypes[11] = "SensingPerspectives";
+	    thingTypes[11] = "SensingPerspectives";
     }
     
     public String querySelector(String tabName){
@@ -304,7 +297,7 @@ public class GetSparqlQuery {
             	System.out.println("WARNING: no query for tab " + tabName);
         }// /switch
         return q;
-    }// /querySelector
+    } // /querySelector
 
 
     //Preconditions: The GetSparqlQuery object has been initialized with a Query object
@@ -332,5 +325,5 @@ public class GetSparqlQuery {
             //in.close();
             //request.close();
         }
-    }// /executeQuery()
+    } // /executeQuery()
 }
