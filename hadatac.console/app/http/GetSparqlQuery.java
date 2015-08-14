@@ -40,7 +40,7 @@ public class GetSparqlQuery {
         //addSparqlUrls();
         addThingTypes();
 
-        this.collection = Play.application().configuration().getString("hadatac.solr.triplestore") + "store/sparql";
+        this.collection = Play.application().configuration().getString("hadatac.solr.triplestore") + "/store/sparql";
         
         for (String tabName : thingTypes ){
             this.sparql_query = new StringBuffer();
