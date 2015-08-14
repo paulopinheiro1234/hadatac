@@ -3,14 +3,16 @@
 @import helper._
 @import be.objectify.deadbolt.java.views.html._
 @import be.objectify.deadbolt.core.utils.TemplateUtils._
+@import play.api.Play
 
 @main("HADataC: Human-Aware Data Collection Framework") {
     <div class="container-fluid">
       <div class="row">
           <div class="col-md-1 col-xs-0"></div>
           <div class="col-md-8 col-xs-0">
-             <h3><font color="darkBlue">HADataC: Human-Aware Data Collection Framework</font></h3>
-             </ul>
+             <h3><font color="darkBlue">@Play.current.configuration.getString("hadatac.community.shortname") 's Human-Aware Data Collection Framework</font></h3>
+             @Play.current.configuration.getString("hadatac.community.description") 
+             <hr>
           </div>
           <div class="col-md-1 col-xs-0"></div>
       </div>
@@ -50,12 +52,15 @@
     <div class="row">
        <div class="col-md-1 col-xs-0"></div>
        <div class="col-md-8 col-xs-0">
+             <hr>
              <h4>Terminology:</h4>
              <ul>
                <li>CCSV: contextualized common separated value</li>
                <li>CSV: common separated value</li>
                <li>KB: knowledge base</li>
              </ul>
+             <hr>
+             (c) 2015, HADataC.org
         </div>
        <div class="col-md-1 col-xs-0"></div>
     </div>
