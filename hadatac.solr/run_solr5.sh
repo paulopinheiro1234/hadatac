@@ -1,4 +1,4 @@
-SOLR_INSTALL_DIR=~/solr-5.2.1
+SOLR_INSTALL_DIR=$HADATAC_SOLR/solr-5.2.1
 
 if [ ! -d "$SOLR_INSTALL_DIR" ]; then
   echo "$SOLR_INSTALL_DIR not found! Please check the SOLR_INSTALL_DIR setting in your $0 script."
@@ -6,7 +6,7 @@ if [ ! -d "$SOLR_INSTALL_DIR" ]; then
 fi
 
 
-SOLR_ENV=~/hadatac/hadatac.solr/solr5.in.sh
+SOLR_ENV=$HADATAC_SOLR/solr5.in.sh
 
 if [ ! -f "$SOLR_ENV" ]; then
   echo "$SOLR_ENV not found! Please check the SOLR_ENV setting in your $0 script."
