@@ -10,6 +10,7 @@ import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
 
+import play.Play;
 import be.objectify.deadbolt.core.models.Permission;
 
 /**
@@ -40,7 +41,7 @@ public class UserPermission extends AppModel implements Permission {
 	
 	public static UserPermission findByValueSolr(String value) {
 		UserPermission permission = null;
-		SolrClient solrClient = new HttpSolrClient("http://localhost:8983/solr/user_permission");
+		SolrClient solrClient = new HttpSolrClient(Play.application().configuration().getString("hadatac.solr.users") + "/user_permission");
     	SolrQuery solrQuery = new SolrQuery("value:" + value);
     	
     	try {
@@ -59,7 +60,7 @@ public class UserPermission extends AppModel implements Permission {
 	
 	public static UserPermission findByIdSolr(String id) {
 		UserPermission permission = null;
-		SolrClient solrClient = new HttpSolrClient("http://localhost:8983/solr/user_permission");
+		SolrClient solrClient = new HttpSolrClient(Play.application().configuration().getString("hadatac.solr.users") + "/user_permission");
     	SolrQuery solrQuery = new SolrQuery("id:" + id);
     	
     	try {
@@ -77,7 +78,7 @@ public class UserPermission extends AppModel implements Permission {
 	}
 	
 	public void save() {
-		SolrClient solrClient = new HttpSolrClient("http://localhost:8983/solr/user_permission");
+		SolrClient solrClient = new HttpSolrClient(Play.application().configuration().getString("hadatac.solr.users") + "/user_permission");
 		
 		if (this.id_s == null) {
 			this.id_s = UUID.randomUUID().toString();

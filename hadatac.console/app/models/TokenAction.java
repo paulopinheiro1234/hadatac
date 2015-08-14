@@ -18,13 +18,13 @@ import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 import org.joda.time.format.ISODateTimeFormat;
 
+import play.Play;
 import play.data.format.Formats;
 
 public class TokenAction {
 
 	public enum Type {
 		EMAIL_VERIFICATION,
-
 		PASSWORD_RESET
 	}
 
@@ -111,7 +111,7 @@ public class TokenAction {
 	}
 	
 	public static TokenAction findByTokenSolr(final String token, final Type type) {
-		SolrClient solrClient = new HttpSolrClient("http://localhost:8983/solr/token_action");
+		SolrClient solrClient = new HttpSolrClient(Play.application().configuration().getString("hadatac.solr.users") + "/token_action");
     	SolrQuery solrQuery = new SolrQuery("token:" + token + " AND type:" + type.name());
     	TokenAction tokenAction = null;
 		
@@ -141,7 +141,7 @@ public class TokenAction {
 	}
 	
 	public static void deleteByUserSolr(final User u, final Type type) {
-		SolrClient solrClient = new HttpSolrClient("http://localhost:8983/solr/token_action");
+		SolrClient solrClient = new HttpSolrClient(Play.application().configuration().getString("hadatac.solr.users") + "/token_action");
 		try {
 			solrClient.deleteByQuery("target_user_id:" + u.id_s + " AND type:" + type.name());
 			solrClient.commit();
@@ -174,7 +174,7 @@ public class TokenAction {
 	}
 	
 	public void save() {
-		SolrClient solrClient = new HttpSolrClient("http://localhost:8983/solr/token_action");
+		SolrClient solrClient = new HttpSolrClient(Play.application().configuration().getString("hadatac.solr.users") + "/token_action");
         
         try {
         	solrClient.addBean(this);

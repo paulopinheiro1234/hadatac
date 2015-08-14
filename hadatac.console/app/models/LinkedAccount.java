@@ -13,6 +13,8 @@ import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
 
+import play.Play;
+
 import com.feth.play.module.pa.user.AuthUser;
 
 public class LinkedAccount extends AppModel {
@@ -50,7 +52,7 @@ public class LinkedAccount extends AppModel {
 	
 	public static LinkedAccount findByProviderKeySolr(final User user, String key) {
 		LinkedAccount account = null;
-		SolrClient solrClient = new HttpSolrClient("http://localhost:8983/solr/linked_account");
+		SolrClient solrClient = new HttpSolrClient(Play.application().configuration().getString("hadatac.solr.users") + "/linked_account");
     	SolrQuery solrQuery = new SolrQuery("user_id:" + user.id_s + " AND provider_key:" + key);
     	
     	try {
@@ -70,7 +72,7 @@ public class LinkedAccount extends AppModel {
 	
 	public static List<LinkedAccount> findByIdSolr(final User user) {
 		List<LinkedAccount> accounts = new ArrayList<LinkedAccount>(); 
-		SolrClient solrClient = new HttpSolrClient("http://localhost:8983/solr/linked_account");
+		SolrClient solrClient = new HttpSolrClient(Play.application().configuration().getString("hadatac.solr.users") + "/linked_account");
     	SolrQuery solrQuery = new SolrQuery("user_id:" + user.id_s);
     	
     	try {
@@ -113,7 +115,7 @@ public class LinkedAccount extends AppModel {
 	}
 	
 	public void save() {
-		SolrClient solrClient = new HttpSolrClient("http://localhost:8983/solr/linked_account");
+		SolrClient solrClient = new HttpSolrClient(Play.application().configuration().getString("hadatac.solr.users") + "/linked_account");
 		
         try {
         	solrClient.addBean(this);
