@@ -74,20 +74,24 @@ public class GetSolrQuery {
     	//TODO Replace this method with something that dynamically checks the SOLR database for all collections
     	//This will require a string formatting approach, and for a password to be asked for at the start of use (to access lidarsonar)
 
-    	String collection_1 = Play.application().configuration().getString("hadatac.solr.data") + "collection1/select?wt=json";
-    	String collection_2 = Play.application().configuration().getString("hadatac.solr.data") + "collection2/select?wt=json";
-    	String collection_datasets  = Play.application().configuration().getString("hadatac.solr.data") + "datasets/select?wt=json";
-    	String collection_wikimapia = Play.application().configuration().getString("hadatac.solr.data") + "wikimapia/select?wt=json";
-    	String collection_lidarsonar = Play.application().configuration().getString("hadatac.solr.data") + "lidarsonar/select?wt=json";
-        	collection_lidarsonar.replaceAll("://","://%s:%s@");
+    	String collection_1 = Play.application().configuration().getString("hadatac.solr.data") + "/collection1/select?wt=json";
+    	String collection_2 = Play.application().configuration().getString("hadatac.solr.data") + "/collection2/select?wt=json";
+    	String collection_datasets  = Play.application().configuration().getString("hadatac.solr.data") + "/datasets/select?wt=json";
+    	String collection_wikimapia = Play.application().configuration().getString("hadatac.solr.data") + "/wikimapia/select?wt=json";
+    	String collection_lidarsonar = Play.application().configuration().getString("hadatac.solr.data") + "/lidarsonar/select?wt=json";
+    	String collection_measurement = Play.application().configuration().getString("hadatac.solr.data") + "/measurement/select?wt=json";
+        collection_lidarsonar.replaceAll("://","://%s:%s@");
     	
+        /*
         collection_urls.put("collection1", collection_1);
     	collection_urls.put("collection2", collection_2);
     	collection_urls.put("datasets", collection_datasets);
     	collection_urls.put("wikimapia", collection_wikimapia);
     	String lidarsonar = String.format(collection_lidarsonar, 
                             play.mvc.Controller.session("username"), play.mvc.Controller.session("password"));
-	    collection_urls.put("lidarsonar", lidarsonar);
+        */
+	    //collection_urls.put("lidarsonar", lidarsonar);
+	    collection_urls.put("measurement", collection_measurement);
     } // /addCollectionUrls()
     
     //Preconditions: The GetSolrQuery object has been initialized by a Query object
