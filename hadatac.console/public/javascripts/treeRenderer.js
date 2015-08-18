@@ -5,8 +5,6 @@ var m = [20, 120, 20, 120],
     w = 1280 - m[1] - m[3],
     h = 800 - m[0] - m[2],
     i = 0,
-    border = 3,
-    bordercolor = 'lightsteelgray',
     root;
 
 var tree = d3.layout.tree()
@@ -15,16 +13,20 @@ var tree = d3.layout.tree()
 var diagonal = d3.svg.diagonal()
     .projection(function(d) { return [d.y, d.x]; });
 
+  root = JSON.parse(results);
+  var depth = getDepth(root);
+  console.log("Depth: " + depth);
+  var theWidth = Math.max((depth*230), (w + m[1] + m[3]));
+
 var vis = d3.select("#body").append("svg:svg")
-    .attr("width", w + m[1] + m[3])
+    .attr("width", theWidth)
     .attr("height", h + m[0] + m[2])
-    .attr("style", "outline: thin solid lightsteelblue;")
+    //.attr("style", "outline: thin solid lightsteelblue;")
   .append("svg:g")
     .attr("transform", "translate(" + m[3] + "," + m[0] + ")");
 
 //d3.json("http://mbostock.github.io/d3/talk/20111018/flare.json", function(json) {
 //alert(results);
-  root = JSON.parse(results);
   root.x0 = h / 2;
   root.y0 = 0;
 
@@ -44,6 +46,20 @@ var vis = d3.select("#body").append("svg:svg")
 
   update(root);
 //});
+
+function getDepth(obj) {
+    var depth = 0;
+    if (obj.children) {
+        obj.children.forEach(function (d) {
+            var tmpDepth = getDepth(d)
+            if (tmpDepth > depth) {
+                depth = tmpDepth
+            }
+        })
+    }
+    return 1 + depth
+}
+
 
 
 function update(source) {
