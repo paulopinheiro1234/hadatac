@@ -86,16 +86,9 @@ public class Application extends Controller {
         //Get the facets
         getFacets(jh);
         
-        String username;
-        if (session("username") == null){
-        	username = "You are not logged in";
-        } else {
-        	username = String.format("Hello, %s", session("username"));
-        }
-        
         //return ok("cool");
         Form<FacetFormData> fd = Form.form(FacetFormData.class).fill(facet_form);
-        return ok(index_browser.render(username, fd, field_facets, query_facets,
+        return ok(index_browser.render(fd, field_facets, query_facets,
                 range_facets, pivot_facets, cluster_facets, 
                 query_results_list, final_query)); 
     }
@@ -148,16 +141,9 @@ public class Application extends Controller {
         //Get the facets
         getFacets(jh);
         
-        String username;
-        if (session("username") == null){
-        	username = "You are not logged in";
-        } else {
-        	username = String.format("Hello, %s", session("username"));
-        }
-        
         //return ok("cool");
         Form<FacetFormData> fd = Form.form(FacetFormData.class).fill(facet_form);
-        return ok(index_browser.render(username, fd, field_facets, query_facets,
+        return ok(index_browser.render(fd, field_facets, query_facets,
                 range_facets, pivot_facets, cluster_facets, 
                 query_results_list, final_query)); 
 
