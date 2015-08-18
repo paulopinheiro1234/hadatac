@@ -1,0 +1,64 @@
+@( results : org.hadatac.console.models.SparqlQueryResults,
+   perspectives : org.hadatac.console.models.SparqlQueryResults,
+   category : String)
+
+@*****************************
+	public TreeMap<String,TripleDocument> results.sparqlResults;
+	public TreeMap<String,TripleDocument> perspectives.sparqlResults;
+    public String results.treeResults;
+    public String json;
+*****************************@
+
+@import helper._
+@import org.hadatac.console.views.html._
+
+@main("Hierarchies") {
+    @metadata_navigation(category)
+    <div class="container-fluid container-spaced">
+      <div class="row">
+        <div class="col-sm-9 col-md-10 main">
+            <ul class="nav nav-tabs">
+                <li class="active"><a data-toggle="tab" href="#table">View as Table</a></li>
+                @if(results.treeResults != null){ <li><a data-toggle="tab" href="#tree">View as Hierarchy</a></li> }
+            </ul>
+            <div class = "tab-content">
+
+            <div id="table" class="tab-pane fade in active">
+                <div><p>(click for more information)</p></div>
+                    <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
+                        <div class="panel panel-default">
+                            @for((k, triple) <- results.sparqlResults){
+                                @defining(perspectives.getMatching("ofModelName",triple.get("modelName"))) {p_list =>
+                                    @detector_model_entry(triple, p_list)
+                                }
+                            }
+                        </div>
+                    </div>
+            </div>
+
+            @if(results.treeResults != null){
+                <div id="tree" class="tab-pane fade in">
+                    <div id="info" class="infobox"></div>
+                    <div id="query" data-results="@results.treeResults"></div>
+                    <div id="body"></div>
+                        <script type="text/javascript" src="/hadatac/assets/javascripts/d3.js"></script>
+                        <script type="text/javascript" src="/hadatac/assets/javascripts/d3.layout.js"></script>
+                        <script type="text/javascript" src="/hadatac/assets/javascripts/treeRenderer.js"></script>
+                        <script type="text/javascript">
+                            d3.selectAll(".node")
+                                .on('mouseover', function (d,i){
+                                    var item = d.name.replace(/\W/g, '');
+                                    var stuff = document.getElementById(item).innerHTML;
+                                    var infobox = document.getElementById('info');
+                                    infobox.innerHTML = stuff;
+                                
+                                });
+                                
+			            </script>
+                    <link type="text/css" rel="stylesheet" href="/hadatac/assets/stylesheets/treeRenderer.css"/>
+                </div>
+            }
+            
+          </div>
+    </div>
+}

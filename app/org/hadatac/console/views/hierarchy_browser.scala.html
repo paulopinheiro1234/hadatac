@@ -1,0 +1,128 @@
+@( results : org.hadatac.console.models.SparqlQueryResults,
+   category : String)
+
+@*****************************
+	public TreeMap<String,TripleDocument> sparqlResults;
+    public String treeResults;
+    public String json;
+*****************************@
+
+@import helper._
+@import org.hadatac.console.views.html._
+
+@main("Hierarchies") {
+    @metadata_navigation(category)
+    <div class="container-fluid container-spaced">
+      <div class="row">
+            <div class="col-sm-9 col-md-10 main">
+            <ul class="nav nav-tabs">
+                <li class="active"><a data-toggle="tab" href="#table">View as Table</a></li>
+                @if(results.treeResults != ""){ <li><a data-toggle="tab" href="#tree">View as Hierarchy</a></li> }
+            </ul>
+            <div class="tab-content">
+
+            <div id="table" class="tab-pane fade in active">
+                <div><p>(click for more information)</p></div>
+                    <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
+                        <div class="panel panel-default">
+                        @category match{
+                            case "InstrumentModels" => {
+                                @for((k, triple) <- results.sparqlResults){
+                                    @instrument_model_entry(triple) 
+                                }
+                            }
+                            case "Instruments" => { 
+                                @for((k, triple) <- results.sparqlResults){
+                                    @instrument_entry(triple) 
+                                }
+                            }
+                            case "Detectors" => { 
+                                @for((k, triple) <- results.sparqlResults){
+                                    @detector_entry(triple) 
+                                }
+                            }
+                            case "PlatformModels" => { 
+                                @for((k, triple) <- results.sparqlResults){
+                                    @platform_model_entry(triple) 
+                                }
+                            }
+                            case "Platforms" => { 
+                                @for((k, triple) <- results.sparqlResults){
+                                    @platform_entry(triple)
+                                }
+                            }
+                            case "Entities" => { 
+                                @for((k, triple) <- results.sparqlResults){
+                                    @*@entity_entry(triple)*@
+                                    @placeholder_entry(triple)
+                                }
+                            }
+                            case "Characteristics" => { 
+                                @for((k, triple) <- results.sparqlResults){
+                                    @characteristic_entry(triple)
+                                }
+                            }
+                            case "Units" => { 
+                                @for((k, triple) <- results.sparqlResults){
+                                    @unit_entry(triple)
+                                }
+                            }
+                            case _ => {
+                            }
+                        }
+                        </div>
+                    </div>
+                </div>
+
+            @if(results.treeResults != null){
+                <div id="tree" class="tab-pane fade in">
+                    <div id="info" class="infobox"></div>
+                    <div id="query" data-results="@results.treeResults"></div>
+                    <div id="body"></div>
+                        <script type="text/javascript" src="/hadatac/assets/javascripts/d3.js"></script>
+                        <script type="text/javascript" src="/hadatac/assets/javascripts/d3.layout.js"></script>
+                        <script type="text/javascript" src="/hadatac/assets/javascripts/treeRenderer.js"></script>
+                        <script type="text/javascript">
+                            d3.selectAll(".node")
+                                .on('mouseover', function (d,i){
+                                    var item = d.name.replace(/\W/g, '');
+                                    var stuff = document.getElementById(item).innerHTML;
+                                    var infobox = document.getElementById('info');
+                                    infobox.innerHTML = stuff;
+                                
+                                });
+                                
+			</script>
+                    <link type="text/css" rel="stylesheet" href="/hadatac/assets/stylesheets/treeRenderer.css"/>
+                </div>
+            }
+            
+          </div>
+    </div>
+}
+
+@infobox_filler(item_name:String) = @{
+    var triple:org.hadatac.console.models.TripleDocument = results.sparqlResults get item_name
+
+    <h4>triple.get("modelName") </h4>
+    if(triple.has("maker")){
+        <p>manufactured by: triple.get("maker")</p>
+    }
+    <p>Description: triple.get("desc")</p>
+    if(triple.has("docLink")){
+        <p>See Online Documentation</p>
+    }
+    <b>Technical Details</b>
+    if(triple.has("minTemp")){
+        <p>Operational between triple.get("minTemp") and triple.get("maxTemp") triple.get("tempUnit").</p>
+    }
+    if(triple.has("numAtt")){
+        <p>Number of attached detectors: triple.get("numAtt")</p>
+    }
+    if(triple.has("numDet")){
+        <p>Number of detachable detectors: triple.get("numDet")</p>
+    }
+    if(triple.has("maxLog")){
+        <p>Maximum measurements logged: triple.get("maxLog")</p>
+    }
+}
