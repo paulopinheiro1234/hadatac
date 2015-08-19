@@ -15,14 +15,18 @@
     @metadata_navigation(category)
     <div class="container-fluid container-spaced">
       <div class="row">
-        <div class="col-sm-9 col-md-10 main">
+        <div class="col-sm-9 col-md-9 main">
             <ul class="nav nav-tabs">
-                <li class="active"><a data-toggle="tab" href="#table">View as Table</a></li>
-                @if(results.treeResults != null){ <li><a data-toggle="tab" href="#tree">View as Hierarchy</a></li> }
+                @if(results.treeResults != ""){
+                    <li class="active" onclick="info_on('info')"><a data-toggle="tab" href="#tree">View as Hierarchy</a></li> 
+                    <li onclick="info_off('info')"><a data-toggle="tab" href="#table">View as Table</a></li>
+                } else {
+                    <li class="active"><a data-toggle="tab" href="#table">View as Table</a></li>
+                }
             </ul>
             <div class = "tab-content">
 
-            <div id="table" class="tab-pane fade in active">
+            <div id="table" class="tab-pane fade in">
                 <div><p>(click for more information)</p></div>
                     <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
                         <div class="panel panel-default">
@@ -33,9 +37,8 @@
                     </div>
             </div>
 
-            @if(results.treeResults != null){
-                <div id="tree" class="tab-pane fade in">
-                    <div id="info" class="infobox"></div>
+            @if(results.treeResults != ""){
+                <div id="tree" class="tab-pane fade in active">
                     <div id="query" data-results="@results.treeResults"></div>
                     <div id="body"></div>
                         <script type="text/javascript" src="/hadatac/assets/javascripts/d3.js"></script>
@@ -58,4 +61,9 @@
             
           </div>
     </div>
+    <div class="col-md-3 col-sm-3">
+        <div class="tab-spacer"></div>
+        <div id="info" class="infobox" style="display:block"></div>
+    </div>
+    <script type="text/javascript" src="/hadatac/assets/javascripts/extra.js"></script>    
 }

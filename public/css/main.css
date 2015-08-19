@@ -30,3 +30,32 @@ form .error .help-inline {
 h1 {
     margin-bottom: 20px !important;
 }
+
+.infobox{
+    min-height:100px;
+    border-style:solid;
+    border-width:1px;
+    border-color:#ccc;
+    background-color:#fff;
+}
+
+#body{
+    border-left-style:solid;
+    border-right-style:solid;
+    border-bottom-style:solid;
+    border-width:1px;
+    border-color:lightsteelblue;
+    overflow-x:auto;
+}
+
+.tab-spacer{
+    height:40px;
+}
+
+.perspective{
+    margin-left:270px;
+    border-style:solid;
+    border-width:1px;
+    border-color:#ccc;
+    text-indent:20px;
+}
