@@ -9,7 +9,7 @@
 
 ## Community
 
-Jois us on this discussion at hadatac-user-list@googlegroups.com.
+Jois us on this discussion at hadatac-user-list+subscribe@googlegroups.com.
 
 ## Acknowledgements
 
