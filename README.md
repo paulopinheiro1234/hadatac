@@ -9,21 +9,7 @@
 
 ## Community
 
-Jois us on this discussion at hadatac-user-list@googlegroups.com
-
-<iframe id="forum_embed"
-  src="javascript:void(0)"
-  scrolling="no"
-  frameborder="0"
-  width="900"
-  height="700">
-</iframe>
-<script type="text/javascript">
-  document.getElementById('forum_embed').src =
-     'https://groups.google.com/forum/embed/?place=forum/hadatac-user-list'
-     + '&showsearch=true&showpopout=true&showtabs=false'
-     + '&parenturl=' + encodeURIComponent(window.location.href);
-</script>
+Jois us on this discussion at hadatac-user-list@googlegroups.com.
 
 ## Acknowledgements
 
