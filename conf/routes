@@ -25,6 +25,8 @@ GET	/hadatac/metadata/detectorlist		org.hadatac.console.controllers.DetectorList
 POST	/hadatac/metadata/detectorlist		org.hadatac.console.controllers.DetectorList.postIndex()
 GET	/hadatac/metadata/entity		org.hadatac.console.controllers.Entity.index()
 POST	/hadatac/metadata/entity		org.hadatac.console.controllers.Entity.postIndex()
+GET	/hadatac/metadata/entitycharacteristic        org.hadatac.console.controllers.EntityCharacteristic.index()
+POST	/hadatac/metadata/entitycharacteristic        org.hadatac.console.controllers.EntityCharacteristic.postIndex()
 GET	/hadatac/metadata/characteristic        org.hadatac.console.controllers.Characteristic.index()
 POST	/hadatac/metadata/characteristic        org.hadatac.console.controllers.Characteristic.postIndex()
 GET	/hadatac/metadata/unit                  org.hadatac.console.controllers.Unit.index()
