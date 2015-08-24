@@ -1,0 +1,18 @@
+PREFIX sioc: <http://rdfs.org/sioc/ns#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX geo: <http://www.w3.org/2003/01/geo/wgs84_pos#>
+PREFIX owl: <http://www.w3.org/2002/07/owl#>
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+PREFIX prov: <http://www.w3.org/ns/prov#>
+PREFIX vstoi: <http://hadatac.org/ont/vstoi#>
+PREFIX hasneto: <http://hadatac.org/ont/hasneto#>
+
+INSERT DATA {
+	<http://localhost/hadatac/deployment/deployment-example01>
+		a						vstoi:Deployment ;
+		hasneto:hasDetector		<http://jefferson.tw.rpi.edu/ontology/jp-kb.owl#VaisalaWINDCAP-0023> ;
+		hasneto:hasInstrument	<http://jefferson.tw.rpi.edu/ontology/jp-sn.owl#WXT520-0023> ;
+		vstoi:hasPlatform		<http://jefferson.tw.rpi.edu/ontology/jp-kb.owl#JP_WX_DFWI> ;
+		prov:startedAtTime		"2015-02-15T19:50:55Z"^^<http://www.w3.org/2001/XMLSchema#dateTime> .
+}

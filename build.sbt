@@ -19,8 +19,14 @@ val appDependencies = Seq(
   "com.fasterxml.jackson.core" % "jackson-databind" % "2.5.1",
   "com.fasterxml.jackson.core" % "jackson-annotations" % "2.5.1",
   "org.apache.commons" % "commons-io" % "1.3.2",
+  "org.apache.commons" % "commons-csv" % "1.1",
   "org.apache.httpcomponents" % "httpclient" % "4.3.6",
-  "org.apache.httpcomponents" % "fluent-hc" % "4.3.6"
+  "org.apache.httpcomponents" % "fluent-hc" % "4.3.6",
+  "org.apache.solr" % "solr-solrj" % "5.2.1",
+  "org.apache.jena" % "jena-core" % "2.13.0",
+  "org.apache.jena" % "jena-arq" % "2.13.0",
+  "args4j" % "args4j" % "2.32",
+  "joda-time" % "joda-time" % "2.8.2"
 )
 
 // add resolver for deadbolt and easymail snapshots
