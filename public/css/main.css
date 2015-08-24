@@ -59,3 +59,7 @@ h1 {
     border-color:#ccc;
     text-indent:20px;
 }
+
+table.sortable th:not(.sorttable_sorted):not(.sorttable_sorted_reverse):not(.sorttable_nosort):after { 
+    content: " \25B4\25BE" 
+}

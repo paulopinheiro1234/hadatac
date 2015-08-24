@@ -1,4 +1,4 @@
-@( results : models.SparqlQueryResults,
+@( results : org.hadatac.console.models.SparqlQueryResults,
    category : String)
 
 @*****************************
@@ -20,7 +20,7 @@
                 <li><a data-toggle="tab" href="#table2">Characteristic-First</a></li>
             </ul>
             <div class = "tab-content">
-
+          <script type="text/javascript" src="@controllers.routes.Assets.versioned("javascripts/sorttable.js")"></script>
             <div id="table1" class="tab-pane fade in active">
                 <div><p>(click headers to sort)</p></div>
                 <div class="fixed-height"><table class="table table-hover sortable">
@@ -43,7 +43,6 @@
                     </tbody>
                 </table></div>
             </div>
-           
            
           </div>
     </div>

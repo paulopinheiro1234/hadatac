@@ -1,16 +1,16 @@
-package controllers;
+package org.hadatac.console.controllers;
 
-import http.GetSparqlQuery;
+import org.hadatac.console.http.GetSparqlQuery;
 
 import java.io.IOException;
 import java.util.TreeMap;
 
-import models.SparqlQuery;
-import models.SparqlQueryResults;
+import org.hadatac.console.models.SparqlQuery;
+import org.hadatac.console.models.SparqlQueryResults;
 import play.mvc.Controller;
 import play.mvc.Result;
-import views.html.entitycharacteristic_browser;
-import views.html.error_page;
+import org.hadatac.console.views.html.entitycharacteristic_browser;
+import org.hadatac.console.views.html.error_page;
 
 
 public class EntityCharacteristic extends Controller {
