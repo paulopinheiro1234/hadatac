@@ -44,9 +44,10 @@ public class SpatialQueryResults extends QueryResults {
 				Iterator<String> docFields = doc.fieldNames();
 				while (docFields.hasNext()){
 					String docField = docFields.next();
+					/*
 					if (docField.equals("characteristic")){
 						continue;
-					}
+					}*/
 					fields.put(docField, doc.get(docField).asText());
 					//System.out.println(docField);
 				}

@@ -29,6 +29,14 @@ public class Measurement {
 	private String characteristic;
 	@Field("characteristic_uri")
 	private String characteristicUri;
+	@Field("instrument_model")
+	private String instrumentModel;
+	@Field("instrument_uri")
+	private String instrumentUri;
+	@Field("platform_name")
+	private String platformName;
+	@Field("platform_uri")
+	private String platformUri;
 	@Field("location")
 	private String location;
 	@Field("elevation")
@@ -36,6 +44,30 @@ public class Measurement {
 	@Field("dataset_uri")
 	private String datasetUri;
 	
+	public String getInstrumentModel() {
+		return instrumentModel;
+	}
+	public void setInstrumentModel(String instrumentModel) {
+		this.instrumentModel = instrumentModel;
+	}
+	public String getInstrumentUri() {
+		return instrumentUri;
+	}
+	public void setInstrumentUri(String instrumentUri) {
+		this.instrumentUri = instrumentUri;
+	}
+	public String getPlatformName() {
+		return platformName;
+	}
+	public void setPlatformName(String platformName) {
+		this.platformName = platformName;
+	}
+	public String getPlatformUri() {
+		return platformUri;
+	}
+	public void setPlatformUri(String platformUri) {
+		this.platformUri = platformUri;
+	}
 	public String getUri() {
 		return uri;
 	}
