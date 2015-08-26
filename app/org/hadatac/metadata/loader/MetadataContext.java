@@ -22,9 +22,10 @@ import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.hadatac.metadata.loader.NameSpace;
 import org.hadatac.metadata.loader.NameSpaces;
-import org.hadatac.console.controllers.triplestore.*;
 import org.w3c.dom.Document;
 import org.xml.sax.InputSource;
+
+import play.Play;
 import play.libs.ws.*;
 import play.mvc.Call;
 
@@ -41,25 +42,24 @@ public class MetadataContext {
 	         // For remote use:
 	         //   - http://jeffersontest.tw.rpi.edu/solr4
     boolean verbose = false;
+
     String processMessage = "";
+    String loadFileMessage = "";
 	
     public MetadataContext(String un, String pwd, String kb, boolean ver) {
         System.out.println("Metadata management set for knowledge base at " + kb);
-	username = un;
-	password = pwd;
-	kbURL = kb;
-	verbose = ver;
-    }
-
-    public static String playClean() {
-	NameSpaces.getInstance();
-	MetadataContext metadata = new MetadataContext("user", "password", "http://localhost:7574/solr", false);
-	return metadata.clean(MetadataContext.WEB);
+	    username = un;
+	    password = pwd;
+	    kbURL = kb;
+	    verbose = ver;
     }
 
     public static Long playTotalTriples() {
-	MetadataContext metadata = new MetadataContext("user", "password", "http://localhost:7574/solr", false);
-        return metadata.totalTriples();
+	     MetadataContext metadata = new MetadataContext("user", 
+	    		                                        "password", 
+	    		                                        Play.application().configuration().getString("hadatac.solr.triplestore"), 
+	    		                                        false);
+      return metadata.totalTriples();
     }
 
     private String executeQuery(String query) throws IllegalStateException, IOException{
@@ -112,31 +112,40 @@ public class MetadataContext {
 	       //System.out.println("<ERROR>");
 	       if (verbose) {
 	    	   while ( (line = br.readLine()) != null)
-	    		   System.out.println(line);
+	    		   message += println(mode, line);
 	       }
 	       //System.out.println("</ERROR>");
 	       int exitVal = proc1.waitFor();
-	       if (mode == WEB) {
-	    	   message = "    exit value: [" + exitVal + "]    ";
-	       } else {
-	          System.out.print("    exit value: [" + exitVal + "]    ");
-	       }
-	       //System.out.println("   Process: [" + command[0] + "]   exitValue: [" + exitVal + "]");
+	       message += print(mode, "    exit value: [" + exitVal + "]    ");
+	       //message += println(mode, "   Process: [" + command[0] + "]   exitValue: [" + exitVal + "]");
 	    } catch (Throwable t) {
 		       t.printStackTrace();
 		}
 		return message;
     }
 
+    public static String println(int mode, String str) {
+    	if (mode == COMMANDLINE) {
+    		System.out.print(str);
+    	} else {
+    		str += "<br>";
+    	}
+    	return str;
+    }
+    
+    public static String print(int mode, String str) {
+    	if (mode == COMMANDLINE) {
+    		System.out.print(str);
+    	}
+    	return str;
+    }
+    
 	public String clean(int mode) {
 	    String message = "";
 	    String straux = "";
 	    //System.out.println("Is WEB? " + (mode == WEB));
-            if (mode == WEB) {
-                message += "   Triples before [clean]: " + totalTriples() + "<br>";
-	    } else {
-		System.out.println("   Triples before [clean]: " + totalTriples());
-	    }
+        message += println(mode,"   Triples before [clean]: " + totalTriples());
+        message += println(mode, " ");
 	    // ATTENTION: For now, it erases entirely the content of the metadata collection 
 	    String query1 = "<delete><query>*:*</query></delete>";
 	    String query2 = "<commit/>";
@@ -148,41 +157,33 @@ public class MetadataContext {
 		    url2 = kbURL + "/store/update?stream.body=" + URLEncoder.encode(query2, "UTF-8");
 		    //Runtime.getRuntime().exec("curl -v " + url1);
 		    //Runtime.getRuntime().exec("curl -v " + url2);
-		    String[] cmd1 = {"curl", "-v", url1};
-		    if (mode == WEB) {
-			message += "    Erasing triples... ";                
-		    } else {
-			System.out.print("   Erasing triples... ");
+		    if (verbose) {
+		        message += println(mode, url1);
+		        message += println(mode, url2);
 		    }
+		    String[] cmd1 = {"curl", "-v", url1};
+			message += print(mode, "    Erasing triples... ");                
 		    straux = executeCommand(mode, cmd1);
 		    if (mode == WEB) {
 		    	message += straux;
 		    }
-		    if (mode == WEB) {
-			message += "<br>   Committing... ";                
-		    } else {
-			System.out.println("");
-			System.out.print("   Committing... ");
-		    }
+		    message += println(mode, "");
+			message += print(mode, "   Committing... ");                
 		    String[] cmd2 = {"curl", "-v", url2};
 		    straux = executeCommand(mode, cmd2);
 		    if (mode == WEB) {
 		    	message += straux;
 		    }
-		    if (mode == WEB) {
-			message += "<br>   Triples after [clean]: " + totalTriples();                
-		    } else {
-			System.out.println("");
-			System.out.println("   Triples after [clean]: " + totalTriples());
-		    }
+		    message += println(mode," ");
+		    message += println(mode," ");
+			message += print(mode,"   Triples after [clean]: " + totalTriples());                
 		} catch (UnsupportedEncodingException e) {
 		    System.out.println("[MetadataManagement] - ERROR encoding URLs");
 		    //e.printStackTrace();
-		    return "";
+		    return message;
 		}
         return message; 
 	}
-
 	
 	/* 
 	 *   contentType correspond to the mime type required for curl to process the data provided. For example, application/rdf+xml is
@@ -190,39 +191,44 @@ public class MetadataContext {
 	 *   
 	 */
 	public Long loadLocalFile(int mode, String filePath, String contentType) {
+		loadFileMessage = "";
 		//System.out.println("File: " + filePath + "   Content Type: " + contentType);
 		Long total = totalTriples();
 		if (verbose) {
 			System.out.println("curl -v " + kbURL + "/store/update/bulk?commit=true -H \"Content-Type: " + contentType + "\" --data-binary @" + filePath);
 		}
 		String[] cmd = {"curl", "-v", kbURL + "/store/update/bulk?commit=true","-H", "Content-Type: " + contentType, "--data-binary", "@" + filePath};
-		executeCommand(mode, cmd);
+		loadFileMessage += executeCommand(mode, cmd);
 		Long newTotal = totalTriples();
 		return (newTotal - total);
 	}
 	
-	public void loadOntologies(int mode) {
+	public String loadOntologies(int mode) {
+	    String message = "";
 		Long total = totalTriples();
-		System.out.println("   Triples before [loadOntologies]: " + total);
-		NameSpaces.getInstance().copyNameSpacesLocally();
+		message += println(mode, "   Triples before [loadOntologies]: " + total);
+		message += println(mode," ");
+		message += NameSpaces.getInstance().copyNameSpacesLocally(mode);
 		for (Map.Entry<String, NameSpace> entry : NameSpaces.table.entrySet()) {
 	    	String abbrev = entry.getKey().toString();
 	    	String nsURL = entry.getValue().getURL();
 	    	if ((abbrev != null) && (nsURL != null) && (entry.getValue().getType() != null) && !nsURL.equals("")) {
 	    		String filePath = "copy" + "-" + abbrev.replace(":","");
-
-	    		System.out.print("   Uploading " + filePath);
-	    		for (int i = filePath.length(); i < 30; i++) {
-	    			System.out.print(" ");
+	    		message += print(mode, "   Uploading " + filePath);
+	    		for (int i = filePath.length(); i < 50; i++) {
+	    			message += print(mode, ".");
 	    		}
 	    		loadLocalFile(mode, filePath, entry.getValue().getType());
+	    		message += loadFileMessage;
 	    		Long newTotal = totalTriples();
-	    		System.out.println("   Added " + (newTotal - total) + " triples.");
+	    		message += println(mode, "   Added " + (newTotal - total) + " triples.");
 	    		
 	    		total = newTotal;
 	    	}	          
 	    }
-		System.out.println("   Triples after [loadOntologies]: " + totalTriples());
+		message += println(mode," ");
+		message += println(mode, "   Triples after [loadOntologies]: " + totalTriples());
+		return message;
 	}
 }	
 	

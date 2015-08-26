@@ -102,7 +102,8 @@ public class NameSpaces {
 	    return ttl;
 	}
 		
-	public void copyNameSpacesLocally() {
+	public String copyNameSpacesLocally(int mode) {
+		String message = "";
 	    //byte[] buffer = new byte[1024];
 	    //int bytesRead;
 
@@ -112,7 +113,10 @@ public class NameSpaces {
 	    	String nsURL = entry.getValue().getURL();
 	    	if (nsURL != null && !nsURL.equals("") && !nsURL.equals(":")) {
 	    		String filePath = "copy" + "-" + abbrev.replace(":","");
-	    		System.out.println("   creating local copy of " + abbrev);		
+	    		message += MetadataContext.print(mode, "   Creating local copy of " + abbrev + ". ");		
+			    for (int i = abbrev.length(); i < 36; i++) {
+			    	message += MetadataContext.print(mode, ".");
+			    }
 	         
 	    		//if (!abbrev.equals("jp-entities:") && (!abbrev.equals(":")) && (!abbrev.equals("jp-sn:"))) {
 	    			URL url;
@@ -139,14 +143,16 @@ public class NameSpaces {
 						inputStream.close();
 						outputStream.close();
 						*/
+		    			message += MetadataContext.println(mode, "Local copy created.");
 					} catch (Exception e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
+						message += MetadataContext.println(mode, "Failed to create local copy.");
 					}
 	    		//}
 	    	}
 	        
-	    }	   
+	    }	
+	    message += MetadataContext.println(mode," ");
+	    return message;
 	}	
 
     public static void main(String[] args) {
