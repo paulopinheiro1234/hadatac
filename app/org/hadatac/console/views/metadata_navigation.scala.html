@@ -37,6 +37,11 @@
        } else {
        		<a href="@org.hadatac.console.controllers.routes.Entity.index()" class="btn btn-primary" role="button">Entity<br>Hierarchy</a>
        }
+       @if(selection == "EntityCharacteristics") {
+       		<a href="@org.hadatac.console.controllers.routes.EntityCharacteristic.index()" class="btn btn-warning" role="button">Entity-Characteristic<br>Table</a>
+       } else {
+       		<a href="@org.hadatac.console.controllers.routes.EntityCharacteristic.index()" class="btn btn-primary" role="button">Entity-Characteristic<br>Table</a>
+       }
 	   @if(selection == "Characteristics") {
        		<a href="@org.hadatac.console.controllers.routes.Characteristic.index()" class="btn btn-warning" role="button">Characteristic<br>Hierarchy</a>
        } else {

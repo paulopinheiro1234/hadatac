@@ -24,7 +24,7 @@ public class GetSparqlQuery {
     public StringBuffer sparql_query = new StringBuffer();
     public TreeMap<String, StringBuffer> list_of_queries = new TreeMap<String, StringBuffer>();
     public String collection;
-    private int numThings = 12;
+    private int numThings = 13;
     public String[] thingTypes = new String[numThings];
     
     public GetSparqlQuery () {} 
@@ -100,6 +100,7 @@ public class GetSparqlQuery {
         thingTypes[9]  = "Characteristics";
         thingTypes[10] = "Units";
 	    thingTypes[11] = "SensingPerspectives";
+	    thingTypes[12] = "EntityCharacteristics";
     }
     
     public String querySelector(String tabName){
@@ -275,6 +276,16 @@ public class GetSparqlQuery {
                     "            ?sp vstoi:hasResponseTimeUnit ?timeunit } ." +
                     " OPTIONAL { ?sp vstoi:hasLowRangeValue ?low ." +
                     "            ?sp vstoi:hasHighRangeValue ?high } ." +
+                    "}";
+                break;
+            case "EntityCharacteristics" : 
+                q = "PREFIX rdfs:<http://www.w3.org/2000/01/rdf-schema#>" + 
+                    "PREFIX owl: <http://www.w3.org/2002/07/owl#>" + 
+                    "SELECT ?ecName ?entity ?chara WHERE { " + 
+                    "   ?ec a <http://jefferson.tw.rpi.edu/ontology/hasneto.owl#EntityCharacteristic> . " + 
+                    "   ?ec rdfs:label ?ecName .  " + 
+                    "   ?ec <http://jefferson.tw.rpi.edu/ontology/hasneto.owl#ofEntity> ?entity .  " + 
+                    "   ?ec <http://jefferson.tw.rpi.edu/ontology/hasneto.owl#ofCharacteristic> ?chara .  " + 
                     "}";
                 break;
             default :

@@ -1,0 +1,49 @@
+@( results : org.hadatac.console.models.SparqlQueryResults,
+   category : String)
+
+@*****************************
+	public TreeMap<String,OtMTripleDocument> results.sparqlResults;
+	public TreeMap<String,ArrayList<String>> results.sparqlResults.item;
+    public String results.treeResults;
+    public String json;
+*****************************@
+
+@import helper._
+
+@main("Hierarchies") {
+    @metadata_navigation(category)
+    <div class="container-fluid container-spaced">
+      <div class="row">
+        <div class="col-sm-9 col-md-10 main">
+            <ul class="nav nav-tabs">
+                <li class="active"><a data-toggle="tab" href="#table1">Entity-First</a></li>
+                <li><a data-toggle="tab" href="#table2">Characteristic-First</a></li>
+            </ul>
+            <div class = "tab-content">
+          <script type="text/javascript" src="@controllers.routes.Assets.versioned("javascripts/sorttable.js")"></script>
+            <div id="table1" class="tab-pane fade in active">
+                <div><p>(click headers to sort)</p></div>
+                <div class="fixed-height"><table class="table table-hover sortable">
+                    <thead><tr><th>Entity</th><th>EntityCharacteristic</th><th>Characteristic</th></tr></thead>
+                    <tbody>
+                        @for((k, triple) <- results.sparqlResults){
+                             @entitycharacteristic_entry(triple, false)
+                        }
+                    </tbody>
+                </table></div>
+            </div>
+            <div id="table2" class="tab-pane fade in">
+                <div><p>(click headers to sort)</p></div>
+                <div class="fixed-height"><table class="table table-hover fixed-height sortable">
+                    <thead><tr><th>Characteristic</th><th>EntityCharacteristic</th><th>Entity</th></tr></thead>
+                    <tbody>
+                        @for((k, triple) <- results.sparqlResults){
+                             @entitycharacteristic_entry(triple, true)
+                        }
+                    </tbody>
+                </table></div>
+            </div>
+           
+          </div>
+    </div>
+}

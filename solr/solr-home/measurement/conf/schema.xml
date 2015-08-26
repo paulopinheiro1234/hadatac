@@ -12,6 +12,10 @@
     <field name="entity_uri" type="string" indexed="true" docValues="true" />
     <field name="characteristic" type="string" indexed="true" docValues="true" />
     <field name="characteristic_uri" type="string" indexed="true" docValues="true" />
+    <field name="instrument_model" type="string" indexed="true" docValues="true" />
+    <field name="instrument_uri" type="string" indexed="true" docValues="true" />
+    <field name="platform_name" type="string" indexed="true" docValues="true" />
+    <field name="platform_uri" type="string" indexed="true" docValues="true" />
     <field name="location" type="latlong" indexed="true" />
     <field name="elevation" type="double" indexed="true" stored="true" docValues="true"/>
     <field name="dataset_uri" type="string" indexed="true" stored="true" docValues="true"/>

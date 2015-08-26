@@ -1,0 +1,10 @@
+@(document : org.hadatac.console.models.Document)
+
+<table>
+@for((field, value) <- document.fields){
+	<tr>
+		<td><b>@field</b></td>
+		<td>@value</td>
+	</tr>
+}
+</table>

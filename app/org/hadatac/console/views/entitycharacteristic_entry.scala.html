@@ -1,0 +1,13 @@
+@(triple : org.hadatac.console.models.TripleDocument,
+  flip : Boolean)
+@*****************************
+  ecName    | name
+  entity   | entity
+  chara | characteristic
+*****************************@
+
+@if(flip){
+    <tr><td>@triple.get("chara")</td> <td>@triple.get("ecName")</td><td>@triple.get("entity")</td></tr>
+} else {
+    <tr><td>@triple.get("entity")</td> <td>@triple.get("ecName")</td><td>@triple.get("chara")</td></tr>
+}
