@@ -4,21 +4,23 @@
         <table class="table table-striped">
             <thead>
               <tr>
-                <th>Timestamp</th>
+                <th>Characteristic</th>
                 <th>Value</th>
+                <th>Timestamp</th>
+                <th>X</th>
+                <th>Y</th>
+                <th>Z</th>
               </tr>
             </thead>
 
             <tbody>
                 @for(document <- documentMap.the_docs) {
                 <tr>
+                	<td>@document.fields.get("characteristic")</td>
+                	<td>@document.fields.get("value")</td>
+                	<td>@document.fields.get("timestamp")</td>
                 		@for((field, value) <- document.fields){
-                			@if(field == "timestamp") {
-                            	<td>@value</td>
-                            }
-                            @if(field == "value") {
-                            	<td>@value</td>
-                            }
+                			
                     	}
                 </tr>
                 }
