@@ -2,14 +2,13 @@ organization := "org.hadatac"
 
 name := "hadatac"
 
-scalaVersion := "2.11.6"
+scalaVersion := "2.11.7"
 
 version := "1.0-SNAPSHOT"
 
 val appDependencies = Seq(
-  "be.objectify"  %% "deadbolt-java"     % "2.4.0",
+  "be.objectify"  %% "deadbolt-java"     % "2.4.1",
   "com.feth"      %% "play-authenticate" % "0.7.0-SNAPSHOT",
-  "org.postgresql"    %  "postgresql"        % "9.4-1201-jdbc41",
   cache,
   javaWs,
   javaJdbc,

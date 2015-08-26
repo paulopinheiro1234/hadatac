@@ -1,26 +1,25 @@
 @(documentMap : org.hadatac.console.models.QueryResults)
 
-    <h2 class="sub-header">Results</h2>
     <div class="table-responsive">
         <table class="table table-striped">
             <thead>
               <tr>
-                <th>Document</th>
+                <th>Timestamp</th>
+                <th>Value</th>
               </tr>
             </thead>
 
             <tbody>
                 @for(document <- documentMap.the_docs) {
                 <tr>
-                        <td>
-                        @for(characteristic <- document.characteristic){
-                				<p>characteristic: @characteristic<p>
-                		}
-                        
                 		@for((field, value) <- document.fields){
-                            <p>@field: @value</p>
+                			@if(field == "timestamp") {
+                            	<td>@value</td>
+                            }
+                            @if(field == "value") {
+                            	<td>@value</td>
+                            }
                     	}
-                    	</td>
                 </tr>
                 }
             </tbody>

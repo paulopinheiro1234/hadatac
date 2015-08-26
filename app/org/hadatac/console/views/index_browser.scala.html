@@ -14,30 +14,37 @@
     <div class="container-fluid">
       
       <div class="row">
-        <div class="col-sm-3 col-md-2 sidebar">
+        <div class="col-md-3 sidebar">
           @form(org.hadatac.console.controllers.routes.Application.postIndex()) {
             @fieldset(facetForm, fieldFacets, queryFacets, rangeFacets, pivotFacets, clusterFacets)
         }
         </div>
-        <div class=" col-sm-offset-3  col-md-offset-2 main">
-          <h1 class="page-header">Faceted Search</h1>
-		  <h4>@final_query</h4>
+        <div class="col-md-2 main">
+          <div id="legend">
+            <legend>Measurements</legend>
+          </div>
+		  <!--h4>@final_query</h4-->
 		  <div class="row placeholders"></div>
-		  <ul class="nav nav-tabs">
-		    @for((collection, query_results) <- documentMap) {
-		  		<li><a data-toggle="tab" href="#@collection">@collection</a></li>
-		    }
-		  </ul>
+		  
           <div class="row placeholders"></div>
-          <div class = "tab-content">
+          <div >
           	@for((collection, query_results) <- documentMap) {
-          		
-          			<div id="@collection" class="tab-pane fade in">
+          			<div id="@collection" class="tab-pane">
           				@table(query_results)
           			</div>
           		
           	}
           </div>
+        </div>
+        <div class="col-md-7">
+          <div id="legend">
+            <legend>Measurement details</legend>
+          </div>
+            @for((collection, query_results) <- documentMap) {
+          		<div class="tab-pane">
+          			@measurement_details(query_results.the_docs(0))
+          		</div>
+          	}
         </div>
       </div>
     </div>

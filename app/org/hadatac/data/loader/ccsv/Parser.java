@@ -114,6 +114,10 @@ public class Parser {
 				measurement.setUnitUri(measurementType.getUnitUri());
 				measurement.setCharacteristic(measurementType.getCharacteristicLabel());
 				measurement.setCharacteristicUri(measurementType.getCharacteristicUri());
+				measurement.setInstrumentModel(hadatacKb.deployment.instrument.getLabel());
+				measurement.setInstrumentUri(hadatacKb.deployment.instrument.getUri());
+				measurement.setPlatformName(hadatacKb.deployment.platform.getLabel());
+				measurement.setPlatformUri(hadatacKb.deployment.platform.getUri());
 				measurement.setEntity(measurementType.getEntityLabel());
 				measurement.setEntityUri(measurementType.getEntityUri());
 				measurement.setDatasetUri(hadatacCcsv.getDatasetKbUri());

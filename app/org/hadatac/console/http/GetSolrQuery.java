@@ -79,7 +79,7 @@ public class GetSolrQuery {
     	String collection_datasets  = Play.application().configuration().getString("hadatac.solr.data") + "/datasets/select?wt=json";
     	String collection_wikimapia = Play.application().configuration().getString("hadatac.solr.data") + "/wikimapia/select?wt=json";
     	String collection_lidarsonar = Play.application().configuration().getString("hadatac.solr.data") + "/lidarsonar/select?wt=json";
-    	String collection_measurement = Play.application().configuration().getString("hadatac.solr.data") + "/measurement/select?wt=json";
+    	String collection_measurement = Play.application().configuration().getString("hadatac.solr.data") + "/measurement/select?wt=json&indent=true&rows=20";
         collection_lidarsonar.replaceAll("://","://%s:%s@");
     	
         /*
@@ -195,7 +195,11 @@ public class GetSolrQuery {
             System.out.println(response);
             StringWriter writer = new StringWriter();
             IOUtils.copy(response.getEntity().getContent(), writer, "utf-8");
-                        
+            
+            System.out.println("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! START WRITER");
+            System.out.println(writer.toString());
+            System.out.println("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! END WRITER");
+            
             return writer.toString();
             
         } finally
