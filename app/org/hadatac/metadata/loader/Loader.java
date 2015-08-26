@@ -125,20 +125,20 @@ public class Loader {
 
 				if (clean) {
 					System.out.println("Executing CLEAN");			
-					metadata.clean();
+					metadata.clean(MetadataContext.COMMANDLINE);
 					System.out.println("");			
 				}
 
 				if (loadOntology) {
 					System.out.println("Executing LOADONTOLOGY");						
-					metadata.loadOntologies();
+					metadata.loadOntologies(MetadataContext.COMMANDLINE);
 					System.out.println("");			
 				}
 		
 				if (loadXls) {
 					System.out.println("Executing LOADXLS");						
 					String ttl = "";
-					ttl = SpreadsheetProcessing.generateTTL(argsMap.get("-i"));
+					ttl = SpreadsheetProcessing.generateTTL(MetadataContext.COMMANDLINE, argsMap.get("-i"));
 					//System.out.println(ttl);			
 				}
 			}

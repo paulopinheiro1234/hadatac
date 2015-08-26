@@ -1,0 +1,58 @@
+@(oper: String)
+
+@import helper._
+@import org.hadatac.console.views.html._
+@import org.hadatac.metadata.loader._
+@import java.net._
+
+@main("Clean Metadata Store") {
+ 
+    <div class="container-fluid">
+      
+      <div class="row">
+
+        <div class="col-md-8 col-md-offset-1">
+
+	     <h4>Cleaning HADataC's metadata store...</h4>
+        
+             @if(oper=="init") {
+                 The metadata store has @MetadataContext.playTotalTriples() triples. <br>
+
+                 <div id="question-box">
+                     Are your sure you want to clean it? 
+                     <a href="@org.hadatac.console.controllers.triplestore.routes.Clean.clean("confirmed")" class="btn btn-success" role="button">Confirm</a>
+                     <a href="@org.hadatac.console.controllers.triplestore.routes.Clean.clean("cancelled")" class="btn btn-danger" role="button">Cancel</a>
+                 </div>
+             }
+
+         <p id='msgarea'></p>
+         
+             @if(oper=="cancelled") {
+                <div id="cancel-box">
+                   <h4>Clean KB has been cancelled.</h4>
+                   Press OK button to return to HADataC's main page <a href="@org.hadatac.console.controllers.routes.Portal.index()" class="btn btn-warning" role="button">Ok</a>
+	        </div>
+             }
+
+             
+           <div id="end-process-box" style="display:none;">
+                  <h4>Clean complete -- check the results above to see if the clean was successful.</h4>
+                  Press OK button to return to HADataC's main page <a href="@org.hadatac.console.controllers.routes.Portal.index()" class="btn btn-warning" role="button">Ok</a>
+	       </div>
+
+	     @if(oper=="confirmed") {
+                <script> 
+                    var msg = "@MetadataContext.playClean()";
+                    $('#msgarea').html(msg.replace(/&lt;br&gt;/g, '<br>'));
+                    document.getElementById('end-process-box').style.display = 'inline';
+                </script>
+	     }
+
+	   </div>
+
+      </div>
+
+    </div>
+
+}
+   

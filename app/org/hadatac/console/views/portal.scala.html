@@ -39,9 +39,9 @@
            </div>
            <div class="col-md-2 col-xs-2">
               <h4>KB Management</h4>  
-              <a href="@org.hadatac.console.controllers.routes.Management.cleanTS()" class="btn btn-primary btn-block" role="button">Clean KB</a>
-              <a href="@org.hadatac.console.controllers.routes.Management.loadOntTS()" class="btn btn-primary btn-block" role="button">Upload Ontologies</a>
-              <a href="@org.hadatac.console.controllers.routes.Management.loadKbTS()" class="btn btn-primary btn-block" role="button">Upload Facts</a>
+              <a href="@org.hadatac.console.controllers.triplestore.routes.Clean.clean("init")" class="btn btn-primary btn-block" role="button">Clean KB</a>
+              <a href="@org.hadatac.console.controllers.triplestore.routes.LoadOnt.loadOnt("init")" class="btn btn-primary btn-block" role="button">Upload Ontologies</a>
+              <a href="@org.hadatac.console.controllers.triplestore.routes.LoadKB.loadKB("init")" class="btn btn-primary btn-block" role="button">Upload Facts</a>
               <a href="" class="btn btn-primary btn-block" role="button">Manage Users</a>
            </div>
 @*           }

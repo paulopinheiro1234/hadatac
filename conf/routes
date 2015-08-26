@@ -3,70 +3,70 @@
 # ~~~~
 
 # Home page
-GET     /hadatac/                               org.hadatac.console.controllers.Portal.index()
-POST    /hadatac/                               org.hadatac.console.controllers.Portal.postIndex()
-GET     /hadatac/measurements                   org.hadatac.console.controllers.Application.index()
-POST    /hadatac/measurements                   org.hadatac.console.controllers.Application.postIndex()
-GET	/hadatac/spatial			org.hadatac.console.controllers.Spatial.index()
-POST	/hadatac/spatial			org.hadatac.console.controllers.Spatial.postIndex()
-GET	/hadatac/metadata  			org.hadatac.console.controllers.Metadata.index()
-POST	/hadatac/metadata			org.hadatac.console.controllers.Metadata.postIndex()
-GET	/hadatac/metadata/platform	    	org.hadatac.console.controllers.Platform.index()
-POST	/hadatac/metadata/platform   		org.hadatac.console.controllers.Platform.postIndex()
-GET	/hadatac/metadata/platformlist	        org.hadatac.console.controllers.PlatformList.index()
-POST	/hadatac/metadata/platformlist   	org.hadatac.console.controllers.PlatformList.postIndex()
-GET	/hadatac/metadata/instrument		org.hadatac.console.controllers.Instrument.index()
-POST	/hadatac/metadata/instrument		org.hadatac.console.controllers.Instrument.postIndex()
-GET	/hadatac/metadata/instrumentlist	org.hadatac.console.controllers.InstrumentList.index()
-POST	/hadatac/metadata/instrumentlist	org.hadatac.console.controllers.InstrumentList.postIndex()
-GET	/hadatac/metadata/detector		org.hadatac.console.controllers.Detector.index()
-POST	/hadatac/metadata/detector		org.hadatac.console.controllers.Detector.postIndex()
-GET	/hadatac/metadata/detectorlist		org.hadatac.console.controllers.DetectorList.index()
-POST	/hadatac/metadata/detectorlist		org.hadatac.console.controllers.DetectorList.postIndex()
-GET	/hadatac/metadata/entity		org.hadatac.console.controllers.Entity.index()
-POST	/hadatac/metadata/entity		org.hadatac.console.controllers.Entity.postIndex()
-GET	/hadatac/metadata/characteristic        org.hadatac.console.controllers.Characteristic.index()
-POST	/hadatac/metadata/characteristic        org.hadatac.console.controllers.Characteristic.postIndex()
-GET	/hadatac/metadata/unit                  org.hadatac.console.controllers.Unit.index()
-POST	/hadatac/metadata/unit                  org.hadatac.console.controllers.Unit.postIndex()
-GET	/hadatac/metadata/agent			org.hadatac.console.controllers.Agent.index()
-POST	/hadatac/metadata/agent			org.hadatac.console.controllers.Agent.postIndex()
+GET     /hadatac/                                  org.hadatac.console.controllers.Portal.index()
+POST    /hadatac/                                  org.hadatac.console.controllers.Portal.postIndex()
+GET     /hadatac/measurements                      org.hadatac.console.controllers.Application.index()
+POST    /hadatac/measurements                      org.hadatac.console.controllers.Application.postIndex()
+GET	/hadatac/spatial			   org.hadatac.console.controllers.Spatial.index()
+POST	/hadatac/spatial			   org.hadatac.console.controllers.Spatial.postIndex()
+GET	/hadatac/metadata  			   org.hadatac.console.controllers.Metadata.index()
+POST	/hadatac/metadata			   org.hadatac.console.controllers.Metadata.postIndex()
+GET	/hadatac/metadata/platform	    	   org.hadatac.console.controllers.Platform.index()
+POST	/hadatac/metadata/platform   		   org.hadatac.console.controllers.Platform.postIndex()
+GET	/hadatac/metadata/platformlist	           org.hadatac.console.controllers.PlatformList.index()
+POST	/hadatac/metadata/platformlist   	   org.hadatac.console.controllers.PlatformList.postIndex()
+GET	/hadatac/metadata/instrument		   org.hadatac.console.controllers.Instrument.index()
+POST	/hadatac/metadata/instrument		   org.hadatac.console.controllers.Instrument.postIndex()
+GET	/hadatac/metadata/instrumentlist	   org.hadatac.console.controllers.InstrumentList.index()
+POST	/hadatac/metadata/instrumentlist	   org.hadatac.console.controllers.InstrumentList.postIndex()
+GET	/hadatac/metadata/detector		   org.hadatac.console.controllers.Detector.index()
+POST	/hadatac/metadata/detector		   org.hadatac.console.controllers.Detector.postIndex()
+GET	/hadatac/metadata/detectorlist		   org.hadatac.console.controllers.DetectorList.index()
+POST	/hadatac/metadata/detectorlist		   org.hadatac.console.controllers.DetectorList.postIndex()
+GET	/hadatac/metadata/entity		   org.hadatac.console.controllers.Entity.index()
+POST	/hadatac/metadata/entity		   org.hadatac.console.controllers.Entity.postIndex()
+GET	/hadatac/metadata/characteristic           org.hadatac.console.controllers.Characteristic.index()
+POST	/hadatac/metadata/characteristic           org.hadatac.console.controllers.Characteristic.postIndex()
+GET	/hadatac/metadata/unit                     org.hadatac.console.controllers.Unit.index()
+POST	/hadatac/metadata/unit                     org.hadatac.console.controllers.Unit.postIndex()
+GET	/hadatac/metadata/agent			   org.hadatac.console.controllers.Agent.index()
+POST	/hadatac/metadata/agent			   org.hadatac.console.controllers.Agent.postIndex()
 
 # Authorization URLs
-GET     /hadatac/auth                           org.hadatac.console.controllers.AuthApplication.index
-GET     /hadatac/restricted                     org.hadatac.console.controllers.AuthApplication.restricted
-GET     /hadatac/assets/javascript/routes.js    org.hadatac.console.controllers.AuthApplication.jsRoutes
-GET     /hadatac/profile                        org.hadatac.console.controllers.AuthApplication.profile
-GET     /hadatac/login                          org.hadatac.console.controllers.AuthApplication.login
-POST    /hadatac/login                          org.hadatac.console.controllers.AuthApplication.doLogin
-GET     /hadatac/logout                         com.feth.play.module.pa.controllers.Authenticate.logout
-GET     /hadatac/authenticate/:provider         com.feth.play.module.pa.controllers.Authenticate.authenticate(provider: String)
-GET     /hadatac/signup                         org.hadatac.console.controllers.AuthApplication.signup
-POST    /hadatac/signup                         org.hadatac.console.controllers.AuthApplication.doSignup
-GET     /hadatac/accounts/unverified            org.hadatac.console.controllers.Signup.unverified
-GET     /hadatac/authenticate/:provider/denied  org.hadatac.console.controllers.Signup.oAuthDenied(provider: String)
-GET     /hadatac/accounts/verify/:token         org.hadatac.console.controllers.Signup.verify(token: String)
-GET     /hadatac/accounts/exists                org.hadatac.console.controllers.Signup.exists
-GET     /hadatac/accounts/password/reset/:token org.hadatac.console.controllers.Signup.resetPassword(token: String)
-POST    /hadatac/accounts/password/reset        org.hadatac.console.controllers.Signup.doResetPassword
-GET     /hadatac/accounts/password/change       org.hadatac.console.controllers.Account.changePassword
-POST    /hadatac/accounts/password/change       org.hadatac.console.controllers.Account.doChangePassword
-GET     /hadatac/accounts/verify                org.hadatac.console.controllers.Account.verifyEmail
-GET     /hadatac/accounts/add                   org.hadatac.console.controllers.Account.link
-GET     /hadatac/accounts/link                  org.hadatac.console.controllers.Account.askLink
-POST    /hadatac/accounts/link                  org.hadatac.console.controllers.Account.doLink
-GET     /hadatac/accounts/merge                 org.hadatac.console.controllers.Account.askMerge
-POST    /hadatac/accounts/merge                 org.hadatac.console.controllers.Account.doMerge
-GET     /hadatac/login/password/forgot          org.hadatac.console.controllers.Signup.forgotPassword(email: String ?= "")
-POST    /hadatac/login/password/forgot          org.hadatac.console.controllers.Signup.doForgotPassword
+GET     /hadatac/auth                              org.hadatac.console.controllers.AuthApplication.index
+GET     /hadatac/restricted                        org.hadatac.console.controllers.AuthApplication.restricted
+GET     /hadatac/assets/javascript/routes.js       org.hadatac.console.controllers.AuthApplication.jsRoutes
+GET     /hadatac/profile                           org.hadatac.console.controllers.AuthApplication.profile
+GET     /hadatac/login                             org.hadatac.console.controllers.AuthApplication.login
+POST    /hadatac/login                             org.hadatac.console.controllers.AuthApplication.doLogin
+GET     /hadatac/logout                            com.feth.play.module.pa.controllers.Authenticate.logout
+GET     /hadatac/authenticate/:provider            com.feth.play.module.pa.controllers.Authenticate.authenticate(provider: String)
+GET     /hadatac/signup                            org.hadatac.console.controllers.AuthApplication.signup
+POST    /hadatac/signup                            org.hadatac.console.controllers.AuthApplication.doSignup
+GET     /hadatac/accounts/unverified               org.hadatac.console.controllers.Signup.unverified
+GET     /hadatac/authenticate/:provider/denied     org.hadatac.console.controllers.Signup.oAuthDenied(provider: String)
+GET     /hadatac/accounts/verify/:token            org.hadatac.console.controllers.Signup.verify(token: String)
+GET     /hadatac/accounts/exists                   org.hadatac.console.controllers.Signup.exists
+GET     /hadatac/accounts/password/reset/:token    org.hadatac.console.controllers.Signup.resetPassword(token: String)
+POST    /hadatac/accounts/password/reset           org.hadatac.console.controllers.Signup.doResetPassword
+GET     /hadatac/accounts/password/change          org.hadatac.console.controllers.Account.changePassword
+POST    /hadatac/accounts/password/change          org.hadatac.console.controllers.Account.doChangePassword
+GET     /hadatac/accounts/verify                   org.hadatac.console.controllers.Account.verifyEmail
+GET     /hadatac/accounts/add                      org.hadatac.console.controllers.Account.link
+GET     /hadatac/accounts/link                     org.hadatac.console.controllers.Account.askLink
+POST    /hadatac/accounts/link                     org.hadatac.console.controllers.Account.doLink
+GET     /hadatac/accounts/merge                    org.hadatac.console.controllers.Account.askMerge
+POST    /hadatac/accounts/merge                    org.hadatac.console.controllers.Account.doMerge
+GET     /hadatac/login/password/forgot             org.hadatac.console.controllers.Signup.forgotPassword(email: String ?= "")
+POST    /hadatac/login/password/forgot             org.hadatac.console.controllers.Signup.doForgotPassword
 
 # metadata store management URLs
-GET     /hadatac/management/clean               org.hadatac.console.controllers.Management.cleanTS
-POST    /hadatac/management/clean               org.hadatac.console.controllers.Management.postCleanTS
-GET     /hadatac/management/loadont             org.hadatac.console.controllers.Management.loadOntTS
-POST    /hadatac/management/loadont             org.hadatac.console.controllers.Management.postLoadOntTS
-GET     /hadatac/management/loadkb              org.hadatac.console.controllers.Management.loadKbTS
-POST    /hadatac/management/loadkb              org.hadatac.console.controllers.Management.postLoadKbTS
+GET     /hadatac/ts/clean                          org.hadatac.console.controllers.triplestore.Clean.clean(oper: String)
+POST    /hadatac/ts/clean                          org.hadatac.console.controllers.triplestore.Clean.postClean(oper: String)
+GET     /hadatac/ts/loadont                        org.hadatac.console.controllers.triplestore.LoadOnt.loadOnt(oper: String)
+POST    /hadatac/ts/loadont                        org.hadatac.console.controllers.triplestore.LoadOnt.postLoadOnt(oper: String)
+GET     /hadatac/ts/loadkb                         org.hadatac.console.controllers.triplestore.LoadKB.loadKB(oper: String)
+POST    /hadatac/ts/loadkb                         org.hadatac.console.controllers.triplestore.LoadKB.postLoadKB(oper: String)
  
 # Map static resources from the /public folder to the /assets URL path
-GET     /hadatac/assets/*file                   controllers.Assets.versioned(path="/public", file: Asset)
+GET     /hadatac/assets/*file                      controllers.Assets.versioned(path="/public", file: Asset)

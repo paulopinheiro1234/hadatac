@@ -18,7 +18,7 @@ public class SpreadsheetProcessing {
 	
 	public static final String KB_FORMAT = "text/turtle";
 	
-	public static String generateTTL(String xlsName) {
+	public static String generateTTL(int mode, String xlsName) {
 		
 		System.out.println("   Triples before [loadXLS]: " + Loader.getMetadataContext().totalTriples());
 		System.out.println("   Parsing spreadsheet " + xlsName);
@@ -72,7 +72,7 @@ public class SpreadsheetProcessing {
 		
 		System.out.println("   Generated " + fileName + " and stored locally.");
 		System.out.print("   Uploading generated file.");
-		Loader.getMetadataContext().loadLocalFile(fileName, KB_FORMAT);
+		Loader.getMetadataContext().loadLocalFile(mode, fileName, KB_FORMAT);
 		System.out.println("");
 		System.out.println("   Triples after [loadXLS]: " + Loader.getMetadataContext().totalTriples());
 		return ttl;
