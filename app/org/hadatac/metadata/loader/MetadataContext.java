@@ -31,9 +31,6 @@ import play.mvc.Call;
 
 public class MetadataContext {
 
-    public static final int WEB = 0;
-    public static final int COMMANDLINE = 1;
-     
     String username = null;
     String password = null;
     String kbURL = null;   
@@ -112,11 +109,11 @@ public class MetadataContext {
 	       //System.out.println("<ERROR>");
 	       if (verbose) {
 	    	   while ( (line = br.readLine()) != null)
-	    		   message += println(mode, line);
+	    		   message += Feedback.println(mode, line);
 	       }
 	       //System.out.println("</ERROR>");
 	       int exitVal = proc1.waitFor();
-	       message += print(mode, "    exit value: [" + exitVal + "]    ");
+	       message += Feedback.print(mode, "    exit value: [" + exitVal + "]    ");
 	       //message += println(mode, "   Process: [" + command[0] + "]   exitValue: [" + exitVal + "]");
 	    } catch (Throwable t) {
 		       t.printStackTrace();
@@ -124,28 +121,12 @@ public class MetadataContext {
 		return message;
     }
 
-    public static String println(int mode, String str) {
-    	if (mode == COMMANDLINE) {
-    		System.out.print(str);
-    	} else {
-    		str += "<br>";
-    	}
-    	return str;
-    }
-    
-    public static String print(int mode, String str) {
-    	if (mode == COMMANDLINE) {
-    		System.out.print(str);
-    	}
-    	return str;
-    }
-    
 	public String clean(int mode) {
 	    String message = "";
 	    String straux = "";
-	    //System.out.println("Is WEB? " + (mode == WEB));
-        message += println(mode,"   Triples before [clean]: " + totalTriples());
-        message += println(mode, " ");
+	    //System.out.println("Is WEB? " + (mode == Feedback.WEB));
+        message += Feedback.println(mode,"   Triples before [clean]: " + totalTriples());
+        message += Feedback.println(mode, " ");
 	    // ATTENTION: For now, it erases entirely the content of the metadata collection 
 	    String query1 = "<delete><query>*:*</query></delete>";
 	    String query2 = "<commit/>";
@@ -158,25 +139,25 @@ public class MetadataContext {
 		    //Runtime.getRuntime().exec("curl -v " + url1);
 		    //Runtime.getRuntime().exec("curl -v " + url2);
 		    if (verbose) {
-		        message += println(mode, url1);
-		        message += println(mode, url2);
+		        message += Feedback.println(mode, url1);
+		        message += Feedback.println(mode, url2);
 		    }
 		    String[] cmd1 = {"curl", "-v", url1};
-			message += print(mode, "    Erasing triples... ");                
+			message += Feedback.print(mode, "    Erasing triples... ");                
 		    straux = executeCommand(mode, cmd1);
-		    if (mode == WEB) {
+		    if (mode == Feedback.WEB) {
 		    	message += straux;
 		    }
-		    message += println(mode, "");
-			message += print(mode, "   Committing... ");                
+		    message += Feedback.println(mode, "");
+			message += Feedback.print(mode, "   Committing... ");                
 		    String[] cmd2 = {"curl", "-v", url2};
 		    straux = executeCommand(mode, cmd2);
-		    if (mode == WEB) {
+		    if (mode == Feedback.WEB) {
 		    	message += straux;
 		    }
-		    message += println(mode," ");
-		    message += println(mode," ");
-			message += print(mode,"   Triples after [clean]: " + totalTriples());                
+		    message += Feedback.println(mode," ");
+		    message += Feedback.println(mode," ");
+			message += Feedback.print(mode,"   Triples after [clean]: " + totalTriples());                
 		} catch (UnsupportedEncodingException e) {
 		    System.out.println("[MetadataManagement] - ERROR encoding URLs");
 		    //e.printStackTrace();
@@ -206,28 +187,28 @@ public class MetadataContext {
 	public String loadOntologies(int mode) {
 	    String message = "";
 		Long total = totalTriples();
-		message += println(mode, "   Triples before [loadOntologies]: " + total);
-		message += println(mode," ");
+		message += Feedback.println(mode, "   Triples before [loadOntologies]: " + total);
+		message += Feedback.println(mode," ");
 		message += NameSpaces.getInstance().copyNameSpacesLocally(mode);
 		for (Map.Entry<String, NameSpace> entry : NameSpaces.table.entrySet()) {
 	    	String abbrev = entry.getKey().toString();
 	    	String nsURL = entry.getValue().getURL();
 	    	if ((abbrev != null) && (nsURL != null) && (entry.getValue().getType() != null) && !nsURL.equals("")) {
 	    		String filePath = "copy" + "-" + abbrev.replace(":","");
-	    		message += print(mode, "   Uploading " + filePath);
+	    		message += Feedback.print(mode, "   Uploading " + filePath);
 	    		for (int i = filePath.length(); i < 50; i++) {
-	    			message += print(mode, ".");
+	    			message += Feedback.print(mode, ".");
 	    		}
 	    		loadLocalFile(mode, filePath, entry.getValue().getType());
 	    		message += loadFileMessage;
 	    		Long newTotal = totalTriples();
-	    		message += println(mode, "   Added " + (newTotal - total) + " triples.");
+	    		message += Feedback.println(mode, "   Added " + (newTotal - total) + " triples.");
 	    		
 	    		total = newTotal;
 	    	}	          
 	    }
-		message += println(mode," ");
-		message += println(mode, "   Triples after [loadOntologies]: " + totalTriples());
+		message += Feedback.println(mode," ");
+		message += Feedback.println(mode, "   Triples after [loadOntologies]: " + totalTriples());
 		return message;
 	}
 }	

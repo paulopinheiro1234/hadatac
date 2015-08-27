@@ -13,15 +13,19 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.hadatac.metadata.loader.Loader;
 import org.hadatac.metadata.loader.NameSpaces;
 import org.hadatac.metadata.loader.SheetProcessing;
+import org.hadatac.metadata.model.SpreadsheetParsingResult;
 
 public class SpreadsheetProcessing {
 	
 	public static final String KB_FORMAT = "text/turtle";
 	
-	public static String generateTTL(int mode, String xlsName) {
-		
-		System.out.println("   Triples before [loadXLS]: " + Loader.getMetadataContext().totalTriples());
-		System.out.println("   Parsing spreadsheet " + xlsName);
+	public static String generateTTL(int mode, MetadataContext mc, String xlsName) {
+
+		String message = "";
+		message += Feedback.println(mode, "   Triples before [loadXLS]: " + mc.totalTriples());
+		message += Feedback.println(mode, " ");
+		message += Feedback.println(mode, "   Parsing spreadsheet " + xlsName);
+		message += Feedback.println(mode, " ");
 		
 		String ttl = "";
 		
@@ -41,22 +45,24 @@ public class SpreadsheetProcessing {
 				//Iterate through workbook's sheets
 				for (int currentSheet=0; currentSheet < workbook.getNumberOfSheets(); currentSheet++) {
 					XSSFSheet sheet = workbook.getSheetAt(currentSheet);	            
-					System.out.print("   Processing sheet " + sheet.getSheetName() + "     ");
+					message += Feedback.print(mode, "   Processing sheet " + sheet.getSheetName() + "     ");
 					for (int i = sheet.getSheetName().length(); i < 20; i++) {
-						System.out.print(" ");
+						message += Feedback.print(mode, ".");
 					}
-					ttl = ttl + "\n# concept: " + sheet.getSheetName() + SheetProcessing.generateTTL(sheet) + "\n";
+					SpreadsheetParsingResult result = SheetProcessing.generateTTL(mode, sheet);
+					ttl = ttl + "\n# concept: " + sheet.getSheetName() + result.getTurtle() + "\n";
+					message += result.getMessage();
 				}
 				
 				file.close();
 
 			} catch (IOException e) {
-				System.out.println("[ERROR]: Could not open file  " + xlsName + " as an XLS spreadsheet");
+				message += Feedback.println(mode, "[ERROR]: Could not open file  " + xlsName + " as an XLS spreadsheet");
 				//e.printStackTrace();
 			}
 		
 		} catch (FileNotFoundException e) {
-			System.out.println("[ERROR]: Could not open file " + xlsName);
+			message += Feedback.println(mode, "[ERROR]: Could not open file " + xlsName);
 			//e.printStackTrace();
 		}
 		
@@ -70,11 +76,13 @@ public class SpreadsheetProcessing {
 			return "";
 		}
 		
-		System.out.println("   Generated " + fileName + " and stored locally.");
-		System.out.print("   Uploading generated file.");
-		Loader.getMetadataContext().loadLocalFile(mode, fileName, KB_FORMAT);
-		System.out.println("");
-		System.out.println("   Triples after [loadXLS]: " + Loader.getMetadataContext().totalTriples());
-		return ttl;
+		message += Feedback.println(mode, " ");
+		message += Feedback.println(mode, "   Generated " + fileName + " and stored locally.");
+		message += Feedback.print(mode, "   Uploading generated file.");
+		mc.loadLocalFile(mode, fileName, KB_FORMAT);
+		message += Feedback.println(mode, "");
+		message += Feedback.println(mode, " ");
+		message += Feedback.println(mode, "   Triples after [loadXLS]: " + mc.totalTriples());
+		return message;
 	}
 }

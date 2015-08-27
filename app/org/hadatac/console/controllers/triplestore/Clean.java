@@ -6,6 +6,7 @@ import play.libs.*;
 
 import org.hadatac.console.views.html.triplestore.*;
 import org.hadatac.metadata.loader.MetadataContext;
+import org.hadatac.metadata.loader.Feedback;
 import org.hadatac.metadata.loader.NameSpaces;
 
 public class Clean extends Controller {
@@ -25,7 +26,7 @@ public class Clean extends Controller {
 	    		                 "password",
 	    		                  Play.application().configuration().getString("hadatac.solr.triplestore"), 
 	    		                  false);
-	     return metadata.clean(MetadataContext.WEB);
+	     return metadata.clean(Feedback.WEB);
    }
 
 }
