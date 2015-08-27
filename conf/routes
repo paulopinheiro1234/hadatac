@@ -69,6 +69,7 @@ GET     /hadatac/ts/loadont                        org.hadatac.console.controlle
 POST    /hadatac/ts/loadont                        org.hadatac.console.controllers.triplestore.LoadOnt.postLoadOnt(oper: String)
 GET     /hadatac/ts/loadkb                         org.hadatac.console.controllers.triplestore.LoadKB.loadKB(oper: String)
 POST    /hadatac/ts/loadkb                         org.hadatac.console.controllers.triplestore.LoadKB.postLoadKB(oper: String)
+POST    /hadatac/ts/loadkbupload                   org.hadatac.console.controllers.triplestore.LoadKB.uploadFile
  
 # Map static resources from the /public folder to the /assets URL path
 GET     /hadatac/assets/*file                      controllers.Assets.versioned(path="/public", file: Asset)
