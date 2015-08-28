@@ -1,34 +1,60 @@
-@(oper: String)
+@(oper: String, message : String)
 
 @import helper._
 @import org.hadatac.console.views.html._
+@import org.hadatac.console.controllers.triplestore._
+@import org.hadatac.metadata.loader._
+@import java.net._
 
-@main("Load Ontologies") {
+@main("Load Facts into Metadata Store") {
+ 
     <div class="container-fluid">
       
       <div class="row">
 
         <div class="col-md-8 col-md-offset-1">
 
+	     <h4>Load facts into metadata store...</h4>
+        
+             @if(oper=="init") {
+                 The metadata store has @MetadataContext.playTotalTriples() triples. <br>
 
-	<h4>Loading ontology dependencies into HADataC's metadata store...</h4>
 
-<!--        <div id="confirmation">
-	  <button id="callConfirm">Confirm!</button>
-	  <div id="dialog" title="Confirmation Required">
-	    Are you sure about loading ontology dependencies into HADataC's medata store? ?
-	  </div>
-        </div>
-	<div id="status-box">(STATUS)</div>
--->
-        <div id="done-box">
-           <h4>Done!</h4>
-           Press OK button to return to HADataC's main page <a href="@org.hadatac.console.controllers.routes.Portal.index()" class="btn btn-warning" role="button">Ok</a>
-        </div>
+              <form name="fileUploadForm" method="POST" enctype="multipart/form-data" action="@org.hadatac.console.controllers.triplestore.routes.LoadKB.uploadFile()">
+                     <input type="file" class="btn btn-info" name="pic">
+                     Are your sure you want to parse and load facts from the spreadsheet into the metadata store?
+                     <input type="submit" class="btn btn-success" value="Confirm">
+                     <a href="@org.hadatac.console.controllers.triplestore.routes.LoadKB.loadKB("cancelled")" class="btn btn-danger" role="button">Cancel</a>
+              </form>
+            }
 
-	</div>
+             <p  style='font-family: "Lucida Console", Monaco, monospace;' id='msgarea'></p>
+         
+             @if(oper=="cancelled") {
+                <div id="cancel-box">
+                   <h4>Operation [Load Facts] has been cancelled.</h4>
+                   Press OK button to return to HADataC's main page <a href="@org.hadatac.console.controllers.routes.Portal.index()" class="btn btn-warning" role="button">Ok</a>
+	        </div>
+             }
+
+             
+           <div id="end-process-box" style="display:none;">
+                  <h4>Operation [Load Facts] complete -- check the results above to see if the clean was successful.</h4>
+                  Press OK button to return to HADataC's main page <a href="@org.hadatac.console.controllers.routes.Portal.index()" class="btn btn-warning" role="button">Ok</a>
+	       </div>
+
+     	     @if(oper=="loaded") {
+                 <script> 
+                       var msg = "@LoadKB.playLoadKB()";
+                       $('#msgarea').html(msg.replace(/&lt;br&gt;/g, '<br>'));
+                       document.getElementById('end-process-box').style.display = 'inline';
+                 </script> 
+              }
+
+	   </div>
 
       </div>
+
     </div>
 
 }

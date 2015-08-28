@@ -7,12 +7,14 @@ import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.hadatac.metadata.loader.ValueCellProcessing;
+import org.hadatac.metadata.model.SpreadsheetParsingResult;
 
 public class SheetProcessing {
 
-	public static String generateTTL(XSSFSheet sheet) {
+	public static SpreadsheetParsingResult generateTTL(int mode, XSSFSheet sheet) {
 
 		String shttl = "";
+		String message = "";
 		
 		boolean firstRow = true;
 		ValueCellProcessing cellProc = new ValueCellProcessing();
@@ -92,8 +94,9 @@ public class SheetProcessing {
 			firstRow = false;
 		}
 		
-		System.out.println("processed " + processedRows + " row(s).");
-		return shttl;
+		message += Feedback.println(mode, "processed " + processedRows + " row(s).");
+		SpreadsheetParsingResult result = new SpreadsheetParsingResult(message, shttl);
+		return result;
 	}
 
 }
