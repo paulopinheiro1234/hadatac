@@ -30,7 +30,7 @@ else HADATAC_HOME=$response
 fi
 
 HADATAC_DOWNLOAD=$HADATAC_HOME/download
-HADATAC_SOLR=$HADATAC_HOME/hadatac.solr
+HADATAC_SOLR=$HADATAC_HOME/solr
 SOLR4_HOME=$HADATAC_SOLR/solr-4.10.4
 SOLR5_HOME=$HADATAC_SOLR/solr-5.2.1
 
@@ -38,7 +38,7 @@ mkdir $HADATAC_HOME
 mkdir $HADATAC_DOWNLOAD
 mkdir $HADATAC_SOLR
 
-cp -R hadatac* $HADATAC_HOME
+cp -R * $HADATAC_HOME
 
 echo "=== Downloading Apache Solr 4.10.4..."
 wget -O $HADATAC_DOWNLOAD/solr-4.10.4.tgz http://archive.apache.org/dist/lucene/solr/4.10.4/solr-4.10.4.tgz
