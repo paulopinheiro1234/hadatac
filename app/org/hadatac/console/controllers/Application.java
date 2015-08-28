@@ -17,6 +17,7 @@ import play.mvc.Controller;
 import play.mvc.Result;
 import org.hadatac.console.views.formdata.FacetFormData;
 import org.hadatac.console.views.html.index_browser;
+import org.hadatac.console.views.html.hadatac_message;
 
 public class Application extends Controller {
 
@@ -60,7 +61,7 @@ public class Application extends Controller {
     	return redirect("/");
     }
 
-    public static Result index() {
+    public static Result index(int p) {
     	Form<FacetFormData> formData = Form.form(FacetFormData.class).fill(facet_form);
         JsonHandler jh = new JsonHandler();
         //ArrayList<String> names = new ArrayList<String>();
@@ -75,7 +76,7 @@ public class Application extends Controller {
     		final_query = query_submit.list_of_queries.get(collection).toString();
     		String query_json = null;
             try {
-    			query_json = query_submit.executeQuery(collection);
+    			query_json = query_submit.executeQuery(collection, p, 20);
     		} catch (IllegalStateException | IOException e1) {
     			e1.printStackTrace();
     		}
@@ -90,10 +91,11 @@ public class Application extends Controller {
         Form<FacetFormData> fd = Form.form(FacetFormData.class).fill(facet_form);
         return ok(index_browser.render(fd, field_facets, query_facets,
                 range_facets, pivot_facets, cluster_facets, 
-                query_results_list, final_query)); 
+                query_results_list, final_query, p, (int) Math.ceil(1808.0/20)));
+        //return ok(hadatac_message.render("HADataC", "Your HADataC instance does not contain any measurements to be browser. Please go ahead and index some."));
     }
 
-    public static Result postIndex() {
+    public static Result postIndex(int p) {
         
     	JsonHandler jh = new JsonHandler();
     	String subject = new String();
@@ -130,7 +132,7 @@ public class Application extends Controller {
     		final_query = query_submit.list_of_queries.get(collection).toString();
     		String query_json = null;
             try {
-    			query_json = query_submit.executeQuery(collection);
+    			query_json = query_submit.executeQuery(collection, p, 20);
     		} catch (IllegalStateException | IOException e1) {
     			e1.printStackTrace();
     		}
@@ -145,7 +147,7 @@ public class Application extends Controller {
         Form<FacetFormData> fd = Form.form(FacetFormData.class).fill(facet_form);
         return ok(index_browser.render(fd, field_facets, query_facets,
                 range_facets, pivot_facets, cluster_facets, 
-                query_results_list, final_query)); 
+                query_results_list, final_query, p, (int) Math.ceil(1808.0/20))); 
 
     }
 
