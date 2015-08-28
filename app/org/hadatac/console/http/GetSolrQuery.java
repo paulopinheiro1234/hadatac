@@ -68,7 +68,7 @@ public class GetSolrQuery {
     //Inputs: None
     //Outputs: None
     //Postconditions: The collection_urls field will be populated with all current collections
-    //				  in the SOLR server, and their associated base URLs.
+    //				  in the SOLR server, and their associated base URLs.    
     public void addCollectionUrls(){
 
     	//TODO Replace this method with something that dynamically checks the SOLR database for all collections
@@ -79,7 +79,7 @@ public class GetSolrQuery {
     	String collection_datasets  = Play.application().configuration().getString("hadatac.solr.data") + "/datasets/select?wt=json";
     	String collection_wikimapia = Play.application().configuration().getString("hadatac.solr.data") + "/wikimapia/select?wt=json";
     	String collection_lidarsonar = Play.application().configuration().getString("hadatac.solr.data") + "/lidarsonar/select?wt=json";
-    	String collection_measurement = Play.application().configuration().getString("hadatac.solr.data") + "/measurement/select?wt=json&indent=true&rows=20";
+    	String collection_measurement = Play.application().configuration().getString("hadatac.solr.data") + "/measurement/select?wt=json&indent=true";
         collection_lidarsonar.replaceAll("://","://%s:%s@");
     	
         /*
@@ -182,7 +182,7 @@ public class GetSolrQuery {
     //Output: Returns JSON in the form of a string. Currently does not handle http errors
     //		  very gracefully. Need to change this.
     //Postconditions: None
-    public String executeQuery(String collection) throws IllegalStateException, IOException{
+    public String executeQuery(String collection, int page, int size) throws IllegalStateException, IOException{
     	CloseableHttpClient httpClient = HttpClients.createDefault();
         HttpGet get = new HttpGet(this.collection_urls.get(collection));
         
@@ -190,7 +190,7 @@ public class GetSolrQuery {
         try
         {
         	HttpClient client = new DefaultHttpClient();
-        	HttpGet request = new HttpGet(this.list_of_queries.get(collection).toString().replace(" ", "%20"));
+        	HttpGet request = new HttpGet(this.list_of_queries.get(collection).toString().replace(" ", "%20") + "&start=" + (page-1)*size + "&rows=" + size);
         	HttpResponse response = client.execute(request);
             System.out.println(response);
             StringWriter writer = new StringWriter();
@@ -207,5 +207,8 @@ public class GetSolrQuery {
             //in.close();
             //request.close();
         }
+    }
+    public String executeQuery(String collection) throws IllegalStateException, IOException{
+    	return executeQuery(collection, 1, 20);
     }// /executeQuery()
 }
