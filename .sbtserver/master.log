@@ -1,0 +1,1200 @@
+New log file opened at Fri Aug 28 13:42:22 EDT 2015 by 4099@tetherless-ThinkPad-T61p
+jvm 4099@tetherless-ThinkPad-T61p
+jvm vmName=Java HotSpot(TM) Server VM vmVendor=Oracle Corporation vmVersion=25.60-b23
+jvm specName=Java Virtual Machine Specification specVendor=Oracle Corporation specVersion=1.8
+jvm arguments: [-Xms256m, -Xmx1024m, -XX:MetaspaceSize=64m, -XX:MaxMetaspaceSize=256m]
+Starting event engine
+Starting sbt command engine
+Waiting for sbt command engine
+Command engine arguments=List()
+Command engine baseDirectory=/home/tetherless/hadatac
+Command engine initial remaining commands List(--initialize, onFailure load-failed, boot, server-send-ready-for-request, server-handle-next-server-request)
+> --initialize
+> initialize
+> onFailure load-failed
+> boot
+> reload
+[Loading] Scanning directory /home/tetherless/hadatac/project
+[Loading] Found non-root projects 
+[Loading] Done in /home/tetherless/hadatac/project, returning: ()
+deducing auto plugins based on known facts Set(Atom(sbt.plugins.CorePlugin)) and clauses Clauses(List(Clause(Atom(sbt.plugins.JvmPlugin),Set(Atom(sbt.plugins.IvyPlugin))), Clause(Atom(sbt.plugins.JUnitXmlReportPlugin),Set(Atom(sbt.plugins.JvmPlugin))), Clause(Atom(sbt.plugins.CorePlugin),Set(Atom(sbt.plugins.IvyPlugin))), Clause(Atom(sbt.plugins.IvyPlugin),Set(Atom(sbt.plugins.JvmPlugin))), Clause(Atom(sbt.plugins.JvmPlugin),Set(Atom(sbt.plugins.JUnitXmlReportPlugin)))))
+  :: deduced result: Matched(sbt.plugins.CorePlugin,sbt.plugins.IvyPlugin,sbt.plugins.JvmPlugin,sbt.plugins.JUnitXmlReportPlugin)
+sorting: ns: List(sbt.plugins.CorePlugin, sbt.plugins.IvyPlugin, sbt.plugins.JvmPlugin, sbt.plugins.JUnitXmlReportPlugin)
+  :: sorting:: found: List(sbt.plugins.CorePlugin) not found List(sbt.plugins.IvyPlugin, sbt.plugins.JvmPlugin, sbt.plugins.JUnitXmlReportPlugin)
+  :: sorting:: found: List(sbt.plugins.CorePlugin, sbt.plugins.IvyPlugin) not found List(sbt.plugins.JvmPlugin, sbt.plugins.JUnitXmlReportPlugin)
+  :: sorting:: found: List(sbt.plugins.CorePlugin, sbt.plugins.IvyPlugin, sbt.plugins.JvmPlugin) not found List(sbt.plugins.JUnitXmlReportPlugin)
+  :: sorting:: found: List(sbt.plugins.CorePlugin, sbt.plugins.IvyPlugin, sbt.plugins.JvmPlugin, sbt.plugins.JUnitXmlReportPlugin) not found List()
+  :: sorted deduced result: List(sbt.plugins.CorePlugin, sbt.plugins.IvyPlugin, sbt.plugins.JvmPlugin, sbt.plugins.JUnitXmlReportPlugin)
+[Loading] Done in /home/tetherless/hadatac/project, returning: (hadatac-build)
+Loading project definition from /home/tetherless/hadatac/project
+Running task... Cancel: sbt.TaskCancellationStrategy$Null$@167fafb, check cycles: false
+
+Initial source changes: 
+	removed:Set()
+	added: Set()
+	modified: Set()
+Removed products: Set()
+External API changes: API Changes: Set()
+Modified binary dependencies: Set()
+Initial directly invalidated sources: Set()
+
+Sources indirectly invalidated by:
+	product: Set()
+	binary dep: Set()
+	external source: Set()
+All initially invalidated sources: Set()
+
+Copy resource mappings: 
+	
+[Loading] Scanning directory /home/tetherless/hadatac
+[Loading] Found root project root w/ remaining 
+deducing auto plugins based on known facts Set(Atom(play.sbt.PlayJava), Atom(play.ebean.sbt.PlayEbean), Atom(sbt.plugins.CorePlugin)) and clauses Clauses(List(Clause(Atom(sbt.plugins.JvmPlugin),Set(Atom(sbt.plugins.IvyPlugin))), Clause(Atom(sbt.plugins.JUnitXmlReportPlugin),Set(Atom(sbt.plugins.JvmPlugin))), Clause(Atom(play.sbt.forkrun.PlayForkRun),Set(Atom(sbt.plugins.BackgroundRunPlugin))), Clause(Atom(play.sbt.forkrun.PlayForkRun),Set(Atom(play.sbt.Play))), Clause(Atom(play.sbt.forkrun.PlayForkRun),Set(Atom(sbt.plugins.SerializersPlugin))), Clause(Atom(play.sbt.Play),Set(Atom(com.typesafe.sbt.packager.archetypes.JavaServerAppPackaging))), Clause(Atom(play.sbt.Play),Set(Atom(play.sbt.routes.RoutesCompiler))), Clause(Atom(play.sbt.Play),Set(Atom(play.twirl.sbt.SbtTwirl))), Clause(Atom(play.sbt.Play),Set(Atom(com.typesafe.sbt.jse.SbtJsTask))), Clause(Atom(play.sbt.PlayAkkaHttpServer),Set(Atom(play.sbt.Play))), Clause(Atom(play.sbt.PlayJava),Set(Atom(play.sbt.Play))), Clause(Atom(play.sbt.PlayLayoutPlugin),Set(Atom(play.sbt.Play))), Clause(Atom(play.sbt.PlayNettyServer),Set(Atom(play.sbt.Play))), Clause(Atom(play.sbt.PlayScala),Set(Atom(play.sbt.Play))), Clause(Atom(play.sbt.routes.RoutesCompiler),Set(Atom(sbt.plugins.JvmPlugin))), Clause(Atom(play.twirl.sbt.SbtTwirl),Set(Atom(sbt.plugins.JvmPlugin))), Clause(Atom(com.typesafe.sbt.packager.archetypes.AkkaAppPackaging),Set(Atom(com.typesafe.sbt.packager.archetypes.JavaAppPackaging))), Clause(Atom(com.typesafe.sbt.packager.archetypes.JavaAppPackaging),Set(Atom(com.typesafe.sbt.packager.windows.WindowsPlugin))), Clause(Atom(com.typesafe.sbt.packager.archetypes.JavaAppPackaging),Set(Atom(com.typesafe.sbt.packager.docker.DockerPlugin))), Clause(Atom(com.typesafe.sbt.packager.archetypes.JavaAppPackaging),Set(Atom(com.typesafe.sbt.packager.debian.DebianPlugin))), Clause(Atom(com.typesafe.sbt.packager.archetypes.JavaAppPackaging),Set(Atom(com.typesafe.sbt.packager.rpm.RpmPlugin))), Clause(Atom(com.typesafe.sbt.packager.archetypes.JavaServerAppPackaging),Set(Atom(com.typesafe.sbt.packager.archetypes.JavaAppPackaging))), Clause(Atom(com.typesafe.sbt.packager.archetypes.jar.ClasspathJarPlugin),Set(Atom(com.typesafe.sbt.packager.archetypes.JavaAppPackaging))), Clause(Atom(com.typesafe.sbt.packager.archetypes.jar.LauncherJarPlugin),Set(Atom(com.typesafe.sbt.packager.archetypes.JavaAppPackaging))), Clause(Atom(com.typesafe.sbt.packager.debian.DebianDeployPlugin),Set(Atom(com.typesafe.sbt.packager.debian.DebianPlugin))), Clause(Atom(com.typesafe.sbt.packager.debian.DebianPlugin),Set(Atom(com.typesafe.sbt.packager.linux.LinuxPlugin))), Clause(Atom(com.typesafe.sbt.packager.debian.JDebPackaging),Set(Atom(com.typesafe.sbt.packager.debian.DebianPlugin))), Clause(Atom(com.typesafe.sbt.packager.docker.DockerPlugin),Set(Atom(com.typesafe.sbt.packager.universal.UniversalPlugin))), Clause(Atom(com.typesafe.sbt.packager.jdkpackager.JDKPackagerDeployPlugin),Set(Atom(com.typesafe.sbt.packager.jdkpackager.JDKPackagerPlugin))), Clause(Atom(com.typesafe.sbt.packager.jdkpackager.JDKPackagerPlugin),Set(Atom(com.typesafe.sbt.packager.archetypes.JavaAppPackaging))), Clause(Atom(com.typesafe.sbt.packager.jdkpackager.JDKPackagerPlugin),Set(Atom(com.typesafe.sbt.packager.archetypes.jar.ClasspathJarPlugin))), Clause(Atom(com.typesafe.sbt.packager.linux.LinuxPlugin),Set(Atom(com.typesafe.sbt.packager.universal.UniversalPlugin))), Clause(Atom(com.typesafe.sbt.packager.rpm.RpmDeployPlugin),Set(Atom(com.typesafe.sbt.packager.rpm.RpmPlugin))), Clause(Atom(com.typesafe.sbt.packager.rpm.RpmPlugin),Set(Atom(com.typesafe.sbt.packager.linux.LinuxPlugin))), Clause(Atom(com.typesafe.sbt.packager.universal.UniversalDeployPlugin),Set(Atom(com.typesafe.sbt.packager.universal.UniversalPlugin))), Clause(Atom(com.typesafe.sbt.packager.universal.UniversalPlugin),Set(Atom(com.typesafe.sbt.SbtNativePackager))), Clause(Atom(com.typesafe.sbt.packager.windows.WindowsDeployPlugin),Set(Atom(com.typesafe.sbt.packager.windows.WindowsPlugin))), Clause(Atom(com.typesafe.sbt.packager.windows.WindowsPlugin),Set(Atom(com.typesafe.sbt.packager.universal.UniversalPlugin))), Clause(Atom(com.typesafe.sbt.web.SbtWeb),Set(Atom(sbt.plugins.JvmPlugin))), Clause(Atom(com.typesafe.sbt.jse.SbtJsEngine),Set(Atom(com.typesafe.sbt.web.SbtWeb))), Clause(Atom(com.typesafe.sbt.jse.SbtJsTask),Set(Atom(com.typesafe.sbt.jse.SbtJsEngine))), Clause(Atom(sbt.plugins.BackgroundRunPlugin),Set(Atom(sbt.plugins.JvmPlugin))), Clause(Atom(play.ebean.sbt.PlayEbean),Set(Atom(com.typesafe.play.sbt.enhancer.PlayEnhancer))), Clause(Atom(com.typesafe.play.sbt.enhancer.PlayEnhancer),Set(Atom(sbt.plugins.JvmPlugin))), Clause(Atom(sbt.plugins.CorePlugin),Set(Atom(sbt.plugins.IvyPlugin))), Clause(Atom(sbt.plugins.IvyPlugin),Set(Atom(sbt.plugins.JvmPlugin))), Clause(Atom(sbt.plugins.JvmPlugin),Set(Atom(sbt.plugins.JUnitXmlReportPlugin))), Clause(And(Set(Atom(sbt.plugins.BackgroundRunPlugin), Atom(play.sbt.Play), Atom(sbt.plugins.SerializersPlugin))),Set(Atom(play.sbt.forkrun.PlayForkRun))), Clause(Atom(play.sbt.Play),Set(Atom(play.sbt.PlayLayoutPlugin))), Clause(Atom(play.sbt.Play),Set(Atom(play.sbt.PlayNettyServer))), Clause(Atom(com.typesafe.sbt.web.SbtWeb),Set(Atom(com.typesafe.sbt.jse.SbtJsEngine))), Clause(Atom(com.typesafe.sbt.jse.SbtJsEngine),Set(Atom(com.typesafe.sbt.jse.SbtJsTask))), Clause(Atom(sbt.plugins.JvmPlugin),Set(Atom(sbt.plugins.BackgroundRunPlugin))), Clause(Atom(sbt.plugins.CorePlugin),Set(Atom(sbt.plugins.InteractionServicePlugin))), Clause(Atom(sbt.plugins.CorePlugin),Set(Atom(sbt.plugins.SendEventServicePlugin))), Clause(Atom(sbt.plugins.CorePlugin),Set(Atom(sbt.plugins.SerializersPlugin))), Clause(Atom(sbt.plugins.JvmPlugin),Set(Atom(com.typesafe.play.sbt.enhancer.PlayEnhancer)))))
+  :: deduced result: Matched(sbt.plugins.CorePlugin,play.ebean.sbt.PlayEbean,play.sbt.PlayJava,com.typesafe.play.sbt.enhancer.PlayEnhancer,sbt.plugins.InteractionServicePlugin,sbt.plugins.SendEventServicePlugin,play.sbt.Play,sbt.plugins.SerializersPlugin,sbt.plugins.IvyPlugin,com.typesafe.sbt.packager.archetypes.JavaServerAppPackaging,play.twirl.sbt.SbtTwirl,sbt.plugins.JvmPlugin,play.sbt.PlayNettyServer,play.sbt.PlayLayoutPlugin,play.sbt.routes.RoutesCompiler,com.typesafe.sbt.jse.SbtJsTask,sbt.plugins.BackgroundRunPlugin,sbt.plugins.JUnitXmlReportPlugin,com.typesafe.sbt.jse.SbtJsEngine,com.typesafe.sbt.packager.archetypes.JavaAppPackaging,com.typesafe.sbt.packager.rpm.RpmPlugin,com.typesafe.sbt.packager.windows.WindowsPlugin,com.typesafe.sbt.web.SbtWeb,com.typesafe.sbt.packager.docker.DockerPlugin,play.sbt.forkrun.PlayForkRun,com.typesafe.sbt.packager.debian.DebianPlugin,com.typesafe.sbt.packager.universal.UniversalPlugin,com.typesafe.sbt.packager.linux.LinuxPlugin,com.typesafe.sbt.SbtNativePackager)
+sorting: ns: List(sbt.plugins.CorePlugin, play.ebean.sbt.PlayEbean, play.sbt.PlayJava, com.typesafe.play.sbt.enhancer.PlayEnhancer, sbt.plugins.InteractionServicePlugin, sbt.plugins.SendEventServicePlugin, play.sbt.Play, sbt.plugins.SerializersPlugin, sbt.plugins.IvyPlugin, com.typesafe.sbt.packager.archetypes.JavaServerAppPackaging, play.twirl.sbt.SbtTwirl, sbt.plugins.JvmPlugin, play.sbt.PlayNettyServer, play.sbt.PlayLayoutPlugin, play.sbt.routes.RoutesCompiler, com.typesafe.sbt.jse.SbtJsTask, sbt.plugins.BackgroundRunPlugin, sbt.plugins.JUnitXmlReportPlugin, com.typesafe.sbt.jse.SbtJsEngine, com.typesafe.sbt.packager.archetypes.JavaAppPackaging, com.typesafe.sbt.packager.rpm.RpmPlugin, com.typesafe.sbt.packager.windows.WindowsPlugin, com.typesafe.sbt.web.SbtWeb, com.typesafe.sbt.packager.docker.DockerPlugin, play.sbt.forkrun.PlayForkRun, com.typesafe.sbt.packager.debian.DebianPlugin, com.typesafe.sbt.packager.universal.UniversalPlugin, com.typesafe.sbt.packager.linux.LinuxPlugin, com.typesafe.sbt.SbtNativePackager)
+  :: sorting:: found: List(sbt.plugins.CorePlugin, com.typesafe.sbt.SbtNativePackager) not found List(play.ebean.sbt.PlayEbean, play.sbt.PlayJava, com.typesafe.play.sbt.enhancer.PlayEnhancer, sbt.plugins.InteractionServicePlugin, sbt.plugins.SendEventServicePlugin, play.sbt.Play, sbt.plugins.SerializersPlugin, sbt.plugins.IvyPlugin, com.typesafe.sbt.packager.archetypes.JavaServerAppPackaging, play.twirl.sbt.SbtTwirl, sbt.plugins.JvmPlugin, play.sbt.PlayNettyServer, play.sbt.PlayLayoutPlugin, play.sbt.routes.RoutesCompiler, com.typesafe.sbt.jse.SbtJsTask, sbt.plugins.BackgroundRunPlugin, sbt.plugins.JUnitXmlReportPlugin, com.typesafe.sbt.jse.SbtJsEngine, com.typesafe.sbt.packager.archetypes.JavaAppPackaging, com.typesafe.sbt.packager.rpm.RpmPlugin, com.typesafe.sbt.packager.windows.WindowsPlugin, com.typesafe.sbt.web.SbtWeb, com.typesafe.sbt.packager.docker.DockerPlugin, play.sbt.forkrun.PlayForkRun, com.typesafe.sbt.packager.debian.DebianPlugin, com.typesafe.sbt.packager.universal.UniversalPlugin, com.typesafe.sbt.packager.linux.LinuxPlugin)
+  :: sorting:: found: List(sbt.plugins.CorePlugin, com.typesafe.sbt.SbtNativePackager, sbt.plugins.InteractionServicePlugin, sbt.plugins.SendEventServicePlugin, sbt.plugins.SerializersPlugin, sbt.plugins.IvyPlugin, com.typesafe.sbt.packager.universal.UniversalPlugin) not found List(play.ebean.sbt.PlayEbean, play.sbt.PlayJava, com.typesafe.play.sbt.enhancer.PlayEnhancer, play.sbt.Play, com.typesafe.sbt.packager.archetypes.JavaServerAppPackaging, play.twirl.sbt.SbtTwirl, sbt.plugins.JvmPlugin, play.sbt.PlayNettyServer, play.sbt.PlayLayoutPlugin, play.sbt.routes.RoutesCompiler, com.typesafe.sbt.jse.SbtJsTask, sbt.plugins.BackgroundRunPlugin, sbt.plugins.JUnitXmlReportPlugin, com.typesafe.sbt.jse.SbtJsEngine, com.typesafe.sbt.packager.archetypes.JavaAppPackaging, com.typesafe.sbt.packager.rpm.RpmPlugin, com.typesafe.sbt.packager.windows.WindowsPlugin, com.typesafe.sbt.web.SbtWeb, com.typesafe.sbt.packager.docker.DockerPlugin, play.sbt.forkrun.PlayForkRun, com.typesafe.sbt.packager.debian.DebianPlugin, com.typesafe.sbt.packager.linux.LinuxPlugin)
+  :: sorting:: found: List(sbt.plugins.CorePlugin, com.typesafe.sbt.SbtNativePackager, sbt.plugins.InteractionServicePlugin, sbt.plugins.SendEventServicePlugin, sbt.plugins.SerializersPlugin, sbt.plugins.IvyPlugin, com.typesafe.sbt.packager.universal.UniversalPlugin, sbt.plugins.JvmPlugin, com.typesafe.sbt.packager.windows.WindowsPlugin, com.typesafe.sbt.packager.docker.DockerPlugin, com.typesafe.sbt.packager.linux.LinuxPlugin) not found List(play.ebean.sbt.PlayEbean, play.sbt.PlayJava, com.typesafe.play.sbt.enhancer.PlayEnhancer, play.sbt.Play, com.typesafe.sbt.packager.archetypes.JavaServerAppPackaging, play.twirl.sbt.SbtTwirl, play.sbt.PlayNettyServer, play.sbt.PlayLayoutPlugin, play.sbt.routes.RoutesCompiler, com.typesafe.sbt.jse.SbtJsTask, sbt.plugins.BackgroundRunPlugin, sbt.plugins.JUnitXmlReportPlugin, com.typesafe.sbt.jse.SbtJsEngine, com.typesafe.sbt.packager.archetypes.JavaAppPackaging, com.typesafe.sbt.packager.rpm.RpmPlugin, com.typesafe.sbt.web.SbtWeb, play.sbt.forkrun.PlayForkRun, com.typesafe.sbt.packager.debian.DebianPlugin)
+  :: sorting:: found: List(sbt.plugins.CorePlugin, com.typesafe.sbt.SbtNativePackager, sbt.plugins.InteractionServicePlugin, sbt.plugins.SendEventServicePlugin, sbt.plugins.SerializersPlugin, sbt.plugins.IvyPlugin, com.typesafe.sbt.packager.universal.UniversalPlugin, sbt.plugins.JvmPlugin, com.typesafe.sbt.packager.windows.WindowsPlugin, com.typesafe.sbt.packager.docker.DockerPlugin, com.typesafe.sbt.packager.linux.LinuxPlugin, com.typesafe.play.sbt.enhancer.PlayEnhancer, play.twirl.sbt.SbtTwirl, play.sbt.routes.RoutesCompiler, sbt.plugins.BackgroundRunPlugin, sbt.plugins.JUnitXmlReportPlugin, com.typesafe.sbt.packager.rpm.RpmPlugin, com.typesafe.sbt.web.SbtWeb, com.typesafe.sbt.packager.debian.DebianPlugin) not found List(play.ebean.sbt.PlayEbean, play.sbt.PlayJava, play.sbt.Play, com.typesafe.sbt.packager.archetypes.JavaServerAppPackaging, play.sbt.PlayNettyServer, play.sbt.PlayLayoutPlugin, com.typesafe.sbt.jse.SbtJsTask, com.typesafe.sbt.jse.SbtJsEngine, com.typesafe.sbt.packager.archetypes.JavaAppPackaging, play.sbt.forkrun.PlayForkRun)
+  :: sorting:: found: List(sbt.plugins.CorePlugin, com.typesafe.sbt.SbtNativePackager, sbt.plugins.InteractionServicePlugin, sbt.plugins.SendEventServicePlugin, sbt.plugins.SerializersPlugin, sbt.plugins.IvyPlugin, com.typesafe.sbt.packager.universal.UniversalPlugin, sbt.plugins.JvmPlugin, com.typesafe.sbt.packager.windows.WindowsPlugin, com.typesafe.sbt.packager.docker.DockerPlugin, com.typesafe.sbt.packager.linux.LinuxPlugin, com.typesafe.play.sbt.enhancer.PlayEnhancer, play.twirl.sbt.SbtTwirl, play.sbt.routes.RoutesCompiler, sbt.plugins.BackgroundRunPlugin, sbt.plugins.JUnitXmlReportPlugin, com.typesafe.sbt.packager.rpm.RpmPlugin, com.typesafe.sbt.web.SbtWeb, com.typesafe.sbt.packager.debian.DebianPlugin, play.ebean.sbt.PlayEbean, com.typesafe.sbt.jse.SbtJsEngine, com.typesafe.sbt.packager.archetypes.JavaAppPackaging) not found List(play.sbt.PlayJava, play.sbt.Play, com.typesafe.sbt.packager.archetypes.JavaServerAppPackaging, play.sbt.PlayNettyServer, play.sbt.PlayLayoutPlugin, com.typesafe.sbt.jse.SbtJsTask, play.sbt.forkrun.PlayForkRun)
+  :: sorting:: found: List(sbt.plugins.CorePlugin, com.typesafe.sbt.SbtNativePackager, sbt.plugins.InteractionServicePlugin, sbt.plugins.SendEventServicePlugin, sbt.plugins.SerializersPlugin, sbt.plugins.IvyPlugin, com.typesafe.sbt.packager.universal.UniversalPlugin, sbt.plugins.JvmPlugin, com.typesafe.sbt.packager.windows.WindowsPlugin, com.typesafe.sbt.packager.docker.DockerPlugin, com.typesafe.sbt.packager.linux.LinuxPlugin, com.typesafe.play.sbt.enhancer.PlayEnhancer, play.twirl.sbt.SbtTwirl, play.sbt.routes.RoutesCompiler, sbt.plugins.BackgroundRunPlugin, sbt.plugins.JUnitXmlReportPlugin, com.typesafe.sbt.packager.rpm.RpmPlugin, com.typesafe.sbt.web.SbtWeb, com.typesafe.sbt.packager.debian.DebianPlugin, play.ebean.sbt.PlayEbean, com.typesafe.sbt.jse.SbtJsEngine, com.typesafe.sbt.packager.archetypes.JavaAppPackaging, com.typesafe.sbt.packager.archetypes.JavaServerAppPackaging, com.typesafe.sbt.jse.SbtJsTask) not found List(play.sbt.PlayJava, play.sbt.Play, play.sbt.PlayNettyServer, play.sbt.PlayLayoutPlugin, play.sbt.forkrun.PlayForkRun)
+  :: sorting:: found: List(sbt.plugins.CorePlugin, com.typesafe.sbt.SbtNativePackager, sbt.plugins.InteractionServicePlugin, sbt.plugins.SendEventServicePlugin, sbt.plugins.SerializersPlugin, sbt.plugins.IvyPlugin, com.typesafe.sbt.packager.universal.UniversalPlugin, sbt.plugins.JvmPlugin, com.typesafe.sbt.packager.windows.WindowsPlugin, com.typesafe.sbt.packager.docker.DockerPlugin, com.typesafe.sbt.packager.linux.LinuxPlugin, com.typesafe.play.sbt.enhancer.PlayEnhancer, play.twirl.sbt.SbtTwirl, play.sbt.routes.RoutesCompiler, sbt.plugins.BackgroundRunPlugin, sbt.plugins.JUnitXmlReportPlugin, com.typesafe.sbt.packager.rpm.RpmPlugin, com.typesafe.sbt.web.SbtWeb, com.typesafe.sbt.packager.debian.DebianPlugin, play.ebean.sbt.PlayEbean, com.typesafe.sbt.jse.SbtJsEngine, com.typesafe.sbt.packager.archetypes.JavaAppPackaging, com.typesafe.sbt.packager.archetypes.JavaServerAppPackaging, com.typesafe.sbt.jse.SbtJsTask, play.sbt.Play) not found List(play.sbt.PlayJava, play.sbt.PlayNettyServer, play.sbt.PlayLayoutPlugin, play.sbt.forkrun.PlayForkRun)
+  :: sorting:: found: List(sbt.plugins.CorePlugin, com.typesafe.sbt.SbtNativePackager, sbt.plugins.InteractionServicePlugin, sbt.plugins.SendEventServicePlugin, sbt.plugins.SerializersPlugin, sbt.plugins.IvyPlugin, com.typesafe.sbt.packager.universal.UniversalPlugin, sbt.plugins.JvmPlugin, com.typesafe.sbt.packager.windows.WindowsPlugin, com.typesafe.sbt.packager.docker.DockerPlugin, com.typesafe.sbt.packager.linux.LinuxPlugin, com.typesafe.play.sbt.enhancer.PlayEnhancer, play.twirl.sbt.SbtTwirl, play.sbt.routes.RoutesCompiler, sbt.plugins.BackgroundRunPlugin, sbt.plugins.JUnitXmlReportPlugin, com.typesafe.sbt.packager.rpm.RpmPlugin, com.typesafe.sbt.web.SbtWeb, com.typesafe.sbt.packager.debian.DebianPlugin, play.ebean.sbt.PlayEbean, com.typesafe.sbt.jse.SbtJsEngine, com.typesafe.sbt.packager.archetypes.JavaAppPackaging, com.typesafe.sbt.packager.archetypes.JavaServerAppPackaging, com.typesafe.sbt.jse.SbtJsTask, play.sbt.Play, play.sbt.PlayJava, play.sbt.PlayNettyServer, play.sbt.PlayLayoutPlugin, play.sbt.forkrun.PlayForkRun) not found List()
+  :: sorted deduced result: List(sbt.plugins.CorePlugin, com.typesafe.sbt.SbtNativePackager, sbt.plugins.InteractionServicePlugin, sbt.plugins.SendEventServicePlugin, sbt.plugins.SerializersPlugin, sbt.plugins.IvyPlugin, com.typesafe.sbt.packager.universal.UniversalPlugin, sbt.plugins.JvmPlugin, com.typesafe.sbt.packager.windows.WindowsPlugin, com.typesafe.sbt.packager.docker.DockerPlugin, com.typesafe.sbt.packager.linux.LinuxPlugin, com.typesafe.play.sbt.enhancer.PlayEnhancer, play.twirl.sbt.SbtTwirl, play.sbt.routes.RoutesCompiler, sbt.plugins.BackgroundRunPlugin, sbt.plugins.JUnitXmlReportPlugin, com.typesafe.sbt.packager.rpm.RpmPlugin, com.typesafe.sbt.web.SbtWeb, com.typesafe.sbt.packager.debian.DebianPlugin, play.ebean.sbt.PlayEbean, com.typesafe.sbt.jse.SbtJsEngine, com.typesafe.sbt.packager.archetypes.JavaAppPackaging, com.typesafe.sbt.packager.archetypes.JavaServerAppPackaging, com.typesafe.sbt.jse.SbtJsTask, play.sbt.Play, play.sbt.PlayJava, play.sbt.PlayNettyServer, play.sbt.PlayLayoutPlugin, play.sbt.forkrun.PlayForkRun)
+[Loading] Done in /home/tetherless/hadatac, returning: (root)
+Set current project to hadatac (in build file:/home/tetherless/hadatac/)
+Reapplying settings...
+Set current project to hadatac (in build file:/home/tetherless/hadatac/)
+> iflast shell
+> server-send-ready-for-request
+> server-handle-next-server-request
+> compile
+Evaluating tasks: compile:compile
+Running task... Cancel: sbt.server.ServerTaskCancellation@199d2ba, check cycles: false
+
+Initial source changes: 
+	removed:Set()
+	added: Set()
+	modified: Set()
+Removed products: Set()
+External API changes: API Changes: Set()
+Modified binary dependencies: Set()
+Initial directly invalidated sources: Set()
+
+Sources indirectly invalidated by:
+	product: Set()
+	binary dep: Set()
+	external source: Set()
+All initially invalidated sources: Set()
+
+Total time: 8 s, completed Aug 28, 2015 1:42:45 PM
+> server-post-command-cleanup
+> server-handle-next-server-request
+> {file:/home/tetherless/hadatac/}root/compile:discoveredMainClasses
+Evaluating tasks: compile:discoveredMainClasses
+Running task... Cancel: sbt.server.ServerTaskCancellation@b46a9, check cycles: false
+
+Initial source changes: 
+	removed:Set()
+	added: Set()
+	modified: Set()
+Removed products: Set()
+External API changes: API Changes: Set()
+Modified binary dependencies: Set()
+Initial directly invalidated sources: Set()
+
+Sources indirectly invalidated by:
+	product: Set()
+	binary dep: Set()
+	external source: Set()
+All initially invalidated sources: Set()
+
+Total time: 3 s, completed Aug 28, 2015 1:42:48 PM
+> server-post-command-cleanup
+> server-handle-next-server-request
+> {file:/home/tetherless/hadatac/}root/compile:mainClass
+Evaluating tasks: compile:mainClass
+Running task... Cancel: sbt.server.ServerTaskCancellation@433e5a, check cycles: false
+Total time: 0 s, completed Aug 28, 2015 1:42:48 PM
+> server-post-command-cleanup
+> server-handle-next-server-request
+> backgroundRun
+Evaluating tasks: compile:backgroundRun
+Running task... Cancel: sbt.server.ServerTaskCancellation@1c93937, check cycles: false
+Total time: 1 s, completed Aug 28, 2015 1:52:49 PM
+> server-post-command-cleanup
+> server-handle-next-server-request
+> {file:/home/tetherless/hadatac/}root/*:playForkConfig
+Evaluating tasks: *:playForkConfig
+Running task... Cancel: sbt.server.ServerTaskCancellation@1ee19b0, check cycles: false
+Total time: 1 s, completed Aug 28, 2015 1:52:57 PM
+> server-post-command-cleanup
+> server-handle-next-server-request
+> root/playForkNotifyStart http://localhost:9000
+Evaluating tasks: *:playForkNotifyStart
+Running task... Cancel: sbt.server.ServerTaskCancellation@181ca23, check cycles: false
+Total time: 0 s, completed Aug 28, 2015 1:53:01 PM
+> server-post-command-cleanup
+> server-handle-next-server-request
+> {file:/home/tetherless/hadatac/}root/*:playForkReload
+Evaluating tasks: *:playForkReload
+Running task... Cancel: sbt.server.ServerTaskCancellation@17d336b, check cycles: false
+
+Initial source changes: 
+	removed:Set()
+	added: Set()
+	modified: Set(/home/tetherless/hadatac/target/scala-2.11/twirl/main/org/hadatac/console/views/html/agent_browser.template.scala)
+Removed products: Set()
+External API changes: API Changes: Set()
+Modified binary dependencies: Set()
+Initial directly invalidated sources: Set(/home/tetherless/hadatac/target/scala-2.11/twirl/main/org/hadatac/console/views/html/agent_browser.template.scala)
+
+Sources indirectly invalidated by:
+	product: Set()
+	binary dep: Set()
+	external source: Set()
+All initially invalidated sources: Set(/home/tetherless/hadatac/target/scala-2.11/twirl/main/org/hadatac/console/views/html/agent_browser.template.scala)
+
+Read from stdout: Compiling 1 Scala source to /home/tetherless/hadatac/target/scala-2.11/classes...
+Compiling 1 Scala source to /home/tetherless/hadatac/target/scala-2.11/classes...
+Getting compiler-interface from component compiler for Scala 2.11.7
+Other repositories:
+Default repositories:
+Getting compiler-interface from component compiler for Scala 2.11.7
+Other repositories:
+Default repositories:
+Running cached compiler b25be1, interfacing (CompilerInterface) with Scala compiler version 2.11.7
+Calling Scala compiler with arguments  (CompilerInterface):
+	-deprecation
+	-unchecked
+	-encoding
+	utf8
+	-bootclasspath
+	/usr/lib/jvm/java-8-oracle/jre/lib/resources.jar:/usr/lib/jvm/java-8-oracle/jre/lib/rt.jar:/usr/lib/jvm/java-8-oracle/jre/lib/sunrsasign.jar:/usr/lib/jvm/java-8-oracle/jre/lib/jsse.jar:/usr/lib/jvm/java-8-oracle/jre/lib/jce.jar:/usr/lib/jvm/java-8-oracle/jre/lib/charsets.jar:/usr/lib/jvm/java-8-oracle/jre/lib/jfr.jar:/usr/lib/jvm/java-8-oracle/jre/classes:/home/tetherless/.ivy2/cache/org.scala-lang/scala-library/jars/scala-library-2.11.7.jar
+	-classpath
+	/home/tetherless/hadatac/target/scala-2.11/classes:/home/tetherless/.ivy2/cache/com.typesafe.play/play-enhancer/jars/play-enhancer-1.1.0.jar:/home/tetherless/.ivy2/cache/com.typesafe.play/twirl-api_2.11/jars/twirl-api_2.11-1.1.1.jar:/home/tetherless/.ivy2/cache/org.apache.commons/commons-lang3/jars/commons-lang3-3.4.jar:/home/tetherless/.ivy2/cache/org.scala-lang.modules/scala-xml_2.11/bundles/scala-xml_2.11-1.0.1.jar:/home/tetherless/.ivy2/cache/com.typesafe.play/play-ebean_2.11/jars/play-ebean_2.11-1.0.0.jar:/home/tetherless/.ivy2/cache/com.typesafe.play/play-java-jdbc_2.11/jars/play-java-jdbc_2.11-2.4.2.jar:/home/tetherless/.ivy2/cache/com.typesafe.play/play-jdbc_2.11/jars/play-jdbc_2.11-2.4.2.jar:/home/tetherless/.ivy2/cache/com.typesafe.play/play-jdbc-api_2.11/jars/play-jdbc-api_2.11-2.4.2.jar:/home/tetherless/.ivy2/cache/com.typesafe.play/play_2.11/jars/play_2.11-2.4.2.jar:/home/tetherless/.ivy2/cache/com.typesafe.play/build-link/jars/build-link-2.4.2.jar:/home/tetherless/.ivy2/cache/com.typesafe.play/play-exceptions/jars/play-exceptions-2.4.2.jar:/home/tetherless/.ivy2/cache/org.javassist/javassist/bundles/javassist-3.19.0-GA.jar:/home/tetherless/.ivy2/cache/com.typesafe.play/play-iteratees_2.11/jars/play-iteratees_2.11-2.4.2.jar:/home/tetherless/.ivy2/cache/org.scala-stm/scala-stm_2.11/jars/scala-stm_2.11-0.7.jar:/home/tetherless/.ivy2/cache/com.typesafe/config/bundles/config-1.3.0.jar:/home/tetherless/.ivy2/cache/com.typesafe.play/play-json_2.11/jars/play-json_2.11-2.4.2.jar:/home/tetherless/.ivy2/cache/com.typesafe.play/play-functional_2.11/jars/play-functional_2.11-2.4.2.jar:/home/tetherless/.ivy2/cache/com.typesafe.play/play-datacommons_2.11/jars/play-datacommons_2.11-2.4.2.jar:/home/tetherless/.ivy2/cache/joda-time/joda-time/jars/joda-time-2.8.2.jar:/home/tetherless/.ivy2/cache/org.joda/joda-convert/jars/joda-convert-1.7.jar:/home/tetherless/.ivy2/cache/org.scala-lang/scala-reflect/jars/scala-reflect-2.11.6.jar:/home/tetherless/.ivy2/cache/com.fasterxml.jackson.core/jackson-core/bundles/jackson-core-2.5.4.jar:/home/tetherless/.ivy2/cache/com.fasterxml.jackson.core/jackson-annotations/bundles/jackson-annotations-2.5.4.jar:/home/tetherless/.ivy2/cache/com.fasterxml.jackson.core/jackson-databind/bundles/jackson-databind-2.5.4.jar:/home/tetherless/.ivy2/cache/com.fasterxml.jackson.datatype/jackson-datatype-jdk8/bundles/jackson-datatype-jdk8-2.5.4.jar:/home/tetherless/.ivy2/cache/com.fasterxml.jackson.datatype/jackson-datatype-jsr310/bundles/jackson-datatype-jsr310-2.5.4.jar:/home/tetherless/.ivy2/cache/com.typesafe.play/play-netty-utils/jars/play-netty-utils-2.4.2.jar:/home/tetherless/.ivy2/cache/org.slf4j/slf4j-api/jars/slf4j-api-1.7.12.jar:/home/tetherless/.ivy2/cache/org.slf4j/jul-to-slf4j/jars/jul-to-slf4j-1.7.12.jar:/home/tetherless/.ivy2/cache/org.slf4j/jcl-over-slf4j/jars/jcl-over-slf4j-1.7.12.jar:/home/tetherless/.ivy2/cache/org.scala-lang.modules/scala-parser-combinators_2.11/bundles/scala-parser-combinators_2.11-1.0.1.jar:/home/tetherless/.ivy2/cache/ch.qos.logback/logback-core/jars/logback-core-1.1.3.jar:/home/tetherless/.ivy2/cache/ch.qos.logback/logback-classic/jars/logback-classic-1.1.3.jar:/home/tetherless/.ivy2/cache/com.typesafe.akka/akka-actor_2.11/jars/akka-actor_2.11-2.3.11.jar:/home/tetherless/.ivy2/cache/com.typesafe.akka/akka-slf4j_2.11/jars/akka-slf4j_2.11-2.3.11.jar:/home/tetherless/.ivy2/cache/commons-codec/commons-codec/jars/commons-codec-1.10.jar:/home/tetherless/.ivy2/cache/xerces/xercesImpl/jars/xercesImpl-2.11.0.jar:/home/tetherless/.ivy2/cache/xml-apis/xml-apis/jars/xml-apis-1.4.01.jar:/home/tetherless/.ivy2/cache/javax.transaction/jta/jars/jta-1.1.jar:/home/tetherless/.ivy2/cache/com.google.inject/guice/jars/guice-4.0.jar:/home/tetherless/.ivy2/cache/javax.inject/javax.inject/jars/javax.inject-1.jar:/home/tetherless/.ivy2/cache/aopalliance/aopalliance/jars/aopalliance-1.0.jar:/home/tetherless/.ivy2/cache/com.google.inject.extensions/guice-assistedinject/jars/guice-assistedinject-4.0.jar:/home/tetherless/.ivy2/cache/com.jolbox/bonecp/bundles/bonecp-0.8.0.RELEASE.jar:/home/tetherless/.ivy2/cache/com.zaxxer/HikariCP/bundles/HikariCP-2.3.7.jar:/home/tetherless/.ivy2/cache/com.h2database/h2/jars/h2-1.4.187.jar:/home/tetherless/.ivy2/cache/tyrex/tyrex/jars/tyrex-1.0.1.jar:/home/tetherless/.ivy2/cache/com.typesafe.play/play-java_2.11/jars/play-java_2.11-2.4.2.jar:/home/tetherless/.ivy2/cache/org.scala-lang.modules/scala-java8-compat_2.11/bundles/scala-java8-compat_2.11-0.3.0.jar:/home/tetherless/.ivy2/cache/org.yaml/snakeyaml/bundles/snakeyaml-1.15.jar:/home/tetherless/.ivy2/cache/org.hibernate/hibernate-validator/jars/hibernate-validator-5.0.3.Final.jar:/home/tetherless/.ivy2/cache/javax.validation/validation-api/jars/validation-api-1.1.0.Final.jar:/home/tetherless/.ivy2/cache/com.fasterxml/classmate/bundles/classmate-1.0.0.jar:/home/tetherless/.ivy2/cache/org.jboss.logging/jboss-logging/jars/jboss-logging-3.2.1.Final.jar:/home/tetherless/.ivy2/cache/org.springframework/spring-context/jars/spring-context-4.1.6.RELEASE.jar:/home/tetherless/.ivy2/cache/org.springframework/spring-core/jars/spring-core-4.1.6.RELEASE.jar:/home/tetherless/.ivy2/cache/org.springframework/spring-beans/jars/spring-beans-4.1.6.RELEASE.jar:/home/tetherless/.ivy2/cache/org.reflections/reflections/jars/reflections-0.9.9.jar:/home/tetherless/.ivy2/cache/com.google.guava/guava/bundles/guava-18.0.jar:/home/tetherless/.ivy2/cache/com.google.code.findbugs/annotations/jars/annotations-2.0.1.jar:/home/tetherless/.ivy2/cache/net.jodah/typetools/bundles/typetools-0.4.1.jar:/home/tetherless/.ivy2/cache/com.google.code.findbugs/jsr305/jars/jsr305-2.0.3.jar:/home/tetherless/.ivy2/cache/org.apache.tomcat/tomcat-servlet-api/jars/tomcat-servlet-api-8.0.21.jar:/home/tetherless/.ivy2/cache/com.typesafe.play/play-jdbc-evolutions_2.11/jars/play-jdbc-evolutions_2.11-2.4.0.jar:/home/tetherless/.ivy2/cache/org.avaje.ebeanorm/avaje-ebeanorm/jars/avaje-ebeanorm-4.6.2.jar:/home/tetherless/.ivy2/cache/javax.persistence/persistence-api/jars/persistence-api-1.0.jar:/home/tetherless/.ivy2/cache/org.avaje.ebeanorm/avaje-ebeanorm-agent/jars/avaje-ebeanorm-agent-4.5.3.jar:/home/tetherless/.ivy2/cache/com.typesafe.play/play-server_2.11/jars/play-server_2.11-2.4.2.jar:/home/tetherless/.ivy2/cache/com.typesafe.play/play-netty-server_2.11/jars/play-netty-server_2.11-2.4.2.jar:/home/tetherless/.ivy2/cache/io.netty/netty/bundles/netty-3.10.3.Final.jar:/home/tetherless/.ivy2/cache/com.typesafe.netty/netty-http-pipelining/jars/netty-http-pipelining-1.1.4.jar:/home/tetherless/.ivy2/cache/be.objectify/deadbolt-java_2.11/jars/deadbolt-java_2.11-2.4.1.jar:/home/tetherless/.ivy2/cache/com.typesafe.play/play-cache_2.11/jars/play-cache_2.11-2.4.2.jar:/home/tetherless/.ivy2/cache/net.sf.ehcache/ehcache-core/jars/ehcache-core-2.6.11.jar:/home/tetherless/.ivy2/cache/be.objectify/deadbolt-core_2.11/jars/deadbolt-core_2.11-2.4.2.jar:/home/tetherless/.ivy2/cache/com.feth/play-authenticate_2.11/jars/play-authenticate_2.11-0.7.0-SNAPSHOT.jar:/home/tetherless/.ivy2/cache/org.apache.httpcomponents/httpclient/jars/httpclient-4.5.jar:/home/tetherless/.ivy2/cache/org.apache.httpcomponents/httpcore/jars/httpcore-4.4.1.jar:/home/tetherless/.ivy2/cache/commons-logging/commons-logging/jars/commons-logging-1.2.jar:/home/tetherless/.ivy2/cache/com.feth/play-easymail_2.11/jars/play-easymail_2.11-0.7.0-SNAPSHOT.jar:/home/tetherless/.ivy2/cache/com.typesafe.play/play-mailer_2.11/jars/play-mailer_2.11-3.0.1.jar:/home/tetherless/.ivy2/cache/org.apache.commons/commons-email/jars/commons-email-1.3.3.jar:/home/tetherless/.ivy2/cache/javax.mail/mail/jars/mail-1.4.5.jar:/home/tetherless/.ivy2/cache/javax.activation/activation/jars/activation-1.1.1.jar:/home/tetherless/.ivy2/cache/org.mindrot/jbcrypt/jars/jbcrypt-0.3m.jar:/home/tetherless/.ivy2/cache/com.typesafe.play/play-java-ws_2.11/jars/play-java-ws_2.11-2.4.2.jar:/home/tetherless/.ivy2/cache/com.typesafe.play/play-ws_2.11/jars/play-ws_2.11-2.4.2.jar:/home/tetherless/.ivy2/cache/com.ning/async-http-client/jars/async-http-client-1.9.21.jar:/home/tetherless/.ivy2/cache/oauth.signpost/signpost-core/jars/signpost-core-1.2.1.2.jar:/home/tetherless/.ivy2/cache/oauth.signpost/signpost-commonshttp4/jars/signpost-commonshttp4-1.2.1.2.jar:/home/tetherless/.ivy2/cache/org.webjars/bootstrap/jars/bootstrap-3.2.0.jar:/home/tetherless/.ivy2/cache/org.webjars/jquery/jars/jquery-1.11.1.jar:/home/tetherless/.ivy2/cache/org.apache.commons/commons-csv/jars/commons-csv-1.1.jar:/home/tetherless/.ivy2/cache/org.apache.httpcomponents/fluent-hc/jars/fluent-hc-4.3.6.jar:/home/tetherless/.ivy2/cache/org.apache.poi/poi-ooxml/jars/poi-ooxml-3.9.jar:/home/tetherless/.ivy2/cache/org.apache.poi/poi/jars/poi-3.9.jar:/home/tetherless/.ivy2/cache/org.apache.poi/poi-ooxml-schemas/jars/poi-ooxml-schemas-3.9.jar:/home/tetherless/.ivy2/cache/org.apache.xmlbeans/xmlbeans/jars/xmlbeans-2.3.0.jar:/home/tetherless/.ivy2/cache/stax/stax-api/jars/stax-api-1.0.1.jar:/home/tetherless/.ivy2/cache/dom4j/dom4j/jars/dom4j-1.6.1.jar:/home/tetherless/.ivy2/cache/org.apache.solr/solr-solrj/jars/solr-solrj-5.2.1.jar:/home/tetherless/.ivy2/cache/commons-io/commons-io/jars/commons-io-2.4.jar:/home/tetherless/.ivy2/cache/org.apache.httpcomponents/httpmime/jars/httpmime-4.4.1.jar:/home/tetherless/.ivy2/cache/org.apache.zookeeper/zookeeper/jars/zookeeper-3.4.6.jar:/home/tetherless/.ivy2/cache/org.codehaus.woodstox/stax2-api/bundles/stax2-api-3.1.4.jar:/home/tetherless/.ivy2/cache/org.codehaus.woodstox/woodstox-core-asl/jars/woodstox-core-asl-4.4.1.jar:/home/tetherless/.ivy2/cache/org.noggit/noggit/jars/noggit-0.6.jar:/home/tetherless/.ivy2/cache/org.apache.jena/jena-core/jars/jena-core-2.13.0.jar:/home/tetherless/.ivy2/cache/org.apache.jena/jena-iri/jars/jena-iri-1.1.2.jar:/home/tetherless/.ivy2/cache/org.slf4j/slf4j-log4j12/jars/slf4j-log4j12-1.7.6.jar:/home/tetherless/.ivy2/cache/log4j/log4j/bundles/log4j-1.2.17.jar:/home/tetherless/.ivy2/cache/org.apache.jena/jena-arq/jars/jena-arq-2.13.0.jar:/home/tetherless/.ivy2/cache/com.github.jsonld-java/jsonld-java/bundles/jsonld-java-0.5.1.jar:/home/tetherless/.ivy2/cache/org.apache.httpcomponents/httpclient-cache/jars/httpclient-cache-4.2.6.jar:/home/tetherless/.ivy2/cache/org.apache.thrift/libthrift/jars/libthrift-0.9.2.jar:/home/tetherless/.ivy2/cache/args4j/args4j/bundles/args4j-2.32.jar
+Scala compilation took 11.339695643 s
+New invalidations:
+	Set()
+Initial set of included nodes: Set()
+Previously invalidated, but (transitively) depend on new invalidations:
+	Set()
+All newly invalidated sources after taking into account (previously) recompiled sources:Set()
+Copy resource mappings: 
+	(/home/tetherless/hadatac/conf/messages.de,/home/tetherless/hadatac/target/scala-2.11/classes/messages.de)
+	(/home/tetherless/hadatac/conf/messages.pt,/home/tetherless/hadatac/target/scala-2.11/classes/messages.pt)
+	(/home/tetherless/hadatac/conf/namespaces.properties,/home/tetherless/hadatac/target/scala-2.11/classes/namespaces.properties)
+	(/home/tetherless/hadatac/conf/messages.es,/home/tetherless/hadatac/target/scala-2.11/classes/messages.es)
+	(/home/tetherless/hadatac/conf/play.plugins,/home/tetherless/hadatac/target/scala-2.11/classes/play.plugins)
+	(/home/tetherless/hadatac/conf/hadatac.conf,/home/tetherless/hadatac/target/scala-2.11/classes/hadatac.conf)
+	(/home/tetherless/hadatac/conf/messages.en,/home/tetherless/hadatac/target/scala-2.11/classes/messages.en)
+	(/home/tetherless/hadatac/conf/application.conf,/home/tetherless/hadatac/target/scala-2.11/classes/application.conf)
+	(/home/tetherless/hadatac/conf/play-authenticate,/home/tetherless/hadatac/target/scala-2.11/classes/play-authenticate)
+	(/home/tetherless/hadatac/conf/messages.fr,/home/tetherless/hadatac/target/scala-2.11/classes/messages.fr)
+	(/home/tetherless/hadatac/conf/routes,/home/tetherless/hadatac/target/scala-2.11/classes/routes)
+	(/home/tetherless/hadatac/conf/messages.ja,/home/tetherless/hadatac/target/scala-2.11/classes/messages.ja)
+	(/home/tetherless/hadatac/conf/messages.id,/home/tetherless/hadatac/target/scala-2.11/classes/messages.id)
+	(/home/tetherless/hadatac/conf/messages.pl,/home/tetherless/hadatac/target/scala-2.11/classes/messages.pl)
+	(/home/tetherless/hadatac/conf/play-authenticate/deadbolt.conf,/home/tetherless/hadatac/target/scala-2.11/classes/play-authenticate/deadbolt.conf)
+	(/home/tetherless/hadatac/conf/play-authenticate/mine.conf,/home/tetherless/hadatac/target/scala-2.11/classes/play-authenticate/mine.conf)
+	(/home/tetherless/hadatac/conf/play-authenticate/smtp.conf,/home/tetherless/hadatac/target/scala-2.11/classes/play-authenticate/smtp.conf)
+Total time: 18 s, completed Aug 28, 2015 1:54:32 PM
+> server-post-command-cleanup
+> server-handle-next-server-request
+> {file:/home/tetherless/hadatac/}root/*:playForkReload
+Evaluating tasks: *:playForkReload
+Running task... Cancel: sbt.server.ServerTaskCancellation@133a02e, check cycles: false
+
+Initial source changes: 
+	removed:Set()
+	added: Set()
+	modified: Set()
+Removed products: Set()
+External API changes: API Changes: Set()
+Modified binary dependencies: Set()
+Initial directly invalidated sources: Set()
+
+Sources indirectly invalidated by:
+	product: Set()
+	binary dep: Set()
+	external source: Set()
+All initially invalidated sources: Set()
+
+Copy resource mappings: 
+	(/home/tetherless/hadatac/conf/messages.de,/home/tetherless/hadatac/target/scala-2.11/classes/messages.de)
+	(/home/tetherless/hadatac/conf/messages.pt,/home/tetherless/hadatac/target/scala-2.11/classes/messages.pt)
+	(/home/tetherless/hadatac/conf/namespaces.properties,/home/tetherless/hadatac/target/scala-2.11/classes/namespaces.properties)
+	(/home/tetherless/hadatac/conf/messages.es,/home/tetherless/hadatac/target/scala-2.11/classes/messages.es)
+	(/home/tetherless/hadatac/conf/play.plugins,/home/tetherless/hadatac/target/scala-2.11/classes/play.plugins)
+	(/home/tetherless/hadatac/conf/hadatac.conf,/home/tetherless/hadatac/target/scala-2.11/classes/hadatac.conf)
+	(/home/tetherless/hadatac/conf/messages.en,/home/tetherless/hadatac/target/scala-2.11/classes/messages.en)
+	(/home/tetherless/hadatac/conf/application.conf,/home/tetherless/hadatac/target/scala-2.11/classes/application.conf)
+	(/home/tetherless/hadatac/conf/play-authenticate,/home/tetherless/hadatac/target/scala-2.11/classes/play-authenticate)
+	(/home/tetherless/hadatac/conf/messages.fr,/home/tetherless/hadatac/target/scala-2.11/classes/messages.fr)
+	(/home/tetherless/hadatac/conf/routes,/home/tetherless/hadatac/target/scala-2.11/classes/routes)
+	(/home/tetherless/hadatac/conf/messages.ja,/home/tetherless/hadatac/target/scala-2.11/classes/messages.ja)
+	(/home/tetherless/hadatac/conf/messages.id,/home/tetherless/hadatac/target/scala-2.11/classes/messages.id)
+	(/home/tetherless/hadatac/conf/messages.pl,/home/tetherless/hadatac/target/scala-2.11/classes/messages.pl)
+	(/home/tetherless/hadatac/conf/play-authenticate/deadbolt.conf,/home/tetherless/hadatac/target/scala-2.11/classes/play-authenticate/deadbolt.conf)
+	(/home/tetherless/hadatac/conf/play-authenticate/mine.conf,/home/tetherless/hadatac/target/scala-2.11/classes/play-authenticate/mine.conf)
+	(/home/tetherless/hadatac/conf/play-authenticate/smtp.conf,/home/tetherless/hadatac/target/scala-2.11/classes/play-authenticate/smtp.conf)
+Total time: 6 s, completed Aug 28, 2015 2:03:22 PM
+> server-post-command-cleanup
+> server-handle-next-server-request
+> {file:/home/tetherless/hadatac/}root/*:playForkReload
+Evaluating tasks: *:playForkReload
+Running task... Cancel: sbt.server.ServerTaskCancellation@f24c8b, check cycles: false
+
+Initial source changes: 
+	removed:Set()
+	added: Set()
+	modified: Set()
+Removed products: Set()
+External API changes: API Changes: Set()
+Modified binary dependencies: Set()
+Initial directly invalidated sources: Set()
+
+Sources indirectly invalidated by:
+	product: Set()
+	binary dep: Set()
+	external source: Set()
+All initially invalidated sources: Set()
+
+Copy resource mappings: 
+	(/home/tetherless/hadatac/conf/messages.de,/home/tetherless/hadatac/target/scala-2.11/classes/messages.de)
+	(/home/tetherless/hadatac/conf/messages.pt,/home/tetherless/hadatac/target/scala-2.11/classes/messages.pt)
+	(/home/tetherless/hadatac/conf/namespaces.properties,/home/tetherless/hadatac/target/scala-2.11/classes/namespaces.properties)
+	(/home/tetherless/hadatac/conf/messages.es,/home/tetherless/hadatac/target/scala-2.11/classes/messages.es)
+	(/home/tetherless/hadatac/conf/play.plugins,/home/tetherless/hadatac/target/scala-2.11/classes/play.plugins)
+	(/home/tetherless/hadatac/conf/hadatac.conf,/home/tetherless/hadatac/target/scala-2.11/classes/hadatac.conf)
+	(/home/tetherless/hadatac/conf/messages.en,/home/tetherless/hadatac/target/scala-2.11/classes/messages.en)
+	(/home/tetherless/hadatac/conf/application.conf,/home/tetherless/hadatac/target/scala-2.11/classes/application.conf)
+	(/home/tetherless/hadatac/conf/play-authenticate,/home/tetherless/hadatac/target/scala-2.11/classes/play-authenticate)
+	(/home/tetherless/hadatac/conf/messages.fr,/home/tetherless/hadatac/target/scala-2.11/classes/messages.fr)
+	(/home/tetherless/hadatac/conf/routes,/home/tetherless/hadatac/target/scala-2.11/classes/routes)
+	(/home/tetherless/hadatac/conf/messages.ja,/home/tetherless/hadatac/target/scala-2.11/classes/messages.ja)
+	(/home/tetherless/hadatac/conf/messages.id,/home/tetherless/hadatac/target/scala-2.11/classes/messages.id)
+	(/home/tetherless/hadatac/conf/messages.pl,/home/tetherless/hadatac/target/scala-2.11/classes/messages.pl)
+	(/home/tetherless/hadatac/conf/play-authenticate/deadbolt.conf,/home/tetherless/hadatac/target/scala-2.11/classes/play-authenticate/deadbolt.conf)
+	(/home/tetherless/hadatac/conf/play-authenticate/mine.conf,/home/tetherless/hadatac/target/scala-2.11/classes/play-authenticate/mine.conf)
+	(/home/tetherless/hadatac/conf/play-authenticate/smtp.conf,/home/tetherless/hadatac/target/scala-2.11/classes/play-authenticate/smtp.conf)
+Total time: 2 s, completed Aug 28, 2015 2:06:24 PM
+> server-post-command-cleanup
+> server-handle-next-server-request
+> {file:/home/tetherless/hadatac/}root/*:playForkReload
+Evaluating tasks: *:playForkReload
+Running task... Cancel: sbt.server.ServerTaskCancellation@e84f83, check cycles: false
+
+Initial source changes: 
+	removed:Set()
+	added: Set()
+	modified: Set(/home/tetherless/hadatac/target/scala-2.11/twirl/main/org/hadatac/console/views/html/agent_browser.template.scala)
+Removed products: Set()
+External API changes: API Changes: Set()
+Modified binary dependencies: Set()
+Initial directly invalidated sources: Set(/home/tetherless/hadatac/target/scala-2.11/twirl/main/org/hadatac/console/views/html/agent_browser.template.scala)
+
+Sources indirectly invalidated by:
+	product: Set()
+	binary dep: Set()
+	external source: Set()
+All initially invalidated sources: Set(/home/tetherless/hadatac/target/scala-2.11/twirl/main/org/hadatac/console/views/html/agent_browser.template.scala)
+
+Read from stdout: Compiling 1 Scala source to /home/tetherless/hadatac/target/scala-2.11/classes...
+Compiling 1 Scala source to /home/tetherless/hadatac/target/scala-2.11/classes...
+Getting compiler-interface from component compiler for Scala 2.11.7
+Other repositories:
+Default repositories:
+Getting compiler-interface from component compiler for Scala 2.11.7
+Other repositories:
+Default repositories:
+Running cached compiler 15bd669, interfacing (CompilerInterface) with Scala compiler version 2.11.7
+Calling Scala compiler with arguments  (CompilerInterface):
+	-deprecation
+	-unchecked
+	-encoding
+	utf8
+	-bootclasspath
+	/usr/lib/jvm/java-8-oracle/jre/lib/resources.jar:/usr/lib/jvm/java-8-oracle/jre/lib/rt.jar:/usr/lib/jvm/java-8-oracle/jre/lib/sunrsasign.jar:/usr/lib/jvm/java-8-oracle/jre/lib/jsse.jar:/usr/lib/jvm/java-8-oracle/jre/lib/jce.jar:/usr/lib/jvm/java-8-oracle/jre/lib/charsets.jar:/usr/lib/jvm/java-8-oracle/jre/lib/jfr.jar:/usr/lib/jvm/java-8-oracle/jre/classes:/home/tetherless/.ivy2/cache/org.scala-lang/scala-library/jars/scala-library-2.11.7.jar
+	-classpath
+	/home/tetherless/hadatac/target/scala-2.11/classes:/home/tetherless/.ivy2/cache/com.typesafe.play/play-enhancer/jars/play-enhancer-1.1.0.jar:/home/tetherless/.ivy2/cache/com.typesafe.play/twirl-api_2.11/jars/twirl-api_2.11-1.1.1.jar:/home/tetherless/.ivy2/cache/org.apache.commons/commons-lang3/jars/commons-lang3-3.4.jar:/home/tetherless/.ivy2/cache/org.scala-lang.modules/scala-xml_2.11/bundles/scala-xml_2.11-1.0.1.jar:/home/tetherless/.ivy2/cache/com.typesafe.play/play-ebean_2.11/jars/play-ebean_2.11-1.0.0.jar:/home/tetherless/.ivy2/cache/com.typesafe.play/play-java-jdbc_2.11/jars/play-java-jdbc_2.11-2.4.2.jar:/home/tetherless/.ivy2/cache/com.typesafe.play/play-jdbc_2.11/jars/play-jdbc_2.11-2.4.2.jar:/home/tetherless/.ivy2/cache/com.typesafe.play/play-jdbc-api_2.11/jars/play-jdbc-api_2.11-2.4.2.jar:/home/tetherless/.ivy2/cache/com.typesafe.play/play_2.11/jars/play_2.11-2.4.2.jar:/home/tetherless/.ivy2/cache/com.typesafe.play/build-link/jars/build-link-2.4.2.jar:/home/tetherless/.ivy2/cache/com.typesafe.play/play-exceptions/jars/play-exceptions-2.4.2.jar:/home/tetherless/.ivy2/cache/org.javassist/javassist/bundles/javassist-3.19.0-GA.jar:/home/tetherless/.ivy2/cache/com.typesafe.play/play-iteratees_2.11/jars/play-iteratees_2.11-2.4.2.jar:/home/tetherless/.ivy2/cache/org.scala-stm/scala-stm_2.11/jars/scala-stm_2.11-0.7.jar:/home/tetherless/.ivy2/cache/com.typesafe/config/bundles/config-1.3.0.jar:/home/tetherless/.ivy2/cache/com.typesafe.play/play-json_2.11/jars/play-json_2.11-2.4.2.jar:/home/tetherless/.ivy2/cache/com.typesafe.play/play-functional_2.11/jars/play-functional_2.11-2.4.2.jar:/home/tetherless/.ivy2/cache/com.typesafe.play/play-datacommons_2.11/jars/play-datacommons_2.11-2.4.2.jar:/home/tetherless/.ivy2/cache/joda-time/joda-time/jars/joda-time-2.8.2.jar:/home/tetherless/.ivy2/cache/org.joda/joda-convert/jars/joda-convert-1.7.jar:/home/tetherless/.ivy2/cache/org.scala-lang/scala-reflect/jars/scala-reflect-2.11.6.jar:/home/tetherless/.ivy2/cache/com.fasterxml.jackson.core/jackson-core/bundles/jackson-core-2.5.4.jar:/home/tetherless/.ivy2/cache/com.fasterxml.jackson.core/jackson-annotations/bundles/jackson-annotations-2.5.4.jar:/home/tetherless/.ivy2/cache/com.fasterxml.jackson.core/jackson-databind/bundles/jackson-databind-2.5.4.jar:/home/tetherless/.ivy2/cache/com.fasterxml.jackson.datatype/jackson-datatype-jdk8/bundles/jackson-datatype-jdk8-2.5.4.jar:/home/tetherless/.ivy2/cache/com.fasterxml.jackson.datatype/jackson-datatype-jsr310/bundles/jackson-datatype-jsr310-2.5.4.jar:/home/tetherless/.ivy2/cache/com.typesafe.play/play-netty-utils/jars/play-netty-utils-2.4.2.jar:/home/tetherless/.ivy2/cache/org.slf4j/slf4j-api/jars/slf4j-api-1.7.12.jar:/home/tetherless/.ivy2/cache/org.slf4j/jul-to-slf4j/jars/jul-to-slf4j-1.7.12.jar:/home/tetherless/.ivy2/cache/org.slf4j/jcl-over-slf4j/jars/jcl-over-slf4j-1.7.12.jar:/home/tetherless/.ivy2/cache/org.scala-lang.modules/scala-parser-combinators_2.11/bundles/scala-parser-combinators_2.11-1.0.1.jar:/home/tetherless/.ivy2/cache/ch.qos.logback/logback-core/jars/logback-core-1.1.3.jar:/home/tetherless/.ivy2/cache/ch.qos.logback/logback-classic/jars/logback-classic-1.1.3.jar:/home/tetherless/.ivy2/cache/com.typesafe.akka/akka-actor_2.11/jars/akka-actor_2.11-2.3.11.jar:/home/tetherless/.ivy2/cache/com.typesafe.akka/akka-slf4j_2.11/jars/akka-slf4j_2.11-2.3.11.jar:/home/tetherless/.ivy2/cache/commons-codec/commons-codec/jars/commons-codec-1.10.jar:/home/tetherless/.ivy2/cache/xerces/xercesImpl/jars/xercesImpl-2.11.0.jar:/home/tetherless/.ivy2/cache/xml-apis/xml-apis/jars/xml-apis-1.4.01.jar:/home/tetherless/.ivy2/cache/javax.transaction/jta/jars/jta-1.1.jar:/home/tetherless/.ivy2/cache/com.google.inject/guice/jars/guice-4.0.jar:/home/tetherless/.ivy2/cache/javax.inject/javax.inject/jars/javax.inject-1.jar:/home/tetherless/.ivy2/cache/aopalliance/aopalliance/jars/aopalliance-1.0.jar:/home/tetherless/.ivy2/cache/com.google.inject.extensions/guice-assistedinject/jars/guice-assistedinject-4.0.jar:/home/tetherless/.ivy2/cache/com.jolbox/bonecp/bundles/bonecp-0.8.0.RELEASE.jar:/home/tetherless/.ivy2/cache/com.zaxxer/HikariCP/bundles/HikariCP-2.3.7.jar:/home/tetherless/.ivy2/cache/com.h2database/h2/jars/h2-1.4.187.jar:/home/tetherless/.ivy2/cache/tyrex/tyrex/jars/tyrex-1.0.1.jar:/home/tetherless/.ivy2/cache/com.typesafe.play/play-java_2.11/jars/play-java_2.11-2.4.2.jar:/home/tetherless/.ivy2/cache/org.scala-lang.modules/scala-java8-compat_2.11/bundles/scala-java8-compat_2.11-0.3.0.jar:/home/tetherless/.ivy2/cache/org.yaml/snakeyaml/bundles/snakeyaml-1.15.jar:/home/tetherless/.ivy2/cache/org.hibernate/hibernate-validator/jars/hibernate-validator-5.0.3.Final.jar:/home/tetherless/.ivy2/cache/javax.validation/validation-api/jars/validation-api-1.1.0.Final.jar:/home/tetherless/.ivy2/cache/com.fasterxml/classmate/bundles/classmate-1.0.0.jar:/home/tetherless/.ivy2/cache/org.jboss.logging/jboss-logging/jars/jboss-logging-3.2.1.Final.jar:/home/tetherless/.ivy2/cache/org.springframework/spring-context/jars/spring-context-4.1.6.RELEASE.jar:/home/tetherless/.ivy2/cache/org.springframework/spring-core/jars/spring-core-4.1.6.RELEASE.jar:/home/tetherless/.ivy2/cache/org.springframework/spring-beans/jars/spring-beans-4.1.6.RELEASE.jar:/home/tetherless/.ivy2/cache/org.reflections/reflections/jars/reflections-0.9.9.jar:/home/tetherless/.ivy2/cache/com.google.guava/guava/bundles/guava-18.0.jar:/home/tetherless/.ivy2/cache/com.google.code.findbugs/annotations/jars/annotations-2.0.1.jar:/home/tetherless/.ivy2/cache/net.jodah/typetools/bundles/typetools-0.4.1.jar:/home/tetherless/.ivy2/cache/com.google.code.findbugs/jsr305/jars/jsr305-2.0.3.jar:/home/tetherless/.ivy2/cache/org.apache.tomcat/tomcat-servlet-api/jars/tomcat-servlet-api-8.0.21.jar:/home/tetherless/.ivy2/cache/com.typesafe.play/play-jdbc-evolutions_2.11/jars/play-jdbc-evolutions_2.11-2.4.0.jar:/home/tetherless/.ivy2/cache/org.avaje.ebeanorm/avaje-ebeanorm/jars/avaje-ebeanorm-4.6.2.jar:/home/tetherless/.ivy2/cache/javax.persistence/persistence-api/jars/persistence-api-1.0.jar:/home/tetherless/.ivy2/cache/org.avaje.ebeanorm/avaje-ebeanorm-agent/jars/avaje-ebeanorm-agent-4.5.3.jar:/home/tetherless/.ivy2/cache/com.typesafe.play/play-server_2.11/jars/play-server_2.11-2.4.2.jar:/home/tetherless/.ivy2/cache/com.typesafe.play/play-netty-server_2.11/jars/play-netty-server_2.11-2.4.2.jar:/home/tetherless/.ivy2/cache/io.netty/netty/bundles/netty-3.10.3.Final.jar:/home/tetherless/.ivy2/cache/com.typesafe.netty/netty-http-pipelining/jars/netty-http-pipelining-1.1.4.jar:/home/tetherless/.ivy2/cache/be.objectify/deadbolt-java_2.11/jars/deadbolt-java_2.11-2.4.1.jar:/home/tetherless/.ivy2/cache/com.typesafe.play/play-cache_2.11/jars/play-cache_2.11-2.4.2.jar:/home/tetherless/.ivy2/cache/net.sf.ehcache/ehcache-core/jars/ehcache-core-2.6.11.jar:/home/tetherless/.ivy2/cache/be.objectify/deadbolt-core_2.11/jars/deadbolt-core_2.11-2.4.2.jar:/home/tetherless/.ivy2/cache/com.feth/play-authenticate_2.11/jars/play-authenticate_2.11-0.7.0-SNAPSHOT.jar:/home/tetherless/.ivy2/cache/org.apache.httpcomponents/httpclient/jars/httpclient-4.5.jar:/home/tetherless/.ivy2/cache/org.apache.httpcomponents/httpcore/jars/httpcore-4.4.1.jar:/home/tetherless/.ivy2/cache/commons-logging/commons-logging/jars/commons-logging-1.2.jar:/home/tetherless/.ivy2/cache/com.feth/play-easymail_2.11/jars/play-easymail_2.11-0.7.0-SNAPSHOT.jar:/home/tetherless/.ivy2/cache/com.typesafe.play/play-mailer_2.11/jars/play-mailer_2.11-3.0.1.jar:/home/tetherless/.ivy2/cache/org.apache.commons/commons-email/jars/commons-email-1.3.3.jar:/home/tetherless/.ivy2/cache/javax.mail/mail/jars/mail-1.4.5.jar:/home/tetherless/.ivy2/cache/javax.activation/activation/jars/activation-1.1.1.jar:/home/tetherless/.ivy2/cache/org.mindrot/jbcrypt/jars/jbcrypt-0.3m.jar:/home/tetherless/.ivy2/cache/com.typesafe.play/play-java-ws_2.11/jars/play-java-ws_2.11-2.4.2.jar:/home/tetherless/.ivy2/cache/com.typesafe.play/play-ws_2.11/jars/play-ws_2.11-2.4.2.jar:/home/tetherless/.ivy2/cache/com.ning/async-http-client/jars/async-http-client-1.9.21.jar:/home/tetherless/.ivy2/cache/oauth.signpost/signpost-core/jars/signpost-core-1.2.1.2.jar:/home/tetherless/.ivy2/cache/oauth.signpost/signpost-commonshttp4/jars/signpost-commonshttp4-1.2.1.2.jar:/home/tetherless/.ivy2/cache/org.webjars/bootstrap/jars/bootstrap-3.2.0.jar:/home/tetherless/.ivy2/cache/org.webjars/jquery/jars/jquery-1.11.1.jar:/home/tetherless/.ivy2/cache/org.apache.commons/commons-csv/jars/commons-csv-1.1.jar:/home/tetherless/.ivy2/cache/org.apache.httpcomponents/fluent-hc/jars/fluent-hc-4.3.6.jar:/home/tetherless/.ivy2/cache/org.apache.poi/poi-ooxml/jars/poi-ooxml-3.9.jar:/home/tetherless/.ivy2/cache/org.apache.poi/poi/jars/poi-3.9.jar:/home/tetherless/.ivy2/cache/org.apache.poi/poi-ooxml-schemas/jars/poi-ooxml-schemas-3.9.jar:/home/tetherless/.ivy2/cache/org.apache.xmlbeans/xmlbeans/jars/xmlbeans-2.3.0.jar:/home/tetherless/.ivy2/cache/stax/stax-api/jars/stax-api-1.0.1.jar:/home/tetherless/.ivy2/cache/dom4j/dom4j/jars/dom4j-1.6.1.jar:/home/tetherless/.ivy2/cache/org.apache.solr/solr-solrj/jars/solr-solrj-5.2.1.jar:/home/tetherless/.ivy2/cache/commons-io/commons-io/jars/commons-io-2.4.jar:/home/tetherless/.ivy2/cache/org.apache.httpcomponents/httpmime/jars/httpmime-4.4.1.jar:/home/tetherless/.ivy2/cache/org.apache.zookeeper/zookeeper/jars/zookeeper-3.4.6.jar:/home/tetherless/.ivy2/cache/org.codehaus.woodstox/stax2-api/bundles/stax2-api-3.1.4.jar:/home/tetherless/.ivy2/cache/org.codehaus.woodstox/woodstox-core-asl/jars/woodstox-core-asl-4.4.1.jar:/home/tetherless/.ivy2/cache/org.noggit/noggit/jars/noggit-0.6.jar:/home/tetherless/.ivy2/cache/org.apache.jena/jena-core/jars/jena-core-2.13.0.jar:/home/tetherless/.ivy2/cache/org.apache.jena/jena-iri/jars/jena-iri-1.1.2.jar:/home/tetherless/.ivy2/cache/org.slf4j/slf4j-log4j12/jars/slf4j-log4j12-1.7.6.jar:/home/tetherless/.ivy2/cache/log4j/log4j/bundles/log4j-1.2.17.jar:/home/tetherless/.ivy2/cache/org.apache.jena/jena-arq/jars/jena-arq-2.13.0.jar:/home/tetherless/.ivy2/cache/com.github.jsonld-java/jsonld-java/bundles/jsonld-java-0.5.1.jar:/home/tetherless/.ivy2/cache/org.apache.httpcomponents/httpclient-cache/jars/httpclient-cache-4.2.6.jar:/home/tetherless/.ivy2/cache/org.apache.thrift/libthrift/jars/libthrift-0.9.2.jar:/home/tetherless/.ivy2/cache/args4j/args4j/bundles/args4j-2.32.jar
+Scala compilation took 2.807179533 s
+New invalidations:
+	Set()
+Initial set of included nodes: Set()
+Previously invalidated, but (transitively) depend on new invalidations:
+	Set()
+All newly invalidated sources after taking into account (previously) recompiled sources:Set()
+Copy resource mappings: 
+	(/home/tetherless/hadatac/conf/messages.de,/home/tetherless/hadatac/target/scala-2.11/classes/messages.de)
+	(/home/tetherless/hadatac/conf/messages.pt,/home/tetherless/hadatac/target/scala-2.11/classes/messages.pt)
+	(/home/tetherless/hadatac/conf/namespaces.properties,/home/tetherless/hadatac/target/scala-2.11/classes/namespaces.properties)
+	(/home/tetherless/hadatac/conf/messages.es,/home/tetherless/hadatac/target/scala-2.11/classes/messages.es)
+	(/home/tetherless/hadatac/conf/play.plugins,/home/tetherless/hadatac/target/scala-2.11/classes/play.plugins)
+	(/home/tetherless/hadatac/conf/hadatac.conf,/home/tetherless/hadatac/target/scala-2.11/classes/hadatac.conf)
+	(/home/tetherless/hadatac/conf/messages.en,/home/tetherless/hadatac/target/scala-2.11/classes/messages.en)
+	(/home/tetherless/hadatac/conf/application.conf,/home/tetherless/hadatac/target/scala-2.11/classes/application.conf)
+	(/home/tetherless/hadatac/conf/play-authenticate,/home/tetherless/hadatac/target/scala-2.11/classes/play-authenticate)
+	(/home/tetherless/hadatac/conf/messages.fr,/home/tetherless/hadatac/target/scala-2.11/classes/messages.fr)
+	(/home/tetherless/hadatac/conf/routes,/home/tetherless/hadatac/target/scala-2.11/classes/routes)
+	(/home/tetherless/hadatac/conf/messages.ja,/home/tetherless/hadatac/target/scala-2.11/classes/messages.ja)
+	(/home/tetherless/hadatac/conf/messages.id,/home/tetherless/hadatac/target/scala-2.11/classes/messages.id)
+	(/home/tetherless/hadatac/conf/messages.pl,/home/tetherless/hadatac/target/scala-2.11/classes/messages.pl)
+	(/home/tetherless/hadatac/conf/play-authenticate/deadbolt.conf,/home/tetherless/hadatac/target/scala-2.11/classes/play-authenticate/deadbolt.conf)
+	(/home/tetherless/hadatac/conf/play-authenticate/mine.conf,/home/tetherless/hadatac/target/scala-2.11/classes/play-authenticate/mine.conf)
+	(/home/tetherless/hadatac/conf/play-authenticate/smtp.conf,/home/tetherless/hadatac/target/scala-2.11/classes/play-authenticate/smtp.conf)
+Total time: 5 s, completed Aug 28, 2015 2:09:24 PM
+> server-post-command-cleanup
+> server-handle-next-server-request
+> {file:/home/tetherless/hadatac/}root/*:playForkReload
+Evaluating tasks: *:playForkReload
+Running task... Cancel: sbt.server.ServerTaskCancellation@117a7d4, check cycles: false
+
+Initial source changes: 
+	removed:Set()
+	added: Set()
+	modified: Set(/home/tetherless/hadatac/target/scala-2.11/twirl/main/org/hadatac/console/views/html/detector_browser.template.scala)
+Removed products: Set()
+External API changes: API Changes: Set()
+Modified binary dependencies: Set()
+Initial directly invalidated sources: Set(/home/tetherless/hadatac/target/scala-2.11/twirl/main/org/hadatac/console/views/html/detector_browser.template.scala)
+
+Sources indirectly invalidated by:
+	product: Set()
+	binary dep: Set()
+	external source: Set()
+All initially invalidated sources: Set(/home/tetherless/hadatac/target/scala-2.11/twirl/main/org/hadatac/console/views/html/detector_browser.template.scala)
+
+Read from stdout: Compiling 1 Scala source to /home/tetherless/hadatac/target/scala-2.11/classes...
+Compiling 1 Scala source to /home/tetherless/hadatac/target/scala-2.11/classes...
+Getting compiler-interface from component compiler for Scala 2.11.7
+Other repositories:
+Default repositories:
+Getting compiler-interface from component compiler for Scala 2.11.7
+Other repositories:
+Default repositories:
+Running cached compiler ae526e, interfacing (CompilerInterface) with Scala compiler version 2.11.7
+Calling Scala compiler with arguments  (CompilerInterface):
+	-deprecation
+	-unchecked
+	-encoding
+	utf8
+	-bootclasspath
+	/usr/lib/jvm/java-8-oracle/jre/lib/resources.jar:/usr/lib/jvm/java-8-oracle/jre/lib/rt.jar:/usr/lib/jvm/java-8-oracle/jre/lib/sunrsasign.jar:/usr/lib/jvm/java-8-oracle/jre/lib/jsse.jar:/usr/lib/jvm/java-8-oracle/jre/lib/jce.jar:/usr/lib/jvm/java-8-oracle/jre/lib/charsets.jar:/usr/lib/jvm/java-8-oracle/jre/lib/jfr.jar:/usr/lib/jvm/java-8-oracle/jre/classes:/home/tetherless/.ivy2/cache/org.scala-lang/scala-library/jars/scala-library-2.11.7.jar
+	-classpath
+	/home/tetherless/hadatac/target/scala-2.11/classes:/home/tetherless/.ivy2/cache/com.typesafe.play/play-enhancer/jars/play-enhancer-1.1.0.jar:/home/tetherless/.ivy2/cache/com.typesafe.play/twirl-api_2.11/jars/twirl-api_2.11-1.1.1.jar:/home/tetherless/.ivy2/cache/org.apache.commons/commons-lang3/jars/commons-lang3-3.4.jar:/home/tetherless/.ivy2/cache/org.scala-lang.modules/scala-xml_2.11/bundles/scala-xml_2.11-1.0.1.jar:/home/tetherless/.ivy2/cache/com.typesafe.play/play-ebean_2.11/jars/play-ebean_2.11-1.0.0.jar:/home/tetherless/.ivy2/cache/com.typesafe.play/play-java-jdbc_2.11/jars/play-java-jdbc_2.11-2.4.2.jar:/home/tetherless/.ivy2/cache/com.typesafe.play/play-jdbc_2.11/jars/play-jdbc_2.11-2.4.2.jar:/home/tetherless/.ivy2/cache/com.typesafe.play/play-jdbc-api_2.11/jars/play-jdbc-api_2.11-2.4.2.jar:/home/tetherless/.ivy2/cache/com.typesafe.play/play_2.11/jars/play_2.11-2.4.2.jar:/home/tetherless/.ivy2/cache/com.typesafe.play/build-link/jars/build-link-2.4.2.jar:/home/tetherless/.ivy2/cache/com.typesafe.play/play-exceptions/jars/play-exceptions-2.4.2.jar:/home/tetherless/.ivy2/cache/org.javassist/javassist/bundles/javassist-3.19.0-GA.jar:/home/tetherless/.ivy2/cache/com.typesafe.play/play-iteratees_2.11/jars/play-iteratees_2.11-2.4.2.jar:/home/tetherless/.ivy2/cache/org.scala-stm/scala-stm_2.11/jars/scala-stm_2.11-0.7.jar:/home/tetherless/.ivy2/cache/com.typesafe/config/bundles/config-1.3.0.jar:/home/tetherless/.ivy2/cache/com.typesafe.play/play-json_2.11/jars/play-json_2.11-2.4.2.jar:/home/tetherless/.ivy2/cache/com.typesafe.play/play-functional_2.11/jars/play-functional_2.11-2.4.2.jar:/home/tetherless/.ivy2/cache/com.typesafe.play/play-datacommons_2.11/jars/play-datacommons_2.11-2.4.2.jar:/home/tetherless/.ivy2/cache/joda-time/joda-time/jars/joda-time-2.8.2.jar:/home/tetherless/.ivy2/cache/org.joda/joda-convert/jars/joda-convert-1.7.jar:/home/tetherless/.ivy2/cache/org.scala-lang/scala-reflect/jars/scala-reflect-2.11.6.jar:/home/tetherless/.ivy2/cache/com.fasterxml.jackson.core/jackson-core/bundles/jackson-core-2.5.4.jar:/home/tetherless/.ivy2/cache/com.fasterxml.jackson.core/jackson-annotations/bundles/jackson-annotations-2.5.4.jar:/home/tetherless/.ivy2/cache/com.fasterxml.jackson.core/jackson-databind/bundles/jackson-databind-2.5.4.jar:/home/tetherless/.ivy2/cache/com.fasterxml.jackson.datatype/jackson-datatype-jdk8/bundles/jackson-datatype-jdk8-2.5.4.jar:/home/tetherless/.ivy2/cache/com.fasterxml.jackson.datatype/jackson-datatype-jsr310/bundles/jackson-datatype-jsr310-2.5.4.jar:/home/tetherless/.ivy2/cache/com.typesafe.play/play-netty-utils/jars/play-netty-utils-2.4.2.jar:/home/tetherless/.ivy2/cache/org.slf4j/slf4j-api/jars/slf4j-api-1.7.12.jar:/home/tetherless/.ivy2/cache/org.slf4j/jul-to-slf4j/jars/jul-to-slf4j-1.7.12.jar:/home/tetherless/.ivy2/cache/org.slf4j/jcl-over-slf4j/jars/jcl-over-slf4j-1.7.12.jar:/home/tetherless/.ivy2/cache/org.scala-lang.modules/scala-parser-combinators_2.11/bundles/scala-parser-combinators_2.11-1.0.1.jar:/home/tetherless/.ivy2/cache/ch.qos.logback/logback-core/jars/logback-core-1.1.3.jar:/home/tetherless/.ivy2/cache/ch.qos.logback/logback-classic/jars/logback-classic-1.1.3.jar:/home/tetherless/.ivy2/cache/com.typesafe.akka/akka-actor_2.11/jars/akka-actor_2.11-2.3.11.jar:/home/tetherless/.ivy2/cache/com.typesafe.akka/akka-slf4j_2.11/jars/akka-slf4j_2.11-2.3.11.jar:/home/tetherless/.ivy2/cache/commons-codec/commons-codec/jars/commons-codec-1.10.jar:/home/tetherless/.ivy2/cache/xerces/xercesImpl/jars/xercesImpl-2.11.0.jar:/home/tetherless/.ivy2/cache/xml-apis/xml-apis/jars/xml-apis-1.4.01.jar:/home/tetherless/.ivy2/cache/javax.transaction/jta/jars/jta-1.1.jar:/home/tetherless/.ivy2/cache/com.google.inject/guice/jars/guice-4.0.jar:/home/tetherless/.ivy2/cache/javax.inject/javax.inject/jars/javax.inject-1.jar:/home/tetherless/.ivy2/cache/aopalliance/aopalliance/jars/aopalliance-1.0.jar:/home/tetherless/.ivy2/cache/com.google.inject.extensions/guice-assistedinject/jars/guice-assistedinject-4.0.jar:/home/tetherless/.ivy2/cache/com.jolbox/bonecp/bundles/bonecp-0.8.0.RELEASE.jar:/home/tetherless/.ivy2/cache/com.zaxxer/HikariCP/bundles/HikariCP-2.3.7.jar:/home/tetherless/.ivy2/cache/com.h2database/h2/jars/h2-1.4.187.jar:/home/tetherless/.ivy2/cache/tyrex/tyrex/jars/tyrex-1.0.1.jar:/home/tetherless/.ivy2/cache/com.typesafe.play/play-java_2.11/jars/play-java_2.11-2.4.2.jar:/home/tetherless/.ivy2/cache/org.scala-lang.modules/scala-java8-compat_2.11/bundles/scala-java8-compat_2.11-0.3.0.jar:/home/tetherless/.ivy2/cache/org.yaml/snakeyaml/bundles/snakeyaml-1.15.jar:/home/tetherless/.ivy2/cache/org.hibernate/hibernate-validator/jars/hibernate-validator-5.0.3.Final.jar:/home/tetherless/.ivy2/cache/javax.validation/validation-api/jars/validation-api-1.1.0.Final.jar:/home/tetherless/.ivy2/cache/com.fasterxml/classmate/bundles/classmate-1.0.0.jar:/home/tetherless/.ivy2/cache/org.jboss.logging/jboss-logging/jars/jboss-logging-3.2.1.Final.jar:/home/tetherless/.ivy2/cache/org.springframework/spring-context/jars/spring-context-4.1.6.RELEASE.jar:/home/tetherless/.ivy2/cache/org.springframework/spring-core/jars/spring-core-4.1.6.RELEASE.jar:/home/tetherless/.ivy2/cache/org.springframework/spring-beans/jars/spring-beans-4.1.6.RELEASE.jar:/home/tetherless/.ivy2/cache/org.reflections/reflections/jars/reflections-0.9.9.jar:/home/tetherless/.ivy2/cache/com.google.guava/guava/bundles/guava-18.0.jar:/home/tetherless/.ivy2/cache/com.google.code.findbugs/annotations/jars/annotations-2.0.1.jar:/home/tetherless/.ivy2/cache/net.jodah/typetools/bundles/typetools-0.4.1.jar:/home/tetherless/.ivy2/cache/com.google.code.findbugs/jsr305/jars/jsr305-2.0.3.jar:/home/tetherless/.ivy2/cache/org.apache.tomcat/tomcat-servlet-api/jars/tomcat-servlet-api-8.0.21.jar:/home/tetherless/.ivy2/cache/com.typesafe.play/play-jdbc-evolutions_2.11/jars/play-jdbc-evolutions_2.11-2.4.0.jar:/home/tetherless/.ivy2/cache/org.avaje.ebeanorm/avaje-ebeanorm/jars/avaje-ebeanorm-4.6.2.jar:/home/tetherless/.ivy2/cache/javax.persistence/persistence-api/jars/persistence-api-1.0.jar:/home/tetherless/.ivy2/cache/org.avaje.ebeanorm/avaje-ebeanorm-agent/jars/avaje-ebeanorm-agent-4.5.3.jar:/home/tetherless/.ivy2/cache/com.typesafe.play/play-server_2.11/jars/play-server_2.11-2.4.2.jar:/home/tetherless/.ivy2/cache/com.typesafe.play/play-netty-server_2.11/jars/play-netty-server_2.11-2.4.2.jar:/home/tetherless/.ivy2/cache/io.netty/netty/bundles/netty-3.10.3.Final.jar:/home/tetherless/.ivy2/cache/com.typesafe.netty/netty-http-pipelining/jars/netty-http-pipelining-1.1.4.jar:/home/tetherless/.ivy2/cache/be.objectify/deadbolt-java_2.11/jars/deadbolt-java_2.11-2.4.1.jar:/home/tetherless/.ivy2/cache/com.typesafe.play/play-cache_2.11/jars/play-cache_2.11-2.4.2.jar:/home/tetherless/.ivy2/cache/net.sf.ehcache/ehcache-core/jars/ehcache-core-2.6.11.jar:/home/tetherless/.ivy2/cache/be.objectify/deadbolt-core_2.11/jars/deadbolt-core_2.11-2.4.2.jar:/home/tetherless/.ivy2/cache/com.feth/play-authenticate_2.11/jars/play-authenticate_2.11-0.7.0-SNAPSHOT.jar:/home/tetherless/.ivy2/cache/org.apache.httpcomponents/httpclient/jars/httpclient-4.5.jar:/home/tetherless/.ivy2/cache/org.apache.httpcomponents/httpcore/jars/httpcore-4.4.1.jar:/home/tetherless/.ivy2/cache/commons-logging/commons-logging/jars/commons-logging-1.2.jar:/home/tetherless/.ivy2/cache/com.feth/play-easymail_2.11/jars/play-easymail_2.11-0.7.0-SNAPSHOT.jar:/home/tetherless/.ivy2/cache/com.typesafe.play/play-mailer_2.11/jars/play-mailer_2.11-3.0.1.jar:/home/tetherless/.ivy2/cache/org.apache.commons/commons-email/jars/commons-email-1.3.3.jar:/home/tetherless/.ivy2/cache/javax.mail/mail/jars/mail-1.4.5.jar:/home/tetherless/.ivy2/cache/javax.activation/activation/jars/activation-1.1.1.jar:/home/tetherless/.ivy2/cache/org.mindrot/jbcrypt/jars/jbcrypt-0.3m.jar:/home/tetherless/.ivy2/cache/com.typesafe.play/play-java-ws_2.11/jars/play-java-ws_2.11-2.4.2.jar:/home/tetherless/.ivy2/cache/com.typesafe.play/play-ws_2.11/jars/play-ws_2.11-2.4.2.jar:/home/tetherless/.ivy2/cache/com.ning/async-http-client/jars/async-http-client-1.9.21.jar:/home/tetherless/.ivy2/cache/oauth.signpost/signpost-core/jars/signpost-core-1.2.1.2.jar:/home/tetherless/.ivy2/cache/oauth.signpost/signpost-commonshttp4/jars/signpost-commonshttp4-1.2.1.2.jar:/home/tetherless/.ivy2/cache/org.webjars/bootstrap/jars/bootstrap-3.2.0.jar:/home/tetherless/.ivy2/cache/org.webjars/jquery/jars/jquery-1.11.1.jar:/home/tetherless/.ivy2/cache/org.apache.commons/commons-csv/jars/commons-csv-1.1.jar:/home/tetherless/.ivy2/cache/org.apache.httpcomponents/fluent-hc/jars/fluent-hc-4.3.6.jar:/home/tetherless/.ivy2/cache/org.apache.poi/poi-ooxml/jars/poi-ooxml-3.9.jar:/home/tetherless/.ivy2/cache/org.apache.poi/poi/jars/poi-3.9.jar:/home/tetherless/.ivy2/cache/org.apache.poi/poi-ooxml-schemas/jars/poi-ooxml-schemas-3.9.jar:/home/tetherless/.ivy2/cache/org.apache.xmlbeans/xmlbeans/jars/xmlbeans-2.3.0.jar:/home/tetherless/.ivy2/cache/stax/stax-api/jars/stax-api-1.0.1.jar:/home/tetherless/.ivy2/cache/dom4j/dom4j/jars/dom4j-1.6.1.jar:/home/tetherless/.ivy2/cache/org.apache.solr/solr-solrj/jars/solr-solrj-5.2.1.jar:/home/tetherless/.ivy2/cache/commons-io/commons-io/jars/commons-io-2.4.jar:/home/tetherless/.ivy2/cache/org.apache.httpcomponents/httpmime/jars/httpmime-4.4.1.jar:/home/tetherless/.ivy2/cache/org.apache.zookeeper/zookeeper/jars/zookeeper-3.4.6.jar:/home/tetherless/.ivy2/cache/org.codehaus.woodstox/stax2-api/bundles/stax2-api-3.1.4.jar:/home/tetherless/.ivy2/cache/org.codehaus.woodstox/woodstox-core-asl/jars/woodstox-core-asl-4.4.1.jar:/home/tetherless/.ivy2/cache/org.noggit/noggit/jars/noggit-0.6.jar:/home/tetherless/.ivy2/cache/org.apache.jena/jena-core/jars/jena-core-2.13.0.jar:/home/tetherless/.ivy2/cache/org.apache.jena/jena-iri/jars/jena-iri-1.1.2.jar:/home/tetherless/.ivy2/cache/org.slf4j/slf4j-log4j12/jars/slf4j-log4j12-1.7.6.jar:/home/tetherless/.ivy2/cache/log4j/log4j/bundles/log4j-1.2.17.jar:/home/tetherless/.ivy2/cache/org.apache.jena/jena-arq/jars/jena-arq-2.13.0.jar:/home/tetherless/.ivy2/cache/com.github.jsonld-java/jsonld-java/bundles/jsonld-java-0.5.1.jar:/home/tetherless/.ivy2/cache/org.apache.httpcomponents/httpclient-cache/jars/httpclient-cache-4.2.6.jar:/home/tetherless/.ivy2/cache/org.apache.thrift/libthrift/jars/libthrift-0.9.2.jar:/home/tetherless/.ivy2/cache/args4j/args4j/bundles/args4j-2.32.jar
+Scala compilation took 3.674972074 s
+New invalidations:
+	Set()
+Initial set of included nodes: Set()
+Previously invalidated, but (transitively) depend on new invalidations:
+	Set()
+All newly invalidated sources after taking into account (previously) recompiled sources:Set()
+Copy resource mappings: 
+	(/home/tetherless/hadatac/conf/messages.de,/home/tetherless/hadatac/target/scala-2.11/classes/messages.de)
+	(/home/tetherless/hadatac/conf/messages.pt,/home/tetherless/hadatac/target/scala-2.11/classes/messages.pt)
+	(/home/tetherless/hadatac/conf/namespaces.properties,/home/tetherless/hadatac/target/scala-2.11/classes/namespaces.properties)
+	(/home/tetherless/hadatac/conf/messages.es,/home/tetherless/hadatac/target/scala-2.11/classes/messages.es)
+	(/home/tetherless/hadatac/conf/play.plugins,/home/tetherless/hadatac/target/scala-2.11/classes/play.plugins)
+	(/home/tetherless/hadatac/conf/hadatac.conf,/home/tetherless/hadatac/target/scala-2.11/classes/hadatac.conf)
+	(/home/tetherless/hadatac/conf/messages.en,/home/tetherless/hadatac/target/scala-2.11/classes/messages.en)
+	(/home/tetherless/hadatac/conf/application.conf,/home/tetherless/hadatac/target/scala-2.11/classes/application.conf)
+	(/home/tetherless/hadatac/conf/play-authenticate,/home/tetherless/hadatac/target/scala-2.11/classes/play-authenticate)
+	(/home/tetherless/hadatac/conf/messages.fr,/home/tetherless/hadatac/target/scala-2.11/classes/messages.fr)
+	(/home/tetherless/hadatac/conf/routes,/home/tetherless/hadatac/target/scala-2.11/classes/routes)
+	(/home/tetherless/hadatac/conf/messages.ja,/home/tetherless/hadatac/target/scala-2.11/classes/messages.ja)
+	(/home/tetherless/hadatac/conf/messages.id,/home/tetherless/hadatac/target/scala-2.11/classes/messages.id)
+	(/home/tetherless/hadatac/conf/messages.pl,/home/tetherless/hadatac/target/scala-2.11/classes/messages.pl)
+	(/home/tetherless/hadatac/conf/play-authenticate/deadbolt.conf,/home/tetherless/hadatac/target/scala-2.11/classes/play-authenticate/deadbolt.conf)
+	(/home/tetherless/hadatac/conf/play-authenticate/mine.conf,/home/tetherless/hadatac/target/scala-2.11/classes/play-authenticate/mine.conf)
+	(/home/tetherless/hadatac/conf/play-authenticate/smtp.conf,/home/tetherless/hadatac/target/scala-2.11/classes/play-authenticate/smtp.conf)
+Total time: 6 s, completed Aug 28, 2015 2:10:17 PM
+> server-post-command-cleanup
+> server-handle-next-server-request
+> {file:/home/tetherless/hadatac/}root/*:playForkReload
+Evaluating tasks: *:playForkReload
+Running task... Cancel: sbt.server.ServerTaskCancellation@caada4, check cycles: false
+
+Initial source changes: 
+	removed:Set()
+	added: Set()
+	modified: Set()
+Removed products: Set()
+External API changes: API Changes: Set()
+Modified binary dependencies: Set()
+Initial directly invalidated sources: Set()
+
+Sources indirectly invalidated by:
+	product: Set()
+	binary dep: Set()
+	external source: Set()
+All initially invalidated sources: Set()
+
+Copy resource mappings: 
+	(/home/tetherless/hadatac/conf/messages.de,/home/tetherless/hadatac/target/scala-2.11/classes/messages.de)
+	(/home/tetherless/hadatac/conf/messages.pt,/home/tetherless/hadatac/target/scala-2.11/classes/messages.pt)
+	(/home/tetherless/hadatac/conf/namespaces.properties,/home/tetherless/hadatac/target/scala-2.11/classes/namespaces.properties)
+	(/home/tetherless/hadatac/conf/messages.es,/home/tetherless/hadatac/target/scala-2.11/classes/messages.es)
+	(/home/tetherless/hadatac/conf/play.plugins,/home/tetherless/hadatac/target/scala-2.11/classes/play.plugins)
+	(/home/tetherless/hadatac/conf/hadatac.conf,/home/tetherless/hadatac/target/scala-2.11/classes/hadatac.conf)
+	(/home/tetherless/hadatac/conf/messages.en,/home/tetherless/hadatac/target/scala-2.11/classes/messages.en)
+	(/home/tetherless/hadatac/conf/application.conf,/home/tetherless/hadatac/target/scala-2.11/classes/application.conf)
+	(/home/tetherless/hadatac/conf/play-authenticate,/home/tetherless/hadatac/target/scala-2.11/classes/play-authenticate)
+	(/home/tetherless/hadatac/conf/messages.fr,/home/tetherless/hadatac/target/scala-2.11/classes/messages.fr)
+	(/home/tetherless/hadatac/conf/routes,/home/tetherless/hadatac/target/scala-2.11/classes/routes)
+	(/home/tetherless/hadatac/conf/messages.ja,/home/tetherless/hadatac/target/scala-2.11/classes/messages.ja)
+	(/home/tetherless/hadatac/conf/messages.id,/home/tetherless/hadatac/target/scala-2.11/classes/messages.id)
+	(/home/tetherless/hadatac/conf/messages.pl,/home/tetherless/hadatac/target/scala-2.11/classes/messages.pl)
+	(/home/tetherless/hadatac/conf/play-authenticate/deadbolt.conf,/home/tetherless/hadatac/target/scala-2.11/classes/play-authenticate/deadbolt.conf)
+	(/home/tetherless/hadatac/conf/play-authenticate/mine.conf,/home/tetherless/hadatac/target/scala-2.11/classes/play-authenticate/mine.conf)
+	(/home/tetherless/hadatac/conf/play-authenticate/smtp.conf,/home/tetherless/hadatac/target/scala-2.11/classes/play-authenticate/smtp.conf)
+Total time: 2 s, completed Aug 28, 2015 2:11:35 PM
+> server-post-command-cleanup
+> server-handle-next-server-request
+> {file:/home/tetherless/hadatac/}root/*:playForkReload
+Evaluating tasks: *:playForkReload
+Running task... Cancel: sbt.server.ServerTaskCancellation@1b9a9b0, check cycles: false
+
+Initial source changes: 
+	removed:Set()
+	added: Set()
+	modified: Set(/home/tetherless/hadatac/target/scala-2.11/twirl/main/org/hadatac/console/views/html/agent_browser.template.scala)
+Removed products: Set()
+External API changes: API Changes: Set()
+Modified binary dependencies: Set()
+Initial directly invalidated sources: Set(/home/tetherless/hadatac/target/scala-2.11/twirl/main/org/hadatac/console/views/html/agent_browser.template.scala)
+
+Sources indirectly invalidated by:
+	product: Set()
+	binary dep: Set()
+	external source: Set()
+All initially invalidated sources: Set(/home/tetherless/hadatac/target/scala-2.11/twirl/main/org/hadatac/console/views/html/agent_browser.template.scala)
+
+Read from stdout: Compiling 1 Scala source to /home/tetherless/hadatac/target/scala-2.11/classes...
+Compiling 1 Scala source to /home/tetherless/hadatac/target/scala-2.11/classes...
+Getting compiler-interface from component compiler for Scala 2.11.7
+Other repositories:
+Default repositories:
+Getting compiler-interface from component compiler for Scala 2.11.7
+Other repositories:
+Default repositories:
+Running cached compiler 149b207, interfacing (CompilerInterface) with Scala compiler version 2.11.7
+Calling Scala compiler with arguments  (CompilerInterface):
+	-deprecation
+	-unchecked
+	-encoding
+	utf8
+	-bootclasspath
+	/usr/lib/jvm/java-8-oracle/jre/lib/resources.jar:/usr/lib/jvm/java-8-oracle/jre/lib/rt.jar:/usr/lib/jvm/java-8-oracle/jre/lib/sunrsasign.jar:/usr/lib/jvm/java-8-oracle/jre/lib/jsse.jar:/usr/lib/jvm/java-8-oracle/jre/lib/jce.jar:/usr/lib/jvm/java-8-oracle/jre/lib/charsets.jar:/usr/lib/jvm/java-8-oracle/jre/lib/jfr.jar:/usr/lib/jvm/java-8-oracle/jre/classes:/home/tetherless/.ivy2/cache/org.scala-lang/scala-library/jars/scala-library-2.11.7.jar
+	-classpath
+	/home/tetherless/hadatac/target/scala-2.11/classes:/home/tetherless/.ivy2/cache/com.typesafe.play/play-enhancer/jars/play-enhancer-1.1.0.jar:/home/tetherless/.ivy2/cache/com.typesafe.play/twirl-api_2.11/jars/twirl-api_2.11-1.1.1.jar:/home/tetherless/.ivy2/cache/org.apache.commons/commons-lang3/jars/commons-lang3-3.4.jar:/home/tetherless/.ivy2/cache/org.scala-lang.modules/scala-xml_2.11/bundles/scala-xml_2.11-1.0.1.jar:/home/tetherless/.ivy2/cache/com.typesafe.play/play-ebean_2.11/jars/play-ebean_2.11-1.0.0.jar:/home/tetherless/.ivy2/cache/com.typesafe.play/play-java-jdbc_2.11/jars/play-java-jdbc_2.11-2.4.2.jar:/home/tetherless/.ivy2/cache/com.typesafe.play/play-jdbc_2.11/jars/play-jdbc_2.11-2.4.2.jar:/home/tetherless/.ivy2/cache/com.typesafe.play/play-jdbc-api_2.11/jars/play-jdbc-api_2.11-2.4.2.jar:/home/tetherless/.ivy2/cache/com.typesafe.play/play_2.11/jars/play_2.11-2.4.2.jar:/home/tetherless/.ivy2/cache/com.typesafe.play/build-link/jars/build-link-2.4.2.jar:/home/tetherless/.ivy2/cache/com.typesafe.play/play-exceptions/jars/play-exceptions-2.4.2.jar:/home/tetherless/.ivy2/cache/org.javassist/javassist/bundles/javassist-3.19.0-GA.jar:/home/tetherless/.ivy2/cache/com.typesafe.play/play-iteratees_2.11/jars/play-iteratees_2.11-2.4.2.jar:/home/tetherless/.ivy2/cache/org.scala-stm/scala-stm_2.11/jars/scala-stm_2.11-0.7.jar:/home/tetherless/.ivy2/cache/com.typesafe/config/bundles/config-1.3.0.jar:/home/tetherless/.ivy2/cache/com.typesafe.play/play-json_2.11/jars/play-json_2.11-2.4.2.jar:/home/tetherless/.ivy2/cache/com.typesafe.play/play-functional_2.11/jars/play-functional_2.11-2.4.2.jar:/home/tetherless/.ivy2/cache/com.typesafe.play/play-datacommons_2.11/jars/play-datacommons_2.11-2.4.2.jar:/home/tetherless/.ivy2/cache/joda-time/joda-time/jars/joda-time-2.8.2.jar:/home/tetherless/.ivy2/cache/org.joda/joda-convert/jars/joda-convert-1.7.jar:/home/tetherless/.ivy2/cache/org.scala-lang/scala-reflect/jars/scala-reflect-2.11.6.jar:/home/tetherless/.ivy2/cache/com.fasterxml.jackson.core/jackson-core/bundles/jackson-core-2.5.4.jar:/home/tetherless/.ivy2/cache/com.fasterxml.jackson.core/jackson-annotations/bundles/jackson-annotations-2.5.4.jar:/home/tetherless/.ivy2/cache/com.fasterxml.jackson.core/jackson-databind/bundles/jackson-databind-2.5.4.jar:/home/tetherless/.ivy2/cache/com.fasterxml.jackson.datatype/jackson-datatype-jdk8/bundles/jackson-datatype-jdk8-2.5.4.jar:/home/tetherless/.ivy2/cache/com.fasterxml.jackson.datatype/jackson-datatype-jsr310/bundles/jackson-datatype-jsr310-2.5.4.jar:/home/tetherless/.ivy2/cache/com.typesafe.play/play-netty-utils/jars/play-netty-utils-2.4.2.jar:/home/tetherless/.ivy2/cache/org.slf4j/slf4j-api/jars/slf4j-api-1.7.12.jar:/home/tetherless/.ivy2/cache/org.slf4j/jul-to-slf4j/jars/jul-to-slf4j-1.7.12.jar:/home/tetherless/.ivy2/cache/org.slf4j/jcl-over-slf4j/jars/jcl-over-slf4j-1.7.12.jar:/home/tetherless/.ivy2/cache/org.scala-lang.modules/scala-parser-combinators_2.11/bundles/scala-parser-combinators_2.11-1.0.1.jar:/home/tetherless/.ivy2/cache/ch.qos.logback/logback-core/jars/logback-core-1.1.3.jar:/home/tetherless/.ivy2/cache/ch.qos.logback/logback-classic/jars/logback-classic-1.1.3.jar:/home/tetherless/.ivy2/cache/com.typesafe.akka/akka-actor_2.11/jars/akka-actor_2.11-2.3.11.jar:/home/tetherless/.ivy2/cache/com.typesafe.akka/akka-slf4j_2.11/jars/akka-slf4j_2.11-2.3.11.jar:/home/tetherless/.ivy2/cache/commons-codec/commons-codec/jars/commons-codec-1.10.jar:/home/tetherless/.ivy2/cache/xerces/xercesImpl/jars/xercesImpl-2.11.0.jar:/home/tetherless/.ivy2/cache/xml-apis/xml-apis/jars/xml-apis-1.4.01.jar:/home/tetherless/.ivy2/cache/javax.transaction/jta/jars/jta-1.1.jar:/home/tetherless/.ivy2/cache/com.google.inject/guice/jars/guice-4.0.jar:/home/tetherless/.ivy2/cache/javax.inject/javax.inject/jars/javax.inject-1.jar:/home/tetherless/.ivy2/cache/aopalliance/aopalliance/jars/aopalliance-1.0.jar:/home/tetherless/.ivy2/cache/com.google.inject.extensions/guice-assistedinject/jars/guice-assistedinject-4.0.jar:/home/tetherless/.ivy2/cache/com.jolbox/bonecp/bundles/bonecp-0.8.0.RELEASE.jar:/home/tetherless/.ivy2/cache/com.zaxxer/HikariCP/bundles/HikariCP-2.3.7.jar:/home/tetherless/.ivy2/cache/com.h2database/h2/jars/h2-1.4.187.jar:/home/tetherless/.ivy2/cache/tyrex/tyrex/jars/tyrex-1.0.1.jar:/home/tetherless/.ivy2/cache/com.typesafe.play/play-java_2.11/jars/play-java_2.11-2.4.2.jar:/home/tetherless/.ivy2/cache/org.scala-lang.modules/scala-java8-compat_2.11/bundles/scala-java8-compat_2.11-0.3.0.jar:/home/tetherless/.ivy2/cache/org.yaml/snakeyaml/bundles/snakeyaml-1.15.jar:/home/tetherless/.ivy2/cache/org.hibernate/hibernate-validator/jars/hibernate-validator-5.0.3.Final.jar:/home/tetherless/.ivy2/cache/javax.validation/validation-api/jars/validation-api-1.1.0.Final.jar:/home/tetherless/.ivy2/cache/com.fasterxml/classmate/bundles/classmate-1.0.0.jar:/home/tetherless/.ivy2/cache/org.jboss.logging/jboss-logging/jars/jboss-logging-3.2.1.Final.jar:/home/tetherless/.ivy2/cache/org.springframework/spring-context/jars/spring-context-4.1.6.RELEASE.jar:/home/tetherless/.ivy2/cache/org.springframework/spring-core/jars/spring-core-4.1.6.RELEASE.jar:/home/tetherless/.ivy2/cache/org.springframework/spring-beans/jars/spring-beans-4.1.6.RELEASE.jar:/home/tetherless/.ivy2/cache/org.reflections/reflections/jars/reflections-0.9.9.jar:/home/tetherless/.ivy2/cache/com.google.guava/guava/bundles/guava-18.0.jar:/home/tetherless/.ivy2/cache/com.google.code.findbugs/annotations/jars/annotations-2.0.1.jar:/home/tetherless/.ivy2/cache/net.jodah/typetools/bundles/typetools-0.4.1.jar:/home/tetherless/.ivy2/cache/com.google.code.findbugs/jsr305/jars/jsr305-2.0.3.jar:/home/tetherless/.ivy2/cache/org.apache.tomcat/tomcat-servlet-api/jars/tomcat-servlet-api-8.0.21.jar:/home/tetherless/.ivy2/cache/com.typesafe.play/play-jdbc-evolutions_2.11/jars/play-jdbc-evolutions_2.11-2.4.0.jar:/home/tetherless/.ivy2/cache/org.avaje.ebeanorm/avaje-ebeanorm/jars/avaje-ebeanorm-4.6.2.jar:/home/tetherless/.ivy2/cache/javax.persistence/persistence-api/jars/persistence-api-1.0.jar:/home/tetherless/.ivy2/cache/org.avaje.ebeanorm/avaje-ebeanorm-agent/jars/avaje-ebeanorm-agent-4.5.3.jar:/home/tetherless/.ivy2/cache/com.typesafe.play/play-server_2.11/jars/play-server_2.11-2.4.2.jar:/home/tetherless/.ivy2/cache/com.typesafe.play/play-netty-server_2.11/jars/play-netty-server_2.11-2.4.2.jar:/home/tetherless/.ivy2/cache/io.netty/netty/bundles/netty-3.10.3.Final.jar:/home/tetherless/.ivy2/cache/com.typesafe.netty/netty-http-pipelining/jars/netty-http-pipelining-1.1.4.jar:/home/tetherless/.ivy2/cache/be.objectify/deadbolt-java_2.11/jars/deadbolt-java_2.11-2.4.1.jar:/home/tetherless/.ivy2/cache/com.typesafe.play/play-cache_2.11/jars/play-cache_2.11-2.4.2.jar:/home/tetherless/.ivy2/cache/net.sf.ehcache/ehcache-core/jars/ehcache-core-2.6.11.jar:/home/tetherless/.ivy2/cache/be.objectify/deadbolt-core_2.11/jars/deadbolt-core_2.11-2.4.2.jar:/home/tetherless/.ivy2/cache/com.feth/play-authenticate_2.11/jars/play-authenticate_2.11-0.7.0-SNAPSHOT.jar:/home/tetherless/.ivy2/cache/org.apache.httpcomponents/httpclient/jars/httpclient-4.5.jar:/home/tetherless/.ivy2/cache/org.apache.httpcomponents/httpcore/jars/httpcore-4.4.1.jar:/home/tetherless/.ivy2/cache/commons-logging/commons-logging/jars/commons-logging-1.2.jar:/home/tetherless/.ivy2/cache/com.feth/play-easymail_2.11/jars/play-easymail_2.11-0.7.0-SNAPSHOT.jar:/home/tetherless/.ivy2/cache/com.typesafe.play/play-mailer_2.11/jars/play-mailer_2.11-3.0.1.jar:/home/tetherless/.ivy2/cache/org.apache.commons/commons-email/jars/commons-email-1.3.3.jar:/home/tetherless/.ivy2/cache/javax.mail/mail/jars/mail-1.4.5.jar:/home/tetherless/.ivy2/cache/javax.activation/activation/jars/activation-1.1.1.jar:/home/tetherless/.ivy2/cache/org.mindrot/jbcrypt/jars/jbcrypt-0.3m.jar:/home/tetherless/.ivy2/cache/com.typesafe.play/play-java-ws_2.11/jars/play-java-ws_2.11-2.4.2.jar:/home/tetherless/.ivy2/cache/com.typesafe.play/play-ws_2.11/jars/play-ws_2.11-2.4.2.jar:/home/tetherless/.ivy2/cache/com.ning/async-http-client/jars/async-http-client-1.9.21.jar:/home/tetherless/.ivy2/cache/oauth.signpost/signpost-core/jars/signpost-core-1.2.1.2.jar:/home/tetherless/.ivy2/cache/oauth.signpost/signpost-commonshttp4/jars/signpost-commonshttp4-1.2.1.2.jar:/home/tetherless/.ivy2/cache/org.webjars/bootstrap/jars/bootstrap-3.2.0.jar:/home/tetherless/.ivy2/cache/org.webjars/jquery/jars/jquery-1.11.1.jar:/home/tetherless/.ivy2/cache/org.apache.commons/commons-csv/jars/commons-csv-1.1.jar:/home/tetherless/.ivy2/cache/org.apache.httpcomponents/fluent-hc/jars/fluent-hc-4.3.6.jar:/home/tetherless/.ivy2/cache/org.apache.poi/poi-ooxml/jars/poi-ooxml-3.9.jar:/home/tetherless/.ivy2/cache/org.apache.poi/poi/jars/poi-3.9.jar:/home/tetherless/.ivy2/cache/org.apache.poi/poi-ooxml-schemas/jars/poi-ooxml-schemas-3.9.jar:/home/tetherless/.ivy2/cache/org.apache.xmlbeans/xmlbeans/jars/xmlbeans-2.3.0.jar:/home/tetherless/.ivy2/cache/stax/stax-api/jars/stax-api-1.0.1.jar:/home/tetherless/.ivy2/cache/dom4j/dom4j/jars/dom4j-1.6.1.jar:/home/tetherless/.ivy2/cache/org.apache.solr/solr-solrj/jars/solr-solrj-5.2.1.jar:/home/tetherless/.ivy2/cache/commons-io/commons-io/jars/commons-io-2.4.jar:/home/tetherless/.ivy2/cache/org.apache.httpcomponents/httpmime/jars/httpmime-4.4.1.jar:/home/tetherless/.ivy2/cache/org.apache.zookeeper/zookeeper/jars/zookeeper-3.4.6.jar:/home/tetherless/.ivy2/cache/org.codehaus.woodstox/stax2-api/bundles/stax2-api-3.1.4.jar:/home/tetherless/.ivy2/cache/org.codehaus.woodstox/woodstox-core-asl/jars/woodstox-core-asl-4.4.1.jar:/home/tetherless/.ivy2/cache/org.noggit/noggit/jars/noggit-0.6.jar:/home/tetherless/.ivy2/cache/org.apache.jena/jena-core/jars/jena-core-2.13.0.jar:/home/tetherless/.ivy2/cache/org.apache.jena/jena-iri/jars/jena-iri-1.1.2.jar:/home/tetherless/.ivy2/cache/org.slf4j/slf4j-log4j12/jars/slf4j-log4j12-1.7.6.jar:/home/tetherless/.ivy2/cache/log4j/log4j/bundles/log4j-1.2.17.jar:/home/tetherless/.ivy2/cache/org.apache.jena/jena-arq/jars/jena-arq-2.13.0.jar:/home/tetherless/.ivy2/cache/com.github.jsonld-java/jsonld-java/bundles/jsonld-java-0.5.1.jar:/home/tetherless/.ivy2/cache/org.apache.httpcomponents/httpclient-cache/jars/httpclient-cache-4.2.6.jar:/home/tetherless/.ivy2/cache/org.apache.thrift/libthrift/jars/libthrift-0.9.2.jar:/home/tetherless/.ivy2/cache/args4j/args4j/bundles/args4j-2.32.jar
+Scala compilation took 1.730904324 s
+New invalidations:
+	Set()
+Initial set of included nodes: Set()
+Previously invalidated, but (transitively) depend on new invalidations:
+	Set()
+All newly invalidated sources after taking into account (previously) recompiled sources:Set()
+Copy resource mappings: 
+	(/home/tetherless/hadatac/conf/messages.de,/home/tetherless/hadatac/target/scala-2.11/classes/messages.de)
+	(/home/tetherless/hadatac/conf/messages.pt,/home/tetherless/hadatac/target/scala-2.11/classes/messages.pt)
+	(/home/tetherless/hadatac/conf/namespaces.properties,/home/tetherless/hadatac/target/scala-2.11/classes/namespaces.properties)
+	(/home/tetherless/hadatac/conf/messages.es,/home/tetherless/hadatac/target/scala-2.11/classes/messages.es)
+	(/home/tetherless/hadatac/conf/play.plugins,/home/tetherless/hadatac/target/scala-2.11/classes/play.plugins)
+	(/home/tetherless/hadatac/conf/hadatac.conf,/home/tetherless/hadatac/target/scala-2.11/classes/hadatac.conf)
+	(/home/tetherless/hadatac/conf/messages.en,/home/tetherless/hadatac/target/scala-2.11/classes/messages.en)
+	(/home/tetherless/hadatac/conf/application.conf,/home/tetherless/hadatac/target/scala-2.11/classes/application.conf)
+	(/home/tetherless/hadatac/conf/play-authenticate,/home/tetherless/hadatac/target/scala-2.11/classes/play-authenticate)
+	(/home/tetherless/hadatac/conf/messages.fr,/home/tetherless/hadatac/target/scala-2.11/classes/messages.fr)
+	(/home/tetherless/hadatac/conf/routes,/home/tetherless/hadatac/target/scala-2.11/classes/routes)
+	(/home/tetherless/hadatac/conf/messages.ja,/home/tetherless/hadatac/target/scala-2.11/classes/messages.ja)
+	(/home/tetherless/hadatac/conf/messages.id,/home/tetherless/hadatac/target/scala-2.11/classes/messages.id)
+	(/home/tetherless/hadatac/conf/messages.pl,/home/tetherless/hadatac/target/scala-2.11/classes/messages.pl)
+	(/home/tetherless/hadatac/conf/play-authenticate/deadbolt.conf,/home/tetherless/hadatac/target/scala-2.11/classes/play-authenticate/deadbolt.conf)
+	(/home/tetherless/hadatac/conf/play-authenticate/mine.conf,/home/tetherless/hadatac/target/scala-2.11/classes/play-authenticate/mine.conf)
+	(/home/tetherless/hadatac/conf/play-authenticate/smtp.conf,/home/tetherless/hadatac/target/scala-2.11/classes/play-authenticate/smtp.conf)
+Total time: 3 s, completed Aug 28, 2015 2:12:51 PM
+> server-post-command-cleanup
+> server-handle-next-server-request
+> {file:/home/tetherless/hadatac/}root/*:playForkReload
+Evaluating tasks: *:playForkReload
+Running task... Cancel: sbt.server.ServerTaskCancellation@57afd4, check cycles: false
+
+Initial source changes: 
+	removed:Set()
+	added: Set()
+	modified: Set(/home/tetherless/hadatac/target/scala-2.11/twirl/main/org/hadatac/console/views/html/agent_browser.template.scala)
+Removed products: Set()
+External API changes: API Changes: Set()
+Modified binary dependencies: Set()
+Initial directly invalidated sources: Set(/home/tetherless/hadatac/target/scala-2.11/twirl/main/org/hadatac/console/views/html/agent_browser.template.scala)
+
+Sources indirectly invalidated by:
+	product: Set()
+	binary dep: Set()
+	external source: Set()
+All initially invalidated sources: Set(/home/tetherless/hadatac/target/scala-2.11/twirl/main/org/hadatac/console/views/html/agent_browser.template.scala)
+
+Read from stdout: Compiling 1 Scala source to /home/tetherless/hadatac/target/scala-2.11/classes...
+Compiling 1 Scala source to /home/tetherless/hadatac/target/scala-2.11/classes...
+Getting compiler-interface from component compiler for Scala 2.11.7
+Other repositories:
+Default repositories:
+Getting compiler-interface from component compiler for Scala 2.11.7
+Other repositories:
+Default repositories:
+Running cached compiler 1766c7d, interfacing (CompilerInterface) with Scala compiler version 2.11.7
+Calling Scala compiler with arguments  (CompilerInterface):
+	-deprecation
+	-unchecked
+	-encoding
+	utf8
+	-bootclasspath
+	/usr/lib/jvm/java-8-oracle/jre/lib/resources.jar:/usr/lib/jvm/java-8-oracle/jre/lib/rt.jar:/usr/lib/jvm/java-8-oracle/jre/lib/sunrsasign.jar:/usr/lib/jvm/java-8-oracle/jre/lib/jsse.jar:/usr/lib/jvm/java-8-oracle/jre/lib/jce.jar:/usr/lib/jvm/java-8-oracle/jre/lib/charsets.jar:/usr/lib/jvm/java-8-oracle/jre/lib/jfr.jar:/usr/lib/jvm/java-8-oracle/jre/classes:/home/tetherless/.ivy2/cache/org.scala-lang/scala-library/jars/scala-library-2.11.7.jar
+	-classpath
+	/home/tetherless/hadatac/target/scala-2.11/classes:/home/tetherless/.ivy2/cache/com.typesafe.play/play-enhancer/jars/play-enhancer-1.1.0.jar:/home/tetherless/.ivy2/cache/com.typesafe.play/twirl-api_2.11/jars/twirl-api_2.11-1.1.1.jar:/home/tetherless/.ivy2/cache/org.apache.commons/commons-lang3/jars/commons-lang3-3.4.jar:/home/tetherless/.ivy2/cache/org.scala-lang.modules/scala-xml_2.11/bundles/scala-xml_2.11-1.0.1.jar:/home/tetherless/.ivy2/cache/com.typesafe.play/play-ebean_2.11/jars/play-ebean_2.11-1.0.0.jar:/home/tetherless/.ivy2/cache/com.typesafe.play/play-java-jdbc_2.11/jars/play-java-jdbc_2.11-2.4.2.jar:/home/tetherless/.ivy2/cache/com.typesafe.play/play-jdbc_2.11/jars/play-jdbc_2.11-2.4.2.jar:/home/tetherless/.ivy2/cache/com.typesafe.play/play-jdbc-api_2.11/jars/play-jdbc-api_2.11-2.4.2.jar:/home/tetherless/.ivy2/cache/com.typesafe.play/play_2.11/jars/play_2.11-2.4.2.jar:/home/tetherless/.ivy2/cache/com.typesafe.play/build-link/jars/build-link-2.4.2.jar:/home/tetherless/.ivy2/cache/com.typesafe.play/play-exceptions/jars/play-exceptions-2.4.2.jar:/home/tetherless/.ivy2/cache/org.javassist/javassist/bundles/javassist-3.19.0-GA.jar:/home/tetherless/.ivy2/cache/com.typesafe.play/play-iteratees_2.11/jars/play-iteratees_2.11-2.4.2.jar:/home/tetherless/.ivy2/cache/org.scala-stm/scala-stm_2.11/jars/scala-stm_2.11-0.7.jar:/home/tetherless/.ivy2/cache/com.typesafe/config/bundles/config-1.3.0.jar:/home/tetherless/.ivy2/cache/com.typesafe.play/play-json_2.11/jars/play-json_2.11-2.4.2.jar:/home/tetherless/.ivy2/cache/com.typesafe.play/play-functional_2.11/jars/play-functional_2.11-2.4.2.jar:/home/tetherless/.ivy2/cache/com.typesafe.play/play-datacommons_2.11/jars/play-datacommons_2.11-2.4.2.jar:/home/tetherless/.ivy2/cache/joda-time/joda-time/jars/joda-time-2.8.2.jar:/home/tetherless/.ivy2/cache/org.joda/joda-convert/jars/joda-convert-1.7.jar:/home/tetherless/.ivy2/cache/org.scala-lang/scala-reflect/jars/scala-reflect-2.11.6.jar:/home/tetherless/.ivy2/cache/com.fasterxml.jackson.core/jackson-core/bundles/jackson-core-2.5.4.jar:/home/tetherless/.ivy2/cache/com.fasterxml.jackson.core/jackson-annotations/bundles/jackson-annotations-2.5.4.jar:/home/tetherless/.ivy2/cache/com.fasterxml.jackson.core/jackson-databind/bundles/jackson-databind-2.5.4.jar:/home/tetherless/.ivy2/cache/com.fasterxml.jackson.datatype/jackson-datatype-jdk8/bundles/jackson-datatype-jdk8-2.5.4.jar:/home/tetherless/.ivy2/cache/com.fasterxml.jackson.datatype/jackson-datatype-jsr310/bundles/jackson-datatype-jsr310-2.5.4.jar:/home/tetherless/.ivy2/cache/com.typesafe.play/play-netty-utils/jars/play-netty-utils-2.4.2.jar:/home/tetherless/.ivy2/cache/org.slf4j/slf4j-api/jars/slf4j-api-1.7.12.jar:/home/tetherless/.ivy2/cache/org.slf4j/jul-to-slf4j/jars/jul-to-slf4j-1.7.12.jar:/home/tetherless/.ivy2/cache/org.slf4j/jcl-over-slf4j/jars/jcl-over-slf4j-1.7.12.jar:/home/tetherless/.ivy2/cache/org.scala-lang.modules/scala-parser-combinators_2.11/bundles/scala-parser-combinators_2.11-1.0.1.jar:/home/tetherless/.ivy2/cache/ch.qos.logback/logback-core/jars/logback-core-1.1.3.jar:/home/tetherless/.ivy2/cache/ch.qos.logback/logback-classic/jars/logback-classic-1.1.3.jar:/home/tetherless/.ivy2/cache/com.typesafe.akka/akka-actor_2.11/jars/akka-actor_2.11-2.3.11.jar:/home/tetherless/.ivy2/cache/com.typesafe.akka/akka-slf4j_2.11/jars/akka-slf4j_2.11-2.3.11.jar:/home/tetherless/.ivy2/cache/commons-codec/commons-codec/jars/commons-codec-1.10.jar:/home/tetherless/.ivy2/cache/xerces/xercesImpl/jars/xercesImpl-2.11.0.jar:/home/tetherless/.ivy2/cache/xml-apis/xml-apis/jars/xml-apis-1.4.01.jar:/home/tetherless/.ivy2/cache/javax.transaction/jta/jars/jta-1.1.jar:/home/tetherless/.ivy2/cache/com.google.inject/guice/jars/guice-4.0.jar:/home/tetherless/.ivy2/cache/javax.inject/javax.inject/jars/javax.inject-1.jar:/home/tetherless/.ivy2/cache/aopalliance/aopalliance/jars/aopalliance-1.0.jar:/home/tetherless/.ivy2/cache/com.google.inject.extensions/guice-assistedinject/jars/guice-assistedinject-4.0.jar:/home/tetherless/.ivy2/cache/com.jolbox/bonecp/bundles/bonecp-0.8.0.RELEASE.jar:/home/tetherless/.ivy2/cache/com.zaxxer/HikariCP/bundles/HikariCP-2.3.7.jar:/home/tetherless/.ivy2/cache/com.h2database/h2/jars/h2-1.4.187.jar:/home/tetherless/.ivy2/cache/tyrex/tyrex/jars/tyrex-1.0.1.jar:/home/tetherless/.ivy2/cache/com.typesafe.play/play-java_2.11/jars/play-java_2.11-2.4.2.jar:/home/tetherless/.ivy2/cache/org.scala-lang.modules/scala-java8-compat_2.11/bundles/scala-java8-compat_2.11-0.3.0.jar:/home/tetherless/.ivy2/cache/org.yaml/snakeyaml/bundles/snakeyaml-1.15.jar:/home/tetherless/.ivy2/cache/org.hibernate/hibernate-validator/jars/hibernate-validator-5.0.3.Final.jar:/home/tetherless/.ivy2/cache/javax.validation/validation-api/jars/validation-api-1.1.0.Final.jar:/home/tetherless/.ivy2/cache/com.fasterxml/classmate/bundles/classmate-1.0.0.jar:/home/tetherless/.ivy2/cache/org.jboss.logging/jboss-logging/jars/jboss-logging-3.2.1.Final.jar:/home/tetherless/.ivy2/cache/org.springframework/spring-context/jars/spring-context-4.1.6.RELEASE.jar:/home/tetherless/.ivy2/cache/org.springframework/spring-core/jars/spring-core-4.1.6.RELEASE.jar:/home/tetherless/.ivy2/cache/org.springframework/spring-beans/jars/spring-beans-4.1.6.RELEASE.jar:/home/tetherless/.ivy2/cache/org.reflections/reflections/jars/reflections-0.9.9.jar:/home/tetherless/.ivy2/cache/com.google.guava/guava/bundles/guava-18.0.jar:/home/tetherless/.ivy2/cache/com.google.code.findbugs/annotations/jars/annotations-2.0.1.jar:/home/tetherless/.ivy2/cache/net.jodah/typetools/bundles/typetools-0.4.1.jar:/home/tetherless/.ivy2/cache/com.google.code.findbugs/jsr305/jars/jsr305-2.0.3.jar:/home/tetherless/.ivy2/cache/org.apache.tomcat/tomcat-servlet-api/jars/tomcat-servlet-api-8.0.21.jar:/home/tetherless/.ivy2/cache/com.typesafe.play/play-jdbc-evolutions_2.11/jars/play-jdbc-evolutions_2.11-2.4.0.jar:/home/tetherless/.ivy2/cache/org.avaje.ebeanorm/avaje-ebeanorm/jars/avaje-ebeanorm-4.6.2.jar:/home/tetherless/.ivy2/cache/javax.persistence/persistence-api/jars/persistence-api-1.0.jar:/home/tetherless/.ivy2/cache/org.avaje.ebeanorm/avaje-ebeanorm-agent/jars/avaje-ebeanorm-agent-4.5.3.jar:/home/tetherless/.ivy2/cache/com.typesafe.play/play-server_2.11/jars/play-server_2.11-2.4.2.jar:/home/tetherless/.ivy2/cache/com.typesafe.play/play-netty-server_2.11/jars/play-netty-server_2.11-2.4.2.jar:/home/tetherless/.ivy2/cache/io.netty/netty/bundles/netty-3.10.3.Final.jar:/home/tetherless/.ivy2/cache/com.typesafe.netty/netty-http-pipelining/jars/netty-http-pipelining-1.1.4.jar:/home/tetherless/.ivy2/cache/be.objectify/deadbolt-java_2.11/jars/deadbolt-java_2.11-2.4.1.jar:/home/tetherless/.ivy2/cache/com.typesafe.play/play-cache_2.11/jars/play-cache_2.11-2.4.2.jar:/home/tetherless/.ivy2/cache/net.sf.ehcache/ehcache-core/jars/ehcache-core-2.6.11.jar:/home/tetherless/.ivy2/cache/be.objectify/deadbolt-core_2.11/jars/deadbolt-core_2.11-2.4.2.jar:/home/tetherless/.ivy2/cache/com.feth/play-authenticate_2.11/jars/play-authenticate_2.11-0.7.0-SNAPSHOT.jar:/home/tetherless/.ivy2/cache/org.apache.httpcomponents/httpclient/jars/httpclient-4.5.jar:/home/tetherless/.ivy2/cache/org.apache.httpcomponents/httpcore/jars/httpcore-4.4.1.jar:/home/tetherless/.ivy2/cache/commons-logging/commons-logging/jars/commons-logging-1.2.jar:/home/tetherless/.ivy2/cache/com.feth/play-easymail_2.11/jars/play-easymail_2.11-0.7.0-SNAPSHOT.jar:/home/tetherless/.ivy2/cache/com.typesafe.play/play-mailer_2.11/jars/play-mailer_2.11-3.0.1.jar:/home/tetherless/.ivy2/cache/org.apache.commons/commons-email/jars/commons-email-1.3.3.jar:/home/tetherless/.ivy2/cache/javax.mail/mail/jars/mail-1.4.5.jar:/home/tetherless/.ivy2/cache/javax.activation/activation/jars/activation-1.1.1.jar:/home/tetherless/.ivy2/cache/org.mindrot/jbcrypt/jars/jbcrypt-0.3m.jar:/home/tetherless/.ivy2/cache/com.typesafe.play/play-java-ws_2.11/jars/play-java-ws_2.11-2.4.2.jar:/home/tetherless/.ivy2/cache/com.typesafe.play/play-ws_2.11/jars/play-ws_2.11-2.4.2.jar:/home/tetherless/.ivy2/cache/com.ning/async-http-client/jars/async-http-client-1.9.21.jar:/home/tetherless/.ivy2/cache/oauth.signpost/signpost-core/jars/signpost-core-1.2.1.2.jar:/home/tetherless/.ivy2/cache/oauth.signpost/signpost-commonshttp4/jars/signpost-commonshttp4-1.2.1.2.jar:/home/tetherless/.ivy2/cache/org.webjars/bootstrap/jars/bootstrap-3.2.0.jar:/home/tetherless/.ivy2/cache/org.webjars/jquery/jars/jquery-1.11.1.jar:/home/tetherless/.ivy2/cache/org.apache.commons/commons-csv/jars/commons-csv-1.1.jar:/home/tetherless/.ivy2/cache/org.apache.httpcomponents/fluent-hc/jars/fluent-hc-4.3.6.jar:/home/tetherless/.ivy2/cache/org.apache.poi/poi-ooxml/jars/poi-ooxml-3.9.jar:/home/tetherless/.ivy2/cache/org.apache.poi/poi/jars/poi-3.9.jar:/home/tetherless/.ivy2/cache/org.apache.poi/poi-ooxml-schemas/jars/poi-ooxml-schemas-3.9.jar:/home/tetherless/.ivy2/cache/org.apache.xmlbeans/xmlbeans/jars/xmlbeans-2.3.0.jar:/home/tetherless/.ivy2/cache/stax/stax-api/jars/stax-api-1.0.1.jar:/home/tetherless/.ivy2/cache/dom4j/dom4j/jars/dom4j-1.6.1.jar:/home/tetherless/.ivy2/cache/org.apache.solr/solr-solrj/jars/solr-solrj-5.2.1.jar:/home/tetherless/.ivy2/cache/commons-io/commons-io/jars/commons-io-2.4.jar:/home/tetherless/.ivy2/cache/org.apache.httpcomponents/httpmime/jars/httpmime-4.4.1.jar:/home/tetherless/.ivy2/cache/org.apache.zookeeper/zookeeper/jars/zookeeper-3.4.6.jar:/home/tetherless/.ivy2/cache/org.codehaus.woodstox/stax2-api/bundles/stax2-api-3.1.4.jar:/home/tetherless/.ivy2/cache/org.codehaus.woodstox/woodstox-core-asl/jars/woodstox-core-asl-4.4.1.jar:/home/tetherless/.ivy2/cache/org.noggit/noggit/jars/noggit-0.6.jar:/home/tetherless/.ivy2/cache/org.apache.jena/jena-core/jars/jena-core-2.13.0.jar:/home/tetherless/.ivy2/cache/org.apache.jena/jena-iri/jars/jena-iri-1.1.2.jar:/home/tetherless/.ivy2/cache/org.slf4j/slf4j-log4j12/jars/slf4j-log4j12-1.7.6.jar:/home/tetherless/.ivy2/cache/log4j/log4j/bundles/log4j-1.2.17.jar:/home/tetherless/.ivy2/cache/org.apache.jena/jena-arq/jars/jena-arq-2.13.0.jar:/home/tetherless/.ivy2/cache/com.github.jsonld-java/jsonld-java/bundles/jsonld-java-0.5.1.jar:/home/tetherless/.ivy2/cache/org.apache.httpcomponents/httpclient-cache/jars/httpclient-cache-4.2.6.jar:/home/tetherless/.ivy2/cache/org.apache.thrift/libthrift/jars/libthrift-0.9.2.jar:/home/tetherless/.ivy2/cache/args4j/args4j/bundles/args4j-2.32.jar
+Scala compilation took 3.273985267 s
+New invalidations:
+	Set()
+Initial set of included nodes: Set()
+Previously invalidated, but (transitively) depend on new invalidations:
+	Set()
+All newly invalidated sources after taking into account (previously) recompiled sources:Set()
+Copy resource mappings: 
+	(/home/tetherless/hadatac/conf/messages.de,/home/tetherless/hadatac/target/scala-2.11/classes/messages.de)
+	(/home/tetherless/hadatac/conf/messages.pt,/home/tetherless/hadatac/target/scala-2.11/classes/messages.pt)
+	(/home/tetherless/hadatac/conf/namespaces.properties,/home/tetherless/hadatac/target/scala-2.11/classes/namespaces.properties)
+	(/home/tetherless/hadatac/conf/messages.es,/home/tetherless/hadatac/target/scala-2.11/classes/messages.es)
+	(/home/tetherless/hadatac/conf/play.plugins,/home/tetherless/hadatac/target/scala-2.11/classes/play.plugins)
+	(/home/tetherless/hadatac/conf/hadatac.conf,/home/tetherless/hadatac/target/scala-2.11/classes/hadatac.conf)
+	(/home/tetherless/hadatac/conf/messages.en,/home/tetherless/hadatac/target/scala-2.11/classes/messages.en)
+	(/home/tetherless/hadatac/conf/application.conf,/home/tetherless/hadatac/target/scala-2.11/classes/application.conf)
+	(/home/tetherless/hadatac/conf/play-authenticate,/home/tetherless/hadatac/target/scala-2.11/classes/play-authenticate)
+	(/home/tetherless/hadatac/conf/messages.fr,/home/tetherless/hadatac/target/scala-2.11/classes/messages.fr)
+	(/home/tetherless/hadatac/conf/routes,/home/tetherless/hadatac/target/scala-2.11/classes/routes)
+	(/home/tetherless/hadatac/conf/messages.ja,/home/tetherless/hadatac/target/scala-2.11/classes/messages.ja)
+	(/home/tetherless/hadatac/conf/messages.id,/home/tetherless/hadatac/target/scala-2.11/classes/messages.id)
+	(/home/tetherless/hadatac/conf/messages.pl,/home/tetherless/hadatac/target/scala-2.11/classes/messages.pl)
+	(/home/tetherless/hadatac/conf/play-authenticate/deadbolt.conf,/home/tetherless/hadatac/target/scala-2.11/classes/play-authenticate/deadbolt.conf)
+	(/home/tetherless/hadatac/conf/play-authenticate/mine.conf,/home/tetherless/hadatac/target/scala-2.11/classes/play-authenticate/mine.conf)
+	(/home/tetherless/hadatac/conf/play-authenticate/smtp.conf,/home/tetherless/hadatac/target/scala-2.11/classes/play-authenticate/smtp.conf)
+Total time: 12 s, completed Aug 28, 2015 2:14:17 PM
+> server-post-command-cleanup
+> server-handle-next-server-request
+> {file:/home/tetherless/hadatac/}root/*:playForkReload
+Evaluating tasks: *:playForkReload
+Running task... Cancel: sbt.server.ServerTaskCancellation@1b0b85b, check cycles: false
+
+Initial source changes: 
+	removed:Set()
+	added: Set()
+	modified: Set(/home/tetherless/hadatac/target/scala-2.11/twirl/main/org/hadatac/console/views/html/agent_browser.template.scala)
+Removed products: Set()
+External API changes: API Changes: Set()
+Modified binary dependencies: Set()
+Initial directly invalidated sources: Set(/home/tetherless/hadatac/target/scala-2.11/twirl/main/org/hadatac/console/views/html/agent_browser.template.scala)
+
+Sources indirectly invalidated by:
+	product: Set()
+	binary dep: Set()
+	external source: Set()
+All initially invalidated sources: Set(/home/tetherless/hadatac/target/scala-2.11/twirl/main/org/hadatac/console/views/html/agent_browser.template.scala)
+
+Read from stdout: Compiling 1 Scala source to /home/tetherless/hadatac/target/scala-2.11/classes...
+Compiling 1 Scala source to /home/tetherless/hadatac/target/scala-2.11/classes...
+Getting compiler-interface from component compiler for Scala 2.11.7
+Other repositories:
+Default repositories:
+Getting compiler-interface from component compiler for Scala 2.11.7
+Other repositories:
+Default repositories:
+Running cached compiler af8145, interfacing (CompilerInterface) with Scala compiler version 2.11.7
+Calling Scala compiler with arguments  (CompilerInterface):
+	-deprecation
+	-unchecked
+	-encoding
+	utf8
+	-bootclasspath
+	/usr/lib/jvm/java-8-oracle/jre/lib/resources.jar:/usr/lib/jvm/java-8-oracle/jre/lib/rt.jar:/usr/lib/jvm/java-8-oracle/jre/lib/sunrsasign.jar:/usr/lib/jvm/java-8-oracle/jre/lib/jsse.jar:/usr/lib/jvm/java-8-oracle/jre/lib/jce.jar:/usr/lib/jvm/java-8-oracle/jre/lib/charsets.jar:/usr/lib/jvm/java-8-oracle/jre/lib/jfr.jar:/usr/lib/jvm/java-8-oracle/jre/classes:/home/tetherless/.ivy2/cache/org.scala-lang/scala-library/jars/scala-library-2.11.7.jar
+	-classpath
+	/home/tetherless/hadatac/target/scala-2.11/classes:/home/tetherless/.ivy2/cache/com.typesafe.play/play-enhancer/jars/play-enhancer-1.1.0.jar:/home/tetherless/.ivy2/cache/com.typesafe.play/twirl-api_2.11/jars/twirl-api_2.11-1.1.1.jar:/home/tetherless/.ivy2/cache/org.apache.commons/commons-lang3/jars/commons-lang3-3.4.jar:/home/tetherless/.ivy2/cache/org.scala-lang.modules/scala-xml_2.11/bundles/scala-xml_2.11-1.0.1.jar:/home/tetherless/.ivy2/cache/com.typesafe.play/play-ebean_2.11/jars/play-ebean_2.11-1.0.0.jar:/home/tetherless/.ivy2/cache/com.typesafe.play/play-java-jdbc_2.11/jars/play-java-jdbc_2.11-2.4.2.jar:/home/tetherless/.ivy2/cache/com.typesafe.play/play-jdbc_2.11/jars/play-jdbc_2.11-2.4.2.jar:/home/tetherless/.ivy2/cache/com.typesafe.play/play-jdbc-api_2.11/jars/play-jdbc-api_2.11-2.4.2.jar:/home/tetherless/.ivy2/cache/com.typesafe.play/play_2.11/jars/play_2.11-2.4.2.jar:/home/tetherless/.ivy2/cache/com.typesafe.play/build-link/jars/build-link-2.4.2.jar:/home/tetherless/.ivy2/cache/com.typesafe.play/play-exceptions/jars/play-exceptions-2.4.2.jar:/home/tetherless/.ivy2/cache/org.javassist/javassist/bundles/javassist-3.19.0-GA.jar:/home/tetherless/.ivy2/cache/com.typesafe.play/play-iteratees_2.11/jars/play-iteratees_2.11-2.4.2.jar:/home/tetherless/.ivy2/cache/org.scala-stm/scala-stm_2.11/jars/scala-stm_2.11-0.7.jar:/home/tetherless/.ivy2/cache/com.typesafe/config/bundles/config-1.3.0.jar:/home/tetherless/.ivy2/cache/com.typesafe.play/play-json_2.11/jars/play-json_2.11-2.4.2.jar:/home/tetherless/.ivy2/cache/com.typesafe.play/play-functional_2.11/jars/play-functional_2.11-2.4.2.jar:/home/tetherless/.ivy2/cache/com.typesafe.play/play-datacommons_2.11/jars/play-datacommons_2.11-2.4.2.jar:/home/tetherless/.ivy2/cache/joda-time/joda-time/jars/joda-time-2.8.2.jar:/home/tetherless/.ivy2/cache/org.joda/joda-convert/jars/joda-convert-1.7.jar:/home/tetherless/.ivy2/cache/org.scala-lang/scala-reflect/jars/scala-reflect-2.11.6.jar:/home/tetherless/.ivy2/cache/com.fasterxml.jackson.core/jackson-core/bundles/jackson-core-2.5.4.jar:/home/tetherless/.ivy2/cache/com.fasterxml.jackson.core/jackson-annotations/bundles/jackson-annotations-2.5.4.jar:/home/tetherless/.ivy2/cache/com.fasterxml.jackson.core/jackson-databind/bundles/jackson-databind-2.5.4.jar:/home/tetherless/.ivy2/cache/com.fasterxml.jackson.datatype/jackson-datatype-jdk8/bundles/jackson-datatype-jdk8-2.5.4.jar:/home/tetherless/.ivy2/cache/com.fasterxml.jackson.datatype/jackson-datatype-jsr310/bundles/jackson-datatype-jsr310-2.5.4.jar:/home/tetherless/.ivy2/cache/com.typesafe.play/play-netty-utils/jars/play-netty-utils-2.4.2.jar:/home/tetherless/.ivy2/cache/org.slf4j/slf4j-api/jars/slf4j-api-1.7.12.jar:/home/tetherless/.ivy2/cache/org.slf4j/jul-to-slf4j/jars/jul-to-slf4j-1.7.12.jar:/home/tetherless/.ivy2/cache/org.slf4j/jcl-over-slf4j/jars/jcl-over-slf4j-1.7.12.jar:/home/tetherless/.ivy2/cache/org.scala-lang.modules/scala-parser-combinators_2.11/bundles/scala-parser-combinators_2.11-1.0.1.jar:/home/tetherless/.ivy2/cache/ch.qos.logback/logback-core/jars/logback-core-1.1.3.jar:/home/tetherless/.ivy2/cache/ch.qos.logback/logback-classic/jars/logback-classic-1.1.3.jar:/home/tetherless/.ivy2/cache/com.typesafe.akka/akka-actor_2.11/jars/akka-actor_2.11-2.3.11.jar:/home/tetherless/.ivy2/cache/com.typesafe.akka/akka-slf4j_2.11/jars/akka-slf4j_2.11-2.3.11.jar:/home/tetherless/.ivy2/cache/commons-codec/commons-codec/jars/commons-codec-1.10.jar:/home/tetherless/.ivy2/cache/xerces/xercesImpl/jars/xercesImpl-2.11.0.jar:/home/tetherless/.ivy2/cache/xml-apis/xml-apis/jars/xml-apis-1.4.01.jar:/home/tetherless/.ivy2/cache/javax.transaction/jta/jars/jta-1.1.jar:/home/tetherless/.ivy2/cache/com.google.inject/guice/jars/guice-4.0.jar:/home/tetherless/.ivy2/cache/javax.inject/javax.inject/jars/javax.inject-1.jar:/home/tetherless/.ivy2/cache/aopalliance/aopalliance/jars/aopalliance-1.0.jar:/home/tetherless/.ivy2/cache/com.google.inject.extensions/guice-assistedinject/jars/guice-assistedinject-4.0.jar:/home/tetherless/.ivy2/cache/com.jolbox/bonecp/bundles/bonecp-0.8.0.RELEASE.jar:/home/tetherless/.ivy2/cache/com.zaxxer/HikariCP/bundles/HikariCP-2.3.7.jar:/home/tetherless/.ivy2/cache/com.h2database/h2/jars/h2-1.4.187.jar:/home/tetherless/.ivy2/cache/tyrex/tyrex/jars/tyrex-1.0.1.jar:/home/tetherless/.ivy2/cache/com.typesafe.play/play-java_2.11/jars/play-java_2.11-2.4.2.jar:/home/tetherless/.ivy2/cache/org.scala-lang.modules/scala-java8-compat_2.11/bundles/scala-java8-compat_2.11-0.3.0.jar:/home/tetherless/.ivy2/cache/org.yaml/snakeyaml/bundles/snakeyaml-1.15.jar:/home/tetherless/.ivy2/cache/org.hibernate/hibernate-validator/jars/hibernate-validator-5.0.3.Final.jar:/home/tetherless/.ivy2/cache/javax.validation/validation-api/jars/validation-api-1.1.0.Final.jar:/home/tetherless/.ivy2/cache/com.fasterxml/classmate/bundles/classmate-1.0.0.jar:/home/tetherless/.ivy2/cache/org.jboss.logging/jboss-logging/jars/jboss-logging-3.2.1.Final.jar:/home/tetherless/.ivy2/cache/org.springframework/spring-context/jars/spring-context-4.1.6.RELEASE.jar:/home/tetherless/.ivy2/cache/org.springframework/spring-core/jars/spring-core-4.1.6.RELEASE.jar:/home/tetherless/.ivy2/cache/org.springframework/spring-beans/jars/spring-beans-4.1.6.RELEASE.jar:/home/tetherless/.ivy2/cache/org.reflections/reflections/jars/reflections-0.9.9.jar:/home/tetherless/.ivy2/cache/com.google.guava/guava/bundles/guava-18.0.jar:/home/tetherless/.ivy2/cache/com.google.code.findbugs/annotations/jars/annotations-2.0.1.jar:/home/tetherless/.ivy2/cache/net.jodah/typetools/bundles/typetools-0.4.1.jar:/home/tetherless/.ivy2/cache/com.google.code.findbugs/jsr305/jars/jsr305-2.0.3.jar:/home/tetherless/.ivy2/cache/org.apache.tomcat/tomcat-servlet-api/jars/tomcat-servlet-api-8.0.21.jar:/home/tetherless/.ivy2/cache/com.typesafe.play/play-jdbc-evolutions_2.11/jars/play-jdbc-evolutions_2.11-2.4.0.jar:/home/tetherless/.ivy2/cache/org.avaje.ebeanorm/avaje-ebeanorm/jars/avaje-ebeanorm-4.6.2.jar:/home/tetherless/.ivy2/cache/javax.persistence/persistence-api/jars/persistence-api-1.0.jar:/home/tetherless/.ivy2/cache/org.avaje.ebeanorm/avaje-ebeanorm-agent/jars/avaje-ebeanorm-agent-4.5.3.jar:/home/tetherless/.ivy2/cache/com.typesafe.play/play-server_2.11/jars/play-server_2.11-2.4.2.jar:/home/tetherless/.ivy2/cache/com.typesafe.play/play-netty-server_2.11/jars/play-netty-server_2.11-2.4.2.jar:/home/tetherless/.ivy2/cache/io.netty/netty/bundles/netty-3.10.3.Final.jar:/home/tetherless/.ivy2/cache/com.typesafe.netty/netty-http-pipelining/jars/netty-http-pipelining-1.1.4.jar:/home/tetherless/.ivy2/cache/be.objectify/deadbolt-java_2.11/jars/deadbolt-java_2.11-2.4.1.jar:/home/tetherless/.ivy2/cache/com.typesafe.play/play-cache_2.11/jars/play-cache_2.11-2.4.2.jar:/home/tetherless/.ivy2/cache/net.sf.ehcache/ehcache-core/jars/ehcache-core-2.6.11.jar:/home/tetherless/.ivy2/cache/be.objectify/deadbolt-core_2.11/jars/deadbolt-core_2.11-2.4.2.jar:/home/tetherless/.ivy2/cache/com.feth/play-authenticate_2.11/jars/play-authenticate_2.11-0.7.0-SNAPSHOT.jar:/home/tetherless/.ivy2/cache/org.apache.httpcomponents/httpclient/jars/httpclient-4.5.jar:/home/tetherless/.ivy2/cache/org.apache.httpcomponents/httpcore/jars/httpcore-4.4.1.jar:/home/tetherless/.ivy2/cache/commons-logging/commons-logging/jars/commons-logging-1.2.jar:/home/tetherless/.ivy2/cache/com.feth/play-easymail_2.11/jars/play-easymail_2.11-0.7.0-SNAPSHOT.jar:/home/tetherless/.ivy2/cache/com.typesafe.play/play-mailer_2.11/jars/play-mailer_2.11-3.0.1.jar:/home/tetherless/.ivy2/cache/org.apache.commons/commons-email/jars/commons-email-1.3.3.jar:/home/tetherless/.ivy2/cache/javax.mail/mail/jars/mail-1.4.5.jar:/home/tetherless/.ivy2/cache/javax.activation/activation/jars/activation-1.1.1.jar:/home/tetherless/.ivy2/cache/org.mindrot/jbcrypt/jars/jbcrypt-0.3m.jar:/home/tetherless/.ivy2/cache/com.typesafe.play/play-java-ws_2.11/jars/play-java-ws_2.11-2.4.2.jar:/home/tetherless/.ivy2/cache/com.typesafe.play/play-ws_2.11/jars/play-ws_2.11-2.4.2.jar:/home/tetherless/.ivy2/cache/com.ning/async-http-client/jars/async-http-client-1.9.21.jar:/home/tetherless/.ivy2/cache/oauth.signpost/signpost-core/jars/signpost-core-1.2.1.2.jar:/home/tetherless/.ivy2/cache/oauth.signpost/signpost-commonshttp4/jars/signpost-commonshttp4-1.2.1.2.jar:/home/tetherless/.ivy2/cache/org.webjars/bootstrap/jars/bootstrap-3.2.0.jar:/home/tetherless/.ivy2/cache/org.webjars/jquery/jars/jquery-1.11.1.jar:/home/tetherless/.ivy2/cache/org.apache.commons/commons-csv/jars/commons-csv-1.1.jar:/home/tetherless/.ivy2/cache/org.apache.httpcomponents/fluent-hc/jars/fluent-hc-4.3.6.jar:/home/tetherless/.ivy2/cache/org.apache.poi/poi-ooxml/jars/poi-ooxml-3.9.jar:/home/tetherless/.ivy2/cache/org.apache.poi/poi/jars/poi-3.9.jar:/home/tetherless/.ivy2/cache/org.apache.poi/poi-ooxml-schemas/jars/poi-ooxml-schemas-3.9.jar:/home/tetherless/.ivy2/cache/org.apache.xmlbeans/xmlbeans/jars/xmlbeans-2.3.0.jar:/home/tetherless/.ivy2/cache/stax/stax-api/jars/stax-api-1.0.1.jar:/home/tetherless/.ivy2/cache/dom4j/dom4j/jars/dom4j-1.6.1.jar:/home/tetherless/.ivy2/cache/org.apache.solr/solr-solrj/jars/solr-solrj-5.2.1.jar:/home/tetherless/.ivy2/cache/commons-io/commons-io/jars/commons-io-2.4.jar:/home/tetherless/.ivy2/cache/org.apache.httpcomponents/httpmime/jars/httpmime-4.4.1.jar:/home/tetherless/.ivy2/cache/org.apache.zookeeper/zookeeper/jars/zookeeper-3.4.6.jar:/home/tetherless/.ivy2/cache/org.codehaus.woodstox/stax2-api/bundles/stax2-api-3.1.4.jar:/home/tetherless/.ivy2/cache/org.codehaus.woodstox/woodstox-core-asl/jars/woodstox-core-asl-4.4.1.jar:/home/tetherless/.ivy2/cache/org.noggit/noggit/jars/noggit-0.6.jar:/home/tetherless/.ivy2/cache/org.apache.jena/jena-core/jars/jena-core-2.13.0.jar:/home/tetherless/.ivy2/cache/org.apache.jena/jena-iri/jars/jena-iri-1.1.2.jar:/home/tetherless/.ivy2/cache/org.slf4j/slf4j-log4j12/jars/slf4j-log4j12-1.7.6.jar:/home/tetherless/.ivy2/cache/log4j/log4j/bundles/log4j-1.2.17.jar:/home/tetherless/.ivy2/cache/org.apache.jena/jena-arq/jars/jena-arq-2.13.0.jar:/home/tetherless/.ivy2/cache/com.github.jsonld-java/jsonld-java/bundles/jsonld-java-0.5.1.jar:/home/tetherless/.ivy2/cache/org.apache.httpcomponents/httpclient-cache/jars/httpclient-cache-4.2.6.jar:/home/tetherless/.ivy2/cache/org.apache.thrift/libthrift/jars/libthrift-0.9.2.jar:/home/tetherless/.ivy2/cache/args4j/args4j/bundles/args4j-2.32.jar
+Scala compilation took 1.336194706 s
+New invalidations:
+	Set()
+Initial set of included nodes: Set()
+Previously invalidated, but (transitively) depend on new invalidations:
+	Set()
+All newly invalidated sources after taking into account (previously) recompiled sources:Set()
+Copy resource mappings: 
+	(/home/tetherless/hadatac/conf/messages.de,/home/tetherless/hadatac/target/scala-2.11/classes/messages.de)
+	(/home/tetherless/hadatac/conf/messages.pt,/home/tetherless/hadatac/target/scala-2.11/classes/messages.pt)
+	(/home/tetherless/hadatac/conf/namespaces.properties,/home/tetherless/hadatac/target/scala-2.11/classes/namespaces.properties)
+	(/home/tetherless/hadatac/conf/messages.es,/home/tetherless/hadatac/target/scala-2.11/classes/messages.es)
+	(/home/tetherless/hadatac/conf/play.plugins,/home/tetherless/hadatac/target/scala-2.11/classes/play.plugins)
+	(/home/tetherless/hadatac/conf/hadatac.conf,/home/tetherless/hadatac/target/scala-2.11/classes/hadatac.conf)
+	(/home/tetherless/hadatac/conf/messages.en,/home/tetherless/hadatac/target/scala-2.11/classes/messages.en)
+	(/home/tetherless/hadatac/conf/application.conf,/home/tetherless/hadatac/target/scala-2.11/classes/application.conf)
+	(/home/tetherless/hadatac/conf/play-authenticate,/home/tetherless/hadatac/target/scala-2.11/classes/play-authenticate)
+	(/home/tetherless/hadatac/conf/messages.fr,/home/tetherless/hadatac/target/scala-2.11/classes/messages.fr)
+	(/home/tetherless/hadatac/conf/routes,/home/tetherless/hadatac/target/scala-2.11/classes/routes)
+	(/home/tetherless/hadatac/conf/messages.ja,/home/tetherless/hadatac/target/scala-2.11/classes/messages.ja)
+	(/home/tetherless/hadatac/conf/messages.id,/home/tetherless/hadatac/target/scala-2.11/classes/messages.id)
+	(/home/tetherless/hadatac/conf/messages.pl,/home/tetherless/hadatac/target/scala-2.11/classes/messages.pl)
+	(/home/tetherless/hadatac/conf/play-authenticate/deadbolt.conf,/home/tetherless/hadatac/target/scala-2.11/classes/play-authenticate/deadbolt.conf)
+	(/home/tetherless/hadatac/conf/play-authenticate/mine.conf,/home/tetherless/hadatac/target/scala-2.11/classes/play-authenticate/mine.conf)
+	(/home/tetherless/hadatac/conf/play-authenticate/smtp.conf,/home/tetherless/hadatac/target/scala-2.11/classes/play-authenticate/smtp.conf)
+Total time: 3 s, completed Aug 28, 2015 2:19:21 PM
+> server-post-command-cleanup
+> server-handle-next-server-request
+> {file:/home/tetherless/hadatac/}root/*:playForkReload
+Evaluating tasks: *:playForkReload
+Running task... Cancel: sbt.server.ServerTaskCancellation@8f6efe, check cycles: false
+
+Initial source changes: 
+	removed:Set()
+	added: Set()
+	modified: Set(/home/tetherless/hadatac/target/scala-2.11/twirl/main/org/hadatac/console/views/html/agent_browser.template.scala)
+Removed products: Set()
+External API changes: API Changes: Set()
+Modified binary dependencies: Set()
+Initial directly invalidated sources: Set(/home/tetherless/hadatac/target/scala-2.11/twirl/main/org/hadatac/console/views/html/agent_browser.template.scala)
+
+Sources indirectly invalidated by:
+	product: Set()
+	binary dep: Set()
+	external source: Set()
+All initially invalidated sources: Set(/home/tetherless/hadatac/target/scala-2.11/twirl/main/org/hadatac/console/views/html/agent_browser.template.scala)
+
+Read from stdout: Compiling 1 Scala source to /home/tetherless/hadatac/target/scala-2.11/classes...
+Compiling 1 Scala source to /home/tetherless/hadatac/target/scala-2.11/classes...
+Getting compiler-interface from component compiler for Scala 2.11.7
+Other repositories:
+Default repositories:
+Getting compiler-interface from component compiler for Scala 2.11.7
+Other repositories:
+Default repositories:
+Running cached compiler 16375db, interfacing (CompilerInterface) with Scala compiler version 2.11.7
+Calling Scala compiler with arguments  (CompilerInterface):
+	-deprecation
+	-unchecked
+	-encoding
+	utf8
+	-bootclasspath
+	/usr/lib/jvm/java-8-oracle/jre/lib/resources.jar:/usr/lib/jvm/java-8-oracle/jre/lib/rt.jar:/usr/lib/jvm/java-8-oracle/jre/lib/sunrsasign.jar:/usr/lib/jvm/java-8-oracle/jre/lib/jsse.jar:/usr/lib/jvm/java-8-oracle/jre/lib/jce.jar:/usr/lib/jvm/java-8-oracle/jre/lib/charsets.jar:/usr/lib/jvm/java-8-oracle/jre/lib/jfr.jar:/usr/lib/jvm/java-8-oracle/jre/classes:/home/tetherless/.ivy2/cache/org.scala-lang/scala-library/jars/scala-library-2.11.7.jar
+	-classpath
+	/home/tetherless/hadatac/target/scala-2.11/classes:/home/tetherless/.ivy2/cache/com.typesafe.play/play-enhancer/jars/play-enhancer-1.1.0.jar:/home/tetherless/.ivy2/cache/com.typesafe.play/twirl-api_2.11/jars/twirl-api_2.11-1.1.1.jar:/home/tetherless/.ivy2/cache/org.apache.commons/commons-lang3/jars/commons-lang3-3.4.jar:/home/tetherless/.ivy2/cache/org.scala-lang.modules/scala-xml_2.11/bundles/scala-xml_2.11-1.0.1.jar:/home/tetherless/.ivy2/cache/com.typesafe.play/play-ebean_2.11/jars/play-ebean_2.11-1.0.0.jar:/home/tetherless/.ivy2/cache/com.typesafe.play/play-java-jdbc_2.11/jars/play-java-jdbc_2.11-2.4.2.jar:/home/tetherless/.ivy2/cache/com.typesafe.play/play-jdbc_2.11/jars/play-jdbc_2.11-2.4.2.jar:/home/tetherless/.ivy2/cache/com.typesafe.play/play-jdbc-api_2.11/jars/play-jdbc-api_2.11-2.4.2.jar:/home/tetherless/.ivy2/cache/com.typesafe.play/play_2.11/jars/play_2.11-2.4.2.jar:/home/tetherless/.ivy2/cache/com.typesafe.play/build-link/jars/build-link-2.4.2.jar:/home/tetherless/.ivy2/cache/com.typesafe.play/play-exceptions/jars/play-exceptions-2.4.2.jar:/home/tetherless/.ivy2/cache/org.javassist/javassist/bundles/javassist-3.19.0-GA.jar:/home/tetherless/.ivy2/cache/com.typesafe.play/play-iteratees_2.11/jars/play-iteratees_2.11-2.4.2.jar:/home/tetherless/.ivy2/cache/org.scala-stm/scala-stm_2.11/jars/scala-stm_2.11-0.7.jar:/home/tetherless/.ivy2/cache/com.typesafe/config/bundles/config-1.3.0.jar:/home/tetherless/.ivy2/cache/com.typesafe.play/play-json_2.11/jars/play-json_2.11-2.4.2.jar:/home/tetherless/.ivy2/cache/com.typesafe.play/play-functional_2.11/jars/play-functional_2.11-2.4.2.jar:/home/tetherless/.ivy2/cache/com.typesafe.play/play-datacommons_2.11/jars/play-datacommons_2.11-2.4.2.jar:/home/tetherless/.ivy2/cache/joda-time/joda-time/jars/joda-time-2.8.2.jar:/home/tetherless/.ivy2/cache/org.joda/joda-convert/jars/joda-convert-1.7.jar:/home/tetherless/.ivy2/cache/org.scala-lang/scala-reflect/jars/scala-reflect-2.11.6.jar:/home/tetherless/.ivy2/cache/com.fasterxml.jackson.core/jackson-core/bundles/jackson-core-2.5.4.jar:/home/tetherless/.ivy2/cache/com.fasterxml.jackson.core/jackson-annotations/bundles/jackson-annotations-2.5.4.jar:/home/tetherless/.ivy2/cache/com.fasterxml.jackson.core/jackson-databind/bundles/jackson-databind-2.5.4.jar:/home/tetherless/.ivy2/cache/com.fasterxml.jackson.datatype/jackson-datatype-jdk8/bundles/jackson-datatype-jdk8-2.5.4.jar:/home/tetherless/.ivy2/cache/com.fasterxml.jackson.datatype/jackson-datatype-jsr310/bundles/jackson-datatype-jsr310-2.5.4.jar:/home/tetherless/.ivy2/cache/com.typesafe.play/play-netty-utils/jars/play-netty-utils-2.4.2.jar:/home/tetherless/.ivy2/cache/org.slf4j/slf4j-api/jars/slf4j-api-1.7.12.jar:/home/tetherless/.ivy2/cache/org.slf4j/jul-to-slf4j/jars/jul-to-slf4j-1.7.12.jar:/home/tetherless/.ivy2/cache/org.slf4j/jcl-over-slf4j/jars/jcl-over-slf4j-1.7.12.jar:/home/tetherless/.ivy2/cache/org.scala-lang.modules/scala-parser-combinators_2.11/bundles/scala-parser-combinators_2.11-1.0.1.jar:/home/tetherless/.ivy2/cache/ch.qos.logback/logback-core/jars/logback-core-1.1.3.jar:/home/tetherless/.ivy2/cache/ch.qos.logback/logback-classic/jars/logback-classic-1.1.3.jar:/home/tetherless/.ivy2/cache/com.typesafe.akka/akka-actor_2.11/jars/akka-actor_2.11-2.3.11.jar:/home/tetherless/.ivy2/cache/com.typesafe.akka/akka-slf4j_2.11/jars/akka-slf4j_2.11-2.3.11.jar:/home/tetherless/.ivy2/cache/commons-codec/commons-codec/jars/commons-codec-1.10.jar:/home/tetherless/.ivy2/cache/xerces/xercesImpl/jars/xercesImpl-2.11.0.jar:/home/tetherless/.ivy2/cache/xml-apis/xml-apis/jars/xml-apis-1.4.01.jar:/home/tetherless/.ivy2/cache/javax.transaction/jta/jars/jta-1.1.jar:/home/tetherless/.ivy2/cache/com.google.inject/guice/jars/guice-4.0.jar:/home/tetherless/.ivy2/cache/javax.inject/javax.inject/jars/javax.inject-1.jar:/home/tetherless/.ivy2/cache/aopalliance/aopalliance/jars/aopalliance-1.0.jar:/home/tetherless/.ivy2/cache/com.google.inject.extensions/guice-assistedinject/jars/guice-assistedinject-4.0.jar:/home/tetherless/.ivy2/cache/com.jolbox/bonecp/bundles/bonecp-0.8.0.RELEASE.jar:/home/tetherless/.ivy2/cache/com.zaxxer/HikariCP/bundles/HikariCP-2.3.7.jar:/home/tetherless/.ivy2/cache/com.h2database/h2/jars/h2-1.4.187.jar:/home/tetherless/.ivy2/cache/tyrex/tyrex/jars/tyrex-1.0.1.jar:/home/tetherless/.ivy2/cache/com.typesafe.play/play-java_2.11/jars/play-java_2.11-2.4.2.jar:/home/tetherless/.ivy2/cache/org.scala-lang.modules/scala-java8-compat_2.11/bundles/scala-java8-compat_2.11-0.3.0.jar:/home/tetherless/.ivy2/cache/org.yaml/snakeyaml/bundles/snakeyaml-1.15.jar:/home/tetherless/.ivy2/cache/org.hibernate/hibernate-validator/jars/hibernate-validator-5.0.3.Final.jar:/home/tetherless/.ivy2/cache/javax.validation/validation-api/jars/validation-api-1.1.0.Final.jar:/home/tetherless/.ivy2/cache/com.fasterxml/classmate/bundles/classmate-1.0.0.jar:/home/tetherless/.ivy2/cache/org.jboss.logging/jboss-logging/jars/jboss-logging-3.2.1.Final.jar:/home/tetherless/.ivy2/cache/org.springframework/spring-context/jars/spring-context-4.1.6.RELEASE.jar:/home/tetherless/.ivy2/cache/org.springframework/spring-core/jars/spring-core-4.1.6.RELEASE.jar:/home/tetherless/.ivy2/cache/org.springframework/spring-beans/jars/spring-beans-4.1.6.RELEASE.jar:/home/tetherless/.ivy2/cache/org.reflections/reflections/jars/reflections-0.9.9.jar:/home/tetherless/.ivy2/cache/com.google.guava/guava/bundles/guava-18.0.jar:/home/tetherless/.ivy2/cache/com.google.code.findbugs/annotations/jars/annotations-2.0.1.jar:/home/tetherless/.ivy2/cache/net.jodah/typetools/bundles/typetools-0.4.1.jar:/home/tetherless/.ivy2/cache/com.google.code.findbugs/jsr305/jars/jsr305-2.0.3.jar:/home/tetherless/.ivy2/cache/org.apache.tomcat/tomcat-servlet-api/jars/tomcat-servlet-api-8.0.21.jar:/home/tetherless/.ivy2/cache/com.typesafe.play/play-jdbc-evolutions_2.11/jars/play-jdbc-evolutions_2.11-2.4.0.jar:/home/tetherless/.ivy2/cache/org.avaje.ebeanorm/avaje-ebeanorm/jars/avaje-ebeanorm-4.6.2.jar:/home/tetherless/.ivy2/cache/javax.persistence/persistence-api/jars/persistence-api-1.0.jar:/home/tetherless/.ivy2/cache/org.avaje.ebeanorm/avaje-ebeanorm-agent/jars/avaje-ebeanorm-agent-4.5.3.jar:/home/tetherless/.ivy2/cache/com.typesafe.play/play-server_2.11/jars/play-server_2.11-2.4.2.jar:/home/tetherless/.ivy2/cache/com.typesafe.play/play-netty-server_2.11/jars/play-netty-server_2.11-2.4.2.jar:/home/tetherless/.ivy2/cache/io.netty/netty/bundles/netty-3.10.3.Final.jar:/home/tetherless/.ivy2/cache/com.typesafe.netty/netty-http-pipelining/jars/netty-http-pipelining-1.1.4.jar:/home/tetherless/.ivy2/cache/be.objectify/deadbolt-java_2.11/jars/deadbolt-java_2.11-2.4.1.jar:/home/tetherless/.ivy2/cache/com.typesafe.play/play-cache_2.11/jars/play-cache_2.11-2.4.2.jar:/home/tetherless/.ivy2/cache/net.sf.ehcache/ehcache-core/jars/ehcache-core-2.6.11.jar:/home/tetherless/.ivy2/cache/be.objectify/deadbolt-core_2.11/jars/deadbolt-core_2.11-2.4.2.jar:/home/tetherless/.ivy2/cache/com.feth/play-authenticate_2.11/jars/play-authenticate_2.11-0.7.0-SNAPSHOT.jar:/home/tetherless/.ivy2/cache/org.apache.httpcomponents/httpclient/jars/httpclient-4.5.jar:/home/tetherless/.ivy2/cache/org.apache.httpcomponents/httpcore/jars/httpcore-4.4.1.jar:/home/tetherless/.ivy2/cache/commons-logging/commons-logging/jars/commons-logging-1.2.jar:/home/tetherless/.ivy2/cache/com.feth/play-easymail_2.11/jars/play-easymail_2.11-0.7.0-SNAPSHOT.jar:/home/tetherless/.ivy2/cache/com.typesafe.play/play-mailer_2.11/jars/play-mailer_2.11-3.0.1.jar:/home/tetherless/.ivy2/cache/org.apache.commons/commons-email/jars/commons-email-1.3.3.jar:/home/tetherless/.ivy2/cache/javax.mail/mail/jars/mail-1.4.5.jar:/home/tetherless/.ivy2/cache/javax.activation/activation/jars/activation-1.1.1.jar:/home/tetherless/.ivy2/cache/org.mindrot/jbcrypt/jars/jbcrypt-0.3m.jar:/home/tetherless/.ivy2/cache/com.typesafe.play/play-java-ws_2.11/jars/play-java-ws_2.11-2.4.2.jar:/home/tetherless/.ivy2/cache/com.typesafe.play/play-ws_2.11/jars/play-ws_2.11-2.4.2.jar:/home/tetherless/.ivy2/cache/com.ning/async-http-client/jars/async-http-client-1.9.21.jar:/home/tetherless/.ivy2/cache/oauth.signpost/signpost-core/jars/signpost-core-1.2.1.2.jar:/home/tetherless/.ivy2/cache/oauth.signpost/signpost-commonshttp4/jars/signpost-commonshttp4-1.2.1.2.jar:/home/tetherless/.ivy2/cache/org.webjars/bootstrap/jars/bootstrap-3.2.0.jar:/home/tetherless/.ivy2/cache/org.webjars/jquery/jars/jquery-1.11.1.jar:/home/tetherless/.ivy2/cache/org.apache.commons/commons-csv/jars/commons-csv-1.1.jar:/home/tetherless/.ivy2/cache/org.apache.httpcomponents/fluent-hc/jars/fluent-hc-4.3.6.jar:/home/tetherless/.ivy2/cache/org.apache.poi/poi-ooxml/jars/poi-ooxml-3.9.jar:/home/tetherless/.ivy2/cache/org.apache.poi/poi/jars/poi-3.9.jar:/home/tetherless/.ivy2/cache/org.apache.poi/poi-ooxml-schemas/jars/poi-ooxml-schemas-3.9.jar:/home/tetherless/.ivy2/cache/org.apache.xmlbeans/xmlbeans/jars/xmlbeans-2.3.0.jar:/home/tetherless/.ivy2/cache/stax/stax-api/jars/stax-api-1.0.1.jar:/home/tetherless/.ivy2/cache/dom4j/dom4j/jars/dom4j-1.6.1.jar:/home/tetherless/.ivy2/cache/org.apache.solr/solr-solrj/jars/solr-solrj-5.2.1.jar:/home/tetherless/.ivy2/cache/commons-io/commons-io/jars/commons-io-2.4.jar:/home/tetherless/.ivy2/cache/org.apache.httpcomponents/httpmime/jars/httpmime-4.4.1.jar:/home/tetherless/.ivy2/cache/org.apache.zookeeper/zookeeper/jars/zookeeper-3.4.6.jar:/home/tetherless/.ivy2/cache/org.codehaus.woodstox/stax2-api/bundles/stax2-api-3.1.4.jar:/home/tetherless/.ivy2/cache/org.codehaus.woodstox/woodstox-core-asl/jars/woodstox-core-asl-4.4.1.jar:/home/tetherless/.ivy2/cache/org.noggit/noggit/jars/noggit-0.6.jar:/home/tetherless/.ivy2/cache/org.apache.jena/jena-core/jars/jena-core-2.13.0.jar:/home/tetherless/.ivy2/cache/org.apache.jena/jena-iri/jars/jena-iri-1.1.2.jar:/home/tetherless/.ivy2/cache/org.slf4j/slf4j-log4j12/jars/slf4j-log4j12-1.7.6.jar:/home/tetherless/.ivy2/cache/log4j/log4j/bundles/log4j-1.2.17.jar:/home/tetherless/.ivy2/cache/org.apache.jena/jena-arq/jars/jena-arq-2.13.0.jar:/home/tetherless/.ivy2/cache/com.github.jsonld-java/jsonld-java/bundles/jsonld-java-0.5.1.jar:/home/tetherless/.ivy2/cache/org.apache.httpcomponents/httpclient-cache/jars/httpclient-cache-4.2.6.jar:/home/tetherless/.ivy2/cache/org.apache.thrift/libthrift/jars/libthrift-0.9.2.jar:/home/tetherless/.ivy2/cache/args4j/args4j/bundles/args4j-2.32.jar
+Scala compilation took 3.02138603 s
+New invalidations:
+	Set()
+Initial set of included nodes: Set()
+Previously invalidated, but (transitively) depend on new invalidations:
+	Set()
+All newly invalidated sources after taking into account (previously) recompiled sources:Set()
+Copy resource mappings: 
+	(/home/tetherless/hadatac/conf/messages.de,/home/tetherless/hadatac/target/scala-2.11/classes/messages.de)
+	(/home/tetherless/hadatac/conf/messages.pt,/home/tetherless/hadatac/target/scala-2.11/classes/messages.pt)
+	(/home/tetherless/hadatac/conf/namespaces.properties,/home/tetherless/hadatac/target/scala-2.11/classes/namespaces.properties)
+	(/home/tetherless/hadatac/conf/messages.es,/home/tetherless/hadatac/target/scala-2.11/classes/messages.es)
+	(/home/tetherless/hadatac/conf/play.plugins,/home/tetherless/hadatac/target/scala-2.11/classes/play.plugins)
+	(/home/tetherless/hadatac/conf/hadatac.conf,/home/tetherless/hadatac/target/scala-2.11/classes/hadatac.conf)
+	(/home/tetherless/hadatac/conf/messages.en,/home/tetherless/hadatac/target/scala-2.11/classes/messages.en)
+	(/home/tetherless/hadatac/conf/application.conf,/home/tetherless/hadatac/target/scala-2.11/classes/application.conf)
+	(/home/tetherless/hadatac/conf/play-authenticate,/home/tetherless/hadatac/target/scala-2.11/classes/play-authenticate)
+	(/home/tetherless/hadatac/conf/messages.fr,/home/tetherless/hadatac/target/scala-2.11/classes/messages.fr)
+	(/home/tetherless/hadatac/conf/routes,/home/tetherless/hadatac/target/scala-2.11/classes/routes)
+	(/home/tetherless/hadatac/conf/messages.ja,/home/tetherless/hadatac/target/scala-2.11/classes/messages.ja)
+	(/home/tetherless/hadatac/conf/messages.id,/home/tetherless/hadatac/target/scala-2.11/classes/messages.id)
+	(/home/tetherless/hadatac/conf/messages.pl,/home/tetherless/hadatac/target/scala-2.11/classes/messages.pl)
+	(/home/tetherless/hadatac/conf/play-authenticate/deadbolt.conf,/home/tetherless/hadatac/target/scala-2.11/classes/play-authenticate/deadbolt.conf)
+	(/home/tetherless/hadatac/conf/play-authenticate/mine.conf,/home/tetherless/hadatac/target/scala-2.11/classes/play-authenticate/mine.conf)
+	(/home/tetherless/hadatac/conf/play-authenticate/smtp.conf,/home/tetherless/hadatac/target/scala-2.11/classes/play-authenticate/smtp.conf)
+Total time: 5 s, completed Aug 28, 2015 2:20:02 PM
+> server-post-command-cleanup
+> server-handle-next-server-request
+> {file:/home/tetherless/hadatac/}root/*:playForkReload
+Evaluating tasks: *:playForkReload
+Running task... Cancel: sbt.server.ServerTaskCancellation@e93826, check cycles: false
+
+Initial source changes: 
+	removed:Set()
+	added: Set()
+	modified: Set()
+Removed products: Set()
+External API changes: API Changes: Set()
+Modified binary dependencies: Set()
+Initial directly invalidated sources: Set()
+
+Sources indirectly invalidated by:
+	product: Set()
+	binary dep: Set()
+	external source: Set()
+All initially invalidated sources: Set()
+
+Copy resource mappings: 
+	(/home/tetherless/hadatac/conf/messages.de,/home/tetherless/hadatac/target/scala-2.11/classes/messages.de)
+	(/home/tetherless/hadatac/conf/messages.pt,/home/tetherless/hadatac/target/scala-2.11/classes/messages.pt)
+	(/home/tetherless/hadatac/conf/namespaces.properties,/home/tetherless/hadatac/target/scala-2.11/classes/namespaces.properties)
+	(/home/tetherless/hadatac/conf/messages.es,/home/tetherless/hadatac/target/scala-2.11/classes/messages.es)
+	(/home/tetherless/hadatac/conf/play.plugins,/home/tetherless/hadatac/target/scala-2.11/classes/play.plugins)
+	(/home/tetherless/hadatac/conf/hadatac.conf,/home/tetherless/hadatac/target/scala-2.11/classes/hadatac.conf)
+	(/home/tetherless/hadatac/conf/messages.en,/home/tetherless/hadatac/target/scala-2.11/classes/messages.en)
+	(/home/tetherless/hadatac/conf/application.conf,/home/tetherless/hadatac/target/scala-2.11/classes/application.conf)
+	(/home/tetherless/hadatac/conf/play-authenticate,/home/tetherless/hadatac/target/scala-2.11/classes/play-authenticate)
+	(/home/tetherless/hadatac/conf/messages.fr,/home/tetherless/hadatac/target/scala-2.11/classes/messages.fr)
+	(/home/tetherless/hadatac/conf/routes,/home/tetherless/hadatac/target/scala-2.11/classes/routes)
+	(/home/tetherless/hadatac/conf/messages.ja,/home/tetherless/hadatac/target/scala-2.11/classes/messages.ja)
+	(/home/tetherless/hadatac/conf/messages.id,/home/tetherless/hadatac/target/scala-2.11/classes/messages.id)
+	(/home/tetherless/hadatac/conf/messages.pl,/home/tetherless/hadatac/target/scala-2.11/classes/messages.pl)
+	(/home/tetherless/hadatac/conf/play-authenticate/deadbolt.conf,/home/tetherless/hadatac/target/scala-2.11/classes/play-authenticate/deadbolt.conf)
+	(/home/tetherless/hadatac/conf/play-authenticate/mine.conf,/home/tetherless/hadatac/target/scala-2.11/classes/play-authenticate/mine.conf)
+	(/home/tetherless/hadatac/conf/play-authenticate/smtp.conf,/home/tetherless/hadatac/target/scala-2.11/classes/play-authenticate/smtp.conf)
+Total time: 2 s, completed Aug 28, 2015 2:20:46 PM
+> server-post-command-cleanup
+> server-handle-next-server-request
+> {file:/home/tetherless/hadatac/}root/*:playForkReload
+Evaluating tasks: *:playForkReload
+Running task... Cancel: sbt.server.ServerTaskCancellation@1c2a458, check cycles: false
+
+Initial source changes: 
+	removed:Set()
+	added: Set()
+	modified: Set()
+Removed products: Set()
+External API changes: API Changes: Set()
+Modified binary dependencies: Set()
+Initial directly invalidated sources: Set()
+
+Sources indirectly invalidated by:
+	product: Set()
+	binary dep: Set()
+	external source: Set()
+All initially invalidated sources: Set()
+
+Copy resource mappings: 
+	(/home/tetherless/hadatac/conf/messages.de,/home/tetherless/hadatac/target/scala-2.11/classes/messages.de)
+	(/home/tetherless/hadatac/conf/messages.pt,/home/tetherless/hadatac/target/scala-2.11/classes/messages.pt)
+	(/home/tetherless/hadatac/conf/namespaces.properties,/home/tetherless/hadatac/target/scala-2.11/classes/namespaces.properties)
+	(/home/tetherless/hadatac/conf/messages.es,/home/tetherless/hadatac/target/scala-2.11/classes/messages.es)
+	(/home/tetherless/hadatac/conf/play.plugins,/home/tetherless/hadatac/target/scala-2.11/classes/play.plugins)
+	(/home/tetherless/hadatac/conf/hadatac.conf,/home/tetherless/hadatac/target/scala-2.11/classes/hadatac.conf)
+	(/home/tetherless/hadatac/conf/messages.en,/home/tetherless/hadatac/target/scala-2.11/classes/messages.en)
+	(/home/tetherless/hadatac/conf/application.conf,/home/tetherless/hadatac/target/scala-2.11/classes/application.conf)
+	(/home/tetherless/hadatac/conf/play-authenticate,/home/tetherless/hadatac/target/scala-2.11/classes/play-authenticate)
+	(/home/tetherless/hadatac/conf/messages.fr,/home/tetherless/hadatac/target/scala-2.11/classes/messages.fr)
+	(/home/tetherless/hadatac/conf/routes,/home/tetherless/hadatac/target/scala-2.11/classes/routes)
+	(/home/tetherless/hadatac/conf/messages.ja,/home/tetherless/hadatac/target/scala-2.11/classes/messages.ja)
+	(/home/tetherless/hadatac/conf/messages.id,/home/tetherless/hadatac/target/scala-2.11/classes/messages.id)
+	(/home/tetherless/hadatac/conf/messages.pl,/home/tetherless/hadatac/target/scala-2.11/classes/messages.pl)
+	(/home/tetherless/hadatac/conf/play-authenticate/deadbolt.conf,/home/tetherless/hadatac/target/scala-2.11/classes/play-authenticate/deadbolt.conf)
+	(/home/tetherless/hadatac/conf/play-authenticate/mine.conf,/home/tetherless/hadatac/target/scala-2.11/classes/play-authenticate/mine.conf)
+	(/home/tetherless/hadatac/conf/play-authenticate/smtp.conf,/home/tetherless/hadatac/target/scala-2.11/classes/play-authenticate/smtp.conf)
+Total time: 2 s, completed Aug 28, 2015 2:21:06 PM
+> server-post-command-cleanup
+> server-handle-next-server-request
+> {file:/home/tetherless/hadatac/}root/*:playForkReload
+Evaluating tasks: *:playForkReload
+Running task... Cancel: sbt.server.ServerTaskCancellation@cbbe8d, check cycles: false
+
+Initial source changes: 
+	removed:Set()
+	added: Set()
+	modified: Set()
+Removed products: Set()
+External API changes: API Changes: Set()
+Modified binary dependencies: Set()
+Initial directly invalidated sources: Set()
+
+Sources indirectly invalidated by:
+	product: Set()
+	binary dep: Set()
+	external source: Set()
+All initially invalidated sources: Set()
+
+Copy resource mappings: 
+	(/home/tetherless/hadatac/conf/messages.de,/home/tetherless/hadatac/target/scala-2.11/classes/messages.de)
+	(/home/tetherless/hadatac/conf/messages.pt,/home/tetherless/hadatac/target/scala-2.11/classes/messages.pt)
+	(/home/tetherless/hadatac/conf/namespaces.properties,/home/tetherless/hadatac/target/scala-2.11/classes/namespaces.properties)
+	(/home/tetherless/hadatac/conf/messages.es,/home/tetherless/hadatac/target/scala-2.11/classes/messages.es)
+	(/home/tetherless/hadatac/conf/play.plugins,/home/tetherless/hadatac/target/scala-2.11/classes/play.plugins)
+	(/home/tetherless/hadatac/conf/hadatac.conf,/home/tetherless/hadatac/target/scala-2.11/classes/hadatac.conf)
+	(/home/tetherless/hadatac/conf/messages.en,/home/tetherless/hadatac/target/scala-2.11/classes/messages.en)
+	(/home/tetherless/hadatac/conf/application.conf,/home/tetherless/hadatac/target/scala-2.11/classes/application.conf)
+	(/home/tetherless/hadatac/conf/play-authenticate,/home/tetherless/hadatac/target/scala-2.11/classes/play-authenticate)
+	(/home/tetherless/hadatac/conf/messages.fr,/home/tetherless/hadatac/target/scala-2.11/classes/messages.fr)
+	(/home/tetherless/hadatac/conf/routes,/home/tetherless/hadatac/target/scala-2.11/classes/routes)
+	(/home/tetherless/hadatac/conf/messages.ja,/home/tetherless/hadatac/target/scala-2.11/classes/messages.ja)
+	(/home/tetherless/hadatac/conf/messages.id,/home/tetherless/hadatac/target/scala-2.11/classes/messages.id)
+	(/home/tetherless/hadatac/conf/messages.pl,/home/tetherless/hadatac/target/scala-2.11/classes/messages.pl)
+	(/home/tetherless/hadatac/conf/play-authenticate/deadbolt.conf,/home/tetherless/hadatac/target/scala-2.11/classes/play-authenticate/deadbolt.conf)
+	(/home/tetherless/hadatac/conf/play-authenticate/mine.conf,/home/tetherless/hadatac/target/scala-2.11/classes/play-authenticate/mine.conf)
+	(/home/tetherless/hadatac/conf/play-authenticate/smtp.conf,/home/tetherless/hadatac/target/scala-2.11/classes/play-authenticate/smtp.conf)
+Total time: 1 s, completed Aug 28, 2015 2:22:30 PM
+> server-post-command-cleanup
+> server-handle-next-server-request
+> {file:/home/tetherless/hadatac/}root/*:playForkReload
+Evaluating tasks: *:playForkReload
+Running task... Cancel: sbt.server.ServerTaskCancellation@15be8c8, check cycles: false
+
+Initial source changes: 
+	removed:Set()
+	added: Set()
+	modified: Set()
+Removed products: Set()
+External API changes: API Changes: Set()
+Modified binary dependencies: Set()
+Initial directly invalidated sources: Set()
+
+Sources indirectly invalidated by:
+	product: Set()
+	binary dep: Set()
+	external source: Set()
+All initially invalidated sources: Set()
+
+Copy resource mappings: 
+	(/home/tetherless/hadatac/conf/messages.de,/home/tetherless/hadatac/target/scala-2.11/classes/messages.de)
+	(/home/tetherless/hadatac/conf/messages.pt,/home/tetherless/hadatac/target/scala-2.11/classes/messages.pt)
+	(/home/tetherless/hadatac/conf/namespaces.properties,/home/tetherless/hadatac/target/scala-2.11/classes/namespaces.properties)
+	(/home/tetherless/hadatac/conf/messages.es,/home/tetherless/hadatac/target/scala-2.11/classes/messages.es)
+	(/home/tetherless/hadatac/conf/play.plugins,/home/tetherless/hadatac/target/scala-2.11/classes/play.plugins)
+	(/home/tetherless/hadatac/conf/hadatac.conf,/home/tetherless/hadatac/target/scala-2.11/classes/hadatac.conf)
+	(/home/tetherless/hadatac/conf/messages.en,/home/tetherless/hadatac/target/scala-2.11/classes/messages.en)
+	(/home/tetherless/hadatac/conf/application.conf,/home/tetherless/hadatac/target/scala-2.11/classes/application.conf)
+	(/home/tetherless/hadatac/conf/play-authenticate,/home/tetherless/hadatac/target/scala-2.11/classes/play-authenticate)
+	(/home/tetherless/hadatac/conf/messages.fr,/home/tetherless/hadatac/target/scala-2.11/classes/messages.fr)
+	(/home/tetherless/hadatac/conf/routes,/home/tetherless/hadatac/target/scala-2.11/classes/routes)
+	(/home/tetherless/hadatac/conf/messages.ja,/home/tetherless/hadatac/target/scala-2.11/classes/messages.ja)
+	(/home/tetherless/hadatac/conf/messages.id,/home/tetherless/hadatac/target/scala-2.11/classes/messages.id)
+	(/home/tetherless/hadatac/conf/messages.pl,/home/tetherless/hadatac/target/scala-2.11/classes/messages.pl)
+	(/home/tetherless/hadatac/conf/play-authenticate/deadbolt.conf,/home/tetherless/hadatac/target/scala-2.11/classes/play-authenticate/deadbolt.conf)
+	(/home/tetherless/hadatac/conf/play-authenticate/mine.conf,/home/tetherless/hadatac/target/scala-2.11/classes/play-authenticate/mine.conf)
+	(/home/tetherless/hadatac/conf/play-authenticate/smtp.conf,/home/tetherless/hadatac/target/scala-2.11/classes/play-authenticate/smtp.conf)
+Total time: 1 s, completed Aug 28, 2015 2:23:03 PM
+> server-post-command-cleanup
+> server-handle-next-server-request
+> {file:/home/tetherless/hadatac/}root/*:playForkReload
+Evaluating tasks: *:playForkReload
+Running task... Cancel: sbt.server.ServerTaskCancellation@fd0475, check cycles: false
+
+Initial source changes: 
+	removed:Set()
+	added: Set()
+	modified: Set()
+Removed products: Set()
+External API changes: API Changes: Set()
+Modified binary dependencies: Set()
+Initial directly invalidated sources: Set()
+
+Sources indirectly invalidated by:
+	product: Set()
+	binary dep: Set()
+	external source: Set()
+All initially invalidated sources: Set()
+
+Copy resource mappings: 
+	(/home/tetherless/hadatac/conf/messages.de,/home/tetherless/hadatac/target/scala-2.11/classes/messages.de)
+	(/home/tetherless/hadatac/conf/messages.pt,/home/tetherless/hadatac/target/scala-2.11/classes/messages.pt)
+	(/home/tetherless/hadatac/conf/namespaces.properties,/home/tetherless/hadatac/target/scala-2.11/classes/namespaces.properties)
+	(/home/tetherless/hadatac/conf/messages.es,/home/tetherless/hadatac/target/scala-2.11/classes/messages.es)
+	(/home/tetherless/hadatac/conf/play.plugins,/home/tetherless/hadatac/target/scala-2.11/classes/play.plugins)
+	(/home/tetherless/hadatac/conf/hadatac.conf,/home/tetherless/hadatac/target/scala-2.11/classes/hadatac.conf)
+	(/home/tetherless/hadatac/conf/messages.en,/home/tetherless/hadatac/target/scala-2.11/classes/messages.en)
+	(/home/tetherless/hadatac/conf/application.conf,/home/tetherless/hadatac/target/scala-2.11/classes/application.conf)
+	(/home/tetherless/hadatac/conf/play-authenticate,/home/tetherless/hadatac/target/scala-2.11/classes/play-authenticate)
+	(/home/tetherless/hadatac/conf/messages.fr,/home/tetherless/hadatac/target/scala-2.11/classes/messages.fr)
+	(/home/tetherless/hadatac/conf/routes,/home/tetherless/hadatac/target/scala-2.11/classes/routes)
+	(/home/tetherless/hadatac/conf/messages.ja,/home/tetherless/hadatac/target/scala-2.11/classes/messages.ja)
+	(/home/tetherless/hadatac/conf/messages.id,/home/tetherless/hadatac/target/scala-2.11/classes/messages.id)
+	(/home/tetherless/hadatac/conf/messages.pl,/home/tetherless/hadatac/target/scala-2.11/classes/messages.pl)
+	(/home/tetherless/hadatac/conf/play-authenticate/deadbolt.conf,/home/tetherless/hadatac/target/scala-2.11/classes/play-authenticate/deadbolt.conf)
+	(/home/tetherless/hadatac/conf/play-authenticate/mine.conf,/home/tetherless/hadatac/target/scala-2.11/classes/play-authenticate/mine.conf)
+	(/home/tetherless/hadatac/conf/play-authenticate/smtp.conf,/home/tetherless/hadatac/target/scala-2.11/classes/play-authenticate/smtp.conf)
+Total time: 1 s, completed Aug 28, 2015 2:23:20 PM
+> server-post-command-cleanup
+> server-handle-next-server-request
+> {file:/home/tetherless/hadatac/}root/*:playForkReload
+Evaluating tasks: *:playForkReload
+Running task... Cancel: sbt.server.ServerTaskCancellation@17294d4, check cycles: false
+
+Initial source changes: 
+	removed:Set()
+	added: Set()
+	modified: Set()
+Removed products: Set()
+External API changes: API Changes: Set()
+Modified binary dependencies: Set()
+Initial directly invalidated sources: Set()
+
+Sources indirectly invalidated by:
+	product: Set()
+	binary dep: Set()
+	external source: Set()
+All initially invalidated sources: Set()
+
+Copy resource mappings: 
+	(/home/tetherless/hadatac/conf/messages.de,/home/tetherless/hadatac/target/scala-2.11/classes/messages.de)
+	(/home/tetherless/hadatac/conf/messages.pt,/home/tetherless/hadatac/target/scala-2.11/classes/messages.pt)
+	(/home/tetherless/hadatac/conf/namespaces.properties,/home/tetherless/hadatac/target/scala-2.11/classes/namespaces.properties)
+	(/home/tetherless/hadatac/conf/messages.es,/home/tetherless/hadatac/target/scala-2.11/classes/messages.es)
+	(/home/tetherless/hadatac/conf/play.plugins,/home/tetherless/hadatac/target/scala-2.11/classes/play.plugins)
+	(/home/tetherless/hadatac/conf/hadatac.conf,/home/tetherless/hadatac/target/scala-2.11/classes/hadatac.conf)
+	(/home/tetherless/hadatac/conf/messages.en,/home/tetherless/hadatac/target/scala-2.11/classes/messages.en)
+	(/home/tetherless/hadatac/conf/application.conf,/home/tetherless/hadatac/target/scala-2.11/classes/application.conf)
+	(/home/tetherless/hadatac/conf/play-authenticate,/home/tetherless/hadatac/target/scala-2.11/classes/play-authenticate)
+	(/home/tetherless/hadatac/conf/messages.fr,/home/tetherless/hadatac/target/scala-2.11/classes/messages.fr)
+	(/home/tetherless/hadatac/conf/routes,/home/tetherless/hadatac/target/scala-2.11/classes/routes)
+	(/home/tetherless/hadatac/conf/messages.ja,/home/tetherless/hadatac/target/scala-2.11/classes/messages.ja)
+	(/home/tetherless/hadatac/conf/messages.id,/home/tetherless/hadatac/target/scala-2.11/classes/messages.id)
+	(/home/tetherless/hadatac/conf/messages.pl,/home/tetherless/hadatac/target/scala-2.11/classes/messages.pl)
+	(/home/tetherless/hadatac/conf/play-authenticate/deadbolt.conf,/home/tetherless/hadatac/target/scala-2.11/classes/play-authenticate/deadbolt.conf)
+	(/home/tetherless/hadatac/conf/play-authenticate/mine.conf,/home/tetherless/hadatac/target/scala-2.11/classes/play-authenticate/mine.conf)
+	(/home/tetherless/hadatac/conf/play-authenticate/smtp.conf,/home/tetherless/hadatac/target/scala-2.11/classes/play-authenticate/smtp.conf)
+Total time: 1 s, completed Aug 28, 2015 2:23:33 PM
+> server-post-command-cleanup
+> server-handle-next-server-request
+> {file:/home/tetherless/hadatac/}root/*:playForkReload
+Evaluating tasks: *:playForkReload
+Running task... Cancel: sbt.server.ServerTaskCancellation@f1bd9a, check cycles: false
+
+Initial source changes: 
+	removed:Set()
+	added: Set()
+	modified: Set(/home/tetherless/hadatac/target/scala-2.11/twirl/main/org/hadatac/console/views/html/detector_model_entry.template.scala)
+Removed products: Set()
+External API changes: API Changes: Set()
+Modified binary dependencies: Set()
+Initial directly invalidated sources: Set(/home/tetherless/hadatac/target/scala-2.11/twirl/main/org/hadatac/console/views/html/detector_model_entry.template.scala)
+
+Sources indirectly invalidated by:
+	product: Set()
+	binary dep: Set()
+	external source: Set()
+All initially invalidated sources: Set(/home/tetherless/hadatac/target/scala-2.11/twirl/main/org/hadatac/console/views/html/detector_model_entry.template.scala)
+
+Read from stdout: Compiling 1 Scala source to /home/tetherless/hadatac/target/scala-2.11/classes...
+Compiling 1 Scala source to /home/tetherless/hadatac/target/scala-2.11/classes...
+Getting compiler-interface from component compiler for Scala 2.11.7
+Other repositories:
+Default repositories:
+Getting compiler-interface from component compiler for Scala 2.11.7
+Other repositories:
+Default repositories:
+Running cached compiler 733cf7, interfacing (CompilerInterface) with Scala compiler version 2.11.7
+Calling Scala compiler with arguments  (CompilerInterface):
+	-deprecation
+	-unchecked
+	-encoding
+	utf8
+	-bootclasspath
+	/usr/lib/jvm/java-8-oracle/jre/lib/resources.jar:/usr/lib/jvm/java-8-oracle/jre/lib/rt.jar:/usr/lib/jvm/java-8-oracle/jre/lib/sunrsasign.jar:/usr/lib/jvm/java-8-oracle/jre/lib/jsse.jar:/usr/lib/jvm/java-8-oracle/jre/lib/jce.jar:/usr/lib/jvm/java-8-oracle/jre/lib/charsets.jar:/usr/lib/jvm/java-8-oracle/jre/lib/jfr.jar:/usr/lib/jvm/java-8-oracle/jre/classes:/home/tetherless/.ivy2/cache/org.scala-lang/scala-library/jars/scala-library-2.11.7.jar
+	-classpath
+	/home/tetherless/hadatac/target/scala-2.11/classes:/home/tetherless/.ivy2/cache/com.typesafe.play/play-enhancer/jars/play-enhancer-1.1.0.jar:/home/tetherless/.ivy2/cache/com.typesafe.play/twirl-api_2.11/jars/twirl-api_2.11-1.1.1.jar:/home/tetherless/.ivy2/cache/org.apache.commons/commons-lang3/jars/commons-lang3-3.4.jar:/home/tetherless/.ivy2/cache/org.scala-lang.modules/scala-xml_2.11/bundles/scala-xml_2.11-1.0.1.jar:/home/tetherless/.ivy2/cache/com.typesafe.play/play-ebean_2.11/jars/play-ebean_2.11-1.0.0.jar:/home/tetherless/.ivy2/cache/com.typesafe.play/play-java-jdbc_2.11/jars/play-java-jdbc_2.11-2.4.2.jar:/home/tetherless/.ivy2/cache/com.typesafe.play/play-jdbc_2.11/jars/play-jdbc_2.11-2.4.2.jar:/home/tetherless/.ivy2/cache/com.typesafe.play/play-jdbc-api_2.11/jars/play-jdbc-api_2.11-2.4.2.jar:/home/tetherless/.ivy2/cache/com.typesafe.play/play_2.11/jars/play_2.11-2.4.2.jar:/home/tetherless/.ivy2/cache/com.typesafe.play/build-link/jars/build-link-2.4.2.jar:/home/tetherless/.ivy2/cache/com.typesafe.play/play-exceptions/jars/play-exceptions-2.4.2.jar:/home/tetherless/.ivy2/cache/org.javassist/javassist/bundles/javassist-3.19.0-GA.jar:/home/tetherless/.ivy2/cache/com.typesafe.play/play-iteratees_2.11/jars/play-iteratees_2.11-2.4.2.jar:/home/tetherless/.ivy2/cache/org.scala-stm/scala-stm_2.11/jars/scala-stm_2.11-0.7.jar:/home/tetherless/.ivy2/cache/com.typesafe/config/bundles/config-1.3.0.jar:/home/tetherless/.ivy2/cache/com.typesafe.play/play-json_2.11/jars/play-json_2.11-2.4.2.jar:/home/tetherless/.ivy2/cache/com.typesafe.play/play-functional_2.11/jars/play-functional_2.11-2.4.2.jar:/home/tetherless/.ivy2/cache/com.typesafe.play/play-datacommons_2.11/jars/play-datacommons_2.11-2.4.2.jar:/home/tetherless/.ivy2/cache/joda-time/joda-time/jars/joda-time-2.8.2.jar:/home/tetherless/.ivy2/cache/org.joda/joda-convert/jars/joda-convert-1.7.jar:/home/tetherless/.ivy2/cache/org.scala-lang/scala-reflect/jars/scala-reflect-2.11.6.jar:/home/tetherless/.ivy2/cache/com.fasterxml.jackson.core/jackson-core/bundles/jackson-core-2.5.4.jar:/home/tetherless/.ivy2/cache/com.fasterxml.jackson.core/jackson-annotations/bundles/jackson-annotations-2.5.4.jar:/home/tetherless/.ivy2/cache/com.fasterxml.jackson.core/jackson-databind/bundles/jackson-databind-2.5.4.jar:/home/tetherless/.ivy2/cache/com.fasterxml.jackson.datatype/jackson-datatype-jdk8/bundles/jackson-datatype-jdk8-2.5.4.jar:/home/tetherless/.ivy2/cache/com.fasterxml.jackson.datatype/jackson-datatype-jsr310/bundles/jackson-datatype-jsr310-2.5.4.jar:/home/tetherless/.ivy2/cache/com.typesafe.play/play-netty-utils/jars/play-netty-utils-2.4.2.jar:/home/tetherless/.ivy2/cache/org.slf4j/slf4j-api/jars/slf4j-api-1.7.12.jar:/home/tetherless/.ivy2/cache/org.slf4j/jul-to-slf4j/jars/jul-to-slf4j-1.7.12.jar:/home/tetherless/.ivy2/cache/org.slf4j/jcl-over-slf4j/jars/jcl-over-slf4j-1.7.12.jar:/home/tetherless/.ivy2/cache/org.scala-lang.modules/scala-parser-combinators_2.11/bundles/scala-parser-combinators_2.11-1.0.1.jar:/home/tetherless/.ivy2/cache/ch.qos.logback/logback-core/jars/logback-core-1.1.3.jar:/home/tetherless/.ivy2/cache/ch.qos.logback/logback-classic/jars/logback-classic-1.1.3.jar:/home/tetherless/.ivy2/cache/com.typesafe.akka/akka-actor_2.11/jars/akka-actor_2.11-2.3.11.jar:/home/tetherless/.ivy2/cache/com.typesafe.akka/akka-slf4j_2.11/jars/akka-slf4j_2.11-2.3.11.jar:/home/tetherless/.ivy2/cache/commons-codec/commons-codec/jars/commons-codec-1.10.jar:/home/tetherless/.ivy2/cache/xerces/xercesImpl/jars/xercesImpl-2.11.0.jar:/home/tetherless/.ivy2/cache/xml-apis/xml-apis/jars/xml-apis-1.4.01.jar:/home/tetherless/.ivy2/cache/javax.transaction/jta/jars/jta-1.1.jar:/home/tetherless/.ivy2/cache/com.google.inject/guice/jars/guice-4.0.jar:/home/tetherless/.ivy2/cache/javax.inject/javax.inject/jars/javax.inject-1.jar:/home/tetherless/.ivy2/cache/aopalliance/aopalliance/jars/aopalliance-1.0.jar:/home/tetherless/.ivy2/cache/com.google.inject.extensions/guice-assistedinject/jars/guice-assistedinject-4.0.jar:/home/tetherless/.ivy2/cache/com.jolbox/bonecp/bundles/bonecp-0.8.0.RELEASE.jar:/home/tetherless/.ivy2/cache/com.zaxxer/HikariCP/bundles/HikariCP-2.3.7.jar:/home/tetherless/.ivy2/cache/com.h2database/h2/jars/h2-1.4.187.jar:/home/tetherless/.ivy2/cache/tyrex/tyrex/jars/tyrex-1.0.1.jar:/home/tetherless/.ivy2/cache/com.typesafe.play/play-java_2.11/jars/play-java_2.11-2.4.2.jar:/home/tetherless/.ivy2/cache/org.scala-lang.modules/scala-java8-compat_2.11/bundles/scala-java8-compat_2.11-0.3.0.jar:/home/tetherless/.ivy2/cache/org.yaml/snakeyaml/bundles/snakeyaml-1.15.jar:/home/tetherless/.ivy2/cache/org.hibernate/hibernate-validator/jars/hibernate-validator-5.0.3.Final.jar:/home/tetherless/.ivy2/cache/javax.validation/validation-api/jars/validation-api-1.1.0.Final.jar:/home/tetherless/.ivy2/cache/com.fasterxml/classmate/bundles/classmate-1.0.0.jar:/home/tetherless/.ivy2/cache/org.jboss.logging/jboss-logging/jars/jboss-logging-3.2.1.Final.jar:/home/tetherless/.ivy2/cache/org.springframework/spring-context/jars/spring-context-4.1.6.RELEASE.jar:/home/tetherless/.ivy2/cache/org.springframework/spring-core/jars/spring-core-4.1.6.RELEASE.jar:/home/tetherless/.ivy2/cache/org.springframework/spring-beans/jars/spring-beans-4.1.6.RELEASE.jar:/home/tetherless/.ivy2/cache/org.reflections/reflections/jars/reflections-0.9.9.jar:/home/tetherless/.ivy2/cache/com.google.guava/guava/bundles/guava-18.0.jar:/home/tetherless/.ivy2/cache/com.google.code.findbugs/annotations/jars/annotations-2.0.1.jar:/home/tetherless/.ivy2/cache/net.jodah/typetools/bundles/typetools-0.4.1.jar:/home/tetherless/.ivy2/cache/com.google.code.findbugs/jsr305/jars/jsr305-2.0.3.jar:/home/tetherless/.ivy2/cache/org.apache.tomcat/tomcat-servlet-api/jars/tomcat-servlet-api-8.0.21.jar:/home/tetherless/.ivy2/cache/com.typesafe.play/play-jdbc-evolutions_2.11/jars/play-jdbc-evolutions_2.11-2.4.0.jar:/home/tetherless/.ivy2/cache/org.avaje.ebeanorm/avaje-ebeanorm/jars/avaje-ebeanorm-4.6.2.jar:/home/tetherless/.ivy2/cache/javax.persistence/persistence-api/jars/persistence-api-1.0.jar:/home/tetherless/.ivy2/cache/org.avaje.ebeanorm/avaje-ebeanorm-agent/jars/avaje-ebeanorm-agent-4.5.3.jar:/home/tetherless/.ivy2/cache/com.typesafe.play/play-server_2.11/jars/play-server_2.11-2.4.2.jar:/home/tetherless/.ivy2/cache/com.typesafe.play/play-netty-server_2.11/jars/play-netty-server_2.11-2.4.2.jar:/home/tetherless/.ivy2/cache/io.netty/netty/bundles/netty-3.10.3.Final.jar:/home/tetherless/.ivy2/cache/com.typesafe.netty/netty-http-pipelining/jars/netty-http-pipelining-1.1.4.jar:/home/tetherless/.ivy2/cache/be.objectify/deadbolt-java_2.11/jars/deadbolt-java_2.11-2.4.1.jar:/home/tetherless/.ivy2/cache/com.typesafe.play/play-cache_2.11/jars/play-cache_2.11-2.4.2.jar:/home/tetherless/.ivy2/cache/net.sf.ehcache/ehcache-core/jars/ehcache-core-2.6.11.jar:/home/tetherless/.ivy2/cache/be.objectify/deadbolt-core_2.11/jars/deadbolt-core_2.11-2.4.2.jar:/home/tetherless/.ivy2/cache/com.feth/play-authenticate_2.11/jars/play-authenticate_2.11-0.7.0-SNAPSHOT.jar:/home/tetherless/.ivy2/cache/org.apache.httpcomponents/httpclient/jars/httpclient-4.5.jar:/home/tetherless/.ivy2/cache/org.apache.httpcomponents/httpcore/jars/httpcore-4.4.1.jar:/home/tetherless/.ivy2/cache/commons-logging/commons-logging/jars/commons-logging-1.2.jar:/home/tetherless/.ivy2/cache/com.feth/play-easymail_2.11/jars/play-easymail_2.11-0.7.0-SNAPSHOT.jar:/home/tetherless/.ivy2/cache/com.typesafe.play/play-mailer_2.11/jars/play-mailer_2.11-3.0.1.jar:/home/tetherless/.ivy2/cache/org.apache.commons/commons-email/jars/commons-email-1.3.3.jar:/home/tetherless/.ivy2/cache/javax.mail/mail/jars/mail-1.4.5.jar:/home/tetherless/.ivy2/cache/javax.activation/activation/jars/activation-1.1.1.jar:/home/tetherless/.ivy2/cache/org.mindrot/jbcrypt/jars/jbcrypt-0.3m.jar:/home/tetherless/.ivy2/cache/com.typesafe.play/play-java-ws_2.11/jars/play-java-ws_2.11-2.4.2.jar:/home/tetherless/.ivy2/cache/com.typesafe.play/play-ws_2.11/jars/play-ws_2.11-2.4.2.jar:/home/tetherless/.ivy2/cache/com.ning/async-http-client/jars/async-http-client-1.9.21.jar:/home/tetherless/.ivy2/cache/oauth.signpost/signpost-core/jars/signpost-core-1.2.1.2.jar:/home/tetherless/.ivy2/cache/oauth.signpost/signpost-commonshttp4/jars/signpost-commonshttp4-1.2.1.2.jar:/home/tetherless/.ivy2/cache/org.webjars/bootstrap/jars/bootstrap-3.2.0.jar:/home/tetherless/.ivy2/cache/org.webjars/jquery/jars/jquery-1.11.1.jar:/home/tetherless/.ivy2/cache/org.apache.commons/commons-csv/jars/commons-csv-1.1.jar:/home/tetherless/.ivy2/cache/org.apache.httpcomponents/fluent-hc/jars/fluent-hc-4.3.6.jar:/home/tetherless/.ivy2/cache/org.apache.poi/poi-ooxml/jars/poi-ooxml-3.9.jar:/home/tetherless/.ivy2/cache/org.apache.poi/poi/jars/poi-3.9.jar:/home/tetherless/.ivy2/cache/org.apache.poi/poi-ooxml-schemas/jars/poi-ooxml-schemas-3.9.jar:/home/tetherless/.ivy2/cache/org.apache.xmlbeans/xmlbeans/jars/xmlbeans-2.3.0.jar:/home/tetherless/.ivy2/cache/stax/stax-api/jars/stax-api-1.0.1.jar:/home/tetherless/.ivy2/cache/dom4j/dom4j/jars/dom4j-1.6.1.jar:/home/tetherless/.ivy2/cache/org.apache.solr/solr-solrj/jars/solr-solrj-5.2.1.jar:/home/tetherless/.ivy2/cache/commons-io/commons-io/jars/commons-io-2.4.jar:/home/tetherless/.ivy2/cache/org.apache.httpcomponents/httpmime/jars/httpmime-4.4.1.jar:/home/tetherless/.ivy2/cache/org.apache.zookeeper/zookeeper/jars/zookeeper-3.4.6.jar:/home/tetherless/.ivy2/cache/org.codehaus.woodstox/stax2-api/bundles/stax2-api-3.1.4.jar:/home/tetherless/.ivy2/cache/org.codehaus.woodstox/woodstox-core-asl/jars/woodstox-core-asl-4.4.1.jar:/home/tetherless/.ivy2/cache/org.noggit/noggit/jars/noggit-0.6.jar:/home/tetherless/.ivy2/cache/org.apache.jena/jena-core/jars/jena-core-2.13.0.jar:/home/tetherless/.ivy2/cache/org.apache.jena/jena-iri/jars/jena-iri-1.1.2.jar:/home/tetherless/.ivy2/cache/org.slf4j/slf4j-log4j12/jars/slf4j-log4j12-1.7.6.jar:/home/tetherless/.ivy2/cache/log4j/log4j/bundles/log4j-1.2.17.jar:/home/tetherless/.ivy2/cache/org.apache.jena/jena-arq/jars/jena-arq-2.13.0.jar:/home/tetherless/.ivy2/cache/com.github.jsonld-java/jsonld-java/bundles/jsonld-java-0.5.1.jar:/home/tetherless/.ivy2/cache/org.apache.httpcomponents/httpclient-cache/jars/httpclient-cache-4.2.6.jar:/home/tetherless/.ivy2/cache/org.apache.thrift/libthrift/jars/libthrift-0.9.2.jar:/home/tetherless/.ivy2/cache/args4j/args4j/bundles/args4j-2.32.jar
+Scala compilation took 2.449059199 s
+New invalidations:
+	Set()
+Initial set of included nodes: Set()
+Previously invalidated, but (transitively) depend on new invalidations:
+	Set()
+All newly invalidated sources after taking into account (previously) recompiled sources:Set()
+Copy resource mappings: 
+	(/home/tetherless/hadatac/conf/messages.de,/home/tetherless/hadatac/target/scala-2.11/classes/messages.de)
+	(/home/tetherless/hadatac/conf/messages.pt,/home/tetherless/hadatac/target/scala-2.11/classes/messages.pt)
+	(/home/tetherless/hadatac/conf/namespaces.properties,/home/tetherless/hadatac/target/scala-2.11/classes/namespaces.properties)
+	(/home/tetherless/hadatac/conf/messages.es,/home/tetherless/hadatac/target/scala-2.11/classes/messages.es)
+	(/home/tetherless/hadatac/conf/play.plugins,/home/tetherless/hadatac/target/scala-2.11/classes/play.plugins)
+	(/home/tetherless/hadatac/conf/hadatac.conf,/home/tetherless/hadatac/target/scala-2.11/classes/hadatac.conf)
+	(/home/tetherless/hadatac/conf/messages.en,/home/tetherless/hadatac/target/scala-2.11/classes/messages.en)
+	(/home/tetherless/hadatac/conf/application.conf,/home/tetherless/hadatac/target/scala-2.11/classes/application.conf)
+	(/home/tetherless/hadatac/conf/play-authenticate,/home/tetherless/hadatac/target/scala-2.11/classes/play-authenticate)
+	(/home/tetherless/hadatac/conf/messages.fr,/home/tetherless/hadatac/target/scala-2.11/classes/messages.fr)
+	(/home/tetherless/hadatac/conf/routes,/home/tetherless/hadatac/target/scala-2.11/classes/routes)
+	(/home/tetherless/hadatac/conf/messages.ja,/home/tetherless/hadatac/target/scala-2.11/classes/messages.ja)
+	(/home/tetherless/hadatac/conf/messages.id,/home/tetherless/hadatac/target/scala-2.11/classes/messages.id)
+	(/home/tetherless/hadatac/conf/messages.pl,/home/tetherless/hadatac/target/scala-2.11/classes/messages.pl)
+	(/home/tetherless/hadatac/conf/play-authenticate/deadbolt.conf,/home/tetherless/hadatac/target/scala-2.11/classes/play-authenticate/deadbolt.conf)
+	(/home/tetherless/hadatac/conf/play-authenticate/mine.conf,/home/tetherless/hadatac/target/scala-2.11/classes/play-authenticate/mine.conf)
+	(/home/tetherless/hadatac/conf/play-authenticate/smtp.conf,/home/tetherless/hadatac/target/scala-2.11/classes/play-authenticate/smtp.conf)
+Total time: 4 s, completed Aug 28, 2015 2:24:57 PM
+> server-post-command-cleanup
+> server-handle-next-server-request
+> {file:/home/tetherless/hadatac/}root/*:playForkReload
+Evaluating tasks: *:playForkReload
+Running task... Cancel: sbt.server.ServerTaskCancellation@bdd03, check cycles: false
+
+Initial source changes: 
+	removed:Set()
+	added: Set()
+	modified: Set(/home/tetherless/hadatac/target/scala-2.11/twirl/main/org/hadatac/console/views/html/detector_entry.template.scala)
+Removed products: Set()
+External API changes: API Changes: Set()
+Modified binary dependencies: Set()
+Initial directly invalidated sources: Set(/home/tetherless/hadatac/target/scala-2.11/twirl/main/org/hadatac/console/views/html/detector_entry.template.scala)
+
+Sources indirectly invalidated by:
+	product: Set()
+	binary dep: Set()
+	external source: Set()
+All initially invalidated sources: Set(/home/tetherless/hadatac/target/scala-2.11/twirl/main/org/hadatac/console/views/html/detector_entry.template.scala)
+
+Read from stdout: Compiling 1 Scala source to /home/tetherless/hadatac/target/scala-2.11/classes...
+Compiling 1 Scala source to /home/tetherless/hadatac/target/scala-2.11/classes...
+Getting compiler-interface from component compiler for Scala 2.11.7
+Other repositories:
+Default repositories:
+Getting compiler-interface from component compiler for Scala 2.11.7
+Other repositories:
+Default repositories:
+Running cached compiler 2f6df4, interfacing (CompilerInterface) with Scala compiler version 2.11.7
+Calling Scala compiler with arguments  (CompilerInterface):
+	-deprecation
+	-unchecked
+	-encoding
+	utf8
+	-bootclasspath
+	/usr/lib/jvm/java-8-oracle/jre/lib/resources.jar:/usr/lib/jvm/java-8-oracle/jre/lib/rt.jar:/usr/lib/jvm/java-8-oracle/jre/lib/sunrsasign.jar:/usr/lib/jvm/java-8-oracle/jre/lib/jsse.jar:/usr/lib/jvm/java-8-oracle/jre/lib/jce.jar:/usr/lib/jvm/java-8-oracle/jre/lib/charsets.jar:/usr/lib/jvm/java-8-oracle/jre/lib/jfr.jar:/usr/lib/jvm/java-8-oracle/jre/classes:/home/tetherless/.ivy2/cache/org.scala-lang/scala-library/jars/scala-library-2.11.7.jar
+	-classpath
+	/home/tetherless/hadatac/target/scala-2.11/classes:/home/tetherless/.ivy2/cache/com.typesafe.play/play-enhancer/jars/play-enhancer-1.1.0.jar:/home/tetherless/.ivy2/cache/com.typesafe.play/twirl-api_2.11/jars/twirl-api_2.11-1.1.1.jar:/home/tetherless/.ivy2/cache/org.apache.commons/commons-lang3/jars/commons-lang3-3.4.jar:/home/tetherless/.ivy2/cache/org.scala-lang.modules/scala-xml_2.11/bundles/scala-xml_2.11-1.0.1.jar:/home/tetherless/.ivy2/cache/com.typesafe.play/play-ebean_2.11/jars/play-ebean_2.11-1.0.0.jar:/home/tetherless/.ivy2/cache/com.typesafe.play/play-java-jdbc_2.11/jars/play-java-jdbc_2.11-2.4.2.jar:/home/tetherless/.ivy2/cache/com.typesafe.play/play-jdbc_2.11/jars/play-jdbc_2.11-2.4.2.jar:/home/tetherless/.ivy2/cache/com.typesafe.play/play-jdbc-api_2.11/jars/play-jdbc-api_2.11-2.4.2.jar:/home/tetherless/.ivy2/cache/com.typesafe.play/play_2.11/jars/play_2.11-2.4.2.jar:/home/tetherless/.ivy2/cache/com.typesafe.play/build-link/jars/build-link-2.4.2.jar:/home/tetherless/.ivy2/cache/com.typesafe.play/play-exceptions/jars/play-exceptions-2.4.2.jar:/home/tetherless/.ivy2/cache/org.javassist/javassist/bundles/javassist-3.19.0-GA.jar:/home/tetherless/.ivy2/cache/com.typesafe.play/play-iteratees_2.11/jars/play-iteratees_2.11-2.4.2.jar:/home/tetherless/.ivy2/cache/org.scala-stm/scala-stm_2.11/jars/scala-stm_2.11-0.7.jar:/home/tetherless/.ivy2/cache/com.typesafe/config/bundles/config-1.3.0.jar:/home/tetherless/.ivy2/cache/com.typesafe.play/play-json_2.11/jars/play-json_2.11-2.4.2.jar:/home/tetherless/.ivy2/cache/com.typesafe.play/play-functional_2.11/jars/play-functional_2.11-2.4.2.jar:/home/tetherless/.ivy2/cache/com.typesafe.play/play-datacommons_2.11/jars/play-datacommons_2.11-2.4.2.jar:/home/tetherless/.ivy2/cache/joda-time/joda-time/jars/joda-time-2.8.2.jar:/home/tetherless/.ivy2/cache/org.joda/joda-convert/jars/joda-convert-1.7.jar:/home/tetherless/.ivy2/cache/org.scala-lang/scala-reflect/jars/scala-reflect-2.11.6.jar:/home/tetherless/.ivy2/cache/com.fasterxml.jackson.core/jackson-core/bundles/jackson-core-2.5.4.jar:/home/tetherless/.ivy2/cache/com.fasterxml.jackson.core/jackson-annotations/bundles/jackson-annotations-2.5.4.jar:/home/tetherless/.ivy2/cache/com.fasterxml.jackson.core/jackson-databind/bundles/jackson-databind-2.5.4.jar:/home/tetherless/.ivy2/cache/com.fasterxml.jackson.datatype/jackson-datatype-jdk8/bundles/jackson-datatype-jdk8-2.5.4.jar:/home/tetherless/.ivy2/cache/com.fasterxml.jackson.datatype/jackson-datatype-jsr310/bundles/jackson-datatype-jsr310-2.5.4.jar:/home/tetherless/.ivy2/cache/com.typesafe.play/play-netty-utils/jars/play-netty-utils-2.4.2.jar:/home/tetherless/.ivy2/cache/org.slf4j/slf4j-api/jars/slf4j-api-1.7.12.jar:/home/tetherless/.ivy2/cache/org.slf4j/jul-to-slf4j/jars/jul-to-slf4j-1.7.12.jar:/home/tetherless/.ivy2/cache/org.slf4j/jcl-over-slf4j/jars/jcl-over-slf4j-1.7.12.jar:/home/tetherless/.ivy2/cache/org.scala-lang.modules/scala-parser-combinators_2.11/bundles/scala-parser-combinators_2.11-1.0.1.jar:/home/tetherless/.ivy2/cache/ch.qos.logback/logback-core/jars/logback-core-1.1.3.jar:/home/tetherless/.ivy2/cache/ch.qos.logback/logback-classic/jars/logback-classic-1.1.3.jar:/home/tetherless/.ivy2/cache/com.typesafe.akka/akka-actor_2.11/jars/akka-actor_2.11-2.3.11.jar:/home/tetherless/.ivy2/cache/com.typesafe.akka/akka-slf4j_2.11/jars/akka-slf4j_2.11-2.3.11.jar:/home/tetherless/.ivy2/cache/commons-codec/commons-codec/jars/commons-codec-1.10.jar:/home/tetherless/.ivy2/cache/xerces/xercesImpl/jars/xercesImpl-2.11.0.jar:/home/tetherless/.ivy2/cache/xml-apis/xml-apis/jars/xml-apis-1.4.01.jar:/home/tetherless/.ivy2/cache/javax.transaction/jta/jars/jta-1.1.jar:/home/tetherless/.ivy2/cache/com.google.inject/guice/jars/guice-4.0.jar:/home/tetherless/.ivy2/cache/javax.inject/javax.inject/jars/javax.inject-1.jar:/home/tetherless/.ivy2/cache/aopalliance/aopalliance/jars/aopalliance-1.0.jar:/home/tetherless/.ivy2/cache/com.google.inject.extensions/guice-assistedinject/jars/guice-assistedinject-4.0.jar:/home/tetherless/.ivy2/cache/com.jolbox/bonecp/bundles/bonecp-0.8.0.RELEASE.jar:/home/tetherless/.ivy2/cache/com.zaxxer/HikariCP/bundles/HikariCP-2.3.7.jar:/home/tetherless/.ivy2/cache/com.h2database/h2/jars/h2-1.4.187.jar:/home/tetherless/.ivy2/cache/tyrex/tyrex/jars/tyrex-1.0.1.jar:/home/tetherless/.ivy2/cache/com.typesafe.play/play-java_2.11/jars/play-java_2.11-2.4.2.jar:/home/tetherless/.ivy2/cache/org.scala-lang.modules/scala-java8-compat_2.11/bundles/scala-java8-compat_2.11-0.3.0.jar:/home/tetherless/.ivy2/cache/org.yaml/snakeyaml/bundles/snakeyaml-1.15.jar:/home/tetherless/.ivy2/cache/org.hibernate/hibernate-validator/jars/hibernate-validator-5.0.3.Final.jar:/home/tetherless/.ivy2/cache/javax.validation/validation-api/jars/validation-api-1.1.0.Final.jar:/home/tetherless/.ivy2/cache/com.fasterxml/classmate/bundles/classmate-1.0.0.jar:/home/tetherless/.ivy2/cache/org.jboss.logging/jboss-logging/jars/jboss-logging-3.2.1.Final.jar:/home/tetherless/.ivy2/cache/org.springframework/spring-context/jars/spring-context-4.1.6.RELEASE.jar:/home/tetherless/.ivy2/cache/org.springframework/spring-core/jars/spring-core-4.1.6.RELEASE.jar:/home/tetherless/.ivy2/cache/org.springframework/spring-beans/jars/spring-beans-4.1.6.RELEASE.jar:/home/tetherless/.ivy2/cache/org.reflections/reflections/jars/reflections-0.9.9.jar:/home/tetherless/.ivy2/cache/com.google.guava/guava/bundles/guava-18.0.jar:/home/tetherless/.ivy2/cache/com.google.code.findbugs/annotations/jars/annotations-2.0.1.jar:/home/tetherless/.ivy2/cache/net.jodah/typetools/bundles/typetools-0.4.1.jar:/home/tetherless/.ivy2/cache/com.google.code.findbugs/jsr305/jars/jsr305-2.0.3.jar:/home/tetherless/.ivy2/cache/org.apache.tomcat/tomcat-servlet-api/jars/tomcat-servlet-api-8.0.21.jar:/home/tetherless/.ivy2/cache/com.typesafe.play/play-jdbc-evolutions_2.11/jars/play-jdbc-evolutions_2.11-2.4.0.jar:/home/tetherless/.ivy2/cache/org.avaje.ebeanorm/avaje-ebeanorm/jars/avaje-ebeanorm-4.6.2.jar:/home/tetherless/.ivy2/cache/javax.persistence/persistence-api/jars/persistence-api-1.0.jar:/home/tetherless/.ivy2/cache/org.avaje.ebeanorm/avaje-ebeanorm-agent/jars/avaje-ebeanorm-agent-4.5.3.jar:/home/tetherless/.ivy2/cache/com.typesafe.play/play-server_2.11/jars/play-server_2.11-2.4.2.jar:/home/tetherless/.ivy2/cache/com.typesafe.play/play-netty-server_2.11/jars/play-netty-server_2.11-2.4.2.jar:/home/tetherless/.ivy2/cache/io.netty/netty/bundles/netty-3.10.3.Final.jar:/home/tetherless/.ivy2/cache/com.typesafe.netty/netty-http-pipelining/jars/netty-http-pipelining-1.1.4.jar:/home/tetherless/.ivy2/cache/be.objectify/deadbolt-java_2.11/jars/deadbolt-java_2.11-2.4.1.jar:/home/tetherless/.ivy2/cache/com.typesafe.play/play-cache_2.11/jars/play-cache_2.11-2.4.2.jar:/home/tetherless/.ivy2/cache/net.sf.ehcache/ehcache-core/jars/ehcache-core-2.6.11.jar:/home/tetherless/.ivy2/cache/be.objectify/deadbolt-core_2.11/jars/deadbolt-core_2.11-2.4.2.jar:/home/tetherless/.ivy2/cache/com.feth/play-authenticate_2.11/jars/play-authenticate_2.11-0.7.0-SNAPSHOT.jar:/home/tetherless/.ivy2/cache/org.apache.httpcomponents/httpclient/jars/httpclient-4.5.jar:/home/tetherless/.ivy2/cache/org.apache.httpcomponents/httpcore/jars/httpcore-4.4.1.jar:/home/tetherless/.ivy2/cache/commons-logging/commons-logging/jars/commons-logging-1.2.jar:/home/tetherless/.ivy2/cache/com.feth/play-easymail_2.11/jars/play-easymail_2.11-0.7.0-SNAPSHOT.jar:/home/tetherless/.ivy2/cache/com.typesafe.play/play-mailer_2.11/jars/play-mailer_2.11-3.0.1.jar:/home/tetherless/.ivy2/cache/org.apache.commons/commons-email/jars/commons-email-1.3.3.jar:/home/tetherless/.ivy2/cache/javax.mail/mail/jars/mail-1.4.5.jar:/home/tetherless/.ivy2/cache/javax.activation/activation/jars/activation-1.1.1.jar:/home/tetherless/.ivy2/cache/org.mindrot/jbcrypt/jars/jbcrypt-0.3m.jar:/home/tetherless/.ivy2/cache/com.typesafe.play/play-java-ws_2.11/jars/play-java-ws_2.11-2.4.2.jar:/home/tetherless/.ivy2/cache/com.typesafe.play/play-ws_2.11/jars/play-ws_2.11-2.4.2.jar:/home/tetherless/.ivy2/cache/com.ning/async-http-client/jars/async-http-client-1.9.21.jar:/home/tetherless/.ivy2/cache/oauth.signpost/signpost-core/jars/signpost-core-1.2.1.2.jar:/home/tetherless/.ivy2/cache/oauth.signpost/signpost-commonshttp4/jars/signpost-commonshttp4-1.2.1.2.jar:/home/tetherless/.ivy2/cache/org.webjars/bootstrap/jars/bootstrap-3.2.0.jar:/home/tetherless/.ivy2/cache/org.webjars/jquery/jars/jquery-1.11.1.jar:/home/tetherless/.ivy2/cache/org.apache.commons/commons-csv/jars/commons-csv-1.1.jar:/home/tetherless/.ivy2/cache/org.apache.httpcomponents/fluent-hc/jars/fluent-hc-4.3.6.jar:/home/tetherless/.ivy2/cache/org.apache.poi/poi-ooxml/jars/poi-ooxml-3.9.jar:/home/tetherless/.ivy2/cache/org.apache.poi/poi/jars/poi-3.9.jar:/home/tetherless/.ivy2/cache/org.apache.poi/poi-ooxml-schemas/jars/poi-ooxml-schemas-3.9.jar:/home/tetherless/.ivy2/cache/org.apache.xmlbeans/xmlbeans/jars/xmlbeans-2.3.0.jar:/home/tetherless/.ivy2/cache/stax/stax-api/jars/stax-api-1.0.1.jar:/home/tetherless/.ivy2/cache/dom4j/dom4j/jars/dom4j-1.6.1.jar:/home/tetherless/.ivy2/cache/org.apache.solr/solr-solrj/jars/solr-solrj-5.2.1.jar:/home/tetherless/.ivy2/cache/commons-io/commons-io/jars/commons-io-2.4.jar:/home/tetherless/.ivy2/cache/org.apache.httpcomponents/httpmime/jars/httpmime-4.4.1.jar:/home/tetherless/.ivy2/cache/org.apache.zookeeper/zookeeper/jars/zookeeper-3.4.6.jar:/home/tetherless/.ivy2/cache/org.codehaus.woodstox/stax2-api/bundles/stax2-api-3.1.4.jar:/home/tetherless/.ivy2/cache/org.codehaus.woodstox/woodstox-core-asl/jars/woodstox-core-asl-4.4.1.jar:/home/tetherless/.ivy2/cache/org.noggit/noggit/jars/noggit-0.6.jar:/home/tetherless/.ivy2/cache/org.apache.jena/jena-core/jars/jena-core-2.13.0.jar:/home/tetherless/.ivy2/cache/org.apache.jena/jena-iri/jars/jena-iri-1.1.2.jar:/home/tetherless/.ivy2/cache/org.slf4j/slf4j-log4j12/jars/slf4j-log4j12-1.7.6.jar:/home/tetherless/.ivy2/cache/log4j/log4j/bundles/log4j-1.2.17.jar:/home/tetherless/.ivy2/cache/org.apache.jena/jena-arq/jars/jena-arq-2.13.0.jar:/home/tetherless/.ivy2/cache/com.github.jsonld-java/jsonld-java/bundles/jsonld-java-0.5.1.jar:/home/tetherless/.ivy2/cache/org.apache.httpcomponents/httpclient-cache/jars/httpclient-cache-4.2.6.jar:/home/tetherless/.ivy2/cache/org.apache.thrift/libthrift/jars/libthrift-0.9.2.jar:/home/tetherless/.ivy2/cache/args4j/args4j/bundles/args4j-2.32.jar
+Scala compilation took 1.468887629 s
+New invalidations:
+	Set()
+Initial set of included nodes: Set()
+Previously invalidated, but (transitively) depend on new invalidations:
+	Set()
+All newly invalidated sources after taking into account (previously) recompiled sources:Set()
+Copy resource mappings: 
+	(/home/tetherless/hadatac/conf/messages.de,/home/tetherless/hadatac/target/scala-2.11/classes/messages.de)
+	(/home/tetherless/hadatac/conf/messages.pt,/home/tetherless/hadatac/target/scala-2.11/classes/messages.pt)
+	(/home/tetherless/hadatac/conf/namespaces.properties,/home/tetherless/hadatac/target/scala-2.11/classes/namespaces.properties)
+	(/home/tetherless/hadatac/conf/messages.es,/home/tetherless/hadatac/target/scala-2.11/classes/messages.es)
+	(/home/tetherless/hadatac/conf/play.plugins,/home/tetherless/hadatac/target/scala-2.11/classes/play.plugins)
+	(/home/tetherless/hadatac/conf/hadatac.conf,/home/tetherless/hadatac/target/scala-2.11/classes/hadatac.conf)
+	(/home/tetherless/hadatac/conf/messages.en,/home/tetherless/hadatac/target/scala-2.11/classes/messages.en)
+	(/home/tetherless/hadatac/conf/application.conf,/home/tetherless/hadatac/target/scala-2.11/classes/application.conf)
+	(/home/tetherless/hadatac/conf/play-authenticate,/home/tetherless/hadatac/target/scala-2.11/classes/play-authenticate)
+	(/home/tetherless/hadatac/conf/messages.fr,/home/tetherless/hadatac/target/scala-2.11/classes/messages.fr)
+	(/home/tetherless/hadatac/conf/routes,/home/tetherless/hadatac/target/scala-2.11/classes/routes)
+	(/home/tetherless/hadatac/conf/messages.ja,/home/tetherless/hadatac/target/scala-2.11/classes/messages.ja)
+	(/home/tetherless/hadatac/conf/messages.id,/home/tetherless/hadatac/target/scala-2.11/classes/messages.id)
+	(/home/tetherless/hadatac/conf/messages.pl,/home/tetherless/hadatac/target/scala-2.11/classes/messages.pl)
+	(/home/tetherless/hadatac/conf/play-authenticate/deadbolt.conf,/home/tetherless/hadatac/target/scala-2.11/classes/play-authenticate/deadbolt.conf)
+	(/home/tetherless/hadatac/conf/play-authenticate/mine.conf,/home/tetherless/hadatac/target/scala-2.11/classes/play-authenticate/mine.conf)
+	(/home/tetherless/hadatac/conf/play-authenticate/smtp.conf,/home/tetherless/hadatac/target/scala-2.11/classes/play-authenticate/smtp.conf)
+Total time: 3 s, completed Aug 28, 2015 2:35:05 PM
+> server-post-command-cleanup
+> server-handle-next-server-request
+> {file:/home/tetherless/hadatac/}root/*:playForkReload
+Evaluating tasks: *:playForkReload
+Running task... Cancel: sbt.server.ServerTaskCancellation@64ff9a, check cycles: false
+
+Initial source changes: 
+	removed:Set()
+	added: Set()
+	modified: Set()
+Removed products: Set()
+External API changes: API Changes: Set()
+Modified binary dependencies: Set()
+Initial directly invalidated sources: Set()
+
+Sources indirectly invalidated by:
+	product: Set()
+	binary dep: Set()
+	external source: Set()
+All initially invalidated sources: Set()
+
+Copy resource mappings: 
+	(/home/tetherless/hadatac/conf/messages.de,/home/tetherless/hadatac/target/scala-2.11/classes/messages.de)
+	(/home/tetherless/hadatac/conf/messages.pt,/home/tetherless/hadatac/target/scala-2.11/classes/messages.pt)
+	(/home/tetherless/hadatac/conf/namespaces.properties,/home/tetherless/hadatac/target/scala-2.11/classes/namespaces.properties)
+	(/home/tetherless/hadatac/conf/messages.es,/home/tetherless/hadatac/target/scala-2.11/classes/messages.es)
+	(/home/tetherless/hadatac/conf/play.plugins,/home/tetherless/hadatac/target/scala-2.11/classes/play.plugins)
+	(/home/tetherless/hadatac/conf/hadatac.conf,/home/tetherless/hadatac/target/scala-2.11/classes/hadatac.conf)
+	(/home/tetherless/hadatac/conf/messages.en,/home/tetherless/hadatac/target/scala-2.11/classes/messages.en)
+	(/home/tetherless/hadatac/conf/application.conf,/home/tetherless/hadatac/target/scala-2.11/classes/application.conf)
+	(/home/tetherless/hadatac/conf/play-authenticate,/home/tetherless/hadatac/target/scala-2.11/classes/play-authenticate)
+	(/home/tetherless/hadatac/conf/messages.fr,/home/tetherless/hadatac/target/scala-2.11/classes/messages.fr)
+	(/home/tetherless/hadatac/conf/routes,/home/tetherless/hadatac/target/scala-2.11/classes/routes)
+	(/home/tetherless/hadatac/conf/messages.ja,/home/tetherless/hadatac/target/scala-2.11/classes/messages.ja)
+	(/home/tetherless/hadatac/conf/messages.id,/home/tetherless/hadatac/target/scala-2.11/classes/messages.id)
+	(/home/tetherless/hadatac/conf/messages.pl,/home/tetherless/hadatac/target/scala-2.11/classes/messages.pl)
+	(/home/tetherless/hadatac/conf/play-authenticate/deadbolt.conf,/home/tetherless/hadatac/target/scala-2.11/classes/play-authenticate/deadbolt.conf)
+	(/home/tetherless/hadatac/conf/play-authenticate/mine.conf,/home/tetherless/hadatac/target/scala-2.11/classes/play-authenticate/mine.conf)
+	(/home/tetherless/hadatac/conf/play-authenticate/smtp.conf,/home/tetherless/hadatac/target/scala-2.11/classes/play-authenticate/smtp.conf)
+Total time: 2 s, completed Aug 28, 2015 2:39:15 PM
+> server-post-command-cleanup
+> server-handle-next-server-request
+> {file:/home/tetherless/hadatac/}root/*:playForkReload
+Evaluating tasks: *:playForkReload
+Running task... Cancel: sbt.server.ServerTaskCancellation@17f337c, check cycles: false
+
+Initial source changes: 
+	removed:Set()
+	added: Set()
+	modified: Set(/home/tetherless/hadatac/target/scala-2.11/twirl/main/org/hadatac/console/views/html/entitycharacteristic_browser.template.scala)
+Removed products: Set()
+External API changes: API Changes: Set()
+Modified binary dependencies: Set()
+Initial directly invalidated sources: Set(/home/tetherless/hadatac/target/scala-2.11/twirl/main/org/hadatac/console/views/html/entitycharacteristic_browser.template.scala)
+
+Sources indirectly invalidated by:
+	product: Set()
+	binary dep: Set()
+	external source: Set()
+All initially invalidated sources: Set(/home/tetherless/hadatac/target/scala-2.11/twirl/main/org/hadatac/console/views/html/entitycharacteristic_browser.template.scala)
+
+Read from stdout: Compiling 1 Scala source to /home/tetherless/hadatac/target/scala-2.11/classes...
+Compiling 1 Scala source to /home/tetherless/hadatac/target/scala-2.11/classes...
+Getting compiler-interface from component compiler for Scala 2.11.7
+Other repositories:
+Default repositories:
+Getting compiler-interface from component compiler for Scala 2.11.7
+Other repositories:
+Default repositories:
+Running cached compiler 12512d2, interfacing (CompilerInterface) with Scala compiler version 2.11.7
+Calling Scala compiler with arguments  (CompilerInterface):
+	-deprecation
+	-unchecked
+	-encoding
+	utf8
+	-bootclasspath
+	/usr/lib/jvm/java-8-oracle/jre/lib/resources.jar:/usr/lib/jvm/java-8-oracle/jre/lib/rt.jar:/usr/lib/jvm/java-8-oracle/jre/lib/sunrsasign.jar:/usr/lib/jvm/java-8-oracle/jre/lib/jsse.jar:/usr/lib/jvm/java-8-oracle/jre/lib/jce.jar:/usr/lib/jvm/java-8-oracle/jre/lib/charsets.jar:/usr/lib/jvm/java-8-oracle/jre/lib/jfr.jar:/usr/lib/jvm/java-8-oracle/jre/classes:/home/tetherless/.ivy2/cache/org.scala-lang/scala-library/jars/scala-library-2.11.7.jar
+	-classpath
+	/home/tetherless/hadatac/target/scala-2.11/classes:/home/tetherless/.ivy2/cache/com.typesafe.play/play-enhancer/jars/play-enhancer-1.1.0.jar:/home/tetherless/.ivy2/cache/com.typesafe.play/twirl-api_2.11/jars/twirl-api_2.11-1.1.1.jar:/home/tetherless/.ivy2/cache/org.apache.commons/commons-lang3/jars/commons-lang3-3.4.jar:/home/tetherless/.ivy2/cache/org.scala-lang.modules/scala-xml_2.11/bundles/scala-xml_2.11-1.0.1.jar:/home/tetherless/.ivy2/cache/com.typesafe.play/play-ebean_2.11/jars/play-ebean_2.11-1.0.0.jar:/home/tetherless/.ivy2/cache/com.typesafe.play/play-java-jdbc_2.11/jars/play-java-jdbc_2.11-2.4.2.jar:/home/tetherless/.ivy2/cache/com.typesafe.play/play-jdbc_2.11/jars/play-jdbc_2.11-2.4.2.jar:/home/tetherless/.ivy2/cache/com.typesafe.play/play-jdbc-api_2.11/jars/play-jdbc-api_2.11-2.4.2.jar:/home/tetherless/.ivy2/cache/com.typesafe.play/play_2.11/jars/play_2.11-2.4.2.jar:/home/tetherless/.ivy2/cache/com.typesafe.play/build-link/jars/build-link-2.4.2.jar:/home/tetherless/.ivy2/cache/com.typesafe.play/play-exceptions/jars/play-exceptions-2.4.2.jar:/home/tetherless/.ivy2/cache/org.javassist/javassist/bundles/javassist-3.19.0-GA.jar:/home/tetherless/.ivy2/cache/com.typesafe.play/play-iteratees_2.11/jars/play-iteratees_2.11-2.4.2.jar:/home/tetherless/.ivy2/cache/org.scala-stm/scala-stm_2.11/jars/scala-stm_2.11-0.7.jar:/home/tetherless/.ivy2/cache/com.typesafe/config/bundles/config-1.3.0.jar:/home/tetherless/.ivy2/cache/com.typesafe.play/play-json_2.11/jars/play-json_2.11-2.4.2.jar:/home/tetherless/.ivy2/cache/com.typesafe.play/play-functional_2.11/jars/play-functional_2.11-2.4.2.jar:/home/tetherless/.ivy2/cache/com.typesafe.play/play-datacommons_2.11/jars/play-datacommons_2.11-2.4.2.jar:/home/tetherless/.ivy2/cache/joda-time/joda-time/jars/joda-time-2.8.2.jar:/home/tetherless/.ivy2/cache/org.joda/joda-convert/jars/joda-convert-1.7.jar:/home/tetherless/.ivy2/cache/org.scala-lang/scala-reflect/jars/scala-reflect-2.11.6.jar:/home/tetherless/.ivy2/cache/com.fasterxml.jackson.core/jackson-core/bundles/jackson-core-2.5.4.jar:/home/tetherless/.ivy2/cache/com.fasterxml.jackson.core/jackson-annotations/bundles/jackson-annotations-2.5.4.jar:/home/tetherless/.ivy2/cache/com.fasterxml.jackson.core/jackson-databind/bundles/jackson-databind-2.5.4.jar:/home/tetherless/.ivy2/cache/com.fasterxml.jackson.datatype/jackson-datatype-jdk8/bundles/jackson-datatype-jdk8-2.5.4.jar:/home/tetherless/.ivy2/cache/com.fasterxml.jackson.datatype/jackson-datatype-jsr310/bundles/jackson-datatype-jsr310-2.5.4.jar:/home/tetherless/.ivy2/cache/com.typesafe.play/play-netty-utils/jars/play-netty-utils-2.4.2.jar:/home/tetherless/.ivy2/cache/org.slf4j/slf4j-api/jars/slf4j-api-1.7.12.jar:/home/tetherless/.ivy2/cache/org.slf4j/jul-to-slf4j/jars/jul-to-slf4j-1.7.12.jar:/home/tetherless/.ivy2/cache/org.slf4j/jcl-over-slf4j/jars/jcl-over-slf4j-1.7.12.jar:/home/tetherless/.ivy2/cache/org.scala-lang.modules/scala-parser-combinators_2.11/bundles/scala-parser-combinators_2.11-1.0.1.jar:/home/tetherless/.ivy2/cache/ch.qos.logback/logback-core/jars/logback-core-1.1.3.jar:/home/tetherless/.ivy2/cache/ch.qos.logback/logback-classic/jars/logback-classic-1.1.3.jar:/home/tetherless/.ivy2/cache/com.typesafe.akka/akka-actor_2.11/jars/akka-actor_2.11-2.3.11.jar:/home/tetherless/.ivy2/cache/com.typesafe.akka/akka-slf4j_2.11/jars/akka-slf4j_2.11-2.3.11.jar:/home/tetherless/.ivy2/cache/commons-codec/commons-codec/jars/commons-codec-1.10.jar:/home/tetherless/.ivy2/cache/xerces/xercesImpl/jars/xercesImpl-2.11.0.jar:/home/tetherless/.ivy2/cache/xml-apis/xml-apis/jars/xml-apis-1.4.01.jar:/home/tetherless/.ivy2/cache/javax.transaction/jta/jars/jta-1.1.jar:/home/tetherless/.ivy2/cache/com.google.inject/guice/jars/guice-4.0.jar:/home/tetherless/.ivy2/cache/javax.inject/javax.inject/jars/javax.inject-1.jar:/home/tetherless/.ivy2/cache/aopalliance/aopalliance/jars/aopalliance-1.0.jar:/home/tetherless/.ivy2/cache/com.google.inject.extensions/guice-assistedinject/jars/guice-assistedinject-4.0.jar:/home/tetherless/.ivy2/cache/com.jolbox/bonecp/bundles/bonecp-0.8.0.RELEASE.jar:/home/tetherless/.ivy2/cache/com.zaxxer/HikariCP/bundles/HikariCP-2.3.7.jar:/home/tetherless/.ivy2/cache/com.h2database/h2/jars/h2-1.4.187.jar:/home/tetherless/.ivy2/cache/tyrex/tyrex/jars/tyrex-1.0.1.jar:/home/tetherless/.ivy2/cache/com.typesafe.play/play-java_2.11/jars/play-java_2.11-2.4.2.jar:/home/tetherless/.ivy2/cache/org.scala-lang.modules/scala-java8-compat_2.11/bundles/scala-java8-compat_2.11-0.3.0.jar:/home/tetherless/.ivy2/cache/org.yaml/snakeyaml/bundles/snakeyaml-1.15.jar:/home/tetherless/.ivy2/cache/org.hibernate/hibernate-validator/jars/hibernate-validator-5.0.3.Final.jar:/home/tetherless/.ivy2/cache/javax.validation/validation-api/jars/validation-api-1.1.0.Final.jar:/home/tetherless/.ivy2/cache/com.fasterxml/classmate/bundles/classmate-1.0.0.jar:/home/tetherless/.ivy2/cache/org.jboss.logging/jboss-logging/jars/jboss-logging-3.2.1.Final.jar:/home/tetherless/.ivy2/cache/org.springframework/spring-context/jars/spring-context-4.1.6.RELEASE.jar:/home/tetherless/.ivy2/cache/org.springframework/spring-core/jars/spring-core-4.1.6.RELEASE.jar:/home/tetherless/.ivy2/cache/org.springframework/spring-beans/jars/spring-beans-4.1.6.RELEASE.jar:/home/tetherless/.ivy2/cache/org.reflections/reflections/jars/reflections-0.9.9.jar:/home/tetherless/.ivy2/cache/com.google.guava/guava/bundles/guava-18.0.jar:/home/tetherless/.ivy2/cache/com.google.code.findbugs/annotations/jars/annotations-2.0.1.jar:/home/tetherless/.ivy2/cache/net.jodah/typetools/bundles/typetools-0.4.1.jar:/home/tetherless/.ivy2/cache/com.google.code.findbugs/jsr305/jars/jsr305-2.0.3.jar:/home/tetherless/.ivy2/cache/org.apache.tomcat/tomcat-servlet-api/jars/tomcat-servlet-api-8.0.21.jar:/home/tetherless/.ivy2/cache/com.typesafe.play/play-jdbc-evolutions_2.11/jars/play-jdbc-evolutions_2.11-2.4.0.jar:/home/tetherless/.ivy2/cache/org.avaje.ebeanorm/avaje-ebeanorm/jars/avaje-ebeanorm-4.6.2.jar:/home/tetherless/.ivy2/cache/javax.persistence/persistence-api/jars/persistence-api-1.0.jar:/home/tetherless/.ivy2/cache/org.avaje.ebeanorm/avaje-ebeanorm-agent/jars/avaje-ebeanorm-agent-4.5.3.jar:/home/tetherless/.ivy2/cache/com.typesafe.play/play-server_2.11/jars/play-server_2.11-2.4.2.jar:/home/tetherless/.ivy2/cache/com.typesafe.play/play-netty-server_2.11/jars/play-netty-server_2.11-2.4.2.jar:/home/tetherless/.ivy2/cache/io.netty/netty/bundles/netty-3.10.3.Final.jar:/home/tetherless/.ivy2/cache/com.typesafe.netty/netty-http-pipelining/jars/netty-http-pipelining-1.1.4.jar:/home/tetherless/.ivy2/cache/be.objectify/deadbolt-java_2.11/jars/deadbolt-java_2.11-2.4.1.jar:/home/tetherless/.ivy2/cache/com.typesafe.play/play-cache_2.11/jars/play-cache_2.11-2.4.2.jar:/home/tetherless/.ivy2/cache/net.sf.ehcache/ehcache-core/jars/ehcache-core-2.6.11.jar:/home/tetherless/.ivy2/cache/be.objectify/deadbolt-core_2.11/jars/deadbolt-core_2.11-2.4.2.jar:/home/tetherless/.ivy2/cache/com.feth/play-authenticate_2.11/jars/play-authenticate_2.11-0.7.0-SNAPSHOT.jar:/home/tetherless/.ivy2/cache/org.apache.httpcomponents/httpclient/jars/httpclient-4.5.jar:/home/tetherless/.ivy2/cache/org.apache.httpcomponents/httpcore/jars/httpcore-4.4.1.jar:/home/tetherless/.ivy2/cache/commons-logging/commons-logging/jars/commons-logging-1.2.jar:/home/tetherless/.ivy2/cache/com.feth/play-easymail_2.11/jars/play-easymail_2.11-0.7.0-SNAPSHOT.jar:/home/tetherless/.ivy2/cache/com.typesafe.play/play-mailer_2.11/jars/play-mailer_2.11-3.0.1.jar:/home/tetherless/.ivy2/cache/org.apache.commons/commons-email/jars/commons-email-1.3.3.jar:/home/tetherless/.ivy2/cache/javax.mail/mail/jars/mail-1.4.5.jar:/home/tetherless/.ivy2/cache/javax.activation/activation/jars/activation-1.1.1.jar:/home/tetherless/.ivy2/cache/org.mindrot/jbcrypt/jars/jbcrypt-0.3m.jar:/home/tetherless/.ivy2/cache/com.typesafe.play/play-java-ws_2.11/jars/play-java-ws_2.11-2.4.2.jar:/home/tetherless/.ivy2/cache/com.typesafe.play/play-ws_2.11/jars/play-ws_2.11-2.4.2.jar:/home/tetherless/.ivy2/cache/com.ning/async-http-client/jars/async-http-client-1.9.21.jar:/home/tetherless/.ivy2/cache/oauth.signpost/signpost-core/jars/signpost-core-1.2.1.2.jar:/home/tetherless/.ivy2/cache/oauth.signpost/signpost-commonshttp4/jars/signpost-commonshttp4-1.2.1.2.jar:/home/tetherless/.ivy2/cache/org.webjars/bootstrap/jars/bootstrap-3.2.0.jar:/home/tetherless/.ivy2/cache/org.webjars/jquery/jars/jquery-1.11.1.jar:/home/tetherless/.ivy2/cache/org.apache.commons/commons-csv/jars/commons-csv-1.1.jar:/home/tetherless/.ivy2/cache/org.apache.httpcomponents/fluent-hc/jars/fluent-hc-4.3.6.jar:/home/tetherless/.ivy2/cache/org.apache.poi/poi-ooxml/jars/poi-ooxml-3.9.jar:/home/tetherless/.ivy2/cache/org.apache.poi/poi/jars/poi-3.9.jar:/home/tetherless/.ivy2/cache/org.apache.poi/poi-ooxml-schemas/jars/poi-ooxml-schemas-3.9.jar:/home/tetherless/.ivy2/cache/org.apache.xmlbeans/xmlbeans/jars/xmlbeans-2.3.0.jar:/home/tetherless/.ivy2/cache/stax/stax-api/jars/stax-api-1.0.1.jar:/home/tetherless/.ivy2/cache/dom4j/dom4j/jars/dom4j-1.6.1.jar:/home/tetherless/.ivy2/cache/org.apache.solr/solr-solrj/jars/solr-solrj-5.2.1.jar:/home/tetherless/.ivy2/cache/commons-io/commons-io/jars/commons-io-2.4.jar:/home/tetherless/.ivy2/cache/org.apache.httpcomponents/httpmime/jars/httpmime-4.4.1.jar:/home/tetherless/.ivy2/cache/org.apache.zookeeper/zookeeper/jars/zookeeper-3.4.6.jar:/home/tetherless/.ivy2/cache/org.codehaus.woodstox/stax2-api/bundles/stax2-api-3.1.4.jar:/home/tetherless/.ivy2/cache/org.codehaus.woodstox/woodstox-core-asl/jars/woodstox-core-asl-4.4.1.jar:/home/tetherless/.ivy2/cache/org.noggit/noggit/jars/noggit-0.6.jar:/home/tetherless/.ivy2/cache/org.apache.jena/jena-core/jars/jena-core-2.13.0.jar:/home/tetherless/.ivy2/cache/org.apache.jena/jena-iri/jars/jena-iri-1.1.2.jar:/home/tetherless/.ivy2/cache/org.slf4j/slf4j-log4j12/jars/slf4j-log4j12-1.7.6.jar:/home/tetherless/.ivy2/cache/log4j/log4j/bundles/log4j-1.2.17.jar:/home/tetherless/.ivy2/cache/org.apache.jena/jena-arq/jars/jena-arq-2.13.0.jar:/home/tetherless/.ivy2/cache/com.github.jsonld-java/jsonld-java/bundles/jsonld-java-0.5.1.jar:/home/tetherless/.ivy2/cache/org.apache.httpcomponents/httpclient-cache/jars/httpclient-cache-4.2.6.jar:/home/tetherless/.ivy2/cache/org.apache.thrift/libthrift/jars/libthrift-0.9.2.jar:/home/tetherless/.ivy2/cache/args4j/args4j/bundles/args4j-2.32.jar
+Scala compilation took 3.295581788 s
+New invalidations:
+	Set()
+Initial set of included nodes: Set()
+Previously invalidated, but (transitively) depend on new invalidations:
+	Set()
+All newly invalidated sources after taking into account (previously) recompiled sources:Set()
+Copy resource mappings: 
+	(/home/tetherless/hadatac/conf/messages.de,/home/tetherless/hadatac/target/scala-2.11/classes/messages.de)
+	(/home/tetherless/hadatac/conf/messages.pt,/home/tetherless/hadatac/target/scala-2.11/classes/messages.pt)
+	(/home/tetherless/hadatac/conf/namespaces.properties,/home/tetherless/hadatac/target/scala-2.11/classes/namespaces.properties)
+	(/home/tetherless/hadatac/conf/messages.es,/home/tetherless/hadatac/target/scala-2.11/classes/messages.es)
+	(/home/tetherless/hadatac/conf/play.plugins,/home/tetherless/hadatac/target/scala-2.11/classes/play.plugins)
+	(/home/tetherless/hadatac/conf/hadatac.conf,/home/tetherless/hadatac/target/scala-2.11/classes/hadatac.conf)
+	(/home/tetherless/hadatac/conf/messages.en,/home/tetherless/hadatac/target/scala-2.11/classes/messages.en)
+	(/home/tetherless/hadatac/conf/application.conf,/home/tetherless/hadatac/target/scala-2.11/classes/application.conf)
+	(/home/tetherless/hadatac/conf/play-authenticate,/home/tetherless/hadatac/target/scala-2.11/classes/play-authenticate)
+	(/home/tetherless/hadatac/conf/messages.fr,/home/tetherless/hadatac/target/scala-2.11/classes/messages.fr)
+	(/home/tetherless/hadatac/conf/routes,/home/tetherless/hadatac/target/scala-2.11/classes/routes)
+	(/home/tetherless/hadatac/conf/messages.ja,/home/tetherless/hadatac/target/scala-2.11/classes/messages.ja)
+	(/home/tetherless/hadatac/conf/messages.id,/home/tetherless/hadatac/target/scala-2.11/classes/messages.id)
+	(/home/tetherless/hadatac/conf/messages.pl,/home/tetherless/hadatac/target/scala-2.11/classes/messages.pl)
+	(/home/tetherless/hadatac/conf/play-authenticate/deadbolt.conf,/home/tetherless/hadatac/target/scala-2.11/classes/play-authenticate/deadbolt.conf)
+	(/home/tetherless/hadatac/conf/play-authenticate/mine.conf,/home/tetherless/hadatac/target/scala-2.11/classes/play-authenticate/mine.conf)
+	(/home/tetherless/hadatac/conf/play-authenticate/smtp.conf,/home/tetherless/hadatac/target/scala-2.11/classes/play-authenticate/smtp.conf)
+Total time: 4 s, completed Aug 28, 2015 2:39:51 PM
+> server-post-command-cleanup
+> server-handle-next-server-request
+> jobStop 1
+Evaluating tasks: *:jobStop
+Running task... Cancel: sbt.server.ServerTaskCancellation@1e70670, check cycles: false
+Total time: 0 s, completed Aug 28, 2015 2:40:30 PM
+> server-post-command-cleanup
+> server-handle-next-server-request
+Done executing sbt server engine, result Right(Exit(0))
+Closing listening server socket
+Waiting for socket thread
+Waiting for request processor thread
+Waiting for command engine result
+Returning control to sbt launcher with result Exit(0)
+Closing the 4099@tetherless-ThinkPad-T61p logs at Fri Aug 28 14:43:57 EDT 2015, goodbye.

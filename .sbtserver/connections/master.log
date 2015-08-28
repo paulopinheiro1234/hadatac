@@ -1,0 +1,110 @@
+New log file opened at Fri Aug 28 13:42:22 EDT 2015 by 4099@tetherless-ThinkPad-T61p
+Taking next connection to: 40136
+New client attempting to connect on port: 37980-40136
+  Address = /127.0.1.1:40136
+This client on port 37980 has uuid 6cb647e5-f018-4b94-9252-f82e153cf94f configName activator humanReadableName Activator protocolVersion 3 featureTags Vector()
+Connected Clients: activator-6cb647e5-f018-4b94-9252-f82e153cf94f
+Taking next connection to: 40136
+New client attempting to connect on port: 37981-40136
+  Address = /127.0.1.1:40136
+Handshake exception on socket: 37981
+sbt.impl.ipc.HandshakeException: Unable to perform handshake
+	at sbt.impl.ipc.Peer.handshake(IPC.scala:46)
+	at sbt.impl.ipc.MultiClientServer.<init>(IPC.scala:150)
+	at sbt.server.SbtServerSocketHandler$$anon$1.run(SbtServerSocketHandler.scala:43)
+Caused by: java.io.EOFException
+	at java.io.DataInputStream.readInt(DataInputStream.java:392)
+	at sbt.impl.ipc.Peer.receive(IPC.scala:95)
+	at sbt.impl.ipc.Peer.handshake(IPC.scala:49)
+	... 2 more
+Taking next connection to: 40136
+New client attempting to connect on port: 37982-40136
+  Address = /127.0.1.1:40136
+This client on port 37982 has uuid 0bc87b05-16e6-43cc-8032-9724ed443b39 configName activator humanReadableName Activator protocolVersion 3 featureTags Vector()
+Connected Clients: activator-6cb647e5-f018-4b94-9252-f82e153cf94f, activator-0bc87b05-16e6-43cc-8032-9724ed443b39
+Taking next connection to: 40136
+Checking to see if clients are empty...
+We have 1 non-daemon clients, continuing serving connections.
+Taking next connection to: 40136
+Checking to see if clients are empty...
+We have 1 non-daemon clients, continuing serving connections.
+Taking next connection to: 40136
+Checking to see if clients are empty...
+We have 1 non-daemon clients, continuing serving connections.
+Taking next connection to: 40136
+New client attempting to connect on port: 38230-40136
+  Address = /127.0.1.1:40136
+Handshake exception on socket: 38230
+sbt.impl.ipc.HandshakeException: Unable to perform handshake
+	at sbt.impl.ipc.Peer.handshake(IPC.scala:46)
+	at sbt.impl.ipc.MultiClientServer.<init>(IPC.scala:150)
+	at sbt.server.SbtServerSocketHandler$$anon$1.run(SbtServerSocketHandler.scala:43)
+Caused by: java.net.SocketException: Connection reset
+	at java.net.SocketInputStream.read(SocketInputStream.java:209)
+	at java.net.SocketInputStream.read(SocketInputStream.java:141)
+	at java.io.BufferedInputStream.fill(BufferedInputStream.java:246)
+	at java.io.BufferedInputStream.read(BufferedInputStream.java:265)
+	at java.io.DataInputStream.readInt(DataInputStream.java:387)
+	at sbt.impl.ipc.Peer.receive(IPC.scala:95)
+	at sbt.impl.ipc.Peer.handshake(IPC.scala:49)
+	... 2 more
+Taking next connection to: 40136
+New client attempting to connect on port: 38231-40136
+  Address = /127.0.1.1:40136
+This client on port 38231 has uuid 76ab03d8-71c3-4ce8-a886-5bf8e8935167 configName play-fork-run humanReadableName Play Fork Run protocolVersion 1 featureTags Vector()
+Connected Clients: activator-0bc87b05-16e6-43cc-8032-9724ed443b39, play-fork-run-76ab03d8-71c3-4ce8-a886-5bf8e8935167
+Taking next connection to: 40136
+Checking to see if clients are empty...
+We have 1 non-daemon clients, continuing serving connections.
+Taking next connection to: 40136
+Checking to see if clients are empty...
+We have 1 non-daemon clients, continuing serving connections.
+Taking next connection to: 40136
+Checking to see if clients are empty...
+We have 1 non-daemon clients, continuing serving connections.
+Taking next connection to: 40136
+Checking to see if clients are empty...
+We have 1 non-daemon clients, continuing serving connections.
+Taking next connection to: 40136
+Checking to see if clients are empty...
+We have 1 non-daemon clients, continuing serving connections.
+Taking next connection to: 40136
+Checking to see if clients are empty...
+We have 1 non-daemon clients, continuing serving connections.
+Taking next connection to: 40136
+Checking to see if clients are empty...
+We have 1 non-daemon clients, continuing serving connections.
+Taking next connection to: 40136
+Checking to see if clients are empty...
+We have 1 non-daemon clients, continuing serving connections.
+Taking next connection to: 40136
+Checking to see if clients are empty...
+We have 1 non-daemon clients, continuing serving connections.
+Taking next connection to: 40136
+Checking to see if clients are empty...
+We have 1 non-daemon clients, continuing serving connections.
+Taking next connection to: 40136
+Checking to see if clients are empty...
+We have 1 non-daemon clients, continuing serving connections.
+Taking next connection to: 40136
+Checking to see if clients are empty...
+We have 1 non-daemon clients, continuing serving connections.
+Taking next connection to: 40136
+Checking to see if clients are empty...
+We have 1 non-daemon clients, continuing serving connections.
+Taking next connection to: 40136
+Checking to see if clients are empty...
+We have 1 non-daemon clients, continuing serving connections.
+Taking next connection to: 40136
+Checking to see if clients are empty...
+We have 1 non-daemon clients, continuing serving connections.
+Taking next connection to: 40136
+Checking to see if clients are empty...
+We have 1 non-daemon clients, continuing serving connections.
+Taking next connection to: 40136
+Checking to see if clients are empty...
+No non-daemon clients connected after 3 min. Shutting down.
+Server socket thread exiting.
+0 clients open, will close them...
+All client sockets have been closed.
+Closing the 4099@tetherless-ThinkPad-T61p logs at Fri Aug 28 14:43:57 EDT 2015, goodbye.

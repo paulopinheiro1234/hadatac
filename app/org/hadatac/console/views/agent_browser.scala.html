@@ -4,20 +4,26 @@
 @import org.hadatac.console.views.html._
 
 @main("Agent Graph") {
-    <div class="container-fluid">
-      
+    @metadata_navigation(category)
+    <div class="container-fluid container-spaced">
       <div class="row">
-        @*<div class="col-sm-9 col-md-10 main">*@
-		  @metadata_navigation(category)
-		  <div class="table-responsive">
+        <div class="col-sm-9 col-md-9 main">
+        <ul class="nav nav-tabs">
+            <li class="active"><a data-toggle="tab">View as Force Graph</a></li> 
+        </ul>
+		  <div class="tab-content tab-pane fade in active">
 			 <div id="query" data-results="@documentMap"></div>
-			 <div id="info" class="infobox"></div>
 			 <div id="body"></div>
              <script src="/hadatac/assets/javascripts/d3.min.js"></script>
              <script src="/hadatac/assets/javascripts/d3.tip.v0.6.3.js"></script>
     		 <script type="text/javascript" src="/hadatac/assets/javascripts/forceFieldRenderer.js"></script>  					   
-    		 <link type="text/css" rel="stylesheet" href="/hadatac/assets/stylesheets/forceFieldRenderer.css"/>   					   
+    		 <link type="text/css" rel="stylesheet" href="/hadatac/assets/stylesheets/forceFieldRenderer.css"/>			   
     	  </div>
+      </div>
+      
+      <div class="col-md-3 col-sm-3">
+            <div class="tab-spacer"></div>
+            <div id="info" class="infobox"></div>
       </div>
     </div>
 

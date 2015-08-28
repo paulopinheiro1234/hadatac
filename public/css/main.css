@@ -46,6 +46,18 @@ h1 {
     border-width:1px;
     border-color:lightsteelblue;
     overflow-x:auto;
+    height:650px;
+    overflow-y:auto;
+}
+
+.panel-group{
+    height:620px;
+    overflow-y:auto;
+}
+
+.fixed-height{
+    height:620px;
+    overflow-y:auto;
 }
 
 .tab-spacer{
