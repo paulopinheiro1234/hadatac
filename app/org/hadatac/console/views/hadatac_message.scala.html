@@ -1,0 +1,13 @@
+@(title : String,
+  message : String)
+
+@import helper._
+@import org.hadatac.console.views.html._
+
+@main("@title") {
+	<div class="container">
+	  <div class="alert alert-info">
+	    <strong>Oops!</strong> @message
+	  </div>
+	</div>
+}

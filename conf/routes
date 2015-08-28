@@ -5,8 +5,8 @@
 # Home page
 GET     /hadatac/                               org.hadatac.console.controllers.Portal.index()
 POST    /hadatac/                               org.hadatac.console.controllers.Portal.postIndex()
-GET     /hadatac/measurements                   org.hadatac.console.controllers.Application.index()
-POST    /hadatac/measurements                   org.hadatac.console.controllers.Application.postIndex()
+GET     /hadatac/measurements                   org.hadatac.console.controllers.Application.index(p: Int ?= 1)
+POST    /hadatac/measurements                   org.hadatac.console.controllers.Application.postIndex(p: Int ?= 1)
 GET	/hadatac/spatial			org.hadatac.console.controllers.Spatial.index()
 POST	/hadatac/spatial			org.hadatac.console.controllers.Spatial.postIndex()
 GET	/hadatac/metadata  			org.hadatac.console.controllers.Metadata.index()
