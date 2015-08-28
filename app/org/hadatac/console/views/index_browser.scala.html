@@ -5,48 +5,72 @@
     pivotFacets: org.hadatac.console.models.FacetsWithCategories,
     clusterFacets: org.hadatac.console.models.FacetsWithCategories,
     documentMap : Map[String, org.hadatac.console.models.SpatialQueryResults],
-    final_query : String)
+    final_query : String,
+    current_page : Integer,
+    max_page : Integer)
 
 @import helper._
 @import org.hadatac.console.views.html._
 
 @main("Simple Faceted Search") {
     <div class="container-fluid">
-      
-      <div class="row">
-        <div class="col-md-3 sidebar">
-          @form(org.hadatac.console.controllers.routes.Application.postIndex()) {
-            @fieldset(facetForm, fieldFacets, queryFacets, rangeFacets, pivotFacets, clusterFacets)
-        }
-        </div>
-        <div class="col-md-3 main">
-          <div id="legend">
-            <legend>Measurements</legend>
-          </div>
-		  <!--h4>@final_query</h4-->
-		  <div class="row placeholders"></div>
-		  
-          <div class="row placeholders"></div>
-          <div >
-          	@for((collection, query_results) <- documentMap) {
-          			<div id="@collection" class="tab-pane">
-          				@table(query_results)
-          			</div>
-          		
-          	}
-          </div>
-        </div>
-        <div class="col-md-6">
-          <div id="legend">
-            <legend>Measurement details</legend>
-          </div>
-            @for((collection, query_results) <- documentMap) {
-          		<div class="tab-pane">
-          			@measurement_details(query_results.the_docs(0))
-          		</div>
-          	}
-        </div>
-      </div>
+	      <div class="row">
+	        <div class="col-md-3 sidebar">
+	          @form(org.hadatac.console.controllers.routes.Application.postIndex()) {
+	            @fieldset(facetForm, fieldFacets, queryFacets, rangeFacets, pivotFacets, clusterFacets)
+	        }
+	        </div>
+	        <div class="col-md-3 main">
+	          <div id="legend">
+	            <legend>Measurements</legend>
+	          </div>
+			  <!--h4>@final_query</h4-->
+			  <div class="row placeholders"></div>
+			  
+	          <div class="row placeholders"></div>
+	          <div >
+	          	@for((collection, query_results) <- documentMap) {
+	          			<div id="@collection" class="tab-pane">
+	          				@table(query_results)
+	          			</div>
+	          		
+	          	}
+	          </div>
+	          <div class="container">    
+	 			<ul class="pagination">
+	 				@if(current_page == 1) {
+	 					<li class="disabled"><a href="#">«</a></li>
+	 				} else {
+						<li><a href="?p=@(current_page-1)">«</a></li>
+					}
+					<li class="active"><a href="?p=@(current_page)">@(current_page)</a></li>
+					@if(current_page == max_page) {
+	 					<li class="disabled"><a href="#">»</a></li>
+	 				} else {
+						<li><a href="?p=@(current_page+1)">»</a></li>
+					}
+				</ul>
+			  </div>
+	        </div>
+	        <div class="col-md-6">
+	          <div class="row">
+	          	<div id="legend">
+	            	<legend>Measurement details</legend>
+	          	</div>
+	            	@for((collection, query_results) <- documentMap) {
+	          			<div class="tab-pane">
+	          				@measurement_details(query_results.the_docs(0))
+	          			</div>
+	          		}
+	          </div>
+	          <div class="row">
+		          <div id="legend">
+		            <legend>Metadata details</legend>
+		          </div>  
+		      </div>
+		    </div>
+	        </div>
+	      </div>
     </div>
 
 }

@@ -5,8 +5,8 @@
 # Home page
 GET     /hadatac/                               org.hadatac.console.controllers.Portal.index()
 POST    /hadatac/                               org.hadatac.console.controllers.Portal.postIndex()
-GET     /hadatac/measurements                   org.hadatac.console.controllers.Application.index()
-POST    /hadatac/measurements                   org.hadatac.console.controllers.Application.postIndex()
+GET     /hadatac/measurements                   org.hadatac.console.controllers.Application.index(p: Int ?= 1)
+POST    /hadatac/measurements                   org.hadatac.console.controllers.Application.postIndex(p: Int ?= 1)
 GET	/hadatac/spatial			org.hadatac.console.controllers.Spatial.index()
 POST	/hadatac/spatial			org.hadatac.console.controllers.Spatial.postIndex()
 GET	/hadatac/metadata  			org.hadatac.console.controllers.Metadata.index()
@@ -69,6 +69,7 @@ GET     /hadatac/ts/loadont                        org.hadatac.console.controlle
 POST    /hadatac/ts/loadont                        org.hadatac.console.controllers.triplestore.LoadOnt.postLoadOnt(oper: String)
 GET     /hadatac/ts/loadkb                         org.hadatac.console.controllers.triplestore.LoadKB.loadKB(oper: String)
 POST    /hadatac/ts/loadkb                         org.hadatac.console.controllers.triplestore.LoadKB.postLoadKB(oper: String)
+POST    /hadatac/ts/loadkbupload                   org.hadatac.console.controllers.triplestore.LoadKB.uploadFile
  
 # Map static resources from the /public folder to the /assets URL path
 GET     /hadatac/assets/*file                      controllers.Assets.versioned(path="/public", file: Asset)
