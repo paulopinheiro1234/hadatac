@@ -65,6 +65,18 @@ POST    /hadatac/accounts/merge                    org.hadatac.console.controlle
 GET     /hadatac/login/password/forgot             org.hadatac.console.controllers.Signup.forgotPassword(email: String ?= "")
 POST    /hadatac/login/password/forgot             org.hadatac.console.controllers.Signup.doForgotPassword
 
+# deployment management
+GET	    /hadatac/deployments/new			       org.hadatac.console.controllers.deployments.NewDeployment.index()
+POST	/hadatac/deployments/new			       org.hadatac.console.controllers.deployments.NewDeployment.postIndex()
+GET	    /hadatac/deployments/close			       org.hadatac.console.controllers.deployments.CloseDeployment.index()
+POST	/hadatac/deployments/close		           org.hadatac.console.controllers.deployments.CloseDeployment.postIndex()
+GET	    /hadatac/deployments/delete	    	       org.hadatac.console.controllers.deployments.DeleteDeployment.index()
+POST	/hadatac/deployments/delete		           org.hadatac.console.controllers.deployments.DeleteDeployment.postIndex()
+GET	    /hadatac/deployments/view			       org.hadatac.console.controllers.deployments.ViewDeployment.index()
+POST	/hadatac/deployments/view	               org.hadatac.console.controllers.deployments.ViewDeployment.postIndex()
+GET	    /hadatac/deployments/urigenerator		   org.hadatac.console.controllers.deployments.URIGenerator.index()
+POST	/hadatac/deployments/urigenerator	       org.hadatac.console.controllers.deployments.URIGenerator.postIndex()
+
 # metadata store management URLs
 GET     /hadatac/ts/clean                          org.hadatac.console.controllers.triplestore.Clean.clean(oper: String)
 POST    /hadatac/ts/clean                          org.hadatac.console.controllers.triplestore.Clean.postClean(oper: String)
