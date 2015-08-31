@@ -1,4 +1,4 @@
-package org.hadatac.metadata.loader;
+package org.hadatac.utils;
 
 public class Feedback {
 
