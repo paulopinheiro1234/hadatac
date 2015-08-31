@@ -12,6 +12,7 @@ import java.net.URL;
 import org.apache.commons.io.FileUtils;
 import org.hadatac.metadata.loader.NameSpace;
 import org.hadatac.metadata.loader.NameSpaces;
+import org.hadatac.utils.Feedback;
 
 public class NameSpaces {
 
