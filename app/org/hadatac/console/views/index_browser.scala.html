@@ -5,6 +5,7 @@
     pivotFacets: org.hadatac.console.models.FacetsWithCategories,
     clusterFacets: org.hadatac.console.models.FacetsWithCategories,
     documentMap : Map[String, org.hadatac.console.models.SpatialQueryResults],
+    documentJson : String,
     final_query : String,
     current_page : Integer,
     max_page : Integer)
@@ -13,6 +14,8 @@
 @import org.hadatac.console.views.html._
 
 @main("Simple Faceted Search") {
+	<div id="query" data-documents="@documentJson"/>
+	<script type="text/javascript" src="/hadatac/assets/javascripts/measurement.js"></script>
     <div class="container-fluid">
 	      <div class="row">
 	        <div class="col-md-3 sidebar">

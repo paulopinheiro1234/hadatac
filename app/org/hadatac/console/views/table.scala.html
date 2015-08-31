@@ -1,7 +1,22 @@
 @(documentMap : org.hadatac.console.models.QueryResults)
 
+	<script type="text/javascript">
+		onload = function() {
+			if (!document.getElementsByTagName || !document.createTextNode) return;
+			var rows = document.getElementById('measurementsTable').getElementsByTagName('tbody')[0].getElementsByTagName('tr');
+			for (i = 0; i < rows.length; i++) {
+				rows[i].onmouseover = function() {
+					var row = this.rowIndex - 1;
+					for (var field in json.response.docs[row]) {
+						document.getElementById('detail_' + field).innerHTML = json.response.docs[row][field]; 
+					}
+				}
+			}
+		}
+	</script>
+
     <div class="table-responsive">
-        <table class="table table-striped">
+        <table class="table table-striped" id="measurementsTable">
             <thead>
               <tr>
                 <th>Characteristic</th>
