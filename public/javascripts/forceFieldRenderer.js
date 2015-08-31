@@ -16,7 +16,7 @@ var drag = force.drag()
     .on("dragstart", dragstart);
 
 // This is the tooltip!
-var tip = d3.tip()
+/*var tip = d3.tip()
   .attr('class', 'd3-tip')
   .offset([-10, 0])
   .html(function(d) {
@@ -26,13 +26,13 @@ var tip = d3.tip()
            "<strong>website:</strong> <span style='color:black'>" + " " + "</span><br>";  
            
   })
+*/
 
-
-var svg = d3.select("body").append("svg")
+var svg = d3.select("#body").append("svg")
     .attr("width", width)
     .attr("height", height);
 
-svg.call(tip);
+//svg.call(tip);
 
 var link = svg.selectAll(".link"),
     node = svg.selectAll(".node");

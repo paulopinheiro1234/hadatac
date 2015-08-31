@@ -67,7 +67,7 @@
           </div>
           <div class="col-md-3 col-sm-3">
             <div class="tab-spacer"></div>
-            @defining(if (results.treeResults != "") "none" else "block") { dis =>
+            @defining(if (results.treeResults != "") "block" else "none") { dis =>
             <div id="info" class="infobox" style="display:@dis"></div>
             }
           </div>
