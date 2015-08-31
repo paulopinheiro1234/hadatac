@@ -4,9 +4,9 @@ import java.io.File;
 import java.io.IOException;
 
 import org.hadatac.data.loader.ccsv.Parser;
-import org.hadatac.data.loader.ccsv.Parser;
 import org.hadatac.data.loader.util.Arguments;
 import org.hadatac.data.loader.util.FileFactory;
+import org.hadatac.utils.Feedback;
 
 public class Main {
 	static FileFactory files;
@@ -31,10 +31,10 @@ public class Main {
 		if (arguments.getInputType().equals("CCSV")) {
 			Parser parser = new Parser();
 			if (arguments.isPv()) {
-				parser.validate(files);
+				parser.validate(Feedback.COMMANDLINE, files);
 			} else {
-				parser.validate(files);
-				parser.index();
+				parser.validate(Feedback.COMMANDLINE, files);
+				parser.index(Feedback.COMMANDLINE);
 			}
 		}
 		
