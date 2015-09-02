@@ -22,16 +22,50 @@ public class DeploymentManagement extends Controller {
 
 	// for /metadata HTTP GET requests
     public static Result index() {
-
-       return ok(deploymentManagement.render());
+        SparqlQuery query = new SparqlQuery();
+        GetSparqlQuery query_submit = new GetSparqlQuery(query);
+        SparqlQueryResults theResults;
+        String tabName = "Deployments";
+        String query_json = null;
+        //System.out.println("DeploymentManagement is requesting: " + tabName);
+        try {
+            query_json = query_submit.executeQuery(tabName);
+            //System.out.println("query_json = " + query_json);
+            if (query_json != null && !query_json.equals("")) {
+                theResults = new SparqlQueryResults(query_json, false);
+            } else {
+            	theResults = null;
+            }
+        } catch (IllegalStateException | IOException | NullPointerException e1) {
+            return internalServerError(error_page.render(e1.toString(), tabName));
+            //e1.printStackTrace();
+        }
+       return ok(deploymentManagement.render(theResults));
         
     }// /index()
 
 
     // for /metadata HTTP POST requests
     public static Result postIndex() {
-        
-        return ok(deploymentManagement.render());
+        SparqlQuery query = new SparqlQuery();
+        GetSparqlQuery query_submit = new GetSparqlQuery(query);
+        SparqlQueryResults theResults;
+        String tabName = "Deployments";
+        String query_json = null;
+        //System.out.println("DeploymentManagement is requesting: " + tabName);
+        try {
+            query_json = query_submit.executeQuery(tabName);
+            //System.out.println("query_json = " + query_json);
+            if (query_json != null && !query_json.equals("")) {
+                theResults = new SparqlQueryResults(query_json, false);
+            } else {
+            	theResults = null;
+            }
+        } catch (IllegalStateException | IOException | NullPointerException e1) {
+            return internalServerError(error_page.render(e1.toString(), tabName));
+            //e1.printStackTrace();
+        }
+        return ok(deploymentManagement.render(theResults));
         
     }// /postIndex()
 
