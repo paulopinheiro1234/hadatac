@@ -62,6 +62,7 @@ public class Application extends Controller {
     }
 
     public static Result index(int p) {
+    	System.out.println("!!!!!! Application.index");
     	Form<FacetFormData> formData = Form.form(FacetFormData.class).fill(facet_form);
         JsonHandler jh = new JsonHandler();
         String query_json = "";
@@ -112,6 +113,8 @@ public class Application extends Controller {
     		if (category.contains("[")) {
     			int index = category.indexOf("[");
     			field_facet_for_query.addFacet(category.substring(0,index), formData.data().get(category));
+    			System.out.println("!!! category: " + category);
+    			System.out.println("!!! get(category): " + formData.data().get(category));
     		} else {
     			subject = formData.data().get(category);
     		}

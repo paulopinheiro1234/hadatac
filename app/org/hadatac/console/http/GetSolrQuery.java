@@ -190,7 +190,7 @@ public class GetSolrQuery {
         try
         {
         	HttpClient client = new DefaultHttpClient();
-        	HttpGet request = new HttpGet(this.list_of_queries.get(collection).toString().replace(" ", "%20") + "&start=" + (page-1)*size + "&rows=" + size);
+        	HttpGet request = new HttpGet(this.list_of_queries.get(collection).toString().replace(" ", "%20") + "&start=" + (page-1)*size + "&rows=" + size + "&facet=true&facet.field=unit&facet.pivot=entity,characteristic&facet.pivot=platform_name,instrument_model");
         	HttpResponse response = client.execute(request);
             System.out.println(response);
             StringWriter writer = new StringWriter();

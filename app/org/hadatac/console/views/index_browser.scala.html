@@ -16,12 +16,58 @@
 @main("Simple Faceted Search") {
 	<div id="query" data-documents="@documentJson"/>
 	<script type="text/javascript" src="/hadatac/assets/javascripts/measurement.js"></script>
+	
     <div class="container-fluid">
 	      <div class="row">
 	        <div class="col-md-3 sidebar">
 	          @form(org.hadatac.console.controllers.routes.Application.postIndex()) {
 	            @fieldset(facetForm, fieldFacets, queryFacets, rangeFacets, pivotFacets, clusterFacets)
 	        }
+	        <div id="treeEntityCharacteristicBox" style="width:100%; height:150px; background-color:#f5f5f5; border :1px solid Silver; overflow:auto;"></div>
+	        <div id="treePlatformInstrumentBox" style="width:100%; height:150px; background-color:#f5f5f5; border :1px solid Silver; overflow:auto;"></div>
+	        <script>
+	        	function parseSolrToTree(type) {
+	        		var i, j;
+	        		i = 0;
+	        		var jsonTree = '{ "id": ' + i + ', "item": [ ';
+		        	for (var entityIndex in json.facet_counts.facet_pivot[type]) {
+		        		var entity = json.facet_counts.facet_pivot[type][entityIndex];
+		        		i++;
+		        		j = 0;
+		        		jsonTree += '{ "id": ' + i + ', "text": "' + entity.value + ' (' + entity.count + ')", "item": [ ';
+		        		for (var characteristicIndex in entity.pivot) {
+		        			var characteristic = entity.pivot[characteristicIndex];
+		        			if (j != 0) {
+		        				jsonTree += ' ,';
+		        			}
+		        			j++;
+		        			jsonTree += '{ "id": ' + i + j + ', "text": "' + characteristic.value + ' (' + characteristic.count + ')" } ';
+		        		}
+		        		jsonTree += '] , "child": ' + j + ' } ';
+		        	}
+		        	jsonTree += '] }';
+		        	return jsonTree;
+	        	}
+	        	
+	        	function loadTree(tree, data) {
+					tree.enableCheckBoxes(true, true);
+					tree.enableThreeStateCheckboxes(true);
+					tree.setImagePath("@controllers.routes.Assets.versioned("lib/dhtmlx/imgs/dhxtree_skyblue/")");
+					tree.setDataMode("json");
+					tree.parse(dataTree, "json");
+	        	}
+	        
+	        	var jsonTree, dataTree, tree;
+	        	jsonTree = parseSolrToTree("entity,characteristic");
+				dataTree = JSON.parse(jsonTree);
+				tree = new dhtmlXTreeObject("treeEntityCharacteristicBox","100%","100%",0);
+				loadTree(tree, dataTree);
+
+				jsonTree = parseSolrToTree("platform_name,instrument_model");
+				dataTree = JSON.parse(jsonTree);
+				tree = new dhtmlXTreeObject("treePlatformInstrumentBox","100%","100%",0);
+				loadTree(tree, dataTree);
+			</script>
 	        </div>
 	        <div class="col-md-3 main">
 	          <div id="legend">
