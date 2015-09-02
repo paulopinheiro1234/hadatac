@@ -78,7 +78,7 @@ public class GetSparqlQuery {
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
         }            
-        System.out.println(tabName + " : " + this.sparql_query);
+        //System.out.println(tabName + " : " + this.sparql_query);
         this.list_of_queries.put(tabName, this.sparql_query);
     }// /getSolrQuery for SPARQL
 
@@ -309,12 +309,12 @@ public class GetSparqlQuery {
         try {
         	HttpClient client = new DefaultHttpClient();
         	HttpGet request = new HttpGet(list_of_queries.get(tab).toString().replace(" ", "%20"));
-        	System.out.println(tab + " : " + list_of_queries.get(tab));
+        	//System.out.println(tab + " : " + list_of_queries.get(tab));
         	request.setHeader("Accept", "application/sparql-results+json");
         	HttpResponse response = client.execute(request);
             StringWriter writer = new StringWriter();
             IOUtils.copy(response.getEntity().getContent(), writer, "utf-8");
-            System.out.println("response: " + response);    
+            //System.out.println("response: " + response);    
             return writer.toString();
         } finally
         {
