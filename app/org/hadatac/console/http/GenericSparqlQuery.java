@@ -9,6 +9,7 @@ import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.impl.client.HttpClients;
@@ -29,8 +30,8 @@ public class GenericSparqlQuery {
     	CloseableHttpClient httpClient = HttpClients.createDefault();
         Scanner in = null;
         try {
-        	HttpClient client = new DefaultHttpClient();
-        	HttpGet request = new HttpGet(final_query);
+        	HttpClient client = new DefaultHttpClient(); 
+        	HttpPost request = new HttpPost(final_query);
         	if (isUpdate) {
             	request.setHeader("Content-Type", "application/x-www-form-urlencoded");
         	}

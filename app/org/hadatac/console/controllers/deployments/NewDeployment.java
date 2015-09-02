@@ -30,6 +30,11 @@ import org.hadatac.console.models.SparqlQuery;
 import org.hadatac.console.models.SparqlQueryResults;
 import org.hadatac.console.http.GenericSparqlQuery;
 
+import com.hp.hpl.jena.update.UpdateExecutionFactory;
+import com.hp.hpl.jena.update.UpdateFactory;
+import com.hp.hpl.jena.update.UpdateProcessor;
+import com.hp.hpl.jena.update.UpdateRequest;
+
 public class NewDeployment extends Controller {
 	
     public static String PREFIXES = 
@@ -118,6 +123,13 @@ public class NewDeployment extends Controller {
     	return host + "/hadatac/kb/" + category + "/" + CONSOLE_ID + "/" + metadataId + "/" ;   
     }
     
+    public static void sparqlUpdate(String query) {
+        UpdateRequest request = UpdateFactory.create(query);
+        UpdateProcessor processor = UpdateExecutionFactory.createRemote(request, 
+        		Play.application().configuration().getString("hadatac.solr.triplestore") + "/store/sparql");
+        processor.execute();
+    } 
+    
     // for /metadata HTTP GET requests
     public static Result index() {
     	return ok(newDeployment.render(Form.form(DeploymentForm.class), 
@@ -146,7 +158,7 @@ public class NewDeployment extends Controller {
     public static Result processForm() {
         Form<DeploymentForm> form = Form.form(DeploymentForm.class).bindFromRequest();
         DeploymentForm data = form.get();
-        DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mmZ");
+        DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
         String dateString = df.format(data.getStartDateTime());
         String insert = "";
     	insert += PREFIXES;
@@ -158,14 +170,16 @@ public class NewDeployment extends Controller {
     	insert += DETECTOR_PREDICATE + "<" + data.getDetector() + "> ;   ";
        	insert += START_TIME_PREDICATE + "\"" + dateString + START_TIME_XMLS + "  "; 
     	insert += LINE_LAST;
-    	GenericSparqlQuery query = new GenericSparqlQuery();
-    	String result = "";
-    	try {
+    	//GenericSparqlQuery query = new GenericSparqlQuery();
+    	//String result = "";
+    	System.out.println(insert);
+    	sparqlUpdate(insert); 
+    	/* try {
     		result = query.execute(insert, true);
     	} catch (Exception e) {
     		System.out.println(result);
     		e.printStackTrace();
-    	}
+    	} */
         if (form.hasErrors()) {
         	System.out.println("HAS ERRORS");
             return badRequest(newDeployment.render(form,
