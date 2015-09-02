@@ -9,7 +9,6 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.io.File;
 import java.io.IOException;
 
 import play.*;
@@ -24,6 +23,8 @@ import org.hadatac.console.views.html.measurements.*;
 import org.hadatac.data.loader.ccsv.Parser;
 import org.hadatac.data.loader.util.Arguments;
 import org.hadatac.data.loader.util.FileFactory;
+import org.hadatac.data.model.DatasetParsingResult;
+import org.hadatac.utils.Feedback;
 import org.kohsuke.args4j.Option;
 
 public class LoadCCSV extends Controller {
@@ -41,6 +42,7 @@ public class LoadCCSV extends Controller {
     }
 
     public static String playLoadCCSV() {
+    	DatasetParsingResult result;
         String message = "";
 		Arguments arguments = new Arguments();
 		arguments.setInputPath(UPLOAD_NAME);
@@ -60,10 +62,14 @@ public class LoadCCSV extends Controller {
 			if (arguments.getInputType().equals("CCSV")) {
 				Parser parser = new Parser();
 				if (arguments.isPv()) {
-					parser.validate(files);
+					result = parser.validate(Feedback.WEB, files);
+					message += result.getMessage();
 				} else {
-					parser.validate(files);
-					parser.index();
+					result = parser.validate(Feedback.WEB, files);
+					message += result.getMessage();
+					if (result.getStatus() == 0) {
+						parser.index(Feedback.WEB);
+					}
 				}
 			}
 			
