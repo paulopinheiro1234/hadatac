@@ -24,7 +24,7 @@ import org.hadatac.utils.Feedback;
 
 public class LoadKB extends Controller {
 
-	private static final String UPLOAD_NAME = "uploads/hasneto-spreadsheet.xls";
+	private static final String UPLOAD_NAME = "tmp/uploads/hasneto-spreadsheet.xls";
 	
     public static Result loadKB(String oper) {
 	return ok(loadKB.render(oper, ""));
