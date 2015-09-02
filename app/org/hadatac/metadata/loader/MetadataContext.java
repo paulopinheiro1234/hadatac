@@ -22,6 +22,7 @@ import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.hadatac.metadata.loader.NameSpace;
 import org.hadatac.metadata.loader.NameSpaces;
+import org.hadatac.utils.Feedback;
 import org.w3c.dom.Document;
 import org.xml.sax.InputSource;
 

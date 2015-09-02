@@ -1,0 +1,19 @@
+@()
+
+@import helper._
+@import org.hadatac.console.views.html._
+
+@main("Deployment Management") {
+    <div class="container-fluid">
+      <div class="row">
+         <div class="navbar-collapse collapse navbar-secondary">
+            <B>Options</B>: 
+          	<a href="@org.hadatac.console.controllers.deployments.routes.NewDeployment.index()" class="btn btn-primary" role="button">Create New Deployment</a>
+       		<a href="@org.hadatac.console.controllers.deployments.routes.CloseDeployment.index()" class="btn btn-primary" role="button">Close Deployment</a>
+       		<a href="@org.hadatac.console.controllers.deployments.routes.ViewDeployment.index()" class="btn btn-primary" role="button">View Deployment</a>
+       		<a href="@org.hadatac.console.controllers.deployments.routes.URIGenerator.index()" class="btn btn-primary" role="button">Register URI Generator</a>
+       		<a href="@org.hadatac.console.controllers.deployments.routes.DeleteDeployment.index()" class="btn btn-primary" role="button">Delete Deployment</a>
+         </div>
+      </div>
+   </div>
+}

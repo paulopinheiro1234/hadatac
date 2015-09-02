@@ -8,6 +8,7 @@ import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.hadatac.metadata.loader.ValueCellProcessing;
 import org.hadatac.metadata.model.SpreadsheetParsingResult;
+import org.hadatac.utils.Feedback;
 
 public class SheetProcessing {
 
