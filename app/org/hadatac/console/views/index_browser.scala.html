@@ -177,7 +177,11 @@
 	          	</div>
 	            	@for((collection, query_results) <- documentMap) {
 	          			<div class="tab-pane">
-	          				@measurement_details(query_results.the_docs(0))
+	          				@if(query_results.the_docs.isEmpty) {
+	          					<script>alert("You have no measurements.");</script>
+							} else {
+								@measurement_details(query_results.the_docs(0))
+							}
 	          			</div>
 	          		}
 	          </div>

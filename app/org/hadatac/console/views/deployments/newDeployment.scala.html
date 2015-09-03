@@ -1,0 +1,86 @@
+@(deployForm: Form[org.hadatac.console.models.DeploymentForm], 
+  thePlatforms : org.hadatac.console.models.SparqlQueryResults,
+  theInstruments : org.hadatac.console.models.SparqlQueryResults,
+  theDetectors : org.hadatac.console.models.SparqlQueryResults)
+
+@import helper._
+@import org.hadatac.console.views.html._
+@import org.hadatac.console.views.html.deployments._
+@import org.hadatac.console.controllers.deployments._
+
+<head> 
+    <script type="text/javascript">
+       var datefield=document.createElement("input")
+       datefield.setAttribute("type", "date")
+       if (datefield.type!="date"){ //if browser doesn't support input type="date", load files for jQuery UI Date Picker
+           document.write('<link href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8/themes/base/jquery-ui.css" rel="stylesheet" type="text/css" />\n')
+           document.write('<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.4/jquery.min.js"><\/script>\n')
+           document.write('<script src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8/jquery-ui.min.js"><\/script>\n') 
+        }
+    </script>
+ 
+    <script>
+       if (datefield.type!="date"){ //if browser doesn't support input type="date", initialize date picker widget:
+       jQuery(function($){ //on document.ready
+           $('#birthday').datepicker();
+           })
+       }
+    </script>
+</head>
+
+@main("New Deployment") {
+  <div class="container">
+    <h2>New Deployment</h2>
+
+    <form class="form-horizontal" method="post" action="@org.hadatac.console.controllers.deployments.routes.NewDeployment.processForm">
+
+    <div class="form-group">
+         <label>Platform</label> 
+         <select  class="form-control col-sm-6" name="platform">
+            @for((k, triple) <- thePlatforms.sparqlResults){
+               @defining(triple.generateID()) {itemID =>
+                   @defining(triple.get("modelName").replaceAll("[\\W]|_", "")) {cleanName =>
+                       <option value="@triple.get("platURI")">@triple.get("modelName") (@triple.get("sn"))</option>         
+                }
+              }
+            }
+         </select>
+
+     </div>
+	 <div class="form-group">
+         <label>Instrument</label>
+         <select class="form-control col-sm-6" name="instrument">
+            @for((k, triple) <- theInstruments.sparqlResults){
+               @defining(triple.generateID()) {itemID =>
+                   @defining(triple.get("modelName").replaceAll("[\\W]|_", "")) {cleanName =>
+                       <option value="@triple.get("instURI")">@triple.get("modelName") (@triple.get("sn"))</option>         
+                }
+              }
+            }
+         </select>
+     </div>
+	 <div class="form-group">
+         <label>Detector(s)</label>
+         <select class="form-control col-sm-6" name="detector">
+            @for((k, triple) <- theDetectors.sparqlResults){
+               @defining(triple.generateID()) {itemID =>
+                   @defining(triple.get("modelName").replaceAll("[\\W]|_", "")) {cleanName =>
+                       <option value="@triple.get("detURI")">@triple.get("modelName") (@triple.get("sn"))</option>         
+                }
+              }
+            }
+         </select>
+     </div>
+	 <div class="form-group">
+         <label for="startdate">Start Date/Time</label><br> 
+         <input class="col-sm-3" " type="date" id="startdate" name="startDateTime" />
+      </div>
+
+      <div class="form-group class="col-sm-6 col-offset-3">
+          <input class="btn btn-success" role="button" type="submit" value="Create" />
+          <a href="@org.hadatac.console.controllers.deployments.routes.DeploymentManagement.index()" class="btn btn-danger" role="button">Cancel</a>
+      </div>
+   </form>    
+</div>
+
+}

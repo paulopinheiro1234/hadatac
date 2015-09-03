@@ -17,14 +17,14 @@ import play.libs.*;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.hadatac.console.views.html.triplestore.*;
-import org.hadatac.metadata.loader.Feedback;
 import org.hadatac.metadata.loader.MetadataContext;
 import org.hadatac.metadata.loader.NameSpaces;
 import org.hadatac.metadata.loader.SpreadsheetProcessing;
+import org.hadatac.utils.Feedback;
 
 public class LoadKB extends Controller {
 
-	private static final String UPLOAD_NAME = "uploads/hasneto-spreadsheet.xls";
+	private static final String UPLOAD_NAME = "tmp/uploads/hasneto-spreadsheet.xls";
 	
     public static Result loadKB(String oper) {
 	return ok(loadKB.render(oper, ""));

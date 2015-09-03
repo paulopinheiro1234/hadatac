@@ -15,10 +15,10 @@ public class Arguments {
 	private String inputPath;
 	
 	@Option(name="-o",required=false,usage="output path for normalized csv",metaVar="output_path")
-	private String outputPath = "example/out/";
+	private String outputPath = "tmp/";
 	
 	@Option(name="-t",required=false,usage="temporary path",metaVar="temp_path")
-	private String tempPath = "example/proc/";
+	private String tempPath = "tmp/";
 	
 	@Option(name="-l",required=false,usage="log path",metaVar="log_path")
 	private String logPath = "logs/";

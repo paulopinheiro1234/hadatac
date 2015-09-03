@@ -22,6 +22,7 @@ import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.hadatac.metadata.loader.NameSpace;
 import org.hadatac.metadata.loader.NameSpaces;
+import org.hadatac.utils.Feedback;
 import org.w3c.dom.Document;
 import org.xml.sax.InputSource;
 
@@ -194,7 +195,7 @@ public class MetadataContext {
 	    	String abbrev = entry.getKey().toString();
 	    	String nsURL = entry.getValue().getURL();
 	    	if ((abbrev != null) && (nsURL != null) && (entry.getValue().getType() != null) && !nsURL.equals("")) {
-	    		String filePath = "copy" + "-" + abbrev.replace(":","");
+	    		String filePath = NameSpaces.CACHE_PATH + "copy" + "-" + abbrev.replace(":","");
 	    		message += Feedback.print(mode, "   Uploading " + filePath);
 	    		for (int i = filePath.length(); i < 50; i++) {
 	    			message += Feedback.print(mode, ".");

@@ -21,38 +21,55 @@
         <div class="col-md-1 col-xs-0"></div>
         <div class="col-md-3 col-xs-2">
            <h4>Data Search/Download</h4>  
-           <a href="" class="btn btn-primary btn-block" role="button">Faceted Search of Data Collections</a>
-           <a href="@org.hadatac.console.controllers.routes.Application.index()" class="btn btn-primary btn-block" role="button">Faceted Search of Measurements</a>
-           <a href="@org.hadatac.console.controllers.routes.Spatial.index()" class="btn btn-primary btn-block" role="button">Spatial Search of Measurements</a>
-           <a href="@org.hadatac.console.controllers.routes.Metadata.index()" class="btn btn-primary btn-block" role="button">Browse Metadata</a>
-           <a href="" class="btn btn-primary btn-block" role="button">Collaboration Insight</a>
+           <a href="" class="btn btn-primary btn-block" role="button">Search Data Collections</a>
+           <a href="@org.hadatac.console.controllers.routes.Application.index()" class="btn btn-primary btn-block" role="button">Search Measurements</a>
+        @*   <a href="@org.hadatac.console.controllers.routes.Spatial.index()" class="btn btn-primary btn-block" role="button">Spatial Search of Measurements</a>
+        *@   <a href="@org.hadatac.console.controllers.routes.Metadata.index()" class="btn btn-primary btn-block" role="button">Browse Metadata</a>
+           <a href="" class="btn btn-primary btn-block disabled" role="button">Show Collaboration Insight</a>
         </div>
 @*        @subjectPresent() {
           @defining(AuthApplication.getLocalUser(session())) { user =>
 *@
           <div class="col-md-3 col-xs-2">
               <h4>Data Upload</h4>  
-              <a href="" class="btn btn-primary btn-block" role="button">Create CCSV from CSV</a>
-              <a href="" class="btn btn-primary btn-block" role="button">Upload CCSV</a>
-              <a href="" class="btn btn-primary btn-block" role="button">Delete Data Collection</a>
-              <a href="" class="btn btn-primary btn-block" role="button">Set Data Collection access permission</a>
+              <a href="@org.hadatac.console.controllers.deployments.routes.DeploymentManagement.index()" class="btn btn-primary btn-block" role="button">Manage Deployments</a>
+              <a href="" class="btn btn-primary btn-block disabled" role="button">Manage Data Collections</a>
+              <a href="" class="btn btn-primary btn-block disabled" role="button">Create CCSV from CSV</a>
+              <a href="@org.hadatac.console.controllers.measurements.routes.LoadCCSV.loadCCSV("init")" class="btn btn-primary btn-block" role="button">Upload CCSV</a>
            </div>
            <div class="col-md-2 col-xs-2">
               <h4>KB Management</h4>  
               <a href="@org.hadatac.console.controllers.triplestore.routes.Clean.clean("init")" class="btn btn-primary btn-block" role="button">Clean KB</a>
               <a href="@org.hadatac.console.controllers.triplestore.routes.LoadOnt.loadOnt("init")" class="btn btn-primary btn-block" role="button">Upload Ontologies</a>
               <a href="@org.hadatac.console.controllers.triplestore.routes.LoadKB.loadKB("init")" class="btn btn-primary btn-block" role="button">Upload Facts</a>
-              <a href="" class="btn btn-primary btn-block" role="button">Manage Users</a>
+              <a href="" class="btn btn-primary btn-block disabled" role="button">Manage Users</a>
            </div>
 @*           }
         }
 *@
         <div class="col-md-1 col-xs-0"></div>
       </div>
-    </div>
-    <div class="row">
-       <div class="col-md-1 col-xs-0"></div>
-       <div class="col-md-8 col-xs-0">
+      <div class="row">
+         <div class="col-md-1 col-xs-0"></div>
+         <div class="col-md-8 col-xs-0">
+             <hr>
+             <h4>Documentation</h4>
+         </div>
+         <div class="col-md-1 col-xs-0"></div>
+      </div>
+      <div class="row">
+         <div class="col-md-1 col-xs-0"></div>
+         <div class="col-md-3 col-xs-0">
+             <a href="https://github.com/paulopinheiro1234/hadatac/wiki/HADataC-Tutorial" class="btn btn-warning btn-block" role="button">Get Started</a>
+         </div>
+         <div class="col-md-3 col-xs-0">
+             <a href="https://github.com/paulopinheiro1234/hadatac/wiki/HADataC-User-Guide" class="btn btn-default btn-block" role="button">User Guide</a>
+         </div>
+         <div class="col-md-2 col-xs-0"></div>
+      </div>
+      <div class="row">
+         <div class="col-md-1 col-xs-0"></div>
+         <div class="col-md-8 col-xs-0">
              <hr>
              <h4>Terminology:</h4>
              <ul>
@@ -60,9 +77,8 @@
                <li>CSV: common separated value</li>
                <li>KB: knowledge base</li>
              </ul>
-             <hr>
-             (c) 2015, HADataC.org
-        </div>
-       <div class="col-md-1 col-xs-0"></div>
+          </div>
+         <div class="col-md-1 col-xs-0"></div>
+      </div>
     </div>
 }

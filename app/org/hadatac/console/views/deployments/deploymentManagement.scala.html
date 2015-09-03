@@ -1,0 +1,46 @@
+@(results : org.hadatac.console.models.SparqlQueryResults)
+
+@import helper._
+@import org.hadatac.console.views.html._
+
+@main("Deployment Management") {
+
+    <h2>Deployment Management</h2>
+    
+    <h3>Management options</h3>
+
+    <div class="container-fluid">
+      <div class="row">
+         <div class="navbar-collapse collapse navbar-secondary">
+          	<a href="@org.hadatac.console.controllers.deployments.routes.NewDeployment.index()" class="btn-sm btn-primary" role="button">Create Regular Deployment</a>
+          	<a href="@org.hadatac.console.controllers.deployments.routes.NewDeployment.index()" class="btn-sm btn-primary" role="button">Create Legacy Deployment</a>
+       		<a href="@org.hadatac.console.controllers.deployments.routes.URIGenerator.index()" class="btn-sm btn-primary" role="button">List Past Deployments</a>
+       		<a href="@org.hadatac.console.controllers.deployments.routes.URIGenerator.index()" class="btn-sm btn-primary" role="button">Register URI Generator</a>
+         </div>
+      </div>
+   </div>
+
+   <hr>
+   
+   <h3>Current Deployments</h3>
+   
+    <div class="container-fluid">
+        <table class="table">
+            <thead>
+                 <tr>
+                    <th>Platform</th>
+                    <th>Instrument</th>
+                    <th>Start DateTime</th>
+                    <th>Operations</th>
+                 </tr>
+            </thead>
+            <tbody>
+              @for((k, triple) <- results.sparqlResults){
+                  @deployment_entry(triple, true)
+              }
+            </tbody>
+        </table>
+    </div>
+ 
+
+}

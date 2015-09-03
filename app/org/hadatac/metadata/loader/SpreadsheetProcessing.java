@@ -14,10 +14,13 @@ import org.hadatac.metadata.loader.Loader;
 import org.hadatac.metadata.loader.NameSpaces;
 import org.hadatac.metadata.loader.SheetProcessing;
 import org.hadatac.metadata.model.SpreadsheetParsingResult;
+import org.hadatac.utils.Feedback;
 
 public class SpreadsheetProcessing {
 	
 	public static final String KB_FORMAT = "text/turtle";
+	
+	public static final String TTL_DIR = "tmp/ttl/";
 	
 	public static String generateTTL(int mode, MetadataContext mc, String xlsName) {
 
@@ -69,7 +72,7 @@ public class SpreadsheetProcessing {
 		String fileName = "";
 		try {
 			String timeStamp = new SimpleDateFormat("yyyyMMdd-HHmmss").format(new Date());
-			fileName = "HASNetO-" + timeStamp + ".ttl";
+			fileName = TTL_DIR + "HASNetO-" + timeStamp + ".ttl";
 			FileUtils.writeStringToFile(new File(fileName), ttl);
 		} catch (IOException e) {
 			e.printStackTrace();

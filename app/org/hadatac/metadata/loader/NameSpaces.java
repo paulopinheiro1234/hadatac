@@ -12,9 +12,12 @@ import java.net.URL;
 import org.apache.commons.io.FileUtils;
 import org.hadatac.metadata.loader.NameSpace;
 import org.hadatac.metadata.loader.NameSpaces;
+import org.hadatac.utils.Feedback;
 
 public class NameSpaces {
 
+	public static String CACHE_PATH = "tmp/cache/";
+	
 	public static Map<String, NameSpace> table = new HashMap<String, NameSpace>(); 
 
 	private static NameSpaces instance = null;
@@ -112,7 +115,7 @@ public class NameSpaces {
 	    	String abbrev = entry.getKey().toString();
 	    	String nsURL = entry.getValue().getURL();
 	    	if (nsURL != null && !nsURL.equals("") && !nsURL.equals(":")) {
-	    		String filePath = "copy" + "-" + abbrev.replace(":","");
+	    		String filePath = CACHE_PATH + "copy" + "-" + abbrev.replace(":","");
 	    		message += Feedback.print(mode, "   Creating local copy of " + abbrev + ". ");		
 			    for (int i = abbrev.length(); i < 36; i++) {
 			    	message += Feedback.print(mode, ".");

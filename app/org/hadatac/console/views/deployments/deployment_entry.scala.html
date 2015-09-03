@@ -1,0 +1,31 @@
+@(triple : org.hadatac.console.models.TripleDocument,
+  flip : Boolean)
+@*****************************
+   ?platform 
+   ?instrument 
+   ?date
+*****************************@
+
+@if(flip){
+    <tr>
+       <td>@triple.get("platform")</td> 
+       <td>@triple.get("instrument")</td>
+       <td>@triple.get("date")</td>
+       <td>
+          <a href="@org.hadatac.console.controllers.deployments.routes.ViewDeployment.index()" class="btn-xs btn-primary" role="button">View</a>
+          <a href="@org.hadatac.console.controllers.deployments.routes.CloseDeployment.index()" class="btn-xs btn-primary" role="button">Close</a>
+          <a href="@org.hadatac.console.controllers.deployments.routes.DeleteDeployment.index()" class="btn-xs btn-primary" role="button">Delete</a>
+       </td>
+    </tr>
+} else {
+    <tr>
+        <td>@triple.get("instrument")</td> 
+        <td>@triple.get("platform")</td>
+        <td>@triple.get("date")</td>
+       <td>
+          <a href="@org.hadatac.console.controllers.deployments.routes.ViewDeployment.index()" class="btn-xs btn-primary" role="button">View</a>
+          <a href="@org.hadatac.console.controllers.deployments.routes.CloseDeployment.index()" class="btn-xs btn-primary" role="button">Close</a>
+          <a href="@org.hadatac.console.controllers.deployments.routes.DeleteDeployment.index()" class="btn-xs btn-primary" role="button">Delete</a>
+       </td>
+    </tr>
+}

@@ -3,10 +3,13 @@
 # ~~~~
 
 # Home page
-GET     /hadatac/                               org.hadatac.console.controllers.Portal.index()
-POST    /hadatac/                               org.hadatac.console.controllers.Portal.postIndex()
-GET     /hadatac/measurements                   org.hadatac.console.controllers.Application.index(p: Int ?= 1, q: String ?= "*:*")
-POST    /hadatac/measurements                   org.hadatac.console.controllers.Application.postIndex(p: Int ?= 1, q: String ?= "*:*")
+GET	/hadatac/                               org.hadatac.console.controllers.Portal.index()
+POST	/hadatac/                               org.hadatac.console.controllers.Portal.postIndex()
+GET	/hadatac/measurements                   org.hadatac.console.controllers.Application.index(p: Int ?= 1, q: String ?= "*:*")
+POST	/hadatac/measurements                   org.hadatac.console.controllers.Application.postIndex(p: Int ?= 1, q: String ?= "*:*")
+GET	/hadatac/measurements/loadccsv		org.hadatac.console.controllers.measurements.LoadCCSV.loadCCSV(oper: String)
+POST	/hadatac/measurements/loadccsv		org.hadatac.console.controllers.measurements.LoadCCSV.postLoadCCSV(oper: String)
+POST	/hadatac/measurements/loadccsv/upload	org.hadatac.console.controllers.measurements.LoadCCSV.uploadFile
 GET	/hadatac/spatial			org.hadatac.console.controllers.Spatial.index()
 POST	/hadatac/spatial			org.hadatac.console.controllers.Spatial.postIndex()
 GET	/hadatac/metadata  			org.hadatac.console.controllers.Metadata.index()
@@ -25,8 +28,8 @@ GET	/hadatac/metadata/detectorlist		org.hadatac.console.controllers.DetectorList
 POST	/hadatac/metadata/detectorlist		org.hadatac.console.controllers.DetectorList.postIndex()
 GET	/hadatac/metadata/entity		org.hadatac.console.controllers.Entity.index()
 POST	/hadatac/metadata/entity		org.hadatac.console.controllers.Entity.postIndex()
-GET	/hadatac/metadata/entitycharacteristic        org.hadatac.console.controllers.EntityCharacteristic.index()
-POST	/hadatac/metadata/entitycharacteristic        org.hadatac.console.controllers.EntityCharacteristic.postIndex()
+GET	/hadatac/metadata/entitycharacteristic	org.hadatac.console.controllers.EntityCharacteristic.index()
+POST	/hadatac/metadata/entitycharacteristic	org.hadatac.console.controllers.EntityCharacteristic.postIndex()
 GET	/hadatac/metadata/characteristic        org.hadatac.console.controllers.Characteristic.index()
 POST	/hadatac/metadata/characteristic        org.hadatac.console.controllers.Characteristic.postIndex()
 GET	/hadatac/metadata/unit                  org.hadatac.console.controllers.Unit.index()
@@ -61,6 +64,22 @@ GET     /hadatac/accounts/merge                    org.hadatac.console.controlle
 POST    /hadatac/accounts/merge                    org.hadatac.console.controllers.Account.doMerge
 GET     /hadatac/login/password/forgot             org.hadatac.console.controllers.Signup.forgotPassword(email: String ?= "")
 POST    /hadatac/login/password/forgot             org.hadatac.console.controllers.Signup.doForgotPassword
+
+# deployment management
+GET	    /hadatac/deployments/		    	       org.hadatac.console.controllers.deployments.DeploymentManagement.index()
+POST	/hadatac/deployments/     			       org.hadatac.console.controllers.deployments.DeploymentManagement.postIndex()
+GET	    /hadatac/deployments/new			       org.hadatac.console.controllers.deployments.NewDeployment.index()
+POST	/hadatac/deployments/new			       org.hadatac.console.controllers.deployments.NewDeployment.postIndex()
+POST 	/hadatac/deployments/new/form		       org.hadatac.console.controllers.deployments.NewDeployment.processForm()
+GET	    /hadatac/deployments/close			       org.hadatac.console.controllers.deployments.CloseDeployment.index()
+POST	/hadatac/deployments/close		           org.hadatac.console.controllers.deployments.CloseDeployment.postIndex()
+GET	    /hadatac/deployments/delete	    	       org.hadatac.console.controllers.deployments.DeleteDeployment.index()
+POST	/hadatac/deployments/delete		           org.hadatac.console.controllers.deployments.DeleteDeployment.postIndex()
+GET	    /hadatac/deployments/view			       org.hadatac.console.controllers.deployments.ViewDeployment.index()
+POST	/hadatac/deployments/view	               org.hadatac.console.controllers.deployments.ViewDeployment.postIndex()
+GET	    /hadatac/deployments/urigenerator		   org.hadatac.console.controllers.deployments.URIGenerator.index()
+POST	/hadatac/deployments/urigenerator	       org.hadatac.console.controllers.deployments.URIGenerator.postIndex()
+POST 	/hadatac/deployments/urigenerator/form	   org.hadatac.console.controllers.deployments.URIGenerator.processForm()
 
 # metadata store management URLs
 GET     /hadatac/ts/clean                          org.hadatac.console.controllers.triplestore.Clean.clean(oper: String)
