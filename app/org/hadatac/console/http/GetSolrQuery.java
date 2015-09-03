@@ -3,13 +3,15 @@ package org.hadatac.console.http;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.URL;
 import java.net.URLEncoder;
 import java.util.Iterator;
 import java.util.Scanner;
 import java.util.TreeMap;
 
 import org.hadatac.console.models.Query;
-
 import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
@@ -36,13 +38,14 @@ public class GetSolrQuery {
     //collection_urls.
     //this.solr_query should NOT BE USED OUTSIDE OF THIS CLASS UNLESS YOU KNOW WHAT YOU'RE DOING
     //I'm mostly talking to myself here.
-    public GetSolrQuery (Query query) {
+    public GetSolrQuery (Query query, String q) {
     	addCollectionUrls();
     	
     	for (String collection : collection_urls.keySet()){
     		this.solr_query = new StringBuffer();
     		this.solr_query.append(collection_urls.get(collection));
-            this.solr_query.append("&q=*:*");
+            //this.solr_query.append("&q=*:*");
+    		this.solr_query.append("&q=" + q);
             
             String quote = new String();
     		try {
@@ -182,7 +185,7 @@ public class GetSolrQuery {
     //Output: Returns JSON in the form of a string. Currently does not handle http errors
     //		  very gracefully. Need to change this.
     //Postconditions: None
-    public String executeQuery(String collection, int page, int size) throws IllegalStateException, IOException{
+    public String executeQuery(String collection, int page, int size) throws IllegalStateException, IOException, URISyntaxException{
     	CloseableHttpClient httpClient = HttpClients.createDefault();
         HttpGet get = new HttpGet(this.collection_urls.get(collection));
         
@@ -190,15 +193,13 @@ public class GetSolrQuery {
         try
         {
         	HttpClient client = new DefaultHttpClient();
-        	HttpGet request = new HttpGet(this.list_of_queries.get(collection).toString().replace(" ", "%20") + "&start=" + (page-1)*size + "&rows=" + size + "&facet=true&facet.field=unit&facet.pivot=entity,characteristic&facet.pivot=platform_name,instrument_model");
+        	URL url = new URL(this.list_of_queries.get(collection).toString() + "&start=" + (page-1)*size + "&rows=" + size + "&facet=true&facet.field=unit&facet.pivot=entity,characteristic&facet.pivot=platform_name,instrument_model");
+        	URI uri = new URI(url.getProtocol(), url.getUserInfo(), url.getHost(), url.getPort(), url.getPath(), url.getQuery(), url.getRef());
+        	HttpGet request = new HttpGet(uri.toASCIIString());
         	HttpResponse response = client.execute(request);
             System.out.println(response);
             StringWriter writer = new StringWriter();
             IOUtils.copy(response.getEntity().getContent(), writer, "utf-8");
-            
-            System.out.println("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! START WRITER");
-            System.out.println(writer.toString());
-            System.out.println("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! END WRITER");
             
             return writer.toString();
             
@@ -208,7 +209,7 @@ public class GetSolrQuery {
             //request.close();
         }
     }
-    public String executeQuery(String collection) throws IllegalStateException, IOException{
+    public String executeQuery(String collection) throws IllegalStateException, IOException, URISyntaxException{
     	return executeQuery(collection, 1, 20);
     }// /executeQuery()
 }
