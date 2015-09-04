@@ -4,17 +4,20 @@ import org.hadatac.console.http.GetSolrQuery;
 import org.hadatac.console.http.JsonHandler;
 
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.util.TreeMap;
 
 import org.hadatac.console.models.FacetsWithCategories;
 import org.hadatac.console.models.SpatialQuery;
 import org.hadatac.console.models.SpatialQueryResults;
+
 //import models.SpatialQuery;
 //import models.SpatialQueryResults;
 import play.data.DynamicForm;
 import play.data.Form;
 import play.mvc.Controller;
 import play.mvc.Result;
+
 import org.hadatac.console.views.formdata.FacetFormData;
 import org.hadatac.console.views.html.index_browser;
 import org.hadatac.console.views.html.hadatac_message;
@@ -61,7 +64,8 @@ public class Application extends Controller {
     	return redirect("/");
     }
 
-    public static Result index(int p) {
+    public static Result index(int p, String q) {
+    	System.out.println("!!!!!! Application.index");
     	Form<FacetFormData> formData = Form.form(FacetFormData.class).fill(facet_form);
         JsonHandler jh = new JsonHandler();
         String query_json = "";
@@ -69,7 +73,7 @@ public class Application extends Controller {
         
         //Get query using http.GetSolrQuery
         SpatialQuery query = new SpatialQuery();
-        GetSolrQuery query_submit = new GetSolrQuery(query);
+        GetSolrQuery query_submit = new GetSolrQuery(query, q);
         TreeMap<String, SpatialQueryResults> query_results_list = new TreeMap<String, SpatialQueryResults>();
     	String final_query = null;
     	
@@ -77,7 +81,7 @@ public class Application extends Controller {
     		final_query = query_submit.list_of_queries.get(collection).toString();
             try {
     			query_json = query_submit.executeQuery(collection, p, 20);
-    		} catch (IllegalStateException | IOException e1) {
+    		} catch (IllegalStateException | IOException | URISyntaxException e1) {
     			e1.printStackTrace();
     		}
             SpatialQueryResults query_results = new SpatialQueryResults(query_json);
@@ -95,7 +99,7 @@ public class Application extends Controller {
         //return ok(hadatac_message.render("HADataC", "Your HADataC instance does not contain any measurements to be browser. Please go ahead and index some."));
     }
 
-    public static Result postIndex(int p) {
+    public static Result postIndex(int p, String q) {
     	String query_json = "";
     	JsonHandler jh = new JsonHandler();
     	String subject = new String();
@@ -112,6 +116,8 @@ public class Application extends Controller {
     		if (category.contains("[")) {
     			int index = category.indexOf("[");
     			field_facet_for_query.addFacet(category.substring(0,index), formData.data().get(category));
+    			System.out.println("!!! category: " + category);
+    			System.out.println("!!! get(category): " + formData.data().get(category));
     		} else {
     			subject = formData.data().get(category);
     		}
@@ -122,7 +128,7 @@ public class Application extends Controller {
     	SpatialQuery query = new SpatialQuery(subject, predicate, field_facet_for_query, query_facets,
     						    pivot_facets, range_facets, cluster_facets);
     	
-    	GetSolrQuery query_submit = new GetSolrQuery(query);
+    	GetSolrQuery query_submit = new GetSolrQuery(query, q);
     	
     	//TODO loop over all queries in query_submit.list_of_queries
     	TreeMap<String, SpatialQueryResults> query_results_list = new TreeMap<String, SpatialQueryResults>();
@@ -132,7 +138,7 @@ public class Application extends Controller {
     		final_query = query_submit.list_of_queries.get(collection).toString();
             try {
     			query_json = query_submit.executeQuery(collection, p, 20);
-    		} catch (IllegalStateException | IOException e1) {
+    		} catch (IllegalStateException | IOException | URISyntaxException e1) {
     			e1.printStackTrace();
     		}
             SpatialQueryResults query_results = new SpatialQueryResults(query_json);

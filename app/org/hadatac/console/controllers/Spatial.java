@@ -4,6 +4,7 @@ import org.hadatac.console.http.GetSolrQuery;
 import org.hadatac.console.http.JsonHandler;
 
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.TreeMap;
@@ -11,10 +12,12 @@ import java.util.TreeMap;
 import org.hadatac.console.models.FacetsWithCategories;
 import org.hadatac.console.models.SpatialQuery;
 import org.hadatac.console.models.SpatialQueryResults;
+
 import play.data.DynamicForm;
 import play.data.Form;
 import play.mvc.Controller;
 import play.mvc.Result;
+
 import org.hadatac.console.views.formdata.FacetFormData;
 import org.hadatac.console.views.html.spatial_faceting;
 
@@ -57,7 +60,7 @@ public class Spatial extends Controller {
         
         //Get query using http.GetSolrQuery
         SpatialQuery query = new SpatialQuery();
-        GetSolrQuery query_submit = new GetSolrQuery(query);
+        GetSolrQuery query_submit = new GetSolrQuery(query, "*:*");
         TreeMap<String, SpatialQueryResults> query_results_list = new TreeMap<String, SpatialQueryResults>();
     	String final_query = null;
     	
@@ -66,7 +69,7 @@ public class Spatial extends Controller {
     		String query_json = null;
             try {
     			query_json = query_submit.executeQuery(collection);
-    		} catch (IllegalStateException e1) {
+    		} catch (IllegalStateException | URISyntaxException e1) {
 			e1.printStackTrace();
 		} catch (IOException e2) {
     			e2.printStackTrace();
@@ -110,7 +113,7 @@ public class Spatial extends Controller {
     	SpatialQuery query = new SpatialQuery(named_geographic_location, spatial_predicate, field_facet_for_query, query_facets,
 			    pivot_facets, range_facets, cluster_facets);
 
-    	GetSolrQuery query_submit = new GetSolrQuery(query);
+    	GetSolrQuery query_submit = new GetSolrQuery(query, "*:*");
 
     	//TODO loop over all queries in query_submit.list_of_queries
     	TreeMap<String, SpatialQueryResults> query_results_list = new TreeMap<String, SpatialQueryResults>();
@@ -121,7 +124,7 @@ public class Spatial extends Controller {
     			String query_json = null;
     			try {
     				query_json = query_submit.executeQuery(collection);
-    			} catch (IllegalStateException e1) {
+    			} catch (IllegalStateException | URISyntaxException e1) {
     				e1.printStackTrace();
 	    		} catch (IOException e2) {
 				e2.printStackTrace();

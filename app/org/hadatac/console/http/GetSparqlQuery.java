@@ -8,7 +8,6 @@ import java.util.Scanner;
 import java.util.TreeMap;
 
 import org.hadatac.console.models.SparqlQuery;
-
 import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
@@ -24,7 +23,7 @@ public class GetSparqlQuery {
     public StringBuffer sparql_query = new StringBuffer();
     public TreeMap<String, StringBuffer> list_of_queries = new TreeMap<String, StringBuffer>();
     public String collection;
-    private int numThings = 13;
+    private int numThings = 14;
     public String[] thingTypes = new String[numThings];
     
     public GetSparqlQuery () {} 
@@ -101,6 +100,7 @@ public class GetSparqlQuery {
         thingTypes[10] = "Units";
 	    thingTypes[11] = "SensingPerspectives";
 	    thingTypes[12] = "EntityCharacteristics";
+	    thingTypes[13] = "Deployments";
     }
     
     public String querySelector(String tabName){
@@ -286,6 +286,19 @@ public class GetSparqlQuery {
                     "   ?ec rdfs:label ?ecName .  " + 
                     "   ?ec <http://jefferson.tw.rpi.edu/ontology/hasneto.owl#ofEntity> ?entity .  " + 
                     "   ?ec <http://jefferson.tw.rpi.edu/ontology/hasneto.owl#ofCharacteristic> ?chara .  " + 
+                    "}";
+                break;
+            case "Deployments" : 
+                q = "PREFIX rdfs:<http://www.w3.org/2000/01/rdf-schema#>" + 
+                    "PREFIX owl: <http://www.w3.org/2002/07/owl#>" +
+                    "PREFIX prov: <http://www.w3.org/ns/prov#>  " +
+        	        "PREFIX vstoi: <http://hadatac.org/ont/vstoi#>  " +
+        	        "PREFIX hasneto: <http://hadatac.org/ont/hasneto#>  " +
+                    "SELECT ?platform ?instrument ?date WHERE { " + 
+                    "   ?dep a vstoi:Deployment . " + 
+                    "   ?dep vstoi:hasPlatform ?platform .  " + 
+                    "   ?dep hasneto:hasInstrument ?instrument .  " + 
+                    "   ?dep prov:startedAtTime ?date .  " + 
                     "}";
                 break;
             default :

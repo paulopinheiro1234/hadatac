@@ -18,7 +18,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class JsonHandler {
     
-    private String field_count_url = Play.application().configuration().getString("hadatac.solr.data") + "/measurement/browse?q=*%3A*&wt=json&facet=true&facet.field=characteristic&facet.field=entity&facet.field=unit&facet.field=platform_name&facet.field=instrument_model&rows=0";
+    private String field_count_url = Play.application().configuration().getString("hadatac.solr.data") + "/measurement/browse?wt=json&facet=true&facet.field=characteristic&facet.field=entity&facet.field=unit&facet.field=platform_name&facet.field=instrument_model&rows=0";
     public Map<String, HashMap<String, String>> categories_facets_and_counts = new HashMap<String, HashMap<String, String>>();
     public Map<String, ArrayList<String>> categories_and_facets = new HashMap<String, ArrayList<String>>();
 
@@ -26,7 +26,8 @@ public class JsonHandler {
 
     public Boolean getFieldCountJson() throws MalformedURLException, IOException{
     //public String getFieldCountJson() throws MalformedURLException, IOException{
-        InputStream in = new URL( field_count_url ).openStream();
+    	String q = "&q=*%3A*";
+        InputStream in = new URL( field_count_url + q ).openStream();
         String response = new String();
         try {
             response = IOUtils.toString( in );
