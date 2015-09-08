@@ -19,6 +19,7 @@ val appDependencies = Seq(
   "com.fasterxml.jackson.core" % "jackson-annotations" % "2.5.1",
   "org.apache.commons" % "commons-io" % "1.3.2",
   "org.apache.commons" % "commons-csv" % "1.1",
+  "commons-validator" % "commons-validator" % "1.4.1",
   "org.apache.httpcomponents" % "httpclient" % "4.3.6",
   "org.apache.httpcomponents" % "fluent-hc" % "4.3.6",
   "org.apache.poi" % "poi-ooxml" % "3.9",
