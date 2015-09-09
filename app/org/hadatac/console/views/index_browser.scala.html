@@ -51,9 +51,12 @@
 	        		
 		        	for (var i_pivot in json.facet_counts.facet_pivot[type]) {
 		        		var field1 = json.facet_counts.facet_pivot[type][i_pivot];
-		        		i++;
 		        		j = 0;
 		        		
+		        		if (i != 0) {
+		        			jsonTree += ' ,';
+		        		}
+		        		i++;
 		        		jsonTree += '{ "id": ' + i + ', "text": "' + field1.value + ' (' + field1.count + ')"';
 		        		jsonTree += ', "item": [ ';
 		        		for (var j_pivot in field1.pivot) {
