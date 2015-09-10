@@ -1,0 +1,18 @@
+@media print{
+    .main{
+        display: block;
+    }
+    .panel-collapse.collapse {
+        display: block !important;
+        height: 100% !important;
+    }
+    .navbar-secondary{
+        display:none;
+    }
+    .footer{
+        display:block;
+    }
+    .btn{
+        display:inherit !important;
+    }
+}

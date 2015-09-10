@@ -1,0 +1,25 @@
+@(triple : org.hadatac.console.models.TripleDocument)
+
+@*****************************
+  hasURI    | detURI
+    | modelName
+  rdfs:label    | name
+  vstoi:isInstrumentAttachment (label)   | instName
+  vstoi:hasSerialNumber    | sn
+*****************************@
+
+<div>
+    <h3>@triple.get("name") (SN: @triple.get("sn"))</h3>
+    <p>(model name: @triple.get("modelName") )</p>
+    <p>URI:</p>
+    @defining(triple.get("detURI")) {theuri =>
+    <form>
+        <input type="text" size="80" value="@theuri">
+    </form>
+    }
+    <p>serial number @triple.get("sn")</p>
+    @if(triple.has("instName")){
+        <p>This Detector is permanently attached to @triple.get("instName") (sn: @triple.get("instSN")).</p>
+    }
+</div>
+<hr>

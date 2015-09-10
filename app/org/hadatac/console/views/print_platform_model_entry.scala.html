@@ -1,0 +1,8 @@
+@(triple : org.hadatac.console.models.TripleDocument)
+
+<div>
+    <h3>@triple.get("modelName") </h3>
+    <p>(manufactured by: @triple.get("maker") )</p>
+    <p>Description: @triple.get("desc")</p>
+</div>
+<hr>

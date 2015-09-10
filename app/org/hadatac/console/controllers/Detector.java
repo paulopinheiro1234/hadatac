@@ -29,7 +29,7 @@ public class Detector extends Controller {
             query_json = query_submit.executeQuery(tabName);
             perspective_json = query_submit.executeQuery("SensingPerspectives");
             //System.out.println("query_json = " + query_json);
-            System.out.println("perspective_json = " + perspective_json);
+            //System.out.println("perspective_json = " + perspective_json);
             theResults = new SparqlQueryResults(query_json, false);
             perspectives = new SparqlQueryResults(perspective_json, false);
         } catch (IllegalStateException | IOException | NullPointerException e1) {
