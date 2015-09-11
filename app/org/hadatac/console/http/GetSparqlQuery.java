@@ -264,11 +264,13 @@ public class GetSparqlQuery {
                 q = "PREFIX rdfs:<http://www.w3.org/2000/01/rdf-schema#>" +
                     "PREFIX owl: <http://www.w3.org/2002/07/owl#>" +
                     "PREFIX vstoi: <http://jefferson.tw.rpi.edu/ontology/vstoi#>" +
+                    //"PREFIX hasneto: <http://hadatac.org/ont/hasneto#>  " +
+                    "PREFIX hasneto: <http://jefferson.tw.rpi.edu/ontology/hasneto.owl#>  " +
                     "SELECT ?sp ?ofModelName ?chara ?accpercent ?accrtwo ?outputres ?maxresponse ?timeunit ?low ?high WHERE {" +
-                    //" ?sp a vstoi:SensingPerspective . " +
+                    " ?sp a vstoi:SensingPerspective . " +
                     " ?sp vstoi:perspectiveOf ?ofModel . " +
                     " ?ofModel rdfs:label ?ofModelName . " +
-                    " ?sp vstoi:hasPerspectiveCharacteristic ?chara ." +
+                    " ?sp hasneto:hasPerspectiveCharacteristic ?chara ." +
                     " OPTIONAL { ?sp vstoi:hasAccuracyPercentage ?accpercent } ." +
                     " OPTIONAL { ?sp vstoi:hasAccuracyR2 ?accrtwo } ." +
                     " OPTIONAL { ?sp vstoi:hasOutputResolution ?outputres } ." +

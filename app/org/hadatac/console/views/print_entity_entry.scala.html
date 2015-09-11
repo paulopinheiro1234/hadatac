@@ -1,0 +1,15 @@
+@(triple : org.hadatac.console.models.OtMTripleDocument)
+  
+@*****************************
+  hasURI/label    | id (array[0])
+  hasCharacteristic    | chara (array)
+*****************************@
+
+<div></div>
+    <h3>@triple.get("id").get(0)</h3>
+    <h4>Characteristics of this entity:</h4>
+    @for(c <- triple.get("chara")) {
+        <p>@c</p>
+    }
+</div>
+<hr>

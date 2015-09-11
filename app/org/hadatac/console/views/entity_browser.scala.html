@@ -16,17 +16,20 @@
     <div class="container-fluid container-spaced">
       <div class="row">
         <div class="col-sm-9 col-md-9 main">
-            <ul class="nav nav-tabs">
+            <ul class="nav nav-tabs hidden-print">
                 @if(results.treeResults != ""){
-                    <li class="active" onclick="info_on('info')"><a data-toggle="tab" href="#tree">View as Hierarchy</a></li> 
-                    <li onclick="info_off('info')"><a data-toggle="tab" href="#table">View as Table</a></li>
+                    <li class="active" onclick="info_on('info')"><a data-toggle="tab" href="#tree"> 
+                        <span class="glyphicon glyphicon-tree-conifer" aria-hidden="true"></span> View as Hierarchy</a></li> 
+                    <li onclick="info_off('info')"><a data-toggle="tab" href="#table">
+                        <span class="glyphicon glyphicon-th-list" aria-hidden="true"></span> View as Table</a></li>
                 } else {
-                    <li class="active"><a data-toggle="tab" href="#table">View as Table</a></li>
+                    <li class="active"><a data-toggle="tab" href="#table">
+                        <span class="glyphicon glyphicon-th-list" aria-hidden="true"></span> View as Table</a></li>
                 }
             </ul>
             <div class = "tab-content">
 
-            <div id="table" class="tab-pane fade in">
+            <div id="table" class="hidden-print tab-pane fade in">
                 <div><p>(click for more information)</p></div>
                     <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
                         <div class="panel panel-default">
@@ -38,7 +41,7 @@
             </div>
 
             @if(results.treeResults != ""){
-                <div id="tree" class="tab-pane fade in active">
+                <div id="tree" class="hidden-print tab-pane fade in active">
                     <div id="query" data-results="@results.treeResults"></div>
                     <div id="body"></div>
                         <script type="text/javascript" src="/hadatac/assets/javascripts/d3.js"></script>
@@ -61,9 +64,18 @@
             
           </div>
     </div>
-    <div class="col-md-3 col-sm-3">
+    <div class="col-md-3 col-sm-3 hidden-print">
         <div class="tab-spacer"></div>
         <div id="info" class="infobox" style="display:block"></div>
     </div>
     <script type="text/javascript" src="/hadatac/assets/javascripts/extra.js"></script>    
+    <script type="text/javascript" src="/hadatac/assets/javascripts/extra.js"></script>
+
+    <div class="visible-print-block">
+        <table>
+            @for((k, triple) <- results.sparqlResults){
+                @print_entity_entry(triple)
+            }
+        </table>
+    </div>
 }

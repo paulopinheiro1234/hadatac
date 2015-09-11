@@ -1,0 +1,23 @@
+@(triple : org.hadatac.console.models.TripleDocument)
+@*****************************
+  hasURI    | platURI
+  rdfs:subClassOf   | (not used)
+  rdfs:label    | name
+  isA:    | modelName
+  vstoi:hasX  | lat
+  vstoi:hasY  | lng
+  hasQRcode  | *add*
+*****************************@
+
+<div>
+    <h4>@triple.get("name") </h4> 
+    <p>(model name: @triple.get("modelName") )</p>
+    <p>serial number: @triple.get("sn")</p>
+    @defining(triple.get("platURI")) {theuri =>
+        <form>
+            <input type="text" size="80" value="@theuri">
+        </form>
+    }
+    <p>located at (@triple.get("lat"), @triple.get("lng"))</p>
+</div>
+<hr>

@@ -21,6 +21,7 @@
         
 		<link rel="stylesheet" type="text/css" href="@controllers.routes.Assets.versioned("lib/dhtmlx/css/dhtmlx.css")"/>
 		<script src="@controllers.routes.Assets.versioned("lib/dhtmlx/js/dhtmlx.js")"></script>
+		<script type="text/stylesheet" rel="stylesheet" media="print" href="@controllers.routes.Assets.versioned("css/printfriendly.css")"></script>
 
     </head>
     <body>
@@ -68,7 +69,7 @@
 
         @content
         
-        <div>
+        <div class="footer">
            <hr>
            (c) 2015, <a href="http://hadatac.org">HADataC.org</a>
         </div>
