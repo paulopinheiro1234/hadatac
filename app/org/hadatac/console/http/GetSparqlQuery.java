@@ -119,8 +119,8 @@ public class GetSparqlQuery {
                     "    ?platModel rdfs:label ?modelName ." +
                     "    ?platURI rdfs:label ?name ." + 
                     "    OPTIONAL { ?platURI vstoi:hasSerialNumber ?sn } ." + 
-                    "    OPTIONAL { ?platModel hasneto:hasFirstCoordinate ?lat ." +
-                    "               ?platModel hasneto:hasSecondCoordinate ?lng } ." +
+                    "    OPTIONAL { ?platURI hasneto:hasFirstCoordinate ?lat ." +
+                    "               ?platURI hasneto:hasSecondCoordinate ?lng } ." +
                     "}";
                 break;
             case "Instruments" : 
