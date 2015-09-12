@@ -1,0 +1,31 @@
+@(results : org.hadatac.console.models.SparqlQueryResults)
+
+@import helper._
+@import org.hadatac.console.views.html._
+
+@main("CSV Annotator") {
+
+    <h2>CSV Annotator</h2>
+    
+    <h3>Step 1 of 3: Select Current Deployments</h3>
+   
+    <div class="container-fluid">
+        <table class="table">
+            <thead>
+                 <tr>
+                    <th>Platform</th>
+                    <th>Instrument</th>
+                    <th>Start DateTime</th>
+                    <th>Operations</th>
+                 </tr>
+            </thead>
+            <tbody>
+              @for((k, triple) <- results.sparqlResults){
+                  @deployment_option(triple)
+              }
+            </tbody>
+        </table>
+    </div>
+ 
+
+}
