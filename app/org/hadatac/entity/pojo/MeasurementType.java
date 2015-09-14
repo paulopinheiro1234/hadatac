@@ -101,9 +101,9 @@ public class MeasurementType {
 			
 			String queryString = Sparql.prefix
 					+ "SELECT ?c ?c_label ?e ?e_label WHERE {\n"
-					+ "  <" + measurementType.getCharacteristicUri() + "> <http://jefferson.tw.rpi.edu/ontology/hasneto.owl#ofCharacteristic> ?c .\n"
+					+ "  <" + measurementType.getCharacteristicUri() + "> <http://hadatac.org/ont/hasneto#ofCharacteristic> ?c .\n"
 					+ "  OPTIONAL { ?c rdfs:label ?c_label . }\n"
-					+ "  <" + measurementType.getCharacteristicUri() + "> <http://jefferson.tw.rpi.edu/ontology/hasneto.owl#ofEntity> ?e .\n"
+					+ "  <" + measurementType.getCharacteristicUri() + "> <http://hadatac.org/ont/hasneto#ofEntity> ?e .\n"
 					+ "  OPTIONAL { ?e rdfs:label ?e_label . }\n"
 					+ "}";
 			

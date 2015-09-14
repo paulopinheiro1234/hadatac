@@ -1,4 +1,4 @@
-package org.hadatac.metadata.loader;
+package org.hadatac.utils;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -10,9 +10,6 @@ import java.io.InputStream;
 import java.net.URL;
 
 import org.apache.commons.io.FileUtils;
-import org.hadatac.metadata.loader.NameSpace;
-import org.hadatac.metadata.loader.NameSpaces;
-import org.hadatac.utils.Feedback;
 
 public class NameSpaces {
 
@@ -71,29 +68,8 @@ public class NameSpaces {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		
-		/*	table.put(":","http://jefferson.tw.rpi.edu/ontology/jp-sn.owl#");
-		table.put("jp-sn:", "http://jefferson.tw.rpi.edu/ontology/jp-kb.owl#");
-		table.put("jp-entities:", "http://jefferson.tw.rpi.edu/ontology/jp-entities#");
-		table.put("jp-standards:", "http://jefferson.tw.rpi.edu/ontology/jp-standards.owl#");
-		table.put("jp-characteristics:", "http://jefferson.tw.rpi.edu/ontology/jp-characteristics.owl#");
-		table.put("oboe:", "http://ecoinformatics.org/oboe/oboe.1.0/oboe.owl#");
-		table.put("oboe-core:","http://ecoinformatics.org/oboe/oboe.1.0/oboe-core.owl#");
-		table.put("oboe-standards:", "http://ecoinformatics.org/oboe/oboe.1.0/oboe-standards.owl#");
-		table.put("oboe-chemistry:", "http://ecoinformatics.org/oboe/oboe.1.0/oboe-chemistry.owl#");
-		table.put("oboe-ecology:", "http://ecoinformatics.org/oboe/oboe.1.0/oboe-ecology.owl#");
-		table.put("oboe-characteristics:", "http://ecoinformatics.org/oboe/oboe.1.0/oboe-characteristics.owl#");
-		table.put("rdf:", "http://www.w3.org/1999/02/22-rdf-syntax-ns#");
-		table.put("rdfs:", "http://www.w3.org/2000/01/rdf-schema#");
-		table.put("xsd:", "http://www.w3.org/2001/XMLSchema#");
-		table.put("owl:", "http://www.w3.org/2002/07/owl#");
-	    table.put("vstoi:", "http://jefferson.tw.rpi.edu/ontology/vstoi#");
-	    table.put("prov:", "http://www.w3.org/ns/prov-o#");
-	    table.put("hasneto:", "http://jefferson.tw.rpi.edu/ontology/hasneto.owl#");
-	    table.put("foaf:", "http://xmlns.com/foaf/0.1/");
-	    */
 	}
-
+		
 	public String printNameSpaceList() {
 		String ttl = "";
 	    for (Map.Entry<String, NameSpace> entry : table.entrySet()) {
@@ -162,6 +138,5 @@ public class NameSpaces {
     	NameSpaces ns = new NameSpaces();
     	System.out.println(ns.printNameSpaceList());
     }
-
 	
 }

@@ -106,8 +106,6 @@ public class GetSolrQuery {
     //				  It will contain the filters of the last query. Also modified is the 
     //				  list_of_queries member variable.
     public GetSolrQuery addSpatialComponent(String named_geographic_location, String spatial_predicate) {
-    	//Right now (4-24-15) the lidarsonar collection is the only collection with associate lats and longs
-    	//Other collections will return no results. Eventually this will change though.
     	for (String collection : this.list_of_queries.keySet()){
     		if (named_geographic_location != null){
             	if (named_geographic_location.length() > 0){
@@ -116,19 +114,6 @@ public class GetSolrQuery {
                 	StringBuffer spatial_query = new StringBuffer();
                 	String json = new String();
                 	String polygon_string = new String();
-                	/*
-                	try {
-                		spatial_query.append("http://jeffersontest.tw.rpi.edu/solr/wikimapia/select?q=location_name");
-                		spatial_query.append(URLEncoder.encode(":\"", "UTF-8"));
-                		spatial_query.append(URLEncoder.encode(named_geographic_location, "UTF-8"));
-                		spatial_query.append(URLEncoder.encode("\"", "UTF-8"));
-                		spatial_query.append("&wt=json");
-                		//System.out.println(spatial_query.toString().charAt(72));
-                		
-                	} catch (Exception e){
-                		e.printStackTrace();
-                	}
-                	*/
                 	try
                     {
                     	HttpClient client = new DefaultHttpClient();

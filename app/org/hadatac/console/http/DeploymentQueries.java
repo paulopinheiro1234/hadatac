@@ -61,7 +61,7 @@ public class DeploymentQueries {
                 q = "PREFIX rdfs:<http://www.w3.org/2000/01/rdf-schema#>" + 
                     "PREFIX owl: <http://www.w3.org/2002/07/owl#>" +
                     "PREFIX prov: <http://www.w3.org/ns/prov#>  " +
-        	        "PREFIX vstoi: <http://jefferson.tw.rpi.edu/ontology/vstoi#>  " +
+        	        "PREFIX vstoi: <http://hadatac.org/ont/vstoi#>  " +
         	        "PREFIX hasneto: <http://hadatac.org/ont/hasneto#>  " +
                     "SELECT ?deploy ?deturi ?detModel WHERE { " + 
                     "   ?deploy a vstoi:Deployment . " + 
@@ -76,7 +76,7 @@ public class DeploymentQueries {
                 q = "PREFIX rdfs:<http://www.w3.org/2000/01/rdf-schema#>" + 
                         "PREFIX foaf:<http://xmlns.com/foaf/0.1/>" + 
                         "PREFIX owl: <http://www.w3.org/2002/07/owl#>" + 
-                        "PREFIX vstoi: <http://jefferson.tw.rpi.edu/ontology/vstoi#>" +
+                        "PREFIX vstoi: <http://hadatac.org/ont/vstoi#>" +
                         "SELECT ?det ?model ?sp ?ec ?ecName WHERE { " + 
                         "    ?model rdfs:subClassOf* vstoi:Detector . " +
                         "    ?det a ?model . " +

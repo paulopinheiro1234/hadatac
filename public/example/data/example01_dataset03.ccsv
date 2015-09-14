@@ -8,9 +8,8 @@
 @prefix oboe-characteristics: <http://ecoinformatics.org/oboe/oboe.1.0/oboe-characteristics.owl#> .
 @prefix oboe-standards: <http://ecoinformatics.org/oboe/oboe.1.0/oboe-standards.owl#> .
 @prefix oboe: <http://ecoinformatics.org/oboe/oboe.1.0/oboe-core.owl#> .
-@prefix jp-characteristics: <http://jefferson.tw.rpi.edu/ontology/jp-charateristics.owl#> .
-@prefix jp-standards: <http://jefferson.tw.rpi.edu/ontology/jp-standards.owl#> .
-@prefix jp-activities: <http://jefferson.tw.rpi.edu/ontology/jp-activities.owl#> .
+@prefix hadatac-standards: <http://hadatac.org/ont/hadatac-standards#> .
+@prefix hadatac-entities: <http://hadatac.org/ont/hadatac-entities#> .
 @prefix vstoi: <http://hadatac.org/ont/vstoi#> .
 @prefix hasneto: <http://hadatac.org/ont/hasneto#> .
 @prefix hadatac: <http://hadatac.org/ont/hadatac#> .
@@ -19,8 +18,8 @@
 
 <example01-dataset03> a vstoi:Dataset; prov:wasGeneratedBy <dataCollection-example01>; hadatac:hasMeasurementType <mt2>,<mt3> .
 
-<mt2> a hadatac:MeasurementType; time:inDateTime <ts0>; hadatac:atColumn 6; oboe:ofCharacteristic jp-characteristics:EC-AirTemperature; oboe:usesStandard oboe-standards:Celsius .
-<mt3> a hadatac:MeasurementType; time:inDateTime <ts0>; hadatac:atColumn 8; oboe:ofCharacteristic jp-characteristics:EC-BarometricPressure; oboe:usesStandard oboe-standards:Hectopascal .
+<mt2> a hadatac:MeasurementType; time:inDateTime <ts0>; hadatac:atColumn 6; oboe:ofCharacteristic hadatac-entities:EC-AirTemperature; oboe:usesStandard oboe-standards:Celsius .
+<mt3> a hadatac:MeasurementType; time:inDateTime <ts0>; hadatac:atColumn 8; oboe:ofCharacteristic hadatac-entities:EC-BarometricPressure; oboe:usesStandard oboe-standards:Hectopascal .
 
 <ts0> hadatac:atColumn 0 .
 == END-PREAMBLE ==

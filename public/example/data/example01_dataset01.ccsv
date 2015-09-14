@@ -8,9 +8,8 @@
 @prefix oboe-characteristics: <http://ecoinformatics.org/oboe/oboe.1.0/oboe-characteristics.owl#> .
 @prefix oboe-standards: <http://ecoinformatics.org/oboe/oboe.1.0/oboe-standards.owl#> .
 @prefix oboe: <http://ecoinformatics.org/oboe/oboe.1.0/oboe-core.owl#> .
-@prefix jp-characteristics: <http://jefferson.tw.rpi.edu/ontology/jp-charateristics.owl#> .
-@prefix jp-standards: <http://jefferson.tw.rpi.edu/ontology/jp-standards.owl#> .
-@prefix jp-activities: <http://jefferson.tw.rpi.edu/ontology/jp-activities.owl#> .
+@prefix hadatac-entities: <http://hadatac.org/ont/hadatac-entities#> .
+@prefix hadatac-standards: <http://hadatac.org/ont/hadatac-standards#> .
 @prefix vstoi: <http://hadatac.org/ont/vstoi#> .
 @prefix hasneto: <http://hadatac.org/ont/hasneto#> .
 @prefix hadatac: <http://hadatac.org/ont/hadatac#> .
@@ -21,8 +20,8 @@
 <deployment-example01> hasneto:hasDataCollection <dataCollection-example01> .
 <example01-dataset01> a vstoi:Dataset; prov:wasGeneratedBy <dataCollection-example01>; hadatac:hasMeasurementType <mt0>,<mt1> .
 
-<mt0> a hadatac:MeasurementType; time:inDateTime <ts0>; hadatac:atColumn 3; oboe:ofCharacteristic jp-characteristics:EC-WindDirection; oboe:usesStandard oboe-standards:Degree .
-<mt1> a hadatac:MeasurementType; time:inDateTime <ts0>; hadatac:atColumn 2; oboe:ofCharacteristic jp-characteristics:EC-WindSpeed; oboe:usesStandard oboe-standards:MeterPerSecond .
+<mt0> a hadatac:MeasurementType; time:inDateTime <ts0>; hadatac:atColumn 3; oboe:ofCharacteristic hadatac-entities:EC-WindDirection; oboe:usesStandard oboe-standards:Degree .
+<mt1> a hadatac:MeasurementType; time:inDateTime <ts0>; hadatac:atColumn 2; oboe:ofCharacteristic hadatac-entities:EC-WindSpeed; oboe:usesStandard oboe-standards:MeterPerSecond .
 
 <ts0> hadatac:atColumn 0 .
 == END-PREAMBLE ==

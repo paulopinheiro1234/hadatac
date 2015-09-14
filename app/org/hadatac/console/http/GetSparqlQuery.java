@@ -63,7 +63,6 @@ public class GetSparqlQuery {
     // Ideally, the above method should be depreciated in favor of this one, as we move
     //    all thingType queries to their own separate pages.
     public GetSparqlQuery (SparqlQuery query, String tabName) {
-        //this.collection = "http://jeffersontest.tw.rpi.edu/solr4/store/sparql";
 	this.collection = Play.application().configuration().getString("hadatac.solr.triplestore") + "/store/sparql";
         this.sparql_query = new StringBuffer();
         this.sparql_query.append(collection);
@@ -110,11 +109,11 @@ public class GetSparqlQuery {
             case "Platforms" : 
                 q = "PREFIX rdfs:<http://www.w3.org/2000/01/rdf-schema#> " + 
                     "PREFIX owl: <http://www.w3.org/2002/07/owl#> " + 
-                    "PREFIX vstoi: <http://jefferson.tw.rpi.edu/ontology/vstoi#> " + 
-                    "PREFIX hasneto: <http://jefferson.tw.rpi.edu/ontology/hasneto.owl#> " + 
+                    "PREFIX vstoi: <http://hadatac.org/ont/vstoi#> " + 
+                    "PREFIX hasneto: <http://hadatac.org/ont/hasneto#> " + 
                     "SELECT ?platURI ?name ?modelName ?sn ?lat ?lng WHERE {" +
                     "    ?platModel rdfs:subClassOf+" + 
-                    "    <http://jefferson.tw.rpi.edu/ontology/vstoi#Platform>  ." + 
+                    "    vstoi:Platform  ." + 
                     "    ?platURI a ?platModel ." +
                     "    ?platModel rdfs:label ?modelName ." +
                     "    ?platURI rdfs:label ?name ." + 
@@ -126,10 +125,10 @@ public class GetSparqlQuery {
             case "Instruments" : 
                 q = "PREFIX rdfs:<http://www.w3.org/2000/01/rdf-schema#>" +
                     "PREFIX owl: <http://www.w3.org/2002/07/owl#>" +
-                    "PREFIX vstoi: <http://jefferson.tw.rpi.edu/ontology/vstoi#>" +
+                    "PREFIX vstoi: <http://hadatac.org/ont/vstoi#>" +
                     "SELECT ?instURI ?name ?modelName ?sn WHERE {" +
                     " ?instModel rdfs:subClassOf+" +
-                    " <http://jefferson.tw.rpi.edu/ontology/vstoi#Instrument> ." +
+                    " vstoi:Instrument ." +
                     " ?instURI a ?instModel ." +
                     " ?instURI rdfs:label ?name ." +
                     " OPTIONAL { ?instURI vstoi:hasSerialNumber ?sn } ." +
@@ -139,10 +138,10 @@ public class GetSparqlQuery {
             case "Detectors" : 
                 q = "PREFIX rdfs:<http://www.w3.org/2000/01/rdf-schema#>" +
                     "PREFIX owl: <http://www.w3.org/2002/07/owl#>" +
-                    "PREFIX vstoi: <http://jefferson.tw.rpi.edu/ontology/vstoi#>" +
+                    "PREFIX vstoi: <http://hadatac.org/ont/vstoi#>" +
                     "SELECT ?detURI ?name ?modelName ?instName ?sn ?instSN WHERE {" +
                     " ?model rdfs:subClassOf+" +
-                    " <http://jefferson.tw.rpi.edu/ontology/vstoi#Detector> ." +
+                    " vstoi:Detector ." +
                     " ?model rdfs:label ?modelName ." + 
                     " ?detURI a ?model ." +
                     " ?detURI rdfs:label ?name ." +
@@ -156,9 +155,9 @@ public class GetSparqlQuery {
                 q = "PREFIX rdfs:<http://www.w3.org/2000/01/rdf-schema#>" + 
                     "PREFIX foaf:<http://xmlns.com/foaf/0.1/>" + 
                     "PREFIX owl: <http://www.w3.org/2002/07/owl#>" + 
-                    "PREFIX vstoi: <http://jefferson.tw.rpi.edu/ontology/vstoi#>" +
+                    "PREFIX vstoi: <http://hadatac.org/ont/vstoi#>" +
                     "SELECT ?model ?modelName ?superModelName ?maker ?desc ?page ?minTemp ?maxTemp ?tempUnit ?docLink ?numAtt ?numDet ?maxLog WHERE {" +
-                    "   ?model rdfs:subClassOf* <http://jefferson.tw.rpi.edu/ontology/vstoi#Instrument> . " + 
+                    "   ?model rdfs:subClassOf* vstoi:Instrument . " + 
                     "   ?model rdfs:label ?modelName ." + 
                     "   OPTIONAL { ?model rdfs:subClassOf ?superModel .  " + 
                     "              ?superModel rdfs:label ?superModelName } ." +
@@ -210,9 +209,9 @@ public class GetSparqlQuery {
                 q = "PREFIX rdfs:<http://www.w3.org/2000/01/rdf-schema#>" + 
                     "PREFIX foaf:<http://xmlns.com/foaf/0.1/>" + 
                     "PREFIX owl: <http://www.w3.org/2002/07/owl#>" + 
-                    "PREFIX vstoi: <http://jefferson.tw.rpi.edu/ontology/vstoi#>" +
+                    "PREFIX vstoi: <http://hadatac.org/ont/vstoi#>" +
                     "SELECT ?modelName ?superModelName ?maker ?desc ?page WHERE { " + 
-                    "    ?model rdfs:subClassOf* <http://jefferson.tw.rpi.edu/ontology/vstoi#Detector> . " + 
+                    "    ?model rdfs:subClassOf* vstoi:Detector . " + 
                 	"    ?model rdfs:subClassOf ?superModel .  " + 
                 	"    OPTIONAL { ?model rdfs:label ?modelName }  " + 
                 	"    OPTIONAL { ?superModel rdfs:label ?superModelName }  " +
@@ -237,9 +236,9 @@ public class GetSparqlQuery {
                 q = "PREFIX rdfs:<http://www.w3.org/2000/01/rdf-schema#>" + 
                     "PREFIX foaf:<http://xmlns.com/foaf/0.1/>" + 
                     "PREFIX owl: <http://www.w3.org/2002/07/owl#>" + 
-                    "PREFIX vstoi: <http://jefferson.tw.rpi.edu/ontology/vstoi#>" +
+                    "PREFIX vstoi: <http://hadatac.org/ont/vstoi#>" +
                 	"SELECT ?modelName ?superModelName ?maker ?desc ?page WHERE { " + 
-                    "   ?model rdfs:subClassOf* <http://jefferson.tw.rpi.edu/ontology/vstoi#Platform> . " + 
+                    "   ?model rdfs:subClassOf* vstoi:Platform . " + 
                 	"   ?model rdfs:subClassOf ?superModel .  " + 
                 	"   OPTIONAL { ?model rdfs:label ?modelName }  " + 
                 	"   OPTIONAL { ?superModel rdfs:label ?superModelName }  " +
@@ -263,7 +262,7 @@ public class GetSparqlQuery {
             case "SensingPerspectives" : 
                 q = "PREFIX rdfs:<http://www.w3.org/2000/01/rdf-schema#>" +
                     "PREFIX owl: <http://www.w3.org/2002/07/owl#>" +
-                    "PREFIX vstoi: <http://jefferson.tw.rpi.edu/ontology/vstoi#>" +
+                    "PREFIX vstoi: <http://hadatac.org/ont/vstoi#>" +
                     "SELECT ?sp ?ofModelName ?chara ?accpercent ?accrtwo ?outputres ?maxresponse ?timeunit ?low ?high WHERE {" +
                     //" ?sp a vstoi:SensingPerspective . " +
                     " ?sp vstoi:perspectiveOf ?ofModel . " +
@@ -281,11 +280,14 @@ public class GetSparqlQuery {
             case "EntityCharacteristics" : 
                 q = "PREFIX rdfs:<http://www.w3.org/2000/01/rdf-schema#>" + 
                     "PREFIX owl: <http://www.w3.org/2002/07/owl#>" + 
+                    "PREFIX hasneto: <http://hadatac.org/ont/hasneto#> " + 
+                    //"SELECT ?ec WHERE { " + 
                     "SELECT ?ecName ?entity ?chara WHERE { " + 
-                    "   ?ec a <http://jefferson.tw.rpi.edu/ontology/hasneto.owl#EntityCharacteristic> . " + 
+                    //"  ?a a hasneto:EntityCharacteristic. " +
+                    "   ?ec a hasneto:EntityCharacteristic . " + 
                     "   ?ec rdfs:label ?ecName .  " + 
-                    "   ?ec <http://jefferson.tw.rpi.edu/ontology/hasneto.owl#ofEntity> ?entity .  " + 
-                    "   ?ec <http://jefferson.tw.rpi.edu/ontology/hasneto.owl#ofCharacteristic> ?chara .  " + 
+                    "   ?ec hasneto:ofEntity ?entity .  " + 
+                    "   ?ec hasneto:ofCharacteristic ?chara .  " + 
                     "}";
                 break;
             case "Deployments" : 
