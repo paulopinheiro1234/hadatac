@@ -20,11 +20,18 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.impl.client.HttpClients;
+import org.apache.jena.riot.RiotNotFoundException;
 import org.hadatac.metadata.loader.NameSpace;
 import org.hadatac.metadata.loader.NameSpaces;
 import org.hadatac.utils.Feedback;
 import org.w3c.dom.Document;
 import org.xml.sax.InputSource;
+
+import com.hp.hpl.jena.query.DatasetAccessor;
+import com.hp.hpl.jena.query.DatasetAccessorFactory;
+import com.hp.hpl.jena.rdf.model.Model;
+import com.hp.hpl.jena.rdf.model.ModelFactory;
+import com.hp.hpl.jena.shared.NotFoundException;
 
 import play.Play;
 import play.libs.ws.*;
@@ -167,12 +174,37 @@ public class MetadataContext {
         return message; 
 	}
 	
+	public String getLang(String contentType) {
+		if (contentType.contains("turtle")) {
+			return "TTL";
+		} else if (contentType.contains("rdf+xml")) {
+			return "RDF/XML";
+		} else {
+			return "";
+		}
+	}
+	
 	/* 
 	 *   contentType correspond to the mime type required for curl to process the data provided. For example, application/rdf+xml is
 	 *   used to process rdf/xml content.
 	 *   
 	 */
 	public Long loadLocalFile(int mode, String filePath, String contentType) {
+		System.out.println("!!! " + filePath + " | " + contentType);
+		Model model = ModelFactory.createDefaultModel();
+		DatasetAccessor accessor = DatasetAccessorFactory.createHTTP(kbURL + "/store/rdf-graph-store");		
+		
+		try {
+			model.read(filePath, getLang(contentType));
+			accessor.add(model);
+		} catch (NotFoundException e) {
+			System.out.println("NotFoundException: " + e.getMessage());
+		} catch (RiotNotFoundException e) {
+			System.out.println("RiotNotFoundException: " + e.getMessage());
+		} catch (Exception e) {
+			System.out.println("Exception: " + e.getMessage());
+		}
+		
 		loadFileMessage = "";
 		//System.out.println("File: " + filePath + "   Content Type: " + contentType);
 		Long total = totalTriples();
@@ -180,7 +212,7 @@ public class MetadataContext {
 			System.out.println("curl -v " + kbURL + "/store/update/bulk?commit=true -H \"Content-Type: " + contentType + "\" --data-binary @" + filePath);
 		}
 		String[] cmd = {"curl", "-v", kbURL + "/store/update/bulk?commit=true","-H", "Content-Type: " + contentType, "--data-binary", "@" + filePath};
-		loadFileMessage += executeCommand(mode, cmd);
+		//loadFileMessage += executeCommand(mode, cmd);
 		Long newTotal = totalTriples();
 		return (newTotal - total);
 	}
