@@ -21,9 +21,9 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.jena.riot.RiotNotFoundException;
-import org.hadatac.metadata.loader.NameSpace;
-import org.hadatac.metadata.loader.NameSpaces;
 import org.hadatac.utils.Feedback;
+import org.hadatac.utils.NameSpace;
+import org.hadatac.utils.NameSpaces;
 import org.w3c.dom.Document;
 import org.xml.sax.InputSource;
 
@@ -44,8 +44,6 @@ public class MetadataContext {
     String kbURL = null;   
 	         // For local use:
 	         //   - http://localhost:7574/solr
-	         // For remote use:
-	         //   - http://jeffersontest.tw.rpi.edu/solr4
     boolean verbose = false;
 
     String processMessage = "";
@@ -190,7 +188,6 @@ public class MetadataContext {
 	 *   
 	 */
 	public Long loadLocalFile(int mode, String filePath, String contentType) {
-		System.out.println("!!! " + filePath + " | " + contentType);
 		Model model = ModelFactory.createDefaultModel();
 		DatasetAccessor accessor = DatasetAccessorFactory.createHTTP(kbURL + "/store/rdf-graph-store");		
 		
@@ -206,7 +203,6 @@ public class MetadataContext {
 		}
 		
 		loadFileMessage = "";
-		//System.out.println("File: " + filePath + "   Content Type: " + contentType);
 		Long total = totalTriples();
 		if (verbose) {
 			System.out.println("curl -v " + kbURL + "/store/update/bulk?commit=true -H \"Content-Type: " + contentType + "\" --data-binary @" + filePath);
@@ -222,7 +218,7 @@ public class MetadataContext {
 		Long total = totalTriples();
 		message += Feedback.println(mode, "   Triples before [loadOntologies]: " + total);
 		message += Feedback.println(mode," ");
-		message += NameSpaces.getInstance().copyNameSpacesLocally(mode);
+		//message += NameSpaces.getInstance().copyNameSpacesLocally(mode);
 		for (Map.Entry<String, NameSpace> entry : NameSpaces.table.entrySet()) {
 	    	String abbrev = entry.getKey().toString();
 	    	String nsURL = entry.getValue().getURL();

@@ -25,7 +25,7 @@ public class EntityCharacteristic extends Controller {
         System.out.println("EntityCharacteristic.java is requesting: " + tabName);
         try {
             query_json = query_submit.executeQuery(tabName);
-            //System.out.println("query_json = " + query_json);
+            System.out.println("query_json = " + query_json);
             theResults = new SparqlQueryResults(query_json, false);
         } catch (IllegalStateException | IOException | NullPointerException e1) {
             return internalServerError(error_page.render(e1.toString(), tabName));

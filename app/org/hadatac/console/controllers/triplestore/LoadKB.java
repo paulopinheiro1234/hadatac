@@ -18,9 +18,9 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.hadatac.console.views.html.triplestore.*;
 import org.hadatac.metadata.loader.MetadataContext;
-import org.hadatac.metadata.loader.NameSpaces;
 import org.hadatac.metadata.loader.SpreadsheetProcessing;
 import org.hadatac.utils.Feedback;
+import org.hadatac.utils.NameSpaces;
 
 public class LoadKB extends Controller {
 

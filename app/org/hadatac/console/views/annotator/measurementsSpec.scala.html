@@ -1,0 +1,57 @@
+@(handler: org.hadatac.console.models.CSVAnnotationHandler,
+  theUnits : org.hadatac.console.models.SparqlQueryResults)
+
+@import helper._
+@import org.hadatac.console.views.html._
+
+@main("CSV Annotator") {
+
+    <h2>CSV Annotator</h2>
+    
+    <h3>Selected Deployment</h3>
+        <ul>
+          <li><b>Deployment URI</b>: @handler.getDeploymentUri()</li>
+          <li><b>Platform</b>: @handler.getDeploymentPlatform()</li>
+          <li><b>Instrument</b>:@handler.getDeploymentInstrument()</li>
+        </ul>
+    
+    <h3>Uploaded CSV</h3>
+        <ul>
+          <li><b>Name</b>: @handler.getDatasetName()</li>
+          <li><b>Upload date/time</b>: @handler.getDatasetUploadDatetime()</li>
+        </ul>
+    
+    <h3>Step 3 of 3: Select Measurements' Characteristics and Units:</h3>
+   
+    <div class="container-fluid">
+        <table class="table">
+            <thead>
+                 <tr>
+                    <th>Measurement</th>
+                    <th>Characteristic</th>
+                    <th>Unit</th>
+                 </tr>
+            </thead>
+            <tbody>
+              @for(field <- handler.getFields()){
+                  @field_option(field, theUnits)
+              } 
+            </tbody>
+        </table>
+    </div>
+ 
+    <h3>CCSV Options</h3>
+
+    <div class="container-fluid">
+      <div class="row">
+         <div class="navbar-collapse collapse navbar-secondary">
+          	<a href="@org.hadatac.console.controllers.annotator.routes.Downloads.uploadCCSV()" class="btn-sm btn-primary" role="button">Upload CCSV</a>
+          	<a href="@org.hadatac.console.controllers.annotator.routes.Downloads.genCCSV()" class="btn-sm btn-primary" role="button">Download CCSV</a>
+       		<a href="@org.hadatac.console.controllers.annotator.routes.Downloads.genPreamble()" class="btn-sm btn-primary" role="button">Download Preamble</a>
+       		<a href="@org.hadatac.console.controllers.annotator.routes.Downloads.cancel()" class="btn-sm btn-danger" role="button">Cancel</a>
+         </div>
+      </div>
+   </div>
+
+
+}

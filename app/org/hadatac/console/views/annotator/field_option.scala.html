@@ -1,0 +1,27 @@
+@(field : String,
+ theUnits : org.hadatac.console.models.SparqlQueryResults)
+
+@import java.net._
+
+<tr>
+
+   <td>@field</td> 
+
+   <td>foo
+   </td>
+
+   <td>
+	 <div class="form-group">
+         <select class="form-control col-sm-6" name="unit">
+            <option value=""></option>
+            @for((k, triple) <- theUnits.sparqlResults){
+               @defining(triple.generateID()) {itemID =>
+                   @defining(triple.get("modelName").replaceAll("[\\W]|_", "")) {cleanName =>
+                       <option value="@triple.get("modelName")">@triple.get("modelName")</option>         
+                }
+              }
+            }
+         </select>
+     </div>
+   </td>
+</tr>

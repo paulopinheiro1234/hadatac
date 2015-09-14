@@ -4,9 +4,9 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.hadatac.metadata.loader.MetadataContext;
-import org.hadatac.metadata.loader.NameSpaces;
 import org.hadatac.metadata.loader.SpreadsheetProcessing;
 import org.hadatac.utils.Feedback;
+import org.hadatac.utils.NameSpaces;
 
 public class Loader {
 

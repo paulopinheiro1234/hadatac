@@ -6,8 +6,8 @@ import play.libs.*;
 
 import org.hadatac.console.views.html.triplestore.*;
 import org.hadatac.metadata.loader.MetadataContext;
-import org.hadatac.metadata.loader.NameSpaces;
 import org.hadatac.utils.Feedback;
+import org.hadatac.utils.NameSpaces;
 
 public class LoadOnt extends Controller {
 

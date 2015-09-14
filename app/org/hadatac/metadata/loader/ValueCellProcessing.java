@@ -5,8 +5,8 @@ import java.util.StringTokenizer;
 import java.util.Vector;
 
 import org.apache.poi.ss.usermodel.Cell;
-import org.hadatac.metadata.loader.NameSpace;
-import org.hadatac.metadata.loader.NameSpaces;
+import org.hadatac.utils.NameSpace;
+import org.hadatac.utils.NameSpaces;
 
 public class ValueCellProcessing {
 	

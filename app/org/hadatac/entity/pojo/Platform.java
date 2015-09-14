@@ -56,9 +56,9 @@ public class Platform {
 				+ "SELECT ?platform ?label ?lat ?lon ?ele WHERE {\n"
 				+ "  <" + hadatac.getDeploymentUri() + "> vstoi:hasPlatform ?platform .\n"
 				+ "  OPTIONAL { ?platform rdfs:label ?label . }\n"
-				+ "  OPTIONAL { ?platform <http://jefferson.tw.rpi.edu/ontology/hasneto.owl#hasFirstCoordinate> ?lat . }\n"
-				+ "  OPTIONAL { ?platform <http://jefferson.tw.rpi.edu/ontology/hasneto.owl#hasSecondCoordinate> ?lon . }\n"
-				+ "  OPTIONAL { ?platform <http://jefferson.tw.rpi.edu/ontology/hasneto.owl#hasThirdCoordinate> ?ele . }\n"
+				+ "  OPTIONAL { ?platform <http://hadatac.org/ont/hasneto#hasFirstCoordinate> ?lat . }\n"
+				+ "  OPTIONAL { ?platform <http://hadatac.org/ont/hasneto#hasSecondCoordinate> ?lon . }\n"
+				+ "  OPTIONAL { ?platform <http://hadatac.org/ont/hasneto#hasThirdCoordinate> ?ele . }\n"
 				+ "}";
 		
 		Query query = QueryFactory.create(queryString);
