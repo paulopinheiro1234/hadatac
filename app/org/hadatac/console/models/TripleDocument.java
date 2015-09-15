@@ -35,7 +35,7 @@ public class TripleDocument{
             } catch (NullPointerException e){
                 if(vars.get(i).equals("sn")) {
                     variable = generateID();
-                    //System.out.println(resultType + " is missing a serial number! " + variable + " generated as placeholder");
+                    //System.out.println("Missing a serial number! " + variable + " generated as placeholder");
                 }
                 else {
                     variable = "";
@@ -44,6 +44,7 @@ public class TripleDocument{
             }// /catch
             this.items.put(vars.get(i), variable);
         }// /for
+        //System.out.println("Generated triple: " + this.get("sn"));
     }// constructor
 	
     public void addItem(String key, String value){
@@ -108,6 +109,6 @@ public class TripleDocument{
     public String generateID(){
         Random rand = new Random();
         int randomNum = rand.nextInt((99999 - 10000) + 1) + 10000;
-        return String.valueOf(randomNum);
+        return "TEMP" + String.valueOf(randomNum);
     }
 }

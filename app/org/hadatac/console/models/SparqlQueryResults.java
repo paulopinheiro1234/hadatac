@@ -64,9 +64,18 @@ public class SparqlQueryResults{
                 TripleDocument triple = new TripleDocument(doc, vars);
                 //System.out.println(triple);
                 // One of the fields in the TripleDocument should function as a primary key for rendering purposes
-                if (doc.has("sn")) { this.sparqlResults.put(triple.get("sn"),triple); }
-                else if (doc.has("modelName")) { this.sparqlResults.put(triple.get("modelName"),triple); }
-                else if (doc.has("sp")) { this.sparqlResults.put(triple.get("sp"),triple); }
+                if (triple.has("sn")) { 
+                    this.sparqlResults.put(triple.get("sn"),triple);
+                    //System.out.println("Adding to results [sn]: " + triple.get("sn"));
+                }
+                else if (triple.has("modelName")) {
+                    this.sparqlResults.put(triple.get("modelName"),triple);
+                    //System.out.println("Adding to results [modelName]: " + triple.get("modelName"));
+                }
+                else if (triple.has("sp")) {
+                    this.sparqlResults.put(triple.get("sp"),triple);
+                    //System.out.println("Adding to results [sp]: " + triple.get("sp"));
+                }
                 else this.sparqlResults.put(triple.generateID(), triple);
             } catch (Exception e){
 			    e.printStackTrace();

@@ -118,8 +118,8 @@ public class GetSparqlQuery {
                     "    ?platModel rdfs:label ?modelName ." +
                     "    ?platURI rdfs:label ?name ." + 
                     "    OPTIONAL { ?platURI vstoi:hasSerialNumber ?sn } ." + 
-                    "    OPTIONAL { ?platModel hasneto:hasFirstCoordinate ?lat ." +
-                    "               ?platModel hasneto:hasSecondCoordinate ?lng } ." +
+                    "    OPTIONAL { ?platURI hasneto:hasFirstCoordinate ?lat ." +
+                    "               ?platURI hasneto:hasSecondCoordinate ?lng } ." +
                     "}";
                 break;
             case "Instruments" : 
@@ -263,11 +263,12 @@ public class GetSparqlQuery {
                 q = "PREFIX rdfs:<http://www.w3.org/2000/01/rdf-schema#>" +
                     "PREFIX owl: <http://www.w3.org/2002/07/owl#>" +
                     "PREFIX vstoi: <http://hadatac.org/ont/vstoi#>" +
+                    "PREFIX hasneto: <http://hadatac.org/ont/hasneto#>  " +
                     "SELECT ?sp ?ofModelName ?chara ?accpercent ?accrtwo ?outputres ?maxresponse ?timeunit ?low ?high WHERE {" +
-                    //" ?sp a vstoi:SensingPerspective . " +
+                    " ?sp a vstoi:SensingPerspective . " +
                     " ?sp vstoi:perspectiveOf ?ofModel . " +
                     " ?ofModel rdfs:label ?ofModelName . " +
-                    " ?sp vstoi:hasPerspectiveCharacteristic ?chara ." +
+                    " ?sp hasneto:hasPerspectiveCharacteristic ?chara ." +
                     " OPTIONAL { ?sp vstoi:hasAccuracyPercentage ?accpercent } ." +
                     " OPTIONAL { ?sp vstoi:hasAccuracyR2 ?accrtwo } ." +
                     " OPTIONAL { ?sp vstoi:hasOutputResolution ?outputres } ." +

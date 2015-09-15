@@ -1,6 +1,6 @@
  @(selection : String)
  
-   <div class="navbar-collapse collapse navbar-secondary">
+   <div class="navbar-collapse collapse navbar-secondary hidden-print">
        <B>Options</B>: 
 	   @if(selection == "PlatformModels") {
           	<a href="@org.hadatac.console.controllers.routes.Platform.index()" class="btn btn-warning" role="button">Platform Model<br>Hierarchy</a>
