@@ -7,6 +7,8 @@ import java.util.Iterator;
 
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVRecord;
+import org.apache.jena.rdf.model.Model;
+import org.apache.jena.rdf.model.ModelFactory;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.impl.HttpSolrClient;
@@ -19,9 +21,6 @@ import org.hadatac.entity.pojo.HADataC;
 import org.hadatac.entity.pojo.Measurement;
 import org.hadatac.entity.pojo.MeasurementType;
 import org.hadatac.utils.Feedback;
-
-import com.hp.hpl.jena.rdf.model.Model;
-import com.hp.hpl.jena.rdf.model.ModelFactory;
 
 public class Parser {
 	

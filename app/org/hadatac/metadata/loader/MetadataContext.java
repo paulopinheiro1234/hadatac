@@ -20,18 +20,17 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.impl.client.HttpClients;
+import org.apache.jena.query.DatasetAccessor;
+import org.apache.jena.query.DatasetAccessorFactory;
+import org.apache.jena.rdf.model.Model;
+import org.apache.jena.rdf.model.ModelFactory;
 import org.apache.jena.riot.RiotNotFoundException;
+import org.apache.jena.shared.NotFoundException;
 import org.hadatac.utils.Feedback;
 import org.hadatac.utils.NameSpace;
 import org.hadatac.utils.NameSpaces;
 import org.w3c.dom.Document;
 import org.xml.sax.InputSource;
-
-import com.hp.hpl.jena.query.DatasetAccessor;
-import com.hp.hpl.jena.query.DatasetAccessorFactory;
-import com.hp.hpl.jena.rdf.model.Model;
-import com.hp.hpl.jena.rdf.model.ModelFactory;
-import com.hp.hpl.jena.shared.NotFoundException;
 
 import play.Play;
 import play.libs.ws.*;

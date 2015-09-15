@@ -1,5 +1,9 @@
 package org.hadatac.console.controllers.deployments;
 
+import org.apache.jena.update.UpdateExecutionFactory;
+import org.apache.jena.update.UpdateFactory;
+import org.apache.jena.update.UpdateProcessor;
+import org.apache.jena.update.UpdateRequest;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServerException;
@@ -29,11 +33,6 @@ import org.hadatac.console.models.DeploymentForm;
 import org.hadatac.console.models.SparqlQuery;
 import org.hadatac.console.models.SparqlQueryResults;
 import org.hadatac.console.http.GenericSparqlQuery;
-
-import com.hp.hpl.jena.update.UpdateExecutionFactory;
-import com.hp.hpl.jena.update.UpdateFactory;
-import com.hp.hpl.jena.update.UpdateProcessor;
-import com.hp.hpl.jena.update.UpdateRequest;
 
 public class NewDeployment extends Controller {
 	
