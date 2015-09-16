@@ -1,5 +1,13 @@
 package org.hadatac.entity.pojo;
 
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+
+import org.apache.http.client.ClientProtocolException;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.jena.query.Query;
 import org.apache.jena.query.QueryExecution;
 import org.apache.jena.query.QueryExecutionFactory;
@@ -9,16 +17,44 @@ import org.apache.jena.query.ResultSet;
 import org.apache.jena.query.ResultSetFactory;
 import org.apache.jena.query.ResultSetRewindable;
 import org.apache.jena.rdf.model.Model;
+import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdf.model.ResourceFactory;
+import org.apache.jena.rdf.model.Statement;
+import org.apache.jena.rdf.model.StmtIterator;
+import org.apache.jena.update.UpdateExecutionFactory;
+import org.apache.jena.update.UpdateFactory;
+import org.apache.jena.update.UpdateProcessor;
+import org.apache.jena.update.UpdateRequest;
 import org.hadatac.data.loader.util.Sparql;
+import org.hadatac.utils.NameSpaces;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 import org.joda.time.format.ISODateTimeFormat;
 
+import play.Play;
+
 public class Deployment {
+	
+	public static String INDENT1 = "     ";
+	
+	public static String LINE1 = "INSERT DATA {  ";
+    
+    public static String LINE3 = INDENT1 + "a         vstoi:Deployment;  ";
+    
+    public static String PLATFORM_PREDICATE =     INDENT1 + "vstoi:hasPlatform        ";
+    
+    public static String INSTRUMENT_PREDICATE =   INDENT1 + "hasneto:hasInstrument    ";
+    
+    public static String DETECTOR_PREDICATE =     INDENT1 + "hasneto:hasDetector      ";
+        
+    public static String START_TIME_PREDICATE =   INDENT1 + "prov:startedAtTime		  ";
+    
+    public static String START_TIME_XMLS =   "\"^^<http://www.w3.org/2001/XMLSchema#dateTime> .";
+    
+    public static String LINE_LAST = "}  ";
 
 	private String uri;
 	private String localName;
@@ -28,16 +64,23 @@ public class Deployment {
 	
 	public Instrument instrument;
 	public Platform platform;
+	public List<Detector> detectors;
 	
 	public Deployment() {
 		startedAt = null;
 		endedAt = null;
 		instrument = null;
 		platform = null;
+		detectors = new ArrayList<Detector>();
 	}
 	
 	public String getStartedAt() {
 		DateTimeFormatter formatter = ISODateTimeFormat.dateTime();
+		return formatter.withZone(DateTimeZone.UTC).print(startedAt);
+	}
+	
+	public String getStartedAtXsd() {
+		DateTimeFormatter formatter = ISODateTimeFormat.dateTimeNoMillis();
 		return formatter.withZone(DateTimeZone.UTC).print(startedAt);
 	}
 
@@ -47,6 +90,10 @@ public class Deployment {
 	}
 	public void setStartedAtXsd(String startedAt) {
 		DateTimeFormatter formatter = ISODateTimeFormat.dateTimeNoMillis();
+		this.startedAt = formatter.parseDateTime(startedAt);
+	}
+	public void setStartedAtXsdWithMillis(String startedAt) {
+		DateTimeFormatter formatter = ISODateTimeFormat.dateTime();
 		this.startedAt = formatter.parseDateTime(startedAt);
 	}
 	public String getEndedAt() {
@@ -85,6 +132,48 @@ public class Deployment {
 
 	public void setCcsvUri(String ccsvUri) {
 		this.ccsvUri = ccsvUri;
+	}
+	
+	public void save() {
+		String insert = "";
+		insert += NameSpaces.getInstance().printSparqlNameSpaceList();
+    	insert += LINE1;
+    	insert += "<" + this.getUri() + ">  ";
+    	insert += LINE3;
+    	insert += PLATFORM_PREDICATE + "<" + this.platform.getUri() + "> ;   ";
+    	insert += INSTRUMENT_PREDICATE + "<" + this.instrument.getUri() + "> ;   ";
+    	Iterator<Detector> i = this.detectors.iterator();
+    	while (i.hasNext()) {
+    		insert += DETECTOR_PREDICATE + "<" + i.next().getUri() + "> ;   ";
+    	}
+       	insert += START_TIME_PREDICATE + "\"" + this.getStartedAt() + START_TIME_XMLS + "  "; 
+    	insert += LINE_LAST;
+    	System.out.println(insert);
+    	UpdateRequest request = UpdateFactory.create(insert);
+        UpdateProcessor processor = UpdateExecutionFactory.createRemote(request, 
+        		Play.application().configuration().getString("hadatac.solr.triplestore") + "/store/sparql");
+        processor.execute();
+        
+        DefaultHttpClient httpclient = new DefaultHttpClient();
+        HttpGet httpget = new HttpGet(Play.application().configuration().getString("hadatac.solr.triplestore")
+        		+ "/store/update?commit=true");
+        try {
+			httpclient.execute(httpget);
+		} catch (ClientProtocolException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	
+	public static Deployment create(String uri) {
+		Deployment deployment = new Deployment();
+		
+		deployment.setUri(uri);
+		
+		return deployment;
 	}
 	
 	public static Deployment findFromDataCollection(HADataC hadatac) {
@@ -155,6 +244,40 @@ public class Deployment {
 		}
 		
 		return null;
+	}
+	
+	public static Deployment find(String uri) {
+		Deployment deployment = null;
+		Model model;
+		Statement statement;
+		RDFNode object;
+		
+		String queryString = "DESCRIBE <" + uri + ">";
+		Query query = QueryFactory.create(queryString);
+		QueryExecution qexec = QueryExecutionFactory.sparqlService(
+				Play.application().configuration().getString("hadatac.solr.triplestore") + "/store/sparql", query);
+		model = qexec.execDescribe();
+		
+		deployment = new Deployment();
+		StmtIterator stmtIterator = model.listStatements();
+		
+		while (stmtIterator.hasNext()) {
+			statement = stmtIterator.next();
+			object = statement.getObject();
+			if (statement.getPredicate().getURI().equals("http://hadatac.org/ont/hasneto#hasInstrument")) {
+				deployment.instrument = Instrument.find(object.asResource().getURI());
+			} else if (statement.getPredicate().getURI().equals("http://hadatac.org/ont/vstoi#hasPlatform")) {
+				deployment.platform = Platform.find(object.asResource().getURI());
+			} else if (statement.getPredicate().getURI().equals("http://hadatac.org/ont/hasneto#hasDetector")) {
+				deployment.detectors.add(Detector.find(object.asResource().getURI()));
+			} else if (statement.getPredicate().getURI().equals("http://www.w3.org/ns/prov#startedAtTime")) {
+				deployment.setStartedAtXsdWithMillis(object.asLiteral().getString());
+			}
+		}
+		
+		deployment.setUri(uri);
+		
+		return deployment;
 	}
 
 	public static Deployment find(Model model, DataCollection dataCollection) {

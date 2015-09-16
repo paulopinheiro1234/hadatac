@@ -29,6 +29,8 @@ import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 import org.joda.time.format.ISODateTimeFormat;
 
+import play.Play;
+
 public class DataCollection {
 	@Field("uri")
 	private String uri;
@@ -142,6 +144,10 @@ public class DataCollection {
 	}
 	public void setStartedAtXsd(String startedAt) {
 		DateTimeFormatter formatter = ISODateTimeFormat.dateTimeNoMillis();
+		this.startedAt = formatter.parseDateTime(startedAt);
+	}
+	public void setStartedAtXsdWithMillis(String startedAt) {
+		DateTimeFormatter formatter = ISODateTimeFormat.dateTime();
 		this.startedAt = formatter.parseDateTime(startedAt);
 	}
 	public String getEndedAt() {
@@ -284,9 +290,23 @@ public class DataCollection {
 		}
 	}
 	
+	public int save() {
+		try {
+			SolrClient client = new HttpSolrClient(Play.application().configuration().getString("hadatac.solr.data") + "/sdc");
+			endedAt = DateTime.parse("9999-12-31T23:59:59.999Z");
+			int status = client.addBean(this).getStatus();
+			client.commit();
+			client.close();
+			return status;
+		} catch (IOException | SolrServerException e) {
+			System.out.println("[ERROR] DataCollection.save() - e.Message: " + e.getMessage());
+			return -1;
+		}
+	}
+	
 	public int save(SolrClient solr) {
 		try {
-			endedAt = endedAt.plusYears(7000);
+			endedAt = DateTime.parse("9999-12-31T23:59:59.999Z");
 			int status = solr.addBean(this).getStatus();
 			solr.commit();
 			return status;

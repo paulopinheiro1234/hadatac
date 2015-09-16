@@ -2,12 +2,16 @@
 <schema version="1.5">
   <fields>
     <field name="_version_" type="long" indexed="true" stored="true"/>
+	<field name="id" type="int" indexed="true" stored="true"/>
     <field name="last_dynamic_metadata_id" type="long" indexed="true" docValues="true"/>
     <field name="timestamp" type="date" indexed="true" stored="true" docValues="true" default="NOW"/>
   </fields>
 
+  <uniqueKey>id</uniqueKey>
+
   <types>
     <fieldType name="string" class="solr.StrField" />
+    <fieldType name="int" class="solr.TrieIntField" />
     <fieldType name="date" class="solr.TrieDateField" />
     <fieldType name="long" class="solr.TrieLongField" />
   </types>
