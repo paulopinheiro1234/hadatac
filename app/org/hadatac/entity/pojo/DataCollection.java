@@ -360,6 +360,37 @@ public class DataCollection {
 		return dataCollection;
 	}
 	
+	public static List<DataCollection> find(Deployment deployment, boolean active) {
+		SolrClient solr = new HttpSolrClient(Play.application().configuration().getString("hadatac.solr.data") + "/sdc");
+		SolrQuery query = new SolrQuery();
+		query.set("q", "deployment_uri:\"" + deployment.getUri() + "\"");
+		query.set("sort", "started_at desc");
+		List<DataCollection> list = new ArrayList<DataCollection>();
+		
+		try {
+			QueryResponse queryResponse = solr.query(query);
+			solr.close();
+			SolrDocumentList results = queryResponse.getResults();
+			Iterator<SolrDocument> i = results.iterator();
+			if (active == true) {
+				if (i.hasNext()) {
+					DataCollection dataCollection = convertFromSolr(i.next()); 
+					if (dataCollection.isFinished() == false) {
+						list.add(dataCollection);
+					}
+				}
+			} else {
+				while (i.hasNext()) {
+					list.add(convertFromSolr(i.next()));
+				}
+			}
+		} catch (Exception e) {
+			System.out.println("[ERROR] DataCollection.find(Deployment) - Exception message: " + e.getMessage());
+		}
+		
+		return list;
+	}
+	
 	public static DataCollection find(HADataC hadatac) {
 		SolrClient solr = new HttpSolrClient(hadatac.getDynamicMetadataURL());
 		SolrQuery query = new SolrQuery("uri:\"" + hadatac.getDataCollectionKbUri() + "\"");

@@ -1,5 +1,7 @@
 package org.hadatac.data.api;
 
+import java.util.List;
+
 import org.hadatac.entity.pojo.ConsoleStore;
 import org.hadatac.entity.pojo.DataCollection;
 import org.hadatac.entity.pojo.Dataset;
@@ -7,8 +9,6 @@ import org.hadatac.entity.pojo.Deployment;
 import org.hadatac.entity.pojo.Detector;
 import org.hadatac.entity.pojo.Instrument;
 import org.hadatac.entity.pojo.Platform;
-
-import play.Play;
 
 public class DataFactory {
 	public static DataCollection createDataCollection(String dataCollectionUri, String deploymentUri) {
@@ -44,6 +44,13 @@ public class DataFactory {
 		deployment.save();
 		
 		return deployment;
+	}
+	
+	public static DataCollection getActiveDataCollection(String deploymentUri) {
+		List<DataCollection> list;
+		Deployment deployment = Deployment.find(deploymentUri);
+		list = DataCollection.find(deployment, true);
+		return list.get(0);
 	}
 	
 	public static long getNextDynamicMetadataId() {
