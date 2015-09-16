@@ -101,11 +101,18 @@ public class Annotator extends Controller {
 		}
     	//System.out.println("uploadCSV: uri is " + uri);
     	if (!uri.equals("")) {
+
+    		/*
+    		 *  Add deployment information into handler
+    		 */
     		String json = DeploymentQueries.exec(DeploymentQueries.DEPLOYMENT_BY_URI, uri);
     		SparqlQueryResults results = new SparqlQueryResults(json, false);
     		TripleDocument docDeployment = results.sparqlResults.values().iterator().next();
     		handler = new CSVAnnotationHandler(uri, docDeployment.get("platform"), docDeployment.get("instrument"));
-    		
+    		    		
+    		/*
+    		 * Add possible detector's characterisitcs into handler
+    		 */
     		String dep_json = DeploymentQueries.exec(DeploymentQueries.DEPLOYMENT_CHARACTERISTICS_BY_URI, uri);
     		SparqlQueryResults results2 = new SparqlQueryResults(dep_json, false);
     		Iterator<TripleDocument> it = results2.sparqlResults.values().iterator();
@@ -119,7 +126,16 @@ public class Annotator extends Controller {
     			}
     		}
     		handler.setDeploymentCharacteristics(deploymentChars);
-    		System.out.println("uploadCSV: dep_json is " + dep_json);
+
+    		/*
+    		 * Add URI of active datacollection in handler
+    		 */
+    		DataCollection dc = DataFactory.getActiveDataCollection(uri);
+    		if (dc != null && dc.getUri() != null) {
+    			handler.setDataCollectionUri(dc.getUri());
+    		}
+    		
+    		//System.out.println("uploadCSV: dep_json is " + dep_json);
     		//System.out.println("uploadCSV: ec_json is " + ec_json);
     	} else 
     	{
