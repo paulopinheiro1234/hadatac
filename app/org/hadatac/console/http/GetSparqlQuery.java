@@ -296,11 +296,13 @@ public class GetSparqlQuery {
                     "PREFIX prov: <http://www.w3.org/ns/prov#>  " +
         	        "PREFIX vstoi: <http://hadatac.org/ont/vstoi#>  " +
         	        "PREFIX hasneto: <http://hadatac.org/ont/hasneto#>  " +
-                    "SELECT ?uri ?platform ?instrument ?date WHERE { " + 
+                    "SELECT ?uri ?platform ?platformName ?instrument ?instrumentName ?date WHERE { " + 
                     "   ?uri a vstoi:Deployment . " + 
                     "   ?uri vstoi:hasPlatform ?platform .  " + 
                     "   ?uri hasneto:hasInstrument ?instrument .  " + 
                     "   ?uri prov:startedAtTime ?date .  " + 
+                    "   OPTIONAL { ?platform rdfs:label ?platformName } ." + 
+                    "   OPTIONAL { ?instrument rdfs:label ?instrumentName } ." + 
                     "}";
                 break;
             default :

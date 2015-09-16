@@ -9,8 +9,8 @@
 @import java.net._
 
 <tr>
-   <td>@triple.get("platform")</td> 
-   <td>@triple.get("instrument")</td>
+   <td>@triple.get("platformName")</td> 
+   <td>@triple.get("instrumentName")</td>
    <td>@triple.get("date")</td>
    <td>
           <a href="@org.hadatac.console.controllers.annotator.routes.Annotator.uploadCSV(URLEncoder.encode(triple.get("uri"),"UTF-8"))" class="btn-xs btn-primary" role="button">Select</a>
