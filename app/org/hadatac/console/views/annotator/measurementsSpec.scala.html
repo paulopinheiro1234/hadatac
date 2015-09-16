@@ -3,6 +3,7 @@
 
 @import helper._
 @import org.hadatac.console.views.html._
+@import org.hadatac.console.controllers.annotator.Downloads
 @import java.net._
 
 @main("CSV Annotator") {
@@ -24,7 +25,7 @@
     
     <h3>Step 3 of 3: Select Measurements' Characteristics and Units:</h3>
    
-    <form name="FullAnnotatorForm" method="POST" enctype="text/plain" action="@org.hadatac.console.controllers.annotator.routes.Downloads.genPreamble(URLEncoder.encode(handler.toJSON(),"UTF-8"))">
+    <form name="FullAnnotatorForm" method="POST" enctype="text/plain" action="@org.hadatac.console.controllers.annotator.routes.Downloads.postGenerate(URLEncoder.encode(handler.toJSON(),"UTF-8"))">
 
         <div class="container-fluid">
             <table class="table">
@@ -48,10 +49,10 @@
         <div class="container-fluid">
            <div class="row">
               <div class="navbar-collapse collapse navbar-secondary">
-                 <input type="submit" class="btn btn-primary" value="Upload CCSV">
-                 <input type="submit" class="btn btn-primary" value="Download CCSV">
-                 <input type="submit" class="btn btn-primary" value="Download Preamble">
-                 <input type="submit" class="btn btn-danger" value="Cancel">
+                 <input type="submit" name="submitButton"  class="btn btn-primary" value="@Downloads.OPER_UPLOAD">
+                 <input type="submit" name="submitButton"  class="btn btn-primary" value="@Downloads.OPER_CCSV">
+                 <input type="submit" name="submitButton"  class="btn btn-primary" value="@Downloads.OPER_PREAMBLE">
+                 <input type="submit" name="submitButton"  class="btn btn-danger"  value="@Downloads.OPER_FINISH">
               </div>
           </div>
         </div>

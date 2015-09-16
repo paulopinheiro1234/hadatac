@@ -87,14 +87,7 @@ POST	/hadatac/annotator/     			       org.hadatac.console.controllers.annotator
 GET	    /hadatac/annotator/loadcsv		    	   org.hadatac.console.controllers.annotator.Annotator.uploadCSV(deployment_uri : String)
 POST	/hadatac/annotator/loadcsv     			   org.hadatac.console.controllers.annotator.Annotator.postUploadCSV(deployment_uri : String)
 POST	/hadatac/annotator/loadcsv/upload          org.hadatac.console.controllers.annotator.FileProcessing.uploadFile(json : String)
-GET     /hadatac/annotator/uploadccsv              org.hadatac.console.controllers.annotator.Downloads.uploadCCSV 
-POST    /hadatac/annotator/uploadccsv              org.hadatac.console.controllers.annotator.Downloads.postUploadCCSV 
-GET     /hadatac/annotator/genccsv                 org.hadatac.console.controllers.annotator.Downloads.genCCSV
-POST    /hadatac/annotator/genccsv                 org.hadatac.console.controllers.annotator.Downloads.postGenCCSV
-GET     /hadatac/annotator/genpreamble             org.hadatac.console.controllers.annotator.Downloads.genPreamble(handler : String)
-POST    /hadatac/annotator/genpreamble             org.hadatac.console.controllers.annotator.Downloads.postGenPreamble(handler : String)
-GET     /hadatac/annotator/cancel                  org.hadatac.console.controllers.annotator.Downloads.cancel
-POST    /hadatac/annotator/cancel                  org.hadatac.console.controllers.annotator.Downloads.postCancel
+POST    /hadatac/annotator/generate                org.hadatac.console.controllers.annotator.Downloads.postGenerate(handler : String)
 
 # metadata store management URLs
 GET     /hadatac/ts/clean                          org.hadatac.console.controllers.triplestore.Clean.clean(oper: String)

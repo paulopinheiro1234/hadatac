@@ -1,11 +1,18 @@
 package org.hadatac.console.controllers.annotator;
 
+import java.io.File;
+import java.io.IOException;
+import java.io.StringReader;
 import java.net.URLDecoder;
+import java.util.ArrayList;
+import java.util.Properties;
 
+import play.Play;
 import play.mvc.*;
 import play.mvc.Http.*;
 import play.mvc.Result;
 
+import org.apache.commons.io.FileUtils;
 import org.hadatac.console.models.CSVAnnotationHandler;
 import org.hadatac.console.views.html.annotator.*;
 import org.hadatac.utils.NameSpaces;
@@ -14,81 +21,70 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class Downloads extends Controller {
 
-    public static Result uploadCCSV() {
-      return ok(completeAnnotation.render());   
-    }
+	/* 
+	 *  Download operations
+	 */
+	public static final String OPER_UPLOAD     = "Upload CCSV";
+	public static final String OPER_CCSV       = "Download CCSV";
+	public static final String OPER_PREAMBLE   = "Download Preamble";
+	public static final String OPER_FINISH     = "Finish";
+	
+	/*
+	 *  Preamble fragments
+	 */
 
-    public static Result postUploadCCSV() {
-        return ok(completeAnnotation.render());
-    }
+	public static final String FRAG_START_PREAMBLE          = "== START-PREAMBLE ==\n";
+    public static final String FRAG_END_PREAMBLE            = "== END-PREAMBLE ==\n";
 
-    public static Result genCCSV() {
-        return ok(completeAnnotation.render());   
-    }
+    public static final String FRAG_KB_PART1                = "<kb> a hadatac:KnowledgeBase; hadatac:hasHost \"";
+    public static final String FRAG_KB_PART2                = "\"^^xsd:anyURI . \n\n";
 
-    public static Result postGenCCSV() {
-        return ok(completeAnnotation.render());
-    }
-    
-    public static Result genPreamble(String handler_json) {
+    public static final String FRAG_DATASET                 = " a vstoi:Dataset; prov:wasGeneratedBy <";
+    public static final String FRAG_HAS_MEASUREMENT_TYPE    = " hasMeasurementType ";
+    public static final String FRAG_MT                      = "<mt";
 
+    public static final String FRAG_MEASUREMENT_TYPE_PART1  = "> a hadatac:MeasurementType; hadatac:atColumn ";
+    public static final String FRAG_MEASUREMENT_TYPE_PART2  = "; oboe:ofCharacteristic ";
+    public static final String FRAG_MEASUREMENT_TYPE_PART3  = "; oboe:usesStandard ";
+
+    public static Result postGenerate(String handler_json) {
+
+    	String oper = "";
+    	
+    	RequestBody body = request().body();
+    	if (body == null) {
+            return ok(completeAnnotation.render("Error processing form: form appears to be empty."));       		    		
+    	}
+    	
+    	String textBody = body.asText();
+    	Properties p = new Properties();
     	try {
-			handler_json = URLDecoder.decode(handler_json, "UTF-8");
+	    	p.load(new StringReader(textBody));
 		} catch (Exception e) {
 			e.printStackTrace();
+            return ok(completeAnnotation.render("Error processing form: form appears to be empty."));       		
 		}
-    	System.out.println(handler_json);
+
+    	System.out.println("Selection: " + p.getProperty("submitButton"));
+    	if (p.getProperty("submitButton") != null)
+    		oper = p.getProperty("submitButton");
     	
-    	ObjectMapper mapper = new ObjectMapper();    	
-    	CSVAnnotationHandler handler = null;
-    	try {
-			handler = mapper.readValue(handler_json, CSVAnnotationHandler.class);
-			int i = 0;
-			for (String str : handler.getFields()) {
-				System.out.println(str);
-				i++;
-			}
-			  RequestBody body = request().body();
-			  String textBody = body.asText();
-			  
-			  if(textBody != null) {
-			    System.out.println("Got: [" + textBody + "]");
-			  } else {
-			    badRequest("Expecting text/plain request body");
-			  }
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-			return ok (uploadCSV.render(null, "fail", "Lost deployment information."));
-		} 
-    	    	
-        return ok(completeAnnotation.render());   
-    }
-
-    public static final String START_PREAMBLE = "== START-PREAMBLE ==";
-    public static final String END_PREAMBLE   = "== START-PREAMBLE ==";
-
-    /* <example-kb> a hadatac:KnowledgeBase; hadatac:hasHost "http://localhost"^^xsd:anyURI .
-
-    <example01-dataset02> a vstoi:Dataset; prov:wasGeneratedBy <dataCollection-example01>; hadatac:hasMeasurementType <mt0>,<mt1> .
-
-    <mt0> a hadatac:MeasurementType; time:inDateTime <ts0>; hadatac:atColumn 3; oboe:ofCharacteristic hadatac-entities:EC-WindDirection; oboe:ofCharacteristic jp-characteristics:EC-WindDirection; oboe:usesStandard oboe-standards:Degree .
-    <mt1> a hadatac:MeasurementType; time:inDateTime <ts0>; hadatac:atColumn 2; oboe:ofCharacteristic hadatac-entities:EC-WindSpeed; oboe:usesStandard oboe-standards:MeterPerSecond .
-    <ts0> hadatac:atColumn 0 .
-    */
-   
-    public static Result postGenPreamble(String handler_json) {
-
-    	
+    	if (oper.equals(OPER_FINISH)) {
+            return ok(completeAnnotation.render("Annotation operation finished."));       		
+    	}
     	
     	NameSpaces ns = NameSpaces.getInstance();
-    	String preamble = START_PREAMBLE;
+    	String preamble = FRAG_START_PREAMBLE;
     	preamble += ns.printNameSpaceList();
     	preamble += "\n";
 
     	/* 
     	 * Insert KB
     	 */
+    	
+    	preamble += FRAG_KB_PART1;
+    	preamble += Play.application().configuration().getString("hadatac.console.host") + "/hadatac/"; 
+    	preamble += FRAG_KB_PART2;
     	
     	try {
 			handler_json = URLDecoder.decode(handler_json, "UTF-8");
@@ -103,40 +99,86 @@ public class Downloads extends Controller {
 			handler = mapper.readValue(handler_json, CSVAnnotationHandler.class);
 
 			  /* 
-			   * Insert Data Collection
+			   * Insert Data Set
 			   */
 			
-			  /*int i = 0;
-			  for (String str : handler.getFields()) {
-		  		  System.out.println(str);
-	  		 	  i++;
-		      }*/
+			  preamble += "<DATASET URI>";
+			  preamble += FRAG_DATASET;
+			  preamble += "DATACOLLECTION_URI>; ";
 			
-			  RequestBody body = request().body();
-			  String textBody = body.asText();
+			  int i = 0;
+			  ArrayList<Integer> mt = new ArrayList<Integer>();
+			  for (String str : handler.getFields()) {
+		  		  //System.out.println(str);
+	  		 	  //System.out.println("get " + i + "-characteristic: [" + p.getProperty(i + "-characteristic") + "]");
+	  		 	  //System.out.println("get " + i + "-unit:           [" + p.getProperty(i + "-unit") + "]");
+	  		 	  if ((p.getProperty(i + "-characteristic") != null) && 
+	  		 		  (!p.getProperty(i + "-characteristic").equals("")) && 
+		  		 	  (p.getProperty(i + "-unit") != null) && 
+			  		  (!p.getProperty(i + "-unit").equals(""))) {
+			  			  mt.add(i);
+			  		  }
+	  		 	  i++;
+		      }
 			  
+			  preamble += FRAG_HAS_MEASUREMENT_TYPE;	
+			  int aux = 0;
+			  for (Integer mt_count : mt) {
+				  preamble += FRAG_MT + aux++ + "> ";
+			  }
+			  preamble += ".\n\n";
+			  
+			  /*
+			   * Insert measurement types
+			   */
+			  
+			  aux = 0;
+			  for (Integer mt_count : mt) {
+				  preamble += FRAG_MT + aux;
+				  preamble += FRAG_MEASUREMENT_TYPE_PART1;
+				  preamble += mt_count;
+				  preamble += FRAG_MEASUREMENT_TYPE_PART2;
+				  preamble += p.getProperty(mt_count + "-characteristic"); 
+				  preamble += FRAG_MEASUREMENT_TYPE_PART3;
+				  preamble += p.getProperty(mt_count + "-unit"); 
+				  preamble += " .\n";
+			  }
+
 			  if(textBody != null) {
-			    System.out.println("Got: [" + textBody + "]");
+			    //System.out.println("Got: [" + textBody + "]");
 			  } else {
 			    badRequest("Expecting text/plain request body");
 			  }
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-			return ok (completeAnnotation.render());
+			return ok (completeAnnotation.render("Error processing form. Please restart form."));
 		} 
     	
-    	preamble += END_PREAMBLE;
-    	System.out.println(preamble);
-        return ok(completeAnnotation.render());
-    }
-
-    public static Result cancel() {
-        return ok(completeAnnotation.render());   
-    }
-
-    public static Result postCancel() {
-        return ok(completeAnnotation.render());
+    	preamble += FRAG_END_PREAMBLE;
+    	
+    	if (oper.equals(OPER_PREAMBLE)) {
+    		return ok(preamble).as("text/turtle");
+    	}
+    	
+    	if (oper.equals(OPER_CCSV)) {
+		    File newFile = new File(handler.getDatasetName()); 
+		    try {
+				preamble += FileUtils.readFileToString(newFile, "UTF-8");
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+				return ok (completeAnnotation.render("Error reading cached CSV file. Please restart form."));
+			}
+	        return ok(preamble).as("text/turtle");
+    	}
+    	
+    	if (oper.equals(OPER_UPLOAD)) {
+    		
+    	}
+    	
+		return ok (completeAnnotation.render("Error processing form: unspecified download operation."));
+    	
     }
 
 }
