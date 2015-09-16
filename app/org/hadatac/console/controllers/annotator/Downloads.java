@@ -15,6 +15,7 @@ import play.mvc.Result;
 import org.apache.commons.io.FileUtils;
 import org.hadatac.console.models.CSVAnnotationHandler;
 import org.hadatac.console.views.html.annotator.*;
+import org.hadatac.data.api.DataFactory;
 import org.hadatac.utils.NameSpaces;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -102,9 +103,9 @@ public class Downloads extends Controller {
 			   * Insert Data Set
 			   */
 			
-			  preamble += "<DATASET URI>";
+			  preamble += "<" + DataFactory.getNextURI(DataFactory.DATASET_ABBREV) + ">";
 			  preamble += FRAG_DATASET;
-			  preamble += "DATACOLLECTION_URI>; ";
+			  preamble += handler.getDataCollectionUri() + ">; ";
 			
 			  int i = 0;
 			  ArrayList<Integer> mt = new ArrayList<Integer>();

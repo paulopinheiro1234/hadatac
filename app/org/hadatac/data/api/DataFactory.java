@@ -10,8 +10,19 @@ import org.hadatac.entity.pojo.Detector;
 import org.hadatac.entity.pojo.Instrument;
 import org.hadatac.entity.pojo.Platform;
 
+import play.Play;
+
 public class DataFactory {
-	public static DataCollection createDataCollection(String dataCollectionUri, String deploymentUri) {
+
+	public static String DEPLOYMENT_ABBREV = "DP";
+
+    public static String DATA_COLLECTION_ABBREV = "DC";
+    
+    public static String DATASET_ABBREV = "DS";
+    
+    public static String CONSOLE_ID = "00000001";
+    
+    public static DataCollection createDataCollection(String dataCollectionUri, String deploymentUri) {
 		DataCollection dataCollection = null;
 		Deployment deployment = Deployment.find(deploymentUri);
 		
@@ -67,4 +78,15 @@ public class DataFactory {
 		
 		return -1;
 	}
+
+    public static String getNextURI(String category) {
+    	String metadataId = Long.toHexString(DataFactory.getNextDynamicMetadataId());
+    	String host = Play.application().configuration().getString("hadatac.console.host");
+    	for (int i = metadataId.length(); i <= 8; i++) {
+    		metadataId = "0" + metadataId;
+    	}
+    	return host + "/hadatac/kb/" + category + "/" + CONSOLE_ID + "/" + metadataId + "/" ;   
+    }
+    
+
 }
