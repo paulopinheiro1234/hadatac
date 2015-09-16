@@ -46,6 +46,7 @@ public class GetSolrQuery {
     		this.solr_query.append(collection_urls.get(collection));
             //this.solr_query.append("&q=*:*");
     		this.solr_query.append("&q=" + q);
+    		System.out.println("!!! GetSolrQuery: " + q);
             
             String quote = new String();
     		try {
@@ -178,7 +179,7 @@ public class GetSolrQuery {
         try
         {
         	HttpClient client = new DefaultHttpClient();
-        	URL url = new URL(this.list_of_queries.get(collection).toString() + "&start=" + (page-1)*size + "&rows=" + size + "&facet=true&facet.field=unit&facet.pivot=entity,characteristic&facet.pivot=platform_name,instrument_model");
+        	URL url = new URL(this.list_of_queries.get(collection).toString() + "&start=" + (page-1)*size + "&rows=" + size + "&facet=true&facet.mincount=1&facet.field=unit&facet.pivot=entity,characteristic&facet.pivot=platform_name,instrument_model");
         	URI uri = new URI(url.getProtocol(), url.getUserInfo(), url.getHost(), url.getPort(), url.getPath(), url.getQuery(), url.getRef());
         	HttpGet request = new HttpGet(uri.toASCIIString());
         	HttpResponse response = client.execute(request);

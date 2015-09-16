@@ -8,7 +8,8 @@
     documentJson : String,
     final_query : String,
     current_page : Integer,
-    max_page : Integer)
+    max_page : Integer,
+    handler: org.hadatac.console.models.FacetHandler)
 
 @import helper._
 @import org.hadatac.console.views.html._
@@ -42,7 +43,23 @@
 				<label class="col-md-offset-1 control-label">Platforms and Instruments</label>
 			</div>
 	        <div id="treePlatformInstrumentBox" style="width:100%; height:150px; background-color:#f5f5f5; border :1px solid Silver; overflow:auto;"></div>
+	        <center>
+	        	<button type="button" class="btn btn-primary" onClick="submitSearch();">Search</button>
+	        	<button type="button" class="btn btn-default">Clear</button>
+	        </center>
 	        <script>
+	        	function submitSearch() {
+	        		var ids;
+	        		var json;
+	        		ids = treeEC.getAllChecked().split(",");
+	        		jsonSearch = '{';
+	        		for (var i = 0; i < ids.length; i++) {
+	        			var id = ids[i];
+	        			
+	        		}
+	        		json = '}';
+	        	}
+	        	
 	        	function parseSolrFacetPivotToTree(type) {
 	        		var i, j, q, jsonTree, fields;
 	        		i = 0;
@@ -104,18 +121,23 @@
 					tree.setImagePath("@controllers.routes.Assets.versioned("lib/dhtmlx/imgs/dhxtree_skyblue/")");
 					tree.setDataMode("json");
 					tree.attachEvent("onClick",function(id) {
-						//alert(tree.getUserData(id,"field") + ':' + tree.getUserData(id,"value"));
-						//alert(getURLParameter('q'));
-						var url = decodeURI(window.location.href);
-						if (getURLParameter('q') == null) {
-							if (url.indexOf('?') > 0) {
-								url += '&q='
-							} else {
-								url += '?q=';
-							}
-							url += tree.getUserData(id,"field") + ':"' + tree.getUserData(id,"value") + '"';
+						var url = location.protocol + '//' + location.host + location.pathname;
+						if (url.indexOf('?') > 0) {
+							url += '&facetAdd='
 						} else {
-							url += ' AND ' + tree.getUserData(id,"field") + ':"' + tree.getUserData(id,"value") + '"';
+							url += '?facetAdd=';
+						}
+						url += tree.getUserData(id,"field") + ':"' + tree.getUserData(id,"value") + '"';
+						url += '&facets=' + '@Html(handler.toJSON())';
+						var children = tree.getSubItems(id).split(",");
+						if (children.length > 0) {
+							url += '&facetDel=';
+							for (var i = 0; i < children.length; i++) {
+								if (i != 0) {
+									url += ',';
+								}
+								url += tree.getUserData(children[i],"field");
+							}
 						}
 						window.location.href = encodeURI(url);
 						return true;
@@ -124,21 +146,23 @@
 					tree.openAllItems(0);
 	        	}
 	        
-	        	var jsonTree, dataTree, tree;
+	        	var jsonTree, dataTree, treeEC;
 	        	jsonTree = parseSolrFacetPivotToTree("entity,characteristic");
 				dataTree = JSON.parse(jsonTree);
-				tree = new dhtmlXTreeObject("treeEntityCharacteristicBox","100%","100%",0);
-				loadTree(tree, dataTree);
+				treeEC = new dhtmlXTreeObject("treeEntityCharacteristicBox","100%","100%",0);
+				loadTree(treeEC, dataTree);
 				
+				var treePI;
 				jsonTree = parseSolrFacetPivotToTree("platform_name,instrument_model");
 				dataTree = JSON.parse(jsonTree);
-				tree = new dhtmlXTreeObject("treePlatformInstrumentBox","100%","100%",0);
-				loadTree(tree, dataTree);
+				treePI = new dhtmlXTreeObject("treePlatformInstrumentBox","100%","100%",0);
+				loadTree(treePI, dataTree);
 				
+				var treeU
 				jsonTree = parseSolrFacetFieldToTree("unit");
 				dataTree = JSON.parse(jsonTree);
-				tree = new dhtmlXTreeObject("treeUnitBox","100%","100%",0);
-				loadTree(tree, dataTree);
+				treeU = new dhtmlXTreeObject("treeUnitBox","100%","100%",0);
+				loadTree(treeU, dataTree);
 			</script>
 	        </div>
 	        <div class="col-md-3 main">

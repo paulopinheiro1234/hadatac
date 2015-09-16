@@ -5,8 +5,10 @@ import org.hadatac.console.http.JsonHandler;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.net.URLDecoder;
 import java.util.TreeMap;
 
+import org.hadatac.console.models.FacetHandler;
 import org.hadatac.console.models.FacetsWithCategories;
 import org.hadatac.console.models.SpatialQuery;
 import org.hadatac.console.models.SpatialQueryResults;
@@ -20,6 +22,9 @@ import play.mvc.Result;
 
 import org.hadatac.console.views.formdata.FacetFormData;
 import org.hadatac.console.views.html.index_browser;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import org.hadatac.console.views.html.hadatac_message;
 
 public class Application extends Controller {
@@ -64,8 +69,29 @@ public class Application extends Controller {
     	return redirect("/");
     }
 
-    public static Result index(int p, String q) {
-    	System.out.println("!!!!!! Application.index");
+    public static Result index(int p, String facets, String facetAdd, String facetDel) {
+    	System.out.println("!!! index PARAMS - facets: |" + facets + "| facet: |" + facetAdd + "|");
+    	try {
+    		if (!facets.isEmpty()) {
+    			facets = URLDecoder.decode(facets, "UTF-8");
+    			System.out.println("AFTER DECODE: " + facets);
+    		}
+		} catch (Exception e) {
+			System.out.println("URLDecoder.decode: " + e.getMessage());
+		}
+    	ObjectMapper mapper = new ObjectMapper();
+    	
+    	FacetHandler handler = null;
+    	try {
+    		handler = mapper.readValue(facets, FacetHandler.class);
+    	} catch (Exception e) {
+    		handler = new FacetHandler();
+    		System.out.println("mapper.readValue: " + e.getMessage());
+    	}
+    	if (!facetAdd.isEmpty()) {
+    		handler.putFacet(facetAdd.substring(0, facetAdd.indexOf(":")), facetAdd.substring(facetAdd.indexOf(":")+2, facetAdd.length()-1));
+    	}
+    	
     	Form<FacetFormData> formData = Form.form(FacetFormData.class).fill(facet_form);
         JsonHandler jh = new JsonHandler();
         String query_json = "";
@@ -73,7 +99,7 @@ public class Application extends Controller {
         
         //Get query using http.GetSolrQuery
         SpatialQuery query = new SpatialQuery();
-        GetSolrQuery query_submit = new GetSolrQuery(query, q);
+        GetSolrQuery query_submit = new GetSolrQuery(query, handler.toSolrQuery());
         TreeMap<String, SpatialQueryResults> query_results_list = new TreeMap<String, SpatialQueryResults>();
     	String final_query = null;
     	
@@ -95,11 +121,32 @@ public class Application extends Controller {
         Form<FacetFormData> fd = Form.form(FacetFormData.class).fill(facet_form);
         return ok(index_browser.render(fd, field_facets, query_facets,
                 range_facets, pivot_facets, cluster_facets, 
-                query_results_list, query_json, final_query, p, (int) Math.ceil(1808.0/20)));
+                query_results_list, query_json, final_query, p, (int) Math.ceil(1808.0/20), handler));
         //return ok(hadatac_message.render("HADataC", "Your HADataC instance does not contain any measurements to be browser. Please go ahead and index some."));
     }
 
-    public static Result postIndex(int p, String q) {
+    public static Result postIndex(int p, String facets, String facetAdd, String facetDel) {
+    	System.out.println("!!! postIndex PARAMS - facets: |" + facets + "| facet: |" + facetAdd + "|");
+    	try {
+    		if (!facets.isEmpty()) {
+    			facets = URLDecoder.decode(facets, "UTF-8");
+    		}
+		} catch (Exception e) {
+			System.out.println("URLDecoder.decode: " + e.getMessage());
+		}
+    	ObjectMapper mapper = new ObjectMapper();
+    	
+    	FacetHandler handler = null;
+    	try {
+    		handler = mapper.readValue(facets, FacetHandler.class);
+    	} catch (Exception e) {
+    		handler = new FacetHandler();
+    		System.out.println("mapper.readValue: " + e.getMessage());
+    	}
+    	if (!facetAdd.isEmpty()) {
+    		handler.putFacet(facetAdd.substring(0, facetAdd.indexOf(":")), facetAdd.substring(facetAdd.indexOf(":")+1, facetAdd.length()));
+    	}
+    	
     	String query_json = "";
     	JsonHandler jh = new JsonHandler();
     	String subject = new String();
@@ -128,7 +175,7 @@ public class Application extends Controller {
     	SpatialQuery query = new SpatialQuery(subject, predicate, field_facet_for_query, query_facets,
     						    pivot_facets, range_facets, cluster_facets);
     	
-    	GetSolrQuery query_submit = new GetSolrQuery(query, q);
+    	GetSolrQuery query_submit = new GetSolrQuery(query, handler.toSolrQuery());
     	
     	//TODO loop over all queries in query_submit.list_of_queries
     	TreeMap<String, SpatialQueryResults> query_results_list = new TreeMap<String, SpatialQueryResults>();
@@ -152,7 +199,7 @@ public class Application extends Controller {
         Form<FacetFormData> fd = Form.form(FacetFormData.class).fill(facet_form);
         return ok(index_browser.render(fd, field_facets, query_facets,
                 range_facets, pivot_facets, cluster_facets, 
-                query_results_list, query_json, final_query, p, (int) Math.ceil(1808.0/20))); 
+                query_results_list, query_json, final_query, p, (int) Math.ceil(1808.0/20), handler)); 
 
     }
 
