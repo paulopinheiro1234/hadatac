@@ -62,6 +62,9 @@ public class DataFactory {
 		List<DataCollection> list;
 		Deployment deployment = Deployment.find(deploymentUri);
 		list = DataCollection.find(deployment, true);
+		if (list.isEmpty()) {
+			return null;
+		}
 		return list.get(0);
 	}
 	
