@@ -283,8 +283,6 @@ public class DataCollection {
 	}
 	
 	public boolean isFinished() {
-		System.out.println("!!!!!! start: " + startedAt.toString());
-		System.out.println("!!!!!! end: " + startedAt.toString());
 		if (endedAt == null) {
 			return false;
 		} else {
