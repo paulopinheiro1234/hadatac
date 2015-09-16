@@ -6,7 +6,7 @@ import org.hadatac.console.models.SparqlQuery;
 import org.hadatac.console.models.TreeQuery;
 import play.mvc.Controller;
 import play.mvc.Result;
-import org.hadatac.console.views.html.metadata;
+import org.hadatac.console.views.html.metadata.metadata;
 
 
 public class Metadata extends Controller {
