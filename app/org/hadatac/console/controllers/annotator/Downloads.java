@@ -41,7 +41,7 @@ public class Downloads extends Controller {
     public static final String FRAG_KB_PART2                = "\"^^xsd:anyURI . \n\n";
 
     public static final String FRAG_DATASET                 = " a vstoi:Dataset; prov:wasGeneratedBy <";
-    public static final String FRAG_HAS_MEASUREMENT_TYPE    = " hasMeasurementType ";
+    public static final String FRAG_HAS_MEASUREMENT_TYPE    = " hadatac:hasMeasurementType ";
     public static final String FRAG_MT                      = "<mt";
 
     public static final String FRAG_MEASUREMENT_TYPE_PART1  = "> a hadatac:MeasurementType; hadatac:atColumn ";
@@ -139,9 +139,9 @@ public class Downloads extends Controller {
 				  preamble += FRAG_MEASUREMENT_TYPE_PART1;
 				  preamble += mt_count;
 				  preamble += FRAG_MEASUREMENT_TYPE_PART2;
-				  preamble += p.getProperty(mt_count + "-characteristic"); 
+				  preamble += "<" + p.getProperty(mt_count + "-characteristic") + ">"; 
 				  preamble += FRAG_MEASUREMENT_TYPE_PART3;
-				  preamble += p.getProperty(mt_count + "-unit"); 
+				  preamble += "<" + p.getProperty(mt_count + "-unit") + ">"; 
 				  preamble += " .\n";
 			  }
 
