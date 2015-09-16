@@ -1,0 +1,26 @@
+@()
+
+@import helper._
+@import org.hadatac.console.views.html._
+
+@main("Metadata") {
+    <div class="container-fluid">
+     
+     <h3>Scientific Concepts</h3> 
+      <div class="row">
+		  @science_navigation("", false)
+      </div>
+
+     <h3>Empirical Infrastructure</h3> 
+      <div class="row">
+		  @empirical_navigation("", false)
+      </div>
+
+     <h3>Computational Infrastructure</h3> 
+      <div class="row">
+		  @computational_navigation("", false)
+      </div>
+
+    </div>
+
+}
