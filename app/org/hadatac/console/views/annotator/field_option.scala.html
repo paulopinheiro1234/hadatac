@@ -1,23 +1,35 @@
-@(field : String,
+@(index : Int,
+ field : String,
+ charNames: Map[String, String],
  theUnits : org.hadatac.console.models.SparqlQueryResults)
 
 @import java.net._
+@import org.hadatac.utils._
 
 <tr>
 
    <td>@field</td> 
 
-   <td>foo
+   <td>	 
+      <div class="form-group">
+         <select class="form-control col-sm-6" name="@index-characteristic">
+            <option value=""></option>
+            @for((ecuri,ecname) <- charNames) {
+                <option value="@ecuri">@ecname</option>         
+            }
+         </select>
+     </div>
+   
    </td>
 
    <td>
 	 <div class="form-group">
-         <select class="form-control col-sm-6" name="unit">
+         <select class="form-control col-sm-6" name="@index-unit">
             <option value=""></option>
             @for((k, triple) <- theUnits.sparqlResults){
                @defining(triple.generateID()) {itemID =>
                    @defining(triple.get("modelName").replaceAll("[\\W]|_", "")) {cleanName =>
-                       <option value="@triple.get("modelName")">@triple.get("modelName")</option>         
+                       <option value="@triple.get("modelName")">@PrettyName.uri(triple.get("modelName"))</option>         
                 }
               }
             }

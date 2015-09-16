@@ -48,12 +48,12 @@ public class DeploymentQueries {
                     "PREFIX prov: <http://www.w3.org/ns/prov#>  " +
         	        "PREFIX vstoi: <http://hadatac.org/ont/vstoi#>  " +
         	        "PREFIX hasneto: <http://hadatac.org/ont/hasneto#>  " +
-                    "SELECT ?ec ?ecName WHERE { " + 
+                    "SELECT ?deturi ?detModel ?sp ?ec ?ecName WHERE { " + 
                     "   <" + uri + "> a vstoi:Deployment . " + 
                     "   <" + uri + "> hasneto:hasDetector ?deturi .  " +
                     "   ?deturi a ?detModel . " +
                     "   ?sp vstoi:perspectiveOf ?detModel . " +
-                    "   ?sp vstoi:hasPerspectiveCharacteristic ?ec ." +
+                    "   ?sp hasneto:hasPerspectiveCharacteristic ?ec ." +
                     "   ?ec rdfs:label ?ecName .  " + 
                     "}";
                 break;

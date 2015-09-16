@@ -12,6 +12,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
 
 import org.hadatac.console.models.SparqlQuery;
 import org.hadatac.console.models.SparqlQueryResults;
@@ -82,8 +86,8 @@ public class Annotator extends Controller {
     }// /postIndex()
 
     public static Result uploadCSV(String uri) {
-    	
-		CSVAnnotationHandler handler;
+
+    	CSVAnnotationHandler handler;
     	try {
     		if (uri != null) {
 			    uri = URLDecoder.decode(uri, "UTF-8");
@@ -96,12 +100,23 @@ public class Annotator extends Controller {
     	//System.out.println("uploadCSV: uri is " + uri);
     	if (!uri.equals("")) {
     		String json = DeploymentQueries.exec(DeploymentQueries.DEPLOYMENT_BY_URI, uri);
-    		String dep_json = DeploymentQueries.exec(DeploymentQueries.DEPLOYMENT_CHARACTERISTICS, uri);
-    		String ec_json = DeploymentQueries.exec(DeploymentQueries.DETECTOR_SENSING_PERSPECTIVE, uri);
     		SparqlQueryResults results = new SparqlQueryResults(json, false);
-    		TripleDocument doc = results.sparqlResults.values().iterator().next();
-    		handler = new CSVAnnotationHandler(uri, doc.get("platform"), doc.get("instrument"));
+    		TripleDocument docDeployment = results.sparqlResults.values().iterator().next();
+    		handler = new CSVAnnotationHandler(uri, docDeployment.get("platform"), docDeployment.get("instrument"));
     		
+    		String dep_json = DeploymentQueries.exec(DeploymentQueries.DEPLOYMENT_CHARACTERISTICS_BY_URI, uri);
+    		SparqlQueryResults results2 = new SparqlQueryResults(dep_json, false);
+    		Iterator<TripleDocument> it = results2.sparqlResults.values().iterator();
+    		Map<String,String> deploymentChars = new HashMap<String,String>();
+    		TripleDocument docChar;
+    		while (it.hasNext()) {
+    			docChar = (TripleDocument) it.next();
+    			if (docChar != null && docChar.get("ec") != null && docChar.get("ecName") != null) {
+    				deploymentChars.put((String)docChar.get("ec"),(String)docChar.get("ecName"));
+    				System.out.println("EC: " + docChar.get("ec") + "   ecName: " + docChar.get("ecName"));
+    			}
+    		}
+    		handler.setDeploymentCharacteristics(deploymentChars);
     		System.out.println("uploadCSV: dep_json is " + dep_json);
     		//System.out.println("uploadCSV: ec_json is " + ec_json);
     	} else 
@@ -125,14 +140,28 @@ public class Annotator extends Controller {
 		} catch (UnsupportedEncodingException e) {
 			e.printStackTrace();
 		}
-    	System.out.println("uploadCSV: uri is " + uri);
+    	//System.out.println("uploadCSV: uri is " + uri);
     	if (!uri.equals("")) {
     		String json = DeploymentQueries.exec(DeploymentQueries.DEPLOYMENT_BY_URI, uri);
     		SparqlQueryResults results = new SparqlQueryResults(json, false);
-    		TripleDocument doc = results.sparqlResults.values().iterator().next();
-    		handler = new CSVAnnotationHandler(uri, doc.get("platform"), doc.get("instrument"));
+    		TripleDocument docDeployment = results.sparqlResults.values().iterator().next();
+    		handler = new CSVAnnotationHandler(uri, docDeployment.get("platform"), docDeployment.get("instrument"));
     		
-    		System.out.println("uploadCSV: json is " + json);
+    		String dep_json = DeploymentQueries.exec(DeploymentQueries.DEPLOYMENT_CHARACTERISTICS_BY_URI, uri);
+    		SparqlQueryResults results2 = new SparqlQueryResults(dep_json, false);
+    		Iterator<TripleDocument> it = results2.sparqlResults.values().iterator();
+    		Map<String,String> deploymentChars = new HashMap<String,String>();
+    		TripleDocument docChar;
+    		while (it.hasNext()) {
+    			docChar = (TripleDocument) it.next();
+    			if (docChar != null && docChar.get("ec") != null && docChar.get("ecName") != null) {
+    				deploymentChars.put((String)docChar.get("ec"),(String)docChar.get("ecName"));
+    				System.out.println("EC: " + docChar.get("ec") + "   ecName: " + docChar.get("ecName"));
+    			}
+    		}
+    		handler.setDeploymentCharacteristics(deploymentChars);
+    		System.out.println("uploadCSV: dep_json is " + dep_json);
+    		//System.out.println("uploadCSV: ec_json is " + ec_json);
     	} else 
     	{
     		handler = new CSVAnnotationHandler(uri, "", "");

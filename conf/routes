@@ -91,8 +91,8 @@ GET     /hadatac/annotator/uploadccsv              org.hadatac.console.controlle
 POST    /hadatac/annotator/uploadccsv              org.hadatac.console.controllers.annotator.Downloads.postUploadCCSV 
 GET     /hadatac/annotator/genccsv                 org.hadatac.console.controllers.annotator.Downloads.genCCSV
 POST    /hadatac/annotator/genccsv                 org.hadatac.console.controllers.annotator.Downloads.postGenCCSV
-GET     /hadatac/annotator/genpreamble             org.hadatac.console.controllers.annotator.Downloads.genPreamble
-POST    /hadatac/annotator/genpreamble             org.hadatac.console.controllers.annotator.Downloads.postGenPreamble
+GET     /hadatac/annotator/genpreamble             org.hadatac.console.controllers.annotator.Downloads.genPreamble(handler : String)
+POST    /hadatac/annotator/genpreamble             org.hadatac.console.controllers.annotator.Downloads.postGenPreamble(handler : String)
 GET     /hadatac/annotator/cancel                  org.hadatac.console.controllers.annotator.Downloads.cancel
 POST    /hadatac/annotator/cancel                  org.hadatac.console.controllers.annotator.Downloads.postCancel
 

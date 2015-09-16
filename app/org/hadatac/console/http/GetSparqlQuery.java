@@ -252,9 +252,10 @@ public class GetSparqlQuery {
                 q = "PREFIX rdfs:<http://www.w3.org/2000/01/rdf-schema#>" + 
                     "PREFIX owl: <http://www.w3.org/2002/07/owl#>" + 
                     "PREFIX oboe: <http://ecoinformatics.org/oboe/oboe.1.0/oboe-core.owl#>" + 
-                    "SELECT ?modelName ?superModelName ?chara WHERE { " + 
+                    "SELECT ?modelName ?superModelName ?chara ?label WHERE { " + 
                     "   ?modelName rdfs:subClassOf* oboe:Standard . " + 
                     "   ?modelName rdfs:subClassOf ?superModelName .  " + 
+                    "   OPTIONAL { ?modelName rdfs:label ?label } ." +
                     "   OPTIONAL { ?modelName oboe:standardFor ?m .  " + 
                     "              ?m oboe:ofCharacteristic ?chara } . " +
                     "}";
@@ -282,9 +283,7 @@ public class GetSparqlQuery {
                 q = "PREFIX rdfs:<http://www.w3.org/2000/01/rdf-schema#>" + 
                     "PREFIX owl: <http://www.w3.org/2002/07/owl#>" + 
                     "PREFIX hasneto: <http://hadatac.org/ont/hasneto#> " + 
-                    //"SELECT ?ec WHERE { " + 
                     "SELECT ?ecName ?entity ?chara WHERE { " + 
-                    //"  ?a a hasneto:EntityCharacteristic. " +
                     "   ?ec a hasneto:EntityCharacteristic . " + 
                     "   ?ec rdfs:label ?ecName .  " + 
                     "   ?ec hasneto:ofEntity ?entity .  " + 
