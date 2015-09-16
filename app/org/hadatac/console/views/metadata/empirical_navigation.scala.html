@@ -1,0 +1,47 @@
+ @(selection : String, showLabel : Boolean)
+ 
+   <div class="navbar-collapse collapse navbar-secondary hidden-print">
+       @if(showLabel) {
+           <B>Options</B>: 
+       }
+	   @if(selection == "PlatformModels") {
+          	<a href="@org.hadatac.console.controllers.routes.Platform.index()" class="btn btn-warning" role="button">Platform Model<br>Hierarchy</a>
+       } else {
+          	<a href="@org.hadatac.console.controllers.routes.Platform.index()" class="btn btn-primary" role="button">Platform Model<br>Hierarchy</a>
+       }
+	   @if(selection == "Platforms") {
+       		<a href="@org.hadatac.console.controllers.routes.PlatformList.index()" class="btn btn-warning" role="button">Platform<br>List</a>
+       } else {
+       		<a href="@org.hadatac.console.controllers.routes.PlatformList.index()" class="btn btn-primary" role="button">Platform<br>List</a>
+       }
+	   @if(selection == "InstrumentModels") {
+       		<a href="@org.hadatac.console.controllers.routes.Instrument.index()" class="btn btn-warning" role="button">Instrument Model<br>Hierarchy</a>
+       } else {
+       		<a href="@org.hadatac.console.controllers.routes.Instrument.index()" class="btn btn-primary" role="button">Instrument Model<br>Hierarchy</a>
+       }
+	   @if(selection == "Instruments") {
+       		<a href="@org.hadatac.console.controllers.routes.InstrumentList.index()" class="btn btn-warning" role="button">Instrument<br>List</a>
+       } else {
+       		<a href="@org.hadatac.console.controllers.routes.InstrumentList.index()" class="btn btn-primary" role="button">Instrument<br>List</a>
+       }
+	   @if(selection == "DetectorModels") {
+       		<a href="@org.hadatac.console.controllers.routes.Detector.index()" class="btn btn-warning" role="button">Detector Model<br>Hierarchy</a>
+       } else {
+       		<a href="@org.hadatac.console.controllers.routes.Detector.index()" class="btn btn-primary" role="button">Detector Model<br>Hierarchy</a>
+       }
+	   @if(selection == "Detectors") {
+       		<a href="@org.hadatac.console.controllers.routes.DetectorList.index()" class="btn btn-warning" role="button">Detector<br>List</a>
+       } else {
+       		<a href="@org.hadatac.console.controllers.routes.DetectorList.index()" class="btn btn-primary" role="button">Detector<br>List</a>
+       }
+	   @if(selection == "Samples") {
+       		<a href="@org.hadatac.console.controllers.routes.DetectorList.index()" class="btn btn-warning disabled" role="button">Samples<br>List</a>
+       } else {
+       		<a href="@org.hadatac.console.controllers.routes.DetectorList.index()" class="btn btn-primary disabled" role="button">Samples<br>List</a>
+       }
+	   @if(selection == "Calibrations") {
+       		<a href="@org.hadatac.console.controllers.routes.DetectorList.index()" class="btn btn-warning disabled" role="button">Calibrations<br>List</a>
+       } else {
+       		<a href="@org.hadatac.console.controllers.routes.DetectorList.index()" class="btn btn-primary disabled" role="button">Calibrations<br>List</a>
+       }
+    </div>
