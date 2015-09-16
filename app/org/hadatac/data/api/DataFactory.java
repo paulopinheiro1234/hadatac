@@ -22,6 +22,7 @@ public class DataFactory {
 		dataCollection.setPlatformName(deployment.platform.getLabel());
 		dataCollection.setInstrumentModel(deployment.instrument.getLabel());
 		dataCollection.setStartedAtXsdWithMillis(deployment.getStartedAt());
+		dataCollection.setDeploymentUri(deploymentUri);
 		dataCollection.save();
 		
 		return dataCollection;
