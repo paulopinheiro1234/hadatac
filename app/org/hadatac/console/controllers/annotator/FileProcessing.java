@@ -64,7 +64,6 @@ public class FileProcessing extends Controller {
 	}
 	
     public static Result uploadFile(String handler_json) {
-
     	try {
 			handler_json = URLDecoder.decode(handler_json, "UTF-8");
 		} catch (Exception e) {
@@ -83,12 +82,12 @@ public class FileProcessing extends Controller {
 		} 
     	
     	//System.out.println("uploadFile CALLED!");
-           MultipartFormData body = request().body().asMultipartFormData();
-		   FilePart uploadedfile = body.getFile("pic");
-		   if (uploadedfile != null) {
+        MultipartFormData body = request().body().asMultipartFormData();
+		FilePart uploadedfile = body.getFile("pic");
+		if (uploadedfile != null) {
 		       File file = uploadedfile.getFile();
-		       handler.setDatasetName(uploadedfile.getFilename());
-		       File newFile = new File(UPLOAD_PATH + handler.getDatasetName());
+		       handler.setDatasetName(UPLOAD_PATH + uploadedfile.getFilename());
+		       File newFile = new File(handler.getDatasetName());
 		       InputStream isFile;
 		       InputStream isFile2;
 		       try {
@@ -118,9 +117,9 @@ public class FileProcessing extends Controller {
 			       return ok (uploadCSV.render(null, "fail", "Could not find uploaded file"));
 			   }
 	     	   return ok(measurementsSpec.render(handler,getQueryResults("Units")));
-		   } else {
-			 return ok (uploadCSV.render(null, "fail", "Error uploading file. Please try again."));
-		   } 
+		} else {
+		   return ok (uploadCSV.render(null, "fail", "Error uploading file. Please try again."));
+		} 
     } 
     
 }

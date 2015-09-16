@@ -23,11 +23,11 @@ public class TripleDocument{
             try {
                 if(node.get(vars.get(i)).hasNonNull("value"))
                     variable = node.get(vars.get(i)).get("value").asText();
-                    if(variable.contains("#"))
-                        if(!vars.get(i).contains("URI")){
-                            variable = prettyFromURI(variable);
+                    //if(variable.contains("#")) 
+                    	//if(!vars.get(i).contains("URI")){
+                            //variable = prettyFromURI(variable);
                             //System.out.println(variable);
-                        }
+                        //}
                     if(isDouble(variable)){
                         variable = toNum(Double.parseDouble(variable));
                     }

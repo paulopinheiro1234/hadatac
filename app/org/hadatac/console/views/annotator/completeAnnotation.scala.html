@@ -1,4 +1,4 @@
-@()
+@(message : String)
 
 @import helper._
 @import org.hadatac.console.views.html._
@@ -7,6 +7,8 @@
 
     <h2>CSV Annotator</h2>
     
-    <h3>Annotation completed</h3>
+    <h3>@message</h3>
+
+    Press OK button to return to HADataC's main page <a href="@org.hadatac.console.controllers.routes.Portal.index()" class="btn btn-warning" role="button">Ok</a>
    
 }
