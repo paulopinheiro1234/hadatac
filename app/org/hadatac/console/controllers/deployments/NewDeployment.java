@@ -29,6 +29,9 @@ import play.data.*;
 
 import org.hadatac.console.views.html.*;
 import org.hadatac.console.views.html.deployments.*;
+import org.hadatac.data.api.DataFactory;
+import org.hadatac.entity.pojo.DataCollection;
+import org.hadatac.entity.pojo.Deployment;
 import org.hadatac.console.models.DeploymentForm;
 import org.hadatac.console.models.SparqlQuery;
 import org.hadatac.console.models.SparqlQueryResults;
@@ -56,24 +59,6 @@ public class NewDeployment extends Controller {
     
     public static String CONSOLE_ID = "00000001";
     
-    public static String INDENT1 = "     ";
-        
-    public static String LINE1 = "INSERT DATA {  ";
-    
-    public static String LINE3 = INDENT1 + "a         vstoi:Deployment;  ";
-    
-    public static String PLATFORM_PREDICATE =     INDENT1 + "vstoi:hasPlatform        ";
-    
-    public static String INSTRUMENT_PREDICATE =   INDENT1 + "hasneto:hasInstrument    ";
-    
-    public static String DETECTOR_PREDICATE =     INDENT1 + "hasneto:hasDetector      ";
-        
-    public static String START_TIME_PREDICATE =   INDENT1 + "prov:startedAtTime		  ";
-    
-    public static String START_TIME_XMLS =   "\"^^<http://www.w3.org/2001/XMLSchema#dateTime> .";
-    
-    public static String LINE_LAST = "}  ";
-    
     public static SparqlQueryResults getQueryResults(String tabName) {
 	    SparqlQuery query = new SparqlQuery();
         GetSparqlQuery query_submit = new GetSparqlQuery(query);
@@ -88,46 +73,15 @@ public class NewDeployment extends Controller {
         }
 		return thePlatforms;
 	}
-	
-    private static long getNextDynamicMetadataId() {
-        SolrClient client = new HttpSolrClient(Play.application().configuration().getString("hadatac.solr.data") + "/console_store");
-        SolrQuery parameters = new SolrQuery();
-        parameters.set("q", "*:*");
-        parameters.set("sort", "last_dynamic_metadata_id desc");
-        parameters.set("start", "0");
-        parameters.set("rows", "1");
-        parameters.set("fl", "last_dynamic_metadata_id");
-        QueryResponse response;
-        try {
-            response = client.query(parameters);
-            client.close();
-            SolrDocumentList list = response.getResults();
-            Iterator<SolrDocument> i = list.iterator();
-            if (i.hasNext()) {
-                long id = Long.parseLong(i.next().getFieldValue("last_dynamic_metadata_id").toString());
-                return ++id;
-            }
-        } catch (SolrServerException | IOException e) {
-            e.printStackTrace();
-        }
-        return -1;
-    }
-
+    
     public static String getNextDynamicMetadataURI(String category) {
-    	String metadataId = Long.toHexString(getNextDynamicMetadataId());
+    	String metadataId = Long.toHexString(DataFactory.getNextDynamicMetadataId());
     	String host = Play.application().configuration().getString("hadatac.console.host");
     	for (int i = metadataId.length(); i <= 8; i++) {
     		metadataId = "0" + metadataId;
     	}
     	return host + "/hadatac/kb/" + category + "/" + CONSOLE_ID + "/" + metadataId + "/" ;   
     }
-    
-    public static void sparqlUpdate(String query) {
-        UpdateRequest request = UpdateFactory.create(query);
-        UpdateProcessor processor = UpdateExecutionFactory.createRemote(request, 
-        		Play.application().configuration().getString("hadatac.solr.triplestore") + "/store/sparql");
-        processor.execute();
-    } 
     
     // for /metadata HTTP GET requests
     public static Result index() {
@@ -160,25 +114,12 @@ public class NewDeployment extends Controller {
         DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
         String dateString = df.format(data.getStartDateTime());
         String insert = "";
-    	insert += PREFIXES;
-    	insert += LINE1;
-    	insert += "<" + getNextDynamicMetadataURI(DEPLOYMENT_ABBREV) + ">  ";
-    	insert += LINE3;
-    	insert += PLATFORM_PREDICATE + "<" + data.getPlatform() + "> ;   ";
-    	insert += INSTRUMENT_PREDICATE + "<" + data.getInstrument() + "> ;   ";
-    	insert += DETECTOR_PREDICATE + "<" + data.getDetector() + "> ;   ";
-       	insert += START_TIME_PREDICATE + "\"" + dateString + START_TIME_XMLS + "  "; 
-    	insert += LINE_LAST;
-    	//GenericSparqlQuery query = new GenericSparqlQuery();
-    	//String result = "";
-    	System.out.println(insert);
-    	sparqlUpdate(insert); 
-    	/* try {
-    		result = query.execute(insert, true);
-    	} catch (Exception e) {
-    		System.out.println(result);
-    		e.printStackTrace();
-    	} */
+        String deploymentUri = getNextDynamicMetadataURI(DEPLOYMENT_ABBREV);
+        String dataCollectionUri = getNextDynamicMetadataURI(DATA_COLLECTION_ABBREV);
+        String[] detectorUri = new String[1];
+        detectorUri[0] = data.getDetector();
+        Deployment deployment = DataFactory.createDeployment(deploymentUri, data.getPlatform(), data.getInstrument(), detectorUri, dateString);
+        DataCollection dataCollection = DataFactory.createDataCollection(dataCollectionUri, deploymentUri);
         if (form.hasErrors()) {
         	System.out.println("HAS ERRORS");
             return badRequest(newDeployment.render(form,

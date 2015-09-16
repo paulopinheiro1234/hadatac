@@ -8,7 +8,13 @@ import org.apache.jena.query.QuerySolution;
 import org.apache.jena.query.ResultSet;
 import org.apache.jena.query.ResultSetFactory;
 import org.apache.jena.query.ResultSetRewindable;
+import org.apache.jena.rdf.model.Model;
+import org.apache.jena.rdf.model.RDFNode;
+import org.apache.jena.rdf.model.Statement;
+import org.apache.jena.rdf.model.StmtIterator;
 import org.hadatac.data.loader.util.Sparql;
+
+import play.Play;
 
 public class Platform {
 	private String uri;
@@ -46,6 +52,34 @@ public class Platform {
 	}
 	public void setLabel(String label) {
 		this.label = label;
+	}
+	
+	public static Platform find(String uri) {
+		Platform platform = null;
+		Model model;
+		Statement statement;
+		RDFNode object;
+		
+		String queryString = "DESCRIBE <" + uri + ">";
+		Query query = QueryFactory.create(queryString);
+		QueryExecution qexec = QueryExecutionFactory.sparqlService(
+				Play.application().configuration().getString("hadatac.solr.triplestore") + "/store/sparql", query);
+		model = qexec.execDescribe();
+		
+		platform = new Platform();
+		StmtIterator stmtIterator = model.listStatements();
+		
+		while (stmtIterator.hasNext()) {
+			statement = stmtIterator.next();
+			object = statement.getObject();
+			if (statement.getPredicate().getURI().equals("http://www.w3.org/2000/01/rdf-schema#label")) {
+				platform.setLabel(object.asLiteral().getString());
+			}
+		}
+		
+		platform.setUri(uri);
+		
+		return platform;
 	}
 	
 	public static Platform find(HADataC hadatac) {
