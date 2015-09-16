@@ -1,5 +1,7 @@
 package org.hadatac.console.models;
 
+import java.util.Map;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class CSVAnnotationHandler {
@@ -9,8 +11,7 @@ public class CSVAnnotationHandler {
     public String deploymentPlatform;
     public String deploymentInstrument;
     /* After step 1 -- at controller time */
-    public String[] deploymentCharacteristicsName;
-    public String[] deploymentCharacteristicsUri;
+    public Map<String,String> deploymentCharacteristics;
     public String dataCollectionUri;
     
     /* After step 2 */
@@ -54,20 +55,12 @@ public class CSVAnnotationHandler {
         return deploymentInstrument;
     }	    
         
-    public void setDeploymentCharacteristicsName(String[] charsName) {
-        deploymentCharacteristicsName = charsName;
+    public void setDeploymentCharacteristics(Map<String, String> chars) {
+        deploymentCharacteristics = chars;
     }	    
         
-    public String[] getDeploymentCharacteristicsName() {
-        return deploymentCharacteristicsName;
-    }	    
-        
-    public void setDeploymentCharacteristicsUri(String[] charsURI) {
-        deploymentCharacteristicsUri = charsURI;
-    }	    
-        
-    public String[] getDeploymentCharacteristicsUri() {
-        return deploymentCharacteristicsUri;
+    public Map<String, String> getDeploymentCharacteristics() {
+        return deploymentCharacteristics;
     }	    
         
     public String getDataCollectionUri() {

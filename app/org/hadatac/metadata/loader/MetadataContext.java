@@ -189,25 +189,30 @@ public class MetadataContext {
 	public Long loadLocalFile(int mode, String filePath, String contentType) {
 		Model model = ModelFactory.createDefaultModel();
 		DatasetAccessor accessor = DatasetAccessorFactory.createHTTP(kbURL + "/store/rdf-graph-store");		
-		
+
+		loadFileMessage = "";
+		Long total = totalTriples();
 		try {
 			model.read(filePath, getLang(contentType));
 			accessor.add(model);
 		} catch (NotFoundException e) {
+			System.out.println("NotFoundException: file " + filePath);
 			System.out.println("NotFoundException: " + e.getMessage());
 		} catch (RiotNotFoundException e) {
+			System.out.println("RiotNotFoundException: file " + filePath);
 			System.out.println("RiotNotFoundException: " + e.getMessage());
 		} catch (Exception e) {
+			System.out.println("Exception: file " + filePath);
 			System.out.println("Exception: " + e.getMessage());
 		}
 		
-		loadFileMessage = "";
-		Long total = totalTriples();
-		if (verbose) {
-			System.out.println("curl -v " + kbURL + "/store/update/bulk?commit=true -H \"Content-Type: " + contentType + "\" --data-binary @" + filePath);
-		}
-		String[] cmd = {"curl", "-v", kbURL + "/store/update/bulk?commit=true","-H", "Content-Type: " + contentType, "--data-binary", "@" + filePath};
+		//loadFileMessage = "";
+		//if (verbose) {
+		//	System.out.println("curl -v " + kbURL + "/store/update/bulk?commit=true -H \"Content-Type: " + contentType + "\" --data-binary @" + filePath);
+		//}
+		//String[] cmd = {"curl", "-v", kbURL + "/store/update/bulk?commit=true","-H", "Content-Type: " + contentType, "--data-binary", "@" + filePath};
 		//loadFileMessage += executeCommand(mode, cmd);
+
 		Long newTotal = totalTriples();
 		return (newTotal - total);
 	}
@@ -217,7 +222,7 @@ public class MetadataContext {
 		Long total = totalTriples();
 		message += Feedback.println(mode, "   Triples before [loadOntologies]: " + total);
 		message += Feedback.println(mode," ");
-		//message += NameSpaces.getInstance().copyNameSpacesLocally(mode);
+		message += NameSpaces.getInstance().copyNameSpacesLocally(mode);
 		for (Map.Entry<String, NameSpace> entry : NameSpaces.table.entrySet()) {
 	    	String abbrev = entry.getKey().toString();
 	    	String nsURL = entry.getValue().getURL();
