@@ -80,6 +80,17 @@ public class NameSpaces {
 	    }
 	    return ttl;
 	}
+	
+	public String printSparqlNameSpaceList() {
+		String ttl = "";
+	    for (Map.Entry<String, NameSpace> entry : table.entrySet()) {
+	        String abbrev = entry.getKey().toString();;
+	        NameSpace ns = entry.getValue();
+	        //System.out.println("@prefix " + abbrev + " <" + ns.toString() + "> .");
+	        ttl = ttl + "PREFIX " + abbrev + ": <" + ns.getName() + "> \n";
+	    }
+	    return ttl;
+	}
 		
 	public String copyNameSpacesLocally(int mode) {
 		String message = "";
