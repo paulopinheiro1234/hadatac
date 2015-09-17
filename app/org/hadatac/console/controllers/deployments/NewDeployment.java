@@ -16,10 +16,12 @@ import org.hadatac.console.http.GetSparqlQuery;
 import java.io.IOException;
 import java.net.URLEncoder;
 import java.text.DateFormat;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.chrono.ChronoLocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.Date;
 import java.util.Iterator;
 
 import play.Play;
@@ -39,26 +41,6 @@ import org.hadatac.console.http.GenericSparqlQuery;
 
 public class NewDeployment extends Controller {
 	
-    public static String PREFIXES = 
-    		"PREFIX sioc: <http://rdfs.org/sioc/ns#>  " + 
-    		"PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>  " +
-    		"PREFIX geo: <http://www.w3.org/2003/01/geo/wgs84_pos#>  " +
-    	    "PREFIX owl: <http://www.w3.org/2002/07/owl#>  " +
-    	    "PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>  " +
-    	    "PREFIX skos: <http://www.w3.org/2004/02/skos/core#>  " +
-    	    "PREFIX prov: <http://www.w3.org/ns/prov#>  " +
-    	    "PREFIX vstoi: <http://hadatac.org/ont/vstoi#>  " +
-    	    "PREFIX hasneto: <http://hadatac.org/ont/hasneto#>  " +
-    	    "  ";
-    
-    public static String DEPLOYMENT_ABBREV = "DP";
-
-    public static String DATA_COLLECTION_ABBREV = "DC";
-    
-    public static String DATASET_ABBREV = "DS";
-    
-    public static String CONSOLE_ID = "00000001";
-    
     public static SparqlQueryResults getQueryResults(String tabName) {
 	    SparqlQuery query = new SparqlQuery();
         GetSparqlQuery query_submit = new GetSparqlQuery(query);
@@ -73,15 +55,6 @@ public class NewDeployment extends Controller {
         }
 		return thePlatforms;
 	}
-    
-    public static String getNextDynamicMetadataURI(String category) {
-    	String metadataId = Long.toHexString(DataFactory.getNextDynamicMetadataId());
-    	String host = Play.application().configuration().getString("hadatac.console.host");
-    	for (int i = metadataId.length(); i <= 8; i++) {
-    		metadataId = "0" + metadataId;
-    	}
-    	return host + "/hadatac/kb/" + category + "/" + CONSOLE_ID + "/" + metadataId + "/" ;   
-    }
     
     // for /metadata HTTP GET requests
     public static Result index() {
@@ -111,11 +84,22 @@ public class NewDeployment extends Controller {
     public static Result processForm() {
         Form<DeploymentForm> form = Form.form(DeploymentForm.class).bindFromRequest();
         DeploymentForm data = form.get();
-        DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
-        String dateString = df.format(data.getStartDateTime());
+
+        String dateStringFromJs = data.getStartDateTime();
+        String dateString = "";
+        DateFormat jsFormat = new SimpleDateFormat("MM/dd/yyyy HH:mm a");
+        Date dateFromJs;
+		try {
+			dateFromJs = jsFormat.parse(dateStringFromJs);
+	        DateFormat isoFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
+	        dateString = isoFormat.format(dateFromJs);
+		} catch (ParseException e) {
+			e.printStackTrace();
+		}
+
         String insert = "";
-        String deploymentUri = getNextDynamicMetadataURI(DEPLOYMENT_ABBREV);
-        String dataCollectionUri = getNextDynamicMetadataURI(DATA_COLLECTION_ABBREV);
+        String deploymentUri = DataFactory.getNextURI(DataFactory.DEPLOYMENT_ABBREV);
+        String dataCollectionUri = DataFactory.getNextURI(DataFactory.DATA_COLLECTION_ABBREV);
         String[] detectorUri = new String[1];
         detectorUri[0] = data.getDetector();
         Deployment deployment = DataFactory.createDeployment(deploymentUri, data.getPlatform(), data.getInstrument(), detectorUri, dateString);
@@ -127,7 +111,7 @@ public class NewDeployment extends Controller {
 			          getQueryResults("Instruments"),
 			          getQueryResults("Detectors")));        
         } else {
-            return ok(newDeploymentConfirm.render(data));
+            return ok(deploymentConfirm.render("New Deployment", data));
         }
     }
 

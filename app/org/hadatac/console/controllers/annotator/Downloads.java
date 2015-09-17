@@ -15,6 +15,7 @@ import play.mvc.Result;
 import org.apache.commons.io.FileUtils;
 import org.hadatac.console.models.CSVAnnotationHandler;
 import org.hadatac.console.views.html.annotator.*;
+import org.hadatac.data.api.DataFactory;
 import org.hadatac.utils.NameSpaces;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -40,7 +41,7 @@ public class Downloads extends Controller {
     public static final String FRAG_KB_PART2                = "\"^^xsd:anyURI . \n\n";
 
     public static final String FRAG_DATASET                 = " a vstoi:Dataset; prov:wasGeneratedBy <";
-    public static final String FRAG_HAS_MEASUREMENT_TYPE    = " hasMeasurementType ";
+    public static final String FRAG_HAS_MEASUREMENT_TYPE    = " hadatac:hasMeasurementType ";
     public static final String FRAG_MT                      = "<mt";
 
     public static final String FRAG_MEASUREMENT_TYPE_PART1  = "> a hadatac:MeasurementType; hadatac:atColumn ";
@@ -102,9 +103,9 @@ public class Downloads extends Controller {
 			   * Insert Data Set
 			   */
 			
-			  preamble += "<DATASET URI>";
+			  preamble += "<" + DataFactory.getNextURI(DataFactory.DATASET_ABBREV) + ">";
 			  preamble += FRAG_DATASET;
-			  preamble += "DATACOLLECTION_URI>; ";
+			  preamble += handler.getDataCollectionUri() + ">; ";
 			
 			  int i = 0;
 			  ArrayList<Integer> mt = new ArrayList<Integer>();
@@ -138,9 +139,9 @@ public class Downloads extends Controller {
 				  preamble += FRAG_MEASUREMENT_TYPE_PART1;
 				  preamble += mt_count;
 				  preamble += FRAG_MEASUREMENT_TYPE_PART2;
-				  preamble += p.getProperty(mt_count + "-characteristic"); 
+				  preamble += "<" + p.getProperty(mt_count + "-characteristic") + ">"; 
 				  preamble += FRAG_MEASUREMENT_TYPE_PART3;
-				  preamble += p.getProperty(mt_count + "-unit"); 
+				  preamble += "<" + p.getProperty(mt_count + "-unit") + ">"; 
 				  preamble += " .\n";
 			  }
 

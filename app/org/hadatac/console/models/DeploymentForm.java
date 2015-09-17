@@ -7,7 +7,8 @@ public class DeploymentForm {
     public String platform;
     public String instrument;
     public String detector;
-    public Date startDateTime;
+    public String startDateTime;
+    public String endDateTime;
  
     public String getPlatform() {
     	return platform;
@@ -33,12 +34,20 @@ public class DeploymentForm {
     	this.detector = detector;
     }
 
-    public Date getStartDateTime() {
+    public String getStartDateTime() {
     	return startDateTime;
     }
     
-    public void setStartDateTime(Date startDateTime) {
+    public void setStartDateTime(String startDateTime) {
     	this.startDateTime = startDateTime;
+    }
+
+    public String getEndDateTime() {
+    	return endDateTime;
+    }
+    
+    public void setEndDateTime(String endDateTime) {
+    	this.endDateTime = endDateTime;
     }
 
 

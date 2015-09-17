@@ -322,39 +322,54 @@ public class DataCollection {
 		dataCollection.setUri(doc.getFieldValue("uri").toString());
 		dataCollection.setStartedAt(doc.getFieldValue("started_at").toString());
 		dataCollection.setEndedAt(doc.getFieldValue("ended_at").toString());
-		i = doc.getFieldValues("unit").iterator();
-		while (i.hasNext()) {
-			dataCollection.addUnit(i.next().toString());
+		if (doc.getFieldValues("unit") != null) {
+			i = doc.getFieldValues("unit").iterator();
+			while (i.hasNext()) {
+				dataCollection.addUnit(i.next().toString());
+			}
 		}
-		i = doc.getFieldValues("unit_uri").iterator();
-		while (i.hasNext()) {
-			dataCollection.addUnitUri(i.next().toString());
+		if (doc.getFieldValues("unit_uri") != null) {
+			i = doc.getFieldValues("unit_uri").iterator();
+			while (i.hasNext()) {
+				dataCollection.addUnitUri(i.next().toString());
+			}
 		}
-		i = doc.getFieldValues("entity").iterator();
-		while (i.hasNext()) {
-			dataCollection.addEntity(i.next().toString());
+		if (doc.getFieldValues("entity") != null) {
+			i = doc.getFieldValues("entity").iterator();
+			while (i.hasNext()) {
+				dataCollection.addEntity(i.next().toString());
+			}
 		}
-		i = doc.getFieldValues("entity_uri").iterator();
-		while (i.hasNext()) {
-			dataCollection.addEntityUri(i.next().toString());
+		if (doc.getFieldValues("entity_uri") != null) {
+			i = doc.getFieldValues("entity_uri").iterator();
+			while (i.hasNext()) {
+				dataCollection.addEntityUri(i.next().toString());
+			}
 		}
-		i = doc.getFieldValues("characteristic").iterator();
-		while (i.hasNext()) {
-			dataCollection.addCharacteristic(i.next().toString());
+		if (doc.getFieldValues("characteristic") != null) {
+			i = doc.getFieldValues("characteristic").iterator();
+			while (i.hasNext()) {
+				dataCollection.addCharacteristic(i.next().toString());
+			}
 		}
-		i = doc.getFieldValues("characteristic_uri").iterator();
-		while (i.hasNext()) {
-			dataCollection.addCharacteristicUri(i.next().toString());
+		if (doc.getFieldValues("characteristic_uri") != null) {
+			i = doc.getFieldValues("characteristic_uri").iterator();
+			while (i.hasNext()) {
+				dataCollection.addCharacteristicUri(i.next().toString());
+			}
 		}
+		
 		dataCollection.setDeploymentUri(doc.getFieldValue("deployment_uri").toString());
 		dataCollection.setInstrumentModel(doc.getFieldValue("instrument_model").toString());
 		dataCollection.setInstrumentUri(doc.getFieldValue("instrument_uri").toString());
 		dataCollection.setPlatformName(doc.getFieldValue("platform_name").toString());
 		dataCollection.setPlatformUri(doc.getFieldValue("platform_uri").toString());
 		
-		i =doc.getFieldValues("dataset_uri").iterator();
-		while (i.hasNext()) {
-			dataCollection.addDatasetUri(i.next().toString());
+		if (doc.getFieldValues("dataset_uri") != null) {
+			i = doc.getFieldValues("dataset_uri").iterator();
+			while (i.hasNext()) {
+				dataCollection.addDatasetUri(i.next().toString());
+			}
 		}
 		
 		return dataCollection;
@@ -374,7 +389,8 @@ public class DataCollection {
 			Iterator<SolrDocument> i = results.iterator();
 			if (active == true) {
 				if (i.hasNext()) {
-					DataCollection dataCollection = convertFromSolr(i.next()); 
+					DataCollection dataCollection = convertFromSolr(i.next());
+					System.out.println("!!! HERE 3");
 					if (dataCollection.isFinished() == false) {
 						list.add(dataCollection);
 					}
@@ -385,7 +401,7 @@ public class DataCollection {
 				}
 			}
 		} catch (Exception e) {
-			System.out.println("[ERROR] DataCollection.find(Deployment) - Exception message: " + e.getMessage());
+			System.out.println("[ERROR] DataCollection.find(Deployment, boolean) - Exception message: " + e.getMessage());
 		}
 		
 		return list;
