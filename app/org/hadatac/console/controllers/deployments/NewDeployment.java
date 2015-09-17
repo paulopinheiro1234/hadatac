@@ -16,10 +16,12 @@ import org.hadatac.console.http.GetSparqlQuery;
 import java.io.IOException;
 import java.net.URLEncoder;
 import java.text.DateFormat;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.chrono.ChronoLocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.Date;
 import java.util.Iterator;
 
 import play.Play;
@@ -82,8 +84,19 @@ public class NewDeployment extends Controller {
     public static Result processForm() {
         Form<DeploymentForm> form = Form.form(DeploymentForm.class).bindFromRequest();
         DeploymentForm data = form.get();
-        DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
-        String dateString = df.format(data.getStartDateTime());
+
+        String dateStringFromJs = data.getStartDateTime();
+        String dateString = "";
+        DateFormat jsFormat = new SimpleDateFormat("MM/dd/yyyy HH:mm a");
+        Date dateFromJs;
+		try {
+			dateFromJs = jsFormat.parse(dateStringFromJs);
+	        DateFormat isoFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
+	        dateString = isoFormat.format(dateFromJs);
+		} catch (ParseException e) {
+			e.printStackTrace();
+		}
+
         String insert = "";
         String deploymentUri = DataFactory.getNextURI(DataFactory.DEPLOYMENT_ABBREV);
         String dataCollectionUri = DataFactory.getNextURI(DataFactory.DATA_COLLECTION_ABBREV);
@@ -98,7 +111,7 @@ public class NewDeployment extends Controller {
 			          getQueryResults("Instruments"),
 			          getQueryResults("Detectors")));        
         } else {
-            return ok(newDeploymentConfirm.render(data));
+            return ok(deploymentConfirm.render("New Deployment", data));
         }
     }
 

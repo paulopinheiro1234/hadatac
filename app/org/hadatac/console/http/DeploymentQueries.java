@@ -22,6 +22,8 @@ public class DeploymentQueries {
     public static final String DEPLOYMENT_CHARACTERISTICS        = "DeploymentCharacteristics";
     public static final String DEPLOYMENT_CHARACTERISTICS_BY_URI = "DeploymentCharacteristicsByURI";
     public static final String DETECTOR_SENSING_PERSPECTIVE      = "DetectorSensingPerspective";
+    public static final String ACTIVE_DEPLOYMENTS                = "ActiveDeployments";
+    public static final String CLOSED_DEPLOYMENTS                = "ClosedDeployments";
     
     public static String querySelector(String concept, String uri){
         // default query?
@@ -33,12 +35,14 @@ public class DeploymentQueries {
                     "PREFIX prov: <http://www.w3.org/ns/prov#>  " +
         	        "PREFIX vstoi: <http://hadatac.org/ont/vstoi#>  " +
         	        "PREFIX hasneto: <http://hadatac.org/ont/hasneto#>  " +
-                    "SELECT ?platform ?instrument ?date WHERE { " + 
+                    "SELECT ?uri ?platform ?instrument ?detector ?date WHERE { " + 
                     "   <" + uri + "> a vstoi:Deployment . " + 
                     "   <" + uri + "> vstoi:hasPlatform ?platformuri .  " +
                     "   ?platformuri rdfs:label ?platform . " +
                     "   <" + uri + "> hasneto:hasInstrument ?instrumenturi .  " + 
                     "   ?instrumenturi rdfs:label ?instrument . " +
+                    "   <" + uri + "> hasneto:hasDetector ?detectoruri .  " + 
+                    "   ?detectoruri rdfs:label ?detector . " +
                     "   <" + uri + "> prov:startedAtTime ?date .  " + 
                     "}";
                 break;
@@ -85,6 +89,40 @@ public class DeploymentQueries {
                         "    OPTIONAL { ?sp vstoi:hasPerspectiveCharacteristic ?ec } " +
                         "    OPTIONAL { ?ec rdfs:label ?ecName }  " + 
                     	"}";
+                break;
+            case ACTIVE_DEPLOYMENTS : 
+                q = "PREFIX rdfs:<http://www.w3.org/2000/01/rdf-schema#>" + 
+                    "PREFIX owl: <http://www.w3.org/2002/07/owl#>" +
+                    "PREFIX prov: <http://www.w3.org/ns/prov#>  " +
+        	        "PREFIX vstoi: <http://hadatac.org/ont/vstoi#>  " +
+        	        "PREFIX hasneto: <http://hadatac.org/ont/hasneto#>  " +
+                    "SELECT ?platform ?instrument ?datetime WHERE { " + 
+                    "   ?dep a vstoi:Deployment . " + 
+                    "   ?dep vstoi:hasPlatform ?platformuri .  " +
+                    "   ?platformuri rdfs:label ?platform . " +
+                    "   ?dep hasneto:hasInstrument ?instrumenturi .  " + 
+                    "   ?instrumenturi rdfs:label ?instrument . " +
+                    "   ?dep prov:startedAtTime ?datetime .  " + 
+                    "   FILTER NOT EXIST { ?dep prov:startedAtTime ?enddatetime . } " + 
+                    "} " + 
+                    "ORDER BY DESC(?datetime) ";
+                break;
+            case CLOSED_DEPLOYMENTS : 
+                q = "PREFIX rdfs:<http://www.w3.org/2000/01/rdf-schema#>" + 
+                    "PREFIX owl: <http://www.w3.org/2002/07/owl#>" +
+                    "PREFIX prov: <http://www.w3.org/ns/prov#>  " +
+            	    "PREFIX vstoi: <http://hadatac.org/ont/vstoi#>  " +
+            	    "PREFIX hasneto: <http://hadatac.org/ont/hasneto#>  " +
+                    "SELECT ?platform ?instrument ?startdatetime ?enddatetime WHERE { " + 
+                    "   ?dep a vstoi:Deployment . " + 
+                    "   ?dep vstoi:hasPlatform ?platformuri .  " +
+                    "   ?platformuri rdfs:label ?platform . " +
+                    "   ?dep hasneto:hasInstrument ?instrumenturi .  " + 
+                    "   ?instrumenturi rdfs:label ?instrument . " +
+                    "   ?dep prov:startedAtTime ?startdatetime .  " + 
+                    "   FILTER EXIST { ?dep prov:startedAtTime ?enddatetime . } " + 
+                    "} " +
+                    "ORDER BY DESC(?datetime) ";
                 break;
             default :
             	q = "";

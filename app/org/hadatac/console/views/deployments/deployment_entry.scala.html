@@ -1,10 +1,13 @@
 @(triple : org.hadatac.console.models.TripleDocument,
   flip : Boolean)
 @*****************************
+   ?uri
    ?platform 
    ?instrument 
    ?date
 *****************************@
+
+@import java.net._
 
 @if(flip){
     <tr>
@@ -13,7 +16,7 @@
        <td>@triple.get("date")</td>
        <td>
           <a href="@org.hadatac.console.controllers.deployments.routes.ViewDeployment.index()" class="btn-xs btn-primary" role="button">View</a>
-          <a href="@org.hadatac.console.controllers.deployments.routes.CloseDeployment.index()" class="btn-xs btn-primary" role="button">Close</a>
+          <a href="@org.hadatac.console.controllers.deployments.routes.CloseDeployment.index(URLEncoder.encode(triple.get("uri"),"UTF-8"))" class="btn-xs btn-primary" role="button">Close</a>
           <a href="@org.hadatac.console.controllers.deployments.routes.DeleteDeployment.index()" class="btn-xs btn-primary" role="button">Delete</a>
        </td>
     </tr>
@@ -24,7 +27,7 @@
         <td>@triple.get("date")</td>
        <td>
           <a href="@org.hadatac.console.controllers.deployments.routes.ViewDeployment.index()" class="btn-xs btn-primary" role="button">View</a>
-          <a href="@org.hadatac.console.controllers.deployments.routes.CloseDeployment.index()" class="btn-xs btn-primary" role="button">Close</a>
+          <a href="@org.hadatac.console.controllers.deployments.routes.CloseDeployment.index(URLEncoder.encode(triple.get("uri"),"UTF-8"))" class="btn-xs btn-primary" role="button">Close</a>
           <a href="@org.hadatac.console.controllers.deployments.routes.DeleteDeployment.index()" class="btn-xs btn-primary" role="button">Delete</a>
        </td>
     </tr>
