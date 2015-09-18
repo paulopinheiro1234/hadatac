@@ -112,7 +112,9 @@ public class Parser {
 			while (i.hasNext()) {
 				MeasurementType measurementType = i.next();
 				measurement.setUri(hadatacCcsv.getMeasurementUri() + hadatacCcsv.dataset.getLocalName() + "/" + measurementType.getLocalName() + "-" + cont);
-				measurement.setTimestampXsd(record.get(measurementType.getTimestampColumn()));
+				if (measurementType.getTimestampColumn() > -1) {
+					measurement.setTimestampXsd(record.get(measurementType.getTimestampColumn()));
+				}
 				measurement.setValue(Double.parseDouble(record.get(measurementType.getValueColumn())));
 				measurement.setUnit(measurementType.getUnitLabel());
 				measurement.setUnitUri(measurementType.getUnitUri());
@@ -176,8 +178,10 @@ public class Parser {
 		
 		// deployment
 		if (hadatacCcsv.dataCollection.getStatus() > 0) {
+			System.out.println("!! FIND FROM DC");
 			hadatacKb.deployment = Deployment.findFromDataCollection(hadatacKb);
 		} else {
+			System.out.println("!! FIND FROM PREAMBLE");
 			hadatacKb.deployment = Deployment.findFromPreamble(hadatacCcsv);
 		}
 		if (hadatacKb.deployment == null) {

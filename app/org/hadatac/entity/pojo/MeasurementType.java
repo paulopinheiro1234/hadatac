@@ -31,6 +31,11 @@ public class MeasurementType {
 	private int timestampColumn;
 	private int elevationColumn;
 	
+	public MeasurementType() {
+		this.timestampColumn = -1;
+		this.elevationColumn = -1;
+	}
+	
 	public int getValueColumn() {
 		return valueColumn;
 	}
@@ -202,7 +207,6 @@ public class MeasurementType {
 		ResultSet results = qexec.execSelect();
 		ResultSetRewindable resultsrw = ResultSetFactory.copyResults(results);
 		
-		ResultSetFormatter.outputAsCSV(System.out, resultsrw);
 		resultsrw.reset();
 		while (resultsrw.hasNext()) {
 			QuerySolution soln = resultsrw.next();
@@ -212,8 +216,7 @@ public class MeasurementType {
 			measurementType.setCharacteristicUri(soln.getResource("char").getURI());
 			measurementType.setUnitUri(soln.getResource("unit").getURI());
 			measurementType.setValueColumn(soln.getLiteral("column").getInt());
-			System.out.println("!! loading from preamble: " + soln.getLiteral("column").getInt());
-			if (soln.getLiteral("tsColumn") != null) { measurementType.setTimestampColumn(soln.getLiteral("tsColumn").getInt()); }
+			//if (soln.getLiteral("tsColumn") != null) { System.out.println("!!! TEM TIMESTAMP: " + soln.getLiteral("tsColumn").getInt()); measurementType.setTimestampColumn(soln.getLiteral("tsColumn").getInt()); }
 			list.add(measurementType);
 		}
 		
