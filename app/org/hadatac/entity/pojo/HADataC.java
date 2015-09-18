@@ -82,17 +82,20 @@ public class HADataC {
 	
 	public String getDatasetKbUri() {
 		//return host + "/hadatac/" + deployment.getLocalName() + "/" + dataCollection.getLocalName() + "/" + dataset.getLocalName();
-		return host + "/hadatac/dataset/" + dataset.getLocalName();
+		//return host + "/hadatac/dataset/" + dataset.getLocalName();
+		return dataset.getCcsvUri();
 	}
 	
 	public String getDataCollectionKbUri() {
 		//return host + "/hadatac/" + deployment.getLocalName() + "/" + dataCollection.getLocalName();
-		return host + "/hadatac/datacollection/" + dataCollection.getLocalName();
+		//return host + "/hadatac/datacollection/" + dataCollection.getLocalName();
+		return dataCollection.getCcsvUri();
 	}
 	
 	public String getDeploymentUri() {
 		//return host + "/hadatac/" + deployment.getLocalName();
-		return host + "/hadatac/deployment/" + deployment.getLocalName();
+		//return host + "/hadatac/deployment/" + deployment.getLocalName();
+		return deployment.getUri();
 	}
 	
 	public String getMeasurementUri() {
