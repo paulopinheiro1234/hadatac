@@ -1,0 +1,20 @@
+@(message: String, data : org.hadatac.console.models.DeploymentForm)
+
+@import org.hadatac.console.views.html._
+@import org.hadatac.console.controllers.deployments._
+
+@main(message) {
+    <h1>@message</h1>
+
+	<ul>
+		<li>Platform: @data.getPlatform()</li>
+		<li>Instrument: @data.getInstrument()</li>
+		<li>Detector: @data.getDetector()</li>
+		<li>Start Date/Time: @data.getStartDateTime()</li>
+		<li>End Date/Time: @data.getEndDateTime()</li>
+	</ul>
+    <p class="buttons">
+        <a href="@org.hadatac.console.controllers.deployments.routes.DeploymentManagement.index()">Back to Deployment Management</a>
+    </p>
+
+}
