@@ -89,7 +89,7 @@ public class Downloads extends Controller {
     	 */
     	
     	preamble += FRAG_KB_PART1;
-    	preamble += Play.application().configuration().getString("hadatac.console.host") + "/hadatac/"; 
+    	preamble += Play.application().configuration().getString("hadatac.console.kb"); 
     	preamble += FRAG_KB_PART2;
     	
     	try {
