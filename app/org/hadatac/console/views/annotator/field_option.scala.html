@@ -14,6 +14,7 @@
       <div class="form-group">
          <select class="form-control col-sm-6" name="@index-characteristic">
             <option value=""></option>
+            <option value="http://hadatac.org/ont/hadatac-entities">Time</option>
             @for((ecuri,ecname) <- charNames) {
                 <option value="@ecuri">@ecname</option>         
             }
@@ -26,6 +27,7 @@
 	 <div class="form-group">
          <select class="form-control col-sm-6" name="@index-unit">
             <option value=""></option>
+            <option value="time:inDateTime">TimeStamp</option>
             @for((k, triple) <- theUnits.sparqlResults){
                @defining(triple.generateID()) {itemID =>
                    @defining(triple.get("modelName").replaceAll("[\\W]|_", "")) {cleanName =>

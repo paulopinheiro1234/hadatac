@@ -222,7 +222,7 @@ public class MetadataContext {
 		Long total = totalTriples();
 		message += Feedback.println(mode, "   Triples before [loadOntologies]: " + total);
 		message += Feedback.println(mode," ");
-		//message += NameSpaces.getInstance().copyNameSpacesLocally(mode);
+		message += NameSpaces.getInstance().copyNameSpacesLocally(mode);
 		for (Map.Entry<String, NameSpace> entry : NameSpaces.table.entrySet()) {
 	    	String abbrev = entry.getKey().toString();
 	    	String nsURL = entry.getValue().getURL();

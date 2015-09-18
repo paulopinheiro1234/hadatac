@@ -44,9 +44,14 @@ public class Downloads extends Controller {
     public static final String FRAG_HAS_MEASUREMENT_TYPE    = " hadatac:hasMeasurementType ";
     public static final String FRAG_MT                      = "<mt";
 
-    public static final String FRAG_MEASUREMENT_TYPE_PART1  = "> a hadatac:MeasurementType; hadatac:atColumn ";
-    public static final String FRAG_MEASUREMENT_TYPE_PART2  = "; oboe:ofCharacteristic ";
-    public static final String FRAG_MEASUREMENT_TYPE_PART3  = "; oboe:usesStandard ";
+    public static final String FRAG_MEASUREMENT_TYPE_PART1  = "> a hadatac:MeasurementType; ";
+    public static final String FRAG_MEASUREMENT_TYPE_PART2  = " hadatac:atColumn ";
+    public static final String FRAG_MEASUREMENT_TYPE_PART3  = "; oboe:ofCharacteristic ";
+    public static final String FRAG_MEASUREMENT_TYPE_PART4  = "; oboe:usesStandard ";
+
+    public static final String FRAG_IN_DATE_TIME            = "time:inDateTime";
+    public static final String FRAG_IN_DATE_TIME_SUFFIX     = " <ts0>; ";
+    public static final String FRAG_IN_DATE_TIME_STATEMENT  = "<ts0> hadatac:atColumn ";
 
     public static Result postGenerate(String handler_json) {
 
@@ -108,6 +113,7 @@ public class Downloads extends Controller {
 			  preamble += handler.getDataCollectionUri() + ">; ";
 			
 			  int i = 0;
+			  int timeStampIndex = -1;
 			  ArrayList<Integer> mt = new ArrayList<Integer>();
 			  for (String str : handler.getFields()) {
 		  		  //System.out.println(str);
@@ -117,7 +123,11 @@ public class Downloads extends Controller {
 	  		 		  (!p.getProperty(i + "-characteristic").equals("")) && 
 		  		 	  (p.getProperty(i + "-unit") != null) && 
 			  		  (!p.getProperty(i + "-unit").equals(""))) {
-			  			  mt.add(i);
+	  		 		  	 if (p.getProperty(i + "-unit").equals(FRAG_IN_DATE_TIME)) {
+	  		 		  		 timeStampIndex = i; 
+	  		 		  	 } else {
+	  		 		  		 mt.add(i);
+	  		 		  	 }
 			  		  }
 	  		 	  i++;
 		      }
@@ -137,17 +147,25 @@ public class Downloads extends Controller {
 			  for (Integer mt_count : mt) {
 				  preamble += FRAG_MT + aux;
 				  preamble += FRAG_MEASUREMENT_TYPE_PART1;
-				  preamble += mt_count;
+				  if (timeStampIndex != -1) {
+					  preamble += FRAG_IN_DATE_TIME;
+					  preamble += FRAG_IN_DATE_TIME_SUFFIX;
+				  }
 				  preamble += FRAG_MEASUREMENT_TYPE_PART2;
-				  preamble += "<" + p.getProperty(mt_count + "-characteristic") + ">"; 
+				  preamble += mt_count;
 				  preamble += FRAG_MEASUREMENT_TYPE_PART3;
+				  preamble += "<" + p.getProperty(mt_count + "-characteristic") + ">"; 
+				  preamble += FRAG_MEASUREMENT_TYPE_PART4;
 				  preamble += "<" + p.getProperty(mt_count + "-unit") + ">"; 
 				  preamble += " .\n";
 			  }
 
-			  if(textBody != null) {
-			    //System.out.println("Got: [" + textBody + "]");
-			  } else {
+			  if (timeStampIndex != -1) {
+				  preamble += "\n";
+				  preamble += FRAG_IN_DATE_TIME_STATEMENT + " " + timeStampIndex + "  . \n";  
+			  }
+			  
+			  if (textBody == null) {
 			    badRequest("Expecting text/plain request body");
 			  }
 		} catch (Exception e) {
