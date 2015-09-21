@@ -22,9 +22,9 @@
         <div class="col-md-3 col-xs-2">
            <h4>Data Search/Download</h4>  
            <a href="" class="btn btn-primary btn-block" role="button">Search Data Collections</a>
-           <a href="@org.hadatac.console.controllers.routes.Application.index()" class="btn btn-primary btn-block" role="button">Search Measurements</a>
-        @*   <a href="@org.hadatac.console.controllers.routes.Spatial.index()" class="btn btn-primary btn-block" role="button">Spatial Search of Measurements</a>
-        *@   <a href="@org.hadatac.console.controllers.routes.Metadata.index()" class="btn btn-primary btn-block" role="button">Browse Metadata</a>
+           <a href="@org.hadatac.console.controllers.routes.Application.index()" class="btn btn-primary btn-block" role="button">Search Data Acquisitions</a>
+           <a href="@org.hadatac.console.controllers.routes.Metadata.index()" class="btn btn-primary btn-block" role="button">Browse Metadata</a>
+           <a href="" class="btn btn-primary btn-block disabled" role="button">Infer Semantic Differences</a>
            <a href="" class="btn btn-primary btn-block disabled" role="button">Show Collaboration Insight</a>
         </div>
 @*        @subjectPresent() {
@@ -32,6 +32,7 @@
 *@
           <div class="col-md-3 col-xs-2">
               <h4>Data Upload</h4>  
+              <a href="" class="btn btn-primary btn-block disabled" role="button">Manage Scientific Activities</a>
               <a href="@org.hadatac.console.controllers.deployments.routes.DeploymentManagement.index()" class="btn btn-primary btn-block" role="button">Manage Deployments</a>
               <a href="" class="btn btn-primary btn-block disabled" role="button">Manage Data Collections</a>
               <a href="@org.hadatac.console.controllers.annotator.routes.Annotator.selectDeployment()" class="btn btn-primary btn-block" role="button">Create CCSV from CSV</a>
