@@ -177,7 +177,7 @@ public class Deployment {
 	}
 	
 	public static Deployment findFromDataCollection(HADataC hadatac) {
-		String queryString = Sparql.prefix
+		String queryString = NameSpaces.getInstance().printSparqlNameSpaceList()
 				+ "SELECT ?startedAt ?endedAt ?detector ?instrument ?platform WHERE {\n"
 				+ "  <" + hadatac.dataCollection.getDeploymentUri() + "> a vstoi:Deployment .\n"
 				+ "  <" + hadatac.dataCollection.getDeploymentUri() + "> prov:startedAtTime ?startedAt .\n"
@@ -188,6 +188,8 @@ public class Deployment {
 				+ "}";
 		
 		Query query = QueryFactory.create(queryString);
+		
+		System.out.println(queryString);
 		
 		QueryExecution qexec = QueryExecutionFactory.sparqlService(hadatac.getStaticMetadataSparqlURL(), query);
 		ResultSet results = qexec.execSelect();
@@ -200,9 +202,10 @@ public class Deployment {
 			Resource resource = ResourceFactory.createResource(hadatac.dataCollection.getDeploymentUri());
 			deployment.setLocalName(resource.getLocalName());
 			deployment.setUri(hadatac.dataCollection.getDeploymentUri());
-			deployment.setStartedAtXsd(soln.getLiteral("startedAt").getString());
+			deployment.setStartedAtXsdWithMillis(soln.getLiteral("startedAt").getString());
 			if (soln.getLiteral("endedAt") != null) { deployment.setEndedAtXsd(soln.getLiteral("endedAt").getString()); }
 			hadatac.deployment = deployment;
+			System.out.println("!! DEPLOYMENT.FINDFROMDC " + deployment.getUri());
 			deployment.platform = Platform.find(hadatac);
 			deployment.instrument = Instrument.find(hadatac);
 			

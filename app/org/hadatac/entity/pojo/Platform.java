@@ -13,6 +13,7 @@ import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Statement;
 import org.apache.jena.rdf.model.StmtIterator;
 import org.hadatac.data.loader.util.Sparql;
+import org.hadatac.utils.NameSpaces;
 
 import play.Play;
 
@@ -85,7 +86,7 @@ public class Platform {
 	public static Platform find(HADataC hadatac) {
 		Platform platform = null;
 		
-		String queryString = Sparql.prefix
+		String queryString = NameSpaces.getInstance().printSparqlNameSpaceList()
 				+ "SELECT ?platform ?label ?lat ?lon ?ele WHERE {\n"
 				+ "  <" + hadatac.getDeploymentUri() + "> vstoi:hasPlatform ?platform .\n"
 				+ "  OPTIONAL { ?platform rdfs:label ?label . }\n"
