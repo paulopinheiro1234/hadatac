@@ -1,26 +1,32 @@
 package org.hadatac.console.models;
 
 import org.hadatac.console.http.GetSparqlQuery;
+import org.hadatac.utils.Collections;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class ForceFieldQuery {
 
-	//Get query using http.GetSparqlQuery
-    SparqlQuery query = new SparqlQuery();
-    GetSparqlQuery query_submit = new GetSparqlQuery(query);
-
 	List<AgentNode> agents = new ArrayList<AgentNode>();
 
-	public ForceFieldQuery(String tabQuery, boolean usingURIs) {
-		tabQuery = "OrganizationsH";
+	public ForceFieldQuery() {
+		this(Collections.METADATA_SPARQL);
+	}
+	
+	public ForceFieldQuery(String collectionSource) {
+		//Get query using http.GetSparqlQuery
+	    SparqlQuery query = new SparqlQuery();
+	    GetSparqlQuery query_submit = new GetSparqlQuery(collectionSource, query);
+
+
+	    System.out.println("Collection source in use: " + collectionSource);
+		String tabQuery = "OrganizationsH";
 		agents.add(new AgentNode("prov:Agent", "Agent", AgentNode.AGENT, "", ""));
 		System.out.println("REQUESTED: <" + tabQuery + ">");
 		String query_json = null;
@@ -54,20 +60,27 @@ public class ForceFieldQuery {
 			name = "";
 			uri = "";
 			memberOf = "";
-		    JsonNode binding = elements.next();
-		    JsonNode nameNode = binding.findPath("name");
-		    if (nameNode != null && nameNode.get("value") != null) {
-		    	name = nameNode.get("value").asText();
-		    }
-			JsonNode uriNode = binding.findPath("agent");
+
+			JsonNode binding = elements.next();
+
+		    JsonNode uriNode = binding.findPath("agent");
 		    if (uriNode != null && uriNode.get("value") != null) {
 		    	uri = uriNode.get("value").asText();
 		    }
-			JsonNode emailNode = binding.findPath("email");
+
+			JsonNode nameNode = binding.findPath("name");
+		    if (nameNode != null && nameNode.get("value") != null) {
+		    	name = nameNode.get("value").asText();
+		    } else {
+		    	name = uri;
+		    }
+
+		    JsonNode emailNode = binding.findPath("email");
 		    if (emailNode != null && emailNode.get("value") != null) {
 		    	email = emailNode.get("value").asText();
 		    }
-			JsonNode memberOfNode = binding.findPath("member");
+
+		    JsonNode memberOfNode = binding.findPath("member");
 		    if (memberOfNode != null && memberOfNode.get("value") != null) {
 		    	memberOf = memberOfNode.get("value").asText();
 		    }
@@ -111,19 +124,25 @@ public class ForceFieldQuery {
 			uri = "";
 			memberOf = "";
 		    JsonNode binding = elements.next();
-		    JsonNode nameNode = binding.findPath("name");
-		    if (nameNode != null && nameNode.get("value") != null) {
-		    	name = nameNode.get("value").asText();
-		    }
+		    
 			JsonNode uriNode = binding.findPath("agent");
 		    if (uriNode != null && uriNode.get("value") != null) {
 		    	uri = uriNode.get("value").asText();
 		    }
-			JsonNode emailNode = binding.findPath("email");
+
+		    JsonNode nameNode = binding.findPath("name");
+		    if (nameNode != null && nameNode.get("value") != null) {
+		    	name = nameNode.get("value").asText();
+		    } else {
+		    	name = uri;
+		    }
+
+		    JsonNode emailNode = binding.findPath("email");
 		    if (emailNode != null && emailNode.get("value") != null) {
 		    	email = emailNode.get("value").asText();
 		    }
-			JsonNode memberOfNode = binding.findPath("member");
+
+		    JsonNode memberOfNode = binding.findPath("member");
 		    if (memberOfNode != null && memberOfNode.get("value") != null) {
 		    	memberOf = memberOfNode.get("value").asText();
 		    }

@@ -1,0 +1,64 @@
+@(oper: String, message : String)
+
+@import helper._
+@import org.hadatac.console.views.html._
+@import org.hadatac.console.controllers.triplestore._
+@import org.hadatac.metadata.loader._
+@import java.net._
+
+@main("Users Pre-Registration") {
+ 
+    <div class="container-fluid">
+      
+      <div class="row">
+
+        <div class="col-md-8 col-md-offset-1">
+
+	     <h4>User Pre-Registration</h4>
+        
+             @if(oper=="init") {
+                 The metadata store has @PermissionsContext.playTotalTriples() triples. <br>
+
+
+              <form name="fileUploadForm" method="POST" enctype="multipart/form-data" action="@org.hadatac.console.controllers.triplestore.routes.Users.uploadFile()">
+                     <input type="file" class="btn btn-info" name="pic">
+                     Are your sure you want to pre-register users from the spreadsheet?
+                     <input type="submit" class="btn btn-success" value="Confirm">
+                     <a href="@org.hadatac.console.controllers.triplestore.routes.Users.preRegistration("cancelled")" class="btn btn-danger" role="button">Cancel</a>
+              </form>
+            }
+
+             <p  style='font-family: "Lucida Console", Monaco, monospace;' id='msgarea'></p>
+         
+             @if(oper=="cancelled") {
+                <div id="cancel-box">
+                   <h4>Operation [USERS Pre-Registration] has been cancelled.</h4>
+                   Press OK button to return to HADataC's main page <a href="@org.hadatac.console.controllers.routes.Portal.index()" class="btn btn-warning" role="button">Ok</a>
+	        </div>
+             }
+             
+           <div id="end-process-box" style="display:none;">
+                  <h4>Operation [User Pre-Registration] complete -- check the results above to see if the clean was successful.</h4>
+                  Press OK button to return to HADataC's main page <a href="@org.hadatac.console.controllers.routes.Portal.index()" class="btn btn-warning" role="button">Ok</a>
+	       </div>
+
+     	     @if(oper=="loaded") {
+                 <script> 
+                       var msg = "@Users.commitPreRegistration()";
+                       $('#msgarea').html(msg.replace(/&lt;br&gt;/g, '<br>'));
+                       document.getElementById('end-process-box').style.display = 'inline';
+                 </script> 
+              }
+
+         <h4>User Visualization</h4>
+          
+             <a href="@org.hadatac.console.controllers.triplestore.routes.UserNetwork.index()" class="btn btn-primary" role="button">User<br>Network</a>
+         
+
+	   </div>
+
+      </div>
+
+    </div>
+
+}

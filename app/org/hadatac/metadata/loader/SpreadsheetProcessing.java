@@ -22,10 +22,10 @@ public class SpreadsheetProcessing {
 	
 	public static final String TTL_DIR = "tmp/ttl/";
 	
-	public static String generateTTL(int mode, MetadataContext mc, String xlsName) {
+	public static String generateTTL(int mode, RDFContext rdf, String xlsName) {
 
 		String message = "";
-		message += Feedback.println(mode, "   Triples before [loadXLS]: " + mc.totalTriples());
+		message += Feedback.println(mode, "   Triples before [loadXLS]: " + rdf.totalTriples());
 		message += Feedback.println(mode, " ");
 		message += Feedback.println(mode, "   Parsing spreadsheet " + xlsName);
 		message += Feedback.println(mode, " ");
@@ -82,10 +82,10 @@ public class SpreadsheetProcessing {
 		message += Feedback.println(mode, " ");
 		message += Feedback.println(mode, "   Generated " + fileName + " and stored locally.");
 		message += Feedback.print(mode, "   Uploading generated file.");
-		mc.loadLocalFile(mode, fileName, KB_FORMAT);
+		rdf.loadLocalFile(mode, fileName, KB_FORMAT);
 		message += Feedback.println(mode, "");
 		message += Feedback.println(mode, " ");
-		message += Feedback.println(mode, "   Triples after [loadXLS]: " + mc.totalTriples());
+		message += Feedback.println(mode, "   Triples after [loadXLS]: " + rdf.totalTriples());
 		return message;
 	}
 }

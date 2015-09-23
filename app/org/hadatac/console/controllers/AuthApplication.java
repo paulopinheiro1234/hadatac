@@ -3,17 +3,22 @@ package org.hadatac.console.controllers;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+import org.hadatac.console.controllers.triplestore.Users;
 import org.hadatac.console.models.User;
+
 import play.Routes;
 import play.data.Form;
 import play.mvc.*;
 import play.mvc.Http.Response;
 import play.mvc.Http.Session;
 import play.mvc.Result;
+
 import org.hadatac.console.providers.MyUsernamePasswordAuthProvider;
 import org.hadatac.console.providers.MyUsernamePasswordAuthProvider.MyLogin;
 import org.hadatac.console.providers.MyUsernamePasswordAuthProvider.MySignup;
 import org.hadatac.console.views.html.*;
+import org.hadatac.console.views.html.triplestore.*;
+
 import be.objectify.deadbolt.java.actions.Group;
 import be.objectify.deadbolt.java.actions.Restrict;
 
@@ -85,6 +90,10 @@ public class AuthApplication extends Controller {
 			// User did not fill everything properly
 			return badRequest(signup.render(filledForm));
 		} else {
+			if (!Users.isPreRegistered(filledForm.get().email)) {
+				return ok(notRegistered.render());
+			};
+			
 			// Everything was filled
 			// do something with your part of the form before handling the user
 			// signup
