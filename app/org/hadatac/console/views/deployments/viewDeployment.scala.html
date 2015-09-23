@@ -4,34 +4,47 @@
 @import org.hadatac.console.controllers.deployments._
 
 @main("View Deployment") {
-    <h1>View Deployment</h1>
-    
-    <h2>Basic Info</h2>
-	<ul>
-		<li>URI: @data.getPlatform()</li>
-		<li>Platform: @data.getPlatform()</li>
-		@if(data.getHasFirstCoordinate() != null && data.getHasSecondCoordinate() != null) {
-		<ul>
-		  <li>Coordinates: (@data.getHasFirstCoordinate(), @data.getHasSecondCoordinate())</li>
-		</ul>
-		}
-		<li>Instrument: @data.getInstrument()</li>
-		<li>Start Date/Time: @data.getStartDateTime()</li>
-		<li>End Date/Time: @data.getEndDateTime()</li>
-	</ul>
+    <link rel="stylesheet" href="http://openlayers.org/en/v3.9.0/css/ol.css">
+    <script type="text/javascript" charset="utf-8" src="http://www.openlayers.org/api/OpenLayers.js"></script>
+    <script type="text/javascript" charset="utf-8" src="@controllers.routes.Assets.versioned("javascripts/openLayersFunctions.js")"></script>
 
-    <h2>Sensing Info</h2>
-    <ul>
- 		<li>Detector: @data.getDetector()</li>
- 		<ul>
- 		   <li>Characteristic: </li>
- 		</ul>   
-    </ul>
-       
-    <h2>Data Collections</h2>
-    
-    <p class="buttons">
-        <a href="@org.hadatac.console.controllers.deployments.routes.DeploymentManagement.index()">Back to Deployment Management</a>
-    </p>
 
+    <div class="row">
+        <div class="col-md-6">
+            <h1>View Deployment</h1>
+            
+            <h2>Basic Info</h2>
+                <ul>
+                        <li>URI: @data.getPlatform()</li>
+                        <li>Platform: @data.getPlatform()</li>
+                        <li>Instrument: @data.getInstrument()</li>
+                        <li>Start Date/Time: @data.getStartDateTime()</li>
+                        <li>End Date/Time: @data.getEndDateTime()</li>
+                </ul>
+
+            <h2>Sensing Info</h2>
+            <ul>
+                        <li>Detector: @data.getDetector()</li>
+                        <ul>
+                           <li>Characteristic: </li>
+                        </ul>   
+            </ul>
+
+
+            <h2>Data Collections</h2>
+            
+            <p class="buttons">
+                <a href="@org.hadatac.console.controllers.deployments.routes.DeploymentManagement.index()">Back to Deployment Management</a>
+            </p>
+        </div>
+
+        <div class="col-md-6">
+            <div class="row text-center">
+                <div style="width:95%; height:500px" id="map"></div>
+                @if(data.getHasFirstCoordinate() != null && data.getHasSecondCoordinate() != null){
+                    <script type="text/javascript">locations=["@data.getHasFirstCoordinate()","@data.getHasSecondCoordinate()"];createMap(locations);</script>
+                }
+            </div>
+        </div>
+    </div>
 }
