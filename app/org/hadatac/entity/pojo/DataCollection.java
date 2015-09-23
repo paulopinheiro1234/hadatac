@@ -20,6 +20,7 @@ import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.beans.Field;
 import org.apache.solr.client.solrj.impl.HttpSolrClient;
 import org.apache.solr.client.solrj.response.QueryResponse;
+import org.apache.solr.client.solrj.response.UpdateResponse;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
 import org.hadatac.data.loader.util.Sparql;
@@ -36,6 +37,10 @@ public class DataCollection {
 	private String uri;
 	private DateTime startedAt;
 	private DateTime endedAt;
+	@Field("owner_uri")
+	private String ownerUri;
+	@Field("permission_uri")
+	private String permissionUri;
 	@Field("unit")
 	private List<String> unit;
 	@Field("unit_uri")
@@ -129,6 +134,21 @@ public class DataCollection {
 	public void setUri(String uri) {
 		this.uri = uri;
 	}
+	public String getOwnerUri() {
+		return ownerUri;
+	}
+
+	public void setOwnerUri(String ownerUri) {
+		this.ownerUri = ownerUri;
+	}
+
+	public String getPermissionUri() {
+		return permissionUri;
+	}
+
+	public void setPermissionUri(String permissionUri) {
+		this.permissionUri = permissionUri;
+	}
 	public String getStartedAt() {
 		DateTimeFormatter formatter = ISODateTimeFormat.dateTime();
 		return formatter.withZone(DateTimeZone.UTC).print(startedAt);
@@ -165,6 +185,10 @@ public class DataCollection {
 	}
 	public void setEndedAtXsd(String endedAt) {
 		DateTimeFormatter formatter = ISODateTimeFormat.dateTimeNoMillis();
+		this.endedAt = formatter.parseDateTime(endedAt);
+	}
+	public void setEndedAtXsdWithMillis(String endedAt) {
+		DateTimeFormatter formatter = ISODateTimeFormat.dateTime();
 		this.endedAt = formatter.parseDateTime(endedAt);
 	}
 	public List<String> getUnit() {
@@ -375,6 +399,57 @@ public class DataCollection {
 		return dataCollection;
 	}
 	
+	public static List<DataCollection> find(String ownerUri) {
+		List<DataCollection> list = new ArrayList<DataCollection>();
+		
+		SolrClient solr = new HttpSolrClient(Play.application().configuration().getString("hadatac.solr.data") + "/sdc");
+		SolrQuery query = new SolrQuery();
+		query.set("q", "owner_uri:\"" + ownerUri + "\"");
+		query.set("sort", "started_at asc");
+		
+		try {
+			QueryResponse response = solr.query(query);
+			solr.close();
+			SolrDocumentList results = response.getResults();
+			Iterator<SolrDocument> i = results.iterator();
+			while (i.hasNext()) {
+				DataCollection dataCollection = convertFromSolr(i.next());
+				list.add(dataCollection);
+			}
+		} catch (Exception e) {
+			list.clear();
+			System.out.println("[ERROR] DataCollection.find(String) - Exception message: " + e.getMessage());
+		}
+		
+		return list;
+	}
+	
+	public int close(String endedAt) {
+		this.setEndedAtXsdWithMillis(endedAt);
+		return this.save();
+	}
+	
+	public int delete() {
+		try {
+			Iterator<String> i = datasetUri.iterator();
+			while (i.hasNext()) {
+				Measurement.delete(i.next());
+			}
+			SolrClient solr = new HttpSolrClient(Play.application().configuration().getString("hadatac.solr.data") + "/sdc");
+			UpdateResponse response = solr.deleteById(this.uri);
+			solr.close();
+			return response.getStatus();
+		} catch (SolrServerException e) {
+			System.out.println("[ERROR] DataCollection.delete() - SolrServerException message: " + e.getMessage());
+		} catch (IOException e) {
+			System.out.println("[ERROR] DataCollection.delete() - IOException message: " + e.getMessage());
+		} catch (Exception e) {
+			System.out.println("[ERROR] DataCollection.delete() - Exception message: " + e.getMessage());
+		}
+		
+		return -1;
+	}
+	
 	public static List<DataCollection> find(Deployment deployment, boolean active) {
 		SolrClient solr = new HttpSolrClient(Play.application().configuration().getString("hadatac.solr.data") + "/sdc");
 		SolrQuery query = new SolrQuery();
@@ -390,7 +465,6 @@ public class DataCollection {
 			if (active == true) {
 				if (i.hasNext()) {
 					DataCollection dataCollection = convertFromSolr(i.next());
-					System.out.println("!!! HERE 3");
 					if (dataCollection.isFinished() == false) {
 						list.add(dataCollection);
 					}
@@ -525,6 +599,11 @@ public class DataCollection {
 		dataCollection.addDatasetUri(hadatacCcsv.getDatasetKbUri());
 		
 		return dataCollection;
+	}
+	
+	public int setPermission(String uri) {
+		this.permissionUri = uri;
+		return 0;
 	}
 	
 	public void merge(DataCollection dataCollection) {

@@ -115,6 +115,8 @@ public class Parser {
 				if (measurementType.getTimestampColumn() > -1) {
 					measurement.setTimestampXsd(record.get(measurementType.getTimestampColumn()));
 				}
+				measurement.setOwnerUri(hadatacKb.dataCollection.getOwnerUri());
+				measurement.setPermissionUri(hadatacKb.dataCollection.getPermissionUri());
 				measurement.setValue(Double.parseDouble(record.get(measurementType.getValueColumn())));
 				measurement.setUnit(measurementType.getUnitLabel());
 				measurement.setUnitUri(measurementType.getUnitUri());

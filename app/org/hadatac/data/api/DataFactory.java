@@ -22,12 +22,14 @@ public class DataFactory {
     
     public static String CONSOLE_ID = "00000001";
     
-    public static DataCollection createDataCollection(String dataCollectionUri, String deploymentUri) {
+    public static DataCollection createDataCollection(String dataCollectionUri, String deploymentUri, String ownerUri) {
 		DataCollection dataCollection = null;
 		Deployment deployment = Deployment.find(deploymentUri);
 		
 		dataCollection = new DataCollection();
 		dataCollection.setUri(dataCollectionUri);
+		dataCollection.setOwnerUri(ownerUri);
+		dataCollection.setPermissionUri(ownerUri);
 		dataCollection.setPlatformUri(deployment.platform.getUri());
 		dataCollection.setInstrumentUri(deployment.instrument.getUri());
 		dataCollection.setPlatformName(deployment.platform.getLabel());
