@@ -37,6 +37,9 @@ import org.hadatac.entity.pojo.Deployment;
 import org.hadatac.console.models.DeploymentForm;
 import org.hadatac.console.models.SparqlQuery;
 import org.hadatac.console.models.SparqlQueryResults;
+import org.hadatac.console.models.User;
+import org.hadatac.console.controllers.AuthApplication;
+import org.hadatac.console.controllers.triplestore.Users;
 import org.hadatac.console.http.GenericSparqlQuery;
 
 public class NewDeployment extends Controller {
@@ -82,6 +85,7 @@ public class NewDeployment extends Controller {
      * Handles the form submission.
      */
     public static Result processForm() {
+    	final User user = AuthApplication.getLocalUser(session());
         Form<DeploymentForm> form = Form.form(DeploymentForm.class).bindFromRequest();
         DeploymentForm data = form.get();
 
@@ -103,7 +107,7 @@ public class NewDeployment extends Controller {
         String[] detectorUri = new String[1];
         detectorUri[0] = data.getDetector();
         Deployment deployment = DataFactory.createDeployment(deploymentUri, data.getPlatform(), data.getInstrument(), detectorUri, dateString);
-        DataCollection dataCollection = DataFactory.createDataCollection(dataCollectionUri, deploymentUri, "");
+        DataCollection dataCollection = DataFactory.createDataCollection(dataCollectionUri, deploymentUri, Users.getUriByEmail(user.email));
         if (form.hasErrors()) {
         	System.out.println("HAS ERRORS");
             return badRequest(newDeployment.render(form,
