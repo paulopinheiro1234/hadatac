@@ -101,5 +101,12 @@ GET     /hadatac/ts/loadkb                         org.hadatac.console.controlle
 POST    /hadatac/ts/loadkb                         org.hadatac.console.controllers.triplestore.LoadKB.postLoadKB(oper: String)
 POST    /hadatac/ts/loadkbupload                   org.hadatac.console.controllers.triplestore.LoadKB.uploadFile
  
+# Permissions store management URLs
+GET     /hadatac/perm/preregister                  org.hadatac.console.controllers.triplestore.Users.preRegistration(oper: String)
+POST    /hadatac/perm/preregister                  org.hadatac.console.controllers.triplestore.Users.postPreRegistration(oper: String)
+POST    /hadatac/perm/preregister/upload           org.hadatac.console.controllers.triplestore.Users.uploadFile
+GET	    /hadatac/perm/userNetwork			       org.hadatac.console.controllers.triplestore.UserNetwork.index()
+POST	/hadatac/perm/userNetwork			       org.hadatac.console.controllers.triplestore.UserNetwork.postIndex()
+ 
 # Map static resources from the /public folder to the /assets URL path
 GET     /hadatac/assets/*file                      controllers.Assets.versioned(path="/public", file: Asset)

@@ -13,6 +13,7 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.impl.client.HttpClients;
+import org.hadatac.utils.Collections;
 
 import play.Play;
 
@@ -133,7 +134,7 @@ public class DeploymentQueries {
 
 
     public static String exec(String concept, String uri) {
-	    String collection = Play.application().configuration().getString("hadatac.solr.triplestore") + "/store/sparql";
+	    String collection = Collections.getCollectionsName(Collections.METADATA_SPARQL);
         StringBuffer sparql_query = new StringBuffer();
         sparql_query.append(collection);
         sparql_query.append("?q=");

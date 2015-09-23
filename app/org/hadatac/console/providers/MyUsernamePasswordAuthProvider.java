@@ -234,10 +234,10 @@ public class MyUsernamePasswordAuthProvider
 		final String langCode = lang.code();
 
 		final String html = getEmailTemplate(
-				"views.html.account.signup.email.verify_email", langCode, url,
+				"org.hadatac.console.views.html.account.signup.email.verify_email", langCode, url,
 				token, user.getName(), user.getEmail());
 		final String text = getEmailTemplate(
-				"views.txt.account.signup.email.verify_email", langCode, url,
+				"org.hadatac.console.views.txt.account.signup.email.verify_email", langCode, url,
 				token, user.getName(), user.getEmail());
 
 		return new Body(text, html);
@@ -288,10 +288,10 @@ public class MyUsernamePasswordAuthProvider
 		final String langCode = lang.code();
 
 		final String html = getEmailTemplate(
-				"views.html.account.email.password_reset", langCode, url,
+				"org.hadatac.console.views.html.account.email.password_reset", langCode, url,
 				token, user.name, user.email);
 		final String text = getEmailTemplate(
-				"views.txt.account.email.password_reset", langCode, url, token,
+				"org.hadatac.console.views.txt.account.email.password_reset", langCode, url, token,
 				user.name, user.email);
 
 		return new Body(text, html);
@@ -369,10 +369,10 @@ public class MyUsernamePasswordAuthProvider
 		final String langCode = lang.code();
 
 		final String html = getEmailTemplate(
-				"views.html.account.email.verify_email", langCode, url, token,
+				"org.hadatac.console.views.html.account.email.verify_email", langCode, url, token,
 				user.name, user.email);
 		final String text = getEmailTemplate(
-				"views.txt.account.email.verify_email", langCode, url, token,
+				"org.hadatac.console.views.txt.account.email.verify_email", langCode, url, token,
 				user.name, user.email);
 
 		return new Body(text, html);

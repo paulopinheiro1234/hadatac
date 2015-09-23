@@ -46,6 +46,9 @@ public class User extends AppModel implements Subject {
 	
 	@Field("id")
 	public String id_s;
+	
+	@Field("uri")
+	public String uri;
 
 	@Constraints.Email
 	@Field("email")

@@ -8,6 +8,7 @@ import java.util.Scanner;
 import java.util.TreeMap;
 
 import org.hadatac.console.models.SparqlQuery;
+import org.hadatac.utils.Collections;
 import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
@@ -21,9 +22,13 @@ import play.Play;
 public class GetSparqlQuery {
 
     public StringBuffer sparql_query = new StringBuffer();
+
     public TreeMap<String, StringBuffer> list_of_queries = new TreeMap<String, StringBuffer>();
+
     public String collection;
+    
     private int numThings = 14;
+
     public String[] thingTypes = new String[numThings];
     
     public GetSparqlQuery () {} 
@@ -36,9 +41,14 @@ public class GetSparqlQuery {
 
     // for SPARQL queries!
     public GetSparqlQuery (SparqlQuery query) {
+    	this(Collections.METADATA_SPARQL, query);
+    }
+    
+    public GetSparqlQuery (String collectionSource, SparqlQuery query) {
         //addSparqlUrls();
         addThingTypes();
-        this.collection = Play.application().configuration().getString("hadatac.solr.triplestore") + "/store/sparql";
+        this.collection = Collections.getCollectionsName(collectionSource);
+        System.out.println("Collection: " + collection);
         
         for (String tabName : thingTypes ){
             this.sparql_query = new StringBuffer();
@@ -59,12 +69,18 @@ public class GetSparqlQuery {
         }
     }// /getSolrQuery for SPARQL
 
-    // For SPARQL queries that only make one query (instead of for all tabs)
+    public GetSparqlQuery (SparqlQuery query, String tabName) {
+    	this(Collections.METADATA_SPARQL, query, tabName);
+    }
+    	// For SPARQL queries that only make one query (instead of for all tabs)
     // Ideally, the above method should be depreciated in favor of this one, as we move
     //    all thingType queries to their own separate pages.
-    public GetSparqlQuery (SparqlQuery query, String tabName) {
-	this.collection = Play.application().configuration().getString("hadatac.solr.triplestore") + "/store/sparql";
-        this.sparql_query = new StringBuffer();
+    public GetSparqlQuery (String collectionSource, SparqlQuery query, String tabName) {
+    	this.collection = Collections.getCollectionsName(collectionSource);
+
+        System.out.println("Collection: " + collection);
+
+    	this.sparql_query = new StringBuffer();
         this.sparql_query.append(collection);
         this.sparql_query.append("?q=");
         String q = querySelector(tabName);
@@ -190,7 +206,7 @@ public class GetSparqlQuery {
             		"PREFIX foaf: <http://xmlns.com/foaf/0.1/> " +
             		"SELECT * WHERE { " +
             		"  ?agent a foaf:Group . " + 
-            		"  ?agent foaf:name ?name . " + 
+            		"  OPTIONAL { ?agent foaf:name ?name . } " + 
             		"  OPTIONAL { ?agent foaf:mbox ?email . } " + 
             		"  OPTIONAL { ?agent foaf:member ?member . } " +
             		"}";
@@ -200,7 +216,7 @@ public class GetSparqlQuery {
             		"PREFIX foaf: <http://xmlns.com/foaf/0.1/> " +
             		"SELECT * WHERE { " +
             		"  ?agent a foaf:Person . " + 
-            		"  ?agent foaf:name ?name . " + 
+            		"  OPTIONAL { ?agent foaf:name ?name . } " + 
             		"  OPTIONAL { ?agent foaf:mbox ?email . } " + 
             		"  OPTIONAL { ?agent foaf:member ?member . } " +
             		"}";
@@ -326,7 +342,7 @@ public class GetSparqlQuery {
         try {
         	HttpClient client = new DefaultHttpClient();
         	HttpGet request = new HttpGet(list_of_queries.get(tab).toString().replace(" ", "%20"));
-        	//System.out.println(tab + " : " + list_of_queries.get(tab));
+        	System.out.println(tab + " : " + list_of_queries.get(tab));
         	request.setHeader("Accept", "application/sparql-results+json");
         	HttpResponse response = client.execute(request);
             StringWriter writer = new StringWriter();

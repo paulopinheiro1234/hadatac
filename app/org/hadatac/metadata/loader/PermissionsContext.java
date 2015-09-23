@@ -28,8 +28,6 @@ import org.apache.jena.riot.RiotNotFoundException;
 import org.apache.jena.shared.NotFoundException;
 import org.hadatac.utils.Collections;
 import org.hadatac.utils.Feedback;
-import org.hadatac.utils.NameSpace;
-import org.hadatac.utils.NameSpaces;
 import org.w3c.dom.Document;
 import org.xml.sax.InputSource;
 
@@ -37,20 +35,18 @@ import play.Play;
 import play.libs.ws.*;
 import play.mvc.Call;
 
-public class MetadataContext implements RDFContext {
+public class PermissionsContext implements RDFContext {
 
     String username = null;
     String password = null;
     String kbURL = null;   
-	         // For local use:
-	         //   - http://localhost:7574/solr
     boolean verbose = false;
 
     String processMessage = "";
     String loadFileMessage = "";
 	
-    public MetadataContext(String un, String pwd, String kb, boolean ver) {
-        System.out.println("Metadata management set for knowledge base at " + kb);
+    public PermissionsContext(String un, String pwd, String kb, boolean ver) {
+        System.out.println("Permissions management set for knowledge base at " + kb);
 	    username = un;
 	    password = pwd;
 	    kbURL = kb;
@@ -58,11 +54,11 @@ public class MetadataContext implements RDFContext {
     }
 
     public static Long playTotalTriples() {
-	     MetadataContext metadata = new MetadataContext("user", 
+	     PermissionsContext permissions = new PermissionsContext("user", 
 	    		                                        "password", 
-	    		                                        Play.application().configuration().getString("hadatac.solr.triplestore"), 
+	    		                                        Play.application().configuration().getString("hadatac.solr.permissions"), 
 	    		                                        false);
-      return metadata.totalTriples();
+      return permissions.totalTriples();
     }
 
     private String executeQuery(String query) throws IllegalStateException, IOException{
@@ -70,8 +66,7 @@ public class MetadataContext implements RDFContext {
         //Scanner in = null;
         try {
         	HttpClient client = new DefaultHttpClient();
-         	//System.out.println("Query: <" + kbURL + "/store/sparql?q=" + query + ">");
-         	HttpGet request = new HttpGet(kbURL + Collections.METADATA_SPARQL + "?q=" + URLEncoder.encode(query, "UTF-8"));
+         	HttpGet request = new HttpGet(kbURL + Collections.PERMISSIONS_SPARQL+ "?q=" + URLEncoder.encode(query, "UTF-8"));
         	request.setHeader("Accept", "application/sparql-results+xml");
         	HttpResponse response = client.execute(request);
             StringWriter writer = new StringWriter();
@@ -79,10 +74,7 @@ public class MetadataContext implements RDFContext {
     
             return writer.toString();
             
-        } finally
-        {
-            //in.close();
-            //request.close();
+        } finally {
         }
     }// /executeQuery()
     
@@ -189,7 +181,7 @@ public class MetadataContext implements RDFContext {
 	 */
 	public Long loadLocalFile(int mode, String filePath, String contentType) {
 		Model model = ModelFactory.createDefaultModel();
-		DatasetAccessor accessor = DatasetAccessorFactory.createHTTP(kbURL + Collections.METADATA_GRAPH);		
+		DatasetAccessor accessor = DatasetAccessorFactory.createHTTP(kbURL + Collections.PERMISSIONS_GRAPH);		
 
 		loadFileMessage = "";
 		Long total = totalTriples();
@@ -207,43 +199,9 @@ public class MetadataContext implements RDFContext {
 			System.out.println("Exception: " + e.getMessage());
 		}
 		
-		//loadFileMessage = "";
-		//if (verbose) {
-		//	System.out.println("curl -v " + kbURL + "/store/update/bulk?commit=true -H \"Content-Type: " + contentType + "\" --data-binary @" + filePath);
-		//}
-		//String[] cmd = {"curl", "-v", kbURL + "/store/update/bulk?commit=true","-H", "Content-Type: " + contentType, "--data-binary", "@" + filePath};
-		//loadFileMessage += executeCommand(mode, cmd);
-
 		Long newTotal = totalTriples();
 		return (newTotal - total);
 	}
 	
-	public String loadOntologies(int mode) {
-	    String message = "";
-		Long total = totalTriples();
-		message += Feedback.println(mode, "   Triples before [loadOntologies]: " + total);
-		message += Feedback.println(mode," ");
-		message += NameSpaces.getInstance().copyNameSpacesLocally(mode);
-		for (Map.Entry<String, NameSpace> entry : NameSpaces.table.entrySet()) {
-	    	String abbrev = entry.getKey().toString();
-	    	String nsURL = entry.getValue().getURL();
-	    	if ((abbrev != null) && (nsURL != null) && (entry.getValue().getType() != null) && !nsURL.equals("")) {
-	    		String filePath = NameSpaces.CACHE_PATH + "copy" + "-" + abbrev.replace(":","");
-	    		message += Feedback.print(mode, "   Uploading " + filePath);
-	    		for (int i = filePath.length(); i < 50; i++) {
-	    			message += Feedback.print(mode, ".");
-	    		}
-	    		loadLocalFile(mode, filePath, entry.getValue().getType());
-	    		message += loadFileMessage;
-	    		Long newTotal = totalTriples();
-	    		message += Feedback.println(mode, "   Added " + (newTotal - total) + " triples.");
-	    		
-	    		total = newTotal;
-	    	}	          
-	    }
-		message += Feedback.println(mode," ");
-		message += Feedback.println(mode, "   Triples after [loadOntologies]: " + totalTriples());
-		return message;
-	}
 }	
 	

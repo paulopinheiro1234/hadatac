@@ -13,7 +13,7 @@ public class Agent extends Controller {
 
     	String category = "Agents";
     	
-    	ForceFieldQuery ffq = new ForceFieldQuery(category, false);
+    	ForceFieldQuery ffq = new ForceFieldQuery();
     	
         System.out.println("Agent index() was called!");
         return ok(agent_browser.render(ffq.getQueryResult().replace("\n", " "), category));
@@ -26,7 +26,7 @@ public class Agent extends Controller {
         
     	String category = "Agents";
     	
-    	ForceFieldQuery ffq = new ForceFieldQuery(category, false);
+    	ForceFieldQuery ffq = new ForceFieldQuery();
     	
         System.out.println("Agent index() was called!");
         return ok(agent_browser.render(ffq.getQueryResult().replace("\n", " "), category));
