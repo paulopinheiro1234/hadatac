@@ -262,6 +262,13 @@ public class User extends AppModel implements Subject {
 		this.save();
 		otherUser.save();
 	}
+	
+	public static User create(final AuthUser authUser, String uri) {
+		User user = User.create(authUser);
+		user.uri = uri;
+		user.save();
+		return user;
+	}
 
 	public static User create(final AuthUser authUser) {
 		final User user = new User();
