@@ -1,0 +1,130 @@
+//Requires the following files to be included in the html
+//Openlayers js must be included before this script is called
+//"http://www.openlayers.org/api/OpenLayers.js"
+//"http://openlayers.org/en/v3.9.0/css/ol.css"
+//The function createMap(locations) expects a div in the html with the id map
+//<div style="width:95%; height:500px" id="map"></div>
+
+
+function createMap(locations){
+
+    var map;
+
+    //Create the background map
+    map = new OpenLayers.Map("map");
+    var mapnik = new OpenLayers.Layer.OSM();
+    map.addLayer(mapnik);
+
+        
+    //Projections for converting between standard lat/lon 
+    //and the standard web map projection EPSG:900913
+    var epsg = new OpenLayers.Projection("EPSG:4326");
+    var osm = new OpenLayers.Projection("EPSG:900913");
+    //The center lat and lon will center the view of the map upon loading
+    var center_lat;
+    var center_lon;
+    var zoom;
+    var extent;
+    var zoom_to_extent;
+    var bbox;
+
+
+    //Generate the bounding box for a list of locations
+    if (locations){
+        bbox = generate_bbox(locations);
+    }
+
+    if (bbox){
+        if (bbox.length == 4){
+            center_lat = bbox[0] + ((bbox[1] - bbox[0]) / 2);
+            center_lon = bbox[2] + ((bbox[3] - bbox[2]) / 2);
+            extent = new OpenLayers.Bounds(bbox[2],bbox[0],bbox[3],bbox[1]).transform(epsg,osm);
+            zoom_to_extent = true;
+        }
+	else {
+	    if (locations.length == 2){
+		center_lon = parseFloat(locations[1]);
+		center_lat = parseFloat(locations[0]);
+	    }
+	    zoom = 11;
+	} 
+    } else {
+	alert("Bbox doesn't exist for some reason");
+    }
+
+    var centerlonlat = new OpenLayers.LonLat(center_lon, center_lat).transform(
+            epsg, // transform from WGS 1984
+            osm // to Spherical Mercator
+        );
+
+    //Create the markers layer
+    //This is used to add the icons which mark the locations on the map
+    var markers = new OpenLayers.Layer.Markers( "Markers" );
+    map.addLayer(markers);
+
+    //Can optionally mark the center of the map
+    //markers.addMarker(new OpenLayers.Marker(centerlonlat));
+
+    //These are the variables which will hold the values for a specific instance
+    //(I'm using the word "Instance" to refer to a data point, deployment, etc
+    var instance_lon;
+    var instance_lat;
+    var instance_lonlat;
+
+    //Add the markers to the map
+    if (locations){
+        for (i = 0; i < locations.length - 1; i = i + 2){
+            instance_lon = parseFloat(locations[i+1]);
+            instance_lat = parseFloat(locations[i]);
+            instance_lonlat = new OpenLayers.LonLat(instance_lon, instance_lat).transform(
+                    epsg, osm
+            );
+            markers.addMarker(new OpenLayers.Marker(instance_lonlat));
+        }
+    }
+
+    //Set the center of the map so it looks right on loading
+    map.setCenter(centerlonlat, zoom);
+
+    if (zoom_to_extent){
+        map.zoomToExtent(extent);
+    }
+}
+
+function generate_bbox(locations){
+    var generated_bbox = [];
+    var lon;
+    var lat;
+    var minlon = 100000000.0;
+    var minlat = -100000000.0;
+    var maxlon = 100000000.0;
+    var maxlat = -100000000.0;
+
+    if (locations.length <= 2){
+	return generated_bbox;
+    }
+
+    for (i = 0; i < locations.length - 1; i = i + 2){
+        lon = parseFloat(locations[i+1]);
+        lat = parseFloat(locations[i]);
+        if (lon < minlon){
+            minlon = lon;
+        }
+        if (lon > maxlon){
+            maxlon = lon; 
+        }
+        if (lat < minlat){
+            minlat = lat;
+        }
+        if (lat > maxlat){
+            maxlat = lat;
+        }
+    }
+
+    //Order is min lat, max lat, min lon, max lon
+    generated_bbox.push(minlat);
+    generated_bbox.push(maxlat);
+    generated_bbox.push(minlon);
+    generated_bbox.push(maxlon);
+    return generated_bbox;
+}
