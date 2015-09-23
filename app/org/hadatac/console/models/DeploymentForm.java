@@ -5,6 +5,8 @@ import java.util.Date;
 public class DeploymentForm {
 
     public String platform;
+    public String hasFirstCoordinate;
+    public String hasSecondCoordinate;
     public String instrument;
     public String detector;
     public String startDateTime;
@@ -16,6 +18,22 @@ public class DeploymentForm {
     
     public void setPlatform(String platform) {
     	this.platform = platform;
+    }
+
+    public String getHasFirstCoordinate() {
+    	return hasFirstCoordinate;
+    }
+    
+    public void setHasFirstCoordinate(String hasFirstCoordinate) {
+    	this.hasFirstCoordinate = hasFirstCoordinate;
+    }
+
+    public String getHasSecondCoordinate() {
+    	return hasSecondCoordinate;
+    }
+    
+    public void setHasSecondCoordinate(String hasSecondCoordinate) {
+    	this.hasSecondCoordinate = hasSecondCoordinate;
     }
 
     public String getInstrument() {

@@ -7,10 +7,12 @@ import com.feth.play.module.pa.providers.password.UsernamePasswordAuthUser;
 import com.google.inject.Inject;
 
 import org.hadatac.console.controllers.routes;
+import org.hadatac.console.controllers.triplestore.Users;
 import org.hadatac.console.models.LinkedAccount;
 import org.hadatac.console.models.TokenAction;
 import org.hadatac.console.models.TokenAction.Type;
 import org.hadatac.console.models.User;
+
 import play.Application;
 import play.Logger;
 import play.data.Form;
@@ -139,8 +141,10 @@ public class MyUsernamePasswordAuthProvider
 			}
 		}
 		// The user either does not exist or is inactive - create a new one
+		String userUri = Users.getUriByEmail(user.getEmail());
+		
 		@SuppressWarnings("unused")
-		final User newUser = User.create(user);
+		final User newUser = User.create(user, userUri);
 		// Usually the email should be verified before allowing login, however
 		// if you return
 		// return SignupResult.USER_CREATED;

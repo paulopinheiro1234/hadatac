@@ -5,15 +5,23 @@ import java.io.IOException;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.beans.Field;
+import org.apache.solr.client.solrj.impl.HttpSolrClient;
+import org.apache.solr.client.solrj.response.UpdateResponse;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 import org.joda.time.format.ISODateTimeFormat;
 
+import play.Play;
+
 public class Measurement {
 	@Field("uri")
 	private String uri;
+	@Field("owner_uri")
+	private String ownerUri;
+	@Field("permission_uri")
+	private String permissionUri;
 	private DateTime timestamp;
 	@Field("value")
 	private double value;
@@ -44,6 +52,18 @@ public class Measurement {
 	@Field("dataset_uri")
 	private String datasetUri;
 	
+	public String getOwnerUri() {
+		return ownerUri;
+	}
+	public void setOwnerUri(String ownerUri) {
+		this.ownerUri = ownerUri;
+	}
+	public String getPermissionUri() {
+		return permissionUri;
+	}
+	public void setPermissionUri(String permissionUri) {
+		this.permissionUri = permissionUri;
+	}
 	public String getInstrumentModel() {
 		return instrumentModel;
 	}
@@ -156,5 +176,22 @@ public class Measurement {
 			System.out.println("[ERROR] Measurement.save - e.Message: " + e.getMessage());
 			return -1;
 		}
+	}
+	
+	public static int delete(String datasetUri) {
+		SolrClient solr = new HttpSolrClient(Play.application().configuration().getString("hadatac.solr.data") + "/measurement");
+		try {
+			UpdateResponse response = solr.deleteByQuery("dataset_uri:\"" + datasetUri + "\"");
+			solr.close();
+			return response.getStatus();
+		} catch (SolrServerException e) {
+			System.out.println("[ERROR] Measurement.delete - SolrServerException message: " + e.getMessage());
+		} catch (IOException e) {
+			System.out.println("[ERROR] Measurement.delete - IOException message: " + e.getMessage());
+		} catch (Exception e) {
+			System.out.println("[ERROR] Measurement.delete - Exception message: " + e.getMessage());
+		}
+		
+		return -1;
 	}
 }

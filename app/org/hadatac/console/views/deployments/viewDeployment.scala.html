@@ -10,6 +10,11 @@
 	<ul>
 		<li>URI: @data.getPlatform()</li>
 		<li>Platform: @data.getPlatform()</li>
+		@if(data.getHasFirstCoordinate() != null && data.getHasSecondCoordinate() != null) {
+		<ul>
+		  <li>Coordinates: (@data.getHasFirstCoordinate(), @data.getHasSecondCoordinate())</li>
+		</ul>
+		}
 		<li>Instrument: @data.getInstrument()</li>
 		<li>Start Date/Time: @data.getStartDateTime()</li>
 		<li>End Date/Time: @data.getEndDateTime()</li>

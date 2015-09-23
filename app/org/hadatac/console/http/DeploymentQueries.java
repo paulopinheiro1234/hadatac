@@ -36,10 +36,12 @@ public class DeploymentQueries {
                     "PREFIX prov: <http://www.w3.org/ns/prov#>  " +
         	        "PREFIX vstoi: <http://hadatac.org/ont/vstoi#>  " +
         	        "PREFIX hasneto: <http://hadatac.org/ont/hasneto#>  " +
-                    "SELECT ?uri ?platform ?instrument ?detector ?date WHERE { " + 
+                    "SELECT ?uri ?platform ?hasFirstCoordinate ?hasSecondCoordinate ?instrument ?detector ?date WHERE { " + 
                     "   <" + uri + "> a vstoi:Deployment . " + 
                     "   <" + uri + "> vstoi:hasPlatform ?platformuri .  " +
                     "   ?platformuri rdfs:label ?platform . " +
+                    "   OPTIONAL { ?platformuri hasneto:hasFirstCoordinate ?hasFirstCoordinate . } " +
+                    "   OPTIONAL { ?platformuri hasneto:hasSecondCoordinate ?hasSecondCoordinate . } " +
                     "   <" + uri + "> hasneto:hasInstrument ?instrumenturi .  " + 
                     "   ?instrumenturi rdfs:label ?instrument . " +
                     "   <" + uri + "> hasneto:hasDetector ?detectoruri .  " + 

@@ -103,7 +103,7 @@ public class NewDeployment extends Controller {
         String[] detectorUri = new String[1];
         detectorUri[0] = data.getDetector();
         Deployment deployment = DataFactory.createDeployment(deploymentUri, data.getPlatform(), data.getInstrument(), detectorUri, dateString);
-        DataCollection dataCollection = DataFactory.createDataCollection(dataCollectionUri, deploymentUri);
+        DataCollection dataCollection = DataFactory.createDataCollection(dataCollectionUri, deploymentUri, "");
         if (form.hasErrors()) {
         	System.out.println("HAS ERRORS");
             return badRequest(newDeployment.render(form,

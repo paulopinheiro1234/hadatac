@@ -7,7 +7,7 @@ scalaVersion := "2.11.7"
 version := "1.0-SNAPSHOT"
 
 val appDependencies = Seq(
-  "be.objectify"  %% "deadbolt-java"     % "2.4.2.1",
+  "be.objectify"  %% "deadbolt-java"     % "2.4.3",
   "com.feth"      %% "play-authenticate" % "0.7.0-SNAPSHOT",
   cache,
   javaWs,
