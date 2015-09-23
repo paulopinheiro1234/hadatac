@@ -37,9 +37,18 @@ public class ViewDeployment extends Controller {
     		 *  Add deployment information into handler
     		 */
     		String json = DeploymentQueries.exec(DeploymentQueries.DEPLOYMENT_BY_URI, uri);
+    		System.out.println(json);
     		SparqlQueryResults results = new SparqlQueryResults(json, false);
     		TripleDocument docDeployment = results.sparqlResults.values().iterator().next();
     		dep.setPlatform(docDeployment.get("platform"));
+    		String first = docDeployment.get("hasFirstCoordinate");
+    		if (first != null) {
+    			dep.setHasFirstCoordinate(first);
+    		}
+    		String second = docDeployment.get("hasSecondCoordinate");
+    		if (second != null) {
+    			dep.setHasSecondCoordinate(second);
+    		}
     		dep.setInstrument(docDeployment.get("instrument"));
     		dep.setDetector(docDeployment.get("detector"));
     		dep.setStartDateTime(docDeployment.get("date"));
@@ -82,9 +91,18 @@ public class ViewDeployment extends Controller {
     		 *  Add deployment information into handler
     		 */
     		String json = DeploymentQueries.exec(DeploymentQueries.DEPLOYMENT_BY_URI, uri);
+    		System.out.println(json);
     		SparqlQueryResults results = new SparqlQueryResults(json, false);
     		TripleDocument docDeployment = results.sparqlResults.values().iterator().next();
     		dep.setPlatform(docDeployment.get("platform"));
+    		String first = docDeployment.get("hasFirstCoordinate");
+    		if (first != null) {
+    			dep.setHasFirstCoordinate(first);
+    		}
+    		String second = docDeployment.get("hasSecondCoordinate");
+    		if (second != null) {
+    			dep.setHasSecondCoordinate(second);
+    		}
     		dep.setInstrument(docDeployment.get("instrument"));
     		dep.setDetector(docDeployment.get("detector"));
     		dep.setStartDateTime(docDeployment.get("date"));
@@ -98,6 +116,7 @@ public class ViewDeployment extends Controller {
 			//	e.printStackTrace();
 			//}
 
+            System.out.println("closing deployment");
             return ok(viewDeployment.render(dep));
     	}
     	return ok(viewDeployment.render(dep));
