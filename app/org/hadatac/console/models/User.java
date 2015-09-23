@@ -465,6 +465,7 @@ public class User extends AppModel implements Subject {
 	private static User convertSolrDocumentToUser(SolrDocument doc) {
 		User user = new User();
 		user.id_s = doc.getFieldValue("id").toString();
+		user.uri = doc.getFieldValue("uri").toString();
 		user.email = doc.getFieldValue("email").toString();
 		user.name = doc.getFieldValue("name").toString();
 		user.firstName = doc.getFieldValue("first_name").toString();
