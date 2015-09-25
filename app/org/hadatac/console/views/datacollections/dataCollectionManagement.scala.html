@@ -1,0 +1,47 @@
+@(results : org.hadatac.console.models.SparqlQueryResults)
+
+@import helper._
+@import org.hadatac.console.views.html._
+
+@main("Data Collection Management") {
+
+    <h2>Data Collection Management</h2>
+    
+    <h3>Management options</h3>
+
+    <div class="container-fluid">
+      <div class="row">
+         <div class="navbar-collapse collapse navbar-secondary">
+          	<a href="@org.hadatac.console.controllers.datacollections.routes.DataCollectionManagement.index("active")" class="btn-sm btn-primary" role="button">Active Collections</a>
+          	<a href="@org.hadatac.console.controllers.datacollections.routes.DataCollectionManagement.index("closed")" class="btn-sm btn-primary" role="button">Closed Collections</a>
+          	<a href="@org.hadatac.console.controllers.datacollections.routes.DataCollectionManagement.index("all")" class="btn-sm btn-primary" role="button">All Collections</a>
+         </div>
+      </div>
+   </div>
+
+   <hr>
+   
+   <h3>User's Active Data Collections</h3>
+   
+    <div class="container-fluid">
+        <table class="table">
+            <thead>
+                 <tr>
+                    <th>Triggering Event</th>
+                    <th>Platform</th>
+                    <th>Instrument</th>
+                    <th>Start Date/Time</th>
+                    <th># of Data Points</th>
+                    <th>Operations</th>
+                 </tr>
+            </thead>
+            <tbody>
+              @for((k, triple) <- results.sparqlResults){
+                  @datacollection_entry(triple)
+              }
+            </tbody>
+        </table>
+    </div>
+ 
+
+}

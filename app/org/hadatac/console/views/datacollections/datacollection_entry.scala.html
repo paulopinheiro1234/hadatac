@@ -1,0 +1,21 @@
+@(triple : org.hadatac.console.models.TripleDocument)
+@*****************************
+   ?uri
+   ?platform 
+   ?instrument 
+   ?date
+*****************************@
+
+@import java.net._
+
+    <tr>
+       <td></td> 
+       <td>@triple.get("platformName")</td> 
+       <td>@triple.get("instrumentName")</td>
+       <td>@triple.get("date")</td>
+       <td></td>
+       <td>
+          <a href="@org.hadatac.console.controllers.datacollections.routes.DeleteDataCollection.index(URLEncoder.encode(triple.get("uri"),"UTF-8"))" class="btn-xs btn-primary" role="button">Delete</a>
+          <a href="@org.hadatac.console.controllers.datacollections.routes.SetAccessPermission.index(URLEncoder.encode(triple.get("uri"),"UTF-8"))" class="btn-xs btn-primary" role="button">Permission</a>
+       </td>
+    </tr>

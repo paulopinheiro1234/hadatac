@@ -84,6 +84,14 @@ GET	    /hadatac/deployments/urigenerator		   org.hadatac.console.controllers.de
 POST	/hadatac/deployments/urigenerator	       org.hadatac.console.controllers.deployments.URIGenerator.postIndex()
 POST 	/hadatac/deployments/urigenerator/form	   org.hadatac.console.controllers.deployments.URIGenerator.processForm()
 
+# data collection management
+GET	    /hadatac/datacollections/		    	   org.hadatac.console.controllers.datacollections.DataCollectionManagement.index(option : String)
+POST	/hadatac/datacollections/     			   org.hadatac.console.controllers.datacollections.DataCollectionManagement.postIndex(option : String)
+GET	    /hadatac/datacollections/delete		       org.hadatac.console.controllers.datacollections.DeleteDataCollection.index(dc_uri : String)
+POST	/hadatac/datacollections/delete     	   org.hadatac.console.controllers.datacollections.DeleteDataCollection.postIndex(dc_uri : String)
+GET	    /hadatac/datacollections/access		       org.hadatac.console.controllers.datacollections.SetAccessPermission.index(dc_uri : String)
+POST	/hadatac/datacollections/access     	   org.hadatac.console.controllers.datacollections.SetAccessPermission.postIndex(dc_uri : String)
+
 # annotator
 GET	    /hadatac/annotator/		    	           org.hadatac.console.controllers.annotator.Annotator.selectDeployment
 POST	/hadatac/annotator/     			       org.hadatac.console.controllers.annotator.Annotator.postSelectDeployment
