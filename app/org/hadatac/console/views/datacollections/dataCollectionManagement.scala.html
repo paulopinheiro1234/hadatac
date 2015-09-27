@@ -1,7 +1,8 @@
-@(results : org.hadatac.console.models.SparqlQueryResults)
+@(results : List[org.hadatac.entity.pojo.DataCollection])
 
 @import helper._
 @import org.hadatac.console.views.html._
+@import org.hadatac.console.controllers._
 
 @main("Data Collection Management") {
 
@@ -21,7 +22,7 @@
 
    <hr>
    
-   <h3>User's Active Data Collections</h3>
+   <h3>@AuthApplication.getLocalUser(session()).name's Active Data Collections</h3>
    
     <div class="container-fluid">
         <table class="table">
@@ -36,8 +37,8 @@
                  </tr>
             </thead>
             <tbody>
-              @for((k, triple) <- results.sparqlResults){
-                  @datacollection_entry(triple)
+              @for(dataCollection <- results){
+                  @datacollection_entry(dataCollection)
               }
             </tbody>
         </table>

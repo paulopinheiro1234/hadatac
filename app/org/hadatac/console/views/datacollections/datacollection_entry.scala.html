@@ -1,21 +1,15 @@
-@(triple : org.hadatac.console.models.TripleDocument)
-@*****************************
-   ?uri
-   ?platform 
-   ?instrument 
-   ?date
-*****************************@
+@(dc : org.hadatac.entity.pojo.DataCollection)
 
 @import java.net._
 
     <tr>
        <td></td> 
-       <td>@triple.get("platformName")</td> 
-       <td>@triple.get("instrumentName")</td>
-       <td>@triple.get("date")</td>
+       <td>@dc.getPlatformName()</td> 
+       <td>@dc.getInstrumentModel()</td>
+       <td>@dc.getStartedAt()</td>
        <td></td>
        <td>
-          <a href="@org.hadatac.console.controllers.datacollections.routes.DeleteDataCollection.index(URLEncoder.encode(triple.get("uri"),"UTF-8"))" class="btn-xs btn-primary" role="button">Delete</a>
-          <a href="@org.hadatac.console.controllers.datacollections.routes.SetAccessPermission.index(URLEncoder.encode(triple.get("uri"),"UTF-8"))" class="btn-xs btn-primary" role="button">Permission</a>
+          <a href="@org.hadatac.console.controllers.datacollections.routes.DeleteDataCollection.index(URLEncoder.encode(dc.getUri(),"UTF-8"))" class="btn-xs btn-primary" role="button">Delete</a>
+          <a href="@org.hadatac.console.controllers.datacollections.routes.SetAccessPermission.index(URLEncoder.encode(dc.getUri(),"UTF-8"))" class="btn-xs btn-primary" role="button">Permission</a>
        </td>
     </tr>

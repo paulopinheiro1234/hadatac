@@ -1,0 +1,26 @@
+@(dc : org.hadatac.entity.pojo.DataCollection)
+
+@import helper._
+@import org.hadatac.console.views.html._
+@import org.hadatac.console.controllers._
+
+@main("Set Data Collection Access Permission") {
+
+    <h2>Set Data Collection Access Permission</h2>
+    
+    <div class="container-fluid">
+       <ul>
+           <li><i>URI:</i> @dc.getUri()</li>
+           <li><i>Status:</i> @dc.getStatus()</li>
+           <li><i>Triggering Event:</i> </li>
+           <li><i>Platform:</i> @dc.getPlatformName()</li>
+           <li><i>Instrument:</i> @dc.getInstrumentModel()</li>
+           <li><i>Start Date/Time:</i> @dc.getStartedAt()</li>
+           <li><i>End Date/Time:</i> @dc.getEndedAt()</li>
+           <li><i># of Data Points:</i> </li>
+           <li><i>Permission:</i> @dc.getPermissionUri()</li>
+       </ul>
+    </div>
+ 
+
+}
