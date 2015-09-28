@@ -1,26 +1,56 @@
-@(dc : org.hadatac.entity.pojo.DataCollection)
+@(oper : String, dc : org.hadatac.entity.pojo.DataCollection)
 
 @import helper._
 @import org.hadatac.console.views.html._
 @import org.hadatac.console.controllers._
+@import org.hadatac.console.controllers.datacollections._
 
-@main("Set Data Collection Access Permission") {
+@main("Change Data Access Permission") {
 
-    <h2>Set Data Collection Access Permission</h2>
+    <h2>Change Data Access Permission</h2>
     
     <div class="container-fluid">
        <ul>
-           <li><i>URI:</i> @dc.getUri()</li>
-           <li><i>Status:</i> @dc.getStatus()</li>
-           <li><i>Triggering Event:</i> </li>
-           <li><i>Platform:</i> @dc.getPlatformName()</li>
-           <li><i>Instrument:</i> @dc.getInstrumentModel()</li>
-           <li><i>Start Date/Time:</i> @dc.getStartedAt()</li>
-           <li><i>End Date/Time:</i> @dc.getEndedAt()</li>
-           <li><i># of Data Points:</i> </li>
-           <li><i>Permission:</i> @dc.getPermissionUri()</li>
+           <li><b>URI:</b> @dc.getUri()</li>
+           <li><b>Status:</b> @dc.getStatus()</li>
+           <li><b>Triggering Event:</b> </li>
+           <li><b>Platform:</b> @dc.getPlatformName()</li>
+           <li><b>Instrument:</b> @dc.getInstrumentModel()</li>
+           <li><b>Start Date/Time:</b> @dc.getStartedAt()</li>
+           <li><b>End Date/Time:</b> @dc.getEndedAt()</li>
+           <li><b># of Data Points:</b> </li>
+           <li><b>Current Permission:</b> @dc.getPermissionUri()</li>
        </ul>
     </div>
  
+    @if(oper=="init") {
+        <div id="question-box">
+           Are your sure you want to change the access permission for this data collection and its data points? 
+           <a href="@org.hadatac.console.controllers.datacollections.routes.SetAccessPermission.index("confirmed", dc.getUri())" class="btn btn-success" role="button">Confirm</a>
+           <a href="@org.hadatac.console.controllers.datacollections.routes.SetAccessPermission.index("cancelled", dc.getUri())" class="btn btn-danger" role="button">Cancel</a>
+        </div>
+    }
+
+    <p  style='font-family: "Lucida Console", Monaco, monospace;' id='msgarea'></p>
+         
+    @if(oper=="cancelled") {
+        <div id="cancel-box">
+          <h4>Operation [Change Data Access Permission] has been cancelled.</h4>
+          Press OK button to return to Data Collection Management page <a href="@org.hadatac.console.controllers.datacollections.routes.DataCollectionManagement.index("active")" class="btn btn-warning" role="button">Ok</a>
+	    </div>
+    }
+
+             
+     <div id="end-process-box" style="display:none;">
+          Press OK button to return to Data Collection Management page <a href="@org.hadatac.console.controllers.datacollections.routes.DataCollectionManagement.index("active")" class="btn btn-warning" role="button">Ok</a>
+	 </div>
+
+	 @if(oper=="confirmed") {
+         <script> 
+            var msg = "@SetAccessPermission.newPermission(dc.getUri(), "")";
+            $('#msgarea').html(msg.replace(/&lt;br&gt;/g, '<br>'));
+            document.getElementById('end-process-box').style.display = 'inline';
+         </script>
+	 }
 
 }
