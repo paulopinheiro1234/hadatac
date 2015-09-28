@@ -41,6 +41,8 @@ public class DataCollection {
 	private String ownerUri;
 	@Field("permission_uri")
 	private String permissionUri;
+	@Field("triggering_event")
+	private int triggeringEvent;
 	@Field("unit")
 	private List<String> unit;
 	@Field("unit_uri")
@@ -149,6 +151,35 @@ public class DataCollection {
 	public void setPermissionUri(String permissionUri) {
 		this.permissionUri = permissionUri;
 	}
+	
+	public int getTriggeringEvent() {
+		return triggeringEvent;
+	}
+
+	public void setTriggeringEvent(int triggeringEvent) {
+		this.triggeringEvent = triggeringEvent;
+	}
+	
+	public String getTriggeringEventName() {
+		switch (triggeringEvent) {
+			case TriggeringEvent.INITIAL_DEPLOYMENT:
+				return TriggeringEvent.INITIAL_DEPLOYMENT_NAME;
+			case TriggeringEvent.LEGACY_DEPLOYMENT:
+				return TriggeringEvent.LEGACY_DEPLOYMENT_NAME;
+			case TriggeringEvent.CHANGED_CONFIGURATION:
+				return TriggeringEvent.CHANGED_CONFIGURATION_NAME;
+			case TriggeringEvent.CHANGED_OWNERSHIP:
+				return TriggeringEvent.CHANGED_OWNERSHIP_NAME;
+			case TriggeringEvent.AUTO_CALIBRATION:
+				return TriggeringEvent.AUTO_CALIBRATION_NAME;
+			case TriggeringEvent.SUSPEND_DATA_ACQUISITION:
+				return TriggeringEvent.SUSPEND_DATA_ACQUISITION_NAME;
+			case TriggeringEvent.RESUME_DATA_ACQUISITION:
+				return TriggeringEvent.RESUME_DATA_ACQUISITION_NAME;
+		}
+		return "";
+	}
+	
 	public String getStartedAt() {
 		DateTimeFormatter formatter = ISODateTimeFormat.dateTime();
 		return formatter.withZone(DateTimeZone.UTC).print(startedAt);
@@ -344,6 +375,9 @@ public class DataCollection {
 		Iterator<Object> i;
 		DataCollection dataCollection = new DataCollection();
 		dataCollection.setUri(doc.getFieldValue("uri").toString());
+		dataCollection.setOwnerUri(doc.getFieldValue("owner_uri").toString());
+		dataCollection.setPermissionUri(doc.getFieldValue("permission_uri").toString());
+		dataCollection.setTriggeringEvent(Integer.parseInt(doc.getFieldValue("triggering_event").toString()));
 		dataCollection.setStartedAt(doc.getFieldValue("started_at").toString());
 		dataCollection.setEndedAt(doc.getFieldValue("ended_at").toString());
 		if (doc.getFieldValues("unit") != null) {

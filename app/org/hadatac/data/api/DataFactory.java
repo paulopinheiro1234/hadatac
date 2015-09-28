@@ -22,7 +22,7 @@ public class DataFactory {
     
     public static String CONSOLE_ID = "00000001";
     
-    public static DataCollection createDataCollection(String dataCollectionUri, String deploymentUri, String ownerUri) {
+    public static DataCollection createDataCollection(String dataCollectionUri, String deploymentUri, int triggeringEvent, String ownerUri) {
 		DataCollection dataCollection = null;
 		Deployment deployment = Deployment.find(deploymentUri);
 		
@@ -30,6 +30,7 @@ public class DataFactory {
 		dataCollection.setUri(dataCollectionUri);
 		dataCollection.setOwnerUri(ownerUri);
 		dataCollection.setPermissionUri(ownerUri);
+		dataCollection.setTriggeringEvent(triggeringEvent);
 		dataCollection.setPlatformUri(deployment.platform.getUri());
 		dataCollection.setInstrumentUri(deployment.instrument.getUri());
 		dataCollection.setPlatformName(deployment.platform.getLabel());
