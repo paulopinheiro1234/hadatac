@@ -1,7 +1,8 @@
-@(results : org.hadatac.console.models.SparqlQueryResults)
+@(option : String, results : List[org.hadatac.entity.pojo.DataCollection])
 
 @import helper._
 @import org.hadatac.console.views.html._
+@import org.hadatac.console.controllers._
 
 @main("Data Collection Management") {
 
@@ -12,16 +13,37 @@
     <div class="container-fluid">
       <div class="row">
          <div class="navbar-collapse collapse navbar-secondary">
-          	<a href="@org.hadatac.console.controllers.datacollections.routes.DataCollectionManagement.index("active")" class="btn-sm btn-primary" role="button">Active Collections</a>
-          	<a href="@org.hadatac.console.controllers.datacollections.routes.DataCollectionManagement.index("closed")" class="btn-sm btn-primary" role="button">Closed Collections</a>
-          	<a href="@org.hadatac.console.controllers.datacollections.routes.DataCollectionManagement.index("all")" class="btn-sm btn-primary" role="button">All Collections</a>
+        	@if(option == "active") {
+            	<a href="@org.hadatac.console.controllers.datacollections.routes.DataCollectionManagement.index("active")" class="btn-sm btn-warning disabled" role="button">Active Collections</a>
+            } else {
+            	<a href="@org.hadatac.console.controllers.datacollections.routes.DataCollectionManagement.index("active")" class="btn-sm btn-primary" role="button">Active Collections</a>
+            } 	
+        	@if(option == "closed") {
+             	<a href="@org.hadatac.console.controllers.datacollections.routes.DataCollectionManagement.index("closed")" class="btn-sm btn-warning disabled" role="button">Closed Collections</a>
+            } else {
+             	<a href="@org.hadatac.console.controllers.datacollections.routes.DataCollectionManagement.index("closed")" class="btn-sm btn-primary" role="button">Closed Collections</a>
+            }
+        	@if(option == "all") {
+             	<a href="@org.hadatac.console.controllers.datacollections.routes.DataCollectionManagement.index("all")" class="btn-sm btn-warning disabled" role="button">All Collections</a>
+            } else {
+             	<a href="@org.hadatac.console.controllers.datacollections.routes.DataCollectionManagement.index("all")" class="btn-sm btn-primary" role="button">All Collections</a>
+            }
          </div>
       </div>
    </div>
 
    <hr>
    
-   <h3>User's Active Data Collections</h3>
+   @if(option == "active") {
+        <h3>@AuthApplication.getLocalUser(session()).name's Active Data Collections</h3>
+   } 
+   @if(option == "closed") {
+        <h3>@AuthApplication.getLocalUser(session()).name's Closed Data Collections</h3>
+   } 
+   @if(option == "all") {
+        <h3>@AuthApplication.getLocalUser(session()).name's Active and Closed Data Collections</h3>
+   } 
+
    
     <div class="container-fluid">
         <table class="table">
@@ -36,8 +58,8 @@
                  </tr>
             </thead>
             <tbody>
-              @for((k, triple) <- results.sparqlResults){
-                  @datacollection_entry(triple)
+              @for(dataCollection <- results){
+                  @datacollection_entry(dataCollection)
               }
             </tbody>
         </table>

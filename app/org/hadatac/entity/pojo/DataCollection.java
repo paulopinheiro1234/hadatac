@@ -424,6 +424,29 @@ public class DataCollection {
 		return list;
 	}
 	
+	public static DataCollection findByUri(String dataCollectionUri) {
+		
+		SolrClient solr = new HttpSolrClient(Play.application().configuration().getString("hadatac.solr.data") + "/sdc");
+		SolrQuery query = new SolrQuery();
+		query.set("q", "uri:\"" + dataCollectionUri + "\"");
+		query.set("sort", "started_at asc");
+		DataCollection dataCollection = null;
+		
+		try {
+			QueryResponse queryResponse = solr.query(query);
+			solr.close();
+			SolrDocumentList list = queryResponse.getResults();
+			if (list.size() == 1) {
+				dataCollection = convertFromSolr(list.get(0));
+				//hadatac.deployment = Deployment.find(hadatac);
+			}
+		} catch (Exception e) {
+			System.out.println("[ERROR] DataCollection.findByUri(dataCollectionUri) - Exception message: " + e.getMessage());
+		}
+				
+		return dataCollection;
+	}
+	
 	public int close(String endedAt) {
 		this.setEndedAtXsdWithMillis(endedAt);
 		return this.save();

@@ -2,11 +2,13 @@
 
 @import helper._
 @import org.hadatac.console.views.html._
+@import org.hadatac.console.controllers._
 @import be.objectify.deadbolt.java.views.html._
 @import be.objectify.deadbolt.core.utils.TemplateUtils._
 @import play.api.Play
 
 @main("HADataC: Human-Aware Data Acquisition Framework") {
+
     <div class="container-fluid">
       <div class="row">
           <div class="col-md-1 col-xs-0"></div>
@@ -27,17 +29,16 @@
            <a href="" class="btn btn-primary btn-block disabled" role="button">Infer Semantic Differences</a>
            <a href="" class="btn btn-primary btn-block disabled" role="button">Show Collaboration Insight</a>
         </div>
-@*        @subjectPresent() {
-          @defining(AuthApplication.getLocalUser(session())) { user =>
-*@
           <div class="col-md-3 col-xs-2">
               <h4>Data Upload</h4>  
               <a href="" class="btn btn-primary btn-block disabled" role="button">Manage Scientific Activities</a>
-              <a href="@org.hadatac.console.controllers.deployments.routes.DeploymentManagement.index()" class="btn btn-primary btn-block" role="button">Manage Deployments</a>
-              <a href="@org.hadatac.console.controllers.datacollections.routes.DataCollectionManagement.index("active")" class="btn btn-primary btn-block" role="button">Manage Data Collections</a>
-              <a href="@org.hadatac.console.controllers.annotator.routes.Annotator.selectDeployment()" class="btn btn-primary btn-block" role="button">Create CCSV from CSV</a>
-              <a href="@org.hadatac.console.controllers.measurements.routes.LoadCCSV.loadCCSV("init")" class="btn btn-primary btn-block" role="button">Upload CCSV</a>
+              <a href="@org.hadatac.console.controllers.deployments.routes.DeploymentManagement.index()" id="deployments" class="btn btn-primary btn-block" role="button">Manage Deployments</a>
+              <a href="@org.hadatac.console.controllers.datacollections.routes.DataCollectionManagement.index("active")"  id="datacollections" class="btn btn-primary btn-block" role="button">Manage Data Collections</a>
+              <a href="@org.hadatac.console.controllers.annotator.routes.Annotator.selectDeployment()"  id="annotator" class="btn btn-primary btn-block" role="button">Create CCSV from CSV</a>
+              <a href="@org.hadatac.console.controllers.measurements.routes.LoadCCSV.loadCCSV("init")"  id="csvloader" class="btn btn-primary btn-block" role="button">Upload CCSV</a>
            </div>
+          @subjectPresent() {
+          @defining(AuthApplication.getLocalUser(session())) { user =>
            <div class="col-md-2 col-xs-2">
               <h4>KB Management</h4>  
               <a href="@org.hadatac.console.controllers.triplestore.routes.Clean.clean("init")" class="btn btn-primary btn-block" role="button">Clean KB</a>
@@ -45,9 +46,8 @@
               <a href="@org.hadatac.console.controllers.triplestore.routes.LoadKB.loadKB("init")" class="btn btn-primary btn-block" role="button">Upload Facts</a>
               <a href="@org.hadatac.console.controllers.triplestore.routes.Users.preRegistration("init")" class="btn btn-primary btn-block" role="button">Manage Users</a>
            </div>
-@*           }
-        }
-*@
+           }
+        } 
         <div class="col-md-1 col-xs-0"></div>
       </div>
       <div class="row">
@@ -82,4 +82,22 @@
          <div class="col-md-1 col-xs-0"></div>
       </div>
     </div>
+
+    <script type="text/javascript">
+        $( document ).ready(function() {
+          var hasUser = ("@AuthApplication.getLocalUser(session())" != "");
+          if (hasUser) {
+              $('#deployments').attr( 'class', 'btn btn-primary btn-block' );
+              $('#datacollections').attr( 'class', 'btn btn-primary btn-block' );
+              $('#annotator').attr( 'class', 'btn btn-primary btn-block' );
+              $('#csvloader').attr( 'class', 'btn btn-primary btn-block' );
+          } else {
+              $('#deployments').attr( 'class', 'btn btn-primary btn-block disabled' );
+              $('#datacollections').attr( 'class', 'btn btn-primary btn-block disabled' );
+              $('#annotator').attr( 'class', 'btn btn-primary btn-block disabled' );
+              $('#csvloader').attr( 'class', 'btn btn-primary btn-block disabled' );
+          }
+        });
+    </script>
+
 }
