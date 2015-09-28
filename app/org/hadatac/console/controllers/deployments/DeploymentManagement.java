@@ -21,7 +21,7 @@ import org.hadatac.console.views.html.deployments.*;
 public class DeploymentManagement extends Controller {
 
 	// for /metadata HTTP GET requests
-    public static Result index() {
+    public static Result index(String option) {
         SparqlQuery query = new SparqlQuery();
         GetSparqlQuery query_submit = new GetSparqlQuery(query);
         SparqlQueryResults theResults;
@@ -40,13 +40,13 @@ public class DeploymentManagement extends Controller {
             return internalServerError(error_page.render(e1.toString(), tabName));
             //e1.printStackTrace();
         }
-       return ok(deploymentManagement.render(theResults));
+       return ok(deploymentManagement.render(option, theResults));
         
     }// /index()
 
 
     // for /metadata HTTP POST requests
-    public static Result postIndex() {
+    public static Result postIndex(String option) {
         SparqlQuery query = new SparqlQuery();
         GetSparqlQuery query_submit = new GetSparqlQuery(query);
         SparqlQueryResults theResults;
@@ -65,7 +65,7 @@ public class DeploymentManagement extends Controller {
             return internalServerError(error_page.render(e1.toString(), tabName));
             //e1.printStackTrace();
         }
-        return ok(deploymentManagement.render(theResults));
+        return ok(deploymentManagement.render(option, theResults));
         
     }// /postIndex()
 

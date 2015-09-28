@@ -66,8 +66,8 @@ GET     /hadatac/login/password/forgot             org.hadatac.console.controlle
 POST    /hadatac/login/password/forgot             org.hadatac.console.controllers.Signup.doForgotPassword
 
 # deployment management
-GET	    /hadatac/deployments/		    	       org.hadatac.console.controllers.deployments.DeploymentManagement.index()
-POST	/hadatac/deployments/     			       org.hadatac.console.controllers.deployments.DeploymentManagement.postIndex()
+GET	    /hadatac/deployments/		    	       org.hadatac.console.controllers.deployments.DeploymentManagement.index(oper : String)
+POST	/hadatac/deployments/     			       org.hadatac.console.controllers.deployments.DeploymentManagement.postIndex(oper : String)
 GET	    /hadatac/deployments/new			       org.hadatac.console.controllers.deployments.NewDeployment.index()
 POST	/hadatac/deployments/new			       org.hadatac.console.controllers.deployments.NewDeployment.postIndex()
 POST 	/hadatac/deployments/new/form		       org.hadatac.console.controllers.deployments.NewDeployment.processForm()
@@ -78,8 +78,6 @@ GET	    /hadatac/deployments/delete	    	       org.hadatac.console.controllers.
 POST	/hadatac/deployments/delete		           org.hadatac.console.controllers.deployments.DeleteDeployment.postIndex()
 GET	    /hadatac/deployments/view			       org.hadatac.console.controllers.deployments.ViewDeployment.index(deployment_uri : String)
 POST	/hadatac/deployments/view	               org.hadatac.console.controllers.deployments.ViewDeployment.postIndex(deployment_uri : String)
-GET	    /hadatac/deployments/listclosed			   org.hadatac.console.controllers.deployments.ClosedDeployments.index()
-POST	/hadatac/deployments/listclosed	           org.hadatac.console.controllers.deployments.ClosedDeployments.postIndex()
 GET	    /hadatac/deployments/urigenerator		   org.hadatac.console.controllers.deployments.URIGenerator.index()
 POST	/hadatac/deployments/urigenerator	       org.hadatac.console.controllers.deployments.URIGenerator.postIndex()
 POST 	/hadatac/deployments/urigenerator/form	   org.hadatac.console.controllers.deployments.URIGenerator.processForm()

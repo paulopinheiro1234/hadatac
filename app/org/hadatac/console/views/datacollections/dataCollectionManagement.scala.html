@@ -14,19 +14,19 @@
       <div class="row">
          <div class="navbar-collapse collapse navbar-secondary">
         	@if(option == "active") {
-            	<a href="@org.hadatac.console.controllers.datacollections.routes.DataCollectionManagement.index("active")" class="btn-sm btn-warning disabled" role="button">Active Collections</a>
+            	<a href='@org.hadatac.console.controllers.datacollections.routes.DataCollectionManagement.index("active")' class="btn-sm btn-warning disabled" role="button">Active Collections</a>
             } else {
-            	<a href="@org.hadatac.console.controllers.datacollections.routes.DataCollectionManagement.index("active")" class="btn-sm btn-primary" role="button">Active Collections</a>
+            	<a href='@org.hadatac.console.controllers.datacollections.routes.DataCollectionManagement.index("active")' class="btn-sm btn-primary" role="button">Active Collections</a>
             } 	
         	@if(option == "closed") {
-             	<a href="@org.hadatac.console.controllers.datacollections.routes.DataCollectionManagement.index("closed")" class="btn-sm btn-warning disabled" role="button">Closed Collections</a>
+             	<a href='@org.hadatac.console.controllers.datacollections.routes.DataCollectionManagement.index("closed")' class="btn-sm btn-warning disabled" role="button">Closed Collections</a>
             } else {
-             	<a href="@org.hadatac.console.controllers.datacollections.routes.DataCollectionManagement.index("closed")" class="btn-sm btn-primary" role="button">Closed Collections</a>
+             	<a href='@org.hadatac.console.controllers.datacollections.routes.DataCollectionManagement.index("closed")' class="btn-sm btn-primary" role="button">Closed Collections</a>
             }
         	@if(option == "all") {
-             	<a href="@org.hadatac.console.controllers.datacollections.routes.DataCollectionManagement.index("all")" class="btn-sm btn-warning disabled" role="button">All Collections</a>
+             	<a href='@org.hadatac.console.controllers.datacollections.routes.DataCollectionManagement.index("all")' class="btn-sm btn-warning disabled" role="button">All Collections</a>
             } else {
-             	<a href="@org.hadatac.console.controllers.datacollections.routes.DataCollectionManagement.index("all")" class="btn-sm btn-primary" role="button">All Collections</a>
+             	<a href='@org.hadatac.console.controllers.datacollections.routes.DataCollectionManagement.index("all")' class="btn-sm btn-primary" role="button">All Collections</a>
             }
          </div>
       </div>
