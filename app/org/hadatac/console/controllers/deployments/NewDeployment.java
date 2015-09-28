@@ -34,6 +34,7 @@ import org.hadatac.console.views.html.deployments.*;
 import org.hadatac.data.api.DataFactory;
 import org.hadatac.entity.pojo.DataCollection;
 import org.hadatac.entity.pojo.Deployment;
+import org.hadatac.entity.pojo.TriggeringEvent;
 import org.hadatac.console.models.DeploymentForm;
 import org.hadatac.console.models.SparqlQuery;
 import org.hadatac.console.models.SparqlQueryResults;
@@ -107,7 +108,7 @@ public class NewDeployment extends Controller {
         String[] detectorUri = new String[1];
         detectorUri[0] = data.getDetector();
         Deployment deployment = DataFactory.createDeployment(deploymentUri, data.getPlatform(), data.getInstrument(), detectorUri, dateString);
-        DataCollection dataCollection = DataFactory.createDataCollection(dataCollectionUri, deploymentUri, Users.getUriByEmail(user.email));
+        DataCollection dataCollection = DataFactory.createDataCollection(dataCollectionUri, deploymentUri, TriggeringEvent.INITIAL_DEPLOYMENT, Users.getUriByEmail(user.email));
         if (form.hasErrors()) {
         	System.out.println("HAS ERRORS");
             return badRequest(newDeployment.render(form,
