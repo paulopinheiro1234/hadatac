@@ -26,91 +26,70 @@ import org.hadatac.entity.pojo.Deployment;
 public class CloseDeployment extends Controller {
 	
 	// for /metadata HTTP GET requests
-    public static Result index(String uri) {
+    public static Result index(String deployment_uri) {
 
-    	DeploymentForm dep = new DeploymentForm();
+    	DeploymentForm depForm = new DeploymentForm();
+    	Deployment dep = null;
     	
     	try {
-    		if (uri != null) {
-			    uri = URLDecoder.decode(uri, "UTF-8");
+    		if (deployment_uri != null) {
+			    deployment_uri = URLDecoder.decode(deployment_uri, "UTF-8");
     		} else {
-    			uri = "";
+    			deployment_uri = "";
     		}
 		} catch (UnsupportedEncodingException e) {
 			e.printStackTrace();
 		}
 
-    	if (!uri.equals("")) {
+    	if (!deployment_uri.equals("")) {
 
+    		dep = Deployment.find(deployment_uri);
     		/*
     		 *  Add deployment information into handler
     		 */
-    		String json = DeploymentQueries.exec(DeploymentQueries.DEPLOYMENT_BY_URI, uri);
-    		SparqlQueryResults results = new SparqlQueryResults(json, false);
-    		TripleDocument docDeployment = results.sparqlResults.values().iterator().next();
-    		dep.setPlatform(docDeployment.get("platform"));
-    		dep.setInstrument(docDeployment.get("instrument"));
-    		dep.setDetector(docDeployment.get("detector"));
-    		dep.setStartDateTime(docDeployment.get("date"));
+    		depForm.setPlatform(dep.platform.getLabel());
+    		depForm.setInstrument(dep.instrument.getLabel());
+    		depForm.setDetector(dep.detectors.get(0).getLabel());
+    		depForm.setStartDateTime(dep.getStartedAt());
  
-    		//DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:SSS'Z'");
-    		//Date startDate;
-			//try {
-			//	startDate = df.parse(docDeployment.get("date"));
-	    	//	dep.setStartDateTime(startDate);
-			//} catch (ParseException e) {
-			//	e.printStackTrace();
-			//}
-
             System.out.println("closing deployment");
-            return ok(closeDeployment.render(dep));
+            return ok(closeDeployment.render(depForm));
     	}
-    	return ok(closeDeployment.render(dep));
+    	return ok(closeDeployment.render(depForm));
         
     }// /index()
 
 
     // for /metadata HTTP POST requests
-    public static Result postIndex(String uri) {
-
-    	DeploymentForm dep = new DeploymentForm();
+    public static Result postIndex(String deployment_uri) {
+    	DeploymentForm depForm = new DeploymentForm();
+    	Deployment dep = null;
     	
     	try {
-    		if (uri != null) {
-			    uri = URLDecoder.decode(uri, "UTF-8");
+    		if (deployment_uri != null) {
+			    deployment_uri = URLDecoder.decode(deployment_uri, "UTF-8");
     		} else {
-    			uri = "";
+    			deployment_uri = "";
     		}
 		} catch (UnsupportedEncodingException e) {
 			e.printStackTrace();
 		}
 
-    	if (!uri.equals("")) {
+    	if (!deployment_uri.equals("")) {
 
+    		dep = Deployment.find(deployment_uri);
     		/*
     		 *  Add deployment information into handler
     		 */
-    		String json = DeploymentQueries.exec(DeploymentQueries.DEPLOYMENT_BY_URI, uri);
-    		SparqlQueryResults results = new SparqlQueryResults(json, false);
-    		TripleDocument docDeployment = results.sparqlResults.values().iterator().next();
-    		dep.setPlatform(docDeployment.get("platform"));
-    		dep.setInstrument(docDeployment.get("instrument"));
-    		dep.setDetector(docDeployment.get("detector"));
-    		dep.setStartDateTime(docDeployment.get("date"));
+    		depForm.setPlatform(dep.platform.getLabel());
+    		depForm.setInstrument(dep.instrument.getLabel());
+    		depForm.setDetector(dep.detectors.get(0).getLabel());
+    		depForm.setStartDateTime(dep.getStartedAt());
  
-    		//DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
-    		//Date startDate;
-			//try {
-			//	startDate = df.parse(docDeployment.get("date"));
-	    	//	dep.setStartDateTime(startDate);
-			//} catch (ParseException e) {
-			//	e.printStackTrace();
-			//}
-
             System.out.println("closing deployment");
-            return ok(closeDeployment.render(dep));
+            return ok(closeDeployment.render(depForm));
     	}
-    	return ok(closeDeployment.render(dep));
+    	return ok(closeDeployment.render(depForm));
         
     }// /postIndex()
 

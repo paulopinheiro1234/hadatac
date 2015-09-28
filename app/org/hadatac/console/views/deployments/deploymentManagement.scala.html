@@ -1,7 +1,8 @@
-@(oper : String, results : org.hadatac.console.models.SparqlQueryResults)
+@(oper : org.hadatac.utils.State, results : List[org.hadatac.entity.pojo.Deployment])
 
 @import helper._
 @import org.hadatac.console.views.html._
+@import org.hadatac.utils._
 
 @main("Deployment Management") {
 
@@ -12,15 +13,15 @@
     <div class="container-fluid">
       <div class="row">
          <div class="navbar-collapse collapse navbar-secondary">
-            @if(oper == "active") { 
-          		<a href="@org.hadatac.console.controllers.deployments.routes.DeploymentManagement.index("active")" class="btn-sm btn-warning disabled" role="button">Active Deployments</a>
+            @if(oper.getCurrent() == State.ACTIVE) { 
+          		<a href="@org.hadatac.console.controllers.deployments.routes.DeploymentManagement.index(State.ACTIVE)" class="btn-sm btn-warning disabled" role="button">Active Deployments</a>
           	} else {
-          		<a href="@org.hadatac.console.controllers.deployments.routes.DeploymentManagement.index("active")" class="btn-sm btn-primary" role="button">Active Deployments</a>
+          		<a href="@org.hadatac.console.controllers.deployments.routes.DeploymentManagement.index(State.ACTIVE)" class="btn-sm btn-primary" role="button">Active Deployments</a>
           	}
-          	@if(oper == "closed") {
-       		    <a href="@org.hadatac.console.controllers.deployments.routes.DeploymentManagement.index("closed")" class="btn-sm btn-warning disabled" role="button">Closed Deployments</a>
+          	@if(oper.getCurrent() == State.CLOSED) {
+       		    <a href="@org.hadatac.console.controllers.deployments.routes.DeploymentManagement.index(State.CLOSED)" class="btn-sm btn-warning disabled" role="button">Closed Deployments</a>
        		} else {
-       		    <a href="@org.hadatac.console.controllers.deployments.routes.DeploymentManagement.index("closed")" class="btn-sm btn-primary" role="button">Closed Deployments</a>
+       		    <a href="@org.hadatac.console.controllers.deployments.routes.DeploymentManagement.index(State.CLOSED)" class="btn-sm btn-primary" role="button">Closed Deployments</a>
        		}
           	<a href="@org.hadatac.console.controllers.deployments.routes.NewDeployment.index()" class="btn-sm btn-primary" role="button">Create Regular Deployment</a>
           	<a href="@org.hadatac.console.controllers.deployments.routes.NewDeployment.index()" class="btn-sm btn-primary" role="button">Create Legacy Deployment</a>
@@ -31,13 +32,13 @@
 
    <hr>
 
-   @if(oper == "active") {   
+   @if(oper.getCurrent() == State.ACTIVE) {   
       <h3>Active Deployments</h3>
    } else {
-      @if(oper == "closed") {   
+      @if(oper.getCurrent() == State.CLOSED) {   
          <h3>Closed Deployments</h3>
       } else {
-          @if(oper == "all") {  
+          @if(oper.getCurrent() == State.ALL) {  
              <h3>All Deployments</h3>
           } 
       }
@@ -50,12 +51,15 @@
                     <th>Platform</th>
                     <th>Instrument</th>
                     <th>Start DateTime</th>
+                    @if(oper.getCurrent() != State.ACTIVE) {
+                        <th>End Date/Time</th>
+                    }
                     <th>Operations</th>
                  </tr>
             </thead>
             <tbody>
-              @for((k, triple) <- results.sparqlResults){
-                  @deployment_entry(triple, true)
+              @for(deployment <- results){
+                  @deployment_entry(oper, deployment)
               }
             </tbody>
         </table>

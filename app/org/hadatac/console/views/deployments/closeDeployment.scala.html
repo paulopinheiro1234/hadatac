@@ -1,6 +1,7 @@
 @(deploy: org.hadatac.console.models.DeploymentForm)
 
 @import helper._
+@import org.hadatac.utils._
 @import org.hadatac.console.views.html._
 @import org.hadatac.console.views.html.deployments._
 @import org.hadatac.console.controllers.deployments._
@@ -81,7 +82,7 @@
 
      <div class="form-group class="col-sm-6 col-offset-3">
         <input class="btn btn-success" role="button" type="submit" value="Close" />
-        <a href="@org.hadatac.console.controllers.deployments.routes.DeploymentManagement.index("active")" class="btn btn-danger" role="button">Cancel</a>
+        <a href="@org.hadatac.console.controllers.deployments.routes.DeploymentManagement.index(State.ACTIVE)" class="btn btn-danger" role="button">Cancel</a>
      </div>
 
    </form>    
