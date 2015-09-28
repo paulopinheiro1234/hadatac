@@ -1,4 +1,4 @@
-@(results : org.hadatac.console.models.SparqlQueryResults)
+@(oper : String, results : org.hadatac.console.models.SparqlQueryResults)
 
 @import helper._
 @import org.hadatac.console.views.html._
@@ -12,17 +12,36 @@
     <div class="container-fluid">
       <div class="row">
          <div class="navbar-collapse collapse navbar-secondary">
+            @if(oper == "active") { 
+          		<a href="@org.hadatac.console.controllers.deployments.routes.DeploymentManagement.index("active")" class="btn-sm btn-warning disabled" role="button">Active Deployments</a>
+          	} else {
+          		<a href="@org.hadatac.console.controllers.deployments.routes.DeploymentManagement.index("active")" class="btn-sm btn-primary" role="button">Active Deployments</a>
+          	}
+          	@if(oper == "closed") {
+       		    <a href="@org.hadatac.console.controllers.deployments.routes.DeploymentManagement.index("closed")" class="btn-sm btn-warning disabled" role="button">Closed Deployments</a>
+       		} else {
+       		    <a href="@org.hadatac.console.controllers.deployments.routes.DeploymentManagement.index("closed")" class="btn-sm btn-primary" role="button">Closed Deployments</a>
+       		}
           	<a href="@org.hadatac.console.controllers.deployments.routes.NewDeployment.index()" class="btn-sm btn-primary" role="button">Create Regular Deployment</a>
           	<a href="@org.hadatac.console.controllers.deployments.routes.NewDeployment.index()" class="btn-sm btn-primary" role="button">Create Legacy Deployment</a>
-       		<a href="@org.hadatac.console.controllers.deployments.routes.ClosedDeployments.index()" class="btn-sm btn-primary" role="button">List Past Deployments</a>
        		<a href="@org.hadatac.console.controllers.deployments.routes.URIGenerator.index()" class="btn-sm btn-primary" role="button">Register URI Generator</a>
          </div>
       </div>
    </div>
 
    <hr>
-   
-   <h3>Active Deployments</h3>
+
+   @if(oper == "active") {   
+      <h3>Active Deployments</h3>
+   } else {
+      @if(oper == "closed") {   
+         <h3>Closed Deployments</h3>
+      } else {
+          @if(oper == "all") {  
+             <h3>All Deployments</h3>
+          } 
+      }
+   }
    
     <div class="container-fluid">
         <table class="table">

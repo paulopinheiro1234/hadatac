@@ -12,7 +12,7 @@ public class DeleteDeployment extends Controller {
     public static Result index() {
 
        System.out.println("deleting deployment");
-       return redirect(routes.DeploymentManagement.index());
+       return redirect(routes.DeploymentManagement.index("active"));
         
     }// /index()
 
@@ -21,7 +21,7 @@ public class DeleteDeployment extends Controller {
     public static Result postIndex() {
         
         System.out.println("deleting deployment");
-        return redirect(routes.DeploymentManagement.index());
+        return redirect(routes.DeploymentManagement.index("active"));
         
     }// /postIndex()
 
