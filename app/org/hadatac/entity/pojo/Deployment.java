@@ -44,6 +44,8 @@ public class Deployment {
     
     public static String LINE3 = INDENT1 + "a         vstoi:Deployment;  ";
     
+    public static String LINE3_LEGACY = INDENT1 + "a         vstoi:LegacyDeployment;  ";
+    
     public static String PLATFORM_PREDICATE =     INDENT1 + "vstoi:hasPlatform        ";
     
     public static String INSTRUMENT_PREDICATE =   INDENT1 + "hasneto:hasInstrument    ";
@@ -61,6 +63,7 @@ public class Deployment {
 	private String ccsvUri;
 	private DateTime startedAt;
 	private DateTime endedAt;
+	private boolean legacy;
 	
 	public Instrument instrument;
 	public Platform platform;
@@ -71,9 +74,18 @@ public class Deployment {
 		endedAt = null;
 		instrument = null;
 		platform = null;
+		legacy = false;
 		detectors = new ArrayList<Detector>();
 	}
 	
+	public boolean isLegacy() {
+		return legacy;
+	}
+
+	public void setLegacy(boolean legacy) {
+		this.legacy = legacy;
+	}
+
 	public String getStartedAt() {
 		DateTimeFormatter formatter = ISODateTimeFormat.dateTime();
 		return formatter.withZone(DateTimeZone.UTC).print(startedAt);
@@ -139,7 +151,11 @@ public class Deployment {
 		insert += NameSpaces.getInstance().printSparqlNameSpaceList();
     	insert += LINE1;
     	insert += "<" + this.getUri() + ">  ";
-    	insert += LINE3;
+    	if (this.isLegacy()) {
+    		insert += LINE3_LEGACY;
+    	} else {
+    		insert += LINE3;
+    	}
     	insert += PLATFORM_PREDICATE + "<" + this.platform.getUri() + "> ;   ";
     	insert += INSTRUMENT_PREDICATE + "<" + this.instrument.getUri() + "> ;   ";
     	Iterator<Detector> i = this.detectors.iterator();
@@ -172,6 +188,15 @@ public class Deployment {
 		Deployment deployment = new Deployment();
 		
 		deployment.setUri(uri);
+		
+		return deployment;
+	}
+	
+	public static Deployment createLegacy(String uri) {
+		Deployment deployment = new Deployment();
+		
+		deployment.setUri(uri);
+		deployment.setLegacy(true);
 		
 		return deployment;
 	}

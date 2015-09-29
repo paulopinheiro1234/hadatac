@@ -68,8 +68,8 @@ POST    /hadatac/login/password/forgot             org.hadatac.console.controlle
 # deployment management
 GET	    /hadatac/deployments/		    	       org.hadatac.console.controllers.deployments.DeploymentManagement.index(oper : String)
 POST	/hadatac/deployments/     			       org.hadatac.console.controllers.deployments.DeploymentManagement.postIndex(oper : String)
-GET	    /hadatac/deployments/new			       org.hadatac.console.controllers.deployments.NewDeployment.index()
-POST	/hadatac/deployments/new			       org.hadatac.console.controllers.deployments.NewDeployment.postIndex()
+GET	    /hadatac/deployments/new			       org.hadatac.console.controllers.deployments.NewDeployment.index(type : String)
+POST	/hadatac/deployments/new			       org.hadatac.console.controllers.deployments.NewDeployment.postIndex(type : String)
 POST 	/hadatac/deployments/new/form		       org.hadatac.console.controllers.deployments.NewDeployment.processForm()
 GET	    /hadatac/deployments/close			       org.hadatac.console.controllers.deployments.CloseDeployment.index(deployment_uri : String)
 POST	/hadatac/deployments/close		           org.hadatac.console.controllers.deployments.CloseDeployment.postIndex(deployment_uri : String)

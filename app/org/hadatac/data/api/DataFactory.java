@@ -47,8 +47,27 @@ public class DataFactory {
 		return dataset;
 	}
 	
-	public static Deployment createDeployment(String deploymentUri, String platformUri, String instrumentUri, String[] detectorUri, String startedAt) {
-		Deployment deployment = Deployment.create(deploymentUri);
+	public static Deployment createDeployment(String deploymentUri, String platformUri, String instrumentUri, String[] detectorUri, String startedAt, String type) {
+		Deployment deployment;
+		if (type.equalsIgnoreCase("LEGACY")) {
+			deployment = Deployment.createLegacy(deploymentUri);
+		} else {
+			deployment = Deployment.create(deploymentUri);
+		}
+		
+		deployment.platform = Platform.find(platformUri);
+		deployment.instrument = Instrument.find(instrumentUri);
+		for (int i = 0; i < detectorUri.length; i++) {
+			deployment.detectors.add(Detector.find(detectorUri[i]));
+		}
+		deployment.setStartedAtXsd(startedAt);
+		deployment.save();
+		
+		return deployment;
+	}
+	
+	public static Deployment createLegacyDeployment(String deploymentUri, String platformUri, String instrumentUri, String[] detectorUri, String startedAt) {
+		Deployment deployment = Deployment.createLegacy(deploymentUri);
 		
 		deployment.platform = Platform.find(platformUri);
 		deployment.instrument = Instrument.find(instrumentUri);
