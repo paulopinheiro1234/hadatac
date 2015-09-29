@@ -27,7 +27,9 @@ import org.apache.jena.update.UpdateFactory;
 import org.apache.jena.update.UpdateProcessor;
 import org.apache.jena.update.UpdateRequest;
 import org.hadatac.data.loader.util.Sparql;
+import org.hadatac.utils.Collections;
 import org.hadatac.utils.NameSpaces;
+import org.hadatac.utils.State;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.joda.time.format.DateTimeFormat;
@@ -274,13 +276,13 @@ public class Deployment {
 		return null;
 	}
 	
-	public static Deployment find(String uri) {
+	public static Deployment find(String deployment_uri) {
 		Deployment deployment = null;
 		Model model;
 		Statement statement;
 		RDFNode object;
 		
-		String queryString = "DESCRIBE <" + uri + ">";
+		String queryString = "DESCRIBE <" + deployment_uri + ">";
 		Query query = QueryFactory.create(queryString);
 		QueryExecution qexec = QueryExecutionFactory.sparqlService(
 				Play.application().configuration().getString("hadatac.solr.triplestore") + "/store/sparql", query);
@@ -303,9 +305,67 @@ public class Deployment {
 			}
 		}
 		
-		deployment.setUri(uri);
+		deployment.setUri(deployment_uri);
 		
 		return deployment;
+	}
+
+	public static List<Deployment> find(State state) {
+		List<Deployment> deployments = new ArrayList<Deployment>();
+	    String queryString = "";
+        if (state.getCurrent() == State.ACTIVE) { 
+    	   queryString = "PREFIX prov: <http://www.w3.org/ns/prov#>  " +
+    			   "PREFIX vstoi: <http://hadatac.org/ont/vstoi#>  " +
+    			   "SELECT ?uri WHERE { " + 
+    			   "   ?uri a vstoi:Deployment . " + 
+    			   "   FILTER NOT EXISTS { ?uri prov:endedAtTime ?enddatetime . } " + 
+    			   "} " + 
+    			   "ORDER BY DESC(?datetime) ";
+        } else {
+    	   if (state.getCurrent() == State.CLOSED) {
+    		   queryString = "PREFIX prov: <http://www.w3.org/ns/prov#>  " +
+    				   "PREFIX vstoi: <http://hadatac.org/ont/vstoi#>  " +
+    				   "SELECT ?uri WHERE { " + 
+    				   "   ?uri a vstoi:Deployment . " + 
+    				   "   ?uri prov:startedAtTime ?startdatetime .  " + 
+    				   "   ?uri prov:endedAtTime ?enddatetime .  " + 
+    				   "} " +
+    				   "ORDER BY DESC(?datetime) ";
+    	   } else {
+        	   if (state.getCurrent() == State.ALL) {
+        		   queryString = "PREFIX prov: <http://www.w3.org/ns/prov#>  " +
+        				   "PREFIX vstoi: <http://hadatac.org/ont/vstoi#>  " +
+        				   "SELECT ?uri WHERE { " + 
+        				   "   ?uri a vstoi:Deployment . " + 
+        				   "} " +
+        				   "ORDER BY DESC(?datetime) ";
+        	   } else {
+        		   System.out.println("Deployment.java: no valid state specified.");
+        		   return null;
+        	   }
+    	   }
+        }
+		Query query = QueryFactory.create(queryString);
+		
+		System.out.println(queryString);
+		
+		QueryExecution qexec = QueryExecutionFactory.sparqlService(Collections.getCollectionsName(Collections.METADATA_SPARQL), query);
+		ResultSet results = qexec.execSelect();
+		ResultSetRewindable resultsrw = ResultSetFactory.copyResults(results);
+		qexec.close();
+		
+		Deployment dep = null;
+		while (resultsrw.hasNext()) {
+			QuerySolution soln = resultsrw.next();
+			if (soln != null && soln.getResource("uri").getURI()!= null) { 
+				//dep = Deployment.find(soln.getLiteral("uri").getString()); 
+				dep = Deployment.find(soln.getResource("uri").getURI()); 
+			}
+			deployments.add(dep);
+			
+		}
+		
+		return deployments;
 	}
 
 	public static Deployment find(Model model, DataCollection dataCollection) {
