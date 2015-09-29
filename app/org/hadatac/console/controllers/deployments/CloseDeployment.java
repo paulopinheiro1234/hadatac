@@ -118,8 +118,7 @@ public class CloseDeployment extends Controller {
 		} catch (ParseException e) {
 			e.printStackTrace();
 		}
-		dep.setEndedAtXsd(endDateString);
-		dep.saveEndedAtTime();
+		dep.close(endDateString);
 		
 		data.setPlatform(dep.platform.getLabel());
 		data.setInstrument(dep.instrument.getLabel());

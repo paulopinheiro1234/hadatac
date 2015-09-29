@@ -348,7 +348,9 @@ public class DataCollection {
 	public int save() {
 		try {
 			SolrClient client = new HttpSolrClient(Play.application().configuration().getString("hadatac.solr.data") + "/sdc");
-			endedAt = DateTime.parse("9999-12-31T23:59:59.999Z");
+			if (endedAt == null) {
+				endedAt = DateTime.parse("9999-12-31T23:59:59.999Z");
+			}
 			int status = client.addBean(this).getStatus();
 			client.commit();
 			client.close();
@@ -482,7 +484,7 @@ public class DataCollection {
 	}
 	
 	public int close(String endedAt) {
-		this.setEndedAtXsdWithMillis(endedAt);
+		this.setEndedAtXsd(endedAt);
 		return this.save();
 	}
 	

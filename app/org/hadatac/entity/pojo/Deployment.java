@@ -127,7 +127,11 @@ public class Deployment {
 	}
 	public void setEndedAtXsd(String endedAt) {
 		DateTimeFormatter formatter = ISODateTimeFormat.dateTimeNoMillis();
-		this.startedAt = formatter.parseDateTime(endedAt);
+		this.endedAt = formatter.parseDateTime(endedAt);
+	}
+	public void setEndedAtXsdWithMillis(String endedAt) {
+		DateTimeFormatter formatter = ISODateTimeFormat.dateTime();
+		this.endedAt = formatter.parseDateTime(endedAt);
 	}
 	
 	public String getUri() {
@@ -220,6 +224,16 @@ public class Deployment {
 		    	e.printStackTrace();
 	    	}
        	}
+	}
+	
+	public void close(String endedAt) {
+		setEndedAtXsd(endedAt);
+		List<DataCollection> list = DataCollection.find(this, true);
+		if (!list.isEmpty()) {
+			DataCollection dc = list.get(0);
+			dc.close(endedAt);
+		}
+		saveEndedAtTime();
 	}
 	
 	public void delete() {
