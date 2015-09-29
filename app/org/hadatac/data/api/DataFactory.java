@@ -110,7 +110,7 @@ public class DataFactory {
     	for (int i = metadataId.length(); i <= 8; i++) {
     		metadataId = "0" + metadataId;
     	}
-    	return host + "/hadatac/kb/" + category + "/" + CONSOLE_ID + "/" + metadataId + "/" ;   
+    	return host + "/hadatac/kb/" + category + "/" + CONSOLE_ID + "/" + metadataId ;   
     }
     
 
