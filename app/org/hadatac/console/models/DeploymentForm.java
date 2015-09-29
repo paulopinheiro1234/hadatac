@@ -1,7 +1,5 @@
 package org.hadatac.console.models;
 
-import java.util.Date;
-
 public class DeploymentForm {
 
     public String platform;

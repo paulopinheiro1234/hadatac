@@ -42,9 +42,13 @@ public class Deployment {
 	
 	public static String INDENT1 = "     ";
 	
-	public static String LINE1 = "INSERT DATA {  ";
+	public static String INSERT_LINE1 = "INSERT DATA {  ";
+    
+	public static String DELETE_LINE1 = "DELETE WHERE {  ";
     
     public static String LINE3 = INDENT1 + "a         vstoi:Deployment;  ";
+    
+    public static String DELETE_LINE3 = INDENT1 + " ?p ?o . ";
     
     public static String PLATFORM_PREDICATE =     INDENT1 + "vstoi:hasPlatform        ";
     
@@ -54,7 +58,9 @@ public class Deployment {
         
     public static String START_TIME_PREDICATE =   INDENT1 + "prov:startedAtTime		  ";
     
-    public static String START_TIME_XMLS =   "\"^^<http://www.w3.org/2001/XMLSchema#dateTime> .";
+    public static String END_TIME_PREDICATE =     INDENT1 + "prov:endedAtTime		  ";
+    
+    public static String TIME_XMLS =   "\"^^<http://www.w3.org/2001/XMLSchema#dateTime> .";
     
     public static String LINE_LAST = "}  ";
 
@@ -139,7 +145,7 @@ public class Deployment {
 	public void save() {
 		String insert = "";
 		insert += NameSpaces.getInstance().printSparqlNameSpaceList();
-    	insert += LINE1;
+    	insert += INSERT_LINE1;
     	insert += "<" + this.getUri() + ">  ";
     	insert += LINE3;
     	insert += PLATFORM_PREDICATE + "<" + this.platform.getUri() + "> ;   ";
@@ -148,12 +154,14 @@ public class Deployment {
     	while (i.hasNext()) {
     		insert += DETECTOR_PREDICATE + "<" + i.next().getUri() + "> ;   ";
     	}
-       	insert += START_TIME_PREDICATE + "\"" + this.getStartedAt() + START_TIME_XMLS + "  "; 
+       	insert += START_TIME_PREDICATE + "\"" + this.getStartedAt() + TIME_XMLS + "  ";
+       	if (this.getEndedAt() != null) {
+           	insert += END_TIME_PREDICATE + "\"" + this.getEndedAt() + TIME_XMLS + "  ";
+       	}
     	insert += LINE_LAST;
     	System.out.println(insert);
     	UpdateRequest request = UpdateFactory.create(insert);
-        UpdateProcessor processor = UpdateExecutionFactory.createRemote(request, 
-        		Play.application().configuration().getString("hadatac.solr.triplestore") + "/store/sparql");
+        UpdateProcessor processor = UpdateExecutionFactory.createRemote(request, Collections.getCollectionsName(Collections.METADATA_SPARQL));
         processor.execute();
         
         DefaultHttpClient httpclient = new DefaultHttpClient();
@@ -168,6 +176,60 @@ public class Deployment {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+	}
+	
+	public void saveEndedAtTime() {
+		String insert = "";
+       	if (this.getEndedAt() != null) {
+		    insert += NameSpaces.getInstance().printSparqlNameSpaceList();
+    	    insert += INSERT_LINE1;
+    	    insert += "<" + this.getUri() + ">  ";
+           	insert += END_TIME_PREDICATE + "\"" + this.getEndedAt() + TIME_XMLS + "  ";
+    	    insert += LINE_LAST;
+    	    System.out.println(insert);
+    	    UpdateRequest request = UpdateFactory.create(insert);
+            UpdateProcessor processor = UpdateExecutionFactory.createRemote(request,Collections.getCollectionsName(Collections.METADATA_SPARQL)); 
+            processor.execute();
+        
+            DefaultHttpClient httpclient = new DefaultHttpClient();
+            HttpGet httpget = new HttpGet(Play.application().configuration().getString("hadatac.solr.triplestore")
+             		+ "/store/update?commit=true");
+            try {
+    			httpclient.execute(httpget);  
+	    	} catch (ClientProtocolException e) {
+    			// TODO Auto-generated catch block
+    			e.printStackTrace();
+	    	} catch (IOException e) {
+		    	// TODO Auto-generated catch block
+		    	e.printStackTrace();
+	    	}
+       	}
+	}
+	
+	public void delete() {
+		String query = "";
+		query += NameSpaces.getInstance().printSparqlNameSpaceList();
+        query += DELETE_LINE1;
+    	query += "<" + this.getUri() + ">  ";
+        query += DELETE_LINE3;
+    	query += LINE_LAST;
+        System.out.println(query);
+    	UpdateRequest request = UpdateFactory.create(query);
+        UpdateProcessor processor = UpdateExecutionFactory.createRemote(request, Collections.getCollectionsName(Collections.METADATA_SPARQL));
+        processor.execute();
+        
+        DefaultHttpClient httpclient = new DefaultHttpClient();
+        HttpGet httpget = new HttpGet(Play.application().configuration().getString("hadatac.solr.triplestore")
+            	+ "/store/update?commit=true");
+        try {
+    	    httpclient.execute(httpget);  
+	    } catch (ClientProtocolException e) {
+    		// TODO Auto-generated catch block
+    		e.printStackTrace();
+	    } catch (IOException e) {
+		    // TODO Auto-generated catch block
+		    e.printStackTrace();
+	    }
 	}
 	
 	public static Deployment create(String uri) {
@@ -293,7 +355,7 @@ public class Deployment {
     			   "PREFIX vstoi: <http://hadatac.org/ont/vstoi#>  " +
     			   "SELECT ?uri WHERE { " + 
     			   "   ?uri a vstoi:Deployment . " + 
-    			   "   FILTER NOT EXISTS { ?uri prov:endedAtTime ?enddatetime . } " + 
+    			   "   FILTER EXISTS { ?uri prov:endedAtTime ?enddatetime . } " + 
     			   "} " + 
     			   "ORDER BY DESC(?datetime) ";
         } else {

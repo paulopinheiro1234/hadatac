@@ -1,4 +1,4 @@
-@(deploy: org.hadatac.console.models.DeploymentForm)
+@(deployment_uri : String, deploy: org.hadatac.console.models.DeploymentForm)
 
 @import helper._
 @import org.hadatac.utils._
@@ -31,7 +31,7 @@
   <div class="container">
     <h2>Close Deployment</h2>
 
-    <form class="form-horizontal" method="post" action="@org.hadatac.console.controllers.deployments.routes.CloseDeployment.processForm">
+    <form class="form-horizontal" method="post" action="@org.hadatac.console.controllers.deployments.routes.CloseDeployment.processForm(deployment_uri)">
 
     <div class="form-group">
          <label>Platform</label> 

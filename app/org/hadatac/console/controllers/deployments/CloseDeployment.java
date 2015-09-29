@@ -12,14 +12,8 @@ import play.data.Form;
 import play.mvc.Controller;
 import play.mvc.Result;
 
-import org.hadatac.console.http.DeploymentQueries;
-import org.hadatac.console.models.CSVAnnotationHandler;
 import org.hadatac.console.models.DeploymentForm;
-import org.hadatac.console.models.SparqlQueryResults;
-import org.hadatac.console.models.TripleDocument;
 import org.hadatac.console.views.html.deployments.*;
-import org.hadatac.data.api.DataFactory;
-import org.hadatac.entity.pojo.DataCollection;
 import org.hadatac.entity.pojo.Deployment;
 
 
@@ -53,9 +47,9 @@ public class CloseDeployment extends Controller {
     		depForm.setStartDateTime(dep.getStartedAt());
  
             System.out.println("closing deployment");
-            return ok(closeDeployment.render(depForm));
+            return ok(closeDeployment.render(deployment_uri, depForm));
     	}
-    	return ok(closeDeployment.render(depForm));
+    	return ok(closeDeployment.render(deployment_uri, depForm));
         
     }// /index()
 
@@ -87,14 +81,30 @@ public class CloseDeployment extends Controller {
     		depForm.setStartDateTime(dep.getStartedAt());
  
             System.out.println("closing deployment");
-            return ok(closeDeployment.render(depForm));
+            return ok(closeDeployment.render(deployment_uri, depForm));
     	}
-    	return ok(closeDeployment.render(depForm));
+    	return ok(closeDeployment.render(deployment_uri, depForm));
         
     }// /postIndex()
 
-    public static Result processForm() {
-        Form<DeploymentForm> form = Form.form(DeploymentForm.class).bindFromRequest();
+    public static Result processForm(String deployment_uri) {
+    	Deployment dep = null;
+    	
+    	try {
+    		if (deployment_uri != null) {
+			    deployment_uri = URLDecoder.decode(deployment_uri, "UTF-8");
+    		} else {
+    			deployment_uri = "";
+    		}
+		} catch (UnsupportedEncodingException e) {
+			e.printStackTrace();
+		}
+
+    	if (!deployment_uri.equals("")) {
+    		dep = Deployment.find(deployment_uri);
+    	}
+    	
+    	Form<DeploymentForm> form = Form.form(DeploymentForm.class).bindFromRequest();
         DeploymentForm data = form.get();
 
         String dateStringFromJs = data.getEndDateTime();
@@ -108,11 +118,19 @@ public class CloseDeployment extends Controller {
 		} catch (ParseException e) {
 			e.printStackTrace();
 		}
+		dep.setEndedAtXsd(endDateString);
+		dep.saveEndedAtTime();
 		
-        //Deployment deployment = DataFactory.closeDeployment(deploymentUri, endDateString);
+		data.setPlatform(dep.platform.getLabel());
+		data.setInstrument(dep.instrument.getLabel());
+		data.setDetector(dep.detectors.get(0).getLabel());
+		data.setStartDateTime(dep.getStartedAt());
+		data.setEndDateTime(dep.getEndedAt());
+
+		//Deployment deployment = DataFactory.closeDeployment(deploymentUri, endDateString);
         if (form.hasErrors()) {
         	System.out.println("HAS ERRORS");
-            return badRequest(closeDeployment.render(data));
+            return badRequest(closeDeployment.render(deployment_uri, data));
         } else {
             return ok(deploymentConfirm.render("Close Deployment", data));
         }

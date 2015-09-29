@@ -1,4 +1,4 @@
-@(data : org.hadatac.console.models.DeploymentForm)
+@(deployment : org.hadatac.entity.pojo.Deployment)
 
 @import org.hadatac.console.views.html._
 @import org.hadatac.utils._
@@ -16,19 +16,19 @@
             
             <h2>Basic Info</h2>
                 <ul>
-                        <li>URI: @data.getPlatform()</li>
-                        <li>Platform: @data.getPlatform()</li>
-                        <li>Instrument: @data.getInstrument()</li>
-                        <li>Start Date/Time: @data.getStartDateTime()</li>
-                        <li>End Date/Time: @data.getEndDateTime()</li>
+                    <li>URI: @deployment.getUri()</li>
+                    <li>Platform: @deployment.platform.getLabel()</li>
+                    <li>Instrument: @deployment.instrument.getLabel()</li>
+                    <li>Start Date/Time: @deployment.getStartedAt()</li>
+                    <li>End Date/Time: @deployment.getEndedAt()</li>
                 </ul>
 
             <h2>Sensing Info</h2>
             <ul>
-                        <li>Detector: @data.getDetector()</li>
-                        <ul>
-                           <li>Characteristic: </li>
-                        </ul>   
+                 <li>Detector: @deployment.detectors.get(0).getLabel()</li>
+                    <ul>
+                       <li>Characteristic: </li>
+                    </ul>   
             </ul>
 
 
@@ -42,8 +42,8 @@
         <div class="col-md-6">
             <div class="row text-center">
                 <div style="width:95%; height:500px" id="map"></div>
-                @if(data.getHasFirstCoordinate() != null && data.getHasSecondCoordinate() != null){
-                    <script type="text/javascript">locations=["@data.getHasFirstCoordinate()","@data.getHasSecondCoordinate()"];createMap(locations);</script>
+                @if(deployment.platform.getFirstCoordinate() != null && deployment.platform.getSecondCoordinate() != null){
+                    <script type="text/javascript">locations=["@deployment.platform.getFirstCoordinate()","@deployment.platform.getSecondCoordinate()"];createMap(locations);</script>
                 }
             </div>
         </div>

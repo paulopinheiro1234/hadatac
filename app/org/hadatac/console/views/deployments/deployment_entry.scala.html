@@ -15,6 +15,6 @@
        @if(oper.getCurrent() == State.ACTIVE) {
            <a href="@org.hadatac.console.controllers.deployments.routes.CloseDeployment.index(URLEncoder.encode(deployment.getUri(),"UTF-8"))" class="btn-xs btn-primary" role="button">Close</a>
        }
-       <a href="@org.hadatac.console.controllers.deployments.routes.DeleteDeployment.index()" class="btn-xs btn-primary" role="button">Delete</a>
+       <a href="@org.hadatac.console.controllers.deployments.routes.DeleteDeployment.index(URLEncoder.encode(deployment.getUri(),"UTF-8"))" class="btn-xs btn-primary" role="button">Delete</a>
    </td>
 </tr>
