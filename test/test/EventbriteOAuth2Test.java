@@ -2,8 +2,8 @@ package test;
 
 import com.feth.play.module.pa.providers.oauth2.eventbrite.EventBriteAuthProvider;
 import com.feth.play.module.pa.providers.oauth2.eventbrite.EventBriteAuthUser;
-import models.User;
 import org.fluentlenium.core.domain.FluentWebElement;
+import org.hadatac.console.models.User;
 import org.junit.Test;
 import org.openqa.selenium.NoSuchElementException;
 

@@ -1,7 +1,8 @@
 @(deployForm: Form[org.hadatac.console.models.DeploymentForm], 
   thePlatforms : org.hadatac.console.models.SparqlQueryResults,
   theInstruments : org.hadatac.console.models.SparqlQueryResults,
-  theDetectors : org.hadatac.console.models.SparqlQueryResults)
+  theDetectors : org.hadatac.console.models.SparqlQueryResults,
+  deploymentType : String)
 
 @import helper._
 @import org.hadatac.utils._
@@ -48,7 +49,7 @@
 </script>
 
   <div class="container">
-    <h2>New Deployment</h2>
+    <h2>New @deploymentType Deployment</h2>
 
     <form class="form-horizontal" name="newDeployment" method="post" action="@org.hadatac.console.controllers.deployments.routes.NewDeployment.processForm">
 
@@ -114,6 +115,10 @@
                </script>
             </div>
          </div>
+     </div>
+     
+     <div class="form-group" hidden="true">
+     	<input id="type" name="type" type="text" class="form-control" value="@deploymentType" hidden="true" />
      </div>
 
       <div class="form-group" class="col-sm-6 col-offset-3">

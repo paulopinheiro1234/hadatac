@@ -9,8 +9,17 @@ public class DeploymentForm {
     public String detector;
     public String startDateTime;
     public String endDateTime;
+    public String type;
  
-    public String getPlatform() {
+    public String getType() {
+		return type;
+	}
+
+	public void setType(String type) {
+		this.type = type;
+	}
+
+	public String getPlatform() {
     	return platform;
     }
     
