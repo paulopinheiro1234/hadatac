@@ -171,7 +171,7 @@ public class Deployment {
     		insert += DETECTOR_PREDICATE + "<" + i.next().getUri() + "> ;   ";
     	}
        	insert += START_TIME_PREDICATE + "\"" + this.getStartedAt() + TIME_XMLS + "  ";
-       	if (this.getEndedAt() != null) {
+       	if (this.endedAt != null) {
            	insert += END_TIME_PREDICATE + "\"" + this.getEndedAt() + TIME_XMLS + "  ";
        	}
     	insert += LINE_LAST;
@@ -380,7 +380,7 @@ public class Deployment {
     			   "PREFIX vstoi: <http://hadatac.org/ont/vstoi#>  " +
     			   "SELECT ?uri WHERE { " + 
     			   "   ?uri a vstoi:Deployment . " + 
-    			   "   FILTER EXISTS { ?uri prov:endedAtTime ?enddatetime . } " + 
+    			   "   FILTER NOT EXISTS { ?uri prov:endedAtTime ?enddatetime . } " + 
     			   "} " + 
     			   "ORDER BY DESC(?datetime) ";
         } else {
