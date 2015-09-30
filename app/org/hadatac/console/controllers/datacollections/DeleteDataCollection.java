@@ -36,6 +36,7 @@ public class DeleteDataCollection extends Controller {
     		
             return ok(deleteDataCollection.render(oper, dc));
     	}
+    	
     	return ok(deleteDataCollection.render(oper, dc));
         
     }// /index()
@@ -65,6 +66,7 @@ public class DeleteDataCollection extends Controller {
     		
             return ok(deleteDataCollection.render(oper, dc));
     	}
+    	
     	return ok(deleteDataCollection.render(oper, dc));
         
     }// /postIndex()

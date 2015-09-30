@@ -496,6 +496,7 @@ public class DataCollection {
 			}
 			SolrClient solr = new HttpSolrClient(Play.application().configuration().getString("hadatac.solr.data") + "/sdc");
 			UpdateResponse response = solr.deleteById(this.uri);
+			solr.commit();
 			solr.close();
 			return response.getStatus();
 		} catch (SolrServerException e) {

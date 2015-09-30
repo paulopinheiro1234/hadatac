@@ -182,6 +182,7 @@ public class Measurement {
 		SolrClient solr = new HttpSolrClient(Play.application().configuration().getString("hadatac.solr.data") + "/measurement");
 		try {
 			UpdateResponse response = solr.deleteByQuery("dataset_uri:\"" + datasetUri + "\"");
+			solr.commit();
 			solr.close();
 			return response.getStatus();
 		} catch (SolrServerException e) {
