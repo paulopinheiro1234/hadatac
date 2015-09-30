@@ -1,6 +1,7 @@
 @(oper : String, dc : org.hadatac.entity.pojo.DataCollection)
 
 @import helper._
+@import org.hadatac.utils._
 @import org.hadatac.console.views.html._
 @import org.hadatac.console.controllers._
 @import org.hadatac.console.controllers.datacollections._
@@ -36,13 +37,13 @@
     @if(oper=="cancelled") {
         <div id="cancel-box">
           <h4>Operation [Change Data Access Permission] has been cancelled.</h4>
-          Press OK button to return to Data Collection Management page <a href="@org.hadatac.console.controllers.datacollections.routes.DataCollectionManagement.index("active")" class="btn btn-warning" role="button">Ok</a>
+          Press OK button to return to Data Collection Management page <a href="@org.hadatac.console.controllers.datacollections.routes.DataCollectionManagement.index(State.ACTIVE)" class="btn btn-warning" role="button">Ok</a>
 	    </div>
     }
 
              
      <div id="end-process-box" style="display:none;">
-          Press OK button to return to Data Collection Management page <a href="@org.hadatac.console.controllers.datacollections.routes.DataCollectionManagement.index("active")" class="btn btn-warning" role="button">Ok</a>
+          Press OK button to return to Data Collection Management page <a href="@org.hadatac.console.controllers.datacollections.routes.DataCollectionManagement.index(State.ACTIVE)" class="btn btn-warning" role="button">Ok</a>
 	 </div>
 
 	 @if(oper=="confirmed") {

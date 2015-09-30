@@ -4,11 +4,11 @@
 @import org.hadatac.utils._
 
 <tr>
-   <td>@deployment.platform.getLabel()</td> 
-   <td>@deployment.instrument.getLabel()</td>
-   <td>@deployment.getStartedAt()</td>
+   <td>@if(deployment.platform != null && deployment.platform.getLabel() != null) { @deployment.platform.getLabel() }</td> 
+   <td>@if(deployment.instrument != null && deployment.instrument.getLabel() != null) { @deployment.instrument.getLabel() }</td>
+   <td>@if(deployment.getStartedAt() != null) { @deployment.getStartedAt() }</td>
    @if(oper.getCurrent() != State.ACTIVE) {
-       <td>@deployment.getEndedAt()</td>
+       <td>@if(deployment.getEndedAt() != null) { @deployment.getEndedAt() }</td>
    }
    <td>
        <a href="@org.hadatac.console.controllers.deployments.routes.ViewDeployment.index(URLEncoder.encode(deployment.getUri(),"UTF-8"))" class="btn-xs btn-primary" role="button">View</a>

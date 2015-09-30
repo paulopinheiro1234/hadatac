@@ -24,6 +24,7 @@ import org.apache.solr.client.solrj.response.UpdateResponse;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
 import org.hadatac.data.loader.util.Sparql;
+import org.hadatac.utils.State;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.joda.time.format.DateTimeFormat;
@@ -433,6 +434,39 @@ public class DataCollection {
 		}
 		
 		return dataCollection;
+	}
+	
+	public static List<DataCollection> find(String ownerUri, State state) {
+		List<DataCollection> list = new ArrayList<DataCollection>();
+		
+		SolrClient solr = new HttpSolrClient(Play.application().configuration().getString("hadatac.solr.data") + "/sdc");
+		SolrQuery query = new SolrQuery();
+		if (state.getCurrent() == State.ALL) {
+			query.set("q", "owner_uri:\"" + ownerUri + "\"");
+		} else { 
+			if (state.getCurrent() == State.ACTIVE) {
+		      query.set("q", "owner_uri:\"" + ownerUri + "\"" + " AND " + "ended_at:\"9999-12-31T23:59:59.999Z\"");
+			} else {  // it is assumed that state is CLOSED
+			      query.set("q", "owner_uri:\"" + ownerUri + "\"" + " AND " + "-ended_at:\"9999-12-31T23:59:59.999Z\"");
+			}
+		}
+		query.set("sort", "started_at asc");
+		
+		try {
+			QueryResponse response = solr.query(query);
+			solr.close();
+			SolrDocumentList results = response.getResults();
+			Iterator<SolrDocument> i = results.iterator();
+			while (i.hasNext()) {
+				DataCollection dataCollection = convertFromSolr(i.next());
+				list.add(dataCollection);
+			}
+		} catch (Exception e) {
+			list.clear();
+			System.out.println("[ERROR] DataCollection.find(String) - Exception message: " + e.getMessage());
+		}
+		
+		return list;
 	}
 	
 	public static List<DataCollection> find(String ownerUri) {
