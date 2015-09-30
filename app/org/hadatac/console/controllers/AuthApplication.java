@@ -3,7 +3,7 @@ package org.hadatac.console.controllers;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-import org.hadatac.console.controllers.triplestore.Users;
+import org.hadatac.console.controllers.triplestore.UserManagement;
 import org.hadatac.console.models.User;
 
 import play.Routes;
@@ -90,7 +90,7 @@ public class AuthApplication extends Controller {
 			// User did not fill everything properly
 			return badRequest(signup.render(filledForm));
 		} else {
-			if (!Users.isPreRegistered(filledForm.get().email)) {
+			if (!UserManagement.isPreRegistered(filledForm.get().email)) {
 				return ok(notRegistered.render());
 			};
 			

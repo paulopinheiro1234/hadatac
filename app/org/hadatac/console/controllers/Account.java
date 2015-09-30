@@ -1,6 +1,6 @@
 package org.hadatac.console.controllers;
 
-import org.hadatac.console.controllers.triplestore.Users;
+import org.hadatac.console.controllers.triplestore.UserManagement;
 import org.hadatac.console.models.User;
 import be.objectify.deadbolt.java.actions.Restrict;
 import be.objectify.deadbolt.java.actions.Group;
@@ -129,7 +129,7 @@ public class Account extends Controller {
 			final User user = AuthApplication.getLocalUser(session());
 			final String newPassword = filledForm.get().password;
 			/* - This code sets the URI of the user after change password as a way to set a uri that is missing from a previous registration. - */
-			user.uri = Users.getUriByEmail(user.email);
+			user.uri = UserManagement.getUriByEmail(user.email);
 			user.save();
 			/* ---- */
 			user.changePassword(new MyUsernamePasswordAuthUser(newPassword),

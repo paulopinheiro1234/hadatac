@@ -12,19 +12,21 @@
       
       <div class="row">
 
-        <div class="col-md-8 col-md-offset-1">
+        <div class="col-md-4 col-md-offset-1">
 
-	     <h4>User Pre-Registration</h4>
+	       <h4>User Pre-Registration</h4>
+        
+    	     <h5>Batch Processing</h5>
         
              @if(oper=="init") {
                  The metadata store has @PermissionsContext.playTotalTriples() triples. <br>
 
 
-              <form name="fileUploadForm" method="POST" enctype="multipart/form-data" action="@org.hadatac.console.controllers.triplestore.routes.Users.uploadFile()">
+              <form name="fileUploadForm" method="POST" enctype="multipart/form-data" action="@org.hadatac.console.controllers.triplestore.routes.UserManagement.uploadFile()">
                      <input type="file" class="btn btn-info" name="pic">
                      Are your sure you want to pre-register users from the spreadsheet?
                      <input type="submit" class="btn btn-success" value="Confirm">
-                     <a href="@org.hadatac.console.controllers.triplestore.routes.Users.preRegistration("cancelled")" class="btn btn-danger" role="button">Cancel</a>
+                     <a href="@org.hadatac.console.controllers.triplestore.routes.UserManagement.preRegistration("cancelled")" class="btn btn-danger" role="button">Cancel</a>
               </form>
             }
 
@@ -44,17 +46,24 @@
 
      	     @if(oper=="loaded") {
                  <script> 
-                       var msg = "@Users.commitPreRegistration()";
+                       var msg = "@UserManagement.commitPreRegistration()";
                        $('#msgarea').html(msg.replace(/&lt;br&gt;/g, '<br>'));
                        document.getElementById('end-process-box').style.display = 'inline';
                  </script> 
               }
 
+          <h5>On-Line Processing</h5>
+
+             <a href="" class="btn btn-block btn-primary disabled" role="button">On-Line User Pre-Registration</a>
+
          <h4>User Visualization</h4>
           
-             <a href="@org.hadatac.console.controllers.triplestore.routes.UserNetwork.index()" class="btn btn-primary" role="button">User<br>Network</a>
+             <a href="@org.hadatac.console.controllers.triplestore.routes.UserNetwork.index()" class="btn btn-block btn-primary" role="button">User Network</a>
          
-
+         <h4>Permission Management</h4>
+          
+             <a href="" class="btn btn-block btn-primary disabled" role="button">Grant/Revoke Administrative Permission</a>
+         
 	   </div>
 
       </div>

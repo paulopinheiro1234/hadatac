@@ -7,7 +7,7 @@ import com.feth.play.module.pa.providers.password.UsernamePasswordAuthUser;
 import com.google.inject.Inject;
 
 import org.hadatac.console.controllers.routes;
-import org.hadatac.console.controllers.triplestore.Users;
+import org.hadatac.console.controllers.triplestore.UserManagement;
 import org.hadatac.console.models.LinkedAccount;
 import org.hadatac.console.models.TokenAction;
 import org.hadatac.console.models.TokenAction.Type;
@@ -141,7 +141,7 @@ public class MyUsernamePasswordAuthProvider
 			}
 		}
 		// The user either does not exist or is inactive - create a new one
-		String userUri = Users.getUriByEmail(user.getEmail());
+		String userUri = UserManagement.getUriByEmail(user.getEmail());
 		
 		@SuppressWarnings("unused")
 		final User newUser = User.create(user, userUri);

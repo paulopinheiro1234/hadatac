@@ -108,9 +108,9 @@ POST    /hadatac/ts/loadkb                         org.hadatac.console.controlle
 POST    /hadatac/ts/loadkbupload                   org.hadatac.console.controllers.triplestore.LoadKB.uploadFile
  
 # Permissions store management URLs
-GET     /hadatac/perm/preregister                  org.hadatac.console.controllers.triplestore.Users.preRegistration(oper: String)
-POST    /hadatac/perm/preregister                  org.hadatac.console.controllers.triplestore.Users.postPreRegistration(oper: String)
-POST    /hadatac/perm/preregister/upload           org.hadatac.console.controllers.triplestore.Users.uploadFile
+GET     /hadatac/perm/preregister                  org.hadatac.console.controllers.triplestore.UserManagement.preRegistration(oper: String)
+POST    /hadatac/perm/preregister                  org.hadatac.console.controllers.triplestore.UserManagement.postPreRegistration(oper: String)
+POST    /hadatac/perm/preregister/upload           org.hadatac.console.controllers.triplestore.UserManagement.uploadFile
 GET	    /hadatac/perm/userNetwork			       org.hadatac.console.controllers.triplestore.UserNetwork.index()
 POST	/hadatac/perm/userNetwork			       org.hadatac.console.controllers.triplestore.UserNetwork.postIndex()
  

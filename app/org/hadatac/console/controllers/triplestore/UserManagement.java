@@ -25,7 +25,7 @@ import org.hadatac.metadata.loader.PermissionsContext;
 import org.hadatac.metadata.loader.SpreadsheetProcessing;
 import org.hadatac.utils.Feedback;
 
-public class Users extends Controller {
+public class UserManagement extends Controller {
 
 	private static final String UPLOAD_NAME = "tmp/uploads/users-spreadsheet.xls";
 	
