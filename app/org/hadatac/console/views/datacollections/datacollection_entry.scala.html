@@ -11,7 +11,7 @@
        @if(state.getCurrent() != State.ACTIVE) {
            <td>@dc.getEndedAt()</td>
        }
-       <td></td>
+       <td>@dc.getNumberDataPoints()</td>
        <td>
           <a href="@org.hadatac.console.controllers.datacollections.routes.DeleteDataCollection.index("init", URLEncoder.encode(dc.getUri(),"UTF-8"))" class="btn-xs btn-primary" role="button">Delete</a>
           <a href="@org.hadatac.console.controllers.datacollections.routes.SetAccessPermission.index("init", URLEncoder.encode(dc.getUri(),"UTF-8"))" class="btn-xs btn-primary" role="button">Permission</a>

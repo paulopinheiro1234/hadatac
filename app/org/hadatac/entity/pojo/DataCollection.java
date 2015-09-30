@@ -44,6 +44,8 @@ public class DataCollection {
 	private String permissionUri;
 	@Field("triggering_event")
 	private int triggeringEvent;
+	@Field("nr_data_points")
+	private long numberDataPoints;
 	@Field("unit")
 	private List<String> unit;
 	@Field("unit_uri")
@@ -90,6 +92,7 @@ public class DataCollection {
 	public DataCollection() {
 		startedAt = null;
 		endedAt = null;
+		numberDataPoints = 0;
 		datasetUri = new ArrayList<String>();
 		unit = new ArrayList<String>();
 		unitUri = new ArrayList<String>();
@@ -113,6 +116,14 @@ public class DataCollection {
 
 	public void setCcsvUri(String ccsvUri) {
 		this.ccsvUri = ccsvUri;
+	}
+	
+	public long getNumberDataPoints() {
+		return numberDataPoints;
+	}
+
+	public void setNumberDataPoints(long numberDataPoints) {
+		this.numberDataPoints = numberDataPoints;
 	}
 
 	public String getLocalName() {
@@ -337,6 +348,9 @@ public class DataCollection {
 	public boolean containsDataset(String uri) {
 		return datasetUri.contains(uri);
 	}
+	public void addNumberDataPoints(long number) {
+		numberDataPoints += number;
+	}
 	
 	public boolean isFinished() {
 		if (endedAt == null) {
@@ -364,9 +378,12 @@ public class DataCollection {
 	
 	public int save(SolrClient solr) {
 		try {
-			endedAt = DateTime.parse("9999-12-31T23:59:59.999Z");
+			if (endedAt == null) {
+				endedAt = DateTime.parse("9999-12-31T23:59:59.999Z");
+			}
 			int status = solr.addBean(this).getStatus();
 			solr.commit();
+			solr.close();
 			return status;
 		} catch (IOException | SolrServerException e) {
 			System.out.println("[ERROR] DataCollection.save(SolrClient) - e.Message: " + e.getMessage());
@@ -381,6 +398,7 @@ public class DataCollection {
 		dataCollection.setOwnerUri(doc.getFieldValue("owner_uri").toString());
 		dataCollection.setPermissionUri(doc.getFieldValue("permission_uri").toString());
 		dataCollection.setTriggeringEvent(Integer.parseInt(doc.getFieldValue("triggering_event").toString()));
+		dataCollection.setNumberDataPoints(Long.parseLong(doc.getFieldValue("nr_data_points").toString()));
 		dataCollection.setStartedAt(doc.getFieldValue("started_at").toString());
 		dataCollection.setEndedAt(doc.getFieldValue("ended_at").toString());
 		if (doc.getFieldValues("unit") != null) {
