@@ -1,6 +1,6 @@
 @(triple : org.hadatac.console.models.TripleDocument)
 @*****************************
-  hasURI    | (not used)
+  hasURI    | model
   rdfs:subClassOf   | (not used)
   rdfs:label    | instModelName
   vstoi:hasMaker    | maker
@@ -38,6 +38,11 @@
     <p>Description: @triple.get("desc")</p>
     @if(triple.has("docLink")){
         <a href="@triple.get("docLink")" target="_blank">See Online Documentation</a>
+    }
+    @defining(triple.get("model")) {theuri =>
+    <form>
+        <input type="text" size="80" value="@theuri">
+    </form>
     }
 </div>
 <hr>

@@ -1,4 +1,11 @@
 @(triple : org.hadatac.console.models.TripleDocument)
+@*****************************
+  hasURI    | model
+  rdfs:subClassOf   | (not used)
+  rdfs:label    | modelName
+  vstoi:hasMaker  | maker
+  vstoi:hasDesc  | desc
+*****************************@
 
 @defining(triple.generateID()) {itemID =>
 <div class="panel-heading" role="tab" id="heading@itemID">
@@ -13,6 +20,11 @@
     <div class="panel-body">
         <p><b>@triple.get("modelName") </b> (manufactured by: @triple.get("maker") )</p>
         <p>Description: @triple.get("desc")</p>
+        @defining(triple.get("model")) {theuri =>
+            <form>
+                <input type="text" size="80" value="@theuri">
+            </form>
+        }
     </div>
 </div>
 }

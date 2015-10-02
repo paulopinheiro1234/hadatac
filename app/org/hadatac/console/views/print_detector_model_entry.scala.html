@@ -2,7 +2,7 @@
   p_list : List[org.hadatac.console.models.TripleDocument])
   
 @*****************************
-  hasURI    | (not used)
+  hasURI    | model
   rdfs:subClassOf   | (not used)
   rdfs:label    | modelName
   vstoi:hasMaker    | maker
@@ -21,6 +21,11 @@
     <p>Description: @triple.get("desc")</p>
     @if(triple.has("docLink")){
         <a href="@triple.get("docLink")" target="_blank">See Online Documentation</a>
+    }
+    @defining(triple.get("model")) {theuri =>
+    <form>
+        <input type="text" size="80" value="@theuri">
+    </form>
     }
     <h4>Sensing Perspectives:</h4>
     @for(p <- p_list){

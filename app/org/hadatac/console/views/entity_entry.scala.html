@@ -17,6 +17,11 @@
     <div id="@cleanName" class="panel-collapse collapse" role="tabpanel" aria-labelledby="heading@cleanName">
         <div class="panel-body">
             <h3>@itemID</h3>
+            @defining(triple.get("id").get(0)) {theuri =>
+            <form>
+                <input type="text" size="80" value="@theuri">
+            </form>
+            }
         </div>
             <h4>Characteristics of this entity:</h4>
             @for(c <- triple.get("chara")) {
