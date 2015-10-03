@@ -132,7 +132,7 @@ public class Loader {
 
 				if (loadOntology) {
 					System.out.println("Executing LOADONTOLOGY");						
-					metadata.loadOntologies(Feedback.COMMANDLINE);
+					metadata.loadOntologies(Feedback.COMMANDLINE, "confirmed");
 					System.out.println("");			
 				}
 		

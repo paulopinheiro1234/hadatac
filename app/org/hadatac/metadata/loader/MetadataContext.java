@@ -50,7 +50,7 @@ public class MetadataContext implements RDFContext {
     String loadFileMessage = "";
 	
     public MetadataContext(String un, String pwd, String kb, boolean ver) {
-        System.out.println("Metadata management set for knowledge base at " + kb);
+        //System.out.println("Metadata management set for knowledge base at " + kb);
 	    username = un;
 	    password = pwd;
 	    kbURL = kb;
@@ -218,31 +218,43 @@ public class MetadataContext implements RDFContext {
 		return (newTotal - total);
 	}
 	
-	public String loadOntologies(int mode) {
+	/*
+	 *  oper: "confirmed" cache ontologies from the web and load
+	 *        "confrmedCache" load from cached ontologies
+	 *        "cache" cache ontologies from the web
+	 */
+	public String loadOntologies(int mode, String oper) {
 	    String message = "";
-		Long total = totalTriples();
-		message += Feedback.println(mode, "   Triples before [loadOntologies]: " + total);
-		message += Feedback.println(mode," ");
-		message += NameSpaces.getInstance().copyNameSpacesLocally(mode);
-		for (Map.Entry<String, NameSpace> entry : NameSpaces.table.entrySet()) {
-	    	String abbrev = entry.getKey().toString();
-	    	String nsURL = entry.getValue().getURL();
-	    	if ((abbrev != null) && (nsURL != null) && (entry.getValue().getType() != null) && !nsURL.equals("")) {
-	    		String filePath = NameSpaces.CACHE_PATH + "copy" + "-" + abbrev.replace(":","");
-	    		message += Feedback.print(mode, "   Uploading " + filePath);
-	    		for (int i = filePath.length(); i < 50; i++) {
-	    			message += Feedback.print(mode, ".");
-	    		}
-	    		loadLocalFile(mode, filePath, entry.getValue().getType());
-	    		message += loadFileMessage;
-	    		Long newTotal = totalTriples();
-	    		message += Feedback.println(mode, "   Added " + (newTotal - total) + " triples.");
-	    		
-	    		total = newTotal;
-	    	}	          
+	    Long total = new Long(0);
+	    if (!oper.equals("cache")) {
+		    total = totalTriples();
+		    message += Feedback.println(mode, "   Triples before [loadOntologies]: " + total);
+		    message += Feedback.println(mode," ");
 	    }
-		message += Feedback.println(mode," ");
-		message += Feedback.println(mode, "   Triples after [loadOntologies]: " + totalTriples());
+		if (!oper.equals("confirmedCache")) {
+		    message += NameSpaces.getInstance().copyNameSpacesLocally(mode);
+		}
+		if (!oper.equals("cache")) {
+		    for (Map.Entry<String, NameSpace> entry : NameSpaces.table.entrySet()) {
+	    	    String abbrev = entry.getKey().toString();
+	    	    String nsURL = entry.getValue().getURL();
+	    	    if ((abbrev != null) && (nsURL != null) && (entry.getValue().getType() != null) && !nsURL.equals("")) {
+	    		    String filePath = NameSpaces.CACHE_PATH + "copy" + "-" + abbrev.replace(":","");
+	    		    message += Feedback.print(mode, "   Uploading " + filePath);
+	    		    for (int i = filePath.length(); i < 50; i++) {
+	    			    message += Feedback.print(mode, ".");
+	    		    }
+	    		    loadLocalFile(mode, filePath, entry.getValue().getType());
+	    		    message += loadFileMessage;
+	    		    Long newTotal = totalTriples();
+	    		    message += Feedback.println(mode, "   Added " + (newTotal - total) + " triples.");
+	    		
+	    		    total = newTotal;
+	    	    }	          
+	         }
+	    	 message += Feedback.println(mode," ");
+		     message += Feedback.println(mode, "   Triples after [loadOntologies]: " + totalTriples());
+		}
 		return message;
 	}
 }	

@@ -13,7 +13,9 @@ import org.apache.commons.io.FileUtils;
 
 public class NameSpaces {
 
-	public static String CACHE_PATH = "tmp/cache/";
+	public static String CACHE_PATH   = "tmp/cache/";
+	public static String CACHE_PREFIX = "copy-";
+
 
 	public static Map<String, NameSpace> table = new HashMap<String, NameSpace>(); 
 
@@ -102,7 +104,7 @@ public class NameSpaces {
 	    	String abbrev = entry.getKey().toString();
 	    	String nsURL = entry.getValue().getURL();
 	    	if (nsURL != null && !nsURL.equals("") && !nsURL.equals(":")) {
-	    		String filePath = CACHE_PATH + "copy" + "-" + abbrev.replace(":","");
+	    		String filePath = CACHE_PATH + CACHE_PREFIX + abbrev.replace(":","");
 	    		message += Feedback.print(mode, "   Creating local copy of " + abbrev + ". ");		
 			    for (int i = abbrev.length(); i < 36; i++) {
 			    	message += Feedback.print(mode, ".");
