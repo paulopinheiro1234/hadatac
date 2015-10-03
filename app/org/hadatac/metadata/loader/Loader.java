@@ -139,7 +139,7 @@ public class Loader {
 				if (loadXls) {
 					System.out.println("Executing LOADXLS");						
 					String message = "";
-					message = SpreadsheetProcessing.generateTTL(Feedback.COMMANDLINE, metadata, argsMap.get("-i"));
+					message = SpreadsheetProcessing.generateTTL(Feedback.COMMANDLINE, "load", metadata, argsMap.get("-i"));
 					//System.out.println(message);			
 				}
 			}

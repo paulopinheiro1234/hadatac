@@ -34,18 +34,18 @@ public class LoadKB extends Controller {
 	return ok(loadKB.render(oper, ""));
     }
 
-    public static String playLoadKB() {
+    public static String playLoadKB(String oper) {
 	     NameSpaces.getInstance();
 	     MetadataContext metadata = new 
 	    		 MetadataContext("user", 
 	    				         "password", 
 	    				         Play.application().configuration().getString("hadatac.solr.triplestore"), 
 	    				         false);
-	     String message = SpreadsheetProcessing.generateTTL(Feedback.WEB, metadata, UPLOAD_NAME);
+	     String message = SpreadsheetProcessing.generateTTL(Feedback.WEB, oper, metadata, UPLOAD_NAME);
 	     return message;
    }
     
-    public static Result uploadFile() {
+    public static Result uploadFile(String oper) {
     	//System.out.println("uploadFile CALLED!");
            MultipartFormData body = request().body().asMultipartFormData();
 		   FilePart uploadedfile = body.getFile("pic");
@@ -75,7 +75,7 @@ public class LoadKB extends Controller {
 			   } catch (FileNotFoundException e1) {
 			       return ok (loadKB.render("fail", "Could not find uploaded file"));
 			   }
-	     	   return ok(loadKB.render("loaded", "File uploaded successfully."));
+	     	   return ok(loadKB.render(oper, "File uploaded successfully."));
 		   } else {
 			 return ok (loadKB.render("fail", "Error uploading file. Please try again."));
 		   } 

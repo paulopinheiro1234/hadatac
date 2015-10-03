@@ -43,7 +43,7 @@ public class UserManagement extends Controller {
 	    				         "password", 
 	    				         Play.application().configuration().getString("hadatac.solr.permissions"), 
 	    				         false);
-	     String message = SpreadsheetProcessing.generateTTL(Feedback.WEB, permissions, UPLOAD_NAME);
+	     String message = SpreadsheetProcessing.generateTTL(Feedback.WEB, "load", permissions, UPLOAD_NAME);
 	     return message;
    }
     

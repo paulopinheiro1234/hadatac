@@ -14,7 +14,7 @@ import org.apache.commons.io.FileUtils;
 public class NameSpaces {
 
 	public static String CACHE_PATH = "tmp/cache/";
-	
+
 	public static Map<String, NameSpace> table = new HashMap<String, NameSpace>(); 
 
 	private static NameSpaces instance = null;
@@ -32,7 +32,7 @@ public class NameSpaces {
 		InputStream input = null;
 		
 		try {
-			System.out.println("loading properties file for namespaces.");
+			//System.out.println("loading properties file for namespaces.");
 			//prop.load(new FileInputStream("namespaces.properties"));
 			input = getClass().getClassLoader().getResourceAsStream("namespaces.properties");
 			prop.load(input);
@@ -147,7 +147,7 @@ public class NameSpaces {
 
     public static void main(String[] args) {
     	NameSpaces ns = new NameSpaces();
-    	System.out.println(ns.printNameSpaceList());
+    	//System.out.println(ns.printNameSpaceList());
     }
 	
 }
