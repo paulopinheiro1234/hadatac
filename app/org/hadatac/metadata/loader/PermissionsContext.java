@@ -46,7 +46,7 @@ public class PermissionsContext implements RDFContext {
     String loadFileMessage = "";
 	
     public PermissionsContext(String un, String pwd, String kb, boolean ver) {
-        System.out.println("Permissions management set for knowledge base at " + kb);
+        //System.out.println("Permissions management set for knowledge base at " + kb);
 	    username = un;
 	    password = pwd;
 	    kbURL = kb;
