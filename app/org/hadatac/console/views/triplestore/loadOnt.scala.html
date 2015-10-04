@@ -1,4 +1,4 @@
-@(oper: String)
+@(oper: String, cacheList : List[String])
 
 @import helper._
 @import org.hadatac.console.views.html._
@@ -14,41 +14,54 @@
 
         <div class="col-md-8 col-md-offset-1">
 
-	     <h4>Loading ontologies into HADataC's metadata store...</h4>
+	     <h4>Load Ontologies into Metadata Store</h4>
         
              @if(oper=="init") {
-                 The metadata store has @MetadataContext.playTotalTriples() triples. <br>
+                 The metadata store has <b>@MetadataContext.playTotalTriples() triples.</b> <br><br>
+
+                 <p>HADatAc associated ontologies provide the concepts required for the framework to acquire and manage scientific data. Associated ontologies
+                 may be loaded staright from the web, or may be cached locally in case they need to be reloaded afterwards, when connectivity may be unavailable.
+                 Associated ontologies that are currently cached are listed below.</p>
 
                  <div id="question-box">
-                     Are your sure you want to load associated ontologies? 
-                     <a href="@org.hadatac.console.controllers.triplestore.routes.LoadOnt.loadOnt("confirmed")" class="btn btn-success" role="button">Confirm</a>
-                     <a href="@org.hadatac.console.controllers.triplestore.routes.LoadOnt.loadOnt("cancelled")" class="btn btn-danger" role="button">Cancel</a>
+                     <a href="@org.hadatac.console.controllers.triplestore.routes.LoadOnt.loadOnt("confirmed")" class="btn btn-primary" role="button">Load Ontologies from the Web</a>
+                     <a href="@org.hadatac.console.controllers.triplestore.routes.LoadOnt.loadOnt("confirmedCache")" class="btn btn-primary" role="button">Load Cached Ontologies</a>
+                     <a href="@org.hadatac.console.controllers.triplestore.routes.LoadOnt.loadOnt("cache")" class="btn btn-primary" role="button">Cache Ontologies from the Web</a>
+                     <a href="@org.hadatac.console.controllers.triplestore.routes.LoadOnt.eraseCache()" class="btn btn-primary" role="button">Erase Cached Ontologies</a>
                  </div>
+                 
+                 <p><br>Note: Ontologies are cached locally when loaded straight from the web.</p>
              }
              
          <p style='font-family: "Lucida Console", Monaco, monospace;' id='msgarea'></p>
          
-             @if(oper=="cancelled") {
-                <div id="cancel-box">
-                   <h4>Load Ontologies has been cancelled.</h4>
-                   Press OK button to return to HADataC's main page <a href="@org.hadatac.console.controllers.routes.Portal.index()" class="btn btn-warning" role="button">Ok</a>
-	        </div>
-             }
-
-             
            <div id="end-process-box" style="display:none;">
                   <h4>Load Ontologies complete -- check the results above to see if the clean was successful.</h4>
-                  Press OK button to return to HADataC's main page <a href="@org.hadatac.console.controllers.routes.Portal.index()" class="btn btn-warning" role="button">Ok</a>
+                  <a href="@org.hadatac.console.controllers.triplestore.routes.LoadOnt.loadOnt("init")" class="btn btn-warning" role="button">Back to Load Ontologies</a>
 	       </div>
 
-	     @if(oper=="confirmed") {
+	     @if(oper=="confirmed" || oper=="confirmedCache" || oper=="cache") {
                 <script> 
-                    var msg = "@LoadOnt.playLoadOntologies()";
+                    var msg = "@LoadOnt.playLoadOntologies(oper)";
                     $('#msgarea').html(msg.replace(/&lt;br&gt;/g, '<br>'));
                     document.getElementById('end-process-box').style.display = 'inline';
                 </script>
 	     }
 
+         <hr>
+
+         @if(oper=="init") {         
+	         <h4>Cached Ontologies</h4>
+             <ul>
+                 @for(cachedFile <- cacheList) {
+                     <li>@cachedFile</li>
+                 }
+             </ul>
+        
+             <hr>
+         
+             <a href="@org.hadatac.console.controllers.routes.Portal.index()" class="btn btn-warning" role="button">Back to Main Menu</a>
+         }
 	   </div>
 
       </div>

@@ -55,13 +55,13 @@ public class DataContext {
 			return response.getResults().getNumFound();
 		} catch (SolrServerException e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			//e.printStackTrace();
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			//e.printStackTrace();
 		}
 		
-		return 0L;
+		return (long) -1;
 	}
 	
 	public Long totalDataCollections() {
@@ -76,12 +76,12 @@ public class DataContext {
 			return response.getResults().getNumFound();
 		} catch (SolrServerException e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			//e.printStackTrace();
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			//e.printStackTrace();
 		}
 		
-		return 0L;
+		return (long) -1;
 	}
 }

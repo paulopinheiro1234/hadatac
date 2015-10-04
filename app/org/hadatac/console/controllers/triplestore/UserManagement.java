@@ -25,7 +25,7 @@ import org.hadatac.metadata.loader.PermissionsContext;
 import org.hadatac.metadata.loader.SpreadsheetProcessing;
 import org.hadatac.utils.Feedback;
 
-public class Users extends Controller {
+public class UserManagement extends Controller {
 
 	private static final String UPLOAD_NAME = "tmp/uploads/users-spreadsheet.xls";
 	
@@ -43,7 +43,7 @@ public class Users extends Controller {
 	    				         "password", 
 	    				         Play.application().configuration().getString("hadatac.solr.permissions"), 
 	    				         false);
-	     String message = SpreadsheetProcessing.generateTTL(Feedback.WEB, permissions, UPLOAD_NAME);
+	     String message = SpreadsheetProcessing.generateTTL(Feedback.WEB, "load", permissions, UPLOAD_NAME);
 	     return message;
    }
     

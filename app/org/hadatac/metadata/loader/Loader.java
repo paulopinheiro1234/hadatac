@@ -132,14 +132,14 @@ public class Loader {
 
 				if (loadOntology) {
 					System.out.println("Executing LOADONTOLOGY");						
-					metadata.loadOntologies(Feedback.COMMANDLINE);
+					metadata.loadOntologies(Feedback.COMMANDLINE, "confirmed");
 					System.out.println("");			
 				}
 		
 				if (loadXls) {
 					System.out.println("Executing LOADXLS");						
 					String message = "";
-					message = SpreadsheetProcessing.generateTTL(Feedback.COMMANDLINE, metadata, argsMap.get("-i"));
+					message = SpreadsheetProcessing.generateTTL(Feedback.COMMANDLINE, "load", metadata, argsMap.get("-i"));
 					//System.out.println(message);			
 				}
 			}

@@ -27,6 +27,7 @@ import org.apache.jena.rdf.model.ModelFactory;
 import org.apache.jena.riot.RiotNotFoundException;
 import org.apache.jena.shared.NotFoundException;
 import org.hadatac.utils.Collections;
+import org.hadatac.utils.Command;
 import org.hadatac.utils.Feedback;
 import org.w3c.dom.Document;
 import org.xml.sax.InputSource;
@@ -46,7 +47,7 @@ public class PermissionsContext implements RDFContext {
     String loadFileMessage = "";
 	
     public PermissionsContext(String un, String pwd, String kb, boolean ver) {
-        System.out.println("Permissions management set for knowledge base at " + kb);
+        //System.out.println("Permissions management set for knowledge base at " + kb);
 	    username = un;
 	    password = pwd;
 	    kbURL = kb;
@@ -89,36 +90,11 @@ public class PermissionsContext implements RDFContext {
 		    //System.out.println(result);
 		    return Long.valueOf(doc.getElementsByTagName("literal").item(0).getTextContent()).longValue();
     	} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			//e.printStackTrace();
 			return (long) -1;
 		} 
     }
     
-    private String executeCommand(int mode, String[] command) {
-    	String message = "";
-		try {
-	       Runtime rt = Runtime.getRuntime();
-	       Process proc1 = rt.exec(command);
-	       InputStream stderr = proc1.getErrorStream();
-	       InputStreamReader isr = new InputStreamReader(stderr);
-	       BufferedReader br = new BufferedReader(isr);
-	       String line = null;
-	       //System.out.println("<ERROR>");
-	       if (verbose) {
-	    	   while ( (line = br.readLine()) != null)
-	    		   message += Feedback.println(mode, line);
-	       }
-	       //System.out.println("</ERROR>");
-	       int exitVal = proc1.waitFor();
-	       message += Feedback.print(mode, "    exit value: [" + exitVal + "]    ");
-	       //message += println(mode, "   Process: [" + command[0] + "]   exitValue: [" + exitVal + "]");
-	    } catch (Throwable t) {
-		       t.printStackTrace();
-		}
-		return message;
-    }
-
 	public String clean(int mode) {
 	    String message = "";
 	    String straux = "";
@@ -142,14 +118,14 @@ public class PermissionsContext implements RDFContext {
 		    }
 		    String[] cmd1 = {"curl", "-v", url1};
 			message += Feedback.print(mode, "    Erasing triples... ");                
-		    straux = executeCommand(mode, cmd1);
+		    straux = Command.exec(mode, verbose, cmd1);
 		    if (mode == Feedback.WEB) {
 		    	message += straux;
 		    }
 		    message += Feedback.println(mode, "");
 			message += Feedback.print(mode, "   Committing... ");                
 		    String[] cmd2 = {"curl", "-v", url2};
-		    straux = executeCommand(mode, cmd2);
+		    straux = Command.exec(mode, verbose, cmd2);
 		    if (mode == Feedback.WEB) {
 		    	message += straux;
 		    }
