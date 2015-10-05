@@ -24,6 +24,7 @@ import org.apache.solr.client.solrj.response.UpdateResponse;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
 import org.hadatac.data.loader.util.Sparql;
+import org.hadatac.utils.State;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.joda.time.format.DateTimeFormat;
@@ -41,6 +42,10 @@ public class DataCollection {
 	private String ownerUri;
 	@Field("permission_uri")
 	private String permissionUri;
+	@Field("triggering_event")
+	private int triggeringEvent;
+	@Field("nr_data_points")
+	private long numberDataPoints;
 	@Field("unit")
 	private List<String> unit;
 	@Field("unit_uri")
@@ -87,6 +92,7 @@ public class DataCollection {
 	public DataCollection() {
 		startedAt = null;
 		endedAt = null;
+		numberDataPoints = 0;
 		datasetUri = new ArrayList<String>();
 		unit = new ArrayList<String>();
 		unitUri = new ArrayList<String>();
@@ -110,6 +116,14 @@ public class DataCollection {
 
 	public void setCcsvUri(String ccsvUri) {
 		this.ccsvUri = ccsvUri;
+	}
+	
+	public long getNumberDataPoints() {
+		return numberDataPoints;
+	}
+
+	public void setNumberDataPoints(long numberDataPoints) {
+		this.numberDataPoints = numberDataPoints;
 	}
 
 	public String getLocalName() {
@@ -149,6 +163,35 @@ public class DataCollection {
 	public void setPermissionUri(String permissionUri) {
 		this.permissionUri = permissionUri;
 	}
+	
+	public int getTriggeringEvent() {
+		return triggeringEvent;
+	}
+
+	public void setTriggeringEvent(int triggeringEvent) {
+		this.triggeringEvent = triggeringEvent;
+	}
+	
+	public String getTriggeringEventName() {
+		switch (triggeringEvent) {
+			case TriggeringEvent.INITIAL_DEPLOYMENT:
+				return TriggeringEvent.INITIAL_DEPLOYMENT_NAME;
+			case TriggeringEvent.LEGACY_DEPLOYMENT:
+				return TriggeringEvent.LEGACY_DEPLOYMENT_NAME;
+			case TriggeringEvent.CHANGED_CONFIGURATION:
+				return TriggeringEvent.CHANGED_CONFIGURATION_NAME;
+			case TriggeringEvent.CHANGED_OWNERSHIP:
+				return TriggeringEvent.CHANGED_OWNERSHIP_NAME;
+			case TriggeringEvent.AUTO_CALIBRATION:
+				return TriggeringEvent.AUTO_CALIBRATION_NAME;
+			case TriggeringEvent.SUSPEND_DATA_ACQUISITION:
+				return TriggeringEvent.SUSPEND_DATA_ACQUISITION_NAME;
+			case TriggeringEvent.RESUME_DATA_ACQUISITION:
+				return TriggeringEvent.RESUME_DATA_ACQUISITION_NAME;
+		}
+		return "";
+	}
+	
 	public String getStartedAt() {
 		DateTimeFormatter formatter = ISODateTimeFormat.dateTime();
 		return formatter.withZone(DateTimeZone.UTC).print(startedAt);
@@ -305,6 +348,9 @@ public class DataCollection {
 	public boolean containsDataset(String uri) {
 		return datasetUri.contains(uri);
 	}
+	public void addNumberDataPoints(long number) {
+		numberDataPoints += number;
+	}
 	
 	public boolean isFinished() {
 		if (endedAt == null) {
@@ -317,7 +363,9 @@ public class DataCollection {
 	public int save() {
 		try {
 			SolrClient client = new HttpSolrClient(Play.application().configuration().getString("hadatac.solr.data") + "/sdc");
-			endedAt = DateTime.parse("9999-12-31T23:59:59.999Z");
+			if (endedAt == null) {
+				endedAt = DateTime.parse("9999-12-31T23:59:59.999Z");
+			}
 			int status = client.addBean(this).getStatus();
 			client.commit();
 			client.close();
@@ -330,9 +378,12 @@ public class DataCollection {
 	
 	public int save(SolrClient solr) {
 		try {
-			endedAt = DateTime.parse("9999-12-31T23:59:59.999Z");
+			if (endedAt == null) {
+				endedAt = DateTime.parse("9999-12-31T23:59:59.999Z");
+			}
 			int status = solr.addBean(this).getStatus();
 			solr.commit();
+			solr.close();
 			return status;
 		} catch (IOException | SolrServerException e) {
 			System.out.println("[ERROR] DataCollection.save(SolrClient) - e.Message: " + e.getMessage());
@@ -344,6 +395,10 @@ public class DataCollection {
 		Iterator<Object> i;
 		DataCollection dataCollection = new DataCollection();
 		dataCollection.setUri(doc.getFieldValue("uri").toString());
+		dataCollection.setOwnerUri(doc.getFieldValue("owner_uri").toString());
+		dataCollection.setPermissionUri(doc.getFieldValue("permission_uri").toString());
+		dataCollection.setTriggeringEvent(Integer.parseInt(doc.getFieldValue("triggering_event").toString()));
+		dataCollection.setNumberDataPoints(Long.parseLong(doc.getFieldValue("nr_data_points").toString()));
 		dataCollection.setStartedAt(doc.getFieldValue("started_at").toString());
 		dataCollection.setEndedAt(doc.getFieldValue("ended_at").toString());
 		if (doc.getFieldValues("unit") != null) {
@@ -399,6 +454,39 @@ public class DataCollection {
 		return dataCollection;
 	}
 	
+	public static List<DataCollection> find(String ownerUri, State state) {
+		List<DataCollection> list = new ArrayList<DataCollection>();
+		
+		SolrClient solr = new HttpSolrClient(Play.application().configuration().getString("hadatac.solr.data") + "/sdc");
+		SolrQuery query = new SolrQuery();
+		if (state.getCurrent() == State.ALL) {
+			query.set("q", "owner_uri:\"" + ownerUri + "\"");
+		} else { 
+			if (state.getCurrent() == State.ACTIVE) {
+		      query.set("q", "owner_uri:\"" + ownerUri + "\"" + " AND " + "ended_at:\"9999-12-31T23:59:59.999Z\"");
+			} else {  // it is assumed that state is CLOSED
+			      query.set("q", "owner_uri:\"" + ownerUri + "\"" + " AND " + "-ended_at:\"9999-12-31T23:59:59.999Z\"");
+			}
+		}
+		query.set("sort", "started_at asc");
+		
+		try {
+			QueryResponse response = solr.query(query);
+			solr.close();
+			SolrDocumentList results = response.getResults();
+			Iterator<SolrDocument> i = results.iterator();
+			while (i.hasNext()) {
+				DataCollection dataCollection = convertFromSolr(i.next());
+				list.add(dataCollection);
+			}
+		} catch (Exception e) {
+			list.clear();
+			System.out.println("[ERROR] DataCollection.find(String) - Exception message: " + e.getMessage());
+		}
+		
+		return list;
+	}
+	
 	public static List<DataCollection> find(String ownerUri) {
 		List<DataCollection> list = new ArrayList<DataCollection>();
 		
@@ -448,7 +536,7 @@ public class DataCollection {
 	}
 	
 	public int close(String endedAt) {
-		this.setEndedAtXsdWithMillis(endedAt);
+		this.setEndedAtXsd(endedAt);
 		return this.save();
 	}
 	
@@ -460,6 +548,7 @@ public class DataCollection {
 			}
 			SolrClient solr = new HttpSolrClient(Play.application().configuration().getString("hadatac.solr.data") + "/sdc");
 			UpdateResponse response = solr.deleteById(this.uri);
+			solr.commit();
 			solr.close();
 			return response.getStatus();
 		} catch (SolrServerException e) {

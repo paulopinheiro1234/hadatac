@@ -1,9 +1,9 @@
 package test;
 
 import com.feth.play.module.pa.providers.oauth2.google.GoogleAuthUser;
-import models.User;
 import net.sf.ehcache.CacheManager;
 import org.fest.assertions.Assertions;
+import org.hadatac.console.models.User;
 import org.junit.Test;
 
 import static org.fest.assertions.Assertions.assertThat;

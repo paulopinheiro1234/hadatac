@@ -17,26 +17,31 @@ import org.hadatac.console.views.html.hierarchy_browser;
 import org.hadatac.console.views.html.error_page;
 import org.hadatac.console.views.html.datacollections.*;
 import org.hadatac.entity.pojo.DataCollection;
+import org.hadatac.utils.State;
 
 
 public class DataCollectionManagement extends Controller {
 
 	// for /metadata HTTP GET requests
-    public static Result index(String option) {
+    public static Result index(int stateId) {
 
-    	List<DataCollection> theResults = DataCollection.find(AuthApplication.getLocalUser(session()).uri);
+    	State state = new State(stateId);
     	
-        return ok(dataCollectionManagement.render(option, theResults));
+    	List<DataCollection> theResults = DataCollection.find(AuthApplication.getLocalUser(session()).uri, state);    		
+    	
+        return ok(dataCollectionManagement.render(state, theResults));
         
     }// /index()
 
 
     // for /metadata HTTP POST requests
-    public static Result postIndex(String option) {
+    public static Result postIndex(int stateId) {
 
-    	List<DataCollection> theResults = DataCollection.find(AuthApplication.getLocalUser(session()).uri);
+    	State state = new State(stateId);
     	
-        return ok(dataCollectionManagement.render(option, theResults));
+    	List<DataCollection> theResults = DataCollection.find(AuthApplication.getLocalUser(session()).uri, state);    		
+    	
+        return ok(dataCollectionManagement.render(state, theResults));
         
     }// /postIndex()
 

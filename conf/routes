@@ -66,16 +66,17 @@ GET     /hadatac/login/password/forgot             org.hadatac.console.controlle
 POST    /hadatac/login/password/forgot             org.hadatac.console.controllers.Signup.doForgotPassword
 
 # deployment management
-GET	    /hadatac/deployments/		    	       org.hadatac.console.controllers.deployments.DeploymentManagement.index(oper : String)
-POST	/hadatac/deployments/     			       org.hadatac.console.controllers.deployments.DeploymentManagement.postIndex(oper : String)
-GET	    /hadatac/deployments/new			       org.hadatac.console.controllers.deployments.NewDeployment.index()
-POST	/hadatac/deployments/new			       org.hadatac.console.controllers.deployments.NewDeployment.postIndex()
+GET	    /hadatac/deployments/		    	       org.hadatac.console.controllers.deployments.DeploymentManagement.index(oper : Int)
+POST	/hadatac/deployments/     			       org.hadatac.console.controllers.deployments.DeploymentManagement.postIndex(oper : Int)
+GET	    /hadatac/deployments/new			       org.hadatac.console.controllers.deployments.NewDeployment.index(type : String)
+POST	/hadatac/deployments/new			       org.hadatac.console.controllers.deployments.NewDeployment.postIndex(type : String)
 POST 	/hadatac/deployments/new/form		       org.hadatac.console.controllers.deployments.NewDeployment.processForm()
 GET	    /hadatac/deployments/close			       org.hadatac.console.controllers.deployments.CloseDeployment.index(deployment_uri : String)
 POST	/hadatac/deployments/close		           org.hadatac.console.controllers.deployments.CloseDeployment.postIndex(deployment_uri : String)
-POST 	/hadatac/deployments/close/form	           org.hadatac.console.controllers.deployments.CloseDeployment.processForm()
-GET	    /hadatac/deployments/delete	    	       org.hadatac.console.controllers.deployments.DeleteDeployment.index()
-POST	/hadatac/deployments/delete		           org.hadatac.console.controllers.deployments.DeleteDeployment.postIndex()
+POST 	/hadatac/deployments/close/form	           org.hadatac.console.controllers.deployments.CloseDeployment.processForm(deployment_uri : String)
+GET	    /hadatac/deployments/delete	    	       org.hadatac.console.controllers.deployments.DeleteDeployment.index(deployment_uri : String)
+POST	/hadatac/deployments/delete		           org.hadatac.console.controllers.deployments.DeleteDeployment.postIndex(deployment_uri : String)
+POST 	/hadatac/deployments/delete/form	       org.hadatac.console.controllers.deployments.DeleteDeployment.processForm(deployment_uri : String)
 GET	    /hadatac/deployments/view			       org.hadatac.console.controllers.deployments.ViewDeployment.index(deployment_uri : String)
 POST	/hadatac/deployments/view	               org.hadatac.console.controllers.deployments.ViewDeployment.postIndex(deployment_uri : String)
 GET	    /hadatac/deployments/urigenerator		   org.hadatac.console.controllers.deployments.URIGenerator.index()
@@ -83,8 +84,8 @@ POST	/hadatac/deployments/urigenerator	       org.hadatac.console.controllers.de
 POST 	/hadatac/deployments/urigenerator/form	   org.hadatac.console.controllers.deployments.URIGenerator.processForm()
 
 # data collection management
-GET	    /hadatac/datacollections/		    	   org.hadatac.console.controllers.datacollections.DataCollectionManagement.index(option : String)
-POST	/hadatac/datacollections/     			   org.hadatac.console.controllers.datacollections.DataCollectionManagement.postIndex(option : String)
+GET	    /hadatac/datacollections/		    	   org.hadatac.console.controllers.datacollections.DataCollectionManagement.index(oper : Int)
+POST	/hadatac/datacollections/     			   org.hadatac.console.controllers.datacollections.DataCollectionManagement.postIndex(oper : Int)
 GET	    /hadatac/datacollections/delete		       org.hadatac.console.controllers.datacollections.DeleteDataCollection.index(oper : String, dc_uri : String)
 POST	/hadatac/datacollections/delete     	   org.hadatac.console.controllers.datacollections.DeleteDataCollection.postIndex(oper : String, dc_uri : String)
 GET	    /hadatac/datacollections/access		       org.hadatac.console.controllers.datacollections.SetAccessPermission.index(oper : String, dc_uri : String)

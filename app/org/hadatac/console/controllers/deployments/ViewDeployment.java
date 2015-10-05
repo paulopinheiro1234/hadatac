@@ -12,31 +12,36 @@ import org.hadatac.console.http.DeploymentQueries;
 import org.hadatac.console.models.DeploymentForm;
 import org.hadatac.console.models.SparqlQueryResults;
 import org.hadatac.console.models.TripleDocument;
+import org.hadatac.entity.pojo.Deployment;
 
 
 public class ViewDeployment extends Controller {
 	
 	// for /metadata HTTP GET requests
-    public static Result index(String uri) {
+    public static Result index(String deployment_uri) {
 
-    	DeploymentForm dep = new DeploymentForm();
+    	//DeploymentForm dep = new DeploymentForm();
+    	Deployment deployment = null;
     	
     	try {
-    		if (uri != null) {
-			    uri = URLDecoder.decode(uri, "UTF-8");
+    		if (deployment_uri != null) {
+			    deployment_uri = URLDecoder.decode(deployment_uri, "UTF-8");
     		} else {
-    			uri = "";
+    			deployment_uri = "";
     		}
 		} catch (UnsupportedEncodingException e) {
 			e.printStackTrace();
 		}
 
-    	if (!uri.equals("")) {
+    	if (!deployment_uri.equals("")) {
 
-    		/*
+
+        	deployment = Deployment.find(deployment_uri);
+
+        		/*
     		 *  Add deployment information into handler
     		 */
-    		String json = DeploymentQueries.exec(DeploymentQueries.DEPLOYMENT_BY_URI, uri);
+    		/*String json = DeploymentQueries.exec(DeploymentQueries.DEPLOYMENT_BY_URI, uri);
     		System.out.println(json);
     		SparqlQueryResults results = new SparqlQueryResults(json, false);
     		TripleDocument docDeployment = results.sparqlResults.values().iterator().next();
@@ -64,33 +69,37 @@ public class ViewDeployment extends Controller {
 
             System.out.println("closing deployment");
             return ok(viewDeployment.render(dep));
+            */
     	}
-    	return ok(viewDeployment.render(dep));
+    	return ok(viewDeployment.render(deployment));
+    
         
     }// /index()
 
 
     // for /metadata HTTP POST requests
-    public static Result postIndex(String uri) {
+    public static Result postIndex(String deployment_uri) {
 
-    	DeploymentForm dep = new DeploymentForm();
+    	Deployment deployment = null;
     	
     	try {
-    		if (uri != null) {
-			    uri = URLDecoder.decode(uri, "UTF-8");
+    		if (deployment_uri != null) {
+			    deployment_uri = URLDecoder.decode(deployment_uri, "UTF-8");
     		} else {
-    			uri = "";
+    			deployment_uri = "";
     		}
 		} catch (UnsupportedEncodingException e) {
 			e.printStackTrace();
 		}
 
-    	if (!uri.equals("")) {
+    	if (!deployment_uri.equals("")) {
 
-    		/*
+        	deployment = Deployment.find(deployment_uri);
+
+        	/*
     		 *  Add deployment information into handler
     		 */
-    		String json = DeploymentQueries.exec(DeploymentQueries.DEPLOYMENT_BY_URI, uri);
+    		/*String json = DeploymentQueries.exec(DeploymentQueries.DEPLOYMENT_BY_URI, uri);
     		System.out.println(json);
     		SparqlQueryResults results = new SparqlQueryResults(json, false);
     		TripleDocument docDeployment = results.sparqlResults.values().iterator().next();
@@ -118,9 +127,10 @@ public class ViewDeployment extends Controller {
 
             System.out.println("closing deployment");
             return ok(viewDeployment.render(dep));
+            */
     	}
-    	return ok(viewDeployment.render(dep));
-        
+    	return ok(viewDeployment.render(deployment));
+            
     }// /postIndex()
 
 }

@@ -4,6 +4,8 @@
     <field name="uri" type="string" indexed="true" stored="true"/>
 	<field name="owner_uri" type="string" indexed="true" docValues="true" />
 	<field name="permission_uri" type="string" indexed="true" docValues="true" />
+	<field name="triggering_event" type="int" stored="true" indexed="true" docValues="true" />
+	<field name="nr_data_points" type="long" stored="true" indexed="true" docValues="true" />
     <field name="_version_" type="long" indexed="true" stored="true"/>
     <field name="_text_" type="text_general" indexed="true" stored="false" multiValued="true" />
     <field name="started_at" type="date" indexed="true" stored="true" docValues="true" default="NULL" />
@@ -38,7 +40,7 @@
     <fieldType name="date" class="solr.TrieDateField" precisionStep="0" positionIncrementGap="0"/>
     <fieldType name="long" class="solr.TrieLongField" precisionStep="0" positionIncrementGap="0"/>
     <fieldType name="double" class="solr.TrieDoubleField"/>
-    <fieldType name="int" class="solr.TrieIntField" precisionStep="8"/>
+    <fieldType name="int" class="solr.TrieIntField"/>
     <fieldType name="latlong" class="solr.SpatialRecursivePrefixTreeFieldType"
                spatialContextFactory="com.spatial4j.core.context.jts.JtsSpatialContextFactory"
                distErrPct="0.025"

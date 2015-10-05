@@ -22,6 +22,8 @@ public class Platform {
 	private String localName;
 	private String label;
 	private String location;
+	private String firstCoordinate;
+	private String secondCoordinate;
 	private String elevation;
 	
 	public String getLocation() {
@@ -53,6 +55,18 @@ public class Platform {
 	}
 	public void setLabel(String label) {
 		this.label = label;
+	}
+	public String getFirstCoordinate() {
+		return firstCoordinate;
+	}
+	public void setFirstCoordinate(String firstCoordinate) {
+		this.firstCoordinate = firstCoordinate;
+	}
+	public String getSecondCoordinate() {
+		return secondCoordinate;
+	}
+	public void setSecondCoordinate(String secondCoordinate) {
+		this.secondCoordinate = secondCoordinate;
 	}
 	
 	public static Platform find(String uri) {
@@ -113,6 +127,8 @@ public class Platform {
 			else { platform.setLabel(soln.getResource("platform").getLocalName()); }
 			if (soln.getLiteral("lat") != null && soln.getLiteral("lon") != null) {
 				platform.setLocation(soln.getLiteral("lat").getString() + ";" + soln.getLiteral("lon").getString());
+				platform.setFirstCoordinate(soln.getLiteral("lat").getString());
+				platform.setSecondCoordinate(soln.getLiteral("long").getString());
 			}
 			if (soln.getLiteral("ele") != null) { platform.setLabel(soln.getLiteral("ele").getString()); }
 		}

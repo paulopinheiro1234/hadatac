@@ -134,6 +134,9 @@ public class Parser {
 			cont++;
 		}
 		
+		hadatacKb.dataCollection.addNumberDataPoints(cont);
+		hadatacKb.dataCollection.save();
+		
 		files.closeFile("csv", "r");
 		return 0;
 	}
