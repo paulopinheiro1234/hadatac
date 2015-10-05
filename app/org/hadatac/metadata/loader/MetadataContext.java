@@ -111,8 +111,8 @@ public class MetadataContext implements RDFContext {
 	    String url1;
 	    String url2;
 		try {
-		    url1 = kbURL + "/store/update?stream.body=" + URLEncoder.encode(query1, "UTF-8");
-		    url2 = kbURL + "/store/update?stream.body=" + URLEncoder.encode(query2, "UTF-8");
+		    url1 = Collections.getCollectionsName(Collections.METADATA_UPDATE) + "?stream.body=" + URLEncoder.encode(query1, "UTF-8");
+		    url2 = Collections.getCollectionsName(Collections.METADATA_UPDATE) + "?stream.body=" + URLEncoder.encode(query2, "UTF-8");
 		    //Runtime.getRuntime().exec("curl -v " + url1);
 		    //Runtime.getRuntime().exec("curl -v " + url2);
 		    if (verbose) {

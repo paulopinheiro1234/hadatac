@@ -21,6 +21,7 @@ import org.hadatac.console.http.PermissionQueries;
 import org.hadatac.console.models.SparqlQueryResults;
 import org.hadatac.console.models.TripleDocument;
 import org.hadatac.console.views.html.triplestore.*;
+import org.hadatac.entity.pojo.User;
 import org.hadatac.metadata.loader.PermissionsContext;
 import org.hadatac.metadata.loader.SpreadsheetProcessing;
 import org.hadatac.utils.Feedback;
@@ -30,11 +31,11 @@ public class UserManagement extends Controller {
 	private static final String UPLOAD_NAME = "tmp/uploads/users-spreadsheet.xls";
 	
     public static Result preRegistration(String oper) {
-	return ok(users.render(oper, ""));
+    	return ok(users.render(oper, "", User.find()));
     }
 
     public static Result postPreRegistration(String oper) {
-	return ok(users.render(oper, ""));
+    	return ok(users.render(oper, "", User.find()));
     }
 
     public static String commitPreRegistration() {
@@ -69,17 +70,17 @@ public class UserManagement extends Controller {
 		     			try {
 		     				isFile.close();
 		     			} catch (Exception e) {
-		     				 return ok (users.render("fail", "Could not save uploaded file."));
+		     				 return ok (users.render("fail", "Could not save uploaded file.",User.find()));
 		     			}
 			    	} catch (Exception e) {
-						 return ok (users.render("fail", "Could not process uploaded file."));
+						 return ok (users.render("fail", "Could not process uploaded file.",User.find()));
 				    }
 			   } catch (FileNotFoundException e1) {
-			       return ok (users.render("fail", "Could not find uploaded file"));
+			       return ok (users.render("fail", "Could not find uploaded file",User.find()));
 			   }
-	     	   return ok(users.render("loaded", "File uploaded successfully."));
+	     	   return ok(users.render("loaded", "File uploaded successfully.",User.find()));
 		   } else {
-			 return ok (users.render("fail", "Error uploading file. Please try again."));
+			 return ok (users.render("fail", "Error uploading file. Please try again.",User.find()));
 		   } 
     } 
     

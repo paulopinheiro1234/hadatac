@@ -12,6 +12,7 @@ public class Collections {
     
     // triplestore
 	public static final String METADATA_SPARQL             = "/store/sparql";
+	public static final String METADATA_UPDATE             = "/store/update";
 	public static final String METADATA_GRAPH              = "/store/rdf-graph-store";
     
     // users 
@@ -23,6 +24,7 @@ public class Collections {
    
     // permissions
 	public static final String PERMISSIONS_SPARQL          = "/store_users/sparql";
+	public static final String PERMISSIONS_UPDATE          = "/store_users/update";
 	public static final String PERMISSIONS_GRAPH           = "/store_users/rdf-graph-store";
     
 	public static String getCollectionsName(String request) {
@@ -35,6 +37,7 @@ public class Collections {
             case URI_GENERATOR :           collectionName = Play.application().configuration().getString("hadatac.solr.data") + request;
                                            break;
             case METADATA_SPARQL:
+            case METADATA_UPDATE:
             case METADATA_GRAPH :          collectionName = Play.application().configuration().getString("hadatac.solr.triplestore") + request;
                                            break;
             case AUTHENTICATE_USERS:
@@ -44,6 +47,7 @@ public class Collections {
             case AUTHENTICATE_PERMISSIONS: collectionName = Play.application().configuration().getString("hadatac.solr.permissions") + request;
                                            break;
             case PERMISSIONS_SPARQL:
+            case PERMISSIONS_UPDATE:
             case PERMISSIONS_GRAPH :       collectionName = Play.application().configuration().getString("hadatac.solr.permissions") + request;
                                            break;
 		}

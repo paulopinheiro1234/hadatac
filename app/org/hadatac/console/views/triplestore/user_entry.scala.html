@@ -1,0 +1,18 @@
+@(user : org.hadatac.entity.pojo.User)
+
+@import java.net._
+
+    <tr>
+       <td>@user.getName()</td> 
+       <td>@user.getUri()</td> 
+       <td>@if(user.getImmediateGroup() != null) { @user.getImmediateGroup.getName() }</td>
+       <td>@if(user.isAdministrator()) { YES } else { NO }</td>
+       <td>
+          @if(user.isAdministrator()) {
+               <a href="@org.hadatac.console.controllers.triplestore.routes.ChangePermission.index(URLEncoder.encode(user.getUri(),"UTF-8"))" class="btn-xs btn-primary" role="button">Revoke Admin</a>
+          } else {
+               <a href="@org.hadatac.console.controllers.triplestore.routes.ChangePermission.index(URLEncoder.encode(user.getUri(),"UTF-8"))" class="btn-xs btn-primary" role="button">Grant Admin</a>
+          }
+          <a href="" class="btn-xs btn-primary" role="button">Delete</a>
+       </td>
+    </tr>

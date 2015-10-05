@@ -7,12 +7,9 @@ import com.feth.play.module.pa.PlayAuthenticate.Resolver;
 import com.feth.play.module.pa.exceptions.AccessDeniedException;
 import com.feth.play.module.pa.exceptions.AuthException;
 
-import controllers.routes;
-
 import play.Application;
 import play.GlobalSettings;
 import play.mvc.Call;
-import org.hadatac.console.controllers.*;
 import org.hadatac.utils.Repository;
 
 public class Global extends GlobalSettings {
@@ -71,21 +68,28 @@ public class Global extends GlobalSettings {
 		});
 		
 		// check if CURL is properly installed
+		// TODO: implement this code
 		
 		// check if SOLR instances are up. If not, start them up
 		solrFirstVerification();
 		
 		// check if SOLR instances are still down, If so, show an error message
+		// TODO: implement this code
 
+        // check existence/availability of security role
 		initialData();
 		
 		// check if default user still have default password. If so, ask to change.
+		// TODO: implement this code
 		
 	    // check if there is at least one user is pre-registered. If not, ask to pre-register at least the main user
+		// TODO: implement this code
 		
-		// (NOT SURE THIS SHOULD BE ON ONSTART) check if ontologies are loaded. If not ask to upload them  
+		// (NOT SURE THIS FUNCTION SHOULD BE CALLED ON ONSTART) check if ontologies are loaded. If not ask to upload them  
+		// TODO: implement this code
 
-		// (NOT SURE THIS SHOULD BE ON ONSTART) check if instances are loaded. If not, show how to upload some default instances  
+		// (NOT SURE THIS FUNCTION SHOULD BE CALLED ON ONSTART) check if instances are loaded. If not, show how to upload some default instances  
+		// TODO: implement this code
 		
 	}
 

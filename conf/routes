@@ -116,6 +116,8 @@ POST    /hadatac/perm/preregister                  org.hadatac.console.controlle
 POST    /hadatac/perm/preregister/upload           org.hadatac.console.controllers.triplestore.UserManagement.uploadFile
 GET	    /hadatac/perm/userNetwork			       org.hadatac.console.controllers.triplestore.UserNetwork.index()
 POST	/hadatac/perm/userNetwork			       org.hadatac.console.controllers.triplestore.UserNetwork.postIndex()
+GET	    /hadatac/perm/admin		        	       org.hadatac.console.controllers.triplestore.ChangePermission.index(user_uri: String)
+POST	/hadatac/perm/admin      			       org.hadatac.console.controllers.triplestore.ChangePermission.postIndex(user_uri: String)
  
 # Map static resources from the /public folder to the /assets URL path
 GET     /hadatac/assets/*file                      controllers.Assets.versioned(path="/public", file: Asset)

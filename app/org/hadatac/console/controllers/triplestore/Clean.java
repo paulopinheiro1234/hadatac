@@ -32,12 +32,12 @@ public class Clean extends Controller {
     		result = metadata.clean(Feedback.WEB);
     	} else if (oper.equals("usergraph")) {
     		NameSpaces.getInstance();
-    		PermissionsContext metadata = new 
+    		PermissionsContext permission = new 
 	    		 PermissionsContext("user", 
 	    		                 "password",
 	    		                  Play.application().configuration().getString("hadatac.solr.permissions"), 
 	    		                  false);
-    		result = metadata.clean(Feedback.WEB);
+    		result = permission.clean(Feedback.WEB);
     	} else if (oper.equals("collections")) {
     	} else if (oper.equals("acquisitions:")) {
     	}

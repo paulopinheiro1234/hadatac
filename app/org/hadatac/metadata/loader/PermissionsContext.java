@@ -39,8 +39,7 @@ import play.mvc.Call;
 public class PermissionsContext implements RDFContext {
 
     String username = null;
-    String password = null;
-    String kbURL = null;   
+    String password = null;   
     boolean verbose = false;
 
     String processMessage = "";
@@ -50,7 +49,6 @@ public class PermissionsContext implements RDFContext {
         //System.out.println("Permissions management set for knowledge base at " + kb);
 	    username = un;
 	    password = pwd;
-	    kbURL = kb;
 	    verbose = ver;
     }
 
@@ -67,7 +65,7 @@ public class PermissionsContext implements RDFContext {
         //Scanner in = null;
         try {
         	HttpClient client = new DefaultHttpClient();
-         	HttpGet request = new HttpGet(kbURL + Collections.PERMISSIONS_SPARQL+ "?q=" + URLEncoder.encode(query, "UTF-8"));
+         	HttpGet request = new HttpGet(Collections.getCollectionsName(Collections.PERMISSIONS_SPARQL) + "?q=" + URLEncoder.encode(query, "UTF-8"));
         	request.setHeader("Accept", "application/sparql-results+xml");
         	HttpResponse response = client.execute(request);
             StringWriter writer = new StringWriter();
@@ -108,8 +106,8 @@ public class PermissionsContext implements RDFContext {
 	    String url1;
 	    String url2;
 		try {
-		    url1 = kbURL + "/store/update?stream.body=" + URLEncoder.encode(query1, "UTF-8");
-		    url2 = kbURL + "/store/update?stream.body=" + URLEncoder.encode(query2, "UTF-8");
+		    url1 = Collections.getCollectionsName(Collections.PERMISSIONS_UPDATE) + "?stream.body=" + URLEncoder.encode(query1, "UTF-8");
+		    url2 = Collections.getCollectionsName(Collections.PERMISSIONS_SPARQL) + "?stream.body=" + URLEncoder.encode(query2, "UTF-8");
 		    //Runtime.getRuntime().exec("curl -v " + url1);
 		    //Runtime.getRuntime().exec("curl -v " + url2);
 		    if (verbose) {
@@ -133,7 +131,7 @@ public class PermissionsContext implements RDFContext {
 		    message += Feedback.println(mode," ");
 			message += Feedback.print(mode,"   Triples after [clean]: " + totalTriples());                
 		} catch (UnsupportedEncodingException e) {
-		    System.out.println("[MetadataManagement] - ERROR encoding URLs");
+		    System.out.println("[PermissionsManagement] - ERROR encoding URLs");
 		    //e.printStackTrace();
 		    return message;
 		}
@@ -157,7 +155,7 @@ public class PermissionsContext implements RDFContext {
 	 */
 	public Long loadLocalFile(int mode, String filePath, String contentType) {
 		Model model = ModelFactory.createDefaultModel();
-		DatasetAccessor accessor = DatasetAccessorFactory.createHTTP(kbURL + Collections.PERMISSIONS_GRAPH);		
+		DatasetAccessor accessor = DatasetAccessorFactory.createHTTP(Collections.getCollectionsName(Collections.PERMISSIONS_GRAPH));		
 
 		loadFileMessage = "";
 		Long total = totalTriples();
