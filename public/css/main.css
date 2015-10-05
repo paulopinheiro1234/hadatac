@@ -74,3 +74,9 @@ h1 {
 table.sortable th:not(.sorttable_sorted):not(.sorttable_sorted_reverse):not(.sorttable_nosort):after { 
     content: " \25B4\25BE" 
 }
+
+#rcorners {
+    border-radius: 15px;
+    border: 2px solid DarkBlue;
+    padding: 20px; 
+}

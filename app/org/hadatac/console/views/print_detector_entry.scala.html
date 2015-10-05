@@ -21,5 +21,10 @@
     @if(triple.has("instName")){
         <p>This Detector is permanently attached to @triple.get("instName") (sn: @triple.get("instSN")).</p>
     }
+    @defining(triple.get("detURI")) {theuri =>
+        <form>
+            <input type="text" size="80" value="@theuri">
+        </form>
+    }
 </div>
 <hr>

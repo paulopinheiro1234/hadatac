@@ -19,5 +19,10 @@
         </form>
     }
     <p>located at (@triple.get("lat"), @triple.get("lng"))</p>
+    @defining(triple.get("platURI")) {theuri =>
+    <form>
+        <input type="text" size="80" value="@theuri">
+    </form>
+    }
 </div>
 <hr>

@@ -102,16 +102,19 @@ POST    /hadatac/annotator/generate                org.hadatac.console.controlle
 # metadata store management URLs
 GET     /hadatac/ts/clean                          org.hadatac.console.controllers.triplestore.Clean.clean(oper: String)
 POST    /hadatac/ts/clean                          org.hadatac.console.controllers.triplestore.Clean.postClean(oper: String)
+GET     /hadatac/ts/startstop                      org.hadatac.console.controllers.triplestore.StartStop.index(oper: String, repository: String)
+POST    /hadatac/ts/startstop                      org.hadatac.console.controllers.triplestore.StartStop.postIndex(oper: String, repository: String)
 GET     /hadatac/ts/loadont                        org.hadatac.console.controllers.triplestore.LoadOnt.loadOnt(oper: String)
 POST    /hadatac/ts/loadont                        org.hadatac.console.controllers.triplestore.LoadOnt.postLoadOnt(oper: String)
+GET     /hadatac/ts/loadont/cache                  org.hadatac.console.controllers.triplestore.LoadOnt.eraseCache()
 GET     /hadatac/ts/loadkb                         org.hadatac.console.controllers.triplestore.LoadKB.loadKB(oper: String)
 POST    /hadatac/ts/loadkb                         org.hadatac.console.controllers.triplestore.LoadKB.postLoadKB(oper: String)
-POST    /hadatac/ts/loadkbupload                   org.hadatac.console.controllers.triplestore.LoadKB.uploadFile
+POST    /hadatac/ts/loadkb/upload                  org.hadatac.console.controllers.triplestore.LoadKB.uploadFile(oper: String)
  
 # Permissions store management URLs
-GET     /hadatac/perm/preregister                  org.hadatac.console.controllers.triplestore.Users.preRegistration(oper: String)
-POST    /hadatac/perm/preregister                  org.hadatac.console.controllers.triplestore.Users.postPreRegistration(oper: String)
-POST    /hadatac/perm/preregister/upload           org.hadatac.console.controllers.triplestore.Users.uploadFile
+GET     /hadatac/perm/preregister                  org.hadatac.console.controllers.triplestore.UserManagement.preRegistration(oper: String)
+POST    /hadatac/perm/preregister                  org.hadatac.console.controllers.triplestore.UserManagement.postPreRegistration(oper: String)
+POST    /hadatac/perm/preregister/upload           org.hadatac.console.controllers.triplestore.UserManagement.uploadFile
 GET	    /hadatac/perm/userNetwork			       org.hadatac.console.controllers.triplestore.UserNetwork.index()
 POST	/hadatac/perm/userNetwork			       org.hadatac.console.controllers.triplestore.UserNetwork.postIndex()
  

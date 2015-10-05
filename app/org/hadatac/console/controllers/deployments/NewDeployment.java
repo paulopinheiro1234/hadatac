@@ -40,7 +40,7 @@ import org.hadatac.console.models.SparqlQuery;
 import org.hadatac.console.models.SparqlQueryResults;
 import org.hadatac.console.models.User;
 import org.hadatac.console.controllers.AuthApplication;
-import org.hadatac.console.controllers.triplestore.Users;
+import org.hadatac.console.controllers.triplestore.UserManagement;
 import org.hadatac.console.http.GenericSparqlQuery;
 
 public class NewDeployment extends Controller {

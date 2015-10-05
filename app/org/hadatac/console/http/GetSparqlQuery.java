@@ -226,7 +226,7 @@ public class GetSparqlQuery {
                     "PREFIX foaf:<http://xmlns.com/foaf/0.1/>" + 
                     "PREFIX owl: <http://www.w3.org/2002/07/owl#>" + 
                     "PREFIX vstoi: <http://hadatac.org/ont/vstoi#>" +
-                    "SELECT ?modelName ?superModelName ?maker ?desc ?page WHERE { " + 
+                    "SELECT ?model ?modelName ?superModelName ?maker ?desc ?page WHERE { " + 
                     "    ?model rdfs:subClassOf* vstoi:Detector . " + 
                 	"    ?model rdfs:subClassOf ?superModel .  " + 
                 	"    OPTIONAL { ?model rdfs:label ?modelName }  " + 
@@ -253,7 +253,7 @@ public class GetSparqlQuery {
                     "PREFIX foaf:<http://xmlns.com/foaf/0.1/>" + 
                     "PREFIX owl: <http://www.w3.org/2002/07/owl#>" + 
                     "PREFIX vstoi: <http://hadatac.org/ont/vstoi#>" +
-                	"SELECT ?modelName ?superModelName ?maker ?desc ?page WHERE { " + 
+                	"SELECT ?model ?modelName ?superModelName ?maker ?desc ?page WHERE { " + 
                     "   ?model rdfs:subClassOf* vstoi:Platform . " + 
                 	"   ?model rdfs:subClassOf ?superModel .  " + 
                 	"   OPTIONAL { ?model rdfs:label ?modelName }  " + 

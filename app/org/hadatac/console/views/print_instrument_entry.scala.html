@@ -17,6 +17,11 @@
             <input type="text" size="80" value="@theuri">
         </form>
     }
+    @defining(triple.get("instURI")) {theuri =>
+    <form>
+        <input type="text" size="80" value="@theuri">
+    </form>
+    }
     @if(triple.has("detName")){
         <p>This Instrument has this Detector permanently attached: @triple.get("detName") (sn: @triple.get("detSN")).</p>
     }

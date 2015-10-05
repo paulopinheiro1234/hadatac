@@ -13,8 +13,10 @@ import org.apache.commons.io.FileUtils;
 
 public class NameSpaces {
 
-	public static String CACHE_PATH = "tmp/cache/";
-	
+	public static String CACHE_PATH   = "tmp/cache/";
+	public static String CACHE_PREFIX = "copy-";
+
+
 	public static Map<String, NameSpace> table = new HashMap<String, NameSpace>(); 
 
 	private static NameSpaces instance = null;
@@ -32,7 +34,7 @@ public class NameSpaces {
 		InputStream input = null;
 		
 		try {
-			System.out.println("loading properties file for namespaces.");
+			//System.out.println("loading properties file for namespaces.");
 			//prop.load(new FileInputStream("namespaces.properties"));
 			input = getClass().getClassLoader().getResourceAsStream("namespaces.properties");
 			prop.load(input);
@@ -102,7 +104,7 @@ public class NameSpaces {
 	    	String abbrev = entry.getKey().toString();
 	    	String nsURL = entry.getValue().getURL();
 	    	if (nsURL != null && !nsURL.equals("") && !nsURL.equals(":")) {
-	    		String filePath = CACHE_PATH + "copy" + "-" + abbrev.replace(":","");
+	    		String filePath = CACHE_PATH + CACHE_PREFIX + abbrev.replace(":","");
 	    		message += Feedback.print(mode, "   Creating local copy of " + abbrev + ". ");		
 			    for (int i = abbrev.length(); i < 36; i++) {
 			    	message += Feedback.print(mode, ".");
@@ -147,7 +149,7 @@ public class NameSpaces {
 
     public static void main(String[] args) {
     	NameSpaces ns = new NameSpaces();
-    	System.out.println(ns.printNameSpaceList());
+    	//System.out.println(ns.printNameSpaceList());
     }
 	
 }
