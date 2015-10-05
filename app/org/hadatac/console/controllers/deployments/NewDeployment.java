@@ -115,7 +115,7 @@ public class NewDeployment extends Controller {
         	triggeringEvent = TriggeringEvent.INITIAL_DEPLOYMENT;
         }
         Deployment deployment = DataFactory.createDeployment(deploymentUri, data.getPlatform(), data.getInstrument(), detectorUri, dateString, data.getType());
-        DataCollection dataCollection = DataFactory.createDataCollection(dataCollectionUri, deploymentUri, triggeringEvent, Users.getUriByEmail(user.email));
+        DataCollection dataCollection = DataFactory.createDataCollection(dataCollectionUri, deploymentUri, triggeringEvent, UserManagement.getUriByEmail(user.email));
         if (form.hasErrors()) {
         	System.out.println("HAS ERRORS");
             return badRequest(newDeployment.render(form,
