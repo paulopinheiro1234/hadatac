@@ -13,6 +13,7 @@ import play.Application;
 import play.GlobalSettings;
 import play.mvc.Call;
 import org.hadatac.console.controllers.*;
+import org.hadatac.utils.Repository;
 
 public class Global extends GlobalSettings {
 
@@ -68,8 +69,24 @@ public class Global extends GlobalSettings {
 				return super.onException(e);
 			}
 		});
+		
+		// check if CURL is properly installed
+		
+		// check if SOLR instances are up. If not, start them up
+		solrFirstVerification();
+		
+		// check if SOLR instances are still down, If so, show an error message
 
 		initialData();
+		
+		// check if default user still have default password. If so, ask to change.
+		
+	    // check if there is at least one user is pre-registered. If not, ask to pre-register at least the main user
+		
+		// (NOT SURE THIS SHOULD BE ON ONSTART) check if ontologies are loaded. If not ask to upload them  
+
+		// (NOT SURE THIS SHOULD BE ON ONSTART) check if instances are loaded. If not, show how to upload some default instances  
+		
 	}
 
 	private void initialData() {
@@ -82,4 +99,18 @@ public class Global extends GlobalSettings {
 			}
 		}
 	}
+
+	private void solrFirstVerification() {
+		if (!Repository.operational(Repository.DATA)) {
+			System.out.println("Repository " + Repository.DATA + " was identified as being down");
+			Repository.startStopMetadataRepository(Repository.START, Repository.DATA);			
+			System.out.println("A startup command has been issue to epository " + Repository.DATA + ".");
+		}
+		if (!Repository.operational(Repository.METADATA)) {
+			System.out.println("Repository " + Repository.METADATA + " was identified as being down");
+			Repository.startStopMetadataRepository(Repository.START, Repository.METADATA);
+			System.out.println("A startup command has been issue to epository " + Repository.METADATA + ".");
+		}
+	}
+
 }
