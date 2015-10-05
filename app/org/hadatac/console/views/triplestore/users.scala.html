@@ -1,4 +1,4 @@
-@(oper: String, message : String)
+@(oper: String, message : String, users: List[org.hadatac.entity.pojo.User])
 
 @import helper._
 @import org.hadatac.console.views.html._
@@ -8,66 +8,106 @@
 
 @main("Users Pre-Registration") {
  
+     <script>
+        function checkform() {
+            if(document.getElementById('upload').value != "") {
+                 document.getElementById('submitMessage').style.display = 'inline';
+		    }
+	    }
+     </script>
+
     <div class="container-fluid">
       
-      <div class="row">
+        @if(oper=="init") {
 
-        <div class="col-md-4 col-md-offset-1">
+            <div class="row">
+                 <div class="col-md-1"></div>
+                 <div class="col-md-3 col-xs-2">
+                     <h3>Permission Management</h3>
+                     The metadata store has @PermissionsContext.playTotalTriples() triples. <br>
+                 </div>
+            </div>
+            <div class="row">
+                 <div class="col-md-1"></div>
+                 <div class="col-md-3">
+                    <h4>Options</h4>
+                 </div>
+            </div>
+            <div class="row">
 
-	       <h4>User Pre-Registration</h4>
+                 <div class="col-md-1"></div>
         
-    	     <h5>Batch Processing</h5>
-        
-             @if(oper=="init") {
-                 The metadata store has @PermissionsContext.playTotalTriples() triples. <br>
+                 <div class="col-md-3 col-xs-2">
+                      <div id="rcorners">
+                          <form name="fileUploadForm" id='upload' method="POST" enctype="multipart/form-data" action="@org.hadatac.console.controllers.triplestore.routes.UserManagement.uploadFile()" onchange='checkform()' >
+                             <b>Batch User Pre-Registration</b> <input type="file" class="btn btn-info" name="pic">
+                             <div id='submitMessage'  style="display:none;" >
+                                 <input type="submit" class="btn btn-success" value="Parse and Load Users">
+                             </div>
+                          </form>
+                      </div>
+                 </div>
+                 <div class="col-md-3 col-xs-2">
+                      <a href="" class="btn btn-block btn-primary disabled" role="button">On-Line User Pre-Registration</a>
+                 </div>
+                 <div class="col-md-3 col-xs-2">
+                      <a href="@org.hadatac.console.controllers.triplestore.routes.UserNetwork.index()" class="btn btn-block btn-primary" role="button">User Network</a>
+                 </div>
+ 	        </div>
 
+       }
 
-              <form name="fileUploadForm" method="POST" enctype="multipart/form-data" action="@org.hadatac.console.controllers.triplestore.routes.UserManagement.uploadFile()">
-                     <input type="file" class="btn btn-info" name="pic">
-                     Are your sure you want to pre-register users from the spreadsheet?
-                     <input type="submit" class="btn btn-success" value="Confirm">
-                     <a href="@org.hadatac.console.controllers.triplestore.routes.UserManagement.preRegistration("cancelled")" class="btn btn-danger" role="button">Cancel</a>
-              </form>
-            }
-
-             <p  style='font-family: "Lucida Console", Monaco, monospace;' id='msgarea'></p>
+        <p  style='font-family: "Lucida Console", Monaco, monospace;' id='msgarea'></p>
          
-             @if(oper=="cancelled") {
-                <div id="cancel-box">
-                   <h4>Operation [USERS Pre-Registration] has been cancelled.</h4>
-                   Press OK button to return to HADataC's main page <a href="@org.hadatac.console.controllers.routes.Portal.index()" class="btn btn-warning" role="button">Ok</a>
-	        </div>
-             }
-             
-           <div id="end-process-box" style="display:none;">
-                  <h4>Operation [User Pre-Registration] complete -- check the results above to see if the clean was successful.</h4>
-                  Press OK button to return to HADataC's main page <a href="@org.hadatac.console.controllers.routes.Portal.index()" class="btn btn-warning" role="button">Ok</a>
-	       </div>
+        <div id="end-process-box" style="display:none;">
+            <h4>Operation [User Pre-Registration] complete -- check the results above to see if the clean was successful.</h4>
+            <a href="@org.hadatac.console.controllers.triplestore.routes.UserManagement.preRegistration("init")" class="btn btn-warning" role="button">Back to Manage Users</a>
+	    </div>
 
-     	     @if(oper=="loaded") {
-                 <script> 
-                       var msg = "@UserManagement.commitPreRegistration()";
-                       $('#msgarea').html(msg.replace(/&lt;br&gt;/g, '<br>'));
-                       document.getElementById('end-process-box').style.display = 'inline';
-                 </script> 
-              }
-
-          <h5>On-Line Processing</h5>
-
-             <a href="" class="btn btn-block btn-primary disabled" role="button">On-Line User Pre-Registration</a>
-
-         <h4>User Visualization</h4>
-          
-             <a href="@org.hadatac.console.controllers.triplestore.routes.UserNetwork.index()" class="btn btn-block btn-primary" role="button">User Network</a>
-         
-         <h4>Permission Management</h4>
-          
-             <a href="" class="btn btn-block btn-primary disabled" role="button">Grant/Revoke Administrative Permission</a>
-         
-	   </div>
+     	@if(oper=="loaded") {
+            <script> 
+                var msg = "@UserManagement.commitPreRegistration()";
+                $('#msgarea').html(msg.replace(/&lt;br&gt;/g, '<br>'));
+                document.getElementById('end-process-box').style.display = 'inline';
+            </script> 
+        }
 
       </div>
-
     </div>
+
+    @if(oper=="init") {
+        <div class="row">
+             <div class="col-md-1"></div>
+             <div class="col-md-3">
+                <h4>User List</h4>
+             </div>
+        </div>
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-md-1"></div>
+                <div class="col-md-11">                  
+                  <table class="table">
+                    <thead>
+                       <tr>
+                          <th>User Name</th>
+                          <th>URI</th>
+                          <th>Group</th>
+                          <th>Admin</th>
+                          <th>Operations</th>
+                       </tr>
+                    </thead>
+                    <tbody>
+                       @for((user) <- users){
+                          @user_entry(user)
+                       }
+                    </tbody>
+                  </table>
+                  <br><br>
+                  <a href="@org.hadatac.console.controllers.routes.Portal.index()" class="btn btn-warning" role="button">Back to Main Menu</a>
+                </div>
+            </div>
+        </div>
+    }   
+
 
 }

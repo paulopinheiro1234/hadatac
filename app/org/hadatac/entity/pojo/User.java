@@ -24,7 +24,8 @@ import org.hadatac.utils.Collections;
 
 import play.Play;
 
-public class User {
+public class User implements Comparable<User> {
+	
 	private String uri;
 	private String name;
 	private String email;
@@ -81,11 +82,11 @@ public class User {
 		this.immediateGroup = immediateGroup;
 	}
 	
-	public boolean isAdminstrator() {
+	public boolean isAdministrator() {
 		return administrator;
 	}
 
-	public void setAdminisrator(boolean administrator) {
+	public void setAdministrator(boolean administrator) {
 		this.administrator = administrator;
 	}
 	
@@ -102,6 +103,44 @@ public class User {
 			}
 		}
 		return nameList;
+	}
+	
+	public void save() {
+		User tmpUser = User.find(uri);
+
+		boolean updateAdministrator = this.administrator != tmpUser.isAdministrator();
+			
+        if (updateAdministrator) {
+        	//"DELETE DATA { <http://example/book3>  dc:title  x }"
+        	//"INSERT DATA { <http://example/book3>  dc:title  y }"
+        }
+	}
+	
+	public static List<User> find() {
+		List<User> users = new ArrayList<User>();
+		String queryString = 
+				"PREFIX prov: <http://www.w3.org/ns/prov#>  " +
+        		"PREFIX foaf: <http://xmlns.com/foaf/0.1/> " +
+				"SELECT ?uri WHERE { " +
+				"  ?uri a foaf:Person . " +
+				"} ";
+		
+		Query query = QueryFactory.create(queryString);
+		
+		QueryExecution qexec = QueryExecutionFactory.sparqlService(Collections.getCollectionsName(Collections.PERMISSIONS_SPARQL), query);
+		ResultSet results = qexec.execSelect();
+		ResultSetRewindable resultsrw = ResultSetFactory.copyResults(results);
+		qexec.close();
+		
+		while (resultsrw.hasNext()) {
+			QuerySolution soln = resultsrw.next();
+			System.out.println("URI from main query: " + soln.getResource("uri").getURI());
+			User user = find(soln.getResource("uri").getURI());
+			users.add(user);
+		}			
+
+		java.util.Collections.sort((List<User>) users);
+		return users;
 	}
 	
 	public static User find(String uri) {
@@ -126,8 +165,16 @@ public class User {
 			object = statement.getObject();
 			if (statement.getPredicate().getURI().equals("http://www.w3.org/2000/01/rdf-schema#label")) {
 				user.setLabel(object.asLiteral().getString());
+				System.out.println("label: " + object.asLiteral().getString());
 		    } else if (statement.getPredicate().getURI().equals("http://xmlns.com/foaf/0.1/member")) {
 			     user.immediateGroup = User.find(object.asResource().getURI());
+			} else if (statement.getPredicate().getURI().equals("")) {
+				if (object.asLiteral().getString().equals("true")) {
+				    user.setAdministrator(true);
+				} else {
+				    user.setAdministrator(false);
+				}
+				System.out.println("mbox: " + object.asLiteral().getString());
 		    }
 		}
 		
@@ -136,18 +183,26 @@ public class User {
 		
 		StmtIterator stmtIteratorPublic = modelPublic.listStatements();
 		while (stmtIteratorPublic.hasNext()) {
-			statement = stmtIteratorPrivate.next();
+			statement = stmtIteratorPublic.next();
 			object = statement.getObject();
 			if (statement.getPredicate().getURI().equals("http://xmlns.com/foaf/0.1/name")) {
 				user.setName(object.asLiteral().getString());
+				System.out.println("name: " + object.asLiteral().getString());
 			} else if (statement.getPredicate().getURI().equals("http://xmlns.com/foaf/0.1/mbox")) {
 				user.setEmail(object.asLiteral().getString());
-			} else if (statement.getPredicate().getURI().equals("http://xmlns.com/foaf/0.1/homepage")) {
-				user.setHomepage(object.asLiteral().getString());
-			}
+				System.out.println("mbox: " + object.asLiteral().getString());
+			} //else if (statement.getPredicate().getURI().equals("http://xmlns.com/foaf/0.1/homepage")) {
+				//user.setHomepage(object.asLiteral().getString());
+				//System.out.println("homepage: " + object.asLiteral().getString());
+			//}
 		}
 		
 		return user;
 	}
+	
+	@Override
+    public int compareTo(User another) {
+        return this.getName().compareTo(another.getName());
+    }
 	
 }
