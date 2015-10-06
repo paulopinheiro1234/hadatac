@@ -12,110 +12,99 @@ import play.data.Form;
 import play.mvc.Controller;
 import play.mvc.Result;
 
-import org.hadatac.console.http.DeploymentQueries;
-import org.hadatac.console.models.CSVAnnotationHandler;
 import org.hadatac.console.models.DeploymentForm;
-import org.hadatac.console.models.SparqlQueryResults;
-import org.hadatac.console.models.TripleDocument;
 import org.hadatac.console.views.html.deployments.*;
-import org.hadatac.data.api.DataFactory;
-import org.hadatac.entity.pojo.DataCollection;
 import org.hadatac.entity.pojo.Deployment;
 
 
 public class CloseDeployment extends Controller {
 	
 	// for /metadata HTTP GET requests
-    public static Result index(String uri) {
+    public static Result index(String deployment_uri) {
 
-    	DeploymentForm dep = new DeploymentForm();
+    	DeploymentForm depForm = new DeploymentForm();
+    	Deployment dep = null;
     	
     	try {
-    		if (uri != null) {
-			    uri = URLDecoder.decode(uri, "UTF-8");
+    		if (deployment_uri != null) {
+			    deployment_uri = URLDecoder.decode(deployment_uri, "UTF-8");
     		} else {
-    			uri = "";
+    			deployment_uri = "";
     		}
 		} catch (UnsupportedEncodingException e) {
 			e.printStackTrace();
 		}
 
-    	if (!uri.equals("")) {
+    	if (!deployment_uri.equals("")) {
 
+    		dep = Deployment.find(deployment_uri);
     		/*
     		 *  Add deployment information into handler
     		 */
-    		String json = DeploymentQueries.exec(DeploymentQueries.DEPLOYMENT_BY_URI, uri);
-    		SparqlQueryResults results = new SparqlQueryResults(json, false);
-    		TripleDocument docDeployment = results.sparqlResults.values().iterator().next();
-    		dep.setPlatform(docDeployment.get("platform"));
-    		dep.setInstrument(docDeployment.get("instrument"));
-    		dep.setDetector(docDeployment.get("detector"));
-    		dep.setStartDateTime(docDeployment.get("date"));
+    		depForm.setPlatform(dep.platform.getLabel());
+    		depForm.setInstrument(dep.instrument.getLabel());
+    		depForm.setDetector(dep.detectors.get(0).getLabel());
+    		depForm.setStartDateTime(dep.getStartedAt());
  
-    		//DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:SSS'Z'");
-    		//Date startDate;
-			//try {
-			//	startDate = df.parse(docDeployment.get("date"));
-	    	//	dep.setStartDateTime(startDate);
-			//} catch (ParseException e) {
-			//	e.printStackTrace();
-			//}
-
             System.out.println("closing deployment");
-            return ok(closeDeployment.render(dep));
+            return ok(closeDeployment.render(deployment_uri, depForm));
     	}
-    	return ok(closeDeployment.render(dep));
+    	return ok(closeDeployment.render(deployment_uri, depForm));
         
     }// /index()
 
 
     // for /metadata HTTP POST requests
-    public static Result postIndex(String uri) {
-
-    	DeploymentForm dep = new DeploymentForm();
+    public static Result postIndex(String deployment_uri) {
+    	DeploymentForm depForm = new DeploymentForm();
+    	Deployment dep = null;
     	
     	try {
-    		if (uri != null) {
-			    uri = URLDecoder.decode(uri, "UTF-8");
+    		if (deployment_uri != null) {
+			    deployment_uri = URLDecoder.decode(deployment_uri, "UTF-8");
     		} else {
-    			uri = "";
+    			deployment_uri = "";
     		}
 		} catch (UnsupportedEncodingException e) {
 			e.printStackTrace();
 		}
 
-    	if (!uri.equals("")) {
+    	if (!deployment_uri.equals("")) {
 
+    		dep = Deployment.find(deployment_uri);
     		/*
     		 *  Add deployment information into handler
     		 */
-    		String json = DeploymentQueries.exec(DeploymentQueries.DEPLOYMENT_BY_URI, uri);
-    		SparqlQueryResults results = new SparqlQueryResults(json, false);
-    		TripleDocument docDeployment = results.sparqlResults.values().iterator().next();
-    		dep.setPlatform(docDeployment.get("platform"));
-    		dep.setInstrument(docDeployment.get("instrument"));
-    		dep.setDetector(docDeployment.get("detector"));
-    		dep.setStartDateTime(docDeployment.get("date"));
+    		depForm.setPlatform(dep.platform.getLabel());
+    		depForm.setInstrument(dep.instrument.getLabel());
+    		depForm.setDetector(dep.detectors.get(0).getLabel());
+    		depForm.setStartDateTime(dep.getStartedAt());
  
-    		//DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
-    		//Date startDate;
-			//try {
-			//	startDate = df.parse(docDeployment.get("date"));
-	    	//	dep.setStartDateTime(startDate);
-			//} catch (ParseException e) {
-			//	e.printStackTrace();
-			//}
-
             System.out.println("closing deployment");
-            return ok(closeDeployment.render(dep));
+            return ok(closeDeployment.render(deployment_uri, depForm));
     	}
-    	return ok(closeDeployment.render(dep));
+    	return ok(closeDeployment.render(deployment_uri, depForm));
         
     }// /postIndex()
 
-    public static Result processForm() {
-        Form<DeploymentForm> form = Form.form(DeploymentForm.class).bindFromRequest();
+    public static Result processForm(String deployment_uri) {
+    	Deployment dep = null;
+    	
+    	try {
+    		if (deployment_uri != null) {
+			    deployment_uri = URLDecoder.decode(deployment_uri, "UTF-8");
+    		} else {
+    			deployment_uri = "";
+    		}
+		} catch (UnsupportedEncodingException e) {
+			e.printStackTrace();
+		}
+
+    	if (!deployment_uri.equals("")) {
+    		dep = Deployment.find(deployment_uri);
+    	}
+    	
+    	Form<DeploymentForm> form = Form.form(DeploymentForm.class).bindFromRequest();
         DeploymentForm data = form.get();
 
         String dateStringFromJs = data.getEndDateTime();
@@ -129,11 +118,18 @@ public class CloseDeployment extends Controller {
 		} catch (ParseException e) {
 			e.printStackTrace();
 		}
+		dep.close(endDateString);
 		
-        //Deployment deployment = DataFactory.closeDeployment(deploymentUri, endDateString);
+		data.setPlatform(dep.platform.getLabel());
+		data.setInstrument(dep.instrument.getLabel());
+		data.setDetector(dep.detectors.get(0).getLabel());
+		data.setStartDateTime(dep.getStartedAt());
+		data.setEndDateTime(dep.getEndedAt());
+
+		//Deployment deployment = DataFactory.closeDeployment(deploymentUri, endDateString);
         if (form.hasErrors()) {
         	System.out.println("HAS ERRORS");
-            return badRequest(closeDeployment.render(data));
+            return badRequest(closeDeployment.render(deployment_uri, data));
         } else {
             return ok(deploymentConfirm.render("Close Deployment", data));
         }

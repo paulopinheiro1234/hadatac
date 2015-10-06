@@ -27,7 +27,9 @@ import org.apache.jena.update.UpdateFactory;
 import org.apache.jena.update.UpdateProcessor;
 import org.apache.jena.update.UpdateRequest;
 import org.hadatac.data.loader.util.Sparql;
+import org.hadatac.utils.Collections;
 import org.hadatac.utils.NameSpaces;
+import org.hadatac.utils.State;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.joda.time.format.DateTimeFormat;
@@ -40,9 +42,15 @@ public class Deployment {
 	
 	public static String INDENT1 = "     ";
 	
-	public static String LINE1 = "INSERT DATA {  ";
+	public static String INSERT_LINE1 = "INSERT DATA {  ";
+    
+	public static String DELETE_LINE1 = "DELETE WHERE {  ";
     
     public static String LINE3 = INDENT1 + "a         vstoi:Deployment;  ";
+    
+    public static String DELETE_LINE3 = INDENT1 + " ?p ?o . ";
+
+    public static String LINE3_LEGACY = INDENT1 + "a         vstoi:LegacyDeployment;  ";
     
     public static String PLATFORM_PREDICATE =     INDENT1 + "vstoi:hasPlatform        ";
     
@@ -52,7 +60,9 @@ public class Deployment {
         
     public static String START_TIME_PREDICATE =   INDENT1 + "prov:startedAtTime		  ";
     
-    public static String START_TIME_XMLS =   "\"^^<http://www.w3.org/2001/XMLSchema#dateTime> .";
+    public static String END_TIME_PREDICATE =     INDENT1 + "prov:endedAtTime		  ";
+    
+    public static String TIME_XMLS =   "\"^^<http://www.w3.org/2001/XMLSchema#dateTime> .";
     
     public static String LINE_LAST = "}  ";
 
@@ -61,6 +71,7 @@ public class Deployment {
 	private String ccsvUri;
 	private DateTime startedAt;
 	private DateTime endedAt;
+	private boolean legacy;
 	
 	public Instrument instrument;
 	public Platform platform;
@@ -71,9 +82,18 @@ public class Deployment {
 		endedAt = null;
 		instrument = null;
 		platform = null;
+		legacy = false;
 		detectors = new ArrayList<Detector>();
 	}
 	
+	public boolean isLegacy() {
+		return legacy;
+	}
+
+	public void setLegacy(boolean legacy) {
+		this.legacy = legacy;
+	}
+
 	public String getStartedAt() {
 		DateTimeFormatter formatter = ISODateTimeFormat.dateTime();
 		return formatter.withZone(DateTimeZone.UTC).print(startedAt);
@@ -107,7 +127,11 @@ public class Deployment {
 	}
 	public void setEndedAtXsd(String endedAt) {
 		DateTimeFormatter formatter = ISODateTimeFormat.dateTimeNoMillis();
-		this.startedAt = formatter.parseDateTime(endedAt);
+		this.endedAt = formatter.parseDateTime(endedAt);
+	}
+	public void setEndedAtXsdWithMillis(String endedAt) {
+		DateTimeFormatter formatter = ISODateTimeFormat.dateTime();
+		this.endedAt = formatter.parseDateTime(endedAt);
 	}
 	
 	public String getUri() {
@@ -137,21 +161,27 @@ public class Deployment {
 	public void save() {
 		String insert = "";
 		insert += NameSpaces.getInstance().printSparqlNameSpaceList();
-    	insert += LINE1;
+    	insert += INSERT_LINE1;
     	insert += "<" + this.getUri() + ">  ";
-    	insert += LINE3;
+    	if (this.isLegacy()) {
+    		insert += LINE3_LEGACY;
+    	} else {
+    		insert += LINE3;
+    	}
     	insert += PLATFORM_PREDICATE + "<" + this.platform.getUri() + "> ;   ";
     	insert += INSTRUMENT_PREDICATE + "<" + this.instrument.getUri() + "> ;   ";
     	Iterator<Detector> i = this.detectors.iterator();
     	while (i.hasNext()) {
     		insert += DETECTOR_PREDICATE + "<" + i.next().getUri() + "> ;   ";
     	}
-       	insert += START_TIME_PREDICATE + "\"" + this.getStartedAt() + START_TIME_XMLS + "  "; 
+       	insert += START_TIME_PREDICATE + "\"" + this.getStartedAt() + TIME_XMLS + "  ";
+       	if (this.endedAt != null) {
+           	insert += END_TIME_PREDICATE + "\"" + this.getEndedAt() + TIME_XMLS + "  ";
+       	}
     	insert += LINE_LAST;
     	System.out.println(insert);
     	UpdateRequest request = UpdateFactory.create(insert);
-        UpdateProcessor processor = UpdateExecutionFactory.createRemote(request, 
-        		Play.application().configuration().getString("hadatac.solr.triplestore") + "/store/sparql");
+        UpdateProcessor processor = UpdateExecutionFactory.createRemote(request, Collections.getCollectionsName(Collections.METADATA_SPARQL));
         processor.execute();
         
         DefaultHttpClient httpclient = new DefaultHttpClient();
@@ -168,10 +198,83 @@ public class Deployment {
 		}
 	}
 	
+	public void saveEndedAtTime() {
+		String insert = "";
+       	if (this.getEndedAt() != null) {
+		    insert += NameSpaces.getInstance().printSparqlNameSpaceList();
+    	    insert += INSERT_LINE1;
+    	    insert += "<" + this.getUri() + ">  ";
+           	insert += END_TIME_PREDICATE + "\"" + this.getEndedAt() + TIME_XMLS + "  ";
+    	    insert += LINE_LAST;
+    	    System.out.println(insert);
+    	    UpdateRequest request = UpdateFactory.create(insert);
+            UpdateProcessor processor = UpdateExecutionFactory.createRemote(request,Collections.getCollectionsName(Collections.METADATA_SPARQL)); 
+            processor.execute();
+        
+            DefaultHttpClient httpclient = new DefaultHttpClient();
+            HttpGet httpget = new HttpGet(Play.application().configuration().getString("hadatac.solr.triplestore")
+             		+ "/store/update?commit=true");
+            try {
+    			httpclient.execute(httpget);  
+	    	} catch (ClientProtocolException e) {
+    			// TODO Auto-generated catch block
+    			e.printStackTrace();
+	    	} catch (IOException e) {
+		    	// TODO Auto-generated catch block
+		    	e.printStackTrace();
+	    	}
+       	}
+	}
+	
+	public void close(String endedAt) {
+		setEndedAtXsd(endedAt);
+		List<DataCollection> list = DataCollection.find(this, true);
+		if (!list.isEmpty()) {
+			DataCollection dc = list.get(0);
+			dc.close(endedAt);
+		}
+		saveEndedAtTime();
+	}
+	
+	public void delete() {
+		String query = "";
+		query += NameSpaces.getInstance().printSparqlNameSpaceList();
+        query += DELETE_LINE1;
+    	query += "<" + this.getUri() + ">  ";
+        query += DELETE_LINE3;
+    	query += LINE_LAST;
+        System.out.println(query);
+    	UpdateRequest request = UpdateFactory.create(query);
+        UpdateProcessor processor = UpdateExecutionFactory.createRemote(request, Collections.getCollectionsName(Collections.METADATA_SPARQL));
+        processor.execute();
+        
+        DefaultHttpClient httpclient = new DefaultHttpClient();
+        HttpGet httpget = new HttpGet(Play.application().configuration().getString("hadatac.solr.triplestore")
+            	+ "/store/update?commit=true");
+        try {
+    	    httpclient.execute(httpget);  
+	    } catch (ClientProtocolException e) {
+    		// TODO Auto-generated catch block
+    		e.printStackTrace();
+	    } catch (IOException e) {
+		    // TODO Auto-generated catch block
+		    e.printStackTrace();
+	    }
+	}
+	
 	public static Deployment create(String uri) {
 		Deployment deployment = new Deployment();
 		
 		deployment.setUri(uri);
+		
+		return deployment;
+	}
+	
+	public static Deployment createLegacy(String uri) {
+		Deployment deployment = new Deployment();
+		
+		deployment.setUri(uri);
+		deployment.setLegacy(true);
 		
 		return deployment;
 	}
@@ -249,13 +352,13 @@ public class Deployment {
 		return null;
 	}
 	
-	public static Deployment find(String uri) {
+	public static Deployment find(String deployment_uri) {
 		Deployment deployment = null;
 		Model model;
 		Statement statement;
 		RDFNode object;
 		
-		String queryString = "DESCRIBE <" + uri + ">";
+		String queryString = "DESCRIBE <" + deployment_uri + ">";
 		Query query = QueryFactory.create(queryString);
 		QueryExecution qexec = QueryExecutionFactory.sparqlService(
 				Play.application().configuration().getString("hadatac.solr.triplestore") + "/store/sparql", query);
@@ -278,9 +381,67 @@ public class Deployment {
 			}
 		}
 		
-		deployment.setUri(uri);
+		deployment.setUri(deployment_uri);
 		
 		return deployment;
+	}
+
+	public static List<Deployment> find(State state) {
+		List<Deployment> deployments = new ArrayList<Deployment>();
+	    String queryString = "";
+        if (state.getCurrent() == State.ACTIVE) { 
+    	   queryString = "PREFIX prov: <http://www.w3.org/ns/prov#>  " +
+    			   "PREFIX vstoi: <http://hadatac.org/ont/vstoi#>  " +
+    			   "SELECT ?uri WHERE { " + 
+    			   "   ?uri a vstoi:Deployment . " + 
+    			   "   FILTER NOT EXISTS { ?uri prov:endedAtTime ?enddatetime . } " + 
+    			   "} " + 
+    			   "ORDER BY DESC(?datetime) ";
+        } else {
+    	   if (state.getCurrent() == State.CLOSED) {
+    		   queryString = "PREFIX prov: <http://www.w3.org/ns/prov#>  " +
+    				   "PREFIX vstoi: <http://hadatac.org/ont/vstoi#>  " +
+    				   "SELECT ?uri WHERE { " + 
+    				   "   ?uri a vstoi:Deployment . " + 
+    				   "   ?uri prov:startedAtTime ?startdatetime .  " + 
+    				   "   ?uri prov:endedAtTime ?enddatetime .  " + 
+    				   "} " +
+    				   "ORDER BY DESC(?datetime) ";
+    	   } else {
+        	   if (state.getCurrent() == State.ALL) {
+        		   queryString = "PREFIX prov: <http://www.w3.org/ns/prov#>  " +
+        				   "PREFIX vstoi: <http://hadatac.org/ont/vstoi#>  " +
+        				   "SELECT ?uri WHERE { " + 
+        				   "   ?uri a vstoi:Deployment . " + 
+        				   "} " +
+        				   "ORDER BY DESC(?datetime) ";
+        	   } else {
+        		   System.out.println("Deployment.java: no valid state specified.");
+        		   return null;
+        	   }
+    	   }
+        }
+		Query query = QueryFactory.create(queryString);
+		
+		System.out.println(queryString);
+		
+		QueryExecution qexec = QueryExecutionFactory.sparqlService(Collections.getCollectionsName(Collections.METADATA_SPARQL), query);
+		ResultSet results = qexec.execSelect();
+		ResultSetRewindable resultsrw = ResultSetFactory.copyResults(results);
+		qexec.close();
+		
+		Deployment dep = null;
+		while (resultsrw.hasNext()) {
+			QuerySolution soln = resultsrw.next();
+			if (soln != null && soln.getResource("uri").getURI()!= null) { 
+				//dep = Deployment.find(soln.getLiteral("uri").getString()); 
+				dep = Deployment.find(soln.getResource("uri").getURI()); 
+			}
+			deployments.add(dep);
+			
+		}
+		
+		return deployments;
 	}
 
 	public static Deployment find(Model model, DataCollection dataCollection) {

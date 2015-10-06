@@ -1,34 +1,20 @@
-@(triple : org.hadatac.console.models.TripleDocument,
-  flip : Boolean)
-@*****************************
-   ?uri
-   ?platform 
-   ?instrument 
-   ?date
-*****************************@
+@(oper : org.hadatac.utils.State, deployment : org.hadatac.entity.pojo.Deployment)
 
 @import java.net._
+@import org.hadatac.utils._
 
-@if(flip){
-    <tr>
-       <td>@triple.get("platformName")</td> 
-       <td>@triple.get("instrumentName")</td>
-       <td>@triple.get("date")</td>
-       <td>
-          <a href="@org.hadatac.console.controllers.deployments.routes.ViewDeployment.index(URLEncoder.encode(triple.get("uri"),"UTF-8"))" class="btn-xs btn-primary" role="button">View</a>
-          <a href="@org.hadatac.console.controllers.deployments.routes.CloseDeployment.index(URLEncoder.encode(triple.get("uri"),"UTF-8"))" class="btn-xs btn-primary" role="button">Close</a>
-          <a href="@org.hadatac.console.controllers.deployments.routes.DeleteDeployment.index()" class="btn-xs btn-primary" role="button">Delete</a>
-       </td>
-    </tr>
-} else {
-    <tr>
-        <td>@triple.get("instrumentName")</td> 
-        <td>@triple.get("platformName")</td>
-        <td>@triple.get("date")</td>
-       <td>
-          <a href="@org.hadatac.console.controllers.deployments.routes.ViewDeployment.index(URLEncoder.encode(triple.get("uri"),"UTF-8"))" class="btn-xs btn-primary" role="button">View</a>
-          <a href="@org.hadatac.console.controllers.deployments.routes.CloseDeployment.index(URLEncoder.encode(triple.get("uri"),"UTF-8"))" class="btn-xs btn-primary" role="button">Close</a>
-          <a href="@org.hadatac.console.controllers.deployments.routes.DeleteDeployment.index()" class="btn-xs btn-primary" role="button">Delete</a>
-       </td>
-    </tr>
-}
+<tr>
+   <td>@if(deployment.platform != null && deployment.platform.getLabel() != null) { @deployment.platform.getLabel() }</td> 
+   <td>@if(deployment.instrument != null && deployment.instrument.getLabel() != null) { @deployment.instrument.getLabel() }</td>
+   <td>@if(deployment.getStartedAt() != null) { @deployment.getStartedAt() }</td>
+   @if(oper.getCurrent() != State.ACTIVE) {
+       <td>@if(deployment.getEndedAt() != null) { @deployment.getEndedAt() }</td>
+   }
+   <td>
+       <a href="@org.hadatac.console.controllers.deployments.routes.ViewDeployment.index(URLEncoder.encode(deployment.getUri(),"UTF-8"))" class="btn-xs btn-primary" role="button">View</a>
+       @if(oper.getCurrent() == State.ACTIVE) {
+           <a href="@org.hadatac.console.controllers.deployments.routes.CloseDeployment.index(URLEncoder.encode(deployment.getUri(),"UTF-8"))" class="btn-xs btn-primary" role="button">Close</a>
+       }
+       <a href="@org.hadatac.console.controllers.deployments.routes.DeleteDeployment.index(URLEncoder.encode(deployment.getUri(),"UTF-8"))" class="btn-xs btn-primary" role="button">Delete</a>
+   </td>
+</tr>

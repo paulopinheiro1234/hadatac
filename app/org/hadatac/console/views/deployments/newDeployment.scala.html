@@ -1,9 +1,11 @@
 @(deployForm: Form[org.hadatac.console.models.DeploymentForm], 
   thePlatforms : List[org.hadatac.entity.pojo.Platform],
   theInstruments : org.hadatac.console.models.SparqlQueryResults,
-  theDetectors : org.hadatac.console.models.SparqlQueryResults)
+  theDetectors : org.hadatac.console.models.SparqlQueryResults,
+  deploymentType : String)
 
 @import helper._
+@import org.hadatac.utils._
 @import org.hadatac.console.views.html._
 @import org.hadatac.console.views.html.deployments._
 @import org.hadatac.console.controllers.deployments._
@@ -47,7 +49,7 @@
 </script>
 
   <div class="container">
-    <h2>New Deployment</h2>
+    <h2>New @deploymentType Deployment</h2>
 
     <form class="form-horizontal" name="newDeployment" method="post" action="@org.hadatac.console.controllers.deployments.routes.NewDeployment.processForm">
 
@@ -111,10 +113,14 @@
             </div>
          </div>
      </div>
+     
+     <div class="form-group" hidden="true">
+     	<input id="type" name="type" type="text" class="form-control" value="@deploymentType" hidden="true" />
+     </div>
 
       <div class="form-group" class="col-sm-6 col-offset-3">
           <input class="btn btn-success" role="button" id="submitbutton" type="submit" value="Create" disabled="disabled" />
-          <a href="@org.hadatac.console.controllers.deployments.routes.DeploymentManagement.index("active")" class="btn btn-danger" role="button">Cancel</a>
+          <a href="@org.hadatac.console.controllers.deployments.routes.DeploymentManagement.index(State.ACTIVE)" class="btn btn-danger" role="button">Cancel</a>
       </div>
    </form>    
 </div>

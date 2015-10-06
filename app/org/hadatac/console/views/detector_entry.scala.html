@@ -17,14 +17,14 @@
     <div id="@itemID" class="panel-collapse collapse" role="tabpanel" aria-labelledby="heading@itemID">
         <div class="panel-body">
             <p><b>@triple.get("name") </b> (model name: @triple.get("modelName") )</p>
+            <p>serial number @itemID</p>
+            @if(triple.has("instName")){
+                <p>This Detector is permanently attached to @triple.get("instName") (sn: @triple.get("instSN")).</p>
+            }
             @defining(triple.get("detURI")) {theuri =>
             <form>
                 <input type="text" size="80" value="@theuri">
             </form>
-            }
-            <p>serial number @itemID</p>
-            @if(triple.has("instName")){
-                <p>This Detector is permanently attached to @triple.get("instName") (sn: @triple.get("instSN")).</p>
             }
         </div>
     </div>

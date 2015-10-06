@@ -4,5 +4,10 @@
     <h3>@triple.get("modelName") </h3>
     <p>(manufactured by: @triple.get("maker") )</p>
     <p>Description: @triple.get("desc")</p>
+    @defining(triple.get("model")) {theuri =>
+    <form>
+        <input type="text" size="80" value="@theuri">
+    </form>
+    }
 </div>
 <hr>

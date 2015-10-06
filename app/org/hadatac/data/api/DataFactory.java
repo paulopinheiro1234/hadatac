@@ -22,7 +22,7 @@ public class DataFactory {
     
     public static String CONSOLE_ID = "00000001";
     
-    public static DataCollection createDataCollection(String dataCollectionUri, String deploymentUri, String ownerUri) {
+    public static DataCollection createDataCollection(String dataCollectionUri, String deploymentUri, int triggeringEvent, String ownerUri) {
 		DataCollection dataCollection = null;
 		Deployment deployment = Deployment.find(deploymentUri);
 		
@@ -30,6 +30,7 @@ public class DataFactory {
 		dataCollection.setUri(dataCollectionUri);
 		dataCollection.setOwnerUri(ownerUri);
 		dataCollection.setPermissionUri(ownerUri);
+		dataCollection.setTriggeringEvent(triggeringEvent);
 		dataCollection.setPlatformUri(deployment.platform.getUri());
 		dataCollection.setInstrumentUri(deployment.instrument.getUri());
 		dataCollection.setPlatformName(deployment.platform.getLabel());
@@ -46,8 +47,27 @@ public class DataFactory {
 		return dataset;
 	}
 	
-	public static Deployment createDeployment(String deploymentUri, String platformUri, String instrumentUri, String[] detectorUri, String startedAt) {
-		Deployment deployment = Deployment.create(deploymentUri);
+	public static Deployment createDeployment(String deploymentUri, String platformUri, String instrumentUri, String[] detectorUri, String startedAt, String type) {
+		Deployment deployment;
+		if (type.equalsIgnoreCase("LEGACY")) {
+			deployment = Deployment.createLegacy(deploymentUri);
+		} else {
+			deployment = Deployment.create(deploymentUri);
+		}
+		
+		deployment.platform = Platform.find(platformUri);
+		deployment.instrument = Instrument.find(instrumentUri);
+		for (int i = 0; i < detectorUri.length; i++) {
+			deployment.detectors.add(Detector.find(detectorUri[i]));
+		}
+		deployment.setStartedAtXsd(startedAt);
+		deployment.save();
+		
+		return deployment;
+	}
+	
+	public static Deployment createLegacyDeployment(String deploymentUri, String platformUri, String instrumentUri, String[] detectorUri, String startedAt) {
+		Deployment deployment = Deployment.createLegacy(deploymentUri);
 		
 		deployment.platform = Platform.find(platformUri);
 		deployment.instrument = Instrument.find(instrumentUri);
@@ -90,7 +110,7 @@ public class DataFactory {
     	for (int i = metadataId.length(); i <= 8; i++) {
     		metadataId = "0" + metadataId;
     	}
-    	return host + "/hadatac/kb/" + category + "/" + CONSOLE_ID + "/" + metadataId + "/" ;   
+    	return host + "/hadatac/kb/" + category + "/" + CONSOLE_ID + "/" + metadataId ;   
     }
     
 

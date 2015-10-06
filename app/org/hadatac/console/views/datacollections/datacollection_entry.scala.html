@@ -1,13 +1,17 @@
-@(dc : org.hadatac.entity.pojo.DataCollection)
+@(state: org.hadatac.utils.State, dc : org.hadatac.entity.pojo.DataCollection)
 
 @import java.net._
+@import org.hadatac.utils._
 
     <tr>
-       <td></td> 
+       <td>@dc.getTriggeringEventName()</td> 
        <td>@dc.getPlatformName()</td> 
        <td>@dc.getInstrumentModel()</td>
        <td>@dc.getStartedAt()</td>
-       <td></td>
+       @if(state.getCurrent() != State.ACTIVE) {
+           <td>@dc.getEndedAt()</td>
+       }
+       <td>@dc.getNumberDataPoints()</td>
        <td>
           <a href="@org.hadatac.console.controllers.datacollections.routes.DeleteDataCollection.index("init", URLEncoder.encode(dc.getUri(),"UTF-8"))" class="btn-xs btn-primary" role="button">Delete</a>
           <a href="@org.hadatac.console.controllers.datacollections.routes.SetAccessPermission.index("init", URLEncoder.encode(dc.getUri(),"UTF-8"))" class="btn-xs btn-primary" role="button">Permission</a>
