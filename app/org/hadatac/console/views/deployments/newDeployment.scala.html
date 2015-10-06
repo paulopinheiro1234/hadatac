@@ -1,5 +1,5 @@
 @(deployForm: Form[org.hadatac.console.models.DeploymentForm], 
-  thePlatforms : org.hadatac.console.models.SparqlQueryResults,
+  thePlatforms : List[org.hadatac.entity.pojo.Platform],
   theInstruments : org.hadatac.console.models.SparqlQueryResults,
   theDetectors : org.hadatac.console.models.SparqlQueryResults)
 
@@ -55,12 +55,9 @@
          <label>Platform</label> 
          <select  class="form-control col-sm-6" id="platform" name="platform" onchange="checkform()" >
             <option value=""></option>         
-            @for((k, triple) <- thePlatforms.sparqlResults){
-               @defining(triple.generateID()) {itemID =>
-                   @defining(triple.get("modelName").replaceAll("[\\W]|_", "")) {cleanName =>
-                       <option value="@triple.get("platURI")">@triple.get("modelName") (@triple.get("sn"))</option>         
-                }
-              }
+
+            @for(platform <- thePlatforms) {
+                <option value="@platform.getUri()">@platform.getLabel() @if(platform.getSerialNumber() != null) { (SN: @platform.getSerialNumber()) }</option>
             }
          </select>
 

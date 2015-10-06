@@ -1,46 +1,29 @@
 package org.hadatac.console.controllers.deployments;
 
-import org.apache.jena.update.UpdateExecutionFactory;
-import org.apache.jena.update.UpdateFactory;
-import org.apache.jena.update.UpdateProcessor;
-import org.apache.jena.update.UpdateRequest;
-import org.apache.solr.client.solrj.SolrClient;
-import org.apache.solr.client.solrj.SolrQuery;
-import org.apache.solr.client.solrj.SolrServerException;
-import org.apache.solr.client.solrj.impl.HttpSolrClient;
-import org.apache.solr.client.solrj.response.QueryResponse;
-import org.apache.solr.common.SolrDocument;
-import org.apache.solr.common.SolrDocumentList;
 import org.hadatac.console.http.GetSparqlQuery;
 
 import java.io.IOException;
-import java.net.URLEncoder;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.time.LocalDate;
-import java.time.chrono.ChronoLocalDate;
-import java.time.format.DateTimeFormatter;
 import java.util.Date;
-import java.util.Iterator;
 
 import play.Play;
 import play.mvc.Controller;
 import play.mvc.Result;
 import play.data.*;
 
-import org.hadatac.console.views.html.*;
 import org.hadatac.console.views.html.deployments.*;
 import org.hadatac.data.api.DataFactory;
 import org.hadatac.entity.pojo.DataCollection;
 import org.hadatac.entity.pojo.Deployment;
+import org.hadatac.entity.pojo.Platform;
 import org.hadatac.console.models.DeploymentForm;
 import org.hadatac.console.models.SparqlQuery;
 import org.hadatac.console.models.SparqlQueryResults;
 import org.hadatac.console.models.User;
 import org.hadatac.console.controllers.AuthApplication;
 import org.hadatac.console.controllers.triplestore.UserManagement;
-import org.hadatac.console.http.GenericSparqlQuery;
 
 public class NewDeployment extends Controller {
 	
@@ -62,7 +45,8 @@ public class NewDeployment extends Controller {
     // for /metadata HTTP GET requests
     public static Result index() {
     	return ok(newDeployment.render(Form.form(DeploymentForm.class), 
-    			  getQueryResults("Platforms"),
+    			  Platform.find(),
+    			  //getQueryResults("Platforms"),
     			  getQueryResults("Instruments"),
     			  getQueryResults("Detectors")));
         
@@ -73,8 +57,9 @@ public class NewDeployment extends Controller {
     public static Result postIndex() {
 
     	return ok(newDeployment.render(Form.form(DeploymentForm.class), 
-  			  getQueryResults("Platforms"),
-  			  getQueryResults("Instruments"),
+  			  //getQueryResults("Platforms"),
+              Platform.find(),
+    		  getQueryResults("Instruments"),
   			  getQueryResults("Detectors")));
         
     }// /postIndex()
@@ -111,7 +96,8 @@ public class NewDeployment extends Controller {
         if (form.hasErrors()) {
         	System.out.println("HAS ERRORS");
             return badRequest(newDeployment.render(form,
-			          getQueryResults("Platforms"),
+            		  Platform.find(),
+			          //getQueryResults("Platforms"),
 			          getQueryResults("Instruments"),
 			          getQueryResults("Detectors")));        
         } else {
