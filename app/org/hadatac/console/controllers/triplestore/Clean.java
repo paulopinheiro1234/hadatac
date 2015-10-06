@@ -2,9 +2,9 @@ package org.hadatac.console.controllers.triplestore;
 
 import play.*;
 import play.mvc.*;
-import play.libs.*;
 
 import org.hadatac.console.views.html.triplestore.*;
+import org.hadatac.data.loader.DataContext;
 import org.hadatac.metadata.loader.MetadataContext;
 import org.hadatac.metadata.loader.PermissionsContext;
 import org.hadatac.utils.Feedback;
@@ -39,7 +39,21 @@ public class Clean extends Controller {
 	    		                  false);
     		result = permission.clean(Feedback.WEB);
     	} else if (oper.equals("collections")) {
-    	} else if (oper.equals("acquisitions:")) {
+    		NameSpaces.getInstance();
+    		DataContext collection = new 
+	    		 DataContext("user", 
+	    		             "password",
+	    		             Play.application().configuration().getString("hadatac.solr.data"), 
+	    		             false);
+    		result = collection.cleanDataCollections(Feedback.WEB);
+    	} else if (oper.equals("acquisitions")) {
+    		NameSpaces.getInstance();
+    		DataContext acquisition = new 
+	    		 DataContext("user", 
+	    		             "password",
+	    		             Play.application().configuration().getString("hadatac.solr.data"), 
+	    		             false);
+    		result = acquisition.cleanDataAcquisitions(Feedback.WEB);
     	}
 	     return result;
    }
