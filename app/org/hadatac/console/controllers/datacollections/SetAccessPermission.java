@@ -2,6 +2,7 @@ package org.hadatac.console.controllers.datacollections;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
+import java.util.Iterator;
 
 import play.mvc.Controller;
 import play.mvc.Result;
@@ -9,6 +10,7 @@ import play.mvc.Result;
 import org.hadatac.console.views.html.datacollections.*;
 import org.hadatac.entity.pojo.DataCollection;
 import org.hadatac.entity.pojo.HADataC;
+import org.hadatac.entity.pojo.User;
 
 public class SetAccessPermission extends Controller {
 	
@@ -35,15 +37,19 @@ public class SetAccessPermission extends Controller {
     		
     		dc = DataCollection.findByUri(uri);
     		
-            return ok(setAccessPermission.render(oper, dc));
+    		User user = User.find(dc.getOwnerUri());
+    		System.out.println("DC OWNER URI: " + dc.getOwnerUri());
+    		
+            return ok(setAccessPermission.render(oper, dc, user.getGroupNames()));
     	}
-    	return ok(setAccessPermission.render(oper, dc));
+    	return ok(setAccessPermission.render(oper, dc, null));
         
     }// /index()
 
 
     // for /metadata HTTP POST requests
     public static Result postIndex(String oper, String uri) {
+    	
     	DataCollection dc = new DataCollection();
     	
     	try {
@@ -64,9 +70,11 @@ public class SetAccessPermission extends Controller {
     		
     		dc = DataCollection.findByUri(uri);
     		
-            return ok(setAccessPermission.render(oper, dc));
+    		User user = User.find(dc.getOwnerUri());
+    		
+            return ok(setAccessPermission.render(oper, dc, user.getGroupNames()));
     	}
-    	return ok(setAccessPermission.render(oper, dc));
+    	return ok(setAccessPermission.render(oper, dc, null));
         
     }// /postIndex()
     

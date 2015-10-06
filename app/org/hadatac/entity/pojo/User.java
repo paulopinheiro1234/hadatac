@@ -90,7 +90,7 @@ public class User implements Comparable<User> {
 		this.administrator = administrator;
 	}
 	
-	public Map<String, String> getGroupNames(String uri) {
+	public Map<String, String> getGroupNames() {
 		Map<String, String> nameList = new HashMap<String,String>();
 		User user = User.find(uri);
 		if (user != null && user.getUri() != null && user.getName() != null) {
@@ -167,15 +167,15 @@ public class User implements Comparable<User> {
 				user.setLabel(object.asLiteral().getString());
 				System.out.println("label: " + object.asLiteral().getString());
 		    } else if (statement.getPredicate().getURI().equals("http://xmlns.com/foaf/0.1/member")) {
-			     user.immediateGroup = User.find(object.asResource().getURI());
-			} else if (statement.getPredicate().getURI().equals("")) {
-				if (object.asLiteral().getString().equals("true")) {
-				    user.setAdministrator(true);
-				} else {
-				    user.setAdministrator(false);
-				}
-				System.out.println("mbox: " + object.asLiteral().getString());
-		    }
+			    user.immediateGroup = User.find(object.asResource().getURI());
+			} //else if (statement.getPredicate().getURI().equals("")) {
+				//if (object.asLiteral().getString().equals("true")) {
+				  //  user.setAdministrator(true);
+				//} else {
+				 //   user.setAdministrator(false);
+				//}
+				//System.out.println("mbox: " + object.asLiteral().getString());
+		    //}
 		}
 		
 		QueryExecution qexecPublic = QueryExecutionFactory.sparqlService(Collections.getCollectionsName(Collections.METADATA_SPARQL), query);

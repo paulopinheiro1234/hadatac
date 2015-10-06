@@ -88,8 +88,8 @@ GET	    /hadatac/datacollections/		    	   org.hadatac.console.controllers.datac
 POST	/hadatac/datacollections/     			   org.hadatac.console.controllers.datacollections.DataCollectionManagement.postIndex(oper : Int)
 GET	    /hadatac/datacollections/delete		       org.hadatac.console.controllers.datacollections.DeleteDataCollection.index(oper : String, dc_uri : String)
 POST	/hadatac/datacollections/delete     	   org.hadatac.console.controllers.datacollections.DeleteDataCollection.postIndex(oper : String, dc_uri : String)
-GET	    /hadatac/datacollections/access		       org.hadatac.console.controllers.datacollections.SetAccessPermission.index(oper : String, dc_uri : String)
-POST	/hadatac/datacollections/access     	   org.hadatac.console.controllers.datacollections.SetAccessPermission.postIndex(oper : String, dc_uri : String)
+GET	    /hadatac/datacollections/access		       org.hadatac.console.controllers.datacollections.SetAccessPermission.index(oper : String, dc_uri)
+POST	/hadatac/datacollections/access     	   org.hadatac.console.controllers.datacollections.SetAccessPermission.postIndex(oper : String, dc_uri)
 
 # annotator
 GET	    /hadatac/annotator/		    	           org.hadatac.console.controllers.annotator.Annotator.selectDeployment
