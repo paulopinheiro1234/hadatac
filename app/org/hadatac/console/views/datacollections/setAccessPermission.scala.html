@@ -1,4 +1,7 @@
-@(oper : String, dc : org.hadatac.entity.pojo.DataCollection, perms : Map[String, String], newPerm: String)
+@(oper    : String, 
+  dc      : org.hadatac.entity.pojo.DataCollection, 
+  perms   : Map[String, String], 
+  newPerm : String)
 
 @import helper._
 @import org.hadatac.utils._
@@ -39,7 +42,7 @@
          <div id="question-box">
            <br><br>
            Are your sure you want to change the access permission for this data collection and its data points? 
-           <a href="@org.hadatac.console.controllers.datacollections.routes.SetAccessPermission.index("confirmed", dc.getUri())" class="btn btn-success" role="button">Confirm</a>
+           <a href="@org.hadatac.console.controllers.datacollections.routes.SetAccessPermission.index("confirmed", dc.getUri(), "")" class="btn btn-success" role="button">Confirm</a>
         </div>
        }
 

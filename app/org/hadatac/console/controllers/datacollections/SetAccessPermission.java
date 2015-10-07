@@ -15,7 +15,7 @@ import org.hadatac.entity.pojo.User;
 public class SetAccessPermission extends Controller {
 	
 	// for /metadata HTTP GET requests
-    public static Result index(String oper, String uri) {
+    public static Result index(String oper, String uri, String perm) {
     	
     	DataCollection dc = new DataCollection();
     	
@@ -40,15 +40,15 @@ public class SetAccessPermission extends Controller {
     		User user = User.find(dc.getOwnerUri());
     		System.out.println("DC OWNER URI: " + dc.getOwnerUri());
     		
-            return ok(setAccessPermission.render(oper, dc, user.getGroupNames()));
+            return ok(setAccessPermission.render(oper, dc, user.getGroupNames(), perm));
     	}
-    	return ok(setAccessPermission.render(oper, dc, null));
+    	return ok(setAccessPermission.render(oper, dc, null, ""));
         
     }// /index()
 
 
     // for /metadata HTTP POST requests
-    public static Result postIndex(String oper, String uri) {
+    public static Result postIndex(String oper, String uri, String perm) {
     	
     	DataCollection dc = new DataCollection();
     	
@@ -72,9 +72,9 @@ public class SetAccessPermission extends Controller {
     		
     		User user = User.find(dc.getOwnerUri());
     		
-            return ok(setAccessPermission.render(oper, dc, user.getGroupNames()));
+            return ok(setAccessPermission.render(oper, dc, user.getGroupNames(), perm));
     	}
-    	return ok(setAccessPermission.render(oper, dc, null));
+    	return ok(setAccessPermission.render(oper, dc, null, ""));
         
     }// /postIndex()
     
