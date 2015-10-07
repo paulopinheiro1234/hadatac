@@ -1,7 +1,5 @@
-@(oper    : String, 
-  dc      : org.hadatac.entity.pojo.DataCollection, 
-  perms   : Map[String, String], 
-  newPerm : String)
+@(dc      : org.hadatac.entity.pojo.DataCollection, 
+  perms   : Map[String, String])
 
 @import helper._
 @import org.hadatac.utils._
@@ -26,44 +24,29 @@
            <li><b>Current Permission:</b> @dc.getPermissionUri()</li>
        </ul>
 
-       @if(oper=="init") {
-         <div class="form-group">
-           <label>New Permission</label>
-           <select class="form-control col-sm-6" id="instrument" name="instrument" onchange="checkform()" >
-              <option value="">Public</option>         
-               @for((permUri, permName) <- perms){
-                  @if(permUri != dc.getPermissionUri()) {
-                      <option value="@permUri">@permName</option> 
-                  }        
-               }
-           </select>
-         </div>
+       <form class="form-horizontal" name="newPermission" method="post" action="@org.hadatac.console.controllers.datacollections.routes.SetAccessPermission.newPermission(dc.getUri())">
+       
+           <div class="form-group">
+              <label>New Permission</label>
+              <select class="form-control col-sm-6" id="newPermission" name="newPermission" >
+                 <option value="">Public</option>         
+                 @for((permUri, permName) <- perms){
+                    @if(permUri != dc.getPermissionUri()) {
+                       <option value="@permUri">@permName</option> 
+                    }        
+                 }
+              </select>
+           </div>
 
-         <div id="question-box">
-           <br><br>
-           Are your sure you want to change the access permission for this data collection and its data points? 
-           <a href="@org.hadatac.console.controllers.datacollections.routes.SetAccessPermission.index("confirmed", dc.getUri(), "")" class="btn btn-success" role="button">Confirm</a>
-        </div>
-       }
+           <div id="question-box">
+              <br>
+              Are your sure you want to change the access permission for this data collection and its data points? 
+              <input class="btn btn-success" role="button" type="submit" value="Confirm New Permission" />
+           </div>
+       </form>
 
-       <p  style='font-family: "Lucida Console", Monaco, monospace;' id='msgarea'></p>
-         
-       <div id="end-process-box" style="display:none;">
-          <a href="@org.hadatac.console.controllers.datacollections.routes.DataCollectionManagement.index(State.ACTIVE)" class="btn btn-warning" role="button">Back to Data Collection Management</a>
-	   </div>
-
-	   @if(oper=="confirmed") {
-         <script> 
-            var msg = "@SetAccessPermission.newPermission(dc.getUri(), "")";
-            $('#msgarea').html(msg.replace(/&lt;br&gt;/g, '<br>'));
-            document.getElementById('end-process-box').style.display = 'inline';
-         </script>
-	   }
-
-       @if(oper=="init") {
-         <br>
-     	 <a href="@org.hadatac.console.controllers.datacollections.routes.DataCollectionManagement.index(State.ACTIVE)" class="btn btn-warning" role="button">Back to Data Collection Management</a>
-       }
+       <br>
+       <a href="@org.hadatac.console.controllers.datacollections.routes.DataCollectionManagement.index(State.ACTIVE)" class="btn btn-warning" role="button">Back to Data Collection Management</a>
 
     </div>
 

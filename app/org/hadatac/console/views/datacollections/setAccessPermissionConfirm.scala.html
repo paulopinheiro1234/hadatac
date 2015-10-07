@@ -1,0 +1,33 @@
+@(dc : org.hadatac.entity.pojo.DataCollection)
+
+@import helper._
+@import org.hadatac.utils._
+@import org.hadatac.console.views.html._
+@import org.hadatac.console.controllers._
+@import org.hadatac.console.controllers.datacollections._
+
+@main("Change Data Access Permission") {
+
+    <h2>Change Data Access Permission</h2>
+    
+    <h3>Listing below shows new permission</h3>
+
+    <div class="container-fluid">
+       <ul>
+           <li><b>URI:</b> @dc.getUri()</li>
+           <li><b>Status:</b> @dc.getStatus()</li>
+           <li><b>Triggering Event:</b> </li>
+           <li><b>Platform:</b> @dc.getPlatformName()</li>
+           <li><b>Instrument:</b> @dc.getInstrumentModel()</li>
+           <li><b>Start Date/Time:</b> @dc.getStartedAt()</li>
+           <li><b>End Date/Time:</b> @dc.getEndedAt()</li>
+           <li><b># of Data Points:</b> </li>
+           <li><b>Current Permission:</b> <b><font color="blue">@dc.getPermissionUri()</font></b></li>
+       </ul>
+
+       <br>
+       <a href="@org.hadatac.console.controllers.datacollections.routes.DataCollectionManagement.index(State.ACTIVE)" class="btn btn-warning" role="button">Back to Data Collection Management</a>
+
+    </div>
+
+}
