@@ -17,6 +17,8 @@ import org.hadatac.console.views.html.deployments.*;
 import org.hadatac.data.api.DataFactory;
 import org.hadatac.entity.pojo.DataCollection;
 import org.hadatac.entity.pojo.Deployment;
+import org.hadatac.entity.pojo.Detector;
+import org.hadatac.entity.pojo.Instrument;
 import org.hadatac.entity.pojo.Platform;
 import org.hadatac.entity.pojo.TriggeringEvent;
 import org.hadatac.console.models.DeploymentForm;
@@ -47,9 +49,8 @@ public class NewDeployment extends Controller {
     public static Result index(String type) {
     	return ok(newDeployment.render(Form.form(DeploymentForm.class), 
     			  Platform.find(),
-    			  //getQueryResults("Platforms"),
-    			  getQueryResults("Instruments"),
-    			  getQueryResults("Detectors"),
+    			  Instrument.findAvailable(),
+    			  Detector.find(),
     			  type));
         
     }// /index()
@@ -58,10 +59,9 @@ public class NewDeployment extends Controller {
     // for /metadata HTTP POST requests
     public static Result postIndex(String type) {
     	return ok(newDeployment.render(Form.form(DeploymentForm.class), 
-  			  //getQueryResults("Platforms"),
               Platform.find(),
-    		  getQueryResults("Instruments"),
-  			  getQueryResults("Detectors"),
+    		  Instrument.findAvailable(),
+			  Detector.find(),
   			  type));
         
     }// /postIndex()
@@ -105,9 +105,8 @@ public class NewDeployment extends Controller {
         	System.out.println("HAS ERRORS");
             return badRequest(newDeployment.render(form,
             		  Platform.find(),
-			          //getQueryResults("Platforms"),
-			          getQueryResults("Instruments"),
-			          getQueryResults("Detectors"),
+			          Instrument.find(),
+	    			  Detector.find(),
 			          data.getType()));        
         } else {
             return ok(deploymentConfirm.render("New Deployment", data));
