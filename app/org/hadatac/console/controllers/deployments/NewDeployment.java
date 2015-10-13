@@ -50,7 +50,7 @@ public class NewDeployment extends Controller {
     	return ok(newDeployment.render(Form.form(DeploymentForm.class), 
     			  Platform.find(),
     			  Instrument.findAvailable(),
-    			  Detector.find(),
+    			  Detector.findAvailable(),
     			  type));
         
     }// /index()
@@ -61,7 +61,7 @@ public class NewDeployment extends Controller {
     	return ok(newDeployment.render(Form.form(DeploymentForm.class), 
               Platform.find(),
     		  Instrument.findAvailable(),
-			  Detector.find(),
+			  Detector.findAvailable(),
   			  type));
         
     }// /postIndex()
@@ -92,14 +92,20 @@ public class NewDeployment extends Controller {
         String insert = "";
         String deploymentUri = DataFactory.getNextURI(DataFactory.DEPLOYMENT_ABBREV);
         String dataCollectionUri = DataFactory.getNextURI(DataFactory.DATA_COLLECTION_ABBREV);
-        String[] detectorUri = new String[1];
-        detectorUri[0] = data.getDetector();
         if (data.getType().equalsIgnoreCase("LEGACY")) {
         	triggeringEvent = TriggeringEvent.LEGACY_DEPLOYMENT;
         } else {
         	triggeringEvent = TriggeringEvent.INITIAL_DEPLOYMENT;
         }
-        Deployment deployment = DataFactory.createDeployment(deploymentUri, data.getPlatform(), data.getInstrument(), detectorUri, dateString, data.getType());
+        
+        System.out.println("new deployment: size of detector's array : " + data.getDetector().size());
+        if (data.getDetector().size() > 0) {
+        	for (String detector : data.getDetector()) {
+        		System.out.println("   -- det uri: " + detector);
+        	}
+        }
+        
+        Deployment deployment = DataFactory.createDeployment(deploymentUri, data.getPlatform(), data.getInstrument(), data.getDetector(), dateString, data.getType());
         DataCollection dataCollection = DataFactory.createDataCollection(dataCollectionUri, deploymentUri, triggeringEvent, UserManagement.getUriByEmail(user.email));
         if (form.hasErrors()) {
         	System.out.println("HAS ERRORS");
