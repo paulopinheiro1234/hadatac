@@ -25,10 +25,12 @@
 
             <h2>Sensing Info</h2>
             <ul>
-                 <li>Detector: @deployment.detectors.get(0).getLabel()</li>
+                 @for(detector <- deployment.detectors) {
+                    <li>Detector: @detector.getLabel()</li>
                     <ul>
                        <li>Characteristic: </li>
                     </ul>   
+                 }
             </ul>
 
 

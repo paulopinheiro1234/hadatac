@@ -1,16 +1,22 @@
 package org.hadatac.console.models;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class DeploymentForm {
 
     public String platform;
     public String hasFirstCoordinate;
     public String hasSecondCoordinate;
     public String instrument;
-    public String detector;
+    public List<String> detector;
     public String startDateTime;
     public String endDateTime;
     public String type;
  
+    public DeploymentForm () {
+    	detector = new ArrayList<String>();
+    }
     public String getType() {
 		return type;
 	}
@@ -51,12 +57,16 @@ public class DeploymentForm {
     	this.instrument = instrument;
     }
 
-    public String getDetector() {
+    public List<String> getDetector() {
     	return detector;
     }
     
-    public void setDetector(String detector) {
+    public void setDetector(List<String> detector) {
     	this.detector = detector;
+    }
+
+    public void addDetector(String detector) {
+    	this.detector.add(detector);
     }
 
     public String getStartDateTime() {

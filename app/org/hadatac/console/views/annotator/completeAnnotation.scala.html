@@ -5,10 +5,18 @@
 
 @main("CSV Annotator") {
 
-    <h2>CSV Annotator</h2>
+    <h2>Create CCSV from CSV</h2>
     
-    <h3>@message</h3>
-
-    Press OK button to return to HADataC's main page <a href="@org.hadatac.console.controllers.routes.Portal.index()" class="btn btn-warning" role="button">Ok</a>
+    <p style='font-family: "Lucida Console", Monaco, monospace;' id='msgarea'></p>
+  
+    <a href="@org.hadatac.console.controllers.annotator.routes.Annotator.selectDeployment()" class="btn btn-warning" role="button">Back to Creat CCSV from CSV</a>
    
+    <script> 
+       $(document).ready(function() {       
+           var msg = "@message";
+           var msg2 = decodeURIComponent(msg).replace(/&amp;/g,'&').replace(/&lt;/g, '<').replace(/&gt;/g, '>');
+           $('#msgarea').html(msg2);
+        });
+    </script> 
+
 }

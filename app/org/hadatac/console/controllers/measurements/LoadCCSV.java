@@ -31,7 +31,7 @@ public class LoadCCSV extends Controller {
 
 	static FileFactory files;
 
-	private static final String UPLOAD_NAME = "uploads/latest.ccsv";
+	public static final String UPLOAD_NAME = "uploads/latest.ccsv";
 	
     public static Result loadCCSV(String oper) {
 	return ok(loadCCSV.render(oper, ""));

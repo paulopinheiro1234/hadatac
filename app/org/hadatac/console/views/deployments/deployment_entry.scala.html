@@ -5,7 +5,8 @@
 
 <tr>
    <td>@if(deployment.platform != null && deployment.platform.getLabel() != null) { @deployment.platform.getLabel() }</td> 
-   <td>@if(deployment.instrument != null && deployment.instrument.getLabel() != null) { @deployment.instrument.getLabel() }</td>
+   <td>@if(deployment.instrument != null && deployment.instrument.getLabel() != null) { @deployment.instrument.getLabel() @if(deployment.instrument.getSerialNumber() != null) { (SN: @deployment.instrument.getSerialNumber()) }}
+   </td>
    <td>@if(deployment.getStartedAt() != null) { @deployment.getStartedAt() }</td>
    @if(oper.getCurrent() != State.ACTIVE) {
        <td>@if(deployment.getEndedAt() != null) { @deployment.getEndedAt() }</td>
@@ -13,7 +14,7 @@
    <td>
        <a href="@org.hadatac.console.controllers.deployments.routes.ViewDeployment.index(URLEncoder.encode(deployment.getUri(),"UTF-8"))" class="btn-xs btn-primary" role="button">View</a>
        @if(oper.getCurrent() == State.ACTIVE) {
-           <a href="@org.hadatac.console.controllers.deployments.routes.CloseDeployment.index(URLEncoder.encode(deployment.getUri(),"UTF-8"))" class="btn-xs btn-primary" role="button">Close</a>
+           <a href="@org.hadatac.console.controllers.deployments.routes.CloseDeployment.index(URLEncoder.encode(deployment.getUri(),"UTF-8"))" class="btn-xs btn-primary" role="button">Undeploy</a>
        }
        <a href="@org.hadatac.console.controllers.deployments.routes.DeleteDeployment.index(URLEncoder.encode(deployment.getUri(),"UTF-8"))" class="btn-xs btn-primary" role="button">Delete</a>
    </td>

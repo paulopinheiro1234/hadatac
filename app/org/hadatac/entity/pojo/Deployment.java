@@ -434,7 +434,6 @@ public class Deployment {
 		while (resultsrw.hasNext()) {
 			QuerySolution soln = resultsrw.next();
 			if (soln != null && soln.getResource("uri").getURI()!= null) { 
-				//dep = Deployment.find(soln.getLiteral("uri").getString()); 
 				dep = Deployment.find(soln.getResource("uri").getURI()); 
 			}
 			deployments.add(dep);

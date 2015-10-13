@@ -1,7 +1,7 @@
 @(deployForm: Form[org.hadatac.console.models.DeploymentForm], 
-  thePlatforms : org.hadatac.console.models.SparqlQueryResults,
-  theInstruments : org.hadatac.console.models.SparqlQueryResults,
-  theDetectors : org.hadatac.console.models.SparqlQueryResults,
+  thePlatforms   : List[org.hadatac.entity.pojo.Platform],
+  theInstruments : List[org.hadatac.entity.pojo.Instrument],
+  theDetectors   : List[org.hadatac.entity.pojo.Detector],
   deploymentType : String)
 
 @import helper._
@@ -57,12 +57,9 @@
          <label>Platform</label> 
          <select  class="form-control col-sm-6" id="platform" name="platform" onchange="checkform()" >
             <option value=""></option>         
-            @for((k, triple) <- thePlatforms.sparqlResults){
-               @defining(triple.generateID()) {itemID =>
-                   @defining(triple.get("modelName").replaceAll("[\\W]|_", "")) {cleanName =>
-                       <option value="@triple.get("platURI")">@triple.get("modelName") (@triple.get("sn"))</option>         
-                }
-              }
+
+            @for(platform <- thePlatforms) {
+                <option value="@platform.getUri()">@platform.getLabel() @if(platform.getSerialNumber() != null) { (SN: @platform.getSerialNumber()) }</option>
             }
          </select>
 
@@ -71,24 +68,16 @@
          <label>Instrument</label>
          <select class="form-control col-sm-6" id="instrument" name="instrument" onchange="checkform()" >
             <option value=""></option>         
-            @for((k, triple) <- theInstruments.sparqlResults){
-               @defining(triple.generateID()) {itemID =>
-                   @defining(triple.get("modelName").replaceAll("[\\W]|_", "")) {cleanName =>
-                       <option value="@triple.get("instURI")">@triple.get("modelName") (@triple.get("sn"))</option>         
-                }
-              }
+            @for(instrument <- theInstruments){
+                <option value="@instrument.getUri()">@instrument.getLabel()  @if(instrument.getSerialNumber() != null) { (SN: @instrument.getSerialNumber()) }</option>         
             }
          </select>
      </div>
 	 <div class="form-group">
          <label>Detector(s)</label>
-         <select class="form-control col-sm-6" id="detector" multiple="multiple" name="detector" onchange="checkform()" disabled='disabled' >
-            @for((k, triple) <- theDetectors.sparqlResults){
-               @defining(triple.generateID()) {itemID =>
-                   @defining(triple.get("modelName").replaceAll("[\\W]|_", "")) {cleanName =>
-                       <option value="@triple.get("detURI")">@triple.get("modelName") (@triple.get("sn"))</option>         
-                }
-              }
+         <select class="form-control col-sm-6" id="detector" multiple="multiple" name="detector[]" onchange="checkform()" disabled='disabled' >
+            @for((detector) <- theDetectors){
+                <option value="@detector.getUri()">@detector.getLabel()  @if(detector.getSerialNumber() != null) { (SN: @detector.getSerialNumber()) }</option>         
             }
          </select>
      </div>

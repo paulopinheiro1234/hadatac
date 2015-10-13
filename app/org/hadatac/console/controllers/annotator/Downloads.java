@@ -4,7 +4,9 @@ import java.io.File;
 import java.io.IOException;
 import java.io.StringReader;
 import java.net.URLDecoder;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.Properties;
 
 import play.Play;
@@ -13,9 +15,15 @@ import play.mvc.Http.*;
 import play.mvc.Result;
 
 import org.apache.commons.io.FileUtils;
+import org.hadatac.console.controllers.measurements.LoadCCSV;
 import org.hadatac.console.models.CSVAnnotationHandler;
 import org.hadatac.console.views.html.annotator.*;
 import org.hadatac.data.api.DataFactory;
+import org.hadatac.data.loader.ccsv.Parser;
+import org.hadatac.data.loader.util.Arguments;
+import org.hadatac.data.loader.util.FileFactory;
+import org.hadatac.data.model.DatasetParsingResult;
+import org.hadatac.utils.Feedback;
 import org.hadatac.utils.NameSpaces;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -185,7 +193,6 @@ public class Downloads extends Controller {
 		    try {
 				preamble += FileUtils.readFileToString(newFile, "UTF-8");
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 				return ok (completeAnnotation.render("Error reading cached CSV file. Please restart form."));
 			}
@@ -193,7 +200,26 @@ public class Downloads extends Controller {
     	}
     	
     	if (oper.equals(OPER_UPLOAD)) {
-    		
+    		String message = "";
+    		File newFile = new File(handler.getDatasetName()); 
+		    try {
+				preamble += FileUtils.readFileToString(newFile, "UTF-8");
+			} catch (IOException e) {
+				e.printStackTrace();
+				return ok (completeAnnotation.render("Error reading cached CSV file. Please restart form."));
+			}
+
+		    try {
+				FileUtils.writeStringToFile(new File(LoadCCSV.UPLOAD_NAME), preamble);
+			} catch (IOException e) {
+				e.printStackTrace();
+				return ok (completeAnnotation.render("Error aving CCSV file locally. Please restart form."));
+			}
+		    
+		    message = LoadCCSV.playLoadCCSV();
+		    
+			return ok (completeAnnotation.render(message));
+		    
     	}
     	
 		return ok (completeAnnotation.render("Error processing form: unspecified download operation."));

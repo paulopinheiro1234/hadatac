@@ -1,5 +1,8 @@
 package org.hadatac.entity.pojo;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.apache.jena.query.Query;
 import org.apache.jena.query.QueryExecution;
 import org.apache.jena.query.QueryExecutionFactory;
@@ -13,11 +16,12 @@ import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Statement;
 import org.apache.jena.rdf.model.StmtIterator;
 import org.hadatac.data.loader.util.Sparql;
+import org.hadatac.utils.Collections;
 import org.hadatac.utils.NameSpaces;
 
 import play.Play;
 
-public class Platform {
+public class Platform implements Comparable<Platform> {
 	private String uri;
 	private String localName;
 	private String label;
@@ -25,6 +29,7 @@ public class Platform {
 	private String firstCoordinate;
 	private String secondCoordinate;
 	private String elevation;
+	private String serialNumber;
 	
 	public String getLocation() {
 		return location;
@@ -69,6 +74,13 @@ public class Platform {
 		this.secondCoordinate = secondCoordinate;
 	}
 	
+	public String getSerialNumber() {
+		return serialNumber;
+	}
+	public void setSerialNumber(String serialNumber) {
+		this.serialNumber = serialNumber;
+	}
+	
 	public static Platform find(String uri) {
 		Platform platform = null;
 		Model model;
@@ -89,12 +101,43 @@ public class Platform {
 			object = statement.getObject();
 			if (statement.getPredicate().getURI().equals("http://www.w3.org/2000/01/rdf-schema#label")) {
 				platform.setLabel(object.asLiteral().getString());
+			} else if (statement.getPredicate().getURI().equals("http://hadatac.org/ont/vstoi#hasSerialNumber")) {
+				platform.setSerialNumber(object.asLiteral().getString());
 			}
 		}
 		
 		platform.setUri(uri);
 		
 		return platform;
+	}
+	
+	public static List<Platform> find() {
+		System.out.println("Inside Lits<Pltaform>");
+		List<Platform> platforms = new ArrayList<Platform>();
+		String queryString = NameSpaces.getInstance().printSparqlNameSpaceList() +
+			" SELECT ?uri WHERE { " +
+            " ?platModel rdfs:subClassOf+ vstoi:Platform . " + 
+		    " ?uri a ?platModel ." + 
+			"} ";
+			
+		System.out.println("Query: " + queryString);
+		Query query = QueryFactory.create(queryString);
+			
+		QueryExecution qexec = QueryExecutionFactory.sparqlService(Collections.getCollectionsName(Collections.METADATA_SPARQL), query);
+		ResultSet results = qexec.execSelect();
+		ResultSetRewindable resultsrw = ResultSetFactory.copyResults(results);
+		qexec.close();
+			
+		while (resultsrw.hasNext()) {
+			QuerySolution soln = resultsrw.next();
+			System.out.println("URI from main query: " + soln.getResource("uri").getURI());
+			Platform platform = find(soln.getResource("uri").getURI());
+			platforms.add(platform);
+		}			
+
+		java.util.Collections.sort((List<Platform>) platforms);
+		return platforms;
+		
 	}
 	
 	public static Platform find(HADataC hadatac) {
@@ -135,4 +178,10 @@ public class Platform {
 		
 		return platform;
 	}
+
+	@Override
+    public int compareTo(Platform another) {
+        return this.getLabel().compareTo(another.getLabel());
+    }
+	
 }

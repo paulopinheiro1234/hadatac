@@ -1,39 +1,25 @@
 package org.hadatac.console.controllers.deployments;
 
-import org.apache.jena.update.UpdateExecutionFactory;
-import org.apache.jena.update.UpdateFactory;
-import org.apache.jena.update.UpdateProcessor;
-import org.apache.jena.update.UpdateRequest;
-import org.apache.solr.client.solrj.SolrClient;
-import org.apache.solr.client.solrj.SolrQuery;
-import org.apache.solr.client.solrj.SolrServerException;
-import org.apache.solr.client.solrj.impl.HttpSolrClient;
-import org.apache.solr.client.solrj.response.QueryResponse;
-import org.apache.solr.common.SolrDocument;
-import org.apache.solr.common.SolrDocumentList;
 import org.hadatac.console.http.GetSparqlQuery;
 
 import java.io.IOException;
-import java.net.URLEncoder;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.time.LocalDate;
-import java.time.chrono.ChronoLocalDate;
-import java.time.format.DateTimeFormatter;
 import java.util.Date;
-import java.util.Iterator;
 
 import play.Play;
 import play.mvc.Controller;
 import play.mvc.Result;
 import play.data.*;
 
-import org.hadatac.console.views.html.*;
 import org.hadatac.console.views.html.deployments.*;
 import org.hadatac.data.api.DataFactory;
 import org.hadatac.entity.pojo.DataCollection;
 import org.hadatac.entity.pojo.Deployment;
+import org.hadatac.entity.pojo.Detector;
+import org.hadatac.entity.pojo.Instrument;
+import org.hadatac.entity.pojo.Platform;
 import org.hadatac.entity.pojo.TriggeringEvent;
 import org.hadatac.console.models.DeploymentForm;
 import org.hadatac.console.models.SparqlQuery;
@@ -41,7 +27,6 @@ import org.hadatac.console.models.SparqlQueryResults;
 import org.hadatac.console.models.User;
 import org.hadatac.console.controllers.AuthApplication;
 import org.hadatac.console.controllers.triplestore.UserManagement;
-import org.hadatac.console.http.GenericSparqlQuery;
 
 public class NewDeployment extends Controller {
 	
@@ -63,9 +48,9 @@ public class NewDeployment extends Controller {
     // for /metadata HTTP GET requests
     public static Result index(String type) {
     	return ok(newDeployment.render(Form.form(DeploymentForm.class), 
-    			  getQueryResults("Platforms"),
-    			  getQueryResults("Instruments"),
-    			  getQueryResults("Detectors"),
+    			  Platform.find(),
+    			  Instrument.findAvailable(),
+    			  Detector.findAvailable(),
     			  type));
         
     }// /index()
@@ -74,9 +59,9 @@ public class NewDeployment extends Controller {
     // for /metadata HTTP POST requests
     public static Result postIndex(String type) {
     	return ok(newDeployment.render(Form.form(DeploymentForm.class), 
-  			  getQueryResults("Platforms"),
-  			  getQueryResults("Instruments"),
-  			  getQueryResults("Detectors"),
+              Platform.find(),
+    		  Instrument.findAvailable(),
+			  Detector.findAvailable(),
   			  type));
         
     }// /postIndex()
@@ -107,21 +92,27 @@ public class NewDeployment extends Controller {
         String insert = "";
         String deploymentUri = DataFactory.getNextURI(DataFactory.DEPLOYMENT_ABBREV);
         String dataCollectionUri = DataFactory.getNextURI(DataFactory.DATA_COLLECTION_ABBREV);
-        String[] detectorUri = new String[1];
-        detectorUri[0] = data.getDetector();
         if (data.getType().equalsIgnoreCase("LEGACY")) {
         	triggeringEvent = TriggeringEvent.LEGACY_DEPLOYMENT;
         } else {
         	triggeringEvent = TriggeringEvent.INITIAL_DEPLOYMENT;
         }
-        Deployment deployment = DataFactory.createDeployment(deploymentUri, data.getPlatform(), data.getInstrument(), detectorUri, dateString, data.getType());
+        
+        System.out.println("new deployment: size of detector's array : " + data.getDetector().size());
+        if (data.getDetector().size() > 0) {
+        	for (String detector : data.getDetector()) {
+        		System.out.println("   -- det uri: " + detector);
+        	}
+        }
+        
+        Deployment deployment = DataFactory.createDeployment(deploymentUri, data.getPlatform(), data.getInstrument(), data.getDetector(), dateString, data.getType());
         DataCollection dataCollection = DataFactory.createDataCollection(dataCollectionUri, deploymentUri, triggeringEvent, UserManagement.getUriByEmail(user.email));
         if (form.hasErrors()) {
         	System.out.println("HAS ERRORS");
             return badRequest(newDeployment.render(form,
-			          getQueryResults("Platforms"),
-			          getQueryResults("Instruments"),
-			          getQueryResults("Detectors"),
+            		  Platform.find(),
+			          Instrument.find(),
+	    			  Detector.find(),
 			          data.getType()));        
         } else {
             return ok(deploymentConfirm.render("New Deployment", data));
