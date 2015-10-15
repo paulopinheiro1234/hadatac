@@ -1,4 +1,5 @@
-@(deployment : org.hadatac.entity.pojo.Deployment)
+@(deployment      : org.hadatac.entity.pojo.Deployment,
+  dataCollections : List[org.hadatac.entity.pojo.DataCollection])
 
 @import org.hadatac.console.views.html._
 @import org.hadatac.utils._
@@ -8,7 +9,6 @@
     <link rel="stylesheet" href="http://openlayers.org/en/v3.9.0/css/ol.css">
     <script type="text/javascript" charset="utf-8" src="http://www.openlayers.org/api/OpenLayers.js"></script>
     <script type="text/javascript" charset="utf-8" src="@controllers.routes.Assets.versioned("javascripts/openLayersFunctions.js")"></script>
-
 
     <div class="row">
         <div class="col-md-6">
@@ -24,30 +24,57 @@
                 </ul>
 
             <h2>Sensing Info</h2>
-            <ul>
-                 @for(detector <- deployment.detectors) {
-                    <li>Detector: @detector.getLabel()</li>
-                    <ul>
-                       <li>Characteristic: </li>
-                    </ul>   
-                 }
-            </ul>
-
-
-            <h2>Data Collections</h2>
-            
-            <p class="buttons">
-                <a href="@org.hadatac.console.controllers.deployments.routes.DeploymentManagement.index(State.ACTIVE)">Back to Deployment Management</a>
-            </p>
+                <ul>
+                   @for(detector <- deployment.detectors) {
+                      <li>Detector: @detector.getLabel()</li>
+                      <ul>
+                         <li>Characteristic: </li>
+                      </ul>   
+                   }
+                </ul>
         </div>
 
         <div class="col-md-6">
             <div class="row text-center">
                 <div style="width:95%; height:500px" id="map"></div>
-                @if(deployment.platform.getFirstCoordinate() != null && deployment.platform.getSecondCoordinate() != null){
+                @if(deployment.platform.getFirstCoordinate() != null && deployment.platform.getSecondCoordinate() != null) {
                     <script type="text/javascript">locations=["@deployment.platform.getFirstCoordinate()","@deployment.platform.getSecondCoordinate()"];createMap(locations);</script>
                 }
             </div>
         </div>
+
     </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <h2>Employment's Data Collections</h2>
+               <div class="container-fluid">
+                 <table class="table">
+                    <thead>
+                      <tr>
+                        <th>Triggering Event</th>
+                        <th>Platform</th>
+                        <th>Instrument</th>
+                        <th>Start Date/Time</th>
+                        <th>End Date/Time</th>
+                        <th># of Data Points</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                       @for(dc <- dataCollections){
+                          <tr>
+                             <td>@dc.getTriggeringEventName()</td> 
+                             <td>@dc.getPlatformName()</td> 
+                             <td>@dc.getInstrumentModel()</td>
+                             <td>@dc.getStartedAt()</td>
+                             <td>@dc.getEndedAt()</td>
+                          </tr>
+                       }
+                    </tbody>
+                 </table>
+               </div>
+        </div>
+    </div>
+
+   @deploymentButton(true)
 }

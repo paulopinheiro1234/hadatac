@@ -10,12 +10,18 @@
 
 @main("Instrument/Detector Availability") {
 
-    <h2>Resource Availability</h2>
-       
-    <h3>Instruments</h3>
-       
-    <div class="container-fluid">
+  <div class="row">
+  <div class="col-md-offset-1">
 
+  <h2>Resource Availability</h2>
+
+  <ul class="nav nav-tabs">     
+      <li><a data-toggle="tab" href="#instrument">Instruments</a></li>
+      <li><a data-toggle="tab" href="#detector">Detectors</a></li>
+  </ul>
+
+  <div class="tab-content">
+    <div id="instrument" class="tab-pane fade in active">
       <div class="row">
          <div class="col-md-6">
          <table class="table">
@@ -34,7 +40,6 @@
             </tbody>
         </table>
         </div>
-
         <div class="col-md-6">
         <table class="table">
             <thead>
@@ -55,9 +60,7 @@
       </div>  
     </div>
  
-    <h3>Detectors</h3>
-       
-    <div class="container-fluid">
+    <div id="detector" class="tab-pane fade">
          <div class="col-md-6">
          <table class="table">
             <thead>
@@ -75,7 +78,6 @@
             </tbody>
         </table>
         </div>
-
         <div class="col-md-6">
         <table class="table">
             <thead>
@@ -95,9 +97,11 @@
         </div>
       </div>  
     </div>
+  </div>
  
-    <div class="container-fluid">
-       <a href="@org.hadatac.console.controllers.deployments.routes.DeploymentManagement.index(State.ACTIVE)" class="btn btn-warning" role="button">Back to Deployment Management</a>
-    </div>
+  </div>
+  </div>
+
+  @deploymentButton(true)
 
 }
