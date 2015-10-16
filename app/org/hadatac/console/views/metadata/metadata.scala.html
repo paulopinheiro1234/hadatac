@@ -2,6 +2,10 @@
 
 @import helper._
 @import org.hadatac.console.views.html._
+@import org.hadatac.console.views.html.metadata.concepts._
+@import org.hadatac.console.views.html.metadata.activities._
+@import org.hadatac.console.views.html.metadata.empirical._
+@import org.hadatac.console.views.html.metadata.computational._
 
 @main("Browse Metadata") {
     <div class="container-fluid">
@@ -9,25 +13,25 @@
      <h2>Browse Metadata</h2>
      
       <div class="row">
-		  @science_navigation("", false)
+		  @science_navigation("")
       </div>
 
       <hr>
       
       <div class="row">
-		  @empirical_activity_navigation("", false)
+		  @empirical_activity_navigation("")
       </div>
 
       <hr>
       
       <div class="row">
-		  @empirical_navigation("", false)
+		  @empirical_navigation("")
       </div>
 
       <hr>
       
       <div class="row">
-		  @computational_navigation("", false)
+		  @computational_navigation("")
       </div>
 
     </div>

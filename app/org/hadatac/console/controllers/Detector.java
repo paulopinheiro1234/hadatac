@@ -9,7 +9,7 @@ import org.hadatac.console.models.SparqlQuery;
 import org.hadatac.console.models.SparqlQueryResults;
 import play.mvc.Controller;
 import play.mvc.Result;
-import org.hadatac.console.views.html.detector_browser;
+import org.hadatac.console.views.html.metadata.empirical.detector_browser;
 import org.hadatac.console.views.html.error_page;
 
 

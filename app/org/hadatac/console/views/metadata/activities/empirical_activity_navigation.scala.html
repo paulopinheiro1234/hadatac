@@ -1,0 +1,25 @@
+ @(selection : String)
+ 
+   <div class="navbar-collapse collapse navbar-secondary hidden-print">
+       <div class="col-md-1">
+       	   <button type="button" class="btn btn-link"><b>Empirical<br>Activities</b></button>
+       </div>
+ 	   @if(selection == "Samples") {
+             <div class="col-md-1">
+       		     <a href="" class="btn-xs btn-block btn-warning disabled" role="button">Samples<br>List<br>&nbsp;</a>
+       	     </div>
+       } else {
+             <div class="col-md-1">
+       		     <a href="" class="btn-xs btn-block btn-primary disabled" role="button">Samples<br>List<br>&nbsp;</a>
+       	     </div>
+       }
+	   @if(selection == "Calibrations") {
+             <div class="col-md-1">
+       		     <a href="" class="btn-xs btn-block btn-warning disabled" role="button">Calibrations<br>List<br>&nbsp;</a>
+       	     </div>
+       } else {
+             <div class="col-md-1">
+       		     <a href="" class="btn-xs btn-block btn-primary disabled" role="button">Calibrations<br>List<br>&nbsp;</a>
+       	     </div>
+       }
+    </div>

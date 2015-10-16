@@ -1,13 +1,9 @@
- @(selection : String, showLabel : Boolean)
+ @(selection : String)
  
    <div class="navbar-collapse collapse navbar-secondary hidden-print">
-       @if(showLabel) {
-           <B>Options</B>:
-       } else {
-             <div class="col-md-1">
-       	         <button type="button" class="btn btn-link"><b>Scientific<br>Concepts</b></button>
-       	     </div>
-       } 
+       <div class="col-md-1">
+       	   <button type="button" class="btn btn-link"><b>Scientific<br>Concepts</b></button>
+       </div>
 	   @if(selection == "Entities") {
              <div class="col-md-1">
        		     <a href="@org.hadatac.console.controllers.routes.Entity.index()" class="btn-xs btn-block btn-warning" role="button">Entity<br>Hierarchy<br>&nbsp;</a>

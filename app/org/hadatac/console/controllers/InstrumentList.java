@@ -13,7 +13,7 @@ import play.data.DynamicForm;
 import play.data.Form;
 import play.mvc.Controller;
 import play.mvc.Result;
-import org.hadatac.console.views.html.hierarchy_browser;
+import org.hadatac.console.views.html.metadata.hierarchy_browser;
 import org.hadatac.console.views.html.error_page;
 
 

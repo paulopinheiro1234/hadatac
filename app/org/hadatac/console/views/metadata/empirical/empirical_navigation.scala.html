@@ -1,13 +1,9 @@
- @(selection : String, showLabel : Boolean)
+ @(selection : String)
  
    <div class="navbar-collapse collapse navbar-secondary hidden-print">
-       @if(showLabel) {
-           <B>Options</B>: 
-       } else {
-             <div class="col-md-1">
-       	          <button type="button" class="btn btn-block btn-link"><b>Empirical<br>Infrastructure</b></button>
-       	     </div>
-       }
+        <div class="col-md-1">
+       	    <button type="button" class="btn btn-block btn-link"><b>Empirical<br>Infrastructure</b></button>
+       	</div>
 	   @if(selection == "PlatformModels") {
              <div class="col-md-1">
           	     <a href="@org.hadatac.console.controllers.routes.Platform.index()" class="btn-xs btn-block btn-warning" role="button">Platform<br>Model<br>Hierarchy</a>

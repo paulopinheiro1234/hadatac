@@ -3,7 +3,7 @@ package org.hadatac.console.controllers;
 import org.hadatac.console.models.ForceFieldQuery;
 import play.mvc.Controller;
 import play.mvc.Result;
-import org.hadatac.console.views.html.agent_browser;
+import org.hadatac.console.views.html.metadata.concepts.agent_browser;
 
 
 public class Agent extends Controller {

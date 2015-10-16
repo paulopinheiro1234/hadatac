@@ -3,13 +3,11 @@ package org.hadatac.console.controllers;
 import org.hadatac.console.http.GetSparqlQuery;
 
 import java.io.IOException;
-import java.util.TreeMap;
-
 import org.hadatac.console.models.SparqlQuery;
 import org.hadatac.console.models.SparqlQueryResults;
 import play.mvc.Controller;
 import play.mvc.Result;
-import org.hadatac.console.views.html.hierarchy_browser;
+import org.hadatac.console.views.html.metadata.hierarchy_browser;
 import org.hadatac.console.views.html.error_page;
 
 
