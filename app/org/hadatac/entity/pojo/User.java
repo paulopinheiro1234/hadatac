@@ -2,8 +2,10 @@ package org.hadatac.entity.pojo;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.apache.jena.query.Query;
 import org.apache.jena.query.QueryExecution;
@@ -88,6 +90,19 @@ public class User implements Comparable<User> {
 
 	public void setAdministrator(boolean administrator) {
 		this.administrator = administrator;
+	}
+	
+	public String getGroupNamesUri() {
+		String list = "";
+		Map<String, String> map = getGroupNames();
+		Iterator<String> i = map.keySet().iterator();
+		while (i.hasNext()) {
+			list += i.next();
+			if (i.hasNext()) {
+				list += ",";
+			}
+		}
+		return list;
 	}
 	
 	public Map<String, String> getGroupNames() {

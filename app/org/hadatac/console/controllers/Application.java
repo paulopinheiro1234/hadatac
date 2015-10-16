@@ -1,16 +1,13 @@
 package org.hadatac.console.controllers;
 
-import org.hadatac.console.http.GetSolrQuery;
 import org.hadatac.console.http.JsonHandler;
 
-import java.io.IOException;
-import java.net.URISyntaxException;
-import java.net.URLDecoder;
-import java.util.TreeMap;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.StringTokenizer;
 
 import org.hadatac.console.models.FacetHandler;
 import org.hadatac.console.models.FacetsWithCategories;
-import org.hadatac.console.models.SpatialQuery;
 import org.hadatac.console.models.SpatialQueryResults;
 
 //import models.SpatialQuery;
@@ -21,11 +18,11 @@ import play.mvc.Controller;
 import play.mvc.Result;
 
 import org.hadatac.console.views.formdata.FacetFormData;
-import org.hadatac.console.views.html.index_browser;
+import org.hadatac.console.views.html.dataacquisition_browser;
+import org.hadatac.data.model.AcquisitionQueryResult;
+import org.hadatac.entity.pojo.Measurement;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-
-import org.hadatac.console.views.html.hadatac_message;
 
 public class Application extends Controller {
 
@@ -68,8 +65,36 @@ public class Application extends Controller {
     	    	
     	return redirect("/");
     }
+    
+    public static List<String> getPermissions(String permissions) {
+    	List<String> result = new ArrayList<String>();
+    	
+    	if (permissions != null) {
+	    	StringTokenizer tokens = new StringTokenizer(permissions, ",");
+	    	while (tokens.hasMoreTokens()) {
+	    		result.add(tokens.nextToken());
+	    	}
+    	}
+    	
+    	return result;
+    }
 
-    public static Result index(int p, String facets, String facetAdd, String facetDel) {
+    public static Result index(int page, int rows, String facets) {
+    	ObjectMapper mapper = new ObjectMapper();
+    	
+    	List<String> permissions = getPermissions(session().get("user_hyerarchy"));
+    	AcquisitionQueryResult results = Measurement.find(page, rows, permissions, null);
+    	
+    	FacetHandler handler = null;
+    	try {
+    		handler = mapper.readValue(facets, FacetHandler.class);
+    	} catch (Exception e) {
+    		handler = new FacetHandler();
+    		System.out.println("mapper.readValue: " + e.getMessage());
+    	}
+    	
+    	return ok(dataacquisition_browser.render(results, results.toJSON(), handler.toJSON()));
+    	/*
     	System.out.println("!!! index PARAMS - facets: |" + facets + "| facet: |" + facetAdd + "|");
     	try {
     		if (!facets.isEmpty()) {
@@ -106,7 +131,8 @@ public class Application extends Controller {
     	for (String collection : query_submit.list_of_queries.keySet()){
     		final_query = query_submit.list_of_queries.get(collection).toString();
             try {
-    			query_json = query_submit.executeQuery(collection, p, 20);
+            	String hyerarchy = session().get("user_hyerarchy");
+            	query_json = query_submit.executeQuery(collection, p, 20, hyerarchy);
     		} catch (IllegalStateException | IOException | URISyntaxException e1) {
     			e1.printStackTrace();
     		}
@@ -123,9 +149,25 @@ public class Application extends Controller {
                 range_facets, pivot_facets, cluster_facets, 
                 query_results_list, query_json, final_query, p, (int) Math.ceil(1808.0/20), handler));
         //return ok(hadatac_message.render("HADataC", "Your HADataC instance does not contain any measurements to be browser. Please go ahead and index some."));
+         * */
     }
 
-    public static Result postIndex(int p, String facets, String facetAdd, String facetDel) {
+    public static Result postIndex(int page, int rows, String facets) {
+    	ObjectMapper mapper = new ObjectMapper();
+    	
+    	List<String> permissions = getPermissions(session().get("user_hyerarchy"));
+    	AcquisitionQueryResult results = Measurement.find(page, rows, permissions, null);
+    	
+    	FacetHandler handler = null;
+    	try {
+    		handler = mapper.readValue(facets, FacetHandler.class);
+    	} catch (Exception e) {
+    		handler = new FacetHandler();
+    		System.out.println("mapper.readValue: " + e.getMessage());
+    	}
+    	
+    	return ok(dataacquisition_browser.render(results, results.toJSON(), handler.toJSON()));
+    	/*
     	System.out.println("!!! postIndex PARAMS - facets: |" + facets + "| facet: |" + facetAdd + "|");
     	try {
     		if (!facets.isEmpty()) {
@@ -184,7 +226,8 @@ public class Application extends Controller {
     	for (String collection : query_submit.list_of_queries.keySet()){
     		final_query = query_submit.list_of_queries.get(collection).toString();
             try {
-    			query_json = query_submit.executeQuery(collection, p, 20);
+            	String hyerarchy = session().get("user_hyerarchy");
+	            query_json = query_submit.executeQuery(collection, p, 20, hyerarchy);
     		} catch (IllegalStateException | IOException | URISyntaxException e1) {
     			e1.printStackTrace();
     		}
@@ -200,7 +243,6 @@ public class Application extends Controller {
         return ok(index_browser.render(fd, field_facets, query_facets,
                 range_facets, pivot_facets, cluster_facets, 
                 query_results_list, query_json, final_query, p, (int) Math.ceil(1808.0/20), handler)); 
-
+		*/
     }
-
 }

@@ -33,6 +33,12 @@ public class AuthApplication extends Controller {
 	public static final String USER_ROLE = "user";
 	
 	public static Result index() {
+		final User localUser = getLocalUser(session());
+		if (localUser != null) {
+			final org.hadatac.entity.pojo.User user = org.hadatac.entity.pojo.User.find(localUser.uri);
+			String permissions = user.getGroupNamesUri();
+			session().put("user_hyerarchy", permissions);
+		}
 		return ok(portal.render());
 	}
 
