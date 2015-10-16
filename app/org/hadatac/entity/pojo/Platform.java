@@ -28,6 +28,7 @@ public class Platform implements Comparable<Platform> {
 	private String location;
 	private String firstCoordinate;
 	private String secondCoordinate;
+	private String thirdCoordinate;
 	private String elevation;
 	private String serialNumber;
 	
@@ -67,10 +68,20 @@ public class Platform implements Comparable<Platform> {
 	public void setFirstCoordinate(String firstCoordinate) {
 		this.firstCoordinate = firstCoordinate;
 	}
+
 	public String getSecondCoordinate() {
 		return secondCoordinate;
 	}
+
 	public void setSecondCoordinate(String secondCoordinate) {
+		this.secondCoordinate = secondCoordinate;
+	}
+	
+	public String getThirdCoordinate() {
+		return secondCoordinate;
+	}
+
+	public void setThirdCoordinate(String secondCoordinate) {
 		this.secondCoordinate = secondCoordinate;
 	}
 	
@@ -103,6 +114,12 @@ public class Platform implements Comparable<Platform> {
 				platform.setLabel(object.asLiteral().getString());
 			} else if (statement.getPredicate().getURI().equals("http://hadatac.org/ont/vstoi#hasSerialNumber")) {
 				platform.setSerialNumber(object.asLiteral().getString());
+			} else if (statement.getPredicate().getURI().equals("http://hadatac.org/ont/hasneto#hasFirstCoordinate")) {
+				platform.setFirstCoordinate(object.asLiteral().getString());
+			} else if (statement.getPredicate().getURI().equals("http://hadatac.org/ont/hasneto#hasSecondCoordinate")) {
+				platform.setSecondCoordinate(object.asLiteral().getString());
+			} else if (statement.getPredicate().getURI().equals("http://hadatac.org/ont/hasneto#hasThirdCoordinate")) {
+				platform.setThirdCoordinate(object.asLiteral().getString());
 			}
 		}
 		

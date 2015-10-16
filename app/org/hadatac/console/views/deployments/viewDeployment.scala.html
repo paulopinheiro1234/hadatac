@@ -16,19 +16,30 @@
             
             <h2>Basic Info</h2>
                 <ul>
-                    <li>URI: @deployment.getUri()</li>
-                    <li>Platform: @deployment.platform.getLabel()</li>
-                    <li>Instrument: @deployment.instrument.getLabel()</li>
-                    <li>Start Date/Time: @deployment.getStartedAt()</li>
-                    <li>End Date/Time: @deployment.getEndedAt()</li>
+                    <li><b>URI</b>: @deployment.getUri()</li>
+                    <li><b>Platform</b>: @deployment.platform.getLabel()</li>
+                    <ul>
+                       <li><b>First Coordinate</b>: @deployment.platform.getFirstCoordinate()</li>
+                       <li><b>Second Coordinate</b>: @deployment.platform.getSecondCoordinate() </li>
+                       <li><b>Third Coordinate</b>: @deployment.platform.getThirdCoordinate()</li>
+                    </ul>
+                    @if(deployment.instrument != null) {
+                       <li><b>Instrument</b>: @deployment.instrument.getLabel()</li>
+                       <ul>
+                         <li><b>Serial Number</b>: @deployment.instrument.getSerialNumber()</li>
+                      </ul>
+                    }
+                    <li><b>Start Date/Time</b>: @deployment.getStartedAt()</li>
+                    <li><b>End Date/Time</b>: @deployment.getEndedAt()</li>
                 </ul>
 
             <h2>Sensing Info</h2>
                 <ul>
                    @for(detector <- deployment.detectors) {
-                      <li>Detector: @detector.getLabel()</li>
+                      <li><b>Detector</b>: @detector.getLabel()</li>
                       <ul>
-                         <li>Characteristic: </li>
+                         <li><b>Serial Number</b>: @detector.getSerialNumber()</li>
+                         <li><b>Characteristic</b>: </li>
                       </ul>   
                    }
                 </ul>
@@ -47,14 +58,12 @@
 
     <div class="row">
         <div class="col-md-12">
-            <h2>Employment's Data Collections</h2>
+            <h2>Deployment's Data Collections</h2>
                <div class="container-fluid">
                  <table class="table">
                     <thead>
                       <tr>
                         <th>Triggering Event</th>
-                        <th>Platform</th>
-                        <th>Instrument</th>
                         <th>Start Date/Time</th>
                         <th>End Date/Time</th>
                         <th># of Data Points</th>
@@ -64,10 +73,9 @@
                        @for(dc <- dataCollections){
                           <tr>
                              <td>@dc.getTriggeringEventName()</td> 
-                             <td>@dc.getPlatformName()</td> 
-                             <td>@dc.getInstrumentModel()</td>
                              <td>@dc.getStartedAt()</td>
                              <td>@dc.getEndedAt()</td>
+                             <td>@dc.getNumberDataPoints()</td>
                           </tr>
                        }
                     </tbody>

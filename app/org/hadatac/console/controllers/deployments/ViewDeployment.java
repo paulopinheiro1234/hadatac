@@ -42,7 +42,7 @@ public class ViewDeployment extends Controller {
 
     	if (!deployment_uri.equals("")) {
         	deployment = Deployment.find(deployment_uri);
-        	dataCollections = DataCollection.find(AuthApplication.getLocalUser(session()).uri, allState);    		
+        	dataCollections = DataCollection.find(deployment, false);    		
     	}
     	return ok(viewDeployment.render(deployment, dataCollections));
     
@@ -69,7 +69,7 @@ public class ViewDeployment extends Controller {
 
     	if (!deployment_uri.equals("")) {
         	deployment = Deployment.find(deployment_uri);
-        	dataCollections = DataCollection.find(AuthApplication.getLocalUser(session()).uri, allState);    		
+        	dataCollections = DataCollection.find(deployment, false);    		
     	}
     	return ok(viewDeployment.render(deployment, dataCollections));
         
