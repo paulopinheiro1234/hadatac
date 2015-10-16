@@ -25,19 +25,24 @@ public class Detector implements Comparable<Detector>  {
 	private String localName;
 	private String label;
 	private String serialNumber;
+	private String isInstrumentAttachment;
 	
 	public String getUri() {
 		return uri;
 	}
+
 	public void setUri(String uri) {
 		this.uri = uri;
 	}
+
 	public String getLocalName() {
 		return localName;
 	}
+
 	public void setLocalName(String localName) {
 		this.localName = localName;
 	}
+
 	public String getLabel() {
 		return label;
 	}
@@ -48,8 +53,17 @@ public class Detector implements Comparable<Detector>  {
 	public String getSerialNumber() {
 		return serialNumber;
 	}
+
 	public void setSerialNumber(String serialNumber) {
 		this.serialNumber = serialNumber;
+	}
+	
+	public String getIsInstrumentAttachment() {
+		return isInstrumentAttachment;
+	}
+	
+	public void setIsInstrumentAttachment(String isInstrumentAttachment) {
+		this.isInstrumentAttachment = isInstrumentAttachment;
 	}
 	
 	public static List<Detector> find() {
@@ -103,9 +117,11 @@ public class Detector implements Comparable<Detector>  {
 				detector.setLabel(object.asLiteral().getString());
 			} else if (statement.getPredicate().getURI().equals("http://hadatac.org/ont/vstoi#hasSerialNumber")) {
 				detector.setSerialNumber(object.asLiteral().getString());
+			} else if (statement.getPredicate().getURI().equals("http://hadatac.org/ont/vstoi#isInstrumentAttachment")) {
+				detector.setIsInstrumentAttachment(object.asResource().getURI());
 			}
 		}
-		
+
 		detector.setUri(uri);
 		
 		return detector;
