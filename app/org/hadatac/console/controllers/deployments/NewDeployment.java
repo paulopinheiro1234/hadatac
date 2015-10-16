@@ -17,6 +17,8 @@ import org.hadatac.console.views.html.deployments.*;
 import org.hadatac.data.api.DataFactory;
 import org.hadatac.entity.pojo.DataCollection;
 import org.hadatac.entity.pojo.Deployment;
+import org.hadatac.entity.pojo.Detector;
+import org.hadatac.entity.pojo.Instrument;
 import org.hadatac.entity.pojo.Platform;
 import org.hadatac.entity.pojo.TriggeringEvent;
 import org.hadatac.console.models.DeploymentForm;
@@ -47,9 +49,8 @@ public class NewDeployment extends Controller {
     public static Result index(String type) {
     	return ok(newDeployment.render(Form.form(DeploymentForm.class), 
     			  Platform.find(),
-    			  //getQueryResults("Platforms"),
-    			  getQueryResults("Instruments"),
-    			  getQueryResults("Detectors"),
+    			  Instrument.findAvailable(),
+    			  Detector.findAvailable(),
     			  type));
         
     }// /index()
@@ -58,10 +59,9 @@ public class NewDeployment extends Controller {
     // for /metadata HTTP POST requests
     public static Result postIndex(String type) {
     	return ok(newDeployment.render(Form.form(DeploymentForm.class), 
-  			  //getQueryResults("Platforms"),
               Platform.find(),
-    		  getQueryResults("Instruments"),
-  			  getQueryResults("Detectors"),
+    		  Instrument.findAvailable(),
+			  Detector.findAvailable(),
   			  type));
         
     }// /postIndex()
@@ -92,22 +92,27 @@ public class NewDeployment extends Controller {
         String insert = "";
         String deploymentUri = DataFactory.getNextURI(DataFactory.DEPLOYMENT_ABBREV);
         String dataCollectionUri = DataFactory.getNextURI(DataFactory.DATA_COLLECTION_ABBREV);
-        String[] detectorUri = new String[1];
-        detectorUri[0] = data.getDetector();
         if (data.getType().equalsIgnoreCase("LEGACY")) {
         	triggeringEvent = TriggeringEvent.LEGACY_DEPLOYMENT;
         } else {
         	triggeringEvent = TriggeringEvent.INITIAL_DEPLOYMENT;
         }
-        Deployment deployment = DataFactory.createDeployment(deploymentUri, data.getPlatform(), data.getInstrument(), detectorUri, dateString, data.getType());
+        
+        System.out.println("new deployment: size of detector's array : " + data.getDetector().size());
+        if (data.getDetector().size() > 0) {
+        	for (String detector : data.getDetector()) {
+        		System.out.println("   -- det uri: " + detector);
+        	}
+        }
+        
+        Deployment deployment = DataFactory.createDeployment(deploymentUri, data.getPlatform(), data.getInstrument(), data.getDetector(), dateString, data.getType());
         DataCollection dataCollection = DataFactory.createDataCollection(dataCollectionUri, deploymentUri, triggeringEvent, UserManagement.getUriByEmail(user.email));
         if (form.hasErrors()) {
         	System.out.println("HAS ERRORS");
             return badRequest(newDeployment.render(form,
             		  Platform.find(),
-			          //getQueryResults("Platforms"),
-			          getQueryResults("Instruments"),
-			          getQueryResults("Detectors"),
+			          Instrument.find(),
+	    			  Detector.find(),
 			          data.getType()));        
         } else {
             return ok(deploymentConfirm.render("New Deployment", data));

@@ -7,6 +7,7 @@ import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Iterator;
 
 import play.data.Form;
 import play.mvc.Controller;
@@ -15,6 +16,7 @@ import play.mvc.Result;
 import org.hadatac.console.models.DeploymentForm;
 import org.hadatac.console.views.html.deployments.*;
 import org.hadatac.entity.pojo.Deployment;
+import org.hadatac.entity.pojo.Detector;
 
 
 public class CloseDeployment extends Controller {
@@ -43,7 +45,12 @@ public class CloseDeployment extends Controller {
     		 */
     		depForm.setPlatform(dep.platform.getLabel());
     		depForm.setInstrument(dep.instrument.getLabel());
-    		depForm.setDetector(dep.detectors.get(0).getLabel());
+    		if (dep.detectors != null) {
+    			Iterator detectors = dep.detectors.iterator();
+    			while (detectors.hasNext()) {
+    				depForm.addDetector(((Detector)detectors.next()).getLabel());
+    			}
+    		}
     		depForm.setStartDateTime(dep.getStartedAt());
  
             System.out.println("closing deployment");
@@ -77,7 +84,12 @@ public class CloseDeployment extends Controller {
     		 */
     		depForm.setPlatform(dep.platform.getLabel());
     		depForm.setInstrument(dep.instrument.getLabel());
-    		depForm.setDetector(dep.detectors.get(0).getLabel());
+    		if (dep.detectors != null) {
+    			Iterator detectors = dep.detectors.iterator();
+    			while (detectors.hasNext()) {
+    				depForm.addDetector(((Detector)detectors.next()).getLabel());
+    			}
+    		}
     		depForm.setStartDateTime(dep.getStartedAt());
  
             System.out.println("closing deployment");
@@ -122,7 +134,12 @@ public class CloseDeployment extends Controller {
 		
 		data.setPlatform(dep.platform.getLabel());
 		data.setInstrument(dep.instrument.getLabel());
-		data.setDetector(dep.detectors.get(0).getLabel());
+		if (dep.detectors != null) {
+			Iterator detectors = dep.detectors.iterator();
+			while (detectors.hasNext()) {
+				data.addDetector(((Detector)detectors.next()).getLabel());
+			}
+		}
 		data.setStartDateTime(dep.getStartedAt());
 		data.setEndDateTime(dep.getEndedAt());
 

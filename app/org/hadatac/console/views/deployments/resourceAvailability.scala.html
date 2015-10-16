@@ -1,0 +1,107 @@
+@(instruments         : List[org.hadatac.entity.pojo.Instrument],
+  instrumentsDeployed : List[org.hadatac.entity.pojo.Instrument], 
+  detectors           : List[org.hadatac.entity.pojo.Detector],
+  detectorsDeployed   : List[org.hadatac.entity.pojo.Detector]
+  )
+
+@import helper._
+@import org.hadatac.console.views.html._
+@import org.hadatac.utils._
+
+@main("Instrument/Detector Availability") {
+
+  <div class="row">
+  <div class="col-md-offset-1">
+
+  <h2>Resource Availability</h2>
+
+  <ul class="nav nav-tabs">     
+      <li><a data-toggle="tab" href="#instrument">Instruments</a></li>
+      <li><a data-toggle="tab" href="#detector">Detectors</a></li>
+  </ul>
+
+  <div class="tab-content">
+    <div id="instrument" class="tab-pane fade in active">
+      <div class="row">
+         <div class="col-md-6">
+         <table class="table">
+            <thead>
+                 <tr>
+                    <th>Available Instruments</th>
+                 </tr>
+            </thead>
+            <tbody>
+              @for(instrument <- instruments){
+                  <tr>
+                     <td>@if(instrument != null && instrument.getLabel() != null) { @instrument.getLabel() @if(instrument.getSerialNumber() != null) { (SN: @instrument.getSerialNumber()) }}</td>
+                     <td></td>
+                  </tr>
+              }
+            </tbody>
+        </table>
+        </div>
+        <div class="col-md-6">
+        <table class="table">
+            <thead>
+                 <tr>
+                    <th>Deployed Instruments</th>
+                 </tr>
+            </thead>
+            <tbody>
+              @for(instDeployed <- instrumentsDeployed){
+                  <tr>
+                     <td>@if(instDeployed != null && instDeployed.getLabel() != null) { @instDeployed.getLabel() @if(instDeployed.getSerialNumber() != null) { (SN: @instDeployed.getSerialNumber()) }}</td>
+                     <td></td>
+                  </tr>
+              }
+            </tbody>
+        </table>
+        </div>
+      </div>  
+    </div>
+ 
+    <div id="detector" class="tab-pane fade">
+         <div class="col-md-6">
+         <table class="table">
+            <thead>
+                 <tr>
+                    <th>Available Detectors</th>
+                 </tr>
+            </thead>
+            <tbody>
+              @for(detector <- detectors){
+                  <tr>
+                     <td>@if(detector != null && detector.getLabel() != null) { @detector.getLabel() @if(detector.getSerialNumber() != null) { (SN: @detector.getSerialNumber()) }}</td>
+                     <td></td>
+                  </tr>
+              }
+            </tbody>
+        </table>
+        </div>
+        <div class="col-md-6">
+        <table class="table">
+            <thead>
+                 <tr>
+                    <th>Deployed Detectors</th>
+                 </tr>
+            </thead>
+            <tbody>
+              @for(detDeployed <- detectorsDeployed){
+                  <tr>
+                     <td>@if(detDeployed != null && detDeployed.getLabel() != null) { @detDeployed.getLabel() @if(detDeployed.getSerialNumber() != null) { (SN: @detDeployed.getSerialNumber()) }}</td>
+                     <td></td>
+                  </tr>
+              }
+            </tbody>
+        </table>
+        </div>
+      </div>  
+    </div>
+  </div>
+ 
+  </div>
+  </div>
+
+  @deploymentButton(true)
+
+}

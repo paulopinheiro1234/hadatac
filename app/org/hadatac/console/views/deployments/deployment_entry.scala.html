@@ -5,7 +5,8 @@
 
 <tr>
    <td>@if(deployment.platform != null && deployment.platform.getLabel() != null) { @deployment.platform.getLabel() }</td> 
-   <td>@if(deployment.instrument != null && deployment.instrument.getLabel() != null) { @deployment.instrument.getLabel() }</td>
+   <td>@if(deployment.instrument != null && deployment.instrument.getLabel() != null) { @deployment.instrument.getLabel() @if(deployment.instrument.getSerialNumber() != null) { (SN: @deployment.instrument.getSerialNumber()) }}
+   </td>
    <td>@if(deployment.getStartedAt() != null) { @deployment.getStartedAt() }</td>
    @if(oper.getCurrent() != State.ACTIVE) {
        <td>@if(deployment.getEndedAt() != null) { @deployment.getEndedAt() }</td>

@@ -47,7 +47,7 @@ public class DataFactory {
 		return dataset;
 	}
 	
-	public static Deployment createDeployment(String deploymentUri, String platformUri, String instrumentUri, String[] detectorUri, String startedAt, String type) {
+	public static Deployment createDeployment(String deploymentUri, String platformUri, String instrumentUri, List<String> detectorUri, String startedAt, String type) {
 		Deployment deployment;
 		if (type.equalsIgnoreCase("LEGACY")) {
 			deployment = Deployment.createLegacy(deploymentUri);
@@ -57,8 +57,8 @@ public class DataFactory {
 		
 		deployment.platform = Platform.find(platformUri);
 		deployment.instrument = Instrument.find(instrumentUri);
-		for (int i = 0; i < detectorUri.length; i++) {
-			deployment.detectors.add(Detector.find(detectorUri[i]));
+		for (int i = 0; i < detectorUri.size(); i++) {
+			deployment.detectors.add(Detector.find(detectorUri.get(i)));
 		}
 		deployment.setStartedAtXsd(startedAt);
 		deployment.save();
@@ -66,13 +66,13 @@ public class DataFactory {
 		return deployment;
 	}
 	
-	public static Deployment createLegacyDeployment(String deploymentUri, String platformUri, String instrumentUri, String[] detectorUri, String startedAt) {
+	public static Deployment createLegacyDeployment(String deploymentUri, String platformUri, String instrumentUri, List<String> detectorUri, String startedAt) {
 		Deployment deployment = Deployment.createLegacy(deploymentUri);
 		
 		deployment.platform = Platform.find(platformUri);
 		deployment.instrument = Instrument.find(instrumentUri);
-		for (int i = 0; i < detectorUri.length; i++) {
-			deployment.detectors.add(Detector.find(detectorUri[i]));
+		for (int i = 0; i < detectorUri.size(); i++) {
+			deployment.detectors.add(Detector.find(detectorUri.get(i)));
 		}
 		deployment.setStartedAtXsd(startedAt);
 		deployment.save();

@@ -1,4 +1,5 @@
-@(deployment : org.hadatac.entity.pojo.Deployment)
+@(deployment      : org.hadatac.entity.pojo.Deployment,
+  dataCollections : List[org.hadatac.entity.pojo.DataCollection])
 
 @import org.hadatac.console.views.html._
 @import org.hadatac.utils._
@@ -9,43 +10,79 @@
     <script type="text/javascript" charset="utf-8" src="http://www.openlayers.org/api/OpenLayers.js"></script>
     <script type="text/javascript" charset="utf-8" src="@controllers.routes.Assets.versioned("javascripts/openLayersFunctions.js")"></script>
 
-
     <div class="row">
         <div class="col-md-6">
             <h1>View Deployment</h1>
             
             <h2>Basic Info</h2>
                 <ul>
-                    <li>URI: @deployment.getUri()</li>
-                    <li>Platform: @deployment.platform.getLabel()</li>
-                    <li>Instrument: @deployment.instrument.getLabel()</li>
-                    <li>Start Date/Time: @deployment.getStartedAt()</li>
-                    <li>End Date/Time: @deployment.getEndedAt()</li>
+                    <li><b>URI</b>: @deployment.getUri()</li>
+                    <li><b>Platform</b>: @deployment.platform.getLabel()</li>
+                    <ul>
+                       <li><b>First Coordinate</b>: @deployment.platform.getFirstCoordinate()</li>
+                       <li><b>Second Coordinate</b>: @deployment.platform.getSecondCoordinate() </li>
+                       <li><b>Third Coordinate</b>: @deployment.platform.getThirdCoordinate()</li>
+                    </ul>
+                    @if(deployment.instrument != null) {
+                       <li><b>Instrument</b>: @deployment.instrument.getLabel()</li>
+                       <ul>
+                         <li><b>Serial Number</b>: @deployment.instrument.getSerialNumber()</li>
+                      </ul>
+                    }
+                    <li><b>Start Date/Time</b>: @deployment.getStartedAt()</li>
+                    <li><b>End Date/Time</b>: @deployment.getEndedAt()</li>
                 </ul>
 
             <h2>Sensing Info</h2>
-            <ul>
-                 <li>Detector: @deployment.detectors.get(0).getLabel()</li>
-                    <ul>
-                       <li>Characteristic: </li>
-                    </ul>   
-            </ul>
-
-
-            <h2>Data Collections</h2>
-            
-            <p class="buttons">
-                <a href="@org.hadatac.console.controllers.deployments.routes.DeploymentManagement.index(State.ACTIVE)">Back to Deployment Management</a>
-            </p>
+                <ul>
+                   @for(detector <- deployment.detectors) {
+                      <li><b>Detector</b>: @detector.getLabel()</li>
+                      <ul>
+                         <li><b>Serial Number</b>: @detector.getSerialNumber()</li>
+                         <li><b>Characteristic</b>: </li>
+                      </ul>   
+                   }
+                </ul>
         </div>
 
         <div class="col-md-6">
             <div class="row text-center">
                 <div style="width:95%; height:500px" id="map"></div>
-                @if(deployment.platform.getFirstCoordinate() != null && deployment.platform.getSecondCoordinate() != null){
+                @if(deployment.platform.getFirstCoordinate() != null && deployment.platform.getSecondCoordinate() != null) {
                     <script type="text/javascript">locations=["@deployment.platform.getFirstCoordinate()","@deployment.platform.getSecondCoordinate()"];createMap(locations);</script>
                 }
             </div>
         </div>
+
     </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <h2>Deployment's Data Collections</h2>
+               <div class="container-fluid">
+                 <table class="table">
+                    <thead>
+                      <tr>
+                        <th>Triggering Event</th>
+                        <th>Start Date/Time</th>
+                        <th>End Date/Time</th>
+                        <th># of Data Points</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                       @for(dc <- dataCollections){
+                          <tr>
+                             <td>@dc.getTriggeringEventName()</td> 
+                             <td>@dc.getStartedAt()</td>
+                             <td>@dc.getEndedAt()</td>
+                             <td>@dc.getNumberDataPoints()</td>
+                          </tr>
+                       }
+                    </tbody>
+                 </table>
+               </div>
+        </div>
+    </div>
+
+   @deploymentButton(true)
 }
