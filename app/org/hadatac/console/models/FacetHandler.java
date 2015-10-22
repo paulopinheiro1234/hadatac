@@ -2,13 +2,14 @@ package org.hadatac.console.models;
 
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Map;
 import java.util.Set;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class FacetHandler {
-	public HashMap<String, String> facetsAnd;
-	public HashMap<String, String> facetsOr;
+	public Map<String, String> facetsAnd;
+	public Map<String, String> facetsOr;
 	
 	public FacetHandler() {
 		facetsAnd = new HashMap<String, String>();
