@@ -1,15 +1,16 @@
-package org.hadatac.console.controllers;
+package org.hadatac.console.controllers.metadata;
 
 import play.mvc.Controller;
 import play.mvc.Result;
-import org.hadatac.console.views.html.portal;
+import org.hadatac.console.views.html.metadata.metadata;
 
-public class Portal extends Controller {
+
+public class Metadata extends Controller {
 	
 	// for /metadata HTTP GET requests
     public static Result index() {
 
-       return ok(portal.render());
+       return ok(metadata.render());
         
     }// /index()
 
@@ -17,7 +18,7 @@ public class Portal extends Controller {
     // for /metadata HTTP POST requests
     public static Result postIndex() {
         
-        return ok(portal.render());
+        return ok(metadata.render());
         
     }// /postIndex()
 

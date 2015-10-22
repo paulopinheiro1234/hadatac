@@ -1,0 +1,52 @@
+ @(selection : String)
+ 
+   <div class="navbar-collapse collapse navbar-secondary hidden-print">
+       <div class="col-md-1">
+       	   <button type="button" class="btn btn-link"><b>Scientific<br>Concepts</b></button>
+       </div>
+	   @if(selection == "Entities") {
+             <div class="col-md-1">
+       		     <a href="@org.hadatac.console.controllers.metadata.concepts.routes.Entity.index()" class="btn-xs btn-block btn-warning" role="button">Entity<br>Hierarchy<br>&nbsp;</a>
+       	     </div>
+       } else {
+             <div class="col-md-1">
+       		     <a href="@org.hadatac.console.controllers.metadata.concepts.routes.Entity.index()" class="btn-xs btn-block btn-primary" role="button">Entity<br>Hierarchy<br>&nbsp;</a>
+       	     </div>
+       }
+       @if(selection == "EntityCharacteristics") {
+             <div class="col-md-1">
+       		     <a href="@org.hadatac.console.controllers.metadata.concepts.routes.EntityCharacteristic.index()" class="btn-xs btn-block btn-warning" role="button">Entity-<br>Characteristic<br>Table</a>
+       	     </div>
+       } else {
+             <div class="col-md-1">
+       		     <a href="@org.hadatac.console.controllers.metadata.concepts.routes.EntityCharacteristic.index()" class="btn-xs btn-block btn-primary" role="button">Entity-<br>Characteristic<br>Table</a>
+       	     </div>
+       }
+	   @if(selection == "Characteristics") {
+             <div class="col-md-1">
+       		     <a href="@org.hadatac.console.controllers.metadata.concepts.routes.Characteristic.index()" class="btn-xs btn-block btn-warning" role="button">Characteristic<br>Hierarchy<br>&nbsp;</a>
+       	     </div>
+       } else {
+             <div class="col-md-1">
+       		     <a href="@org.hadatac.console.controllers.metadata.concepts.routes.Characteristic.index()" class="btn-xs btn-block btn-primary" role="button">Characteristic<br>Hierarchy<br>&nbsp;</a>
+       	     </div>
+       }
+	   @if(selection == "Units") {
+             <div class="col-md-1">
+       		     <a href="@org.hadatac.console.controllers.metadata.concepts.routes.Unit.index()" class="btn-xs btn-block btn-warning" role="button">Unit<br>Hierarchy<br>&nbsp;</a>
+       	     </div>
+       } else {
+             <div class="col-md-1">
+       		     <a href="@org.hadatac.console.controllers.metadata.concepts.routes.Unit.index()" class="btn-xs btn-block btn-primary" role="button">Unit<br>Hierarchy<br>&nbsp;</a>
+       	     </div>
+       }
+	   @if(selection == "Agents") {
+             <div class="col-md-1">
+                 <a href="@org.hadatac.console.controllers.metadata.concepts.routes.Agent.index()" class="btn-xs btn-block btn-warning" role="button">Agent<br>Network<br>&nbsp;</a>
+       	     </div>
+       } else {
+             <div class="col-md-1">
+       		     <a href="@org.hadatac.console.controllers.metadata.concepts.routes.Agent.index()" class="btn-xs btn-block btn-primary" role="button">Agent<br>Network<br>&nbsp;</a>
+       	     </div>
+       }
+    </div>
