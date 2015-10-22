@@ -1,4 +1,4 @@
-package org.hadatac.console.controllers;
+package org.hadatac.console.controllers.metadata;
 
 import play.mvc.Controller;
 import play.mvc.Result;

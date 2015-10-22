@@ -1,13 +1,8 @@
 package org.hadatac.console.controllers;
 
-import org.hadatac.console.http.GetSparqlQuery;
-import java.io.IOException;
-import org.hadatac.console.models.SparqlQuery;
-import org.hadatac.console.models.TreeQuery;
 import play.mvc.Controller;
 import play.mvc.Result;
 import org.hadatac.console.views.html.portal;
-
 
 public class Portal extends Controller {
 	

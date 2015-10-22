@@ -1,4 +1,4 @@
-package org.hadatac.console.controllers;
+package org.hadatac.console.controllers.metadata.concepts;
 
 import org.hadatac.console.models.ForceFieldQuery;
 import play.mvc.Controller;

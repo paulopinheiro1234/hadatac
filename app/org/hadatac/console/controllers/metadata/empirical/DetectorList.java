@@ -1,4 +1,4 @@
-package org.hadatac.console.controllers;
+package org.hadatac.console.controllers.metadata.empirical;
 
 import org.hadatac.console.http.GetSparqlQuery;
 
