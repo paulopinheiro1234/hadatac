@@ -1,10 +1,56 @@
-@(document : org.hadatac.console.models.Document)
+@(	document : org.hadatac.entity.pojo.Measurement )
 
 <table>
-@for((field, value) <- document.fields){
 	<tr>
-		<td><b>@field</b></td>
-		<td id="detail_@field"></td>
+		<td><b>URI</b></td>
+		<td id="detail_uri"></td>
 	</tr>
-}
+	<tr>
+		<td><b>Timestamp</b></td>
+		<td id="detail_timestamp"></td>
+	</tr>
+	<tr>
+		<td><b>Value</b></td>
+		<td id="detail_value"></td>
+	</tr>
+	<tr>
+		<td><b>Entity</b></td>
+		<td id="detail_entity"></td>
+	</tr>
+	<tr>
+		<td><b>Entity URI</b></td>
+		<td id="detail_entity_uri"></td>
+	</tr>
+	<tr>
+		<td><b>Characteristic</b></td>
+		<td id="detail_characteristic"></td>
+	</tr>
+	<tr>
+		<td><b>Characteristic URI</b></td>
+		<td id="detail_characteristic_uri"></td>
+	</tr>
+	<tr>
+		<td><b>Unit</b></td>
+		<td id="detail_unit"></td>
+	</tr>
+	<tr>
+		<td><b>Unit URI</b></td>
+		<td id="detail_unit_uri"></td>
+	</tr>
+	<tr>
+		<td><b>Instrument model</b></td>
+		<td id="detail_instrument_model"></td>
+	</tr>
+	<tr>
+		<td><b>Instrument URI</b></td>
+		<td id="detail_instrument_uri"></td>
+	</tr>
+	<tr>
+		<td><b>Platform name</b></td>
+		<td id="detail_platform_name"></td>
+	</tr>
+	<tr>
+		<td><b>Platform URI</b></td>
+		<td id="detail_platform_uri"></td>
+	</tr>
 </table>

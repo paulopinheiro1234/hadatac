@@ -94,6 +94,13 @@
 					<div id="legend">
 						<legend>Measurement details</legend>
 					</div>
+					<div class="tab-pane">
+						@if(results.documents.isEmpty) {
+							<script>alert("You have no measurements.");</script>
+						} else {
+							@measurement_details(results.documents(0))
+						}
+					</div>
 				</div>
 				<div class="row">
 					<div id="legend">
