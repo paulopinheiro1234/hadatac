@@ -83,7 +83,6 @@ public class Application extends Controller {
     	ObjectMapper mapper = new ObjectMapper();
     	
     	List<String> permissions = getPermissions(session().get("user_hyerarchy"));
-    	AcquisitionQueryResult results = Measurement.find(page, rows, permissions, null);
     	
     	FacetHandler handler = null;
     	try {
@@ -92,6 +91,8 @@ public class Application extends Controller {
     		handler = new FacetHandler();
     		System.out.println("mapper.readValue: " + e.getMessage());
     	}
+    	
+    	AcquisitionQueryResult results = Measurement.find(page, rows, permissions, handler);
     	
     	return ok(dataacquisition_browser.render(results, results.toJSON(), handler.toJSON()));
     	/*
@@ -156,7 +157,6 @@ public class Application extends Controller {
     	ObjectMapper mapper = new ObjectMapper();
     	
     	List<String> permissions = getPermissions(session().get("user_hyerarchy"));
-    	AcquisitionQueryResult results = Measurement.find(page, rows, permissions, null);
     	
     	FacetHandler handler = null;
     	try {
@@ -165,6 +165,8 @@ public class Application extends Controller {
     		handler = new FacetHandler();
     		System.out.println("mapper.readValue: " + e.getMessage());
     	}
+    	
+    	AcquisitionQueryResult results = Measurement.find(page, rows, permissions, handler);
     	
     	return ok(dataacquisition_browser.render(results, results.toJSON(), handler.toJSON()));
     	/*

@@ -21,6 +21,7 @@ import org.apache.solr.client.solrj.response.UpdateResponse;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
 import org.apache.solr.common.util.NamedList;
+import org.hadatac.console.models.FacetHandler;
 import org.hadatac.console.models.Pivot;
 import org.hadatac.data.model.AcquisitionQueryResult;
 import org.joda.time.DateTime;
@@ -212,7 +213,7 @@ public class Measurement {
 		return -1;
 	}
 	
-	public static AcquisitionQueryResult find(int page, int qtd, List<String> permissions, Map<String, String> facets) {
+	public static AcquisitionQueryResult find(int page, int qtd, List<String> permissions, FacetHandler handler) {
 		AcquisitionQueryResult result = new AcquisitionQueryResult();
 		
 		SolrClient solr = new HttpSolrClient(Play.application().configuration().getString("hadatac.solr.data") + "/measurement");
@@ -230,18 +231,20 @@ public class Measurement {
 			}
 		}
 		
-		if (facets == null) {
-			facet_query = "*:*";
-		} else {
-			Iterator<String> j = facets.keySet().iterator();
-			while (j.hasNext()) {
-				String field = j.next();
-				String value = facets.get(field);
+		if (handler != null) {
+			Iterator<String> i = handler.facetsAnd.keySet().iterator();
+			while (i.hasNext()) {
+				String field = i.next();
+				String value = handler.facetsAnd.get(field);
 				facet_query += field + ":\"" + value + "\"";
-				if (j.hasNext()) {
+				if (i.hasNext()) {
 					facet_query += " AND ";
 				}
 			}
+		}
+		
+		if (facet_query.trim().equals("")) {
+			facet_query = "*:*";
 		}
 		
 		q =  "(" + permission_query + ") AND (" + facet_query + ")";

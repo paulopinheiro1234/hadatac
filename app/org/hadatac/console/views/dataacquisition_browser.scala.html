@@ -42,9 +42,9 @@
 						tree.setImagePath("@controllers.routes.Assets.versioned("lib/dhtmlx/imgs/dhxtree_skyblue/")");
 						tree.setDataMode("json");
 						tree.attachEvent("onClick",function(id) {
-							jsonFacet['facetsAdd'].push({ "field" : tree.getUserData(id,'field') , "value" : tree.getUserData(id,'value') });
+							jsonFacet['facetsAnd'][tree.getUserData(id, 'field')] = tree.getUserData(id, 'value');
 							var url = location.protocol + '//' + location.host + location.pathname;
-							url += '&facets=' + jsonFacet.stringify();
+							url += '?facets=' + JSON.stringify(jsonFacet);
 							window.location.href = encodeURI(url);
 							return true;
 						});
