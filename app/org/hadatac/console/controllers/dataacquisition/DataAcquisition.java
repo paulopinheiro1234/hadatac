@@ -1,4 +1,4 @@
-package org.hadatac.console.controllers;
+package org.hadatac.console.controllers.dataacquisition;
 
 import org.hadatac.console.http.JsonHandler;
 
@@ -18,13 +18,13 @@ import play.mvc.Controller;
 import play.mvc.Result;
 
 import org.hadatac.console.views.formdata.FacetFormData;
-import org.hadatac.console.views.html.dataacquisition_browser;
+import org.hadatac.console.views.html.dataacquisition.dataacquisition_browser;
 import org.hadatac.data.model.AcquisitionQueryResult;
 import org.hadatac.entity.pojo.Measurement;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-public class Application extends Controller {
+public class DataAcquisition extends Controller {
 
     public static FacetFormData facet_form = new FacetFormData();
     public static FacetsWithCategories field_facets = new FacetsWithCategories();

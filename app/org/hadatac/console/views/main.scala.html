@@ -44,7 +44,7 @@
             </div>
             <div id="navbar" class="navbar-collapse collapse">
               <ul class="nav navbar-nav">
-                <li><a href="@org.hadatac.console.controllers.routes.Application.index()">Search Data</a></li>
+                <li><a href="@org.hadatac.console.controllers.dataacquisition.routes.DataAcquisition.index()">Search Data</a></li>
                 <li><a href="@org.hadatac.console.controllers.metadata.routes.Metadata.index()">Browse Metadata</a></li>
                 @subjectNotPresent() {
                    <li class="@("active".when(nav == "signup"))"><a href="@org.hadatac.console.controllers.routes.AuthApplication.signup()">@Messages("playauthenticate.navigation.signup")</a></li>
