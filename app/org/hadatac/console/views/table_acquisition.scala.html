@@ -1,0 +1,52 @@
+@(	documents : List[org.hadatac.entity.pojo.Measurement] )
+
+	<script type="text/javascript">
+		onload = function() {
+			if (!document.getElementsByTagName || !document.createTextNode) return;
+			var rows = document.getElementById('measurementsTable').getElementsByTagName('tbody')[0].getElementsByTagName('tr');
+			for (i = 0; i < rows.length; i++) {
+				rows[i].onmouseover = function() {
+					var row = this.rowIndex - 1;
+					document.getElementById('detail_uri').innerHTML = json.documents[row]['uri'];
+					document.getElementById('detail_timestamp').innerHTML = json.documents[row]['timestamp'];
+					document.getElementById('detail_value').innerHTML = json.documents[row]['value'];
+					document.getElementById('detail_entity').innerHTML = json.documents[row]['entity'];
+					document.getElementById('detail_entity_uri').innerHTML = json.documents[row]['entityUri'];
+					document.getElementById('detail_characteristic').innerHTML = json.documents[row]['characteristic'];
+					document.getElementById('detail_characteristic_uri').innerHTML = json.documents[row]['characteristicUri'];
+					document.getElementById('detail_unit').innerHTML = json.documents[row]['unit'];
+					document.getElementById('detail_unit_uri').innerHTML = json.documents[row]['unitUri'];
+					document.getElementById('detail_instrument_model').innerHTML = json.documents[row]['instrumentModel'];
+					document.getElementById('detail_instrument_uri').innerHTML = json.documents[row]['instrumentUri'];
+					document.getElementById('detail_platform_name').innerHTML = json.documents[row]['platformName'];
+					document.getElementById('detail_platform_uri').innerHTML = json.documents[row]['platformUri'];
+				}
+			}
+		}
+	</script>
+
+    <div class="table-responsive">
+        <table class="table table-striped" id="measurementsTable">
+            <thead>
+              <tr>
+                <th>Characteristic</th>
+                <th>Value</th>
+                <th>Timestamp</th>
+                <th>X</th>
+                <th>Y</th>
+                <th>Z</th>
+              </tr>
+            </thead>
+
+            <tbody>
+                @for(document <- documents) {
+                <tr>
+                	<td>@document.getCharacteristic</td>
+                	<td>@document.getValue()</td>
+                	<td>@document.getTimestamp()</td>
+                </tr>
+                }
+            </tbody>
+
+        </table>
+    </div>

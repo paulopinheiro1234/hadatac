@@ -1,9 +1,4 @@
 @(  facetForm: Form[org.hadatac.console.views.formdata.FacetFormData],
-    fieldFacets: org.hadatac.console.models.FacetsWithCategories,
-    queryFacets: org.hadatac.console.models.FacetsWithCategories,
-    rangeFacets: org.hadatac.console.models.FacetsWithCategories,
-    pivotFacets: org.hadatac.console.models.FacetsWithCategories,
-    clusterFacets: org.hadatac.console.models.FacetsWithCategories,
     documentMap : Map[String, org.hadatac.console.models.SpatialQueryResults],
     documentJson : String,
     final_query : String,
@@ -158,7 +153,7 @@
 				treePI = new dhtmlXTreeObject("treePlatformInstrumentBox","100%","100%",0);
 				loadTree(treePI, dataTree);
 				
-				var treeU
+				var treeU;
 				jsonTree = parseSolrFacetFieldToTree("unit");
 				dataTree = JSON.parse(jsonTree);
 				treeU = new dhtmlXTreeObject("treeUnitBox","100%","100%",0);
@@ -207,7 +202,7 @@
 	          				@if(query_results.the_docs.isEmpty) {
 	          					<script>alert("You have no measurements.");</script>
 							} else {
-								@measurement_details(query_results.the_docs(0))
+								@*measurement_details(query_results.the_docs(0))*@
 							}
 	          			</div>
 	          		}
