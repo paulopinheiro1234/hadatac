@@ -15,7 +15,7 @@ import play.mvc.Http.*;
 import play.mvc.Result;
 
 import org.apache.commons.io.FileUtils;
-import org.hadatac.console.controllers.measurements.LoadCCSV;
+import org.hadatac.console.controllers.dataacquisition.LoadCCSV;
 import org.hadatac.console.models.CSVAnnotationHandler;
 import org.hadatac.console.views.html.annotator.*;
 import org.hadatac.data.api.DataFactory;

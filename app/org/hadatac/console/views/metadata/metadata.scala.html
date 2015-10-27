@@ -2,24 +2,40 @@
 
 @import helper._
 @import org.hadatac.console.views.html._
+@import org.hadatac.console.views.html.metadata.concepts._
+@import org.hadatac.console.views.html.metadata.activities._
+@import org.hadatac.console.views.html.metadata.empirical._
+@import org.hadatac.console.views.html.metadata.computational._
 
-@main("Metadata") {
+@main("Browse Metadata") {
     <div class="container-fluid">
      
-     <h3>Scientific Concepts</h3> 
+     <h2>Browse Metadata</h2>
+     
       <div class="row">
-		  @science_navigation("", false)
+		  @science_navigation("")
       </div>
 
-     <h3>Empirical Infrastructure</h3> 
+      <hr>
+      
       <div class="row">
-		  @empirical_navigation("", false)
+		  @empirical_activity_navigation("")
       </div>
 
-     <h3>Computational Infrastructure</h3> 
+      <hr>
+      
       <div class="row">
-		  @computational_navigation("", false)
+		  @empirical_navigation("")
       </div>
+
+      <hr>
+      
+      <div class="row">
+		  @computational_navigation("")
+      </div>
+
+      <br><br><br>
+      @mainButton(false)
 
     </div>
 
