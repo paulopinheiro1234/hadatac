@@ -15,6 +15,7 @@ import play.mvc.Http.*;
 import play.mvc.Result;
 
 import org.apache.commons.io.FileUtils;
+import org.hadatac.console.controllers.AuthApplication;
 import org.hadatac.console.controllers.dataacquisition.LoadCCSV;
 import org.hadatac.console.models.CSVAnnotationHandler;
 import org.hadatac.console.views.html.annotator.*;
@@ -27,6 +28,9 @@ import org.hadatac.utils.Feedback;
 import org.hadatac.utils.NameSpaces;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+
+import be.objectify.deadbolt.java.actions.Group;
+import be.objectify.deadbolt.java.actions.Restrict;
 
 public class Downloads extends Controller {
 
@@ -61,6 +65,7 @@ public class Downloads extends Controller {
     public static final String FRAG_IN_DATE_TIME_SUFFIX     = " <ts0>; ";
     public static final String FRAG_IN_DATE_TIME_STATEMENT  = "<ts0> hadatac:atColumn ";
 
+    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
     public static Result postGenerate(String handler_json) {
 
     	String oper = "";

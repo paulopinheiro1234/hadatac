@@ -8,13 +8,18 @@ import play.*;
 import play.mvc.*;
 import play.libs.*;
 
+import org.hadatac.console.controllers.AuthApplication;
 import org.hadatac.console.views.html.triplestore.*;
 import org.hadatac.metadata.loader.MetadataContext;
 import org.hadatac.utils.Feedback;
 import org.hadatac.utils.NameSpaces;
 
+import be.objectify.deadbolt.java.actions.Group;
+import be.objectify.deadbolt.java.actions.Restrict;
+
 public class LoadOnt extends Controller {
 	
+	@Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
     public static Result loadOnt(String oper) {
     	
     	List<String> cacheList = new ArrayList<String>();
@@ -35,6 +40,7 @@ public class LoadOnt extends Controller {
     	return ok(loadOnt.render(oper, cacheList));
     }
 
+	@Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
     public static Result postLoadOnt(String oper) {
     	
     	List<String> cacheList = new ArrayList<String>();
@@ -65,6 +71,7 @@ public class LoadOnt extends Controller {
 	     return metadata.loadOntologies(Feedback.WEB, oper);
     }
 
+    @Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
     public static Result eraseCache() {
     	List<String> cacheList = new ArrayList<String>();
     	File folder = new File(NameSpaces.CACHE_PATH); 

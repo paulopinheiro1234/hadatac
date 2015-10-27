@@ -6,12 +6,17 @@ import java.net.URLDecoder;
 import play.mvc.Controller;
 import play.mvc.Result;
 
+import org.hadatac.console.controllers.AuthApplication;
 import org.hadatac.console.views.html.datacollections.*;
 import org.hadatac.entity.pojo.DataCollection;
+
+import be.objectify.deadbolt.java.actions.Group;
+import be.objectify.deadbolt.java.actions.Restrict;
 
 public class DeleteDataCollection extends Controller {
 	
 	// for /metadata HTTP GET requests
+	@Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
     public static Result index(String oper, String uri) {
     	
     	DataCollection dc = new DataCollection();
@@ -43,6 +48,7 @@ public class DeleteDataCollection extends Controller {
 
 
     // for /metadata HTTP POST requests
+	@Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
     public static Result postIndex(String oper, String uri) {
     	DataCollection dc = new DataCollection();
     	

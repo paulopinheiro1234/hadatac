@@ -18,12 +18,16 @@ import org.hadatac.entity.pojo.DataCollection;
 import org.hadatac.entity.pojo.Deployment;
 import org.hadatac.utils.State;
 
+import be.objectify.deadbolt.java.actions.Group;
+import be.objectify.deadbolt.java.actions.Restrict;
+
 
 public class ViewDeployment extends Controller {
 	
 	private static State allState = new State(State.ALL);
 	
 	// for /metadata HTTP GET requests
+	@Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
     public static Result index(String deployment_uri) {
 
     	//DeploymentForm dep = new DeploymentForm();
@@ -51,6 +55,7 @@ public class ViewDeployment extends Controller {
 
 
     // for /metadata HTTP POST requests
+	@Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
     public static Result postIndex(String deployment_uri) {
 
     	//DeploymentForm dep = new DeploymentForm();

@@ -16,6 +16,7 @@ import play.libs.*;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
+import org.hadatac.console.controllers.AuthApplication;
 import org.hadatac.console.http.DeploymentQueries;
 import org.hadatac.console.http.PermissionQueries;
 import org.hadatac.console.models.SparqlQueryResults;
@@ -26,14 +27,19 @@ import org.hadatac.metadata.loader.PermissionsContext;
 import org.hadatac.metadata.loader.SpreadsheetProcessing;
 import org.hadatac.utils.Feedback;
 
+import be.objectify.deadbolt.java.actions.Group;
+import be.objectify.deadbolt.java.actions.Restrict;
+
 public class UserManagement extends Controller {
 
 	private static final String UPLOAD_NAME = "tmp/uploads/users-spreadsheet.xls";
 	
+	@Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
     public static Result preRegistration(String oper) {
     	return ok(users.render(oper, "", User.find()));
     }
 
+	@Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
     public static Result postPreRegistration(String oper) {
     	return ok(users.render(oper, "", User.find()));
     }
@@ -48,6 +54,7 @@ public class UserManagement extends Controller {
 	     return message;
    }
     
+    @Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
     public static Result uploadFile() {
     	//System.out.println("uploadFile CALLED!");
            MultipartFormData body = request().body().asMultipartFormData();
