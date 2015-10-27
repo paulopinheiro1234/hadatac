@@ -68,7 +68,7 @@ public class Spatial extends Controller {
     		final_query = query_submit.list_of_queries.get(collection).toString();
     		String query_json = null;
             try {
-    			query_json = query_submit.executeQuery(collection);
+    			query_json = query_submit.executeQuery(collection, null);
     		} catch (IllegalStateException | URISyntaxException e1) {
 			e1.printStackTrace();
 		} catch (IOException e2) {
@@ -123,7 +123,7 @@ public class Spatial extends Controller {
     			final_query = query_submit.list_of_queries.get(collection).toString();
     			String query_json = null;
     			try {
-    				query_json = query_submit.executeQuery(collection);
+    				query_json = query_submit.executeQuery(collection, null);
     			} catch (IllegalStateException | URISyntaxException e1) {
     				e1.printStackTrace();
 	    		} catch (IOException e2) {

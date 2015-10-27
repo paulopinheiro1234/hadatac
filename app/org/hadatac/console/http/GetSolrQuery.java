@@ -9,6 +9,7 @@ import java.net.URL;
 import java.net.URLEncoder;
 import java.util.Iterator;
 import java.util.Scanner;
+import java.util.StringTokenizer;
 import java.util.TreeMap;
 
 import org.hadatac.console.models.Query;
@@ -171,15 +172,25 @@ public class GetSolrQuery {
     //Output: Returns JSON in the form of a string. Currently does not handle http errors
     //		  very gracefully. Need to change this.
     //Postconditions: None
-    public String executeQuery(String collection, int page, int size) throws IllegalStateException, IOException, URISyntaxException{
+    public String executeQuery(String collection, int page, int size, String permissions) throws IllegalStateException, IOException, URISyntaxException{
     	CloseableHttpClient httpClient = HttpClients.createDefault();
         HttpGet get = new HttpGet(this.collection_urls.get(collection));
         
         Scanner in = null;
         try
         {
+        	StringTokenizer tokens = new StringTokenizer(permissions, ",");
+        	String query = this.list_of_queries.get(collection).toString() + " AND (";
+        	while (tokens.hasMoreTokens()) {
+        		query += "permission_uri:\"" + tokens.nextToken() + "\"";
+        		if (tokens.hasMoreTokens()) {
+        			query +=  " OR ";
+        		}
+        	}
+        	query += ")";
+        	System.out.println("!!!!! QUERY: " + query);
         	HttpClient client = new DefaultHttpClient();
-        	URL url = new URL(this.list_of_queries.get(collection).toString() + "&start=" + (page-1)*size + "&rows=" + size + "&facet=true&facet.mincount=1&facet.field=unit&facet.pivot=entity,characteristic&facet.pivot=platform_name,instrument_model");
+        	URL url = new URL(query + "&start=" + (page-1)*size + "&rows=" + size + "&facet=true&facet.mincount=1&facet.field=unit&facet.pivot=entity,characteristic&facet.pivot=platform_name,instrument_model");
         	URI uri = new URI(url.getProtocol(), url.getUserInfo(), url.getHost(), url.getPort(), url.getPath(), url.getQuery(), url.getRef());
         	HttpGet request = new HttpGet(uri.toASCIIString());
         	HttpResponse response = client.execute(request);
@@ -195,7 +206,7 @@ public class GetSolrQuery {
             //request.close();
         }
     }
-    public String executeQuery(String collection) throws IllegalStateException, IOException, URISyntaxException{
-    	return executeQuery(collection, 1, 20);
+    public String executeQuery(String collection, String permissions) throws IllegalStateException, IOException, URISyntaxException{
+    	return executeQuery(collection, 1, 20, permissions);
     }// /executeQuery()
 }

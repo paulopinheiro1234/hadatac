@@ -5,8 +5,8 @@
 # Home page
 GET	    /hadatac/                                 org.hadatac.console.controllers.Portal.index()
 POST	/hadatac/                                 org.hadatac.console.controllers.Portal.postIndex()
-GET	    /hadatac/measurements                     org.hadatac.console.controllers.Application.index(p: Int ?= 1, facets: String ?= "", facetAdd: String ?= "", facetDel: String ?= "")
-POST	/hadatac/measurements                     org.hadatac.console.controllers.Application.postIndex(p: Int ?= 1, facets: String ?= "", facetAdd: String ?= "", facetDel: String ?= "")
+GET	    /hadatac/measurements                     org.hadatac.console.controllers.Application.index(start: Int ?= 1, rows: Int ?= 20, facets: String ?= "")
+POST	/hadatac/measurements                     org.hadatac.console.controllers.Application.postIndex(start: Int ?= 1, rows: Int ?= 20, facets: String ?= "")
 GET	    /hadatac/measurements/loadccsv		      org.hadatac.console.controllers.measurements.LoadCCSV.loadCCSV(oper: String)
 POST	/hadatac/measurements/loadccsv		      org.hadatac.console.controllers.measurements.LoadCCSV.postLoadCCSV(oper: String)
 POST	/hadatac/measurements/loadccsv/upload	  org.hadatac.console.controllers.measurements.LoadCCSV.uploadFile
