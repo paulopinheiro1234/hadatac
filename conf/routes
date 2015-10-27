@@ -48,7 +48,7 @@ GET     /hadatac/assets/javascript/routes.js       org.hadatac.console.controlle
 GET     /hadatac/profile                           org.hadatac.console.controllers.AuthApplication.profile
 GET     /hadatac/login                             org.hadatac.console.controllers.AuthApplication.login
 POST    /hadatac/login                             org.hadatac.console.controllers.AuthApplication.doLogin
-GET     /hadatac/logout                            com.feth.play.module.pa.controllers.Authenticate.logout
+GET     /hadatac/logout                            org.hadatac.console.controllers.AuthApplication.doSignout
 GET     /hadatac/authenticate/:provider            com.feth.play.module.pa.controllers.Authenticate.authenticate(provider: String)
 GET     /hadatac/signup                            org.hadatac.console.controllers.AuthApplication.signup
 POST    /hadatac/signup                            org.hadatac.console.controllers.AuthApplication.doSignup

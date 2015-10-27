@@ -58,7 +58,7 @@
                          <a href="#" class="dropdown-toggle" data-toggle="dropdown"><i class="glyphicon glyphicon-user"></i> @user.name <span class="caret"></span></a>
                          <ul class="dropdown-menu" role="menu">
                             <li class="@("active".when(nav == "profile"))"><a href="@org.hadatac.console.controllers.routes.AuthApplication.profile()">@Messages("playauthenticate.navigation.profile")</a></li>
-                            <li><a href="@com.feth.play.module.pa.controllers.routes.Authenticate.logout()"><i class="icon-off"></i> @Messages("playauthenticate.navigation.logout")</a></li>
+                            <li><a href="@org.hadatac.console.controllers.routes.AuthApplication.doSignout()"><i class="icon-off"></i> @Messages("playauthenticate.navigation.logout")</a></li>
                          </ul>
                      </li>
                   }
