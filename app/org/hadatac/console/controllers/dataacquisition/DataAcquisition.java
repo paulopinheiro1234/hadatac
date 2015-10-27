@@ -82,7 +82,7 @@ public class DataAcquisition extends Controller {
     public static Result index(int page, int rows, String facets) {
     	ObjectMapper mapper = new ObjectMapper();
     	
-    	List<String> permissions = getPermissions(session().get("user_hyerarchy"));
+    	List<String> permissions = getPermissions(session().get("user_hierarchy"));
     	
     	FacetHandler handler = null;
     	try {
@@ -95,62 +95,6 @@ public class DataAcquisition extends Controller {
     	AcquisitionQueryResult results = Measurement.find(page, rows, permissions, handler);
     	
     	return ok(dataacquisition_browser.render(results, results.toJSON(), handler.toJSON()));
-    	/*
-    	System.out.println("!!! index PARAMS - facets: |" + facets + "| facet: |" + facetAdd + "|");
-    	try {
-    		if (!facets.isEmpty()) {
-    			facets = URLDecoder.decode(facets, "UTF-8");
-    			System.out.println("AFTER DECODE: " + facets);
-    		}
-		} catch (Exception e) {
-			System.out.println("URLDecoder.decode: " + e.getMessage());
-		}
-    	ObjectMapper mapper = new ObjectMapper();
-    	
-    	FacetHandler handler = null;
-    	try {
-    		handler = mapper.readValue(facets, FacetHandler.class);
-    	} catch (Exception e) {
-    		handler = new FacetHandler();
-    		System.out.println("mapper.readValue: " + e.getMessage());
-    	}
-    	if (!facetAdd.isEmpty()) {
-    		handler.putFacet(facetAdd.substring(0, facetAdd.indexOf(":")), facetAdd.substring(facetAdd.indexOf(":")+2, facetAdd.length()-1));
-    	}
-    	
-    	Form<FacetFormData> formData = Form.form(FacetFormData.class).fill(facet_form);
-        JsonHandler jh = new JsonHandler();
-        String query_json = "";
-        //ArrayList<String> names = new ArrayList<String>();
-        
-        //Get query using http.GetSolrQuery
-        SpatialQuery query = new SpatialQuery();
-        GetSolrQuery query_submit = new GetSolrQuery(query, handler.toSolrQuery());
-        TreeMap<String, SpatialQueryResults> query_results_list = new TreeMap<String, SpatialQueryResults>();
-    	String final_query = null;
-    	
-    	for (String collection : query_submit.list_of_queries.keySet()){
-    		final_query = query_submit.list_of_queries.get(collection).toString();
-            try {
-            	String hyerarchy = session().get("user_hyerarchy");
-            	query_json = query_submit.executeQuery(collection, p, 20, hyerarchy);
-    		} catch (IllegalStateException | IOException | URISyntaxException e1) {
-    			e1.printStackTrace();
-    		}
-            SpatialQueryResults query_results = new SpatialQueryResults(query_json);
-            query_results_list.put(collection, query_results);
-    	}
-    	
-        //Get the facets
-        getFacets(jh);
-        
-        //return ok("cool");
-        Form<FacetFormData> fd = Form.form(FacetFormData.class).fill(facet_form);
-        return ok(index_browser.render(fd, field_facets, query_facets,
-                range_facets, pivot_facets, cluster_facets, 
-                query_results_list, query_json, final_query, p, (int) Math.ceil(1808.0/20), handler));
-        //return ok(hadatac_message.render("HADataC", "Your HADataC instance does not contain any measurements to be browser. Please go ahead and index some."));
-         * */
     }
 
     public static Result postIndex(int page, int rows, String facets) {
@@ -169,82 +113,5 @@ public class DataAcquisition extends Controller {
     	AcquisitionQueryResult results = Measurement.find(page, rows, permissions, handler);
     	
     	return ok(dataacquisition_browser.render(results, results.toJSON(), handler.toJSON()));
-    	/*
-    	System.out.println("!!! postIndex PARAMS - facets: |" + facets + "| facet: |" + facetAdd + "|");
-    	try {
-    		if (!facets.isEmpty()) {
-    			facets = URLDecoder.decode(facets, "UTF-8");
-    		}
-		} catch (Exception e) {
-			System.out.println("URLDecoder.decode: " + e.getMessage());
-		}
-    	ObjectMapper mapper = new ObjectMapper();
-    	
-    	FacetHandler handler = null;
-    	try {
-    		handler = mapper.readValue(facets, FacetHandler.class);
-    	} catch (Exception e) {
-    		handler = new FacetHandler();
-    		System.out.println("mapper.readValue: " + e.getMessage());
-    	}
-    	if (!facetAdd.isEmpty()) {
-    		handler.putFacet(facetAdd.substring(0, facetAdd.indexOf(":")), facetAdd.substring(facetAdd.indexOf(":")+1, facetAdd.length()));
-    	}
-    	
-    	String query_json = "";
-    	JsonHandler jh = new JsonHandler();
-    	String subject = new String();
-    	String predicate = "within";
-    	DynamicForm formData = Form.form().bindFromRequest();
-    	
-    	FacetsWithCategories field_facet_for_query = new FacetsWithCategories();
-    	
-    	//Searching for the index of "[" is done here, because of the way the views are set up
-    	//The scala will add a number to each category so as to map
-    	//The same category to more than 1 facet
-    	//When creating the query, however, this number is not needed.
-    	for (String category : formData.data().keySet()){
-    		if (category.contains("[")) {
-    			int index = category.indexOf("[");
-    			field_facet_for_query.addFacet(category.substring(0,index), formData.data().get(category));
-    			System.out.println("!!! category: " + category);
-    			System.out.println("!!! get(category): " + formData.data().get(category));
-    		} else {
-    			subject = formData.data().get(category);
-    		}
-    	}
-    	
-    	//TODO Change Query constructor not to accept named_geographic_location and spatial_predicate as args
-    	//Don't need it since the addSpatialComponent function was created
-    	SpatialQuery query = new SpatialQuery(subject, predicate, field_facet_for_query, query_facets,
-    						    pivot_facets, range_facets, cluster_facets);
-    	
-    	GetSolrQuery query_submit = new GetSolrQuery(query, handler.toSolrQuery());
-    	
-    	//TODO loop over all queries in query_submit.list_of_queries
-    	TreeMap<String, SpatialQueryResults> query_results_list = new TreeMap<String, SpatialQueryResults>();
-    	String final_query = null;
-    	
-    	for (String collection : query_submit.list_of_queries.keySet()){
-    		final_query = query_submit.list_of_queries.get(collection).toString();
-            try {
-            	String hyerarchy = session().get("user_hyerarchy");
-	            query_json = query_submit.executeQuery(collection, p, 20, hyerarchy);
-    		} catch (IllegalStateException | IOException | URISyntaxException e1) {
-    			e1.printStackTrace();
-    		}
-            SpatialQueryResults query_results = new SpatialQueryResults(query_json);
-            query_results_list.put(collection, query_results);
-    	}
-    	
-        //Get the facets
-        getFacets(jh);
-        
-        //return ok("cool");
-        Form<FacetFormData> fd = Form.form(FacetFormData.class).fill(facet_form);
-        return ok(index_browser.render(fd, field_facets, query_facets,
-                range_facets, pivot_facets, cluster_facets, 
-                query_results_list, query_json, final_query, p, (int) Math.ceil(1808.0/20), handler)); 
-		*/
     }
 }

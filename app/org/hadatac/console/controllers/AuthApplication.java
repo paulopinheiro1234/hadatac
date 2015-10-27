@@ -37,7 +37,7 @@ public class AuthApplication extends Controller {
 		if (localUser != null) {
 			final org.hadatac.entity.pojo.User user = org.hadatac.entity.pojo.User.find(localUser.uri);
 			String permissions = user.getGroupNamesUri();
-			session().put("user_hyerarchy", permissions);
+			session().put("user_hierarchy", permissions);
 		}
 		return ok(portal.render());
 	}
@@ -105,6 +105,11 @@ public class AuthApplication extends Controller {
 			// signup
 			return UsernamePasswordAuthProvider.handleSignup(ctx());
 		}
+	}
+	
+	public static Result doSignout() {
+		session().put("user_hierarchy", "");
+		return com.feth.play.module.pa.controllers.Authenticate.logout();
 	}
 
 	public static String formatTimestamp(final long t) {
