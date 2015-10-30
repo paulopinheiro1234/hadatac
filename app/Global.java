@@ -1,6 +1,7 @@
 import java.util.Arrays;
 
 import org.hadatac.console.models.SecurityRole;
+import org.hadatac.console.models.User;
 
 import com.feth.play.module.pa.PlayAuthenticate;
 import com.feth.play.module.pa.PlayAuthenticate.Resolver;
@@ -96,7 +97,7 @@ public class Global extends GlobalSettings {
 	private void initialData() {
 		if (SecurityRole.existsSolr() == false) {
 			for (final String roleName : Arrays
-					.asList(org.hadatac.console.controllers.AuthApplication.USER_ROLE)) {
+					.asList(org.hadatac.console.controllers.AuthApplication.DATA_OWNER_ROLE, org.hadatac.console.controllers.AuthApplication.DATA_MANAGER_ROLE)) {
 				final SecurityRole role = new SecurityRole();
 				role.roleName = roleName;
 				role.save();

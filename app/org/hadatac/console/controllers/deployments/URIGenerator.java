@@ -7,6 +7,7 @@ import org.apache.solr.client.solrj.impl.HttpSolrClient;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
+import org.hadatac.console.controllers.AuthApplication;
 import org.hadatac.console.http.GetSparqlQuery;
 
 import java.io.IOException;
@@ -26,9 +27,13 @@ import play.mvc.Result;
 
 import org.hadatac.console.views.html.deployments.*;
 
+import be.objectify.deadbolt.java.actions.Group;
+import be.objectify.deadbolt.java.actions.Restrict;
+
 public class URIGenerator extends Controller {
 	
 	// for /metadata HTTP GET requests
+	@Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
     public static Result index() {
 
        return ok(uriGenerator.render(Form.form(URIGeneratorForm.class)));
@@ -37,6 +42,7 @@ public class URIGenerator extends Controller {
 
 
     // for /metadata HTTP POST requests
+	@Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
     public static Result postIndex() {
         
         return ok(uriGenerator.render(Form.form(URIGeneratorForm.class)));
@@ -69,6 +75,7 @@ public class URIGenerator extends Controller {
     /**
      * Handles the form submission.
      */
+    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
     public static Result processForm() {
         Form<URIGeneratorForm> form = Form.form(URIGeneratorForm.class).bindFromRequest();
         URIGeneratorForm data = form.get();

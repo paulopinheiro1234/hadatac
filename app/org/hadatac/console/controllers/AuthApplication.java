@@ -30,7 +30,8 @@ public class AuthApplication extends Controller {
 
 	public static final String FLASH_MESSAGE_KEY = "message";
 	public static final String FLASH_ERROR_KEY = "error";
-	public static final String USER_ROLE = "user";
+	public static final String DATA_OWNER_ROLE = "data_owner";
+	public static final String DATA_MANAGER_ROLE = "data_manager";
 	
 	public static Result index() {
 		final User localUser = getLocalUser(session());
@@ -48,13 +49,13 @@ public class AuthApplication extends Controller {
 		return localUser;
 	}
 
-	@Restrict(@Group(AuthApplication.USER_ROLE))
+	@Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
 	public static Result restricted() {
 		final User localUser = getLocalUser(session());
 		return ok(restricted.render(localUser));
 	}
 
-	@Restrict(@Group(AuthApplication.USER_ROLE))
+	@Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
 	public static Result profile() {
 		final User localUser = getLocalUser(session());
 		return ok(profile.render(localUser));
@@ -96,9 +97,11 @@ public class AuthApplication extends Controller {
 			// User did not fill everything properly
 			return badRequest(signup.render(filledForm));
 		} else {
-			if (!UserManagement.isPreRegistered(filledForm.get().email)) {
-				return ok(notRegistered.render());
-			};
+			if (User.existsSolr()) { // only check for pre-registration if it is not the first user signing up
+				if (!UserManagement.isPreRegistered(filledForm.get().email)) {
+					return ok(notRegistered.render());
+				}
+			}
 			
 			// Everything was filled
 			// do something with your part of the form before handling the user

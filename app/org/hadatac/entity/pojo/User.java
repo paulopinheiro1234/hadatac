@@ -1,5 +1,6 @@
 package org.hadatac.entity.pojo;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -7,6 +8,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.http.client.ClientProtocolException;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.jena.query.Query;
 import org.apache.jena.query.QueryExecution;
 import org.apache.jena.query.QueryExecutionFactory;
@@ -21,12 +25,29 @@ import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdf.model.Statement;
 import org.apache.jena.rdf.model.StmtIterator;
+import org.apache.jena.update.UpdateExecutionFactory;
+import org.apache.jena.update.UpdateFactory;
+import org.apache.jena.update.UpdateProcessor;
+import org.apache.jena.update.UpdateRequest;
 import org.hadatac.data.loader.util.Sparql;
 import org.hadatac.utils.Collections;
+import org.hadatac.utils.NameSpaces;
 
 import play.Play;
 
 public class User implements Comparable<User> {
+	
+	public static String INDENT1 = "     ";
+	
+	public static String INSERT_LINE1 = "INSERT DATA {  ";
+    
+    public static String LINE3 = INDENT1 + "a         prov:Person, foaf:Person;  ";
+    
+    public static String MBOX_PREDICATE =     INDENT1 + "foaf:mbox        ";
+    
+    public static String TIME_XMLS =   "\"^^<http://www.w3.org/2001/XMLSchema#dateTime> .";
+    
+    public static String LINE_LAST = "}  ";
 	
 	private String uri;
 	private String name;
@@ -129,6 +150,37 @@ public class User implements Comparable<User> {
         	//"DELETE DATA { <http://example/book3>  dc:title  x }"
         	//"INSERT DATA { <http://example/book3>  dc:title  y }"
         }
+        
+        String insert = "";
+		insert += NameSpaces.getInstance().printSparqlNameSpaceList();
+		insert += INSERT_LINE1;
+    	insert += "<" + this.getUri() + ">  ";
+    	insert += MBOX_PREDICATE + "\"" + this.email + "\" ;   ";
+    	insert += LINE_LAST;
+    	
+    	System.out.println("!!!! INSERT USER QUERY\n" + insert);
+        
+        UpdateRequest request = UpdateFactory.create(insert);
+        UpdateProcessor processor = UpdateExecutionFactory.createRemote(request, Collections.getCollectionsName(Collections.PERMISSIONS_SPARQL));
+        processor.execute();
+        
+        DefaultHttpClient httpclient = new DefaultHttpClient();
+        HttpGet httpget = new HttpGet(Play.application().configuration().getString("hadatac.solr.triplestore")
+        		+ "/store_users/update?commit=true");
+        try {
+			httpclient.execute(httpget);
+		} catch (ClientProtocolException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	
+	public static User create() {
+		User user = new User();
+		return user;
 	}
 	
 	public static List<User> find() {

@@ -16,20 +16,26 @@ import play.libs.*;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
+import org.hadatac.console.controllers.AuthApplication;
 import org.hadatac.console.views.html.triplestore.*;
 import org.hadatac.metadata.loader.MetadataContext;
 import org.hadatac.metadata.loader.SpreadsheetProcessing;
 import org.hadatac.utils.Feedback;
 import org.hadatac.utils.NameSpaces;
 
+import be.objectify.deadbolt.java.actions.Group;
+import be.objectify.deadbolt.java.actions.Restrict;
+
 public class LoadKB extends Controller {
 
 	private static final String UPLOAD_NAME = "tmp/uploads/hasneto-spreadsheet.xls";
 	
+	@Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
     public static Result loadKB(String oper) {
 	return ok(loadKB.render(oper, ""));
     }
 
+	@Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
     public static Result postLoadKB(String oper) {
 	return ok(loadKB.render(oper, ""));
     }
@@ -45,6 +51,7 @@ public class LoadKB extends Controller {
 	     return message;
    }
     
+    @Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
     public static Result uploadFile(String oper) {
     	//System.out.println("uploadFile CALLED!");
            MultipartFormData body = request().body().asMultipartFormData();

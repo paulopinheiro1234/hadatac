@@ -2,6 +2,7 @@ package org.hadatac.console.controllers.annotator;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
+import org.hadatac.console.controllers.AuthApplication;
 import org.hadatac.console.http.DeploymentQueries;
 import org.hadatac.console.http.GetSparqlQuery;
 
@@ -30,6 +31,9 @@ import org.hadatac.console.views.html.annotator.*;
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+
+import be.objectify.deadbolt.java.actions.Group;
+import be.objectify.deadbolt.java.actions.Restrict;
 
 
 public class FileProcessing extends Controller {
@@ -63,6 +67,7 @@ public class FileProcessing extends Controller {
 		return theResults;
 	}
 	
+    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
     public static Result uploadFile(String handler_json) {
     	try {
 			handler_json = URLDecoder.decode(handler_json, "UTF-8");
