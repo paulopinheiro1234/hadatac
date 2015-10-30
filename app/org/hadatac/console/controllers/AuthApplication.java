@@ -97,9 +97,11 @@ public class AuthApplication extends Controller {
 			// User did not fill everything properly
 			return badRequest(signup.render(filledForm));
 		} else {
-			if (!UserManagement.isPreRegistered(filledForm.get().email)) {
-				return ok(notRegistered.render());
-			};
+			if (User.existsSolr()) { // only check for pre-registration if it is not the first user signing up
+				if (!UserManagement.isPreRegistered(filledForm.get().email)) {
+					return ok(notRegistered.render());
+				}
+			}
 			
 			// Everything was filled
 			// do something with your part of the form before handling the user
