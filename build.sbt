@@ -8,7 +8,7 @@ version := "1.0-SNAPSHOT"
 
 val appDependencies = Seq(
   "be.objectify"  %% "deadbolt-java"     % "2.4.3",
-  "com.feth"      %% "play-authenticate" % "0.7.0-SNAPSHOT",
+  "com.feth"      %% "play-authenticate" % "0.7.0",
   cache,
   javaWs,
   javaJdbc,
@@ -27,7 +27,7 @@ val appDependencies = Seq(
   "org.apache.jena" % "jena-core" % "3.0.0",
   "org.apache.jena" % "jena-arq" % "3.0.0",
   "args4j" % "args4j" % "2.32",
-  "joda-time" % "joda-time" % "2.8.2"
+  "joda-time" % "joda-time" % "2.9"
 )
 
 // add resolver for deadbolt and easymail snapshots
