@@ -506,7 +506,8 @@ public class User extends AppModel implements Subject {
 		user.name = doc.getFieldValue("name").toString();
 		user.firstName = doc.getFieldValue("first_name").toString();
 		user.lastName = doc.getFieldValue("last_name").toString();
-		user.setLastLogin(doc.getFieldValue("last_login").toString());
+		DateTime date = new DateTime((Date)doc.getFieldValue("last_login"));
+		user.setLastLogin(date.withZone(DateTimeZone.UTC).toString("EEE MMM dd HH:mm:ss zzz yyyy"));
 		user.active = Boolean.parseBoolean(doc.getFieldValue("active").toString());
 		user.emailValidated = Boolean.parseBoolean(doc.getFieldValue("email_validated").toString());
 		
