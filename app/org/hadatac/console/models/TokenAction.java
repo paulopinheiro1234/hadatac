@@ -120,13 +120,16 @@ public class TokenAction {
 			solrClient.close();
 			SolrDocumentList list = queryResponse.getResults();
 			if (list.size() == 1) {
+				DateTime date;
 				tokenAction = new TokenAction();
 				SolrDocument doc = list.get(0);
 				tokenAction.id_s = doc.getFieldValue("id").toString();
 				tokenAction.token = doc.getFieldValue("token").toString();
 				tokenAction.setType(doc.getFieldValue("type").toString());
-				tokenAction.setCreated(doc.getFieldValue("created").toString());
-				tokenAction.setExpires(doc.getFieldValue("expires").toString());
+				date = new DateTime((Date)doc.getFieldValue("created"));
+				tokenAction.setCreated(date.withZone(DateTimeZone.UTC).toString("EEE MMM dd HH:mm:ss zzz yyyy"));
+				date = new DateTime((Date)doc.getFieldValue("expires"));
+				tokenAction.setExpires(date.withZone(DateTimeZone.UTC).toString("EEE MMM dd HH:mm:ss zzz yyyy"));
 				tokenAction.targetUser = User.findByIdSolr(doc.getFieldValue("target_user_id").toString());
 			}
 		} catch (Exception e) {

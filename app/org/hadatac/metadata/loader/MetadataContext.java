@@ -166,6 +166,7 @@ public class MetadataContext implements RDFContext {
 		Long total = totalTriples();
 		try {
 			model.read(filePath, getLang(contentType));
+			System.out.println("------------------====---------");
 			accessor.add(model);
 		} catch (NotFoundException e) {
 			System.out.println("NotFoundException: file " + filePath);
