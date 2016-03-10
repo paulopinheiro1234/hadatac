@@ -2,6 +2,7 @@ package org.hadatac.entity.pojo;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 
@@ -393,14 +394,17 @@ public class DataCollection {
 	
 	public static DataCollection convertFromSolr(SolrDocument doc) {
 		Iterator<Object> i;
+		DateTime date;
 		DataCollection dataCollection = new DataCollection();
 		dataCollection.setUri(doc.getFieldValue("uri").toString());
 		dataCollection.setOwnerUri(doc.getFieldValue("owner_uri").toString());
 		dataCollection.setPermissionUri(doc.getFieldValue("permission_uri").toString());
 		dataCollection.setTriggeringEvent(Integer.parseInt(doc.getFieldValue("triggering_event").toString()));
 		dataCollection.setNumberDataPoints(Long.parseLong(doc.getFieldValue("nr_data_points").toString()));
-		dataCollection.setStartedAt(doc.getFieldValue("started_at").toString());
-		dataCollection.setEndedAt(doc.getFieldValue("ended_at").toString());
+		date = new DateTime((Date)doc.getFieldValue("started_at"));
+		dataCollection.setStartedAt(date.withZone(DateTimeZone.UTC).toString("EEE MMM dd HH:mm:ss zzz yyyy"));
+		date = new DateTime((Date)doc.getFieldValue("ended_at"));
+		dataCollection.setEndedAt(date.withZone(DateTimeZone.UTC).toString("EEE MMM dd HH:mm:ss zzz yyyy"));
 		if (doc.getFieldValues("unit") != null) {
 			i = doc.getFieldValues("unit").iterator();
 			while (i.hasNext()) {

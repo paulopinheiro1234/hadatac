@@ -1,6 +1,7 @@
 package org.hadatac.entity.pojo;
 
 import java.io.IOException;
+import java.util.Date;
 import java.util.Iterator;
 
 import org.apache.solr.client.solrj.SolrClient;
@@ -80,11 +81,13 @@ public class ConsoleStore {
             SolrDocumentList list = response.getResults();
             Iterator<SolrDocument> i = list.iterator();
             if (i.hasNext()) {
+            	DateTime date;
             	SolrDocument document = i.next();
             	consoleStore = new ConsoleStore();
             	consoleStore.setId(Integer.parseInt(document.getFieldValue("id").toString()));
             	consoleStore.setLastDynamicMetadataId(Long.parseLong(document.getFieldValue("last_dynamic_metadata_id").toString()));
-            	consoleStore.setTimestamp(document.getFieldValue("timestamp").toString());
+            	date = new DateTime((Date)document.getFieldValue("timestamp"));
+            	consoleStore.setTimestamp(date.withZone(DateTimeZone.UTC).toString("EEE MMM dd HH:mm:ss zzz yyyy"));
             }
         } catch (SolrServerException | IOException e) {
         	System.out.println("[ERROR] ConsoleStore.find() - e.Message: " + e.getMessage());
