@@ -15,6 +15,9 @@ public class ValueCellProcessing {
 	}
 	
 	boolean isAbbreviatedURI(String str) {
+		if (str.trim().split(" ").length >= 2){
+			return false;
+		}
 		if (!str.contains(":") || str.contains("//"))
 			return false;
 		if (str.substring(0,str.indexOf(':')).contains(" "))
@@ -56,13 +59,32 @@ public class ValueCellProcessing {
 	        String abbrev = entry.getKey().toString();
 	        String nsString = entry.getValue().getName();
 	        if (str.startsWith(nsString)) {
-	        	//System.out.println("REPLACE: " + resp + " / " + abbrev);
+	        	System.out.println("REPLACE: " + resp + " / " + abbrev);
 	        	resp = str.replace(nsString, abbrev + ":");
 	        	return resp; 
 	        }
 	    }
 	    return "<" + str + ">";
-	}	
+	}
+	
+	/* 
+	 *  if the argument str starts with the abbreviation of one of the name spaces registered in NameSpaces.table, the
+	 *  abbreviation gets replaced by the name space's URI. Otherwise, the string is returned wrapper
+	 *  around angular brackets.
+	 */
+	private String replacePrefix(String str) {
+		String resp = str;
+	    for (Map.Entry<String, NameSpace> entry : NameSpaces.table.entrySet()) {
+	        String abbrev = entry.getKey().toString();
+	        String nsString = entry.getValue().getName();
+	        if (str.startsWith(nsString)) {
+	        	System.out.println("REPLACE: " + resp + " / " + abbrev);
+	        	resp = str.replace(nsString, abbrev + ":");
+	        	return resp; 
+	        }
+	    }
+	    return "<" + str + ">";
+	}
 	
 	/* 
 	 *  check if the namespace in str is in the namamespace list (NameSpaces.table). 
@@ -83,17 +105,19 @@ public class ValueCellProcessing {
 	    }
 		System.out.println("# WARNING: NAMESPACE NOT DEFINED <" + nsName + ">");
 		System.out.println(abbrev);
-	return;
+		return;
 	}
 	
-	private String processSubjectValue(String subject) {
-		if (isAbbreviatedURI(subject)) 
+	public String processSubjectValue(String subject) {
+		if (isAbbreviatedURI(subject)) {
 			validateNameSpace(subject);
+			return (subject + "\n");
+		}
 		// no indentation or semicolon at the end of the string
 		return (replaceNameSpace(subject) + "\n");	
 	}
 	
-	private String processObjectValue(String object) {
+	public String processObjectValue(String object) {
 		
 		// if abbreviated URI, just print it
 		if (isAbbreviatedURI(object)) { 

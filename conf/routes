@@ -119,6 +119,11 @@ GET     /hadatac/ts/loadont/cache                  org.hadatac.console.controlle
 GET     /hadatac/ts/loadkb                         org.hadatac.console.controllers.triplestore.LoadKB.loadKB(oper: String)
 POST    /hadatac/ts/loadkb                         org.hadatac.console.controllers.triplestore.LoadKB.postLoadKB(oper: String)
 POST    /hadatac/ts/loadkb/upload                  org.hadatac.console.controllers.triplestore.LoadKB.uploadFile(oper: String)
+GET     /hadatac/ts/exportkb                       org.hadatac.console.controllers.triplestore.ExportKB.exportKB(oper: String)
+POST    /hadatac/ts/exportkb                       org.hadatac.console.controllers.triplestore.ExportKB.exportFile(oper: String)
+GET     /hadatac/ts/synclabkey                     org.hadatac.console.controllers.triplestore.LoadKB.loadLabkeyKB(oper: String)
+POST    /hadatac/ts/synclabkey                     org.hadatac.console.controllers.triplestore.LoadKB.postLoadLabkeyKB(oper: String)
+POST    /hadatac/ts/synclabkey/loading             org.hadatac.console.controllers.triplestore.LoadKB.playLoadLabkeyKB(oper: String)
  
 # Permissions store management URLs
 GET     /hadatac/perm/preregister                  org.hadatac.console.controllers.triplestore.UserManagement.preRegistration(oper: String)
