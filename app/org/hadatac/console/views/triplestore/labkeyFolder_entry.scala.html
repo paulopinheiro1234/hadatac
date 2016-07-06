@@ -1,0 +1,12 @@
+@(labkeyLoginForm : org.hadatac.console.models.LabKeyLoginForm, 
+  folder_name : String)
+
+@import java.net._
+@import org.hadatac.utils._
+
+<tr>
+   <td>@if(folder_name != null) { @folder_name }</td>
+   <td>
+       <a href="@org.hadatac.console.controllers.triplestore.routes.LoadKB.playLoadLabkeyLists(labkeyLoginForm, folder_name)" class="btn-xs btn-primary" role="button">View</a>
+   </td>
+</tr>

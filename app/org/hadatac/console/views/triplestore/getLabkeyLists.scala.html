@@ -1,0 +1,32 @@
+@(labkeyLoginForm : org.hadatac.console.models.LabKeyLoginForm,
+  folder : String,
+  results : List[String])
+
+@import helper._
+@import org.hadatac.console.views.html._
+@import org.hadatac.console.controllers.triplestore._
+@import org.hadatac.metadata.loader._
+@import java.net._
+
+@main("LabKey List") {
+
+     <div class="container-fluid">
+        <table class="table">
+            <thead>
+                 <tr>
+                    <th>List Name</th>
+                    <th>Operations</th>
+                 </tr>
+            </thead>
+            <tbody>
+              @for(list_name <- results){
+                  @labkeyList_entry(labkeyLoginForm, folder, list_name)
+              }
+            </tbody>
+        </table>
+ 
+ 		<a href="@org.hadatac.console.controllers.triplestore.routes.LoadKB.playLoadLabkeyKB("load", folder, labkeyLoginForm)" class="btn btn-warning" role="button">Batch Loading</a>
+        <a href="@org.hadatac.console.controllers.triplestore.routes.LoadKB.playLoadLabkeyFolders("load", labkeyLoginForm)" class="btn btn-warning" role="button">Back</a>
+
+    </div>
+}
