@@ -27,7 +27,8 @@ val appDependencies = Seq(
   "org.apache.jena" % "jena-core" % "3.0.1",
   "org.apache.jena" % "jena-arq" % "3.0.1",
   "args4j" % "args4j" % "2.33",
-  "joda-time" % "joda-time" % "2.9.2"
+  "joda-time" % "joda-time" % "2.9.2",
+  "org.jasypt" % "jasypt" % "1.9.2"
 )
 
 // add resolver for deadbolt and easymail snapshots
