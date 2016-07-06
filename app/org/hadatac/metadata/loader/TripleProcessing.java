@@ -10,6 +10,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.StringTokenizer;
@@ -118,9 +119,39 @@ public class TripleProcessing {
 				
 		return clttl;
 	}
+	
+    public static List<String> getLabKeyLists(String labkey_site, String user_name, 
+    		String password, String path) throws CommandException {
+    	
+		LabkeyDataLoader loader = new LabkeyDataLoader(labkey_site, user_name, password, path);
+		try {
+			List<String> queryNames = loader.getAllQueryNames();
+			return queryNames;
+		} catch (CommandException e) {
+			if(e.getMessage().equals("Unauthorized")){
+				throw e;
+			}
+		}
+		return null;
+	}
+    
+    public static List<String> getLabKeyFolders(String labkey_site, String user_name, 
+    		String password, String path) throws CommandException {
+    	
+		LabkeyDataLoader loader = new LabkeyDataLoader(labkey_site, user_name, password, path);
+		try {
+			List<String> folders = loader.getSubfolders();
+			return folders;
+		} catch (CommandException e) {
+			if(e.getMessage().equals("Unauthorized")){
+				throw e;
+			}
+		}
+		return null;
+	}
 
-    public static String generateTTL(int mode, String oper, RDFContext rdf, 
-    		String labkey_site, String user_name, String password, String path) throws CommandException {
+    public static String generateTTL(int mode, String oper, RDFContext rdf, String labkey_site, 
+    		String user_name, String password, String path, String list_name) throws CommandException {
 
 		String message = "";
 		if (oper.equals("load")) {
@@ -135,7 +166,14 @@ public class TripleProcessing {
 				new HashMap< String, List<String> >();
 		
 		try {
-			List<String> queryNames = loader.getAllQueryNames();
+			List<String> queryNames = null;
+			if(list_name == null){
+				queryNames = loader.getAllQueryNames();
+			}
+			else{
+				queryNames = new LinkedList<String>();
+				queryNames.add(list_name);
+			}
 			for(String query : queryNames){
 				List<String> cols = loader.getColumnNames(query, false);
 				if(loader.containsInstanceData(cols)){

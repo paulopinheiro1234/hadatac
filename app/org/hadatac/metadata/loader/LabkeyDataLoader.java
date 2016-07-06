@@ -7,6 +7,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.labkey.remoteapi.CommandException;
 import org.labkey.remoteapi.Connection;
@@ -14,6 +15,9 @@ import org.labkey.remoteapi.query.GetQueriesCommand;
 import org.labkey.remoteapi.query.GetQueriesResponse;
 import org.labkey.remoteapi.query.SelectRowsCommand;
 import org.labkey.remoteapi.query.SelectRowsResponse;
+import org.labkey.remoteapi.security.GetContainersCommand;
+import org.labkey.remoteapi.security.GetContainersResponse;
+import org.labkey.remoteapi.security.EnsureLoginCommand;
 
 public class LabkeyDataLoader {
 	public Map< String, Map< String, List<PlainTriple> > > mapQueryNameToTriples = 
@@ -114,6 +118,55 @@ public class LabkeyDataLoader {
 		}
 		
 		return null;
+	}
+	
+	private void checkAuthentication() throws CommandException {
+		List<String> listFolders = new LinkedList<String>();
+		EnsureLoginCommand cmd = new EnsureLoginCommand();
+		cmd.setRequiredVersion(9.1);
+		try {
+			cmd.execute(cn, "");
+		} catch (IOException e) {
+			e.printStackTrace();
+		} catch (CommandException e) {
+			if(e.getMessage().equals("Unauthorized")){
+				throw e;
+			}
+			else{
+				e.printStackTrace();
+			}
+		}
+	}
+	
+	public List<String> getSubfolders() throws CommandException {
+		checkAuthentication();
+		List<String> listFolders = new LinkedList<String>();
+		GetContainersCommand cmd = new GetContainersCommand();
+		cmd.setRequiredVersion(9.1);
+		GetContainersResponse response;
+		try {
+			response = cmd.execute(cn, folder_path);
+			Map<String, Object> retMap = response.getParsedData();
+			JSONArray subfolders = (JSONArray)((JSONObject)retMap).get("children");
+			for(Object proj : subfolders){
+				String proj_name = ((JSONObject)proj).get("title").toString();
+				if(proj_name.equals("home") || proj_name.equals("Shared")){
+					continue;
+				}
+				listFolders.add(proj_name);
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		} catch (CommandException e) {
+			if(e.getMessage().equals("Unauthorized")){
+				throw e;
+			}
+			else{
+				e.printStackTrace();
+			}
+		}
+		
+		return listFolders;
 	}
 	
 	public boolean isDefaultColumn(String col){

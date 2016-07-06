@@ -30,6 +30,10 @@ public class ValueCellProcessing {
 	 *  the content is regarded to be an object set.
 	 */
 	boolean isObjectSet (String cellContent) {
+		
+		if (cellContent.startsWith("<") && (cellContent.endsWith(">"))){
+			cellContent = cellContent.replace("<", "").replace(">", "").replace("&", ", ");
+		}
 		 // we need to tokanize the string and verify that the first token is an URI
 	     StringTokenizer st = new StringTokenizer(cellContent,",");
 	     
@@ -131,7 +135,7 @@ public class ValueCellProcessing {
 			// either replace namespace with acronym or add angled brackets
 			//System.out.print(replaceNameSpace(object));
 			return replaceNameSpace(object);
-		} 		
+		}
 		
 		// if not URI, print the object between quotes
 		object = object.replace("\n", " ").replace("\r", " ").replace("\"", "''");
