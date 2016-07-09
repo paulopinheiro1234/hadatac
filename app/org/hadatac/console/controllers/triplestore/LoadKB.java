@@ -58,9 +58,8 @@ public class LoadKB extends Controller {
     
     public static Properties loadConfig() {
     	Properties prop = new Properties();
-        String fileName = "conf/labkey.config";
 		try {
-			InputStream is = new FileInputStream(fileName);
+			InputStream is = LoadKB.class.getClassLoader().getResourceAsStream("labkey.config");
 			prop.load(is);
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();

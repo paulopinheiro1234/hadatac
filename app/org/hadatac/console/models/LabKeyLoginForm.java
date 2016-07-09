@@ -22,9 +22,8 @@ public class LabKeyLoginForm implements QueryStringBindable<LabKeyLoginForm> {
     
     public LabKeyLoginForm(){
     	Properties prop = new Properties();
-        String fileName = "conf/labkey.config";
 		try {
-			InputStream is = new FileInputStream(fileName);
+			InputStream is = getClass().getClassLoader().getResourceAsStream("labkey.config");
 			prop.load(is);
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
