@@ -34,6 +34,7 @@ import play.mvc.Result;
 public class LoadKB extends Controller {
 
 	private static final String UPLOAD_NAME = "tmp/uploads/hasneto-spreadsheet.xls";
+	private static final String UPLOAD_TURTLE_NAME = "tmp/uploads/turtle.ttl";
 	
 	@Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
     public static Result loadKB(String oper) {
@@ -52,7 +53,13 @@ public class LoadKB extends Controller {
 	    				         "password", 
 	    				         Play.application().configuration().getString("hadatac.solr.triplestore"), 
 	    				         false);
-	     String message = SpreadsheetProcessing.generateTTL(Feedback.WEB, oper, metadata, UPLOAD_NAME);
+	     String message = "";
+	     if(oper.equals("turtle")){
+	    	 message = TripleProcessing.processTTL(Feedback.WEB, oper, metadata, UPLOAD_TURTLE_NAME);
+	     }
+	     else{
+	    	 message = SpreadsheetProcessing.generateTTL(Feedback.WEB, oper, metadata, UPLOAD_NAME); 
+	     }
 	     return message;
 	}
     
@@ -223,38 +230,74 @@ public class LoadKB extends Controller {
     
     @Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
     public static Result uploadFile(String oper) {
-    	//System.out.println("uploadFile CALLED!");
+    	System.out.println("uploadFile CALLED!");
     	MultipartFormData body = request().body().asMultipartFormData();
-		   FilePart uploadedfile = body.getFile("pic");
-		   if (uploadedfile != null) {
-		       File file = uploadedfile.getFile();
-		       File newFile = new File(UPLOAD_NAME);
-		       InputStream isFile;
-		       try {
-					isFile = new FileInputStream(file);
-		            byte[] byteFile;
-				    try {
-		     			byteFile = IOUtils.toByteArray(isFile);
-		     			try {
-		     				FileUtils.writeByteArrayToFile(newFile, byteFile);
-		     			} catch (Exception e) {
-		     				// TODO Auto-generated catch block
-		     				e.printStackTrace();
-		     			}
-		     			try {
-		     				isFile.close();
-		     			} catch (Exception e) {
-		     				 return ok (loadKB.render("fail", "Could not save uploaded file."));
-		     			}
-			    	} catch (Exception e) {
-						 return ok (loadKB.render("fail", "Could not process uploaded file."));
-				    }
-			   } catch (FileNotFoundException e1) {
-			       return ok (loadKB.render("fail", "Could not find uploaded file"));
-			   }
-	     	   return ok(loadKB.render(oper, "File uploaded successfully."));
-		   } else {
-			   return ok (loadKB.render("fail", "Error uploading file. Please try again."));
-		}
+    	FilePart uploadedfile = body.getFile("pic");
+    	if (uploadedfile != null) {
+    		File file = uploadedfile.getFile();
+    		File newFile = new File(UPLOAD_NAME);
+    		InputStream isFile;
+    		try {
+    			isFile = new FileInputStream(file);
+    			byte[] byteFile;
+    			try {
+    				byteFile = IOUtils.toByteArray(isFile);
+    				try {
+    					FileUtils.writeByteArrayToFile(newFile, byteFile);
+    				} catch (Exception e) {
+    					// TODO Auto-generated catch block
+    					e.printStackTrace();
+    				}
+    				try {
+    					isFile.close();
+    				} catch (Exception e) {
+    					return ok (loadKB.render("fail", "Could not save uploaded file."));
+    				}
+    			} catch (Exception e) {
+    				return ok (loadKB.render("fail", "Could not process uploaded file."));
+    			}
+    		} catch (FileNotFoundException e1) {
+    			return ok (loadKB.render("fail", "Could not find uploaded file"));
+    		}
+    		return ok(loadKB.render(oper, "File uploaded successfully."));
+    	} else {
+    		return ok (loadKB.render("fail", "Error uploading file. Please try again."));
+    	}
+    }
+    
+    @Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
+    public static Result uploadTurtleFile(String oper) {
+    	System.out.println("uploadTurtleFile CALLED!");
+    	MultipartFormData body = request().body().asMultipartFormData();
+    	FilePart uploadedfile = body.getFile("pic");
+    	if (uploadedfile != null) {
+    		File file = uploadedfile.getFile();
+    		File newFile = new File(UPLOAD_TURTLE_NAME);
+    		InputStream isFile;
+    		try {
+    			isFile = new FileInputStream(file);
+    			byte[] byteFile;
+    			try {
+    				byteFile = IOUtils.toByteArray(isFile);
+    				try {
+    					FileUtils.writeByteArrayToFile(newFile, byteFile);
+    				} catch (Exception e) {
+    					e.printStackTrace();
+    				}
+    				try {
+    					isFile.close();
+    				} catch (Exception e) {
+    					return ok (loadKB.render("fail", "Could not save uploaded file."));
+    				}
+    			} catch (Exception e) {
+    				return ok (loadKB.render("fail", "Could not process uploaded file."));
+    			}
+    		} catch (FileNotFoundException e1) {
+    			return ok (loadKB.render("fail", "Could not find uploaded file"));
+    		}
+    		return ok(loadKB.render("turtle", "File uploaded successfully."));
+    	} else {
+    		return ok (loadKB.render("fail", "Error uploading file. Please try again."));
+    	}
     }
 }

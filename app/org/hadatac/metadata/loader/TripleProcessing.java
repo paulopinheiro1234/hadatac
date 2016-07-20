@@ -264,4 +264,48 @@ public class TripleProcessing {
 
 	    return message;
 	}
+    
+    public static String processTTL(int mode, String oper, RDFContext rdf, String fileName) {
+		String message = "";
+		if (oper.equals("load")) {
+		   message += Feedback.println(mode, "   Triples before loading from LABKEY: " + rdf.totalTriples());
+		   message += Feedback.println(mode, " ");
+		}
+		
+		String listing = "";
+		try {
+			listing = URLEncoder.encode(SpreadsheetProcessing.printFileWithLineNumber(mode, fileName), "UTF-8");
+		} catch (UnsupportedEncodingException e) {
+			e.printStackTrace();
+		};
+
+		System.out.println("");
+		message += Feedback.println(mode, " ");
+		message += Feedback.println(mode, "   Generated " + fileName + " and stored locally.");
+		try {
+			Model model = RDFDataMgr.loadModel(fileName);
+			message += Feedback.println(mode, " ");
+			message += Feedback.print(mode, "SUCCESS parsing the document!");
+			message += Feedback.println(mode, " ");
+			message += Feedback.println(mode, "==== TURTLE (TTL) FILE CONTENT ====");
+			message += listing;
+		} catch (Exception e) {
+			message += Feedback.println(mode, " ");
+			message += Feedback.print(mode, "ERROR parsing the document!");
+			message += Feedback.println(mode, " ");
+			message += e.getMessage();
+			message += Feedback.println(mode, " ");
+			message += Feedback.println(mode, " ");
+			message += Feedback.println(mode, "==== TURTLE (TTL) FILE CONTENT ====");
+			message += listing;
+			return message;
+		}
+
+	    message += Feedback.print(mode, "   Uploading generated file.");
+	    rdf.loadLocalFile(mode, fileName, KB_FORMAT);
+	    message += Feedback.println(mode, "");
+	    message += Feedback.println(mode, " ");
+	    message += Feedback.println(mode, "   Triples after [loading]: " + rdf.totalTriples());
+	    return message;
+	}
 }
