@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<schema version="1.5">
+  <fields>
+    <field name="uri" type="string" indexed="true" stored="true"/>
+	<field name="owner_uri" type="string" indexed="true" docValues="true" />
+	<field name="permission_uri" type="string" indexed="true" docValues="true" />
+    <field name="_version_" type="long" indexed="true" stored="true"/>
+    <field name="_text_" type="text_general" indexed="true" stored="false" multiValued="true"/>
+    <field name="timestamp" type="date" indexed="true" stored="true" docValues="true" />
+    <field name="value" type="double" indexed="true" docValues="true" />
+    <field name="unit" type="string" indexed="true" docValues="true" />
+    <field name="unit_uri" type="string" indexed="true" docValues="true" />
+    <field name="entity" type="string" indexed="true" docValues="true" />
+    <field name="entity_uri" type="string" indexed="true" docValues="true" />
+    <field name="characteristic" type="string" indexed="true" docValues="true" />
+    <field name="characteristic_uri" type="string" indexed="true" docValues="true" />
+    <field name="instrument_model" type="string" indexed="true" docValues="true" />
+    <field name="instrument_uri" type="string" indexed="true" docValues="true" />
+    <field name="platform_name" type="string" indexed="true" docValues="true" />
+    <field name="platform_uri" type="string" indexed="true" docValues="true" />
+    <field name="location" type="latlong" indexed="true" />
+    <field name="elevation" type="double" indexed="true" stored="true" docValues="true"/>
+    <field name="dataset_uri" type="string" indexed="true" stored="true" docValues="true"/>
+    <dynamicField name="JP_*" type="string" indexed="true" stored="true" />
+    <copyField source="JP_*" dest="_text_" />
+    <copyField source="characteristic" dest="_text_" />
+    <copyField source="entity" dest="_text_" />
+    <copyField source="unit" dest="_text_" />
+  </fields>
+
+  <uniqueKey>uri</uniqueKey>
+
+  <types>
+    <fieldType name="string" class="solr.StrField" />
+    <fieldType name="date" class="solr.TrieDateField" precisionStep="0" positionIncrementGap="0"/>
+    <fieldType name="long" class="solr.TrieLongField" precisionStep="0" positionIncrementGap="0"/>
+    <fieldType name="double" class="solr.TrieDoubleField"/>
+    <fieldType name="int" class="solr.TrieIntField" precisionStep="8"/>
+    <fieldType name="latlong" class="solr.SpatialRecursivePrefixTreeFieldType"
+               spatialContextFactory="com.spatial4j.core.context.jts.JtsSpatialContextFactory"
+               distErrPct="0.025"
+               maxDistErr="0.000009"
+               units="degrees" />
+    <fieldType name="text_general" class="solr.TextField" positionIncrementGap="100" multiValued="true">
+      <analyzer type="index">
+        <tokenizer class="solr.StandardTokenizerFactory"/>
+        <filter class="solr.StopFilterFactory" ignoreCase="true" words="stopwords.txt" />
+        <filter class="solr.LowerCaseFilterFactory"/>
+      </analyzer>
+      <analyzer type="query">
+        <tokenizer class="solr.StandardTokenizerFactory"/>
+        <filter class="solr.StopFilterFactory" ignoreCase="true" words="stopwords.txt" />
+        <filter class="solr.LowerCaseFilterFactory"/>
+      </analyzer>
+    </fieldType>
+
+  </types>
+</schema>
