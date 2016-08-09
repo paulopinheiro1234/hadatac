@@ -313,10 +313,10 @@ public class GetSparqlQuery {
         	        "PREFIX vstoi: <http://hadatac.org/ont/vstoi#>  " +
         	        "PREFIX hasneto: <http://hadatac.org/ont/hasneto#>  " +
                     "SELECT ?uri ?platform ?platformName ?instrument ?instrumentName ?date WHERE { " + 
-                    "   ?uri a vstoi:Deployment . " + 
-                    "   ?uri vstoi:hasPlatform ?platform .  " + 
+                    "   ?uri a hasneto:Deployment . " + 
+                    "   ?uri hasneto:hasPlatform ?platform .  " + 
                     "   ?uri hasneto:hasInstrument ?instrument .  " + 
-                    "   ?uri prov:startedAtTime ?date .  " + 
+                    "   OPTIONAL { ?uri prov:startedAtTime ?date } .  " + 
                     "   OPTIONAL { ?platform rdfs:label ?platformName } ." + 
                     "   OPTIONAL { ?instrument rdfs:label ?instrumentName } ." + 
                     "}";
@@ -347,7 +347,7 @@ public class GetSparqlQuery {
         	HttpResponse response = client.execute(request);
             StringWriter writer = new StringWriter();
             IOUtils.copy(response.getEntity().getContent(), writer, "utf-8");
-            //System.out.println("response: " + response);    
+            System.out.println("response: " + response);    
             return writer.toString();
         } finally
         {

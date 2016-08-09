@@ -120,12 +120,27 @@ public class TripleProcessing {
 		return clttl;
 	}
 	
-    public static List<String> getLabKeyLists(String labkey_site, String user_name, 
+    public static List<String> getLabKeyMetadataLists(String labkey_site, String user_name, 
     		String password, String path) throws CommandException {
     	
 		LabkeyDataLoader loader = new LabkeyDataLoader(labkey_site, user_name, password, path);
 		try {
-			List<String> queryNames = loader.getAllQueryNames();
+			List<String> queryNames = loader.getMetadataQueryNames();
+			return queryNames;
+		} catch (CommandException e) {
+			if(e.getMessage().equals("Unauthorized")){
+				throw e;
+			}
+		}
+		return null;
+	}
+    
+    public static List<String> getLabKeyInstanceDataLists(String labkey_site, String user_name, 
+    		String password, String path) throws CommandException {
+    	
+		LabkeyDataLoader loader = new LabkeyDataLoader(labkey_site, user_name, password, path);
+		try {
+			List<String> queryNames = loader.getInstanceDataQueryNames();
 			return queryNames;
 		} catch (CommandException e) {
 			if(e.getMessage().equals("Unauthorized")){
@@ -151,12 +166,12 @@ public class TripleProcessing {
 	}
 
     public static String generateTTL(int mode, String oper, RDFContext rdf, String labkey_site, 
-    		String user_name, String password, String path, String list_name) throws CommandException {
+    		String user_name, String password, String path, List<String> list_names) throws CommandException {
 
 		String message = "";
 		if (oper.equals("load")) {
-		   message += Feedback.println(mode, "   Triples before loading from LABKEY: " + rdf.totalTriples());
-		   message += Feedback.println(mode, " ");
+			message += Feedback.println(mode, "   Triples before loading from LABKEY: " + rdf.totalTriples());
+			message += Feedback.println(mode, " ");
 		}
 		
 		LabkeyDataLoader loader = new LabkeyDataLoader(labkey_site, user_name, password, path);
@@ -167,16 +182,16 @@ public class TripleProcessing {
 		
 		try {
 			List<String> queryNames = null;
-			if(list_name == null){
+			if(list_names == null){
 				queryNames = loader.getAllQueryNames();
 			}
 			else{
 				queryNames = new LinkedList<String>();
-				queryNames.add(list_name);
+				queryNames.addAll(list_names);
 			}
 			for(String query : queryNames){
 				List<String> cols = loader.getColumnNames(query, false);
-				if(loader.containsInstanceData(cols)){
+				if(loader.containsInstanceData(cols) || loader.containsMetaData(cols)){
 					mapSheets.put(query, loader.selectRows(query, cols));
 				}
 				mapPreds.put(query, cols);

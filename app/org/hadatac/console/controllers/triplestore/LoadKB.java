@@ -6,7 +6,9 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Comparator;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 
 import org.apache.commons.io.FileUtils;
@@ -77,9 +79,11 @@ public class LoadKB extends Controller {
     }
     
     @Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
-    public static Result playLoadLabkeyKB(String oper, String folder, LabKeyLoginForm auth) {
-    	System.out.println(String.format("Batch loading data from \"/%s\"...", folder));
+    public static Result playLoadLabkeyKB(String oper, String folder, 
+    		List<String> list_names, LabKeyLoginForm auth) {
+    	System.out.println(String.format("Batch loading metadata from \"/%s\"...", folder));
     	
+    	List<String> final_names = new LinkedList<String>();
     	String user_name = "";
         String password = "";
         LabKeyLoginForm data = null;
@@ -88,11 +92,23 @@ public class LoadKB extends Controller {
     		data = form.get();
             user_name = data.getUserName();
             password = data.getPassword();
+            final_names.addAll(list_names);
     	}
-    	else if(oper.equals("load")){
+    	else if(oper.contains("load")){
     		user_name = auth.getUserName();
             password = auth.getPassword();
             data = auth;
+            
+            if(oper.equals("load_instance_data")){
+            	// get request value from submitted form
+                Map<String, String[]> name_map = request().body().asFormUrlEncoded();
+                final_names.addAll(name_map.keySet());
+                oper = "load";
+            }
+            else{
+            	final_names.addAll(list_names);
+            	System.out.println(final_names.size());
+            }
     	}
         
         Properties prop = loadConfig();
@@ -109,7 +125,7 @@ public class LoadKB extends Controller {
     	String message = "";
     	try {
     		message = TripleProcessing.generateTTL(Feedback.WEB, oper, metadata, 
-    				site, user_name, password, path, null);
+    				site, user_name, password, path, final_names);
     	} catch(CommandException e) {
     		if(e.getMessage().equals("Unauthorized")){
     			return ok(syncLabkey.render(Form.form(LabKeyLoginForm.class), "login_failed", ""));
@@ -140,8 +156,10 @@ public class LoadKB extends Controller {
     	
     	String message = "";
     	try {
+    		List<String> loading_list = new LinkedList<String>();
+    		loading_list.add(list_name);
     		message = TripleProcessing.generateTTL(
-    				Feedback.WEB, oper, metadata, site, user_name, password, path, list_name);
+    				Feedback.WEB, oper, metadata, site, user_name, password, path, loading_list);
     	} catch(CommandException e) {
     		if(e.getMessage().equals("Unauthorized")){
     			return ok(syncLabkey.render(Form.form(LabKeyLoginForm.class), "login_failed", ""));
@@ -201,10 +219,18 @@ public class LoadKB extends Controller {
         String site = prop.getProperty("site");
         String path = String.format("/%s", folder);
     	
-    	List<String> retLists = null;
+    	List<String> retMetadataLists = null;
+    	List<String> retDataLists = null;
     	try {
-    		retLists = TripleProcessing.getLabKeyLists(site, user_name, password, path);
-    		retLists.sort(new Comparator<String>() {
+    		retMetadataLists = TripleProcessing.getLabKeyMetadataLists(site, user_name, password, path);
+    		retDataLists = TripleProcessing.getLabKeyInstanceDataLists(site, user_name, password, path);
+    		retMetadataLists.sort(new Comparator<String>() {
+    			@Override
+				public int compare(String o1, String o2) {
+					return o1.compareTo(o2);
+				}
+			});
+    		retDataLists.sort(new Comparator<String>() {
     			@Override
 				public int compare(String o1, String o2) {
 					return o1.compareTo(o2);
@@ -215,7 +241,7 @@ public class LoadKB extends Controller {
     			return ok(syncLabkey.render(Form.form(LabKeyLoginForm.class), "login_failed", ""));
     		}
     	}
-    	return ok(getLabkeyLists.render(auth, folder, retLists));
+    	return ok(getLabkeyLists.render(auth, folder, retMetadataLists, retDataLists));
     }
     
     @Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
