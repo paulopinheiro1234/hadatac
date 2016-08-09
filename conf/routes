@@ -14,8 +14,15 @@ POST	/hadatac/acquisitions/loadccsv/upload	  org.hadatac.console.controllers.dat
 # Metadata
 GET	    /hadatac/metadata  		 	              org.hadatac.console.controllers.metadata.Metadata.index()
 POST	/hadatac/metadata			              org.hadatac.console.controllers.metadata.Metadata.postIndex()
+<<<<<<< HEAD
 GET     /hadatac/metadataacquisitions          	  org.hadatac.console.controllers.metadataacquisition.MetadataAcquisition.index()
 POST    /hadatac/metadataacquisitions             org.hadatac.console.controllers.metadataacquisition.MetadataAcquisition.postIndex()
+=======
+GET	    /hadatac/metadataacquisitions             org.hadatac.console.controllers.metadataacquisition.MetadataAcquisition.index()
+POST	/hadatac/metadataacquisitions             org.hadatac.console.controllers.metadataacquisition.MetadataAcquisition.postIndex()
+GET	    /hadatac/dataacquisitions       	      org.hadatac.console.controllers.dataacquisitionfacet.DataAcquisitionFacet.index()
+POST	/hadatac/dataacquisitions     	    	  org.hadatac.console.controllers.dataacquisitionfacet.DataAcquisitionFacet.postIndex()
+>>>>>>> a8aa82048d32cef6d9ffebc4094b3b6d17a3bf91
 
 # Metadata concepts
 GET	    /hadatac/metadata/entity		          org.hadatac.console.controllers.metadata.concepts.Entity.index()

@@ -3,6 +3,7 @@
 @import helper._
 @import org.hadatac.console.views.html._
 
+<<<<<<< HEAD
 @main("Study Browser") {
    <div class="container-fluid">
    
@@ -13,4 +14,161 @@
          <hr>      <hr>
            <hr>      <br><br><br>
      @mainButton(false)    </div>
+=======
+@main("Study Browser Home") {
+   		<script type="text/javascript" src="@controllers.routes.Assets.versioned("javascripts/vendor/jquery/1.7.1/jquery-1.7.1.min.js")"></script>
+		<link rel="stylesheet" type="text/css" href="@controllers.routes.Assets.versioned("javascripts/vendor/bootstrap/css/bootstrap.min.css")"/>
+		<script type="text/javascript" src="@controllers.routes.Assets.versioned("javascripts/vendor/bootstrap/js/bootstrap.min.js")"></script>
+		<script type="text/javascript" src="@controllers.routes.Assets.versioned("javascripts/vendor/linkify/1.0/jquery.linkify-1.0-min.js")"></script>
+
+		<link rel="stylesheet" href="@controllers.routes.Assets.versioned("javascripts/vendor/jquery-ui-1.8.18.custom/jquery-ui-1.8.18.custom.css")"/>
+		<script type="text/javascript" src="@controllers.routes.Assets.versioned("javascripts/vendor/jquery-ui-1.8.18.custom/jquery-ui-1.8.18.custom.min.js")"></script>
+		
+		<script type="text/javascript" src="@controllers.routes.Assets.versioned("javascripts/jquery.facetview.js")"></script>
+		
+  		<link rel="stylesheet" type="text/css" href="@controllers.routes.Assets.versioned("css/facetview.css")"/>
+  		<link rel="stylesheet" type="text/css" href="@controllers.routes.Assets.versioned("css/style.css")"/>
+		  <!-- Load c3.css -->
+		<link rel="stylesheet" type="text/css" href="@controllers.routes.Assets.versioned("javascripts/vendor/c3-0.4.10/c3.css")"/>
+		  <!-- Load d3.js and c3.js -->
+		<script type="text/javascript" src="@controllers.routes.Assets.versioned("javascripts/vendor/d3-3.5.6/d3.min.js")"></script>
+		<script type="text/javascript" src="@controllers.routes.Assets.versioned("javascripts/vendor/c3-0.4.10/c3.min.js")"></script>
+				
+  <script type="text/javascript">
+jQuery(document).ready(function($) {
+  $('.facet-view-simple').each(function() {
+  $(this).facetview({
+    search_url: 'http://localhost:8983/solr/studies/select?',
+    search_index: 'solr',
+    datatype: 'json',
+    facets: [
+        {'field': 'acculturation', 'display': 'Acculturation'},
+        {'field': 'anthropometry', 'display': 'Anthropometry'},
+        {'field': 'assessment', 'display': 'Assessment'},
+        {'field': 'ATIDU', 'display': 'Alcohol, Tobacco & Illicit Drug Use'},
+        {'field': 'BDN', 'display': 'Behavior, Diet & Nutrition'},
+        {'field': 'birthOutcomes', 'display': 'Birth Outcomes'},
+        {'field': 'demographics', 'display': 'Demographics'},
+        {'field': 'housingCharacteristics', 'display' : 'Housing Characteristics'},
+        {'field': 'laboratory', 'display': 'Lab/Medical Test'},
+        {'field': 'occupation', 'display': 'Occupation'},
+        {'field': 'socioEconomicStatus', 'display': 'Socioeconomic Status'},
+    ],
+    search_sortby: [{'display':'Name', 'field':'name.exact'},{'display':'Demographics','field':'demographics.exact'},{'display':'Lab/Medical Test','field':'laboratory.exact'},{'display':'Birth Outcomes','field':'birthOutcomes.exact'},{'display':'Acculturation','field':'acculturation.exact'},{'display':'Anthropometry','field':'anthropometry.exact'},{'display':'Assessment','field':'assessment.exact'},{'display':'Alcohol, Tobacco & Illicit Drug Use','field':'ATIDU.exact'},{'display':'Behavior, Diet & Nutrition','field':'BDN.exact'},{'display':'Housing Characteristics','field':'housingCharacteristics.exact'},{'display':'Occupation','field':'occupation.exact'},{'display':'Socioeconomic Status','field':'socioEconomicStatus.exact'}],
+    searchbox_fieldselect: [{'display':'Name', 'field':'name.exact'},{'display':'Demographics','field':'demographics.exact'},{'display':'Lab/Medical Test','field':'laboratory.exact'},{'display':'Birth Outcomes','field':'birthOutcomes.exact'},{'display':'Acculturation','field':'acculturation.exact'},{'display':'Anthropometry','field':'anthropometry.exact'},{'display':'Assessment','field':'assessment.exact'},{'display':'Alcohol, Tobacco & Illicit Drug Use','field':'ATIDU.exact'},{'display':'Behavior, Diet & Nutrition','field':'BDN.exact'},{'display':'Housing Characteristics','field':'housingCharacteristics.exact'},{'display':'Occupation','field':'occupation.exact'},{'display':'Socioeconomic Status','field':'socioEconomicStatus.exact'}],
+    paging: {
+      size: 10
+    },
+    predefined_filters: {
+        //'owner.exact': {'term':{'owner.exact':'test'}}
+    },
+    result_display : [
+        [
+          {
+            "pre" : "<h3>",
+            "field" : "projectTitle",
+            "post" : " - "
+          },
+          {
+            "pre" : "(",
+            "field" : "name",
+            "post" : ")</h3>"
+          }
+        ],
+        [
+          {
+            "pre" : "<b>Institution:</b> ",
+            "field" : "institution",
+            "post" : ", "
+          },
+          {
+            "pre" : " ",
+            "field" : "location",
+            "post" : " "
+          }
+        ],
+        [
+          {
+            "pre" : "<b>Principal Investigator(s):</b>",
+            "field" : "PI",
+            "post" : " "
+          }
+        ],
+        [
+          {
+            "pre" : "<b>Co-Investigator(s):</b>",
+            "field" : "CI",
+            "post" : " "
+          }
+        ],
+        [
+          {
+            "pre" : "<b>Number of Subjects:</b> ",
+            "field" : "numSubjects",
+            "post" : " "
+          }
+        ],
+        [
+          {
+            "pre" : "<b>Number of Samples:</b> ",
+            "field" : "numSamples",
+            "post" : " "
+          }
+        ],
+        [
+          {
+            "pre" : "<p>",
+            "field" : "description",
+            "post" : "</p>"
+          }
+        ],
+        [
+          {
+            "pre" : "<b>Alcohol, Tobacco & Illicit Drug Use: </b>",
+            "field" : "ATIDU",
+            "post" : " "
+          }
+        ],
+        [
+          {
+            "pre" : "<b>Birth Outcomes: </b>",
+            "field" : "birthOutcomes",
+            "post" : " "
+          }
+        ],
+        [
+          {
+            "pre" : "<b>Demographics: </b>",
+            "field" : "demographics",
+            "post" : " "
+          }
+        ],
+        [
+          {
+            "pre" : "<b>Housing Characteristics: </b>",
+            "field" : "housingCharacteristics",
+            "post" : " "
+          }
+        ]
+    ],
+    default_operator: "AND",
+    default_freetext_fuzzify: "*"
+  });
+  });
+});
+  </script>
+	<hr>  
+    <div class="container-fluid">
+    <div class="page-header">
+      <h2>
+      Study Faceted Search
+      </h2>
+    </div>
+    
+    <div class="content">
+    
+	  <div class="facet-view-simple"></div>
+
+   </div> 
+>>>>>>> a8aa82048d32cef6d9ffebc4094b3b6d17a3bf91
 }
