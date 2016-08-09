@@ -1,4 +1,5 @@
 package org.hadatac.console.controllers.dataacquisitionfacet;
+
 import play.mvc.Controller;
 import play.mvc.Result;
 import org.hadatac.console.views.html.dataacquisitionfacet.*;
