@@ -13,4 +13,23 @@
        		     <a href="@org.hadatac.console.controllers.metadata.concepts.routes.Entity.index()" class="btn-xs btn-block btn-primary" role="button">Experiments<br>&nbsp;<br>&nbsp;</a>
        	     </div>
        }
+       @if(selection == "StudiesFacet") {
+             <div class="col-md-1">
+       		     <a href="@org.hadatac.console.controllers.metadataacquisition.routes.MetadataAcquisition.index()" class="btn-xs btn-block btn-warning" role="button">Studies -<br>Faceted Browser<br>&nbsp;</a>
+       	     </div>
+       } else {
+             <div class="col-md-1">
+       		     <a href="@org.hadatac.console.controllers.metadataacquisition.routes.MetadataAcquisition.index()" class="btn-xs btn-block btn-primary" role="button">Studies -<br>Faceted Browser<br>&nbsp;</a>
+       	     </div>
+       }
+       @if(selection == "DataAcquisitionFacet") {
+             <div class="col-md-1">
+       		     <a href="@org.hadatac.console.controllers.dataacquisitionfacet.routes.DataAcquisitionFacet.index()" class="btn-xs btn-block btn-warning" role="button">Data Acquisition -<br>Faceted Browser<br>&nbsp;</a>
+       	     </div>
+       } else {
+             <div class="col-md-1">
+       		     <a href="@org.hadatac.console.controllers.dataacquisitionfacet.routes.DataAcquisitionFacet.index()" class="btn-xs btn-block btn-primary" role="button">Data Acquisition -<br>Faceted Browser<br>&nbsp;</a>
+       	     </div>
+       }
+       
     </div>
