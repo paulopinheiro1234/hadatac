@@ -316,7 +316,7 @@ public class GetSparqlQuery {
                     "   ?uri a hasneto:Deployment . " + 
                     "   ?uri hasneto:hasPlatform ?platform .  " + 
                     "   ?uri hasneto:hasInstrument ?instrument .  " + 
-                    "   OPTIONAL { ?uri prov:startedAtTime ?date } .  " + 
+                    "   ?uri prov:startedAtTime ?date .  " + 
                     "   OPTIONAL { ?platform rdfs:label ?platformName } ." + 
                     "   OPTIONAL { ?instrument rdfs:label ?instrumentName } ." + 
                     "}";
