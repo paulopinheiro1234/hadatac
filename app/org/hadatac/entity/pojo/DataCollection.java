@@ -47,6 +47,14 @@ public class DataCollection {
 	private int triggeringEvent;
 	@Field("nr_data_points")
 	private long numberDataPoints;
+	@Field("label")
+	private List<String> label;
+	@Field("comment")
+    private List<String> comment;
+	@Field("used_uri")
+    private List<String> usedUri;
+	@Field("was_associated_with_uri")
+    private List<String> wasAssociatedWithUri;
 	@Field("unit")
 	private List<String> unit;
 	@Field("unit_uri")
@@ -59,6 +67,10 @@ public class DataCollection {
 	private List<String> characteristic;
 	@Field("characteristic_uri")
 	private List<String> characteristicUri;
+	@Field("type")
+    private String type;
+	@Field("type_uri")
+    private String typeUri;
 	@Field("deployment_uri")
 	private String deploymentUri;
 	@Field("instrument_model")
@@ -94,6 +106,10 @@ public class DataCollection {
 		startedAt = null;
 		endedAt = null;
 		numberDataPoints = 0;
+		label = new ArrayList<String>();
+		comment = new ArrayList<String>();
+		usedUri = new ArrayList<String>();
+		wasAssociatedWithUri = new ArrayList<String>();
 		datasetUri = new ArrayList<String>();
 		unit = new ArrayList<String>();
 		unitUri = new ArrayList<String>();
@@ -102,6 +118,78 @@ public class DataCollection {
 		entity = new ArrayList<String>();
 		entityUri = new ArrayList<String>();
 	}
+	
+	public List<String> getLabel() {
+        return label;
+    }
+
+    public void setLabel(List<String> label) {
+        this.label = label;
+    }
+    
+    public void addLabel(String label) {
+        if (this.label.contains(label) == false) {
+            this.label.add(label);
+        }
+    }
+
+    public List<String> getComment() {
+        return comment;
+    }
+
+    public void setComment(List<String> comment) {
+        this.comment = comment;
+    }
+    
+    public void addComment(String comment) {
+        if (this.comment.contains(comment) == false) {
+            this.comment.add(comment);
+        }
+    }
+
+    public List<String> getUsedUri() {
+        return usedUri;
+    }
+
+    public void setUsedUri(List<String> usedUri) {
+        this.usedUri = usedUri;
+    }
+    
+    public void addUsedUri(String usedUri) {
+        if (this.usedUri.contains(usedUri) == false) {
+            this.usedUri.add(usedUri);
+        }
+    }
+
+    public List<String> getWasAssociatedWithUri() {
+        return wasAssociatedWithUri;
+    }
+
+    public void setWasAssociatedWithUri(List<String> wasAssociatedWithUri) {
+        this.wasAssociatedWithUri = wasAssociatedWithUri;
+    }
+    
+    public void addWasAssociatedWithUri(String wasAssociatedWithUri) {
+        if (this.wasAssociatedWithUri.contains(wasAssociatedWithUri) == false) {
+            this.wasAssociatedWithUri.add(wasAssociatedWithUri);
+        }
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
+    }
+
+    public String getTypeUri() {
+        return typeUri;
+    }
+
+    public void setTypeUri(String typeUri) {
+        this.typeUri = typeUri;
+    }
 	
 	public String getElevation() {
 		return elevation;
@@ -405,6 +493,30 @@ public class DataCollection {
 		dataCollection.setStartedAt(date.withZone(DateTimeZone.UTC).toString("EEE MMM dd HH:mm:ss zzz yyyy"));
 		date = new DateTime((Date)doc.getFieldValue("ended_at"));
 		dataCollection.setEndedAt(date.withZone(DateTimeZone.UTC).toString("EEE MMM dd HH:mm:ss zzz yyyy"));
+		if (doc.getFieldValues("label") != null) {
+            i = doc.getFieldValues("label").iterator();
+            while (i.hasNext()) {
+                dataCollection.addLabel(i.next().toString());
+            }
+        }
+		if (doc.getFieldValues("comment") != null) {
+            i = doc.getFieldValues("comment").iterator();
+            while (i.hasNext()) {
+                dataCollection.addComment(i.next().toString());
+            }
+        }
+		if (doc.getFieldValues("used_uri") != null) {
+            i = doc.getFieldValues("used_uri").iterator();
+            while (i.hasNext()) {
+                dataCollection.addUsedUri(i.next().toString());
+            }
+        }
+		if (doc.getFieldValues("was_associated_with_uri") != null) {
+            i = doc.getFieldValues("was_associated_with_uri").iterator();
+            while (i.hasNext()) {
+                dataCollection.addWasAssociatedWithUri(i.next().toString());
+            }
+        }
 		if (doc.getFieldValues("unit") != null) {
 			i = doc.getFieldValues("unit").iterator();
 			while (i.hasNext()) {
@@ -417,6 +529,10 @@ public class DataCollection {
 				dataCollection.addUnitUri(i.next().toString());
 			}
 		}
+		
+		dataCollection.setType(doc.getFieldValue("type").toString());
+		dataCollection.setTypeUri(doc.getFieldValue("type_uri").toString());
+		
 		if (doc.getFieldValues("entity") != null) {
 			i = doc.getFieldValues("entity").iterator();
 			while (i.hasNext()) {
