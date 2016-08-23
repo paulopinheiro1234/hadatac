@@ -24,6 +24,7 @@ import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.client.solrj.response.UpdateResponse;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
+
 import org.hadatac.data.loader.util.Sparql;
 import org.hadatac.utils.State;
 import org.joda.time.DateTime;
@@ -37,8 +38,20 @@ import play.Play;
 public class DataCollection {
 	@Field("uri")
 	private String uri;
+	@Field("label")
+	private String label;
+	@Field("comment")
+	private String comment;
+	@Field("used_uri")
+	private String used_uri;
+	@Field("was_associated_with_uri")
+	private String was_associated_with_uri;
+	@Field("study_uri")
+	private String study_uri;
+	
 	private DateTime startedAt;
 	private DateTime endedAt;
+	
 	@Field("owner_uri")
 	private String ownerUri;
 	@Field("permission_uri")
@@ -63,6 +76,10 @@ public class DataCollection {
 	private List<String> entity;
 	@Field("entity_uri")
 	private List<String> entityUri;
+	@Field("type")
+	private List<String> type;
+	@Field("type_uri")
+	private List<String> typeUri;
 	@Field("characteristic")
 	private List<String> characteristic;
 	@Field("characteristic_uri")
@@ -71,6 +88,10 @@ public class DataCollection {
     private String type;
 	@Field("type_uri")
     private String typeUri;
+	@Field("study_uri")
+	private String studyUri;
+	@Field("schema_uri")
+	private String schemaUri;
 	@Field("deployment_uri")
 	private String deploymentUri;
 	@Field("instrument_model")
@@ -85,7 +106,6 @@ public class DataCollection {
 	private String location;
 	@Field("elevation")
 	private String elevation;
-
 	@Field("dataset_uri")
 	private List<String> datasetUri;
 	
@@ -117,6 +137,8 @@ public class DataCollection {
 		characteristicUri = new ArrayList<String>();
 		entity = new ArrayList<String>();
 		entityUri = new ArrayList<String>();
+		type = new ArrayList<String>();
+		typeUri = new ArrayList<String>();
 	}
 	
 	public List<String> getLabel() {
@@ -237,10 +259,45 @@ public class DataCollection {
 	public void setUri(String uri) {
 		this.uri = uri;
 	}
+	
+	public String getLabel() {
+		return label;
+	}
+	public void setLabel(String label) {
+		this.label = label;
+	}
+	
+	public String getComment() {
+		return comment;
+	}
+	public void setComment(String comment) {
+		this.comment = comment;
+	}
+	
+	public String getUsedUri() {
+		return used_uri;
+	}
+	public void setUsedUri(String used_uri) {
+		this.used_uri = used_uri;
+	}
+	
+	public String getAssociatedUri() {
+		return was_associated_with_uri;
+	}
+	public void setAssociatedUri(String uri) {
+		this.was_associated_with_uri = uri;
+	}
+	
+	public String getStudyUri() {
+		return study_uri;
+	}
+	public void setStudyUri(String study_uri) {
+		this.study_uri = study_uri;
+	}
+	
 	public String getOwnerUri() {
 		return ownerUri;
 	}
-
 	public void setOwnerUri(String ownerUri) {
 		this.ownerUri = ownerUri;
 	}
@@ -248,7 +305,6 @@ public class DataCollection {
 	public String getPermissionUri() {
 		return permissionUri;
 	}
-
 	public void setPermissionUri(String permissionUri) {
 		this.permissionUri = permissionUri;
 	}
@@ -256,7 +312,6 @@ public class DataCollection {
 	public int getTriggeringEvent() {
 		return triggeringEvent;
 	}
-
 	public void setTriggeringEvent(int triggeringEvent) {
 		this.triggeringEvent = triggeringEvent;
 	}
@@ -389,6 +444,12 @@ public class DataCollection {
 			this.characteristicUri.add(characteristicUri);
 		}
 	}
+	public String getSchemaUri() {
+		return schemaUri;
+	}
+	public void setSchemaUri(String schemaUri) {
+		this.schemaUri = schemaUri;
+	}
 	public String getDeploymentUri() {
 		return deploymentUri;
 	}
@@ -488,7 +549,7 @@ public class DataCollection {
 		dataCollection.setOwnerUri(doc.getFieldValue("owner_uri").toString());
 		dataCollection.setPermissionUri(doc.getFieldValue("permission_uri").toString());
 		dataCollection.setTriggeringEvent(Integer.parseInt(doc.getFieldValue("triggering_event").toString()));
-		dataCollection.setNumberDataPoints(Long.parseLong(doc.getFieldValue("nr_data_points").toString()));
+		//dataCollection.setNumberDataPoints(Long.parseLong(doc.getFieldValue("nr_data_points").toString()));
 		date = new DateTime((Date)doc.getFieldValue("started_at"));
 		dataCollection.setStartedAt(date.withZone(DateTimeZone.UTC).toString("EEE MMM dd HH:mm:ss zzz yyyy"));
 		date = new DateTime((Date)doc.getFieldValue("ended_at"));
@@ -517,6 +578,8 @@ public class DataCollection {
                 dataCollection.addWasAssociatedWithUri(i.next().toString());
             }
         }
+		//date = new DateTime((Date)doc.getFieldValue("ended_at"));
+		//dataCollection.setEndedAt(date.withZone(DateTimeZone.UTC).toString("EEE MMM dd HH:mm:ss zzz yyyy"));
 		if (doc.getFieldValues("unit") != null) {
 			i = doc.getFieldValues("unit").iterator();
 			while (i.hasNext()) {
@@ -577,15 +640,17 @@ public class DataCollection {
 	public static List<DataCollection> find(String ownerUri, State state) {
 		List<DataCollection> list = new ArrayList<DataCollection>();
 		
+		System.out.println("owner:");
+		System.out.println(ownerUri);
 		SolrClient solr = new HttpSolrClient(Play.application().configuration().getString("hadatac.solr.data") + "/sdc");
 		SolrQuery query = new SolrQuery();
 		if (state.getCurrent() == State.ALL) {
 			query.set("q", "owner_uri:\"" + ownerUri + "\"");
 		} else { 
 			if (state.getCurrent() == State.ACTIVE) {
-		      query.set("q", "owner_uri:\"" + ownerUri + "\"" + " AND " + "ended_at:\"9999-12-31T23:59:59.999Z\"");
+				query.set("q", "owner_uri:\"" + ownerUri + "\"" + " AND " + "ended_at:\"9999-12-31T23:59:59.999Z\"");
 			} else {  // it is assumed that state is CLOSED
-			      query.set("q", "owner_uri:\"" + ownerUri + "\"" + " AND " + "-ended_at:\"9999-12-31T23:59:59.999Z\"");
+				query.set("q", "owner_uri:\"" + ownerUri + "\"" + " AND " + "-ended_at:\"9999-12-31T23:59:59.999Z\"");
 			}
 		}
 		query.set("sort", "started_at asc");
@@ -594,9 +659,12 @@ public class DataCollection {
 			QueryResponse response = solr.query(query);
 			solr.close();
 			SolrDocumentList results = response.getResults();
+			System.out.println("Hello");
+			System.out.println(results.size());
 			Iterator<SolrDocument> i = results.iterator();
 			while (i.hasNext()) {
 				DataCollection dataCollection = convertFromSolr(i.next());
+				System.out.println("DataCollection added");
 				list.add(dataCollection);
 			}
 		} catch (Exception e) {

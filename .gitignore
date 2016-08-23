@@ -16,3 +16,11 @@ RUNNING_PID
 .cache-main
 .cache-tests
 ~
+download
+solr/solr-4.10.4
+solr/solr-5.2.1
+solr/*.sh
+solr/*.bat
+solr/README.md
+solr/LICENSE
+test

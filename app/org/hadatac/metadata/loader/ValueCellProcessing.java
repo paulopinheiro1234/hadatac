@@ -22,6 +22,8 @@ public class ValueCellProcessing {
 			return false;
 		if (str.substring(0,str.indexOf(':')).contains(" "))
 			return false;
+		if (str.substring(str.indexOf(':') + 1, str.length()).contains(":"))
+			return false;
 		return true;
 	}
 	
@@ -81,9 +83,9 @@ public class ValueCellProcessing {
 	    for (Map.Entry<String, NameSpace> entry : NameSpaces.table.entrySet()) {
 	        String abbrev = entry.getKey().toString();
 	        String nsString = entry.getValue().getName();
-	        if (str.startsWith(nsString)) {
-	        	System.out.println("REPLACE: " + resp + " / " + abbrev);
-	        	resp = str.replace(nsString, abbrev + ":");
+	        if (str.startsWith(abbrev + ":")) {
+	        	System.out.println("REPLACE: " + resp + " / " + nsString);
+	        	resp = str.replace(abbrev + ":", nsString);
 	        	return resp; 
 	        }
 	    }
@@ -96,7 +98,6 @@ public class ValueCellProcessing {
 	 *  space used in the argument str is not registered in NameSpaces.table.
 	 */
 	public void validateNameSpace(String str) {
-		//System.out.println("Validating namespace <" + str + ">");
 		if (str.indexOf(':') <= 0)
 			return;
 		String abbrev = "";
@@ -108,7 +109,6 @@ public class ValueCellProcessing {
 	        }
 	    }
 		System.out.println("# WARNING: NAMESPACE NOT DEFINED <" + nsName + ">");
-		System.out.println(abbrev);
 		return;
 	}
 	
@@ -122,11 +122,9 @@ public class ValueCellProcessing {
 	}
 	
 	public String processObjectValue(String object) {
-		
 		// if abbreviated URI, just print it
 		if (isAbbreviatedURI(object)) { 
 			validateNameSpace(object);
-			//System.out.print(object);
 			return object;
 		}
 
@@ -142,6 +140,24 @@ public class ValueCellProcessing {
 		//System.out.println("\"" + object + "\"");		
 		return "\"" + object + "\"";
 	}
+	
+	public String convertToWholeURI(String object){
+    	if (isAbbreviatedURI(object)) {
+    		validateNameSpace(object);
+    		String resp = object;
+    	    for (Map.Entry<String, NameSpace> entry : NameSpaces.table.entrySet()) {
+    	        String abbrev = entry.getKey().toString();
+    	        String nsString = entry.getValue().getName();
+    	        if (object.startsWith(abbrev + ":")) {
+    	        	System.out.println("REPLACE: " + resp + " / " + nsString);
+    	        	resp = object.replace(abbrev + ":", nsString);
+    	        	return resp;
+    	        }
+    	    }
+    	}
+    	
+    	return object;
+    }
 	
 	public String exec(Cell cell, Vector<String> predicates) {
 

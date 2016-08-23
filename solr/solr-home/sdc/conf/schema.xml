@@ -23,6 +23,7 @@
     <field name="entity" type="string" indexed="true" docValues="true" multiValued="true" />
     <field name="entity_uri" type="string" indexed="true" docValues="true" multiValued="true" />
     <field name="study_uri" type="string" indexed="true" docValues="true" />
+    <field name="schema_uri" type="string" indexed="true" docValues="true" />
     <field name="deployment_uri" type="string" indexed="true" docValues="true" />
     <field name="instrument_model" type="string" indexed="true" docValues="true" />
     <field name="instrument_uri" type="string" indexed="true" docValues="true" />

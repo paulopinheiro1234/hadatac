@@ -24,8 +24,8 @@
         <div class="col-md-1 col-xs-0"></div>
         <div class="col-md-3 col-xs-2">
            <h4>Data Search/Download</h4>  
-           <a href="" class="btn btn-primary btn-block" role="button">Search Data Collections</a>
-           <a href="@org.hadatac.console.controllers.dataacquisition.routes.DataAcquisition.index()" class="btn btn-primary btn-block" role="button">Search Data Acquisitions</a>
+           <a href="@org.hadatac.console.controllers.metadataacquisition.routes.MetadataAcquisition.index()" id="metadatafacet" class="btn btn-primary btn-block disabled" role="button">Search Studies</a>
+           <a href="@org.hadatac.console.controllers.dataacquisitionfacet.routes.DataAcquisitionFacet.index()" id="dataacquisitionfacet" class="btn btn-primary btn-block disabled" role="button">Search Data Acquisitions</a>
            <a href="@org.hadatac.console.controllers.metadata.routes.Metadata.index()" class="btn btn-primary btn-block" role="button">Browse Metadata</a>
            <a href="" class="btn btn-primary btn-block disabled" role="button">Infer Semantic Differences</a>
            <a href="" class="btn btn-primary btn-block disabled" role="button">Show Collaboration Insight</a>
@@ -89,11 +89,15 @@
         $( document ).ready(function() {
           var hasUser = ("@AuthApplication.getLocalUser(session())" != "");
           if (hasUser) {
+              $('#metadatafacet').attr( 'class', 'btn btn-primary btn-block' );
+              $('#dataacquisitionfacet').attr( 'class', 'btn btn-primary btn-block' );
               $('#deployments').attr( 'class', 'btn btn-primary btn-block' );
               $('#datacollections').attr( 'class', 'btn btn-primary btn-block' );
               $('#annotator').attr( 'class', 'btn btn-primary btn-block' );
               $('#csvloader').attr( 'class', 'btn btn-primary btn-block' );
           } else {
+              $('#metadatafacet').attr( 'class', 'btn btn-primary btn-block disabled' );
+              $('#dataacquisitionfacet').attr( 'class', 'btn btn-primary btn-block disabled' );
               $('#deployments').attr( 'class', 'btn btn-primary btn-block disabled' );
               $('#datacollections').attr( 'class', 'btn btn-primary btn-block disabled' );
               $('#annotator').attr( 'class', 'btn btn-primary btn-block disabled' );

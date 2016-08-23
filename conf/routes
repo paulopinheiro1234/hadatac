@@ -5,6 +5,8 @@
 # Home page
 GET	    /hadatac/                                 org.hadatac.console.controllers.Portal.index()
 POST	/hadatac/                                 org.hadatac.console.controllers.Portal.postIndex()
+GET	    /hadatac                                  org.hadatac.console.controllers.Portal.index()
+POST	/hadatac                                  org.hadatac.console.controllers.Portal.postIndex()
 GET	    /hadatac/acquisitions                     org.hadatac.console.controllers.dataacquisition.DataAcquisition.index(start: Int ?= 1, rows: Int ?= 20, facets: String ?= "")
 POST	/hadatac/acquisitions                     org.hadatac.console.controllers.dataacquisition.DataAcquisition.postIndex(start: Int ?= 1, rows: Int ?= 20, facets: String ?= "")
 GET	    /hadatac/acquisitions/loadccsv		      org.hadatac.console.controllers.dataacquisition.LoadCCSV.loadCCSV(oper: String)
@@ -14,6 +16,13 @@ POST	/hadatac/acquisitions/loadccsv/upload	  org.hadatac.console.controllers.dat
 # Metadata
 GET	    /hadatac/metadata  		 	              org.hadatac.console.controllers.metadata.Metadata.index()
 POST	/hadatac/metadata			              org.hadatac.console.controllers.metadata.Metadata.postIndex()
+
+GET     /hadatac/metadataacquisitions          	  org.hadatac.console.controllers.metadataacquisition.MetadataAcquisition.index()
+POST    /hadatac/metadataacquisitions             org.hadatac.console.controllers.metadataacquisition.MetadataAcquisition.postIndex()
+GET	    /hadatac/metadataacquisitions             org.hadatac.console.controllers.metadataacquisition.MetadataAcquisition.index()
+POST	/hadatac/metadataacquisitions             org.hadatac.console.controllers.metadataacquisition.MetadataAcquisition.postIndex()
+GET	    /hadatac/dataacquisitions       	      org.hadatac.console.controllers.dataacquisitionfacet.DataAcquisitionFacet.index()
+POST	/hadatac/dataacquisitions     	    	  org.hadatac.console.controllers.dataacquisitionfacet.DataAcquisitionFacet.postIndex()
 
 # Metadata concepts
 GET	    /hadatac/metadata/entity		          org.hadatac.console.controllers.metadata.concepts.Entity.index()
@@ -124,14 +133,16 @@ GET     /hadatac/ts/exportkb                       org.hadatac.console.controlle
 POST    /hadatac/ts/exportkb                       org.hadatac.console.controllers.triplestore.ExportKB.exportFile(oper: String)
 GET     /hadatac/ts/synclabkey                     org.hadatac.console.controllers.triplestore.LoadKB.loadLabkeyKB(oper: String)
 POST    /hadatac/ts/synclabkey                     org.hadatac.console.controllers.triplestore.LoadKB.postLoadLabkeyKB(oper: String)
-GET     /hadatac/ts/synclabkey/loadbatch           org.hadatac.console.controllers.triplestore.LoadKB.playLoadLabkeyKB(oper: String, folder: String, auth: org.hadatac.console.models.LabKeyLoginForm)
-POST    /hadatac/ts/synclabkey/loadbatch           org.hadatac.console.controllers.triplestore.LoadKB.playLoadLabkeyKB(oper: String, folder: String, auth: org.hadatac.console.models.LabKeyLoginForm)
+GET     /hadatac/ts/synclabkey/loadbatch           org.hadatac.console.controllers.triplestore.LoadKB.playLoadLabkeyKB(oper: String, folder: String, list_names: java.util.List[String], auth: org.hadatac.console.models.LabKeyLoginForm)
+POST    /hadatac/ts/synclabkey/loadbatch           org.hadatac.console.controllers.triplestore.LoadKB.playLoadLabkeyKB(oper: String, folder: String, list_names: java.util.List[String], auth: org.hadatac.console.models.LabKeyLoginForm)
 GET     /hadatac/ts/synclabkey/folders             org.hadatac.console.controllers.triplestore.LoadKB.playLoadLabkeyFolders(oper: String, auth: org.hadatac.console.models.LabKeyLoginForm)
 POST    /hadatac/ts/synclabkey/folders             org.hadatac.console.controllers.triplestore.LoadKB.playLoadLabkeyFolders(oper: String, auth: org.hadatac.console.models.LabKeyLoginForm)
 GET    	/hadatac/ts/synclabkey/lists               org.hadatac.console.controllers.triplestore.LoadKB.playLoadLabkeyLists(auth: org.hadatac.console.models.LabKeyLoginForm, folder: String)
 POST    /hadatac/ts/synclabkey/lists               org.hadatac.console.controllers.triplestore.LoadKB.playLoadLabkeyLists(auth: org.hadatac.console.models.LabKeyLoginForm, folder: String)
 GET    	/hadatac/ts/synclabkey/loadlist            org.hadatac.console.controllers.triplestore.LoadKB.playLoadLabkeyListContent(oper: String, auth: org.hadatac.console.models.LabKeyLoginForm, folder: String, listName: String)
 POST    /hadatac/ts/synclabkey/loadlist            org.hadatac.console.controllers.triplestore.LoadKB.playLoadLabkeyListContent(oper: String, auth: org.hadatac.console.models.LabKeyLoginForm, folder: String, listName: String)
+GET    	/hadatac/ts/synclabkey/loadacquisition     org.hadatac.console.controllers.triplestore.LoadKB.playLoadLabkeyDataAcquisition(oper: String, folder: String, list_names: java.util.List[String], auth: org.hadatac.console.models.LabKeyLoginForm)
+POST    /hadatac/ts/synclabkey/loadacquisition     org.hadatac.console.controllers.triplestore.LoadKB.playLoadLabkeyDataAcquisition(oper: String, folder: String, list_names: java.util.List[String], auth: org.hadatac.console.models.LabKeyLoginForm)
 
 # Permissions store management URLs
 GET     /hadatac/perm/preregister                  org.hadatac.console.controllers.triplestore.UserManagement.preRegistration(oper: String)

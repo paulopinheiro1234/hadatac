@@ -18,11 +18,19 @@ import java.util.StringTokenizer;
 import org.apache.commons.io.FileUtils;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.riot.RDFDataMgr;
+import org.hadatac.console.controllers.AuthApplication;
+import org.hadatac.console.controllers.triplestore.UserManagement;
+import org.hadatac.console.models.User;
+import org.hadatac.entity.pojo.DataCollection;
+import org.hadatac.entity.pojo.Deployment;
+import org.hadatac.entity.pojo.TriggeringEvent;
 import org.hadatac.metadata.loader.LabkeyDataLoader.PlainTriple;
 import org.hadatac.metadata.model.SpreadsheetParsingResult;
 import org.hadatac.utils.Feedback;
 import org.hadatac.utils.NameSpaces;
 import org.labkey.remoteapi.CommandException;
+
+import play.mvc.Controller;
 
 public class TripleProcessing {
 	
@@ -120,12 +128,27 @@ public class TripleProcessing {
 		return clttl;
 	}
 	
-    public static List<String> getLabKeyLists(String labkey_site, String user_name, 
+    public static List<String> getLabKeyMetadataLists(String labkey_site, String user_name, 
     		String password, String path) throws CommandException {
     	
 		LabkeyDataLoader loader = new LabkeyDataLoader(labkey_site, user_name, password, path);
 		try {
-			List<String> queryNames = loader.getAllQueryNames();
+			List<String> queryNames = loader.getMetadataQueryNames(false);
+			return queryNames;
+		} catch (CommandException e) {
+			if(e.getMessage().equals("Unauthorized")){
+				throw e;
+			}
+		}
+		return null;
+	}
+    
+    public static List<String> getLabKeyInstanceDataLists(String labkey_site, String user_name, 
+    		String password, String path) throws CommandException {
+    	
+		LabkeyDataLoader loader = new LabkeyDataLoader(labkey_site, user_name, password, path);
+		try {
+			List<String> queryNames = loader.getInstanceDataQueryNames();
 			return queryNames;
 		} catch (CommandException e) {
 			if(e.getMessage().equals("Unauthorized")){
@@ -149,34 +172,26 @@ public class TripleProcessing {
 		}
 		return null;
 	}
-
-    public static String generateTTL(int mode, String oper, RDFContext rdf, String labkey_site, 
-    		String user_name, String password, String path, String list_name) throws CommandException {
-
-		String message = "";
-		if (oper.equals("load")) {
-		   message += Feedback.println(mode, "   Triples before loading from LABKEY: " + rdf.totalTriples());
-		   message += Feedback.println(mode, " ");
-		}
-		
-		LabkeyDataLoader loader = new LabkeyDataLoader(labkey_site, user_name, password, path);
-		Map< String, Map< String, List<PlainTriple> > > mapSheets = 
-				new HashMap< String, Map< String, List<PlainTriple> > >();
-		Map< String, List<String> > mapPreds = 
-				new HashMap< String, List<String> >();
-		
+    
+    private static String loadTriples(
+    		LabkeyDataLoader loader, 
+    		List<String> list_names, 
+    		Map< String, Map< String, List<PlainTriple> > > mapSheets, 
+    		Map< String, List<String> > mapPreds) throws CommandException {
+    	
+    	String message = "";
 		try {
 			List<String> queryNames = null;
-			if(list_name == null){
+			if(list_names == null){
 				queryNames = loader.getAllQueryNames();
 			}
 			else{
 				queryNames = new LinkedList<String>();
-				queryNames.add(list_name);
+				queryNames.addAll(list_names);
 			}
 			for(String query : queryNames){
 				List<String> cols = loader.getColumnNames(query, false);
-				if(loader.containsInstanceData(cols)){
+				if(loader.containsInstanceData(cols) || loader.containsMetaData(cols)){
 					mapSheets.put(query, loader.selectRows(query, cols));
 				}
 				mapPreds.put(query, cols);
@@ -187,9 +202,113 @@ public class TripleProcessing {
 				throw e;
 			}
 			else{
-				message += e.getMessage();
+				return e.getMessage();
 			}
-			return message;
+		}
+		
+		return message;
+    }
+    
+    public static String importDataAcquisition(String labkey_site, String user_name, 
+    		String password, String path, List<String> list_names) throws CommandException {
+    	
+    	String message = "";
+    	LabkeyDataLoader loader = new LabkeyDataLoader(labkey_site, user_name, password, path);
+		Map< String, Map< String, List<PlainTriple> > > mapSheets = 
+				new HashMap< String, Map< String, List<PlainTriple> > >();
+		Map< String, List<String> > mapPreds = 
+				new HashMap< String, List<String> >();
+		
+		String ret = loadTriples(loader, list_names, mapSheets, mapPreds);
+		if(!ret.equals("")){
+			return (message + ret);
+		}
+		
+		for(String queryName : mapSheets.keySet()){
+			Map< String, List<PlainTriple> > sheet = mapSheets.get(queryName);
+			for (String uri : sheet.keySet()) {
+				System.out.println(String.format("Processing data acquisition %s", uri));
+				
+				ValueCellProcessing cellProc = new ValueCellProcessing();
+				DataCollection dataCollection = new DataCollection();
+				dataCollection.setUri(cellProc.convertToWholeURI(uri));
+				
+				for(PlainTriple triple : sheet.get(uri)){
+					String cellValue = triple.obj.trim();
+					String predicate = triple.pred.trim();
+					
+					if(predicate.equals("rdfs:label")){
+						dataCollection.setLabel(cellValue);
+					}
+					else if(predicate.equals("rdfs:comment")){
+						dataCollection.setComment(cellValue);
+					}
+					else if(predicate.equals("prov:startedAtTime")){
+						dataCollection.setStartedAt(cellValue);
+					}
+					else if(predicate.equals("prov:endedAtTime")){
+						dataCollection.setEndedAt(cellValue);
+					}
+					else if(predicate.equals("prov:used")){
+						dataCollection.setUsedUri(cellProc.convertToWholeURI(cellValue));
+					}
+					else if(predicate.equals("prov:wasAssociatedWith")){
+						dataCollection.setAssociatedUri(cellProc.convertToWholeURI(cellValue));
+					}
+					else if(predicate.equals("hasco:isDataAcquisitionOf")){
+						dataCollection.setStudyUri(cellProc.convertToWholeURI(cellValue));
+					}
+					else if(predicate.equals("hasneto:hasDeployment")){
+						String deployment_uri = cellProc.convertToWholeURI(cellValue);
+						dataCollection.setDeploymentUri(deployment_uri);
+						
+						final User user = AuthApplication.getLocalUser(Controller.session());
+						String ownerUri = UserManagement.getUriByEmail(user.email);
+						System.out.println(user.email);
+						System.out.println("OwnerUri is:");
+						System.out.println(ownerUri);
+						dataCollection.setOwnerUri(ownerUri);
+						
+						Deployment deployment = Deployment.find(deployment_uri);
+						dataCollection.setPermissionUri(ownerUri);
+						dataCollection.setTriggeringEvent(TriggeringEvent.INITIAL_DEPLOYMENT);
+						dataCollection.setPlatformUri(deployment.platform.getUri());
+						dataCollection.setInstrumentUri(deployment.instrument.getUri());
+						dataCollection.setPlatformName(deployment.platform.getLabel());
+						dataCollection.setInstrumentModel(deployment.instrument.getLabel());
+						dataCollection.setStartedAtXsdWithMillis(deployment.getStartedAt());
+						System.out.println("time is " + deployment.getStartedAt());
+					}
+					else if(predicate.equals("hasco:hasSchema")){
+						dataCollection.setSchemaUri(cellProc.convertToWholeURI(cellValue));
+					}
+					dataCollection.save();
+					System.out.println("Successfully saved in Solr");
+				}
+			}
+		}
+		
+		return message;
+    }
+
+    public static String generateTTL(int mode, String oper, RDFContext rdf, String labkey_site, 
+    		String user_name, String password, String path, List<String> list_names) throws CommandException {
+
+		String message = "";
+		if (oper.equals("load")) {
+			message += Feedback.println(mode, "   Triples before loading from LABKEY: " + rdf.totalTriples());
+			message += Feedback.println(mode, " ");
+		}
+		
+		LabkeyDataLoader loader = new LabkeyDataLoader(labkey_site, user_name, password, path);
+		Map< String, Map< String, List<PlainTriple> > > mapSheets = 
+				new HashMap< String, Map< String, List<PlainTriple> > >();
+		Map< String, List<String> > mapPreds = 
+				new HashMap< String, List<String> >();
+		
+		String ret = loadTriples(loader, list_names, mapSheets, mapPreds);
+		if(!ret.equals("")){
+			return (message + ret);
 		}
 		
 		message += Feedback.println(mode, "   Parsing triples from LABKEY " );
@@ -203,7 +322,7 @@ public class TripleProcessing {
 		
 		for(String queryName : mapSheets.keySet()){
 			Map< String, List<PlainTriple> > sheet = mapSheets.get(queryName);
-			message += Feedback.print(mode, "   Processing sheet " + queryName + "     ");
+			message += Feedback.print(mode, "   Processing sheet " + queryName + "  ()   ");
 			for (int i = queryName.length(); i < 25; i++) {
 				message += Feedback.print(mode, ".");
 			}

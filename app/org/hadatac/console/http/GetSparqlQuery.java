@@ -347,7 +347,7 @@ public class GetSparqlQuery {
         	HttpResponse response = client.execute(request);
             StringWriter writer = new StringWriter();
             IOUtils.copy(response.getEntity().getContent(), writer, "utf-8");
-            //System.out.println("response: " + response);    
+            System.out.println("response: " + response);    
             return writer.toString();
         } finally
         {

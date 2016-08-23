@@ -44,6 +44,16 @@ public class LabkeyDataLoader {
 		return folder_path;
 	}
 	
+	private String replaceIrregularCharacters(String str){
+		String ret = str;
+		String invalid_char = " .;{}()/\\";
+		for (int i = 0, n = invalid_char.length(); i < n; i++) {
+		    char c = invalid_char.charAt(i);
+		    ret = ret.replace(String.valueOf(c), "-");
+		}
+		return ret;
+	}
+	
 	public Map< String, List<PlainTriple> > selectRows(String queryName, List<String> cols) throws CommandException {
 		Map< String, List<PlainTriple> > mapRow = new HashMap< String, List<PlainTriple> >();
 		SelectRowsCommand cmd = new SelectRowsCommand("lists", queryName);
@@ -54,11 +64,10 @@ public class LabkeyDataLoader {
 			SelectRowsResponse response = cmd.execute(cn, folder_path);
 			for (Map<String, Object> row : response.getRows()){
 				String pri_key = "";
-				if(row.containsKey("uri")){
-					pri_key = "uri";
-				}
-				else if(row.containsKey("hasURI")){
-					pri_key = "hasURI";
+				for(String the_key : row.keySet()){
+					if(the_key.toLowerCase().contains("uri")){
+						pri_key = the_key;
+					}
 				}
 				String sub = ((JSONObject)row.get(pri_key)).get("value").toString();
 				List<PlainTriple> triples = new LinkedList<PlainTriple>();
@@ -67,9 +76,9 @@ public class LabkeyDataLoader {
 						continue;
 					}
 					PlainTriple tri = new PlainTriple();
-					tri.sub = sub;
-					tri.pred = pred.toString();
-					Object obj_value = ((JSONObject)row.get(tri.pred)).get("value");
+					tri.sub = replaceIrregularCharacters(sub);
+					tri.pred = replaceIrregularCharacters(pred.toString());
+					Object obj_value = ((JSONObject)row.get(pred.toString())).get("value");
 					if(obj_value == null){
 						continue;
 					}
@@ -82,7 +91,7 @@ public class LabkeyDataLoader {
 				mapRow.put(sub, triples);
 			}
 			
-			System.out.println(String.format("Read %d row(s) with %d triple(s) from Table \"%s\"\n", 
+			System.out.println(String.format("Read %d row(s) with %d triple(s) from Table \"%s\"", 
 					response.getRowCount(), nTriples, queryName));
 			return mapRow;
 		} catch (IOException e) {
@@ -96,7 +105,7 @@ public class LabkeyDataLoader {
 			}
 		}
 		
-		return null;
+		return mapRow;
 	}
 	
 	public List<String> getAllQueryNames() throws CommandException {
@@ -116,7 +125,67 @@ public class LabkeyDataLoader {
 				e.printStackTrace();
 			}
 		}
-		
+		return null;
+	}
+
+	public List<String> getMetadataQueryNames(boolean bLocalTypesOnly) throws CommandException {
+		GetQueriesCommand cmd = new GetQueriesCommand("lists");
+		cmd.setRequiredVersion(9.1);
+		GetQueriesResponse response;
+		try {
+			response = cmd.execute(cn, folder_path);
+			List<String> results = new LinkedList<String>();
+			for(String query : response.getQueryNames()){
+				List<String> cols = getColumnNames(query, false);
+				if(containsMetaData(cols)){
+					if(bLocalTypesOnly){
+						if(query.startsWith("Local") && query.endsWith("Type")){
+							results.add(query);
+						}
+					}
+					else{
+						results.add(query);
+					}
+				}
+			}
+			return results;
+		} catch (IOException e) {
+			e.printStackTrace();
+		} catch (CommandException e) {
+			if(e.getMessage().equals("Unauthorized")){
+				throw e;
+			}
+			else{
+				e.printStackTrace();
+			}
+		}
+		return null;
+	}
+	
+	public List<String> getInstanceDataQueryNames() throws CommandException {
+		GetQueriesCommand cmd = new GetQueriesCommand("lists");
+		cmd.setRequiredVersion(9.1);
+		GetQueriesResponse response;
+		try {
+			response = cmd.execute(cn, folder_path);
+			List<String> results = new LinkedList<String>();
+			for(String query : response.getQueryNames()){
+				List<String> cols = getColumnNames(query, false);
+				if(containsInstanceData(cols)){
+					results.add(query);
+				}
+			}
+			return results;
+		} catch (IOException e) {
+			e.printStackTrace();
+		} catch (CommandException e) {
+			if(e.getMessage().equals("Unauthorized")){
+				throw e;
+			}
+			else{
+				e.printStackTrace();
+			}
+		}
 		return null;
 	}
 	
@@ -191,6 +260,15 @@ public class LabkeyDataLoader {
 		return false;
 	}
 	
+	public boolean containsMetaData(List<String> columns){
+		for(String col : columns){
+			if(col.contains("subClassOf")){
+				return true;
+			}
+		}
+		return false;
+	}
+	
 	public List<String> getColumnNames(String query_name, boolean bRetDefault) throws CommandException {
 		GetQueriesCommand cmd = new GetQueriesCommand("lists");
 		cmd.setRequiredVersion(9.1);
@@ -223,24 +301,5 @@ public class LabkeyDataLoader {
 		}
 		
 		return null;
-	}
-	
-	public void insertRowData(){
-//		InsertRowsCommand cmd = new InsertRowsCommand("lists", "Instruments");
-//
-//		Map<String,Object> row = new HashMap<String,Object>();
-//		row.put("FirstName", "Insert");
-//		row.put("LastName", "Test");
-//		cmd.addRow(row); //can add multiple rows to insert many at once
-//		try {
-//			SaveRowsResponse response = cmd.execute(cn, "/Test");
-//		} catch (IOException e) {
-//			e.printStackTrace();
-//		} catch (CommandException e) {
-//			e.printStackTrace();
-//		}
-//
-//		get the newly-assigned primary key value from the first return row
-//		int newKey = resp.getRows().get(0).get("Key");
 	}
 }

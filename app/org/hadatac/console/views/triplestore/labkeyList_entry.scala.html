@@ -6,8 +6,8 @@
 @import org.hadatac.utils._
 
 <tr>
-   <td>@if(list_name != null) { @list_name }</td>
-   <td>
-       <a href="@org.hadatac.console.controllers.triplestore.routes.LoadKB.playLoadLabkeyListContent("load", labkeyLoginForm, folder, list_name)" class="btn-xs btn-primary" role="button">Load</a>
-   </td>
+	<td>@if(list_name != null) { @list_name }</td>
+   	<td>
+		<input type="checkbox" name="@list_name" id="@list_name" >
+   	</td>
 </tr>
