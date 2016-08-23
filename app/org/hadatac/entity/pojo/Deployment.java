@@ -378,6 +378,7 @@ public class Deployment {
 				deployment.detectors.add(Detector.find(object.asResource().getURI()));
 			} else if (statement.getPredicate().getURI().equals("http://www.w3.org/ns/prov#startedAtTime")) {
 				deployment.setStartedAtXsdWithMillis(object.asLiteral().getString());
+				System.out.println("StartedTime is " + object.asLiteral().getString());
 			}
 		}
 		

@@ -128,7 +128,7 @@ public class LabkeyDataLoader {
 		return null;
 	}
 
-	public List<String> getMetadataQueryNames() throws CommandException {
+	public List<String> getMetadataQueryNames(boolean bLocalTypesOnly) throws CommandException {
 		GetQueriesCommand cmd = new GetQueriesCommand("lists");
 		cmd.setRequiredVersion(9.1);
 		GetQueriesResponse response;
@@ -138,7 +138,14 @@ public class LabkeyDataLoader {
 			for(String query : response.getQueryNames()){
 				List<String> cols = getColumnNames(query, false);
 				if(containsMetaData(cols)){
-					results.add(query);
+					if(bLocalTypesOnly){
+						if(query.startsWith("Local") && query.endsWith("Type")){
+							results.add(query);
+						}
+					}
+					else{
+						results.add(query);
+					}
 				}
 			}
 			return results;
@@ -294,24 +301,5 @@ public class LabkeyDataLoader {
 		}
 		
 		return null;
-	}
-	
-	public void insertRowData(){
-//		InsertRowsCommand cmd = new InsertRowsCommand("lists", "Instruments");
-//
-//		Map<String,Object> row = new HashMap<String,Object>();
-//		row.put("FirstName", "Insert");
-//		row.put("LastName", "Test");
-//		cmd.addRow(row); //can add multiple rows to insert many at once
-//		try {
-//			SaveRowsResponse response = cmd.execute(cn, "/Test");
-//		} catch (IOException e) {
-//			e.printStackTrace();
-//		} catch (CommandException e) {
-//			e.printStackTrace();
-//		}
-//
-//		get the newly-assigned primary key value from the first return row
-//		int newKey = resp.getRows().get(0).get("Key");
 	}
 }

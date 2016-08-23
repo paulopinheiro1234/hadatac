@@ -14,15 +14,21 @@ import java.util.Properties;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.hadatac.console.controllers.AuthApplication;
+import org.hadatac.console.views.html.datacollections.dataCollectionManagement;
 import org.hadatac.console.views.html.triplestore.*;
+import org.hadatac.entity.pojo.DataCollection;
 import org.hadatac.console.models.LabKeyLoginForm;
+import org.hadatac.console.models.User;
 import org.hadatac.metadata.loader.MetadataContext;
 import org.hadatac.metadata.loader.SpreadsheetProcessing;
 import org.hadatac.metadata.loader.TripleProcessing;
 import org.hadatac.utils.Feedback;
 import org.hadatac.utils.NameSpaces;
+import org.hadatac.utils.State;
 import org.labkey.remoteapi.CommandException;
 import org.labkey.remoteapi.Connection;
+
+import com.ning.http.client.AsyncHandler.STATE;
 
 import be.objectify.deadbolt.java.actions.Group;
 import be.objectify.deadbolt.java.actions.Restrict;
@@ -76,6 +82,53 @@ public class LoadKB extends Controller {
 			e.printStackTrace();
 		}
 		return prop;
+    }
+    
+    @Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
+    public static Result playLoadLabkeyDataAcquisition(String oper, String folder, 
+    		List<String> list_names, LabKeyLoginForm auth) {
+    	System.out.println(String.format("Batch loading data acquisition from \"/%s\"...", folder));
+    	
+    	List<String> final_names = new LinkedList<String>();
+    	String user_name = "";
+        String password = "";
+        LabKeyLoginForm data = null;
+    	if(oper.equals("init")){
+    		Form<LabKeyLoginForm> form = Form.form(LabKeyLoginForm.class).bindFromRequest();
+    		data = form.get();
+            user_name = data.getUserName();
+            password = data.getPassword();
+            final_names.addAll(list_names);
+    	}
+    	else if(oper.contains("load")){
+    		user_name = auth.getUserName();
+            password = auth.getPassword();
+            data = auth;
+            for(String name : list_names){
+            	if(name.equals("DataAcquisition")){
+            		final_names.add(name);
+            	}
+            }
+    	}
+        
+        Properties prop = loadConfig();
+        String path = String.format("/%s", folder);
+        String site = prop.getProperty("site");
+    	
+        NameSpaces.getInstance();
+    	try {
+    		String message = TripleProcessing.importDataAcquisition(site, user_name, password, path, final_names);
+    	} catch(CommandException e) {
+    		if(e.getMessage().equals("Unauthorized")){
+    			return ok(syncLabkey.render(Form.form(LabKeyLoginForm.class), "login_failed", ""));
+    		}
+    	}
+    	
+    	State state = new State(State.ALL);
+    	final User user = AuthApplication.getLocalUser(Controller.session());
+		String ownerUri = UserManagement.getUriByEmail(user.email);
+    	List<DataCollection> theResults = DataCollection.find(ownerUri, state);
+        return ok(dataCollectionManagement.render(state, theResults));
     }
     
     @Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))

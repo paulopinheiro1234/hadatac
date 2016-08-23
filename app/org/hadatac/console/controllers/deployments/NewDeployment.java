@@ -8,7 +8,6 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-import play.Play;
 import play.mvc.Controller;
 import play.mvc.Result;
 import play.data.*;
