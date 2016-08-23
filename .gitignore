@@ -23,3 +23,4 @@ solr/*.sh
 solr/*.bat
 solr/README.md
 solr/LICENSE
+test
