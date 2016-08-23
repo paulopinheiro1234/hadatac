@@ -78,7 +78,7 @@ public class LabkeyDataLoader {
 					PlainTriple tri = new PlainTriple();
 					tri.sub = replaceIrregularCharacters(sub);
 					tri.pred = replaceIrregularCharacters(pred.toString());
-					Object obj_value = ((JSONObject)row.get(tri.pred)).get("value");
+					Object obj_value = ((JSONObject)row.get(pred.toString())).get("value");
 					if(obj_value == null){
 						continue;
 					}
