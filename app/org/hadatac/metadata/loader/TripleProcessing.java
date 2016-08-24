@@ -282,6 +282,7 @@ public class TripleProcessing {
 					else if(predicate.equals("hasco:hasSchema")){
 						dataCollection.setSchemaUri(cellProc.convertToWholeURI(cellValue));
 					}
+					dataCollection.setNumberDataPoints(0);
 					dataCollection.save();
 					System.out.println("Successfully saved in Solr");
 				}

@@ -99,7 +99,7 @@ public class Instrument  implements Comparable<Instrument> {
 			"} " + 
 			"ORDER BY DESC(?datetime) ";
 			
-		//System.out.println("Query: " + queryString);
+		System.out.println("Query: " + queryString);
 		Query query = QueryFactory.create(queryString);
 			
 		QueryExecution qexec = QueryExecutionFactory.sparqlService(Collections.getCollectionsName(Collections.METADATA_SPARQL), query);
@@ -109,7 +109,7 @@ public class Instrument  implements Comparable<Instrument> {
 			
 		while (resultsrw.hasNext()) {
 			QuerySolution soln = resultsrw.next();
-			//System.out.println("URI from main query: " + soln.getResource("uri").getURI());
+			System.out.println("URI from main query: " + soln.getResource("uri").getURI());
 			Instrument instrument = find(soln.getResource("uri").getURI());
 			instruments.add(instrument);
 		}			
