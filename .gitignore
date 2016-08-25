@@ -25,4 +25,6 @@ solr/*.*.sh
 solr/*.*.bat
 solr/README.md
 solr/LICENSE
+solr/solr-home/users/
+solr/solr-home/linked_account/
 test
