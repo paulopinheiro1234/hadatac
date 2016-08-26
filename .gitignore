@@ -25,8 +25,8 @@ solr/*.*.sh
 solr/*.*.bat
 solr/README.md
 solr/LICENSE
-solr/solr-home/users
-solr/solr-home/linked_account
-solr/solr-home/sdc
-solr/solrdf-home/store
+solr/solr-home/users/data
+solr/solr-home/linked_account/data
+solr/solr-home/sdc/data
+solr/solrdf-home/store/data
 test
