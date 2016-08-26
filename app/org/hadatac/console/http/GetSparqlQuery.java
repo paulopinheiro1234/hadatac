@@ -194,11 +194,12 @@ public class GetSparqlQuery {
                 q = "PREFIX rdfs:<http://www.w3.org/2000/01/rdf-schema#>" + 
                     "PREFIX owl: <http://www.w3.org/2002/07/owl#>" + 
                     "PREFIX oboe: <http://ecoinformatics.org/oboe/oboe.1.0/oboe-core.owl#>" + 
+                    "PREFIX sio: <http://semanticscience.org/resource/>" +
                     "SELECT ?id ?superId ?chara WHERE { " + 
-                    "   ?id rdfs:subClassOf* oboe:Entity . " + 
+                    "   ?id rdfs:subClassOf* sio:Object . " + 
                     "   ?id rdfs:subClassOf ?superId .  " + 
                     //"   OPTIONAL { ?ent rdfs:label ?id . } " + 
-                    "   OPTIONAL { ?id oboe:hasCharacteristic ?chara . } " +
+                    //"   OPTIONAL { ?id oboe:hasCharacteristic ?chara . } " +
                     "}";
                 break;
             case "OrganizationsH" : 
@@ -241,9 +242,14 @@ public class GetSparqlQuery {
             case "Characteristics" : 
                 q = "PREFIX rdfs:<http://www.w3.org/2000/01/rdf-schema#>" + 
                     "PREFIX owl: <http://www.w3.org/2002/07/owl#>" + 
-                	"SELECT ?modelName ?superModelName WHERE { " + 
-                    "   ?modelName rdfs:subClassOf* <http://ecoinformatics.org/oboe/oboe.1.0/oboe-core.owl#Characteristic> . " + 
-                	"   ?modelName rdfs:subClassOf ?superModelName .  " + 
+                    "PREFIX hasneto: <http://hadatac.org/ont/hasneto#> " +
+                    "PREFIX sio: <http://semanticscience.org/resource/>" +
+                	"SELECT DISTINCT ?modelName ?superModelName WHERE { " + 
+                    "   ?modelName rdfs:subClassOf* <http://semanticscience.org/resource/Attribute> . " +
+//					"   ?modelName rdfs:subClassOf* <http://hadatac.org/ont/hasneto#Attribute> . " +
+                    "   ?modelName rdfs:subClassOf ?superModelName .  " + 
+//                    "   ?modelName rdfs:subClassOf* <http://ecoinformatics.org/oboe/oboe.1.0/oboe-core.owl#Characteristic> . " + 
+//                	"   ?modelName rdfs:subClassOf ?superModelName .  " + 
                 	//"   OPTIONAL { ?model rdfs:label ?modelName }  " + 
                 	//"   OPTIONAL { ?superModel rdfs:label ?superModelName }  " +
                 	"}";
@@ -313,8 +319,8 @@ public class GetSparqlQuery {
         	        "PREFIX vstoi: <http://hadatac.org/ont/vstoi#>  " +
         	        "PREFIX hasneto: <http://hadatac.org/ont/hasneto#>  " +
                     "SELECT ?uri ?platform ?platformName ?instrument ?instrumentName ?date WHERE { " + 
-                    "   ?uri a vstoi:Deployment . " + 
-                    "   ?uri vstoi:hasPlatform ?platform .  " + 
+                    "   ?uri a hasneto:Deployment . " + 
+                    "   ?uri hasneto:hasPlatform ?platform .  " + 
                     "   ?uri hasneto:hasInstrument ?instrument .  " + 
                     "   ?uri prov:startedAtTime ?date .  " + 
                     "   OPTIONAL { ?platform rdfs:label ?platformName } ." + 
