@@ -121,7 +121,7 @@ public class FileProcessing extends Controller {
 			   } catch (FileNotFoundException e1) {
 			       return ok (uploadCSV.render(null, "fail", "Could not find uploaded file"));
 			   }
-	     	   return ok(measurementsSpec.render(handler,getQueryResults("Units")));
+	     	   return ok(measurementsSpec.render(handler, getQueryResults("Entities"), getQueryResults("Units")));
 		} else {
 		   return ok (uploadCSV.render(null, "fail", "Error uploading file. Please try again."));
 		} 

@@ -1,4 +1,5 @@
 @(handler: org.hadatac.console.models.CSVAnnotationHandler,
+  theEntities : org.hadatac.console.models.SparqlQueryResults,
   theUnits : org.hadatac.console.models.SparqlQueryResults)
 
 @import helper._
@@ -32,13 +33,14 @@
                  <thead>
                     <tr>
                        <th>Measurement</th>
+                       <th>Entity</th>
                        <th>Characteristic</th>
                        <th>Unit</th>
                     </tr>
                  </thead>
                  <tbody>
                     @for((field, index) <- handler.getFields.zipWithIndex){
-                        @field_option(index, field, handler.getDeploymentCharacteristics(), theUnits)
+                        @field_option(index, field, handler.getDeploymentCharacteristics(), theEntities, theUnits)
                     } 
                  </tbody>
             </table>

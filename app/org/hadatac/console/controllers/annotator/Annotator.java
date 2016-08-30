@@ -106,14 +106,14 @@ public class Annotator extends Controller {
 		} catch (UnsupportedEncodingException e) {
 			e.printStackTrace();
 		}
-    	//System.out.println("uploadCSV: uri is " + uri);
+    	System.out.println("uploadCSV: uri is " + uri);
     	if (!uri.equals("")) {
 
     		/*
     		 *  Add deployment information into handler
     		 */
     		String json = DeploymentQueries.exec(DeploymentQueries.DEPLOYMENT_BY_URI, uri);
-    		System.out.println(json);
+    		//System.out.println(json);
     		SparqlQueryResults results = new SparqlQueryResults(json, false);
     		TripleDocument docDeployment = results.sparqlResults.values().iterator().next();
     		handler = new CSVAnnotationHandler(uri, docDeployment.get("platform"), docDeployment.get("instrument"));
@@ -122,6 +122,7 @@ public class Annotator extends Controller {
     		 * Add possible detector's characterisitcs into handler
     		 */
     		String dep_json = DeploymentQueries.exec(DeploymentQueries.DEPLOYMENT_CHARACTERISTICS_BY_URI, uri);
+    		System.out.println(dep_json);
     		SparqlQueryResults results2 = new SparqlQueryResults(dep_json, false);
     		Iterator<TripleDocument> it = results2.sparqlResults.values().iterator();
     		Map<String,String> deploymentChars = new HashMap<String,String>();
@@ -182,6 +183,7 @@ public class Annotator extends Controller {
     		 * Add possible detector's characterisitcs into handler
     		 */
     		String dep_json = DeploymentQueries.exec(DeploymentQueries.DEPLOYMENT_CHARACTERISTICS_BY_URI, uri);
+    		System.out.println(dep_json);
     		SparqlQueryResults results2 = new SparqlQueryResults(dep_json, false);
     		Iterator<TripleDocument> it = results2.sparqlResults.values().iterator();
     		Map<String,String> deploymentChars = new HashMap<String,String>();
