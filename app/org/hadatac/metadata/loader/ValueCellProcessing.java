@@ -32,26 +32,40 @@ public class ValueCellProcessing {
 	 *  the content is regarded to be an object set.
 	 */
 	boolean isObjectSet (String cellContent) {
-		
+
 		if (cellContent.startsWith("<") && (cellContent.endsWith(">"))){
 			cellContent = cellContent.replace("<", "").replace(">", "").replace("&", ", ");
 		}
-		 // we need to tokanize the string and verify that the first token is an URI
-	     StringTokenizer st = new StringTokenizer(cellContent,",");
-	     
-	     // the string needs to have at least two tokens
-	     String firstToken, secondToken;
-	     if (!st.hasMoreTokens()) {
-	    	 return false;
-	     }
-	     firstToken = st.nextToken().trim();
-	     if (!st.hasMoreTokens()) {
-	    	 return false;
-	     }
-	     secondToken = st.nextToken().trim();
-	     
-	     // the first token (we could also test the second) needs to be an URI
-	     return (isFullURI(firstToken) || isAbbreviatedURI(firstToken));
+		else if(cellContent.contains("&")){
+			boolean isValid = true;
+			StringTokenizer st = new StringTokenizer(cellContent, "&");
+			while (st.hasMoreTokens()) {
+				String token = st.nextToken().trim();
+				if(!isAbbreviatedURI(token)){
+					isValid = false;
+					break;
+				}
+			}
+			if(isValid){
+				cellContent = cellContent.replace("&", ", ");
+			}
+		}
+		// we need to tokanize the string and verify that the first token is an URI
+		StringTokenizer st = new StringTokenizer(cellContent, ",");
+
+		// the string needs to have at least two tokens
+		String firstToken, secondToken;
+		if (!st.hasMoreTokens()) {
+			return false;
+		}
+		firstToken = st.nextToken().trim();
+		if (!st.hasMoreTokens()) {
+			return false;
+		}
+		secondToken = st.nextToken().trim();
+
+		// the first token (we could also test the second) needs to be an URI
+		return (isFullURI(firstToken) || isAbbreviatedURI(firstToken));
 	}
 	
 	/* 
@@ -131,13 +145,11 @@ public class ValueCellProcessing {
 		// if full URI, either abbreviated it or print it between angled brackets
 		if (isFullURI(object)) {
 			// either replace namespace with acronym or add angled brackets
-			//System.out.print(replaceNameSpace(object));
 			return replaceNameSpace(object);
 		}
 		
 		// if not URI, print the object between quotes
 		object = object.replace("\n", " ").replace("\r", " ").replace("\"", "''");
-		//System.out.println("\"" + object + "\"");		
 		return "\"" + object + "\"";
 	}
 	

@@ -299,7 +299,7 @@ public class Deployment {
 		ResultSetRewindable resultsrw = ResultSetFactory.copyResults(results);
 		qexec.close();
 		
-		if (resultsrw.size() == 1) {
+		if (resultsrw.size() >= 1) {
 			QuerySolution soln = resultsrw.next();
 			Deployment deployment = new Deployment();
 			Resource resource = ResourceFactory.createResource(hadatac.dataCollection.getDeploymentUri());
@@ -336,7 +336,7 @@ public class Deployment {
 		ResultSetRewindable resultsrw = ResultSetFactory.copyResults(results);
 		qexec.close();
 		
-		if (resultsrw.size() == 1) {
+		if (resultsrw.size() >= 1) {
 			QuerySolution soln = resultsrw.next();
 			Deployment deployment = new Deployment();
 			deployment.setLocalName(hadatac.deployment.getLocalName());

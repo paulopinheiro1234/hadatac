@@ -145,6 +145,8 @@ GET    	/hadatac/ts/synclabkey/loadacquisition     org.hadatac.console.controlle
 POST    /hadatac/ts/synclabkey/loadacquisition     org.hadatac.console.controllers.triplestore.LoadKB.playLoadLabkeyDataAcquisition(oper: String, folder: String, list_names: java.util.List[String], auth: org.hadatac.console.models.LabKeyLoginForm)
 
 # Permissions store management URLs
+GET     /hadatac/perm/onlinepreregister            org.hadatac.console.controllers.triplestore.UserManagement.onLinePreRegistration(oper: String)
+POST    /hadatac/perm/onlinepreregister            org.hadatac.console.controllers.triplestore.UserManagement.postOnLinePreRegistration(oper: String)
 GET     /hadatac/perm/preregister                  org.hadatac.console.controllers.triplestore.UserManagement.preRegistration(oper: String)
 POST    /hadatac/perm/preregister                  org.hadatac.console.controllers.triplestore.UserManagement.postPreRegistration(oper: String)
 POST    /hadatac/perm/preregister/upload           org.hadatac.console.controllers.triplestore.UserManagement.uploadFile

@@ -39,7 +39,6 @@ public class Parser {
 		String message = "";
 		Model model;
 		String preamble;
-		int status;
 		
 		this.files = files;
 		files.openFile("ccsv", "r");
@@ -51,9 +50,11 @@ public class Parser {
 		// -- START verify if model is successfully loaded
 		if (model.isEmpty()) {
 			message += Feedback.println(mode, "[ERROR] Preamble not a well-formed Turtle.");
+			System.out.println("[ERROR] Preamble not a well-formed Turtle.");
 			new DatasetParsingResult(1, message);
 		} else {
 			message += Feedback.println(mode, "[OK] Preamble a well-formed Turtle.");
+			System.out.println("[OK] Preamble a well-formed Turtle.");
 		}
 		// -- END verify if model is successfully loaded
 		
@@ -80,6 +81,7 @@ public class Parser {
 		}
 		
 		SolrClient solr = new HttpSolrClient(hadatacCcsv.getDynamicMetadataURL());
+		System.out.println("hadatacKb.dataCollection.save(solr)...");
 		hadatacKb.dataCollection.save(solr);
 		try {
 			solr.close();
@@ -90,7 +92,9 @@ public class Parser {
 		
 		solr = new HttpSolrClient(hadatacCcsv.getMeasurementURL());
 		try {
+			System.out.println("indexMeasurements(solr)...");
 			indexMeasurements(solr);
+			System.out.println("solr.commit()...");
 			solr.commit();
 			solr.close();
 		} catch (IOException | SolrServerException e) {
@@ -113,6 +117,7 @@ public class Parser {
 				MeasurementType measurementType = i.next();
 				measurement.setUri(hadatacCcsv.getMeasurementUri() + hadatacCcsv.dataset.getLocalName() + "/" + measurementType.getLocalName() + "-" + cont);
 				if (measurementType.getTimestampColumn() > -1) {
+					System.out.println("measurementType.getTimestampColumn() > -1");
 					measurement.setTimestampXsd(record.get(measurementType.getTimestampColumn()));
 				}
 				measurement.setOwnerUri(hadatacKb.dataCollection.getOwnerUri());
@@ -212,9 +217,11 @@ public class Parser {
 		// load hadatac
 		hadatacCcsv = HADataC.find(model);
 		if (hadatacCcsv == null) {
+			System.out.println("hadatacCcsv == null");
 			message += Feedback.println(mode, "[ERROR] Preamble does not contain a single hadatac:KnowledgeBase.");
 			return new DatasetParsingResult(1, message);
 		} else {
+			System.out.println("[OK] Preamble contains a single hadatac:KnowledgeBase: <" + hadatacCcsv.getLocalName() + ">");
 			message += Feedback.println(mode, "[OK] Preamble contains a single hadatac:KnowledgeBase: <" + hadatacCcsv.getLocalName() + ">");
 		}
 		
@@ -224,6 +231,7 @@ public class Parser {
 			message += Feedback.println(mode, "[ERROR] Preamble does not contain a single vstoi:Dataset.");
 			return new DatasetParsingResult(1, message);
 		} else {
+			System.out.println("[OK] Preamble contains a single vstoi:Dataset: <" + hadatacCcsv.dataset.getLocalName() + ">");
 			message += Feedback.println(mode, "[OK] Preamble contains a single vstoi:Dataset: <" + hadatacCcsv.dataset.getLocalName() + ">");
 		}
 		
@@ -233,11 +241,13 @@ public class Parser {
 			message += Feedback.println(mode, "[ERROR] Preamble does not contain a single hasneto:DataCollection.");
 			return new DatasetParsingResult(1, message);
 		} else {
+			System.out.println("[OK] Preamble contains a single hasneto:DataCollection: <" + hadatacCcsv.dataCollection.getLocalName() + ">");
 			message += Feedback.println(mode, "[OK] Preamble contains a single hasneto:DataCollection: <" + hadatacCcsv.dataCollection.getLocalName() + ">");
 		}
 		
 		// deployment
 		if (hadatacCcsv.dataCollection.getStatus() == 0) {
+			System.out.println("Deployment find");
 			hadatacCcsv.deployment = Deployment.find(model, hadatacCcsv.dataCollection);
 			if (hadatacCcsv.deployment == null) {
 				message += Feedback.println(mode, "[ERROR] This hasneto:DataCollection requires a vstoi:Deployment that is not specified.");
@@ -252,6 +262,7 @@ public class Parser {
 		// load measurement types
 		hadatacCcsv.dataset.measurementTypes = MeasurementType.find(model, hadatacCcsv.dataset);
 		if (hadatacCcsv.dataset.measurementTypes.isEmpty()) {
+			System.out.println("Measurement is empty");
 			message += Feedback.println(mode, "[ERROR] Preamble does not contain any well described measurement types.");
 			return new DatasetParsingResult(1, message);
 		} else {

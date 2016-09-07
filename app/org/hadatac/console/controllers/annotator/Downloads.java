@@ -58,8 +58,9 @@ public class Downloads extends Controller {
 
     public static final String FRAG_MEASUREMENT_TYPE_PART1  = "> a hadatac:MeasurementType; ";
     public static final String FRAG_MEASUREMENT_TYPE_PART2  = " hadatac:atColumn ";
-    public static final String FRAG_MEASUREMENT_TYPE_PART3  = "; oboe:ofCharacteristic ";
-    public static final String FRAG_MEASUREMENT_TYPE_PART4  = "; oboe:usesStandard ";
+    public static final String FRAG_MEASUREMENT_TYPE_PART3  = "; hasneto:hasEntity ";
+    public static final String FRAG_MEASUREMENT_TYPE_PART4  = "; hasneto:hasAttribute ";
+    public static final String FRAG_MEASUREMENT_TYPE_PART5  = "; hasneto:hasUnit ";
 
     public static final String FRAG_IN_DATE_TIME            = "time:inDateTime";
     public static final String FRAG_IN_DATE_TIME_SUFFIX     = " <ts0>; ";
@@ -129,28 +130,37 @@ public class Downloads extends Controller {
 			  int timeStampIndex = -1;
 			  ArrayList<Integer> mt = new ArrayList<Integer>();
 			  for (String str : handler.getFields()) {
-		  		  //System.out.println(str);
-	  		 	  //System.out.println("get " + i + "-characteristic: [" + p.getProperty(i + "-characteristic") + "]");
-	  		 	  //System.out.println("get " + i + "-unit:           [" + p.getProperty(i + "-unit") + "]");
-	  		 	  if ((p.getProperty(i + "-characteristic") != null) && 
-	  		 		  (!p.getProperty(i + "-characteristic").equals("")) && 
-		  		 	  (p.getProperty(i + "-unit") != null) && 
-			  		  (!p.getProperty(i + "-unit").equals(""))) {
-	  		 		  	 if (p.getProperty(i + "-unit").equals(FRAG_IN_DATE_TIME)) {
-	  		 		  		 timeStampIndex = i; 
-	  		 		  	 } else {
-	  		 		  		 mt.add(i);
-	  		 		  	 }
-			  		  }
-	  		 	  i++;
-		      }
+				  System.out.println(str);
+				  System.out.println("get " + i + "-entity: [" + p.getProperty(i + "-entity") + "]");
+				  System.out.println("get " + i + "-characteristic: [" + p.getProperty(i + "-characteristic") + "]");
+				  System.out.println("get " + i + "-unit:           [" + p.getProperty(i + "-unit") + "]");
+				  if ((p.getProperty(i + "-entity") != null) && 
+					  (!p.getProperty(i + "-entity").equals("")) &&
+					  (p.getProperty(i + "-characteristic") != null) && 
+					  (!p.getProperty(i + "-characteristic").equals("")) && 
+					  (p.getProperty(i + "-unit") != null) && 
+					  (!p.getProperty(i + "-unit").equals(""))) {
+
+					  if (p.getProperty(i + "-unit").equals(FRAG_IN_DATE_TIME)) {
+						  timeStampIndex = i; 
+					  } else {
+						  mt.add(i);
+					  }
+				  }
+				  i++;
+			  }
 			  
 			  preamble += FRAG_HAS_MEASUREMENT_TYPE;	
 			  int aux = 0;
 			  for (Integer mt_count : mt) {
-				  preamble += FRAG_MT + aux++ + "> ";
+				  preamble += FRAG_MT + aux + "> ";
+				  if(aux != (mt.size() - 1)){
+					  preamble += ", ";
+				  }
+				  aux++;
 			  }
 			  preamble += ".\n\n";
+			  System.out.println(preamble);
 			  
 			  /*
 			   * Insert measurement types
@@ -167,10 +177,13 @@ public class Downloads extends Controller {
 				  preamble += FRAG_MEASUREMENT_TYPE_PART2;
 				  preamble += mt_count;
 				  preamble += FRAG_MEASUREMENT_TYPE_PART3;
-				  preamble += "<" + p.getProperty(mt_count + "-characteristic") + ">"; 
+				  preamble += "<" + p.getProperty(mt_count + "-entity") + ">"; 
 				  preamble += FRAG_MEASUREMENT_TYPE_PART4;
+				  preamble += "<" + p.getProperty(mt_count + "-characteristic") + ">"; 
+				  preamble += FRAG_MEASUREMENT_TYPE_PART5;
 				  preamble += "<" + p.getProperty(mt_count + "-unit") + ">"; 
 				  preamble += " .\n";
+				  aux++;
 			  }
 
 			  if (timeStampIndex != -1) {
@@ -179,7 +192,7 @@ public class Downloads extends Controller {
 			  }
 			  
 			  if (textBody == null) {
-			    badRequest("Expecting text/plain request body");
+				  badRequest("Expecting text/plain request body");
 			  }
 		} catch (Exception e) {
 			// TODO Auto-generated catch block

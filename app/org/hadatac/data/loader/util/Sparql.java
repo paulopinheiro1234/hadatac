@@ -11,5 +11,6 @@ public class Sparql {
 			+ "PREFIX oboe: <http://ecoinformatics.org/oboe/oboe.1.0/oboe-core.owl#>\n"
 			+ "PREFIX hadatac: <http://hadatac.org/ont/hadatac#>\n"
 			+ "PREFIX hasneto: <http://hadatac.org/ont/hasneto#>\n"
-			+ "PREFIX vstoi: <http://hadatac.org/ont/vstoi#>\n"; 
+			+ "PREFIX vstoi: <http://hadatac.org/ont/vstoi#>\n"
+			+ "PREFIX hasco: <http://hadatac.org/ont/hasco/>\n"; 
 }

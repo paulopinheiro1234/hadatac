@@ -272,11 +272,11 @@ public class GetSparqlQuery {
                     "PREFIX owl: <http://www.w3.org/2002/07/owl#>" + 
                     "PREFIX oboe: <http://ecoinformatics.org/oboe/oboe.1.0/oboe-core.owl#>" +
                     "PREFIX obo: <http://geneontology.org/GO.format.obo-1_2.shtml#>" +
-                    "SELECT ?modelName ?superModelName ?chara ?label WHERE { " + 
-                    "   ?modelName rdfs:subClassOf* obo:UO_0000000 . " + 
-                    "   ?modelName rdfs:subClassOf ?superModelName .  " + 
-                    "   OPTIONAL { ?modelName rdfs:label ?label } ." +
-                    "   OPTIONAL { ?modelName oboe:standardFor ?m .  " + 
+                    "SELECT ?id ?superModelName ?chara ?label WHERE { " + 
+                    "   ?id rdfs:subClassOf* obo:UO_0000000 . " + 
+                    "   ?id rdfs:subClassOf ?superModelName .  " + 
+                    "   OPTIONAL { ?id rdfs:label ?label } ." +
+                    "   OPTIONAL { ?id oboe:standardFor ?m .  " + 
                     "              ?m oboe:ofCharacteristic ?chara } . " +
                     "}";
                 break;
