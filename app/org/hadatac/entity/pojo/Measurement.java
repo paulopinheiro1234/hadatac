@@ -248,6 +248,7 @@ public class Measurement {
 		}
 		
 		q =  "(" + permission_query + ") AND (" + facet_query + ")";
+		q =  facet_query;
 		System.out.println("!!! QUERY: " + q);
 		query.setQuery(q);
 		query.setStart((page-1)*qtd);
@@ -263,6 +264,7 @@ public class Measurement {
 			SolrDocumentList results = queryResponse.getResults();
 			Iterator<SolrDocument> m = results.iterator();
 			while (m.hasNext()) {
+				System.out.println("Next");
 				result.documents.add(convertFromSolr(m.next()));
 			}
 			
@@ -296,6 +298,7 @@ public class Measurement {
 					result.pivot_facets.put(entry.getKey(), parents);
 					
 					List<PivotField> list = entry.getValue();
+					System.out.println("List<PivotField> size: " + list.size());
 					Iterator<PivotField> i_parents = list.iterator();
 					System.out.println("!!!!!!! PIVOT: " + entry.getKey());
 					while (i_parents.hasNext()) {

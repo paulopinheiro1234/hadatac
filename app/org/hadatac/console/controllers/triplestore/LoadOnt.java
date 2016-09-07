@@ -23,9 +23,21 @@ public class LoadOnt extends Controller {
     public static Result loadOnt(String oper) {
     	
     	List<String> cacheList = new ArrayList<String>();
-    	File folder = new File(NameSpaces.CACHE_PATH); 
-    	String name = "";
+    	File folder = new File(NameSpaces.CACHE_PATH);
     	
+    	// if the directory does not exist, create it
+    	if (!folder.exists()) {
+    	    System.out.println("creating directory: " + NameSpaces.CACHE_PATH);
+    	    try{
+    	    	folder.mkdir();
+    	    } 
+    	    catch(SecurityException se){
+    	    	System.out.println("Failed to create directory.");
+    	    }
+    	    System.out.println("DIR created");
+    	}
+    	
+    	String name = "";
     	for (final File fileEntry : folder.listFiles()) {
     	    if (!fileEntry.isDirectory()) {
     	    	name = fileEntry.getName();

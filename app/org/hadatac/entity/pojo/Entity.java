@@ -57,7 +57,7 @@ public class Entity implements HADatAcClass, Comparable<Entity> {
 		List<Entity> entities = new ArrayList<Entity>();
 		String queryString = NameSpaces.getInstance().printSparqlNameSpaceList() +
 			" SELECT ?uri WHERE { " +
-            " ?uri rdfs:subClassOf* oboe:Entity . " + 
+            " ?uri rdfs:subClassOf* sio:Object . " + 
 			"} ";
 			
 		//System.out.println("Query: " + queryString);

@@ -106,7 +106,13 @@ public class TripleProcessing {
 			// cell has object value
 			clttl = clttl + "   " + predicate + " ";
 			if (cellProc.isObjectSet(cellValue)) {
-				StringTokenizer st = new StringTokenizer(cellValue,",");
+				StringTokenizer st;
+				if(cellValue.contains("&")){
+					st = new StringTokenizer(cellValue, "&");
+				}
+				else{
+					st = new StringTokenizer(cellValue, ",");
+				}
 				while (st.hasMoreTokens()) {
 					clttl = clttl + cellProc.processObjectValue(st.nextToken().trim());
 					if (st.hasMoreTokens()){

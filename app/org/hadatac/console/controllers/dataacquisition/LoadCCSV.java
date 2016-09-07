@@ -34,11 +34,11 @@ public class LoadCCSV extends Controller {
 	public static final String UPLOAD_NAME = "uploads/latest.ccsv";
 	
     public static Result loadCCSV(String oper) {
-	return ok(loadCCSV.render(oper, ""));
+    	return ok(loadCCSV.render(oper, ""));
     }
 
     public static Result postLoadCCSV(String oper) {
-	return ok(loadCCSV.render(oper, ""));
+    	return ok(loadCCSV.render(oper, ""));
     }
 
     public static String playLoadCCSV() {
@@ -68,6 +68,7 @@ public class LoadCCSV extends Controller {
 					result = parser.validate(Feedback.WEB, files);
 					message += result.getMessage();
 					if (result.getStatus() == 0) {
+						System.out.println("Indexing...");
 						parser.index(Feedback.WEB);
 					}
 				}
@@ -84,38 +85,38 @@ public class LoadCCSV extends Controller {
     
     public static Result uploadFile() {
     	//System.out.println("uploadFile CALLED!");
-           MultipartFormData body = request().body().asMultipartFormData();
-		   FilePart uploadedfile = body.getFile("pic");
-		   if (uploadedfile != null) {
-		       File file = uploadedfile.getFile();
-		       File newFile = new File(UPLOAD_NAME);
-		       InputStream isFile;
-		       try {
-					isFile = new FileInputStream(file);
-		            byte[] byteFile;
-				    try {
-		     			byteFile = IOUtils.toByteArray(isFile);
-		     			try {
-		     				FileUtils.writeByteArrayToFile(newFile, byteFile);
-		     			} catch (Exception e) {
-		     				// TODO Auto-generated catch block
-		     				e.printStackTrace();
-		     			}
-		     			try {
-		     				isFile.close();
-		     			} catch (Exception e) {
-		     				 return ok (loadCCSV.render("fail", "Could not save uploaded file."));
-		     			}
-			    	} catch (Exception e) {
-						 return ok (loadCCSV.render("fail", "Could not process uploaded file."));
-				    }
-			   } catch (FileNotFoundException e1) {
-			       return ok (loadCCSV.render("fail", "Could not find uploaded file"));
-			   }
-	     	   return ok(loadCCSV.render("loaded", "File uploaded successfully."));
-		   } else {
-			 return ok (loadCCSV.render("fail", "Error uploading file. Please try again."));
-		   } 
+    	MultipartFormData body = request().body().asMultipartFormData();
+    	FilePart uploadedfile = body.getFile("pic");
+    	if (uploadedfile != null) {
+    		File file = uploadedfile.getFile();
+    		File newFile = new File(UPLOAD_NAME);
+    		InputStream isFile;
+    		try {
+    			isFile = new FileInputStream(file);
+    			byte[] byteFile;
+    			try {
+    				byteFile = IOUtils.toByteArray(isFile);
+    				try {
+    					FileUtils.writeByteArrayToFile(newFile, byteFile);
+    				} catch (Exception e) {
+    					// TODO Auto-generated catch block
+    					e.printStackTrace();
+    				}
+    				try {
+    					isFile.close();
+    				} catch (Exception e) {
+    					return ok (loadCCSV.render("fail", "Could not save uploaded file."));
+    				}
+    			} catch (Exception e) {
+    				return ok (loadCCSV.render("fail", "Could not process uploaded file."));
+    			}
+    		} catch (FileNotFoundException e1) {
+    			return ok (loadCCSV.render("fail", "Could not find uploaded file"));
+    		}
+    		return ok(loadCCSV.render("loaded", "File uploaded successfully."));
+    	} else {
+    		return ok (loadCCSV.render("fail", "Error uploading file. Please try again."));
+    	} 
     } 
     
 }

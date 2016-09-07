@@ -195,11 +195,11 @@ public class GetSparqlQuery {
                     "PREFIX owl: <http://www.w3.org/2002/07/owl#>" + 
                     "PREFIX oboe: <http://ecoinformatics.org/oboe/oboe.1.0/oboe-core.owl#>" + 
                     "PREFIX sio: <http://semanticscience.org/resource/>" +
-                    "SELECT ?id ?superId ?chara WHERE { " + 
+                    "SELECT ?id ?superId ?label ?chara WHERE { " + 
                     "   ?id rdfs:subClassOf* sio:Object . " + 
                     "   ?id rdfs:subClassOf ?superId .  " + 
-                    //"   OPTIONAL { ?ent rdfs:label ?id . } " + 
-                    //"   OPTIONAL { ?id oboe:hasCharacteristic ?chara . } " +
+                    "   OPTIONAL { ?id rdfs:label ?label . } " + 
+                    "   OPTIONAL { ?id oboe:hasCharacteristic ?chara . } " +
                     "}";
                 break;
             case "OrganizationsH" : 
@@ -245,13 +245,10 @@ public class GetSparqlQuery {
                     "PREFIX hasneto: <http://hadatac.org/ont/hasneto#> " +
                     "PREFIX sio: <http://semanticscience.org/resource/>" +
                 	"SELECT DISTINCT ?modelName ?superModelName WHERE { " + 
-                    "   ?modelName rdfs:subClassOf* <http://semanticscience.org/resource/Attribute> . " +
-//					"   ?modelName rdfs:subClassOf* <http://hadatac.org/ont/hasneto#Attribute> . " +
+                    "   ?modelName rdfs:subClassOf* hasneto:Attribute . " +
                     "   ?modelName rdfs:subClassOf ?superModelName .  " + 
-//                    "   ?modelName rdfs:subClassOf* <http://ecoinformatics.org/oboe/oboe.1.0/oboe-core.owl#Characteristic> . " + 
-//                	"   ?modelName rdfs:subClassOf ?superModelName .  " + 
-                	//"   OPTIONAL { ?model rdfs:label ?modelName }  " + 
-                	//"   OPTIONAL { ?superModel rdfs:label ?superModelName }  " +
+                	"   OPTIONAL { ?model rdfs:label ?modelName }  " + 
+                	"   OPTIONAL { ?superModel rdfs:label ?superModelName }  " +
                 	"}";
                 break;
             case "PlatformModels" : 
@@ -273,12 +270,13 @@ public class GetSparqlQuery {
             case "Units" : 
                 q = "PREFIX rdfs:<http://www.w3.org/2000/01/rdf-schema#>" + 
                     "PREFIX owl: <http://www.w3.org/2002/07/owl#>" + 
-                    "PREFIX oboe: <http://ecoinformatics.org/oboe/oboe.1.0/oboe-core.owl#>" + 
-                    "SELECT ?modelName ?superModelName ?chara ?label WHERE { " + 
-                    "   ?modelName rdfs:subClassOf* oboe:Standard . " + 
-                    "   ?modelName rdfs:subClassOf ?superModelName .  " + 
-                    "   OPTIONAL { ?modelName rdfs:label ?label } ." +
-                    "   OPTIONAL { ?modelName oboe:standardFor ?m .  " + 
+                    "PREFIX oboe: <http://ecoinformatics.org/oboe/oboe.1.0/oboe-core.owl#>" +
+                    "PREFIX obo: <http://geneontology.org/GO.format.obo-1_2.shtml#>" +
+                    "SELECT ?id ?superModelName ?chara ?label WHERE { " + 
+                    "   ?id rdfs:subClassOf* obo:UO_0000000 . " + 
+                    "   ?id rdfs:subClassOf ?superModelName .  " + 
+                    "   OPTIONAL { ?id rdfs:label ?label } ." +
+                    "   OPTIONAL { ?id oboe:standardFor ?m .  " + 
                     "              ?m oboe:ofCharacteristic ?chara } . " +
                     "}";
                 break;

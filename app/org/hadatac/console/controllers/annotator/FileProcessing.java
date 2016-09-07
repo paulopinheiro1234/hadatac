@@ -59,7 +59,7 @@ public class FileProcessing extends Controller {
     	String query_json = null;
         try {
             query_json = query_submit.executeQuery(tabName);
-            //System.out.println("query_json = " + query_json);
+            System.out.println("query_json = " + query_json);
             theResults = new SparqlQueryResults(query_json, false);
         } catch (IllegalStateException | IOException | NullPointerException e1) {
             e1.printStackTrace();
@@ -121,7 +121,7 @@ public class FileProcessing extends Controller {
 			   } catch (FileNotFoundException e1) {
 			       return ok (uploadCSV.render(null, "fail", "Could not find uploaded file"));
 			   }
-	     	   return ok(measurementsSpec.render(handler,getQueryResults("Units")));
+	     	   return ok(measurementsSpec.render(handler, getQueryResults("Entities"), getQueryResults("Units")));
 		} else {
 		   return ok (uploadCSV.render(null, "fail", "Error uploading file. Please try again."));
 		} 

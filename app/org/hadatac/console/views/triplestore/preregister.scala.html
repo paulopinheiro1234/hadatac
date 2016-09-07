@@ -1,0 +1,79 @@
+@(oper: String)
+
+@import helper._
+@import org.hadatac.utils._
+@import org.hadatac.console.views.html._
+@import org.hadatac.console.controllers._
+
+@main("Add Preregistered User") {
+
+	<script type="text/javascript">
+		function checkform() {
+    		var cansubmit = true;
+    		if (document.getElementById('usr_uri').value.length == 0) {
+		        cansubmit = false;
+    		}
+    		if (document.getElementById('given_name').value.length == 0) {
+        		cansubmit = false;
+    		}
+    		if (document.getElementById('family_name').value.length == 0) {
+        		cansubmit = false;
+    		}
+    		if (document.getElementById('email').value.length == 0) {
+        		cansubmit = false;
+    		}
+
+		    if (cansubmit) {
+       			document.getElementById('submitbutton').disabled = false;
+    		} else {
+        		document.getElementById('submitbutton').disabled = 'disabled';
+    		}
+ 		}
+	</script>
+
+  <div class="container">
+
+    <form class="form-horizontal" name="newUser" method="post" action="@org.hadatac.console.controllers.deployments.routes.NewDeployment.processForm">
+  		<div class="form-group">
+  			<label for="usr_uri">User URI:*</label>
+ 			<input type="text" class="form-control" name="usr_uri" id="usr_uri" onchange="checkform()" >
+ 		</div>
+ 		
+		<div class="form-group">
+			<label for="given_name">Given Name:*</label>
+  			<input type="text" class="form-control" name="given_name" id="given_name" onchange="checkform()" >
+		</div>
+		
+		<div class="form-group">
+  			<label for="family_name">Family Name:*</label>
+ 			<input type="text" class="form-control" name="family_name" id="family_name" onchange="checkform()" >
+ 		</div>
+ 		
+		<div class="form-group">
+			<label for="email">Email Address:*</label>
+  			<input type="text" class="form-control" name="email" id="email" onchange="checkform()" >
+		</div>
+		
+		<div class="form-group">
+			<label for="comment">Comment:</label>
+  			<input type="text" class="form-control" name="comment" id="comment" >
+		</div>
+		
+		<div class="form-group">
+			<label for="homepage">Homepage:</label>
+  			<input type="text" class="form-control" name="homepage" id="homepage"" >
+		</div>
+		
+		<div class="form-group">
+			<label for="org_uri">Organization URI:</label>
+  			<input type="text" class="form-control" name="org_uri" id="org_uri" >
+		</div>
+  		
+     	<div class="form-group" class="col-sm-6 col-offset-3">
+        	<input class="btn btn-success" role="button" id="submitbutton" type="submit" value="Create" disabled="disabled" />
+     	</div>
+   	</form>    
+  </div>
+
+
+}
