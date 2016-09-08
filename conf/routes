@@ -34,6 +34,20 @@ POST	/hadatac/metadata/unit                    org.hadatac.console.controllers.m
 GET	    /hadatac/metadata/agent			          org.hadatac.console.controllers.metadata.concepts.Agent.index()
 POST	/hadatac/metadata/agent			          org.hadatac.console.controllers.metadata.concepts.Agent.postIndex()
 
+# Metaclasses
+GET	    /hadatac/metadata/demographics            org.hadatac.console.controllers.metadata.metaclasses.Demographics.index()
+POST	/hadatac/metadata/demographics            org.hadatac.console.controllers.metadata.metaclasses.Demographics.postIndex()
+GET	    /hadatac/metadata/birthoutcomes           org.hadatac.console.controllers.metadata.metaclasses.BirthOutcomes.index()
+POST	/hadatac/metadata/birthoutcomes           org.hadatac.console.controllers.metadata.metaclasses.BirthOutcomes.postIndex()
+GET	    /hadatac/metadata/atidu			          org.hadatac.console.controllers.metadata.metaclasses.ATIDU.index()
+POST	/hadatac/metadata/atidu			          org.hadatac.console.controllers.metadata.metaclasses.ATIDU.postIndex()
+GET	    /hadatac/metadata/housingcharacteristic   org.hadatac.console.controllers.metadata.metaclasses.HousingCharacteristic.index()
+POST	/hadatac/metadata/housingcharacteristic   org.hadatac.console.controllers.metadata.metaclasses.HousingCharacteristic.postIndex()
+GET	    /hadatac/metadata/antropometry            org.hadatac.console.controllers.metadata.metaclasses.Anthropometry.index()
+POST	/hadatac/metadata/anthropometry           org.hadatac.console.controllers.metadata.metaclasses.Anthropometry.postIndex()
+GET	    /hadatac/metadata/bdn		              org.hadatac.console.controllers.metadata.metaclasses.BDN.index()
+POST	/hadatac/metadata/bdn		              org.hadatac.console.controllers.metadata.metaclasses.BDN.postIndex()
+
 # Metadata empirical
 GET	    /hadatac/metadata/platform	    	      org.hadatac.console.controllers.metadata.empirical.Platform.index()
 POST	/hadatac/metadata/platform   		      org.hadatac.console.controllers.metadata.empirical.Platform.postIndex()

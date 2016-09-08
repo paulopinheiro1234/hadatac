@@ -6,16 +6,17 @@
 @import org.hadatac.console.views.html.metadata.activities._
 @import org.hadatac.console.views.html.metadata.empirical._
 @import org.hadatac.console.views.html.metadata.computational._
+@import org.hadatac.console.views.html.metadata.metaclasses._
 
 @main("Browse Metadata") {
     <div class="container-fluid">
      
      <h2>Browse Metadata</h2>
      
-     <div class="row">
+<!--     <div class="row">
 		  @study_navigation("")
       </div>
-      
+ -->     
       <hr>
      
       <div class="row">
@@ -38,6 +39,12 @@
       
       <div class="row">
 		  @computational_navigation("")
+      </div>
+      
+      <hr>
+      
+      <div class="row">
+		  @metaclasses_navigation("")
       </div>
 
       <br><br><br>
