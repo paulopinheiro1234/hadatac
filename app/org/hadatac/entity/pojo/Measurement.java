@@ -247,7 +247,7 @@ public class Measurement {
 			facet_query = "*:*";
 		}
 		
-		q =  "(" + permission_query + ") AND (" + facet_query + ")";
+		//q =  "(" + permission_query + ") AND (" + facet_query + ")";
 		q =  facet_query;
 		System.out.println("!!! QUERY: " + q);
 		query.setQuery(q);
