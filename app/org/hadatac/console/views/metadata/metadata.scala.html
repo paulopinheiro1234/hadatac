@@ -7,6 +7,7 @@
 @import org.hadatac.console.views.html.metadata.empirical._
 @import org.hadatac.console.views.html.metadata.computational._
 @import org.hadatac.console.views.html.metadata.metaclasses._
+@import org.hadatac.console.views.html.metadata.analytes._
 
 @main("Browse Metadata") {
     <div class="container-fluid">
@@ -21,6 +22,18 @@
      
       <div class="row">
 		  @science_navigation("")
+      </div>
+      
+      <hr>
+      
+      <div class="row">
+		  @metaclasses_navigation("")
+      </div>
+
+      <hr>
+      
+      <div class="row">
+		  @analytes_navigation("")
       </div>
 
       <hr>
@@ -40,12 +53,7 @@
       <div class="row">
 		  @computational_navigation("")
       </div>
-      
-      <hr>
-      
-      <div class="row">
-		  @metaclasses_navigation("")
-      </div>
+     
 
       <br><br><br>
       @mainButton(false)

@@ -27,7 +27,7 @@ public class GetSparqlQuery {
 
     public String collection;
     
-    private int numThings = 20;
+    private int numThings = 25;
 
     public String[] thingTypes = new String[numThings];
     
@@ -122,6 +122,11 @@ public class GetSparqlQuery {
 	    thingTypes[17] = "ATIDU";
 	    thingTypes[18] = "Anthropometry";
 	    thingTypes[19] = "BDN";
+	    thingTypes[20] = "Analytes";
+	    thingTypes[21] = "Alkaloids";
+	    thingTypes[22] = "Arsenic";
+	    thingTypes[23] = "Elements";
+	    thingTypes[24] = "OrganicAromatic";
     }
     
     public String querySelector(String tabName){
@@ -422,6 +427,86 @@ public class GetSparqlQuery {
             		"PREFIX skos: <http://www.w3.org/2004/02/skos/core#>" +
             		"SELECT ?id ?superId ?label ?comment WHERE { " + 
                     "   ?id rdfs:subClassOf* chear:BehaviorDietAndNutrition . " + 
+                    "   ?id rdfs:subClassOf ?superId .  " + 
+                    "   OPTIONAL { ?id rdfs:label ?label } . " + 
+                    " 	OPTIONAL { ?id skos:definition ?comment } . " +
+                    "}";
+                break;
+            case "Analytes" :
+            	q = "PREFIX sio: <http://semanticscience.org/resource/>" + 
+            		"PREFIX chear: <http://hadatac.org/ont/chear#>" + 
+            		"PREFIX prov: <http://www.w3.org/ns/prov#>" + 
+            		"PREFIX hasco: <http://hadatac.org/ont/hasco/>" + 
+            		"PREFIX hasneto: <http://hadatac.org/ont/hasneto#>" + 
+            		"PREFIX dcterms: <http://purl.org/dc/terms/>" + 
+            		"PREFIX rdfs:<http://www.w3.org/2000/01/rdf-schema#>" + 
+            		"PREFIX skos: <http://www.w3.org/2004/02/skos/core#>" +
+            		"SELECT ?id ?superId ?label ?comment WHERE { " + 
+                    "   ?id rdfs:subClassOf* chear:Analyte . " + 
+                    "   ?id rdfs:subClassOf ?superId .  " + 
+                    "   OPTIONAL { ?id rdfs:label ?label } . " + 
+                    " 	OPTIONAL { ?id skos:definition ?comment } . " +
+                    "}";
+                break;
+            case "Alkaloids" :
+            	q = "PREFIX sio: <http://semanticscience.org/resource/>" + 
+            		"PREFIX chear: <http://hadatac.org/ont/chear#>" + 
+            		"PREFIX prov: <http://www.w3.org/ns/prov#>" + 
+            		"PREFIX hasco: <http://hadatac.org/ont/hasco/>" + 
+            		"PREFIX hasneto: <http://hadatac.org/ont/hasneto#>" + 
+            		"PREFIX dcterms: <http://purl.org/dc/terms/>" + 
+            		"PREFIX rdfs:<http://www.w3.org/2000/01/rdf-schema#>" + 
+            		"PREFIX skos: <http://www.w3.org/2004/02/skos/core#>" +
+            		"SELECT ?id ?superId ?label ?comment WHERE { " + 
+                    "   ?id rdfs:subClassOf* chear:Alkaloid . " + 
+                    "   ?id rdfs:subClassOf ?superId .  " + 
+                    "   OPTIONAL { ?id rdfs:label ?label } . " + 
+                    " 	OPTIONAL { ?id skos:definition ?comment } . " +
+                    "}";
+                break;
+            case "Arsenic" :
+            	q = "PREFIX sio: <http://semanticscience.org/resource/>" + 
+            		"PREFIX chear: <http://hadatac.org/ont/chear#>" + 
+            		"PREFIX prov: <http://www.w3.org/ns/prov#>" + 
+            		"PREFIX hasco: <http://hadatac.org/ont/hasco/>" + 
+            		"PREFIX hasneto: <http://hadatac.org/ont/hasneto#>" + 
+            		"PREFIX dcterms: <http://purl.org/dc/terms/>" + 
+            		"PREFIX rdfs:<http://www.w3.org/2000/01/rdf-schema#>" + 
+            		"PREFIX skos: <http://www.w3.org/2004/02/skos/core#>" +
+            		"SELECT ?id ?superId ?label ?comment WHERE { " + 
+                    "   ?id rdfs:subClassOf* chear:ArsenicSpecies . " + 
+                    "   ?id rdfs:subClassOf ?superId .  " + 
+                    "   OPTIONAL { ?id rdfs:label ?label } . " + 
+                    " 	OPTIONAL { ?id skos:definition ?comment } . " +
+                    "}";
+                break;
+            case "Elements" :
+            	q = "PREFIX sio: <http://semanticscience.org/resource/>" + 
+            		"PREFIX chear: <http://hadatac.org/ont/chear#>" + 
+            		"PREFIX prov: <http://www.w3.org/ns/prov#>" + 
+            		"PREFIX hasco: <http://hadatac.org/ont/hasco/>" + 
+            		"PREFIX hasneto: <http://hadatac.org/ont/hasneto#>" + 
+            		"PREFIX dcterms: <http://purl.org/dc/terms/>" + 
+            		"PREFIX rdfs:<http://www.w3.org/2000/01/rdf-schema#>" + 
+            		"PREFIX skos: <http://www.w3.org/2004/02/skos/core#>" +
+            		"SELECT ?id ?superId ?label ?comment WHERE { " + 
+                    "   ?id rdfs:subClassOf* chear:Element . " + 
+                    "   ?id rdfs:subClassOf ?superId .  " + 
+                    "   OPTIONAL { ?id rdfs:label ?label } . " + 
+                    " 	OPTIONAL { ?id skos:definition ?comment } . " +
+                    "}";
+                break;
+            case "OrganicAromatic" :
+            	q = "PREFIX sio: <http://semanticscience.org/resource/>" + 
+            		"PREFIX chear: <http://hadatac.org/ont/chear#>" + 
+            		"PREFIX prov: <http://www.w3.org/ns/prov#>" + 
+            		"PREFIX hasco: <http://hadatac.org/ont/hasco/>" + 
+            		"PREFIX hasneto: <http://hadatac.org/ont/hasneto#>" + 
+            		"PREFIX dcterms: <http://purl.org/dc/terms/>" + 
+            		"PREFIX rdfs:<http://www.w3.org/2000/01/rdf-schema#>" + 
+            		"PREFIX skos: <http://www.w3.org/2004/02/skos/core#>" +
+            		"SELECT ?id ?superId ?label ?comment WHERE { " + 
+                    "   ?id rdfs:subClassOf* chear:OrganicAromaticCompound . " + 
                     "   ?id rdfs:subClassOf ?superId .  " + 
                     "   OPTIONAL { ?id rdfs:label ?label } . " + 
                     " 	OPTIONAL { ?id skos:definition ?comment } . " +
