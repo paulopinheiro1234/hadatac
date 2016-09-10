@@ -1,7 +1,9 @@
+@()
+
 @import helper._
 @import org.hadatac.console.views.html._
 
-@main("Pilot 5") {
+@main("Analytes Faceted Browser") {
    		<script type="text/javascript" src="@controllers.routes.Assets.versioned("javascripts/vendor/jquery/1.7.1/jquery-1.7.1.min.js")"></script>
 		<link rel="stylesheet" type="text/css" href="@controllers.routes.Assets.versioned("javascripts/vendor/bootstrap/css/bootstrap.min.css")"/>
 		<script type="text/javascript" src="@controllers.routes.Assets.versioned("javascripts/vendor/bootstrap/js/bootstrap.min.js")"></script>
@@ -20,18 +22,18 @@
 		<script type="text/javascript" src="@controllers.routes.Assets.versioned("javascripts/vendor/d3-3.5.6/d3.min.js")"></script>
 		<script type="text/javascript" src="@controllers.routes.Assets.versioned("javascripts/vendor/c3-0.4.10/c3.min.js")"></script>
 				
-   <script type="text/javascript">
+  <script type="text/javascript">
 jQuery(document).ready(function($) {
   $('.facet-view-simple').each(function() {
   $(this).facetview({
-    search_url: 'http://localhost:8983/solr/subjects/select?',
+    search_url: 'http://localhost:8983/solr/analytes/select?',
     search_index: 'solr',
     datatype: 'json',
     facets: [
-        {'field': 'hascoisSubjectOf', 'display': 'Study'},
+        {'field': 'rdfssubClassOf', 'display': 'Analyte Types'},
     ],
-    search_sortby: [{'display':'URI', 'field':'hasURI.exact'},{'display':'Study', 'field':'hascoisSubjectOf.exact'}],
-    searchbox_fieldselect: [{'display':'URI', 'field':'hasURI.exact'},{'display':'Study', 'field':'hascoisSubjectOf.exact'}],
+    search_sortby: [{'display':'URI', 'field':'hasURI.exact'},{'display':'Analyte Type', 'field':'rdfssubClassOf.exact'}],
+    searchbox_fieldselect: [{'display':'URI', 'field':'hasURI.exact'},{'display':'Analyte Type', 'field':'rdfssubClassOf.exact'}],
     paging: {
       size: 10
     },
@@ -41,30 +43,38 @@ jQuery(document).ready(function($) {
     result_display : [
         [
           {
-            "pre" : "<h3>",
-            "field" : "uri",
-            "post" : "</h3>"
-          }
-        ],
-        [
-          {
-            "pre" : "<b>(",
+            "pre" : "<h2>",
             "field" : "rdfslabel",
-            "post" : ")</b>"
+            "post" : " -- "
+          },
+          {
+            "pre" : " ",
+            "field" : "dctermsidentifier",
+            "post" : "</h2> "
+          },
+          {
+            "pre" : "<h3>",
+            "field" : "hasURI",
+            "post" : "</h3>"
+          },
+          {
+            "pre" : "(",
+            "field" : "rdfssubClassOf",
+            "post" : ")<br>"
           }
         ],
         [
           {
-            "pre" : "<b>Is Subject Of: </b>",
-            "field" : "hascoisSubjectOf",
-            "post" : " "
+            "pre" : "<br><p>",
+            "field" : "rdfscomment",
+            "post" : "</p>"
           }
         ],
         [
           {
-            "pre" : "<b>rdfs:type - </b>",
-            "field" : "a",
-            "post" : " "
+            "pre" : "<br><b>Editorial Note:</b> ",
+            "field" : "skoseditorialNote",
+            "post" : ""
           }
         ]
     ],
@@ -74,19 +84,16 @@ jQuery(document).ready(function($) {
   });
 });
   </script>
-
 	<hr>  
     <div class="container-fluid">
     <div class="page-header">
-	<a href="../metadataacquisitions">Study Browser</a>
-    <br><a href="./dataacquisitions">Data Acquisitions</a>
-    <br><a href="./schemaattributes">Schema Attributes</a>
-    <br><a href="./analytes">Analytes</a>
-      <h2>Metal Mixtures and Fetal Growth</h2>
+      <h2>
+      Analytes Faceted Search
+      </h2>
     </div>
-      <p>Metals are important biologically, with complex functions. Many are both nutrients and toxicants. Mixtures of metals are a real life exposure scenario. There are no published studies of metal mixtures and fetal growth. Understanding these relationships will be important to implement prevention programs.</p>
+    
     <div class="content">
-   	  <h2> Subjects </h2>
+    
 	  <div class="facet-view-simple"></div>
 
    </div> 

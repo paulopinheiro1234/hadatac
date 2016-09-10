@@ -1,8 +1,8 @@
-package org.hadatac.console.controllers.dataacquisitionfacet;
+package org.hadatac.console.controllers.metadataacquisition;
 
 import play.mvc.Controller;
 import play.mvc.Result;
-import org.hadatac.console.views.html.dataacquisitionfacet.*;
+import org.hadatac.console.views.html.metadataacquisition.*;
 
 public class DataAcquisitionFacet extends Controller {
     
