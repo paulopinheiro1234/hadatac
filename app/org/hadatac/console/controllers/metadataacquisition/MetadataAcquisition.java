@@ -1,5 +1,6 @@
 package org.hadatac.console.controllers.metadataacquisition;
 
+import org.hadatac.console.controllers.AuthApplication;
 import org.hadatac.console.http.JsonHandler;
 
 import java.util.ArrayList;
@@ -24,6 +25,9 @@ import org.hadatac.data.model.MetadataAcquisitionQueryResult;
 import org.hadatac.entity.pojo.Study;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+
+import be.objectify.deadbolt.java.actions.Group;
+import be.objectify.deadbolt.java.actions.Restrict;
 
 public class MetadataAcquisition extends Controller {
 
@@ -79,7 +83,8 @@ public class MetadataAcquisition extends Controller {
     	
     	return result;
     }
-
+    
+    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
     public static Result index(int page, int rows, String facets) {
     	ObjectMapper mapper = new ObjectMapper();
     	
@@ -97,7 +102,8 @@ public class MetadataAcquisition extends Controller {
     	
     	return ok(metadataacquisition.render(results, results.toJSON(), handler.toJSON()));
     }
-
+    
+    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
     public static Result postIndex(int page, int rows, String facets) {
     	ObjectMapper mapper = new ObjectMapper();
     	
