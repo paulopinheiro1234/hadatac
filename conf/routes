@@ -21,6 +21,8 @@ GET	    /hadatac/metadataacquisitions             org.hadatac.console.controller
 POST	/hadatac/metadataacquisitions             org.hadatac.console.controllers.metadataacquisition.MetadataAcquisition.postIndex(start: Int ?= 1, rows: Int ?= 20, facets: String ?= "")
 GET	    /hadatac/dataacquisitions       	      org.hadatac.console.controllers.dataacquisitionfacet.DataAcquisitionFacet.index()
 POST	/hadatac/dataacquisitions     	    	  org.hadatac.console.controllers.dataacquisitionfacet.DataAcquisitionFacet.postIndex()
+GET	    /hadatac/schemaattributes       	      org.hadatac.console.controllers.metadataacquisition.SchemaAttribute.index()
+POST	/hadatac/schemaattributes     	    	  org.hadatac.console.controllers.metadataacquisition.SchemaAttribute.postIndex()
 GET	    /hadatac/pilot1				              org.hadatac.console.controllers.metadataacquisition.Pilot1.index()
 POST	/hadatac/pilot1				              org.hadatac.console.controllers.metadataacquisition.Pilot1.postIndex()
 GET	    /hadatac/pilot3				              org.hadatac.console.controllers.metadataacquisition.Pilot3.index()

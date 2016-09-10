@@ -28,10 +28,10 @@ jQuery(document).ready(function($) {
     search_index: 'solr',
     datatype: 'json',
     facets: [
-        {'field': 'hasco:isSubjectOf', 'display': 'Study'},
+        {'field': 'hascoisSubjectOf', 'display': 'Study'},
     ],
-    search_sortby: [{'display':'URI', 'field':'hasURI.exact'},{'display':'Study', 'field':'hasco:isSubjectOf.exact'}],
-    searchbox_fieldselect: [{'display':'URI', 'field':'hasURI.exact'},{'display':'Study', 'field':'hasco:isSubjectOf.exact'}],
+    search_sortby: [{'display':'URI', 'field':'hasURI.exact'},{'display':'Study', 'field':'hascoisSubjectOf.exact'}],
+    searchbox_fieldselect: [{'display':'URI', 'field':'hasURI.exact'},{'display':'Study', 'field':'hascoisSubjectOf.exact'}],
     paging: {
       size: 10
     },
@@ -49,14 +49,14 @@ jQuery(document).ready(function($) {
         [
           {
             "pre" : "<b>(",
-            "field" : "rdfs:label",
+            "field" : "rdfslabel",
             "post" : ")</b>"
           }
         ],
         [
           {
             "pre" : "<b>Is Subject Of: </b>",
-            "field" : "hasco:isSubjectOf",
+            "field" : "hascoisSubjectOf",
             "post" : " "
           }
         ],
@@ -77,7 +77,7 @@ jQuery(document).ready(function($) {
 	<hr>  
     <div class="container-fluid">
     <div class="page-header">
-    <a href="./metadataacquisitions">Study Browser</a><br><a href="./dataacquisitions">Data Acquisitions</a>
+    <a href="./metadataacquisitions">Study Browser</a><br><a href="./dataacquisitions">Data Acquisitions</a><br><a href="./schemaattributes">Schema Attributes</a>
       <h2>Urine Biomarkers for Eosinophilic Esophagitis</h2>
     </div>
       <p>Eosinophilic esophagitis (EoE), a rapidly emerging allergic disease affecting all ages, presents with esophageal food impaction, dysphagia and esophageal stricturing. EoE is currently diagnosed and assessed with endoscopic biopsies that show major increases in eosinophil number and inflammation in only the esophagus. Generally, EoE is related to a food allergy and resolves if the inciting food is removed from the diet. However, IgE antibody tests generally do not identify the causative food and repeat endoscopic biopsies are required to assess disease activity. Endoscopy is expensive, requires sedation or anesthesia, and risks bleeding or perforation. Repeated endoscopy to assess treatment is not appealing to patients with EoE.  A non-invasive method to assess disease activity in patients with established EoE is needed and we believe that a urine or serum test for assessing disease activity in EoE patients will be useful clinically and also will help increase our understanding of the biology of this important condition. </p>
