@@ -2,10 +2,10 @@
 <schema version="1.5">
   <fields>
     <field name="uri" type="string" indexed="true" stored="true"/>
-    <field name="owner_uri" type="string" indexed="true" docValues="true" />
-    <field name="permission_uri" type="string" indexed="true" docValues="true" />
-    <field name="triggering_event" type="int" stored="true" indexed="true" docValues="true" />
-    <field name="nr_data_points" type="long" stored="true" indexed="true" docValues="true" />
+	<field name="owner_uri" type="string" indexed="true" docValues="true" />
+	<field name="permission_uri" type="string" indexed="true" docValues="true" />
+	<field name="triggering_event" type="int" stored="true" indexed="true" docValues="true" />
+	<field name="nr_data_points" type="long" stored="true" indexed="true" docValues="true" />
     <field name="_version_" type="long" indexed="true" stored="true"/>
     <field name="_text_" type="text_general" indexed="true" stored="false" multiValued="true" />
     <field name="label" type="string" indexed="true" docValues="true" multiValued="true" />
