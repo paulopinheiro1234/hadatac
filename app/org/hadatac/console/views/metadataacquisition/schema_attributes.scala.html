@@ -1,4 +1,4 @@
-@()
+@(collection_url : java.lang.String)
 
 @import helper._
 @import org.hadatac.console.views.html._
@@ -26,7 +26,7 @@
 jQuery(document).ready(function($) {
   $('.facet-view-simple').each(function() {
   $(this).facetview({
-    search_url: 'http://localhost:8983/solr/schema_attributes/select?',
+    search_url: '@collection_url',
     search_index: 'solr',
     datatype: 'json',
     facets: [

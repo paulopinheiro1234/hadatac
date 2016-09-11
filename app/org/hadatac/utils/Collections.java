@@ -9,6 +9,11 @@ public class Collections {
 	public static final String DATA_ACQUISITION            = "/measurement";
 	public static final String CONSOLE_STORE               = "/console_store";
 	public static final String URI_GENERATOR               = "/uri_generator";
+	public static final String METADATA_ACQUISITION        = "/studies/select";
+	public static final String METADATA_DA			       = "/data_acquisitions/select";
+	public static final String SUBJECTS_ACQUISITION	       = "/subjects/select";
+	public static final String ANALYTES_ACQUISITION        = "/analytes/select";
+	public static final String SCHEMA_ATTRIBUTES           = "/schema_attributes/select";
     
     // triplestore
 	public static final String METADATA_SPARQL             = "/store/sparql";
@@ -26,6 +31,7 @@ public class Collections {
 	public static final String PERMISSIONS_SPARQL          = "/store_users/sparql";
 	public static final String PERMISSIONS_UPDATE          = "/store_users/update";
 	public static final String PERMISSIONS_GRAPH           = "/store_users/rdf-graph-store";
+	
     
 	public static String getCollectionsName(String request) {
 	
@@ -33,6 +39,11 @@ public class Collections {
 		switch (request) {
             case DATA_COLLECTION:
             case DATA_ACQUISITION:
+            case METADATA_ACQUISITION:
+            case SUBJECTS_ACQUISITION:
+            case ANALYTES_ACQUISITION:
+            case METADATA_DA:
+            case SCHEMA_ATTRIBUTES:
             case CONSOLE_STORE:
             case URI_GENERATOR :           collectionName = Play.application().configuration().getString("hadatac.solr.data") + request;
                                            break;

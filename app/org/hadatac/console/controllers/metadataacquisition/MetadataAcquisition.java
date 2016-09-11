@@ -23,6 +23,7 @@ import org.hadatac.console.views.html.metadataacquisition.*;
 
 import org.hadatac.data.model.MetadataAcquisitionQueryResult;
 import org.hadatac.entity.pojo.Study;
+import org.hadatac.utils.Collections;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -86,6 +87,7 @@ public class MetadataAcquisition extends Controller {
     
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
     public static Result index(int page, int rows, String facets) {
+    	String collection = Collections.getCollectionsName(Collections.METADATA_ACQUISITION);
     	ObjectMapper mapper = new ObjectMapper();
     	
     	List<String> permissions = getPermissions(session().get("user_hierarchy"));
@@ -100,11 +102,12 @@ public class MetadataAcquisition extends Controller {
     	
     	MetadataAcquisitionQueryResult results = Study.find(page, rows, permissions, handler);
     	
-    	return ok(metadataacquisition.render(results, results.toJSON(), handler.toJSON()));
+    	return ok(metadataacquisition.render(results, results.toJSON(), handler.toJSON(), collection));
     }
     
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
     public static Result postIndex(int page, int rows, String facets) {
+    	String collection = Collections.getCollectionsName(Collections.METADATA_ACQUISITION);
     	ObjectMapper mapper = new ObjectMapper();
     	
     	List<String> permissions = getPermissions(session().get("user_hyerarchy"));
@@ -119,6 +122,6 @@ public class MetadataAcquisition extends Controller {
     	
     	MetadataAcquisitionQueryResult results = Study.find(page, rows, permissions, handler);
     	
-    	return ok(metadataacquisition.render(results, results.toJSON(), handler.toJSON()));
+    	return ok(metadataacquisition.render(results, results.toJSON(), handler.toJSON(), collection));
     }
 }

@@ -3,22 +3,23 @@ package org.hadatac.console.controllers.metadataacquisition;
 import play.mvc.Controller;
 import play.mvc.Result;
 import org.hadatac.console.views.html.metadataacquisition.*;
+import org.hadatac.utils.Collections;
 
 
 public class Pilot1 extends Controller {
 	
 	// for /metadata HTTP GET requests
     public static Result index() {
-
-       return ok(pilot1.render());
+       String collection = Collections.getCollectionsName(Collections.SUBJECTS_ACQUISITION);
+       return ok(pilot1.render(collection));
         
     }// /index()
 
 
     // for /metadata HTTP POST requests
     public static Result postIndex() {
-        
-        return ok(pilot1.render());
+    	String collection = Collections.getCollectionsName(Collections.SUBJECTS_ACQUISITION);
+        return ok(pilot1.render(collection));
         
     }// /postIndex()
 
