@@ -30,14 +30,14 @@ jQuery(document).ready(function($) {
     search_index: 'solr',
     datatype: 'json',
     facets: [
-        {'field': 'isDataAcquisitionOf', 'display': 'Study'},
-        {'field': 'type', 'display': 'Type'},
-        {'field': 'associatedWith', 'display': 'Associated With'},
-        {'field': 'hasContext', 'display': 'Context'},
-        {'field': 'hasMethod', 'display': 'Method'},
+        {'field': 'a', 'display': 'Data Acquisition Type'},
+        {'field': 'provwasAssociatedWith', 'display': 'Associated With'},
+        {'field': 'hascoisDataAcquisitionOf', 'display': 'Study'},
+        {'field': 'hascohasSchema', 'display': 'Schema'},
+        {'field': 'hascohasMethod', 'display': 'Method'},
     ],
-    search_sortby: [{'display':'Name', 'field':'name.exact'},{'display':'Data Acquisition Of', 'field':'isDataAcquisitionOf.exact'}],
-    searchbox_fieldselect: [{'display':'Name', 'field':'name.exact'}],
+    search_sortby: [{'display':'Data Acquisition Type', 'field':'a.exact'},{'display':'Data Acquisition Of', 'field':'hascoisDataAcquisitionOf.exact'}],
+    searchbox_fieldselect: [{'display':'Data Acquisition Type', 'field':'a.exact'},{'display':'Data Acquisition Of', 'field':'hascoisDataAcquisitionOf.exact'}],
     paging: {
       size: 10
     },
@@ -48,7 +48,7 @@ jQuery(document).ready(function($) {
         [
           {
             "pre" : "<h3>",
-            "field" : "name",
+            "field" : "hasURI",
             "post" : "</h3>"
           }
         ],
@@ -61,36 +61,36 @@ jQuery(document).ready(function($) {
         ],
         [
           {
-            "pre" : "<b>Data Acquisition of: </b>",
-            "field" : "isDataAcquisitionOf",
+            "pre" : "<b>Data Acquisition Of: </b>",
+            "field" : "hascoisDataAcquisitionOf",
             "post" : " "
           }
         ],
         [
           {
             "pre" : "<b>Associated With: </b>",
-            "field" : "associatedWith",
+            "field" : "provwasAssociatedWith",
             "post" : " "
           }
         ],
         [
           {
             "pre" : "<b>Has Method: </b>",
-            "field" : "hasMethod",
+            "field" : "hascohasMethod",
             "post" : " "
           }
         ],
         [
           {
-            "pre" : "<b>Has Context: </b>",
-            "field" : "hasContext",
+            "pre" : "<b>Has Schema: </b>",
+            "field" : "hascohasSchema",
             "post" : " "
           }
         ],
         [
           {
             "pre" : " ",
-            "field" : "comment",
+            "field" : "rdfscomment",
             "post" : ". "
           }
         ]
