@@ -114,6 +114,8 @@ GET	    /hadatac/annotator/loadcsv		    	   org.hadatac.console.controllers.anno
 POST	/hadatac/annotator/loadcsv     			   org.hadatac.console.controllers.annotator.Annotator.postUploadCSV(deployment_uri : String)
 POST	/hadatac/annotator/loadcsv/upload          org.hadatac.console.controllers.annotator.FileProcessing.uploadFile(json : String)
 POST    /hadatac/annotator/generate                org.hadatac.console.controllers.annotator.Downloads.postGenerate(handler : String)
+GET	    /hadatac/annotator/autoccsv		    	   org.hadatac.console.controllers.annotator.AutoAnnotator.index()
+POST	/hadatac/annotator/autoccsv     		   org.hadatac.console.controllers.annotator.AutoAnnotator.postIndex()
 
 # metadata store management URLs
 GET     /hadatac/ts/clean                          org.hadatac.console.controllers.triplestore.Clean.clean(oper: String)
