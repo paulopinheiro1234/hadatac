@@ -24,9 +24,12 @@
         <div class="col-md-1 col-xs-0"></div>
         <div class="col-md-3 col-xs-2">
            <h4>Data Search/Download</h4>  
-           <a href="@org.hadatac.console.controllers.metadataacquisition.routes.MetadataAcquisition.index()" id="metadatafacet" class="btn btn-primary btn-block disabled" role="button">Search Studies</a>
-           <a href="@org.hadatac.console.controllers.metadataacquisition.routes.DataAcquisitionFacet.index()" id="dataacquisitionfacet" class="btn btn-primary btn-block disabled" role="button">Search Data Acquisitions</a>
            <a href="@org.hadatac.console.controllers.metadata.routes.Metadata.index()" class="btn btn-primary btn-block" role="button">Browse Metadata</a>
+           <a href="@org.hadatac.console.controllers.metadataacquisition.routes.MetadataAcquisition.index()" id="metadatafacet" class="btn btn-primary btn-block disabled" role="button">Search Studies</a>
+           <a href="@org.hadatac.console.controllers.dataacquisition.routes.DataAcquisition.index()" id="data" class="btn btn-primary btn-block disabled" role="button">Search Data</a>
+           <a href="@org.hadatac.console.controllers.metadataacquisition.routes.DataAcquisitionFacet.index()" id="dataacquisitionfacet" class="btn btn-primary btn-block disabled" role="button">Search Data Acquisitions</a>
+           <a href="@org.hadatac.console.controllers.metadataacquisition.routes.SchemaAttribute.index()" id="variables" class="btn btn-primary btn-block disabled" role="button">Search Variables</a>
+           <a href="@org.hadatac.console.controllers.metadataacquisition.routes.Analytes.index()" id="analytes" class="btn btn-primary btn-block disabled" role="button">Search Analytes</a>
            <a href="" class="btn btn-primary btn-block disabled" role="button">Infer Semantic Differences</a>
            <a href="" class="btn btn-primary btn-block disabled" role="button">Show Collaboration Insight</a>
         </div>
@@ -90,6 +93,9 @@
           var hasUser = ("@AuthApplication.getLocalUser(session())" != "");
           if (hasUser) {
               $('#metadatafacet').attr( 'class', 'btn btn-primary btn-block' );
+              $('#data').attr( 'class', 'btn btn-primary btn-block' );
+              $('#variables').attr( 'class', 'btn btn-primary btn-block' );
+              $('#analytes').attr( 'class', 'btn btn-primary btn-block' );
               $('#dataacquisitionfacet').attr( 'class', 'btn btn-primary btn-block' );
               $('#deployments').attr( 'class', 'btn btn-primary btn-block' );
               $('#datacollections').attr( 'class', 'btn btn-primary btn-block' );
@@ -98,6 +104,9 @@
           } else {
               $('#metadatafacet').attr( 'class', 'btn btn-primary btn-block disabled' );
               $('#dataacquisitionfacet').attr( 'class', 'btn btn-primary btn-block disabled' );
+              $('#data').attr( 'class', 'btn btn-primary btn-block disabled' );
+              $('#variables').attr( 'class', 'btn btn-primary btn-block disabled' );
+              $('#analytes').attr( 'class', 'btn btn-primary btn-block disabled' );
               $('#deployments').attr( 'class', 'btn btn-primary btn-block disabled' );
               $('#datacollections').attr( 'class', 'btn btn-primary btn-block disabled' );
               $('#annotator').attr( 'class', 'btn btn-primary btn-block disabled' );
