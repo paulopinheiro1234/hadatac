@@ -1,26 +1,36 @@
 == START-PREAMBLE ==
-@prefix hasco: <http://hadatac.org/ont/hasco/> . 
+@prefix chebi: <http://identifiers.org/chebi/> . 
+@prefix hadatac-sn: <http://hadatac.org/ont/hadatac-sn#> . 
 @prefix owl: <http://www.w3.org/2002/07/owl#> . 
 @prefix vstoi: <http://hadatac.org/ont/vstoi#> . 
 @prefix case-kb: <http://hadatac.org/kb/case#> . 
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> . 
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> . 
 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> . 
-@prefix chear: <http://hadatac.org/ont/chear#> . 
+@prefix oboe-core.owl: <http://geneontology.org/GO.format.obo-1_2.shtml#> . 
 @prefix chear-kb: <http://hadatac.org/kb/chear#> . 
 @prefix dct: <http://purl.org/dc/terms/> . 
-@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> . 
 @prefix sio: <http://semanticscience.org/resource/> . 
+@prefix dcterms: <http://purl.org/dc/terms/> . 
 @prefix uo: <http://purl.obolibrary.org/obo/uo#> . 
 @prefix hasneto: <http://hadatac.org/ont/hasneto#> . 
 @prefix prov: <http://www.w3.org/ns/prov#> . 
-@prefix obo: <http://geneontology.org/GO.format.obo-1_2.shtml#> . 
 @prefix hadatac: <http://hadatac.org/ont/hadatac#> . 
 @prefix case: <http://hadatac.org/ont/case#> . 
 @prefix foaf: <http://xmlns.com/foaf/0.1/> . 
+@prefix hasco: <http://hadatac.org/ont/hasco/> . 
+@prefix uberon: <http://purl.obolibrary.org/obo/uberon.owl#> . 
+@prefix sio-subset-labels.owl: <http://semanticscience.org/resource/> . 
+@prefix chear: <http://hadatac.org/ont/chear#> . 
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> . 
+@prefix oboe-core: <http://geneontology.org/GO.format.obo-1_2.shtml#> . 
+@prefix fma: <http://purl.org/sig/ont/fma/> . 
+@prefix obo: <http://geneontology.org/GO.format.obo-1_2.shtml#> . 
+@prefix pubchem: <http://rdf.ncbi.nlm.nih.gov/pubchem/compound/> . 
 
 <kb> a hadatac:KnowledgeBase; hadatac:hasHost "http://localhost"^^xsd:anyURI . 
 
-<http://localhost:9000/hadatac/kb/DS/00000001/00000004e> a vstoi:Dataset; prov:wasGeneratedBy <http://hadatac.org/kb/case#DA-AQ-July-2016-Hobo>;  hadatac:hasMeasurementType <mt0> , <mt1> , <mt2> .
+<http://localhost:9000/hadatac/kb/DS/00000001/00000004f> a vstoi:Dataset; prov:wasGeneratedBy <http://hadatac.org/kb/case#DA-AQ-July-2016-Hobo>;  hadatac:hasMeasurementType <mt0> , <mt1> , <mt2> .
 
 <mt0> a hadatac:MeasurementType;  hadatac:atColumn 2; hasneto:hasEntity <http://hadatac.org/ont/case#OTYP-Air>; hasneto:hasAttribute <http://hadatac.org/ont/case#ATTYP-Temperature>; hasneto:hasUnit <http://geneontology.org/GO.format.obo-1_2.shtml#UO_0000195> .
 <mt1> a hadatac:MeasurementType;  hadatac:atColumn 3; hasneto:hasEntity <http://hadatac.org/ont/case#OTYP-Air>; hasneto:hasAttribute <http://hadatac.org/ont/case#ATTYP-RelativeHumidity>; hasneto:hasUnit <http://geneontology.org/GO.format.obo-1_2.shtml#UO_0000187> .

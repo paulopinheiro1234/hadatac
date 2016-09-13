@@ -44,8 +44,8 @@ public class DeploymentQueries {
                     "   OPTIONAL { ?platformuri hasneto:hasSecondCoordinate ?hasSecondCoordinate . } " +
                     "   <" + uri + "> hasneto:hasInstrument ?instrumenturi .  " + 
                     "   ?instrumenturi rdfs:label ?instrument . " +
-                    "   <" + uri + "> hasneto:hasDetector ?detectoruri .  " + 
-                    "   ?detectoruri rdfs:label ?detector . " +
+                    "   OPTIONAL { <" + uri + "> hasneto:hasDetector ?detectoruri . } " + 
+                    "   OPTIONAL { ?detectoruri rdfs:label ?detector . } " +
                     "   <" + uri + "> prov:startedAtTime ?date .  " + 
                     "}";
                 break;

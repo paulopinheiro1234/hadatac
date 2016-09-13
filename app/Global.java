@@ -1,6 +1,7 @@
 import java.util.Arrays;
 
 import org.hadatac.console.models.SecurityRole;
+import org.hadatac.console.controllers.annotator.AutoAnnotator;
 
 import com.feth.play.module.pa.PlayAuthenticate;
 import com.feth.play.module.pa.PlayAuthenticate.Resolver;
@@ -11,6 +12,10 @@ import play.Application;
 import play.GlobalSettings;
 import play.mvc.Call;
 import org.hadatac.utils.Repository;
+import play.libs.Akka;
+import scala.concurrent.duration.FiniteDuration;
+import java.util.concurrent.TimeUnit;
+import java.util.Date;
 
 public class Global extends GlobalSettings {
 
@@ -91,6 +96,18 @@ public class Global extends GlobalSettings {
 		// (NOT SURE THIS FUNCTION SHOULD BE CALLED ON ONSTART) check if instances are loaded. If not, show how to upload some default instances  
 		// TODO: implement this code
 		
+		// Create thread for auto ccsv annotation
+		FiniteDuration delay = FiniteDuration.create(0, TimeUnit.SECONDS);
+		FiniteDuration frequency = FiniteDuration.create(30, TimeUnit.SECONDS);
+
+		Runnable annotation = new Runnable() {
+		   @Override
+		   public void run() {
+			   AutoAnnotator.autoAnnotate();
+		   }
+		};
+		
+		Akka.system().scheduler().schedule(delay, frequency, annotation, Akka.system().dispatcher());
 	}
 
 	private void initialData() {

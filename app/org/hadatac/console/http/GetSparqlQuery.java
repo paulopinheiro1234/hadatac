@@ -518,8 +518,7 @@ public class GetSparqlQuery {
         }// /switch
         return q;
     } // /querySelector
-
-
+    
     //Preconditions: The GetSparqlQuery object has been initialized with a Query object
     //Inputs: None. Executes query based on the member string sparql_query.
     //Output: Returns JSON in the form of a string. Currently does not handle http errors
