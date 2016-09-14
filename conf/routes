@@ -13,6 +13,23 @@ GET	    /hadatac/acquisitions/loadccsv		      org.hadatac.console.controllers.da
 POST	/hadatac/acquisitions/loadccsv		      org.hadatac.console.controllers.dataacquisition.LoadCCSV.postLoadCCSV(oper: String)
 POST	/hadatac/acquisitions/loadccsv/upload	  org.hadatac.console.controllers.dataacquisition.LoadCCSV.uploadFile
 
+GET	    /hadatac/metadataacquisitions/solrsearch            			org.hadatac.console.http.SolrSearchProxy.getStudyAcquisition()
+POST	/hadatac/metadataacquisitions/solrsearch   						org.hadatac.console.http.SolrSearchProxy.getStudyAcquisition()
+GET	    /hadatac/metadataacquisitions/dataacquisitions/solrsearch    	org.hadatac.console.http.SolrSearchProxy.getMetadataDataAcquisition()
+POST	/hadatac/metadataacquisitions/dataacquisitions/solrsearch 	  	org.hadatac.console.http.SolrSearchProxy.getMetadataDataAcquisition()
+GET	    /hadatac/metadataacquisitions/schemaattributes/solrsearch		org.hadatac.console.http.SolrSearchProxy.getSchemaAttributes()
+POST	/hadatac/metadataacquisitions/schemaattributes/solrsearch		org.hadatac.console.http.SolrSearchProxy.getSchemaAttributes()
+GET	    /hadatac/metadataacquisitions/analytes/solrsearch		   	    org.hadatac.console.http.SolrSearchProxy.getAnalytesAcquisition()
+POST	/hadatac/metadataacquisitions/analytes/solrsearch		     	org.hadatac.console.http.SolrSearchProxy.getAnalytesAcquisition()
+GET	    /hadatac/metadataacquisitions/pilot1/solrsearch				    org.hadatac.console.http.SolrSearchProxy.getSubjectAcquisition()
+POST	/hadatac/metadataacquisitions/pilot1/solrsearch				    org.hadatac.console.http.SolrSearchProxy.getSubjectAcquisition()
+GET	    /hadatac/metadataacquisitions/pilot3/solrsearch				    org.hadatac.console.http.SolrSearchProxy.getSubjectAcquisition()
+POST	/hadatac/metadataacquisitions/pilot3/solrsearch				    org.hadatac.console.http.SolrSearchProxy.getSubjectAcquisition()
+GET	    /hadatac/metadataacquisitions/pilot5/solrsearch				    org.hadatac.console.http.SolrSearchProxy.getSubjectAcquisition()
+POST	/hadatac/metadataacquisitions/pilot5/solrsearch				    org.hadatac.console.http.SolrSearchProxy.getSubjectAcquisition()
+GET	    /hadatac/metadataacquisitions/pilot6/solrsearch				    org.hadatac.console.http.SolrSearchProxy.getSubjectAcquisition()
+POST	/hadatac/metadataacquisitions/pilot6/solrsearch				    org.hadatac.console.http.SolrSearchProxy.getSubjectAcquisition()
+
 # Metadata
 GET	    /hadatac/metadata  		 	              org.hadatac.console.controllers.metadata.Metadata.index()
 POST	/hadatac/metadata			              org.hadatac.console.controllers.metadata.Metadata.postIndex()
