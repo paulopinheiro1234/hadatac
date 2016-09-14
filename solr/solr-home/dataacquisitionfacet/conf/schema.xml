@@ -1,28 +1,24 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <schema version="1.5">
   <fields>
-    <field name="uri" type="string" indexed="true" stored="true"/>
-    <field name="name" type="string" indexed="true" docValues="true" />
-    <field name="label" type="string" indexed="true" docValues="true" />
-    <field name="type" type="string" indexed="true" docValues="true" />
-    <field name="comment" type="string" indexed="true" docValues="true" />
-    <field name="associatedWith" type="string" indexed="true" docValues="true" />
-    <field name="hasContext" type="string" indexed="true" docValues="true" />
-    <field name="hasMethod" type="string" indexed="true" docValues="true" />
-    <field name="isDataAcquisitionOf" type="string" indexed="true" docValues="true" />
+    <field name="hasURI" type="string" indexed="true" stored="true"/>
+    <field name="a" type="string" indexed="true" docValues="true" />
+    <field name="rdfslabel" type="string" indexed="true" docValues="true" />
+    <field name="rdfscomment" type="string" indexed="true" docValues="true" />
+    <field name="provstartedAtTime" type="string" indexed="true" docValues="true" />
+    <field name="provendedAtTime" type="string" indexed="true" docValues="true" />
+    <field name="provused" type="string" indexed="true" docValues="true" />
+    <field name="provwasAssociatedWith" type="string" indexed="true" docValues="true" />
+    <field name="hasnetohasDeployment" type="string" indexed="true" docValues="true" />
+    <field name="hascohasMethod" type="string" indexed="true" docValues="true" />
+    <field name="hascoisDataAcquisitionOf" type="string" indexed="true" docValues="true" />
+    <field name="hascohasSchema" type="string" indexed="true" docValues="true" />
     <field name="_version_" type="long" indexed="true" stored="true"/>
     <field name="_text_" type="text_general" indexed="true" stored="false" multiValued="true"/>
-    <copyField source="uri" dest="_text_" />
-    <copyField source="name" dest="_text_" />
-    <copyField source="label" dest="_text_" />
-    <copyField source="comment" dest="_text_" />
-    <copyField source="associatedWith" dest="_text_" />
-    <copyField source="hasContext" dest="_text_" />
-    <copyField source="hasMethod" dest="_text_" />
-    <copyField source="isDataAcquisitionOf" dest="_text_" />
+    <copyField source="hasURI" dest="_text_" />
   </fields>
 
-  <uniqueKey>uri</uniqueKey>
+  <uniqueKey>hasURI</uniqueKey>
 
   <types>
     <fieldType name="string" class="solr.StrField" />
