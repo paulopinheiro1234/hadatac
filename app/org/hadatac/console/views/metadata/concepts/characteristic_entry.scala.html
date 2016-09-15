@@ -15,5 +15,9 @@
     <div class="panel-body">
         <h4>@triple.get("modelName") </h4> 
     </div>
+    <h4>Comment:</h4>
+            @for(c <- triple.get("comment")) {
+                <p>@c</p>
+            }
 </div>
 }
