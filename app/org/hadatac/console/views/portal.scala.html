@@ -26,6 +26,7 @@
            <h4>Data Search/Download</h4>  
            <a href="@org.hadatac.console.controllers.metadata.routes.Metadata.index()" class="btn btn-primary btn-block" role="button">Browse Metadata</a>
            <a href="@org.hadatac.console.controllers.metadataacquisition.routes.MetadataAcquisition.index()" id="metadatafacet" class="btn btn-primary btn-block disabled" role="button">Search Studies</a>
+           <a href="@org.hadatac.console.controllers.metadataacquisition.routes.ViewSubject.index("chear-kb:SBJ-0001-Pilot-1")" id = "subjectviewdemo" class="btn btn-primary btn-block disabled" role="button">View Subject Demo</a>           
            <a href="@org.hadatac.console.controllers.dataacquisition.routes.DataAcquisition.index()" id="data" class="btn btn-primary btn-block disabled" role="button">Search Data</a>
            <a href="@org.hadatac.console.controllers.metadataacquisition.routes.DataAcquisitionFacet.index()" id="dataacquisitionfacet" class="btn btn-primary btn-block disabled" role="button">Search Data Acquisitions</a>
            <a href="@org.hadatac.console.controllers.metadataacquisition.routes.SchemaAttribute.index()" id="variables" class="btn btn-primary btn-block disabled" role="button">Search Variables</a>
@@ -94,6 +95,7 @@
           var hasUser = ("@AuthApplication.getLocalUser(session())" != "");
           if (hasUser) {
               $('#metadatafacet').attr( 'class', 'btn btn-primary btn-block' );
+              $('#subjectviewdemo').attr( 'class', 'btn btn-primary btn-block');
               $('#data').attr( 'class', 'btn btn-primary btn-block' );
               $('#variables').attr( 'class', 'btn btn-primary btn-block' );
               $('#analytes').attr( 'class', 'btn btn-primary btn-block' );
@@ -105,6 +107,7 @@
               $('#csvloader').attr( 'class', 'btn btn-primary btn-block' );
           } else {
               $('#metadatafacet').attr( 'class', 'btn btn-primary btn-block disabled' );
+              $('#subjectviewdemo').attr( 'class', 'btn btn-primary btn-block disabled');
               $('#dataacquisitionfacet').attr( 'class', 'btn btn-primary btn-block disabled' );
               $('#data').attr( 'class', 'btn btn-primary btn-block disabled' );
               $('#variables').attr( 'class', 'btn btn-primary btn-block disabled' );

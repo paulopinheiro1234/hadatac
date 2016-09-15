@@ -23,8 +23,8 @@ GET	    /hadatac/metadataacquisitions/dataacquisitions      org.hadatac.console.
 POST	/hadatac/metadataacquisitions/dataacquisitions 	  	org.hadatac.console.controllers.metadataacquisition.DataAcquisitionFacet.postIndex()
 GET	    /hadatac/metadataacquisitions/schemaattributes		org.hadatac.console.controllers.metadataacquisition.SchemaAttribute.index()
 POST	/hadatac/metadataacquisitions/schemaattributes		org.hadatac.console.controllers.metadataacquisition.SchemaAttribute.postIndex()
-GET	    /hadatac/metadataacquisitions/analytes		   	    	      org.hadatac.console.controllers.metadataacquisition.Analytes.index()
-POST	/hadatac/metadataacquisitions/analytes		     	    	  org.hadatac.console.controllers.metadataacquisition.Analytes.postIndex()
+GET	    /hadatac/metadataacquisitions/analytes		   	   	org.hadatac.console.controllers.metadataacquisition.Analytes.index()
+POST	/hadatac/metadataacquisitions/analytes		     	org.hadatac.console.controllers.metadataacquisition.Analytes.postIndex()
 GET	    /hadatac/metadataacquisitions/pilot1				              org.hadatac.console.controllers.metadataacquisition.Pilot1.index()
 POST	/hadatac/metadataacquisitions/pilot1				              org.hadatac.console.controllers.metadataacquisition.Pilot1.postIndex()
 GET	    /hadatac/metadataacquisitions/pilot3				              org.hadatac.console.controllers.metadataacquisition.Pilot3.index()
@@ -33,6 +33,8 @@ GET	    /hadatac/metadataacquisitions/pilot5				              org.hadatac.consol
 POST	/hadatac/metadataacquisitions/pilot5				              org.hadatac.console.controllers.metadataacquisition.Pilot5.postIndex()
 GET	    /hadatac/metadataacquisitions/pilot6				              org.hadatac.console.controllers.metadataacquisition.Pilot6.index()
 POST	/hadatac/metadataacquisitions/pilot6				              org.hadatac.console.controllers.metadataacquisition.Pilot6.postIndex()
+GET	    /hadatac/metadataacquisitions/viewSubject	org.hadatac.console.controllers.metadataacquisition.ViewSubject.index(subject_uri: String)
+POST	/hadatac/metadataacquisitions/viewSubject	org.hadatac.console.controllers.metadataacquisition.ViewSubject.postIndex(subject_uri: String)
 
 # Metadata concepts
 GET	    /hadatac/metadata/entity		          org.hadatac.console.controllers.metadata.concepts.Entity.index()
