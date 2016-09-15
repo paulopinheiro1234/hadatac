@@ -1,5 +1,6 @@
 package org.hadatac.console.controllers.metadataacquisition;
 
+import play.Play;
 import play.mvc.Controller;
 import play.mvc.Result;
 
@@ -16,7 +17,8 @@ public class Pilot6 extends Controller {
 	// for /metadata HTTP GET requests
 	@Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
     public static Result index() {
-       String collection = Collections.getCollectionsName(Collections.SUBJECTS_ACQUISITION);
+		String collection = Play.application().configuration().getString("hadatac.console.host_deploy") + 
+    			request().path() + "/solrsearch";
        return ok(pilot6.render(collection));
         
     }// /index()
@@ -25,8 +27,7 @@ public class Pilot6 extends Controller {
     // for /metadata HTTP POST requests
 	@Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
     public static Result postIndex() {
-    	String collection = Collections.getCollectionsName(Collections.SUBJECTS_ACQUISITION);
-        return ok(pilot6.render(collection));
+    	return index();
         
     }// /postIndex()
 
