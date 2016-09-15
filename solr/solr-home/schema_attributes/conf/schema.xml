@@ -5,14 +5,13 @@
     <field name="a" type="string" indexed="true" docValues="true" />
     <field name="rdfslabel" type="string" indexed="true" docValues="true" />
     <field name="rdfscomment" type="string" indexed="true" docValues="true" />
-    <field name="provstartedAtTime" type="string" indexed="true" docValues="true" />
-    <field name="provendedAtTime" type="string" indexed="true" docValues="true" />
-    <field name="provused" type="string" indexed="true" docValues="true" />
-    <field name="provwasAssociatedWith" type="string" indexed="true" docValues="true" />
-    <field name="hasnetohasDeployment" type="string" indexed="true" docValues="true" />
-    <field name="hascohasMethod" type="string" indexed="true" docValues="true" />
-    <field name="hascoisDataAcquisitionOf" type="string" indexed="true" docValues="true" />
-    <field name="hascohasSchema" type="string" indexed="true" docValues="true" />
+    <field name="hasnetopartOfSchema" type="string" indexed="true" docValues="true" />
+    <field name="hascohasPosition" type="string" indexed="true" stored="true"/>
+    <field name="hasnetohasEntity" type="string" indexed="true" docValues="true" />
+    <field name="hasnetohasAttribute" type="string" indexed="true" stored="true"/>
+    <field name="hasnetohasUnit" type="string" indexed="true" docValues="true" />
+    <field name="hascohasSource" type="string" indexed="true" stored="true"/>
+    <field name="hascoisPIConfirmed" type="string" indexed="true" stored="true"/>
     <field name="_version_" type="long" indexed="true" stored="true"/>
     <field name="_text_" type="text_general" indexed="true" stored="false" multiValued="true"/>
     <copyField source="hasURI" dest="_text_" />

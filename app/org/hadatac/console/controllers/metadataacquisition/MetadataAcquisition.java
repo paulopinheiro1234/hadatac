@@ -11,6 +11,7 @@ import org.hadatac.console.models.FacetHandler;
 import org.hadatac.console.models.FacetsWithCategories;
 import org.hadatac.console.models.SpatialQueryResults;
 
+import play.Play;
 //import models.SpatialQuery;
 //import models.SpatialQueryResults;
 import play.data.DynamicForm;
@@ -87,7 +88,9 @@ public class MetadataAcquisition extends Controller {
     
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
     public static Result index(int page, int rows, String facets) {
-    	String collection = Collections.getCollectionsName(Collections.METADATA_ACQUISITION);
+    	String collection = Play.application().configuration().getString("hadatac.console.host_deploy") + 
+    			request().path() + "/solrsearch";
+    	
     	ObjectMapper mapper = new ObjectMapper();
     	
     	List<String> permissions = getPermissions(session().get("user_hierarchy"));
@@ -107,7 +110,7 @@ public class MetadataAcquisition extends Controller {
     
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
     public static Result postIndex(int page, int rows, String facets) {
-    	String collection = Collections.getCollectionsName(Collections.METADATA_ACQUISITION);
+    	String collection = Collections.getCollectionsName(Collections.STUDY_ACQUISITION);
     	ObjectMapper mapper = new ObjectMapper();
     	
     	List<String> permissions = getPermissions(session().get("user_hyerarchy"));
