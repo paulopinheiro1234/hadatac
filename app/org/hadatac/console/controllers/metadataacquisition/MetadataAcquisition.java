@@ -32,7 +32,8 @@ import be.objectify.deadbolt.java.actions.Group;
 import be.objectify.deadbolt.java.actions.Restrict;
 
 public class MetadataAcquisition extends Controller {
-
+	
+	/*
     public static FacetFormData facet_form = new FacetFormData();
     public static FacetsWithCategories field_facets = new FacetsWithCategories();
     public static FacetsWithCategories query_facets = new FacetsWithCategories();
@@ -85,12 +86,13 @@ public class MetadataAcquisition extends Controller {
     	
     	return result;
     }
-    
+    */
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    public static Result index(int page, int rows, String facets) {
+    //public static Result index(int page, int rows, String facets) {
+    public static Result index() {
     	String collection = Play.application().configuration().getString("hadatac.console.host_deploy") + 
     			request().path() + "/solrsearch";
-    	
+    	/*
     	ObjectMapper mapper = new ObjectMapper();
     	
     	List<String> permissions = getPermissions(session().get("user_hierarchy"));
@@ -105,12 +107,15 @@ public class MetadataAcquisition extends Controller {
     	
     	MetadataAcquisitionQueryResult results = Study.find(page, rows, permissions, handler);
     	
-    	return ok(metadataacquisition.render(results, results.toJSON(), handler.toJSON(), collection));
+    	return ok(metadataacquisition.render(results, results.toJSON(), handler.toJSON(), collection));*/
+    	return ok(metadataacquisition.render(collection));
     }
     
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    public static Result postIndex(int page, int rows, String facets) {
+    //public static Result postIndex(int page, int rows, String facets) {
+    public static Result postIndex() {
     	String collection = Collections.getCollectionsName(Collections.STUDY_ACQUISITION);
+    	/*
     	ObjectMapper mapper = new ObjectMapper();
     	
     	List<String> permissions = getPermissions(session().get("user_hyerarchy"));
@@ -126,5 +131,7 @@ public class MetadataAcquisition extends Controller {
     	MetadataAcquisitionQueryResult results = Study.find(page, rows, permissions, handler);
     	
     	return ok(metadataacquisition.render(results, results.toJSON(), handler.toJSON(), collection));
+    	*/
+    	return ok(metadataacquisition.render(collection));
     }
 }

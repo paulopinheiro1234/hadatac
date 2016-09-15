@@ -37,7 +37,7 @@ public class Entity extends Controller {
         }
         System.out.println("Entity index() was called!");
     	
-    	List<org.hadatac.entity.pojo.Entity> entities = org.hadatac.entity.pojo.Entity.find();
+    	//List<org.hadatac.entity.pojo.Entity> entities = org.hadatac.entity.pojo.Entity.find();
     	
         return ok(entity_browser.render(theResults, "Entities"));
     }// /index()
@@ -62,7 +62,7 @@ public class Entity extends Controller {
         }
         System.out.println("Entity index() was called!");
     	
-    	List<org.hadatac.entity.pojo.Entity> entities = org.hadatac.entity.pojo.Entity.find();
+    	//List<org.hadatac.entity.pojo.Entity> entities = org.hadatac.entity.pojo.Entity.find();
     	
         return ok(entity_browser.render(theResults, "Entities"));
     }// /postIndex()
