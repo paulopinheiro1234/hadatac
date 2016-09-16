@@ -111,7 +111,7 @@ public class MeasurementType {
 					+ "  OPTIONAL { " + "<" + measurementType.getEntityUri() + "> " + "rdfs:label ?e_label . }\n"
 					+ "}";
 			
-			System.out.println(queryString);
+			//System.out.println(queryString);
 			
 			Query query = QueryFactory.create(queryString);
 			
@@ -125,14 +125,25 @@ public class MeasurementType {
 			measurementTypeKb.setTimestampColumn(measurementType.getTimestampColumn());
 			
 			System.out.println("resultsrw.size(): " + resultsrw.size());
-			if (resultsrw.size() == 1) {
+			
+			if (resultsrw.size() >= 1) {
 				QuerySolution soln = resultsrw.next();
 				measurementTypeKb.setCharacteristicUri(measurementType.getCharacteristicUri());
-				if (soln.getLiteral("c_label") != null) { measurementTypeKb.setCharacteristicLabel(soln.getLiteral("c_label").getString()); }
-				else { measurementTypeKb.setCharacteristicLabel(soln.getResource("c").getLocalName()); }
+				if (soln.getLiteral("c_label") != null) {
+					measurementTypeKb.setCharacteristicLabel(soln.getLiteral("c_label").getString()); 
+				}
+				else {
+					//measurementTypeKb.setCharacteristicLabel(soln.getResource("c").getLocalName());
+					measurementTypeKb.setCharacteristicLabel("non-label characteristic");
+				}
 				measurementTypeKb.setEntityUri(measurementType.getEntityUri());
-				if (soln.getLiteral("e_label") != null) { measurementTypeKb.setEntityLabel(soln.getLiteral("e_label").getString()); }
-				else { measurementTypeKb.setEntityLabel(soln.getResource("e").getLocalName()); }
+				if (soln.getLiteral("e_label") != null) {
+					measurementTypeKb.setEntityLabel(soln.getLiteral("e_label").getString()); 
+				}
+				else { 
+					//measurementTypeKb.setEntityLabel(soln.getResource("e").getLocalName());
+					measurementTypeKb.setEntityLabel("Subject");
+				}
 			} else {
 				measurementTypeComplete = false;
 			}
@@ -142,7 +153,7 @@ public class MeasurementType {
 					+ "  <" + measurementType.getUnitUri() + "> rdfs:label ?u_label . \n"
 					+ "}";
 			
-			System.out.println(queryString);
+			//System.out.println(queryString);
 			
 			query = QueryFactory.create(queryString);
 			qexec = QueryExecutionFactory.sparqlService(hadatac.getStaticMetadataSparqlURL(), query);
@@ -150,7 +161,7 @@ public class MeasurementType {
 			resultsrw = ResultSetFactory.copyResults(results);
 			qexec.close();
 			
-			if (resultsrw.size() == 1) {
+			if (resultsrw.size() >= 1) {
 				QuerySolution soln = resultsrw.next();
 				measurementTypeKb.setUnitUri(measurementType.getUnitUri());
 				if (soln.getLiteral("u_label") != null) {

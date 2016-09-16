@@ -126,7 +126,7 @@ public class Annotator extends Controller {
     		 *  Add deployment information into handler
     		 */
     		String json = DeploymentQueries.exec(DeploymentQueries.DEPLOYMENT_BY_URI, uri);
-    		//System.out.println(json);
+    		System.out.println(json);
     		SparqlQueryResults results = new SparqlQueryResults(json, false);
     		TripleDocument docDeployment = results.sparqlResults.values().iterator().next();
     		handler = new CSVAnnotationHandler(uri, docDeployment.get("platform"), docDeployment.get("instrument"));
@@ -142,9 +142,9 @@ public class Annotator extends Controller {
     		TripleDocument docChar;
     		while (it.hasNext()) {
     			docChar = (TripleDocument) it.next();
-    			if (docChar != null && docChar.get("ec") != null && docChar.get("ecName") != null) {
-    				deploymentChars.put((String)docChar.get("ec"),(String)docChar.get("ecName"));
-    				System.out.println("EC: " + docChar.get("ec") + "   ecName: " + docChar.get("ecName"));
+    			if (docChar != null && docChar.get("char") != null && docChar.get("charName") != null) {
+    				deploymentChars.put((String)docChar.get("char"),(String)docChar.get("charName"));
+    				System.out.println("EC: " + docChar.get("char") + "   ecName: " + docChar.get("charName"));
     			}
     		}
     		handler.setDeploymentCharacteristics(deploymentChars);
@@ -203,9 +203,9 @@ public class Annotator extends Controller {
     		TripleDocument docChar;
     		while (it.hasNext()) {
     			docChar = (TripleDocument) it.next();
-    			if (docChar != null && docChar.get("ec") != null && docChar.get("ecName") != null) {
-    				deploymentChars.put((String)docChar.get("ec"),(String)docChar.get("ecName"));
-    				System.out.println("EC: " + docChar.get("ec") + "   ecName: " + docChar.get("ecName"));
+    			if (docChar != null && docChar.get("char") != null && docChar.get("charName") != null) {
+    				deploymentChars.put((String)docChar.get("char"),(String)docChar.get("charName"));
+    				System.out.println("EC: " + docChar.get("char") + "   ecName: " + docChar.get("charName"));
     			}
     		}
     		handler.setDeploymentCharacteristics(deploymentChars);
