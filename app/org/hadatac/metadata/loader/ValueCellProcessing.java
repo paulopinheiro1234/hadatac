@@ -73,7 +73,21 @@ public class ValueCellProcessing {
 	 *  URI gets replaced by the name space's abbreviation. Otherwise, the string is returned wrapper
 	 *  around angular brackets.
 	 */
-	public String replaceNameSpace(String str) {
+	private String replaceNameSpace(String str) {
+		String resp = str;
+	    for (Map.Entry<String, NameSpace> entry : NameSpaces.getInstance().table.entrySet()) {
+	        String abbrev = entry.getKey().toString();
+	        String nsString = entry.getValue().getName();
+	        if (str.startsWith(nsString)) {
+	        	System.out.println("REPLACE: " + resp + " / " + abbrev);
+	        	resp = str.replace(nsString, abbrev + ":");
+	        	return resp; 
+	        }
+	    }
+	    return "<" + str + ">";
+	}
+	
+	public String replaceNameSpaceEx(String str) {
 		String resp = str;
 	    for (Map.Entry<String, NameSpace> entry : NameSpaces.getInstance().table.entrySet()) {
 	        String abbrev = entry.getKey().toString();
