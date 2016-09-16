@@ -19,8 +19,9 @@ public class Sub1Pilot5 extends Controller {
 	// for /metadata HTTP GET requests
 	@Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
     public static Result index() {
-		
-    	return ok(sub1Pilot5.render());
+		String collection = Play.application().configuration().getString("hadatac.console.host_deploy") + 
+    			request().path() + "/solrsearch";
+    	return ok(sub1Pilot5.render(collection));
     	
     }// /index()
 

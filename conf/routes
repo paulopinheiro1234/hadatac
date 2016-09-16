@@ -30,6 +30,8 @@ POST	/hadatac/metadataacquisitions/pilot5/solrsearch				    org.hadatac.console.
 GET	    /hadatac/metadataacquisitions/pilot6/solrsearch				    org.hadatac.console.http.SolrSearchProxy.getSubjectAcquisition()
 POST	/hadatac/metadataacquisitions/pilot6/solrsearch				    org.hadatac.console.http.SolrSearchProxy.getSubjectAcquisition()
 
+GET	    /hadatac/metadataacquisitions/sub1Pilot5/solrsearch				    org.hadatac.console.http.SolrSearchProxy.getSampleAcquisition()
+POST	/hadatac/metadataacquisitions/sub1Pilot5/solrsearch				    org.hadatac.console.http.SolrSearchProxy.getSampleAcquisition()
 # Metadata
 GET	    /hadatac/metadata  		 	              org.hadatac.console.controllers.metadata.Metadata.index()
 POST	/hadatac/metadata			              org.hadatac.console.controllers.metadata.Metadata.postIndex()

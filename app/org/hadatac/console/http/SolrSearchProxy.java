@@ -41,6 +41,13 @@ public class SolrSearchProxy extends Controller {
 				request().toString().split((request().path()))[1];
 		return getSolrSearch(path);
 	}
+
+    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
+	public static Result getSampleAcquisition(){
+		String path = Collections.getCollectionsName(Collections.SAMPLES_ACQUISITION) + 
+				request().toString().split((request().path()))[1];
+		return getSolrSearch(path);
+	}
 	
 	@Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
 	public static Result getAnalytesAcquisition(){
