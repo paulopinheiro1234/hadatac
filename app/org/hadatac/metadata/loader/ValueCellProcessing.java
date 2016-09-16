@@ -132,7 +132,7 @@ public class ValueCellProcessing {
 			return (subject + "\n");
 		}
 		// no indentation or semicolon at the end of the string
-		return ("<" + replaceNameSpace(subject) + ">" + "\n");	
+		return (replaceNameSpace(subject) + "\n");
 	}
 	
 	public String processObjectValue(String object) {
@@ -145,7 +145,7 @@ public class ValueCellProcessing {
 		// if full URI, either abbreviated it or print it between angled brackets
 		if (isFullURI(object)) {
 			// either replace namespace with acronym or add angled brackets
-			return "<" + replaceNameSpace(object) + ">";
+			return replaceNameSpace(object);
 		}
 		
 		// if not URI, print the object between quotes
