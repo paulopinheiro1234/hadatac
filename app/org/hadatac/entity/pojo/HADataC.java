@@ -65,7 +65,7 @@ public class HADataC {
 		ResultSet results = qexec.execSelect();
 		ResultSetRewindable resultsrw = ResultSetFactory.copyResults(results);
 		
-		if (resultsrw.size() == 1) {
+		if (resultsrw.size() >= 1) {
 			QuerySolution soln = resultsrw.next();
 			HADataC hadatac = new HADataC();
 			hadatac.setLocalName(soln.getResource("kb").getLocalName());

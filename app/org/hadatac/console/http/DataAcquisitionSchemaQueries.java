@@ -32,9 +32,9 @@ public class DataAcquisitionSchemaQueries {
             		"PREFIX vstoi: <http://hadatac.org/ont/vstoi#> " +
             		"PREFIX hasneto: <http://hadatac.org/ont/hasneto#> " +
         			"PREFIX hasco: <http://hadatac.org/ont/hasco/> " +
-        			"SELECT ?uri ?partOfSchema ?hasPosition ?hasEntity ?hasAttribute ?hasUnit ?hasSource ?isPIConfirmed WHERE { " + 
+        			"SELECT ?uri ?hasPosition ?hasEntity ?hasAttribute ?hasUnit ?hasSource ?isPIConfirmed WHERE { " + 
         			"   ?uri a hasneto:DataAcquisitionSchema . " + 
-        			"   ?uri hasneto:partOfSchema ?partOfSchema .  " + 
+        			"   ?uri hasneto:partOfSchema " + "<" + uri + "> .  " + 
         			"   ?uri hasco:hasPosition ?hasPosition .  " + 
         			"   OPTIONAL { ?uri hasneto:hasEntity ?hasEntity } ." + 
         			"   OPTIONAL { ?uri hasneto:hasAttribute ?hasAttribute } ." + 

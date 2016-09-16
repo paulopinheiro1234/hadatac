@@ -17,6 +17,7 @@ import java.util.Map;
 import java.util.Properties;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.FilenameUtils;
 import org.hadatac.console.controllers.AuthApplication;
 import org.hadatac.console.controllers.dataacquisition.LoadCCSV;
 import org.hadatac.console.controllers.triplestore.LoadKB;
@@ -26,10 +27,10 @@ import org.hadatac.console.http.DeploymentQueries;
 import org.hadatac.console.models.CSVAnnotationHandler;
 import org.hadatac.console.models.SparqlQueryResults;
 import org.hadatac.console.models.TripleDocument;
-import org.hadatac.console.models.User;
 import org.hadatac.console.views.html.annotator.auto_ccsv;
 import org.hadatac.data.api.DataFactory;
 import org.hadatac.entity.pojo.DataCollection;
+import org.hadatac.metadata.loader.ValueCellProcessing;
 import org.hadatac.utils.NameSpaces;
 import org.hadatac.utils.State;
 
@@ -171,11 +172,21 @@ public class AutoAnnotator extends Controller {
 		String deployment_uri = null;
 		String schema_uri = null;
 		for(DataCollection dc : da_list){
-			String[] st = dc.getUri().split(":");
-			if(st[1].equals(file_name)){
+			System.out.println(file_name);
+			String base_name = FilenameUtils.getBaseName(file_name);
+			System.out.println(base_name);
+			ValueCellProcessing cellProc = new ValueCellProcessing();
+			System.out.println(dc.getUri());
+			System.out.println(cellProc.replaceNameSpace(dc.getUri()));
+			String qname = cellProc.replaceNameSpace(dc.getUri()).split(":")[1];
+			System.out.println(qname);
+			if(qname.equals(base_name)){
 				dc_uri = dc.getUri();
+				System.out.println("=================================" + dc_uri);
 				deployment_uri = dc.getDeploymentUri();
+				System.out.println("=================================" + deployment_uri);
 				schema_uri = dc.getSchemaUri();
+				System.out.println("=================================" + schema_uri);
 				break;
 			}
 		}
@@ -202,7 +213,7 @@ public class AutoAnnotator extends Controller {
     		 *  Add deployment information into handler
     		 */
     		String json = DeploymentQueries.exec(DeploymentQueries.DEPLOYMENT_BY_URI, deployment_uri);
-    		System.out.println(json);
+    		//System.out.println(json);
     		SparqlQueryResults results = new SparqlQueryResults(json, false);
     		TripleDocument docDeployment = results.sparqlResults.values().iterator().next();
     		handler = new CSVAnnotationHandler(deployment_uri, docDeployment.get("platform"), docDeployment.get("instrument"));
@@ -218,9 +229,9 @@ public class AutoAnnotator extends Controller {
     		TripleDocument docChar;
     		while (it.hasNext()) {
     			docChar = (TripleDocument) it.next();
-    			if (docChar != null && docChar.get("ec") != null && docChar.get("ecName") != null) {
-    				deploymentChars.put((String)docChar.get("ec"),(String)docChar.get("ecName"));
-    				System.out.println("EC: " + docChar.get("ec") + "   ecName: " + docChar.get("ecName"));
+    			if (docChar != null && docChar.get("char") != null && docChar.get("charName") != null) {
+    				deploymentChars.put((String)docChar.get("char"),(String)docChar.get("charName"));
+    				System.out.println("EC: " + docChar.get("char") + "   ecName: " + docChar.get("charName"));
     			}
     		}
     		handler.setDeploymentCharacteristics(deploymentChars);
@@ -275,9 +286,9 @@ public class AutoAnnotator extends Controller {
 				System.out.println("get " + i + "-attribute: [" + attrib + "]");
 				System.out.println("get " + i + "-unit: [" + unit + "]");
 
-				if (entity != null && !entity.equals("") &&
-						attrib != null && !attrib.equals("") && 
-						unit != null && !unit.equals("")) {	
+//				if (entity != null && !entity.equals("") &&
+//						attrib != null && !attrib.equals("") && 
+//						unit != null && !unit.equals("")) {	
 					if (unit.equals(Downloads.FRAG_IN_DATE_TIME)) {
 						timeStampIndex = i; 
 					} else {
@@ -301,7 +312,7 @@ public class AutoAnnotator extends Controller {
 						mt.add(i);
 						mt_preamble.add(p);
 					}
-				}
+//				}
 			}
 			
 			preamble += Downloads.FRAG_HAS_MEASUREMENT_TYPE;	
@@ -330,9 +341,19 @@ public class AutoAnnotator extends Controller {
 		}
 
 		preamble += Downloads.FRAG_END_PREAMBLE;
-		
-		String message = "";
-		File newFile = new File(file_name);
+
+		Properties prop = new Properties();
+		try {
+			InputStream is = LoadKB.class.getClassLoader().getResourceAsStream("autoccsv.config");
+			prop.load(is);
+			is.close();
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		String path_unproc = prop.getProperty("path_unproc");
+		File newFile = new File(path_unproc + file_name);
 	    try {
 			preamble += FileUtils.readFileToString(newFile, "UTF-8");
 		} catch (IOException e) {
@@ -346,7 +367,7 @@ public class AutoAnnotator extends Controller {
 			e.printStackTrace();
 			return false;
 		}
-	    message = LoadCCSV.playLoadCCSV();
+	    LoadCCSV.playLoadCCSV();
 	    
 	    return true;
 	}
