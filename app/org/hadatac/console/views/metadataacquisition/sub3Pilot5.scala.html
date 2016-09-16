@@ -1,0 +1,45 @@
+@()
+
+@import helper._
+@import org.hadatac.console.views.html._
+
+@main("sub3Pilot5") {
+   
+    <link rel="stylesheet" href="http://openlayers.org/en/v3.9.0/css/ol.css">
+    <script type="text/javascript" charset="utf-8" src="http://www.openlayers.org/api/OpenLayers.js"></script>
+    <script type="text/javascript" charset="utf-8" src="@controllers.routes.Assets.versioned("javascripts/openLayersFunctions.js")"></script>
+
+    <div class="row">
+        <div class="col-md-6">
+            <h1>View Subject</h1>
+            
+            <h2>Basic Info</h2>
+                <ul>
+                    <li><b>URI</b>: chear-kb:SBJ-0003-Pilot-5</li>
+                    <li><b>Type</b>: sio:Human</li>
+                    <li><b>Label</b>: ID 0003 - Pilot 5</li>    
+                    <li><b>Of Study</b>: chear-kb:CH-Pilot-5</li>                      
+                </ul>
+
+            <h2>Attribute Info</h2>
+                <ul>
+						<li></b>chear-kb:AR-educ_3cat</b>   Mother's education in categories</li>
+						<li></b>chear-kb:AR-cbc_hemogM</b>    Mother's hemoglobin</li>
+						<li></b>chear-kb:AR-gestage_comb</b>    gestage_comb  Child's gestational age in complete weeks</li>
+						<li></b>chear-kb:AR-height_m_mean_cm</b>  Mother's height in cm.</li>
+						<li></b>chear-kb:AR-mother_age_year</b>  Mother's age in years</li>
+						<li></b>chear-kb:AR-SES_scored</b>  SES index</li>
+						<li></b>chear-kb:AR-sexo_h</b>  Child's sex</li>
+						<li></b>chear-kb:AR-t10g</b>  Mother's highest grade of education</li>
+						<li></b>chear-kb:AR-t10n</b>  Mother's highest level of education</li>
+						<li></b>chear-kb:AR-t23g</b>  Head of the household, highest grade of education</li>
+						<li></b>chear-kb:AR-t23n</b>  Head of the household, highest level of education</li>
+						<li></b>chear-kb:AR-t24</b>  Total number of rooms in the home</li>
+						<li></b>chear-kb:AR-t25</b>  Total number of bathrooms in the home</li>
+						<li></b>chear-kb:AR-vnc_esp</b>  Mother's race, ask the mother to specify which indigenous language</li>
+						<li></b>chear-kb:AR-w7_iq</b>  Mother's IQ</li>
+						<li></b>chear-kb:AR-weight_m_mean</b>  Mother's weight in kg.</li>
+                </ul>
+        </div>
+        </div>
+}
