@@ -63,6 +63,8 @@ public class Parser {
 		if (result.getStatus() == 0) {
 			message += result.getMessage();
 			result = loadFromKb(mode);
+			System.out.println("loadFromKb(mode): " + result.getStatus());
+			System.out.println("loadFromKb(mode) message: " + result.getMessage());
 			message += result.getMessage();
 		}
 		
@@ -92,7 +94,6 @@ public class Parser {
 		
 		solr = new HttpSolrClient(hadatacCcsv.getMeasurementURL());
 		try {
-			System.out.println("indexMeasurements(solr)...");
 			indexMeasurements(solr);
 			System.out.println("solr.commit()...");
 			solr.commit();
@@ -106,23 +107,30 @@ public class Parser {
 	}
 	
 	private int indexMeasurements(SolrClient solr) throws IOException {
-		files.openFile("csv", "r");
+		System.out.println("indexMeasurements(solr)...");
 		
+		files.openFile("csv", "r");
 		Iterable<CSVRecord> records = CSVFormat.DEFAULT.withHeader().parse(files.getReader("csv"));
 		Measurement measurement = new Measurement();
-		int cont = 0;
+		int count = 0;
 		for (CSVRecord record : records) {
 			Iterator<MeasurementType> i = hadatacKb.dataset.measurementTypes.iterator();
 			while (i.hasNext()) {
 				MeasurementType measurementType = i.next();
-				measurement.setUri(hadatacCcsv.getMeasurementUri() + hadatacCcsv.dataset.getLocalName() + "/" + measurementType.getLocalName() + "-" + cont);
+				measurement.setUri(hadatacCcsv.getMeasurementUri() + hadatacCcsv.dataset.getLocalName() + "/" + measurementType.getLocalName() + "-" + count);
 				if (measurementType.getTimestampColumn() > -1) {
 					System.out.println("measurementType.getTimestampColumn() > -1");
 					measurement.setTimestampXsd(record.get(measurementType.getTimestampColumn()));
 				}
 				measurement.setOwnerUri(hadatacKb.dataCollection.getOwnerUri());
 				measurement.setPermissionUri(hadatacKb.dataCollection.getPermissionUri());
-				measurement.setValue(Double.parseDouble(record.get(measurementType.getValueColumn())));
+				//measurement.setValue(Double.parseDouble(record.get(measurementType.getValueColumn())));
+				if(record.get(measurementType.getValueColumn() - 1).isEmpty()){
+					measurement.setValue("NO_VALUE");
+				}
+				else{
+					measurement.setValue(record.get(measurementType.getValueColumn() - 1));
+				}
 				measurement.setUnit(measurementType.getUnitLabel());
 				measurement.setUnitUri(measurementType.getUnitUri());
 				measurement.setCharacteristic(measurementType.getCharacteristicLabel());
@@ -136,17 +144,20 @@ public class Parser {
 				measurement.setDatasetUri(hadatacCcsv.getDatasetKbUri());
 				measurement.save(solr);
 			}
-			cont++;
+			count++;
 		}
 		
-		hadatacKb.dataCollection.addNumberDataPoints(cont);
+		hadatacKb.dataCollection.addNumberDataPoints(count);
 		hadatacKb.dataCollection.save();
 		
 		files.closeFile("csv", "r");
+		System.out.println("Finished indexMeasurements(solr)");
 		return 0;
 	}
 	
 	private DatasetParsingResult loadFromKb(int mode) {
+		System.out.println("loadFromKb is called!");
+		
 		String message = "";
 		
 		// hadatac
@@ -172,6 +183,7 @@ public class Parser {
 		
 		// dataset
 		if (hadatacCcsv.dataCollection.getStatus() > 0) {
+			System.out.println(hadatacCcsv.getDatasetKbUri());
 			if (hadatacKb.dataCollection.containsDataset(hadatacCcsv.getDatasetKbUri())) {
 				message += Feedback.println(mode, "[ERROR] Dataset was already processed.");
 				return new DatasetParsingResult(1, message);

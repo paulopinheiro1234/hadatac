@@ -198,7 +198,7 @@ public class Instrument  implements Comparable<Instrument> {
 		ResultSetRewindable resultsrw = ResultSetFactory.copyResults(results);
 		qexec.close();
 		
-		if (resultsrw.size() == 1) {
+		if (resultsrw.size() >= 1) {
 			QuerySolution soln = resultsrw.next();
 			instrument = new Instrument();
 			instrument.setLocalName(soln.getResource("instrument").getLocalName());

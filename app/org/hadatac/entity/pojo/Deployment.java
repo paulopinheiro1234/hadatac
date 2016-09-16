@@ -284,15 +284,15 @@ public class Deployment {
 				+ "SELECT ?startedAt ?endedAt ?detector ?instrument ?platform WHERE {\n"
 				+ "  <" + hadatac.dataCollection.getDeploymentUri() + "> a vstoi:Deployment .\n"
 				+ "  <" + hadatac.dataCollection.getDeploymentUri() + "> prov:startedAtTime ?startedAt .\n"
-				+ "  <" + hadatac.dataCollection.getDeploymentUri() + "> hasneto:hasDetector ?detector .\n"
 				+ "  <" + hadatac.dataCollection.getDeploymentUri() + "> hasneto:hasInstrument ?instrument .\n"
 				+ "  <" + hadatac.dataCollection.getDeploymentUri() + "> vstoi:hasPlatform ?platform .\n"
+				+ "  OPTIONAL { <" + hadatac.dataCollection.getDeploymentUri() + "> hasneto:hasDetector ?detector . }\n"
 				+ "  OPTIONAL { <" + hadatac.dataCollection.getDeploymentUri() + "> prov:endedAtTime ?endedAt . }\n"
 				+ "}";
 		
 		Query query = QueryFactory.create(queryString);
 		
-		System.out.println(queryString);
+		//System.out.println(queryString);
 		
 		QueryExecution qexec = QueryExecutionFactory.sparqlService(hadatac.getStaticMetadataSparqlURL(), query);
 		ResultSet results = qexec.execSelect();
@@ -456,7 +456,7 @@ public class Deployment {
 		ResultSet results = qexec.execSelect();
 		ResultSetRewindable resultsrw = ResultSetFactory.copyResults(results);
 		
-		if (resultsrw.size() == 1) {
+		if (resultsrw.size() >= 1) {
 			QuerySolution soln = resultsrw.next();
 			Deployment deployment = new Deployment();
 			deployment.setLocalName(soln.getResource("dp").getLocalName());
