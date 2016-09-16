@@ -61,6 +61,9 @@ public class AutoAnnotator extends Controller {
 		String path_unproc = prop.getProperty("path_unproc");
 		
 		File folder = new File(path_proc);
+		if (!folder.exists()){
+			folder.mkdirs();
+	    }
 		File[] listOfFiles = folder.listFiles();
 		for (int i = 0; i < listOfFiles.length; i++) {
 			if (listOfFiles[i].isFile()) {
@@ -68,6 +71,9 @@ public class AutoAnnotator extends Controller {
 			}
 		}
 		folder = new File(path_unproc);
+		if (!folder.exists()){
+			folder.mkdirs();
+	    }
 		listOfFiles = folder.listFiles();
 		for (int i = 0; i < listOfFiles.length; i++) {
 			if (listOfFiles[i].isFile()) {
@@ -144,6 +150,9 @@ public class AutoAnnotator extends Controller {
 		String path_unproc = prop.getProperty("path_unproc");
 		
 		File folder = new File(path_unproc);
+		if (!folder.exists()){
+			folder.mkdirs();
+	    }
 		File[] listOfFiles = folder.listFiles();
 		for (int i = 0; i < listOfFiles.length; i++) {
 			if (listOfFiles[i].isFile()) {
