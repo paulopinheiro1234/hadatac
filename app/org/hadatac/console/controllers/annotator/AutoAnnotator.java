@@ -91,7 +91,7 @@ public class AutoAnnotator extends Controller {
 	
 	@Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
     public static void toggleAutoAnnotator() {
-		System.out.println("Toggling...");
+		//System.out.println("Toggling...");
 		
 		Properties prop = new Properties();
 		try {
