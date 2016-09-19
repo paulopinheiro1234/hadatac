@@ -348,10 +348,11 @@ public class GetSparqlQuery {
             		"PREFIX rdfs:<http://www.w3.org/2000/01/rdf-schema#>" + 
             		"PREFIX skos: <http://www.w3.org/2004/02/skos/core#>" +
             		"SELECT ?id ?superId ?label ?comment WHERE { " + 
-                    "   ?id rdfs:subClassOf* chear:Demographics . " + 
+                    "   ?id rdfs:subClassOf* chear:Demographic . " + 
                     "   ?id rdfs:subClassOf ?superId .  " + 
                     "   OPTIONAL { ?id rdfs:label ?label } . " + 
-                    " 	OPTIONAL { ?id skos:definition ?comment } . " +
+//                    " 	OPTIONAL { ?id skos:definition ?comment } . " +
+					" 	OPTIONAL { ?id rdfs:comment ?comment } . " +
                     "}";
                 break;
             case "BirthOutcomes" :
@@ -364,10 +365,11 @@ public class GetSparqlQuery {
             		"PREFIX rdfs:<http://www.w3.org/2000/01/rdf-schema#>" + 
             		"PREFIX skos: <http://www.w3.org/2004/02/skos/core#>" +
             		"SELECT ?id ?superId ?label ?comment WHERE { " + 
-                    "   ?id rdfs:subClassOf* chear:BirthOutcomes . " + 
+                    "   ?id rdfs:subClassOf* chear:BirthOutcome . " + 
                     "   ?id rdfs:subClassOf ?superId .  " + 
                     "   OPTIONAL { ?id rdfs:label ?label } . " + 
-                    " 	OPTIONAL { ?id skos:definition ?comment } . " +
+//                    " 	OPTIONAL { ?id skos:definition ?comment } . " +
+                    " 	OPTIONAL { ?id rdfs:comment ?comment } . " +
                     "}";
                 break;
             case "HousingCharacteristic" :
@@ -383,7 +385,8 @@ public class GetSparqlQuery {
                     "   ?id rdfs:subClassOf* chear:HousingCharacteristic . " + 
                     "   ?id rdfs:subClassOf ?superId .  " + 
                     "   OPTIONAL { ?id rdfs:label ?label } . " + 
-                    " 	OPTIONAL { ?id skos:definition ?comment } . " +
+//                    " 	OPTIONAL { ?id skos:definition ?comment } . " +
+                    " 	OPTIONAL { ?id rdfs:comment ?comment } . " +
                     "}";
                 break;
             case "ATIDU" :
@@ -399,7 +402,8 @@ public class GetSparqlQuery {
                     "   ?id rdfs:subClassOf* chear:ATIDU . " + 
                     "   ?id rdfs:subClassOf ?superId .  " + 
                     "   OPTIONAL { ?id rdfs:label ?label } . " + 
-                    " 	OPTIONAL { ?id skos:definition ?comment } . " +
+//                    " 	OPTIONAL { ?id skos:definition ?comment } . " +
+                    " 	OPTIONAL { ?id rdfs:comment ?comment } . " +
                     "}";
                 break;
             case "Anthropometry" :
@@ -415,7 +419,8 @@ public class GetSparqlQuery {
                     "   ?id rdfs:subClassOf* chear:Anthropometry . " + 
                     "   ?id rdfs:subClassOf ?superId .  " + 
                     "   OPTIONAL { ?id rdfs:label ?label } . " + 
-                    " 	OPTIONAL { ?id skos:definition ?comment } . " +
+//                    " 	OPTIONAL { ?id skos:definition ?comment } . " +
+                    " 	OPTIONAL { ?id rdfs:comment ?comment } . " +
                     "}";
                 break;
             case "BDN" :
@@ -431,7 +436,8 @@ public class GetSparqlQuery {
                     "   ?id rdfs:subClassOf* chear:BehaviorDietAndNutrition . " + 
                     "   ?id rdfs:subClassOf ?superId .  " + 
                     "   OPTIONAL { ?id rdfs:label ?label } . " + 
-                    " 	OPTIONAL { ?id skos:definition ?comment } . " +
+//                    " 	OPTIONAL { ?id skos:definition ?comment } . " +
+                    " 	OPTIONAL { ?id rdfs:comment ?comment } . " +
                     "}";
                 break;
             case "Analytes" :
