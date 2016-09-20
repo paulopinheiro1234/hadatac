@@ -286,7 +286,10 @@ public class TripleProcessing {
 						System.out.println("time is " + deployment.getStartedAt());
 					}
 					else if(predicate.equals("hasco:hasSchema")){
+						System.out.println("*********************************************" + dataCollection.getUri());
+						System.out.println("=============================================" + cellValue);
 						dataCollection.setSchemaUri(cellProc.convertToWholeURI(cellValue));
+						System.out.println("+++++++++++++++++++++++++++++++++++++++++++++" + dataCollection.getSchemaUri());
 					}
 					dataCollection.setNumberDataPoints(0);
 					dataCollection.save();

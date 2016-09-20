@@ -10,6 +10,7 @@ public class Collections {
 	public static final String CONSOLE_STORE               = "/console_store";
 	public static final String URI_GENERATOR               = "/uri_generator";
 	public static final String STUDY_ACQUISITION           = "/studies/select";
+	public static final String SAMPLES_ACQUISITION           = "/samples/select";
 	public static final String METADATA_DA			       = "/data_acquisitions/select";
 	public static final String SUBJECTS_ACQUISITION	       = "/subjects/select";
 	public static final String ANALYTES_ACQUISITION        = "/analytes/select";
@@ -58,6 +59,7 @@ public class Collections {
                                            break;
             case STUDY_ACQUISITION:
             case SUBJECTS_ACQUISITION:
+            case SAMPLES_ACQUISITION:
             case ANALYTES_ACQUISITION:
             case METADATA_DA:
             case SCHEMA_ATTRIBUTES:        collectionName = Play.application().configuration().getString("hadatac.solr.data") + request;

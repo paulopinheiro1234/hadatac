@@ -59,13 +59,13 @@ public class Dataset {
 		ResultSet results = qexec.execSelect();
 		ResultSetRewindable resultsrw = ResultSetFactory.copyResults(results);
 		
-		if (resultsrw.size() == 1) {
+		if (resultsrw.size() >= 1) {
 			QuerySolution soln = resultsrw.next();
 			Dataset dataset = new Dataset();
 			dataset.setLocalName(soln.getResource("ds").getLocalName());
 			dataset.setCcsvUri(soln.getResource("ds").getURI());
 			return dataset;
-		} else
+		}
 
 		return null;
 	}

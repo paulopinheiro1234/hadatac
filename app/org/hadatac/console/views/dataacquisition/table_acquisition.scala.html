@@ -29,6 +29,7 @@
         <table class="table table-striped" id="measurementsTable">
             <thead>
               <tr>
+              	<th>Object</th>
                 <th>Characteristic</th>
                 <th>Value</th>
                 <th>Timestamp</th>
@@ -41,7 +42,8 @@
             <tbody>
                 @for(document <- documents) {
                 <tr>
-                	<td>@document.getCharacteristic</td>
+                    <td>@document.getEntity()</td>
+                	<td>@document.getCharacteristic()</td>
                 	<td>@document.getValue()</td>
                 	<td>@document.getTimestamp()</td>
                 </tr>

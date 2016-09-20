@@ -73,9 +73,9 @@ public class ValueCellProcessing {
 	 *  URI gets replaced by the name space's abbreviation. Otherwise, the string is returned wrapper
 	 *  around angular brackets.
 	 */
-	private String replaceNameSpace(String str) {
+	public String replaceNameSpace(String str) {
 		String resp = str;
-	    for (Map.Entry<String, NameSpace> entry : NameSpaces.table.entrySet()) {
+	    for (Map.Entry<String, NameSpace> entry : NameSpaces.getInstance().table.entrySet()) {
 	        String abbrev = entry.getKey().toString();
 	        String nsString = entry.getValue().getName();
 	        if (str.startsWith(nsString)) {
@@ -84,7 +84,7 @@ public class ValueCellProcessing {
 	        	return resp; 
 	        }
 	    }
-	    return "<" + str + ">";
+	    return str;
 	}
 	
 	/* 
@@ -92,7 +92,7 @@ public class ValueCellProcessing {
 	 *  abbreviation gets replaced by the name space's URI. Otherwise, the string is returned wrapper
 	 *  around angular brackets.
 	 */
-	private String replacePrefix(String str) {
+	public String replacePrefix(String str) {
 		String resp = str;
 	    for (Map.Entry<String, NameSpace> entry : NameSpaces.table.entrySet()) {
 	        String abbrev = entry.getKey().toString();
@@ -132,7 +132,7 @@ public class ValueCellProcessing {
 			return (subject + "\n");
 		}
 		// no indentation or semicolon at the end of the string
-		return (replaceNameSpace(subject) + "\n");	
+		return ("<" + replaceNameSpace(subject) + ">" + "\n");	
 	}
 	
 	public String processObjectValue(String object) {
@@ -145,7 +145,7 @@ public class ValueCellProcessing {
 		// if full URI, either abbreviated it or print it between angled brackets
 		if (isFullURI(object)) {
 			// either replace namespace with acronym or add angled brackets
-			return replaceNameSpace(object);
+			return "<" + replaceNameSpace(object) + ">";
 		}
 		
 		// if not URI, print the object between quotes

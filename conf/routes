@@ -30,6 +30,8 @@ POST	/hadatac/metadataacquisitions/pilot5/solrsearch				    org.hadatac.console.
 GET	    /hadatac/metadataacquisitions/pilot6/solrsearch				    org.hadatac.console.http.SolrSearchProxy.getSubjectAcquisition()
 POST	/hadatac/metadataacquisitions/pilot6/solrsearch				    org.hadatac.console.http.SolrSearchProxy.getSubjectAcquisition()
 
+GET	    /hadatac/metadataacquisitions/sub1Pilot5/solrsearch				    org.hadatac.console.http.SolrSearchProxy.getSampleAcquisition()
+POST	/hadatac/metadataacquisitions/sub1Pilot5/solrsearch				    org.hadatac.console.http.SolrSearchProxy.getSampleAcquisition()
 # Metadata
 GET	    /hadatac/metadata  		 	              org.hadatac.console.controllers.metadata.Metadata.index()
 POST	/hadatac/metadata			              org.hadatac.console.controllers.metadata.Metadata.postIndex()
@@ -52,8 +54,22 @@ GET	    /hadatac/metadataacquisitions/pilot5				              org.hadatac.consol
 POST	/hadatac/metadataacquisitions/pilot5				              org.hadatac.console.controllers.metadataacquisition.Pilot5.postIndex()
 GET	    /hadatac/metadataacquisitions/pilot6				              org.hadatac.console.controllers.metadataacquisition.Pilot6.index()
 POST	/hadatac/metadataacquisitions/pilot6				              org.hadatac.console.controllers.metadataacquisition.Pilot6.postIndex()
+<<<<<<< HEAD
 GET	    /hadatac/metadataacquisitions/viewSubject	org.hadatac.console.controllers.metadataacquisition.ViewSubject.index(subject_uri: String)
 POST	/hadatac/metadataacquisitions/viewSubject	org.hadatac.console.controllers.metadataacquisition.ViewSubject.postIndex(subject_uri: String)
+=======
+GET	    /hadatac/metadataacquisitions/sub1Pilot5				              org.hadatac.console.controllers.metadataacquisition.Sub1Pilot5.index()
+POST	/hadatac/metadataacquisitions/sub1Pilot5				              org.hadatac.console.controllers.metadataacquisition.Sub1Pilot5.postIndex()
+GET	    /hadatac/metadataacquisitions/sub2Pilot5				              org.hadatac.console.controllers.metadataacquisition.Sub2Pilot5.index()
+POST	/hadatac/metadataacquisitions/sub2Pilot5				              org.hadatac.console.controllers.metadataacquisition.Sub2Pilot5.postIndex()
+GET	    /hadatac/metadataacquisitions/sub3Pilot5				              org.hadatac.console.controllers.metadataacquisition.Sub3Pilot5.index()
+POST	/hadatac/metadataacquisitions/sub3Pilot5				              org.hadatac.console.controllers.metadataacquisition.Sub3Pilot5.postIndex()
+GET	    /hadatac/metadataacquisitions/sub4Pilot5				              org.hadatac.console.controllers.metadataacquisition.Sub4Pilot5.index()
+POST	/hadatac/metadataacquisitions/sub4Pilot5				              org.hadatac.console.controllers.metadataacquisition.Sub4Pilot5.postIndex()
+GET	    /hadatac/metadataacquisitions/sub5Pilot5				              org.hadatac.console.controllers.metadataacquisition.Sub5Pilot5.index()
+POST	/hadatac/metadataacquisitions/sub5Pilot5				              org.hadatac.console.controllers.metadataacquisition.Sub5Pilot5.postIndex()
+
+>>>>>>> chear
 
 # Metadata concepts
 GET	    /hadatac/metadata/entity		          org.hadatac.console.controllers.metadata.concepts.Entity.index()
