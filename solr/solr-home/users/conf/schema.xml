@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<schema version="1.5">
+  <fields>
+    <field name="id" type="string" indexed="true" stored="true"/>
+    <field name="_version_" type="long" indexed="true" stored="true"/>
+	<field name="uri" type="string" indexed="true" stored="true" default=""/>
+    <field name="email" type="string" indexed="true" stored="true"/>
+    <field name="name" type="string" indexed="true" stored="true" default=""/>
+    <field name="first_name" type="string" indexed="true" stored="true" default=""/>
+    <field name="last_name" type="string" indexed="true" stored="true" default=""/>
+    <field name="last_login" type="date" indexed="true" stored="true"/>
+    <field name="active" type="boolean" indexed="true" stored="true"/>
+    <field name="email_validated" type="boolean" indexed="true" stored="true"/>
+    <field name="security_role_id" type="string" indexed="true" stored="true" multiValued="true"/>
+    <field name="user_permission_id" type="string" indexed="true" stored="true" multiValued="true"/>
+  </fields>
+
+  <uniqueKey>id</uniqueKey>
+
+  <types>
+    <fieldType name="string" class="solr.StrField" />
+    <fieldType name="date" class="solr.TrieDateField" precisionStep="0" positionIncrementGap="0"/>
+    <fieldType name="long" class="solr.TrieLongField" precisionStep="0" positionIncrementGap="0"/>
+    <fieldType name="int" class="solr.TrieIntField" precisionStep="0" positionIncrementGap="0"/>
+    <fieldType name="boolean" class="solr.BoolField" omitNorms="true"/>
+  </types>
+</schema>

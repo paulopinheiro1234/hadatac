@@ -1,4 +1,4 @@
-@()
+@(collection_url : java.lang.String)
 
 @import helper._
 @import org.hadatac.console.views.html._
@@ -26,7 +26,7 @@
 jQuery(document).ready(function($) {
   $('.facet-view-simple').each(function() {
   $(this).facetview({
-    search_url: 'http://localhost:8983/solr/studies/select?',
+    search_url: '@collection_url',
     search_index: 'solr',
     datatype: 'json',
     facets: [
@@ -39,11 +39,12 @@ jQuery(document).ready(function($) {
         {'field': 'demographics', 'display': 'Demographics'},
         {'field': 'housingCharacteristics', 'display' : 'Housing Characteristics'},
         {'field': 'laboratory', 'display': 'Lab/Medical Test'},
+        {'field': 'metals', 'display': 'Prenatal Metals Exposure'},
         {'field': 'occupation', 'display': 'Occupation'},
         {'field': 'socioEconomicStatus', 'display': 'Socioeconomic Status'},
     ],
-    search_sortby: [{'display':'Name', 'field':'name.exact'},{'display':'Demographics','field':'demographics.exact'},{'display':'Lab/Medical Test','field':'laboratory.exact'},{'display':'Birth Outcomes','field':'birthOutcomes.exact'},{'display':'Acculturation','field':'acculturation.exact'},{'display':'Anthropometry','field':'anthropometry.exact'},{'display':'Assessment','field':'assessment.exact'},{'display':'Alcohol, Tobacco & Illicit Drug Use','field':'ATIDU.exact'},{'display':'Behavior, Diet & Nutrition','field':'BDN.exact'},{'display':'Housing Characteristics','field':'housingCharacteristics.exact'},{'display':'Occupation','field':'occupation.exact'},{'display':'Socioeconomic Status','field':'socioEconomicStatus.exact'}],
-    searchbox_fieldselect: [{'display':'Name', 'field':'name.exact'},{'display':'Demographics','field':'demographics.exact'},{'display':'Lab/Medical Test','field':'laboratory.exact'},{'display':'Birth Outcomes','field':'birthOutcomes.exact'},{'display':'Acculturation','field':'acculturation.exact'},{'display':'Anthropometry','field':'anthropometry.exact'},{'display':'Assessment','field':'assessment.exact'},{'display':'Alcohol, Tobacco & Illicit Drug Use','field':'ATIDU.exact'},{'display':'Behavior, Diet & Nutrition','field':'BDN.exact'},{'display':'Housing Characteristics','field':'housingCharacteristics.exact'},{'display':'Occupation','field':'occupation.exact'},{'display':'Socioeconomic Status','field':'socioEconomicStatus.exact'}],
+    search_sortby: [{'display':'Name', 'field':'name.exact'},{'display':'Demographics','field':'demographics.exact'},{'display':'Lab/Medical Test','field':'laboratory.exact'},{'display':'Prenatal Metals Exposure','field':'metals.exact'},{'display':'Birth Outcomes','field':'birthOutcomes.exact'},{'display':'Acculturation','field':'acculturation.exact'},{'display':'Anthropometry','field':'anthropometry.exact'},{'display':'Assessment','field':'assessment.exact'},{'display':'Alcohol, Tobacco & Illicit Drug Use','field':'ATIDU.exact'},{'display':'Behavior, Diet & Nutrition','field':'BDN.exact'},{'display':'Housing Characteristics','field':'housingCharacteristics.exact'},{'display':'Occupation','field':'occupation.exact'},{'display':'Socioeconomic Status','field':'socioEconomicStatus.exact'}],
+    searchbox_fieldselect: [{'display':'Name', 'field':'name.exact'},{'display':'Demographics','field':'demographics.exact'},{'display':'Lab/Medical Test','field':'laboratory.exact'},{'display':'Prenatal Metals Exposure','field':'metals.exact'},{'display':'Birth Outcomes','field':'birthOutcomes.exact'},{'display':'Acculturation','field':'acculturation.exact'},{'display':'Anthropometry','field':'anthropometry.exact'},{'display':'Assessment','field':'assessment.exact'},{'display':'Alcohol, Tobacco & Illicit Drug Use','field':'ATIDU.exact'},{'display':'Behavior, Diet & Nutrition','field':'BDN.exact'},{'display':'Housing Characteristics','field':'housingCharacteristics.exact'},{'display':'Occupation','field':'occupation.exact'},{'display':'Socioeconomic Status','field':'socioEconomicStatus.exact'}],
     paging: {
       size: 10
     },
@@ -77,14 +78,14 @@ jQuery(document).ready(function($) {
         ],
         [
           {
-            "pre" : "<b>Principal Investigator(s):</b>",
+            "pre" : "<b>Principal Investigator(s):</b> ",
             "field" : "PI",
             "post" : " "
           }
         ],
         [
           {
-            "pre" : "<b>Co-Investigator(s):</b>",
+            "pre" : "<b>Co-Investigator(s):</b> ",
             "field" : "CI",
             "post" : " "
           }
@@ -112,29 +113,36 @@ jQuery(document).ready(function($) {
         ],
         [
           {
-            "pre" : "<b>Alcohol, Tobacco & Illicit Drug Use: </b>",
+            "pre" : "<b>Alcohol, Tobacco & Illicit Drug Use:</b> ",
             "field" : "ATIDU",
             "post" : " "
           }
         ],
         [
           {
-            "pre" : "<b>Birth Outcomes: </b>",
+            "pre" : "<b>Birth Outcomes:</b> ",
             "field" : "birthOutcomes",
             "post" : " "
           }
         ],
         [
           {
-            "pre" : "<b>Demographics: </b>",
+            "pre" : "<b>Demographics:</b> ",
             "field" : "demographics",
             "post" : " "
           }
         ],
         [
           {
-            "pre" : "<b>Housing Characteristics: </b>",
+            "pre" : "<b>Housing Characteristics:</b> ",
             "field" : "housingCharacteristics",
+            "post" : " "
+          }
+        ],
+        [
+          {
+            "pre" : "<b>Prenatal Metals Exposure:</b> ",
+            "field" : "metals",
             "post" : " "
           }
         ]

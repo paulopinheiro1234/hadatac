@@ -178,7 +178,7 @@ public class Platform implements Comparable<Platform> {
 		ResultSetRewindable resultsrw = ResultSetFactory.copyResults(results);
 		qexec.close();
 		
-		if (resultsrw.size() == 1) {
+		if (resultsrw.size() >= 1) {
 			QuerySolution soln = resultsrw.next();
 			platform = new Platform();
 			platform.setLocalName(soln.getResource("platform").getLocalName());

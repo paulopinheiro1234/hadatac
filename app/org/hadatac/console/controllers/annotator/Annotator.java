@@ -3,6 +3,9 @@ package org.hadatac.console.controllers.annotator;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.hadatac.console.controllers.AuthApplication;
+import org.hadatac.console.controllers.triplestore.LoadKB;
+import org.hadatac.console.controllers.triplestore.UserManagement;
+import org.hadatac.console.http.DataAcquisitionSchemaQueries;
 import org.hadatac.console.http.DeploymentQueries;
 import org.hadatac.console.http.GetSparqlQuery;
 
@@ -11,27 +14,37 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.StringReader;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
+import java.util.Properties;
+import java.util.StringTokenizer;
 
 import org.hadatac.console.models.SparqlQuery;
 import org.hadatac.console.models.SparqlQueryResults;
 import org.hadatac.console.models.CSVAnnotationHandler;
 import org.hadatac.console.models.TripleDocument;
+import org.hadatac.console.models.User;
 
+import play.Play;
 import play.mvc.Controller;
 import play.mvc.Result;
 import play.mvc.Http.MultipartFormData;
+import play.mvc.Http.RequestBody;
 import play.mvc.Http.MultipartFormData.FilePart;
 
 import org.hadatac.console.views.html.error_page;
 import org.hadatac.console.views.html.annotator.*;
 import org.hadatac.data.api.DataFactory;
 import org.hadatac.entity.pojo.DataCollection;
+import org.hadatac.metadata.loader.ValueCellProcessing;
+import org.hadatac.utils.NameSpaces;
+import org.hadatac.utils.State;
 
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonMappingException;
@@ -113,7 +126,7 @@ public class Annotator extends Controller {
     		 *  Add deployment information into handler
     		 */
     		String json = DeploymentQueries.exec(DeploymentQueries.DEPLOYMENT_BY_URI, uri);
-    		//System.out.println(json);
+    		System.out.println(json);
     		SparqlQueryResults results = new SparqlQueryResults(json, false);
     		TripleDocument docDeployment = results.sparqlResults.values().iterator().next();
     		handler = new CSVAnnotationHandler(uri, docDeployment.get("platform"), docDeployment.get("instrument"));
@@ -129,9 +142,9 @@ public class Annotator extends Controller {
     		TripleDocument docChar;
     		while (it.hasNext()) {
     			docChar = (TripleDocument) it.next();
-    			if (docChar != null && docChar.get("ec") != null && docChar.get("ecName") != null) {
-    				deploymentChars.put((String)docChar.get("ec"),(String)docChar.get("ecName"));
-    				System.out.println("EC: " + docChar.get("ec") + "   ecName: " + docChar.get("ecName"));
+    			if (docChar != null && docChar.get("char") != null && docChar.get("charName") != null) {
+    				deploymentChars.put((String)docChar.get("char"),(String)docChar.get("charName"));
+    				System.out.println("EC: " + docChar.get("char") + "   ecName: " + docChar.get("charName"));
     			}
     		}
     		handler.setDeploymentCharacteristics(deploymentChars);
@@ -190,9 +203,9 @@ public class Annotator extends Controller {
     		TripleDocument docChar;
     		while (it.hasNext()) {
     			docChar = (TripleDocument) it.next();
-    			if (docChar != null && docChar.get("ec") != null && docChar.get("ecName") != null) {
-    				deploymentChars.put((String)docChar.get("ec"),(String)docChar.get("ecName"));
-    				System.out.println("EC: " + docChar.get("ec") + "   ecName: " + docChar.get("ecName"));
+    			if (docChar != null && docChar.get("char") != null && docChar.get("charName") != null) {
+    				deploymentChars.put((String)docChar.get("char"),(String)docChar.get("charName"));
+    				System.out.println("EC: " + docChar.get("char") + "   ecName: " + docChar.get("charName"));
     			}
     		}
     		handler.setDeploymentCharacteristics(deploymentChars);
@@ -207,13 +220,11 @@ public class Annotator extends Controller {
     		
     		//System.out.println("uploadCSV: dep_json is " + dep_json);
     		//System.out.println("uploadCSV: ec_json is " + ec_json);
-    	} else 
-    	{
+    	} else {
     		handler = new CSVAnnotationHandler(uri, "", "");
     	}
 
     	return ok(uploadCSV.render(handler, "init",""));
         
     }// /postIndex()
-    
 }

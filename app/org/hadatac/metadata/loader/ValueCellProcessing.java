@@ -32,26 +32,40 @@ public class ValueCellProcessing {
 	 *  the content is regarded to be an object set.
 	 */
 	boolean isObjectSet (String cellContent) {
-		
+
 		if (cellContent.startsWith("<") && (cellContent.endsWith(">"))){
 			cellContent = cellContent.replace("<", "").replace(">", "").replace("&", ", ");
 		}
-		 // we need to tokanize the string and verify that the first token is an URI
-	     StringTokenizer st = new StringTokenizer(cellContent,",");
-	     
-	     // the string needs to have at least two tokens
-	     String firstToken, secondToken;
-	     if (!st.hasMoreTokens()) {
-	    	 return false;
-	     }
-	     firstToken = st.nextToken().trim();
-	     if (!st.hasMoreTokens()) {
-	    	 return false;
-	     }
-	     secondToken = st.nextToken().trim();
-	     
-	     // the first token (we could also test the second) needs to be an URI
-	     return (isFullURI(firstToken) || isAbbreviatedURI(firstToken));
+		else if(cellContent.contains("&")){
+			boolean isValid = true;
+			StringTokenizer st = new StringTokenizer(cellContent, "&");
+			while (st.hasMoreTokens()) {
+				String token = st.nextToken().trim();
+				if(!isAbbreviatedURI(token)){
+					isValid = false;
+					break;
+				}
+			}
+			if(isValid){
+				cellContent = cellContent.replace("&", ", ");
+			}
+		}
+		// we need to tokanize the string and verify that the first token is an URI
+		StringTokenizer st = new StringTokenizer(cellContent, ",");
+
+		// the string needs to have at least two tokens
+		String firstToken, secondToken;
+		if (!st.hasMoreTokens()) {
+			return false;
+		}
+		firstToken = st.nextToken().trim();
+		if (!st.hasMoreTokens()) {
+			return false;
+		}
+		secondToken = st.nextToken().trim();
+
+		// the first token (we could also test the second) needs to be an URI
+		return (isFullURI(firstToken) || isAbbreviatedURI(firstToken));
 	}
 	
 	/* 
@@ -61,7 +75,7 @@ public class ValueCellProcessing {
 	 */
 	private String replaceNameSpace(String str) {
 		String resp = str;
-	    for (Map.Entry<String, NameSpace> entry : NameSpaces.table.entrySet()) {
+	    for (Map.Entry<String, NameSpace> entry : NameSpaces.getInstance().table.entrySet()) {
 	        String abbrev = entry.getKey().toString();
 	        String nsString = entry.getValue().getName();
 	        if (str.startsWith(nsString)) {
@@ -73,12 +87,26 @@ public class ValueCellProcessing {
 	    return "<" + str + ">";
 	}
 	
+	public String replaceNameSpaceEx(String str) {
+		String resp = str;
+	    for (Map.Entry<String, NameSpace> entry : NameSpaces.getInstance().table.entrySet()) {
+	        String abbrev = entry.getKey().toString();
+	        String nsString = entry.getValue().getName();
+	        if (str.startsWith(nsString)) {
+	        	System.out.println("REPLACE: " + resp + " / " + abbrev);
+	        	resp = str.replace(nsString, abbrev + ":");
+	        	return resp; 
+	        }
+	    }
+	    return str;
+	}
+	
 	/* 
 	 *  if the argument str starts with the abbreviation of one of the name spaces registered in NameSpaces.table, the
 	 *  abbreviation gets replaced by the name space's URI. Otherwise, the string is returned wrapper
 	 *  around angular brackets.
 	 */
-	private String replacePrefix(String str) {
+	public String replacePrefix(String str) {
 		String resp = str;
 	    for (Map.Entry<String, NameSpace> entry : NameSpaces.table.entrySet()) {
 	        String abbrev = entry.getKey().toString();
@@ -118,7 +146,7 @@ public class ValueCellProcessing {
 			return (subject + "\n");
 		}
 		// no indentation or semicolon at the end of the string
-		return (replaceNameSpace(subject) + "\n");	
+		return (replaceNameSpace(subject) + "\n");
 	}
 	
 	public String processObjectValue(String object) {
@@ -131,13 +159,11 @@ public class ValueCellProcessing {
 		// if full URI, either abbreviated it or print it between angled brackets
 		if (isFullURI(object)) {
 			// either replace namespace with acronym or add angled brackets
-			//System.out.print(replaceNameSpace(object));
 			return replaceNameSpace(object);
 		}
 		
 		// if not URI, print the object between quotes
 		object = object.replace("\n", " ").replace("\r", " ").replace("\"", "''");
-		//System.out.println("\"" + object + "\"");		
 		return "\"" + object + "\"";
 	}
 	

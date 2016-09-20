@@ -466,6 +466,9 @@ public class DataCollection {
 		dataCollection.setStartedAt(date.withZone(DateTimeZone.UTC).toString("EEE MMM dd HH:mm:ss zzz yyyy"));
 		date = new DateTime((Date)doc.getFieldValue("ended_at"));
 		dataCollection.setEndedAt(date.withZone(DateTimeZone.UTC).toString("EEE MMM dd HH:mm:ss zzz yyyy"));
+		if (doc.getFieldValues("schema_uri") != null) {
+			dataCollection.setSchemaUri(doc.getFieldValue("schema_uri").toString());
+		}
 		if (doc.getFieldValues("unit") != null) {
 			i = doc.getFieldValues("unit").iterator();
 			while (i.hasNext()) {
@@ -698,7 +701,7 @@ public class DataCollection {
 		ResultSet results = qexec.execSelect();
 		ResultSetRewindable resultsrw = ResultSetFactory.copyResults(results);
 		
-		if (resultsrw.size() == 1) {
+		if (resultsrw.size() >= 1) {
 			QuerySolution soln = resultsrw.next();
 			DataCollection dataCollection = new DataCollection();
 			dataCollection.setLocalName(soln.getResource("dc").getLocalName());
@@ -721,7 +724,7 @@ public class DataCollection {
 		results = qexec.execSelect();
 		resultsrw = ResultSetFactory.copyResults(results);
 		
-		if (resultsrw.size() == 1) {
+		if (resultsrw.size() >= 1) {
 			QuerySolution soln = resultsrw.next();
 			DataCollection dataCollection = new DataCollection();
 			dataCollection.setLocalName(soln.getResource("dc").getLocalName());
@@ -742,7 +745,7 @@ public class DataCollection {
 		results = qexec.execSelect();
 		resultsrw = ResultSetFactory.copyResults(results);
 		
-		if (resultsrw.size() == 1) {
+		if (resultsrw.size() >= 1) {
 			QuerySolution soln = resultsrw.next();
 			DataCollection dataCollection = new DataCollection();
 			dataCollection.setLocalName(soln.getResource("dc").getLocalName());

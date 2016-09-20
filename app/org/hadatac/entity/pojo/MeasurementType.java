@@ -102,16 +102,16 @@ public class MeasurementType {
 			measurementType = i.next();
 			measurementTypeKb = new MeasurementType();
 			measurementTypeComplete = true;
-			
+
 			String queryString = Sparql.prefix
-					+ "SELECT ?c ?c_label ?e ?e_label WHERE {\n"
-					+ "  <" + measurementType.getCharacteristicUri() + "> <http://hadatac.org/ont/hasneto#ofCharacteristic> ?c .\n"
-					+ "  OPTIONAL { ?c rdfs:label ?c_label . }\n"
-					+ "  <" + measurementType.getCharacteristicUri() + "> <http://hadatac.org/ont/hasneto#ofEntity> ?e .\n"
-					+ "  OPTIONAL { ?e rdfs:label ?e_label . }\n"
+					+ "SELECT ?dc ?c_label ?e_label WHERE {\n"
+					+ " ?dc " + "hasneto:hasAttribute" + " <" + measurementType.getCharacteristicUri() + "> .\n"
+					+ "  OPTIONAL { " + "<" + measurementType.getCharacteristicUri() + "> " + "rdfs:label ?c_label . }\n"
+					+ " ?dc " + "hasneto:hasEntity" + " <" + measurementType.getEntityUri() + "> .\n"
+					+ "  OPTIONAL { " + "<" + measurementType.getEntityUri() + "> " + "rdfs:label ?e_label . }\n"
 					+ "}";
 			
-			System.out.println(queryString);
+			//System.out.println(queryString);
 			
 			Query query = QueryFactory.create(queryString);
 			
@@ -124,25 +124,36 @@ public class MeasurementType {
 			measurementTypeKb.setValueColumn(measurementType.getValueColumn());
 			measurementTypeKb.setTimestampColumn(measurementType.getTimestampColumn());
 			
-			if (resultsrw.size() == 1) {
+			System.out.println("resultsrw.size(): " + resultsrw.size());
+			
+			if (resultsrw.size() >= 1) {
 				QuerySolution soln = resultsrw.next();
-				measurementTypeKb.setCharacteristicUri(soln.getResource("c").getURI());
-				if (soln.getLiteral("c_label") != null) { measurementTypeKb.setCharacteristicLabel(soln.getLiteral("c_label").getString()); }
-				else { measurementTypeKb.setCharacteristicLabel(soln.getResource("c").getLocalName()); }
-				measurementTypeKb.setEntityUri(soln.getResource("e").getURI());
-				if (soln.getLiteral("e_label") != null) { measurementTypeKb.setEntityLabel(soln.getLiteral("e_label").getString()); }
-				else { measurementTypeKb.setEntityLabel(soln.getResource("e").getLocalName()); }
+				measurementTypeKb.setCharacteristicUri(measurementType.getCharacteristicUri());
+				if (soln.getLiteral("c_label") != null) {
+					measurementTypeKb.setCharacteristicLabel(soln.getLiteral("c_label").getString()); 
+				}
+				else {
+					//measurementTypeKb.setCharacteristicLabel(soln.getResource("c").getLocalName());
+					measurementTypeKb.setCharacteristicLabel("non-label characteristic");
+				}
+				measurementTypeKb.setEntityUri(measurementType.getEntityUri());
+				if (soln.getLiteral("e_label") != null) {
+					measurementTypeKb.setEntityLabel(soln.getLiteral("e_label").getString()); 
+				}
+				else { 
+					//measurementTypeKb.setEntityLabel(soln.getResource("e").getLocalName());
+					measurementTypeKb.setEntityLabel("Subject");
+				}
 			} else {
 				measurementTypeComplete = false;
 			}
 			
 			queryString = Sparql.prefix
 					+ "SELECT ?u_label WHERE {\n"
-					+ "  <" + measurementType.getUnitUri() + "> a owl:Class .\n"
-					+ "  OPTIONAL { <" + measurementType.getUnitUri() + "> rdfs:label ?u_label . }\n"
+					+ "  <" + measurementType.getUnitUri() + "> rdfs:label ?u_label . \n"
 					+ "}";
 			
-			System.out.println(queryString);
+			//System.out.println(queryString);
 			
 			query = QueryFactory.create(queryString);
 			qexec = QueryExecutionFactory.sparqlService(hadatac.getStaticMetadataSparqlURL(), query);
@@ -150,7 +161,7 @@ public class MeasurementType {
 			resultsrw = ResultSetFactory.copyResults(results);
 			qexec.close();
 			
-			if (resultsrw.size() == 1) {
+			if (resultsrw.size() >= 1) {
 				QuerySolution soln = resultsrw.next();
 				measurementTypeKb.setUnitUri(measurementType.getUnitUri());
 				if (soln.getLiteral("u_label") != null) {
@@ -191,12 +202,13 @@ public class MeasurementType {
 		List<MeasurementType> list = new ArrayList<MeasurementType>();
 		
 		String queryString = Sparql.prefix
-				+ "SELECT ?mt ?column ?char ?unit ?tsColumn WHERE {\n"
+				+ "SELECT ?mt ?column ?ent ?char ?unit ?tsColumn WHERE {\n"
 				+ "  <" + dataset.getCcsvUri() + "> hadatac:hasMeasurementType ?mt .\n"
 				+ "  ?mt a hadatac:MeasurementType .\n"
 				+ "  ?mt hadatac:atColumn ?column .\n"
-				+ "  ?mt oboe:ofCharacteristic ?char .\n"
-				+ "  ?mt oboe:usesStandard ?unit .\n"
+				+ "  ?mt hasneto:hasEntity ?ent .\n"
+				+ "  ?mt hasneto:hasAttribute ?char .\n"
+				+ "  ?mt hasneto:hasUnit ?unit .\n"
 				+ "  OPTIONAL { ?mt time:inDateTime ?ts . }\n"
 				+ "  OPTIONAL { ?ts hadatac:atColumn ?tsColumn . }\n"
 				+ "}";
@@ -213,6 +225,7 @@ public class MeasurementType {
 			MeasurementType measurementType = new MeasurementType();
 			measurementType.setUri(soln.getResource("mt").getURI());
 			measurementType.setLocalName(soln.getResource("mt").getLocalName());
+			measurementType.setEntityUri(soln.getResource("ent").getURI());
 			measurementType.setCharacteristicUri(soln.getResource("char").getURI());
 			measurementType.setUnitUri(soln.getResource("unit").getURI());
 			measurementType.setValueColumn(soln.getLiteral("column").getInt());

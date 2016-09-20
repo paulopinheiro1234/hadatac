@@ -44,8 +44,8 @@ public class DeploymentQueries {
                     "   OPTIONAL { ?platformuri hasneto:hasSecondCoordinate ?hasSecondCoordinate . } " +
                     "   <" + uri + "> hasneto:hasInstrument ?instrumenturi .  " + 
                     "   ?instrumenturi rdfs:label ?instrument . " +
-                    "   <" + uri + "> hasneto:hasDetector ?detectoruri .  " + 
-                    "   ?detectoruri rdfs:label ?detector . " +
+                    "   OPTIONAL { <" + uri + "> hasneto:hasDetector ?detectoruri . } " + 
+                    "   OPTIONAL { ?detectoruri rdfs:label ?detector . } " +
                     "   <" + uri + "> prov:startedAtTime ?date .  " + 
                     "}";
                 break;
@@ -55,14 +55,24 @@ public class DeploymentQueries {
                     "PREFIX prov: <http://www.w3.org/ns/prov#>  " +
         	        "PREFIX vstoi: <http://hadatac.org/ont/vstoi#>  " +
         	        "PREFIX hasneto: <http://hadatac.org/ont/hasneto#>  " +
-                    "SELECT ?deturi ?detModel ?sp ?ec ?ecName WHERE { " + 
+                    "SELECT ?deturi ?detModel ?insturi ?instModel ?sp ?ent ?char ?charName WHERE { { " + 
                     "   <" + uri + "> a vstoi:Deployment . " + 
                     "   <" + uri + "> hasneto:hasDetector ?deturi .  " +
                     "   ?deturi a ?detModel . " +
                     "   ?sp vstoi:perspectiveOf ?detModel . " +
-                    "   ?sp hasneto:hasPerspectiveCharacteristic ?ec ." +
-                    "   ?ec rdfs:label ?ecName .  " + 
-                    "}";
+                    "   ?sp hasneto:hasPerspectiveEntity ?ent ." +
+                    "   ?sp hasneto:hasPerspectiveCharacteristic ?char . " +
+                    "   ?char rdfs:label ?charName .  " + 
+                    "} " + 
+                    "UNION { " + 
+                    "   <" + uri + "> a vstoi:Deployment . " + 
+                    "   <" + uri + "> hasneto:hasInstrument ?insturi .  " +
+                    "   ?insturi a ?instModel . " +
+                    "   ?sp vstoi:perspectiveOf ?instModel . " +
+                    "   ?sp hasneto:hasPerspectiveEntity ?ent ." +
+                    "   ?sp hasneto:hasPerspectiveCharacteristic ?char . " +
+                    "   ?char rdfs:label ?charName .  " + 
+                    "} }";
                 break;
             case DEPLOYMENT_CHARACTERISTICS : 
                 q = "PREFIX rdfs:<http://www.w3.org/2000/01/rdf-schema#>" + 

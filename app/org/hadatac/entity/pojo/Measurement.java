@@ -42,7 +42,7 @@ public class Measurement {
 	private String permissionUri;
 	private DateTime timestamp;
 	@Field("value")
-	private double value;
+	private String value;
 	@Field("unit")
 	private String unit;
 	@Field("unit_uri")
@@ -125,10 +125,10 @@ public class Measurement {
 		DateTimeFormatter formatter = ISODateTimeFormat.dateTimeNoMillis();
 		this.timestamp = formatter.parseDateTime(timestamp);
 	}
-	public double getValue() {
+	public String getValue() {
 		return value;
 	}
-	public void setValue(double value) {
+	public void setValue(String value) {
 		this.value = value;
 	}
 	public String getUnit() {
@@ -231,6 +231,7 @@ public class Measurement {
 				permission_query += "permission_uri:\"" + i.next() + "\"";
 			}
 		}
+		System.out.println(permission_query);
 		
 		if (handler != null) {
 			Iterator<String> i = handler.facetsAnd.keySet().iterator();
@@ -248,7 +249,8 @@ public class Measurement {
 			facet_query = "*:*";
 		}
 		
-		q =  "(" + permission_query + ") AND (" + facet_query + ")";
+		//q =  "(" + permission_query + ") AND (" + facet_query + ")";
+		q =  facet_query;
 		System.out.println("!!! QUERY: " + q);
 		query.setQuery(q);
 		query.setStart((page-1)*qtd);
@@ -262,8 +264,10 @@ public class Measurement {
 			QueryResponse queryResponse = solr.query(query);
 			solr.close();
 			SolrDocumentList results = queryResponse.getResults();
+			System.out.println("SolrDocumentList: " + results.size());
 			Iterator<SolrDocument> m = results.iterator();
 			while (m.hasNext()) {
+				System.out.println("Next");
 				result.documents.add(convertFromSolr(m.next()));
 			}
 			
@@ -297,6 +301,7 @@ public class Measurement {
 					result.pivot_facets.put(entry.getKey(), parents);
 					
 					List<PivotField> list = entry.getValue();
+					System.out.println("List<PivotField> size: " + list.size());
 					Iterator<PivotField> i_parents = list.iterator();
 					System.out.println("!!!!!!! PIVOT: " + entry.getKey());
 					while (i_parents.hasNext()) {
@@ -336,15 +341,28 @@ public class Measurement {
 	}
 	
 	public static Measurement convertFromSolr(SolrDocument doc) {
+		System.out.println("convertFromSolr is called");
+		
 		Measurement m = new Measurement();
 		DateTime date;
 		
 		m.setUri(doc.getFieldValue("uri").toString());
 		m.setOwnerUri(doc.getFieldValue("owner_uri").toString());
 		m.setPermissionUri(doc.getFieldValue("permission_uri").toString());
-		date = new DateTime((Date)doc.getFieldValue("timestamp"));
-		if (doc.getFieldValue("timestamp") !=null) { m.setTimestamp(date.withZone(DateTimeZone.UTC).toString("EEE MMM dd HH:mm:ss zzz yyyy")); }
-		m.setValue(Double.parseDouble(doc.getFieldValue("value").toString()));
+        date = new DateTime((Date)doc.getFieldValue("timestamp"));
+		if (doc.getFieldValue("timestamp") !=null) { 
+			//m.setTimestamp(doc.getFieldValue("timestamp").toString());
+		    m.setTimestamp(date.withZone(DateTimeZone.UTC).toString("EEE MMM dd HH:mm:ss zzz yyyy"));
+			System.out.println("timestamp != null");
+		}
+		//m.setValue(Double.parseDouble(doc.getFieldValue("value").toString()));
+		m.setValue(doc.getFieldValue("value").toString());
+		System.out.println(doc.getFieldValue("unit"));
+		System.out.println(doc.getFieldValue("entity"));
+		System.out.println(doc.getFieldValue("characteristic"));
+		System.out.println(doc.getFieldValue("unit_uri"));
+		System.out.println(doc.getFieldValue("entity_uri"));
+		System.out.println(doc.getFieldValue("characteristic_uri"));
 		m.setUnit(doc.getFieldValue("unit").toString());
 		m.setUnitUri(doc.getFieldValue("unit_uri").toString());
 		m.setEntity(doc.getFieldValue("entity").toString());
@@ -358,6 +376,7 @@ public class Measurement {
 		if (doc.getFieldValue("location") !=null) { m.setLocation(doc.getFieldValue("location").toString()); }
 		if (doc.getFieldValue("elevation") !=null) { m.setElevation(Double.parseDouble(doc.getFieldValue("elevation").toString())); }
 		m.setDatasetUri(doc.getFieldValue("dataset_uri").toString());
+		System.out.println("Finished convertFromSolr");
 		
 		return m;
 	}
