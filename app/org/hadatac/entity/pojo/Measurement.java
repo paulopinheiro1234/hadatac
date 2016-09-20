@@ -2,6 +2,7 @@ package org.hadatac.entity.pojo;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -336,11 +337,13 @@ public class Measurement {
 	
 	public static Measurement convertFromSolr(SolrDocument doc) {
 		Measurement m = new Measurement();
+		DateTime date;
 		
 		m.setUri(doc.getFieldValue("uri").toString());
 		m.setOwnerUri(doc.getFieldValue("owner_uri").toString());
 		m.setPermissionUri(doc.getFieldValue("permission_uri").toString());
-		if (doc.getFieldValue("timestamp") !=null) { m.setTimestamp(doc.getFieldValue("timestamp").toString()); }
+		date = new DateTime((Date)doc.getFieldValue("timestamp"));
+		if (doc.getFieldValue("timestamp") !=null) { m.setTimestamp(date.withZone(DateTimeZone.UTC).toString("EEE MMM dd HH:mm:ss zzz yyyy")); }
 		m.setValue(Double.parseDouble(doc.getFieldValue("value").toString()));
 		m.setUnit(doc.getFieldValue("unit").toString());
 		m.setUnitUri(doc.getFieldValue("unit_uri").toString());
