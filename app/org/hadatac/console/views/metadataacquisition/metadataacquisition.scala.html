@@ -30,21 +30,12 @@ jQuery(document).ready(function($) {
     search_index: 'solr',
     datatype: 'json',
     facets: [
-        {'field': 'acculturation', 'display': 'Acculturation'},
-        {'field': 'anthropometry', 'display': 'Anthropometry'},
-        {'field': 'assessment', 'display': 'Assessment'},
-        {'field': 'ATIDU', 'display': 'Alcohol, Tobacco & Illicit Drug Use'},
-        {'field': 'BDN', 'display': 'Behavior, Diet & Nutrition'},
-        {'field': 'birthOutcomes', 'display': 'Birth Outcomes'},
-        {'field': 'demographics', 'display': 'Demographics'},
-        {'field': 'housingCharacteristics', 'display' : 'Housing Characteristics'},
-        {'field': 'laboratory', 'display': 'Lab/Medical Test'},
-        {'field': 'metals', 'display': 'Prenatal Metals Exposure'},
-        {'field': 'occupation', 'display': 'Occupation'},
-        {'field': 'socioEconomicStatus', 'display': 'Socioeconomic Status'},
+        {'field': 'casehasScale', 'display': 'Scale'},
+        {'field': 'hascohasProject', 'display': 'Project'},
+        {'field': 'hascohasGrant', 'display': 'Grant'},
     ],
-    search_sortby: [{'display':'Name', 'field':'name.exact'},{'display':'Demographics','field':'demographics.exact'},{'display':'Lab/Medical Test','field':'laboratory.exact'},{'display':'Prenatal Metals Exposure','field':'metals.exact'},{'display':'Birth Outcomes','field':'birthOutcomes.exact'},{'display':'Acculturation','field':'acculturation.exact'},{'display':'Anthropometry','field':'anthropometry.exact'},{'display':'Assessment','field':'assessment.exact'},{'display':'Alcohol, Tobacco & Illicit Drug Use','field':'ATIDU.exact'},{'display':'Behavior, Diet & Nutrition','field':'BDN.exact'},{'display':'Housing Characteristics','field':'housingCharacteristics.exact'},{'display':'Occupation','field':'occupation.exact'},{'display':'Socioeconomic Status','field':'socioEconomicStatus.exact'}],
-    searchbox_fieldselect: [{'display':'Name', 'field':'name.exact'},{'display':'Demographics','field':'demographics.exact'},{'display':'Lab/Medical Test','field':'laboratory.exact'},{'display':'Prenatal Metals Exposure','field':'metals.exact'},{'display':'Birth Outcomes','field':'birthOutcomes.exact'},{'display':'Acculturation','field':'acculturation.exact'},{'display':'Anthropometry','field':'anthropometry.exact'},{'display':'Assessment','field':'assessment.exact'},{'display':'Alcohol, Tobacco & Illicit Drug Use','field':'ATIDU.exact'},{'display':'Behavior, Diet & Nutrition','field':'BDN.exact'},{'display':'Housing Characteristics','field':'housingCharacteristics.exact'},{'display':'Occupation','field':'occupation.exact'},{'display':'Socioeconomic Status','field':'socioEconomicStatus.exact'}],
+    search_sortby: [{'display':'URI','field':'uri.exact'}],
+    searchbox_fieldselect: [{'display':'URI', 'field':'uri.exact'}],
     paging: {
       size: 10
     },
@@ -55,95 +46,46 @@ jQuery(document).ready(function($) {
         [
           {
             "pre" : "<h3>",
-            "field" : "projectTitle",
+            "field" : "rdfslabel",
             "post" : " - "
           },
           {
             "pre" : "(",
-            "field" : "name",
+            "field" : "uri",
             "post" : ")</h3>"
           }
         ],
         [
           {
-            "pre" : "<b>Institution:</b> ",
-            "field" : "institution",
+            "pre" : "<b>Type:</b> ",
+            "field" : "a",
             "post" : ", "
           },
           {
-            "pre" : " ",
-            "field" : "location",
+            "pre" : "<b>Scale:</b> ",
+            "field" : "casehasScale",
             "post" : " "
           }
         ],
         [
           {
             "pre" : "<b>Principal Investigator(s):</b> ",
-            "field" : "PI",
+            "field" : "hascohasPI",
             "post" : " "
           }
         ],
         [
           {
-            "pre" : "<b>Co-Investigator(s):</b> ",
-            "field" : "CI",
-            "post" : " "
-          }
-        ],
-        [
-          {
-            "pre" : "<b>Number of Subjects:</b> ",
-            "field" : "numSubjects",
-            "post" : " "
-          }
-        ],
-        [
-          {
-            "pre" : "<b>Number of Samples:</b> ",
-            "field" : "numSamples",
+            "pre" : "<b>Grant(s):</b> ",
+            "field" : "hascohasGrant",
             "post" : " "
           }
         ],
         [
           {
             "pre" : "<p>",
-            "field" : "description",
+            "field" : "rdfscomment",
             "post" : "</p>"
-          }
-        ],
-        [
-          {
-            "pre" : "<b>Alcohol, Tobacco & Illicit Drug Use:</b> ",
-            "field" : "ATIDU",
-            "post" : " "
-          }
-        ],
-        [
-          {
-            "pre" : "<b>Birth Outcomes:</b> ",
-            "field" : "birthOutcomes",
-            "post" : " "
-          }
-        ],
-        [
-          {
-            "pre" : "<b>Demographics:</b> ",
-            "field" : "demographics",
-            "post" : " "
-          }
-        ],
-        [
-          {
-            "pre" : "<b>Housing Characteristics:</b> ",
-            "field" : "housingCharacteristics",
-            "post" : " "
-          }
-        ],
-        [
-          {
-            "pre" : "<b>Prenatal Metals Exposure:</b> ",
-            "field" : "metals",
-            "post" : " "
           }
         ]
     ],
