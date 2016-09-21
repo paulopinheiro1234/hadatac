@@ -96,8 +96,10 @@ public class AutoAnnotator extends Controller {
 	}
 	
 	@Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    public static void toggleAutoAnnotator() {
+    public static Result toggleAutoAnnotator(List<String> unproc_files, 
+    		                                 List<String> proc_files) {
 		System.out.println("Toggling...");
+		boolean bStarted = false;
 		
 		Properties prop = new Properties();
 		try {
@@ -112,10 +114,12 @@ public class AutoAnnotator extends Controller {
 		
 		if(prop.getProperty("auto").equals("on")){
 			prop.setProperty("auto", "off");
+			bStarted = false;
 			System.out.println("off");
 		}
 		else if(prop.getProperty("auto").equals("off")){
 			prop.setProperty("auto", "on");
+			bStarted = true;
 			System.out.println("on");
 		}
 		URL url = LoadKB.class.getClassLoader().getResource("autoccsv.config");
@@ -128,6 +132,8 @@ public class AutoAnnotator extends Controller {
 		} catch (URISyntaxException e) {
 			e.printStackTrace();
 		}
+		
+		return ok(auto_ccsv.render(unproc_files, proc_files, bStarted));
 	}
 	
 	public static void autoAnnotate() {

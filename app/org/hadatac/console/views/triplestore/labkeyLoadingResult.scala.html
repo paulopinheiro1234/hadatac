@@ -1,6 +1,7 @@
 @(labkeyLoginForm : org.hadatac.console.models.LabKeyLoginForm,
   folder_name : String,
   oper : String,
+  content : String,
   result : String)
 
 @import helper._
@@ -31,7 +32,7 @@
                 document.getElementById('end-process-box').style.display = 'inline';
              </script>
 
-             <a href="@org.hadatac.console.controllers.triplestore.routes.LoadKB.playLoadLabkeyLists(labkeyLoginForm, folder_name)" class="btn btn-warning" role="button">Back</a>
+             <a href="@org.hadatac.console.controllers.triplestore.routes.LoadKB.playLoadLabkeyLists(labkeyLoginForm, folder_name, content)" class="btn btn-warning" role="button">Back</a>
 
 	   </div>
 
