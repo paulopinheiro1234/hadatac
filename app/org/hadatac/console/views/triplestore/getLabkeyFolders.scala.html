@@ -1,5 +1,6 @@
 @(labkeyLoginForm : org.hadatac.console.models.LabKeyLoginForm,
-  results : List[String])
+  results : List[String],
+  content : String)
 
 @import helper._
 @import org.hadatac.console.views.html._
@@ -19,12 +20,12 @@
             </thead>
             <tbody>
               @for(folder_name <- results){
-                  @labkeyFolder_entry(labkeyLoginForm, folder_name)
+                  @labkeyFolder_entry(labkeyLoginForm, folder_name, content)
               }
             </tbody>
         </table>
  
-        <a href="@org.hadatac.console.controllers.triplestore.routes.LoadKB.loadLabkeyKB("init")" class="btn btn-warning" role="button">Back</a>
+        <a href="@org.hadatac.console.controllers.triplestore.routes.LoadKB.loadLabkeyKB("init", content)" class="btn btn-warning" role="button">Back</a>
 
     </div>
 }
