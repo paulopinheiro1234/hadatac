@@ -38,31 +38,31 @@ import be.objectify.deadbolt.java.actions.Restrict;
 
 public class ViewSubject extends Controller {
 	
-	public static Map<String, String> find(String subject_uri) {
+	public static Map<String, String> findBasic(String subject_uri) {
 
-		String queryString = "";
+		String basicQueryString = "";
 
-    	queryString = 
+		basicQueryString = 
     	
     	"PREFIX prov: <http://www.w3.org/ns/prov#> "
         + " PREFIX chear-kb: <http://hadatac.org/kb/chear#> "
         + "SELECT * "
-        + "WHERE { <http://hadatac.org/kb/chear#SBJ-0001-Pilot-1> ?p ?o }";
+        + "WHERE  {	" + subject_uri + " ?p ?o }";
+    	
+    	
         
-		Query query = QueryFactory.create(queryString);
+		Query basicQuery = QueryFactory.create(basicQueryString);
 		
-		System.out.println(queryString);
-		
-		QueryExecution qexec = QueryExecutionFactory.sparqlService(Collections.getCollectionsName(Collections.METADATA_SPARQL), query);
+		QueryExecution qexec = QueryExecutionFactory.sparqlService(Collections.getCollectionsName(Collections.METADATA_SPARQL), basicQuery);
 		ResultSet results = qexec.execSelect();
 		ResultSetRewindable resultsrw = ResultSetFactory.copyResults(results);
 		qexec.close();
 		
 		Map<String, String> poResult = new HashMap<String, String>();
-		
+		System.out.println("HERE IS THE RAW resultsrw*********" + resultsrw);
 		while (resultsrw.hasNext()) {
 			QuerySolution soln = resultsrw.next();
-//			System.out.println("HERE IS THE RAW SOLN*********" + soln.toString());
+			System.out.println("HERE IS THE RAW SOLN*********" + soln.toString());
 			poResult.put(soln.get("p").toString(), soln.get("o").toString());
 //			System.out.println("THIS IS SUBROW*********" + poResult);
 
@@ -70,15 +70,44 @@ public class ViewSubject extends Controller {
 		return poResult;
 	}
 	
+	public static List<String> findSample(String subject_uri) {
+
+		String sampleQueryString = "";
+		
+    	sampleQueryString = 
+    	    	
+    	"PREFIX prov: <http://www.w3.org/ns/prov#> "
+        + " PREFIX chear-kb: <http://hadatac.org/kb/chear#> "
+        + "SELECT * "
+        + "WHERE { ?s <http://hadatac.org/ont/hasco/isSampleOf> " + subject_uri + " }";
+        
+		Query sampleQuery = QueryFactory.create(sampleQueryString);
+		
+		QueryExecution qexec = QueryExecutionFactory.sparqlService(Collections.getCollectionsName(Collections.METADATA_SPARQL), sampleQuery);
+		ResultSet results = qexec.execSelect();
+		ResultSetRewindable resultsrw = ResultSetFactory.copyResults(results);
+		qexec.close();
+		
+		List<String> sampleResult = new ArrayList<String>();
+		
+		while (resultsrw.hasNext()) {
+			QuerySolution soln = resultsrw.next();
+			System.out.println("HERE IS THE SAMPLES*********" + soln.toString());
+			sampleResult.add(soln.get("s").toString());
+//			System.out.println("THIS IS SUBROW*********" + poResult);
+
+		}
+		return sampleResult;
+	}
+	
 	// for /metadata HTTP GET requests
 	@Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
     public static Result index(String subject_uri) {
 
-    	Subject subject = null;
-
-    	Map<String, String> poResult = find(subject_uri);
+    	Map<String, String> poResult = findBasic(subject_uri);
+    	List<String> sampleResult = findSample(subject_uri);
         
-    	return ok(viewSubject.render(poResult));
+    	return ok(viewSubject.render(poResult,sampleResult));
     
         
     }// /index()
