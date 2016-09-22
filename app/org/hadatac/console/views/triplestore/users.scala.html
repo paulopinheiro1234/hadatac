@@ -1,4 +1,7 @@
-@(oper: String, message : String, users: List[org.hadatac.entity.pojo.User])
+@(oper: String, 
+  message : String, 
+  users: List[org.hadatac.entity.pojo.User],
+  source: String)
 
 @import helper._
 @import org.hadatac.console.views.html._
@@ -54,7 +57,6 @@
                       <a href="@org.hadatac.console.controllers.triplestore.routes.UserNetwork.index()" class="btn btn-block btn-primary" role="button">User Network</a>
                  </div>
  	        </div>
-
        }
 
         <p  style='font-family: "Lucida Console", Monaco, monospace;' id='msgarea'></p>
@@ -66,7 +68,7 @@
 
      	@if(oper=="loaded") {
             <script> 
-                var msg = "@UserManagement.commitPreRegistration()";
+                var msg = "@UserManagement.commitPreRegistration(source)";
                 $('#msgarea').html(msg.replace(/&lt;br&gt;/g, '<br>'));
                 document.getElementById('end-process-box').style.display = 'inline';
             </script> 

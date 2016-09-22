@@ -33,7 +33,7 @@
 
   <div class="container">
 
-    <form class="form-horizontal" name="newUser" method="post" action="@org.hadatac.console.controllers.deployments.routes.NewDeployment.processForm">
+    <form class="form-horizontal" name="newUser" method="post" action="@org.hadatac.console.controllers.triplestore.routes.UserManagement.submitPreRegistrationForm()">
   		<div class="form-group">
   			<label for="usr_uri">User URI:*</label>
  			<input type="text" class="form-control" name="usr_uri" id="usr_uri" onchange="checkform()" >
@@ -74,6 +74,4 @@
      	</div>
    	</form>    
   </div>
-
-
 }

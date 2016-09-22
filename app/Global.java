@@ -1,7 +1,12 @@
+import java.io.File;
 import java.util.Arrays;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.concurrent.TimeUnit;
 
-import org.hadatac.console.models.SecurityRole;
 import org.hadatac.console.controllers.annotator.AutoAnnotator;
+import org.hadatac.console.models.SecurityRole;
+import org.hadatac.utils.Repository;
 
 import com.feth.play.module.pa.PlayAuthenticate;
 import com.feth.play.module.pa.PlayAuthenticate.Resolver;
@@ -10,12 +15,9 @@ import com.feth.play.module.pa.exceptions.AuthException;
 
 import play.Application;
 import play.GlobalSettings;
-import play.mvc.Call;
-import org.hadatac.utils.Repository;
 import play.libs.Akka;
+import play.mvc.Call;
 import scala.concurrent.duration.FiniteDuration;
-import java.util.concurrent.TimeUnit;
-import java.util.Date;
 
 public class Global extends GlobalSettings {
 
@@ -83,6 +85,7 @@ public class Global extends GlobalSettings {
 
         // check existence/availability of security role
 		initialData();
+		initDirectoryStructure();
 		
 		// check if default user still have default password. If so, ask to change.
 		// TODO: implement this code
@@ -120,6 +123,32 @@ public class Global extends GlobalSettings {
 			}
 		}
 	}
+	
+	private void initDirectoryStructure(){
+		List<String> listFolderPaths = new LinkedList<String>();
+		listFolderPaths.add("tmp");
+		listFolderPaths.add("logs");
+		listFolderPaths.add("processed_csv");
+		listFolderPaths.add("unprocessed_csv");
+		listFolderPaths.add("tmp/ttl");
+		listFolderPaths.add("tmp/cache");
+		listFolderPaths.add("tmp/uploads");
+    	
+		for(String path : listFolderPaths){
+			File folder = new File(path);
+			// if the directory does not exist, create it
+	    	if (!folder.exists()) {
+	    	    System.out.println("creating directory: " + path);
+	    	    try{
+	    	    	folder.mkdir();
+	    	    } 
+	    	    catch(SecurityException se){
+	    	    	System.out.println("Failed to create directory.");
+	    	    }
+	    	    System.out.println("DIR created");
+	    	}
+		}
+	}
 
 	private void solrFirstVerification() {
 		if (!Repository.operational(Repository.DATA)) {
@@ -133,5 +162,4 @@ public class Global extends GlobalSettings {
 			System.out.println("A startup command has been issue to epository " + Repository.METADATA + ".");
 		}
 	}
-
 }

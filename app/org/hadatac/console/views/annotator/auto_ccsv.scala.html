@@ -10,27 +10,12 @@
 
 @main("Automatic CCSV Generation") {
 	
-	<script type="text/javascript">
-        function start() {
-        	var msg = "@org.hadatac.console.controllers.annotator.AutoAnnotator.toggleAutoAnnotator()";
-            alert("Auto-Annotator has been started");
-            document.getElementById("start").disabled = true;
-        	document.getElementById("stop").disabled = false;
-	    }
-        function stop() {
-        	var msg = "@org.hadatac.console.controllers.annotator.AutoAnnotator.toggleAutoAnnotator()";
-            alert("Auto-Annotator has been stopped");
-            document.getElementById("start").disabled = false;
-        	document.getElementById("stop").disabled = true;
-	    }
-     </script>
-	
 	@if(bStarted){
-		<button type="button" class="btn btn-primary" disabled=true id="start" onclick="start()">Start Auto-Annotator</button>
-		<button type="button" class="btn btn-primary" id="stop" onclick="stop()">Stop Auto-Annotator</button>
+		<a href="@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.toggleAutoAnnotator(unprocessedFiles, processedFiles)" class="btn btn-primary disabled" role="button">Start Auto-Annotator</a>
+		<a href="@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.toggleAutoAnnotator(unprocessedFiles, processedFiles)" class="btn btn-primary" role="button">Stop Auto-Annotator</a>
 	}else{
-		<button type="button" class="btn btn-primary" id="start" onclick="start()">Start Auto-Annotator</button>
-		<button type="button" class="btn btn-primary" disabled=true id="stop" onclick="stop()">Stop Auto-Annotator</button>
+		<a href="@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.toggleAutoAnnotator(unprocessedFiles, processedFiles)" class="btn btn-primary" role="button">Start Auto-Annotator</a>
+		<a href="@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.toggleAutoAnnotator(unprocessedFiles, processedFiles)" class="btn btn-primary disabled" role="button">Stop Auto-Annotator</a>		
 	}
 	
 	<div class="container-fluid">

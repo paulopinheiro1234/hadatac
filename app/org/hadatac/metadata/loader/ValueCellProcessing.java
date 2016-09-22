@@ -214,5 +214,31 @@ public class ValueCellProcessing {
 				
 		return clttl;
 	}
+	
+	public String execCellValue(String cellValue, String predicate) {
+		String clttl = "";
 
+		// cell has subject value
+		if (predicate.equals("hasURI")) {
+			clttl = clttl + processSubjectValue(cellValue);
+			return clttl;
+		}
+		
+		// cell has object value
+		clttl = clttl + "   " + predicate + " ";
+		if (isObjectSet(cellValue)) {
+		     StringTokenizer st = new StringTokenizer(cellValue,",");
+		     while (st.hasMoreTokens()) {
+		         clttl = clttl + processObjectValue(st.nextToken().trim());
+		         if (st.hasMoreTokens()) {
+		        	 clttl = clttl + ", ";
+		         }
+		     }
+		} else {
+			clttl = clttl + processObjectValue(cellValue);
+		}
+		clttl = clttl + ";\n";
+				
+		return clttl;
+	}
 }

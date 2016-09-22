@@ -29,6 +29,7 @@ import org.apache.jena.update.UpdateExecutionFactory;
 import org.apache.jena.update.UpdateFactory;
 import org.apache.jena.update.UpdateProcessor;
 import org.apache.jena.update.UpdateRequest;
+import org.hadatac.console.views.html.deployments.newDeployment;
 import org.hadatac.data.loader.util.Sparql;
 import org.hadatac.utils.Collections;
 import org.hadatac.utils.NameSpaces;
@@ -70,6 +71,7 @@ public class User implements Comparable<User> {
 	}
 
 	public void setName(String name) {
+		System.out.println("setName: " + name);
 		this.name = name;
 	}
 
@@ -234,8 +236,17 @@ public class User implements Comparable<User> {
 				user.setLabel(object.asLiteral().getString());
 				System.out.println("label: " + object.asLiteral().getString());
 		    } else if (statement.getPredicate().getURI().equals("http://xmlns.com/foaf/0.1/member")) {
-			    user.immediateGroup = User.find(object.asResource().getURI());
-			} //else if (statement.getPredicate().getURI().equals("")) {
+		    	User group = new User();
+		    	group.setUri(object.asResource().getURI());
+			    user.setImmediateGroup(group);
+			} else if (statement.getPredicate().getURI().equals("http://xmlns.com/foaf/0.1/name")) {
+				user.setName(object.asLiteral().getString());
+				System.out.println("name: " + object.asLiteral().getString());
+			} else if (statement.getPredicate().getURI().equals("http://xmlns.com/foaf/0.1/mbox")) {
+				user.setEmail(object.asLiteral().getString());
+				System.out.println("mbox: " + object.asLiteral().getString());
+			}
+			//else if (statement.getPredicate().getURI().equals("")) {
 				//if (object.asLiteral().getString().equals("true")) {
 				  //  user.setAdministrator(true);
 				//} else {
@@ -258,10 +269,7 @@ public class User implements Comparable<User> {
 			} else if (statement.getPredicate().getURI().equals("http://xmlns.com/foaf/0.1/mbox")) {
 				user.setEmail(object.asLiteral().getString());
 				System.out.println("mbox: " + object.asLiteral().getString());
-			} //else if (statement.getPredicate().getURI().equals("http://xmlns.com/foaf/0.1/homepage")) {
-				//user.setHomepage(object.asLiteral().getString());
-				//System.out.println("homepage: " + object.asLiteral().getString());
-			//}
+			}
 		}
 		
 		return user;
@@ -269,7 +277,7 @@ public class User implements Comparable<User> {
 	
 	@Override
     public int compareTo(User another) {
-        return this.getName().compareTo(another.getName());
+        //return this.getName().compareTo(another.getName());
+		return this.getUri().compareTo(another.getUri());
     }
-	
 }
