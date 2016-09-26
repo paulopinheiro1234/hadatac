@@ -1336,7 +1336,7 @@ search box - the end user will not know they are happening.
                 query = "*:*";
             }
             theurl += options.query_parameter + '=' + query;
-            document.getElementById("btn_download").href=document.getElementById("download_url").textContent+'?'+theurl.replace("wt=json","wt=csv");
+            document.getElementById("btn_download").href=document.getElementById("download_url").textContent+'?'+theurl.replace("wt=json","wt=csv").replace(/rows=\d+&start=\d+&/,'');
             return theurl;
 	};
         // execute a search
