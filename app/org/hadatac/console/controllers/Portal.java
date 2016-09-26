@@ -8,17 +8,14 @@ public class Portal extends Controller {
 	
 	// for /metadata HTTP GET requests
     public static Result index() {
-
-       return ok(portal.render());
-        
+    	System.out.println("Portal.index() is called");
+    	return ok(portal.render()); 
     }// /index()
 
 
     // for /metadata HTTP POST requests
     public static Result postIndex() {
-        
-        return ok(portal.render());
-        
+    	return ok(portal.render());
     }// /postIndex()
 
 }
