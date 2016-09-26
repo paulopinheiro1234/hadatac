@@ -31,9 +31,10 @@ jQuery(document).ready(function($) {
     datatype: 'json',
     facets: [
         {'field': 'hasnetopartOfSchema', 'display': 'Schema'},
-        {'field': 'hascoisAttributeReferenceOf', 'display': 'Attribute of'},
-        {'field': 'hascohasReference', 'display': 'Entity'},
+        {'field': 'hasnetohasAttribute', 'display': 'Attribute'},
+        {'field': 'hasnetohasEntity', 'display': 'Entity'},
         {'field': 'hascohasSource', 'display': 'Source'},
+        {'field': 'hasnetohasUnit', 'display': 'Unit'},
         {'field': 'hascoisPIConfirmed', 'display': 'PI Confirmed'},
     ],
     search_sortby: [{'display':'Name', 'field':'name.exact'},{'display':'Data Acquisition Of', 'field':'isDataAcquisitionOf.exact'}],
@@ -53,7 +54,7 @@ jQuery(document).ready(function($) {
           },
           {
             "pre" : " ",
-            "field" : "hascoisAttributeReferenceOf",
+            "field" : "hasnetohasAttribute",
             "post" : "</h2> "
           },
           {
@@ -81,8 +82,8 @@ jQuery(document).ready(function($) {
         ],
         [
           {
-            "pre" : "<b>Attribute of:</b> ",
-            "field" : "hascoisAttributeReferenceOf",
+            "pre" : "<b>Attribute:</b> ",
+            "field" : "hasnetohasAttribute",
             "post" : " "
           }
         ],
