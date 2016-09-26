@@ -26,8 +26,9 @@
 		  <!-- Load d3.js and c3.js -->
 		<script type="text/javascript" src="@controllers.routes.Assets.versioned("javascripts/vendor/d3-3.5.6/d3.min.js")"></script>
 		<script type="text/javascript" src="@controllers.routes.Assets.versioned("javascripts/vendor/c3-0.4.10/c3.min.js")"></script>	
+
 				
-  <script type="text/javascript">
+	<script type="text/javascript">
 jQuery(document).ready(function($) {
   $('.facet-view-simple').each(function() {
   $(this).facetview({
@@ -53,25 +54,12 @@ jQuery(document).ready(function($) {
             "post" : "</h3>"
           }
         ],
+        
         [
           {
-            "pre" : "<b>",
-            "field" : "rdfslabel",
-            "post" : "</b>"
-          }
-        ],
-        [
-          {
-              "pre" : "<b>",
+              "pre" : "<a href=\"./viewSubject?subject_uri=",
               "field" : "hasURI",
-              "post" : "</b>"
-          }
-        ],
-        [
-          {
-            "pre" : "<b>rdfs:type - </b>",
-            "field" : "a",
-            "post" : " "
+              "post" : "\">"
           }
         ]
     ],
@@ -80,7 +68,10 @@ jQuery(document).ready(function($) {
   });
   });
 });
-  </script>
+
+	</script>
+  
+
 	<hr>  
     <div class="container-fluid">
     <div class="page-header">
@@ -103,5 +94,6 @@ The long-term goal of this research is to improve non-invasive methods to assess
     <div class="content">
    	  <h2> Subjects </h2>
 	  <div class="facet-view-simple"></div>
+	  
    </div>
 }
