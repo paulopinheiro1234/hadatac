@@ -1337,8 +1337,9 @@ search box - the end user will not know they are happening.
             }
             theurl += options.query_parameter + '=' + query;
             // -- ADDED for download functionality
-            if (document.getElementById("btn_download") != null) {
-            	document.getElementById("btn_download").href=document.getElementById("download_url").textContent+'?'+theurl.replace("wt=json","wt=csv").replace(/rows=\d+&start=\d+&/,'');
+            var btn = document.getElementById("btn_download");
+            if (btn != null) {
+            	btn.href=document.getElementById("download_url").textContent+'?'+theurl.replace("wt=json","wt=csv").replace(/rows=\d+&start=\d+&/,'');
             }
             //---
             return theurl;
