@@ -28,6 +28,15 @@ public class SolrSearchProxy extends Controller {
 	}
 	
 	@Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
+    public static Result getStudyAcquisitionDownload(){
+        String path = Collections.getCollectionsName(Collections.STUDY_ACQUISITION) + 
+                request().toString().split((request().path()))[1];
+        System.out.println(path);
+        response().setContentType("text/csv");
+        return getSolrSearch(path);
+    }
+	
+	@Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
 	public static Result getStudyAcquisition(){
 		String path = Collections.getCollectionsName(Collections.STUDY_ACQUISITION) + 
 				request().toString().split((request().path()))[1];

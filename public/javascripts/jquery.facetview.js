@@ -1336,6 +1336,12 @@ search box - the end user will not know they are happening.
                 query = "*:*";
             }
             theurl += options.query_parameter + '=' + query;
+            // -- ADDED for download functionality
+            var btn = document.getElementById("btn_download");
+            if (btn != null) {
+            	btn.href=document.getElementById("download_url").textContent+'?'+theurl.replace("wt=json","wt=csv").replace(/rows=\d+&start=\d+&/,'');
+            }
+            //---
             return theurl;
 	};
         // execute a search
