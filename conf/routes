@@ -225,7 +225,7 @@ POST    /hadatac/perm/onlinepreregister            org.hadatac.console.controlle
 GET     /hadatac/perm/preregister                  org.hadatac.console.controllers.triplestore.UserManagement.preRegistration(oper: String)
 POST    /hadatac/perm/preregister                  org.hadatac.console.controllers.triplestore.UserManagement.postPreRegistration(oper: String)
 POST    /hadatac/perm/preregister/upload           org.hadatac.console.controllers.triplestore.UserManagement.uploadFile()
-POST    /hadatac/perm/preregister/uploadform       org.hadatac.console.controllers.triplestore.UserManagement.submitPreRegistrationForm()
+POST    /hadatac/perm/preregister/uploadform       org.hadatac.console.controllers.triplestore.UserManagement.submitPreRegistrationForm(oper: String)
 GET	    /hadatac/perm/userNetwork			       org.hadatac.console.controllers.triplestore.UserNetwork.index()
 POST	/hadatac/perm/userNetwork			       org.hadatac.console.controllers.triplestore.UserNetwork.postIndex()
 GET	    /hadatac/perm/admin		        	       org.hadatac.console.controllers.triplestore.ChangePermission.index(user_uri: String)

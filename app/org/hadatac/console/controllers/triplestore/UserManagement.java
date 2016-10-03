@@ -12,6 +12,8 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.annotation.Generated;
+
 import play.*;
 import play.data.Form;
 import play.mvc.*;
@@ -26,11 +28,13 @@ import org.apache.jena.riot.RDFDataMgr;
 import org.hadatac.console.controllers.AuthApplication;
 import org.hadatac.console.http.PermissionQueries;
 import org.hadatac.console.models.UserPreRegistrationForm;
+import org.hadatac.console.models.GroupRegistrationForm;
 import org.hadatac.console.models.SparqlQueryResults;
 import org.hadatac.console.models.TripleDocument;
 import org.hadatac.console.views.html.triplestore.*;
 import org.hadatac.entity.pojo.User;
 import org.hadatac.metadata.loader.PermissionsContext;
+import org.hadatac.metadata.loader.RDFContext;
 import org.hadatac.metadata.loader.SpreadsheetProcessing;
 import org.hadatac.metadata.loader.ValueCellProcessing;
 import org.hadatac.utils.Feedback;
@@ -64,12 +68,22 @@ public class UserManagement extends Controller {
 	}
 	
 	@Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
-	public static Result submitPreRegistrationForm() {
-		return ok(users.render("loaded", "", User.find(), "form"));
+	public static Result onLineGroupRegistration(String oper) {
+		return ok(preregisterGroup.render(oper));
 	}
 	
 	@Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
-	public static String commitPreRegistration(String source) {
+	public static Result postOnLineGroupRegistration(String oper) {
+		return ok(preregisterGroup.render(oper));
+	}
+	
+	@Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
+	public static Result submitPreRegistrationForm(String oper) {
+		return ok(users.render(oper, "", User.find(), "form"));
+	}
+	
+	@Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
+	public static String commitUserPreRegistration(String source) {
 		System.out.println("Adding pre-registered user...");
 		int mode = Feedback.WEB;
 		String oper = "load";
@@ -95,7 +109,6 @@ public class UserManagement extends Controller {
 		    String org_uri = data.getOrgUri();
 		    
 		    Map<String, String> pred_value_map = new HashMap<String, String>();
-			ValueCellProcessing cellProc = new ValueCellProcessing();
 			pred_value_map.put("a", "foaf:Person, prov:Person");
 			pred_value_map.put("foaf:name", given_name + " " + family_name);
 			pred_value_map.put("foaf:familyName", family_name);
@@ -104,73 +117,118 @@ public class UserManagement extends Controller {
 			pred_value_map.put("foaf:mbox", email);
 			pred_value_map.put("foaf:homepage", homepage);
 			pred_value_map.put("foaf:member", org_uri);
+			
+			message = generateTTL(mode, oper, rdf, usr_uri, pred_value_map);
+		}
+		return message;
+	}
+	
+	@Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
+	public static String commitGroupRegistration(String source) {
+		System.out.println("Adding registered group...");
+		int mode = Feedback.WEB;
+		String oper = "load";
+		String message = "";
+		PermissionsContext rdf = new PermissionsContext(
+						"user", 
+						"password", 
+						Play.application().configuration().getString("hadatac.solr.permissions"), 
+						false);
 		
-			message += Feedback.println(mode, "   Triples before [preregistration]: " + rdf.totalTriples());
-			message += Feedback.println(mode, " ");
+		if(source.equals("batch")){
+			message = SpreadsheetProcessing.generateTTL(mode, oper, rdf, UPLOAD_NAME);
+		}
+		else if(source.equals("form")){
+			Form<GroupRegistrationForm> form = Form.form(GroupRegistrationForm.class).bindFromRequest();
+			GroupRegistrationForm data = form.get();
+			String group_uri = data.getGroupUri();
+		    String group_name = data.getGroupName();
+		    String comment = data.getComment();
+		    String homepage = data.getHomepage();
+		    String org_uri = data.getOrgUri();
+		    
+		    Map<String, String> pred_value_map = new HashMap<String, String>();
+			pred_value_map.put("a", "prov:Organization");
+			pred_value_map.put("foaf:name", group_name);
+			pred_value_map.put("rdfs:comment", comment);
+			pred_value_map.put("foaf:homepage", homepage);
+			pred_value_map.put("foaf:member", org_uri);
 			
-			String ttl = "";
-			NameSpaces ns = NameSpaces.getInstance();
-			ttl = ttl + ns.printNameSpaceList();
-			
-			ttl = ttl + "# properties: ";
-			for(String key : pred_value_map.keySet()){
-				ttl = ttl + "[" + key + "] ";
-			}
-			ttl = ttl + "\n\n";
-			
-			cellProc.validateNameSpace("hasURI");
-			ttl = ttl + cellProc.execCellValue(usr_uri, "hasURI");
-			for(String key : pred_value_map.keySet()){
-				String value = pred_value_map.get(key);
-				cellProc.validateNameSpace(key);
-				ttl = ttl + cellProc.execCellValue(value, key);
-				ttl = ttl + "\n";
-			}
-			System.out.println(ttl);
-			
-			String fileName = "";
-			try {
-				String timeStamp = new SimpleDateFormat("yyyyMMdd-HHmmss").format(new Date());
-				fileName = SpreadsheetProcessing.TTL_DIR + "HASNetO-" + timeStamp + ".ttl";
-				FileUtils.writeStringToFile(new File(fileName), ttl);
-			} catch (IOException e) {
-				message += e.getMessage();
-				return message;
-			}
-			
-			String listing = "";
-			try {
-				listing = URLEncoder.encode(SpreadsheetProcessing.printFileWithLineNumber(mode, fileName), "UTF-8");
-			} catch (UnsupportedEncodingException e1) {
-				e1.printStackTrace();
-			};
+			message = generateTTL(mode, oper, rdf, group_uri, pred_value_map);
+		}
+		return message;
+	}
+	
+	@Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
+	public static String generateTTL(int mode, String oper, RDFContext rdf, 
+			                  String uri, Map<String, String> pred_value_map){
+		String message = "";
+		message += Feedback.println(mode, "   Triples before [preregistration]: " + rdf.totalTriples());
+		message += Feedback.println(mode, " ");
+		
+		String ttl = "";
+		NameSpaces ns = NameSpaces.getInstance();
+		ttl = ttl + ns.printNameSpaceList();
+		
+		ttl = ttl + "# properties: ";
+		for(String key : pred_value_map.keySet()){
+			ttl = ttl + "[" + key + "] ";
+		}
+		ttl = ttl + "\n\n";
+		
+		ValueCellProcessing cellProc = new ValueCellProcessing();
+		cellProc.validateNameSpace("hasURI");
+		ttl = ttl + cellProc.execCellValue(uri, "hasURI");
+		for(String key : pred_value_map.keySet()){
+			String value = pred_value_map.get(key);
+			cellProc.validateNameSpace(key);
+			ttl = ttl + cellProc.execCellValue(value, key);
+			ttl = ttl + "\n";
+		}
+		System.out.println(ttl);
+		
+		String fileName = "";
+		try {
+			String timeStamp = new SimpleDateFormat("yyyyMMdd-HHmmss").format(new Date());
+			fileName = SpreadsheetProcessing.TTL_DIR + "HASNetO-" + timeStamp + ".ttl";
+			FileUtils.writeStringToFile(new File(fileName), ttl);
+		} catch (IOException e) {
+			message += e.getMessage();
+			return message;
+		}
+		
+		String listing = "";
+		try {
+			listing = URLEncoder.encode(SpreadsheetProcessing.printFileWithLineNumber(mode, fileName), "UTF-8");
+		} catch (UnsupportedEncodingException e1) {
+			e1.printStackTrace();
+		}
 
+		message += Feedback.println(mode, " ");
+		message += Feedback.println(mode, "   Generated " + fileName + " and stored locally.");
+		try {
+			Model model = RDFDataMgr.loadModel(fileName);
 			message += Feedback.println(mode, " ");
-			message += Feedback.println(mode, "   Generated " + fileName + " and stored locally.");
-			try {
-				Model model = RDFDataMgr.loadModel(fileName);
-				message += Feedback.println(mode, " ");
-				message += Feedback.print(mode, "SUCCESS parsing the document!");
-				message += Feedback.println(mode, " ");
-			} catch (Exception e) {
-				message += Feedback.println(mode, " ");
-				message += Feedback.print(mode, "ERROR parsing the document!");
-				message += Feedback.println(mode, " ");
-				message += e.getMessage();
-				message += Feedback.println(mode, " ");
-				message += Feedback.println(mode, " ");
-				message += Feedback.println(mode, "==== TURTLE (TTL) CODE GENERATED FROM THE SPREADSHEET ====");
-				message += listing;
-				return message;
-			}
+			message += Feedback.print(mode, "SUCCESS parsing the document!");
+			message += Feedback.println(mode, " ");
+		} catch (Exception e) {
+			message += Feedback.println(mode, " ");
+			message += Feedback.print(mode, "ERROR parsing the document!");
+			message += Feedback.println(mode, " ");
+			message += e.getMessage();
+			message += Feedback.println(mode, " ");
+			message += Feedback.println(mode, " ");
+			message += Feedback.println(mode, "==== TURTLE (TTL) CODE GENERATED FROM THE SPREADSHEET ====");
+			message += listing;
+			return message;
+		}
 
-			if (oper.equals("load")) {
-			    message += Feedback.print(mode, "   Uploading generated file.");
-			    rdf.loadLocalFile(mode, fileName, SpreadsheetProcessing.KB_FORMAT);
-			    message += Feedback.println(mode, "");
-			    message += Feedback.println(mode, " ");
-			    message += Feedback.println(mode, "   Triples after [preregistration]: " + rdf.totalTriples());
-			}
+		if (oper.equals("load")) {
+		    message += Feedback.print(mode, "   Uploading generated file.");
+		    rdf.loadLocalFile(mode, fileName, SpreadsheetProcessing.KB_FORMAT);
+		    message += Feedback.println(mode, "");
+		    message += Feedback.println(mode, " ");
+		    message += Feedback.println(mode, "   Triples after [preregistration]: " + rdf.totalTriples());
 		}
 		return message;
 	}

@@ -52,6 +52,7 @@
                  </div>
                  <div class="col-md-3 col-xs-2">
                       <a href="@org.hadatac.console.controllers.triplestore.routes.UserManagement.onLinePreRegistration("init")" class="btn btn-block btn-primary" role="button">On-Line User Pre-Registration</a>
+                      <a href="@org.hadatac.console.controllers.triplestore.routes.UserManagement.onLinePreRegistration("init")" class="btn btn-block btn-primary" role="button">On-Line Group Registration</a>
                  </div>
                  <div class="col-md-3 col-xs-2">
                       <a href="@org.hadatac.console.controllers.triplestore.routes.UserNetwork.index()" class="btn btn-block btn-primary" role="button">User Network</a>
@@ -66,9 +67,17 @@
             <a href="@org.hadatac.console.controllers.triplestore.routes.UserManagement.preRegistration("init")" class="btn btn-warning" role="button">Back to Manage Users</a>
 	    </div>
 
-     	@if(oper=="loaded") {
+     	@if(oper=="load_users") {
             <script> 
-                var msg = "@UserManagement.commitPreRegistration(source)";
+                var msg = "@UserManagement.commitUserPreRegistration(source)";
+                $('#msgarea').html(msg.replace(/&lt;br&gt;/g, '<br>'));
+                document.getElementById('end-process-box').style.display = 'inline';
+            </script> 
+        } 
+        
+        @if(oper=="load_groups") {
+            <script> 
+                var msg = "@UserManagement.commitGroupRegistration(source)";
                 $('#msgarea').html(msg.replace(/&lt;br&gt;/g, '<br>'));
                 document.getElementById('end-process-box').style.display = 'inline';
             </script> 
@@ -109,7 +118,5 @@
                 </div>
             </div>
         </div>
-    }   
-
-
+    }
 }
