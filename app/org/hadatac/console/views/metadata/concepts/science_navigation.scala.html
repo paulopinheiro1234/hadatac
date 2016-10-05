@@ -58,4 +58,13 @@
        		     <a href="@org.hadatac.console.controllers.metadata.concepts.routes.Agent.index()" class="btn-xs btn-block btn-primary" role="button">Agent<br>Network<br>&nbsp;</a>
        	     </div>
        }
+       @if(selection == "Indicators") {
+             <div class="col-md-1">
+                 <a href="@org.hadatac.console.controllers.metadata.concepts.routes.Indicator.index()" class="btn-xs btn-block btn-warning" role="button">Indicators<br>Hierarchy<br>&nbsp;</a>
+       	     </div>
+       } else {
+             <div class="col-md-1">
+       		     <a href="@org.hadatac.console.controllers.metadata.concepts.routes.Indicator.index()" class="btn-xs btn-block btn-primary" role="button">Indicators<br>Hierarchy<br>&nbsp;</a>
+       	     </div>
+       }
     </div>

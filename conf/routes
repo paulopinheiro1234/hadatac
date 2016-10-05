@@ -75,6 +75,8 @@ GET	    /hadatac/metadata/entitycharacteristic	  org.hadatac.console.controllers
 POST	/hadatac/metadata/entitycharacteristic	  org.hadatac.console.controllers.metadata.concepts.EntityCharacteristic.postIndex()
 GET	    /hadatac/metadata/characteristic          org.hadatac.console.controllers.metadata.concepts.Characteristic.index()
 POST	/hadatac/metadata/characteristic          org.hadatac.console.controllers.metadata.concepts.Characteristic.postIndex()
+GET	    /hadatac/metadata/indicator     		  org.hadatac.console.controllers.metadata.concepts.Indicator.index()
+POST	/hadatac/metadata/indicator			      org.hadatac.console.controllers.metadata.concepts.Indicator.postIndex()
 GET	    /hadatac/metadata/unit                    org.hadatac.console.controllers.metadata.concepts.Unit.index()
 POST	/hadatac/metadata/unit                    org.hadatac.console.controllers.metadata.concepts.Unit.postIndex()
 GET	    /hadatac/metadata/agent			          org.hadatac.console.controllers.metadata.concepts.Agent.index()
@@ -91,8 +93,8 @@ GET	    /hadatac/metadata/housingcharacteristic   org.hadatac.console.controller
 POST	/hadatac/metadata/housingcharacteristic   org.hadatac.console.controllers.metadata.metaclasses.HousingCharacteristic.postIndex()
 GET	    /hadatac/metadata/antropometry            org.hadatac.console.controllers.metadata.metaclasses.Anthropometry.index()
 POST	/hadatac/metadata/anthropometry           org.hadatac.console.controllers.metadata.metaclasses.Anthropometry.postIndex()
-GET	    /hadatac/metadata/bdn		              org.hadatac.console.controllers.metadata.metaclasses.BDN.index()
-POST	/hadatac/metadata/bdn		              org.hadatac.console.controllers.metadata.metaclasses.BDN.postIndex()
+GET	    /hadatac/metadata/pregnancycharacteristic    org.hadatac.console.controllers.metadata.metaclasses.PregnancyCharacteristic.index()
+POST	/hadatac/metadata/pregnancycharacteristic         org.hadatac.console.controllers.metadata.metaclasses.PregnancyCharacteristic.postIndex()
 
 # Analytes
 GET	    /hadatac/metadata/analytes      	      org.hadatac.console.controllers.metadata.analytes.Analytes.index()

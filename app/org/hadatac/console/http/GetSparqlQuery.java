@@ -121,13 +121,13 @@ public class GetSparqlQuery {
 	    thingTypes[16] = "HousingCharacteristic";
 	    thingTypes[17] = "ATIDU";
 	    thingTypes[18] = "Anthropometry";
-	    thingTypes[19] = "BDN";
+	    thingTypes[19] = "PregnancyCharacteristic";
 	    thingTypes[20] = "Analytes";
 	    thingTypes[21] = "Alkaloids";
 	    thingTypes[22] = "Arsenic";
 	    thingTypes[23] = "Elements";
 	    thingTypes[24] = "OrganicAromatic";
-	    thingTypes[25] = "Attributes";
+	    thingTypes[25] = "Indicators";
     }
     
     public String querySelector(String tabName){
@@ -423,7 +423,7 @@ public class GetSparqlQuery {
                     " 	OPTIONAL { ?id rdfs:comment ?comment } . " +
                     "}";
                 break;
-            case "BDN" :
+            case "PregnancyCharacteristic" :
             	q = "PREFIX sio: <http://semanticscience.org/resource/>" + 
             		"PREFIX chear: <http://hadatac.org/ont/chear#>" + 
             		"PREFIX prov: <http://www.w3.org/ns/prov#>" + 
@@ -433,7 +433,7 @@ public class GetSparqlQuery {
             		"PREFIX rdfs:<http://www.w3.org/2000/01/rdf-schema#>" + 
             		"PREFIX skos: <http://www.w3.org/2004/02/skos/core#>" +
             		"SELECT ?id ?superId ?label ?comment WHERE { " + 
-                    "   ?id rdfs:subClassOf* chear:BehaviorDietAndNutrition . " + 
+                    "   ?id rdfs:subClassOf* chear:PregnancyCharacteristic . " + 
                     "   ?id rdfs:subClassOf ?superId .  " + 
                     "   OPTIONAL { ?id rdfs:label ?label } . " + 
 //                    " 	OPTIONAL { ?id skos:definition ?comment } . " +
@@ -520,21 +520,18 @@ public class GetSparqlQuery {
                     " 	OPTIONAL { ?id skos:definition ?comment } . " +
                     "}";
                 break;
-            case "Attributes" :
-            	q = "PREFIX sio: <http://semanticscience.org/resource/>" + 
-            		"PREFIX chear: <http://hadatac.org/ont/chear#>" + 
-            		"PREFIX prov: <http://www.w3.org/ns/prov#>" + 
-            		"PREFIX hasco: <http://hadatac.org/ont/hasco/>" + 
-            		"PREFIX hasneto: <http://hadatac.org/ont/hasneto#>" + 
-            		"PREFIX dcterms: <http://purl.org/dc/terms/>" + 
-            		"PREFIX rdfs:<http://www.w3.org/2000/01/rdf-schema#>" + 
-            		"PREFIX skos: <http://www.w3.org/2004/02/skos/core#>" +
-            		"SELECT ?id ?superId ?label ?comment WHERE { " + 
-                    "   ?id rdfs:subClassOf* sio:Attributes . " + 
-                    "   ?id rdfs:subClassOf ?superId .  " + 
-                    "   OPTIONAL { ?id rdfs:label ?label } . " + 
-                    " 	OPTIONAL { ?id rdfs:comment ?comment } . " +
-                    "}";
+            case "Indicators" :
+            	q = "PREFIX rdfs:<http://www.w3.org/2000/01/rdf-schema#>" + 
+                        "PREFIX owl: <http://www.w3.org/2002/07/owl#>" + 
+                        "PREFIX hasneto: <http://hadatac.org/ont/hasneto#> " +
+                        "PREFIX chear: <http://hadatac.org/ont/chear#>" + 
+                        "PREFIX sio: <http://semanticscience.org/resource/>" +
+                    	"SELECT DISTINCT ?modelName ?superModelName ?label ?comment WHERE { " + 
+                        "   ?modelName rdfs:subClassOf* chear:Indicator . " +
+                        "   ?modelName rdfs:subClassOf ?superModelName .  " + 
+                        "   OPTIONAL { ?modelName rdfs:label ?label } . " + 
+                        " 	OPTIONAL { ?modelName rdfs:comment ?comment } . " +
+                    	"}";
                 break;
             default :
             	q = "";

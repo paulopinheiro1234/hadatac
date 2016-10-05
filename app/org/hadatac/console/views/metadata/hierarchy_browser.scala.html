@@ -13,7 +13,7 @@
 @import org.hadatac.console.views.html.metadata.empirical._
 
 @main("Hierarchies") {
-    @if((category == "Units") || (category == "Characteristics")) { 
+    @if((category == "Units") || (category == "Characteristics") || (category == "Indicators")) { 
         @science_navigation(category)
     } else {
         @empirical_navigation(category)
