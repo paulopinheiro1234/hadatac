@@ -192,8 +192,7 @@ public class AutoAnnotator extends Controller {
 			System.out.println(base_name);
 			ValueCellProcessing cellProc = new ValueCellProcessing();
 			System.out.println(dc.getUri());
-			System.out.println(cellProc.replaceNameSpace(dc.getUri()));
-			String qname = cellProc.replaceNameSpace(dc.getUri()).split(":")[1];
+			String qname = cellProc.replaceNameSpaceEx(dc.getUri()).split(":")[1];
 			System.out.println(qname);
 			if(qname.equals(base_name)){
 				dc_uri = dc.getUri();

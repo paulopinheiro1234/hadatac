@@ -10,16 +10,10 @@
 	<script type="text/javascript">
 		function checkform() {
     		var cansubmit = true;
-    		if (document.getElementById('usr_uri').value.length == 0) {
+    		if (document.getElementById('group_uri').value.length == 0) {
 		        cansubmit = false;
     		}
-    		if (document.getElementById('given_name').value.length == 0) {
-        		cansubmit = false;
-    		}
-    		if (document.getElementById('family_name').value.length == 0) {
-        		cansubmit = false;
-    		}
-    		if (document.getElementById('email').value.length == 0) {
+    		if (document.getElementById('group_name').value.length == 0) {
         		cansubmit = false;
     		}
 
@@ -33,25 +27,15 @@
 
   <div class="container">
 
-    <form class="form-horizontal" name="newUser" method="post" action="@org.hadatac.console.controllers.triplestore.routes.UserManagement.submitPreRegistrationForm("load_users")">
+    <form class="form-horizontal" name="newGroup" method="post" action="@org.hadatac.console.controllers.triplestore.routes.UserManagement.submitPreRegistrationForm("load_groups")">
   		<div class="form-group">
-  			<label for="usr_uri">User URI:*</label>
- 			<input type="text" class="form-control" name="usr_uri" id="usr_uri" onchange="checkform()" >
+  			<label for="group_uri">Group URI:*</label>
+ 			<input type="text" class="form-control" name="group_uri" id="group_uri" onchange="checkform()" >
  		</div>
  		
 		<div class="form-group">
-			<label for="given_name">Given Name:*</label>
-  			<input type="text" class="form-control" name="given_name" id="given_name" onchange="checkform()" >
-		</div>
-		
-		<div class="form-group">
-  			<label for="family_name">Family Name:*</label>
- 			<input type="text" class="form-control" name="family_name" id="family_name" onchange="checkform()" >
- 		</div>
- 		
-		<div class="form-group">
-			<label for="email">Email Address:*</label>
-  			<input type="text" class="form-control" name="email" id="email" onchange="checkform()" >
+			<label for="group_name">Group Name:*</label>
+  			<input type="text" class="form-control" name="group_name" id="group_name" onchange="checkform()" >
 		</div>
 		
 		<div class="form-group">

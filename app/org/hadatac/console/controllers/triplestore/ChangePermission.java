@@ -34,12 +34,12 @@ public class ChangePermission extends Controller {
 
 	@Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
     public static Result index(String user_uri) {
-    	return ok(users.render("init", "", User.find()));
+    	return ok(users.render("init", "", User.find(), ""));
     }
 
 	@Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
     public static Result postIndex(String user_rui) {
-    	return ok(users.render("init", "", User.find()));
+    	return ok(users.render("init", "", User.find(), ""));
     }
 
 

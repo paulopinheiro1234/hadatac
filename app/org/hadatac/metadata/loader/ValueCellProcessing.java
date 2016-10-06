@@ -73,7 +73,21 @@ public class ValueCellProcessing {
 	 *  URI gets replaced by the name space's abbreviation. Otherwise, the string is returned wrapper
 	 *  around angular brackets.
 	 */
-	public String replaceNameSpace(String str) {
+	private String replaceNameSpace(String str) {
+		String resp = str;
+	    for (Map.Entry<String, NameSpace> entry : NameSpaces.getInstance().table.entrySet()) {
+	        String abbrev = entry.getKey().toString();
+	        String nsString = entry.getValue().getName();
+	        if (str.startsWith(nsString)) {
+	        	System.out.println("REPLACE: " + resp + " / " + abbrev);
+	        	resp = str.replace(nsString, abbrev + ":");
+	        	return resp; 
+	        }
+	    }
+	    return "<" + str + ">";
+	}
+	
+	public String replaceNameSpaceEx(String str) {
 		String resp = str;
 	    for (Map.Entry<String, NameSpace> entry : NameSpaces.getInstance().table.entrySet()) {
 	        String abbrev = entry.getKey().toString();
@@ -132,7 +146,7 @@ public class ValueCellProcessing {
 			return (subject + "\n");
 		}
 		// no indentation or semicolon at the end of the string
-		return ("<" + replaceNameSpace(subject) + ">" + "\n");	
+		return (replaceNameSpace(subject) + "\n");
 	}
 	
 	public String processObjectValue(String object) {
@@ -145,7 +159,7 @@ public class ValueCellProcessing {
 		// if full URI, either abbreviated it or print it between angled brackets
 		if (isFullURI(object)) {
 			// either replace namespace with acronym or add angled brackets
-			return "<" + replaceNameSpace(object) + ">";
+			return replaceNameSpace(object);
 		}
 		
 		// if not URI, print the object between quotes
@@ -200,5 +214,31 @@ public class ValueCellProcessing {
 				
 		return clttl;
 	}
+	
+	public String execCellValue(String cellValue, String predicate) {
+		String clttl = "";
 
+		// cell has subject value
+		if (predicate.equals("hasURI")) {
+			clttl = clttl + processSubjectValue(cellValue);
+			return clttl;
+		}
+		
+		// cell has object value
+		clttl = clttl + "   " + predicate + " ";
+		if (isObjectSet(cellValue)) {
+		     StringTokenizer st = new StringTokenizer(cellValue,",");
+		     while (st.hasMoreTokens()) {
+		         clttl = clttl + processObjectValue(st.nextToken().trim());
+		         if (st.hasMoreTokens()) {
+		        	 clttl = clttl + ", ";
+		         }
+		     }
+		} else {
+			clttl = clttl + processObjectValue(cellValue);
+		}
+		clttl = clttl + ";\n";
+				
+		return clttl;
+	}
 }
