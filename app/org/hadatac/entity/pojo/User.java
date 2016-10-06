@@ -149,8 +149,6 @@ public class User implements Comparable<User> {
 		boolean updateAdministrator = this.administrator != tmpUser.isAdministrator();
 			
         if (updateAdministrator) {
-        	//"DELETE DATA { <http://example/book3>  dc:title  x }"
-        	//"INSERT DATA { <http://example/book3>  dc:title  y }"
         }
         
         String insert = "";
@@ -277,7 +275,6 @@ public class User implements Comparable<User> {
 	
 	@Override
     public int compareTo(User another) {
-        //return this.getName().compareTo(another.getName());
 		return this.getUri().compareTo(another.getUri());
     }
 }

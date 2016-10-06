@@ -222,6 +222,8 @@ POST    /hadatac/ts/synclabkey/loadacquisition     org.hadatac.console.controlle
 # Permissions store management URLs
 GET     /hadatac/perm/onlinepreregister            org.hadatac.console.controllers.triplestore.UserManagement.onLinePreRegistration(oper: String)
 POST    /hadatac/perm/onlinepreregister            org.hadatac.console.controllers.triplestore.UserManagement.postOnLinePreRegistration(oper: String)
+GET     /hadatac/perm/onlinegroupregister          org.hadatac.console.controllers.triplestore.UserManagement.onLineGroupRegistration(oper: String)
+POST    /hadatac/perm/onlinegroupregister          org.hadatac.console.controllers.triplestore.UserManagement.postOnLineGroupRegistration(oper: String)
 GET     /hadatac/perm/preregister                  org.hadatac.console.controllers.triplestore.UserManagement.preRegistration(oper: String)
 POST    /hadatac/perm/preregister                  org.hadatac.console.controllers.triplestore.UserManagement.postPreRegistration(oper: String)
 POST    /hadatac/perm/preregister/upload           org.hadatac.console.controllers.triplestore.UserManagement.uploadFile()
