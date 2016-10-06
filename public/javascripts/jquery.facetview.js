@@ -407,7 +407,7 @@ search box - the end user will not know they are happening.
             "pager_slider": false,
             "searchwrap_start":'<table class="table table-striped table-bordered" id="facetview_results">',
             "searchwrap_end":"</table>",
-            "resultwrap_start":"<tr><td>",
+            "resultwrap_start":"<tr><td id=\"",
             "resultwrap_end":"</td></tr>",
             "result_box_colours":[],
             "fadein":800,
@@ -807,7 +807,7 @@ search box - the end user will not know they are happening.
         // given a result record, build how it should look on the page
         var buildrecord = function(index) {
             var record = options.data['records'][index];
-            var result = options.resultwrap_start;
+            var result = options.resultwrap_start+index+"\">";
             // add first image where available
             if (options.display_images) {
 
@@ -837,9 +837,16 @@ search box - the end user will not know they are happening.
                             }
                         } else {
                             line += thevalue;
+
+                        } 
+                        if (display[lineitem][object]['post'].includes(">")){
+                        	
+                        	display[lineitem][object]['post']
+                        		? line += display[lineitem][object]['post'] + thevalue + "</a>": line += ' ';
+                        } else {
+                        	display[lineitem][object]['post']
+                            	? line += display[lineitem][object]['post'] : line += ' ';
                         }
-                        display[lineitem][object]['post'] 
-                            ? line += display[lineitem][object]['post'] : line += ' ';
                     }
                 }
                 if (line) {
