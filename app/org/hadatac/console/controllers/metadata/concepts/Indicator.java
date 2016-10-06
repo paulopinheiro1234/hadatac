@@ -1,70 +1,57 @@
-package org.hadatac.console.controllers.metadata.metaclasses;
+package org.hadatac.console.controllers.metadata.concepts;
 
 import org.hadatac.console.http.GetSparqlQuery;
 
 import java.io.IOException;
-import java.util.List;
-import java.util.TreeMap;
-
 import org.hadatac.console.models.SparqlQuery;
-import org.hadatac.console.models.OtMSparqlQueryResults;
-
+import org.hadatac.console.models.SparqlQueryResults;
 import play.mvc.Controller;
 import play.mvc.Result;
-
-import org.hadatac.console.views.html.metadata.metaclasses.metaclasses_browser;
+import org.hadatac.console.views.html.metadata.hierarchy_browser;
 import org.hadatac.console.views.html.error_page;
 
 
-public class BDN extends Controller {
+public class Indicator extends Controller {
 	
 	// for /metadata HTTP GET requests
     public static Result index() {
-
-    	SparqlQuery query = new SparqlQuery();
+        SparqlQuery query = new SparqlQuery();
         GetSparqlQuery query_submit = new GetSparqlQuery(query);
-        OtMSparqlQueryResults theResults;
-        String tabName = "BDN";
+        SparqlQueryResults theResults;
+        String tabName = "Indicators";
         String query_json = null;
-        System.out.println("BDN.java is requesting: " + tabName);
+        System.out.println("Indicator.java is requesting: " + tabName);
         try {
             query_json = query_submit.executeQuery(tabName);
             //System.out.println("query_json = " + query_json);
-            theResults = new OtMSparqlQueryResults(query_json, true);
+            theResults = new SparqlQueryResults(query_json, true);
         } catch (IllegalStateException | IOException | NullPointerException e1) {
             return internalServerError(error_page.render(e1.toString(), tabName));
             //e1.printStackTrace();
         }
-        System.out.println("BDN index() was called!");
-    	
-    	//List<org.hadatac.entity.pojo.Entity> entities = org.hadatac.entity.pojo.Entity.find();
-    	
-        return ok(metaclasses_browser.render(theResults, "BDN"));
+        System.out.println("Indicator index() was called!");
+        return ok(hierarchy_browser.render(theResults, tabName));
     }// /index()
 
 
     // for /metadata HTTP POST requests
     public static Result postIndex() {
-
-    	SparqlQuery query = new SparqlQuery();
+        SparqlQuery query = new SparqlQuery();
         GetSparqlQuery query_submit = new GetSparqlQuery(query);
-        OtMSparqlQueryResults theResults;
-        String tabName = "BDN";
+        SparqlQueryResults theResults;
+        String tabName = "Indicators";
         String query_json = null;
-        System.out.println("BDN.java is requesting: " + tabName);
+        System.out.println("Indicator.java is requesting: " + tabName);
         try {
             query_json = query_submit.executeQuery(tabName);
             //System.out.println("query_json = " + query_json);
-            theResults = new OtMSparqlQueryResults(query_json, true);
+            theResults = new SparqlQueryResults(query_json, true);
         } catch (IllegalStateException | IOException | NullPointerException e1) {
             return internalServerError(error_page.render(e1.toString(), tabName));
             //e1.printStackTrace();
         }
-        System.out.println("BDN index() was called!");
-    	
-    	//List<org.hadatac.entity.pojo.Entity> entities = org.hadatac.entity.pojo.Entity.find();
-    	
-        return ok(metaclasses_browser.render(theResults, "BDN"));
+        System.out.println("Indicator postIndex() was called!");
+        return ok(hierarchy_browser.render(theResults, tabName));
     }// /postIndex()
 
 }
