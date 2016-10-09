@@ -59,6 +59,8 @@ GET	    /hadatac/metadataacquisitions/pilot6				              org.hadatac.consol
 POST	/hadatac/metadataacquisitions/pilot6				              org.hadatac.console.controllers.metadataacquisition.Pilot6.postIndex()
 GET	    /hadatac/metadataacquisitions/viewSubject	org.hadatac.console.controllers.metadataacquisition.ViewSubject.index(subject_uri: String)
 POST	/hadatac/metadataacquisitions/viewSubject	org.hadatac.console.controllers.metadataacquisition.ViewSubject.postIndex(subject_uri: String)
+GET	    /hadatac/metadataacquisitions/viewStudy		org.hadatac.console.controllers.metadataacquisition.ViewStudy.index(study_uri: String)
+POST	/hadatac/metadataacquisitions/viewStudy		org.hadatac.console.controllers.metadataacquisition.ViewStudy.postIndex(study_uri: String)
 
 
 # Metadata concepts

@@ -1,0 +1,37 @@
+@(poResult      : Map[String, List[String]],
+  subjectResult	: List[String])
+
+@import org.hadatac.console.views.html._
+@import org.hadatac.utils._
+@import org.hadatac.console.controllers.metadataacquisition._
+@import helper._
+@import org.hadatac.console.controllers._
+@import be.objectify.deadbolt.java.views.html._
+@import be.objectify.deadbolt.core.utils.TemplateUtils._
+@import play.api.Play
+
+@main("Study View") {
+    <link rel="stylesheet" href="http://openlayers.org/en/v3.9.0/css/ol.css">
+    <script type="text/javascript" charset="utf-8" src="http://www.openlayers.org/api/OpenLayers.js"></script>
+    <script type="text/javascript" charset="utf-8" src="@controllers.routes.Assets.versioned("javascripts/openLayersFunctions.js")"></script>
+    <div class="row">
+        <div class="col-md-6">
+            <h1>Study View</h1>
+                
+             <h2>Basic Info</h2>
+				<ul>        		
+					@for(key <- poResult.keySet()){
+						<li>@key.toString
+							<ul><li>@poResult.get(key)</li></ul>
+						</li>
+					}
+				</ul>
+			<h3>Subject List</h3>
+				<ul>
+					@for(s <- subjectResult){
+						<li>@s.toString</li>
+					}
+				</ul>
+    	</div>
+    </div>
+}
