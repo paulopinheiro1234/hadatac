@@ -43,7 +43,30 @@ public class ViewStudy extends Controller {
 		String basicQueryString = "";
 
 		basicQueryString = 
-		"PREFIX sio: <http://semanticscience.org/resource/>PREFIX chear: <http://hadatac.org/ont/chear#>PREFIX chear-kb: <http://hadatac.org/kb/chear#>PREFIX prov: <http://www.w3.org/ns/prov#>PREFIX hasco: <http://hadatac.org/ont/hasco/>PREFIX hasneto: <http://hadatac.org/ont/hasneto#>PREFIX dcterms: <http://purl.org/dc/terms/>PREFIX rdfs:<http://www.w3.org/2000/01/rdf-schema#>PREFIX skos: <http://www.w3.org/2004/02/skos/core#>PREFIX foaf: <http://xmlns.com/foaf/0.1/>SELECT ?studyUri ?studyLabel ?proj ?studyDef ?studyComment ?agentName ?institutionName  WHERE {        ?subUri rdfs:subClassOf* hasco:Study .                        ?studyUri a ?subUri .             ?studyUri rdfs:label ?studyLabel .            ?studyUri rdfs:label " + study_uri + " .         OPTIONAL { ?studyUri chear-kb:project ?proj } .         OPTIONAL { ?studyUri skos:definition ?studyDef } .         OPTIONAL { ?studyUri rdfs:comment ?studyComment } .         OPTIONAL { ?studyUri hasco:hasAgent ?agent .                                    ?agent foaf:name ?agentName } .         OPTIONAL { ?studyUri hasco:hasInstitution ?institution .                                  ?institution foaf:name ?institutionName} .                              }";
+		"PREFIX sio: <http://semanticscience.org/resource/>" + 
+		"PREFIX chear: <http://hadatac.org/ont/chear#>" + 
+		"PREFIX chear-kb: <http://hadatac.org/kb/chear#>" + 
+		"PREFIX prov: <http://www.w3.org/ns/prov#>" + 
+		"PREFIX hasco: <http://hadatac.org/ont/hasco/>" + 
+		"PREFIX hasneto: <http://hadatac.org/ont/hasneto#>" + 
+		"PREFIX dcterms: <http://purl.org/dc/terms/>" + 
+		"PREFIX rdfs:<http://www.w3.org/2000/01/rdf-schema#>" + 
+		"PREFIX skos: <http://www.w3.org/2004/02/skos/core#>" +
+		"PREFIX foaf: <http://xmlns.com/foaf/0.1/>" + 
+		"SELECT ?studyUri ?studyLabel ?proj ?studyDef ?studyComment ?agentName ?institutionName " + 
+		" WHERE {        ?subUri rdfs:subClassOf* hasco:Study . " + 
+		"                       ?studyUri a ?subUri . " + 
+//		"           ?studyUri rdfs:label " + study_uri + " . " + 
+		"           ?studyUri rdfs:label ?studyLabel  . " + 
+		"			FILTER ( ?studyUri = " + study_uri + " ) . " +
+		"        OPTIONAL { ?studyUri chear-kb:project ?proj } . " + 
+		"        OPTIONAL { ?studyUri skos:definition ?studyDef } . " + 
+		"        OPTIONAL { ?studyUri rdfs:comment ?studyComment } . " + 
+		"        OPTIONAL { ?studyUri hasco:hasAgent ?agent . " + 
+		"                                   ?agent foaf:name ?agentName } . " + 
+		"        OPTIONAL { ?studyUri hasco:hasInstitution ?institution . " + 
+		"                                 ?institution foaf:name ?institutionName} . " + 
+		"                             }" ;
 /*		"PREFIX sio: <http://semanticscience.org/resource/> "
 			+ "PREFIX chear: <http://hadatac.org/ont/chear#> "
 			+ "PREFIX chear-kb: <http://hadatac.org/kb/chear#> "
@@ -71,51 +94,61 @@ public class ViewStudy extends Controller {
 		while (resultsrw.hasNext()) {
 			QuerySolution soln = resultsrw.next();
 			System.out.println("HERE IS THE RAW SOLN*********" + soln.toString());
-			values.add(soln.get("studyLabel").toString());
-			values.add(soln.get("studyDef").toString());
-			values.add(soln.get("proj").toString());
-			values.add(soln.get("studyComment").toString());
-			values.add(soln.get("agentName").toString());
-			values.add(soln.get("institutionName").toString());
+			values.add("Label: " + soln.get("studyLabel").toString());
+			values.add("Title: " + soln.get("studyDef").toString());
+			values.add("Project: " + soln.get("proj").toString());
+			values.add("Comment: " + soln.get("studyComment").toString());
+			values.add("Agent(s): " + soln.get("agentName").toString());
+			values.add("Institution: " + soln.get("institutionName").toString());
 			poResult.put(soln.get("studyUri").toString(),values);
 			
-			
-			//			poResult.put(soln.get("studyUri").toString(),soln.get("studyLabel").toString(),soln.get("proj").toString(),soln.get("studyDef").toString(),soln.get("studyComment").toString(),soln.get("agentName").toString(),soln.get("institutionName").toString(),soln.get("demographicLabel").toString());
-//			poResult.put(soln.get("studyUri").toString(),soln.get("studyLabel").toString());
-//			poResult.put(soln.get("studyUri").toString(),soln.get("studyDef").toString());
-//			System.out.println("THIS IS SUBROW*********" + poResult);
-
 		}
 		return poResult;
 	}
 	
-	public static List<String> findSubject(String study_uri) {
+	public static Map<String, List<String>> findSubject(String study_uri) {
 
 		String subjectQueryString = "";
 		
     	subjectQueryString = 
-    	    	
-    	"PREFIX prov: <http://www.w3.org/ns/prov#> "
-        + " PREFIX chear-kb: <http://hadatac.org/kb/chear#> "
-        + "SELECT * "
-        + "WHERE { ?s <http://hadatac.org/ont/hasco/isSampleOf> " + study_uri + " }";
+    	"PREFIX sio: <http://semanticscience.org/resource/>" + 
+    	"PREFIX chear: <http://hadatac.org/ont/chear#>" + 
+    	"PREFIX chear-kb: <http://hadatac.org/kb/chear#>" + 
+    	"PREFIX prov: <http://www.w3.org/ns/prov#>" + 
+    	"PREFIX hasco: <http://hadatac.org/ont/hasco/>" + 
+    	"PREFIX hasneto: <http://hadatac.org/ont/hasneto#>" + 
+    	"PREFIX dcterms: <http://purl.org/dc/terms/>" + 
+    	"PREFIX rdfs:<http://www.w3.org/2000/01/rdf-schema#>" + 
+    	"PREFIX skos: <http://www.w3.org/2004/02/skos/core#>" +
+    	"PREFIX foaf: <http://xmlns.com/foaf/0.1/>" + 
+    	"SELECT ?subjectUri ?subjectType ?subjectLabel ?cohort ?study " +
+    	"			 WHERE {        ?subjectUri hasco:isSubjectOf* ?cohort . " +
+    	"			        		?cohort hasco:isCohortOf ?study . " +
+    	"			        		OPTIONAL { ?subjectUri rdfs:label ?subjectLabel } . " +
+    	"			        		OPTIONAL { ?subjectUri a ?subjectType } . " +
+    	"			        		FILTER (?study = " + study_uri + ") . " +
+    	"			                             }";		
         
-		Query sampleQuery = QueryFactory.create(subjectQueryString);
+		Query subjectQuery = QueryFactory.create(subjectQueryString);
 		
-		QueryExecution qexec = QueryExecutionFactory.sparqlService(Collections.getCollectionsName(Collections.METADATA_SPARQL), sampleQuery);
-		ResultSet results = qexec.execSelect();
+		QueryExecution qexec2 = QueryExecutionFactory.sparqlService(Collections.getCollectionsName(Collections.METADATA_SPARQL), subjectQuery);
+		ResultSet results = qexec2.execSelect();
 		ResultSetRewindable resultsrw = ResultSetFactory.copyResults(results);
-		qexec.close();
-		
-		List<String> subjectResult = new ArrayList<String>();
+		qexec2.close();
+		Map<String, List<String>> subjectResult = new HashMap<String, List<String>>();
+		List<String> values = new ArrayList<String>();
 		
 		while (resultsrw.hasNext()) {
 			QuerySolution soln = resultsrw.next();
-			System.out.println("HERE IS THE SAMPLES*********" + soln.toString());
-			subjectResult.add(soln.get("s").toString());
-//			System.out.println("THIS IS SUBROW*********" + poResult);
-
+			System.out.println("HERE IS THE RAW SOLN*********" + soln.toString());
+			values.add("Label: " + soln.get("subjectLabel").toString());
+			values.add("Type: " + soln.get("subjectType").toString());
+			values.add("Cohort: " + soln.get("cohort").toString());
+			values.add("Study: " + soln.get("study").toString());
+			subjectResult.put(soln.get("subjectUri").toString(),values);
+			
 		}
+		
 		return subjectResult;
 	}
 	
@@ -125,7 +158,7 @@ public class ViewStudy extends Controller {
 
  //   	Map<String, String> poResult = findBasic(study_uri);
 		Map<String, List<String>> poResult = findBasic(study_uri);
-    	List<String> subjectResult = findSubject(study_uri);
+		Map<String, List<String>> subjectResult = findSubject(study_uri);
         
     	return ok(viewStudy.render(poResult,subjectResult));
     

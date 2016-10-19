@@ -1,5 +1,5 @@
 @(poResult      : Map[String, List[String]],
-  subjectResult	: List[String])
+  subjectResult	: Map[String, List[String]])
 
 @import org.hadatac.console.views.html._
 @import org.hadatac.utils._
@@ -22,14 +22,25 @@
 				<ul>        		
 					@for(key <- poResult.keySet()){
 						<li>@key.toString
-							<ul><li>@poResult.get(key)</li></ul>
+							<ul>
+							@for(s <- poResult.get(key)) {
+							<li>@s.toString</li>
+							}
+							</ul>
 						</li>
 					}
 				</ul>
 			<h3>Subject List</h3>
-				<ul>
-					@for(s <- subjectResult){
-						<li>@s.toString</li>
+				<ul>        		
+					@for(key <- subjectResult.keySet()){
+						<li>@key.toString
+							<ul>
+							@for(s <- subjectResult.get(key)) {
+							<li>@s.toString</li>
+							}
+							<li>END </li>
+							</ul>
+						</li>
 					}
 				</ul>
     	</div>
