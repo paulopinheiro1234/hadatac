@@ -12,7 +12,7 @@ import java.util.Map;
 import play.mvc.Controller;
 import play.mvc.Result;
 
-import org.hadatac.console.views.html.metadataacquisition.*;
+import org.hadatac.console.views.html.metadata.*;
 import org.apache.jena.query.Query;
 import org.apache.jena.query.QueryExecution;
 import org.apache.jena.query.QueryExecutionFactory;
@@ -146,7 +146,7 @@ public class ViewStudy extends Controller {
 		Map<String, List<String>> poResult = findBasic(study_uri);
 		Map<String, List<String>> subjectResult = findSubject(study_uri);
         
-    	return ok(viewStudy.render(poResult,subjectResult));
+    	return ok(dynamicPage.render(poResult,subjectResult));
     
         
     }// /index()

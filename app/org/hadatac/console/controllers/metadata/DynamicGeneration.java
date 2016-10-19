@@ -17,7 +17,7 @@ import org.apache.jena.query.QuerySolution;
 import org.apache.jena.query.ResultSet;
 import org.apache.jena.query.ResultSetFactory;
 import org.apache.jena.query.ResultSetRewindable;
-import org.hadatac.console.views.html.metadata.dynamicPage;
+import org.hadatac.console.views.html.metadataacquisition.*;
 import org.hadatac.utils.Collections;
 
 
@@ -124,17 +124,20 @@ public class DynamicGeneration extends Controller {
 	}
 	
 	// for /metadata HTTP GET requests
-    public static Result index() {
-
-       return ok(dynamicPage.render());
+    public static Result index(String study_uri) {
+    	
+		Map<String, List<String>> studyResult = findStudy(study_uri);
+		Map<String, List<String>> subjectResult = findSubject(study_uri);
+        
+        return ok(viewStudy.render(studyResult,subjectResult));
         
     }// /index()
 
 
     // for /metadata HTTP POST requests
-    public static Result postIndex() {
+    public static Result postIndex(String study_uri) {
         
-        return ok(dynamicPage.render());
+        return index(study_uri);
         
     }// /postIndex()
 
