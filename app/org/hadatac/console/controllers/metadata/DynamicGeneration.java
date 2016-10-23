@@ -1,7 +1,9 @@
 package org.hadatac.console.controllers.metadata;
 
+import java.io.IOException;
 import java.net.URLDecoder;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -19,13 +21,54 @@ import org.apache.jena.query.ResultSetFactory;
 import org.apache.jena.query.ResultSetRewindable;
 import org.apache.jena.rdf.model.Model;
 import org.hadatac.console.views.html.metadataacquisition.*;
+import org.hadatac.metadata.loader.*;
 import org.hadatac.utils.Collections;
-
+import org.json.simple.JSONObject;
+import org.labkey.remoteapi.query.*;
+import org.labkey.remoteapi.CommandException;
+import org.labkey.remoteapi.Connection;
 
 public class DynamicGeneration extends Controller {
 	
 //	public static Map<String, String> findBasic(String study_uri) {
 	public static Map<String, List<String>> findStudy() {
+		
+		Connection cn = new Connection("http://chear.tw.rpi.edu/labkey", "rashidsabbir@gmail.com", "Worrde123");
+		SelectRowsCommand cmd = new SelectRowsCommand("lists", "LocalStudyIndicatorType");
+		cmd.setRequiredVersion(9.1);
+		cmd.setColumns(Arrays.asList("hasURI", "rdfs:subClassOf", "rdfs:label", "rdfs:comment", "prov:wasGeneratedBy", "skos:editorialNote", "hasco:needsApproval", "hasco:approvedBy"));
+		Map<String, List<String>> indicatorMap = new HashMap<String, List<String>>();
+		List<String> indicatorValues ; 
+		String selectString="SELECT ?studyUri ?studyLabel ?proj ?studyTitle ?studyComment ?agentName ?institutionName ";
+		SelectRowsResponse response;
+		try {
+			response = cmd.execute(cn, "/CHEAR Production");
+			System.out.println("Number of rows: " + response.getRowCount());
+
+			for (Map<String, Object> row : response.getRows())
+			{
+				System.out.println(row);
+				indicatorValues = new ArrayList<String>();
+				JSONObject superClass = (JSONObject)row.get("rdfs:subClassOf");
+				indicatorValues.add(superClass.get("value").toString());
+				JSONObject label = (JSONObject)row.get("rdfs:label");
+				indicatorValues.add(label.get("value").toString());
+				selectString = selectString + "?" + label.get("value").toString().replaceAll(" ", "").replaceAll(",", "") + " ";
+				JSONObject comment = (JSONObject)row.get("rdfs:comment");
+				indicatorValues.add(comment.get("value").toString());
+				JSONObject uri = (JSONObject)row.get("hasURI");
+				indicatorMap.put(uri.get("value").toString(),indicatorValues);
+			}
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (CommandException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		System.out.println(selectString);
+		
 		String studyQueryString = "";
 
 		studyQueryString = 
@@ -39,6 +82,7 @@ public class DynamicGeneration extends Controller {
 		"PREFIX rdfs:<http://www.w3.org/2000/01/rdf-schema#>" + 
 		"PREFIX skos: <http://www.w3.org/2004/02/skos/core#>" +
 		"PREFIX foaf: <http://xmlns.com/foaf/0.1/>" + 
+		"SELECT ?studyUri ?studyLabel ?proj ?studyTitle ?studyComment ?agentName ?institutionName   ?demographic ?acculturation ?birthOutcome ?anthropometry ?assessment ?ATIDU ?diet ?envExposure ?housingChar ?medHist ?mentalHealth ?PPU ?pregnancyChar  WHERE {        ?subUri rdfs:subClassOf hasco:Study .  		                      ?studyUri a ?subUri .  	           ?studyUri rdfs:label ?studyLabel  .   					 	OPTIONAL { ?studyUri chear-kb:project ?proj } .  					 	OPTIONAL { ?studyUri skos:definition ?studyTitle } .  					 	OPTIONAL { ?studyUri rdfs:comment ?studyComment } .  					 	OPTIONAL { ?studyUri hasco:hasAgent ?agent .                                   	?agent foaf:name ?agentName } .  					 	OPTIONAL { ?studyUri hasco:hasInstitution ?institution .                                  ?institution foaf:name ?institutionName} .        OPTIONAL {?schemaUri_ hasco:isSchemaOf ?studyUri .                  ?schemaAttribute_ hasneto:partOfSchema ?schemaUri_ } .        OPTIONAL {          		?schemaAttribute_ hasneto:hasAttribute ?demographic_ .                                   ?demographic_ rdfs:subClassOf* chear:Demographic                  } .       OPTIONAL {          		?schemaAttribute_ hasneto:hasAttribute ?acculturation .                                   ?acculturation rdfs:subClassOf* chear:Acculturation                  } .       OPTIONAL {          		?schemaAttribute_ hasneto:hasAttribute ?birthOutcome .                                   ?birthOutcome rdfs:subClassOf* chear:BirthOutcome                 } .        OPTIONAL {          		?schemaAttribute_ hasneto:hasAttribute ?anthropometry .                                   ?anthropometry rdfs:subClassOf* chear:Anthropometry                  } .        OPTIONAL {          		?schemaAttribute_ hasneto:hasAttribute ?assessment .                                   ?assessment rdfs:subClassOf* chear:Assessment                  } .        OPTIONAL {          		?schemaAttribute_ hasneto:hasAttribute ?ATIDU .                                   ?ATIDU rdfs:subClassOf* chear:ATIDU                  } .        OPTIONAL {          		?schemaAttribute_ hasneto:hasAttribute ?diet .                                   ?diet rdfs:subClassOf* chear:DietAndNutrition                  }  .        OPTIONAL {          		?schemaAttribute_ hasneto:hasAttribute ?envExposure .                                   ?envExposure rdfs:subClassOf* chear:EnvironmentalExposure                  } .        OPTIONAL {          		?schemaAttribute_ hasneto:hasAttribute ?housingChar .                                   ?housingChar rdfs:subClassOf* chear:HousingCharacteristic                  } .        OPTIONAL {          		?schemaAttribute_ hasneto:hasAttribute ?medHist .                                   ?medHist rdfs:subClassOf* chear:MedicalHistory                  } .        OPTIONAL {          		?schemaAttribute_ hasneto:hasAttribute ?mentalHealth .                                   ?mentalHealth rdfs:subClassOf* chear:MentalHealth                  } .        OPTIONAL {          		?schemaAttribute_ hasneto:hasAttribute ?PPU .                                   ?PPU rdfs:subClassOf* chear:PersonalProductUse                  } .        OPTIONAL {          		?schemaAttribute_ hasneto:hasAttribute ?pregnancyChar .                                   ?pregnancyChar rdfs:subClassOf* chear:PregnancyCharacteristic                  } .              }";
 	/*	
 "SELECT DISTINCT ?studyUri ?studyLabel ?studyTitle ?proj ?studyComment " +
 "(group_concat(distinct   ?agentName_ ; separator = ' & ') as ?agentName) " +
@@ -136,7 +180,7 @@ public class DynamicGeneration extends Controller {
 "      } " +
 "GROUP BY ?studyUri ?studyLabel ?proj ?studyTitle ?studyComment ?agentName ?institutionName ?schemaUri ?schemaAttributeLabel ?schemaLabel ?schemaAttribute ?demographic ?demographicLabel  ?acculturationLabel ?pregnancyCharLabel ?PPULabel ?mentalHealthLabel ?medHistLabel ?housingCharLabel ?envExposureLabel ?dietLabel ?ATIDULabel ?assessmentLabel ?anthropometryLabel ?birthOutcomeLabel ";
 	*/		
-
+/*
 "SELECT ?studyUri ?studyLabel ?proj ?studyTitle ?studyComment  ?agentName " +
 "?institutionName ?demographic ?acculturation ?birthOutcome ?anthropometry ?assessment " + 
 "?ATIDU ?diet ?envExposure ?housingChar ?medHist ?mentalHealth ?PPU ?pregnancyChar " + 
@@ -219,24 +263,23 @@ public class DynamicGeneration extends Controller {
 //		"                                   ?agent foaf:name ?agentName } . " + 
 //		"        OPTIONAL { ?studyUri hasco:hasInstitution ?institution . " + 
 //		"                                 ?institution foaf:name ?institutionName} . " + 
-//		"                             }" ;
+//		"                             }" ;*/
 		System.out.println(studyQueryString);
 		Query studyQuery = QueryFactory.create(studyQueryString);
 		
-//		QueryExecution qexec = QueryExecutionFactory.sparqlService(Collections.getCollectionsName(Collections.METADATA_SPARQL), studyQuery);
+		QueryExecution qexec = QueryExecutionFactory.sparqlService(Collections.getCollectionsName(Collections.METADATA_SPARQL), studyQuery);
 //		Model results = qexec.execConstruct();
 //		ResultSetRewindable resultsrw = ResultSetFactory.makeRewindable(results);
-		QueryExecution qexec = QueryExecutionFactory.sparqlService(Collections.getCollectionsName(Collections.METADATA_SPARQL), studyQuery);
 		ResultSet results = qexec.execSelect();
 		ResultSetRewindable resultsrw = ResultSetFactory.copyResults(results);
 		qexec.close();
 		Map<String, List<String>> studyResult = new HashMap<String, List<String>>();
 		List<String> values = new ArrayList<String>();
 //		Map<String, String> poResult = new HashMap<String, String>();
-		System.out.println("HERE IS THE RAW resultsrw*********" + resultsrw);
+	//	System.out.println("HERE IS THE RAW resultsrw*********" + resultsrw);
 		while (resultsrw.hasNext()) {
 			QuerySolution soln = resultsrw.next();
-			System.out.println("HERE IS THE RAW SOLN*********" + soln.toString());
+	//		System.out.println("HERE IS THE RAW SOLN*********" + soln.toString());
 			values.add("Label: " + soln.get("studyLabel").toString());
 			values.add("Title: " + soln.get("studyTitle").toString());
 			values.add("Project: " + soln.get("proj").toString());
@@ -246,7 +289,8 @@ public class DynamicGeneration extends Controller {
 			studyResult.put(soln.get("studyUri").toString(),values);
 			
 		}
-		return studyResult;
+//		return studyResult;
+		return indicatorMap;
 	}
 	
 	
@@ -283,7 +327,7 @@ public class DynamicGeneration extends Controller {
 		
 		while (resultsrw.hasNext()) {
 			QuerySolution soln = resultsrw.next();
-			System.out.println("HERE IS THE RAW SOLN*********" + soln.toString());
+	//		System.out.println("HERE IS THE RAW SOLN*********" + soln.toString());
 			values.add("Label: " + soln.get("subjectLabel").toString());
 			values.add("Type: " + soln.get("subjectType").toString());
 			values.add("Cohort: " + soln.get("cohort").toString());
