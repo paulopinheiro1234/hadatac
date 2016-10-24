@@ -10,15 +10,15 @@
 @import be.objectify.deadbolt.core.utils.TemplateUtils._
 @import play.api.Play
 
-@main("Study View") {
+@main("Dynamic Page Generator") {
     <link rel="stylesheet" href="http://openlayers.org/en/v3.9.0/css/ol.css">
     <script type="text/javascript" charset="utf-8" src="http://www.openlayers.org/api/OpenLayers.js"></script>
     <script type="text/javascript" charset="utf-8" src="@controllers.routes.Assets.versioned("javascripts/openLayersFunctions.js")"></script>
     <div class="row">
         <div class="col-md-6">
-            <h1>Study View</h1>
+            <h1>Dynamic Page Generator</h1>
                 
-             <h2>Basic Info</h2>
+             <h2>Study Indicators</h2>
 				<ul>        		
 					@for(key <- studyResult.keySet()){
 						<li>@key.toString

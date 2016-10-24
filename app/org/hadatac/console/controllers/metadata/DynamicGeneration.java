@@ -20,7 +20,7 @@ import org.apache.jena.query.ResultSet;
 import org.apache.jena.query.ResultSetFactory;
 import org.apache.jena.query.ResultSetRewindable;
 import org.apache.jena.rdf.model.Model;
-import org.hadatac.console.views.html.metadataacquisition.*;
+import org.hadatac.console.views.html.metadata.*;
 import org.hadatac.metadata.loader.*;
 import org.hadatac.utils.Collections;
 import org.json.simple.JSONObject;
@@ -31,17 +31,77 @@ import org.labkey.remoteapi.Connection;
 public class DynamicGeneration extends Controller {
 	
 //	public static Map<String, String> findBasic(String study_uri) {
-	public static Map<String, List<String>> findStudy() {
+	public static Map<String, List<String>> generateStudy() {
 		
-		Connection cn = new Connection("http://chear.tw.rpi.edu/labkey", "rashidsabbir@gmail.com", "Worrde123");
-		SelectRowsCommand cmd = new SelectRowsCommand("lists", "LocalStudyIndicatorType");
-		cmd.setRequiredVersion(9.1);
-		cmd.setColumns(Arrays.asList("hasURI", "rdfs:subClassOf", "rdfs:label", "rdfs:comment", "prov:wasGeneratedBy", "skos:editorialNote", "hasco:needsApproval", "hasco:approvedBy"));
 		Map<String, List<String>> indicatorMap = new HashMap<String, List<String>>();
-		List<String> indicatorValues ; 
+		List<String> indicatorValues ;
+		
+		String facetPageString="@(collection_url : java.lang.String)\n\n" +
+							   "@import helper._\n" +
+							   "@import org.hadatac.console.views.html._\n\n" +
+							   "@main(\"Study Browser Home\") {\n" +
+							   "	<script type=\"text/javascript\" src=\"@controllers.routes.Assets.versioned(\"javascripts/vendor/jquery/1.7.1/jquery-1.7.1.min.js\")\"></script>\n" +
+							   "	<link rel=\"stylesheet\" type=\"text/css\" href=\"@controllers.routes.Assets.versioned(\"javascripts/vendor/bootstrap/css/bootstrap.min.css\")\"/>\n" +
+							   "	<script type=\"text/javascript\" src=\"@controllers.routes.Assets.versioned(\"javascripts/vendor/bootstrap/js/bootstrap.min.js\")\"></script>\n" +
+							   "	<script type=\"text/javascript\" src=\"@controllers.routes.Assets.versioned(\"javascripts/vendor/linkify/1.0/jquery.linkify-1.0-min.js\")\"></script>\n" +
+							   "	<link rel=\"stylesheet\" href=\"@controllers.routes.Assets.versioned(\"javascripts/vendor/jquery-ui-1.8.18.custom/jquery-ui-1.8.18.custom.css\")\"/>\n" +
+							   "	<script type=\"text/javascript\" src=\"@controllers.routes.Assets.versioned(\"javascripts/vendor/jquery-ui-1.8.18.custom/jquery-ui-1.8.18.custom.min.js\")\"></script>\n" +
+							   "	<script type=\"text/javascript\" src=\"@controllers.routes.Assets.versioned(\"javascripts/jquery.facetview.js\")\"></script>\n" +
+							   "	<link rel=\"stylesheet\" type=\"text/css\" href=\"@controllers.routes.Assets.versioned(\"css/facetview.css\")\"/>\n" +
+							   " 	<link rel=\"stylesheet\" type=\"text/css\" href=\"@controllers.routes.Assets.versioned(\"css/style.css\")\"/>\n" +
+							   "	<link rel=\"stylesheet\" type=\"text/css\" href=\"@controllers.routes.Assets.versioned(\"javascripts/vendor/c3-0.4.10/c3.css\")\"/>\n" +
+							   "	<script type=\"text/javascript\" src=\"@controllers.routes.Assets.versioned(\"javascripts/vendor/d3-3.5.6/d3.min.js\")\"></script>\n" +
+							   "	<script type=\"text/javascript\" src=\"@controllers.routes.Assets.versioned(\"javascripts/vendor/c3-0.4.10/c3.min.js\")\"></script>\n" +
+							   "	<script type=\"text/javascript\">\n" +
+							   "jQuery(document).ready(function($) {\n" +
+							   "  $('.facet-view-simple').each(function() {\n" +
+							   "  $(this).facetview({\n" +
+							   "    search_url: '@collection_url',\n" +
+							   "    search_index: 'solr',\n" +
+							   "    datatype: 'json',\n" +
+							   "    facets: [ \n" ;
+		String facetSearchSortString="[{'display':'Study URI', 'field':'studyUri.exact'}";
+		String schemaString="<?xml version=\"1.0\" encoding=\"UTF-8\" ?>\n" +
+							"<schema version=\"1.5\">\n" + 
+							"  <fields>\n" + 
+						    "    <field name=\"studyUri\" type=\"string\" indexed=\"true\" stored=\"true\"/>\n" +
+						    "    <field name=\"studyLabel\" type=\"string\" indexed=\"true\" docValues=\"true\" />\n" +
+						    "    <field name=\"proj\" type=\"string\" indexed=\"true\" docValues=\"true\" />\n" +
+						    "    <field name=\"studyTitle\" type=\"string\" indexed=\"true\" docValues=\"true\" />\n" +
+						    "    <field name=\"studyComment\" type=\"string\" indexed=\"true\" docValues=\"true\" />\n" +
+						    "    <field name=\"agentName\" type=\"string\" indexed=\"true\" docValues=\"true\" multiValued=\"true\"  />\n" +
+						    "    <field name=\"institutionName\" type=\"string\" indexed=\"true\" docValues=\"true\" />\n";
+
+		String prefixString="PREFIX sio: <http://semanticscience.org/resource/> " + 
+							"PREFIX chear: <http://hadatac.org/ont/chear#> " +
+							"PREFIX chear-kb: <http://hadatac.org/kb/chear#> " +
+							"PREFIX prov: <http://www.w3.org/ns/prov#> " +
+							"PREFIX hasco: <http://hadatac.org/ont/hasco/> " +
+							"PREFIX hasneto: <http://hadatac.org/ont/hasneto#> " +
+							"PREFIX dcterms: <http://purl.org/dc/terms/> " +
+							"PREFIX rdfs:<http://www.w3.org/2000/01/rdf-schema#> " +
+							"PREFIX skos: <http://www.w3.org/2004/02/skos/core#> " +
+							"PREFIX foaf: <http://xmlns.com/foaf/0.1/> ";
 		String selectString="SELECT ?studyUri ?studyLabel ?proj ?studyTitle ?studyComment ?agentName ?institutionName ";
+		String whereString=" WHERE { ?subUri rdfs:subClassOf hasco:Study . " +
+		                      "?studyUri a ?subUri .  " +
+		                      "?studyUri rdfs:label ?studyLabel . " +
+		                      "OPTIONAL { ?studyUri chear-kb:project ?proj . " +
+		                      " ?studyUri skos:definition ?studyTitle . " +
+		                      " ?studyUri rdfs:comment ?studyComment . " +
+		                      " ?studyUri hasco:hasAgent ?agent .  " +
+		                      " ?agent foaf:name ?agentName . " +
+		                      " ?studyUri hasco:hasInstitution ?institution . " +
+                              " ?institution foaf:name ?institutionName } . " +
+						 	  "?schemaUri hasco:isSchemaOf ?studyUri . " +
+                			  "?schemaAttribute hasneto:partOfSchema ?schemaUri . ";
 		SelectRowsResponse response;
+		
 		try {
+			Connection cn = new Connection("http://chear.tw.rpi.edu/labkey", "rashidsabbir@gmail.com", "");
+			SelectRowsCommand cmd = new SelectRowsCommand("lists", "LocalStudyIndicatorType");
+			cmd.setRequiredVersion(9.1);
+			cmd.setColumns(Arrays.asList("hasURI", "rdfs:subClassOf", "rdfs:label", "rdfs:comment", "prov:wasGeneratedBy", "skos:editorialNote", "hasco:needsApproval", "hasco:approvedBy"));
 			response = cmd.execute(cn, "/CHEAR Production");
 			System.out.println("Number of rows: " + response.getRowCount());
 
@@ -49,14 +109,19 @@ public class DynamicGeneration extends Controller {
 			{
 				System.out.println(row);
 				indicatorValues = new ArrayList<String>();
+				JSONObject uri = (JSONObject)row.get("hasURI");
 				JSONObject superClass = (JSONObject)row.get("rdfs:subClassOf");
 				indicatorValues.add(superClass.get("value").toString());
 				JSONObject label = (JSONObject)row.get("rdfs:label");
 				indicatorValues.add(label.get("value").toString());
+				facetPageString=facetPageString + "        {'field': '" + label.get("value").toString().replaceAll(" ", "").replaceAll(",", "") + "', 'display': '" + label.get("value").toString() + "'},\n";
+				facetSearchSortString=facetSearchSortString + ",{'display':'" + label.get("value").toString() + "','field':'" + label.get("value").toString().replaceAll(" ", "").replaceAll(",", "") + ".exact'}" ;
+				schemaString=schemaString + "    <field name=\" " + label.get("value").toString().replaceAll(" ", "").replaceAll(",", "") + "\" type=\"string\" indexed=\"true\" docValues=\"true\" multiValued=\"true\"  />\n" ;
 				selectString = selectString + "?" + label.get("value").toString().replaceAll(" ", "").replaceAll(",", "") + " ";
+				whereString = whereString + "OPTIONAL { ?schemaAttribute hasneto:hasAttribute ?" + label.get("value").toString().replaceAll(" ", "").replaceAll(",", "") +
+						" . ?" + label.get("value").toString().replaceAll(" ", "").replaceAll(",", "") + " rdfs:subClassOf* " + uri.get("value").toString() + " } . ";
 				JSONObject comment = (JSONObject)row.get("rdfs:comment");
 				indicatorValues.add(comment.get("value").toString());
-				JSONObject uri = (JSONObject)row.get("hasURI");
 				indicatorMap.put(uri.get("value").toString(),indicatorValues);
 			}
 		} catch (IOException e) {
@@ -66,205 +131,127 @@ public class DynamicGeneration extends Controller {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		facetPageString =facetPageString + "    ],\n    search_sortby: " + facetSearchSortString + "],\n    searchbox_fieldselect: "+ facetSearchSortString + "],\n" +
+				"    paging: {\n" + 
+				"      size: 10\n" +
+				"    },\n" +
+				"    predefined_filters: {\n" +
+				"        //'owner.exact': {'term':{'owner.exact':'test'}}\n" + 
+				"    },\n" +
+				"    result_display : [\n" +
+				"        [\n" +
+				"          {\n" + 
+				"            \"pre\" : \"<h3>\",\n" +
+				"            \"field\" : \"studyTitle\",\n" +
+				"            \"post\" : \" - \"\n" +
+				"          },\n" +
+				"          {\n" +
+				"            \"pre\" : \"(\",\n" +
+				"            \"field\" : \"studyLabel\",\n" +
+				"            \"post\" : \")</h3>\"\n" +
+				"          }\n" +
+				"        ],\n" +
+				"        [\n" +
+				"          {\n" +
+				"            \"pre\" : \"<b>Institution:</b> \",\n" +
+				"            \"field\" : \"institutionName\",\n" +
+				"            \"post\" : \", \"\n" +
+				"          },\n" +
+				"        [\n" +
+				"          {\n" +
+				"            \"pre\" : \"<b>Principal Investigator(s):</b> \",\n" +
+				"            \"field\" : \"agentName\",\n" +
+				"            \"post\" : \" \"\n" +
+				"          }\n" +
+				"        ],\n" +
+				"        [\n" +
+				"          {\n" + 
+				"            \"pre\" : \"<p>\",\n" + 
+				"            \"field\" : \"studyComment\",\n" +
+				"            \"post\" : \"</p>\"\n" +
+				"          }\n" +
+				"        ]\n" +
+				"    ],\n" +
+				"    default_operator: \"AND\",\n" +
+				"    default_freetext_fuzzify: \"*\"\n" + 
+				"    });\n" +
+				"  });\n" +
+				"});\n" +
+				"    </script>\n" +
+				"	<hr>  \n" + 
+				"    <div class=\"container-fluid\">\n" + 
+				"    <div class=\"page-header\">\n" + 
+				"      <h2>\n" + 
+				"      Study Faceted Search\n" + 
+				"      </h2>\n" + 
+				"   </div>\n" + 
+				"   <div class=\"content\">\n" + 
+				"	 <div class=\"facet-view-simple\"></div>\n" +
+				"   </div> \n" +
+				"   <div id=\"download_url\" style=\"visibility: hidden ;\">@org.hadatac.console.http.routes.SolrSearchProxy.getStudyAcquisitionDownload()</div>\n" + 
+				"   <!-- Trigger the modal with a button -->\n" + 
+				"   <button type=\"button\" class=\"btn btn-info btn-lg\" data-toggle=\"modal\" data-target=\"#myModal\">Download</button>\n" + 
+				"   <!-- Modal -->\n" +
+				"	<div id=\"myModal\" class=\"modal fade\" role=\"dialog\">\n" + 
+				"	  <div class=\"modal-dialog\">\n" +
+				"	    <!-- Modal content-->\n" +
+				"	    <div class=\"modal-content\">\n" + 
+				"	      <div class=\"modal-header\">\n" +
+				"	        <button type=\"button\" class=\"close\" data-dismiss=\"modal\">&times;</button>\n" + 
+				"	        <h4 class=\"modal-title\">Download</h4>\n" +
+				"	      </div>\n" +
+				"	      <div class=\"modal-body\">\n" + 
+				"	        <p>Format:</p>\n" +
+				"	        <select class=\"form-control\" id=\"sel_format\">\n" + 
+				"              <option>CSV</option>\n" +
+				"              <option>JSON</option>\n" +
+				"            </select>\n" +
+				"	        <a href=\"\" class=\"btn btn-info\" role=\"button\" id=\"btn_download\">Confirm</a>\n" + 
+				"	      </div>\n" +
+				"	      <div class=\"modal-footer\">\n" + 
+				"	        <button type=\"button\" class=\"btn btn-default\" data-dismiss=\"modal\">Close</button>\n" + 
+				"	      </div>\n" +
+				"	    </div>\n" +
+				"	  </div>\n" +
+				"	</div>\n" +
+				"}";
 		
-		System.out.println(selectString);
+		System.out.println(facetPageString);
+		schemaString = schemaString + "    <field name=\"_version_\" type=\"long\" indexed=\"true\" stored=\"true\"/>\n" +
+									  "    <field name=\"_text_\" type=\"text_general\" indexed=\"true\" stored=\"false\" multiValued=\"true\"/>\n" +
+									  "    <copyField source=\"studyUri\" dest=\"_text_\" />\n" +
+									  "  </fields>\n" +
+									  "  <uniqueKey>studyUri</uniqueKey>\n" +
+									  "  <types>\n" +
+									  "    <fieldType name=\"string\" class=\"solr.StrField\" />\n" +
+									  "    <fieldType name=\"date\" class=\"solr.TrieDateField\" precisionStep=\"0\" positionIncrementGap=\"0\"/>\n" +
+									  "    <fieldType name=\"long\" class=\"solr.TrieLongField\" precisionStep=\"0\" positionIncrementGap=\"0\"/>\n" +
+									  "    <fieldType name=\"double\" class=\"solr.TrieDoubleField\"/>\n" +
+									  "    <fieldType name=\"int\" class=\"solr.TrieIntField\" precisionStep=\"8\"/>\n" +
+									  "    <fieldType name=\"latlong\" class=\"solr.SpatialRecursivePrefixTreeFieldType\"\n" +
+									  "              spatialContextFactory=\"com.spatial4j.core.context.jts.JtsSpatialContextFactory\"\n" +
+									  "              distErrPct=\"0.025\"\n" +
+									  "              maxDistErr=\"0.000009\"\n" +
+									  "              units=\"degrees\" />\n" +
+									  "    <fieldType name=\"text_general\" class=\"solr.TextField\" positionIncrementGap=\"100\" multiValued=\"true\">\n" +
+									  "      <analyzer type=\"index\">\n" +
+									  "        <tokenizer class=\"solr.StandardTokenizerFactory\"/>\n" +
+									  "        <filter class=\"solr.StopFilterFactory\" ignoreCase=\"true\" words=\"stopwords.txt\" />\n" +
+									  "        <filter class=\"solr.LowerCaseFilterFactory\"/> \n" +
+									  "      </analyzer> \n" +
+									  "      <analyzer type=\"query\">\n" +
+									  "        <tokenizer class=\"solr.StandardTokenizerFactory\"/>\n" +
+									  "        <filter class=\"solr.StopFilterFactory\" ignoreCase=\"true\" words=\"stopwords.txt\" />\n" +
+									  "        <filter class=\"solr.LowerCaseFilterFactory\"/>\n" +
+									  "      </analyzer>\n" +
+									  "    </fieldType>\n" +
+									  "  </types>\n" +
+									  "</schema> " ;
+		System.out.println(schemaString);
 		
-		String studyQueryString = "";
-
-		studyQueryString = 
-		"PREFIX sio: <http://semanticscience.org/resource/>" + 
-		"PREFIX chear: <http://hadatac.org/ont/chear#>" + 
-		"PREFIX chear-kb: <http://hadatac.org/kb/chear#>" + 
-		"PREFIX prov: <http://www.w3.org/ns/prov#>" + 
-		"PREFIX hasco: <http://hadatac.org/ont/hasco/>" + 
-		"PREFIX hasneto: <http://hadatac.org/ont/hasneto#>" + 
-		"PREFIX dcterms: <http://purl.org/dc/terms/>" + 
-		"PREFIX rdfs:<http://www.w3.org/2000/01/rdf-schema#>" + 
-		"PREFIX skos: <http://www.w3.org/2004/02/skos/core#>" +
-		"PREFIX foaf: <http://xmlns.com/foaf/0.1/>" + 
-		"SELECT ?studyUri ?studyLabel ?proj ?studyTitle ?studyComment ?agentName ?institutionName   ?demographic ?acculturation ?birthOutcome ?anthropometry ?assessment ?ATIDU ?diet ?envExposure ?housingChar ?medHist ?mentalHealth ?PPU ?pregnancyChar  WHERE {        ?subUri rdfs:subClassOf hasco:Study .  		                      ?studyUri a ?subUri .  	           ?studyUri rdfs:label ?studyLabel  .   					 	OPTIONAL { ?studyUri chear-kb:project ?proj } .  					 	OPTIONAL { ?studyUri skos:definition ?studyTitle } .  					 	OPTIONAL { ?studyUri rdfs:comment ?studyComment } .  					 	OPTIONAL { ?studyUri hasco:hasAgent ?agent .                                   	?agent foaf:name ?agentName } .  					 	OPTIONAL { ?studyUri hasco:hasInstitution ?institution .                                  ?institution foaf:name ?institutionName} .        OPTIONAL {?schemaUri_ hasco:isSchemaOf ?studyUri .                  ?schemaAttribute_ hasneto:partOfSchema ?schemaUri_ } .        OPTIONAL {          		?schemaAttribute_ hasneto:hasAttribute ?demographic_ .                                   ?demographic_ rdfs:subClassOf* chear:Demographic                  } .       OPTIONAL {          		?schemaAttribute_ hasneto:hasAttribute ?acculturation .                                   ?acculturation rdfs:subClassOf* chear:Acculturation                  } .       OPTIONAL {          		?schemaAttribute_ hasneto:hasAttribute ?birthOutcome .                                   ?birthOutcome rdfs:subClassOf* chear:BirthOutcome                 } .        OPTIONAL {          		?schemaAttribute_ hasneto:hasAttribute ?anthropometry .                                   ?anthropometry rdfs:subClassOf* chear:Anthropometry                  } .        OPTIONAL {          		?schemaAttribute_ hasneto:hasAttribute ?assessment .                                   ?assessment rdfs:subClassOf* chear:Assessment                  } .        OPTIONAL {          		?schemaAttribute_ hasneto:hasAttribute ?ATIDU .                                   ?ATIDU rdfs:subClassOf* chear:ATIDU                  } .        OPTIONAL {          		?schemaAttribute_ hasneto:hasAttribute ?diet .                                   ?diet rdfs:subClassOf* chear:DietAndNutrition                  }  .        OPTIONAL {          		?schemaAttribute_ hasneto:hasAttribute ?envExposure .                                   ?envExposure rdfs:subClassOf* chear:EnvironmentalExposure                  } .        OPTIONAL {          		?schemaAttribute_ hasneto:hasAttribute ?housingChar .                                   ?housingChar rdfs:subClassOf* chear:HousingCharacteristic                  } .        OPTIONAL {          		?schemaAttribute_ hasneto:hasAttribute ?medHist .                                   ?medHist rdfs:subClassOf* chear:MedicalHistory                  } .        OPTIONAL {          		?schemaAttribute_ hasneto:hasAttribute ?mentalHealth .                                   ?mentalHealth rdfs:subClassOf* chear:MentalHealth                  } .        OPTIONAL {          		?schemaAttribute_ hasneto:hasAttribute ?PPU .                                   ?PPU rdfs:subClassOf* chear:PersonalProductUse                  } .        OPTIONAL {          		?schemaAttribute_ hasneto:hasAttribute ?pregnancyChar .                                   ?pregnancyChar rdfs:subClassOf* chear:PregnancyCharacteristic                  } .              }";
-	/*	
-"SELECT DISTINCT ?studyUri ?studyLabel ?studyTitle ?proj ?studyComment " +
-"(group_concat(distinct   ?agentName_ ; separator = ' & ') as ?agentName) " +
-"?institutionName " +
-"(group_concat(distinct ?demographicLabel_ ; separator = ' & ') as ?demographicLabel)" +
-"(group_concat(distinct ?acculturationLabel_ ; separator = ' & ') as ?acculturationLabel)" +
-"(group_concat(distinct ?birthOutcomeLabel_ ; separator = ' & ') as ?birthOutcomeLabel)" +
-"(group_concat(distinct ?anthropometryLabel_ ; separator = ' & ') as ?anthropometryLabel)" +
-"(group_concat(distinct ?assessmentLabel_ ; separator = ' & ') as ?assessmentLabel)" +
-"(group_concat(distinct ?ATIDULabel_ ; separator = ' & ') as ?ATIDULabel)" +
-"(group_concat(distinct ?dietLabel_ ; separator = ' & ') as ?dietLabel)" +
-"(group_concat(distinct ?envExposureLabel_ ; separator = ' & ') as ?envExposureLabel)" +
-"(group_concat(distinct ?housingCharLabel_ ; separator = ' & ') as ?housingCharLabel)" +
-"(group_concat(distinct ?medHistLabel_ ; separator = ' & ') as ?medHistLabel)" +
-"(group_concat(distinct ?mentalHealthLabel_ ; separator = ' & ') as ?mentalHealthLabel)" +
-"(group_concat(distinct ?PPULabel_ ; separator = ' & ') as ?PPULabel)" +
-"(group_concat(distinct ?pregnancyCharLabel_ ; separator = ' & ') as ?pregnancyCharLabel)" +
-"WHERE {        ?subUri rdfs:subClassOf hasco:Study . " +
-"		                      ?studyUri a ?subUri . " +
-"	           ?studyUri rdfs:label ?studyLabel  .  " +
-"					 	OPTIONAL { ?studyUri chear-kb:project ?proj } . " +
-"					 	OPTIONAL { ?studyUri skos:definition ?studyTitle } . " +
-"					 	OPTIONAL { ?studyUri rdfs:comment ?studyComment } . " +
-"					 	OPTIONAL { ?studyUri hasco:hasAgent ?agent . " +
-"                                 	?agent foaf:name ?agentName_ } . " +
-"					 	OPTIONAL { ?studyUri hasco:hasInstitution ?institution . " +
-"                                 ?institution foaf:name ?institutionName} . " +
-"       OPTIONAL {?schemaUri_ hasco:isSchemaOf ?studyUri ." +
-"                 ?schemaAttribute_ hasneto:partOfSchema ?schemaUri_ } . " +
-"       OPTIONAL { " +
-"         		?schemaAttribute_ hasneto:hasAttribute ?demographic_ . " +
-"                                 ?demographic_ rdfs:subClassOf* chear:Demographic . " +
-"                			?demographic_ rdfs:label ?demographicLabel_ " +
-"                } ." +
-"      OPTIONAL { " +
-"         		?schemaAttribute_ hasneto:hasAttribute ?acculturation_ . " +
-"                                 ?acculturation_ rdfs:subClassOf* chear:Acculturation . " +
-"                			?acculturation_ rdfs:label ?acculturationLabel_ " +
-"                } . " +
-"      OPTIONAL { " +
-"         		?schemaAttribute_ hasneto:hasAttribute ?birthOutcome_ .  " +
-"                                 ?birthOutcome_ rdfs:subClassOf* chear:BirthOutcome . " +
-"                			?birthOutcome_ rdfs:label ?birthOutcomeLabel_ " +
-"                } . " +
-"       OPTIONAL { " +
-"         		?schemaAttribute_ hasneto:hasAttribute ?anthropometry_ .  " +
-"                                 ?anthropometry_ rdfs:subClassOf* chear:Anthropometry . " +
-"                			?anthropometry_ rdfs:label ?anthropometryLabel_ " +
-"                } . " +
-"       OPTIONAL { " +
-"         		?schemaAttribute_ hasneto:hasAttribute ?assessment_ .  " +
-"                                 ?assessment_ rdfs:subClassOf* chear:Assessment . " +
-"                			?assessment_ rdfs:label ?assessmentLabel_ " +
-"                } . " +
-"       OPTIONAL { " +
-"         		?schemaAttribute_ hasneto:hasAttribute ?ATIDU_ .  " +
-"                                 ?ATIDU_ rdfs:subClassOf* chear:ATIDU . " +
-"                			?ATIDU_ rdfs:label ?ATIDULabel_ " +
-"                } . " +
-"       OPTIONAL { " +
-"         		?schemaAttribute_ hasneto:hasAttribute ?diet_ .  " +
-"                                 ?diet_ rdfs:subClassOf* chear:DietAndNutrition . " +
-"                			?diet_ rdfs:label ?dietLabel_ " +
-"                } . " +
-"       OPTIONAL { " +
-"         		?schemaAttribute_ hasneto:hasAttribute ?envExposure_ .  " +
-"                                 ?envExposure_ rdfs:subClassOf* chear:EnvironmentalExposure . " +
-"                			?envExposure_ rdfs:label ?envExposureLabel_ " +
-"                } . " +
-"       OPTIONAL { " +
-"         		?schemaAttribute_ hasneto:hasAttribute ?housingChar_ .  " +
-"                                 ?housingChar_ rdfs:subClassOf* chear:HousingCharacteristic . " +
-"                			?housingChar_ rdfs:label ?housingCharLabel_ " +
-"                } . " +
-"       OPTIONAL { " +
-"         		?schemaAttribute_ hasneto:hasAttribute ?medHist_ .  " +
-"                                 ?medHist_ rdfs:subClassOf* chear:MedicalHistory . " +
-"                			?medHist_ rdfs:label ?medHistLabel_ " +
-"                } . " +
-"       OPTIONAL { " +
-"         		?schemaAttribute_ hasneto:hasAttribute ?mentalHealth_ .  " +
-"                                 ?mentalHealth_ rdfs:subClassOf* chear:MentalHealth . " +
-"                			?mentalHealth_ rdfs:label ?mentalHealthLabel_ " +
-"                } . " +
-"       OPTIONAL { " +
-"         		?schemaAttribute_ hasneto:hasAttribute ?PPU_ .  " +
-"                                 ?PPU_ rdfs:subClassOf* chear:PersonalProductUse . " +
-"                			?PPU_ rdfs:label ?PPULabel_ " +
-"                } . " +
-"       OPTIONAL { " +
-"         		?schemaAttribute_ hasneto:hasAttribute ?pregnancyChar_ .  " +
-"                                 ?pregnancyChar_ rdfs:subClassOf* chear:PregnancyCharacteristic . " +
-"                			?pregnancyChar_ rdfs:label ?pregnancyCharLabel_ " +
-"                } .       " +
-"      } " +
-"GROUP BY ?studyUri ?studyLabel ?proj ?studyTitle ?studyComment ?agentName ?institutionName ?schemaUri ?schemaAttributeLabel ?schemaLabel ?schemaAttribute ?demographic ?demographicLabel  ?acculturationLabel ?pregnancyCharLabel ?PPULabel ?mentalHealthLabel ?medHistLabel ?housingCharLabel ?envExposureLabel ?dietLabel ?ATIDULabel ?assessmentLabel ?anthropometryLabel ?birthOutcomeLabel ";
-	*/		
-/*
-"SELECT ?studyUri ?studyLabel ?proj ?studyTitle ?studyComment  ?agentName " +
-"?institutionName ?demographic ?acculturation ?birthOutcome ?anthropometry ?assessment " + 
-"?ATIDU ?diet ?envExposure ?housingChar ?medHist ?mentalHealth ?PPU ?pregnancyChar " + 
-"WHERE {        ?subUri rdfs:subClassOf hasco:Study .  " +
-"		                      ?studyUri a ?subUri .  " +
-"	           ?studyUri rdfs:label ?studyLabel  .   " +
-"					 	OPTIONAL { ?studyUri chear-kb:project ?proj } .  " +
-"					 	OPTIONAL { ?studyUri skos:definition ?studyTitle } .  " +
-"					 	OPTIONAL { ?studyUri rdfs:comment ?studyComment } .  " +
-"					 	OPTIONAL { ?studyUri hasco:hasAgent ?agent .  " +
-"                                 	?agent foaf:name ?agentName } .  " +
-"					 	OPTIONAL { ?studyUri hasco:hasInstitution ?institution . " +
-"                                 ?institution foaf:name ?institutionName} . " +
-"       OPTIONAL {?schemaUri_ hasco:isSchemaOf ?studyUri . " +
-"                 ?schemaAttribute_ hasneto:partOfSchema ?schemaUri_ } . " +
-"       OPTIONAL { " +
-"         		?schemaAttribute_ hasneto:hasAttribute ?demographic_ .  " +
-"                                 ?demographic_ rdfs:subClassOf* chear:Demographic  " +
-"                } . " +
-"      OPTIONAL { " +
-"         		?schemaAttribute_ hasneto:hasAttribute ?acculturation .  " +
-"                                 ?acculturation rdfs:subClassOf* chear:Acculturation  " +
-"                } . " +
-"      OPTIONAL { " +
-"         		?schemaAttribute_ hasneto:hasAttribute ?birthOutcome .  " +
-"                                 ?birthOutcome rdfs:subClassOf* chear:BirthOutcome " +
-"                } . " +
-"       OPTIONAL { " +
-"         		?schemaAttribute_ hasneto:hasAttribute ?anthropometry .  " +
-"                                 ?anthropometry rdfs:subClassOf* chear:Anthropometry  " +
-"                } . " +
-"       OPTIONAL { " +
-"         		?schemaAttribute_ hasneto:hasAttribute ?assessment .  " +
-"                                 ?assessment rdfs:subClassOf* chear:Assessment  " +
-"                } . " +
-"       OPTIONAL { " +
-"         		?schemaAttribute_ hasneto:hasAttribute ?ATIDU .  " +
-"                                 ?ATIDU rdfs:subClassOf* chear:ATIDU  " +
-"                } . " +
-"       OPTIONAL { " +
-"         		?schemaAttribute_ hasneto:hasAttribute ?diet .  " +
-"                                 ?diet rdfs:subClassOf* chear:DietAndNutrition  " +
-"                }  . " +
-"       OPTIONAL { " +
-"         		?schemaAttribute_ hasneto:hasAttribute ?envExposure .  " +
-"                                 ?envExposure rdfs:subClassOf* chear:EnvironmentalExposure  " +
-"                } . " +
-"       OPTIONAL { " +
-"         		?schemaAttribute_ hasneto:hasAttribute ?housingChar .  " +
-"                                 ?housingChar rdfs:subClassOf* chear:HousingCharacteristic  " +
-"                } . " +
-"       OPTIONAL { " +
-"         		?schemaAttribute_ hasneto:hasAttribute ?medHist . " + 
-"                                 ?medHist rdfs:subClassOf* chear:MedicalHistory " + 
-"                } . " +
-"       OPTIONAL { " +
-"         		?schemaAttribute_ hasneto:hasAttribute ?mentalHealth . " + 
-"                                 ?mentalHealth rdfs:subClassOf* chear:MentalHealth  " +
-"                } . " +
-"       OPTIONAL { " +
-"         		?schemaAttribute_ hasneto:hasAttribute ?PPU .  " +
-"                                 ?PPU rdfs:subClassOf* chear:PersonalProductUse  " +
-"                } . " +
-"       OPTIONAL { " +
-"         		?schemaAttribute_ hasneto:hasAttribute ?pregnancyChar .  " +
-"                                 ?pregnancyChar rdfs:subClassOf* chear:PregnancyCharacteristic  " +
-"                } . " +
-"      } " ;		
-		
-//		"SELECT ?studyUri ?studyLabel ?proj ?studyDef ?studyComment ?agentName ?institutionName " + 
-//		" WHERE {        ?subUri rdfs:subClassOf hasco:Study . " +
-//		//"CONSTRUCT {        ?subUri rdfs:subClassOf hasco:Study . " +
-//		"                       ?studyUri a ?subUri . " + 
-//		"           ?studyUri rdfs:label ?studyLabel  .  " +
-//		//"WHERE {        OPTIONAL { ?studyUri chear-kb:project ?proj } . " + 
-//		"        OPTIONAL { ?studyUri chear-kb:project ?proj } . " + 
-//		"        OPTIONAL { ?studyUri skos:definition ?studyTitle } . " + 
-//		"        OPTIONAL { ?studyUri rdfs:comment ?studyComment } . " + 
-//		"        OPTIONAL { ?studyUri hasco:hasAgent ?agent . " + 
-//		"                                   ?agent foaf:name ?agentName } . " + 
-//		"        OPTIONAL { ?studyUri hasco:hasInstitution ?institution . " + 
-//		"                                 ?institution foaf:name ?institutionName} . " + 
-//		"                             }" ;*/
+		String studyQueryString = prefixString + selectString + whereString + " } ";
 		System.out.println(studyQueryString);
+		
 		Query studyQuery = QueryFactory.create(studyQueryString);
 		
 		QueryExecution qexec = QueryExecutionFactory.sparqlService(Collections.getCollectionsName(Collections.METADATA_SPARQL), studyQuery);
@@ -289,8 +276,8 @@ public class DynamicGeneration extends Controller {
 			studyResult.put(soln.get("studyUri").toString(),values);
 			
 		}
-//		return studyResult;
-		return indicatorMap;
+		return studyResult;
+//		return indicatorMap;
 	}
 	
 	
@@ -342,10 +329,10 @@ public class DynamicGeneration extends Controller {
 	// for /metadata HTTP GET requests
     public static Result index() {
     	
-		Map<String, List<String>> studyResult = findStudy();
+		Map<String, List<String>> studyResult = generateStudy();
 		Map<String, List<String>> subjectResult = findSubject();
         
-        return ok(viewStudy.render(studyResult,subjectResult));
+        return ok(dynamicPage.render(studyResult,subjectResult));
         
     }// /index()
 
