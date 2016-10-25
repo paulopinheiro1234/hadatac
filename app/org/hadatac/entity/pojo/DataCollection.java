@@ -6,6 +6,7 @@ import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 
+import org.apache.jena.base.Sys;
 import org.apache.jena.query.Query;
 import org.apache.jena.query.QueryExecution;
 import org.apache.jena.query.QueryExecutionFactory;
@@ -425,7 +426,7 @@ public class DataCollection {
 	public int save() {
 		try {
 			SolrClient client = new HttpSolrClient(Play.application().configuration().getString("hadatac.solr.data") + "/sdc");
-			if (endedAt == null) {
+			if (endedAt.toString().startsWith("9999")) {
 				endedAt = DateTime.parse("9999-12-31T23:59:59.999Z");
 			}
 			int status = client.addBean(this).getStatus();
@@ -440,7 +441,7 @@ public class DataCollection {
 	
 	public int save(SolrClient solr) {
 		try {
-			if (endedAt == null) {
+			if (endedAt.toString().startsWith("9999")) {
 				endedAt = DateTime.parse("9999-12-31T23:59:59.999Z");
 			}
 			int status = solr.addBean(this).getStatus();
@@ -531,12 +532,10 @@ public class DataCollection {
 		SolrQuery query = new SolrQuery();
 		if (state.getCurrent() == State.ALL) {
 			query.set("q", "owner_uri:\"" + ownerUri + "\"");
-		} else { 
-			if (state.getCurrent() == State.ACTIVE) {
-				query.set("q", "owner_uri:\"" + ownerUri + "\"" + " AND " + "ended_at:\"9999-12-31T23:59:59.999Z\"");
-			} else {  // it is assumed that state is CLOSED
-				query.set("q", "owner_uri:\"" + ownerUri + "\"" + " AND " + "-ended_at:\"9999-12-31T23:59:59.999Z\"");
-			}
+		} else if (state.getCurrent() == State.ACTIVE) {
+			query.set("q", "owner_uri:\"" + ownerUri + "\"" + " AND " + "ended_at:\"9999-12-31T23:59:59.999Z\"");
+		} else {  // it is assumed that state is CLOSED
+			query.set("q", "owner_uri:\"" + ownerUri + "\"" + " AND " + "-ended_at:\"9999-12-31T23:59:59.999Z\"");
 		}
 		query.set("sort", "started_at asc");
 		
@@ -544,7 +543,6 @@ public class DataCollection {
 			QueryResponse response = solr.query(query);
 			solr.close();
 			SolrDocumentList results = response.getResults();
-			System.out.println("Hello");
 			System.out.println(results.size());
 			Iterator<SolrDocument> i = results.iterator();
 			while (i.hasNext()) {

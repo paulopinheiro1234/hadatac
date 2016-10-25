@@ -225,8 +225,10 @@ POST    /hadatac/perm/preregister/upload           org.hadatac.console.controlle
 POST    /hadatac/perm/preregister/uploadform       org.hadatac.console.controllers.triplestore.UserManagement.submitPreRegistrationForm(oper: String)
 GET	    /hadatac/perm/userNetwork			       org.hadatac.console.controllers.triplestore.UserNetwork.index()
 POST	/hadatac/perm/userNetwork			       org.hadatac.console.controllers.triplestore.UserNetwork.postIndex()
-GET	    /hadatac/perm/admin		        	       org.hadatac.console.controllers.triplestore.ChangePermission.index(user_uri: String)
-POST	/hadatac/perm/admin      			       org.hadatac.console.controllers.triplestore.ChangePermission.postIndex(user_uri: String)
+GET	    /hadatac/perm/change		        	   org.hadatac.console.controllers.triplestore.UserManagement.changeUserPermission(user_uri: String, bGrant: Boolean)
+POST	/hadatac/perm/change     			       org.hadatac.console.controllers.triplestore.UserManagement.postChangeUserPermission(user_uri: String, bGrant: Boolean)
+GET	    /hadatac/perm/delete		        	   org.hadatac.console.controllers.triplestore.UserManagement.deleteUser(user_uri: String)
+POST	/hadatac/perm/delete     			       org.hadatac.console.controllers.triplestore.UserManagement.postDeleteUser(user_uri: String)
  
 # Map static resources from the /public folder to the /assets URL path
 GET     /hadatac/assets/*file                      controllers.Assets.versioned(path="/public", file: Asset)

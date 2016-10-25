@@ -24,8 +24,10 @@ public class DataCollectionManagement extends Controller {
     public static Result index(int stateId) {
 
     	State state = new State(stateId);
-    	final User user = AuthApplication.getLocalUser(Controller.session());
+    	final User user = AuthApplication.getLocalUser(session());
 		String ownerUri = UserManagement.getUriByEmail(user.email);
+		System.out.println(user.email);
+		System.out.println(ownerUri);
     	List<DataCollection> theResults = DataCollection.find(ownerUri, state);    		
     	
         return ok(dataCollectionManagement.render(state, theResults));

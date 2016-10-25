@@ -9,10 +9,10 @@
        <td>@if(user.isAdministrator()) { YES } else { NO }</td>
        <td>
           @if(user.isAdministrator()) {
-               <a href="@org.hadatac.console.controllers.triplestore.routes.ChangePermission.index(URLEncoder.encode(user.getUri(),"UTF-8"))" class="btn-xs btn-primary" role="button">Revoke Admin</a>
+               <a href="@org.hadatac.console.controllers.triplestore.routes.UserManagement.changeUserPermission(URLEncoder.encode(user.getUri(),"UTF-8"), false)" class="btn-xs btn-primary" role="button">Revoke Admin</a>
           } else {
-               <a href="@org.hadatac.console.controllers.triplestore.routes.ChangePermission.index(URLEncoder.encode(user.getUri(),"UTF-8"))" class="btn-xs btn-primary" role="button">Grant Admin</a>
+               <a href="@org.hadatac.console.controllers.triplestore.routes.UserManagement.changeUserPermission(URLEncoder.encode(user.getUri(),"UTF-8"), true)" class="btn-xs btn-primary" role="button">Grant Admin</a>
           }
-          <a href="" class="btn-xs btn-primary" role="button">Delete</a>
+          <a href="@org.hadatac.console.controllers.triplestore.routes.UserManagement.deleteUser(URLEncoder.encode(user.getUri(),"UTF-8"))" class="btn-xs btn-primary" role="button">Delete</a>
        </td>
     </tr>

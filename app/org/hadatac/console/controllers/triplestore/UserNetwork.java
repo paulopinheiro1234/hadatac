@@ -20,7 +20,7 @@ public class UserNetwork extends Controller {
     public static Result index() {
 
     	ForceFieldQuery ffq = new ForceFieldQuery(Collections.PERMISSIONS_SPARQL);
-    	
+    	System.out.println(ffq.getQueryResult().toString());
         System.out.println("Agent index() was called!");
         return ok(userNetwork.render(ffq.getQueryResult().replace("\n", " ")));
         

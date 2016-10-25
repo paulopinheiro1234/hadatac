@@ -33,6 +33,7 @@ import org.hadatac.console.models.SparqlQueryResults;
 import org.hadatac.console.models.TripleDocument;
 import org.hadatac.console.views.html.triplestore.*;
 import org.hadatac.entity.pojo.User;
+import org.hadatac.entity.pojo.UserGroup;
 import org.hadatac.metadata.loader.PermissionsContext;
 import org.hadatac.metadata.loader.RDFContext;
 import org.hadatac.metadata.loader.SpreadsheetProcessing;
@@ -49,12 +50,12 @@ public class UserManagement extends Controller {
 
 	@Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
 	public static Result preRegistration(String oper) {
-		return ok(users.render(oper, "", User.find(), ""));
+		return ok(users.render(oper, "", User.find(), UserGroup.find(), ""));
 	}
 
 	@Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
 	public static Result postPreRegistration(String oper) {
-		return ok(users.render(oper, "", User.find(), ""));
+		return ok(users.render(oper, "", User.find(), UserGroup.find(), ""));
 	}
 
 	@Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
@@ -78,8 +79,32 @@ public class UserManagement extends Controller {
 	}
 	
 	@Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
+    public static Result changeUserPermission(String user_uri, boolean bGrant) {
+		User.changePermission(user_uri, bGrant);
+		return ok(users.render("init", "", User.find(), UserGroup.find(), ""));
+    }
+
+	@Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
+    public static Result postChangeUserPermission(String user_uri, boolean bGrant) {
+		User.changePermission(user_uri, bGrant);
+    	return ok(users.render("init", "", User.find(), UserGroup.find(), ""));
+    }
+	
+	@Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
+    public static Result deleteUser(String user_uri) {
+		User.deleteUser(user_uri);
+		return ok(users.render("init", "", User.find(), UserGroup.find(), ""));
+    }
+
+	@Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
+    public static Result postDeleteUser(String user_uri) {
+		User.deleteUser(user_uri);
+    	return ok(users.render("init", "", User.find(), UserGroup.find(), ""));
+    }
+	
+	@Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
 	public static Result submitPreRegistrationForm(String oper) {
-		return ok(users.render(oper, "", User.find(), "form"));
+		return ok(users.render(oper, "", User.find(), UserGroup.find(), "form"));
 	}
 	
 	@Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
@@ -117,6 +142,7 @@ public class UserManagement extends Controller {
 			pred_value_map.put("foaf:mbox", email);
 			pred_value_map.put("foaf:homepage", homepage);
 			pred_value_map.put("foaf:member", org_uri);
+			pred_value_map.put("hadatac:isadmin", "false");
 			
 			message = generateTTL(mode, oper, rdf, usr_uri, pred_value_map);
 		}
@@ -256,17 +282,17 @@ public class UserManagement extends Controller {
 					try {
 						isFile.close();
 					} catch (Exception e) {
-						return ok (users.render("fail", "Could not save uploaded file.", User.find(), ""));
+						return ok (users.render("fail", "Could not save uploaded file.", User.find(), UserGroup.find(), ""));
 					}
 				} catch (Exception e) {
-					return ok (users.render("fail", "Could not process uploaded file.",User.find(), ""));
+					return ok (users.render("fail", "Could not process uploaded file.", User.find(), UserGroup.find(), ""));
 				}
 			} catch (FileNotFoundException e1) {
-				return ok (users.render("fail", "Could not find uploaded file",User.find(), ""));
+				return ok (users.render("fail", "Could not find uploaded file", User.find(), UserGroup.find(), ""));
 			}
-			return ok(users.render("loaded", "File uploaded successfully.",User.find(), "batch"));
+			return ok(users.render("loaded", "File uploaded successfully.", User.find(), UserGroup.find(), "batch"));
 		} else {
-			return ok (users.render("fail", "Error uploading file. Please try again.",User.find(), ""));
+			return ok (users.render("fail", "Error uploading file. Please try again.", User.find(), UserGroup.find(), ""));
 		} 
 	} 
 

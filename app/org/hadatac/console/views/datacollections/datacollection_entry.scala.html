@@ -9,7 +9,11 @@
        <td>@dc.getInstrumentModel()</td>
        <td>@dc.getStartedAt()</td>
        @if(state.getCurrent() != State.ACTIVE) {
-           <td>@dc.getEndedAt()</td>
+    	   @if(dc.getEndedAt().startsWith("9999")){
+    		   <td></td>
+    	   }else{
+    		   <td>@dc.getEndedAt()</td>
+    	   }
        }
        <td>@dc.getNumberDataPoints()</td>
        <td>

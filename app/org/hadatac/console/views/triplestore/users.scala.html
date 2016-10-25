@@ -1,6 +1,7 @@
 @(oper: String, 
   message : String, 
   users: List[org.hadatac.entity.pojo.User],
+  groups: List[org.hadatac.entity.pojo.User],
   source: String)
 
 @import helper._
@@ -113,7 +114,37 @@
                        }
                     </tbody>
                   </table>
-                  <br><br>
+                  <br>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+             <div class="col-md-1"></div>
+             <div class="col-md-3">
+                <h4>Group List</h4>
+             </div>
+        </div>
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-md-1"></div>
+                <div class="col-md-11">
+                  <table class="table">
+                    <thead>
+                       <tr>
+                          <th>Group Name</th>
+                          <th>URI</th>
+                          <th>Group</th>
+                          <th>Admin</th>
+                          <th>Operations</th>
+                       </tr>
+                    </thead>
+                    <tbody>
+                       @for((group) <- groups){
+                          @user_entry(group)
+                       }
+                    </tbody>
+                  </table>
+                  <br>
                   <a href="@org.hadatac.console.controllers.routes.Portal.index()" class="btn btn-warning" role="button">Back to Main Menu</a>
                 </div>
             </div>

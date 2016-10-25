@@ -24,7 +24,6 @@ public class ForceFieldQuery {
 	    SparqlQuery query = new SparqlQuery();
 	    GetSparqlQuery query_submit = new GetSparqlQuery(collectionSource, query);
 
-
 	    System.out.println("Collection source in use: " + collectionSource);
 		String tabQuery = "OrganizationsH";
 		agents.add(new AgentNode("prov:Agent", "Agent", AgentNode.AGENT, "", ""));
@@ -32,7 +31,7 @@ public class ForceFieldQuery {
 		String query_json = null;
 	    try {
 			query_json = query_submit.executeQuery(tabQuery);
-			System.out.println("AQUI ESTA O RESULTADO: <" + query_json + ">");
+			System.out.println("Here is the result: <" + query_json + ">");
 		} catch (IllegalStateException | IOException e1) {
 	        e1.printStackTrace();
 		}
@@ -42,14 +41,13 @@ public class ForceFieldQuery {
 	    JsonNode rootNode = null;
 		try {
 			rootNode = mapper.readTree(query_json);
-			System.out.println("AQUI ESTA O TAMANHO DO RESULTADO 2: <" + rootNode.size() + ">");
+			System.out.println("Here is the size of results: <" + rootNode.size() + ">");
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 	
-		//JsonNode phoneNosNode = rootNode.path("phoneNumbers");
 		JsonNode bindingsNode = rootNode.findPath("bindings");
-		System.out.println("AQUI ESTA O TAMANHO DO BINDINGS: <" + bindingsNode.size() + ">");
+		System.out.println("Here is the size of bindings: <" + bindingsNode.size() + ">");
 		Iterator<JsonNode> elements = bindingsNode.elements();
 		
 		String name = null;
@@ -62,7 +60,6 @@ public class ForceFieldQuery {
 			memberOf = "";
 
 			JsonNode binding = elements.next();
-
 		    JsonNode uriNode = binding.findPath("agent");
 		    if (uriNode != null && uriNode.get("value") != null) {
 		    	uri = uriNode.get("value").asText();
@@ -91,11 +88,11 @@ public class ForceFieldQuery {
 		}
 
 		tabQuery = "PeopleH";
-		System.out.println("REQUESTED: <" + tabQuery + ">");
+		System.out.println("Requested: <" + tabQuery + ">");
 		query_json = null;
 	    try {
 			query_json = query_submit.executeQuery(tabQuery);
-			System.out.println("AQUI ESTA O RESULTADO: <" + query_json + ">");
+			System.out.println("Here is the result: <" + query_json + ">");
 		} catch (IllegalStateException | IOException e1) {
 	        e1.printStackTrace();
 		}
@@ -105,14 +102,14 @@ public class ForceFieldQuery {
 	    rootNode = null;
 		try {
 			rootNode = mapper.readTree(query_json);
-			System.out.println("AQUI ESTA O TAMANHO DO RESULTADO 2: <" + rootNode.size() + ">");
+			System.out.println("Here is the size of results: <" + rootNode.size() + ">");
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 	
 		//JsonNode phoneNosNode = rootNode.path("phoneNumbers");
 		bindingsNode = rootNode.findPath("bindings");
-		System.out.println("AQUI ESTA O TAMANHO DO BINDINGS: <" + bindingsNode.size() + ">");
+		System.out.println("Here is the size of bindings: <" + bindingsNode.size() + ">");
 		elements = bindingsNode.elements();
 		
 		name = null;
@@ -152,7 +149,7 @@ public class ForceFieldQuery {
 		    System.out.println("agent = <"+ uri + " , " + name + " , " + email + " , " + memberOf + ">"); 
 		}
 		
-		System.out.println("JSON RESULTANTE: <" + toJson() + ">");
+		System.out.println("Json result: <" + toJson() + ">");
     }
 
 	private int findAgentIndex(String uri) {
@@ -200,7 +197,7 @@ public class ForceFieldQuery {
 				} else {
 					int ind = findAgentIndex(tmpAgent.getMemberOf());
 					if (ind == -1) {
-						System.out.println("Invalid memberOf info for " + tmpAgent.getURI());
+						System.out.println("Invalid memberOf info for " + tmpAgent.getURI() + " under " + tmpAgent.getMemberOf());
 					} else {
 						json = json + "    {\"source\": " + agents.indexOf(tmpAgent) + " ,";
 						json = json + " \"target\": " + ind + " ,";
@@ -221,10 +218,11 @@ public class ForceFieldQuery {
 	}
 	
     public String getQueryResult() {
-    	if (agents.size() == 0) 
+    	if (agents.size() == 0){
     		return "";
-    	else
+    	}
+    	else{
     		return toJson();
-    }
-    
+    	}
+    } 
 }

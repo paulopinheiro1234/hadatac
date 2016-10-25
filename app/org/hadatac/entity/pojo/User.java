@@ -1,14 +1,18 @@
 package org.hadatac.entity.pojo;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
+import org.apache.http.HttpResponse;
 import org.apache.http.client.ClientProtocolException;
+import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.jena.query.Query;
@@ -20,36 +24,18 @@ import org.apache.jena.query.ResultSet;
 import org.apache.jena.query.ResultSetFactory;
 import org.apache.jena.query.ResultSetRewindable;
 import org.apache.jena.rdf.model.Model;
-import org.apache.jena.rdf.model.Property;
 import org.apache.jena.rdf.model.RDFNode;
-import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdf.model.Statement;
 import org.apache.jena.rdf.model.StmtIterator;
 import org.apache.jena.update.UpdateExecutionFactory;
 import org.apache.jena.update.UpdateFactory;
 import org.apache.jena.update.UpdateProcessor;
 import org.apache.jena.update.UpdateRequest;
-import org.hadatac.console.views.html.deployments.newDeployment;
-import org.hadatac.data.loader.util.Sparql;
 import org.hadatac.utils.Collections;
 import org.hadatac.utils.NameSpaces;
-
 import play.Play;
 
 public class User implements Comparable<User> {
-	
-	public static String INDENT1 = "     ";
-	
-	public static String INSERT_LINE1 = "INSERT DATA {  ";
-    
-    public static String LINE3 = INDENT1 + "a         prov:Person, foaf:Person;  ";
-    
-    public static String MBOX_PREDICATE =     INDENT1 + "foaf:mbox        ";
-    
-    public static String TIME_XMLS =   "\"^^<http://www.w3.org/2001/XMLSchema#dateTime> .";
-    
-    public static String LINE_LAST = "}  ";
-	
 	private String uri;
 	private String name;
 	private String email;
@@ -65,13 +51,12 @@ public class User implements Comparable<User> {
 	public void setUri(String uri) {
 		this.uri = uri;
 	}
-
+	
 	public String getName() {
 		return name;
 	}
 
 	public void setName(String name) {
-		System.out.println("setName: " + name);
 		this.name = name;
 	}
 
@@ -144,20 +129,12 @@ public class User implements Comparable<User> {
 	}
 	
 	public void save() {
-		User tmpUser = User.find(uri);
-
-		boolean updateAdministrator = this.administrator != tmpUser.isAdministrator();
-			
-        if (updateAdministrator) {
-        }
-        
         String insert = "";
 		insert += NameSpaces.getInstance().printSparqlNameSpaceList();
-		insert += INSERT_LINE1;
+		insert += "INSERT DATA {  ";
     	insert += "<" + this.getUri() + ">  ";
-    	insert += MBOX_PREDICATE + "\"" + this.email + "\" ;   ";
-    	insert += LINE_LAST;
-    	
+    	insert += " foaf:mbox " + "\"" + this.email + "\" ;   ";
+    	insert += "}  ";
     	System.out.println("!!!! INSERT USER QUERY\n" + insert);
         
         UpdateRequest request = UpdateFactory.create(insert);
@@ -233,25 +210,30 @@ public class User implements Comparable<User> {
 			if (statement.getPredicate().getURI().equals("http://www.w3.org/2000/01/rdf-schema#label")) {
 				user.setLabel(object.asLiteral().getString());
 				System.out.println("label: " + object.asLiteral().getString());
-		    } else if (statement.getPredicate().getURI().equals("http://xmlns.com/foaf/0.1/member")) {
-		    	User group = new User();
-		    	group.setUri(object.asResource().getURI());
-			    user.setImmediateGroup(group);
-			} else if (statement.getPredicate().getURI().equals("http://xmlns.com/foaf/0.1/name")) {
+		    }
+			else if (statement.getPredicate().getURI().equals("http://xmlns.com/foaf/0.1/member")) {
+				if(!object.toString().equals("")){
+			    	User group = new User();
+			    	group.setUri(object.asResource().getURI());
+				    user.setImmediateGroup(group);
+				}
+			} 
+			else if (statement.getPredicate().getURI().equals("http://xmlns.com/foaf/0.1/name")) {
 				user.setName(object.asLiteral().getString());
 				System.out.println("name: " + object.asLiteral().getString());
-			} else if (statement.getPredicate().getURI().equals("http://xmlns.com/foaf/0.1/mbox")) {
+			}
+			else if (statement.getPredicate().getURI().equals("http://xmlns.com/foaf/0.1/mbox")) {
 				user.setEmail(object.asLiteral().getString());
 				System.out.println("mbox: " + object.asLiteral().getString());
 			}
-			//else if (statement.getPredicate().getURI().equals("")) {
-				//if (object.asLiteral().getString().equals("true")) {
-				  //  user.setAdministrator(true);
-				//} else {
-				 //   user.setAdministrator(false);
-				//}
-				//System.out.println("mbox: " + object.asLiteral().getString());
-		    //}
+			else if (statement.getPredicate().getURI().equals("http://hadatac.org/ont/hadatac#isadmin")) {
+				if (object.asLiteral().getString().equals("true")) {
+				    user.setAdministrator(true);
+				} else {
+				    user.setAdministrator(false);
+				}
+				System.out.println("IsAdmin: " + object.asLiteral().getString());
+		    }
 		}
 		
 		QueryExecution qexecPublic = QueryExecutionFactory.sparqlService(Collections.getCollectionsName(Collections.METADATA_SPARQL), query);
@@ -271,6 +253,45 @@ public class User implements Comparable<User> {
 		}
 		
 		return user;
+	}
+	
+	public static void changePermission(String uri, boolean bAdmin) {
+		try {
+			uri = URLDecoder.decode(uri,"UTF-8");
+		} catch (UnsupportedEncodingException e) {
+			e.printStackTrace();
+		}
+		String flag = "";
+		String counter_flag = "";
+		if(bAdmin){
+			flag = "true";
+			counter_flag = "false";
+		}
+		else{
+			flag = "false";
+			counter_flag = "true";
+		}
+		
+		String queryString =  "DELETE { <" + uri + "> <http://hadatac.org/ont/hadatac#isadmin> \"" + counter_flag + "\" .  } \n"
+							+ "INSERT { <" + uri + "> <http://hadatac.org/ont/hadatac#isadmin> \"" + flag + "\" . } \n "
+							+ "WHERE { } \n";
+		System.out.println(queryString);
+		UpdateRequest req = UpdateFactory.create(queryString);
+		UpdateProcessor processor = UpdateExecutionFactory.createRemote(req, Collections.getCollectionsName(Collections.PERMISSIONS_SPARQL));
+		processor.execute();
+	}
+	
+	public static void deleteUser(String uri) {
+		try {
+			uri = URLDecoder.decode(uri,"UTF-8");
+		} catch (UnsupportedEncodingException e) {
+			e.printStackTrace();
+		}
+		String queryString = "DELETE WHERE { <" + uri + "> ?p1 ?o1 } \n";
+		System.out.println(queryString);
+		UpdateRequest req = UpdateFactory.create(queryString);
+		UpdateProcessor processor = UpdateExecutionFactory.createRemote(req, Collections.getCollectionsName(Collections.PERMISSIONS_SPARQL));
+		processor.execute();
 	}
 	
 	@Override
