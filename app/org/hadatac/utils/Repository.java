@@ -37,6 +37,7 @@ public class Repository {
         	return message;
         }
     	String home = Play.application().configuration().getString("hadatac.solr.home");
+    	System.out.println(home);
     	if (!home.endsWith("/")) {
     		home = home + "/";
     	}
