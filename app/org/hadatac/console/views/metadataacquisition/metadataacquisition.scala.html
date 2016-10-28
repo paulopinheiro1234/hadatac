@@ -4,47 +4,53 @@
 @import org.hadatac.console.views.html._
 
 @main("Study Browser Home") {
-   		<script type="text/javascript" src="@controllers.routes.Assets.versioned("javascripts/vendor/jquery/1.7.1/jquery-1.7.1.min.js")"></script>
-		<link rel="stylesheet" type="text/css" href="@controllers.routes.Assets.versioned("javascripts/vendor/bootstrap/css/bootstrap.min.css")"/>
-		<script type="text/javascript" src="@controllers.routes.Assets.versioned("javascripts/vendor/bootstrap/js/bootstrap.min.js")"></script>
-		<script type="text/javascript" src="@controllers.routes.Assets.versioned("javascripts/vendor/linkify/1.0/jquery.linkify-1.0-min.js")"></script>
-
-		<link rel="stylesheet" href="@controllers.routes.Assets.versioned("javascripts/vendor/jquery-ui-1.8.18.custom/jquery-ui-1.8.18.custom.css")"/>
-		<script type="text/javascript" src="@controllers.routes.Assets.versioned("javascripts/vendor/jquery-ui-1.8.18.custom/jquery-ui-1.8.18.custom.min.js")"></script>
-		
-		<script type="text/javascript" src="@controllers.routes.Assets.versioned("javascripts/jquery.facetview.js")"></script>
-		
-  		<link rel="stylesheet" type="text/css" href="@controllers.routes.Assets.versioned("css/facetview.css")"/>
-  		<link rel="stylesheet" type="text/css" href="@controllers.routes.Assets.versioned("css/style.css")"/>
-		  <!-- Load c3.css -->
-		<link rel="stylesheet" type="text/css" href="@controllers.routes.Assets.versioned("javascripts/vendor/c3-0.4.10/c3.css")"/>
-		  <!-- Load d3.js and c3.js -->
-		<script type="text/javascript" src="@controllers.routes.Assets.versioned("javascripts/vendor/d3-3.5.6/d3.min.js")"></script>
-		<script type="text/javascript" src="@controllers.routes.Assets.versioned("javascripts/vendor/c3-0.4.10/c3.min.js")"></script>
-				
-  <script type="text/javascript">
+	<script type="text/javascript" src="@controllers.routes.Assets.versioned("javascripts/vendor/jquery/1.7.1/jquery-1.7.1.min.js")"></script>
+	<link rel="stylesheet" type="text/css" href="@controllers.routes.Assets.versioned("javascripts/vendor/bootstrap/css/bootstrap.min.css")"/>
+	<script type="text/javascript" src="@controllers.routes.Assets.versioned("javascripts/vendor/bootstrap/js/bootstrap.min.js")"></script>
+	<script type="text/javascript" src="@controllers.routes.Assets.versioned("javascripts/vendor/linkify/1.0/jquery.linkify-1.0-min.js")"></script>
+	<link rel="stylesheet" href="@controllers.routes.Assets.versioned("javascripts/vendor/jquery-ui-1.8.18.custom/jquery-ui-1.8.18.custom.css")"/>
+	<script type="text/javascript" src="@controllers.routes.Assets.versioned("javascripts/vendor/jquery-ui-1.8.18.custom/jquery-ui-1.8.18.custom.min.js")"></script>
+	<script type="text/javascript" src="@controllers.routes.Assets.versioned("javascripts/jquery.facetview.js")"></script>
+	<link rel="stylesheet" type="text/css" href="@controllers.routes.Assets.versioned("css/facetview.css")"/>
+ 	<link rel="stylesheet" type="text/css" href="@controllers.routes.Assets.versioned("css/style.css")"/>
+	<link rel="stylesheet" type="text/css" href="@controllers.routes.Assets.versioned("javascripts/vendor/c3-0.4.10/c3.css")"/>
+	<script type="text/javascript" src="@controllers.routes.Assets.versioned("javascripts/vendor/d3-3.5.6/d3.min.js")"></script>
+	<script type="text/javascript" src="@controllers.routes.Assets.versioned("javascripts/vendor/c3-0.4.10/c3.min.js")"></script>
+	<script type="text/javascript">
 jQuery(document).ready(function($) {
   $('.facet-view-simple').each(function() {
   $(this).facetview({
     search_url: '@collection_url',
     search_index: 'solr',
     datatype: 'json',
-    facets: [
-        {'field': 'acculturation', 'display': 'Acculturation'},
-        {'field': 'anthropometry', 'display': 'Anthropometry'},
-        {'field': 'assessment', 'display': 'Assessment'},
-        {'field': 'ATIDU', 'display': 'Alcohol, Tobacco & Illicit Drug Use'},
-        {'field': 'BDN', 'display': 'Behavior, Diet & Nutrition'},
-        {'field': 'birthOutcomes', 'display': 'Birth Outcomes'},
-        {'field': 'demographics', 'display': 'Demographics'},
-        {'field': 'housingCharacteristics', 'display' : 'Housing Characteristics'},
-        {'field': 'laboratory', 'display': 'Lab/Medical Test'},
-        {'field': 'metals', 'display': 'Prenatal Metals Exposure'},
-        {'field': 'occupation', 'display': 'Occupation'},
-        {'field': 'socioEconomicStatus', 'display': 'Socioeconomic Status'},
+    facets: [ 
+        {'field': 'AlcoholTobaccoandIllicitDrugUseLabel', 'display': 'Alcohol, Tobacco, and Illicit Drug Use'},
+        {'field': 'AcculturationLabel', 'display': 'Acculturation'},
+        {'field': 'AnthropometryLabel', 'display': 'Anthropometry'},
+        {'field': 'PhysicalandMentalAssessmentLabel', 'display': 'Physical and Mental Assessment'},
+        {'field': 'BirthOutcomeLabel', 'display': 'Birth Outcome'},
+        {'field': 'DeliveryCharacteristicsLabel', 'display': 'Delivery Characteristics'},
+        {'field': 'DemographicLabel', 'display': 'Demographic'},
+        {'field': 'DietandNutritionLabel', 'display': 'Diet and Nutrition'},
+        {'field': 'EnvironmentalExposureLabel', 'display': 'Environmental Exposure'},
+        {'field': 'HospitalUtilizationandAccesstoCareLabel', 'display': 'Hospital Utilization and Access to Care'},
+        {'field': 'HousingCharacteristicLabel', 'display': 'Housing Characteristic'},
+        {'field': 'MedicalHistoryLabel', 'display': 'Medical History'},
+        {'field': 'MentalHealthLabel', 'display': 'Mental Health'},
+        {'field': 'NeighborhoodCharacteristicLabel', 'display': 'Neighborhood Characteristic'},
+        {'field': 'OralHealthLabel', 'display': 'Oral Health'},
+        {'field': 'ParentalHealthandFamilyHistoryLabel', 'display': 'Parental Health and Family History'},
+        {'field': 'PersonalProductUseLabel', 'display': 'Personal Product Use'},
+        {'field': 'PhysicalActivityandFitnessLabel', 'display': 'Physical Activity and Fitness'},
+        {'field': 'PregnancyCharacteristicLabel', 'display': 'Pregnancy Characteristic'},
+        {'field': 'PrescriptionMedicationandDietarySupplementsLabel', 'display': 'Prescription Medication and Dietary Supplements'},
+        {'field': 'ReproductiveHealthLabel', 'display': 'Reproductive Health'},
+        {'field': 'SleepCharacterisitcLabel', 'display': 'Sleep Characterisitc'},
+        {'field': 'SocioeconomicClassStatusLabel', 'display': 'Socioeconomic Class Status'},
+        {'field': 'TargetedAnalyteLabel', 'display': 'Targeted Analyte'},
     ],
-    search_sortby: [{'display':'Name', 'field':'name.exact'},{'display':'Demographics','field':'demographics.exact'},{'display':'Lab/Medical Test','field':'laboratory.exact'},{'display':'Prenatal Metals Exposure','field':'metals.exact'},{'display':'Birth Outcomes','field':'birthOutcomes.exact'},{'display':'Acculturation','field':'acculturation.exact'},{'display':'Anthropometry','field':'anthropometry.exact'},{'display':'Assessment','field':'assessment.exact'},{'display':'Alcohol, Tobacco & Illicit Drug Use','field':'ATIDU.exact'},{'display':'Behavior, Diet & Nutrition','field':'BDN.exact'},{'display':'Housing Characteristics','field':'housingCharacteristics.exact'},{'display':'Occupation','field':'occupation.exact'},{'display':'Socioeconomic Status','field':'socioEconomicStatus.exact'}],
-    searchbox_fieldselect: [{'display':'Name', 'field':'name.exact'},{'display':'Demographics','field':'demographics.exact'},{'display':'Lab/Medical Test','field':'laboratory.exact'},{'display':'Prenatal Metals Exposure','field':'metals.exact'},{'display':'Birth Outcomes','field':'birthOutcomes.exact'},{'display':'Acculturation','field':'acculturation.exact'},{'display':'Anthropometry','field':'anthropometry.exact'},{'display':'Assessment','field':'assessment.exact'},{'display':'Alcohol, Tobacco & Illicit Drug Use','field':'ATIDU.exact'},{'display':'Behavior, Diet & Nutrition','field':'BDN.exact'},{'display':'Housing Characteristics','field':'housingCharacteristics.exact'},{'display':'Occupation','field':'occupation.exact'},{'display':'Socioeconomic Status','field':'socioEconomicStatus.exact'}],
+    search_sortby: [{'display':'Study URI', 'field':'studyUri.exact'},{'display':'Alcohol, Tobacco, and Illicit Drug Use','field':'AlcoholTobaccoandIllicitDrugUseLabel.exact'},{'display':'Acculturation','field':'AcculturationLabel.exact'},{'display':'Anthropometry','field':'AnthropometryLabel.exact'},{'display':'Physical and Mental Assessment','field':'PhysicalandMentalAssessmentLabel.exact'},{'display':'Birth Outcome','field':'BirthOutcomeLabel.exact'},{'display':'Delivery Characteristics','field':'DeliveryCharacteristicsLabel.exact'},{'display':'Demographic','field':'DemographicLabel.exact'},{'display':'Diet and Nutrition','field':'DietandNutritionLabel.exact'},{'display':'Environmental Exposure','field':'EnvironmentalExposureLabel.exact'},{'display':'Hospital Utilization and Access to Care','field':'HospitalUtilizationandAccesstoCareLabel.exact'},{'display':'Housing Characteristic','field':'HousingCharacteristicLabel.exact'},{'display':'Medical History','field':'MedicalHistoryLabel.exact'},{'display':'Mental Health','field':'MentalHealthLabel.exact'},{'display':'Neighborhood Characteristic','field':'NeighborhoodCharacteristicLabel.exact'},{'display':'Oral Health','field':'OralHealthLabel.exact'},{'display':'Parental Health and Family History','field':'ParentalHealthandFamilyHistoryLabel.exact'},{'display':'Personal Product Use','field':'PersonalProductUseLabel.exact'},{'display':'Physical Activity and Fitness','field':'PhysicalActivityandFitnessLabel.exact'},{'display':'Pregnancy Characteristic','field':'PregnancyCharacteristicLabel.exact'},{'display':'Prescription Medication and Dietary Supplements','field':'PrescriptionMedicationandDietarySupplementsLabel.exact'},{'display':'Reproductive Health','field':'ReproductiveHealthLabel.exact'},{'display':'Sleep Characterisitc','field':'SleepCharacterisitcLabel.exact'},{'display':'Socioeconomic Class Status','field':'SocioeconomicClassStatusLabel.exact'},{'display':'Targeted Analyte','field':'TargetedAnalyteLabel.exact'}],
+    searchbox_fieldselect: [{'display':'Study URI', 'field':'studyUri.exact'},{'display':'Alcohol, Tobacco, and Illicit Drug Use','field':'AlcoholTobaccoandIllicitDrugUseLabel.exact'},{'display':'Acculturation','field':'AcculturationLabel.exact'},{'display':'Anthropometry','field':'AnthropometryLabel.exact'},{'display':'Physical and Mental Assessment','field':'PhysicalandMentalAssessmentLabel.exact'},{'display':'Birth Outcome','field':'BirthOutcomeLabel.exact'},{'display':'Delivery Characteristics','field':'DeliveryCharacteristicsLabel.exact'},{'display':'Demographic','field':'DemographicLabel.exact'},{'display':'Diet and Nutrition','field':'DietandNutritionLabel.exact'},{'display':'Environmental Exposure','field':'EnvironmentalExposureLabel.exact'},{'display':'Hospital Utilization and Access to Care','field':'HospitalUtilizationandAccesstoCareLabel.exact'},{'display':'Housing Characteristic','field':'HousingCharacteristicLabel.exact'},{'display':'Medical History','field':'MedicalHistoryLabel.exact'},{'display':'Mental Health','field':'MentalHealthLabel.exact'},{'display':'Neighborhood Characteristic','field':'NeighborhoodCharacteristicLabel.exact'},{'display':'Oral Health','field':'OralHealthLabel.exact'},{'display':'Parental Health and Family History','field':'ParentalHealthandFamilyHistoryLabel.exact'},{'display':'Personal Product Use','field':'PersonalProductUseLabel.exact'},{'display':'Physical Activity and Fitness','field':'PhysicalActivityandFitnessLabel.exact'},{'display':'Pregnancy Characteristic','field':'PregnancyCharacteristicLabel.exact'},{'display':'Prescription Medication and Dietary Supplements','field':'PrescriptionMedicationandDietarySupplementsLabel.exact'},{'display':'Reproductive Health','field':'ReproductiveHealthLabel.exact'},{'display':'Sleep Characterisitc','field':'SleepCharacterisitcLabel.exact'},{'display':'Socioeconomic Class Status','field':'SocioeconomicClassStatusLabel.exact'},{'display':'Targeted Analyte','field':'TargetedAnalyteLabel.exact'}],
     paging: {
       size: 10
     },
@@ -55,127 +61,59 @@ jQuery(document).ready(function($) {
         [
           {
             "pre" : "<h3>",
-            "field" : "projectTitle",
+            "field" : "studyTitle",
             "post" : " - "
           },
           {
             "pre" : "(",
-            "field" : "name",
+            "field" : "studyLabel",
             "post" : ")</h3>"
           }
         ],
         [
           {
             "pre" : "<b>Institution:</b> ",
-            "field" : "institution",
+            "field" : "institutionName",
             "post" : ", "
-          },
-          {
-            "pre" : " ",
-            "field" : "location",
-            "post" : " "
           }
         ],
         [
           {
             "pre" : "<b>Principal Investigator(s):</b> ",
-            "field" : "PI",
-            "post" : " "
-          }
-        ],
-        [
-          {
-            "pre" : "<b>Co-Investigator(s):</b> ",
-            "field" : "CI",
-            "post" : " "
-          }
-        ],
-        [
-          {
-            "pre" : "<b>Number of Subjects:</b> ",
-            "field" : "numSubjects",
-            "post" : " "
-          }
-        ],
-        [
-          {
-            "pre" : "<b>Number of Samples:</b> ",
-            "field" : "numSamples",
+            "field" : "agentName",
             "post" : " "
           }
         ],
         [
           {
             "pre" : "<p>",
-            "field" : "description",
+            "field" : "studyComment",
             "post" : "</p>"
-          }
-        ],
-        [
-          {
-            "pre" : "<b>Alcohol, Tobacco & Illicit Drug Use:</b> ",
-            "field" : "ATIDU",
-            "post" : " "
-          }
-        ],
-        [
-          {
-            "pre" : "<b>Birth Outcomes:</b> ",
-            "field" : "birthOutcomes",
-            "post" : " "
-          }
-        ],
-        [
-          {
-            "pre" : "<b>Demographics:</b> ",
-            "field" : "demographics",
-            "post" : " "
-          }
-        ],
-        [
-          {
-            "pre" : "<b>Housing Characteristics:</b> ",
-            "field" : "housingCharacteristics",
-            "post" : " "
-          }
-        ],
-        [
-          {
-            "pre" : "<b>Prenatal Metals Exposure:</b> ",
-            "field" : "metals",
-            "post" : " "
           }
         ]
     ],
     default_operator: "AND",
     default_freetext_fuzzify: "*"
-  });
+    });
   });
 });
-  </script>
+    </script>
 	<hr>  
     <div class="container-fluid">
     <div class="page-header">
       <h2>
       Study Faceted Search
       </h2>
-    </div>
-    
-    <div class="content">
-    
-	  <div class="facet-view-simple"></div>
-
+   </div>
+   <div class="content">
+	 <div class="facet-view-simple"></div>
    </div> 
-   
    <div id="download_url" style="visibility: hidden ;">@org.hadatac.console.http.routes.SolrSearchProxy.getStudyAcquisitionDownload()</div>
-   
    <!-- Trigger the modal with a button -->
    <button type="button" class="btn btn-info btn-lg" data-toggle="modal" data-target="#myModal">Download</button>
-   
    <!-- Modal -->
 	<div id="myModal" class="modal fade" role="dialog">
 	  <div class="modal-dialog">
-	
 	    <!-- Modal content-->
 	    <div class="modal-content">
 	      <div class="modal-header">
@@ -194,7 +132,6 @@ jQuery(document).ready(function($) {
 	        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
 	      </div>
 	    </div>
-	
 	  </div>
 	</div>
 }

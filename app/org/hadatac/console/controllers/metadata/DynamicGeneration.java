@@ -7,6 +7,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 
 import play.mvc.Controller;
 import play.mvc.Result;
@@ -33,8 +34,21 @@ public class DynamicGeneration extends Controller {
 //	public static Map<String, String> findBasic(String study_uri) {
 	public static Map<String, List<String>> generateStudy() {
 		
-		Map<String, List<String>> indicatorMap = new HashMap<String, List<String>>();
-		List<String> indicatorValues ;
+		String indicatorQuery="PREFIX rdfs:<http://www.w3.org/2000/01/rdf-schema#> PREFIX chear: <http://hadatac.org/ont/chear#>SELECT ?studyIndicator ?label ?comment WHERE { ?studyIndicator rdfs:subClassOf chear:StudyIndicator . ?studyIndicator rdfs:label ?label . ?studyIndicator rdfs:comment ?comment . }";
+		QueryExecution qexec0 = QueryExecutionFactory.sparqlService(Collections.getCollectionsName(Collections.METADATA_SPARQL), indicatorQuery);
+		ResultSet indicatorResults = qexec0.execSelect();
+		ResultSetRewindable resultsrw0 = ResultSetFactory.copyResults(indicatorResults);
+		qexec0.close();
+		Map<String, String> indicatorMap = new HashMap<String, String>();
+		String indicatorLabel = "";
+		while (resultsrw0.hasNext()) {
+			QuerySolution soln = resultsrw0.next();
+	//		System.out.println("HERE IS THE RAW SOLN*********" + soln.toString());
+			indicatorLabel = soln.get("label").toString();
+//			indicatorValues.add("Comment: " + soln.get("comment").toString());
+			indicatorMap.put(soln.get("studyIndicator").toString(),indicatorLabel);		
+		}
+		Map<String, String> indicatorMapSorted = new TreeMap<String, String>(indicatorMap);
 		
 		String facetPageString="@(collection_url : java.lang.String)\n\n" +
 							   "@import helper._\n" +
@@ -83,7 +97,7 @@ public class DynamicGeneration extends Controller {
 							"PREFIX skos: <http://www.w3.org/2004/02/skos/core#> " +
 							"PREFIX foaf: <http://xmlns.com/foaf/0.1/> ";
 		String selectString="SELECT ?studyUri ?studyLabel ?proj ?studyTitle ?studyComment ?agentName ?institutionName ";
-		String whereString=" WHERE { ?subUri rdfs:subClassOf hasco:Study . " +
+		String whereString=" 	WHERE { ?subUri rdfs:subClassOf hasco:Study . " +
 		                      "?studyUri a ?subUri .  " +
 		                      "?studyUri rdfs:label ?studyLabel . " +
 		                      "OPTIONAL { ?studyUri chear-kb:project ?proj . " +
@@ -95,6 +109,8 @@ public class DynamicGeneration extends Controller {
                               " ?institution foaf:name ?institutionName } . " +
 						 	  "?schemaUri hasco:isSchemaOf ?studyUri . " +
                 			  "?schemaAttribute hasneto:partOfSchema ?schemaUri . ";
+		String groupByString="GROUP BY ?studyUri ?studyLabel ?proj ?studyTitle ?studyComment ?agentName ?institutionName ";
+		/*
 		SelectRowsResponse response;
 		
 		try {
@@ -108,22 +124,28 @@ public class DynamicGeneration extends Controller {
 			for (Map<String, Object> row : response.getRows())
 			{
 				System.out.println(row);
-				indicatorValues = new ArrayList<String>();
+				//indicatorValues = new ArrayList<String>();
 				JSONObject uri = (JSONObject)row.get("hasURI");
 				JSONObject superClass = (JSONObject)row.get("rdfs:subClassOf");
-				indicatorValues.add(superClass.get("value").toString());
+				//indicatorValues.add(superClass.get("value").toString());
 				JSONObject label = (JSONObject)row.get("rdfs:label");
-				indicatorValues.add(label.get("value").toString());
-				facetPageString=facetPageString + "        {'field': '" + label.get("value").toString().replaceAll(" ", "").replaceAll(",", "") + "', 'display': '" + label.get("value").toString() + "'},\n";
-				facetSearchSortString=facetSearchSortString + ",{'display':'" + label.get("value").toString() + "','field':'" + label.get("value").toString().replaceAll(" ", "").replaceAll(",", "") + ".exact'}" ;
-				schemaString=schemaString + "    <field name=\" " + label.get("value").toString().replaceAll(" ", "").replaceAll(",", "") + "\" type=\"string\" indexed=\"true\" docValues=\"true\" multiValued=\"true\"  />\n" ;
-				selectString = selectString + "?" + label.get("value").toString().replaceAll(" ", "").replaceAll(",", "") + " ";
+				//indicatorValues.add(label.get("value").toString());
+				facetPageString=facetPageString + "        {'field': '" + label.get("value").toString().replaceAll(" ", "").replaceAll(",", "") + "Label', 'display': '" + label.get("value").toString() + "'},\n";
+				facetSearchSortString=facetSearchSortString + ",{'display':'" + label.get("value").toString() + "','field':'" + label.get("value").toString().replaceAll(" ", "").replaceAll(",", "") + "Label.exact'}" ;
+				//schemaString=schemaString + "    <field name=\"" + label.get("value").toString().replaceAll(" ", "").replaceAll(",", "") + "\" type=\"string\" indexed=\"true\" docValues=\"true\" multiValued=\"true\"  />\n" ;
+				schemaString=schemaString + "    <field name=\"" + label.get("value").toString().replaceAll(" ", "").replaceAll(",", "") + "Label\" type=\"string\" indexed=\"true\" docValues=\"true\" multiValued=\"true\"  />\n" ;
+				//selectString = selectString + "?" + label.get("value").toString().replaceAll(" ", "").replaceAll(",", "") + " ";
+				selectString = selectString + "?" + label.get("value").toString().replaceAll(" ", "").replaceAll(",", "") + "Label ";
+				
+				groupByString = groupByString + "?" + label.get("value").toString().replaceAll(" ", "").replaceAll(",", "") + "Label ";
 				whereString = whereString + "OPTIONAL { ?schemaAttribute hasneto:hasAttribute ?" + label.get("value").toString().replaceAll(" ", "").replaceAll(",", "") +
-						" . ?" + label.get("value").toString().replaceAll(" ", "").replaceAll(",", "") + " rdfs:subClassOf* " + uri.get("value").toString() + " } . ";
+						" . ?" + label.get("value").toString().replaceAll(" ", "").replaceAll(",", "") + " rdfs:subClassOf* " + uri.get("value").toString() + 
+						" . ?" + label.get("value").toString().replaceAll(" ", "").replaceAll(",", "") + " rdfs:label ?" + label.get("value").toString().replaceAll(" ", "").replaceAll(",", "") +"Label } . ";
 				JSONObject comment = (JSONObject)row.get("rdfs:comment");
-				indicatorValues.add(comment.get("value").toString());
-				indicatorMap.put(uri.get("value").toString(),indicatorValues);
+				//indicatorValues.add(comment.get("value").toString());
+				//indicatorMap.put(uri.get("value").toString(),indicatorValues);
 			}
+			
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -131,6 +153,21 @@ public class DynamicGeneration extends Controller {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		*/
+		for(Map.Entry<String, String> entry : indicatorMapSorted.entrySet()){
+		    System.out.println("Key : " + entry.getKey() + " and Value: " + entry.getValue());
+		    facetPageString=facetPageString + "        {'field': '" + entry.getValue().toString().replaceAll(" ", "").replaceAll(",", "") + "Label', 'display': '" + entry.getValue().toString() + "'},\n";
+			facetSearchSortString=facetSearchSortString + ",{'display':'" + entry.getValue().toString() + "','field':'" + entry.getValue().toString().replaceAll(" ", "").replaceAll(",", "") + "Label.exact'}" ;
+			schemaString=schemaString + "    <field name=\"" + entry.getValue().toString().replaceAll(" ", "").replaceAll(",", "") + "Label\" type=\"string\" indexed=\"true\" docValues=\"true\" multiValued=\"true\"  />\n" ;
+			selectString = selectString + "?" + entry.getValue().toString().replaceAll(" ", "").replaceAll(",", "") + "Label ";
+			
+			groupByString = groupByString + "?" + entry.getValue().toString().replaceAll(" ", "").replaceAll(",", "") + "Label ";
+			whereString = whereString + "OPTIONAL { ?schemaAttribute hasneto:hasAttribute ?" + entry.getValue().toString().replaceAll(" ", "").replaceAll(",", "") +
+					" . ?" + entry.getValue().toString().replaceAll(" ", "").replaceAll(",", "") + " rdfs:subClassOf* " + entry.getKey().toString().replaceAll("http://hadatac.org/ont/chear#","chear:") + 
+					" . ?" + entry.getValue().toString().replaceAll(" ", "").replaceAll(",", "") + " rdfs:label ?" + entry.getValue().toString().replaceAll(" ", "").replaceAll(",", "") +"Label } . ";
+			
+		}
+		
 		facetPageString =facetPageString + "    ],\n    search_sortby: " + facetSearchSortString + "],\n    searchbox_fieldselect: "+ facetSearchSortString + "],\n" +
 				"    paging: {\n" + 
 				"      size: 10\n" +
@@ -149,6 +186,24 @@ public class DynamicGeneration extends Controller {
 				"            \"pre\" : \"(\",\n" +
 				"            \"field\" : \"studyLabel\",\n" +
 				"            \"post\" : \")</h3>\"\n" +
+/*
+//				"            \"pre\" : \"<h3><a href=\\\"./metadataacquisitions/viewStudy?study_uri=\\\"\",\n" +
+				"            \"pre\" : \"<h3>\",\n" +
+				"            \"field\" : \"studyUri\",\n" +
+//				"            \"post\" : \">\"\n" +
+				"            \"post\" : \" - \"\n" +
+				"          },\n" +
+				"          {\n" +
+				"            \"pre\" : \"\"\n" +
+				"            \"field\" : \"studyTitle\",\n" +
+//				"            \"post\" : \"</a> - \"\n" +
+				"            \"post\" : \" - \"\n" +
+				"          },\n" +
+				"          {\n" +
+				"            \"pre\" : \"(\",\n" +
+				"            \"field\" : \"studyLabel\",\n" +
+				"            \"post\" : \")</h3>\"\n" +
+*/
 				"          }\n" +
 				"        ],\n" +
 				"        [\n" +
@@ -156,7 +211,8 @@ public class DynamicGeneration extends Controller {
 				"            \"pre\" : \"<b>Institution:</b> \",\n" +
 				"            \"field\" : \"institutionName\",\n" +
 				"            \"post\" : \", \"\n" +
-				"          },\n" +
+				"          }\n" +
+				"        ],\n" +
 				"        [\n" +
 				"          {\n" +
 				"            \"pre\" : \"<b>Principal Investigator(s):</b> \",\n" +
@@ -249,7 +305,7 @@ public class DynamicGeneration extends Controller {
 									  "</schema> " ;
 		System.out.println(schemaString);
 		
-		String studyQueryString = prefixString + selectString + whereString + " } ";
+		String studyQueryString = prefixString + selectString + whereString + " } " + groupByString;;
 		System.out.println(studyQueryString);
 		
 		Query studyQuery = QueryFactory.create(studyQueryString);
