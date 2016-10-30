@@ -5,6 +5,7 @@ public class AgentNode {
 	public static final int AGENT = 0;
 	public static final int ORGANIZATION = 1;
 	public static final int PERSON = 2;
+	public static final int GROUP = 3;
 	
     private String name;
     private String uri;
@@ -38,7 +39,5 @@ public class AgentNode {
         
     public String getMemberOf() {
         return memberOf;
-    }	    
-        
- 
+    }
 }

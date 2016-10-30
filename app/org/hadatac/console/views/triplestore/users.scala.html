@@ -133,14 +133,13 @@
                        <tr>
                           <th>Group Name</th>
                           <th>URI</th>
-                          <th>Group</th>
                           <th>Admin</th>
                           <th>Operations</th>
                        </tr>
                     </thead>
                     <tbody>
                        @for((group) <- groups){
-                          @user_entry(group)
+                          @group_entry(group)
                        }
                     </tbody>
                   </table>

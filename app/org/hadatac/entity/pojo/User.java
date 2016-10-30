@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
+import java.security.PrivilegedActionException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -37,10 +38,13 @@ import play.Play;
 
 public class User implements Comparable<User> {
 	private String uri;
+	private String given_name;
+	private String family_name;
 	private String name;
 	private String email;
 	private String homepage;
-	private String label;
+	private String comment;
+	private String org_uri;
 	private User immediateGroup;
 	private boolean administrator;
 	
@@ -50,6 +54,22 @@ public class User implements Comparable<User> {
 
 	public void setUri(String uri) {
 		this.uri = uri;
+	}
+	
+	public String getGivenName() {
+		return given_name;
+	}
+
+	public void setGivenName(String name) {
+		this.given_name = name;
+	}
+	
+	public String getFamilyName() {
+		return family_name;
+	}
+
+	public void setFamilyName(String name) {
+		this.family_name = name;
 	}
 	
 	public String getName() {
@@ -76,12 +96,12 @@ public class User implements Comparable<User> {
 		this.homepage = homepage;
 	}
 
-	public String getLabel() {
-		return label;
+	public String getComment() {
+		return comment;
 	}
 
-	public void setLabel(String label) {
-		this.label = label;
+	public void setComment(String comment) {
+		this.comment = comment;
 	}
 	
 	public User getImmediateGroup() {
@@ -90,6 +110,14 @@ public class User implements Comparable<User> {
 
 	public void setImmediateGroup(User immediateGroup) {
 		this.immediateGroup = immediateGroup;
+	}
+	
+	public String getOrgUri(){
+		return org_uri;
+	}
+	
+	public void setOrgUri(String uri){
+		org_uri = uri;
 	}
 	
 	public boolean isAdministrator() {
@@ -188,13 +216,12 @@ public class User implements Comparable<User> {
 	}
 	
 	public static User find(String uri) {
-		User user = null;
 		Model modelPublic;
 		Model modelPrivate;
 		Statement statement;
 		RDFNode object;
 		
-		user = new User();
+		User user = new User();
 		user.setUri(uri);
 		
 		String queryString = "DESCRIBE <" + uri + ">";
@@ -207,17 +234,25 @@ public class User implements Comparable<User> {
 		while (stmtIteratorPrivate.hasNext()) {
 			statement = stmtIteratorPrivate.next();
 			object = statement.getObject();
-			if (statement.getPredicate().getURI().equals("http://www.w3.org/2000/01/rdf-schema#label")) {
-				user.setLabel(object.asLiteral().getString());
-				System.out.println("label: " + object.asLiteral().getString());
+			if (statement.getPredicate().getURI().equals("http://www.w3.org/2000/01/rdf-schema#comment")) {
+				user.setComment(object.asLiteral().getString());
+				System.out.println("comment: " + object.asLiteral().getString());
 		    }
-			else if (statement.getPredicate().getURI().equals("http://xmlns.com/foaf/0.1/member")) {
+			else if (statement.getPredicate().getURI().equals("http://hadatac.org/ont/hadatac#isMemberOfGroup")) {
 				if(!object.toString().equals("")){
-			    	User group = new User();
+			    	User group = UserGroup.find(object.asResource().getURI());
 			    	group.setUri(object.asResource().getURI());
 				    user.setImmediateGroup(group);
 				}
-			} 
+			}
+			else if (statement.getPredicate().getURI().equals("http://xmlns.com/foaf/0.1/givenName")) {
+				user.setGivenName(object.asLiteral().getString());
+				System.out.println("given_name: " + object.asLiteral().getString());
+			}
+			else if (statement.getPredicate().getURI().equals("http://xmlns.com/foaf/0.1/familyName")) {
+				user.setFamilyName(object.asLiteral().getString());
+				System.out.println("family_name: " + object.asLiteral().getString());
+			}
 			else if (statement.getPredicate().getURI().equals("http://xmlns.com/foaf/0.1/name")) {
 				user.setName(object.asLiteral().getString());
 				System.out.println("name: " + object.asLiteral().getString());
@@ -225,6 +260,18 @@ public class User implements Comparable<User> {
 			else if (statement.getPredicate().getURI().equals("http://xmlns.com/foaf/0.1/mbox")) {
 				user.setEmail(object.asLiteral().getString());
 				System.out.println("mbox: " + object.asLiteral().getString());
+			}
+			else if (statement.getPredicate().getURI().equals("http://xmlns.com/foaf/0.1/homepage")) {
+				String homepage = object.asLiteral().getString();
+				if(homepage.startsWith("\"") && homepage.endsWith("\"")){
+					homepage.replace("\"", "");
+				}
+				user.setHomepage(homepage);
+				System.out.println("homepage: " + homepage);
+		    }
+			else if (statement.getPredicate().getURI().equals("http://hadatac.org/ont/hadatac#isMemberOfOrg")) {
+				user.setOrgUri(object.asResource().getURI());
+				System.out.println("org: " + object.asResource().getURI());
 			}
 			else if (statement.getPredicate().getURI().equals("http://hadatac.org/ont/hadatac#isadmin")) {
 				if (object.asLiteral().getString().equals("true")) {
@@ -282,11 +329,6 @@ public class User implements Comparable<User> {
 	}
 	
 	public static void deleteUser(String uri) {
-		try {
-			uri = URLDecoder.decode(uri,"UTF-8");
-		} catch (UnsupportedEncodingException e) {
-			e.printStackTrace();
-		}
 		String queryString = "DELETE WHERE { <" + uri + "> ?p1 ?o1 } \n";
 		System.out.println(queryString);
 		UpdateRequest req = UpdateFactory.create(queryString);

@@ -27,7 +27,7 @@ public class GetSparqlQuery {
 
     public String collection;
     
-    private int numThings = 26;
+    private int numThings = 27;
 
     public String[] thingTypes = new String[numThings];
     
@@ -110,24 +110,25 @@ public class GetSparqlQuery {
         thingTypes[5]  = "DetectorModels";
         thingTypes[6]  = "Entities";
         thingTypes[7]  = "OrganizationsH";
-        thingTypes[8]  = "PeopleH";
-        thingTypes[9]  = "Characteristics";
-        thingTypes[10] = "Units";
-	    thingTypes[11] = "SensingPerspectives";
-	    thingTypes[12] = "EntityCharacteristics";
-	    thingTypes[13] = "Deployments";
-	    thingTypes[14] = "Demographics";
-	    thingTypes[15] = "BirthOutcomes";
-	    thingTypes[16] = "HousingCharacteristic";
-	    thingTypes[17] = "ATIDU";
-	    thingTypes[18] = "Anthropometry";
-	    thingTypes[19] = "PregnancyCharacteristic";
-	    thingTypes[20] = "Analytes";
-	    thingTypes[21] = "Alkaloids";
-	    thingTypes[22] = "Arsenic";
-	    thingTypes[23] = "Elements";
-	    thingTypes[24] = "OrganicAromatic";
-	    thingTypes[25] = "Indicators";
+        thingTypes[8]  = "GroupsH";
+        thingTypes[9]  = "PeopleH";
+        thingTypes[10] = "Characteristics";
+        thingTypes[11] = "Units";
+	    thingTypes[12] = "SensingPerspectives";
+	    thingTypes[13] = "EntityCharacteristics";
+	    thingTypes[14] = "Deployments";
+	    thingTypes[15] = "Demographics";
+	    thingTypes[16] = "BirthOutcomes";
+	    thingTypes[17] = "HousingCharacteristic";
+	    thingTypes[18] = "ATIDU";
+	    thingTypes[19] = "Anthropometry";
+	    thingTypes[20] = "PregnancyCharacteristic";
+	    thingTypes[21] = "Analytes";
+	    thingTypes[22] = "Alkaloids";
+	    thingTypes[23] = "Arsenic";
+	    thingTypes[24] = "Elements";
+	    thingTypes[25] = "OrganicAromatic";
+	    thingTypes[26] = "Indicators";
     }
     
     public String querySelector(String tabName){
@@ -218,20 +219,32 @@ public class GetSparqlQuery {
             	q = "PREFIX prov: <http://www.w3.org/ns/prov#> " + 
             		"PREFIX foaf: <http://xmlns.com/foaf/0.1/> " +
             		"SELECT * WHERE { " +
-            		"  ?agent a foaf:Group . " + 
+            		"  ?agent a foaf:Organization . " + 
             		"  OPTIONAL { ?agent foaf:name ?name . } " + 
             		"  OPTIONAL { ?agent foaf:mbox ?email . } " + 
-            		"  OPTIONAL { ?agent foaf:member ?member . } " +
+            		"}";
+                break;
+            case "GroupsH" : 
+            	q = "PREFIX prov: <http://www.w3.org/ns/prov#> " + 
+            		"PREFIX foaf: <http://xmlns.com/foaf/0.1/> " +
+            		"PREFIX hadatac: <http://hadatac.org/ont/hadatac#> " + 
+            		"SELECT * WHERE { " +
+            		"  ?agent a foaf:Group . " + 
+            		"  OPTIONAL { ?agent foaf:name ?name . } " + 
+            		"  OPTIONAL { ?agent foaf:homepage ?page . } " + 
+            		"  OPTIONAL { ?agent hadatac:isMemberOfOrg ?organization . } " +
             		"}";
                 break;
             case "PeopleH" : 
             	q = "PREFIX prov: <http://www.w3.org/ns/prov#> " + 
-            		"PREFIX foaf: <http://xmlns.com/foaf/0.1/> " +
+            		"PREFIX foaf: <http://xmlns.com/foaf/0.1/> " + 
+            		"PREFIX hadatac: <http://hadatac.org/ont/hadatac#> " + 
             		"SELECT * WHERE { " +
             		"  ?agent a foaf:Person . " + 
             		"  OPTIONAL { ?agent foaf:name ?name . } " + 
             		"  OPTIONAL { ?agent foaf:mbox ?email . } " + 
-            		"  OPTIONAL { ?agent foaf:member ?member . } " +
+            		"  OPTIONAL { ?agent hadatac:isMemberOfGroup ?group . } " + 
+            		"  OPTIONAL { ?agent hadatac:isMemberOfOrg ?organization . } " +
             		"}";
                 break;
             case "DetectorModels" : 

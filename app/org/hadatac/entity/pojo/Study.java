@@ -738,5 +738,4 @@ public class Study {
 			return -1;
 		}
 	}
-	
 }

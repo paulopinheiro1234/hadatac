@@ -23,7 +23,7 @@ public class UserNetwork extends Controller {
     	System.out.println(ffq.getQueryResult().toString());
         System.out.println("Agent index() was called!");
         return ok(userNetwork.render(ffq.getQueryResult().replace("\n", " ")));
-        
+      
     }// /index()
 
 

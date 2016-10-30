@@ -6,6 +6,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -23,6 +24,7 @@ import play.libs.*;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
+import org.apache.jena.base.Sys;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.riot.RDFDataMgr;
 import org.hadatac.console.controllers.AuthApplication;
@@ -60,12 +62,13 @@ public class UserManagement extends Controller {
 
 	@Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
 	public static Result onLinePreRegistration(String oper) {
-		return ok(preregister.render(oper));
+		System.out.println(oper);
+		return ok(preregister.render(oper, UserGroup.find()));
 	}
 
 	@Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
 	public static Result postOnLinePreRegistration(String oper) {
-		return ok(preregister.render(oper));
+		return ok(preregister.render(oper, UserGroup.find()));
 	}
 	
 	@Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
@@ -91,13 +94,64 @@ public class UserManagement extends Controller {
     }
 	
 	@Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
+    public static Result editGroup(String user_uri) {
+		try {
+			user_uri = URLDecoder.decode(user_uri, "UTF-8");
+		} catch (UnsupportedEncodingException e) {
+			e.printStackTrace();
+		}
+		return ok(editregisterGroup.render("edit", UserGroup.find(user_uri)));
+    }
+	
+	@Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
+    public static Result postEditGroup(String user_uri) {
+		try {
+			user_uri = URLDecoder.decode(user_uri, "UTF-8");
+		} catch (UnsupportedEncodingException e) {
+			e.printStackTrace();
+		}
+		return ok(editregisterGroup.render("edit", UserGroup.find(user_uri)));
+    }
+	
+	@Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
+    public static Result editUser(String user_uri) {
+		try {
+			user_uri = URLDecoder.decode(user_uri, "UTF-8");
+		} catch (UnsupportedEncodingException e) {
+			e.printStackTrace();
+		}
+		User user = User.find(user_uri);
+		return ok(editregister.render("edit", UserGroup.find(), User.find(user_uri)));
+    }
+	
+	@Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
+    public static Result postEditUser(String user_uri) {
+		try {
+			user_uri = URLDecoder.decode(user_uri, "UTF-8");
+		} catch (UnsupportedEncodingException e) {
+			e.printStackTrace();
+		}
+		return ok(editregister.render("edit", UserGroup.find(), User.find(user_uri)));
+    }
+	
+	@Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
     public static Result deleteUser(String user_uri) {
+		try {
+			user_uri = URLDecoder.decode(user_uri, "UTF-8");
+		} catch (UnsupportedEncodingException e) {
+			e.printStackTrace();
+		}
 		User.deleteUser(user_uri);
 		return ok(users.render("init", "", User.find(), UserGroup.find(), ""));
     }
 
 	@Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
     public static Result postDeleteUser(String user_uri) {
+		try {
+			user_uri = URLDecoder.decode(user_uri, "UTF-8");
+		} catch (UnsupportedEncodingException e) {
+			e.printStackTrace();
+		}
 		User.deleteUser(user_uri);
     	return ok(users.render("init", "", User.find(), UserGroup.find(), ""));
     }
@@ -131,6 +185,7 @@ public class UserManagement extends Controller {
 		    String comment = data.getComment();
 		    String email = data.getEmail();
 		    String homepage = data.getHomepage();
+		    String group_uri = data.getGroupUri();
 		    String org_uri = data.getOrgUri();
 		    
 		    Map<String, String> pred_value_map = new HashMap<String, String>();
@@ -140,8 +195,9 @@ public class UserManagement extends Controller {
 			pred_value_map.put("foaf:givenName", given_name);
 			pred_value_map.put("rdfs:comment", comment);
 			pred_value_map.put("foaf:mbox", email);
-			pred_value_map.put("foaf:homepage", homepage);
-			pred_value_map.put("foaf:member", org_uri);
+			pred_value_map.put("foaf:homepage", "\"" + homepage + "\"");
+			pred_value_map.put("hadatac:isMemberOfGroup", group_uri);
+			pred_value_map.put("hadatac:isMemberOfOrg", org_uri);
 			pred_value_map.put("hadatac:isadmin", "false");
 			
 			message = generateTTL(mode, oper, rdf, usr_uri, pred_value_map);
@@ -174,11 +230,11 @@ public class UserManagement extends Controller {
 		    String org_uri = data.getOrgUri();
 		    
 		    Map<String, String> pred_value_map = new HashMap<String, String>();
-			pred_value_map.put("a", "prov:Organization");
+			pred_value_map.put("a", "foaf:Group, prov:Group");
 			pred_value_map.put("foaf:name", group_name);
 			pred_value_map.put("rdfs:comment", comment);
-			pred_value_map.put("foaf:homepage", homepage);
-			pred_value_map.put("foaf:member", org_uri);
+			pred_value_map.put("foaf:homepage", "\"" + homepage + "\"");
+			pred_value_map.put("hadatac:isMemberOfOrg", org_uri);
 			
 			message = generateTTL(mode, oper, rdf, group_uri, pred_value_map);
 		}

@@ -7,6 +7,7 @@ public class UserPreRegistrationForm {
     public String email = "";
     public String comment = "";
     public String homepage = "";
+    public String group_uri = "";
     public String org_uri = "";
     
     public String getUserUri() {
@@ -26,6 +27,9 @@ public class UserPreRegistrationForm {
     }
     public String getHomepage() {
     	return homepage;
+    }
+    public String getGroupUri() {
+    	return group_uri;
     }
     public String getOrgUri() {
     	return org_uri;
