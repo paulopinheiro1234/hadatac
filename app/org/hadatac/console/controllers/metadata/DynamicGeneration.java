@@ -33,19 +33,76 @@ public class DynamicGeneration extends Controller {
 	
 //	public static Map<String, String> findBasic(String study_uri) {
 	public static Map<String, List<String>> generateStudy() {
+		String prefixString="PREFIX sio: <http://semanticscience.org/resource/> " + 
+				"PREFIX chear: <http://hadatac.org/ont/chear#> " +
+				"PREFIX chear-kb: <http://hadatac.org/kb/chear#> " +
+				"PREFIX prov: <http://www.w3.org/ns/prov#> " +
+				"PREFIX hasco: <http://hadatac.org/ont/hasco/> " +
+				"PREFIX hasneto: <http://hadatac.org/ont/hasneto#> " +
+				"PREFIX dcterms: <http://purl.org/dc/terms/> " +
+				"PREFIX rdfs:<http://www.w3.org/2000/01/rdf-schema#> " +
+				"PREFIX skos: <http://www.w3.org/2004/02/skos/core#> " +
+				"PREFIX foaf: <http://xmlns.com/foaf/0.1/> ";
+		
+		String initStudyQuery="SELECT DISTINCT ?studyUri ?studyLabel ?proj ?studyTitle ?studyComment " +
+				"(group_concat( ?agentName_ ; separator = ' & ') as ?agentName) " +
+				"?institutionName  " +
+				"WHERE {        ?subUri rdfs:subClassOf hasco:Study .  " +
+				"		                      ?studyUri a ?subUri .  " +
+				"	           ?studyUri rdfs:label ?studyLabel  .   " +
+				"					 	OPTIONAL { ?studyUri chear-kb:project ?proj . " +
+				"                                  ?studyUri skos:definition ?studyTitle . " +
+				"                                   ?studyUri rdfs:comment ?studyComment . " +
+				"                                  ?studyUri hasco:hasAgent ?agent .  " +
+				"                                 	?agent foaf:name ?agentName_ . " +
+				"                                  ?studyUri hasco:hasInstitution ?institution . " +
+				"                                 ?institution foaf:name ?institutionName} . } " +
+				"GROUP BY ?studyUri ?studyLabel ?proj ?studyTitle ?studyComment ?agentName ?institutionName ";
+		
+		QueryExecution qexecStudy = QueryExecutionFactory.sparqlService(Collections.getCollectionsName(Collections.METADATA_SPARQL), prefixString + initStudyQuery);
+		ResultSet initStudyResults = qexecStudy.execSelect();
+		ResultSetRewindable resultsrwStudy = ResultSetFactory.copyResults(initStudyResults);
+		qexecStudy.close();
+		String initStudyJson="{\n\"commit\": {}";
+		Map<String, List<String>> initStudyMap = new HashMap<String, List<String>>();
+		List<String> initStudyValues = new ArrayList<String>();
+		
+		while (resultsrwStudy.hasNext()) {
+			QuerySolution soln = resultsrwStudy.next();
+					
+			initStudyValues= new ArrayList<String>();
+			initStudyValues.add("Label: " + soln.get("studyLabel").toString());
+			initStudyValues.add("Title: " + soln.get("studyTitle").toString());
+			initStudyValues.add("Project: " + soln.get("proj").toString());
+			initStudyValues.add("Comment: " + soln.get("studyComment").toString());
+			initStudyValues.add("Agent(s): " + soln.get("agentName").toString());
+			initStudyValues.add("Institution: " + soln.get("institutionName").toString());
+			initStudyMap.put(soln.get("studyUri").toString(),initStudyValues);
+			
+			initStudyJson=initStudyJson + ",\n\"add\":\n\t{\n\t\"doc\":\n\t\t{\n";
+			initStudyJson=initStudyJson + "\t\t\"studyUri\": \"" + soln.get("studyUri").toString() + "\" ,\n";
+			initStudyJson=initStudyJson + "\t\t\"studyLabel\": \"" + soln.get("studyLabel").toString() + "\" ,\n";
+			initStudyJson=initStudyJson + "\t\t\"studyTitle\": \"" + soln.get("studyTitle").toString() + "\" ,\n";
+			initStudyJson=initStudyJson + "\t\t\"proj\": \"" + soln.get("proj").toString() + "\" ,\n";
+			initStudyJson=initStudyJson + "\t\t\"studyComment\": \"" + soln.get("studyComment").toString() + "\" ,\n";
+			initStudyJson=initStudyJson + "\t\t\"agentName\": \"" + soln.get("agentName").toString() + "\" ,\n";
+			initStudyJson=initStudyJson + "\t\t\"institutionName\": \"" + soln.get("institutionName").toString() + "\"\n";
+			initStudyJson=initStudyJson + "\t\t}\n\t}";
+		}
+		initStudyJson=initStudyJson + "\n}" ;
+		System.out.println(initStudyJson);
 		
 		String indicatorQuery="PREFIX rdfs:<http://www.w3.org/2000/01/rdf-schema#> PREFIX chear: <http://hadatac.org/ont/chear#>SELECT ?studyIndicator ?label ?comment WHERE { ?studyIndicator rdfs:subClassOf chear:StudyIndicator . ?studyIndicator rdfs:label ?label . ?studyIndicator rdfs:comment ?comment . }";
-		QueryExecution qexec0 = QueryExecutionFactory.sparqlService(Collections.getCollectionsName(Collections.METADATA_SPARQL), indicatorQuery);
-		ResultSet indicatorResults = qexec0.execSelect();
-		ResultSetRewindable resultsrw0 = ResultSetFactory.copyResults(indicatorResults);
-		qexec0.close();
+		QueryExecution qexecInd = QueryExecutionFactory.sparqlService(Collections.getCollectionsName(Collections.METADATA_SPARQL), indicatorQuery);
+		ResultSet indicatorResults = qexecInd.execSelect();
+		ResultSetRewindable resultsrwIndc = ResultSetFactory.copyResults(indicatorResults);
+		qexecInd.close();
+		
 		Map<String, String> indicatorMap = new HashMap<String, String>();
 		String indicatorLabel = "";
-		while (resultsrw0.hasNext()) {
-			QuerySolution soln = resultsrw0.next();
-	//		System.out.println("HERE IS THE RAW SOLN*********" + soln.toString());
+		while (resultsrwIndc.hasNext()) {
+			QuerySolution soln = resultsrwIndc.next();
 			indicatorLabel = soln.get("label").toString();
-//			indicatorValues.add("Comment: " + soln.get("comment").toString());
 			indicatorMap.put(soln.get("studyIndicator").toString(),indicatorLabel);		
 		}
 		Map<String, String> indicatorMapSorted = new TreeMap<String, String>(indicatorMap);
@@ -86,16 +143,6 @@ public class DynamicGeneration extends Controller {
 						    "    <field name=\"agentName\" type=\"string\" indexed=\"true\" docValues=\"true\" multiValued=\"true\"  />\n" +
 						    "    <field name=\"institutionName\" type=\"string\" indexed=\"true\" docValues=\"true\" />\n";
 
-		String prefixString="PREFIX sio: <http://semanticscience.org/resource/> " + 
-							"PREFIX chear: <http://hadatac.org/ont/chear#> " +
-							"PREFIX chear-kb: <http://hadatac.org/kb/chear#> " +
-							"PREFIX prov: <http://www.w3.org/ns/prov#> " +
-							"PREFIX hasco: <http://hadatac.org/ont/hasco/> " +
-							"PREFIX hasneto: <http://hadatac.org/ont/hasneto#> " +
-							"PREFIX dcterms: <http://purl.org/dc/terms/> " +
-							"PREFIX rdfs:<http://www.w3.org/2000/01/rdf-schema#> " +
-							"PREFIX skos: <http://www.w3.org/2004/02/skos/core#> " +
-							"PREFIX foaf: <http://xmlns.com/foaf/0.1/> ";
 		String selectString="SELECT ?studyUri ?studyLabel ?proj ?studyTitle ?studyComment ?agentName ?institutionName ";
 		String whereString=" 	WHERE { ?subUri rdfs:subClassOf hasco:Study . " +
 		                      "?studyUri a ?subUri .  " +
@@ -110,63 +157,55 @@ public class DynamicGeneration extends Controller {
 						 	  "?schemaUri hasco:isSchemaOf ?studyUri . " +
                 			  "?schemaAttribute hasneto:partOfSchema ?schemaUri . ";
 		String groupByString="GROUP BY ?studyUri ?studyLabel ?proj ?studyTitle ?studyComment ?agentName ?institutionName ";
-		/*
-		SelectRowsResponse response;
-		
-		try {
-			Connection cn = new Connection("http://chear.tw.rpi.edu/labkey", "rashidsabbir@gmail.com", "");
-			SelectRowsCommand cmd = new SelectRowsCommand("lists", "LocalStudyIndicatorType");
-			cmd.setRequiredVersion(9.1);
-			cmd.setColumns(Arrays.asList("hasURI", "rdfs:subClassOf", "rdfs:label", "rdfs:comment", "prov:wasGeneratedBy", "skos:editorialNote", "hasco:needsApproval", "hasco:approvedBy"));
-			response = cmd.execute(cn, "/CHEAR Production");
-			System.out.println("Number of rows: " + response.getRowCount());
-
-			for (Map<String, Object> row : response.getRows())
-			{
-				System.out.println(row);
-				//indicatorValues = new ArrayList<String>();
-				JSONObject uri = (JSONObject)row.get("hasURI");
-				JSONObject superClass = (JSONObject)row.get("rdfs:subClassOf");
-				//indicatorValues.add(superClass.get("value").toString());
-				JSONObject label = (JSONObject)row.get("rdfs:label");
-				//indicatorValues.add(label.get("value").toString());
-				facetPageString=facetPageString + "        {'field': '" + label.get("value").toString().replaceAll(" ", "").replaceAll(",", "") + "Label', 'display': '" + label.get("value").toString() + "'},\n";
-				facetSearchSortString=facetSearchSortString + ",{'display':'" + label.get("value").toString() + "','field':'" + label.get("value").toString().replaceAll(" ", "").replaceAll(",", "") + "Label.exact'}" ;
-				//schemaString=schemaString + "    <field name=\"" + label.get("value").toString().replaceAll(" ", "").replaceAll(",", "") + "\" type=\"string\" indexed=\"true\" docValues=\"true\" multiValued=\"true\"  />\n" ;
-				schemaString=schemaString + "    <field name=\"" + label.get("value").toString().replaceAll(" ", "").replaceAll(",", "") + "Label\" type=\"string\" indexed=\"true\" docValues=\"true\" multiValued=\"true\"  />\n" ;
-				//selectString = selectString + "?" + label.get("value").toString().replaceAll(" ", "").replaceAll(",", "") + " ";
-				selectString = selectString + "?" + label.get("value").toString().replaceAll(" ", "").replaceAll(",", "") + "Label ";
-				
-				groupByString = groupByString + "?" + label.get("value").toString().replaceAll(" ", "").replaceAll(",", "") + "Label ";
-				whereString = whereString + "OPTIONAL { ?schemaAttribute hasneto:hasAttribute ?" + label.get("value").toString().replaceAll(" ", "").replaceAll(",", "") +
-						" . ?" + label.get("value").toString().replaceAll(" ", "").replaceAll(",", "") + " rdfs:subClassOf* " + uri.get("value").toString() + 
-						" . ?" + label.get("value").toString().replaceAll(" ", "").replaceAll(",", "") + " rdfs:label ?" + label.get("value").toString().replaceAll(" ", "").replaceAll(",", "") +"Label } . ";
-				JSONObject comment = (JSONObject)row.get("rdfs:comment");
-				//indicatorValues.add(comment.get("value").toString());
-				//indicatorMap.put(uri.get("value").toString(),indicatorValues);
-			}
-			
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (CommandException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		*/
+		String updateIndicatorJson="{\n\"commit\": {}";
 		for(Map.Entry<String, String> entry : indicatorMapSorted.entrySet()){
-		    System.out.println("Key : " + entry.getKey() + " and Value: " + entry.getValue());
-		    facetPageString=facetPageString + "        {'field': '" + entry.getValue().toString().replaceAll(" ", "").replaceAll(",", "") + "Label', 'display': '" + entry.getValue().toString() + "'},\n";
-			facetSearchSortString=facetSearchSortString + ",{'display':'" + entry.getValue().toString() + "','field':'" + entry.getValue().toString().replaceAll(" ", "").replaceAll(",", "") + "Label.exact'}" ;
-			schemaString=schemaString + "    <field name=\"" + entry.getValue().toString().replaceAll(" ", "").replaceAll(",", "") + "Label\" type=\"string\" indexed=\"true\" docValues=\"true\" multiValued=\"true\"  />\n" ;
-			selectString = selectString + "?" + entry.getValue().toString().replaceAll(" ", "").replaceAll(",", "") + "Label ";
+		    System.out.println("Key : " + entry.getKey() + " and Value: " + entry.getValue() + "\n");
+		    String label = entry.getValue().toString().replaceAll(" ", "").replaceAll(",", "").toString() + "Label";
+		    facetPageString=facetPageString + "        {'field': '" + label + "', 'display': '" + entry.getValue().toString() + "'},\n";
+			facetSearchSortString=facetSearchSortString + ",{'display':'" + entry.getValue().toString() + "','field':'" + label + ".exact'}" ;
+			schemaString=schemaString + "    <field name=\"" + label + "\" type=\"string\" indexed=\"true\" docValues=\"true\" multiValued=\"true\"  />\n" ;
+			selectString = selectString + "?" + label;
 			
 			groupByString = groupByString + "?" + entry.getValue().toString().replaceAll(" ", "").replaceAll(",", "") + "Label ";
 			whereString = whereString + "OPTIONAL { ?schemaAttribute hasneto:hasAttribute ?" + entry.getValue().toString().replaceAll(" ", "").replaceAll(",", "") +
 					" . ?" + entry.getValue().toString().replaceAll(" ", "").replaceAll(",", "") + " rdfs:subClassOf* " + entry.getKey().toString().replaceAll("http://hadatac.org/ont/chear#","chear:") + 
-					" . ?" + entry.getValue().toString().replaceAll(" ", "").replaceAll(",", "") + " rdfs:label ?" + entry.getValue().toString().replaceAll(" ", "").replaceAll(",", "") +"Label } . ";
+					" . ?" + entry.getValue().toString().replaceAll(" ", "").replaceAll(",", "") + " rdfs:label ?" + label  + " } . ";
 			
+			String indvIndicatorQuery = "PREFIX rdfs:<http://www.w3.org/2000/01/rdf-schema#> PREFIX chear: <http://hadatac.org/ont/chear#>PREFIX hasco: <http://hadatac.org/ont/hasco/>PREFIX hasneto: <http://hadatac.org/ont/hasneto#>SELECT DISTINCT ?studyUri " +
+					"?" + label + " " +
+					"WHERE { ?schemaUri hasco:isSchemaOf ?studyUri . ?schemaAttribute hasneto:partOfSchema ?schemaUri . ?schemaAttribute hasneto:hasAttribute " +
+					"?" + entry.getValue().toString().replaceAll(" ", "").replaceAll(",", "") +
+					" . ?" + entry.getValue().toString().replaceAll(" ", "").replaceAll(",", "") + " rdfs:subClassOf* " + entry.getKey().toString().replaceAll("http://hadatac.org/ont/chear#","chear:") + 
+					" . ?" + entry.getValue().toString().replaceAll(" ", "").replaceAll(",", "") + " rdfs:label ?" + label + " . " +
+					"}";
+			System.out.println(indvIndicatorQuery + "\n");
+			QueryExecution qexecIndvInd = QueryExecutionFactory.sparqlService(Collections.getCollectionsName(Collections.METADATA_SPARQL), indvIndicatorQuery);
+			ResultSet indvIndResults = qexecIndvInd.execSelect();
+			ResultSetRewindable resultsrwIndvInd = ResultSetFactory.copyResults(indvIndResults);
+			qexecIndvInd.close();
+			Map<String, List<String>> indvIndicatorMap = new HashMap<String,  List<String>>();
+			List<String> indvIndicatorValues = new ArrayList<String>();
+			while (resultsrwIndvInd.hasNext()) {
+				QuerySolution soln = resultsrwIndvInd.next();
+				System.out.println(soln);
+				indvIndicatorValues.add(soln.get(label).toString());
+				indvIndicatorMap.put(soln.get("studyUri").toString(),indvIndicatorValues);
+			}
+			System.out.println(indvIndicatorMap + "\n");
+			String indvIndicatorJson="";
+			for (String key : indvIndicatorMap.keySet()) {
+				indvIndicatorJson=indvIndicatorJson + ",\n\"add\":\n\t{ \"doc\":\n\t\t{\n";
+				indvIndicatorJson=indvIndicatorJson + "\t\t\"studyUri\": \"" + key + "\" ,\n";
+				indvIndicatorJson=indvIndicatorJson + "\t\t\"" + label + "\":\n\t\t\t{ \"add\": \n\t\t\t\t[ " ;
+				for (String indicator : indvIndicatorMap.get(key)){
+					indvIndicatorJson=indvIndicatorJson + "\""+ indicator +"\",";
+				}
+				indvIndicatorJson=indvIndicatorJson.substring(0, indvIndicatorJson.length()-1) + " ]\n\t\t\t}\n\t\t}\n\t}" ; // using substring to remove last comma 
+			}
+			updateIndicatorJson=updateIndicatorJson + indvIndicatorJson;
 		}
+		updateIndicatorJson = updateIndicatorJson + "\n}";
+		System.out.println(updateIndicatorJson + "\n");
 		
 		facetPageString =facetPageString + "    ],\n    search_sortby: " + facetSearchSortString + "],\n    searchbox_fieldselect: "+ facetSearchSortString + "],\n" +
 				"    paging: {\n" + 
@@ -222,9 +261,9 @@ public class DynamicGeneration extends Controller {
 				"        ],\n" +
 				"        [\n" +
 				"          {\n" + 
-				"            \"pre\" : \"<p>\",\n" + 
+				"            \"pre\" : \"\\n\\n\",\n" + 
 				"            \"field\" : \"studyComment\",\n" +
-				"            \"post\" : \"</p>\"\n" +
+				"            \"post\" : \"\"\n" +
 				"          }\n" +
 				"        ]\n" +
 				"    ],\n" +
@@ -323,6 +362,7 @@ public class DynamicGeneration extends Controller {
 		while (resultsrw.hasNext()) {
 			QuerySolution soln = resultsrw.next();
 	//		System.out.println("HERE IS THE RAW SOLN*********" + soln.toString());
+			values.clear();
 			values.add("Label: " + soln.get("studyLabel").toString());
 			values.add("Title: " + soln.get("studyTitle").toString());
 			values.add("Project: " + soln.get("proj").toString());
@@ -332,7 +372,29 @@ public class DynamicGeneration extends Controller {
 			studyResult.put(soln.get("studyUri").toString(),values);
 			
 		}
-		return studyResult;
+		
+		
+		try {
+			ProcessBuilder p=new ProcessBuilder("curl","http://localhost:8983/solr/studies/update?commit=true", "-H","Content-type:application/json",
+	                "--data-binary",initStudyJson );
+			final Process shell = p.start();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		try {
+			ProcessBuilder p=new ProcessBuilder("curl","http://localhost:8983/solr/studies/update?commit=true", "-H","Content-type:application/json",
+	                "--data-binary",updateIndicatorJson );
+			final Process shell = p.start();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		
+//		return studyResult;
+		return initStudyMap;
 //		return indicatorMap;
 	}
 	
@@ -371,6 +433,7 @@ public class DynamicGeneration extends Controller {
 		while (resultsrw.hasNext()) {
 			QuerySolution soln = resultsrw.next();
 	//		System.out.println("HERE IS THE RAW SOLN*********" + soln.toString());
+			values = new ArrayList<String>();
 			values.add("Label: " + soln.get("subjectLabel").toString());
 			values.add("Type: " + soln.get("subjectType").toString());
 			values.add("Cohort: " + soln.get("cohort").toString());

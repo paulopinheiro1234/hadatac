@@ -12,7 +12,7 @@ import java.util.Map;
 import play.mvc.Controller;
 import play.mvc.Result;
 
-import org.hadatac.console.views.html.metadata.*;
+import org.hadatac.console.views.html.metadataacquisition.*;
 import org.apache.jena.query.Query;
 import org.apache.jena.query.QueryExecution;
 import org.apache.jena.query.QueryExecutionFactory;
@@ -76,10 +76,11 @@ public class ViewStudy extends Controller {
 		Map<String, List<String>> poResult = new HashMap<String, List<String>>();
 		List<String> values = new ArrayList<String>();
 //		Map<String, String> poResult = new HashMap<String, String>();
-		System.out.println("HERE IS THE RAW resultsrw*********" + resultsrw);
+//		System.out.println("HERE IS THE RAW resultsrw*********" + resultsrw);
 		while (resultsrw.hasNext()) {
 			QuerySolution soln = resultsrw.next();
-			System.out.println("HERE IS THE RAW SOLN*********" + soln.toString());
+//			System.out.println("HERE IS THE RAW SOLN*********" + soln.toString());
+			values = new ArrayList<String>();
 			values.add("Label: " + soln.get("studyLabel").toString());
 			values.add("Title: " + soln.get("studyDef").toString());
 			values.add("Project: " + soln.get("proj").toString());
@@ -126,13 +127,13 @@ public class ViewStudy extends Controller {
 		
 		while (resultsrw.hasNext()) {
 			QuerySolution soln = resultsrw.next();
-			System.out.println("HERE IS THE RAW SOLN*********" + soln.toString());
+//			System.out.println("HERE IS THE RAW SOLN*********" + soln.toString());
+			values = new ArrayList<String>();
 			values.add("Label: " + soln.get("subjectLabel").toString());
 			values.add("Type: " + soln.get("subjectType").toString());
 			values.add("Cohort: " + soln.get("cohort").toString());
 			values.add("Study: " + soln.get("study").toString());
-			subjectResult.put(soln.get("subjectUri").toString(),values);
-			
+			subjectResult.put(soln.get("subjectUri").toString(),values);		
 		}
 		
 		return subjectResult;
@@ -146,7 +147,7 @@ public class ViewStudy extends Controller {
 		Map<String, List<String>> poResult = findBasic(study_uri);
 		Map<String, List<String>> subjectResult = findSubject(study_uri);
         
-    	return ok(dynamicPage.render(poResult,subjectResult));
+    	return ok(viewStudy.render(poResult,subjectResult));
     
         
     }// /index()
