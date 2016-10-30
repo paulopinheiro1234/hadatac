@@ -29,7 +29,9 @@
            <div class="form-group">
               <label>New Permission</label>
               <select class="form-control col-sm-6" id="newPermission" name="newPermission" >
-                 <option value="">Public</option>         
+              	 @if(dc.getPermissionUri() != "Public"){
+              		<option value="Public">Public</option> 
+              	 }         
                  @for((permUri, permName) <- perms){
                     @if(permUri != dc.getPermissionUri()) {
                        <option value="@permUri">@permName</option> 

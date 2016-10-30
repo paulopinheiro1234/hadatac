@@ -94,6 +94,7 @@ public class SetAccessPermission extends Controller {
 	@Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
     public static Result newPermission(String dc_uri) {
        	DataCollection dc = new DataCollection();
+       	System.out.println("New Permission for " + dc_uri);
     	
     	try {
     		if (dc_uri != null) {
@@ -116,6 +117,7 @@ public class SetAccessPermission extends Controller {
     	
     	if (dc != null) {
     		Form<SetPermissionForm> form = Form.form(SetPermissionForm.class).bindFromRequest();
+    		System.out.println(form.toString());
     		SetPermissionForm data = form.get();
 
     		String newPermUri = data.getNewPermission();
@@ -125,7 +127,7 @@ public class SetAccessPermission extends Controller {
     	}
     	
     	DataCollection dc2 = DataCollection.findByUri(dc_uri);
-    			
+    	
         return ok(setAccessPermissionConfirm.render(dc2));
     }
 }

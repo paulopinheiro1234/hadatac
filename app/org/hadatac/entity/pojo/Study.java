@@ -711,7 +711,7 @@ public class Study {
 	public int save() {
 		try {
 			SolrClient client = new HttpSolrClient(Play.application().configuration().getString("hadatac.solr.data") + "/studies_facet");
-			if (endedAt == null) {
+			if (endedAt.toString().startsWith("9999")) {
 				endedAt = DateTime.parse("9999-12-31T23:59:59.999Z");
 			}
 			int status = client.addBean(this).getStatus();
@@ -726,7 +726,7 @@ public class Study {
 	
 	public int save(SolrClient solr) {
 		try {
-			if (endedAt == null) {
+			if (endedAt.toString().startsWith("9999")) {
 				endedAt = DateTime.parse("9999-12-31T23:59:59.999Z");
 			}
 			int status = solr.addBean(this).getStatus();
@@ -738,5 +738,4 @@ public class Study {
 			return -1;
 		}
 	}
-	
 }
