@@ -1,5 +1,8 @@
 package org.hadatac.console.controllers.metadata;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.net.URLDecoder;
 import java.util.ArrayList;
@@ -82,7 +85,7 @@ public class DynamicGeneration extends Controller {
 			initStudyJson=initStudyJson + ",\n\"add\":\n\t{\n\t\"doc\":\n\t\t{\n";
 			initStudyJson=initStudyJson + "\t\t\"studyUri\": \"" + soln.get("studyUri").toString() + "\" ,\n";
 			initStudyJson=initStudyJson + "\t\t\"studyLabel\": \"" + soln.get("studyLabel").toString() + "\" ,\n";
-			initStudyJson=initStudyJson + "\t\t\"studyTitle\": \"" + soln.get("studyTitle").toString() + "\" ,\n";
+			initStudyJson=initStudyJson + "\t\t\"studyTitle\": \"<a href=\\\"./metadataacquisitions/viewStudy?study_uri=" + soln.get("studyUri").toString().replaceAll("http://hadatac.org/ont/chear#","chear:").replaceAll("http://hadatac.org/kb/chear#","chear-kb:") + "\\\">" + soln.get("studyTitle").toString() + "</a>\" ,\n";
 			initStudyJson=initStudyJson + "\t\t\"proj\": \"" + soln.get("proj").toString() + "\" ,\n";
 			initStudyJson=initStudyJson + "\t\t\"studyComment\": \"" + soln.get("studyComment").toString() + "\" ,\n";
 			initStudyJson=initStudyJson + "\t\t\"agentName\": \"" + soln.get("agentName").toString() + "\" ,\n";
@@ -143,7 +146,7 @@ public class DynamicGeneration extends Controller {
 						    "    <field name=\"agentName\" type=\"string\" indexed=\"true\" docValues=\"true\" multiValued=\"true\"  />\n" +
 						    "    <field name=\"institutionName\" type=\"string\" indexed=\"true\" docValues=\"true\" />\n";
 
-		String selectString="SELECT ?studyUri ?studyLabel ?proj ?studyTitle ?studyComment ?agentName ?institutionName ";
+		/*		String selectString="SELECT ?studyUri ?studyLabel ?proj ?studyTitle ?studyComment ?agentName ?institutionName ";
 		String whereString=" 	WHERE { ?subUri rdfs:subClassOf hasco:Study . " +
 		                      "?studyUri a ?subUri .  " +
 		                      "?studyUri rdfs:label ?studyLabel . " +
@@ -156,29 +159,29 @@ public class DynamicGeneration extends Controller {
                               " ?institution foaf:name ?institutionName } . " +
 						 	  "?schemaUri hasco:isSchemaOf ?studyUri . " +
                 			  "?schemaAttribute hasneto:partOfSchema ?schemaUri . ";
-		String groupByString="GROUP BY ?studyUri ?studyLabel ?proj ?studyTitle ?studyComment ?agentName ?institutionName ";
+		String groupByString="GROUP BY ?studyUri ?studyLabel ?proj ?studyTitle ?studyComment ?agentName ?institutionName ";*/
 		String updateIndicatorJson="{\n\"commit\": {}";
 		for(Map.Entry<String, String> entry : indicatorMapSorted.entrySet()){
-		    System.out.println("Key : " + entry.getKey() + " and Value: " + entry.getValue() + "\n");
+		    //System.out.println("Key : " + entry.getKey() + " and Value: " + entry.getValue() + "\n");
 		    String label = entry.getValue().toString().replaceAll(" ", "").replaceAll(",", "").toString() + "Label";
 		    facetPageString=facetPageString + "        {'field': '" + label + "', 'display': '" + entry.getValue().toString() + "'},\n";
 			facetSearchSortString=facetSearchSortString + ",{'display':'" + entry.getValue().toString() + "','field':'" + label + ".exact'}" ;
 			schemaString=schemaString + "    <field name=\"" + label + "\" type=\"string\" indexed=\"true\" docValues=\"true\" multiValued=\"true\"  />\n" ;
-			selectString = selectString + "?" + label;
+/*			selectString = selectString + "?" + label;
 			
 			groupByString = groupByString + "?" + entry.getValue().toString().replaceAll(" ", "").replaceAll(",", "") + "Label ";
 			whereString = whereString + "OPTIONAL { ?schemaAttribute hasneto:hasAttribute ?" + entry.getValue().toString().replaceAll(" ", "").replaceAll(",", "") +
-					" . ?" + entry.getValue().toString().replaceAll(" ", "").replaceAll(",", "") + " rdfs:subClassOf* " + entry.getKey().toString().replaceAll("http://hadatac.org/ont/chear#","chear:") + 
+					" . ?" + entry.getValue().toString().replaceAll(" ", "").replaceAll(",", "") + " rdfs:subClassOf* " + entry.getKey().toString().replaceAll("http://hadatac.org/ont/chear#","chear:").replaceAll("http://hadatac.org/kb/chear#","chear-kb:") + 
 					" . ?" + entry.getValue().toString().replaceAll(" ", "").replaceAll(",", "") + " rdfs:label ?" + label  + " } . ";
-			
+			*/
 			String indvIndicatorQuery = "PREFIX rdfs:<http://www.w3.org/2000/01/rdf-schema#> PREFIX chear: <http://hadatac.org/ont/chear#>PREFIX hasco: <http://hadatac.org/ont/hasco/>PREFIX hasneto: <http://hadatac.org/ont/hasneto#>SELECT DISTINCT ?studyUri " +
 					"?" + label + " " +
 					"WHERE { ?schemaUri hasco:isSchemaOf ?studyUri . ?schemaAttribute hasneto:partOfSchema ?schemaUri . ?schemaAttribute hasneto:hasAttribute " +
 					"?" + entry.getValue().toString().replaceAll(" ", "").replaceAll(",", "") +
-					" . ?" + entry.getValue().toString().replaceAll(" ", "").replaceAll(",", "") + " rdfs:subClassOf* " + entry.getKey().toString().replaceAll("http://hadatac.org/ont/chear#","chear:") + 
+					" . ?" + entry.getValue().toString().replaceAll(" ", "").replaceAll(",", "") + " rdfs:subClassOf* " + entry.getKey().toString().replaceAll("http://hadatac.org/ont/chear#","chear:").replaceAll("http://hadatac.org/kb/chear#","chear-kb:") + 
 					" . ?" + entry.getValue().toString().replaceAll(" ", "").replaceAll(",", "") + " rdfs:label ?" + label + " . " +
 					"}";
-			System.out.println(indvIndicatorQuery + "\n");
+			//System.out.println(indvIndicatorQuery + "\n");
 			QueryExecution qexecIndvInd = QueryExecutionFactory.sparqlService(Collections.getCollectionsName(Collections.METADATA_SPARQL), indvIndicatorQuery);
 			ResultSet indvIndResults = qexecIndvInd.execSelect();
 			ResultSetRewindable resultsrwIndvInd = ResultSetFactory.copyResults(indvIndResults);
@@ -191,7 +194,7 @@ public class DynamicGeneration extends Controller {
 				indvIndicatorValues.add(soln.get(label).toString());
 				indvIndicatorMap.put(soln.get("studyUri").toString(),indvIndicatorValues);
 			}
-			System.out.println(indvIndicatorMap + "\n");
+			//System.out.println(indvIndicatorMap + "\n");
 			String indvIndicatorJson="";
 			for (String key : indvIndicatorMap.keySet()) {
 				indvIndicatorJson=indvIndicatorJson + ",\n\"add\":\n\t{ \"doc\":\n\t\t{\n";
@@ -205,7 +208,7 @@ public class DynamicGeneration extends Controller {
 			updateIndicatorJson=updateIndicatorJson + indvIndicatorJson;
 		}
 		updateIndicatorJson = updateIndicatorJson + "\n}";
-		System.out.println(updateIndicatorJson + "\n");
+		//System.out.println(updateIndicatorJson + "\n");
 		
 		facetPageString =facetPageString + "    ],\n    search_sortby: " + facetSearchSortString + "],\n    searchbox_fieldselect: "+ facetSearchSortString + "],\n" +
 				"    paging: {\n" + 
@@ -225,24 +228,6 @@ public class DynamicGeneration extends Controller {
 				"            \"pre\" : \"(\",\n" +
 				"            \"field\" : \"studyLabel\",\n" +
 				"            \"post\" : \")</h3>\"\n" +
-/*
-//				"            \"pre\" : \"<h3><a href=\\\"./metadataacquisitions/viewStudy?study_uri=\\\"\",\n" +
-				"            \"pre\" : \"<h3>\",\n" +
-				"            \"field\" : \"studyUri\",\n" +
-//				"            \"post\" : \">\"\n" +
-				"            \"post\" : \" - \"\n" +
-				"          },\n" +
-				"          {\n" +
-				"            \"pre\" : \"\"\n" +
-				"            \"field\" : \"studyTitle\",\n" +
-//				"            \"post\" : \"</a> - \"\n" +
-				"            \"post\" : \" - \"\n" +
-				"          },\n" +
-				"          {\n" +
-				"            \"pre\" : \"(\",\n" +
-				"            \"field\" : \"studyLabel\",\n" +
-				"            \"post\" : \")</h3>\"\n" +
-*/
 				"          }\n" +
 				"        ],\n" +
 				"        [\n" +
@@ -311,7 +296,6 @@ public class DynamicGeneration extends Controller {
 				"	</div>\n" +
 				"}";
 		
-		System.out.println(facetPageString);
 		schemaString = schemaString + "    <field name=\"_version_\" type=\"long\" indexed=\"true\" stored=\"true\"/>\n" +
 									  "    <field name=\"_text_\" type=\"text_general\" indexed=\"true\" stored=\"false\" multiValued=\"true\"/>\n" +
 									  "    <copyField source=\"studyUri\" dest=\"_text_\" />\n" +
@@ -342,16 +326,24 @@ public class DynamicGeneration extends Controller {
 									  "    </fieldType>\n" +
 									  "  </types>\n" +
 									  "</schema> " ;
+		System.out.println(facetPageString);
 		System.out.println(schemaString);
-		
+		try {
+			File facetPage = new File("./app/org/hadatac/console/views/metadataacquisition/metadataacquisition.scala.html");
+			FileWriter facetPageStream = new FileWriter(facetPage,false);
+			facetPageStream.write(facetPageString);
+			facetPageStream.close();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} 
+/*		
 		String studyQueryString = prefixString + selectString + whereString + " } " + groupByString;;
-		System.out.println(studyQueryString);
+		//System.out.println(studyQueryString);
 		
 		Query studyQuery = QueryFactory.create(studyQueryString);
 		
 		QueryExecution qexec = QueryExecutionFactory.sparqlService(Collections.getCollectionsName(Collections.METADATA_SPARQL), studyQuery);
-//		Model results = qexec.execConstruct();
-//		ResultSetRewindable resultsrw = ResultSetFactory.makeRewindable(results);
 		ResultSet results = qexec.execSelect();
 		ResultSetRewindable resultsrw = ResultSetFactory.copyResults(results);
 		qexec.close();
@@ -372,7 +364,7 @@ public class DynamicGeneration extends Controller {
 			studyResult.put(soln.get("studyUri").toString(),values);
 			
 		}
-		
+*/		
 		
 		try {
 			ProcessBuilder p=new ProcessBuilder("curl","http://localhost:8983/solr/studies/update?commit=true", "-H","Content-type:application/json",
@@ -391,11 +383,8 @@ public class DynamicGeneration extends Controller {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
-		
-//		return studyResult;
+				
 		return initStudyMap;
-//		return indicatorMap;
 	}
 	
 	
