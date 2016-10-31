@@ -124,7 +124,7 @@ public class Downloads extends Controller {
 			
 			  preamble += "<" + DataFactory.getNextURI(DataFactory.DATASET_ABBREV) + ">";
 			  preamble += FRAG_DATASET;
-			  preamble += handler.getDataCollectionUri() + ">; ";
+			  preamble += handler.getDataAcquisitionUri() + ">; ";
 			
 			  int i = 0;
 			  int timeStampIndex = -1;

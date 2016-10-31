@@ -24,7 +24,7 @@ import org.hadatac.entity.pojo.Measurement;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-public class DataAcquisition extends Controller {
+public class DataAcquisitionSearch extends Controller {
 
     public static FacetFormData facet_form = new FacetFormData();
     public static FacetsWithCategories field_facets = new FacetsWithCategories();
@@ -33,7 +33,6 @@ public class DataAcquisition extends Controller {
     public static FacetsWithCategories range_facets = new FacetsWithCategories();
     public static FacetsWithCategories cluster_facets = new FacetsWithCategories();
     public static SpatialQueryResults query_results = new SpatialQueryResults();
-    
     
     //Postconditions: field_facets will be modified if there are facets in the JsonHandler
     public static void getFacets(JsonHandler jh){

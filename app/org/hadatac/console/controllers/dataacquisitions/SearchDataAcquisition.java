@@ -1,9 +1,9 @@
-package org.hadatac.console.controllers.datacollections;
+package org.hadatac.console.controllers.dataacquisitions;
 
 import play.mvc.Controller;
 import play.mvc.Result;
 
-public class SearchDataCollection extends Controller {
+public class SearchDataAcquisition extends Controller {
 
 	public static Result index(int p, String facets, String facetAdd, String facetDel) {
 		return null;

@@ -14,9 +14,9 @@ import java.util.Properties;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.hadatac.console.controllers.AuthApplication;
-import org.hadatac.console.views.html.datacollections.dataCollectionManagement;
+import org.hadatac.console.views.html.dataacquisitions.dataAcquisitionManagement;
 import org.hadatac.console.views.html.triplestore.*;
-import org.hadatac.entity.pojo.DataCollection;
+import org.hadatac.entity.pojo.DataAcquisition;
 import org.hadatac.console.models.LabKeyLoginForm;
 import org.hadatac.console.models.User;
 import org.hadatac.metadata.loader.MetadataContext;
@@ -127,8 +127,8 @@ public class LoadKB extends Controller {
     	State state = new State(State.ALL);
     	final User user = AuthApplication.getLocalUser(Controller.session());
 		String ownerUri = UserManagement.getUriByEmail(user.email);
-    	List<DataCollection> theResults = DataCollection.find(ownerUri, state);
-        return ok(dataCollectionManagement.render(state, theResults));
+    	List<DataAcquisition> theResults = DataAcquisition.find(ownerUri, state);
+        return ok(dataAcquisitionManagement.render(state, theResults));
     }
     
     @Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))

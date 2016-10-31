@@ -20,7 +20,7 @@ public class HADataC {
 	private String host;
 	
 	public Dataset dataset;
-	public DataCollection dataCollection;
+	public DataAcquisition dataCollection;
 	public Deployment deployment;
 	
 	public HADataC () {
@@ -86,7 +86,7 @@ public class HADataC {
 		return dataset.getCcsvUri();
 	}
 	
-	public String getDataCollectionKbUri() {
+	public String getDataAcquisitionKbUri() {
 		//return host + "/hadatac/" + deployment.getLocalName() + "/" + dataCollection.getLocalName();
 		//return host + "/hadatac/datacollection/" + dataCollection.getLocalName();
 		return dataCollection.getCcsvUri();
@@ -116,11 +116,11 @@ public class HADataC {
 		return dataset.getURI();
 	}
 	
-	public String getDataCollectionKbURI() {
+	public String getDataAcquisitionKbURI() {
 		return hostname + "/hadatac/" + deployment.getLocalName() + "/" + dataCollection.getLocalName();
 	}
 	
-	public String getDataCollectionPreambleURI() {
+	public String getDataAcquisitionPreambleURI() {
 		return dataCollection.getURI();
 	}
 	

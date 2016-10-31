@@ -1,10 +1,10 @@
-@(dc : org.hadatac.entity.pojo.DataCollection)
+@(dc : org.hadatac.entity.pojo.DataAcquisition)
 
 @import helper._
 @import org.hadatac.utils._
 @import org.hadatac.console.views.html._
 @import org.hadatac.console.controllers._
-@import org.hadatac.console.controllers.datacollections._
+@import org.hadatac.console.controllers.dataacquisitions._
 
 @main("Change Data Access Permission") {
 
@@ -26,7 +26,7 @@
        </ul>
 
        <br>
-       <a href="@org.hadatac.console.controllers.datacollections.routes.DataCollectionManagement.index(State.ACTIVE)" class="btn btn-warning" role="button">Back to Data Collection Management</a>
+       <a href="@org.hadatac.console.controllers.dataacquisitions.routes.DataAcquisitionManagement.index(State.ACTIVE)" class="btn btn-warning" role="button">Back to Data Acquisition Management</a>
 
     </div>
 

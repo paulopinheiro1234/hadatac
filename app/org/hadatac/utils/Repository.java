@@ -22,7 +22,7 @@ public class Repository {
     		return ((MetadataContext.playTotalTriples() != -1) && 
     				(PermissionsContext.playTotalTriples() != -1));
     	} else if (repository.equals(DATA)) {
-        	 return ((DataContext.playTotalDataCollections() != -1)&&
+        	 return ((DataContext.playTotalDataAcquisitions() != -1)&&
                      (DataContext.playTotalMeasurements() != -1));
     		
     	}

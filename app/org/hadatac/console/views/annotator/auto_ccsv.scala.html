@@ -10,6 +10,14 @@
 
 @main("Automatic CCSV Generation") {
 	
+	<script type="text/javascript">
+    function checkform() {
+    	if(document.getElementById('upload').value != "") {
+             document.getElementById('submitMessage').style.display = 'inline';
+	    }
+    }    
+    </script>
+	
 	@if(bStarted){
 		<a href="@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.toggleAutoAnnotator(unprocessedFiles, processedFiles)" class="btn btn-primary disabled" role="button">Start Auto-Annotator</a>
 		<a href="@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.toggleAutoAnnotator(unprocessedFiles, processedFiles)" class="btn btn-primary" role="button">Stop Auto-Annotator</a>
@@ -18,21 +26,60 @@
 		<a href="@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.toggleAutoAnnotator(unprocessedFiles, processedFiles)" class="btn btn-primary disabled" role="button">Stop Auto-Annotator</a>		
 	}
 	
+	<br><br>
+    <div id="rcorners" class="col-md-3">
+    	<h4>CSV File Uploader</h4>
+    	<form name="fileUploadForm" id='upload' method="POST" enctype="multipart/form-data" action="@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.uploadCSVFile("load")" onchange="checkform()">
+        	<input type="file" class="btn btn-info" name="pic"> 
+        	<div id='submitMessage'  style="display:none;" >
+        	<br>Press <input type="submit" class="btn-sm btn-success" value="Upload"> to upload the csv file to the unprocessed files. 
+        	</div>
+        </form>
+    </div>
+
 	<div class="container-fluid">
-		<h4>Processed CSV Files:</h4>
-		<select multiple disabled size="5">
-			@for(file_name <- processedFiles){
-				<option>@file_name</option>	
-			}
-		</select>
-		
-		<h4>Unprocessed CSV Files:</h4>
-		<select multiple disabled size="5">
-			@for(file_name <- unprocessedFiles){
-				<option>@file_name</option>	
-			}
-		</select>
+	<table class="table">
+	<thead>
+         <tr>
+            <th>Processed CSV Files</th>
+            <th>Operations</th>
+         </tr>
+    </thead>
+    <tbody>
+    	@for(file_name <- processedFiles){
+    		<tr>
+    			<td>@file_name</td>
+    			<td>
+    			<a href="@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.moveCSVFile(file_name)" class="btn-xs btn-primary" role="button">Move to Unprocessed Folder</a>
+    			<a href="@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.deleteCSVFile(file_name, true)" class="btn-xs btn-primary" role="button">Delete</a>
+    			</td>	
+    		</tr>
+    	}
+    </tbody>
+    </table>
+    
+    <br>
+    
+	<table class="table">
+	<thead>
+         <tr>
+            <th>Unprocessed CSV Files</th>
+            <th>Operations</th>
+         </tr>
+    </thead>
+    <tbody>
+    	@for(file_name <- unprocessedFiles){
+    		<tr>
+    			<td>@file_name</td>
+    			<td>
+    			<a href="@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.deleteCSVFile(file_name, false)" class="btn-xs btn-primary" role="button">Delete</a>
+    			</td>	
+    		</tr>
+    	}
+    </tbody>
+    </table>
     </div>
     
+    <br><br>
     <a href="@org.hadatac.console.controllers.routes.Portal.index()" class="btn btn-warning" role="button">Back to Main Page</a>
 }

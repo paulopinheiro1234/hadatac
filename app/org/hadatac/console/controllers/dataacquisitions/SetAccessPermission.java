@@ -1,4 +1,4 @@
-package org.hadatac.console.controllers.datacollections;
+package org.hadatac.console.controllers.dataacquisitions;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
@@ -15,8 +15,8 @@ import play.mvc.Result;
 import org.hadatac.console.controllers.AuthApplication;
 import org.hadatac.console.models.DeploymentForm;
 import org.hadatac.console.models.SetPermissionForm;
-import org.hadatac.console.views.html.datacollections.*;
-import org.hadatac.entity.pojo.DataCollection;
+import org.hadatac.console.views.html.dataacquisitions.*;
+import org.hadatac.entity.pojo.DataAcquisition;
 import org.hadatac.entity.pojo.HADataC;
 import org.hadatac.entity.pojo.User;
 
@@ -29,7 +29,7 @@ public class SetAccessPermission extends Controller {
 	@Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
     public static Result index(String uri) {
     	
-    	DataCollection dc = new DataCollection();
+		DataAcquisition dc = new DataAcquisition();
     	
     	try {
     		if (uri != null) {
@@ -47,7 +47,7 @@ public class SetAccessPermission extends Controller {
     		 *  Add deployment information into handler
     		 */
     		
-    		dc = DataCollection.findByUri(uri);
+    		dc = DataAcquisition.findByUri(uri);
     		
     		User user = User.find(dc.getOwnerUri());
     		System.out.println("DC OWNER URI: " + dc.getOwnerUri());
@@ -63,7 +63,7 @@ public class SetAccessPermission extends Controller {
 	@Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
     public static Result postIndex(String uri) {
     	
-    	DataCollection dc = new DataCollection();
+		DataAcquisition dc = new DataAcquisition();
     	
     	try {
     		if (uri != null) {
@@ -81,7 +81,7 @@ public class SetAccessPermission extends Controller {
     		 *  Add deployment information into handler
     		 */
     		
-    		dc = DataCollection.findByUri(uri);
+    		dc = DataAcquisition.findByUri(uri);
     		
     		User user = User.find(dc.getOwnerUri());
     		
@@ -93,7 +93,7 @@ public class SetAccessPermission extends Controller {
     
 	@Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
     public static Result newPermission(String dc_uri) {
-       	DataCollection dc = new DataCollection();
+		DataAcquisition dc = new DataAcquisition();
        	System.out.println("New Permission for " + dc_uri);
     	
     	try {
@@ -112,7 +112,7 @@ public class SetAccessPermission extends Controller {
     		 *  Add deployment information into handler
     		 */
     		
-    		dc = DataCollection.findByUri(dc_uri);
+    		dc = DataAcquisition.findByUri(dc_uri);
     	}
     	
     	if (dc != null) {
@@ -126,7 +126,7 @@ public class SetAccessPermission extends Controller {
     		dc.save();
     	}
     	
-    	DataCollection dc2 = DataCollection.findByUri(dc_uri);
+    	DataAcquisition dc2 = DataAcquisition.findByUri(dc_uri);
     	
         return ok(setAccessPermissionConfirm.render(dc2));
     }

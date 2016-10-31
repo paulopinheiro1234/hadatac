@@ -21,7 +21,7 @@ import org.apache.jena.riot.RDFDataMgr;
 import org.hadatac.console.controllers.AuthApplication;
 import org.hadatac.console.controllers.triplestore.UserManagement;
 import org.hadatac.console.models.User;
-import org.hadatac.entity.pojo.DataCollection;
+import org.hadatac.entity.pojo.DataAcquisition;
 import org.hadatac.entity.pojo.Deployment;
 import org.hadatac.entity.pojo.TriggeringEvent;
 import org.hadatac.metadata.loader.LabkeyDataLoader.PlainTriple;
@@ -236,7 +236,7 @@ public class TripleProcessing {
 				System.out.println(String.format("Processing data acquisition %s", uri));
 				
 				ValueCellProcessing cellProc = new ValueCellProcessing();
-				DataCollection dataCollection = new DataCollection();
+				DataAcquisition dataCollection = new DataAcquisition();
 				dataCollection.setUri(cellProc.convertToWholeURI(uri));
 				
 				for(PlainTriple triple : sheet.get(uri)){

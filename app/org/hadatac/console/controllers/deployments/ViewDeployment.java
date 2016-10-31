@@ -14,7 +14,7 @@ import org.hadatac.console.http.DeploymentQueries;
 import org.hadatac.console.models.DeploymentForm;
 import org.hadatac.console.models.SparqlQueryResults;
 import org.hadatac.console.models.TripleDocument;
-import org.hadatac.entity.pojo.DataCollection;
+import org.hadatac.entity.pojo.DataAcquisition;
 import org.hadatac.entity.pojo.Deployment;
 import org.hadatac.utils.State;
 
@@ -32,7 +32,7 @@ public class ViewDeployment extends Controller {
 
     	//DeploymentForm dep = new DeploymentForm();
     	Deployment deployment = null;
-    	List<DataCollection> dataCollections = null;
+    	List<DataAcquisition> dataCollections = null;
     	
     	try {
     		if (deployment_uri != null) {
@@ -46,7 +46,7 @@ public class ViewDeployment extends Controller {
 
     	if (!deployment_uri.equals("")) {
         	deployment = Deployment.find(deployment_uri);
-        	dataCollections = DataCollection.find(deployment, false);    		
+        	dataCollections = DataAcquisition.find(deployment, false);    		
     	}
     	return ok(viewDeployment.render(deployment, dataCollections));
     
@@ -60,7 +60,7 @@ public class ViewDeployment extends Controller {
 
     	//DeploymentForm dep = new DeploymentForm();
     	Deployment deployment = null;
-    	List<DataCollection> dataCollections = null;
+    	List<DataAcquisition> dataCollections = null;
     	
     	try {
     		if (deployment_uri != null) {
@@ -74,7 +74,7 @@ public class ViewDeployment extends Controller {
 
     	if (!deployment_uri.equals("")) {
         	deployment = Deployment.find(deployment_uri);
-        	dataCollections = DataCollection.find(deployment, false);    		
+        	dataCollections = DataAcquisition.find(deployment, false);    		
     	}
     	return ok(viewDeployment.render(deployment, dataCollections));
         

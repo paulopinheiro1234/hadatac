@@ -28,7 +28,7 @@ import org.hadatac.console.http.DeploymentQueries;
 import org.hadatac.console.models.DeploymentForm;
 import org.hadatac.console.models.SparqlQueryResults;
 import org.hadatac.console.models.TripleDocument;
-import org.hadatac.entity.pojo.DataCollection;
+import org.hadatac.entity.pojo.DataAcquisition;
 import org.hadatac.entity.pojo.Deployment;
 import org.hadatac.utils.Collections;
 import org.hadatac.utils.State;

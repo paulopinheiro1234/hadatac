@@ -16,8 +16,8 @@
 
 <example-kb> a hadatac:KnowledgeBase; hadatac:hasHost "http://localhost"^^xsd:anyURI .
 
-<dataCollection-example01> a hasneto:DataCollection; prov:startedAtTime "2015-02-12T09:30:00Z"^^xsd:dateTime .
-<deployment-example01> hasneto:hasDataCollection <dataCollection-example01> .
+<dataCollection-example01> a hasneto:DataAcquisition; prov:startedAtTime "2015-02-12T09:30:00Z"^^xsd:dateTime .
+<deployment-example01> hasneto:hasDataAcquisition <dataCollection-example01> .
 <example01-dataset01> a vstoi:Dataset; prov:wasGeneratedBy <dataCollection-example01>; hadatac:hasMeasurementType <mt0>,<mt1> .
 
 <mt0> a hadatac:MeasurementType; time:inDateTime <ts0>; hadatac:atColumn 3; oboe:ofCharacteristic hadatac-entities:EC-WindDirection; oboe:usesStandard oboe-standards:Degree .

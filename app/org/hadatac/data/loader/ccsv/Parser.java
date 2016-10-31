@@ -14,7 +14,7 @@ import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.impl.HttpSolrClient;
 import org.hadatac.data.loader.util.FileFactory;
 import org.hadatac.data.model.DatasetParsingResult;
-import org.hadatac.entity.pojo.DataCollection;
+import org.hadatac.entity.pojo.DataAcquisition;
 import org.hadatac.entity.pojo.Dataset;
 import org.hadatac.entity.pojo.Deployment;
 import org.hadatac.entity.pojo.HADataC;
@@ -75,7 +75,7 @@ public class Parser {
 	
 	public int index(int mode) {
 		// data collection
-		DataCollection dataCollection = DataCollection.create(hadatacCcsv, hadatacKb);
+		DataAcquisition dataCollection = DataAcquisition.create(hadatacCcsv, hadatacKb);
 		if (hadatacCcsv.dataCollection.getStatus() > 0) {
 			hadatacKb.dataCollection.merge(dataCollection);
 		} else {
@@ -164,20 +164,20 @@ public class Parser {
 		hadatacKb = HADataC.find();
 		
 		// datacollection
-		hadatacKb.dataCollection = DataCollection.find(hadatacCcsv);
+		hadatacKb.dataCollection = DataAcquisition.find(hadatacCcsv);
 		if (hadatacCcsv.dataCollection.getStatus() > 0) {
 			if (hadatacKb.dataCollection == null) {
-				message += Feedback.println(mode, "[ERROR] Data Collection not found in the knowledge base.");
+				message += Feedback.println(mode, "[ERROR] Data Acquisition not found in the knowledge base.");
 				return new DatasetParsingResult(1, message);
 			} else {
-				message += Feedback.println(mode, "[OK] Data Collection found on the knowledge base.");
+				message += Feedback.println(mode, "[OK] Data Acquisition found on the knowledge base.");
 			}
 		} else {
 			if (hadatacKb.dataCollection != null) {
-				message += Feedback.println(mode, "[ERROR] Data Collection already exists in the knowledge base.");
+				message += Feedback.println(mode, "[ERROR] Data Acquisition already exists in the knowledge base.");
 				return new DatasetParsingResult(1, message);
 			} else {
-				message += Feedback.println(mode, "[OK] Data Collection does not exist in the knowledge base.");
+				message += Feedback.println(mode, "[OK] Data Acquisition does not exist in the knowledge base.");
 			}
 		}
 		
@@ -193,7 +193,7 @@ public class Parser {
 				hadatacKb.dataset.setUri(hadatacCcsv.getDatasetKbUri());
 			}
 		} else {
-			message += Feedback.println(mode, "[OK] Dataset is not already processed. This is a new Data Collection.");
+			message += Feedback.println(mode, "[OK] Dataset is not already processed. This is a new Data Acquisition.");
 			hadatacKb.dataset = new Dataset(); 
 			hadatacKb.dataset.setUri(hadatacCcsv.getDatasetKbUri());
 		}
@@ -201,7 +201,7 @@ public class Parser {
 		// deployment
 		if (hadatacCcsv.dataCollection.getStatus() > 0) {
 			System.out.println("!! FIND FROM DC");
-			hadatacKb.deployment = Deployment.findFromDataCollection(hadatacKb);
+			hadatacKb.deployment = Deployment.findFromDataAcquisition(hadatacKb);
 		} else {
 			System.out.println("!! FIND FROM PREAMBLE");
 			hadatacKb.deployment = Deployment.findFromPreamble(hadatacCcsv);
@@ -248,13 +248,13 @@ public class Parser {
 		}
 		
 		// load datacollection
-		hadatacCcsv.dataCollection = DataCollection.find(model, hadatacCcsv.dataset);
+		hadatacCcsv.dataCollection = DataAcquisition.find(model, hadatacCcsv.dataset);
 		if (hadatacCcsv.dataCollection == null) {
-			message += Feedback.println(mode, "[ERROR] Preamble does not contain a single hasneto:DataCollection.");
+			message += Feedback.println(mode, "[ERROR] Preamble does not contain a single hasneto:DataAcquisition.");
 			return new DatasetParsingResult(1, message);
 		} else {
-			System.out.println("[OK] Preamble contains a single hasneto:DataCollection: <" + hadatacCcsv.dataCollection.getLocalName() + ">");
-			message += Feedback.println(mode, "[OK] Preamble contains a single hasneto:DataCollection: <" + hadatacCcsv.dataCollection.getLocalName() + ">");
+			System.out.println("[OK] Preamble contains a single hasneto:DataAcquisition: <" + hadatacCcsv.dataCollection.getLocalName() + ">");
+			message += Feedback.println(mode, "[OK] Preamble contains a single hasneto:DataAcquisition: <" + hadatacCcsv.dataCollection.getLocalName() + ">");
 		}
 		
 		// deployment
@@ -262,13 +262,13 @@ public class Parser {
 			System.out.println("Deployment find");
 			hadatacCcsv.deployment = Deployment.find(model, hadatacCcsv.dataCollection);
 			if (hadatacCcsv.deployment == null) {
-				message += Feedback.println(mode, "[ERROR] This hasneto:DataCollection requires a vstoi:Deployment that is not specified.");
+				message += Feedback.println(mode, "[ERROR] This hasneto:DataAcquisition requires a vstoi:Deployment that is not specified.");
 				return new DatasetParsingResult(1, message);
 			} else {
-				message += Feedback.println(mode, "[OK] This hasneto:DataCollection requires a vstoi:Deployment that is specified: <" + hadatacCcsv.deployment.getLocalName() + ">");
+				message += Feedback.println(mode, "[OK] This hasneto:DataAcquisition requires a vstoi:Deployment that is specified: <" + hadatacCcsv.deployment.getLocalName() + ">");
 			}
 		} else {
-			message += Feedback.println(mode, "[OK] This hasneto:DataCollection does not require a vstoi:Deployment in the preamble.");
+			message += Feedback.println(mode, "[OK] This hasneto:DataAcquisition does not require a vstoi:Deployment in the preamble.");
 		}
 		
 		// load measurement types

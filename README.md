@@ -1,4 +1,4 @@
-# HADataC - Human-Aware Data Collection Framework
+# HADataC - Human-Aware Data Acquisition Framework
 
 ## What is HADataC?
 

@@ -1,6 +1,6 @@
 cls
 ECHO OFF
-ECHO === Welcome to HADataC - The Human-Aware Data Collection Framework ===
+ECHO === Welcome to HADataC - The Human-Aware Data Acquisition Framework ===
 ECHO 
 ECHO   The following wizard will guide you into deploying a working
 ECHO instance of HADataC on your machine. Please refer to

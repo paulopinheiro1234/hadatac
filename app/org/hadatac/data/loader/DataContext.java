@@ -39,13 +39,13 @@ public class DataContext {
 		return data.totalMeasurements();
 	}
 	
-	public static Long playTotalDataCollections() {
+	public static Long playTotalDataAcquisitions() {
 		DataContext data = new DataContext( "user", 
 				"password",
 				Play.application().configuration().getString("hadatac.solr.data"), 
 				false);
 		
-		return data.totalDataCollections();
+		return data.totalDataAcquisitions();
 	}
 	
 	public Long totalMeasurements() {
@@ -69,7 +69,7 @@ public class DataContext {
 		return (long) -1;
 	}
 	
-	public Long totalDataCollections() {
+	public Long totalDataAcquisitions() {
 		SolrClient solr = new HttpSolrClient(kbURL + "/sdc");
 		SolrQuery parameters = new SolrQuery();
 		parameters.set("q", "*:*");
@@ -94,7 +94,7 @@ public class DataContext {
 		String message = "";
 	    String straux = "";
 	    //System.out.println("Is WEB? " + (mode == Feedback.WEB));
-        message += Feedback.println(mode,"   Documents before [clean]: " + totalDataCollections());
+        message += Feedback.println(mode,"   Documents before [clean]: " + totalDataAcquisitions());
         message += Feedback.println(mode, " ");
 	    // ATTENTION: For now, it erases entirely the content of the metadata collection 
 	    String query1 = "<delete><query>*:*</query></delete>";
@@ -126,7 +126,7 @@ public class DataContext {
 		    }
 		    message += Feedback.println(mode," ");
 		    message += Feedback.println(mode," ");
-			message += Feedback.print(mode,"   Triples after [clean]: " + totalDataCollections());                
+			message += Feedback.print(mode,"   Triples after [clean]: " + totalDataAcquisitions());                
 		} catch (UnsupportedEncodingException e) {
 		    System.out.println("[DataManagement] - ERROR encoding URLs");
 		    //e.printStackTrace();

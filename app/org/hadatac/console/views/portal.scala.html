@@ -25,7 +25,7 @@
         <div class="col-md-3 col-xs-2">
            <h4>Data Search/Download</h4>
            <a href="@org.hadatac.console.controllers.metadataacquisition.routes.MetadataAcquisition.index()" id="metadatafacet" class="btn btn-primary btn-block disabled" role="button">Search Studies</a>
-           <a href="@org.hadatac.console.controllers.dataacquisition.routes.DataAcquisition.index()" id="data" class="btn btn-primary btn-block disabled" role="button">Search Data</a>
+           <a href="@org.hadatac.console.controllers.dataacquisition.routes.DataAcquisitionSearch.index()" id="data" class="btn btn-primary btn-block disabled" role="button">Search Data</a>
            <a href="@org.hadatac.console.controllers.metadataacquisition.routes.DataAcquisitionFacet.index()" id="dataacquisitionfacet" class="btn btn-primary btn-block disabled" role="button">Search Data Acquisitions</a>
            <a href="@org.hadatac.console.controllers.metadataacquisition.routes.SchemaAttribute.index()" id="variables" class="btn btn-primary btn-block disabled" role="button">Search Variables</a>
            <a href="@org.hadatac.console.controllers.metadataacquisition.routes.Analytes.index()" id="analytes" class="btn btn-primary btn-block disabled" role="button">Search Analytes</a>
@@ -36,9 +36,9 @@
           <div class="col-md-3 col-xs-2">
               <h4>Data Upload</h4>  
               <!-- <a href="" class="btn btn-primary btn-block disabled" role="button">Manage Scientific Activities</a>  -->
-              <a href="@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.index()" id="autoannotate" class="btn btn-primary btn-block" role="button">Manage Auto Annotation</a>
+              <a href="@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.index()" id="autoannotate" class="btn btn-primary btn-block" role="button">Manage CSV Annotation</a>
               <a href="@org.hadatac.console.controllers.deployments.routes.DeploymentManagement.index(State.ACTIVE)" id="deployments" class="btn btn-primary btn-block" role="button">Manage Deployments</a>
-              <a href="@org.hadatac.console.controllers.datacollections.routes.DataCollectionManagement.index(State.ACTIVE)"  id="datacollections" class="btn btn-primary btn-block" role="button">Manage Data Collections</a>
+              <a href="@org.hadatac.console.controllers.dataacquisitions.routes.DataAcquisitionManagement.index(State.ACTIVE)"  id="dataacquisitions" class="btn btn-primary btn-block" role="button">Manage Data Acquisitions</a>
               <a href="@org.hadatac.console.controllers.annotator.routes.Annotator.selectDeployment()"  id="annotator" class="btn btn-primary btn-block" role="button">Create CCSV from CSV</a>
               <a href="@org.hadatac.console.controllers.dataacquisition.routes.LoadCCSV.loadCCSV("init")"  id="csvloader" class="btn btn-primary btn-block" role="button">Upload CCSV</a>
            </div>
@@ -102,7 +102,7 @@
               $('#dataacquisitionfacet').attr( 'class', 'btn btn-primary btn-block' );
               $('#autoannotate').attr( 'class', 'btn btn-primary btn-block' );
               $('#deployments').attr( 'class', 'btn btn-primary btn-block' );
-              $('#datacollections').attr( 'class', 'btn btn-primary btn-block' );
+              $('#dataacquisitions').attr( 'class', 'btn btn-primary btn-block' );
               $('#annotator').attr( 'class', 'btn btn-primary btn-block' );
               $('#csvloader').attr( 'class', 'btn btn-primary btn-block' );
           } else {
@@ -114,7 +114,7 @@
               $('#analytes').attr( 'class', 'btn btn-primary btn-block disabled' );
               $('#autoannotate').attr( 'class', 'btn btn-primary btn-block disabled' );
               $('#deployments').attr( 'class', 'btn btn-primary btn-block disabled' );
-              $('#datacollections').attr( 'class', 'btn btn-primary btn-block disabled' );
+              $('#dataacquisitions').attr( 'class', 'btn btn-primary btn-block disabled' );
               $('#annotator').attr( 'class', 'btn btn-primary btn-block disabled' );
               $('#csvloader').attr( 'class', 'btn btn-primary btn-block disabled' );
           }

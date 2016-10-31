@@ -1,6 +1,7 @@
 package org.hadatac.console.controllers.annotator;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -18,6 +19,7 @@ import java.util.Properties;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.io.IOUtils;
 import org.hadatac.console.controllers.AuthApplication;
 import org.hadatac.console.controllers.dataacquisition.LoadCCSV;
 import org.hadatac.console.controllers.triplestore.LoadKB;
@@ -29,7 +31,7 @@ import org.hadatac.console.models.SparqlQueryResults;
 import org.hadatac.console.models.TripleDocument;
 import org.hadatac.console.views.html.annotator.auto_ccsv;
 import org.hadatac.data.api.DataFactory;
-import org.hadatac.entity.pojo.DataCollection;
+import org.hadatac.entity.pojo.DataAcquisition;
 import org.hadatac.metadata.loader.ValueCellProcessing;
 import org.hadatac.utils.NameSpaces;
 import org.hadatac.utils.State;
@@ -39,6 +41,8 @@ import be.objectify.deadbolt.java.actions.Restrict;
 import play.Play;
 import play.mvc.Controller;
 import play.mvc.Result;
+import play.mvc.Http.MultipartFormData;
+import play.mvc.Http.MultipartFormData.FilePart;
 
 public class AutoAnnotator extends Controller {
 	
@@ -181,12 +185,12 @@ public class AutoAnnotator extends Controller {
     	
 		State state = new State(State.ALL);
 		String ownerUri = UserManagement.getUriByEmail("gychant@qq.com");
-    	List<DataCollection> da_list = DataCollection.find(ownerUri, state);
+    	List<DataAcquisition> da_list = DataAcquisition.find(ownerUri, state);
 		
 		String dc_uri = null;
 		String deployment_uri = null;
 		String schema_uri = null;
-		for(DataCollection dc : da_list){
+		for(DataAcquisition dc : da_list){
 			System.out.println(file_name);
 			String base_name = FilenameUtils.getBaseName(file_name);
 			System.out.println(base_name);
@@ -253,9 +257,9 @@ public class AutoAnnotator extends Controller {
     		/*
     		 * Add URI of active datacollection in handler
     		 */
-    		DataCollection dc = DataFactory.getActiveDataCollection(deployment_uri);
+    		DataAcquisition dc = DataFactory.getActiveDataAcquisition(deployment_uri);
     		if (dc != null && dc.getUri() != null) {
-    			handler.setDataCollectionUri(dc.getUri());
+    			handler.setDataAcquisitionUri(dc.getUri());
     		}
     	} else {
     		handler = new CSVAnnotationHandler(deployment_uri, "", "");
@@ -280,7 +284,7 @@ public class AutoAnnotator extends Controller {
 			//Insert Data Set
 			preamble += "<" + DataFactory.getNextURI(DataFactory.DATASET_ABBREV) + ">";
 			preamble += Downloads.FRAG_DATASET;
-			preamble += handler.getDataCollectionUri() + ">; ";
+			preamble += handler.getDataAcquisitionUri() + ">; ";
 
 			int timeStampIndex = -1;
 			int aux = 0;
@@ -385,4 +389,90 @@ public class AutoAnnotator extends Controller {
 	    
 	    return true;
 	}
+    
+    public static Result moveCSVFile(String file_name) {
+    	Properties prop = new Properties();
+		try {
+			InputStream is = LoadKB.class.getClassLoader().getResourceAsStream("autoccsv.config");
+			prop.load(is);
+			is.close();
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
+		String path_proc = prop.getProperty("path_proc");
+		String path_unproc = prop.getProperty("path_unproc");
+		
+		File destFolder = new File(path_unproc);
+		if (!destFolder.exists()){
+			destFolder.mkdirs();
+	    }
+		File file = new File(path_proc + "/" + file_name);
+		file.renameTo(new File(destFolder + "/" + file_name));
+		
+		return index();
+    }
+    
+    public static Result deleteCSVFile(String file_name, boolean isProcessed) {
+    	Properties prop = new Properties();
+		try {
+			InputStream is = LoadKB.class.getClassLoader().getResourceAsStream("autoccsv.config");
+			prop.load(is);
+			is.close();
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
+		String path = "";
+		if(isProcessed){
+			path = prop.getProperty("path_proc");
+		}
+		else{
+			path = prop.getProperty("path_unproc");
+		}
+		
+		File file = new File(path + "/" + file_name);
+		file.delete();
+		
+		return index();
+    }
+    
+    @Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
+    public static Result uploadCSVFile(String oper) {
+    	System.out.println("uploadCSVFile CALLED!");
+    	
+    	Properties prop = new Properties();
+		try {
+			InputStream is = LoadKB.class.getClassLoader().getResourceAsStream("autoccsv.config");
+			prop.load(is);
+			is.close();
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		String path = prop.getProperty("path_unproc");
+		
+    	MultipartFormData body = request().body().asMultipartFormData();
+    	FilePart uploadedfile = body.getFile("pic");
+    	if (uploadedfile != null) {
+    		File file = uploadedfile.getFile();
+    		File newFile = new File(path + "/" + uploadedfile.getFilename());
+    		InputStream isFile;
+    		try {
+    			isFile = new FileInputStream(file);
+    			byte[] byteFile;
+    			byteFile = IOUtils.toByteArray(isFile);
+    			FileUtils.writeByteArrayToFile(newFile, byteFile);
+    			isFile.close();
+    		} catch (Exception e) {
+    			e.printStackTrace();
+    		}
+    	}
+    	return index();
+    }
 }

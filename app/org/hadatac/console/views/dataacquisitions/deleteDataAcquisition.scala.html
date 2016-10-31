@@ -1,14 +1,14 @@
-@(oper : String, dc : org.hadatac.entity.pojo.DataCollection)
+@(oper : String, dc : org.hadatac.entity.pojo.DataAcquisition)
 
 @import helper._
 @import org.hadatac.utils._
 @import org.hadatac.console.views.html._
 @import org.hadatac.console.controllers._
-@import org.hadatac.console.controllers.datacollections._
+@import org.hadatac.console.controllers.dataacquisitions._
 
-@main("Delete Data Collection") {
+@main("Delete Data Acquisition") {
 
-    <h2>Delete Data Collection</h2>
+    <h2>Delete Data Acquisition</h2>
     
     <div class="container-fluid">
        <ul>
@@ -27,8 +27,8 @@
     @if(oper=="init") {
         <div id="question-box">
            Are your sure you want to delete this data collection? 
-           <a href="@org.hadatac.console.controllers.datacollections.routes.DeleteDataCollection.index("confirmed", dc.getUri())" class="btn btn-success" role="button">Confirm</a>
-           <a href="@org.hadatac.console.controllers.datacollections.routes.DeleteDataCollection.index("cancelled", dc.getUri())" class="btn btn-danger" role="button">Cancel</a>
+           <a href="@org.hadatac.console.controllers.dataacquisitions.routes.DeleteDataAcquisition.index("confirmed", dc.getUri())" class="btn btn-success" role="button">Confirm</a>
+           <a href="@org.hadatac.console.controllers.dataacquisitions.routes.DeleteDataAcquisition.index("cancelled", dc.getUri())" class="btn btn-danger" role="button">Cancel</a>
         </div>
     }
 
@@ -36,19 +36,19 @@
          
     @if(oper=="cancelled") {
         <div id="cancel-box">
-          <h4>Operation [Delete Data Collection] has been cancelled.</h4>
-          Press OK button to return to Data Collection Management page <a href="@org.hadatac.console.controllers.datacollections.routes.DataCollectionManagement.index(State.ACTIVE)" class="btn btn-warning" role="button">Ok</a>
+          <h4>Operation [Delete Data Acquisition] has been cancelled.</h4>
+          Press OK button to return to Data Acquisition Management page <a href="@org.hadatac.console.controllers.dataacquisitions.routes.DataAcquisitionManagement.index(State.ACTIVE)" class="btn btn-warning" role="button">Ok</a>
 	    </div>
     }
 
              
      <div id="end-process-box" style="display:none;">
-          Press OK button to return to Data Collection Management page <a href="@org.hadatac.console.controllers.datacollections.routes.DataCollectionManagement.index(State.ACTIVE)" class="btn btn-warning" role="button">Ok</a>
+          Press OK button to return to Data Acquisition Management page <a href="@org.hadatac.console.controllers.dataacquisitions.routes.DataAcquisitionManagement.index(State.ACTIVE)" class="btn btn-warning" role="button">Ok</a>
 	 </div>
 
 	 @if(oper=="confirmed") {
          <script> 
-            var msg = "@DeleteDataCollection.delete(dc.getUri())";
+            var msg = "@DeleteDataAcquisition.delete(dc.getUri())";
             $('#msgarea').html(msg.replace(/&lt;br&gt;/g, '<br>'));
             document.getElementById('end-process-box').style.display = 'inline';
          </script>

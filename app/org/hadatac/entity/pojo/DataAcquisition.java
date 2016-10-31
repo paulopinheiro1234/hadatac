@@ -36,7 +36,7 @@ import org.joda.time.format.ISODateTimeFormat;
 
 import play.Play;
 
-public class DataCollection {
+public class DataAcquisition {
 	@Field("uri")
 	private String uri;
 	@Field("label")
@@ -102,16 +102,16 @@ public class DataCollection {
 	private String localName;
 	private int status;
 	/*
-	 * 0 - DataCollection is a new one, its details on the preamble
+	 * 0 - DataAcquisition is a new one, its details on the preamble
 	 * 		It should not exist inside the KB
 	 * 		Preamble must contain deployment link and deployment must exists on the KB
-	 * 1 - DataCollection already exists, only a reference present on the preamble
+	 * 1 - DataAcquisition already exists, only a reference present on the preamble
 	 * 		It should exist inside the KB as not finished yet 
-	 * 2 - DataCollection already exists, the preamble states its termination with endedAtTime information
+	 * 2 - DataAcquisition already exists, the preamble states its termination with endedAtTime information
 	 * 		It should exist inside the KB as not finished yet
 	 */
 	
-	public DataCollection() {
+	public DataAcquisition() {
 		startedAt = null;
 		endedAt = null;
 		numberDataPoints = 0;
@@ -434,7 +434,7 @@ public class DataCollection {
 			client.close();
 			return status;
 		} catch (IOException | SolrServerException e) {
-			System.out.println("[ERROR] DataCollection.save() - e.Message: " + e.getMessage());
+			System.out.println("[ERROR] DataAcquisition.save() - e.Message: " + e.getMessage());
 			return -1;
 		}
 	}
@@ -449,15 +449,15 @@ public class DataCollection {
 			solr.close();
 			return status;
 		} catch (IOException | SolrServerException e) {
-			System.out.println("[ERROR] DataCollection.save(SolrClient) - e.Message: " + e.getMessage());
+			System.out.println("[ERROR] DataAcquisition.save(SolrClient) - e.Message: " + e.getMessage());
 			return -1;
 		}
 	}
 	
-	public static DataCollection convertFromSolr(SolrDocument doc) {
+	public static DataAcquisition convertFromSolr(SolrDocument doc) {
 		Iterator<Object> i;
 		DateTime date;
-		DataCollection dataCollection = new DataCollection();
+		DataAcquisition dataCollection = new DataAcquisition();
 		dataCollection.setUri(doc.getFieldValue("uri").toString());
 		dataCollection.setOwnerUri(doc.getFieldValue("owner_uri").toString());
 		dataCollection.setPermissionUri(doc.getFieldValue("permission_uri").toString());
@@ -523,8 +523,8 @@ public class DataCollection {
 		return dataCollection;
 	}
 	
-	public static List<DataCollection> find(String ownerUri, State state) {
-		List<DataCollection> list = new ArrayList<DataCollection>();
+	public static List<DataAcquisition> find(String ownerUri, State state) {
+		List<DataAcquisition> list = new ArrayList<DataAcquisition>();
 		
 		System.out.println("owner:");
 		System.out.println(ownerUri);
@@ -546,20 +546,20 @@ public class DataCollection {
 			System.out.println(results.size());
 			Iterator<SolrDocument> i = results.iterator();
 			while (i.hasNext()) {
-				DataCollection dataCollection = convertFromSolr(i.next());
-				System.out.println("DataCollection added");
+				DataAcquisition dataCollection = convertFromSolr(i.next());
+				System.out.println("DataAcquisition added");
 				list.add(dataCollection);
 			}
 		} catch (Exception e) {
 			list.clear();
-			System.out.println("[ERROR] DataCollection.find(String) - Exception message: " + e.getMessage());
+			System.out.println("[ERROR] DataAcquisition.find(String) - Exception message: " + e.getMessage());
 		}
 		
 		return list;
 	}
 	
-	public static List<DataCollection> find(String ownerUri) {
-		List<DataCollection> list = new ArrayList<DataCollection>();
+	public static List<DataAcquisition> find(String ownerUri) {
+		List<DataAcquisition> list = new ArrayList<DataAcquisition>();
 		
 		SolrClient solr = new HttpSolrClient(Play.application().configuration().getString("hadatac.solr.data") + "/sdc");
 		SolrQuery query = new SolrQuery();
@@ -572,24 +572,24 @@ public class DataCollection {
 			SolrDocumentList results = response.getResults();
 			Iterator<SolrDocument> i = results.iterator();
 			while (i.hasNext()) {
-				DataCollection dataCollection = convertFromSolr(i.next());
+				DataAcquisition dataCollection = convertFromSolr(i.next());
 				list.add(dataCollection);
 			}
 		} catch (Exception e) {
 			list.clear();
-			System.out.println("[ERROR] DataCollection.find(String) - Exception message: " + e.getMessage());
+			System.out.println("[ERROR] DataAcquisition.find(String) - Exception message: " + e.getMessage());
 		}
 		
 		return list;
 	}
 	
-	public static DataCollection findByUri(String dataCollectionUri) {
+	public static DataAcquisition findByUri(String dataCollectionUri) {
 		
 		SolrClient solr = new HttpSolrClient(Play.application().configuration().getString("hadatac.solr.data") + "/sdc");
 		SolrQuery query = new SolrQuery();
 		query.set("q", "uri:\"" + dataCollectionUri + "\"");
 		query.set("sort", "started_at asc");
-		DataCollection dataCollection = null;
+		DataAcquisition dataCollection = null;
 		
 		try {
 			QueryResponse queryResponse = solr.query(query);
@@ -600,7 +600,7 @@ public class DataCollection {
 				//hadatac.deployment = Deployment.find(hadatac);
 			}
 		} catch (Exception e) {
-			System.out.println("[ERROR] DataCollection.findByUri(dataCollectionUri) - Exception message: " + e.getMessage());
+			System.out.println("[ERROR] DataAcquisition.findByUri(dataCollectionUri) - Exception message: " + e.getMessage());
 		}
 				
 		return dataCollection;
@@ -623,22 +623,22 @@ public class DataCollection {
 			solr.close();
 			return response.getStatus();
 		} catch (SolrServerException e) {
-			System.out.println("[ERROR] DataCollection.delete() - SolrServerException message: " + e.getMessage());
+			System.out.println("[ERROR] DataAcquisition.delete() - SolrServerException message: " + e.getMessage());
 		} catch (IOException e) {
-			System.out.println("[ERROR] DataCollection.delete() - IOException message: " + e.getMessage());
+			System.out.println("[ERROR] DataAcquisition.delete() - IOException message: " + e.getMessage());
 		} catch (Exception e) {
-			System.out.println("[ERROR] DataCollection.delete() - Exception message: " + e.getMessage());
+			System.out.println("[ERROR] DataAcquisition.delete() - Exception message: " + e.getMessage());
 		}
 		
 		return -1;
 	}
 	
-	public static List<DataCollection> find(Deployment deployment, boolean active) {
+	public static List<DataAcquisition> find(Deployment deployment, boolean active) {
 		SolrClient solr = new HttpSolrClient(Play.application().configuration().getString("hadatac.solr.data") + "/sdc");
 		SolrQuery query = new SolrQuery();
 		query.set("q", "deployment_uri:\"" + deployment.getUri() + "\"");
 		query.set("sort", "started_at desc");
-		List<DataCollection> list = new ArrayList<DataCollection>();
+		List<DataAcquisition> list = new ArrayList<DataAcquisition>();
 		
 		try {
 			QueryResponse queryResponse = solr.query(query);
@@ -647,7 +647,7 @@ public class DataCollection {
 			Iterator<SolrDocument> i = results.iterator();
 			if (active == true) {
 				if (i.hasNext()) {
-					DataCollection dataCollection = convertFromSolr(i.next());
+					DataAcquisition dataCollection = convertFromSolr(i.next());
 					if (dataCollection.isFinished() == false) {
 						list.add(dataCollection);
 					}
@@ -658,16 +658,16 @@ public class DataCollection {
 				}
 			}
 		} catch (Exception e) {
-			System.out.println("[ERROR] DataCollection.find(Deployment, boolean) - Exception message: " + e.getMessage());
+			System.out.println("[ERROR] DataAcquisition.find(Deployment, boolean) - Exception message: " + e.getMessage());
 		}
 		
 		return list;
 	}
 	
-	public static DataCollection find(HADataC hadatac) {
+	public static DataAcquisition find(HADataC hadatac) {
 		SolrClient solr = new HttpSolrClient(hadatac.getDynamicMetadataURL());
-		SolrQuery query = new SolrQuery("uri:\"" + hadatac.getDataCollectionKbUri() + "\"");
-		DataCollection dataCollection = null;
+		SolrQuery query = new SolrQuery("uri:\"" + hadatac.getDataAcquisitionKbUri() + "\"");
+		DataAcquisition dataCollection = null;
 		
 		try {
 			QueryResponse queryResponse = solr.query(query);
@@ -678,17 +678,17 @@ public class DataCollection {
 				//hadatac.deployment = Deployment.find(hadatac);
 			}
 		} catch (Exception e) {
-			System.out.println("[ERROR] DataCollection.find(HADataC) - Exception message: " + e.getMessage());
+			System.out.println("[ERROR] DataAcquisition.find(HADataC) - Exception message: " + e.getMessage());
 		}
 		
 		return dataCollection;
 	}
 	
-	public static DataCollection find(Model model, Dataset dataset) {
+	public static DataAcquisition find(Model model, Dataset dataset) {
 		String queryString = Sparql.prefix
 				+ "SELECT ?dc ?startedAt ?endedAt WHERE {\n"
 				+ "  <" + dataset.getCcsvUri() + "> prov:wasGeneratedBy ?dc .\n"
-				+ "  ?dc a hasneto:DataCollection .\n"
+				+ "  ?dc a hasneto:DataAcquisition .\n"
 				+ "  ?dc prov:startedAtTime ?startedAt .\n"
 				+ "  OPTIONAL { ?dc prov:endedAtTime ?endedAt } .\n"
 				+ "}";
@@ -701,7 +701,7 @@ public class DataCollection {
 		
 		if (resultsrw.size() >= 1) {
 			QuerySolution soln = resultsrw.next();
-			DataCollection dataCollection = new DataCollection();
+			DataAcquisition dataCollection = new DataAcquisition();
 			dataCollection.setLocalName(soln.getResource("dc").getLocalName());
 			dataCollection.setCcsvUri(soln.getResource("dc").getURI());
 			dataCollection.setStartedAtXsd(soln.getLiteral("startedAt").getString());
@@ -724,7 +724,7 @@ public class DataCollection {
 		
 		if (resultsrw.size() >= 1) {
 			QuerySolution soln = resultsrw.next();
-			DataCollection dataCollection = new DataCollection();
+			DataAcquisition dataCollection = new DataAcquisition();
 			dataCollection.setLocalName(soln.getResource("dc").getLocalName());
 			dataCollection.setCcsvUri(soln.getResource("dc").getURI());
 			dataCollection.setEndedAtXsd(soln.getLiteral("endedAt").getString());
@@ -745,7 +745,7 @@ public class DataCollection {
 		
 		if (resultsrw.size() >= 1) {
 			QuerySolution soln = resultsrw.next();
-			DataCollection dataCollection = new DataCollection();
+			DataAcquisition dataCollection = new DataAcquisition();
 			dataCollection.setLocalName(soln.getResource("dc").getLocalName());
 			dataCollection.setCcsvUri(soln.getResource("dc").getURI());
 			dataCollection.setStatus(1);
@@ -755,11 +755,11 @@ public class DataCollection {
 		return null;
 	}
 	
-	public static DataCollection create(HADataC hadatacCcsv, HADataC hadatacKb) {
-		DataCollection dataCollection = new DataCollection();
+	public static DataAcquisition create(HADataC hadatacCcsv, HADataC hadatacKb) {
+		DataAcquisition dataCollection = new DataAcquisition();
 		
 		dataCollection.setLocalName(hadatacCcsv.dataCollection.getLocalName());
-		dataCollection.setUri(hadatacCcsv.getDataCollectionKbUri());
+		dataCollection.setUri(hadatacCcsv.getDataAcquisitionKbUri());
 		dataCollection.setStartedAtXsd(hadatacCcsv.dataCollection.getStartedAtXsd());
 		dataCollection.setEndedAtXsd(hadatacCcsv.dataCollection.getEndedAtXsd());
 		Iterator<MeasurementType> i = hadatacKb.dataset.measurementTypes.iterator();
@@ -789,7 +789,7 @@ public class DataCollection {
 		return 0;
 	}
 	
-	public void merge(DataCollection dataCollection) {
+	public void merge(DataAcquisition dataCollection) {
 		Iterator<String> i;
 		
 		i = dataCollection.unit.iterator();

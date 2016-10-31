@@ -14,7 +14,7 @@ import play.data.*;
 
 import org.hadatac.console.views.html.deployments.*;
 import org.hadatac.data.api.DataFactory;
-import org.hadatac.entity.pojo.DataCollection;
+import org.hadatac.entity.pojo.DataAcquisition;
 import org.hadatac.entity.pojo.Deployment;
 import org.hadatac.entity.pojo.Detector;
 import org.hadatac.entity.pojo.Instrument;
@@ -112,7 +112,7 @@ public class NewDeployment extends Controller {
         }
         
         Deployment deployment = DataFactory.createDeployment(deploymentUri, data.getPlatform(), data.getInstrument(), data.getDetector(), dateString, data.getType());
-        DataCollection dataCollection = DataFactory.createDataCollection(dataCollectionUri, deploymentUri, triggeringEvent, UserManagement.getUriByEmail(user.email));
+        DataAcquisition dataCollection = DataFactory.createDataAcquisition(dataCollectionUri, deploymentUri, triggeringEvent, UserManagement.getUriByEmail(user.email));
         if (form.hasErrors()) {
         	System.out.println("HAS ERRORS");
             return badRequest(newDeployment.render(form,

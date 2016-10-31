@@ -228,9 +228,9 @@ public class Deployment {
 	
 	public void close(String endedAt) {
 		setEndedAtXsd(endedAt);
-		List<DataCollection> list = DataCollection.find(this, true);
+		List<DataAcquisition> list = DataAcquisition.find(this, true);
 		if (!list.isEmpty()) {
-			DataCollection dc = list.get(0);
+			DataAcquisition dc = list.get(0);
 			dc.close(endedAt);
 		}
 		saveEndedAtTime();
@@ -279,7 +279,7 @@ public class Deployment {
 		return deployment;
 	}
 	
-	public static Deployment findFromDataCollection(HADataC hadatac) {
+	public static Deployment findFromDataAcquisition(HADataC hadatac) {
 		String queryString = NameSpaces.getInstance().printSparqlNameSpaceList()
 				+ "SELECT ?startedAt ?endedAt ?detector ?instrument ?platform WHERE {\n"
 				+ "  <" + hadatac.dataCollection.getDeploymentUri() + "> a vstoi:Deployment .\n"
@@ -444,10 +444,10 @@ public class Deployment {
 		return deployments;
 	}
 
-	public static Deployment find(Model model, DataCollection dataCollection) {
+	public static Deployment find(Model model, DataAcquisition dataCollection) {
 		String queryString = Sparql.prefix
 				+ "SELECT ?dp WHERE {\n"
-				+ "  ?dp hasneto:hasDataCollection <" + dataCollection.getCcsvUri() + "> .\n"
+				+ "  ?dp hasneto:hasDataAcquisition <" + dataCollection.getCcsvUri() + "> .\n"
 				+ "}";
 		
 		Query query = QueryFactory.create(queryString);

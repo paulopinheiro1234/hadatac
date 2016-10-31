@@ -1,6 +1,6 @@
 #!/bin/bash
 clear
-echo "=== Welcome to HADataC - The Human-Aware Data Collection Framework ==="
+echo "=== Welcome to HADataC - The Human-Aware Data Acquisition Framework ==="
 echo ""
 echo "  The following wizard will guide you into deploying a working"
 echo "instance of HADataC on your machine. Please refer to"

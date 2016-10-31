@@ -3,7 +3,7 @@ package org.hadatac.data.api;
 import java.util.List;
 
 import org.hadatac.entity.pojo.ConsoleStore;
-import org.hadatac.entity.pojo.DataCollection;
+import org.hadatac.entity.pojo.DataAcquisition;
 import org.hadatac.entity.pojo.Dataset;
 import org.hadatac.entity.pojo.Deployment;
 import org.hadatac.entity.pojo.Detector;
@@ -22,11 +22,11 @@ public class DataFactory {
     
     public static String CONSOLE_ID = "00000001";
     
-    public static DataCollection createDataCollection(String dataCollectionUri, String deploymentUri, int triggeringEvent, String ownerUri) {
-		DataCollection dataCollection = null;
+    public static DataAcquisition createDataAcquisition(String dataCollectionUri, String deploymentUri, int triggeringEvent, String ownerUri) {
+    	DataAcquisition dataCollection = null;
 		Deployment deployment = Deployment.find(deploymentUri);
 		
-		dataCollection = new DataCollection();
+		dataCollection = new DataAcquisition();
 		dataCollection.setUri(dataCollectionUri);
 		dataCollection.setOwnerUri(ownerUri);
 		dataCollection.setPermissionUri(ownerUri);
@@ -80,10 +80,10 @@ public class DataFactory {
 		return deployment;
 	}
 	
-	public static DataCollection getActiveDataCollection(String deploymentUri) {
-		List<DataCollection> list;
+	public static DataAcquisition getActiveDataAcquisition(String deploymentUri) {
+		List<DataAcquisition> list;
 		Deployment deployment = Deployment.find(deploymentUri);
-		list = DataCollection.find(deployment, true);
+		list = DataAcquisition.find(deployment, true);
 		if (list.isEmpty()) {
 			return null;
 		}

@@ -1,4 +1,4 @@
-package org.hadatac.console.controllers.datacollections;
+package org.hadatac.console.controllers.dataacquisitions;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
@@ -7,19 +7,19 @@ import play.mvc.Controller;
 import play.mvc.Result;
 
 import org.hadatac.console.controllers.AuthApplication;
-import org.hadatac.console.views.html.datacollections.*;
-import org.hadatac.entity.pojo.DataCollection;
+import org.hadatac.console.views.html.dataacquisitions.*;
+import org.hadatac.entity.pojo.DataAcquisition;
 
 import be.objectify.deadbolt.java.actions.Group;
 import be.objectify.deadbolt.java.actions.Restrict;
 
-public class DeleteDataCollection extends Controller {
+public class DeleteDataAcquisition extends Controller {
 	
 	// for /metadata HTTP GET requests
 	@Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
     public static Result index(String oper, String uri) {
     	
-    	DataCollection dc = new DataCollection();
+		DataAcquisition dc = new DataAcquisition();
     	
     	try {
     		if (uri != null) {
@@ -37,12 +37,12 @@ public class DeleteDataCollection extends Controller {
     		 *  Add deployment information into handler
     		 */
     		
-    		dc = DataCollection.findByUri(uri);
+    		dc = DataAcquisition.findByUri(uri);
     		
-            return ok(deleteDataCollection.render(oper, dc));
+            return ok(deleteDataAcquisition.render(oper, dc));
     	}
     	
-    	return ok(deleteDataCollection.render(oper, dc));
+    	return ok(deleteDataAcquisition.render(oper, dc));
         
     }// /index()
 
@@ -50,7 +50,7 @@ public class DeleteDataCollection extends Controller {
     // for /metadata HTTP POST requests
 	@Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
     public static Result postIndex(String oper, String uri) {
-    	DataCollection dc = new DataCollection();
+		DataAcquisition dc = new DataAcquisition();
     	
     	try {
     		if (uri != null) {
@@ -68,17 +68,17 @@ public class DeleteDataCollection extends Controller {
     		 *  Add deployment information into handler
     		 */
     		
-    		dc = DataCollection.findByUri(uri);
+    		dc = DataAcquisition.findByUri(uri);
     		
-            return ok(deleteDataCollection.render(oper, dc));
+            return ok(deleteDataAcquisition.render(oper, dc));
     	}
     	
-    	return ok(deleteDataCollection.render(oper, dc));
+    	return ok(deleteDataAcquisition.render(oper, dc));
         
     }// /postIndex()
 
     public static String delete(String uri) {
-    	DataCollection dc = new DataCollection();
+    	DataAcquisition dc = new DataAcquisition();
     	try {
     		if (uri != null) {
 			    uri = URLDecoder.decode(uri, "UTF-8");
@@ -95,12 +95,12 @@ public class DeleteDataCollection extends Controller {
     		 *  Add deployment information into handler
     		 */
     		
-    		dc = DataCollection.findByUri(uri);
+    		dc = DataAcquisition.findByUri(uri);
     		dc.delete();
     		
-            return "Data Collection deleted.";
+            return "Data Acquisition deleted.";
     	}
-    	return "Data Collection failed to be deleted.";
+    	return "Data Acquisition failed to be deleted.";
         
     }
 }

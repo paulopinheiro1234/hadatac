@@ -41,7 +41,7 @@ import play.mvc.Http.MultipartFormData.FilePart;
 import org.hadatac.console.views.html.error_page;
 import org.hadatac.console.views.html.annotator.*;
 import org.hadatac.data.api.DataFactory;
-import org.hadatac.entity.pojo.DataCollection;
+import org.hadatac.entity.pojo.DataAcquisition;
 import org.hadatac.metadata.loader.ValueCellProcessing;
 import org.hadatac.utils.NameSpaces;
 import org.hadatac.utils.State;
@@ -152,9 +152,9 @@ public class Annotator extends Controller {
     		/*
     		 * Add URI of active datacollection in handler
     		 */
-    		DataCollection dc = DataFactory.getActiveDataCollection(uri);
+    		DataAcquisition dc = DataFactory.getActiveDataAcquisition(uri);
     		if (dc != null && dc.getUri() != null) {
-    			handler.setDataCollectionUri(dc.getUri());
+    			handler.setDataAcquisitionUri(dc.getUri());
     		}
     		
     		//System.out.println("uploadCSV: dep_json is " + dep_json);
@@ -213,9 +213,9 @@ public class Annotator extends Controller {
     		/*
     		 * Add URI of active datacollection in handler
     		 */
-    		DataCollection dc = DataFactory.getActiveDataCollection(uri);
+    		DataAcquisition dc = DataFactory.getActiveDataAcquisition(uri);
     		if (dc != null && dc.getUri() != null) {
-    			handler.setDataCollectionUri(dc.getUri());
+    			handler.setDataAcquisitionUri(dc.getUri());
     		}
     		
     		//System.out.println("uploadCSV: dep_json is " + dep_json);

@@ -32,7 +32,7 @@
                      @if(Repository.operational(Repository.DATA)) {
                          <b><font color="green">OPERATIONAL</font></b> 
                          <br>    		
-                         Data Collections Content:  <b>@DataContext.playTotalDataCollections() documents.</b> Data Acquisitions Content:  <b>@DataContext.playTotalMeasurements() documents.</b>
+                         Data Acquisition Content:  <b>@DataContext.playTotalDataAcquisitions() documents.</b>  Acquisition Data Content:  <b>@DataContext.playTotalMeasurements() documents.</b>
                      } else {
                          <b><font color="red">DOWN</font></b>
                      }
@@ -41,8 +41,8 @@
                      <div id="question-box">
                          <a href="@org.hadatac.console.controllers.triplestore.routes.StartStop.index("start","data")" class="btn btn-primary" role="button">Start-Up Repository</a>
                          <a href="@org.hadatac.console.controllers.triplestore.routes.StartStop.index("stop","data")" class="btn btn-primary" role="button">Shutdown Repository</a>
-                         <a href="@org.hadatac.console.controllers.triplestore.routes.Clean.clean("collections")" class="btn btn-primary" role="button">Clean Data Collections</a>
-                         <a href="@org.hadatac.console.controllers.triplestore.routes.Clean.clean("acquisitions")" class="btn btn-primary" role="button">Clean Data Acquisitions</a>
+                         <a href="@org.hadatac.console.controllers.triplestore.routes.Clean.clean("collections")" class="btn btn-primary" role="button">Clean Data Acquisitions</a>
+                         <a href="@org.hadatac.console.controllers.triplestore.routes.Clean.clean("acquisitions")" class="btn btn-primary" role="button">Clean Acquisition Data</a>
                      </div>
                  </div>
 

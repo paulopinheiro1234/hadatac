@@ -63,11 +63,11 @@ public class CSVAnnotationHandler {
         return deploymentCharacteristics;
     }	    
         
-    public String getDataCollectionUri() {
+    public String getDataAcquisitionUri() {
         return dataCollectionUri;
     }	    
         
-    public void setDataCollectionUri(String dcURI) {
+    public void setDataAcquisitionUri(String dcURI) {
         dataCollectionUri = dcURI;
     }	    
         
