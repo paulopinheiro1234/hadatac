@@ -6,7 +6,6 @@ import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 
-import org.apache.jena.base.Sys;
 import org.apache.jena.query.Query;
 import org.apache.jena.query.QueryExecution;
 import org.apache.jena.query.QueryExecutionFactory;
@@ -426,7 +425,10 @@ public class DataAcquisition {
 	public int save() {
 		try {
 			SolrClient client = new HttpSolrClient(Play.application().configuration().getString("hadatac.solr.data") + "/sdc");
-			if (endedAt.toString().startsWith("9999")) {
+			if (null == endedAt) {
+				endedAt = DateTime.parse("9999-12-31T23:59:59.999Z");
+			}
+			else if (endedAt.toString().startsWith("9999")) {
 				endedAt = DateTime.parse("9999-12-31T23:59:59.999Z");
 			}
 			int status = client.addBean(this).getStatus();
@@ -441,7 +443,10 @@ public class DataAcquisition {
 	
 	public int save(SolrClient solr) {
 		try {
-			if (endedAt.toString().startsWith("9999")) {
+			if (null == endedAt) {
+				endedAt = DateTime.parse("9999-12-31T23:59:59.999Z");
+			}
+			else if (endedAt.toString().startsWith("9999")) {
 				endedAt = DateTime.parse("9999-12-31T23:59:59.999Z");
 			}
 			int status = solr.addBean(this).getStatus();

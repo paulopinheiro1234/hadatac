@@ -26,9 +26,6 @@ import org.hadatac.utils.Feedback;
 import org.hadatac.utils.NameSpaces;
 import org.hadatac.utils.State;
 import org.labkey.remoteapi.CommandException;
-import org.labkey.remoteapi.Connection;
-
-import com.ning.http.client.AsyncHandler.STATE;
 
 import be.objectify.deadbolt.java.actions.Group;
 import be.objectify.deadbolt.java.actions.Restrict;
@@ -120,7 +117,7 @@ public class LoadKB extends Controller {
     		String message = TripleProcessing.importDataAcquisition(site, user_name, password, path, final_names);
     	} catch(CommandException e) {
     		if(e.getMessage().equals("Unauthorized")){
-    			return ok(syncLabkey.render(Form.form(LabKeyLoginForm.class), "login_failed", content, ""));
+    			return ok(syncLabkey.render(Form.form(LabKeyLoginForm.class), "login_failed", content, "", false));
     		}
     	}
     	
@@ -181,11 +178,16 @@ public class LoadKB extends Controller {
     				site, user_name, password, path, final_names);
     	} catch(CommandException e) {
     		if(e.getMessage().equals("Unauthorized")){
-    			return ok(syncLabkey.render(Form.form(LabKeyLoginForm.class), "login_failed", content, ""));
+    			return ok(syncLabkey.render(Form.form(LabKeyLoginForm.class), "login_failed", content, "", false));
     		}
     	}
     	
-    	return ok(syncLabkey.render(Form.form(LabKeyLoginForm.class), oper, content, message));
+    	boolean isLoadedStudy = false;
+    	if (final_names.contains("Study")){
+    		isLoadedStudy = true;
+    	}
+    	
+    	return ok(syncLabkey.render(Form.form(LabKeyLoginForm.class), oper, content, message, isLoadedStudy));
     }
     
     @Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
@@ -215,7 +217,7 @@ public class LoadKB extends Controller {
     				Feedback.WEB, oper, metadata, site, user_name, password, path, loading_list);
     	} catch(CommandException e) {
     		if(e.getMessage().equals("Unauthorized")){
-    			return ok(syncLabkey.render(Form.form(LabKeyLoginForm.class), "login_failed", content, ""));
+    			return ok(syncLabkey.render(Form.form(LabKeyLoginForm.class), "login_failed", content, "", false));
     		}
     	}
     	
@@ -256,7 +258,7 @@ public class LoadKB extends Controller {
 			});
     	} catch(CommandException e) {
     		if(e.getMessage().equals("Unauthorized")){
-    			return ok(syncLabkey.render(Form.form(LabKeyLoginForm.class), "login_failed", content, ""));
+    			return ok(syncLabkey.render(Form.form(LabKeyLoginForm.class), "login_failed", content, "", false));
     		}
     	}
     	return ok(getLabkeyFolders.render(data, folders, content));
@@ -295,7 +297,7 @@ public class LoadKB extends Controller {
     		}
     	} catch(CommandException e) {
     		if(e.getMessage().equals("Unauthorized")){
-    			return ok(syncLabkey.render(Form.form(LabKeyLoginForm.class), "login_failed", content, ""));
+    			return ok(syncLabkey.render(Form.form(LabKeyLoginForm.class), "login_failed", content, "", false));
     		}
     	}
     	return ok(getLabkeyLists.render(auth, folder, content, retMetadataLists, retDataLists));
@@ -303,12 +305,12 @@ public class LoadKB extends Controller {
     
     @Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
     public static Result loadLabkeyKB(String oper, String content) {
-    	return ok(syncLabkey.render(Form.form(LabKeyLoginForm.class), oper, content, ""));
+    	return ok(syncLabkey.render(Form.form(LabKeyLoginForm.class), oper, content, "", false));
     }
     
     @Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
     public static Result postLoadLabkeyKB(String oper, String content) {
-    	return ok(syncLabkey.render(Form.form(LabKeyLoginForm.class), oper, content, ""));
+    	return ok(syncLabkey.render(Form.form(LabKeyLoginForm.class), oper, content, "", false));
     }
     
     @Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
