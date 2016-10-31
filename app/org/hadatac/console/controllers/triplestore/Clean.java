@@ -51,7 +51,7 @@ public class Clean extends Controller {
 	    		             "password",
 	    		             Play.application().configuration().getString("hadatac.solr.data"), 
 	    		             false);
-    		result = collection.cleanDataAcquisitions(Feedback.WEB);
+    		result = collection.cleanDataCollections(Feedback.WEB);
     	} else if (oper.equals("acquisitions")) {
     		NameSpaces.getInstance();
     		DataContext acquisition = new 
