@@ -21,10 +21,10 @@
              <h2>Basic Info</h2>
 				<ul>        		
 					@for(key <- studyResult.keySet()){
-						<li>@key.toString
+						<li>@key.toString.replaceAll("http://hadatac.org/ont/chear#","chear:").replaceAll("http://hadatac.org/kb/chear#","chear-kb:")
 							<ul>
 							@for(s <- studyResult.get(key)) {
-							<li>@s.toString</li>
+							<li>@s.toString.replaceAll("http://hadatac.org/ont/chear#","chear:").replaceAll("http://hadatac.org/kb/chear#","chear-kb:")</li>
 							}
 							</ul>
 						</li>
@@ -33,10 +33,10 @@
 			<h3>Subject List</h3>
 				<ul>        		
 					@for(key <- subjectResult.keySet()){
-						<li>@key.toString
+						<li><a href="./viewSubject?subject_uri=@key.toString.replaceAll("http://hadatac.org/ont/chear#","chear:").replaceAll("http://hadatac.org/kb/chear#","chear-kb:")">@key.toString.replaceAll("http://hadatac.org/ont/chear#","chear:").replaceAll("http://hadatac.org/kb/chear#","chear-kb:")</a>
 							<ul>
 							@for(s <- subjectResult.get(key)) {
-							<li>@s.toString</li>
+							<li>@s.toString.replaceAll("http://hadatac.org/ont/chear#","chear:").replaceAll("http://hadatac.org/kb/chear#","chear-kb:")</li>
 							}
 							</ul>
 						</li>

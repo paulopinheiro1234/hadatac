@@ -1,4 +1,4 @@
-@(poResult      : Map[String, String],
+@(subjectResult      : Map[String, List[String]],
   sampleResult	: List[String])
 
 @import org.hadatac.console.views.html._
@@ -20,9 +20,13 @@
                 
              <h2>Basic Info</h2>
 				<ul>        		
-					@for(key <- poResult.keySet()){
-						<li>@key.toString
-							<ul><li>@poResult.get(key)</li></ul>
+					@for(key <- subjectResult.keySet()){
+						<li>@key.toString.replaceAll("http://hadatac.org/ont/chear#","chear:").replaceAll("http://hadatac.org/kb/chear#","chear-kb:")
+							<ul>
+							@for(s <- subjectResult.get(key)) {
+							<li>@s.toString</li>
+							}
+							</ul>
 						</li>
 					}
 				</ul>

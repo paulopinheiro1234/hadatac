@@ -53,12 +53,13 @@ public class ViewStudy extends Controller {
 		"PREFIX rdfs:<http://www.w3.org/2000/01/rdf-schema#>" + 
 		"PREFIX skos: <http://www.w3.org/2004/02/skos/core#>" +
 		"PREFIX foaf: <http://xmlns.com/foaf/0.1/>" + 
-		"SELECT ?studyUri ?studyLabel ?proj ?studyDef ?studyComment ?agentName ?institutionName " + 
+		"SELECT ?studyUri ?studyLabel ?projLabel ?studyDef ?studyComment ?agentName ?institutionName " + 
 		" WHERE {        ?subUri rdfs:subClassOf hasco:Study . " + 
 		"                       ?studyUri a ?subUri . " + 
 		"           ?studyUri rdfs:label ?studyLabel  . " + 
 		"			FILTER ( ?studyUri = " + study_uri + " ) . " +
-		"        OPTIONAL { ?studyUri chear-kb:project ?proj } . " + 
+		"        OPTIONAL { ?studyUri chear-kb:project ?proj. " +
+		"					?proj rdfs:label ?projLabel} . " + 
 		"        OPTIONAL { ?studyUri skos:definition ?studyDef } . " + 
 		"        OPTIONAL { ?studyUri rdfs:comment ?studyComment } . " + 
 		"        OPTIONAL { ?studyUri hasco:hasAgent ?agent . " + 
@@ -83,7 +84,7 @@ public class ViewStudy extends Controller {
 			values = new ArrayList<String>();
 			values.add("Label: " + soln.get("studyLabel").toString());
 			values.add("Title: " + soln.get("studyDef").toString());
-			values.add("Project: " + soln.get("proj").toString());
+			values.add("Project: " + soln.get("projLabel").toString());
 			values.add("Comment: " + soln.get("studyComment").toString());
 			values.add("Agent(s): " + soln.get("agentName").toString());
 			values.add("Institution: " + soln.get("institutionName").toString());
@@ -108,9 +109,11 @@ public class ViewStudy extends Controller {
     	"PREFIX rdfs:<http://www.w3.org/2000/01/rdf-schema#>" + 
     	"PREFIX skos: <http://www.w3.org/2004/02/skos/core#>" +
     	"PREFIX foaf: <http://xmlns.com/foaf/0.1/>" + 
-    	"SELECT ?subjectUri ?subjectType ?subjectLabel ?cohort ?study " +
+    	"SELECT ?subjectUri ?subjectType ?subjectLabel ?cohortLabel ?studyLabel " +
     	"			 WHERE {        ?subjectUri hasco:isSubjectOf* ?cohort . " +
     	"			        		?cohort hasco:isCohortOf ?study . " +
+    	"							?study rdfs:label ?studyLabel . " +
+    	"							?cohort rdfs:label ?cohortLabel ." +
     	"			        		OPTIONAL { ?subjectUri rdfs:label ?subjectLabel } . " +
     	"			        		OPTIONAL { ?subjectUri a ?subjectType } . " +
     	"			        		FILTER (?study = " + study_uri + ") . " +
@@ -131,8 +134,8 @@ public class ViewStudy extends Controller {
 			values = new ArrayList<String>();
 			values.add("Label: " + soln.get("subjectLabel").toString());
 			values.add("Type: " + soln.get("subjectType").toString());
-			values.add("Cohort: " + soln.get("cohort").toString());
-			values.add("Study: " + soln.get("study").toString());
+			values.add("Cohort: " + soln.get("cohortLabel").toString());
+			values.add("Study: " + soln.get("studyLabel").toString());
 			subjectResult.put(soln.get("subjectUri").toString(),values);		
 		}
 		
