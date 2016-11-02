@@ -5,7 +5,7 @@
 <tr>
    	<td>@user.getName()</td> 
    	<td>@user.getUri()</td> 
-   	<td>@if(user.getImmediateGroup() != null) { @user.getImmediateGroup.getName() }</td>
+   	<td>@if(org.hadatac.entity.pojo.User.find(user.getImmediateGroupUri()) != null) { @org.hadatac.entity.pojo.User.find(user.getImmediateGroupUri()).getName() }</td>
    	<td>@if(user.isAdministrator()) { YES } else { NO }</td>
    	<td>
     	@if(user.isAdministrator()) {

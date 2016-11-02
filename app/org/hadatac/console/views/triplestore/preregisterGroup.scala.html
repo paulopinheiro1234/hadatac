@@ -1,4 +1,5 @@
-@(oper: String)
+@(oper: String,
+  theGroups: List[org.hadatac.entity.pojo.User])
 
 @import helper._
 @import org.hadatac.utils._
@@ -29,12 +30,12 @@
 
     <form class="form-horizontal" name="newGroup" method="post" action="@org.hadatac.console.controllers.triplestore.routes.UserManagement.submitPreRegistrationForm("load_groups")">
   		<div class="form-group">
-  			<label for="group_uri">Group URI:*</label>
+  			<label for="group_uri">Acess Level URI:*</label>
  			<input type="text" class="form-control" name="group_uri" id="group_uri" onchange="checkform()" >
  		</div>
  		
 		<div class="form-group">
-			<label for="group_name">Group Name:*</label>
+			<label for="group_name">Acess Level Name:*</label>
   			<input type="text" class="form-control" name="group_name" id="group_name" onchange="checkform()" >
 		</div>
 		
@@ -48,9 +49,14 @@
   			<input type="text" class="form-control" name="homepage" id="homepage"" >
 		</div>
 		
-		<div class="form-group">
-			<label for="org_uri">Organization URI:</label>
-  			<input type="text" class="form-control" name="org_uri" id="org_uri" >
+  		<div class="form-group">
+			<label for="parent_group_uri">Parent Access Level: </label>
+  			<select class="form-control col-sm-6" id="parent_group_uri" name="parent_group_uri" >
+  				<option value="Public">Public</option>
+  				@for(group <- theGroups){
+              		<option value="@group.getUri()">@group.getName()</option>
+                }
+            </select>
 		</div>
   		
      	<div class="form-group" class="col-sm-6 col-offset-3">

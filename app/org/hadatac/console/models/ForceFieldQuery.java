@@ -1,5 +1,6 @@
 package org.hadatac.console.models;
 
+import org.apache.jena.base.Sys;
 import org.hadatac.console.http.GetSparqlQuery;
 import org.hadatac.utils.Collections;
 
@@ -25,9 +26,7 @@ public class ForceFieldQuery {
 		collectionSource = source;
 		System.out.println("Collection source in use: " + collectionSource);
 		agents.add(new AgentNode("prov:Agent", "Public", AgentNode.AGENT, "", ""));
-		agents.add(new AgentNode("hadatac:chear", "CHEAR", AgentNode.ORGANIZATION, "", "prov:Agent"));
 		addGroupNodes();
-		addOrganizationNodes();
 		addPersonNodes();
 	}
 	
@@ -76,23 +75,8 @@ public class ForceFieldQuery {
 		    String uri = getNodeValue(binding.findPath("agent"), "");
 		    String name = getNodeValue(binding.findPath("name"), uri);
 		    String email = getNodeValue(binding.findPath("email"), "");
-		    String memberOf = getNodeValue(binding.findPath("organization"), "");
-		    agents.add(new AgentNode(uri, name, AgentNode.GROUP, "", memberOf));
-		}
-	}
-
-	private void addOrganizationNodes(){
-		JsonNode rootNode = readTreeNodes("OrganizationsH");
-		JsonNode bindingsNode = rootNode.findPath("bindings");
-		System.out.println("Here is the size of bindings: <" + bindingsNode.size() + ">");
-		
-		Iterator<JsonNode> elements = bindingsNode.elements();
-		while (elements.hasNext()){
-			JsonNode binding = elements.next();
-			String uri = getNodeValue(binding.findPath("agent"), "");
-			String name = getNodeValue(binding.findPath("name"), uri);
-			String email = getNodeValue(binding.findPath("email"), "");
-		    agents.add(new AgentNode(uri, name, AgentNode.ORGANIZATION, email, null));
+		    String memberOf = getNodeValue(binding.findPath("group"), "");
+		    agents.add(new AgentNode(uri, name, AgentNode.GROUP, email, memberOf));
 		}
 	}
 	
@@ -100,6 +84,7 @@ public class ForceFieldQuery {
 		JsonNode rootNode = readTreeNodes("PeopleH");
 		JsonNode bindingsNode = rootNode.findPath("bindings");
 		System.out.println("Here is the size of bindings: <" + bindingsNode.size() + ">");
+		System.out.println(bindingsNode.toString());
 		
 		Iterator<JsonNode> elements = bindingsNode.elements();
 		while (elements.hasNext()){
@@ -114,16 +99,19 @@ public class ForceFieldQuery {
 	
 	private int findAgentIndex(String uri) {
 		Iterator<AgentNode> ag = agents.iterator();
+		if (uri.equals("Public")){
+			return 0;
+		}
 		while (ag.hasNext()) {
 			AgentNode tmpAgent = ag.next();
-			if (tmpAgent.getURI().equals(uri)) 
+			if (tmpAgent.getURI().equals(uri)){
 				return agents.indexOf(tmpAgent);
+			}
 		}
 		return -1;
 	}
 	
 	private String toJson() {
-		AgentNode theAgent = null;
 		JSONObject tree = new JSONObject();
 		
 		JSONArray nodes = new JSONArray();
@@ -131,9 +119,7 @@ public class ForceFieldQuery {
 		while (ag.hasNext()) {
 			AgentNode tmpAgent = ag.next();
 			JSONObject agent = new JSONObject();
-			if (tmpAgent.getType() == AgentNode.AGENT) {
-				theAgent = tmpAgent;
-			}
+			System.out.println(tmpAgent.getName());
 			agent.put("name", tmpAgent.getName());
 			if (tmpAgent.getEmail() != null && !tmpAgent.getEmail().equals("")) {
 				agent.put("email", tmpAgent.getEmail());
@@ -148,31 +134,20 @@ public class ForceFieldQuery {
 		while (ag.hasNext()) {
 			AgentNode tmpAgent = ag.next();
 			JSONObject edge = new JSONObject();
-			if (tmpAgent.getType() == AgentNode.PERSON) {
-				if (!tmpAgent.getMemberOf().equals("")) {
-					int ind = findAgentIndex(tmpAgent.getMemberOf());
-					if (ind == -1) {
-						System.out.println("Invalid memberOf info for " + tmpAgent.getURI() + " under " + tmpAgent.getMemberOf());
-					}
-					else {
-						edge.put("source", agents.indexOf(tmpAgent));
-						edge.put("target", ind);
-						edge.put("value", 4);
-						links.add(edge);
-					}
-				}			
-			}
-			else if(tmpAgent.getType() == AgentNode.GROUP) {
-				edge.put("source", agents.indexOf(tmpAgent));
-				edge.put("target", 1);
-				edge.put("value", 4);
-				links.add(edge);
-			}
-			else if(tmpAgent.getType() == AgentNode.ORGANIZATION) {
-				edge.put("source", agents.indexOf(tmpAgent));
-				edge.put("target", 0);
-				edge.put("value", 4);
-				links.add(edge);
+			System.out.println(tmpAgent.getName() + "=====");
+			System.out.println(tmpAgent.getMemberOf() + "!!!!!");
+			if (!tmpAgent.getMemberOf().equals("")) {
+				int ind = findAgentIndex(tmpAgent.getMemberOf());
+				if (ind == -1) {
+					System.out.println("Invalid memberOf info for " + tmpAgent.getURI() + " under " + tmpAgent.getMemberOf());
+				}
+				else {
+					edge.put("source", agents.indexOf(tmpAgent));
+					edge.put("target", ind);
+					edge.put("value", 4);
+					links.add(edge);
+					
+				}
 			}
 		}
 		tree.put("links", links);

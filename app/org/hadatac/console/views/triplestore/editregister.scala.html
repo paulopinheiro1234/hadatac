@@ -67,21 +67,22 @@
 		</div>
 		
 		<div class="form-group">
-			<label for="group_uri">Group: </label>
+			<label for="group_uri">Access Level: </label>
   			<select class="form-control col-sm-6" id="group_uri" name="group_uri" >
-              	 @for(group <- theGroups){
-              	 	<option value="@group.getUri()">@group.getName()</option>
-                 }
+  				<option value="Public">Public</option>
+            	@for(group <- theGroups){
+              		@if(group.getUri().equals(user.getUri())){
+              	 		<option selected value="@group.getUri()">@group.getName()</option>
+              	 	}
+              	 	else{
+              	 		<option value="@group.getUri()">@group.getName()</option>
+              	 	}
+                }
             </select>
-		</div>
-		
-		<div class="form-group">
-			<label for="org_uri">Organization URI:</label>
-			<input type="text" value="@user.getOrgUri()" class="form-control" name="org_uri" id="org_uri" >			
 		</div>
   		
      	<div class="form-group" class="col-sm-6 col-offset-3">
-        	<input class="btn btn-success" role="button" id="submitbutton" type="submit" value="Create" />
+        	<input class="btn btn-success" role="button" id="submitbutton" type="submit" value="Submit" />
      	</div>
    	</form>    
   </div>

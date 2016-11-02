@@ -5,7 +5,7 @@ public class GroupRegistrationForm {
     public String group_name = "";
     public String comment = "";
     public String homepage = "";
-    public String org_uri = "";
+    public String parent_group_uri = "";
     
     public String getGroupUri() {
     	return group_uri;
@@ -19,7 +19,7 @@ public class GroupRegistrationForm {
     public String getHomepage() {
     	return homepage;
     }
-    public String getOrgUri() {
-    	return org_uri;
+    public String getParentGroupUri() {
+    	return parent_group_uri;
     }
 }

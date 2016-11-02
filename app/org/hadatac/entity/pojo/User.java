@@ -35,6 +35,7 @@ import org.apache.jena.update.UpdateRequest;
 import org.hadatac.utils.Collections;
 import org.hadatac.utils.NameSpaces;
 import play.Play;
+import scala.reflect.internal.tpe.FindMembers.FindMember;
 
 public class User implements Comparable<User> {
 	private String uri;
@@ -45,7 +46,7 @@ public class User implements Comparable<User> {
 	private String homepage;
 	private String comment;
 	private String org_uri;
-	private User immediateGroup;
+	private String immediateGroupUri;
 	private boolean administrator;
 	
 	public String getUri() {
@@ -104,12 +105,12 @@ public class User implements Comparable<User> {
 		this.comment = comment;
 	}
 	
-	public User getImmediateGroup() {
-		return immediateGroup;
+	public String getImmediateGroupUri() {
+		return immediateGroupUri;
 	}
 
-	public void setImmediateGroup(User immediateGroup) {
-		this.immediateGroup = immediateGroup;
+	public void setImmediateGroupUri(String group_uri) {
+		this.immediateGroupUri = group_uri;
 	}
 	
 	public String getOrgUri(){
@@ -145,9 +146,9 @@ public class User implements Comparable<User> {
 		Map<String, String> nameList = new HashMap<String,String>();
 		User user = User.find(uri);
 		if (user != null && user.getUri() != null && user.getName() != null) {
-			nameList.put(user.getUri(),user.getName());
-			while (user.getImmediateGroup() != null) {
-				user = user.getImmediateGroup();
+			nameList.put(user.getUri(), user.getName());
+			while (user.getImmediateGroupUri() != null) {
+				user = User.find(getImmediateGroupUri());
 				if (user.getName() != null) {
     				nameList.put(user.getUri(), user.getName());
 				}
@@ -239,10 +240,12 @@ public class User implements Comparable<User> {
 				System.out.println("comment: " + object.asLiteral().getString());
 		    }
 			else if (statement.getPredicate().getURI().equals("http://hadatac.org/ont/hadatac#isMemberOfGroup")) {
-				if(!object.toString().equals("")){
-			    	User group = UserGroup.find(object.asResource().getURI());
-			    	group.setUri(object.asResource().getURI());
-				    user.setImmediateGroup(group);
+				if(object.toString().equals("Public") || object.toString().equals("")){
+					user.setImmediateGroupUri("Public");
+				}
+				else{
+					user.setImmediateGroupUri(object.asResource().toString());
+					System.out.println("memberOfUri: " + object.asResource().toString());
 				}
 			}
 			else if (statement.getPredicate().getURI().equals("http://xmlns.com/foaf/0.1/givenName")) {
@@ -263,16 +266,14 @@ public class User implements Comparable<User> {
 			}
 			else if (statement.getPredicate().getURI().equals("http://xmlns.com/foaf/0.1/homepage")) {
 				String homepage = object.asLiteral().getString();
-				if(homepage.startsWith("\"") && homepage.endsWith("\"")){
-					homepage.replace("\"", "");
+				if(homepage.startsWith("<") && homepage.endsWith(">")){
+					System.out.println("homepage: " + homepage);
+					homepage = homepage.replace("<", "");
+					homepage = homepage.replace(">", "");
 				}
 				user.setHomepage(homepage);
 				System.out.println("homepage: " + homepage);
 		    }
-			else if (statement.getPredicate().getURI().equals("http://hadatac.org/ont/hadatac#isMemberOfOrg")) {
-				user.setOrgUri(object.asResource().getURI());
-				System.out.println("org: " + object.asResource().getURI());
-			}
 			else if (statement.getPredicate().getURI().equals("http://hadatac.org/ont/hadatac#isadmin")) {
 				if (object.asLiteral().getString().equals("true")) {
 				    user.setAdministrator(true);
@@ -319,7 +320,7 @@ public class User implements Comparable<User> {
 			counter_flag = "true";
 		}
 		
-		String queryString =  "DELETE { <" + uri + "> <http://hadatac.org/ont/hadatac#isadmin> \"" + counter_flag + "\" .  } \n"
+		String queryString =  "DELETE { <" + uri + "> <http://hadatac.org/ont/hadatac#isadmin> \"" + counter_flag + "\" .  } \n "
 							+ "INSERT { <" + uri + "> <http://hadatac.org/ont/hadatac#isadmin> \"" + flag + "\" . } \n "
 							+ "WHERE { } \n";
 		System.out.println(queryString);
@@ -328,7 +329,37 @@ public class User implements Comparable<User> {
 		processor.execute();
 	}
 	
+	public static void changeAccessLevel(String uri, String group_uri) {
+		try {
+			uri = URLDecoder.decode(uri, "UTF-8");
+		} catch (UnsupportedEncodingException e) {
+			e.printStackTrace();
+		}
+		
+		String command = "";
+		System.out.println("group_uri is " + group_uri);
+		if(group_uri.equals("Public")){
+			command = "DELETE { <" + uri + "> <http://hadatac.org/ont/hadatac#isMemberOfGroup> \"" + group_uri + "\" .  } \n"
+					+ "INSERT { <" + uri + "> <http://hadatac.org/ont/hadatac#isMemberOfGroup> \"" + group_uri + "\" . } \n "
+					+ "WHERE { } \n";
+		}
+		else{
+			command = "DELETE { <" + uri + "> <http://hadatac.org/ont/hadatac#isMemberOfGroup> <" + group_uri + "> .  } \n"
+					+ "INSERT { <" + uri + "> <http://hadatac.org/ont/hadatac#isMemberOfGroup> <" + group_uri + "> . } \n "
+					+ "WHERE { } \n";
+		}
+		
+		System.out.println(command);
+		UpdateRequest req = UpdateFactory.create(command);
+		UpdateProcessor processor = UpdateExecutionFactory.createRemote(req, Collections.getCollectionsName(Collections.PERMISSIONS_SPARQL));
+		processor.execute();
+	}
+	
 	public static void deleteUser(String uri) {
+		for(User user : UserGroup.findMembers(uri)){
+			changeAccessLevel(user.getUri(), User.find(uri).getImmediateGroupUri());
+		}
+		
 		String queryString = "DELETE WHERE { <" + uri + "> ?p1 ?o1 } \n";
 		System.out.println(queryString);
 		UpdateRequest req = UpdateFactory.create(queryString);

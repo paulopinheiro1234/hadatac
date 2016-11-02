@@ -10,7 +10,7 @@ public class Collections {
 	public static final String CONSOLE_STORE               = "/console_store";
 	public static final String URI_GENERATOR               = "/uri_generator";
 	public static final String STUDY_ACQUISITION           = "/studies/select";
-	public static final String SAMPLES_ACQUISITION           = "/samples/select";
+	public static final String SAMPLES_ACQUISITION         = "/samples/select";
 	public static final String METADATA_DA			       = "/data_acquisitions/select";
 	public static final String SUBJECTS_ACQUISITION	       = "/subjects/select";
 	public static final String ANALYTES_ACQUISITION        = "/analytes/select";

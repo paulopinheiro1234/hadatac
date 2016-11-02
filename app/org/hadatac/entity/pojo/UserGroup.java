@@ -63,4 +63,35 @@ public class UserGroup extends User {
 		java.util.Collections.sort((List<User>) users);
 		return users;
 	}
+	
+	public static List<User> findMembers(String group_uri) {
+		System.out.println("findMembers(" + group_uri + ") is called.");
+		List<User> users = new ArrayList<User>();
+		String queryString = 
+				"PREFIX prov: <http://www.w3.org/ns/prov#>  " +
+        		"PREFIX foaf: <http://xmlns.com/foaf/0.1/> " +
+        		"PREFIX hadatac: <http://hadatac.org/ont/hadatac#> " + 
+				"SELECT ?uri WHERE { " +
+				"  ?uri a foaf:Person . " +
+				"  ?uri hadatac:isMemberOfGroup <" + group_uri + "> . " +
+				"} ";
+		
+		Query query = QueryFactory.create(queryString);
+		
+		QueryExecution qexec = QueryExecutionFactory.sparqlService(Collections.getCollectionsName(Collections.PERMISSIONS_SPARQL), query);
+		ResultSet results = qexec.execSelect();
+		ResultSetRewindable resultsrw = ResultSetFactory.copyResults(results);
+		qexec.close();
+		
+		while (resultsrw.hasNext()) {
+			QuerySolution soln = resultsrw.next();
+			System.out.println("URI from main query: " + soln.getResource("uri").getURI());
+			User user = find(soln.getResource("uri").getURI());
+			users.add(user);
+		}		
+		System.out.println(users.size());
+		
+		java.util.Collections.sort((List<User>) users);
+		return users;
+	}
 }
