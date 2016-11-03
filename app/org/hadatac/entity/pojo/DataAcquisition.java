@@ -563,6 +563,32 @@ public class DataAcquisition {
 		return list;
 	}
 	
+	public static List<DataAcquisition> findAll() {
+		List<DataAcquisition> list = new ArrayList<DataAcquisition>();
+		SolrClient solr = new HttpSolrClient(Play.application().configuration().getString("hadatac.solr.data") + "/sdc");
+		SolrQuery query = new SolrQuery();
+		query.set("q", "owner_uri:*");
+		query.set("sort", "started_at asc");
+		
+		try {
+			QueryResponse response = solr.query(query);
+			solr.close();
+			SolrDocumentList results = response.getResults();
+			System.out.println(results.size());
+			Iterator<SolrDocument> i = results.iterator();
+			while (i.hasNext()) {
+				DataAcquisition dataCollection = convertFromSolr(i.next());
+				System.out.println("DataAcquisition added");
+				list.add(dataCollection);
+			}
+		} catch (Exception e) {
+			list.clear();
+			System.out.println("[ERROR] DataAcquisition.find(String) - Exception message: " + e.getMessage());
+		}
+		
+		return list;
+	}
+	
 	public static List<DataAcquisition> find(String ownerUri) {
 		List<DataAcquisition> list = new ArrayList<DataAcquisition>();
 		

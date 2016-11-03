@@ -185,9 +185,7 @@ public class AutoAnnotator extends Controller {
     	System.out.println("Annotating " + file_name);
     	
 		State state = new State(State.ALL);
-		final User user = AuthApplication.getLocalUser(session());
-		String ownerUri = UserManagement.getUriByEmail(user.email);
-    	List<DataAcquisition> da_list = DataAcquisition.find(ownerUri, state);
+    	List<DataAcquisition> da_list = DataAcquisition.findAll();
 		
 		String dc_uri = null;
 		String deployment_uri = null;
