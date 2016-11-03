@@ -29,6 +29,7 @@ import org.hadatac.console.http.DeploymentQueries;
 import org.hadatac.console.models.CSVAnnotationHandler;
 import org.hadatac.console.models.SparqlQueryResults;
 import org.hadatac.console.models.TripleDocument;
+import org.hadatac.console.models.User;
 import org.hadatac.console.views.html.annotator.auto_ccsv;
 import org.hadatac.data.api.DataFactory;
 import org.hadatac.entity.pojo.DataAcquisition;
@@ -184,7 +185,8 @@ public class AutoAnnotator extends Controller {
     	System.out.println("Annotating " + file_name);
     	
 		State state = new State(State.ALL);
-		String ownerUri = UserManagement.getUriByEmail("gychant@qq.com");
+		final User user = AuthApplication.getLocalUser(session());
+		String ownerUri = UserManagement.getUriByEmail(user.email);
     	List<DataAcquisition> da_list = DataAcquisition.find(ownerUri, state);
 		
 		String dc_uri = null;
