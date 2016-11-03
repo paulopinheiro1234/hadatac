@@ -53,13 +53,14 @@ public class DynamicGeneration extends Controller {
 				"WHERE {        ?subUri rdfs:subClassOf hasco:Study .  " +
 				"		                      ?studyUri a ?subUri .  " +
 				"	           ?studyUri rdfs:label ?studyLabel  .   " +
-				"					 	OPTIONAL { ?studyUri chear-kb:project ?proj . " +
+				"					 	?studyUri chear-kb:project ?proj . " +
 				"                                  ?studyUri skos:definition ?studyTitle . " +
 				"                                   ?studyUri rdfs:comment ?studyComment . " +
 				"                                  ?studyUri hasco:hasAgent ?agent .  " +
 				"                                 	?agent foaf:name ?agentName_ . " +
 				"                                  ?studyUri hasco:hasInstitution ?institution . " +
-				"                                 ?institution foaf:name ?institutionName} . } " +
+//				"                                 ?institution foaf:name ?institutionName} . } " +
+				"                                 ?institution foaf:name ?institutionName . } " +
 				"GROUP BY ?studyUri ?studyLabel ?proj ?studyTitle ?studyComment ?agentName ?institutionName ";
 		
 		QueryExecution qexecStudy = QueryExecutionFactory.sparqlService(Collections.getCollectionsName(Collections.METADATA_SPARQL), prefixString + initStudyQuery);
@@ -84,8 +85,9 @@ public class DynamicGeneration extends Controller {
 			
 			initStudyJson=initStudyJson + ",\n\"add\":\n\t{\n\t\"doc\":\n\t\t{\n";
 			initStudyJson=initStudyJson + "\t\t\"studyUri\": \"" + soln.get("studyUri").toString() + "\" ,\n";
-			initStudyJson=initStudyJson + "\t\t\"studyLabel\": \"" + soln.get("studyLabel").toString() + "\" ,\n";
-			initStudyJson=initStudyJson + "\t\t\"studyTitle\": \"<a href=\\\"./metadataacquisitions/viewStudy?study_uri=" + soln.get("studyUri").toString().replaceAll("http://hadatac.org/ont/chear#","chear:").replaceAll("http://hadatac.org/kb/chear#","chear-kb:") + "\\\">" + soln.get("studyTitle").toString() + "</a>\" ,\n";
+			initStudyJson=initStudyJson + "\t\t\"studyLabel\": \"<a href=\\\"./metadataacquisitions/viewStudy?study_uri=" + soln.get("studyUri").toString().replaceAll("http://hadatac.org/ont/chear#","chear:").replaceAll("http://hadatac.org/kb/chear#","chear-kb:") + "\\\">" + soln.get("studyLabel").toString() + "</a>\" ,\n";
+			//initStudyJson=initStudyJson + "\t\t\"studyTitle\": \"<a href=\\\"./metadataacquisitions/viewStudy?study_uri=" + soln.get("studyUri").toString().replaceAll("http://hadatac.org/ont/chear#","chear:").replaceAll("http://hadatac.org/kb/chear#","chear-kb:") + "\\\">" + soln.get("studyTitle").toString() + "</a>\" ,\n";
+			initStudyJson=initStudyJson + "\t\t\"studyTitle\": \"" + soln.get("studyTitle").toString() + "\" ,\n";
 			initStudyJson=initStudyJson + "\t\t\"proj\": \"" + soln.get("proj").toString() + "\" ,\n";
 			initStudyJson=initStudyJson + "\t\t\"studyComment\": \"" + soln.get("studyComment").toString() + "\" ,\n";
 			initStudyJson=initStudyJson + "\t\t\"agentName\": \"" + soln.get("agentName").toString() + "\" ,\n";
@@ -221,12 +223,12 @@ public class DynamicGeneration extends Controller {
 				"        [\n" +
 				"          {\n" + 
 				"            \"pre\" : \"<h3>\",\n" +
-				"            \"field\" : \"studyTitle\",\n" +
+				"            \"field\" : \"studyLabel\",\n" +
 				"            \"post\" : \" - \"\n" +
 				"          },\n" +
 				"          {\n" +
 				"            \"pre\" : \"(\",\n" +
-				"            \"field\" : \"studyLabel\",\n" +
+				"            \"field\" : \"studyTitle\",\n" +
 				"            \"post\" : \")</h3>\"\n" +
 				"          }\n" +
 				"        ],\n" +

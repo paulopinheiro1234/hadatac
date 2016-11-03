@@ -53,13 +53,14 @@ public class ViewStudy extends Controller {
 		"PREFIX rdfs:<http://www.w3.org/2000/01/rdf-schema#>" + 
 		"PREFIX skos: <http://www.w3.org/2004/02/skos/core#>" +
 		"PREFIX foaf: <http://xmlns.com/foaf/0.1/>" + 
-		"SELECT ?studyUri ?studyLabel ?projLabel ?studyDef ?studyComment ?agentName ?institutionName " + 
+		"SELECT ?studyUri ?studyLabel ?proj ?studyDef ?studyComment ?agentName ?institutionName " + 
 		" WHERE {        ?subUri rdfs:subClassOf hasco:Study . " + 
 		"                       ?studyUri a ?subUri . " + 
 		"           ?studyUri rdfs:label ?studyLabel  . " + 
 		"			FILTER ( ?studyUri = " + study_uri + " ) . " +
-		"        OPTIONAL { ?studyUri chear-kb:project ?proj. " +
-		"					?proj rdfs:label ?projLabel} . " + 
+//		"        OPTIONAL { ?studyUri chear-kb:project ?proj. " +
+//		"					?proj rdfs:label ?projLabel} . " + 
+		"		OPTIONAL {?studyUri chear-kb:project ?proj} . " +
 		"        OPTIONAL { ?studyUri skos:definition ?studyDef } . " + 
 		"        OPTIONAL { ?studyUri rdfs:comment ?studyComment } . " + 
 		"        OPTIONAL { ?studyUri hasco:hasAgent ?agent . " + 
@@ -84,7 +85,7 @@ public class ViewStudy extends Controller {
 			values = new ArrayList<String>();
 			values.add("Label: " + soln.get("studyLabel").toString());
 			values.add("Title: " + soln.get("studyDef").toString());
-			values.add("Project: " + soln.get("projLabel").toString());
+			values.add("Project: " + soln.get("proj").toString());
 			values.add("Comment: " + soln.get("studyComment").toString());
 			values.add("Agent(s): " + soln.get("agentName").toString());
 			values.add("Institution: " + soln.get("institutionName").toString());
