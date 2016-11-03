@@ -33,7 +33,7 @@ public class DataAcquisitionSchemaQueries {
             		"PREFIX hasneto: <http://hadatac.org/ont/hasneto#> " +
         			"PREFIX hasco: <http://hadatac.org/ont/hasco/> " +
         			"SELECT ?uri ?hasPosition ?hasEntity ?hasAttribute ?hasUnit ?hasSource ?isPIConfirmed WHERE { " + 
-        			"   ?uri a hasneto:DataAcquisitionSchema . " + 
+        			"   ?uri a hasneto:DASchemaAttribute . " + 
         			"   ?uri hasneto:partOfSchema " + "<" + uri + "> .  " + 
         			"   ?uri hasco:hasPosition ?hasPosition .  " + 
         			"   OPTIONAL { ?uri hasneto:hasEntity ?hasEntity } ." + 

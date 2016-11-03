@@ -51,7 +51,8 @@ public class DataFactory {
 		Deployment deployment;
 		if (type.equalsIgnoreCase("LEGACY")) {
 			deployment = Deployment.createLegacy(deploymentUri);
-		} else {
+		} 
+		else {
 			deployment = Deployment.create(deploymentUri);
 		}
 		
@@ -112,6 +113,4 @@ public class DataFactory {
     	}
     	return host + "/hadatac/kb/" + category + "/" + CONSOLE_ID + "/" + metadataId ;   
     }
-    
-
 }
