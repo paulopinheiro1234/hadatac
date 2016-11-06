@@ -148,20 +148,6 @@ public class DynamicGeneration extends Controller {
 						    "    <field name=\"agentName\" type=\"string\" indexed=\"true\" docValues=\"true\" />\n" +
 						    "    <field name=\"institutionName\" type=\"string\" indexed=\"true\" docValues=\"true\" />\n";
 
-		/*		String selectString="SELECT ?studyUri ?studyLabel ?proj ?studyTitle ?studyComment ?agentName ?institutionName ";
-		String whereString=" 	WHERE { ?subUri rdfs:subClassOf hasco:Study . " +
-		                      "?studyUri a ?subUri .  " +
-		                      "?studyUri rdfs:label ?studyLabel . " +
-		                      "OPTIONAL { ?studyUri chear-kb:project ?proj . " +
-		                      " ?studyUri skos:definition ?studyTitle . " +
-		                      " ?studyUri rdfs:comment ?studyComment . " +
-		                      " ?studyUri hasco:hasAgent ?agent .  " +
-		                      " ?agent foaf:name ?agentName . " +
-		                      " ?studyUri hasco:hasInstitution ?institution . " +
-                              " ?institution foaf:name ?institutionName } . " +
-						 	  "?schemaUri hasco:isSchemaOf ?studyUri . " +
-                			  "?schemaAttribute hasneto:partOfSchema ?schemaUri . ";
-		String groupByString="GROUP BY ?studyUri ?studyLabel ?proj ?studyTitle ?studyComment ?agentName ?institutionName ";*/
 		String updateIndicatorJson="{\n\"commit\": {}";
 		for(Map.Entry<String, String> entry : indicatorMapSorted.entrySet()){
 		    //System.out.println("Key : " + entry.getKey() + " and Value: " + entry.getValue() + "\n");
@@ -169,13 +155,7 @@ public class DynamicGeneration extends Controller {
 		    facetPageString=facetPageString + "        {'field': '" + label + "', 'display': '" + entry.getValue().toString() + "'},\n";
 			facetSearchSortString=facetSearchSortString + ",{'display':'" + entry.getValue().toString() + "','field':'" + label + ".exact'}" ;
 			schemaString=schemaString + "    <field name=\"" + label + "\" type=\"string\" indexed=\"true\" docValues=\"true\" multiValued=\"true\"  />\n" ;
-/*			selectString = selectString + "?" + label;
-			
-			groupByString = groupByString + "?" + entry.getValue().toString().replaceAll(" ", "").replaceAll(",", "") + "Label ";
-			whereString = whereString + "OPTIONAL { ?schemaAttribute hasneto:hasAttribute ?" + entry.getValue().toString().replaceAll(" ", "").replaceAll(",", "") +
-					" . ?" + entry.getValue().toString().replaceAll(" ", "").replaceAll(",", "") + " rdfs:subClassOf* " + entry.getKey().toString().replaceAll("http://hadatac.org/ont/chear#","chear:").replaceAll("http://hadatac.org/kb/chear#","chear-kb:") + 
-					" . ?" + entry.getValue().toString().replaceAll(" ", "").replaceAll(",", "") + " rdfs:label ?" + label  + " } . ";
-			*/
+
 			String indvIndicatorQuery = "PREFIX rdfs:<http://www.w3.org/2000/01/rdf-schema#> PREFIX chear: <http://hadatac.org/ont/chear#>PREFIX hasco: <http://hadatac.org/ont/hasco/>PREFIX hasneto: <http://hadatac.org/ont/hasneto#>SELECT DISTINCT ?studyUri " +
 					"?" + label + " " +
 					"WHERE { ?schemaUri hasco:isSchemaOf ?studyUri . ?schemaAttribute hasneto:partOfSchema ?schemaUri . ?schemaAttribute hasneto:hasAttribute " +
@@ -183,31 +163,11 @@ public class DynamicGeneration extends Controller {
 					" . ?" + entry.getValue().toString().replaceAll(" ", "").replaceAll(",", "") + " rdfs:subClassOf* " + entry.getKey().toString().replaceAll("http://hadatac.org/ont/chear#","chear:").replaceAll("http://hadatac.org/kb/chear#","chear-kb:") + 
 					" . ?" + entry.getValue().toString().replaceAll(" ", "").replaceAll(",", "") + " rdfs:label ?" + label + " . " +
 					"}";
-			System.out.println(indvIndicatorQuery + "\n");
+//			System.out.println(indvIndicatorQuery + "\n");
 			QueryExecution qexecIndvInd = QueryExecutionFactory.sparqlService(Collections.getCollectionsName(Collections.METADATA_SPARQL), indvIndicatorQuery);
 			ResultSet indvIndResults = qexecIndvInd.execSelect();
 			ResultSetRewindable resultsrwIndvInd = ResultSetFactory.copyResults(indvIndResults);
 			qexecIndvInd.close();
-			Map<String, List<String>> indvIndicatorMap = new HashMap<String,  List<String>>();
-			List<String> indvIndicatorValues = new ArrayList<String>();
-			/*while (resultsrwIndvInd.hasNext()) {
-				QuerySolution soln = resultsrwIndvInd.next();
-				System.out.println("Current Indicator Soln: " + soln);
-				System.out.println("Study:" + soln.get("?studyUri"));
-				indvIndicatorValues.add(soln.get(label).toString());
-				indvIndicatorMap.put(soln.get("studyUri").toString(),indvIndicatorValues);
-			}
-			System.out.println("Indv Indicator Map: " + indvIndicatorMap + "\n");
-			String indvIndicatorJson="";
-			for (String key : indvIndicatorMap.keySet()) {
-				indvIndicatorJson=indvIndicatorJson + ",\n\"add\":\n\t{ \"doc\":\n\t\t{\n";
-				indvIndicatorJson=indvIndicatorJson + "\t\t\"studyUri\": \"" + key + "\" ,\n";
-				indvIndicatorJson=indvIndicatorJson + "\t\t\"" + label + "\":\n\t\t\t{ \"add\": \n\t\t\t\t[ " ;
-				for (String indicator : indvIndicatorMap.get(key)){
-					indvIndicatorJson=indvIndicatorJson + "\""+ indicator +"\",";
-				}
-				indvIndicatorJson=indvIndicatorJson.substring(0, indvIndicatorJson.length()-1) + " ]\n\t\t\t}\n\t\t}\n\t}" ; // using substring to remove last comma 
-			}*/
 			String indvIndicatorJson="";
 			while (resultsrwIndvInd.hasNext()) {
 				QuerySolution soln = resultsrwIndvInd.next();
@@ -220,12 +180,10 @@ public class DynamicGeneration extends Controller {
 				indvIndicatorJson=indvIndicatorJson + " ]\n\t\t\t}\n\t\t}\n\t}";
 				System.out.println(indvIndicatorJson);
 				updateIndicatorJson=updateIndicatorJson + indvIndicatorJson;
-//				indvIndicatorValues.add(soln.get(label).toString());
-//				indvIndicatorMap.put(soln.get("studyUri").toString(),indvIndicatorValues);
 			}
 		}
 		updateIndicatorJson = updateIndicatorJson + "\n}";
-//		System.out.println(updateIndicatorJson + "\n");
+		System.out.println(updateIndicatorJson + "\n");
 		
 		facetPageString =facetPageString + "    ],\n    search_sortby: " + facetSearchSortString + "],\n    searchbox_fieldselect: "+ facetSearchSortString + "],\n" +
 				"    paging: {\n" + 
@@ -354,34 +312,6 @@ public class DynamicGeneration extends Controller {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} 
-/*		
-		String studyQueryString = prefixString + selectString + whereString + " } " + groupByString;;
-		//System.out.println(studyQueryString);
-		
-		Query studyQuery = QueryFactory.create(studyQueryString);
-		
-		QueryExecution qexec = QueryExecutionFactory.sparqlService(Collections.getCollectionsName(Collections.METADATA_SPARQL), studyQuery);
-		ResultSet results = qexec.execSelect();
-		ResultSetRewindable resultsrw = ResultSetFactory.copyResults(results);
-		qexec.close();
-		Map<String, List<String>> studyResult = new HashMap<String, List<String>>();
-		List<String> values = new ArrayList<String>();
-//		Map<String, String> poResult = new HashMap<String, String>();
-	//	System.out.println("HERE IS THE RAW resultsrw*********" + resultsrw);
-		while (resultsrw.hasNext()) {
-			QuerySolution soln = resultsrw.next();
-	//		System.out.println("HERE IS THE RAW SOLN*********" + soln.toString());
-			values.clear();
-			values.add("Label: " + soln.get("studyLabel").toString());
-			values.add("Title: " + soln.get("studyTitle").toString());
-			values.add("Project: " + soln.get("proj").toString());
-			values.add("Comment: " + soln.get("studyComment").toString());
-			values.add("Agent(s): " + soln.get("agentName").toString());
-			values.add("Institution: " + soln.get("institutionName").toString());
-			studyResult.put(soln.get("studyUri").toString(),values);
-			
-		}
-*/		
 		
 		try {
 			ProcessBuilder p=new ProcessBuilder("curl","http://localhost:8983/solr/studies/update?commit=true", "-H","Content-type:application/json",
