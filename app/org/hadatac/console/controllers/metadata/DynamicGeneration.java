@@ -145,7 +145,7 @@ public class DynamicGeneration extends Controller {
 						    "    <field name=\"proj\" type=\"string\" indexed=\"true\" docValues=\"true\" />\n" +
 						    "    <field name=\"studyTitle\" type=\"string\" indexed=\"true\" docValues=\"true\" />\n" +
 						    "    <field name=\"studyComment\" type=\"string\" indexed=\"true\" docValues=\"true\" />\n" +
-						    "    <field name=\"agentName\" type=\"string\" indexed=\"true\" docValues=\"true\" multiValued=\"true\"  />\n" +
+						    "    <field name=\"agentName\" type=\"string\" indexed=\"true\" docValues=\"true\" />\n" +
 						    "    <field name=\"institutionName\" type=\"string\" indexed=\"true\" docValues=\"true\" />\n";
 
 		/*		String selectString="SELECT ?studyUri ?studyLabel ?proj ?studyTitle ?studyComment ?agentName ?institutionName ";
@@ -183,20 +183,21 @@ public class DynamicGeneration extends Controller {
 					" . ?" + entry.getValue().toString().replaceAll(" ", "").replaceAll(",", "") + " rdfs:subClassOf* " + entry.getKey().toString().replaceAll("http://hadatac.org/ont/chear#","chear:").replaceAll("http://hadatac.org/kb/chear#","chear-kb:") + 
 					" . ?" + entry.getValue().toString().replaceAll(" ", "").replaceAll(",", "") + " rdfs:label ?" + label + " . " +
 					"}";
-			//System.out.println(indvIndicatorQuery + "\n");
+			System.out.println(indvIndicatorQuery + "\n");
 			QueryExecution qexecIndvInd = QueryExecutionFactory.sparqlService(Collections.getCollectionsName(Collections.METADATA_SPARQL), indvIndicatorQuery);
 			ResultSet indvIndResults = qexecIndvInd.execSelect();
 			ResultSetRewindable resultsrwIndvInd = ResultSetFactory.copyResults(indvIndResults);
 			qexecIndvInd.close();
 			Map<String, List<String>> indvIndicatorMap = new HashMap<String,  List<String>>();
 			List<String> indvIndicatorValues = new ArrayList<String>();
-			while (resultsrwIndvInd.hasNext()) {
+			/*while (resultsrwIndvInd.hasNext()) {
 				QuerySolution soln = resultsrwIndvInd.next();
-				System.out.println(soln);
+				System.out.println("Current Indicator Soln: " + soln);
+				System.out.println("Study:" + soln.get("?studyUri"));
 				indvIndicatorValues.add(soln.get(label).toString());
 				indvIndicatorMap.put(soln.get("studyUri").toString(),indvIndicatorValues);
 			}
-			//System.out.println(indvIndicatorMap + "\n");
+			System.out.println("Indv Indicator Map: " + indvIndicatorMap + "\n");
 			String indvIndicatorJson="";
 			for (String key : indvIndicatorMap.keySet()) {
 				indvIndicatorJson=indvIndicatorJson + ",\n\"add\":\n\t{ \"doc\":\n\t\t{\n";
@@ -206,11 +207,25 @@ public class DynamicGeneration extends Controller {
 					indvIndicatorJson=indvIndicatorJson + "\""+ indicator +"\",";
 				}
 				indvIndicatorJson=indvIndicatorJson.substring(0, indvIndicatorJson.length()-1) + " ]\n\t\t\t}\n\t\t}\n\t}" ; // using substring to remove last comma 
+			}*/
+			String indvIndicatorJson="";
+			while (resultsrwIndvInd.hasNext()) {
+				QuerySolution soln = resultsrwIndvInd.next();
+				System.out.println("Solution: " + soln);
+				indvIndicatorJson="";
+				indvIndicatorJson=indvIndicatorJson + ",\n\"add\":\n\t{ \"doc\":\n\t\t{\n";
+				indvIndicatorJson=indvIndicatorJson + "\t\t\"studyUri\": \"" + soln.get("studyUri").toString() + "\" ,\n";
+				indvIndicatorJson=indvIndicatorJson + "\t\t\"" + label + "\":\n\t\t\t{ \"add\": \n\t\t\t\t[ " ;
+				indvIndicatorJson=indvIndicatorJson + "\""+ soln.get(label).toString() +"\"";
+				indvIndicatorJson=indvIndicatorJson + " ]\n\t\t\t}\n\t\t}\n\t}";
+				System.out.println(indvIndicatorJson);
+				updateIndicatorJson=updateIndicatorJson + indvIndicatorJson;
+//				indvIndicatorValues.add(soln.get(label).toString());
+//				indvIndicatorMap.put(soln.get("studyUri").toString(),indvIndicatorValues);
 			}
-			updateIndicatorJson=updateIndicatorJson + indvIndicatorJson;
 		}
 		updateIndicatorJson = updateIndicatorJson + "\n}";
-		//System.out.println(updateIndicatorJson + "\n");
+//		System.out.println(updateIndicatorJson + "\n");
 		
 		facetPageString =facetPageString + "    ],\n    search_sortby: " + facetSearchSortString + "],\n    searchbox_fieldselect: "+ facetSearchSortString + "],\n" +
 				"    paging: {\n" + 
