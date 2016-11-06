@@ -33,7 +33,8 @@
 			<h3>Sample List</h3>
 				<ul>
 					@for(s <- sampleResult){
-						<li>@s.toString</li>
+						<li><a href="./viewSample?sample_uri=@key.toString.replaceAll("http://hadatac.org/ont/chear#","chear:").replaceAll("http://hadatac.org/kb/chear#","chear-kb:")">@key.toString.replaceAll("http://hadatac.org/ont/chear#","chear:").replaceAll("http://hadatac.org/kb/chear#","chear-kb:")</a>
+						@s.toString</li>
 					}
 				</ul>
     	</div>
