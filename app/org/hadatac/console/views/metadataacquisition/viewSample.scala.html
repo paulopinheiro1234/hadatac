@@ -20,7 +20,7 @@
              <h2>Basic Info</h2>
 				<ul>        		
 					@for(key <- sampleResult.keySet()){
-						<li>@key.toString.replaceAll("http://hadatac.org/ont/chear#","chear:").replaceAll("http://hadatac.org/kb/chear#","chear-kb:")
+						<li><a href="./viewSample?sample_uri=@key.toString.replaceAll("http://hadatac.org/ont/chear#","chear:").replaceAll("http://hadatac.org/kb/chear#","chear-kb:")">@key.toString.replaceAll("http://hadatac.org/ont/chear#","chear:").replaceAll("http://hadatac.org/kb/chear#","chear-kb:")</a>
 							<ul>
 							@for(s <- sampleResult.get(key)) {
 							<li>@s.toString</li>

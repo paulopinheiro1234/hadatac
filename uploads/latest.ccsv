@@ -30,414 +30,161 @@
 
 <kb> a hadatac:KnowledgeBase; hadatac:hasHost "http://localhost"^^xsd:anyURI . 
 
-<http://localhost:9000/hadatac/kb/DS/00000001/ffffffffffffffff> a vstoi:Dataset; prov:wasGeneratedBy <http://hadatac.org/kb/chear#DA-PS5-QUESTIONNAIRE>;  hadatac:hasMeasurementType <mt0> , <mt1> , <mt2> , <mt3> , <mt4> , <mt5> , <mt6> , <mt7> , <mt8> , <mt9> , <mt10> , <mt11> , <mt12> , <mt13> , <mt14> , <mt15> , <mt16> , <mt17> , <mt18> , <mt19> , <mt20> , <mt21> , <mt22> , <mt23> , <mt24> , <mt25> , <mt26> , <mt27> , <mt28> , <mt29> , <mt30> , <mt31> , <mt32> , <mt33> , <mt34> , <mt35> , <mt36> .
+<http://localhost:9000/hadatac/kb/DS/00000001/ffffffffffffffff> a vstoi:Dataset; prov:wasGeneratedBy <http://hadatac.org/kb/chear#DA-PS6-QUESTIONNAIRE>;  hadatac:hasMeasurementType <mt0> , <mt1> , <mt2> , <mt3> , <mt4> , <mt5> , <mt6> , <mt7> , <mt8> , <mt9> , <mt10> , <mt11> , <mt12> , <mt13> , <mt14> , <mt15> , <mt16> , <mt17> , <mt18> , <mt19> , <mt20> , <mt21> , <mt22> , <mt23> , <mt24> , <mt25> , <mt26> , <mt27> , <mt28> , <mt29> , <mt30> , <mt31> , <mt32> , <mt33> , <mt34> , <mt35> , <mt36> , <mt37> , <mt38> , <mt39> , <mt40> , <mt41> .
 
-<mt0> a hadatac:MeasurementType;  hadatac:atColumn 38; hasneto:hasEntity <http://hadatac.org/ont/hasco/Subject>; hasneto:hasAttribute <http://hadatac.org/ont/chear#MotherAge>; hasneto:hasUnit <http://geneontology.org/GO.format.obo-1_2.shtml#UO_0000036> .
-<mt1> a hadatac:MeasurementType;  hadatac:atColumn 30; hasneto:hasEntity <http://hadatac.org/ont/hasco/Subject>; hasneto:hasAttribute <http://hadatac.org/ont/chear#ComputerCount>; hasneto:hasUnit <> .
-<mt2> a hadatac:MeasurementType;  hadatac:atColumn 17; hasneto:hasEntity <http://hadatac.org/ont/hasco/Subject>; hasneto:hasAttribute <http://hadatac.org/ont/chear#HHEducationLevel>; hasneto:hasUnit <> .
-<mt3> a hadatac:MeasurementType;  hadatac:atColumn 28; hasneto:hasEntity <http://hadatac.org/ont/hasco/Subject>; hasneto:hasAttribute <http://hadatac.org/ont/chear#ToasterCount>; hasneto:hasUnit <> .
-<mt4> a hadatac:MeasurementType;  hadatac:atColumn 36; hasneto:hasEntity <http://hadatac.org/ont/hasco/Subject>; hasneto:hasAttribute <http://hadatac.org/ont/chear#BirthWeight>; hasneto:hasUnit <http://geneontology.org/GO.format.obo-1_2.shtml#UO_0000009> .
-<mt5> a hadatac:MeasurementType;  hadatac:atColumn 3; hasneto:hasEntity <http://hadatac.org/ont/hasco/Subject>; hasneto:hasAttribute <http://hadatac.org/ont/chear#MotherWeight>; hasneto:hasUnit <http://geneontology.org/GO.format.obo-1_2.shtml#UO_0000009> .
-<mt6> a hadatac:MeasurementType;  hadatac:atColumn 19; hasneto:hasEntity <http://hadatac.org/ont/hasco/Subject>; hasneto:hasAttribute <http://hadatac.org/ont/chear#RoomCount>; hasneto:hasUnit <> .
-<mt7> a hadatac:MeasurementType;  hadatac:atColumn 7; hasneto:hasEntity <http://hadatac.org/ont/hasco/Subject>; hasneto:hasAttribute <http://hadatac.org/ont/chear#MotherRace>; hasneto:hasUnit <> .
-<mt8> a hadatac:MeasurementType;  hadatac:atColumn 27; hasneto:hasEntity <http://hadatac.org/ont/hasco/Subject>; hasneto:hasAttribute <http://hadatac.org/ont/chear#MicrowaveOvenCount>; hasneto:hasUnit <> .
-<mt9> a hadatac:MeasurementType;  hadatac:atColumn 22; hasneto:hasEntity <http://hadatac.org/ont/hasco/Subject>; hasneto:hasAttribute <http://hadatac.org/ont/chear#LightBulbCount>; hasneto:hasUnit <> .
-<mt10> a hadatac:MeasurementType;  hadatac:atColumn 14; hasneto:hasEntity <http://hadatac.org/ont/hasco/Subject>; hasneto:hasAttribute <http://hadatac.org/ont/chear#SocioeconomicStatusIndex>; hasneto:hasUnit <> .
-<mt11> a hadatac:MeasurementType;  hadatac:atColumn 6; hasneto:hasEntity <http://hadatac.org/ont/hasco/Subject>; hasneto:hasAttribute <http://hadatac.org/ont/chear#MotherRace>; hasneto:hasUnit <> .
-<mt12> a hadatac:MeasurementType;  hadatac:atColumn 24; hasneto:hasEntity <http://hadatac.org/ont/hasco/Subject>; hasneto:hasAttribute <http://hadatac.org/ont/chear#CarCount>; hasneto:hasUnit <> .
-<mt13> a hadatac:MeasurementType;  hadatac:atColumn 5; hasneto:hasEntity <http://hadatac.org/ont/hasco/Subject>; hasneto:hasAttribute <http://hadatac.org/ont/chear#Hispanic>; hasneto:hasUnit <> .
-<mt14> a hadatac:MeasurementType;  hadatac:atColumn 20; hasneto:hasEntity <http://hadatac.org/ont/hasco/Subject>; hasneto:hasAttribute <http://hadatac.org/ont/chear#BathroomCount>; hasneto:hasUnit <> .
-<mt15> a hadatac:MeasurementType;  hadatac:atColumn 33; hasneto:hasEntity <http://hadatac.org/ont/hasco/Subject>; hasneto:hasAttribute <http://hadatac.org/ont/chear#FatherEducationGrade>; hasneto:hasUnit <> .
-<mt16> a hadatac:MeasurementType;  hadatac:atColumn 13; hasneto:hasEntity <http://hadatac.org/ont/hasco/Subject>; hasneto:hasAttribute <http://hadatac.org/ont/chear#MotherEducationLevel>; hasneto:hasUnit <> .
-<mt17> a hadatac:MeasurementType;  hadatac:atColumn 37; hasneto:hasEntity <http://hadatac.org/ont/hasco/Subject>; hasneto:hasAttribute <http://hadatac.org/ont/chear#MotherDOB>; hasneto:hasUnit <> .
-<mt18> a hadatac:MeasurementType;  hadatac:atColumn 21; hasneto:hasEntity <http://hadatac.org/ont/hasco/Subject>; hasneto:hasAttribute <http://hadatac.org/ont/chear#BoilerCount>; hasneto:hasUnit <> .
-<mt19> a hadatac:MeasurementType;  hadatac:atColumn 8; hasneto:hasEntity <http://hadatac.org/ont/hasco/Subject>; hasneto:hasAttribute <http://hadatac.org/ont/chear#MotherRace>; hasneto:hasUnit <> .
-<mt20> a hadatac:MeasurementType;  hadatac:atColumn 32; hasneto:hasEntity <http://hadatac.org/ont/hasco/Subject>; hasneto:hasAttribute <http://hadatac.org/ont/chear#FatherEducationLevel>; hasneto:hasUnit <> .
-<mt21> a hadatac:MeasurementType;  hadatac:atColumn 10; hasneto:hasEntity <http://hadatac.org/ont/hasco/Subject>; hasneto:hasAttribute <http://hadatac.org/ont/chear#ChildSex>; hasneto:hasUnit <> .
-<mt22> a hadatac:MeasurementType;  hadatac:atColumn 23; hasneto:hasEntity <http://hadatac.org/ont/hasco/Subject>; hasneto:hasAttribute <http://hadatac.org/ont/chear#FloorType>; hasneto:hasUnit <> .
-<mt23> a hadatac:MeasurementType;  hadatac:atColumn 11; hasneto:hasEntity <http://hadatac.org/ont/hasco/Subject>; hasneto:hasAttribute <http://hadatac.org/ont/chear#GestationalAge>; hasneto:hasUnit <http://geneontology.org/GO.format.obo-1_2.shtml#UO_0000034> .
-<mt24> a hadatac:MeasurementType;  hadatac:atColumn 25; hasneto:hasEntity <http://hadatac.org/ont/hasco/Subject>; hasneto:hasAttribute <http://hadatac.org/ont/chear#VacuumCleanerCount>; hasneto:hasUnit <> .
-<mt25> a hadatac:MeasurementType;  hadatac:atColumn 15; hasneto:hasEntity <http://hadatac.org/ont/hasco/Subject>; hasneto:hasAttribute <http://hadatac.org/ont/chear#MotherEducationLevel>; hasneto:hasUnit <> .
-<mt26> a hadatac:MeasurementType;  hadatac:atColumn 18; hasneto:hasEntity <http://hadatac.org/ont/hasco/Subject>; hasneto:hasAttribute <http://hadatac.org/ont/chear#HHEducationGrade>; hasneto:hasUnit <> .
-<mt27> a hadatac:MeasurementType;  hadatac:atColumn 26; hasneto:hasEntity <http://hadatac.org/ont/hasco/Subject>; hasneto:hasAttribute <http://hadatac.org/ont/chear#WashingMachineCount>; hasneto:hasUnit <> .
-<mt28> a hadatac:MeasurementType;  hadatac:atColumn 4; hasneto:hasEntity <http://hadatac.org/ont/hasco/Subject>; hasneto:hasAttribute <http://hadatac.org/ont/chear#MotherHeight>; hasneto:hasUnit <http://geneontology.org/GO.format.obo-1_2.shtml#UO_0000015> .
-<mt29> a hadatac:MeasurementType;  hadatac:atColumn 29; hasneto:hasEntity <http://hadatac.org/ont/hasco/Subject>; hasneto:hasAttribute <http://hadatac.org/ont/chear#VCRPlayerCount>; hasneto:hasUnit <> .
-<mt30> a hadatac:MeasurementType;  hadatac:atColumn 31; hasneto:hasEntity <http://hadatac.org/ont/hasco/Subject>; hasneto:hasAttribute <http://hadatac.org/ont/chear#MotherIQ>; hasneto:hasUnit <> .
-<mt31> a hadatac:MeasurementType;  hadatac:atColumn 16; hasneto:hasEntity <http://hadatac.org/ont/hasco/Subject>; hasneto:hasAttribute <http://hadatac.org/ont/chear#MotherEducationGrade>; hasneto:hasUnit <> .
-<mt32> a hadatac:MeasurementType;  hadatac:atColumn 9; hasneto:hasEntity <http://hadatac.org/ont/hasco/Subject>; hasneto:hasAttribute <http://hadatac.org/ont/chear#ChildDOB>; hasneto:hasUnit <> .
-<mt33> a hadatac:MeasurementType;  hadatac:atColumn 12; hasneto:hasEntity <http://hadatac.org/ont/hasco/Subject>; hasneto:hasAttribute <http://hadatac.org/ont/chear#MotherHemoglobin>; hasneto:hasUnit <> .
-<mt34> a hadatac:MeasurementType;  hadatac:atColumn 29; hasneto:hasEntity <http://hadatac.org/ont/hasco/Subject>; hasneto:hasAttribute <http://hadatac.org/ont/chear#DVDPlayerCount>; hasneto:hasUnit <> .
-<mt35> a hadatac:MeasurementType;  hadatac:atColumn 34; hasneto:hasEntity <http://hadatac.org/ont/hasco/Subject>; hasneto:hasAttribute <http://hadatac.org/ont/chear#MotherWeight>; hasneto:hasUnit <http://geneontology.org/GO.format.obo-1_2.shtml#UO_0000009> .
-<mt36> a hadatac:MeasurementType;  hadatac:atColumn 35; hasneto:hasEntity <http://hadatac.org/ont/hasco/Subject>; hasneto:hasAttribute <http://hadatac.org/ont/chear#MotherHeight>; hasneto:hasUnit <http://geneontology.org/GO.format.obo-1_2.shtml#UO_0000008> .
+<mt0> a hadatac:MeasurementType;  hadatac:atColumn 38; hasneto:hasEntity <http://hadatac.org/ont/hasco/Subject>; hasneto:hasAttribute <http://hadatac.org/ont/chear#MotherPrePregnancyWeight>; hasneto:hasUnit <http://geneontology.org/GO.format.obo-1_2.shtml#UO_0000009> .
+<mt1> a hadatac:MeasurementType;  hadatac:atColumn 5; hasneto:hasEntity <http://hadatac.org/ont/hasco/Subject>; hasneto:hasAttribute <http://hadatac.org/ont/chear#HouseholdIncome>; hasneto:hasUnit <> .
+<mt2> a hadatac:MeasurementType;  hadatac:atColumn 35; hasneto:hasEntity <http://hadatac.org/ont/hasco/Subject>; hasneto:hasAttribute <http://hadatac.org/ont/chear#MaritalStatus>; hasneto:hasUnit <> .
+<mt3> a hadatac:MeasurementType;  hadatac:atColumn 22; hasneto:hasEntity <http://hadatac.org/ont/hasco/Subject>; hasneto:hasAttribute <http://semanticscience.org/resource/Race>; hasneto:hasUnit <> .
+<mt4> a hadatac:MeasurementType;  hadatac:atColumn 9; hasneto:hasEntity <http://hadatac.org/ont/hasco/Subject>; hasneto:hasAttribute <http://hadatac.org/ont/chear#LandfillProximity>; hasneto:hasUnit <> .
+<mt5> a hadatac:MeasurementType;  hadatac:atColumn 3; hasneto:hasEntity <http://hadatac.org/ont/hasco/Subject>; hasneto:hasAttribute <>; hasneto:hasUnit <> .
+<mt6> a hadatac:MeasurementType;  hadatac:atColumn 17; hasneto:hasEntity <http://hadatac.org/ont/hasco/Subject>; hasneto:hasAttribute <http://hadatac.org/ont/chear#FreshVegetableConsumption>; hasneto:hasUnit <> .
+<mt7> a hadatac:MeasurementType;  hadatac:atColumn 26; hasneto:hasEntity <http://hadatac.org/ont/hasco/Subject>; hasneto:hasAttribute <http://hadatac.org/ont/chear#Pregnancy>; hasneto:hasUnit <> .
+<mt8> a hadatac:MeasurementType;  hadatac:atColumn 12; hasneto:hasEntity <http://hadatac.org/ont/hasco/Subject>; hasneto:hasAttribute <http://hadatac.org/ont/chear#MedicalHistory>; hasneto:hasUnit <> .
+<mt9> a hadatac:MeasurementType;  hadatac:atColumn 39; hasneto:hasEntity <http://hadatac.org/ont/hasco/Subject>; hasneto:hasAttribute <http://hadatac.org/ont/chear#MotherPostPregnancyWeight>; hasneto:hasUnit <http://geneontology.org/GO.format.obo-1_2.shtml#UO_0000009> .
+<mt10> a hadatac:MeasurementType;  hadatac:atColumn 33; hasneto:hasEntity <http://hadatac.org/ont/hasco/Subject>; hasneto:hasAttribute <http://hadatac.org/ont/chear#Gravida>; hasneto:hasUnit <> .
+<mt11> a hadatac:MeasurementType;  hadatac:atColumn 36; hasneto:hasEntity <http://hadatac.org/ont/hasco/Subject>; hasneto:hasAttribute <http://hadatac.org/ont/chear#MotherEducationLevel>; hasneto:hasUnit <> .
+<mt12> a hadatac:MeasurementType;  hadatac:atColumn 15; hasneto:hasEntity <http://hadatac.org/ont/hasco/Subject>; hasneto:hasAttribute <http://hadatac.org/ont/chear#FastFoodConsumption>; hasneto:hasUnit <> .
+<mt13> a hadatac:MeasurementType;  hadatac:atColumn 37; hasneto:hasEntity <http://hadatac.org/ont/hasco/Subject>; hasneto:hasAttribute <http://hadatac.org/ont/chear#MotherOccupation>; hasneto:hasUnit <> .
+<mt14> a hadatac:MeasurementType;  hadatac:atColumn 42; hasneto:hasEntity <http://hadatac.org/ont/hasco/Subject>; hasneto:hasAttribute <http://hadatac.org/ont/chear#SmokingStatus>; hasneto:hasUnit <> .
+<mt15> a hadatac:MeasurementType;  hadatac:atColumn 16; hasneto:hasEntity <http://hadatac.org/ont/hasco/Subject>; hasneto:hasAttribute <http://hadatac.org/ont/chear#FastFoodFrequency>; hasneto:hasUnit <> .
+<mt16> a hadatac:MeasurementType;  hadatac:atColumn 20; hasneto:hasEntity <http://hadatac.org/ont/hasco/Subject>; hasneto:hasAttribute <http://hadatac.org/ont/chear#StressFrequency>; hasneto:hasUnit <> .
+<mt17> a hadatac:MeasurementType;  hadatac:atColumn 24; hasneto:hasEntity <http://hadatac.org/ont/hasco/Subject>; hasneto:hasAttribute <http://hadatac.org/ont/chear#Pregnancy>; hasneto:hasUnit <> .
+<mt18> a hadatac:MeasurementType;  hadatac:atColumn 29; hasneto:hasEntity <http://hadatac.org/ont/hasco/Subject>; hasneto:hasAttribute <http://hadatac.org/ont/chear#BirthWeight>; hasneto:hasUnit <http://geneontology.org/GO.format.obo-1_2.shtml#UO_0000021> .
+<mt19> a hadatac:MeasurementType;  hadatac:atColumn 2; hasneto:hasEntity <http://hadatac.org/ont/hasco/Subject>; hasneto:hasAttribute <>; hasneto:hasUnit <> .
+<mt20> a hadatac:MeasurementType;  hadatac:atColumn 10; hasneto:hasEntity <http://hadatac.org/ont/hasco/Subject>; hasneto:hasAttribute <http://hadatac.org/ont/chear#PerfumeUse>; hasneto:hasUnit <> .
+<mt21> a hadatac:MeasurementType;  hadatac:atColumn 13; hasneto:hasEntity <http://hadatac.org/ont/hasco/Subject>; hasneto:hasAttribute <http://hadatac.org/ont/chear#CannedFoodConsumption>; hasneto:hasUnit <> .
+<mt22> a hadatac:MeasurementType;  hadatac:atColumn 30; hasneto:hasEntity <http://hadatac.org/ont/hasco/Subject>; hasneto:hasAttribute <http://hadatac.org/ont/chear#ChildSex>; hasneto:hasUnit <> .
+<mt23> a hadatac:MeasurementType;  hadatac:atColumn 18; hasneto:hasEntity <http://hadatac.org/ont/hasco/Subject>; hasneto:hasAttribute <http://hadatac.org/ont/chear#FreshVegetableFrequency>; hasneto:hasUnit <> .
+<mt24> a hadatac:MeasurementType;  hadatac:atColumn 23; hasneto:hasEntity <http://hadatac.org/ont/hasco/Subject>; hasneto:hasAttribute <http://hadatac.org/ont/chear#Pregnancy>; hasneto:hasUnit <> .
+<mt25> a hadatac:MeasurementType;  hadatac:atColumn 14; hasneto:hasEntity <http://hadatac.org/ont/hasco/Subject>; hasneto:hasAttribute <http://hadatac.org/ont/chear#CannedFoodFrequency>; hasneto:hasUnit <> .
+<mt26> a hadatac:MeasurementType;  hadatac:atColumn 1; hasneto:hasEntity <http://hadatac.org/ont/hasco/Subject>; hasneto:hasAttribute <>; hasneto:hasUnit <> .
+<mt27> a hadatac:MeasurementType;  hadatac:atColumn 40; hasneto:hasEntity <http://hadatac.org/ont/hasco/Subject>; hasneto:hasAttribute <http://hadatac.org/ont/chear#MotherHeight>; hasneto:hasUnit <http://geneontology.org/GO.format.obo-1_2.shtml#UO_0000015> .
+<mt28> a hadatac:MeasurementType;  hadatac:atColumn 7; hasneto:hasEntity <http://hadatac.org/ont/hasco/Subject>; hasneto:hasAttribute <http://hadatac.org/ont/chear#QuitSmoking>; hasneto:hasUnit <> .
+<mt29> a hadatac:MeasurementType;  hadatac:atColumn 21; hasneto:hasEntity <http://hadatac.org/ont/hasco/Subject>; hasneto:hasAttribute <http://hadatac.org/ont/chear#Hispanic>; hasneto:hasUnit <> .
+<mt30> a hadatac:MeasurementType;  hadatac:atColumn 34; hasneto:hasEntity <http://hadatac.org/ont/hasco/Subject>; hasneto:hasAttribute <http://hadatac.org/ont/chear#Parity>; hasneto:hasUnit <> .
+<mt31> a hadatac:MeasurementType;  hadatac:atColumn 31; hasneto:hasEntity <http://hadatac.org/ont/hasco/Subject>; hasneto:hasAttribute <http://hadatac.org/ont/chear#APGAR>; hasneto:hasUnit <> .
+<mt32> a hadatac:MeasurementType;  hadatac:atColumn 27; hasneto:hasEntity <http://hadatac.org/ont/hasco/Subject>; hasneto:hasAttribute <http://hadatac.org/ont/chear#CesareanSection>; hasneto:hasUnit <> .
+<mt33> a hadatac:MeasurementType;  hadatac:atColumn 19; hasneto:hasEntity <http://hadatac.org/ont/hasco/Subject>; hasneto:hasAttribute <http://hadatac.org/ont/chear#Stress>; hasneto:hasUnit <> .
+<mt34> a hadatac:MeasurementType;  hadatac:atColumn 11; hasneto:hasEntity <http://hadatac.org/ont/hasco/Subject>; hasneto:hasAttribute <http://hadatac.org/ont/chear#HaircareProductUse>; hasneto:hasUnit <> .
+<mt35> a hadatac:MeasurementType;  hadatac:atColumn 25; hasneto:hasEntity <http://hadatac.org/ont/hasco/Subject>; hasneto:hasAttribute <http://hadatac.org/ont/chear#HadPretermBirth>; hasneto:hasUnit <> .
+<mt36> a hadatac:MeasurementType;  hadatac:atColumn 28; hasneto:hasEntity <http://hadatac.org/ont/hasco/Subject>; hasneto:hasAttribute <http://hadatac.org/ont/chear#HadCaesareanSection>; hasneto:hasUnit <> .
+<mt37> a hadatac:MeasurementType;  hadatac:atColumn 4; hasneto:hasEntity <http://hadatac.org/ont/hasco/Subject>; hasneto:hasAttribute <>; hasneto:hasUnit <> .
+<mt38> a hadatac:MeasurementType;  hadatac:atColumn 8; hasneto:hasEntity <http://hadatac.org/ont/hasco/Subject>; hasneto:hasAttribute <http://hadatac.org/ont/chear#SmokingStatus>; hasneto:hasUnit <> .
+<mt39> a hadatac:MeasurementType;  hadatac:atColumn 6; hasneto:hasEntity <http://hadatac.org/ont/hasco/Subject>; hasneto:hasAttribute <http://hadatac.org/ont/chear#SmokingStatus>; hasneto:hasUnit <> .
+<mt40> a hadatac:MeasurementType;  hadatac:atColumn 32; hasneto:hasEntity <http://hadatac.org/ont/hasco/Subject>; hasneto:hasAttribute <http://hadatac.org/ont/chear#MotherAge>; hasneto:hasUnit <http://geneontology.org/GO.format.obo-1_2.shtml#UO_0000036> .
+<mt41> a hadatac:MeasurementType;  hadatac:atColumn 41; hasneto:hasEntity <http://hadatac.org/ont/hasco/Subject>; hasneto:hasAttribute <http://hadatac.org/ont/chear#SmokingStatus>; hasneto:hasUnit <> .
 == END-PREAMBLE ==
-folio,etapa,weight_m_mean,height_m_mean_cm,vna,vnb,vnc,vnc_esp,fechanac,sexo_h,gestage_comb,cbc_hemogM,educ_3cat,SES_scored,t10n,t10g,t23n,t23g,t24,t25,t26,t27,t28,t29,t30,t31,t32,t33,t34,t35,w7_iq,v1_n,v1_g,v79,v80,v114,fechanac_M,mother_age_year
-1,0,,,,,,,11/23/2008,1,41,15.5783,,,,,,,,,,,,,,,,,,,,,,,,10.7783,,34.3473
-1,2T,,,,,,,,,,17.0553,1,1,6,3,5,3,1,1,1,1,1,1,1,1,1,1,1,2,,5,1,87.055,4.56531,,11/25/1970,33.9164
-1,3T,,,,,,,,,,16.4196,1,1,6,3,5,3,1,1,1,1,1,1,1,1,1,1,1,2,,5,1,98.32,,,11/25/1970,34.5064
-2,0,,,,,,,11/23/2008,1,40,16.7479,,,,,,,,,,,,,,,,,,,,,,,,9.2979,,38.3168
-2,2T,,,,,,,,,,16.1004,1,1,6,3,5,3,1,1,1,1,1,1,1,1,1,1,1,2,,5,1,66.4,4.20043,,11/25/1970,37.6723
-2,3T,,,,,,,,,,17.0675,1,1,6,3,5,3,1,1,1,1,1,1,1,1,1,1,1,2,,5,1,73.968,,,11/25/1970,38.7077
-2,12,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,72.258,,,,39.7642
-2,18,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,67.911,,,,39.6802
-2,48,70.139,164.539,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
-2,72,70.5112,163.111,1,,2,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
-2,1,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,71.398,,,,38.9679
-2,6,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,73.247,,,,39.239
-3,0,,,,,,,11/23/2008,1,40,,,,,,,,,,,,,,,,,,,,,,,,,9.3263,,33.8879
-3,2T,,,,,,,,,,15.8943,1,1,6,3,5,3,1,1,1,1,1,1,1,1,1,1,1,2,,5,1,60.294,4.27426,,11/25/1970,33.8579
-3,3T,,,,,,,,,,15.5347,1,1,6,3,5,3,1,1,1,1,1,1,1,1,1,1,1,2,,5,1,63.235,,,11/25/1970,34.5612
-3,18,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,57.267,,,,36.8416
-3,24,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,55.003,,,,37.0002
-3,48,59.3177,153.518,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
-3,72,59.8467,152.347,1,,2,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
-3,1,,,,,,,,,,,,,,,,,,,,,,,,,,,,,72,,,57.018,,,,34.7831
-3,6,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,57.626,,,,34.6046
-4,0,,,,,,,11/23/2008,1,42,13.6028,,,,,,,,,,,,,,,,,,,,,,,,9.3028,,39.48
-4,2T,,,,,,,,,,14.1629,1,1,6,3,5,3,1,1,1,1,1,1,1,1,1,1,1,2,,5,1,51.963,4.41286,,11/25/1970,39.9485
-4,3T,,,,,,,,,,15.4526,1,1,6,3,5,3,1,1,1,1,1,1,1,1,1,1,1,2,,5,1,56.553,,,11/25/1970,39.8038
-4,18,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,48.763,,,,42.1569
-4,24,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,48.609,,,,42.5232
-4,48,47.5207,148.071,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
-4,72,48.9755,147.526,1,,2,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
-4,1,,,,,,,,,,,,,,,,,,,,,,,,,,,,,74,,,52.651,,,,41.1158
-4,6,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,46.02,,,,39.9033
-5,0,,,,,,,11/23/2008,1,43,,,,,,,,,,,,,,,,,,,,,,,,,8.414,,23.8508
-5,2T,,,,,,,,,,16.3712,1,1,6,3,5,3,1,1,1,1,1,1,1,1,1,1,1,2,,5,1,58.971,4.32121,,11/25/1970,22.993
-5,3T,,,,,,,,,,16.4713,1,1,6,3,5,3,1,1,1,1,1,1,1,1,1,1,1,2,,5,1,61.471,,,11/25/1970,22.9586
-6,0,,,,,,,11/23/2008,1,38,,,,,,,,,,,,,,,,,,,,,,,,,8.1378,,38.788
-6,2T,,,,,,,,,,14.0608,1,1,6,3,5,3,1,1,1,1,1,1,1,1,1,1,1,2,,5,1,80.561,4.16084,,11/25/1970,38.9907
-6,3T,,,,,,,,,,12.6875,1,1,6,3,5,3,1,1,1,1,1,1,1,1,1,1,1,2,,5,1,84.287,,,11/25/1970,39.1445
-6,12,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,76.836,,,,41.2237
-6,18,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,74.891,,,,41.6524
-6,24,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,76.752,,,,41.5195
-6,48,68.5293,163.829,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
-6,72,70.2766,163.777,1,,2,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
-6,1,,,,,,,,,,,,,,,,,,,,,,,,,,,,,99,,,78.853,,,,39.2019
-6,6,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,77.461,,,,40.7177
-7,0,,,,,,,11/23/2008,1,39,,,,,,,,,,,,,,,,,,,,,,,,,9.3307,,32.0214
-7,2T,,,,,,,,,,13.9663,1,1,6,3,5,3,1,1,1,1,1,1,1,1,1,1,1,2,,5,1,78.566,3.11633,,11/25/1970,30.7819
-7,3T,,,,,,,,,,14.1976,1,1,6,3,5,3,1,1,1,1,1,1,1,1,1,1,1,2,,5,1,89.198,,,11/25/1970,33.6651
-7,12,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,76.277,,,,35.3747
-7,18,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,79.22,,,,33.3359
-7,24,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,83.202,,,,34.6915
-7,48,84.1549,159.705,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
-7,72,87.643,157.893,1,,2,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
-7,1,,,,,,,,,,,,,,,,,,,,,,,,,,,,,55,,,76.276,,,,32.4625
-7,6,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,71.587,,,,33.7009
-8,0,,,,,,,11/23/2008,1,42,14.6423,,,,,,,,,,,,,,,,,,,,,,,,10.1423,,35.7472
-8,2T,,,,,,,,,,14.8773,1,1,6,3,5,3,1,1,1,1,1,1,1,1,1,1,1,2,,5,1,72.677,4.23732,,11/25/1970,35.0798
-8,3T,,,,,,,,,,13.8899,1,1,6,3,5,3,1,1,1,1,1,1,1,1,1,1,1,2,,5,1,80.49,,,11/25/1970,35.1251
-8,24,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,65.709,,,,37.9061
-8,48,68.9231,161.123,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
-8,1,,,,,,,,,,,,,,,,,,,,,,,,,,,,,86,,,72.64,,,,35.041
-8,6,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,69.81,,,,35.6294
-9,0,,,,,,,11/23/2008,1,44,15.9117,,,,,,,,,,,,,,,,,,,,,,,,9.3617,,34.9357
-9,2T,,,,,,,,,,15.3493,1,1,6,3,5,3,1,1,1,1,1,1,1,1,1,1,1,2,,5,1,100.949,4.96926,,11/25/1970,33.9517
-9,3T,,,,,,,,,,14.9943,1,1,6,3,5,3,1,1,1,1,1,1,1,1,1,1,1,2,,5,1,103.394,,,11/25/1970,34.1404
-9,12,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,93.106,,,,34.3488
-9,18,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,99.913,,,,35.6512
-9,24,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,102.884,,,,35.7503
-9,6,,,,,,,,,,,,,,,,,,,,,,,,,,,,,99,,,95.696,,,,34.1508
-10,0,,,,,,,11/23/2008,1,40,14.3986,,,,,,,,,,,,,,,,,,,,,,,,10.3086,,29.0634
-10,2T,,,,,,,,,,14.9609,1,1,6,3,5,3,1,1,1,1,1,1,1,1,1,1,1,2,,5,1,67.961,4.54087,,11/25/1970,28.0752
-10,3T,,,,,,,,,,15.3841,1,1,6,3,5,3,1,1,1,1,1,1,1,1,1,1,1,2,,5,1,74.284,,,11/25/1970,28.664
-10,12,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,64.772,,,,28.5638
-10,18,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,65.009,,,,30.102
-10,48,66.439,163.039,1,,2,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
-10,1,,,,,,,,,,,,,,,,,,,,,,,,,,,,,80,,,67.896,,,,28.4619
-11,2T,,,,,,,,,,15.0183,1,1,6,3,5,3,1,1,1,1,1,1,1,1,1,1,1,2,,5,1,60.618,4.18829,,11/25/1970,36.1022
-11,3T,,,,,,,,,,17.2816,1,1,6,3,5,3,1,1,1,1,1,1,1,1,1,1,1,2,,5,1,69.182,,,11/25/1970,36.9393
-12,0,,,,,,,11/23/2008,1,40,15.1579,,,,,,,,,,,,,,,,,,,,,,,,9.2379,,22.2948
-12,2T,,,,,,,,,,15.0434,1,1,6,3,5,3,1,1,1,1,1,1,1,1,1,1,1,2,,5,1,65.643,5.19337,,11/25/1970,23.4134
-12,3T,,,,,,,,,,14.9767,1,1,6,3,5,3,1,1,1,1,1,1,1,1,1,1,1,2,,5,1,69.977,,,11/25/1970,22.9876
-12,12,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,65.415,,,,24.2649
-12,18,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,62.905,,,,25.3667
-12,24,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,65.824,,,,26.081
-12,48,69.6597,159.16,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
-12,72,65.7385,158.038,1,,2,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
-12,6,,,,,,,,,,,,,,,,,,,,,,,,,,,,,87,,,66.009,,,,23.1713
-13,0,,,,,,,11/23/2008,1,40,14.7903,,,,,,,,,,,,,,,,,,,,,,,,9.6703,,27.1213
-13,2T,,,,,,,,,,15.892,1,1,6,3,5,3,1,1,1,1,1,1,1,1,1,1,1,2,,5,1,91.692,4.23203,,11/25/1970,27.0479
-13,3T,,,,,,,,,,13.4128,1,1,6,3,5,3,1,1,1,1,1,1,1,1,1,1,1,2,,5,1,97.913,,,11/25/1970,26.5261
-13,18,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,97.6,,,,29.5311
-13,24,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,99.152,,,,28.9821
-13,48,78.8054,156.805,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
-13,72,99.0207,157.371,1,,2,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
-13,6,,,,,,,,,,,,,,,,,,,,,,,,,,,,,98,,,82.165,,,,27.3944
-14,0,,,,,,,11/23/2008,1,44,14.9102,,,,,,,,,,,,,,,,,,,,,,,,10.6102,,24.3467
-14,2T,,,,,,,,,,15.0131,1,1,6,3,5,3,1,1,1,1,1,1,1,1,1,1,1,2,,5,1,64.413,3.95308,,11/25/1970,22.7334
-14,3T,,,,,,,,,,14.2502,1,1,6,3,5,3,1,1,1,1,1,1,1,1,1,1,1,2,,5,1,72.15,,,11/25/1970,23.2361
-14,12,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,68.087,,,,24.0613
-14,18,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,70.877,,,,25.2298
-14,24,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,69.598,,,,24.9466
-14,1,,,,,,,,,,,,,,,,,,,,,,,,,,,,,91,,,75.009,,,,22.8414
-14,6,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,66.444,,,,24.1893
-15,0,,,,,,,11/23/2008,1,42,16.3388,,,,,,,,,,,,,,,,,,,,,,,,9.3388,,27.7317
-15,2T,,,,,,,,,,14.4009,1,1,6,3,5,3,1,1,1,1,1,1,1,1,1,1,1,2,,5,1,59.901,3.44086,,11/25/1970,25.9611
-15,3T,,,,,,,,,,17.0177,1,1,6,3,5,3,1,1,1,1,1,1,1,1,1,1,1,2,,5,1,70.318,,,11/25/1970,28.201
-15,1,,,,,,,,,,,,,,,,,,,,,,,,,,,,,77,,,64,,,,28.5773
-16,0,,,,,,,11/23/2008,1,41,,,,,,,,,,,,,,,,,,,,,,,,,9.1102,,24.7559
-16,2T,,,,,,,,,,16.7592,1,1,6,3,5,3,1,1,1,1,1,1,1,1,1,1,1,2,,5,1,73.059,5.62922,,11/25/1970,25.7704
-16,3T,,,,,,,,,,15.6275,1,1,6,3,5,3,1,1,1,1,1,1,1,1,1,1,1,2,,5,1,78.627,,,11/25/1970,24.6261
-16,6,,,,,,,,,,,,,,,,,,,,,,,,,,,,,107,,,71.784,,,,26.4646
-17,0,,,,,,,11/23/2008,1,41,,,,,,,,,,,,,,,,,,,,,,,,,10.0191,,40.4716
-17,2T,,,,,,,,,,16.0854,1,1,6,3,5,3,1,1,1,1,1,1,1,1,1,1,1,2,,5,1,70.985,4.54541,,11/25/1970,39.2674
-17,3T,,,,,,,,,,14.9716,1,1,6,3,5,3,1,1,1,1,1,1,1,1,1,1,1,2,,5,1,76.072,,,11/25/1970,38.6301
-17,12,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,66.761,,,,39.7115
-17,18,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,67.151,,,,39.3384
-17,24,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,67.549,,,,41.5967
-17,1,,,,,,,,,,,,,,,,,,,,,,,,,,,,,85,,,69.63,,,,40.3556
-17,6,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,71.762,,,,40.4144
-18,0,,,,,,,11/23/2008,1,40,15.6581,,,,,,,,,,,,,,,,,,,,,,,,8.2581,,32.2281
-18,2T,,,,,,,,,,15.9886,1,1,6,3,5,3,1,1,1,1,1,1,1,1,1,1,1,2,,5,1,67.389,4.93862,,11/25/1970,32.8944
-18,3T,,,,,,,,,,15.3581,1,1,6,3,5,3,1,1,1,1,1,1,1,1,1,1,1,2,,5,1,73.758,,,11/25/1970,32.0131
-18,12,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,68.658,,,,33.3656
-18,18,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,70.575,,,,34.9586
-18,24,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,71.131,,,,35.1212
-18,48,71.5827,158.983,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
-18,72,70.8374,158.237,1,,2,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
-18,1,,,,,,,,,,,,,,,,,,,,,,,,,,,,,55,,,69.265,,,,32.2363
-18,6,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,71.415,,,,33.8212
-19,0,,,,,,,11/23/2008,1,42,14.5582,,,,,,,,,,,,,,,,,,,,,,,,10.2182,,23.065
-19,2T,,,,,,,,,,15.6691,1,1,6,3,5,3,1,1,1,1,1,1,1,1,1,1,1,2,,5,1,52.769,5.78912,,11/25/1970,23.9871
-19,3T,,,,,,,,,,14.6495,1,1,6,3,5,3,1,1,1,1,1,1,1,1,1,1,1,2,,5,1,58.55,,,11/25/1970,22.5331
-19,12,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,46.414,,,,24.9664
-19,18,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,45.999,,,,23.9222
-19,24,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,48.778,,,,26.2194
-19,48,49.7924,155.192,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
-19,72,53.3245,157.625,1,,2,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
-19,1,,,,,,,,,,,,,,,,,,,,,,,,,,,,,76,,,52.044,,,,24.2436
-19,6,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,45.154,,,,22.7973
-20,0,,,,,,,11/23/2008,1,42,17.5642,,,,,,,,,,,,,,,,,,,,,,,,9.6142,,30.7972
-20,2T,,,,,,,,,,15.6759,1,1,6,3,5,3,1,1,1,1,1,1,1,1,1,1,1,2,,5,1,62.376,3.88595,,11/25/1970,29.8202
-20,3T,,,,,,,,,,14.8996,1,1,6,3,5,3,1,1,1,1,1,1,1,1,1,1,1,2,,5,1,68.2,,,11/25/1970,29.8738
-20,12,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,60.548,,,,32.3911
-20,24,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,58.162,,,,30.9804
-20,48,65.917,154.417,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
-20,72,62.6826,155.033,1,,2,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
-20,1,,,,,,,,,,,,,,,,,,,,,,,,,,,,,90,,,63.451,,,,31.3741
-20,6,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,58.501,,,,30.3512
-21,0,,,,,,,11/23/2008,1,41,,,,,,,,,,,,,,,,,,,,,,,,,8.0012,,24.1058
-21,2T,,,,,,,,,,15.8796,1,1,6,3,5,3,1,1,1,1,1,1,1,1,1,1,1,2,,5,1,71.28,4.82959,,11/25/1970,24.5363
-21,3T,,,,,,,,,,16.0531,1,1,6,3,5,3,1,1,1,1,1,1,1,1,1,1,1,2,,5,1,77.153,,,11/25/1970,24.6808
-21,12,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,69.607,,,,24.7362
-21,18,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,72.457,,,,26.2334
-21,24,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,70.87,,,,26.0362
-21,1,,,,,,,,,,,,,,,,,,,,,,,,,,,,,86,,,70.268,,,,24.5198
-22,0,,,,,,,11/23/2008,1,40,14.1175,,,,,,,,,,,,,,,,,,,,,,,,7.4175,,23.1881
-22,2T,,,,,,,,,,15.5639,1,1,6,3,5,3,1,1,1,1,1,1,1,1,1,1,1,2,,5,1,84.064,4.56395,,11/25/1970,23.5622
-22,3T,,,,,,,,,,15.0206,1,1,6,3,5,3,1,1,1,1,1,1,1,1,1,1,1,2,,5,1,95.021,,,11/25/1970,23.4872
-22,24,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,83.717,,,,25.63
-22,1,,,,,,,,,,,,,,,,,,,,,,,,,,,,,91,,,92.176,,,,24.1373
-22,6,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,86.112,,,,24.4972
-23,0,,,,,,,11/23/2008,1,37,15.6638,,,,,,,,,,,,,,,,,,,,,,,,9.2738,,29.0306
-23,2T,,,,,,,,,,17.3602,1,1,6,3,5,3,1,1,1,1,1,1,1,1,1,1,1,2,,5,1,81.76,5.35024,,11/25/1970,29.9423
-23,3T,,,,,,,,,,17.5409,1,1,6,3,5,3,1,1,1,1,1,1,1,1,1,1,1,2,,5,1,92.641,,,11/25/1970,30.5557
-23,12,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,79.98,,,,30.8062
-23,18,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,78.682,,,,30.0096
-23,24,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,79.247,,,,30.5697
-23,1,,,,,,,,,,,,,,,,,,,,,,,,,,,,,99,,,80.746,,,,27.8167
-24,0,,,,,,,11/23/2008,1,35,16.6927,,,,,,,,,,,,,,,,,,,,,,,,7.3927,,31.1925
-24,2T,,,,,,,,,,16.4306,1,1,6,3,5,3,1,1,1,1,1,1,1,1,1,1,1,2,,5,1,73.631,5.17058,,11/25/1970,31.5156
-24,3T,,,,,,,,,,16.5812,1,1,6,3,5,3,1,1,1,1,1,1,1,1,1,1,1,2,,5,1,79.981,,,11/25/1970,31.1537
-24,12,,,,,,,,,,,,,,,,,,,,,,,,,,,,,87,,,67.681,,,,33.1373
-24,18,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,70.032,,,,33.8061
-24,24,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,71.509,,,,34.401
-24,48,75.6966,158.397,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
-24,72,72.5507,158.401,1,,2,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
-25,0,,,,,,,11/23/2008,1,42,17.7301,,,,,,,,,,,,,,,,,,,,,,,,9.0801,,33.8692
-25,2T,,,,,,,,,,17.0585,1,1,6,3,5,3,1,1,1,1,1,1,1,1,1,1,1,2,,5,1,49.859,6.37851,,11/25/1970,35.5033
-25,3T,,,,,,,,,,15.7142,1,1,6,3,5,3,1,1,1,1,1,1,1,1,1,1,1,2,,5,1,52.714,,,11/25/1970,33.6328
-25,12,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,43.587,,,,35.2309
-25,18,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,44.009,,,,34.7926
-25,24,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,45.749,,,,36.6088
-25,48,46.2562,156.456,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
-25,72,45.3277,156.128,1,,2,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
-25,1,,,,,,,,,,,,,,,,,,,,,,,,,,,,,110,,,45.983,,,,33.6093
-25,6,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,43.251,,,,34.7964
-26,0,,,,,,,11/23/2008,1,41,18.5547,,,,,,,,,,,,,,,,,,,,,,,,9.4947,,30.1623
-26,2T,,,,,,,,,,17.2048,1,1,6,3,5,3,1,1,1,1,1,1,1,1,1,1,1,2,,5,1,62.105,4.6248,,11/25/1970,29.6455
-26,3T,,,,,,,,,,16.9669,1,1,6,3,5,3,1,1,1,1,1,1,1,1,1,1,1,2,,5,1,66.667,,,11/25/1970,29.4649
-26,18,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,58.969,,,,31.7839
-26,24,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,57.668,,,,31.482
-26,1,,,,,,,,,,,,,,,,,,,,,,,,,,,,,79,,,60.59,,,,30.1883
-27,0,,,,,,,11/23/2008,1,45,13.5736,,,,,,,,,,,,,,,,,,,,,,,,9.0436,,37.5119
-27,2T,,,,,,,,,,15.5119,1,1,6,3,5,3,1,1,1,1,1,1,1,1,1,1,1,2,,5,1,50.912,4.9619,,11/25/1970,37.1778
-27,3T,,,,,,,,,,16.464,1,1,6,3,5,3,1,1,1,1,1,1,1,1,1,1,1,2,,5,1,58.964,,,11/25/1970,37.4818
-27,12,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,50.163,,,,37.8337
-27,18,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,47.304,,,,37.5595
-27,24,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,48.554,,,,39.7994
-27,48,43.7092,157.309,1,,2,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
-27,1,,,,,,,,,,,,,,,,,,,,,,,,,,,,,82,,,55.063,,,,36.794
-28,0,,,,,,,11/23/2008,1,42,,,,,,,,,,,,,,,,,,,,,,,,,10.5414,,40.4284
-28,2T,,,,,,,,,,18.4396,1,1,6,3,5,3,1,1,1,1,1,1,1,1,1,1,1,2,,5,1,71.54,6.00959,,11/25/1970,40.6957
-28,3T,,,,,,,,,,16.8535,1,1,6,3,5,3,1,1,1,1,1,1,1,1,1,1,1,2,,5,1,72.753,,,11/25/1970,39.1614
-28,12,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,64.804,,,,41.3368
-28,18,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,66.112,,,,41.752
-28,48,66.2349,146.335,1,,2,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
-28,1,,,,,,,,,,,,,,,,,,,,,,,,,,,,,88,,,64.157,,,,39.7679
-28,6,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,64.146,,,,41.1976
-29,0,,,,,,,11/23/2008,1,47,15.8429,,,,,,,,,,,,,,,,,,,,,,,,8.7729,,28.5327
-29,2T,,,,,,,,,,15.4678,1,1,6,3,5,3,1,1,1,1,1,1,1,1,1,1,1,2,,5,1,66.968,3.4878,,11/25/1970,26.3429
-29,3T,,,,,,,,,,13.5462,1,1,6,3,5,3,1,1,1,1,1,1,1,1,1,1,1,2,,5,1,70.946,,,11/25/1970,26.1087
-29,18,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,68.966,,,,28.9728
-29,24,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,68.389,,,,29.3378
-29,48,73.2937,155.844,1,,2,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
-29,1,,,,,,,,,,,,,,,,,,,,,,,,,,,,,80,,,68.899,,,,27.8768
-29,6,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,70.412,,,,29.811
-30,0,,,,,,,11/23/2008,1,41,17.0251,,,,,,,,,,,,,,,,,,,,,,,,8.4151,,29.4072
-30,2T,,,,,,,,,,17.6298,1,1,6,3,5,3,1,1,1,1,1,1,1,1,1,1,1,2,,5,1,69.53,5.02978,,11/25/1970,29.3559
-30,3T,,,,,,,,,,16.329,1,1,6,3,5,3,1,1,1,1,1,1,1,1,1,1,1,2,,5,1,82.529,,,11/25/1970,29.0742
-30,12,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,69.624,,,,30.0218
-30,1,,,,,,,,,,,,,,,,,,,,,,,,,,,,,89,,,68.067,,,,29.3444
-31,0,,,,,,,11/23/2008,1,40,14.5546,,,,,,,,,,,,,,,,,,,,,,,,8.8546,,31.1771
-31,2T,,,,,,,,,,16.6344,1,1,6,3,5,3,1,1,1,1,1,1,1,1,1,1,1,2,,5,1,58.534,4.97442,,11/25/1970,32.2709
-31,3T,,,,,,,,,,16.5075,1,1,6,3,5,3,1,1,1,1,1,1,1,1,1,1,1,2,,5,1,67.707,,,11/25/1970,32.6767
-31,12,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,65.465,,,,33.6009
-31,18,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,62.649,,,,34.28
-31,24,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,60.595,,,,36.0241
-31,48,61.9364,147.736,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
-31,1,,,,,,,,,,,,,,,,,,,,,,,,,,,,,68,,,63.061,,,,32.2657
-31,6,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,67.2,,,,32.5239
-32,0,,,,,,,11/23/2008,1,42,13.0406,,,,,,,,,,,,,,,,,,,,,,,,9.7306,,25.4731
-32,2T,,,,,,,,,,15.8916,1,1,6,3,5,3,1,1,1,1,1,1,1,1,1,1,1,2,,5,1,59.792,4.62165,,11/25/1970,25.1354
-32,3T,,,,,,,,,,12.6643,1,1,6,3,5,3,1,1,1,1,1,1,1,1,1,1,1,2,,5,1,65.764,,,11/25/1970,24.1243
-32,12,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,61.779,,,,25.9221
-32,18,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,60.512,,,,26.8424
-32,24,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,60.116,,,,27.3324
-32,48,72.4377,166.638,1,,2,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
-32,1,,,,,,,,,,,,,,,,,,,,,,,,,,,,,88,,,61.331,,,,23.4402
-32,6,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,65.717,,,,26.5614
-33,0,,,,,,,11/23/2008,1,41,12.4692,,,,,,,,,,,,,,,,,,,,,,,,9.6192,,25.3266
-33,2T,,,,,,,,,,13.8545,1,1,6,3,5,3,1,1,1,1,1,1,1,1,1,1,1,2,,5,1,47.554,4.05445,,11/25/1970,24.3477
-33,3T,,,,,,,,,,13.6468,1,1,6,3,5,3,1,1,1,1,1,1,1,1,1,1,1,2,,5,1,53.047,,,11/25/1970,24.9673
-33,12,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,43.13,,,,25.3977
-33,18,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,43.733,,,,27.2756
-33,24,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,44.083,,,,26.3499
-33,48,44.9749,152.675,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
-33,1,,,,,,,,,,,,,,,,,,,,,,,,,,,,,103,,,49.403,,,,25.6586
-33,6,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,48.783,,,,26.4526
-34,0,,,,,,,11/23/2008,1,42,14.6589,,,,,,,,,,,,,,,,,,,,,,,,8.8589,,29.9426
-34,2T,,,,,,,,,,17.7331,1,1,6,3,5,3,1,1,1,1,1,1,1,1,1,1,1,2,,5,1,62.433,4.96307,,11/25/1970,30.7897
-34,3T,,,,,,,,,,16.9398,1,1,6,3,5,3,1,1,1,1,1,1,1,1,1,1,1,2,,5,1,68.54,,,11/25/1970,31.14
-34,24,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,62.232,,,,33.0167
-34,1,,,,,,,,,,,,,,,,,,,,,,,,,,,,,103,,,60.606,,,,30.4772
-35,0,,,,,,,11/23/2008,1,43,18.2626,,,,,,,,,,,,,,,,,,,,,,,,10.3626,,35.705
-35,2T,,,,,,,,,,17.0777,1,1,6,3,5,3,1,1,1,1,1,1,1,1,1,1,1,2,,5,1,51.978,5.0077,,11/25/1970,35.1984
-35,3T,,,,,,,,,,15.8182,1,1,6,3,5,3,1,1,1,1,1,1,1,1,1,1,1,2,,5,1,55.718,,,11/25/1970,34.7346
-35,18,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,48.394,,,,35.8421
-35,24,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,48.107,,,,36.7531
-35,48,46.9479,155.248,1,,2,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
-35,1,,,,,,,,,,,,,,,,,,,,,,,,,,,,,73,,,52.231,,,,34.6667
-35,6,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,52.696,,,,36.3669
-36,0,,,,,,,11/23/2008,1,39,16.3847,,,,,,,,,,,,,,,,,,,,,,,,8.6447,,28.5791
-36,2T,,,,,,,,,,16.193,1,1,6,3,5,3,1,1,1,1,1,1,1,1,1,1,1,2,,5,1,58.093,4.25301,,11/25/1970,28.348
-36,3T,,,,,,,,,,17.6821,1,1,6,3,5,3,1,1,1,1,1,1,1,1,1,1,1,2,,5,1,64.482,,,11/25/1970,29.4835
-36,12,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,61.367,,,,30.8826
-36,18,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,60.441,,,,31.1471
-36,24,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,58.152,,,,30.6673
-36,48,60.5942,169.694,1,,2,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
-36,1,,,,,,,,,,,,,,,,,,,,,,,,,,,,,93,,,58.593,,,,29.7837
-36,6,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,59.661,,,,30.7733
-37,0,,,,,,,11/23/2008,1,38,17.3317,,,,,,,,,,,,,,,,,,,,,,,,8.3217,,23.3935
-37,2T,,,,,,,,,,16.2333,1,1,6,3,5,3,1,1,1,1,1,1,1,1,1,1,1,2,,5,1,53.433,4.02325,,11/25/1970,21.9884
-37,3T,,,,,,,,,,17.1899,1,1,6,3,5,3,1,1,1,1,1,1,1,1,1,1,1,2,,5,1,59.79,,,11/25/1970,23.4695
-37,24,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,59.364,,,,24.8859
-37,48,62.3299,152.43,1,,2,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
-37,1,,,,,,,,,,,,,,,,,,,,,,,,,,,,,102,,,56.126,,,,22.9805
-37,6,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,59.737,,,,24.5571
-38,0,,,,,,,11/23/2008,1,42,16.5954,,,,,,,,,,,,,,,,,,,,,,,,8.8354,,24.5079
-38,2T,,,,,,,,,,16.2088,1,1,6,3,5,3,1,1,1,1,1,1,1,1,1,1,1,2,,5,1,79.109,4.49881,,11/25/1970,24.3407
-38,3T,,,,,,,,,,16.0609,1,1,6,3,5,3,1,1,1,1,1,1,1,1,1,1,1,2,,5,1,83.361,,,11/25/1970,24.0446
-38,12,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,81.049,,,,26.414
-38,24,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,81.333,,,,27.4471
-38,1,,,,,,,,,,,,,,,,,,,,,,,,,,,,,90,,,80.675,,,,24.5808
-38,6,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,77.281,,,,24.5159
-39,0,,,,,,,11/23/2008,1,41,16.4871,,,,,,,,,,,,,,,,,,,,,,,,8.9471,,25.3267
-39,2T,,,,,,,,,,17.2309,1,1,6,3,5,3,1,1,1,1,1,1,1,1,1,1,1,2,,5,1,57.831,5.47093,,11/25/1970,25.6434
-39,3T,,,,,,,,,,16.6025,1,1,6,3,5,3,1,1,1,1,1,1,1,1,1,1,1,2,,5,1,62.203,,,11/25/1970,25.0915
-39,12,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,53.984,,,,25.2396
-39,48,61.2885,167.639,1,,2,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
-39,1,,,,,,,,,,,,,,,,,,,,,,,,,,,,,83,,,59.88,,,,25.9152
-39,6,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,56.867,,,,25.6409
-40,0,,,,,,,11/23/2008,1,43,17.8821,,,,,,,,,,,,,,,,,,,,,,,,10.4221,,38.7941
-40,2T,,,,,,,,,,17.1237,1,1,6,3,5,3,1,1,1,1,1,1,1,1,1,1,1,2,,5,1,80.224,5.24366,,11/25/1970,37.7195
-40,3T,,,,,,,,,,16.5621,1,1,6,3,5,3,1,1,1,1,1,1,1,1,1,1,1,2,,5,1,86.662,,,11/25/1970,37.429
-40,12,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,86.783,,,,38.608
-40,18,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,86.984,,,,39.0261
-40,24,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,87.753,,,,39.4747
-40,48,75.8374,156.437,1,,2,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
-40,1,,,,,,,,,,,,,,,,,,,,,,,,,,,,,98,,,84.503,,,,37.5108
-40,6,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,86.586,,,,37.5045
-41,0,,,,,,,11/23/2008,1,43,16.6799,,,,,,,,,,,,,,,,,,,,,,,,8.9799,,31.9204
-41,2T,,,,,,,,,,16.2143,1,1,6,3,5,3,1,1,1,1,1,1,1,1,1,1,1,2,,5,1,51.714,4.17428,,11/25/1970,31.1332
-41,3T,,,,,,,,,,17.5854,1,1,6,3,5,3,1,1,1,1,1,1,1,1,1,1,1,2,,5,1,64.085,,,11/25/1970,32.789
-41,12,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,54.937,,,,33.7562
-41,18,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,55.205,,,,33.8646
-41,24,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,54.025,,,,33.4187
-41,48,54.2036,148.504,1,,2,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
-41,1,,,,,,,,,,,,,,,,,,,,,,,,,,,,,71,,,59.111,,,,32.5366
-41,6,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,55.641,,,,33.4877
-42,0,,,,,,,11/23/2008,1,41,15.3143,,,,,,,,,,,,,,,,,,,,,,,,7.7343,,29.7799
-42,2T,,,,,,,,,,16.1143,1,1,6,3,5,3,1,1,1,1,1,1,1,1,1,1,1,2,,5,1,45.914,4.40433,,11/25/1970,28.6693
-42,3T,,,,,,,,,,18.1081,1,1,6,3,5,3,1,1,1,1,1,1,1,1,1,1,1,2,,5,1,53.008,,,11/25/1970,30.067
-42,18,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,45.663,,,,32.0263
-42,48,46.7518,153.452,1,,2,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
-42,1,,,,,,,,,,,,,,,,,,,,,,,,,,,,,76,,,41.459,,,,27.7227
-42,6,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,45.243,,,,29.4156
-43,0,,,,,,,11/23/2008,1,41,14.1423,,,,,,,,,,,,,,,,,,,,,,,,8.6823,,30.5286
-43,2T,,,,,,,,,,13.8625,1,1,6,3,5,3,1,1,1,1,1,1,1,1,1,1,1,2,,5,1,99.262,3.85246,,11/25/1970,29.8326
-43,3T,,,,,,,,,,16.0508,1,1,6,3,5,3,1,1,1,1,1,1,1,1,1,1,1,2,,5,1,103.351,,,11/25/1970,31.2276
-43,12,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,91.454,,,,32.3427
-43,48,,,1,,2,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
-43,1,,,,,,,,,,,,,,,,,,,,,,,,,,,,,66,,,95.488,,,,31.0562
-43,6,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,95.581,,,,32.0714
-44,0,,,,,,,11/23/2008,1,45,,,,,,,,,,,,,,,,,,,,,,,,,10.1607,,35.0854
-44,2T,,,,,,,,,,15.4784,1,1,6,3,5,3,1,1,1,1,1,1,1,1,1,1,1,2,,5,1,72.978,3.47841,,11/25/1970,33.5404
-44,3T,,,,,,,,,,15.3132,1,1,6,3,5,3,1,1,1,1,1,1,1,1,1,1,1,2,,5,1,76.213,,,11/25/1970,34.5352
-44,12,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,77.423,,,,37.2555
-44,24,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,79.224,,,,38.3691
-44,1,,,,,,,,,,,,,,,,,,,,,,,,,,,,,90,,,73.318,,,,34.4362
-44,6,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,72.712,,,,35.749
-45,0,,,,,,,11/23/2008,1,41,16.5105,,,,,,,,,,,,,,,,,,,,,,,,10.1005,,25.1435
-45,2T,,,,,,,,,,16.8443,1,1,6,3,5,3,1,1,1,1,1,1,1,1,1,1,1,2,,5,1,88.544,4.67426,,11/25/1970,24.405
-45,3T,,,,,,,,,,17.166,1,1,6,3,5,3,1,1,1,1,1,1,1,1,1,1,1,2,,5,1,99.166,,,11/25/1970,25.306
-45,12,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,92.612,,,,25.5747
-45,18,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,94.157,,,,25.9234
-45,24,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,94.044,,,,27.3035
-45,48,95.9071,166.807,1,,2,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
-45,1,,,,,,,,,,,,,,,,,,,,,,,,,,,,,105,,,92.284,,,,24.1238
-45,6,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,94.755,,,,26.4998
-46,0,,,,,,,11/23/2008,1,41,16.3911,,,,,,,,,,,,,,,,,,,,,,,,8.5811,,29.83
-46,2T,,,,,,,,,,14.966,1,1,6,3,5,3,1,1,1,1,1,1,1,1,1,1,1,2,,5,1,54.966,3.41604,,11/25/1970,28.6997
-46,3T,,,,,,,,,,16.0852,1,1,6,3,5,3,1,1,1,1,1,1,1,1,1,1,1,2,,5,1,59.785,,,11/25/1970,29.9036
-46,1,,,,,,,,,,,,,,,,,,,,,,,,,,,,,106,,,52.894,,,,30.7263
-47,0,,,,,,,11/23/2008,1,40,,,,,,,,,,,,,,,,,,,,,,,,,8.8426,,30.5013
-47,2T,,,,,,,,,,14.3782,1,1,6,3,5,3,1,1,1,1,1,1,1,1,1,1,1,2,,5,1,68.678,4.7582,,11/25/1970,30.2117
-47,3T,,,,,,,,,,16.1175,1,1,6,3,5,3,1,1,1,1,1,1,1,1,1,1,1,2,,5,1,80.117,,,11/25/1970,30.4002
-47,12,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,68.21,,,,30.4453
-47,18,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,70.795,,,,
-47,48,69.8145,160.715,1,,2,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
-47,1,,,,,,,,,,,,,,,,,,,,,,,,,,,,,66,,,76.995,,,,30.469
-47,6,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,76.13,,,,31.0292
-48,0,,,,,,,11/23/2008,1,42,,,,,,,,,,,,,,,,,,,,,,,,,6.9182,,41.3574
-48,2T,,,,,,,,,,16.626,1,1,6,3,5,3,1,1,1,1,1,1,1,1,1,1,1,2,,5,1,59.126,4.67604,,11/25/1970,42.2855
-48,3T,,,,,,,,,,15.3528,1,1,6,3,5,3,1,1,1,1,1,1,1,1,1,1,1,2,,5,1,62.353,,,11/25/1970,41.7533
-48,48,55.9141,157.914,1,,2,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
-49,0,,,,,,,11/23/2008,1,42,16.1221,,,,,,,,,,,,,,,,,,,,,,,,9.0921,,36.9597
-49,2T,,,,,,,,,,16.4454,1,1,6,3,5,3,1,1,1,1,1,1,1,1,1,1,1,2,,5,1,56.645,4.64537,,11/25/1970,35.7559
-49,3T,,,,,,,,,,15.1444,1,1,6,3,5,3,1,1,1,1,1,1,1,1,1,1,1,2,,5,1,62.844,,,11/25/1970,35.4315
-49,12,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,50.917,,,,36.6675
-49,18,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,51.569,,,,37.0642
-49,48,57.156,153.056,1,,2,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
-49,1,,,,,,,,,,,,,,,,,,,,,,,,,,,,,109,,,58.997,,,,35.8245
-49,6,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,54.607,,,,36.3596
-50,0,,,,,,,11/23/2008,1,42,16.7462,,,,,,,,,,,,,,,,,,,,,,,,8.6562,,36.3641
-50,2T,,,,,,,,,,17.1886,1,1,6,3,5,3,1,1,1,1,1,1,1,1,1,1,1,2,,5,1,67.589,4.46862,,11/25/1970,36.4315
-50,3T,,,,,,,,,,17.6848,1,1,6,3,5,3,1,1,1,1,1,1,1,1,1,1,1,2,,5,1,74.185,,,11/25/1970,36.3686
-50,12,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,73.392,,,,38.8394
-50,18,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,73.473,,,,39.3215
-50,48,,,1,,2,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
-50,1,,,,,,,,,,,,,,,,,,,,,,,,,,,,,98,,,68.276,,,,36.187
-50,6,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,71.202,,,,36.5542
-
+PID,Family_ID,Or_Subject_ID,Family_Member,SurveyQ1,SurveyQ2,SurveyQ2b,SurveyQ3,SurveyQ4,SurveyQ5a,SurveyQ5b,SurveyQ6,SurveyQ7,SurveyQ7a,SurveyQ8,SurveyQ8a,SurveyQ9,SurveyQ9a,SurveyQ10,SurveyQ10a,SurveyQ11,SurveyQ12,pregcomp,no_days2deliv,preterm,rod,rep_csec,birth_details,brthwt_gms,gender,apgar,mtr_age_yrs,Gravida,parity,marital_stat,edu,occupation,prepreg_wt_kg,postpreg_wt_kg,mtr_ht_cm,smoking_details,drugs
+9376542,VP-ARMII-117,VP-ARMII-117-M,mother,6,no,0,no,no,yes,yes,no,yes,2,yes,3,yes,1,yes,3,no,White,Gestational hypertension,274,No,Vaginal,NA,Spontaneous,4100,Female,9,29,2,1,Married,2,Physician Assistant,72,91,172,Never Smoked,
+2326304,VP-ARMII-118,VP-ARMII-118-M,mother,6,no,0,no,no,no,no,no,yes,2,no,1,yes,2,yes,3,no,White,None Known,277,No,Vaginal,NA,Spontaneous,3615,Female,7,35,3,2,Married,2,Physician,63,75,162,Never Smoked,
+7245459,VP-ARMII-119,VP-ARMII-119-M,mother,4,no,0,no,no,yes,no,no,yes,2,yes,2,yes,1,yes,3,no,White,None Known,291,No,Vaginal,NA,Spontaneous,3200,Female,7,28,1,0,Married,2,Physical Therapist,92,105,172,Never Smoked,
+9190711,VP-ARMII-120,VP-ARMII-120-M,mother,5,no,0,no,no,yes,no,no,yes,2,no,1,yes,1,no,2,no,White,Anterior Low Lying Placenta,289,No,Vaginal,NA,Spontaneous,3170,Female,8,31,1,0,Married,2,Cytogenetic Tech,69,84,160,Never Smoked,
+7135502,VP-ARMII-121,VP-ARMII-121-M,mother,5,no,0,no,not sure,yes,yes,no,yes,2,yes,2,yes,1,yes,3,no,White,Gestational hypertension,278,No,Vaginal,NA,Spontaneous,2955,Female,8,28,1,0,Married,2,Project Mgr,57,73,160,Never Smoked,
+2212272,VP-ARMII-127,VP-ARMII-127-M,mother,5,no,0,no,no,no,yes,no,yes,2,yes,2,yes,1,no,2,no,White,None Known,283,No,Vaginal,NA,Spontaneous,3380,Female,9,33,2,1,Married,2,Family Med Resident,68,82,188,Never smoked,
+6527477,VP-ARMII-128,VP-ARMII-128-M,mother,4,no,0,no,no,yes,yes,no,yes,3,yes,3,yes,1,yes,3,no,White,None Known,282,No,Cesarean,yes,Planned,4070,Female,8,32,2,1,Married,2,Epidemiologist,135,137,167,Never smoked,
+9660887,VP-ARMII-133,VP-ARMII-133-M,mother,1,no,0,no,no,yes,yes,no,yes,2,yes,2,yes,1,yes,3,no,White,None Known,274,No,Cesarean,yes,Planned,3500,Female,9,27,2,1,Married,1,Homemaker,51,68,157,Never smoked,
+8077067,VP-ARMII-134,VP-ARMII-134-M,mother,5,no,0,no,no,yes,yes,no,no,1,yes,2,yes,1,yes,3,no,White,NA,282,No,Vaginal,NA,Spontaneous,3870,Female,9,31,1,0,Married,2,Licensing,71,93,180,Never smoked,H/O Marijuana (college yrs)
+7101033,VP-ARMII-135,VP-ARMII-135-M,mother,4,no,0,no,no,yes,yes,no,yes,2,no,1,yes,2,no,3,no,White,None Known,270,No,Vaginal,NA,Spontaneous,3035,Female,9,37,5,4,Single,2,Manager,68,86,172,Social smoker in her 20's (Quit),
+2019198,VP-ARMII-136,VP-ARMII-136-M,mother,1,no,0,no,no,yes,yes,no,yes,2,yes,3,yes,1,yes,3,no,White,None Known,272,No,Vaginal,NA,Spontaneous,3500,Female,7,26,3,0,Single,1,retail,70,94,172,NA,
+8799926,VP-ARMII-137,VP-ARMII-137-M,mother,6,no,0,no,no,yes,yes,no,no,1,no,1,yes,1,yes,3,no,White,None Known,269,No,Vaginal,NA,Spontaneous,3445,Female,9,31,1,0,Married,2,IT Specialist,69,88,170,Never smoked (social smoker in college),
+4288981,VP-ARMII-142,VP-ARMII-142-M,mother,5,no,0,no,not sure,yes,yes,no,no,1,yes,2,yes,,no,3,no,White,None Known,273,No,Cesarean,yes,Planned,3605,Female,8,35,4,1,Married,2,Nurse Practitioner,66,82,167,Never smoked,
+6697148,VP-ARMII-143,VP-ARMII-143-M,mother,3,no,1997,no,no,no,yes,no,no,1,no,1,yes,2,yes,3,no,White,None Known,289,No,Vaginal,NA,Spontaneous,3460,Female,7,35,2,1,Married,2,Professor,53,62,165,h/O Cig smoker (Quit 15 yrs ago),
+3994860,VP-ARMII-149,VP-ARMII-149-M,mother,3,no,0,no,no,yes,no,yes,no,1,no,1,yes,1,no,1,no,White,no,268,No,Vaginal,NA,Spontaneous,3840,Female,8,33,3,2,Married,2,Unemployed,62,77,172,none,
+7348972,VP-ARMII-150,VP-ARMII-150-M,mother,3,no,0,no,no,no,yes,no,yes,2,no,1,yes,1,yes,3,no,White,None Known,271,No,Vaginal,NA,Spontaneous,2930,Female,8,36,4,3,Married,2,Stay at Home Mom,59,70,155,Never smoked,
+9194333,VP-ARMII-151,VP-ARMII-151-M,mother,5,no,0,no,no,yes,yes,no,no,1,no,1,yes,1,no,2,no,White,None Known,284,No,Vaginal,NA,Spontaneous,3390,Female,8,28,1,0,Married,2,Health research,60,76,157,NA,
+5848866,VP-ARMII-152,VP-ARMII-152-M,mother,2,no,0,no,no,no,no,no,no,1,no,1,yes,1,no,3,no,White,None Known,271,No,Cesarean,no,Planned,3910,Female,9,26,1,0,Married,2,Student,73,95,175,Never smoked,
+6853436,VP-ARMII-153,VP-ARMII-153-M,mother,5,no,0,no,no,yes,no,yes,yes,2,yes,2,yes,1,yes,4,no,White,None Known,280,No,Vaginal,NA,Spontaneous,3570,Female,8,34,3,0,Married,2,admin specialist,79,91,,Never smoked,
+9980905,VP-ARMII-154,VP-ARMII-154-M,mother,3,no,0,no,no,yes,yes,no,no,1,no,1,yes,1,yes,3,no,White,cHTN,269,No,Vaginal,NA,Spontaneous,3370,Female,9,33,2,1,Married,2,Pathologist,64,72,167,none,
+1440189,VP-ARMII-155,VP-ARMII-155-M,mother,4,no,0,no,no,no,yes,yes,yes,2,no,1,yes,1,yes,4,no,White,"GDM, diet-controlled",277,No,Cesarean,no,Planned,3190,Female,9,39,1,0,Married,2,Admin,64,74,160,none,
+1880657,VP-ARMII-157,VP-ARMII-157-M,mother,6,no,0,no,no,no,no,no,yes,2,no,1,yes,1,yes,3,no,White,ICD for ARVD,282,No,Vaginal,NA,Spontaneous,3560,Female,9,31,2,1,Married,2,Resident,62,72,177,none,
+8371973,VP-ARMII-158,VP-ARMII-158-M,mother,5,no,0,no,no,yes,yes,no,yes,2,no,1,yes,1,no,2,no,White,None Known,263,No,Vaginal,NA,Spontaneous,3265,Female,9,34,3,2,Married,2,Research Admin,59,73,165,Never smoked,
+4877486,VP-ARMII-159,VP-ARMII-159-M,mother,3,no,0,no,no,no,no,no,yes,2,no,1,yes,1,no,1,no,White,None Known,273,No,Vaginal,NA,Spontaneous,3315,Female,9,31,1,0,Married,2,Librarian,74,88,162,Never smoked,
+5622501,VP-ARMII-161,VP-ARMII-161-M,mother,5,no,0,no,no,yes,no,no,no,1,no,1,yes,1,no,2,no,White,None Known,277,No,Cesarean,no,Add-on,3510,Female,8,38,3,2,Married,2,Professor,64,75,170,none,
+2821460,VP-ARMII-162,VP-ARMII-162-M,mother,4,no,2011,no,no,yes,yes,no,yes,2,yes,4,yes,1,no,2,no,White,None Known,281,No,Cesarean,no,Urgent,4510,Female,1,37,3,0,Single,2,NA,85,103,172,H/O cig smoker (Quit in 2011),
+8495459,VP-ARMII-163,VP-ARMII-163-M,mother,4,no,0,no,no,no,yes,no,no,1,no,1,yes,1,yes,3,no,White,AMA,281,No,Vaginal,NA,Spontaneous,3190,Female,9,36,2,1,Married,2,Grad Student,62,72,165,Never smoked,
+3732237,VP-ARMII-164,VP-ARMII-164-M,mother,6,no,0,yes,no,yes,no,no,no,1,no,1,yes,1,yes,3,no,White,None Known,292,No,Cesarean,no,Urgent,4685,Female,8,29,1,0,Married,3,Clinical Pharmacist,59,85,172,Never smoked,
+9535766,VP-ARMII-165,VP-ARMII-165-M,mother,3,no,0,no,no,yes,yes,no,yes,2,yes,2,no,0,no,,no,White,None Known,279,No,Vaginal,NA,Vacuum Assisted,3550,Female,7,27,1,0,Married,1,Pt sevice asst,79,89,167,NA,
+8562779,VP-ARMII-166,VP-ARMII-166-M,mother,6,no,0,no,no,yes,yes,no,yes,2,no,1,yes,1,no,2,no,White,,273,No,Cesarean,no,Planned,3030,Female,8,36,2,1,Married,2,Teacher,64,76.65,167,"Never smoked, no alcohol exposure in preg",
+8045932,VP-ARMII-173,VP-ARMII-173-M,mother,3,no,0,no,no,yes,yes,no,yes,2,no,1,yes,1,yes,3,no,White,,284,No,Vaginal,NA,Spontaneous,3115,Female,9,32,2,2,Married,2,Development Manager,94,90.719,165,"Never smoked, daily alcohol exposure prior to preg",No
+2670743,VP-ARMII-174,VP-ARMII-174-M,mother,4,no,0,no,no,yes,yes,no,no,1,no,1,yes,1,,2,no,White,,271,No,Vaginal,NA,Spontaneous,,Female,9,28,3,3,Married,1,RN,95.255,96.163,162,Never Smoker,No
+2721264,VP-ARMII-175,VP-ARMII-175-M,mother,6,no,0,no,no,yes,yes,yes,no,1,no,1,yes,,yes,2,no,White,,273,No,Cesarean,yes,Planned,,Female,9,38,3,2,Married,2,MD,53,62.59,165,Never Smoker,No
+4018123,VP-ARMII-177,VP-ARMII-177-M,mother,6,no,0,no,no,no,no,no,yes,2,no,1,yes,2,no,,no,White,,267,No,Vaginal,NA,Spontaneous,,Female,8,28,2,1,Married,2,NP,54,64.411,162,Never Smoked,No
+7862535,VP-ARMII-178,VP-ARMII-178-M,mother,4,no,0,no,no,yes,yes,no,yes,2,no,1,yes,1,,3,no,White,,288,No,Cesarean,no,Urgent,,Female,9,32,1,1,Married,3,RN,67,87.544,172,Never smoker,No
+7255805,VP-ARMII-179,VP-ARMII-179-M,mother,2,no,0,no,no,no,yes,no,yes,2,yes,2,yes,1,no,,no,White,,284,No,Vaginal,NA,Spontaneous,,Female,9,27,1,1,Married,2,,74,81.466,170,Never smoked,
+1876515,VP-ARMII-180,VP-ARMII-180-M,mother,2,no,0,no,no,yes,yes,no,yes,2,no,1,yes,1,no,,no,White,,264,No,Vaginal,NA,Spontaneous,,Female,8,31,3,1,Married,2,Teacher,58.832,71.986,162,Never smoked,No
+2662922,VP-ARMII-182,VP-ARMII-182-M,mother,5,no,0,no,no,no,yes,no,no,1,yes,4,no,0,no,2,no,White,,267,No,Cesarean,yes,Planned,3940,Female,8,36,4,4,Married,2,Stay at home mom,51.256,72.122,154.3,Never smoker,No
+5267703,VP-ARMII-185,VP-ARMII-185-M,mother,1,no,2005,no,no,yes,yes,no,yes,2,no,1,yes,2,,2,no,White,,282,No,Vaginal,NA,Spontaneous,,Female,8,30,1,1,Single,3,,58.06,77.111,167.6,Former smoker (1pack/day for 5 years; quit date 1/1/05),No; since 2005
+3329422,VP-ARMII-193,VP-ARMII-193-M,mother,4,no,0,no,no,no,yes,no,yes,2,yes,2,yes,1,yes,3,no,White,,286,No,Cesarean,yes,Add-on,3895,Female,8,36,3,2,Married,2,Stay at home mom,70.988,81.7,167.6,Never Smoker,No
+1225523,VP-ARMII-195,VP-ARMII-195-M,mother,6,no,0,no,no,yes,yes,no,no,1,no,1,yes,3,no,,no,White,,267,No,Vaginal,NA,Spontaneous,3090,Female,9,32,2,2,Married,3,MD,63.504,78.019,167.6,Never smoker,No
+5914528,VP-ARMII-199,VP-ARMII-199-M,mother,4,no,0,no,no,yes,yes,no,yes,2,no,1,Yes,2,no,,no,White,,282,No,Vaginal,NA,Spontaneous,2805,Female,8,37,4,3,Married,3,,70.761,76.658,,Never Smoker,No
+8285207,VP-ARMII-200,VP-ARMII-200-M,mother,4,no,0,no,no,yes,yes,no,no,1,no,1,yes,1,yes,2,no,White,,276,No,Vaginal,NA,Spontaneous,3270,Female,7,34,2,2,Married,3,,63.504,72.576,160,Never Smoker,No
+5553656,VP-ARMII-205,VP-ARMII-205-M,mother,6,no,0,no,no,yes,yes,yes,yes,2,no,1,yes,2,no,,no,White,,283,No,Vaginal,NA,Spontaneous,3545,Female,8,40,2,2,Married,3,,60.782,74.617,161.3,Never Smoker,No
+3260205,VP-ARMII-206,VP-ARMII-206-M,mother,1,no,0,no,no,yes,no,no,no,1,no,1,yes,2,no,,no,White,,280,No,Vaginal,NA,Spontaneous,4230,Female,9,28,2,2,Married,3,Homemaker,58.968,73.057,,Never Smoker,No
+4511457,VP-ARMII-207,VP-ARMII-207-M,mother,6,no,0,no,no,yes,yes,yes,yes,2,no,1,yes,2,yes,2,no,White,,286,No,Cesarean,no,Add-on,3905,Female,9,29,1,1,Married,3,,58.514,76.204,163.8,Never Smoker,No
+6242473,VP-ARMII-208,VP-ARMII-208-M,mother,5,no,0,no,no,yes,yes,no,no,1,yes,2,yes,1,yes,3,no,White,,277,No,Cesarean,yes,Add-on,4090,Female,8,30,3,3,Married,3,,104.327,112.038,162.6,,No
+9402264,VP-ARMII-210,VP-ARMII-210-M,mother,5,no,0,no,no,yes,yes,no,no,1,yes,2,yes,1,yes,3,no,White,,286,No,Cesarean,no,Urgent,3740,Female,8,30,1,1,Married,3,Residents,72.576,85.276,176.5,Never Smoker,No
+6952881,VP-ARMII-211,VP-ARMII-211-M,mother,3,no,0,no,no,yes,yes,no,yes,2,no,1,yes,2,yes,3,no,White,,286,No,Cesarean,no,Urgent,4065,Female,9,27,1,1,Married,2,Student,81.647,87.544,172.7,Never Smoker,No
+5532718,VP-ARMII-218,VP-ARMII-218-M,mother,6,no,0,no,no,yes,yes,no,yes,2,yes,2,yes,2,yes,3,no,White,,285,No,Vaginal,NA,Spontaneous,3270,Female,8,31,2,1,Married,3,,65.772,,167.6,Never Smoker,
+6122311,VP-ARMII-219,VP-ARMII-219-M,mother,3,no,0,no,no,yes,no,no,no,1,no,1,yes,1,yes,3,no,White,,283,No,Vaginal,NA,Spontaneous,3820,Female,8,26,2,2,Married,3,,76.658,,165.1,Never Smoker,
+3383668,VP-ARMII-220,VP-ARMII-220-M,mother,3,no,0,no,no,yes,yes,no,no,1,no,1,yes,2,no,,no,White,,281,No,Vaginal,NA,Spontaneous,3770,Female,8,32,2,2,Married,3,,58.514,,165.1,Never Smoker,
+2316685,VP-ARMII-221,VP-ARMII-221-M,mother,2,no,2011,no,no,yes,yes,yes,no,1,no,1,yes,1,yes,3,no,White,,273,No,Cesarean,yes,Planned,3410,Female,8,33,3,3,Married,3,Medical Billing,111.273,,158.8,"Former Smoker (Quit Date: 5/1/2011) .3 ppd, 3 pack-years",
+6986715,VP-ARMII-222,VP-ARMII-222-M,mother,5,no,0,no,no,yes,yes,no,no,1,no,1,yes,2,yes,3,no,White,,280,No,Vaginal,NA,Spontaneous,3480,Female,9,31,1,1,Single,3,MedPeds MD,55.792,,162.6,Never Smoker,
+5654314,VP-ARMII-223,VP-ARMII-223-M,mother,5,no,0,no,no,yes,yes,no,no,1,yes,2,yes,1,no,,no,White,,281,No,Cesarean,yes,Planned,3530,Female,9,35,3,2,Married,3,,81.194,,154.9,Never Smoker,
+3105368,VP-ARMII-228,VP-ARMII-228-M,mother,3,no,0,yes,no,yes,yes,no,no,1,yes,2,yes,1,no,,no,White,,278,No,Vaginal,NA,Spontaneous,3710,Female,9,29,1,1,Single,3,,91.627,,162.6,Never Smoker,
+3443801,VP-ARMII-117,VP-ARMII-117-C,child,6,no,0,no,no,yes,yes,no,yes,2,yes,3,yes,1,yes,3,no,White,Gestational hypertension,274,No,Vaginal,NA,Spontaneous,4100,Male,9,29,2,1,Married,2,Physician Assistant,72,91,172,Never Smoked,
+1933399,VP-ARMII-118,VP-ARMII-118-C,child,6,no,0,no,no,no,no,no,yes,2,no,1,yes,2,yes,3,no,White,None Known,277,No,Vaginal,NA,Spontaneous,3615,Male,7,35,3,2,Married,2,Physician,63,75,162,Never Smoked,
+3723202,VP-ARMII-119,VP-ARMII-119-C,child,4,no,0,no,no,yes,no,no,yes,2,yes,2,yes,1,yes,3,no,White,None Known,291,No,Vaginal,NA,Spontaneous,3200,Female,7,28,1,0,Married,2,Physical Therapist,92,105,172,Never Smoked,
+6191985,VP-ARMII-120,VP-ARMII-120-C,child,5,no,0,no,no,yes,no,no,yes,2,no,1,yes,1,no,2,no,White,Anterior Low Lying Placenta,289,No,Vaginal,NA,Spontaneous,3170,Female,8,31,1,0,Married,2,Cytogenetic Tech,69,84,160,Never Smoked,
+6757298,VP-ARMII-121,VP-ARMII-121-C,child,5,no,0,no,not sure,yes,yes,no,yes,2,yes,2,yes,1,yes,3,no,White,Gestational hypertension,278,No,Vaginal,NA,Spontaneous,2955,Male,8,28,1,0,Married,2,Project Mgr,57,73,160,Never Smoked,
+3826807,VP-ARMII-127,VP-ARMII-127-C,child,5,no,0,no,no,no,yes,no,yes,2,yes,2,yes,1,no,2,no,White,None Known,283,No,Vaginal,NA,Spontaneous,3380,Female,9,33,2,1,Married,2,Family Med Resident,68,82,188,Never smoked,
+6627095,VP-ARMII-128,VP-ARMII-128-C,child,4,no,0,no,no,yes,yes,no,yes,3,yes,3,yes,1,yes,3,no,White,None Known,282,No,Cesarean,yes,Planned,4070,Female,8,32,2,1,Married,2,Epidemiologist,135,137,167,Never smoked,
+3593506,VP-ARMII-133,VP-ARMII-133-C,child,1,no,0,no,no,yes,yes,no,yes,2,yes,2,yes,1,yes,3,no,White,None Known,274,No,Cesarean,yes,Planned,3500,Female,9,27,2,1,Married,1,Homemaker,51,68,157,Never smoked,
+9583337,VP-ARMII-134,VP-ARMII-134-C,child,5,no,0,no,no,yes,yes,no,no,1,yes,2,yes,1,yes,3,no,White,NA,282,No,Vaginal,NA,Spontaneous,3870,Female,9,31,1,0,Married,2,Licensing,71,93,180,Never smoked,H/O Marijuana (college yrs)
+6386288,VP-ARMII-135,VP-ARMII-135-C,child,4,no,0,no,no,yes,yes,no,yes,2,no,1,yes,2,no,3,no,White,None Known,270,No,Vaginal,NA,Spontaneous,3035,Female,9,37,5,4,Single,2,Manager,68,86,172,Social smoker in her 20's (Quit),
+9294232,VP-ARMII-136,VP-ARMII-136-C,child,1,no,0,no,no,yes,yes,no,yes,2,yes,3,yes,1,yes,3,no,White,None Known,272,No,Vaginal,NA,Spontaneous,3500,Female,7,26,3,0,Single,1,retail,70,94,172,NA,
+8791469,VP-ARMII-137,VP-ARMII-137-C,child,6,no,0,no,no,yes,yes,no,no,1,no,1,yes,1,yes,3,no,White,None Known,269,No,Vaginal,NA,Spontaneous,3445,Female,9,31,1,0,Married,2,IT Specialist,69,88,170,Never smoked (social smoker in college),
+8963084,VP-ARMII-142,VP-ARMII-142-C,child,5,no,0,no,not sure,yes,yes,no,no,1,yes,2,yes,,no,3,no,White,None Known,273,No,Cesarean,yes,Planned,3605,Male,8,35,4,1,Married,2,Nurse Practitioner,66,82,167,Never smoked,
+3223690,VP-ARMII-143,VP-ARMII-143-C,child,3,no,1997,no,no,no,yes,no,no,1,no,1,yes,2,yes,3,no,White,None Known,289,No,Vaginal,NA,Spontaneous,3460,Male,7,35,2,1,Married,2,Professor,53,62,165,h/O Cig smoker (Quit 15 yrs ago),
+2687051,VP-ARMII-149,VP-ARMII-149-C,child,3,no,0,no,no,yes,no,yes,no,1,no,1,yes,1,no,1,no,White,no,268,No,Vaginal,NA,Spontaneous,3840,Male,8,33,3,2,Married,2,Unemployed,62,77,172,none,
+5483110,VP-ARMII-150,VP-ARMII-150-C,child,3,no,0,no,no,no,yes,no,yes,2,no,1,yes,1,yes,3,no,White,None Known,271,No,Vaginal,NA,Spontaneous,2930,Male,8,36,4,3,Married,2,Stay at Home Mom,59,70,155,Never smoked,
+9548553,VP-ARMII-151,VP-ARMII-151-C,child,5,no,0,no,no,yes,yes,no,no,1,no,1,yes,1,no,2,no,White,None Known,284,No,Vaginal,NA,Spontaneous,3390,Female,8,28,1,0,Married,2,Health research,60,76,157,NA,
+3139953,VP-ARMII-152,VP-ARMII-152-C,child,2,no,0,no,no,no,no,no,no,1,no,1,yes,1,no,3,no,White,None Known,271,No,Cesarean,no,Planned,3910,Male,9,26,1,0,Married,2,Student,73,95,175,Never smoked,
+3413606,VP-ARMII-153,VP-ARMII-153-C,child,5,no,0,no,no,yes,no,yes,yes,2,yes,2,yes,1,yes,4,no,White,None Known,280,No,Vaginal,NA,Spontaneous,3570,Female,8,34,3,0,Married,2,admin specialist,79,91,,Never smoked,
+8313322,VP-ARMII-154,VP-ARMII-154-C,child,3,no,0,no,no,yes,yes,no,no,1,no,1,yes,1,yes,3,no,White,cHTN,269,No,Vaginal,NA,Spontaneous,3370,Male,9,33,2,1,Married,2,Pathologist,64,72,167,none,
+6216048,VP-ARMII-155,VP-ARMII-155-C,child,4,no,0,no,no,no,yes,yes,yes,2,no,1,yes,1,yes,4,no,White,"GDM, diet-controlled",277,No,Cesarean,no,Planned,3190,Female,9,39,1,0,Married,2,Admin,64,74,160,none,
+8433765,VP-ARMII-157,VP-ARMII-157-C,child,6,no,0,no,no,no,no,no,yes,2,no,1,yes,1,yes,3,no,White,ICD for ARVD,282,No,Vaginal,NA,Spontaneous,3560,Female,9,31,2,1,Married,2,Resident,62,72,177,none,
+7113335,VP-ARMII-158,VP-ARMII-158-C,child,5,no,0,no,no,yes,yes,no,yes,2,no,1,yes,1,no,2,no,White,None Known,263,No,Vaginal,NA,Spontaneous,3265,Female,9,34,3,2,Married,2,Research Admin,59,73,165,Never smoked,
+1605369,VP-ARMII-159,VP-ARMII-159-C,child,3,no,0,no,no,no,no,no,yes,2,no,1,yes,1,no,1,no,White,None Known,273,No,Vaginal,NA,Spontaneous,3315,Male,9,31,1,0,Married,2,Librarian,74,88,162,Never smoked,
+9331901,VP-ARMII-161,VP-ARMII-161-C,child,5,no,0,no,no,yes,no,no,no,1,no,1,yes,1,no,2,no,White,None Known,277,No,Cesarean,no,Add-on,3510,Female,8,38,3,2,Married,2,Professor,64,75,170,none,
+3170529,VP-ARMII-162,VP-ARMII-162-C,child,4,no,2011,no,no,yes,yes,no,yes,2,yes,4,yes,1,no,2,no,White,None Known,281,No,Cesarean,no,Urgent,4510,Male,1,37,3,0,Single,2,NA,85,103,172,H/O cig smoker (Quit in 2011),
+8674889,VP-ARMII-163,VP-ARMII-163-C,child,4,no,0,no,no,no,yes,no,no,1,no,1,yes,1,yes,3,no,White,AMA,281,No,Vaginal,NA,Spontaneous,3190,Female,9,36,2,1,Married,2,Grad Student,62,72,165,Never smoked,
+8310807,VP-ARMII-164,VP-ARMII-164-C,child,6,no,0,yes,no,yes,no,no,no,1,no,1,yes,1,yes,3,no,White,None Known,292,No,Cesarean,no,Urgent,4685,Male,8,29,1,0,Married,3,Clinical Pharmacist,59,85,172,Never smoked,
+5771787,VP-ARMII-165,VP-ARMII-165-C,child,3,no,0,no,no,yes,yes,no,yes,2,yes,2,no,0,no,,no,White,None Known,279,No,Vaginal,NA,Vacuum Assisted,3550,Male,7,27,1,0,Married,1,Pt sevice asst,79,89,167,NA,
+7967151,VP-ARMII-166,VP-ARMII-166-C,child,6,no,0,no,no,yes,yes,no,yes,2,no,1,yes,1,no,2,no,White,,273,No,Cesarean,no,Planned,3030,Female,8,36,2,1,Married,2,Teacher,64,76.65,167,"Never smoked, no alcohol exposure in preg",
+8980641,VP-ARMII-173,VP-ARMII-173-C,child,3,no,0,no,no,yes,yes,no,yes,2,no,1,yes,1,yes,3,no,White,,284,No,Vaginal,NA,Spontaneous,3115,Female,9,32,2,2,Married,2,Development Manager,94,90.719,165,"Never smoked, daily alcohol exposure prior to preg",No
+9934175,VP-ARMII-174,VP-ARMII-174-C,child,4,no,0,no,no,yes,yes,no,no,1,no,1,yes,1,,2,no,White,,271,No,Vaginal,NA,Spontaneous,,Female,9,28,3,3,Married,1,RN,95.255,96.163,162,Never Smoker,No
+4265997,VP-ARMII-175,VP-ARMII-175-C,child,6,no,0,no,no,yes,yes,yes,no,1,no,1,yes,,yes,2,no,White,,273,No,Cesarean,yes,Planned,,Male,9,38,3,2,Married,2,MD,53,62.59,165,Never Smoker,No
+8920001,VP-ARMII-177,VP-ARMII-177-C,child,6,no,0,no,no,no,no,no,yes,2,no,1,yes,2,no,,no,White,,267,No,Vaginal,NA,Spontaneous,,Male,8,28,2,1,Married,2,NP,54,64.411,162,Never Smoked,No
+7986714,VP-ARMII-178,VP-ARMII-178-C,child,4,no,0,no,no,yes,yes,no,yes,2,no,1,yes,1,,3,no,White,,288,No,Cesarean,no,Urgent,,Male,9,32,1,1,Married,3,RN,67,87.544,172,Never smoker,No
+7663255,VP-ARMII-179,VP-ARMII-179-C,child,2,no,0,no,no,no,yes,no,yes,2,yes,2,yes,1,no,,no,White,,284,No,Vaginal,NA,Spontaneous,,Female,9,27,1,1,Married,2,,74,81.466,170,Never smoked,
+4314514,VP-ARMII-180,VP-ARMII-180-C,child,2,no,0,no,no,yes,yes,no,yes,2,no,1,yes,1,no,,no,White,,264,No,Vaginal,NA,Spontaneous,,Male,8,31,3,1,Married,2,Teacher,58.832,71.986,162,Never smoked,No
+4290177,VP-ARMII-182,VP-ARMII-182-C,child,5,no,0,no,no,no,yes,no,no,1,yes,4,no,0,no,2,no,White,,267,No,Cesarean,yes,Planned,3940,Male,8,36,4,4,Married,2,Stay at home mom,51.256,72.122,154.3,Never smoker,No
+3415619,VP-ARMII-185,VP-ARMII-185-C,child,1,no,2005,no,no,yes,yes,no,yes,2,no,1,yes,2,,2,no,White,,282,No,Vaginal,NA,Spontaneous,,Male,8,30,1,1,Single,3,,58.06,77.111,167.6,Former smoker (1pack/day for 5 years; quit date 1/1/05),No; since 2005
+4096111,VP-ARMII-193,VP-ARMII-193-C,child,4,no,0,no,no,no,yes,no,yes,2,yes,2,yes,1,yes,3,no,White,,286,No,Cesarean,yes,Add-on,3895,Male,8,36,3,2,Married,2,Stay at home mom,70.988,81.7,167.6,Never Smoker,No
+8656563,VP-ARMII-195,VP-ARMII-195-C,child,6,no,0,no,no,yes,yes,no,no,1,no,1,yes,3,no,,no,White,,267,No,Vaginal,NA,Spontaneous,3090,Female,9,32,2,2,Married,3,MD,63.504,78.019,167.6,Never smoker,No
+2668820,VP-ARMII-199,VP-ARMII-199-C,child,4,no,0,no,no,yes,yes,no,yes,2,no,1,Yes,2,no,,no,White,,282,No,Vaginal,NA,Spontaneous,2805,Female,8,37,4,3,Married,3,,70.761,76.658,,Never Smoker,No
+6574875,VP-ARMII-200,VP-ARMII-200-C,child,4,no,0,no,no,yes,yes,no,no,1,no,1,yes,1,yes,2,no,White,,276,No,Vaginal,NA,Spontaneous,3270,Female,7,34,2,2,Married,3,,63.504,72.576,160,Never Smoker,No
+6457097,VP-ARMII-205,VP-ARMII-205-C,child,6,no,0,no,no,yes,yes,yes,yes,2,no,1,yes,2,no,,no,White,,283,No,Vaginal,NA,Spontaneous,3545,Male,8,40,2,2,Married,3,,60.782,74.617,161.3,Never Smoker,No
+3218989,VP-ARMII-206,VP-ARMII-206-C,child,1,no,0,no,no,yes,no,no,no,1,no,1,yes,2,no,,no,White,,280,No,Vaginal,NA,Spontaneous,4230,Male,9,28,2,2,Married,3,Homemaker,58.968,73.057,,Never Smoker,No
+2503043,VP-ARMII-207,VP-ARMII-207-C,child,6,no,0,no,no,yes,yes,yes,yes,2,no,1,yes,2,yes,2,no,White,,286,No,Cesarean,no,Add-on,3905,Male,9,29,1,1,Married,3,,58.514,76.204,163.8,Never Smoker,No
+9262320,VP-ARMII-208,VP-ARMII-208-C,child,5,no,0,no,no,yes,yes,no,no,1,yes,2,yes,1,yes,3,no,White,,277,No,Cesarean,yes,Add-on,4090,Male,8,30,3,3,Married,3,,104.327,112.038,162.6,,No
+9271255,VP-ARMII-210,VP-ARMII-210-C,child,5,no,0,no,no,yes,yes,no,no,1,yes,2,yes,1,yes,3,no,White,,286,No,Cesarean,no,Urgent,3740,Female,8,30,1,1,Married,3,Residents,72.576,85.276,176.5,Never Smoker,No
+2349983,VP-ARMII-211,VP-ARMII-211-C,child,3,no,0,no,no,yes,yes,no,yes,2,no,1,yes,2,yes,3,no,White,,286,No,Cesarean,no,Urgent,4065,Female,9,27,1,1,Married,2,Student,81.647,87.544,172.7,Never Smoker,No
+6984090,VP-ARMII-218,VP-ARMII-218-C,child,6,no,0,no,no,yes,yes,no,yes,2,yes,2,yes,2,yes,3,no,White,,285,No,Vaginal,NA,Spontaneous,3270,Female,8,31,2,1,Married,3,,65.772,,167.6,Never Smoker,
+7476393,VP-ARMII-219,VP-ARMII-219-C,child,3,no,0,no,no,yes,no,no,no,1,no,1,yes,1,yes,3,no,White,,283,No,Vaginal,NA,Spontaneous,3820,Male,8,26,2,2,Married,3,,76.658,,165.1,Never Smoker,
+1498997,VP-ARMII-220,VP-ARMII-220-C,child,3,no,0,no,no,yes,yes,no,no,1,no,1,yes,2,no,,no,White,,281,No,Vaginal,NA,Spontaneous,3770,Female,8,32,2,2,Married,3,,58.514,,165.1,Never Smoker,
+7150246,VP-ARMII-221,VP-ARMII-221-C,child,2,no,2011,no,no,yes,yes,yes,no,1,no,1,yes,1,yes,3,no,White,,273,No,Cesarean,yes,Planned,3410,Female,8,33,3,3,Married,3,Medical Billing,111.273,,158.8,"Former Smoker (Quit Date: 5/1/2011) .3 ppd, 3 pack-years",
+8122947,VP-ARMII-222,VP-ARMII-222-C,child,5,no,0,no,no,yes,yes,no,no,1,no,1,yes,2,yes,3,no,White,,280,No,Vaginal,NA,Spontaneous,3480,Female,9,31,1,1,Single,3,MedPeds MD,55.792,,162.6,Never Smoker,
+6348510,VP-ARMII-223,VP-ARMII-223-C,child,5,no,0,no,no,yes,yes,no,no,1,yes,2,yes,1,no,,no,White,,281,No,Cesarean,yes,Planned,3530,Male,9,35,3,2,Married,3,,81.194,,154.9,Never Smoker,
+9321662,VP-ARMII-228,VP-ARMII-228-C,child,3,no,0,yes,no,yes,yes,no,no,1,yes,2,yes,1,no,,no,White,,278,No,Vaginal,NA,Spontaneous,3710,Male,9,29,1,1,Single,3,,91.627,,162.6,Never Smoker,

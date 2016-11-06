@@ -22,11 +22,93 @@
 					document.getElementById('detail_platform_uri').innerHTML = json.documents[row]['platformUri'];
 				}
 			}
+			
+			for(i = (cur_page - 1) * page_size; i < Math.min(cur_page * page_size, num_results); i++){
+				document.getElementById(i.toString()).style.display = '';
+			}
+			updatePage();
+		}
+		
+		var cur_page = 1;
+		var page_size = 15;
+		var num_results = @documents.size();
+		var total_page = Math.ceil(@documents.size()/page_size);
+		function nextPage(){
+			if(cur_page < total_page){
+				for(i = (cur_page - 1) * page_size; i < Math.min(cur_page * page_size, num_results); i++){
+					document.getElementById(i.toString()).style.display = 'none';
+				}
+				cur_page += 1;
+				for(i = (cur_page - 1) * page_size; i < Math.min(cur_page * page_size, num_results); i++){
+					document.getElementById(i.toString()).style.display = '';
+				}
+			}
+			updatePage();
+		}
+		function prevPage(){
+			if(cur_page > 1){
+				for(i = (cur_page - 1) * page_size; i < Math.min(cur_page * page_size, num_results); i++){
+					document.getElementById(i.toString()).style.display = 'none';
+				}
+				cur_page -= 1;
+				for(i = (cur_page - 1) * page_size; i < Math.min(cur_page * page_size, num_results); i++){
+					document.getElementById(i.toString()).style.display = '';
+				}
+			}
+			updatePage();
+		}
+		function firstPage(){
+			for(i = (cur_page - 1) * page_size; i < Math.min(cur_page * page_size, num_results); i++){
+				document.getElementById(i.toString()).style.display = 'none';
+			}
+			cur_page = 1;
+			for(i = (cur_page - 1) * page_size; i < Math.min(cur_page * page_size, num_results); i++){
+				document.getElementById(i.toString()).style.display = '';
+			}
+			updatePage();
+		}
+		function lastPage(){
+			for(i = (cur_page - 1) * page_size; i < Math.min(cur_page * page_size, num_results); i++){
+				document.getElementById(i.toString()).style.display = 'none';
+			}
+			cur_page = total_page;
+			for(i = (cur_page - 1) * page_size; i < Math.min(cur_page * page_size, num_results); i++){
+				document.getElementById(i.toString()).style.display = '';
+			}
+			updatePage();
+		}
+		function updatePage(){
+			if(cur_page == 1){
+				document.getElementById('prevpage').disabled = true;
+				document.getElementById('firstpage').disabled = true;
+			}
+			else{
+				document.getElementById('prevpage').disabled = false;
+				document.getElementById('firstpage').disabled = false;
+			}
+			if(cur_page == total_page){
+				document.getElementById('nextpage').disabled = true;
+				document.getElementById('lastpage').disabled = true;
+			}
+			else{
+				document.getElementById('nextpage').disabled = false;
+				document.getElementById('lastpage').disabled = false;
+			}
+			
+			var pages;
+			pages = "Current Page: " + cur_page.toString() + " \/ " + total_page.toString() 
+					+ ", Number of Result: " + num_results.toString();
+			document.getElementById('pagecontrl').innerHTML = pages;
 		}
 	</script>
 
     <div class="table-responsive">
-        <table class="table table-striped" id="measurementsTable">
+    	<button type="button" id="nextpage" class="btn btn-primary" onClick="nextPage();">Next Page</button>
+    	<button type="button" id="prevpage"class="btn btn-primary" onClick="prevPage();">Previous Page</button>
+    	<button type="button" id="firstpage" class="btn btn-primary" onClick="firstPage();">First Page</button>
+    	<button type="button" id="lastpage"class="btn btn-primary" onClick="lastPage();">Last Page</button>
+    	<p id="pagecontrl"></p>
+    	<table class="table table-striped" id="measurementsTable">
             <thead>
               <tr>
               	<th>Object</th>
@@ -40,8 +122,8 @@
             </thead>
 
             <tbody>
-                @for(document <- documents) {
-                <tr>
+            	@for((document, index) <- documents.zipWithIndex) {
+                <tr id="@index" style="display: none">
                     <td>@document.getEntity()</td>
                 	<td>@document.getCharacteristic()</td>
                 	<td>@document.getValue()</td>

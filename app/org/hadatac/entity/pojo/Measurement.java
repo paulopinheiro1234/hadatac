@@ -253,8 +253,8 @@ public class Measurement {
 		q =  facet_query;
 		System.out.println("!!! QUERY: " + q);
 		query.setQuery(q);
-		query.setStart((page-1)*qtd);
-		query.setRows(qtd);
+		query.setStart(0);
+		query.setRows(10000000);
 		query.setFacet(true);
 		query.addFacetField("unit");
 		query.addFacetPivotField("entity,characteristic");
