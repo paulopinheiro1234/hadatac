@@ -110,6 +110,68 @@ public class ViewSubject extends Controller {
 		}*/
 		return subjectResult;
 	}
+	public static Map<String, List<String>> findSampleMap(String subject_uri) {
+
+		String sampleQueryString = "";
+		
+    	sampleQueryString = 
+    	"PREFIX sio: <http://semanticscience.org/resource/>" + 
+    	"PREFIX chear: <http://hadatac.org/ont/chear#>" + 
+    	"PREFIX chear-kb: <http://hadatac.org/kb/chear#>" + 
+    	"PREFIX prov: <http://www.w3.org/ns/prov#>" + 
+    	"PREFIX hasco: <http://hadatac.org/ont/hasco/>" + 
+    	"PREFIX hasneto: <http://hadatac.org/ont/hasneto#>" + 
+    	"PREFIX dcterms: <http://purl.org/dc/terms/>" + 
+    	"PREFIX rdfs:<http://www.w3.org/2000/01/rdf-schema#>" + 
+    	"PREFIX skos: <http://www.w3.org/2004/02/skos/core#>" +
+    	"PREFIX foaf: <http://xmlns.com/foaf/0.1/>" + 
+    	"SELECT ?sampleUri ?subjectUri ?subjectLabel ?sampleType ?sampleLabel ?cohortLabel ?comment" +
+		 "WHERE {        ?subjectUri hasco:isSubjectOf* ?cohort ." +
+		 "       		?sampleUri hasco:isSampleOf ?subjectUri ." +
+		 "				?sampleUri rdfs:comment ?comment . " +
+		 "				?cohort rdfs:label ?cohortLabel . " +
+		 "       		OPTIONAL { ?subjectUri rdfs:label ?subjectLabel } .  " + 
+		 "       		OPTIONAL { ?sampleUri rdfs:label ?sampleLabel } .  " + 
+		 "       		OPTIONAL { ?sampleUri a ?sampleType  } .  " +
+         "      FILTER (?subjectUri = " + subject_uri + " ) .  " +
+		 "                            }";
+	/*	
+		String basicQueryString = "";
+
+		basicQueryString = 
+    	
+    	"PREFIX prov: <http://www.w3.org/ns/prov#> "
+        + " PREFIX chear-kb: <http://hadatac.org/kb/chear#> "
+        + "SELECT * "
+        + "WHERE  {	" + subject_uri + " ?p ?o }";
+    */	
+    	
+        
+		//Query basicQuery = QueryFactory.create(basicQueryString);
+    	Query basicQuery = QueryFactory.create(sampleQueryString);
+    	
+		QueryExecution qexec = QueryExecutionFactory.sparqlService(Collections.getCollectionsName(Collections.METADATA_SPARQL), basicQuery);
+		ResultSet results = qexec.execSelect();
+		ResultSetRewindable resultsrw = ResultSetFactory.copyResults(results);
+		qexec.close();
+		
+		Map<String, List<String>> sampleResult = new HashMap<String, List<String>>();
+		List<String> values = new ArrayList<String>();
+		
+		while (resultsrw.hasNext()) {
+			QuerySolution soln = resultsrw.next();
+			System.out.println("HERE IS THE RAW SOLN*********" + soln.toString());
+			values = new ArrayList<String>();
+			values.add("Label: " + soln.get("sampleLabel").toString());
+			values.add("Type: " + soln.get("sampleType").toString());
+			values.add("Sample Of: " + soln.get("subjectLabel").toString());
+			//values.add("Comment: " + soln.get("comment").toString());
+			sampleResult.put(soln.get("sampleUri").toString(),values);	
+			System.out.println("THIS IS SUBROW*********" + sampleResult);	
+		}
+
+		return sampleResult;
+	}
 	
 	public static List<String> findSample(String subject_uri) {
 
@@ -146,8 +208,9 @@ public class ViewSubject extends Controller {
     public static Result index(String subject_uri) {
 
     	Map<String, List<String>> subjectResult = findBasic(subject_uri);
-    	List<String> sampleResult = findSample(subject_uri);
-        
+    	//List<String> sampleResult = findSample(subject_uri);
+    	Map<String, List<String>> sampleResult = findSampleMap(subject_uri);
+    	
     	return ok(viewSubject.render(subjectResult,sampleResult));
     
         

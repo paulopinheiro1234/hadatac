@@ -1,5 +1,5 @@
 @(subjectResult      : Map[String, List[String]],
-  sampleResult	: List[String])
+  sampleResult	: Map[String, List[String]])
 
 @import org.hadatac.console.views.html._
 @import org.hadatac.utils._
@@ -32,9 +32,14 @@
 				</ul>
 			<h3>Sample List</h3>
 				<ul>
-					@for(s <- sampleResult){
+					@for(key <- sampleResult.keySet()){
 						<li><a href="./viewSample?sample_uri=@key.toString.replaceAll("http://hadatac.org/ont/chear#","chear:").replaceAll("http://hadatac.org/kb/chear#","chear-kb:")">@key.toString.replaceAll("http://hadatac.org/ont/chear#","chear:").replaceAll("http://hadatac.org/kb/chear#","chear-kb:")</a>
-						@s.toString</li>
+							<ul>
+							@for(s <- sampleResult.get(key)) {
+							<li>@s.toString.replaceAll("http://hadatac.org/ont/chear#","chear:").replaceAll("http://hadatac.org/kb/chear#","chear-kb:")</li>
+							}
+							</ul>
+						</li>
 					}
 				</ul>
     	</div>

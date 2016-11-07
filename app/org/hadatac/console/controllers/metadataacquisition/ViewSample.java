@@ -53,14 +53,23 @@ public class ViewSample extends Controller {
     	"PREFIX rdfs:<http://www.w3.org/2000/01/rdf-schema#>" + 
     	"PREFIX skos: <http://www.w3.org/2004/02/skos/core#>" +
     	"PREFIX foaf: <http://xmlns.com/foaf/0.1/>" + 
-    	"SELECT ?sampleUri ?sampleType ?sampleLabel ?sub ?measureObject ?comment " +
-    	"			 WHERE {        ?sampleUri =" + sample_uri + " ." +
-    	" 							" + sample_uri + "a ?sampleType . " +
-    	"							" + sample_uri + "rdfs:label ?sampleLabel ." +
-    	"			        		" + sample_uri + "hasco:isSampleOf ?sub . " +
-    	"							" + sample_uri + "hasco:isMeasuredObjectOf ?measureObject" +
-    	"			        		" + sample_uri + "rdfs:comment .";
-		
+    	"SELECT ?sampleUri ?subjectUri ?subjectLabel ?sampleType ?sampleLabel ?freezeThaw ?storageTemp ?storageTempUnit ?cohortLabel ?object ?samplingVolume ?samplingVolumeUnit ?comment" +
+		 "WHERE {        ?subjectUri hasco:isSubjectOf* ?cohort ." +
+		 "       		?sampleUri hasco:isSampleOf ?subjectUri ." +
+		 "				?sampleUri rdfs:comment ?comment . " +
+		 "				?sampleUri hasco:isMeasuredObjectOf ?object . " +
+		 "				?sampleUri hasco:hasSamplingVolume ?samplingVolume . " +
+		 "				?sampleUri hasco:hasSamplingVolumeUnit ?samplingVolumeUnit . " +
+		 "				?sampleUri hasco:hasStorageTemperature ?storageTemp . " +
+		 "				?sampleUri hasco:hasStorageTemperatureUnit ?storageTempUnit . " +
+		 "				?sampleUri hasco:hasNumFreezeThaw ?freezeThaw . " +
+		 "				?sampleUri rdfs:comment ?comment . " +
+		 "				?cohort rdfs:label ?cohortLabel . " +
+		 "       		OPTIONAL { ?subjectUri rdfs:label ?subjectLabel } .  " + 
+		 "       		OPTIONAL { ?sampleUri rdfs:label ?sampleLabel } .  " + 
+		 "       		OPTIONAL { ?sampleUri a ?sampleType  } .  " +
+         "      FILTER (?sampleUri = " + sample_uri + " ) .  " +
+		 "                            }";		
 	/*	
 		String basicQueryString = "";
 
@@ -90,9 +99,14 @@ public class ViewSample extends Controller {
 			values = new ArrayList<String>();
 			values.add("Label: " + soln.get("sampleLabel").toString());
 			values.add("Type: " + soln.get("sampleType").toString());
-			values.add("SampleOf: " + soln.get("sub").toString());
-			values.add("MeasuredObjectOf: " + soln.get("measureObject").toString());
-			values.add("Comment: " + soln.get("comment").toString());
+			values.add("Sample Of: " + soln.get("subjectLabel").toString());
+			values.add("Measured Object Of: " + soln.get("object").toString());
+			values.add("Sample Volume: " + soln.get("samplingVolume").toString());
+			values.add("Sample Volume Unit: " + soln.get("samplingVolumeUnit").toString());
+			values.add("Storage Temperature: " + soln.get("storageTemp").toString());
+			values.add("Storage Temperature Unit: " + soln.get("storageTempUnit").toString());
+			values.add("Freeze Thaw Count: " + soln.get("freezeThaw").toString());
+			//values.add("Comment: " + soln.get("comment").toString());
 			sampleResult.put(soln.get("sampleUri").toString(),values);	
 			System.out.println("THIS IS SUBROW*********" + sampleResult);	
 		}
