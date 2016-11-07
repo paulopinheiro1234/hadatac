@@ -478,7 +478,7 @@ public class GetSparqlQuery {
             		"PREFIX rdfs:<http://www.w3.org/2000/01/rdf-schema#>" + 
             		"PREFIX skos: <http://www.w3.org/2004/02/skos/core#>" +
             		"SELECT ?id ?superId ?label ?comment WHERE { " + 
-                    "   ?id rdfs:subClassOf* chear:Alkaloid . " + 
+                    "   ?id rdfs:subClassOf* chear:AlkylPhosphatePesticideMetabolite . " + 
                     "   ?id rdfs:subClassOf ?superId .  " + 
                     "   OPTIONAL { ?id rdfs:label ?label } . " + 
                     " 	OPTIONAL { ?id skos:definition ?comment } . " +
