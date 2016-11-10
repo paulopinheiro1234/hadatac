@@ -20,10 +20,10 @@
              <h2>Basic Info</h2>
 				<ul>        		
 					@for(key <- sampleResult.keySet()){
-						<li>@key.toString.replaceAll("http://hadatac.org/ont/chear#","chear:").replaceAll("http://hadatac.org/kb/chear#","chear-kb:")
+						<li>@key.toString.replaceAll("http://hadatac.org/ont/chear#","chear:").replaceAll("http://hadatac.org/ont/case#","case:").replaceAll("http://hadatac.org/kb/chear#","chear-kb:")
 							<ul>
 							@for(s <- sampleResult.get(key)) {
-							<li>@s.toString.replaceAll("http://hadatac.org/ont/chear#","chear:").replaceAll("http://hadatac.org/kb/chear#","chear-kb:")</li>
+							<li>@s.toString.replaceAll("http://hadatac.org/ont/chear#","chear:").replaceAll("http://hadatac.org/ont/case#","case:").replaceAll("http://hadatac.org/kb/chear#","chear-kb:")</li>
 							}
 							</ul>
 						</li>

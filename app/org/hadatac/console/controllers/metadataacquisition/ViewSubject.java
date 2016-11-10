@@ -46,6 +46,8 @@ public class ViewSubject extends Controller {
     	"PREFIX sio: <http://semanticscience.org/resource/>" + 
     	"PREFIX chear: <http://hadatac.org/ont/chear#>" + 
     	"PREFIX chear-kb: <http://hadatac.org/kb/chear#>" + 
+    	"PREFIX case: <http://hadatac.org/ont/case#>" + 
+    	"PREFIX case-kb: <http://hadatac.org/kb/case#>" + 
     	"PREFIX prov: <http://www.w3.org/ns/prov#>" + 
     	"PREFIX hasco: <http://hadatac.org/ont/hasco/>" + 
     	"PREFIX hasneto: <http://hadatac.org/ont/hasneto#>" + 
@@ -118,6 +120,8 @@ public class ViewSubject extends Controller {
     	"PREFIX sio: <http://semanticscience.org/resource/>" + 
     	"PREFIX chear: <http://hadatac.org/ont/chear#>" + 
     	"PREFIX chear-kb: <http://hadatac.org/kb/chear#>" + 
+    	"PREFIX case: <http://hadatac.org/ont/case#>" + 
+    	"PREFIX case-kb: <http://hadatac.org/kb/case#>" + 
     	"PREFIX prov: <http://www.w3.org/ns/prov#>" + 
     	"PREFIX hasco: <http://hadatac.org/ont/hasco/>" + 
     	"PREFIX hasneto: <http://hadatac.org/ont/hasneto#>" + 
@@ -181,6 +185,7 @@ public class ViewSubject extends Controller {
     	    	
     	"PREFIX prov: <http://www.w3.org/ns/prov#> "
         + " PREFIX chear-kb: <http://hadatac.org/kb/chear#> "
+        + " PREFIX case-kb: <http://hadatac.org/kb/case#> "
         + "SELECT * "
         + "WHERE { ?s <http://hadatac.org/ont/hasco/isSampleOf> " + subject_uri + " }";
         

@@ -41,7 +41,7 @@ public class ViewStudy extends Controller {
 	
 	//public static Map<String, List<String>> findStudyIndicators(String study_uri) {
 	public static Map<String, String> findStudyIndicators(String study_uri) {
-		String indicatorQuery="PREFIX rdfs:<http://www.w3.org/2000/01/rdf-schema#> PREFIX chear: <http://hadatac.org/ont/chear#>SELECT ?studyIndicator ?label ?comment WHERE { ?studyIndicator rdfs:subClassOf chear:StudyIndicator . ?studyIndicator rdfs:label ?label . ?studyIndicator rdfs:comment ?comment . }";
+		String indicatorQuery="PREFIX rdfs:<http://www.w3.org/2000/01/rdf-schema#> PREFIX case: <http://hadatac.org/ont/case#>PREFIX chear: <http://hadatac.org/ont/chear#>SELECT ?studyIndicator ?label ?comment WHERE { ?studyIndicator rdfs:subClassOf chear:StudyIndicator . ?studyIndicator rdfs:label ?label . ?studyIndicator rdfs:comment ?comment . }";
 		QueryExecution qexecInd = QueryExecutionFactory.sparqlService(Collections.getCollectionsName(Collections.METADATA_SPARQL), indicatorQuery);
 		ResultSet indicatorResults = qexecInd.execSelect();
 		ResultSetRewindable resultsrwIndc = ResultSetFactory.copyResults(indicatorResults);
@@ -62,15 +62,15 @@ public class ViewStudy extends Controller {
 		    //System.out.println("Key : " + entry.getKey() + " and Value: " + entry.getValue() + "\n");
 		    String label = entry.getValue().toString().replaceAll(" ", "").replaceAll(",", "").toString() + "Label";
 
-			String indvIndicatorQuery = "PREFIX rdfs:<http://www.w3.org/2000/01/rdf-schema#> PREFIX chear: <http://hadatac.org/ont/chear#>PREFIX chear-kb: <http://hadatac.org/kb/chear#>PREFIX hasco: <http://hadatac.org/ont/hasco/>PREFIX hasneto: <http://hadatac.org/ont/hasneto#>SELECT DISTINCT ?studyUri " +
+			String indvIndicatorQuery = "PREFIX rdfs:<http://www.w3.org/2000/01/rdf-schema#> PREFIX chear: <http://hadatac.org/ont/chear#>PREFIX case: <http://hadatac.org/ont/case#>PREFIX chear-kb: <http://hadatac.org/kb/chear#>PREFIX case-kb: <http://hadatac.org/kb/case#>PREFIX hasco: <http://hadatac.org/ont/hasco/>PREFIX hasneto: <http://hadatac.org/ont/hasneto#>SELECT DISTINCT ?studyUri " +
 					"?" + label + " " +
 					"WHERE { ?schemaUri hasco:isSchemaOf ?studyUri . ?schemaAttribute hasneto:partOfSchema ?schemaUri . ?schemaAttribute hasneto:hasAttribute " +
 					"?" + entry.getValue().toString().replaceAll(" ", "").replaceAll(",", "") +
-					" . ?" + entry.getValue().toString().replaceAll(" ", "").replaceAll(",", "") + " rdfs:subClassOf* " + entry.getKey().toString().replaceAll("http://hadatac.org/ont/chear#","chear:").replaceAll("http://hadatac.org/kb/chear#","chear-kb:") + 
+					" . ?" + entry.getValue().toString().replaceAll(" ", "").replaceAll(",", "") + " rdfs:subClassOf* " + entry.getKey().toString().replaceAll("http://hadatac.org/ont/chear#","chear:").replaceAll("http://hadatac.org/ont/case#","case:").replaceAll("http://hadatac.org/kb/chear#","chear-kb:").replaceAll("http://hadatac.org/kb/case#","case-kb:") + 
 					" . ?" + entry.getValue().toString().replaceAll(" ", "").replaceAll(",", "") + " rdfs:label ?" + label + " . " +
 					"			FILTER ( ?studyUri = " + study_uri + " ) . " +
 					"}";
-			
+			System.out.println(indvIndicatorQuery + "\n");
 			QueryExecution qexecIndvInd = QueryExecutionFactory.sparqlService(Collections.getCollectionsName(Collections.METADATA_SPARQL), indvIndicatorQuery);
 			ResultSet indvIndResults = qexecIndvInd.execSelect();
 			ResultSetRewindable resultsrwIndvInd = ResultSetFactory.copyResults(indvIndResults);
@@ -96,7 +96,9 @@ public class ViewStudy extends Controller {
 		basicQueryString = 
 		"PREFIX sio: <http://semanticscience.org/resource/>" + 
 		"PREFIX chear: <http://hadatac.org/ont/chear#>" + 
+		"PREFIX case: <http://hadatac.org/ont/case#>" + 
 		"PREFIX chear-kb: <http://hadatac.org/kb/chear#>" + 
+		"PREFIX case-kb: <http://hadatac.org/kb/case#>" +
 		"PREFIX prov: <http://www.w3.org/ns/prov#>" + 
 		"PREFIX hasco: <http://hadatac.org/ont/hasco/>" + 
 		"PREFIX hasneto: <http://hadatac.org/ont/hasneto#>" + 
@@ -111,7 +113,7 @@ public class ViewStudy extends Controller {
 		"			FILTER ( ?studyUri = " + study_uri + " ) . " +
 //		"        OPTIONAL { ?studyUri chear-kb:project ?proj. " +
 //		"					?proj rdfs:label ?projLabel} . " + 
-		"		OPTIONAL {?studyUri chear-kb:project ?proj} . " +
+		"		OPTIONAL {?studyUri hasco:hasProject ?proj} . " +
 		"        OPTIONAL { ?studyUri skos:definition ?studyDef } . " + 
 		"        OPTIONAL { ?studyUri rdfs:comment ?studyComment } . " + 
 		"        OPTIONAL { ?studyUri hasco:hasAgent ?agent . " + 
@@ -153,7 +155,9 @@ public class ViewStudy extends Controller {
     	subjectQueryString = 
     	"PREFIX sio: <http://semanticscience.org/resource/>" + 
     	"PREFIX chear: <http://hadatac.org/ont/chear#>" + 
+		"PREFIX case: <http://hadatac.org/ont/case#>" + 
     	"PREFIX chear-kb: <http://hadatac.org/kb/chear#>" + 
+    	"PREFIX case-kb: <http://hadatac.org/kb/case#>" + 
     	"PREFIX prov: <http://www.w3.org/ns/prov#>" + 
     	"PREFIX hasco: <http://hadatac.org/ont/hasco/>" + 
     	"PREFIX hasneto: <http://hadatac.org/ont/hasneto#>" + 

@@ -38,8 +38,10 @@ public class DynamicGeneration extends Controller {
 //	public static Map<String, String> findBasic(String study_uri) {
 	public static Map<String, List<String>> generateStudy() {
 		String prefixString="PREFIX sio: <http://semanticscience.org/resource/> " + 
-				"PREFIX chear: <http://hadatac.org/ont/chear#> " +
-				"PREFIX chear-kb: <http://hadatac.org/kb/chear#> " +
+//				"PREFIX chear: <http://hadatac.org/ont/chear#> " +
+//				"PREFIX chear-kb: <http://hadatac.org/kb/chear#> " +
+//				"PREFIX case: <http://hadatac.org/ont/case#> " +
+//				"PREFIX case-kb: <http://hadatac.org/kb/case#> " +
 				"PREFIX prov: <http://www.w3.org/ns/prov#> " +
 				"PREFIX hasco: <http://hadatac.org/ont/hasco/> " +
 				"PREFIX hasneto: <http://hadatac.org/ont/hasneto#> " +
@@ -54,7 +56,7 @@ public class DynamicGeneration extends Controller {
 				"WHERE {        ?subUri rdfs:subClassOf hasco:Study .  " +
 				"		                      ?studyUri a ?subUri .  " +
 				"	           ?studyUri rdfs:label ?studyLabel  .   " +
-				"					 	?studyUri chear-kb:project ?proj . " +
+				"					 	?studyUri hasco:hasProject ?proj . " +
 				"                                  ?studyUri skos:definition ?studyTitle . " +
 				"                                   ?studyUri rdfs:comment ?studyComment . " +
 				"                                  ?studyUri hasco:hasAgent ?agent .  " +
@@ -86,7 +88,7 @@ public class DynamicGeneration extends Controller {
 			
 			initStudyJson=initStudyJson + ",\n\"add\":\n\t{\n\t\"doc\":\n\t\t{\n";
 			initStudyJson=initStudyJson + "\t\t\"studyUri\": \"" + soln.get("studyUri").toString() + "\" ,\n";
-			initStudyJson=initStudyJson + "\t\t\"studyLabel\": \"<a href=\\\"./metadataacquisitions/viewStudy?study_uri=" + soln.get("studyUri").toString().replaceAll("http://hadatac.org/ont/chear#","chear:").replaceAll("http://hadatac.org/kb/chear#","chear-kb:") + "\\\">" + soln.get("studyLabel").toString() + "</a>\" ,\n";
+			initStudyJson=initStudyJson + "\t\t\"studyLabel\": \"<a href=\\\"./metadataacquisitions/viewStudy?study_uri=" + soln.get("studyUri").toString().replaceAll("http://hadatac.org/ont/chear#","chear:").replaceAll("http://hadatac.org/ont/case#","case:").replaceAll("http://hadatac.org/kb/chear#","chear-kb:").replaceAll("http://hadatac.org/kb/case#","case-kb:") + "\\\">" + soln.get("studyLabel").toString() + "</a>\" ,\n";
 			//initStudyJson=initStudyJson + "\t\t\"studyTitle\": \"<a href=\\\"./metadataacquisitions/viewStudy?study_uri=" + soln.get("studyUri").toString().replaceAll("http://hadatac.org/ont/chear#","chear:").replaceAll("http://hadatac.org/kb/chear#","chear-kb:") + "\\\">" + soln.get("studyTitle").toString() + "</a>\" ,\n";
 			initStudyJson=initStudyJson + "\t\t\"studyTitle\": \"" + soln.get("studyTitle").toString() + "\" ,\n";
 			initStudyJson=initStudyJson + "\t\t\"proj\": \"" + soln.get("proj").toString() + "\" ,\n";
@@ -157,11 +159,11 @@ public class DynamicGeneration extends Controller {
 			facetSearchSortString=facetSearchSortString + ",{'display':'" + entry.getValue().toString() + "','field':'" + label + ".exact'}" ;
 			schemaString=schemaString + "    <field name=\"" + label + "\" type=\"string\" indexed=\"true\" docValues=\"true\" multiValued=\"true\"  />\n" ;
 
-			String indvIndicatorQuery = "PREFIX rdfs:<http://www.w3.org/2000/01/rdf-schema#> PREFIX chear: <http://hadatac.org/ont/chear#>PREFIX hasco: <http://hadatac.org/ont/hasco/>PREFIX hasneto: <http://hadatac.org/ont/hasneto#>SELECT DISTINCT ?studyUri " +
+			String indvIndicatorQuery = "PREFIX rdfs:<http://www.w3.org/2000/01/rdf-schema#> PREFIX chear: <http://hadatac.org/ont/chear#> PREFIX case: <http://hadatac.org/ont/case#>PREFIX hasco: <http://hadatac.org/ont/hasco/>PREFIX hasneto: <http://hadatac.org/ont/hasneto#>SELECT DISTINCT ?studyUri " +
 					"?" + label + " " +
 					"WHERE { ?schemaUri hasco:isSchemaOf ?studyUri . ?schemaAttribute hasneto:partOfSchema ?schemaUri . ?schemaAttribute hasneto:hasAttribute " +
 					"?" + entry.getValue().toString().replaceAll(" ", "").replaceAll(",", "") +
-					" . ?" + entry.getValue().toString().replaceAll(" ", "").replaceAll(",", "") + " rdfs:subClassOf* " + entry.getKey().toString().replaceAll("http://hadatac.org/ont/chear#","chear:").replaceAll("http://hadatac.org/kb/chear#","chear-kb:") + 
+					" . ?" + entry.getValue().toString().replaceAll(" ", "").replaceAll(",", "") + " rdfs:subClassOf* " + entry.getKey().toString().replaceAll("http://hadatac.org/ont/chear#","chear:").replaceAll("http://hadatac.org/ont/case#","case:").replaceAll("http://hadatac.org/kb/chear#","chear-kb:") + 
 					" . ?" + entry.getValue().toString().replaceAll(" ", "").replaceAll(",", "") + " rdfs:label ?" + label + " . " +
 					"}";
 //			System.out.println(indvIndicatorQuery + "\n");
@@ -304,6 +306,8 @@ public class DynamicGeneration extends Controller {
 									  "</schema> " ;
 		System.out.println(facetPageString);
 		System.out.println(schemaString);
+		
+		// Generate facet view html.scala file
 		try {
 			File facetPage = new File("./app/org/hadatac/console/views/metadataacquisition/metadataacquisition.scala.html");
 			FileWriter facetPageStream = new FileWriter(facetPage,false);
@@ -313,6 +317,7 @@ public class DynamicGeneration extends Controller {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} 
+		// Generate schema.xml file
 		try {
 			File schemaXML = new File(Play.application().configuration().getString("hadatac.solr.home") + "/solr-home/studies_facet/conf/schema.xml");
 			FileWriter schemaXMLStream = new FileWriter(schemaXML,false);
@@ -322,6 +327,16 @@ public class DynamicGeneration extends Controller {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} 
+		// Delete Existing Data
+	/*	try {
+			ProcessBuilder p=new ProcessBuilder("curl","http://localhost:8983/solr/studies/update?commit=true", "-H","Content-type:text/xml",
+	                "--data-binary","'<delete><query>*:*</query></delete>'");
+			final Process shell = p.start();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}*/
+		// Add Studies
 		try {
 			ProcessBuilder p=new ProcessBuilder("curl","http://localhost:8983/solr/studies/update?commit=true", "-H","Content-type:application/json",
 	                "--data-binary",initStudyJson );
@@ -330,7 +345,7 @@ public class DynamicGeneration extends Controller {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
+		// Add Indicators
 		try {
 			ProcessBuilder p=new ProcessBuilder("curl","http://localhost:8983/solr/studies/update?commit=true", "-H","Content-type:application/json",
 	                "--data-binary",updateIndicatorJson );
