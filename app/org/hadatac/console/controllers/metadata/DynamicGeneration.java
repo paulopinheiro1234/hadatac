@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
+import play.Play;
 import play.mvc.Controller;
 import play.mvc.Result;
 
@@ -138,7 +139,7 @@ public class DynamicGeneration extends Controller {
 							   "    facets: [ \n" ;
 		String facetSearchSortString="[{'display':'Study URI', 'field':'studyUri.exact'}";
 		String schemaString="<?xml version=\"1.0\" encoding=\"UTF-8\" ?>\n" +
-							"<schema version=\"1.5\">\n" + 
+							"<schema version=\"1.5\"><!-- This schema was Dynamically Generated -->\n" + 
 							"  <fields>\n" + 
 						    "    <field name=\"studyUri\" type=\"string\" indexed=\"true\" stored=\"true\"/>\n" +
 						    "    <field name=\"studyLabel\" type=\"string\" indexed=\"true\" docValues=\"true\" />\n" +
@@ -312,7 +313,15 @@ public class DynamicGeneration extends Controller {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} 
-		
+		try {
+			File schemaXML = new File(Play.application().configuration().getString("hadatac.solr.home") + "/solr-home/studies_facet/conf/schema.xml");
+			FileWriter schemaXMLStream = new FileWriter(schemaXML,false);
+			schemaXMLStream.write(schemaString);
+			schemaXMLStream.close();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} 
 		try {
 			ProcessBuilder p=new ProcessBuilder("curl","http://localhost:8983/solr/studies/update?commit=true", "-H","Content-type:application/json",
 	                "--data-binary",initStudyJson );
