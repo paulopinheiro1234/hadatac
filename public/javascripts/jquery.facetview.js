@@ -1043,7 +1043,7 @@ search box - the end user will not know they are happening.
             $('.facetview_filterchoice', obj).bind('click',clickfilterchoice);
             $('.facetview_filters', obj).each(function() {
                 $(this).find('.facetview_filtershow').css({'color':'#333','font-weight':'bold'}).children('i').show();
-                if ( $(this).children().find('.facetview_filtervalue').length > 1 ) {
+                if ( $(this).children().find('.facetview_filtervalue').length > 0 ) {
                     $(this).show();
                 } else {
                     //$(this).hide();
