@@ -68,9 +68,9 @@ public class ViewStudy extends Controller {
 					"?" + entry.getValue().toString().replaceAll(" ", "").replaceAll(",", "") +
 					" . ?" + entry.getValue().toString().replaceAll(" ", "").replaceAll(",", "") + " rdfs:subClassOf* " + entry.getKey().toString().replaceAll("http://hadatac.org/ont/chear#","chear:").replaceAll("http://hadatac.org/ont/case#","case:").replaceAll("http://hadatac.org/kb/chear#","chear-kb:").replaceAll("http://hadatac.org/kb/case#","case-kb:") + 
 					" . ?" + entry.getValue().toString().replaceAll(" ", "").replaceAll(",", "") + " rdfs:label ?" + label + " . " +
-					"			FILTER ( ?studyUri = " + study_uri + " ) . " +
+					"			FILTER ( ?studyUri = " + study_uri.replaceAll("http://hadatac.org/ont/chear#","chear:").replaceAll("http://hadatac.org/ont/case#","case:").replaceAll("http://hadatac.org/kb/chear#","chear-kb:").replaceAll("http://hadatac.org/kb/case#","case-kb:") + " ) . " +
 					"}";
-			System.out.println(indvIndicatorQuery + "\n");
+			//System.out.println(indvIndicatorQuery + "\n");
 			QueryExecution qexecIndvInd = QueryExecutionFactory.sparqlService(Collections.getCollectionsName(Collections.METADATA_SPARQL), indvIndicatorQuery);
 			ResultSet indvIndResults = qexecIndvInd.execSelect();
 			ResultSetRewindable resultsrwIndvInd = ResultSetFactory.copyResults(indvIndResults);
@@ -78,14 +78,14 @@ public class ViewStudy extends Controller {
 			String indvIndicatorString="";
 			while (resultsrwIndvInd.hasNext()) {
 				QuerySolution soln = resultsrwIndvInd.next();
-				System.out.println("Solution: " + soln);
+				//System.out.println("Solution: " + soln);
 				indvIndicatorString += soln.get(label).toString() + ", ";
-				System.out.println("Indicator String: " + indvIndicatorString);
+				//System.out.println("Indicator String: " + indvIndicatorString);
 			}
 			if (indvIndicatorString != ""){
 				indvIndicatorString = indvIndicatorString.substring(0, indvIndicatorString.length()-2);
+				indicatorValues.put(entry.getValue().toString(),indvIndicatorString);
 			}
-			indicatorValues.put(entry.getValue().toString(),indvIndicatorString);
 		}
 		return indicatorValues;
 	}

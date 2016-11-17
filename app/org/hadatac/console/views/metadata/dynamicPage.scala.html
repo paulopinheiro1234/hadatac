@@ -1,5 +1,6 @@
 @(studyResult      : Map[String, List[String]],
-  subjectResult	: Map[String, List[String]])
+  subjectResult	: Map[String, List[String]],
+  indicatorResult : Map[String, Map[String, String]])
 
 @import org.hadatac.console.views.html._
 @import org.hadatac.utils._
@@ -25,6 +26,18 @@
 							<ul>
 							@for(s <- studyResult.get(key)) {
 							<li>@s.toString</li>
+							}
+							</ul>
+							<ul>
+							@for(indKey <- indicatorResult.keySet()) {
+							@if(indKey.toString == key.toString){
+								<li>Indicators</li>
+									<ul>
+									@for(r <- indicatorResult.get(indKey)){
+									<li>@r.toString.replaceFirst(",",":")</li>
+									}
+									</ul>
+								}
 							}
 							</ul>
 						</li>
