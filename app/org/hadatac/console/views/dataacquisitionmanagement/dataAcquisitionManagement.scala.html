@@ -15,19 +15,19 @@
       <div class="row">
          <div class="navbar-collapse collapse navbar-secondary">
         	@if(state.getCurrent() == State.ACTIVE) {
-            	<a href='@org.hadatac.console.controllers.dataacquisitions.routes.DataAcquisitionManagement.index(State.ACTIVE)' class="btn-sm btn-warning disabled" role="button">Active Acquisitions</a>
+            	<a href='@org.hadatac.console.controllers.dataacquisitionmanagement.routes.DataAcquisitionManagement.index(State.ACTIVE)' class="btn-sm btn-warning disabled" role="button">Active Acquisitions</a>
             } else {
-            	<a href='@org.hadatac.console.controllers.dataacquisitions.routes.DataAcquisitionManagement.index(State.ACTIVE)' class="btn-sm btn-primary" role="button">Active Acquisitions</a>
+            	<a href='@org.hadatac.console.controllers.dataacquisitionmanagement.routes.DataAcquisitionManagement.index(State.ACTIVE)' class="btn-sm btn-primary" role="button">Active Acquisitions</a>
             } 	
         	@if(state.getCurrent() == State.CLOSED) {
-             	<a href='@org.hadatac.console.controllers.dataacquisitions.routes.DataAcquisitionManagement.index(State.CLOSED)' class="btn-sm btn-warning disabled" role="button">Closed Acquisitions</a>
+             	<a href='@org.hadatac.console.controllers.dataacquisitionmanagement.routes.DataAcquisitionManagement.index(State.CLOSED)' class="btn-sm btn-warning disabled" role="button">Closed Acquisitions</a>
             } else {
-             	<a href='@org.hadatac.console.controllers.dataacquisitions.routes.DataAcquisitionManagement.index(State.CLOSED)' class="btn-sm btn-primary" role="button">Closed Acquisitions</a>
+             	<a href='@org.hadatac.console.controllers.dataacquisitionmanagement.routes.DataAcquisitionManagement.index(State.CLOSED)' class="btn-sm btn-primary" role="button">Closed Acquisitions</a>
             }
         	@if(state.getCurrent() == State.ALL) {
-             	<a href='@org.hadatac.console.controllers.dataacquisitions.routes.DataAcquisitionManagement.index(State.ALL)' class="btn-sm btn-warning disabled" role="button">All Acquisitions</a>
+             	<a href='@org.hadatac.console.controllers.dataacquisitionmanagement.routes.DataAcquisitionManagement.index(State.ALL)' class="btn-sm btn-warning disabled" role="button">All Acquisitions</a>
             } else {
-             	<a href='@org.hadatac.console.controllers.dataacquisitions.routes.DataAcquisitionManagement.index(State.ALL)' class="btn-sm btn-primary" role="button">All Acquisitions</a>
+             	<a href='@org.hadatac.console.controllers.dataacquisitionmanagement.routes.DataAcquisitionManagement.index(State.ALL)' class="btn-sm btn-primary" role="button">All Acquisitions</a>
             }
          </div>
       </div>

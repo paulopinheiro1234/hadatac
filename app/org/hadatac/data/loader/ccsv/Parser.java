@@ -92,9 +92,8 @@ public class Parser {
 			e.printStackTrace();
 		}
 		
-		solr = new HttpSolrClient(hadatacCcsv.getMeasurementURL());
 		try {
-			indexMeasurements(solr);
+			indexMeasurements();
 			System.out.println("solr.commit()...");
 			solr.commit();
 			solr.close();
@@ -106,27 +105,30 @@ public class Parser {
 		return 0;
 	}
 	
-	private int indexMeasurements(SolrClient solr) throws IOException {
-		System.out.println("indexMeasurements(solr)...");
+	private int indexMeasurements() throws IOException {
+		System.out.println("indexMeasurements()...");
 		
 		files.openFile("csv", "r");
 		Iterable<CSVRecord> records = CSVFormat.DEFAULT.withHeader().parse(files.getReader("csv"));
-		Measurement measurement = new Measurement();
 		int count = 0;
 		for (CSVRecord record : records) {
 			Iterator<MeasurementType> i = hadatacKb.dataset.measurementTypes.iterator();
 			while (i.hasNext()) {
 				MeasurementType measurementType = i.next();
+				Measurement measurement = new Measurement();
 				measurement.setUri(hadatacCcsv.getMeasurementUri() + hadatacCcsv.dataset.getLocalName() + "/" + measurementType.getLocalName() + "-" + count);
 				if (measurementType.getTimestampColumn() > -1) {
 					System.out.println("measurementType.getTimestampColumn() > -1");
 					measurement.setTimestampXsd(record.get(measurementType.getTimestampColumn()));
 				}
 				measurement.setOwnerUri(hadatacKb.dataCollection.getOwnerUri());
+				measurement.setAcquisitionUri(hadatacKb.dataCollection.getUri());
 				measurement.setPermissionUri(hadatacKb.dataCollection.getPermissionUri());
 				//measurement.setValue(Double.parseDouble(record.get(measurementType.getValueColumn())));
 				if(record.get(measurementType.getValueColumn() - 1).isEmpty()){
-					measurement.setValue("NO_VALUE");
+					//measurement.setValue("NO_VALUE");
+					System.out.println("NO_VALUE");
+					continue;
 				}
 				else{
 					measurement.setValue(record.get(measurementType.getValueColumn() - 1));
@@ -142,7 +144,7 @@ public class Parser {
 				measurement.setEntity(measurementType.getEntityLabel());
 				measurement.setEntityUri(measurementType.getEntityUri());
 				measurement.setDatasetUri(hadatacCcsv.getDatasetKbUri());
-				measurement.save(solr);
+				measurement.save();
 			}
 			count++;
 		}
@@ -151,7 +153,7 @@ public class Parser {
 		hadatacKb.dataCollection.save();
 		
 		files.closeFile("csv", "r");
-		System.out.println("Finished indexMeasurements(solr)");
+		System.out.println("Finished indexMeasurements()");
 		return 0;
 	}
 	
@@ -159,11 +161,7 @@ public class Parser {
 		System.out.println("loadFromKb is called!");
 		
 		String message = "";
-		
-		// hadatac
 		hadatacKb = HADataC.find();
-		
-		// datacollection
 		hadatacKb.dataCollection = DataAcquisition.find(hadatacCcsv);
 		if (hadatacCcsv.dataCollection.getStatus() > 0) {
 			if (hadatacKb.dataCollection == null) {

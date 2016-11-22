@@ -1,4 +1,4 @@
-package org.hadatac.console.controllers.dataacquisition;
+package org.hadatac.console.controllers.dataacquisitionsearch;
 
 import org.hadatac.console.http.JsonHandler;
 
@@ -18,7 +18,7 @@ import play.mvc.Controller;
 import play.mvc.Result;
 
 import org.hadatac.console.views.formdata.FacetFormData;
-import org.hadatac.console.views.html.dataacquisition.dataacquisition_browser;
+import org.hadatac.console.views.html.dataacquisitionsearch.dataacquisition_browser;
 import org.hadatac.data.model.AcquisitionQueryResult;
 import org.hadatac.entity.pojo.Measurement;
 
@@ -97,20 +97,6 @@ public class DataAcquisitionSearch extends Controller {
     }
 
     public static Result postIndex(int page, int rows, String facets) {
-    	ObjectMapper mapper = new ObjectMapper();
-    	
-    	List<String> permissions = getPermissions(session().get("user_hyerarchy"));
-    	
-    	FacetHandler handler = null;
-    	try {
-    		handler = mapper.readValue(facets, FacetHandler.class);
-    	} catch (Exception e) {
-    		handler = new FacetHandler();
-    		System.out.println("mapper.readValue: " + e.getMessage());
-    	}
-    	
-    	AcquisitionQueryResult results = Measurement.find(page, rows, permissions, handler);
-    	
-    	return ok(dataacquisition_browser.render(results, results.toJSON(), handler.toJSON()));
+    	return index(page, rows, facets);
     }
 }

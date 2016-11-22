@@ -5,7 +5,7 @@
 @import org.hadatac.utils._
 @import org.hadatac.console.views.html._
 @import org.hadatac.console.controllers._
-@import org.hadatac.console.controllers.dataacquisitions._
+@import org.hadatac.console.controllers.dataacquisitionmanagement._
 
 @main("Change Data Access Permission") {
 
@@ -24,7 +24,7 @@
            <li><b>Current Permission:</b> @dc.getPermissionUri()</li>
        </ul>
 
-       <form class="form-horizontal" name="newPermission" method="post" action="@org.hadatac.console.controllers.dataacquisitions.routes.SetAccessPermission.newPermission(dc.getUri())">
+       <form class="form-horizontal" name="newPermission" method="post" action="@org.hadatac.console.controllers.dataacquisitionmanagement.routes.SetAccessPermission.newPermission(dc.getUri())">
        
            <div class="form-group">
               <label>New Permission</label>
@@ -48,7 +48,7 @@
        </form>
 
        <br>
-       <a href="@org.hadatac.console.controllers.dataacquisitions.routes.DataAcquisitionManagement.index(State.ACTIVE)" class="btn btn-warning" role="button">Back to Data Acquisition Management</a>
+       <a href="@org.hadatac.console.controllers.dataacquisitionmanagement.routes.DataAcquisitionManagement.index(State.ACTIVE)" class="btn btn-warning" role="button">Back to Data Acquisition Management</a>
 
     </div>
 

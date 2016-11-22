@@ -21,7 +21,7 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.hadatac.console.controllers.AuthApplication;
-import org.hadatac.console.controllers.dataacquisition.LoadCCSV;
+import org.hadatac.console.controllers.dataacquisitionsearch.LoadCCSV;
 import org.hadatac.console.controllers.triplestore.LoadKB;
 import org.hadatac.console.controllers.triplestore.UserManagement;
 import org.hadatac.console.http.DataAcquisitionSchemaQueries;

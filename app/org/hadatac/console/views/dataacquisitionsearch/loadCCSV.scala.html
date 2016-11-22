@@ -2,7 +2,7 @@
 
 @import helper._
 @import org.hadatac.console.views.html._
-@import org.hadatac.console.controllers.dataacquisition._
+@import org.hadatac.console.controllers.dataacquisitionsearch._
 @import org.hadatac.data.loader._
 @import org.hadatac.metadata.loader._
 @import java.net._
@@ -22,11 +22,11 @@
                  The measurement store has @DataContext.playTotalMeasurements() measurements. <br>
 
 
-              <form name="fileUploadForm" method="POST" enctype="multipart/form-data" action="@org.hadatac.console.controllers.dataacquisition.routes.LoadCCSV.uploadFile()">
+              <form name="fileUploadForm" method="POST" enctype="multipart/form-data" action="@org.hadatac.console.controllers.dataacquisitionsearch.routes.LoadCCSV.uploadFile()">
                      <input type="file" class="btn btn-info" name="pic">
                      Are your sure you want to have the CCSV file loaded and indexed into the measurements repository?
                      <input type="submit" class="btn btn-success" value="Confirm">
-                     <a href="@org.hadatac.console.controllers.dataacquisition.routes.LoadCCSV.loadCCSV("cancelled")" class="btn btn-danger" role="button">Cancel</a>
+                     <a href="@org.hadatac.console.controllers.dataacquisitionsearch.routes.LoadCCSV.loadCCSV("cancelled")" class="btn btn-danger" role="button">Cancel</a>
               </form>
             }
 
