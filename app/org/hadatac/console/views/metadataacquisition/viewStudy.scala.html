@@ -1,5 +1,6 @@
 @(studyResult      : Map[String, List[String]],
-  subjectResult	: Map[String, List[String]])
+  subjectResult	: Map[String, List[String]],
+  indicatorValues : Map[String,String])
 
 @import org.hadatac.console.views.html._
 @import org.hadatac.utils._
@@ -21,22 +22,33 @@
              <h2>Basic Info</h2>
 				<ul>        		
 					@for(key <- studyResult.keySet()){
-						<li>@key.toString.replaceAll("http://hadatac.org/ont/chear#","chear:").replaceAll("http://hadatac.org/kb/chear#","chear-kb:")
+						<li>@key.toString.replaceAll("http://hadatac.org/ont/chear#","chear:").replaceAll("http://hadatac.org/ont/case#","case:").replaceAll("http://hadatac.org/kb/chear#","chear-kb:").replaceAll("http://hadatac.org/kb/case#","case-kb:")
 							<ul>
 							@for(s <- studyResult.get(key)) {
-							<li>@s.toString.replaceAll("http://hadatac.org/ont/chear#","chear:").replaceAll("http://hadatac.org/kb/chear#","chear-kb:")</li>
+							<li>@s.toString.replaceAll("http://hadatac.org/ont/chear#","chear:").replaceAll("http://hadatac.org/ont/case#","case:").replaceAll("http://hadatac.org/kb/chear#","chear-kb:").replaceAll("http://hadatac.org/kb/case#","case-kb:")</li>
 							}
 							</ul>
 						</li>
 					}
 				</ul>
+			<h3>Indicators</h3>
+				<ul>
+					@for(key <- indicatorValues.keySet()){
+						@if(indicatorValues.get(key).toString!=""){
+						<li>@key.toString</li>
+						<ul>
+							@indicatorValues.get(key).toString
+						</ul>
+						}
+					}
+				</ul>
 			<h3>Subject List</h3>
 				<ul>        		
 					@for(key <- subjectResult.keySet()){
-						<li><a href="./viewSubject?subject_uri=@key.toString.replaceAll("http://hadatac.org/ont/chear#","chear:").replaceAll("http://hadatac.org/kb/chear#","chear-kb:")">@key.toString.replaceAll("http://hadatac.org/ont/chear#","chear:").replaceAll("http://hadatac.org/kb/chear#","chear-kb:")</a>
+						<li><a href="./viewSubject?subject_uri=@key.toString.replaceAll("http://hadatac.org/ont/chear#","chear:").replaceAll("http://hadatac.org/ont/case#","case:").replaceAll("http://hadatac.org/kb/chear#","chear-kb:").replaceAll("http://hadatac.org/ont/case#","case:").replaceAll("http://hadatac.org/kb/chear#","chear-kb:").replaceAll("http://hadatac.org/kb/case#","case-kb:")">@key.toString.replaceAll("http://hadatac.org/ont/chear#","chear:").replaceAll("http://hadatac.org/kb/chear#","chear-kb:").replaceAll("http://hadatac.org/kb/case#","case-kb:")</a>
 							<ul>
 							@for(s <- subjectResult.get(key)) {
-							<li>@s.toString.replaceAll("http://hadatac.org/ont/chear#","chear:").replaceAll("http://hadatac.org/kb/chear#","chear-kb:")</li>
+							<li>@s.toString.replaceAll("http://hadatac.org/ont/chear#","chear:").replaceAll("http://hadatac.org/ont/case#","case:").replaceAll("http://hadatac.org/kb/chear#","chear-kb:").replaceAll("http://hadatac.org/kb/case#","case-kb:")</li>
 							}
 							</ul>
 						</li>

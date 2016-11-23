@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 
 import play.mvc.Controller;
 import play.mvc.Result;
@@ -38,14 +39,66 @@ import be.objectify.deadbolt.java.actions.Restrict;
 
 public class ViewStudy extends Controller {
 	
-//	public static Map<String, String> findBasic(String study_uri) {
+	//public static Map<String, List<String>> findStudyIndicators(String study_uri) {
+	public static Map<String, String> findStudyIndicators(String study_uri) {
+		String indicatorQuery="PREFIX rdfs:<http://www.w3.org/2000/01/rdf-schema#> PREFIX case: <http://hadatac.org/ont/case#>PREFIX chear: <http://hadatac.org/ont/chear#>SELECT ?studyIndicator ?label ?comment WHERE { ?studyIndicator rdfs:subClassOf chear:StudyIndicator . ?studyIndicator rdfs:label ?label . ?studyIndicator rdfs:comment ?comment . }";
+		QueryExecution qexecInd = QueryExecutionFactory.sparqlService(Collections.getCollectionsName(Collections.METADATA_SPARQL), indicatorQuery);
+		ResultSet indicatorResults = qexecInd.execSelect();
+		ResultSetRewindable resultsrwIndc = ResultSetFactory.copyResults(indicatorResults);
+		qexecInd.close();
+		
+		Map<String, String> indicatorMap = new HashMap<String, String>();
+		String indicatorLabel = "";
+		while (resultsrwIndc.hasNext()) {
+			QuerySolution soln = resultsrwIndc.next();
+			indicatorLabel = soln.get("label").toString();
+			indicatorMap.put(soln.get("studyIndicator").toString(),indicatorLabel);		
+		}
+		Map<String, String> indicatorMapSorted = new TreeMap<String, String>(indicatorMap);
+		
+		Map<String, String> indicatorValues = new HashMap<String, String>();
+		
+		for(Map.Entry<String, String> entry : indicatorMapSorted.entrySet()){
+		    //System.out.println("Key : " + entry.getKey() + " and Value: " + entry.getValue() + "\n");
+		    String label = entry.getValue().toString().replaceAll(" ", "").replaceAll(",", "").toString() + "Label";
+
+			String indvIndicatorQuery = "PREFIX rdfs:<http://www.w3.org/2000/01/rdf-schema#> PREFIX chear: <http://hadatac.org/ont/chear#>PREFIX case: <http://hadatac.org/ont/case#>PREFIX chear-kb: <http://hadatac.org/kb/chear#>PREFIX case-kb: <http://hadatac.org/kb/case#>PREFIX hasco: <http://hadatac.org/ont/hasco/>PREFIX hasneto: <http://hadatac.org/ont/hasneto#>SELECT DISTINCT ?studyUri " +
+					"?" + label + " " +
+					"WHERE { ?schemaUri hasco:isSchemaOf ?studyUri . ?schemaAttribute hasneto:partOfSchema ?schemaUri . ?schemaAttribute hasneto:hasAttribute " +
+					"?" + entry.getValue().toString().replaceAll(" ", "").replaceAll(",", "") +
+					" . ?" + entry.getValue().toString().replaceAll(" ", "").replaceAll(",", "") + " rdfs:subClassOf* " + entry.getKey().toString().replaceAll("http://hadatac.org/ont/chear#","chear:").replaceAll("http://hadatac.org/ont/case#","case:").replaceAll("http://hadatac.org/kb/chear#","chear-kb:").replaceAll("http://hadatac.org/kb/case#","case-kb:") + 
+					" . ?" + entry.getValue().toString().replaceAll(" ", "").replaceAll(",", "") + " rdfs:label ?" + label + " . " +
+					"			FILTER ( ?studyUri = " + study_uri.replaceAll("http://hadatac.org/ont/chear#","chear:").replaceAll("http://hadatac.org/ont/case#","case:").replaceAll("http://hadatac.org/kb/chear#","chear-kb:").replaceAll("http://hadatac.org/kb/case#","case-kb:") + " ) . " +
+					"}";
+			//System.out.println(indvIndicatorQuery + "\n");
+			QueryExecution qexecIndvInd = QueryExecutionFactory.sparqlService(Collections.getCollectionsName(Collections.METADATA_SPARQL), indvIndicatorQuery);
+			ResultSet indvIndResults = qexecIndvInd.execSelect();
+			ResultSetRewindable resultsrwIndvInd = ResultSetFactory.copyResults(indvIndResults);
+			qexecIndvInd.close();
+			String indvIndicatorString="";
+			while (resultsrwIndvInd.hasNext()) {
+				QuerySolution soln = resultsrwIndvInd.next();
+				//System.out.println("Solution: " + soln);
+				indvIndicatorString += soln.get(label).toString() + ", ";
+				//System.out.println("Indicator String: " + indvIndicatorString);
+			}
+			if (indvIndicatorString != ""){
+				indvIndicatorString = indvIndicatorString.substring(0, indvIndicatorString.length()-2);
+				indicatorValues.put(entry.getValue().toString(),indvIndicatorString);
+			}
+		}
+		return indicatorValues;
+	}
+	
 	public static Map<String, List<String>> findBasic(String study_uri) {
 		String basicQueryString = "";
 
 		basicQueryString = 
 		"PREFIX sio: <http://semanticscience.org/resource/>" + 
 		"PREFIX chear: <http://hadatac.org/ont/chear#>" + 
+		"PREFIX case: <http://hadatac.org/ont/case#>" + 
 		"PREFIX chear-kb: <http://hadatac.org/kb/chear#>" + 
+		"PREFIX case-kb: <http://hadatac.org/kb/case#>" +
 		"PREFIX prov: <http://www.w3.org/ns/prov#>" + 
 		"PREFIX hasco: <http://hadatac.org/ont/hasco/>" + 
 		"PREFIX hasneto: <http://hadatac.org/ont/hasneto#>" + 
@@ -60,7 +113,7 @@ public class ViewStudy extends Controller {
 		"			FILTER ( ?studyUri = " + study_uri + " ) . " +
 //		"        OPTIONAL { ?studyUri chear-kb:project ?proj. " +
 //		"					?proj rdfs:label ?projLabel} . " + 
-		"		OPTIONAL {?studyUri chear-kb:project ?proj} . " +
+		"		OPTIONAL {?studyUri hasco:hasProject ?proj} . " +
 		"        OPTIONAL { ?studyUri skos:definition ?studyDef } . " + 
 		"        OPTIONAL { ?studyUri rdfs:comment ?studyComment } . " + 
 		"        OPTIONAL { ?studyUri hasco:hasAgent ?agent . " + 
@@ -102,7 +155,9 @@ public class ViewStudy extends Controller {
     	subjectQueryString = 
     	"PREFIX sio: <http://semanticscience.org/resource/>" + 
     	"PREFIX chear: <http://hadatac.org/ont/chear#>" + 
+		"PREFIX case: <http://hadatac.org/ont/case#>" + 
     	"PREFIX chear-kb: <http://hadatac.org/kb/chear#>" + 
+    	"PREFIX case-kb: <http://hadatac.org/kb/case#>" + 
     	"PREFIX prov: <http://www.w3.org/ns/prov#>" + 
     	"PREFIX hasco: <http://hadatac.org/ont/hasco/>" + 
     	"PREFIX hasneto: <http://hadatac.org/ont/hasneto#>" + 
@@ -146,12 +201,12 @@ public class ViewStudy extends Controller {
 	// for /metadata HTTP GET requests
 	@Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
     public static Result index(String study_uri) {
-
+		Map<String, String> indicatorValues = findStudyIndicators(study_uri);
  //   	Map<String, String> poResult = findBasic(study_uri);
 		Map<String, List<String>> poResult = findBasic(study_uri);
 		Map<String, List<String>> subjectResult = findSubject(study_uri);
         
-    	return ok(viewStudy.render(poResult,subjectResult));
+    	return ok(viewStudy.render(poResult,subjectResult,indicatorValues));
     
         
     }// /index()
