@@ -1,19 +1,29 @@
 @(triple : org.hadatac.console.models.TripleDocument)
 @*****************************
-  cleanURI    | modelName
+  cleanURI/label    | id (array[0])
   rdfs:subClassOf   | superModelName
 *****************************@
 
-@defining(triple.get("modelName").replaceAll("[\\W]|_", "")) {itemID =>
-<div class="panel-heading" role="tab" id="heading@itemID">
-    <h4 class="panel-title">
-        <a class="collapsed" role="button" data-toggle="collapse" data-parent="#accordion" href="#@itemID" aria-expanded="false" aria-controls="@itemID">
-            @triple.get("modelName")</a></h4>
+@defining(triple.get("label")) {itemID =>
+    @defining(itemID.replaceAll("[\\W]|_", "")) {cleanName =>
+    <div class="panel-heading" role="tab" id="heading@itemID">
+        <h4 class="panel-title">
         
-</div>
-<div id="@itemID" class="panel-collapse collapse" role="tabpanel" aria-labelledby="heading@itemID">
-    <div class="panel-body">
-        <h4>@triple.get("modelName") </h4> 
+            <a class="collapsed" role="button" data-toggle="collapse" data-parent="#accordion" href="#@cleanName" aria-expanded="false" aria-controls="@cleanName">
+                @itemID</a></h4>
+            
     </div>
-</div>
+    <div id="@cleanName" class="panel-collapse collapse" role="tabpanel" aria-labelledby="heading@cleanName">
+        <div class="panel-body">
+            <h3>@itemID</h3>
+            @defining(triple.get("label")) {theuri =>
+            <form>
+                <input type="text" size="80" value="@theuri">
+            </form>
+            }
+        </div>
+        <h4>Comment:</h4>
+            <p>@triple.get("comment")<p>
+    </div>
+    }
 }

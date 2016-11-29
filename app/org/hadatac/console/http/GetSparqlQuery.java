@@ -295,14 +295,12 @@ public class GetSparqlQuery {
             case "Units" : 
                 q = "PREFIX rdfs:<http://www.w3.org/2000/01/rdf-schema#>" + 
                     "PREFIX owl: <http://www.w3.org/2002/07/owl#>" + 
-                    "PREFIX oboe: <http://ecoinformatics.org/oboe/oboe.1.0/oboe-core.owl#>" +
                     "PREFIX obo: <http://geneontology.org/GO.format.obo-1_2.shtml#>" +
-                    "SELECT ?id ?superModelName ?chara ?label WHERE { " + 
+                    "SELECT ?id ?superModelName ?comment ?label WHERE { " + 
                     "   ?id rdfs:subClassOf* obo:UO_0000000 . " + 
                     "   ?id rdfs:subClassOf ?superModelName .  " + 
                     "   OPTIONAL { ?id rdfs:label ?label } ." +
-                    "   OPTIONAL { ?id oboe:standardFor ?m .  " + 
-                    "              ?m oboe:ofCharacteristic ?chara } . " +
+                    "   OPTIONAL { ?id rdfs:comment ?comment } . " +
                     "}";
                 break;
             case "SensingPerspectives" : 
