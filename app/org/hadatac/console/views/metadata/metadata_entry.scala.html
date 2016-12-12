@@ -1,5 +1,5 @@
 @(triple : org.hadatac.console.models.OtMTripleDocument)
-  
+
 @*****************************
   hasURI/label    | id (array[0])
 *****************************@
@@ -8,11 +8,9 @@
     @defining(itemID.replaceAll("[\\W]|_", "")) {cleanName =>
     <div class="panel-heading" role="tab" id="heading@itemID">
         <h4 class="panel-title">
-        
             <a class="collapsed" role="button" data-toggle="collapse" data-parent="#accordion" href="#@cleanName" aria-expanded="false" aria-controls="@cleanName">
                 @itemID</a></h4>
-            
-    </div>
+	 </div>
     <div id="@cleanName" class="panel-collapse collapse" role="tabpanel" aria-labelledby="heading@cleanName">
         <div class="panel-body">
             <h3>@itemID</h3>
@@ -30,8 +28,8 @@
             @for(c <- triple.get("comment")) {
                 <p>@c</p>
             }
-            @for(c <- triple.get("def")) {
-                <p>@c</p>
+            @for(n <- triple.get("note")) {
+                <p>@n</p>
             }
         <h4>Note:</h4>
             @for(c <- triple.get("note")) {

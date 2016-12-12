@@ -1,0 +1,228 @@
+@(selection : String)
+
+@import org.hadatac.console.controllers._
+
+    <div class="navbar-collapse collapse navbar-secondary hidden-print">
+        <div class="col-md-1.5">
+            <button type="button" class="btn btn-link"><b>Study Indicator</b></button>
+        </div>
+        @if(selection == "DeliveryCharacteristics") {
+            <div class="col-md-1">
+                <a href="@org.hadatac.console.controllers.metadata.routes.MetadataEntry.index(selection)" class="btn-xs btn-block btn-warning" role="button">Delivery Characteristics<br>&nbsp;<br>&nbsp;</a>
+            </div>
+        } else {
+            <div class="col-md-1">
+                <a href="@org.hadatac.console.controllers.metadata.routes.MetadataEntry.index("DeliveryCharacteristics")" class="btn-xs btn-block btn-primary" role="button">Delivery Characteristics<br>&nbsp;<br>&nbsp;</a>
+            </div>
+        }
+        @if(selection == "PrescriptionMedicationandDietarySupplements") {
+            <div class="col-md-1">
+                <a href="@org.hadatac.console.controllers.metadata.routes.MetadataEntry.index(selection)" class="btn-xs btn-block btn-warning" role="button">Prescription Medication and Di<br>&nbsp;<br>&nbsp;</a>
+            </div>
+        } else {
+            <div class="col-md-1">
+                <a href="@org.hadatac.console.controllers.metadata.routes.MetadataEntry.index("PrescriptionMedicationandDietarySupplements")" class="btn-xs btn-block btn-primary" role="button">Prescription Medication and Di<br>&nbsp;<br>&nbsp;</a>
+            </div>
+        }
+        @if(selection == "PhysicalActivityandFitness") {
+            <div class="col-md-1">
+                <a href="@org.hadatac.console.controllers.metadata.routes.MetadataEntry.index(selection)" class="btn-xs btn-block btn-warning" role="button">Physical Activity and Fitness<br>&nbsp;<br>&nbsp;</a>
+            </div>
+        } else {
+            <div class="col-md-1">
+                <a href="@org.hadatac.console.controllers.metadata.routes.MetadataEntry.index("PhysicalActivityandFitness")" class="btn-xs btn-block btn-primary" role="button">Physical Activity and Fitness<br>&nbsp;<br>&nbsp;</a>
+            </div>
+        }
+        @if(selection == "ParentalHealthandFamilyHistory") {
+            <div class="col-md-1">
+                <a href="@org.hadatac.console.controllers.metadata.routes.MetadataEntry.index(selection)" class="btn-xs btn-block btn-warning" role="button">Parental Health and Family His<br>&nbsp;<br>&nbsp;</a>
+            </div>
+        } else {
+            <div class="col-md-1">
+                <a href="@org.hadatac.console.controllers.metadata.routes.MetadataEntry.index("ParentalHealthandFamilyHistory")" class="btn-xs btn-block btn-primary" role="button">Parental Health and Family His<br>&nbsp;<br>&nbsp;</a>
+            </div>
+        }
+        @if(selection == "ReproductiveHealth") {
+            <div class="col-md-1">
+                <a href="@org.hadatac.console.controllers.metadata.routes.MetadataEntry.index(selection)" class="btn-xs btn-block btn-warning" role="button">Reproductive Health<br>&nbsp;<br>&nbsp;</a>
+            </div>
+        } else {
+            <div class="col-md-1">
+                <a href="@org.hadatac.console.controllers.metadata.routes.MetadataEntry.index("ReproductiveHealth")" class="btn-xs btn-block btn-primary" role="button">Reproductive Health<br>&nbsp;<br>&nbsp;</a>
+            </div>
+        }
+        @if(selection == "MentalHealth") {
+            <div class="col-md-1">
+                <a href="@org.hadatac.console.controllers.metadata.routes.MetadataEntry.index(selection)" class="btn-xs btn-block btn-warning" role="button">Mental Health<br>&nbsp;<br>&nbsp;</a>
+            </div>
+        } else {
+            <div class="col-md-1">
+                <a href="@org.hadatac.console.controllers.metadata.routes.MetadataEntry.index("MentalHealth")" class="btn-xs btn-block btn-primary" role="button">Mental Health<br>&nbsp;<br>&nbsp;</a>
+            </div>
+        }
+        @if(selection == "Anthropometry") {
+            <div class="col-md-1">
+                <a href="@org.hadatac.console.controllers.metadata.routes.MetadataEntry.index(selection)" class="btn-xs btn-block btn-warning" role="button">Anthropometry<br>&nbsp;<br>&nbsp;</a>
+            </div>
+        } else {
+            <div class="col-md-1">
+                <a href="@org.hadatac.console.controllers.metadata.routes.MetadataEntry.index("Anthropometry")" class="btn-xs btn-block btn-primary" role="button">Anthropometry<br>&nbsp;<br>&nbsp;</a>
+            </div>
+        }
+        <br /><br /><br /><br /><br />
+        @if(selection == "SleepCharacterisitic") {
+            <div class="col-md-1">
+                <a href="@org.hadatac.console.controllers.metadata.routes.MetadataEntry.index(selection)" class="btn-xs btn-block btn-warning" role="button">Sleep Characterisitic<br>&nbsp;<br>&nbsp;</a>
+            </div>
+        } else {
+            <div class="col-md-1">
+                <a href="@org.hadatac.console.controllers.metadata.routes.MetadataEntry.index("SleepCharacterisitic")" class="btn-xs btn-block btn-primary" role="button">Sleep Characterisitic<br>&nbsp;<br>&nbsp;</a>
+            </div>
+        }
+        @if(selection == "DietandNutrition") {
+            <div class="col-md-1">
+                <a href="@org.hadatac.console.controllers.metadata.routes.MetadataEntry.index(selection)" class="btn-xs btn-block btn-warning" role="button">Diet and Nutrition<br>&nbsp;<br>&nbsp;</a>
+            </div>
+        } else {
+            <div class="col-md-1">
+                <a href="@org.hadatac.console.controllers.metadata.routes.MetadataEntry.index("DietandNutrition")" class="btn-xs btn-block btn-primary" role="button">Diet and Nutrition<br>&nbsp;<br>&nbsp;</a>
+            </div>
+        }
+        @if(selection == "SocioeconomicClassStatus") {
+            <div class="col-md-1">
+                <a href="@org.hadatac.console.controllers.metadata.routes.MetadataEntry.index(selection)" class="btn-xs btn-block btn-warning" role="button">Socioeconomic Class Status<br>&nbsp;<br>&nbsp;</a>
+            </div>
+        } else {
+            <div class="col-md-1">
+                <a href="@org.hadatac.console.controllers.metadata.routes.MetadataEntry.index("SocioeconomicClassStatus")" class="btn-xs btn-block btn-primary" role="button">Socioeconomic Class Status<br>&nbsp;<br>&nbsp;</a>
+            </div>
+        }
+        @if(selection == "AlcoholTobaccoandIllicitDrugUse") {
+            <div class="col-md-1">
+                <a href="@org.hadatac.console.controllers.metadata.routes.MetadataEntry.index(selection)" class="btn-xs btn-block btn-warning" role="button">Alcohol, Tobacco, and Illicit <br>&nbsp;<br>&nbsp;</a>
+            </div>
+        } else {
+            <div class="col-md-1">
+                <a href="@org.hadatac.console.controllers.metadata.routes.MetadataEntry.index("AlcoholTobaccoandIllicitDrugUse")" class="btn-xs btn-block btn-primary" role="button">Alcohol, Tobacco, and Illicit <br>&nbsp;<br>&nbsp;</a>
+            </div>
+        }
+        @if(selection == "OralHealth") {
+            <div class="col-md-1">
+                <a href="@org.hadatac.console.controllers.metadata.routes.MetadataEntry.index(selection)" class="btn-xs btn-block btn-warning" role="button">Oral Health<br>&nbsp;<br>&nbsp;</a>
+            </div>
+        } else {
+            <div class="col-md-1">
+                <a href="@org.hadatac.console.controllers.metadata.routes.MetadataEntry.index("OralHealth")" class="btn-xs btn-block btn-primary" role="button">Oral Health<br>&nbsp;<br>&nbsp;</a>
+            </div>
+        }
+        @if(selection == "EnvironmentalExposure") {
+            <div class="col-md-1">
+                <a href="@org.hadatac.console.controllers.metadata.routes.MetadataEntry.index(selection)" class="btn-xs btn-block btn-warning" role="button">Environmental Exposure<br>&nbsp;<br>&nbsp;</a>
+            </div>
+        } else {
+            <div class="col-md-1">
+                <a href="@org.hadatac.console.controllers.metadata.routes.MetadataEntry.index("EnvironmentalExposure")" class="btn-xs btn-block btn-primary" role="button">Environmental Exposure<br>&nbsp;<br>&nbsp;</a>
+            </div>
+        }
+        @if(selection == "BirthOutcome") {
+            <div class="col-md-1">
+                <a href="@org.hadatac.console.controllers.metadata.routes.MetadataEntry.index(selection)" class="btn-xs btn-block btn-warning" role="button">Birth Outcome<br>&nbsp;<br>&nbsp;</a>
+            </div>
+        } else {
+            <div class="col-md-1">
+                <a href="@org.hadatac.console.controllers.metadata.routes.MetadataEntry.index("BirthOutcome")" class="btn-xs btn-block btn-primary" role="button">Birth Outcome<br>&nbsp;<br>&nbsp;</a>
+            </div>
+        }
+        <br /><br /><br /><br /><br />
+        @if(selection == "HospitalUtilizationandAccesstoCare") {
+            <div class="col-md-1">
+                <a href="@org.hadatac.console.controllers.metadata.routes.MetadataEntry.index(selection)" class="btn-xs btn-block btn-warning" role="button">Hospital Utilization and Acces<br>&nbsp;<br>&nbsp;</a>
+            </div>
+        } else {
+            <div class="col-md-1">
+                <a href="@org.hadatac.console.controllers.metadata.routes.MetadataEntry.index("HospitalUtilizationandAccesstoCare")" class="btn-xs btn-block btn-primary" role="button">Hospital Utilization and Acces<br>&nbsp;<br>&nbsp;</a>
+            </div>
+        }
+        @if(selection == "TargetedAnalyte") {
+            <div class="col-md-1">
+                <a href="@org.hadatac.console.controllers.metadata.routes.MetadataEntry.index(selection)" class="btn-xs btn-block btn-warning" role="button">Targeted Analyte<br>&nbsp;<br>&nbsp;</a>
+            </div>
+        } else {
+            <div class="col-md-1">
+                <a href="@org.hadatac.console.controllers.metadata.routes.MetadataEntry.index("TargetedAnalyte")" class="btn-xs btn-block btn-primary" role="button">Targeted Analyte<br>&nbsp;<br>&nbsp;</a>
+            </div>
+        }
+        @if(selection == "PregnancyCharacteristic") {
+            <div class="col-md-1">
+                <a href="@org.hadatac.console.controllers.metadata.routes.MetadataEntry.index(selection)" class="btn-xs btn-block btn-warning" role="button">Pregnancy Characteristic<br>&nbsp;<br>&nbsp;</a>
+            </div>
+        } else {
+            <div class="col-md-1">
+                <a href="@org.hadatac.console.controllers.metadata.routes.MetadataEntry.index("PregnancyCharacteristic")" class="btn-xs btn-block btn-primary" role="button">Pregnancy Characteristic<br>&nbsp;<br>&nbsp;</a>
+            </div>
+        }
+        @if(selection == "NeighborhoodCharacteristic") {
+            <div class="col-md-1">
+                <a href="@org.hadatac.console.controllers.metadata.routes.MetadataEntry.index(selection)" class="btn-xs btn-block btn-warning" role="button">Neighborhood Characteristic<br>&nbsp;<br>&nbsp;</a>
+            </div>
+        } else {
+            <div class="col-md-1">
+                <a href="@org.hadatac.console.controllers.metadata.routes.MetadataEntry.index("NeighborhoodCharacteristic")" class="btn-xs btn-block btn-primary" role="button">Neighborhood Characteristic<br>&nbsp;<br>&nbsp;</a>
+            </div>
+        }
+        @if(selection == "PersonalProductUse") {
+            <div class="col-md-1">
+                <a href="@org.hadatac.console.controllers.metadata.routes.MetadataEntry.index(selection)" class="btn-xs btn-block btn-warning" role="button">Personal Product Use<br>&nbsp;<br>&nbsp;</a>
+            </div>
+        } else {
+            <div class="col-md-1">
+                <a href="@org.hadatac.console.controllers.metadata.routes.MetadataEntry.index("PersonalProductUse")" class="btn-xs btn-block btn-primary" role="button">Personal Product Use<br>&nbsp;<br>&nbsp;</a>
+            </div>
+        }
+        @if(selection == "PhysicalandMentalAssessment") {
+            <div class="col-md-1">
+                <a href="@org.hadatac.console.controllers.metadata.routes.MetadataEntry.index(selection)" class="btn-xs btn-block btn-warning" role="button">Physical and Mental Assessment<br>&nbsp;<br>&nbsp;</a>
+            </div>
+        } else {
+            <div class="col-md-1">
+                <a href="@org.hadatac.console.controllers.metadata.routes.MetadataEntry.index("PhysicalandMentalAssessment")" class="btn-xs btn-block btn-primary" role="button">Physical and Mental Assessment<br>&nbsp;<br>&nbsp;</a>
+            </div>
+        }
+        @if(selection == "HousingCharacteristic") {
+            <div class="col-md-1">
+                <a href="@org.hadatac.console.controllers.metadata.routes.MetadataEntry.index(selection)" class="btn-xs btn-block btn-warning" role="button">Housing Characteristic<br>&nbsp;<br>&nbsp;</a>
+            </div>
+        } else {
+            <div class="col-md-1">
+                <a href="@org.hadatac.console.controllers.metadata.routes.MetadataEntry.index("HousingCharacteristic")" class="btn-xs btn-block btn-primary" role="button">Housing Characteristic<br>&nbsp;<br>&nbsp;</a>
+            </div>
+        }
+        <br /><br /><br /><br /><br />
+        @if(selection == "Demographic") {
+            <div class="col-md-1">
+                <a href="@org.hadatac.console.controllers.metadata.routes.MetadataEntry.index(selection)" class="btn-xs btn-block btn-warning" role="button">Demographic<br>&nbsp;<br>&nbsp;</a>
+            </div>
+        } else {
+            <div class="col-md-1">
+                <a href="@org.hadatac.console.controllers.metadata.routes.MetadataEntry.index("Demographic")" class="btn-xs btn-block btn-primary" role="button">Demographic<br>&nbsp;<br>&nbsp;</a>
+            </div>
+        }
+        @if(selection == "MedicalHistory") {
+            <div class="col-md-1">
+                <a href="@org.hadatac.console.controllers.metadata.routes.MetadataEntry.index(selection)" class="btn-xs btn-block btn-warning" role="button">Medical History<br>&nbsp;<br>&nbsp;</a>
+            </div>
+        } else {
+            <div class="col-md-1">
+                <a href="@org.hadatac.console.controllers.metadata.routes.MetadataEntry.index("MedicalHistory")" class="btn-xs btn-block btn-primary" role="button">Medical History<br>&nbsp;<br>&nbsp;</a>
+            </div>
+        }
+        @if(selection == "Acculturation") {
+            <div class="col-md-1">
+                <a href="@org.hadatac.console.controllers.metadata.routes.MetadataEntry.index(selection)" class="btn-xs btn-block btn-warning" role="button">Acculturation<br>&nbsp;<br>&nbsp;</a>
+            </div>
+        } else {
+            <div class="col-md-1">
+                <a href="@org.hadatac.console.controllers.metadata.routes.MetadataEntry.index("Acculturation")" class="btn-xs btn-block btn-primary" role="button">Acculturation<br>&nbsp;<br>&nbsp;</a>
+            </div>
+        }
+    </div>

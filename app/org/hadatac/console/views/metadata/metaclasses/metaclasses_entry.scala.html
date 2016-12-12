@@ -1,8 +1,7 @@
 @(triple : org.hadatac.console.models.OtMTripleDocument)
   
 @*****************************
-  hasURI/label    | id (array[0])
-  hasCharacteristic    | chara (array)
+  hasURI/label    | uri (array[0])
 *****************************@
 
 @defining(triple.get("id").get(0)) {itemID =>
@@ -17,7 +16,7 @@
     <div id="@cleanName" class="panel-collapse collapse" role="tabpanel" aria-labelledby="heading@cleanName">
         <div class="panel-body">
             <h3>@itemID</h3>
-            @defining(triple.get("id").get(0)) {theuri =>
+            @defining(triple.get("uri").get(0)) {theuri =>
             <form>
                 <input type="text" size="80" value="@theuri">
             </form>

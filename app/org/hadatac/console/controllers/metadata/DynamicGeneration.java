@@ -101,7 +101,7 @@ public class DynamicGeneration extends Controller {
 			
 			initStudyJson=initStudyJson + ",\n\"add\":\n\t{\n\t\"doc\":\n\t\t{\n";
 			initStudyJson=initStudyJson + "\t\t\"studyUri\": \"" + soln.get("studyUri").toString() + "\" ,\n";
-			initStudyJson=initStudyJson + "\t\t\"studyLabel\": \"<a href=\\\"./metadataacquisitions/viewStudy?study_uri=" + soln.get("studyUri").toString().replaceAll("http://hadatac.org/ont/chear#","chear:").replaceAll("http://hadatac.org/ont/case#","case:").replaceAll("http://hadatac.org/kb/chear#","chear-kb:").replaceAll("http://hadatac.org/kb/case#","case-kb:") + "\\\">" + soln.get("studyLabel").toString() + "</a>\" ,\n";
+			initStudyJson=initStudyJson + "\t\t\"studyLabel\": \"<a href=\\\""+ Play.application().configuration().getString("hadatac.console.host_deploy") + "/hadatac/metadataacquisitions/viewStudy?study_uri=" + soln.get("studyUri").toString().replaceAll("http://hadatac.org/ont/chear#","chear:").replaceAll("http://hadatac.org/ont/case#","case:").replaceAll("http://hadatac.org/kb/chear#","chear-kb:").replaceAll("http://hadatac.org/kb/case#","case-kb:") + "\\\">" + soln.get("studyLabel").toString() + "</a>\" ,\n";
 			initStudyJson=initStudyJson + "\t\t\"studyTitle\": \"" + soln.get("studyTitle").toString() + "\" ,\n";
 			initStudyJson=initStudyJson + "\t\t\"proj\": \"" + soln.get("proj").toString() + "\" ,\n";
 			initStudyJson=initStudyJson + "\t\t\"studyComment\": \"" + soln.get("studyComment").toString() + "\" ,\n";
@@ -127,7 +127,7 @@ public class DynamicGeneration extends Controller {
 		}
 		Map<String, String> indicatorMapSorted = new TreeMap<String, String>(indicatorMap);
 		
-		String analyteQuery="PREFIX rdfs:<http://www.w3.org/2000/01/rdf-schema#> PREFIX chear: <http://hadatac.org/ont/chear#>SELECT ?analyteIndicator ?label ?comment WHERE { ?analyteIndicator rdfs:subClassOf chear:Analyte . OPTIONAL{ ?analyteIndicator rdfs:label ?label } . OPTIONAL { ?analyteIndicator rdfs:comment ?comment } . }";
+		String analyteQuery="PREFIX rdfs:<http://www.w3.org/2000/01/rdf-schema#> PREFIX chear: <http://hadatac.org/ont/chear#>SELECT ?analyteIndicator ?label ?comment WHERE { ?analyteIndicator rdfs:subClassOf chear:TargetedAnalyte . OPTIONAL{ ?analyteIndicator rdfs:label ?label } . OPTIONAL { ?analyteIndicator rdfs:comment ?comment } . }";
 		QueryExecution qexecAnalyte = QueryExecutionFactory.sparqlService(Collections.getCollectionsName(Collections.METADATA_SPARQL), analyteQuery);
 		ResultSet analyteResults = qexecAnalyte.execSelect();
 		ResultSetRewindable resultsrwAnalyte = ResultSetFactory.copyResults(analyteResults);
@@ -208,7 +208,7 @@ public class DynamicGeneration extends Controller {
 		String updateIndicatorJson="{\n\"commit\": {}";
 		for(Map.Entry<String, String> entry : indicatorMapSorted.entrySet()){
 		    //System.out.println("Key : " + entry.getKey() + " and Value: " + entry.getValue() + "\n");
-		    String label = entry.getValue().toString().replaceAll(" ", "").replaceAll(",", "").toString() + "Label";
+		    String label = entry.getValue().toString().replaceAll(" ", "").replaceAll(",", "") + "Label";
 		    facetPageString=facetPageString + "        {'field': '" + label + "', 'display': '" + entry.getValue().toString() + "'},\n";
 			facetSearchSortString=facetSearchSortString + ",{'display':'" + entry.getValue().toString() + "','field':'" + label + ".exact'}" ;
 			schemaString=schemaString + "    <field name=\"" + label + "\" type=\"string\" indexed=\"true\" docValues=\"true\" multiValued=\"true\"  />\n" ;
@@ -523,7 +523,7 @@ public class DynamicGeneration extends Controller {
 			FileWriter facetPageStream = new FileWriter(facetPage,false);
 			facetPageStream.write(facetPageString);
 			facetPageStream.close();
-			System.out.println("Writing Study Facet Page\n");
+			System.out.println("Wrote Study Facet Page\n");
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -534,7 +534,7 @@ public class DynamicGeneration extends Controller {
 			FileWriter facetPageStream = new FileWriter(facetPage,false);
 			facetPageStream.write(analyteFacetPageString);
 			facetPageStream.close();
-			System.out.println("Writing Analyte Facet Page\n");
+			System.out.println("Wrote Analyte Facet Page\n");
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -546,7 +546,7 @@ public class DynamicGeneration extends Controller {
 			FileWriter schemaXMLStream = new FileWriter(schemaXML,false);
 			schemaXMLStream.write(schemaString);
 			schemaXMLStream.close();
-			System.out.println("Writing Study Schema File\n");
+			System.out.println("Wrote Study Schema File\n");
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -557,7 +557,7 @@ public class DynamicGeneration extends Controller {
 			FileWriter schemaXMLStream = new FileWriter(schemaXML,false);
 			schemaXMLStream.write(analyteSchemaString);
 			schemaXMLStream.close();
-			System.out.println("Writing Analyte Schema File\n");
+			System.out.println("Wrote Analyte Schema File\n");
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -692,7 +692,7 @@ public class DynamicGeneration extends Controller {
 	
 	// for /metadata HTTP GET requests
     public static Result index() {
-    	
+    	System.out.println(Play.application().configuration().getString("hadatac.console.host_deploy")+"/metadataacquisitions/viewStudy?study_uri=");
 		Map<String, List<String>> studyResult = generateStudy();
 		Map<String, List<String>> subjectResult = findSubject();
 		Map<String, Map<String, String>> indicatorResults = new HashMap<String, Map<String,String>>();

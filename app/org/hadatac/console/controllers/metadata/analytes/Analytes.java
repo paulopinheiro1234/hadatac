@@ -13,6 +13,7 @@ import play.mvc.Controller;
 import play.mvc.Result;
 
 import org.hadatac.console.views.html.metadata.analytes.analytes_browser;
+import org.hadatac.console.views.html.metadata.metadata_browser;
 import org.hadatac.console.views.html.error_page;
 
 
@@ -24,7 +25,7 @@ public class Analytes extends Controller {
     	SparqlQuery query = new SparqlQuery();
         GetSparqlQuery query_submit = new GetSparqlQuery(query);
         OtMSparqlQueryResults theResults;
-        String tabName = "Analytes";
+        String tabName = "TargetedAnalyte";
         String query_json = null;
         System.out.println("Analytes.java is requesting: " + tabName);
         try {
@@ -39,7 +40,7 @@ public class Analytes extends Controller {
     	
     	//List<org.hadatac.entity.pojo.Entity> entities = org.hadatac.entity.pojo.Entity.find();
     	
-        return ok(analytes_browser.render(theResults, "Analytes"));
+        return ok(metadata_browser.render(theResults, "TargetedAnalyte"));
     }// /index()
 
 
@@ -49,7 +50,7 @@ public class Analytes extends Controller {
     	SparqlQuery query = new SparqlQuery();
         GetSparqlQuery query_submit = new GetSparqlQuery(query);
         OtMSparqlQueryResults theResults;
-        String tabName = "Analytes";
+        String tabName = "TargetedAnalyte";
         String query_json = null;
         System.out.println("Analytes.java is requesting: " + tabName);
         try {
@@ -64,7 +65,7 @@ public class Analytes extends Controller {
     	
     	//List<org.hadatac.entity.pojo.Entity> entities = org.hadatac.entity.pojo.Entity.find();
     	
-        return ok(analytes_browser.render(theResults, "Analytes"));
+        return ok(metadata_browser.render(theResults, "TargetedAnalyte"));
     }// /postIndex()
 
 }

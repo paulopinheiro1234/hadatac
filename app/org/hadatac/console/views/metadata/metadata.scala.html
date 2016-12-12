@@ -2,62 +2,36 @@
 
 @import helper._
 @import org.hadatac.console.views.html._
-@import org.hadatac.console.views.html.metadata.concepts._
-@import org.hadatac.console.views.html.metadata.activities._
-@import org.hadatac.console.views.html.metadata.empirical._
-@import org.hadatac.console.views.html.metadata.computational._
-@import org.hadatac.console.views.html.metadata.metaclasses._
-@import org.hadatac.console.views.html.metadata.analytes._
 
 @main("Browse Metadata") {
     <div class="container-fluid">
-     
-     <h2>Browse Metadata</h2>
-     
-<!--     <div class="row">
-		  @study_navigation("")
-      </div>
- -->     
-      <hr>
-     
-      <div class="row">
-		  @science_navigation("")
-      </div>
-      
-      <hr>
-      
-      <div class="row">
-		  @metaclasses_navigation("")
-      </div>
+        <h2>Browse Metadata</h2>
+        <div class="row">
+            @data_acquisition_indicator_navigation("")
+        </div>
+        <hr>
 
-      <hr>
-      
-      <div class="row">
-		  @analytes_navigation("")
-      </div>
+        <div class="row">
+            @sample_indicator_navigation("")
+        </div>
+        <hr>
 
-      <hr>
-      
-      <div class="row">
-		  @empirical_activity_navigation("")
-      </div>
+        <div class="row">
+            @study_indicator_navigation("")
+        </div>
+        <hr>
 
-      <hr>
-      
-      <div class="row">
-		  @empirical_navigation("")
-      </div>
+        <div class="row">
+            @targeted_analyte_navigation("")
+        </div>
+        <hr>
 
-      <hr>
-      
-      <div class="row">
-		  @computational_navigation("")
-      </div>
-     
+        <div class="row">
+            @variable_indicator_navigation("")
+        </div>
+        <hr>
 
-      <br><br><br>
-      @mainButton(false)
-
+        <br><br><br>
+        @mainButton(false)
     </div>
-
 }

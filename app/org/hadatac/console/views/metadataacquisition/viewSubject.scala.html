@@ -8,7 +8,8 @@
 @import org.hadatac.console.controllers._
 @import be.objectify.deadbolt.java.views.html._
 @import be.objectify.deadbolt.core.utils.TemplateUtils._
-@import play.api.Play
+@import play.api.Play._
+@import play.api.Play.current
 
 @main("View Subject") {
     <link rel="stylesheet" href="http://openlayers.org/en/v3.9.0/css/ol.css">
@@ -33,7 +34,7 @@
 			<h3>Sample List</h3>
 				<ul>
 					@for(key <- sampleResult.keySet()){
-						<li><a href="./viewSample?sample_uri=@key.toString.replaceAll("http://hadatac.org/ont/chear#","chear:").replaceAll("http://hadatac.org/ont/case#","case:").replaceAll("http://hadatac.org/kb/chear#","chear-kb:").replaceAll("http://hadatac.org/kb/case#","case-kb:")">@key.toString.replaceAll("http://hadatac.org/ont/chear#","chear:").replaceAll("http://hadatac.org/ont/case#","case:").replaceAll("http://hadatac.org/kb/chear#","chear-kb:").replaceAll("http://hadatac.org/kb/case#","case-kb:")</a>
+						<li><a href="@play.api.Play.application.configuration.getString("hadatac.console.host_deploy")/hadatac/metadataacquisitions/viewSample?sample_uri=@key.toString.replaceAll("http://hadatac.org/ont/chear#","chear:").replaceAll("http://hadatac.org/ont/case#","case:").replaceAll("http://hadatac.org/kb/chear#","chear-kb:").replaceAll("http://hadatac.org/kb/case#","case-kb:")">@key.toString.replaceAll("http://hadatac.org/ont/chear#","chear:").replaceAll("http://hadatac.org/ont/case#","case:").replaceAll("http://hadatac.org/kb/chear#","chear-kb:").replaceAll("http://hadatac.org/kb/case#","case-kb:")</a>
 							<ul>
 							@for(s <- sampleResult.get(key)) {
 							<li>@s.toString.replaceAll("http://hadatac.org/ont/chear#","chear:").replaceAll("http://hadatac.org/ont/case#","case:").replaceAll("http://hadatac.org/kb/chear#","case-kb:").replaceAll("http://hadatac.org/kb/chear#","case-kb:")</li>

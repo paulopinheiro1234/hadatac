@@ -1,9 +1,8 @@
-@( results : org.hadatac.console.models.OtMSparqlQueryResults,
-   category : String)
+@( results : org.hadatac.console.models.OtMSparqlQueryResults, category : String)
 
 @*****************************
-	public TreeMap<String,OtMTripleDocument> results.sparqlResults;
-	public TreeMap<String,ArrayList<String>> results.sparqlResults.item;
+    public TreeMap<String,OtMTripleDocument> results.sparqlResults
+;    public TreeMap<String,ArrayList<String>> results.sparqlResults.item;
     public String results.treeResults;
     public String json;
 *****************************@
@@ -12,14 +11,28 @@
 @import org.hadatac.console.views.html._
 
 @main("Hierarchies") {
-    @analytes_navigation(category)
+    @if((category == "Instrument") || (category == "Detector") || (category == "Platform")){
+        @data_acquisition_indicator_navigation(category)
+    }
+    @if((category == "PregnancySample") || (category == "Cell") || (category == "cell") || (category == "tissue") || (category == "Tissue")){
+        @sample_indicator_navigation(category)
+    }
+    @if((category == "DeliveryCharacteristics") || (category == "PrescriptionMedicationandDietarySupplements") || (category == "PhysicalActivityandFitness") || (category == "ParentalHealthandFamilyHistory") || (category == "ReproductiveHealth") || (category == "MentalHealth") || (category == "Anthropometry") || (category == "SleepCharacterisitic") || (category == "DietandNutrition") || (category == "SocioeconomicClassStatus") || (category == "AlcoholTobaccoandIllicitDrugUse") || (category == "OralHealth") || (category == "EnvironmentalExposure") || (category == "BirthOutcome") || (category == "HospitalUtilizationandAccesstoCare") || (category == "TargetedAnalyte") || (category == "PregnancyCharacteristic") || (category == "NeighborhoodCharacteristic") || (category == "PersonalProductUse") || (category == "PhysicalandMentalAssessment") || (category == "HousingCharacteristic") || (category == "Demographic") || (category == "MedicalHistory") || (category == "Acculturation")){
+        @study_indicator_navigation(category)
+    }
+    @if((category == "VolatileOrganicCompound") || (category == "TobaccoMetabolite") || (category == "PolybrominatedDiphenylEther") || (category == "Element") || (category == "Creatinine") || (category == "Paraben") || (category == "Phthalate") || (category == "ArsenicSpecies") || (category == "PFC") || (category == "MercurySpecies") || (category == "EnvironmentalPhenol") || (category == "AlkylPhosphatePesticideMetabolite")){
+        @targeted_analyte_navigation(category)
+    }
+    @if((category == "DataAcquisitionSchemaAttribute")){
+        @variable_indicator_navigation(category)
+    }
     <div class="container-fluid container-spaced">
       <div class="row">
         <div class="col-sm-9 col-md-9 main">
             <ul class="nav nav-tabs hidden-print">
                 @if(results.treeResults != ""){
-                    <li class="active" onclick="info_on('info')"><a data-toggle="tab" href="#tree"> 
-                        <span class="glyphicon glyphicon-tree-conifer" aria-hidden="true"></span> View as Hierarchy</a></li> 
+                    <li class="active" onclick="info_on('info')"><a data-toggle="tab" href="#tree">
+                        <span class="glyphicon glyphicon-tree-conifer" aria-hidden="true"></span> View as Hierarchy</a></li>
                     <li onclick="info_off('info')"><a data-toggle="tab" href="#table">
                         <span class="glyphicon glyphicon-th-list" aria-hidden="true"></span> View as Table</a></li>
                 } else {
@@ -28,13 +41,12 @@
                 }
             </ul>
             <div class = "tab-content">
-
             <div id="table" class="hidden-print tab-pane fade in">
                 <div><p>(click for more information)</p></div>
                     <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
                         <div class="panel panel-default">
                         @for((k, triple) <- results.sparqlResults){
-        	            	@analytes_entry(triple)
+        	            	@metadata_entry(triple)
             	        }
                         </div>
                     </div>
@@ -47,33 +59,30 @@
                         <script type="text/javascript" src="/hadatac/assets/javascripts/d3.js"></script>
                         <script type="text/javascript" src="/hadatac/assets/javascripts/d3.layout.js"></script>
                         <script type="text/javascript" src="/hadatac/assets/javascripts/treeRenderer.js"></script>
-			            <script type="text/javascript">
+                        <script type="text/javascript">
                         	d3.selectAll(".node")
                                 .on('mouseover', function (d,i){
                                     var item = d.name.replace(/\W/g, '');
                                     var stuff = document.getElementById(item).innerHTML;
                                     var infobox = document.getElementById('info');
                                     infobox.innerHTML = stuff;
-                                
                                 });
 			            </script>
                     <link type="text/css" rel="stylesheet" href="/hadatac/assets/stylesheets/treeRenderer.css"/>
                 </div>
             }
-            
           </div>
     </div>
     <div class="col-md-3 col-sm-3 hidden-print">
         <div class="tab-spacer"></div>
         <div id="info" class="infobox" style="display:block"></div>
     </div>
-    <script type="text/javascript" src="/hadatac/assets/javascripts/extra.js"></script>    
-    <script type="text/javascript" src="/hadatac/assets/javascripts/extra.js"></script>
+    <script type="text/javascript" src="/hadatac/assets/javascripts/extra.js"></script> 
 
     <div class="visible-print-block">
         <table>
         	@for((k, triple) <- results.sparqlResults){
-            	@print_analytes_entry(triple)
+            	@print_metadata_entry(triple)
             }
         </table>
     </div>

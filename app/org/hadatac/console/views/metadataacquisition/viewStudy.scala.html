@@ -9,7 +9,8 @@
 @import org.hadatac.console.controllers._
 @import be.objectify.deadbolt.java.views.html._
 @import be.objectify.deadbolt.core.utils.TemplateUtils._
-@import play.api.Play
+@import play.api.Play._
+@import play.api.Play.current
 
 @main("Study View") {
     <link rel="stylesheet" href="http://openlayers.org/en/v3.9.0/css/ol.css">
@@ -45,7 +46,7 @@
 			<h3>Subject List</h3>
 				<ul>        		
 					@for(key <- subjectResult.keySet()){
-						<li><a href="./viewSubject?subject_uri=@key.toString.replaceAll("http://hadatac.org/ont/chear#","chear:").replaceAll("http://hadatac.org/ont/case#","case:").replaceAll("http://hadatac.org/kb/chear#","chear-kb:").replaceAll("http://hadatac.org/ont/case#","case:").replaceAll("http://hadatac.org/kb/chear#","chear-kb:").replaceAll("http://hadatac.org/kb/case#","case-kb:")">@key.toString.replaceAll("http://hadatac.org/ont/chear#","chear:").replaceAll("http://hadatac.org/kb/chear#","chear-kb:").replaceAll("http://hadatac.org/kb/case#","case-kb:")</a>
+						<li><a href="@play.api.Play.application.configuration.getString("hadatac.console.host_deploy")/hadatac/metadataacquisitions/viewSubject?subject_uri=@key.toString.replaceAll("http://hadatac.org/ont/chear#","chear:").replaceAll("http://hadatac.org/ont/case#","case:").replaceAll("http://hadatac.org/kb/chear#","chear-kb:").replaceAll("http://hadatac.org/ont/case#","case:").replaceAll("http://hadatac.org/kb/chear#","chear-kb:").replaceAll("http://hadatac.org/kb/case#","case-kb:")">@key.toString.replaceAll("http://hadatac.org/ont/chear#","chear:").replaceAll("http://hadatac.org/kb/chear#","chear-kb:").replaceAll("http://hadatac.org/kb/case#","case-kb:")</a>
 							<ul>
 							@for(s <- subjectResult.get(key)) {
 							<li>@s.toString.replaceAll("http://hadatac.org/ont/chear#","chear:").replaceAll("http://hadatac.org/ont/case#","case:").replaceAll("http://hadatac.org/kb/chear#","chear-kb:").replaceAll("http://hadatac.org/kb/case#","case-kb:")</li>

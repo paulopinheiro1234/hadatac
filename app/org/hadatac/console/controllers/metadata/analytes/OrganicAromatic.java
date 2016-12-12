@@ -24,7 +24,7 @@ public class OrganicAromatic extends Controller {
     	SparqlQuery query = new SparqlQuery();
         GetSparqlQuery query_submit = new GetSparqlQuery(query);
         OtMSparqlQueryResults theResults;
-        String tabName = "OrganicAromatic";
+        String tabName = "VolatileOrganicCompound";
         String query_json = null;
         System.out.println("OrganicAromatic.java is requesting: " + tabName);
         try {
@@ -39,7 +39,7 @@ public class OrganicAromatic extends Controller {
     	
     	//List<org.hadatac.entity.pojo.Entity> entities = org.hadatac.entity.pojo.Entity.find();
     	
-        return ok(analytes_browser.render(theResults, "OrganicAromatic"));
+        return ok(analytes_browser.render(theResults, "VolatileOrganicCompound"));
     }// /index()
 
 
@@ -49,7 +49,7 @@ public class OrganicAromatic extends Controller {
     	SparqlQuery query = new SparqlQuery();
         GetSparqlQuery query_submit = new GetSparqlQuery(query);
         OtMSparqlQueryResults theResults;
-        String tabName = "OrganicAromatic";
+        String tabName = "VolatileOrganicCompound";
         String query_json = null;
         System.out.println("OrganicAromatic.java is requesting: " + tabName);
         try {
@@ -64,7 +64,7 @@ public class OrganicAromatic extends Controller {
     	
     	//List<org.hadatac.entity.pojo.Entity> entities = org.hadatac.entity.pojo.Entity.find();
     	
-        return ok(analytes_browser.render(theResults, "OrganicAromatic"));
+        return ok(analytes_browser.render(theResults, "VolatileOrganicCompound"));
     }// /postIndex()
 
 }
