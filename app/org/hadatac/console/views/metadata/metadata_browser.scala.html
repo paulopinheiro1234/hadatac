@@ -11,7 +11,10 @@
 @import org.hadatac.console.views.html._
 
 @main("Hierarchies") {
-    @if((category == "Instrument") || (category == "Detector") || (category == "Platform")){
+    @if((category == "Organization") || (category == "Person")){
+        @agent_indicator_navigation(category)
+    }
+    @if((category == "Deployments") || (category == "Instrument") || (category == "Detector") || (category == "SensingPerspective") || (category == "Platform")){
         @data_acquisition_indicator_navigation(category)
     }
     @if((category == "PregnancySample") || (category == "Cell") || (category == "cell") || (category == "tissue") || (category == "Tissue")){

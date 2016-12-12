@@ -6,6 +6,15 @@
         <div class="col-md-1.5">
             <button type="button" class="btn btn-link"><b>Data Acquisition Indicator</b></button>
         </div>
+        @if(selection == "Deployments") {
+            <div class="col-md-1">
+                <a href="@org.hadatac.console.controllers.metadata.routes.MetadataEntry.index(selection)" class="btn-xs btn-block btn-warning" role="button">Deployments<br>&nbsp;<br>&nbsp;</a>
+            </div>
+        } else {
+            <div class="col-md-1">
+                <a href="@org.hadatac.console.controllers.metadata.routes.MetadataEntry.index("Deployments")" class="btn-xs btn-block btn-primary" role="button">Deployments<br>&nbsp;<br>&nbsp;</a>
+            </div>
+        }
         @if(selection == "Instrument") {
             <div class="col-md-1">
                 <a href="@org.hadatac.console.controllers.metadata.routes.MetadataEntry.index(selection)" class="btn-xs btn-block btn-warning" role="button">Instrument<br>&nbsp;<br>&nbsp;</a>
@@ -22,6 +31,15 @@
         } else {
             <div class="col-md-1">
                 <a href="@org.hadatac.console.controllers.metadata.routes.MetadataEntry.index("Detector")" class="btn-xs btn-block btn-primary" role="button">Detector<br>&nbsp;<br>&nbsp;</a>
+            </div>
+        }
+        @if(selection == "SensingPerspective") {
+            <div class="col-md-1">
+                <a href="@org.hadatac.console.controllers.metadata.routes.MetadataEntry.index(selection)" class="btn-xs btn-block btn-warning" role="button">Sensing Perspective<br>&nbsp;<br>&nbsp;</a>
+            </div>
+        } else {
+            <div class="col-md-1">
+                <a href="@org.hadatac.console.controllers.metadata.routes.MetadataEntry.index("SensingPerspective")" class="btn-xs btn-block btn-primary" role="button">Sensing Perspective<br>&nbsp;<br>&nbsp;</a>
             </div>
         }
         @if(selection == "Platform") {
