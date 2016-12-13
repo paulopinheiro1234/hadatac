@@ -199,6 +199,8 @@ GET	    /hadatac/annotator/movecsv		    	   org.hadatac.console.controllers.anno
 POST	/hadatac/annotator/movecsv    		       org.hadatac.console.controllers.annotator.AutoAnnotator.moveCSVFile(file_name : String)
 GET	    /hadatac/annotator/deletecsv		       org.hadatac.console.controllers.annotator.AutoAnnotator.deleteCSVFile(file_name : String, isProcessed : Boolean)
 POST	/hadatac/annotator/deletecsv    		   org.hadatac.console.controllers.annotator.AutoAnnotator.deleteCSVFile(file_name : String, isProcessed : Boolean)
+GET	    /hadatac/annotator/log                     org.hadatac.console.controllers.annotator.AutoAnnotator.checkAnnotationLog(file_name : String)
+POST	/hadatac/annotator/log                     org.hadatac.console.controllers.annotator.AutoAnnotator.checkAnnotationLog(file_name : String)
 
 # metadata store management URLs
 GET     /hadatac/ts/clean                          org.hadatac.console.controllers.triplestore.Clean.clean(oper: String)

@@ -1,0 +1,25 @@
+@(fileName : String)
+
+@import helper._
+@import org.hadatac.console.views.html._
+@import org.hadatac.console.controllers.annotator._
+@import java.net._
+
+@main("Annotation Log") {
+	
+   	<div id="end-process-box" style="display:none;">
+		<h4>Annotation Logs: </h4>
+  	</div>
+	
+	<p style='font-family: "Lucida Console", Monaco, monospace;' id='msgarea'></p>
+	
+	<script>
+		var msg = '@AnnotationLog.find(fileName)';
+		var msg2 = decodeURIComponent(msg).replace(/\+/g, '&nbsp;');
+       	$('#msgarea').html(msg2.replace(/&lt;/g, '<').replace(/&gt;/g, '>'));
+      	document.getElementById('end-process-box').style.display = 'inline';
+	</script>
+	
+    <br><br>
+    <a href="@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.index()" class="btn btn-primary" role="button">Back</a>
+}

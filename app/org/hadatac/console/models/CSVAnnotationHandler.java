@@ -84,7 +84,7 @@ public class CSVAnnotationHandler {
     }	    
         
     public void setDatasetUploadDatetime(String datasetUploadDatetime) {
-        datasetUploadDatetime = datasetUploadDatetime;
+        this.datasetUploadDatetime = datasetUploadDatetime;
     }	          
  
     public String[] getFields() {

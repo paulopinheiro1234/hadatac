@@ -78,8 +78,9 @@ public class LoadCCSV extends Controller {
 			files.closeFile("log", "w");
 		} catch (Exception e) {
 			e.printStackTrace();
-		}		
-		message += "[" + new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()) + "] end of file "; //+ ccsvFile.getName();
+		}
+		
+		message += "[" + new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()) + "] end of file";
 	    return message;
    }
     

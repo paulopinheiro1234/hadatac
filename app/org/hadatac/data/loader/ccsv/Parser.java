@@ -51,8 +51,8 @@ public class Parser {
 		if (model.isEmpty()) {
 			message += Feedback.println(mode, "[ERROR] Preamble not a well-formed Turtle.");
 			System.out.println("[ERROR] Preamble not a well-formed Turtle.");
-			new DatasetParsingResult(1, message);
-		} else {
+		} 
+		else {
 			message += Feedback.println(mode, "[OK] Preamble a well-formed Turtle.");
 			System.out.println("[OK] Preamble a well-formed Turtle.");
 		}
@@ -127,7 +127,7 @@ public class Parser {
 				//measurement.setValue(Double.parseDouble(record.get(measurementType.getValueColumn())));
 				if(record.get(measurementType.getValueColumn() - 1).isEmpty()){
 					//measurement.setValue("NO_VALUE");
-					System.out.println("NO_VALUE");
+					//System.out.println("NO_VALUE");
 					continue;
 				}
 				else{
