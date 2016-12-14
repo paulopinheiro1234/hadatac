@@ -4,7 +4,7 @@
 @import org.hadatac.utils._
 @import org.hadatac.console.views.html._
 @import org.hadatac.console.controllers._
-@import org.hadatac.console.controllers.dataacquisitions._
+@import org.hadatac.console.controllers.dataacquisitionmanagement._
 
 @main("Delete Data Acquisition") {
 
@@ -27,8 +27,8 @@
     @if(oper=="init") {
         <div id="question-box">
            Are your sure you want to delete this data collection? 
-           <a href="@org.hadatac.console.controllers.dataacquisitions.routes.DeleteDataAcquisition.index("confirmed", dc.getUri())" class="btn btn-success" role="button">Confirm</a>
-           <a href="@org.hadatac.console.controllers.dataacquisitions.routes.DeleteDataAcquisition.index("cancelled", dc.getUri())" class="btn btn-danger" role="button">Cancel</a>
+           <a href="@org.hadatac.console.controllers.dataacquisitionmanagement.routes.DeleteDataAcquisition.index("confirmed", dc.getUri())" class="btn btn-success" role="button">Confirm</a>
+           <a href="@org.hadatac.console.controllers.dataacquisitionmanagement.routes.DeleteDataAcquisition.index("cancelled", dc.getUri())" class="btn btn-danger" role="button">Cancel</a>
         </div>
     }
 
@@ -37,13 +37,13 @@
     @if(oper=="cancelled") {
         <div id="cancel-box">
           <h4>Operation [Delete Data Acquisition] has been cancelled.</h4>
-          Press OK button to return to Data Acquisition Management page <a href="@org.hadatac.console.controllers.dataacquisitions.routes.DataAcquisitionManagement.index(State.ACTIVE)" class="btn btn-warning" role="button">Ok</a>
+          Press OK button to return to Data Acquisition Management page <a href="@org.hadatac.console.controllers.dataacquisitionmanagement.routes.DataAcquisitionManagement.index(State.ACTIVE)" class="btn btn-warning" role="button">Ok</a>
 	    </div>
     }
 
              
      <div id="end-process-box" style="display:none;">
-          Press OK button to return to Data Acquisition Management page <a href="@org.hadatac.console.controllers.dataacquisitions.routes.DataAcquisitionManagement.index(State.ACTIVE)" class="btn btn-warning" role="button">Ok</a>
+          Press OK button to return to Data Acquisition Management page <a href="@org.hadatac.console.controllers.dataacquisitionmanagement.routes.DataAcquisitionManagement.index(State.ACTIVE)" class="btn btn-warning" role="button">Ok</a>
 	 </div>
 
 	 @if(oper=="confirmed") {

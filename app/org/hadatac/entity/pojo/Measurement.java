@@ -21,7 +21,6 @@ import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.client.solrj.response.UpdateResponse;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
-import org.apache.solr.common.util.NamedList;
 import org.hadatac.console.models.FacetHandler;
 import org.hadatac.console.models.Pivot;
 import org.hadatac.data.model.AcquisitionQueryResult;
@@ -38,6 +37,8 @@ public class Measurement {
 	private String uri;
 	@Field("owner_uri")
 	private String ownerUri;
+	@Field("acquisition_uri")
+	private String acquisitionUri;
 	@Field("permission_uri")
 	private String permissionUri;
 	private DateTime timestamp;
@@ -75,6 +76,12 @@ public class Measurement {
 	}
 	public void setOwnerUri(String ownerUri) {
 		this.ownerUri = ownerUri;
+	}
+	public String getAcquisitionUri() {
+		return acquisitionUri;
+	}
+	public void setAcquisitionUri(String acquisitionUri) {
+		this.acquisitionUri = acquisitionUri;
 	}
 	public String getPermissionUri() {
 		return permissionUri;
@@ -186,9 +193,12 @@ public class Measurement {
 		this.datasetUri = datasetUri;
 	}
 	
-	public int save(SolrClient client) {
+	public int save() {
+		SolrClient solr = new HttpSolrClient(Play.application().configuration().getString("hadatac.solr.data") + "/measurement");
 		try {
-			int status = client.addBean(this).getStatus();
+			int status = solr.addBean(this).getStatus();
+			solr.commit();
+			solr.close();
 			return status;
 		} catch (IOException | SolrServerException e) {
 			System.out.println("[ERROR] Measurement.save - e.Message: " + e.getMessage());
@@ -223,7 +233,7 @@ public class Measurement {
 		String facet_query = "";
 		String q;
 		
-		permission_query += "permission_uri:\"" + "PUBLIC" + "\"";
+		permission_query += "permission_uri:\"" + "Public" + "\"";
 		if (permissions != null) {
 			Iterator<String> i = permissions.iterator();
 			while (i.hasNext()) {
@@ -249,8 +259,7 @@ public class Measurement {
 			facet_query = "*:*";
 		}
 		
-		//q =  "(" + permission_query + ") AND (" + facet_query + ")";
-		q =  facet_query;
+		q =  "(" + permission_query + ") AND (" + facet_query + ")";
 		System.out.println("!!! QUERY: " + q);
 		query.setQuery(q);
 		query.setStart(0);
@@ -340,6 +349,29 @@ public class Measurement {
 		return result;
 	}
 	
+	public static List<Measurement> findByDataAcquisitionUri(String acquisition_uri) {
+		List<Measurement> listMeasurement = new ArrayList<Measurement>();
+		
+		SolrClient solr = new HttpSolrClient(Play.application().configuration().getString("hadatac.solr.data") + "/measurement");
+		SolrQuery query = new SolrQuery();
+		query.set("q", "acquisition_uri:\"" + acquisition_uri + "\"");
+		
+		try {
+			QueryResponse response = solr.query(query);
+			solr.close();
+			SolrDocumentList results = response.getResults();
+			Iterator<SolrDocument> i = results.iterator();
+			while (i.hasNext()) {
+				Measurement measurement = convertFromSolr(i.next());
+				listMeasurement.add(measurement);
+			}
+		} catch (Exception e) {
+			System.out.println("[ERROR] Measurement.findByDataAcquisitionUri(acquisition_uri) - Exception message: " + e.getMessage());
+		}
+				
+		return listMeasurement;
+	}
+	
 	public static Measurement convertFromSolr(SolrDocument doc) {
 		System.out.println("convertFromSolr is called");
 		
@@ -348,6 +380,7 @@ public class Measurement {
 		
 		m.setUri(doc.getFieldValue("uri").toString());
 		m.setOwnerUri(doc.getFieldValue("owner_uri").toString());
+		m.setAcquisitionUri(doc.getFieldValue("acquisition_uri").toString());
 		m.setPermissionUri(doc.getFieldValue("permission_uri").toString());
         date = new DateTime((Date)doc.getFieldValue("timestamp"));
 		if (doc.getFieldValue("timestamp") !=null) { 

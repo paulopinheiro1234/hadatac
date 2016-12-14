@@ -7,11 +7,11 @@ GET	    /hadatac/                                 org.hadatac.console.controller
 POST	/hadatac/                                 org.hadatac.console.controllers.Portal.postIndex()
 GET	    /hadatac                                  org.hadatac.console.controllers.Portal.index()
 POST	/hadatac                                  org.hadatac.console.controllers.Portal.postIndex()
-GET	    /hadatac/acquisitions                     org.hadatac.console.controllers.dataacquisition.DataAcquisitionSearch.index(start: Int ?= 1, rows: Int ?= 20, facets: String ?= "")
-POST	/hadatac/acquisitions                     org.hadatac.console.controllers.dataacquisition.DataAcquisitionSearch.postIndex(start: Int ?= 1, rows: Int ?= 20, facets: String ?= "")
-GET	    /hadatac/acquisitions/loadccsv		      org.hadatac.console.controllers.dataacquisition.LoadCCSV.loadCCSV(oper: String)
-POST	/hadatac/acquisitions/loadccsv		      org.hadatac.console.controllers.dataacquisition.LoadCCSV.postLoadCCSV(oper: String)
-POST	/hadatac/acquisitions/loadccsv/upload	  org.hadatac.console.controllers.dataacquisition.LoadCCSV.uploadFile
+GET	    /hadatac/acquisitions                     org.hadatac.console.controllers.dataacquisitionsearch.DataAcquisitionSearch.index(start: Int ?= 1, rows: Int ?= 20, facets: String ?= "")
+POST	/hadatac/acquisitions                     org.hadatac.console.controllers.dataacquisitionsearch.DataAcquisitionSearch.postIndex(start: Int ?= 1, rows: Int ?= 20, facets: String ?= "")
+GET	    /hadatac/acquisitions/loadccsv		      org.hadatac.console.controllers.dataacquisitionsearch.LoadCCSV.loadCCSV(oper: String)
+POST	/hadatac/acquisitions/loadccsv		      org.hadatac.console.controllers.dataacquisitionsearch.LoadCCSV.postLoadCCSV(oper: String)
+POST	/hadatac/acquisitions/loadccsv/upload	  org.hadatac.console.controllers.dataacquisitionsearch.LoadCCSV.uploadFile
 
 GET	    /hadatac/metadataacquisitions/solrsearch            			org.hadatac.console.http.SolrSearchProxy.getStudyAcquisition()
 POST	/hadatac/metadataacquisitions/solrsearch   						org.hadatac.console.http.SolrSearchProxy.getStudyAcquisition()
@@ -168,15 +168,15 @@ POST	/hadatac/deployments/urigenerator	       org.hadatac.console.controllers.de
 POST 	/hadatac/deployments/urigenerator/form	   org.hadatac.console.controllers.deployments.URIGenerator.processForm()
 
 # data collection management
-GET	    /hadatac/dataacquisitions/		    	   org.hadatac.console.controllers.dataacquisitions.DataAcquisitionManagement.index(oper : Int)
-POST	/hadatac/dataacquisitions/     			   org.hadatac.console.controllers.dataacquisitions.DataAcquisitionManagement.postIndex(oper : Int)
-GET	    /hadatac/dataacquisitions/delete		       org.hadatac.console.controllers.dataacquisitions.DeleteDataAcquisition.index(oper : String, dc_uri : String)
-POST	/hadatac/dataacquisitions/delete     	   org.hadatac.console.controllers.dataacquisitions.DeleteDataAcquisition.postIndex(oper : String, dc_uri : String)
-GET	    /hadatac/dataacquisitions/access		       org.hadatac.console.controllers.dataacquisitions.SetAccessPermission.index(dc_uri : String)
-POST	/hadatac/dataacquisitions/access     	   org.hadatac.console.controllers.dataacquisitions.SetAccessPermission.postIndex(dc_uri : String)
-POST	/hadatac/dataacquisitions/access/form       org.hadatac.console.controllers.dataacquisitions.SetAccessPermission.newPermission(dc_uri : String)
-GET	    /hadatac/dataacquisitions/search	    	   org.hadatac.console.controllers.dataacquisitions.SearchDataAcquisition.index(p: Int ?= 1, facets: String ?= "", facetAdd: String ?= "", facetDel: String ?= "")
-POST	/hadatac/dataacquisitions/search			   org.hadatac.console.controllers.dataacquisitions.SearchDataAcquisition.postIndex(p: Int ?= 1, facets: String ?= "", facetAdd: String ?= "", facetDel: String ?= "")
+GET	    /hadatac/dataacquisitions/		    	   org.hadatac.console.controllers.dataacquisitionmanagement.DataAcquisitionManagement.index(oper : Int)
+POST	/hadatac/dataacquisitions/     			   org.hadatac.console.controllers.dataacquisitionmanagement.DataAcquisitionManagement.postIndex(oper : Int)
+GET	    /hadatac/dataacquisitions/delete		       org.hadatac.console.controllers.dataacquisitionmanagement.DeleteDataAcquisition.index(oper : String, dc_uri : String)
+POST	/hadatac/dataacquisitions/delete     	   org.hadatac.console.controllers.dataacquisitionmanagement.DeleteDataAcquisition.postIndex(oper : String, dc_uri : String)
+GET	    /hadatac/dataacquisitions/access		       org.hadatac.console.controllers.dataacquisitionmanagement.SetAccessPermission.index(dc_uri : String)
+POST	/hadatac/dataacquisitions/access     	   org.hadatac.console.controllers.dataacquisitionmanagement.SetAccessPermission.postIndex(dc_uri : String)
+POST	/hadatac/dataacquisitions/access/form       org.hadatac.console.controllers.dataacquisitionmanagement.SetAccessPermission.newPermission(dc_uri : String)
+GET	    /hadatac/dataacquisitions/search	    	   org.hadatac.console.controllers.dataacquisitionmanagement.SearchDataAcquisition.index(p: Int ?= 1, facets: String ?= "", facetAdd: String ?= "", facetDel: String ?= "")
+POST	/hadatac/dataacquisitions/search			   org.hadatac.console.controllers.dataacquisitionmanagement.SearchDataAcquisition.postIndex(p: Int ?= 1, facets: String ?= "", facetAdd: String ?= "", facetDel: String ?= "")
 
 # annotator
 GET	    /hadatac/annotator/		    	           org.hadatac.console.controllers.annotator.Annotator.selectDeployment
@@ -195,6 +195,8 @@ GET	    /hadatac/annotator/movecsv		    	   org.hadatac.console.controllers.anno
 POST	/hadatac/annotator/movecsv    		       org.hadatac.console.controllers.annotator.AutoAnnotator.moveCSVFile(file_name : String)
 GET	    /hadatac/annotator/deletecsv		       org.hadatac.console.controllers.annotator.AutoAnnotator.deleteCSVFile(file_name : String, isProcessed : Boolean)
 POST	/hadatac/annotator/deletecsv    		   org.hadatac.console.controllers.annotator.AutoAnnotator.deleteCSVFile(file_name : String, isProcessed : Boolean)
+GET	    /hadatac/annotator/log                     org.hadatac.console.controllers.annotator.AutoAnnotator.checkAnnotationLog(file_name : String)
+POST	/hadatac/annotator/log                     org.hadatac.console.controllers.annotator.AutoAnnotator.checkAnnotationLog(file_name : String)
 
 # metadata store management URLs
 GET     /hadatac/ts/clean                          org.hadatac.console.controllers.triplestore.Clean.clean(oper: String)

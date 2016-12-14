@@ -1,4 +1,4 @@
-package org.hadatac.console.controllers.dataacquisitions;
+package org.hadatac.console.controllers.dataacquisitionmanagement;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
@@ -7,6 +7,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Iterator;
+import java.util.List;
 
 import play.data.Form;
 import play.mvc.Controller;
@@ -15,9 +16,11 @@ import play.mvc.Result;
 import org.hadatac.console.controllers.AuthApplication;
 import org.hadatac.console.models.DeploymentForm;
 import org.hadatac.console.models.SetPermissionForm;
-import org.hadatac.console.views.html.dataacquisitions.*;
+import org.hadatac.console.views.html.dataacquisitionmanagement.*;
+import org.hadatac.console.views.html.dataacquisitionsearch.measurement_details;
 import org.hadatac.entity.pojo.DataAcquisition;
 import org.hadatac.entity.pojo.HADataC;
+import org.hadatac.entity.pojo.Measurement;
 import org.hadatac.entity.pojo.User;
 
 import be.objectify.deadbolt.java.actions.Group;
@@ -106,12 +109,7 @@ public class SetAccessPermission extends Controller {
 			e.printStackTrace();
 		}
 
-    	if (!dc_uri.equals("")) {
-
-    		/*
-    		 *  Add deployment information into handler
-    		 */
-    		
+    	if (!dc_uri.equals("")) {    		
     		dc = DataAcquisition.findByUri(dc_uri);
     	}
     	
@@ -124,6 +122,12 @@ public class SetAccessPermission extends Controller {
     		System.out.println("New Perm: " + newPermUri);
     		dc.setPermissionUri(newPermUri);
     		dc.save();
+    		
+    		List<Measurement> listMeasurement = Measurement.findByDataAcquisitionUri(dc_uri);
+    		for(Measurement measurement : listMeasurement){
+    			measurement.setPermissionUri(newPermUri);
+    			measurement.save();
+    		}
     	}
     	
     	DataAcquisition dc2 = DataAcquisition.findByUri(dc_uri);

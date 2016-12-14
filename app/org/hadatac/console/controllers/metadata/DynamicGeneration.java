@@ -561,7 +561,7 @@ public class DynamicGeneration extends Controller {
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		} 
+		}
 		
 		// Delete Existing Study Data
 		try {
@@ -617,6 +617,7 @@ public class DynamicGeneration extends Controller {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+
 		// Add Indicators
 		try {
 			ProcessBuilder p=new ProcessBuilder("curl","http://localhost:8983/solr/studies/update?commit=true", "-H","Content-type:application/json",

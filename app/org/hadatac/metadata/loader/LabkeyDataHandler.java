@@ -15,11 +15,13 @@ import org.labkey.remoteapi.query.GetQueriesCommand;
 import org.labkey.remoteapi.query.GetQueriesResponse;
 import org.labkey.remoteapi.query.SelectRowsCommand;
 import org.labkey.remoteapi.query.SelectRowsResponse;
+import org.labkey.remoteapi.query.UpdateRowsCommand;
+import org.labkey.remoteapi.query.SaveRowsResponse;
 import org.labkey.remoteapi.security.GetContainersCommand;
 import org.labkey.remoteapi.security.GetContainersResponse;
 import org.labkey.remoteapi.security.EnsureLoginCommand;
 
-public class LabkeyDataLoader {
+public class LabkeyDataHandler {
 	public Map< String, Map< String, List<PlainTriple> > > mapQueryNameToTriples = 
 			new HashMap< String, Map< String, List<PlainTriple> > >();
 	private Connection cn = null;
@@ -31,7 +33,7 @@ public class LabkeyDataLoader {
 		public String obj;
 	}
 	
-	public LabkeyDataLoader(String labkey_site, String user_name, String password, String path){
+	public LabkeyDataHandler(String labkey_site, String user_name, String password, String path){
 		cn = new Connection(labkey_site, user_name, password);
 		setFolderPath(path);
 	}
@@ -107,6 +109,63 @@ public class LabkeyDataLoader {
 		
 		return mapRow;
 	}
+	
+//	public Map< String, List<PlainTriple> > updateRows(String queryName, List<String> cols) throws CommandException {
+//		Map< String, List<PlainTriple> > mapRow = new HashMap< String, List<PlainTriple> >();
+//		UpdateRowsCommand cmdUpd = new UpdateRowsCommand("lists", queryName);
+//		Map<String, Object> row = new HashMap<String, Object>();
+//		row.put("Key", "newKey");
+//		row.put("LastName", "Test UPDATED");
+//		cmdUpd.addRow(row);
+//		SaveRowsResponse = cmdUpd.execute(cn, "PROJECT_NAME");
+//		int nTriples = 0;
+//		try {
+//			SelectRowsResponse response = cmd.execute(cn, folder_path);
+//			for (Map<String, Object> row : response.getRows()){
+//				String pri_key = "";
+//				for(String the_key : row.keySet()){
+//					if(the_key.toLowerCase().contains("uri")){
+//						pri_key = the_key;
+//					}
+//				}
+//				String sub = ((JSONObject)row.get(pri_key)).get("value").toString();
+//				List<PlainTriple> triples = new LinkedList<PlainTriple>();
+//				for(Object pred : row.keySet()){
+//					if(((String)pred).equals(pri_key)){
+//						continue;
+//					}
+//					PlainTriple tri = new PlainTriple();
+//					tri.sub = replaceIrregularCharacters(sub);
+//					tri.pred = replaceIrregularCharacters(pred.toString());
+//					Object obj_value = ((JSONObject)row.get(pred.toString())).get("value");
+//					if(obj_value == null){
+//						continue;
+//					}
+//					else{
+//						tri.obj = obj_value.toString();
+//					}
+//			        triples.add(tri);
+//			        nTriples++;
+//				}
+//				mapRow.put(sub, triples);
+//			}
+//			
+//			System.out.println(String.format("Read %d row(s) with %d triple(s) from Table \"%s\"", 
+//					response.getRowCount(), nTriples, queryName));
+//			return mapRow;
+//		} catch (IOException e) {
+//			e.printStackTrace();
+//		} catch (CommandException e) {
+//			if(e.getMessage().equals("Unauthorized")){
+//				throw e;
+//			}
+//			else{
+//				e.printStackTrace();
+//			}
+//		}
+//		
+//		return mapRow;
+//	}
 	
 	public List<String> getAllQueryNames() throws CommandException {
 		GetQueriesCommand cmd = new GetQueriesCommand("lists");

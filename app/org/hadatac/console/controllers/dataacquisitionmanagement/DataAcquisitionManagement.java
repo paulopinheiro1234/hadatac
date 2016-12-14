@@ -1,4 +1,4 @@
-package org.hadatac.console.controllers.dataacquisitions;
+package org.hadatac.console.controllers.dataacquisitionmanagement;
 
 import org.hadatac.console.controllers.AuthApplication;
 import org.hadatac.console.controllers.triplestore.UserManagement;
@@ -9,7 +9,7 @@ import java.util.List;
 import play.mvc.Controller;
 import play.mvc.Result;
 
-import org.hadatac.console.views.html.dataacquisitions.*;
+import org.hadatac.console.views.html.dataacquisitionmanagement.*;
 import org.hadatac.entity.pojo.DataAcquisition;
 import org.hadatac.utils.State;
 
@@ -19,10 +19,8 @@ import be.objectify.deadbolt.java.actions.Restrict;
 
 public class DataAcquisitionManagement extends Controller {
 
-	// for /metadata HTTP GET requests
 	@Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
     public static Result index(int stateId) {
-
     	State state = new State(stateId);
     	final User user = AuthApplication.getLocalUser(session());
 		String ownerUri = UserManagement.getUriByEmail(user.email);
@@ -30,22 +28,16 @@ public class DataAcquisitionManagement extends Controller {
 		System.out.println(ownerUri);
     	List<DataAcquisition> theResults = DataAcquisition.find(ownerUri, state);    		
     	
-        return ok(dataAcquisitionManagement.render(state, theResults));
-        
-    }// /index()
+        return ok(dataAcquisitionManagement.render(state, theResults));   
+    }
 
-
-    // for /metadata HTTP POST requests
 	@Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
     public static Result postIndex(int stateId) {
-
     	State state = new State(stateId);
     	final User user = AuthApplication.getLocalUser(Controller.session());
 		String ownerUri = UserManagement.getUriByEmail(user.email);
     	List<DataAcquisition> theResults = DataAcquisition.find(ownerUri, state);    		
     	
         return ok(dataAcquisitionManagement.render(state, theResults));
-        
-    }// /postIndex()
-
+    }
 }

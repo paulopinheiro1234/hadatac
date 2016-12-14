@@ -1,4 +1,4 @@
-package org.hadatac.console.controllers.dataacquisition;
+package org.hadatac.console.controllers.dataacquisitionsearch;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -19,7 +19,7 @@ import play.libs.*;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
-import org.hadatac.console.views.html.dataacquisition.*;
+import org.hadatac.console.views.html.dataacquisitionsearch.*;
 import org.hadatac.data.loader.ccsv.Parser;
 import org.hadatac.data.loader.util.Arguments;
 import org.hadatac.data.loader.util.FileFactory;
@@ -78,8 +78,9 @@ public class LoadCCSV extends Controller {
 			files.closeFile("log", "w");
 		} catch (Exception e) {
 			e.printStackTrace();
-		}		
-		message += "[" + new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()) + "] end of file "; //+ ccsvFile.getName();
+		}
+		
+		message += "[" + new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()) + "] end of file";
 	    return message;
    }
     

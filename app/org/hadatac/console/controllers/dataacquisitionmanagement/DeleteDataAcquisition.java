@@ -1,4 +1,4 @@
-package org.hadatac.console.controllers.dataacquisitions;
+package org.hadatac.console.controllers.dataacquisitionmanagement;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
@@ -7,7 +7,7 @@ import play.mvc.Controller;
 import play.mvc.Result;
 
 import org.hadatac.console.controllers.AuthApplication;
-import org.hadatac.console.views.html.dataacquisitions.*;
+import org.hadatac.console.views.html.dataacquisitionmanagement.*;
 import org.hadatac.entity.pojo.DataAcquisition;
 
 import be.objectify.deadbolt.java.actions.Group;
