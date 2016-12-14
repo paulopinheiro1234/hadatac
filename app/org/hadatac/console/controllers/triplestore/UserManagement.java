@@ -13,18 +13,14 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.annotation.Generated;
-
 import play.*;
 import play.data.Form;
 import play.mvc.*;
 import play.mvc.Http.MultipartFormData;
 import play.mvc.Http.MultipartFormData.FilePart;
-import play.libs.*;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
-import org.apache.jena.base.Sys;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.riot.RDFDataMgr;
 import org.hadatac.console.controllers.AuthApplication;
@@ -34,6 +30,7 @@ import org.hadatac.console.models.GroupRegistrationForm;
 import org.hadatac.console.models.SparqlQueryResults;
 import org.hadatac.console.models.TripleDocument;
 import org.hadatac.console.views.html.triplestore.*;
+import org.hadatac.console.models.SysUser;
 import org.hadatac.entity.pojo.User;
 import org.hadatac.entity.pojo.UserGroup;
 import org.hadatac.metadata.loader.PermissionsContext;
@@ -82,15 +79,42 @@ public class UserManagement extends Controller {
 	}
 	
 	@Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
-    public static Result changeUserPermission(String user_uri, boolean bGrant) {
-		User.changePermission(user_uri, bGrant);
+    public static Result grantAdminPermission(String user_uri) {
+		try {
+			user_uri = URLDecoder.decode(user_uri, "UTF-8");
+		} catch (UnsupportedEncodingException e) {
+			e.printStackTrace();
+		}
+		SysUser su = SysUser.findByEmail(User.find(user_uri).getEmail());
+		su.addSecurityRole(AuthApplication.DATA_MANAGER_ROLE);
+		su.save();
+		
 		return ok(users.render("init", "", User.find(), UserGroup.find(), ""));
     }
-
+	
 	@Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
-    public static Result postChangeUserPermission(String user_uri, boolean bGrant) {
-		User.changePermission(user_uri, bGrant);
-    	return ok(users.render("init", "", User.find(), UserGroup.find(), ""));
+    public static Result postGrantAdminPermission(String user_uri) {
+		return grantAdminPermission(user_uri);
+    }
+	
+	@Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
+    public static Result revokeAdminPermission(String user_uri) {
+		try {
+			user_uri = URLDecoder.decode(user_uri, "UTF-8");
+		} catch (UnsupportedEncodingException e) {
+			e.printStackTrace();
+		}
+		
+		SysUser su = SysUser.findByEmail(User.find(user_uri).getEmail());
+		su.removeSecurityRole(AuthApplication.DATA_MANAGER_ROLE);
+		su.save();
+		
+		return ok(users.render("init", "", User.find(), UserGroup.find(), ""));
+    }
+	
+	@Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
+    public static Result postRevokeAdminPermission(String user_uri) {
+		return revokeAdminPermission(user_uri);
     }
 	
 	@Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))

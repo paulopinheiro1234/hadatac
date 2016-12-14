@@ -20,7 +20,7 @@ import org.apache.jena.rdf.model.Model;
 import org.apache.jena.riot.RDFDataMgr;
 import org.hadatac.console.controllers.AuthApplication;
 import org.hadatac.console.controllers.triplestore.UserManagement;
-import org.hadatac.console.models.User;
+import org.hadatac.console.models.SysUser;
 import org.hadatac.entity.pojo.DataAcquisition;
 import org.hadatac.entity.pojo.Deployment;
 import org.hadatac.entity.pojo.TriggeringEvent;
@@ -268,7 +268,7 @@ public class TripleProcessing {
 						String deployment_uri = cellProc.convertToWholeURI(cellValue);
 						dataCollection.setDeploymentUri(deployment_uri);
 						
-						final User user = AuthApplication.getLocalUser(Controller.session());
+						final SysUser user = AuthApplication.getLocalUser(Controller.session());
 						String ownerUri = UserManagement.getUriByEmail(user.email);
 						System.out.println(user.email);
 						System.out.println("OwnerUri is:");

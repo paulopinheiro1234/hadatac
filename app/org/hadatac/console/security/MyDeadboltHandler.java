@@ -2,7 +2,7 @@ package org.hadatac.console.security;
 
 import java.util.Optional;
 
-import org.hadatac.console.models.User;
+import org.hadatac.console.models.SysUser;
 import play.libs.F;
 import play.libs.F.Promise;
 import play.mvc.Http;
@@ -48,7 +48,7 @@ public class MyDeadboltHandler extends AbstractDeadboltHandler {
 	public Promise<Optional<Subject>> getSubject(final Http.Context context) {
 		final AuthUserIdentity u = PlayAuthenticate.getUser(context);
 		// Caching might be a good idea here
-		return F.Promise.pure(Optional.ofNullable((Subject)User.findByAuthUserIdentity(u)));
+		return F.Promise.pure(Optional.ofNullable((Subject)SysUser.findByAuthUserIdentity(u)));
 	}
 
 	@Override

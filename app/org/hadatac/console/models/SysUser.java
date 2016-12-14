@@ -11,6 +11,7 @@ import com.feth.play.module.pa.user.EmailIdentity;
 import com.feth.play.module.pa.user.NameIdentity;
 import com.feth.play.module.pa.user.FirstLastNameIdentity;
 
+import org.hadatac.console.controllers.AuthApplication;
 import org.hadatac.console.models.TokenAction.Type;
 import play.Play;
 import play.data.format.Formats;
@@ -36,7 +37,7 @@ import java.util.*;
  * Deadbolt2
  */
 
-public class User extends AppModel implements Subject {
+public class SysUser extends AppModel implements Subject {
 	/**
 	 * 
 	 */
@@ -80,7 +81,7 @@ public class User extends AppModel implements Subject {
 
 	public List<UserPermission> permissions;
 	
-	public User() {
+	public SysUser() {
 		roles = new ArrayList<SecurityRole>();
 	}
 	
@@ -113,6 +114,42 @@ public class User extends AppModel implements Subject {
 			SecurityRole role = new SecurityRole();
 			role.id_s = id;
 			roles.add(role);
+		}
+	}
+	
+	public boolean isDataManager() {
+		SecurityRole target = SecurityRole.findByRoleNameSolr(AuthApplication.DATA_MANAGER_ROLE);
+		for(SecurityRole r : roles) {
+			if(r.id_s.equals(target.id_s)){
+				return true;
+			}
+		}
+		return false;
+	}
+	
+	public void addSecurityRole(String role_name) {
+		SecurityRole new_role = SecurityRole.findByRoleNameSolr(role_name);
+		boolean isRoleExisted = false;
+		Iterator<SecurityRole> iterRoles = roles.iterator();
+		while (iterRoles.hasNext()) {
+			SecurityRole role = iterRoles.next();
+			if(role.id_s.equals(new_role.id_s)){
+				isRoleExisted = true;
+			}
+		}
+		if(!isRoleExisted){
+			roles.add(new_role);
+		}
+	}
+	
+	public void removeSecurityRole(String role_name) {
+		SecurityRole new_role = SecurityRole.findByRoleNameSolr(role_name);
+		Iterator<SecurityRole> iterRoles = roles.iterator();
+		while (iterRoles.hasNext()) {
+			SecurityRole role = iterRoles.next();
+			if(role.id_s.equals(new_role.id_s)){
+				iterRoles.remove();
+			}
 		}
 	}
 	
@@ -160,7 +197,7 @@ public class User extends AppModel implements Subject {
 	
 	public static boolean existsByAuthUserIdentitySolr(
 			final AuthUserIdentity identity) {
-		final List<User> users;
+		final List<SysUser> users;
 		if (identity instanceof UsernamePasswordAuthUser) {
 			users = getUsernamePasswordAuthUserFindSolr((UsernamePasswordAuthUser) identity);
 		} else {
@@ -169,12 +206,12 @@ public class User extends AppModel implements Subject {
 		return !users.isEmpty();
 	}
 	
-	private static List<User> getAuthUserFindSolr(
+	private static List<SysUser> getAuthUserFindSolr(
 		final AuthUserIdentity identity) {
 		SolrClient solrClient = new HttpSolrClient(Play.application().configuration().getString("hadatac.solr.users") + "/user");
 		String query = "active:true AND provider_user_id:" + identity.getId() + " AND provider_key:" + identity.getProvider();
     	SolrQuery solrQuery = new SolrQuery(query);
-    	List<User> users = new ArrayList<User>();
+    	List<SysUser> users = new ArrayList<SysUser>();
     	
     	try {
 			QueryResponse queryResponse = solrClient.query(solrQuery);
@@ -182,7 +219,7 @@ public class User extends AppModel implements Subject {
 			SolrDocumentList list = queryResponse.getResults();
 			Iterator<SolrDocument> i = list.iterator();
 			while (i.hasNext()) {
-				User user = convertSolrDocumentToUser(i.next());
+				SysUser user = convertSolrDocumentToUser(i.next());
 				users.add(user);
 			}
 		} catch (Exception e) {
@@ -192,18 +229,18 @@ public class User extends AppModel implements Subject {
     	return users;
 	}
 
-	public static User findByAuthUserIdentity(final AuthUserIdentity identity) {
+	public static SysUser findByAuthUserIdentity(final AuthUserIdentity identity) {
 		return findByAuthUserIdentitySolr(identity);
 	}
 	
-	public static User findByAuthUserIdentitySolr(final AuthUserIdentity identity) {
+	public static SysUser findByAuthUserIdentitySolr(final AuthUserIdentity identity) {
 		if (identity == null) {
 			return null;
 		}
 		if (identity instanceof UsernamePasswordAuthUser) {
 			return findByUsernamePasswordIdentitySolr((UsernamePasswordAuthUser) identity);
 		} else {
-			List<User> users = getAuthUserFindSolr(identity); 
+			List<SysUser> users = getAuthUserFindSolr(identity); 
 			if (users.size() == 1) {
 				return users.get(0);
 			} else {
@@ -212,14 +249,14 @@ public class User extends AppModel implements Subject {
 		}
 	}
 
-	public static User findByUsernamePasswordIdentity(
+	public static SysUser findByUsernamePasswordIdentity(
 			final UsernamePasswordAuthUser identity) {
 		return findByUsernamePasswordIdentitySolr(identity);
 	}
 	
-	public static User findByUsernamePasswordIdentitySolr(
+	public static SysUser findByUsernamePasswordIdentitySolr(
 			final UsernamePasswordAuthUser identity) {
-		List<User> users = getUsernamePasswordAuthUserFindSolr(identity);
+		List<SysUser> users = getUsernamePasswordAuthUserFindSolr(identity);
 		if (users.size() == 1) {
 			return users.get(0);
 		} else {
@@ -227,10 +264,10 @@ public class User extends AppModel implements Subject {
 		}
 	}
 	
-	public static User findByIdSolr(final String id) {
+	public static SysUser findByIdSolr(final String id) {
 		SolrClient solrClient = new HttpSolrClient(Play.application().configuration().getString("hadatac.solr.users") + "/users");
     	SolrQuery solrQuery = new SolrQuery("id:" + id);
-    	User user = null;
+    	SysUser user = null;
     	
     	try {
 			QueryResponse queryResponse = solrClient.query(solrQuery);
@@ -246,16 +283,16 @@ public class User extends AppModel implements Subject {
     	return user;
 	}
 
-	private static List<User> getUsernamePasswordAuthUserFindSolr(
+	private static List<SysUser> getUsernamePasswordAuthUserFindSolr(
 			final UsernamePasswordAuthUser identity) {
 		return getEmailUserFindSolr(identity.getEmail(), identity.getProvider());
 	}
 
-	public void merge(final User otherUser) {
+	public void merge(final SysUser otherUser) {
 		mergeSolr(otherUser);
 	}
 	
-	public void mergeSolr(final User otherUser) {
+	public void mergeSolr(final SysUser otherUser) {
 		for (final LinkedAccount acc : otherUser.linkedAccounts) {
 			this.linkedAccounts.add(LinkedAccount.create(acc));
 		}
@@ -267,8 +304,8 @@ public class User extends AppModel implements Subject {
 		otherUser.save();
 	}
 	
-	public static User create(final AuthUser authUser, String uri) {
-		User user = User.create(authUser);
+	public static SysUser create(final AuthUser authUser, String uri) {
+		SysUser user = SysUser.create(authUser);
 		user.uri = uri;
 		user.save();
 		return user;
@@ -292,8 +329,8 @@ public class User extends AppModel implements Subject {
     	return false;
 	}
 
-	public static User create(final AuthUser authUser) {
-		final User user = new User();
+	public static SysUser create(final AuthUser authUser) {
+		final SysUser user = new SysUser();
 		
 		user.roles.add(SecurityRole
 				.findByRoleNameSolr(org.hadatac.console.controllers.AuthApplication.DATA_OWNER_ROLE));
@@ -335,7 +372,7 @@ public class User extends AppModel implements Subject {
 		
 		user.id_s = UUID.randomUUID().toString();
 		
-		if (User.existsSolr() == false) {
+		if (SysUser.existsSolr() == false) {
 			user.roles.add(SecurityRole
 					.findByRoleNameSolr(org.hadatac.console.controllers.AuthApplication.DATA_MANAGER_ROLE));
 			user.emailValidated = true;
@@ -348,7 +385,6 @@ public class User extends AppModel implements Subject {
 		userTs.setName(user.name);
 		userTs.setEmail(user.email);
 		userTs.setUri("http://localhost/users#admin");
-		userTs.setAdministrator(true);
 		userTs.save();
 		
 		return user;
@@ -378,8 +414,8 @@ public class User extends AppModel implements Subject {
 	}
 	
 	public static void mergeSolr(final AuthUser oldUser, final AuthUser newUser) {
-		User.findByAuthUserIdentitySolr(oldUser).merge(
-				User.findByAuthUserIdentitySolr(newUser));
+		SysUser.findByAuthUserIdentitySolr(oldUser).merge(
+				SysUser.findByAuthUserIdentitySolr(newUser));
 	}
 
 	public Set<String> getProviders() {
@@ -393,23 +429,24 @@ public class User extends AppModel implements Subject {
 
 	public static void addLinkedAccount(final AuthUser oldUser,
 			final AuthUser newUser) {
-		final User u = User.findByAuthUserIdentity(oldUser);
+		final SysUser u = SysUser.findByAuthUserIdentity(oldUser);
 		u.linkedAccounts.add(LinkedAccount.create(newUser));
 		u.save();
 	}
 
 	public static void setLastLoginDate(final AuthUser knownUser) {
-		final User u = User.findByAuthUserIdentity(knownUser);
+		final SysUser u = SysUser.findByAuthUserIdentity(knownUser);
 		u.lastLogin = new Date();
 		u.save();
 	}
 
-	public static User findByEmail(final String email) {
+	public static SysUser findByEmail(final String email) {
+		System.out.println(String.format("findByEmail: %s", email));
 		return findByEmailSolr(email);
 	}
 	
-	public static User findByEmailSolr(final String email) {
-		List<User> users = getEmailUserFindSolr(email);
+	public static SysUser findByEmailSolr(final String email) {
+		List<SysUser> users = getEmailUserFindSolr(email);
 		if (users.size() == 1) {
 			return users.get(0);
 		} else {
@@ -417,15 +454,15 @@ public class User extends AppModel implements Subject {
 		}
 	}
 
-	private static List<User> getEmailUserFindSolr(final String email) {
+	private static List<SysUser> getEmailUserFindSolr(final String email) {
 		return getEmailUserFindSolr(email, "");
 	}
 	
-	private static List<User> getEmailUserFindSolr(final String email, final String providerKey) {
+	private static List<SysUser> getEmailUserFindSolr(final String email, final String providerKey) {
 		SolrClient solrClient = new HttpSolrClient(Play.application().configuration().getString("hadatac.solr.users") + "/users");
 		String query = "email:" + email + " AND active:true";
     	SolrQuery solrQuery = new SolrQuery(query);
-    	List<User> users = new ArrayList<User>();
+    	List<SysUser> users = new ArrayList<SysUser>();
     	
     	try {
 			QueryResponse queryResponse = solrClient.query(solrQuery);
@@ -433,7 +470,7 @@ public class User extends AppModel implements Subject {
 			SolrDocumentList list = queryResponse.getResults();
 			Iterator<SolrDocument> i = list.iterator();
 			while (i.hasNext()) {
-				User user = convertSolrDocumentToUser(i.next());
+				SysUser user = convertSolrDocumentToUser(i.next());
 				users.add(user);
 				if (!providerKey.isEmpty()) {
 					LinkedAccount account = LinkedAccount.findByProviderKeySolr(user, providerKey);
@@ -457,7 +494,7 @@ public class User extends AppModel implements Subject {
 		return LinkedAccount.findByProviderKeySolr(this, providerKey);
 	}
 
-	public static void verify(final User unverified) {
+	public static void verify(final SysUser unverified) {
 		// You might want to wrap this into a transaction
 		unverified.emailValidated = true;
 		unverified.save();
@@ -498,8 +535,8 @@ public class User extends AppModel implements Subject {
 		TokenAction.deleteByUserSolr(this, Type.PASSWORD_RESET);
 	}
 	
-	private static User convertSolrDocumentToUser(SolrDocument doc) {
-		User user = new User();
+	private static SysUser convertSolrDocumentToUser(SolrDocument doc) {
+		SysUser user = new SysUser();
 		user.id_s = doc.getFieldValue("id").toString();
 		user.uri = doc.getFieldValue("uri").toString();
 		user.email = doc.getFieldValue("email").toString();

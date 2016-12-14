@@ -11,7 +11,7 @@ import org.hadatac.console.controllers.triplestore.UserManagement;
 import org.hadatac.console.models.LinkedAccount;
 import org.hadatac.console.models.TokenAction;
 import org.hadatac.console.models.TokenAction.Type;
-import org.hadatac.console.models.User;
+import org.hadatac.console.models.SysUser;
 
 import play.Application;
 import play.Logger;
@@ -129,7 +129,7 @@ public class MyUsernamePasswordAuthProvider
 
 	@Override
 	protected com.feth.play.module.pa.providers.password.UsernamePasswordAuthProvider.SignupResult signupUser(final MyUsernamePasswordAuthUser user) {
-		final User u = User.findByUsernamePasswordIdentity(user);
+		final SysUser u = SysUser.findByUsernamePasswordIdentity(user);
 		if (u != null) {
 			if (u.emailValidated) {
 				// This user exists, has its email validated and is active
@@ -144,7 +144,7 @@ public class MyUsernamePasswordAuthProvider
 		String userUri = UserManagement.getUriByEmail(user.getEmail());
 		
 		@SuppressWarnings("unused")
-		final User newUser = User.create(user, userUri);
+		final SysUser newUser = SysUser.create(user, userUri);
 		// Usually the email should be verified before allowing login, however
 		// if you return
 		// return SignupResult.USER_CREATED;
@@ -158,7 +158,7 @@ public class MyUsernamePasswordAuthProvider
 	@Override
 	protected com.feth.play.module.pa.providers.password.UsernamePasswordAuthProvider.LoginResult loginUser(
 			final MyLoginUsernamePasswordAuthUser authUser) {
-		final User u = User.findByUsernamePasswordIdentity(authUser);
+		final SysUser u = SysUser.findByUsernamePasswordIdentity(authUser);
 		if (u == null) {
 			return LoginResult.NOT_FOUND;
 		} else {
@@ -262,29 +262,29 @@ public class MyUsernamePasswordAuthProvider
 	
 	protected String generateVerificationRecordSolr(
 			final MyUsernamePasswordAuthUser user) {
-		return generateVerificationRecord(User.findByAuthUserIdentitySolr(user));
+		return generateVerificationRecord(SysUser.findByAuthUserIdentitySolr(user));
 	}
 
-	protected String generateVerificationRecord(final User user) {
+	protected String generateVerificationRecord(final SysUser user) {
 		final String token = generateToken();
 		// Do database actions, etc.
 		TokenAction.create(Type.EMAIL_VERIFICATION, token, user);
 		return token;
 	}
 
-	protected String generatePasswordResetRecord(final User u) {
+	protected String generatePasswordResetRecord(final SysUser u) {
 		final String token = generateToken();
 		TokenAction.create(Type.PASSWORD_RESET, token, u);
 		return token;
 	}
 
-	protected String getPasswordResetMailingSubject(final User user,
+	protected String getPasswordResetMailingSubject(final SysUser user,
 			final Context ctx) {
 		return Messages.get("playauthenticate.password.reset_email.subject");
 	}
 
 	protected Body getPasswordResetMailingBody(final String token,
-			final User user, final Context ctx) {
+			final SysUser user, final Context ctx) {
 
 		final boolean isSecure = getConfiguration().getBoolean(
 				SETTING_KEY_PASSWORD_RESET_LINK_SECURE);
@@ -304,7 +304,7 @@ public class MyUsernamePasswordAuthProvider
 		return new Body(text, html);
 	}
 
-	public void sendPasswordResetMailing(final User user, final Context ctx) {
+	public void sendPasswordResetMailing(final SysUser user, final Context ctx) {
 		final String token = generatePasswordResetRecord(user);
 		final String subject = getPasswordResetMailingSubject(user, ctx);
 		final Body body = getPasswordResetMailingBody(token, user, ctx);
@@ -316,7 +316,7 @@ public class MyUsernamePasswordAuthProvider
 				SETTING_KEY_LINK_LOGIN_AFTER_PASSWORD_RESET);
 	}
 
-	protected String getVerifyEmailMailingSubjectAfterSignup(final User user,
+	protected String getVerifyEmailMailingSubjectAfterSignup(final SysUser user,
 			final Context ctx) {
 		return Messages.get("playauthenticate.password.verify_email.subject");
 	}
@@ -365,7 +365,7 @@ public class MyUsernamePasswordAuthProvider
 	}
 
 	protected Body getVerifyEmailMailingBodyAfterSignup(final String token,
-			final User user, final Context ctx) {
+			final SysUser user, final Context ctx) {
 
 		final boolean isSecure = getConfiguration().getBoolean(
 				SETTING_KEY_VERIFICATION_LINK_SECURE);
@@ -385,7 +385,7 @@ public class MyUsernamePasswordAuthProvider
 		return new Body(text, html);
 	}
 
-	public void sendVerifyEmailMailingAfterSignup(final User user,
+	public void sendVerifyEmailMailingAfterSignup(final SysUser user,
 			final Context ctx) {
 
 		final String subject = getVerifyEmailMailingSubjectAfterSignup(user,
@@ -395,7 +395,7 @@ public class MyUsernamePasswordAuthProvider
 		sendMail(subject, body, getEmailName(user));
 	}
 
-	private String getEmailName(final User user) {
+	private String getEmailName(final SysUser user) {
 		return getEmailName(user.email, user.name);
 	}
 }

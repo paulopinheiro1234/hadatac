@@ -1,6 +1,6 @@
 package org.hadatac.console.service;
 
-import org.hadatac.console.models.User;
+import org.hadatac.console.models.SysUser;
 import play.Application;
 
 import com.feth.play.module.pa.user.AuthUser;
@@ -21,9 +21,9 @@ public class MyUserServicePlugin extends UserServicePlugin {
 	}
 	
 	public Object saveSolr(final AuthUser authUser) {
-		final boolean isLinked = User.existsByAuthUserIdentity(authUser);
+		final boolean isLinked = SysUser.existsByAuthUserIdentity(authUser);
 		if (!isLinked) {
-			return User.create(authUser).id_s;
+			return SysUser.create(authUser).id_s;
 		} else {
 			// we have this user already, so return null
 			return null;
@@ -34,7 +34,7 @@ public class MyUserServicePlugin extends UserServicePlugin {
 	public Object getLocalIdentity(final AuthUserIdentity identity) {
 		// For production: Caching might be a good idea here...
 		// ...and dont forget to sync the cache when users get deactivated/deleted
-		final User u = User.findByAuthUserIdentity(identity);
+		final SysUser u = SysUser.findByAuthUserIdentity(identity);
 		if(u != null) {
 			return u.id_s;
 		} else {
@@ -45,21 +45,21 @@ public class MyUserServicePlugin extends UserServicePlugin {
 	@Override
 	public AuthUser merge(final AuthUser newUser, final AuthUser oldUser) {
 		if (!oldUser.equals(newUser)) {
-			User.merge(oldUser, newUser);
+			SysUser.merge(oldUser, newUser);
 		}
 		return oldUser;
 	}
 
 	@Override
 	public AuthUser link(final AuthUser oldUser, final AuthUser newUser) {
-		User.addLinkedAccount(oldUser, newUser);
+		SysUser.addLinkedAccount(oldUser, newUser);
 		return newUser;
 	}
 	
 	@Override
 	public AuthUser update(final AuthUser knownUser) {
 		// User logged in again, bump last login date
-		User.setLastLoginDate(knownUser);
+		SysUser.setLastLoginDate(knownUser);
 		return knownUser;
 	}
 

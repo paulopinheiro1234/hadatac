@@ -2,7 +2,7 @@ package org.hadatac.console.controllers.dataacquisitionmanagement;
 
 import org.hadatac.console.controllers.AuthApplication;
 import org.hadatac.console.controllers.triplestore.UserManagement;
-import org.hadatac.console.models.User;
+import org.hadatac.console.models.SysUser;
 
 import java.util.List;
 
@@ -22,7 +22,7 @@ public class DataAcquisitionManagement extends Controller {
 	@Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
     public static Result index(int stateId) {
     	State state = new State(stateId);
-    	final User user = AuthApplication.getLocalUser(session());
+    	final SysUser user = AuthApplication.getLocalUser(session());
 		String ownerUri = UserManagement.getUriByEmail(user.email);
 		System.out.println(user.email);
 		System.out.println(ownerUri);
@@ -34,7 +34,7 @@ public class DataAcquisitionManagement extends Controller {
 	@Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
     public static Result postIndex(int stateId) {
     	State state = new State(stateId);
-    	final User user = AuthApplication.getLocalUser(Controller.session());
+    	final SysUser user = AuthApplication.getLocalUser(Controller.session());
 		String ownerUri = UserManagement.getUriByEmail(user.email);
     	List<DataAcquisition> theResults = DataAcquisition.find(ownerUri, state);    		
     	
