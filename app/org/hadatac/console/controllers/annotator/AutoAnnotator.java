@@ -30,7 +30,7 @@ import org.hadatac.console.http.DeploymentQueries;
 import org.hadatac.console.models.CSVAnnotationHandler;
 import org.hadatac.console.models.SparqlQueryResults;
 import org.hadatac.console.models.TripleDocument;
-import org.hadatac.console.models.User;
+import org.hadatac.console.models.SysUser;
 import org.hadatac.console.views.html.annotator.*;
 import org.hadatac.data.api.DataFactory;
 import org.hadatac.entity.pojo.DataAcquisition;

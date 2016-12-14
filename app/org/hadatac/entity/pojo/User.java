@@ -32,6 +32,8 @@ import org.apache.jena.update.UpdateExecutionFactory;
 import org.apache.jena.update.UpdateFactory;
 import org.apache.jena.update.UpdateProcessor;
 import org.apache.jena.update.UpdateRequest;
+import org.apache.xmlbeans.impl.xb.xsdschema.Public;
+import org.hadatac.console.models.SysUser;
 import org.hadatac.utils.Collections;
 import org.hadatac.utils.NameSpaces;
 import play.Play;
@@ -47,7 +49,6 @@ public class User implements Comparable<User> {
 	private String comment;
 	private String org_uri;
 	private String immediateGroupUri;
-	private boolean administrator;
 	
 	public String getUri() {
 		return uri;
@@ -121,14 +122,6 @@ public class User implements Comparable<User> {
 		org_uri = uri;
 	}
 	
-	public boolean isAdministrator() {
-		return administrator;
-	}
-
-	public void setAdministrator(boolean administrator) {
-		this.administrator = administrator;
-	}
-	
 	public String getGroupNamesUri() {
 		String list = "";
 		Map<String, String> map = getGroupNames();
@@ -140,6 +133,10 @@ public class User implements Comparable<User> {
 			}
 		}
 		return list;
+	}
+	
+	public boolean isAdministrator() {
+		return SysUser.findByEmail(getEmail()).isDataManager();
 	}
 	
 	public Map<String, String> getGroupNames() {
@@ -274,14 +271,6 @@ public class User implements Comparable<User> {
 				user.setHomepage(homepage);
 				System.out.println("homepage: " + homepage);
 		    }
-			else if (statement.getPredicate().getURI().equals("http://hadatac.org/ont/hadatac#isadmin")) {
-				if (object.asLiteral().getString().equals("true")) {
-				    user.setAdministrator(true);
-				} else {
-				    user.setAdministrator(false);
-				}
-				System.out.println("IsAdmin: " + object.asLiteral().getString());
-		    }
 		}
 		
 		QueryExecution qexecPublic = QueryExecutionFactory.sparqlService(Collections.getCollectionsName(Collections.METADATA_SPARQL), query);
@@ -301,32 +290,6 @@ public class User implements Comparable<User> {
 		}
 		
 		return user;
-	}
-	
-	public static void changePermission(String uri, boolean bAdmin) {
-		try {
-			uri = URLDecoder.decode(uri,"UTF-8");
-		} catch (UnsupportedEncodingException e) {
-			e.printStackTrace();
-		}
-		String flag = "";
-		String counter_flag = "";
-		if(bAdmin){
-			flag = "true";
-			counter_flag = "false";
-		}
-		else{
-			flag = "false";
-			counter_flag = "true";
-		}
-		
-		String queryString =  "DELETE { <" + uri + "> <http://hadatac.org/ont/hadatac#isadmin> \"" + counter_flag + "\" .  } \n "
-							+ "INSERT { <" + uri + "> <http://hadatac.org/ont/hadatac#isadmin> \"" + flag + "\" . } \n "
-							+ "WHERE { } \n";
-		System.out.println(queryString);
-		UpdateRequest req = UpdateFactory.create(queryString);
-		UpdateProcessor processor = UpdateExecutionFactory.createRemote(req, Collections.getCollectionsName(Collections.PERMISSIONS_SPARQL));
-		processor.execute();
 	}
 	
 	public static void changeAccessLevel(String uri, String group_uri) {

@@ -29,7 +29,7 @@ public class LinkedAccount extends AppModel {
 	@Field("id")
 	public String id_s;
 
-	public User user;
+	public SysUser user;
 
 	@Field("provider_user_id")
 	public String providerUserId;
@@ -43,14 +43,14 @@ public class LinkedAccount extends AppModel {
 	
 	@Field("user_id")
 	public void setUserId(String id) {
-		user = User.findByIdSolr(id);
+		user = SysUser.findByIdSolr(id);
 	}
 
-	public static LinkedAccount findByProviderKey(final User user, String key) {
+	public static LinkedAccount findByProviderKey(final SysUser user, String key) {
 		return findByProviderKeySolr(user, key);
 	}
 	
-	public static LinkedAccount findByProviderKeySolr(final User user, String key) {
+	public static LinkedAccount findByProviderKeySolr(final SysUser user, String key) {
 		LinkedAccount account = null;
 		SolrClient solrClient = new HttpSolrClient(Play.application().configuration().getString("hadatac.solr.users") + "/linked_account");
     	SolrQuery solrQuery = new SolrQuery("user_id:" + user.id_s + " AND provider_key:" + key);
@@ -70,7 +70,7 @@ public class LinkedAccount extends AppModel {
     	return account;
 	}
 	
-	public static List<LinkedAccount> findByIdSolr(final User user) {
+	public static List<LinkedAccount> findByIdSolr(final SysUser user) {
 		List<LinkedAccount> accounts = new ArrayList<LinkedAccount>(); 
 		SolrClient solrClient = new HttpSolrClient(Play.application().configuration().getString("hadatac.solr.users") + "/linked_account");
     	SolrQuery solrQuery = new SolrQuery("user_id:" + user.id_s);

@@ -29,7 +29,7 @@ import org.hadatac.console.models.SparqlQuery;
 import org.hadatac.console.models.SparqlQueryResults;
 import org.hadatac.console.models.CSVAnnotationHandler;
 import org.hadatac.console.models.TripleDocument;
-import org.hadatac.console.models.User;
+import org.hadatac.console.models.SysUser;
 
 import play.Play;
 import play.mvc.Controller;

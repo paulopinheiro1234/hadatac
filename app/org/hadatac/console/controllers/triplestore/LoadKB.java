@@ -18,7 +18,7 @@ import org.hadatac.console.views.html.dataacquisitionmanagement.dataAcquisitionM
 import org.hadatac.console.views.html.triplestore.*;
 import org.hadatac.entity.pojo.DataAcquisition;
 import org.hadatac.console.models.LabKeyLoginForm;
-import org.hadatac.console.models.User;
+import org.hadatac.console.models.SysUser;
 import org.hadatac.metadata.loader.MetadataContext;
 import org.hadatac.metadata.loader.SpreadsheetProcessing;
 import org.hadatac.metadata.loader.TripleProcessing;
@@ -122,7 +122,7 @@ public class LoadKB extends Controller {
     	}
     	
     	State state = new State(State.ALL);
-    	final User user = AuthApplication.getLocalUser(Controller.session());
+    	final SysUser user = AuthApplication.getLocalUser(Controller.session());
 		String ownerUri = UserManagement.getUriByEmail(user.email);
     	List<DataAcquisition> theResults = DataAcquisition.find(ownerUri, state);
         return ok(dataAcquisitionManagement.render(state, theResults));

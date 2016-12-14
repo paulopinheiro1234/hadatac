@@ -4,7 +4,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import org.hadatac.console.controllers.triplestore.UserManagement;
-import org.hadatac.console.models.User;
+import org.hadatac.console.models.SysUser;
 
 import play.Routes;
 import play.data.Form;
@@ -34,7 +34,7 @@ public class AuthApplication extends Controller {
 	public static final String DATA_MANAGER_ROLE = "data_manager";
 	
 	public static Result index() {
-		final User localUser = getLocalUser(session());
+		final SysUser localUser = getLocalUser(session());
 		if (localUser != null) {
 			final org.hadatac.entity.pojo.User user = org.hadatac.entity.pojo.User.find(localUser.uri);
 			String permissions = user.getGroupNamesUri();
@@ -43,21 +43,21 @@ public class AuthApplication extends Controller {
 		return ok(portal.render());
 	}
 
-	public static User getLocalUser(final Session session) {
+	public static SysUser getLocalUser(final Session session) {
 		final AuthUser currentAuthUser = PlayAuthenticate.getUser(session);
-		final User localUser = User.findByAuthUserIdentity(currentAuthUser);
+		final SysUser localUser = SysUser.findByAuthUserIdentity(currentAuthUser);
 		return localUser;
 	}
 
 	@Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
 	public static Result restricted() {
-		final User localUser = getLocalUser(session());
+		final SysUser localUser = getLocalUser(session());
 		return ok(restricted.render(localUser));
 	}
 
 	@Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
 	public static Result profile() {
-		final User localUser = getLocalUser(session());
+		final SysUser localUser = getLocalUser(session());
 		return ok(profile.render(localUser));
 	}
 
@@ -97,7 +97,7 @@ public class AuthApplication extends Controller {
 			// User did not fill everything properly
 			return badRequest(signup.render(filledForm));
 		} else {
-			if (User.existsSolr()) { // only check for pre-registration if it is not the first user signing up
+			if (SysUser.existsSolr()) { // only check for pre-registration if it is not the first user signing up
 				if (!UserManagement.isPreRegistered(filledForm.get().email)) {
 					return ok(notRegistered.render());
 				}

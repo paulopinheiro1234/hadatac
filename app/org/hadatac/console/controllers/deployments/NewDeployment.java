@@ -27,7 +27,7 @@ import be.objectify.deadbolt.java.actions.Restrict;
 import org.hadatac.console.models.DeploymentForm;
 import org.hadatac.console.models.SparqlQuery;
 import org.hadatac.console.models.SparqlQueryResults;
-import org.hadatac.console.models.User;
+import org.hadatac.console.models.SysUser;
 import org.hadatac.console.controllers.AuthApplication;
 import org.hadatac.console.controllers.triplestore.UserManagement;
 
@@ -78,7 +78,7 @@ public class NewDeployment extends Controller {
      */
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
     public static Result processForm() {
-    	final User user = AuthApplication.getLocalUser(session());
+    	final SysUser user = AuthApplication.getLocalUser(session());
         Form<DeploymentForm> form = Form.form(DeploymentForm.class).bindFromRequest();
         DeploymentForm data = form.get();
 

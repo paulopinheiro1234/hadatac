@@ -48,7 +48,7 @@ public class TokenAction {
 	@Field("token")
 	public String token;
 
-	public User targetUser;
+	public SysUser targetUser;
 
 	public Type type;
 
@@ -130,7 +130,7 @@ public class TokenAction {
 				tokenAction.setCreated(date.withZone(DateTimeZone.UTC).toString("EEE MMM dd HH:mm:ss zzz yyyy"));
 				date = new DateTime((Date)doc.getFieldValue("expires"));
 				tokenAction.setExpires(date.withZone(DateTimeZone.UTC).toString("EEE MMM dd HH:mm:ss zzz yyyy"));
-				tokenAction.targetUser = User.findByIdSolr(doc.getFieldValue("target_user_id").toString());
+				tokenAction.targetUser = SysUser.findByIdSolr(doc.getFieldValue("target_user_id").toString());
 			}
 		} catch (Exception e) {
 			System.out.println("[ERROR] TokenAction.findByTokenSolr - Exception message: " + e.getMessage());
@@ -139,11 +139,11 @@ public class TokenAction {
     	return tokenAction;
 	}
 
-	public static void deleteByUser(final User u, final Type type) {
+	public static void deleteByUser(final SysUser u, final Type type) {
 		deleteByUserSolr(u, type);
 	}
 	
-	public static void deleteByUserSolr(final User u, final Type type) {
+	public static void deleteByUserSolr(final SysUser u, final Type type) {
 		SolrClient solrClient = new HttpSolrClient(Play.application().configuration().getString("hadatac.solr.users") + "/token_action");
 		try {
 			solrClient.deleteByQuery("target_user_id:" + u.id_s + " AND type:" + type.name());
@@ -160,7 +160,7 @@ public class TokenAction {
 	}
 
 	public static TokenAction create(final Type type, final String token,
-			final User targetUser) {
+			final SysUser targetUser) {
 		final TokenAction ua = new TokenAction();
 		ua.id_s = UUID.randomUUID().toString();
 		ua.targetUser = targetUser;

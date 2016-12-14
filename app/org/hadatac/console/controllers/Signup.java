@@ -2,7 +2,7 @@ package org.hadatac.console.controllers;
 
 import org.hadatac.console.models.TokenAction;
 import org.hadatac.console.models.TokenAction.Type;
-import org.hadatac.console.models.User;
+import org.hadatac.console.models.SysUser;
 import play.data.Form;
 import play.i18n.Messages;
 import play.mvc.Controller;
@@ -79,7 +79,7 @@ public class Signup extends Controller {
 							"playauthenticate.reset_password.message.instructions_sent",
 							email));
 
-			final User user = User.findByEmail(email);
+			final SysUser user = SysUser.findByEmail(email);
 			if (user != null) {
 				// yep, we have a user with this email that is active - we do
 				// not know if the user owning that account has requested this
@@ -154,7 +154,7 @@ public class Signup extends Controller {
 			if (ta == null) {
 				return badRequest(no_token_or_invalid.render());
 			}
-			final User u = ta.targetUser;
+			final SysUser u = ta.targetUser;
 			try {
 				// Pass true for the second parameter if you want to
 				// automatically create a password and the exception never to
@@ -200,7 +200,7 @@ public class Signup extends Controller {
 			return badRequest(no_token_or_invalid.render());
 		}
 		final String email = ta.targetUser.email;
-		User.verify(ta.targetUser);
+		SysUser.verify(ta.targetUser);
 		flash(AuthApplication.FLASH_MESSAGE_KEY,
 				Messages.get("playauthenticate.verify_email.success", email));
 		if (AuthApplication.getLocalUser(session()) != null) {
