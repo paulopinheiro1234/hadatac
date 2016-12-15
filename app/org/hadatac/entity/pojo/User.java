@@ -32,12 +32,10 @@ import org.apache.jena.update.UpdateExecutionFactory;
 import org.apache.jena.update.UpdateFactory;
 import org.apache.jena.update.UpdateProcessor;
 import org.apache.jena.update.UpdateRequest;
-import org.apache.xmlbeans.impl.xb.xsdschema.Public;
 import org.hadatac.console.models.SysUser;
 import org.hadatac.utils.Collections;
 import org.hadatac.utils.NameSpaces;
 import play.Play;
-import scala.reflect.internal.tpe.FindMembers.FindMember;
 
 public class User implements Comparable<User> {
 	private String uri;
@@ -124,8 +122,9 @@ public class User implements Comparable<User> {
 	
 	public String getGroupNamesUri() {
 		String list = "";
-		Map<String, String> map = getGroupNames();
-		Iterator<String> i = map.keySet().iterator();
+		Map<String, String> nameList = new HashMap<String,String>();
+		getGroupNames(nameList);
+		Iterator<String> i = nameList.keySet().iterator();
 		while (i.hasNext()) {
 			list += i.next();
 			if (i.hasNext()) {
@@ -139,19 +138,15 @@ public class User implements Comparable<User> {
 		return SysUser.findByEmail(getEmail()).isDataManager();
 	}
 	
-	public Map<String, String> getGroupNames() {
-		Map<String, String> nameList = new HashMap<String,String>();
-		User user = User.find(uri);
-		if (user != null && user.getUri() != null && user.getName() != null) {
-			nameList.put(user.getUri(), user.getName());
-			while (user.getImmediateGroupUri() != null) {
-				user = User.find(getImmediateGroupUri());
-				if (user.getName() != null) {
-    				nameList.put(user.getUri(), user.getName());
-				}
+	public void getGroupNames(Map<String, String> nameList) {
+		nameList.put(getUri(), getName());
+		if(getImmediateGroupUri() != null) {
+			User user = User.find(getImmediateGroupUri());
+			if (user.getName() != null) {
+    			nameList.put(user.getUri(), user.getName());
+    			user.getGroupNames(nameList);
 			}
 		}
-		return nameList;
 	}
 	
 	public void save() {
