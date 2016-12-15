@@ -615,7 +615,6 @@ public class DataAcquisition {
 	}
 	
 	public static DataAcquisition findByUri(String dataCollectionUri) {
-		
 		SolrClient solr = new HttpSolrClient(Play.application().configuration().getString("hadatac.solr.data") + "/sdc");
 		SolrQuery query = new SolrQuery();
 		query.set("q", "uri:\"" + dataCollectionUri + "\"");
@@ -628,7 +627,6 @@ public class DataAcquisition {
 			SolrDocumentList list = queryResponse.getResults();
 			if (list.size() == 1) {
 				dataCollection = convertFromSolr(list.get(0));
-				//hadatac.deployment = Deployment.find(hadatac);
 			}
 		} catch (Exception e) {
 			System.out.println("[ERROR] DataAcquisition.findByUri(dataCollectionUri) - Exception message: " + e.getMessage());

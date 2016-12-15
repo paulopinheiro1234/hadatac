@@ -24,7 +24,7 @@ import org.hadatac.console.models.User;
 import org.hadatac.entity.pojo.DataAcquisition;
 import org.hadatac.entity.pojo.Deployment;
 import org.hadatac.entity.pojo.TriggeringEvent;
-import org.hadatac.metadata.loader.LabkeyDataLoader.PlainTriple;
+import org.hadatac.metadata.loader.LabkeyDataHandler.PlainTriple;
 import org.hadatac.metadata.model.SpreadsheetParsingResult;
 import org.hadatac.utils.Feedback;
 import org.hadatac.utils.NameSpaces;
@@ -137,7 +137,7 @@ public class TripleProcessing {
     public static List<String> getLabKeyMetadataLists(String labkey_site, String user_name, 
     		String password, String path) throws CommandException {
     	
-		LabkeyDataLoader loader = new LabkeyDataLoader(labkey_site, user_name, password, path);
+    	LabkeyDataHandler loader = new LabkeyDataHandler(labkey_site, user_name, password, path);
 		try {
 			List<String> queryNames = loader.getMetadataQueryNames(false);
 			return queryNames;
@@ -152,7 +152,7 @@ public class TripleProcessing {
     public static List<String> getLabKeyInstanceDataLists(String labkey_site, String user_name, 
     		String password, String path) throws CommandException {
     	
-		LabkeyDataLoader loader = new LabkeyDataLoader(labkey_site, user_name, password, path);
+    	LabkeyDataHandler loader = new LabkeyDataHandler(labkey_site, user_name, password, path);
 		try {
 			List<String> queryNames = loader.getInstanceDataQueryNames();
 			return queryNames;
@@ -167,7 +167,7 @@ public class TripleProcessing {
     public static List<String> getLabKeyFolders(String labkey_site, String user_name, 
     		String password, String path) throws CommandException {
     	
-		LabkeyDataLoader loader = new LabkeyDataLoader(labkey_site, user_name, password, path);
+    	LabkeyDataHandler loader = new LabkeyDataHandler(labkey_site, user_name, password, path);
 		try {
 			List<String> folders = loader.getSubfolders();
 			return folders;
@@ -180,7 +180,7 @@ public class TripleProcessing {
 	}
     
     private static String loadTriples(
-    		LabkeyDataLoader loader, 
+    		LabkeyDataHandler loader, 
     		List<String> list_names, 
     		Map< String, Map< String, List<PlainTriple> > > mapSheets, 
     		Map< String, List<String> > mapPreds) throws CommandException {
@@ -219,7 +219,7 @@ public class TripleProcessing {
     		String password, String path, List<String> list_names) throws CommandException {
     	
     	String message = "";
-    	LabkeyDataLoader loader = new LabkeyDataLoader(labkey_site, user_name, password, path);
+    	LabkeyDataHandler loader = new LabkeyDataHandler(labkey_site, user_name, password, path);
 		Map< String, Map< String, List<PlainTriple> > > mapSheets = 
 				new HashMap< String, Map< String, List<PlainTriple> > >();
 		Map< String, List<String> > mapPreds = 
@@ -310,7 +310,7 @@ public class TripleProcessing {
 			message += Feedback.println(mode, " ");
 		}
 		
-		LabkeyDataLoader loader = new LabkeyDataLoader(labkey_site, user_name, password, path);
+		LabkeyDataHandler loader = new LabkeyDataHandler(labkey_site, user_name, password, path);
 		Map< String, Map< String, List<PlainTriple> > > mapSheets = 
 				new HashMap< String, Map< String, List<PlainTriple> > >();
 		Map< String, List<String> > mapPreds = 

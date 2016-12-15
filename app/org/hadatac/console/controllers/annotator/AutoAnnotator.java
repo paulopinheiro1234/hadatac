@@ -21,21 +21,24 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.hadatac.console.controllers.AuthApplication;
-import org.hadatac.console.controllers.dataacquisition.LoadCCSV;
+import org.hadatac.console.controllers.dataacquisitionsearch.LoadCCSV;
 import org.hadatac.console.controllers.triplestore.LoadKB;
 import org.hadatac.console.controllers.triplestore.UserManagement;
+import org.hadatac.console.controllers.annotator.AnnotationLog;
 import org.hadatac.console.http.DataAcquisitionSchemaQueries;
 import org.hadatac.console.http.DeploymentQueries;
 import org.hadatac.console.models.CSVAnnotationHandler;
 import org.hadatac.console.models.SparqlQueryResults;
 import org.hadatac.console.models.TripleDocument;
 import org.hadatac.console.models.User;
-import org.hadatac.console.views.html.annotator.auto_ccsv;
+import org.hadatac.console.views.html.annotator.*;
 import org.hadatac.data.api.DataFactory;
 import org.hadatac.entity.pojo.DataAcquisition;
 import org.hadatac.metadata.loader.ValueCellProcessing;
 import org.hadatac.utils.NameSpaces;
 import org.hadatac.utils.State;
+
+import com.avaje.ebean.enhance.ant.AntEnhanceTask;
 
 import be.objectify.deadbolt.java.actions.Group;
 import be.objectify.deadbolt.java.actions.Restrict;
@@ -183,10 +186,11 @@ public class AutoAnnotator extends Controller {
 	
     public static boolean annotateCSVFile(String file_name) {
     	System.out.println("Annotating " + file_name);
+    	AnnotationLog log = new AnnotationLog();
+    	log.setFileName(file_name);
     	
-		State state = new State(State.ALL);
     	List<DataAcquisition> da_list = DataAcquisition.findAll();
-		
+	
 		String dc_uri = null;
 		String deployment_uri = null;
 		String schema_uri = null;
@@ -210,6 +214,8 @@ public class AutoAnnotator extends Controller {
 		}
 		if(dc_uri == null){
 			System.out.println(String.format("Cannot find the target data acquisition: %s", file_name));
+			log.addline(String.format("Cannot find the target data acquisition: %s", file_name));
+			log.save();
 			return false;
 		}
 		
@@ -226,7 +232,6 @@ public class AutoAnnotator extends Controller {
 		}
     	System.out.println("uploadCSV: uri is " + deployment_uri);
     	if (!deployment_uri.equals("")) {
-
     		/*
     		 *  Add deployment information into handler
     		 */
@@ -267,6 +272,8 @@ public class AutoAnnotator extends Controller {
     	
     	if(schema_uri == null){
     		System.out.println("Cannot find schema of the data acquisition");
+    		log.addline("Cannot find schema of the data acquisition");
+    		log.save();
     		return false;
     	}
 
@@ -385,7 +392,9 @@ public class AutoAnnotator extends Controller {
 			e.printStackTrace();
 			return false;
 		}
-	    LoadCCSV.playLoadCCSV();
+	    String msg = LoadCCSV.playLoadCCSV();
+	    log.addline(msg);
+		log.save();
 	    
 	    return true;
 	}
@@ -415,7 +424,13 @@ public class AutoAnnotator extends Controller {
 		return index();
     }
     
+    public static Result checkAnnotationLog(String file_name) {
+    	return ok(annotation_log.render(file_name));
+    }
+    
     public static Result deleteCSVFile(String file_name, boolean isProcessed) {
+    	AnnotationLog.delete(file_name);
+    	
     	Properties prop = new Properties();
 		try {
 			InputStream is = LoadKB.class.getClassLoader().getResourceAsStream("autoccsv.config");
@@ -457,22 +472,24 @@ public class AutoAnnotator extends Controller {
 		}
 		String path = prop.getProperty("path_unproc");
 		
-    	MultipartFormData body = request().body().asMultipartFormData();
-    	FilePart uploadedfile = body.getFile("pic");
-    	if (uploadedfile != null) {
-    		File file = uploadedfile.getFile();
-    		File newFile = new File(path + "/" + uploadedfile.getFilename());
-    		InputStream isFile;
-    		try {
-    			isFile = new FileInputStream(file);
-    			byte[] byteFile;
-    			byteFile = IOUtils.toByteArray(isFile);
-    			FileUtils.writeByteArrayToFile(newFile, byteFile);
-    			isFile.close();
-    		} catch (Exception e) {
-    			e.printStackTrace();
-    		}
-    	}
+    	List<FilePart> fileParts = request().body().asMultipartFormData().getFiles();
+    	for(FilePart filePart : fileParts) {
+    		if (filePart != null) {
+        		File file = filePart.getFile();
+        		File newFile = new File(path + "/" + filePart.getFilename());
+        		InputStream isFile;
+        		try {
+        			isFile = new FileInputStream(file);
+        			byte[] byteFile;
+        			byteFile = IOUtils.toByteArray(isFile);
+        			FileUtils.writeByteArrayToFile(newFile, byteFile);
+        			isFile.close();
+        		} catch (Exception e) {
+        			e.printStackTrace();
+        		}
+        	}
+ 		}
+    	
     	return index();
     }
 }

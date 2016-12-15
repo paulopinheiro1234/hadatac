@@ -47,6 +47,7 @@
 				<ul>        		
 					@for(key <- subjectResult.keySet()){
 						<li><a href="@play.api.Play.application.configuration.getString("hadatac.console.host_deploy")/hadatac/metadataacquisitions/viewSubject?subject_uri=@key.toString.replaceAll("http://hadatac.org/ont/chear#","chear:").replaceAll("http://hadatac.org/ont/case#","case:").replaceAll("http://hadatac.org/kb/chear#","chear-kb:").replaceAll("http://hadatac.org/ont/case#","case:").replaceAll("http://hadatac.org/kb/chear#","chear-kb:").replaceAll("http://hadatac.org/kb/case#","case-kb:")">@key.toString.replaceAll("http://hadatac.org/ont/chear#","chear:").replaceAll("http://hadatac.org/kb/chear#","chear-kb:").replaceAll("http://hadatac.org/kb/case#","case-kb:")</a>
+
 							<ul>
 							@for(s <- subjectResult.get(key)) {
 							<li>@s.toString.replaceAll("http://hadatac.org/ont/chear#","chear:").replaceAll("http://hadatac.org/ont/case#","case:").replaceAll("http://hadatac.org/kb/chear#","chear-kb:").replaceAll("http://hadatac.org/kb/case#","case-kb:")</li>

@@ -14,7 +14,7 @@ import java.util.Properties;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.hadatac.console.controllers.AuthApplication;
-import org.hadatac.console.views.html.dataacquisitions.dataAcquisitionManagement;
+import org.hadatac.console.views.html.dataacquisitionmanagement.dataAcquisitionManagement;
 import org.hadatac.console.views.html.triplestore.*;
 import org.hadatac.entity.pojo.DataAcquisition;
 import org.hadatac.console.models.LabKeyLoginForm;

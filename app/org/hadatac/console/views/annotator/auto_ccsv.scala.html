@@ -30,7 +30,7 @@
     <div id="rcorners" class="col-md-3">
     	<h4>CSV File Uploader</h4>
     	<form name="fileUploadForm" id='upload' method="POST" enctype="multipart/form-data" action="@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.uploadCSVFile("load")" onchange="checkform()">
-        	<input type="file" class="btn btn-info" name="pic"> 
+        	<input type="file" multiple="multiple" class="btn btn-info" name="pic"> 
         	<div id='submitMessage'  style="display:none;" >
         	<br>Press <input type="submit" class="btn-sm btn-success" value="Upload"> to upload the csv file to the unprocessed files. 
         	</div>
@@ -52,6 +52,7 @@
     			<td>
     			<a href="@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.moveCSVFile(file_name)" class="btn-xs btn-primary" role="button">Move to Unprocessed Folder</a>
     			<a href="@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.deleteCSVFile(file_name, true)" class="btn-xs btn-primary" role="button">Delete</a>
+    			<a href="@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.checkAnnotationLog(file_name)" class="btn-xs btn-primary" role="button">Logs</a>
     			</td>	
     		</tr>
     	}
@@ -73,13 +74,14 @@
     			<td>@file_name</td>
     			<td>
     			<a href="@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.deleteCSVFile(file_name, false)" class="btn-xs btn-primary" role="button">Delete</a>
+    			<a href="@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.checkAnnotationLog(file_name)" class="btn-xs btn-primary" role="button">Logs</a>
     			</td>	
     		</tr>
     	}
     </tbody>
     </table>
     </div>
-    
+	
     <br><br>
     <a href="@org.hadatac.console.controllers.routes.Portal.index()" class="btn btn-warning" role="button">Back to Main Page</a>
 }

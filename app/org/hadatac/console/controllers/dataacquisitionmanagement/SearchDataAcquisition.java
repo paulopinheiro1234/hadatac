@@ -1,4 +1,4 @@
-package org.hadatac.console.controllers.dataacquisitions;
+package org.hadatac.console.controllers.dataacquisitionmanagement;
 
 import play.mvc.Controller;
 import play.mvc.Result;
