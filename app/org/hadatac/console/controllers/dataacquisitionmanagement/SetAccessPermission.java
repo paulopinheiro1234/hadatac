@@ -6,8 +6,10 @@ import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 import play.data.Form;
 import play.mvc.Controller;
@@ -51,11 +53,13 @@ public class SetAccessPermission extends Controller {
     		 */
     		
     		dc = DataAcquisition.findByUri(uri);
-    		
     		User user = User.find(dc.getOwnerUri());
     		System.out.println("DC OWNER URI: " + dc.getOwnerUri());
     		
-            return ok(setAccessPermission.render(dc, user.getGroupNames()));
+    		Map<String, String> nameList = new HashMap<String, String>();
+    		user.getGroupNames(nameList);
+    		
+            return ok(setAccessPermission.render(dc, nameList));
     	}
     	return ok(setAccessPermission.render(dc, null));
         
@@ -86,9 +90,11 @@ public class SetAccessPermission extends Controller {
     		
     		dc = DataAcquisition.findByUri(uri);
     		
+    		Map<String, String> nameList = new HashMap<String, String>();
     		User user = User.find(dc.getOwnerUri());
+    		user.getGroupNames(nameList);
     		
-            return ok(setAccessPermission.render(dc, user.getGroupNames()));
+            return ok(setAccessPermission.render(dc, nameList));
     	}
     	return ok(setAccessPermission.render(dc, null));
         
