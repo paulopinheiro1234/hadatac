@@ -5,9 +5,19 @@
 @import java.net._
 @import org.hadatac.utils._
 
+@if(content != "diff_tool"){
 <tr>
 	<td>@if(folder_name != null) { @folder_name }</td>
    	<td>
   		<a href="@org.hadatac.console.controllers.triplestore.routes.LoadKB.playLoadLabkeyLists(labkeyLoginForm, folder_name, content)" class="btn-xs btn-primary" role="button">View</a>
    	</td>
 </tr>
+}
+@if(content == "diff_tool"){
+<tr>
+	<td>@if(folder_name != null) { @folder_name }</td>
+   	<td>
+   		<input type="checkbox" name=@folder_name value="false">
+   	</td>
+</tr>
+}

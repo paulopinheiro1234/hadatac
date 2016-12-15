@@ -14,16 +14,16 @@
     @if((category == "Organization") || (category == "Person")){
         @agent_indicator_navigation(category)
     }
-    @if((category == "Deployments") || (category == "Instrument") || (category == "Detector") || (category == "SensingPerspective") || (category == "Platform")){
+    @if((category == "Detector") || (category == "SensingPerspective") || (category == "Platform") || (category == "Deployments") || (category == "Instrument")){
         @data_acquisition_indicator_navigation(category)
     }
-    @if((category == "PregnancySample") || (category == "Cell") || (category == "cell") || (category == "tissue") || (category == "Tissue")){
+    @if((category == "PregnancySample") || (category == "Cell") || (category == "Tissue")){
         @sample_indicator_navigation(category)
     }
-    @if((category == "DeliveryCharacteristics") || (category == "PrescriptionMedicationandDietarySupplements") || (category == "PhysicalActivityandFitness") || (category == "ParentalHealthandFamilyHistory") || (category == "ReproductiveHealth") || (category == "MentalHealth") || (category == "Anthropometry") || (category == "SleepCharacterisitic") || (category == "DietandNutrition") || (category == "SocioeconomicClassStatus") || (category == "AlcoholTobaccoandIllicitDrugUse") || (category == "OralHealth") || (category == "EnvironmentalExposure") || (category == "BirthOutcome") || (category == "HospitalUtilizationandAccesstoCare") || (category == "TargetedAnalyte") || (category == "PregnancyCharacteristic") || (category == "NeighborhoodCharacteristic") || (category == "PersonalProductUse") || (category == "PhysicalandMentalAssessment") || (category == "HousingCharacteristic") || (category == "Demographic") || (category == "MedicalHistory") || (category == "Acculturation")){
+    @if((category == "EnvironmentalExposure") || (category == "BirthOutcome") || (category == "OralHealth") || (category == "ParentalHealthandFamilyHistory") || (category == "TargetedAnalyte") || (category == "ReproductiveHealth") || (category == "PrescriptionMedicationandDietarySupplements") || (category == "NeighborhoodCharacteristic") || (category == "PregnancyCharacteristic") || (category == "AlcoholTobaccoandIllicitDrugUse") || (category == "DeliveryCharacteristics") || (category == "DietandNutrition") || (category == "SocioeconomicClassStatus") || (category == "HousingCharacteristic") || (category == "PersonalProductUse") || (category == "MedicalHistory") || (category == "Anthropometry") || (category == "SleepCharacterisitic") || (category == "Acculturation") || (category == "MentalHealth") || (category == "PhysicalandMentalAssessment") || (category == "Demographic") || (category == "HospitalUtilizationandAccesstoCare") || (category == "PhysicalActivityandFitness")){
         @study_indicator_navigation(category)
     }
-    @if((category == "VolatileOrganicCompound") || (category == "TobaccoMetabolite") || (category == "PolybrominatedDiphenylEther") || (category == "Element") || (category == "Creatinine") || (category == "Paraben") || (category == "Phthalate") || (category == "ArsenicSpecies") || (category == "PFC") || (category == "MercurySpecies") || (category == "EnvironmentalPhenol") || (category == "AlkylPhosphatePesticideMetabolite")){
+    @if((category == "Element") || (category == "PolybrominatedDiphenylEther") || (category == "ArsenicSpecies") || (category == "Paraben") || (category == "TobaccoMetabolite") || (category == "Phthalate") || (category == "MercurySpecies") || (category == "EnvironmentalPhenol") || (category == "VolatileOrganicCompound") || (category == "Creatinine") || (category == "PFC") || (category == "AlkylPhosphatePesticideMetabolite")){
         @targeted_analyte_navigation(category)
     }
     @if((category == "DataAcquisitionSchemaAttribute")){
