@@ -68,6 +68,10 @@ function update(source) {
   // Compute the new tree layout.
   var nodes = tree.nodes(root).reverse();
 
+  //var max_x = d3.max(nodes, function(node) {return node.x}) + 4550;
+  //var max_y = d3.max(nodes, function(node) {return node.y}) + 4550;
+  
+  //tree.size([max_y,max_x]);
   // Normalize for fixed-depth.
   nodes.forEach(function(d) { d.y = d.depth * 180; });
 
@@ -103,7 +107,7 @@ function update(source) {
 
   nodeUpdate.select("text")
       .style("fill-opacity", 1);
-
+      
   // Transition exiting nodes to the parent's new position.
   var nodeExit = node.exit().transition()
       .duration(duration)

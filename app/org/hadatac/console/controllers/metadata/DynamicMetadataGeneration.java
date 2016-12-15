@@ -57,10 +57,10 @@ public class DynamicMetadataGeneration extends Controller {
 					"        </div>\n" ;
 		    String indicatorType = entry.getKey().toString().replaceAll("http://hadatac.org/ont/chear#","chear:").replaceAll("http://hadatac.org/ont/case#","case:").replaceAll("http://hadatac.org/kb/chear#","chear-kb:");
 		    String indvIndicatorQuery = "PREFIX rdfs:<http://www.w3.org/2000/01/rdf-schema#> PREFIX chear: <http://hadatac.org/ont/chear#> PREFIX case: <http://hadatac.org/ont/case#>PREFIX hasco: <http://hadatac.org/ont/hasco/>PREFIX hasneto: <http://hadatac.org/ont/hasneto#>SELECT DISTINCT ?indicator " +
-					"?label " +
+					"(MIN(?label_) AS ?label)" +
 					"WHERE { ?indicator rdfs:subClassOf " + indicatorType + " . " +
-					"?indicator rdfs:label ?label . " + 
-					"}";
+					"?indicator rdfs:label ?label_ . " + 
+					"} GROUP BY ?indicator ?label";
 			QueryExecution qexecIndvInd = QueryExecutionFactory.sparqlService(Collections.getCollectionsName(Collections.METADATA_SPARQL), indvIndicatorQuery);
 			ResultSet indvIndResults = qexecIndvInd.execSelect();
 			ResultSetRewindable resultsrwIndvInd = ResultSetFactory.copyResults(indvIndResults);
@@ -91,7 +91,7 @@ public class DynamicMetadataGeneration extends Controller {
 			}
 			metadataNavigationString = metadataNavigationString +
 						"    </div>\n";
-			System.out.println(metadataNavigationString);
+			//System.out.println(metadataNavigationString);
 			try {
 				File metadataNavigationPage = new File(fileName);
 				FileWriter metadataNavigationPageStream = new FileWriter(metadataNavigationPage,false);
@@ -118,7 +118,7 @@ public class DynamicMetadataGeneration extends Controller {
 				"_navigation(\"\")\n        </div>\n        <hr>\n\n";
 		}
 		metadataBrowserString = metadataBrowserString + "        <br><br><br>\n        @mainButton(false)\n    </div>\n}";
-		System.out.println(metadataBrowserString);
+		//System.out.println(metadataBrowserString);
 		try {
 			File metadataBrowserPage = new File("./app/org/hadatac/console/views/metadata/metadata.scala.html");
 			FileWriter metadataBrowserPageStream = new FileWriter(metadataBrowserPage,false);
@@ -208,12 +208,12 @@ public class DynamicMetadataGeneration extends Controller {
 		for(Map.Entry<String, String> entry : indicatorMap.entrySet()){
 		    //System.out.println("Key : " + entry.getKey() + " and Value: " + entry.getValue() + "\n");
 		    String indicatorType = entry.getKey().toString().replaceAll("http://hadatac.org/ont/chear#","chear:").replaceAll("http://hadatac.org/ont/case#","case:").replaceAll("http://hadatac.org/kb/chear#","chear-kb:");
-		    System.out.println("Indicator Type: " + indicatorType + "\n");
+		    //System.out.println("Indicator Type: " + indicatorType + "\n");
 		    String indvIndicatorQuery = "PREFIX rdfs:<http://www.w3.org/2000/01/rdf-schema#> PREFIX chear: <http://hadatac.org/ont/chear#> PREFIX case: <http://hadatac.org/ont/case#>PREFIX hasco: <http://hadatac.org/ont/hasco/>PREFIX hasneto: <http://hadatac.org/ont/hasneto#>SELECT DISTINCT ?indicator " +
-					"?label " +
+					"(MIN(?label_) AS ?label)" +
 					"WHERE { ?indicator rdfs:subClassOf " + indicatorType + " . " +
-					"?indicator rdfs:label ?label . " + 
-					"}";
+					"?indicator rdfs:label ?label_ . " + 
+					"} GROUP BY ?indicator ?label";
 			//System.out.println(indvIndicatorQuery + "\n");
 			QueryExecution qexecIndvInd = QueryExecutionFactory.sparqlService(Collections.getCollectionsName(Collections.METADATA_SPARQL), indvIndicatorQuery);
 			ResultSet indvIndResults = qexecIndvInd.execSelect();
@@ -242,12 +242,12 @@ public class DynamicMetadataGeneration extends Controller {
 		for(Map.Entry<String, String> entry : indicatorMap.entrySet()){
 		    //System.out.println("Key : " + entry.getKey() + " and Value: " + entry.getValue() + "\n");
 		    String indicatorType = entry.getKey().toString().replaceAll("http://hadatac.org/ont/chear#","chear:").replaceAll("http://hadatac.org/ont/case#","case:").replaceAll("http://hadatac.org/kb/chear#","chear-kb:");
-		    System.out.println("Indicator Type: " + indicatorType + "\n");
+		    //System.out.println("Indicator Type: " + indicatorType + "\n");
 		    String indvIndicatorQuery = "PREFIX rdfs:<http://www.w3.org/2000/01/rdf-schema#> PREFIX chear: <http://hadatac.org/ont/chear#> PREFIX case: <http://hadatac.org/ont/case#>PREFIX hasco: <http://hadatac.org/ont/hasco/>PREFIX hasneto: <http://hadatac.org/ont/hasneto#>SELECT DISTINCT ?indicator " +
-					"?label " +
+					"(MIN(?label_) AS ?label)" +
 					"WHERE { ?indicator rdfs:subClassOf " + indicatorType + " . " +
-					"?indicator rdfs:label ?label . " + 
-					"}";
+					"?indicator rdfs:label ?label_ . " + 
+					"} GROUP BY ?indicator ?label";
 			//System.out.println(indvIndicatorQuery + "\n");
 			QueryExecution qexecIndvInd = QueryExecutionFactory.sparqlService(Collections.getCollectionsName(Collections.METADATA_SPARQL), indvIndicatorQuery);
 			ResultSet indvIndResults = qexecIndvInd.execSelect();
@@ -413,7 +413,6 @@ public class DynamicMetadataGeneration extends Controller {
 			    "    public void addThingTypes(){\n" ;
 		Map<String, String> indicatorValueMapSorted = new TreeMap<String, String>(indicatorValueMap);
 		List<String> allIndicatorLabels = new ArrayList<String>(indicatorValueMapSorted.values());
-		List<String> allIndicatorKeys = new ArrayList<String>(indicatorValueMapSorted.keySet());
 		for (int i=0;i<indicatorValueMapSorted.size();i++){
 			getSPARQLClassString = getSPARQLClassString + "        thingTypes[" + i + "]  = \"" + allIndicatorLabels.get(i).replaceAll(" ", "").replaceAll(",", "") + "\";\n" ;
 		}
@@ -421,7 +420,65 @@ public class DynamicMetadataGeneration extends Controller {
 				"    public String querySelector(String tabName){\n" +
 				"        String q = \"SELECT * WHERE { ?s ?p ?o } LIMIT 10\";\n" +
 				"        switch (tabName){\n" ;
-		for (int i=0;i<indicatorValueMapSorted.size();i++){
+		
+		for(Map.Entry<String, String> entry : indicatorMapSorted.entrySet()){
+			String indicatorValue = entry.getValue().toString().replaceAll(" ", "").replaceAll(",", "");
+			String indicatorType = entry.getKey().toString().replaceAll("http://hadatac.org/ont/chear#","chear:").replaceAll("http://hadatac.org/ont/case#","case:").replaceAll("http://hadatac.org/kb/chear#","chear-kb:");
+			//System.out.println("Value: " + indicatorValue);
+			//System.out.println("Type: " + indicatorType);
+			String indvIndicatorQuery = "PREFIX rdfs:<http://www.w3.org/2000/01/rdf-schema#> PREFIX chear: <http://hadatac.org/ont/chear#> PREFIX case: <http://hadatac.org/ont/case#>PREFIX hasco: <http://hadatac.org/ont/hasco/>PREFIX hasneto: <http://hadatac.org/ont/hasneto#>SELECT DISTINCT ?indicator " +
+					"(MIN(?label_) AS ?label)" +
+					"WHERE { ?indicator rdfs:subClassOf " + indicatorType + " . " +
+					"?indicator rdfs:label ?label_ . " + 
+					"} GROUP BY ?indicator ?label";
+			QueryExecution qexecIndvInd = QueryExecutionFactory.sparqlService(Collections.getCollectionsName(Collections.METADATA_SPARQL), indvIndicatorQuery);
+			ResultSet indvIndResults = qexecIndvInd.execSelect();
+			ResultSetRewindable resultsrwIndvInd = ResultSetFactory.copyResults(indvIndResults);
+			qexecIndvInd.close();
+			if (indicatorValue.equals("DataAcquisitionIndicator")) {
+				while (resultsrwIndvInd.hasNext()) {
+					QuerySolution soln = resultsrwIndvInd.next();
+					getSPARQLClassString = getSPARQLClassString + "            case \"" + soln.get("label").toString().replaceAll(" ", "").replaceAll(",", "") + "\":\n" +
+							"               q= \"" + prefixString + "\" + \n" +
+							"                   \"SELECT ?id ?superId ?label ?iden ?comment ?def ?unit ?note ?attrTo ?assocWith \" + \n" +
+							"                   \"WHERE { \" + \n" +
+							"                   \"  ?id rdfs:subClassOf* " + soln.get("indicator").toString().replaceAll("http://hadatac.org/ont/chear#","chear:").replaceAll("http://hadatac.org/ont/case#","case:").replaceAll("http://hadatac.org/kb/chear#","chear-kb:").replaceAll("http://hadatac.org/ont/hasneto#","hasneto:").replaceAll("http://semanticscience.org/resource/","sio:").replaceAll("http://hadatac.org/ont/vstoi#", "vstoi:").replaceAll("http://purl.obolibrary.org/obo/CHEBI_", "chebi:") + " . \" + \n" +
+							"                   \"  ?id rdfs:subClassOf ?superId . \" + \n" +
+							"                   \"  ?id rdfs:label ?label .\" + \n" +
+							"                   \"  OPTIONAL {?id dcterms:identifier ?iden} . \" + \n" +
+							"                   \"  OPTIONAL {?id rdfs:comment ?comment} . \" + \n" +
+							"                   \"  OPTIONAL {?id skos:definition ?def} . \" + \n" +
+							"                   \"  OPTIONAL {?id hasneto:hasUnit ?unit} . \" + \n" +
+							"                   \"  OPTIONAL {?id skos:editorialNote ?note} . \" + \n" +
+							"                   \"  OPTIONAL {?id prov:wasAttributedTo ?attrTo} . \" + \n" +
+							"                   \"  OPTIONAL {?id prov:wasAssociatedWith ?assocWith} . \" + \n" +
+							"                   \"} \";\n " +
+							"               break;\n" ;
+				}
+		    } else {
+		    	while (resultsrwIndvInd.hasNext()) {
+					QuerySolution soln = resultsrwIndvInd.next();
+					getSPARQLClassString = getSPARQLClassString + "            case \"" + soln.get("label").toString().replaceAll(" ", "").replaceAll(",", "") + "\":\n" +
+							"               q= \"" + prefixString + "\" + \n" +
+							"                   \"SELECT ?id ?superId ?label ?iden ?comment ?def ?unit ?note ?attrTo ?assocWith \" + \n" +
+							"                   \"WHERE { \" + \n" +
+							"                   \"  ?id rdfs:subClassOf* " + soln.get("indicator").toString().replaceAll("http://hadatac.org/ont/chear#","chear:").replaceAll("http://hadatac.org/ont/case#","case:").replaceAll("http://hadatac.org/kb/chear#","chear-kb:").replaceAll("http://hadatac.org/ont/hasneto#","hasneto:").replaceAll("http://semanticscience.org/resource/","sio:").replaceAll("http://hadatac.org/ont/vstoi#", "vstoi:").replaceAll("http://purl.obolibrary.org/obo/CHEBI_", "chebi:") + " . \" + \n" +
+							"                   \"  ?id rdfs:subClassOf ?superId . \" + \n" +
+							"                   \"  ?id rdfs:label ?label .\" + \n" +
+							"                   \"  OPTIONAL {?id dcterms:identifier ?iden} . \" + \n" +
+							"                   \"  OPTIONAL {?id rdfs:comment ?comment} . \" + \n" +
+							"                   \"  OPTIONAL {?id skos:definition ?def} . \" + \n" +
+							"                   \"  OPTIONAL {?id hasneto:hasUnit ?unit} . \" + \n" +
+							"                   \"  OPTIONAL {?id skos:editorialNote ?note} . \" + \n" +
+							"                   \"  OPTIONAL {?id prov:wasAttributedTo ?attrTo} . \" + \n" +
+							"                   \"  OPTIONAL {?id prov:wasAssociatedWith ?assocWith} . \" + \n" +
+							"                   \"} \";\n " +
+							"               break;\n" ;
+				}
+		    }
+		}
+		
+/*		for (int i=0;i<indicatorValueMapSorted.size();i++){
 			getSPARQLClassString = getSPARQLClassString + "            case \"" + allIndicatorLabels.get(i).replaceAll(" ", "").replaceAll(",", "") + "\":\n" +
 				"               q= \"" + prefixString + "\" + \n" +
 				"                   \"SELECT ?id ?superId ?label ?iden ?comment ?def ?unit ?note ?attrTo ?assocWith \" + \n" +
@@ -439,6 +496,7 @@ public class DynamicMetadataGeneration extends Controller {
 				"                   \"} \";\n " +
 				"               break;\n" ;
 		}
+*/		
 		getSPARQLClassString = getSPARQLClassString + "            default :\n" +
 				"                q = \"\";\n" +
 				"                System.out.println(\"WARNING: no query for tab \" + tabName);\n" +
