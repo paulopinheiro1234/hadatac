@@ -29,18 +29,6 @@
 						</li>
 					}
 				</ul>
-				
-				<h3>Indicators</h3>
-				<ul>
-					@for(key <- indicatorValues.keySet()){
-						@if(indicatorValues.get(key).toString!=""){
-						<li>@key.toString</li>
-						<ul>
-							@indicatorValues.get(key).toString
-						</ul>
-						}
-					}
-				</ul>
     	</div>
     </div>
 }
