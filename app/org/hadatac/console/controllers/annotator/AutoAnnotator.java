@@ -33,6 +33,7 @@ import org.hadatac.console.models.TripleDocument;
 import org.hadatac.console.models.SysUser;
 import org.hadatac.console.views.html.annotator.*;
 import org.hadatac.data.api.DataFactory;
+import org.hadatac.data.model.DatasetParsingResult;
 import org.hadatac.entity.pojo.DataAcquisition;
 import org.hadatac.metadata.loader.ValueCellProcessing;
 import org.hadatac.utils.NameSpaces;
@@ -186,29 +187,27 @@ public class AutoAnnotator extends Controller {
 	
     public static boolean annotateCSVFile(String file_name) {
     	System.out.println("Annotating " + file_name);
+    	String base_name = FilenameUtils.getBaseName(file_name).split("_")[0];
+    	
     	AnnotationLog log = new AnnotationLog();
     	log.setFileName(file_name);
-    	
-    	List<DataAcquisition> da_list = DataAcquisition.findAll();
 	
 		String dc_uri = null;
 		String deployment_uri = null;
 		String schema_uri = null;
+		List<DataAcquisition> da_list = DataAcquisition.findAll();
 		for(DataAcquisition dc : da_list){
-			System.out.println(file_name);
-			String base_name = FilenameUtils.getBaseName(file_name);
-			System.out.println(base_name);
+			System.out.println("Data Acquisition URI: " + dc.getUri());
 			ValueCellProcessing cellProc = new ValueCellProcessing();
-			System.out.println(dc.getUri());
 			String qname = cellProc.replaceNameSpaceEx(dc.getUri()).split(":")[1];
 			System.out.println(qname);
 			if(qname.equals(base_name)){
 				dc_uri = dc.getUri();
-				System.out.println("=================================" + dc_uri);
+				System.out.println("DataAcquisitionURI: " + dc_uri);
 				deployment_uri = dc.getDeploymentUri();
-				System.out.println("=================================" + deployment_uri);
+				System.out.println("DeploymentURI: " + deployment_uri);
 				schema_uri = dc.getSchemaUri();
-				System.out.println("=================================" + schema_uri);
+				System.out.println("DataAcquisitionSchema:" + schema_uri);
 				break;
 			}
 		}
@@ -266,7 +265,8 @@ public class AutoAnnotator extends Controller {
     		if (dc != null && dc.getUri() != null) {
     			handler.setDataAcquisitionUri(dc.getUri());
     		}
-    	} else {
+    	} 
+    	else {
     		handler = new CSVAnnotationHandler(deployment_uri, "", "");
     	}
     	
@@ -392,9 +392,12 @@ public class AutoAnnotator extends Controller {
 			e.printStackTrace();
 			return false;
 		}
-	    String msg = LoadCCSV.playLoadCCSV();
-	    log.addline(msg);
+	    DatasetParsingResult result = LoadCCSV.playLoadCCSV();
+	    log.addline(result.getMessage());
 		log.save();
+		if(result.getStatus() != 0){
+			return false;
+		}
 	    
 	    return true;
 	}

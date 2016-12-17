@@ -41,8 +41,8 @@ public class LoadCCSV extends Controller {
     	return ok(loadCCSV.render(oper, ""));
     }
 
-    public static String playLoadCCSV() {
-    	DatasetParsingResult result;
+    public static DatasetParsingResult playLoadCCSV() {
+    	DatasetParsingResult result = null;
         String message = "";
 		Arguments arguments = new Arguments();
 		arguments.setInputPath(UPLOAD_NAME);
@@ -81,7 +81,7 @@ public class LoadCCSV extends Controller {
 		}
 		
 		message += "[" + new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()) + "] end of file";
-	    return message;
+	    return new DatasetParsingResult(result.getStatus(), message);
    }
     
     public static Result uploadFile() {

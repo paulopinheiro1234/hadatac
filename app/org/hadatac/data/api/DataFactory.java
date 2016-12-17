@@ -84,7 +84,7 @@ public class DataFactory {
 	public static DataAcquisition getActiveDataAcquisition(String deploymentUri) {
 		List<DataAcquisition> list;
 		Deployment deployment = Deployment.find(deploymentUri);
-		list = DataAcquisition.find(deployment, true);
+		list = DataAcquisition.find(deployment, false);
 		if (list.isEmpty()) {
 			return null;
 		}

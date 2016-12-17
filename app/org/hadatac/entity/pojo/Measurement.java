@@ -355,6 +355,7 @@ public class Measurement {
 		SolrClient solr = new HttpSolrClient(Play.application().configuration().getString("hadatac.solr.data") + "/measurement");
 		SolrQuery query = new SolrQuery();
 		query.set("q", "acquisition_uri:\"" + acquisition_uri + "\"");
+		query.set("rows", "10000000");
 		
 		try {
 			QueryResponse response = solr.query(query);

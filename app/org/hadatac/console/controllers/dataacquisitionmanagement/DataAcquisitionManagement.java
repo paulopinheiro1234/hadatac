@@ -26,18 +26,13 @@ public class DataAcquisitionManagement extends Controller {
 		String ownerUri = UserManagement.getUriByEmail(user.email);
 		System.out.println(user.email);
 		System.out.println(ownerUri);
-    	List<DataAcquisition> theResults = DataAcquisition.find(ownerUri, state);    		
+    	List<DataAcquisition> results = DataAcquisition.find(ownerUri, state);
     	
-        return ok(dataAcquisitionManagement.render(state, theResults));   
+        return ok(dataAcquisitionManagement.render(state, results));   
     }
 
 	@Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
     public static Result postIndex(int stateId) {
-    	State state = new State(stateId);
-    	final SysUser user = AuthApplication.getLocalUser(Controller.session());
-		String ownerUri = UserManagement.getUriByEmail(user.email);
-    	List<DataAcquisition> theResults = DataAcquisition.find(ownerUri, state);    		
-    	
-        return ok(dataAcquisitionManagement.render(state, theResults));
+    	return index(stateId);
     }
 }

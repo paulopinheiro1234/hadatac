@@ -126,8 +126,7 @@ public class Deployment {
 		this.endedAt = formatter.parseDateTime(endedAt);
 	}
 	public void setEndedAtXsd(String endedAt) {
-		DateTimeFormatter formatter = ISODateTimeFormat.dateTimeNoMillis();
-		this.endedAt = formatter.parseDateTime(endedAt);
+		this.endedAt = DateTime.parse(endedAt);
 	}
 	public void setEndedAtXsdWithMillis(String endedAt) {
 		DateTimeFormatter formatter = ISODateTimeFormat.dateTime();
@@ -282,12 +281,12 @@ public class Deployment {
 	public static Deployment findFromDataAcquisition(HADataC hadatac) {
 		String queryString = NameSpaces.getInstance().printSparqlNameSpaceList()
 				+ "SELECT ?startedAt ?endedAt ?detector ?instrument ?platform WHERE {\n"
-				+ "  <" + hadatac.dataCollection.getDeploymentUri() + "> a vstoi:Deployment .\n"
-				+ "  <" + hadatac.dataCollection.getDeploymentUri() + "> prov:startedAtTime ?startedAt .\n"
-				+ "  <" + hadatac.dataCollection.getDeploymentUri() + "> hasneto:hasInstrument ?instrument .\n"
-				+ "  <" + hadatac.dataCollection.getDeploymentUri() + "> vstoi:hasPlatform ?platform .\n"
-				+ "  OPTIONAL { <" + hadatac.dataCollection.getDeploymentUri() + "> hasneto:hasDetector ?detector . }\n"
-				+ "  OPTIONAL { <" + hadatac.dataCollection.getDeploymentUri() + "> prov:endedAtTime ?endedAt . }\n"
+				+ "  <" + hadatac.getDataAcquisition().getDeploymentUri() + "> a vstoi:Deployment .\n"
+				+ "  <" + hadatac.getDataAcquisition().getDeploymentUri() + "> prov:startedAtTime ?startedAt .\n"
+				+ "  <" + hadatac.getDataAcquisition().getDeploymentUri() + "> hasneto:hasInstrument ?instrument .\n"
+				+ "  <" + hadatac.getDataAcquisition().getDeploymentUri() + "> vstoi:hasPlatform ?platform .\n"
+				+ "  OPTIONAL { <" + hadatac.getDataAcquisition().getDeploymentUri() + "> hasneto:hasDetector ?detector . }\n"
+				+ "  OPTIONAL { <" + hadatac.getDataAcquisition().getDeploymentUri() + "> prov:endedAtTime ?endedAt . }\n"
 				+ "}";
 		
 		Query query = QueryFactory.create(queryString);
@@ -302,12 +301,14 @@ public class Deployment {
 		if (resultsrw.size() >= 1) {
 			QuerySolution soln = resultsrw.next();
 			Deployment deployment = new Deployment();
-			Resource resource = ResourceFactory.createResource(hadatac.dataCollection.getDeploymentUri());
+			Resource resource = ResourceFactory.createResource(hadatac.getDataAcquisition().getDeploymentUri());
 			deployment.setLocalName(resource.getLocalName());
-			deployment.setUri(hadatac.dataCollection.getDeploymentUri());
+			deployment.setUri(hadatac.getDataAcquisition().getDeploymentUri());
 			deployment.setStartedAtXsdWithMillis(soln.getLiteral("startedAt").getString());
-			if (soln.getLiteral("endedAt") != null) { deployment.setEndedAtXsd(soln.getLiteral("endedAt").getString()); }
-			hadatac.deployment = deployment;
+			if (soln.getLiteral("endedAt") != null) { 
+				deployment.setEndedAtXsd(soln.getLiteral("endedAt").getString());
+			}
+			hadatac.setDeployment(deployment);
 			System.out.println("!! DEPLOYMENT.FINDFROMDC " + deployment.getUri());
 			deployment.platform = Platform.find(hadatac);
 			deployment.instrument = Instrument.find(hadatac);
@@ -339,7 +340,7 @@ public class Deployment {
 		if (resultsrw.size() >= 1) {
 			QuerySolution soln = resultsrw.next();
 			Deployment deployment = new Deployment();
-			deployment.setLocalName(hadatac.deployment.getLocalName());
+			deployment.setLocalName(hadatac.getDeployment().getLocalName());
 			deployment.setUri(hadatac.getDeploymentUri());
 			deployment.setStartedAtXsd(soln.getLiteral("startedAt").getString());
 			if (soln.getLiteral("endedAt") != null) { deployment.setEndedAtXsd(soln.getLiteral("endedAt").getString()); }
@@ -444,10 +445,10 @@ public class Deployment {
 		return deployments;
 	}
 
-	public static Deployment find(Model model, DataAcquisition dataCollection) {
+	public static Deployment find(Model model, DataAcquisition dataAcquisition) {
 		String queryString = Sparql.prefix
 				+ "SELECT ?dp WHERE {\n"
-				+ "  ?dp hasneto:hasDataAcquisition <" + dataCollection.getCcsvUri() + "> .\n"
+				+ "  ?dp hasneto:hasDataAcquisition <" + dataAcquisition.getCcsvUri() + "> .\n"
 				+ "}";
 		
 		Query query = QueryFactory.create(queryString);
