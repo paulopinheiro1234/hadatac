@@ -24,7 +24,9 @@ import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.client.solrj.response.UpdateResponse;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
-
+import org.hadatac.console.controllers.AuthApplication;
+import org.hadatac.console.controllers.triplestore.UserManagement;
+import org.hadatac.console.models.SysUser;
 import org.hadatac.data.loader.util.Sparql;
 import org.hadatac.utils.State;
 import org.joda.time.DateTime;
@@ -567,6 +569,22 @@ public class DataAcquisition {
 		}
 		
 		return list;
+	}
+	
+	public static List<String> findAllAccessibleDataAcquisition(String user_uri){
+		List<String> listURI = new ArrayList<String>();
+		User user = User.find(user_uri);
+		String group_uri = user.getImmediateGroupUri();
+		
+		for(DataAcquisition acquisition : findAll()) {
+			if(acquisition.getPermissionUri().equals("Public")
+			|| acquisition.getPermissionUri().equals(group_uri)
+			|| acquisition.getPermissionUri().equals(user_uri)){
+				listURI.add(acquisition.getUri());
+			}
+		}
+		
+		return listURI;
 	}
 	
 	public static List<DataAcquisition> findAll() {

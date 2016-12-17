@@ -97,6 +97,7 @@ public class Parser {
 			indexMeasurements();
 			System.out.println("solr.commit()...");
 			solr.commit();
+			System.out.println("commit() finished...");
 			solr.close();
 		} catch (IOException | SolrServerException e) {
 			// TODO Auto-generated catch block
@@ -124,9 +125,8 @@ public class Parser {
 				}
 				measurement.setOwnerUri(hadatacKb.getDataAcquisition().getOwnerUri());
 				measurement.setAcquisitionUri(hadatacKb.getDataAcquisition().getUri());
-				measurement.setPermissionUri(hadatacKb.getDataAcquisition().getPermissionUri());
+				measurement.setStudyUri(hadatacKb.getDataAcquisition().getStudyUri());
 				if(record.get(measurementType.getValueColumn() - 1).isEmpty()){
-					//System.out.println("NO_VALUE");
 					continue;
 				}
 				else{

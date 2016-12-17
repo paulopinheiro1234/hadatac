@@ -54,6 +54,5 @@
         <filter class="solr.LowerCaseFilterFactory"/>
       </analyzer>
     </fieldType>
-
   </types>
 </schema>

@@ -18,12 +18,12 @@ public class Clean extends Controller {
 
 	@Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
     public static Result clean(String oper) {
-	return ok(clean.render(oper));
+		return ok(clean.render(oper));
     }
 
 	@Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
     public static Result postClean(String oper) {
-	return ok(clean.render(oper));
+		return ok(clean.render(oper));
     }
 
     public static String playClean(String oper) {

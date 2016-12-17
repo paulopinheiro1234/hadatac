@@ -236,63 +236,63 @@ public class TripleProcessing {
 				System.out.println(String.format("Processing data acquisition %s", uri));
 				
 				ValueCellProcessing cellProc = new ValueCellProcessing();
-				DataAcquisition dataCollection = new DataAcquisition();
-				dataCollection.setUri(cellProc.convertToWholeURI(uri));
+				DataAcquisition dataAcquisition = new DataAcquisition();
+				dataAcquisition.setUri(cellProc.convertToWholeURI(uri));
 				
 				for(PlainTriple triple : sheet.get(uri)){
 					String cellValue = triple.obj.trim();
 					String predicate = triple.pred.trim();
 					
 					if(predicate.equals("rdfs:label")){
-						dataCollection.setLabel(cellValue);
+						dataAcquisition.setLabel(cellValue);
 					}
 					else if(predicate.equals("rdfs:comment")){
-						dataCollection.setComment(cellValue);
+						dataAcquisition.setComment(cellValue);
 					}
 					else if(predicate.equals("prov:startedAtTime")){
-						dataCollection.setStartedAt(cellValue);
+						dataAcquisition.setStartedAt(cellValue);
 					}
 					else if(predicate.equals("prov:endedAtTime")){
-						dataCollection.setEndedAt(cellValue);
+						dataAcquisition.setEndedAt(cellValue);
 					}
 					else if(predicate.equals("prov:used")){
-						dataCollection.setUsedUri(cellProc.convertToWholeURI(cellValue));
+						dataAcquisition.setUsedUri(cellProc.convertToWholeURI(cellValue));
 					}
 					else if(predicate.equals("prov:wasAssociatedWith")){
-						dataCollection.setAssociatedUri(cellProc.convertToWholeURI(cellValue));
+						dataAcquisition.setAssociatedUri(cellProc.convertToWholeURI(cellValue));
 					}
 					else if(predicate.equals("hasco:isDataAcquisitionOf")){
-						dataCollection.setStudyUri(cellProc.convertToWholeURI(cellValue));
+						dataAcquisition.setStudyUri(cellProc.convertToWholeURI(cellValue));
 					}
 					else if(predicate.equals("hasneto:hasDeployment")){
 						String deployment_uri = cellProc.convertToWholeURI(cellValue);
-						dataCollection.setDeploymentUri(deployment_uri);
+						dataAcquisition.setDeploymentUri(deployment_uri);
 						
 						final SysUser user = AuthApplication.getLocalUser(Controller.session());
 						String ownerUri = UserManagement.getUriByEmail(user.email);
 						System.out.println(user.email);
 						System.out.println("OwnerUri is:");
 						System.out.println(ownerUri);
-						dataCollection.setOwnerUri(ownerUri);
+						dataAcquisition.setOwnerUri(ownerUri);
 						
 						Deployment deployment = Deployment.find(deployment_uri);
-						dataCollection.setPermissionUri(ownerUri);
-						dataCollection.setTriggeringEvent(TriggeringEvent.INITIAL_DEPLOYMENT);
-						dataCollection.setPlatformUri(deployment.platform.getUri());
-						dataCollection.setInstrumentUri(deployment.instrument.getUri());
-						dataCollection.setPlatformName(deployment.platform.getLabel());
-						dataCollection.setInstrumentModel(deployment.instrument.getLabel());
-						dataCollection.setStartedAtXsdWithMillis(deployment.getStartedAt());
+						dataAcquisition.setPermissionUri(ownerUri);
+						dataAcquisition.setTriggeringEvent(TriggeringEvent.INITIAL_DEPLOYMENT);
+						dataAcquisition.setPlatformUri(deployment.platform.getUri());
+						dataAcquisition.setInstrumentUri(deployment.instrument.getUri());
+						dataAcquisition.setPlatformName(deployment.platform.getLabel());
+						dataAcquisition.setInstrumentModel(deployment.instrument.getLabel());
+						dataAcquisition.setStartedAtXsdWithMillis(deployment.getStartedAt());
 						System.out.println("time is " + deployment.getStartedAt());
 					}
 					else if(predicate.equals("hasco:hasSchema")){
-						System.out.println("*********************************************" + dataCollection.getUri());
+						System.out.println("*********************************************" + dataAcquisition.getUri());
 						System.out.println("=============================================" + cellValue);
-						dataCollection.setSchemaUri(cellProc.convertToWholeURI(cellValue));
-						System.out.println("+++++++++++++++++++++++++++++++++++++++++++++" + dataCollection.getSchemaUri());
+						dataAcquisition.setSchemaUri(cellProc.convertToWholeURI(cellValue));
+						System.out.println("+++++++++++++++++++++++++++++++++++++++++++++" + dataAcquisition.getSchemaUri());
 					}
-					dataCollection.setNumberDataPoints(0);
-					dataCollection.save();
+					dataAcquisition.setNumberDataPoints(0);
+					dataAcquisition.save();
 					System.out.println("Successfully saved in Solr");
 				}
 			}

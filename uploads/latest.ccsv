@@ -32,10 +32,10 @@
 
 <http://localhost:9000/hadatac/kb/DS/00000001/ffffffffffffffff> a vstoi:Dataset; prov:wasGeneratedBy <http://hadatac.org/kb/case#DA-CBIS-Nov-2016-Hobo>;  hadatac:hasMeasurementType <mt0> , <mt1> , <mt2> , <mt3> .
 
-<mt0> a hadatac:MeasurementType;  hadatac:atColumn 4; hasneto:hasEntity <http://hadatac.org/ont/case#OTYP-Air>; hasneto:hasAttribute <http://hadatac.org/ont/case#ATTYP-RelativeHumidity>; hasneto:hasUnit <http://geneontology.org/GO.format.obo-1_2.shtml#UO_0000187> .
+<mt0> a hadatac:MeasurementType;  hadatac:atColumn 5; hasneto:hasEntity <http://hadatac.org/ont/case#OTYP-Air>; hasneto:hasAttribute <http://hadatac.org/ont/case#ATTYP-CarbonDioxideConcentration>; hasneto:hasUnit <http://geneontology.org/GO.format.obo-1_2.shtml#UO_0000169> .
 <mt1> a hadatac:MeasurementType;  hadatac:atColumn 2; hasneto:hasEntity <http://hadatac.org/ont/hasneto#Time>; hasneto:hasAttribute <http://semanticscience.org/resource/TimeInstant>; hasneto:hasUnit <http://geneontology.org/GO.format.obo-1_2.shtml#UO_0000003> .
-<mt2> a hadatac:MeasurementType;  hadatac:atColumn 5; hasneto:hasEntity <http://hadatac.org/ont/case#OTYP-Air>; hasneto:hasAttribute <http://hadatac.org/ont/case#ATTYP-CarbonDioxideConcentration>; hasneto:hasUnit <http://geneontology.org/GO.format.obo-1_2.shtml#UO_0000169> .
-<mt3> a hadatac:MeasurementType;  hadatac:atColumn 3; hasneto:hasEntity <http://hadatac.org/ont/case#OTYP-Air>; hasneto:hasAttribute <http://hadatac.org/ont/case#ATTYP-Temperature>; hasneto:hasUnit <http://geneontology.org/GO.format.obo-1_2.shtml#UO_0000195> .
+<mt2> a hadatac:MeasurementType;  hadatac:atColumn 3; hasneto:hasEntity <http://hadatac.org/ont/case#OTYP-Air>; hasneto:hasAttribute <http://hadatac.org/ont/case#ATTYP-Temperature>; hasneto:hasUnit <http://geneontology.org/GO.format.obo-1_2.shtml#UO_0000195> .
+<mt3> a hadatac:MeasurementType;  hadatac:atColumn 4; hasneto:hasEntity <http://hadatac.org/ont/case#OTYP-Air>; hasneto:hasAttribute <http://hadatac.org/ont/case#ATTYP-RelativeHumidity>; hasneto:hasUnit <http://geneontology.org/GO.format.obo-1_2.shtml#UO_0000187> .
 == END-PREAMBLE ==
 ﻿"Plot Title: 10883467"
 "#","Date Time, GMT-04:00","Temp, °F (LGR S/N: 10883467, SEN S/N: 10883467)","RH, % (LGR S/N: 10883467, SEN S/N: 10883467)","CO2, ppm (LGR S/N: 10883467, SEN S/N: 10883467)","Calibration Button Down (LGR S/N: 10883467)","Manual Calibration, ppm (LGR S/N: 10883467)","Host Connected (LGR S/N: 10883467)","Stopped (LGR S/N: 10883467)","End Of File (LGR S/N: 10883467)"
