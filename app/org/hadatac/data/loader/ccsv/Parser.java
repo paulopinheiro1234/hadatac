@@ -75,16 +75,17 @@ public class Parser {
 	
 	public int index(int mode) {
 		// data collection
-		DataAcquisition dataCollection = DataAcquisition.create(hadatacCcsv, hadatacKb);
-		if (hadatacCcsv.dataCollection.getStatus() > 0) {
-			hadatacKb.dataCollection.merge(dataCollection);
-		} else {
-			hadatacKb.dataCollection = dataCollection;
+		DataAcquisition dataAcquisition = DataAcquisition.create(hadatacCcsv, hadatacKb);
+		if (hadatacCcsv.getDataAcquisition().getStatus() > 0) {
+			hadatacKb.getDataAcquisition().merge(dataAcquisition);
+		} 
+		else {
+			hadatacKb.setDataAcquisition(dataAcquisition);
 		}
 		
 		SolrClient solr = new HttpSolrClient(hadatacCcsv.getDynamicMetadataURL());
 		System.out.println("hadatacKb.dataCollection.save(solr)...");
-		hadatacKb.dataCollection.save(solr);
+		hadatacKb.getDataAcquisition().save(solr);
 		try {
 			solr.close();
 		} catch (IOException e) {
@@ -112,21 +113,19 @@ public class Parser {
 		Iterable<CSVRecord> records = CSVFormat.DEFAULT.withHeader().parse(files.getReader("csv"));
 		int count = 0;
 		for (CSVRecord record : records) {
-			Iterator<MeasurementType> i = hadatacKb.dataset.measurementTypes.iterator();
+			Iterator<MeasurementType> i = hadatacKb.getDataset().getMeasurementTypes().iterator();
 			while (i.hasNext()) {
 				MeasurementType measurementType = i.next();
 				Measurement measurement = new Measurement();
-				measurement.setUri(hadatacCcsv.getMeasurementUri() + hadatacCcsv.dataset.getLocalName() + "/" + measurementType.getLocalName() + "-" + count);
+				measurement.setUri(hadatacCcsv.getMeasurementUri() + hadatacCcsv.getDataset().getLocalName() + "/" + measurementType.getLocalName() + "-" + count);
 				if (measurementType.getTimestampColumn() > -1) {
 					System.out.println("measurementType.getTimestampColumn() > -1");
 					measurement.setTimestampXsd(record.get(measurementType.getTimestampColumn()));
 				}
-				measurement.setOwnerUri(hadatacKb.dataCollection.getOwnerUri());
-				measurement.setAcquisitionUri(hadatacKb.dataCollection.getUri());
-				measurement.setPermissionUri(hadatacKb.dataCollection.getPermissionUri());
-				//measurement.setValue(Double.parseDouble(record.get(measurementType.getValueColumn())));
+				measurement.setOwnerUri(hadatacKb.getDataAcquisition().getOwnerUri());
+				measurement.setAcquisitionUri(hadatacKb.getDataAcquisition().getUri());
+				measurement.setPermissionUri(hadatacKb.getDataAcquisition().getPermissionUri());
 				if(record.get(measurementType.getValueColumn() - 1).isEmpty()){
-					//measurement.setValue("NO_VALUE");
 					//System.out.println("NO_VALUE");
 					continue;
 				}
@@ -137,10 +136,10 @@ public class Parser {
 				measurement.setUnitUri(measurementType.getUnitUri());
 				measurement.setCharacteristic(measurementType.getCharacteristicLabel());
 				measurement.setCharacteristicUri(measurementType.getCharacteristicUri());
-				measurement.setInstrumentModel(hadatacKb.deployment.instrument.getLabel());
-				measurement.setInstrumentUri(hadatacKb.deployment.instrument.getUri());
-				measurement.setPlatformName(hadatacKb.deployment.platform.getLabel());
-				measurement.setPlatformUri(hadatacKb.deployment.platform.getUri());
+				measurement.setInstrumentModel(hadatacKb.getDeployment().instrument.getLabel());
+				measurement.setInstrumentUri(hadatacKb.getDeployment().instrument.getUri());
+				measurement.setPlatformName(hadatacKb.getDeployment().platform.getLabel());
+				measurement.setPlatformUri(hadatacKb.getDeployment().platform.getUri());
 				measurement.setEntity(measurementType.getEntityLabel());
 				measurement.setEntityUri(measurementType.getEntityUri());
 				measurement.setDatasetUri(hadatacCcsv.getDatasetKbUri());
@@ -149,8 +148,8 @@ public class Parser {
 			count++;
 		}
 		
-		hadatacKb.dataCollection.addNumberDataPoints(count);
-		hadatacKb.dataCollection.save();
+		hadatacKb.getDataAcquisition().addNumberDataPoints(count);
+		hadatacKb.getDataAcquisition().save();
 		
 		files.closeFile("csv", "r");
 		System.out.println("Finished indexMeasurements()");
@@ -162,61 +161,66 @@ public class Parser {
 		
 		String message = "";
 		hadatacKb = HADataC.find();
-		hadatacKb.dataCollection = DataAcquisition.find(hadatacCcsv);
-		if (hadatacCcsv.dataCollection.getStatus() > 0) {
-			if (hadatacKb.dataCollection == null) {
+		hadatacKb.setDataAcquisition(DataAcquisition.find(hadatacCcsv));
+		if (hadatacCcsv.getDataAcquisition().getStatus() > 0) {
+			if (hadatacKb.getDataAcquisition() == null) {
 				message += Feedback.println(mode, "[ERROR] Data Acquisition not found in the knowledge base.");
 				return new DatasetParsingResult(1, message);
-			} else {
+			} 
+			else {
 				message += Feedback.println(mode, "[OK] Data Acquisition found on the knowledge base.");
 			}
-		} else {
-			if (hadatacKb.dataCollection != null) {
+		} 
+		else {
+			if (hadatacKb.getDataAcquisition() != null) {
 				message += Feedback.println(mode, "[ERROR] Data Acquisition already exists in the knowledge base.");
 				return new DatasetParsingResult(1, message);
-			} else {
+			} 
+			else {
 				message += Feedback.println(mode, "[OK] Data Acquisition does not exist in the knowledge base.");
 			}
 		}
 		
 		// dataset
-		if (hadatacCcsv.dataCollection.getStatus() > 0) {
+		if (hadatacCcsv.getDataAcquisition().getStatus() > 0) {
 			System.out.println(hadatacCcsv.getDatasetKbUri());
-			if (hadatacKb.dataCollection.containsDataset(hadatacCcsv.getDatasetKbUri())) {
+			if (hadatacKb.getDataAcquisition().containsDataset(hadatacCcsv.getDatasetKbUri())) {
 				message += Feedback.println(mode, "[ERROR] Dataset was already processed.");
-				return new DatasetParsingResult(1, message);
-			} else {
+			} 
+			else {
 				message += Feedback.println(mode, "[OK] Dataset is not already processed.");
-				hadatacKb.dataset = new Dataset(); 
-				hadatacKb.dataset.setUri(hadatacCcsv.getDatasetKbUri());
 			}
-		} else {
-			message += Feedback.println(mode, "[OK] Dataset is not already processed. This is a new Data Acquisition.");
-			hadatacKb.dataset = new Dataset(); 
-			hadatacKb.dataset.setUri(hadatacCcsv.getDatasetKbUri());
 		}
+		else {
+			message += Feedback.println(mode, "[OK] Dataset is not already processed. This is a new Data Acquisition.");
+		}
+		Dataset dataset = new Dataset();
+		dataset.setUri(hadatacCcsv.getDatasetKbUri());
+		hadatacKb.setDataset(dataset);
 		
 		// deployment
-		if (hadatacCcsv.dataCollection.getStatus() > 0) {
+		if (hadatacCcsv.getDataAcquisition().getStatus() > 0) {
 			System.out.println("!! FIND FROM DC");
-			hadatacKb.deployment = Deployment.findFromDataAcquisition(hadatacKb);
+			hadatacKb.setDeployment(Deployment.findFromDataAcquisition(hadatacKb));
 		} else {
 			System.out.println("!! FIND FROM PREAMBLE");
-			hadatacKb.deployment = Deployment.findFromPreamble(hadatacCcsv);
+			hadatacKb.setDeployment(Deployment.findFromPreamble(hadatacCcsv));
 		}
-		if (hadatacKb.deployment == null) {
+		if (hadatacKb.getDeployment() == null) {
 			message += Feedback.println(mode, "[ERROR] Deployment is not defined in the knowledge base.");
 		} else {
-			message += Feedback.println(mode, "[OK] Deployment is defined in the knowledge base: <" + hadatacKb.deployment.getLocalName() + ">");
-			if (hadatacKb.deployment.getEndedAt() == null) {
-				message += Feedback.println(mode, "[ERROR] Deployment is already finished at: " + hadatacKb.deployment.getEndedAt() + "");
+			message += Feedback.println(mode, "[OK] Deployment is defined in the knowledge base: <" + 
+					hadatacKb.getDeployment().getLocalName() + ">");
+			if (hadatacKb.getDeployment().getEndedAt() == null) {
+				message += Feedback.println(mode, "[ERROR] Deployment is already finished at: " + 
+					hadatacKb.getDeployment().getEndedAt() + "");
 			} else {
 				message += Feedback.println(mode, "[OK] Deployment is still open.");
 			}
 		}
 		
 		// measurement types
-		hadatacKb.dataset.measurementTypes = MeasurementType.find(hadatacCcsv);
+		hadatacKb.getDataset().setMeasurementTypes(MeasurementType.find(hadatacCcsv));
 		
 		return new DatasetParsingResult(0, message);
 	}
@@ -236,48 +240,52 @@ public class Parser {
 		}
 		
 		// load dataset
-		hadatacCcsv.dataset = Dataset.find(model);
-		if (hadatacCcsv.dataset == null) {
+		hadatacCcsv.setDataset(Dataset.find(model));
+		if (hadatacCcsv.getDataset() == null) {
 			message += Feedback.println(mode, "[ERROR] Preamble does not contain a single vstoi:Dataset.");
 			return new DatasetParsingResult(1, message);
 		} else {
-			System.out.println("[OK] Preamble contains a single vstoi:Dataset: <" + hadatacCcsv.dataset.getLocalName() + ">");
-			message += Feedback.println(mode, "[OK] Preamble contains a single vstoi:Dataset: <" + hadatacCcsv.dataset.getLocalName() + ">");
+			System.out.println("[OK] Preamble contains a single vstoi:Dataset: <" + hadatacCcsv.getDataset().getLocalName() + ">");
+			message += Feedback.println(mode, "[OK] Preamble contains a single vstoi:Dataset: <" + hadatacCcsv.getDataset().getLocalName() + ">");
 		}
 		
 		// load datacollection
-		hadatacCcsv.dataCollection = DataAcquisition.find(model, hadatacCcsv.dataset);
-		if (hadatacCcsv.dataCollection == null) {
+		hadatacCcsv.setDataAcquisition(DataAcquisition.find(model, hadatacCcsv.getDataset()));;
+		if (hadatacCcsv.getDataAcquisition() == null) {
 			message += Feedback.println(mode, "[ERROR] Preamble does not contain a single hasneto:DataAcquisition.");
 			return new DatasetParsingResult(1, message);
-		} else {
-			System.out.println("[OK] Preamble contains a single hasneto:DataAcquisition: <" + hadatacCcsv.dataCollection.getLocalName() + ">");
-			message += Feedback.println(mode, "[OK] Preamble contains a single hasneto:DataAcquisition: <" + hadatacCcsv.dataCollection.getLocalName() + ">");
+		} 
+		else {
+			System.out.println("[OK] Preamble contains a single hasneto:DataAcquisition: <" + 
+								hadatacCcsv.getDataAcquisition().getLocalName() + ">");
+			message += Feedback.println(mode, "[OK] Preamble contains a single hasneto:DataAcquisition: <" + 
+								hadatacCcsv.getDataAcquisition().getLocalName() + ">");
 		}
 		
 		// deployment
-		if (hadatacCcsv.dataCollection.getStatus() == 0) {
+		if (hadatacCcsv.getDataAcquisition().getStatus() == 0) {
 			System.out.println("Deployment find");
-			hadatacCcsv.deployment = Deployment.find(model, hadatacCcsv.dataCollection);
-			if (hadatacCcsv.deployment == null) {
+			hadatacCcsv.setDeployment(Deployment.find(model, hadatacCcsv.getDataAcquisition()));
+			if (hadatacCcsv.getDeployment() == null) {
 				message += Feedback.println(mode, "[ERROR] This hasneto:DataAcquisition requires a vstoi:Deployment that is not specified.");
 				return new DatasetParsingResult(1, message);
 			} else {
-				message += Feedback.println(mode, "[OK] This hasneto:DataAcquisition requires a vstoi:Deployment that is specified: <" + hadatacCcsv.deployment.getLocalName() + ">");
+				message += Feedback.println(mode, "[OK] This hasneto:DataAcquisition requires a vstoi:Deployment that is specified: <" + 
+						hadatacCcsv.getDeployment().getLocalName() + ">");
 			}
 		} else {
 			message += Feedback.println(mode, "[OK] This hasneto:DataAcquisition does not require a vstoi:Deployment in the preamble.");
 		}
 		
 		// load measurement types
-		hadatacCcsv.dataset.measurementTypes = MeasurementType.find(model, hadatacCcsv.dataset);
-		if (hadatacCcsv.dataset.measurementTypes.isEmpty()) {
+		hadatacCcsv.getDataset().setMeasurementTypes(MeasurementType.find(model, hadatacCcsv.getDataset()));
+		if (hadatacCcsv.getDataset().getMeasurementTypes().isEmpty()) {
 			System.out.println("Measurement is empty");
 			message += Feedback.println(mode, "[ERROR] Preamble does not contain any well described measurement types.");
 			return new DatasetParsingResult(1, message);
 		} else {
 			message += Feedback.print(mode, "[OK] Preamble contains the following well described measurement types: ");
-			Iterator<MeasurementType> i = hadatacCcsv.dataset.measurementTypes.iterator();
+			Iterator<MeasurementType> i = hadatacCcsv.getDataset().getMeasurementTypes().iterator();
 			while (i.hasNext()) {
 				message += Feedback.print(mode, "<" + i.next().getLocalName() + "> ");
 			}

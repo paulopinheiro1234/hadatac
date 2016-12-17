@@ -88,6 +88,7 @@ public class AnnotationLog {
 		SolrClient solr = new HttpSolrClient(Play.application().configuration().getString("hadatac.solr.data") + "/annotation_log");
 		SolrQuery query = new SolrQuery();
 		query.set("q", "file_name:\"" + file_name + "\"");
+		query.set("rows", "10000000");
 		try {
 			QueryResponse response = solr.query(query);
 			solr.close();

@@ -197,7 +197,7 @@ public class Downloads extends Controller {
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-			return ok (completeAnnotation.render("Error processing form. Please restart form."));
+			return ok(completeAnnotation.render("Error processing form. Please restart form."));
 		} 
     	
     	preamble += FRAG_END_PREAMBLE;
@@ -212,35 +212,33 @@ public class Downloads extends Controller {
 				preamble += FileUtils.readFileToString(newFile, "UTF-8");
 			} catch (IOException e) {
 				e.printStackTrace();
-				return ok (completeAnnotation.render("Error reading cached CSV file. Please restart form."));
+				return ok(completeAnnotation.render("Error reading cached CSV file. Please restart form."));
 			}
 	        return ok(preamble).as("text/turtle");
     	}
     	
     	if (oper.equals(OPER_UPLOAD)) {
-    		String message = "";
     		File newFile = new File(handler.getDatasetName()); 
 		    try {
 				preamble += FileUtils.readFileToString(newFile, "UTF-8");
 			} catch (IOException e) {
 				e.printStackTrace();
-				return ok (completeAnnotation.render("Error reading cached CSV file. Please restart form."));
+				return ok(completeAnnotation.render("Error reading cached CSV file. Please restart form."));
 			}
 
 		    try {
 				FileUtils.writeStringToFile(new File(LoadCCSV.UPLOAD_NAME), preamble);
 			} catch (IOException e) {
 				e.printStackTrace();
-				return ok (completeAnnotation.render("Error aving CCSV file locally. Please restart form."));
+				return ok(completeAnnotation.render("Error aving CCSV file locally. Please restart form."));
 			}
 		    
-		    message = LoadCCSV.playLoadCCSV();
-		    
-			return ok (completeAnnotation.render(message));
+		    DatasetParsingResult result = LoadCCSV.playLoadCCSV();
+			return ok(completeAnnotation.render(result.getMessage()));
 		    
     	}
     	
-		return ok (completeAnnotation.render("Error processing form: unspecified download operation."));
+		return ok(completeAnnotation.render("Error processing form: unspecified download operation."));
     	
     }
 

@@ -17,7 +17,15 @@ public class Dataset {
 	private String localName;
 	private String ccsvUri;
 	private String uri;
-
+	private List<MeasurementType> measurementTypes;
+	
+	public List<MeasurementType> getMeasurementTypes() {
+		return measurementTypes;
+	}
+	public void setMeasurementTypes(List<MeasurementType> types) {
+		this.measurementTypes = types;
+	}
+	
 	public String getUri() {
 		return uri;
 	}
@@ -25,8 +33,6 @@ public class Dataset {
 	public void setUri(String uri) {
 		this.uri = uri;
 	}
-
-	public List<MeasurementType> measurementTypes;
 	
 	public Dataset() {
 	}

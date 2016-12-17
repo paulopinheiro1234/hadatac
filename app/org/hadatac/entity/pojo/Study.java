@@ -667,6 +667,7 @@ public class Study {
 		
 		query.set("q", "uri:\"" + uri + "\"");
 		query.set("sort", "started_at asc");
+		query.set("rows", "10000000");
 		
 		try {
 			QueryResponse response = solr.query(query);
