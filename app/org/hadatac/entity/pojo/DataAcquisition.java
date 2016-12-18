@@ -48,8 +48,6 @@ public class DataAcquisition {
 	private String used_uri;
 	@Field("was_associated_with_uri")
 	private String was_associated_with_uri;
-	@Field("study_uri")
-	private String study_uri;
 	
 	private DateTime startedAt;
 	private DateTime endedAt;
@@ -203,10 +201,10 @@ public class DataAcquisition {
 	}
 	
 	public String getStudyUri() {
-		return study_uri;
+		return studyUri;
 	}
 	public void setStudyUri(String study_uri) {
-		this.study_uri = study_uri;
+		this.studyUri = study_uri;
 	}
 	
 	public String getOwnerUri() {
@@ -473,6 +471,7 @@ public class DataAcquisition {
 		dataAcquisition.setUri(doc.getFieldValue("uri").toString());
 		dataAcquisition.setOwnerUri(doc.getFieldValue("owner_uri").toString());
 		dataAcquisition.setPermissionUri(doc.getFieldValue("permission_uri").toString());
+		dataAcquisition.setStudyUri(doc.getFieldValue("study_uri").toString());
 		dataAcquisition.setTriggeringEvent(Integer.parseInt(doc.getFieldValue("triggering_event").toString()));
 		dataAcquisition.setNumberDataPoints(Long.parseLong(doc.getFieldValue("nr_data_points").toString()));
 		date = new DateTime((Date)doc.getFieldValue("started_at"));

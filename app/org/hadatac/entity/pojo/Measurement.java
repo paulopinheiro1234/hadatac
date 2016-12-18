@@ -298,27 +298,22 @@ public class Measurement {
 			}
 			
 			if (queryResponse.getFacetPivot() != null) {
-				Iterator<Entry<String, List<PivotField>>> i1 = queryResponse.getFacetPivot().iterator();
+				Iterator<Entry<String, List<PivotField>>> iter = queryResponse.getFacetPivot().iterator();
 				
-				while (i1.hasNext()) {
-					Entry<String, List<PivotField>> entry = i1.next();
-					
-					if (entry.getKey().equals("entity,characteristic")) {
-						
-					} 
-					else if (entry.getKey().equals("platform_name,instrument_model")) {
-						
-					}
+				while (iter.hasNext()) {
+					Entry<String, List<PivotField>> entry = iter.next();
 					
 					List<Pivot> parents = new ArrayList<Pivot>();
 					result.pivot_facets.put(entry.getKey(), parents);
-					
-					List<PivotField> list = entry.getValue();
-					System.out.println("List<PivotField> size: " + list.size());
-					Iterator<PivotField> i_parents = list.iterator();
 					System.out.println("!!!!!!! PIVOT: " + entry.getKey());
-					while (i_parents.hasNext()) {
-						PivotField pivot = i_parents.next();
+					
+					List<PivotField> listPivotField = entry.getValue();
+					System.out.println("List<PivotField> size: " + listPivotField.size());
+					Iterator<PivotField> iterParents = listPivotField.iterator();
+					
+					while (iterParents.hasNext()) {
+						PivotField pivot = iterParents.next();
+						
 						Pivot parent = new Pivot();
 						parent.field = pivot.getField();
 						parent.value = pivot.getValue().toString();
@@ -327,17 +322,21 @@ public class Measurement {
 						System.out.println("!!! PIVOT FIELD: " + pivot.getField());
 						System.out.println("!!! PIVOT VALUE: " + pivot.getValue().toString());
 						System.out.println("!!! PIVOT COUNT: " + pivot.getCount());
-						Iterator <PivotField> i_children = pivot.getPivot().iterator();
-						while (i_children.hasNext()) {
-							pivot = i_children.next();
-							Pivot child = new Pivot();
-							child.field = pivot.getField();
-							child.value = pivot.getValue().toString();
-							child.count = pivot.getCount();
-							parent.children.add(child);
-							System.out.println("!!! PIVOT FIELD: " + pivot.getField());
-							System.out.println("!!! PIVOT VALUE: " + pivot.getValue().toString());
-							System.out.println("!!! PIVOT COUNT: " + pivot.getCount());
+						
+						List<PivotField> subPivotFiled = pivot.getPivot();
+						if(null != subPivotFiled){
+							Iterator<PivotField> iterChildren = subPivotFiled.iterator();
+							while (iterChildren.hasNext()) {
+								pivot = iterChildren.next();
+								Pivot child = new Pivot();
+								child.field = pivot.getField();
+								child.value = pivot.getValue().toString();
+								child.count = pivot.getCount();
+								parent.children.add(child);
+								System.out.println("!!! PIVOT FIELD: " + pivot.getField());
+								System.out.println("!!! PIVOT VALUE: " + pivot.getValue().toString());
+								System.out.println("!!! PIVOT COUNT: " + pivot.getCount());
+							}
 						}
 					}
 				}
