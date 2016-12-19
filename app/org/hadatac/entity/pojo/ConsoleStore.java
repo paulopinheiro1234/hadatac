@@ -27,6 +27,9 @@ public class ConsoleStore {
 	@Field("last_dynamic_metadata_id")
 	private long lastDynamicMetadataId;
 	
+	@Field("timestamp")
+	private DateTime timestamp;
+	
 	public int getId() {
 		return id;
 	}
@@ -39,13 +42,11 @@ public class ConsoleStore {
 	public void setLastDynamicMetadataId(long lastDynamicMetadataId) {
 		this.lastDynamicMetadataId = lastDynamicMetadataId;
 	}
-	private DateTime timestamp;
 	
 	public String getTimestamp() {
 		DateTimeFormatter formatter = ISODateTimeFormat.dateTime();
 		return formatter.withZone(DateTimeZone.UTC).print(timestamp);
 	}
-	@Field("timestamp")
 	public void setTimestamp(String timestamp) {
 		DateTimeFormatter formatter = DateTimeFormat.forPattern("EEE MMM dd HH:mm:ss zzz yyyy");
 		this.timestamp = formatter.parseDateTime(timestamp);

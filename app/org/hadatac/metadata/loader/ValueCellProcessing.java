@@ -121,6 +121,25 @@ public class ValueCellProcessing {
 	}
 	
 	/* 
+	 *  if the argument str starts with the abbreviation of one of the name spaces registered in NameSpaces.table, the
+	 *  abbreviation gets replaced by the name space's URI. Otherwise, the string is returned wrapper
+	 *  around angular brackets.
+	 */
+	public String replacePrefixEx(String str) {
+		String resp = str;
+	    for (Map.Entry<String, NameSpace> entry : NameSpaces.table.entrySet()) {
+	        String abbrev = entry.getKey().toString();
+	        String nsString = entry.getValue().getName();
+	        if (str.startsWith(abbrev + ":")) {
+	        	System.out.println("REPLACE: " + resp + " / " + nsString);
+	        	resp = str.replace(abbrev + ":", nsString);
+	        	return resp; 
+	        }
+	    }
+	    return str;
+	}
+	
+	/* 
 	 *  check if the namespace in str is in the namamespace list (NameSpaces.table). 
 	 *  If not, it issues a warning message. A warning message is issue if the name 
 	 *  space used in the argument str is not registered in NameSpaces.table.

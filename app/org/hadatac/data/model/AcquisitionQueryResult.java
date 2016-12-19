@@ -11,9 +11,17 @@ import org.hadatac.entity.pojo.Measurement;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class AcquisitionQueryResult {
+	private int nDocSize = 0;
 	public List<Measurement> documents;
 	public Map<String, Map<String, Long>> field_facets;
 	public Map<String, List<Pivot>> pivot_facets;
+	
+	public int getDocumentSize(){
+		return this.nDocSize;
+	}
+	public void setDocumentSize(int nDocSize){
+		this.nDocSize = nDocSize;
+	}
 	
 	public AcquisitionQueryResult() {
 		documents = new ArrayList<Measurement>();
