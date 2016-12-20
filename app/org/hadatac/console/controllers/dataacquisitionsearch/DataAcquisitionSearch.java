@@ -13,19 +13,18 @@ import org.hadatac.console.models.FacetsWithCategories;
 import org.hadatac.console.models.SpatialQueryResults;
 import org.hadatac.console.models.SysUser;
 
-//import models.SpatialQuery;
-//import models.SpatialQueryResults;
 import play.data.DynamicForm;
 import play.data.Form;
+import play.libs.Json;
 import play.mvc.Controller;
 import play.mvc.Result;
 
 import org.hadatac.console.views.formdata.FacetFormData;
 import org.hadatac.console.views.html.dataacquisitionsearch.dataacquisition_browser;
 import org.hadatac.data.model.AcquisitionQueryResult;
-import org.hadatac.entity.pojo.DataAcquisition;
 import org.hadatac.entity.pojo.Measurement;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class DataAcquisitionSearch extends Controller {
@@ -81,8 +80,21 @@ public class DataAcquisitionSearch extends Controller {
     	
     	return result;
     }
-
-    public static Result index(int page, int rows, String facets) {
+    
+    public static Result facetSearchProxy(int page, int rows, String facets){
+    	ObjectMapper mapper = new ObjectMapper();    	
+    	FacetHandler handler = null;
+    	try {
+    		handler = mapper.readValue(facets, FacetHandler.class);
+    	} catch (Exception e) {
+    		handler = new FacetHandler();
+    		System.out.println("mapper.readValue: " + e.getMessage());
+    	}
+    	
+    	return ok(Json.toJson(handler));
+    }
+    
+    public static Result querySearchProxy(int page, int rows, String facets){
     	ObjectMapper mapper = new ObjectMapper();    	
     	FacetHandler handler = null;
     	try {
@@ -102,10 +114,14 @@ public class DataAcquisitionSearch extends Controller {
     		results = Measurement.find(ownerUri, page, rows, handler);
     	}
     	
-    	return ok(dataacquisition_browser.render(results, results.toJSON(), handler.toJSON()));
+    	return ok(results.toJSON());
+    }
+    
+    public static Result index() {
+    	return ok(dataacquisition_browser.render());
     }
 
-    public static Result postIndex(int page, int rows, String facets) {
-    	return index(page, rows, facets);
+    public static Result postIndex() {
+    	return index();
     }
 }
