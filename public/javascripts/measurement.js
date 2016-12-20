@@ -1,15 +1,9 @@
-var query_res = document.getElementById('query');
-var results = query_res.dataset.documents;
-var json = JSON.parse(results);
-var facet_res = document.getElementById('facetDiv');
-var facetsStrFromDiv = facet_res.dataset.documents;
-var jsonFacet = JSON.parse(facetsStrFromDiv);
 
 function getURLParameter(name) {
 	return decodeURIComponent((new RegExp('[?|&]' + name + '=' + '([^&;]+?)(&|#|;|$)').exec(location.search)||[,""])[1].replace(/\+/g, '%20'))||null
 }
 
-function parseSolrFacetFieldToTree(type) {
+function parseSolrFacetFieldToTree(type, json) {
 	var i;
 	i = 0;
 	flag = false;
@@ -23,11 +17,10 @@ function parseSolrFacetFieldToTree(type) {
 		jsonTree += '{ "id": ' + i + ', "userdata": [ { "name": "field", "content": "' + type + '" }, { "name": "value", "content": "' + i_field + '" } ], "text": "' + i_field + ' (' + field + ')" } ';
 	}
 	jsonTree += '] }';
-	//alert(jsonTree);
 	return jsonTree;
 }
 
-function parseSolrFacetPivotToTree(type) {
+function parseSolrFacetPivotToTree(type, json) {
 	var i, j, q, jsonTree, fields;
 	i = 0;
 	jsonTree = '{ "id": ' + i + ', "item": [ ';
@@ -54,6 +47,5 @@ function parseSolrFacetPivotToTree(type) {
 		jsonTree += '] , "child": ' + j + ', "tooltip": "' + field1.value + '" , "userdata": [ { "name": "field", "content": "' + fields[0] + '" }, { "name": "value", "content": "' + field1.value + '" } ] } ';
 	}
 	jsonTree += '] }';
-	//alert(jsonTree);
 	return jsonTree;
 }
