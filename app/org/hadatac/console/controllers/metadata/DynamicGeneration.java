@@ -110,7 +110,7 @@ public class DynamicGeneration extends Controller {
 			initStudyJson=initStudyJson + "\t\t}\n\t}";
 		}
 		initStudyJson=initStudyJson + "\n}" ;
-		//System.out.println(initStudyJson);
+		System.out.println(initStudyJson);
 		
 		String indicatorQuery="PREFIX rdfs:<http://www.w3.org/2000/01/rdf-schema#> PREFIX chear: <http://hadatac.org/ont/chear#>SELECT ?studyIndicator ?label ?comment WHERE { ?studyIndicator rdfs:subClassOf chear:StudyIndicator . ?studyIndicator rdfs:label ?label . OPTIONAL { ?studyIndicator rdfs:comment ?comment } . }";
 		QueryExecution qexecInd = QueryExecutionFactory.sparqlService(Collections.getCollectionsName(Collections.METADATA_SPARQL), indicatorQuery);
@@ -126,7 +126,7 @@ public class DynamicGeneration extends Controller {
 			indicatorMap.put(soln.get("studyIndicator").toString(),indicatorLabel);		
 		}
 		Map<String, String> indicatorMapSorted = new TreeMap<String, String>(indicatorMap);
-		
+		System.out.println("Indicators: " + indicatorMapSorted);
 		String analyteQuery="PREFIX rdfs:<http://www.w3.org/2000/01/rdf-schema#> PREFIX chear: <http://hadatac.org/ont/chear#>SELECT ?analyteIndicator ?label ?comment WHERE { ?analyteIndicator rdfs:subClassOf chear:TargetedAnalyte . OPTIONAL{ ?analyteIndicator rdfs:label ?label } . OPTIONAL { ?analyteIndicator rdfs:comment ?comment } . }";
 		QueryExecution qexecAnalyte = QueryExecutionFactory.sparqlService(Collections.getCollectionsName(Collections.METADATA_SPARQL), analyteQuery);
 		ResultSet analyteResults = qexecAnalyte.execSelect();
@@ -207,7 +207,7 @@ public class DynamicGeneration extends Controller {
 		String analyteSchemaString=schemaString;
 		String updateIndicatorJson="{\n\"commit\": {}";
 		for(Map.Entry<String, String> entry : indicatorMapSorted.entrySet()){
-		    //System.out.println("Key : " + entry.getKey() + " and Value: " + entry.getValue() + "\n");
+		    System.out.println("Key : " + entry.getKey() + " and Value: " + entry.getValue() + "\n");
 		    String label = entry.getValue().toString().replaceAll(" ", "").replaceAll(",", "") + "Label";
 		    facetPageString=facetPageString + "        {'field': '" + label + "', 'display': '" + entry.getValue().toString() + "'},\n";
 			facetSearchSortString=facetSearchSortString + ",{'display':'" + entry.getValue().toString() + "','field':'" + label + ".exact'}" ;
@@ -220,7 +220,7 @@ public class DynamicGeneration extends Controller {
 					" . ?" + entry.getValue().toString().replaceAll(" ", "").replaceAll(",", "") + " rdfs:subClassOf+ " + entry.getKey().toString().replaceAll("http://hadatac.org/ont/chear#","chear:").replaceAll("http://hadatac.org/ont/case#","case:").replaceAll("http://hadatac.org/kb/chear#","chear-kb:") + 
 					" . ?" + entry.getValue().toString().replaceAll(" ", "").replaceAll(",", "") + " rdfs:label ?" + label + " . " +
 					"}";
-//			System.out.println(indvIndicatorQuery + "\n");
+			System.out.println(indvIndicatorQuery + "\n");
 			QueryExecution qexecIndvInd = QueryExecutionFactory.sparqlService(Collections.getCollectionsName(Collections.METADATA_SPARQL), indvIndicatorQuery);
 			ResultSet indvIndResults = qexecIndvInd.execSelect();
 			ResultSetRewindable resultsrwIndvInd = ResultSetFactory.copyResults(indvIndResults);
@@ -228,19 +228,19 @@ public class DynamicGeneration extends Controller {
 			String indvIndicatorJson="";
 			while (resultsrwIndvInd.hasNext()) {
 				QuerySolution soln = resultsrwIndvInd.next();
-				//System.out.println("Solution: " + soln);
+				System.out.println("Solution: " + soln);
 				indvIndicatorJson="";
 				indvIndicatorJson=indvIndicatorJson + ",\n\"add\":\n\t{ \"doc\":\n\t\t{\n";
 				indvIndicatorJson=indvIndicatorJson + "\t\t\"studyUri\": \"" + soln.get("studyUri").toString() + "\" ,\n";
 				indvIndicatorJson=indvIndicatorJson + "\t\t\"" + label + "\":\n\t\t\t{ \"add\": \n\t\t\t\t[ " ;
 				indvIndicatorJson=indvIndicatorJson + "\""+ soln.get(label).toString() +"\"";
 				indvIndicatorJson=indvIndicatorJson + " ]\n\t\t\t}\n\t\t}\n\t}";
-				//System.out.println(indvIndicatorJson);
+				System.out.println(indvIndicatorJson);
 				updateIndicatorJson=updateIndicatorJson + indvIndicatorJson;
 			}
 		}
 		updateIndicatorJson = updateIndicatorJson + "\n}";
-		//System.out.println(updateIndicatorJson + "\n");
+		System.out.println(updateIndicatorJson + "\n");
 		
 		String updateAnalyteJson="{\n\"commit\": {}";
 		for(Map.Entry<String, String> entry : analyteMapSorted.entrySet()){
@@ -257,7 +257,7 @@ public class DynamicGeneration extends Controller {
 					" . ?" + entry.getValue().toString().replaceAll(" ", "").replaceAll(",", "") + " rdfs:subClassOf+ " + entry.getKey().toString().replaceAll("http://hadatac.org/ont/chear#","chear:").replaceAll("http://hadatac.org/ont/case#","case:").replaceAll("http://hadatac.org/kb/chear#","chear-kb:").replaceAll("http://purl.obolibrary.org/obo/CHEBI_", "chebi:") + 
 					" . ?" + entry.getValue().toString().replaceAll(" ", "").replaceAll(",", "") + " rdfs:label ?" + label + " . " +
 					"}";
-			//System.out.println(indvIndicatorQuery + "\n");
+			System.out.println(indvAnalyteQuery + "\n");
 			QueryExecution qexecIndvAnalyte = QueryExecutionFactory.sparqlService(Collections.getCollectionsName(Collections.METADATA_SPARQL), indvAnalyteQuery);
 			ResultSet indvAnalyteResults = qexecIndvAnalyte.execSelect();
 			ResultSetRewindable resultsrwIndvAnalyte = ResultSetFactory.copyResults(indvAnalyteResults);
@@ -265,7 +265,7 @@ public class DynamicGeneration extends Controller {
 			String indvAnalyteJson="";
 			while (resultsrwIndvAnalyte.hasNext()) {
 				QuerySolution soln = resultsrwIndvAnalyte.next();
-				//System.out.println("Solution: " + soln);
+				System.out.println("Solution: " + soln);
 				indvAnalyteJson="";
 				indvAnalyteJson=indvAnalyteJson + ",\n\"add\":\n\t{ \"doc\":\n\t\t{\n";
 				indvAnalyteJson=indvAnalyteJson + "\t\t\"studyUri\": \"" + soln.get("studyUri").toString() + "\" ,\n";
