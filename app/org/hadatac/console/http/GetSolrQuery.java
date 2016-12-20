@@ -162,51 +162,7 @@ public class GetSolrQuery {
                 }
         	}
     	}
-    	//System.out.println("The spatial query:");
-    	//System.out.println(this.solr_query.toString());
+
     	return this;
-    }// /addSpatialComponent()
-    
-    //Preconditions: The GetSolrQuery object has been initialized by a Query object
-    //Inputs: None. Executes query based on the member string solr_query.
-    //Output: Returns JSON in the form of a string. Currently does not handle http errors
-    //		  very gracefully. Need to change this.
-    //Postconditions: None
-    public String executeQuery(String collection, int page, int size, String permissions) throws IllegalStateException, IOException, URISyntaxException{
-    	CloseableHttpClient httpClient = HttpClients.createDefault();
-        HttpGet get = new HttpGet(this.collection_urls.get(collection));
-        
-        Scanner in = null;
-        try
-        {
-        	StringTokenizer tokens = new StringTokenizer(permissions, ",");
-        	String query = this.list_of_queries.get(collection).toString() + " AND (";
-        	while (tokens.hasMoreTokens()) {
-        		query += "permission_uri:\"" + tokens.nextToken() + "\"";
-        		if (tokens.hasMoreTokens()) {
-        			query +=  " OR ";
-        		}
-        	}
-        	query += ")";
-        	System.out.println("!!!!! QUERY: " + query);
-        	HttpClient client = new DefaultHttpClient();
-        	URL url = new URL(query + "&start=" + (page-1)*size + "&rows=" + size + "&facet=true&facet.mincount=1&facet.field=unit&facet.pivot=entity,characteristic&facet.pivot=platform_name,instrument_model");
-        	URI uri = new URI(url.getProtocol(), url.getUserInfo(), url.getHost(), url.getPort(), url.getPath(), url.getQuery(), url.getRef());
-        	HttpGet request = new HttpGet(uri.toASCIIString());
-        	HttpResponse response = client.execute(request);
-            System.out.println(response);
-            StringWriter writer = new StringWriter();
-            IOUtils.copy(response.getEntity().getContent(), writer, "utf-8");
-            
-            return writer.toString();
-            
-        } finally
-        {
-            //in.close();
-            //request.close();
-        }
     }
-    public String executeQuery(String collection, String permissions) throws IllegalStateException, IOException, URISyntaxException{
-    	return executeQuery(collection, 1, 20, permissions);
-    }// /executeQuery()
 }

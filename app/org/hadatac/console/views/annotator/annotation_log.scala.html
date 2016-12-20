@@ -16,8 +16,8 @@
 	
 	<script>
 		var msg = '@AnnotationLog.find(fileName)';
-		var msg2 = decodeURIComponent(msg).replace(/\+/g, '&nbsp;');
-       	$('#msgarea').html(msg2.replace(/&lt;/g, '<').replace(/&gt;/g, '>'));
+		var msg2 = decodeURIComponent(msg);
+       	$('#msgarea').html(msg2.replace(/&lt;br&gt;/g, '<br>').replace(/&amp;lt;/g, '<').replace(/&amp;gt;/g, '>'));
       	document.getElementById('end-process-box').style.display = 'inline';
 	</script>
 	

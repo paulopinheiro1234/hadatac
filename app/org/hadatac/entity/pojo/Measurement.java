@@ -39,8 +39,8 @@ public class Measurement {
 	private String ownerUri;
 	@Field("acquisition_uri")
 	private String acquisitionUri;
-	@Field("permission_uri")
-	private String permissionUri;
+	@Field("study_uri")
+	private String studyUri;
 	private DateTime timestamp;
 	@Field("value")
 	private String value;
@@ -83,11 +83,11 @@ public class Measurement {
 	public void setAcquisitionUri(String acquisitionUri) {
 		this.acquisitionUri = acquisitionUri;
 	}
-	public String getPermissionUri() {
-		return permissionUri;
+	public String getStudyUri() {
+		return studyUri;
 	}
-	public void setPermissionUri(String permissionUri) {
-		this.permissionUri = permissionUri;
+	public void setStudyUri(String studyUri) {
+		this.studyUri = studyUri;
 	}
 	public String getInstrumentModel() {
 		return instrumentModel;
@@ -224,24 +224,24 @@ public class Measurement {
 		return -1;
 	}
 	
-	public static AcquisitionQueryResult find(int page, int qtd, List<String> permissions, FacetHandler handler) {
+	public static AcquisitionQueryResult find(String user_uri, int page, int qtd, FacetHandler handler) {
 		AcquisitionQueryResult result = new AcquisitionQueryResult();
 		
 		SolrClient solr = new HttpSolrClient(Play.application().configuration().getString("hadatac.solr.data") + "/measurement");
 		SolrQuery query = new SolrQuery();
-		String permission_query = "";
+		String acquisition_query = "";
 		String facet_query = "";
-		String q;
+		String q = "";
 		
-		permission_query += "permission_uri:\"" + "Public" + "\"";
-		if (permissions != null) {
-			Iterator<String> i = permissions.iterator();
-			while (i.hasNext()) {
-				permission_query += " OR ";
-				permission_query += "permission_uri:\"" + i.next() + "\"";
+		List<String> listURI = DataAcquisition.findAllAccessibleDataAcquisition(user_uri);
+		Iterator<String> iter_uri = listURI.iterator();
+		while(iter_uri.hasNext()){
+			String uri = iter_uri.next();
+			acquisition_query += "acquisition_uri" + ":\"" + uri + "\"";
+			if(iter_uri.hasNext()){
+				acquisition_query += " OR ";
 			}
 		}
-		System.out.println(permission_query);
 		
 		if (handler != null) {
 			Iterator<String> i = handler.facetsAnd.keySet().iterator();
@@ -256,16 +256,19 @@ public class Measurement {
 		}
 		
 		if (facet_query.trim().equals("")) {
-			facet_query = "*:*";
+			q = acquisition_query;
+		}
+		else {
+			q = "(" + acquisition_query + ") AND (" + facet_query + ")";
 		}
 		
-		q =  "(" + permission_query + ") AND (" + facet_query + ")";
 		System.out.println("!!! QUERY: " + q);
 		query.setQuery(q);
 		query.setStart(0);
 		query.setRows(10000000);
 		query.setFacet(true);
 		query.addFacetField("unit");
+		query.addFacetPivotField("study_uri");
 		query.addFacetPivotField("entity,characteristic");
 		query.addFacetPivotField("platform_name,instrument_model");
 		
@@ -295,26 +298,22 @@ public class Measurement {
 			}
 			
 			if (queryResponse.getFacetPivot() != null) {
-				Iterator<Entry<String, List<PivotField>>> i1 = queryResponse.getFacetPivot().iterator();
+				Iterator<Entry<String, List<PivotField>>> iter = queryResponse.getFacetPivot().iterator();
 				
-				while (i1.hasNext()) {
-					Entry<String, List<PivotField>> entry = i1.next();
-					
-					if (entry.getKey().equals("entity,characteristic")) {
-						
-					} else if (entry.getKey().equals("platform_name,instrument_model")) {
-						
-					}
+				while (iter.hasNext()) {
+					Entry<String, List<PivotField>> entry = iter.next();
 					
 					List<Pivot> parents = new ArrayList<Pivot>();
 					result.pivot_facets.put(entry.getKey(), parents);
-					
-					List<PivotField> list = entry.getValue();
-					System.out.println("List<PivotField> size: " + list.size());
-					Iterator<PivotField> i_parents = list.iterator();
 					System.out.println("!!!!!!! PIVOT: " + entry.getKey());
-					while (i_parents.hasNext()) {
-						PivotField pivot = i_parents.next();
+					
+					List<PivotField> listPivotField = entry.getValue();
+					System.out.println("List<PivotField> size: " + listPivotField.size());
+					Iterator<PivotField> iterParents = listPivotField.iterator();
+					
+					while (iterParents.hasNext()) {
+						PivotField pivot = iterParents.next();
+						
 						Pivot parent = new Pivot();
 						parent.field = pivot.getField();
 						parent.value = pivot.getValue().toString();
@@ -323,17 +322,21 @@ public class Measurement {
 						System.out.println("!!! PIVOT FIELD: " + pivot.getField());
 						System.out.println("!!! PIVOT VALUE: " + pivot.getValue().toString());
 						System.out.println("!!! PIVOT COUNT: " + pivot.getCount());
-						Iterator <PivotField> i_children = pivot.getPivot().iterator();
-						while (i_children.hasNext()) {
-							pivot = i_children.next();
-							Pivot child = new Pivot();
-							child.field = pivot.getField();
-							child.value = pivot.getValue().toString();
-							child.count = pivot.getCount();
-							parent.children.add(child);
-							System.out.println("!!! PIVOT FIELD: " + pivot.getField());
-							System.out.println("!!! PIVOT VALUE: " + pivot.getValue().toString());
-							System.out.println("!!! PIVOT COUNT: " + pivot.getCount());
+						
+						List<PivotField> subPivotFiled = pivot.getPivot();
+						if(null != subPivotFiled){
+							Iterator<PivotField> iterChildren = subPivotFiled.iterator();
+							while (iterChildren.hasNext()) {
+								pivot = iterChildren.next();
+								Pivot child = new Pivot();
+								child.field = pivot.getField();
+								child.value = pivot.getValue().toString();
+								child.count = pivot.getCount();
+								parent.children.add(child);
+								System.out.println("!!! PIVOT FIELD: " + pivot.getField());
+								System.out.println("!!! PIVOT VALUE: " + pivot.getValue().toString());
+								System.out.println("!!! PIVOT COUNT: " + pivot.getCount());
+							}
 						}
 					}
 				}
@@ -355,6 +358,7 @@ public class Measurement {
 		SolrClient solr = new HttpSolrClient(Play.application().configuration().getString("hadatac.solr.data") + "/measurement");
 		SolrQuery query = new SolrQuery();
 		query.set("q", "acquisition_uri:\"" + acquisition_uri + "\"");
+		query.set("rows", "10000000");
 		
 		try {
 			QueryResponse response = solr.query(query);
@@ -381,7 +385,6 @@ public class Measurement {
 		m.setUri(doc.getFieldValue("uri").toString());
 		m.setOwnerUri(doc.getFieldValue("owner_uri").toString());
 		m.setAcquisitionUri(doc.getFieldValue("acquisition_uri").toString());
-		m.setPermissionUri(doc.getFieldValue("permission_uri").toString());
         date = new DateTime((Date)doc.getFieldValue("timestamp"));
 		if (doc.getFieldValue("timestamp") !=null) { 
 			//m.setTimestamp(doc.getFieldValue("timestamp").toString());

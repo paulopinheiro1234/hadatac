@@ -124,8 +124,9 @@ public class LoadKB extends Controller {
     	State state = new State(State.ALL);
     	final SysUser user = AuthApplication.getLocalUser(Controller.session());
 		String ownerUri = UserManagement.getUriByEmail(user.email);
-    	List<DataAcquisition> theResults = DataAcquisition.find(ownerUri, state);
-        return ok(dataAcquisitionManagement.render(state, theResults));
+    	List<DataAcquisition> results = DataAcquisition.find(ownerUri, state);
+    	
+        return ok(dataAcquisitionManagement.render(state, results));
     }
     
     @Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))

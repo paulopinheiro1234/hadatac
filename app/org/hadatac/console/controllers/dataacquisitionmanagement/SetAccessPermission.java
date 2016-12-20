@@ -128,12 +128,6 @@ public class SetAccessPermission extends Controller {
     		System.out.println("New Perm: " + newPermUri);
     		dc.setPermissionUri(newPermUri);
     		dc.save();
-    		
-    		List<Measurement> listMeasurement = Measurement.findByDataAcquisitionUri(dc_uri);
-    		for(Measurement measurement : listMeasurement){
-    			measurement.setPermissionUri(newPermUri);
-    			measurement.save();
-    		}
     	}
     	
     	DataAcquisition dc2 = DataAcquisition.findByUri(dc_uri);

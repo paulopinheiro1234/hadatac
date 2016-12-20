@@ -11,7 +11,6 @@ import org.apache.jena.query.QueryFactory;
 import org.apache.jena.query.QuerySolution;
 import org.apache.jena.query.ResultSet;
 import org.apache.jena.query.ResultSetFactory;
-import org.apache.jena.query.ResultSetFormatter;
 import org.apache.jena.query.ResultSetRewindable;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.Resource;
@@ -97,7 +96,7 @@ public class MeasurementType {
 		MeasurementType measurementTypeKb;
 		boolean measurementTypeComplete;
 		
-		Iterator<MeasurementType> i = hadatac.dataset.measurementTypes.iterator();
+		Iterator<MeasurementType> i = hadatac.getDataset().getMeasurementTypes().iterator();
 		while (i.hasNext()) {
 			measurementType = i.next();
 			measurementTypeKb = new MeasurementType();
@@ -133,15 +132,13 @@ public class MeasurementType {
 					measurementTypeKb.setCharacteristicLabel(soln.getLiteral("c_label").getString()); 
 				}
 				else {
-					//measurementTypeKb.setCharacteristicLabel(soln.getResource("c").getLocalName());
 					measurementTypeKb.setCharacteristicLabel("non-label characteristic");
 				}
 				measurementTypeKb.setEntityUri(measurementType.getEntityUri());
 				if (soln.getLiteral("e_label") != null) {
 					measurementTypeKb.setEntityLabel(soln.getLiteral("e_label").getString()); 
 				}
-				else { 
-					//measurementTypeKb.setEntityLabel(soln.getResource("e").getLocalName());
+				else {
 					measurementTypeKb.setEntityLabel("Subject");
 				}
 			} else {
@@ -229,7 +226,6 @@ public class MeasurementType {
 			measurementType.setCharacteristicUri(soln.getResource("char").getURI());
 			measurementType.setUnitUri(soln.getResource("unit").getURI());
 			measurementType.setValueColumn(soln.getLiteral("column").getInt());
-			//if (soln.getLiteral("tsColumn") != null) { System.out.println("!!! TEM TIMESTAMP: " + soln.getLiteral("tsColumn").getInt()); measurementType.setTimestampColumn(soln.getLiteral("tsColumn").getInt()); }
 			list.add(measurementType);
 		}
 		

@@ -1,5 +1,7 @@
 package org.hadatac.console.controllers.dataacquisitionsearch;
 
+import org.hadatac.console.controllers.AuthApplication;
+import org.hadatac.console.controllers.triplestore.UserManagement;
 import org.hadatac.console.http.JsonHandler;
 
 import java.util.ArrayList;
@@ -9,6 +11,7 @@ import java.util.StringTokenizer;
 import org.hadatac.console.models.FacetHandler;
 import org.hadatac.console.models.FacetsWithCategories;
 import org.hadatac.console.models.SpatialQueryResults;
+import org.hadatac.console.models.SysUser;
 
 //import models.SpatialQuery;
 //import models.SpatialQueryResults;
@@ -20,6 +23,7 @@ import play.mvc.Result;
 import org.hadatac.console.views.formdata.FacetFormData;
 import org.hadatac.console.views.html.dataacquisitionsearch.dataacquisition_browser;
 import org.hadatac.data.model.AcquisitionQueryResult;
+import org.hadatac.entity.pojo.DataAcquisition;
 import org.hadatac.entity.pojo.Measurement;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -79,10 +83,7 @@ public class DataAcquisitionSearch extends Controller {
     }
 
     public static Result index(int page, int rows, String facets) {
-    	ObjectMapper mapper = new ObjectMapper();
-    	
-    	List<String> permissions = getPermissions(session().get("user_hierarchy"));
-    	
+    	ObjectMapper mapper = new ObjectMapper();    	
     	FacetHandler handler = null;
     	try {
     		handler = mapper.readValue(facets, FacetHandler.class);
@@ -91,7 +92,15 @@ public class DataAcquisitionSearch extends Controller {
     		System.out.println("mapper.readValue: " + e.getMessage());
     	}
     	
-    	AcquisitionQueryResult results = Measurement.find(page, rows, permissions, handler);
+    	AcquisitionQueryResult results = null;
+    	final SysUser user = AuthApplication.getLocalUser(session());
+    	if(null == user){
+    		results = Measurement.find("Public", page, rows, handler);
+    	}
+    	else{
+    		String ownerUri = UserManagement.getUriByEmail(user.email);
+    		results = Measurement.find(ownerUri, page, rows, handler);
+    	}
     	
     	return ok(dataacquisition_browser.render(results, results.toJSON(), handler.toJSON()));
     }

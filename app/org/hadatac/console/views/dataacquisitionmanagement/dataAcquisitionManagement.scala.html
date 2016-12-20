@@ -1,4 +1,5 @@
-@(state : org.hadatac.utils.State, results : List[org.hadatac.entity.pojo.DataAcquisition])
+@(state : org.hadatac.utils.State, 
+  results : List[org.hadatac.entity.pojo.DataAcquisition])
 
 @import helper._
 @import org.hadatac.utils._
@@ -58,6 +59,7 @@
                         <th>End Date/Time</th>
                     }
                     <th># of Data Points</th>
+                    <th>Permission</th>
                     <th>Operations</th>
                  </tr>
             </thead>
@@ -67,10 +69,6 @@
               }
             </tbody>
         </table>
-
         @mainButton(false)
-        
     </div>
- 
-
 }
