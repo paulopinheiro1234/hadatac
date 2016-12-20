@@ -24,10 +24,10 @@
               }
             </tbody>
         </table>
- 
+
         <a href="@org.hadatac.console.controllers.triplestore.routes.LoadKB.loadLabkeyKB("init", content)" class="btn btn-warning" role="button">Back</a>
         @if(content=="diff_tool"){
-        	<a href="@org.hadatac.console.controllers.triplestore.routes.LoadKB.loadLabkeyKB("init", content)" class="btn-xs btn-primary" role="button">Submit</a>
+        	<a href="@org.hadatac.console.controllers.triplestore.routes.DiffTool.index(labkeyLoginForm)" class="btn-xs btn-primary" role="button">Submit</a>
         }
     </div>
 }
