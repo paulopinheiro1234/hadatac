@@ -7,7 +7,7 @@
 	<field name="study_uri" type="string" indexed="true" docValues="true" />
     <field name="_version_" type="long" indexed="true" stored="true"/>
     <field name="_text_" type="text_general" indexed="true" stored="false" multiValued="true"/>
-    <field name="timestamp" type="date" indexed="true" stored="true" docValues="true" />
+    <field name="timestamp" type="string" indexed="true" stored="true" docValues="true" />
     <field name="value" type="string" indexed="true" docValues="true" />
     <field name="unit" type="string" indexed="true" docValues="true" />
     <field name="unit_uri" type="string" indexed="true" docValues="true" />

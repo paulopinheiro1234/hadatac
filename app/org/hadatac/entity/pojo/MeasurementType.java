@@ -16,6 +16,7 @@ import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdf.model.ResourceFactory;
 import org.hadatac.data.loader.util.Sparql;
+import org.hadatac.metadata.loader.ValueCellProcessing;
 
 public class MeasurementType {
 	private String uri;
@@ -91,14 +92,13 @@ public class MeasurementType {
 	}
 	
 	public static List<MeasurementType> find(HADataC hadatac) {
-		List<MeasurementType> measurementTypesKb = new ArrayList<MeasurementType>();
-		MeasurementType measurementType;
+		List<MeasurementType> results = new ArrayList<MeasurementType>();
 		MeasurementType measurementTypeKb;
 		boolean measurementTypeComplete;
 		
-		Iterator<MeasurementType> i = hadatac.getDataset().getMeasurementTypes().iterator();
-		while (i.hasNext()) {
-			measurementType = i.next();
+		Iterator<MeasurementType> iter = hadatac.getDataset().getMeasurementTypes().iterator();
+		while (iter.hasNext()) {
+			MeasurementType measurementType = iter.next();
 			measurementTypeKb = new MeasurementType();
 			measurementTypeComplete = true;
 
@@ -110,13 +110,11 @@ public class MeasurementType {
 					+ "  OPTIONAL { " + "<" + measurementType.getEntityUri() + "> " + "rdfs:label ?e_label . }\n"
 					+ "}";
 			
-			//System.out.println(queryString);
-			
 			Query query = QueryFactory.create(queryString);
 			
 			QueryExecution qexec = QueryExecutionFactory.sparqlService(hadatac.getStaticMetadataSparqlURL(), query);
-			ResultSet results = qexec.execSelect();
-			ResultSetRewindable resultsrw = ResultSetFactory.copyResults(results);
+			ResultSet resultset = qexec.execSelect();
+			ResultSetRewindable resultsrw = ResultSetFactory.copyResults(resultset);
 			qexec.close();
 			
 			measurementTypeKb.setLocalName(measurementType.getLocalName());
@@ -154,8 +152,8 @@ public class MeasurementType {
 			
 			query = QueryFactory.create(queryString);
 			qexec = QueryExecutionFactory.sparqlService(hadatac.getStaticMetadataSparqlURL(), query);
-			results = qexec.execSelect();
-			resultsrw = ResultSetFactory.copyResults(results);
+			resultset = qexec.execSelect();
+			resultsrw = ResultSetFactory.copyResults(resultset);
 			qexec.close();
 			
 			if (resultsrw.size() >= 1) {
@@ -173,14 +171,14 @@ public class MeasurementType {
 			}
 			
 			if (measurementTypeComplete == true) {
-				measurementTypesKb.add(measurementTypeKb);
+				results.add(measurementTypeKb);
 				System.out.println("[OK] Measurement type <" + measurementType.getLocalName() + "> is defined in the knowledge base. Entity: \"" + measurementTypeKb.getEntityLabel() + "\"; Characteristic: \"" + measurementTypeKb.getCharacteristicLabel() + "\"; Unit: \"" + measurementTypeKb.getUnitLabel() + "\"");
 			} else {
 				System.out.println("[WARNING] Measurement type <" + measurementType.getLocalName() + "> is not defined in the knowledge base."); 
 			}
 		}
 		
-		return measurementTypesKb;
+		return results;
 	}
 	
 	public String getCharacteristicLabel() {
@@ -217,6 +215,7 @@ public class MeasurementType {
 		ResultSetRewindable resultsrw = ResultSetFactory.copyResults(results);
 		
 		resultsrw.reset();
+		ValueCellProcessing cellProc = new ValueCellProcessing();
 		while (resultsrw.hasNext()) {
 			QuerySolution soln = resultsrw.next();
 			MeasurementType measurementType = new MeasurementType();
@@ -226,6 +225,10 @@ public class MeasurementType {
 			measurementType.setCharacteristicUri(soln.getResource("char").getURI());
 			measurementType.setUnitUri(soln.getResource("unit").getURI());
 			measurementType.setValueColumn(soln.getLiteral("column").getInt());
+			if(measurementType.getCharacteristicUri().equals(cellProc.replacePrefixEx("sio:TimeStamp"))
+			|| measurementType.getCharacteristicUri().equals(cellProc.replacePrefixEx("sio:TimeInstant"))){
+				measurementType.setTimestampColumn(soln.getLiteral("column").getInt());
+			}
 			list.add(measurementType);
 		}
 		

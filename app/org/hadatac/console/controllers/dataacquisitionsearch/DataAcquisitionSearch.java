@@ -13,8 +13,6 @@ import org.hadatac.console.models.FacetsWithCategories;
 import org.hadatac.console.models.SpatialQueryResults;
 import org.hadatac.console.models.SysUser;
 
-//import models.SpatialQuery;
-//import models.SpatialQueryResults;
 import play.data.DynamicForm;
 import play.data.Form;
 import play.mvc.Controller;
@@ -23,7 +21,6 @@ import play.mvc.Result;
 import org.hadatac.console.views.formdata.FacetFormData;
 import org.hadatac.console.views.html.dataacquisitionsearch.dataacquisition_browser;
 import org.hadatac.data.model.AcquisitionQueryResult;
-import org.hadatac.entity.pojo.DataAcquisition;
 import org.hadatac.entity.pojo.Measurement;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -85,6 +82,8 @@ public class DataAcquisitionSearch extends Controller {
     public static Result index(int page, int rows, String facets) {
     	ObjectMapper mapper = new ObjectMapper();    	
     	FacetHandler handler = null;
+    	long resultSize = 0;
+    	System.out.println("[DataAcquisitionSearch] Page: " + page + "   Rows:" + rows);
     	try {
     		handler = mapper.readValue(facets, FacetHandler.class);
     	} catch (Exception e) {
@@ -95,14 +94,18 @@ public class DataAcquisitionSearch extends Controller {
     	AcquisitionQueryResult results = null;
     	final SysUser user = AuthApplication.getLocalUser(session());
     	if(null == user){
+    		resultSize = Measurement.findSize("Public", handler);
     		results = Measurement.find("Public", page, rows, handler);
     	}
     	else{
     		String ownerUri = UserManagement.getUriByEmail(user.email);
+    		resultSize = Measurement.findSize(ownerUri, handler);
     		results = Measurement.find(ownerUri, page, rows, handler);
     	}
+    	System.out.println("[DataAcquisitionSearch] Total size response: " + resultSize);
     	
-    	return ok(dataacquisition_browser.render(results, results.toJSON(), handler.toJSON()));
+    	return ok(dataacquisition_browser.render(page, rows, facets, resultSize, 
+    			results, results.toJSON(), handler.toJSON()));
     }
 
     public static Result postIndex(int page, int rows, String facets) {

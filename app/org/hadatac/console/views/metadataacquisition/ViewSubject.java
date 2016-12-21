@@ -77,9 +77,9 @@ public class ViewSubject extends Controller {
 			String indvIndicatorString="";
 			while (resultsrwIndvInd.hasNext()) {
 				QuerySolution soln = resultsrwIndvInd.next();
-				//System.out.println("Solution: " + soln);
+				System.out.println("Solution: " + soln);
 				indvIndicatorString += soln.get(label).toString() + ", ";
-				//System.out.println("Indicator String: " + indvIndicatorString);
+				System.out.println("Indicator String: " + indvIndicatorString);
 			}
 			if (indvIndicatorString != ""){
 				indvIndicatorString = indvIndicatorString.substring(0, indvIndicatorString.length()-2);

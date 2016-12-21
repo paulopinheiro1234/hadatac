@@ -78,11 +78,11 @@ public class Platform implements Comparable<Platform> {
 	}
 	
 	public String getThirdCoordinate() {
-		return secondCoordinate;
+		return thirdCoordinate;
 	}
 
-	public void setThirdCoordinate(String secondCoordinate) {
-		this.secondCoordinate = secondCoordinate;
+	public void setThirdCoordinate(String thirdCoordinate) {
+		this.thirdCoordinate = thirdCoordinate;
 	}
 	
 	public String getSerialNumber() {
@@ -183,14 +183,27 @@ public class Platform implements Comparable<Platform> {
 			platform = new Platform();
 			platform.setLocalName(soln.getResource("platform").getLocalName());
 			platform.setUri(soln.getResource("platform").getURI());
-			if (soln.getLiteral("label") != null) { platform.setLabel(soln.getLiteral("label").getString()); }
-			else { platform.setLabel(soln.getResource("platform").getLocalName()); }
-			if (soln.getLiteral("lat") != null && soln.getLiteral("lon") != null) {
-				platform.setLocation(soln.getLiteral("lat").getString() + ";" + soln.getLiteral("lon").getString());
+			if (soln.getLiteral("label") != null) {
+				platform.setLabel(soln.getLiteral("label").getString());
+			}
+			else {
+				platform.setLabel(soln.getResource("platform").getLocalName());
+			}
+			if(soln.getLiteral("lat") != null) {
 				platform.setFirstCoordinate(soln.getLiteral("lat").getString());
+			}
+			if(soln.getLiteral("lon") != null) {
 				platform.setSecondCoordinate(soln.getLiteral("long").getString());
 			}
-			if (soln.getLiteral("ele") != null) { platform.setLabel(soln.getLiteral("ele").getString()); }
+			if(soln.getLiteral("ele") != null) {
+				platform.setThirdCoordinate(soln.getLiteral("ele").getString());
+				platform.setLocation("(" + platform.getFirstCoordinate() + ", " 
+						 				 + platform.getSecondCoordinate() + ", "
+						 				 + platform.getThirdCoordinate() + ")");
+			}
+			if (soln.getLiteral("ele") != null) {
+				platform.setElevation(soln.getLiteral("ele").getString());
+			}
 		}
 		
 		return platform;

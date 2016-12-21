@@ -1,4 +1,8 @@
-@(	documents : List[org.hadatac.entity.pojo.Measurement] )
+@( page : Int,
+   rows : Int,
+   facets : String,
+   documents : List[org.hadatac.entity.pojo.Measurement],
+   resultsSize : Long)
 
 	<script type="text/javascript">
 		onload = function() {
@@ -23,59 +27,24 @@
 				}
 			}
 			
-			for(i = (cur_page - 1) * page_size; i < Math.min(cur_page * page_size, num_results); i++){
-				document.getElementById(i.toString()).style.display = '';
-			}
 			updatePage();
 		}
 		
-		var cur_page = 1;
+		var cur_page = @page;
 		var page_size = 15;
-		var num_results = @documents.size();
-		var total_page = Math.ceil(@documents.size()/page_size);
+		var num_results = @resultsSize;
+		var total_page = Math.ceil(num_results/page_size);
 		function nextPage(){
-			if(cur_page < total_page){
-				for(i = (cur_page - 1) * page_size; i < Math.min(cur_page * page_size, num_results); i++){
-					document.getElementById(i.toString()).style.display = 'none';
-				}
-				cur_page += 1;
-				for(i = (cur_page - 1) * page_size; i < Math.min(cur_page * page_size, num_results); i++){
-					document.getElementById(i.toString()).style.display = '';
-				}
-			}
-			updatePage();
+			window.location.href = "@org.hadatac.console.controllers.dataacquisitionsearch.routes.DataAcquisitionSearch.index(page + 1, rows, facets)";
 		}
 		function prevPage(){
-			if(cur_page > 1){
-				for(i = (cur_page - 1) * page_size; i < Math.min(cur_page * page_size, num_results); i++){
-					document.getElementById(i.toString()).style.display = 'none';
-				}
-				cur_page -= 1;
-				for(i = (cur_page - 1) * page_size; i < Math.min(cur_page * page_size, num_results); i++){
-					document.getElementById(i.toString()).style.display = '';
-				}
-			}
-			updatePage();
+			window.location.href = "@org.hadatac.console.controllers.dataacquisitionsearch.routes.DataAcquisitionSearch.index(page - 1, rows, facets)";
 		}
 		function firstPage(){
-			for(i = (cur_page - 1) * page_size; i < Math.min(cur_page * page_size, num_results); i++){
-				document.getElementById(i.toString()).style.display = 'none';
-			}
-			cur_page = 1;
-			for(i = (cur_page - 1) * page_size; i < Math.min(cur_page * page_size, num_results); i++){
-				document.getElementById(i.toString()).style.display = '';
-			}
-			updatePage();
+			window.location.href = "@org.hadatac.console.controllers.dataacquisitionsearch.routes.DataAcquisitionSearch.index(1, rows, facets)";
 		}
 		function lastPage(){
-			for(i = (cur_page - 1) * page_size; i < Math.min(cur_page * page_size, num_results); i++){
-				document.getElementById(i.toString()).style.display = 'none';
-			}
-			cur_page = total_page;
-			for(i = (cur_page - 1) * page_size; i < Math.min(cur_page * page_size, num_results); i++){
-				document.getElementById(i.toString()).style.display = '';
-			}
-			updatePage();
+			window.location.href = "@org.hadatac.console.controllers.dataacquisitionsearch.routes.DataAcquisitionSearch.index(Math.ceil(resultsSize/15).intValue() + 1, rows, facets)";
 		}
 		function updatePage(){
 			if(cur_page == 1){
@@ -115,19 +84,18 @@
                 <th>Characteristic</th>
                 <th>Value</th>
                 <th>Timestamp</th>
-                <th>X</th>
-                <th>Y</th>
-                <th>Z</th>
+                <th>Location</th>
               </tr>
             </thead>
 
             <tbody>
             	@for((document, index) <- documents.zipWithIndex) {
-                <tr id="@index" style="display: none">
+                <tr id="@index">
                     <td>@document.getEntity()</td>
                 	<td>@document.getCharacteristic()</td>
                 	<td>@document.getValue()</td>
                 	<td>@document.getTimestamp()</td>
+                	<td>@document.getLocation()</td>
                 </tr>
                 }
             </tbody>

@@ -23,7 +23,6 @@ function parseSolrFacetFieldToTree(type) {
 		jsonTree += '{ "id": ' + i + ', "userdata": [ { "name": "field", "content": "' + type + '" }, { "name": "value", "content": "' + i_field + '" } ], "text": "' + i_field + ' (' + field + ')" } ';
 	}
 	jsonTree += '] }';
-	//alert(jsonTree);
 	return jsonTree;
 }
 
@@ -54,6 +53,5 @@ function parseSolrFacetPivotToTree(type) {
 		jsonTree += '] , "child": ' + j + ', "tooltip": "' + field1.value + '" , "userdata": [ { "name": "field", "content": "' + fields[0] + '" }, { "name": "value", "content": "' + field1.value + '" } ] } ';
 	}
 	jsonTree += '] }';
-	//alert(jsonTree);
 	return jsonTree;
 }

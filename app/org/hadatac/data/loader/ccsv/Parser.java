@@ -22,6 +22,8 @@ import org.hadatac.entity.pojo.Measurement;
 import org.hadatac.entity.pojo.MeasurementType;
 import org.hadatac.utils.Feedback;
 
+import play.Play;
+
 public class Parser {
 	
 	private FileFactory files;
@@ -112,26 +114,35 @@ public class Parser {
 		
 		files.openFile("csv", "r");
 		Iterable<CSVRecord> records = CSVFormat.DEFAULT.withHeader().parse(files.getReader("csv"));
-		int count = 0;
+		int total_count = 0;
+		int batch_size = 10000;
+		int nTimeStampCol = 0;
+		for(MeasurementType mt : hadatacKb.getDataset().getMeasurementTypes()){
+			if(mt.getTimestampColumn() > -1){
+				nTimeStampCol = mt.getTimestampColumn();
+			}
+		}
+		SolrClient solr = new HttpSolrClient(Play.application().configuration().getString("hadatac.solr.data") + "/measurement");
 		for (CSVRecord record : records) {
-			Iterator<MeasurementType> i = hadatacKb.getDataset().getMeasurementTypes().iterator();
-			while (i.hasNext()) {
-				MeasurementType measurementType = i.next();
+			Iterator<MeasurementType> iter = hadatacKb.getDataset().getMeasurementTypes().iterator();
+			while (iter.hasNext()) {
+				MeasurementType measurementType = iter.next();
 				Measurement measurement = new Measurement();
-				measurement.setUri(hadatacCcsv.getMeasurementUri() + hadatacCcsv.getDataset().getLocalName() + "/" + measurementType.getLocalName() + "-" + count);
-				if (measurementType.getTimestampColumn() > -1) {
-					System.out.println("measurementType.getTimestampColumn() > -1");
-					measurement.setTimestampXsd(record.get(measurementType.getTimestampColumn()));
-				}
-				measurement.setOwnerUri(hadatacKb.getDataAcquisition().getOwnerUri());
-				measurement.setAcquisitionUri(hadatacKb.getDataAcquisition().getUri());
-				measurement.setStudyUri(hadatacKb.getDataAcquisition().getStudyUri());
 				if(record.get(measurementType.getValueColumn() - 1).isEmpty()){
 					continue;
 				}
 				else{
 					measurement.setValue(record.get(measurementType.getValueColumn() - 1));
 				}
+				if (measurementType.getTimestampColumn() > -1) {
+					continue;
+				}
+				measurement.setTimestamp(record.get(nTimeStampCol - 1));
+				measurement.setLocation(hadatacKb.getDeployment().platform.getLocation());
+				measurement.setUri(hadatacCcsv.getMeasurementUri() + hadatacCcsv.getDataset().getLocalName() + "/" + measurementType.getLocalName() + "-" + total_count);
+				measurement.setOwnerUri(hadatacKb.getDataAcquisition().getOwnerUri());
+				measurement.setAcquisitionUri(hadatacKb.getDataAcquisition().getUri());
+				measurement.setStudyUri(hadatacKb.getDataAcquisition().getStudyUri());
 				measurement.setUnit(measurementType.getUnitLabel());
 				measurement.setUnitUri(measurementType.getUnitUri());
 				measurement.setCharacteristic(measurementType.getCharacteristicLabel());
@@ -143,12 +154,24 @@ public class Parser {
 				measurement.setEntity(measurementType.getEntityLabel());
 				measurement.setEntityUri(measurementType.getEntityUri());
 				measurement.setDatasetUri(hadatacCcsv.getDatasetKbUri());
-				measurement.save();
+				try {
+					solr.addBean(measurement);
+				} catch (SolrServerException e) {
+					System.out.println("[ERROR] SolrClient.addBean - e.Message: " + e.getMessage());
+				}
+				if((++total_count) % batch_size == 0){
+					try {
+						solr.commit();
+						System.out.println(String.format("Committed %s measurements!", batch_size));
+					} catch (IOException | SolrServerException e) {
+						System.out.println("[ERROR] SolrClient.commit - e.Message: " + e.getMessage());
+					}
+				}
 			}
-			count++;
 		}
+		solr.close();
 		
-		hadatacKb.getDataAcquisition().addNumberDataPoints(count);
+		hadatacKb.getDataAcquisition().addNumberDataPoints(total_count);
 		hadatacKb.getDataAcquisition().save();
 		
 		files.closeFile("csv", "r");

@@ -1,6 +1,10 @@
-@(	results : org.hadatac.data.model.AcquisitionQueryResult,
+@(	page : Int,
+	rows : Int,
+	facets : String,
+	resultsSize : Long,
+	results : org.hadatac.data.model.AcquisitionQueryResult,
 	documentJson : String,
-	facetJson : String )
+	facetJson : String)
 
 @import helper._
 @import org.hadatac.console.views.html._
@@ -8,7 +12,7 @@
 @main("Simple Faceted Search") {
 	<div id="query" data-documents="@documentJson"/>
 	<div id="facetDiv" data-documents="@facetJson"/>
-	<script type="text/javascript" src="/hadatac/assets/javascripts/measurement.js"></script>
+	
 	<div class="container-fluid">
 		<div class="row">
 			<div class="col-md-3 sidebar">
@@ -38,52 +42,6 @@
 				<center>
 					<button type="button" class="btn btn-primary" onClick="clearSearch();">Clear Search</button>
 				</center>
-				<script>
-					function clearSearch(){
-						var url = location.protocol + '//' + location.host + location.pathname;
-						window.location.href = encodeURI(url);
-					}
-					function loadTree(tree, data) {
-						tree.enableCheckBoxes(true, true);
-						tree.enableThreeStateCheckboxes(true);
-						tree.setImagePath("@controllers.routes.Assets.versioned("lib/dhtmlx/imgs/dhxtree_skyblue/")");
-						tree.setDataMode("json");
-						tree.attachEvent("onCheck",function(id) {
-							jsonFacet['facetsAnd'][tree.getUserData(id, 'field')] = tree.getUserData(id, 'value');
-							var url = location.protocol + '//' + location.host + location.pathname;
-							url += '?facets=' + JSON.stringify(jsonFacet);
-							window.location.href = encodeURI(url);
-							return true;
-						});
-						tree.parse(dataTree, "json");
-						tree.openAllItems(0);
-					}
-					
-					var jsonTree, dataTree;
-					var treeS;
-					jsonTree = parseSolrFacetPivotToTree("study_uri");
-					dataTree = JSON.parse(jsonTree);
-					treeS = new dhtmlXTreeObject("treeStudyBox","100%","100%",0);
-					loadTree(treeS, dataTree);
-					
-					var treeEC;
-					jsonTree = parseSolrFacetPivotToTree("entity,characteristic");
-					dataTree = JSON.parse(jsonTree);
-					treeEC = new dhtmlXTreeObject("treeEntityCharacteristicBox","100%","100%",0);
-					loadTree(treeEC, dataTree);
-					
-					var treeU;
-					jsonTree = parseSolrFacetFieldToTree("unit");
-					dataTree = JSON.parse(jsonTree);
-					treeU = new dhtmlXTreeObject("treeUnitBox","100%","100%",0);
-					loadTree(treeU, dataTree);
-					
-					var treePI;
-					jsonTree = parseSolrFacetPivotToTree("platform_name,instrument_model");
-					dataTree = JSON.parse(jsonTree);
-					treePI = new dhtmlXTreeObject("treePlatformInstrumentBox","100%","100%",0);
-					loadTree(treePI, dataTree);
-				</script>
 			</div>
 			<div class="col-md-5 main">
 				<div id="legend">
@@ -93,7 +51,7 @@
 				<div class="row placeholders"></div>
 				<div>
 					<div id="acquisition" class="tab-pane">
-						@table_acquisition(results.documents)
+						@table_acquisition(page, rows, facets, results.documents, resultsSize)
 					</div>
 				</div>
 				<div class="container">
@@ -123,4 +81,52 @@
 			</div>
 		</div>
 	</div>
+	
+	<script type="text/javascript" src="/hadatac/assets/javascripts/measurement.js"></script>
+	<script>
+	function clearSearch(){
+		var url = location.protocol + '//' + location.host + location.pathname;
+		window.location.href = encodeURI(url);
+	}
+	function loadTree(tree, data) {
+		tree.enableCheckBoxes(true, true);
+		tree.enableThreeStateCheckboxes(true);
+		tree.setImagePath("@controllers.routes.Assets.versioned("lib/dhtmlx/imgs/dhxtree_skyblue/")");
+		tree.setDataMode("json");
+		tree.attachEvent("onCheck",function(id) {
+			jsonFacet['facetsAnd'][tree.getUserData(id, 'field')] = tree.getUserData(id, 'value');
+			var url = location.protocol + '//' + location.host + location.pathname;
+			url += '?facets=' + JSON.stringify(jsonFacet);
+			window.location.href = encodeURI(url);
+			return true;
+		});
+		tree.parse(data, "json");
+		tree.openAllItems(0);
+	}
+	
+	var jsonTree, dataTree;
+	var treeS;
+	jsonTree = parseSolrFacetPivotToTree("study_uri");
+	dataTree = JSON.parse(jsonTree);
+	treeS = new dhtmlXTreeObject("treeStudyBox","100%","100%",0);
+	loadTree(treeS, dataTree);
+	
+	var treeEC;
+	jsonTree = parseSolrFacetPivotToTree("entity,characteristic");
+	dataTree = JSON.parse(jsonTree);
+	treeEC = new dhtmlXTreeObject("treeEntityCharacteristicBox","100%","100%",0);
+	loadTree(treeEC, dataTree);
+	
+	var treeU;
+	jsonTree = parseSolrFacetFieldToTree("unit");
+	dataTree = JSON.parse(jsonTree);
+	treeU = new dhtmlXTreeObject("treeUnitBox","100%","100%",0);
+	loadTree(treeU, dataTree);
+	
+	var treePI;
+	jsonTree = parseSolrFacetPivotToTree("platform_name,instrument_model");
+	dataTree = JSON.parse(jsonTree);
+	treePI = new dhtmlXTreeObject("treePlatformInstrumentBox","100%","100%",0);
+	loadTree(treePI, dataTree);
+	</script>
 }
