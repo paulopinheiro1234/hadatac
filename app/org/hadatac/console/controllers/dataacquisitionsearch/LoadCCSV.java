@@ -19,6 +19,7 @@ import play.libs.*;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
+import org.hadatac.console.controllers.annotator.AnnotationLog;
 import org.hadatac.console.views.html.dataacquisitionsearch.*;
 import org.hadatac.data.loader.ccsv.Parser;
 import org.hadatac.data.loader.util.Arguments;
@@ -69,7 +70,9 @@ public class LoadCCSV extends Controller {
 					message += result.getMessage();
 					if (result.getStatus() == 0) {
 						System.out.println("Indexing...");
-						parser.index(Feedback.WEB);
+						DatasetParsingResult result_parse = parser.index(Feedback.WEB);
+						result.setStatus(result_parse.getStatus());
+						message += result_parse.getMessage();
 					}
 				}
 			}

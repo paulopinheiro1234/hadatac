@@ -374,8 +374,10 @@ public class AutoAnnotator extends Controller {
 			is.close();
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
+			return false;
 		} catch (IOException e) {
 			e.printStackTrace();
+			return false;
 		}
 		String path_unproc = prop.getProperty("path_unproc");
 		File newFile = new File(path_unproc + file_name);
@@ -395,11 +397,11 @@ public class AutoAnnotator extends Controller {
 	    DatasetParsingResult result = LoadCCSV.playLoadCCSV();
 	    log.addline(result.getMessage());
 		log.save();
-		if(result.getStatus() != 0){
-			return false;
+		if(result.getStatus() == 0){
+			return true;
 		}
 	    
-	    return true;
+	    return false;
 	}
     
     public static Result moveCSVFile(String file_name) {

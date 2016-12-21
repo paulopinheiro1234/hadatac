@@ -446,24 +446,6 @@ public class DataAcquisition {
 		}
 	}
 	
-	public int save(SolrClient solr) {
-		try {
-			if (null == endedAt) {
-				endedAt = DateTime.parse("9999-12-31T23:59:59.999Z");
-			}
-			else if (endedAt.toString().startsWith("9999")) {
-				endedAt = DateTime.parse("9999-12-31T23:59:59.999Z");
-			}
-			int status = solr.addBean(this).getStatus();
-			solr.commit();
-			solr.close();
-			return status;
-		} catch (IOException | SolrServerException e) {
-			System.out.println("[ERROR] DataAcquisition.save(SolrClient) - e.Message: " + e.getMessage());
-			return -1;
-		}
-	}
-	
 	public static DataAcquisition convertFromSolr(SolrDocument doc) {
 		Iterator<Object> i;
 		DateTime date;
