@@ -1,5 +1,6 @@
 @(subjectResult      : Map[String, List[String]],
-  sampleResult	: Map[String, List[String]])
+  sampleResult	: Map[String, List[String]],
+  indicatorValues : Map[String,String])
 
 @import org.hadatac.console.views.html._
 @import org.hadatac.utils._
@@ -31,6 +32,19 @@
 						</li>
 					}
 				</ul>
+
+			<h3>Indicators</h3>
+				<ul>
+					@for(key <- indicatorValues.keySet()){
+						@if(indicatorValues.get(key).toString!=""){
+						<li>@key.toString</li>
+						<ul>
+							@indicatorValues.get(key).toString
+						</ul>
+						}
+					}
+				</ul>
+
 			<h3>Sample List</h3>
 				<ul>
 					@for(key <- sampleResult.keySet()){
