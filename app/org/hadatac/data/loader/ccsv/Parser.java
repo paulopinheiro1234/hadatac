@@ -115,7 +115,7 @@ public class Parser {
 		files.openFile("csv", "r");
 		Iterable<CSVRecord> records = CSVFormat.DEFAULT.withHeader().parse(files.getReader("csv"));
 		int total_count = 0;
-		int batch_size = 1000;
+		int batch_size = 10000;
 		int nTimeStampCol = 0;
 		for(MeasurementType mt : hadatacKb.getDataset().getMeasurementTypes()){
 			if(mt.getTimestampColumn() > -1){

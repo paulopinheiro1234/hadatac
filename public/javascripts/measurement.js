@@ -1,9 +1,15 @@
+var query_res = document.getElementById('query');
+var results = query_res.dataset.documents;
+var json = JSON.parse(results);
+var facet_res = document.getElementById('facetDiv');
+var facetsStrFromDiv = facet_res.dataset.documents;
+var jsonFacet = JSON.parse(facetsStrFromDiv);
 
 function getURLParameter(name) {
 	return decodeURIComponent((new RegExp('[?|&]' + name + '=' + '([^&;]+?)(&|#|;|$)').exec(location.search)||[,""])[1].replace(/\+/g, '%20'))||null
 }
 
-function parseSolrFacetFieldToTree(type, json) {
+function parseSolrFacetFieldToTree(type) {
 	var i;
 	i = 0;
 	flag = false;
@@ -20,7 +26,7 @@ function parseSolrFacetFieldToTree(type, json) {
 	return jsonTree;
 }
 
-function parseSolrFacetPivotToTree(type, json) {
+function parseSolrFacetPivotToTree(type) {
 	var i, j, q, jsonTree, fields;
 	i = 0;
 	jsonTree = '{ "id": ' + i + ', "item": [ ';

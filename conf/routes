@@ -7,8 +7,8 @@ GET	    /hadatac/                                 org.hadatac.console.controller
 POST	/hadatac/                                 org.hadatac.console.controllers.Portal.postIndex()
 GET	    /hadatac                                  org.hadatac.console.controllers.Portal.index()
 POST	/hadatac                                  org.hadatac.console.controllers.Portal.postIndex()
-GET	    /hadatac/acquisitions                     org.hadatac.console.controllers.dataacquisitionsearch.DataAcquisitionSearch.index(start: Int ?= 0, rows: Int ?= 20, facets: String ?= "")
-POST	/hadatac/acquisitions                     org.hadatac.console.controllers.dataacquisitionsearch.DataAcquisitionSearch.postIndex(start: Int ?= 1, rows: Int ?= 20, facets: String ?= "")
+GET	    /hadatac/acquisitions                     org.hadatac.console.controllers.dataacquisitionsearch.DataAcquisitionSearch.index(start: Int ?= 1, rows: Int ?= 15, facets: String ?= "")
+POST	/hadatac/acquisitions                     org.hadatac.console.controllers.dataacquisitionsearch.DataAcquisitionSearch.postIndex(start: Int ?= 1, rows: Int ?= 15, facets: String ?= "")
 GET	    /hadatac/acquisitions/loadccsv		      org.hadatac.console.controllers.dataacquisitionsearch.LoadCCSV.loadCCSV(oper: String)
 POST	/hadatac/acquisitions/loadccsv		      org.hadatac.console.controllers.dataacquisitionsearch.LoadCCSV.postLoadCCSV(oper: String)
 POST	/hadatac/acquisitions/loadccsv/upload	  org.hadatac.console.controllers.dataacquisitionsearch.LoadCCSV.uploadFile
