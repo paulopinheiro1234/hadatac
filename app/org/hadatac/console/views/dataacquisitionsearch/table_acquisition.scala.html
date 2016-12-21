@@ -1,4 +1,8 @@
-@(documents : List[org.hadatac.entity.pojo.Measurement])
+@(	page : Int,
+        rows : Int,
+        facets : String,
+        documents : List[org.hadatac.entity.pojo.Measurement],
+        resultsSize : Long)
 
 	<script type="text/javascript">
 		onload = function() {
@@ -29,10 +33,10 @@
 			updatePage();
 		}
 		
-		var cur_page = 1;
+		var cur_page = @page;
 		var page_size = 15;
-		var num_results = @documents.size();
-		var total_page = Math.ceil(@documents.size()/page_size);
+		var num_results = @resultsSize;
+		var total_page = Math.ceil(num_results/page_size);
 		function nextPage(){
 			if(cur_page < total_page){
 				for(i = (cur_page - 1) * page_size; i < Math.min(cur_page * page_size, num_results); i++){
@@ -98,11 +102,14 @@
 			var pages;
 			pages = "Current Page: " + cur_page.toString() + " \/ " + total_page.toString() 
 					+ ", Number of Result: " + num_results.toString();
+		        alert("Test");
 			document.getElementById('pagecontrl').innerHTML = pages;
 		}
 	</script>
 
     <div class="table-responsive">
+        <!-- <a href="@org.hadatac.console.controllers.dataacquisitionsearch.routes.DataAcquisitionSearch.index(page + 1, rows, facets)">Next Page</a> 
+        <a href="@org.hadatac.console.controllers.dataacquisitionsearch.routes.DataAcquisitionSearch.index(page - 1, rows, facets)">Previous Page</a> -->
     	<button type="button" id="prevpage"class="btn btn-primary" onClick="prevPage();">Previous Page</button>
     	<button type="button" id="nextpage" class="btn btn-primary" onClick="nextPage();">Next Page</button>
     	<button type="button" id="firstpage" class="btn btn-primary" onClick="firstPage();">First Page</button>
@@ -115,7 +122,9 @@
                 <th>Characteristic</th>
                 <th>Value</th>
                 <th>Timestamp</th>
-                <th>Location</th>
+                <th>X</th>
+                <th>Y</th>
+                <th>Z</th>
               </tr>
             </thead>
 
@@ -126,7 +135,6 @@
                 	<td>@document.getCharacteristic()</td>
                 	<td>@document.getValue()</td>
                 	<td>@document.getTimestamp()</td>
-                	<td>@document.getLocation()</td>
                 </tr>
                 }
             </tbody>

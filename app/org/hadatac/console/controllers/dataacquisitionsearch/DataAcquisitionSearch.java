@@ -37,6 +37,7 @@ public class DataAcquisitionSearch extends Controller {
     public static FacetsWithCategories range_facets = new FacetsWithCategories();
     public static FacetsWithCategories cluster_facets = new FacetsWithCategories();
     public static SpatialQueryResults query_results = new SpatialQueryResults();
+    public static long resultSize; 
     
     //Postconditions: field_facets will be modified if there are facets in the JsonHandler
     public static void getFacets(JsonHandler jh){
@@ -80,11 +81,15 @@ public class DataAcquisitionSearch extends Controller {
     	}
     	
     	return result;
-    }
+     }
 
     public static Result index(int page, int rows, String facets) {
     	ObjectMapper mapper = new ObjectMapper();    	
     	FacetHandler handler = null;
+	resultSize = 0;
+
+	System.out.println("[DataAcquisitionSearch] Page: " + page + "   Rows:" + rows);
+
     	try {
     		handler = mapper.readValue(facets, FacetHandler.class);
     	} catch (Exception e) {
@@ -95,14 +100,18 @@ public class DataAcquisitionSearch extends Controller {
     	AcquisitionQueryResult results = null;
     	final SysUser user = AuthApplication.getLocalUser(session());
     	if(null == user){
+	        resultSize = Measurement.findSize("Public", handler);
     		results = Measurement.find("Public", page, rows, handler);
     	}
     	else{
     		String ownerUri = UserManagement.getUriByEmail(user.email);
+		resultSize = Measurement.findSize(ownerUri, handler);
     		results = Measurement.find(ownerUri, page, rows, handler);
     	}
     	
-    	return ok(dataacquisition_browser.render(results, results.toJSON(), handler.toJSON()));
+	System.out.println("[DataAcquisitionSearch] Total size response: " + resultSize);
+
+    	return ok(dataacquisition_browser.render(page, rows, facets, results, resultSize, results.toJSON(), handler.toJSON()));
     }
 
     public static Result postIndex(int page, int rows, String facets) {
