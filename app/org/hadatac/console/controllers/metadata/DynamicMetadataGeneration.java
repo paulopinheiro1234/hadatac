@@ -360,17 +360,17 @@ public class DynamicMetadataGeneration extends Controller {
 		Map<String, String> indicatorMapSorted = getIndicatorTypes();
 		Map<String, String> indicatorValueMap = getIndicatorValues(indicatorMapSorted);
 
-		String getSPARQLClassString = "public class GetSparqlQuery { \n" +
+		String getSPARQLClassString = "public class GetSparqlQueryDynamic { \n" +
 				"    public StringBuffer sparql_query = new StringBuffer();\n" +
 				"    public TreeMap<String, StringBuffer> list_of_queries = new TreeMap<String, StringBuffer>();\n" +
 				"    public String collection;\n" +
 				"    private int numThings = " + indicatorValueMap.size() + ";\n" +
 				"    public String[] thingTypes = new String[numThings];\n\n" +
-				"    public GetSparqlQuery () {} \n\n" + 
-				"    public GetSparqlQuery (SparqlQuery query) {\n" +
+				"    public GetSparqlQueryDynamic () {} \n\n" + 
+				"    public GetSparqlQueryDynamic (SparqlQuery query) {\n" +
 			    "        this(Collections.METADATA_SPARQL, query);\n" +
 			    "    }\n\n" + 
-			    "    public GetSparqlQuery (String collectionSource, SparqlQuery query) {\n" +
+			    "    public GetSparqlQueryDynamic (String collectionSource, SparqlQuery query) {\n" +
 			    "        addThingTypes();\n" +
 			    "        this.collection = Collections.getCollectionsName(collectionSource);\n" +
 			    "        System.out.println(\"Collection: \" + collection);\n\n" +
@@ -390,10 +390,10 @@ public class DynamicMetadataGeneration extends Controller {
 			    "            this.list_of_queries.put(tabName, this.sparql_query);\n" +
 			    "        }\n" +
 			    "    }\n\n" + 
-			    "    public GetSparqlQuery (SparqlQuery query, String tabName) {\n" +
+			    "    public GetSparqlQueryDynamic (SparqlQuery query, String tabName) {\n" +
 			    "        this(Collections.METADATA_SPARQL, query, tabName);\n" +
 			    "    }\n\n" +
-			    "    public GetSparqlQuery (String collectionSource, SparqlQuery query, String tabName) {\n" +
+			    "    public GetSparqlQueryDynamic (String collectionSource, SparqlQuery query, String tabName) {\n" +
 				"        this.collection = Collections.getCollectionsName(collectionSource);\n" +
 			    "        System.out.println(\"Collection: \" + collection);\n" +
 			    "        this.sparql_query = new StringBuffer();\n" +
@@ -478,25 +478,6 @@ public class DynamicMetadataGeneration extends Controller {
 		    }
 		}
 		
-/*		for (int i=0;i<indicatorValueMapSorted.size();i++){
-			getSPARQLClassString = getSPARQLClassString + "            case \"" + allIndicatorLabels.get(i).replaceAll(" ", "").replaceAll(",", "") + "\":\n" +
-				"               q= \"" + prefixString + "\" + \n" +
-				"                   \"SELECT ?id ?superId ?label ?iden ?comment ?def ?unit ?note ?attrTo ?assocWith \" + \n" +
-				"                   \"WHERE { \" + \n" +
-				"                   \"  ?id rdfs:subClassOf* " + allIndicatorKeys.get(i) + " . \" + \n" +
-				"                   \"  ?id rdfs:subClassOf ?superId . \" + \n" +
-				"                   \"  ?id rdfs:label ?label .\" + \n" +
-				"                   \"  OPTIONAL {?id dcterms:identifier ?iden} . \" + \n" +
-				"                   \"  OPTIONAL {?id rdfs:comment ?comment} . \" + \n" +
-				"                   \"  OPTIONAL {?id skos:definition ?def} . \" + \n" +
-				"                   \"  OPTIONAL {?id hasneto:hasUnit ?unit} . \" + \n" +
-				"                   \"  OPTIONAL {?id skos:editorialNote ?note} . \" + \n" +
-				"                   \"  OPTIONAL {?id prov:wasAttributedTo ?attrTo} . \" + \n" +
-				"                   \"  OPTIONAL {?id prov:wasAssociatedWith ?assocWith} . \" + \n" +
-				"                   \"} \";\n " +
-				"               break;\n" ;
-		}
-*/		
 		getSPARQLClassString = getSPARQLClassString + "            default :\n" +
 				"                q = \"\";\n" +
 				"                System.out.println(\"WARNING: no query for tab \" + tabName);\n" +
@@ -522,11 +503,11 @@ public class DynamicMetadataGeneration extends Controller {
 				 importString + getSPARQLClassString;
 		//System.out.println(getSPARQLJavaString);// Generate facet view html.scala file
 		try {
-			File getSPARQLPage = new File("./app/org/hadatac/console/http/GetSparqlQuery.java");
+			File getSPARQLPage = new File("./app/org/hadatac/console/http/GetSparqlQueryDynamic.java");
 			FileWriter getSPARQLPageStream = new FileWriter(getSPARQLPage,false);
 			getSPARQLPageStream.write(getSPARQLJavaString);
 			getSPARQLPageStream.close();
-			System.out.println("Wrote GetSparqlQuery.java\n");
+			System.out.println("Wrote GetSparqlQueryDynamic.java\n");
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

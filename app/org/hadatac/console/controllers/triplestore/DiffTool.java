@@ -109,7 +109,7 @@ public class DiffTool extends Controller {
 
         return dataArrayM;
     }
-
+/*
     //Purpose is to retrieve just the list names from each list manager
     private static Collection<String> ConnectToLabkey_Retrieve_List_Names(String url_name, Connection cn) throws Exception{
         
@@ -133,7 +133,7 @@ public class DiffTool extends Controller {
 
         return dataNameArray;
     }
-
+*/
     //Built for getting the headers of the sub-list
     private static Collection<String> ConnectToLabkey_List(String url_name, String list_name, Connection cn) throws Exception{
         
@@ -300,9 +300,21 @@ public class DiffTool extends Controller {
         Collection<ArrayList<String>> dataArraySecond = ConnectToLabkey_List_Manager(Schema2, cn);
         CompareListCollections(dataArrayMain, dataArraySecond,  writer, Schema1, Schema2);
 
-        Collection<String> dataArrayH1 = ConnectToLabkey_Retrieve_List_Names(Schema1, cn);
-        Collection<String> dataArrayH2 = ConnectToLabkey_Retrieve_List_Names(Schema2, cn);
+//        Collection<String> dataArrayH1 = ConnectToLabkey_Retrieve_List_Names(Schema1, cn);
+//        Collection<String> dataArrayH2 = ConnectToLabkey_Retrieve_List_Names(Schema2, cn);
 
+        Collection<String> dataArrayH1 =  new ArrayList<String>();
+        Collection<String> dataArrayH2 =  new ArrayList<String>();
+
+        for (Iterator<ArrayList<String>> iter1 = dataArrayMain.iterator(); iter1.hasNext(); ) {
+            ArrayList<String> arr_iter1 = iter1.next();
+            dataArrayH1.add(arr_iter1.get(0));
+        }
+        for (Iterator<ArrayList<String>> iter2 = dataArraySecond.iterator(); iter2.hasNext(); ) {
+            ArrayList<String> arr_iter2 = iter2.next();
+            dataArrayH2.add(arr_iter2.get(0));
+        }
+        
         Collection<String> dataArrayCombined = CombineHeaders(dataArrayH1, dataArrayH2, writer, Schema1, Schema2);
 
         for (Iterator<String> iter = dataArrayCombined.iterator(); iter.hasNext(); ) {

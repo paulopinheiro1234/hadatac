@@ -1,6 +1,7 @@
 package org.hadatac.console.controllers.metadata;
 
 import org.hadatac.console.http.GetSparqlQuery;
+import org.hadatac.console.http.GetSparqlQueryDynamic;
 
 import java.io.IOException;
 import java.util.List;
@@ -23,7 +24,7 @@ public class MetadataEntry extends Controller {
     public static Result index(String tabName) {
 
     	SparqlQuery query = new SparqlQuery();
-        GetSparqlQuery query_submit = new GetSparqlQuery(query);
+        GetSparqlQueryDynamic query_submit = new GetSparqlQueryDynamic(query);
         OtMSparqlQueryResults theResults;
         String query_json = null;
         System.out.println("MetadataEntry.java is requesting: " + tabName);
