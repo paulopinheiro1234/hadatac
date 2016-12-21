@@ -75,8 +75,7 @@ public class Parser {
 		return new DatasetParsingResult(result.getStatus(), message);
 	}
 	
-	public int index(int mode) {
-		// data collection
+	public DatasetParsingResult index(int mode) {
 		DataAcquisition dataAcquisition = DataAcquisition.create(hadatacCcsv, hadatacKb);
 		if (hadatacCcsv.getDataAcquisition().getStatus() > 0) {
 			hadatacKb.getDataAcquisition().merge(dataAcquisition);
@@ -85,35 +84,32 @@ public class Parser {
 			hadatacKb.setDataAcquisition(dataAcquisition);
 		}
 		
-		SolrClient solr = new HttpSolrClient(hadatacCcsv.getDynamicMetadataURL());
 		System.out.println("hadatacKb.dataCollection.save(solr)...");
-		hadatacKb.getDataAcquisition().save(solr);
-		try {
-			solr.close();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		
-		try {
-			indexMeasurements();
-			System.out.println("solr.commit()...");
-			solr.commit();
-			System.out.println("commit() finished...");
-			solr.close();
-		} catch (IOException | SolrServerException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		
-		return 0;
+		hadatacKb.getDataAcquisition().save();
+		DatasetParsingResult result = indexMeasurements();
+
+		return new DatasetParsingResult(result.getStatus(), result.getMessage());
 	}
 	
-	private int indexMeasurements() throws IOException {
+	private DatasetParsingResult indexMeasurements(){
 		System.out.println("indexMeasurements()...");
+		String message = "";
 		
-		files.openFile("csv", "r");
-		Iterable<CSVRecord> records = CSVFormat.DEFAULT.withHeader().parse(files.getReader("csv"));
+		try {
+			files.openFile("csv", "r");
+		} catch (IOException e) {
+			e.printStackTrace();
+			message += "[ERROR] Fail to open the csv file\n";
+			return new DatasetParsingResult(1, message);
+		}
+		Iterable<CSVRecord> records = null;
+		try {
+			records = CSVFormat.DEFAULT.withHeader().parse(files.getReader("csv"));
+		} catch (IOException e) {
+			e.printStackTrace();
+			message += "[ERROR] Fail to parse header of the csv file\n";
+			return new DatasetParsingResult(1, message);
+		}
 		int total_count = 0;
 		int batch_size = 10000;
 		int nTimeStampCol = 0;
@@ -156,27 +152,45 @@ public class Parser {
 				measurement.setDatasetUri(hadatacCcsv.getDatasetKbUri());
 				try {
 					solr.addBean(measurement);
-				} catch (SolrServerException e) {
+				} catch (IOException | SolrServerException e) {
 					System.out.println("[ERROR] SolrClient.addBean - e.Message: " + e.getMessage());
 				}
 				if((++total_count) % batch_size == 0){
 					try {
+						System.out.println("solr.commit()...");
 						solr.commit();
 						System.out.println(String.format("Committed %s measurements!", batch_size));
 					} catch (IOException | SolrServerException e) {
 						System.out.println("[ERROR] SolrClient.commit - e.Message: " + e.getMessage());
+						message += "[ERROR] Fail to commit to solr\n";
+						return new DatasetParsingResult(1, message);
 					}
 				}
 			}
 		}
-		solr.close();
+		try {
+			try {
+				System.out.println("solr.commit()...");
+				solr.commit();
+				System.out.println(String.format("Committed %s measurements!", total_count % batch_size));
+			} catch (IOException | SolrServerException e) {
+				System.out.println("[ERROR] SolrClient.commit - e.Message: " + e.getMessage());
+				message += "[ERROR] Fail to commit to solr\n";
+				return new DatasetParsingResult(1, message);
+			}
+			solr.close();
+			files.closeFile("csv", "r");
+		} catch (IOException e) {
+			e.printStackTrace();
+			message += "[ERROR] Fail to close the csv file\n";
+			return new DatasetParsingResult(1, message);
+		}
 		
 		hadatacKb.getDataAcquisition().addNumberDataPoints(total_count);
 		hadatacKb.getDataAcquisition().save();
 		
-		files.closeFile("csv", "r");
 		System.out.println("Finished indexMeasurements()");
-		return 0;
+		return new DatasetParsingResult(0, message);
 	}
 	
 	private DatasetParsingResult loadFromKb(int mode) {

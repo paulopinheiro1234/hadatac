@@ -1,7 +1,7 @@
 package org.hadatac.data.model;
 
 public class DatasetParsingResult {
-	private int status;
+	private int status = 0;
 	private String message = "";
 	
 	public DatasetParsingResult(int status, String message) {
