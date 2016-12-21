@@ -282,7 +282,7 @@ public class Measurement {
 			System.out.println("[ERROR] SolrClient.solr - IOException message: " + e.getMessage());
 		}
 		
-		query.setStart((page) * qtd);
+		query.setStart((page - 1) * qtd);
 		query.setRows(qtd);
 		try {
 			QueryResponse queryResponse = solr.query(query);

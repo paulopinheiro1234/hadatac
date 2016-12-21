@@ -32,7 +32,6 @@ public class AcquisitionQueryResult {
 	public String toJSON() {
 		ObjectMapper mapper = new ObjectMapper();
 		try {
-			System.out.println(mapper.writeValueAsString(this));
 			return mapper.writeValueAsString(this);
 		} catch (Exception e) {
 			System.out.println("[ERROR] AcquisitionQueryResult.toJSON() - Exception message: " + e.getMessage());

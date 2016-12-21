@@ -1,10 +1,38 @@
-@()
+@(documents : List[org.hadatac.entity.pojo.Measurement])
 
 	<script type="text/javascript">
+		onload = function() {
+			if (!document.getElementsByTagName || !document.createTextNode) return;
+			var rows = document.getElementById('measurementsTable').getElementsByTagName('tbody')[0].getElementsByTagName('tr');
+			for (i = 0; i < rows.length; i++) {
+				rows[i].onmouseover = function() {
+					var row = this.rowIndex - 1;
+					document.getElementById('detail_uri').innerHTML = json.documents[row]['uri'];
+					document.getElementById('detail_timestamp').innerHTML = json.documents[row]['timestamp'];
+					document.getElementById('detail_value').innerHTML = json.documents[row]['value'];
+					document.getElementById('detail_entity').innerHTML = json.documents[row]['entity'];
+					document.getElementById('detail_entity_uri').innerHTML = json.documents[row]['entityUri'];
+					document.getElementById('detail_characteristic').innerHTML = json.documents[row]['characteristic'];
+					document.getElementById('detail_characteristic_uri').innerHTML = json.documents[row]['characteristicUri'];
+					document.getElementById('detail_unit').innerHTML = json.documents[row]['unit'];
+					document.getElementById('detail_unit_uri').innerHTML = json.documents[row]['unitUri'];
+					document.getElementById('detail_instrument_model').innerHTML = json.documents[row]['instrumentModel'];
+					document.getElementById('detail_instrument_uri').innerHTML = json.documents[row]['instrumentUri'];
+					document.getElementById('detail_platform_name').innerHTML = json.documents[row]['platformName'];
+					document.getElementById('detail_platform_uri').innerHTML = json.documents[row]['platformUri'];
+				}
+			}
+			
+			for(i = (cur_page - 1) * page_size; i < Math.min(cur_page * page_size, num_results); i++){
+				document.getElementById(i.toString()).style.display = '';
+			}
+			updatePage();
+		}
+		
 		var cur_page = 1;
 		var page_size = 15;
-		var num_results = 1000;
-		var total_page = Math.ceil(num_results/page_size);
+		var num_results = @documents.size();
+		var total_page = Math.ceil(@documents.size()/page_size);
 		function nextPage(){
 			if(cur_page < total_page){
 				for(i = (cur_page - 1) * page_size; i < Math.min(cur_page * page_size, num_results); i++){
@@ -19,8 +47,13 @@
 		}
 		function prevPage(){
 			if(cur_page > 1){
+				for(i = (cur_page - 1) * page_size; i < Math.min(cur_page * page_size, num_results); i++){
+					document.getElementById(i.toString()).style.display = 'none';
+				}
 				cur_page -= 1;
-				
+				for(i = (cur_page - 1) * page_size; i < Math.min(cur_page * page_size, num_results); i++){
+					document.getElementById(i.toString()).style.display = '';
+				}
 			}
 			updatePage();
 		}
@@ -44,7 +77,7 @@
 			}
 			updatePage();
 		}
-		function updatePage(docs){
+		function updatePage(){
 			if(cur_page == 1){
 				document.getElementById('prevpage').disabled = true;
 				document.getElementById('firstpage').disabled = true;
@@ -66,24 +99,6 @@
 			pages = "Current Page: " + cur_page.toString() + " \/ " + total_page.toString() 
 					+ ", Number of Result: " + num_results.toString();
 			document.getElementById('pagecontrl').innerHTML = pages;
-
-			var table = document.getElementById("measurementsTable");
-			while(table.rows.length > 1) {
-				table.deleteRow(1);
-			}
-			for(var m in docs){
-				var row = table.insertRow(0);
-				var object = row.insertCell(0);
-			    var characteristic = row.insertCell(1);
-			    var value = row.insertCell(2);
-			    var timestamp = row.insertCell(3);
-			    var location = row.insertCell(4);
-			    object.innerHTML = m[entity];
-			    characteristic.innerHTML = m[characteristic];
-			    value.innerHTML = m[value];
-			    timestamp.innerHTML = m[timestamp];
-			    location.innerHTML = m[location];	
-			}
 		}
 	</script>
 
@@ -103,5 +118,18 @@
                 <th>Location</th>
               </tr>
             </thead>
+
+            <tbody>
+            	@for((document, index) <- documents.zipWithIndex) {
+                <tr id="@index" style="display: none">
+                    <td>@document.getEntity()</td>
+                	<td>@document.getCharacteristic()</td>
+                	<td>@document.getValue()</td>
+                	<td>@document.getTimestamp()</td>
+                	<td>@document.getLocation()</td>
+                </tr>
+                }
+            </tbody>
+
         </table>
     </div>
