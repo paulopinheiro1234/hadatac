@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 
 import play.mvc.Controller;
 import play.mvc.Result;
@@ -37,6 +38,56 @@ import be.objectify.deadbolt.java.actions.Group;
 import be.objectify.deadbolt.java.actions.Restrict;
 
 public class ViewSample extends Controller {
+
+	public static Map<String, String> findSampleIndicators(String sample_uri) {
+		String indicatorQuery="PREFIX rdfs:<http://www.w3.org/2000/01/rdf-schema#> PREFIX case: <http://hadatac.org/ont/case#>PREFIX chear: <http://hadatac.org/ont/chear#>SELECT ?sampleIndicator ?label ?comment WHERE { ?sampleIndicator rdfs:subClassOf chear:sampleIndicator . ?sampleIndicator rdfs:label ?label . ?sampleIndicator rdfs:comment ?comment . }";
+		QueryExecution qexecInd = QueryExecutionFactory.sparqlService(Collections.getCollectionsName(Collections.METADATA_SPARQL), indicatorQuery);
+		ResultSet indicatorResults = qexecInd.execSelect();
+		ResultSetRewindable resultsrwIndc = ResultSetFactory.copyResults(indicatorResults);
+		qexecInd.close();
+		
+		Map<String, String> indicatorMap = new HashMap<String, String>();
+		String indicatorLabel = "";
+		while (resultsrwIndc.hasNext()) {
+			QuerySolution soln = resultsrwIndc.next();
+			indicatorLabel = soln.get("label").toString();
+			indicatorMap.put(soln.get("sampleIndicator").toString(),indicatorLabel);		
+		}
+		Map<String, String> indicatorMapSorted = new TreeMap<String, String>(indicatorMap);
+		
+		Map<String, String> indicatorValues = new HashMap<String, String>();
+		
+		for(Map.Entry<String, String> entry : indicatorMapSorted.entrySet()){
+		    //System.out.println("Key : " + entry.getKey() + " and Value: " + entry.getValue() + "\n");
+		    String label = entry.getValue().toString().replaceAll(" ", "").replaceAll(",", "").toString() + "Label";
+
+			String indvIndicatorQuery = "PREFIX rdfs:<http://www.w3.org/2000/01/rdf-schema#> PREFIX chear: <http://hadatac.org/ont/chear#>PREFIX case: <http://hadatac.org/ont/case#>PREFIX chear-kb: <http://hadatac.org/kb/chear#>PREFIX case-kb: <http://hadatac.org/kb/case#>PREFIX hasco: <http://hadatac.org/ont/hasco/>PREFIX hasneto: <http://hadatac.org/ont/hasneto#>SELECT DISTINCT ?sampleUri " +
+					"?" + label + " " +
+					"WHERE { ?schemaUri hasco:isSchemaOf ?sampleUri . ?schemaAttribute hasneto:partOfSchema ?schemaUri . ?schemaAttribute hasneto:hasAttribute " +
+					"?" + entry.getValue().toString().replaceAll(" ", "").replaceAll(",", "") +
+					" . ?" + entry.getValue().toString().replaceAll(" ", "").replaceAll(",", "") + " rdfs:subClassOf* " + entry.getKey().toString().replaceAll("http://hadatac.org/ont/chear#","chear:").replaceAll("http://hadatac.org/ont/case#","case:").replaceAll("http://hadatac.org/kb/chear#","chear-kb:").replaceAll("http://hadatac.org/kb/case#","case-kb:") + 
+					" . ?" + entry.getValue().toString().replaceAll(" ", "").replaceAll(",", "") + " rdfs:label ?" + label + " . " +
+					"			FILTER ( ?sampleUri = " + sample_uri.replaceAll("http://hadatac.org/ont/chear#","chear:").replaceAll("http://hadatac.org/ont/case#","case:").replaceAll("http://hadatac.org/kb/chear#","chear-kb:").replaceAll("http://hadatac.org/kb/case#","case-kb:") + " ) . " +
+					"}";
+			//System.out.println(indvIndicatorQuery + "\n");
+			QueryExecution qexecIndvInd = QueryExecutionFactory.sparqlService(Collections.getCollectionsName(Collections.METADATA_SPARQL), indvIndicatorQuery);
+			ResultSet indvIndResults = qexecIndvInd.execSelect();
+			ResultSetRewindable resultsrwIndvInd = ResultSetFactory.copyResults(indvIndResults);
+			qexecIndvInd.close();
+			String indvIndicatorString="";
+			while (resultsrwIndvInd.hasNext()) {
+				QuerySolution soln = resultsrwIndvInd.next();
+				//System.out.println("Solution: " + soln);
+				indvIndicatorString += soln.get(label).toString() + ", ";
+				//System.out.println("Indicator String: " + indvIndicatorString);
+			}
+			if (indvIndicatorString != ""){
+				indvIndicatorString = indvIndicatorString.substring(0, indvIndicatorString.length()-2);
+				indicatorValues.put(entry.getValue().toString(),indvIndicatorString);
+			}
+		}
+		return indicatorValues;
+	}
 	
 	public static Map<String, List<String>> findBasic(String sample_uri) {
 
@@ -119,9 +170,10 @@ public class ViewSample extends Controller {
 	@Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
     public static Result index(String sample_uri) {
 
+		Map<String, String> indicatorValues = findSampleIndicators(sample_uri);
     	Map<String, List<String>> sampleResult = findBasic(sample_uri);
         
-    	return ok(viewSample.render(sampleResult));    
+    	return ok(viewSample.render(sampleResult,indicatorValues));    
         
     }// /index()
 

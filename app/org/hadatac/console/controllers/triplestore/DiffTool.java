@@ -75,8 +75,8 @@ public class DiffTool extends Controller {
 
 
     //Retrieves both the name and description of each list
-    private static Collection<ArrayList<String>> ConnectToLabkey_List_Manager(String url_name, String user, String pass) throws Exception{
-        Connection cn = new Connection("http://chear.tw.rpi.edu/labkey/", user, pass);
+    private static Collection<ArrayList<String>> ConnectToLabkey_List_Manager(String url_name, Connection cn) throws Exception{
+        
         SelectRowsCommand cmd = new SelectRowsCommand("ListManager", "ListManager");
         cmd.setRequiredVersion(9.1);
         cmd.setColumns(Arrays.asList("Name", "Description"));
@@ -111,9 +111,9 @@ public class DiffTool extends Controller {
     }
 
     //Purpose is to retrieve just the list names from each list manager
-    private static Collection<String> ConnectToLabkey_Retrieve_List_Names(String url_name, String user, String pass) throws Exception{
-        Connection cn = new Connection("http://chear.tw.rpi.edu/labkey/", user, pass);
-        SelectRowsCommand cmd = new SelectRowsCommand("ListManager", "ListManager");
+    private static Collection<String> ConnectToLabkey_Retrieve_List_Names(String url_name, Connection cn) throws Exception{
+        
+    	SelectRowsCommand cmd = new SelectRowsCommand("ListManager", "ListManager");
         cmd.setRequiredVersion(9.1);
         cmd.setColumns(Arrays.asList("Name", "Description"));
         cmd.setSorts(Collections.singletonList(new Sort("Name")));
@@ -135,8 +135,8 @@ public class DiffTool extends Controller {
     }
 
     //Built for getting the headers of the sub-list
-    private static Collection<String> ConnectToLabkey_List(String url_name, String list_name, String user, String pass) throws Exception{
-        Connection cn = new Connection("http://chear.tw.rpi.edu/labkey/", user, pass);
+    private static Collection<String> ConnectToLabkey_List(String url_name, String list_name, Connection cn) throws Exception{
+        
         SelectRowsCommand cmd = new SelectRowsCommand("lists", list_name);
         cmd.setRequiredVersion(9.1);
 
@@ -291,25 +291,25 @@ public class DiffTool extends Controller {
         String Schema2 = "CHEAR Production";
         String username = auth.user_name;
         String password = auth.password;
-        
+        Connection cn = new Connection("http://chear.tw.rpi.edu/labkey/", username, password);
 
         PrintWriter writer = new PrintWriter("./app/org/hadatac/console/views/triplestore/diff_results.scala.html", "UTF-8");
         writer.print("@()\n@import helper._\n@import org.hadatac.console.views.html._\n@import org.hadatac.console.controllers.triplestore._\n@import org.hadatac.data.loader._\n@import org.hadatac.metadata.loader._\n@import org.hadatac.utils._\n@import java.net._\n@import play._\n\n@main(\"Diff Tool Results\") {\n<div class=\"container-fluid\">\n<h1>Diff Tool Results</h1>\n");
         //Map<String, Object> chear_dev_map = connect_chear_dev();
-        Collection<ArrayList<String>> dataArrayMain = ConnectToLabkey_List_Manager(Schema1, username, password);
-        Collection<ArrayList<String>> dataArraySecond = ConnectToLabkey_List_Manager(Schema2, username, password);
+        Collection<ArrayList<String>> dataArrayMain = ConnectToLabkey_List_Manager(Schema1, cn);
+        Collection<ArrayList<String>> dataArraySecond = ConnectToLabkey_List_Manager(Schema2, cn);
         CompareListCollections(dataArrayMain, dataArraySecond,  writer, Schema1, Schema2);
 
-        Collection<String> dataArrayH1 = ConnectToLabkey_Retrieve_List_Names(Schema1, username, password);
-        Collection<String> dataArrayH2 = ConnectToLabkey_Retrieve_List_Names(Schema2, username, password);
+        Collection<String> dataArrayH1 = ConnectToLabkey_Retrieve_List_Names(Schema1, cn);
+        Collection<String> dataArrayH2 = ConnectToLabkey_Retrieve_List_Names(Schema2, cn);
 
         Collection<String> dataArrayCombined = CombineHeaders(dataArrayH1, dataArrayH2, writer, Schema1, Schema2);
 
         for (Iterator<String> iter = dataArrayCombined.iterator(); iter.hasNext(); ) {
             String sub_list_name = iter.next();
             writer.print("<h2>List Name: " + sub_list_name + "</h2>\n\n");
-            Collection<String> dataArrayH11 = ConnectToLabkey_List(Schema1,sub_list_name, username, password);
-            Collection<String> dataArrayH22 = ConnectToLabkey_List(Schema2,sub_list_name, username, password);
+            Collection<String> dataArrayH11 = ConnectToLabkey_List(Schema1,sub_list_name, cn);
+            Collection<String> dataArrayH22 = ConnectToLabkey_List(Schema2,sub_list_name, cn);
 
             CompareHeaders(dataArrayH11, dataArrayH22, writer, Schema1, Schema2);
 
