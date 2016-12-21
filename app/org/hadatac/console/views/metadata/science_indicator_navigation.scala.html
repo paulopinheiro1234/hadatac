@@ -1,0 +1,45 @@
+@(selection : String)
+
+@import org.hadatac.console.controllers._
+
+    <div class="navbar-collapse collapse navbar-secondary hidden-print">
+        <div class="col-md-1.5">
+            <button type="button" class="btn btn-link"><b>Science Indicator</b></button>
+        </div>
+        @if(selection == "Process") {
+            <div class="col-md-1">
+                <a href="@org.hadatac.console.controllers.metadata.routes.MetadataEntry.index(selection)" class="btn-xs btn-block btn-warning" role="button">Process<br>&nbsp;<br>&nbsp;</a>
+            </div>
+        } else {
+            <div class="col-md-1">
+                <a href="@org.hadatac.console.controllers.metadata.routes.MetadataEntry.index("Process")" class="btn-xs btn-block btn-primary" role="button">Process<br>&nbsp;<br>&nbsp;</a>
+            </div>
+        }
+        @if(selection == "Entity") {
+            <div class="col-md-1">
+                <a href="@org.hadatac.console.controllers.metadata.routes.MetadataEntry.index(selection)" class="btn-xs btn-block btn-warning" role="button">Entity<br>&nbsp;<br>&nbsp;</a>
+            </div>
+        } else {
+            <div class="col-md-1">
+                <a href="@org.hadatac.console.controllers.metadata.routes.MetadataEntry.index("Entity")" class="btn-xs btn-block btn-primary" role="button">Entity<br>&nbsp;<br>&nbsp;</a>
+            </div>
+        }
+        @if(selection == "Object") {
+            <div class="col-md-1">
+                <a href="@org.hadatac.console.controllers.metadata.routes.MetadataEntry.index(selection)" class="btn-xs btn-block btn-warning" role="button">Object<br>&nbsp;<br>&nbsp;</a>
+            </div>
+        } else {
+            <div class="col-md-1">
+                <a href="@org.hadatac.console.controllers.metadata.routes.MetadataEntry.index("Object")" class="btn-xs btn-block btn-primary" role="button">Object<br>&nbsp;<br>&nbsp;</a>
+            </div>
+        }
+        @if(selection == "Attribute") {
+            <div class="col-md-1">
+                <a href="@org.hadatac.console.controllers.metadata.routes.MetadataEntry.index(selection)" class="btn-xs btn-block btn-warning" role="button">Attribute<br>&nbsp;<br>&nbsp;</a>
+            </div>
+        } else {
+            <div class="col-md-1">
+                <a href="@org.hadatac.console.controllers.metadata.routes.MetadataEntry.index("Attribute")" class="btn-xs btn-block btn-primary" role="button">Attribute<br>&nbsp;<br>&nbsp;</a>
+            </div>
+        }
+    </div>

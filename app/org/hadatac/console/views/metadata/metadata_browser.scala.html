@@ -20,6 +20,9 @@
     @if((category == "PregnancySample") || (category == "Cell") || (category == "Tissue")){
         @sample_indicator_navigation(category)
     }
+    @if((category == "Process") || (category == "Entity") || (category == "Object") || (category == "Attribute")){
+        @science_indicator_navigation(category)
+    }
     @if((category == "EnvironmentalExposure") || (category == "BirthOutcome") || (category == "OralHealth") || (category == "ParentalHealthandFamilyHistory") || (category == "TargetedAnalyte") || (category == "ReproductiveHealth") || (category == "PrescriptionMedicationandDietarySupplements") || (category == "NeighborhoodCharacteristic") || (category == "PregnancyCharacteristic") || (category == "AlcoholTobaccoandIllicitDrugUse") || (category == "DeliveryCharacteristics") || (category == "DietandNutrition") || (category == "SocioeconomicClassStatus") || (category == "HousingCharacteristic") || (category == "PersonalProductUse") || (category == "MedicalHistory") || (category == "Anthropometry") || (category == "SleepCharacterisitic") || (category == "Acculturation") || (category == "MentalHealth") || (category == "PhysicalandMentalAssessment") || (category == "Demographic") || (category == "HospitalUtilizationandAccesstoCare") || (category == "PhysicalActivityandFitness")){
         @study_indicator_navigation(category)
     }
