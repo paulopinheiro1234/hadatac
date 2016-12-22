@@ -138,6 +138,9 @@ public class Parser {
 				if (measurementType.getTimestampColumn() > -1) {
 					continue;
 				}
+				if (measurementType.getIdColumn() > -1) {
+					continue;
+				}
 				measurement.setTimestamp(record.get(nTimeStampCol - 1));
 				measurement.setUri(hadatacCcsv.getMeasurementUri() + hadatacCcsv.getDataset().getLocalName() + "/" + measurementType.getLocalName() + "-" + total_count);
 				measurement.setOwnerUri(hadatacKb.getDataAcquisition().getOwnerUri());
