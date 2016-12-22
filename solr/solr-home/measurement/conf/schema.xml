@@ -5,6 +5,7 @@
 	<field name="owner_uri" type="string" indexed="true" docValues="true" />
 	<field name="acquisition_uri" type="string" indexed="true" docValues="true" />
 	<field name="study_uri" type="string" indexed="true" docValues="true" />
+	<field name="object_uri" type="string" indexed="true" docValues="true" />
     <field name="_version_" type="long" indexed="true" stored="true"/>
     <field name="_text_" type="text_general" indexed="true" stored="false" multiValued="true"/>
     <field name="timestamp" type="string" indexed="true" stored="true" docValues="true" />
