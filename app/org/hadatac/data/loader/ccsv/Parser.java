@@ -20,6 +20,7 @@ import org.hadatac.entity.pojo.Deployment;
 import org.hadatac.entity.pojo.HADataC;
 import org.hadatac.entity.pojo.Measurement;
 import org.hadatac.entity.pojo.MeasurementType;
+import org.hadatac.entity.pojo.Subject;
 import org.hadatac.utils.Feedback;
 
 import play.Play;
@@ -113,9 +114,13 @@ public class Parser {
 		int total_count = 0;
 		int batch_size = 10000;
 		int nTimeStampCol = 0;
+		int nIdCol = 0;
 		for(MeasurementType mt : hadatacKb.getDataset().getMeasurementTypes()){
 			if(mt.getTimestampColumn() > -1){
 				nTimeStampCol = mt.getTimestampColumn();
+			}
+			if(mt.getIdColumn() > -1){
+				nIdCol = mt.getIdColumn();
 			}
 		}
 		SolrClient solr = new HttpSolrClient(Play.application().configuration().getString("hadatac.solr.data") + "/measurement");
@@ -134,11 +139,11 @@ public class Parser {
 					continue;
 				}
 				measurement.setTimestamp(record.get(nTimeStampCol - 1));
-				measurement.setLocation(hadatacKb.getDeployment().platform.getLocation());
 				measurement.setUri(hadatacCcsv.getMeasurementUri() + hadatacCcsv.getDataset().getLocalName() + "/" + measurementType.getLocalName() + "-" + total_count);
 				measurement.setOwnerUri(hadatacKb.getDataAcquisition().getOwnerUri());
 				measurement.setAcquisitionUri(hadatacKb.getDataAcquisition().getUri());
 				measurement.setStudyUri(hadatacKb.getDataAcquisition().getStudyUri());
+				measurement.setObjectUri(Subject.find(measurement.getStudyUri(), record.get(nIdCol - 1)).getUri());
 				measurement.setUnit(measurementType.getUnitLabel());
 				measurement.setUnitUri(measurementType.getUnitUri());
 				measurement.setCharacteristic(measurementType.getCharacteristicLabel());

@@ -41,6 +41,8 @@ public class Measurement {
 	private String acquisitionUri;
 	@Field("study_uri")
 	private String studyUri;
+	@Field("object_uri")
+	private String objectUri;
 	@Field("timestamp")
 	private String timestamp;
 	@Field("value")
@@ -89,6 +91,12 @@ public class Measurement {
 	}
 	public void setStudyUri(String studyUri) {
 		this.studyUri = studyUri;
+	}
+	public String getObjectUri() {
+		return objectUri;
+	}
+	public void setObjectUri(String objectUri) {
+		this.objectUri = objectUri;
 	}
 	public String getInstrumentModel() {
 		return instrumentModel;
@@ -440,6 +448,8 @@ public class Measurement {
 		m.setUri(doc.getFieldValue("uri").toString());
 		m.setOwnerUri(doc.getFieldValue("owner_uri").toString());
 		m.setAcquisitionUri(doc.getFieldValue("acquisition_uri").toString());
+		m.setStudyUri(doc.getFieldValue("study_uri").toString());
+		m.setObjectUri(doc.getFieldValue("object_uri").toString());
 		if (doc.getFieldValue("timestamp") != null) {
 			m.setTimestamp(doc.getFieldValue("timestamp").toString());
 		}
