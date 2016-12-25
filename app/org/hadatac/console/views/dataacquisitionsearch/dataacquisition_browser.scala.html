@@ -105,17 +105,17 @@
 	}
 	
 	var jsonTree, dataTree;
-	var treeS;
-	jsonTree = parseSolrFacetPivotToTree("study_uri");
-	dataTree = JSON.parse(jsonTree);
-	treeS = new dhtmlXTreeObject("treeStudyBox","100%","100%",0);
-	loadTree(treeS, dataTree);
-	
 	var treeEC;
 	jsonTree = parseSolrFacetPivotToTree("entity,characteristic");
 	dataTree = JSON.parse(jsonTree);
 	treeEC = new dhtmlXTreeObject("treeEntityCharacteristicBox","100%","100%",0);
 	loadTree(treeEC, dataTree);
+	
+	var treeS;
+	jsonTree = parseSolrFacetPivotToTree("study_uri");
+	dataTree = JSON.parse(jsonTree);
+	treeS = new dhtmlXTreeObject("treeStudyBox","100%","100%",0);
+	loadTree(treeS, dataTree);
 	
 	var treeU;
 	jsonTree = parseSolrFacetFieldToTree("unit");
@@ -130,3 +130,5 @@
 	loadTree(treePI, dataTree);
 	</script>
 }
+
+

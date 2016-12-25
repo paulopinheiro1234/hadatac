@@ -333,10 +333,10 @@ public class Measurement {
 		System.out.println("Starting at: " + ((page - 1)* qtd + 1) + "    page: " + page + "     qtd: " + qtd);
 		query.setRows(qtd);
 		query.setFacet(true);
-		query.addFacetPivotField("study_uri");
 		query.addFacetPivotField("entity,characteristic");
 		query.addFacetField("unit");
 		query.addFacetPivotField("platform_name,instrument_model");
+		query.addFacetPivotField("study_uri");
 		
 		try {
 			QueryResponse queryResponse = solr.query(query);

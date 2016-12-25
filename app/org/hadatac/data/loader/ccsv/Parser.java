@@ -21,6 +21,7 @@ import org.hadatac.entity.pojo.HADataC;
 import org.hadatac.entity.pojo.Measurement;
 import org.hadatac.entity.pojo.MeasurementType;
 import org.hadatac.entity.pojo.Subject;
+import org.hadatac.metadata.loader.ValueCellProcessing;
 import org.hadatac.utils.Feedback;
 
 import play.Play;
@@ -113,8 +114,8 @@ public class Parser {
 		}
 		int total_count = 0;
 		int batch_size = 10000;
-		int nTimeStampCol = 0;
-		int nIdCol = 0;
+		int nTimeStampCol = -1;
+		int nIdCol = -1;
 		for(MeasurementType mt : hadatacKb.getDataset().getMeasurementTypes()){
 			if(mt.getTimestampColumn() > -1){
 				nTimeStampCol = mt.getTimestampColumn();
@@ -124,10 +125,18 @@ public class Parser {
 			}
 		}
 		SolrClient solr = new HttpSolrClient(Play.application().configuration().getString("hadatac.solr.data") + "/measurement");
+		ValueCellProcessing cellProc = new ValueCellProcessing();
 		for (CSVRecord record : records) {
 			Iterator<MeasurementType> iter = hadatacKb.getDataset().getMeasurementTypes().iterator();
 			while (iter.hasNext()) {
 				MeasurementType measurementType = iter.next();
+				if (measurementType.getTimestampColumn() > -1) {
+					continue;
+				}
+				if (measurementType.getTimestampColumn() > -1) {
+					continue;
+				}
+				
 				Measurement measurement = new Measurement();
 				if(record.get(measurementType.getValueColumn() - 1).isEmpty()){
 					continue;
@@ -135,15 +144,22 @@ public class Parser {
 				else{
 					measurement.setValue(record.get(measurementType.getValueColumn() - 1));
 				}
-				if (measurementType.getTimestampColumn() > -1) {
-					continue;
+				if(nTimeStampCol > -1){
+					measurement.setTimestamp(record.get(nTimeStampCol - 1));
 				}
-				measurement.setTimestamp(record.get(nTimeStampCol - 1));
+				else {
+					measurement.setTimestamp("");
+				}
+				if(nIdCol > -1){
+					measurement.setObjectUri(Subject.find(measurement.getStudyUri(), record.get(nIdCol - 1)).getUri());
+				}
+				else {
+					measurement.setObjectUri("");
+				}
 				measurement.setUri(hadatacCcsv.getMeasurementUri() + hadatacCcsv.getDataset().getLocalName() + "/" + measurementType.getLocalName() + "-" + total_count);
 				measurement.setOwnerUri(hadatacKb.getDataAcquisition().getOwnerUri());
 				measurement.setAcquisitionUri(hadatacKb.getDataAcquisition().getUri());
-				measurement.setStudyUri(hadatacKb.getDataAcquisition().getStudyUri());
-				measurement.setObjectUri(Subject.find(measurement.getStudyUri(), record.get(nIdCol - 1)).getUri());
+				measurement.setStudyUri(cellProc.replaceNameSpaceEx(hadatacKb.getDataAcquisition().getStudyUri()));
 				measurement.setUnit(measurementType.getUnitLabel());
 				measurement.setUnitUri(measurementType.getUnitUri());
 				measurement.setCharacteristic(measurementType.getCharacteristicLabel());
@@ -168,6 +184,12 @@ public class Parser {
 					} catch (IOException | SolrServerException e) {
 						System.out.println("[ERROR] SolrClient.commit - e.Message: " + e.getMessage());
 						message += "[ERROR] Fail to commit to solr\n";
+						try {
+							solr.close();
+						} catch (IOException e1) {
+							System.out.println("[ERROR] SolrClient.close - e.Message: " + e1.getMessage());
+							message += "[ERROR] Fail to close solr\n";
+						}
 						return new DatasetParsingResult(1, message);
 					}
 				}
@@ -179,11 +201,11 @@ public class Parser {
 				solr.commit();
 				System.out.println(String.format("Committed %s measurements!", total_count % batch_size));
 			} catch (IOException | SolrServerException e) {
+				solr.close();
 				System.out.println("[ERROR] SolrClient.commit - e.Message: " + e.getMessage());
 				message += "[ERROR] Fail to commit to solr\n";
 				return new DatasetParsingResult(1, message);
 			}
-			solr.close();
 			files.closeFile("csv", "r");
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -195,6 +217,12 @@ public class Parser {
 		hadatacKb.getDataAcquisition().save();
 		
 		System.out.println("Finished indexMeasurements()");
+		try {
+			solr.close();
+		} catch (IOException e) {
+			System.out.println("[ERROR] SolrClient.close - e.Message: " + e.getMessage());
+			message += "[ERROR] Fail to close solr\n";
+		}
 		return new DatasetParsingResult(0, message);
 	}
 	
