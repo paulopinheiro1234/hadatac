@@ -271,6 +271,7 @@ public class DynamicMetadataGeneration extends Controller {
 				}
 				else {
 					System.out.println("renderMetadataBrowserHTML() No Label: " + soln + "\n");
+					metadataBrowserHTMLString = metadataBrowserHTMLString + "(category == \"\")";
 				}
 				if (resultsrwIndvInd.hasNext()){
 					metadataBrowserHTMLString = metadataBrowserHTMLString + " || ";
