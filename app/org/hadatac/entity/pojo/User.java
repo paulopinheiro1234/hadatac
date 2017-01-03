@@ -201,29 +201,34 @@ public class User implements Comparable<User> {
 			QuerySolution soln = resultsrw.next();
 			System.out.println("URI from main query: " + soln.getResource("uri").getURI());
 			User user = find(soln.getResource("uri").getURI());
-			users.add(user);
+			if(null != user){
+				users.add(user);
+			}
 		}			
 
 		java.util.Collections.sort((List<User>) users);
 		return users;
 	}
 	
-	public static User find(String uri) {
+	public static User find(String uri) {	
+		User user = new User();
+		
+		boolean bHasEmail = false;
+		
+		String queryString = "DESCRIBE <" + uri + ">";
+		Query query = QueryFactory.create(queryString);
+		
 		Model modelPublic;
 		Model modelPrivate;
 		Statement statement;
 		RDFNode object;
 		
-		User user = new User();
-		user.setUri(uri);
-		
-		String queryString = "DESCRIBE <" + uri + ">";
-		Query query = QueryFactory.create(queryString);
-		
-		QueryExecution qexecPrivate = QueryExecutionFactory.sparqlService(Collections.getCollectionsName(Collections.PERMISSIONS_SPARQL), query);
+		QueryExecution qexecPrivate = QueryExecutionFactory.sparqlService(
+				Collections.getCollectionsName(Collections.PERMISSIONS_SPARQL), query);
 		modelPrivate = qexecPrivate.execDescribe();
 
 		StmtIterator stmtIteratorPrivate = modelPrivate.listStatements();
+		
 		while (stmtIteratorPrivate.hasNext()) {
 			statement = stmtIteratorPrivate.next();
 			object = statement.getObject();
@@ -254,6 +259,7 @@ public class User implements Comparable<User> {
 			}
 			else if (statement.getPredicate().getURI().equals("http://xmlns.com/foaf/0.1/mbox")) {
 				user.setEmail(object.asLiteral().getString());
+				bHasEmail = true;
 				System.out.println("mbox: " + object.asLiteral().getString());
 			}
 			else if (statement.getPredicate().getURI().equals("http://xmlns.com/foaf/0.1/homepage")) {
@@ -280,11 +286,17 @@ public class User implements Comparable<User> {
 				System.out.println("name: " + object.asLiteral().getString());
 			} else if (statement.getPredicate().getURI().equals("http://xmlns.com/foaf/0.1/mbox")) {
 				user.setEmail(object.asLiteral().getString());
+				bHasEmail = true;
 				System.out.println("mbox: " + object.asLiteral().getString());
 			}
 		}
 		
-		return user;
+		if(bHasEmail){
+			user.setUri(uri);
+			return user;
+		}
+		
+		return null;
 	}
 	
 	public static void changeAccessLevel(String uri, String group_uri) {

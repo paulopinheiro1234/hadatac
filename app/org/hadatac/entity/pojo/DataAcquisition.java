@@ -555,6 +555,9 @@ public class DataAcquisition {
 	public static List<String> findAllAccessibleDataAcquisition(String user_uri){
 		List<String> listURI = new ArrayList<String>();
 		User user = User.find(user_uri);
+		if(null == user){
+			return listURI;
+		}
 		String group_uri = user.getImmediateGroupUri();
 		
 		for(DataAcquisition acquisition : findAll()) {
