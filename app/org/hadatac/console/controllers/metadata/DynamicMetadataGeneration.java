@@ -70,23 +70,28 @@ public class DynamicMetadataGeneration extends Controller {
 				resultCount += 1;
 				QuerySolution soln = resultsrwIndvInd.next();
 				int maxLength = 30;
-				int buttonTextLength = soln.get("label").toString().length();
-				if (buttonTextLength > maxLength) {
-					buttonTextLength = maxLength;
+				if (soln.contains("label")){
+					int buttonTextLength = soln.get("label").toString().length();
+					if (buttonTextLength > maxLength) {
+						buttonTextLength = maxLength;
+					}
+					metadataNavigationString = metadataNavigationString + 
+							"        @if(selection == \"" + soln.get("label").toString().replaceAll(" ", "").replaceAll(",", "") + "\") {\n" +
+							"            <div class=\"col-md-1\">\n" +
+							"                <a href=\"@org.hadatac.console.controllers.metadata.routes.MetadataEntry.index(selection)\" class=\"btn-xs btn-block btn-warning\" role=\"button\">" + soln.get("label").toString().substring(0, buttonTextLength) + "<br>&nbsp;<br>&nbsp;</a>\n" +
+							"            </div>\n" +
+							"        } else {\n" +
+							"            <div class=\"col-md-1\">\n" +
+							"                <a href=\"@org.hadatac.console.controllers.metadata.routes.MetadataEntry.index(\"" + soln.get("label").toString().replaceAll(" ", "").replaceAll(",", "") + "\")\" class=\"btn-xs btn-block btn-primary\" role=\"button\">" + soln.get("label").toString().substring(0, buttonTextLength) + "<br>&nbsp;<br>&nbsp;</a>\n" +
+							"            </div>\n" + 
+							"        }\n" ;
+					int multiple = resultCount % 7;
+					if (multiple==0){
+						metadataNavigationString = metadataNavigationString + "        <br /><br /><br /><br /><br />\n";
+					}
 				}
-				metadataNavigationString = metadataNavigationString + 
-						"        @if(selection == \"" + soln.get("label").toString().replaceAll(" ", "").replaceAll(",", "") + "\") {\n" +
-						"            <div class=\"col-md-1\">\n" +
-						"                <a href=\"@org.hadatac.console.controllers.metadata.routes.MetadataEntry.index(selection)\" class=\"btn-xs btn-block btn-warning\" role=\"button\">" + soln.get("label").toString().substring(0, buttonTextLength) + "<br>&nbsp;<br>&nbsp;</a>\n" +
-						"            </div>\n" +
-						"        } else {\n" +
-						"            <div class=\"col-md-1\">\n" +
-						"                <a href=\"@org.hadatac.console.controllers.metadata.routes.MetadataEntry.index(\"" + soln.get("label").toString().replaceAll(" ", "").replaceAll(",", "") + "\")\" class=\"btn-xs btn-block btn-primary\" role=\"button\">" + soln.get("label").toString().substring(0, buttonTextLength) + "<br>&nbsp;<br>&nbsp;</a>\n" +
-						"            </div>\n" + 
-						"        }\n" ;
-				int multiple = resultCount % 7;
-				if (multiple==0){
-					metadataNavigationString = metadataNavigationString + "        <br /><br /><br /><br /><br />\n";
+				else {
+					System.out.println("renderNavigationHTML() No Label: " + soln + "\n"); 
 				}
 			}
 			metadataNavigationString = metadataNavigationString +
@@ -221,8 +226,13 @@ public class DynamicMetadataGeneration extends Controller {
 			qexecIndvInd.close();
 			while (resultsrwIndvInd.hasNext()) {
 				QuerySolution soln = resultsrwIndvInd.next();
-				indicatorValueLabel = soln.get("label").toString();
-				indicatorValueMap.put(soln.get("indicator").toString().replaceAll("http://hadatac.org/ont/chear#","chear:").replaceAll("http://hadatac.org/ont/case#","case:").replaceAll("http://hadatac.org/kb/chear#","chear-kb:").replaceAll("http://hadatac.org/ont/hasneto#","hasneto:").replaceAll("http://semanticscience.org/resource/","sio:").replaceAll("http://hadatac.org/ont/vstoi#", "vstoi:").replaceAll("http://purl.obolibrary.org/obo/CHEBI_", "chebi:"),indicatorValueLabel);
+				if (soln.contains("label")){
+					indicatorValueLabel = soln.get("label").toString();
+					indicatorValueMap.put(soln.get("indicator").toString().replaceAll("http://hadatac.org/ont/chear#","chear:").replaceAll("http://hadatac.org/ont/case#","case:").replaceAll("http://hadatac.org/kb/chear#","chear-kb:").replaceAll("http://hadatac.org/ont/hasneto#","hasneto:").replaceAll("http://semanticscience.org/resource/","sio:").replaceAll("http://hadatac.org/ont/vstoi#", "vstoi:").replaceAll("http://purl.obolibrary.org/obo/CHEBI_", "chebi:"),indicatorValueLabel);
+				}
+				else {
+					System.out.println("getIndicatorValues() No Label: " + soln + "\n");
+				}
 			}
 		}
 		return indicatorValueMap;
@@ -256,7 +266,12 @@ public class DynamicMetadataGeneration extends Controller {
 			metadataBrowserHTMLString = metadataBrowserHTMLString + "    @if(";
 			while (resultsrwIndvInd.hasNext()) {
 				QuerySolution soln = resultsrwIndvInd.next();
-				metadataBrowserHTMLString = metadataBrowserHTMLString + "(category == \"" + soln.get("label").toString().replaceAll(" ", "").replaceAll(",", "") + "\")";
+				if (soln.contains("label")){
+					metadataBrowserHTMLString = metadataBrowserHTMLString + "(category == \"" + soln.get("label").toString().replaceAll(" ", "").replaceAll(",", "") + "\")";
+				}
+				else {
+					System.out.println("renderMetadataBrowserHTML() No Label: " + soln + "\n");
+				}
 				if (resultsrwIndvInd.hasNext()){
 					metadataBrowserHTMLString = metadataBrowserHTMLString + " || ";
 				} else {
@@ -458,7 +473,8 @@ public class DynamicMetadataGeneration extends Controller {
 		    } else {
 		    	while (resultsrwIndvInd.hasNext()) {
 					QuerySolution soln = resultsrwIndvInd.next();
-					getSPARQLClassString = getSPARQLClassString + "            case \"" + soln.get("label").toString().replaceAll(" ", "").replaceAll(",", "") + "\":\n" +
+					if (soln.contains("label")) {		
+						getSPARQLClassString = getSPARQLClassString + "            case \"" + soln.get("label").toString().replaceAll(" ", "").replaceAll(",", "") + "\":\n" +
 							"               q= \"" + prefixString + "\" + \n" +
 							"                   \"SELECT ?id ?superId ?label ?iden ?comment ?def ?unit ?note ?attrTo ?assocWith \" + \n" +
 							"                   \"WHERE { \" + \n" +
@@ -474,6 +490,10 @@ public class DynamicMetadataGeneration extends Controller {
 							"                   \"  OPTIONAL {?id prov:wasAssociatedWith ?assocWith} . \" + \n" +
 							"                   \"} \";\n " +
 							"               break;\n" ;
+					}
+					else {
+						System.out.println("renderSPARQLPage() No Label: " + soln + "\n");
+					}
 				}
 		    }
 		}
