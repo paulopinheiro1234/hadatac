@@ -57,7 +57,9 @@ public class UserGroup extends User {
 			QuerySolution soln = resultsrw.next();
 			System.out.println("URI from main query: " + soln.getResource("uri").getURI());
 			User user = find(soln.getResource("uri").getURI());
-			users.add(user);
+			if(null != user){
+				users.add(user);
+			}
 		}			
 
 		java.util.Collections.sort((List<User>) users);
