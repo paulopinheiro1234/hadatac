@@ -153,8 +153,11 @@ public class User implements Comparable<User> {
         String insert = "";
 		insert += NameSpaces.getInstance().printSparqlNameSpaceList();
 		insert += "INSERT DATA {  ";
+    	insert += "<" + this.getUri() + "> a foaf:Person . \n";
     	insert += "<" + this.getUri() + ">  ";
-    	insert += " foaf:mbox " + "\"" + this.email + "\" ;   ";
+    	insert += " foaf:mbox " + "\"" + this.email + "\" . ";
+    	insert += "<" + this.getUri() + ">  ";
+    	insert += " hadatac:isMemberOfGroup " + "\"Public\" . ";
     	insert += "}  ";
     	System.out.println("!!!! INSERT USER QUERY\n" + insert);
         
