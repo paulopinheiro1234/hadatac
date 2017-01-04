@@ -698,8 +698,8 @@ public class DynamicGeneration extends Controller {
 		Map<String, List<String>> subjectResult = findSubject();
 		Map<String, Map<String, String>> indicatorResults = new HashMap<String, Map<String,String>>();
 		for (Map.Entry<String, List<String>> study: studyResult.entrySet()){
-        Map<String, String> indicatorResult = ViewStudy.findStudyIndicators(study.getKey());
-        indicatorResults.put(study.getKey(), indicatorResult);
+			Map<String, String> indicatorResult = ViewStudy.findStudyIndicators(study.getKey());
+			indicatorResults.put(study.getKey(), indicatorResult);
 		}
         return ok(dynamicPage.render(studyResult,subjectResult, indicatorResults));
         
