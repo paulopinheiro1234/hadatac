@@ -336,7 +336,11 @@ public class User implements Comparable<User> {
 		System.out.println(queryString);
 		UpdateRequest req = UpdateFactory.create(queryString);
 		UpdateProcessor processor = UpdateExecutionFactory.createRemote(req, Collections.getCollectionsName(Collections.PERMISSIONS_SPARQL));
-		processor.execute();
+		try {
+			processor.execute();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 	
 	@Override
