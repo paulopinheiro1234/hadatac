@@ -85,8 +85,8 @@ public class AuthApplication extends Controller {
 
 	public static Result doSignup() {
 		com.feth.play.module.pa.controllers.Authenticate.noCache(response());
-		final Form<MySignup> filledForm = MyUsernamePasswordAuthProvider.SIGNUP_FORM
-				.bindFromRequest();
+		final Form<MySignup> filledForm = 
+				MyUsernamePasswordAuthProvider.SIGNUP_FORM.bindFromRequest();
 		if (filledForm.hasErrors()) {
 			// User did not fill everything properly
 			return badRequest(signup.render(filledForm));
@@ -105,7 +105,6 @@ public class AuthApplication extends Controller {
 	}
 	
 	public static Result doSignout() {
-		session().put("user_hierarchy", "");
 		return com.feth.play.module.pa.controllers.Authenticate.logout();
 	}
 
