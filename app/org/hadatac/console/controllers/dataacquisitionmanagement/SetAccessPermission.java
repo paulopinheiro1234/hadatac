@@ -30,7 +30,6 @@ import be.objectify.deadbolt.java.actions.Restrict;
 
 public class SetAccessPermission extends Controller {
 	
-	// for /metadata HTTP GET requests
 	@Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
     public static Result index(String uri) {
     	
@@ -53,52 +52,23 @@ public class SetAccessPermission extends Controller {
     		 */
     		
     		dc = DataAcquisition.findByUri(uri);
-    		User user = User.find(dc.getOwnerUri());
     		System.out.println("DC OWNER URI: " + dc.getOwnerUri());
-    		
+    		User user = User.find(dc.getOwnerUri());
     		Map<String, String> nameList = new HashMap<String, String>();
-    		user.getGroupNames(nameList);
+    		if(null != user){
+    			user.getGroupNames(nameList);
+    		}
     		
             return ok(setAccessPermission.render(dc, nameList));
     	}
+    	
     	return ok(setAccessPermission.render(dc, null));
-        
-    }// /index()
+    }
 
-
-    // for /metadata HTTP POST requests
 	@Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
     public static Result postIndex(String uri) {
-    	
-		DataAcquisition dc = new DataAcquisition();
-    	
-    	try {
-    		if (uri != null) {
-			    uri = URLDecoder.decode(uri, "UTF-8");
-    		} else {
-    			uri = "";
-    		}
-		} catch (UnsupportedEncodingException e) {
-			e.printStackTrace();
-		}
-
-    	if (!uri.equals("")) {
-
-    		/*
-    		 *  Add deployment information into handler
-    		 */
-    		
-    		dc = DataAcquisition.findByUri(uri);
-    		
-    		Map<String, String> nameList = new HashMap<String, String>();
-    		User user = User.find(dc.getOwnerUri());
-    		user.getGroupNames(nameList);
-    		
-            return ok(setAccessPermission.render(dc, nameList));
-    	}
-    	return ok(setAccessPermission.render(dc, null));
-        
-    }// /postIndex()
+    	return index(uri);
+    }
     
 	@Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
     public static Result newPermission(String dc_uri) {
