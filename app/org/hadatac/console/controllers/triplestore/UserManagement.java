@@ -410,8 +410,11 @@ public class UserManagement extends Controller {
 		String json = PermissionQueries.exec(PermissionQueries.PERMISSION_BY_EMAIL, email);
 		SparqlQueryResults results = new SparqlQueryResults(json, false);
 		//System.out.println("results: " + results.json);
-		if (results == null || !results.sparqlResults.values().iterator().hasNext()) 
+		if (results == null
+			|| results.sparqlResults == null
+			|| !results.sparqlResults.values().iterator().hasNext()){
 			return null;
+		}
 		TripleDocument docPermission = results.sparqlResults.values().iterator().next();
 		String uri = docPermission.get("uri");
 		return uri;

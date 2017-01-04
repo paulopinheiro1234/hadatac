@@ -34,12 +34,6 @@ public class AuthApplication extends Controller {
 	public static final String DATA_MANAGER_ROLE = "data_manager";
 	
 	public static Result index() {
-		final SysUser localUser = getLocalUser(session());
-		if (localUser != null) {
-			final org.hadatac.entity.pojo.User user = org.hadatac.entity.pojo.User.find(localUser.uri);
-			String permissions = user.getGroupNamesUri();
-			session().put("user_hierarchy", permissions);
-		}
 		return ok(portal.render());
 	}
 

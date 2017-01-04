@@ -21,7 +21,7 @@ public class SparqlQueryResults{
 
 	public SparqlQueryResults(String json_result, boolean usingURIs){
         this.json = json_result;
-        //System.out.println(this.json);
+        System.out.println(this.json);
         // create an ObjectMapper instance.
         ObjectMapper mapper = new ObjectMapper();
         // use the ObjectMapper to read the json string and create a tree
@@ -30,6 +30,10 @@ public class SparqlQueryResults{
 			node = mapper.readTree(json);
 		} catch (IOException e) {
 			e.printStackTrace();
+		}
+		if(null == node){
+			this.treeResults = "";
+			return;
 		}
 		JsonNode header = node.get("head");
 		header = header.get("vars");

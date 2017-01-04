@@ -212,9 +212,8 @@ public class User implements Comparable<User> {
 	
 	public static User find(String uri) {	
 		User user = new User();
-		
+
 		boolean bHasEmail = false;
-		
 		String queryString = "DESCRIBE <" + uri + ">";
 		Query query = QueryFactory.create(queryString);
 		
