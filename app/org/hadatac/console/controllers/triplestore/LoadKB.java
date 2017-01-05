@@ -270,7 +270,6 @@ public class LoadKB extends Controller {
     	System.out.println(String.format("Accessing LabKey lists of %s", folder));
         String user_name = auth.getUserName();
         String password = auth.getPassword();
-        
         Properties prop = loadConfig();
         String site = prop.getProperty("site");
         String path = String.format("/%s", folder);

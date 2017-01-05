@@ -332,16 +332,21 @@ public class DiffTool extends Controller {
 
     }
     
-    public static Result index(LabKeyLoginForm auth) throws Exception {
+    //public static void updateForm(String alias, List<String> selectedTerms) {
+    public static void updateForm(String alias) {
+    	System.out.println("Alias: " + alias);
+    }
+    
+    public static Result index(LabKeyLoginForm auth, String list1, String list2) throws Exception {
     	
     	runDiffTool(auth);
         return ok(diff_results.render());
         
     }
     
-    public static Result postIndex(LabKeyLoginForm auth) throws Exception {
+    public static Result postIndex(LabKeyLoginForm auth, String list1, String list2) throws Exception {
         
-        return index(auth);
+        return index(auth, list1, list2);
         
     }
     

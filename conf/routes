@@ -224,8 +224,8 @@ GET    	/hadatac/ts/synclabkey/loadlist            org.hadatac.console.controlle
 POST    /hadatac/ts/synclabkey/loadlist            org.hadatac.console.controllers.triplestore.LoadKB.playLoadLabkeyListContent(oper: String, content: String, auth: org.hadatac.console.models.LabKeyLoginForm, folder: String, listName: String)
 GET    	/hadatac/ts/synclabkey/loadacquisition     org.hadatac.console.controllers.triplestore.LoadKB.playLoadLabkeyDataAcquisition(oper: String, content: String, folder: String, list_names: java.util.List[String], auth: org.hadatac.console.models.LabKeyLoginForm)
 POST    /hadatac/ts/synclabkey/loadacquisition     org.hadatac.console.controllers.triplestore.LoadKB.playLoadLabkeyDataAcquisition(oper: String, content: String, folder: String, list_names: java.util.List[String], auth: org.hadatac.console.models.LabKeyLoginForm)
-GET    	/hadatac/ts/synclabkey/difftool			   org.hadatac.console.controllers.triplestore.DiffTool.index(auth: org.hadatac.console.models.LabKeyLoginForm)
-POST    /hadatac/ts/synclabkey/difftool			   org.hadatac.console.controllers.triplestore.DiffTool.postIndex(auth: org.hadatac.console.models.LabKeyLoginForm)
+GET    	/hadatac/ts/synclabkey/difftool			   org.hadatac.console.controllers.triplestore.DiffTool.index(auth: org.hadatac.console.models.LabKeyLoginForm,topic1: String,topic2: String)
+POST    /hadatac/ts/synclabkey/difftool			   org.hadatac.console.controllers.triplestore.DiffTool.postIndex(auth: org.hadatac.console.models.LabKeyLoginForm,topic1: String,topic2: String)
 
 
 
