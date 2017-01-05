@@ -41,7 +41,34 @@
 				
 				<center>
 					<button type="button" class="btn btn-primary" onClick="clearSearch();">Clear Search</button>
+					<button type="button" class="btn btn-primary" data-toggle="modal" data-target="#myModal">Download</button>
 				</center>
+				
+				<div id="download_url" style="visibility: hidden ;">@org.hadatac.console.http.routes.SolrSearchProxy.getDataAcquisitionDownload()</div>
+				
+				<!-- Modal -->
+				<div id="myModal" class="modal fade" role="dialog">
+					<div class="modal-dialog">
+						<!-- Modal content-->
+						<div class="modal-content">
+							<div class="modal-header">
+								<button type="button" class="close" data-dismiss="modal">&times;</button>
+								<h4 class="modal-title">Download</h4>
+							</div>
+							<div class="modal-body">
+								<p>Format:</p>
+								<select class="form-control" id="sel_format">
+									<option>CSV</option>
+									<option>JSON</option>
+								</select>
+								<a href="" class="btn btn-info" role="button" id="btn_download">Confirm</a>
+							</div>
+							<div class="modal-footer">
+								<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+							</div>
+						</div>
+					</div>
+				</div>
 			</div>
 			<div class="col-md-5 main">
 				<div id="legend">
@@ -102,6 +129,11 @@
 		});
 		tree.parse(data, "json");
 		tree.openAllItems(0);
+	}
+	
+	var btn = document.getElementById("btn_download");
+	if (btn != null) {
+		btn.href=document.getElementById("download_url").textContent+'?wt=csv&q=*:*&rows=1000000';
 	}
 	
 	var jsonTree, dataTree;

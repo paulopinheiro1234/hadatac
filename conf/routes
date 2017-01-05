@@ -31,6 +31,7 @@ GET	    /hadatac/metadataacquisitions/pilot6/solrsearch				    org.hadatac.conso
 POST	/hadatac/metadataacquisitions/pilot6/solrsearch				    org.hadatac.console.http.SolrSearchProxy.getSubjectAcquisition()
 
 GET	    /hadatac/metadataacquisitions/download	            			org.hadatac.console.http.SolrSearchProxy.getStudyAcquisitionDownload()
+GET	    /hadatac/dataacquisitions/download	            				org.hadatac.console.http.SolrSearchProxy.getDataAcquisitionDownload()
 
 GET	    /hadatac/metadataacquisitions/sub1Pilot5/solrsearch				    org.hadatac.console.http.SolrSearchProxy.getSampleAcquisition()
 POST	/hadatac/metadataacquisitions/sub1Pilot5/solrsearch				    org.hadatac.console.http.SolrSearchProxy.getSampleAcquisition()
