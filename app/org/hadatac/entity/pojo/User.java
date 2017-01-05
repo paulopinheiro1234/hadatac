@@ -135,7 +135,11 @@ public class User implements Comparable<User> {
 	}
 	
 	public boolean isAdministrator() {
-		return SysUser.findByEmail(getEmail()).isDataManager();
+		SysUser user = SysUser.findByEmail(getEmail());
+		if(null != user){
+			return user.isDataManager();
+		}
+		return false;
 	}
 	
 	public void getGroupNames(Map<String, String> nameList) {
