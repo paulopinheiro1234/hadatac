@@ -183,13 +183,7 @@ public class UserManagement extends Controller {
 
 	@Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
     public static Result postDeleteUser(String user_uri) {
-		try {
-			user_uri = URLDecoder.decode(user_uri, "UTF-8");
-		} catch (UnsupportedEncodingException e) {
-			e.printStackTrace();
-		}
-		User.deleteUser(user_uri);
-    	return ok(users.render("init", "", User.find(), UserGroup.find(), ""));
+    	return deleteUser(user_uri);
     }
 	
 	@Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
@@ -232,7 +226,6 @@ public class UserManagement extends Controller {
 			pred_value_map.put("foaf:mbox", email);
 			pred_value_map.put("foaf:homepage", "<" + homepage + ">");
 			pred_value_map.put("hadatac:isMemberOfGroup", group_uri);
-			pred_value_map.put("hadatac:isadmin", "false");
 			
 			deleteUser(usr_uri);
 			message = generateTTL(mode, oper, rdf, usr_uri, pred_value_map);
@@ -410,8 +403,11 @@ public class UserManagement extends Controller {
 		String json = PermissionQueries.exec(PermissionQueries.PERMISSION_BY_EMAIL, email);
 		SparqlQueryResults results = new SparqlQueryResults(json, false);
 		//System.out.println("results: " + results.json);
-		if (results == null || !results.sparqlResults.values().iterator().hasNext()) 
+		if (results == null
+			|| results.sparqlResults == null
+			|| !results.sparqlResults.values().iterator().hasNext()){
 			return null;
+		}
 		TripleDocument docPermission = results.sparqlResults.values().iterator().next();
 		String uri = docPermission.get("uri");
 		return uri;

@@ -34,12 +34,6 @@ public class AuthApplication extends Controller {
 	public static final String DATA_MANAGER_ROLE = "data_manager";
 	
 	public static Result index() {
-		final SysUser localUser = getLocalUser(session());
-		if (localUser != null) {
-			final org.hadatac.entity.pojo.User user = org.hadatac.entity.pojo.User.find(localUser.uri);
-			String permissions = user.getGroupNamesUri();
-			session().put("user_hierarchy", permissions);
-		}
 		return ok(portal.render());
 	}
 
@@ -91,8 +85,8 @@ public class AuthApplication extends Controller {
 
 	public static Result doSignup() {
 		com.feth.play.module.pa.controllers.Authenticate.noCache(response());
-		final Form<MySignup> filledForm = MyUsernamePasswordAuthProvider.SIGNUP_FORM
-				.bindFromRequest();
+		final Form<MySignup> filledForm = 
+				MyUsernamePasswordAuthProvider.SIGNUP_FORM.bindFromRequest();
 		if (filledForm.hasErrors()) {
 			// User did not fill everything properly
 			return badRequest(signup.render(filledForm));
@@ -111,7 +105,6 @@ public class AuthApplication extends Controller {
 	}
 	
 	public static Result doSignout() {
-		session().put("user_hierarchy", "");
 		return com.feth.play.module.pa.controllers.Authenticate.logout();
 	}
 

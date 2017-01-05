@@ -135,7 +135,11 @@ public class User implements Comparable<User> {
 	}
 	
 	public boolean isAdministrator() {
-		return SysUser.findByEmail(getEmail()).isDataManager();
+		SysUser user = SysUser.findByEmail(getEmail());
+		if(null != user){
+			return user.isDataManager();
+		}
+		return false;
 	}
 	
 	public void getGroupNames(Map<String, String> nameList) {
@@ -153,8 +157,11 @@ public class User implements Comparable<User> {
         String insert = "";
 		insert += NameSpaces.getInstance().printSparqlNameSpaceList();
 		insert += "INSERT DATA {  ";
+    	insert += "<" + this.getUri() + "> a foaf:Person . \n";
     	insert += "<" + this.getUri() + ">  ";
-    	insert += " foaf:mbox " + "\"" + this.email + "\" ;   ";
+    	insert += " foaf:mbox " + "\"" + this.email + "\" . ";
+    	insert += "<" + this.getUri() + ">  ";
+    	insert += " hadatac:isMemberOfGroup " + "\"Public\" . ";
     	insert += "}  ";
     	System.out.println("!!!! INSERT USER QUERY\n" + insert);
         
@@ -212,9 +219,8 @@ public class User implements Comparable<User> {
 	
 	public static User find(String uri) {	
 		User user = new User();
-		
+
 		boolean bHasEmail = false;
-		
 		String queryString = "DESCRIBE <" + uri + ">";
 		Query query = QueryFactory.create(queryString);
 		
@@ -334,7 +340,11 @@ public class User implements Comparable<User> {
 		System.out.println(queryString);
 		UpdateRequest req = UpdateFactory.create(queryString);
 		UpdateProcessor processor = UpdateExecutionFactory.createRemote(req, Collections.getCollectionsName(Collections.PERMISSIONS_SPARQL));
-		processor.execute();
+		try {
+			processor.execute();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 	
 	@Override

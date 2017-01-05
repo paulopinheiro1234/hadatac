@@ -128,7 +128,9 @@ public class MyUsernamePasswordAuthProvider
 	}
 
 	@Override
-	protected com.feth.play.module.pa.providers.password.UsernamePasswordAuthProvider.SignupResult signupUser(final MyUsernamePasswordAuthUser user) {
+	protected com.feth.play.module.pa.providers.password.UsernamePasswordAuthProvider.SignupResult 
+		signupUser(final MyUsernamePasswordAuthUser user) {
+		
 		final SysUser u = SysUser.findByUsernamePasswordIdentity(user);
 		if (u != null) {
 			if (u.emailValidated) {

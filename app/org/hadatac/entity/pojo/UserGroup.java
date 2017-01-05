@@ -37,6 +37,86 @@ import play.Play;
 
 public class UserGroup extends User {
 	
+	public static User find(String uri) {	
+		User user = new User();
+		String queryString = "DESCRIBE <" + uri + ">";
+		Query query = QueryFactory.create(queryString);
+		
+		Model modelPublic;
+		Model modelPrivate;
+		Statement statement;
+		RDFNode object;
+		
+		QueryExecution qexecPrivate = QueryExecutionFactory.sparqlService(
+				Collections.getCollectionsName(Collections.PERMISSIONS_SPARQL), query);
+		modelPrivate = qexecPrivate.execDescribe();
+
+		StmtIterator stmtIteratorPrivate = modelPrivate.listStatements();
+		
+		while (stmtIteratorPrivate.hasNext()) {
+			statement = stmtIteratorPrivate.next();
+			object = statement.getObject();
+			if (statement.getPredicate().getURI().equals("http://www.w3.org/2000/01/rdf-schema#comment")) {
+				user.setComment(object.asLiteral().getString());
+				System.out.println("comment: " + object.asLiteral().getString());
+		    }
+			else if (statement.getPredicate().getURI().equals("http://hadatac.org/ont/hadatac#isMemberOfGroup")) {
+				if(object.toString().equals("Public") || object.toString().equals("")){
+					user.setImmediateGroupUri("Public");
+				}
+				else{
+					user.setImmediateGroupUri(object.asResource().toString());
+					System.out.println("memberOfUri: " + object.asResource().toString());
+				}
+			}
+			else if (statement.getPredicate().getURI().equals("http://xmlns.com/foaf/0.1/givenName")) {
+				user.setGivenName(object.asLiteral().getString());
+				System.out.println("given_name: " + object.asLiteral().getString());
+			}
+			else if (statement.getPredicate().getURI().equals("http://xmlns.com/foaf/0.1/familyName")) {
+				user.setFamilyName(object.asLiteral().getString());
+				System.out.println("family_name: " + object.asLiteral().getString());
+			}
+			else if (statement.getPredicate().getURI().equals("http://xmlns.com/foaf/0.1/name")) {
+				user.setName(object.asLiteral().getString());
+				System.out.println("name: " + object.asLiteral().getString());
+			}
+			else if (statement.getPredicate().getURI().equals("http://xmlns.com/foaf/0.1/mbox")) {
+				user.setEmail(object.asLiteral().getString());
+				System.out.println("mbox: " + object.asLiteral().getString());
+			}
+			else if (statement.getPredicate().getURI().equals("http://xmlns.com/foaf/0.1/homepage")) {
+				String homepage = object.asLiteral().getString();
+				if(homepage.startsWith("<") && homepage.endsWith(">")){
+					System.out.println("homepage: " + homepage);
+					homepage = homepage.replace("<", "");
+					homepage = homepage.replace(">", "");
+				}
+				user.setHomepage(homepage);
+				System.out.println("homepage: " + homepage);
+		    }
+		}
+		
+		QueryExecution qexecPublic = QueryExecutionFactory.sparqlService(Collections.getCollectionsName(Collections.METADATA_SPARQL), query);
+		modelPublic = qexecPublic.execDescribe();
+		
+		StmtIterator stmtIteratorPublic = modelPublic.listStatements();
+		while (stmtIteratorPublic.hasNext()) {
+			statement = stmtIteratorPublic.next();
+			object = statement.getObject();
+			if (statement.getPredicate().getURI().equals("http://xmlns.com/foaf/0.1/name")) {
+				user.setName(object.asLiteral().getString());
+				System.out.println("name: " + object.asLiteral().getString());
+			} else if (statement.getPredicate().getURI().equals("http://xmlns.com/foaf/0.1/mbox")) {
+				user.setEmail(object.asLiteral().getString());
+				System.out.println("mbox: " + object.asLiteral().getString());
+			}
+		}
+		
+		user.setUri(uri);
+		return user;
+	}
+	
 	public static List<User> find() {
 		List<User> users = new ArrayList<User>();
 		String queryString = 
@@ -57,7 +137,9 @@ public class UserGroup extends User {
 			QuerySolution soln = resultsrw.next();
 			System.out.println("URI from main query: " + soln.getResource("uri").getURI());
 			User user = find(soln.getResource("uri").getURI());
-			users.add(user);
+			if(null != user){
+				users.add(user);
+			}
 		}			
 
 		java.util.Collections.sort((List<User>) users);
