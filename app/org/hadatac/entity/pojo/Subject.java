@@ -49,10 +49,9 @@ public class Subject {
 		Subject subject = new Subject();
 		String queryString = NameSpaces.getInstance().printSparqlNameSpaceList()
 				+ "SELECT ?uri WHERE {\n"
-				+ "  ?uri a sio:Human .\n"
 				+ "  ?uri hasco:originalID " + subject_id + " .\n"
 				+ "  ?uri hasco:isSubjectOf ?cohort .\n"
-				+ "  ?cohort hasco:isCohortOf ?uri .\n"
+				+ "  ?cohort hasco:isCohortOf " + study_uri + " .\n"
 				+ "}";
 		
 		Query query = QueryFactory.create(queryString);
