@@ -38,7 +38,7 @@ import org.labkey.remoteapi.Connection;
 public class DynamicGeneration extends Controller {
 	
 //	public static Map<String, String> findBasic(String study_uri) {
-	public static Map<String, List<String>> generateStudy() {
+	public static Map<String, List<String>> generateStudy(GeneratedStrings generatedStringsObject) {
 		String prefixString="PREFIX sio: <http://semanticscience.org/resource/> " + 
 //				"PREFIX chear: <http://hadatac.org/ont/chear#> " +
 //				"PREFIX chear-kb: <http://hadatac.org/kb/chear#> " +
@@ -517,6 +517,8 @@ public class DynamicGeneration extends Controller {
 		//System.out.println(schemaString);
 		//System.out.println(analyteSchemaString);
 		
+		
+		/*
 		// Generate facet view html.scala file
 		try {
 			File facetPage = new File("./app/org/hadatac/console/views/metadataacquisition/metadataacquisition.scala.html");
@@ -641,8 +643,137 @@ public class DynamicGeneration extends Controller {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		*/
+		generatedStringsObject.setGeneratedStrings(facetPageString, analyteFacetPageString, schemaString, analyteSchemaString, initStudyJson, updateIndicatorJson, updateAnalyteJson);
 				
 		return initStudyMap;
+	}
+	
+	public static void doDynamicGeneration(String facetPageString, String analyteFacetPageString, String schemaString, String analyteSchemaString, String initStudyJson, String updateIndicatorJson, String updateAnalyteJson){
+		// Generate facet view html.scala file
+				try {
+					File facetPage = new File("./app/org/hadatac/console/views/metadataacquisition/metadataacquisition.scala.html");
+					FileWriter facetPageStream = new FileWriter(facetPage,false);
+					facetPageStream.write(facetPageString);
+					facetPageStream.close();
+					System.out.println("Wrote Study Facet Page\n");
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} 
+				// Generate analyte facet view html.scala file
+				try {
+					File facetPage = new File("./app/org/hadatac/console/views/metadataacquisition/analytes.scala.html");
+					FileWriter facetPageStream = new FileWriter(facetPage,false);
+					facetPageStream.write(analyteFacetPageString);
+					facetPageStream.close();
+					System.out.println("Wrote Analyte Facet Page\n");
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				
+				// Generate schema.xml file
+				try {
+					File schemaXML = new File(Play.application().configuration().getString("hadatac.solr.home") + "/solr-home/studies_facet/conf/schema.xml");
+					FileWriter schemaXMLStream = new FileWriter(schemaXML,false);
+					schemaXMLStream.write(schemaString);
+					schemaXMLStream.close();
+					System.out.println("Wrote Study Schema File\n");
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} 
+				// Generate analytes schema file
+				try {
+					File schemaXML = new File(Play.application().configuration().getString("hadatac.solr.home") + "/solr-home/analytes/conf/schema.xml");
+					FileWriter schemaXMLStream = new FileWriter(schemaXML,false);
+					schemaXMLStream.write(analyteSchemaString);
+					schemaXMLStream.close();
+					System.out.println("Wrote Analyte Schema File\n");
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				
+				// Delete Existing Study Data
+				try {
+					ProcessBuilder p=new ProcessBuilder("curl","http://localhost:8983/solr/studies/update?commit=true", "-H","Content-type:text/xml",
+			                "--data-binary","<delete><query>*:*</query></delete>");
+					final Process shell = p.start();
+					shell.waitFor();
+					System.out.println("Deleting Existing Studies in Solr Collection, EXIT STATUS: " + shell.exitValue() + "\n");
+				} catch (IOException | InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				// Delete Existing Analytes Data
+				try {
+					ProcessBuilder p=new ProcessBuilder("curl","http://localhost:8983/solr/analytes/update?commit=true", "-H","Content-type:text/xml",
+			                "--data-binary","<delete><query>*:*</query></delete>");
+					final Process shell = p.start();
+					shell.waitFor();
+					System.out.println("Deleting Existing Analytes in Solr Collection, EXIT STATUS: " + shell.exitValue() + "\n");
+				} catch (IOException | InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				
+				// Restart Solr 5
+				try {
+					ProcessBuilder p=new ProcessBuilder(Play.application().configuration().getString("hadatac.solr.home") + "/run_solr5.sh", "restart" );
+					final Process shell = p.start();
+					shell.waitFor();
+					System.out.println("Restarting Solr, EXIT STATUS: " + shell.exitValue() + "\n");
+				} catch (IOException | InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} 		
+				// Add Studies
+				try {
+					ProcessBuilder p=new ProcessBuilder("curl","http://localhost:8983/solr/studies/update?commit=true", "-H","Content-type:application/json",
+			                "--data-binary",initStudyJson );
+					final Process shell = p.start();
+					shell.waitFor();
+					System.out.println("Added Studies to Study Solr Collection, EXIT STATUS: " + shell.exitValue() + "\n");
+				} catch (IOException | InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				try {
+					ProcessBuilder p=new ProcessBuilder("curl","http://localhost:8983/solr/analytes/update?commit=true", "-H","Content-type:application/json",
+			                "--data-binary",initStudyJson );
+					final Process shell = p.start();
+					shell.waitFor();
+					System.out.println("Added Studies to Analytes Solr Collection, EXIT STATUS: " + shell.exitValue() + "\n");
+				} catch (IOException | InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+
+				// Add Indicators
+				try {
+					ProcessBuilder p=new ProcessBuilder("curl","http://localhost:8983/solr/studies/update?commit=true", "-H","Content-type:application/json",
+			                "--data-binary",updateIndicatorJson );
+					final Process shell = p.start();
+					shell.waitFor();
+					System.out.println("Added Indicators to Studies, EXIT STATUS: " + shell.exitValue() + "\n");
+				} catch (IOException | InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				
+				// Add Analytes
+				try {
+					ProcessBuilder p=new ProcessBuilder("curl","http://localhost:8983/solr/analytes/update?commit=true", "-H","Content-type:application/json",
+			                "--data-binary",updateAnalyteJson );
+					final Process shell = p.start();
+					shell.waitFor();
+					System.out.println("Added Analytes, EXIT STATUS: " + shell.exitValue() + "\n");
+				} catch (IOException | InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 	}
 	
 	public static Map<String, List<String>> findSubject() {
@@ -691,10 +822,71 @@ public class DynamicGeneration extends Controller {
 		return subjectResult;
 	}
 	
+	public static class GeneratedStrings {
+		public String facetPageString;
+		public String analyteFacetPageString;
+		public String schemaString;
+		public String analyteSchemaString;
+		public String initStudyJson;
+		public String updateIndicatorJson;
+		public String updateAnalyteJson;
+		
+		public GeneratedStrings(){
+			this.facetPageString = "";
+			this.analyteFacetPageString = "";
+			this.schemaString = "";
+			this.analyteSchemaString = "";
+			this.initStudyJson = "";
+			this.updateIndicatorJson = "";
+			this.updateAnalyteJson = "";
+		}
+		
+		public void setGeneratedStrings(String facetPageString, String analyteFacetPageString, String schemaString, String analyteSchemaString, String initStudyJson, String updateIndicatorJson, String updateAnalyteJson) {
+			this.facetPageString = facetPageString;
+			this.analyteFacetPageString = analyteFacetPageString;
+			this.schemaString = schemaString;
+			this.analyteSchemaString = analyteSchemaString;
+			this.initStudyJson = initStudyJson;
+			this.updateIndicatorJson = updateIndicatorJson;
+			this.updateAnalyteJson = updateAnalyteJson;
+		}
+		
+		public String getFacetPageString(){
+			return this.facetPageString;
+		}
+		
+		public String getAnalyteFacetPageString(){
+			return this.analyteFacetPageString;
+		}
+		
+		public String getSchemaString(){
+			return this.schemaString;
+		}
+		
+		public String getAnalyteSchemaString(){
+			return this.analyteSchemaString;
+		}
+		
+		public String getInitStudyJson(){
+			return this.initStudyJson;
+		}
+		
+		public String getUpdateIndicatorJson(){
+			return this.updateIndicatorJson;
+		}
+		
+		public String getUpdateAnalyteJson(){
+			return this.updateAnalyteJson;
+		}
+		
+	}
+	
 	// for /metadata HTTP GET requests
     public static Result index() {
+    	GeneratedStrings generatedStringsObject = new GeneratedStrings();
     	System.out.println(Play.application().configuration().getString("hadatac.console.host_deploy")+"/metadataacquisitions/viewStudy?study_uri=");
-		Map<String, List<String>> studyResult = generateStudy();
+		Map<String, List<String>> studyResult = generateStudy(generatedStringsObject);
+		doDynamicGeneration(generatedStringsObject.getFacetPageString(), generatedStringsObject.getAnalyteFacetPageString(), generatedStringsObject.getSchemaString(), generatedStringsObject.getAnalyteSchemaString(), generatedStringsObject.getInitStudyJson(), generatedStringsObject.getUpdateIndicatorJson(), generatedStringsObject.getUpdateAnalyteJson());
 		Map<String, List<String>> subjectResult = findSubject();
 		Map<String, Map<String, String>> indicatorResults = new HashMap<String, Map<String,String>>();
 		for (Map.Entry<String, List<String>> study: studyResult.entrySet()){

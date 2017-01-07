@@ -5,6 +5,7 @@ import java.util.Map;
 
 import org.hadatac.console.controllers.*;
 import org.hadatac.console.controllers.metadata.*;
+import org.hadatac.console.controllers.metadata.DynamicGeneration.GeneratedStrings;
 import org.hadatac.console.controllers.metadataacquisition.*;
 
 import static org.junit.Assert.assertEquals;
@@ -42,7 +43,8 @@ public class ControllersTest {
 	
 	@Test
 	public void testDynamicStudyBrowserGeneration(){
-		Map<String, List<String>> studyResult = DynamicGeneration.generateStudy();
+		GeneratedStrings generatedStringsObject = new DynamicGeneration.GeneratedStrings();
+		Map<String, List<String>> studyResult = DynamicGeneration.generateStudy(generatedStringsObject);
 		Map<String, List<String>> subjectResult = DynamicGeneration.findSubject();
 		Map<String, Map<String, String>> indicatorResults = new HashMap<String, Map<String,String>>();
 		for (Map.Entry<String, List<String>> study: studyResult.entrySet()){

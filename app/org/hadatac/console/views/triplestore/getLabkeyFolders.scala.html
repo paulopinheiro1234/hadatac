@@ -3,31 +3,48 @@
   content : String)
 
 @import helper._
+@import org.hadatac.utils._
 @import org.hadatac.console.views.html._
 @import org.hadatac.console.controllers.triplestore._
 @import org.hadatac.metadata.loader._
 @import java.net._
 
 @main("LabKey List") {
-
-     <div class="container-fluid">
+	<div class="container-fluid">
         <table class="table">
-            <thead>
-                 <tr>
-                    <th>Folder</th>
-                    <th>Operations</th>
-                 </tr>
-            </thead>
-            <tbody>
-              @for(folder_name <- results){
-                  @labkeyFolder_entry(labkeyLoginForm, folder_name, content)
-              }
+			<thead>
+	             <tr>
+	                <th>Folder</th>
+	                <th>Operations</th>
+	             </tr>
+	        </thead>
+	        <tbody>
+			@if(content=="diff_tool"){
+				@form(action=org.hadatac.console.controllers.triplestore.routes.DiffTool.index(labkeyLoginForm,"a","b")){
+					<input type="hidden" name="auth" value="@labkeyLoginForm">
+					
+					@for((folder_name,index) <- results.zipWithIndex){
+						<tr>
+							<td>@if(folder_name != null) { @folder_name }</td>
+						   	<td>
+						   		<input type="checkbox" name="topic@index" value=@folder_name.toString.replace(" ","_")>
+						   	</td>
+						</tr>
+					}
+					<input type="submit" class="btn btn-primary" value="Create">
+				}
+		    } else {
+		        @for(folder_name <- results){
+		             @labkeyFolder_entry(labkeyLoginForm, folder_name, content)
+		        }
+		    }
             </tbody>
         </table>
 
+
         <a href="@org.hadatac.console.controllers.triplestore.routes.LoadKB.loadLabkeyKB("init", content)" class="btn btn-primary" role="button">Back</a>
-        @if(content=="diff_tool"){
-        	<a href="@org.hadatac.console.controllers.triplestore.routes.DiffTool.index(labkeyLoginForm)" class="btn-xs btn-primary" role="button">Submit</a>
-        }
+     @if(content=="diff_tool"){
+        <a href="@org.hadatac.console.controllers.triplestore.routes.DiffTool.index(labkeyLoginForm, "a", "b")" class="btn btn-primary" role="button">Submit</a>
+     }
     </div>
 }
