@@ -210,8 +210,6 @@ public class MeasurementType {
 				+ "  ?mt hasneto:hasEntity ?ent .\n"
 				+ "  ?mt hasneto:hasAttribute ?char .\n"
 				+ "  ?mt hasneto:hasUnit ?unit .\n"
-				//+ "  OPTIONAL { ?mt time:inDateTime ?ts . }\n"
-				//+ "  OPTIONAL { ?ts hadatac:atColumn ?tsColumn . }\n"
 				+ "}";
 		
 		Query query = QueryFactory.create(queryString);
@@ -234,9 +232,11 @@ public class MeasurementType {
 			if(measurementType.getCharacteristicUri().equals(cellProc.replacePrefixEx("sio:TimeStamp"))
 			|| measurementType.getCharacteristicUri().equals(cellProc.replacePrefixEx("sio:TimeInstant"))){
 				measurementType.setTimestampColumn(soln.getLiteral("column").getInt());
+				System.out.println("TimeStampColumn: " + soln.getLiteral("column").getInt());
 			}
 			if(measurementType.getCharacteristicUri().equals(cellProc.replacePrefixEx("hasco:originalID"))){
 				measurementType.setIdColumn(soln.getLiteral("column").getInt());
+				System.out.println("IdColumn: " + measurementType.getIdColumn());
 			}
 			list.add(measurementType);
 		}

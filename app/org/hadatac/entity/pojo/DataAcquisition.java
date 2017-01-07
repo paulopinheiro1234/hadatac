@@ -803,6 +803,7 @@ public class DataAcquisition {
 		
 		dataAcquisition.setLocalName(hadatacCcsv.getDataAcquisition().getLocalName());
 		dataAcquisition.setUri(hadatacCcsv.getDataAcquisitionKbUri());
+		dataAcquisition.setStudyUri(hadatacCcsv.getDataAcquisition().getStudyUri());
 		dataAcquisition.setStartedAtXsd(hadatacCcsv.getDataAcquisition().getStartedAtXsd());
 		dataAcquisition.setEndedAtXsd(hadatacCcsv.getDataAcquisition().getEndedAtXsd());
 		Iterator<MeasurementType> i = hadatacKb.getDataset().getMeasurementTypes().iterator();

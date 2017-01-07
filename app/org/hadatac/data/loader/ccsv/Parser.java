@@ -116,7 +116,7 @@ public class Parser {
 		int batch_size = 10000;
 		int nTimeStampCol = -1;
 		int nIdCol = -1;
-		for(MeasurementType mt : hadatacKb.getDataset().getMeasurementTypes()){
+		for(MeasurementType mt : hadatacCcsv.getDataset().getMeasurementTypes()){
 			if(mt.getTimestampColumn() > -1){
 				nTimeStampCol = mt.getTimestampColumn();
 			}
@@ -127,13 +127,13 @@ public class Parser {
 		SolrClient solr = new HttpSolrClient(Play.application().configuration().getString("hadatac.solr.data") + "/measurement");
 		ValueCellProcessing cellProc = new ValueCellProcessing();
 		for (CSVRecord record : records) {
-			Iterator<MeasurementType> iter = hadatacKb.getDataset().getMeasurementTypes().iterator();
+			Iterator<MeasurementType> iter = hadatacCcsv.getDataset().getMeasurementTypes().iterator();
 			while (iter.hasNext()) {
 				MeasurementType measurementType = iter.next();
 				if (measurementType.getTimestampColumn() > -1) {
 					continue;
 				}
-				if (measurementType.getTimestampColumn() > -1) {
+				if (measurementType.getIdColumn() > -1) {
 					continue;
 				}
 				
@@ -144,12 +144,15 @@ public class Parser {
 				else{
 					measurement.setValue(record.get(measurementType.getValueColumn() - 1));
 				}
+				
 				if(nTimeStampCol > -1){
 					measurement.setTimestamp(record.get(nTimeStampCol - 1));
 				}
 				else {
 					measurement.setTimestamp("");
 				}
+				
+				measurement.setStudyUri(cellProc.replaceNameSpaceEx(hadatacKb.getDataAcquisition().getStudyUri()));
 				if(nIdCol > -1){
 					measurement.setObjectUri(Subject.find(measurement.getStudyUri(), record.get(nIdCol - 1)).getUri());
 				}
@@ -159,7 +162,6 @@ public class Parser {
 				measurement.setUri(hadatacCcsv.getMeasurementUri() + hadatacCcsv.getDataset().getLocalName() + "/" + measurementType.getLocalName() + "-" + total_count);
 				measurement.setOwnerUri(hadatacKb.getDataAcquisition().getOwnerUri());
 				measurement.setAcquisitionUri(hadatacKb.getDataAcquisition().getUri());
-				measurement.setStudyUri(cellProc.replaceNameSpaceEx(hadatacKb.getDataAcquisition().getStudyUri()));
 				measurement.setUnit(measurementType.getUnitLabel());
 				measurement.setUnitUri(measurementType.getUnitUri());
 				measurement.setCharacteristic(measurementType.getCharacteristicLabel());

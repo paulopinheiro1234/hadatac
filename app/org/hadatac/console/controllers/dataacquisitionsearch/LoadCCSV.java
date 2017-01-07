@@ -43,7 +43,7 @@ public class LoadCCSV extends Controller {
     }
 
     public static DatasetParsingResult playLoadCCSV() {
-    	DatasetParsingResult result = null;
+    	int status = 0;
         String message = "";
 		Arguments arguments = new Arguments();
 		arguments.setInputPath(UPLOAD_NAME);
@@ -63,15 +63,17 @@ public class LoadCCSV extends Controller {
 			if (arguments.getInputType().equals("CCSV")) {
 				Parser parser = new Parser();
 				if (arguments.isPv()) {
-					result = parser.validate(Feedback.WEB, files);
+					DatasetParsingResult result = parser.validate(Feedback.WEB, files);
+					status = result.getStatus();
 					message += result.getMessage();
 				} else {
-					result = parser.validate(Feedback.WEB, files);
+					DatasetParsingResult result = parser.validate(Feedback.WEB, files);
+					status = result.getStatus();
 					message += result.getMessage();
-					if (result.getStatus() == 0) {
+					if (status == 0) {
 						System.out.println("Indexing...");
 						DatasetParsingResult result_parse = parser.index(Feedback.WEB);
-						result.setStatus(result_parse.getStatus());
+						status = result_parse.getStatus();
 						message += result_parse.getMessage();
 					}
 				}
@@ -81,10 +83,12 @@ public class LoadCCSV extends Controller {
 			files.closeFile("log", "w");
 		} catch (Exception e) {
 			e.printStackTrace();
+			status = 1;
+			message += "Exception in playLoadCCSV()";
 		}
 		
 		message += "[" + new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()) + "] end of file";
-	    return new DatasetParsingResult(result.getStatus(), message);
+	    return new DatasetParsingResult(status, message);
    }
     
     public static Result uploadFile() {

@@ -390,8 +390,7 @@ public class MyUsernamePasswordAuthProvider
 	public void sendVerifyEmailMailingAfterSignup(final SysUser user,
 			final Context ctx) {
 
-		final String subject = getVerifyEmailMailingSubjectAfterSignup(user,
-				ctx);
+		final String subject = getVerifyEmailMailingSubjectAfterSignup(user, ctx);
 		final String token = generateVerificationRecord(user);
 		final Body body = getVerifyEmailMailingBodyAfterSignup(token, user, ctx);
 		sendMail(subject, body, getEmailName(user));
