@@ -86,8 +86,10 @@ public class UserManagement extends Controller {
 			e.printStackTrace();
 		}
 		SysUser su = SysUser.findByEmail(User.find(user_uri).getEmail());
-		su.addSecurityRole(AuthApplication.DATA_MANAGER_ROLE);
-		su.save();
+		if(su != null){
+			su.addSecurityRole(AuthApplication.DATA_MANAGER_ROLE);
+			su.save();
+		}
 		
 		return ok(users.render("init", "", User.find(), UserGroup.find(), ""));
     }
@@ -106,8 +108,10 @@ public class UserManagement extends Controller {
 		}
 		
 		SysUser su = SysUser.findByEmail(User.find(user_uri).getEmail());
-		su.removeSecurityRole(AuthApplication.DATA_MANAGER_ROLE);
-		su.save();
+		if(su != null){
+			su.removeSecurityRole(AuthApplication.DATA_MANAGER_ROLE);
+			su.save();
+		}
 		
 		return ok(users.render("init", "", User.find(), UserGroup.find(), ""));
     }

@@ -51,11 +51,10 @@ public class Subject {
 				+ "SELECT ?uri WHERE {\n"
 				+ "  ?uri hasco:originalID \"" + subject_id + "\" .\n"
 				+ "  ?uri hasco:isSubjectOf ?cohort .\n"
-				+ "  ?cohort hasco:isCohortOf <" + study_uri + "> .\n"
+				+ "  ?cohort hasco:isCohortOf " + study_uri + " .\n"
 				+ "}";
 		
 		Query query = QueryFactory.create(queryString);
-		System.out.println(queryString);
 		
 		QueryExecution qexec = QueryExecutionFactory.sparqlService(Collections.getCollectionsName(Collections.METADATA_SPARQL), query);
 		ResultSet results = qexec.execSelect();

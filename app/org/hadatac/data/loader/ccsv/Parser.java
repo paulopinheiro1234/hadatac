@@ -116,7 +116,7 @@ public class Parser {
 		int batch_size = 10000;
 		int nTimeStampCol = -1;
 		int nIdCol = -1;
-		for(MeasurementType mt : hadatacCcsv.getDataset().getMeasurementTypes()){
+		for(MeasurementType mt : hadatacKb.getDataset().getMeasurementTypes()){
 			if(mt.getTimestampColumn() > -1){
 				nTimeStampCol = mt.getTimestampColumn();
 			}
@@ -127,7 +127,7 @@ public class Parser {
 		SolrClient solr = new HttpSolrClient(Play.application().configuration().getString("hadatac.solr.data") + "/measurement");
 		ValueCellProcessing cellProc = new ValueCellProcessing();
 		for (CSVRecord record : records) {
-			Iterator<MeasurementType> iter = hadatacCcsv.getDataset().getMeasurementTypes().iterator();
+			Iterator<MeasurementType> iter = hadatacKb.getDataset().getMeasurementTypes().iterator();
 			while (iter.hasNext()) {
 				MeasurementType measurementType = iter.next();
 				if (measurementType.getTimestampColumn() > -1) {

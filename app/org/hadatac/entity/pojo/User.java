@@ -16,6 +16,7 @@ import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.jena.query.Query;
 import org.apache.jena.query.QueryExecution;
 import org.apache.jena.query.QueryExecutionFactory;
@@ -191,7 +192,7 @@ public class User implements Comparable<User> {
 	public static List<User> find() {
 		List<User> users = new ArrayList<User>();
 		String queryString = 
-				"PREFIX prov: <http://www.w3.org/ns/prov#>  " +
+				"PREFIX prov: <http://www.w3.org/ns/prov#> " +
         		"PREFIX foaf: <http://xmlns.com/foaf/0.1/> " +
 				"SELECT ?uri WHERE { " +
 				"  ?uri a foaf:Person . " +
@@ -245,6 +246,7 @@ public class User implements Comparable<User> {
 			else if (statement.getPredicate().getURI().equals("http://hadatac.org/ont/hadatac#isMemberOfGroup")) {
 				if(object.toString().equals("Public") || object.toString().equals("")){
 					user.setImmediateGroupUri("Public");
+					System.out.println("memberOfUri: " + "Public");
 				}
 				else{
 					user.setImmediateGroupUri(object.asResource().toString());
@@ -336,7 +338,9 @@ public class User implements Comparable<User> {
 			changeAccessLevel(user.getUri(), User.find(uri).getImmediateGroupUri());
 		}
 		
-		String queryString = "DELETE WHERE { <" + uri + "> ?p1 ?o1 } \n";
+		String queryString = "";
+		queryString += NameSpaces.getInstance().printSparqlNameSpaceList();
+		queryString += "DELETE WHERE { <" + uri + "> ?p ?o . } ";
 		System.out.println(queryString);
 		UpdateRequest req = UpdateFactory.create(queryString);
 		UpdateProcessor processor = UpdateExecutionFactory.createRemote(req, Collections.getCollectionsName(Collections.PERMISSIONS_SPARQL));
@@ -345,6 +349,17 @@ public class User implements Comparable<User> {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+		
+        HttpClient httpclient = HttpClientBuilder.create().build();
+        HttpGet httpget = new HttpGet(Play.application().configuration().getString("hadatac.solr.permissions")
+            	+ "/store_users/update?commit=true");
+        try {
+    	    httpclient.execute(httpget);  
+	    } catch (ClientProtocolException e) {
+    		e.printStackTrace();
+	    } catch (IOException e) {
+		    e.printStackTrace();
+	    }
 	}
 	
 	@Override

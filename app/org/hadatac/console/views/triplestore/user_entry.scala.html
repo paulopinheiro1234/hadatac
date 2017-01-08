@@ -8,8 +8,10 @@
    	<td>@if(user.getImmediateGroupUri().equals("Public")) {
    		Public
    	} else {
-   		@if(org.hadatac.entity.pojo.User.find(user.getImmediateGroupUri()) != null) { 
-   			@org.hadatac.entity.pojo.User.find(user.getImmediateGroupUri()).getName() 
+   		@if(org.hadatac.entity.pojo.UserGroup.find(user.getImmediateGroupUri()) != null) { 
+   			@org.hadatac.entity.pojo.UserGroup.find(user.getImmediateGroupUri()).getName() 
+   		} else {
+   			null
    		}
    	}
    	</td>

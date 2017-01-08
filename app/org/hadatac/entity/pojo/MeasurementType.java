@@ -128,6 +128,7 @@ public class MeasurementType {
 			measurementTypeKb.setLocalName(measurementType.getLocalName());
 			measurementTypeKb.setValueColumn(measurementType.getValueColumn());
 			measurementTypeKb.setTimestampColumn(measurementType.getTimestampColumn());
+			measurementTypeKb.setIdColumn(measurementType.getIdColumn());
 			
 			System.out.println("resultsrw.size(): " + resultsrw.size());
 			
