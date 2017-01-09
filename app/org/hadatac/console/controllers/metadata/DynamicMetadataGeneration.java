@@ -48,7 +48,7 @@ public class DynamicMetadataGeneration extends Controller {
 	
 	public static void renderNavigationHTML(Map<String,String> indicatorMap){
 		for(Map.Entry<String, String> entry : indicatorMap.entrySet()){
-			String fileName = "app/org/hadatac/console/views/metadata/" + entry.getValue().toString().toLowerCase().replaceAll(" ", "_") + "_navigation.scala.html";
+			String fileName = Play.application().configuration().getString("hadatac.console.host_deploy_location") + "/app/org/hadatac/console/views/metadata/" + entry.getValue().toString().toLowerCase().replaceAll(" ", "_") + "_navigation.scala.html";
 			String metadataNavigationString = "@(selection : String)\n\n" +
 					"@import org.hadatac.console.controllers._\n\n" +
 					"    <div class=\"navbar-collapse collapse navbar-secondary hidden-print\">\n" +
@@ -91,7 +91,7 @@ public class DynamicMetadataGeneration extends Controller {
 					}
 				}
 				else {
-					System.out.println("renderNavigationHTML() No Label: " + soln + "\n"); 
+					System.out.println("renderNavigationHTML() No Label: " + soln.toString() + "\n"); 
 				}
 			}
 			metadataNavigationString = metadataNavigationString +
@@ -125,7 +125,7 @@ public class DynamicMetadataGeneration extends Controller {
 		metadataBrowserString = metadataBrowserString + "        <br><br><br>\n        @mainButton(false)\n    </div>\n}";
 		//System.out.println(metadataBrowserString);
 		try {
-			File metadataBrowserPage = new File("./app/org/hadatac/console/views/metadata/metadata.scala.html");
+			File metadataBrowserPage = new File(Play.application().configuration().getString("hadatac.console.host_deploy_location") + "/app/org/hadatac/console/views/metadata/metadata.scala.html");
 			FileWriter metadataBrowserPageStream = new FileWriter(metadataBrowserPage,false);
 			metadataBrowserPageStream.write(metadataBrowserString);
 			metadataBrowserPageStream.close();
@@ -177,7 +177,7 @@ public class DynamicMetadataGeneration extends Controller {
 				"}" ;
 		//System.out.println(metadataEntry);
 		try {
-			File metadataEntryPage = new File("./app/org/hadatac/console/views/metadata/metadata_entry.scala.html");
+			File metadataEntryPage = new File(Play.application().configuration().getString("hadatac.console.host_deploy_location") + "/app/org/hadatac/console/views/metadata/metadata_entry.scala.html");
 			FileWriter metadataEntryPageStream = new FileWriter(metadataEntryPage,false);
 			metadataEntryPageStream.write(metadataEntry);
 			metadataEntryPageStream.close();
@@ -231,7 +231,7 @@ public class DynamicMetadataGeneration extends Controller {
 					indicatorValueMap.put(soln.get("indicator").toString().replaceAll("http://hadatac.org/ont/chear#","chear:").replaceAll("http://hadatac.org/ont/case#","case:").replaceAll("http://hadatac.org/kb/chear#","chear-kb:").replaceAll("http://hadatac.org/ont/hasneto#","hasneto:").replaceAll("http://semanticscience.org/resource/","sio:").replaceAll("http://hadatac.org/ont/vstoi#", "vstoi:").replaceAll("http://purl.obolibrary.org/obo/CHEBI_", "chebi:"),indicatorValueLabel);
 				}
 				else {
-					System.out.println("getIndicatorValues() No Label: " + soln + "\n");
+					System.out.println("getIndicatorValues() No Label: " + soln.toString() + "\n");
 				}
 			}
 		}
@@ -270,7 +270,7 @@ public class DynamicMetadataGeneration extends Controller {
 					metadataBrowserHTMLString = metadataBrowserHTMLString + "(category == \"" + soln.get("label").toString().replaceAll(" ", "").replaceAll(",", "") + "\")";
 				}
 				else {
-					System.out.println("renderMetadataBrowserHTML() No Label: " + soln + "\n");
+					System.out.println("renderMetadataBrowserHTML() No Label: " + soln.toString() + "\n");
 					metadataBrowserHTMLString = metadataBrowserHTMLString + "(category == \"\")";
 				}
 				if (resultsrwIndvInd.hasNext()){
@@ -343,7 +343,7 @@ public class DynamicMetadataGeneration extends Controller {
 				"}";
 		//System.out.println(metadataBrowserHTMLString);
 		try {
-			File metadataBrowserHTMLPage = new File("./app/org/hadatac/console/views/metadata/metadata_browser.scala.html");
+			File metadataBrowserHTMLPage = new File(Play.application().configuration().getString("hadatac.console.host_deploy_location") + "/app/org/hadatac/console/views/metadata/metadata_browser.scala.html");
 			FileWriter metadataBrowserHTMLPageStream = new FileWriter(metadataBrowserHTMLPage,false);
 			metadataBrowserHTMLPageStream.write(metadataBrowserHTMLString);
 			metadataBrowserHTMLPageStream.close();
@@ -493,7 +493,7 @@ public class DynamicMetadataGeneration extends Controller {
 							"               break;\n" ;
 					}
 					else {
-						System.out.println("renderSPARQLPage() No Label: " + soln + "\n");
+						System.out.println("renderSPARQLPage() No Label: " + soln.toString() + "\n");
 					}
 				}
 		    }
@@ -524,7 +524,7 @@ public class DynamicMetadataGeneration extends Controller {
 				 importString + getSPARQLClassString;
 		//System.out.println(getSPARQLJavaString);// Generate facet view html.scala file
 		try {
-			File getSPARQLPage = new File("./app/org/hadatac/console/http/GetSparqlQueryDynamic.java");
+			File getSPARQLPage = new File(Play.application().configuration().getString("hadatac.console.host_deploy_location") + "/app/org/hadatac/console/http/GetSparqlQueryDynamic.java");
 			FileWriter getSPARQLPageStream = new FileWriter(getSPARQLPage,false);
 			getSPARQLPageStream.write(getSPARQLJavaString);
 			getSPARQLPageStream.close();

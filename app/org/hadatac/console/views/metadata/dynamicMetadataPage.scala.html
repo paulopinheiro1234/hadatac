@@ -16,27 +16,9 @@
         <div class="col-md-6">
             <h1>Dynamic Metadata Generator</h1>
               <body>
-             <h2>Dynamic Metadata</h2>
-			<div>
-		      <form method="get" action="">
-		        <input type="text" id="url" name="url" value="http://www.w3.org/People/Berners-Lee/card.rdf" size="100"/>
-		        <input type="submit" value="Redraw"/>
-		      </form>
-		    </div>
-		    <div style="" id="content">
-		      <svg id="chart"></svg>
-		    </div>
-		    <script type="text/javascript">
-				function restart(){
-				   loadVal = $.getUrlVar("url")
-				    if (loadVal != null) {
-				        url.value = decodeURIComponent(loadVal);
-				    }
-				    viewrdf("#chart",1000,1000,url.value,300);
-				}
-				restart();
-		   </script>
-   				</body>
+                <h2>Dynamic Metadata</h2>
+                <p>Visit Metadata Browser to view Dynamically Generated Page</p>
+		 	  </body>
    
     	</div>
     </div>
