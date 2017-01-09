@@ -52,13 +52,13 @@ public class LoadCCSV extends Controller {
 		arguments.setVerbose(true);
 		arguments.setPv(false);
 
-		File inputFile = new File(arguments.getInputPath());
-		files = new FileFactory(arguments);
-		files.setFile(inputFile, inputFile.getName());
+		//File inputFile = new File(arguments.getInputPath());
+		//files = new FileFactory(arguments);
+		//files.setFile(inputFile, inputFile.getName());
 			
 		try {
-			files.openFile("log", "w");
-			files.writeln("log", "[START] " + arguments.getInputPath() + " generating measurements.");
+			//files.openFile("log", "w");
+			//files.writeln("log", "[START] " + arguments.getInputPath() + " generating measurements.");
 			
 			if (arguments.getInputType().equals("CCSV")) {
 				Parser parser = new Parser();
@@ -79,12 +79,13 @@ public class LoadCCSV extends Controller {
 				}
 			}
 			
-			files.writeln("log", "[END] " + arguments.getInputPath() + " generating measurements.");
-			files.closeFile("log", "w");
+			//files.writeln("log", "[END] " + arguments.getInputPath() + " generating measurements.");
+			//files.closeFile("log", "w");
 		} catch (Exception e) {
 			e.printStackTrace();
 			status = 1;
-			message += "Exception in playLoadCCSV()";
+			message += "Exception in playLoadCCSV(): \n";
+			message += e.toString();
 		}
 		
 		message += "[" + new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()) + "] end of file";
@@ -92,7 +93,6 @@ public class LoadCCSV extends Controller {
    }
     
     public static Result uploadFile() {
-    	//System.out.println("uploadFile CALLED!");
     	MultipartFormData body = request().body().asMultipartFormData();
     	FilePart uploadedfile = body.getFile("pic");
     	if (uploadedfile != null) {
@@ -125,6 +125,5 @@ public class LoadCCSV extends Controller {
     	} else {
     		return ok (loadCCSV.render("fail", "Error uploading file. Please try again."));
     	} 
-    } 
-    
+    }
 }

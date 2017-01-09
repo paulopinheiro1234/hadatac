@@ -147,9 +147,11 @@ public class User implements Comparable<User> {
 		nameList.put(getUri(), getName());
 		if(getImmediateGroupUri() != null) {
 			User user = User.find(getImmediateGroupUri());
-			if (user.getName() != null) {
-    			nameList.put(user.getUri(), user.getName());
-    			user.getGroupNames(nameList);
+			if(user != null){
+				if (user.getName() != null) {
+	    			nameList.put(user.getUri(), user.getName());
+	    			user.getGroupNames(nameList);
+				}
 			}
 		}
 	}
