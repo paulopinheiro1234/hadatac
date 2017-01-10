@@ -105,10 +105,8 @@ public class AutoAnnotator extends Controller {
 	}
 	
 	@Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    public static Result toggleAutoAnnotator(List<String> unproc_files, 
-    		                                 List<String> proc_files) {
+    public static Result toggleAutoAnnotator() {
 		System.out.println("Toggling...");
-		boolean bStarted = false;
 		
 		Properties prop = new Properties();
 		try {
@@ -123,12 +121,10 @@ public class AutoAnnotator extends Controller {
 		
 		if(prop.getProperty("auto").equals("on")){
 			prop.setProperty("auto", "off");
-			bStarted = false;
 			System.out.println("off");
 		}
 		else if(prop.getProperty("auto").equals("off")){
 			prop.setProperty("auto", "on");
-			bStarted = true;
 			System.out.println("on");
 		}
 		URL url = LoadKB.class.getClassLoader().getResource("autoccsv.config");
@@ -142,7 +138,7 @@ public class AutoAnnotator extends Controller {
 			e.printStackTrace();
 		}
 		
-		return ok(auto_ccsv.render(unproc_files, proc_files, bStarted));
+		return redirect(routes.AutoAnnotator.index());
 	}
 	
 	public static void autoAnnotate() {
@@ -187,7 +183,7 @@ public class AutoAnnotator extends Controller {
 	
     public static boolean annotateCSVFile(String file_name) {
     	System.out.println("Annotating " + file_name);
-    	String base_name = FilenameUtils.getBaseName(file_name).split("_")[0];
+    	String base_name = FilenameUtils.getBaseName(file_name);
     	
     	AnnotationLog log = new AnnotationLog();
     	log.setFileName(file_name);
@@ -201,7 +197,7 @@ public class AutoAnnotator extends Controller {
 			ValueCellProcessing cellProc = new ValueCellProcessing();
 			String qname = cellProc.replaceNameSpaceEx(dc.getUri()).split(":")[1];
 			System.out.println(qname);
-			if(qname.equals(base_name)){
+			if(base_name.startsWith(qname)){
 				dc_uri = dc.getUri();
 				System.out.println("DataAcquisitionURI: " + dc_uri);
 				deployment_uri = dc.getDeploymentUri();
@@ -229,7 +225,7 @@ public class AutoAnnotator extends Controller {
 			e.printStackTrace();
 			return false;
 		}
-    	System.out.println("uploadCSV: uri is " + deployment_uri);
+    	System.out.println("deployment_uri is " + deployment_uri);
     	if (!deployment_uri.equals("")) {
     		/*
     		 *  Add deployment information into handler
@@ -245,12 +241,11 @@ public class AutoAnnotator extends Controller {
     		 */
     		String dep_json = DeploymentQueries.exec(DeploymentQueries.DEPLOYMENT_CHARACTERISTICS_BY_URI, deployment_uri);
     		System.out.println(dep_json);
-    		SparqlQueryResults results2 = new SparqlQueryResults(dep_json, false);
-    		Iterator<TripleDocument> it = results2.sparqlResults.values().iterator();
+    		SparqlQueryResults char_results = new SparqlQueryResults(dep_json, false);
     		Map<String,String> deploymentChars = new HashMap<String,String>();
-    		TripleDocument docChar;
-    		while (it.hasNext()) {
-    			docChar = (TripleDocument) it.next();
+    		Iterator<TripleDocument> iterDoc = char_results.sparqlResults.values().iterator();
+    		while (iterDoc.hasNext()) {
+    			TripleDocument docChar = (TripleDocument)iterDoc.next();
     			if (docChar != null && docChar.get("char") != null && docChar.get("charName") != null) {
     				deploymentChars.put((String)docChar.get("char"),(String)docChar.get("charName"));
     				System.out.println("EC: " + docChar.get("char") + "   ecName: " + docChar.get("charName"));
@@ -426,7 +421,30 @@ public class AutoAnnotator extends Controller {
 		File file = new File(path_proc + "/" + file_name);
 		file.renameTo(new File(destFolder + "/" + file_name));
 		
-		return index();
+		return redirect(routes.AutoAnnotator.index());
+    }
+    
+    public static Result downloadCSVFile(String file_name, boolean isProcessed) {
+    	Properties prop = new Properties();
+		try {
+			InputStream is = LoadKB.class.getClassLoader().getResourceAsStream("autoccsv.config");
+			prop.load(is);
+			is.close();
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
+		String path = ""; 
+		if(isProcessed){
+			path = prop.getProperty("path_proc");
+		}
+		else{
+			path = prop.getProperty("path_unproc");
+		}
+		
+		return ok(new File(path + "/" + file_name));
     }
     
     public static Result checkAnnotationLog(String file_name) {
@@ -458,7 +476,7 @@ public class AutoAnnotator extends Controller {
 		File file = new File(path + "/" + file_name);
 		file.delete();
 		
-		return index();
+		return redirect(routes.AutoAnnotator.index());
     }
     
     @Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))

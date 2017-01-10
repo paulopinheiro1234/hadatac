@@ -84,9 +84,6 @@ public class DeploymentQueries {
                     "   ?deploy a vstoi:Deployment . " + 
                     "   ?deploy hasneto:hasDetector ?deturi .  " +
                     "   ?deturi a ?detModel . " +
-                    //"   OPTIONAL { ?sp vstoi:perspectiveOf ?detModel } " +
-                    //"   OPTIONAL { ?sp vstoi:hasPerspectiveCharacteristic ?ec } " +
-                    //"   OPTIONAL { ?ec rdfs:label ?ecName }  " + 
                     "}";
                 break;
             case DETECTOR_SENSING_PERSPECTIVE : 

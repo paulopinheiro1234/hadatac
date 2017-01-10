@@ -3,6 +3,8 @@ package org.hadatac.data.loader.ccsv;
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.math.BigDecimal;
+import java.util.Date;
 import java.util.Iterator;
 
 import org.apache.commons.csv.CSVFormat;
@@ -124,6 +126,8 @@ public class Parser {
 				nIdCol = mt.getIdColumn();
 			}
 		}
+		
+		boolean isSubjectPlatform = Subject.isPlatform(hadatacKb.getDeployment().getPlatform().getUri());
 		SolrClient solr = new HttpSolrClient(Play.application().configuration().getString("hadatac.solr.data") + "/measurement");
 		ValueCellProcessing cellProc = new ValueCellProcessing();
 		for (CSVRecord record : records) {
@@ -146,7 +150,15 @@ public class Parser {
 				}
 				
 				if(nTimeStampCol > -1){
-					measurement.setTimestamp(record.get(nTimeStampCol - 1));
+					String sTime = record.get(nTimeStampCol - 1);
+					if(sTime.contains("E")){
+						int timeStamp = new BigDecimal(sTime).intValue() / 256;
+						Date time = new Date((long)timeStamp * 1000);
+						measurement.setTimestamp(time.toString());
+					}
+					else{
+						measurement.setTimestamp(record.get(nTimeStampCol - 1));
+					}
 				}
 				else {
 					measurement.setTimestamp("");
@@ -157,7 +169,12 @@ public class Parser {
 					measurement.setObjectUri(Subject.find(measurement.getStudyUri(), record.get(nIdCol - 1)).getUri());
 				}
 				else {
-					measurement.setObjectUri("");
+					if(isSubjectPlatform){
+						measurement.setObjectUri(hadatacKb.getDeploymentUri());
+					}
+					else{
+						measurement.setObjectUri("");
+					}
 				}
 				measurement.setUri(hadatacCcsv.getMeasurementUri() + hadatacCcsv.getDataset().getLocalName() + "/" + measurementType.getLocalName() + "-" + total_count);
 				measurement.setOwnerUri(hadatacKb.getDataAcquisition().getOwnerUri());
@@ -166,10 +183,10 @@ public class Parser {
 				measurement.setUnitUri(measurementType.getUnitUri());
 				measurement.setCharacteristic(measurementType.getCharacteristicLabel());
 				measurement.setCharacteristicUri(measurementType.getCharacteristicUri());
-				measurement.setInstrumentModel(hadatacKb.getDeployment().instrument.getLabel());
-				measurement.setInstrumentUri(hadatacKb.getDeployment().instrument.getUri());
-				measurement.setPlatformName(hadatacKb.getDeployment().platform.getLabel());
-				measurement.setPlatformUri(hadatacKb.getDeployment().platform.getUri());
+				measurement.setInstrumentModel(hadatacKb.getDeployment().getInstrument().getLabel());
+				measurement.setInstrumentUri(hadatacKb.getDeployment().getInstrument().getUri());
+				measurement.setPlatformName(hadatacKb.getDeployment().getPlatform().getLabel());
+				measurement.setPlatformUri(hadatacKb.getDeployment().getPlatform().getUri());
 				measurement.setEntity(measurementType.getEntityLabel());
 				measurement.setEntityUri(measurementType.getEntityUri());
 				measurement.setDatasetUri(hadatacCcsv.getDatasetKbUri());

@@ -73,9 +73,9 @@ public class Deployment {
 	private DateTime endedAt;
 	private boolean legacy;
 	
-	public Instrument instrument;
-	public Platform platform;
-	public List<Detector> detectors;
+	private Instrument instrument;
+	private Platform platform;
+	private List<Detector> detectors;
 	
 	public Deployment() {
 		startedAt = null;
@@ -155,6 +155,27 @@ public class Deployment {
 
 	public void setCcsvUri(String ccsvUri) {
 		this.ccsvUri = ccsvUri;
+	}
+	
+	public Instrument getInstrument() {
+		return instrument;
+	}
+	public void setInstrument(Instrument instrument) {
+		this.instrument = instrument;
+	}
+	
+	public Platform getPlatform() {
+		return platform;
+	}
+	public void setPlatform(Platform platform) {
+		this.platform = platform;
+	}
+	
+	public List<Detector> getDetectors() {
+		return detectors;
+	}
+	public void setDetectors(List<Detector> detectors) {
+		this.detectors = detectors;
 	}
 	
 	public void save() {

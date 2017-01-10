@@ -48,18 +48,17 @@ public class UserManagement extends Controller {
 	private static final String UPLOAD_NAME = "tmp/uploads/users-spreadsheet.xls";
 
 	@Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
-	public static Result preRegistration(String oper) {
+	public static Result index(String oper) {
 		return ok(users.render(oper, "", User.find(), UserGroup.find(), ""));
 	}
 
 	@Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
-	public static Result postPreRegistration(String oper) {
+	public static Result postIndex(String oper) {
 		return ok(users.render(oper, "", User.find(), UserGroup.find(), ""));
 	}
 
 	@Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
 	public static Result onLinePreRegistration(String oper) {
-		System.out.println(oper);
 		return ok(preregister.render(oper, UserGroup.find()));
 	}
 
@@ -91,7 +90,7 @@ public class UserManagement extends Controller {
 			su.save();
 		}
 		
-		return ok(users.render("init", "", User.find(), UserGroup.find(), ""));
+		return redirect(routes.UserManagement.index("init"));
     }
 	
 	@Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
@@ -113,7 +112,7 @@ public class UserManagement extends Controller {
 			su.save();
 		}
 		
-		return ok(users.render("init", "", User.find(), UserGroup.find(), ""));
+		return redirect(routes.UserManagement.index("init"));
     }
 	
 	@Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
@@ -182,7 +181,7 @@ public class UserManagement extends Controller {
 			e.printStackTrace();
 		}
 		User.deleteUser(user_uri);
-		return ok(users.render("init", "", User.find(), UserGroup.find(), ""));
+		return redirect(routes.UserManagement.index("init"));
     }
 
 	@Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))

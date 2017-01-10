@@ -188,14 +188,16 @@ POST	/hadatac/annotator/loadcsv/upload          org.hadatac.console.controllers.
 POST    /hadatac/annotator/generate                org.hadatac.console.controllers.annotator.Downloads.postGenerate(handler : String)
 GET	    /hadatac/annotator/autoccsv		    	   org.hadatac.console.controllers.annotator.AutoAnnotator.index()
 POST	/hadatac/annotator/autoccsv     		   org.hadatac.console.controllers.annotator.AutoAnnotator.postIndex()
-GET	    /hadatac/annotator/toggle		    	   org.hadatac.console.controllers.annotator.AutoAnnotator.toggleAutoAnnotator(unprocessedFiles: java.util.List[String], processedFiles: java.util.List[String])
-POST	/hadatac/annotator/toggle     		       org.hadatac.console.controllers.annotator.AutoAnnotator.toggleAutoAnnotator(unprocessedFiles: java.util.List[String], processedFiles: java.util.List[String])
-GET	    /hadatac/annotator/uploadcsv		    	   org.hadatac.console.controllers.annotator.AutoAnnotator.uploadCSVFile(oper : String)
-POST	/hadatac/annotator/uploadcsv    		       org.hadatac.console.controllers.annotator.AutoAnnotator.uploadCSVFile(oper : String)
+GET	    /hadatac/annotator/toggle		    	   org.hadatac.console.controllers.annotator.AutoAnnotator.toggleAutoAnnotator()
+POST	/hadatac/annotator/toggle     		       org.hadatac.console.controllers.annotator.AutoAnnotator.toggleAutoAnnotator()
+GET	    /hadatac/annotator/uploadcsv		       org.hadatac.console.controllers.annotator.AutoAnnotator.uploadCSVFile(oper : String)
+POST	/hadatac/annotator/uploadcsv    		   org.hadatac.console.controllers.annotator.AutoAnnotator.uploadCSVFile(oper : String)
 GET	    /hadatac/annotator/movecsv		    	   org.hadatac.console.controllers.annotator.AutoAnnotator.moveCSVFile(file_name : String)
 POST	/hadatac/annotator/movecsv    		       org.hadatac.console.controllers.annotator.AutoAnnotator.moveCSVFile(file_name : String)
 GET	    /hadatac/annotator/deletecsv		       org.hadatac.console.controllers.annotator.AutoAnnotator.deleteCSVFile(file_name : String, isProcessed : Boolean)
 POST	/hadatac/annotator/deletecsv    		   org.hadatac.console.controllers.annotator.AutoAnnotator.deleteCSVFile(file_name : String, isProcessed : Boolean)
+GET	    /hadatac/annotator/downloadcsv		       org.hadatac.console.controllers.annotator.AutoAnnotator.downloadCSVFile(file_name : String, isProcessed : Boolean)
+POST	/hadatac/annotator/downloadcsv    		   org.hadatac.console.controllers.annotator.AutoAnnotator.downloadCSVFile(file_name : String, isProcessed : Boolean)
 GET	    /hadatac/annotator/log                     org.hadatac.console.controllers.annotator.AutoAnnotator.checkAnnotationLog(file_name : String)
 POST	/hadatac/annotator/log                     org.hadatac.console.controllers.annotator.AutoAnnotator.checkAnnotationLog(file_name : String)
 
@@ -228,15 +230,13 @@ POST    /hadatac/ts/synclabkey/loadacquisition     org.hadatac.console.controlle
 GET    	/hadatac/ts/synclabkey/difftool			   org.hadatac.console.controllers.triplestore.DiffTool.index(auth: org.hadatac.console.models.LabKeyLoginForm,topic1: String,topic2: String)
 POST    /hadatac/ts/synclabkey/difftool			   org.hadatac.console.controllers.triplestore.DiffTool.postIndex(auth: org.hadatac.console.models.LabKeyLoginForm,topic1: String,topic2: String)
 
-
-
 # Permissions store management URLs
 GET     /hadatac/perm/onlinepreregister            org.hadatac.console.controllers.triplestore.UserManagement.onLinePreRegistration(oper: String)
 POST    /hadatac/perm/onlinepreregister            org.hadatac.console.controllers.triplestore.UserManagement.postOnLinePreRegistration(oper: String)
 GET     /hadatac/perm/onlinegroupregister          org.hadatac.console.controllers.triplestore.UserManagement.onLineGroupRegistration(oper: String)
 POST    /hadatac/perm/onlinegroupregister          org.hadatac.console.controllers.triplestore.UserManagement.postOnLineGroupRegistration(oper: String)
-GET     /hadatac/perm/preregister                  org.hadatac.console.controllers.triplestore.UserManagement.preRegistration(oper: String)
-POST    /hadatac/perm/preregister                  org.hadatac.console.controllers.triplestore.UserManagement.postPreRegistration(oper: String)
+GET     /hadatac/perm/preregister                  org.hadatac.console.controllers.triplestore.UserManagement.index(oper: String)
+POST    /hadatac/perm/preregister                  org.hadatac.console.controllers.triplestore.UserManagement.postIndex(oper: String)
 POST    /hadatac/perm/preregister/upload           org.hadatac.console.controllers.triplestore.UserManagement.uploadFile()
 POST    /hadatac/perm/preregister/uploadform       org.hadatac.console.controllers.triplestore.UserManagement.submitPreRegistrationForm(oper: String)
 GET	    /hadatac/perm/userNetwork			       org.hadatac.console.controllers.triplestore.UserNetwork.index()
