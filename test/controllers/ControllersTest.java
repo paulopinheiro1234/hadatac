@@ -8,8 +8,6 @@ import org.hadatac.console.controllers.metadata.*;
 import org.hadatac.console.controllers.metadata.DynamicGeneration.GeneratedStrings;
 import org.hadatac.console.controllers.metadataacquisition.*;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 import static play.mvc.Http.Status.OK;
 
 import java.util.ArrayList;
@@ -51,9 +49,12 @@ public class ControllersTest {
 			Map<String, String> indicatorResult = ViewStudy.findStudyIndicators(study.getKey());
 			indicatorResults.put(study.getKey(), indicatorResult);
 		}
+		assertNotNull(studyResult);
+		assertNotNull(subjectResult);
+		assertNotNull(indicatorResults);
 	}
 	
-	@Test
+	@Ignore @Test
 	public void testDynamicMetadataBrowserGeneration(){
 		Map<String,String> indicatorMap = DynamicMetadataGeneration.getIndicatorTypes();
 		DynamicMetadataGeneration.renderSPARQLPage();
@@ -67,6 +68,8 @@ public class ControllersTest {
 	public void testViewSample(){
 		Map<String, String> indicatorValues = ViewSample.findSampleIndicators("chear-kb:fakeSample");
     	Map<String, List<String>> sampleResult = ViewSample.findBasic("chear-kb:fakeSample");
+		assertNotNull(indicatorValues);
+		assertNotNull(sampleResult);
 	}
 	
 	@Test
@@ -74,6 +77,9 @@ public class ControllersTest {
 		Map<String, String> indicatorValues = ViewSubject.findSubjectIndicators("chear-kb:fakeSubject");
 		Map<String, List<String>> subjectResult = ViewSubject.findBasic("chear-kb:fakeSubject");
 		Map<String, List<String>> sampleResult = ViewSubject.findSampleMap("chear-kb:fakeSubject");
+		assertNotNull(indicatorValues);
+		assertNotNull(subjectResult);
+		assertNotNull(sampleResult);
 	}
 	
 	@Test
@@ -81,6 +87,9 @@ public class ControllersTest {
 		Map<String, String> indicatorValues = ViewStudy.findStudyIndicators("chear-kb:fakeStudy");
 		Map<String, List<String>> poResult = ViewStudy.findBasic("chear-kb:fakeStudy");
 		Map<String, List<String>> subjectResult = ViewStudy.findSubject("chear-kb:fakeStudy");
+		assertNotNull(indicatorValues);
+		assertNotNull(poResult);
+		assertNotNull(subjectResult);
 	}
 
 }
