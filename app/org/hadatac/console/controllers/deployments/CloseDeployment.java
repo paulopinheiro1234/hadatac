@@ -48,12 +48,12 @@ public class CloseDeployment extends Controller {
     		/*
     		 *  Add deployment information into handler
     		 */
-    		depForm.setPlatform(dep.platform.getLabel());
-    		depForm.setInstrument(dep.instrument.getLabel());
-    		if (dep.detectors != null) {
-    			Iterator detectors = dep.detectors.iterator();
-    			while (detectors.hasNext()) {
-    				depForm.addDetector(((Detector)detectors.next()).getLabel());
+    		depForm.setPlatform(dep.getPlatform().getLabel());
+    		depForm.setInstrument(dep.getInstrument().getLabel());
+    		if (dep.getDetectors() != null) {
+    			Iterator<Detector> iterDetectors = dep.getDetectors().iterator();
+    			while (iterDetectors.hasNext()) {
+    				depForm.addDetector(((Detector)iterDetectors.next()).getLabel());
     			}
     		}
     		depForm.setStartDateTime(dep.getStartedAt());
@@ -88,12 +88,12 @@ public class CloseDeployment extends Controller {
     		/*
     		 *  Add deployment information into handler
     		 */
-    		depForm.setPlatform(dep.platform.getLabel());
-    		depForm.setInstrument(dep.instrument.getLabel());
-    		if (dep.detectors != null) {
-    			Iterator detectors = dep.detectors.iterator();
-    			while (detectors.hasNext()) {
-    				depForm.addDetector(((Detector)detectors.next()).getLabel());
+    		depForm.setPlatform(dep.getPlatform().getLabel());
+    		depForm.setInstrument(dep.getInstrument().getLabel());
+    		if (dep.getDetectors() != null) {
+    			Iterator<Detector> iterDetectors = dep.getDetectors().iterator();
+    			while (iterDetectors.hasNext()) {
+    				depForm.addDetector(((Detector)iterDetectors.next()).getLabel());
     			}
     		}
     		depForm.setStartDateTime(dep.getStartedAt());
@@ -139,12 +139,12 @@ public class CloseDeployment extends Controller {
 		}
 		dep.close(endDateString);
 		
-		data.setPlatform(dep.platform.getLabel());
-		data.setInstrument(dep.instrument.getLabel());
-		if (dep.detectors != null) {
-			Iterator detectors = dep.detectors.iterator();
-			while (detectors.hasNext()) {
-				data.addDetector(((Detector)detectors.next()).getLabel());
+		data.setPlatform(dep.getPlatform().getLabel());
+		data.setInstrument(dep.getInstrument().getLabel());
+		if (dep.getDetectors() != null) {
+			Iterator<Detector> iterDetectors = dep.getDetectors().iterator();
+			while (iterDetectors.hasNext()) {
+				data.addDetector(((Detector)iterDetectors.next()).getLabel());
 			}
 		}
 		data.setStartDateTime(dep.getStartedAt());

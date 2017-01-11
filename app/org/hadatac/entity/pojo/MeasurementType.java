@@ -18,6 +18,8 @@ import org.apache.jena.rdf.model.ResourceFactory;
 import org.hadatac.data.loader.util.Sparql;
 import org.hadatac.metadata.loader.ValueCellProcessing;
 
+import scala.reflect.internal.Types.ThisType;
+
 public class MeasurementType {
 	private String uri;
 	private String localName;
@@ -29,11 +31,13 @@ public class MeasurementType {
 	private String entityLabel;
 	private int valueColumn;
 	private int timestampColumn;
+	private int timeInstantColumn;
 	private int idColumn;
 	private int elevationColumn;
 	
 	public MeasurementType() {
 		this.timestampColumn = -1;
+		this.timeInstantColumn = -1;
 		this.elevationColumn = -1;
 		this.idColumn = -1;
 	}
@@ -49,6 +53,12 @@ public class MeasurementType {
 	}
 	public void setTimestampColumn(int timestampColumn) {
 		this.timestampColumn = timestampColumn;
+	}
+	public int getTimeInstantColumn() {
+		return timeInstantColumn;
+	}
+	public void setTimeInstantColumn(int timeInstantColumn) {
+		this.timeInstantColumn = timeInstantColumn;
 	}
 	public int getIdColumn() {
 		return idColumn;
@@ -128,6 +138,7 @@ public class MeasurementType {
 			measurementTypeKb.setLocalName(measurementType.getLocalName());
 			measurementTypeKb.setValueColumn(measurementType.getValueColumn());
 			measurementTypeKb.setTimestampColumn(measurementType.getTimestampColumn());
+			measurementTypeKb.setTimeInstantColumn(measurementType.getTimeInstantColumn());
 			measurementTypeKb.setIdColumn(measurementType.getIdColumn());
 			
 			System.out.println("resultsrw.size(): " + resultsrw.size());
@@ -230,10 +241,13 @@ public class MeasurementType {
 			measurementType.setCharacteristicUri(soln.getResource("char").getURI());
 			measurementType.setUnitUri(soln.getResource("unit").getURI());
 			measurementType.setValueColumn(soln.getLiteral("column").getInt());
-			if(measurementType.getCharacteristicUri().equals(cellProc.replacePrefixEx("sio:TimeStamp"))
-			|| measurementType.getCharacteristicUri().equals(cellProc.replacePrefixEx("sio:TimeInstant"))){
+			if(measurementType.getCharacteristicUri().equals(cellProc.replacePrefixEx("sio:TimeStamp"))){
 				measurementType.setTimestampColumn(soln.getLiteral("column").getInt());
 				System.out.println("TimeStampColumn: " + soln.getLiteral("column").getInt());
+			}
+			if(measurementType.getCharacteristicUri().equals(cellProc.replacePrefixEx("sio:TimeInstant"))){
+				measurementType.setTimeInstantColumn(soln.getLiteral("column").getInt());
+				System.out.println("TimeInstantColumn: " + soln.getLiteral("column").getInt());
 			}
 			if(measurementType.getCharacteristicUri().equals(cellProc.replacePrefixEx("hasco:originalID"))){
 				measurementType.setIdColumn(soln.getLiteral("column").getInt());

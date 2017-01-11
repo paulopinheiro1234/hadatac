@@ -24,21 +24,9 @@ jQuery(document).ready(function($) {
     search_index: 'solr',
     datatype: 'json',
     facets: [ 
-        {'field': 'AlkylPhosphatePesticideMetaboliteLabel', 'display': 'Alkyl Phosphate Pesticide Metabolite'},
-        {'field': 'ArsenicSpeciesLabel', 'display': 'Arsenic Species'},
-        {'field': 'ElementLabel', 'display': 'Element'},
-        {'field': 'MercurySpeciesLabel', 'display': 'Mercury Species'},
-        {'field': 'VolatileOrganicCompoundLabel', 'display': 'Volatile Organic Compound'},
-        {'field': 'ParabenLabel', 'display': 'Paraben'},
-        {'field': 'PFCLabel', 'display': 'PFC'},
-        {'field': 'EnvironmentalPhenolLabel', 'display': 'Environmental Phenol'},
-        {'field': 'PhthalateLabel', 'display': 'Phthalate'},
-        {'field': 'PolybrominatedDiphenylEtherLabel', 'display': 'Polybrominated Diphenyl Ether'},
-        {'field': 'TobaccoMetaboliteLabel', 'display': 'Tobacco Metabolite'},
-        {'field': 'CreatinineLabel', 'display': 'Creatinine'},
     ],
-    search_sortby: [{'display':'Study URI', 'field':'studyUri.exact'},{'display':'Alkyl Phosphate Pesticide Metabolite','field':'AlkylPhosphatePesticideMetaboliteLabel.exact'},{'display':'Arsenic Species','field':'ArsenicSpeciesLabel.exact'},{'display':'Element','field':'ElementLabel.exact'},{'display':'Mercury Species','field':'MercurySpeciesLabel.exact'},{'display':'Volatile Organic Compound','field':'VolatileOrganicCompoundLabel.exact'},{'display':'Paraben','field':'ParabenLabel.exact'},{'display':'PFC','field':'PFCLabel.exact'},{'display':'Environmental Phenol','field':'EnvironmentalPhenolLabel.exact'},{'display':'Phthalate','field':'PhthalateLabel.exact'},{'display':'Polybrominated Diphenyl Ether','field':'PolybrominatedDiphenylEtherLabel.exact'},{'display':'Tobacco Metabolite','field':'TobaccoMetaboliteLabel.exact'},{'display':'Creatinine','field':'CreatinineLabel.exact'}],
-    searchbox_fieldselect: [{'display':'Study URI', 'field':'studyUri.exact'},{'display':'Alkyl Phosphate Pesticide Metabolite','field':'AlkylPhosphatePesticideMetaboliteLabel.exact'},{'display':'Arsenic Species','field':'ArsenicSpeciesLabel.exact'},{'display':'Element','field':'ElementLabel.exact'},{'display':'Mercury Species','field':'MercurySpeciesLabel.exact'},{'display':'Volatile Organic Compound','field':'VolatileOrganicCompoundLabel.exact'},{'display':'Paraben','field':'ParabenLabel.exact'},{'display':'PFC','field':'PFCLabel.exact'},{'display':'Environmental Phenol','field':'EnvironmentalPhenolLabel.exact'},{'display':'Phthalate','field':'PhthalateLabel.exact'},{'display':'Polybrominated Diphenyl Ether','field':'PolybrominatedDiphenylEtherLabel.exact'},{'display':'Tobacco Metabolite','field':'TobaccoMetaboliteLabel.exact'},{'display':'Creatinine','field':'CreatinineLabel.exact'}],
+    search_sortby: [{'display':'Study URI', 'field':'studyUri.exact'}],
+    searchbox_fieldselect: [{'display':'Study URI', 'field':'studyUri.exact'}],
     paging: {
       size: 10
     },

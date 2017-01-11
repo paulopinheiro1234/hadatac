@@ -817,12 +817,12 @@ public class DataAcquisition {
 			dataAcquisition.addUnitUri(measurementType.getUnitUri());
 		}
 		dataAcquisition.setDeploymentUri(hadatacKb.getDeploymentUri());
-		dataAcquisition.setInstrumentModel(hadatacKb.getDeployment().instrument.getLabel());
-		dataAcquisition.setInstrumentUri(hadatacKb.getDeployment().instrument.getUri());
-		dataAcquisition.setPlatformName(hadatacKb.getDeployment().platform.getLabel());
-		dataAcquisition.setPlatformUri(hadatacKb.getDeployment().platform.getUri());
-		dataAcquisition.setLocation(hadatacKb.getDeployment().platform.getLocation());
-		dataAcquisition.setElevation(hadatacKb.getDeployment().platform.getElevation());
+		dataAcquisition.setInstrumentModel(hadatacKb.getDeployment().getInstrument().getLabel());
+		dataAcquisition.setInstrumentUri(hadatacKb.getDeployment().getInstrument().getUri());
+		dataAcquisition.setPlatformName(hadatacKb.getDeployment().getPlatform().getLabel());
+		dataAcquisition.setPlatformUri(hadatacKb.getDeployment().getPlatform().getUri());
+		dataAcquisition.setLocation(hadatacKb.getDeployment().getPlatform().getLocation());
+		dataAcquisition.setElevation(hadatacKb.getDeployment().getPlatform().getElevation());
 		dataAcquisition.addDatasetUri(hadatacCcsv.getDatasetKbUri());
 		
 		return dataAcquisition;

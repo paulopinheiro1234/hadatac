@@ -51,14 +51,14 @@ public class LoadCCSV extends Controller {
 		arguments.setOutputPath("upload/");
 		arguments.setVerbose(true);
 		arguments.setPv(false);
+		
+		File inputFile = new File(arguments.getInputPath());
+		files = new FileFactory(arguments);
+		files.setFile(inputFile, inputFile.getName());
 
-		//File inputFile = new File(arguments.getInputPath());
-		//files = new FileFactory(arguments);
-		//files.setFile(inputFile, inputFile.getName());
-			
 		try {
-			//files.openFile("log", "w");
-			//files.writeln("log", "[START] " + arguments.getInputPath() + " generating measurements.");
+			files.openFile("log", "w");
+			files.writeln("log", "[START] " + arguments.getInputPath() + " generating measurements.");
 			
 			if (arguments.getInputType().equals("CCSV")) {
 				Parser parser = new Parser();
@@ -79,12 +79,12 @@ public class LoadCCSV extends Controller {
 				}
 			}
 			
-			//files.writeln("log", "[END] " + arguments.getInputPath() + " generating measurements.");
-			//files.closeFile("log", "w");
+			files.writeln("log", "[END] " + arguments.getInputPath() + " generating measurements.");
+			files.closeFile("log", "w");
 		} catch (Exception e) {
 			e.printStackTrace();
 			status = 1;
-			message += "Exception in playLoadCCSV(): \n";
+			message += "Exception in playLoadCCSV(): ";
 			message += e.toString();
 		}
 		

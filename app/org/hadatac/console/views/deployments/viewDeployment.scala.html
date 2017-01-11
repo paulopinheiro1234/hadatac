@@ -17,16 +17,16 @@
             <h2>Basic Info</h2>
                 <ul>
                     <li><b>URI</b>: @deployment.getUri()</li>
-                    <li><b>Platform</b>: @deployment.platform.getLabel()</li>
+                    <li><b>Platform</b>: @deployment.getPlatform().getLabel()</li>
                     <ul>
-                       <li><b>First Coordinate</b>: @deployment.platform.getFirstCoordinate()</li>
-                       <li><b>Second Coordinate</b>: @deployment.platform.getSecondCoordinate() </li>
-                       <li><b>Third Coordinate</b>: @deployment.platform.getThirdCoordinate()</li>
+                       <li><b>First Coordinate</b>: @deployment.getPlatform().getFirstCoordinate()</li>
+                       <li><b>Second Coordinate</b>: @deployment.getPlatform().getSecondCoordinate() </li>
+                       <li><b>Third Coordinate</b>: @deployment.getPlatform().getThirdCoordinate()</li>
                     </ul>
-                    @if(deployment.instrument != null) {
-                       <li><b>Instrument</b>: @deployment.instrument.getLabel()</li>
+                    @if(deployment.getInstrument() != null) {
+                       <li><b>Instrument</b>: @deployment.getInstrument().getLabel()</li>
                        <ul>
-                         <li><b>Serial Number</b>: @deployment.instrument.getSerialNumber()</li>
+                         <li><b>Serial Number</b>: @deployment.getInstrument().getSerialNumber()</li>
                       </ul>
                     }
                     <li><b>Start Date/Time</b>: @deployment.getStartedAt()</li>
@@ -35,7 +35,7 @@
 
             <h2>Sensing Info</h2>
                 <ul>
-                   @for(detector <- deployment.detectors) {
+                   @for(detector <- deployment.getDetectors()) {
                       <li><b>Detector</b>: @detector.getLabel()</li>
                       <ul>
                          <li><b>Serial Number</b>: @detector.getSerialNumber()</li>
@@ -48,8 +48,8 @@
         <div class="col-md-6">
             <div class="row text-center">
                 <div style="width:95%; height:500px" id="map"></div>
-                @if(deployment.platform.getFirstCoordinate() != null && deployment.platform.getSecondCoordinate() != null) {
-                    <script type="text/javascript">locations=["@deployment.platform.getFirstCoordinate()","@deployment.platform.getSecondCoordinate()"];createMap(locations);</script>
+                @if(deployment.getPlatform().getFirstCoordinate() != null && deployment.getPlatform().getSecondCoordinate() != null) {
+                    <script type="text/javascript">locations=["@deployment.getPlatform().getFirstCoordinate()","@deployment.getPlatform().getSecondCoordinate()"];createMap(locations);</script>
                 }
             </div>
         </div>

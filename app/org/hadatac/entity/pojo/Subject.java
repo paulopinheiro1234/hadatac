@@ -45,6 +45,27 @@ public class Subject {
 		this.ofStudy = ofStudy;
 	}
 	
+	public static boolean isPlatform(String subject_uri) {
+		String queryString = NameSpaces.getInstance().printSparqlNameSpaceList()
+				+ "SELECT ?cohort WHERE {\n"
+				+ "  <" + subject_uri + "> a hasco:SubjectPlatform . \n"
+				+ "  <" + subject_uri + "> hasco:isSubjectOf ?cohort .\n"
+				+ "}";
+		
+		Query query = QueryFactory.create(queryString);
+		
+		QueryExecution qexec = QueryExecutionFactory.sparqlService(Collections.getCollectionsName(Collections.METADATA_SPARQL), query);
+		ResultSet results = qexec.execSelect();
+		ResultSetRewindable resultsrw = ResultSetFactory.copyResults(results);
+		qexec.close();
+		
+		if (resultsrw.size() >= 1) {
+			return true;
+		}
+		
+		return false;
+	}
+	
 	public static Subject find(String study_uri, String subject_id) {
 		Subject subject = new Subject();
 		String queryString = NameSpaces.getInstance().printSparqlNameSpaceList()

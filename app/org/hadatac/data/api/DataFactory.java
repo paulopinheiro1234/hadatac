@@ -31,10 +31,10 @@ public class DataFactory {
 		dataCollection.setOwnerUri(ownerUri);
 		dataCollection.setPermissionUri(ownerUri);
 		dataCollection.setTriggeringEvent(triggeringEvent);
-		dataCollection.setPlatformUri(deployment.platform.getUri());
-		dataCollection.setInstrumentUri(deployment.instrument.getUri());
-		dataCollection.setPlatformName(deployment.platform.getLabel());
-		dataCollection.setInstrumentModel(deployment.instrument.getLabel());
+		dataCollection.setPlatformUri(deployment.getPlatform().getUri());
+		dataCollection.setInstrumentUri(deployment.getInstrument().getUri());
+		dataCollection.setPlatformName(deployment.getPlatform().getLabel());
+		dataCollection.setInstrumentModel(deployment.getInstrument().getLabel());
 		dataCollection.setStartedAtXsdWithMillis(deployment.getStartedAt());
 		dataCollection.setDeploymentUri(deploymentUri);
 		dataCollection.save();
@@ -56,10 +56,10 @@ public class DataFactory {
 			deployment = Deployment.create(deploymentUri);
 		}
 		
-		deployment.platform = Platform.find(platformUri);
-		deployment.instrument = Instrument.find(instrumentUri);
+		deployment.setPlatform(Platform.find(platformUri));
+		deployment.setInstrument(Instrument.find(instrumentUri));
 		for (int i = 0; i < detectorUri.size(); i++) {
-			deployment.detectors.add(Detector.find(detectorUri.get(i)));
+			deployment.getDetectors().add(Detector.find(detectorUri.get(i)));
 		}
 		deployment.setStartedAtXsd(startedAt);
 		deployment.save();
@@ -70,10 +70,10 @@ public class DataFactory {
 	public static Deployment createLegacyDeployment(String deploymentUri, String platformUri, String instrumentUri, List<String> detectorUri, String startedAt) {
 		Deployment deployment = Deployment.createLegacy(deploymentUri);
 		
-		deployment.platform = Platform.find(platformUri);
-		deployment.instrument = Instrument.find(instrumentUri);
+		deployment.setPlatform(Platform.find(platformUri));
+		deployment.setInstrument(Instrument.find(instrumentUri));
 		for (int i = 0; i < detectorUri.size(); i++) {
-			deployment.detectors.add(Detector.find(detectorUri.get(i)));
+			deployment.getDetectors().add(Detector.find(detectorUri.get(i)));
 		}
 		deployment.setStartedAtXsd(startedAt);
 		deployment.save();

@@ -278,10 +278,10 @@ public class TripleProcessing {
 						Deployment deployment = Deployment.find(deployment_uri);
 						dataAcquisition.setPermissionUri(ownerUri);
 						dataAcquisition.setTriggeringEvent(TriggeringEvent.INITIAL_DEPLOYMENT);
-						dataAcquisition.setPlatformUri(deployment.platform.getUri());
-						dataAcquisition.setInstrumentUri(deployment.instrument.getUri());
-						dataAcquisition.setPlatformName(deployment.platform.getLabel());
-						dataAcquisition.setInstrumentModel(deployment.instrument.getLabel());
+						dataAcquisition.setPlatformUri(deployment.getPlatform().getUri());
+						dataAcquisition.setInstrumentUri(deployment.getInstrument().getUri());
+						dataAcquisition.setPlatformName(deployment.getPlatform().getLabel());
+						dataAcquisition.setInstrumentModel(deployment.getInstrument().getLabel());
 						dataAcquisition.setStartedAtXsdWithMillis(deployment.getStartedAt());
 						System.out.println("time is " + deployment.getStartedAt());
 					}

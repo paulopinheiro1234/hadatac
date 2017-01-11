@@ -21,11 +21,11 @@
     <div class="container-fluid">
 	
 	@if(bStarted){
-		<a href="@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.toggleAutoAnnotator(unprocessedFiles, processedFiles)" class="btn btn-primary disabled" role="button">Start Auto-Annotator</a>
-		<a href="@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.toggleAutoAnnotator(unprocessedFiles, processedFiles)" class="btn btn-primary" role="button">Stop Auto-Annotator</a>
+		<a href="@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.toggleAutoAnnotator()" class="btn btn-primary disabled" role="button">Start Auto-Annotator</a>
+		<a href="@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.toggleAutoAnnotator()" class="btn btn-primary" role="button">Stop Auto-Annotator</a>
 	}else{
-		<a href="@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.toggleAutoAnnotator(unprocessedFiles, processedFiles)" class="btn btn-primary" role="button">Start Auto-Annotator</a>
-		<a href="@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.toggleAutoAnnotator(unprocessedFiles, processedFiles)" class="btn btn-primary disabled" role="button">Stop Auto-Annotator</a>		
+		<a href="@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.toggleAutoAnnotator()" class="btn btn-primary" role="button">Start Auto-Annotator</a>
+		<a href="@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.toggleAutoAnnotator()" class="btn btn-primary disabled" role="button">Stop Auto-Annotator</a>		
 	}
 	
 	<br><br>
@@ -55,6 +55,7 @@
     			<a href="@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.moveCSVFile(file_name)" class="btn-xs btn-primary" role="button">Move to Unprocessed Folder</a>
     			<a href="@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.deleteCSVFile(file_name, true)" class="btn-xs btn-primary" role="button">Delete</a>
     			<a href="@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.checkAnnotationLog(file_name)" class="btn-xs btn-primary" role="button">Logs</a>
+    			<a href="@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.downloadCSVFile(file_name, true)" class="btn-xs btn-primary" role="button">Download</a>
     			</td>	
     		</tr>
     	}
@@ -77,6 +78,7 @@
     			<td>
     			<a href="@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.deleteCSVFile(file_name, false)" class="btn-xs btn-primary" role="button">Delete</a>
     			<a href="@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.checkAnnotationLog(file_name)" class="btn-xs btn-primary" role="button">Logs</a>
+    			<a href="@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.downloadCSVFile(file_name, false)" class="btn-xs btn-primary" role="button">Download</a>
     			</td>	
     		</tr>
     	}

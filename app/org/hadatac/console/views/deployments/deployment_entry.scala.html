@@ -4,8 +4,8 @@
 @import org.hadatac.utils._
 
 <tr>
-   <td>@if(deployment.platform != null && deployment.platform.getLabel() != null) { @deployment.platform.getLabel() }</td> 
-   <td>@if(deployment.instrument != null && deployment.instrument.getLabel() != null) { @deployment.instrument.getLabel() @if(deployment.instrument.getSerialNumber() != null) { (SN: @deployment.instrument.getSerialNumber()) }}
+   <td>@if(deployment.getPlatform() != null && deployment.getPlatform().getLabel() != null) { @deployment.getPlatform().getLabel() }</td> 
+   <td>@if(deployment.getInstrument() != null && deployment.getInstrument().getLabel() != null) { @deployment.getInstrument().getLabel() @if(deployment.getInstrument().getSerialNumber() != null) { (SN: @deployment.getInstrument().getSerialNumber()) }}
    </td>
    <td>@if(deployment.getStartedAt() != null) { @deployment.getStartedAt() }</td>
    @if(oper.getCurrent() != State.ACTIVE) {
