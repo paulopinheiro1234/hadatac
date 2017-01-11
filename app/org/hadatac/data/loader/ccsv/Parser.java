@@ -117,10 +117,14 @@ public class Parser {
 		int total_count = 0;
 		int batch_size = 10000;
 		int nTimeStampCol = -1;
+		int nTimeInstantCol = -1;
 		int nIdCol = -1;
 		for(MeasurementType mt : hadatacKb.getDataset().getMeasurementTypes()){
 			if(mt.getTimestampColumn() > -1){
 				nTimeStampCol = mt.getTimestampColumn();
+			}
+			if(mt.getTimeInstantColumn() > -1){
+				nTimeInstantCol = mt.getTimeInstantColumn();
 			}
 			if(mt.getIdColumn() > -1){
 				nIdCol = mt.getIdColumn();
@@ -137,6 +141,9 @@ public class Parser {
 				if (measurementType.getTimestampColumn() > -1) {
 					continue;
 				}
+				if (measurementType.getTimeInstantColumn() > -1) {
+					continue;
+				}
 				if (measurementType.getIdColumn() > -1) {
 					continue;
 				}
@@ -151,14 +158,12 @@ public class Parser {
 				
 				if(nTimeStampCol > -1){
 					String sTime = record.get(nTimeStampCol - 1);
-					if(sTime.contains("E")){
-						int timeStamp = new BigDecimal(sTime).intValue() / 256;
-						Date time = new Date((long)timeStamp * 1000);
-						measurement.setTimestamp(time.toString());
-					}
-					else{
-						measurement.setTimestamp(record.get(nTimeStampCol - 1));
-					}
+					int timeStamp = new BigDecimal(sTime).intValue();
+					Date time = new Date((long)timeStamp * 1000);
+					measurement.setTimestamp(time.toString());
+				}
+				else if(nTimeInstantCol > -1){
+					measurement.setTimestamp(record.get(nTimeInstantCol - 1));
 				}
 				else {
 					measurement.setTimestamp("");
@@ -170,7 +175,7 @@ public class Parser {
 				}
 				else {
 					if(isSubjectPlatform){
-						measurement.setObjectUri(hadatacKb.getDeploymentUri());
+						measurement.setObjectUri(hadatacKb.getDeployment().getPlatform().getUri());
 					}
 					else{
 						measurement.setObjectUri("");

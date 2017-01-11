@@ -46,6 +46,7 @@ import be.objectify.deadbolt.java.actions.Restrict;
 import play.Play;
 import play.mvc.Controller;
 import play.mvc.Result;
+import play.mvc.BodyParser;
 import play.mvc.Http.MultipartFormData;
 import play.mvc.Http.MultipartFormData.FilePart;
 
@@ -480,6 +481,7 @@ public class AutoAnnotator extends Controller {
     }
     
     @Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
+    @BodyParser.Of(value = BodyParser.MultipartFormData.class, maxLength = 300 * 1024)
     public static Result uploadCSVFile(String oper) {
     	System.out.println("uploadCSVFile CALLED!");
     	
@@ -513,6 +515,6 @@ public class AutoAnnotator extends Controller {
         	}
  		}
     	
-    	return index();
+    	return redirect(routes.AutoAnnotator.index());
     }
 }
