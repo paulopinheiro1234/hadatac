@@ -31,6 +31,7 @@ import org.joda.time.format.DateTimeFormatter;
 import org.joda.time.format.ISODateTimeFormat;
 
 import java.util.*;
+import org.hadatac.entity.pojo.User;
 
 /**
  * Initial version based on work by Steve Chaloner (steve@objectify.be) for
@@ -381,7 +382,7 @@ public class SysUser extends AppModel implements Subject {
 		user.save();
 		// user.saveManyToManyAssociations("roles");
 		// user.saveManyToManyAssociations("permissions");
-		org.hadatac.entity.pojo.User userTs =  new org.hadatac.entity.pojo.User();
+		User userTs =  new User();
 		userTs.setName(user.name);
 		userTs.setEmail(user.email);
 		userTs.setUri("http://localhost/users#admin");

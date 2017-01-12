@@ -144,9 +144,8 @@ public class User implements Comparable<User> {
 	}
 	
 	public void getGroupNames(Map<String, String> nameList) {
-		nameList.put(getUri(), getName());
 		if(getImmediateGroupUri() != null) {
-			User user = User.find(getImmediateGroupUri());
+			User user = UserGroup.find(getImmediateGroupUri());
 			if(user != null){
 				if (user.getName() != null) {
 	    			nameList.put(user.getUri(), user.getName());

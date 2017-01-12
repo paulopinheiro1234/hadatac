@@ -96,11 +96,9 @@ public class DataAcquisitionSearch extends Controller {
     	if(null == user){
     		resultSize = Measurement.findSize("Public", handler);
     		results = Measurement.find("Public", page, rows, handler);
-    		System.out.println("Owner Uri: Public");
     	}
     	else{
     		String ownerUri = UserManagement.getUriByEmail(user.email);
-    		System.out.println("Owner Uri: " + ownerUri);
     		resultSize = Measurement.findSize(ownerUri, handler);
     		results = Measurement.find(ownerUri, page, rows, handler);
     	}

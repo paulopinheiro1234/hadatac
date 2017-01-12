@@ -554,11 +554,20 @@ public class DataAcquisition {
 	
 	public static List<String> findAllAccessibleDataAcquisition(String user_uri){
 		List<String> listURI = new ArrayList<String>();
-		User user = User.find(user_uri);
-		if(null == user){
-			return listURI;
+		
+		String group_uri = "";
+		if(user_uri.equals("Public")){
+			group_uri = "Public";
 		}
-		String group_uri = user.getImmediateGroupUri();
+		else{
+			User user = User.find(user_uri);
+			if(null == user){
+				return listURI;
+			}
+			else{
+				group_uri = user.getImmediateGroupUri();
+			}
+		}
 		
 		for(DataAcquisition acquisition : findAll()) {
 			if(acquisition.getPermissionUri().equals("Public")

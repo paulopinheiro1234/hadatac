@@ -53,11 +53,16 @@ public class SetAccessPermission extends Controller {
     		
     		dc = DataAcquisition.findByUri(uri);
     		System.out.println("DC OWNER URI: " + dc.getOwnerUri());
-    		User user = User.find(dc.getOwnerUri());
+    		
     		Map<String, String> nameList = new HashMap<String, String>();
+    		User user = User.find(dc.getOwnerUri());
     		if(null != user){
+    			if(user.getUri() != dc.getPermissionUri()){
+        			nameList.put(user.getUri(), user.getName());
+        		}
     			user.getGroupNames(nameList);
     		}
+    		System.out.println("name list: " + nameList);
     		
             return ok(setAccessPermission.render(dc, nameList));
     	}
