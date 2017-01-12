@@ -289,6 +289,74 @@ public class Measurement {
 		return respSize;
 	}
 	
+	public static AcquisitionQueryResult find(String user_uri, String study_uri, 
+											  String subject_uri, String char_uri) {
+		AcquisitionQueryResult result = new AcquisitionQueryResult();
+		
+		SolrClient solr = new HttpSolrClient(
+				Play.application().configuration().getString("hadatac.solr.data") + "/measurement");
+		SolrQuery query = new SolrQuery();
+		String acquisition_query = "";
+		String facet_query = "";
+		String q = "";
+		
+		List<String> listURI = DataAcquisition.findAllAccessibleDataAcquisition(user_uri);
+		Iterator<String> iter_uri = listURI.iterator();
+		while(iter_uri.hasNext()){
+			String uri = iter_uri.next();
+			acquisition_query += "acquisition_uri" + ":\"" + uri + "\"";
+			if(iter_uri.hasNext()){
+				acquisition_query += " OR ";
+			}
+		}
+		
+		if(!study_uri.equals("")){
+			facet_query += "study_uri" + ":\"" + study_uri + "\"";
+		}
+		if(!subject_uri.equals("")){
+			if(!study_uri.equals("")){
+				facet_query += " AND ";
+			}
+			facet_query += "object_uri" + ":\"" + subject_uri + "\"";
+		}
+		if(!char_uri.equals("")){
+			if(!study_uri.equals("") || !subject_uri.equals("")){
+				facet_query += " AND ";
+			}
+			facet_query += "characteristic_uri" + ":\"" + char_uri + "\"";
+		}
+		
+		if (facet_query.trim().equals("")) {
+			q = acquisition_query;
+		}
+		else {
+			q = "(" + acquisition_query + ") AND (" + facet_query + ")";
+		}
+		
+		System.out.println("QUERY: " + q);
+		query.setQuery(q);
+		query.setFacet(false);
+		
+		try {
+			QueryResponse queryResponse = solr.query(query);
+			solr.close();
+			SolrDocumentList results = queryResponse.getResults();
+			System.out.println("SolrDocumentList: " + results.size());
+			Iterator<SolrDocument> m = results.iterator();
+			while (m.hasNext()) {
+				result.documents.add(convertFromSolr(m.next()));
+			}
+		} catch (SolrServerException e) {
+			System.out.println("[ERROR] Measurement.find(int, int, List<String>, Map<String, String>) - SolrServerException message: " + e.getMessage());
+		} catch (IOException e) {
+			System.out.println("[ERROR] Measurement.find(int, int, List<String>, Map<String, String>) - IOException message: " + e.getMessage());
+		} catch (Exception e) {
+			System.out.println("[ERROR] Measurement.find(int, int, List<String>, Map<String, String>) - Exception message: " + e.getMessage());
+		}
+		
+		return result;
+	}
+	
 	public static AcquisitionQueryResult find(String user_uri, int page, int qtd, FacetHandler handler) {
 		AcquisitionQueryResult result = new AcquisitionQueryResult();
 		
