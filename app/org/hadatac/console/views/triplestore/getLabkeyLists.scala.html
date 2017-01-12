@@ -17,9 +17,7 @@
 			var names = [];
 			@if(instance_data_list_names != null) {
 	        	@for(id <- instance_data_list_names) {
-	        		@if(id != "DataAcquisition") {
-	            		names.push('@id');
-	            	}
+	        		names.push('@id');
 	           }
 	        }
 	        var i;
@@ -48,7 +46,7 @@
             </tbody>
         </table>
         
-        <a href="@org.hadatac.console.controllers.triplestore.routes.LoadKB.playLoadLabkeyDataAcquisition("load", content, folder, instance_data_list_names, labkeyLoginForm)" class="btn btn-warning" role="button">Load Data Acquisition</a>
+        <a href="@org.hadatac.console.controllers.triplestore.routes.LoadKB.playLoadLabkeyDataAcquisition("load", content, folder, instance_data_list_names, labkeyLoginForm)" class="btn btn-primary" role="button">Load Data Acquisition</a>
         }
         
         @if(metadata_list_names != null){
@@ -85,13 +83,11 @@
 	            </thead>
 	            <tbody>
 	              @for(list_name <- instance_data_list_names){
-	              	  @if(list_name != "DataAcquisition"){
-	              	  	  @labkeyList_entry(labkeyLoginForm, folder, list_name)
-	              	  } 
+	              		@labkeyList_entry(labkeyLoginForm, folder, list_name) 
 	              }
 	            </tbody>
 	        </table>
-	        <input class="btn btn-success" role="button" id="submitbutton" type="submit" value="Batch Loading Selected Instance Data" />
+	        <input class="btn btn-primary" role="button" id="submitbutton" type="submit" value="Batch Loading Selected Instance Data" />
 	        <a href="@org.hadatac.console.controllers.triplestore.routes.LoadKB.playLoadLabkeyFolders("load", labkeyLoginForm, content)" class="btn btn-primary" role="button">Back</a>
         </form>
 		}
