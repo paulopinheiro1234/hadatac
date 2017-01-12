@@ -473,7 +473,7 @@ public class DynamicMetadataGeneration extends Controller {
 				"        switch (tabName){\n" ;
 		
 		for(Map.Entry<String, String> entry : indicatorMapSorted.entrySet()){
-			String indicatorValue = entry.getValue().toString().replaceAll(" ", "").replaceAll(",", "");
+			//String indicatorValue = entry.getValue().toString().replaceAll(" ", "").replaceAll(",", "");
 			String indicatorType = entry.getKey().toString();
 			for (Map.Entry<String, String> prefixes : prefixMap.entrySet()){
 				if (indicatorType.contains(prefixes.getValue())){
