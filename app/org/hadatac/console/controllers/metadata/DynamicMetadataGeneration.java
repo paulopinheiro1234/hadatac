@@ -39,6 +39,7 @@ import org.hadatac.console.views.html.metadata.*;
 import org.hadatac.console.views.html.metadataacquisition.*;
 import org.hadatac.metadata.loader.*;
 import org.hadatac.utils.Collections;
+import org.hadatac.utils.NameSpaces;
 import org.json.simple.JSONObject;
 import org.labkey.remoteapi.query.*;
 import org.labkey.remoteapi.CommandException;
@@ -47,6 +48,7 @@ import org.labkey.remoteapi.Connection;
 public class DynamicMetadataGeneration extends Controller {
 	
 	public static void renderNavigationHTML(Map<String,String> indicatorMap){
+		String prefixString = NameSpaces.getInstance().printSparqlNameSpaceList().replaceAll("\n", " ");
 		for(Map.Entry<String, String> entry : indicatorMap.entrySet()){
 			String fileName = Play.application().configuration().getString("hadatac.console.host_deploy_location") + "/app/org/hadatac/console/views/metadata/" + entry.getValue().toString().toLowerCase().replaceAll(" ", "_") + "_navigation.scala.html";
 			String metadataNavigationString = "@(selection : String)\n\n" +
@@ -56,7 +58,8 @@ public class DynamicMetadataGeneration extends Controller {
 					"            <button type=\"button\" class=\"btn btn-link\"><b>" + entry.getValue().toString() + "</b></button>\n" +
 					"        </div>\n" ;
 		    String indicatorType = entry.getKey().toString().replaceAll("http://hadatac.org/ont/chear#","chear:").replaceAll("http://hadatac.org/ont/case#","case:").replaceAll("http://hadatac.org/kb/chear#","chear-kb:");
-		    String indvIndicatorQuery = "PREFIX rdfs:<http://www.w3.org/2000/01/rdf-schema#> PREFIX chear: <http://hadatac.org/ont/chear#> PREFIX case: <http://hadatac.org/ont/case#>PREFIX hasco: <http://hadatac.org/ont/hasco/>PREFIX hasneto: <http://hadatac.org/ont/hasneto#>SELECT DISTINCT ?indicator " +
+		    //String indvIndicatorQuery = "PREFIX rdfs:<http://www.w3.org/2000/01/rdf-schema#> PREFIX chear: <http://hadatac.org/ont/chear#> PREFIX case: <http://hadatac.org/ont/case#>PREFIX hasco: <http://hadatac.org/ont/hasco/>PREFIX hasneto: <http://hadatac.org/ont/hasneto#>SELECT DISTINCT ?indicator " +
+		    String indvIndicatorQuery = prefixString + "SELECT DISTINCT ?indicator " +
 					"(MIN(?label_) AS ?label)" +
 					"WHERE { ?indicator rdfs:subClassOf " + indicatorType + " . " +
 					"?indicator rdfs:label ?label_ . " + 
@@ -189,7 +192,9 @@ public class DynamicMetadataGeneration extends Controller {
 	}
 	
 	public static Map<String, String> getIndicatorTypes(){
-		String indicatorQuery="PREFIX rdfs:<http://www.w3.org/2000/01/rdf-schema#> PREFIX chear: <http://hadatac.org/ont/chear#>SELECT DISTINCT ?indicatorType ?label ?comment WHERE { ?indicatorType rdfs:subClassOf chear:Indicator . ?indicatorType rdfs:label ?label . }";
+		String prefixString = NameSpaces.getInstance().printSparqlNameSpaceList().replaceAll("\n", " ");
+		//String indicatorQuery="PREFIX rdfs:<http://www.w3.org/2000/01/rdf-schema#> PREFIX chear: <http://hadatac.org/ont/chear#>SELECT DISTINCT ?indicatorType ?label ?comment WHERE { ?indicatorType rdfs:subClassOf chear:Indicator . ?indicatorType rdfs:label ?label . }";
+		String indicatorQuery=prefixString + "SELECT DISTINCT ?indicatorType ?label ?comment WHERE { ?indicatorType rdfs:subClassOf chear:Indicator . ?indicatorType rdfs:label ?label . }";
 		QueryExecution qexecInd = QueryExecutionFactory.sparqlService(Collections.getCollectionsName(Collections.METADATA_SPARQL), indicatorQuery);
 		ResultSet indicatorResults = qexecInd.execSelect();
 		ResultSetRewindable resultsrwIndc = ResultSetFactory.copyResults(indicatorResults);
@@ -208,13 +213,15 @@ public class DynamicMetadataGeneration extends Controller {
 	}
 	
 	public static Map<String, String> getIndicatorValues(Map<String, String> indicatorMap){
+		String prefixString = NameSpaces.getInstance().printSparqlNameSpaceList().replaceAll("\n", " ");
 		Map<String, String> indicatorValueMap = new HashMap<String, String>();
 		String indicatorValueLabel = "";
 		for(Map.Entry<String, String> entry : indicatorMap.entrySet()){
 		    //System.out.println("Key : " + entry.getKey() + " and Value: " + entry.getValue() + "\n");
 		    String indicatorType = entry.getKey().toString().replaceAll("http://hadatac.org/ont/chear#","chear:").replaceAll("http://hadatac.org/ont/case#","case:").replaceAll("http://hadatac.org/kb/chear#","chear-kb:");
 		    //System.out.println("Indicator Type: " + indicatorType + "\n");
-		    String indvIndicatorQuery = "PREFIX rdfs:<http://www.w3.org/2000/01/rdf-schema#> PREFIX chear: <http://hadatac.org/ont/chear#> PREFIX case: <http://hadatac.org/ont/case#>PREFIX hasco: <http://hadatac.org/ont/hasco/>PREFIX hasneto: <http://hadatac.org/ont/hasneto#>SELECT DISTINCT ?indicator " +
+		    //String indvIndicatorQuery = "PREFIX rdfs:<http://www.w3.org/2000/01/rdf-schema#> PREFIX chear: <http://hadatac.org/ont/chear#> PREFIX case: <http://hadatac.org/ont/case#>PREFIX hasco: <http://hadatac.org/ont/hasco/>PREFIX hasneto: <http://hadatac.org/ont/hasneto#>SELECT DISTINCT ?indicator " +
+		    String indvIndicatorQuery = prefixString + "SELECT DISTINCT ?indicator " +
 					"(MIN(?label_) AS ?label)" +
 					"WHERE { ?indicator rdfs:subClassOf " + indicatorType + " . " +
 					"?indicator rdfs:label ?label_ . " + 
@@ -239,6 +246,7 @@ public class DynamicMetadataGeneration extends Controller {
 	}
 	
 	public static void renderMetadataBrowserHTML(Map<String, String> indicatorMap){
+		String prefixString = NameSpaces.getInstance().printSparqlNameSpaceList().replaceAll("\n", " ");
 		String metadataBrowserHTMLString="@( results : org.hadatac.console.models.OtMSparqlQueryResults, category : String)\n\n" +
 				"@*****************************\n" +
 				"    public TreeMap<String,OtMTripleDocument> results.sparqlResults\n;" +
@@ -253,7 +261,8 @@ public class DynamicMetadataGeneration extends Controller {
 		    //System.out.println("Key : " + entry.getKey() + " and Value: " + entry.getValue() + "\n");
 		    String indicatorType = entry.getKey().toString().replaceAll("http://hadatac.org/ont/chear#","chear:").replaceAll("http://hadatac.org/ont/case#","case:").replaceAll("http://hadatac.org/kb/chear#","chear-kb:");
 		    //System.out.println("Indicator Type: " + indicatorType + "\n");
-		    String indvIndicatorQuery = "PREFIX rdfs:<http://www.w3.org/2000/01/rdf-schema#> PREFIX chear: <http://hadatac.org/ont/chear#> PREFIX case: <http://hadatac.org/ont/case#>PREFIX hasco: <http://hadatac.org/ont/hasco/>PREFIX hasneto: <http://hadatac.org/ont/hasneto#>SELECT DISTINCT ?indicator " +
+		    //String indvIndicatorQuery = "PREFIX rdfs:<http://www.w3.org/2000/01/rdf-schema#> PREFIX chear: <http://hadatac.org/ont/chear#> PREFIX case: <http://hadatac.org/ont/case#>PREFIX hasco: <http://hadatac.org/ont/hasco/>PREFIX hasneto: <http://hadatac.org/ont/hasneto#>SELECT DISTINCT ?indicator " +
+		    String indvIndicatorQuery = prefixString + "SELECT DISTINCT ?indicator " +
 					"(MIN(?label_) AS ?label)" +
 					"WHERE { ?indicator rdfs:subClassOf " + indicatorType + " . " +
 					"?indicator rdfs:label ?label_ . " + 
@@ -355,7 +364,8 @@ public class DynamicMetadataGeneration extends Controller {
 	}
 	
 	public static void renderSPARQLPage(){
-		String prefixString="PREFIX owl: <http://www.w3.org/2002/07/owl#> PREFIX obo: <http://geneontology.org/GO.format.obo-1_2.shtml#> PREFIX sio: <http://semanticscience.org/resource/> PREFIX chear: <http://hadatac.org/ont/chear#> PREFIX prov: <http://www.w3.org/ns/prov#> PREFIX hasco: <http://hadatac.org/ont/hasco/> PREFIX hasneto: <http://hadatac.org/ont/hasneto#> PREFIX dcterms: <http://purl.org/dc/terms/> PREFIX rdfs:<http://www.w3.org/2000/01/rdf-schema#> PREFIX skos: <http://www.w3.org/2004/02/skos/core#> PREFIX foaf:<http://xmlns.com/foaf/0.1/> PREFIX vstoi: <http://hadatac.org/ont/vstoi#>";
+		String prefixString = NameSpaces.getInstance().printSparqlNameSpaceList().replaceAll("\n", " ");
+//		String prefixString="PREFIX owl: <http://www.w3.org/2002/07/owl#> PREFIX obo: <http://geneontology.org/GO.format.obo-1_2.shtml#> PREFIX sio: <http://semanticscience.org/resource/> PREFIX chear: <http://hadatac.org/ont/chear#> PREFIX prov: <http://www.w3.org/ns/prov#> PREFIX hasco: <http://hadatac.org/ont/hasco/> PREFIX hasneto: <http://hadatac.org/ont/hasneto#> PREFIX dcterms: <http://purl.org/dc/terms/> PREFIX rdfs:<http://www.w3.org/2000/01/rdf-schema#> PREFIX skos: <http://www.w3.org/2004/02/skos/core#> PREFIX foaf:<http://xmlns.com/foaf/0.1/> PREFIX vstoi: <http://hadatac.org/ont/vstoi#>";
 		String importString="import java.io.IOException;\n" +
 				"import java.io.StringWriter;\n" +
 				"import java.io.UnsupportedEncodingException;\n" +

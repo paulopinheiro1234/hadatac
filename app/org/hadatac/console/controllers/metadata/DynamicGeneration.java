@@ -30,28 +30,19 @@ import org.hadatac.console.views.html.metadata.*;
 import org.hadatac.console.views.html.metadataacquisition.*;
 import org.hadatac.metadata.loader.*;
 import org.hadatac.utils.Collections;
+import org.hadatac.utils.NameSpaces;
 import org.json.simple.JSONObject;
 import org.labkey.remoteapi.query.*;
 import org.labkey.remoteapi.CommandException;
 import org.labkey.remoteapi.Connection;
 
+import org.hadatac.console.controllers.metadata.DynamicFunctions;
+
 public class DynamicGeneration extends Controller {
-	
-//	public static Map<String, String> findBasic(String study_uri) {
+
 	public static Map<String, List<String>> generateStudy(GeneratedStrings generatedStringsObject) {
-		String prefixString="PREFIX sio: <http://semanticscience.org/resource/> " + 
-//				"PREFIX chear: <http://hadatac.org/ont/chear#> " +
-//				"PREFIX chear-kb: <http://hadatac.org/kb/chear#> " +
-//				"PREFIX case: <http://hadatac.org/ont/case#> " +
-//				"PREFIX case-kb: <http://hadatac.org/kb/case#> " +
-				"PREFIX prov: <http://www.w3.org/ns/prov#> " +
-				"PREFIX hasco: <http://hadatac.org/ont/hasco/> " +
-				"PREFIX hasneto: <http://hadatac.org/ont/hasneto#> " +
-				"PREFIX dcterms: <http://purl.org/dc/terms/> " +
-				"PREFIX rdfs:<http://www.w3.org/2000/01/rdf-schema#> " +
-				"PREFIX skos: <http://www.w3.org/2004/02/skos/core#> " +
-				"PREFIX foaf: <http://xmlns.com/foaf/0.1/> ";
-		
+
+		String prefixString = NameSpaces.getInstance().printSparqlNameSpaceList().replaceAll("\n", " ");
 		String initStudyQuery="SELECT DISTINCT ?studyUri ?studyLabel ?proj ?studyTitle ?studyComment " +
 				"(group_concat( ?agentName_ ; separator = ' & ') as ?agentName) " +
 				"?institutionName  " +
@@ -98,10 +89,17 @@ public class DynamicGeneration extends Controller {
 				initStudyValues.add("Institution: " + soln.get("institutionName").toString());
 			}
 			initStudyMap.put(soln.get("studyUri").toString(),initStudyValues);
-			
+//			String studyUriString = soln.get("studyUri").toString().replaceAll("http://hadatac.org/ont/chear#","chear:").replaceAll("http://hadatac.org/ont/case#","case:").replaceAll("http://hadatac.org/kb/chear#","chear-kb:").replaceAll("http://hadatac.org/kb/case#","case-kb:");
+			String studyUriString = soln.get("studyUri").toString();
+			Map<String,String> prefixMap = DynamicFunctions.getPrefixMap();
+			for (Map.Entry<String, String> prefixes : prefixMap.entrySet()){
+				if (studyUriString.contains(prefixes.getValue())){
+					studyUriString = studyUriString.replaceAll(prefixes.getValue(), prefixes.getKey()+":");
+				}
+			}
 			initStudyJson=initStudyJson + ",\n\"add\":\n\t{\n\t\"doc\":\n\t\t{\n";
 			initStudyJson=initStudyJson + "\t\t\"studyUri\": \"" + soln.get("studyUri").toString() + "\" ,\n";
-			initStudyJson=initStudyJson + "\t\t\"studyLabel\": \"<a href=\\\""+ Play.application().configuration().getString("hadatac.console.host_deploy") + "/hadatac/metadataacquisitions/viewStudy?study_uri=" + soln.get("studyUri").toString().replaceAll("http://hadatac.org/ont/chear#","chear:").replaceAll("http://hadatac.org/ont/case#","case:").replaceAll("http://hadatac.org/kb/chear#","chear-kb:").replaceAll("http://hadatac.org/kb/case#","case-kb:") + "\\\">" + soln.get("studyLabel").toString() + "</a>\" ,\n";
+			initStudyJson=initStudyJson + "\t\t\"studyLabel\": \"<a href=\\\""+ Play.application().configuration().getString("hadatac.console.host_deploy") + "/hadatac/metadataacquisitions/viewStudy?study_uri=" + studyUriString + "\\\">" + soln.get("studyLabel").toString() + "</a>\" ,\n";
 			initStudyJson=initStudyJson + "\t\t\"studyTitle\": \"" + soln.get("studyTitle").toString() + "\" ,\n";
 			initStudyJson=initStudyJson + "\t\t\"proj\": \"" + soln.get("proj").toString() + "\" ,\n";
 			initStudyJson=initStudyJson + "\t\t\"studyComment\": \"" + soln.get("studyComment").toString() + "\" ,\n";
@@ -111,8 +109,8 @@ public class DynamicGeneration extends Controller {
 		}
 		initStudyJson=initStudyJson + "\n}" ;
 		//System.out.println(initStudyJson);
-		
-		String indicatorQuery="PREFIX rdfs:<http://www.w3.org/2000/01/rdf-schema#> PREFIX chear: <http://hadatac.org/ont/chear#>SELECT ?studyIndicator ?label ?comment WHERE { ?studyIndicator rdfs:subClassOf chear:StudyIndicator . ?studyIndicator rdfs:label ?label . OPTIONAL { ?studyIndicator rdfs:comment ?comment } . }";
+//		String indicatorQuery="PREFIX rdfs:<http://www.w3.org/2000/01/rdf-schema#> PREFIX chear: <http://hadatac.org/ont/chear#>SELECT ?studyIndicator ?label ?comment WHERE { ?studyIndicator rdfs:subClassOf chear:StudyIndicator . ?studyIndicator rdfs:label ?label . OPTIONAL { ?studyIndicator rdfs:comment ?comment } . }";
+		String indicatorQuery=prefixString + "SELECT ?studyIndicator ?label ?comment WHERE { ?studyIndicator rdfs:subClassOf chear:StudyIndicator . ?studyIndicator rdfs:label ?label . OPTIONAL { ?studyIndicator rdfs:comment ?comment } . }";
 		QueryExecution qexecInd = QueryExecutionFactory.sparqlService(Collections.getCollectionsName(Collections.METADATA_SPARQL), indicatorQuery);
 		ResultSet indicatorResults = qexecInd.execSelect();
 		ResultSetRewindable resultsrwIndc = ResultSetFactory.copyResults(indicatorResults);
@@ -127,7 +125,8 @@ public class DynamicGeneration extends Controller {
 		}
 		Map<String, String> indicatorMapSorted = new TreeMap<String, String>(indicatorMap);
 		//System.out.println("Indicators: " + indicatorMapSorted);
-		String analyteQuery="PREFIX rdfs:<http://www.w3.org/2000/01/rdf-schema#> PREFIX chear: <http://hadatac.org/ont/chear#>SELECT ?analyteIndicator ?label ?comment WHERE { ?analyteIndicator rdfs:subClassOf chear:TargetedAnalyte . OPTIONAL{ ?analyteIndicator rdfs:label ?label } . OPTIONAL { ?analyteIndicator rdfs:comment ?comment } . }";
+		//String analyteQuery="PREFIX rdfs:<http://www.w3.org/2000/01/rdf-schema#> PREFIX chear: <http://hadatac.org/ont/chear#>SELECT ?analyteIndicator ?label ?comment WHERE { ?analyteIndicator rdfs:subClassOf chear:TargetedAnalyte . OPTIONAL{ ?analyteIndicator rdfs:label ?label } . OPTIONAL { ?analyteIndicator rdfs:comment ?comment } . }";
+		String analyteQuery=prefixString + "SELECT ?analyteIndicator ?label ?comment WHERE { ?analyteIndicator rdfs:subClassOf chear:TargetedAnalyte . OPTIONAL{ ?analyteIndicator rdfs:label ?label } . OPTIONAL { ?analyteIndicator rdfs:comment ?comment } . }";
 		QueryExecution qexecAnalyte = QueryExecutionFactory.sparqlService(Collections.getCollectionsName(Collections.METADATA_SPARQL), analyteQuery);
 		ResultSet analyteResults = qexecAnalyte.execSelect();
 		ResultSetRewindable resultsrwAnalyte = ResultSetFactory.copyResults(analyteResults);
@@ -212,12 +211,18 @@ public class DynamicGeneration extends Controller {
 		    facetPageString=facetPageString + "        {'field': '" + label + "', 'display': '" + entry.getValue().toString() + "'},\n";
 			facetSearchSortString=facetSearchSortString + ",{'display':'" + entry.getValue().toString() + "','field':'" + label + ".exact'}" ;
 			schemaString=schemaString + "    <field name=\"" + label + "\" type=\"string\" indexed=\"true\" docValues=\"true\" multiValued=\"true\"  />\n" ;
-
-			String indvIndicatorQuery = "PREFIX rdfs:<http://www.w3.org/2000/01/rdf-schema#> PREFIX chear: <http://hadatac.org/ont/chear#> PREFIX case: <http://hadatac.org/ont/case#>PREFIX hasco: <http://hadatac.org/ont/hasco/>PREFIX hasneto: <http://hadatac.org/ont/hasneto#>SELECT DISTINCT ?studyUri " +
+			String studyUriString = entry.getKey().toString();
+			Map<String,String> prefixMap = DynamicFunctions.getPrefixMap();
+			for (Map.Entry<String, String> prefixes : prefixMap.entrySet()){
+				if (studyUriString.contains(prefixes.getValue())){
+					studyUriString = studyUriString.replaceAll(prefixes.getValue(), prefixes.getKey()+":");
+				}
+			}
+			String indvIndicatorQuery = prefixString + "SELECT DISTINCT ?studyUri " +			
 					"?" + label + " " +
 					"WHERE { ?schemaUri hasco:isSchemaOf ?studyUri . ?schemaAttribute hasneto:partOfSchema ?schemaUri . ?schemaAttribute hasneto:hasAttribute " +
 					"?" + entry.getValue().toString().replaceAll(" ", "").replaceAll(",", "") +
-					" . ?" + entry.getValue().toString().replaceAll(" ", "").replaceAll(",", "") + " rdfs:subClassOf+ " + entry.getKey().toString().replaceAll("http://hadatac.org/ont/chear#","chear:").replaceAll("http://hadatac.org/ont/case#","case:").replaceAll("http://hadatac.org/kb/chear#","chear-kb:") + 
+					" . ?" + entry.getValue().toString().replaceAll(" ", "").replaceAll(",", "") + " rdfs:subClassOf+ " + studyUriString + 
 					" . ?" + entry.getValue().toString().replaceAll(" ", "").replaceAll(",", "") + " rdfs:label ?" + label + " . " +
 					"}";
 			//System.out.println(indvIndicatorQuery + "\n");
@@ -249,12 +254,18 @@ public class DynamicGeneration extends Controller {
 		    analyteFacetPageString=analyteFacetPageString + "        {'field': '" + label + "', 'display': '" + entry.getValue().toString() + "'},\n";
 			analyteSearchSortString=analyteSearchSortString + ",{'display':'" + entry.getValue().toString() + "','field':'" + label + ".exact'}" ;
 		    analyteSchemaString=analyteSchemaString + "    <field name=\"" + label + "\" type=\"string\" indexed=\"true\" docValues=\"true\" multiValued=\"true\"  />\n" ;
-
-			String indvAnalyteQuery = "PREFIX rdfs:<http://www.w3.org/2000/01/rdf-schema#> PREFIX chear: <http://hadatac.org/ont/chear#> PREFIX case: <http://hadatac.org/ont/case#>PREFIX hasco: <http://hadatac.org/ont/hasco/>PREFIX hasneto: <http://hadatac.org/ont/hasneto#>PREFIX chebi: <http://purl.obolibrary.org/obo/CHEBI_>SELECT DISTINCT ?studyUri " +
+		    String analyteUriString = entry.getKey().toString();
+			Map<String,String> prefixMap = DynamicFunctions.getPrefixMap();
+			for (Map.Entry<String, String> prefixes : prefixMap.entrySet()){
+				if (analyteUriString.contains(prefixes.getValue())){
+					analyteUriString = analyteUriString.replaceAll(prefixes.getValue(), prefixes.getKey()+":");
+				}
+			}
+			String indvAnalyteQuery = prefixString + "SELECT DISTINCT ?studyUri " +
 					"?" + label + " " +
 					"WHERE { ?schemaUri hasco:isSchemaOf ?studyUri . ?schemaAttribute hasneto:partOfSchema ?schemaUri . ?schemaAttribute hasneto:hasAttribute " +
 					"?" + entry.getValue().toString().replaceAll(" ", "").replaceAll(",", "") +
-					" . ?" + entry.getValue().toString().replaceAll(" ", "").replaceAll(",", "") + " rdfs:subClassOf+ " + entry.getKey().toString().replaceAll("http://hadatac.org/ont/chear#","chear:").replaceAll("http://hadatac.org/ont/case#","case:").replaceAll("http://hadatac.org/kb/chear#","chear-kb:").replaceAll("http://purl.obolibrary.org/obo/CHEBI_", "chebi:") + 
+					" . ?" + entry.getValue().toString().replaceAll(" ", "").replaceAll(",", "") + " rdfs:subClassOf+ " + analyteUriString + 
 					" . ?" + entry.getValue().toString().replaceAll(" ", "").replaceAll(",", "") + " rdfs:label ?" + label + " . " +
 					"}";
 			//System.out.println(indvAnalyteQuery + "\n");
@@ -651,19 +662,10 @@ public class DynamicGeneration extends Controller {
 	
 	public static Map<String, List<String>> findSubject() {
 
-		String subjectQueryString = "";
+		String prefixString = NameSpaces.getInstance().printSparqlNameSpaceList().replaceAll("\n", " ");
 		
-    	subjectQueryString = 
-    	"PREFIX sio: <http://semanticscience.org/resource/>" + 
-    	"PREFIX chear: <http://hadatac.org/ont/chear#>" + 
-    	"PREFIX chear-kb: <http://hadatac.org/kb/chear#>" + 
-    	"PREFIX prov: <http://www.w3.org/ns/prov#>" + 
-    	"PREFIX hasco: <http://hadatac.org/ont/hasco/>" + 
-    	"PREFIX hasneto: <http://hadatac.org/ont/hasneto#>" + 
-    	"PREFIX dcterms: <http://purl.org/dc/terms/>" + 
-    	"PREFIX rdfs:<http://www.w3.org/2000/01/rdf-schema#>" + 
-    	"PREFIX skos: <http://www.w3.org/2004/02/skos/core#>" +
-    	"PREFIX foaf: <http://xmlns.com/foaf/0.1/>" + 
+		String subjectQueryString = "";
+		subjectQueryString = prefixString +
     	"SELECT ?subjectUri ?subjectType ?subjectLabel ?cohort ?study " +
     	"			 WHERE {        ?subjectUri hasco:isSubjectOf* ?cohort . " +
     	"			        		?cohort hasco:isCohortOf ?study . " +
