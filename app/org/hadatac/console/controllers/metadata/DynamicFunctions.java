@@ -169,6 +169,7 @@ public class DynamicFunctions extends Controller {
 		return indicatorValueMap;
 	}	
 	
+	// Find Samples functions need to be editted to include full information, as is done in ViewSample code
 	public static Map<String, Map<String,String>> findSample(String subject_uri) {
 		String sampleQueryString = "";		
     	sampleQueryString = getPrefixes() +
@@ -257,6 +258,101 @@ public class DynamicFunctions extends Controller {
 		return sampleResult;
 	}
 	
+	public static Map<String, Map<String,String>> findStudy(String study_uri) {
+		String studyQueryString = "";
+		studyQueryString = getPrefixes() +
+		"SELECT ?studyUri ?studyLabel ?proj ?studyDef ?studyComment ?agentName ?institutionName " + 
+		" WHERE {        ?subUri rdfs:subClassOf hasco:Study . " + 
+		"                       ?studyUri a ?subUri . " + 
+		"           ?studyUri rdfs:label ?studyLabel  . " + 
+		"			FILTER ( ?studyUri = " + study_uri + " ) . " +
+		"		 OPTIONAL {?studyUri hasco:hasProject ?proj} . " +
+		"        OPTIONAL { ?studyUri skos:definition ?studyDef } . " + 
+		"        OPTIONAL { ?studyUri rdfs:comment ?studyComment } . " + 
+		"        OPTIONAL { ?studyUri hasco:hasAgent ?agent . " + 
+		"                                   ?agent foaf:name ?agentName } . " + 
+		"        OPTIONAL { ?studyUri hasco:hasInstitution ?institution . " + 
+		"                                 ?institution foaf:name ?institutionName} . " + 
+		"                             }" ;
+     
+		Query studyQuery = QueryFactory.create(studyQueryString);
+		
+		QueryExecution qexec = QueryExecutionFactory.sparqlService(Collections.getCollectionsName(Collections.METADATA_SPARQL), studyQuery);
+		ResultSet results = qexec.execSelect();
+		ResultSetRewindable resultsrw = ResultSetFactory.copyResults(results);
+		qexec.close();
+
+		Map<String, Map<String,String>> studyResult = new HashMap<String, Map<String,String>>();
+		Map<String,String> values = new HashMap<String, String>();
+		
+		while (resultsrw.hasNext()) {
+			QuerySolution soln = resultsrw.next();
+			values = new HashMap<String, String>();
+			if (soln.contains("studyLabel"))
+				values.put("Label" , soln.get("studyLabel").toString());
+			if (soln.contains("studyDef"))
+				values.put("Title" , soln.get("studyDef").toString());
+			if (soln.contains("proj"))
+				values.put("Project" , replaceURLWithPrefix(soln.get("proj").toString()));
+			if (soln.contains("studyComment"))
+				values.put("Comment" , soln.get("studyComment").toString());
+			if (soln.contains("agentName"))
+				values.put("Agents" , soln.get("agentName").toString());
+			if (soln.contains("institutionName"))
+				values.put("Institution" , soln.get("institutionName").toString());
+			studyResult.put(replaceURLWithPrefix(soln.get("studyUri").toString()),values);
+			
+		}
+		return studyResult;
+	}
+	
+	public static Map<String, Map<String,String>> findStudies() {
+		String studyQueryString = "";
+		studyQueryString = getPrefixes() +
+		"SELECT ?studyUri ?studyLabel ?proj ?studyDef ?studyComment ?agentName ?institutionName " + 
+		" WHERE {        ?subUri rdfs:subClassOf hasco:Study . " + 
+		"                       ?studyUri a ?subUri . " + 
+		"           ?studyUri rdfs:label ?studyLabel  . " + 
+		"		 OPTIONAL {?studyUri hasco:hasProject ?proj} . " +
+		"        OPTIONAL { ?studyUri skos:definition ?studyDef } . " + 
+		"        OPTIONAL { ?studyUri rdfs:comment ?studyComment } . " + 
+		"        OPTIONAL { ?studyUri hasco:hasAgent ?agent . " + 
+		"                                   ?agent foaf:name ?agentName } . " + 
+		"        OPTIONAL { ?studyUri hasco:hasInstitution ?institution . " + 
+		"                                 ?institution foaf:name ?institutionName} . " + 
+		"                             }" ;
+     
+		Query studyQuery = QueryFactory.create(studyQueryString);
+		
+		QueryExecution qexec = QueryExecutionFactory.sparqlService(Collections.getCollectionsName(Collections.METADATA_SPARQL), studyQuery);
+		ResultSet results = qexec.execSelect();
+		ResultSetRewindable resultsrw = ResultSetFactory.copyResults(results);
+		qexec.close();
+
+		Map<String, Map<String,String>> studyResult = new HashMap<String, Map<String,String>>();
+		Map<String,String> values = new HashMap<String, String>();
+		
+		while (resultsrw.hasNext()) {
+			QuerySolution soln = resultsrw.next();
+			values = new HashMap<String, String>();
+			if (soln.contains("studyLabel"))
+				values.put("Label" , soln.get("studyLabel").toString());
+			if (soln.contains("studyDef"))
+				values.put("Title" , soln.get("studyDef").toString());
+			if (soln.contains("proj"))
+				values.put("Project" , replaceURLWithPrefix(soln.get("proj").toString()));
+			if (soln.contains("studyComment"))
+				values.put("Comment" , soln.get("studyComment").toString());
+			if (soln.contains("agentName"))
+				values.put("Agents" , soln.get("agentName").toString());
+			if (soln.contains("institutionName"))
+				values.put("Institution" , soln.get("institutionName").toString());
+			studyResult.put(replaceURLWithPrefix(soln.get("studyUri").toString()),values);
+			
+		}
+		return studyResult;
+	}
+	
 	// for /metadata HTTP GET requests
     public static Result index() {
     	Map<String,String> indicators = getIndicatorTypes();
@@ -269,6 +365,8 @@ public class DynamicFunctions extends Controller {
     	System.out.println(replaceURLWithPrefix("http://hadatac.org/ont/chear#BloodPlasma"));
     	System.out.println(replacePrefixWithURL("chear-kb:SBJ-0032-Pilot-6"));
     	System.out.println(findSamples());
+    	System.out.println(findStudy("chear-kb:STD-Pilot-3"));
+    	System.out.println(findStudies());
         return ok();        
     }// /index()
 
