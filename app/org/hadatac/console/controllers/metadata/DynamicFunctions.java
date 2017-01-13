@@ -55,51 +55,29 @@ public class DynamicFunctions extends Controller {
 		return prefixMap;
 	}
 	
-	public static Map<String, Map<String,String>> getIndicatorValuesAndLabels(Map<String, String> indicatorMap){
-		String prefixString = getPrefixes();
+	public static String replaceURLWithPrefix(String label){
 		Map<String,String> prefixMap = getPrefixMap();
-		Map<String, Map<String,String>> indicatorValueMap = new HashMap<String, Map<String,String>>();
-		Map<String,String> values = new HashMap<String, String>();
-		String indicatorValue = "";
-		String indicatorValueLabel = "";
-		for(Map.Entry<String, String> entry : indicatorMap.entrySet()){
-			values = new HashMap<String, String>();
-		    String indicatorType = entry.getKey().toString();
-		    String indvIndicatorQuery = prefixString + "SELECT DISTINCT ?indicator " +
-					"(MIN(?label_) AS ?label)" +
-					"WHERE { ?indicator rdfs:subClassOf " + indicatorType + " . " +
-					"?indicator rdfs:label ?label_ . " + 
-					"} GROUP BY ?indicator ?label";
-
-		    QueryExecution qexecIndvInd = QueryExecutionFactory.sparqlService(Collections.getCollectionsName(Collections.METADATA_SPARQL), indvIndicatorQuery);
-			ResultSet indvIndResults = qexecIndvInd.execSelect();
-			ResultSetRewindable resultsrwIndvInd = ResultSetFactory.copyResults(indvIndResults);
-			qexecIndvInd.close();
-			while (resultsrwIndvInd.hasNext()) {
-				QuerySolution soln = resultsrwIndvInd.next();
-				if (soln.contains("label")){
-					indicatorValue = soln.get("indicator").toString();
-					indicatorValueLabel = soln.get("label").toString();
-					for (Map.Entry<String, String> prefixes : prefixMap.entrySet()){
-						if (indicatorValue.contains(prefixes.getValue())){
-							indicatorValue = indicatorValue.replaceAll(prefixes.getValue(), prefixes.getKey() + ":");
-						}
-					}
-					values.put(indicatorValue,indicatorValueLabel);
-				}
-				else {
-					System.out.println("getIndicatorValues() No Label: " + soln.toString() + "\n");
-				}
+		for (Map.Entry<String, String> prefixes : prefixMap.entrySet()){
+//			System.out.println("Prefix Values: " + prefixes.getValue() + "\n");
+			if (label.contains(prefixes.getValue())){
+				label = label.replaceAll(prefixes.getValue(), prefixes.getKey() + ":");
 			}
-			indicatorValueMap.put(indicatorType,values);
 		}
-		return indicatorValueMap;
+		return label;
+	}
+	
+	public static String replacePrefixWithURL(String label){
+		Map<String,String> prefixMap = getPrefixMap();
+		for (Map.Entry<String, String> prefixes : prefixMap.entrySet()){
+			if (label.contains(prefixes.getKey() + ":")){
+				label = label.replaceAll(prefixes.getKey() + ":", prefixes.getValue());
+			}
+		}
+		return label;
 	}
 	
 	public static Map<String, String> getIndicatorTypes(){
-		String prefixString = getPrefixes();
-		Map<String,String> prefixMap = getPrefixMap();
-		String indicatorQuery=prefixString + "SELECT DISTINCT ?indicatorType ?label ?comment WHERE { ?indicatorType rdfs:subClassOf chear:Indicator . ?indicatorType rdfs:label ?label . }";
+		String indicatorQuery= getPrefixes() + "SELECT DISTINCT ?indicatorType ?label ?comment WHERE { ?indicatorType rdfs:subClassOf chear:Indicator . ?indicatorType rdfs:label ?label . }";
 		QueryExecution qexecInd = QueryExecutionFactory.sparqlService(Collections.getCollectionsName(Collections.METADATA_SPARQL), indicatorQuery);
 		ResultSet indicatorResults = qexecInd.execSelect();
 		ResultSetRewindable resultsrwIndc = ResultSetFactory.copyResults(indicatorResults);
@@ -109,30 +87,64 @@ public class DynamicFunctions extends Controller {
 		String indicatorLabel = "";
 		while (resultsrwIndc.hasNext()) {
 			QuerySolution soln = resultsrwIndc.next();
-			indicatorLabel = soln.get("label").toString();
-			String indicatorType = soln.get("indicatorType").toString();
-			for (Map.Entry<String, String> prefixes : prefixMap.entrySet()){
-				if (indicatorType.contains(prefixes.getValue())){
-					indicatorType = indicatorType.replaceAll(prefixes.getValue(), prefixes.getKey() + ":");
-				}
+			indicatorLabel = "";
+			if (soln.contains("label"))
+				indicatorLabel = soln.get("label").toString();
+			if (soln.contains("indicatorType")){
+				String indicatorType = replaceURLWithPrefix(soln.get("indicatorType").toString());
+				indicatorMap.put(indicatorType, indicatorLabel);
 			}
-			indicatorMap.put(indicatorType, indicatorLabel);		
 		}
 		Map<String, String> indicatorMapSorted = new TreeMap<String, String>(indicatorMap);
 		//System.out.println("Indicator Types: " + indicatorMapSorted);
 		return indicatorMapSorted;
 	}
 	
+	public static Map<String, Map<String,String>> getIndicatorValuesAndLabels(Map<String, String> indicatorMap){
+		Map<String, Map<String,String>> indicatorValueMap = new HashMap<String, Map<String,String>>();
+		Map<String,String> values = new HashMap<String, String>();
+		String indicatorValue = "";
+		String indicatorValueLabel = "";
+		for(Map.Entry<String, String> entry : indicatorMap.entrySet()){
+			values = new HashMap<String, String>();
+		    String indicatorType = entry.getKey().toString();
+		    String indvIndicatorQuery = getPrefixes() + "SELECT DISTINCT ?indicator " +
+					"(MIN(?label_) AS ?label)" +
+					"WHERE { ?indicator rdfs:subClassOf " + indicatorType + " . " +
+					"?indicator rdfs:label ?label_ . " + 
+					"} GROUP BY ?indicator ?label";
+
+		    QueryExecution qexecIndvInd = QueryExecutionFactory.sparqlService(Collections.getCollectionsName(Collections.METADATA_SPARQL), indvIndicatorQuery);
+			ResultSet indvIndResults = qexecIndvInd.execSelect();
+			ResultSetRewindable resultsrwIndvInd = ResultSetFactory.copyResults(indvIndResults);
+			qexecIndvInd.close();
+			while (resultsrwIndvInd.hasNext()) {
+				QuerySolution soln = resultsrwIndvInd.next();
+				indicatorValueLabel = "";
+				if (soln.contains("label")){
+					indicatorValueLabel = soln.get("label").toString();
+				}
+				else {
+					System.out.println("getIndicatorValues() No Label: " + soln.toString() + "\n");
+				}
+				if (soln.contains("indicator")){
+					indicatorValue = replaceURLWithPrefix(soln.get("indicator").toString());
+					values.put(indicatorValue,indicatorValueLabel);
+				}
+			}
+			indicatorValueMap.put(indicatorType,values);
+		}
+		return indicatorValueMap;
+	}
+	
 	public static Map<String, List<String>> getIndicatorValues(Map<String, String> indicatorMap){
-		String prefixString = getPrefixes();
-		Map<String,String> prefixMap = getPrefixMap();
 		Map<String, List<String>> indicatorValueMap = new HashMap<String, List<String>>();
 		List<String> values = new ArrayList<String>();
 		String indicatorValueLabel = "";
 		for(Map.Entry<String, String> entry : indicatorMap.entrySet()){
 			values = new ArrayList<String>();
 		    String indicatorType = entry.getKey().toString();
-		    String indvIndicatorQuery = prefixString + "SELECT DISTINCT ?indicator " +
+		    String indvIndicatorQuery = getPrefixes() + "SELECT DISTINCT ?indicator " +
 					"(MIN(?label_) AS ?label)" +
 					"WHERE { ?indicator rdfs:subClassOf " + indicatorType + " . " +
 					"?indicator rdfs:label ?label_ . " + 
@@ -145,12 +157,7 @@ public class DynamicFunctions extends Controller {
 			while (resultsrwIndvInd.hasNext()) {
 				QuerySolution soln = resultsrwIndvInd.next();
 				if (soln.contains("label")){
-					indicatorValueLabel = soln.get("indicator").toString();
-					for (Map.Entry<String, String> prefixes : prefixMap.entrySet()){
-						if (indicatorValueLabel.contains(prefixes.getValue())){
-							indicatorValueLabel = indicatorValueLabel.replaceAll(prefixes.getValue(), prefixes.getKey() + ":");
-						}
-					}
+					indicatorValueLabel = replaceURLWithPrefix(soln.get("indicator").toString());
 					values.add(indicatorValueLabel);
 				}
 				else {
@@ -160,6 +167,94 @@ public class DynamicFunctions extends Controller {
 			indicatorValueMap.put(indicatorType,values);
 		}
 		return indicatorValueMap;
+	}	
+	
+	public static Map<String, Map<String,String>> findSample(String subject_uri) {
+		String sampleQueryString = "";		
+    	sampleQueryString = getPrefixes() +
+    	"SELECT ?sampleUri ?subjectUri ?subjectLabel ?sampleType ?sampleLabel ?cohortLabel ?comment" +
+		 "WHERE {        ?subjectUri hasco:isSubjectOf* ?cohort ." +
+		 "       		?sampleUri hasco:isSampleOf ?subjectUri ." +
+		 "				?sampleUri rdfs:comment ?comment . " +
+		 "				?cohort rdfs:label ?cohortLabel . " +
+		 "       		OPTIONAL { ?subjectUri rdfs:label ?subjectLabel } .  " + 
+		 "       		OPTIONAL { ?sampleUri rdfs:label ?sampleLabel } .  " + 
+		 "       		OPTIONAL { ?sampleUri a ?sampleType  } .  " +
+         "      FILTER (?subjectUri = " + subject_uri + " ) .  " +
+		 "                            }";
+    	Query basicQuery = QueryFactory.create(sampleQueryString);
+    	
+		QueryExecution qexec = QueryExecutionFactory.sparqlService(Collections.getCollectionsName(Collections.METADATA_SPARQL), basicQuery);
+		ResultSet results = qexec.execSelect();
+		ResultSetRewindable resultsrw = ResultSetFactory.copyResults(results);
+		qexec.close();
+		
+		Map<String, Map<String,String>> sampleResult = new HashMap<String, Map<String,String>>();
+		Map<String,String> values = new HashMap<String, String>();
+		
+		while (resultsrw.hasNext()) {
+			QuerySolution soln = resultsrw.next();
+			values = new HashMap<String, String>();
+			if (soln.contains("sampleLabel"))
+				values.put("Label", soln.get("sampleLabel").toString());
+			if (soln.contains("sampleType"))
+				values.put("Type", replaceURLWithPrefix(soln.get("sampleType").toString()));
+			if (soln.contains("subjectLabel"))
+				values.put("Subject", soln.get("subjectLabel").toString());
+			if (soln.contains("subjectUri"))
+				values.put("SubjectURI", replaceURLWithPrefix(soln.get("subjectUri").toString()));
+			if (soln.contains("comment"))
+				values.put("Comment", soln.get("comment").toString());
+			if (soln.contains("cohortLabel"))
+				values.put("Cohort", soln.get("cohortLabel").toString());
+			sampleResult.put(replaceURLWithPrefix(soln.get("sampleUri").toString()),values);	
+//			System.out.println("Samples: " + sampleResult);	
+		}
+
+		return sampleResult;
+	}
+
+	public static Map<String, Map<String,String>> findSamples() {
+		String sampleQueryString = "";		
+    	sampleQueryString = getPrefixes() +
+    	"SELECT ?sampleUri ?subjectUri ?subjectLabel ?sampleType ?sampleLabel ?cohortLabel ?comment" +
+		 "WHERE {        ?subjectUri hasco:isSubjectOf* ?cohort ." +
+		 "       		?sampleUri hasco:isSampleOf ?subjectUri ." +
+		 "				?sampleUri rdfs:comment ?comment . " +
+		 "				?cohort rdfs:label ?cohortLabel . " +
+		 "       		OPTIONAL { ?subjectUri rdfs:label ?subjectLabel } .  " + 
+		 "       		OPTIONAL { ?sampleUri rdfs:label ?sampleLabel } .  " + 
+		 "       		OPTIONAL { ?sampleUri a ?sampleType  } .  " +
+		 "                            }";
+    	Query basicQuery = QueryFactory.create(sampleQueryString);
+    	
+		QueryExecution qexec = QueryExecutionFactory.sparqlService(Collections.getCollectionsName(Collections.METADATA_SPARQL), basicQuery);
+		ResultSet results = qexec.execSelect();
+		ResultSetRewindable resultsrw = ResultSetFactory.copyResults(results);
+		qexec.close();
+		
+		Map<String, Map<String,String>> sampleResult = new HashMap<String, Map<String,String>>();
+		Map<String,String> values = new HashMap<String, String>();
+		
+		while (resultsrw.hasNext()) {
+			QuerySolution soln = resultsrw.next();
+			values = new HashMap<String, String>();
+			if (soln.contains("sampleLabel"))
+				values.put("Label", soln.get("sampleLabel").toString());
+			if (soln.contains("sampleType"))
+				values.put("Type", replaceURLWithPrefix(soln.get("sampleType").toString()));
+			if (soln.contains("subjectLabel"))
+				values.put("Subject", soln.get("subjectLabel").toString());
+			if (soln.contains("subjectUri"))
+				values.put("SubjectURI", replaceURLWithPrefix(soln.get("subjectUri").toString()));
+			if (soln.contains("comment"))
+				values.put("Comment", soln.get("comment").toString());
+			if (soln.contains("cohortLabel"))
+				values.put("Cohort", soln.get("cohortLabel").toString());
+			sampleResult.put(replaceURLWithPrefix(soln.get("sampleUri").toString()),values);	
+//			System.out.println("Samples: " + sampleResult);	
+		}
+		return sampleResult;
 	}
 	
 	// for /metadata HTTP GET requests
@@ -170,6 +265,10 @@ public class DynamicFunctions extends Controller {
     	System.out.println("Indicator Values: " + valueMap + "\n");
     	Map<String,Map<String,String>> valueMapWithLabels = getIndicatorValuesAndLabels(indicators);
     	System.out.println("Indicator Values and Labels: " + valueMapWithLabels + "\n");
+    	System.out.println(findSample("chear-kb:SBJ-0032-Pilot-6"));
+    	System.out.println(replaceURLWithPrefix("http://hadatac.org/ont/chear#BloodPlasma"));
+    	System.out.println(replacePrefixWithURL("chear-kb:SBJ-0032-Pilot-6"));
+    	System.out.println(findSamples());
         return ok();        
     }// /index()
 
