@@ -57,7 +57,13 @@ public class DynamicMetadataGeneration extends Controller {
 					"        <div class=\"col-md-1.5\">\n" +
 					"            <button type=\"button\" class=\"btn btn-link\"><b>" + entry.getValue().toString() + "</b></button>\n" +
 					"        </div>\n" ;
-		    String indicatorType = entry.getKey().toString().replaceAll("http://hadatac.org/ont/chear#","chear:").replaceAll("http://hadatac.org/ont/case#","case:").replaceAll("http://hadatac.org/kb/chear#","chear-kb:");
+		    String indicatorType = entry.getKey().toString();
+			Map<String,String> prefixMap = DynamicFunctions.getPrefixMap();
+			for (Map.Entry<String, String> prefixes : prefixMap.entrySet()){
+				if (indicatorType.contains(prefixes.getValue())){
+					indicatorType = indicatorType.replaceAll(prefixes.getValue(), prefixes.getKey() + ":");
+				}
+			}
 		    //String indvIndicatorQuery = "PREFIX rdfs:<http://www.w3.org/2000/01/rdf-schema#> PREFIX chear: <http://hadatac.org/ont/chear#> PREFIX case: <http://hadatac.org/ont/case#>PREFIX hasco: <http://hadatac.org/ont/hasco/>PREFIX hasneto: <http://hadatac.org/ont/hasneto#>SELECT DISTINCT ?indicator " +
 		    String indvIndicatorQuery = prefixString + "SELECT DISTINCT ?indicator " +
 					"(MIN(?label_) AS ?label)" +
@@ -218,7 +224,13 @@ public class DynamicMetadataGeneration extends Controller {
 		String indicatorValueLabel = "";
 		for(Map.Entry<String, String> entry : indicatorMap.entrySet()){
 		    //System.out.println("Key : " + entry.getKey() + " and Value: " + entry.getValue() + "\n");
-		    String indicatorType = entry.getKey().toString().replaceAll("http://hadatac.org/ont/chear#","chear:").replaceAll("http://hadatac.org/ont/case#","case:").replaceAll("http://hadatac.org/kb/chear#","chear-kb:");
+		    String indicatorType = entry.getKey().toString();
+			Map<String,String> prefixMap = DynamicFunctions.getPrefixMap();
+			for (Map.Entry<String, String> prefixes : prefixMap.entrySet()){
+				if (indicatorType.contains(prefixes.getValue())){
+					indicatorType = indicatorType.replaceAll(prefixes.getValue(), prefixes.getKey() + ":");
+				}
+			}
 		    //System.out.println("Indicator Type: " + indicatorType + "\n");
 		    //String indvIndicatorQuery = "PREFIX rdfs:<http://www.w3.org/2000/01/rdf-schema#> PREFIX chear: <http://hadatac.org/ont/chear#> PREFIX case: <http://hadatac.org/ont/case#>PREFIX hasco: <http://hadatac.org/ont/hasco/>PREFIX hasneto: <http://hadatac.org/ont/hasneto#>SELECT DISTINCT ?indicator " +
 		    String indvIndicatorQuery = prefixString + "SELECT DISTINCT ?indicator " +
@@ -235,7 +247,13 @@ public class DynamicMetadataGeneration extends Controller {
 				QuerySolution soln = resultsrwIndvInd.next();
 				if (soln.contains("label")){
 					indicatorValueLabel = soln.get("label").toString();
-					indicatorValueMap.put(soln.get("indicator").toString().replaceAll("http://hadatac.org/ont/chear#","chear:").replaceAll("http://hadatac.org/ont/case#","case:").replaceAll("http://hadatac.org/kb/chear#","chear-kb:").replaceAll("http://hadatac.org/ont/hasneto#","hasneto:").replaceAll("http://semanticscience.org/resource/","sio:").replaceAll("http://hadatac.org/ont/vstoi#", "vstoi:").replaceAll("http://purl.obolibrary.org/obo/CHEBI_", "chebi:"),indicatorValueLabel);
+					String indicatorUrl = soln.get("indicator").toString();
+					for (Map.Entry<String, String> prefixes : prefixMap.entrySet()){
+						if (indicatorUrl.contains(prefixes.getValue())){
+							indicatorUrl = indicatorUrl.replaceAll(prefixes.getValue(), prefixes.getKey() + ":");
+						}
+					}
+					indicatorValueMap.put(indicatorUrl,indicatorValueLabel);
 				}
 				else {
 					System.out.println("getIndicatorValues() No Label: " + soln.toString() + "\n");
@@ -247,6 +265,7 @@ public class DynamicMetadataGeneration extends Controller {
 	
 	public static void renderMetadataBrowserHTML(Map<String, String> indicatorMap){
 		String prefixString = NameSpaces.getInstance().printSparqlNameSpaceList().replaceAll("\n", " ");
+		Map<String,String> prefixMap = DynamicFunctions.getPrefixMap();
 		String metadataBrowserHTMLString="@( results : org.hadatac.console.models.OtMSparqlQueryResults, category : String)\n\n" +
 				"@*****************************\n" +
 				"    public TreeMap<String,OtMTripleDocument> results.sparqlResults\n;" +
@@ -259,7 +278,12 @@ public class DynamicMetadataGeneration extends Controller {
 				"@main(\"Hierarchies\") {\n" ;
 		for(Map.Entry<String, String> entry : indicatorMap.entrySet()){
 		    //System.out.println("Key : " + entry.getKey() + " and Value: " + entry.getValue() + "\n");
-		    String indicatorType = entry.getKey().toString().replaceAll("http://hadatac.org/ont/chear#","chear:").replaceAll("http://hadatac.org/ont/case#","case:").replaceAll("http://hadatac.org/kb/chear#","chear-kb:");
+			String indicatorType = entry.getKey().toString();
+			for (Map.Entry<String, String> prefixes : prefixMap.entrySet()){
+				if (indicatorType.contains(prefixes.getValue())){
+					indicatorType = indicatorType.replaceAll(prefixes.getValue(), prefixes.getKey() + ":");
+				}
+			}
 		    //System.out.println("Indicator Type: " + indicatorType + "\n");
 		    //String indvIndicatorQuery = "PREFIX rdfs:<http://www.w3.org/2000/01/rdf-schema#> PREFIX chear: <http://hadatac.org/ont/chear#> PREFIX case: <http://hadatac.org/ont/case#>PREFIX hasco: <http://hadatac.org/ont/hasco/>PREFIX hasneto: <http://hadatac.org/ont/hasneto#>SELECT DISTINCT ?indicator " +
 		    String indvIndicatorQuery = prefixString + "SELECT DISTINCT ?indicator " +
@@ -365,6 +389,7 @@ public class DynamicMetadataGeneration extends Controller {
 	
 	public static void renderSPARQLPage(){
 		String prefixString = NameSpaces.getInstance().printSparqlNameSpaceList().replaceAll("\n", " ");
+		Map<String,String> prefixMap = DynamicFunctions.getPrefixMap();
 //		String prefixString="PREFIX owl: <http://www.w3.org/2002/07/owl#> PREFIX obo: <http://geneontology.org/GO.format.obo-1_2.shtml#> PREFIX sio: <http://semanticscience.org/resource/> PREFIX chear: <http://hadatac.org/ont/chear#> PREFIX prov: <http://www.w3.org/ns/prov#> PREFIX hasco: <http://hadatac.org/ont/hasco/> PREFIX hasneto: <http://hadatac.org/ont/hasneto#> PREFIX dcterms: <http://purl.org/dc/terms/> PREFIX rdfs:<http://www.w3.org/2000/01/rdf-schema#> PREFIX skos: <http://www.w3.org/2004/02/skos/core#> PREFIX foaf:<http://xmlns.com/foaf/0.1/> PREFIX vstoi: <http://hadatac.org/ont/vstoi#>";
 		String importString="import java.io.IOException;\n" +
 				"import java.io.StringWriter;\n" +
@@ -448,11 +473,18 @@ public class DynamicMetadataGeneration extends Controller {
 				"        switch (tabName){\n" ;
 		
 		for(Map.Entry<String, String> entry : indicatorMapSorted.entrySet()){
-			String indicatorValue = entry.getValue().toString().replaceAll(" ", "").replaceAll(",", "");
-			String indicatorType = entry.getKey().toString().replaceAll("http://hadatac.org/ont/chear#","chear:").replaceAll("http://hadatac.org/ont/case#","case:").replaceAll("http://hadatac.org/kb/chear#","chear-kb:");
+			//String indicatorValue = entry.getValue().toString().replaceAll(" ", "").replaceAll(",", "");
+			String indicatorType = entry.getKey().toString();
+			for (Map.Entry<String, String> prefixes : prefixMap.entrySet()){
+				if (indicatorType.contains(prefixes.getValue())){
+					indicatorType = indicatorType.replaceAll(prefixes.getValue(), prefixes.getKey() + ":");
+				}
+			}
+			//String indicatorType = entry.getKey().toString().replaceAll("http://hadatac.org/ont/chear#","chear:").replaceAll("http://hadatac.org/ont/case#","case:").replaceAll("http://hadatac.org/kb/chear#","chear-kb:");
 			//System.out.println("Value: " + indicatorValue);
 			//System.out.println("Type: " + indicatorType);
-			String indvIndicatorQuery = "PREFIX rdfs:<http://www.w3.org/2000/01/rdf-schema#> PREFIX chear: <http://hadatac.org/ont/chear#> PREFIX case: <http://hadatac.org/ont/case#>PREFIX hasco: <http://hadatac.org/ont/hasco/>PREFIX hasneto: <http://hadatac.org/ont/hasneto#>SELECT DISTINCT ?indicator " +
+			//String indvIndicatorQuery = "PREFIX rdfs:<http://www.w3.org/2000/01/rdf-schema#> PREFIX chear: <http://hadatac.org/ont/chear#> PREFIX case: <http://hadatac.org/ont/case#>PREFIX hasco: <http://hadatac.org/ont/hasco/>PREFIX hasneto: <http://hadatac.org/ont/hasneto#>SELECT DISTINCT ?indicator " +
+			String indvIndicatorQuery = prefixString + "SELECT DISTINCT ?indicator " +
 					"(MIN(?label_) AS ?label)" +
 					"WHERE { ?indicator rdfs:subClassOf " + indicatorType + " . " +
 					"?indicator rdfs:label ?label_ . " + 
@@ -461,50 +493,34 @@ public class DynamicMetadataGeneration extends Controller {
 			ResultSet indvIndResults = qexecIndvInd.execSelect();
 			ResultSetRewindable resultsrwIndvInd = ResultSetFactory.copyResults(indvIndResults);
 			qexecIndvInd.close();
-			if (indicatorValue.equals("DataAcquisitionIndicator")) {
-				while (resultsrwIndvInd.hasNext()) {
-					QuerySolution soln = resultsrwIndvInd.next();
+		   	while (resultsrwIndvInd.hasNext()) {
+				QuerySolution soln = resultsrwIndvInd.next();
+				if (soln.contains("label")) {
+					String indicatorString=soln.get("indicator").toString();
+					for (Map.Entry<String, String> prefixes : prefixMap.entrySet()){
+						if (indicatorString.contains(prefixes.getValue())){
+							indicatorString = indicatorString.replaceAll(prefixes.getValue(), prefixes.getKey() + ":");
+						}
+					}
 					getSPARQLClassString = getSPARQLClassString + "            case \"" + soln.get("label").toString().replaceAll(" ", "").replaceAll(",", "") + "\":\n" +
-							"               q= \"" + prefixString + "\" + \n" +
-							"                   \"SELECT ?id ?superId ?label ?iden ?comment ?def ?unit ?note ?attrTo ?assocWith \" + \n" +
-							"                   \"WHERE { \" + \n" +
-							"                   \"  ?id rdfs:subClassOf* " + soln.get("indicator").toString().replaceAll("http://hadatac.org/ont/chear#","chear:").replaceAll("http://hadatac.org/ont/case#","case:").replaceAll("http://hadatac.org/kb/chear#","chear-kb:").replaceAll("http://hadatac.org/ont/hasneto#","hasneto:").replaceAll("http://semanticscience.org/resource/","sio:").replaceAll("http://hadatac.org/ont/vstoi#", "vstoi:").replaceAll("http://purl.obolibrary.org/obo/CHEBI_", "chebi:") + " . \" + \n" +
-							"                   \"  ?id rdfs:subClassOf ?superId . \" + \n" +
-							"                   \"  ?id rdfs:label ?label .\" + \n" +
-							"                   \"  OPTIONAL {?id dcterms:identifier ?iden} . \" + \n" +
-							"                   \"  OPTIONAL {?id rdfs:comment ?comment} . \" + \n" +
-							"                   \"  OPTIONAL {?id skos:definition ?def} . \" + \n" +
-							"                   \"  OPTIONAL {?id hasneto:hasUnit ?unit} . \" + \n" +
-							"                   \"  OPTIONAL {?id skos:editorialNote ?note} . \" + \n" +
-							"                   \"  OPTIONAL {?id prov:wasAttributedTo ?attrTo} . \" + \n" +
-							"                   \"  OPTIONAL {?id prov:wasAssociatedWith ?assocWith} . \" + \n" +
-							"                   \"} \";\n " +
-							"               break;\n" ;
+						"               q= \"" + prefixString + "\" + \n" +
+						"                   \"SELECT ?id ?superId ?label ?iden ?comment ?def ?unit ?note ?attrTo ?assocWith \" + \n" +
+						"                   \"WHERE { \" + \n" +
+						"                   \"  ?id rdfs:subClassOf* " + indicatorString + " . \" + \n" +
+						"                   \"  ?id rdfs:subClassOf ?superId . \" + \n" +
+						"                   \"  ?id rdfs:label ?label .\" + \n" +
+						"                   \"  OPTIONAL {?id dcterms:identifier ?iden} . \" + \n" +
+						"                   \"  OPTIONAL {?id rdfs:comment ?comment} . \" + \n" +
+						"                   \"  OPTIONAL {?id skos:definition ?def} . \" + \n" +
+						"                   \"  OPTIONAL {?id hasneto:hasUnit ?unit} . \" + \n" +
+						"                   \"  OPTIONAL {?id skos:editorialNote ?note} . \" + \n" +
+						"                   \"  OPTIONAL {?id prov:wasAttributedTo ?attrTo} . \" + \n" +
+						"                   \"  OPTIONAL {?id prov:wasAssociatedWith ?assocWith} . \" + \n" +
+						"                   \"} \";\n " +
+						"               break;\n" ;
 				}
-		    } else {
-		    	while (resultsrwIndvInd.hasNext()) {
-					QuerySolution soln = resultsrwIndvInd.next();
-					if (soln.contains("label")) {		
-						getSPARQLClassString = getSPARQLClassString + "            case \"" + soln.get("label").toString().replaceAll(" ", "").replaceAll(",", "") + "\":\n" +
-							"               q= \"" + prefixString + "\" + \n" +
-							"                   \"SELECT ?id ?superId ?label ?iden ?comment ?def ?unit ?note ?attrTo ?assocWith \" + \n" +
-							"                   \"WHERE { \" + \n" +
-							"                   \"  ?id rdfs:subClassOf* " + soln.get("indicator").toString().replaceAll("http://hadatac.org/ont/chear#","chear:").replaceAll("http://hadatac.org/ont/case#","case:").replaceAll("http://hadatac.org/kb/chear#","chear-kb:").replaceAll("http://hadatac.org/ont/hasneto#","hasneto:").replaceAll("http://semanticscience.org/resource/","sio:").replaceAll("http://hadatac.org/ont/vstoi#", "vstoi:").replaceAll("http://purl.obolibrary.org/obo/CHEBI_", "chebi:") + " . \" + \n" +
-							"                   \"  ?id rdfs:subClassOf ?superId . \" + \n" +
-							"                   \"  ?id rdfs:label ?label .\" + \n" +
-							"                   \"  OPTIONAL {?id dcterms:identifier ?iden} . \" + \n" +
-							"                   \"  OPTIONAL {?id rdfs:comment ?comment} . \" + \n" +
-							"                   \"  OPTIONAL {?id skos:definition ?def} . \" + \n" +
-							"                   \"  OPTIONAL {?id hasneto:hasUnit ?unit} . \" + \n" +
-							"                   \"  OPTIONAL {?id skos:editorialNote ?note} . \" + \n" +
-							"                   \"  OPTIONAL {?id prov:wasAttributedTo ?attrTo} . \" + \n" +
-							"                   \"  OPTIONAL {?id prov:wasAssociatedWith ?assocWith} . \" + \n" +
-							"                   \"} \";\n " +
-							"               break;\n" ;
-					}
-					else {
-						System.out.println("renderSPARQLPage() No Label: " + soln.toString() + "\n");
-					}
+				else {
+					System.out.println("renderSPARQLPage() No Label: " + soln.toString() + "\n");
 				}
 		    }
 		}
