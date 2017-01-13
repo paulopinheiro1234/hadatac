@@ -306,10 +306,81 @@ public class SysUser extends AppModel implements Subject {
 	}
 	
 	public static SysUser create(final AuthUser authUser, String uri) {
-		SysUser user = SysUser.create(authUser);
-		user.uri = uri;
+		/////////////////
+		final SysUser sys_user = new SysUser();
+		
+		sys_user.roles.add(SecurityRole
+				.findByRoleNameSolr(org.hadatac.console.controllers.AuthApplication.DATA_OWNER_ROLE));
+		sys_user.permissions = new ArrayList<UserPermission>();
+		sys_user.active = true;
+		sys_user.lastLogin = new Date();
+		sys_user.linkedAccounts = Collections.singletonList(LinkedAccount
+				.create(authUser));
+
+		if (authUser instanceof EmailIdentity) {
+			final EmailIdentity identity = (EmailIdentity) authUser;
+			// Remember, even when getting them from FB & Co., emails should be
+			// verified within the application as a security breach there might
+			// break your security as well!
+			sys_user.email = identity.getEmail();
+			sys_user.emailValidated = false;
+		}
+
+		if (authUser instanceof NameIdentity) {
+			final NameIdentity identity = (NameIdentity) authUser;
+			final String name = identity.getName();
+			if (name != null) {
+				sys_user.name = name;
+			}
+		}
+		
+		if (authUser instanceof FirstLastNameIdentity) {
+		  final FirstLastNameIdentity identity = (FirstLastNameIdentity) authUser;
+		  final String firstName = identity.getFirstName();
+		  final String lastName = identity.getLastName();
+		  if (firstName != null) {
+			  sys_user.firstName = firstName;
+		  }
+		  if (lastName != null) {
+			  sys_user.lastName = lastName;
+		  }
+		}
+		
+		sys_user.id_s = UUID.randomUUID().toString();
+		
+		User user = new User();
+		user.setName(sys_user.name);
+		user.setEmail(sys_user.email);
+		
+		if (SysUser.existsSolr() == false) {
+			sys_user.roles.add(SecurityRole
+					.findByRoleNameSolr(org.hadatac.console.controllers.AuthApplication.DATA_MANAGER_ROLE));
+			sys_user.emailValidated = true;
+			String admin_uri = "http://localhost/users#admin";
+			user.setUri(admin_uri);
+			if(null == uri){
+				sys_user.uri = admin_uri;
+			}
+			else{
+				sys_user.uri = uri;
+			}
+			user.save();
+			sys_user.save();
+			
+			return sys_user;
+		}
+
+		if(null == uri) {
+			sys_user.uri = "";
+		}
+		else {
+			sys_user.uri = uri;
+		}
+		
 		user.save();
-		return user;
+		sys_user.save();
+		
+		return sys_user;
 	}
 	
 	public static boolean existsSolr() {
@@ -331,15 +402,14 @@ public class SysUser extends AppModel implements Subject {
 	}
 
 	public static SysUser create(final AuthUser authUser) {
-		final SysUser user = new SysUser();
+		final SysUser sys_user = new SysUser();
 		
-		user.roles.add(SecurityRole
+		sys_user.roles.add(SecurityRole
 				.findByRoleNameSolr(org.hadatac.console.controllers.AuthApplication.DATA_OWNER_ROLE));
-		user.permissions = new ArrayList<UserPermission>();
-		// user.permissions.add(UserPermission.findByValue("printers.edit"));
-		user.active = true;
-		user.lastLogin = new Date();
-		user.linkedAccounts = Collections.singletonList(LinkedAccount
+		sys_user.permissions = new ArrayList<UserPermission>();
+		sys_user.active = true;
+		sys_user.lastLogin = new Date();
+		sys_user.linkedAccounts = Collections.singletonList(LinkedAccount
 				.create(authUser));
 
 		if (authUser instanceof EmailIdentity) {
@@ -347,15 +417,15 @@ public class SysUser extends AppModel implements Subject {
 			// Remember, even when getting them from FB & Co., emails should be
 			// verified within the application as a security breach there might
 			// break your security as well!
-			user.email = identity.getEmail();
-			user.emailValidated = false;
+			sys_user.email = identity.getEmail();
+			sys_user.emailValidated = false;
 		}
 
 		if (authUser instanceof NameIdentity) {
 			final NameIdentity identity = (NameIdentity) authUser;
 			final String name = identity.getName();
 			if (name != null) {
-				user.name = name;
+				sys_user.name = name;
 			}
 		}
 		
@@ -364,31 +434,30 @@ public class SysUser extends AppModel implements Subject {
 		  final String firstName = identity.getFirstName();
 		  final String lastName = identity.getLastName();
 		  if (firstName != null) {
-		    user.firstName = firstName;
+			  sys_user.firstName = firstName;
 		  }
 		  if (lastName != null) {
-		    user.lastName = lastName;
+			  sys_user.lastName = lastName;
 		  }
 		}
 		
-		user.id_s = UUID.randomUUID().toString();
+		sys_user.id_s = UUID.randomUUID().toString();
+		
+		User user = new User();
+		user.setName(sys_user.name);
+		user.setEmail(sys_user.email);
 		
 		if (SysUser.existsSolr() == false) {
-			user.roles.add(SecurityRole
+			sys_user.roles.add(SecurityRole
 					.findByRoleNameSolr(org.hadatac.console.controllers.AuthApplication.DATA_MANAGER_ROLE));
-			user.emailValidated = true;
+			sys_user.emailValidated = true;
+			user.setUri("http://localhost/users#admin");
 		}
 
 		user.save();
-		// user.saveManyToManyAssociations("roles");
-		// user.saveManyToManyAssociations("permissions");
-		User userTs =  new User();
-		userTs.setName(user.name);
-		userTs.setEmail(user.email);
-		userTs.setUri("http://localhost/users#admin");
-		userTs.save();
+		sys_user.save();
 		
-		return user;
+		return sys_user;
 	}
 	
 	public void save() {

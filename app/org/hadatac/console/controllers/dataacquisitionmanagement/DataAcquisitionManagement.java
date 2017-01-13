@@ -24,8 +24,8 @@ public class DataAcquisitionManagement extends Controller {
     	State state = new State(stateId);
     	final SysUser user = AuthApplication.getLocalUser(session());
 		String ownerUri = UserManagement.getUriByEmail(user.email);
-		System.out.println(user.email);
-		System.out.println(ownerUri);
+		System.out.println("Email: " + user.email);
+		System.out.println("Owner URI: " + ownerUri);
     	List<DataAcquisition> results = DataAcquisition.find(ownerUri, state);
     	
         return ok(dataAcquisitionManagement.render(state, results));   
