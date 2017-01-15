@@ -169,95 +169,6 @@ public class DynamicFunctions extends Controller {
 		return indicatorValueMap;
 	}	
 	
-	// Find Samples functions need to be editted to include full information, as is done in ViewSample code
-	public static Map<String, Map<String,String>> findSample(String subject_uri) {
-		String sampleQueryString = "";		
-    	sampleQueryString = getPrefixes() +
-    	"SELECT ?sampleUri ?subjectUri ?subjectLabel ?sampleType ?sampleLabel ?cohortLabel ?comment" +
-		 "WHERE {        ?subjectUri hasco:isSubjectOf* ?cohort ." +
-		 "       		?sampleUri hasco:isSampleOf ?subjectUri ." +
-		 "				?sampleUri rdfs:comment ?comment . " +
-		 "				?cohort rdfs:label ?cohortLabel . " +
-		 "       		OPTIONAL { ?subjectUri rdfs:label ?subjectLabel } .  " + 
-		 "       		OPTIONAL { ?sampleUri rdfs:label ?sampleLabel } .  " + 
-		 "       		OPTIONAL { ?sampleUri a ?sampleType  } .  " +
-         "      FILTER (?subjectUri = " + subject_uri + " ) .  " +
-		 "                            }";
-    	Query basicQuery = QueryFactory.create(sampleQueryString);
-    	
-		QueryExecution qexec = QueryExecutionFactory.sparqlService(Collections.getCollectionsName(Collections.METADATA_SPARQL), basicQuery);
-		ResultSet results = qexec.execSelect();
-		ResultSetRewindable resultsrw = ResultSetFactory.copyResults(results);
-		qexec.close();
-		
-		Map<String, Map<String,String>> sampleResult = new HashMap<String, Map<String,String>>();
-		Map<String,String> values = new HashMap<String, String>();
-		
-		while (resultsrw.hasNext()) {
-			QuerySolution soln = resultsrw.next();
-			values = new HashMap<String, String>();
-			if (soln.contains("sampleLabel"))
-				values.put("Label", soln.get("sampleLabel").toString());
-			if (soln.contains("sampleType"))
-				values.put("Type", replaceURLWithPrefix(soln.get("sampleType").toString()));
-			if (soln.contains("subjectLabel"))
-				values.put("Subject", soln.get("subjectLabel").toString());
-			if (soln.contains("subjectUri"))
-				values.put("SubjectURI", replaceURLWithPrefix(soln.get("subjectUri").toString()));
-			if (soln.contains("comment"))
-				values.put("Comment", soln.get("comment").toString());
-			if (soln.contains("cohortLabel"))
-				values.put("Cohort", soln.get("cohortLabel").toString());
-			sampleResult.put(replaceURLWithPrefix(soln.get("sampleUri").toString()),values);	
-//			System.out.println("Samples: " + sampleResult);	
-		}
-
-		return sampleResult;
-	}
-
-	public static Map<String, Map<String,String>> findSamples() {
-		String sampleQueryString = "";		
-    	sampleQueryString = getPrefixes() +
-    	"SELECT ?sampleUri ?subjectUri ?subjectLabel ?sampleType ?sampleLabel ?cohortLabel ?comment" +
-		 "WHERE {        ?subjectUri hasco:isSubjectOf* ?cohort ." +
-		 "       		?sampleUri hasco:isSampleOf ?subjectUri ." +
-		 "				?sampleUri rdfs:comment ?comment . " +
-		 "				?cohort rdfs:label ?cohortLabel . " +
-		 "       		OPTIONAL { ?subjectUri rdfs:label ?subjectLabel } .  " + 
-		 "       		OPTIONAL { ?sampleUri rdfs:label ?sampleLabel } .  " + 
-		 "       		OPTIONAL { ?sampleUri a ?sampleType  } .  " +
-		 "                            }";
-    	Query basicQuery = QueryFactory.create(sampleQueryString);
-    	
-		QueryExecution qexec = QueryExecutionFactory.sparqlService(Collections.getCollectionsName(Collections.METADATA_SPARQL), basicQuery);
-		ResultSet results = qexec.execSelect();
-		ResultSetRewindable resultsrw = ResultSetFactory.copyResults(results);
-		qexec.close();
-		
-		Map<String, Map<String,String>> sampleResult = new HashMap<String, Map<String,String>>();
-		Map<String,String> values = new HashMap<String, String>();
-		
-		while (resultsrw.hasNext()) {
-			QuerySolution soln = resultsrw.next();
-			values = new HashMap<String, String>();
-			if (soln.contains("sampleLabel"))
-				values.put("Label", soln.get("sampleLabel").toString());
-			if (soln.contains("sampleType"))
-				values.put("Type", replaceURLWithPrefix(soln.get("sampleType").toString()));
-			if (soln.contains("subjectLabel"))
-				values.put("Subject", soln.get("subjectLabel").toString());
-			if (soln.contains("subjectUri"))
-				values.put("SubjectURI", replaceURLWithPrefix(soln.get("subjectUri").toString()));
-			if (soln.contains("comment"))
-				values.put("Comment", soln.get("comment").toString());
-			if (soln.contains("cohortLabel"))
-				values.put("Cohort", soln.get("cohortLabel").toString());
-			sampleResult.put(replaceURLWithPrefix(soln.get("sampleUri").toString()),values);	
-//			System.out.println("Samples: " + sampleResult);	
-		}
-		return sampleResult;
-	}
-	
 	public static Map<String, Map<String,String>> findStudy(String study_uri) {
 		String studyQueryString = "";
 		studyQueryString = getPrefixes() +
@@ -352,6 +263,279 @@ public class DynamicFunctions extends Controller {
 		}
 		return studyResult;
 	}
+	public static Map<String, Map<String,String>> findSubjects() {
+		String subjectQueryString = "";		
+		subjectQueryString = getPrefixes() +
+    			"SELECT ?subjectUri ?subjectType ?subjectTypeLabel ?subjectLabel ?cohortLabel ?studyLabel " +
+    	    	"			 WHERE {        ?subjectUri hasco:isSubjectOf* ?cohort . " +
+    	    	"							?study rdfs:label ?studyLabel ." +
+    	    	"			        		?cohort hasco:isCohortOf ?study . " +
+    	    	"							?cohort rdfs:label ?cohortLabel" +
+    	    	"			        		OPTIONAL { ?subjectUri rdfs:label ?subjectLabel } . " +
+    	    	"			        		OPTIONAL { ?subjectUri a ?subjectType . " +
+    	    	"										?subjectType rdfs:label ?subjectTypeLabel} . " +
+    	    	"			                             }";
+    	Query basicQuery = QueryFactory.create(subjectQueryString);
+    	
+		QueryExecution qexec = QueryExecutionFactory.sparqlService(Collections.getCollectionsName(Collections.METADATA_SPARQL), basicQuery);
+		ResultSet results = qexec.execSelect();
+		ResultSetRewindable resultsrw = ResultSetFactory.copyResults(results);
+		qexec.close();
+		
+		Map<String, Map<String,String>> subjectResult = new HashMap<String, Map<String,String>>();
+		Map<String,String> values = new HashMap<String, String>();
+		
+		while (resultsrw.hasNext()) {
+			QuerySolution soln = resultsrw.next();
+			values = new HashMap<String, String>();
+			if (soln.contains("subjectLabel"))
+				values.put("Label", soln.get("subjectLabel").toString());
+			if (soln.contains("subjectType"))
+				values.put("Type", replaceURLWithPrefix(soln.get("subjectType").toString()));
+			if (soln.contains("subjectTypeLabel"))
+				values.put("TypeLabel", soln.get("subjectTypeLabel").toString());
+			if (soln.contains("cohortLabel"))
+				values.put("Cohort", soln.get("cohortLabel").toString());
+			if (soln.contains("studyLabel"))
+				values.put("Study", replaceURLWithPrefix(soln.get("studyLabel").toString()));
+			subjectResult.put(replaceURLWithPrefix(soln.get("subjectUri").toString()),values);
+//			System.out.println("Samples: " + sampleResult);	
+		}
+		return subjectResult;
+	}
+	
+	public static Map<String, Map<String,String>> findSubject(String subject_uri) {
+		String subjectQueryString = "";		
+		subjectQueryString = getPrefixes() +
+    			"SELECT ?subjectUri ?subjectType ?subjectTypeLabel ?subjectLabel ?cohortLabel ?studyLabel " +
+    	    	"			 WHERE {        ?subjectUri hasco:isSubjectOf* ?cohort . " +
+    	    	"							?study rdfs:label ?studyLabel ." +
+    	    	"			        		?cohort hasco:isCohortOf ?study . " +
+    	    	"							?cohort rdfs:label ?cohortLabel" +
+    	    	"			        		OPTIONAL { ?subjectUri rdfs:label ?subjectLabel } . " +
+    	    	"			        		OPTIONAL { ?subjectUri a ?subjectType . " +
+    	    	"										?subjectType rdfs:label ?subjectTypeLabel} . " +
+    	    	"			        		FILTER (?subjectUri = " + subject_uri + ") . " +
+    	    	"			                             }";
+    	Query basicQuery = QueryFactory.create(subjectQueryString);
+    	
+		QueryExecution qexec = QueryExecutionFactory.sparqlService(Collections.getCollectionsName(Collections.METADATA_SPARQL), basicQuery);
+		ResultSet results = qexec.execSelect();
+		ResultSetRewindable resultsrw = ResultSetFactory.copyResults(results);
+		qexec.close();
+		
+		Map<String, Map<String,String>> subjectResult = new HashMap<String, Map<String,String>>();
+		Map<String,String> values = new HashMap<String, String>();
+		
+		while (resultsrw.hasNext()) {
+			QuerySolution soln = resultsrw.next();
+			values = new HashMap<String, String>();
+			if (soln.contains("subjectLabel"))
+				values.put("Label", soln.get("subjectLabel").toString());
+			if (soln.contains("subjectType"))
+				values.put("Type", replaceURLWithPrefix(soln.get("subjectType").toString()));
+			if (soln.contains("subjectTypeLabel"))
+				values.put("TypeLabel", soln.get("subjectTypeLabel").toString());
+			if (soln.contains("cohortLabel"))
+				values.put("Cohort", soln.get("cohortLabel").toString());
+			if (soln.contains("studyLabel"))
+				values.put("Study", replaceURLWithPrefix(soln.get("studyLabel").toString()));
+			subjectResult.put(replaceURLWithPrefix(soln.get("subjectUri").toString()),values);
+//			System.out.println("Samples: " + sampleResult);	
+		}
+		return subjectResult;
+	}
+	
+	
+	public static Map<String, Map<String,String>> findSample(String sample_uri) {
+		String sampleQueryString = "";		
+    	sampleQueryString = getPrefixes() +
+    	"SELECT ?sampleUri ?subjectUri ?subjectLabel ?sampleType ?sampleLabel ?freezeThaw ?storageTemp ?storageTempUnit ?cohortLabel ?object ?samplingVolume ?samplingVolumeUnit ?comment" +
+    	"WHERE {        ?subjectUri hasco:isSubjectOf* ?cohort ." +
+    	"       		?sampleUri hasco:isSampleOf ?subjectUri ." +
+    	"				?sampleUri rdfs:comment ?comment . " +
+    	"				OPTIONAL { ?sampleUri hasco:isMeasuredObjectOf ?object . " +
+    	"				?sampleUri hasco:hasSamplingVolume ?samplingVolume . " +
+    	"				?sampleUri hasco:hasSamplingVolumeUnit ?samplingVolumeUnit . " +
+    	"				?sampleUri hasco:hasStorageTemperature ?storageTemp . " +
+    	"				?sampleUri hasco:hasStorageTemperatureUnit ?storageTempUnit . " +
+    	"				?sampleUri hasco:hasNumFreezeThaw ?freezeThaw } . " +
+    	"				?sampleUri rdfs:comment ?comment . " +
+    	"				?cohort rdfs:label ?cohortLabel . " +
+    	"       		OPTIONAL { ?subjectUri rdfs:label ?subjectLabel } .  " + 
+    	"       		OPTIONAL { ?sampleUri rdfs:label ?sampleLabel } .  " + 
+    	"       		OPTIONAL { ?sampleUri a ?sampleType  } .  " +
+        "      FILTER (?sampleUri = " + sample_uri + " ) .  " +
+	    "                            }";
+    	Query basicQuery = QueryFactory.create(sampleQueryString);
+    	
+		QueryExecution qexec = QueryExecutionFactory.sparqlService(Collections.getCollectionsName(Collections.METADATA_SPARQL), basicQuery);
+		ResultSet results = qexec.execSelect();
+		ResultSetRewindable resultsrw = ResultSetFactory.copyResults(results);
+		qexec.close();
+		
+		Map<String, Map<String,String>> sampleResult = new HashMap<String, Map<String,String>>();
+		Map<String,String> values = new HashMap<String, String>();
+		//?freezeThaw ?storageTemp ?storageTempUnit ?cohortLabel ?object ?samplingVolume ?samplingVolumeUnit
+		while (resultsrw.hasNext()) {
+			QuerySolution soln = resultsrw.next();
+			values = new HashMap<String, String>();
+			if (soln.contains("sampleLabel"))
+				values.put("Label", soln.get("sampleLabel").toString());
+			if (soln.contains("sampleType"))
+				values.put("Type", replaceURLWithPrefix(soln.get("sampleType").toString()));
+			if (soln.contains("subjectLabel"))
+				values.put("Subject", soln.get("subjectLabel").toString());
+			if (soln.contains("subjectUri"))
+				values.put("SubjectURI", replaceURLWithPrefix(soln.get("subjectUri").toString()));
+			if (soln.contains("comment"))
+				values.put("Comment", soln.get("comment").toString());
+			if (soln.contains("cohortLabel"))
+				values.put("Cohort", soln.get("cohortLabel").toString());
+			if (soln.contains("freezeThaw"))
+				values.put("FreezeThaw", soln.get("freezeThaw").toString());
+			if (soln.contains("storageTemp"))
+				values.put("StorageTemp", replaceURLWithPrefix(soln.get("storageTemp").toString()));
+			if (soln.contains("storageTempUnit"))
+				values.put("StorageTempUnit", replaceURLWithPrefix(soln.get("storageTempUnit").toString()));
+			if (soln.contains("object"))
+				values.put("MeasuredObject", replaceURLWithPrefix(soln.get("object").toString()));
+			if (soln.contains("samplingVolume"))
+				values.put("Volume", replaceURLWithPrefix(soln.get("samplingVolume").toString()));
+			if (soln.contains("samplingVolumeUnit"))
+				values.put("VolumeUnit", replaceURLWithPrefix(soln.get("samplingVolumeUnit").toString()));
+			sampleResult.put(replaceURLWithPrefix(soln.get("sampleUri").toString()),values);	
+//			System.out.println("Samples: " + sampleResult);	
+		}
+
+		return sampleResult;
+	}
+	public static Map<String, Map<String,String>> findSampleBySubject(String subject_uri) {
+		String sampleQueryString = "";		
+    	sampleQueryString = getPrefixes() +
+    	"SELECT ?sampleUri ?subjectUri ?subjectLabel ?sampleType ?sampleLabel ?freezeThaw ?storageTemp ?storageTempUnit ?cohortLabel ?object ?samplingVolume ?samplingVolumeUnit ?comment" +
+    	"WHERE {        ?subjectUri hasco:isSubjectOf* ?cohort ." +
+    	"       		?sampleUri hasco:isSampleOf ?subjectUri ." +
+    	"				?sampleUri rdfs:comment ?comment . " +
+    	"				OPTIONAL { ?sampleUri hasco:isMeasuredObjectOf ?object . " +
+    	"				?sampleUri hasco:hasSamplingVolume ?samplingVolume . " +
+    	"				?sampleUri hasco:hasSamplingVolumeUnit ?samplingVolumeUnit . " +
+    	"				?sampleUri hasco:hasStorageTemperature ?storageTemp . " +
+    	"				?sampleUri hasco:hasStorageTemperatureUnit ?storageTempUnit . " +
+    	"				?sampleUri hasco:hasNumFreezeThaw ?freezeThaw } . " +
+    	"				?sampleUri rdfs:comment ?comment . " +
+    	"				?cohort rdfs:label ?cohortLabel . " +
+    	"       		OPTIONAL { ?subjectUri rdfs:label ?subjectLabel } .  " + 
+    	"       		OPTIONAL { ?sampleUri rdfs:label ?sampleLabel } .  " + 
+    	"       		OPTIONAL { ?sampleUri a ?sampleType  } .  " +
+        "      FILTER (?subjectUri = " + subject_uri + " ) .  " +
+	    "                            }";
+    	Query basicQuery = QueryFactory.create(sampleQueryString);
+    	
+		QueryExecution qexec = QueryExecutionFactory.sparqlService(Collections.getCollectionsName(Collections.METADATA_SPARQL), basicQuery);
+		ResultSet results = qexec.execSelect();
+		ResultSetRewindable resultsrw = ResultSetFactory.copyResults(results);
+		qexec.close();
+		
+		Map<String, Map<String,String>> sampleResult = new HashMap<String, Map<String,String>>();
+		Map<String,String> values = new HashMap<String, String>();
+		//?freezeThaw ?storageTemp ?storageTempUnit ?cohortLabel ?object ?samplingVolume ?samplingVolumeUnit
+		while (resultsrw.hasNext()) {
+			QuerySolution soln = resultsrw.next();
+			values = new HashMap<String, String>();
+			if (soln.contains("sampleLabel"))
+				values.put("Label", soln.get("sampleLabel").toString());
+			if (soln.contains("sampleType"))
+				values.put("Type", replaceURLWithPrefix(soln.get("sampleType").toString()));
+			if (soln.contains("subjectLabel"))
+				values.put("Subject", soln.get("subjectLabel").toString());
+			if (soln.contains("subjectUri"))
+				values.put("SubjectURI", replaceURLWithPrefix(soln.get("subjectUri").toString()));
+			if (soln.contains("comment"))
+				values.put("Comment", soln.get("comment").toString());
+			if (soln.contains("cohortLabel"))
+				values.put("Cohort", soln.get("cohortLabel").toString());
+			if (soln.contains("freezeThaw"))
+				values.put("FreezeThaw", soln.get("freezeThaw").toString());
+			if (soln.contains("storageTemp"))
+				values.put("StorageTemp", replaceURLWithPrefix(soln.get("storageTemp").toString()));
+			if (soln.contains("storageTempUnit"))
+				values.put("StorageTempUnit", replaceURLWithPrefix(soln.get("storageTempUnit").toString()));
+			if (soln.contains("object"))
+				values.put("MeasuredObject", replaceURLWithPrefix(soln.get("object").toString()));
+			if (soln.contains("samplingVolume"))
+				values.put("Volume", replaceURLWithPrefix(soln.get("samplingVolume").toString()));
+			if (soln.contains("samplingVolumeUnit"))
+				values.put("VolumeUnit", replaceURLWithPrefix(soln.get("samplingVolumeUnit").toString()));
+			sampleResult.put(replaceURLWithPrefix(soln.get("sampleUri").toString()),values);	
+//			System.out.println("Samples: " + sampleResult);	
+		}
+
+		return sampleResult;
+	}
+
+	public static Map<String, Map<String,String>> findSamples() {
+		String sampleQueryString = "";		
+    	sampleQueryString = getPrefixes() +
+    			"SELECT ?sampleUri ?subjectUri ?subjectLabel ?sampleType ?sampleLabel ?freezeThaw ?storageTemp ?storageTempUnit ?cohortLabel ?object ?samplingVolume ?samplingVolumeUnit ?comment" +
+    			"WHERE {        ?subjectUri hasco:isSubjectOf* ?cohort ." +
+    			"       		?sampleUri hasco:isSampleOf ?subjectUri ." +
+    			"				?sampleUri rdfs:comment ?comment . " +
+    			"				OPTIONAL { ?sampleUri hasco:isMeasuredObjectOf ?object . " +
+    			"				?sampleUri hasco:hasSamplingVolume ?samplingVolume . " +
+    			"				?sampleUri hasco:hasSamplingVolumeUnit ?samplingVolumeUnit . " +
+    			"				?sampleUri hasco:hasStorageTemperature ?storageTemp . " +
+    			"				?sampleUri hasco:hasStorageTemperatureUnit ?storageTempUnit . " +
+    			"				?sampleUri hasco:hasNumFreezeThaw ?freezeThaw } . " +
+    			"				?sampleUri rdfs:comment ?comment . " +
+    			"				?cohort rdfs:label ?cohortLabel . " +
+    			"       		OPTIONAL { ?subjectUri rdfs:label ?subjectLabel } .  " + 
+    			"       		OPTIONAL { ?sampleUri rdfs:label ?sampleLabel } .  " + 
+    			"       		OPTIONAL { ?sampleUri a ?sampleType  } .  " +
+    			"                            }";
+    	Query basicQuery = QueryFactory.create(sampleQueryString);
+    	
+		QueryExecution qexec = QueryExecutionFactory.sparqlService(Collections.getCollectionsName(Collections.METADATA_SPARQL), basicQuery);
+		ResultSet results = qexec.execSelect();
+		ResultSetRewindable resultsrw = ResultSetFactory.copyResults(results);
+		qexec.close();
+		
+		Map<String, Map<String,String>> sampleResult = new HashMap<String, Map<String,String>>();
+		Map<String,String> values = new HashMap<String, String>();
+		
+		while (resultsrw.hasNext()) {
+			QuerySolution soln = resultsrw.next();
+			values = new HashMap<String, String>();
+			if (soln.contains("sampleLabel"))
+				values.put("Label", soln.get("sampleLabel").toString());
+			if (soln.contains("sampleType"))
+				values.put("Type", replaceURLWithPrefix(soln.get("sampleType").toString()));
+			if (soln.contains("subjectLabel"))
+				values.put("Subject", soln.get("subjectLabel").toString());
+			if (soln.contains("subjectUri"))
+				values.put("SubjectURI", replaceURLWithPrefix(soln.get("subjectUri").toString()));
+			if (soln.contains("comment"))
+				values.put("Comment", soln.get("comment").toString());
+			if (soln.contains("cohortLabel"))
+				values.put("Cohort", soln.get("cohortLabel").toString());
+			if (soln.contains("freezeThaw"))
+				values.put("FreezeThaw", soln.get("freezeThaw").toString());
+			if (soln.contains("storageTemp"))
+				values.put("StorageTemp", replaceURLWithPrefix(soln.get("storageTemp").toString()));
+			if (soln.contains("storageTempUnit"))
+				values.put("StorageTempUnit", replaceURLWithPrefix(soln.get("storageTempUnit").toString()));
+			if (soln.contains("object"))
+				values.put("MeasuredObject", replaceURLWithPrefix(soln.get("object").toString()));
+			if (soln.contains("samplingVolume"))
+				values.put("Volume", replaceURLWithPrefix(soln.get("samplingVolume").toString()));
+			if (soln.contains("samplingVolumeUnit"))
+				values.put("VolumeUnit", replaceURLWithPrefix(soln.get("samplingVolumeUnit").toString()));
+			sampleResult.put(replaceURLWithPrefix(soln.get("sampleUri").toString()),values);
+//			System.out.println("Samples: " + sampleResult);	
+		}
+		return sampleResult;
+	}
+	
 	
 	// for /metadata HTTP GET requests
     public static Result index() {
@@ -361,12 +545,19 @@ public class DynamicFunctions extends Controller {
     	System.out.println("Indicator Values: " + valueMap + "\n");
     	Map<String,Map<String,String>> valueMapWithLabels = getIndicatorValuesAndLabels(indicators);
     	System.out.println("Indicator Values and Labels: " + valueMapWithLabels + "\n");
-    	System.out.println(findSample("chear-kb:SBJ-0032-Pilot-6"));
     	System.out.println(replaceURLWithPrefix("http://hadatac.org/ont/chear#BloodPlasma"));
-    	System.out.println(replacePrefixWithURL("chear-kb:SBJ-0032-Pilot-6"));
-    	System.out.println(findSamples());
+    	System.out.println(findSubject("chear-kb:SBJ-0032-Pilot-6"));
+    	
     	System.out.println(findStudy("chear-kb:STD-Pilot-3"));
     	System.out.println(findStudies());
+    	
+    	System.out.println(findSamples());
+    	System.out.println(findSampleBySubject("chear-kb:SBJ-0032-Pilot-6"));
+    	System.out.println(findSample("chear-kb:SPL-0032-Pilot-6-Urine-ICP-MS"));
+    	
+    	System.out.println(findSubject("chear-kb:SBJ-0032-Pilot-6"));
+    	System.out.println(findSubjects());
+    	
         return ok();        
     }// /index()
 
