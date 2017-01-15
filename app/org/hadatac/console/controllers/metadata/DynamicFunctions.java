@@ -545,18 +545,18 @@ public class DynamicFunctions extends Controller {
     	System.out.println("Indicator Values: " + valueMap + "\n");
     	Map<String,Map<String,String>> valueMapWithLabels = getIndicatorValuesAndLabels(indicators);
     	System.out.println("Indicator Values and Labels: " + valueMapWithLabels + "\n");
-    	System.out.println(replaceURLWithPrefix("http://hadatac.org/ont/chear#BloodPlasma"));
-    	System.out.println(findSubject("chear-kb:SBJ-0032-Pilot-6"));
+    	//System.out.println(replaceURLWithPrefix("http://hadatac.org/ont/chear#BloodPlasma"));
+    	//System.out.println(findSubject("chear-kb:SBJ-0032-Pilot-6"));
     	
-    	System.out.println(findStudy("chear-kb:STD-Pilot-3"));
-    	System.out.println(findStudies());
+    	//System.out.println(findStudy("chear-kb:STD-Pilot-3"));
+    	//System.out.println(findStudies());
     	
-    	System.out.println(findSamples());
-    	System.out.println(findSampleBySubject("chear-kb:SBJ-0032-Pilot-6"));
-    	System.out.println(findSample("chear-kb:SPL-0032-Pilot-6-Urine-ICP-MS"));
+    	//System.out.println(findSamples());
+    	//System.out.println(findSampleBySubject("chear-kb:SBJ-0032-Pilot-6"));
+    	//System.out.println(findSample("chear-kb:SPL-0032-Pilot-6-Urine-ICP-MS"));
     	
-    	System.out.println(findSubject("chear-kb:SBJ-0032-Pilot-6"));
-    	System.out.println(findSubjects());
+    	//System.out.println(findSubject("chear-kb:SBJ-0032-Pilot-6"));
+    	//System.out.println(findSubjects());
     	
         return ok();        
     }// /index()

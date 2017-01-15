@@ -567,7 +567,7 @@ public class DynamicMetadataGeneration extends Controller {
     	renderSPARQLPage();
 		renderNavigationHTML(indicatorMap);
 		renderMetadataHTML(indicatorMap);
-    	renderMetadataEntryHTML();
+    	//renderMetadataEntryHTML();
     	renderMetadataBrowserHTML(indicatorMap);
 
     	return ok(dynamicMetadataPage.render());
