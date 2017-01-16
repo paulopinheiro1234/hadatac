@@ -1,22 +1,13 @@
 package org.hadatac.entity.pojo;
 
-import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
-import java.net.URLEncoder;
-import java.security.PrivilegedActionException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.http.HttpResponse;
-import org.apache.http.client.ClientProtocolException;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.jena.query.Query;
 import org.apache.jena.query.QueryExecution;
 import org.apache.jena.query.QueryExecutionFactory;
@@ -36,7 +27,6 @@ import org.apache.jena.update.UpdateRequest;
 import org.hadatac.console.models.SysUser;
 import org.hadatac.utils.Collections;
 import org.hadatac.utils.NameSpaces;
-import play.Play;
 
 public class User implements Comparable<User> {
 	private String uri;
@@ -168,21 +158,9 @@ public class User implements Comparable<User> {
     	System.out.println("!!!! INSERT USER QUERY\n" + insert);
         
         UpdateRequest request = UpdateFactory.create(insert);
-        UpdateProcessor processor = UpdateExecutionFactory.createRemote(request, Collections.getCollectionsName(Collections.PERMISSIONS_SPARQL));
+        UpdateProcessor processor = UpdateExecutionFactory.createRemote(request, 
+        		Collections.getCollectionsName(Collections.PERMISSIONS_UPDATE));
         processor.execute();
-        
-        DefaultHttpClient httpclient = new DefaultHttpClient();
-        HttpGet httpget = new HttpGet(Play.application().configuration().getString("hadatac.solr.triplestore")
-        		+ "/store_users/update?commit=true");
-        try {
-			httpclient.execute(httpget);
-		} catch (ClientProtocolException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
 	}
 	
 	public static User create() {
@@ -201,7 +179,8 @@ public class User implements Comparable<User> {
 		
 		Query query = QueryFactory.create(queryString);
 		
-		QueryExecution qexec = QueryExecutionFactory.sparqlService(Collections.getCollectionsName(Collections.PERMISSIONS_SPARQL), query);
+		QueryExecution qexec = QueryExecutionFactory.sparqlService(
+				Collections.getCollectionsName(Collections.PERMISSIONS_SPARQL), query);
 		ResultSet results = qexec.execSelect();
 		ResultSetRewindable resultsrw = ResultSetFactory.copyResults(results);
 		qexec.close();
@@ -283,7 +262,8 @@ public class User implements Comparable<User> {
 		    }
 		}
 		
-		QueryExecution qexecPublic = QueryExecutionFactory.sparqlService(Collections.getCollectionsName(Collections.METADATA_SPARQL), query);
+		QueryExecution qexecPublic = QueryExecutionFactory.sparqlService(
+				Collections.getCollectionsName(Collections.METADATA_SPARQL), query);
 		modelPublic = qexecPublic.execDescribe();
 		
 		StmtIterator stmtIteratorPublic = modelPublic.listStatements();
@@ -330,7 +310,8 @@ public class User implements Comparable<User> {
 		
 		System.out.println(command);
 		UpdateRequest req = UpdateFactory.create(command);
-		UpdateProcessor processor = UpdateExecutionFactory.createRemote(req, Collections.getCollectionsName(Collections.PERMISSIONS_SPARQL));
+		UpdateProcessor processor = UpdateExecutionFactory.createRemote(
+				req, Collections.getCollectionsName(Collections.PERMISSIONS_UPDATE));
 		processor.execute();
 	}
 	
@@ -344,23 +325,9 @@ public class User implements Comparable<User> {
 		queryString += "DELETE WHERE { <" + uri + "> ?p ?o . } ";
 		System.out.println(queryString);
 		UpdateRequest req = UpdateFactory.create(queryString);
-		UpdateProcessor processor = UpdateExecutionFactory.createRemote(req, Collections.getCollectionsName(Collections.PERMISSIONS_SPARQL));
-		try {
-			processor.execute();
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		
-        HttpClient httpclient = HttpClientBuilder.create().build();
-        HttpGet httpget = new HttpGet(Play.application().configuration().getString("hadatac.solr.permissions")
-            	+ "/store_users/update?commit=true");
-        try {
-    	    httpclient.execute(httpget);  
-	    } catch (ClientProtocolException e) {
-    		e.printStackTrace();
-	    } catch (IOException e) {
-		    e.printStackTrace();
-	    }
+		UpdateProcessor processor = UpdateExecutionFactory.createRemote(
+				req, Collections.getCollectionsName(Collections.PERMISSIONS_UPDATE));
+		processor.execute();
 	}
 	
 	@Override

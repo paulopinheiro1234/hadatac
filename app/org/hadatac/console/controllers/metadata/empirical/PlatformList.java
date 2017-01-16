@@ -31,7 +31,7 @@ public class PlatformList extends Controller {
             query_json = query_submit.executeQuery(tabName);
             //System.out.println("query_json = " + query_json);
             theResults = new SparqlQueryResults(query_json, false);
-        } catch (IllegalStateException | IOException | NullPointerException e1) {
+        } catch (IllegalStateException | NullPointerException e1) {
             return internalServerError(error_page.render(e1.toString(), tabName));
             //e1.printStackTrace();
         }
@@ -52,7 +52,7 @@ public class PlatformList extends Controller {
             query_json = query_submit.executeQuery(tabName);
             //System.out.println("query_json = " + query_json);
             theResults = new SparqlQueryResults(query_json, false);
-        } catch (IllegalStateException | IOException | NullPointerException e1) {
+        } catch (IllegalStateException | NullPointerException e1) {
             return internalServerError(error_page.render(e1.toString(), tabName));
             //e1.printStackTrace();
         }

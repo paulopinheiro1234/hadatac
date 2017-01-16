@@ -17,9 +17,9 @@ public class Collections {
 	public static final String SCHEMA_ATTRIBUTES           = "/schema_attributes/select";
     
     // triplestore
-	public static final String METADATA_SPARQL             = "/store/sparql";
+	public static final String METADATA_SPARQL             = "/store/query";
 	public static final String METADATA_UPDATE             = "/store/update";
-	public static final String METADATA_GRAPH              = "/store/rdf-graph-store";
+	public static final String METADATA_GRAPH              = "/store/data";
     
     // users 
 	public static final String AUTHENTICATE_USERS          = "/users";
@@ -29,10 +29,9 @@ public class Collections {
 	public static final String AUTHENTICATE_PERMISSIONS    = "/user_permission";
    
     // permissions
-	public static final String PERMISSIONS_SPARQL          = "/store_users/sparql";
+	public static final String PERMISSIONS_SPARQL          = "/store_users/query";
 	public static final String PERMISSIONS_UPDATE          = "/store_users/update";
-	public static final String PERMISSIONS_GRAPH           = "/store_users/rdf-graph-store";
-	
+	public static final String PERMISSIONS_GRAPH           = "/store_users/data";
     
 	public static String getCollectionsName(String request) {
 	

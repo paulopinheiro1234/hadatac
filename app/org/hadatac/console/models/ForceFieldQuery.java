@@ -38,7 +38,7 @@ public class ForceFieldQuery {
 	    try {
 			query_json = query_submit.executeQuery(tabQuery);
 			System.out.println("Here is the result: <" + query_json + ">");
-		} catch (IllegalStateException | IOException e1) {
+		} catch (IllegalStateException e1) {
 	        e1.printStackTrace();
 		}
 	

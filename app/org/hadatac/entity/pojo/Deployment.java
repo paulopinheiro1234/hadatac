@@ -1,13 +1,9 @@
 package org.hadatac.entity.pojo;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import org.apache.http.client.ClientProtocolException;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.jena.query.Query;
 import org.apache.jena.query.QueryExecution;
 import org.apache.jena.query.QueryExecutionFactory;
@@ -201,21 +197,9 @@ public class Deployment {
     	insert += LINE_LAST;
     	System.out.println(insert);
     	UpdateRequest request = UpdateFactory.create(insert);
-        UpdateProcessor processor = UpdateExecutionFactory.createRemote(request, Collections.getCollectionsName(Collections.METADATA_SPARQL));
+        UpdateProcessor processor = UpdateExecutionFactory.createRemote(
+        		request, Collections.getCollectionsName(Collections.METADATA_UPDATE));
         processor.execute();
-        
-        DefaultHttpClient httpclient = new DefaultHttpClient();
-        HttpGet httpget = new HttpGet(Play.application().configuration().getString("hadatac.solr.triplestore")
-        		+ "/store/update?commit=true");
-        try {
-			httpclient.execute(httpget);
-		} catch (ClientProtocolException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
 	}
 	
 	public void saveEndedAtTime() {
@@ -228,21 +212,8 @@ public class Deployment {
     	    insert += LINE_LAST;
     	    System.out.println(insert);
     	    UpdateRequest request = UpdateFactory.create(insert);
-            UpdateProcessor processor = UpdateExecutionFactory.createRemote(request,Collections.getCollectionsName(Collections.METADATA_SPARQL)); 
+            UpdateProcessor processor = UpdateExecutionFactory.createRemote(request,Collections.getCollectionsName(Collections.METADATA_UPDATE)); 
             processor.execute();
-        
-            DefaultHttpClient httpclient = new DefaultHttpClient();
-            HttpGet httpget = new HttpGet(Play.application().configuration().getString("hadatac.solr.triplestore")
-             		+ "/store/update?commit=true");
-            try {
-    			httpclient.execute(httpget);  
-	    	} catch (ClientProtocolException e) {
-    			// TODO Auto-generated catch block
-    			e.printStackTrace();
-	    	} catch (IOException e) {
-		    	// TODO Auto-generated catch block
-		    	e.printStackTrace();
-	    	}
        	}
 	}
 	
@@ -265,21 +236,8 @@ public class Deployment {
     	query += LINE_LAST;
         System.out.println(query);
     	UpdateRequest request = UpdateFactory.create(query);
-        UpdateProcessor processor = UpdateExecutionFactory.createRemote(request, Collections.getCollectionsName(Collections.METADATA_SPARQL));
+        UpdateProcessor processor = UpdateExecutionFactory.createRemote(request, Collections.getCollectionsName(Collections.METADATA_UPDATE));
         processor.execute();
-        
-        DefaultHttpClient httpclient = new DefaultHttpClient();
-        HttpGet httpget = new HttpGet(Play.application().configuration().getString("hadatac.solr.triplestore")
-            	+ "/store/update?commit=true");
-        try {
-    	    httpclient.execute(httpget);  
-	    } catch (ClientProtocolException e) {
-    		// TODO Auto-generated catch block
-    		e.printStackTrace();
-	    } catch (IOException e) {
-		    // TODO Auto-generated catch block
-		    e.printStackTrace();
-	    }
 	}
 	
 	public static Deployment create(String uri) {

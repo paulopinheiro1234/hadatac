@@ -42,7 +42,7 @@ public class NewDeployment extends Controller {
             query_json = query_submit.executeQuery(tabName);
             //System.out.println("query_json = " + query_json);
             thePlatforms = new SparqlQueryResults(query_json, false);
-        } catch (IllegalStateException | IOException | NullPointerException e1) {
+        } catch (IllegalStateException | NullPointerException e1) {
             e1.printStackTrace();
         }
 		return thePlatforms;

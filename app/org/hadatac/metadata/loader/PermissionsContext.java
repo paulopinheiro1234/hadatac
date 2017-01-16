@@ -1,36 +1,26 @@
 package org.hadatac.metadata.loader;
 
-import java.util.Map;
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.StringReader;
-import java.io.StringWriter;
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
-
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-
-import org.apache.commons.io.IOUtils;
-import org.apache.http.HttpResponse;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.http.impl.client.HttpClients;
 import org.apache.jena.query.DatasetAccessor;
 import org.apache.jena.query.DatasetAccessorFactory;
+import org.apache.jena.query.Query;
+import org.apache.jena.query.QueryExecution;
+import org.apache.jena.query.QueryExecutionFactory;
+import org.apache.jena.query.QueryFactory;
+import org.apache.jena.query.QuerySolution;
+import org.apache.jena.query.ResultSet;
+import org.apache.jena.query.ResultSetFactory;
+import org.apache.jena.query.ResultSetRewindable;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
 import org.apache.jena.riot.RiotNotFoundException;
 import org.apache.jena.shared.NotFoundException;
+import org.apache.jena.update.UpdateExecutionFactory;
+import org.apache.jena.update.UpdateFactory;
+import org.apache.jena.update.UpdateProcessor;
+import org.apache.jena.update.UpdateRequest;
 import org.hadatac.utils.Collections;
-import org.hadatac.utils.Command;
 import org.hadatac.utils.Feedback;
-import org.w3c.dom.Document;
-import org.xml.sax.InputSource;
+import org.hadatac.utils.NameSpaces;
 
 import play.Play;
 import play.libs.ws.*;
@@ -46,95 +36,56 @@ public class PermissionsContext implements RDFContext {
     String loadFileMessage = "";
 	
     public PermissionsContext(String un, String pwd, String kb, boolean ver) {
-        //System.out.println("Permissions management set for knowledge base at " + kb);
 	    username = un;
 	    password = pwd;
 	    verbose = ver;
     }
 
     public static Long playTotalTriples() {
-	     PermissionsContext permissions = new PermissionsContext("user", 
-	    		                                        "password", 
-	    		                                        Play.application().configuration().getString("hadatac.solr.permissions"), 
-	    		                                        false);
-      return permissions.totalTriples();
+    	PermissionsContext permissions = new PermissionsContext(
+	    		 "user", "password", 
+	    		 Play.application().configuration().getString("hadatac.solr.permissions"),
+	    		 false);
+    	return permissions.totalTriples();
     }
-
-    private String executeQuery(String query) throws IllegalStateException, IOException{
-        CloseableHttpClient httpClient = HttpClients.createDefault();
-        //Scanner in = null;
-        try {
-        	HttpClient client = new DefaultHttpClient();
-         	HttpGet request = new HttpGet(Collections.getCollectionsName(Collections.PERMISSIONS_SPARQL) + "?q=" + URLEncoder.encode(query, "UTF-8"));
-        	request.setHeader("Accept", "application/sparql-results+xml");
-        	HttpResponse response = client.execute(request);
-            StringWriter writer = new StringWriter();
-            IOUtils.copy(response.getEntity().getContent(), writer, "utf-8");
-    
-            return writer.toString();
-            
-        } finally {
-        }
-    }// /executeQuery()
-    
+   
     public Long totalTriples() {
-    	String query = "SELECT (COUNT(*) as ?tot) WHERE { ?s ?p ?o . }";
     	try {
-			String result = executeQuery(query);
-		    DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-		    DocumentBuilder builder = factory.newDocumentBuilder();
-		    InputSource is = new InputSource(new StringReader(result));
-		    Document doc = builder.parse(is);
-		    //System.out.println(result);
-		    return Long.valueOf(doc.getElementsByTagName("literal").item(0).getTextContent()).longValue();
+    		String queryString = NameSpaces.getInstance().printSparqlNameSpaceList() + 
+    				"SELECT (COUNT(*) as ?tot) WHERE { ?s ?p ?o . }";
+    		
+    		Query query = QueryFactory.create(queryString);
+    			
+    		QueryExecution qexec = QueryExecutionFactory.sparqlService(Collections.getCollectionsName(Collections.PERMISSIONS_SPARQL), query);
+    		ResultSet results = qexec.execSelect();
+    		ResultSetRewindable resultsrw = ResultSetFactory.copyResults(results);
+    		qexec.close();
+    		
+    		QuerySolution soln = resultsrw.next();
+    		return Long.valueOf(soln.getLiteral("tot").getValue().toString()).longValue();
     	} catch (Exception e) {
-			//e.printStackTrace();
+			e.printStackTrace();
 			return (long) -1;
-		} 
+		}
     }
     
 	public String clean(int mode) {
-	    String message = "";
-	    String straux = "";
-	    //System.out.println("Is WEB? " + (mode == Feedback.WEB));
+		String message = "";
         message += Feedback.println(mode,"   Triples before [clean]: " + totalTriples());
         message += Feedback.println(mode, " ");
-	    // ATTENTION: For now, it erases entirely the content of the metadata collection 
-	    String query1 = "<delete><query>*:*</query></delete>";
-	    String query2 = "<commit/>";
-	    
-	    String url1;
-	    String url2;
-		try {
-		    url1 = Collections.getCollectionsName(Collections.PERMISSIONS_UPDATE) + "?stream.body=" + URLEncoder.encode(query1, "UTF-8");
-		    url2 = Collections.getCollectionsName(Collections.PERMISSIONS_SPARQL) + "?stream.body=" + URLEncoder.encode(query2, "UTF-8");
-		    //Runtime.getRuntime().exec("curl -v " + url1);
-		    //Runtime.getRuntime().exec("curl -v " + url2);
-		    if (verbose) {
-		        message += Feedback.println(mode, url1);
-		        message += Feedback.println(mode, url2);
-		    }
-		    String[] cmd1 = {"curl", "-v", url1};
-			message += Feedback.print(mode, "    Erasing triples... ");                
-		    straux = Command.exec(mode, verbose, cmd1);
-		    if (mode == Feedback.WEB) {
-		    	message += straux;
-		    }
-		    message += Feedback.println(mode, "");
-			message += Feedback.print(mode, "   Committing... ");                
-		    String[] cmd2 = {"curl", "-v", url2};
-		    straux = Command.exec(mode, verbose, cmd2);
-		    if (mode == Feedback.WEB) {
-		    	message += straux;
-		    }
-		    message += Feedback.println(mode," ");
-		    message += Feedback.println(mode," ");
-			message += Feedback.print(mode,"   Triples after [clean]: " + totalTriples());                
-		} catch (UnsupportedEncodingException e) {
-		    System.out.println("[PermissionsManagement] - ERROR encoding URLs");
-		    //e.printStackTrace();
-		    return message;
-		}
+        
+        String queryString = "";
+		queryString += NameSpaces.getInstance().printSparqlNameSpaceList();
+		queryString += "DELETE WHERE { ?s ?p ?o . } ";
+		UpdateRequest req = UpdateFactory.create(queryString);
+		UpdateProcessor processor = UpdateExecutionFactory.createRemote(req, 
+				Collections.getCollectionsName(Collections.PERMISSIONS_UPDATE));
+		processor.execute();
+		
+		message += Feedback.println(mode, " ");
+		message += Feedback.println(mode, " ");
+		message += Feedback.print(mode, "   Triples after [clean]: " + totalTriples());
+		
         return message; 
 	}
 	
@@ -155,7 +106,8 @@ public class PermissionsContext implements RDFContext {
 	 */
 	public Long loadLocalFile(int mode, String filePath, String contentType) {
 		Model model = ModelFactory.createDefaultModel();
-		DatasetAccessor accessor = DatasetAccessorFactory.createHTTP(Collections.getCollectionsName(Collections.PERMISSIONS_GRAPH));		
+		DatasetAccessor accessor = DatasetAccessorFactory.createHTTP(
+				Collections.getCollectionsName(Collections.PERMISSIONS_GRAPH));		
 
 		loadFileMessage = "";
 		Long total = totalTriples();

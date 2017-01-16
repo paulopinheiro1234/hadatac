@@ -32,7 +32,7 @@ public class Detector extends Controller {
             //System.out.println("perspective_json = " + perspective_json);
             theResults = new SparqlQueryResults(query_json, false);
             perspectives = new SparqlQueryResults(perspective_json, false);
-        } catch (IllegalStateException | IOException | NullPointerException e1) {
+        } catch (IllegalStateException | NullPointerException e1) {
             return internalServerError(error_page.render(e1.toString(), tabName));
             //e1.printStackTrace();
         }
@@ -57,7 +57,7 @@ public class Detector extends Controller {
             //System.out.println("query_json = " + query_json);
             theResults = new SparqlQueryResults(query_json, false);
             perspectives = new SparqlQueryResults(perspective_json, false);
-        } catch (IllegalStateException | IOException | NullPointerException e1) {
+        } catch (IllegalStateException | NullPointerException e1) {
             return internalServerError(error_page.render(e1.toString(), tabName));
             //e1.printStackTrace();
         }

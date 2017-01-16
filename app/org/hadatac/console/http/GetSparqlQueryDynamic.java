@@ -1,27 +1,18 @@
 package org.hadatac.console.http;
+import java.io.ByteArrayOutputStream;
 //This Java Class was Dynamically Generated
-import java.io.IOException;
-import java.io.StringWriter;
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
-import java.util.Scanner;
-import java.util.TreeMap;
 import org.hadatac.console.models.SparqlQuery;
 import org.hadatac.utils.Collections;
-import org.apache.commons.io.IOUtils;
-import org.apache.http.HttpResponse;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.http.impl.client.HttpClients;
-import play.Play;
-public class GetSparqlQueryDynamic { 
-    public StringBuffer sparql_query = new StringBuffer();
-    public TreeMap<String, StringBuffer> list_of_queries = new TreeMap<String, StringBuffer>();
+import org.hadatac.utils.NameSpaces;
+import org.apache.jena.query.Query;
+import org.apache.jena.query.QueryExecution;
+import org.apache.jena.query.QueryExecutionFactory;
+import org.apache.jena.query.QueryFactory;
+import org.apache.jena.query.ResultSet;
+import org.apache.jena.query.ResultSetFormatter;
+
+public class GetSparqlQueryDynamic {
     public String collection;
-    private int numThings = 51;
-    public String[] thingTypes = new String[numThings];
 
     public GetSparqlQueryDynamic () {} 
 
@@ -30,27 +21,8 @@ public class GetSparqlQueryDynamic {
     }
 
     public GetSparqlQueryDynamic (String collectionSource, SparqlQuery query) {
-        addThingTypes();
         this.collection = Collections.getCollectionsName(collectionSource);
         System.out.println("Collection: " + collection);
-
-        for (String tabName : thingTypes ){
-            this.sparql_query = new StringBuffer();
-            this.sparql_query.append(collection);
-            this.sparql_query.append("?q=");
-            String q = querySelector(tabName);
-
-            @SuppressWarnings("unused")
-            String quote = new String();
-            try {
-                this.sparql_query.append(URLEncoder.encode(q, "UTF-8"));
-                quote = URLEncoder.encode("\"", "UTF-8");
-            } catch (UnsupportedEncodingException e) {
-                e.printStackTrace();
-            }
-
-            this.list_of_queries.put(tabName, this.sparql_query);
-        }
     }
 
     public GetSparqlQueryDynamic (SparqlQuery query, String tabName) {
@@ -60,75 +32,6 @@ public class GetSparqlQueryDynamic {
     public GetSparqlQueryDynamic (String collectionSource, SparqlQuery query, String tabName) {
         this.collection = Collections.getCollectionsName(collectionSource);
         System.out.println("Collection: " + collection);
-        this.sparql_query = new StringBuffer();
-        this.sparql_query.append(collection);
-        this.sparql_query.append("?q=");
-        String q = querySelector(tabName);
-
-        @SuppressWarnings("unused")
-        String quote = new String();
-        try {
-            this.sparql_query.append(URLEncoder.encode(q, "UTF-8"));
-            quote = URLEncoder.encode("\"", "UTF-8");
-        } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
-        }
-
-        this.list_of_queries.put(tabName, this.sparql_query);
-    }
-
-    public void addThingTypes(){
-        thingTypes[0]  = "AlcoholTobaccoandIllicitDrugUse";
-        thingTypes[1]  = "Acculturation";
-        thingTypes[2]  = "AlkylPhosphatePesticideMetabolite";
-        thingTypes[3]  = "Anthropometry";
-        thingTypes[4]  = "ArsenicSpecies";
-        thingTypes[5]  = "PhysicalandMentalAssessment";
-        thingTypes[6]  = "BirthOutcome";
-        thingTypes[7]  = "DeliveryCharacteristics";
-        thingTypes[8]  = "Demographic";
-        thingTypes[9]  = "DietandNutrition";
-        thingTypes[10]  = "Element";
-        thingTypes[11]  = "EnvironmentalExposure";
-        thingTypes[12]  = "HospitalUtilizationandAccesstoCare";
-        thingTypes[13]  = "HousingCharacteristic";
-        thingTypes[14]  = "MedicalHistory";
-        thingTypes[15]  = "MentalHealth";
-        thingTypes[16]  = "MercurySpecies";
-        thingTypes[17]  = "NeighborhoodCharacteristic";
-        thingTypes[18]  = "OralHealth";
-        thingTypes[19]  = "VolatileOrganicCompound";
-        thingTypes[20]  = "Paraben";
-        thingTypes[21]  = "ParentalHealthandFamilyHistory";
-        thingTypes[22]  = "PFC";
-        thingTypes[23]  = "PersonalProductUse";
-        thingTypes[24]  = "EnvironmentalPhenol";
-        thingTypes[25]  = "Phthalate";
-        thingTypes[26]  = "PhysicalActivityandFitness";
-        thingTypes[27]  = "PolybrominatedDiphenylEther";
-        thingTypes[28]  = "PregnancyCharacteristic";
-        thingTypes[29]  = "PregnancySample";
-        thingTypes[30]  = "PrescriptionMedicationandDietarySupplements";
-        thingTypes[31]  = "ReproductiveHealth";
-        thingTypes[32]  = "SleepCharacterisitic";
-        thingTypes[33]  = "SocioeconomicClassStatus";
-        thingTypes[34]  = "TargetedAnalyte";
-        thingTypes[35]  = "TobaccoMetabolite";
-        thingTypes[36]  = "Creatinine";
-        thingTypes[37]  = "DataAcquisitionSchemaAttribute";
-        thingTypes[38]  = "Organization";
-        thingTypes[39]  = "Person";
-        thingTypes[40]  = "Attribute";
-        thingTypes[41]  = "Cell";
-        thingTypes[42]  = "Entity";
-        thingTypes[43]  = "Object";
-        thingTypes[44]  = "Process";
-        thingTypes[45]  = "Tissue";
-        thingTypes[46]  = "Deployments";
-        thingTypes[47]  = "Detector";
-        thingTypes[48]  = "Instrument";
-        thingTypes[49]  = "Platform";
-        thingTypes[50]  = "SensingPerspective";
     }
 
     public String querySelector(String tabName){
@@ -954,20 +857,28 @@ public class GetSparqlQueryDynamic {
                 q = "";
                 System.out.println("WARNING: no query for tab " + tabName);
         }
-    return q; 
+        
+        return q; 
     }
 
-    public String executeQuery(String tab) throws IllegalStateException, IOException{
-        try {
-            HttpClient client = new DefaultHttpClient();
-            HttpGet request = new HttpGet(list_of_queries.get(tab).toString().replace(" ", "%20"));
-            System.out.println(tab + " : " + list_of_queries.get(tab));
-            request.setHeader("Accept", "application/sparql-results+json");
-            HttpResponse response = client.execute(request);
-            StringWriter writer = new StringWriter();
-            IOUtils.copy(response.getEntity().getContent(), writer, "utf-8");
-            System.out.println("Response: " + response);
-            return writer.toString();
-        } finally {}
+    public String executeQuery(String tab) {
+    	ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+    	try {
+    		String queryString = NameSpaces.getInstance().printSparqlNameSpaceList() + 
+    					querySelector(tab);
+    		Query query = QueryFactory.create(queryString);
+    		QueryExecution qexec = QueryExecutionFactory.sparqlService(collection, query);
+    		ResultSet results = qexec.execSelect();
+    		
+    		ResultSetFormatter.outputAsJSON(outputStream, results);
+    		qexec.close();
+    		
+    		return outputStream.toString("UTF-8");
+    	} catch (Exception e) {
+			e.printStackTrace();
+		}
+    	
+    	return "";
     }
 }
+

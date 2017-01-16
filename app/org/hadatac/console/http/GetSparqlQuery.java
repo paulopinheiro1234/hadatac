@@ -1,21 +1,23 @@
 package org.hadatac.console.http;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
-import java.util.Scanner;
 import java.util.TreeMap;
 
 import org.hadatac.console.models.SparqlQuery;
 import org.hadatac.utils.Collections;
-import org.apache.commons.io.IOUtils;
-import org.apache.http.HttpResponse;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.http.impl.client.HttpClients;
+import org.hadatac.utils.NameSpaces;
+import org.apache.jena.query.Query;
+import org.apache.jena.query.QueryExecution;
+import org.apache.jena.query.QueryExecutionFactory;
+import org.apache.jena.query.QueryFactory;
+import org.apache.jena.query.QuerySolution;
+import org.apache.jena.query.ResultSet;
+import org.apache.jena.query.ResultSetFactory;
+import org.apache.jena.query.ResultSetRewindable;
+import org.apache.jena.query.ResultSetFormatter;
 
 import play.Play;
 
@@ -550,30 +552,28 @@ public class GetSparqlQuery {
         return q;
     } // /querySelector
     
-    //Preconditions: The GetSparqlQuery object has been initialized with a Query object
-    //Inputs: None. Executes query based on the member string sparql_query.
-    //Output: Returns JSON in the form of a string. Currently does not handle http errors
-    //		  very gracefully. Need to change this.
-    //Postconditions: None
-    public String executeQuery(String tab) throws IllegalStateException, IOException{
-        CloseableHttpClient httpClient = HttpClients.createDefault();
-        //HttpGet get = new HttpGet(this.collection_urls.get(collection));
-        
-        Scanner in = null;
-        try {
-        	HttpClient client = new DefaultHttpClient();
-        	HttpGet request = new HttpGet(list_of_queries.get(tab).toString().replace(" ", "%20"));
-        	System.out.println(tab + " : " + list_of_queries.get(tab));
-        	request.setHeader("Accept", "application/sparql-results+json");
-        	HttpResponse response = client.execute(request);
-            StringWriter writer = new StringWriter();
-            IOUtils.copy(response.getEntity().getContent(), writer, "utf-8");
-            System.out.println("response: " + response);    
-            return writer.toString();
-        } finally
-        {
-            //in.close();
-            //request.close();
-        }
-    } // /executeQuery()
+    public String executeQuery(String tab) {
+    	ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+    	
+    	try {
+    		String queryString = NameSpaces.getInstance().printSparqlNameSpaceList() + 
+    				querySelector(tab);
+    		System.out.println("queryString: " + querySelector(tab));
+    		Query query = QueryFactory.create(queryString);
+    			
+    		QueryExecution qexec = QueryExecutionFactory.sparqlService(
+    				Collections.getCollectionsName(Collections.PERMISSIONS_SPARQL), query);
+    		ResultSet results = qexec.execSelect();
+    		
+    		ResultSetFormatter.outputAsJSON(outputStream, results);
+    		qexec.close();
+    		
+    		return outputStream.toString("UTF-8");
+    	} catch (Exception e) {
+			e.printStackTrace();
+		}
+    	
+    	return "";
+    }
 }
+

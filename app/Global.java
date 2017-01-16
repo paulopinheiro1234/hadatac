@@ -159,8 +159,7 @@ public class Global extends GlobalSettings {
 		}
 		if (!Repository.operational(Repository.METADATA)) {
 			System.out.println("Repository " + Repository.METADATA + " was identified as being down");
-			Repository.startStopMetadataRepository(Repository.START, Repository.METADATA);
-			System.out.println("A startup command has been issue to epository " + Repository.METADATA + ".");
+			//System.out.println("A startup command has been issue to epository " + Repository.METADATA + ".");
 		}
 	}
 }

@@ -37,7 +37,7 @@ public class TreeQuery {
 	    try {
 			query_json = query_submit.executeQuery(tabQuery);
 			System.out.println("AQUI ESTA O RESULTADO: <" + query_json + ">");
-		} catch (IllegalStateException | IOException e1) {
+		} catch (IllegalStateException e1) {
 	        e1.printStackTrace();
 		}
 	
