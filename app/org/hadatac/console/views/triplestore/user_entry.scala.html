@@ -16,6 +16,7 @@
    	}
    	</td>
    	<td>@if(user.isAdministrator()) { YES } else { NO }</td>
+   	<td>@if(user.isValidated()) { Validated } else { Pending }</td>
    	<td>
     	@if(user.isAdministrator()) {
         	<a href="@org.hadatac.console.controllers.triplestore.routes.UserManagement.revokeAdminPermission(URLEncoder.encode(user.getUri(),"UTF-8"))" class="btn-xs btn-primary" role="button">Revoke Admin</a>
@@ -24,5 +25,6 @@
       	}
       	<a href="@org.hadatac.console.controllers.triplestore.routes.UserManagement.editUser(URLEncoder.encode(user.getUri(),"UTF-8"))" class="btn-xs btn-primary" role="button">Edit</a>
       	<a href="@org.hadatac.console.controllers.triplestore.routes.UserManagement.deleteUser(URLEncoder.encode(user.getUri(),"UTF-8"))" class="btn-xs btn-primary" role="button">Delete</a>
+      	<a href="@org.hadatac.console.controllers.triplestore.routes.UserManagement.sendInvitationEmail(user.getGivenName(), user.getEmail())" class="btn-xs btn-primary" role="button">Send Validation Email</a>
    	</td>
 </tr>

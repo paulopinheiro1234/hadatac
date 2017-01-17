@@ -17,7 +17,7 @@ import be.objectify.deadbolt.core.models.Permission;
  * Initial version based on work by Steve Chaloner (steve@objectify.be) for
  * Deadbolt2
  */
-public class UserPermission extends AppModel implements Permission {
+public class UserPermission implements Permission {
 	/**
 	 * 
 	 */

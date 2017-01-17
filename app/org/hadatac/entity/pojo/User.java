@@ -133,6 +133,14 @@ public class User implements Comparable<User> {
 		return false;
 	}
 	
+	public boolean isValidated() {
+		SysUser user = SysUser.findByEmail(getEmail());
+		if(null != user) {
+			return user.isEmailValidated();
+		}
+		return false;
+	}
+	
 	public void getGroupNames(Map<String, String> nameList) {
 		if(getImmediateGroupUri() != null) {
 			User user = UserGroup.find(getImmediateGroupUri());
@@ -318,6 +326,14 @@ public class User implements Comparable<User> {
 	public static void deleteUser(String uri) {
 		for(User user : UserGroup.findMembers(uri)){
 			changeAccessLevel(user.getUri(), User.find(uri).getImmediateGroupUri());
+		}
+		
+		User user = User.find(uri);
+		if(null != user){
+			SysUser sys_user = SysUser.findByEmail(user.getEmail());
+			if(null != sys_user){
+				sys_user.delete();
+			}
 		}
 		
 		String queryString = "";

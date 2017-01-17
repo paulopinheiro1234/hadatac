@@ -237,8 +237,8 @@ GET     /hadatac/perm/onlinepreregister            org.hadatac.console.controlle
 POST    /hadatac/perm/onlinepreregister            org.hadatac.console.controllers.triplestore.UserManagement.postOnLinePreRegistration(oper: String)
 GET     /hadatac/perm/onlinegroupregister          org.hadatac.console.controllers.triplestore.UserManagement.onLineGroupRegistration(oper: String)
 POST    /hadatac/perm/onlinegroupregister          org.hadatac.console.controllers.triplestore.UserManagement.postOnLineGroupRegistration(oper: String)
-GET     /hadatac/perm/preregister                  org.hadatac.console.controllers.triplestore.UserManagement.index(oper: String)
-POST    /hadatac/perm/preregister                  org.hadatac.console.controllers.triplestore.UserManagement.postIndex(oper: String)
+GET     /hadatac/perm/user                  	   org.hadatac.console.controllers.triplestore.UserManagement.index(oper: String)
+POST    /hadatac/perm/user                         org.hadatac.console.controllers.triplestore.UserManagement.postIndex(oper: String)
 POST    /hadatac/perm/preregister/upload           org.hadatac.console.controllers.triplestore.UserManagement.uploadFile()
 POST    /hadatac/perm/preregister/uploadform       org.hadatac.console.controllers.triplestore.UserManagement.submitPreRegistrationForm(oper: String)
 GET	    /hadatac/perm/userNetwork			       org.hadatac.console.controllers.triplestore.UserNetwork.index()
@@ -253,6 +253,8 @@ GET	    /hadatac/perm/editgroup		        	   org.hadatac.console.controllers.tri
 POST	/hadatac/perm/editgroup     			   org.hadatac.console.controllers.triplestore.UserManagement.postEditGroup(user_uri: String)
 GET	    /hadatac/perm/delete		        	   org.hadatac.console.controllers.triplestore.UserManagement.deleteUser(user_uri: String)
 POST	/hadatac/perm/delete     			       org.hadatac.console.controllers.triplestore.UserManagement.postDeleteUser(user_uri: String)
+GET	    /hadatac/perm/invite		        	   org.hadatac.console.controllers.triplestore.UserManagement.sendInvitationEmail(user_name: String, user_email: String)
+POST	/hadatac/perm/invite     			       org.hadatac.console.controllers.triplestore.UserManagement.postSendInvitationEmail(user_name: String, user_email: String)
  
 # Map static resources from the /public folder to the /assets URL path
 GET     /hadatac/assets/*file                      controllers.Assets.versioned(path="/public", file: Asset)

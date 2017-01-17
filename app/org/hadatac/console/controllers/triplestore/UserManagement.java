@@ -24,6 +24,7 @@ import org.apache.commons.io.IOUtils;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.riot.RDFDataMgr;
 import org.hadatac.console.controllers.AuthApplication;
+import org.hadatac.console.providers.MyUsernamePasswordAuthProvider;
 import org.hadatac.console.http.PermissionQueries;
 import org.hadatac.console.models.UserPreRegistrationForm;
 import org.hadatac.console.models.GroupRegistrationForm;
@@ -187,6 +188,18 @@ public class UserManagement extends Controller {
 	@Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
     public static Result postDeleteUser(String user_uri) {
     	return deleteUser(user_uri);
+    }
+	
+	@Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
+    public static Result sendInvitationEmail(String user_name, String user_email) {
+		MyUsernamePasswordAuthProvider.getProvider().sendInvitationMailing(
+				user_name, user_email, ctx());
+		return redirect(routes.UserManagement.index("init"));
+    }
+
+	@Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
+    public static Result postSendInvitationEmail(String user_name, String user_email) {
+    	return sendInvitationEmail(user_name, user_email);
     }
 	
 	@Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
@@ -386,16 +399,13 @@ public class UserManagement extends Controller {
 	} 
 
 	public static boolean isPreRegistered(String email) {
-		//System.out.println("Email: " + email);
 		String json = PermissionQueries.exec(PermissionQueries.PERMISSION_BY_EMAIL, email);
 		SparqlQueryResults results = new SparqlQueryResults(json, false);
-		//System.out.println("results: " + results.json);
 		if (results == null || !results.sparqlResults.values().iterator().hasNext()) 
 			return false;
 		TripleDocument docPermission = results.sparqlResults.values().iterator().next();
 		String uri = docPermission.get("uri");
 		if (uri != null && !uri.equals("")) {
-			//System.out.println(uri);
 			return true; 
 		}
 		return false;

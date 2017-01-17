@@ -100,7 +100,7 @@ public class DeleteDataAcquisition extends Controller {
     		
             return "Data Acquisition deleted.";
     	}
+    	
     	return "Data Acquisition failed to be deleted.";
-        
     }
 }

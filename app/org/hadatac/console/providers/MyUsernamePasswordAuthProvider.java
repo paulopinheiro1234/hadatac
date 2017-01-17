@@ -306,12 +306,37 @@ public class MyUsernamePasswordAuthProvider
 
 		return new Body(text, html);
 	}
+	
+	protected Body getInvitationMailingBody(String user_name, String user_email, final Context ctx) {
+		final boolean isSecure = getConfiguration().getBoolean(
+				SETTING_KEY_VERIFICATION_LINK_SECURE);
+		final String url = routes.AuthApplication.signup().absoluteURL(
+				isSecure, Play.application().configuration().getString("hadatac.console.base_url"));
+
+		final Lang lang = Lang.preferred(ctx.request().acceptLanguages());
+		final String langCode = lang.code();
+
+		final String html = getEmailTemplate(
+				"org.hadatac.console.views.html.account.signup.email.invitation_email", langCode, url,
+				"", user_name, user_email);
+		final String text = getEmailTemplate(
+				"org.hadatac.console.views.txt.account.signup.email.invitation_email", langCode, url, 
+				"", user_name, user_email);
+
+		return new Body(text, html);
+	}
 
 	public void sendPasswordResetMailing(final SysUser user, final Context ctx) {
 		final String token = generatePasswordResetRecord(user);
 		final String subject = getPasswordResetMailingSubject(user, ctx);
 		final Body body = getPasswordResetMailingBody(token, user, ctx);
 		sendMail(subject, body, getEmailName(user));
+	}
+	
+	public void sendInvitationMailing(String user_name, String user_email, final Context ctx) {
+		final String subject = "Invitation from HADatAc Team";
+		final Body body = getInvitationMailingBody(user_name, user_email, ctx);
+		sendMail(subject, body, user_email);
 	}
 
 	public boolean isLoginAfterPasswordReset() {

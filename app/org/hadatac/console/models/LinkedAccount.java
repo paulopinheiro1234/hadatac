@@ -17,7 +17,7 @@ import play.Play;
 
 import com.feth.play.module.pa.user.AuthUser;
 
-public class LinkedAccount extends AppModel {
+public class LinkedAccount {
 
 	/**
 	 * 

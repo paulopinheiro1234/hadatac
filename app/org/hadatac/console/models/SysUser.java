@@ -19,9 +19,11 @@ import play.data.validation.Constraints;
 
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrQuery;
+import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.beans.Field;
 import org.apache.solr.client.solrj.impl.HttpSolrClient;
 import org.apache.solr.client.solrj.response.QueryResponse;
+import org.apache.solr.client.solrj.response.UpdateResponse;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
 import org.joda.time.DateTime;
@@ -30,7 +32,10 @@ import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 import org.joda.time.format.ISODateTimeFormat;
 
+import java.io.IOException;
 import java.util.*;
+
+import org.hadatac.entity.pojo.Measurement;
 import org.hadatac.entity.pojo.User;
 
 /**
@@ -38,7 +43,7 @@ import org.hadatac.entity.pojo.User;
  * Deadbolt2
  */
 
-public class SysUser extends AppModel implements Subject {
+public class SysUser implements Subject {
 	/**
 	 * 
 	 */
@@ -128,6 +133,10 @@ public class SysUser extends AppModel implements Subject {
 		return false;
 	}
 	
+	public boolean isEmailValidated() {
+		return emailValidated;
+	}
+	
 	public void addSecurityRole(String role_name) {
 		SecurityRole new_role = SecurityRole.findByRoleNameSolr(role_name);
 		boolean isRoleExisted = false;
@@ -176,8 +185,7 @@ public class SysUser extends AppModel implements Subject {
 	}
 
 	@Override
-	public String getIdentifier()
-	{
+	public String getIdentifier() {
 		return Long.toString(this.id);
 	}
 
@@ -477,6 +485,25 @@ public class SysUser extends AppModel implements Subject {
         	account.user = this;
         	account.save();
         }
+	}
+	
+	public int delete() {
+		try {
+			SolrClient solr = new HttpSolrClient(
+					Play.application().configuration().getString("hadatac.solr.users") + "/users");
+			UpdateResponse response = solr.deleteById(this.id_s);
+			solr.commit();
+			solr.close();
+			return response.getStatus();
+		} catch (SolrServerException e) {
+			System.out.println("[ERROR] SysUser.delete() - SolrServerException message: " + e.getMessage());
+		} catch (IOException e) {
+			System.out.println("[ERROR] SysUser.delete() - IOException message: " + e.getMessage());
+		} catch (Exception e) {
+			System.out.println("[ERROR] SysUser.delete() - Exception message: " + e.getMessage());
+		}
+		
+		return -1;
 	}
 
 	public static void merge(final AuthUser oldUser, final AuthUser newUser) {
