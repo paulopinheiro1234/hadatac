@@ -5,6 +5,7 @@ import org.hadatac.console.http.GetSparqlQueryDynamic;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 import java.util.TreeMap;
 
 import org.hadatac.console.models.SparqlQuery;
@@ -32,15 +33,16 @@ public class MetadataEntry extends Controller {
             query_json = query_submit.executeQuery(tabName);
             //System.out.println("query_json = " + query_json);
             theResults = new OtMSparqlQueryResults(query_json, true);
-        } catch (IllegalStateException | IOException | NullPointerException e1) {
+        } catch (IllegalStateException | NullPointerException | IOException	 e1) {
             return internalServerError(error_page.render(e1.toString(), tabName));
             //e1.printStackTrace();
         }
         System.out.println(tabName + " index() was called!");
     	
     	//List<org.hadatac.entity.pojo.Entity> entities = org.hadatac.entity.pojo.Entity.find();
-    	
-        return ok(metadata_browser.render(theResults, tabName));
+        Map<String,String> indicators = DynamicFunctions.getIndicatorTypes();
+        Map<String,List<String>> values = DynamicFunctions.getIndicatorValuesJustLabels(indicators);
+        return ok(metadata_browser.render(theResults, tabName, values));
     }// /index()
 
 

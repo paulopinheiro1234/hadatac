@@ -1,45 +1,19 @@
-@()
+@(indicatorMap : Map[String,List[String]])
 
 @import helper._
 @import org.hadatac.console.views.html._
 
 @main("Browse Metadata") {
     <div class="container-fluid">
+    
         <h2>Browse Metadata</h2>
+        
+        @for(indicatorKey <- indicatorMap.keySet()){
         <div class="row">
-            @agent_indicator_navigation("")
+            @indicator_navigation("",indicatorMap,indicatorKey)
         </div>
         <hr>
-
-        <div class="row">
-            @data_acquisition_indicator_navigation("")
-        </div>
-        <hr>
-
-        <div class="row">
-            @sample_indicator_navigation("")
-        </div>
-        <hr>
-
-        <div class="row">
-            @science_indicator_navigation("")
-        </div>
-        <hr>
-
-        <div class="row">
-            @study_indicator_navigation("")
-        </div>
-        <hr>
-
-        <div class="row">
-            @targeted_analyte_navigation("")
-        </div>
-        <hr>
-
-        <div class="row">
-            @variable_indicator_navigation("")
-        </div>
-        <hr>
+        }
 
         <br><br><br>
         @mainButton(false)

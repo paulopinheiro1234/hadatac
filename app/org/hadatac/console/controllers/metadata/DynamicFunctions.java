@@ -137,6 +137,44 @@ public class DynamicFunctions extends Controller {
 		return indicatorValueMap;
 	}
 	
+	public static Map<String, List<String>> getIndicatorValuesJustLabels(Map<String, String> indicatorMap){
+		Map<String, List<String>> indicatorValueMap = new HashMap<String, List<String>>();
+		List<String> values = new ArrayList<String>();
+		//String indicatorValue = "";
+		String indicatorValueLabel = "";
+		for(Map.Entry<String, String> entry : indicatorMap.entrySet()){
+			values = new ArrayList<String>();
+		    String indicatorType = entry.getKey().toString();
+		    String indvIndicatorQuery = getPrefixes() + "SELECT DISTINCT ?indicator " +
+					"(MIN(?label_) AS ?label)" +
+					"WHERE { ?indicator rdfs:subClassOf " + indicatorType + " . " +
+					"?indicator rdfs:label ?label_ . " + 
+					"} GROUP BY ?indicator ?label";
+
+		    QueryExecution qexecIndvInd = QueryExecutionFactory.sparqlService(Collections.getCollectionsName(Collections.METADATA_SPARQL), indvIndicatorQuery);
+			ResultSet indvIndResults = qexecIndvInd.execSelect();
+			ResultSetRewindable resultsrwIndvInd = ResultSetFactory.copyResults(indvIndResults);
+			qexecIndvInd.close();
+			while (resultsrwIndvInd.hasNext()) {
+				QuerySolution soln = resultsrwIndvInd.next();
+				indicatorValueLabel = "";
+				if (soln.contains("label")){
+					indicatorValueLabel = soln.get("label").toString();
+				}
+				else {
+					System.out.println("getIndicatorValues() No Label: " + soln.toString() + "\n");
+				}
+				if (soln.contains("indicator")){
+					//indicatorValue = replaceURLWithPrefix(soln.get("indicator").toString());
+					values.add(indicatorValueLabel);
+				}
+			}
+			String indicatorTypeLabel = entry.getValue().toString();
+			indicatorValueMap.put(indicatorTypeLabel,values);
+		}
+		return indicatorValueMap;
+	}
+	
 	public static Map<String, List<String>> getIndicatorValues(Map<String, String> indicatorMap){
 		Map<String, List<String>> indicatorValueMap = new HashMap<String, List<String>>();
 		List<String> values = new ArrayList<String>();
@@ -545,17 +583,19 @@ public class DynamicFunctions extends Controller {
     	System.out.println("Indicator Values: " + valueMap + "\n");
     	Map<String,Map<String,String>> valueMapWithLabels = getIndicatorValuesAndLabels(indicators);
     	System.out.println("Indicator Values and Labels: " + valueMapWithLabels + "\n");
-    	//System.out.println(replaceURLWithPrefix("http://hadatac.org/ont/chear#BloodPlasma"));
-    	//System.out.println(findSubject("chear-kb:SBJ-0032-Pilot-6"));
+    	Map<String,List<String>> valueMapJustLabels = getIndicatorValuesJustLabels(indicators);
+    	System.out.println("Indicator Values Just Labels: " + valueMapJustLabels + "\n");
+    	System.out.println(replaceURLWithPrefix("http://hadatac.org/ont/chear#BloodPlasma"));
+    	System.out.println(findSubject("chear-kb:SBJ-0032-Pilot-6"));
     	
-    	//System.out.println(findStudy("chear-kb:STD-Pilot-3"));
-    	//System.out.println(findStudies());
+    	System.out.println(findStudy("chear-kb:STD-Pilot-3"));
+    	System.out.println("Studies: " + findStudies());
     	
     	//System.out.println(findSamples());
     	//System.out.println(findSampleBySubject("chear-kb:SBJ-0032-Pilot-6"));
-    	//System.out.println(findSample("chear-kb:SPL-0032-Pilot-6-Urine-ICP-MS"));
+    	System.out.println(findSample("chear-kb:SPL-0032-Pilot-6-Urine-ICP-MS"));
     	
-    	//System.out.println(findSubject("chear-kb:SBJ-0032-Pilot-6"));
+    	System.out.println(findSubject("chear-kb:SBJ-0032-Pilot-6"));
     	//System.out.println(findSubjects());
     	
         return ok();        

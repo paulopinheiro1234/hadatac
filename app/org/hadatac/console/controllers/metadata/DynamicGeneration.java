@@ -42,7 +42,7 @@ public class DynamicGeneration extends Controller {
 
 	public static Map<String, List<String>> generateStudy(GeneratedStrings generatedStringsObject) {
 
-		String prefixString = NameSpaces.getInstance().printSparqlNameSpaceList().replaceAll("\n", " ");
+		String prefixString = DynamicFunctions.getPrefixes();
 		String initStudyQuery="SELECT DISTINCT ?studyUri ?studyLabel ?proj ?studyTitle ?studyComment " +
 				"(group_concat( ?agentName_ ; separator = ' & ') as ?agentName) " +
 				"?institutionName  " +
@@ -62,53 +62,51 @@ public class DynamicGeneration extends Controller {
 		ResultSet initStudyResults = qexecStudy.execSelect();
 		ResultSetRewindable resultsrwStudy = ResultSetFactory.copyResults(initStudyResults);
 		qexecStudy.close();
-		String initStudyJson="{\n\"commit\": {}";
+		
 		Map<String, List<String>> initStudyMap = new HashMap<String, List<String>>();
 		List<String> initStudyValues = new ArrayList<String>();
+		String initStudyJson="{\n\"commit\": {}";
 		
 		while (resultsrwStudy.hasNext()) {
 			QuerySolution soln = resultsrwStudy.next();
-					
+			System.out.println("Study Results Soln: " + soln.toString() + "\n");
+			initStudyJson=initStudyJson + ",\n\"add\":\n\t{\n\t\"doc\":\n\t\t{\n";
+			
 			initStudyValues= new ArrayList<String>();
+			String studyUriString = "";
+			if (soln.contains("studyUri")){
+				initStudyMap.put(soln.get("studyUri").toString(),initStudyValues);
+				studyUriString = DynamicFunctions.replaceURLWithPrefix(soln.get("studyUri").toString());
+				initStudyJson=initStudyJson + "\t\t\"studyUri\": \"" + soln.get("studyUri").toString() + "\" ,\n";
+			}
 			if (soln.contains("studyLabel")){
 				initStudyValues.add("Label: " + soln.get("studyLabel").toString());
+				initStudyJson=initStudyJson + "\t\t\"studyLabel\": \"<a href=\\\""+ Play.application().configuration().getString("hadatac.console.host_deploy") + "/hadatac/metadataacquisitions/viewStudy?study_uri=" + studyUriString + "\\\">" + soln.get("studyLabel").toString() + "</a>\" ,\n";
 			}
 			if (soln.contains("studyTitle")){
-					initStudyValues.add("Title: " + soln.get("studyTitle").toString());
+				initStudyValues.add("Title: " + soln.get("studyTitle").toString());
+				initStudyJson=initStudyJson + "\t\t\"studyTitle\": \"" + soln.get("studyTitle").toString() + "\" ,\n";
 			}
 			if (soln.contains("proj")){
-				initStudyValues.add("Project: " + soln.get("proj").toString());
+				initStudyValues.add("Project: " + DynamicFunctions.replaceURLWithPrefix(soln.get("proj").toString()));
+				initStudyJson=initStudyJson + "\t\t\"proj\": \"" + soln.get("proj").toString() + "\" ,\n";
 			}
 			if (soln.contains("studyComment")){
 				initStudyValues.add("Comment: " + soln.get("studyComment").toString());
+				initStudyJson=initStudyJson + "\t\t\"studyComment\": \"" + soln.get("studyComment").toString() + "\" ,\n";
 			}
 			if (soln.contains("agentName")){
 				initStudyValues.add("Agent(s): " + soln.get("agentName").toString());
+				initStudyJson=initStudyJson + "\t\t\"agentName\": \"" + soln.get("agentName").toString() + "\" ,\n";
 			}
 			if (soln.contains("institutionName")){
 				initStudyValues.add("Institution: " + soln.get("institutionName").toString());
+				initStudyJson=initStudyJson + "\t\t\"institutionName\": \"" + soln.get("institutionName").toString() + "\"\n";
 			}
-			initStudyMap.put(soln.get("studyUri").toString(),initStudyValues);
-//			String studyUriString = soln.get("studyUri").toString().replaceAll("http://hadatac.org/ont/chear#","chear:").replaceAll("http://hadatac.org/ont/case#","case:").replaceAll("http://hadatac.org/kb/chear#","chear-kb:").replaceAll("http://hadatac.org/kb/case#","case-kb:");
-			String studyUriString = soln.get("studyUri").toString();
-			Map<String,String> prefixMap = DynamicFunctions.getPrefixMap();
-			for (Map.Entry<String, String> prefixes : prefixMap.entrySet()){
-				if (studyUriString.contains(prefixes.getValue())){
-					studyUriString = studyUriString.replaceAll(prefixes.getValue(), prefixes.getKey()+":");
-				}
-			}
-			initStudyJson=initStudyJson + ",\n\"add\":\n\t{\n\t\"doc\":\n\t\t{\n";
-			initStudyJson=initStudyJson + "\t\t\"studyUri\": \"" + soln.get("studyUri").toString() + "\" ,\n";
-			initStudyJson=initStudyJson + "\t\t\"studyLabel\": \"<a href=\\\""+ Play.application().configuration().getString("hadatac.console.host_deploy") + "/hadatac/metadataacquisitions/viewStudy?study_uri=" + studyUriString + "\\\">" + soln.get("studyLabel").toString() + "</a>\" ,\n";
-			initStudyJson=initStudyJson + "\t\t\"studyTitle\": \"" + soln.get("studyTitle").toString() + "\" ,\n";
-			initStudyJson=initStudyJson + "\t\t\"proj\": \"" + soln.get("proj").toString() + "\" ,\n";
-			initStudyJson=initStudyJson + "\t\t\"studyComment\": \"" + soln.get("studyComment").toString() + "\" ,\n";
-			initStudyJson=initStudyJson + "\t\t\"agentName\": \"" + soln.get("agentName").toString() + "\" ,\n";
-			initStudyJson=initStudyJson + "\t\t\"institutionName\": \"" + soln.get("institutionName").toString() + "\"\n";
 			initStudyJson=initStudyJson + "\t\t}\n\t}";
 		}
 		initStudyJson=initStudyJson + "\n}" ;
-		//System.out.println(initStudyJson);
+		System.out.println("Init Study JSON: " + initStudyJson + "\n");
 //		String indicatorQuery="PREFIX rdfs:<http://www.w3.org/2000/01/rdf-schema#> PREFIX chear: <http://hadatac.org/ont/chear#>SELECT ?studyIndicator ?label ?comment WHERE { ?studyIndicator rdfs:subClassOf chear:StudyIndicator . ?studyIndicator rdfs:label ?label . OPTIONAL { ?studyIndicator rdfs:comment ?comment } . }";
 		String indicatorQuery=prefixString + "SELECT ?studyIndicator ?label ?comment WHERE { ?studyIndicator rdfs:subClassOf chear:StudyIndicator . ?studyIndicator rdfs:label ?label . OPTIONAL { ?studyIndicator rdfs:comment ?comment } . }";
 		QueryExecution qexecInd = QueryExecutionFactory.sparqlService(Collections.getCollectionsName(Collections.METADATA_SPARQL), indicatorQuery);
@@ -124,7 +122,7 @@ public class DynamicGeneration extends Controller {
 			indicatorMap.put(soln.get("studyIndicator").toString(),indicatorLabel);		
 		}
 		Map<String, String> indicatorMapSorted = new TreeMap<String, String>(indicatorMap);
-		//System.out.println("Indicators: " + indicatorMapSorted);
+		System.out.println("Indicators: " + indicatorMapSorted);
 		//String analyteQuery="PREFIX rdfs:<http://www.w3.org/2000/01/rdf-schema#> PREFIX chear: <http://hadatac.org/ont/chear#>SELECT ?analyteIndicator ?label ?comment WHERE { ?analyteIndicator rdfs:subClassOf chear:TargetedAnalyte . OPTIONAL{ ?analyteIndicator rdfs:label ?label } . OPTIONAL { ?analyteIndicator rdfs:comment ?comment } . }";
 		String analyteQuery=prefixString + "SELECT ?analyteIndicator ?label ?comment WHERE { ?analyteIndicator rdfs:subClassOf chear:TargetedAnalyte . OPTIONAL{ ?analyteIndicator rdfs:label ?label } . OPTIONAL { ?analyteIndicator rdfs:comment ?comment } . }";
 		QueryExecution qexecAnalyte = QueryExecutionFactory.sparqlService(Collections.getCollectionsName(Collections.METADATA_SPARQL), analyteQuery);
@@ -141,7 +139,7 @@ public class DynamicGeneration extends Controller {
 			analyteMap.put(soln.get("analyteIndicator").toString(),analyteLabel);		
 		}
 		Map<String, String> analyteMapSorted = new TreeMap<String, String>(analyteMap);
-		//System.out.println("Analyte Indicators: " + analyteMapSorted);
+		System.out.println("Analyte Indicators: " + analyteMapSorted);
 		
 		String facetPageString="@(collection_url : java.lang.String)\n\n" +
 							   "@import helper._\n" +
@@ -206,7 +204,7 @@ public class DynamicGeneration extends Controller {
 		String analyteSchemaString=schemaString;
 		String updateIndicatorJson="{\n\"commit\": {}";
 		for(Map.Entry<String, String> entry : indicatorMapSorted.entrySet()){
-		    //System.out.println("Key : " + entry.getKey() + " and Value: " + entry.getValue() + "\n");
+		    System.out.println("Key : " + entry.getKey() + " and Value: " + entry.getValue() + "\n");
 		    String label = entry.getValue().toString().replaceAll(" ", "").replaceAll(",", "") + "Label";
 		    facetPageString=facetPageString + "        {'field': '" + label + "', 'display': '" + entry.getValue().toString() + "'},\n";
 			facetSearchSortString=facetSearchSortString + ",{'display':'" + entry.getValue().toString() + "','field':'" + label + ".exact'}" ;
@@ -225,7 +223,7 @@ public class DynamicGeneration extends Controller {
 					" . ?" + entry.getValue().toString().replaceAll(" ", "").replaceAll(",", "") + " rdfs:subClassOf+ " + studyUriString + 
 					" . ?" + entry.getValue().toString().replaceAll(" ", "").replaceAll(",", "") + " rdfs:label ?" + label + " . " +
 					"}";
-			//System.out.println(indvIndicatorQuery + "\n");
+			System.out.println(indvIndicatorQuery + "\n");
 			QueryExecution qexecIndvInd = QueryExecutionFactory.sparqlService(Collections.getCollectionsName(Collections.METADATA_SPARQL), indvIndicatorQuery);
 			ResultSet indvIndResults = qexecIndvInd.execSelect();
 			ResultSetRewindable resultsrwIndvInd = ResultSetFactory.copyResults(indvIndResults);
@@ -240,12 +238,12 @@ public class DynamicGeneration extends Controller {
 				indvIndicatorJson=indvIndicatorJson + "\t\t\"" + label + "\":\n\t\t\t{ \"add\": \n\t\t\t\t[ " ;
 				indvIndicatorJson=indvIndicatorJson + "\""+ soln.get(label).toString() +"\"";
 				indvIndicatorJson=indvIndicatorJson + " ]\n\t\t\t}\n\t\t}\n\t}";
-				//System.out.println(indvIndicatorJson);
+				System.out.println("Individual Indicator: " + indvIndicatorJson);
 				updateIndicatorJson=updateIndicatorJson + indvIndicatorJson;
 			}
 		}
 		updateIndicatorJson = updateIndicatorJson + "\n}";
-		//System.out.println(updateIndicatorJson + "\n");
+		System.out.println("Update Indicator: " + updateIndicatorJson + "\n");
 		
 		String updateAnalyteJson="{\n\"commit\": {}";
 		for(Map.Entry<String, String> entry : analyteMapSorted.entrySet()){
@@ -759,15 +757,15 @@ public class DynamicGeneration extends Controller {
 	// for /metadata HTTP GET requests
     public static Result index() {
     	GeneratedStrings generatedStringsObject = new GeneratedStrings();
-    	System.out.println(Play.application().configuration().getString("hadatac.console.host_deploy")+"/metadataacquisitions/viewStudy?study_uri=");
+//    	System.out.println(Play.application().configuration().getString("hadatac.console.host_deploy")+"/metadataacquisitions/viewStudy?study_uri=");
 		Map<String, List<String>> studyResult = generateStudy(generatedStringsObject);
 		doDynamicGeneration(generatedStringsObject.getFacetPageString(), generatedStringsObject.getAnalyteFacetPageString(), generatedStringsObject.getSchemaString(), generatedStringsObject.getAnalyteSchemaString(), generatedStringsObject.getInitStudyJson(), generatedStringsObject.getUpdateIndicatorJson(), generatedStringsObject.getUpdateAnalyteJson());
 		Map<String, List<String>> subjectResult = findSubject();
 		Map<String, Map<String, String>> indicatorResults = new HashMap<String, Map<String,String>>();
-		for (Map.Entry<String, List<String>> study: studyResult.entrySet()){
+		/*for (Map.Entry<String, List<String>> study: studyResult.entrySet()){
 			Map<String, String> indicatorResult = ViewStudy.findStudyIndicators(study.getKey());
 			indicatorResults.put(study.getKey(), indicatorResult);
-		}
+		}*/
         return ok(dynamicPage.render(studyResult,subjectResult, indicatorResults));
         
     }// /index()
