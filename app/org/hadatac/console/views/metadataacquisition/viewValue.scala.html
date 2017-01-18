@@ -20,7 +20,11 @@
              <h2></h2>
 				<ul>        		
 					@for(i <- indicatorValueResults){
-						<li>@i.toString</li>				
+						<li>@i.getStudyUri()
+							<li>@i.getObjectUri()
+								<li>@i.getValue()</li>
+							</li>
+						</li>			
 					}
 				</ul>
     	</div>

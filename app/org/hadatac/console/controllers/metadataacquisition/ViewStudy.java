@@ -44,7 +44,7 @@ import be.objectify.deadbolt.java.actions.Restrict;
 public class ViewStudy extends Controller {
 	
 	//public static Map<String, List<String>> findStudyIndicators(String study_uri) {
-	public static Map<String, String> findStudyIndicators(String study_uri) {
+	public static Map<String, List<String>> findStudyIndicators(String study_uri) {
 		String indicatorQuery="PREFIX rdfs:<http://www.w3.org/2000/01/rdf-schema#> PREFIX case: <http://hadatac.org/ont/case#>PREFIX chear: <http://hadatac.org/ont/chear#>SELECT ?studyIndicator ?label ?comment WHERE { ?studyIndicator rdfs:subClassOf chear:StudyIndicator . ?studyIndicator rdfs:label ?label . ?studyIndicator rdfs:comment ?comment . }";
 		QueryExecution qexecInd = QueryExecutionFactory.sparqlService(Collections.getCollectionsName(Collections.METADATA_SPARQL), indicatorQuery);
 		ResultSet indicatorResults = qexecInd.execSelect();
@@ -60,7 +60,7 @@ public class ViewStudy extends Controller {
 		}
 		Map<String, String> indicatorMapSorted = new TreeMap<String, String>(indicatorMap);
 		
-		Map<String, String> indicatorValues = new HashMap<String, String>();
+		Map<String, List<String>> indicatorValues = new HashMap<String, List<String>>();
 		
 		for(Map.Entry<String, String> entry : indicatorMapSorted.entrySet()){
 		    //System.out.println("Key : " + entry.getKey() + " and Value: " + entry.getValue() + "\n");
@@ -79,17 +79,16 @@ public class ViewStudy extends Controller {
 			ResultSet indvIndResults = qexecIndvInd.execSelect();
 			ResultSetRewindable resultsrwIndvInd = ResultSetFactory.copyResults(indvIndResults);
 			qexecIndvInd.close();
-			String indvIndicatorString="";
+			List<String> indvIndicatorList = new ArrayList<String>();
 			while (resultsrwIndvInd.hasNext()) {
 				QuerySolution soln = resultsrwIndvInd.next();
 				//System.out.println("Solution: " + soln);
-				indvIndicatorString += soln.get(label).toString() + ", ";
+				indvIndicatorList.add(soln.get(label).toString());
 				//System.out.println("Indicator String: " + indvIndicatorString);
 			}
-			if (indvIndicatorString != ""){
-				indvIndicatorString = indvIndicatorString.substring(0, indvIndicatorString.length()-2);
-				indicatorValues.put(entry.getValue().toString(),indvIndicatorString);
-			}
+
+				indicatorValues.put(entry.getValue().toString(),indvIndicatorList);
+			
 		}
 		return indicatorValues;
 	}
@@ -228,7 +227,9 @@ public class ViewStudy extends Controller {
 	// for /metadata HTTP GET requests
 	@Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
     public static Result index(String study_uri) {
-		Map<String, String> indicatorValues = findStudyIndicators(study_uri);
+		
+		
+		Map<String, List<String>> indicatorValues = findStudyIndicators(study_uri);
  //   	Map<String, String> poResult = findBasic(study_uri);
 		Map<String, List<String>> poResult = findBasic(study_uri);
 		Map<String, List<String>> subjectResult = findSubject(study_uri);
