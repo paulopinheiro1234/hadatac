@@ -37,38 +37,6 @@ public class GetSparqlQueryDynamic {
     public String querySelector(String tabName){
         String q = "SELECT * WHERE { ?s ?p ?o } LIMIT 10";
         switch (tabName){
-            case "Organization":
-               q= "PREFIX chebi: <http://purl.obolibrary.org/obo/CHEBI_>  PREFIX hadatac-sn: <http://hadatac.org/ont/hadatac-sn#>  PREFIX owl: <http://www.w3.org/2002/07/owl#>  PREFIX vstoi: <http://hadatac.org/ont/vstoi#>  PREFIX case-kb: <http://hadatac.org/kb/case#>  PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>  PREFIX skos: <http://www.w3.org/2004/02/skos/core#>  PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>  PREFIX chear-kb: <http://hadatac.org/kb/chear#>  PREFIX dct: <http://purl.org/dc/terms/>  PREFIX sio: <http://semanticscience.org/resource/>  PREFIX dcterms: <http://purl.org/dc/terms/>  PREFIX uo: <http://purl.obolibrary.org/obo/uo#>  PREFIX hasneto: <http://hadatac.org/ont/hasneto#>  PREFIX prov: <http://www.w3.org/ns/prov#>  PREFIX hadatac: <http://hadatac.org/ont/hadatac#>  PREFIX case: <http://hadatac.org/ont/case#>  PREFIX foaf: <http://xmlns.com/foaf/0.1/>  PREFIX hasco: <http://hadatac.org/ont/hasco/>  PREFIX uberon: <http://purl.obolibrary.org/obo/uberon.owl#>  PREFIX chear: <http://hadatac.org/ont/chear#>  PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>  PREFIX fma: <http://purl.org/sig/ont/fma/>  PREFIX obo: <http://geneontology.org/GO.format.obo-1_2.shtml#>  PREFIX pubchem: <http://rdf.ncbi.nlm.nih.gov/pubchem/compound/>  " + 
-                   "SELECT ?id ?superId ?label ?iden ?comment ?def ?unit ?note ?attrTo ?assocWith " + 
-                   "WHERE { " + 
-                   "  ?id rdfs:subClassOf* prov:Organization . " + 
-                   "  ?id rdfs:subClassOf ?superId . " + 
-                   "  ?id rdfs:label ?label ." + 
-                   "  OPTIONAL {?id dcterms:identifier ?iden} . " + 
-                   "  OPTIONAL {?id rdfs:comment ?comment} . " + 
-                   "  OPTIONAL {?id skos:definition ?def} . " + 
-                   "  OPTIONAL {?id hasneto:hasUnit ?unit} . " + 
-                   "  OPTIONAL {?id skos:editorialNote ?note} . " + 
-                   "  OPTIONAL {?id prov:wasAttributedTo ?attrTo} . " + 
-                   "  OPTIONAL {?id prov:wasAssociatedWith ?assocWith} . " + 
-                   "} ";
-                break;
-            case "Person":
-               q= "PREFIX chebi: <http://purl.obolibrary.org/obo/CHEBI_>  PREFIX hadatac-sn: <http://hadatac.org/ont/hadatac-sn#>  PREFIX owl: <http://www.w3.org/2002/07/owl#>  PREFIX vstoi: <http://hadatac.org/ont/vstoi#>  PREFIX case-kb: <http://hadatac.org/kb/case#>  PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>  PREFIX skos: <http://www.w3.org/2004/02/skos/core#>  PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>  PREFIX chear-kb: <http://hadatac.org/kb/chear#>  PREFIX dct: <http://purl.org/dc/terms/>  PREFIX sio: <http://semanticscience.org/resource/>  PREFIX dcterms: <http://purl.org/dc/terms/>  PREFIX uo: <http://purl.obolibrary.org/obo/uo#>  PREFIX hasneto: <http://hadatac.org/ont/hasneto#>  PREFIX prov: <http://www.w3.org/ns/prov#>  PREFIX hadatac: <http://hadatac.org/ont/hadatac#>  PREFIX case: <http://hadatac.org/ont/case#>  PREFIX foaf: <http://xmlns.com/foaf/0.1/>  PREFIX hasco: <http://hadatac.org/ont/hasco/>  PREFIX uberon: <http://purl.obolibrary.org/obo/uberon.owl#>  PREFIX chear: <http://hadatac.org/ont/chear#>  PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>  PREFIX fma: <http://purl.org/sig/ont/fma/>  PREFIX obo: <http://geneontology.org/GO.format.obo-1_2.shtml#>  PREFIX pubchem: <http://rdf.ncbi.nlm.nih.gov/pubchem/compound/>  " + 
-                   "SELECT ?id ?superId ?label ?iden ?comment ?def ?unit ?note ?attrTo ?assocWith " + 
-                   "WHERE { " + 
-                   "  ?id rdfs:subClassOf* prov:Person . " + 
-                   "  ?id rdfs:subClassOf ?superId . " + 
-                   "  ?id rdfs:label ?label ." + 
-                   "  OPTIONAL {?id dcterms:identifier ?iden} . " + 
-                   "  OPTIONAL {?id rdfs:comment ?comment} . " + 
-                   "  OPTIONAL {?id skos:definition ?def} . " + 
-                   "  OPTIONAL {?id hasneto:hasUnit ?unit} . " + 
-                   "  OPTIONAL {?id skos:editorialNote ?note} . " + 
-                   "  OPTIONAL {?id prov:wasAttributedTo ?attrTo} . " + 
-                   "  OPTIONAL {?id prov:wasAssociatedWith ?assocWith} . " + 
-                   "} ";
-                break;
             case "Detector":
                q= "PREFIX chebi: <http://purl.obolibrary.org/obo/CHEBI_>  PREFIX hadatac-sn: <http://hadatac.org/ont/hadatac-sn#>  PREFIX owl: <http://www.w3.org/2002/07/owl#>  PREFIX vstoi: <http://hadatac.org/ont/vstoi#>  PREFIX case-kb: <http://hadatac.org/kb/case#>  PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>  PREFIX skos: <http://www.w3.org/2004/02/skos/core#>  PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>  PREFIX chear-kb: <http://hadatac.org/kb/chear#>  PREFIX dct: <http://purl.org/dc/terms/>  PREFIX sio: <http://semanticscience.org/resource/>  PREFIX dcterms: <http://purl.org/dc/terms/>  PREFIX uo: <http://purl.obolibrary.org/obo/uo#>  PREFIX hasneto: <http://hadatac.org/ont/hasneto#>  PREFIX prov: <http://www.w3.org/ns/prov#>  PREFIX hadatac: <http://hadatac.org/ont/hadatac#>  PREFIX case: <http://hadatac.org/ont/case#>  PREFIX foaf: <http://xmlns.com/foaf/0.1/>  PREFIX hasco: <http://hadatac.org/ont/hasco/>  PREFIX uberon: <http://purl.obolibrary.org/obo/uberon.owl#>  PREFIX chear: <http://hadatac.org/ont/chear#>  PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>  PREFIX fma: <http://purl.org/sig/ont/fma/>  PREFIX obo: <http://geneontology.org/GO.format.obo-1_2.shtml#>  PREFIX pubchem: <http://rdf.ncbi.nlm.nih.gov/pubchem/compound/>  " + 
                    "SELECT ?id ?superId ?label ?iden ?comment ?def ?unit ?note ?attrTo ?assocWith " + 
@@ -149,54 +117,6 @@ public class GetSparqlQueryDynamic {
                    "  OPTIONAL {?id prov:wasAssociatedWith ?assocWith} . " + 
                    "} ";
                 break;
-            case "PregnancySample":
-               q= "PREFIX chebi: <http://purl.obolibrary.org/obo/CHEBI_>  PREFIX hadatac-sn: <http://hadatac.org/ont/hadatac-sn#>  PREFIX owl: <http://www.w3.org/2002/07/owl#>  PREFIX vstoi: <http://hadatac.org/ont/vstoi#>  PREFIX case-kb: <http://hadatac.org/kb/case#>  PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>  PREFIX skos: <http://www.w3.org/2004/02/skos/core#>  PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>  PREFIX chear-kb: <http://hadatac.org/kb/chear#>  PREFIX dct: <http://purl.org/dc/terms/>  PREFIX sio: <http://semanticscience.org/resource/>  PREFIX dcterms: <http://purl.org/dc/terms/>  PREFIX uo: <http://purl.obolibrary.org/obo/uo#>  PREFIX hasneto: <http://hadatac.org/ont/hasneto#>  PREFIX prov: <http://www.w3.org/ns/prov#>  PREFIX hadatac: <http://hadatac.org/ont/hadatac#>  PREFIX case: <http://hadatac.org/ont/case#>  PREFIX foaf: <http://xmlns.com/foaf/0.1/>  PREFIX hasco: <http://hadatac.org/ont/hasco/>  PREFIX uberon: <http://purl.obolibrary.org/obo/uberon.owl#>  PREFIX chear: <http://hadatac.org/ont/chear#>  PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>  PREFIX fma: <http://purl.org/sig/ont/fma/>  PREFIX obo: <http://geneontology.org/GO.format.obo-1_2.shtml#>  PREFIX pubchem: <http://rdf.ncbi.nlm.nih.gov/pubchem/compound/>  " + 
-                   "SELECT ?id ?superId ?label ?iden ?comment ?def ?unit ?note ?attrTo ?assocWith " + 
-                   "WHERE { " + 
-                   "  ?id rdfs:subClassOf* chear:PregnancySample . " + 
-                   "  ?id rdfs:subClassOf ?superId . " + 
-                   "  ?id rdfs:label ?label ." + 
-                   "  OPTIONAL {?id dcterms:identifier ?iden} . " + 
-                   "  OPTIONAL {?id rdfs:comment ?comment} . " + 
-                   "  OPTIONAL {?id skos:definition ?def} . " + 
-                   "  OPTIONAL {?id hasneto:hasUnit ?unit} . " + 
-                   "  OPTIONAL {?id skos:editorialNote ?note} . " + 
-                   "  OPTIONAL {?id prov:wasAttributedTo ?attrTo} . " + 
-                   "  OPTIONAL {?id prov:wasAssociatedWith ?assocWith} . " + 
-                   "} ";
-                break;
-            case "Cell":
-               q= "PREFIX chebi: <http://purl.obolibrary.org/obo/CHEBI_>  PREFIX hadatac-sn: <http://hadatac.org/ont/hadatac-sn#>  PREFIX owl: <http://www.w3.org/2002/07/owl#>  PREFIX vstoi: <http://hadatac.org/ont/vstoi#>  PREFIX case-kb: <http://hadatac.org/kb/case#>  PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>  PREFIX skos: <http://www.w3.org/2004/02/skos/core#>  PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>  PREFIX chear-kb: <http://hadatac.org/kb/chear#>  PREFIX dct: <http://purl.org/dc/terms/>  PREFIX sio: <http://semanticscience.org/resource/>  PREFIX dcterms: <http://purl.org/dc/terms/>  PREFIX uo: <http://purl.obolibrary.org/obo/uo#>  PREFIX hasneto: <http://hadatac.org/ont/hasneto#>  PREFIX prov: <http://www.w3.org/ns/prov#>  PREFIX hadatac: <http://hadatac.org/ont/hadatac#>  PREFIX case: <http://hadatac.org/ont/case#>  PREFIX foaf: <http://xmlns.com/foaf/0.1/>  PREFIX hasco: <http://hadatac.org/ont/hasco/>  PREFIX uberon: <http://purl.obolibrary.org/obo/uberon.owl#>  PREFIX chear: <http://hadatac.org/ont/chear#>  PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>  PREFIX fma: <http://purl.org/sig/ont/fma/>  PREFIX obo: <http://geneontology.org/GO.format.obo-1_2.shtml#>  PREFIX pubchem: <http://rdf.ncbi.nlm.nih.gov/pubchem/compound/>  " + 
-                   "SELECT ?id ?superId ?label ?iden ?comment ?def ?unit ?note ?attrTo ?assocWith " + 
-                   "WHERE { " + 
-                   "  ?id rdfs:subClassOf* sio:Cell . " + 
-                   "  ?id rdfs:subClassOf ?superId . " + 
-                   "  ?id rdfs:label ?label ." + 
-                   "  OPTIONAL {?id dcterms:identifier ?iden} . " + 
-                   "  OPTIONAL {?id rdfs:comment ?comment} . " + 
-                   "  OPTIONAL {?id skos:definition ?def} . " + 
-                   "  OPTIONAL {?id hasneto:hasUnit ?unit} . " + 
-                   "  OPTIONAL {?id skos:editorialNote ?note} . " + 
-                   "  OPTIONAL {?id prov:wasAttributedTo ?attrTo} . " + 
-                   "  OPTIONAL {?id prov:wasAssociatedWith ?assocWith} . " + 
-                   "} ";
-                break;
-            case "Tissue":
-               q= "PREFIX chebi: <http://purl.obolibrary.org/obo/CHEBI_>  PREFIX hadatac-sn: <http://hadatac.org/ont/hadatac-sn#>  PREFIX owl: <http://www.w3.org/2002/07/owl#>  PREFIX vstoi: <http://hadatac.org/ont/vstoi#>  PREFIX case-kb: <http://hadatac.org/kb/case#>  PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>  PREFIX skos: <http://www.w3.org/2004/02/skos/core#>  PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>  PREFIX chear-kb: <http://hadatac.org/kb/chear#>  PREFIX dct: <http://purl.org/dc/terms/>  PREFIX sio: <http://semanticscience.org/resource/>  PREFIX dcterms: <http://purl.org/dc/terms/>  PREFIX uo: <http://purl.obolibrary.org/obo/uo#>  PREFIX hasneto: <http://hadatac.org/ont/hasneto#>  PREFIX prov: <http://www.w3.org/ns/prov#>  PREFIX hadatac: <http://hadatac.org/ont/hadatac#>  PREFIX case: <http://hadatac.org/ont/case#>  PREFIX foaf: <http://xmlns.com/foaf/0.1/>  PREFIX hasco: <http://hadatac.org/ont/hasco/>  PREFIX uberon: <http://purl.obolibrary.org/obo/uberon.owl#>  PREFIX chear: <http://hadatac.org/ont/chear#>  PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>  PREFIX fma: <http://purl.org/sig/ont/fma/>  PREFIX obo: <http://geneontology.org/GO.format.obo-1_2.shtml#>  PREFIX pubchem: <http://rdf.ncbi.nlm.nih.gov/pubchem/compound/>  " + 
-                   "SELECT ?id ?superId ?label ?iden ?comment ?def ?unit ?note ?attrTo ?assocWith " + 
-                   "WHERE { " + 
-                   "  ?id rdfs:subClassOf* sio:Tissue . " + 
-                   "  ?id rdfs:subClassOf ?superId . " + 
-                   "  ?id rdfs:label ?label ." + 
-                   "  OPTIONAL {?id dcterms:identifier ?iden} . " + 
-                   "  OPTIONAL {?id rdfs:comment ?comment} . " + 
-                   "  OPTIONAL {?id skos:definition ?def} . " + 
-                   "  OPTIONAL {?id hasneto:hasUnit ?unit} . " + 
-                   "  OPTIONAL {?id skos:editorialNote ?note} . " + 
-                   "  OPTIONAL {?id prov:wasAttributedTo ?attrTo} . " + 
-                   "  OPTIONAL {?id prov:wasAssociatedWith ?assocWith} . " + 
-                   "} ";
-                break;
             case "Process":
                q= "PREFIX chebi: <http://purl.obolibrary.org/obo/CHEBI_>  PREFIX hadatac-sn: <http://hadatac.org/ont/hadatac-sn#>  PREFIX owl: <http://www.w3.org/2002/07/owl#>  PREFIX vstoi: <http://hadatac.org/ont/vstoi#>  PREFIX case-kb: <http://hadatac.org/kb/case#>  PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>  PREFIX skos: <http://www.w3.org/2004/02/skos/core#>  PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>  PREFIX chear-kb: <http://hadatac.org/kb/chear#>  PREFIX dct: <http://purl.org/dc/terms/>  PREFIX sio: <http://semanticscience.org/resource/>  PREFIX dcterms: <http://purl.org/dc/terms/>  PREFIX uo: <http://purl.obolibrary.org/obo/uo#>  PREFIX hasneto: <http://hadatac.org/ont/hasneto#>  PREFIX prov: <http://www.w3.org/ns/prov#>  PREFIX hadatac: <http://hadatac.org/ont/hadatac#>  PREFIX case: <http://hadatac.org/ont/case#>  PREFIX foaf: <http://xmlns.com/foaf/0.1/>  PREFIX hasco: <http://hadatac.org/ont/hasco/>  PREFIX uberon: <http://purl.obolibrary.org/obo/uberon.owl#>  PREFIX chear: <http://hadatac.org/ont/chear#>  PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>  PREFIX fma: <http://purl.org/sig/ont/fma/>  PREFIX obo: <http://geneontology.org/GO.format.obo-1_2.shtml#>  PREFIX pubchem: <http://rdf.ncbi.nlm.nih.gov/pubchem/compound/>  " + 
                    "SELECT ?id ?superId ?label ?iden ?comment ?def ?unit ?note ?attrTo ?assocWith " + 
@@ -261,11 +181,11 @@ public class GetSparqlQueryDynamic {
                    "  OPTIONAL {?id prov:wasAssociatedWith ?assocWith} . " + 
                    "} ";
                 break;
-            case "EnvironmentalExposure":
+            case "GenericIndicator":
                q= "PREFIX chebi: <http://purl.obolibrary.org/obo/CHEBI_>  PREFIX hadatac-sn: <http://hadatac.org/ont/hadatac-sn#>  PREFIX owl: <http://www.w3.org/2002/07/owl#>  PREFIX vstoi: <http://hadatac.org/ont/vstoi#>  PREFIX case-kb: <http://hadatac.org/kb/case#>  PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>  PREFIX skos: <http://www.w3.org/2004/02/skos/core#>  PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>  PREFIX chear-kb: <http://hadatac.org/kb/chear#>  PREFIX dct: <http://purl.org/dc/terms/>  PREFIX sio: <http://semanticscience.org/resource/>  PREFIX dcterms: <http://purl.org/dc/terms/>  PREFIX uo: <http://purl.obolibrary.org/obo/uo#>  PREFIX hasneto: <http://hadatac.org/ont/hasneto#>  PREFIX prov: <http://www.w3.org/ns/prov#>  PREFIX hadatac: <http://hadatac.org/ont/hadatac#>  PREFIX case: <http://hadatac.org/ont/case#>  PREFIX foaf: <http://xmlns.com/foaf/0.1/>  PREFIX hasco: <http://hadatac.org/ont/hasco/>  PREFIX uberon: <http://purl.obolibrary.org/obo/uberon.owl#>  PREFIX chear: <http://hadatac.org/ont/chear#>  PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>  PREFIX fma: <http://purl.org/sig/ont/fma/>  PREFIX obo: <http://geneontology.org/GO.format.obo-1_2.shtml#>  PREFIX pubchem: <http://rdf.ncbi.nlm.nih.gov/pubchem/compound/>  " + 
                    "SELECT ?id ?superId ?label ?iden ?comment ?def ?unit ?note ?attrTo ?assocWith " + 
                    "WHERE { " + 
-                   "  ?id rdfs:subClassOf* chear:EnvironmentalExposure . " + 
+                   "  ?id rdfs:subClassOf* case:GenericIndicator . " + 
                    "  ?id rdfs:subClassOf ?superId . " + 
                    "  ?id rdfs:label ?label ." + 
                    "  OPTIONAL {?id dcterms:identifier ?iden} . " + 
@@ -277,11 +197,11 @@ public class GetSparqlQueryDynamic {
                    "  OPTIONAL {?id prov:wasAssociatedWith ?assocWith} . " + 
                    "} ";
                 break;
-            case "BirthOutcome":
+            case "BioEnvIndicator":
                q= "PREFIX chebi: <http://purl.obolibrary.org/obo/CHEBI_>  PREFIX hadatac-sn: <http://hadatac.org/ont/hadatac-sn#>  PREFIX owl: <http://www.w3.org/2002/07/owl#>  PREFIX vstoi: <http://hadatac.org/ont/vstoi#>  PREFIX case-kb: <http://hadatac.org/kb/case#>  PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>  PREFIX skos: <http://www.w3.org/2004/02/skos/core#>  PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>  PREFIX chear-kb: <http://hadatac.org/kb/chear#>  PREFIX dct: <http://purl.org/dc/terms/>  PREFIX sio: <http://semanticscience.org/resource/>  PREFIX dcterms: <http://purl.org/dc/terms/>  PREFIX uo: <http://purl.obolibrary.org/obo/uo#>  PREFIX hasneto: <http://hadatac.org/ont/hasneto#>  PREFIX prov: <http://www.w3.org/ns/prov#>  PREFIX hadatac: <http://hadatac.org/ont/hadatac#>  PREFIX case: <http://hadatac.org/ont/case#>  PREFIX foaf: <http://xmlns.com/foaf/0.1/>  PREFIX hasco: <http://hadatac.org/ont/hasco/>  PREFIX uberon: <http://purl.obolibrary.org/obo/uberon.owl#>  PREFIX chear: <http://hadatac.org/ont/chear#>  PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>  PREFIX fma: <http://purl.org/sig/ont/fma/>  PREFIX obo: <http://geneontology.org/GO.format.obo-1_2.shtml#>  PREFIX pubchem: <http://rdf.ncbi.nlm.nih.gov/pubchem/compound/>  " + 
                    "SELECT ?id ?superId ?label ?iden ?comment ?def ?unit ?note ?attrTo ?assocWith " + 
                    "WHERE { " + 
-                   "  ?id rdfs:subClassOf* chear:BirthOutcome . " + 
+                   "  ?id rdfs:subClassOf* case:BioEnvironmentIndicator . " + 
                    "  ?id rdfs:subClassOf ?superId . " + 
                    "  ?id rdfs:label ?label ." + 
                    "  OPTIONAL {?id dcterms:identifier ?iden} . " + 
@@ -293,11 +213,11 @@ public class GetSparqlQueryDynamic {
                    "  OPTIONAL {?id prov:wasAssociatedWith ?assocWith} . " + 
                    "} ";
                 break;
-            case "OralHealth":
+            case "PhysiologyIndicator":
                q= "PREFIX chebi: <http://purl.obolibrary.org/obo/CHEBI_>  PREFIX hadatac-sn: <http://hadatac.org/ont/hadatac-sn#>  PREFIX owl: <http://www.w3.org/2002/07/owl#>  PREFIX vstoi: <http://hadatac.org/ont/vstoi#>  PREFIX case-kb: <http://hadatac.org/kb/case#>  PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>  PREFIX skos: <http://www.w3.org/2004/02/skos/core#>  PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>  PREFIX chear-kb: <http://hadatac.org/kb/chear#>  PREFIX dct: <http://purl.org/dc/terms/>  PREFIX sio: <http://semanticscience.org/resource/>  PREFIX dcterms: <http://purl.org/dc/terms/>  PREFIX uo: <http://purl.obolibrary.org/obo/uo#>  PREFIX hasneto: <http://hadatac.org/ont/hasneto#>  PREFIX prov: <http://www.w3.org/ns/prov#>  PREFIX hadatac: <http://hadatac.org/ont/hadatac#>  PREFIX case: <http://hadatac.org/ont/case#>  PREFIX foaf: <http://xmlns.com/foaf/0.1/>  PREFIX hasco: <http://hadatac.org/ont/hasco/>  PREFIX uberon: <http://purl.obolibrary.org/obo/uberon.owl#>  PREFIX chear: <http://hadatac.org/ont/chear#>  PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>  PREFIX fma: <http://purl.org/sig/ont/fma/>  PREFIX obo: <http://geneontology.org/GO.format.obo-1_2.shtml#>  PREFIX pubchem: <http://rdf.ncbi.nlm.nih.gov/pubchem/compound/>  " + 
                    "SELECT ?id ?superId ?label ?iden ?comment ?def ?unit ?note ?attrTo ?assocWith " + 
                    "WHERE { " + 
-                   "  ?id rdfs:subClassOf* chear:OralHealth . " + 
+                   "  ?id rdfs:subClassOf* case:PhysiologyIndicator . " + 
                    "  ?id rdfs:subClassOf ?superId . " + 
                    "  ?id rdfs:label ?label ." + 
                    "  OPTIONAL {?id dcterms:identifier ?iden} . " + 
@@ -309,11 +229,11 @@ public class GetSparqlQueryDynamic {
                    "  OPTIONAL {?id prov:wasAssociatedWith ?assocWith} . " + 
                    "} ";
                 break;
-            case "ParentalHealthandFamilyHistory":
+            case "PhysicalEnvIndicator":
                q= "PREFIX chebi: <http://purl.obolibrary.org/obo/CHEBI_>  PREFIX hadatac-sn: <http://hadatac.org/ont/hadatac-sn#>  PREFIX owl: <http://www.w3.org/2002/07/owl#>  PREFIX vstoi: <http://hadatac.org/ont/vstoi#>  PREFIX case-kb: <http://hadatac.org/kb/case#>  PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>  PREFIX skos: <http://www.w3.org/2004/02/skos/core#>  PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>  PREFIX chear-kb: <http://hadatac.org/kb/chear#>  PREFIX dct: <http://purl.org/dc/terms/>  PREFIX sio: <http://semanticscience.org/resource/>  PREFIX dcterms: <http://purl.org/dc/terms/>  PREFIX uo: <http://purl.obolibrary.org/obo/uo#>  PREFIX hasneto: <http://hadatac.org/ont/hasneto#>  PREFIX prov: <http://www.w3.org/ns/prov#>  PREFIX hadatac: <http://hadatac.org/ont/hadatac#>  PREFIX case: <http://hadatac.org/ont/case#>  PREFIX foaf: <http://xmlns.com/foaf/0.1/>  PREFIX hasco: <http://hadatac.org/ont/hasco/>  PREFIX uberon: <http://purl.obolibrary.org/obo/uberon.owl#>  PREFIX chear: <http://hadatac.org/ont/chear#>  PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>  PREFIX fma: <http://purl.org/sig/ont/fma/>  PREFIX obo: <http://geneontology.org/GO.format.obo-1_2.shtml#>  PREFIX pubchem: <http://rdf.ncbi.nlm.nih.gov/pubchem/compound/>  " + 
                    "SELECT ?id ?superId ?label ?iden ?comment ?def ?unit ?note ?attrTo ?assocWith " + 
                    "WHERE { " + 
-                   "  ?id rdfs:subClassOf* chear:ParentalHealthAndFamilyHistory . " + 
+                   "  ?id rdfs:subClassOf* case:PhysicalEnvironmentIndicator . " + 
                    "  ?id rdfs:subClassOf ?superId . " + 
                    "  ?id rdfs:label ?label ." + 
                    "  OPTIONAL {?id dcterms:identifier ?iden} . " + 
@@ -325,11 +245,11 @@ public class GetSparqlQueryDynamic {
                    "  OPTIONAL {?id prov:wasAssociatedWith ?assocWith} . " + 
                    "} ";
                 break;
-            case "TargetedAnalyte":
+            case "CognitionIndicator":
                q= "PREFIX chebi: <http://purl.obolibrary.org/obo/CHEBI_>  PREFIX hadatac-sn: <http://hadatac.org/ont/hadatac-sn#>  PREFIX owl: <http://www.w3.org/2002/07/owl#>  PREFIX vstoi: <http://hadatac.org/ont/vstoi#>  PREFIX case-kb: <http://hadatac.org/kb/case#>  PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>  PREFIX skos: <http://www.w3.org/2004/02/skos/core#>  PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>  PREFIX chear-kb: <http://hadatac.org/kb/chear#>  PREFIX dct: <http://purl.org/dc/terms/>  PREFIX sio: <http://semanticscience.org/resource/>  PREFIX dcterms: <http://purl.org/dc/terms/>  PREFIX uo: <http://purl.obolibrary.org/obo/uo#>  PREFIX hasneto: <http://hadatac.org/ont/hasneto#>  PREFIX prov: <http://www.w3.org/ns/prov#>  PREFIX hadatac: <http://hadatac.org/ont/hadatac#>  PREFIX case: <http://hadatac.org/ont/case#>  PREFIX foaf: <http://xmlns.com/foaf/0.1/>  PREFIX hasco: <http://hadatac.org/ont/hasco/>  PREFIX uberon: <http://purl.obolibrary.org/obo/uberon.owl#>  PREFIX chear: <http://hadatac.org/ont/chear#>  PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>  PREFIX fma: <http://purl.org/sig/ont/fma/>  PREFIX obo: <http://geneontology.org/GO.format.obo-1_2.shtml#>  PREFIX pubchem: <http://rdf.ncbi.nlm.nih.gov/pubchem/compound/>  " + 
                    "SELECT ?id ?superId ?label ?iden ?comment ?def ?unit ?note ?attrTo ?assocWith " + 
                    "WHERE { " + 
-                   "  ?id rdfs:subClassOf* chear:TargetedAnalyte . " + 
+                   "  ?id rdfs:subClassOf* case:CognitionIndicator . " + 
                    "  ?id rdfs:subClassOf ?superId . " + 
                    "  ?id rdfs:label ?label ." + 
                    "  OPTIONAL {?id dcterms:identifier ?iden} . " + 
@@ -341,507 +261,11 @@ public class GetSparqlQueryDynamic {
                    "  OPTIONAL {?id prov:wasAssociatedWith ?assocWith} . " + 
                    "} ";
                 break;
-            case "ReproductiveHealth":
+            case "DemographicsIndicator":
                q= "PREFIX chebi: <http://purl.obolibrary.org/obo/CHEBI_>  PREFIX hadatac-sn: <http://hadatac.org/ont/hadatac-sn#>  PREFIX owl: <http://www.w3.org/2002/07/owl#>  PREFIX vstoi: <http://hadatac.org/ont/vstoi#>  PREFIX case-kb: <http://hadatac.org/kb/case#>  PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>  PREFIX skos: <http://www.w3.org/2004/02/skos/core#>  PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>  PREFIX chear-kb: <http://hadatac.org/kb/chear#>  PREFIX dct: <http://purl.org/dc/terms/>  PREFIX sio: <http://semanticscience.org/resource/>  PREFIX dcterms: <http://purl.org/dc/terms/>  PREFIX uo: <http://purl.obolibrary.org/obo/uo#>  PREFIX hasneto: <http://hadatac.org/ont/hasneto#>  PREFIX prov: <http://www.w3.org/ns/prov#>  PREFIX hadatac: <http://hadatac.org/ont/hadatac#>  PREFIX case: <http://hadatac.org/ont/case#>  PREFIX foaf: <http://xmlns.com/foaf/0.1/>  PREFIX hasco: <http://hadatac.org/ont/hasco/>  PREFIX uberon: <http://purl.obolibrary.org/obo/uberon.owl#>  PREFIX chear: <http://hadatac.org/ont/chear#>  PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>  PREFIX fma: <http://purl.org/sig/ont/fma/>  PREFIX obo: <http://geneontology.org/GO.format.obo-1_2.shtml#>  PREFIX pubchem: <http://rdf.ncbi.nlm.nih.gov/pubchem/compound/>  " + 
                    "SELECT ?id ?superId ?label ?iden ?comment ?def ?unit ?note ?attrTo ?assocWith " + 
                    "WHERE { " + 
-                   "  ?id rdfs:subClassOf* chear:ReproductiveHealth . " + 
-                   "  ?id rdfs:subClassOf ?superId . " + 
-                   "  ?id rdfs:label ?label ." + 
-                   "  OPTIONAL {?id dcterms:identifier ?iden} . " + 
-                   "  OPTIONAL {?id rdfs:comment ?comment} . " + 
-                   "  OPTIONAL {?id skos:definition ?def} . " + 
-                   "  OPTIONAL {?id hasneto:hasUnit ?unit} . " + 
-                   "  OPTIONAL {?id skos:editorialNote ?note} . " + 
-                   "  OPTIONAL {?id prov:wasAttributedTo ?attrTo} . " + 
-                   "  OPTIONAL {?id prov:wasAssociatedWith ?assocWith} . " + 
-                   "} ";
-                break;
-            case "PrescriptionMedicationandDietarySupplements":
-               q= "PREFIX chebi: <http://purl.obolibrary.org/obo/CHEBI_>  PREFIX hadatac-sn: <http://hadatac.org/ont/hadatac-sn#>  PREFIX owl: <http://www.w3.org/2002/07/owl#>  PREFIX vstoi: <http://hadatac.org/ont/vstoi#>  PREFIX case-kb: <http://hadatac.org/kb/case#>  PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>  PREFIX skos: <http://www.w3.org/2004/02/skos/core#>  PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>  PREFIX chear-kb: <http://hadatac.org/kb/chear#>  PREFIX dct: <http://purl.org/dc/terms/>  PREFIX sio: <http://semanticscience.org/resource/>  PREFIX dcterms: <http://purl.org/dc/terms/>  PREFIX uo: <http://purl.obolibrary.org/obo/uo#>  PREFIX hasneto: <http://hadatac.org/ont/hasneto#>  PREFIX prov: <http://www.w3.org/ns/prov#>  PREFIX hadatac: <http://hadatac.org/ont/hadatac#>  PREFIX case: <http://hadatac.org/ont/case#>  PREFIX foaf: <http://xmlns.com/foaf/0.1/>  PREFIX hasco: <http://hadatac.org/ont/hasco/>  PREFIX uberon: <http://purl.obolibrary.org/obo/uberon.owl#>  PREFIX chear: <http://hadatac.org/ont/chear#>  PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>  PREFIX fma: <http://purl.org/sig/ont/fma/>  PREFIX obo: <http://geneontology.org/GO.format.obo-1_2.shtml#>  PREFIX pubchem: <http://rdf.ncbi.nlm.nih.gov/pubchem/compound/>  " + 
-                   "SELECT ?id ?superId ?label ?iden ?comment ?def ?unit ?note ?attrTo ?assocWith " + 
-                   "WHERE { " + 
-                   "  ?id rdfs:subClassOf* chear:PrescriptionMedication . " + 
-                   "  ?id rdfs:subClassOf ?superId . " + 
-                   "  ?id rdfs:label ?label ." + 
-                   "  OPTIONAL {?id dcterms:identifier ?iden} . " + 
-                   "  OPTIONAL {?id rdfs:comment ?comment} . " + 
-                   "  OPTIONAL {?id skos:definition ?def} . " + 
-                   "  OPTIONAL {?id hasneto:hasUnit ?unit} . " + 
-                   "  OPTIONAL {?id skos:editorialNote ?note} . " + 
-                   "  OPTIONAL {?id prov:wasAttributedTo ?attrTo} . " + 
-                   "  OPTIONAL {?id prov:wasAssociatedWith ?assocWith} . " + 
-                   "} ";
-                break;
-            case "NeighborhoodCharacteristic":
-               q= "PREFIX chebi: <http://purl.obolibrary.org/obo/CHEBI_>  PREFIX hadatac-sn: <http://hadatac.org/ont/hadatac-sn#>  PREFIX owl: <http://www.w3.org/2002/07/owl#>  PREFIX vstoi: <http://hadatac.org/ont/vstoi#>  PREFIX case-kb: <http://hadatac.org/kb/case#>  PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>  PREFIX skos: <http://www.w3.org/2004/02/skos/core#>  PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>  PREFIX chear-kb: <http://hadatac.org/kb/chear#>  PREFIX dct: <http://purl.org/dc/terms/>  PREFIX sio: <http://semanticscience.org/resource/>  PREFIX dcterms: <http://purl.org/dc/terms/>  PREFIX uo: <http://purl.obolibrary.org/obo/uo#>  PREFIX hasneto: <http://hadatac.org/ont/hasneto#>  PREFIX prov: <http://www.w3.org/ns/prov#>  PREFIX hadatac: <http://hadatac.org/ont/hadatac#>  PREFIX case: <http://hadatac.org/ont/case#>  PREFIX foaf: <http://xmlns.com/foaf/0.1/>  PREFIX hasco: <http://hadatac.org/ont/hasco/>  PREFIX uberon: <http://purl.obolibrary.org/obo/uberon.owl#>  PREFIX chear: <http://hadatac.org/ont/chear#>  PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>  PREFIX fma: <http://purl.org/sig/ont/fma/>  PREFIX obo: <http://geneontology.org/GO.format.obo-1_2.shtml#>  PREFIX pubchem: <http://rdf.ncbi.nlm.nih.gov/pubchem/compound/>  " + 
-                   "SELECT ?id ?superId ?label ?iden ?comment ?def ?unit ?note ?attrTo ?assocWith " + 
-                   "WHERE { " + 
-                   "  ?id rdfs:subClassOf* chear:NeighborhoodCharacteristic . " + 
-                   "  ?id rdfs:subClassOf ?superId . " + 
-                   "  ?id rdfs:label ?label ." + 
-                   "  OPTIONAL {?id dcterms:identifier ?iden} . " + 
-                   "  OPTIONAL {?id rdfs:comment ?comment} . " + 
-                   "  OPTIONAL {?id skos:definition ?def} . " + 
-                   "  OPTIONAL {?id hasneto:hasUnit ?unit} . " + 
-                   "  OPTIONAL {?id skos:editorialNote ?note} . " + 
-                   "  OPTIONAL {?id prov:wasAttributedTo ?attrTo} . " + 
-                   "  OPTIONAL {?id prov:wasAssociatedWith ?assocWith} . " + 
-                   "} ";
-                break;
-            case "PregnancyCharacteristic":
-               q= "PREFIX chebi: <http://purl.obolibrary.org/obo/CHEBI_>  PREFIX hadatac-sn: <http://hadatac.org/ont/hadatac-sn#>  PREFIX owl: <http://www.w3.org/2002/07/owl#>  PREFIX vstoi: <http://hadatac.org/ont/vstoi#>  PREFIX case-kb: <http://hadatac.org/kb/case#>  PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>  PREFIX skos: <http://www.w3.org/2004/02/skos/core#>  PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>  PREFIX chear-kb: <http://hadatac.org/kb/chear#>  PREFIX dct: <http://purl.org/dc/terms/>  PREFIX sio: <http://semanticscience.org/resource/>  PREFIX dcterms: <http://purl.org/dc/terms/>  PREFIX uo: <http://purl.obolibrary.org/obo/uo#>  PREFIX hasneto: <http://hadatac.org/ont/hasneto#>  PREFIX prov: <http://www.w3.org/ns/prov#>  PREFIX hadatac: <http://hadatac.org/ont/hadatac#>  PREFIX case: <http://hadatac.org/ont/case#>  PREFIX foaf: <http://xmlns.com/foaf/0.1/>  PREFIX hasco: <http://hadatac.org/ont/hasco/>  PREFIX uberon: <http://purl.obolibrary.org/obo/uberon.owl#>  PREFIX chear: <http://hadatac.org/ont/chear#>  PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>  PREFIX fma: <http://purl.org/sig/ont/fma/>  PREFIX obo: <http://geneontology.org/GO.format.obo-1_2.shtml#>  PREFIX pubchem: <http://rdf.ncbi.nlm.nih.gov/pubchem/compound/>  " + 
-                   "SELECT ?id ?superId ?label ?iden ?comment ?def ?unit ?note ?attrTo ?assocWith " + 
-                   "WHERE { " + 
-                   "  ?id rdfs:subClassOf* chear:PregnancyCharacteristic . " + 
-                   "  ?id rdfs:subClassOf ?superId . " + 
-                   "  ?id rdfs:label ?label ." + 
-                   "  OPTIONAL {?id dcterms:identifier ?iden} . " + 
-                   "  OPTIONAL {?id rdfs:comment ?comment} . " + 
-                   "  OPTIONAL {?id skos:definition ?def} . " + 
-                   "  OPTIONAL {?id hasneto:hasUnit ?unit} . " + 
-                   "  OPTIONAL {?id skos:editorialNote ?note} . " + 
-                   "  OPTIONAL {?id prov:wasAttributedTo ?attrTo} . " + 
-                   "  OPTIONAL {?id prov:wasAssociatedWith ?assocWith} . " + 
-                   "} ";
-                break;
-            case "AlcoholTobaccoandIllicitDrugUse":
-               q= "PREFIX chebi: <http://purl.obolibrary.org/obo/CHEBI_>  PREFIX hadatac-sn: <http://hadatac.org/ont/hadatac-sn#>  PREFIX owl: <http://www.w3.org/2002/07/owl#>  PREFIX vstoi: <http://hadatac.org/ont/vstoi#>  PREFIX case-kb: <http://hadatac.org/kb/case#>  PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>  PREFIX skos: <http://www.w3.org/2004/02/skos/core#>  PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>  PREFIX chear-kb: <http://hadatac.org/kb/chear#>  PREFIX dct: <http://purl.org/dc/terms/>  PREFIX sio: <http://semanticscience.org/resource/>  PREFIX dcterms: <http://purl.org/dc/terms/>  PREFIX uo: <http://purl.obolibrary.org/obo/uo#>  PREFIX hasneto: <http://hadatac.org/ont/hasneto#>  PREFIX prov: <http://www.w3.org/ns/prov#>  PREFIX hadatac: <http://hadatac.org/ont/hadatac#>  PREFIX case: <http://hadatac.org/ont/case#>  PREFIX foaf: <http://xmlns.com/foaf/0.1/>  PREFIX hasco: <http://hadatac.org/ont/hasco/>  PREFIX uberon: <http://purl.obolibrary.org/obo/uberon.owl#>  PREFIX chear: <http://hadatac.org/ont/chear#>  PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>  PREFIX fma: <http://purl.org/sig/ont/fma/>  PREFIX obo: <http://geneontology.org/GO.format.obo-1_2.shtml#>  PREFIX pubchem: <http://rdf.ncbi.nlm.nih.gov/pubchem/compound/>  " + 
-                   "SELECT ?id ?superId ?label ?iden ?comment ?def ?unit ?note ?attrTo ?assocWith " + 
-                   "WHERE { " + 
-                   "  ?id rdfs:subClassOf* chear:ATIDU . " + 
-                   "  ?id rdfs:subClassOf ?superId . " + 
-                   "  ?id rdfs:label ?label ." + 
-                   "  OPTIONAL {?id dcterms:identifier ?iden} . " + 
-                   "  OPTIONAL {?id rdfs:comment ?comment} . " + 
-                   "  OPTIONAL {?id skos:definition ?def} . " + 
-                   "  OPTIONAL {?id hasneto:hasUnit ?unit} . " + 
-                   "  OPTIONAL {?id skos:editorialNote ?note} . " + 
-                   "  OPTIONAL {?id prov:wasAttributedTo ?attrTo} . " + 
-                   "  OPTIONAL {?id prov:wasAssociatedWith ?assocWith} . " + 
-                   "} ";
-                break;
-            case "DeliveryCharacteristics":
-               q= "PREFIX chebi: <http://purl.obolibrary.org/obo/CHEBI_>  PREFIX hadatac-sn: <http://hadatac.org/ont/hadatac-sn#>  PREFIX owl: <http://www.w3.org/2002/07/owl#>  PREFIX vstoi: <http://hadatac.org/ont/vstoi#>  PREFIX case-kb: <http://hadatac.org/kb/case#>  PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>  PREFIX skos: <http://www.w3.org/2004/02/skos/core#>  PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>  PREFIX chear-kb: <http://hadatac.org/kb/chear#>  PREFIX dct: <http://purl.org/dc/terms/>  PREFIX sio: <http://semanticscience.org/resource/>  PREFIX dcterms: <http://purl.org/dc/terms/>  PREFIX uo: <http://purl.obolibrary.org/obo/uo#>  PREFIX hasneto: <http://hadatac.org/ont/hasneto#>  PREFIX prov: <http://www.w3.org/ns/prov#>  PREFIX hadatac: <http://hadatac.org/ont/hadatac#>  PREFIX case: <http://hadatac.org/ont/case#>  PREFIX foaf: <http://xmlns.com/foaf/0.1/>  PREFIX hasco: <http://hadatac.org/ont/hasco/>  PREFIX uberon: <http://purl.obolibrary.org/obo/uberon.owl#>  PREFIX chear: <http://hadatac.org/ont/chear#>  PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>  PREFIX fma: <http://purl.org/sig/ont/fma/>  PREFIX obo: <http://geneontology.org/GO.format.obo-1_2.shtml#>  PREFIX pubchem: <http://rdf.ncbi.nlm.nih.gov/pubchem/compound/>  " + 
-                   "SELECT ?id ?superId ?label ?iden ?comment ?def ?unit ?note ?attrTo ?assocWith " + 
-                   "WHERE { " + 
-                   "  ?id rdfs:subClassOf* chear:DeliveryCharacteristic . " + 
-                   "  ?id rdfs:subClassOf ?superId . " + 
-                   "  ?id rdfs:label ?label ." + 
-                   "  OPTIONAL {?id dcterms:identifier ?iden} . " + 
-                   "  OPTIONAL {?id rdfs:comment ?comment} . " + 
-                   "  OPTIONAL {?id skos:definition ?def} . " + 
-                   "  OPTIONAL {?id hasneto:hasUnit ?unit} . " + 
-                   "  OPTIONAL {?id skos:editorialNote ?note} . " + 
-                   "  OPTIONAL {?id prov:wasAttributedTo ?attrTo} . " + 
-                   "  OPTIONAL {?id prov:wasAssociatedWith ?assocWith} . " + 
-                   "} ";
-                break;
-            case "DietandNutrition":
-               q= "PREFIX chebi: <http://purl.obolibrary.org/obo/CHEBI_>  PREFIX hadatac-sn: <http://hadatac.org/ont/hadatac-sn#>  PREFIX owl: <http://www.w3.org/2002/07/owl#>  PREFIX vstoi: <http://hadatac.org/ont/vstoi#>  PREFIX case-kb: <http://hadatac.org/kb/case#>  PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>  PREFIX skos: <http://www.w3.org/2004/02/skos/core#>  PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>  PREFIX chear-kb: <http://hadatac.org/kb/chear#>  PREFIX dct: <http://purl.org/dc/terms/>  PREFIX sio: <http://semanticscience.org/resource/>  PREFIX dcterms: <http://purl.org/dc/terms/>  PREFIX uo: <http://purl.obolibrary.org/obo/uo#>  PREFIX hasneto: <http://hadatac.org/ont/hasneto#>  PREFIX prov: <http://www.w3.org/ns/prov#>  PREFIX hadatac: <http://hadatac.org/ont/hadatac#>  PREFIX case: <http://hadatac.org/ont/case#>  PREFIX foaf: <http://xmlns.com/foaf/0.1/>  PREFIX hasco: <http://hadatac.org/ont/hasco/>  PREFIX uberon: <http://purl.obolibrary.org/obo/uberon.owl#>  PREFIX chear: <http://hadatac.org/ont/chear#>  PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>  PREFIX fma: <http://purl.org/sig/ont/fma/>  PREFIX obo: <http://geneontology.org/GO.format.obo-1_2.shtml#>  PREFIX pubchem: <http://rdf.ncbi.nlm.nih.gov/pubchem/compound/>  " + 
-                   "SELECT ?id ?superId ?label ?iden ?comment ?def ?unit ?note ?attrTo ?assocWith " + 
-                   "WHERE { " + 
-                   "  ?id rdfs:subClassOf* chear:DietAndNutrition . " + 
-                   "  ?id rdfs:subClassOf ?superId . " + 
-                   "  ?id rdfs:label ?label ." + 
-                   "  OPTIONAL {?id dcterms:identifier ?iden} . " + 
-                   "  OPTIONAL {?id rdfs:comment ?comment} . " + 
-                   "  OPTIONAL {?id skos:definition ?def} . " + 
-                   "  OPTIONAL {?id hasneto:hasUnit ?unit} . " + 
-                   "  OPTIONAL {?id skos:editorialNote ?note} . " + 
-                   "  OPTIONAL {?id prov:wasAttributedTo ?attrTo} . " + 
-                   "  OPTIONAL {?id prov:wasAssociatedWith ?assocWith} . " + 
-                   "} ";
-                break;
-            case "SocioeconomicClassStatus":
-               q= "PREFIX chebi: <http://purl.obolibrary.org/obo/CHEBI_>  PREFIX hadatac-sn: <http://hadatac.org/ont/hadatac-sn#>  PREFIX owl: <http://www.w3.org/2002/07/owl#>  PREFIX vstoi: <http://hadatac.org/ont/vstoi#>  PREFIX case-kb: <http://hadatac.org/kb/case#>  PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>  PREFIX skos: <http://www.w3.org/2004/02/skos/core#>  PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>  PREFIX chear-kb: <http://hadatac.org/kb/chear#>  PREFIX dct: <http://purl.org/dc/terms/>  PREFIX sio: <http://semanticscience.org/resource/>  PREFIX dcterms: <http://purl.org/dc/terms/>  PREFIX uo: <http://purl.obolibrary.org/obo/uo#>  PREFIX hasneto: <http://hadatac.org/ont/hasneto#>  PREFIX prov: <http://www.w3.org/ns/prov#>  PREFIX hadatac: <http://hadatac.org/ont/hadatac#>  PREFIX case: <http://hadatac.org/ont/case#>  PREFIX foaf: <http://xmlns.com/foaf/0.1/>  PREFIX hasco: <http://hadatac.org/ont/hasco/>  PREFIX uberon: <http://purl.obolibrary.org/obo/uberon.owl#>  PREFIX chear: <http://hadatac.org/ont/chear#>  PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>  PREFIX fma: <http://purl.org/sig/ont/fma/>  PREFIX obo: <http://geneontology.org/GO.format.obo-1_2.shtml#>  PREFIX pubchem: <http://rdf.ncbi.nlm.nih.gov/pubchem/compound/>  " + 
-                   "SELECT ?id ?superId ?label ?iden ?comment ?def ?unit ?note ?attrTo ?assocWith " + 
-                   "WHERE { " + 
-                   "  ?id rdfs:subClassOf* chear:SocioeconomicStatus . " + 
-                   "  ?id rdfs:subClassOf ?superId . " + 
-                   "  ?id rdfs:label ?label ." + 
-                   "  OPTIONAL {?id dcterms:identifier ?iden} . " + 
-                   "  OPTIONAL {?id rdfs:comment ?comment} . " + 
-                   "  OPTIONAL {?id skos:definition ?def} . " + 
-                   "  OPTIONAL {?id hasneto:hasUnit ?unit} . " + 
-                   "  OPTIONAL {?id skos:editorialNote ?note} . " + 
-                   "  OPTIONAL {?id prov:wasAttributedTo ?attrTo} . " + 
-                   "  OPTIONAL {?id prov:wasAssociatedWith ?assocWith} . " + 
-                   "} ";
-                break;
-            case "HousingCharacteristic":
-               q= "PREFIX chebi: <http://purl.obolibrary.org/obo/CHEBI_>  PREFIX hadatac-sn: <http://hadatac.org/ont/hadatac-sn#>  PREFIX owl: <http://www.w3.org/2002/07/owl#>  PREFIX vstoi: <http://hadatac.org/ont/vstoi#>  PREFIX case-kb: <http://hadatac.org/kb/case#>  PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>  PREFIX skos: <http://www.w3.org/2004/02/skos/core#>  PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>  PREFIX chear-kb: <http://hadatac.org/kb/chear#>  PREFIX dct: <http://purl.org/dc/terms/>  PREFIX sio: <http://semanticscience.org/resource/>  PREFIX dcterms: <http://purl.org/dc/terms/>  PREFIX uo: <http://purl.obolibrary.org/obo/uo#>  PREFIX hasneto: <http://hadatac.org/ont/hasneto#>  PREFIX prov: <http://www.w3.org/ns/prov#>  PREFIX hadatac: <http://hadatac.org/ont/hadatac#>  PREFIX case: <http://hadatac.org/ont/case#>  PREFIX foaf: <http://xmlns.com/foaf/0.1/>  PREFIX hasco: <http://hadatac.org/ont/hasco/>  PREFIX uberon: <http://purl.obolibrary.org/obo/uberon.owl#>  PREFIX chear: <http://hadatac.org/ont/chear#>  PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>  PREFIX fma: <http://purl.org/sig/ont/fma/>  PREFIX obo: <http://geneontology.org/GO.format.obo-1_2.shtml#>  PREFIX pubchem: <http://rdf.ncbi.nlm.nih.gov/pubchem/compound/>  " + 
-                   "SELECT ?id ?superId ?label ?iden ?comment ?def ?unit ?note ?attrTo ?assocWith " + 
-                   "WHERE { " + 
-                   "  ?id rdfs:subClassOf* chear:HousingCharacteristic . " + 
-                   "  ?id rdfs:subClassOf ?superId . " + 
-                   "  ?id rdfs:label ?label ." + 
-                   "  OPTIONAL {?id dcterms:identifier ?iden} . " + 
-                   "  OPTIONAL {?id rdfs:comment ?comment} . " + 
-                   "  OPTIONAL {?id skos:definition ?def} . " + 
-                   "  OPTIONAL {?id hasneto:hasUnit ?unit} . " + 
-                   "  OPTIONAL {?id skos:editorialNote ?note} . " + 
-                   "  OPTIONAL {?id prov:wasAttributedTo ?attrTo} . " + 
-                   "  OPTIONAL {?id prov:wasAssociatedWith ?assocWith} . " + 
-                   "} ";
-                break;
-            case "PersonalProductUse":
-               q= "PREFIX chebi: <http://purl.obolibrary.org/obo/CHEBI_>  PREFIX hadatac-sn: <http://hadatac.org/ont/hadatac-sn#>  PREFIX owl: <http://www.w3.org/2002/07/owl#>  PREFIX vstoi: <http://hadatac.org/ont/vstoi#>  PREFIX case-kb: <http://hadatac.org/kb/case#>  PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>  PREFIX skos: <http://www.w3.org/2004/02/skos/core#>  PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>  PREFIX chear-kb: <http://hadatac.org/kb/chear#>  PREFIX dct: <http://purl.org/dc/terms/>  PREFIX sio: <http://semanticscience.org/resource/>  PREFIX dcterms: <http://purl.org/dc/terms/>  PREFIX uo: <http://purl.obolibrary.org/obo/uo#>  PREFIX hasneto: <http://hadatac.org/ont/hasneto#>  PREFIX prov: <http://www.w3.org/ns/prov#>  PREFIX hadatac: <http://hadatac.org/ont/hadatac#>  PREFIX case: <http://hadatac.org/ont/case#>  PREFIX foaf: <http://xmlns.com/foaf/0.1/>  PREFIX hasco: <http://hadatac.org/ont/hasco/>  PREFIX uberon: <http://purl.obolibrary.org/obo/uberon.owl#>  PREFIX chear: <http://hadatac.org/ont/chear#>  PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>  PREFIX fma: <http://purl.org/sig/ont/fma/>  PREFIX obo: <http://geneontology.org/GO.format.obo-1_2.shtml#>  PREFIX pubchem: <http://rdf.ncbi.nlm.nih.gov/pubchem/compound/>  " + 
-                   "SELECT ?id ?superId ?label ?iden ?comment ?def ?unit ?note ?attrTo ?assocWith " + 
-                   "WHERE { " + 
-                   "  ?id rdfs:subClassOf* chear:PersonalProductUse . " + 
-                   "  ?id rdfs:subClassOf ?superId . " + 
-                   "  ?id rdfs:label ?label ." + 
-                   "  OPTIONAL {?id dcterms:identifier ?iden} . " + 
-                   "  OPTIONAL {?id rdfs:comment ?comment} . " + 
-                   "  OPTIONAL {?id skos:definition ?def} . " + 
-                   "  OPTIONAL {?id hasneto:hasUnit ?unit} . " + 
-                   "  OPTIONAL {?id skos:editorialNote ?note} . " + 
-                   "  OPTIONAL {?id prov:wasAttributedTo ?attrTo} . " + 
-                   "  OPTIONAL {?id prov:wasAssociatedWith ?assocWith} . " + 
-                   "} ";
-                break;
-            case "MedicalHistory":
-               q= "PREFIX chebi: <http://purl.obolibrary.org/obo/CHEBI_>  PREFIX hadatac-sn: <http://hadatac.org/ont/hadatac-sn#>  PREFIX owl: <http://www.w3.org/2002/07/owl#>  PREFIX vstoi: <http://hadatac.org/ont/vstoi#>  PREFIX case-kb: <http://hadatac.org/kb/case#>  PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>  PREFIX skos: <http://www.w3.org/2004/02/skos/core#>  PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>  PREFIX chear-kb: <http://hadatac.org/kb/chear#>  PREFIX dct: <http://purl.org/dc/terms/>  PREFIX sio: <http://semanticscience.org/resource/>  PREFIX dcterms: <http://purl.org/dc/terms/>  PREFIX uo: <http://purl.obolibrary.org/obo/uo#>  PREFIX hasneto: <http://hadatac.org/ont/hasneto#>  PREFIX prov: <http://www.w3.org/ns/prov#>  PREFIX hadatac: <http://hadatac.org/ont/hadatac#>  PREFIX case: <http://hadatac.org/ont/case#>  PREFIX foaf: <http://xmlns.com/foaf/0.1/>  PREFIX hasco: <http://hadatac.org/ont/hasco/>  PREFIX uberon: <http://purl.obolibrary.org/obo/uberon.owl#>  PREFIX chear: <http://hadatac.org/ont/chear#>  PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>  PREFIX fma: <http://purl.org/sig/ont/fma/>  PREFIX obo: <http://geneontology.org/GO.format.obo-1_2.shtml#>  PREFIX pubchem: <http://rdf.ncbi.nlm.nih.gov/pubchem/compound/>  " + 
-                   "SELECT ?id ?superId ?label ?iden ?comment ?def ?unit ?note ?attrTo ?assocWith " + 
-                   "WHERE { " + 
-                   "  ?id rdfs:subClassOf* chear:MedicalHistory . " + 
-                   "  ?id rdfs:subClassOf ?superId . " + 
-                   "  ?id rdfs:label ?label ." + 
-                   "  OPTIONAL {?id dcterms:identifier ?iden} . " + 
-                   "  OPTIONAL {?id rdfs:comment ?comment} . " + 
-                   "  OPTIONAL {?id skos:definition ?def} . " + 
-                   "  OPTIONAL {?id hasneto:hasUnit ?unit} . " + 
-                   "  OPTIONAL {?id skos:editorialNote ?note} . " + 
-                   "  OPTIONAL {?id prov:wasAttributedTo ?attrTo} . " + 
-                   "  OPTIONAL {?id prov:wasAssociatedWith ?assocWith} . " + 
-                   "} ";
-                break;
-            case "Anthropometry":
-               q= "PREFIX chebi: <http://purl.obolibrary.org/obo/CHEBI_>  PREFIX hadatac-sn: <http://hadatac.org/ont/hadatac-sn#>  PREFIX owl: <http://www.w3.org/2002/07/owl#>  PREFIX vstoi: <http://hadatac.org/ont/vstoi#>  PREFIX case-kb: <http://hadatac.org/kb/case#>  PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>  PREFIX skos: <http://www.w3.org/2004/02/skos/core#>  PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>  PREFIX chear-kb: <http://hadatac.org/kb/chear#>  PREFIX dct: <http://purl.org/dc/terms/>  PREFIX sio: <http://semanticscience.org/resource/>  PREFIX dcterms: <http://purl.org/dc/terms/>  PREFIX uo: <http://purl.obolibrary.org/obo/uo#>  PREFIX hasneto: <http://hadatac.org/ont/hasneto#>  PREFIX prov: <http://www.w3.org/ns/prov#>  PREFIX hadatac: <http://hadatac.org/ont/hadatac#>  PREFIX case: <http://hadatac.org/ont/case#>  PREFIX foaf: <http://xmlns.com/foaf/0.1/>  PREFIX hasco: <http://hadatac.org/ont/hasco/>  PREFIX uberon: <http://purl.obolibrary.org/obo/uberon.owl#>  PREFIX chear: <http://hadatac.org/ont/chear#>  PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>  PREFIX fma: <http://purl.org/sig/ont/fma/>  PREFIX obo: <http://geneontology.org/GO.format.obo-1_2.shtml#>  PREFIX pubchem: <http://rdf.ncbi.nlm.nih.gov/pubchem/compound/>  " + 
-                   "SELECT ?id ?superId ?label ?iden ?comment ?def ?unit ?note ?attrTo ?assocWith " + 
-                   "WHERE { " + 
-                   "  ?id rdfs:subClassOf* chear:Anthropometry . " + 
-                   "  ?id rdfs:subClassOf ?superId . " + 
-                   "  ?id rdfs:label ?label ." + 
-                   "  OPTIONAL {?id dcterms:identifier ?iden} . " + 
-                   "  OPTIONAL {?id rdfs:comment ?comment} . " + 
-                   "  OPTIONAL {?id skos:definition ?def} . " + 
-                   "  OPTIONAL {?id hasneto:hasUnit ?unit} . " + 
-                   "  OPTIONAL {?id skos:editorialNote ?note} . " + 
-                   "  OPTIONAL {?id prov:wasAttributedTo ?attrTo} . " + 
-                   "  OPTIONAL {?id prov:wasAssociatedWith ?assocWith} . " + 
-                   "} ";
-                break;
-            case "SleepCharacterisitic":
-               q= "PREFIX chebi: <http://purl.obolibrary.org/obo/CHEBI_>  PREFIX hadatac-sn: <http://hadatac.org/ont/hadatac-sn#>  PREFIX owl: <http://www.w3.org/2002/07/owl#>  PREFIX vstoi: <http://hadatac.org/ont/vstoi#>  PREFIX case-kb: <http://hadatac.org/kb/case#>  PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>  PREFIX skos: <http://www.w3.org/2004/02/skos/core#>  PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>  PREFIX chear-kb: <http://hadatac.org/kb/chear#>  PREFIX dct: <http://purl.org/dc/terms/>  PREFIX sio: <http://semanticscience.org/resource/>  PREFIX dcterms: <http://purl.org/dc/terms/>  PREFIX uo: <http://purl.obolibrary.org/obo/uo#>  PREFIX hasneto: <http://hadatac.org/ont/hasneto#>  PREFIX prov: <http://www.w3.org/ns/prov#>  PREFIX hadatac: <http://hadatac.org/ont/hadatac#>  PREFIX case: <http://hadatac.org/ont/case#>  PREFIX foaf: <http://xmlns.com/foaf/0.1/>  PREFIX hasco: <http://hadatac.org/ont/hasco/>  PREFIX uberon: <http://purl.obolibrary.org/obo/uberon.owl#>  PREFIX chear: <http://hadatac.org/ont/chear#>  PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>  PREFIX fma: <http://purl.org/sig/ont/fma/>  PREFIX obo: <http://geneontology.org/GO.format.obo-1_2.shtml#>  PREFIX pubchem: <http://rdf.ncbi.nlm.nih.gov/pubchem/compound/>  " + 
-                   "SELECT ?id ?superId ?label ?iden ?comment ?def ?unit ?note ?attrTo ?assocWith " + 
-                   "WHERE { " + 
-                   "  ?id rdfs:subClassOf* chear:SleepCharacterisitic . " + 
-                   "  ?id rdfs:subClassOf ?superId . " + 
-                   "  ?id rdfs:label ?label ." + 
-                   "  OPTIONAL {?id dcterms:identifier ?iden} . " + 
-                   "  OPTIONAL {?id rdfs:comment ?comment} . " + 
-                   "  OPTIONAL {?id skos:definition ?def} . " + 
-                   "  OPTIONAL {?id hasneto:hasUnit ?unit} . " + 
-                   "  OPTIONAL {?id skos:editorialNote ?note} . " + 
-                   "  OPTIONAL {?id prov:wasAttributedTo ?attrTo} . " + 
-                   "  OPTIONAL {?id prov:wasAssociatedWith ?assocWith} . " + 
-                   "} ";
-                break;
-            case "Acculturation":
-               q= "PREFIX chebi: <http://purl.obolibrary.org/obo/CHEBI_>  PREFIX hadatac-sn: <http://hadatac.org/ont/hadatac-sn#>  PREFIX owl: <http://www.w3.org/2002/07/owl#>  PREFIX vstoi: <http://hadatac.org/ont/vstoi#>  PREFIX case-kb: <http://hadatac.org/kb/case#>  PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>  PREFIX skos: <http://www.w3.org/2004/02/skos/core#>  PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>  PREFIX chear-kb: <http://hadatac.org/kb/chear#>  PREFIX dct: <http://purl.org/dc/terms/>  PREFIX sio: <http://semanticscience.org/resource/>  PREFIX dcterms: <http://purl.org/dc/terms/>  PREFIX uo: <http://purl.obolibrary.org/obo/uo#>  PREFIX hasneto: <http://hadatac.org/ont/hasneto#>  PREFIX prov: <http://www.w3.org/ns/prov#>  PREFIX hadatac: <http://hadatac.org/ont/hadatac#>  PREFIX case: <http://hadatac.org/ont/case#>  PREFIX foaf: <http://xmlns.com/foaf/0.1/>  PREFIX hasco: <http://hadatac.org/ont/hasco/>  PREFIX uberon: <http://purl.obolibrary.org/obo/uberon.owl#>  PREFIX chear: <http://hadatac.org/ont/chear#>  PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>  PREFIX fma: <http://purl.org/sig/ont/fma/>  PREFIX obo: <http://geneontology.org/GO.format.obo-1_2.shtml#>  PREFIX pubchem: <http://rdf.ncbi.nlm.nih.gov/pubchem/compound/>  " + 
-                   "SELECT ?id ?superId ?label ?iden ?comment ?def ?unit ?note ?attrTo ?assocWith " + 
-                   "WHERE { " + 
-                   "  ?id rdfs:subClassOf* chear:Acculturation . " + 
-                   "  ?id rdfs:subClassOf ?superId . " + 
-                   "  ?id rdfs:label ?label ." + 
-                   "  OPTIONAL {?id dcterms:identifier ?iden} . " + 
-                   "  OPTIONAL {?id rdfs:comment ?comment} . " + 
-                   "  OPTIONAL {?id skos:definition ?def} . " + 
-                   "  OPTIONAL {?id hasneto:hasUnit ?unit} . " + 
-                   "  OPTIONAL {?id skos:editorialNote ?note} . " + 
-                   "  OPTIONAL {?id prov:wasAttributedTo ?attrTo} . " + 
-                   "  OPTIONAL {?id prov:wasAssociatedWith ?assocWith} . " + 
-                   "} ";
-                break;
-            case "MentalHealth":
-               q= "PREFIX chebi: <http://purl.obolibrary.org/obo/CHEBI_>  PREFIX hadatac-sn: <http://hadatac.org/ont/hadatac-sn#>  PREFIX owl: <http://www.w3.org/2002/07/owl#>  PREFIX vstoi: <http://hadatac.org/ont/vstoi#>  PREFIX case-kb: <http://hadatac.org/kb/case#>  PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>  PREFIX skos: <http://www.w3.org/2004/02/skos/core#>  PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>  PREFIX chear-kb: <http://hadatac.org/kb/chear#>  PREFIX dct: <http://purl.org/dc/terms/>  PREFIX sio: <http://semanticscience.org/resource/>  PREFIX dcterms: <http://purl.org/dc/terms/>  PREFIX uo: <http://purl.obolibrary.org/obo/uo#>  PREFIX hasneto: <http://hadatac.org/ont/hasneto#>  PREFIX prov: <http://www.w3.org/ns/prov#>  PREFIX hadatac: <http://hadatac.org/ont/hadatac#>  PREFIX case: <http://hadatac.org/ont/case#>  PREFIX foaf: <http://xmlns.com/foaf/0.1/>  PREFIX hasco: <http://hadatac.org/ont/hasco/>  PREFIX uberon: <http://purl.obolibrary.org/obo/uberon.owl#>  PREFIX chear: <http://hadatac.org/ont/chear#>  PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>  PREFIX fma: <http://purl.org/sig/ont/fma/>  PREFIX obo: <http://geneontology.org/GO.format.obo-1_2.shtml#>  PREFIX pubchem: <http://rdf.ncbi.nlm.nih.gov/pubchem/compound/>  " + 
-                   "SELECT ?id ?superId ?label ?iden ?comment ?def ?unit ?note ?attrTo ?assocWith " + 
-                   "WHERE { " + 
-                   "  ?id rdfs:subClassOf* chear:MentalHealth . " + 
-                   "  ?id rdfs:subClassOf ?superId . " + 
-                   "  ?id rdfs:label ?label ." + 
-                   "  OPTIONAL {?id dcterms:identifier ?iden} . " + 
-                   "  OPTIONAL {?id rdfs:comment ?comment} . " + 
-                   "  OPTIONAL {?id skos:definition ?def} . " + 
-                   "  OPTIONAL {?id hasneto:hasUnit ?unit} . " + 
-                   "  OPTIONAL {?id skos:editorialNote ?note} . " + 
-                   "  OPTIONAL {?id prov:wasAttributedTo ?attrTo} . " + 
-                   "  OPTIONAL {?id prov:wasAssociatedWith ?assocWith} . " + 
-                   "} ";
-                break;
-            case "PhysicalandMentalAssessment":
-               q= "PREFIX chebi: <http://purl.obolibrary.org/obo/CHEBI_>  PREFIX hadatac-sn: <http://hadatac.org/ont/hadatac-sn#>  PREFIX owl: <http://www.w3.org/2002/07/owl#>  PREFIX vstoi: <http://hadatac.org/ont/vstoi#>  PREFIX case-kb: <http://hadatac.org/kb/case#>  PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>  PREFIX skos: <http://www.w3.org/2004/02/skos/core#>  PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>  PREFIX chear-kb: <http://hadatac.org/kb/chear#>  PREFIX dct: <http://purl.org/dc/terms/>  PREFIX sio: <http://semanticscience.org/resource/>  PREFIX dcterms: <http://purl.org/dc/terms/>  PREFIX uo: <http://purl.obolibrary.org/obo/uo#>  PREFIX hasneto: <http://hadatac.org/ont/hasneto#>  PREFIX prov: <http://www.w3.org/ns/prov#>  PREFIX hadatac: <http://hadatac.org/ont/hadatac#>  PREFIX case: <http://hadatac.org/ont/case#>  PREFIX foaf: <http://xmlns.com/foaf/0.1/>  PREFIX hasco: <http://hadatac.org/ont/hasco/>  PREFIX uberon: <http://purl.obolibrary.org/obo/uberon.owl#>  PREFIX chear: <http://hadatac.org/ont/chear#>  PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>  PREFIX fma: <http://purl.org/sig/ont/fma/>  PREFIX obo: <http://geneontology.org/GO.format.obo-1_2.shtml#>  PREFIX pubchem: <http://rdf.ncbi.nlm.nih.gov/pubchem/compound/>  " + 
-                   "SELECT ?id ?superId ?label ?iden ?comment ?def ?unit ?note ?attrTo ?assocWith " + 
-                   "WHERE { " + 
-                   "  ?id rdfs:subClassOf* chear:Assessment . " + 
-                   "  ?id rdfs:subClassOf ?superId . " + 
-                   "  ?id rdfs:label ?label ." + 
-                   "  OPTIONAL {?id dcterms:identifier ?iden} . " + 
-                   "  OPTIONAL {?id rdfs:comment ?comment} . " + 
-                   "  OPTIONAL {?id skos:definition ?def} . " + 
-                   "  OPTIONAL {?id hasneto:hasUnit ?unit} . " + 
-                   "  OPTIONAL {?id skos:editorialNote ?note} . " + 
-                   "  OPTIONAL {?id prov:wasAttributedTo ?attrTo} . " + 
-                   "  OPTIONAL {?id prov:wasAssociatedWith ?assocWith} . " + 
-                   "} ";
-                break;
-            case "Demographic":
-               q= "PREFIX chebi: <http://purl.obolibrary.org/obo/CHEBI_>  PREFIX hadatac-sn: <http://hadatac.org/ont/hadatac-sn#>  PREFIX owl: <http://www.w3.org/2002/07/owl#>  PREFIX vstoi: <http://hadatac.org/ont/vstoi#>  PREFIX case-kb: <http://hadatac.org/kb/case#>  PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>  PREFIX skos: <http://www.w3.org/2004/02/skos/core#>  PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>  PREFIX chear-kb: <http://hadatac.org/kb/chear#>  PREFIX dct: <http://purl.org/dc/terms/>  PREFIX sio: <http://semanticscience.org/resource/>  PREFIX dcterms: <http://purl.org/dc/terms/>  PREFIX uo: <http://purl.obolibrary.org/obo/uo#>  PREFIX hasneto: <http://hadatac.org/ont/hasneto#>  PREFIX prov: <http://www.w3.org/ns/prov#>  PREFIX hadatac: <http://hadatac.org/ont/hadatac#>  PREFIX case: <http://hadatac.org/ont/case#>  PREFIX foaf: <http://xmlns.com/foaf/0.1/>  PREFIX hasco: <http://hadatac.org/ont/hasco/>  PREFIX uberon: <http://purl.obolibrary.org/obo/uberon.owl#>  PREFIX chear: <http://hadatac.org/ont/chear#>  PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>  PREFIX fma: <http://purl.org/sig/ont/fma/>  PREFIX obo: <http://geneontology.org/GO.format.obo-1_2.shtml#>  PREFIX pubchem: <http://rdf.ncbi.nlm.nih.gov/pubchem/compound/>  " + 
-                   "SELECT ?id ?superId ?label ?iden ?comment ?def ?unit ?note ?attrTo ?assocWith " + 
-                   "WHERE { " + 
-                   "  ?id rdfs:subClassOf* chear:Demographic . " + 
-                   "  ?id rdfs:subClassOf ?superId . " + 
-                   "  ?id rdfs:label ?label ." + 
-                   "  OPTIONAL {?id dcterms:identifier ?iden} . " + 
-                   "  OPTIONAL {?id rdfs:comment ?comment} . " + 
-                   "  OPTIONAL {?id skos:definition ?def} . " + 
-                   "  OPTIONAL {?id hasneto:hasUnit ?unit} . " + 
-                   "  OPTIONAL {?id skos:editorialNote ?note} . " + 
-                   "  OPTIONAL {?id prov:wasAttributedTo ?attrTo} . " + 
-                   "  OPTIONAL {?id prov:wasAssociatedWith ?assocWith} . " + 
-                   "} ";
-                break;
-            case "HospitalUtilizationandAccesstoCare":
-               q= "PREFIX chebi: <http://purl.obolibrary.org/obo/CHEBI_>  PREFIX hadatac-sn: <http://hadatac.org/ont/hadatac-sn#>  PREFIX owl: <http://www.w3.org/2002/07/owl#>  PREFIX vstoi: <http://hadatac.org/ont/vstoi#>  PREFIX case-kb: <http://hadatac.org/kb/case#>  PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>  PREFIX skos: <http://www.w3.org/2004/02/skos/core#>  PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>  PREFIX chear-kb: <http://hadatac.org/kb/chear#>  PREFIX dct: <http://purl.org/dc/terms/>  PREFIX sio: <http://semanticscience.org/resource/>  PREFIX dcterms: <http://purl.org/dc/terms/>  PREFIX uo: <http://purl.obolibrary.org/obo/uo#>  PREFIX hasneto: <http://hadatac.org/ont/hasneto#>  PREFIX prov: <http://www.w3.org/ns/prov#>  PREFIX hadatac: <http://hadatac.org/ont/hadatac#>  PREFIX case: <http://hadatac.org/ont/case#>  PREFIX foaf: <http://xmlns.com/foaf/0.1/>  PREFIX hasco: <http://hadatac.org/ont/hasco/>  PREFIX uberon: <http://purl.obolibrary.org/obo/uberon.owl#>  PREFIX chear: <http://hadatac.org/ont/chear#>  PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>  PREFIX fma: <http://purl.org/sig/ont/fma/>  PREFIX obo: <http://geneontology.org/GO.format.obo-1_2.shtml#>  PREFIX pubchem: <http://rdf.ncbi.nlm.nih.gov/pubchem/compound/>  " + 
-                   "SELECT ?id ?superId ?label ?iden ?comment ?def ?unit ?note ?attrTo ?assocWith " + 
-                   "WHERE { " + 
-                   "  ?id rdfs:subClassOf* chear:HospitalUtilization . " + 
-                   "  ?id rdfs:subClassOf ?superId . " + 
-                   "  ?id rdfs:label ?label ." + 
-                   "  OPTIONAL {?id dcterms:identifier ?iden} . " + 
-                   "  OPTIONAL {?id rdfs:comment ?comment} . " + 
-                   "  OPTIONAL {?id skos:definition ?def} . " + 
-                   "  OPTIONAL {?id hasneto:hasUnit ?unit} . " + 
-                   "  OPTIONAL {?id skos:editorialNote ?note} . " + 
-                   "  OPTIONAL {?id prov:wasAttributedTo ?attrTo} . " + 
-                   "  OPTIONAL {?id prov:wasAssociatedWith ?assocWith} . " + 
-                   "} ";
-                break;
-            case "PhysicalActivityandFitness":
-               q= "PREFIX chebi: <http://purl.obolibrary.org/obo/CHEBI_>  PREFIX hadatac-sn: <http://hadatac.org/ont/hadatac-sn#>  PREFIX owl: <http://www.w3.org/2002/07/owl#>  PREFIX vstoi: <http://hadatac.org/ont/vstoi#>  PREFIX case-kb: <http://hadatac.org/kb/case#>  PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>  PREFIX skos: <http://www.w3.org/2004/02/skos/core#>  PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>  PREFIX chear-kb: <http://hadatac.org/kb/chear#>  PREFIX dct: <http://purl.org/dc/terms/>  PREFIX sio: <http://semanticscience.org/resource/>  PREFIX dcterms: <http://purl.org/dc/terms/>  PREFIX uo: <http://purl.obolibrary.org/obo/uo#>  PREFIX hasneto: <http://hadatac.org/ont/hasneto#>  PREFIX prov: <http://www.w3.org/ns/prov#>  PREFIX hadatac: <http://hadatac.org/ont/hadatac#>  PREFIX case: <http://hadatac.org/ont/case#>  PREFIX foaf: <http://xmlns.com/foaf/0.1/>  PREFIX hasco: <http://hadatac.org/ont/hasco/>  PREFIX uberon: <http://purl.obolibrary.org/obo/uberon.owl#>  PREFIX chear: <http://hadatac.org/ont/chear#>  PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>  PREFIX fma: <http://purl.org/sig/ont/fma/>  PREFIX obo: <http://geneontology.org/GO.format.obo-1_2.shtml#>  PREFIX pubchem: <http://rdf.ncbi.nlm.nih.gov/pubchem/compound/>  " + 
-                   "SELECT ?id ?superId ?label ?iden ?comment ?def ?unit ?note ?attrTo ?assocWith " + 
-                   "WHERE { " + 
-                   "  ?id rdfs:subClassOf* chear:PhysicalActivityAndFitness . " + 
-                   "  ?id rdfs:subClassOf ?superId . " + 
-                   "  ?id rdfs:label ?label ." + 
-                   "  OPTIONAL {?id dcterms:identifier ?iden} . " + 
-                   "  OPTIONAL {?id rdfs:comment ?comment} . " + 
-                   "  OPTIONAL {?id skos:definition ?def} . " + 
-                   "  OPTIONAL {?id hasneto:hasUnit ?unit} . " + 
-                   "  OPTIONAL {?id skos:editorialNote ?note} . " + 
-                   "  OPTIONAL {?id prov:wasAttributedTo ?attrTo} . " + 
-                   "  OPTIONAL {?id prov:wasAssociatedWith ?assocWith} . " + 
-                   "} ";
-                break;
-            case "Element":
-               q= "PREFIX chebi: <http://purl.obolibrary.org/obo/CHEBI_>  PREFIX hadatac-sn: <http://hadatac.org/ont/hadatac-sn#>  PREFIX owl: <http://www.w3.org/2002/07/owl#>  PREFIX vstoi: <http://hadatac.org/ont/vstoi#>  PREFIX case-kb: <http://hadatac.org/kb/case#>  PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>  PREFIX skos: <http://www.w3.org/2004/02/skos/core#>  PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>  PREFIX chear-kb: <http://hadatac.org/kb/chear#>  PREFIX dct: <http://purl.org/dc/terms/>  PREFIX sio: <http://semanticscience.org/resource/>  PREFIX dcterms: <http://purl.org/dc/terms/>  PREFIX uo: <http://purl.obolibrary.org/obo/uo#>  PREFIX hasneto: <http://hadatac.org/ont/hasneto#>  PREFIX prov: <http://www.w3.org/ns/prov#>  PREFIX hadatac: <http://hadatac.org/ont/hadatac#>  PREFIX case: <http://hadatac.org/ont/case#>  PREFIX foaf: <http://xmlns.com/foaf/0.1/>  PREFIX hasco: <http://hadatac.org/ont/hasco/>  PREFIX uberon: <http://purl.obolibrary.org/obo/uberon.owl#>  PREFIX chear: <http://hadatac.org/ont/chear#>  PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>  PREFIX fma: <http://purl.org/sig/ont/fma/>  PREFIX obo: <http://geneontology.org/GO.format.obo-1_2.shtml#>  PREFIX pubchem: <http://rdf.ncbi.nlm.nih.gov/pubchem/compound/>  " + 
-                   "SELECT ?id ?superId ?label ?iden ?comment ?def ?unit ?note ?attrTo ?assocWith " + 
-                   "WHERE { " + 
-                   "  ?id rdfs:subClassOf* chear:Element . " + 
-                   "  ?id rdfs:subClassOf ?superId . " + 
-                   "  ?id rdfs:label ?label ." + 
-                   "  OPTIONAL {?id dcterms:identifier ?iden} . " + 
-                   "  OPTIONAL {?id rdfs:comment ?comment} . " + 
-                   "  OPTIONAL {?id skos:definition ?def} . " + 
-                   "  OPTIONAL {?id hasneto:hasUnit ?unit} . " + 
-                   "  OPTIONAL {?id skos:editorialNote ?note} . " + 
-                   "  OPTIONAL {?id prov:wasAttributedTo ?attrTo} . " + 
-                   "  OPTIONAL {?id prov:wasAssociatedWith ?assocWith} . " + 
-                   "} ";
-                break;
-            case "PolybrominatedDiphenylEther":
-               q= "PREFIX chebi: <http://purl.obolibrary.org/obo/CHEBI_>  PREFIX hadatac-sn: <http://hadatac.org/ont/hadatac-sn#>  PREFIX owl: <http://www.w3.org/2002/07/owl#>  PREFIX vstoi: <http://hadatac.org/ont/vstoi#>  PREFIX case-kb: <http://hadatac.org/kb/case#>  PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>  PREFIX skos: <http://www.w3.org/2004/02/skos/core#>  PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>  PREFIX chear-kb: <http://hadatac.org/kb/chear#>  PREFIX dct: <http://purl.org/dc/terms/>  PREFIX sio: <http://semanticscience.org/resource/>  PREFIX dcterms: <http://purl.org/dc/terms/>  PREFIX uo: <http://purl.obolibrary.org/obo/uo#>  PREFIX hasneto: <http://hadatac.org/ont/hasneto#>  PREFIX prov: <http://www.w3.org/ns/prov#>  PREFIX hadatac: <http://hadatac.org/ont/hadatac#>  PREFIX case: <http://hadatac.org/ont/case#>  PREFIX foaf: <http://xmlns.com/foaf/0.1/>  PREFIX hasco: <http://hadatac.org/ont/hasco/>  PREFIX uberon: <http://purl.obolibrary.org/obo/uberon.owl#>  PREFIX chear: <http://hadatac.org/ont/chear#>  PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>  PREFIX fma: <http://purl.org/sig/ont/fma/>  PREFIX obo: <http://geneontology.org/GO.format.obo-1_2.shtml#>  PREFIX pubchem: <http://rdf.ncbi.nlm.nih.gov/pubchem/compound/>  " + 
-                   "SELECT ?id ?superId ?label ?iden ?comment ?def ?unit ?note ?attrTo ?assocWith " + 
-                   "WHERE { " + 
-                   "  ?id rdfs:subClassOf* chear:PolybrominatedDiphenylEther . " + 
-                   "  ?id rdfs:subClassOf ?superId . " + 
-                   "  ?id rdfs:label ?label ." + 
-                   "  OPTIONAL {?id dcterms:identifier ?iden} . " + 
-                   "  OPTIONAL {?id rdfs:comment ?comment} . " + 
-                   "  OPTIONAL {?id skos:definition ?def} . " + 
-                   "  OPTIONAL {?id hasneto:hasUnit ?unit} . " + 
-                   "  OPTIONAL {?id skos:editorialNote ?note} . " + 
-                   "  OPTIONAL {?id prov:wasAttributedTo ?attrTo} . " + 
-                   "  OPTIONAL {?id prov:wasAssociatedWith ?assocWith} . " + 
-                   "} ";
-                break;
-            case "ArsenicSpecies":
-               q= "PREFIX chebi: <http://purl.obolibrary.org/obo/CHEBI_>  PREFIX hadatac-sn: <http://hadatac.org/ont/hadatac-sn#>  PREFIX owl: <http://www.w3.org/2002/07/owl#>  PREFIX vstoi: <http://hadatac.org/ont/vstoi#>  PREFIX case-kb: <http://hadatac.org/kb/case#>  PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>  PREFIX skos: <http://www.w3.org/2004/02/skos/core#>  PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>  PREFIX chear-kb: <http://hadatac.org/kb/chear#>  PREFIX dct: <http://purl.org/dc/terms/>  PREFIX sio: <http://semanticscience.org/resource/>  PREFIX dcterms: <http://purl.org/dc/terms/>  PREFIX uo: <http://purl.obolibrary.org/obo/uo#>  PREFIX hasneto: <http://hadatac.org/ont/hasneto#>  PREFIX prov: <http://www.w3.org/ns/prov#>  PREFIX hadatac: <http://hadatac.org/ont/hadatac#>  PREFIX case: <http://hadatac.org/ont/case#>  PREFIX foaf: <http://xmlns.com/foaf/0.1/>  PREFIX hasco: <http://hadatac.org/ont/hasco/>  PREFIX uberon: <http://purl.obolibrary.org/obo/uberon.owl#>  PREFIX chear: <http://hadatac.org/ont/chear#>  PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>  PREFIX fma: <http://purl.org/sig/ont/fma/>  PREFIX obo: <http://geneontology.org/GO.format.obo-1_2.shtml#>  PREFIX pubchem: <http://rdf.ncbi.nlm.nih.gov/pubchem/compound/>  " + 
-                   "SELECT ?id ?superId ?label ?iden ?comment ?def ?unit ?note ?attrTo ?assocWith " + 
-                   "WHERE { " + 
-                   "  ?id rdfs:subClassOf* chear:ArsenicSpecies . " + 
-                   "  ?id rdfs:subClassOf ?superId . " + 
-                   "  ?id rdfs:label ?label ." + 
-                   "  OPTIONAL {?id dcterms:identifier ?iden} . " + 
-                   "  OPTIONAL {?id rdfs:comment ?comment} . " + 
-                   "  OPTIONAL {?id skos:definition ?def} . " + 
-                   "  OPTIONAL {?id hasneto:hasUnit ?unit} . " + 
-                   "  OPTIONAL {?id skos:editorialNote ?note} . " + 
-                   "  OPTIONAL {?id prov:wasAttributedTo ?attrTo} . " + 
-                   "  OPTIONAL {?id prov:wasAssociatedWith ?assocWith} . " + 
-                   "} ";
-                break;
-            case "Paraben":
-               q= "PREFIX chebi: <http://purl.obolibrary.org/obo/CHEBI_>  PREFIX hadatac-sn: <http://hadatac.org/ont/hadatac-sn#>  PREFIX owl: <http://www.w3.org/2002/07/owl#>  PREFIX vstoi: <http://hadatac.org/ont/vstoi#>  PREFIX case-kb: <http://hadatac.org/kb/case#>  PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>  PREFIX skos: <http://www.w3.org/2004/02/skos/core#>  PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>  PREFIX chear-kb: <http://hadatac.org/kb/chear#>  PREFIX dct: <http://purl.org/dc/terms/>  PREFIX sio: <http://semanticscience.org/resource/>  PREFIX dcterms: <http://purl.org/dc/terms/>  PREFIX uo: <http://purl.obolibrary.org/obo/uo#>  PREFIX hasneto: <http://hadatac.org/ont/hasneto#>  PREFIX prov: <http://www.w3.org/ns/prov#>  PREFIX hadatac: <http://hadatac.org/ont/hadatac#>  PREFIX case: <http://hadatac.org/ont/case#>  PREFIX foaf: <http://xmlns.com/foaf/0.1/>  PREFIX hasco: <http://hadatac.org/ont/hasco/>  PREFIX uberon: <http://purl.obolibrary.org/obo/uberon.owl#>  PREFIX chear: <http://hadatac.org/ont/chear#>  PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>  PREFIX fma: <http://purl.org/sig/ont/fma/>  PREFIX obo: <http://geneontology.org/GO.format.obo-1_2.shtml#>  PREFIX pubchem: <http://rdf.ncbi.nlm.nih.gov/pubchem/compound/>  " + 
-                   "SELECT ?id ?superId ?label ?iden ?comment ?def ?unit ?note ?attrTo ?assocWith " + 
-                   "WHERE { " + 
-                   "  ?id rdfs:subClassOf* chear:Paraben . " + 
-                   "  ?id rdfs:subClassOf ?superId . " + 
-                   "  ?id rdfs:label ?label ." + 
-                   "  OPTIONAL {?id dcterms:identifier ?iden} . " + 
-                   "  OPTIONAL {?id rdfs:comment ?comment} . " + 
-                   "  OPTIONAL {?id skos:definition ?def} . " + 
-                   "  OPTIONAL {?id hasneto:hasUnit ?unit} . " + 
-                   "  OPTIONAL {?id skos:editorialNote ?note} . " + 
-                   "  OPTIONAL {?id prov:wasAttributedTo ?attrTo} . " + 
-                   "  OPTIONAL {?id prov:wasAssociatedWith ?assocWith} . " + 
-                   "} ";
-                break;
-            case "TobaccoMetabolite":
-               q= "PREFIX chebi: <http://purl.obolibrary.org/obo/CHEBI_>  PREFIX hadatac-sn: <http://hadatac.org/ont/hadatac-sn#>  PREFIX owl: <http://www.w3.org/2002/07/owl#>  PREFIX vstoi: <http://hadatac.org/ont/vstoi#>  PREFIX case-kb: <http://hadatac.org/kb/case#>  PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>  PREFIX skos: <http://www.w3.org/2004/02/skos/core#>  PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>  PREFIX chear-kb: <http://hadatac.org/kb/chear#>  PREFIX dct: <http://purl.org/dc/terms/>  PREFIX sio: <http://semanticscience.org/resource/>  PREFIX dcterms: <http://purl.org/dc/terms/>  PREFIX uo: <http://purl.obolibrary.org/obo/uo#>  PREFIX hasneto: <http://hadatac.org/ont/hasneto#>  PREFIX prov: <http://www.w3.org/ns/prov#>  PREFIX hadatac: <http://hadatac.org/ont/hadatac#>  PREFIX case: <http://hadatac.org/ont/case#>  PREFIX foaf: <http://xmlns.com/foaf/0.1/>  PREFIX hasco: <http://hadatac.org/ont/hasco/>  PREFIX uberon: <http://purl.obolibrary.org/obo/uberon.owl#>  PREFIX chear: <http://hadatac.org/ont/chear#>  PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>  PREFIX fma: <http://purl.org/sig/ont/fma/>  PREFIX obo: <http://geneontology.org/GO.format.obo-1_2.shtml#>  PREFIX pubchem: <http://rdf.ncbi.nlm.nih.gov/pubchem/compound/>  " + 
-                   "SELECT ?id ?superId ?label ?iden ?comment ?def ?unit ?note ?attrTo ?assocWith " + 
-                   "WHERE { " + 
-                   "  ?id rdfs:subClassOf* chear:TobaccoMetabolite . " + 
-                   "  ?id rdfs:subClassOf ?superId . " + 
-                   "  ?id rdfs:label ?label ." + 
-                   "  OPTIONAL {?id dcterms:identifier ?iden} . " + 
-                   "  OPTIONAL {?id rdfs:comment ?comment} . " + 
-                   "  OPTIONAL {?id skos:definition ?def} . " + 
-                   "  OPTIONAL {?id hasneto:hasUnit ?unit} . " + 
-                   "  OPTIONAL {?id skos:editorialNote ?note} . " + 
-                   "  OPTIONAL {?id prov:wasAttributedTo ?attrTo} . " + 
-                   "  OPTIONAL {?id prov:wasAssociatedWith ?assocWith} . " + 
-                   "} ";
-                break;
-            case "Phthalate":
-               q= "PREFIX chebi: <http://purl.obolibrary.org/obo/CHEBI_>  PREFIX hadatac-sn: <http://hadatac.org/ont/hadatac-sn#>  PREFIX owl: <http://www.w3.org/2002/07/owl#>  PREFIX vstoi: <http://hadatac.org/ont/vstoi#>  PREFIX case-kb: <http://hadatac.org/kb/case#>  PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>  PREFIX skos: <http://www.w3.org/2004/02/skos/core#>  PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>  PREFIX chear-kb: <http://hadatac.org/kb/chear#>  PREFIX dct: <http://purl.org/dc/terms/>  PREFIX sio: <http://semanticscience.org/resource/>  PREFIX dcterms: <http://purl.org/dc/terms/>  PREFIX uo: <http://purl.obolibrary.org/obo/uo#>  PREFIX hasneto: <http://hadatac.org/ont/hasneto#>  PREFIX prov: <http://www.w3.org/ns/prov#>  PREFIX hadatac: <http://hadatac.org/ont/hadatac#>  PREFIX case: <http://hadatac.org/ont/case#>  PREFIX foaf: <http://xmlns.com/foaf/0.1/>  PREFIX hasco: <http://hadatac.org/ont/hasco/>  PREFIX uberon: <http://purl.obolibrary.org/obo/uberon.owl#>  PREFIX chear: <http://hadatac.org/ont/chear#>  PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>  PREFIX fma: <http://purl.org/sig/ont/fma/>  PREFIX obo: <http://geneontology.org/GO.format.obo-1_2.shtml#>  PREFIX pubchem: <http://rdf.ncbi.nlm.nih.gov/pubchem/compound/>  " + 
-                   "SELECT ?id ?superId ?label ?iden ?comment ?def ?unit ?note ?attrTo ?assocWith " + 
-                   "WHERE { " + 
-                   "  ?id rdfs:subClassOf* chear:Phthalate . " + 
-                   "  ?id rdfs:subClassOf ?superId . " + 
-                   "  ?id rdfs:label ?label ." + 
-                   "  OPTIONAL {?id dcterms:identifier ?iden} . " + 
-                   "  OPTIONAL {?id rdfs:comment ?comment} . " + 
-                   "  OPTIONAL {?id skos:definition ?def} . " + 
-                   "  OPTIONAL {?id hasneto:hasUnit ?unit} . " + 
-                   "  OPTIONAL {?id skos:editorialNote ?note} . " + 
-                   "  OPTIONAL {?id prov:wasAttributedTo ?attrTo} . " + 
-                   "  OPTIONAL {?id prov:wasAssociatedWith ?assocWith} . " + 
-                   "} ";
-                break;
-            case "MercurySpecies":
-               q= "PREFIX chebi: <http://purl.obolibrary.org/obo/CHEBI_>  PREFIX hadatac-sn: <http://hadatac.org/ont/hadatac-sn#>  PREFIX owl: <http://www.w3.org/2002/07/owl#>  PREFIX vstoi: <http://hadatac.org/ont/vstoi#>  PREFIX case-kb: <http://hadatac.org/kb/case#>  PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>  PREFIX skos: <http://www.w3.org/2004/02/skos/core#>  PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>  PREFIX chear-kb: <http://hadatac.org/kb/chear#>  PREFIX dct: <http://purl.org/dc/terms/>  PREFIX sio: <http://semanticscience.org/resource/>  PREFIX dcterms: <http://purl.org/dc/terms/>  PREFIX uo: <http://purl.obolibrary.org/obo/uo#>  PREFIX hasneto: <http://hadatac.org/ont/hasneto#>  PREFIX prov: <http://www.w3.org/ns/prov#>  PREFIX hadatac: <http://hadatac.org/ont/hadatac#>  PREFIX case: <http://hadatac.org/ont/case#>  PREFIX foaf: <http://xmlns.com/foaf/0.1/>  PREFIX hasco: <http://hadatac.org/ont/hasco/>  PREFIX uberon: <http://purl.obolibrary.org/obo/uberon.owl#>  PREFIX chear: <http://hadatac.org/ont/chear#>  PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>  PREFIX fma: <http://purl.org/sig/ont/fma/>  PREFIX obo: <http://geneontology.org/GO.format.obo-1_2.shtml#>  PREFIX pubchem: <http://rdf.ncbi.nlm.nih.gov/pubchem/compound/>  " + 
-                   "SELECT ?id ?superId ?label ?iden ?comment ?def ?unit ?note ?attrTo ?assocWith " + 
-                   "WHERE { " + 
-                   "  ?id rdfs:subClassOf* chear:MercurySpecies . " + 
-                   "  ?id rdfs:subClassOf ?superId . " + 
-                   "  ?id rdfs:label ?label ." + 
-                   "  OPTIONAL {?id dcterms:identifier ?iden} . " + 
-                   "  OPTIONAL {?id rdfs:comment ?comment} . " + 
-                   "  OPTIONAL {?id skos:definition ?def} . " + 
-                   "  OPTIONAL {?id hasneto:hasUnit ?unit} . " + 
-                   "  OPTIONAL {?id skos:editorialNote ?note} . " + 
-                   "  OPTIONAL {?id prov:wasAttributedTo ?attrTo} . " + 
-                   "  OPTIONAL {?id prov:wasAssociatedWith ?assocWith} . " + 
-                   "} ";
-                break;
-            case "EnvironmentalPhenol":
-               q= "PREFIX chebi: <http://purl.obolibrary.org/obo/CHEBI_>  PREFIX hadatac-sn: <http://hadatac.org/ont/hadatac-sn#>  PREFIX owl: <http://www.w3.org/2002/07/owl#>  PREFIX vstoi: <http://hadatac.org/ont/vstoi#>  PREFIX case-kb: <http://hadatac.org/kb/case#>  PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>  PREFIX skos: <http://www.w3.org/2004/02/skos/core#>  PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>  PREFIX chear-kb: <http://hadatac.org/kb/chear#>  PREFIX dct: <http://purl.org/dc/terms/>  PREFIX sio: <http://semanticscience.org/resource/>  PREFIX dcterms: <http://purl.org/dc/terms/>  PREFIX uo: <http://purl.obolibrary.org/obo/uo#>  PREFIX hasneto: <http://hadatac.org/ont/hasneto#>  PREFIX prov: <http://www.w3.org/ns/prov#>  PREFIX hadatac: <http://hadatac.org/ont/hadatac#>  PREFIX case: <http://hadatac.org/ont/case#>  PREFIX foaf: <http://xmlns.com/foaf/0.1/>  PREFIX hasco: <http://hadatac.org/ont/hasco/>  PREFIX uberon: <http://purl.obolibrary.org/obo/uberon.owl#>  PREFIX chear: <http://hadatac.org/ont/chear#>  PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>  PREFIX fma: <http://purl.org/sig/ont/fma/>  PREFIX obo: <http://geneontology.org/GO.format.obo-1_2.shtml#>  PREFIX pubchem: <http://rdf.ncbi.nlm.nih.gov/pubchem/compound/>  " + 
-                   "SELECT ?id ?superId ?label ?iden ?comment ?def ?unit ?note ?attrTo ?assocWith " + 
-                   "WHERE { " + 
-                   "  ?id rdfs:subClassOf* chear:Phenol . " + 
-                   "  ?id rdfs:subClassOf ?superId . " + 
-                   "  ?id rdfs:label ?label ." + 
-                   "  OPTIONAL {?id dcterms:identifier ?iden} . " + 
-                   "  OPTIONAL {?id rdfs:comment ?comment} . " + 
-                   "  OPTIONAL {?id skos:definition ?def} . " + 
-                   "  OPTIONAL {?id hasneto:hasUnit ?unit} . " + 
-                   "  OPTIONAL {?id skos:editorialNote ?note} . " + 
-                   "  OPTIONAL {?id prov:wasAttributedTo ?attrTo} . " + 
-                   "  OPTIONAL {?id prov:wasAssociatedWith ?assocWith} . " + 
-                   "} ";
-                break;
-            case "VolatileOrganicCompound":
-               q= "PREFIX chebi: <http://purl.obolibrary.org/obo/CHEBI_>  PREFIX hadatac-sn: <http://hadatac.org/ont/hadatac-sn#>  PREFIX owl: <http://www.w3.org/2002/07/owl#>  PREFIX vstoi: <http://hadatac.org/ont/vstoi#>  PREFIX case-kb: <http://hadatac.org/kb/case#>  PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>  PREFIX skos: <http://www.w3.org/2004/02/skos/core#>  PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>  PREFIX chear-kb: <http://hadatac.org/kb/chear#>  PREFIX dct: <http://purl.org/dc/terms/>  PREFIX sio: <http://semanticscience.org/resource/>  PREFIX dcterms: <http://purl.org/dc/terms/>  PREFIX uo: <http://purl.obolibrary.org/obo/uo#>  PREFIX hasneto: <http://hadatac.org/ont/hasneto#>  PREFIX prov: <http://www.w3.org/ns/prov#>  PREFIX hadatac: <http://hadatac.org/ont/hadatac#>  PREFIX case: <http://hadatac.org/ont/case#>  PREFIX foaf: <http://xmlns.com/foaf/0.1/>  PREFIX hasco: <http://hadatac.org/ont/hasco/>  PREFIX uberon: <http://purl.obolibrary.org/obo/uberon.owl#>  PREFIX chear: <http://hadatac.org/ont/chear#>  PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>  PREFIX fma: <http://purl.org/sig/ont/fma/>  PREFIX obo: <http://geneontology.org/GO.format.obo-1_2.shtml#>  PREFIX pubchem: <http://rdf.ncbi.nlm.nih.gov/pubchem/compound/>  " + 
-                   "SELECT ?id ?superId ?label ?iden ?comment ?def ?unit ?note ?attrTo ?assocWith " + 
-                   "WHERE { " + 
-                   "  ?id rdfs:subClassOf* chear:OrganicAromaticCompound . " + 
-                   "  ?id rdfs:subClassOf ?superId . " + 
-                   "  ?id rdfs:label ?label ." + 
-                   "  OPTIONAL {?id dcterms:identifier ?iden} . " + 
-                   "  OPTIONAL {?id rdfs:comment ?comment} . " + 
-                   "  OPTIONAL {?id skos:definition ?def} . " + 
-                   "  OPTIONAL {?id hasneto:hasUnit ?unit} . " + 
-                   "  OPTIONAL {?id skos:editorialNote ?note} . " + 
-                   "  OPTIONAL {?id prov:wasAttributedTo ?attrTo} . " + 
-                   "  OPTIONAL {?id prov:wasAssociatedWith ?assocWith} . " + 
-                   "} ";
-                break;
-            case "Creatinine":
-               q= "PREFIX chebi: <http://purl.obolibrary.org/obo/CHEBI_>  PREFIX hadatac-sn: <http://hadatac.org/ont/hadatac-sn#>  PREFIX owl: <http://www.w3.org/2002/07/owl#>  PREFIX vstoi: <http://hadatac.org/ont/vstoi#>  PREFIX case-kb: <http://hadatac.org/kb/case#>  PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>  PREFIX skos: <http://www.w3.org/2004/02/skos/core#>  PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>  PREFIX chear-kb: <http://hadatac.org/kb/chear#>  PREFIX dct: <http://purl.org/dc/terms/>  PREFIX sio: <http://semanticscience.org/resource/>  PREFIX dcterms: <http://purl.org/dc/terms/>  PREFIX uo: <http://purl.obolibrary.org/obo/uo#>  PREFIX hasneto: <http://hadatac.org/ont/hasneto#>  PREFIX prov: <http://www.w3.org/ns/prov#>  PREFIX hadatac: <http://hadatac.org/ont/hadatac#>  PREFIX case: <http://hadatac.org/ont/case#>  PREFIX foaf: <http://xmlns.com/foaf/0.1/>  PREFIX hasco: <http://hadatac.org/ont/hasco/>  PREFIX uberon: <http://purl.obolibrary.org/obo/uberon.owl#>  PREFIX chear: <http://hadatac.org/ont/chear#>  PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>  PREFIX fma: <http://purl.org/sig/ont/fma/>  PREFIX obo: <http://geneontology.org/GO.format.obo-1_2.shtml#>  PREFIX pubchem: <http://rdf.ncbi.nlm.nih.gov/pubchem/compound/>  " + 
-                   "SELECT ?id ?superId ?label ?iden ?comment ?def ?unit ?note ?attrTo ?assocWith " + 
-                   "WHERE { " + 
-                   "  ?id rdfs:subClassOf* chebi:16737 . " + 
-                   "  ?id rdfs:subClassOf ?superId . " + 
-                   "  ?id rdfs:label ?label ." + 
-                   "  OPTIONAL {?id dcterms:identifier ?iden} . " + 
-                   "  OPTIONAL {?id rdfs:comment ?comment} . " + 
-                   "  OPTIONAL {?id skos:definition ?def} . " + 
-                   "  OPTIONAL {?id hasneto:hasUnit ?unit} . " + 
-                   "  OPTIONAL {?id skos:editorialNote ?note} . " + 
-                   "  OPTIONAL {?id prov:wasAttributedTo ?attrTo} . " + 
-                   "  OPTIONAL {?id prov:wasAssociatedWith ?assocWith} . " + 
-                   "} ";
-                break;
-            case "PFC":
-               q= "PREFIX chebi: <http://purl.obolibrary.org/obo/CHEBI_>  PREFIX hadatac-sn: <http://hadatac.org/ont/hadatac-sn#>  PREFIX owl: <http://www.w3.org/2002/07/owl#>  PREFIX vstoi: <http://hadatac.org/ont/vstoi#>  PREFIX case-kb: <http://hadatac.org/kb/case#>  PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>  PREFIX skos: <http://www.w3.org/2004/02/skos/core#>  PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>  PREFIX chear-kb: <http://hadatac.org/kb/chear#>  PREFIX dct: <http://purl.org/dc/terms/>  PREFIX sio: <http://semanticscience.org/resource/>  PREFIX dcterms: <http://purl.org/dc/terms/>  PREFIX uo: <http://purl.obolibrary.org/obo/uo#>  PREFIX hasneto: <http://hadatac.org/ont/hasneto#>  PREFIX prov: <http://www.w3.org/ns/prov#>  PREFIX hadatac: <http://hadatac.org/ont/hadatac#>  PREFIX case: <http://hadatac.org/ont/case#>  PREFIX foaf: <http://xmlns.com/foaf/0.1/>  PREFIX hasco: <http://hadatac.org/ont/hasco/>  PREFIX uberon: <http://purl.obolibrary.org/obo/uberon.owl#>  PREFIX chear: <http://hadatac.org/ont/chear#>  PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>  PREFIX fma: <http://purl.org/sig/ont/fma/>  PREFIX obo: <http://geneontology.org/GO.format.obo-1_2.shtml#>  PREFIX pubchem: <http://rdf.ncbi.nlm.nih.gov/pubchem/compound/>  " + 
-                   "SELECT ?id ?superId ?label ?iden ?comment ?def ?unit ?note ?attrTo ?assocWith " + 
-                   "WHERE { " + 
-                   "  ?id rdfs:subClassOf* chear:Perfluorocarbon . " + 
-                   "  ?id rdfs:subClassOf ?superId . " + 
-                   "  ?id rdfs:label ?label ." + 
-                   "  OPTIONAL {?id dcterms:identifier ?iden} . " + 
-                   "  OPTIONAL {?id rdfs:comment ?comment} . " + 
-                   "  OPTIONAL {?id skos:definition ?def} . " + 
-                   "  OPTIONAL {?id hasneto:hasUnit ?unit} . " + 
-                   "  OPTIONAL {?id skos:editorialNote ?note} . " + 
-                   "  OPTIONAL {?id prov:wasAttributedTo ?attrTo} . " + 
-                   "  OPTIONAL {?id prov:wasAssociatedWith ?assocWith} . " + 
-                   "} ";
-                break;
-            case "AlkylPhosphatePesticideMetabolite":
-               q= "PREFIX chebi: <http://purl.obolibrary.org/obo/CHEBI_>  PREFIX hadatac-sn: <http://hadatac.org/ont/hadatac-sn#>  PREFIX owl: <http://www.w3.org/2002/07/owl#>  PREFIX vstoi: <http://hadatac.org/ont/vstoi#>  PREFIX case-kb: <http://hadatac.org/kb/case#>  PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>  PREFIX skos: <http://www.w3.org/2004/02/skos/core#>  PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>  PREFIX chear-kb: <http://hadatac.org/kb/chear#>  PREFIX dct: <http://purl.org/dc/terms/>  PREFIX sio: <http://semanticscience.org/resource/>  PREFIX dcterms: <http://purl.org/dc/terms/>  PREFIX uo: <http://purl.obolibrary.org/obo/uo#>  PREFIX hasneto: <http://hadatac.org/ont/hasneto#>  PREFIX prov: <http://www.w3.org/ns/prov#>  PREFIX hadatac: <http://hadatac.org/ont/hadatac#>  PREFIX case: <http://hadatac.org/ont/case#>  PREFIX foaf: <http://xmlns.com/foaf/0.1/>  PREFIX hasco: <http://hadatac.org/ont/hasco/>  PREFIX uberon: <http://purl.obolibrary.org/obo/uberon.owl#>  PREFIX chear: <http://hadatac.org/ont/chear#>  PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>  PREFIX fma: <http://purl.org/sig/ont/fma/>  PREFIX obo: <http://geneontology.org/GO.format.obo-1_2.shtml#>  PREFIX pubchem: <http://rdf.ncbi.nlm.nih.gov/pubchem/compound/>  " + 
-                   "SELECT ?id ?superId ?label ?iden ?comment ?def ?unit ?note ?attrTo ?assocWith " + 
-                   "WHERE { " + 
-                   "  ?id rdfs:subClassOf* chear:AlkylPhosphatePesticideMetabolite . " + 
-                   "  ?id rdfs:subClassOf ?superId . " + 
-                   "  ?id rdfs:label ?label ." + 
-                   "  OPTIONAL {?id dcterms:identifier ?iden} . " + 
-                   "  OPTIONAL {?id rdfs:comment ?comment} . " + 
-                   "  OPTIONAL {?id skos:definition ?def} . " + 
-                   "  OPTIONAL {?id hasneto:hasUnit ?unit} . " + 
-                   "  OPTIONAL {?id skos:editorialNote ?note} . " + 
-                   "  OPTIONAL {?id prov:wasAttributedTo ?attrTo} . " + 
-                   "  OPTIONAL {?id prov:wasAssociatedWith ?assocWith} . " + 
-                   "} ";
-                break;
-            case "DataAcquisitionSchemaAttribute":
-               q= "PREFIX chebi: <http://purl.obolibrary.org/obo/CHEBI_>  PREFIX hadatac-sn: <http://hadatac.org/ont/hadatac-sn#>  PREFIX owl: <http://www.w3.org/2002/07/owl#>  PREFIX vstoi: <http://hadatac.org/ont/vstoi#>  PREFIX case-kb: <http://hadatac.org/kb/case#>  PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>  PREFIX skos: <http://www.w3.org/2004/02/skos/core#>  PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>  PREFIX chear-kb: <http://hadatac.org/kb/chear#>  PREFIX dct: <http://purl.org/dc/terms/>  PREFIX sio: <http://semanticscience.org/resource/>  PREFIX dcterms: <http://purl.org/dc/terms/>  PREFIX uo: <http://purl.obolibrary.org/obo/uo#>  PREFIX hasneto: <http://hadatac.org/ont/hasneto#>  PREFIX prov: <http://www.w3.org/ns/prov#>  PREFIX hadatac: <http://hadatac.org/ont/hadatac#>  PREFIX case: <http://hadatac.org/ont/case#>  PREFIX foaf: <http://xmlns.com/foaf/0.1/>  PREFIX hasco: <http://hadatac.org/ont/hasco/>  PREFIX uberon: <http://purl.obolibrary.org/obo/uberon.owl#>  PREFIX chear: <http://hadatac.org/ont/chear#>  PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>  PREFIX fma: <http://purl.org/sig/ont/fma/>  PREFIX obo: <http://geneontology.org/GO.format.obo-1_2.shtml#>  PREFIX pubchem: <http://rdf.ncbi.nlm.nih.gov/pubchem/compound/>  " + 
-                   "SELECT ?id ?superId ?label ?iden ?comment ?def ?unit ?note ?attrTo ?assocWith " + 
-                   "WHERE { " + 
-                   "  ?id rdfs:subClassOf* hasneto:DASchemaAttribute . " + 
+                   "  ?id rdfs:subClassOf* case:DemographicsIndicator . " + 
                    "  ?id rdfs:subClassOf ?superId . " + 
                    "  ?id rdfs:label ?label ." + 
                    "  OPTIONAL {?id dcterms:identifier ?iden} . " + 
@@ -881,4 +305,3 @@ public class GetSparqlQueryDynamic {
     	return "";
     }
 }
-

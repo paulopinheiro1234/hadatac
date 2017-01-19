@@ -144,7 +144,7 @@ public class DynamicMetadataGeneration extends Controller {
 		}
 	}
 	
-	public static void renderMetadataEntryHTML(){
+/*	public static void renderMetadataEntryHTML(){
 		String metadataEntry = "@(triple : org.hadatac.console.models.OtMTripleDocument)\n\n" +
 				"@*****************************\n" +
 				"  hasURI/label    | id (array[0])\n" +
@@ -194,7 +194,7 @@ public class DynamicMetadataGeneration extends Controller {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} 
-	}
+	}*/
 	
 	public static Map<String, String> getIndicatorTypes(){
 		String prefixString = NameSpaces.getInstance().printSparqlNameSpaceList().replaceAll("\n", " ");
@@ -391,6 +391,7 @@ public class DynamicMetadataGeneration extends Controller {
 		Map<String,String> prefixMap = DynamicFunctions.getPrefixMap();
 //		String prefixString="PREFIX owl: <http://www.w3.org/2002/07/owl#> PREFIX obo: <http://geneontology.org/GO.format.obo-1_2.shtml#> PREFIX sio: <http://semanticscience.org/resource/> PREFIX chear: <http://hadatac.org/ont/chear#> PREFIX prov: <http://www.w3.org/ns/prov#> PREFIX hasco: <http://hadatac.org/ont/hasco/> PREFIX hasneto: <http://hadatac.org/ont/hasneto#> PREFIX dcterms: <http://purl.org/dc/terms/> PREFIX rdfs:<http://www.w3.org/2000/01/rdf-schema#> PREFIX skos: <http://www.w3.org/2004/02/skos/core#> PREFIX foaf:<http://xmlns.com/foaf/0.1/> PREFIX vstoi: <http://hadatac.org/ont/vstoi#>";
 		String importString="import java.io.IOException;\n" +
+				"import java.io.ByteArrayOutputStream;\n" + 
 				"import java.io.StringWriter;\n" +
 				"import java.io.UnsupportedEncodingException;\n" +
 				"import java.net.URLEncoder;\n" +
@@ -398,6 +399,7 @@ public class DynamicMetadataGeneration extends Controller {
 				"import java.util.TreeMap;\n" +
 				"import org.hadatac.console.models.SparqlQuery;\n" +
 				"import org.hadatac.utils.Collections;\n" +
+				"import org.hadatac.utils.NameSpaces;\n" +
 				"import org.apache.commons.io.IOUtils;\n" +
 				"import org.apache.http.HttpResponse;\n" +
 				"import org.apache.http.client.HttpClient;\n" +
@@ -405,6 +407,12 @@ public class DynamicMetadataGeneration extends Controller {
 				"import org.apache.http.impl.client.CloseableHttpClient;\n" +
 				"import org.apache.http.impl.client.DefaultHttpClient;\n" +
 				"import org.apache.http.impl.client.HttpClients;\n" +
+				"import org.apache.jena.query.Query;\n" +
+				"import org.apache.jena.query.QueryExecution;\n" +
+				"import org.apache.jena.query.QueryExecutionFactory;\n" +
+				"import org.apache.jena.query.QueryFactory\n;" +
+				"import org.apache.jena.query.ResultSet;\n" +
+				"import org.apache.jena.query.ResultSetFormatter;\n" +
 				"import play.Play;\n";
 		
 		Map<String, String> indicatorMapSorted = getIndicatorTypes();
@@ -530,7 +538,7 @@ public class DynamicMetadataGeneration extends Controller {
 				"        }\n" + 
 				"    return q; \n" +
 				"    }\n\n" +
-				"    public String executeQuery(String tab) throws IllegalStateException, IOException{\n" +
+/*				"    public String executeQuery(String tab) throws IllegalStateException, IOException{\n" +
 				"        try {\n" +
 				"            HttpClient client = new DefaultHttpClient();\n" +
 				"            HttpGet request = new HttpGet(list_of_queries.get(tab).toString().replace(\" \", \"%20\"));\n" +
@@ -542,7 +550,22 @@ public class DynamicMetadataGeneration extends Controller {
 				"            System.out.println(\"Response: \" + response);\n" + 
 				"            return writer.toString();\n" + 
 				"        } finally {}\n" + 
-				"    }\n" + 
+				"    }\n" + */
+				"    public String executeQuery(String tab) throws IllegalStateException, IOException{\n" +
+				"        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();\n" +
+				"        try {\n" +
+				"            String queryString = NameSpaces.getInstance().printSparqlNameSpaceList() + querySelector(tab);\n" +
+				"            Query query = QueryFactory.create(queryString);\n" +
+				"            QueryExecution qexec = QueryExecutionFactory.sparqlService(collection, query);\n" +
+				"            ResultSet results = qexec.execSelect();\n" +
+				"            ResultSetFormatter.outputAsJSON(outputStream, results);\n" +
+				"            qexec.close();\n" +
+				"            return outputStream.toString(\"UTF-8\");\n" +
+				"        } catch (Exception e) {\n" +
+				"			 e.printStackTrace();\n" + 
+				"    	 }\n" + 
+				"	return \"\";\n" +
+				"   }\n" +
 				"}" ;
 		String getSPARQLJavaString="package org.hadatac.console.http;\n"				+ 
 				"//This Java Class was Dynamically Generated\n" + 
@@ -564,10 +587,9 @@ public class DynamicMetadataGeneration extends Controller {
     public static Result index() {
     	Map<String,String> indicatorMap = getIndicatorTypes();
     	renderSPARQLPage();
-		renderNavigationHTML(indicatorMap);
-		renderMetadataHTML(indicatorMap);
-    	renderMetadataEntryHTML();
-    	renderMetadataBrowserHTML(indicatorMap);
+		//renderNavigationHTML(indicatorMap);
+		//renderMetadataHTML(indicatorMap);
+    	//renderMetadataBrowserHTML(indicatorMap);
 
     	return ok(dynamicMetadataPage.render());
         

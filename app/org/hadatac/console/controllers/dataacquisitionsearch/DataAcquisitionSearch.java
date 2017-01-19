@@ -82,6 +82,7 @@ public class DataAcquisitionSearch extends Controller {
     public static Result index(int page, int rows, String facets) {
     	ObjectMapper mapper = new ObjectMapper();    	
     	FacetHandler handler = null;
+    	String ownerUri;
     	long resultSize = 0;
     	System.out.println("[DataAcquisitionSearch] Page: " + page + "   Rows:" + rows + "   Facets:" + facets);
     	try {
@@ -94,18 +95,19 @@ public class DataAcquisitionSearch extends Controller {
     	AcquisitionQueryResult results = null;
     	final SysUser user = AuthApplication.getLocalUser(session());
     	if(null == user){
-    		resultSize = Measurement.findSize("Public", handler);
-    		results = Measurement.find("Public", page, rows, handler);
+    	    ownerUri = "Public";
+    		resultSize = Measurement.findSize(ownerUri, handler);
+    		results = Measurement.find(ownerUri, page, rows, handler);
     	}
     	else{
-    		String ownerUri = UserManagement.getUriByEmail(user.email);
+    		ownerUri = UserManagement.getUriByEmail(user.email);
     		resultSize = Measurement.findSize(ownerUri, handler);
     		results = Measurement.find(ownerUri, page, rows, handler);
     	}
     	System.out.println("[DataAcquisitionSearch] Total size response: " + resultSize);
     	
     	return ok(dataacquisition_browser.render(page, rows, facets, resultSize, 
-    			results, results.toJSON(), handler.toJSON()));
+    			results, results.toJSON(), handler.toJSON(), Measurement.buildQuery(ownerUri, page, rows, handler)));
     }
 
     public static Result postIndex(int page, int rows, String facets) {

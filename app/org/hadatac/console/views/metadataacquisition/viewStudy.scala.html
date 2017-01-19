@@ -1,6 +1,7 @@
 @(studyResult      : Map[String, List[String]],
   subjectResult	: Map[String, List[String]],
-  indicatorValues : Map[String,String])
+  indicatorValues : Map[String,List[String]],
+  showValues : Map[String,String])
 
 @import org.hadatac.console.views.html._
 @import org.hadatac.utils._
@@ -37,9 +38,12 @@
 					@for(key <- indicatorValues.keySet()){
 						@if(indicatorValues.get(key).toString!=""){
 						<li>@key.toString</li>
-						<ul>
-							@indicatorValues.get(key).toString
-						</ul>
+							@for( i <- indicatorValues.get(key)){
+							
+								<a href="@org.hadatac.console.controllers.metadataacquisition.routes.ViewValue.index(showValues.get("user").toString(), showValues.get("study").toString(),"","")">@i.toString()</a>
+							
+							}
+							
 						}
 					}
 				</ul>

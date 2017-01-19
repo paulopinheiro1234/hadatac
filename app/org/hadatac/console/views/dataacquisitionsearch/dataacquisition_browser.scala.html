@@ -4,13 +4,14 @@
 	resultsSize : Long,
 	results : org.hadatac.data.model.AcquisitionQueryResult,
 	documentJson : String,
-	facetJson : String)
+	facetJson : String,
+	query : String)
 
 @import helper._
 @import org.hadatac.console.views.html._
 
 @main("Simple Faceted Search") {
-	<div id="query" data-documents="@documentJson"/>
+	<div id="query" data-documents="@documentJson" data-query="@query"/>
 	<div id="facetDiv" data-documents="@facetJson"/>
 	
 	<div class="container-fluid">
@@ -133,7 +134,7 @@
 	
 	var btn = document.getElementById("btn_download");
 	if (btn != null) {
-		btn.href=document.getElementById("download_url").textContent+'?wt=csv&q=*:*&rows=1000000';
+		btn.href=document.getElementById("download_url").textContent+'?wt=csv&rows=9999999&q='+encodeURIComponent(document.getElementById('query').getAttribute('data-query'));
 	}
 	
 	var jsonTree, dataTree;
