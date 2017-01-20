@@ -1,4 +1,5 @@
-@(collection_url : java.lang.String)
+@(collection_url : java.lang.String,
+indicators : Map[String,List[String]])
 
 @import helper._
 @import org.hadatac.console.views.html._
@@ -24,33 +25,16 @@ jQuery(document).ready(function($) {
     search_index: 'solr',
     datatype: 'json',
     facets: [ 
-        {'field': 'AlcoholTobaccoandIllicitDrugUseLabel', 'display': 'Alcohol, Tobacco, and Illicit Drug Use'},
-        {'field': 'AcculturationLabel', 'display': 'Acculturation'},
-        {'field': 'AnthropometryLabel', 'display': 'Anthropometry'},
-        {'field': 'PhysicalandMentalAssessmentLabel', 'display': 'Physical and Mental Assessment'},
-        {'field': 'BirthOutcomeLabel', 'display': 'Birth Outcome'},
-        {'field': 'DeliveryCharacteristicsLabel', 'display': 'Delivery Characteristics'},
-        {'field': 'DemographicLabel', 'display': 'Demographic'},
-        {'field': 'DietandNutritionLabel', 'display': 'Diet and Nutrition'},
-        {'field': 'EnvironmentalExposureLabel', 'display': 'Environmental Exposure'},
-        {'field': 'HospitalUtilizationandAccesstoCareLabel', 'display': 'Hospital Utilization and Access to Care'},
-        {'field': 'HousingCharacteristicLabel', 'display': 'Housing Characteristic'},
-        {'field': 'MedicalHistoryLabel', 'display': 'Medical History'},
-        {'field': 'MentalHealthLabel', 'display': 'Mental Health'},
-        {'field': 'NeighborhoodCharacteristicLabel', 'display': 'Neighborhood Characteristic'},
-        {'field': 'OralHealthLabel', 'display': 'Oral Health'},
-        {'field': 'ParentalHealthandFamilyHistoryLabel', 'display': 'Parental Health and Family History'},
-        {'field': 'PersonalProductUseLabel', 'display': 'Personal Product Use'},
-        {'field': 'PhysicalActivityandFitnessLabel', 'display': 'Physical Activity and Fitness'},
-        {'field': 'PregnancyCharacteristicLabel', 'display': 'Pregnancy Characteristic'},
-        {'field': 'PrescriptionMedicationandDietarySupplementsLabel', 'display': 'Prescription Medication and Dietary Supplements'},
-        {'field': 'ReproductiveHealthLabel', 'display': 'Reproductive Health'},
-        {'field': 'SleepCharacterisiticLabel', 'display': 'Sleep Characterisitic'},
-        {'field': 'SocioeconomicClassStatusLabel', 'display': 'Socioeconomic Class Status'},
-        {'field': 'TargetedAnalyteLabel', 'display': 'Targeted Analyte'},
-    ],
-    search_sortby: [{'display':'Study URI', 'field':'studyUri.exact'},{'display':'Alcohol, Tobacco, and Illicit Drug Use','field':'AlcoholTobaccoandIllicitDrugUseLabel.exact'},{'display':'Acculturation','field':'AcculturationLabel.exact'},{'display':'Anthropometry','field':'AnthropometryLabel.exact'},{'display':'Physical and Mental Assessment','field':'PhysicalandMentalAssessmentLabel.exact'},{'display':'Birth Outcome','field':'BirthOutcomeLabel.exact'},{'display':'Delivery Characteristics','field':'DeliveryCharacteristicsLabel.exact'},{'display':'Demographic','field':'DemographicLabel.exact'},{'display':'Diet and Nutrition','field':'DietandNutritionLabel.exact'},{'display':'Environmental Exposure','field':'EnvironmentalExposureLabel.exact'},{'display':'Hospital Utilization and Access to Care','field':'HospitalUtilizationandAccesstoCareLabel.exact'},{'display':'Housing Characteristic','field':'HousingCharacteristicLabel.exact'},{'display':'Medical History','field':'MedicalHistoryLabel.exact'},{'display':'Mental Health','field':'MentalHealthLabel.exact'},{'display':'Neighborhood Characteristic','field':'NeighborhoodCharacteristicLabel.exact'},{'display':'Oral Health','field':'OralHealthLabel.exact'},{'display':'Parental Health and Family History','field':'ParentalHealthandFamilyHistoryLabel.exact'},{'display':'Personal Product Use','field':'PersonalProductUseLabel.exact'},{'display':'Physical Activity and Fitness','field':'PhysicalActivityandFitnessLabel.exact'},{'display':'Pregnancy Characteristic','field':'PregnancyCharacteristicLabel.exact'},{'display':'Prescription Medication and Dietary Supplements','field':'PrescriptionMedicationandDietarySupplementsLabel.exact'},{'display':'Reproductive Health','field':'ReproductiveHealthLabel.exact'},{'display':'Sleep Characterisitic','field':'SleepCharacterisiticLabel.exact'},{'display':'Socioeconomic Class Status','field':'SocioeconomicClassStatusLabel.exact'},{'display':'Targeted Analyte','field':'TargetedAnalyteLabel.exact'}],
-    searchbox_fieldselect: [{'display':'Study URI', 'field':'studyUri.exact'},{'display':'Alcohol, Tobacco, and Illicit Drug Use','field':'AlcoholTobaccoandIllicitDrugUseLabel.exact'},{'display':'Acculturation','field':'AcculturationLabel.exact'},{'display':'Anthropometry','field':'AnthropometryLabel.exact'},{'display':'Physical and Mental Assessment','field':'PhysicalandMentalAssessmentLabel.exact'},{'display':'Birth Outcome','field':'BirthOutcomeLabel.exact'},{'display':'Delivery Characteristics','field':'DeliveryCharacteristicsLabel.exact'},{'display':'Demographic','field':'DemographicLabel.exact'},{'display':'Diet and Nutrition','field':'DietandNutritionLabel.exact'},{'display':'Environmental Exposure','field':'EnvironmentalExposureLabel.exact'},{'display':'Hospital Utilization and Access to Care','field':'HospitalUtilizationandAccesstoCareLabel.exact'},{'display':'Housing Characteristic','field':'HousingCharacteristicLabel.exact'},{'display':'Medical History','field':'MedicalHistoryLabel.exact'},{'display':'Mental Health','field':'MentalHealthLabel.exact'},{'display':'Neighborhood Characteristic','field':'NeighborhoodCharacteristicLabel.exact'},{'display':'Oral Health','field':'OralHealthLabel.exact'},{'display':'Parental Health and Family History','field':'ParentalHealthandFamilyHistoryLabel.exact'},{'display':'Personal Product Use','field':'PersonalProductUseLabel.exact'},{'display':'Physical Activity and Fitness','field':'PhysicalActivityandFitnessLabel.exact'},{'display':'Pregnancy Characteristic','field':'PregnancyCharacteristicLabel.exact'},{'display':'Prescription Medication and Dietary Supplements','field':'PrescriptionMedicationandDietarySupplementsLabel.exact'},{'display':'Reproductive Health','field':'ReproductiveHealthLabel.exact'},{'display':'Sleep Characterisitic','field':'SleepCharacterisiticLabel.exact'},{'display':'Socioeconomic Class Status','field':'SocioeconomicClassStatusLabel.exact'},{'display':'Targeted Analyte','field':'TargetedAnalyteLabel.exact'}],
+    @if(indicators.contains("Study Indicator")){@for(studyIndicator <- indicators.get("Study Indicator")){    {'field': '@studyIndicator.replace(" ","").replace(",","")Label', 'display': '@studyIndicator'},
+    }}],
+    search_sortby: [
+        {'field':'studyUri.exact', 'display':'Study URI'},
+    @if(indicators.contains("Study Indicator")){@for(studyIndicator <- indicators.get("Study Indicator")){    {'field': '@studyIndicator.replace(" ","").replace(",","")Label.exact', 'display': '@studyIndicator'},
+    }}],
+    searchbox_fieldselect: [
+        {'field':'studyUri.exact', 'display':'Study URI'},
+    @if(indicators.contains("Study Indicator")){@for(studyIndicator <- indicators.get("Study Indicator")){    {'field': '@studyIndicator.replace(" ","").replace(",","")Label.exact', 'display': '@studyIndicator'},
+    }}],
     paging: {
       size: 10
     },
