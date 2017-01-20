@@ -419,7 +419,23 @@ public class DynamicMetadataGeneration extends Controller {
 		Map<String, String> indicatorValueMap = getIndicatorValues(indicatorMapSorted);
 
 		String getSPARQLClassString = "public class GetSparqlQueryDynamic { \n" +
-				"    public StringBuffer sparql_query = new StringBuffer();\n" +
+				"    public String collection;\n" +
+				"    public GetSparqlQueryDynamic () {}\n\n" +
+				"    public GetSparqlQueryDynamic (SparqlQuery query) {\n" +
+				"    	this(Collections.METADATA_SPARQL, query);\n" +
+				"    }\n\n" +
+				"    public GetSparqlQueryDynamic (String collectionSource, SparqlQuery query) {\n" +
+				"        this.collection = Collections.getCollectionsName(collectionSource);\n" +
+				"        System.out.println(\"Collection: \" + collection);\n" +
+				"    }\n\n" +
+				"    public GetSparqlQueryDynamic (SparqlQuery query, String tabName) {\n" +
+				"    	this(Collections.METADATA_SPARQL, query, tabName);\n" +
+				"    }\n\n" +
+				"    public GetSparqlQueryDynamic (String collectionSource, SparqlQuery query, String tabName) {\n" +
+				"    	this.collection = Collections.getCollectionsName(collectionSource);\n" +
+				"        System.out.println(\"Collection: \" + collection);\n" +
+				"    }\n\n" +
+/*				"    public StringBuffer sparql_query = new StringBuffer();\n" +
 				"    public TreeMap<String, StringBuffer> list_of_queries = new TreeMap<String, StringBuffer>();\n" +
 				"    public String collection;\n" +
 				"    private int numThings = " + indicatorValueMap.size() + ";\n" +
@@ -474,7 +490,7 @@ public class DynamicMetadataGeneration extends Controller {
 		for (int i=0;i<indicatorValueMapSorted.size();i++){
 			getSPARQLClassString = getSPARQLClassString + "        thingTypes[" + i + "]  = \"" + allIndicatorLabels.get(i).replaceAll(" ", "").replaceAll(",", "") + "\";\n" ;
 		}
-		getSPARQLClassString = getSPARQLClassString + "    }\n\n" + 
+		getSPARQLClassString = getSPARQLClassString + "    }\n\n" + */
 				"    public String querySelector(String tabName){\n" +
 				"        String q = \"SELECT * WHERE { ?s ?p ?o } LIMIT 10\";\n" +
 				"        switch (tabName){\n" ;
@@ -586,7 +602,7 @@ public class DynamicMetadataGeneration extends Controller {
 	// for /metadata HTTP GET requests
     public static Result index() {
     	Map<String,String> indicatorMap = getIndicatorTypes();
-    	renderSPARQLPage();
+    	//renderSPARQLPage();
 		//renderNavigationHTML(indicatorMap);
 		//renderMetadataHTML(indicatorMap);
     	//renderMetadataBrowserHTML(indicatorMap);

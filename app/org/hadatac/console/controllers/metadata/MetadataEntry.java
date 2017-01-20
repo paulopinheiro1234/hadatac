@@ -27,6 +27,7 @@ public class MetadataEntry extends Controller {
         System.out.println("MetadataEntry.java is requesting: " + tabName);
         try {
             query_json = query_submit.executeQuery(tabName);
+            System.out.println(query_json);
             theResults = new OtMSparqlQueryResults(query_json, true);
         } catch (IllegalStateException | NullPointerException | IOException e1) {
             return internalServerError(error_page.render(e1.toString(), tabName));
@@ -36,6 +37,10 @@ public class MetadataEntry extends Controller {
     	//List<org.hadatac.entity.pojo.Entity> entities = org.hadatac.entity.pojo.Entity.find();
         Map<String,String> indicators = DynamicFunctions.getIndicatorTypes();
         Map<String,List<String>> values = DynamicFunctions.getIndicatorValuesJustLabels(indicators);
+        /*for (String key : theResults.sparqlResults.keySet()){
+        	System.out.println(theResults.sparqlResults.get(key).toString());
+        }
+        System.out.println(theResults.treeResults);*/
         return ok(metadata_browser.render(theResults, tabName, values));
     }
 
