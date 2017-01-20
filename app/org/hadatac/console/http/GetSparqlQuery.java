@@ -22,119 +22,29 @@ import org.apache.jena.query.ResultSetFormatter;
 import play.Play;
 
 public class GetSparqlQuery {
-
-    public StringBuffer sparql_query = new StringBuffer();
-
-    public TreeMap<String, StringBuffer> list_of_queries = new TreeMap<String, StringBuffer>();
-
     public String collection;
-    
-    private int numThings = 27;
-
-    public String[] thingTypes = new String[numThings];
     
     public GetSparqlQuery () {} 
 
-    //list_of_queries contains all the queries to execute
-    //this.sparql_query will be a query to return all documents in the last collection of
-    //collection_urls.
-    //this.sparql_query should NOT BE USED OUTSIDE OF THIS CLASS UNLESS YOU KNOW WHAT YOU'RE DOING
-    //I'm mostly talking to myself here.
-
-    // for SPARQL queries!
     public GetSparqlQuery (SparqlQuery query) {
     	this(Collections.METADATA_SPARQL, query);
     }
     
     public GetSparqlQuery (String collectionSource, SparqlQuery query) {
-        //addSparqlUrls();
-        addThingTypes();
         this.collection = Collections.getCollectionsName(collectionSource);
         System.out.println("Collection: " + collection);
-        
-        for (String tabName : thingTypes ){
-            this.sparql_query = new StringBuffer();
-            this.sparql_query.append(collection);
-            this.sparql_query.append("?q=");
-            String q = querySelector(tabName);
-
-            String quote = new String();
-            try {
-                this.sparql_query.append(URLEncoder.encode(q, "UTF-8"));
-                quote = URLEncoder.encode("\"", "UTF-8");
-            } catch (UnsupportedEncodingException e) {
-                e.printStackTrace();
-            }
-            
-            //System.out.println(tabName + " : " + this.sparql_query);
-            this.list_of_queries.put(tabName, this.sparql_query);
-        }
-    }// /getSolrQuery for SPARQL
+    }
 
     public GetSparqlQuery (SparqlQuery query, String tabName) {
     	this(Collections.METADATA_SPARQL, query, tabName);
     }
-    	// For SPARQL queries that only make one query (instead of for all tabs)
-    // Ideally, the above method should be depreciated in favor of this one, as we move
-    //    all thingType queries to their own separate pages.
+
     public GetSparqlQuery (String collectionSource, SparqlQuery query, String tabName) {
     	this.collection = Collections.getCollectionsName(collectionSource);
-
         System.out.println("Collection: " + collection);
-
-    	this.sparql_query = new StringBuffer();
-        this.sparql_query.append(collection);
-        this.sparql_query.append("?q=");
-        String q = querySelector(tabName);
-            
-        String quote = new String();
-        try {
-            this.sparql_query.append(URLEncoder.encode(q, "UTF-8"));
-            quote = URLEncoder.encode("\"", "UTF-8");
-        } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
-        }            
-        //System.out.println(tabName + " : " + this.sparql_query);
-        this.list_of_queries.put(tabName, this.sparql_query);
-    }// /getSolrQuery for SPARQL
-
-    // TYPES of THINGS in the metadata. These should be high-level concepts.
-    // If this list is updated, make sure each new thingtype has a corresponding
-    //  query in the method below, and that numThings is updated accordingly.
-    // (Until I make a more dynamic implementation for this....)
-    // IDEA: a config file that we can parse into Thing + query, with methods to check it dynamically?
-    public void addThingTypes(){
-        thingTypes[0]  = "Platforms";
-        thingTypes[1]  = "PlatformModels";
-        thingTypes[2]  = "Instruments";
-        thingTypes[3]  = "InstrumentModels";
-        thingTypes[4]  = "Detectors";
-        thingTypes[5]  = "DetectorModels";
-        thingTypes[6]  = "Entities";
-        thingTypes[7]  = "OrganizationsH";
-        thingTypes[8]  = "GroupsH";
-        thingTypes[9]  = "PeopleH";
-        thingTypes[10] = "Characteristics";
-        thingTypes[11] = "Units";
-	    thingTypes[12] = "SensingPerspectives";
-	    thingTypes[13] = "EntityCharacteristics";
-	    thingTypes[14] = "Deployments";
-	    thingTypes[15] = "Demographics";
-	    thingTypes[16] = "BirthOutcomes";
-	    thingTypes[17] = "HousingCharacteristic";
-	    thingTypes[18] = "ATIDU";
-	    thingTypes[19] = "Anthropometry";
-	    thingTypes[20] = "PregnancyCharacteristic";
-	    thingTypes[21] = "Analytes";
-	    thingTypes[22] = "Alkaloids";
-	    thingTypes[23] = "Arsenic";
-	    thingTypes[24] = "Elements";
-	    thingTypes[25] = "OrganicAromatic";
-	    thingTypes[26] = "Indicators";
     }
     
     public String querySelector(String tabName){
-        // default query?
         String q = "SELECT * WHERE { ?s ?p ?o } LIMIT 10";
         switch (tabName){
             case "Platforms" : 
@@ -548,21 +458,18 @@ public class GetSparqlQuery {
             default :
             	q = "";
             	System.out.println("WARNING: no query for tab " + tabName);
-        }// /switch
+        }
         return q;
-    } // /querySelector
+    }
     
     public String executeQuery(String tab) {
     	ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-    	
     	try {
     		String queryString = NameSpaces.getInstance().printSparqlNameSpaceList() + 
     				querySelector(tab);
-    		System.out.println("queryString: " + querySelector(tab));
     		Query query = QueryFactory.create(queryString);
     			
-    		QueryExecution qexec = QueryExecutionFactory.sparqlService(
-    				Collections.getCollectionsName(Collections.PERMISSIONS_SPARQL), query);
+    		QueryExecution qexec = QueryExecutionFactory.sparqlService(collection, query);
     		ResultSet results = qexec.execSelect();
     		
     		ResultSetFormatter.outputAsJSON(outputStream, results);
