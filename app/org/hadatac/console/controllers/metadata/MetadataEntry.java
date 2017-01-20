@@ -28,7 +28,7 @@ public class MetadataEntry extends Controller {
         try {
             query_json = query_submit.executeQuery(tabName);
             theResults = new OtMSparqlQueryResults(query_json, true);
-        } catch (IllegalStateException | NullPointerException e1) {
+        } catch (IllegalStateException | NullPointerException | IOException e1) {
             return internalServerError(error_page.render(e1.toString(), tabName));
         }
         System.out.println(tabName + " index() was called!");
