@@ -10,6 +10,7 @@ import org.apache.jena.query.ResultSetFactory;
 import org.apache.jena.query.ResultSetRewindable;
 import org.apache.jena.rdf.model.Model;
 import org.hadatac.data.loader.util.Sparql;
+import org.hadatac.utils.Collections;
 
 public class HADataC {
 	
@@ -113,7 +114,7 @@ public class HADataC {
 	}
 	
 	public String getStaticMetadataSparqlURL() {
-		return host + ":7574/solr/store/sparql";
+		return Collections.getCollectionsName(Collections.METADATA_SPARQL);
 	}
 	
 	public String getDynamicMetadataURL() {

@@ -30,9 +30,7 @@ public class MetadataContext implements RDFContext {
 
     String username = null;
     String password = null;
-    String kbURL = null;   
-	         // For local use:
-	         //   - http://localhost:7574/solr
+    String kbURL = null;
     boolean verbose = false;
 
     String processMessage = "";
