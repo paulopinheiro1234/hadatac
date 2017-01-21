@@ -13,9 +13,14 @@
 @main("Users Pre-Registration") {
  
      <script>
-        function checkform() {
-            if(document.getElementById('upload').value != "") {
-                 document.getElementById('submitMessage').style.display = 'inline';
+        function checkform1() {
+            if(document.getElementById('upload1').value != "") {
+                 document.getElementById('submitMessage1').style.display = 'inline';
+		    }
+	    }
+	    function checkform2() {
+	    	if(document.getElementById('upload2').value != "") {
+                document.getElementById('submitMessage2').style.display = 'inline';
 		    }
 	    }
      </script>
@@ -43,20 +48,28 @@
         
                  <div class="col-md-3 col-xs-2">
                       <div id="rcorners">
-                          <form name="fileUploadForm" id='upload' method="POST" enctype="multipart/form-data" action="@org.hadatac.console.controllers.triplestore.routes.UserManagement.uploadFile()" onchange='checkform()' >
+                          <form name="fileUploadForm" id='upload1' method="POST" enctype="multipart/form-data" action="@org.hadatac.console.controllers.triplestore.routes.UserManagement.uploadFile("xls")" onchange='checkform1()' >
                              <b>Batch User Pre-Registration</b> <input type="file" class="btn btn-info" name="pic">
-                             <div id='submitMessage'  style="display:none;" >
+                             <div id='submitMessage1'  style="display:none;" >
                                  <input type="submit" class="btn btn-success" value="Parse and Load Users">
                              </div>
                           </form>
+                          <form name="fileUploadForm" id='upload2' method="POST" enctype="multipart/form-data" action="@org.hadatac.console.controllers.triplestore.routes.UserManagement.uploadFile("ttl")" onchange="checkform2()">
+                     		 <b>Load User Graph from turtle</b> <input type="file" class="btn btn-info" name="pic"> 
+                     		 <div id='submitMessage2'  style="display:none;" >
+                        		 <input type="submit" class="btn-sm btn-success" value="Parse and Load Users">
+	                 		 </div>
+                 	  	  </form>
                       </div>
                  </div>
+                 
                  <div class="col-md-3 col-xs-2">
                       <a href="@org.hadatac.console.controllers.triplestore.routes.UserManagement.onLinePreRegistration("init")" class="btn btn-block btn-primary" role="button">Form User Pre-Registration</a>
                       <a href="@org.hadatac.console.controllers.triplestore.routes.UserManagement.onLineGroupRegistration("init")" class="btn btn-block btn-primary" role="button">Access Level Registration</a>
                  </div>
                  <div class="col-md-3 col-xs-2">
                       <a href="@org.hadatac.console.controllers.triplestore.routes.UserNetwork.index()" class="btn btn-block btn-primary" role="button">User Network</a>
+                      <a href="@org.hadatac.console.controllers.triplestore.routes.UserManagement.backupUserGraph()" class="btn btn-block btn-primary" role="button">Backup User Graph</a>
                  </div>
  	        </div>
        }
@@ -149,4 +162,20 @@
             </div>
         </div>
     }
+    
+    @if(oper=="turtle") {
+		<p  style='font-family: "Lucida Console", Monaco, monospace;' id='msgarea'></p>
+        <div id="end-process-box" style="display:none;">
+            <h4>Operation [Load User Graph] complete -- check the results above to see if the operation was successful.</h4>
+            <a href="@org.hadatac.console.controllers.triplestore.routes.UserManagement.index("init")" class="btn btn-warning" role="button">Back to Manage Users</a>
+	    </div>
+
+    	<script> 
+       		var msg = "@UserManagement.commitUserPreRegistration(source)";
+            $('#msgarea').html(msg.replace(/&lt;br&gt;/g, '<br>'));
+           	document.getElementById('end-process-box').style.display = 'inline';
+    	</script>
+    	
+		<a href="@org.hadatac.console.controllers.triplestore.routes.LoadKB.loadKB("init")" class="btn btn-warning" role="button">Back to Load KB</a>
+	}
 }

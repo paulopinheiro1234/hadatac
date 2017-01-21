@@ -1,5 +1,8 @@
 package org.hadatac.entity.pojo;
 
+import java.io.ByteArrayOutputStream;
+import java.io.OutputStream;
+import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.util.ArrayList;
@@ -15,11 +18,16 @@ import org.apache.jena.query.QueryFactory;
 import org.apache.jena.query.QuerySolution;
 import org.apache.jena.query.ResultSet;
 import org.apache.jena.query.ResultSetFactory;
+import org.apache.jena.query.ResultSetFormatter;
 import org.apache.jena.query.ResultSetRewindable;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.RDFNode;
+import org.apache.jena.rdf.model.RDFWriter;
 import org.apache.jena.rdf.model.Statement;
 import org.apache.jena.rdf.model.StmtIterator;
+import org.apache.jena.riot.Lang;
+import org.apache.jena.riot.RDFDataMgr;
+import org.apache.jena.sparql.resultset.RDFOutput;
 import org.apache.jena.update.UpdateExecutionFactory;
 import org.apache.jena.update.UpdateFactory;
 import org.apache.jena.update.UpdateProcessor;
@@ -174,6 +182,20 @@ public class User implements Comparable<User> {
 	public static User create() {
 		User user = new User();
 		return user;
+	}
+	
+	public static String outputAsTurtle() {
+		String queryString = "CONSTRUCT { ?s ?p ?o } WHERE { ?s ?p ?o } ";
+		Query query = QueryFactory.create(queryString);
+		
+		QueryExecution qexec = QueryExecutionFactory.sparqlService(
+				Collections.getCollectionsName(Collections.PERMISSIONS_SPARQL), query);
+		Model model = qexec.execConstruct();
+		
+		ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+	    RDFDataMgr.write(outputStream, model, Lang.TURTLE);
+        
+		return outputStream.toString();
 	}
 	
 	public static List<User> find() {

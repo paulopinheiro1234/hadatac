@@ -47,6 +47,7 @@ import be.objectify.deadbolt.java.actions.Restrict;
 public class UserManagement extends Controller {
 
 	private static final String UPLOAD_NAME = "tmp/uploads/users-spreadsheet.xls";
+	private static final String UPLOAD_NAME_TTL = "tmp/uploads/users-graph.ttl";
 
 	@Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
 	public static Result index(String oper) {
@@ -188,6 +189,17 @@ public class UserManagement extends Controller {
 	@Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
     public static Result postDeleteUser(String user_uri) {
     	return deleteUser(user_uri);
+    }
+	
+	@Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
+    public static Result backupUserGraph() {
+		return ok(User.outputAsTurtle());
+		//return redirect(routes.UserManagement.index("init"));
+    }
+
+	@Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
+    public static Result postBackupUserGraph() {
+    	return backupUserGraph();
     }
 	
 	@Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
@@ -362,38 +374,31 @@ public class UserManagement extends Controller {
 	}
 
 	@Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
-	public static Result uploadFile() {
-		//System.out.println("uploadFile CALLED!");
+	public static Result uploadFile(String file_type) {
 		MultipartFormData body = request().body().asMultipartFormData();
 		FilePart uploadedfile = body.getFile("pic");
 		if (uploadedfile != null) {
 			File file = uploadedfile.getFile();
-			File newFile = new File(UPLOAD_NAME);
+			String file_name = "";
+			if(file_type.equals("xls")){
+				file_name = UPLOAD_NAME;
+			}
+			else if(file_type.equals("ttl")){
+				file_name = UPLOAD_NAME_TTL;
+			}
+			File newFile = new File(file_name);
 			InputStream isFile;
 			try {
 				isFile = new FileInputStream(file);
-				byte[] byteFile;
-				try {
-					byteFile = IOUtils.toByteArray(isFile);
-					try {
-						FileUtils.writeByteArrayToFile(newFile, byteFile);
-					} catch (Exception e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
-					try {
-						isFile.close();
-					} catch (Exception e) {
-						return ok (users.render("fail", "Could not save uploaded file.", User.find(), UserGroup.find(), ""));
-					}
-				} catch (Exception e) {
-					return ok (users.render("fail", "Could not process uploaded file.", User.find(), UserGroup.find(), ""));
-				}
-			} catch (FileNotFoundException e1) {
+				byte[] byteFile = IOUtils.toByteArray(isFile);
+				FileUtils.writeByteArrayToFile(newFile, byteFile);
+				isFile.close();
+			} catch (Exception e) {
 				return ok (users.render("fail", "Could not find uploaded file", User.find(), UserGroup.find(), ""));
 			}
 			return ok(users.render("loaded", "File uploaded successfully.", User.find(), UserGroup.find(), "batch"));
-		} else {
+		}
+		else {
 			return ok (users.render("fail", "Error uploading file. Please try again.", User.find(), UserGroup.find(), ""));
 		} 
 	} 
