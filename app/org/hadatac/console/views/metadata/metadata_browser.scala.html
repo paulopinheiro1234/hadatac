@@ -1,8 +1,8 @@
 @( results : org.hadatac.console.models.OtMSparqlQueryResults, category : String, indicatorMap : Map[String,List[String]])
 
 @*****************************
-    public TreeMap<String,OtMTripleDocument> results.sparqlResults
-;    public TreeMap<String,ArrayList<String>> results.sparqlResults.item;
+    public TreeMap<String,OtMTripleDocument> results.sparqlResults;
+    public TreeMap<String,ArrayList<String>> results.sparqlResults.item;
     public String results.treeResults;
     public String json;
 *****************************@
@@ -14,7 +14,7 @@
 
 	@for(indicatorKey <- indicatorMap.keySet()){
 		@for(indicators <- indicatorMap.get(indicatorKey)) {
-			@if(category == indicators.replace(" ","")){
+			@if(category == indicators.replace(" ","").replace(",","")){
 				@indicator_navigation(category,indicatorMap,indicatorKey)
 			}
 		}

@@ -10,13 +10,13 @@ key : String)
             <button type="button" class="btn btn-link"><b>@key</b></button>
         </div>
         @for((indicators,index) <- indicatorMap.get(key).zipWithIndex){
-        	@if(selection == indicators.replace(" ","")) {
+        	@if(selection == indicators.replace(" ","").replace(",","")) {
         		<div class="col-md-1">
-        		 	<a href="@org.hadatac.console.controllers.metadata.routes.MetadataEntry.index(indicators.replace(" ",""))" class="btn-xs btn-block btn-warning" role="button">@indicators<br>&nbsp;<br>&nbsp;</a>
+        		 	<a href="@org.hadatac.console.controllers.metadata.routes.MetadataEntry.index(indicators.replace(" ","").replace(",",""))" class="btn-xs btn-block btn-warning" role="button">@indicators<br>&nbsp;<br>&nbsp;</a>
 	        	</div>
 	        } else {
             	<div class="col-md-1">
-                	<a href="@org.hadatac.console.controllers.metadata.routes.MetadataEntry.index(indicators.replace(" ",""))" class="btn-xs btn-block btn-primary" role="button">@indicators<br>&nbsp;<br>&nbsp;</a>
+                	<a href="@org.hadatac.console.controllers.metadata.routes.MetadataEntry.index(indicators.replace(" ","").replace(",",""))" class="btn-xs btn-block btn-primary" role="button">@indicators<br>&nbsp;<br>&nbsp;</a>
             	</div>
         	}
         	@if(((index+1)%7)==0){

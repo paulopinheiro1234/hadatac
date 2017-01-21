@@ -533,7 +533,7 @@ public class DynamicGeneration extends Controller {
 	
 	public static void doDynamicGeneration(String facetPageString, String analyteFacetPageString, String schemaString, String analyteSchemaString, String initStudyJson, String updateIndicatorJson, String updateAnalyteJson){
 		// Generate facet view html.scala file
-				try {
+				/*try {
 					File facetPage = new File(Play.application().configuration().getString("hadatac.console.host_deploy_location") + "/app/org/hadatac/console/views/metadataacquisition/metadataacquisition.scala.html");
 					FileWriter facetPageStream = new FileWriter(facetPage,false);
 					facetPageStream.write(facetPageString);
@@ -554,7 +554,7 @@ public class DynamicGeneration extends Controller {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
-				
+				*/
 				// Generate schema.xml file
 				try {
 					File schemaXML = new File(Play.application().configuration().getString("hadatac.solr.home") + "/solr-home/studies_facet/conf/schema.xml");

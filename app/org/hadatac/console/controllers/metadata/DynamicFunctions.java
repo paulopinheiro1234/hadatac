@@ -66,6 +66,25 @@ public class DynamicFunctions extends Controller {
 		return label;
 	}
 	
+	public static String replaceTabNameWithConcept(String tabName){
+		Map<String, String> indicatorTypes = getIndicatorTypes();
+		Map<String,Map<String,String>> valueMapWithLabels = getIndicatorValuesAndLabels(indicatorTypes);
+		String returnString = "";
+		for (String key : valueMapWithLabels.keySet() ){
+			for (String k : valueMapWithLabels.get(key).keySet()){
+				/*System.out.println("k: " + k + "\n");
+				System.out.println("value: " + valueMapWithLabels.get(key).get(k) + "\n");
+				System.out.println("value reduced: " + valueMapWithLabels.get(key).get(k).replace(" ","").replace(",","")+ "\n");
+				System.out.println("tabName: " + tabName + "\n");*/
+				if (tabName.equals(valueMapWithLabels.get(key).get(k).replace(" ","").replace(",",""))){
+					returnString = k;
+					return returnString;
+				}
+			}
+		}
+		return returnString;
+	}
+	
 	public static String replacePrefixWithURL(String label){
 		Map<String,String> prefixMap = getPrefixMap();
 		for (Map.Entry<String, String> prefixes : prefixMap.entrySet()){
@@ -597,7 +616,7 @@ public class DynamicFunctions extends Controller {
     	
     	System.out.println(findSubject("chear-kb:SBJ-0032-Pilot-6"));
     	//System.out.println(findSubjects());
-    	
+    	System.out.println(replaceTabNameWithConcept("ReproductiveHealth"));
         return ok();        
     }// /index()
 

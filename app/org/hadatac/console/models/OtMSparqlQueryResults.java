@@ -51,12 +51,13 @@ public class OtMSparqlQueryResults{
 		
 		Iterator<JsonNode> parseResults = bindings.iterator();
 		numVars = vars.size();
+		//System.out.println("Number of Vars: " + numVars + "\n");
+		//System.out.println("Vars: " + vars + "\n");
 		
 		// build TreeQueryResults:
         if(vars.contains("id") && vars.contains("superId"))
             buildTreeQueryResults(bindings, usingURIs);
-		else this.treeResults = "";    
-		
+		else this.treeResults = "";
         // NOW BUILD THE SPARQLQUERYRESULTS:
         this.sparqlResults = new TreeMap<String,OtMTripleDocument>();
         while (parseResults.hasNext()){
@@ -94,26 +95,34 @@ public class OtMSparqlQueryResults{
             modelN = "";
 		    superN = "";
             JsonNode binding = elements.next();
+            //System.out.println("Binding: " + binding + "\n");
             JsonNode modelNameNode = binding.findPath("id");
+            //System.out.println("modelNameNode: " + modelNameNode + "\n");
             if (modelNameNode != null && modelNameNode.get("value") != null) {
                 modelN = modelNameNode.get("value").asText();
             }
 		    JsonNode superNameNode = binding.findPath("superId");
+		    //System.out.println("superNameNode: " + superNameNode + "\n");
             if (superNameNode != null && superNameNode.get("value") != null) {
                 superN = superNameNode.get("value").asText();
+                //System.out.println("superN: " + superN + "\n");
             }
             if (usingURIs && ! modelN.equals("")) {
                 modelN = prettyFromURI(modelN);
+                //System.out.println("modelN: " + modelN + "\n");
             }
             if (usingURIs && ! superN.equals("")) {
                 superN = prettyFromURI(superN);
+                //System.out.println("usingURIs superN: " + superN + "\n");
             }
             if (superN.equals("")) {
                 newTree = new TreeNode(modelN);
+                //System.out.println("Super Node is blank: " + newTree.toJson(0) + "\n");
             } else {
                 TreeNode parent;
                 if (newTree == null) {
                     parent = null;
+                    //System.out.println("Parent Null New Tree");
                 } else {
                     parent = newTree.hasValue(superN);
                 }
@@ -121,6 +130,7 @@ public class OtMSparqlQueryResults{
                     if (newTree == null) {
                         newTree = new TreeNode(superN);
                         newTree.addChild(modelN);
+                        //System.out.println("New Tree in Null Parent: " + newTree.toJson(0) + "\n");
                     } else {
                         //System.out.println("Parent <" + superN + "> not found");
                     }
@@ -129,14 +139,18 @@ public class OtMSparqlQueryResults{
                     if (copyNode == null) {
                         parent.addChild(modelN);
                     }
+                    //System.out.println("copy node: " + copyNode.toJson(0) + "\n");
                 }
             }
         //System.out.println("model Name = <"+ modelN + " , " + superN + ">"); 
+        //System.out.println("New Tree in Loop: " + newTree.toJson(0) + "\n");
         }// /while
         if (newTree == null) 
             this.treeResults = "";
         else
             this.treeResults = newTree.toJson(0);
+        //System.out.println("New Tree : " + newTree.toJson(0) + "\n");
+        //System.out.println("Tree Results: " + this.treeResults);
 	}// /buildTreeQueryResults
 	
 	public OtMTripleDocument getTriple (String key){
