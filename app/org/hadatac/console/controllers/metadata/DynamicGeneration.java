@@ -580,7 +580,7 @@ public class DynamicGeneration extends Controller {
 				
 				// Delete Existing Study Data
 				try {
-					ProcessBuilder p=new ProcessBuilder("curl","http://localhost:8983/solr/studies/update?commit=true", "-H","Content-type:text/xml",
+					ProcessBuilder p=new ProcessBuilder("curl",Play.application().configuration().getString("hadatac.solr.data") + "/studies/update?commit=true", "-H","Content-type:text/xml",
 			                "--data-binary","<delete><query>*:*</query></delete>");
 					final Process shell = p.start();
 					shell.waitFor();
@@ -591,7 +591,7 @@ public class DynamicGeneration extends Controller {
 				}
 				// Delete Existing Analytes Data
 				try {
-					ProcessBuilder p=new ProcessBuilder("curl","http://localhost:8983/solr/analytes/update?commit=true", "-H","Content-type:text/xml",
+					ProcessBuilder p=new ProcessBuilder("curl",Play.application().configuration().getString("hadatac.solr.data") + "/analytes/update?commit=true", "-H","Content-type:text/xml",
 			                "--data-binary","<delete><query>*:*</query></delete>");
 					final Process shell = p.start();
 					shell.waitFor();
@@ -613,7 +613,7 @@ public class DynamicGeneration extends Controller {
 				} 		
 				// Add Studies
 				try {
-					ProcessBuilder p=new ProcessBuilder("curl","http://localhost:8983/solr/studies/update?commit=true", "-H","Content-type:application/json",
+					ProcessBuilder p=new ProcessBuilder("curl",Play.application().configuration().getString("hadatac.solr.data") + "/studies/update?commit=true", "-H","Content-type:application/json",
 			                "--data-binary",initStudyJson );
 					final Process shell = p.start();
 					shell.waitFor();
@@ -623,7 +623,7 @@ public class DynamicGeneration extends Controller {
 					e.printStackTrace();
 				}
 				try {
-					ProcessBuilder p=new ProcessBuilder("curl","http://localhost:8983/solr/analytes/update?commit=true", "-H","Content-type:application/json",
+					ProcessBuilder p=new ProcessBuilder("curl",Play.application().configuration().getString("hadatac.solr.data") + "/analytes/update?commit=true", "-H","Content-type:application/json",
 			                "--data-binary",initStudyJson );
 					final Process shell = p.start();
 					shell.waitFor();
@@ -635,7 +635,7 @@ public class DynamicGeneration extends Controller {
 
 				// Add Indicators
 				try {
-					ProcessBuilder p=new ProcessBuilder("curl","http://localhost:8983/solr/studies/update?commit=true", "-H","Content-type:application/json",
+					ProcessBuilder p=new ProcessBuilder("curl",Play.application().configuration().getString("hadatac.solr.data") + "/studies/update?commit=true", "-H","Content-type:application/json",
 			                "--data-binary",updateIndicatorJson );
 					final Process shell = p.start();
 					shell.waitFor();
@@ -647,7 +647,7 @@ public class DynamicGeneration extends Controller {
 				
 				// Add Analytes
 				try {
-					ProcessBuilder p=new ProcessBuilder("curl","http://localhost:8983/solr/analytes/update?commit=true", "-H","Content-type:application/json",
+					ProcessBuilder p=new ProcessBuilder("curl",Play.application().configuration().getString("hadatac.solr.data") + "/analytes/update?commit=true", "-H","Content-type:application/json",
 			                "--data-binary",updateAnalyteJson );
 					final Process shell = p.start();
 					shell.waitFor();
