@@ -83,33 +83,6 @@ POST	/hadatac/metadata/unit                    org.hadatac.console.controllers.m
 GET	    /hadatac/metadata/agent			          org.hadatac.console.controllers.metadata.concepts.Agent.index()
 POST	/hadatac/metadata/agent			          org.hadatac.console.controllers.metadata.concepts.Agent.postIndex()
 
-# Metaclasses
-GET	    /hadatac/metadata/demographics            org.hadatac.console.controllers.metadata.metaclasses.Demographics.index()
-POST	/hadatac/metadata/demographics            org.hadatac.console.controllers.metadata.metaclasses.Demographics.postIndex()
-GET	    /hadatac/metadata/birthoutcomes           org.hadatac.console.controllers.metadata.metaclasses.BirthOutcomes.index()
-POST	/hadatac/metadata/birthoutcomes           org.hadatac.console.controllers.metadata.metaclasses.BirthOutcomes.postIndex()
-GET	    /hadatac/metadata/atidu			          org.hadatac.console.controllers.metadata.metaclasses.ATIDU.index()
-POST	/hadatac/metadata/atidu			          org.hadatac.console.controllers.metadata.metaclasses.ATIDU.postIndex()
-GET	    /hadatac/metadata/housingcharacteristic   org.hadatac.console.controllers.metadata.metaclasses.HousingCharacteristic.index()
-POST	/hadatac/metadata/housingcharacteristic   org.hadatac.console.controllers.metadata.metaclasses.HousingCharacteristic.postIndex()
-GET	    /hadatac/metadata/antropometry            org.hadatac.console.controllers.metadata.metaclasses.Anthropometry.index()
-POST	/hadatac/metadata/anthropometry           org.hadatac.console.controllers.metadata.metaclasses.Anthropometry.postIndex()
-GET	    /hadatac/metadata/pregnancycharacteristic    org.hadatac.console.controllers.metadata.metaclasses.PregnancyCharacteristic.index()
-POST	/hadatac/metadata/pregnancycharacteristic         org.hadatac.console.controllers.metadata.metaclasses.PregnancyCharacteristic.postIndex()
-
-# Analytes
-GET	    /hadatac/metadata/analytes      	      org.hadatac.console.controllers.metadata.analytes.Analytes.index()
-POST	/hadatac/metadata/analytes       	     org.hadatac.console.controllers.metadata.analytes.Analytes.postIndex()
-GET	    /hadatac/metadata/alkaloids      	      org.hadatac.console.controllers.metadata.analytes.Alkaloids.index()
-POST	/hadatac/metadata/alkaloids       	     org.hadatac.console.controllers.metadata.analytes.Alkaloids.postIndex()
-GET	    /hadatac/metadata/arsenic	      	      org.hadatac.console.controllers.metadata.analytes.Arsenic.index()
-POST	/hadatac/metadata/arsenic       	     org.hadatac.console.controllers.metadata.analytes.Arsenic.postIndex()
-GET	    /hadatac/metadata/elements	      	      org.hadatac.console.controllers.metadata.analytes.Elements.index()
-POST	/hadatac/metadata/elements       	     org.hadatac.console.controllers.metadata.analytes.Elements.postIndex()
-GET	    /hadatac/metadata/organicaromatic	      	      org.hadatac.console.controllers.metadata.analytes.OrganicAromatic.index()
-POST	/hadatac/metadata/organicaromatic       	     org.hadatac.console.controllers.metadata.analytes.OrganicAromatic.postIndex()
-
-
 # Metadata empirical
 GET	    /hadatac/metadata/platform	    	      org.hadatac.console.controllers.metadata.empirical.Platform.index()
 POST	/hadatac/metadata/platform   		      org.hadatac.console.controllers.metadata.empirical.Platform.postIndex()
