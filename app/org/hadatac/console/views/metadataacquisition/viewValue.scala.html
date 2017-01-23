@@ -9,7 +9,7 @@
 @import play.api.Play._
 @import play.api.Play.current
 
-@main("View Subject") {
+@main("View Indicators") {
     <link rel="stylesheet" href="http://openlayers.org/en/v3.9.0/css/ol.css">
     <script type="text/javascript" charset="utf-8" src="http://www.openlayers.org/api/OpenLayers.js"></script>
     <script type="text/javascript" charset="utf-8" src="@controllers.routes.Assets.versioned("javascripts/openLayersFunctions.js")"></script>
@@ -17,16 +17,43 @@
         <div class="col-md-6">
             <h1>Indicator Values</h1>
                 
-             <h2></h2>
+             <h2>indicatorValueResults[0].getStudyUri()</h2>
 				<ul>        		
 					@for(i <- indicatorValueResults){
-						<li>@i.getStudyUri()
-							<li>@i.getObjectUri()
+						<li>@i.getObjectUri()
+							<li>@i.getCharacteristic()
 								<li>@i.getValue()</li>
 							</li>
-						</li>			
+						</li>
 					}
 				</ul>
     	</div>
     </div>
+    
+    <div id="download_url" style="visibility: hidden ;">@org.hadatac.console.http.routes.SolrSearchProxy.getStudyAcquisitionDownload()</div>
+   <!-- Trigger the modal with a button -->
+   <button type="button" class="btn btn-info btn-lg" data-toggle="modal" data-target="#myModal">Download</button>
+   <!-- Modal -->
+	<div id="myModal" class="modal fade" role="dialog">
+	  <div class="modal-dialog">
+	    <!-- Modal content-->
+	    <div class="modal-content">
+	      <div class="modal-header">
+	        <button type="button" class="close" data-dismiss="modal">&times;</button>
+	        <h4 class="modal-title">Download</h4>
+	      </div>
+	      <div class="modal-body">
+	        <p>Format:</p>
+	        <select class="form-control" id="sel_format">
+              <option>CSV</option>
+              <option>JSON</option>
+            </select>
+	        <a href="" class="btn btn-info" role="button" id="btn_download">Confirm</a>
+	      </div>
+	      <div class="modal-footer">
+	        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+	      </div>
+	    </div>
+	  </div>
+	 </div>
 }

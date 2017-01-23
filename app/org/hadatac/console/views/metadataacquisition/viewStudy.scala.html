@@ -1,6 +1,7 @@
 @(studyResult      : Map[String, List[String]],
   subjectResult	: Map[String, List[String]],
   indicatorValues : Map[String,List[String]],
+  indicatorUris	:	Map[String,String],
   showValues : Map[String,String])
 
 @import org.hadatac.console.views.html._
@@ -40,7 +41,7 @@
 						<li>@key.toString</li>
 							@for( i <- indicatorValues.get(key)){
 							
-								<a href="@org.hadatac.console.controllers.metadataacquisition.routes.ViewValue.index(showValues.get("user").toString(), showValues.get("study").toString(),"","")">@i.toString()</a>
+								<a href="@org.hadatac.console.controllers.metadataacquisition.routes.ViewValue.index(showValues.get("user").toString(), showValues.get("study").toString(),"",indicatorUris.get(i))">@i.toString() + "(" + indicatorUris.get(i) + ")"</a>
 							
 							}
 							
