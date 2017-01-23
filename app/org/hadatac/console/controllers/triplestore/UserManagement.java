@@ -47,7 +47,15 @@ import be.objectify.deadbolt.java.actions.Restrict;
 public class UserManagement extends Controller {
 
 	private static final String UPLOAD_NAME = "tmp/uploads/users-spreadsheet.xls";
-	private static final String UPLOAD_NAME_TTL = "tmp/uploads/users-graph.ttl";
+	private static final String UPLOAD_NAME_TTL = "tmp/uploads/user-graph.ttl";
+	
+	public static String getSpreadSheetPath(){
+		return UPLOAD_NAME;
+	}
+	
+	public static String getTurtlePath(){
+		return UPLOAD_NAME_TTL;
+	}
 
 	@Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
 	public static Result index(String oper) {
@@ -194,7 +202,6 @@ public class UserManagement extends Controller {
 	@Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
     public static Result backupUserGraph() {
 		return ok(User.outputAsTurtle());
-		//return redirect(routes.UserManagement.index("init"));
     }
 
 	@Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
@@ -300,6 +307,42 @@ public class UserManagement extends Controller {
 	}
 	
 	@Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
+	public static String commitUserGraphRegistration() {
+		System.out.println("Adding pre-registered user...");
+		int mode = Feedback.WEB;
+		String message = "";
+		PermissionsContext rdf = new PermissionsContext(
+						"user", 
+						"password", 
+						Play.application().configuration().getString("hadatac.solr.permissions"), 
+						false);
+		try {
+			Model model = RDFDataMgr.loadModel(UPLOAD_NAME_TTL);
+			message += Feedback.println(mode, " ");
+			message += Feedback.print(mode, "SUCCESS parsing the document!");
+			message += Feedback.println(mode, " ");
+		} catch (Exception e) {
+			message += Feedback.println(mode, " ");
+			message += Feedback.print(mode, "ERROR parsing the document!");
+			message += Feedback.println(mode, " ");
+			message += e.getMessage();
+			message += Feedback.println(mode, " ");
+			message += Feedback.println(mode, " ");
+			message += Feedback.println(mode, "==== TURTLE (TTL) UPLOADED ====");
+			
+			return message;
+		}
+		
+		message += Feedback.print(mode, "   Uploading generated file.");
+		rdf.loadLocalFile(mode, UPLOAD_NAME_TTL, SpreadsheetProcessing.KB_FORMAT);
+		message += Feedback.println(mode, "");
+		message += Feedback.println(mode, " ");
+		message += Feedback.println(mode, "   Triples after [preregistration]: " + rdf.totalTriples());
+		    
+		return message;
+	}
+	
+	@Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
 	public static String generateTTL(int mode, String oper, RDFContext rdf, 
 			                  String uri, Map<String, String> pred_value_map){
 		String message = "";
@@ -387,16 +430,21 @@ public class UserManagement extends Controller {
 				file_name = UPLOAD_NAME_TTL;
 			}
 			File newFile = new File(file_name);
-			InputStream isFile;
+			InputStream fileInputStream;
 			try {
-				isFile = new FileInputStream(file);
-				byte[] byteFile = IOUtils.toByteArray(isFile);
+				fileInputStream = new FileInputStream(file);
+				byte[] byteFile = IOUtils.toByteArray(fileInputStream);
 				FileUtils.writeByteArrayToFile(newFile, byteFile);
-				isFile.close();
+				fileInputStream.close();
 			} catch (Exception e) {
 				return ok (users.render("fail", "Could not find uploaded file", User.find(), UserGroup.find(), ""));
 			}
-			return ok(users.render("loaded", "File uploaded successfully.", User.find(), UserGroup.find(), "batch"));
+			if(file_type.equals("ttl")){
+				return ok(users.render("loaded", "File uploaded successfully.", User.find(), UserGroup.find(), "turtle"));
+			}
+			else{
+				return ok(users.render("loaded", "File uploaded successfully.", User.find(), UserGroup.find(), "batch"));
+			}
 		}
 		else {
 			return ok (users.render("fail", "Error uploading file. Please try again.", User.find(), UserGroup.find(), ""));

@@ -1,6 +1,9 @@
 package org.hadatac.entity.pojo;
 
 import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
@@ -32,6 +35,7 @@ import org.apache.jena.update.UpdateExecutionFactory;
 import org.apache.jena.update.UpdateFactory;
 import org.apache.jena.update.UpdateProcessor;
 import org.apache.jena.update.UpdateRequest;
+import org.hadatac.console.controllers.triplestore.UserManagement;
 import org.hadatac.console.models.SysUser;
 import org.hadatac.utils.Collections;
 import org.hadatac.utils.NameSpaces;
@@ -184,7 +188,7 @@ public class User implements Comparable<User> {
 		return user;
 	}
 	
-	public static String outputAsTurtle() {
+	public static File outputAsTurtle() {
 		String queryString = "CONSTRUCT { ?s ?p ?o } WHERE { ?s ?p ?o } ";
 		Query query = QueryFactory.create(queryString);
 		
@@ -192,10 +196,16 @@ public class User implements Comparable<User> {
 				Collections.getCollectionsName(Collections.PERMISSIONS_SPARQL), query);
 		Model model = qexec.execConstruct();
 		
-		ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+		File ttl_file = new File(UserManagement.getTurtlePath());
+		FileOutputStream outputStream = null;
+		try {
+			outputStream = new FileOutputStream(ttl_file);
+		} catch (FileNotFoundException e) {
+			System.out.println(e.getMessage());
+		}
 	    RDFDataMgr.write(outputStream, model, Lang.TURTLE);
         
-		return outputStream.toString();
+		return ttl_file;
 	}
 	
 	public static List<User> find() {
