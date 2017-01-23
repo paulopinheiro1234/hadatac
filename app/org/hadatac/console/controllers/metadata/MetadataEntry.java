@@ -13,7 +13,6 @@ import org.hadatac.console.models.OtMSparqlQueryResults;
 import play.mvc.Controller;
 import play.mvc.Result;
 
-import org.hadatac.console.views.html.metadata.analytes.analytes_browser;
 import org.hadatac.console.views.html.metadata.metadata_browser;
 import org.hadatac.console.views.html.error_page;
 
