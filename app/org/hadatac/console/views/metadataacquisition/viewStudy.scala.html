@@ -41,7 +41,7 @@
 						<li>@key.toString</li>
 							@for( i <- indicatorValues.get(key)){
 							
-								<a href="@org.hadatac.console.controllers.metadataacquisition.routes.ViewValue.index(showValues.get("user").toString(), showValues.get("study").toString(),"",indicatorUris.get(i))">@i.toString() + "(" + indicatorUris.get(i) + ")"</a>
+								<a href="@org.hadatac.console.controllers.metadataacquisition.routes.ViewValue.index(showValues.get("user").toString(), showValues.get("study").toString(),"",indicatorUris.get(i))">@i.toString()<b>@indicatorUris.get(i)</b></a>
 							
 							}
 							

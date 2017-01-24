@@ -17,12 +17,12 @@
         <div class="col-md-6">
             <h1>Indicator Values</h1>
                 
-             <h2>indicatorValueResults[0].getStudyUri()</h2>
+             <h2>@indicatorValueResults[0].getStudyUri()</h2>
 				<ul>        		
 					@for(i <- indicatorValueResults){
-						<li>@i.getObjectUri()
-							<li>@i.getCharacteristic()
-								<li>@i.getValue()</li>
+						<li><b>Subject:</b>@i.getObjectUri()
+							<li><b>Name:</b>@i.getCharacteristic()
+								<li><b>Value:</b>@i.getValue()</li>
 							</li>
 						</li>
 					}
