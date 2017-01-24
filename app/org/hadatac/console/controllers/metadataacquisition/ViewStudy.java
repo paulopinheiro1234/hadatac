@@ -77,7 +77,7 @@ public class ViewStudy extends Controller {
 					" . ?" + entry.getValue().toString().replaceAll(" ", "").replaceAll(",", "") + " rdfs:subClassOf* " + entry.getKey().toString().replaceAll("http://hadatac.org/ont/chear#","chear:").replaceAll("http://hadatac.org/ont/case#","case:").replaceAll("http://hadatac.org/kb/chear#","chear-kb:").replaceAll("http://hadatac.org/kb/case#","case-kb:") + 
 					" . ?" + entry.getValue().toString().replaceAll(" ", "").replaceAll(",", "") + " rdfs:label ?" + label + 
 					" . ?uri" + " rdfs:subClassOf* " + entry.getKey() +
-					" . ?uri" + " rdfs:label ?" + " rdfs:label ?" + label + " . " +
+					" . ?uri" + " rdfs:label ?" + label + " . " +
 					"			FILTER ( ?studyUri = " + study_uri.replaceAll("http://hadatac.org/ont/chear#","chear:").replaceAll("http://hadatac.org/ont/case#","case:").replaceAll("http://hadatac.org/kb/chear#","chear-kb:").replaceAll("http://hadatac.org/kb/case#","case-kb:") + " ) . " +
 					"}";
 			//System.out.println(indvIndicatorQuery + "\n");
@@ -136,7 +136,7 @@ public class ViewStudy extends Controller {
 					" . ?" + entry.getValue().toString().replaceAll(" ", "").replaceAll(",", "") + " rdfs:subClassOf* " + entry.getKey().toString().replaceAll("http://hadatac.org/ont/chear#","chear:").replaceAll("http://hadatac.org/ont/case#","case:").replaceAll("http://hadatac.org/kb/chear#","chear-kb:").replaceAll("http://hadatac.org/kb/case#","case-kb:") + 
 					" . ?" + entry.getValue().toString().replaceAll(" ", "").replaceAll(",", "") + " rdfs:label ?" + label +
 					" . ?uri" + " rdfs:subClassOf* " + entry.getKey() +
-					" . ?uri" + " rdfs:label ?" + " rdfs:label ?" + label + " . " +
+					" . ?uri" + " rdfs:label ?" + label + " . " +
 					"			FILTER ( ?studyUri = " + study_uri.replaceAll("http://hadatac.org/ont/chear#","chear:").replaceAll("http://hadatac.org/ont/case#","case:").replaceAll("http://hadatac.org/kb/chear#","chear-kb:").replaceAll("http://hadatac.org/kb/case#","case-kb:") + " ) . " +
 					"}";
 			//System.out.println(indvIndicatorQuery + "\n");
