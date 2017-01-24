@@ -128,7 +128,8 @@ public class Account extends Controller {
 		} else {
 			final SysUser user = AuthApplication.getLocalUser(session());
 			final String newPassword = filledForm.get().password;
-			/* - This code sets the URI of the user after change password as a way to set a uri that is missing from a previous registration. - */
+			/* - This code sets the URI of the user after change password as a way to set a uri 
+			 * that is missing from a previous registration. - */
 			user.uri = UserManagement.getUriByEmail(user.email);
 			user.save();
 			/* ---- */
