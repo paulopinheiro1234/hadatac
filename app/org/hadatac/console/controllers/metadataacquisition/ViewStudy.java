@@ -67,12 +67,12 @@ public class ViewStudy extends Controller {
 		Map<String, List<String>> indicatorUris = new HashMap<String, List<String>>();
 		
 		for(Map.Entry<String, String> entry : indicatorMapSorted.entrySet()){
-		    //System.out.println("Key : " + entry.getKey() + " and Value: " + entry.getValue() + "\n");
+		    System.out.println("Key : " + entry.getKey() + " and Value: " + entry.getValue() + "\n");
 		    String label = entry.getValue().toString().replaceAll(" ", "").replaceAll(",", "").toString() + "Label";
-		    String uri = entry.getValue().toString().replaceAll(" ", "").replaceAll(",", "");
+//		    String uri = entry.getValue().toString().replaceAll(" ", "").replaceAll(",", "");
 
 			String indvIndicatorQuery = "PREFIX rdfs:<http://www.w3.org/2000/01/rdf-schema#> PREFIX chear: <http://hadatac.org/ont/chear#>PREFIX case: <http://hadatac.org/ont/case#>PREFIX chear-kb: <http://hadatac.org/kb/chear#>PREFIX case-kb: <http://hadatac.org/kb/case#>PREFIX hasco: <http://hadatac.org/ont/hasco/>PREFIX hasneto: <http://hadatac.org/ont/hasneto#>SELECT DISTINCT ?studyUri " +
-					"?" + label + " ?" + uri +
+					"?" + label +
 					"WHERE { ?schemaUri hasco:isSchemaOf ?studyUri . ?schemaAttribute hasneto:partOfSchema ?schemaUri . ?schemaAttribute hasneto:hasAttribute " +
 					"?" + entry.getValue().toString().replaceAll(" ", "").replaceAll(",", "") +
 					" . ?" + entry.getValue().toString().replaceAll(" ", "").replaceAll(",", "") + " rdfs:subClassOf* " + entry.getKey().toString().replaceAll("http://hadatac.org/ont/chear#","chear:").replaceAll("http://hadatac.org/ont/case#","case:").replaceAll("http://hadatac.org/kb/chear#","chear-kb:").replaceAll("http://hadatac.org/kb/case#","case-kb:") + 
@@ -86,16 +86,13 @@ public class ViewStudy extends Controller {
 				ResultSetRewindable resultsrwIndvInd = ResultSetFactory.copyResults(indvIndResults);
 				qexecIndvInd.close();
 				List<String> indvIndicatorList = new ArrayList<String>();
-				List<String> indvIndicatorUri = new ArrayList<String>();
 				while (resultsrwIndvInd.hasNext()) {
 					QuerySolution soln = resultsrwIndvInd.next();
 					System.out.println("Solution: " + soln);
 					indvIndicatorList.add(soln.get(label).toString());
-					indvIndicatorUri.add(soln.get(uri).toString());
 					//System.out.println("Indicator String: " + indvIndicatorString);
 				}
 				indicatorValues.put(entry.getValue().toString(),indvIndicatorList);
-				indicatorUris.put(entry.getValue().toString(),indvIndicatorUri);
 			} catch (QueryExceptionHTTP e) {
 				e.printStackTrace();
 			}
@@ -127,14 +124,14 @@ public class ViewStudy extends Controller {
 		for(Map.Entry<String, String> entry : indicatorMapSorted.entrySet()){
 		    //System.out.println("Key : " + entry.getKey() + " and Value: " + entry.getValue() + "\n");
 		    String label = entry.getValue().toString().replaceAll(" ", "").replaceAll(",", "").toString() + "Label";
-		    String uri = entry.getValue().toString().replaceAll(" ", "").replaceAll(",", "");
+//		    String uri = entry.getValue().toString().replaceAll(" ", "").replaceAll(",", "");
 
 			String indvIndicatorQuery = "PREFIX rdfs:<http://www.w3.org/2000/01/rdf-schema#> PREFIX chear: <http://hadatac.org/ont/chear#>PREFIX case: <http://hadatac.org/ont/case#>PREFIX chear-kb: <http://hadatac.org/kb/chear#>PREFIX case-kb: <http://hadatac.org/kb/case#>PREFIX hasco: <http://hadatac.org/ont/hasco/>PREFIX hasneto: <http://hadatac.org/ont/hasneto#>SELECT DISTINCT ?studyUri " +
-					"?" + label + " ?" + uri +
+					"?" + label + " ?uri " +
 					"WHERE { ?schemaUri hasco:isSchemaOf ?studyUri . ?schemaAttribute hasneto:partOfSchema ?schemaUri . ?schemaAttribute hasneto:hasAttribute " +
-					"?" + entry.getValue().toString().replaceAll(" ", "").replaceAll(",", "") +
-					" . ?" + entry.getValue().toString().replaceAll(" ", "").replaceAll(",", "") + " rdfs:subClassOf* " + entry.getKey().toString().replaceAll("http://hadatac.org/ont/chear#","chear:").replaceAll("http://hadatac.org/ont/case#","case:").replaceAll("http://hadatac.org/kb/chear#","chear-kb:").replaceAll("http://hadatac.org/kb/case#","case-kb:") + 
-					" . ?" + entry.getValue().toString().replaceAll(" ", "").replaceAll(",", "") + " rdfs:label ?" + label + " . " +
+					"?uri "+
+					" . ?uri " + " rdfs:subClassOf* " + entry.getKey().toString().replaceAll("http://hadatac.org/ont/chear#","chear:").replaceAll("http://hadatac.org/ont/case#","case:").replaceAll("http://hadatac.org/kb/chear#","chear-kb:").replaceAll("http://hadatac.org/kb/case#","case-kb:") + 
+					" . ?uri " + " rdfs:label ?" + label + " . " +
 					"			FILTER ( ?studyUri = " + study_uri.replaceAll("http://hadatac.org/ont/chear#","chear:").replaceAll("http://hadatac.org/ont/case#","case:").replaceAll("http://hadatac.org/kb/chear#","chear-kb:").replaceAll("http://hadatac.org/kb/case#","case-kb:") + " ) . " +
 					"}";
 			//System.out.println(indvIndicatorQuery + "\n");
@@ -148,7 +145,7 @@ public class ViewStudy extends Controller {
 					QuerySolution soln = resultsrwIndvInd.next();
 					System.out.println("Solution: " + soln);
 					indvIndicatorList.add(soln.get(label).toString());
-					indicatorUris.put(soln.get(label).toString(),soln.get(uri).toString());
+					indicatorUris.put(soln.get(label).toString(),soln.get("uri").toString());
 					//System.out.println("Indicator String: " + indvIndicatorString);
 				}
 				indicatorValues.put(entry.getValue().toString(),indvIndicatorList);
