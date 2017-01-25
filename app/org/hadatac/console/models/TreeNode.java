@@ -13,9 +13,13 @@ public class TreeNode {
         children = new ArrayList<TreeNode>();
     }
  
+    public ArrayList<TreeNode> getChildren() {
+        return children;
+    }
+    
     public String getName() {
         return name;
-    }	    
+    }
     
     public TreeNode hasValue(String s) {
     	if (name.equals(s)) {
@@ -36,6 +40,19 @@ public class TreeNode {
     public void addChild(String s) {
     	TreeNode newTreeNode = new TreeNode(s);
     	children.add(newTreeNode);
+    }
+    
+    public void addChild(TreeNode n) {
+    	children.add(n);
+    }
+    
+    public void replaceChild(TreeNode child, TreeNode replacement) {
+    	if (children.contains(child)){
+    		children.remove(child);
+    		children.add(replacement);
+    	} else {
+    		System.out.println("TreeNode.java - replaceChild : Specified Child Not Contained in TreeNode Children: \n" + this.toJson(0) + "\n");
+    	}
     }
     
     public String toJson(int level) {

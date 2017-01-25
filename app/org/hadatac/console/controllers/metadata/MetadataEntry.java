@@ -26,8 +26,10 @@ public class MetadataEntry extends Controller {
         System.out.println("MetadataEntry.java is requesting: " + tabName);
         try {
             query_json = query_submit.executeQuery(tabName);
-            System.out.println(query_json);
-            theResults = new OtMSparqlQueryResults(query_json, true);
+            //System.out.println("Pre Conversion: " + query_json + "\n");
+            theResults = new OtMSparqlQueryResults(query_json, true, tabName);
+            //System.out.println("Results: " + theResults.json + "\n");
+            
         } catch (IllegalStateException | NullPointerException | IOException e1) {
             return internalServerError(error_page.render(e1.toString(), tabName));
         }
