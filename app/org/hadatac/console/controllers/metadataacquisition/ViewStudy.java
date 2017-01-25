@@ -201,7 +201,7 @@ public class ViewStudy extends Controller {
     			+ "?subjectUri hasco:isSubjectOf* ?cohort . "
     			+ "?cohort hasco:isCohortOf " + study_uri + " . "
     			+ study_uri + " rdfs:label ?studyLabel . "
-    			+ "cohort rdfs:label ?cohortLabel . "
+    			+ "?cohort rdfs:label ?cohortLabel . "
     			+ "OPTIONAL { ?subjectUri rdfs:label ?subjectLabel } . "
     			+ "OPTIONAL { ?subjectUri a ?subjectType } . "
     			+ "}";		
@@ -209,7 +209,8 @@ public class ViewStudy extends Controller {
 		List<String> values = new ArrayList<String>();
 		try {
 			Query subjectQuery = QueryFactory.create(subjectQueryString);
-			QueryExecution qexec2 = QueryExecutionFactory.sparqlService(Collections.getCollectionsName(Collections.METADATA_SPARQL), subjectQuery);
+			QueryExecution qexec2 = QueryExecutionFactory.sparqlService(
+					Collections.getCollectionsName(Collections.METADATA_SPARQL), subjectQuery);
 			ResultSet results = qexec2.execSelect();
 			ResultSetRewindable resultsrw = ResultSetFactory.copyResults(results);
 			qexec2.close();
