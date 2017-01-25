@@ -45,7 +45,7 @@ wait $!
 wget -O $HADATAC_DOWNLOAD/solr-5.2.1.tgz.md5 http://archive.apache.org/dist/lucene/solr/5.2.1/solr-5.2.1.tgz.md5
 wait $!
 echo "=== Downloading JTS Topology Suite 1.13..."
-wget -O $HADATAC_DOWNLOAD/jts-1.13.zip http://pilotfiber.dl.sourceforge.net/project/jts-topo-suite/jts/1.13/jts-1.13.zip
+wget -O $HADATAC_DOWNLOAD/jts-1.13.zip https://sourceforge.net/projects/jts-topo-suite/files/jts/1.13/jts-1.13.zip
 
 echo "=== Uncompressing Apache Solr 5.2.1..."
 tar xfz $HADATAC_DOWNLOAD/solr-5.2.1.tgz -C $HADATAC_SOLR

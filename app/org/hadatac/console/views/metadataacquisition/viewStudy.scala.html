@@ -1,7 +1,7 @@
-@(studyResult      : Map[String, List[String]],
+@(studyResult : Map[String, List[String]],
   subjectResult	: Map[String, List[String]],
   indicatorValues : Map[String,List[String]],
-  indicatorUris	:	Map[String,String],
+  indicatorUris	: Map[String,String],
   showValues : Map[String,String])
 
 @import org.hadatac.console.views.html._
@@ -25,10 +25,10 @@
              <h2>Basic Info</h2>
 				<ul>        		
 					@for(key <- studyResult.keySet()){
-						<li>@key.toString.replaceAll("http://hadatac.org/ont/chear#","chear:").replaceAll("http://hadatac.org/ont/case#","case:").replaceAll("http://hadatac.org/kb/chear#","chear-kb:").replaceAll("http://hadatac.org/kb/case#","case-kb:")
+						<li>@key.toString
 							<ul>
 							@for(s <- studyResult.get(key)) {
-							<li>@s.toString.replaceAll("http://hadatac.org/ont/chear#","chear:").replaceAll("http://hadatac.org/ont/case#","case:").replaceAll("http://hadatac.org/kb/chear#","chear-kb:").replaceAll("http://hadatac.org/kb/case#","case-kb:")</li>
+								<li>@s.toString</li>
 							}
 							</ul>
 						</li>
@@ -37,12 +37,10 @@
 			<h3>Indicators</h3>
 				<ul>
 					@for(key <- indicatorValues.keySet()){
-						@if(indicatorValues.get(key).toString!=""){
+						@if(indicatorValues.get(key).toString != ""){
 						<li>@key.toString</li>
 							@for( i <- indicatorValues.get(key)){
-							
 								<a href="@org.hadatac.console.controllers.metadataacquisition.routes.ViewValue.index(showValues.get("user").toString(), showValues.get("study").toString(),"",indicatorUris.get(i))">@i.toString()<b>@indicatorUris.get(i)</b></a>
-							
 							}
 							
 						}
@@ -51,11 +49,11 @@
 			<h3>Subject List</h3>
 				<ul>        		
 					@for(key <- subjectResult.keySet()){
-						<li><a href="@play.api.Play.application.configuration.getString("hadatac.console.host_deploy")/hadatac/metadataacquisitions/viewSubject?subject_uri=@key.toString.replaceAll("http://hadatac.org/ont/chear#","chear:").replaceAll("http://hadatac.org/ont/case#","case:").replaceAll("http://hadatac.org/kb/chear#","chear-kb:").replaceAll("http://hadatac.org/ont/case#","case:").replaceAll("http://hadatac.org/kb/chear#","chear-kb:").replaceAll("http://hadatac.org/kb/case#","case-kb:")">@key.toString.replaceAll("http://hadatac.org/ont/chear#","chear:").replaceAll("http://hadatac.org/kb/chear#","chear-kb:").replaceAll("http://hadatac.org/kb/case#","case-kb:")</a>
+						<li><a href="@org.hadatac.console.controllers.metadataacquisition.routes.ViewSubject.index(key.toString)">@key.toString</a>
 
 							<ul>
 							@for(s <- subjectResult.get(key)) {
-							<li>@s.toString.replaceAll("http://hadatac.org/ont/chear#","chear:").replaceAll("http://hadatac.org/ont/case#","case:").replaceAll("http://hadatac.org/kb/chear#","chear-kb:").replaceAll("http://hadatac.org/kb/case#","case-kb:")</li>
+							<li>@s.toString</li>
 							}
 							</ul>
 						</li>

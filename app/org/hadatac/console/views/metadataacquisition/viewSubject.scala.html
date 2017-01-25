@@ -1,6 +1,6 @@
-@(subjectResult      : Map[String, List[String]],
+@(subjectResult : Map[String, List[String]],
   sampleResult	: Map[String, List[String]],
-  indicatorValues : Map[String,String])
+  indicatorValues : Map[String, List[String]])
 
 @import org.hadatac.console.views.html._
 @import org.hadatac.utils._
@@ -23,10 +23,10 @@
              <h2>Basic Info</h2>
 				<ul>        		
 					@for(key <- subjectResult.keySet()){
-						<li>@key.toString.replaceAll("http://hadatac.org/ont/chear#","chear:").replaceAll("http://hadatac.org/ont/case#","case:").replaceAll("http://hadatac.org/kb/chear#","chear-kb:").replaceAll("http://hadatac.org/kb/case#","case-kb:")
+						<li>@key.toString
 							<ul>
 							@for(s <- subjectResult.get(key)) {
-							<li>@s.toString</li>
+								<li>@s.toString</li>
 							}
 							</ul>
 						</li>
@@ -36,10 +36,10 @@
 			<h3>Indicators</h3>
 				<ul>
 					@for(key <- indicatorValues.keySet()){
-						@if(indicatorValues.get(key).toString!=""){
+						@if(indicatorValues.get(key).size() > 0){
 						<li>@key.toString</li>
 						<ul>
-							@indicatorValues.get(key).toString
+							@indicatorValues.get(key).mkString(", ")
 						</ul>
 						}
 					}
@@ -48,11 +48,10 @@
 			<h3>Sample List</h3>
 				<ul>
 					@for(key <- sampleResult.keySet()){
-						<li><a href="@play.api.Play.application.configuration.getString("hadatac.console.host_deploy")/hadatac/metadataacquisitions/viewSample?sample_uri=@key.toString.replaceAll("http://hadatac.org/ont/chear#","chear:").replaceAll("http://hadatac.org/ont/case#","case:").replaceAll("http://hadatac.org/kb/chear#","chear-kb:").replaceAll("http://hadatac.org/kb/case#","case-kb:")">@key.toString.replaceAll("http://hadatac.org/ont/chear#","chear:").replaceAll("http://hadatac.org/ont/case#","case:").replaceAll("http://hadatac.org/kb/chear#","chear-kb:").replaceAll("http://hadatac.org/kb/case#","case-kb:")</a>
-
+						<li><a href="@org.hadatac.console.controllers.metadataacquisition.routes.ViewSample.index(key.toString)">@key.toString</a>
 							<ul>
 							@for(s <- sampleResult.get(key)) {
-							<li>@s.toString.replaceAll("http://hadatac.org/ont/chear#","chear:").replaceAll("http://hadatac.org/ont/case#","case:").replaceAll("http://hadatac.org/kb/chear#","case-kb:").replaceAll("http://hadatac.org/kb/chear#","case-kb:")</li>
+							<li>@s.toString</li>
 							}
 							</ul>
 						</li>
