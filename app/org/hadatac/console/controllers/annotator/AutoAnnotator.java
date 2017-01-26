@@ -272,10 +272,9 @@ public class AutoAnnotator extends Controller {
     		log.save();
     		return false;
     	}
-
-		NameSpaces ns = NameSpaces.getInstance();
+ 
 		String preamble = Downloads.FRAG_START_PREAMBLE;
-		preamble += ns.printNameSpaceList();
+		preamble += NameSpaces.getInstance().printNameSpaceList();
 		preamble += "\n";
 
 		//Insert KB    	

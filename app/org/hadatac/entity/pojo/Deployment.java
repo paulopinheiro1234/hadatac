@@ -22,7 +22,6 @@ import org.apache.jena.update.UpdateExecutionFactory;
 import org.apache.jena.update.UpdateFactory;
 import org.apache.jena.update.UpdateProcessor;
 import org.apache.jena.update.UpdateRequest;
-import org.hadatac.data.loader.util.Sparql;
 import org.hadatac.utils.Collections;
 import org.hadatac.utils.NameSpaces;
 import org.hadatac.utils.State;
@@ -299,7 +298,7 @@ public class Deployment {
 	}
 	
 	public static Deployment findFromPreamble(HADataC hadatac) {
-		String queryString = Sparql.prefix
+		String queryString = NameSpaces.getInstance().printSparqlNameSpaceList() 
 				+ "SELECT ?startedAt ?endedAt ?detector ?instrument ?platform WHERE {\n"
 				+ "  <" + hadatac.getDeploymentUri() + "> a vstoi:Deployment .\n"
 				+ "  <" + hadatac.getDeploymentUri() + "> prov:startedAtTime ?startedAt .\n"
@@ -425,7 +424,7 @@ public class Deployment {
 	}
 
 	public static Deployment find(Model model, DataAcquisition dataAcquisition) {
-		String queryString = Sparql.prefix
+		String queryString = NameSpaces.getInstance().printSparqlNameSpaceList() 
 				+ "SELECT ?dp WHERE {\n"
 				+ "  ?dp hasneto:hasDataAcquisition <" + dataAcquisition.getCcsvUri() + "> .\n"
 				+ "}";

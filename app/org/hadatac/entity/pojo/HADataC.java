@@ -9,8 +9,8 @@ import org.apache.jena.query.ResultSet;
 import org.apache.jena.query.ResultSetFactory;
 import org.apache.jena.query.ResultSetRewindable;
 import org.apache.jena.rdf.model.Model;
-import org.hadatac.data.loader.util.Sparql;
 import org.hadatac.utils.Collections;
+import org.hadatac.utils.NameSpaces;
 
 public class HADataC {
 	
@@ -70,7 +70,7 @@ public class HADataC {
 	}
 	
 	public static HADataC find(Model model) {
-		String queryString = Sparql.prefix
+		String queryString = NameSpaces.getInstance().printSparqlNameSpaceList() 
 				+ "SELECT ?kb ?host WHERE {\n"
 				+ "  ?kb a hadatac:KnowledgeBase .\n"
 				+ "  ?kb hadatac:hasHost ?host .\n"

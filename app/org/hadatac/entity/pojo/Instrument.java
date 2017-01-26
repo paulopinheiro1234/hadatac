@@ -17,7 +17,6 @@ import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdf.model.Statement;
 import org.apache.jena.rdf.model.StmtIterator;
-import org.hadatac.data.loader.util.Sparql;
 import org.hadatac.utils.Collections;
 import org.hadatac.utils.NameSpaces;
 
@@ -185,7 +184,7 @@ public class Instrument  implements Comparable<Instrument> {
 	public static Instrument find(HADataC hadatac) {
 		Instrument instrument = null;
 		
-		String queryString = Sparql.prefix
+		String queryString = NameSpaces.getInstance().printSparqlNameSpaceList() 
 				+ "SELECT ?instrument ?label WHERE {\n"
 				+ "  <" + hadatac.getDeploymentUri() + "> hasneto:hasInstrument ?instrument .\n"
 				+ "  OPTIONAL { ?instrument rdfs:label ?label . }\n"

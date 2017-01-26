@@ -132,7 +132,8 @@ public class Parser {
 		}
 		
 		boolean isSubjectPlatform = Subject.isPlatform(hadatacKb.getDeployment().getPlatform().getUri());
-		SolrClient solr = new HttpSolrClient(Play.application().configuration().getString("hadatac.solr.data") + "/measurement");
+		SolrClient solr = new HttpSolrClient(Play.application().configuration().
+				getString("hadatac.solr.data") + "/measurement");
 		ValueCellProcessing cellProc = new ValueCellProcessing();
 		for (CSVRecord record : records) {
 			Iterator<MeasurementType> iter = hadatacKb.getDataset().getMeasurementTypes().iterator();
@@ -181,7 +182,11 @@ public class Parser {
 						measurement.setObjectUri("");
 					}
 				}
-				measurement.setUri(hadatacCcsv.getMeasurementUri() + hadatacCcsv.getDataset().getLocalName() + "/" + measurementType.getLocalName() + "-" + total_count);
+				
+				measurement.setUri(cellProc.replacePrefixEx(measurement.getStudyUri()) + "/" 
+						+ cellProc.replaceNameSpaceEx(hadatacKb.getDataAcquisition().getUri()).split(":")[1] + "/"
+						+ hadatacCcsv.getDataset().getLocalName() + "/" 
+						+ measurementType.getLocalName() + "-" + total_count);
 				measurement.setOwnerUri(hadatacKb.getDataAcquisition().getOwnerUri());
 				measurement.setAcquisitionUri(hadatacKb.getDataAcquisition().getUri());
 				measurement.setUnit(measurementType.getUnitLabel());

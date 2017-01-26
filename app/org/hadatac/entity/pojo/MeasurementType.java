@@ -15,10 +15,8 @@ import org.apache.jena.query.ResultSetRewindable;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdf.model.ResourceFactory;
-import org.hadatac.data.loader.util.Sparql;
 import org.hadatac.metadata.loader.ValueCellProcessing;
-
-import scala.reflect.internal.Types.ThisType;
+import org.hadatac.utils.NameSpaces;
 
 public class MeasurementType {
 	private String uri;
@@ -120,7 +118,7 @@ public class MeasurementType {
 			measurementTypeKb = new MeasurementType();
 			measurementTypeComplete = true;
 
-			String queryString = Sparql.prefix
+			String queryString = NameSpaces.getInstance().printSparqlNameSpaceList() 
 					+ "SELECT ?dc ?c_label ?e_label WHERE {\n"
 					+ " ?dc " + "hasneto:hasAttribute" + " <" + measurementType.getCharacteristicUri() + "> .\n"
 					+ "  OPTIONAL { " + "<" + measurementType.getCharacteristicUri() + "> " + "rdfs:label ?c_label . }\n"
@@ -163,7 +161,7 @@ public class MeasurementType {
 				measurementTypeComplete = false;
 			}
 			
-			queryString = Sparql.prefix
+			queryString = NameSpaces.getInstance().printSparqlNameSpaceList() 
 					+ "SELECT ?u_label WHERE {\n"
 					+ "  <" + measurementType.getUnitUri() + "> rdfs:label ?u_label . \n"
 					+ "}";
@@ -214,7 +212,7 @@ public class MeasurementType {
 	public static List<MeasurementType> find(Model model, Dataset dataset) {
 		List<MeasurementType> list = new ArrayList<MeasurementType>();
 		
-		String queryString = Sparql.prefix
+		String queryString = NameSpaces.getInstance().printSparqlNameSpaceList() 
 				+ "SELECT ?mt ?column ?ent ?char ?unit WHERE {\n"
 				+ "  <" + dataset.getCcsvUri() + "> hadatac:hasMeasurementType ?mt .\n"
 				+ "  ?mt a hadatac:MeasurementType .\n"

@@ -27,7 +27,7 @@ import org.apache.solr.common.SolrDocumentList;
 import org.hadatac.console.controllers.AuthApplication;
 import org.hadatac.console.controllers.triplestore.UserManagement;
 import org.hadatac.console.models.SysUser;
-import org.hadatac.data.loader.util.Sparql;
+import org.hadatac.utils.NameSpaces;
 import org.hadatac.utils.State;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
@@ -735,7 +735,7 @@ public class DataAcquisition {
 	}
 	
 	public static DataAcquisition find(Model model, Dataset dataset) {
-		String queryString = Sparql.prefix
+		String queryString = NameSpaces.getInstance().printSparqlNameSpaceList() 
 				+ "SELECT ?dc ?startedAt ?endedAt WHERE {\n"
 				+ "  <" + dataset.getCcsvUri() + "> prov:wasGeneratedBy ?dc .\n"
 				+ "  ?dc a hasneto:DataAcquisition .\n"
@@ -762,7 +762,7 @@ public class DataAcquisition {
 			return dataAcquisition;
 		}
 		
-		queryString = Sparql.prefix
+		queryString = NameSpaces.getInstance().printSparqlNameSpaceList()
 				+ "SELECT ?dc ?endedAt WHERE {\n"
 				+ "  <" + dataset.getCcsvUri() + "> prov:wasGeneratedBy ?dc .\n"
 				+ "  ?dc prov:endedAtTime ?endedAt .\n"
@@ -784,7 +784,7 @@ public class DataAcquisition {
 			return dataAcquisition;
 		}
 		
-		queryString = Sparql.prefix
+		queryString = NameSpaces.getInstance().printSparqlNameSpaceList() 
 				+ "SELECT ?dc ?endedAt WHERE {\n"
 				+ "  <" + dataset.getCcsvUri() + "> prov:wasGeneratedBy ?dc .\n"
 				+ "}";

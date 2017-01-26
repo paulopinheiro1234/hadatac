@@ -11,7 +11,7 @@ import org.apache.jena.query.ResultSet;
 import org.apache.jena.query.ResultSetFactory;
 import org.apache.jena.query.ResultSetRewindable;
 import org.apache.jena.rdf.model.Model;
-import org.hadatac.data.loader.util.Sparql;
+import org.hadatac.utils.NameSpaces;
 
 public class Dataset {
 	private String localName;
@@ -54,7 +54,7 @@ public class Dataset {
 	}
 	
 	public static Dataset find(Model model) {
-		String queryString = Sparql.prefix
+		String queryString = NameSpaces.getInstance().printSparqlNameSpaceList() 
 				+ "SELECT ?ds WHERE {\n"
 				+ "  ?ds a vstoi:Dataset .\n"
 				+ "}";

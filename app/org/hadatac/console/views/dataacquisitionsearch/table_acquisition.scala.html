@@ -30,10 +30,13 @@
 			updatePage();
 		}
 		
-		var cur_page = @page;
 		var page_size = 15;
 		var num_results = @resultsSize;
 		var total_page = Math.ceil(num_results/page_size);
+		var cur_page = @page; 
+		if(cur_page > total_page){
+			cur_page = total_page;
+		}
 		function nextPage(){
 			window.location.href = "@org.hadatac.console.controllers.dataacquisitionsearch.routes.DataAcquisitionSearch.index(page + 1, rows, facets)";
 		}
