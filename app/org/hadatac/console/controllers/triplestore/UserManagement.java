@@ -184,19 +184,19 @@ public class UserManagement extends Controller {
     }
 	
 	@Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
-    public static Result deleteUser(String user_uri) {
+    public static Result deleteUser(String user_uri, boolean deleteAuth) {
 		try {
 			user_uri = URLDecoder.decode(user_uri, "UTF-8");
 		} catch (UnsupportedEncodingException e) {
 			e.printStackTrace();
 		}
-		User.deleteUser(user_uri);
+		User.deleteUser(user_uri, deleteAuth);
 		return redirect(routes.UserManagement.index("init"));
     }
 
 	@Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
-    public static Result postDeleteUser(String user_uri) {
-    	return deleteUser(user_uri);
+    public static Result postDeleteUser(String user_uri, boolean deleteAuth) {
+    	return deleteUser(user_uri, deleteAuth);
     }
 	
 	@Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
@@ -262,7 +262,7 @@ public class UserManagement extends Controller {
 			pred_value_map.put("foaf:homepage", "<" + homepage + ">");
 			pred_value_map.put("hadatac:isMemberOfGroup", group_uri);
 			
-			deleteUser(usr_uri);
+			deleteUser(usr_uri, false);
 			message = generateTTL(mode, oper, rdf, usr_uri, pred_value_map);
 		}
 		return message;
@@ -299,7 +299,7 @@ public class UserManagement extends Controller {
 			pred_value_map.put("foaf:homepage", "\"" + homepage + "\"");
 			pred_value_map.put("hadatac:isMemberOfGroup", parent_group_uri);
 			
-			deleteUser(group_uri);
+			deleteUser(group_uri, false);
 			
 			message = generateTTL(mode, oper, rdf, group_uri, pred_value_map);
 		}

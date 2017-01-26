@@ -355,16 +355,18 @@ public class User implements Comparable<User> {
 		processor.execute();
 	}
 	
-	public static void deleteUser(String uri) {
+	public static void deleteUser(String uri, boolean deleteAuth) {
 		for(User user : UserGroup.findMembers(uri)){
 			changeAccessLevel(user.getUri(), User.find(uri).getImmediateGroupUri());
 		}
 		
-		User user = User.find(uri);
-		if(null != user){
-			SysUser sys_user = SysUser.findByEmail(user.getEmail());
-			if(null != sys_user){
-				sys_user.delete();
+		if (deleteAuth){
+			User user = User.find(uri);
+			if(null != user){
+				SysUser sys_user = SysUser.findByEmail(user.getEmail());
+				if(null != sys_user){
+					sys_user.delete();
+				}
 			}
 		}
 		

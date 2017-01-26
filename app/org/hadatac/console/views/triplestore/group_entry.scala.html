@@ -7,6 +7,6 @@
    	<td>@user.getUri()</td>
    	<td>
       	<a href="@org.hadatac.console.controllers.triplestore.routes.UserManagement.editGroup(URLEncoder.encode(user.getUri(),"UTF-8"))" class="btn-xs btn-primary" role="button">Edit</a>
-      	<a href="@org.hadatac.console.controllers.triplestore.routes.UserManagement.deleteUser(URLEncoder.encode(user.getUri(),"UTF-8"))" class="btn-xs btn-primary" role="button">Delete</a>
+      	<a href="@org.hadatac.console.controllers.triplestore.routes.UserManagement.deleteUser(URLEncoder.encode(user.getUri(),"UTF-8"), false)" class="btn-xs btn-primary" role="button">Delete</a>
    	</td>
 </tr>
