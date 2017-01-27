@@ -92,6 +92,7 @@ public class LoadCCSV extends Controller {
 	    return new DatasetParsingResult(status, message);
    }
     
+    @BodyParser.Of(value = BodyParser.MultipartFormData.class, maxLength = 500 * 1024 * 1024)
     public static Result uploadFile() {
     	MultipartFormData body = request().body().asMultipartFormData();
     	FilePart uploadedfile = body.getFile("pic");

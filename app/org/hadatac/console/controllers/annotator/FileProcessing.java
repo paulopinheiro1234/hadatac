@@ -20,6 +20,7 @@ import org.hadatac.console.models.SparqlQueryResults;
 import org.hadatac.console.models.CSVAnnotationHandler;
 import org.hadatac.console.models.TripleDocument;
 
+import play.mvc.BodyParser;
 import play.mvc.Controller;
 import play.mvc.Result;
 import play.mvc.Http.MultipartFormData;
@@ -68,6 +69,7 @@ public class FileProcessing extends Controller {
 	}
 	
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
+    @BodyParser.Of(value = BodyParser.MultipartFormData.class, maxLength = 500 * 1024 * 1024)
     public static Result uploadFile(String handler_json) {
     	try {
 			handler_json = URLDecoder.decode(handler_json, "UTF-8");

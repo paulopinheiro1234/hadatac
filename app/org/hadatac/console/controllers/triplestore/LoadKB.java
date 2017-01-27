@@ -31,6 +31,7 @@ import be.objectify.deadbolt.java.actions.Group;
 import be.objectify.deadbolt.java.actions.Restrict;
 import play.Play;
 import play.data.Form;
+import play.mvc.BodyParser;
 import play.mvc.Controller;
 import play.mvc.Http.MultipartFormData;
 import play.mvc.Http.MultipartFormData.FilePart;
@@ -314,6 +315,7 @@ public class LoadKB extends Controller {
     }
     
     @Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
+    @BodyParser.Of(value = BodyParser.MultipartFormData.class, maxLength = 500 * 1024 * 1024)
     public static Result uploadFile(String oper) {
     	System.out.println("uploadFile CALLED!");
     	MultipartFormData body = request().body().asMultipartFormData();
@@ -351,6 +353,7 @@ public class LoadKB extends Controller {
     }
     
     @Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
+    @BodyParser.Of(value = BodyParser.MultipartFormData.class, maxLength = 500 * 1024 * 1024)
     public static Result uploadTurtleFile(String oper) {
     	System.out.println("uploadTurtleFile CALLED!");
     	MultipartFormData body = request().body().asMultipartFormData();

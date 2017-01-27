@@ -417,6 +417,7 @@ public class UserManagement extends Controller {
 	}
 
 	@Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
+	@BodyParser.Of(value = BodyParser.MultipartFormData.class, maxLength = 500 * 1024 * 1024)
 	public static Result uploadFile(String file_type) {
 		MultipartFormData body = request().body().asMultipartFormData();
 		FilePart uploadedfile = body.getFile("pic");
