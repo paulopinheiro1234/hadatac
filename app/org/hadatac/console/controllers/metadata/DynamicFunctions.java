@@ -27,7 +27,9 @@ import org.apache.jena.query.ResultSetFactory;
 import org.apache.jena.query.ResultSetRewindable;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.sparql.engine.http.QueryExceptionHTTP;
+import org.hadatac.console.controllers.AuthApplication;
 import org.hadatac.console.controllers.metadataacquisition.ViewStudy;
+import org.hadatac.console.models.SysUser;
 import org.hadatac.console.views.html.metadata.*;
 import org.hadatac.console.views.html.metadataacquisition.*;
 import org.hadatac.metadata.loader.*;
@@ -97,7 +99,7 @@ public class DynamicFunctions extends Controller {
 	}
 	
 	public static Map<String, String> getIndicatorTypes(){
-		String indicatorQuery= getPrefixes() + "	";
+		String indicatorQuery= getPrefixes() + "SELECT DISTINCT ?indicatorType ?label ?comment WHERE { ?indicatorType rdfs:subClassOf chear:Indicator . ?indicatorType rdfs:label ?label . }";
 		Map<String, String> indicatorMap = new HashMap<String, String>();
 		try {
 			QueryExecution qexecInd = QueryExecutionFactory.sparqlService(Collections.getCollectionsName(Collections.METADATA_SPARQL), indicatorQuery);
