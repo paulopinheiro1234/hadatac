@@ -480,7 +480,7 @@ public class AutoAnnotator extends Controller {
     }
     
     @Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
-    @BodyParser.Of(value = BodyParser.MultipartFormData.class, maxLength = 300 * 1024)
+    @BodyParser.Of(value = BodyParser.MultipartFormData.class, maxLength = 500 * 1024 * 1024)
     public static Result uploadCSVFile(String oper) {
     	System.out.println("uploadCSVFile CALLED!");
     	
