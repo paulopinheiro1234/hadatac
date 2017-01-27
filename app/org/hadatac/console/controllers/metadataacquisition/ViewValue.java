@@ -1,5 +1,6 @@
 package org.hadatac.console.controllers.metadataacquisition;
 
+import java.util.ArrayList;
 import java.util.List;
 import play.mvc.Controller;
 import play.mvc.Result;
@@ -24,7 +25,13 @@ public class ViewValue extends Controller {
     public static Result index(String user_uri, String study_uri, 
     						   String subject_uri, String char_uri) {
 		List<Measurement> indicatorValueResults = findValue(user_uri, study_uri, subject_uri, char_uri);
-    	return ok(viewValue.render(indicatorValueResults));
+		if (indicatorValueResults == null){
+			List<Measurement> indicatorValueResults2 = new ArrayList<Measurement>();
+			return ok(viewValue.render(indicatorValueResults2));
+		}
+		else{
+	    	return ok(viewValue.render(indicatorValueResults));			
+		}
     }
 
 	@Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
