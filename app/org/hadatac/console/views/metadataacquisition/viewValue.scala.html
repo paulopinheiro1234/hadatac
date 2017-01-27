@@ -18,7 +18,10 @@
         <div class="col-md-6">
             <h1>Indicator Values</h1>
                 
-             <h2>@indicatorValueResults.get(0).getStudyUri()</h2>
+ 			@if(indicatorValueResults.isEmpty()){
+ 				NULL
+ 			}else{
+ 				<h2>@indicatorValueResults.get(0).getStudyUri()</h2>
 				<ul>        		
 					@for(i <- indicatorValueResults){
 						<li><b>Subject:</b>@i.getObjectUri()
@@ -28,6 +31,8 @@
 						</li>
 					}
 				</ul>
+ 			}
+            
     	</div>
     </div>
     
