@@ -314,6 +314,7 @@ public class SysUser implements Subject {
 	}
 	
 	public static SysUser create(final AuthUser authUser, String uri) {
+		System.out.println("Sign up uri: " + uri);
 		/////////////////
 		final SysUser sys_user = new SysUser();
 		
@@ -356,16 +357,17 @@ public class SysUser implements Subject {
 		
 		sys_user.id_s = UUID.randomUUID().toString();
 		
-		User user = new User();
-		user.setName(sys_user.name);
-		user.setEmail(sys_user.email);
-		
 		if (SysUser.existsSolr() == false) {
 			sys_user.roles.add(SecurityRole
 					.findByRoleNameSolr(org.hadatac.console.controllers.AuthApplication.DATA_MANAGER_ROLE));
 			sys_user.emailValidated = true;
+			
 			String admin_uri = "http://localhost/users#admin";
+			User user = new User();
+			user.setName(sys_user.name);
+			user.setEmail(sys_user.email);
 			user.setUri(admin_uri);
+			
 			if(null == uri){
 				sys_user.uri = admin_uri;
 			}
@@ -384,8 +386,6 @@ public class SysUser implements Subject {
 		else {
 			sys_user.uri = uri;
 		}
-		
-		user.save();
 		sys_user.save();
 		
 		return sys_user;
