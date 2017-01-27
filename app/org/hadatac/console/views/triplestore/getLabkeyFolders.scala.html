@@ -20,8 +20,8 @@
 	        </thead>
 	        <tbody>
 			@if(content=="diff_tool"){
-				@form(action=org.hadatac.console.controllers.triplestore.routes.DiffTool.index(labkeyLoginForm,"a","b")){
-					<input type="hidden" name="auth" value="@labkeyLoginForm">
+				@form(action=org.hadatac.console.controllers.triplestore.routes.DiffTool.index(labkeyLoginForm,results)){
+					<!-- <input type="hidden" name="auth" value="@labkeyLoginForm">
 					
 					@for((folder_name,index) <- results.zipWithIndex){
 						<tr>
@@ -32,6 +32,10 @@
 						</tr>
 					}
 					<input type="submit" class="btn btn-primary" value="Create">
+					-->
+					@for(list_name <- results){
+	              		@labkeyList_entry(labkeyLoginForm, list_name, list_name) 
+	              	}
 				}
 		    } else {
 		        @for(folder_name <- results){
@@ -44,7 +48,7 @@
 
         <a href="@org.hadatac.console.controllers.triplestore.routes.LoadKB.loadLabkeyKB("init", content)" class="btn btn-primary" role="button">Back</a>
      @if(content=="diff_tool"){
-        <a href="@org.hadatac.console.controllers.triplestore.routes.DiffTool.index(labkeyLoginForm, "a", "b")" class="btn btn-primary" role="button">Submit</a>
+        <a href="@org.hadatac.console.controllers.triplestore.routes.DiffTool.index(labkeyLoginForm, results)" class="btn btn-primary" role="button">Submit</a>
      }
     </div>
 }
