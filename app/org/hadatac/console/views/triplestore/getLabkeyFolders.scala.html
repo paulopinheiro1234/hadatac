@@ -1,7 +1,6 @@
 @(labkeyLoginForm : org.hadatac.console.models.LabKeyLoginForm,
   results : List[String],
   content : String)
-
 @import helper._
 @import org.hadatac.utils._
 @import org.hadatac.console.views.html._
@@ -10,6 +9,9 @@
 @import java.net._
 
 @main("LabKey List") {
+
+@string = "This is a string"
+
 	<div class="container-fluid">
         <table class="table">
 			<thead>
@@ -19,8 +21,10 @@
 	             </tr>
 	        </thead>
 	        <tbody>
+	        @string
 			@if(content=="diff_tool"){
-				@form(action=org.hadatac.console.controllers.triplestore.routes.DiffTool.index(labkeyLoginForm,results)){
+			
+				<form class="form-horizontal" name="diff_form_load" method="post" action="@org.hadatac.console.controllers.triplestore.routes.DiffTool.index(labkeyLoginForm,results)">
 					<!-- <input type="hidden" name="auth" value="@labkeyLoginForm">
 					
 					@for((folder_name,index) <- results.zipWithIndex){
@@ -36,7 +40,9 @@
 					@for(list_name <- results){
 	              		@labkeyList_entry(labkeyLoginForm, list_name, list_name) 
 	              	}
-				}
+	              	
+	              	<input class="btn btn-primary" role="button" id="submitbutton" type="submit" value="Submit" />
+				</form>
 		    } else {
 		        @for(folder_name <- results){
 		             @labkeyFolder_entry(labkeyLoginForm, folder_name, content)
@@ -48,7 +54,9 @@
 
         <a href="@org.hadatac.console.controllers.triplestore.routes.LoadKB.loadLabkeyKB("init", content)" class="btn btn-primary" role="button">Back</a>
      @if(content=="diff_tool"){
-        <a href="@org.hadatac.console.controllers.triplestore.routes.DiffTool.index(labkeyLoginForm, results)" class="btn btn-primary" role="button">Submit</a>
+<!--        <a href="@org.hadatac.console.controllers.triplestore.routes.DiffTool.index(labkeyLoginForm, results)" class="btn btn-primary" role="button" id="submitbutton" type="submit">Submit</a>
+-->
+		<input class="btn btn-primary" role="button" id="submitbutton" type="submit" value="Submit" />
      }
     </div>
 }
