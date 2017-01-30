@@ -9,11 +9,8 @@
 @import java.net._
 
 @main("LabKey List") {
-
-@string = "This is a string"
-
 	<div class="container-fluid">
-        <table class="table">
+        <table class="table">ck
 			<thead>
 	             <tr>
 	                <th>Folder</th>
@@ -21,7 +18,6 @@
 	             </tr>
 	        </thead>
 	        <tbody>
-	        @string
 			@if(content=="diff_tool"){
 			
 				<form class="form-horizontal" name="diff_form_load" method="post" action="@org.hadatac.console.controllers.triplestore.routes.DiffTool.index(labkeyLoginForm,results)">
