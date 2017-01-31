@@ -22,15 +22,22 @@ import org.hadatac.utils.NameSpaces;
 import org.hadatac.utils.State;
 */
 import org.hadatac.console.views.html.triplestore.*;
-
+import org.hadatac.entity.pojo.DataAcquisition;
+import org.hadatac.metadata.loader.TripleProcessing;
+import org.hadatac.utils.NameSpaces;
+import org.hadatac.utils.State;
 import org.labkey.remoteapi.query.*;
+import org.hadatac.console.controllers.AuthApplication;
 import org.hadatac.console.controllers.metadataacquisition.ViewStudy;
 import org.hadatac.console.models.LabKeyLoginForm;
+import org.hadatac.console.models.SysUser;
+import org.labkey.remoteapi.CommandException;
 import org.labkey.remoteapi.Connection;
 import org.labkey.remoteapi.query.SelectRowsCommand;
 import org.labkey.remoteapi.query.SelectRowsResponse;
 
 import play.Play;
+import play.data.Form;
 /*
 import play.Play;
 import play.data.Form;
@@ -43,6 +50,20 @@ import play.mvc.Result;
 
 public class DiffTool extends Controller {
 
+	public static List<String> diffLoadLists(List<String> list_names) {
+    	System.out.println("Loading List Info for Diff Tool\n");
+    	List<String> final_names = new LinkedList<String>();
+    	if (list_names.size() == 2){
+	        for(String name : list_names){
+        		final_names.add(name);
+	        }
+        }
+        else {
+        	System.out.println("Please Select Exactly 2 Folders\n");
+        }   
+    	return final_names;
+    }
+	
 	//Used to pull the name and description from the lists
     private static ArrayList<String> Convert_str(String s, String type){
         ArrayList<String>dataArray = new ArrayList<String>() ;
@@ -109,31 +130,7 @@ public class DiffTool extends Controller {
 
         return dataArrayM;
     }
-/*
-    //Purpose is to retrieve just the list names from each list manager
-    private static Collection<String> ConnectToLabkey_Retrieve_List_Names(String url_name, Connection cn) throws Exception{
-        
-    	SelectRowsCommand cmd = new SelectRowsCommand("ListManager", "ListManager");
-        cmd.setRequiredVersion(9.1);
-        cmd.setColumns(Arrays.asList("Name", "Description"));
-        cmd.setSorts(Collections.singletonList(new Sort("Name")));
 
-        SelectRowsResponse response = cmd.execute(cn, url_name);
-        ////System.out.println("Number of rows: " + response.getRowCount());
-
-        List<Map<String,Object>> rows = response.getRows();
-        int i = 0;
-
-        Collection <String> dataNameArray = new ArrayList<String>() ;
-
-        for (Map<String, Object> row : rows) {
-            dataNameArray.add(Get_Name(rows.get(i).get("Name").toString(), "Name"));
-            i++;
-        }
-
-        return dataNameArray;
-    }
-*/
     //Built for getting the headers of the sub-list
     private static Collection<String> ConnectToLabkey_List(String url_name, String list_name, Connection cn) throws Exception{
         
@@ -278,8 +275,8 @@ public class DiffTool extends Controller {
         }
     }
 
-    public static void runDiffTool(LabKeyLoginForm auth) throws Exception {
-
+    public static void runDiffTool(LabKeyLoginForm auth, List<String> list) throws Exception {
+    	
         /*if(args.length != 4){
             System.out.println("ERROR: Incorrect number of arguments");
             System.out.println(args[0]);
@@ -287,9 +284,16 @@ public class DiffTool extends Controller {
             return;
         }
 */
-        String Schema1 = "CHEAR Development";
-        String Schema2 = "CHEAR Production";
-        String username = auth.user_name;
+    	String Schema1 = "";
+       	String Schema2 = "";
+		if (list.size()==2) {
+        	Schema1 = list.get(0);//"CHEAR Development";
+        	Schema2 = list.get(1);//"CHEAR Production";
+		} else {
+			Schema1 = "CHEAR Development";
+        	Schema2 = "CHEAR Production";
+		}	
+		String username = auth.user_name;
         String password = auth.password;
         Connection cn = new Connection("http://chear.tw.rpi.edu/labkey/", username, password);
 
@@ -337,16 +341,16 @@ public class DiffTool extends Controller {
     	System.out.println("Alias: " + alias);
     }
     
-    public static Result index(LabKeyLoginForm auth, String list1, String list2) throws Exception {
-    	
-    	runDiffTool(auth);
+    public static Result index(LabKeyLoginForm auth, List<String> list_names) throws Exception {
+    	List<String> lists = diffLoadLists(list_names);
+    	runDiffTool(auth,lists);
         return ok(diff_results.render());
         
     }
     
-    public static Result postIndex(LabKeyLoginForm auth, String list1, String list2) throws Exception {
+    public static Result postIndex(LabKeyLoginForm auth, List<String> list_names) throws Exception {
         
-        return index(auth, list1, list2);
+        return index(auth, list_names);
         
     }
     

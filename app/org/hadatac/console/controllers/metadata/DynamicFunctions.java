@@ -27,7 +27,9 @@ import org.apache.jena.query.ResultSetFactory;
 import org.apache.jena.query.ResultSetRewindable;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.sparql.engine.http.QueryExceptionHTTP;
+import org.hadatac.console.controllers.AuthApplication;
 import org.hadatac.console.controllers.metadataacquisition.ViewStudy;
+import org.hadatac.console.models.SysUser;
 import org.hadatac.console.views.html.metadata.*;
 import org.hadatac.console.views.html.metadataacquisition.*;
 import org.hadatac.metadata.loader.*;
@@ -621,26 +623,27 @@ public class DynamicFunctions extends Controller {
 	// for /metadata HTTP GET requests
     public static Result index() {
     	Map<String,String> indicators = getIndicatorTypes();
-    	System.out.println("Indicators: " + indicators + "\n");
+    	//System.out.println("Indicators: " + indicators + "\n");
     	Map<String,List<String>> valueMap = getIndicatorValues(indicators);
-    	System.out.println("Indicator Values: " + valueMap + "\n");
+    	//System.out.println("Indicator Values: " + valueMap + "\n");
     	Map<String,Map<String,String>> valueMapWithLabels = getIndicatorValuesAndLabels(indicators);
-    	System.out.println("Indicator Values and Labels: " + valueMapWithLabels + "\n");
+    	//System.out.println("Indicator Values and Labels: " + valueMapWithLabels + "\n");
     	Map<String,List<String>> valueMapJustLabels = getIndicatorValuesJustLabels(indicators);
-    	System.out.println("Indicator Values Just Labels: " + valueMapJustLabels + "\n");
-    	System.out.println(replaceURLWithPrefix("http://hadatac.org/ont/chear#BloodPlasma"));
-    	System.out.println(findSubject("chear-kb:SBJ-0032-Pilot-6"));
+    	//System.out.println("Indicator Values Just Labels: " + valueMapJustLabels + "\n");
+    	//System.out.println(replaceURLWithPrefix("http://hadatac.org/ont/chear#BloodPlasma"));
+    	//System.out.println(findSubject("chear-kb:SBJ-0032-Pilot-6"));
     	
-    	System.out.println(findStudy("chear-kb:STD-Pilot-3"));
-    	System.out.println("Studies: " + findStudies());
+    	//System.out.println(findStudy("chear-kb:STD-Pilot-3"));
+    	//System.out.println("Studies: " + findStudies());
     	
     	//System.out.println(findSamples());
     	//System.out.println(findSampleBySubject("chear-kb:SBJ-0032-Pilot-6"));
-    	System.out.println(findSample("chear-kb:SPL-0032-Pilot-6-Urine-ICP-MS"));
+    	//System.out.println(findSample("chear-kb:SPL-0032-Pilot-6-Urine-ICP-MS"));
     	
-    	System.out.println(findSubject("chear-kb:SBJ-0032-Pilot-6"));
+    	//System.out.println(findSubject("chear-kb:SBJ-0032-Pilot-6"));
     	//System.out.println(findSubjects());
-    	System.out.println(replaceTabNameWithConcept("ReproductiveHealth"));
+    	//System.out.println(replaceTabNameWithConcept("ReproductiveHealth"));
+    	System.out.println(getPrefixes());
         return ok();        
     }// /index()
 

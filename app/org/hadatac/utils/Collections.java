@@ -50,7 +50,7 @@ public class Collections {
             case AUTHENTICATE_ACCOUNTS: 
             case AUTHENTICATE_ROLES: 
             case AUTHENTICATE_TOKENS:
-            case AUTHENTICATE_PERMISSIONS: collectionName = Play.application().configuration().getString("hadatac.solr.permissions") + request;
+            case AUTHENTICATE_PERMISSIONS: collectionName = Play.application().configuration().getString("hadatac.solr.data") + request;
                                            break;
             case PERMISSIONS_SPARQL:
             case PERMISSIONS_UPDATE:
