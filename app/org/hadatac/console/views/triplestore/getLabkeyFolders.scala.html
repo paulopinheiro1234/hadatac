@@ -10,7 +10,7 @@
 
 @main("LabKey List") {
 	<div class="container-fluid">
-        <table class="table">ck
+        <table class="table">
 			<thead>
 	             <tr>
 	                <th>Folder</th>
@@ -50,8 +50,6 @@
 
         <a href="@org.hadatac.console.controllers.triplestore.routes.LoadKB.loadLabkeyKB("init", content)" class="btn btn-primary" role="button">Back</a>
      @if(content=="diff_tool"){
-<!--        <a href="@org.hadatac.console.controllers.triplestore.routes.DiffTool.index(labkeyLoginForm, results)" class="btn btn-primary" role="button" id="submitbutton" type="submit">Submit</a>
--->
 		<input class="btn btn-primary" role="button" id="submitbutton" type="submit" value="Submit" />
      }
     </div>

@@ -48,8 +48,8 @@ public class DataContext {
 		return data.totalDataAcquisitions();
 	}
 	
-	public Long totalMeasurements() {
-		SolrClient solr = new HttpSolrClient(kbURL + "/measurement");
+	private Long totalDocuments(String solrCoreName) {
+		SolrClient solr = new HttpSolrClient(kbURL + solrCoreName);
 		SolrQuery parameters = new SolrQuery();
 		parameters.set("q", "*:*");
 		parameters.set("rows", 0);
@@ -59,239 +59,83 @@ public class DataContext {
 			solr.close();
 			return response.getResults().getNumFound();
 		} catch (SolrServerException e) {
-			// TODO Auto-generated catch block
-			//e.printStackTrace();
+			e.printStackTrace();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			//e.printStackTrace();
+			e.printStackTrace();
 		}
 		
 		return (long) -1;
+	}
+	
+	public Long totalMeasurements() {
+		return totalDocuments(Collections.DATA_ACQUISITION);
 	}
 	
 	public Long totalUsers() {
-		SolrClient solr = new HttpSolrClient(kbURL + "/users");
-		SolrQuery parameters = new SolrQuery();
-		parameters.set("q", "*:*");
-		parameters.set("rows", 0);
-		
-		try {
-			QueryResponse response = solr.query(parameters);
-			solr.close();
-			return response.getResults().getNumFound();
-		} catch (SolrServerException e) {
-			// TODO Auto-generated catch block
-			//e.printStackTrace();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			//e.printStackTrace();
-		}
-		
-		return (long) -1;
+		return totalDocuments(Collections.AUTHENTICATE_USERS);
 	}
 	
 	public Long totalDataAcquisitions() {
-		SolrClient solr = new HttpSolrClient(kbURL + "/sdc");
-		SolrQuery parameters = new SolrQuery();
-		parameters.set("q", "*:*");
-		parameters.set("rows", 0);
-		
+		return totalDocuments(Collections.DATA_COLLECTION);
+	}
+	
+	private String cleanAllDocuments(int mode, String solrCoreName) {
+		String message = "";
+	    String straux = "";
+	    
+        message += Feedback.println(mode,"   Documents before [clean]: " + totalDocuments(solrCoreName));
+        message += Feedback.println(mode, " ");
+
+	    String query1 = "<delete><query>*:*</query></delete>";
+	    String query2 = "<commit/>";
+	    
+	    String url1;
+	    String url2;
 		try {
-			QueryResponse response = solr.query(parameters);
-			solr.close();
-			return response.getResults().getNumFound();
-		} catch (SolrServerException e) {
-			// TODO Auto-generated catch block
-			//e.printStackTrace();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			//e.printStackTrace();
+		    url1 = Collections.getCollectionsName(solrCoreName) + "/update?stream.body=" + URLEncoder.encode(query1, "UTF-8");
+		    url2 = Collections.getCollectionsName(solrCoreName) + "/update?stream.body=" + URLEncoder.encode(query2, "UTF-8");
+
+		    if (verbose) {
+		        message += Feedback.println(mode, url1);
+		        message += Feedback.println(mode, url2);
+		    }
+		    String[] cmd1 = {"curl", "-v", url1};
+			message += Feedback.print(mode, "    Erasing documents... ");                
+		    straux = Command.exec(mode, verbose, cmd1);
+		    if (mode == Feedback.WEB) {
+		    	message += straux;
+		    }
+		    message += Feedback.println(mode, "");
+			message += Feedback.print(mode, "   Committing... ");                
+		    String[] cmd2 = {"curl", "-v", url2};
+		    straux = Command.exec(mode, verbose, cmd2);
+		    if (mode == Feedback.WEB) {
+		    	message += straux;
+		    }
+		    message += Feedback.println(mode," ");
+		    message += Feedback.println(mode," ");
+			message += Feedback.print(mode,"   Triples after [clean]: " + totalDocuments(solrCoreName));                
+		} catch (UnsupportedEncodingException e) {
+		    System.out.println("[DataManagement] - ERROR encoding URLs");
+		    return message;
 		}
 		
-		return (long) -1;
+        return message;
 	}
 	
 	public String cleanDataCollections(int mode) {
-		String message = "";
-	    String straux = "";
-	    //System.out.println("Is WEB? " + (mode == Feedback.WEB));
-        message += Feedback.println(mode,"   Documents before [clean]: " + totalDataAcquisitions());
-        message += Feedback.println(mode, " ");
-	    // ATTENTION: For now, it erases entirely the content of the metadata collection 
-	    String query1 = "<delete><query>*:*</query></delete>";
-	    String query2 = "<commit/>";
-	    
-	    String url1;
-	    String url2;
-		try {
-		    url1 = Collections.getCollectionsName(Collections.DATA_COLLECTION) + "/update?stream.body=" + URLEncoder.encode(query1, "UTF-8");
-		    url2 = Collections.getCollectionsName(Collections.DATA_COLLECTION) + "/update?stream.body=" + URLEncoder.encode(query2, "UTF-8");
-		    //Runtime.getRuntime().exec("curl -v " + url1);
-		    //Runtime.getRuntime().exec("curl -v " + url2);
-		    if (verbose) {
-		        message += Feedback.println(mode, url1);
-		        message += Feedback.println(mode, url2);
-		    }
-		    String[] cmd1 = {"curl", "-v", url1};
-			message += Feedback.print(mode, "    Erasing documents... ");                
-		    straux = Command.exec(mode, verbose, cmd1);
-		    if (mode == Feedback.WEB) {
-		    	message += straux;
-		    }
-		    message += Feedback.println(mode, "");
-			message += Feedback.print(mode, "   Committing... ");                
-		    String[] cmd2 = {"curl", "-v", url2};
-		    straux = Command.exec(mode, verbose, cmd2);
-		    if (mode == Feedback.WEB) {
-		    	message += straux;
-		    }
-		    message += Feedback.println(mode," ");
-		    message += Feedback.println(mode," ");
-			message += Feedback.print(mode,"   Triples after [clean]: " + totalDataAcquisitions());                
-		} catch (UnsupportedEncodingException e) {
-		    System.out.println("[DataManagement] - ERROR encoding URLs");
-		    //e.printStackTrace();
-		    return message;
-		}
-        return message;
+		return cleanAllDocuments(mode, Collections.DATA_COLLECTION);
 	}
 	
 	public String cleanDataUsers(int mode) {
-		String message = "";
-	    String straux = "";
-	    //System.out.println("Is WEB? " + (mode == Feedback.WEB));
-        message += Feedback.println(mode,"   Documents before [clean]: " + totalUsers());
-        message += Feedback.println(mode, " ");
-	    // ATTENTION: For now, it erases entirely the content of the metadata collection 
-	    String query1 = "<delete><query>*:*</query></delete>";
-	    String query2 = "<commit/>";
-	    
-	    String url1;
-	    String url2;
-		try {
-		    url1 = Collections.getCollectionsName(Collections.AUTHENTICATE_USERS) + "/update?stream.body=" + URLEncoder.encode(query1, "UTF-8");
-		    url2 = Collections.getCollectionsName(Collections.AUTHENTICATE_USERS) + "/update?stream.body=" + URLEncoder.encode(query2, "UTF-8");
-		    System.out.println("DATA URL1: " + url1);
-		    System.out.println("DATA URL2 :" + url2);
-		    //Runtime.getRuntime().exec("curl -v " + url1);
-		    //Runtime.getRuntime().exec("curl -v " + url2);
-		    if (verbose) {
-		        message += Feedback.println(mode, url1);
-		        message += Feedback.println(mode, url2);
-		    }
-		    String[] cmd1 = {"curl", "-v", url1};
-			message += Feedback.print(mode, "    Erasing documents... ");                
-		    straux = Command.exec(mode, verbose, cmd1);
-		    if (mode == Feedback.WEB) {
-		    	message += straux;
-		    }
-		    message += Feedback.println(mode, "");
-			message += Feedback.print(mode, "   Committing... ");                
-		    String[] cmd2 = {"curl", "-v", url2};
-		    straux = Command.exec(mode, verbose, cmd2);
-		    if (mode == Feedback.WEB) {
-		    	message += straux;
-		    }
-		    message += Feedback.println(mode," ");
-		    message += Feedback.println(mode," ");
-			message += Feedback.print(mode,"   Triples after [clean]: " + totalUsers());                
-		} catch (UnsupportedEncodingException e) {
-		    System.out.println("[DataManagement] - ERROR encoding URLs");
-		    //e.printStackTrace();
-		    return message;
-		}
-        return message;
+		return cleanAllDocuments(mode, Collections.AUTHENTICATE_USERS);
 	}
 	
 	public String cleanDataAccounts(int mode) {
-		String message = "";
-	    String straux = "";
-	    //System.out.println("Is WEB? " + (mode == Feedback.WEB));
-        message += Feedback.println(mode,"   Documents before [clean]: " + totalUsers());
-        message += Feedback.println(mode, " ");
-	    // ATTENTION: For now, it erases entirely the content of the metadata collection 
-	    String query1 = "<delete><query>*:*</query></delete>";
-	    String query2 = "<commit/>";
-	    
-	    String url1;
-	    String url2;
-		try {
-		    url1 = Collections.getCollectionsName(Collections.AUTHENTICATE_ACCOUNTS) + "/update?stream.body=" + URLEncoder.encode(query1, "UTF-8");
-		    url2 = Collections.getCollectionsName(Collections.AUTHENTICATE_ACCOUNTS) + "/update?stream.body=" + URLEncoder.encode(query2, "UTF-8");
-		    System.out.println("Accounts URL1: " + url1);
-		    System.out.println("Accounts URL2 :" + url2);
-		    //Runtime.getRuntime().exec("curl -v " + url1);
-		    //Runtime.getRuntime().exec("curl -v " + url2);
-		    if (verbose) {
-		        message += Feedback.println(mode, url1);
-		        message += Feedback.println(mode, url2);
-		    }
-		    String[] cmd1 = {"curl", "-v", url1};
-			message += Feedback.print(mode, "    Erasing documents... ");                
-		    straux = Command.exec(mode, verbose, cmd1);
-		    if (mode == Feedback.WEB) {
-		    	message += straux;
-		    }
-		    message += Feedback.println(mode, "");
-			message += Feedback.print(mode, "   Committing... ");                
-		    String[] cmd2 = {"curl", "-v", url2};
-		    straux = Command.exec(mode, verbose, cmd2);
-		    if (mode == Feedback.WEB) {
-		    	message += straux;
-		    }
-		    message += Feedback.println(mode," ");
-		    message += Feedback.println(mode," ");
-			message += Feedback.print(mode,"   Triples after [clean]: " + totalUsers());                
-		} catch (UnsupportedEncodingException e) {
-		    System.out.println("[DataManagement] - ERROR encoding URLs");
-		    //e.printStackTrace();
-		    return message;
-		}
-        return message;
+		return cleanAllDocuments(mode, Collections.AUTHENTICATE_ACCOUNTS);
 	}
 	
 	public String cleanDataAcquisitions(int mode) {
-		String message = "";
-	    String straux = "";
-	    //System.out.println("Is WEB? " + (mode == Feedback.WEB));
-        message += Feedback.println(mode,"   Documents before [clean]: " + totalMeasurements());
-        message += Feedback.println(mode, " ");
-	    // ATTENTION: For now, it erases entirely the content of the metadata collection 
-	    String query1 = "<delete><query>*:*</query></delete>";
-	    String query2 = "<commit/>";
-	    
-	    String url1;
-	    String url2;
-		try {
-		    url1 = Collections.getCollectionsName(Collections.DATA_ACQUISITION) + "/update?stream.body=" + URLEncoder.encode(query1, "UTF-8");
-		    url2 = Collections.getCollectionsName(Collections.DATA_ACQUISITION) + "/update?stream.body=" + URLEncoder.encode(query2, "UTF-8");
-		    //Runtime.getRuntime().exec("curl -v " + url1);
-		    //Runtime.getRuntime().exec("curl -v " + url2);
-		    if (verbose) {
-		        message += Feedback.println(mode, url1);
-		        message += Feedback.println(mode, url2);
-		    }
-		    String[] cmd1 = {"curl", "-v", url1};
-			message += Feedback.print(mode, "    Erasing documents... ");                
-		    straux = Command.exec(mode, verbose, cmd1);
-		    if (mode == Feedback.WEB) {
-		    	message += straux;
-		    }
-		    message += Feedback.println(mode, "");
-			message += Feedback.print(mode, "   Committing... ");                
-		    String[] cmd2 = {"curl", "-v", url2};
-		    straux = Command.exec(mode, verbose, cmd2);
-		    if (mode == Feedback.WEB) {
-		    	message += straux;
-		    }
-		    message += Feedback.println(mode," ");
-		    message += Feedback.println(mode," ");
-			message += Feedback.print(mode,"   Triples after [clean]: " + totalMeasurements());                
-		} catch (UnsupportedEncodingException e) {
-		    System.out.println("[DataManagement] - ERROR encoding URLs");
-		    //e.printStackTrace();
-		    return message;
-		}
-        return message;
+		return cleanAllDocuments(mode, Collections.DATA_ACQUISITION);
 	}
 }

@@ -38,6 +38,8 @@ import java.util.*;
 import org.hadatac.entity.pojo.Measurement;
 import org.hadatac.entity.pojo.User;
 
+import org.hadatac.utils.Collections;
+
 /**
  * Initial version based on work by Steve Chaloner (steve@objectify.be) for
  * Deadbolt2
@@ -217,7 +219,9 @@ public class SysUser implements Subject {
 	
 	private static List<SysUser> getAuthUserFindSolr(
 		final AuthUserIdentity identity) {
-		SolrClient solrClient = new HttpSolrClient(Play.application().configuration().getString("hadatac.solr.users") + "/user");
+		SolrClient solrClient = new HttpSolrClient(
+				Play.application().configuration().getString("hadatac.solr.users") + 
+				Collections.AUTHENTICATE_USERS);
 		String query = "active:true AND provider_user_id:" + identity.getId() + " AND provider_key:" + identity.getProvider();
     	SolrQuery solrQuery = new SolrQuery(query);
     	List<SysUser> users = new ArrayList<SysUser>();
@@ -274,7 +278,9 @@ public class SysUser implements Subject {
 	}
 	
 	public static SysUser findByIdSolr(final String id) {
-		SolrClient solrClient = new HttpSolrClient(Play.application().configuration().getString("hadatac.solr.users") + "/users");
+		SolrClient solrClient = new HttpSolrClient(
+				Play.application().configuration().getString("hadatac.solr.users") + 
+				Collections.AUTHENTICATE_USERS);
     	SolrQuery solrQuery = new SolrQuery("id:" + id);
     	SysUser user = null;
     	
@@ -323,7 +329,7 @@ public class SysUser implements Subject {
 		sys_user.permissions = new ArrayList<UserPermission>();
 		sys_user.active = true;
 		sys_user.lastLogin = new Date();
-		sys_user.linkedAccounts = Collections.singletonList(LinkedAccount
+		sys_user.linkedAccounts = java.util.Collections.singletonList(LinkedAccount
 				.create(authUser));
 
 		if (authUser instanceof EmailIdentity) {
@@ -392,7 +398,9 @@ public class SysUser implements Subject {
 	}
 	
 	public static boolean existsSolr() {
-		SolrClient solrClient = new HttpSolrClient(Play.application().configuration().getString("hadatac.solr.users") + "/users");
+		SolrClient solrClient = new HttpSolrClient(
+				Play.application().configuration().getString("hadatac.solr.users") + 
+				Collections.AUTHENTICATE_USERS);
     	SolrQuery solrQuery = new SolrQuery("*:*");
     	
     	try {
@@ -417,7 +425,7 @@ public class SysUser implements Subject {
 		sys_user.permissions = new ArrayList<UserPermission>();
 		sys_user.active = true;
 		sys_user.lastLogin = new Date();
-		sys_user.linkedAccounts = Collections.singletonList(LinkedAccount
+		sys_user.linkedAccounts = java.util.Collections.singletonList(LinkedAccount
 				.create(authUser));
 
 		if (authUser instanceof EmailIdentity) {
@@ -469,7 +477,9 @@ public class SysUser implements Subject {
 	}
 	
 	public void save() {
-		SolrClient solrClient = new HttpSolrClient(Play.application().configuration().getString("hadatac.solr.users") + "/users");
+		SolrClient solrClient = new HttpSolrClient(
+				Play.application().configuration().getString("hadatac.solr.users") + 
+				Collections.AUTHENTICATE_USERS);
         
         try {
 			solrClient.addBean(this);
@@ -490,7 +500,8 @@ public class SysUser implements Subject {
 	public int delete() {
 		try {
 			SolrClient solr = new HttpSolrClient(
-					Play.application().configuration().getString("hadatac.solr.users") + "/users");
+					Play.application().configuration().getString("hadatac.solr.users") + 
+					Collections.AUTHENTICATE_USERS);
 			UpdateResponse response = solr.deleteById(this.id_s);
 			solr.commit();
 			solr.close();
@@ -556,7 +567,9 @@ public class SysUser implements Subject {
 	}
 	
 	private static List<SysUser> getEmailUserFindSolr(final String email, final String providerKey) {
-		SolrClient solrClient = new HttpSolrClient(Play.application().configuration().getString("hadatac.solr.users") + "/users");
+		SolrClient solrClient = new HttpSolrClient(
+				Play.application().configuration().getString("hadatac.solr.users") + 
+				Collections.AUTHENTICATE_USERS);
 		String query = "email:" + email + " AND active:true";
     	SolrQuery solrQuery = new SolrQuery(query);
     	List<SysUser> users = new ArrayList<SysUser>();
