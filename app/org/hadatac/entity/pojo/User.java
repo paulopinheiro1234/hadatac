@@ -1,11 +1,8 @@
 package org.hadatac.entity.pojo;
 
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
-import java.io.OutputStream;
-import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.util.ArrayList;
@@ -21,16 +18,13 @@ import org.apache.jena.query.QueryFactory;
 import org.apache.jena.query.QuerySolution;
 import org.apache.jena.query.ResultSet;
 import org.apache.jena.query.ResultSetFactory;
-import org.apache.jena.query.ResultSetFormatter;
 import org.apache.jena.query.ResultSetRewindable;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.RDFNode;
-import org.apache.jena.rdf.model.RDFWriter;
 import org.apache.jena.rdf.model.Statement;
 import org.apache.jena.rdf.model.StmtIterator;
 import org.apache.jena.riot.Lang;
 import org.apache.jena.riot.RDFDataMgr;
-import org.apache.jena.sparql.resultset.RDFOutput;
 import org.apache.jena.update.UpdateExecutionFactory;
 import org.apache.jena.update.UpdateFactory;
 import org.apache.jena.update.UpdateProcessor;
@@ -355,9 +349,11 @@ public class User implements Comparable<User> {
 		processor.execute();
 	}
 	
-	public static void deleteUser(String uri, boolean deleteAuth) {
-		for(User user : UserGroup.findMembers(uri)){
-			changeAccessLevel(user.getUri(), User.find(uri).getImmediateGroupUri());
+	public static void deleteUser(String uri, boolean deleteAuth, boolean deleteMember) {
+		if (deleteMember) {
+			for(User user : UserGroup.findMembers(uri)){
+				changeAccessLevel(user.getUri(), User.find(uri).getImmediateGroupUri());
+			}
 		}
 		
 		if (deleteAuth){
