@@ -35,7 +35,11 @@
     	</div>
     </div>
     
-    <div id="download_url" style="visibility: hidden ;">@org.hadatac.console.http.routes.SolrSearchProxy.getStudyAcquisitionDownload()</div>
+   	<center>
+					<button type="button" class="btn btn-primary" data-toggle="modal" data-target="#myModal">Download</button>
+	</center>
+    
+    <div id="btn_download" style="visibility: hidden ;">@org.hadatac.console.http.routes.SolrSearchProxy.getCurrentMeasurements(indicatorValueResults)</div>
    <!-- Trigger the modal with a button -->
    <button type="button" class="btn btn-info btn-lg" data-toggle="modal" data-target="#myModal">Download</button>
    <!-- Modal -->
