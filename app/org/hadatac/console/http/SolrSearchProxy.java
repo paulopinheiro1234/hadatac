@@ -4,9 +4,11 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.List;
 
 import org.hadatac.console.controllers.AuthApplication;
 import org.hadatac.utils.Collections;
+import org.hadatac.entity.pojo.Measurement;
 
 import be.objectify.deadbolt.java.actions.Group;
 import be.objectify.deadbolt.java.actions.Restrict;
@@ -28,6 +30,13 @@ public class SolrSearchProxy extends Controller {
 	}
 	
 	@Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
+	public static Result getCurrentMeasurements(List<Measurement> lm) {
+		InputStream is = null;
+		is = (InputStream) lm.stream(); 
+		return ok(is);
+	}
+	
+	@Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
     public static Result getDataAcquisitionDownload(){
         String path = Collections.getCollectionsName(Collections.DATA_ACQUISITION) + "/select" +
                 request().toString().split((request().path()))[1];
@@ -42,6 +51,13 @@ public class SolrSearchProxy extends Controller {
         System.out.println(path);
         response().setContentType("text/csv");
         return getSolrSearch(path);
+    }
+	
+	@Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
+    public static Result getIndicatorValueDownload(List<Measurement> lm){
+
+        response().setContentType("text/csv");
+        return getCurrentMeasurements(lm);
     }
 	
 	@Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
