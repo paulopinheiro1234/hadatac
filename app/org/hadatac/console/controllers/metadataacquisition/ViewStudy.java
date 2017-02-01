@@ -239,7 +239,7 @@ public class ViewStudy extends Controller {
 	        results = null;
 	    }
 	    else{
-	    	results = UserManagement.getUriByEmail(user.email);
+	    	results = UserManagement.getUriByEmail(user.getEmail());
 	    }
 	    System.out.println("This is the current user's uri:" + results);
 	    

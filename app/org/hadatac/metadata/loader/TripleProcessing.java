@@ -269,8 +269,8 @@ public class TripleProcessing {
 						dataAcquisition.setDeploymentUri(deployment_uri);
 						
 						final SysUser user = AuthApplication.getLocalUser(Controller.session());
-						String ownerUri = UserManagement.getUriByEmail(user.email);
-						System.out.println(user.email);
+						String ownerUri = UserManagement.getUriByEmail(user.getEmail());
+						System.out.println(user.getEmail());
 						System.out.println("OwnerUri is:");
 						System.out.println(ownerUri);
 						dataAcquisition.setOwnerUri(ownerUri);

@@ -10,6 +10,7 @@ import java.util.Iterator;
 import java.util.Map;
 
 import org.apache.commons.io.IOUtils;
+import org.hadatac.utils.Collections;
 
 import play.Play;
 
@@ -18,7 +19,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class JsonHandler {
     
-    private String field_count_url = Play.application().configuration().getString("hadatac.solr.data") + "/measurement/browse?wt=json&facet=true&facet.field=characteristic&facet.field=entity&facet.field=unit&facet.field=platform_name&facet.field=instrument_model&rows=0";
+    private String field_count_url = Play.application().configuration().getString("hadatac.solr.data") 
+    		+ Collections.DATA_ACQUISITION 
+    		+ "/browse?wt=json&facet=true&facet.field=characteristic&facet.field=entity"
+    		+ "&facet.field=unit&facet.field=platform_name&facet.field=instrument_model&rows=0";
     public Map<String, HashMap<String, String>> categories_facets_and_counts = new HashMap<String, HashMap<String, String>>();
     public Map<String, ArrayList<String>> categories_and_facets = new HashMap<String, ArrayList<String>>();
 

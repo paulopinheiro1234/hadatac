@@ -104,7 +104,8 @@ public class Detector implements Comparable<Detector>  {
 		String queryString = "DESCRIBE <" + uri + ">";
 		Query query = QueryFactory.create(queryString);
 		QueryExecution qexec = QueryExecutionFactory.sparqlService(
-				Play.application().configuration().getString("hadatac.solr.triplestore") + "/store/sparql", query);
+				Play.application().configuration().getString("hadatac.solr.triplestore") 
+				+ Collections.METADATA_SPARQL, query);
 		model = qexec.execDescribe();
 		
 		detector = new Detector();

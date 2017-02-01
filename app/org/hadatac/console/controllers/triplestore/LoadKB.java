@@ -22,6 +22,7 @@ import org.hadatac.console.models.SysUser;
 import org.hadatac.metadata.loader.MetadataContext;
 import org.hadatac.metadata.loader.SpreadsheetProcessing;
 import org.hadatac.metadata.loader.TripleProcessing;
+import org.hadatac.utils.ConfigProp;
 import org.hadatac.utils.Feedback;
 import org.hadatac.utils.NameSpaces;
 import org.hadatac.utils.State;
@@ -69,19 +70,6 @@ public class LoadKB extends Controller {
 	     return message;
 	}
     
-    public static Properties loadConfig() {
-    	Properties prop = new Properties();
-		try {
-			InputStream is = LoadKB.class.getClassLoader().getResourceAsStream("labkey.config");
-			prop.load(is);
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		return prop;
-    }
-    
     @Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
     public static Result playLoadLabkeyDataAcquisition(String oper, String content, String folder, 
     		List<String> list_names, LabKeyLoginForm auth) {
@@ -109,9 +97,8 @@ public class LoadKB extends Controller {
             }
     	}
         
-        Properties prop = loadConfig();
         String path = String.format("/%s", folder);
-        String site = prop.getProperty("site");
+        String site = ConfigProp.getPropertyValue("labkey.config", "site");
     	
         NameSpaces.getInstance();
     	try {
@@ -124,7 +111,7 @@ public class LoadKB extends Controller {
     	
     	State state = new State(State.ALL);
     	final SysUser user = AuthApplication.getLocalUser(Controller.session());
-		String ownerUri = UserManagement.getUriByEmail(user.email);
+		String ownerUri = UserManagement.getUriByEmail(user.getEmail());
     	List<DataAcquisition> results = DataAcquisition.find(ownerUri, state);
     	
         return ok(dataAcquisitionManagement.render(state, results));
@@ -162,10 +149,9 @@ public class LoadKB extends Controller {
             	System.out.println(final_names.size());
             }
     	}
-        
-        Properties prop = loadConfig();
+
         String path = String.format("/%s", folder);
-        String site = prop.getProperty("site");
+        String site = ConfigProp.getPropertyValue("labkey.config", "site");
     	
     	NameSpaces.getInstance();
     	MetadataContext metadata = new 
@@ -199,9 +185,8 @@ public class LoadKB extends Controller {
     	
         String user_name = auth.getUserName();
         String password = auth.getPassword();
-        
-        Properties prop = loadConfig();
-        String site = prop.getProperty("site");
+
+        String site = ConfigProp.getPropertyValue("labkey.config", "site");
         String path = String.format("/%s", folder);
     	
     	NameSpaces.getInstance();
@@ -245,8 +230,7 @@ public class LoadKB extends Controller {
             data = auth;
     	}
     	
-        Properties prop = loadConfig();
-        String site = prop.getProperty("site");
+        String site = ConfigProp.getPropertyValue("labkey.config", "site");
         String path = "/";
     	
     	List<String> folders = null;
@@ -271,8 +255,7 @@ public class LoadKB extends Controller {
     	System.out.println(String.format("Accessing LabKey lists of %s", folder));
         String user_name = auth.getUserName();
         String password = auth.getPassword();
-        Properties prop = loadConfig();
-        String site = prop.getProperty("site");
+        String site = ConfigProp.getPropertyValue("labkey.config", "site");
         String path = String.format("/%s", folder);
     	
     	List<String> retMetadataLists = null;

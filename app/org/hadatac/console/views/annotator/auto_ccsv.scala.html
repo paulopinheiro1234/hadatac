@@ -1,5 +1,5 @@
-@(unprocessedFiles : List[String], 
-  processedFiles : List[String],
+@(unprocessedFiles : List[org.hadatac.entity.pojo.CSVFile], 
+  processedFiles : List[org.hadatac.entity.pojo.CSVFile],
   bStarted : Boolean)
 
 @import helper._
@@ -44,19 +44,23 @@
 	<thead>
          <tr>
             <th>Processed CSV Files</th>
+            <th>Time Uploaded</th>
+            <th>Time Processed</th>
             <th>Operations</th>
          </tr>
     </thead>
     <tbody>
-    	@for(file_name <- processedFiles){
+    	@for(file <- processedFiles){
     		<tr>
-    			<td>@file_name</td>
+    			<td>@file.getFileName()</td>
+    			<td>@file.getUploadTime()</td>
+    			<td>@file.getProcessTime()</td>
     			<td>
-    			<a href="@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.moveCSVFile(file_name)" class="btn-xs btn-primary" role="button">Move to Unprocessed Folder</a>
-    			<a href="@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.deleteCSVFile(file_name, true)" class="btn-xs btn-primary" role="button">Delete</a>
-    			<a href="@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.checkAnnotationLog(file_name)" class="btn-xs btn-primary" role="button">Logs</a>
-    			<a href="@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.downloadCSVFile(file_name, true)" class="btn-xs btn-primary" role="button">Download</a>
-    			</td>	
+    			<a href="@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.moveCSVFile(file.getFileName())" class="btn-xs btn-primary" role="button">Move to Unprocessed Folder</a>
+    			<a href="@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.deleteCSVFile(file.getFileName(), true)" class="btn-xs btn-primary" role="button">Delete</a>
+    			<a href="@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.checkAnnotationLog(file.getFileName())" class="btn-xs btn-primary" role="button">Logs</a>
+    			<a href="@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.downloadCSVFile(file.getFileName(), true)" class="btn-xs btn-primary" role="button">Download</a>
+    			</td>
     		</tr>
     	}
     </tbody>
@@ -68,17 +72,19 @@
 	<thead>
          <tr>
             <th>Unprocessed CSV Files</th>
+            <th>Time Uploaded</th>
             <th>Operations</th>
          </tr>
     </thead>
     <tbody>
-    	@for(file_name <- unprocessedFiles){
+    	@for(file <- unprocessedFiles){
     		<tr>
-    			<td>@file_name</td>
+    			<td>@file.getFileName()</td>
+    			<td>@file.getUploadTime()</td>
     			<td>
-    			<a href="@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.deleteCSVFile(file_name, false)" class="btn-xs btn-primary" role="button">Delete</a>
-    			<a href="@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.checkAnnotationLog(file_name)" class="btn-xs btn-primary" role="button">Logs</a>
-    			<a href="@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.downloadCSVFile(file_name, false)" class="btn-xs btn-primary" role="button">Download</a>
+    			<a href="@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.deleteCSVFile(file.getFileName(), false)" class="btn-xs btn-primary" role="button">Delete</a>
+    			<a href="@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.checkAnnotationLog(file.getFileName())" class="btn-xs btn-primary" role="button">Logs</a>
+    			<a href="@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.downloadCSVFile(file.getFileName(), false)" class="btn-xs btn-primary" role="button">Download</a>
     			</td>	
     		</tr>
     	}

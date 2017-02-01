@@ -23,7 +23,7 @@ public class MyUserServicePlugin extends UserServicePlugin {
 	public Object saveSolr(final AuthUser authUser) {
 		final boolean isLinked = SysUser.existsByAuthUserIdentity(authUser);
 		if (!isLinked) {
-			return SysUser.create(authUser).id_s;
+			return SysUser.create(authUser).getId();
 		} else {
 			// we have this user already, so return null
 			return null;
@@ -36,7 +36,7 @@ public class MyUserServicePlugin extends UserServicePlugin {
 		// ...and dont forget to sync the cache when users get deactivated/deleted
 		final SysUser u = SysUser.findByAuthUserIdentity(identity);
 		if(u != null) {
-			return u.id_s;
+			return u.getId();
 		} else {
 			return null;
 		}

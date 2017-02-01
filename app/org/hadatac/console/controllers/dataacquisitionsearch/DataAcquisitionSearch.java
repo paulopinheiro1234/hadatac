@@ -100,7 +100,7 @@ public class DataAcquisitionSearch extends Controller {
     		results = Measurement.find(ownerUri, page, rows, handler);
     	}
     	else{
-    		ownerUri = UserManagement.getUriByEmail(user.email);
+    		ownerUri = UserManagement.getUriByEmail(user.getEmail());
     		if(null == ownerUri){
     			ownerUri = "Public";
     		}

@@ -24,6 +24,7 @@ import org.apache.solr.common.SolrDocumentList;
 import org.hadatac.console.models.FacetHandler;
 import org.hadatac.console.models.Pivot;
 import org.hadatac.data.model.AcquisitionQueryResult;
+import org.hadatac.utils.Collections;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.joda.time.format.DateTimeFormat;
@@ -203,7 +204,9 @@ public class Measurement {
 	}
 	
 	public int save() {
-		SolrClient solr = new HttpSolrClient(Play.application().configuration().getString("hadatac.solr.data") + "/measurement");
+		SolrClient solr = new HttpSolrClient(
+				Play.application().configuration().getString("hadatac.solr.data") 
+				+ Collections.DATA_ACQUISITION);
 		try {
 			int status = solr.addBean(this).getStatus();
 			solr.commit();
@@ -216,7 +219,9 @@ public class Measurement {
 	}
 	
 	public static int delete(String datasetUri) {
-		SolrClient solr = new HttpSolrClient(Play.application().configuration().getString("hadatac.solr.data") + "/measurement");
+		SolrClient solr = new HttpSolrClient(
+				Play.application().configuration().getString("hadatac.solr.data") 
+				+ Collections.DATA_ACQUISITION);
 		try {
 			UpdateResponse response = solr.deleteByQuery("dataset_uri:\"" + datasetUri + "\"");
 			solr.commit();
@@ -234,7 +239,9 @@ public class Measurement {
 	}
 	
 	public static long findSize(String user_uri, FacetHandler handler) {
-		SolrClient solr = new HttpSolrClient(Play.application().configuration().getString("hadatac.solr.data") + "/measurement");
+		SolrClient solr = new HttpSolrClient(
+				Play.application().configuration().getString("hadatac.solr.data") 
+				+ Collections.DATA_ACQUISITION);
 		SolrQuery query = new SolrQuery();
 		query.setStart(0);
 		query.setRows(100000000);
@@ -335,7 +342,8 @@ public class Measurement {
 		AcquisitionQueryResult result = new AcquisitionQueryResult();
 		
 		SolrClient solr = new HttpSolrClient(
-				Play.application().configuration().getString("hadatac.solr.data") + "/measurement");
+				Play.application().configuration().getString("hadatac.solr.data") 
+				+ Collections.DATA_ACQUISITION);
 		SolrQuery query = new SolrQuery();
 		
 		String q = buildQuery(user_uri, study_uri, subject_uri, char_uri);
@@ -404,7 +412,9 @@ public class Measurement {
 	public static AcquisitionQueryResult find(String user_uri, int page, int qtd, FacetHandler handler) {
 		AcquisitionQueryResult result = new AcquisitionQueryResult();
 		
-		SolrClient solr = new HttpSolrClient(Play.application().configuration().getString("hadatac.solr.data") + "/measurement");
+		SolrClient solr = new HttpSolrClient(
+				Play.application().configuration().getString("hadatac.solr.data")
+				+ Collections.DATA_ACQUISITION);
 		SolrQuery query = new SolrQuery();
 		
 		String q = buildQuery(user_uri, page, qtd, handler);
@@ -502,7 +512,9 @@ public class Measurement {
 	public static List<Measurement> findByDataAcquisitionUri(String acquisition_uri) {
 		List<Measurement> listMeasurement = new ArrayList<Measurement>();
 		
-		SolrClient solr = new HttpSolrClient(Play.application().configuration().getString("hadatac.solr.data") + "/measurement");
+		SolrClient solr = new HttpSolrClient(
+				Play.application().configuration().getString("hadatac.solr.data") 
+				+ Collections.DATA_ACQUISITION);
 		SolrQuery query = new SolrQuery();
 		query.set("q", "acquisition_uri:\"" + acquisition_uri + "\"");
 		query.set("rows", "10000000");

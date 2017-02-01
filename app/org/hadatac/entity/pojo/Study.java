@@ -2,6 +2,7 @@ package org.hadatac.entity.pojo;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -24,6 +25,7 @@ import org.apache.solr.common.SolrDocumentList;
 import org.hadatac.console.models.FacetHandler;
 import org.hadatac.console.models.Pivot;
 import org.hadatac.data.model.MetadataAcquisitionQueryResult;
+import org.hadatac.utils.Collections;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.joda.time.format.DateTimeFormat;
@@ -584,7 +586,9 @@ public class Study {
 	public static MetadataAcquisitionQueryResult find(int page, int qtd, List<String> permissions, FacetHandler handler) {
 		MetadataAcquisitionQueryResult result = new MetadataAcquisitionQueryResult();
 		
-		SolrClient solr = new HttpSolrClient(Play.application().configuration().getString("hadatac.solr.data") + "/studies_facet");
+		SolrClient solr = new HttpSolrClient(
+				Play.application().configuration().getString("hadatac.solr.data")
+				+ Collections.STUDIES_FACET);
 		SolrQuery query = new SolrQuery();
 		String permission_query = "";
 		String facet_query = "";
@@ -662,7 +666,9 @@ public class Study {
 		
 		System.out.println("uri:");
 		System.out.println(uri);
-		SolrClient solr = new HttpSolrClient(Play.application().configuration().getString("hadatac.solr.data") + "/studies_facet");
+		SolrClient solr = new HttpSolrClient(
+				Play.application().configuration().getString("hadatac.solr.data")
+				+ Collections.STUDIES_FACET);
 		SolrQuery query = new SolrQuery();
 		
 		query.set("q", "uri:\"" + uri + "\"");
@@ -692,7 +698,9 @@ public class Study {
 	}
 	
 	public int delete() {
-		SolrClient solr = new HttpSolrClient(Play.application().configuration().getString("hadatac.solr.data") + "/studies_facet");
+		SolrClient solr = new HttpSolrClient(
+				Play.application().configuration().getString("hadatac.solr.data")
+				+ Collections.STUDIES_FACET);
 		try {
 			UpdateResponse response = solr.deleteByQuery("uri:\"" + uri + "\"");
 			solr.commit();
@@ -711,7 +719,9 @@ public class Study {
 	
 	public int save() {
 		try {
-			SolrClient client = new HttpSolrClient(Play.application().configuration().getString("hadatac.solr.data") + "/studies_facet");
+			SolrClient client = new HttpSolrClient(
+					Play.application().configuration().getString("hadatac.solr.data")
+					+ Collections.STUDIES_FACET);
 			if (endedAt.toString().startsWith("9999")) {
 				endedAt = DateTime.parse("9999-12-31T23:59:59.999Z");
 			}

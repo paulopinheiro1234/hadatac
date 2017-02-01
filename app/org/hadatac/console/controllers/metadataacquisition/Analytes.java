@@ -17,8 +17,7 @@ import be.objectify.deadbolt.java.actions.Restrict;
 
 
 public class Analytes extends Controller {
-	
-	// for /metadata HTTP GET requests
+
 	@Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
     public static Result index() {
     	String collection = Play.application().configuration().getString("hadatac.console.host_deploy") + 
@@ -26,13 +25,10 @@ public class Analytes extends Controller {
     	Map<String,String> indicators = DynamicFunctions.getIndicatorTypes();
         Map<String,List<String>> values = DynamicFunctions.getIndicatorValuesJustLabels(indicators);
     	return ok(analytes.render(collection,values));
-    }// /index()
+    }
 
-
-    // for /metadata HTTP POST requests
 	@Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
     public static Result postIndex() {
         return index();
-    }// /postIndex()
-
+    }
 }

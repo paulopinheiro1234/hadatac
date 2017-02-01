@@ -12,6 +12,7 @@ import org.apache.solr.client.solrj.impl.HttpSolrClient;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
+import org.hadatac.utils.Collections;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.joda.time.format.DateTimeFormat;
@@ -63,12 +64,12 @@ public class TokenAction {
 	public DateTime expires_j;
 	
 	public String getTargetUserId() {
-		return targetUser.id_s;
+		return targetUser.getId();
 	}
 	
 	@Field("target_user_id")
 	public void setTargetUserId(String id_s) {
-		targetUser.id_s = id_s;
+		targetUser.setId(id_s);
 	}
 	
 	public String getType() {
@@ -111,7 +112,9 @@ public class TokenAction {
 	}
 	
 	public static TokenAction findByTokenSolr(final String token, final Type type) {
-		SolrClient solrClient = new HttpSolrClient(Play.application().configuration().getString("hadatac.solr.users") + "/token_action");
+		SolrClient solrClient = new HttpSolrClient(
+				Play.application().configuration().getString("hadatac.solr.users")
+				+ Collections.AUTHENTICATE_TOKENS);
     	SolrQuery solrQuery = new SolrQuery("token:" + token + " AND type:" + type.name());
     	TokenAction tokenAction = null;
 		
@@ -144,9 +147,11 @@ public class TokenAction {
 	}
 	
 	public static void deleteByUserSolr(final SysUser u, final Type type) {
-		SolrClient solrClient = new HttpSolrClient(Play.application().configuration().getString("hadatac.solr.users") + "/token_action");
+		SolrClient solrClient = new HttpSolrClient(
+				Play.application().configuration().getString("hadatac.solr.users") 
+				+ Collections.AUTHENTICATE_TOKENS);
 		try {
-			solrClient.deleteByQuery("target_user_id:" + u.id_s + " AND type:" + type.name());
+			solrClient.deleteByQuery("target_user_id:" + u.getId() + " AND type:" + type.name());
 			solrClient.commit();
 			solrClient.close();
 		} catch (SolrServerException | IOException e) {
@@ -177,7 +182,9 @@ public class TokenAction {
 	}
 	
 	public void save() {
-		SolrClient solrClient = new HttpSolrClient(Play.application().configuration().getString("hadatac.solr.users") + "/token_action");
+		SolrClient solrClient = new HttpSolrClient(
+				Play.application().configuration().getString("hadatac.solr.users") 
+				+ Collections.AUTHENTICATE_TOKENS);
         
         try {
         	solrClient.addBean(this);

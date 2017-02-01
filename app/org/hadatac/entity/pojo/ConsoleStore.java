@@ -12,6 +12,7 @@ import org.apache.solr.client.solrj.impl.HttpSolrClient;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
+import org.hadatac.utils.Collections;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.joda.time.format.DateTimeFormat;
@@ -54,7 +55,9 @@ public class ConsoleStore {
 	
 	public int save() {
 		try {
-			SolrClient client = new HttpSolrClient(Play.application().configuration().getString("hadatac.solr.data") + "/console_store");
+			SolrClient client = new HttpSolrClient(
+					Play.application().configuration().getString("hadatac.solr.data") 
+					+ Collections.CONSOLE_STORE);
 			this.timestamp = DateTime.now();
 			int status = client.addBean(this).getStatus();
 			client.commit();
@@ -69,7 +72,9 @@ public class ConsoleStore {
 	public static ConsoleStore find() {
 		ConsoleStore consoleStore = null;
 		
-		SolrClient client = new HttpSolrClient(Play.application().configuration().getString("hadatac.solr.data") + "/console_store");
+		SolrClient client = new HttpSolrClient(
+				Play.application().configuration().getString("hadatac.solr.data") 
+				+ Collections.CONSOLE_STORE);
         SolrQuery parameters = new SolrQuery();
         parameters.set("q", "*:*");
         parameters.set("sort", "last_dynamic_metadata_id desc");

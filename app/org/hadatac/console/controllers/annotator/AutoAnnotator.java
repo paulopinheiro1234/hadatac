@@ -10,7 +10,10 @@ import java.io.UnsupportedEncodingException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLDecoder;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -34,12 +37,15 @@ import org.hadatac.console.models.SysUser;
 import org.hadatac.console.views.html.annotator.*;
 import org.hadatac.data.api.DataFactory;
 import org.hadatac.data.model.DatasetParsingResult;
+import org.hadatac.entity.pojo.CSVFile;
 import org.hadatac.entity.pojo.DataAcquisition;
 import org.hadatac.metadata.loader.ValueCellProcessing;
+import org.hadatac.utils.ConfigProp;
 import org.hadatac.utils.NameSpaces;
 import org.hadatac.utils.State;
 
 import com.avaje.ebean.enhance.ant.AntEnhanceTask;
+import com.typesafe.config.impl.ConfigImpl;
 
 import be.objectify.deadbolt.java.actions.Group;
 import be.objectify.deadbolt.java.actions.Restrict;
@@ -52,50 +58,48 @@ import play.mvc.Http.MultipartFormData.FilePart;
 
 public class AutoAnnotator extends Controller {
 	
-	@Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    public static Result index() {
-		Properties prop = new Properties();
-		try {
-			InputStream is = LoadKB.class.getClassLoader().getResourceAsStream("autoccsv.config");
-			prop.load(is);
-			is.close();
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		
-		ArrayList<String> proc_files = new ArrayList<String>();
-		ArrayList<String> unproc_files = new ArrayList<String>();
-		String path_proc = prop.getProperty("path_proc");
-		String path_unproc = prop.getProperty("path_unproc");
-		
-		File folder = new File(path_proc);
+	private static void filterNonexistedFiles(String path, List<CSVFile> files) {
+		File folder = new File(path);
 		if (!folder.exists()){
 			folder.mkdirs();
 	    }
+		
 		File[] listOfFiles = folder.listFiles();
-		for (int i = 0; i < listOfFiles.length; i++) {
-			if (listOfFiles[i].isFile()) {
-				proc_files.add(listOfFiles[i].getName());
+		Iterator<CSVFile> iterFile = files.iterator();
+		while(iterFile.hasNext()) {
+			CSVFile file = iterFile.next();
+			boolean isExisted = false;
+			for (int i = 0; i < listOfFiles.length; i++) {
+				if (listOfFiles[i].isFile()) {
+					if(file.getFileName().equals(listOfFiles[i].getName())) {
+						isExisted = true;
+						break;
+					}
+				}
+			}
+			if (!isExisted) {
+				iterFile.remove();
 			}
 		}
-		folder = new File(path_unproc);
-		if (!folder.exists()){
-			folder.mkdirs();
-	    }
-		listOfFiles = folder.listFiles();
-		for (int i = 0; i < listOfFiles.length; i++) {
-			if (listOfFiles[i].isFile()) {
-				unproc_files.add(listOfFiles[i].getName());
-			}
-		}
+	}
+	
+	@Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
+    public static Result index() {		
+		final SysUser user = AuthApplication.getLocalUser(session());
+		
+		List<CSVFile> proc_files = CSVFile.find(user.getEmail(), State.PROCESSED);
+		List<CSVFile> unproc_files = CSVFile.find(user.getEmail(), State.UNPROCESSED);
+		
+		String path_proc = ConfigProp.getPropertyValue("autoccsv.config", "path_proc");
+		String path_unproc = ConfigProp.getPropertyValue("autoccsv.config", "path_unproc");
+		
+		filterNonexistedFiles(path_proc, proc_files);
+		filterNonexistedFiles(path_unproc, unproc_files);
 		
 		boolean bStarted = false;
-		if(prop.getProperty("auto").equals("on")){
+		if(ConfigProp.getPropertyValue("autoccsv.config", "auto").equals("on")){
 			bStarted = true;
 		}
-		System.out.println(bStarted);
 
 		return ok(auto_ccsv.render(unproc_files, proc_files, bStarted));
 	}
@@ -109,75 +113,45 @@ public class AutoAnnotator extends Controller {
     public static Result toggleAutoAnnotator() {
 		System.out.println("Toggling...");
 		
-		Properties prop = new Properties();
-		try {
-			InputStream is = LoadKB.class.getClassLoader().getResourceAsStream("autoccsv.config");
-			prop.load(is);
-			is.close();
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
+		if (ConfigProp.getPropertyValue("autoccsv.config", "auto").equals("on")) {
+			ConfigProp.setPropertyValue("autoccsv.config", "auto", "off");
+			System.out.println("Turning auto-annotation off");
 		}
-		
-		if(prop.getProperty("auto").equals("on")){
-			prop.setProperty("auto", "off");
-			System.out.println("off");
-		}
-		else if(prop.getProperty("auto").equals("off")){
-			prop.setProperty("auto", "on");
-			System.out.println("on");
-		}
-		URL url = LoadKB.class.getClassLoader().getResource("autoccsv.config");
-		try {
-			prop.store(new FileOutputStream(new File(url.toURI())), null);
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		} catch (URISyntaxException e) {
-			e.printStackTrace();
+		else {
+			ConfigProp.setPropertyValue("autoccsv.config", "auto", "on");
+			System.out.println("Turning auto-annotation on");
 		}
 		
 		return redirect(routes.AutoAnnotator.index());
 	}
 	
 	public static void autoAnnotate() {
-		Properties prop = new Properties();
-		try {
-			InputStream is = LoadKB.class.getClassLoader().getResourceAsStream("autoccsv.config");
-			prop.load(is);
-			is.close();
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		
-		if(prop.getProperty("auto").equals("off")){
+		if(ConfigProp.getPropertyValue("autoccsv.config", "auto").equals("off")){
 			return;
 		}
 		
-		String path_proc = prop.getProperty("path_proc");
-		String path_unproc = prop.getProperty("path_unproc");
+		String path_proc = ConfigProp.getPropertyValue("autoccsv.config", "path_proc");
+		String path_unproc = ConfigProp.getPropertyValue("autoccsv.config", "path_unproc");
+		List<CSVFile> unproc_files = CSVFile.findAll(State.UNPROCESSED);
+		filterNonexistedFiles(path_unproc, unproc_files);
 		
-		File folder = new File(path_unproc);
-		if (!folder.exists()){
-			folder.mkdirs();
-	    }
-		File[] listOfFiles = folder.listFiles();
-		for (int i = 0; i < listOfFiles.length; i++) {
-			if (listOfFiles[i].isFile()) {
-				String file_name = listOfFiles[i].getName();
-				if(annotateCSVFile(file_name)){
-					//Move the file to the folder for processed files
-					File destFolder = new File(path_proc);
-					if (!destFolder.exists()){
-						destFolder.mkdirs();
-				    }
-					listOfFiles[i].renameTo(new File(destFolder + "/" + file_name));
-					listOfFiles[i].delete();
-				}
+		for (CSVFile file : unproc_files) {
+			String file_name = file.getFileName();
+			if(annotateCSVFile(file_name)){
+				//Move the file to the folder for processed files
+				File destFolder = new File(path_proc);
+				if (!destFolder.exists()){
+					destFolder.mkdirs();
+			    }
+				
+				file.delete();
+
+				file.setProcessStatus(true);
+				file.setProcessTime(new SimpleDateFormat("yyyy/MM/dd HH:mm:ss").format(new Date()));
+				file.save();
+				File f = new File(path_unproc + "/" + file_name);
+				f.renameTo(new File(destFolder + "/" + file_name));
+				f.delete();
 			}
 		}
 	}
@@ -238,7 +212,7 @@ public class AutoAnnotator extends Controller {
     		handler = new CSVAnnotationHandler(deployment_uri, docDeployment.get("platform"), docDeployment.get("instrument"));
     		    		
     		/*
-    		 * Add possible detector's characterisitcs into handler
+    		 * Add possible detector's characteristics into handler
     		 */
     		String dep_json = DeploymentQueries.exec(DeploymentQueries.DEPLOYMENT_CHARACTERISTICS_BY_URI, deployment_uri);
     		System.out.println(dep_json);
@@ -362,19 +336,7 @@ public class AutoAnnotator extends Controller {
 
 		preamble += Downloads.FRAG_END_PREAMBLE;
 
-		Properties prop = new Properties();
-		try {
-			InputStream is = LoadKB.class.getClassLoader().getResourceAsStream("autoccsv.config");
-			prop.load(is);
-			is.close();
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-			return false;
-		} catch (IOException e) {
-			e.printStackTrace();
-			return false;
-		}
-		String path_unproc = prop.getProperty("path_unproc");
+		String path_unproc = ConfigProp.getPropertyValue("autoccsv.config", "path_unproc");
 		File newFile = new File(path_unproc + file_name);
 	    try {
 			preamble += FileUtils.readFileToString(newFile, "UTF-8");
@@ -399,20 +361,15 @@ public class AutoAnnotator extends Controller {
 	    return false;
 	}
     
-    public static Result moveCSVFile(String file_name) {
-    	Properties prop = new Properties();
-		try {
-			InputStream is = LoadKB.class.getClassLoader().getResourceAsStream("autoccsv.config");
-			prop.load(is);
-			is.close();
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+    public static Result moveCSVFile(String file_name) {		
+		String path_proc = ConfigProp.getPropertyValue("autoccsv.config", "path_proc");
+		String path_unproc = ConfigProp.getPropertyValue("autoccsv.config", "path_unproc");
 		
-		String path_proc = prop.getProperty("path_proc");
-		String path_unproc = prop.getProperty("path_unproc");
+		final SysUser user = AuthApplication.getLocalUser(session());
+		CSVFile csvFile = CSVFile.findByName(user.getEmail(), file_name);
+		csvFile.delete();
+		csvFile.setProcessStatus(false);
+		csvFile.save();
 		
 		File destFolder = new File(path_unproc);
 		if (!destFolder.exists()){
@@ -424,24 +381,13 @@ public class AutoAnnotator extends Controller {
 		return redirect(routes.AutoAnnotator.index());
     }
     
-    public static Result downloadCSVFile(String file_name, boolean isProcessed) {
-    	Properties prop = new Properties();
-		try {
-			InputStream is = LoadKB.class.getClassLoader().getResourceAsStream("autoccsv.config");
-			prop.load(is);
-			is.close();
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		
+    public static Result downloadCSVFile(String file_name, boolean isProcessed) {		
 		String path = ""; 
 		if(isProcessed){
-			path = prop.getProperty("path_proc");
+			path = ConfigProp.getPropertyValue("autoccsv.config", "path_proc");
 		}
 		else{
-			path = prop.getProperty("path_unproc");
+			path = ConfigProp.getPropertyValue("autoccsv.config", "path_unproc");
 		}
 		
 		return ok(new File(path + "/" + file_name));
@@ -454,23 +400,16 @@ public class AutoAnnotator extends Controller {
     public static Result deleteCSVFile(String file_name, boolean isProcessed) {
     	AnnotationLog.delete(file_name);
     	
-    	Properties prop = new Properties();
-		try {
-			InputStream is = LoadKB.class.getClassLoader().getResourceAsStream("autoccsv.config");
-			prop.load(is);
-			is.close();
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		
+    	final SysUser user = AuthApplication.getLocalUser(session());
+		CSVFile csvFile = CSVFile.findByName(user.getEmail(), file_name);
+		csvFile.delete();
+
 		String path = "";
 		if(isProcessed){
-			path = prop.getProperty("path_proc");
+			path = ConfigProp.getPropertyValue("autoccsv.config", "path_proc");
 		}
 		else{
-			path = prop.getProperty("path_unproc");
+			path = ConfigProp.getPropertyValue("autoccsv.config", "path_unproc");
 		}
 		
 		File file = new File(path + "/" + file_name);
@@ -484,17 +423,7 @@ public class AutoAnnotator extends Controller {
     public static Result uploadCSVFile(String oper) {
     	System.out.println("uploadCSVFile CALLED!");
     	
-    	Properties prop = new Properties();
-		try {
-			InputStream is = LoadKB.class.getClassLoader().getResourceAsStream("autoccsv.config");
-			prop.load(is);
-			is.close();
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		String path = prop.getProperty("path_unproc");
+		String path = ConfigProp.getPropertyValue("autoccsv.config", "path_unproc");
 		
     	List<FilePart> fileParts = request().body().asMultipartFormData().getFiles();
     	for(FilePart filePart : fileParts) {
@@ -508,6 +437,13 @@ public class AutoAnnotator extends Controller {
         			byteFile = IOUtils.toByteArray(isFile);
         			FileUtils.writeByteArrayToFile(newFile, byteFile);
         			isFile.close();
+        			
+        			CSVFile csvFile = new CSVFile();
+        			csvFile.setFileName(filePart.getFilename());
+        			csvFile.setOwnerEmail(AuthApplication.getLocalUser(session()).getEmail());
+        			csvFile.setProcessStatus(false);
+        			csvFile.setUploadTime(new SimpleDateFormat("yyyy/MM/dd HH:mm:ss").format(new Date()));
+        			csvFile.save();
         		} catch (Exception e) {
         			e.printStackTrace();
         		}
@@ -517,3 +453,4 @@ public class AutoAnnotator extends Controller {
     	return redirect(routes.AutoAnnotator.index());
     }
 }
+

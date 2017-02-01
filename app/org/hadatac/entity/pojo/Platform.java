@@ -100,7 +100,8 @@ public class Platform implements Comparable<Platform> {
 		String queryString = "DESCRIBE <" + uri + ">";
 		Query query = QueryFactory.create(queryString);
 		QueryExecution qexec = QueryExecutionFactory.sparqlService(
-				Play.application().configuration().getString("hadatac.solr.triplestore") + "/store/sparql", query);
+				Play.application().configuration().getString("hadatac.solr.triplestore") 
+				+ Collections.METADATA_SPARQL, query);
 		model = qexec.execDescribe();
 		
 		platform = new Platform();

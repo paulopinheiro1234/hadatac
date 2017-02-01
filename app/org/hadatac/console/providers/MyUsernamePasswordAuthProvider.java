@@ -134,7 +134,7 @@ public class MyUsernamePasswordAuthProvider
 		
 		final SysUser u = SysUser.findByUsernamePasswordIdentity(authUser);
 		if (u != null) {
-			if (u.emailValidated) {
+			if (u.getEmailValidated()) {
 				// This user exists, has its email validated and is active
 				return SignupResult.USER_EXISTS;
 			} else {
@@ -152,7 +152,7 @@ public class MyUsernamePasswordAuthProvider
 		// if you return
 		// return SignupResult.USER_CREATED;
 		// then the user gets logged in directly
-		if (newUser.emailValidated == true) {
+		if (newUser.getEmailValidated() == true) {
 			return SignupResult.USER_CREATED;
 		}
 		return SignupResult.USER_CREATED_UNVERIFIED;
@@ -165,10 +165,10 @@ public class MyUsernamePasswordAuthProvider
 		if (u == null) {
 			return LoginResult.NOT_FOUND;
 		} else {
-			if (!u.emailValidated) {
+			if (!u.getEmailValidated()) {
 				return LoginResult.USER_UNVERIFIED;
 			} else {
-				for (final LinkedAccount acc : u.linkedAccounts) {
+				for (final LinkedAccount acc : u.getLinkedAccounts()) {
 					if (getKey().equals(acc.providerKey)) {
 						if (authUser.checkPassword(acc.providerUserId,
 								authUser.getPassword())) {
@@ -299,10 +299,10 @@ public class MyUsernamePasswordAuthProvider
 
 		final String html = getEmailTemplate(
 				"org.hadatac.console.views.html.account.email.password_reset", langCode, url,
-				token, user.name, user.email);
+				token, user.getName(), user.getEmail());
 		final String text = getEmailTemplate(
 				"org.hadatac.console.views.txt.account.email.password_reset", langCode, url, token,
-				user.name, user.email);
+				user.getName(), user.getEmail());
 
 		return new Body(text, html);
 	}
@@ -405,10 +405,10 @@ public class MyUsernamePasswordAuthProvider
 
 		final String html = getEmailTemplate(
 				"org.hadatac.console.views.html.account.email.verify_email", langCode, url, token,
-				user.name, user.email);
+				user.getName(), user.getEmail());
 		final String text = getEmailTemplate(
 				"org.hadatac.console.views.txt.account.email.verify_email", langCode, url, token,
-				user.name, user.email);
+				user.getName(), user.getEmail());
 
 		return new Body(text, html);
 	}
@@ -423,6 +423,6 @@ public class MyUsernamePasswordAuthProvider
 	}
 
 	private String getEmailName(final SysUser user) {
-		return getEmailName(user.email, user.name);
+		return getEmailName(user.getEmail(), user.getName());
 	}
 }

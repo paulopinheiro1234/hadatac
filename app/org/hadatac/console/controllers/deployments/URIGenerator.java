@@ -26,6 +26,7 @@ import play.mvc.Controller;
 import play.mvc.Result;
 
 import org.hadatac.console.views.html.deployments.*;
+import org.hadatac.utils.Collections;
 
 import be.objectify.deadbolt.java.actions.Group;
 import be.objectify.deadbolt.java.actions.Restrict;
@@ -50,7 +51,9 @@ public class URIGenerator extends Controller {
     }// /postIndex()
 
     public static long getNextId() {
-        SolrClient client = new HttpSolrClient(Play.application().configuration().getString("hadatac.solr.data") + "/uri_generator");
+        SolrClient client = new HttpSolrClient(
+        		Play.application().configuration().getString("hadatac.solr.data")
+        		+ Collections.URI_GENERATOR);
         SolrQuery parameters = new SolrQuery();
         parameters.set("q", "*:*");
         parameters.set("sort", "generated_id desc");

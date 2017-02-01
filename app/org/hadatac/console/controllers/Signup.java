@@ -87,7 +87,7 @@ public class Signup extends Controller {
 				final MyUsernamePasswordAuthProvider provider = MyUsernamePasswordAuthProvider
 						.getProvider();
 				// User exists
-				if (user.emailValidated) {
+				if (user.getEmailValidated()) {
 					provider.sendPasswordResetMailing(user, ctx());
 					// In case you actually want to let (the unknown person)
 					// know whether a user was found/an email was sent, use,
@@ -173,7 +173,7 @@ public class Signup extends Controller {
 						Messages.get("playauthenticate.reset_password.message.success.auto_login"));
 
 				return PlayAuthenticate.loginAndRedirect(ctx(),
-						new MyLoginUsernamePasswordAuthUser(u.email));
+						new MyLoginUsernamePasswordAuthUser(u.getEmail()));
 			} else {
 				// send the user to the login page
 				flash(AuthApplication.FLASH_MESSAGE_KEY,
@@ -199,7 +199,7 @@ public class Signup extends Controller {
 		if (ta == null) {
 			return badRequest(no_token_or_invalid.render());
 		}
-		final String email = ta.targetUser.email;
+		final String email = ta.targetUser.getEmail();
 		SysUser.verify(ta.targetUser);
 		flash(AuthApplication.FLASH_MESSAGE_KEY,
 				Messages.get("playauthenticate.verify_email.success", email));

@@ -340,7 +340,8 @@ public class Deployment {
 		String queryString = "DESCRIBE <" + deployment_uri + ">";
 		Query query = QueryFactory.create(queryString);
 		QueryExecution qexec = QueryExecutionFactory.sparqlService(
-				Play.application().configuration().getString("hadatac.solr.triplestore") + "/store/sparql", query);
+				Play.application().configuration().getString("hadatac.solr.triplestore") 
+				+ Collections.METADATA_SPARQL, query);
 		model = qexec.execDescribe();
 		
 		deployment = new Deployment();

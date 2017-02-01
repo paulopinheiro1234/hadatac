@@ -160,7 +160,8 @@ public class Instrument  implements Comparable<Instrument> {
 		String queryString = "DESCRIBE <" + uri + ">";
 		Query query = QueryFactory.create(queryString);
 		QueryExecution qexec = QueryExecutionFactory.sparqlService(
-				Play.application().configuration().getString("hadatac.solr.triplestore") + "/store/sparql", query);
+				Play.application().configuration().getString("hadatac.solr.triplestore") 
+				+ Collections.METADATA_SPARQL, query);
 		model = qexec.execDescribe();
 		
 		instrument = new Instrument();

@@ -27,6 +27,7 @@ import org.apache.solr.common.SolrDocumentList;
 import org.hadatac.console.controllers.AuthApplication;
 import org.hadatac.console.controllers.triplestore.UserManagement;
 import org.hadatac.console.models.SysUser;
+import org.hadatac.utils.Collections;
 import org.hadatac.utils.NameSpaces;
 import org.hadatac.utils.State;
 import org.joda.time.DateTime;
@@ -429,7 +430,9 @@ public class DataAcquisition {
 	
 	public int save() {
 		try {
-			SolrClient client = new HttpSolrClient(Play.application().configuration().getString("hadatac.solr.data") + "/sdc");
+			SolrClient client = new HttpSolrClient(
+					Play.application().configuration().getString("hadatac.solr.data") 
+					+ Collections.DATA_COLLECTION);
 			if (null == endedAt) {
 				endedAt = DateTime.parse("9999-12-31T23:59:59.999Z");
 			}
@@ -521,7 +524,9 @@ public class DataAcquisition {
 		
 		System.out.println("owner:");
 		System.out.println(ownerUri);
-		SolrClient solr = new HttpSolrClient(Play.application().configuration().getString("hadatac.solr.data") + "/sdc");
+		SolrClient solr = new HttpSolrClient(
+				Play.application().configuration().getString("hadatac.solr.data") 
+				+ Collections.DATA_COLLECTION);
 		SolrQuery query = new SolrQuery();
 		if (state.getCurrent() == State.ALL) {
 			query.set("q", "owner_uri:\"" + ownerUri + "\"");
@@ -582,7 +587,9 @@ public class DataAcquisition {
 	
 	public static List<DataAcquisition> findAll() {
 		List<DataAcquisition> list = new ArrayList<DataAcquisition>();
-		SolrClient solr = new HttpSolrClient(Play.application().configuration().getString("hadatac.solr.data") + "/sdc");
+		SolrClient solr = new HttpSolrClient(
+				Play.application().configuration().getString("hadatac.solr.data") 
+				+ Collections.DATA_COLLECTION);
 		SolrQuery query = new SolrQuery();
 		query.set("q", "owner_uri:*");
 		query.set("sort", "started_at asc");
@@ -610,7 +617,9 @@ public class DataAcquisition {
 	public static List<DataAcquisition> find(String ownerUri) {
 		List<DataAcquisition> list = new ArrayList<DataAcquisition>();
 		
-		SolrClient solr = new HttpSolrClient(Play.application().configuration().getString("hadatac.solr.data") + "/sdc");
+		SolrClient solr = new HttpSolrClient(
+				Play.application().configuration().getString("hadatac.solr.data") 
+				+ Collections.DATA_COLLECTION);
 		SolrQuery query = new SolrQuery();
 		query.set("q", "owner_uri:\"" + ownerUri + "\"");
 		query.set("sort", "started_at asc");
@@ -634,7 +643,9 @@ public class DataAcquisition {
 	}
 	
 	public static DataAcquisition findByUri(String dataCollectionUri) {
-		SolrClient solr = new HttpSolrClient(Play.application().configuration().getString("hadatac.solr.data") + "/sdc");
+		SolrClient solr = new HttpSolrClient(
+				Play.application().configuration().getString("hadatac.solr.data") 
+				+ Collections.DATA_COLLECTION);
 		SolrQuery query = new SolrQuery();
 		query.set("q", "uri:\"" + dataCollectionUri + "\"");
 		query.set("sort", "started_at asc");
@@ -666,7 +677,9 @@ public class DataAcquisition {
 			while (i.hasNext()) {
 				Measurement.delete(i.next());
 			}
-			SolrClient solr = new HttpSolrClient(Play.application().configuration().getString("hadatac.solr.data") + "/sdc");
+			SolrClient solr = new HttpSolrClient(
+					Play.application().configuration().getString("hadatac.solr.data") 
+					+ Collections.DATA_COLLECTION);
 			UpdateResponse response = solr.deleteById(this.uri);
 			solr.commit();
 			solr.close();
@@ -683,7 +696,9 @@ public class DataAcquisition {
 	}
 	
 	public static List<DataAcquisition> find(Deployment deployment, boolean active) {
-		SolrClient solr = new HttpSolrClient(Play.application().configuration().getString("hadatac.solr.data") + "/sdc");
+		SolrClient solr = new HttpSolrClient(
+				Play.application().configuration().getString("hadatac.solr.data") 
+				+ Collections.DATA_COLLECTION);
 		SolrQuery query = new SolrQuery();
 		query.set("q", "deployment_uri:\"" + deployment.getUri() + "\"");
 		query.set("sort", "started_at desc");
