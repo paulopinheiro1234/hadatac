@@ -21,6 +21,7 @@ import org.apache.jena.query.ResultSetFactory;
 import org.apache.jena.query.ResultSetRewindable;
 import org.apache.jena.sparql.engine.http.QueryExceptionHTTP;
 import org.hadatac.console.controllers.AuthApplication;
+import org.hadatac.console.controllers.metadata.DynamicFunctions;
 import org.hadatac.console.controllers.triplestore.UserManagement;
 import org.hadatac.console.models.SysUser;
 import org.hadatac.utils.Collections;
@@ -139,7 +140,7 @@ public class ViewStudy extends Controller {
 				while (resultsrwIndvInd.hasNext()) {
 					QuerySolution soln = resultsrwIndvInd.next();
 					System.out.println("Solution: " + soln);
-					indicatorUris.put(soln.get("label").toString(), soln.get("uri").toString());
+					indicatorUris.put(soln.get("label").toString(), DynamicFunctions.replaceURLWithPrefix(soln.get("uri").toString()));
 				}
 			} catch (QueryExceptionHTTP e) {
 				e.printStackTrace();
@@ -220,9 +221,9 @@ public class ViewStudy extends Controller {
 				QuerySolution soln = resultsrw.next();
 				values = new ArrayList<String>();
 				values.add("Label: " + soln.get("subjectLabel").toString());
-				values.add("Type: " + cellProc.replaceNameSpaceEx(soln.get("subjectType").toString()));
-				values.add("Cohort: " + soln.get("cohortLabel").toString());
-				values.add("Study: " + soln.get("studyLabel").toString());
+		//		values.add("Type: " + cellProc.replaceNameSpaceEx(soln.get("subjectType").toString()));
+		//		values.add("Cohort: " + soln.get("cohortLabel").toString());
+		//		values.add("Study: " + soln.get("studyLabel").toString());
 				subjectResult.put(cellProc.replaceNameSpaceEx(soln.get("subjectUri").toString()) ,values);		
 			}
 		} catch (QueryExceptionHTTP e) {
