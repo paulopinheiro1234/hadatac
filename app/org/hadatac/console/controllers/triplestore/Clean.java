@@ -47,19 +47,19 @@ public class Clean extends Controller {
 	    		                  false);
     		result = permission.clean(Feedback.WEB);
     		
-//    		DataContext userCollection = new 
-//    				DataContext("user", 
-//   	    		             	"password",
-//   	    		             	Play.application().configuration().getString("hadatac.solr.users"), 
-//   	    		             	false);
-//       		result = userCollection.cleanDataUsers(Feedback.WEB);
-//       		
-//       		DataContext linkedCollection = new 
-//       				DataContext("user", 
-//      	    		            "password",
-//      	    		            Play.application().configuration().getString("hadatac.solr.data"), 
-//      	    		            false);
-//          	result = linkedCollection.cleanDataAccounts(Feedback.WEB);
+    		DataContext userCollection = new 
+    				DataContext("user", 
+   	    		             	"password",
+   	    		             	Play.application().configuration().getString("hadatac.solr.users"), 
+   	    		             	false);
+       		result = userCollection.cleanDataUsers(Feedback.WEB);
+       		
+       		DataContext linkedCollection = new 
+       				DataContext("user", 
+      	    		            "password",
+      	    		            Play.application().configuration().getString("hadatac.solr.data"), 
+      	    		            false);
+          	result = linkedCollection.cleanDataAccounts(Feedback.WEB);
     	} else if (oper.equals("collections")) {
     		NameSpaces.getInstance();
     		DataContext collection = new 
