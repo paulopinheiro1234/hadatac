@@ -1,0 +1,58 @@
+@(assignOwnerForm: Form[org.hadatac.console.models.AssignOwnerForm],
+  selectedFile: String, 
+  theUsers   : List[org.hadatac.entity.pojo.User])
+
+@import helper._
+@import org.hadatac.utils._
+@import org.hadatac.console.views.html._
+@import org.hadatac.console.views.html.triplestore._
+@import org.hadatac.console.controllers.triplestore._
+@import org.hadatac.console.controllers._
+
+@main("Assign Owner") {
+
+<script type="text/javascript">
+   function checkform() {
+      var f = document.forms["assignOwner"].elements;
+      var cansubmit = true;
+
+      if (document.getElementById('user').value.length == 0) {
+         cansubmit = false;
+      }
+         
+      if (cansubmit) {
+          document.getElementById('submitbutton').disabled = false;
+      } else {
+          document.getElementById('submitbutton').disabled = 'disabled';
+      }
+   }
+</script>
+
+  <div class="container">
+    <h2>Assign Owner</h2>
+
+    <form class="form-horizontal" name="assignOwner" method="post" action="@org.hadatac.console.controllers.triplestore.routes.FileManagement.processForm(selectedFile)">
+
+    <div class="form-group">
+		 <label>Selected File</label> <br>
+		 @selectedFile <br>
+		 <br>
+         <label>New Owner</label> 
+         <select  class="form-control col-sm-6" id="user" name="user" onchange="checkform()" >
+            <option value=""></option>         
+
+            @for(user <- theUsers) {
+                <option value="@user.getEmail()">@user.getEmail()</option>
+            }
+         </select>
+     </div>
+          
+      <div class="form-group" class="col-sm-6 col-offset-3">
+          <input class="btn btn-success" role="button" id="submitbutton" type="submit" value="Assign Owner" disabled="disabled" />
+      </div>
+      
+   </form>    
+</div>
+
+
+}

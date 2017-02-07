@@ -206,6 +206,11 @@ GET    	/hadatac/ts/synclabkey/loadacquisition     org.hadatac.console.controlle
 POST    /hadatac/ts/synclabkey/loadacquisition     org.hadatac.console.controllers.triplestore.LoadKB.playLoadLabkeyDataAcquisition(oper: String, content: String, folder: String, list_names: java.util.List[String], auth: org.hadatac.console.models.LabKeyLoginForm)
 GET    	/hadatac/ts/synclabkey/difftool			   org.hadatac.console.controllers.triplestore.DiffTool.index(auth: org.hadatac.console.models.LabKeyLoginForm, list_names: java.util.List[String])
 POST    /hadatac/ts/synclabkey/difftool			   org.hadatac.console.controllers.triplestore.DiffTool.postIndex(auth: org.hadatac.console.models.LabKeyLoginForm, list_names: java.util.List[String])
+GET	    /hadatac/ts/file		    	           org.hadatac.console.controllers.triplestore.FileManagement.index()
+POST	/hadatac/ts/file     	            	   org.hadatac.console.controllers.triplestore.FileManagement.postIndex()
+GET	    /hadatac/ts/file/owner		    	       org.hadatac.console.controllers.triplestore.FileManagement.assignFileOwner(file: String)
+POST	/hadatac/ts/file/owner     	               org.hadatac.console.controllers.triplestore.FileManagement.postAssignFileOwner(file: String)
+POST	/hadatac/ts/file/owner/form     	       org.hadatac.console.controllers.triplestore.FileManagement.processForm(file : String)
 
 # Permissions store management URLs
 GET     /hadatac/perm/onlinepreregister            org.hadatac.console.controllers.triplestore.UserManagement.onLinePreRegistration(oper: String)
