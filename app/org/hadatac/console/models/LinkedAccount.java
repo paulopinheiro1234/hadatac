@@ -1,5 +1,6 @@
 package org.hadatac.console.models;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -7,12 +8,15 @@ import java.util.UUID;
 
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrQuery;
+import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.beans.Field;
 import org.apache.solr.client.solrj.impl.HttpSolrClient;
 import org.apache.solr.client.solrj.response.QueryResponse;
+import org.apache.solr.client.solrj.response.UpdateResponse;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
 import org.hadatac.utils.Collections;
+import org.noggit.JSONUtil;
 
 import play.Play;
 
@@ -30,13 +34,13 @@ public class LinkedAccount {
 	@Field("id")
 	public String id_s;
 
-	public SysUser user;
-
 	@Field("provider_user_id")
 	public String providerUserId;
 	
 	@Field("provider_key")
 	public String providerKey;
+	
+	public SysUser user;
 	
 	public String getUserId() {
 		return user.getId();
@@ -97,6 +101,25 @@ public class LinkedAccount {
     	
     	return accounts;
 	}
+	
+	public static String outputAsJson() {
+		SolrClient solrClient = new HttpSolrClient(
+				Play.application().configuration().getString("hadatac.solr.users")
+				+ Collections.AUTHENTICATE_ACCOUNTS);
+		String query = "*:*";
+    	SolrQuery solrQuery = new SolrQuery(query);
+    	
+    	try {
+			QueryResponse queryResponse = solrClient.query(solrQuery);
+			solrClient.close();
+			SolrDocumentList docs = queryResponse.getResults();
+			return JSONUtil.toJSON(docs);
+		} catch (Exception e) {
+			System.out.println("[ERROR] SysUser.outputAsJson - Exception message: " + e.getMessage());
+		}
+    	
+    	return "";
+	}
 
 	public static LinkedAccount create(final AuthUser authUser) {
 		final LinkedAccount ret = new LinkedAccount();
@@ -130,6 +153,26 @@ public class LinkedAccount {
 		} catch (Exception e) {
 			System.out.println("[ERROR] LinkedAccount.save - Exception message: " + e.getMessage());
 		}
+	}
+	
+	public int delete() {
+		try {
+			SolrClient solr = new HttpSolrClient(
+					Play.application().configuration().getString("hadatac.solr.users") 
+					+ Collections.AUTHENTICATE_ACCOUNTS);
+			UpdateResponse response = solr.deleteById(this.id_s);
+			solr.commit();
+			solr.close();
+			return response.getStatus();
+		} catch (SolrServerException e) {
+			System.out.println("[ERROR] LinkedAccount.delete() - SolrServerException message: " + e.getMessage());
+		} catch (IOException e) {
+			System.out.println("[ERROR] LinkedAccount.delete() - IOException message: " + e.getMessage());
+		} catch (Exception e) {
+			System.out.println("[ERROR] LinkedAccount.delete() - Exception message: " + e.getMessage());
+		}
+		
+		return -1;
 	}
 	
 	private static LinkedAccount convertSolrDocumentToLinkedAccount(SolrDocument doc) {

@@ -3,6 +3,7 @@ package org.hadatac.console.controllers.triplestore;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
@@ -21,6 +22,11 @@ import play.mvc.Http.MultipartFormData.FilePart;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.StringEntity;
+import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.riot.RDFDataMgr;
 import org.hadatac.console.controllers.AuthApplication;
@@ -28,6 +34,7 @@ import org.hadatac.console.providers.MyUsernamePasswordAuthProvider;
 import org.hadatac.console.http.PermissionQueries;
 import org.hadatac.console.models.UserPreRegistrationForm;
 import org.hadatac.console.models.GroupRegistrationForm;
+import org.hadatac.console.models.LinkedAccount;
 import org.hadatac.console.models.SparqlQueryResults;
 import org.hadatac.console.models.TripleDocument;
 import org.hadatac.console.views.html.triplestore.*;
@@ -38,8 +45,12 @@ import org.hadatac.metadata.loader.PermissionsContext;
 import org.hadatac.metadata.loader.RDFContext;
 import org.hadatac.metadata.loader.SpreadsheetProcessing;
 import org.hadatac.metadata.loader.ValueCellProcessing;
+import org.hadatac.utils.Collections;
 import org.hadatac.utils.Feedback;
 import org.hadatac.utils.NameSpaces;
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+import org.json.simple.JSONValue;
 
 import be.objectify.deadbolt.java.actions.Group;
 import be.objectify.deadbolt.java.actions.Restrict;
@@ -48,6 +59,7 @@ public class UserManagement extends Controller {
 
 	private static final String UPLOAD_NAME = "tmp/uploads/users-spreadsheet.xls";
 	private static final String UPLOAD_NAME_TTL = "tmp/uploads/user-graph.ttl";
+	private static final String UPLOAD_NAME_JSON = "tmp/uploads/user-auth.json";
 	
 	public static String getSpreadSheetPath(){
 		return UPLOAD_NAME;
@@ -55,6 +67,10 @@ public class UserManagement extends Controller {
 	
 	public static String getTurtlePath(){
 		return UPLOAD_NAME_TTL;
+	}
+	
+	public static String getJsonPath(){
+		return UPLOAD_NAME_JSON;
 	}
 
 	@Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
@@ -197,6 +213,75 @@ public class UserManagement extends Controller {
 	@Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
     public static Result postDeleteUser(String user_uri, boolean deleteAuth, boolean deleteMember) {
     	return deleteUser(user_uri, deleteAuth, deleteMember);
+    }
+	
+	@Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
+    public static Result backupUserAuthentication() {
+		JSONArray sys_user = (JSONArray) JSONValue.parse(SysUser.outputAsJson());
+		for (int i = 0; i < sys_user.size(); i++) {
+			((JSONObject)sys_user.get(i)).remove("_version_");
+		}
+		JSONArray linked_account = (JSONArray) JSONValue.parse(LinkedAccount.outputAsJson());
+		for (int i = 0; i < linked_account.size(); i++) {
+			((JSONObject)linked_account.get(i)).remove("_version_");
+		}
+		HashMap<String,Object> combined = new HashMap<String,Object>();
+		combined.put("sys_user", sys_user);
+		combined.put("linked_account", linked_account);
+		File ret_file = new File(getJsonPath());
+		try {
+			FileUtils.writeStringToFile(ret_file, new JSONObject(combined).toJSONString());
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
+		return ok(ret_file);
+    }
+	
+	private static boolean commitJsonDataToSolr(String solrCollection, String content) {
+		try {
+			HttpClient httpClient = HttpClientBuilder.create().build();
+		    HttpPost post = new HttpPost(solrCollection + "/update?commit=true");
+		    StringEntity entity  = new StringEntity(content, "UTF-8");
+		    entity.setContentType("application/json");
+		    post.setEntity(entity);
+		    HttpResponse response = httpClient.execute(post);
+		    System.out.println("Status: " + response.getStatusLine().getStatusCode());
+		    if (200 == response.getStatusLine().getStatusCode()) {
+		    	return true;
+		    }
+		} catch (IOException e) {
+		    e.printStackTrace();
+		} catch (Exception e) {
+		    e.printStackTrace();
+		}
+		
+		return false;
+	}
+	
+	@Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
+	public static String recoverUserAuthentication() {
+		System.out.println("Recovering User Authentication ...");
+		try {
+			JSONObject combined = (JSONObject) JSONValue.parse(new FileReader(UPLOAD_NAME_JSON));
+			if (!commitJsonDataToSolr(Play.application().configuration().getString("hadatac.solr.users") 
+					+ Collections.AUTHENTICATE_USERS, combined.get("sys_user").toString())) {
+				return "Failed to recover user authentications! ";
+			}
+			if (!commitJsonDataToSolr(Play.application().configuration().getString("hadatac.solr.users") 
+					+ Collections.AUTHENTICATE_ACCOUNTS, combined.get("linked_account").toString())) {
+				return "Failed to recover user authentications! ";
+			}
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		}
+		
+		return "Successfully recovered user authentications! ";
+	}
+
+	@Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
+    public static Result postBackupUserAuthentication() {
+    	return backupUserAuthentication();
     }
 	
 	@Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
@@ -430,6 +515,9 @@ public class UserManagement extends Controller {
 			else if(file_type.equals("ttl")){
 				file_name = UPLOAD_NAME_TTL;
 			}
+			else if(file_type.equals("json")){
+				file_name = UPLOAD_NAME_JSON;
+			}
 			File newFile = new File(file_name);
 			InputStream fileInputStream;
 			try {
@@ -440,10 +528,15 @@ public class UserManagement extends Controller {
 			} catch (Exception e) {
 				return ok (users.render("fail", "Could not find uploaded file", User.find(), UserGroup.find(), ""));
 			}
-			if(file_type.equals("ttl")){
+			if(file_type.equals("ttl")) {
+				System.out.println("Uploaded turtle file!");
 				return ok(users.render("loaded", "File uploaded successfully.", User.find(), UserGroup.find(), "turtle"));
 			}
-			else{
+			else if(file_type.equals("json")) {
+				System.out.println("Uploaded json file!");
+				return ok(users.render("loaded", "File uploaded successfully.", User.find(), UserGroup.find(), "json"));
+			}
+			else {
 				return ok(users.render("loaded", "File uploaded successfully.", User.find(), UserGroup.find(), "batch"));
 			}
 		}
@@ -469,6 +562,7 @@ public class UserManagement extends Controller {
 		System.out.println("Email: " + email);
 		String json = PermissionQueries.exec(PermissionQueries.PERMISSION_BY_EMAIL, email);
 		SparqlQueryResults results = new SparqlQueryResults(json, false);
+		System.out.println("Initialize sparql query results!");
 		if (results == null
 			|| results.sparqlResults == null
 			|| !results.sparqlResults.values().iterator().hasNext()){
@@ -476,6 +570,8 @@ public class UserManagement extends Controller {
 		}
 		TripleDocument docPermission = results.sparqlResults.values().iterator().next();
 		String uri = docPermission.get("uri");
+		System.out.println(uri);
+		
 		return uri;
 	}
 }

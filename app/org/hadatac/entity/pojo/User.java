@@ -30,6 +30,7 @@ import org.apache.jena.update.UpdateFactory;
 import org.apache.jena.update.UpdateProcessor;
 import org.apache.jena.update.UpdateRequest;
 import org.hadatac.console.controllers.triplestore.UserManagement;
+import org.hadatac.console.models.LinkedAccount;
 import org.hadatac.console.models.SysUser;
 import org.hadatac.utils.Collections;
 import org.hadatac.utils.NameSpaces;
@@ -361,6 +362,9 @@ public class User implements Comparable<User> {
 			if(null != user){
 				SysUser sys_user = SysUser.findByEmail(user.getEmail());
 				if(null != sys_user){
+					for (LinkedAccount acc : LinkedAccount.findByIdSolr(sys_user)) {
+						acc.delete();
+					}
 					sys_user.delete();
 				}
 			}

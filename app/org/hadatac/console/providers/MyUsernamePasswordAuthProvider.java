@@ -146,7 +146,6 @@ public class MyUsernamePasswordAuthProvider
 		// The user either does not exist or is inactive - create a new one
 		String userUri = UserManagement.getUriByEmail(authUser.getEmail());
 		
-		@SuppressWarnings("unused")
 		final SysUser newUser = SysUser.create(authUser, userUri);
 		// Usually the email should be verified before allowing login, however
 		// if you return

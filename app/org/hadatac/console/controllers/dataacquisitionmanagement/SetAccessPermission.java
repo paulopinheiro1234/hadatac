@@ -24,6 +24,7 @@ import org.hadatac.entity.pojo.DataAcquisition;
 import org.hadatac.entity.pojo.HADataC;
 import org.hadatac.entity.pojo.Measurement;
 import org.hadatac.entity.pojo.User;
+import org.hadatac.entity.pojo.UserGroup;
 
 import be.objectify.deadbolt.java.actions.Group;
 import be.objectify.deadbolt.java.actions.Restrict;
@@ -60,7 +61,10 @@ public class SetAccessPermission extends Controller {
     			if(user.getUri() != dc.getPermissionUri()){
         			nameList.put(user.getUri(), user.getName());
         		}
-    			user.getGroupNames(nameList);
+    			List<User> groups = UserGroup.find();
+    			for (User group : groups) {
+    				nameList.put(group.getUri(), group.getName());
+    			}
     		}
     		System.out.println("name list: " + nameList);
     		

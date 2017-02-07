@@ -31,6 +31,7 @@ import org.joda.time.DateTimeZone;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 import org.joda.time.format.ISODateTimeFormat;
+import org.noggit.JSONUtil;
 
 import java.io.IOException;
 import java.util.*;
@@ -74,10 +75,8 @@ public class SysUser implements Subject {
 	@Field("last_name")
 	private String lastName;
 
-	@Formats.DateTime(pattern = "yyyy-MM-dd HH:mm:ss")
-	private Date lastLogin;
-	
-	public DateTime lastLogin_j;
+	@Field("last_login")
+	private String lastLogin;
 
 	@Field("active")
 	private boolean active;
@@ -85,6 +84,8 @@ public class SysUser implements Subject {
 	@Field("email_validated")
 	private boolean emailValidated;
 
+	private DateTime lastLogin_j;
+	
 	private List<SecurityRole> roles;
 
 	private List<LinkedAccount> linkedAccounts;
@@ -142,7 +143,6 @@ public class SysUser implements Subject {
 		return formatter.withZone(DateTimeZone.UTC).print(this.lastLogin_j);
 	}
 	
-	@Field("last_login")
 	public void setLastLogin(String lastLogin) {
 		DateTimeFormatter formatter = DateTimeFormat.forPattern("EEE MMM dd HH:mm:ss zzz yyyy");
 		lastLogin_j = formatter.parseDateTime(lastLogin);
@@ -394,7 +394,7 @@ public class SysUser implements Subject {
 				.findByRoleNameSolr(org.hadatac.console.controllers.AuthApplication.DATA_OWNER_ROLE));
 		sys_user.permissions = new ArrayList<UserPermission>();
 		sys_user.active = true;
-		sys_user.lastLogin = new Date();
+		sys_user.lastLogin = (new Date()).toString();
 		sys_user.linkedAccounts = java.util.Collections.singletonList(LinkedAccount
 				.create(authUser));
 
@@ -490,7 +490,7 @@ public class SysUser implements Subject {
 				.findByRoleNameSolr(org.hadatac.console.controllers.AuthApplication.DATA_OWNER_ROLE));
 		sys_user.permissions = new ArrayList<UserPermission>();
 		sys_user.active = true;
-		sys_user.lastLogin = new Date();
+		sys_user.lastLogin = (new Date()).toString();
 		sys_user.linkedAccounts = java.util.Collections.singletonList(LinkedAccount
 				.create(authUser));
 
@@ -610,7 +610,7 @@ public class SysUser implements Subject {
 
 	public static void setLastLoginDate(final AuthUser knownUser) {
 		final SysUser u = SysUser.findByAuthUserIdentity(knownUser);
-		u.lastLogin = new Date();
+		u.lastLogin = (new Date()).toString();
 		u.save();
 	}
 
@@ -660,6 +660,25 @@ public class SysUser implements Subject {
 		}
     	
     	return users;
+	}
+	
+	public static String outputAsJson() {
+		SolrClient solrClient = new HttpSolrClient(
+				Play.application().configuration().getString("hadatac.solr.users") 
+				+ Collections.AUTHENTICATE_USERS);
+		String query = "*:*";
+    	SolrQuery solrQuery = new SolrQuery(query);
+    	
+    	try {
+			QueryResponse queryResponse = solrClient.query(solrQuery);
+			solrClient.close();
+			SolrDocumentList docs = queryResponse.getResults();
+			return JSONUtil.toJSON(docs);
+		} catch (Exception e) {
+			System.out.println("[ERROR] SysUser.outputAsJson - Exception message: " + e.getMessage());
+		}
+    	
+    	return "";
 	}
 
 	public LinkedAccount getAccountByProvider(final String providerKey) {
@@ -719,8 +738,12 @@ public class SysUser implements Subject {
 		user.name = doc.getFieldValue("name").toString();
 		user.firstName = doc.getFieldValue("first_name").toString();
 		user.lastName = doc.getFieldValue("last_name").toString();
-		DateTime date = new DateTime((Date)doc.getFieldValue("last_login"));
-		user.setLastLogin(date.withZone(DateTimeZone.UTC).toString("EEE MMM dd HH:mm:ss zzz yyyy"));
+		if (null == doc.getFieldValue("last_login")) {
+			user.setLastLogin((new Date()).toString());
+		}
+		else {
+			user.setLastLogin(doc.getFieldValue("last_login").toString());
+		}
 		user.active = Boolean.parseBoolean(doc.getFieldValue("active").toString());
 		user.emailValidated = Boolean.parseBoolean(doc.getFieldValue("email_validated").toString());
 		

@@ -23,6 +23,11 @@
                 document.getElementById('submitMessage2').style.display = 'inline';
 		    }
 	    }
+	    function checkform3() {
+	    	if(document.getElementById('upload3').value != "") {
+                document.getElementById('submitMessage3').style.display = 'inline';
+		    }
+	    }
      </script>
 
     <div class="container-fluid">
@@ -51,13 +56,19 @@
                           <form name="fileUploadForm" id='upload1' method="POST" enctype="multipart/form-data" action="@org.hadatac.console.controllers.triplestore.routes.UserManagement.uploadFile("xls")" onchange='checkform1()' >
                              <b>Batch User Pre-Registration</b> <input type="file" class="btn btn-info" name="pic">
                              <div id='submitMessage1'  style="display:none;" >
-                                 <input type="submit" class="btn btn-success" value="Parse and Load Users">
+                                 <input type="submit" class="btn btn-success" value="Parse and Load">
                              </div>
                           </form>
                           <form name="fileUploadForm" id='upload2' method="POST" enctype="multipart/form-data" action="@org.hadatac.console.controllers.triplestore.routes.UserManagement.uploadFile("ttl")" onchange="checkform2()">
                      		 <b>Load User Graph from turtle</b> <input type="file" class="btn btn-info" name="pic"> 
                      		 <div id='submitMessage2'  style="display:none;" >
-                        		 <input type="submit" class="btn-sm btn-success" value="Parse and Load Users">
+                        		 <input type="submit" class="btn-sm btn-success" value="Parse and Load">
+	                 		 </div>
+                 	  	  </form>
+                 	  	  <form name="fileUploadForm" id='upload3' method="POST" enctype="multipart/form-data" action="@org.hadatac.console.controllers.triplestore.routes.UserManagement.uploadFile("json")" onchange="checkform3()">
+                     		 <b>Load User Authentication from json</b> <input type="file" class="btn btn-info" name="pic"> 
+                     		 <div id='submitMessage3'  style="display:none;" >
+                        		 <input type="submit" class="btn-sm btn-success" value="Parse and Load">
 	                 		 </div>
                  	  	  </form>
                       </div>
@@ -69,19 +80,18 @@
                  </div>
                  <div class="col-md-3 col-xs-2">
                       <a href="@org.hadatac.console.controllers.triplestore.routes.UserNetwork.index()" class="btn btn-block btn-primary" role="button">User Network</a>
+                      <a href="@org.hadatac.console.controllers.triplestore.routes.UserManagement.backupUserAuthentication()" class="btn btn-block btn-primary" role="button">Backup User Authentication</a>
                       <a href="@org.hadatac.console.controllers.triplestore.routes.UserManagement.backupUserGraph()" class="btn btn-block btn-primary" role="button">Backup User Graph</a>
                  </div>
  	        </div>
        }
 
-        <p  style='font-family: "Lucida Console", Monaco, monospace;' id='msgarea'></p>
-         
-        <div id="end-process-box" style="display:none;">
+     	@if(oper=="load_users") {
+     		<p  style='font-family: "Lucida Console", Monaco, monospace;' id='msgarea'></p>
+        	<div id="end-process-box" style="display:none;">
             <h4>Operation [User Pre-Registration] complete -- check the results above to see if the clean was successful.</h4>
             <a href="@org.hadatac.console.controllers.triplestore.routes.UserManagement.index("init")" class="btn btn-warning" role="button">Back to Manage Users</a>
-	    </div>
-
-     	@if(oper=="load_users") {
+	    	</div>
             <script> 
                 var msg = "@UserManagement.commitUserPreRegistration(source)";
                 $('#msgarea').html(msg.replace(/&lt;br&gt;/g, '<br>'));
@@ -90,6 +100,11 @@
         } 
         
         @if(oper=="load_groups") {
+        	<p  style='font-family: "Lucida Console", Monaco, monospace;' id='msgarea'></p>
+        	<div id="end-process-box" style="display:none;">
+            <h4>Operation [User Pre-Registration] complete -- check the results above to see if the clean was successful.</h4>
+            <a href="@org.hadatac.console.controllers.triplestore.routes.UserManagement.index("init")" class="btn btn-warning" role="button">Back to Manage Users</a>
+	    	</div>
             <script> 
                 var msg = "@UserManagement.commitGroupRegistration(source)";
                 $('#msgarea').html(msg.replace(/&lt;br&gt;/g, '<br>'));
@@ -174,6 +189,20 @@
     	<script> 
        		var msg = "@UserManagement.commitUserGraphRegistration()";
             $('#msgarea').html(msg.replace(/&lt;br&gt;/g, '<br>'));
+           	document.getElementById('end-process-box').style.display = 'inline';
+    	</script>
+	}
+	
+	@if(source=="json") {
+        <div id="end-process-box" style="display:none;">
+            <h4>Operation [Load User Authentication] complete </h4>
+            <p style='font-family: "Lucida Console", Monaco, monospace;' id='msgarea'></p>
+            <a href="@org.hadatac.console.controllers.triplestore.routes.UserManagement.index("init")" class="btn btn-warning" role="button">Back to Manage Users</a>
+	    </div>
+
+    	<script>
+       		var msg = "@UserManagement.recoverUserAuthentication()";
+       		$('#msgarea').html(msg.replace(/&lt;br&gt;/g, '<br>'));
            	document.getElementById('end-process-box').style.display = 'inline';
     	</script>
 	}
