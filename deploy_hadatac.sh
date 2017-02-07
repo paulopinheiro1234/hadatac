@@ -3,6 +3,12 @@ clear
 echo "=== HADataC - The Human-Aware Data Acquisition Framework - Deployment Script ==="
 echo ""
 
+# Make sure only root can run this script
+if [ "$(id -u)" != "0" ]; then
+   echo "This script must be run as root" 1>&2
+   exit 1
+fi
+
 read -r -p "Proceed with deployment? [y/N] " response
 case $response in
     [yY][eE][sS]|[yY]) 
@@ -47,13 +53,15 @@ echo "Checking out Latest Code from GitHub"
 echo ""
 git checkout -- conf/hadatac.conf
 git checkout -- conf/labkey.config
+git checkout -- conf/namespaces.properties
+git checkout -- conf/play-authenticate/smtp.conf conf/play-authenticate/
 git pull
 echo "Copying over config files"
 echo ""
 cp /data/conf/hadatac.conf conf/
-cp /data/conf/labkey.config conf/
+cp /data/conf/labkey.config conf/
+cp /data/namespaces.properties
 cp /data/conf/play-authenticate/smtp.conf conf/play-authenticate/
-rm -rf ~/.sbt/0.13
 echo "Creating Distribution File"
 echo ""
 sbt clean
