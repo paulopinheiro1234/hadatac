@@ -59,8 +59,8 @@ git pull
 echo "Copying over config files"
 echo ""
 cp /data/conf/hadatac.conf conf/
-cp /data/conf/labkey.config conf/
-cp /data/namespaces.properties
+cp /data/conf/labkey.config conf/
+cp /data/conf/namespaces.properties conf/
 cp /data/conf/play-authenticate/smtp.conf conf/play-authenticate/
 echo "Creating Distribution File"
 echo ""
