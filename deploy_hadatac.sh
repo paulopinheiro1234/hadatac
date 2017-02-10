@@ -43,12 +43,15 @@ service hadatac stop
 echo "Stopping Solr5 Service"
 echo ""
 sh ${SOLR_HOME}/run_solr5.sh stop
+echo ""
 echo "Stopping Blazegraph Service"
 echo ""
 service jetty8 stop
+echo ""
 echo "Changing to Hadatac Git Directory"
 echo ""
 cd ${GIT_HOME}
+echo ""
 echo "Checking out Latest Code from GitHub"
 echo ""
 git checkout -- conf/hadatac.conf
@@ -56,28 +59,37 @@ git checkout -- conf/labkey.config
 git checkout -- conf/namespaces.properties
 git checkout -- conf/play-authenticate/smtp.conf conf/play-authenticate/
 git pull
+echo ""
 echo "Copying over config files"
 echo ""
 cp /data/conf/hadatac.conf conf/
 cp /data/conf/labkey.config conf/
 cp /data/conf/namespaces.properties conf/
 cp /data/conf/play-authenticate/smtp.conf conf/play-authenticate/
+echo ""
 echo "Creating Distribution File"
 echo ""
 sbt clean
 sbt dist
+echo ""
 echo "Copy Distribution File to /data directory"
 echo ""
 cp ${GIT_HOME}/target/universal/hadatac-1.0-SNAPSHOT.zip /data/
+echo ""
 echo "Removing Old Distribution Folder"
 echo ""
 rm -rf /data/hadatac-1.0-SNAPSHOT
 cd /data/
+echo ""
 echo "Unzipping Current Distribution File"
 echo ""
 unzip hadatac-1.0-SNAPSHOT.zip
+echo ""
 echo "Starting Services"
 echo ""
 sh ${SOLR_HOME}/run_solr5.sh start
 service jetty8 start 
 service hadatac start
+echo ""
+echo "Deployment Complete"
+echo ""
