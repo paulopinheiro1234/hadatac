@@ -1,5 +1,6 @@
 package org.hadatac.console.http;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
@@ -30,10 +31,9 @@ public class SolrSearchProxy extends Controller {
 	}
 	
 	@Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-	public static Result getCurrentMeasurements(List<Measurement> lm) {
-		InputStream is = null;
-		is = (InputStream) lm.stream(); 
-		return ok(is);
+	public static Result getIndicatorValueDownload(String lm) {
+		File file = new File(lm);
+		return ok(file);
 	}
 	
 	@Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
@@ -51,13 +51,6 @@ public class SolrSearchProxy extends Controller {
         System.out.println(path);
         response().setContentType("text/csv");
         return getSolrSearch(path);
-    }
-	
-	@Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    public static Result getIndicatorValueDownload(List<Measurement> lm){
-
-        response().setContentType("text/csv");
-        return getCurrentMeasurements(lm);
     }
 	
 	@Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
