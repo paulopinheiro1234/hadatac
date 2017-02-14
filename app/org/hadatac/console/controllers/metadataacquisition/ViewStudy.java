@@ -140,7 +140,7 @@ public class ViewStudy extends Controller {
 				while (resultsrwIndvInd.hasNext()) {
 					QuerySolution soln = resultsrwIndvInd.next();
 					System.out.println("Solution: " + soln);
-					indicatorUris.put(soln.get("label").toString(), DynamicFunctions.replaceURLWithPrefix(soln.get("uri").toString()));
+					indicatorUris.put(soln.get("label").toString(), soln.get("uri").toString());
 				}
 			} catch (QueryExceptionHTTP e) {
 				e.printStackTrace();
