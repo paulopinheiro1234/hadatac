@@ -32,6 +32,11 @@ public class ViewValue extends Controller {
 		if (indicatorValueResults == null){
 			List<Measurement> indicatorValueResults2 = new ArrayList<Measurement>();
 			File indicator_detail_csv = new File("/data/indicatorDetails.csv");
+			try {
+	            FileUtils.writeStringToFile(indicator_detail_csv, "", false);
+	        } catch (IOException e) {
+	            e.printStackTrace();
+	        }
 	        try {
 	            FileUtils.writeStringToFile(indicator_detail_csv, "NULL");
 	        } catch (IOException e) {
@@ -42,6 +47,11 @@ public class ViewValue extends Controller {
 		}
 		else{
 			File indicator_detail_csv = new File("/data/indicatorDetails.csv");
+			try {
+	            FileUtils.writeStringToFile(indicator_detail_csv, "", false);
+	        } catch (IOException e) {
+	            e.printStackTrace();
+	        }
 			for(int i=0; i<indicatorValueResults.size(); i++){
 				List<String> temp_sentence = new ArrayList<String>();
 				temp_sentence.add(indicatorValueResults.get(i).getObjectUri().toString());
