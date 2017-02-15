@@ -236,8 +236,20 @@ public class TripleProcessing {
 				System.out.println(String.format("Processing data acquisition %s", uri));
 				
 				ValueCellProcessing cellProc = new ValueCellProcessing();
-				DataAcquisition dataAcquisition = new DataAcquisition();
-				dataAcquisition.setUri(cellProc.convertToWholeURI(uri));
+				String dataAcquisitionUri = cellProc.convertToWholeURI(uri);
+				DataAcquisition dataAcquisition = DataAcquisition.findByUri(dataAcquisitionUri);
+				if (null == dataAcquisition) {	
+					final SysUser user = AuthApplication.getLocalUser(Controller.session());
+					String ownerUri = UserManagement.getUriByEmail(user.getEmail());
+					System.out.println("User Email is: " + user.getEmail());
+					System.out.println("OwnerUri is: " + ownerUri);
+					dataAcquisition = new DataAcquisition();
+					dataAcquisition.setUri(dataAcquisitionUri);
+					dataAcquisition.setOwnerUri(ownerUri);
+					dataAcquisition.setPermissionUri(ownerUri);
+					dataAcquisition.setTriggeringEvent(TriggeringEvent.INITIAL_DEPLOYMENT);
+					dataAcquisition.setNumberDataPoints(0);
+				}
 				
 				for(PlainTriple triple : sheet.get(uri)){
 					String cellValue = triple.obj.trim();
@@ -268,16 +280,7 @@ public class TripleProcessing {
 						String deployment_uri = cellProc.convertToWholeURI(cellValue);
 						dataAcquisition.setDeploymentUri(deployment_uri);
 						
-						final SysUser user = AuthApplication.getLocalUser(Controller.session());
-						String ownerUri = UserManagement.getUriByEmail(user.getEmail());
-						System.out.println(user.getEmail());
-						System.out.println("OwnerUri is:");
-						System.out.println(ownerUri);
-						dataAcquisition.setOwnerUri(ownerUri);
-						
 						Deployment deployment = Deployment.find(deployment_uri);
-						dataAcquisition.setPermissionUri(ownerUri);
-						dataAcquisition.setTriggeringEvent(TriggeringEvent.INITIAL_DEPLOYMENT);
 						dataAcquisition.setPlatformUri(deployment.getPlatform().getUri());
 						dataAcquisition.setInstrumentUri(deployment.getInstrument().getUri());
 						dataAcquisition.setPlatformName(deployment.getPlatform().getLabel());
@@ -291,7 +294,6 @@ public class TripleProcessing {
 						dataAcquisition.setSchemaUri(cellProc.convertToWholeURI(cellValue));
 						System.out.println("+++++++++++++++++++++++++++++++++++++++++++++" + dataAcquisition.getSchemaUri());
 					}
-					dataAcquisition.setNumberDataPoints(0);
 					dataAcquisition.save();
 					System.out.println("Successfully saved in Solr");
 				}

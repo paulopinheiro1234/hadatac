@@ -520,41 +520,33 @@ public class DataAcquisition {
 	}
 	
 	public static List<DataAcquisition> find(String ownerUri, State state) {
-		List<DataAcquisition> list = new ArrayList<DataAcquisition>();
-		
-		System.out.println("owner:");
-		System.out.println(ownerUri);
-		SolrClient solr = new HttpSolrClient(
-				Play.application().configuration().getString("hadatac.solr.data") 
-				+ Collections.DATA_COLLECTION);
 		SolrQuery query = new SolrQuery();
 		if (state.getCurrent() == State.ALL) {
-			query.set("q", "owner_uri:\"" + ownerUri + "\"");
+			if (null == ownerUri) {
+				query.set("q", "owner_uri:*");
+			}
+			else {
+				query.set("q", "owner_uri:\"" + ownerUri + "\"");
+			}
 		} else if (state.getCurrent() == State.ACTIVE) {
-			query.set("q", "owner_uri:\"" + ownerUri + "\"" + " AND " + "ended_at:\"9999-12-31T23:59:59.999Z\"");
+			if (null == ownerUri) {
+				query.set("q", "owner_uri:* AND " + "ended_at:\"9999-12-31T23:59:59.999Z\"");
+			}
+			else {
+				query.set("q", "owner_uri:\"" + ownerUri + "\"" + " AND " + "ended_at:\"9999-12-31T23:59:59.999Z\"");
+			}
 		} else {  // it is assumed that state is CLOSED
-			query.set("q", "owner_uri:\"" + ownerUri + "\"" + " AND " + "-ended_at:\"9999-12-31T23:59:59.999Z\"");
+			if (null == ownerUri) {
+				query.set("q", "owner_uri:* AND " + "-ended_at:\"9999-12-31T23:59:59.999Z\"");
+			}
+			else {
+				query.set("q", "owner_uri:\"" + ownerUri + "\"" + " AND " + "-ended_at:\"9999-12-31T23:59:59.999Z\"");
+			}
 		}
 		query.set("sort", "started_at asc");
 		query.set("rows", "10000000");
 		
-		try {
-			QueryResponse response = solr.query(query);
-			solr.close();
-			SolrDocumentList results = response.getResults();
-			System.out.println(results.size());
-			Iterator<SolrDocument> i = results.iterator();
-			while (i.hasNext()) {
-				DataAcquisition dataCollection = convertFromSolr(i.next());
-				System.out.println("DataAcquisition added");
-				list.add(dataCollection);
-			}
-		} catch (Exception e) {
-			list.clear();
-			System.out.println("[ERROR] DataAcquisition.find(String) - Exception message: " + e.getMessage());
-		}
-		
-		return list;
+		return find(query);
 	}
 	
 	public static List<String> findAllAccessibleDataAcquisition(String user_uri){
@@ -586,84 +578,54 @@ public class DataAcquisition {
 	}
 	
 	public static List<DataAcquisition> findAll() {
-		List<DataAcquisition> list = new ArrayList<DataAcquisition>();
-		SolrClient solr = new HttpSolrClient(
-				Play.application().configuration().getString("hadatac.solr.data") 
-				+ Collections.DATA_COLLECTION);
 		SolrQuery query = new SolrQuery();
 		query.set("q", "owner_uri:*");
 		query.set("sort", "started_at asc");
 		query.set("rows", "10000000");
 		
-		try {
-			QueryResponse response = solr.query(query);
-			solr.close();
-			SolrDocumentList results = response.getResults();
-			System.out.println(results.size());
-			Iterator<SolrDocument> i = results.iterator();
-			while (i.hasNext()) {
-				DataAcquisition dataCollection = convertFromSolr(i.next());
-				System.out.println("DataAcquisition added");
-				list.add(dataCollection);
-			}
-		} catch (Exception e) {
-			list.clear();
-			System.out.println("[ERROR] DataAcquisition.find(String) - Exception message: " + e.getMessage());
-		}
-		
-		return list;
+		return find(query);
+	}
+	
+	public static List<DataAcquisition> findAll(State state) {
+		return find(null, state);
 	}
 	
 	public static List<DataAcquisition> find(String ownerUri) {
-		List<DataAcquisition> list = new ArrayList<DataAcquisition>();
-		
-		SolrClient solr = new HttpSolrClient(
-				Play.application().configuration().getString("hadatac.solr.data") 
-				+ Collections.DATA_COLLECTION);
 		SolrQuery query = new SolrQuery();
 		query.set("q", "owner_uri:\"" + ownerUri + "\"");
 		query.set("sort", "started_at asc");
 		query.set("rows", "10000000");
 		
-		try {
-			QueryResponse response = solr.query(query);
-			solr.close();
-			SolrDocumentList results = response.getResults();
-			Iterator<SolrDocument> i = results.iterator();
-			while (i.hasNext()) {
-				DataAcquisition dataCollection = convertFromSolr(i.next());
-				list.add(dataCollection);
-			}
-		} catch (Exception e) {
-			list.clear();
-			System.out.println("[ERROR] DataAcquisition.find(String) - Exception message: " + e.getMessage());
-		}
-		
-		return list;
+		return find(query);
 	}
 	
-	public static DataAcquisition findByUri(String dataCollectionUri) {
+	public static DataAcquisition findDataAcquisition(SolrQuery query) {
+		DataAcquisition dataAcquisition = null;
 		SolrClient solr = new HttpSolrClient(
 				Play.application().configuration().getString("hadatac.solr.data") 
 				+ Collections.DATA_COLLECTION);
-		SolrQuery query = new SolrQuery();
-		query.set("q", "uri:\"" + dataCollectionUri + "\"");
-		query.set("sort", "started_at asc");
-		query.set("rows", "10000000");
-		DataAcquisition dataCollection = null;
 		
 		try {
 			QueryResponse queryResponse = solr.query(query);
 			solr.close();
 			SolrDocumentList list = queryResponse.getResults();
 			if (list.size() == 1) {
-				dataCollection = convertFromSolr(list.get(0));
+				dataAcquisition = convertFromSolr(list.get(0));
 			}
 		} catch (Exception e) {
-			System.out.println("[ERROR] DataAcquisition.findByUri(dataCollectionUri) - Exception message: " + e.getMessage());
+			System.out.println("[ERROR] DataAcquisition.find(SolrQuery) - Exception message: " + e.getMessage());
 		}
 				
-		return dataCollection;
+		return dataAcquisition;
+	}
+	
+	public static DataAcquisition findByUri(String dataAcquisitionUri) {
+		SolrQuery query = new SolrQuery();
+		query.set("q", "uri:\"" + dataAcquisitionUri + "\"");
+		query.set("sort", "started_at asc");
+		query.set("rows", "10000000");
+
+		return findDataAcquisition(query);
 	}
 	
 	public int close(String endedAt) {
@@ -695,58 +657,54 @@ public class DataAcquisition {
 		return -1;
 	}
 	
-	public static List<DataAcquisition> find(Deployment deployment, boolean active) {
+	public static List<DataAcquisition> find(SolrQuery query) {
+		List<DataAcquisition> list = new ArrayList<DataAcquisition>();
+		
 		SolrClient solr = new HttpSolrClient(
 				Play.application().configuration().getString("hadatac.solr.data") 
 				+ Collections.DATA_COLLECTION);
-		SolrQuery query = new SolrQuery();
-		query.set("q", "deployment_uri:\"" + deployment.getUri() + "\"");
-		query.set("sort", "started_at desc");
-		query.set("rows", "10000000");
-		List<DataAcquisition> list = new ArrayList<DataAcquisition>();
-		
+
 		try {
-			QueryResponse queryResponse = solr.query(query);
+			QueryResponse response = solr.query(query);
 			solr.close();
-			SolrDocumentList results = queryResponse.getResults();
+			SolrDocumentList results = response.getResults();
 			Iterator<SolrDocument> i = results.iterator();
-			if (active == true) {
-				if (i.hasNext()) {
-					DataAcquisition dataCollection = convertFromSolr(i.next());
-					if (dataCollection.isFinished() == false) {
-						list.add(dataCollection);
-					}
-				}
-			} else {
-				while (i.hasNext()) {
-					list.add(convertFromSolr(i.next()));
-				}
+			while (i.hasNext()) {
+				DataAcquisition dataAcquisition = convertFromSolr(i.next());
+				list.add(dataAcquisition);
 			}
 		} catch (Exception e) {
-			System.out.println("[ERROR] DataAcquisition.find(Deployment, boolean) - Exception message: " + e.getMessage());
+			list.clear();
+			System.out.println("[ERROR] DataAcquisition.find(SolrQuery) - Exception message: " + e.getMessage());
 		}
 		
 		return list;
 	}
 	
-	public static DataAcquisition find(HADataC hadatac) {
-		SolrClient solr = new HttpSolrClient(hadatac.getDynamicMetadataURL());
-		SolrQuery query = new SolrQuery("uri:\"" + hadatac.getDataAcquisitionKbUri() + "\"");
-		System.out.println("uri:\"" + hadatac.getDataAcquisitionKbUri() + "\"");
-		DataAcquisition dataAcquisition = null;
+	public static List<DataAcquisition> find(Deployment deployment, boolean active) {
+		SolrQuery query = new SolrQuery();
+		query.set("q", "deployment_uri:\"" + deployment.getUri() + "\"");
+		query.set("sort", "started_at desc");
+		query.set("rows", "10000000");
+		List<DataAcquisition> listDA = find(query);
 		
-		try {
-			QueryResponse queryResponse = solr.query(query);
-			solr.close();
-			SolrDocumentList list = queryResponse.getResults();
-			if (list.size() == 1) {
-				dataAcquisition = convertFromSolr(list.get(0));
+		if (active == true) {
+			// Filter out inactive data acquisition
+			Iterator<DataAcquisition> iterDA = listDA.iterator();
+			while (iterDA.hasNext()) {
+				DataAcquisition dataAcquisition = iterDA.next();
+				if (dataAcquisition.isFinished() == false) {
+					iterDA.remove();
+				}
 			}
-		} catch (Exception e) {
-			System.out.println("[ERROR] DataAcquisition.find(HADataC) - Exception message: " + e.getMessage());
 		}
-		
-		return dataAcquisition;
+
+		return listDA;
+	}
+	
+	public static DataAcquisition find(HADataC hadatac) {
+		SolrQuery query = new SolrQuery("uri:\"" + hadatac.getDataAcquisitionKbUri() + "\"");
+		return findDataAcquisition(query);
 	}
 	
 	public static DataAcquisition find(Model model, Dataset dataset) {
@@ -850,11 +808,6 @@ public class DataAcquisition {
 		dataAcquisition.addDatasetUri(hadatacCcsv.getDatasetKbUri());
 		
 		return dataAcquisition;
-	}
-	
-	public int setPermission(String uri) {
-		this.permissionUri = uri;
-		return 0;
 	}
 	
 	public void merge(DataAcquisition dataCollection) {

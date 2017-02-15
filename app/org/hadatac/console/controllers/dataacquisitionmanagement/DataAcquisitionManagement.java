@@ -21,12 +21,19 @@ public class DataAcquisitionManagement extends Controller {
 
 	@Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
     public static Result index(int stateId) {
+		List<DataAcquisition> results = null;
     	State state = new State(stateId);
     	final SysUser user = AuthApplication.getLocalUser(session());
-		String ownerUri = UserManagement.getUriByEmail(user.getEmail());
-		System.out.println("Email: " + user.getEmail());
-		System.out.println("Owner URI: " + ownerUri);
-    	List<DataAcquisition> results = DataAcquisition.find(ownerUri, state);
+    	if (user.isDataManager()) {
+    		results = DataAcquisition.findAll(state);
+    	}
+    	else {
+    		String ownerUri = UserManagement.getUriByEmail(user.getEmail());
+    		System.out.println("Email: " + user.getEmail());
+    		System.out.println("Owner URI: " + ownerUri);
+    		results = DataAcquisition.find(ownerUri, state);
+    	}
+		
     	
         return ok(dataAcquisitionManagement.render(state, results));   
     }
