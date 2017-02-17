@@ -203,6 +203,24 @@ public class User implements Comparable<User> {
 		return ttl_file;
 	}
 	
+	public static List<String> getUserEmails() {
+		List<String> emails = new ArrayList<String>();
+		for (User user : find()) {
+			emails.add(user.getEmail());
+		}
+		
+		return emails;
+	}
+	
+	public static List<String> getUserURIs() {
+		List<String> listUri = new ArrayList<String>();
+		for (User user : find()) {
+			listUri.add(user.getUri());
+		}
+		
+		return listUri;
+	}
+	
 	public static List<User> find() {
 		List<User> users = new ArrayList<User>();
 		String queryString = 

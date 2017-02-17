@@ -10,7 +10,6 @@ import java.io.UnsupportedEncodingException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLDecoder;
-import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -18,18 +17,17 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Properties;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.hadatac.console.controllers.AuthApplication;
 import org.hadatac.console.controllers.dataacquisitionsearch.LoadCCSV;
-import org.hadatac.console.controllers.triplestore.LoadKB;
-import org.hadatac.console.controllers.triplestore.UserManagement;
+import org.hadatac.console.controllers.annotator.routes;
 import org.hadatac.console.controllers.annotator.AnnotationLog;
 import org.hadatac.console.http.DataAcquisitionSchemaQueries;
 import org.hadatac.console.http.DeploymentQueries;
+import org.hadatac.console.models.AssignOwnerForm;
 import org.hadatac.console.models.CSVAnnotationHandler;
 import org.hadatac.console.models.SparqlQueryResults;
 import org.hadatac.console.models.TripleDocument;
@@ -39,17 +37,16 @@ import org.hadatac.data.api.DataFactory;
 import org.hadatac.data.model.DatasetParsingResult;
 import org.hadatac.entity.pojo.CSVFile;
 import org.hadatac.entity.pojo.DataAcquisition;
+import org.hadatac.entity.pojo.User;
 import org.hadatac.metadata.loader.ValueCellProcessing;
 import org.hadatac.utils.ConfigProp;
 import org.hadatac.utils.NameSpaces;
 import org.hadatac.utils.State;
 
-import com.avaje.ebean.enhance.ant.AntEnhanceTask;
-import com.typesafe.config.impl.ConfigImpl;
-
 import be.objectify.deadbolt.java.actions.Group;
 import be.objectify.deadbolt.java.actions.Restrict;
 import play.Play;
+import play.data.Form;
 import play.mvc.Controller;
 import play.mvc.Result;
 import play.mvc.BodyParser;
@@ -87,8 +84,16 @@ public class AutoAnnotator extends Controller {
     public static Result index() {		
 		final SysUser user = AuthApplication.getLocalUser(session());
 		
-		List<CSVFile> proc_files = CSVFile.find(user.getEmail(), State.PROCESSED);
-		List<CSVFile> unproc_files = CSVFile.find(user.getEmail(), State.UNPROCESSED);
+		List<CSVFile> proc_files = null;
+		List<CSVFile> unproc_files = null;
+		if (user.isDataManager()) {
+			proc_files = CSVFile.findAll(State.PROCESSED);
+			unproc_files = CSVFile.findAll(State.UNPROCESSED);
+		}
+		else {
+			proc_files = CSVFile.find(user.getEmail(), State.PROCESSED);
+			unproc_files = CSVFile.find(user.getEmail(), State.UNPROCESSED);
+		}
 		
 		String path_proc = ConfigProp.getPropertyValue("autoccsv.config", "path_proc");
 		String path_unproc = ConfigProp.getPropertyValue("autoccsv.config", "path_unproc");
@@ -101,7 +106,7 @@ public class AutoAnnotator extends Controller {
 			bStarted = true;
 		}
 
-		return ok(auto_ccsv.render(unproc_files, proc_files, bStarted));
+		return ok(auto_ccsv.render(unproc_files, proc_files, bStarted, user.isDataManager()));
 	}
 	
 	@Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
@@ -109,7 +114,41 @@ public class AutoAnnotator extends Controller {
 		return index();
 	}
 	
-	@Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
+	@Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
+    public static Result assignFileOwner(String ownerEmail, String selectedFile) {	
+    	return ok(assignOwner.render(Form.form(AssignOwnerForm.class),
+    								 User.getUserEmails(),
+    								 routes.AutoAnnotator.processForm(ownerEmail, selectedFile),
+    								 "Selected File",
+    								 selectedFile));
+	}
+	
+	@Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
+    public static Result postAssignFileOwner(String ownerEmail, String selectedFile) {
+		return assignFileOwner(ownerEmail, selectedFile);
+	}
+	
+    @Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
+    public static Result processForm(String ownerEmail, String selectedFile) {
+        Form<AssignOwnerForm> form = Form.form(AssignOwnerForm.class).bindFromRequest();
+        AssignOwnerForm data = form.get();
+        
+        if (form.hasErrors()) {
+        	System.out.println("HAS ERRORS");
+            return badRequest(assignOwner.render(Form.form(AssignOwnerForm.class),
+					 User.getUserEmails(),
+					 routes.AutoAnnotator.processForm(ownerEmail, selectedFile),
+					 "Selected File",
+					 selectedFile));
+        } else {
+            CSVFile newCSV = CSVFile.findByName(ownerEmail, selectedFile);
+            newCSV.setOwnerEmail(data.getUser());
+            newCSV.save();
+    		return redirect(routes.AutoAnnotator.index());
+        }
+    }
+	
+	@Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
     public static Result toggleAutoAnnotator() {
 		System.out.println("Toggling...");
 		

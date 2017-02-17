@@ -149,13 +149,16 @@ POST 	/hadatac/deployments/urigenerator/form	   org.hadatac.console.controllers.
 # data collection management
 GET	    /hadatac/dataacquisitions/		    	   org.hadatac.console.controllers.dataacquisitionmanagement.DataAcquisitionManagement.index(oper : Int)
 POST	/hadatac/dataacquisitions/     			   org.hadatac.console.controllers.dataacquisitionmanagement.DataAcquisitionManagement.postIndex(oper : Int)
-GET	    /hadatac/dataacquisitions/delete		       org.hadatac.console.controllers.dataacquisitionmanagement.DeleteDataAcquisition.index(oper : String, dc_uri : String)
+GET	    /hadatac/dataacquisitions/delete		   org.hadatac.console.controllers.dataacquisitionmanagement.DeleteDataAcquisition.index(oper : String, dc_uri : String)
 POST	/hadatac/dataacquisitions/delete     	   org.hadatac.console.controllers.dataacquisitionmanagement.DeleteDataAcquisition.postIndex(oper : String, dc_uri : String)
-GET	    /hadatac/dataacquisitions/access		       org.hadatac.console.controllers.dataacquisitionmanagement.SetAccessPermission.index(dc_uri : String)
+GET	    /hadatac/dataacquisitions/access		   org.hadatac.console.controllers.dataacquisitionmanagement.SetAccessPermission.index(dc_uri : String)
 POST	/hadatac/dataacquisitions/access     	   org.hadatac.console.controllers.dataacquisitionmanagement.SetAccessPermission.postIndex(dc_uri : String)
-POST	/hadatac/dataacquisitions/access/form       org.hadatac.console.controllers.dataacquisitionmanagement.SetAccessPermission.newPermission(dc_uri : String)
-GET	    /hadatac/dataacquisitions/search	    	   org.hadatac.console.controllers.dataacquisitionmanagement.SearchDataAcquisition.index(p: Int ?= 1, facets: String ?= "", facetAdd: String ?= "", facetDel: String ?= "")
-POST	/hadatac/dataacquisitions/search			   org.hadatac.console.controllers.dataacquisitionmanagement.SearchDataAcquisition.postIndex(p: Int ?= 1, facets: String ?= "", facetAdd: String ?= "", facetDel: String ?= "")
+POST	/hadatac/dataacquisitions/access/form      org.hadatac.console.controllers.dataacquisitionmanagement.SetAccessPermission.newPermission(dc_uri : String)
+GET	    /hadatac/dataacquisitions/search	       org.hadatac.console.controllers.dataacquisitionmanagement.SearchDataAcquisition.index(p: Int ?= 1, facets: String ?= "", facetAdd: String ?= "", facetDel: String ?= "")
+POST	/hadatac/dataacquisitions/search		   org.hadatac.console.controllers.dataacquisitionmanagement.SearchDataAcquisition.postIndex(p: Int ?= 1, facets: String ?= "", facetAdd: String ?= "", facetDel: String ?= "")
+GET	    /hadatac/dataacquisitions/owner		       org.hadatac.console.controllers.dataacquisitionmanagement.DataAcquisitionManagement.assignOwner(acquisitionUri : String)
+POST	/hadatac/dataacquisitions/owner     	   org.hadatac.console.controllers.dataacquisitionmanagement.DataAcquisitionManagement.postAssignOwner(acquisitionUri : String)
+POST	/hadatac/dataacquisitions/owner/form       org.hadatac.console.controllers.dataacquisitionmanagement.DataAcquisitionManagement.processForm(acquisitionUri : String)
 
 # annotator
 GET	    /hadatac/annotator/		    	           org.hadatac.console.controllers.annotator.Annotator.selectDeployment
@@ -178,6 +181,9 @@ GET	    /hadatac/annotator/downloadcsv		       org.hadatac.console.controllers.a
 POST	/hadatac/annotator/downloadcsv    		   org.hadatac.console.controllers.annotator.AutoAnnotator.downloadCSVFile(file_name : String, isProcessed : Boolean)
 GET	    /hadatac/annotator/log                     org.hadatac.console.controllers.annotator.AutoAnnotator.checkAnnotationLog(file_name : String)
 POST	/hadatac/annotator/log                     org.hadatac.console.controllers.annotator.AutoAnnotator.checkAnnotationLog(file_name : String)
+GET	    /hadatac/annotator/file/owner		       org.hadatac.console.controllers.annotator.AutoAnnotator.assignFileOwner(ownerEmail: String, file: String)
+POST	/hadatac/annotator/file/owner     	       org.hadatac.console.controllers.annotator.AutoAnnotator.postAssignFileOwner(ownerEmail: String, file: String)
+POST	/hadatac/annotator/file/owner/form     	   org.hadatac.console.controllers.annotator.AutoAnnotator.processForm(ownerEmail: String, file : String)
 
 # metadata store management URLs
 GET     /hadatac/ts/clean                          org.hadatac.console.controllers.triplestore.Clean.clean(oper: String)
@@ -207,11 +213,6 @@ GET    	/hadatac/ts/synclabkey/loadacquisition     org.hadatac.console.controlle
 POST    /hadatac/ts/synclabkey/loadacquisition     org.hadatac.console.controllers.triplestore.LoadKB.playLoadLabkeyDataAcquisition(oper: String, content: String, folder: String, list_names: java.util.List[String], auth: org.hadatac.console.models.LabKeyLoginForm)
 GET    	/hadatac/ts/synclabkey/difftool			   org.hadatac.console.controllers.triplestore.DiffTool.index(auth: org.hadatac.console.models.LabKeyLoginForm, list_names: java.util.List[String])
 POST    /hadatac/ts/synclabkey/difftool			   org.hadatac.console.controllers.triplestore.DiffTool.postIndex(auth: org.hadatac.console.models.LabKeyLoginForm, list_names: java.util.List[String])
-GET	    /hadatac/ts/file		    	           org.hadatac.console.controllers.triplestore.FileManagement.index()
-POST	/hadatac/ts/file     	            	   org.hadatac.console.controllers.triplestore.FileManagement.postIndex()
-GET	    /hadatac/ts/file/owner		    	       org.hadatac.console.controllers.triplestore.FileManagement.assignFileOwner(file: String)
-POST	/hadatac/ts/file/owner     	               org.hadatac.console.controllers.triplestore.FileManagement.postAssignFileOwner(file: String)
-POST	/hadatac/ts/file/owner/form     	       org.hadatac.console.controllers.triplestore.FileManagement.processForm(file : String)
 
 # Permissions store management URLs
 GET     /hadatac/perm/onlinepreregister            org.hadatac.console.controllers.triplestore.UserManagement.onLinePreRegistration(oper: String)

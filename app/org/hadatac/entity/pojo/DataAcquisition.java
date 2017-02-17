@@ -546,7 +546,7 @@ public class DataAcquisition {
 		query.set("sort", "started_at asc");
 		query.set("rows", "10000000");
 		
-		return find(query);
+		return findByQuery(query);
 	}
 	
 	public static List<String> findAllAccessibleDataAcquisition(String user_uri){
@@ -583,7 +583,7 @@ public class DataAcquisition {
 		query.set("sort", "started_at asc");
 		query.set("rows", "10000000");
 		
-		return find(query);
+		return findByQuery(query);
 	}
 	
 	public static List<DataAcquisition> findAll(State state) {
@@ -596,7 +596,7 @@ public class DataAcquisition {
 		query.set("sort", "started_at asc");
 		query.set("rows", "10000000");
 		
-		return find(query);
+		return findByQuery(query);
 	}
 	
 	public static DataAcquisition findDataAcquisition(SolrQuery query) {
@@ -624,8 +624,13 @@ public class DataAcquisition {
 		query.set("q", "uri:\"" + dataAcquisitionUri + "\"");
 		query.set("sort", "started_at asc");
 		query.set("rows", "10000000");
+		
+		List<DataAcquisition> results = findByQuery(query);
+		if (!results.isEmpty()) {
+			return results.get(0);
+		}
 
-		return findDataAcquisition(query);
+		return null;
 	}
 	
 	public int close(String endedAt) {
@@ -657,7 +662,7 @@ public class DataAcquisition {
 		return -1;
 	}
 	
-	public static List<DataAcquisition> find(SolrQuery query) {
+	public static List<DataAcquisition> findByQuery(SolrQuery query) {
 		List<DataAcquisition> list = new ArrayList<DataAcquisition>();
 		
 		SolrClient solr = new HttpSolrClient(
@@ -670,8 +675,7 @@ public class DataAcquisition {
 			SolrDocumentList results = response.getResults();
 			Iterator<SolrDocument> i = results.iterator();
 			while (i.hasNext()) {
-				DataAcquisition dataAcquisition = convertFromSolr(i.next());
-				list.add(dataAcquisition);
+				list.add(convertFromSolr(i.next()));
 			}
 		} catch (Exception e) {
 			list.clear();
@@ -686,7 +690,7 @@ public class DataAcquisition {
 		query.set("q", "deployment_uri:\"" + deployment.getUri() + "\"");
 		query.set("sort", "started_at desc");
 		query.set("rows", "10000000");
-		List<DataAcquisition> listDA = find(query);
+		List<DataAcquisition> listDA = findByQuery(query);
 		
 		if (active == true) {
 			// Filter out inactive data acquisition

@@ -1,6 +1,8 @@
-@(assignOwnerForm: Form[org.hadatac.console.models.AssignOwnerForm],
-  selectedFile: String, 
-  theUsers   : List[org.hadatac.entity.pojo.User])
+@(assignOwnerForm : Form[org.hadatac.console.models.AssignOwnerForm],
+  ownerOptions : List[String],
+  action : play.mvc.Call, 
+  targetType : String,
+  targetValue : String)
 
 @import helper._
 @import org.hadatac.utils._
@@ -31,18 +33,18 @@
   <div class="container">
     <h2>Assign Owner</h2>
 
-    <form class="form-horizontal" name="assignOwner" method="post" action="@org.hadatac.console.controllers.triplestore.routes.FileManagement.processForm(selectedFile)">
+    <form class="form-horizontal" name="assignOwner" method="post" action="@action">
 
     <div class="form-group">
-		 <label>Selected File</label> <br>
-		 @selectedFile <br>
+		 <label>@targetType</label> <br>
+		 @targetValue <br>
 		 <br>
          <label>New Owner</label> 
-         <select  class="form-control col-sm-6" id="user" name="user" onchange="checkform()" >
+         <select class="form-control col-sm-6" id="user" name="user" onchange="checkform()" >
             <option value=""></option>         
 
-            @for(user <- theUsers) {
-                <option value="@user.getEmail()">@user.getEmail()</option>
+            @for(opt <- ownerOptions) {
+                <option value="@opt">@opt</option>
             }
          </select>
      </div>
@@ -53,6 +55,5 @@
       
    </form>    
 </div>
-
 
 }

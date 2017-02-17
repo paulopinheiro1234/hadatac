@@ -1,5 +1,6 @@
 @(state : org.hadatac.utils.State, 
-  results : List[org.hadatac.entity.pojo.DataAcquisition])
+  results : List[org.hadatac.entity.pojo.DataAcquisition],
+  bAdmin : Boolean)
 
 @import helper._
 @import org.hadatac.utils._
@@ -59,13 +60,16 @@
                         <th>End Date/Time</th>
                     }
                     <th># of Data Points</th>
+                    @if(bAdmin) {
+                    	<th>Owner</th>
+                    }
                     <th>Permission</th>
                     <th>Operations</th>
                  </tr>
             </thead>
             <tbody>
               @for(dataCollection <- results){
-                  @dataacquisition_entry(state, dataCollection)
+                  @dataacquisition_entry(state, dataCollection, bAdmin)
               }
             </tbody>
         </table>

@@ -114,7 +114,7 @@ public class LoadKB extends Controller {
 		String ownerUri = UserManagement.getUriByEmail(user.getEmail());
     	List<DataAcquisition> results = DataAcquisition.find(ownerUri, state);
     	
-        return ok(dataAcquisitionManagement.render(state, results));
+        return ok(dataAcquisitionManagement.render(state, results, user.isDataManager()));
     }
     
     @Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
