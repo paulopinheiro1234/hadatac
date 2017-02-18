@@ -24,7 +24,7 @@ public class DeploymentQueries {
         // default query?
         String q = "SELECT * WHERE { ?s ?p ?o } LIMIT 10";
         switch (concept){
-            case DEPLOYMENT_BY_URI : 
+            case DEPLOYMENT_BY_URI :
                 q = "PREFIX rdfs:<http://www.w3.org/2000/01/rdf-schema#>" + 
                     "PREFIX owl: <http://www.w3.org/2002/07/owl#>" +
                     "PREFIX prov: <http://www.w3.org/ns/prov#>  " +
@@ -131,9 +131,10 @@ public class DeploymentQueries {
             default :
             	q = "";
             	System.out.println("WARNING: no query for tab " + concept);
-        }// /switch
+        }
+        
         return q;
-    } // /querySelector
+    }
 
 
     public static String exec(String concept, String uri) {

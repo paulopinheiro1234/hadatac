@@ -2,13 +2,9 @@ package org.hadatac.console.controllers.annotator;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
-import java.net.URISyntaxException;
-import java.net.URL;
 import java.net.URLDecoder;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -21,6 +17,7 @@ import java.util.Map;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
+import org.h2.tools.Csv;
 import org.hadatac.console.controllers.AuthApplication;
 import org.hadatac.console.controllers.dataacquisitionsearch.LoadCCSV;
 import org.hadatac.console.controllers.annotator.routes;
@@ -50,11 +47,38 @@ import play.data.Form;
 import play.mvc.Controller;
 import play.mvc.Result;
 import play.mvc.BodyParser;
-import play.mvc.Http.MultipartFormData;
 import play.mvc.Http.MultipartFormData.FilePart;
 
 public class AutoAnnotator extends Controller {
 	
+	private static boolean search(String fileName, List<CSVFile> pool) {
+		for (CSVFile file : pool) {
+			if (file.getFileName().equals(fileName)) {
+				return true;
+			}
+		}
+		
+		return false;
+	}
+	
+	private static void includeUnrecognizedFiles(String path, List<CSVFile> ownedFiles) {		
+ 		File folder = new File(path);
+ 		if (!folder.exists()){
+ 			folder.mkdirs();
+ 	    }
+
+ 		File[] listOfFiles = folder.listFiles();
+ 		for (int i = 0; i < listOfFiles.length; i++) {
+			if (listOfFiles[i].isFile()) {
+				if (!search(listOfFiles[i].getName(), ownedFiles)) {
+					CSVFile newFile = new CSVFile();
+ 					newFile.setFileName(listOfFiles[i].getName());
+ 					ownedFiles.add(newFile);
+				}
+ 			}
+ 		}
+	}
+
 	private static void filterNonexistedFiles(String path, List<CSVFile> files) {
 		File folder = new File(path);
 		if (!folder.exists()){
@@ -86,17 +110,19 @@ public class AutoAnnotator extends Controller {
 		
 		List<CSVFile> proc_files = null;
 		List<CSVFile> unproc_files = null;
+		
+		String path_proc = ConfigProp.getPropertyValue("autoccsv.config", "path_proc");
+		String path_unproc = ConfigProp.getPropertyValue("autoccsv.config", "path_unproc");
+		
 		if (user.isDataManager()) {
 			proc_files = CSVFile.findAll(State.PROCESSED);
 			unproc_files = CSVFile.findAll(State.UNPROCESSED);
+			includeUnrecognizedFiles(path_unproc, unproc_files);
 		}
 		else {
 			proc_files = CSVFile.find(user.getEmail(), State.PROCESSED);
 			unproc_files = CSVFile.find(user.getEmail(), State.UNPROCESSED);
 		}
-		
-		String path_proc = ConfigProp.getPropertyValue("autoccsv.config", "path_proc");
-		String path_unproc = ConfigProp.getPropertyValue("autoccsv.config", "path_unproc");
 		
 		filterNonexistedFiles(path_proc, proc_files);
 		filterNonexistedFiles(path_unproc, unproc_files);
@@ -142,6 +168,13 @@ public class AutoAnnotator extends Controller {
 					 selectedFile));
         } else {
             CSVFile newCSV = CSVFile.findByName(ownerEmail, selectedFile);
+            if (newCSV == null) {
+            	newCSV = new CSVFile();
+            	newCSV.setFileName(selectedFile);
+            	newCSV.setOwnerEmail(AuthApplication.getLocalUser(session()).getEmail());
+            	newCSV.setProcessStatus(false);
+            	newCSV.setUploadTime(new SimpleDateFormat("yyyy/MM/dd HH:mm:ss").format(new Date()));
+            }
             newCSV.setOwnerEmail(data.getUser());
             newCSV.save();
     		return redirect(routes.AutoAnnotator.index());
@@ -227,34 +260,43 @@ public class AutoAnnotator extends Controller {
 			log.save();
 			return false;
 		}
+		if(schema_uri == null){
+    		System.out.println("Cannot find schema of the data acquisition");
+    		log.addline("Cannot find schema of the data acquisition");
+    		log.save();
+    		return false;
+    	}
+		if(deployment_uri == null){
+    		System.out.println("Cannot find deployment of the data acquisition");
+    		log.addline("Cannot find deployment of the data acquisition");
+    		log.save();
+    		return false;
+    	}
 		
-		CSVAnnotationHandler handler;
     	try {
-    		if (deployment_uri != null) {
-    			deployment_uri = URLDecoder.decode(deployment_uri, "UTF-8");
-    		} else {
-    			deployment_uri = "";
-    		}
+    		deployment_uri = URLDecoder.decode(deployment_uri, "UTF-8");
 		} catch (UnsupportedEncodingException e) {
-			e.printStackTrace();
 			return false;
 		}
     	System.out.println("deployment_uri is " + deployment_uri);
+    	
+    	CSVAnnotationHandler handler = null;
     	if (!deployment_uri.equals("")) {
     		/*
     		 *  Add deployment information into handler
     		 */
     		String json = DeploymentQueries.exec(DeploymentQueries.DEPLOYMENT_BY_URI, deployment_uri);
-    		//System.out.println(json);
     		SparqlQueryResults results = new SparqlQueryResults(json, false);
     		TripleDocument docDeployment = results.sparqlResults.values().iterator().next();
-    		handler = new CSVAnnotationHandler(deployment_uri, docDeployment.get("platform"), docDeployment.get("instrument"));
-    		    		
+    		handler = new CSVAnnotationHandler(deployment_uri, 
+    				docDeployment.get("platform"), 
+    				docDeployment.get("instrument"));
+    		
     		/*
     		 * Add possible detector's characteristics into handler
     		 */
-    		String dep_json = DeploymentQueries.exec(DeploymentQueries.DEPLOYMENT_CHARACTERISTICS_BY_URI, deployment_uri);
-    		System.out.println(dep_json);
+    		String dep_json = DeploymentQueries.exec(
+    				DeploymentQueries.DEPLOYMENT_CHARACTERISTICS_BY_URI, deployment_uri);
     		SparqlQueryResults char_results = new SparqlQueryResults(dep_json, false);
     		Map<String,String> deploymentChars = new HashMap<String,String>();
     		Iterator<TripleDocument> iterDoc = char_results.sparqlResults.values().iterator();
@@ -268,24 +310,38 @@ public class AutoAnnotator extends Controller {
     		handler.setDeploymentCharacteristics(deploymentChars);
 
     		/*
-    		 * Add URI of active datacollection in handler
+    		 * Add URI of active data acquisition in handler
     		 */
     		DataAcquisition dc = DataFactory.getActiveDataAcquisition(deployment_uri);
     		if (dc != null && dc.getUri() != null) {
     			handler.setDataAcquisitionUri(dc.getUri());
     		}
-    	} 
-    	else {
-    		handler = new CSVAnnotationHandler(deployment_uri, "", "");
     	}
-    	
-    	if(schema_uri == null){
-    		System.out.println("Cannot find schema of the data acquisition");
-    		log.addline("Cannot find schema of the data acquisition");
-    		log.save();
-    		return false;
-    	}
- 
+
+		String path_unproc = ConfigProp.getPropertyValue("autoccsv.config", "path_unproc");
+		File newFile = new File(path_unproc + file_name);
+	    try {
+			FileUtils.writeStringToFile(new File(LoadCCSV.UPLOAD_NAME), 
+										createPreamble(handler, schema_uri) + 
+										FileUtils.readFileToString(newFile, "UTF-8"));
+		} catch (IOException e) {
+			e.printStackTrace();
+			return false;
+		}
+	    
+	    // Parse and load the generated CCSV file
+	    DatasetParsingResult result = LoadCCSV.playLoadCCSV();
+	    log.addline(result.getMessage());
+		log.save();
+		if(result.getStatus() == 0){
+			return true;
+		}
+	    
+	    return false;
+	}
+    
+    private static String createPreamble(CSVAnnotationHandler handler, 
+    									 String schema_uri) {
 		String preamble = Downloads.FRAG_START_PREAMBLE;
 		preamble += NameSpaces.getInstance().printNameSpaceList();
 		preamble += "\n";
@@ -305,7 +361,8 @@ public class AutoAnnotator extends Controller {
 			int aux = 0;
 			ArrayList<Integer> mt = new ArrayList<Integer>();
 			ArrayList<String> mt_preamble = new ArrayList<String>();
-			String json = DataAcquisitionSchemaQueries.exec(DataAcquisitionSchemaQueries.ATTRIBUTE_BY_SCHEMA_URI, schema_uri);
+			String json = DataAcquisitionSchemaQueries.exec(
+					DataAcquisitionSchemaQueries.ATTRIBUTE_BY_SCHEMA_URI, schema_uri);
 			System.out.println(json);
 			SparqlQueryResults results = new SparqlQueryResults(json, false);
 			Iterator<TripleDocument> iterDoc = results.sparqlResults.values().iterator();
@@ -319,33 +376,29 @@ public class AutoAnnotator extends Controller {
 				System.out.println("get " + i + "-attribute: [" + attrib + "]");
 				System.out.println("get " + i + "-unit: [" + unit + "]");
 
-//				if (entity != null && !entity.equals("") &&
-//						attrib != null && !attrib.equals("") && 
-//						unit != null && !unit.equals("")) {	
-					if (unit.equals(Downloads.FRAG_IN_DATE_TIME)) {
-						timeStampIndex = i; 
-					} else {
-						String p = "";
-						p += Downloads.FRAG_MT + aux;
-						p += Downloads.FRAG_MEASUREMENT_TYPE_PART1;
-						if (timeStampIndex != -1) {
-							p += Downloads.FRAG_IN_DATE_TIME;
-							p += Downloads.FRAG_IN_DATE_TIME_SUFFIX;
-						}
-						p += Downloads.FRAG_MEASUREMENT_TYPE_PART2;
-						p += i;
-						p += Downloads.FRAG_MEASUREMENT_TYPE_PART3;
-						p += "<" + entity + ">";
-						p += Downloads.FRAG_MEASUREMENT_TYPE_PART4;
-						p += "<" + attrib + ">"; 
-						p += Downloads.FRAG_MEASUREMENT_TYPE_PART5;
-						p += "<" + unit + ">";
-						p += " .\n";
-						aux++;
-						mt.add(i);
-						mt_preamble.add(p);
+				if (unit.equals(Downloads.FRAG_IN_DATE_TIME)) {
+					timeStampIndex = i; 
+				} else {
+					String p = "";
+					p += Downloads.FRAG_MT + aux;
+					p += Downloads.FRAG_MEASUREMENT_TYPE_PART1;
+					if (timeStampIndex != -1) {
+						p += Downloads.FRAG_IN_DATE_TIME;
+						p += Downloads.FRAG_IN_DATE_TIME_SUFFIX;
 					}
-//				}
+					p += Downloads.FRAG_MEASUREMENT_TYPE_PART2;
+					p += i;
+					p += Downloads.FRAG_MEASUREMENT_TYPE_PART3;
+					p += "<" + entity + ">";
+					p += Downloads.FRAG_MEASUREMENT_TYPE_PART4;
+					p += "<" + attrib + ">"; 
+					p += Downloads.FRAG_MEASUREMENT_TYPE_PART5;
+					p += "<" + unit + ">";
+					p += " .\n";
+					aux++;
+					mt.add(i);
+					mt_preamble.add(p);
+				}
 			}
 			
 			preamble += Downloads.FRAG_HAS_MEASUREMENT_TYPE;	
@@ -370,42 +423,19 @@ public class AutoAnnotator extends Controller {
 			System.out.println(preamble);
 		} catch (Exception e) {
 			e.printStackTrace();
-			return false;
+			return "";
 		}
 
 		preamble += Downloads.FRAG_END_PREAMBLE;
-
-		String path_unproc = ConfigProp.getPropertyValue("autoccsv.config", "path_unproc");
-		File newFile = new File(path_unproc + file_name);
-	    try {
-			preamble += FileUtils.readFileToString(newFile, "UTF-8");
-		} catch (IOException e) {
-			e.printStackTrace();
-			return false;
-		}
-
-	    try {
-			FileUtils.writeStringToFile(new File(LoadCCSV.UPLOAD_NAME), preamble);
-		} catch (IOException e) {
-			e.printStackTrace();
-			return false;
-		}
-	    DatasetParsingResult result = LoadCCSV.playLoadCCSV();
-	    log.addline(result.getMessage());
-		log.save();
-		if(result.getStatus() == 0){
-			return true;
-		}
-	    
-	    return false;
-	}
+		
+		return preamble;
+    }
     
-    public static Result moveCSVFile(String file_name) {		
+    public static Result moveCSVFile(String ownerEmail, String file_name) {		
 		String path_proc = ConfigProp.getPropertyValue("autoccsv.config", "path_proc");
 		String path_unproc = ConfigProp.getPropertyValue("autoccsv.config", "path_unproc");
 		
-		final SysUser user = AuthApplication.getLocalUser(session());
-		CSVFile csvFile = CSVFile.findByName(user.getEmail(), file_name);
+		CSVFile csvFile = CSVFile.findByName(ownerEmail, file_name);
 		csvFile.delete();
 		csvFile.setProcessStatus(false);
 		csvFile.save();
@@ -436,11 +466,10 @@ public class AutoAnnotator extends Controller {
     	return ok(annotation_log.render(file_name));
     }
     
-    public static Result deleteCSVFile(String file_name, boolean isProcessed) {
+    public static Result deleteCSVFile(String ownerEmail, String file_name, boolean isProcessed) {
     	AnnotationLog.delete(file_name);
     	
-    	final SysUser user = AuthApplication.getLocalUser(session());
-		CSVFile csvFile = CSVFile.findByName(user.getEmail(), file_name);
+		CSVFile csvFile = CSVFile.findByName(ownerEmail, file_name);
 		csvFile.delete();
 
 		String path = "";

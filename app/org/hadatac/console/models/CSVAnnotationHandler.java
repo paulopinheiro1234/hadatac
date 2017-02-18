@@ -97,17 +97,12 @@ public class CSVAnnotationHandler {
  
     public String toJSON() {
     	ObjectMapper mapper = new ObjectMapper();
-
     	try {
             return mapper.writeValueAsString(this);
-
     	} catch (Exception e) {
-
     		e.printStackTrace();
     	} 
     	
     	return "";
-
     }
-    
 }

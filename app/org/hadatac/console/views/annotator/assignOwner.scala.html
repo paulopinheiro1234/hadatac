@@ -15,11 +15,10 @@
 
 <script type="text/javascript">
    function checkform() {
-      var f = document.forms["assignOwner"].elements;
       var cansubmit = true;
 
       if (document.getElementById('user').value.length == 0) {
-         cansubmit = false;
+          cansubmit = false;
       }
          
       if (cansubmit) {
@@ -41,8 +40,7 @@
 		 <br>
          <label>New Owner</label> 
          <select class="form-control col-sm-6" id="user" name="user" onchange="checkform()" >
-            <option value=""></option>         
-
+            <option value=""></option>
             @for(opt <- ownerOptions) {
                 <option value="@opt">@opt</option>
             }

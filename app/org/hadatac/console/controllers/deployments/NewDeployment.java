@@ -2,7 +2,6 @@ package org.hadatac.console.controllers.deployments;
 
 import org.hadatac.console.http.GetSparqlQuery;
 
-import java.io.IOException;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -14,8 +13,6 @@ import play.data.*;
 
 import org.hadatac.console.views.html.deployments.*;
 import org.hadatac.data.api.DataFactory;
-import org.hadatac.entity.pojo.DataAcquisition;
-import org.hadatac.entity.pojo.Deployment;
 import org.hadatac.entity.pojo.Detector;
 import org.hadatac.entity.pojo.Instrument;
 import org.hadatac.entity.pojo.Platform;
@@ -40,15 +37,13 @@ public class NewDeployment extends Controller {
     	String query_json = null;
         try {
             query_json = query_submit.executeQuery(tabName);
-            //System.out.println("query_json = " + query_json);
             thePlatforms = new SparqlQueryResults(query_json, false);
         } catch (IllegalStateException | NullPointerException e1) {
             e1.printStackTrace();
         }
 		return thePlatforms;
 	}
-    
-    // for /metadata HTTP GET requests
+
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
     public static Result index(String type) {
     	return ok(newDeployment.render(Form.form(DeploymentForm.class), 
@@ -57,25 +52,13 @@ public class NewDeployment extends Controller {
     			  Detector.findAvailable(),
     			  type));
         
-    }// /index()
-
-
-    // for /metadata HTTP POST requests
+    }
+    
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
     public static Result postIndex(String type) {
-    	return ok(newDeployment.render(Form.form(DeploymentForm.class), 
-              Platform.find(),
-    		  Instrument.findAvailable(),
-			  Detector.findAvailable(),
-  			  type));
-        
-    }// /postIndex()
-
-    //prov:startedAtTime		"2015-02-15T19:50:55Z"^^<http://www.w3.org/2001/XMLSchema#dateTime> .
-        
-    /**
-     * Handles the form submission.
-     */
+    	return index(type);
+    }
+    
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
     public static Result processForm() {
     	final SysUser user = AuthApplication.getLocalUser(session());
@@ -111,8 +94,8 @@ public class NewDeployment extends Controller {
         	}
         }
         
-        Deployment deployment = DataFactory.createDeployment(deploymentUri, data.getPlatform(), data.getInstrument(), data.getDetector(), dateString, data.getType());
-        DataAcquisition dataCollection = DataFactory.createDataAcquisition(dataCollectionUri, deploymentUri, triggeringEvent, UserManagement.getUriByEmail(user.getEmail()));
+        DataFactory.createDeployment(deploymentUri, data.getPlatform(), data.getInstrument(), data.getDetector(), dateString, data.getType());
+        DataFactory.createDataAcquisition(dataCollectionUri, deploymentUri, triggeringEvent, UserManagement.getUriByEmail(user.getEmail()));
         if (form.hasErrors()) {
         	System.out.println("HAS ERRORS");
             return badRequest(newDeployment.render(form,
@@ -124,5 +107,4 @@ public class NewDeployment extends Controller {
             return ok(deploymentConfirm.render("New Deployment", data));
         }
     }
-
 }
