@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.RandomAccessFile;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.text.SimpleDateFormat;
@@ -14,16 +15,21 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import javax.servlet.http.HttpServletResponse;
+
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
-import org.h2.tools.Csv;
 import org.hadatac.console.controllers.AuthApplication;
 import org.hadatac.console.controllers.dataacquisitionsearch.LoadCCSV;
 import org.hadatac.console.controllers.annotator.routes;
 import org.hadatac.console.controllers.annotator.AnnotationLog;
 import org.hadatac.console.http.DataAcquisitionSchemaQueries;
 import org.hadatac.console.http.DeploymentQueries;
+import org.hadatac.console.http.HttpUtils;
+import org.hadatac.console.http.ResumableInfo;
+import org.hadatac.console.http.ResumableInfoStorage;
+import org.hadatac.console.http.ResumableUpload;
 import org.hadatac.console.models.AssignOwnerForm;
 import org.hadatac.console.models.CSVAnnotationHandler;
 import org.hadatac.console.models.SparqlQueryResults;
@@ -48,6 +54,7 @@ import play.mvc.Controller;
 import play.mvc.Result;
 import play.mvc.BodyParser;
 import play.mvc.Http.MultipartFormData.FilePart;
+import play.mvc.Http.Request;
 
 public class AutoAnnotator extends Controller {
 	
@@ -69,7 +76,7 @@ public class AutoAnnotator extends Controller {
 
  		File[] listOfFiles = folder.listFiles();
  		for (int i = 0; i < listOfFiles.length; i++) {
-			if (listOfFiles[i].isFile()) {
+			if (listOfFiles[i].isFile() && listOfFiles[i].getName().endsWith(".csv")) {
 				if (!search(listOfFiles[i].getName(), ownedFiles)) {
 					CSVFile newFile = new CSVFile();
  					newFile.setFileName(listOfFiles[i].getName());
@@ -519,6 +526,38 @@ public class AutoAnnotator extends Controller {
  		}
     	
     	return redirect(routes.AutoAnnotator.index());
+    }
+    
+    @Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
+    public static Result uploadCSVFileByChunking(
+    		String resumableChunkNumber,
+    		String resumableChunkSize, 
+    		String resumableCurrentChunkSize,
+    		String resumableTotalSize,
+    		String resumableIdentifier,
+    		String resumableFilename,
+    		String resumableRelativePath) {
+    	if (ResumableUpload.uploadFileByChunking(request(), ConfigProp.getPropertyValue("autoccsv.config", "path_unproc"))) {
+            return ok("Uploaded."); //This Chunk has been Uploaded.
+        } else {
+        	return status(HttpServletResponse.SC_NOT_FOUND);
+        }
+    }
+    
+    @Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
+    public static Result postUploadCSVFileByChunking(
+    		String resumableChunkNumber, 
+    		String resumableChunkSize, 
+    		String resumableCurrentChunkSize,
+    		String resumableTotalSize,
+    		String resumableIdentifier,
+    		String resumableFilename,
+    		String resumableRelativePath) {
+    	if (ResumableUpload.postUploadFileByChunking(request(), ConfigProp.getPropertyValue("autoccsv.config", "path_unproc"))) {
+            return(ok("Upload finished"));
+        } else {
+            return(ok("Upload"));
+        }
     }
 }
 
