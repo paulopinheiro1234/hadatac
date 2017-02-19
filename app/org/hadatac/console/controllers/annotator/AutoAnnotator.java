@@ -537,7 +537,7 @@ public class AutoAnnotator extends Controller {
     		String resumableIdentifier,
     		String resumableFilename,
     		String resumableRelativePath) {
-    	if (ResumableUpload.uploadFileByChunking(request(), ConfigProp.getPropertyValue("autoccsv.config", "path_unproc"))) {
+    	if (ResumableUpload.uploadFileByChunking(request(), Play.application().path() + "/" + ConfigProp.getPropertyValue("autoccsv.config", "path_unproc"))) {
             return ok("Uploaded."); //This Chunk has been Uploaded.
         } else {
         	return status(HttpServletResponse.SC_NOT_FOUND);
@@ -554,7 +554,13 @@ public class AutoAnnotator extends Controller {
     		String resumableFilename,
     		String resumableRelativePath) {
     	if (ResumableUpload.postUploadFileByChunking(request(), ConfigProp.getPropertyValue("autoccsv.config", "path_unproc"))) {
-            return(ok("Upload finished"));
+    		CSVFile csvFile = new CSVFile();
+			csvFile.setFileName(resumableFilename);
+			csvFile.setOwnerEmail(AuthApplication.getLocalUser(session()).getEmail());
+			csvFile.setProcessStatus(false);
+			csvFile.setUploadTime(new SimpleDateFormat("yyyy/MM/dd HH:mm:ss").format(new Date()));
+			csvFile.save();
+    		return(ok("Upload finished"));
         } else {
             return(ok("Upload"));
         }
