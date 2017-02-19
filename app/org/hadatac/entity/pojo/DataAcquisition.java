@@ -719,7 +719,6 @@ public class DataAcquisition {
 				+ "  ?dc prov:startedAtTime ?startedAt .\n"
 				+ "  OPTIONAL { ?dc prov:endedAtTime ?endedAt } .\n"
 				+ "}";
-		System.out.println(queryString);
 		
 		Query query = QueryFactory.create(queryString);
 		QueryExecution qexec = QueryExecutionFactory.create(query, model);

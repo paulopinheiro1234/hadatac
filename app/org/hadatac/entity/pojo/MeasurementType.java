@@ -139,8 +139,6 @@ public class MeasurementType {
 			measurementTypeKb.setTimeInstantColumn(measurementType.getTimeInstantColumn());
 			measurementTypeKb.setIdColumn(measurementType.getIdColumn());
 			
-			System.out.println("resultsrw.size(): " + resultsrw.size());
-			
 			if (resultsrw.size() >= 1) {
 				QuerySolution soln = resultsrw.next();
 				measurementTypeKb.setCharacteristicUri(measurementType.getCharacteristicUri());

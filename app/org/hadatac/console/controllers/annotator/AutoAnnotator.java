@@ -4,7 +4,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.RandomAccessFile;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.text.SimpleDateFormat;
@@ -26,9 +25,6 @@ import org.hadatac.console.controllers.annotator.routes;
 import org.hadatac.console.controllers.annotator.AnnotationLog;
 import org.hadatac.console.http.DataAcquisitionSchemaQueries;
 import org.hadatac.console.http.DeploymentQueries;
-import org.hadatac.console.http.HttpUtils;
-import org.hadatac.console.http.ResumableInfo;
-import org.hadatac.console.http.ResumableInfoStorage;
 import org.hadatac.console.http.ResumableUpload;
 import org.hadatac.console.models.AssignOwnerForm;
 import org.hadatac.console.models.CSVAnnotationHandler;
@@ -54,7 +50,6 @@ import play.mvc.Controller;
 import play.mvc.Result;
 import play.mvc.BodyParser;
 import play.mvc.Http.MultipartFormData.FilePart;
-import play.mvc.Http.Request;
 
 public class AutoAnnotator extends Controller {
 	
@@ -247,17 +242,12 @@ public class AutoAnnotator extends Controller {
 		String schema_uri = null;
 		List<DataAcquisition> da_list = DataAcquisition.findAll();
 		for(DataAcquisition dc : da_list){
-			System.out.println("Data Acquisition URI: " + dc.getUri());
 			ValueCellProcessing cellProc = new ValueCellProcessing();
 			String qname = cellProc.replaceNameSpaceEx(dc.getUri()).split(":")[1];
-			System.out.println(qname);
 			if(base_name.startsWith(qname)){
 				dc_uri = dc.getUri();
-				System.out.println("DataAcquisitionURI: " + dc_uri);
 				deployment_uri = dc.getDeploymentUri();
-				System.out.println("DeploymentURI: " + deployment_uri);
 				schema_uri = dc.getSchemaUri();
-				System.out.println("DataAcquisitionSchema:" + schema_uri);
 				break;
 			}
 		}
@@ -370,7 +360,6 @@ public class AutoAnnotator extends Controller {
 			ArrayList<String> mt_preamble = new ArrayList<String>();
 			String json = DataAcquisitionSchemaQueries.exec(
 					DataAcquisitionSchemaQueries.ATTRIBUTE_BY_SCHEMA_URI, schema_uri);
-			System.out.println(json);
 			SparqlQueryResults results = new SparqlQueryResults(json, false);
 			Iterator<TripleDocument> iterDoc = results.sparqlResults.values().iterator();
 			while(iterDoc.hasNext()){
@@ -537,7 +526,7 @@ public class AutoAnnotator extends Controller {
     		String resumableIdentifier,
     		String resumableFilename,
     		String resumableRelativePath) {
-    	if (ResumableUpload.uploadFileByChunking(request(), Play.application().path() + "/" + ConfigProp.getPropertyValue("autoccsv.config", "path_unproc"))) {
+    	if (ResumableUpload.uploadFileByChunking(request(), ConfigProp.getPropertyValue("autoccsv.config", "path_unproc"))) {
             return ok("Uploaded."); //This Chunk has been Uploaded.
         } else {
         	return status(HttpServletResponse.SC_NOT_FOUND);

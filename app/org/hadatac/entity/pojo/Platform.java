@@ -170,9 +170,6 @@ public class Platform implements Comparable<Platform> {
 				+ "}";
 		
 		Query query = QueryFactory.create(queryString);
-		
-		System.out.println(queryString);
-		
 		QueryExecution qexec = QueryExecutionFactory.sparqlService(hadatac.getStaticMetadataSparqlURL(), query);
 		ResultSet results = qexec.execSelect();
 		ResultSetRewindable resultsrw = ResultSetFactory.copyResults(results);
