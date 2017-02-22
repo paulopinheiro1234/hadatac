@@ -249,8 +249,8 @@ public class Measurement {
 		String acquisition_query = "";
 		String facet_query = "";
 		String q = "";
-		List<String> listURI = DataAcquisition.findAllAccessibleDataAcquisition(user_uri);
-		Iterator<String> iter_uri = listURI.iterator();
+		List<String> accessibleDAs = DataAcquisition.findAllAccessibleDataAcquisition(user_uri);
+		Iterator<String> iter_uri = accessibleDAs.iterator();
 		while(iter_uri.hasNext()){
 			String uri = iter_uri.next();
 			acquisition_query += "acquisition_uri" + ":\"" + uri + "\"";

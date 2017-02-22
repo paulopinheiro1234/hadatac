@@ -6,10 +6,7 @@ import java.io.FileOutputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 
 import org.apache.jena.query.Query;
 import org.apache.jena.query.QueryExecution;
@@ -118,20 +115,6 @@ public class User implements Comparable<User> {
 		org_uri = uri;
 	}
 	
-	public String getGroupNamesUri() {
-		String list = "";
-		Map<String, String> nameList = new HashMap<String,String>();
-		getGroupNames(nameList);
-		Iterator<String> i = nameList.keySet().iterator();
-		while (i.hasNext()) {
-			list += i.next();
-			if (i.hasNext()) {
-				list += ",";
-			}
-		}
-		return list;
-	}
-	
 	public boolean isAdministrator() {
 		SysUser user = SysUser.findByEmail(getEmail());
 		if(null != user){
@@ -148,14 +131,12 @@ public class User implements Comparable<User> {
 		return false;
 	}
 	
-	public void getGroupNames(Map<String, String> nameList) {
+	public void getGroupNames(List<String> accessLevels) {
 		if(getImmediateGroupUri() != null) {
 			User user = UserGroup.find(getImmediateGroupUri());
 			if(user != null){
-				if (user.getName() != null) {
-	    			nameList.put(user.getUri(), user.getName());
-	    			user.getGroupNames(nameList);
-				}
+				accessLevels.add(user.getUri());
+	    		user.getGroupNames(accessLevels);
 			}
 		}
 	}
@@ -252,7 +233,7 @@ public class User implements Comparable<User> {
 	}
 	
 	public static User find(String uri) {	
-		User user = new User();
+		User user = null;
 
 		boolean bHasEmail = false;
 		String queryString = "DESCRIBE <" + uri + ">";
@@ -266,58 +247,54 @@ public class User implements Comparable<User> {
 		QueryExecution qexecPrivate = QueryExecutionFactory.sparqlService(
 				Collections.getCollectionsName(Collections.PERMISSIONS_SPARQL), query);
 		modelPrivate = qexecPrivate.execDescribe();
-
-		StmtIterator stmtIteratorPrivate = modelPrivate.listStatements();
+		if (!modelPrivate.isEmpty()) {
+			user = new User();
+		}
 		
+		StmtIterator stmtIteratorPrivate = modelPrivate.listStatements();
 		while (stmtIteratorPrivate.hasNext()) {
 			statement = stmtIteratorPrivate.next();
 			object = statement.getObject();
 			if (statement.getPredicate().getURI().equals("http://www.w3.org/2000/01/rdf-schema#comment")) {
 				user.setComment(object.asLiteral().getString());
-				System.out.println("comment: " + object.asLiteral().getString());
 		    }
 			else if (statement.getPredicate().getURI().equals("http://hadatac.org/ont/hadatac#isMemberOfGroup")) {
 				if(object.toString().equals("Public") || object.toString().equals("")){
 					user.setImmediateGroupUri("Public");
-					System.out.println("memberOfUri: " + "Public");
 				}
 				else{
 					user.setImmediateGroupUri(object.asResource().toString());
-					System.out.println("memberOfUri: " + object.asResource().toString());
 				}
 			}
 			else if (statement.getPredicate().getURI().equals("http://xmlns.com/foaf/0.1/givenName")) {
 				user.setGivenName(object.asLiteral().getString());
-				System.out.println("given_name: " + object.asLiteral().getString());
 			}
 			else if (statement.getPredicate().getURI().equals("http://xmlns.com/foaf/0.1/familyName")) {
 				user.setFamilyName(object.asLiteral().getString());
-				System.out.println("family_name: " + object.asLiteral().getString());
 			}
 			else if (statement.getPredicate().getURI().equals("http://xmlns.com/foaf/0.1/name")) {
 				user.setName(object.asLiteral().getString());
-				System.out.println("name: " + object.asLiteral().getString());
 			}
 			else if (statement.getPredicate().getURI().equals("http://xmlns.com/foaf/0.1/mbox")) {
 				user.setEmail(object.asLiteral().getString());
 				bHasEmail = true;
-				System.out.println("mbox: " + object.asLiteral().getString());
 			}
 			else if (statement.getPredicate().getURI().equals("http://xmlns.com/foaf/0.1/homepage")) {
 				String homepage = object.asLiteral().getString();
 				if(homepage.startsWith("<") && homepage.endsWith(">")){
-					System.out.println("homepage: " + homepage);
 					homepage = homepage.replace("<", "");
 					homepage = homepage.replace(">", "");
 				}
 				user.setHomepage(homepage);
-				System.out.println("homepage: " + homepage);
 		    }
 		}
 		
 		QueryExecution qexecPublic = QueryExecutionFactory.sparqlService(
 				Collections.getCollectionsName(Collections.METADATA_SPARQL), query);
 		modelPublic = qexecPublic.execDescribe();
+		if (!modelPublic.isEmpty() && user == null) {
+			user = new User();
+		}
 		
 		StmtIterator stmtIteratorPublic = modelPublic.listStatements();
 		while (stmtIteratorPublic.hasNext()) {
@@ -325,11 +302,9 @@ public class User implements Comparable<User> {
 			object = statement.getObject();
 			if (statement.getPredicate().getURI().equals("http://xmlns.com/foaf/0.1/name")) {
 				user.setName(object.asLiteral().getString());
-				System.out.println("name: " + object.asLiteral().getString());
 			} else if (statement.getPredicate().getURI().equals("http://xmlns.com/foaf/0.1/mbox")) {
 				user.setEmail(object.asLiteral().getString());
 				bHasEmail = true;
-				System.out.println("mbox: " + object.asLiteral().getString());
 			}
 		}
 		

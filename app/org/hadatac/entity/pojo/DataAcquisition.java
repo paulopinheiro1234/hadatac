@@ -552,28 +552,28 @@ public class DataAcquisition {
 	}
 	
 	public static List<String> findAllAccessibleDataAcquisition(String user_uri){
-		List<String> listURI = new ArrayList<String>();
-		Map<String, String> nameList = new HashMap<String, String>();
+		List<String> results = new ArrayList<String>();
+		List<String> accessLevels = new ArrayList<String>();
 		
 		User user = User.find(user_uri);
 		if (null != user) {
-			user.getGroupNames(nameList);
+			user.getGroupNames(accessLevels);
 		}
 		
 		for(DataAcquisition acquisition : findAll()) {
 			if(acquisition.getPermissionUri().equals("Public")
 			|| acquisition.getPermissionUri().equals(user_uri)){
-				listURI.add(acquisition.getUri());
+				results.add(acquisition.getUri());
 			}
 
-			for (String accessLevel : nameList.keySet()) {
-				if (acquisition.getPermissionUri().equals(accessLevel)) {
-					listURI.add(acquisition.getUri());
+			for (String level : accessLevels) {
+				if (acquisition.getPermissionUri().equals(level)) {
+					results.add(acquisition.getUri());
 				}
 			}
 		}
 		
-		return listURI;
+		return results;
 	}
 	
 	public static List<DataAcquisition> findAll() {
