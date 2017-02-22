@@ -1,6 +1,8 @@
 @(subjectResult : Map[String, List[String]],
   sampleResult	: Map[String, List[String]],
-  indicatorValues : Map[String, List[String]])
+  indicatorValues : Map[String, List[String]],
+  indicatorUris	: Map[String,String],
+  showValues : Map[String,String])
 
 @import org.hadatac.console.views.html._
 @import org.hadatac.utils._
@@ -33,17 +35,21 @@
 					}
 				</ul>
 
-			<h3>Indicators</h3>
-				<ul>
+				<table style="width:80%">
+					<tr><th><h3>Indicator</h3></th><th><h3>Value</h3></th><th><h3>Data URI</h3></th></tr>
 					@for(key <- indicatorValues.keySet()){
-						@if(indicatorValues.get(key).size() > 0){
-						<li>@key.toString</li>
-						<ul>
-							@indicatorValues.get(key).mkString(", ")
-						</ul>
+						@if(indicatorValues.get(key).toString != ""){
+							@if(indicatorValues.get(key).length>0){
+							<tr><td><b>@key.toString</b></td></tr>
+								@for( i <- indicatorValues.get(key)){
+										<tr><td></td><td>@i.toString()</td><td><a href="@org.hadatac.console.controllers.metadataacquisition.routes.ViewValue.index(showValues.get("user").toString(), showValues.get("subject").toString(),"",indicatorUris.get(i))"><b>@indicatorUris.get(i).toString().replace("http://hadatac.org/ont/","")</b></a><br></td></tr>
+								}
+							}
 						}
 					}
-				</ul>
+				</table>
+			
+			
 
 			<h3>Sample List</h3>
 				<ul>
