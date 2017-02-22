@@ -403,7 +403,8 @@ public class Deployment {
 		
 		System.out.println(queryString);
 		
-		QueryExecution qexec = QueryExecutionFactory.sparqlService(Collections.getCollectionsName(Collections.METADATA_SPARQL), query);
+		QueryExecution qexec = QueryExecutionFactory.sparqlService(
+				Collections.getCollectionsName(Collections.METADATA_SPARQL), query);
 		ResultSet results = qexec.execSelect();
 		ResultSetRewindable resultsrw = ResultSetFactory.copyResults(results);
 		qexec.close();
@@ -415,7 +416,6 @@ public class Deployment {
 				dep = Deployment.find(soln.getResource("uri").getURI()); 
 			}
 			deployments.add(dep);
-			
 		}
 		
 		return deployments;

@@ -147,7 +147,6 @@ public class Platform implements Comparable<Platform> {
 			
 		while (resultsrw.hasNext()) {
 			QuerySolution soln = resultsrw.next();
-			System.out.println("URI from main query: " + soln.getResource("uri").getURI());
 			Platform platform = find(soln.getResource("uri").getURI());
 			platforms.add(platform);
 		}			

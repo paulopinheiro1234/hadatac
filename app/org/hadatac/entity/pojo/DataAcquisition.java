@@ -551,7 +551,7 @@ public class DataAcquisition {
 		return findByQuery(query);
 	}
 	
-	public static List<String> findAllAccessibleDataAcquisition(String user_uri){
+	public static List<String> findAllAccessibleDataAcquisition(String user_uri) {
 		List<String> results = new ArrayList<String>();
 		List<String> accessLevels = new ArrayList<String>();
 		
@@ -562,8 +562,10 @@ public class DataAcquisition {
 		
 		for(DataAcquisition acquisition : findAll()) {
 			if(acquisition.getPermissionUri().equals("Public")
-			|| acquisition.getPermissionUri().equals(user_uri)){
+			|| acquisition.getPermissionUri().equals(user_uri)
+			|| acquisition.getOwnerUri().equals(user_uri)){
 				results.add(acquisition.getUri());
+				continue;
 			}
 
 			for (String level : accessLevels) {

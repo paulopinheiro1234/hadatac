@@ -41,7 +41,7 @@ public class Parser {
 	}
 	
 	public DatasetParsingResult validate(int mode, FileFactory files) throws IOException {
-		DatasetParsingResult result;
+		DatasetParsingResult result = null;
 		String message = "";
 		Model model;
 		String preamble;

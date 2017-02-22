@@ -73,7 +73,6 @@ public class Instrument  implements Comparable<Instrument> {
 			
 		while (resultsrw.hasNext()) {
 			QuerySolution soln = resultsrw.next();
-			//System.out.println("URI from main query: " + soln.getResource("uri").getURI());
 			Instrument instrument = find(soln.getResource("uri").getURI());
 			instruments.add(instrument);
 		}			
@@ -108,7 +107,6 @@ public class Instrument  implements Comparable<Instrument> {
 			
 		while (resultsrw.hasNext()) {
 			QuerySolution soln = resultsrw.next();
-			System.out.println("URI from main query: " + soln.getResource("uri").getURI());
 			Instrument instrument = find(soln.getResource("uri").getURI());
 			instruments.add(instrument);
 		}			
@@ -141,7 +139,6 @@ public class Instrument  implements Comparable<Instrument> {
 			
 		while (resultsrw.hasNext()) {
 			QuerySolution soln = resultsrw.next();
-			//System.out.println("URI from main query: " + soln.getResource("uri").getURI());
 			Instrument instrument = find(soln.getResource("uri").getURI());
 			instruments.add(instrument);
 		}			

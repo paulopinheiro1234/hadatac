@@ -251,32 +251,35 @@ public class AutoAnnotator extends Controller {
 				break;
 			}
 		}
-		if(dc_uri == null){
-			System.out.println(String.format("Cannot find the target data acquisition: %s", file_name));
+		if (dc_uri == null) {
 			log.addline(String.format("Cannot find the target data acquisition: %s", file_name));
 			log.save();
 			return false;
+		} else {
+			log.addline(String.format("Found the target data acquisition: %s", file_name));
 		}
-		if(schema_uri == null){
-    		System.out.println("Cannot find schema of the data acquisition");
-    		log.addline("Cannot find schema of the data acquisition");
+		if (schema_uri == null) {
+    		log.addline(String.format("Cannot find schema for the data acquisition: %s", file_name));
     		log.save();
     		return false;
+    	} else {
+    		log.addline(String.format("Found schema %s for the data acquisition: %s", schema_uri, file_name));
     	}
-		if(deployment_uri == null){
-    		System.out.println("Cannot find deployment of the data acquisition");
-    		log.addline("Cannot find deployment of the data acquisition");
+		if (deployment_uri == null) {
+    		log.addline(String.format("Cannot find deployment for the data acquisition: %s", file_name));
     		log.save();
     		return false;
+    	} else {
+    		try {
+        		deployment_uri = URLDecoder.decode(deployment_uri, "UTF-8");
+    		} catch (UnsupportedEncodingException e) {
+    			log.addline(String.format("URL decoding error for deployment uri %s", deployment_uri));
+    			log.save();
+    			return false;
+    		}
+    		log.addline(String.format("Found deployment %s for the data acquisition %s", deployment_uri, file_name));
     	}
 		
-    	try {
-    		deployment_uri = URLDecoder.decode(deployment_uri, "UTF-8");
-		} catch (UnsupportedEncodingException e) {
-			return false;
-		}
-    	System.out.println("deployment_uri is " + deployment_uri);
-    	
     	CSVAnnotationHandler handler = null;
     	if (!deployment_uri.equals("")) {
     		/*
