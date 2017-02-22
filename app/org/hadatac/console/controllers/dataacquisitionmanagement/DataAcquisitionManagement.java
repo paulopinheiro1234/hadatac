@@ -36,8 +36,6 @@ public class DataAcquisitionManagement extends Controller {
     	}
     	else {
     		String ownerUri = UserManagement.getUriByEmail(user.getEmail());
-    		System.out.println("Email: " + user.getEmail());
-    		System.out.println("Owner URI: " + ownerUri);
     		results = DataAcquisition.find(ownerUri, state);
     	}
     	

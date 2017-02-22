@@ -21,7 +21,6 @@ public class SparqlQueryResults{
 
 	public SparqlQueryResults(String json_result, boolean usingURIs){
         this.json = json_result;
-        System.out.println(this.json);
         // create an ObjectMapper instance.
         ObjectMapper mapper = new ObjectMapper();
         // use the ObjectMapper to read the json string and create a tree

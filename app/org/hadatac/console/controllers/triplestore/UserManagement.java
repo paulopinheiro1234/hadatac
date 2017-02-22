@@ -559,10 +559,8 @@ public class UserManagement extends Controller {
 	}
 
 	public static String getUriByEmail(String email) {
-		System.out.println("Email: " + email);
 		String json = PermissionQueries.exec(PermissionQueries.PERMISSION_BY_EMAIL, email);
 		SparqlQueryResults results = new SparqlQueryResults(json, false);
-		System.out.println("Initialize sparql query results!");
 		if (results == null
 			|| results.sparqlResults == null
 			|| !results.sparqlResults.values().iterator().hasNext()){
@@ -570,7 +568,6 @@ public class UserManagement extends Controller {
 		}
 		TripleDocument docPermission = results.sparqlResults.values().iterator().next();
 		String uri = docPermission.get("uri");
-		System.out.println(uri);
 		
 		return uri;
 	}

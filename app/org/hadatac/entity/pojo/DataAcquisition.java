@@ -3,8 +3,10 @@ package org.hadatac.entity.pojo;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.jena.query.Query;
 import org.apache.jena.query.QueryExecution;
@@ -530,17 +532,17 @@ public class DataAcquisition {
 			}
 		} else if (state.getCurrent() == State.ACTIVE) {
 			if (null == ownerUri) {
-				query.set("q", "owner_uri:* AND " + "ended_at:\"9999-12-31T23:59:59.999Z\"");
+				query.set("q", "owner_uri:* AND ended_at:\"9999-12-31T23:59:59.999Z\"");
 			}
 			else {
-				query.set("q", "owner_uri:\"" + ownerUri + "\"" + " AND " + "ended_at:\"9999-12-31T23:59:59.999Z\"");
+				query.set("q", "owner_uri:\"" + ownerUri + "\" AND ended_at:\"9999-12-31T23:59:59.999Z\"");
 			}
 		} else {  // it is assumed that state is CLOSED
 			if (null == ownerUri) {
-				query.set("q", "owner_uri:* AND " + "-ended_at:\"9999-12-31T23:59:59.999Z\"");
+				query.set("q", "owner_uri:* AND -ended_at:\"9999-12-31T23:59:59.999Z\"");
 			}
 			else {
-				query.set("q", "owner_uri:\"" + ownerUri + "\"" + " AND " + "-ended_at:\"9999-12-31T23:59:59.999Z\"");
+				query.set("q", "owner_uri:\"" + ownerUri + "\" AND -ended_at:\"9999-12-31T23:59:59.999Z\"");
 			}
 		}
 		query.set("sort", "started_at asc");
@@ -551,26 +553,23 @@ public class DataAcquisition {
 	
 	public static List<String> findAllAccessibleDataAcquisition(String user_uri){
 		List<String> listURI = new ArrayList<String>();
+		Map<String, String> nameList = new HashMap<String, String>();
 		
-		String group_uri = "";
-		if(user_uri.equals("Public")){
-			group_uri = "Public";
-		}
-		else{
-			User user = User.find(user_uri);
-			if(null == user){
-				return listURI;
-			}
-			else{
-				group_uri = user.getImmediateGroupUri();
-			}
+		User user = User.find(user_uri);
+		if (null != user) {
+			user.getGroupNames(nameList);
 		}
 		
 		for(DataAcquisition acquisition : findAll()) {
 			if(acquisition.getPermissionUri().equals("Public")
-			|| acquisition.getPermissionUri().equals(group_uri)
 			|| acquisition.getPermissionUri().equals(user_uri)){
 				listURI.add(acquisition.getUri());
+			}
+
+			for (String accessLevel : nameList.keySet()) {
+				if (acquisition.getPermissionUri().equals(accessLevel)) {
+					listURI.add(acquisition.getUri());
+				}
 			}
 		}
 		

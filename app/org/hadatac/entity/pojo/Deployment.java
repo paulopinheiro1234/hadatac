@@ -333,23 +333,23 @@ public class Deployment {
 	
 	public static Deployment find(String deployment_uri) {
 		Deployment deployment = null;
-		Model model;
-		Statement statement;
-		RDFNode object;
 		
 		String queryString = "DESCRIBE <" + deployment_uri + ">";
 		Query query = QueryFactory.create(queryString);
 		QueryExecution qexec = QueryExecutionFactory.sparqlService(
 				Play.application().configuration().getString("hadatac.solr.triplestore") 
 				+ Collections.METADATA_SPARQL, query);
-		model = qexec.execDescribe();
+		Model model = qexec.execDescribe();
 		
-		deployment = new Deployment();
 		StmtIterator stmtIterator = model.listStatements();
+		if (!model.isEmpty()) {
+			deployment = new Deployment();
+			deployment.setUri(deployment_uri);
+		}
 		
 		while (stmtIterator.hasNext()) {
-			statement = stmtIterator.next();
-			object = statement.getObject();
+			Statement statement = stmtIterator.next();
+			RDFNode object = statement.getObject();
 			if (statement.getPredicate().getURI().equals("http://hadatac.org/ont/hasneto#hasInstrument")) {
 				deployment.instrument = Instrument.find(object.asResource().getURI());
 			} else if (statement.getPredicate().getURI().equals("http://hadatac.org/ont/vstoi#hasPlatform")) {
@@ -358,11 +358,8 @@ public class Deployment {
 				deployment.detectors.add(Detector.find(object.asResource().getURI()));
 			} else if (statement.getPredicate().getURI().equals("http://www.w3.org/ns/prov#startedAtTime")) {
 				deployment.setStartedAtXsdWithMillis(object.asLiteral().getString());
-				System.out.println("StartedTime is " + object.asLiteral().getString());
 			}
 		}
-		
-		deployment.setUri(deployment_uri);
 		
 		return deployment;
 	}

@@ -79,7 +79,6 @@ public class ValueCellProcessing {
 	        String abbrev = entry.getKey().toString();
 	        String nsString = entry.getValue().getName();
 	        if (str.startsWith(nsString)) {
-	        	//System.out.println("REPLACE: " + resp + " / " + abbrev);
 	        	resp = str.replace(nsString, abbrev + ":");
 	        	return resp; 
 	        }
@@ -93,7 +92,6 @@ public class ValueCellProcessing {
 	        String abbrev = entry.getKey().toString();
 	        String nsString = entry.getValue().getName();
 	        if (str.startsWith(nsString)) {
-	        	//System.out.println("REPLACE: " + resp + " / " + abbrev);
 	        	resp = str.replace(nsString, abbrev + ":");
 	        	return resp; 
 	        }
@@ -112,7 +110,6 @@ public class ValueCellProcessing {
 	        String abbrev = entry.getKey().toString();
 	        String nsString = entry.getValue().getName();
 	        if (str.startsWith(abbrev + ":")) {
-	        	//System.out.println("REPLACE: " + resp + " / " + nsString);
 	        	resp = str.replace(abbrev + ":", nsString);
 	        	return resp; 
 	        }
@@ -131,7 +128,6 @@ public class ValueCellProcessing {
 	        String abbrev = entry.getKey().toString();
 	        String nsString = entry.getValue().getName();
 	        if (str.startsWith(abbrev + ":")) {
-	        	//System.out.println("REPLACE: " + resp + " / " + nsString);
 	        	resp = str.replace(abbrev + ":", nsString);
 	        	return resp; 
 	        }
@@ -194,7 +190,6 @@ public class ValueCellProcessing {
     	        String abbrev = entry.getKey().toString();
     	        String nsString = entry.getValue().getName();
     	        if (object.startsWith(abbrev + ":")) {
-    	        	System.out.println("REPLACE: " + resp + " / " + nsString);
     	        	resp = object.replace(abbrev + ":", nsString);
     	        	return resp;
     	        }
@@ -205,7 +200,6 @@ public class ValueCellProcessing {
     }
 	
 	public String exec(Cell cell, Vector<String> predicates) {
-
 		String clttl = "";
 		String cellValue = cell.getStringCellValue();
 		String predicate = predicates.get(cell.getColumnIndex());

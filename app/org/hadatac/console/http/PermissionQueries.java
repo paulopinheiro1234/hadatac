@@ -17,7 +17,6 @@ public class PermissionQueries {
     public static final String PERMISSIONS_BY_URI        = "PermissionsByURI";
     
     public static String querySelector(String concept, String uri){
-        // default query?
         String q = "SELECT * WHERE { ?s ?p ?o } LIMIT 10";
         switch (concept){
             case PERMISSION_BY_EMAIL : 
@@ -46,9 +45,9 @@ public class PermissionQueries {
             default :
             	q = "";
             	System.out.println("WARNING: no query for tab " + concept);
-        }// /switch
+        }
         return q;
-    } // /querySelector
+    }
 
     public static String exec(String concept, String uri) {
     	ByteArrayOutputStream outputStream = new ByteArrayOutputStream();

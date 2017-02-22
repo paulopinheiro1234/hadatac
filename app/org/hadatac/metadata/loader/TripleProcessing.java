@@ -241,8 +241,6 @@ public class TripleProcessing {
 				if (null == dataAcquisition) {	
 					final SysUser user = AuthApplication.getLocalUser(Controller.session());
 					String ownerUri = UserManagement.getUriByEmail(user.getEmail());
-					System.out.println("User Email is: " + user.getEmail());
-					System.out.println("OwnerUri is: " + ownerUri);
 					dataAcquisition = new DataAcquisition();
 					dataAcquisition.setUri(dataAcquisitionUri);
 					dataAcquisition.setOwnerUri(ownerUri);
@@ -251,7 +249,7 @@ public class TripleProcessing {
 					dataAcquisition.setNumberDataPoints(0);
 				}
 				
-				for(PlainTriple triple : sheet.get(uri)){
+				for (PlainTriple triple : sheet.get(uri)) {
 					String cellValue = triple.obj.trim();
 					String predicate = triple.pred.trim();
 					
@@ -281,22 +279,21 @@ public class TripleProcessing {
 						dataAcquisition.setDeploymentUri(deployment_uri);
 						
 						Deployment deployment = Deployment.find(deployment_uri);
-						dataAcquisition.setPlatformUri(deployment.getPlatform().getUri());
-						dataAcquisition.setInstrumentUri(deployment.getInstrument().getUri());
-						dataAcquisition.setPlatformName(deployment.getPlatform().getLabel());
-						dataAcquisition.setInstrumentModel(deployment.getInstrument().getLabel());
-						dataAcquisition.setStartedAtXsdWithMillis(deployment.getStartedAt());
-						System.out.println("time is " + deployment.getStartedAt());
+						if (deployment != null) {
+							dataAcquisition.setPlatformUri(deployment.getPlatform().getUri());
+							dataAcquisition.setInstrumentUri(deployment.getInstrument().getUri());
+							dataAcquisition.setPlatformName(deployment.getPlatform().getLabel());
+							dataAcquisition.setInstrumentModel(deployment.getInstrument().getLabel());
+							dataAcquisition.setStartedAtXsdWithMillis(deployment.getStartedAt());
+						}
 					}
-					else if(predicate.equals("hasco:hasSchema")){
-						System.out.println("*********************************************" + dataAcquisition.getUri());
-						System.out.println("=============================================" + cellValue);
+					else if (predicate.equals("hasco:hasSchema")) {
 						dataAcquisition.setSchemaUri(cellProc.convertToWholeURI(cellValue));
-						System.out.println("+++++++++++++++++++++++++++++++++++++++++++++" + dataAcquisition.getSchemaUri());
 					}
-					dataAcquisition.save();
-					System.out.println("Successfully saved in Solr");
 				}
+				
+				dataAcquisition.save();
+				System.out.println("Successfully saved " + dataAcquisition.getUri() + " in Solr");
 			}
 		}
 		

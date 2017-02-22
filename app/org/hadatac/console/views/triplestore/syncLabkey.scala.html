@@ -1,5 +1,4 @@
-@(labkeyLoginForm : Form[org.hadatac.console.models.LabKeyLoginForm],
-  oper : String,
+@(oper : String,
   content: String,
   result : String,
   loadStudy : Boolean = false )
@@ -43,7 +42,7 @@
              <div id="rcorners">
                  The metadata store has @MetadataContext.playTotalTriples() triples. <br>
                  
-                 <form class="form-horizontal" name="labkeyLogin" method="post" action="@org.hadatac.console.controllers.triplestore.routes.LoadKB.playLoadLabkeyFolders("init", new LabKeyLoginForm(), content)" >
+                 <form class="form-horizontal" name="labkeyLogin" method="post" action="@org.hadatac.console.controllers.triplestore.routes.LoadKB.playLoadLabkeyFolders("init", content)" >
 
              		<div class="row">
     					<div class="col-xs-6 col-xs-offset-1 col-sm-4">
@@ -98,7 +97,7 @@
              <div id="rcorners">
                  The metadata store has @MetadataContext.playTotalTriples() triples. <br>
                  
-                 <form class="form-horizontal" name="labkeyLogin" method="post" action="@org.hadatac.console.controllers.triplestore.routes.LoadKB.playLoadLabkeyFolders("init", new LabKeyLoginForm(), content)">
+                 <form class="form-horizontal" name="labkeyLogin" method="post" action="@org.hadatac.console.controllers.triplestore.routes.LoadKB.playLoadLabkeyFolders("init", content)">
 
              		<div class="row">
     					<div class="col-xs-6 col-xs-offset-1 col-sm-4">

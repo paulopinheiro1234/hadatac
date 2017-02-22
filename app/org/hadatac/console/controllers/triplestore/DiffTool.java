@@ -275,7 +275,7 @@ public class DiffTool extends Controller {
         }
     }
 
-    public static void runDiffTool(LabKeyLoginForm auth, List<String> list) throws Exception {
+    public static void runDiffTool(List<String> list) throws Exception {
     	
         /*if(args.length != 4){
             System.out.println("ERROR: Incorrect number of arguments");
@@ -293,8 +293,11 @@ public class DiffTool extends Controller {
 			Schema1 = "CHEAR Development";
         	Schema2 = "CHEAR Production";
 		}	
-		String username = auth.user_name;
-        String password = auth.password;
+		String username = session().get("LabKeyUserName");
+        String password = session().get("LabKeyPassword");
+        if (username == null || password == null) {
+        	redirect(routes.LoadKB.loadLabkeyKB("init", "diff_tool"));
+        }
         Connection cn = new Connection("http://chear.tw.rpi.edu/labkey/", username, password);
 
         PrintWriter writer = new PrintWriter("./app/org/hadatac/console/views/triplestore/diff_results.scala.html", "UTF-8");
@@ -333,7 +336,6 @@ public class DiffTool extends Controller {
         }
         writer.print("\n</div>\n}");
         writer.close();
-
     }
     
     //public static void updateForm(String alias, List<String> selectedTerms) {
@@ -341,17 +343,14 @@ public class DiffTool extends Controller {
     	System.out.println("Alias: " + alias);
     }
     
-    public static Result index(LabKeyLoginForm auth, List<String> list_names) throws Exception {
+    public static Result index(List<String> list_names) throws Exception {
     	List<String> lists = diffLoadLists(list_names);
-    	runDiffTool(auth,lists);
+    	runDiffTool(lists);
         return ok(diff_results.render());
-        
     }
     
-    public static Result postIndex(LabKeyLoginForm auth, List<String> list_names) throws Exception {
-        
-        return index(auth, list_names);
-        
+    public static Result postIndex(List<String> list_names) throws Exception {
+        return index(list_names);
     }
     
 }
