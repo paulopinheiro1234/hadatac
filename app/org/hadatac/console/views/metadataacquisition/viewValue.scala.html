@@ -20,8 +20,19 @@
  			@if(indicatorValueResults.isEmpty()){
  				NULL
  			}else{
- 				<h2>@indicatorValueResults.get(0).getStudyUri()</h2>
-				<ul>        		
+ 				<h2>@indicatorValueResults.get(0).toString()</h2>
+ 				<li><b>Name:</b>@indicatorValueResults.get(0).getCharacteristic()</li>
+ 				
+				<table style="width:80%">
+					<tr><th><h3>Subject</h3></th><th><h3>Value</h3></th></tr>
+					@for(i <- indicatorValueResults){
+
+						<tr><td></td><td>@i.getObjectUri()</td><td>@i.getValue()<br></td></tr>
+
+					}
+				</table>
+ 				
+<!--			<ul>        		
 					@for(i <- indicatorValueResults){
 						<li><b>Subject:</b>@i.getObjectUri()
 							<li><b>Name:</b>@i.getCharacteristic()
@@ -29,7 +40,7 @@
 							</li>
 						</li>
 					}
-				</ul>
+				</ul> -->
  			}
             
     	</div>

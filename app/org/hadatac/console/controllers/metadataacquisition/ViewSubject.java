@@ -19,7 +19,10 @@ import org.apache.jena.query.QuerySolution;
 import org.apache.jena.query.ResultSet;
 import org.apache.jena.query.ResultSetFactory;
 import org.apache.jena.query.ResultSetRewindable;
+import org.apache.jena.sparql.engine.http.QueryExceptionHTTP;
 import org.hadatac.console.controllers.AuthApplication;
+import org.hadatac.console.controllers.triplestore.UserManagement;
+import org.hadatac.console.models.SysUser;
 import org.hadatac.utils.Collections;
 import org.hadatac.utils.NameSpaces;
 
@@ -123,6 +126,66 @@ public class ViewSubject extends Controller {
 		return subjectResult;
 	}
 	
+	public static Map<String, String> findSubjectIndicatorsUri(String subject_uri) {
+		String indicatorQuery = ""; 
+		indicatorQuery += NameSpaces.getInstance().printSparqlNameSpaceList();
+		indicatorQuery += "SELECT ?subjectIndicator ?label ?comment WHERE { "
+				+ "?subjectIndicator rdfs:subClassOf chear:subjectIndicator . "
+				+ "?subjectIndicator rdfs:label ?label . "
+				+ "?subjectIndicator rdfs:comment ?comment . }";
+		Map<String, String> indicatorMap = new HashMap<String, String>();
+		String indicatorLabel = "";
+		try {
+			QueryExecution qexecInd = QueryExecutionFactory.sparqlService(
+					Collections.getCollectionsName(Collections.METADATA_SPARQL), indicatorQuery);
+			ResultSet indicatorResults = qexecInd.execSelect();
+			ResultSetRewindable resultsrwIndc = ResultSetFactory.copyResults(indicatorResults);
+			qexecInd.close();
+			while (resultsrwIndc.hasNext()) {
+				QuerySolution soln = resultsrwIndc.next();
+				indicatorLabel = soln.get("label").toString();
+				indicatorMap.put(soln.get("subjectIndicator").toString(),indicatorLabel);		
+			}
+		} catch (QueryExceptionHTTP e) {
+			e.printStackTrace();
+		}
+		Map<String, String> indicatorMapSorted = new TreeMap<String, String>(indicatorMap);
+		Map<String, String> indicatorUris = new HashMap<String, String>();
+		
+		for(Map.Entry<String, String> entry : indicatorMapSorted.entrySet()){
+			String parentIndicatorUri = entry.getKey();
+			String indvIndicatorQuery = "";
+			indvIndicatorQuery += NameSpaces.getInstance().printSparqlNameSpaceList();
+			indvIndicatorQuery += "SELECT DISTINCT ?subjectUri ?label ?uri WHERE { "
+					+ "?subjectUri hasco:isSubjectOf* ?cohort . "
+					+ "?cohort hasco:isCohortOf ?study . "
+					+ "?schemaUri hasco:isSchemaOf ?study . "
+					+ "?schemaAttribute hasneto:partOfSchema ?schemaUri . "
+					+ "?schemaAttribute hasneto:hasAttribute ?uri . "
+					+ "?uri rdfs:subClassOf* <" + parentIndicatorUri + "> . " 
+					+ "?uri rdfs:label ?label . " 
+					+ "FILTER ( ?subjectUri = " + subject_uri + " ) . " 
+					+ "}";
+			try {
+				QueryExecution qexecIndvInd = QueryExecutionFactory.sparqlService(
+						Collections.getCollectionsName(Collections.METADATA_SPARQL), indvIndicatorQuery);
+				ResultSet indvIndResults = qexecIndvInd.execSelect();
+				ResultSetRewindable resultsrwIndvInd = ResultSetFactory.copyResults(indvIndResults);
+				qexecIndvInd.close();
+				
+				while (resultsrwIndvInd.hasNext()) {
+					QuerySolution soln = resultsrwIndvInd.next();
+					System.out.println("Solution: " + soln);
+					indicatorUris.put(soln.get("label").toString(), soln.get("uri").toString());
+				}
+			} catch (QueryExceptionHTTP e) {
+				e.printStackTrace();
+			}
+		}
+		
+		return indicatorUris;
+	}
+	
 	public static Map<String, List<String>> findSampleMap(String subject_uri) {
 		String sampleQueryString = "";
     	sampleQueryString += NameSpaces.getInstance().printSparqlNameSpaceList();
@@ -188,13 +251,33 @@ public class ViewSubject extends Controller {
 		return sampleResult;
 	}
 	
+	public static String findUser() {
+		String results = null;
+	    final SysUser user = AuthApplication.getLocalUser(session());
+	    if(null == user){
+	        results = null;
+	    }
+	    else{
+	    	results = UserManagement.getUriByEmail(user.getEmail());
+	    }
+	    System.out.println("This is the current user's uri:" + results);
+	    
+	    return results;
+	}
+	
 	@Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
     public static Result index(String subject_uri) {
 		Map<String, List<String>> indicatorValues = findSubjectIndicators(subject_uri);
     	Map<String, List<String>> subjectResult = findBasic(subject_uri);
     	Map<String, List<String>> sampleResult = findSampleMap(subject_uri);
+
+		Map<String, String> indicatorUris = findSubjectIndicatorsUri(subject_uri);
+		
+		Map<String, String> showValues = new HashMap<String, String>();
+		showValues.put("subject", subject_uri);
+		showValues.put("user", findUser());
     	
-    	return ok(viewSubject.render(subjectResult, sampleResult, indicatorValues));    
+    	return ok(viewSubject.render(subjectResult, sampleResult, indicatorValues, indicatorUris, showValues));    
     }
 
 	@Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
