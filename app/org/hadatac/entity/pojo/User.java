@@ -135,6 +135,7 @@ public class User implements Comparable<User> {
 		if(getImmediateGroupUri() != null) {
 			User user = UserGroup.find(getImmediateGroupUri());
 			if(user != null){
+				System.out.println("Access Level: " + user.getUri());
 				accessLevels.add(user.getUri());
 	    		user.getGroupNames(accessLevels);
 			}
@@ -221,7 +222,6 @@ public class User implements Comparable<User> {
 		
 		while (resultsrw.hasNext()) {
 			QuerySolution soln = resultsrw.next();
-			System.out.println("URI from main query: " + soln.getResource("uri").getURI());
 			User user = find(soln.getResource("uri").getURI());
 			if(null != user){
 				users.add(user);
@@ -254,6 +254,10 @@ public class User implements Comparable<User> {
 		StmtIterator stmtIteratorPrivate = modelPrivate.listStatements();
 		while (stmtIteratorPrivate.hasNext()) {
 			statement = stmtIteratorPrivate.next();
+			if (!statement.getSubject().getURI().equals(uri)) {
+				continue;
+			}
+			
 			object = statement.getObject();
 			if (statement.getPredicate().getURI().equals("http://www.w3.org/2000/01/rdf-schema#comment")) {
 				user.setComment(object.asLiteral().getString());

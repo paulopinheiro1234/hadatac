@@ -85,7 +85,6 @@ public class Detector implements Comparable<Detector>  {
 			
 		while (resultsrw.hasNext()) {
 			QuerySolution soln = resultsrw.next();
-			//System.out.println("URI from main query: " + soln.getResource("uri").getURI());
 			Detector detector = find(soln.getResource("uri").getURI());
 			detectors.add(detector);
 		}			

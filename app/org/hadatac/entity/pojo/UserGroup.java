@@ -42,6 +42,10 @@ public class UserGroup extends User {
 		StmtIterator stmtIteratorPrivate = modelPrivate.listStatements();
 		while (stmtIteratorPrivate.hasNext()) {
 			statement = stmtIteratorPrivate.next();
+			if (!statement.getSubject().getURI().equals(uri)) {
+				continue;
+			}
+			
 			object = statement.getObject();
 			if (statement.getPredicate().getURI().equals("http://www.w3.org/2000/01/rdf-schema#comment")) {
 				user.setComment(object.asLiteral().getString());
@@ -108,14 +112,14 @@ public class UserGroup extends User {
 		
 		Query query = QueryFactory.create(queryString);
 		
-		QueryExecution qexec = QueryExecutionFactory.sparqlService(Collections.getCollectionsName(Collections.PERMISSIONS_SPARQL), query);
+		QueryExecution qexec = QueryExecutionFactory.sparqlService(
+				Collections.getCollectionsName(Collections.PERMISSIONS_SPARQL), query);
 		ResultSet results = qexec.execSelect();
 		ResultSetRewindable resultsrw = ResultSetFactory.copyResults(results);
 		qexec.close();
 		
 		while (resultsrw.hasNext()) {
 			QuerySolution soln = resultsrw.next();
-			System.out.println("URI from main query: " + soln.getResource("uri").getURI());
 			User user = find(soln.getResource("uri").getURI());
 			if(null != user){
 				users.add(user);
@@ -147,11 +151,9 @@ public class UserGroup extends User {
 		
 		while (resultsrw.hasNext()) {
 			QuerySolution soln = resultsrw.next();
-			System.out.println("URI from main query: " + soln.getResource("uri").getURI());
 			User user = find(soln.getResource("uri").getURI());
 			users.add(user);
-		}		
-		System.out.println(users.size());
+		}
 		
 		java.util.Collections.sort((List<User>) users);
 		return users;

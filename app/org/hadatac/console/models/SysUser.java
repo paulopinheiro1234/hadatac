@@ -615,7 +615,6 @@ public class SysUser implements Subject {
 	}
 
 	public static SysUser findByEmail(final String email) {
-		System.out.println(String.format("findByEmail: %s", email));
 		return findByEmailSolr(email);
 	}
 	

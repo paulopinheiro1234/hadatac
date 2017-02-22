@@ -80,7 +80,7 @@ public class UserManagement extends Controller {
 
 	@Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
 	public static Result postIndex(String oper) {
-		return ok(users.render(oper, "", User.find(), UserGroup.find(), ""));
+		return index(oper);
 	}
 
 	@Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
@@ -90,7 +90,7 @@ public class UserManagement extends Controller {
 
 	@Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
 	public static Result postOnLinePreRegistration(String oper) {
-		return ok(preregister.render(oper, UserGroup.find()));
+		return onLinePreRegistration(oper);
 	}
 	
 	@Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
@@ -100,7 +100,7 @@ public class UserManagement extends Controller {
 	
 	@Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
 	public static Result postOnLineGroupRegistration(String oper) {
-		return ok(preregisterGroup.render(oper, UserGroup.find()));
+		return onLineGroupRegistration(oper);
 	}
 	
 	@Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))

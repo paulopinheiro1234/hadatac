@@ -71,7 +71,7 @@
   			<select class="form-control col-sm-6" id="group_uri" name="group_uri" >
   				<option value="Public">Public</option>
             	@for(group <- theGroups){
-              		@if(group.getUri().equals(user.getUri())){
+              		@if(group.getUri().equals(user.getImmediateGroupUri())){
               	 		<option selected value="@group.getUri()">@group.getName()</option>
               	 	}
               	 	else{
