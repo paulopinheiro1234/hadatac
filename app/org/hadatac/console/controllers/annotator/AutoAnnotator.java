@@ -75,6 +75,7 @@ public class AutoAnnotator extends Controller {
 				if (!search(listOfFiles[i].getName(), ownedFiles)) {
 					CSVFile newFile = new CSVFile();
  					newFile.setFileName(listOfFiles[i].getName());
+ 					newFile.save();
  					ownedFiles.add(newFile);
 				}
  			}
@@ -371,9 +372,6 @@ public class AutoAnnotator extends Controller {
 				String entity = doc.get("hasEntity");
 				String attrib = doc.get("hasAttribute");
 				String unit = doc.get("hasUnit");
-				System.out.println("get " + i + "-entity: [" + entity + "]");
-				System.out.println("get " + i + "-attribute: [" + attrib + "]");
-				System.out.println("get " + i + "-unit: [" + unit + "]");
 
 				if (unit.equals(Downloads.FRAG_IN_DATE_TIME)) {
 					timeStampIndex = i; 
@@ -418,8 +416,6 @@ public class AutoAnnotator extends Controller {
 				preamble += "\n";
 				preamble += Downloads.FRAG_IN_DATE_TIME_STATEMENT + " " + timeStampIndex + "  . \n";  
 			}
-			
-			System.out.println(preamble);
 		} catch (Exception e) {
 			e.printStackTrace();
 			return "";

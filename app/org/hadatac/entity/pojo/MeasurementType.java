@@ -128,7 +128,8 @@ public class MeasurementType {
 			
 			Query query = QueryFactory.create(queryString);
 			
-			QueryExecution qexec = QueryExecutionFactory.sparqlService(hadatac.getStaticMetadataSparqlURL(), query);
+			QueryExecution qexec = QueryExecutionFactory.sparqlService(
+					hadatac.getStaticMetadataSparqlURL(), query);
 			ResultSet resultset = qexec.execSelect();
 			ResultSetRewindable resultsrw = ResultSetFactory.copyResults(resultset);
 			qexec.close();

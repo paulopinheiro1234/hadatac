@@ -76,18 +76,15 @@ public class AnnotationLog {
 		AnnotationLog annotation_log = new AnnotationLog();
 		if(doc.getFieldValue("file_name") != null){
 			annotation_log.setFileName(doc.getFieldValue("file_name").toString());
-			System.out.println(doc.getFieldValue("file_name").toString());
 		}
 		if(doc.getFieldValue("log") != null){
 			annotation_log.setLog(doc.getFieldValue("log").toString());
-			//System.out.println(doc.getFieldValue("log").toString());
 		}
 
 		return annotation_log;
 	}
 	
 	public static String find(String file_name) {
-		System.out.println(String.format("file_name : %s", file_name));
 		SolrClient solr = new HttpSolrClient(
 				Play.application().configuration().getString("hadatac.solr.data")
 				+ Collections.ANNOTATION_LOG);

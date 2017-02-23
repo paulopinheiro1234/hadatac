@@ -58,7 +58,6 @@ public class ConsoleStore {
 			SolrClient client = new HttpSolrClient(
 					Play.application().configuration().getString("hadatac.solr.data") 
 					+ Collections.CONSOLE_STORE);
-			this.timestamp = DateTime.now();
 			int status = client.addBean(this).getStatus();
 			client.commit();
 			client.close();
@@ -75,24 +74,22 @@ public class ConsoleStore {
 		SolrClient client = new HttpSolrClient(
 				Play.application().configuration().getString("hadatac.solr.data") 
 				+ Collections.CONSOLE_STORE);
-        SolrQuery parameters = new SolrQuery();
-        parameters.set("q", "*:*");
-        parameters.set("sort", "last_dynamic_metadata_id desc");
-        parameters.set("start", "0");
-        parameters.set("rows", "1");
-        QueryResponse response;
+        SolrQuery query = new SolrQuery();
+        query.set("q", "*:*");
+        query.set("sort", "last_dynamic_metadata_id desc");
+        query.set("start", "0");
+        query.set("rows", "1");
         try {
-            response = client.query(parameters);
+        	QueryResponse response = client.query(query);
             client.close();
             SolrDocumentList list = response.getResults();
-            Iterator<SolrDocument> i = list.iterator();
-            if (i.hasNext()) {
-            	DateTime date;
-            	SolrDocument document = i.next();
+            Iterator<SolrDocument> iter = list.iterator();
+            if (iter.hasNext()) {
+            	SolrDocument document = iter.next();
             	consoleStore = new ConsoleStore();
             	consoleStore.setId(Integer.parseInt(document.getFieldValue("id").toString()));
             	consoleStore.setLastDynamicMetadataId(Long.parseLong(document.getFieldValue("last_dynamic_metadata_id").toString()));
-            	date = new DateTime((Date)document.getFieldValue("timestamp"));
+            	DateTime date = new DateTime((Date)document.getFieldValue("timestamp"));
             	consoleStore.setTimestamp(date.withZone(DateTimeZone.UTC).toString("EEE MMM dd HH:mm:ss zzz yyyy"));
             }
         } catch (SolrServerException | IOException e) {

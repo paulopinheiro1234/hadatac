@@ -9,6 +9,8 @@ import org.hadatac.entity.pojo.Deployment;
 import org.hadatac.entity.pojo.Detector;
 import org.hadatac.entity.pojo.Instrument;
 import org.hadatac.entity.pojo.Platform;
+import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
 
 import play.Play;
 
@@ -92,10 +94,18 @@ public class DataFactory {
 	}
 	
 	public static long getNextDynamicMetadataId() {
-		ConsoleStore consoleStore = ConsoleStore.find();
-		
 		try {
-			consoleStore.setLastDynamicMetadataId(consoleStore.getLastDynamicMetadataId()+1);
+			ConsoleStore consoleStore = ConsoleStore.find();
+			if (null == consoleStore) {
+				consoleStore = new ConsoleStore();
+				consoleStore.setId(0);
+				System.out.println("Hello");
+	        	consoleStore.setTimestamp(new DateTime().withZone(DateTimeZone.UTC).
+	        			toString("EEE MMM dd HH:mm:ss zzz yyyy"));
+	        	consoleStore.setLastDynamicMetadataId(1);
+			} else {
+				consoleStore.setLastDynamicMetadataId(consoleStore.getLastDynamicMetadataId() + 1);
+			}
 			consoleStore.save();
 			return consoleStore.getLastDynamicMetadataId();
 		} catch (Exception e) {

@@ -269,8 +269,6 @@ public class Deployment {
 		
 		Query query = QueryFactory.create(queryString);
 		
-		//System.out.println(queryString);
-		
 		QueryExecution qexec = QueryExecutionFactory.sparqlService(hadatac.getStaticMetadataSparqlURL(), query);
 		ResultSet results = qexec.execSelect();
 		ResultSetRewindable resultsrw = ResultSetFactory.copyResults(results);
@@ -287,7 +285,6 @@ public class Deployment {
 				deployment.setEndedAtXsd(soln.getLiteral("endedAt").getString());
 			}
 			hadatac.setDeployment(deployment);
-			System.out.println("!! DEPLOYMENT.FINDFROMDC " + deployment.getUri());
 			deployment.platform = Platform.find(hadatac);
 			deployment.instrument = Instrument.find(hadatac);
 			

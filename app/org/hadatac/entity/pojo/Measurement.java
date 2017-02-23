@@ -133,13 +133,9 @@ public class Measurement {
 		return timestamp;
 	}
 	public void setTimestamp(String timestamp) {
-		//DateTimeFormatter formatter = DateTimeFormat.forPattern("EEE MMM dd HH:mm:ss zzz yyyy");
-		//this.timestamp = formatter.parseDateTime(timestamp);
 		this.timestamp = timestamp;
 	}
 	public void setTimestampXsd(String timestamp) {
-		//DateTimeFormatter formatter = ISODateTimeFormat.dateTimeNoMillis();
-		//this.timestamp = formatter.parseDateTime(timestamp);
 		this.timestamp = timestamp;
 	}
 	public String getValue() {

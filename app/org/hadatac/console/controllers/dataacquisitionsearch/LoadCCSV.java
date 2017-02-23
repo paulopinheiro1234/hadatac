@@ -71,7 +71,6 @@ public class LoadCCSV extends Controller {
 					status = result.getStatus();
 					message += result.getMessage();
 					if (status == 0) {
-						System.out.println("Indexing...");
 						DatasetParsingResult result_parse = parser.index(Feedback.WEB);
 						status = result_parse.getStatus();
 						message += result_parse.getMessage();
@@ -108,7 +107,6 @@ public class LoadCCSV extends Controller {
     				try {
     					FileUtils.writeByteArrayToFile(newFile, byteFile);
     				} catch (Exception e) {
-    					// TODO Auto-generated catch block
     					e.printStackTrace();
     				}
     				try {

@@ -24,6 +24,7 @@ import org.hadatac.entity.pojo.Measurement;
 import org.hadatac.entity.pojo.MeasurementType;
 import org.hadatac.entity.pojo.Subject;
 import org.hadatac.metadata.loader.ValueCellProcessing;
+import org.hadatac.utils.Collections;
 import org.hadatac.utils.Feedback;
 
 import play.Play;
@@ -69,8 +70,6 @@ public class Parser {
 		if (result.getStatus() == 0) {
 			message += result.getMessage();
 			result = loadFromKb(mode);
-			System.out.println("loadFromKb(mode): " + result.getStatus());
-			System.out.println("loadFromKb(mode) message: " + result.getMessage());
 			message += result.getMessage();
 		}
 		
@@ -80,6 +79,8 @@ public class Parser {
 	}
 	
 	public DatasetParsingResult index(int mode) {
+		System.out.println("indexing...");
+		
 		DataAcquisition dataAcquisition = DataAcquisition.create(hadatacCcsv, hadatacKb);
 		if (hadatacCcsv.getDataAcquisition().getStatus() > 0) {
 			hadatacKb.getDataAcquisition().merge(dataAcquisition);
@@ -87,8 +88,6 @@ public class Parser {
 		else {
 			hadatacKb.setDataAcquisition(dataAcquisition);
 		}
-		
-		System.out.println("hadatacKb.dataCollection.save(solr)...");
 		hadatacKb.getDataAcquisition().save();
 		DatasetParsingResult result = indexMeasurements();
 
@@ -133,7 +132,7 @@ public class Parser {
 		
 		boolean isSubjectPlatform = Subject.isPlatform(hadatacKb.getDeployment().getPlatform().getUri());
 		SolrClient solr = new HttpSolrClient(Play.application().configuration().
-				getString("hadatac.solr.data") + "/measurement");
+				getString("hadatac.solr.data") + Collections.DATA_ACQUISITION);
 		ValueCellProcessing cellProc = new ValueCellProcessing();
 		for (CSVRecord record : records) {
 			Iterator<MeasurementType> iter = hadatacKb.getDataset().getMeasurementTypes().iterator();
@@ -282,7 +281,6 @@ public class Parser {
 		
 		// dataset
 		if (hadatacCcsv.getDataAcquisition().getStatus() > 0) {
-			System.out.println(hadatacCcsv.getDatasetKbUri());
 			if (hadatacKb.getDataAcquisition().containsDataset(hadatacCcsv.getDatasetKbUri())) {
 				message += Feedback.println(mode, "[ERROR] Dataset was already processed.");
 			} 
@@ -299,10 +297,8 @@ public class Parser {
 		
 		// deployment
 		if (hadatacCcsv.getDataAcquisition().getStatus() > 0) {
-			System.out.println("!! FIND FROM DC");
 			hadatacKb.setDeployment(Deployment.findFromDataAcquisition(hadatacKb));
 		} else {
-			System.out.println("!! FIND FROM PREAMBLE");
 			hadatacKb.setDeployment(Deployment.findFromPreamble(hadatacCcsv));
 		}
 		if (hadatacKb.getDeployment() == null) {
