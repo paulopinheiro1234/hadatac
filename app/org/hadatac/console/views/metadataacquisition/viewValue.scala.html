@@ -20,13 +20,13 @@
  			@if(indicatorValueResults.isEmpty()){
  				NULL
  			}else{
- 				<h2>@indicatorValueResults.get(0).getValue().toString()</h2>
+ 				<h2>@indicatorValueResults.get(0).getUri().toString()</h2>
  				<h3><b>Name:</b>@indicatorValueResults.get(0).getCharacteristic()</h3>
  				
 				<table style="width:80%">
 					<tr><th><h3>Subject</h3></th><th><h3>Value</h3></th></tr>
 					@for(i <- indicatorValueResults){
-						<tr><td>@i.getObjectUri()</td></tr><tr><td>@i.getValue()</td></tr>
+						<tr><td>@i.getObjectUri()</td><td>@i.getValue()</td></tr>
 					}
 				</table>
 				
