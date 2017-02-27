@@ -62,8 +62,7 @@ public class Instrument  implements Comparable<Instrument> {
             " ?instModel rdfs:subClassOf+ vstoi:Instrument . " + 
 		    " ?uri a ?instModel ." + 
 			"} ";
-			
-		//System.out.println("Query: " + queryString);
+		
 		Query query = QueryFactory.create(queryString);
 			
 		QueryExecution qexec = QueryExecutionFactory.sparqlService(Collections.getCollectionsName(Collections.METADATA_SPARQL), query);
@@ -96,8 +95,7 @@ public class Instrument  implements Comparable<Instrument> {
 			"    } " + 
 			"} " + 
 			"ORDER BY DESC(?datetime) ";
-			
-		System.out.println("Query: " + queryString);
+		
 		Query query = QueryFactory.create(queryString);
 			
 		QueryExecution qexec = QueryExecutionFactory.sparqlService(Collections.getCollectionsName(Collections.METADATA_SPARQL), query);
@@ -128,8 +126,7 @@ public class Instrument  implements Comparable<Instrument> {
 			"   FILTER NOT EXISTS { ?dep_uri prov:endedAtTime ?enddatetime . } " + 
 			"} " + 
 			"ORDER BY DESC(?datetime) ";
-			
-		//System.out.println("Query: " + queryString);
+		
 		Query query = QueryFactory.create(queryString);
 			
 		QueryExecution qexec = QueryExecutionFactory.sparqlService(Collections.getCollectionsName(Collections.METADATA_SPARQL), query);

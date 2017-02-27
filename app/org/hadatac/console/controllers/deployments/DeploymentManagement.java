@@ -16,24 +16,19 @@ import play.mvc.Controller;
 
 public class DeploymentManagement extends Controller {
 
-	// for /metadata HTTP GET requests
 	@Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
     public static Result index(int option) {
     	State state = new State(option);
     	List<Deployment> theResults = Deployment.find(state);
     	
         return ok(deploymentManagement.render(state, theResults));
-        
-    }// /index()
+    }
 
-    // for /metadata HTTP POST requests
 	@Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
     public static Result postIndex(int option) {
         State state = new State(option);
         List<Deployment> theResults = Deployment.find(state);
         	
         return ok(deploymentManagement.render(state, theResults));
-            
-    }// /index()
-
+    }
 }

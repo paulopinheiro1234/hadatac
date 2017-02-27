@@ -3,8 +3,6 @@ package org.hadatac.console.controllers.triplestore;
 import play.*;
 import play.mvc.*;
 
-import java.io.IOException;
-
 import org.hadatac.console.controllers.AuthApplication;
 import org.hadatac.console.views.html.triplestore.*;
 import org.hadatac.data.loader.DataContext;

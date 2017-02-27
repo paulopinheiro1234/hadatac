@@ -355,7 +355,6 @@ public class TripleProcessing {
 		String listing = "";
 		try {
 			listing = URLEncoder.encode(SpreadsheetProcessing.printFileWithLineNumber(mode, fileName), "UTF-8");
-			//System.out.println(listing);
 		} catch (UnsupportedEncodingException e1) {
 			e1.printStackTrace();
 		};

@@ -96,7 +96,8 @@ public class LoadKB extends Controller {
     		String message = TripleProcessing.importDataAcquisition(site, user_name, password, path, final_names);
     	} catch(CommandException e) {
     		if(e.getMessage().equals("Unauthorized")){
-    			return ok(syncLabkey.render("login_failed", content, "", false));
+    			return ok(syncLabkey.render("login_failed",
+    					routes.LoadKB.playLoadLabkeyFolders("init", content).url(), "", false));
     		}
     	}
     	
@@ -147,7 +148,8 @@ public class LoadKB extends Controller {
     				site, user_name, password, path, final_names);
     	} catch(CommandException e) {
     		if(e.getMessage().equals("Unauthorized")){
-    			return ok(syncLabkey.render("login_failed", content, "", false));
+    			return ok(syncLabkey.render("login_failed",
+    					routes.LoadKB.playLoadLabkeyFolders("init", content).url(), "", false));
     		}
     	}
     	
@@ -156,7 +158,10 @@ public class LoadKB extends Controller {
     		isLoadedStudy = true;
     	}
     	
-    	return ok(syncLabkey.render(oper, content, message, isLoadedStudy));
+    	return ok(syncLabkey.render(oper,
+    			routes.LoadKB.playLoadLabkeyFolders("init", content).url(),
+    			message, 
+    			isLoadedStudy));
     }
     
     @Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
@@ -188,7 +193,8 @@ public class LoadKB extends Controller {
     				Feedback.WEB, oper, metadata, site, user_name, password, path, loading_list);
     	} catch(CommandException e) {
     		if(e.getMessage().equals("Unauthorized")){
-    			return ok(syncLabkey.render("login_failed", content, "", false));
+    			return ok(syncLabkey.render("login_failed",
+    					routes.LoadKB.playLoadLabkeyFolders("init", content).url(), "", false));
     		}
     	}
     	
@@ -201,7 +207,6 @@ public class LoadKB extends Controller {
     	
     	String user_name = session().get("LabKeyUserName");
         String password = session().get("LabKeyPassword");
-        System.out.println("LabKeyUserName: " + user_name);
         if (user_name == null || password == null) {
         	Form<LabKeyLoginForm> form = Form.form(LabKeyLoginForm.class).bindFromRequest();
             user_name = form.get().getUserName();
@@ -224,7 +229,8 @@ public class LoadKB extends Controller {
     		}
     	} catch(CommandException e) {
     		if(e.getMessage().equals("Unauthorized")){
-    			return ok(syncLabkey.render("login_failed", content, "", false));
+    			return ok(syncLabkey.render("login_failed", 
+    					routes.LoadKB.playLoadLabkeyFolders("init", content).url(), "", false));
     		}
     	}
     	
@@ -268,7 +274,8 @@ public class LoadKB extends Controller {
     		}
     	} catch(CommandException e) {
     		if(e.getMessage().equals("Unauthorized")){
-    			return ok(syncLabkey.render("login_failed", content, "", false));
+    			return ok(syncLabkey.render("login_failed",
+    					routes.LoadKB.playLoadLabkeyFolders("init", content).url(), "", false));
     		}
     	}
     	return ok(getLabkeyLists.render(folder, content, retMetadataLists, retDataLists));
@@ -277,7 +284,8 @@ public class LoadKB extends Controller {
     @Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
     public static Result loadLabkeyKB(String oper, String content) {
     	if (session().get("LabKeyUserName") == null && session().get("LabKeyPassword") == null) {
-    		return ok(syncLabkey.render(oper, content, "", false));
+    		return ok(syncLabkey.render(oper,
+    				routes.LoadKB.playLoadLabkeyFolders("init", content).url(), "", false));
     	}
     	
     	return playLoadLabkeyFolders(oper, content);
@@ -285,7 +293,17 @@ public class LoadKB extends Controller {
     
     @Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
     public static Result postLoadLabkeyKB(String oper, String content) {
-    	return ok(syncLabkey.render(oper, content, "", false));
+    	return loadLabkeyKB(oper, content);
+    }
+    
+    @Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
+    public static Result logInLabkey(String nextCall) {
+    	return ok(syncLabkey.render("init", nextCall, "", false));
+    }
+    
+    @Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
+    public static Result postLogInLabkey(String nextCall) {
+    	return logInLabkey(nextCall);
     }
     
     @Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))

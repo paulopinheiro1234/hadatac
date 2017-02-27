@@ -22,6 +22,7 @@ import org.apache.jena.update.UpdateExecutionFactory;
 import org.apache.jena.update.UpdateFactory;
 import org.apache.jena.update.UpdateProcessor;
 import org.apache.jena.update.UpdateRequest;
+import org.hadatac.console.controllers.triplestore.routes;
 import org.hadatac.utils.Collections;
 import org.hadatac.utils.NameSpaces;
 import org.hadatac.utils.State;
@@ -194,7 +195,6 @@ public class Deployment {
            	insert += END_TIME_PREDICATE + "\"" + this.getEndedAt() + TIME_XMLS + "  ";
        	}
     	insert += LINE_LAST;
-    	System.out.println(insert);
     	UpdateRequest request = UpdateFactory.create(insert);
         UpdateProcessor processor = UpdateExecutionFactory.createRemote(
         		request, Collections.getCollectionsName(Collections.METADATA_UPDATE));
@@ -209,7 +209,6 @@ public class Deployment {
     	    insert += "<" + this.getUri() + ">  ";
            	insert += END_TIME_PREDICATE + "\"" + this.getEndedAt() + TIME_XMLS + "  ";
     	    insert += LINE_LAST;
-    	    System.out.println(insert);
     	    UpdateRequest request = UpdateFactory.create(insert);
             UpdateProcessor processor = UpdateExecutionFactory.createRemote(request,Collections.getCollectionsName(Collections.METADATA_UPDATE)); 
             processor.execute();
@@ -233,7 +232,6 @@ public class Deployment {
     	query += "<" + this.getUri() + ">  ";
         query += DELETE_LINE3;
     	query += LINE_LAST;
-        System.out.println(query);
     	UpdateRequest request = UpdateFactory.create(query);
         UpdateProcessor processor = UpdateExecutionFactory.createRemote(request, Collections.getCollectionsName(Collections.METADATA_UPDATE));
         processor.execute();
@@ -397,8 +395,6 @@ public class Deployment {
     	   }
         }
 		Query query = QueryFactory.create(queryString);
-		
-		System.out.println(queryString);
 		
 		QueryExecution qexec = QueryExecutionFactory.sparqlService(
 				Collections.getCollectionsName(Collections.METADATA_SPARQL), query);

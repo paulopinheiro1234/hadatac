@@ -11,8 +11,10 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.labkey.remoteapi.CommandException;
 import org.labkey.remoteapi.Connection;
+import org.labkey.remoteapi.query.DeleteRowsCommand;
 import org.labkey.remoteapi.query.GetQueriesCommand;
 import org.labkey.remoteapi.query.GetQueriesResponse;
+import org.labkey.remoteapi.query.InsertRowsCommand;
 import org.labkey.remoteapi.query.SelectRowsCommand;
 import org.labkey.remoteapi.query.SelectRowsResponse;
 import org.labkey.remoteapi.query.UpdateRowsCommand;
@@ -110,62 +112,77 @@ public class LabkeyDataHandler {
 		return mapRow;
 	}
 	
-//	public Map< String, List<PlainTriple> > updateRows(String queryName, List<String> cols) throws CommandException {
-//		Map< String, List<PlainTriple> > mapRow = new HashMap< String, List<PlainTriple> >();
-//		UpdateRowsCommand cmdUpd = new UpdateRowsCommand("lists", queryName);
-//		Map<String, Object> row = new HashMap<String, Object>();
-//		row.put("Key", "newKey");
-//		row.put("LastName", "Test UPDATED");
-//		cmdUpd.addRow(row);
-//		SaveRowsResponse = cmdUpd.execute(cn, "PROJECT_NAME");
-//		int nTriples = 0;
-//		try {
-//			SelectRowsResponse response = cmd.execute(cn, folder_path);
-//			for (Map<String, Object> row : response.getRows()){
-//				String pri_key = "";
-//				for(String the_key : row.keySet()){
-//					if(the_key.toLowerCase().contains("uri")){
-//						pri_key = the_key;
-//					}
-//				}
-//				String sub = ((JSONObject)row.get(pri_key)).get("value").toString();
-//				List<PlainTriple> triples = new LinkedList<PlainTriple>();
-//				for(Object pred : row.keySet()){
-//					if(((String)pred).equals(pri_key)){
-//						continue;
-//					}
-//					PlainTriple tri = new PlainTriple();
-//					tri.sub = replaceIrregularCharacters(sub);
-//					tri.pred = replaceIrregularCharacters(pred.toString());
-//					Object obj_value = ((JSONObject)row.get(pred.toString())).get("value");
-//					if(obj_value == null){
-//						continue;
-//					}
-//					else{
-//						tri.obj = obj_value.toString();
-//					}
-//			        triples.add(tri);
-//			        nTriples++;
-//				}
-//				mapRow.put(sub, triples);
-//			}
-//			
-//			System.out.println(String.format("Read %d row(s) with %d triple(s) from Table \"%s\"", 
-//					response.getRowCount(), nTriples, queryName));
-//			return mapRow;
-//		} catch (IOException e) {
-//			e.printStackTrace();
-//		} catch (CommandException e) {
-//			if(e.getMessage().equals("Unauthorized")){
-//				throw e;
-//			}
-//			else{
-//				e.printStackTrace();
-//			}
-//		}
-//		
-//		return mapRow;
-//	}
+	public int updateRows(String queryName, List< Map<String, Object> > rows) throws CommandException {
+		UpdateRowsCommand cmdUpd = new UpdateRowsCommand("lists", queryName);
+		for (Map<String, Object> row : rows) {
+			cmdUpd.addRow(row);
+		}
+
+		try {
+			SaveRowsResponse response = cmdUpd.execute(cn, folder_path);
+			System.out.println(String.format("%d row(s) have been updated in Table \"%s\"", 
+					response.getRowsAffected(), queryName));
+			return response.getRowsAffected().intValue();
+		} catch (CommandException e) {
+			if(e.getMessage().equals("Unauthorized")){
+				throw e;
+			} else{
+				e.printStackTrace();
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
+		return 0;
+	}
+	
+	public int insertRows(String queryName, List< Map<String, Object> > rows) throws CommandException {
+		InsertRowsCommand cmd = new InsertRowsCommand("lists", queryName);
+		for (Map<String, Object> row : rows) {
+			cmd.addRow(row);
+		}
+
+		try {
+			SaveRowsResponse response = cmd.execute(cn, folder_path);
+			System.out.println(String.format("%d row(s) have been inserted in Table \"%s\"", 
+					response.getRowsAffected(), queryName));
+			return response.getRowsAffected().intValue();
+		} catch (CommandException e) {
+			if(e.getMessage().equals("Unauthorized")){
+				throw e;
+			} else{
+				e.printStackTrace();
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
+		return 0;
+	}
+	
+	public int deleteRows(String queryName, List< Map<String, Object> > rows) throws CommandException {
+		DeleteRowsCommand cmd = new DeleteRowsCommand("lists", queryName);
+		for (Map<String, Object> row : rows) {
+			cmd.addRow(row);
+		}
+
+		try {
+			SaveRowsResponse response = cmd.execute(cn, folder_path);
+			System.out.println(String.format("%d row(s) have been deleted in Table \"%s\"", 
+					response.getRowsAffected(), queryName));
+			return response.getRowsAffected().intValue();
+		} catch (CommandException e) {
+			if(e.getMessage().equals("Unauthorized")){
+				throw e;
+			} else{
+				e.printStackTrace();
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
+		return 0;
+	}
 	
 	public List<String> getAllQueryNames() throws CommandException {
 		GetQueriesCommand cmd = new GetQueriesCommand("lists");
@@ -248,8 +265,7 @@ public class LabkeyDataHandler {
 		return null;
 	}
 	
-	private void checkAuthentication() throws CommandException {
-		List<String> listFolders = new LinkedList<String>();
+	public void checkAuthentication() throws CommandException {
 		EnsureLoginCommand cmd = new EnsureLoginCommand();
 		cmd.setRequiredVersion(9.1);
 		try {

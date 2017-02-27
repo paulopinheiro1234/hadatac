@@ -42,8 +42,6 @@ public class DataAcquisitionSearch extends Controller {
             if (jh.getFieldCountJson()) {
                 for (String key : jh.categories_and_facets.keySet()) {
                     for (String facet : jh.categories_and_facets.get(key)){
-                        //HashMap<String, String> temp_map = new HashMap<String, String>();
-                        //temp_map.put(facet, jh.categories_facets_and_counts.get(key).get(facet));
                         if (facet.equals("null")) {field_facets.addFacet(key, "missing"); continue;}
                         field_facets.addFacet(key, facet);
                     }

@@ -201,6 +201,8 @@ GET     /hadatac/ts/exportkb                       org.hadatac.console.controlle
 POST    /hadatac/ts/exportkb                       org.hadatac.console.controllers.triplestore.ExportKB.exportFile(oper: String)
 GET     /hadatac/ts/synclabkey                     org.hadatac.console.controllers.triplestore.LoadKB.loadLabkeyKB(oper: String, content: String)
 POST    /hadatac/ts/synclabkey                     org.hadatac.console.controllers.triplestore.LoadKB.postLoadLabkeyKB(oper: String, content: String)
+GET     /hadatac/ts/loginlabkey                    org.hadatac.console.controllers.triplestore.LoadKB.logInLabkey(nextCall : String)
+POST    /hadatac/ts/loginlabkey                    org.hadatac.console.controllers.triplestore.LoadKB.postLogInLabkey(nextCall : String)
 GET     /hadatac/ts/synclabkey/loadbatch           org.hadatac.console.controllers.triplestore.LoadKB.playLoadLabkeyKB(oper: String, content: String, folder: String, list_names: java.util.List[String])
 POST    /hadatac/ts/synclabkey/loadbatch           org.hadatac.console.controllers.triplestore.LoadKB.playLoadLabkeyKB(oper: String, content: String, folder: String, list_names: java.util.List[String])
 GET     /hadatac/ts/synclabkey/folders             org.hadatac.console.controllers.triplestore.LoadKB.playLoadLabkeyFolders(oper: String, content: String)

@@ -5,18 +5,28 @@ import java.util.List;
 
 public class DeploymentForm {
 
+	public String uri;
     public String platform;
     public String hasFirstCoordinate;
     public String hasSecondCoordinate;
     public String instrument;
-    public List<String> detector;
+    public List<String> detectors;
     public String startDateTime;
     public String endDateTime;
     public String type;
  
     public DeploymentForm () {
-    	detector = new ArrayList<String>();
+    	detectors = new ArrayList<String>();
     }
+    
+    public String getUri() {
+		return uri;
+	}
+
+	public void setUri(String uri) {
+		this.uri = uri;
+	}
+	
     public String getType() {
 		return type;
 	}
@@ -57,16 +67,16 @@ public class DeploymentForm {
     	this.instrument = instrument;
     }
 
-    public List<String> getDetector() {
-    	return detector;
+    public List<String> getDetectors() {
+    	return detectors;
     }
     
-    public void setDetector(List<String> detector) {
-    	this.detector = detector;
+    public void setDetectors(List<String> detector) {
+    	this.detectors = detector;
     }
 
     public void addDetector(String detector) {
-    	this.detector.add(detector);
+    	this.detectors.add(detector);
     }
 
     public String getStartDateTime() {
@@ -84,6 +94,4 @@ public class DeploymentForm {
     public void setEndDateTime(String endDateTime) {
     	this.endDateTime = endDateTime;
     }
-
-
 }

@@ -129,15 +129,13 @@ public class Platform implements Comparable<Platform> {
 	}
 	
 	public static List<Platform> find() {
-		System.out.println("Inside Lits<Pltaform>");
 		List<Platform> platforms = new ArrayList<Platform>();
 		String queryString = NameSpaces.getInstance().printSparqlNameSpaceList() +
 			" SELECT ?uri WHERE { " +
             " ?platModel rdfs:subClassOf+ vstoi:Platform . " + 
 		    " ?uri a ?platModel ." + 
 			"} ";
-			
-		System.out.println("Query: " + queryString);
+		
 		Query query = QueryFactory.create(queryString);
 			
 		QueryExecution qexec = QueryExecutionFactory.sparqlService(Collections.getCollectionsName(Collections.METADATA_SPARQL), query);
@@ -152,8 +150,8 @@ public class Platform implements Comparable<Platform> {
 		}			
 
 		java.util.Collections.sort((List<Platform>) platforms);
-		return platforms;
 		
+		return platforms;
 	}
 	
 	public static Platform find(HADataC hadatac) {

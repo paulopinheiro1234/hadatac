@@ -2,7 +2,8 @@
   thePlatforms   : List[org.hadatac.entity.pojo.Platform],
   theInstruments : List[org.hadatac.entity.pojo.Instrument],
   theDetectors   : List[org.hadatac.entity.pojo.Detector],
-  deploymentType : String)
+  deploymentType : String,
+  loggedInLabKey : Boolean)
 
 @import helper._
 @import org.hadatac.utils._
@@ -18,6 +19,10 @@
       var f = document.forms["newDeployment"].elements;
       var cansubmit = true;
 
+      if (document.getElementById('uri').value.length == 0) {
+          cansubmit = false;
+      }
+
       if (document.getElementById('platform').value.length == 0) {
          cansubmit = false;
       }
@@ -30,10 +35,6 @@
                 instrumentSelector[i].selected = instrumentSelector[i].defaultSelected;
 }      } else {
          document.getElementById('detector').disabled = false;
-      }
-            
-      if (document.getElementById('detector').value.length == 0) { 
-         cansubmit = false;
       }
                 
       if (document.getElementById('startdatetime').value.length == 0) {
@@ -52,10 +53,14 @@
     <h2>New @deploymentType Deployment</h2>
 
     <form class="form-horizontal" name="newDeployment" method="post" action="@org.hadatac.console.controllers.deployments.routes.NewDeployment.processForm">
-
+	
+	<div class="form-group">
+		<label>URI:</label>
+ 		<input type="text" class="form-control col-sm-6" name="uri" id="uri" onchange="checkform()" >
+ 	</div>
     <div class="form-group">
          <label>Platform</label> 
-         <select  class="form-control col-sm-6" id="platform" name="platform" onchange="checkform()" >
+         <select class="form-control col-sm-6" id="platform" name="platform" onchange="checkform()" >
             <option value=""></option>         
 
             @for(platform <- thePlatforms) {
@@ -111,14 +116,16 @@
 
       <div class="form-group" class="col-sm-6 col-offset-3">
           <input class="btn btn-success" role="button" id="submitbutton" type="submit" value="Create" disabled="disabled" />
+          @if(loggedInLabKey == false) {
+          	<a href="@org.hadatac.console.controllers.triplestore.routes.LoadKB.logInLabkey(org.hadatac.console.controllers.deployments.routes.NewDeployment.index(deploymentType).toString())" class="btn btn-success" role="button">Log In to Save to LabKey</a>
+          }
       </div>
       
       <div class="form-group" class="col-sm-6 col-offset-3">
            @deploymentButton(false) 
       </div>
 
-   </form>    
-</div>
-
+   </form>
+  </div>
 
 }
