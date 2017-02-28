@@ -58,10 +58,7 @@ public class NewDeployment extends Controller {
 
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
     public static Result index(String type) {
-    	System.out.println("LabKeyUserName: " + session().get("LabKeyUserName"));
-    	System.out.println("LabKeyPassword: " + session().get("LabKeyPassword"));
     	if (session().get("LabKeyUserName") == null && session().get("LabKeyPassword") == null) {
-    		System.out.println("NULL LABKEY!");
     		return redirect(org.hadatac.console.controllers.triplestore.routes.LoadKB.logInLabkey(
     				routes.NewDeployment.index(type).url()));
     	}

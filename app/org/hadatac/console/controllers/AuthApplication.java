@@ -105,6 +105,8 @@ public class AuthApplication extends Controller {
 	}
 	
 	public static Result doSignout() {
+		session().remove("LabKeyUserName");
+		session().remove("LabKeyPassword");
 		return com.feth.play.module.pa.controllers.Authenticate.logout();
 	}
 
