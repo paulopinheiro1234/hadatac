@@ -95,7 +95,7 @@
     			<td>@file.getProcessTime()</td>
     			<td>
     			<a href="@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.moveCSVFile(file.getOwnerEmail(), file.getFileName())" class="btn-xs btn-primary" role="button">Move to Unprocessed Folder</a>
-    			<a href="@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.deleteCSVFile(file.getOwnerEmail(), file.getFileName(), true)" class="btn-xs btn-primary" role="button">Delete</a>
+    			<a href="@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.deleteCSVFile(file.getOwnerEmail(), file.getFileName(), true)" class="btn-xs btn-primary" role="button" id="delete" onclick="return confirm('Are you sure to delete?')">Delete</a>
     			<a href="@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.checkAnnotationLog(file.getFileName())" class="btn-xs btn-primary" role="button">Logs</a>
     			<a href="@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.downloadCSVFile(file.getFileName(), true)" class="btn-xs btn-primary" role="button">Download</a>
     			@if(bAdmin) {
@@ -129,7 +129,7 @@
     			}
     			<td>@file.getUploadTime()</td>
     			<td>
-    			<a href="@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.deleteCSVFile(file.getOwnerEmail(), file.getFileName(), false)" class="btn-xs btn-primary" role="button">Delete</a>
+    			<a href="@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.deleteCSVFile(file.getOwnerEmail(), file.getFileName(), false)" class="btn-xs btn-primary" role="button" id="delete" onclick="return confirm('Are you sure to delete?')">Delete</a>
     			<a href="@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.checkAnnotationLog(file.getFileName())" class="btn-xs btn-primary" role="button">Logs</a>
     			<a href="@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.downloadCSVFile(file.getFileName(), false)" class="btn-xs btn-primary" role="button">Download</a>
     			@if(bAdmin) {

@@ -12,9 +12,11 @@ import java.util.Map;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.hadatac.console.controllers.AuthApplication;
+import org.hadatac.console.views.html.deployments.newDeployment;
 import org.hadatac.console.views.html.triplestore.*;
 import org.hadatac.console.controllers.triplestore.routes;
 import org.hadatac.console.models.LabKeyLoginForm;
+import org.hadatac.metadata.loader.LabkeyDataHandler;
 import org.hadatac.metadata.loader.MetadataContext;
 import org.hadatac.metadata.loader.SpreadsheetProcessing;
 import org.hadatac.metadata.loader.TripleProcessing;
@@ -298,12 +300,30 @@ public class LoadKB extends Controller {
     
     @Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
     public static Result logInLabkey(String nextCall) {
-    	return ok(syncLabkey.render("init", nextCall, "", false));
+        return ok(syncLabkey.render("init", routes.LoadKB.postLogInLabkey(nextCall).url(), "", false));
     }
     
     @Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
     public static Result postLogInLabkey(String nextCall) {
-    	return logInLabkey(nextCall);
+    	Form<LabKeyLoginForm> form = Form.form(LabKeyLoginForm.class).bindFromRequest();
+    	String site = ConfigProp.getPropertyValue("labkey.config", "site");
+        String path = "/";
+        String user_name = form.get().getUserName();
+        String password = form.get().getPassword();
+    	LabkeyDataHandler loader = new LabkeyDataHandler(
+    			site, user_name, password, path);
+    	try {
+    		loader.checkAuthentication();
+    		session().put("LabKeyUserName", user_name);
+            session().put("LabKeyPassword", password);
+    	} catch(CommandException e) {
+    		if(e.getMessage().equals("Unauthorized")){
+    			return ok(syncLabkey.render("login_failed", 
+    					nextCall, "", false));
+    		}
+    	}
+    	
+    	return redirect(nextCall);
     }
     
     @Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))

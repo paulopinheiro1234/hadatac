@@ -33,7 +33,6 @@ import be.objectify.deadbolt.java.actions.Group;
 import be.objectify.deadbolt.java.actions.Restrict;
 
 import org.hadatac.console.models.DeploymentForm;
-import org.hadatac.console.models.LabKeyLoginForm;
 import org.hadatac.console.models.SparqlQuery;
 import org.hadatac.console.models.SparqlQueryResults;
 import org.hadatac.console.models.SysUser;
@@ -58,38 +57,20 @@ public class NewDeployment extends Controller {
 	}
 
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    public static Result index(String type) {        
-    	boolean isLoggedInLabKey = true;
+    public static Result index(String type) {
+    	System.out.println("LabKeyUserName: " + session().get("LabKeyUserName"));
+    	System.out.println("LabKeyPassword: " + session().get("LabKeyPassword"));
     	if (session().get("LabKeyUserName") == null && session().get("LabKeyPassword") == null) {
-    		isLoggedInLabKey = false;
-
-            Form<LabKeyLoginForm> form = Form.form(LabKeyLoginForm.class).bindFromRequest();
-            if (!form.hasErrors() && !form.get().getUserName().isEmpty() && !form.get().getPassword().isEmpty()) {
-            	String site = ConfigProp.getPropertyValue("labkey.config", "site");
-                String path = "/";
-                String user_name = form.get().getUserName();
-                String password = form.get().getPassword();
-            	LabkeyDataHandler loader = new LabkeyDataHandler(
-            			site, user_name, password, path);
-            	try {
-            		loader.checkAuthentication();
-            		session().put("LabKeyUserName", user_name);
-                    session().put("LabKeyPassword", password);
-                    isLoggedInLabKey = true;
-            	} catch(CommandException e) {
-            		if(e.getMessage().equals("Unauthorized")){
-            			return ok(syncLabkey.render("login_failed", 
-            					routes.NewDeployment.index(type).url(), "", false));
-            		}
-            	}
-            }
+    		System.out.println("NULL LABKEY!");
+    		return redirect(org.hadatac.console.controllers.triplestore.routes.LoadKB.logInLabkey(
+    				routes.NewDeployment.index(type).url()));
     	}
+
     	return ok(newDeployment.render(Form.form(DeploymentForm.class), 
     			  Platform.find(),
     			  Instrument.findAvailable(),
     			  Detector.findAvailable(),
-    			  type,
-    			  isLoggedInLabKey));
+    			  type));
     }
     
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
@@ -123,16 +104,15 @@ public class NewDeployment extends Controller {
         Deployment deployment = DataFactory.createDeployment(deploymentUri, data.getPlatform(), 
         		data.getInstrument(), data.getDetectors(), dateString, data.getType());
         
-        /*
         int triggeringEvent;
         if (data.getType().equalsIgnoreCase("LEGACY")) {
         	triggeringEvent = TriggeringEvent.LEGACY_DEPLOYMENT;
         } else {
         	triggeringEvent = TriggeringEvent.INITIAL_DEPLOYMENT;
         }
+        String dataAcquisitionUri = data.getDataAcquisitionUri();
         DataFactory.createDataAcquisition(dataAcquisitionUri, deploymentUri, triggeringEvent, 
         	UserManagement.getUriByEmail(user.getEmail()));
-        */
         
         String user_name = session().get("LabKeyUserName");
         String password = session().get("LabKeyPassword");

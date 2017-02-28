@@ -2,8 +2,7 @@
   thePlatforms   : List[org.hadatac.entity.pojo.Platform],
   theInstruments : List[org.hadatac.entity.pojo.Instrument],
   theDetectors   : List[org.hadatac.entity.pojo.Detector],
-  deploymentType : String,
-  loggedInLabKey : Boolean)
+  deploymentType : String)
 
 @import helper._
 @import org.hadatac.utils._
@@ -20,6 +19,10 @@
       var cansubmit = true;
 
       if (document.getElementById('uri').value.length == 0) {
+          cansubmit = false;
+      }
+
+      if (document.getElementById('acquisition_uri').value.length == 0) {
           cansubmit = false;
       }
 
@@ -57,6 +60,14 @@
 	<div class="form-group">
 		<label>URI:</label>
  		<input type="text" class="form-control col-sm-6" name="uri" id="uri" onchange="checkform()" >
+ 	</div>
+ 	<div class="form-group">
+		<label>Data Acquisition URI:</label>
+ 		<input type="text" class="form-control col-sm-6" name="acquisition_uri" id="acquisition_uri" onchange="checkform()" >
+ 	</div>
+ 	<div class="form-group">
+		<label>Initial Parameters: (optional)</label>
+ 		<input type="text" class="form-control col-sm-6" name="init_param" id="init_param" onchange="checkform()" >
  	</div>
     <div class="form-group">
          <label>Platform</label> 
@@ -116,9 +127,7 @@
 
       <div class="form-group" class="col-sm-6 col-offset-3">
           <input class="btn btn-success" role="button" id="submitbutton" type="submit" value="Create" disabled="disabled" />
-          @if(loggedInLabKey == false) {
-          	<a href="@org.hadatac.console.controllers.triplestore.routes.LoadKB.logInLabkey(org.hadatac.console.controllers.deployments.routes.NewDeployment.index(deploymentType).toString())" class="btn btn-success" role="button">Log In to Save to LabKey</a>
-          }
+          <p> The created deployment will be saved in LabKey</p>
       </div>
       
       <div class="form-group" class="col-sm-6 col-offset-3">

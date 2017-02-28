@@ -5,7 +5,9 @@ import java.util.List;
 
 public class DeploymentForm {
 
-	public String uri;
+	public String deploymentUri;
+	public String dataAcquisitionUri;
+	public String initialParam;
     public String platform;
     public String hasFirstCoordinate;
     public String hasSecondCoordinate;
@@ -20,11 +22,27 @@ public class DeploymentForm {
     }
     
     public String getUri() {
-		return uri;
+		return deploymentUri;
 	}
 
 	public void setUri(String uri) {
-		this.uri = uri;
+		this.deploymentUri = uri;
+	}
+	
+	public String getDataAcquisitionUri() {
+		return dataAcquisitionUri;
+	}
+
+	public void setDataAcquisitionUri(String dataAcquisitionUri) {
+		this.dataAcquisitionUri = dataAcquisitionUri;
+	}
+	
+	public String getInitialParameter() {
+		return initialParam;
+	}
+
+	public void setInitialParameter(String initialParam) {
+		this.initialParam = initialParam;
 	}
 	
     public String getType() {
