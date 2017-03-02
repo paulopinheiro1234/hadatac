@@ -266,7 +266,7 @@ public class TripleProcessing {
 						dataAcquisition.setEndedAt(cellValue);
 					}
 					else if(predicate.equals("prov:used")){
-						dataAcquisition.setUsedUri(cellProc.convertToWholeURI(cellValue));
+						dataAcquisition.setParameter(cellValue);
 					}
 					else if(predicate.equals("prov:wasAssociatedWith")){
 						dataAcquisition.setAssociatedUri(cellProc.convertToWholeURI(cellValue));

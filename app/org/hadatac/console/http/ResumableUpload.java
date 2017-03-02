@@ -29,7 +29,7 @@ public class ResumableUpload {
 	        byte[] bytes = request.body().asRaw().asBytes();
 	        if (bytes != null) {
 	        	int read = 0;
-		        int write_size = 1024 * 100;
+		        int write_size = 950 * 100;
 		        while (read < bytes.length) {
 		        	raf.write(bytes, read, Math.min(write_size, bytes.length - read));
 		        	read += Math.min(write_size, bytes.length - read);

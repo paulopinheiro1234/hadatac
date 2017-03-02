@@ -54,6 +54,8 @@ public class DataAcquisition {
 	private String ownerUri;
 	@Field("permission_uri")
 	private String permissionUri;
+	@Field("parameter")
+	private String parameter;
 	@Field("triggering_event")
 	private int triggeringEvent;
 	@Field("nr_data_points")
@@ -168,6 +170,13 @@ public class DataAcquisition {
 	}
 	public void setUri(String uri) {
 		this.uri = uri;
+	}
+	
+	public String getParameter() {
+		return parameter;
+	}
+	public void setParameter(String parameter) {
+		this.parameter = parameter;
 	}
 	
 	public String getLabel() {
@@ -451,16 +460,35 @@ public class DataAcquisition {
 		DateTime date;
 		DataAcquisition dataAcquisition = new DataAcquisition();
 		try {
-			dataAcquisition.setUri(doc.getFieldValue("uri").toString());
-			dataAcquisition.setOwnerUri(doc.getFieldValue("owner_uri").toString());
-			dataAcquisition.setPermissionUri(doc.getFieldValue("permission_uri").toString());
-			dataAcquisition.setStudyUri(doc.getFieldValue("study_uri").toString());
-			dataAcquisition.setTriggeringEvent(Integer.parseInt(doc.getFieldValue("triggering_event").toString()));
-			dataAcquisition.setNumberDataPoints(Long.parseLong(doc.getFieldValue("nr_data_points").toString()));
-			date = new DateTime((Date)doc.getFieldValue("started_at"));
-			dataAcquisition.setStartedAt(date.withZone(DateTimeZone.UTC).toString("EEE MMM dd HH:mm:ss zzz yyyy"));
-			date = new DateTime((Date)doc.getFieldValue("ended_at"));
-			dataAcquisition.setEndedAt(date.withZone(DateTimeZone.UTC).toString("EEE MMM dd HH:mm:ss zzz yyyy"));
+			if (doc.getFieldValue("uri") != null) {
+				dataAcquisition.setUri(doc.getFieldValue("uri").toString());
+			}
+			if (doc.getFieldValue("owner_uri") != null) {
+				dataAcquisition.setOwnerUri(doc.getFieldValue("owner_uri").toString());
+			}
+			if (doc.getFieldValue("permission_uri") != null) {
+				dataAcquisition.setPermissionUri(doc.getFieldValue("permission_uri").toString());
+			}
+			if (doc.getFieldValue("parameter") != null) {
+				dataAcquisition.setParameter(doc.getFieldValue("parameter").toString());
+			}
+			if (doc.getFieldValue("study_uri") != null) {
+				dataAcquisition.setStudyUri(doc.getFieldValue("study_uri").toString());
+			}
+			if (doc.getFieldValue("triggering_event") != null) {
+				dataAcquisition.setTriggeringEvent(Integer.parseInt(doc.getFieldValue("triggering_event").toString()));
+			}
+			if (doc.getFieldValue("nr_data_points") != null) {
+				dataAcquisition.setNumberDataPoints(Long.parseLong(doc.getFieldValue("nr_data_points").toString()));
+			}
+			if (doc.getFieldValue("started_at") != null) {
+				date = new DateTime((Date)doc.getFieldValue("started_at"));
+				dataAcquisition.setStartedAt(date.withZone(DateTimeZone.UTC).toString("EEE MMM dd HH:mm:ss zzz yyyy"));
+			}
+			if (doc.getFieldValue("ended_at") != null) {
+				date = new DateTime((Date)doc.getFieldValue("ended_at"));
+				dataAcquisition.setEndedAt(date.withZone(DateTimeZone.UTC).toString("EEE MMM dd HH:mm:ss zzz yyyy"));
+			}
 			if (doc.getFieldValues("schema_uri") != null) {
 				dataAcquisition.setSchemaUri(doc.getFieldValue("schema_uri").toString());
 			}
@@ -500,13 +528,21 @@ public class DataAcquisition {
 					dataAcquisition.addCharacteristicUri(i.next().toString());
 				}
 			}
-			
-			dataAcquisition.setDeploymentUri(doc.getFieldValue("deployment_uri").toString());
-			dataAcquisition.setInstrumentModel(doc.getFieldValue("instrument_model").toString());
-			dataAcquisition.setInstrumentUri(doc.getFieldValue("instrument_uri").toString());
-			dataAcquisition.setPlatformName(doc.getFieldValue("platform_name").toString());
-			dataAcquisition.setPlatformUri(doc.getFieldValue("platform_uri").toString());
-			
+			if (doc.getFieldValue("deployment_uri") != null) {
+				dataAcquisition.setDeploymentUri(doc.getFieldValue("deployment_uri").toString());
+			}
+			if (doc.getFieldValue("instrument_model") != null) {
+				dataAcquisition.setInstrumentModel(doc.getFieldValue("instrument_model").toString());
+			}
+			if (doc.getFieldValue("instrument_uri") != null) {
+				dataAcquisition.setInstrumentUri(doc.getFieldValue("instrument_uri").toString());
+			}
+			if (doc.getFieldValue("platform_name") != null) {
+				dataAcquisition.setPlatformName(doc.getFieldValue("platform_name").toString());
+			}
+			if (doc.getFieldValue("platform_uri") != null) {
+				dataAcquisition.setPlatformUri(doc.getFieldValue("platform_uri").toString());
+			}
 			if (doc.getFieldValues("dataset_uri") != null) {
 				i = doc.getFieldValues("dataset_uri").iterator();
 				while (i.hasNext()) {

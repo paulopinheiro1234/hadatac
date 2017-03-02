@@ -11,6 +11,7 @@ import java.util.Map.Entry;
 
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrQuery;
+import org.apache.solr.client.solrj.SolrRequest;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.beans.Field;
 import org.apache.solr.client.solrj.impl.HttpSolrClient;
@@ -25,11 +26,6 @@ import org.hadatac.console.models.FacetHandler;
 import org.hadatac.console.models.Pivot;
 import org.hadatac.data.model.AcquisitionQueryResult;
 import org.hadatac.utils.Collections;
-import org.joda.time.DateTime;
-import org.joda.time.DateTimeZone;
-import org.joda.time.format.DateTimeFormat;
-import org.joda.time.format.DateTimeFormatter;
-import org.joda.time.format.ISODateTimeFormat;
 
 import play.Play;
 
@@ -246,6 +242,7 @@ public class Measurement {
 		String facet_query = "";
 		String q = "";
 		List<String> accessibleDAs = DataAcquisition.findAllAccessibleDataAcquisition(user_uri);
+		//acquisition_query += "{!terms f=acquisition_uri}" + String.join(",", accessibleDAs);
 		Iterator<String> iter_uri = accessibleDAs.iterator();
 		while(iter_uri.hasNext()){
 			String uri = iter_uri.next();
@@ -277,7 +274,7 @@ public class Measurement {
 		query.setQuery(q);
 		long respSize = 0;
 		try {
-			QueryResponse queryResponse = solr.query(query);
+			QueryResponse queryResponse = solr.query(query, SolrRequest.METHOD.POST);
 			solr.close();
 			respSize = queryResponse.getResults().size();  
 			System.out.println("Total # of documents: " + respSize);
@@ -298,6 +295,7 @@ public class Measurement {
         String q = "";
         
         List<String> listURI = DataAcquisition.findAllAccessibleDataAcquisition(user_uri);
+        //acquisition_query += "{!terms f=acquisition_uri}" + String.join(",", listURI);
         Iterator<String> iter_uri = listURI.iterator();
         while(iter_uri.hasNext()){
             String uri = iter_uri.next();
@@ -343,13 +341,11 @@ public class Measurement {
 		SolrQuery query = new SolrQuery();
 		
 		String q = buildQuery(user_uri, study_uri, subject_uri, char_uri);
-		
-		System.out.println("QUERY: " + q);
 		query.setQuery(q);
 		query.setFacet(false);
 		
 		try {
-			QueryResponse queryResponse = solr.query(query);
+			QueryResponse queryResponse = solr.query(query, SolrRequest.METHOD.POST);
 			solr.close();
 			SolrDocumentList results = queryResponse.getResults();
 			System.out.println("SolrDocumentList: " + results.size());
@@ -374,6 +370,7 @@ public class Measurement {
         String q = "";
         
         List<String> listURI = DataAcquisition.findAllAccessibleDataAcquisition(user_uri);
+        //acquisition_query += "{!terms f=acquisition_uri}" + String.join(",", listURI);
         Iterator<String> iter_uri = listURI.iterator();
         while(iter_uri.hasNext()){
             String uri = iter_uri.next();
@@ -414,8 +411,6 @@ public class Measurement {
 		SolrQuery query = new SolrQuery();
 		
 		String q = buildQuery(user_uri, page, qtd, handler);
-		
-		System.out.println("QUERY: " + q);
 		query.setQuery(q);
 		query.setStart((page - 1)*qtd + 1);
 		System.out.println("Starting at: " + ((page - 1)* qtd + 1) + "    page: " + page + "     qtd: " + qtd);
@@ -427,7 +422,7 @@ public class Measurement {
 		query.addFacetPivotField("study_uri");
 		
 		try {
-			QueryResponse queryResponse = solr.query(query);
+			QueryResponse queryResponse = solr.query(query, SolrRequest.METHOD.POST);
 			solr.close();
 			SolrDocumentList results = queryResponse.getResults();
 			System.out.println("SolrDocumentList: " + results.size());
@@ -531,9 +526,7 @@ public class Measurement {
 		return listMeasurement;
 	}
 	
-	public static Measurement convertFromSolr(SolrDocument doc) {
-		System.out.println("convertFromSolr is called");
-		
+	public static Measurement convertFromSolr(SolrDocument doc) {		
 		Measurement m = new Measurement();
 		m.setUri(doc.getFieldValue("uri").toString());
 		m.setOwnerUri(doc.getFieldValue("owner_uri").toString());

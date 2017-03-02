@@ -24,9 +24,6 @@
 	  <td>@dc.getPermissionUri()</td>
 	  <td>
 	     <a href="@org.hadatac.console.controllers.dataacquisitionmanagement.routes.DeleteDataAcquisition.index("init", URLEncoder.encode(dc.getUri(),"UTF-8"))" class="btn-xs btn-primary" role="button">Delete</a>
-	     @if(bAdmin) {
-	     	<a href="@org.hadatac.console.controllers.dataacquisitionmanagement.routes.DataAcquisitionManagement.assignOwner(URLEncoder.encode(dc.getUri(),"UTF-8"))" class="btn-xs btn-primary" role="button">Change Owner</a>
-	     }
-	     <a href="@org.hadatac.console.controllers.dataacquisitionmanagement.routes.SetAccessPermission.index(URLEncoder.encode(dc.getUri(),"UTF-8"))" class="btn-xs btn-primary" role="button">Permission</a>
-	   </td>
+	     <a href="@org.hadatac.console.controllers.dataacquisitionmanagement.routes.EditDataAcquisition.index(URLEncoder.encode(dc.getUri(),"UTF-8"))" class="btn-xs btn-primary" role="button">Edit</a>
+	  </td>
 	</tr>

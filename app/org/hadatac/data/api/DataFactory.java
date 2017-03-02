@@ -24,24 +24,32 @@ public class DataFactory {
     
     public static String CONSOLE_ID = "00000001";
     
-    public static DataAcquisition createDataAcquisition(String dataCollectionUri, String deploymentUri, int triggeringEvent, String ownerUri) {
-    	DataAcquisition dataCollection = null;
+    public static DataAcquisition createDataAcquisition(
+    		String dataCollectionUri, 
+    		String deploymentUri, 
+    		int triggeringEvent, 
+    		String parameter,
+    		String ownerUri) {
 		Deployment deployment = Deployment.find(deploymentUri);
+		if (null == deployment) {
+			return null;
+		}
 		
-		dataCollection = new DataAcquisition();
-		dataCollection.setUri(dataCollectionUri);
-		dataCollection.setOwnerUri(ownerUri);
-		dataCollection.setPermissionUri(ownerUri);
-		dataCollection.setTriggeringEvent(triggeringEvent);
-		dataCollection.setPlatformUri(deployment.getPlatform().getUri());
-		dataCollection.setInstrumentUri(deployment.getInstrument().getUri());
-		dataCollection.setPlatformName(deployment.getPlatform().getLabel());
-		dataCollection.setInstrumentModel(deployment.getInstrument().getLabel());
-		dataCollection.setStartedAtXsdWithMillis(deployment.getStartedAt());
-		dataCollection.setDeploymentUri(deploymentUri);
-		dataCollection.save();
+		DataAcquisition dataAcquisition = new DataAcquisition();
+		dataAcquisition.setUri(dataCollectionUri);
+		dataAcquisition.setOwnerUri(ownerUri);
+		dataAcquisition.setParameter(parameter);
+		dataAcquisition.setPermissionUri(ownerUri);
+		dataAcquisition.setTriggeringEvent(triggeringEvent);
+		dataAcquisition.setPlatformUri(deployment.getPlatform().getUri());
+		dataAcquisition.setInstrumentUri(deployment.getInstrument().getUri());
+		dataAcquisition.setPlatformName(deployment.getPlatform().getLabel());
+		dataAcquisition.setInstrumentModel(deployment.getInstrument().getLabel());
+		dataAcquisition.setStartedAtXsdWithMillis(deployment.getStartedAt());
+		dataAcquisition.setDeploymentUri(deploymentUri);
+		dataAcquisition.save();
 		
-		return dataCollection;
+		return dataAcquisition;
 	}
 	
 	public static Dataset createDataset() {

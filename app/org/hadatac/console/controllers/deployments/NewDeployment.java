@@ -108,8 +108,9 @@ public class NewDeployment extends Controller {
         	triggeringEvent = TriggeringEvent.INITIAL_DEPLOYMENT;
         }
         String dataAcquisitionUri = data.getDataAcquisitionUri();
+        String param = data.getInitialParameter();
         DataFactory.createDataAcquisition(dataAcquisitionUri, deploymentUri, triggeringEvent, 
-        	UserManagement.getUriByEmail(user.getEmail()));
+        		param, UserManagement.getUriByEmail(user.getEmail()));
         
         String user_name = session().get("LabKeyUserName");
         String password = session().get("LabKeyPassword");

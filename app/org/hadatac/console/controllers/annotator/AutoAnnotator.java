@@ -23,7 +23,7 @@ import org.hadatac.console.controllers.AuthApplication;
 import org.hadatac.console.controllers.dataacquisitionsearch.LoadCCSV;
 import org.hadatac.console.controllers.annotator.routes;
 import org.hadatac.console.controllers.annotator.AnnotationLog;
-import org.hadatac.console.http.DataAcquisitionSchemaQueries;
+import org.hadatac.console.http.DataAcquisitionSchema;
 import org.hadatac.console.http.DeploymentQueries;
 import org.hadatac.console.http.ResumableUpload;
 import org.hadatac.console.models.AssignOwnerForm;
@@ -39,6 +39,7 @@ import org.hadatac.entity.pojo.DataAcquisition;
 import org.hadatac.entity.pojo.User;
 import org.hadatac.metadata.loader.ValueCellProcessing;
 import org.hadatac.utils.ConfigProp;
+import org.hadatac.utils.Feedback;
 import org.hadatac.utils.NameSpaces;
 import org.hadatac.utils.State;
 
@@ -253,32 +254,32 @@ public class AutoAnnotator extends Controller {
 			}
 		}
 		if (dc_uri == null) {
-			log.addline(String.format("Cannot find the target data acquisition: %s", file_name));
+			log.addline(Feedback.println(Feedback.WEB, String.format("[ERROR] Cannot find the target data acquisition: %s", file_name)));
 			log.save();
 			return false;
 		} else {
-			log.addline(String.format("Found the target data acquisition: %s", file_name));
+			log.addline(Feedback.println(Feedback.WEB, String.format("[OK] Found the target data acquisition: %s", file_name)));
 		}
 		if (schema_uri == null) {
-    		log.addline(String.format("Cannot find schema for the data acquisition: %s", file_name));
+    		log.addline(Feedback.println(Feedback.WEB, String.format("[ERROR] No schemas specified for the data acquisition: %s", file_name)));
     		log.save();
     		return false;
     	} else {
-    		log.addline(String.format("Found schema %s for the data acquisition: %s", schema_uri, file_name));
+    		log.addline(Feedback.println(Feedback.WEB, String.format("[OK] Schema %s specified for the data acquisition: %s", schema_uri, file_name)));
     	}
 		if (deployment_uri == null) {
-    		log.addline(String.format("Cannot find deployment for the data acquisition: %s", file_name));
+    		log.addline(Feedback.println(Feedback.WEB, String.format("[ERROR] No deployments specified for the data acquisition: %s", file_name)));
     		log.save();
     		return false;
     	} else {
     		try {
         		deployment_uri = URLDecoder.decode(deployment_uri, "UTF-8");
     		} catch (UnsupportedEncodingException e) {
-    			log.addline(String.format("URL decoding error for deployment uri %s", deployment_uri));
+    			log.addline(Feedback.println(Feedback.WEB, String.format("URL decoding error for deployment uri %s", deployment_uri)));
     			log.save();
     			return false;
     		}
-    		log.addline(String.format("Found deployment %s for the data acquisition %s", deployment_uri, file_name));
+    		log.addline(Feedback.println(Feedback.WEB, String.format("[OK] Deployment %s specified for the data acquisition %s", deployment_uri, file_name)));
     	}
 		
     	CSVAnnotationHandler handler = null;
@@ -305,7 +306,6 @@ public class AutoAnnotator extends Controller {
     			TripleDocument docChar = (TripleDocument)iterDoc.next();
     			if (docChar != null && docChar.get("char") != null && docChar.get("charName") != null) {
     				deploymentChars.put((String)docChar.get("char"),(String)docChar.get("charName"));
-    				System.out.println("EC: " + docChar.get("char") + "   ecName: " + docChar.get("charName"));
     			}
     		}
     		handler.setDeploymentCharacteristics(deploymentChars);
@@ -325,8 +325,9 @@ public class AutoAnnotator extends Controller {
 			FileUtils.writeStringToFile(new File(LoadCCSV.UPLOAD_NAME), 
 										createPreamble(handler, schema_uri) + 
 										FileUtils.readFileToString(newFile, "UTF-8"));
-		} catch (IOException e) {
-			e.printStackTrace();
+		} catch (Exception e) {
+			log.addline(Feedback.println(Feedback.WEB, String.format("[ERROR] %s", e.getMessage())));
+			log.save();
 			return false;
 		}
 	    
@@ -342,7 +343,7 @@ public class AutoAnnotator extends Controller {
 	}
     
     private static String createPreamble(CSVAnnotationHandler handler, 
-    									 String schema_uri) {
+    									 String schema_uri) throws Exception {
 		String preamble = Downloads.FRAG_START_PREAMBLE;
 		preamble += NameSpaces.getInstance().printNameSpaceList();
 		preamble += "\n";
@@ -362,16 +363,17 @@ public class AutoAnnotator extends Controller {
 			int aux = 0;
 			ArrayList<Integer> mt = new ArrayList<Integer>();
 			ArrayList<String> mt_preamble = new ArrayList<String>();
-			String json = DataAcquisitionSchemaQueries.exec(
-					DataAcquisitionSchemaQueries.ATTRIBUTE_BY_SCHEMA_URI, schema_uri);
-			SparqlQueryResults results = new SparqlQueryResults(json, false);
-			Iterator<TripleDocument> iterDoc = results.sparqlResults.values().iterator();
-			while(iterDoc.hasNext()){
-				TripleDocument doc = iterDoc.next();
-				int i = Integer.parseInt(doc.get("hasPosition"));
-				String entity = doc.get("hasEntity");
-				String attrib = doc.get("hasAttribute");
-				String unit = doc.get("hasUnit");
+			
+			DataAcquisitionSchema schema = DataAcquisitionSchema.find(schema_uri);
+			if (null == schema) {
+				throw new Exception(String.format("Can not find schema %s", schema_uri));
+			}
+			
+			for (DataAcquisitionSchema.SchemaAttribute attribute : schema.getAttributes()) {
+				int i = Integer.parseInt(attribute.getPosition());
+				String entity = attribute.getEntity();
+				String attrib = attribute.getAttribute();
+				String unit = attribute.getUnit();
 
 				if (unit.equals(Downloads.FRAG_IN_DATE_TIME)) {
 					timeStampIndex = i; 

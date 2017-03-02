@@ -1,6 +1,6 @@
     var r = new Resumable({
         target:'/hadatac/annotator/uploadcsv',
-        chunkSize:10*1024*1024,
+        chunkSize:10*1024,
         simultaneousUploads:4,
         testChunks: true,
         throttleProgressCallbacks:1,

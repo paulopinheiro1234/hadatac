@@ -14,7 +14,6 @@ public class SparqlQueryResults{
     public String json;
     
     private ArrayList<String> vars = new ArrayList<String>();
-    private int numVars;
     private TreeNode newTree;
     
 	public SparqlQueryResults() {}
@@ -49,10 +48,9 @@ public class SparqlQueryResults{
 		    }
 		} catch (Exception e){
 			e.printStackTrace();
-		}// /try/catch
+		}
 		
 		Iterator<JsonNode> parseResults = bindings.iterator();
-		numVars = vars.size();
 		
 		// build TreeQueryResults:
         if(vars.contains("modelName") && vars.contains("superModelName"))
@@ -83,8 +81,8 @@ public class SparqlQueryResults{
             } catch (Exception e){
 			    e.printStackTrace();
 		    }
-		}// /try/catch
-	}// /constructor
+		}
+	}
 	
 	private void buildTreeQueryResults(JsonNode bindings, boolean usingURIs){
         this.newTree = null;
@@ -138,7 +136,7 @@ public class SparqlQueryResults{
             this.treeResults = "";
         else
             this.treeResults = newTree.toJson(0);
-	}// /buildTreeQueryResults
+	}
 	
 	public TripleDocument getTriple (String key){
 	    TripleDocument item = this.sparqlResults.get(key);

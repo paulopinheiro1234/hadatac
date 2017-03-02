@@ -151,14 +151,11 @@ GET	    /hadatac/dataacquisitions/		    	   org.hadatac.console.controllers.data
 POST	/hadatac/dataacquisitions/     			   org.hadatac.console.controllers.dataacquisitionmanagement.DataAcquisitionManagement.postIndex(oper : Int)
 GET	    /hadatac/dataacquisitions/delete		   org.hadatac.console.controllers.dataacquisitionmanagement.DeleteDataAcquisition.index(oper : String, dc_uri : String)
 POST	/hadatac/dataacquisitions/delete     	   org.hadatac.console.controllers.dataacquisitionmanagement.DeleteDataAcquisition.postIndex(oper : String, dc_uri : String)
-GET	    /hadatac/dataacquisitions/access		   org.hadatac.console.controllers.dataacquisitionmanagement.SetAccessPermission.index(dc_uri : String)
-POST	/hadatac/dataacquisitions/access     	   org.hadatac.console.controllers.dataacquisitionmanagement.SetAccessPermission.postIndex(dc_uri : String)
-POST	/hadatac/dataacquisitions/access/form      org.hadatac.console.controllers.dataacquisitionmanagement.SetAccessPermission.newPermission(dc_uri : String)
+GET	    /hadatac/dataacquisitions/edit		   	   org.hadatac.console.controllers.dataacquisitionmanagement.EditDataAcquisition.index(uri : String)
+POST	/hadatac/dataacquisitions/edit     	       org.hadatac.console.controllers.dataacquisitionmanagement.EditDataAcquisition.postIndex(uri : String)
+POST	/hadatac/dataacquisitions/edit/form        org.hadatac.console.controllers.dataacquisitionmanagement.EditDataAcquisition.processForm(acquisitionUri : String)
 GET	    /hadatac/dataacquisitions/search	       org.hadatac.console.controllers.dataacquisitionmanagement.SearchDataAcquisition.index(p: Int ?= 1, facets: String ?= "", facetAdd: String ?= "", facetDel: String ?= "")
 POST	/hadatac/dataacquisitions/search		   org.hadatac.console.controllers.dataacquisitionmanagement.SearchDataAcquisition.postIndex(p: Int ?= 1, facets: String ?= "", facetAdd: String ?= "", facetDel: String ?= "")
-GET	    /hadatac/dataacquisitions/owner		       org.hadatac.console.controllers.dataacquisitionmanagement.DataAcquisitionManagement.assignOwner(acquisitionUri : String)
-POST	/hadatac/dataacquisitions/owner     	   org.hadatac.console.controllers.dataacquisitionmanagement.DataAcquisitionManagement.postAssignOwner(acquisitionUri : String)
-POST	/hadatac/dataacquisitions/owner/form       org.hadatac.console.controllers.dataacquisitionmanagement.DataAcquisitionManagement.processForm(acquisitionUri : String)
 
 # annotator
 GET	    /hadatac/annotator/		    	           org.hadatac.console.controllers.annotator.Annotator.selectDeployment
