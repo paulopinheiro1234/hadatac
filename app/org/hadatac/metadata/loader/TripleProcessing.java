@@ -292,6 +292,12 @@ public class TripleProcessing {
 					}
 				}
 				
+				if (dataAcquisition.getStartedAt().isEmpty() 
+						|| dataAcquisition.getDeploymentUri().isEmpty()
+						|| dataAcquisition.getSchemaUri().isEmpty()) {
+					continue;
+				}
+				
 				dataAcquisition.save();
 				System.out.println("Successfully saved " + dataAcquisition.getUri() + " in Solr");
 			}
