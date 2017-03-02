@@ -310,10 +310,7 @@ public class AutoAnnotator extends Controller {
     		}
     		handler.setDeploymentCharacteristics(deploymentChars);
 
-    		/*
-    		 * Add URI of active data acquisition in handler
-    		 */
-    		DataAcquisition dc = DataFactory.getActiveDataAcquisition(deployment_uri);
+    		DataAcquisition dc = DataAcquisition.findByUri(dc_uri);
     		if (dc != null && dc.getUri() != null) {
     			handler.setDataAcquisitionUri(dc.getUri());
     		}
