@@ -292,9 +292,9 @@ public class TripleProcessing {
 					}
 				}
 				
-				if (dataAcquisition.getStartedAt().isEmpty() 
-						|| dataAcquisition.getDeploymentUri().isEmpty()
-						|| dataAcquisition.getSchemaUri().isEmpty()) {
+				if (dataAcquisition.getStartedAt() == null || dataAcquisition.getStartedAt().isEmpty() 
+						|| dataAcquisition.getDeploymentUri() == null || dataAcquisition.getDeploymentUri().isEmpty()
+						|| dataAcquisition.getSchemaUri() == null || dataAcquisition.getSchemaUri().isEmpty()) {
 					continue;
 				}
 				
