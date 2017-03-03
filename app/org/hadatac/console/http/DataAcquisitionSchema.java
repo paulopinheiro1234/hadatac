@@ -108,6 +108,7 @@ public class DataAcquisitionSchema {
     }
     
     public static DataAcquisitionSchema find(String schemaUri) {
+	System.out.println("looking for " + schemaUri);
     	DataAcquisitionSchema schema = null;
     	
     	String queryString = NameSpaces.getInstance().printSparqlNameSpaceList() + 
@@ -128,12 +129,17 @@ public class DataAcquisitionSchema {
 		List<SchemaAttribute> attributes = new ArrayList<SchemaAttribute>();
 		while (resultsrw.hasNext()) {
 			QuerySolution soln = resultsrw.next();
-			SchemaAttribute sa = schema.new SchemaAttribute(
+			if (soln.getLiteral("hasPosition") != null && soln.getLiteral("hasPosition").getString() != null &&
+			    soln.getResource("hasEntity") != null && soln.getResource("hasEntity").getURI() != null &&
+			    soln.getResource("hasAttribute") != null && soln.getResource("hasAttribute").getURI() != null &&
+			    soln.getResource("hasUnit") != null && soln.getResource("hasUnit").getURI() != null) {
+			    SchemaAttribute sa = schema.new SchemaAttribute(
 					soln.getLiteral("hasPosition").getString(),
 					soln.getResource("hasEntity").getURI(),
 					soln.getResource("hasAttribute").getURI(),
 					soln.getResource("hasUnit").getURI());
-			attributes.add(sa);
+			    attributes.add(sa);
+			}
 		}
 		
 		schema.setAttributes(attributes);
