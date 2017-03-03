@@ -35,7 +35,7 @@ public class ViewSubject extends Controller {
 		String indicatorQuery = "";
 		indicatorQuery += NameSpaces.getInstance().printSparqlNameSpaceList();
 		indicatorQuery += "SELECT ?subjectIndicator ?label ?comment WHERE { "
-				+ "?subjectIndicator rdfs:subClassOf chear:subjectIndicator . "
+				+ "?subjectIndicator rdfs:subClassOf chear:StudyIndicator . "
 				+ "?subjectIndicator rdfs:label ?label . "
 				+ "?subjectIndicator rdfs:comment ?comment . }";
 		QueryExecution qexecInd = QueryExecutionFactory.sparqlService(
@@ -130,7 +130,7 @@ public class ViewSubject extends Controller {
 		String indicatorQuery = ""; 
 		indicatorQuery += NameSpaces.getInstance().printSparqlNameSpaceList();
 		indicatorQuery += "SELECT ?subjectIndicator ?label ?comment WHERE { "
-				+ "?subjectIndicator rdfs:subClassOf chear:subjectIndicator . "
+				+ "?subjectIndicator rdfs:subClassOf chear:StudyIndicator . "
 				+ "?subjectIndicator rdfs:label ?label . "
 				+ "?subjectIndicator rdfs:comment ?comment . }";
 		Map<String, String> indicatorMap = new HashMap<String, String>();
