@@ -94,7 +94,8 @@ public class DataAcquisitionSearch extends Controller {
     	final SysUser user = AuthApplication.getLocalUser(session());
     	if(null == user){
     	    ownerUri = "Public";
-    		resultSize = Measurement.findSize(ownerUri, handler);
+	        //resultSize = Measurement.findSize(ownerUri, handler);
+	        resultSize = 800000;
     		results = Measurement.find(ownerUri, page, rows, handler);
     	}
     	else{
@@ -102,7 +103,8 @@ public class DataAcquisitionSearch extends Controller {
     		if(null == ownerUri){
     			ownerUri = "Public";
     		}
-    		resultSize = Measurement.findSize(ownerUri, handler);
+    		//resultSize = Measurement.findSize(ownerUri, handler);
+                resultSize = 800000;
     		results = Measurement.find(ownerUri, page, rows, handler);
     	}
     	System.out.println("[DataAcquisitionSearch] Total size response: " + resultSize);
