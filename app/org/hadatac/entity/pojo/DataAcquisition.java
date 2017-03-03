@@ -715,7 +715,7 @@ public class DataAcquisition {
 			}
 		} catch (Exception e) {
 			results.clear();
-			System.out.println("[ERROR] DataAcquisition.find(SolrQuery) - Exception message: " + e.getMessage());
+			System.out.println("[ERROR] DataAcquisition.findByQuery(SolrQuery) - Exception message: " + e.getMessage());
 		}
 		
 		return results;
