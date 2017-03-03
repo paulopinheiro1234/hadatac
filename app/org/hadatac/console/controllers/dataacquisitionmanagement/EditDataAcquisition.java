@@ -18,7 +18,6 @@ import org.hadatac.console.views.html.dataacquisitionmanagement.*;
 import org.hadatac.entity.pojo.DataAcquisition;
 import org.hadatac.entity.pojo.User;
 import org.hadatac.entity.pojo.UserGroup;
-import org.hadatac.utils.State;
 
 import be.objectify.deadbolt.java.actions.Group;
 import be.objectify.deadbolt.java.actions.Restrict;
@@ -81,16 +80,16 @@ public class EditDataAcquisition extends Controller {
         } else {
             DataAcquisition da = DataAcquisition.findByUri(acquisitionUri);
             if (sysUser.isDataManager()) {
-            	if (!da.getOwnerUri().equals(data.getNewOwner())) {
+            	if (da.getOwnerUri() == null || !da.getOwnerUri().equals(data.getNewOwner())) {
                 	da.setOwnerUri(data.getNewOwner());
                 	changedInfos.add(data.getNewOwner());
                 }
             }
-            if (!da.getPermissionUri().equals(data.getNewPermission())) {
+            if (da.getPermissionUri() == null || !da.getPermissionUri().equals(data.getNewPermission())) {
             	da.setPermissionUri(data.getNewPermission());
             	changedInfos.add(data.getNewPermission());
             }
-            if (!da.getParameter().equals(data.getNewParameter())) {
+            if (da.getParameter() == null || !da.getParameter().equals(data.getNewParameter())) {
             	da.setParameter(data.getNewParameter());
             	changedInfos.add(data.getNewParameter());
             }
