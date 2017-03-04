@@ -331,11 +331,6 @@ public class Measurement {
                     facet_query += " AND ";
                 }
             }
-            if (handler.facetsAnd.keySet().isEmpty()) {
-            	facet_query += "uri:*";
-            } else {
-            	facet_query += " AND uri:*";
-            }
         }
         
         if (facet_query.trim().equals("")) {

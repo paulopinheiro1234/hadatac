@@ -386,8 +386,6 @@ public class SysUser implements Subject {
 	}
 	
 	public static SysUser create(final AuthUser authUser, String uri) {
-		System.out.println("Sign up uri: " + uri);
-		/////////////////
 		final SysUser sys_user = new SysUser();
 		
 		sys_user.roles.add(SecurityRole
@@ -604,14 +602,18 @@ public class SysUser implements Subject {
 	public static void addLinkedAccount(final AuthUser oldUser,
 			final AuthUser newUser) {
 		final SysUser u = SysUser.findByAuthUserIdentity(oldUser);
-		u.linkedAccounts.add(LinkedAccount.create(newUser));
-		u.save();
+		if (null != u) {
+			u.linkedAccounts.add(LinkedAccount.create(newUser));
+			u.save();
+		}
 	}
 
 	public static void setLastLoginDate(final AuthUser knownUser) {
 		final SysUser u = SysUser.findByAuthUserIdentity(knownUser);
-		u.lastLogin = (new Date()).toString();
-		u.save();
+		if (null != u) {
+			u.lastLogin = (new Date()).toString();
+			u.save();
+		}
 	}
 
 	public static SysUser findByEmail(final String email) {
