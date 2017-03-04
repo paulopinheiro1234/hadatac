@@ -81,7 +81,6 @@ public class DataAcquisitionSearch extends Controller {
     	ObjectMapper mapper = new ObjectMapper();    	
     	FacetHandler handler = null;
     	String ownerUri;
-    	long resultSize = 0;
     	System.out.println("[DataAcquisitionSearch] Page: " + page + "   Rows:" + rows + "   Facets:" + facets);
     	try {
     		handler = mapper.readValue(facets, FacetHandler.class);
@@ -94,7 +93,6 @@ public class DataAcquisitionSearch extends Controller {
     	final SysUser user = AuthApplication.getLocalUser(session());
     	if(null == user){
     	    ownerUri = "Public";
-    		resultSize = Measurement.findSize(ownerUri, handler);
     		results = Measurement.find(ownerUri, page, rows, handler);
     	}
     	else{
@@ -102,12 +100,11 @@ public class DataAcquisitionSearch extends Controller {
     		if(null == ownerUri){
     			ownerUri = "Public";
     		}
-    		resultSize = Measurement.findSize(ownerUri, handler);
     		results = Measurement.find(ownerUri, page, rows, handler);
     	}
-    	System.out.println("[DataAcquisitionSearch] Total size response: " + resultSize);
+    	System.out.println("[DataAcquisitionSearch] Total size response: " + results.getDocumentSize());
     	
-    	return ok(dataacquisition_browser.render(page, rows, facets, resultSize, 
+    	return ok(dataacquisition_browser.render(page, rows, facets, results.getDocumentSize(), 
     			results, results.toJSON(), handler.toJSON(), Measurement.buildQuery(ownerUri, page, rows, handler)));
     }
 

@@ -230,65 +230,6 @@ public class Measurement {
 		return -1;
 	}
 	
-	public static long findSize(String user_uri, FacetHandler handler) {
-		SolrClient solr = new HttpSolrClient(
-				Play.application().configuration().getString("hadatac.solr.data") 
-				+ Collections.DATA_ACQUISITION);
-		SolrQuery query = new SolrQuery();
-		query.setStart(0);
-		query.setRows(100000000);
-
-		String acquisition_query = "";
-		String facet_query = "";
-		String q = "";
-		List<String> accessibleDAs = DataAcquisition.findAllAccessibleDataAcquisition(user_uri);
-		//acquisition_query += "{!terms f=acquisition_uri}" + String.join(",", accessibleDAs);
-		Iterator<String> iter_uri = accessibleDAs.iterator();
-		while(iter_uri.hasNext()){
-			String uri = iter_uri.next();
-			acquisition_query += "acquisition_uri" + ":\"" + uri + "\"";
-			if(iter_uri.hasNext()){
-				acquisition_query += " OR ";
-			}
-		}
-
-		if (handler != null) {
-			Iterator<String> i = handler.facetsAnd.keySet().iterator();
-			while (i.hasNext()) {
-				String field = i.next();
-				String value = handler.facetsAnd.get(field);
-				facet_query += field + ":\"" + value + "\"";
-				if (i.hasNext()) {
-					facet_query += " AND ";
-				}
-			}
-		}
-		
-		if (facet_query.trim().equals("")) {
-			q = acquisition_query;
-		}
-		else {
-			q = "(" + acquisition_query + ") AND (" + facet_query + ")";
-		}
-		
-		query.setQuery(q);
-		long respSize = 0;
-		try {
-			QueryResponse queryResponse = solr.query(query, SolrRequest.METHOD.POST);
-			solr.close();
-			respSize = queryResponse.getResults().size();  
-			System.out.println("Total # of documents: " + respSize);
-		} catch (SolrServerException e) {
-			System.out.println("[ERROR] Measurement.findSize(String, FacetHandler) - SolrServerException message: " + e.getMessage());
-		} catch (IOException e) {
-			System.out.println("[ERROR] Measurement.findSize(String, FacetHandler) - IOException message: " + e.getMessage());
-		} catch (Exception e) {
-			System.out.println("[ERROR] Measurement.findSize(String, FacetHandler) - Exception message: " + e.getMessage());
-		}
-
-		return respSize;
-	}
-	
 	public static String buildQuery(String user_uri, String study_uri, String subject_uri, String char_uri) {
 	    String acquisition_query = "";
         String facet_query = "";
@@ -390,6 +331,11 @@ public class Measurement {
                     facet_query += " AND ";
                 }
             }
+            if (handler.facetsAnd.keySet().isEmpty()) {
+            	facet_query += "uri:*";
+            } else {
+            	facet_query += " AND uri:*";
+            }
         }
         
         if (facet_query.trim().equals("")) {
@@ -411,15 +357,18 @@ public class Measurement {
 		SolrQuery query = new SolrQuery();
 		
 		String q = buildQuery(user_uri, page, qtd, handler);
+		System.out.println("Hello!!!  " + q);
 		query.setQuery(q);
 		query.setStart((page - 1)*qtd + 1);
 		System.out.println("Starting at: " + ((page - 1)* qtd + 1) + "    page: " + page + "     qtd: " + qtd);
 		query.setRows(qtd);
 		query.setFacet(true);
-		query.addFacetPivotField("entity,characteristic");
+		query.setFacetLimit(-1);
 		query.addFacetField("unit");
-		query.addFacetPivotField("platform_name,instrument_model");
+		query.addFacetField("uri");
 		query.addFacetPivotField("study_uri");
+		query.addFacetPivotField("entity,characteristic");
+		query.addFacetPivotField("platform_name,instrument_model");
 		
 		try {
 			QueryResponse queryResponse = solr.query(query, SolrRequest.METHOD.POST);
@@ -435,6 +384,10 @@ public class Measurement {
 				Iterator<FacetField> f = queryResponse.getFacetFields().iterator();
 				while (f.hasNext()) {
 					FacetField field = f.next();
+					System.out.println("getFacetFields: " + field.getName());
+					if (field.getName().equals("uri")) {
+						result.setDocumentSize((long)field.getValueCount());
+					}
 					result.field_facets.put(field.getName(), new HashMap<String, Long>());
 					Iterator<Count> v = field.getValues().iterator();
 					while (v.hasNext()) {
