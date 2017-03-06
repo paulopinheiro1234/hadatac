@@ -24,7 +24,7 @@
  				<h2>@indicatorValueResults.get(0).getUri().toString()</h2>
  				<h3><b>Name:</b>@indicatorValueResults.get(0).getCharacteristic()</h3>
  				
-				<table style="width:80%">
+				<table id = "MyTable" style="width:80%">
 					<tr><th><h3>Subject</h3></th><th><h3>Value</h3></th></tr>
 					@for(i <- indicatorValueResults){
 						<tr><td>@i.getObjectUri()</td><td>@i.getValue()</td></tr>
@@ -50,7 +50,7 @@
    
    <script>
    $(document).ready(function() { 
-    $("table") 
+    $("MyTable") 
     .tablesorter({widthFixed: true, widgets: ['zebra']}) 
     .tablesorterPager({container: $("#pager")}); 
 	}); 
