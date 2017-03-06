@@ -284,7 +284,7 @@ public class Measurement {
 		
 		String q = buildQuery(user_uri, study_uri, subject_uri, char_uri);
 		query.setQuery(q);
-		query.setRows(-1);
+		query.setRows(10000000);
 		query.setFacet(false);
 		
 		try {
