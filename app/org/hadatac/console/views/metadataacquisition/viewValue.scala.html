@@ -11,10 +11,20 @@
 @import play.api.Play.current
 
 @main("View Indicators") {
+	<head>
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
     <link rel="stylesheet" href="http://openlayers.org/en/v3.9.0/css/ol.css">
     <script type="text/javascript" charset="utf-8" src="http://www.openlayers.org/api/OpenLayers.js"></script>
     <script type="text/javascript" charset="utf-8" src="@controllers.routes.Assets.versioned("javascripts/openLayersFunctions.js")"></script>
     <script type="text/javascript" charset="utf-8" src="http://tablesorter.com/addons/pager/jquery.tablesorter.pager.js"></script>
+   	<script>
+   	$(document).ready(function() { 
+    	$("MyTable") 
+    	.tablesorter({widthFixed: true, widgets: ['zebra']}) 
+    	.tablesorterPager({container: $("#pager")}); 
+		}); 
+   	</script>
+    </head>
     <div class="row">
         <div class="col-md-6">
             <h1>Indicator Values</h1>
@@ -47,12 +57,4 @@
     </div>
     
    <div><a href="@org.hadatac.console.http.routes.SolrSearchProxy.getIndicatorValueDownload("/data/indicatorDetails.csv")" class="btn btn-info btn-lg" role="button">Download</a></div>
-   
-   <script>
-   $(document).ready(function() { 
-    $("MyTable") 
-    .tablesorter({widthFixed: true, widgets: ['zebra']}) 
-    .tablesorterPager({container: $("#pager")}); 
-	}); 
-   </script>
 }
