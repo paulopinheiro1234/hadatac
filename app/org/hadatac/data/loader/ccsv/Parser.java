@@ -171,13 +171,21 @@ public class Parser {
 				
 				measurement.setStudyUri(cellProc.replaceNameSpaceEx(hadatacKb.getDataAcquisition().getStudyUri()));
 				if(nIdCol > -1){
-					measurement.setObjectUri(Subject.find(measurement.getStudyUri(), record.get(nIdCol - 1)).getUri());
+					if (measurementType.getEntityUri().equals(cellProc.replacePrefixEx("sio:Human"))) {
+						measurement.setObjectUri(Subject.findSubject(measurement.getStudyUri(), record.get(nIdCol - 1)).getUri());
+					}
+					else if (measurementType.getEntityUri().equals(cellProc.replacePrefixEx("sio:Sample"))) {
+						String sampleUri = Subject.findSampleUri(measurement.getStudyUri(), record.get(nIdCol - 1));
+						if (sampleUri != null) {
+							measurement.setObjectUri(sampleUri);
+						}
+					}
 				}
 				else {
-					if(isSubjectPlatform){
+					if(isSubjectPlatform) {
 						measurement.setObjectUri(hadatacKb.getDeployment().getPlatform().getUri());
 					}
-					else{
+					else {
 						measurement.setObjectUri("");
 					}
 				}

@@ -230,7 +230,8 @@ public class Measurement {
 		return -1;
 	}
 	
-	public static String buildQuery(String user_uri, String study_uri, String subject_uri, String char_uri) {
+	public static String buildQuery(String user_uri, String study_uri, 
+									String subject_uri, String char_uri) {
 	    String acquisition_query = "";
         String facet_query = "";
         String q = "";
@@ -283,6 +284,7 @@ public class Measurement {
 		
 		String q = buildQuery(user_uri, study_uri, subject_uri, char_uri);
 		query.setQuery(q);
+		query.setRows(-1);
 		query.setFacet(false);
 		
 		try {
@@ -345,6 +347,7 @@ public class Measurement {
 	
 	public static AcquisitionQueryResult find(String user_uri, int page, int qtd, FacetHandler handler) {
 		AcquisitionQueryResult result = new AcquisitionQueryResult();
+		int docSize = 0;
 		
 		SolrClient solr = new HttpSolrClient(
 				Play.application().configuration().getString("hadatac.solr.data")
@@ -360,7 +363,6 @@ public class Measurement {
 		query.setFacet(true);
 		query.setFacetLimit(-1);
 		query.addFacetField("unit");
-		query.addFacetField("uri");
 		query.addFacetPivotField("study_uri");
 		query.addFacetPivotField("entity,characteristic");
 		query.addFacetPivotField("platform_name,instrument_model");
@@ -379,10 +381,6 @@ public class Measurement {
 				Iterator<FacetField> f = queryResponse.getFacetFields().iterator();
 				while (f.hasNext()) {
 					FacetField field = f.next();
-					System.out.println("getFacetFields: " + field.getName());
-					if (field.getName().equals("uri")) {
-						result.setDocumentSize((long)field.getValueCount());
-					}
 					result.field_facets.put(field.getName(), new HashMap<String, Long>());
 					Iterator<Count> v = field.getValues().iterator();
 					while (v.hasNext()) {
@@ -401,7 +399,7 @@ public class Measurement {
 					
 					List<Pivot> parents = new ArrayList<Pivot>();
 					result.pivot_facets.put(entry.getKey(), parents);
-					System.out.println("!!!!!!! PIVOT: " + entry.getKey());
+					System.out.println("PIVOT: " + entry.getKey());
 					
 					List<PivotField> listPivotField = entry.getValue();
 					System.out.println("List<PivotField> size: " + listPivotField.size());
@@ -411,13 +409,16 @@ public class Measurement {
 						PivotField pivot = iterParents.next();
 						
 						Pivot parent = new Pivot();
+						if (pivot.getField().equals("study_uri")) {
+							docSize += pivot.getCount();
+						}
 						parent.field = pivot.getField();
 						parent.value = pivot.getValue().toString();
 						parent.count = pivot.getCount();
 						parents.add(parent);
-						System.out.println("!!! PIVOT FIELD: " + pivot.getField());
-						System.out.println("!!! PIVOT VALUE: " + pivot.getValue().toString());
-						System.out.println("!!! PIVOT COUNT: " + pivot.getCount());
+						System.out.println("PIVOT FIELD: " + pivot.getField());
+						System.out.println("PIVOT VALUE: " + pivot.getValue().toString());
+						System.out.println("PIVOT COUNT: " + pivot.getCount());
 						
 						List<PivotField> subPivotFiled = pivot.getPivot();
 						if(null != subPivotFiled){
@@ -429,9 +430,9 @@ public class Measurement {
 								child.value = pivot.getValue().toString();
 								child.count = pivot.getCount();
 								parent.children.add(child);
-								System.out.println("!!! PIVOT FIELD: " + pivot.getField());
-								System.out.println("!!! PIVOT VALUE: " + pivot.getValue().toString());
-								System.out.println("!!! PIVOT COUNT: " + pivot.getCount());
+								System.out.println("PIVOT FIELD: " + pivot.getField());
+								System.out.println("PIVOT VALUE: " + pivot.getValue().toString());
+								System.out.println("PIVOT COUNT: " + pivot.getCount());
 							}
 						}
 					}
@@ -444,6 +445,8 @@ public class Measurement {
 		} catch (Exception e) {
 			System.out.println("[ERROR] Measurement.find(int, int, List<String>, Map<String, String>) - Exception message: " + e.getMessage());
 		}
+		
+		result.setDocumentSize((long)docSize);
 		
 		return result;
 	}

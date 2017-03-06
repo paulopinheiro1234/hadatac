@@ -49,12 +49,13 @@ public class Subject {
 		String queryString = NameSpaces.getInstance().printSparqlNameSpaceList()
 				+ "SELECT ?cohort WHERE {\n"
 				+ "  <" + subject_uri + "> a hasco:SubjectPlatform . \n"
-				+ "  <" + subject_uri + "> hasco:isSubjectOf ?cohort .\n"
+				+ "  <" + subject_uri + "> hasco:isSubjectOf ?cohort . \n"
 				+ "}";
 		
 		Query query = QueryFactory.create(queryString);
 		
-		QueryExecution qexec = QueryExecutionFactory.sparqlService(Collections.getCollectionsName(Collections.METADATA_SPARQL), query);
+		QueryExecution qexec = QueryExecutionFactory.sparqlService(
+				Collections.getCollectionsName(Collections.METADATA_SPARQL), query);
 		ResultSet results = qexec.execSelect();
 		ResultSetRewindable resultsrw = ResultSetFactory.copyResults(results);
 		qexec.close();
@@ -66,7 +67,7 @@ public class Subject {
 		return false;
 	}
 	
-	public static Subject find(String study_uri, String subject_id) {
+	public static Subject findSubject(String study_uri, String subject_id) {
 		Subject subject = new Subject();
 		String queryString = NameSpaces.getInstance().printSparqlNameSpaceList()
 				+ "SELECT ?uri WHERE {\n"
@@ -77,7 +78,8 @@ public class Subject {
 		
 		Query query = QueryFactory.create(queryString);
 		
-		QueryExecution qexec = QueryExecutionFactory.sparqlService(Collections.getCollectionsName(Collections.METADATA_SPARQL), query);
+		QueryExecution qexec = QueryExecutionFactory.sparqlService(
+				Collections.getCollectionsName(Collections.METADATA_SPARQL), query);
 		ResultSet results = qexec.execSelect();
 		ResultSetRewindable resultsrw = ResultSetFactory.copyResults(results);
 		qexec.close();
@@ -88,7 +90,31 @@ public class Subject {
 		}
 		
 		return subject;
-	}	
+	}
+	
+	public static String findSampleUri(String study_uri, String sample_id) {
+		String queryString = NameSpaces.getInstance().printSparqlNameSpaceList()
+				+ "SELECT ?sampleUri WHERE {\n"
+				+ "  ?sampleUri hasco:originalID \"" + sample_id + "\" .\n"
+				+ "  ?sampleUri hasco:isSampleOf ?subjectUri .\n"
+				+ "  ?subjectUri hasco:isSubjectOf ?cohort .\n"
+				+ "  ?cohort hasco:isCohortOf " + study_uri + " .\n"
+				+ "}";
+		
+		Query query = QueryFactory.create(queryString);
+		QueryExecution qexec = QueryExecutionFactory.sparqlService(
+				Collections.getCollectionsName(Collections.METADATA_SPARQL), query);
+		ResultSet results = qexec.execSelect();
+		ResultSetRewindable resultsrw = ResultSetFactory.copyResults(results);
+		qexec.close();
+		
+		if (resultsrw.size() >= 1) {
+			QuerySolution soln = resultsrw.next();
+			return soln.getResource("sampleUri").getURI();
+		}
+		
+		return null;
+	}
 }
 
 
