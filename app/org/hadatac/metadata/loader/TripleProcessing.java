@@ -31,6 +31,7 @@ import org.hadatac.utils.NameSpaces;
 import org.labkey.remoteapi.CommandException;
 
 import play.mvc.Controller;
+import views.html.defaultpages.badRequest;
 
 public class TripleProcessing {
 	
@@ -218,6 +219,9 @@ public class TripleProcessing {
     public static String importDataAcquisition(String labkey_site, String user_name, 
     		String password, String path, List<String> list_names) throws CommandException {
     	
+    	final SysUser user = AuthApplication.getLocalUser(Controller.session());
+		String ownerUri = UserManagement.getUriByEmail(user.getEmail());
+		
     	String message = "";
     	LabkeyDataHandler loader = new LabkeyDataHandler(labkey_site, user_name, password, path);
 		Map< String, Map< String, List<PlainTriple> > > mapSheets = 
@@ -238,9 +242,7 @@ public class TripleProcessing {
 				ValueCellProcessing cellProc = new ValueCellProcessing();
 				String dataAcquisitionUri = cellProc.convertToWholeURI(uri);
 				DataAcquisition dataAcquisition = DataAcquisition.findByUri(dataAcquisitionUri);
-				if (null == dataAcquisition) {	
-					final SysUser user = AuthApplication.getLocalUser(Controller.session());
-					String ownerUri = UserManagement.getUriByEmail(user.getEmail());
+				if (null == dataAcquisition) {
 					dataAcquisition = new DataAcquisition();
 					dataAcquisition.setUri(dataAcquisitionUri);
 					dataAcquisition.setOwnerUri(ownerUri);

@@ -12,10 +12,10 @@ import java.util.Map;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.hadatac.console.controllers.AuthApplication;
-import org.hadatac.console.views.html.deployments.newDeployment;
 import org.hadatac.console.views.html.triplestore.*;
 import org.hadatac.console.controllers.triplestore.routes;
 import org.hadatac.console.models.LabKeyLoginForm;
+import org.hadatac.console.models.SysUser;
 import org.hadatac.metadata.loader.LabkeyDataHandler;
 import org.hadatac.metadata.loader.MetadataContext;
 import org.hadatac.metadata.loader.SpreadsheetProcessing;
@@ -95,9 +95,14 @@ public class LoadKB extends Controller {
     	
         NameSpaces.getInstance();
     	try {
-    		String message = TripleProcessing.importDataAcquisition(site, user_name, password, path, final_names);
-    	} catch(CommandException e) {
-    		if(e.getMessage().equals("Unauthorized")){
+    		final SysUser user = AuthApplication.getLocalUser(Controller.session());
+    		String ownerUri = UserManagement.getUriByEmail(user.getEmail());
+    		if (null == ownerUri) {
+    			return badRequest("Cannot find corresponding URI for the current logged in user!");
+    		}
+    		TripleProcessing.importDataAcquisition(site, user_name, password, path, final_names);
+    	} catch (CommandException e) {
+    		if (e.getMessage().equals("Unauthorized")) {
     			return ok(syncLabkey.render("login_failed",
     					routes.LoadKB.playLoadLabkeyFolders("init", content).url(), "", false));
     		}
