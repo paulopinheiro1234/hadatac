@@ -146,7 +146,9 @@ public class SolrSearchProxy extends Controller {
 	
 	@Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
 	public static Result getMetadataDataAcquisition(){
-		String path = Collections.getCollectionsName(Collections.METADATA_DA) + 
+//		String path = Collections.getCollectionsName(Collections.METADATA_DA) + 
+//				request().toString().split((request().path()))[1];
+		String path = Collections.getCollectionsName(Collections.DATA_COLLECTION) + "/select" +
 				request().toString().split((request().path()))[1];
 		return getSolrSearch(path);
 	}
