@@ -1,10 +1,15 @@
 package org.hadatac.console.http;
 
+import java.io.DataOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
+import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.net.URLEncoder;
+import java.net.URLConnection;
 import java.util.List;
 
 import org.hadatac.console.controllers.AuthApplication;
@@ -15,19 +20,60 @@ import be.objectify.deadbolt.java.actions.Group;
 import be.objectify.deadbolt.java.actions.Restrict;
 import play.mvc.Controller;
 import play.mvc.Result;
+import play.data.DynamicForm;
+import play.data.Form;
 
 public class SolrSearchProxy extends Controller {
 	
 	@Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
 	public static Result getSolrSearch(String path) {
+	    //System.out.println("path: [" + path + "]");
 		InputStream is = null;
+		URLConnection connection = null;
+		URL url = null;
+		HttpURLConnection con = null;
+
 		try {
-			URL url = new URL(path);
-			is = url.openStream();
+		    url = new URL(path.substring(0,path.indexOf('?')));
+		    con = (HttpURLConnection) url.openConnection();
+		    con.setRequestMethod("POST");
+		    con.setRequestProperty("Accept-Charset", "utf-8");
+		    con.setDoOutput(true);
+		    DataOutputStream wr = new DataOutputStream(con.getOutputStream());
+		    wr.writeBytes(path.substring(path.indexOf('?')+1, path.length()));
+		    wr.flush();
+		    wr.close();
+		    
+		    /*
+		    connection = new URL(path).openConnection();
+		    connection.setDoOutput(true); // Triggers POST.
+		    connection.setRequestProperty("Accept-Charset", "utf-8");
+		    connection.setRequestProperty("Content-Type", "application/x-www-form-urlencoded;charset=utf-8");
+		    */
+		} catch (Exception e) {
+		    e.printStackTrace();
+		}
+
+		try (OutputStream output = con.getOutputStream()) {
+		    output.write(path.getBytes("utf-8"));
 		} catch (IOException e) {
-			e.printStackTrace();
-		} 
-		return ok(is);
+		    e.printStackTrace();
+		}
+ 
+		try {
+		    is = con.getInputStream();
+		    //is = connection.getInputStream();
+		    //URL url = new URL(path);
+		    //is = url.openStream();
+		} catch (IOException e) {
+		    e.printStackTrace();
+		}
+ 
+		if (is != null) {
+		    return ok(is);
+		} else {
+		    return ok();
+		}
 	}
 	
 	@Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
@@ -38,9 +84,25 @@ public class SolrSearchProxy extends Controller {
 	
 	@Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
     public static Result getDataAcquisitionDownload(){
+	DynamicForm form = Form.form().bindFromRequest();
+	String request_wt;
+	String request_rows;
+        String request_q;
+        String request_encoding = "";
+
+	if (form.data().size() == 0) {
+	    return badRequest("[ERROR] getDataAcuisitionDownload expects some data");
+        } else {
+	    request_wt = form.get("wt");
+	    request_rows = form.get("rows");
+	    request_q = form.get("q");
+	    request_encoding = "wt=" + request_wt + "&rows=" + request_rows + "&q=" + request_q;
+	    //System.out.println("Request: " + request_encoding);
+	}
         String path = Collections.getCollectionsName(Collections.DATA_ACQUISITION) + "/select" +
-                request().toString().split((request().path()))[1];
-        response().setContentType("text/csv");
+	    //"?" + URLEncoder.encode(request_encoding);
+	    "?" + request_encoding;
+            response().setContentType("text/csv");
         return getSolrSearch(path);
     }
 	
@@ -48,7 +110,7 @@ public class SolrSearchProxy extends Controller {
     public static Result getStudyAcquisitionDownload(){
         String path = Collections.getCollectionsName(Collections.STUDY_ACQUISITION) + 
                 request().toString().split((request().path()))[1];
-        System.out.println(path);
+        //System.out.println(path);
         response().setContentType("text/csv");
         return getSolrSearch(path);
     }
@@ -57,7 +119,7 @@ public class SolrSearchProxy extends Controller {
 	public static Result getStudyAcquisition(){
 		String path = Collections.getCollectionsName(Collections.STUDY_ACQUISITION) + 
 				request().toString().split((request().path()))[1];
-		System.out.println(path);
+		//System.out.println(path);
 		return getSolrSearch(path);
 	}
 	

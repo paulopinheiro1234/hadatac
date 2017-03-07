@@ -63,6 +63,12 @@
 									<option>JSON</option>
 								</select>
 								<a href="" class="btn btn-info" role="button" id="btn_download">Confirm</a>
+								<form action="@org.hadatac.console.http.routes.SolrSearchProxy.getDataAcquisitionDownload()" method="post">
+                                    <input name="wt" id="wt_post" type="hidden" />
+                                    <input name="rows" id="rows_post" type="hidden" />
+                                    <input name="q" id="q_post" type="hidden" />
+                                    <input name="mySubmit" class="btn btn-info" type="submit" value="New Confirm" />
+                                </form>
 							</div>
 							<div class="modal-footer">
 								<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
@@ -136,6 +142,9 @@
 	if (btn != null) {
 		btn.href=document.getElementById("download_url").textContent+'?wt=csv&rows=9999999&q='+encodeURIComponent(document.getElementById('query').getAttribute('data-query'));
 	}
+	document.getElementById('wt_post').value = 'csv';
+	document.getElementById('rows_post').value = 9999999;
+	document.getElementById('q_post').value = encodeURIComponent(document.getElementById('query').getAttribute('data-query'));
 	
 	var jsonTree, dataTree;
 	var treeEC;
