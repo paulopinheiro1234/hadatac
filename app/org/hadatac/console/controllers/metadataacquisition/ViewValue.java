@@ -16,7 +16,7 @@ import org.apache.commons.lang3.StringUtils;
 import be.objectify.deadbolt.java.actions.Group;
 import be.objectify.deadbolt.java.actions.Restrict;
 
-public class ViewValue extends Controller {	
+public class ViewValue extends Controller {
 	public static List<Measurement> findValue(String user_uri, String study_uri, 
 										      String subject_uri, String char_uri) {
 		AcquisitionQueryResult result = new AcquisitionQueryResult();
