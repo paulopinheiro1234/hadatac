@@ -21,7 +21,7 @@
 	<script type="text/javascript" charset="utf-8" src="@controllers.routes.Assets.versioned("javascripts/jquery.tablesorter.js")"></script>
    	<script>
 		$(document).ready(function() { 
-		    $("myTable").tablesorter({widthFixed: true, widgets: ['zebra']}).tablesorterPager({container: $("#pager")});
+		    $("#myTable").tablesorter({widthFixed: true, widgets: ['zebra']}).tablesorterPager({container: $("#pager")});
 		});
    	</script>
     </head>
@@ -47,9 +47,26 @@
 				</table>
 				
  			}
-            
+	        <div id="pager" class="pager">
+				<form>
+					<img src="http://tablesorter.com/addons/pager/icons/first.png" class="first"/>
+					<img src="http://tablesorter.com/addons/pager/icons/prev.png" class="prev"/>
+					<input type="text" class="pagedisplay"/>
+					<img src="http://tablesorter.com/addons/pager/icons/next.png" class="next"/>
+					<img src="http://tablesorter.com/addons/pager/icons/last.png" class="last"/>
+					<select class="pagesize">
+						<option selected="selected"  value="10">10</option>
+						<option value="20">20</option>
+						<option value="30">30</option>
+						<option  value="40">40</option>
+					</select>
+				</form>
+			</div>
+	            
     	</div>
     </div>
+    
+    
     
    <div><a href="@org.hadatac.console.http.routes.SolrSearchProxy.getIndicatorValueDownload("/data/indicatorDetails.csv")" class="btn btn-info btn-lg" role="button">Download</a></div>
    </body>
