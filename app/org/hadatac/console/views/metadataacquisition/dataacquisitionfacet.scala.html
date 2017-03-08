@@ -30,11 +30,13 @@ jQuery(document).ready(function($) {
     search_index: 'solr',
     datatype: 'json',
     facets: [
-        {'field': 'a', 'display': 'Data Acquisition Type'},
-        {'field': 'provwasAssociatedWith', 'display': 'Associated With'},
-        {'field': 'hascoisDataAcquisitionOf', 'display': 'Study'},
-        {'field': 'hascohasSchema', 'display': 'Schema'},
-        {'field': 'hascohasMethod', 'display': 'Method'},
+        {'field': 'owner_uri', 'display': 'Owner'},
+        {'field': 'triggering_event', 'display': 'Triggering Event'},
+        {'field': 'study_uri', 'display': 'Study'},
+        {'field': 'schema_uri', 'display': 'Schema'},
+        {'field': 'deployment_uri', 'display': 'Deployment'},
+        {'field': 'instrument_model', 'display': 'Instrument'},
+        {'field': 'platform_uri', 'display': 'Platform'},
     ],
     search_sortby: [{'display':'Data Acquisition Type', 'field':'a.exact'},{'display':'Data Acquisition Of', 'field':'hascoisDataAcquisitionOf.exact'}],
     searchbox_fieldselect: [{'display':'Data Acquisition Type', 'field':'a.exact'},{'display':'Data Acquisition Of', 'field':'hascoisDataAcquisitionOf.exact'}],
@@ -48,7 +50,7 @@ jQuery(document).ready(function($) {
         [
           {
             "pre" : "<h3>",
-            "field" : "hasURI",
+            "field" : "uri",
             "post" : "</h3>"
           }
         ],
@@ -61,37 +63,72 @@ jQuery(document).ready(function($) {
         ],
         [
           {
-            "pre" : "<b>Data Acquisition Of: </b>",
-            "field" : "hascoisDataAcquisitionOf",
+            "pre" : "<b>Data Acquisition Of Study: </b>",
+            "field" : "study_uri",
             "post" : " "
           }
         ],
         [
           {
             "pre" : "<b>Associated With: </b>",
-            "field" : "provwasAssociatedWith",
+            "field" : "was_associated_with_uri",
             "post" : " "
           }
         ],
         [
           {
-            "pre" : "<b>Has Method: </b>",
-            "field" : "hascohasMethod",
+            "pre" : "<b>Part of Deployment: </b>",
+            "field" : "deployment_uri",
+            "post" : " "
+          }
+        ],
+        [
+          {
+            "pre" : "<b>Instrument URI: </b>",
+            "field" : "instrument_uri",
+            "post" : " "
+          }
+        ],
+        [
+          {
+            "pre" : "<b>Instrument Model: </b>",
+            "field" : "instrument_model",
             "post" : " "
           }
         ],
         [
           {
             "pre" : "<b>Has Schema: </b>",
-            "field" : "hascohasSchema",
+            "field" : "schema_uri",
             "post" : " "
           }
         ],
         [
           {
-            "pre" : " ",
-            "field" : "rdfscomment",
-            "post" : ". "
+            "pre" : "<b>Part of Platform: </b>",
+            "field" : "platform_name",
+            "post" : " "
+          }
+        ],
+        [
+          {
+            "pre" : "<b>Start Time: </b>",
+            "field" : "started_at",
+            "post" : " "
+          }
+        ],
+        [
+          {
+            "pre" : "<b>End Time: </b>",
+            "field" : "ended_at",
+            "post" : " "
+          }
+        ],
+        [
+          {
+            "pre" : "<b>Number of Data Points: </b>",
+            "field" : "nr_data_points",
+            "post" : " "
           }
         ]
     ],

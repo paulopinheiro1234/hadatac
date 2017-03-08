@@ -85,18 +85,23 @@ public class SolrSearchProxy extends Controller {
 	@Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
     public static Result getDataAcquisitionDownload(){
 	DynamicForm form = Form.form().bindFromRequest();
+	String request_fl;
 	String request_wt;
 	String request_rows;
-        String request_q;
-        String request_encoding = "";
+    String request_q;
+    String request_encoding = "";
 
 	if (form.data().size() == 0) {
 	    return badRequest("[ERROR] getDataAcuisitionDownload expects some data");
         } else {
+        request_fl = form.get("fl");
 	    request_wt = form.get("wt");
 	    request_rows = form.get("rows");
 	    request_q = form.get("q");
 	    request_encoding = "wt=" + request_wt + "&rows=" + request_rows + "&q=" + request_q;
+	    if (!request_fl.equals("")) {
+	        request_encoding += "&fl=" + request_fl; 
+	    }
 	    //System.out.println("Request: " + request_encoding);
 	}
         String path = Collections.getCollectionsName(Collections.DATA_ACQUISITION) + "/select" +
@@ -146,7 +151,9 @@ public class SolrSearchProxy extends Controller {
 	
 	@Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
 	public static Result getMetadataDataAcquisition(){
-		String path = Collections.getCollectionsName(Collections.METADATA_DA) + 
+//		String path = Collections.getCollectionsName(Collections.METADATA_DA) + 
+//				request().toString().split((request().path()))[1];
+		String path = Collections.getCollectionsName(Collections.DATA_COLLECTION) + "/select" +
 				request().toString().split((request().path()))[1];
 		return getSolrSearch(path);
 	}
