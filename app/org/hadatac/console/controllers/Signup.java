@@ -48,12 +48,9 @@ public class Signup extends Controller {
 
 	private static final Form<MyIdentity> FORGOT_PASSWORD_FORM = form(MyIdentity.class);
 
-	public static Result forgotPassword(final String email) {
+	public static Result forgotPassword() {
 		com.feth.play.module.pa.controllers.Authenticate.noCache(response());
 		Form<MyIdentity> form = FORGOT_PASSWORD_FORM;
-		if (email != null && !email.trim().isEmpty()) {
-			form = FORGOT_PASSWORD_FORM.fill(new MyIdentity(email));
-		}
 		return ok(password_forgot.render(form));
 	}
 

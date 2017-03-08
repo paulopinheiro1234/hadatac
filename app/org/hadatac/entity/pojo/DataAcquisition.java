@@ -698,6 +698,15 @@ public class DataAcquisition {
 		return -1;
 	}
 	
+	public int deleteMeasurementData() {
+		Iterator<String> i = datasetUri.iterator();
+		while (i.hasNext()) {
+			Measurement.delete(i.next());
+		}
+		
+		return -1;
+	}
+	
 	public static List<DataAcquisition> findByQuery(SolrQuery query) {
 		List<DataAcquisition> results = new ArrayList<DataAcquisition>();
 		
