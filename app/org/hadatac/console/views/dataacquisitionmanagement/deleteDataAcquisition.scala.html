@@ -1,4 +1,6 @@
-@(oper : String, dc : org.hadatac.entity.pojo.DataAcquisition)
+@(oper : String, 
+  da : org.hadatac.entity.pojo.DataAcquisition,
+  bAdmin : Boolean)
 
 @import helper._
 @import org.hadatac.utils._
@@ -12,23 +14,27 @@
     
     <div class="container-fluid">
        <ul>
-           <li><b>URI:</b> @dc.getUri()</li>
-           <li><b>Status:</b> @dc.getStatus()</li>
-           <li><b>Triggering Event:</b> </li>
-           <li><b>Platform:</b> @dc.getPlatformName()</li>
-           <li><b>Instrument:</b> @dc.getInstrumentModel()</li>
-           <li><b>Start Date/Time:</b> @dc.getStartedAt()</li>
-           <li><b>End Date/Time:</b> @dc.getEndedAt()</li>
-           <li><b># of Data Points:</b> </li>
-           <li><b>Permission:</b> @dc.getPermissionUri()</li>
+			<li><b>URI:</b> @da.getUri()</li>
+       		<li><b>Status:</b> @da.getStatus()</li>
+       		<li><b>Triggering Event:</b> </li>
+       		<li><b>Platform:</b> @da.getPlatformName()</li>
+       		<li><b>Instrument:</b> @da.getInstrumentModel()</li>
+       		<li><b>Start Date/Time:</b> @da.getStartedAt()</li>
+       		<li><b>End Date/Time:</b> @da.getEndedAt()</li>
+       		<li><b># of Data Points:</b> @da.getNumberDataPoints()</li>
+       		<li><b>Current Parameter:</b> @da.getParameter()</li>
+       		@if(bAdmin) {
+       			<li><b>Current Owner:</b> @da.getOwnerUri()</li>
+       		}
+       		<li><b>Current Permission:</b> @da.getPermissionUri()</li>
        </ul>
     </div>
  
     @if(oper=="init") {
         <div id="question-box">
            Are your sure you want to delete this data collection? 
-           <a href="@org.hadatac.console.controllers.dataacquisitionmanagement.routes.DeleteDataAcquisition.index("confirmed", dc.getUri())" class="btn btn-success" role="button">Confirm</a>
-           <a href="@org.hadatac.console.controllers.dataacquisitionmanagement.routes.DeleteDataAcquisition.index("cancelled", dc.getUri())" class="btn btn-danger" role="button">Cancel</a>
+           <a href="@org.hadatac.console.controllers.dataacquisitionmanagement.routes.DeleteDataAcquisition.index("confirmed", da.getUri())" class="btn btn-success" role="button">Confirm</a>
+           <a href="@org.hadatac.console.controllers.dataacquisitionmanagement.routes.DeleteDataAcquisition.index("cancelled", da.getUri())" class="btn btn-danger" role="button">Cancel</a>
         </div>
     }
 
@@ -48,7 +54,7 @@
 
 	 @if(oper=="confirmed") {
          <script> 
-            var msg = "@DeleteDataAcquisition.delete(dc.getUri())";
+            var msg = "@DeleteDataAcquisition.delete(da.getUri())";
             $('#msgarea').html(msg.replace(/&lt;br&gt;/g, '<br>'));
             document.getElementById('end-process-box').style.display = 'inline';
          </script>

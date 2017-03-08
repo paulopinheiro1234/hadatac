@@ -106,6 +106,9 @@
     	}
     </tbody>
     </table>
+    @if(processedFiles.isEmpty()) {
+    	<p>No records for processed files</p>
+    }
     
     <br>
     
@@ -140,6 +143,9 @@
     	}
     </tbody>
     </table>
+    @if(unprocessedFiles.isEmpty()) {
+    	<p>No unprocessed files</p>
+    }
     </div>
 	
     <br><br>
