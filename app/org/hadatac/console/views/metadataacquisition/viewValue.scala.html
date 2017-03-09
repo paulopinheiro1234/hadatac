@@ -17,12 +17,46 @@
     <script type="text/javascript" charset="utf-8" src="http://www.openlayers.org/api/OpenLayers.js"></script>
     <script type="text/javascript" charset="utf-8" src="@controllers.routes.Assets.versioned("javascripts/jquery.tablesorter.pager.js")"></script>
     <script type="text/javascript" charset="utf-8" src="@controllers.routes.Assets.versioned("javascripts/openLayersFunctions.js")"></script>
-    <script type="text/javascript" charset="utf-8" src="@controllers.routes.Assets.versioned("javascripts/jquery-latest.js")"></script> 
-	<script type="text/javascript" charset="utf-8" src="@controllers.routes.Assets.versioned("javascripts/jquery.tablesorter.js")"></script>
-   	<script>
-		$(document).ready(function() { 
-		    $("#myTable").tablesorterPager({container: $("#pager")});
-		});
+	<style>
+		table {
+	    width: 40em;
+	    margin: 2em auto;
+		}
+	
+		thead {
+		    background: #000;
+		    color: #fff;
+		}
+	
+	</style>
+	<script>
+		$(document).ready(function() 
+		    { 
+		
+			$('table.paginated').each(function() {
+			    var currentPage = 0;
+			    var numPerPage = 10;
+			    var $table = $(this);
+			    $table.bind('repaginate', function() {
+			        $table.find('tbody tr').hide().slice(currentPage * numPerPage, (currentPage + 1) * numPerPage).show();
+			    });
+			    $table.trigger('repaginate');
+			    var numRows = $table.find('tbody tr').length;
+			    var numPages = Math.ceil(numRows / numPerPage);
+			    var $pager = $('<div class="pager"></div>');
+			    for (var page = 0; page < numPages; page++) {
+			        $('<span class="page-number"></span>').text(page + 1).bind('click', {
+			            newPage: page
+			        }, function(event) {
+			            currentPage = event.data['newPage'];
+			            $table.trigger('repaginate');
+			            $(this).addClass('active').siblings().removeClass('active');
+			        }).appendTo($pager).addClass('clickable');
+			    }
+			    $pager.insertBefore($table).find('span.page-number:first').addClass('active');
+			});
+		    }
+		);
    	</script>
     </head>
     <body>
@@ -47,7 +81,7 @@
 				</table>
 				
  			}
-	        <div id="pager" class="pager">
+	        <div class="paginated">
 				<form>
 					<img src="http://tablesorter.com/addons/pager/icons/first.png" class="first"/>
 					<img src="http://tablesorter.com/addons/pager/icons/prev.png" class="prev"/>
