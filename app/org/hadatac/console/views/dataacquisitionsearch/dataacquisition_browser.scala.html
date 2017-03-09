@@ -157,7 +157,7 @@
 	loadTree(treeEC, dataTree);
 	
 	var treeS;
-	jsonTree = parseSolrFacetPivotToTree("study_uri");
+	jsonTree = parseSolrFacetPivotToTree("study_uri,acquisition_uri");
 	dataTree = JSON.parse(jsonTree);
 	treeS = new dhtmlXTreeObject("treeStudyBox","100%","100%",0);
 	loadTree(treeS, dataTree);
