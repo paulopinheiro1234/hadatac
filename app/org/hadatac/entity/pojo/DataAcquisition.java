@@ -676,10 +676,8 @@ public class DataAcquisition {
 	
 	public int delete() {
 		try {
-			Iterator<String> i = datasetUri.iterator();
-			while (i.hasNext()) {
-				Measurement.delete(i.next());
-			}
+			deleteMeasurementData();
+			
 			SolrClient solr = new HttpSolrClient(
 					Play.application().configuration().getString("hadatac.solr.data") 
 					+ Collections.DATA_COLLECTION);
@@ -696,6 +694,17 @@ public class DataAcquisition {
 		}
 		
 		return -1;
+	}
+	
+	public boolean deleteMeasurementData() {
+		Iterator<String> iter = datasetUri.iterator();
+		while (iter.hasNext()) {
+			if (Measurement.delete(iter.next()) == 0) {
+				iter.remove();
+			}
+		}
+		
+		return datasetUri.isEmpty();
 	}
 	
 	public static List<DataAcquisition> findByQuery(SolrQuery query) {

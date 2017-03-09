@@ -451,6 +451,26 @@ public class Measurement {
 		return result;
 	}
 	
+	public static long getNumByDataAcquisitionUri(String acquisition_uri) {		
+		SolrClient solr = new HttpSolrClient(
+				Play.application().configuration().getString("hadatac.solr.data") 
+				+ Collections.DATA_ACQUISITION);
+		SolrQuery query = new SolrQuery();
+		query.set("q", "acquisition_uri:\"" + acquisition_uri + "\"");
+		query.set("rows", "10000000");
+		
+		try {
+			QueryResponse response = solr.query(query);
+			solr.close();
+			SolrDocumentList results = response.getResults();
+			return results.getNumFound();
+		} catch (Exception e) {
+			System.out.println("[ERROR] Measurement.findByDataAcquisitionUri(acquisition_uri) - Exception message: " + e.getMessage());
+		}
+				
+		return 0;
+	}
+	
 	public static List<Measurement> findByDataAcquisitionUri(String acquisition_uri) {
 		List<Measurement> listMeasurement = new ArrayList<Measurement>();
 		

@@ -1,4 +1,5 @@
-@(state: org.hadatac.utils.State, dc : org.hadatac.entity.pojo.DataAcquisition, 
+@(state: org.hadatac.utils.State, 
+  dc : org.hadatac.entity.pojo.DataAcquisition, 
   bAdmin : Boolean)
 
 @import java.net._
@@ -25,5 +26,6 @@
 	  <td>
 	     <a href="@org.hadatac.console.controllers.dataacquisitionmanagement.routes.DeleteDataAcquisition.index("init", URLEncoder.encode(dc.getUri(),"UTF-8"))" class="btn-xs btn-primary" role="button">Delete</a>
 	     <a href="@org.hadatac.console.controllers.dataacquisitionmanagement.routes.EditDataAcquisition.index(URLEncoder.encode(dc.getUri(),"UTF-8"))" class="btn-xs btn-primary" role="button">Edit</a>
+	     <a href="@org.hadatac.console.controllers.dataacquisitionmanagement.routes.DeleteDataAcquisition.deleteDataPoints(URLEncoder.encode(dc.getUri(),"UTF-8"), state.getCurrent())" class="btn-xs btn-primary" role="button">Clear</a>
 	  </td>
 	</tr>
