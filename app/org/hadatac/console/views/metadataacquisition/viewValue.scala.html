@@ -19,14 +19,45 @@
     <script type="text/javascript" charset="utf-8" src="@controllers.routes.Assets.versioned("javascripts/openLayersFunctions.js")"></script>
 	<style>
 		table {
-	    width: 40em;
-	    margin: 2em auto;
+		    width: 40em;
+		    margin: 2em auto;
 		}
-	
+		
 		thead {
 		    background: #000;
 		    color: #fff;
 		}
+		
+		td {
+		    width: 10em;
+		    padding: 0.3em;
+		}
+		
+		tbody {
+		    background: #ccc;
+		}
+		
+		div.pager {
+		    text-align: center;
+		    margin: 1em 0;
+		}
+		
+		div.pager span {
+		    display: inline-block;
+		    width: 1.8em;
+		    height: 1.8em;
+		    line-height: 1.8;
+		    text-align: center;
+		    cursor: pointer;
+		    background: #000;
+		    color: #fff;
+		    margin-right: 0.5em;
+		}
+		
+		div.pager span.active {
+		    background: #c00;
+		}
+
 	
 	</style>
 	<script>
