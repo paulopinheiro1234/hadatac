@@ -20,7 +20,12 @@
             	<a href='@org.hadatac.console.controllers.dataacquisitionmanagement.routes.DataAcquisitionManagement.index(State.ACTIVE)' class="btn-sm btn-warning disabled" role="button">Active Acquisitions</a>
             } else {
             	<a href='@org.hadatac.console.controllers.dataacquisitionmanagement.routes.DataAcquisitionManagement.index(State.ACTIVE)' class="btn-sm btn-primary" role="button">Active Acquisitions</a>
-            } 	
+            }
+            @if(state.getCurrent() == State.CHANGED) {
+            	<a href='@org.hadatac.console.controllers.dataacquisitionmanagement.routes.DataAcquisitionManagement.index(State.CHANGED)' class="btn-sm btn-warning disabled" role="button">Changed Acquisitions</a>
+            } else {
+            	<a href='@org.hadatac.console.controllers.dataacquisitionmanagement.routes.DataAcquisitionManagement.index(State.CHANGED)' class="btn-sm btn-primary" role="button">Changed Acquisitions</a>
+            }
         	@if(state.getCurrent() == State.CLOSED) {
              	<a href='@org.hadatac.console.controllers.dataacquisitionmanagement.routes.DataAcquisitionManagement.index(State.CLOSED)' class="btn-sm btn-warning disabled" role="button">Closed Acquisitions</a>
             } else {
@@ -53,6 +58,7 @@
             <thead>
                  <tr>
                     <th>Triggering Event</th>
+                    <th>Name</th>
                     <th>Platform</th>
                     <th>Instrument</th>
                     <th>Start Date/Time</th>

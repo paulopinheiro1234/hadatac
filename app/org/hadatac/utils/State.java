@@ -11,6 +11,7 @@ public class State {
     public static final int ACTIVE  = 1;
 	public static final int CLOSED  = 2;
 	public static final int ALL     = 3;
+	public static final int CHANGED = 4;
 	
 	public static final int PROCESSED  	= 4;
 	public static final int UNPROCESSED = 5;

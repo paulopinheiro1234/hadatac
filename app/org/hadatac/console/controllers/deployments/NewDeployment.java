@@ -62,12 +62,23 @@ public class NewDeployment extends Controller {
     		return redirect(org.hadatac.console.controllers.triplestore.routes.LoadKB.logInLabkey(
     				routes.NewDeployment.index(type).url()));
     	}
-
-    	return ok(newDeployment.render(Form.form(DeploymentForm.class), 
-    			  Platform.find(),
-    			  Instrument.findAvailable(),
-    			  Detector.findAvailable(),
-    			  type));
+    	
+    	if (type.equalsIgnoreCase("regular")) {
+    		return ok(newDeployment.render(Form.form(DeploymentForm.class), 
+      			  Platform.find(),
+      			  Instrument.findAvailable(),
+      			  Detector.findAvailable(),
+      			  type));
+    	}
+    	else if (type.equalsIgnoreCase("legacy")) {
+    		return ok(newDeployment.render(Form.form(DeploymentForm.class),
+      			  Platform.find(),
+      			  Instrument.find(),
+      			  Detector.find(),
+      			  type));
+    	}
+    	
+    	return badRequest("Invalid deployment type!");
     }
     
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
@@ -109,7 +120,7 @@ public class NewDeployment extends Controller {
         }
         String dataAcquisitionUri = data.getDataAcquisitionUri();
         String param = data.getInitialParameter();
-        DataFactory.createDataAcquisition(dataAcquisitionUri, deploymentUri, triggeringEvent, 
+        DataFactory.createDataAcquisition(triggeringEvent, dataAcquisitionUri, deploymentUri, 
         		param, UserManagement.getUriByEmail(user.getEmail()));
         
         String user_name = session().get("LabKeyUserName");
@@ -127,32 +138,34 @@ public class NewDeployment extends Controller {
     
     @Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
     public static void saveToLabKey(Deployment deployment) throws CommandException {
-    	if (null != deployment) {
-    		String site = ConfigProp.getPropertyValue("labkey.config", "site");
-            String path = "/" + ConfigProp.getPropertyValue("labkey.config", "folder");
-            
-        	LabkeyDataHandler loader = new LabkeyDataHandler(
-        			site, session().get("LabKeyUserName"), session().get("LabKeyPassword"), path);
-        	
-        	ValueCellProcessing cellProc = new ValueCellProcessing();
-        	List<String> detectorURIs = new ArrayList<String>();
-        	for (Detector detector : deployment.getDetectors()) {
-        		detectorURIs.add(cellProc.replaceNameSpaceEx(detector.getUri()));
-        	}
-        	String detectors = String.join(", ", detectorURIs);
-        	
-        	List< Map<String, Object> > rows = new ArrayList< Map<String, Object> >();
-        	Map<String, Object> row = new HashMap<String, Object>();
-        	row.put("hasURI", cellProc.replaceNameSpaceEx(deployment.getUri()));
-        	row.put("a", "vstoi:Deployment");
-        	row.put("vstoi:hasPlatform", cellProc.replaceNameSpaceEx(deployment.getPlatform().getUri()));
-        	row.put("hasneto:hasInstrument", cellProc.replaceNameSpaceEx(deployment.getInstrument().getUri()));
-        	row.put("hasneto:hasDetector", detectors);
-        	row.put("prov:startedAtTime", deployment.getStartedAt());
-        	row.put("prov:endedAtTime", deployment.getEndedAt());
-        	rows.add(row);
-        	
-        	loader.insertRows("Deployment", rows);
+    	if (null == deployment) {
+    		return;
     	}
+    	
+		String site = ConfigProp.getPropertyValue("labkey.config", "site");
+        String path = "/" + ConfigProp.getPropertyValue("labkey.config", "folder");
+        
+    	LabkeyDataHandler loader = new LabkeyDataHandler(
+    			site, session().get("LabKeyUserName"), session().get("LabKeyPassword"), path);
+    	
+    	ValueCellProcessing cellProc = new ValueCellProcessing();
+    	List<String> detectorURIs = new ArrayList<String>();
+    	for (Detector detector : deployment.getDetectors()) {
+    		detectorURIs.add(cellProc.replaceNameSpaceEx(detector.getUri()));
+    	}
+    	String detectors = String.join(", ", detectorURIs);
+    	
+    	List< Map<String, Object> > rows = new ArrayList< Map<String, Object> >();
+    	Map<String, Object> row = new HashMap<String, Object>();
+    	row.put("hasURI", cellProc.replaceNameSpaceEx(deployment.getUri()));
+    	row.put("a", "vstoi:Deployment");
+    	row.put("vstoi:hasPlatform", cellProc.replaceNameSpaceEx(deployment.getPlatform().getUri()));
+    	row.put("hasneto:hasInstrument", cellProc.replaceNameSpaceEx(deployment.getInstrument().getUri()));
+    	row.put("hasneto:hasDetector", detectors);
+    	row.put("prov:startedAtTime", deployment.getStartedAt());
+    	row.put("prov:endedAtTime", deployment.getEndedAt());
+    	rows.add(row);
+    	
+    	loader.insertRows("Deployment", rows);
     }
 }

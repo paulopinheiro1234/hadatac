@@ -5,6 +5,7 @@
 	<field name="owner_uri" type="string" indexed="true" docValues="true" />
 	<field name="permission_uri" type="string" indexed="true" docValues="true" />
 	<field name="parameter" type="string" indexed="true" docValues="true" />
+	<field name="status" type="int" stored="true" indexed="true" docValues="true" />
 	<field name="triggering_event" type="int" stored="true" indexed="true" docValues="true" />
 	<field name="nr_data_points" type="long" stored="true" indexed="true" docValues="true" />
     <field name="_version_" type="long" indexed="true" stored="true"/>

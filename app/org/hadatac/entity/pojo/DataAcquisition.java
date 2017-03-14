@@ -24,6 +24,7 @@ import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.client.solrj.response.UpdateResponse;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
+import org.hadatac.metadata.loader.ValueCellProcessing;
 import org.hadatac.utils.Collections;
 import org.hadatac.utils.NameSpaces;
 import org.hadatac.utils.State;
@@ -458,10 +459,14 @@ public class DataAcquisition {
 	public static DataAcquisition convertFromSolr(SolrDocument doc) {
 		Iterator<Object> i;
 		DateTime date;
+		
 		DataAcquisition dataAcquisition = new DataAcquisition();
 		try {
 			if (doc.getFieldValue("uri") != null) {
 				dataAcquisition.setUri(doc.getFieldValue("uri").toString());
+				ValueCellProcessing cellProc = new ValueCellProcessing();
+				dataAcquisition.setLabel(cellProc.replaceNameSpaceEx(
+						dataAcquisition.getUri()).split(":")[1]);
 			}
 			if (doc.getFieldValue("owner_uri") != null) {
 				dataAcquisition.setOwnerUri(doc.getFieldValue("owner_uri").toString());

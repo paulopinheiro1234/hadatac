@@ -25,7 +25,7 @@
       if (document.getElementById('acquisition_uri').value.length == 0) {
           cansubmit = false;
       }
-
+      
       if (document.getElementById('platform').value.length == 0) {
          cansubmit = false;
       }
@@ -53,7 +53,7 @@
 </script>
 
   <div class="container">
-    <h2>New @deploymentType Deployment</h2>
+    <h2>New @deploymentType.substring(0, 1).toUpperCase().concat(deploymentType.substring(1).toLowerCase()) Deployment</h2>
 
     <form class="form-horizontal" name="newDeployment" method="post" action="@org.hadatac.console.controllers.deployments.routes.NewDeployment.processForm">
 	
@@ -72,8 +72,7 @@
     <div class="form-group">
          <label>Platform</label> 
          <select class="form-control col-sm-6" id="platform" name="platform" onchange="checkform()" >
-            <option value=""></option>         
-
+            <option value=""></option>
             @for(platform <- thePlatforms) {
                 <option value="@platform.getUri()">@platform.getLabel() @if(platform.getSerialNumber() != null) { (SN: @platform.getSerialNumber()) }</option>
             }

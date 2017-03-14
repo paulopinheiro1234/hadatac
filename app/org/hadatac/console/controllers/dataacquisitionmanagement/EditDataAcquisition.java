@@ -16,6 +16,7 @@ import org.hadatac.console.models.DataAcquisitionForm;
 import org.hadatac.console.models.SysUser;
 import org.hadatac.console.views.html.dataacquisitionmanagement.*;
 import org.hadatac.entity.pojo.DataAcquisition;
+import org.hadatac.entity.pojo.DataAcquisitionSchema;
 import org.hadatac.entity.pojo.User;
 import org.hadatac.entity.pojo.UserGroup;
 
@@ -54,11 +55,11 @@ public class EditDataAcquisition extends Controller {
     		}
     		
             return ok(editDataAcquisition.render(dataAcquisition, nameList, 
-            		User.getUserURIs(), sysUser.isDataManager()));
+            		User.getUserURIs(), DataAcquisitionSchema.findAll(), sysUser.isDataManager()));
     	}
     	
     	return ok(editDataAcquisition.render(dataAcquisition, null, 
-    			User.getUserURIs(), sysUser.isDataManager()));
+    			User.getUserURIs(), DataAcquisitionSchema.findAll(), sysUser.isDataManager()));
     }
 
 	@Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
@@ -92,6 +93,10 @@ public class EditDataAcquisition extends Controller {
             if (da.getParameter() == null || !da.getParameter().equals(data.getNewParameter())) {
             	da.setParameter(data.getNewParameter());
             	changedInfos.add(data.getNewParameter());
+            }
+            if (da.getSchemaUri() == null || !da.getSchemaUri().equals(data.getNewSchema())) {
+            	da.setSchemaUri(data.getNewSchema());
+            	changedInfos.add(data.getNewSchema());
             }
             
             if (!changedInfos.isEmpty()) {

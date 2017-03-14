@@ -1,6 +1,7 @@
 @(da : org.hadatac.entity.pojo.DataAcquisition, 
-  perms : Map[String, String],
+  permissions : Map[String, String],
   ownerOptions : List[String],
+  schemas : List[org.hadatac.entity.pojo.DataAcquisitionSchema],
   bAdmin : Boolean)
 
 @import helper._
@@ -17,7 +18,7 @@
        <ul>
        <li><b>URI:</b> @da.getUri()</li>
        <li><b>Status:</b> @da.getStatus()</li>
-       <li><b>Triggering Event:</b> </li>
+       <li><b>Triggering Event:</b> @da.getTriggeringEventName()</li>
        <li><b>Platform:</b> @da.getPlatformName()</li>
        <li><b>Instrument:</b> @da.getInstrumentModel()</li>
        <li><b>Start Date/Time:</b> @da.getStartedAt()</li>
@@ -53,11 +54,25 @@
               	 @if(da.getPermissionUri() != "Public"){
               		<option value="Public">Public</option> 
               	 }         
-                 @for((permUri, permName) <- perms){
+                 @for((permUri, permName) <- permissions){
                     @if(permUri.equals(da.getPermissionUri())) {
                     	<option selected value="@permUri">@permName</option>
               	 	} else {
               	 		<option value="@permUri">@permName</option>
+              	 	}
+                 }
+              </select>
+           </div>
+           
+           <div class="form-group">
+              <label>Set Schema</label>
+              <select class="form-control col-sm-6" id="newSchema" name="newSchema" >
+              	<option value=""></option>
+                @for(schema <- schemas){
+                    @if(schema.equals(da.getSchemaUri())) {
+                    	<option selected value="@schema.getUri()">@schema.getUri()</option>
+              	 	} else {
+              	 		<option value="@schema.getUri()">@schema.getUri()</option>
               	 	}
                  }
               </select>

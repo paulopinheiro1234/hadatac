@@ -1,6 +1,5 @@
-package org.hadatac.console.http;
+package org.hadatac.entity.pojo;
 
-import java.io.ByteArrayOutputStream;
 import java.util.List;
 import java.util.ArrayList;
 
@@ -11,14 +10,13 @@ import org.apache.jena.query.QueryFactory;
 import org.apache.jena.query.QuerySolution;
 import org.apache.jena.query.ResultSet;
 import org.apache.jena.query.ResultSetFactory;
-import org.apache.jena.query.ResultSetFormatter;
 import org.apache.jena.query.ResultSetRewindable;
 import org.hadatac.utils.Collections;
 import org.hadatac.utils.NameSpaces;
 
 public class DataAcquisitionSchema {
 
-    public static final String ATTRIBUTE_BY_SCHEMA_URI = "AttributeBySchemaURI";
+	private String uri = "";
     private List<SchemaAttribute> attributes = null;
     
     public class SchemaAttribute {
@@ -47,6 +45,13 @@ public class DataAcquisitionSchema {
     		return unit;
 		}
     }
+    
+    public String getUri() {
+    	return uri;
+	}
+    public void setUri(String uri) {
+    	this.uri = uri;
+	}
 
     public List<SchemaAttribute> getAttributes() {
     	return attributes;
@@ -56,63 +61,21 @@ public class DataAcquisitionSchema {
 		this.attributes = attributes;
 	}
     
-    public static String querySelector(String concept, String uri){
-        // default query?
-        String q = "SELECT * WHERE { ?s ?p ?o } LIMIT 10";
-        switch (concept){
-            case ATTRIBUTE_BY_SCHEMA_URI : 
-            	q = "PREFIX rdfs:<http://www.w3.org/2000/01/rdf-schema#> " + 
-            		"PREFIX owl: <http://www.w3.org/2002/07/owl#> " +
-            		"PREFIX prov: <http://www.w3.org/ns/prov#>  " +
-            		"PREFIX vstoi: <http://hadatac.org/ont/vstoi#> " +
-            		"PREFIX hasneto: <http://hadatac.org/ont/hasneto#> " +
-        			"PREFIX hasco: <http://hadatac.org/ont/hasco/> " +
-        			"SELECT ?uri ?hasPosition ?hasEntity ?hasAttribute ?hasUnit ?hasSource ?isPIConfirmed WHERE { " + 
-        			"   ?uri a hasneto:DASchemaAttribute . " + 
-        			"   ?uri hasneto:partOfSchema " + "<" + uri + "> .  " + 
-        			"   ?uri hasco:hasPosition ?hasPosition .  " + 
-        			"   OPTIONAL { ?uri hasneto:hasEntity ?hasEntity } ." + 
-        			"   OPTIONAL { ?uri hasneto:hasAttribute ?hasAttribute } ." + 
-        			"   OPTIONAL { ?uri hasneto:hasUnit ?hasUnit } ." + 
-        			"   OPTIONAL { ?uri hasco:hasSource ?hasSource } ." + 
-        			"   OPTIONAL { ?uri hasco:isPIConfirmed ?isPIConfirmed } ." + 
-        			"}";
-                break;
-            default :
-            	q = "";
-            	System.out.println("WARNING: no query for tab " + concept);
-        }
-        return q;
-    }
-
-    public static String exec(String concept, String uri) {
-    	ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-    	try {
-    		String queryString = NameSpaces.getInstance().printSparqlNameSpaceList() + 
-    					querySelector(concept, uri);
-    		Query query = QueryFactory.create(queryString);
-    			
-    		QueryExecution qexec = QueryExecutionFactory.sparqlService(
-    				Collections.getCollectionsName(Collections.METADATA_SPARQL), query);
-    		ResultSet results = qexec.execSelect();
-    		
-    		ResultSetFormatter.outputAsJSON(outputStream, results);
-    		qexec.close();
-    		
-    		return outputStream.toString("UTF-8");
-    	} catch (Exception e) {
-			e.printStackTrace();
-		}
-    	
-    	return "";
-    }
-    
     public static DataAcquisitionSchema find(String schemaUri) {
-	System.out.println("looking for " + schemaUri);
+    	System.out.println("Looking for schema " + schemaUri);
     	DataAcquisitionSchema schema = null;
     	
     	String queryString = NameSpaces.getInstance().printSparqlNameSpaceList() + 
-				querySelector(ATTRIBUTE_BY_SCHEMA_URI, schemaUri);
+    			"SELECT ?uri ?hasPosition ?hasEntity ?hasAttribute ?hasUnit ?hasSource ?isPIConfirmed WHERE { " + 
+    			"   ?uri a hasneto:DASchemaAttribute . " + 
+    			"   ?uri hasneto:partOfSchema " + "<" + schemaUri + "> .  " + 
+    			"   ?uri hasco:hasPosition ?hasPosition .  " + 
+    			"   OPTIONAL { ?uri hasneto:hasEntity ?hasEntity } ." + 
+    			"   OPTIONAL { ?uri hasneto:hasAttribute ?hasAttribute } ." + 
+    			"   OPTIONAL { ?uri hasneto:hasUnit ?hasUnit } ." + 
+    			"   OPTIONAL { ?uri hasco:hasSource ?hasSource } ." + 
+    			"   OPTIONAL { ?uri hasco:isPIConfirmed ?isPIConfirmed } ." + 
+    			"}";
     	Query query = QueryFactory.create(queryString);
 		
     	QueryExecution qexec = QueryExecutionFactory.sparqlService(
@@ -141,9 +104,34 @@ public class DataAcquisitionSchema {
 			    attributes.add(sa);
 			}
 		}
-		
 		schema.setAttributes(attributes);
 		
 		return schema;
+    }
+    
+    public static List<DataAcquisitionSchema> findAll() {
+    	List<DataAcquisitionSchema> schemas = new ArrayList<DataAcquisitionSchema>();
+    	
+    	String queryString = NameSpaces.getInstance().printSparqlNameSpaceList() + 
+    			"SELECT ?uri WHERE { " + 
+    			"   ?uri a hasco:DASchema . } ";
+    	Query query = QueryFactory.create(queryString);
+		
+    	QueryExecution qexec = QueryExecutionFactory.sparqlService(
+			Collections.getCollectionsName(Collections.METADATA_SPARQL), query);
+    	ResultSet results = qexec.execSelect();
+		ResultSetRewindable resultsrw = ResultSetFactory.copyResults(results);
+		qexec.close();
+		
+		while (resultsrw.hasNext()) {
+			QuerySolution soln = resultsrw.next();
+			if (soln != null && soln.getResource("uri").getURI() != null) { 
+				DataAcquisitionSchema schema = new DataAcquisitionSchema();
+				schema.setUri(soln.getResource("uri").getURI());
+				schemas.add(schema);
+			}
+		}
+		
+		return schemas;
     }
 }

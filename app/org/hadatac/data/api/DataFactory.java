@@ -25,9 +25,9 @@ public class DataFactory {
     public static String CONSOLE_ID = "00000001";
     
     public static DataAcquisition createDataAcquisition(
+    		int triggeringEvent,
     		String dataCollectionUri, 
     		String deploymentUri, 
-    		int triggeringEvent, 
     		String parameter,
     		String ownerUri) {
 		Deployment deployment = Deployment.find(deploymentUri);

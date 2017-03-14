@@ -4,6 +4,8 @@ import org.hadatac.console.controllers.AuthApplication;
 import org.hadatac.console.controllers.triplestore.UserManagement;
 import org.hadatac.console.models.SysUser;
 
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 import play.mvc.Controller;
@@ -11,6 +13,7 @@ import play.mvc.Result;
 
 import org.hadatac.console.views.html.dataacquisitionmanagement.*;
 import org.hadatac.entity.pojo.DataAcquisition;
+import org.hadatac.metadata.loader.ValueCellProcessing;
 import org.hadatac.utils.State;
 
 import be.objectify.deadbolt.java.actions.Group;
@@ -31,6 +34,18 @@ public class DataAcquisitionManagement extends Controller {
     		String ownerUri = UserManagement.getUriByEmail(user.getEmail());
     		results = DataAcquisition.find(ownerUri, state);
     	}
+    	
+    	ValueCellProcessing cellProc = new ValueCellProcessing();
+		for (DataAcquisition dataAcquisition : results) {
+			dataAcquisition.setSchemaUri(cellProc.replaceNameSpaceEx(
+					dataAcquisition.getSchemaUri()));
+		}
+		results.sort(new Comparator<DataAcquisition>() {
+            @Override
+            public int compare(DataAcquisition lhs, DataAcquisition rhs) {
+                return lhs.getUri().compareTo(rhs.getUri());
+            }
+        });
     	
         return ok(dataAcquisitionManagement.render(state, results, user.isDataManager()));   
     }
