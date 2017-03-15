@@ -78,7 +78,7 @@ public class ViewSubject extends Controller {
 			List<String> listIndicatorLabel = new ArrayList<String>();
 			while (resultsrwIndvInd.hasNext()) {
 				QuerySolution soln = resultsrwIndvInd.next();
-				if(Measurement.find("", "", subject_uri, soln.get("uri").toString()).documents.size() > 0){
+				if(Measurement.find(findUser(), "", subject_uri, soln.get("uri").toString()).documents.size() > 0){
 					listIndicatorLabel.add(soln.get("label").toString());
 				}
 			}

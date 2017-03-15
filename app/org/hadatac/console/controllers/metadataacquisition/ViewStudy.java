@@ -83,7 +83,7 @@ public class ViewStudy extends Controller {
 					QuerySolution soln = resultsrwIndvInd.next();
 					System.out.println("Solution: " + soln);
 					
-					if(Measurement.find("", study_uri, "", soln.get("uri").toString()).documents.size() > 0){
+					if(Measurement.find(findUser(), study_uri, "", soln.get("uri").toString()).documents.size() > 0){
 						indvIndicatorList.add(soln.get("label").toString());
 					}
 				}

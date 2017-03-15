@@ -40,7 +40,7 @@ import be.objectify.deadbolt.java.actions.Restrict;
 public class ViewSample extends Controller {
 
 	public static Map<String, String> findSampleIndicators(String sample_uri) {
-		String indicatorQuery="PREFIX rdfs:<http://www.w3.org/2000/01/rdf-schema#> PREFIX case: <http://hadatac.org/ont/case#>PREFIX chear: <http://hadatac.org/ont/chear#>SELECT ?sampleIndicator ?label ?comment WHERE { ?sampleIndicator rdfs:subClassOf chear:sampleIndicator . ?sampleIndicator rdfs:label ?label . ?sampleIndicator rdfs:comment ?comment . }";
+		String indicatorQuery="PREFIX rdfs:<http://www.w3.org/2000/01/rdf-schema#> PREFIX case: <http://hadatac.org/ont/case#>PREFIX chear: <http://hadatac.org/ont/chear#>SELECT ?sampleIndicator ?label ?comment WHERE { ?sampleIndicator rdfs:subClassOf chear:SampleIndicator . ?sampleIndicator rdfs:label ?label . ?sampleIndicator rdfs:comment ?comment . }";
 		QueryExecution qexecInd = QueryExecutionFactory.sparqlService(Collections.getCollectionsName(Collections.METADATA_SPARQL), indicatorQuery);
 		ResultSet indicatorResults = qexecInd.execSelect();
 		ResultSetRewindable resultsrwIndc = ResultSetFactory.copyResults(indicatorResults);
@@ -51,7 +51,7 @@ public class ViewSample extends Controller {
 		while (resultsrwIndc.hasNext()) {
 			QuerySolution soln = resultsrwIndc.next();
 			indicatorLabel = soln.get("label").toString();
-			indicatorMap.put(soln.get("sampleIndicator").toString(),indicatorLabel);		
+			indicatorMap.put(soln.get("sampleIndicator").toString(),indicatorLabel);	
 		}
 		Map<String, String> indicatorMapSorted = new TreeMap<String, String>(indicatorMap);
 		
@@ -63,7 +63,7 @@ public class ViewSample extends Controller {
 
 			String indvIndicatorQuery = "PREFIX rdfs:<http://www.w3.org/2000/01/rdf-schema#> PREFIX chear: <http://hadatac.org/ont/chear#>PREFIX case: <http://hadatac.org/ont/case#>PREFIX chear-kb: <http://hadatac.org/kb/chear#>PREFIX case-kb: <http://hadatac.org/kb/case#>PREFIX hasco: <http://hadatac.org/ont/hasco/>PREFIX hasneto: <http://hadatac.org/ont/hasneto#>SELECT DISTINCT ?sampleUri " +
 					"?" + label + " " +
-					"WHERE { ?schemaUri hasco:isSchemaOf ?sampleUri . ?schemaAttribute hasneto:partOfSchema ?schemaUri . ?schemaAttribute hasneto:hasAttribute " +
+					"WHERE { ?schemaUri hasco:isSchemaOf " + sample_uri + " . ?schemaAttribute hasneto:partOfSchema ?schemaUri . ?schemaAttribute hasneto:hasAttribute " +
 					"?" + entry.getValue().toString().replaceAll(" ", "").replaceAll(",", "") +
 					" . ?" + entry.getValue().toString().replaceAll(" ", "").replaceAll(",", "") + " rdfs:subClassOf* " + entry.getKey().toString().replaceAll("http://hadatac.org/ont/chear#","chear:").replaceAll("http://hadatac.org/ont/case#","case:").replaceAll("http://hadatac.org/kb/chear#","chear-kb:").replaceAll("http://hadatac.org/kb/case#","case-kb:") + 
 					" . ?" + entry.getValue().toString().replaceAll(" ", "").replaceAll(",", "") + " rdfs:label ?" + label + " . " +
