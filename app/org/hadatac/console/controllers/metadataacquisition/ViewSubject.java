@@ -60,7 +60,7 @@ public class ViewSubject extends Controller {
 			String indvIndicatorQuery = "";
 			indvIndicatorQuery += NameSpaces.getInstance().printSparqlNameSpaceList();
 			indvIndicatorQuery += "SELECT DISTINCT ?label ?uri WHERE { "
-					+ subject_uri + " hasco:originalID ?pid . "
+					+ "<" + subject_uri + "> hasco:originalID ?pid . "
 					+ "?c1	hasneto:hasAttribute	?pid . "
 					+ "?c1	hasneto:partOfSchema	?schemaUri . "
 					+ "?uri	hasneto:partOfSchema	?schemaUri . "
@@ -98,7 +98,7 @@ public class ViewSubject extends Controller {
     			+ "OPTIONAL { ?subjectUri rdfs:label ?subjectLabel } . "
     			+ "OPTIONAL { ?subjectUri a ?subjectType . "
     			+ "			  ?subjectType rdfs:label ?subjectTypeLabel } . "
-    			+ "FILTER ( ?subjectUri = " + subject_uri + " ) . "
+    			+ "FILTER ( ?subjectUri = <" + subject_uri + "> ) . "
     			+ "}";
 		
     	Query basicQuery = QueryFactory.create(subjectQueryString);
