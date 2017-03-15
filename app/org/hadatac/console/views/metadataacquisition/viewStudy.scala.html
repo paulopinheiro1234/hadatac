@@ -62,7 +62,7 @@
 			<h3>Subject List</h3>
 				<ul>        		
 					@for(key <- subjectResult.keySet()){
-						<li><a href="@org.hadatac.console.controllers.metadataacquisition.routes.ViewSubject.index(key.toString)">@key.toString</a>
+						<li><a href="@org.hadatac.console.controllers.metadataacquisition.routes.ViewSubject.index(showValues.get("study").toString(), key.toString)">@key.toString</a>
 
 							<ul>
 							@for(s <- subjectResult.get(key)) {

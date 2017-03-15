@@ -10,6 +10,7 @@ import play.mvc.Controller;
 import play.mvc.Result;
 
 import org.hadatac.console.views.html.metadataacquisition.*;
+import org.hadatac.entity.pojo.Measurement;
 import org.hadatac.metadata.loader.ValueCellProcessing;
 import org.apache.jena.query.Query;
 import org.apache.jena.query.QueryExecution;
@@ -31,7 +32,7 @@ import be.objectify.deadbolt.java.actions.Restrict;
 
 public class ViewSubject extends Controller {
 
-	public static Map<String, List<String>> findSubjectIndicators(String subject_uri) {
+	public static Map<String, List<String>> findSubjectIndicators(String study_uri, String subject_uri) {
 		String indicatorQuery = "";
 		indicatorQuery += NameSpaces.getInstance().printSparqlNameSpaceList();
 		indicatorQuery += "SELECT ?subjectIndicator ?label ?comment WHERE { "
@@ -58,10 +59,10 @@ public class ViewSubject extends Controller {
 			String parentIndicatorUri = entry.getKey();
 			String indvIndicatorQuery = "";
 			indvIndicatorQuery += NameSpaces.getInstance().printSparqlNameSpaceList();
-			indvIndicatorQuery += "SELECT DISTINCT ?subjectUri ?label WHERE { "
+			indvIndicatorQuery += "SELECT DISTINCT ?subjectUri ?label ?uri WHERE { "
 					+ "?subjectUri hasco:isSubjectOf* ?cohort . "
-					+ "?cohort hasco:isCohortOf ?study . "
-					+ "?schemaUri hasco:isSchemaOf ?study . "
+					+ "?cohort hasco:isCohortOf " + study_uri + " . "
+					+ "?schemaUri hasco:isSchemaOf " + study_uri + " . "
 					+ "?schemaAttribute hasneto:partOfSchema ?schemaUri . "
 					+ "?schemaAttribute hasneto:hasAttribute ?uri . "
 					+ "?uri rdfs:subClassOf* <" + parentIndicatorUri + "> . " 
@@ -77,7 +78,9 @@ public class ViewSubject extends Controller {
 			List<String> listIndicatorLabel = new ArrayList<String>();
 			while (resultsrwIndvInd.hasNext()) {
 				QuerySolution soln = resultsrwIndvInd.next();
-				listIndicatorLabel.add(soln.get("label").toString());
+				if(Measurement.find("", "", subject_uri, soln.get("uri").toString()).documents.size() > 0){
+					listIndicatorLabel.add(soln.get("label").toString());
+				}
 			}
 			indicatorValues.put(entry.getValue().toString(), listIndicatorLabel);
 		}
@@ -266,8 +269,8 @@ public class ViewSubject extends Controller {
 	}
 	
 	@Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    public static Result index(String subject_uri) {
-		Map<String, List<String>> indicatorValues = findSubjectIndicators(subject_uri);
+    public static Result index(String study_uri, String subject_uri) {
+		Map<String, List<String>> indicatorValues = findSubjectIndicators(study_uri, subject_uri);
     	Map<String, List<String>> subjectResult = findBasic(subject_uri);
     	Map<String, List<String>> sampleResult = findSampleMap(subject_uri);
 
@@ -281,7 +284,7 @@ public class ViewSubject extends Controller {
     }
 
 	@Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    public static Result postIndex(String subject_uri) {
-		return index(subject_uri);
+    public static Result postIndex(String study_uri, String subject_uri) {
+		return index(study_uri, subject_uri);
 	}
 }

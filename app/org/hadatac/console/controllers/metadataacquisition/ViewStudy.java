@@ -10,6 +10,7 @@ import play.mvc.Controller;
 import play.mvc.Result;
 
 import org.hadatac.console.views.html.metadataacquisition.*;
+import org.hadatac.entity.pojo.Measurement;
 import org.hadatac.metadata.loader.ValueCellProcessing;
 import org.apache.jena.query.Query;
 import org.apache.jena.query.QueryExecution;
@@ -81,7 +82,10 @@ public class ViewStudy extends Controller {
 				while (resultsrwIndvInd.hasNext()) {
 					QuerySolution soln = resultsrwIndvInd.next();
 					System.out.println("Solution: " + soln);
-					indvIndicatorList.add(soln.get("label").toString());
+					
+					if(Measurement.find("", study_uri, "", soln.get("uri").toString()).documents.size() > 0){
+						indvIndicatorList.add(soln.get("label").toString());
+					}
 				}
 				indicatorValues.put(entry.getValue().toString(), indvIndicatorList);
 			} catch (QueryExceptionHTTP e) {
