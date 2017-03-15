@@ -59,15 +59,14 @@ public class ViewSubject extends Controller {
 			String parentIndicatorUri = entry.getKey();
 			String indvIndicatorQuery = "";
 			indvIndicatorQuery += NameSpaces.getInstance().printSparqlNameSpaceList();
-			indvIndicatorQuery += "SELECT DISTINCT ?subjectUri ?label ?uri WHERE { "
-					+ "?subjectUri hasco:isSubjectOf* ?cohort . "
-					+ "?cohort hasco:isCohortOf " + study_uri + " . "
-					+ "?schemaUri hasco:isSchemaOf " + study_uri + " . "
-					+ "?schemaAttribute hasneto:partOfSchema ?schemaUri . "
-					+ "?schemaAttribute hasneto:hasAttribute ?uri . "
+			indvIndicatorQuery += "SELECT DISTINCT ?label ?uri WHERE { "
+					+ subject_uri + " hasco:originalID ?pid . "
+					+ "?c1	hasneto:hasAttribute	?pid . "
+					+ "?c1	hasneto:partOfSchema	?schemaUri . "
+					+ "?uri	hasneto:partOfSchema	?schemaUri . "
+					+ "?uri	hasneto:hasEntity		sio:Human . "
 					+ "?uri rdfs:subClassOf* <" + parentIndicatorUri + "> . " 
-					+ "?uri rdfs:label ?label . " 
-					+ "FILTER ( ?subjectUri = " + subject_uri + " ) . " 
+					+ "?uri rdfs:label ?label . "
 					+ "}";
 			QueryExecution qexecIndvInd = QueryExecutionFactory.sparqlService(
 					Collections.getCollectionsName(Collections.METADATA_SPARQL), indvIndicatorQuery);

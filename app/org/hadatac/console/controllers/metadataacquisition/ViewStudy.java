@@ -64,7 +64,7 @@ public class ViewStudy extends Controller {
 		    String parentIndicatorUri = entry.getKey();
 			String indvIndicatorQuery = "";
 			indvIndicatorQuery += NameSpaces.getInstance().printSparqlNameSpaceList();
-			indvIndicatorQuery += "SELECT DISTINCT ?studyUri ?label ?uri WHERE { "
+			indvIndicatorQuery += "SELECT DISTINCT ?label ?uri WHERE { "
 					+ "?schemaUri hasco:isSchemaOf " + study_uri + " . "
 					+ "?schemaAttribute hasneto:partOfSchema ?schemaUri . "
 					+ "?schemaAttribute hasneto:hasAttribute ?uri . " 
