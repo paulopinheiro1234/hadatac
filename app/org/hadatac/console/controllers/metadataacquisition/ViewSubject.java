@@ -166,7 +166,7 @@ public class ViewSubject extends Controller {
 					+ "?schemaAttribute hasneto:hasAttribute ?uri . "
 					+ "?uri rdfs:subClassOf* <" + parentIndicatorUri + "> . " 
 					+ "?uri rdfs:label ?label . " 
-					+ "FILTER ( ?subjectUri = " + subject_uri + " ) . " 
+					+ "FILTER ( ?subjectUri = <" + subject_uri + "> ) . " 
 					+ "}";
 			try {
 				QueryExecution qexecIndvInd = QueryExecutionFactory.sparqlService(
@@ -199,7 +199,7 @@ public class ViewSubject extends Controller {
 		    	+ "OPTIONAL { ?subjectUri rdfs:label ?subjectLabel } . "
 		    	+ "OPTIONAL { ?sampleUri rdfs:label ?sampleLabel } . "
 		    	+ "OPTIONAL { ?sampleUri a ?sampleType  } . "
-		    	+ "FILTER ( ?subjectUri = " + subject_uri + " ) . "
+		    	+ "FILTER ( ?subjectUri = <" + subject_uri + "> ) . "
 		    	+ "}";
     	Query basicQuery = QueryFactory.create(sampleQueryString);
     	
@@ -231,7 +231,7 @@ public class ViewSubject extends Controller {
 		String sampleQueryString = "";
     	sampleQueryString += NameSpaces.getInstance().printSparqlNameSpaceList();
     	sampleQueryString += "SELECT * WHERE { "
-    			+ "?s <http://hadatac.org/ont/hasco/isSampleOf> " + subject_uri + " . "
+    			+ "?s <http://hadatac.org/ont/hasco/isSampleOf> <" + subject_uri + "> . "
     			+ "}";
         
 		Query sampleQuery = QueryFactory.create(sampleQueryString);

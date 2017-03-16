@@ -65,7 +65,7 @@ public class ViewStudy extends Controller {
 			String indvIndicatorQuery = "";
 			indvIndicatorQuery += NameSpaces.getInstance().printSparqlNameSpaceList();
 			indvIndicatorQuery += "SELECT DISTINCT ?label ?uri WHERE { "
-					+ "?schemaUri hasco:isSchemaOf <" + study_uri + "> . "
+					+ "?schemaUri hasco:isSchemaOf " + study_uri + " . "
 					+ "?schemaAttribute hasneto:partOfSchema ?schemaUri . "
 					+ "?schemaAttribute hasneto:hasAttribute ?uri . " 
 					+ "?uri rdfs:subClassOf* <" + parentIndicatorUri + "> . "
@@ -161,7 +161,7 @@ public class ViewStudy extends Controller {
 				+ "?subUri rdfs:subClassOf hasco:Study . "
 				+ "?studyUri a ?subUri . "
 				+ "?studyUri rdfs:label ?studyLabel . "
-				+ "FILTER ( ?studyUri = <" + study_uri + "> ) . "
+				+ "FILTER ( ?studyUri = " + study_uri + " ) . "
 				+ "OPTIONAL { ?studyUri hasco:hasProject ?proj} . "
 				+ "OPTIONAL { ?studyUri skos:definition ?studyDef } . "
 				+ "OPTIONAL { ?studyUri rdfs:comment ?studyComment } . "
@@ -204,8 +204,8 @@ public class ViewStudy extends Controller {
     	subjectQueryString += NameSpaces.getInstance().printSparqlNameSpaceList(); 
     	subjectQueryString += "SELECT ?subjectUri ?subjectType ?subjectLabel ?cohortLabel ?studyLabel WHERE { "
     			+ "?subjectUri hasco:isSubjectOf* ?cohort . "
-    			+ "?cohort hasco:isCohortOf <" + study_uri + "> . "
-    			+ "<" + study_uri + "> rdfs:label ?studyLabel . "
+    			+ "?cohort hasco:isCohortOf " + study_uri + " . "
+    			+ study_uri + " rdfs:label ?studyLabel . "
     			+ "?cohort rdfs:label ?cohortLabel . "
     			+ "OPTIONAL { ?subjectUri rdfs:label ?subjectLabel } . "
     			+ "OPTIONAL { ?subjectUri a ?subjectType } . "
@@ -228,7 +228,7 @@ public class ViewStudy extends Controller {
 		//		values.add("Type: " + cellProc.replaceNameSpaceEx(soln.get("subjectType").toString()));
 		//		values.add("Cohort: " + soln.get("cohortLabel").toString());
 		//		values.add("Study: " + soln.get("studyLabel").toString());
-				subjectResult.put(cellProc.replaceNameSpaceEx(soln.get("subjectUri").toString()) ,values);		
+				subjectResult.put(soln.get("subjectUri").toString() ,values);		
 			}
 		} catch (QueryExceptionHTTP e) {
 			e.printStackTrace();
