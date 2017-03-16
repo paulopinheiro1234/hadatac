@@ -68,18 +68,19 @@ public class ViewSubject extends Controller {
 					+ "?uri rdfs:label		?label . "
 					+ "?uri rdfs:comment	?comment ."
 					+ "}";
+			
 			QueryExecution qexecIndvInd = QueryExecutionFactory.sparqlService(
 					Collections.getCollectionsName(Collections.METADATA_SPARQL), indvIndicatorQuery);
 			ResultSet indvIndResults = qexecIndvInd.execSelect();
 			ResultSetRewindable resultsrwIndvInd = ResultSetFactory.copyResults(indvIndResults);
 			qexecIndvInd.close();
-			
 			List<String> listIndicatorLabel = new ArrayList<String>();
 			while (resultsrwIndvInd.hasNext()) {
 				QuerySolution soln = resultsrwIndvInd.next();
-				if(Measurement.find(findUser(), study_uri, subject_uri, soln.get("uri").toString()).documents.size() > 0){
-					listIndicatorLabel.add(soln.get("comment").toString());
-				}
+//				if(Measurement.find(findUser(), study_uri, subject_uri, soln.get("uri").toString()).documents.size() > 0){
+//					listIndicatorLabel.add(soln.get("comment").toString());
+//				}
+				listIndicatorLabel.add(soln.get("comment").toString());
 			}
 			indicatorValues.put(entry.getValue().toString(), listIndicatorLabel);
 		}
