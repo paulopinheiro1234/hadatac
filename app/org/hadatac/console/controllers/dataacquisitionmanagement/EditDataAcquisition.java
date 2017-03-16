@@ -2,7 +2,11 @@ package org.hadatac.console.controllers.dataacquisitionmanagement;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -17,8 +21,10 @@ import org.hadatac.console.models.SysUser;
 import org.hadatac.console.views.html.dataacquisitionmanagement.*;
 import org.hadatac.entity.pojo.DataAcquisition;
 import org.hadatac.entity.pojo.DataAcquisitionSchema;
+import org.hadatac.entity.pojo.TriggeringEvent;
 import org.hadatac.entity.pojo.User;
 import org.hadatac.entity.pojo.UserGroup;
+import org.hadatac.metadata.loader.ValueCellProcessing;
 
 import be.objectify.deadbolt.java.actions.Group;
 import be.objectify.deadbolt.java.actions.Restrict;
@@ -28,6 +34,13 @@ public class EditDataAcquisition extends Controller {
 	@Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
     public static Result index(String uri) {
 		DataAcquisition dataAcquisition = new DataAcquisition();
+		
+		ValueCellProcessing cellProc = new ValueCellProcessing();
+		List<DataAcquisitionSchema> schemas = DataAcquisitionSchema.findAll();
+		for (DataAcquisitionSchema schema : schemas) {
+			schema.setUri(cellProc.replaceNameSpaceEx(schema.getUri()));
+		}
+		
 		final SysUser sysUser = AuthApplication.getLocalUser(session());
     	try {
     		if (uri != null) {
@@ -55,11 +68,11 @@ public class EditDataAcquisition extends Controller {
     		}
     		
             return ok(editDataAcquisition.render(dataAcquisition, nameList, 
-            		User.getUserURIs(), DataAcquisitionSchema.findAll(), sysUser.isDataManager()));
+            		User.getUserURIs(), schemas, sysUser.isDataManager()));
     	}
     	
     	return ok(editDataAcquisition.render(dataAcquisition, null, 
-    			User.getUserURIs(), DataAcquisitionSchema.findAll(), sysUser.isDataManager()));
+    			User.getUserURIs(), schemas, sysUser.isDataManager()));
     }
 
 	@Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
@@ -91,7 +104,21 @@ public class EditDataAcquisition extends Controller {
             	changedInfos.add(data.getNewPermission());
             }
             if (da.getParameter() == null || !da.getParameter().equals(data.getNewParameter())) {
+                String dateString = "";
+                DateFormat jsFormat = new SimpleDateFormat("MM/dd/yyyy HH:mm a");
+        		try {
+        			Date dateFromJs = jsFormat.parse(data.getNewDataAcquisitionStartDate());
+        	        DateFormat isoFormat = new SimpleDateFormat("EEE MMM dd HH:mm:ss zzz yyyy");
+        	        dateString = isoFormat.format(dateFromJs);
+        		} catch (ParseException e) {
+        			return badRequest("Cannot parse data " + data.getNewDataAcquisitionStartDate());
+        		}
+            	da.setUri(data.getNewDataAcquisitionUri());
+            	da.setNumberDataPoints(0);
+            	da.setTriggeringEvent(TriggeringEvent.CHANGED_CONFIGURATION);
             	da.setParameter(data.getNewParameter());
+            	da.setStartedAt(dateString);
+            	da.save();
             	changedInfos.add(data.getNewParameter());
             }
             if (da.getSchemaUri() == null || !da.getSchemaUri().equals(data.getNewSchema())) {

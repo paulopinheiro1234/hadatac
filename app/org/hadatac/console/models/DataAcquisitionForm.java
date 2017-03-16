@@ -6,6 +6,8 @@ public class DataAcquisitionForm {
     public String newOwner;
     public String newParameter;
     public String newSchema;
+    public String newDataAcquisitionUri;
+    public String newDataAcquisitionStartDate;
  
     public String getNewPermission() {
 		return newPermission;
@@ -33,5 +35,19 @@ public class DataAcquisitionForm {
 	}
 	public void setNewSchema(String newSchema) {
 		this.newSchema = newSchema;
+	}
+	
+	public String getNewDataAcquisitionUri() {
+		return newDataAcquisitionUri;
+	}
+	public void setNewDataAcquisitionUri(String newDataAcquisitionUri) {
+		this.newDataAcquisitionUri = newDataAcquisitionUri;
+	}
+	
+	public String getNewDataAcquisitionStartDate() {
+		return newDataAcquisitionStartDate;
+	}
+	public void setNewDataAcquisitionStartDate(String newDataAcquisitionStartDate) {
+		this.newDataAcquisitionStartDate = newDataAcquisitionStartDate;
 	}
 }

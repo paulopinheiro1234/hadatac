@@ -11,6 +11,24 @@
 @import org.hadatac.console.controllers.dataacquisitionmanagement._
 
 @main("Change Data Access Permission") {
+	
+	<script type="text/javascript">
+		function checkform() {
+		  var cansubmit = true;
+	      if ($('#newParameter').value != '@da.getParameter()') {
+	     	$('#div_acquisition_uri').show();
+	     	$('#div_startdate').show();
+	      }
+		  if (document.getElementById('startdatetime').value.length == 0) {
+	         cansubmit = false;
+	      }
+	      if (cansubmit) {
+	          document.getElementById('submitbutton').disabled = false;
+	      } else {
+	          document.getElementById('submitbutton').disabled = 'disabled';
+	      }
+	   }
+	</script>
 
     <h2>Edit Data Acquisition</h2>
     
@@ -80,13 +98,42 @@
            
            <div class="form-group">
               <label>Set Parameter</label>
-              <input type="text" value="@da.getParameter()" class="form-control" name="newParameter" id="newParameter" >
+              <input type="text" value="@da.getParameter()" class="form-control" name="newParameter" id="newParameter" oninput="checkform()" >
            </div>
+           
+           <div id="div_acquisition_uri" class="form-group" style="display : none">
+		   	  <label>Data Acquisition URI:</label>
+ 			  <input type="text" class="form-control col-sm-6" name="newDataAcquisitionUri" id="newDataAcquisitionUri" value="@da.getUri()">
+ 		   </div>
+ 		   
+	 	  <div id="div_startdate" class="form-group" style="display : none">
+	         <label for="startdate">Start Date/Time</label><br> 
+	         <div class="container">
+	            <div class="row">
+	               <div class='col-sm-3'>
+	                 <div class="form-group">
+	                    <div class='input-group date' id='startdate' >
+	                       <input type='text' name="newDataAcquisitionStartDate" id="newDataAcquisitionStartDate" class="form-control" />
+	                       <span class="input-group-addon">
+	                          <span class="glyphicon glyphicon-calendar"></span>
+	                       </span>
+	                    </div>
+	                 </div>
+	               </div>
+	               <script type="text/javascript">
+	                 $(function () {
+	                     $('#startdate').datetimepicker();
+	                     $('#startdate').on('dp.change', function (e) { checkform(); });
+	                 });
+	               </script>
+	            </div>
+	         </div>
+	     </div>
 
            <div id="question-box">
               <br>
               Are your sure you want to commit changes to this data acquisition? 
-              <input class="btn btn-success" role="button" type="submit" value="Confirm editing" />
+              <input class="btn btn-success" id="submitbutton" role="button" type="submit" value="Confirm editing" />
            </div>
        </form>
 
