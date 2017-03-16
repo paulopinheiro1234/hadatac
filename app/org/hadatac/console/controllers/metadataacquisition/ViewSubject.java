@@ -77,7 +77,7 @@ public class ViewSubject extends Controller {
 			List<String> listIndicatorLabel = new ArrayList<String>();
 			while (resultsrwIndvInd.hasNext()) {
 				QuerySolution soln = resultsrwIndvInd.next();
-				if(Measurement.find(findUser(), "", subject_uri, soln.get("uri").toString()).documents.size() > 0){
+				if(Measurement.find(findUser(), study_uri, subject_uri, soln.get("uri").toString()).documents.size() > 0){
 					listIndicatorLabel.add(soln.get("label").toString());
 				}
 			}
@@ -278,6 +278,7 @@ public class ViewSubject extends Controller {
 		Map<String, String> showValues = new HashMap<String, String>();
 		showValues.put("subject", subject_uri);
 		showValues.put("user", findUser());
+		showValues.put("study", study_uri);		
     	
     	return ok(viewSubject.render(subjectResult, sampleResult, indicatorValues, indicatorUris, showValues));    
     }
