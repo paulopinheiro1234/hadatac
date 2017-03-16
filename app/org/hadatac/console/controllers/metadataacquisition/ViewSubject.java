@@ -59,13 +59,14 @@ public class ViewSubject extends Controller {
 			String parentIndicatorUri = entry.getKey();
 			String indvIndicatorQuery = "";
 			indvIndicatorQuery += NameSpaces.getInstance().printSparqlNameSpaceList();
-			indvIndicatorQuery += "SELECT DISTINCT ?label ?uri WHERE { "
-					+ "<" + subject_uri + "> hasco:originalID ?pid . "
-					+ "?c1	hasneto:hasAttribute	?pid . "
-					+ "?c1	hasneto:partOfSchema	?schemaUri . "
+			indvIndicatorQuery += "SELECT DISTINCT ?uri ?label ?comment WHERE { "
+  					+ "?schemaUri	hasco:isSchemaOf " + study_uri + " ."
 					+ "?uri	hasneto:partOfSchema	?schemaUri . "
-					+ "?uri	hasneto:hasEntity		sio:Human . "					 
-					+ "?uri rdfs:label ?label . "
+					+ "?uri	hasneto:hasEntity		sio:Human . "
+					+ "?subIndicator rdfs:subClassOf* <" + parentIndicatorUri + "> . "
+					+ "?uri 	hasneto:hasAttribute	?subIndicator ."
+					+ "?uri rdfs:label		?label . "
+					+ "?uri rdfs:comment	?comment ."
 					+ "}";
 			QueryExecution qexecIndvInd = QueryExecutionFactory.sparqlService(
 					Collections.getCollectionsName(Collections.METADATA_SPARQL), indvIndicatorQuery);
@@ -77,7 +78,7 @@ public class ViewSubject extends Controller {
 			while (resultsrwIndvInd.hasNext()) {
 				QuerySolution soln = resultsrwIndvInd.next();
 				if(Measurement.find(findUser(), study_uri, subject_uri, soln.get("uri").toString()).documents.size() > 0){
-					listIndicatorLabel.add(soln.get("label").toString());
+					listIndicatorLabel.add(soln.get("comment").toString());
 				}
 			}
 			indicatorValues.put(entry.getValue().toString(), listIndicatorLabel);
@@ -89,7 +90,8 @@ public class ViewSubject extends Controller {
 	public static Map<String, List<String>> findBasic(String subject_uri) {
 		String subjectQueryString = "";
     	subjectQueryString += NameSpaces.getInstance().printSparqlNameSpaceList();
-    	subjectQueryString += "SELECT ?subjectUri ?subjectTypeLabel ?subjectLabel ?cohortLabel ?studyLabel WHERE { "
+    	subjectQueryString += "SELECT ?pid ?subjectTypeLabel ?subjectLabel ?cohortLabel ?studyLabel WHERE { "
+    			+ "<" + subject_uri + "> hasco:originalID ?pid . "
     			+ "?subjectUri hasco:isSubjectOf* ?cohort . "
     			+ "?study rdfs:label ?studyLabel . "
     			+ "?cohort hasco:isCohortOf ?study . "
@@ -116,6 +118,7 @@ public class ViewSubject extends Controller {
 			QuerySolution soln = resultsrw.next();
 			System.out.println("HERE IS THE RAW SOLN*********" + soln.toString());
 			values = new ArrayList<String>();
+			values.add("Pid: " + soln.get("pid").toString());
 			values.add("Label: " + soln.get("subjectLabel").toString());
 			values.add("Type: " + soln.get("subjectTypeLabel").toString());
 			values.add("Cohort: " + soln.get("cohortLabel").toString());
