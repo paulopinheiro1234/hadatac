@@ -64,8 +64,7 @@ public class ViewSubject extends Controller {
 					+ "?c1	hasneto:hasAttribute	?pid . "
 					+ "?c1	hasneto:partOfSchema	?schemaUri . "
 					+ "?uri	hasneto:partOfSchema	?schemaUri . "
-					+ "?uri	hasneto:hasEntity		sio:Human . "
-					+ "?uri rdfs:subClassOf* <" + parentIndicatorUri + "> . " 
+					+ "?uri	hasneto:hasEntity		sio:Human . "					 
 					+ "?uri rdfs:label ?label . "
 					+ "}";
 			QueryExecution qexecIndvInd = QueryExecutionFactory.sparqlService(
