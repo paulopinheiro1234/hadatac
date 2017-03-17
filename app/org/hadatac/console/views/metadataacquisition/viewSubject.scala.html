@@ -35,11 +35,19 @@
 					}
 				</ul>
 				
-				<ul>
-				@for(key <- indicatorValues.keySet()){
-					<li> @key.toString()</li>
+				<table style="width:80%">
+					<tr><th><h3>Indicator</h3></th><th><h3>Value</h3></th><th><h3>Data URI</h3></th></tr>
+					@for(key <- indicatorValues.keySet()){
+						@if(indicatorValues.get(key).toString() != ""){
+							@if(indicatorValues.get(key).length>0){
+							<tr><td><b>@key.toString</b></td></tr>
+								@for( i <- indicatorValues.get(key)){
+										<tr><td></td><td>@i.toString()</td><td><a href="@org.hadatac.console.controllers.metadataacquisition.routes.ViewValue.index(showValues.get("user").toString(), showValues.get("study").toString(), showValues.get("subject").toString(), indicatorUris.get(i))"><b>@indicatorUris.get(i).toString().replace("http://hadatac.org/ont/","")</b></a><br></td></tr>
+								}
+							}
+						}
 					}
-				</ul>
+				</table>
 			
 			
 
