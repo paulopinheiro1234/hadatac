@@ -95,7 +95,7 @@ public class ViewSubject extends Controller {
 		String subjectQueryString = "";
     	subjectQueryString += NameSpaces.getInstance().printSparqlNameSpaceList();
     	subjectQueryString += "SELECT ?pid ?subjectTypeLabel ?subjectLabel ?cohortLabel ?studyLabel WHERE { "
-    			+ "<" + subject_uri + "> hasco:originalID ?pid . "
+    			+ subject_uri + " hasco:originalID ?pid . "
     			+ "?subjectUri hasco:isSubjectOf* ?cohort . "
     			+ "?study rdfs:label ?studyLabel . "
     			+ "?cohort hasco:isCohortOf ?study . "
@@ -103,7 +103,7 @@ public class ViewSubject extends Controller {
     			+ "OPTIONAL { ?subjectUri rdfs:label ?subjectLabel } . "
     			+ "OPTIONAL { ?subjectUri a ?subjectType . "
     			+ "			  ?subjectType rdfs:label ?subjectTypeLabel } . "
-    			+ "FILTER ( ?subjectUri = <" + subject_uri + "> ) . "
+    			+ "FILTER ( ?subjectUri = " + subject_uri + " ) . "
     			+ "}";
 		
     	Query basicQuery = QueryFactory.create(subjectQueryString);
@@ -204,7 +204,7 @@ public class ViewSubject extends Controller {
 		    	+ "OPTIONAL { ?subjectUri rdfs:label ?subjectLabel } . "
 		    	+ "OPTIONAL { ?sampleUri rdfs:label ?sampleLabel } . "
 		    	+ "OPTIONAL { ?sampleUri a ?sampleType  } . "
-		    	+ "FILTER ( ?subjectUri = <" + subject_uri + "> ) . "
+		    	+ "FILTER ( ?subjectUri = " + subject_uri + " ) . "
 		    	+ "}";
     	Query basicQuery = QueryFactory.create(sampleQueryString);
     	
@@ -236,7 +236,7 @@ public class ViewSubject extends Controller {
 		String sampleQueryString = "";
     	sampleQueryString += NameSpaces.getInstance().printSparqlNameSpaceList();
     	sampleQueryString += "SELECT * WHERE { "
-    			+ "?s <http://hadatac.org/ont/hasco/isSampleOf> <" + subject_uri + "> . "
+    			+ "?s <http://hadatac.org/ont/hasco/isSampleOf> " + subject_uri + " . "
     			+ "}";
         
 		Query sampleQuery = QueryFactory.create(sampleQueryString);

@@ -228,7 +228,7 @@ public class ViewStudy extends Controller {
 		//		values.add("Type: " + cellProc.replaceNameSpaceEx(soln.get("subjectType").toString()));
 		//		values.add("Cohort: " + soln.get("cohortLabel").toString());
 		//		values.add("Study: " + soln.get("studyLabel").toString());
-				subjectResult.put(soln.get("subjectUri").toString() ,values);		
+				subjectResult.put(cellProc.replaceNameSpaceEx(soln.get("subjectUri").toString()) ,values);		
 			}
 		} catch (QueryExceptionHTTP e) {
 			e.printStackTrace();
