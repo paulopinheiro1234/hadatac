@@ -32,7 +32,7 @@ import be.objectify.deadbolt.java.actions.Restrict;
 
 public class ViewSubject extends Controller {
 
-	public static Map<String, List<String>> findSubjectIndicators(String study_uri, String subject_uri) {
+	public static Map<String, List<String>> findSubjectIndicators(String study_uri) {
 		String indicatorQuery = "";
 		indicatorQuery += NameSpaces.getInstance().printSparqlNameSpaceList();
 		indicatorQuery += "SELECT ?subjectIndicator ?label ?comment WHERE { "
@@ -134,8 +134,8 @@ public class ViewSubject extends Controller {
 		return subjectResult;
 	}
 	
-	public static Map<String, String> findSubjectIndicatorsUri(String study_uri, String subject_uri) {
-		String indicatorQuery = ""; 
+	public static Map<String, String> findSubjectIndicatorsUri(String study_uri) {
+		String indicatorQuery = "";
 		indicatorQuery += NameSpaces.getInstance().printSparqlNameSpaceList();
 		indicatorQuery += "SELECT ?subjectIndicator ?label ?comment WHERE { "
 				+ "?subjectIndicator rdfs:subClassOf chear:StudyIndicator . "
@@ -274,11 +274,11 @@ public class ViewSubject extends Controller {
 	
 	@Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
     public static Result index(String study_uri, String subject_uri) {
-		Map<String, List<String>> indicatorValues = findSubjectIndicators(study_uri, subject_uri);
+		Map<String, List<String>> indicatorValues = findSubjectIndicators(study_uri);
     	Map<String, List<String>> subjectResult = findBasic(subject_uri);
     	Map<String, List<String>> sampleResult = findSampleMap(subject_uri);
 
-		Map<String, String> indicatorUris = findSubjectIndicatorsUri(study_uri, subject_uri);
+		Map<String, String> indicatorUris = findSubjectIndicatorsUri(study_uri);
 		
 		Map<String, String> showValues = new HashMap<String, String>();
 		showValues.put("subject", subject_uri);
