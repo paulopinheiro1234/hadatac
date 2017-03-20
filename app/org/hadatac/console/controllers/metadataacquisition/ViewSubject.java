@@ -32,7 +32,7 @@ import be.objectify.deadbolt.java.actions.Restrict;
 
 public class ViewSubject extends Controller {
 
-	public static Map<String, List<String>> findSubjectIndicators(String study_uri) {
+	public static Map<String, List<String>> findSubjectIndicators(String study_uri, String subject_uri) {
 		String indicatorQuery = "";
 		indicatorQuery += NameSpaces.getInstance().printSparqlNameSpaceList();
 		indicatorQuery += "SELECT ?subjectIndicator ?label ?comment WHERE { "
@@ -78,9 +78,9 @@ public class ViewSubject extends Controller {
 				List<String> listIndicatorLabel = new ArrayList<String>();
 				while (resultsrwIndvInd.hasNext()) {
 					QuerySolution soln = resultsrwIndvInd.next();
-//					if(Measurement.find(findUser(), study_uri, subject_uri, soln.get("uri").toString()).documents.size() > 0){
-//						listIndicatorLabel.add(soln.get("comment").toString());
-//					}
+					if(Measurement.find(findUser(), study_uri, subject_uri, soln.get("uri").toString()).documents.size() > 0){
+						listIndicatorLabel.add(soln.get("comment").toString());
+					}
 					listIndicatorLabel.add(soln.get("comment").toString());
 				}
 				indicatorValues.put(entry.getValue().toString(), listIndicatorLabel);
@@ -274,7 +274,7 @@ public class ViewSubject extends Controller {
 	
 	@Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
     public static Result index(String study_uri, String subject_uri) {
-		Map<String, List<String>> indicatorValues = findSubjectIndicators(study_uri);
+		Map<String, List<String>> indicatorValues = findSubjectIndicators(study_uri, subject_uri);
     	Map<String, List<String>> subjectResult = findBasic(subject_uri);
     	Map<String, List<String>> sampleResult = findSampleMap(subject_uri);
 
