@@ -81,7 +81,7 @@ public class ViewSubject extends Controller {
 					if(Measurement.find(findUser(), study_uri, subject_uri, soln.get("uri").toString()).documents.size() > 0){
 						listIndicatorLabel.add(soln.get("comment").toString());
 					}
-					listIndicatorLabel.add(soln.get("comment").toString());
+//					listIndicatorLabel.add(soln.get("comment").toString());
 				}
 				indicatorValues.put(entry.getValue().toString(), listIndicatorLabel);
 			} catch (QueryExceptionHTTP e) {
