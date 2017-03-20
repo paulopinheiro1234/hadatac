@@ -87,7 +87,8 @@ public class ViewSubject extends Controller {
 				List<String> listIndicatorLabel = new ArrayList<String>();
 				while (resultsrwIndvInd.hasNext()) {
 					QuerySolution soln = resultsrwIndvInd.next();
-					if(Measurement.find(findUser(), study_uri, subject_uri, soln.get("uri").toString()).documents.size() > 0){
+					ValueCellProcessing cellProc = new ValueCellProcessing();
+					if(Measurement.find(findUser(), study_uri, cellProc.convertToWholeURI(subject_uri), soln.get("uri").toString()).documents.size() > 0){
 						listIndicatorLabel.add(soln.get("label").toString());
 					}
 //					listIndicatorLabel.add(soln.get("comment").toString());
