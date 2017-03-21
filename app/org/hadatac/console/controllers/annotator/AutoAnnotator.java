@@ -38,11 +38,13 @@ import org.hadatac.entity.pojo.CSVFile;
 import org.hadatac.entity.pojo.DataAcquisition;
 import org.hadatac.entity.pojo.DataAcquisitionSchema;
 import org.hadatac.entity.pojo.User;
+import org.hadatac.metadata.loader.LabkeyDataHandler;
 import org.hadatac.metadata.loader.ValueCellProcessing;
 import org.hadatac.utils.ConfigProp;
 import org.hadatac.utils.Feedback;
 import org.hadatac.utils.NameSpaces;
 import org.hadatac.utils.State;
+import org.labkey.remoteapi.CommandException;
 
 import be.objectify.deadbolt.java.actions.Group;
 import be.objectify.deadbolt.java.actions.Restrict;
@@ -219,7 +221,7 @@ public class AutoAnnotator extends Controller {
 		return redirect(routes.AutoAnnotator.index());
 	}
 	
-	public static void autoAnnotate() {
+	public static void autoAnnotate() throws CommandException {
 		if(ConfigProp.getPropertyValue("autoccsv.config", "auto").equals("off")){
 			return;
 		}
@@ -249,21 +251,28 @@ public class AutoAnnotator extends Controller {
 			}
 		}
 		
-		List<File> idFiles = findFilesByExtension(path_unproc, "sys");
-		for (File file : idFiles) {
+		for (File file : findFilesByExtension(path_unproc, "sid")) {
 			annotateSampleIdFile(file);
+		}
+		
+		for (File file : findFilesByExtension(path_unproc, "pid")) {
+			annotateSubjectIdFile(file);
 		}
 	}
 	
-	public static boolean annotateSampleIdFile(File file) {
+	public static boolean annotateSampleIdFile(File file) throws CommandException {
 		SampleGenerator sampleGenerator = new SampleGenerator(file);
-		sampleGenerator.createRows();
+		List<Map<String, Object>> rows = sampleGenerator.createRows();
+		LabkeyDataHandler ldh = new LabkeyDataHandler("labkey_site", "user_name", "password", "path");
+		ldh.updateRows("Sample", rows);
 		return true;
 	}
 	
-	public static boolean annotateSubjectIdFile(File file) {
+	public static boolean annotateSubjectIdFile(File file) throws CommandException {
 		SubjectGenerator subjectGenerator = new SubjectGenerator(file);
-		subjectGenerator.createRows();
+		List<Map<String, Object>> rows = subjectGenerator.createRows();
+		LabkeyDataHandler ldh = new LabkeyDataHandler("labkey_site", "user_name", "password", "path");
+		ldh.updateRows("Subject", rows);
 		return true;
 	}
 	
