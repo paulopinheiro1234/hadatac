@@ -7,6 +7,7 @@ import java.util.List;
 import play.mvc.Controller;
 import play.mvc.Result;
 import org.hadatac.entity.pojo.Measurement;
+import org.hadatac.metadata.loader.ValueCellProcessing;
 import org.hadatac.console.views.html.metadataacquisition.*;
 import org.hadatac.data.model.AcquisitionQueryResult;
 import org.apache.commons.io.FileUtils;
@@ -28,7 +29,8 @@ public class ViewValue extends Controller {
 	@Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
     public static Result index(String user_uri, String study_uri, 
     						   String subject_uri, String char_uri) {
-		List<Measurement> indicatorValueResults = findValue(user_uri, study_uri, subject_uri, char_uri);
+		ValueCellProcessing cellProc = new ValueCellProcessing();
+		List<Measurement> indicatorValueResults = findValue(user_uri, cellProc.convertToWholeURI(subject_uri), subject_uri, char_uri);
 		if (indicatorValueResults == null){
 			List<Measurement> indicatorValueResults2 = new ArrayList<Measurement>();
 			File indicator_detail_csv = new File("/data/indicatorDetails.csv");
