@@ -78,17 +78,12 @@ public class DataAcquisitionSearch extends Controller {
     }
 
     public static Result index(int page, int rows, String facets) {
-    	ObjectMapper mapper = new ObjectMapper();    	
-    	FacetHandler handler = null;
+    	FacetHandler handler = new FacetHandler();;
     	String ownerUri;
     	System.out.println("[DataAcquisitionSearch] Page: " + page + "   Rows:" + rows + "   Facets:" + facets);
-    	try {
-    		handler = mapper.readValue(facets, FacetHandler.class);
-    	} catch (Exception e) {
-    		handler = new FacetHandler();
-    		System.out.println("mapper.readValue: " + e.getMessage());
-    	}
-    	
+	handler.loadFacets(facets);
+	System.out.println("DataAcquisitionSearch : <" + handler.toSolrQuery() + ">");
+
     	AcquisitionQueryResult results = null;
     	final SysUser user = AuthApplication.getLocalUser(session());
     	if(null == user){
@@ -105,7 +100,7 @@ public class DataAcquisitionSearch extends Controller {
     	System.out.println("[DataAcquisitionSearch] Total size response: " + results.getDocumentSize());
     	
     	return ok(dataacquisition_browser.render(page, rows, facets, results.getDocumentSize(), 
-    			results, results.toJSON(), handler.toJSON(), Measurement.buildQuery(ownerUri, page, rows, handler)));
+    			results, results.toJSON(), handler, Measurement.buildQuery(ownerUri, page, rows, handler)));
     }
 
     public static Result postIndex(int page, int rows, String facets) {

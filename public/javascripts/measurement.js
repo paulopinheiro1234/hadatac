@@ -9,18 +9,46 @@ function getURLParameter(name) {
 	return decodeURIComponent((new RegExp('[?|&]' + name + '=' + '([^&;]+?)(&|#|;|$)').exec(location.search)||[,""])[1].replace(/\+/g, '%20'))||null
 }
 
+function facetPrettyName(type, value) {
+    switch(type) {
+        case 'study_uri':
+            if (value.indexOf(":") > 0) {
+	       value = value.substring(value.indexOf(":") + 1);
+	    }
+            break;
+        case 'acquisition_uri':
+            if (value.indexOf("#") > 0) {
+               value = value.substring(value.indexOf("#") + 1);
+            }
+            break;
+        case 'entity':
+	    value += "'s attribute";
+            break;
+    }
+    return value;
+}
+
 function parseSolrFacetFieldToTree(type) {
 	var i;
 	i = 0;
+        listed = 0;
 	flag = false;
 	jsonTree = '{ "id": ' + i + ', "item": [ ';
 	for (var i_field in json.field_facets[type]) {
 		var field = json.field_facets[type][i_field];
-		if (i != 0) {
+                if (field > 0) {
+                    listed++;
+		}
+		//if (i != 0) {
+                if ((listed > 1) && (field > 0)) {
 			jsonTree += ' ,';
 		}
 		i++;
-		jsonTree += '{ "id": ' + i + ', "userdata": [ { "name": "field", "content": "' + type + '" }, { "name": "value", "content": "' + i_field + '" } ], "text": "' + i_field + ' (' + field + ')" } ';
+                if (field > 0) {
+	       	      jsonTree += '{ "id": ' + i + ', ' + 
+                                    '"userdata": [ { "name": "field", "content": "' + type + '" }, { "name": "value", "content": "' + i_field + '" } ], ' + 
+			  '"text": "' + facetPrettyName(type,i_field) + ' (' + field + ')" } ';
+                }
 	}
 	jsonTree += '] }';
 	return jsonTree;
@@ -40,7 +68,7 @@ function parseSolrFacetPivotToTree(type) {
 			jsonTree += ' ,';
 		}
 		i++;
-		jsonTree += '{ "id": ' + i + ', "text": "' + field1.value + ' (' + field1.count + ')"';
+		jsonTree += '{ "id": ' + i + ', "text": "' + facetPrettyName(fields[0],field1.value) + ' (' + field1.count + ')"';
 		jsonTree += ', "item": [ ';
 		for (var j_pivot in field1.children) {
 			var field2 = field1.children[j_pivot];
@@ -48,9 +76,14 @@ function parseSolrFacetPivotToTree(type) {
 				jsonTree += ' ,';
 			}
 			j++;
-			jsonTree += '{ "id": ' + i + j + ', "text": "' + field2.value + ' (' + field2.count + ')", "tooltip": "' + field2.value + '" , "userdata": [ { "name": "field", "content": "' + fields[1] + '" }, { "name": "value", "content": "' + field2.value + '" } ] } ';
+			jsonTree += '{ "id": ' + i + j + ', "text": "' + facetPrettyName(fields[1],field2.value) + ' (' + field2.count + ')", ' + 
+                                      '"tooltip": "' + field2.value + '" , ' + 
+                                      '"userdata": [ { "name": "field", "content": "' + fields[1] + '" }, ' + 
+                                      '{ "name": "value", "content": "' + field2.value + '" } ] } ';
 		}
-		jsonTree += '] , "child": ' + j + ', "tooltip": "' + field1.value + '" , "userdata": [ { "name": "field", "content": "' + fields[0] + '" }, { "name": "value", "content": "' + field1.value + '" } ] } ';
+		jsonTree += '] , "child": ' + j + ', "tooltip": "' + field1.value + '" , ' + 
+                                '"userdata": [ { "name": "field", "content": "' + fields[0] + '" }, ' + 
+                                '{ "name": "value", "content": "' + field1.value + '" } ] } ';
 	}
 	jsonTree += '] }';
 	return jsonTree;
