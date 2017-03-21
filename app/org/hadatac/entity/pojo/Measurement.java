@@ -324,7 +324,9 @@ public class Measurement {
         }
         
         if (handler != null) {
-            Iterator<String> i = handler.facetsAnd.keySet().iterator();
+	    facet_query = handler.toSolrQuery();
+            System.out.println("BuildQuery: <<" + facet_query + ">>");
+            /*Iterator<String> i = handler.facetsAnd.keySet().iterator();
             while (i.hasNext()) {
                 String field = i.next();
                 String value = handler.facetsAnd.get(field);
@@ -332,7 +334,7 @@ public class Measurement {
                 if (i.hasNext()) {
                     facet_query += " AND ";
                 }
-            }
+		}*/
         }
         
         if (facet_query.trim().equals("")) {

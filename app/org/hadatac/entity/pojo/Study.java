@@ -604,7 +604,8 @@ public class Study {
 		}
 		
 		if (handler != null) {
-			Iterator<String> i = handler.facetsAnd.keySet().iterator();
+		    facet_query = handler.toSolrQuery();
+		    /* Iterator<String> i = handler.facetsAnd.keySet().iterator();
 			while (i.hasNext()) {
 				String field = i.next();
 				String value = handler.facetsAnd.get(field);
@@ -612,7 +613,7 @@ public class Study {
 				if (i.hasNext()) {
 					facet_query += " AND ";
 				}
-			}
+				} */
 		}
 		
 		if (facet_query.trim().equals("")) {
