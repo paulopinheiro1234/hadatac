@@ -12,6 +12,14 @@ import java.util.Map;
 
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVRecord;
+import org.apache.jena.query.QueryExecution;
+import org.apache.jena.query.QueryExecutionFactory;
+import org.apache.jena.query.QuerySolution;
+import org.apache.jena.query.ResultSet;
+import org.apache.jena.query.ResultSetFactory;
+import org.apache.jena.query.ResultSetRewindable;
+import org.hadatac.console.controllers.metadata.DynamicFunctions;
+import org.hadatac.utils.Collections;
 
 public class SampleGenerator {
 	final String kbPrefix = "chear-kb:";
@@ -47,21 +55,37 @@ public class SampleGenerator {
 		mapCol.put("FTcount", 19);
 	}
 	
-	private String getUri() { 
-		return kbPrefix + "SPL-" + String.format("%04d", counter) 
+	private int getSampleCount(String pilotNum){
+		int count=0;
+		String sampleCountQuery = DynamicFunctions.getPrefixes() + "SELECT (count(DISTINCT ?sampleURI) as ?sampleCount) WHERE {?sampleURI hasco:isMeasuredObjectOf ?DA . ?DA hasco:isDataAcquisitionOf chear-kb:STD-Pilot-" + pilotNum + " . }";
+		QueryExecution qexecSample = QueryExecutionFactory.sparqlService(Collections.getCollectionsName(Collections.METADATA_SPARQL), sampleCountQuery);
+		ResultSet sampleResults = qexecSample.execSelect();
+		ResultSetRewindable resultsrwSample = ResultSetFactory.copyResults(sampleResults);
+		QuerySolution soln = resultsrwSample.next();
+		int value = Integer.parseInt(soln.get("sampleCount").toString());
+		qexecSample.close();
+		count += value;
+		return count;
+	}
+	
+	private String getUri() {
+		return kbPrefix + "SPL-" + String.format("%04d", counter + getSampleCount(rec.get(mapCol.get("pilotNum")))) 
 			+ "-Pilot-" + rec.get(mapCol.get("pilotNum") + "-" + rec.get(mapCol.get("sampleSuffix"))); 
 	}
 	private String getType() {
 		return rec.get(mapCol.get("sampleType"));
 	}
 	private String getLabel() {
-		return "SID " + String.format("%04d", counter) + " - Pilot " 
+		return "SID " + String.format("%04d", counter + getSampleCount(rec.get(mapCol.get("pilotNum")))) + " - Pilot " 
 			+ rec.get(mapCol.get("pilotNum")) + " " + rec.get(mapCol.get("sampleSuffix"));
 	}
     private String getOriginalID() {
     	return rec.get(mapCol.get("sampleID"));
     }
     private String getSubjectUri() {
+    	if(mapCol.get("subjectID")!=null){
+    		//mapping of subject uri to given original id
+    	}
     	return kbPrefix + "SBJ-" + String.format("%04d", counter) 
     		+ "-" + rec.get(mapCol.get("subjectID")) + "-Pilot-" + rec.get(mapCol.get("pilotNum"));
     }
@@ -69,7 +93,7 @@ public class SampleGenerator {
     	return dataAcquisition;
     }
     private String getComment() {
-    	return "Sample " + String.format("%04d", counter) 
+    	return "Sample " + String.format("%04d", counter + getSampleCount(rec.get(mapCol.get("pilotNum")))) 
     		+ " for Pilot " + rec.get(mapCol.get("pilotNum")) + " " + rec.get(mapCol.get("sampleSuffix"));
     }
     private String getSamplingMethod() {

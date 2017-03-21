@@ -221,7 +221,7 @@ public class AutoAnnotator extends Controller {
 		return redirect(routes.AutoAnnotator.index());
 	}
 	
-	public static void autoAnnotate() throws CommandException {
+	public static void autoAnnotate() {
 		if(ConfigProp.getPropertyValue("autoccsv.config", "auto").equals("off")){
 			return;
 		}
@@ -260,19 +260,29 @@ public class AutoAnnotator extends Controller {
 		}
 	}
 	
-	public static boolean annotateSampleIdFile(File file) throws CommandException {
+	public static boolean annotateSampleIdFile(File file) {
 		SampleGenerator sampleGenerator = new SampleGenerator(file);
-		List<Map<String, Object>> rows = sampleGenerator.createRows();
+		/*List<Map<String, Object>> rows = sampleGenerator.createRows();
 		LabkeyDataHandler ldh = new LabkeyDataHandler("labkey_site", "user_name", "password", "path");
-		ldh.updateRows("Sample", rows);
+		try {
+			ldh.updateRows("Sample", rows);
+		} catch (CommandException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}*/
 		return true;
 	}
 	
-	public static boolean annotateSubjectIdFile(File file) throws CommandException {
+	public static boolean annotateSubjectIdFile(File file){
 		SubjectGenerator subjectGenerator = new SubjectGenerator(file);
-		List<Map<String, Object>> rows = subjectGenerator.createRows();
+		/*List<Map<String, Object>> rows = subjectGenerator.createRows();
 		LabkeyDataHandler ldh = new LabkeyDataHandler("labkey_site", "user_name", "password", "path");
-		ldh.updateRows("Subject", rows);
+		try {
+			ldh.updateRows("Subject", rows);
+		} catch (CommandException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}*/
 		return true;
 	}
 	
