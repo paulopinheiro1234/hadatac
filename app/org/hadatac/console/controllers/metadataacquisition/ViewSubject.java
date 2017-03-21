@@ -90,6 +90,9 @@ public class ViewSubject extends Controller {
 					ValueCellProcessing cellProc = new ValueCellProcessing();
 					if(Measurement.find(findUser(), study_uri, cellProc.convertToWholeURI(subject_uri), soln.get("uri").toString()).documents.size() > 0){
 						listIndicatorLabel.add(soln.get("label").toString());
+						System.out.println("HEREHERE" + Measurement.find(findUser(), study_uri, cellProc.convertToWholeURI(subject_uri), soln.get("uri").toString()).documents.get(0).getObjectUri().toString() 
+								+ Measurement.find(findUser(), study_uri, cellProc.convertToWholeURI(subject_uri), soln.get("uri").toString()).documents.get(0).getCharacteristic().toString()
+								+ Measurement.find(findUser(), study_uri, cellProc.convertToWholeURI(subject_uri), soln.get("uri").toString()).documents.get(0).getValue().toString());
 					}
 //					listIndicatorLabel.add(soln.get("comment").toString());
 				}
@@ -299,7 +302,8 @@ public class ViewSubject extends Controller {
 		Map<String, String> indicatorUris = findSubjectIndicatorsUri(study_uri);
 		
 		Map<String, String> showValues = new HashMap<String, String>();
-		showValues.put("subject", subject_uri);
+		ValueCellProcessing cellProc = new ValueCellProcessing();
+		showValues.put("subject", cellProc.convertToWholeURI(subject_uri));
 		showValues.put("user", findUser());
 		showValues.put("study", study_uri);		
     	
