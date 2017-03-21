@@ -23,6 +23,7 @@ import org.hadatac.console.controllers.triplestore.UserManagement;
 import org.hadatac.console.models.SysUser;
 import org.hadatac.entity.pojo.DataAcquisition;
 import org.hadatac.entity.pojo.Deployment;
+import org.hadatac.entity.pojo.Measurement;
 import org.hadatac.entity.pojo.TriggeringEvent;
 import org.hadatac.metadata.loader.LabkeyDataHandler.PlainTriple;
 import org.hadatac.metadata.model.SpreadsheetParsingResult;
@@ -248,7 +249,8 @@ public class TripleProcessing {
 					dataAcquisition.setOwnerUri(ownerUri);
 					dataAcquisition.setPermissionUri(ownerUri);
 					dataAcquisition.setTriggeringEvent(TriggeringEvent.INITIAL_DEPLOYMENT);
-					dataAcquisition.setNumberDataPoints(0);
+					dataAcquisition.setNumberDataPoints(Measurement.getNumByDataAcquisitionUri(
+							dataAcquisition.getUri()));
 				}
 				
 				for (PlainTriple triple : sheet.get(uri)) {

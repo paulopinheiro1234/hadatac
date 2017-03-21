@@ -93,7 +93,7 @@ public class ValueCellProcessing {
 	        String nsString = entry.getValue().getName();
 	        if (str.startsWith(nsString)) {
 	        	resp = str.replace(nsString, abbrev + ":");
-	        	return resp; 
+	        	return resp;
 	        }
 	    }
 	    return str;

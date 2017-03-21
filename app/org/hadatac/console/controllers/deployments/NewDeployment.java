@@ -64,14 +64,14 @@ public class NewDeployment extends Controller {
     	}
     	
     	if (type.equalsIgnoreCase("regular")) {
-    		return ok(newDeployment.render(Form.form(DeploymentForm.class), 
+    		return ok(newDeployment.render(
       			  Platform.find(),
       			  Instrument.findAvailable(),
       			  Detector.findAvailable(),
       			  type));
     	}
     	else if (type.equalsIgnoreCase("legacy")) {
-    		return ok(newDeployment.render(Form.form(DeploymentForm.class),
+    		return ok(newDeployment.render(
       			  Platform.find(),
       			  Instrument.find(),
       			  Detector.find(),

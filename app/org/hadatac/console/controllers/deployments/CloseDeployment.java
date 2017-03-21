@@ -25,7 +25,6 @@ import be.objectify.deadbolt.java.actions.Restrict;
 
 public class CloseDeployment extends Controller {
 	
-	// for /metadata HTTP GET requests
 	@Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
     public static Result index(String deployment_uri) {
 
@@ -61,12 +60,10 @@ public class CloseDeployment extends Controller {
             System.out.println("closing deployment");
             return ok(closeDeployment.render(deployment_uri, depForm));
     	}
+    	
     	return ok(closeDeployment.render(deployment_uri, depForm));
-        
-    }// /index()
+    }
 
-
-    // for /metadata HTTP POST requests
 	@Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
     public static Result postIndex(String deployment_uri) {
     	DeploymentForm depForm = new DeploymentForm();
@@ -103,7 +100,7 @@ public class CloseDeployment extends Controller {
     	}
     	return ok(closeDeployment.render(deployment_uri, depForm));
         
-    }// /postIndex()
+    }
 
 	@Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
     public static Result processForm(String deployment_uri) {
@@ -150,7 +147,6 @@ public class CloseDeployment extends Controller {
 		data.setStartDateTime(dep.getStartedAt());
 		data.setEndDateTime(dep.getEndedAt());
 
-		//Deployment deployment = DataFactory.closeDeployment(deploymentUri, endDateString);
         if (form.hasErrors()) {
         	System.out.println("HAS ERRORS");
             return badRequest(closeDeployment.render(deployment_uri, data));

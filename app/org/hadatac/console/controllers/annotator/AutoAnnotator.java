@@ -31,6 +31,8 @@ import org.hadatac.console.models.TripleDocument;
 import org.hadatac.console.models.SysUser;
 import org.hadatac.console.views.html.annotator.*;
 import org.hadatac.data.api.DataFactory;
+import org.hadatac.data.loader.SampleGenerator;
+import org.hadatac.data.loader.SubjectGenerator;
 import org.hadatac.data.model.DatasetParsingResult;
 import org.hadatac.entity.pojo.CSVFile;
 import org.hadatac.entity.pojo.DataAcquisition;
@@ -105,6 +107,25 @@ public class AutoAnnotator extends Controller {
 				iterFile.remove();
 			}
 		}
+	}
+	
+	private static List<File> findFilesByExtension(String path, String ext) {
+		List<File> results = new ArrayList<File>();
+		
+		File folder = new File(path);
+		if (!folder.exists()){
+			folder.mkdirs();
+	    }
+		
+		File[] listOfFiles = folder.listFiles();
+		for (int i = 0; i < listOfFiles.length; i++) {
+			if (listOfFiles[i].isFile() 
+				&& FilenameUtils.getExtension(listOfFiles[i].getName()).equals(ext)) {
+					results.add(listOfFiles[i]);
+			}
+		}
+		
+		return results;
 	}
 	
 	@Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
@@ -186,8 +207,6 @@ public class AutoAnnotator extends Controller {
 	
 	@Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
     public static Result toggleAutoAnnotator() {
-		System.out.println("Toggling...");
-		
 		if (ConfigProp.getPropertyValue("autoccsv.config", "auto").equals("on")) {
 			ConfigProp.setPropertyValue("autoccsv.config", "auto", "off");
 			System.out.println("Turning auto-annotation off");
@@ -229,10 +248,26 @@ public class AutoAnnotator extends Controller {
 				f.delete();
 			}
 		}
+		
+		List<File> idFiles = findFilesByExtension(path_unproc, "sys");
+		for (File file : idFiles) {
+			annotateSampleIdFile(file);
+		}
+	}
+	
+	public static boolean annotateSampleIdFile(File file) {
+		SampleGenerator sampleGenerator = new SampleGenerator(file);
+		sampleGenerator.createRows();
+		return true;
+	}
+	
+	public static boolean annotateSubjectIdFile(File file) {
+		SubjectGenerator subjectGenerator = new SubjectGenerator(file);
+		subjectGenerator.createRows();
+		return true;
 	}
 	
     public static boolean annotateCSVFile(String file_name) {
-    	System.out.println("Annotating " + file_name);
     	String base_name = FilenameUtils.getBaseName(file_name);
     	
     	AnnotationLog log = new AnnotationLog();

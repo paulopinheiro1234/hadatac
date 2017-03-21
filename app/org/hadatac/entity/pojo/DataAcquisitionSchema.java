@@ -115,7 +115,6 @@ public class DataAcquisitionSchema {
     	String queryString = NameSpaces.getInstance().printSparqlNameSpaceList() + 
     			"SELECT ?uri WHERE { " + 
     			"   ?uri a hasco:DASchema . } ";
-    	System.out.println(NameSpaces.getInstance().printSparqlNameSpaceList());
     	Query query = QueryFactory.create(queryString);
 		
     	QueryExecution qexec = QueryExecutionFactory.sparqlService(

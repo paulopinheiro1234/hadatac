@@ -1,5 +1,8 @@
-@(refDataAcquisition : org.hadatac.entity.pojo.DataAcquisition,
-  theDeployments : List[org.hadatac.entity.pojo.Platform])
+@(theDeployments : List[org.hadatac.entity.pojo.Deployment],
+  theSchemas : List[org.hadatac.entity.pojo.DataAcquisitionSchema],
+  permissions : Map[String, String],
+  ownerOptions : List[String],
+  bAdmin : Boolean)
 
 @import helper._
 @import org.hadatac.utils._
@@ -10,103 +13,151 @@
 
 @main("New DataAcquisition") {
 
-<script type="text/javascript">
-   function checkform() {
-      var f = document.forms["newDeployment"].elements;
-      var cansubmit = true;
-
-      if (document.getElementById('uri').value.length == 0) {
-          cansubmit = false;
-      }
-
-      if (document.getElementById('acquisition_uri').value.length == 0) {
-          cansubmit = false;
-      }
-      
-      if (document.getElementById('platform').value.length == 0) {
-         cansubmit = false;
-      }
-         
-      if (document.getElementById('instrument').value.length == 0) { 
-         cansubmit = false;
-         var instrumentSelector = document.getElementById('detector');
-         instrumentSelector.disabled = 'disabled';
-         for (var i = 0, l = instrumentSelector.length; i < l; i++) {
-                instrumentSelector[i].selected = instrumentSelector[i].defaultSelected;
-         }
-      } else {
-         document.getElementById('detector').disabled = false;
-      }
-                
-      if (document.getElementById('startdatetime').value.length == 0) {
-         cansubmit = false;
-      }
-
-      if (cansubmit) {
-          document.getElementById('submitbutton').disabled = false;
-      } else {
-          document.getElementById('submitbutton').disabled = 'disabled';
-      }
-   }
-</script>
-
-  <div class="container">
-    <h2>New DataAcquisition</h2>
-
-    <form class="form-horizontal" name="newDeployment" method="post" action="@org.hadatac.console.controllers.deployments.routes.NewDeployment.processForm">
+	<script type="text/javascript">
+	   function checkform() {
+	      var cansubmit = true;
 	
- 	<div class="form-group">
-		<label>Data Acquisition URI:</label>
- 		<input type="text" class="form-control col-sm-6" name="acquisition_uri" id="acquisition_uri" onchange="checkform()" >
- 	</div>
- 	<div class="form-group">
-		<label>Parameters: (optional)</label>
- 		<input type="text" class="form-control col-sm-6" name="init_param" id="init_param" onchange="checkform()" >
- 	</div>
+	      if (document.getElementById('newUri').value.length == 0) {
+	          cansubmit = false;
+	      }
+	
+	      if (document.getElementById('newDeployment').value.length == 0) {
+	          cansubmit = false;
+	      }
+	      else {
+	    	  document.getElementById('newUri').value = document.getElementById('newDeployment').value.replace("DPL", "DA");
+	      }
+
+	      if (document.getElementById('newSchema').value.length == 0) {
+	          cansubmit = false;
+	      }
+
+	      if (document.getElementById('newPermission').value.length == 0) {
+	          cansubmit = false;
+	      }
+	                
+	      if (document.getElementById('newStartDate').value.length == 0) {
+	         cansubmit = false;
+	      }
+	
+	      if (cansubmit) {
+	          document.getElementById('submitbutton').disabled = false;
+	      } else {
+	          document.getElementById('submitbutton').disabled = 'disabled';
+	      }
+	   }
+	</script>
+
+	<div class="container">
+	  <h2>New Data Acquisition</h2>
+	
+	<form class="form-horizontal" name="newDataAcquisition" method="post" action="@org.hadatac.console.controllers.dataacquisitionmanagement.routes.DataAcquisitionManagement.processForm()">
+	
+	<div class="form-group">
+	       <label>Deployment</label> 
+	       <select class="form-control col-sm-6" id="newDeployment" name="newDeployment" onchange="checkform()" >
+	          <option value=""></option>
+	          @for(deployment <- theDeployments) {
+	              <option value="@deployment.getUri()">@deployment.getUri()</option>
+	          }
+	       </select>
+	</div>
+	
+	<div class="form-group">
+	<label>Data Acquisition URI</label>
+		<input type="text" class="form-control col-sm-6" name="newUri" id="newUri" onchange="checkform()" >
+	</div>
+	  
+	<div class="form-group">
+	       <label>Schema</label> 
+	       <select class="form-control col-sm-6" id="newSchema" name="newSchema" onchange="checkform()" >
+	          <option value=""></option>
+	          @for(schema <- theSchemas) {
+	              <option value="@schema.getUri()">@schema.getUri()</option>
+	          }
+	       </select>
+	  </div>
+	
+	<div class="form-group">
+	<label>Parameters: (optional)</label>
+		<input type="text" class="form-control col-sm-6" name="newParameter" id="newParameter" onchange="checkform()" >
+	</div>
+	
+	@if(bAdmin) {
+	  <div class="form-group">
+          <label>Owner</label>
+          <select class="form-control col-sm-6" id="newOwner" name="newOwner" >
+          	<option value=""></option>
+        	@for(opt <- ownerOptions) {
+            	<option value="@opt">@opt</option>
+        	}
+          </select>
+	  </div>
+	}
+	        
     <div class="form-group">
-         <label>Deployment</label> 
-         <select class="form-control col-sm-6" id="deployment" name="deployment" onchange="checkform()" >
-            <option value=""></option>
-            @for(deployment <- theDeployments) {
-                <option value="@deployment.getUri()">@deployment.getLabel()</option>
-            }
-         </select>
-     </div>
-          
-	 <div class="form-group">
-         <label for="startdate">Start Date/Time</label><br> 
-         <div class="container">
-            <div class="row">
-               <div class='col-sm-3'>
-                 <div class="form-group">
-                    <div class='input-group date' id='startdate' onchange="checkform()" >
-                       <input type='text' name="startDateTime" id="startdatetime" class="form-control" />
-                       <span class="input-group-addon">
-                          <span class="glyphicon glyphicon-calendar"></span>
-                       </span>
-                    </div>
-                 </div>
-               </div>
-               <script type="text/javascript">
-                 $(function () {
-                     $('#startdate').datetimepicker();
-                     $('#startdate').on('dp.change', function (e) { checkform(); });
-                 });
-               </script>
-            </div>
-         </div>
-     </div>
-
-      <div class="form-group" class="col-sm-6 col-offset-3">
-          <input class="btn btn-success" role="button" id="submitbutton" type="submit" value="Create" disabled="disabled" />
-          <p> The created deployment will be saved in LabKey</p>
-      </div>
-      
-      <div class="form-group" class="col-sm-6 col-offset-3">
-           @deploymentButton(false) 
-      </div>
-
-   </form>
-  </div>
-
+       <label>Permission</label>
+       <select class="form-control col-sm-6" id="newPermission" name="newPermission" >
+       <option value="Public">Public</option>       
+          @for((permUri, permName) <- permissions){
+          	<option value="@permUri">@permName</option>
+          }
+       </select>
+    </div>
+	         
+	  <div class="form-group">
+	        <label for="startdate">Start Date/Time</label><br> 
+	        <div class="container">
+	           <div class="row">
+	              <div class='col-sm-3'>
+	                <div class="form-group">
+	                   <div class='input-group date' id='startdate' onchange="checkform()" >
+	                      <input type='text' name="newStartDate" id="newStartDate" class="form-control" />
+	                      <span class="input-group-addon">
+	                         <span class="glyphicon glyphicon-calendar"></span>
+	                      </span>
+	                   </div>
+	                </div>
+	              </div>
+	              <script type="text/javascript">
+	               $(function () {
+	                   $('#startdate').datetimepicker();
+	                   $('#startdate').on('dp.change', function (e) { checkform(); });
+	               });
+	             </script>
+	          </div>
+	       </div>
+	  </div>
+	  
+	  <div class="form-group">
+	        <label for="enddate">End Date/Time</label><br> 
+	        <div class="container">
+	           <div class="row">
+	              <div class='col-sm-3'>
+	                <div class="form-group">
+	                   <div class='input-group date' id='enddate' onchange="checkform()" >
+	                      <input type='text' name="newEndDate" id="newEndDate" class="form-control" />
+	                      <span class="input-group-addon">
+	                         <span class="glyphicon glyphicon-calendar"></span>
+	                      </span>
+	                   </div>
+	                </div>
+	              </div>
+	              <script type="text/javascript">
+	               $(function () {
+	                   $('#enddate').datetimepicker();
+	                   $('#enddate').on('dp.change', function (e) { checkform(); });
+	               });
+	             </script>
+	          </div>
+	       </div>
+	  </div>
+	
+	  <div class="form-group" class="col-sm-6 col-offset-3">
+	      <input class="btn btn-success" role="button" id="submitbutton" type="submit" value="Create" disabled="disabled" />
+	      <a href="@org.hadatac.console.controllers.dataacquisitionmanagement.routes.DataAcquisitionManagement.index(State.ACTIVE)" class="btn btn-primary" role="button">Cancel</a>
+	 	  <p> The created deployment will be saved in LabKey</p>
+	  </div>
+	</form>
+	</div>
 }
