@@ -19,7 +19,7 @@ public class SampleGenerator {
 	Iterable<CSVRecord> records = null;
 	CSVRecord rec = null;
 	int counter = 0;
-	
+	List< Map<String, Object> > rows = new ArrayList<Map<String,Object>>();
 	HashMap<String, Integer> mapCol = new HashMap<String, Integer>();
 	
 	public SampleGenerator(File file) {
@@ -112,12 +112,31 @@ public class SampleGenerator {
     }
     
     public List< Map<String, Object> > createRows() {
-    	List< Map<String, Object> > rows = new ArrayList< Map<String, Object> >();
+    	rows.clear();
     	for (CSVRecord record : records) {
     		rec = record;
     		rows.add(createRow());
     	}
     	
     	return rows;
+    }
+    
+    public String toString() {
+    	String result = String.join("\t", rows.get(0).keySet());
+    	for (Map<String, Object> row : rows) {
+    		List<String> values = new ArrayList<String>();
+    		for (String colName : rows.get(0).keySet()) {
+    			if (row.containsKey(colName)) {
+    				values.add((String)row.get(colName));
+    			}
+    			else {
+    				values.add("");
+    			}
+    		}
+    		result += "\n";
+    		result += String.join("\t", values);
+    	}
+    	
+    	return result;
     }
 }
