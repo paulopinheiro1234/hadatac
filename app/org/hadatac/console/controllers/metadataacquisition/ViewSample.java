@@ -61,14 +61,8 @@ public class ViewSample extends Controller {
 		    //System.out.println("Key : " + entry.getKey() + " and Value: " + entry.getValue() + "\n");
 		    String label = entry.getValue().toString().replaceAll(" ", "").replaceAll(",", "").toString() + "Label";
 
-			String indvIndicatorQuery = "PREFIX rdfs:<http://www.w3.org/2000/01/rdf-schema#> PREFIX chear: <http://hadatac.org/ont/chear#>PREFIX case: <http://hadatac.org/ont/case#>PREFIX chear-kb: <http://hadatac.org/kb/chear#>PREFIX case-kb: <http://hadatac.org/kb/case#>PREFIX hasco: <http://hadatac.org/ont/hasco/>PREFIX hasneto: <http://hadatac.org/ont/hasneto#>SELECT DISTINCT ?sampleUri " +
-					"?" + label + " " +
-					"WHERE { ?schemaUri hasco:isSchemaOf " + sample_uri + " . ?schemaAttribute hasneto:partOfSchema ?schemaUri . ?schemaAttribute hasneto:hasAttribute " +
-					"?" + entry.getValue().toString().replaceAll(" ", "").replaceAll(",", "") +
-					" . ?" + entry.getValue().toString().replaceAll(" ", "").replaceAll(",", "") + " rdfs:subClassOf* " + entry.getKey().toString().replaceAll("http://hadatac.org/ont/chear#","chear:").replaceAll("http://hadatac.org/ont/case#","case:").replaceAll("http://hadatac.org/kb/chear#","chear-kb:").replaceAll("http://hadatac.org/kb/case#","case-kb:") + 
-					" . ?" + entry.getValue().toString().replaceAll(" ", "").replaceAll(",", "") + " rdfs:label ?" + label + " . " +
-					"			FILTER ( ?sampleUri = " + sample_uri.replaceAll("http://hadatac.org/ont/chear#","chear:").replaceAll("http://hadatac.org/ont/case#","case:").replaceAll("http://hadatac.org/kb/chear#","chear-kb:").replaceAll("http://hadatac.org/kb/case#","case-kb:") + " ) . " +
-					"}";
+			String indvIndicatorQuery = "PREFIX cmo: <http://purl.obolibrary.org/obo/cmo#> PREFIX chebi: <http://purl.obolibrary.org/obo/CHEBI_> PREFIX hadatac-sn: <http://hadatac.org/ont/hadatac-sn#> PREFIX owl: <http://www.w3.org/2002/07/owl#> PREFIX vstoi: <http://hadatac.org/ont/vstoi#> PREFIX case-kb: <http://hadatac.org/kb/case#> PREFIX xsd: <http://www.w3.org/2001/XMLSchema#> PREFIX skos: <http://www.w3.org/2004/02/skos/core#> PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> PREFIX chear-kb: <http://hadatac.org/kb/chear#> PREFIX dct: <http://purl.org/dc/terms/> PREFIX sio: <http://semanticscience.org/resource/> PREFIX dcterms: <http://purl.org/dc/terms/> PREFIX uo: <http://purl.obolibrary.org/obo/uo#> PREFIX hasneto: <http://hadatac.org/ont/hasneto#> PREFIX prov: <http://www.w3.org/ns/prov#> PREFIX hadatac: <http://hadatac.org/ont/hadatac#> PREFIX hasco: <http://hadatac.org/ont/hasco/> PREFIX uberon: <http://purl.obolibrary.org/obo/uberon.owl#> PREFIX chear: <http://hadatac.org/ont/chear#> PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>"
+										+ "SELECT DISTINCT ?sindi WHERE { ?sindi rdfs:subClassOf chear:SampleIndicator . }";
 			//System.out.println(indvIndicatorQuery + "\n");
 			QueryExecution qexecIndvInd = QueryExecutionFactory.sparqlService(Collections.getCollectionsName(Collections.METADATA_SPARQL), indvIndicatorQuery);
 			ResultSet indvIndResults = qexecIndvInd.execSelect();
