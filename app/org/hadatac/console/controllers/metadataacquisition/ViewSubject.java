@@ -90,6 +90,9 @@ public class ViewSubject extends Controller {
 					ValueCellProcessing cellProc = new ValueCellProcessing();
 					if(Measurement.find(findUser(), study_uri, cellProc.convertToWholeURI(subject_uri), soln.get("uri").toString()).documents.size() > 0){
 						listIndicatorLabel.add(soln.get("label").toString());
+						System.out.println("HEREHERE" + Measurement.find(findUser(), study_uri, cellProc.convertToWholeURI(subject_uri), soln.get("uri").toString()).documents.get(0).getObjectUri().toString() 
+								+ Measurement.find(findUser(), study_uri, cellProc.convertToWholeURI(subject_uri), soln.get("uri").toString()).documents.get(0).getCharacteristic().toString()
+								+ Measurement.find(findUser(), study_uri, cellProc.convertToWholeURI(subject_uri), soln.get("uri").toString()).documents.get(0).getValue().toString());
 					}
 //					listIndicatorLabel.add(soln.get("comment").toString());
 				}
