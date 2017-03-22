@@ -32,6 +32,8 @@ import org.hadatac.console.controllers.metadataacquisition.ViewStudy;
 import org.hadatac.console.models.SysUser;
 import org.hadatac.console.views.html.metadata.*;
 import org.hadatac.console.views.html.metadataacquisition.*;
+import org.hadatac.data.loader.SampleGenerator;
+import org.hadatac.data.loader.SubjectGenerator;
 import org.hadatac.metadata.loader.*;
 import org.hadatac.utils.Collections;
 import org.hadatac.utils.NameSpace;
@@ -643,8 +645,17 @@ public class DynamicFunctions extends Controller {
     	//System.out.println(findSubject("chear-kb:SBJ-0032-Pilot-6"));
     	//System.out.println(findSubjects());
     	//System.out.println(replaceTabNameWithConcept("ReproductiveHealth"));
-    	System.out.println(getPrefixes());
-        return ok();        
+    	//System.out.println(getPrefixes());
+    	
+    	/*SubjectGenerator sg = new SubjectGenerator(new File("/home/sabbir/Programs/java_code/pid.sys"));
+    	sg.createRows();
+    	System.out.println("Subject String: \n" + sg.toString());*/
+    	
+    	/*SampleGenerator smg = new SampleGenerator(new File("/home/sabbir/Programs/java_code/SID.sys"));
+    	smg.createRows();
+    	System.out.println("Sample String: \n" + smg.toString());*/
+    	
+        return ok(); 
     }// /index()
 
     // for /metadata HTTP POST requests

@@ -286,21 +286,38 @@ public class AutoAnnotator extends Controller {
 			}
 		}
 		
-		List<File> idFiles = findFilesByExtension(path_unproc, "sys");
-		for (File file : idFiles) {
+		for (File file : findFilesByExtension(path_unproc, "sid")) {
 			annotateSampleIdFile(file);
+		}
+		
+		for (File file : findFilesByExtension(path_unproc, "pid")) {
+			annotateSubjectIdFile(file);
 		}
 	}
 	
 	public static boolean annotateSampleIdFile(File file) {
 		SampleGenerator sampleGenerator = new SampleGenerator(file);
-		sampleGenerator.createRows();
+		/*List<Map<String, Object>> rows = sampleGenerator.createRows();
+		LabkeyDataHandler ldh = new LabkeyDataHandler("labkey_site", "user_name", "password", "path");
+		try {
+			ldh.updateRows("Sample", rows);
+		} catch (CommandException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}*/
 		return true;
 	}
 	
-	public static boolean annotateSubjectIdFile(File file) {
+	public static boolean annotateSubjectIdFile(File file){
 		SubjectGenerator subjectGenerator = new SubjectGenerator(file);
-		subjectGenerator.createRows();
+		/*List<Map<String, Object>> rows = subjectGenerator.createRows();
+		LabkeyDataHandler ldh = new LabkeyDataHandler("labkey_site", "user_name", "password", "path");
+		try {
+			ldh.updateRows("Subject", rows);
+		} catch (CommandException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}*/
 		return true;
 	}
 	
