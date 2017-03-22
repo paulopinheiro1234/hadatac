@@ -172,6 +172,8 @@ GET	    /hadatac/annotator/autoccsv		    	   org.hadatac.console.controllers.ann
 POST	/hadatac/annotator/autoccsv     		   org.hadatac.console.controllers.annotator.AutoAnnotator.postIndex()
 GET	    /hadatac/annotator/toggle		    	   org.hadatac.console.controllers.annotator.AutoAnnotator.toggleAutoAnnotator()
 POST	/hadatac/annotator/toggle     		       org.hadatac.console.controllers.annotator.AutoAnnotator.toggleAutoAnnotator()
+GET	    /hadatac/annotator/setcred		           org.hadatac.console.controllers.annotator.AutoAnnotator.setLabKeyCredentials()
+POST	/hadatac/annotator/setcred     	           org.hadatac.console.controllers.annotator.AutoAnnotator.postSetLabKeyCredentials()
 GET	    /hadatac/annotator/uploadcsv		       org.hadatac.console.controllers.annotator.AutoAnnotator.uploadCSVFileByChunking(resumableChunkNumber : String, resumableChunkSize : String, resumableCurrentChunkSize : String, resumableTotalSize : String, resumableIdentifier : String, resumableFilename : String, resumableRelativePath : String)
 POST	/hadatac/annotator/uploadcsv    		   org.hadatac.console.controllers.annotator.AutoAnnotator.postUploadCSVFileByChunking(resumableChunkNumber : String, resumableChunkSize : String, resumableCurrentChunkSize : String, resumableTotalSize : String, resumableIdentifier : String, resumableFilename : String, resumableRelativePath : String)
 GET	    /hadatac/annotator/movecsv		    	   org.hadatac.console.controllers.annotator.AutoAnnotator.moveCSVFile(ownerEmail : String, file_name : String)

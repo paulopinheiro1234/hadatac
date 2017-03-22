@@ -18,6 +18,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
+import org.hadatac.entity.pojo.Credential;
 import org.hadatac.console.controllers.AuthApplication;
 import org.hadatac.console.controllers.dataacquisitionsearch.LoadCCSV;
 import org.hadatac.console.controllers.annotator.routes;
@@ -26,10 +27,13 @@ import org.hadatac.console.http.DeploymentQueries;
 import org.hadatac.console.http.ResumableUpload;
 import org.hadatac.console.models.AssignOwnerForm;
 import org.hadatac.console.models.CSVAnnotationHandler;
+import org.hadatac.console.models.LabKeyLoginForm;
 import org.hadatac.console.models.SparqlQueryResults;
 import org.hadatac.console.models.TripleDocument;
 import org.hadatac.console.models.SysUser;
 import org.hadatac.console.views.html.annotator.*;
+import org.hadatac.console.views.html.triplestore.*;
+import org.hadatac.console.views.html.*;
 import org.hadatac.data.api.DataFactory;
 import org.hadatac.data.loader.SampleGenerator;
 import org.hadatac.data.loader.SubjectGenerator;
@@ -38,11 +42,13 @@ import org.hadatac.entity.pojo.CSVFile;
 import org.hadatac.entity.pojo.DataAcquisition;
 import org.hadatac.entity.pojo.DataAcquisitionSchema;
 import org.hadatac.entity.pojo.User;
+import org.hadatac.metadata.loader.LabkeyDataHandler;
 import org.hadatac.metadata.loader.ValueCellProcessing;
 import org.hadatac.utils.ConfigProp;
 import org.hadatac.utils.Feedback;
 import org.hadatac.utils.NameSpaces;
 import org.hadatac.utils.State;
+import org.labkey.remoteapi.CommandException;
 
 import be.objectify.deadbolt.java.actions.Group;
 import be.objectify.deadbolt.java.actions.Restrict;
@@ -52,6 +58,7 @@ import play.mvc.Controller;
 import play.mvc.Result;
 import play.mvc.BodyParser;
 import play.mvc.Http.MultipartFormData.FilePart;
+import play.twirl.api.Html;
 
 public class AutoAnnotator extends Controller {
 	
@@ -218,6 +225,36 @@ public class AutoAnnotator extends Controller {
 		
 		return redirect(routes.AutoAnnotator.index());
 	}
+	
+	@Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
+    public static Result setLabKeyCredentials() {
+		return ok(syncLabkey.render("init", routes.AutoAnnotator.postSetLabKeyCredentials().url(), "", false));
+	}
+    
+    @Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
+    public static Result postSetLabKeyCredentials() {
+    	Form<LabKeyLoginForm> form = Form.form(LabKeyLoginForm.class).bindFromRequest();
+    	String site = ConfigProp.getPropertyValue("labkey.config", "site");
+        String path = "/";
+        String user_name = form.get().getUserName();
+        String password = form.get().getPassword();
+    	LabkeyDataHandler loader = new LabkeyDataHandler(
+    			site, user_name, password, path);
+    	try {
+    		loader.checkAuthentication();
+    		Credential cred = new Credential();
+    		cred.setUserName(user_name);
+    		cred.setPassword(password);
+    		cred.save();
+    	} catch(CommandException e) {
+    		if(e.getMessage().equals("Unauthorized")){
+    			return ok(syncLabkey.render("login_failed", "", "", false));
+    		}
+    	}
+    	
+    	return ok(main.render("Results,", "", 
+    			new Html("<h3>Your provided credentials are valid and saved!</h3>")));
+    }
 	
 	public static void autoAnnotate() {
 		if(ConfigProp.getPropertyValue("autoccsv.config", "auto").equals("off")){

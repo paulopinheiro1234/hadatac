@@ -11,6 +11,7 @@ public class Collections {
 	public static final String STUDIES_FACET               = "/studies_facet";
 	public static final String ANNOTATION_LOG              = "/annotation_log";
 	public static final String CSV_DATASET                 = "/csv";
+	public static final String LABKEY_CREDENTIAL           = "/labkey";
 	public static final String URI_GENERATOR               = "/uri_generator";
 	public static final String STUDY_ACQUISITION           = "/studies/select";
 	public static final String SAMPLES_ACQUISITION         = "/samples/select";

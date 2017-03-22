@@ -237,7 +237,6 @@ public class Measurement {
         String q = "";
         
         List<String> listURI = DataAcquisition.findAllAccessibleDataAcquisition(user_uri);
-        //acquisition_query += "{!terms f=acquisition_uri}" + String.join(",", listURI);
         Iterator<String> iter_uri = listURI.iterator();
         while(iter_uri.hasNext()){
             String uri = iter_uri.next();
@@ -313,7 +312,6 @@ public class Measurement {
         String q = "";
         
         List<String> listURI = DataAcquisition.findAllAccessibleDataAcquisition(user_uri);
-        //acquisition_query += "{!terms f=acquisition_uri}" + String.join(",", listURI);
         Iterator<String> iter_uri = listURI.iterator();
         while(iter_uri.hasNext()){
             String uri = iter_uri.next();
@@ -357,7 +355,6 @@ public class Measurement {
 		SolrQuery query = new SolrQuery();
 		
 		String q = buildQuery(user_uri, page, qtd, handler);
-		System.out.println("Hello!!!  " + q);
 		query.setQuery(q);
 		query.setStart((page - 1)*qtd + 1);
 		System.out.println("Starting at: " + ((page - 1)* qtd + 1) + "    page: " + page + "     qtd: " + qtd);
