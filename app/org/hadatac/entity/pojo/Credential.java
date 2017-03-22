@@ -109,11 +109,15 @@ public class Credential {
 		return list;
 	}
 	
-	public static List<Credential> findAll(int state) {
+	public static Credential find() {
 		SolrQuery query = new SolrQuery();
 		query.set("q", "*:*");
 		query.set("rows", "10000000");
+		List<Credential> credentials = findByQuery(query);
+		if (credentials.isEmpty()) {
+			return null;
+		}
 		
-		return findByQuery(query);
+		return credentials.get(0);
 	}
 }

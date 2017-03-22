@@ -19,8 +19,8 @@ import org.apache.jena.query.ResultSet;
 import org.apache.jena.query.ResultSetFactory;
 import org.apache.jena.query.ResultSetRewindable;
 import org.apache.jena.rdf.model.Literal;
-import org.hadatac.console.controllers.metadata.DynamicFunctions;
 import org.hadatac.utils.Collections;
+import org.hadatac.utils.NameSpaces;
 
 public class SampleGenerator {
 	final String kbPrefix = "chear-kb:";
@@ -29,7 +29,7 @@ public class SampleGenerator {
 	CSVRecord rec = null;
 	int counter = 1; //starting index number
 	private List< Map<String, Object> > rows = new ArrayList<Map<String,Object>>();
-	HashMap<String, Integer> mapCol = new HashMap<String, Integer>();
+	HashMap<String, String> mapCol = new HashMap<String, String>();
 	
 	public SampleGenerator(File file) {
 		try {
@@ -44,33 +44,38 @@ public class SampleGenerator {
 	
 	private void initMapping() {
 		mapCol.clear();
-        mapCol.put("sampleID", 0);
-        mapCol.put("sampleSuffix", 3);
-        mapCol.put("subjectID", 7);
-        mapCol.put("pilotNum", 8);
-        mapCol.put("sampleType", 11);
-		mapCol.put("samplingMethod", 12);
-		mapCol.put("samplingVol", 15);
-		mapCol.put("samplingVolUnit", 16);
-		mapCol.put("storageTemp", 18);
-		mapCol.put("FTcount", 19);
+        mapCol.put("sampleID", "specimen_id");
+        mapCol.put("sampleSuffix", "suffix");
+        mapCol.put("subjectID", "patient_id");
+        mapCol.put("pilotNum", "project_id");
+        mapCol.put("sampleType", "sample_type");
+		mapCol.put("samplingMethod", "sample_collection_method");
+		mapCol.put("samplingVol", "sample_quantity");
+		mapCol.put("samplingVolUnit", "sample_quantity_uom");
+		mapCol.put("storageTemp", "sample_storage_temp");
+		mapCol.put("FTcount", "sample_freeze_thaw_cycles");
 	}
 	
 	private int getSampleCount(String pilotNum){
-		int count=0;
-		String sampleCountQuery = DynamicFunctions.getPrefixes() + "SELECT (count(DISTINCT ?sampleURI) as ?sampleCount) WHERE {?sampleURI hasco:isMeasuredObjectOf ?DA . ?DA hasco:isDataAcquisitionOf chear-kb:STD-Pilot-" + pilotNum + " . }";
-		QueryExecution qexecSample = QueryExecutionFactory.sparqlService(Collections.getCollectionsName(Collections.METADATA_SPARQL), sampleCountQuery);
+		int count = 0;
+		String sampleCountQuery = NameSpaces.getInstance().printSparqlNameSpaceList() 
+				+ " SELECT (count(DISTINCT ?sampleURI) as ?sampleCount) WHERE { "
+				+ " ?sampleURI hasco:isMeasuredObjectOf ?DA . "
+				+ " ?DA hasco:isDataAcquisitionOf chear-kb:STD-Pilot-" + pilotNum + " . "
+				+ "}";
+		QueryExecution qexecSample = QueryExecutionFactory.sparqlService(
+				Collections.getCollectionsName(Collections.METADATA_SPARQL), sampleCountQuery);
 		ResultSet sampleResults = qexecSample.execSelect();
 		ResultSetRewindable resultsrwSample = ResultSetFactory.copyResults(sampleResults);
-		if(resultsrwSample.hasNext()){
+		qexecSample.close();
+		if (resultsrwSample.hasNext()) {
 			QuerySolution soln = resultsrwSample.next();
 			Literal countLiteral = (Literal) soln.get("sampleCount");
-			if(countLiteral!=null){
-				int value = countLiteral.getInt();
-				count += value;
+			if(countLiteral != null){ 
+				count += countLiteral.getInt();
 			}
 		}
-		qexecSample.close();
+		
 		return count;
 	}
 	
@@ -78,89 +83,106 @@ public class SampleGenerator {
 		return kbPrefix + "SPL-" + String.format("%04d", counter + getSampleCount(rec.get(mapCol.get("pilotNum")))) 
 			+ "-Pilot-" + rec.get(mapCol.get("pilotNum")); //  + "-" + getSampleSuffix()
 	}
+	
 	private String getType() {
-		if(!rec.get(mapCol.get("sampleType")).equals("NULL")){
+		if(!rec.get(mapCol.get("sampleType")).equalsIgnoreCase("NULL")){
 			return rec.get(mapCol.get("sampleType"));
 		} else {
 			return "";
 		}
 	}
+	
 	private String getLabel() {
 		return "SID " + String.format("%04d", counter + getSampleCount(rec.get(mapCol.get("pilotNum")))) + " - Pilot " 
 			+ rec.get(mapCol.get("pilotNum")) + " " + getSampleSuffix();
 	}
+	
     private String getOriginalID() {
-    	if(!rec.get(mapCol.get("sampleID")).equals("NULL")){
+    	if(!rec.get(mapCol.get("sampleID")).equalsIgnoreCase("NULL")){
     		return rec.get(mapCol.get("sampleID"));
     	} else {
     		return "";
     	}
     }
+    
     private String getSubjectUri() {
-		String subject = "";
-    	if(!mapCol.get("subjectID").equals("NULL")){
-    		String subjectQuery = DynamicFunctions.getPrefixes() + "SELECT ?subjectURI WHERE {?subjectURI hasco:originalID " + mapCol.get("subjectID") + " . }";
-    		QueryExecution qexecSubject = QueryExecutionFactory.sparqlService(Collections.getCollectionsName(Collections.METADATA_SPARQL), subjectQuery);
-    		ResultSet subjectResults = qexecSubject.execSelect();
-    		ResultSetRewindable resultsrwSubject = ResultSetFactory.copyResults(subjectResults);
-    		if(resultsrwSubject.hasNext()){
-    			QuerySolution soln = resultsrwSubject.next();
-    			subject = soln.get("subjectURI").toString();
-    		}
-    		qexecSubject.close();
+    	if (rec.get(mapCol.get("subjectID")).equalsIgnoreCase("NULL")) {
+    		return "";
     	}
+    	
+    	String subject = "";
+		String subjectQuery = NameSpaces.getInstance().printSparqlNameSpaceList() 
+				+ " SELECT ?subjectURI WHERE { "
+				+ " ?subjectURI hasco:originalID \"" + rec.get(mapCol.get("subjectID")) + "\" . }";
+		
+		QueryExecution qexecSubject = QueryExecutionFactory.sparqlService(Collections.getCollectionsName(Collections.METADATA_SPARQL), subjectQuery);
+		ResultSet subjectResults = qexecSubject.execSelect();
+		ResultSetRewindable resultsrwSubject = ResultSetFactory.copyResults(subjectResults);
+		qexecSubject.close();
+		if (resultsrwSubject.hasNext()) {
+			QuerySolution soln = resultsrwSubject.next();
+			subject = soln.get("subjectURI").toString();
+		}
+    	
     	return subject;
     }
+    
     private String getDataAcquisition() {
     	return dataAcquisition;
     }
+    
     private String getComment() {
     	return "Sample " + String.format("%04d", counter + getSampleCount(rec.get(mapCol.get("pilotNum")))) 
     		+ " for Pilot " + rec.get(mapCol.get("pilotNum")) + " " + getSampleSuffix();
     }
+    
     private String getSamplingMethod() {
-    	if(!rec.get(mapCol.get("samplingMethod")).equals("NULL")){
+    	if(!rec.get(mapCol.get("samplingMethod")).equalsIgnoreCase("NULL")){
     		return rec.get(mapCol.get("samplingMethod"));
     	} else {
     		return "";
     	}
     }
+    
     private String getSamplingVolume() {
-    	if(!rec.get(mapCol.get("samplingVol")).equals("NULL")){
+    	if(!rec.get(mapCol.get("samplingVol")).equalsIgnoreCase("NULL")){
     		return rec.get(mapCol.get("samplingVol"));
     	} else {
     		return "";
     	}
     }
+    
     private String getSamplingVolumeUnit() {
-    	if(!rec.get(mapCol.get("samplingVolUnit")).equals("NULL")){
-    	return rec.get(mapCol.get("samplingVolUnit"));
+    	if(!rec.get(mapCol.get("samplingVolUnit")).equalsIgnoreCase("NULL")){
+    		return rec.get(mapCol.get("samplingVolUnit"));
     	} else {
     		return "obo:UO_0000095"; // default volume unit
     	}
     }
+    
     private String getStorageTemperature() {
-    	if(!rec.get(mapCol.get("storageTemp")).equals("NULL")){
-    	return rec.get(mapCol.get("storageTemp"));
+    	if(!rec.get(mapCol.get("storageTemp")).equalsIgnoreCase("NULL")){
+    		return rec.get(mapCol.get("storageTemp"));
     	} else {
     		return "";
     	}
     }
     
     private String getStorageTemperatureUnit() {
-    	return "obo:UO_0000027"; // defaulting to Celsius since SID file does not contain temp unit
+    	// defaulting to Celsius since SID file does not contain temp unit
+    	return "obo:UO_0000027";
     }
     
     private String getNumFreezeThaw() {
-    	if(!rec.get(mapCol.get("FTcount")).equals("NULL")){
-    		return rec.get(mapCol.get("FTcount"));
+    	if(!rec.get(mapCol.get("FTcount")).equalsIgnoreCase("NULL")){
+    		return rec.get("FTcount");
     	} else {
     		return "";
     	}
     }
     
     private String getSampleSuffix() {
-    	if(!rec.get(mapCol.get("sampleSuffix")).equals("NULL")){
+    	if(!rec.get(mapCol.get("sampleSuffix")).equalsIgnoreCase("NULL")){
     		return rec.get(mapCol.get("sampleSuffix"));
     	} else {
     		return "";
@@ -188,34 +210,36 @@ public class SampleGenerator {
     }
     
     public List< Map<String, Object> > createRows() {
-    	this.rows.clear();
-    	List< Map<String, Object> > sampleRows = new ArrayList< Map<String, Object> >();
+    	rows.clear();
     	for (CSVRecord record : records) {
     		rec = record;
-    		sampleRows.add(createRow());
+    		rows.add(createRow());
     	}
-    	this.rows = sampleRows;
-    	return sampleRows;
+    	
+    	return rows;
     }
     
     public String toString() {
-    	String result = "";
-    	if(!rows.isEmpty()){
-	    	result = String.join("\t", rows.get(0).keySet());
-	    	for (Map<String, Object> row : rows) {
-	    		List<String> values = new ArrayList<String>();
-	    		for (String colName : rows.get(0).keySet()) {
-	    			if (row.containsKey(colName)) {
-	    				values.add((String)row.get(colName));
-	    			}
-	    			else {
-	    				values.add("");
-	    			}
-	    		}
-	    		result += "\n";
-	    		result += String.join("\t", values);
-	    	}
+    	if (rows.isEmpty()) {
+    		return "";
     	}
+    	
+    	List<String> colNames = new ArrayList<String>(rows.get(0).keySet());
+		String result = String.join(",", colNames);
+    	for (Map<String, Object> row : rows) {
+    		List<String> values = new ArrayList<String>();
+    		for (String colName : colNames) {
+    			if (row.containsKey(colName)) {
+    				values.add((String)row.get(colName));
+    			}
+    			else {
+    				values.add("");
+    			}
+    		}
+    		result += "\n";
+    		result += String.join(",", values);
+    	}
+    	
     	return result;
     }
 }

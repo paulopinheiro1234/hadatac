@@ -1,5 +1,5 @@
-@(unprocessedFiles : List[org.hadatac.entity.pojo.CSVFile], 
-  processedFiles : List[org.hadatac.entity.pojo.CSVFile],
+@(unprocessedFiles : List[org.hadatac.entity.pojo.DataFile], 
+  processedFiles : List[org.hadatac.entity.pojo.DataFile],
   bStarted : Boolean,
   bAdmin : Boolean)
 
@@ -9,7 +9,7 @@
 @import org.hadatac.metadata.loader._
 @import java.net._
 
-@main("Automatic CCSV Generation") {
+@main("Automatic Annotator") {
 	<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
 	<script type="text/javascript" src="@controllers.routes.Assets.versioned("javascripts/resumable.js")"></script>
 	
@@ -37,7 +37,7 @@
 	@*<br><br>
     <div id="rcorners" class="col-md-3">
     	<h4>CSV File Uploader</h4>
-    	<form name="fileUploadForm" id='upload' method="POST" enctype="multipart/form-data" action="@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.uploadCSVFile("load")" onchange="checkform()">
+    	<form name="fileUploadForm" id='upload' method="POST" enctype="multipart/form-data" action="@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.uploadDataFile("load")" onchange="checkform()">
         	<input type="file" multiple="multiple" class="btn btn-info" name="pic"> 
         	<div id='submitMessage'  style="display:none;" >
         	<br>Press <input type="submit" class="btn-sm btn-success" value="Upload"> to upload the csv file to the unprocessed files. 
@@ -51,8 +51,8 @@
     </div>
     
     <div class="resumable-drop" ondragenter="jQuery(this).addClass('resumable-dragover');" ondragend="jQuery(this).removeClass('resumable-dragover');" ondrop="jQuery(this).removeClass('resumable-dragover');">
-      <h4>CSV File Uploader</h4>
-      Drop CSV files here to preview or <a class="resumable-browse"><u>select from your computer</u></a>
+      <h4>Data File Uploader</h4>
+      Drop data files here to preview or <a class="resumable-browse"><u>select from your computer</u></a>
     </div>
     
     <br>
@@ -77,7 +77,7 @@
 	<table class="table">
 	<thead>
          <tr>
-            <th>Processed CSV Files</th>
+            <th>Processed Data Files</th>
             @if(bAdmin) {
             	<th>Owner Email</th>
             }
@@ -96,10 +96,10 @@
     			<td>@file.getUploadTime()</td>
     			<td>@file.getProcessTime()</td>
     			<td>
-    			<a href="@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.moveCSVFile(file.getOwnerEmail(), file.getFileName())" class="btn-xs btn-primary" role="button">Move to Unprocessed Folder</a>
-    			<a href="@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.deleteCSVFile(file.getOwnerEmail(), file.getFileName(), true)" class="btn-xs btn-primary" role="button" id="delete" onclick="return confirm('Are you sure to delete?')">Delete</a>
+    			<a href="@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.moveDataFile(file.getOwnerEmail(), file.getFileName())" class="btn-xs btn-primary" role="button">Move to Unprocessed Folder</a>
+    			<a href="@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.deleteDataFile(file.getOwnerEmail(), file.getFileName(), true)" class="btn-xs btn-primary" role="button" id="delete" onclick="return confirm('Are you sure to delete?')">Delete</a>
     			<a href="@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.checkAnnotationLog(file.getFileName())" class="btn-xs btn-primary" role="button">Logs</a>
-    			<a href="@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.downloadCSVFile(file.getFileName(), true)" class="btn-xs btn-primary" role="button">Download</a>
+    			<a href="@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.downloadDataFile(file.getFileName(), true)" class="btn-xs btn-primary" role="button">Download</a>
     			@if(bAdmin) {
     				<a href="@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.assignFileOwner(file.getOwnerEmail(), file.getFileName())" class="btn-xs btn-primary" role="button">Assign Owner</a>
     			}
@@ -117,7 +117,7 @@
 	<table class="table">
 	<thead>
          <tr>
-            <th>Unprocessed CSV Files</th>
+            <th>Unprocessed Data Files</th>
             @if(bAdmin) {
             	<th>Owner Email</th>
             }
@@ -134,9 +134,9 @@
     			}
     			<td>@file.getUploadTime()</td>
     			<td>
-    			<a href="@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.deleteCSVFile(file.getOwnerEmail(), file.getFileName(), false)" class="btn-xs btn-primary" role="button" id="delete" onclick="return confirm('Are you sure to delete?')">Delete</a>
+    			<a href="@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.deleteDataFile(file.getOwnerEmail(), file.getFileName(), false)" class="btn-xs btn-primary" role="button" id="delete" onclick="return confirm('Are you sure to delete?')">Delete</a>
     			<a href="@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.checkAnnotationLog(file.getFileName())" class="btn-xs btn-primary" role="button">Logs</a>
-    			<a href="@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.downloadCSVFile(file.getFileName(), false)" class="btn-xs btn-primary" role="button">Download</a>
+    			<a href="@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.downloadDataFile(file.getFileName(), false)" class="btn-xs btn-primary" role="button">Download</a>
     			@if(bAdmin) {
     				<a href="@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.assignFileOwner(file.getOwnerEmail(), file.getFileName())" class="btn-xs btn-primary" role="button">Assign Owner</a>
     			}
