@@ -35,6 +35,7 @@ import org.joda.time.format.DateTimeFormatter;
 import org.joda.time.format.ISODateTimeFormat;
 
 import play.Play;
+import scala.reflect.internal.Types.TypeRef;
 
 public class DataAcquisition {
 	@Field("uri")
@@ -70,15 +71,17 @@ public class DataAcquisition {
 	@Field("entity_uri")
 	private List<String> entityUri;
 	@Field("type")
-	private List<String> type;
+	private List<String> types;
 	@Field("type_uri")
-	private List<String> typeUri;
+	private List<String> typeURIs;
 	@Field("characteristic")
 	private List<String> characteristic;
 	@Field("characteristic_uri")
 	private List<String> characteristicUri;
 	@Field("study_uri")
 	private String studyUri;
+	@Field("method_uri")
+	private String methodUri;
 	@Field("schema_uri")
 	private String schemaUri;
 	@Field("deployment_uri")
@@ -122,8 +125,8 @@ public class DataAcquisition {
 		characteristicUri = new ArrayList<String>();
 		entity = new ArrayList<String>();
 		entityUri = new ArrayList<String>();
-		type = new ArrayList<String>();
-		typeUri = new ArrayList<String>();
+		types = new ArrayList<String>();
+		typeURIs = new ArrayList<String>();
 	}
 
 	public String getElevation() {
@@ -255,6 +258,26 @@ public class DataAcquisition {
 		}
 		return "";
 	}
+	public int getTriggeringEventByName(String name) {
+		switch (name) {
+			case TriggeringEvent.INITIAL_DEPLOYMENT_NAME:
+				return TriggeringEvent.INITIAL_DEPLOYMENT;
+			case TriggeringEvent.LEGACY_DEPLOYMENT_NAME:
+				return TriggeringEvent.LEGACY_DEPLOYMENT;
+			case TriggeringEvent.CHANGED_CONFIGURATION_NAME:
+				return TriggeringEvent.CHANGED_CONFIGURATION;
+			case TriggeringEvent.CHANGED_OWNERSHIP_NAME:
+				return TriggeringEvent.CHANGED_OWNERSHIP;
+			case TriggeringEvent.AUTO_CALIBRATION_NAME:
+				return TriggeringEvent.AUTO_CALIBRATION;
+			case TriggeringEvent.SUSPEND_DATA_ACQUISITION_NAME:
+				return TriggeringEvent.SUSPEND_DATA_ACQUISITION;
+			case TriggeringEvent.RESUME_DATA_ACQUISITION_NAME:
+				return TriggeringEvent.RESUME_DATA_ACQUISITION;
+		}
+		
+		return -1;
+	}
 	
 	public String getStartedAt() {
 		DateTimeFormatter formatter = ISODateTimeFormat.dateTime();
@@ -364,6 +387,12 @@ public class DataAcquisition {
 			this.characteristicUri.add(characteristicUri);
 		}
 	}
+	public String getMethodUri() {
+		return methodUri;
+	}
+	public void setMethodUri(String methodUri) {
+		this.methodUri = methodUri;
+	}
 	public String getSchemaUri() {
 		return schemaUri;
 	}
@@ -420,9 +449,36 @@ public class DataAcquisition {
 		}
 		this.datasetUri.add(dataset_uri);
 	}
+	public void deleteDatasetUri(String dataset_uri) {
+		Iterator<String> iter = datasetUri.iterator();
+		while (iter.hasNext()){
+			if (iter.next().equals(dataset_uri)) {
+				iter.remove();
+			}
+		}
+	}
+	public void deleteAllDatasetURIs() {
+		datasetUri.clear();
+	}
 	public boolean containsDataset(String uri) {
 		return datasetUri.contains(uri);
 	}
+	
+	public List<String> getTypeURIs() {
+		return typeURIs;
+	}
+	public void setTypeURIs(List<String> typeURIs) {
+		this.typeURIs = typeURIs;
+	}
+	public void addTypeUri(String type_uri) {
+		for (String uri : typeURIs) {
+			if (uri.equals(type_uri)) {
+				return;
+			}
+		}
+		typeURIs.add(type_uri);
+	}
+	
 	public void addNumberDataPoints(long number) {
 		numberDataPoints += number;
 	}

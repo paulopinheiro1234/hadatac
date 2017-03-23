@@ -131,4 +131,13 @@ public class DataFactory {
     	}
     	return host + "/hadatac/kb/" + category + "/" + CONSOLE_ID + "/" + metadataId ;   
     }
+    
+    public static String getNextDatasetURI(String base) {
+    	String metadataId = Long.toHexString(DataFactory.getNextDynamicMetadataId());
+    	for (int i = metadataId.length(); i <= 8; i++) {
+    		metadataId = "0" + metadataId;
+    	}
+    	
+    	return base + "/" + metadataId ;   
+    }
 }

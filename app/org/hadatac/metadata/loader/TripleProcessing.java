@@ -249,36 +249,58 @@ public class TripleProcessing {
 					dataAcquisition.setOwnerUri(ownerUri);
 					dataAcquisition.setPermissionUri(ownerUri);
 					dataAcquisition.setTriggeringEvent(TriggeringEvent.INITIAL_DEPLOYMENT);
-					dataAcquisition.setNumberDataPoints(Measurement.getNumByDataAcquisitionUri(
-							dataAcquisition.getUri()));
+					dataAcquisition.setNumberDataPoints(
+							Measurement.getNumByDataAcquisition(dataAcquisition));
 				}
 				
 				for (PlainTriple triple : sheet.get(uri)) {
 					String cellValue = triple.obj.trim();
 					String predicate = triple.pred.trim();
 					
-					if(predicate.equals("rdfs:label")){
+					if (predicate.equals("a")) {
+						StringTokenizer st;
+						if(cellValue.contains("&")){
+							st = new StringTokenizer(cellValue, "&");
+						}
+						else{
+							st = new StringTokenizer(cellValue, ",");
+						}
+						while (st.hasMoreTokens()) {
+							dataAcquisition.addTypeUri(
+									cellProc.convertToWholeURI(st.nextToken().trim()));
+						}
+					}
+					else if (predicate.equals("rdfs:label")) {
 						dataAcquisition.setLabel(cellValue);
 					}
-					else if(predicate.equals("rdfs:comment")){
+					else if (predicate.equals("rdfs:comment")) {
 						dataAcquisition.setComment(cellValue);
 					}
-					else if(predicate.equals("prov:startedAtTime")){
+					else if (predicate.equals("prov:startedAtTime")) {
 						dataAcquisition.setStartedAt(cellValue);
 					}
-					else if(predicate.equals("prov:endedAtTime")){
+					else if (predicate.equals("prov:endedAtTime")) {
 						dataAcquisition.setEndedAt(cellValue);
 					}
-					else if(predicate.equals("prov:used")){
+					else if (predicate.equals("prov:used")) {
 						dataAcquisition.setParameter(cellValue);
 					}
-					else if(predicate.equals("prov:wasAssociatedWith")){
+					else if (predicate.equals("prov:wasAssociatedWith")) {
 						dataAcquisition.setAssociatedUri(cellProc.convertToWholeURI(cellValue));
 					}
-					else if(predicate.equals("hasco:isDataAcquisitionOf")){
+					else if (predicate.equals("hasco:isDataAcquisitionOf")) {
 						dataAcquisition.setStudyUri(cellProc.convertToWholeURI(cellValue));
 					}
-					else if(predicate.equals("hasneto:hasDeployment")){
+					else if (predicate.equals("hasco:hasTriggeringEvent")) {
+						dataAcquisition.setTriggeringEvent(dataAcquisition.getTriggeringEventByName(cellValue));
+					}
+					else if (predicate.equals("hasco:hasMethod")) {
+						dataAcquisition.setMethodUri(cellProc.convertToWholeURI(cellValue));
+					}
+					else if (predicate.equals("hasco:hasSchema")) {
+						dataAcquisition.setSchemaUri(cellProc.convertToWholeURI(cellValue));
+					}
+					else if (predicate.equals("hasneto:hasDeployment")) {
 						String deployment_uri = cellProc.convertToWholeURI(cellValue);
 						dataAcquisition.setDeploymentUri(deployment_uri);
 						
@@ -290,9 +312,6 @@ public class TripleProcessing {
 							dataAcquisition.setInstrumentModel(deployment.getInstrument().getLabel());
 							dataAcquisition.setStartedAtXsdWithMillis(deployment.getStartedAt());
 						}
-					}
-					else if (predicate.equals("hasco:hasSchema")) {
-						dataAcquisition.setSchemaUri(cellProc.convertToWholeURI(cellValue));
 					}
 				}
 				

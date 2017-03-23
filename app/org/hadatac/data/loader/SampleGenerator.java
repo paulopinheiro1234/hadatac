@@ -24,12 +24,12 @@ import org.hadatac.utils.NameSpaces;
 
 public class SampleGenerator {
 	final String kbPrefix = "chear-kb:";
-	String dataAcquisition = "";
-	Iterable<CSVRecord> records = null;
-	CSVRecord rec = null;
-	int counter = 1; //starting index number
-	private List< Map<String, Object> > rows = new ArrayList<Map<String,Object>>();
-	HashMap<String, String> mapCol = new HashMap<String, String>();
+	private String dataAcquisition = "";
+	private Iterable<CSVRecord> records = null;
+	private CSVRecord rec = null;
+	private int counter = 1; //starting index number
+	private List< Map<String, Object> > rows = new ArrayList<Map<String, Object>>();
+	private HashMap<String, String> mapCol = new HashMap<String, String>();
 	
 	public SampleGenerator(File file) {
 		try {

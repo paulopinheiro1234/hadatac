@@ -83,12 +83,10 @@ public class FileProcessing extends Controller {
     	try {
 			handler = mapper.readValue(handler_json, CSVAnnotationHandler.class);
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 			return ok (uploadCSV.render(null, "fail", "Lost deployment information."));
 		} 
     	
-    	//System.out.println("uploadFile CALLED!");
         MultipartFormData body = request().body().asMultipartFormData();
 		FilePart uploadedfile = body.getFile("pic");
 		if (uploadedfile != null) {

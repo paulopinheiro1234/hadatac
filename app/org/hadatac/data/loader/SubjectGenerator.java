@@ -19,17 +19,16 @@ import org.apache.jena.query.ResultSet;
 import org.apache.jena.query.ResultSetFactory;
 import org.apache.jena.query.ResultSetRewindable;
 import org.apache.jena.rdf.model.Literal;
-import org.hadatac.console.controllers.metadata.DynamicFunctions;
 import org.hadatac.utils.Collections;
+import org.hadatac.utils.NameSpaces;
 
 public class SubjectGenerator {
 	final String kbPrefix = "chear-kb:";
-	String dataAcquisition = "";
-	Iterable<CSVRecord> records = null;
-	CSVRecord rec = null;
-	int counter = 1; //starting index number
-	private List< Map<String, Object> > rows = new ArrayList<Map<String,Object>>();
-	HashMap<String, Integer> mapCol = new HashMap<String, Integer>();
+	private Iterable<CSVRecord> records = null;
+	private CSVRecord rec = null;
+	private int counter = 1; //starting index number
+	private List< Map<String, Object> > rows = new ArrayList<Map<String, Object>>();
+	private HashMap<String, String> mapCol = new HashMap<String, String>();
 	
 	public SubjectGenerator(File file) {
 		try {
@@ -44,25 +43,28 @@ public class SubjectGenerator {
 	
 	private void initMapping() {
 		mapCol.clear();
-        mapCol.put("subjectID", 0);
-        mapCol.put("pilotNum", 3);
+        mapCol.put("subjectID", "patient_id");
+        mapCol.put("pilotNum", "project_id");
 	}
 	
 	private int getSubjectCount(String pilotNum){
-		int count=0;
-		String subjectCountQuery = DynamicFunctions.getPrefixes() + "SELECT (count(DISTINCT ?subjectURI) as ?subjectCount) WHERE {?subjectURI hasco:isSubjectOf chear-kb:CH-Pilot-" + pilotNum + " . }";
+		int count = 0;
+		String subjectCountQuery = NameSpaces.getInstance().printSparqlNameSpaceList() 
+				+ " SELECT (count(DISTINCT ?subjectURI) as ?subjectCount) WHERE { "
+				+ " ?subjectURI hasco:isSubjectOf chear-kb:CH-Pilot-" + pilotNum + " . }";
 		QueryExecution qexecSubject = QueryExecutionFactory.sparqlService(Collections.getCollectionsName(Collections.METADATA_SPARQL), subjectCountQuery);
 		ResultSet subjectResults = qexecSubject.execSelect();
 		ResultSetRewindable resultsrwSubject = ResultSetFactory.copyResults(subjectResults);
-		if(resultsrwSubject.hasNext()){
+		qexecSubject.close();
+		
+		if (resultsrwSubject.hasNext()) {
 			QuerySolution soln = resultsrwSubject.next();
 			Literal countLiteral = (Literal) soln.get("subjectCount");
-			if(countLiteral!=null){
-				int value = countLiteral.getInt();
-				count += value;
+			if(countLiteral != null){
+				count += countLiteral.getInt();
 			}
 		}
-		qexecSubject.close();
+		
 		return count;
 	}
 	
@@ -97,33 +99,35 @@ public class SubjectGenerator {
     }
     
     public List< Map<String, Object> > createRows() {
-    	List< Map<String, Object> > subjectRows = new ArrayList< Map<String, Object> >();
     	for (CSVRecord record : records) {
     		rec = record;
-    		subjectRows.add(createRow());
+    		rows.add(createRow());
     	}
-    	this.rows=subjectRows;
-    	return subjectRows;
+
+    	return rows;
     }
     
     public String toString() {
-    	String result = "";
-    	if(!rows.isEmpty()){
-	    	result = String.join("\t", rows.get(0).keySet());
-	    	for (Map<String, Object> row : rows) {
-	    		List<String> values = new ArrayList<String>();
-	    		for (String colName : rows.get(0).keySet()) {
-	    			if (row.containsKey(colName)) {
-	    				values.add((String)row.get(colName));
-	    			}
-	    			else {
-	    				values.add("");
-	    			}
-	    		}
-	    		result += "\n";
-	    		result += String.join("\t", values);
-	    	}
+    	if(rows.isEmpty()){
+    		return "";
     	}
+    	
+    	String result = "";
+    	result = String.join(",", rows.get(0).keySet());
+    	for (Map<String, Object> row : rows) {
+    		List<String> values = new ArrayList<String>();
+    		for (String colName : rows.get(0).keySet()) {
+    			if (row.containsKey(colName)) {
+    				values.add((String)row.get(colName));
+    			}
+    			else {
+    				values.add("");
+    			}
+    		}
+    		result += "\n";
+    		result += String.join(",", values);
+    	}
+    	
     	return result;
     }
 }

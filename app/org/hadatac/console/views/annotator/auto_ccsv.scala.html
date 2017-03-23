@@ -96,8 +96,8 @@
     			<td>@file.getUploadTime()</td>
     			<td>@file.getProcessTime()</td>
     			<td>
-    			<a href="@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.moveDataFile(file.getOwnerEmail(), file.getFileName())" class="btn-xs btn-primary" role="button">Move to Unprocessed Folder</a>
-    			<a href="@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.deleteDataFile(file.getOwnerEmail(), file.getFileName(), true)" class="btn-xs btn-primary" role="button" id="delete" onclick="return confirm('Are you sure to delete?')">Delete</a>
+    			<a href="@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.moveDataFile(file.getFileName())" class="btn-xs btn-primary" role="button" onclick="return confirm('Are you sure to move? If so, the ingested data from this file will be deleted as well!')" >Move to Unprocessed Folder</a>
+    			<a href="@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.deleteDataFile(file.getFileName(), true)" class="btn-xs btn-primary" role="button" id="delete" onclick="return confirm('Are you sure to delete? If so, the ingested data from this file will be deleted as well!')">Delete</a>
     			<a href="@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.checkAnnotationLog(file.getFileName())" class="btn-xs btn-primary" role="button">Logs</a>
     			<a href="@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.downloadDataFile(file.getFileName(), true)" class="btn-xs btn-primary" role="button">Download</a>
     			@if(bAdmin) {
@@ -134,7 +134,7 @@
     			}
     			<td>@file.getUploadTime()</td>
     			<td>
-    			<a href="@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.deleteDataFile(file.getOwnerEmail(), file.getFileName(), false)" class="btn-xs btn-primary" role="button" id="delete" onclick="return confirm('Are you sure to delete?')">Delete</a>
+    			<a href="@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.deleteDataFile(file.getFileName(), false)" class="btn-xs btn-primary" role="button" id="delete" onclick="return confirm('Are you sure to delete?')">Delete</a>
     			<a href="@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.checkAnnotationLog(file.getFileName())" class="btn-xs btn-primary" role="button">Logs</a>
     			<a href="@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.downloadDataFile(file.getFileName(), false)" class="btn-xs btn-primary" role="button">Download</a>
     			@if(bAdmin) {

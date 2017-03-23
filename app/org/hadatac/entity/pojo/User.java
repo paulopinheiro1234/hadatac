@@ -328,7 +328,6 @@ public class User implements Comparable<User> {
 		}
 		
 		String command = "";
-		System.out.println("group_uri is " + group_uri);
 		if(group_uri.equals("Public")){
 			command = "DELETE { <" + uri + "> <http://hadatac.org/ont/hadatac#isMemberOfGroup> \"" + group_uri + "\" .  } \n"
 					+ "INSERT { <" + uri + "> <http://hadatac.org/ont/hadatac#isMemberOfGroup> \"" + group_uri + "\" . } \n "
@@ -340,7 +339,6 @@ public class User implements Comparable<User> {
 					+ "WHERE { } \n";
 		}
 		
-		System.out.println(command);
 		UpdateRequest req = UpdateFactory.create(command);
 		UpdateProcessor processor = UpdateExecutionFactory.createRemote(
 				req, Collections.getCollectionsName(Collections.PERMISSIONS_UPDATE));
@@ -370,7 +368,6 @@ public class User implements Comparable<User> {
 		String queryString = "";
 		queryString += NameSpaces.getInstance().printSparqlNameSpaceList();
 		queryString += "DELETE WHERE { <" + uri + "> ?p ?o . } ";
-		System.out.println(queryString);
 		UpdateRequest req = UpdateFactory.create(queryString);
 		UpdateProcessor processor = UpdateExecutionFactory.createRemote(
 				req, Collections.getCollectionsName(Collections.PERMISSIONS_UPDATE));

@@ -101,7 +101,7 @@ public class DeleteDataAcquisition extends Controller {
     		
     		dc = DataAcquisition.findByUri(uri);
     		if (!dc.deleteMeasurementData()) {
-    			dc.setNumberDataPoints(Measurement.getNumByDataAcquisitionUri(dc.getUri()));
+    			dc.setNumberDataPoints(Measurement.getNumByDataAcquisition(dc));
     			dc.save();
     			return badRequest("Measurement data in this data acquisition failed to be deleted.");
     		}
