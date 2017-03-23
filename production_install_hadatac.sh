@@ -61,3 +61,18 @@ wait $!
 cp $HADATAC_DOWNLOAD/jts-1.13/lib/* $HADATAC_SOLR/solr-5.2.1/server/solr-webapp/webapp/WEB-INF/lib/
 
 sh $HADATAC_SOLR/run_solr5.sh restart
+
+echo "=== Installing puppet..."
+apt-get install puppet
+wait $!
+
+echo "=== Installing puppetlabs-stdlib --version 4.14.0..."
+puppet module install puppetlabs-stdlib --version 4.14.0
+wait $!
+
+echo "=== Installing maestrodev-wget --version 1.7.3..."
+puppet module install maestrodev-wget --version 1.7.3
+wait $!
+
+echo "=== Installing blazegraph using puppet..."
+puppet apply blazegraph.pp
