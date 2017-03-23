@@ -23,7 +23,7 @@ HADATAC_HOST=$(hostname --long)
 case $HADATAC_HOST in
     "chear.tw.rpi.edu")
         SOLR_HOME="/data/hadatac-solr/solr" 
-        GIT_HOME="/data/hadatac" ;;
+        GIT_HOME="/data/git/hadatac" ;;
     "chear-test.tw.rpi.edu")
         SOLR_HOME="/data/hadatac-solr/solr"  
         GIT_HOME="/data/git/hadatac";;
