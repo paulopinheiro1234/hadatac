@@ -270,6 +270,19 @@ public class TripleProcessing {
 									cellProc.convertToWholeURI(st.nextToken().trim()));
 						}
 					}
+					else if (predicate.equals("prov:wasAssociatedWith")) {
+						StringTokenizer st;
+						if(cellValue.contains("&")){
+							st = new StringTokenizer(cellValue, "&");
+						}
+						else{
+							st = new StringTokenizer(cellValue, ",");
+						}
+						while (st.hasMoreTokens()) {
+							dataAcquisition.addAssociatedUri(
+									cellProc.convertToWholeURI(st.nextToken().trim()));
+						}
+					}
 					else if (predicate.equals("rdfs:label")) {
 						dataAcquisition.setLabel(cellValue);
 					}
@@ -284,9 +297,6 @@ public class TripleProcessing {
 					}
 					else if (predicate.equals("prov:used")) {
 						dataAcquisition.setParameter(cellValue);
-					}
-					else if (predicate.equals("prov:wasAssociatedWith")) {
-						dataAcquisition.setAssociatedUri(cellProc.convertToWholeURI(cellValue));
 					}
 					else if (predicate.equals("hasco:isDataAcquisitionOf")) {
 						dataAcquisition.setStudyUri(cellProc.convertToWholeURI(cellValue));

@@ -10,10 +10,10 @@
 	<field name="nr_data_points" type="long" stored="true" indexed="true" docValues="true" />
     <field name="_version_" type="long" indexed="true" stored="true"/>
     <field name="_text_" type="text_general" indexed="true" stored="false" multiValued="true" />
-    <field name="label" type="string" indexed="true" docValues="true" multiValued="true" />
-    <field name="comment" type="string" indexed="true" docValues="true" multiValued="true" />
+    <field name="label" type="string" indexed="true" docValues="true" />
+    <field name="comment" type="string" indexed="true" docValues="true" />
     <field name="used_uri" type="string" indexed="true" docValues="true" multiValued="true" />
-    <field name="was_associated_with_uri" type="string" indexed="true" docValues="true" multiValued="true" />
+    <field name="associated_uri" type="string" indexed="true" docValues="true" multiValued="true" />
     <field name="started_at" type="date" indexed="true" stored="true" docValues="true" default="NULL" />
     <field name="ended_at" type="date" indexed="true" stored="true" docValues="true" default="NULL" />
     <field name="unit" type="string" indexed="true" docValues="true" multiValued="true" />

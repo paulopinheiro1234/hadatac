@@ -87,6 +87,9 @@ public class ValueCellProcessing {
 	}
 	
 	public String replaceNameSpaceEx(String str) {
+		if (null == str) {
+			return "";
+		}
 		String resp = str;
 	    for (Map.Entry<String, NameSpace> entry : NameSpaces.getInstance().table.entrySet()) {
 	        String abbrev = entry.getKey().toString();

@@ -13,12 +13,15 @@ import java.util.Map;
 
 import play.mvc.Controller;
 import play.mvc.Result;
+import play.twirl.api.Html;
 import play.data.*;
 
+import org.hadatac.console.views.html.*;
 import org.hadatac.console.views.html.deployments.*;
 import org.hadatac.console.views.html.triplestore.syncLabkey;
 import org.hadatac.console.controllers.deployments.routes;
 import org.hadatac.data.api.DataFactory;
+import org.hadatac.entity.pojo.DataAcquisition;
 import org.hadatac.entity.pojo.Deployment;
 import org.hadatac.entity.pojo.Detector;
 import org.hadatac.entity.pojo.Instrument;
@@ -28,6 +31,7 @@ import org.hadatac.metadata.loader.LabkeyDataHandler;
 import org.hadatac.metadata.loader.ValueCellProcessing;
 import org.hadatac.utils.ConfigProp;
 import org.labkey.remoteapi.CommandException;
+import org.labkey.remoteapi.query.SaveRowsResponse;
 
 import be.objectify.deadbolt.java.actions.Group;
 import be.objectify.deadbolt.java.actions.Restrict;
@@ -37,6 +41,7 @@ import org.hadatac.console.models.SparqlQuery;
 import org.hadatac.console.models.SparqlQueryResults;
 import org.hadatac.console.models.SysUser;
 import org.hadatac.console.controllers.AuthApplication;
+import org.hadatac.console.controllers.dataacquisitionmanagement.DataAcquisitionManagement;
 import org.hadatac.console.controllers.triplestore.UserManagement;
 import org.hadatac.console.controllers.deployments.NewDeployment;
 
@@ -91,7 +96,7 @@ public class NewDeployment extends Controller {
     	final SysUser user = AuthApplication.getLocalUser(session());
         Form<DeploymentForm> form = Form.form(DeploymentForm.class).bindFromRequest();
         if (form.hasErrors()) {
-            return badRequest();
+        	return badRequest("The submitted form has errors!");
         }
         
         DeploymentForm data = form.get();
@@ -105,7 +110,7 @@ public class NewDeployment extends Controller {
 	        DateFormat isoFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
 	        dateString = isoFormat.format(dateFromJs);
 		} catch (ParseException e) {
-			e.printStackTrace();
+			return badRequest("Cannot parse data " + dateStringFromJs);
 		}
 
         String deploymentUri = data.getUri();
@@ -120,52 +125,30 @@ public class NewDeployment extends Controller {
         }
         String dataAcquisitionUri = data.getDataAcquisitionUri();
         String param = data.getInitialParameter();
-        DataFactory.createDataAcquisition(triggeringEvent, dataAcquisitionUri, deploymentUri, 
+        DataAcquisition dataAcquisition = DataFactory.createDataAcquisition(
+        		triggeringEvent, dataAcquisitionUri, deploymentUri, 
         		param, UserManagement.getUriByEmail(user.getEmail()));
         
         String user_name = session().get("LabKeyUserName");
         String password = session().get("LabKeyPassword");
         if (user_name != null && password != null) {
         	try {
-        		saveToLabKey(deployment);
+        		int nRowsOfDeployment = deployment.saveToLabKey(
+        				session().get("LabKeyUserName"), session().get("LabKeyPassword"));
+        		int nRowsOfDA = dataAcquisition.saveToLabKey(
+        				session().get("LabKeyUserName"), session().get("LabKeyPassword"));
+        		deployment.save();
+        		dataAcquisition.save();
+		    	return ok(main.render("Results,", "", new Html("<h3>" 
+		    			+ String.format("%d row(s) have been inserted in Table \"Deployment\" \n", nRowsOfDeployment) 
+		    			+ String.format("%d row(s) have been inserted in Table \"DataAcquisition\"", nRowsOfDA)
+		    			+ "</h3>")));
         	} catch (CommandException e) {
-        		return badRequest("Failed to insert Deployment to LabKey!");
+        		return badRequest("Failed to insert Deployment to LabKey!\n"
+						+ "Error Message: " + e.getMessage());
 			}
         }
         
         return ok(deploymentConfirm.render("New Deployment", data));
-    }
-    
-    @Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
-    public static void saveToLabKey(Deployment deployment) throws CommandException {
-    	if (null == deployment) {
-    		return;
-    	}
-    	
-		String site = ConfigProp.getPropertyValue("labkey.config", "site");
-        String path = "/" + ConfigProp.getPropertyValue("labkey.config", "folder");
-        
-    	LabkeyDataHandler loader = new LabkeyDataHandler(
-    			site, session().get("LabKeyUserName"), session().get("LabKeyPassword"), path);
-    	
-    	ValueCellProcessing cellProc = new ValueCellProcessing();
-    	List<String> detectorURIs = new ArrayList<String>();
-    	for (Detector detector : deployment.getDetectors()) {
-    		detectorURIs.add(cellProc.replaceNameSpaceEx(detector.getUri()));
-    	}
-    	String detectors = String.join(", ", detectorURIs);
-    	
-    	List< Map<String, Object> > rows = new ArrayList< Map<String, Object> >();
-    	Map<String, Object> row = new HashMap<String, Object>();
-    	row.put("hasURI", cellProc.replaceNameSpaceEx(deployment.getUri()));
-    	row.put("a", "vstoi:Deployment");
-    	row.put("vstoi:hasPlatform", cellProc.replaceNameSpaceEx(deployment.getPlatform().getUri()));
-    	row.put("hasneto:hasInstrument", cellProc.replaceNameSpaceEx(deployment.getInstrument().getUri()));
-    	row.put("hasneto:hasDetector", detectors);
-    	row.put("prov:startedAtTime", deployment.getStartedAt());
-    	row.put("prov:endedAtTime", deployment.getEndedAt());
-    	rows.add(row);
-    	
-    	loader.insertRows("Deployment", rows);
     }
 }

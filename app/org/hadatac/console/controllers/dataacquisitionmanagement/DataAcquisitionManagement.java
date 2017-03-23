@@ -19,7 +19,9 @@ import java.util.Map;
 import play.data.Form;
 import play.mvc.Controller;
 import play.mvc.Result;
+import play.twirl.api.Html;
 
+import org.hadatac.console.views.html.main;
 import org.hadatac.console.views.html.dataacquisitionmanagement.*;
 import org.hadatac.entity.pojo.DataAcquisition;
 import org.hadatac.entity.pojo.DataAcquisitionSchema;
@@ -138,43 +140,6 @@ public class DataAcquisitionManagement extends Controller {
     	da.save();
         
         return redirect(routes.DataAcquisitionManagement.index(State.ACTIVE));
-    }
-    
-    @Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
-    public static void saveToLabKey(DataAcquisition dataAcquisition) throws CommandException {
-    	if (null == dataAcquisition) {
-    		return;
-    	}
-    	
-		String site = ConfigProp.getPropertyValue("labkey.config", "site");
-        String path = "/" + ConfigProp.getPropertyValue("labkey.config", "folder");
-        
-    	LabkeyDataHandler loader = new LabkeyDataHandler(
-    			site, session().get("LabKeyUserName"), session().get("LabKeyPassword"), path);
-    	
-    	ValueCellProcessing cellProc = new ValueCellProcessing();
-    	List<String> abbrevURIs = new ArrayList<String>();
-    	for (String uri : dataAcquisition.getTypeURIs()) {
-    		abbrevURIs.add(cellProc.replaceNameSpaceEx(uri));
-    	}
-    	
-    	List< Map<String, Object> > rows = new ArrayList< Map<String, Object> >();
-    	Map<String, Object> row = new HashMap<String, Object>();
-    	row.put("a", String.join(", ", abbrevURIs));
-    	row.put("hasURI", cellProc.replaceNameSpaceEx(dataAcquisition.getUri()));
-    	row.put("rdfs:label", dataAcquisition.getLabel());
-    	row.put("rdfs:comment", dataAcquisition.getComment());
-    	row.put("prov:startedAtTime", dataAcquisition.getStartedAt());
-    	row.put("prov:endedAtTime", dataAcquisition.getEndedAt());
-    	row.put("prov:used", dataAcquisition.getParameter());
-    	row.put("prov:wasAssociatedWith", cellProc.replaceNameSpaceEx(dataAcquisition.getAssociatedUri()));
-    	row.put("hasneto:hasDeployment", cellProc.replaceNameSpaceEx(dataAcquisition.getDeploymentUri()));
-    	row.put("hasco:isDataAcquisitionOf", cellProc.replaceNameSpaceEx(dataAcquisition.getStudyUri()));
-    	row.put("hasco:hasSchema", cellProc.replaceNameSpaceEx(dataAcquisition.getSchemaUri()));
-    	row.put("hasco:hasTriggeringEvent", dataAcquisition.getTriggeringEventName());
-    	rows.add(row);
-    	
-    	loader.insertRows("Deployment", rows);
     }
 }
 

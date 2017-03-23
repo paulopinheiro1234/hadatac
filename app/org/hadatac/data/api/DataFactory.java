@@ -47,7 +47,6 @@ public class DataFactory {
 		dataAcquisition.setInstrumentModel(deployment.getInstrument().getLabel());
 		dataAcquisition.setStartedAtXsdWithMillis(deployment.getStartedAt());
 		dataAcquisition.setDeploymentUri(deploymentUri);
-		dataAcquisition.save();
 		
 		return dataAcquisition;
 	}
@@ -72,7 +71,6 @@ public class DataFactory {
 			deployment.getDetectors().add(Detector.find(detectorUri.get(i)));
 		}
 		deployment.setStartedAtXsd(startedAt);
-		deployment.save();
 		
 		return deployment;
 	}

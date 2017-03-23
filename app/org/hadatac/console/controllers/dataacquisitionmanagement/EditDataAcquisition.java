@@ -14,10 +14,13 @@ import java.util.Map;
 import play.data.Form;
 import play.mvc.Controller;
 import play.mvc.Result;
+import play.twirl.api.Html;
 
 import org.hadatac.console.controllers.AuthApplication;
+import org.hadatac.console.controllers.dataacquisitionmanagement.routes;
 import org.hadatac.console.models.DataAcquisitionForm;
 import org.hadatac.console.models.SysUser;
+import org.hadatac.console.views.html.*;
 import org.hadatac.console.views.html.dataacquisitionmanagement.*;
 import org.hadatac.entity.pojo.DataAcquisition;
 import org.hadatac.entity.pojo.DataAcquisitionSchema;
@@ -25,6 +28,7 @@ import org.hadatac.entity.pojo.TriggeringEvent;
 import org.hadatac.entity.pojo.User;
 import org.hadatac.entity.pojo.UserGroup;
 import org.hadatac.metadata.loader.ValueCellProcessing;
+import org.labkey.remoteapi.CommandException;
 
 import be.objectify.deadbolt.java.actions.Group;
 import be.objectify.deadbolt.java.actions.Restrict;
@@ -33,8 +37,14 @@ public class EditDataAcquisition extends Controller {
 	
 	@Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
     public static Result index(String uri, boolean bChangeParam) {
+    	if ((session().get("LabKeyUserName") == null 
+    			|| session().get("LabKeyPassword") == null)
+    			&& bChangeParam) {
+    		return redirect(org.hadatac.console.controllers.triplestore.routes.LoadKB.logInLabkey(
+    				routes.EditDataAcquisition.index(uri, bChangeParam).url()));
+    	}
+    	
 		DataAcquisition dataAcquisition = new DataAcquisition();
-		
 		ValueCellProcessing cellProc = new ValueCellProcessing();
 		List<DataAcquisitionSchema> schemas = DataAcquisitionSchema.findAll();
 		for (DataAcquisitionSchema schema : schemas) {
@@ -94,14 +104,18 @@ public class EditDataAcquisition extends Controller {
         
         DataAcquisition da = DataAcquisition.findByUri(acquisitionUri);
         if (!data.getNewDataAcquisitionUri().equals("")) {
+            if (null != DataAcquisition.findByUri(data.getNewDataAcquisitionUri())) {
+            	return badRequest("Data acquisition with this uri already exists!");
+            }
+            
         	// Create new data acquisition
-            String strStateDate = "";
+            String strStartDate = "";
             String strEndDate = "";
             DateFormat jsFormat = new SimpleDateFormat("MM/dd/yyyy HH:mm a");
             DateFormat isoFormat = new SimpleDateFormat("EEE MMM dd HH:mm:ss zzz yyyy");
     		try {
     			Date startDate = jsFormat.parse(data.getNewStartDate());
-    			strStateDate = isoFormat.format(startDate);
+    			strStartDate = isoFormat.format(startDate);
     			if (!data.getNewEndDate().equals("")) {
     				Date endDate = jsFormat.parse(data.getNewEndDate());
     				strEndDate = isoFormat.format(endDate);
@@ -113,12 +127,21 @@ public class EditDataAcquisition extends Controller {
         	da.setNumberDataPoints(0);
         	da.setTriggeringEvent(TriggeringEvent.CHANGED_CONFIGURATION);
         	da.setParameter(data.getNewParameter());
-        	da.setStartedAt(strStateDate);
+        	da.setStartedAt(strStartDate);
         	if (!strEndDate.equals("")) {
-        		da.setStartedAt(strEndDate);
+        		da.setEndedAt(strEndDate);
         	}
-        	da.save();
-        	return ok(editDataAcquisitionConfirm.render(da, changedInfos, sysUser.isDataManager()));
+        	try {
+				int nRowsAffected = da.saveToLabKey(
+						session().get("LabKeyUserName"), session().get("LabKeyPassword"));
+				da.save();
+		    	return ok(main.render("Results,", "", new Html("<h3>" 
+		    			+ String.format("%d row(s) have been inserted in Table \"DataAcquisition\"", nRowsAffected) 
+		    			+ "</h3>")));
+			} catch (CommandException e) {
+				return badRequest("Failed to insert new data acquisition to LabKey!\n"
+						+ "Error Message: " + e.getMessage());
+			}
         }
         
         // Update current data acquisition

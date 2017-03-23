@@ -3,8 +3,10 @@ package org.hadatac.entity.pojo;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.jena.query.Query;
 import org.apache.jena.query.QueryExecution;
@@ -24,8 +26,11 @@ import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.client.solrj.response.UpdateResponse;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
+import org.hadatac.console.controllers.AuthApplication;
+import org.hadatac.metadata.loader.LabkeyDataHandler;
 import org.hadatac.metadata.loader.ValueCellProcessing;
 import org.hadatac.utils.Collections;
+import org.hadatac.utils.ConfigProp;
 import org.hadatac.utils.NameSpaces;
 import org.hadatac.utils.State;
 import org.joda.time.DateTime;
@@ -33,9 +38,11 @@ import org.joda.time.DateTimeZone;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 import org.joda.time.format.ISODateTimeFormat;
+import org.labkey.remoteapi.CommandException;
 
+import be.objectify.deadbolt.java.actions.Group;
+import be.objectify.deadbolt.java.actions.Restrict;
 import play.Play;
-import scala.reflect.internal.Types.TypeRef;
 
 public class DataAcquisition {
 	@Field("uri")
@@ -46,8 +53,6 @@ public class DataAcquisition {
 	private String comment;
 	@Field("used_uri")
 	private String used_uri;
-	@Field("was_associated_with_uri")
-	private String was_associated_with_uri;
 	
 	private DateTime startedAt;
 	private DateTime endedAt;
@@ -74,6 +79,8 @@ public class DataAcquisition {
 	private List<String> types;
 	@Field("type_uri")
 	private List<String> typeURIs;
+	@Field("associated_uri")
+	private List<String> associatedURIs;
 	@Field("characteristic")
 	private List<String> characteristic;
 	@Field("characteristic_uri")
@@ -99,7 +106,7 @@ public class DataAcquisition {
 	@Field("elevation")
 	private String elevation;
 	@Field("dataset_uri")
-	private List<String> datasetUri;
+	private List<String> datasetURIs;
 	
 	private String ccsvUri;
 	private String localName;
@@ -118,7 +125,7 @@ public class DataAcquisition {
 		startedAt = null;
 		endedAt = null;
 		numberDataPoints = 0;
-		datasetUri = new ArrayList<String>();
+		datasetURIs = new ArrayList<String>();
 		unit = new ArrayList<String>();
 		unitUri = new ArrayList<String>();
 		characteristic = new ArrayList<String>();
@@ -127,6 +134,7 @@ public class DataAcquisition {
 		entityUri = new ArrayList<String>();
 		types = new ArrayList<String>();
 		typeURIs = new ArrayList<String>();
+		associatedURIs = new ArrayList<String>();
 	}
 
 	public String getElevation() {
@@ -202,13 +210,6 @@ public class DataAcquisition {
 	}
 	public void setUsedUri(String used_uri) {
 		this.used_uri = used_uri;
-	}
-	
-	public String getAssociatedUri() {
-		return was_associated_with_uri;
-	}
-	public void setAssociatedUri(String uri) {
-		this.was_associated_with_uri = uri;
 	}
 	
 	public String getStudyUri() {
@@ -436,21 +437,18 @@ public class DataAcquisition {
 		this.location = location;
 	}
 	public List<String> getDatasetUri() {
-		return datasetUri;
+		return datasetURIs;
 	}
-	public void setDatasetUri(List<String> datasetUri) {
-		this.datasetUri = datasetUri;
+	public void setDatasetUri(List<String> datasetURIs) {
+		this.datasetURIs = datasetURIs;
 	}
 	public void addDatasetUri(String dataset_uri) {
-		for(String uri : datasetUri){
-			if(uri.equals(dataset_uri)){
-				return;
-			}
+		if (!datasetURIs.contains(dataset_uri)) {
+			datasetURIs.add(dataset_uri);
 		}
-		this.datasetUri.add(dataset_uri);
 	}
 	public void deleteDatasetUri(String dataset_uri) {
-		Iterator<String> iter = datasetUri.iterator();
+		Iterator<String> iter = datasetURIs.iterator();
 		while (iter.hasNext()){
 			if (iter.next().equals(dataset_uri)) {
 				iter.remove();
@@ -458,10 +456,10 @@ public class DataAcquisition {
 		}
 	}
 	public void deleteAllDatasetURIs() {
-		datasetUri.clear();
+		datasetURIs.clear();
 	}
 	public boolean containsDataset(String uri) {
-		return datasetUri.contains(uri);
+		return datasetURIs.contains(uri);
 	}
 	
 	public List<String> getTypeURIs() {
@@ -471,12 +469,21 @@ public class DataAcquisition {
 		this.typeURIs = typeURIs;
 	}
 	public void addTypeUri(String type_uri) {
-		for (String uri : typeURIs) {
-			if (uri.equals(type_uri)) {
-				return;
-			}
+		if (!typeURIs.contains(type_uri)) {
+			typeURIs.add(type_uri);
 		}
-		typeURIs.add(type_uri);
+	}
+	
+	public List<String> getAssociatedURIs() {
+		return associatedURIs;
+	}
+	public void setAssociatedURIs(List<String> associatedURIs) {
+		this.associatedURIs = associatedURIs;
+	}
+	public void addAssociatedUri(String associated_uri) {
+		if (!associatedURIs.contains(associated_uri)) {
+			associatedURIs.add(associated_uri);
+		}
 	}
 	
 	public void addNumberDataPoints(long number) {
@@ -520,9 +527,6 @@ public class DataAcquisition {
 		try {
 			if (doc.getFieldValue("uri") != null) {
 				dataAcquisition.setUri(doc.getFieldValue("uri").toString());
-				ValueCellProcessing cellProc = new ValueCellProcessing();
-				dataAcquisition.setLabel(cellProc.replaceNameSpaceEx(
-						dataAcquisition.getUri()).split(":")[1]);
 			}
 			if (doc.getFieldValue("owner_uri") != null) {
 				dataAcquisition.setOwnerUri(doc.getFieldValue("owner_uri").toString());
@@ -550,8 +554,29 @@ public class DataAcquisition {
 				date = new DateTime((Date)doc.getFieldValue("ended_at"));
 				dataAcquisition.setEndedAt(date.withZone(DateTimeZone.UTC).toString("EEE MMM dd HH:mm:ss zzz yyyy"));
 			}
+			if (doc.getFieldValues("method_uri") != null) {
+				dataAcquisition.setMethodUri(doc.getFieldValue("method_uri").toString());
+			}
 			if (doc.getFieldValues("schema_uri") != null) {
 				dataAcquisition.setSchemaUri(doc.getFieldValue("schema_uri").toString());
+			}
+			if (doc.getFieldValue("label") != null) {
+				dataAcquisition.setLabel(doc.getFieldValue("label").toString());
+			}
+			if (doc.getFieldValue("comment") != null) {
+				dataAcquisition.setComment(doc.getFieldValue("comment").toString());
+			}
+			if (doc.getFieldValues("associated_uri") != null) {
+				i = doc.getFieldValues("associated_uri").iterator();
+				while (i.hasNext()) {
+					dataAcquisition.addAssociatedUri(i.next().toString());
+				}
+			}
+			if (doc.getFieldValues("type_uri") != null) {
+				i = doc.getFieldValues("type_uri").iterator();
+				while (i.hasNext()) {
+					dataAcquisition.addTypeUri(i.next().toString());
+				}
 			}
 			if (doc.getFieldValues("unit") != null) {
 				i = doc.getFieldValues("unit").iterator();
@@ -758,14 +783,14 @@ public class DataAcquisition {
 	}
 	
 	public boolean deleteMeasurementData() {
-		Iterator<String> iter = datasetUri.iterator();
+		Iterator<String> iter = datasetURIs.iterator();
 		while (iter.hasNext()) {
 			if (Measurement.delete(iter.next()) == 0) {
 				iter.remove();
 			}
 		}
 		
-		return datasetUri.isEmpty();
+		return datasetURIs.isEmpty();
 	}
 	
 	public static List<DataAcquisition> findByQuery(SolrQuery query) {
@@ -946,7 +971,7 @@ public class DataAcquisition {
 		while (i.hasNext()) {
 			addCharacteristicUri(i.next());
 		}
-		i = dataCollection.datasetUri.iterator();
+		i = dataCollection.datasetURIs.iterator();
 		while (i.hasNext()) {
 			addDatasetUri(i.next());
 		}
@@ -990,11 +1015,50 @@ public class DataAcquisition {
 		builder.append("platform_uri: " + this.platformUri + "\n");
 		builder.append("location: " + this.location + "\n");
 		builder.append("elevation: " + this.elevation + "\n");
-		i = datasetUri.iterator();
+		i = datasetURIs.iterator();
 		while (i.hasNext()) {
 			builder.append("dataset_uri: " + i.next() + "\n");
 		}
 		
 		return builder.toString();
 	}
+	
+    @Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
+    public int saveToLabKey(String user_name, String password) throws CommandException {
+    	
+		String site = ConfigProp.getPropertyValue("labkey.config", "site");
+        String path = "/" + ConfigProp.getPropertyValue("labkey.config", "folder");
+        
+    	LabkeyDataHandler loader = new LabkeyDataHandler(
+    			site, user_name, password, path);
+    	
+    	ValueCellProcessing cellProc = new ValueCellProcessing();
+    	List<String> abbrevTypeURIs = new ArrayList<String>();
+    	for (String uri : getTypeURIs()) {
+    		abbrevTypeURIs.add(cellProc.replaceNameSpaceEx(uri));
+    	}
+    	List<String> abbrevAssociatedURIs = new ArrayList<String>();
+    	for (String uri : getAssociatedURIs()) {
+    		abbrevAssociatedURIs.add(cellProc.replaceNameSpaceEx(uri));
+    	}
+    	
+    	List< Map<String, Object> > rows = new ArrayList< Map<String, Object> >();
+    	Map<String, Object> row = new HashMap<String, Object>();
+    	row.put("a", String.join(", ", abbrevTypeURIs));
+    	row.put("hasURI", cellProc.replaceNameSpaceEx(getUri()));
+    	row.put("rdfs:label", getLabel());
+    	row.put("rdfs:comment", getComment());
+    	row.put("prov:startedAtTime", getStartedAt());
+    	row.put("prov:used", getParameter());
+    	row.put("prov:wasAssociatedWith", String.join(", ", abbrevAssociatedURIs));
+    	row.put("hasneto:hasDeployment", cellProc.replaceNameSpaceEx(getDeploymentUri()));
+    	row.put("hasco:isDataAcquisitionOf", cellProc.replaceNameSpaceEx(getStudyUri()));
+    	row.put("hasco:hasSchema", cellProc.replaceNameSpaceEx(getSchemaUri()));
+    	row.put("hasco:hasTriggeringEvent", getTriggeringEventName());
+    	row.put("prov:endedAtTime", getEndedAt().startsWith("9999")? "" : getEndedAt());
+    	rows.add(row);
+    	
+    	return loader.insertRows("DataAcquisition", rows);
+    }
 }
+
