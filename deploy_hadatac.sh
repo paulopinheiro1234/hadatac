@@ -62,7 +62,9 @@ git pull
 echo ""
 echo "Creating Distribution File"
 echo ""
+rm -rf ${GIT_HOME}/target/web/
 sbt clean
+sbt compile
 sbt dist
 echo ""
 echo "Copy Distribution File to /data directory"
