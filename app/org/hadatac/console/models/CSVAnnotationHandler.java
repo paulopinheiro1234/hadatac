@@ -5,6 +5,8 @@ import java.util.Map;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class CSVAnnotationHandler {
+	
+	private String datasetUri = "";
 
     /* After step 1 */
 	public String deploymentUri;
@@ -26,13 +28,20 @@ public class CSVAnnotationHandler {
     /* After step 3 -- at controller time */
     //private String dataset_uri;
     
-    public CSVAnnotationHandler() {
-    }
+    public CSVAnnotationHandler() {}
     
     public CSVAnnotationHandler(String d_uri, String d_plat, String d_instr) {
     	deploymentUri = d_uri;
     	deploymentPlatform = d_plat;
     	deploymentInstrument = d_instr;
+    }
+    
+    public String getDatasetUri() {
+        return datasetUri;
+    }
+    
+    public void setDatasetUri(String datasetUri) {
+        this.datasetUri = datasetUri;
     }
  
     public void setDeploymentUri(String deploymentUri) {

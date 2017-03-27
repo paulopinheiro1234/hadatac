@@ -47,7 +47,6 @@ public class DataFactory {
 		dataAcquisition.setInstrumentModel(deployment.getInstrument().getLabel());
 		dataAcquisition.setStartedAtXsdWithMillis(deployment.getStartedAt());
 		dataAcquisition.setDeploymentUri(deploymentUri);
-		dataAcquisition.save();
 		
 		return dataAcquisition;
 	}
@@ -72,7 +71,6 @@ public class DataFactory {
 			deployment.getDetectors().add(Detector.find(detectorUri.get(i)));
 		}
 		deployment.setStartedAtXsd(startedAt);
-		deployment.save();
 		
 		return deployment;
 	}
@@ -130,5 +128,14 @@ public class DataFactory {
     		metadataId = "0" + metadataId;
     	}
     	return host + "/hadatac/kb/" + category + "/" + CONSOLE_ID + "/" + metadataId ;   
+    }
+    
+    public static String getNextDatasetURI(String base) {
+    	String metadataId = Long.toHexString(DataFactory.getNextDynamicMetadataId());
+    	for (int i = metadataId.length(); i <= 8; i++) {
+    		metadataId = "0" + metadataId;
+    	}
+    	
+    	return base + "/" + metadataId ;   
     }
 }

@@ -19,11 +19,11 @@ import org.hadatac.utils.State;
 
 import play.Play;
 
-public class CSVFile {
+public class DataFile {
 	@Field("owner_email")
 	private String ownerEmail;
-	@Field("acquisition_uri")
-	private String acquisitionUri;
+	@Field("dataset_uri")
+	private String datasetUri;
 	@Field("file_name")
 	private String fileName;
 	@Field("processed")
@@ -33,9 +33,9 @@ public class CSVFile {
 	@Field("process_time")
 	private String processTime;
 	
-	public CSVFile() {
+	public DataFile() {
 		ownerEmail = "";
-		acquisitionUri = "";
+		datasetUri = "";
 		fileName = "";
 		uploadTime = "";
 		processTime = "";
@@ -49,11 +49,11 @@ public class CSVFile {
 		this.ownerEmail = ownerEmail;
 	}
 	
-	public String getAcquisitionUri() {
-		return acquisitionUri;
+	public String getDatasetUri() {
+		return datasetUri;
 	}
-	public void setAcquisitionUri(String acquisitionUri) {
-		this.acquisitionUri = acquisitionUri;
+	public void setDatasetUri(String datasetUri) {
+		this.datasetUri = datasetUri;
 	}
 	
 	public String getFileName() {
@@ -95,7 +95,7 @@ public class CSVFile {
 			client.close();
 			return status;
 		} catch (IOException | SolrServerException e) {
-			System.out.println("[ERROR] CSVFile.save() - e.Message: " + e.getMessage());
+			System.out.println("[ERROR] DataFile.save() - e.Message: " + e.getMessage());
 			return -1;
 		}
 	}
@@ -110,20 +110,20 @@ public class CSVFile {
 			solr.close();
 			return response.getStatus();
 		} catch (SolrServerException e) {
-			System.out.println("[ERROR] CSVFile.delete() - SolrServerException message: " + e.getMessage());
+			System.out.println("[ERROR] DataFile.delete() - SolrServerException message: " + e.getMessage());
 		} catch (IOException e) {
-			System.out.println("[ERROR] CSVFile.delete() - IOException message: " + e.getMessage());
+			System.out.println("[ERROR] DataFile.delete() - IOException message: " + e.getMessage());
 		} catch (Exception e) {
-			System.out.println("[ERROR] CSVFile.delete() - Exception message: " + e.getMessage());
+			System.out.println("[ERROR] DataFile.delete() - Exception message: " + e.getMessage());
 		}
 		
 		return -1;
 	}
 	
-	public static CSVFile convertFromSolr(SolrDocument doc) {
-		CSVFile object = new CSVFile();
+	public static DataFile convertFromSolr(SolrDocument doc) {
+		DataFile object = new DataFile();
 		object.setOwnerEmail(doc.getFieldValue("owner_email").toString());
-		object.setAcquisitionUri(doc.getFieldValue("acquisition_uri").toString());
+		object.setDatasetUri(doc.getFieldValue("dataset_uri").toString());
 		object.setFileName(doc.getFieldValue("file_name").toString());
 		object.setProcessStatus(Boolean.parseBoolean(doc.getFieldValue("processed").toString()));
 		object.setUploadTime(doc.getFieldValue("upload_time").toString());
@@ -132,7 +132,7 @@ public class CSVFile {
 		return object;
 	}
 	
-	public static List<CSVFile> find(String ownerEmail, int state) {
+	public static List<DataFile> find(String ownerEmail, int state) {
 		SolrQuery query = new SolrQuery();
 		if (state == State.PROCESSED) {
 			query.set("q", "owner_email:\"" + ownerEmail + "\"" + " AND " + "processed:\"true\"");
@@ -145,8 +145,8 @@ public class CSVFile {
 		return findByQuery(query);
 	}
 	
-	public static List<CSVFile> findByQuery(SolrQuery query) {
-		List<CSVFile> list = new ArrayList<CSVFile>();
+	public static List<DataFile> findByQuery(SolrQuery query) {
+		List<DataFile> list = new ArrayList<DataFile>();
 		
 		SolrClient solr = new HttpSolrClient(
 				Play.application().configuration().getString("hadatac.solr.data") 
@@ -162,13 +162,13 @@ public class CSVFile {
 			}
 		} catch (Exception e) {
 			list.clear();
-			System.out.println("[ERROR] CSVFile.find(SolrQuery) - Exception message: " + e.getMessage());
+			System.out.println("[ERROR] DataFile.find(SolrQuery) - Exception message: " + e.getMessage());
 		}
 		
 		return list;
 	}
 	
-	public static List<CSVFile> findAll(int state) {
+	public static List<DataFile> findAll(int state) {
 		SolrQuery query = new SolrQuery();
 		if (state == State.PROCESSED) {
 			query.set("q", "processed:\"true\"");
@@ -181,12 +181,17 @@ public class CSVFile {
 		return findByQuery(query);
 	}
 	
-	public static CSVFile findByName(String ownerEmail, String fileName) {		
+	public static DataFile findByName(String ownerEmail, String fileName) {		
 		SolrQuery query = new SolrQuery();
-		query.set("q", "owner_email:\"" + ownerEmail + "\"" + " AND " + "file_name:\"" + fileName + "\"");
+		if (null == ownerEmail) {
+			query.set("q", "file_name:\"" + fileName + "\"");
+		}
+		else {
+			query.set("q", "owner_email:\"" + ownerEmail + "\"" + " AND " + "file_name:\"" + fileName + "\"");
+		}
 		query.set("rows", "10000000");
 		
-		List<CSVFile> results = findByQuery(query);
+		List<DataFile> results = findByQuery(query);
 		if (!results.isEmpty()) {
 			return results.get(0);
 		}

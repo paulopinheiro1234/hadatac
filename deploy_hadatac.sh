@@ -23,7 +23,7 @@ HADATAC_HOST=$(hostname --long)
 case $HADATAC_HOST in
     "chear.tw.rpi.edu")
         SOLR_HOME="/data/hadatac-solr/solr" 
-        GIT_HOME="/data/hadatac" ;;
+        GIT_HOME="/data/git/hadatac" ;;
     "chear-test.tw.rpi.edu")
         SOLR_HOME="/data/hadatac-solr/solr"  
         GIT_HOME="/data/git/hadatac";;
@@ -60,16 +60,11 @@ git checkout -- conf/namespaces.properties
 git checkout -- conf/play-authenticate/smtp.conf conf/play-authenticate/
 git pull
 echo ""
-echo "Copying over config files"
-echo ""
-cp /data/conf/hadatac.conf conf/
-cp /data/conf/labkey.config conf/
-cp /data/conf/namespaces.properties conf/
-cp /data/conf/play-authenticate/smtp.conf conf/play-authenticate/
-echo ""
 echo "Creating Distribution File"
 echo ""
+rm -rf ${GIT_HOME}/target/web/
 sbt clean
+sbt compile
 sbt dist
 echo ""
 echo "Copy Distribution File to /data directory"
@@ -84,6 +79,14 @@ echo ""
 echo "Unzipping Current Distribution File"
 echo ""
 unzip hadatac-1.0-SNAPSHOT.zip
+echo ""
+echo "Copying over config files"
+echo ""
+cd /data/hadatac-1.0-SNAPSHOT
+cp /data/conf/hadatac.conf conf/
+cp /data/conf/labkey.config conf/
+cp /data/conf/namespaces.properties conf/
+cp /data/conf/play-authenticate/smtp.conf conf/play-authenticate/
 echo ""
 echo "Starting Services"
 echo ""

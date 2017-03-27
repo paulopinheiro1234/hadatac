@@ -237,7 +237,6 @@ public class Measurement {
         String q = "";
         
         List<String> listURI = DataAcquisition.findAllAccessibleDataAcquisition(user_uri);
-        //acquisition_query += "{!terms f=acquisition_uri}" + String.join(",", listURI);
         Iterator<String> iter_uri = listURI.iterator();
         while(iter_uri.hasNext()){
             String uri = iter_uri.next();
@@ -313,7 +312,6 @@ public class Measurement {
         String q = "";
         
         List<String> listURI = DataAcquisition.findAllAccessibleDataAcquisition(user_uri);
-        //acquisition_query += "{!terms f=acquisition_uri}" + String.join(",", listURI);
         Iterator<String> iter_uri = listURI.iterator();
         while(iter_uri.hasNext()){
             String uri = iter_uri.next();
@@ -357,9 +355,8 @@ public class Measurement {
 		SolrQuery query = new SolrQuery();
 		
 		String q = buildQuery(user_uri, page, qtd, handler);
-		System.out.println("Hello!!!  " + q);
 		query.setQuery(q);
-		query.setStart((page - 1)*qtd + 1);
+		query.setStart((page - 1) * qtd + 1);
 		System.out.println("Starting at: " + ((page - 1)* qtd + 1) + "    page: " + page + "     qtd: " + qtd);
 		query.setRows(qtd);
 		query.setFacet(true);
@@ -453,18 +450,27 @@ public class Measurement {
 		return result;
 	}
 	
-	public static long getNumByDataAcquisitionUri(String acquisition_uri) {		
+	public static long getNumByDataAcquisition(DataAcquisition dataAcquisition) {		
 		SolrClient solr = new HttpSolrClient(
 				Play.application().configuration().getString("hadatac.solr.data") 
 				+ Collections.DATA_ACQUISITION);
 		SolrQuery query = new SolrQuery();
-		query.set("q", "acquisition_uri:\"" + acquisition_uri + "\"");
+		query.set("q", "acquisition_uri:\"" + dataAcquisition.getUri() + "\"");
 		query.set("rows", "10000000");
 		
 		try {
 			QueryResponse response = solr.query(query);
 			solr.close();
 			SolrDocumentList results = response.getResults();
+			// Update the data set URI list
+			dataAcquisition.deleteAllDatasetURIs();
+			Iterator<SolrDocument> iter = results.iterator();
+			while (iter.hasNext()) {
+				SolrDocument doc = iter.next();
+				if (doc.getFieldValue("dataset_uri") != null) {
+					dataAcquisition.addDatasetUri(doc.getFieldValue("dataset_uri").toString());
+				}
+			}
 			return results.getNumFound();
 		} catch (Exception e) {
 			System.out.println("[ERROR] Measurement.findByDataAcquisitionUri(acquisition_uri) - Exception message: " + e.getMessage());

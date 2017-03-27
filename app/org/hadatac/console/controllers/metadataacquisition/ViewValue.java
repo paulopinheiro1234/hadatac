@@ -30,7 +30,7 @@ public class ViewValue extends Controller {
     public static Result index(String user_uri, String study_uri, 
     						   String subject_uri, String char_uri) {
 		ValueCellProcessing cellProc = new ValueCellProcessing();
-		List<Measurement> indicatorValueResults = findValue(user_uri, cellProc.convertToWholeURI(subject_uri), subject_uri, char_uri);
+		List<Measurement> indicatorValueResults = findValue(user_uri, study_uri, subject_uri, char_uri);
 		if (indicatorValueResults == null){
 			List<Measurement> indicatorValueResults2 = new ArrayList<Measurement>();
 			File indicator_detail_csv = new File("/data/indicatorDetails.csv");

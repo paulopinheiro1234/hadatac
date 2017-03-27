@@ -1,5 +1,4 @@
-@(deployForm: Form[org.hadatac.console.models.DeploymentForm], 
-  thePlatforms   : List[org.hadatac.entity.pojo.Platform],
+@(thePlatforms   : List[org.hadatac.entity.pojo.Platform],
   theInstruments : List[org.hadatac.entity.pojo.Instrument],
   theDetectors   : List[org.hadatac.entity.pojo.Detector],
   deploymentType : String)
@@ -13,44 +12,47 @@
 
 @main("New Deployment") {
 
-<script type="text/javascript">
-   function checkform() {
-      var f = document.forms["newDeployment"].elements;
-      var cansubmit = true;
-
-      if (document.getElementById('uri').value.length == 0) {
-          cansubmit = false;
-      }
-
-      if (document.getElementById('acquisition_uri').value.length == 0) {
-          cansubmit = false;
-      }
-      
-      if (document.getElementById('platform').value.length == 0) {
-         cansubmit = false;
-      }
-         
-      if (document.getElementById('instrument').value.length == 0) { 
-         cansubmit = false;
-         var instrumentSelector = document.getElementById('detector');
-         instrumentSelector.disabled = 'disabled';
-         for (var i = 0, l = instrumentSelector.length; i < l; i++) {
-                instrumentSelector[i].selected = instrumentSelector[i].defaultSelected;
-}      } else {
-         document.getElementById('detector').disabled = false;
-      }
-                
-      if (document.getElementById('startdatetime').value.length == 0) {
-         cansubmit = false;
-      }
-
-      if (cansubmit) {
-          document.getElementById('submitbutton').disabled = false;
-      } else {
-          document.getElementById('submitbutton').disabled = 'disabled';
-      }
-   }
-</script>
+	<script type="text/javascript">
+	   function checkform() {
+	      var cansubmit = true;
+	
+	      if (document.getElementById('uri').value.length == 0) {
+	          cansubmit = false;
+	      }
+	      else {
+	    	  document.getElementById('acquisition_uri').value = document.getElementById('uri').value.replace("DPL", "DA");
+	      }
+	
+	      if (document.getElementById('acquisition_uri').value.length == 0) {
+	          cansubmit = false;
+	      }
+	      
+	      if (document.getElementById('platform').value.length == 0) {
+	         cansubmit = false;
+	      }
+	         
+	      if (document.getElementById('instrument').value.length == 0) { 
+	         cansubmit = false;
+	         var instrumentSelector = document.getElementById('detector');
+	         instrumentSelector.disabled = 'disabled';
+	         for (var i = 0, l = instrumentSelector.length; i < l; i++) {
+	                instrumentSelector[i].selected = instrumentSelector[i].defaultSelected;
+			 }      
+		  } else {
+	         document.getElementById('detector').disabled = false;
+	      }
+	                
+	      if (document.getElementById('startdatetime').value.length == 0) {
+	         cansubmit = false;
+	      }
+	
+	      if (cansubmit) {
+	          document.getElementById('submitbutton').disabled = false;
+	      } else {
+	          document.getElementById('submitbutton').disabled = 'disabled';
+	      }
+	   }
+	</script>
 
   <div class="container">
     <h2>New @deploymentType.substring(0, 1).toUpperCase().concat(deploymentType.substring(1).toLowerCase()) Deployment</h2>

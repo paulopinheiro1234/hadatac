@@ -1,8 +1,10 @@
 package org.hadatac.entity.pojo;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.jena.query.Query;
 import org.apache.jena.query.QueryExecution;
@@ -22,8 +24,12 @@ import org.apache.jena.update.UpdateExecutionFactory;
 import org.apache.jena.update.UpdateFactory;
 import org.apache.jena.update.UpdateProcessor;
 import org.apache.jena.update.UpdateRequest;
+import org.hadatac.console.controllers.AuthApplication;
 import org.hadatac.console.controllers.triplestore.routes;
+import org.hadatac.metadata.loader.LabkeyDataHandler;
+import org.hadatac.metadata.loader.ValueCellProcessing;
 import org.hadatac.utils.Collections;
+import org.hadatac.utils.ConfigProp;
 import org.hadatac.utils.NameSpaces;
 import org.hadatac.utils.State;
 import org.joda.time.DateTime;
@@ -31,7 +37,10 @@ import org.joda.time.DateTimeZone;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 import org.joda.time.format.ISODateTimeFormat;
+import org.labkey.remoteapi.CommandException;
 
+import be.objectify.deadbolt.java.actions.Group;
+import be.objectify.deadbolt.java.actions.Restrict;
 import play.Play;
 
 public class Deployment {
@@ -436,4 +445,34 @@ public class Deployment {
 		
 		return null;
 	}
+	
+    @Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
+    public int saveToLabKey(String user_name, String password) throws CommandException {
+    	
+		String site = ConfigProp.getPropertyValue("labkey.config", "site");
+        String path = "/" + ConfigProp.getPropertyValue("labkey.config", "folder");
+        
+    	LabkeyDataHandler loader = new LabkeyDataHandler(
+    			site, user_name, password, path);
+    	
+    	ValueCellProcessing cellProc = new ValueCellProcessing();
+    	List<String> detectorURIs = new ArrayList<String>();
+    	for (Detector detector : getDetectors()) {
+    		detectorURIs.add(cellProc.replaceNameSpaceEx(detector.getUri()));
+    	}
+    	String detectors = String.join(", ", detectorURIs);
+    	
+    	List< Map<String, Object> > rows = new ArrayList< Map<String, Object> >();
+    	Map<String, Object> row = new HashMap<String, Object>();
+    	row.put("hasURI", cellProc.replaceNameSpaceEx(getUri()));
+    	row.put("a", "vstoi:Deployment");
+    	row.put("vstoi:hasPlatform", cellProc.replaceNameSpaceEx(getPlatform().getUri()));
+    	row.put("hasneto:hasInstrument", cellProc.replaceNameSpaceEx(getInstrument().getUri()));
+    	row.put("hasneto:hasDetector", detectors);
+    	row.put("prov:startedAtTime", getStartedAt());
+    	row.put("prov:endedAtTime", getEndedAt());
+    	rows.add(row);
+    	
+    	return loader.insertRows("Deployment", rows);
+    }
 }

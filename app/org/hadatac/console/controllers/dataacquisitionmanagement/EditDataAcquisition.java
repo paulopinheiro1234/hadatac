@@ -14,10 +14,13 @@ import java.util.Map;
 import play.data.Form;
 import play.mvc.Controller;
 import play.mvc.Result;
+import play.twirl.api.Html;
 
 import org.hadatac.console.controllers.AuthApplication;
+import org.hadatac.console.controllers.dataacquisitionmanagement.routes;
 import org.hadatac.console.models.DataAcquisitionForm;
 import org.hadatac.console.models.SysUser;
+import org.hadatac.console.views.html.*;
 import org.hadatac.console.views.html.dataacquisitionmanagement.*;
 import org.hadatac.entity.pojo.DataAcquisition;
 import org.hadatac.entity.pojo.DataAcquisitionSchema;
@@ -25,6 +28,7 @@ import org.hadatac.entity.pojo.TriggeringEvent;
 import org.hadatac.entity.pojo.User;
 import org.hadatac.entity.pojo.UserGroup;
 import org.hadatac.metadata.loader.ValueCellProcessing;
+import org.labkey.remoteapi.CommandException;
 
 import be.objectify.deadbolt.java.actions.Group;
 import be.objectify.deadbolt.java.actions.Restrict;
@@ -32,9 +36,15 @@ import be.objectify.deadbolt.java.actions.Restrict;
 public class EditDataAcquisition extends Controller {
 	
 	@Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    public static Result index(String uri) {
+    public static Result index(String uri, boolean bChangeParam) {
+    	if ((session().get("LabKeyUserName") == null 
+    			|| session().get("LabKeyPassword") == null)
+    			&& bChangeParam) {
+    		return redirect(org.hadatac.console.controllers.triplestore.routes.LoadKB.logInLabkey(
+    				routes.EditDataAcquisition.index(uri, bChangeParam).url()));
+    	}
+    	
 		DataAcquisition dataAcquisition = new DataAcquisition();
-		
 		ValueCellProcessing cellProc = new ValueCellProcessing();
 		List<DataAcquisitionSchema> schemas = DataAcquisitionSchema.findAll();
 		for (DataAcquisitionSchema schema : schemas) {
@@ -68,20 +78,20 @@ public class EditDataAcquisition extends Controller {
     		}
     		
             return ok(editDataAcquisition.render(dataAcquisition, nameList, 
-            		User.getUserURIs(), schemas, sysUser.isDataManager()));
+            		User.getUserURIs(), schemas, sysUser.isDataManager(), bChangeParam));
     	}
     	
     	return ok(editDataAcquisition.render(dataAcquisition, null, 
-    			User.getUserURIs(), schemas, sysUser.isDataManager()));
+    			User.getUserURIs(), schemas, sysUser.isDataManager(), bChangeParam));
     }
 
 	@Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    public static Result postIndex(String uri) {
-    	return index(uri);
+    public static Result postIndex(String uri, boolean bChangeParam) {
+    	return index(uri, bChangeParam);
     }
 	
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    public static Result processForm(String acquisitionUri) {
+    public static Result processForm(String acquisitionUri, boolean bChangeParam) {
     	final SysUser sysUser = AuthApplication.getLocalUser(session());
     	
         Form<DataAcquisitionForm> form = Form.form(DataAcquisitionForm.class).bindFromRequest();
@@ -89,10 +99,59 @@ public class EditDataAcquisition extends Controller {
         List<String> changedInfos = new ArrayList<String>();
         
         if (form.hasErrors()) {
-        	System.out.println("HAS ERRORS");
-            return badRequest();
-        } else {
-            DataAcquisition da = DataAcquisition.findByUri(acquisitionUri);
+            return badRequest("The submitted form has errors!");
+        }
+        
+        DataAcquisition da = DataAcquisition.findByUri(acquisitionUri);
+        if (!data.getNewDataAcquisitionUri().equals("")) {
+            if (null != DataAcquisition.findByUri(data.getNewDataAcquisitionUri())) {
+            	return badRequest("Data acquisition with this uri already exists!");
+            }
+            
+        	// Create new data acquisition
+            String strStartDate = "";
+            String strEndDate = "";
+            DateFormat jsFormat = new SimpleDateFormat("MM/dd/yyyy HH:mm a");
+            DateFormat isoFormat = new SimpleDateFormat("EEE MMM dd HH:mm:ss zzz yyyy");
+    		try {
+    			Date startDate = jsFormat.parse(data.getNewStartDate());
+    			strStartDate = isoFormat.format(startDate);
+    			if (!data.getNewEndDate().equals("")) {
+    				Date endDate = jsFormat.parse(data.getNewEndDate());
+    				strEndDate = isoFormat.format(endDate);
+    			}    
+    		} catch (ParseException e) {
+    			return badRequest("Cannot parse data " + data.getNewStartDate());
+    		}
+        	da.setUri(data.getNewDataAcquisitionUri());
+        	da.setNumberDataPoints(0);
+        	da.setTriggeringEvent(TriggeringEvent.CHANGED_CONFIGURATION);
+        	da.setParameter(data.getNewParameter());
+        	da.setStartedAt(strStartDate);
+        	if (!strEndDate.equals("")) {
+        		da.setEndedAt(strEndDate);
+        	}
+        	try {
+				int nRowsAffected = da.saveToLabKey(
+						session().get("LabKeyUserName"), session().get("LabKeyPassword"));
+				da.save();
+		    	return ok(main.render("Results,", "", new Html("<h3>" 
+		    			+ String.format("%d row(s) have been inserted in Table \"DataAcquisition\"", nRowsAffected) 
+		    			+ "</h3>")));
+			} catch (CommandException e) {
+				return badRequest("Failed to insert new data acquisition to LabKey!\n"
+						+ "Error Message: " + e.getMessage());
+			}
+        }
+        
+        // Update current data acquisition
+        if (bChangeParam) {
+            if (da.getParameter() == null || !da.getParameter().equals(data.getNewParameter())) {
+            	da.setParameter(data.getNewParameter());
+            	changedInfos.add(data.getNewParameter());
+            }
+        }
+        else {
             if (sysUser.isDataManager()) {
             	if (da.getOwnerUri() == null || !da.getOwnerUri().equals(data.getNewOwner())) {
                 	da.setOwnerUri(data.getNewOwner());
@@ -103,34 +162,16 @@ public class EditDataAcquisition extends Controller {
             	da.setPermissionUri(data.getNewPermission());
             	changedInfos.add(data.getNewPermission());
             }
-            if (da.getParameter() == null || !da.getParameter().equals(data.getNewParameter())) {
-                String dateString = "";
-                DateFormat jsFormat = new SimpleDateFormat("MM/dd/yyyy HH:mm a");
-        		try {
-        			Date dateFromJs = jsFormat.parse(data.getNewDataAcquisitionStartDate());
-        	        DateFormat isoFormat = new SimpleDateFormat("EEE MMM dd HH:mm:ss zzz yyyy");
-        	        dateString = isoFormat.format(dateFromJs);
-        		} catch (ParseException e) {
-        			return badRequest("Cannot parse data " + data.getNewDataAcquisitionStartDate());
-        		}
-            	da.setUri(data.getNewDataAcquisitionUri());
-            	da.setNumberDataPoints(0);
-            	da.setTriggeringEvent(TriggeringEvent.CHANGED_CONFIGURATION);
-            	da.setParameter(data.getNewParameter());
-            	da.setStartedAt(dateString);
-            	da.save();
-            	changedInfos.add(data.getNewParameter());
-            }
             if (da.getSchemaUri() == null || !da.getSchemaUri().equals(data.getNewSchema())) {
             	da.setSchemaUri(data.getNewSchema());
             	changedInfos.add(data.getNewSchema());
             }
-            
-            if (!changedInfos.isEmpty()) {
-            	da.save();
-            }
-            
-            return ok(editDataAcquisitionConfirm.render(da, changedInfos, sysUser.isDataManager()));
         }
+        
+        if (!changedInfos.isEmpty()) {
+        	da.save();
+        }
+        
+        return ok(editDataAcquisitionConfirm.render(da, changedInfos, sysUser.isDataManager()));
     }
 }

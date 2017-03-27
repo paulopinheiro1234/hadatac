@@ -120,15 +120,7 @@ public class LabkeyDataHandler {
 
 		try {
 			SaveRowsResponse response = cmdUpd.execute(cn, folder_path);
-			System.out.println(String.format("%d row(s) have been updated in Table \"%s\"", 
-					response.getRowsAffected(), queryName));
 			return response.getRowsAffected().intValue();
-		} catch (CommandException e) {
-			if(e.getMessage().equals("Unauthorized")){
-				throw e;
-			} else{
-				e.printStackTrace();
-			}
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -144,15 +136,7 @@ public class LabkeyDataHandler {
 
 		try {
 			SaveRowsResponse response = cmd.execute(cn, folder_path);
-			System.out.println(String.format("%d row(s) have been inserted in Table \"%s\"", 
-					response.getRowsAffected(), queryName));
 			return response.getRowsAffected().intValue();
-		} catch (CommandException e) {
-			if(e.getMessage().equals("Unauthorized")){
-				throw e;
-			} else{
-				e.printStackTrace();
-			}
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -168,15 +152,7 @@ public class LabkeyDataHandler {
 
 		try {
 			SaveRowsResponse response = cmd.execute(cn, folder_path);
-			System.out.println(String.format("%d row(s) have been deleted in Table \"%s\"", 
-					response.getRowsAffected(), queryName));
 			return response.getRowsAffected().intValue();
-		} catch (CommandException e) {
-			if(e.getMessage().equals("Unauthorized")){
-				throw e;
-			} else{
-				e.printStackTrace();
-			}
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

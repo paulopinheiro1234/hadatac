@@ -18,6 +18,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
+import org.hadatac.entity.pojo.Credential;
 import org.hadatac.console.controllers.AuthApplication;
 import org.hadatac.console.controllers.dataacquisitionsearch.LoadCCSV;
 import org.hadatac.console.controllers.annotator.routes;
@@ -26,21 +27,29 @@ import org.hadatac.console.http.DeploymentQueries;
 import org.hadatac.console.http.ResumableUpload;
 import org.hadatac.console.models.AssignOwnerForm;
 import org.hadatac.console.models.CSVAnnotationHandler;
+import org.hadatac.console.models.LabKeyLoginForm;
 import org.hadatac.console.models.SparqlQueryResults;
 import org.hadatac.console.models.TripleDocument;
 import org.hadatac.console.models.SysUser;
 import org.hadatac.console.views.html.annotator.*;
+import org.hadatac.console.views.html.triplestore.*;
+import org.hadatac.console.views.html.*;
 import org.hadatac.data.api.DataFactory;
+import org.hadatac.data.loader.SampleGenerator;
+import org.hadatac.data.loader.SubjectGenerator;
 import org.hadatac.data.model.DatasetParsingResult;
-import org.hadatac.entity.pojo.CSVFile;
+import org.hadatac.entity.pojo.DataFile;
+import org.hadatac.entity.pojo.Measurement;
 import org.hadatac.entity.pojo.DataAcquisition;
 import org.hadatac.entity.pojo.DataAcquisitionSchema;
 import org.hadatac.entity.pojo.User;
+import org.hadatac.metadata.loader.LabkeyDataHandler;
 import org.hadatac.metadata.loader.ValueCellProcessing;
 import org.hadatac.utils.ConfigProp;
 import org.hadatac.utils.Feedback;
 import org.hadatac.utils.NameSpaces;
 import org.hadatac.utils.State;
+import org.labkey.remoteapi.CommandException;
 
 import be.objectify.deadbolt.java.actions.Group;
 import be.objectify.deadbolt.java.actions.Restrict;
@@ -50,11 +59,12 @@ import play.mvc.Controller;
 import play.mvc.Result;
 import play.mvc.BodyParser;
 import play.mvc.Http.MultipartFormData.FilePart;
+import play.twirl.api.Html;
 
 public class AutoAnnotator extends Controller {
 	
-	private static boolean search(String fileName, List<CSVFile> pool) {
-		for (CSVFile file : pool) {
+	private static boolean search(String fileName, List<DataFile> pool) {
+		for (DataFile file : pool) {
 			if (file.getFileName().equals(fileName)) {
 				return true;
 			}
@@ -63,7 +73,7 @@ public class AutoAnnotator extends Controller {
 		return false;
 	}
 	
-	private static void includeUnrecognizedFiles(String path, List<CSVFile> ownedFiles) {		
+	private static void includeUnrecognizedFiles(String path, List<DataFile> ownedFiles) {		
  		File folder = new File(path);
  		if (!folder.exists()){
  			folder.mkdirs();
@@ -73,7 +83,7 @@ public class AutoAnnotator extends Controller {
  		for (int i = 0; i < listOfFiles.length; i++) {
 			if (listOfFiles[i].isFile() && listOfFiles[i].getName().endsWith(".csv")) {
 				if (!search(listOfFiles[i].getName(), ownedFiles)) {
-					CSVFile newFile = new CSVFile();
+					DataFile newFile = new DataFile();
  					newFile.setFileName(listOfFiles[i].getName());
  					newFile.save();
  					ownedFiles.add(newFile);
@@ -82,16 +92,16 @@ public class AutoAnnotator extends Controller {
  		}
 	}
 
-	private static void filterNonexistedFiles(String path, List<CSVFile> files) {
+	private static void filterNonexistedFiles(String path, List<DataFile> files) {
 		File folder = new File(path);
 		if (!folder.exists()){
 			folder.mkdirs();
 	    }
 		
 		File[] listOfFiles = folder.listFiles();
-		Iterator<CSVFile> iterFile = files.iterator();
-		while(iterFile.hasNext()) {
-			CSVFile file = iterFile.next();
+		Iterator<DataFile> iterFile = files.iterator();
+		while (iterFile.hasNext()) {
+			DataFile file = iterFile.next();
 			boolean isExisted = false;
 			for (int i = 0; i < listOfFiles.length; i++) {
 				if (listOfFiles[i].isFile()) {
@@ -107,31 +117,50 @@ public class AutoAnnotator extends Controller {
 		}
 	}
 	
+	private static List<File> findFilesByExtension(String path, String ext) {
+		List<File> results = new ArrayList<File>();
+		
+		File folder = new File(path);
+		if (!folder.exists()){
+			folder.mkdirs();
+	    }
+		
+		File[] listOfFiles = folder.listFiles();
+		for (int i = 0; i < listOfFiles.length; i++) {
+			if (listOfFiles[i].isFile() 
+				&& FilenameUtils.getExtension(listOfFiles[i].getName()).equals(ext)) {
+					results.add(listOfFiles[i]);
+			}
+		}
+		
+		return results;
+	}
+	
 	@Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
     public static Result index() {		
 		final SysUser user = AuthApplication.getLocalUser(session());
 		
-		List<CSVFile> proc_files = null;
-		List<CSVFile> unproc_files = null;
+		List<DataFile> proc_files = null;
+		List<DataFile> unproc_files = null;
 		
 		String path_proc = ConfigProp.getPropertyValue("autoccsv.config", "path_proc");
 		String path_unproc = ConfigProp.getPropertyValue("autoccsv.config", "path_unproc");
 		
 		if (user.isDataManager()) {
-			proc_files = CSVFile.findAll(State.PROCESSED);
-			unproc_files = CSVFile.findAll(State.UNPROCESSED);
+			proc_files = DataFile.findAll(State.PROCESSED);
+			unproc_files = DataFile.findAll(State.UNPROCESSED);
 			includeUnrecognizedFiles(path_unproc, unproc_files);
 		}
 		else {
-			proc_files = CSVFile.find(user.getEmail(), State.PROCESSED);
-			unproc_files = CSVFile.find(user.getEmail(), State.UNPROCESSED);
+			proc_files = DataFile.find(user.getEmail(), State.PROCESSED);
+			unproc_files = DataFile.find(user.getEmail(), State.UNPROCESSED);
 		}
 		
 		filterNonexistedFiles(path_proc, proc_files);
 		filterNonexistedFiles(path_unproc, unproc_files);
 		
 		boolean bStarted = false;
-		if(ConfigProp.getPropertyValue("autoccsv.config", "auto").equals("on")){
+		if (ConfigProp.getPropertyValue("autoccsv.config", "auto").equals("on")) {
 			bStarted = true;
 		}
 
@@ -170,24 +199,22 @@ public class AutoAnnotator extends Controller {
 					 "Selected File",
 					 selectedFile));
         } else {
-            CSVFile newCSV = CSVFile.findByName(ownerEmail, selectedFile);
-            if (newCSV == null) {
-            	newCSV = new CSVFile();
-            	newCSV.setFileName(selectedFile);
-            	newCSV.setOwnerEmail(AuthApplication.getLocalUser(session()).getEmail());
-            	newCSV.setProcessStatus(false);
-            	newCSV.setUploadTime(new SimpleDateFormat("yyyy/MM/dd HH:mm:ss").format(new Date()));
+        	DataFile file = DataFile.findByName(ownerEmail, selectedFile);
+            if (file == null) {
+            	file = new DataFile();
+            	file.setFileName(selectedFile);
+            	file.setOwnerEmail(AuthApplication.getLocalUser(session()).getEmail());
+            	file.setProcessStatus(false);
+            	file.setUploadTime(new SimpleDateFormat("yyyy/MM/dd HH:mm:ss").format(new Date()));
             }
-            newCSV.setOwnerEmail(data.getUser());
-            newCSV.save();
+            file.setOwnerEmail(data.getUser());
+            file.save();
     		return redirect(routes.AutoAnnotator.index());
         }
     }
 	
 	@Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
     public static Result toggleAutoAnnotator() {
-		System.out.println("Toggling...");
-		
 		if (ConfigProp.getPropertyValue("autoccsv.config", "auto").equals("on")) {
 			ConfigProp.setPropertyValue("autoccsv.config", "auto", "off");
 			System.out.println("Turning auto-annotation off");
@@ -200,6 +227,37 @@ public class AutoAnnotator extends Controller {
 		return redirect(routes.AutoAnnotator.index());
 	}
 	
+	@Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
+    public static Result setLabKeyCredentials() {
+		return ok(syncLabkey.render("init", routes.AutoAnnotator.
+				postSetLabKeyCredentials().url(), "", false));
+	}
+    
+    @Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
+    public static Result postSetLabKeyCredentials() {
+    	Form<LabKeyLoginForm> form = Form.form(LabKeyLoginForm.class).bindFromRequest();
+    	String site = ConfigProp.getPropertyValue("labkey.config", "site");
+        String path = "/";
+        String user_name = form.get().getUserName();
+        String password = form.get().getPassword();
+    	LabkeyDataHandler loader = new LabkeyDataHandler(
+    			site, user_name, password, path);
+    	try {
+    		loader.checkAuthentication();
+    		Credential cred = new Credential();
+    		cred.setUserName(user_name);
+    		cred.setPassword(password);
+    		cred.save();
+    	} catch(CommandException e) {
+    		if(e.getMessage().equals("Unauthorized")){
+    			return ok(syncLabkey.render("login_failed", "", "", false));
+    		}
+    	}
+    	
+    	return ok(main.render("Results,", "", 
+    			new Html("<h3>Your provided credentials are valid and saved!</h3>")));
+    }
+	
 	public static void autoAnnotate() {
 		if(ConfigProp.getPropertyValue("autoccsv.config", "auto").equals("off")){
 			return;
@@ -207,12 +265,22 @@ public class AutoAnnotator extends Controller {
 		
 		String path_proc = ConfigProp.getPropertyValue("autoccsv.config", "path_proc");
 		String path_unproc = ConfigProp.getPropertyValue("autoccsv.config", "path_unproc");
-		List<CSVFile> unproc_files = CSVFile.findAll(State.UNPROCESSED);
+		List<DataFile> unproc_files = DataFile.findAll(State.UNPROCESSED);
 		filterNonexistedFiles(path_unproc, unproc_files);
 		
-		for (CSVFile file : unproc_files) {
+		for (DataFile file : unproc_files) {
 			String file_name = file.getFileName();
-			if(annotateCSVFile(file_name)){
+			boolean bSucceed = false;
+			if (file_name.startsWith("DA")) {
+				bSucceed = annotateCSVFile(file);
+			}
+			else if (file_name.startsWith("SID")) {
+				bSucceed = annotateSampleIdFile(new File(path_unproc + "/" + file_name));
+			}
+			else if (file_name.startsWith("PID")) {
+				bSucceed = annotateSubjectIdFile(new File(path_unproc + "/" + file_name));
+			}
+			if (bSucceed) {
 				//Move the file to the folder for processed files
 				File destFolder = new File(path_proc);
 				if (!destFolder.exists()){
@@ -231,8 +299,70 @@ public class AutoAnnotator extends Controller {
 		}
 	}
 	
-    public static boolean annotateCSVFile(String file_name) {
-    	System.out.println("Annotating " + file_name);
+	public static boolean annotateSampleIdFile(File file) {
+		SampleGenerator sampleGenerator = new SampleGenerator(file);
+		List<Map<String, Object>> rows = sampleGenerator.createRows();
+		String site = ConfigProp.getPropertyValue("labkey.config", "site");
+		//String path = "/" + ConfigProp.getPropertyValue("labkey.config", "folder");
+		String path = "/SIDPIDTEST";
+        Credential cred = Credential.find();
+        AnnotationLog log = new AnnotationLog();
+    	log.setFileName(file.getName());
+        if (null == cred) {
+        	log.addline(Feedback.println(Feedback.WEB, "[ERROR] No LabKey credentials are provided!"));
+    		log.save();
+    		return false;
+        }
+    	LabkeyDataHandler labkeyDataHandler = new LabkeyDataHandler(
+    			site, cred.getUserName(), cred.getPassword(), path);
+		try {
+			int nRows = labkeyDataHandler.insertRows("Sample", rows);
+			log.addline(Feedback.println(Feedback.WEB, String.format(
+					"[OK] %d row(s) have been inserted into Sample table", nRows)));
+			log.addline(Feedback.println(Feedback.WEB, String.format(sampleGenerator.toString())));
+    		log.save();
+		} catch (CommandException e) {
+			log.addline(Feedback.println(Feedback.WEB, "[ERROR] " + e.getMessage()));
+    		log.save();
+    		return false;
+		}
+		
+		return true;
+	}
+	
+	public static boolean annotateSubjectIdFile(File file){
+		SubjectGenerator subjectGenerator = new SubjectGenerator(file);
+		List<Map<String, Object>> rows = subjectGenerator.createRows();
+		String site = ConfigProp.getPropertyValue("labkey.config", "site");
+        //String path = "/" + ConfigProp.getPropertyValue("labkey.config", "folder");
+        String path = "/SIDPIDTEST";
+        Credential cred = Credential.find();
+        AnnotationLog log = new AnnotationLog();
+    	log.setFileName(file.getName());
+        if (null == cred) {
+        	log.addline(Feedback.println(Feedback.WEB, "[ERROR] No LabKey credentials are provided!"));
+    		log.save();
+    		return false;
+        }
+    	LabkeyDataHandler labkeyDataHandler = new LabkeyDataHandler(
+    			site, cred.getUserName(), cred.getPassword(), path);
+		try {
+			int nRows = labkeyDataHandler.insertRows("Subject", rows);
+			log.addline(Feedback.println(Feedback.WEB, String.format(
+					"[OK] %d row(s) have been inserted into Subject table", nRows)));
+			log.addline(Feedback.println(Feedback.WEB, String.format(subjectGenerator.toString())));
+			log.save();
+		} catch (CommandException e) {
+			log.addline(Feedback.println(Feedback.WEB, "[ERROR] " + e.getMessage()));
+    		log.save();
+    		return false;
+		}
+		
+		return true;
+	}
+	
+    public static boolean annotateCSVFile(DataFile dataFile) {
+    	String file_name = dataFile.getFileName();
     	String base_name = FilenameUtils.getBaseName(file_name);
     	
     	AnnotationLog log = new AnnotationLog();
@@ -312,6 +442,7 @@ public class AutoAnnotator extends Controller {
     		DataAcquisition dc = DataAcquisition.findByUri(dc_uri);
     		if (dc != null && dc.getUri() != null) {
     			handler.setDataAcquisitionUri(dc.getUri());
+    			handler.setDatasetUri(DataFactory.getNextDatasetURI(handler.getDataAcquisitionUri()));
     		}
     	}
 
@@ -332,6 +463,7 @@ public class AutoAnnotator extends Controller {
 	    log.addline(result.getMessage());
 		log.save();
 		if(result.getStatus() == 0){
+			dataFile.setDatasetUri(handler.getDatasetUri());
 			return true;
 		}
 	    
@@ -351,7 +483,7 @@ public class AutoAnnotator extends Controller {
 
 		try {
 			//Insert Data Set
-			preamble += "<" + DataFactory.getNextURI(DataFactory.DATASET_ABBREV) + ">";
+			preamble += "<" + handler.getDatasetUri() + ">";
 			preamble += Downloads.FRAG_DATASET;
 			preamble += handler.getDataAcquisitionUri() + ">; ";
 
@@ -424,15 +556,39 @@ public class AutoAnnotator extends Controller {
 		return preamble;
     }
     
-    public static Result moveCSVFile(String ownerEmail, String file_name) {		
+    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
+    public static Result checkAnnotationLog(String file_name) {
+    	return ok(annotation_log.render(file_name));
+    }
+    
+    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
+    public static Result moveDataFile(String file_name) {			
+		final SysUser user = AuthApplication.getLocalUser(session());
+		DataFile dataFile = null;
+		if (user.isDataManager()) {
+			dataFile = DataFile.findByName(null, file_name);
+		}
+		else {
+			dataFile = DataFile.findByName(user.getEmail(), file_name);
+		}
+		if (null == dataFile) {
+			return badRequest("You do NOT have the permission to operate this file!");
+		}
+		
+		Measurement.delete(dataFile.getDatasetUri());
+		List<DataAcquisition> dataAcquisitions = DataAcquisition.findAll();
+		for (DataAcquisition da : dataAcquisitions) {
+			if (da.containsDataset(dataFile.getDatasetUri())) {
+				da.setNumberDataPoints(Measurement.getNumByDataAcquisition(da));
+				da.save();
+			}
+		}
+		dataFile.delete();
+		dataFile.setProcessStatus(false);
+		dataFile.save();
+		
 		String path_proc = ConfigProp.getPropertyValue("autoccsv.config", "path_proc");
 		String path_unproc = ConfigProp.getPropertyValue("autoccsv.config", "path_unproc");
-		
-		CSVFile csvFile = CSVFile.findByName(ownerEmail, file_name);
-		csvFile.delete();
-		csvFile.setProcessStatus(false);
-		csvFile.save();
-		
 		File destFolder = new File(path_unproc);
 		if (!destFolder.exists()){
 			destFolder.mkdirs();
@@ -443,7 +599,8 @@ public class AutoAnnotator extends Controller {
 		return redirect(routes.AutoAnnotator.index());
     }
     
-    public static Result downloadCSVFile(String file_name, boolean isProcessed) {		
+    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
+    public static Result downloadDataFile(String file_name, boolean isProcessed) {		
 		String path = ""; 
 		if(isProcessed){
 			path = ConfigProp.getPropertyValue("autoccsv.config", "path_proc");
@@ -455,15 +612,30 @@ public class AutoAnnotator extends Controller {
 		return ok(new File(path + "/" + file_name));
     }
     
-    public static Result checkAnnotationLog(String file_name) {
-    	return ok(annotation_log.render(file_name));
-    }
-    
-    public static Result deleteCSVFile(String ownerEmail, String file_name, boolean isProcessed) {
+    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
+    public static Result deleteDataFile(String file_name, boolean isProcessed) {
+		final SysUser user = AuthApplication.getLocalUser(session());
+		DataFile dataFile = null;
+		if (user.isDataManager()) {
+			dataFile = DataFile.findByName(null, file_name);
+		}
+		else {
+			dataFile = DataFile.findByName(user.getEmail(), file_name);
+		}
+		if (null == dataFile) {
+			return badRequest("You do NOT have the permission to operate this file!");
+		}
+		
     	AnnotationLog.delete(file_name);
-    	
-		CSVFile csvFile = CSVFile.findByName(ownerEmail, file_name);
-		csvFile.delete();
+    	Measurement.delete(dataFile.getDatasetUri());
+		List<DataAcquisition> dataAcquisitions = DataAcquisition.findAll();
+		for (DataAcquisition da : dataAcquisitions) {
+			if (da.containsDataset(dataFile.getDatasetUri())) {
+				da.setNumberDataPoints(Measurement.getNumByDataAcquisition(da));
+				da.save();
+			}
+		}
+		dataFile.delete();
 
 		String path = "";
 		if(isProcessed){
@@ -481,9 +653,7 @@ public class AutoAnnotator extends Controller {
     
     @Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
     @BodyParser.Of(value = BodyParser.MultipartFormData.class, maxLength = 500 * 1024 * 1024)
-    public static Result uploadCSVFile(String oper) {
-    	System.out.println("uploadCSVFile CALLED!");
-    	
+    public static Result uploadDataFile(String oper) {
 		String path = ConfigProp.getPropertyValue("autoccsv.config", "path_unproc");
 		
     	List<FilePart> fileParts = request().body().asMultipartFormData().getFiles();
@@ -499,12 +669,12 @@ public class AutoAnnotator extends Controller {
         			FileUtils.writeByteArrayToFile(newFile, byteFile);
         			isFile.close();
         			
-        			CSVFile csvFile = new CSVFile();
-        			csvFile.setFileName(filePart.getFilename());
-        			csvFile.setOwnerEmail(AuthApplication.getLocalUser(session()).getEmail());
-        			csvFile.setProcessStatus(false);
-        			csvFile.setUploadTime(new SimpleDateFormat("yyyy/MM/dd HH:mm:ss").format(new Date()));
-        			csvFile.save();
+        			DataFile dataFile = new DataFile();
+        			dataFile.setFileName(filePart.getFilename());
+        			dataFile.setOwnerEmail(AuthApplication.getLocalUser(session()).getEmail());
+        			dataFile.setProcessStatus(false);
+        			dataFile.setUploadTime(new SimpleDateFormat("yyyy/MM/dd HH:mm:ss").format(new Date()));
+        			dataFile.save();
         		} catch (Exception e) {
         			e.printStackTrace();
         		}
@@ -515,7 +685,7 @@ public class AutoAnnotator extends Controller {
     }
     
     @Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
-    public static Result uploadCSVFileByChunking(
+    public static Result uploadDataFileByChunking(
     		String resumableChunkNumber,
     		String resumableChunkSize, 
     		String resumableCurrentChunkSize,
@@ -531,7 +701,7 @@ public class AutoAnnotator extends Controller {
     }
     
     @Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
-    public static Result postUploadCSVFileByChunking(
+    public static Result postUploadDataFileByChunking(
     		String resumableChunkNumber, 
     		String resumableChunkSize, 
     		String resumableCurrentChunkSize,
@@ -540,12 +710,12 @@ public class AutoAnnotator extends Controller {
     		String resumableFilename,
     		String resumableRelativePath) {
     	if (ResumableUpload.postUploadFileByChunking(request(), ConfigProp.getPropertyValue("autoccsv.config", "path_unproc"))) {
-    		CSVFile csvFile = new CSVFile();
-			csvFile.setFileName(resumableFilename);
-			csvFile.setOwnerEmail(AuthApplication.getLocalUser(session()).getEmail());
-			csvFile.setProcessStatus(false);
-			csvFile.setUploadTime(new SimpleDateFormat("yyyy/MM/dd HH:mm:ss").format(new Date()));
-			csvFile.save();
+    		DataFile dataFile = new DataFile();
+    		dataFile.setFileName(resumableFilename);
+    		dataFile.setOwnerEmail(AuthApplication.getLocalUser(session()).getEmail());
+    		dataFile.setProcessStatus(false);
+    		dataFile.setUploadTime(new SimpleDateFormat("yyyy/MM/dd HH:mm:ss").format(new Date()));
+    		dataFile.save();
     		return(ok("Upload finished"));
         } else {
             return(ok("Upload"));

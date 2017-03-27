@@ -2,7 +2,8 @@
   permissions : Map[String, String],
   ownerOptions : List[String],
   schemas : List[org.hadatac.entity.pojo.DataAcquisitionSchema],
-  bAdmin : Boolean)
+  bAdmin : Boolean,
+  bChangeParam : Boolean)
 
 @import helper._
 @import org.hadatac.utils._
@@ -13,21 +14,41 @@
 @main("Change Data Access Permission") {
 	
 	<script type="text/javascript">
+		$(document).ready(function(){
+	    	checkform();
+		});
+		
 		function checkform() {
 		  var cansubmit = true;
-	      if ($('#newParameter').value != '@da.getParameter()') {
-	     	$('#div_acquisition_uri').show();
-	     	$('#div_startdate').show();
-	      }
-		  if (document.getElementById('startdatetime').value.length == 0) {
-	         cansubmit = false;
-	      }
+		  if (document.getElementById('newParameter').value == '@da.getParameter()') {
+		  	cansubmit = false;
+		  }
+		  if (document.getElementById('div_acquisition_uri').style.display == "") {
+		  	if (document.getElementById('newStartDate').value == "") {
+	        	cansubmit = false;
+	      	}
+		  }
 	      if (cansubmit) {
 	          document.getElementById('submitbutton').disabled = false;
 	      } else {
 	          document.getElementById('submitbutton').disabled = 'disabled';
 	      }
-	   }
+	    }
+	    
+	    function onConfirm() {
+	      if (document.getElementById('newParameter').value != '@da.getParameter()') {
+	      	if (document.getElementById('div_acquisition_uri').style.display == "none") {
+	    		if(confirm('Parameter has been changed. Do you want to create a new data acquisition?')) {
+	    			$('#div_acquisition_uri').show();
+		     		$('#div_startdate').show();
+		     		$('#div_enddate').show();
+		     		document.getElementById('newDataAcquisitionUri').value = '@da.getUri()';
+		     		checkform();
+		     		return false;
+	    		}
+	    	}
+		  }
+		}
 	</script>
 
     <h2>Edit Data Acquisition</h2>
@@ -48,20 +69,21 @@
        }
        <li><b>Current Permission:</b> @da.getPermissionUri()</li>
 
-       <form class="form-horizontal" name="editForm" method="post" action="@org.hadatac.console.controllers.dataacquisitionmanagement.routes.EditDataAcquisition.processForm(da.getUri())">
+       <form class="form-horizontal" name="editForm" method="post" action="@org.hadatac.console.controllers.dataacquisitionmanagement.routes.EditDataAcquisition.processForm(da.getUri(), bChangeParam)">
        
+       @if(!bChangeParam) {
        	 @if(bAdmin) {
 		   <div class="form-group">
               <label>Set Owner</label>
               <select class="form-control col-sm-6" id="newOwner" name="newOwner" >
-              	<option value=""></option>
-            	@for(opt <- ownerOptions) {
-                	@if(opt.equals(da.getOwnerUri())){
-              	 		<option selected value="@opt">@opt</option>
-              	 	} else {
-              	 		<option value="@opt">@opt</option>
-              	 	}
-            	}
+              <option value=""></option>
+              @for(opt <- ownerOptions) {
+                @if(opt.equals(da.getOwnerUri())){
+              	 	<option selected value="@opt">@opt</option>
+              	} else {
+              	 	<option value="@opt">@opt</option>
+              	}
+              }
               </select>
            </div>
          }
@@ -87,7 +109,7 @@
               <select class="form-control col-sm-6" id="newSchema" name="newSchema" >
               	<option value=""></option>
                 @for(schema <- schemas){
-                    @if(schema.equals(da.getSchemaUri())) {
+                    @if(da.getSchemaUri().contains(schema.getUri().split(":")(1))) {
                     	<option selected value="@schema.getUri()">@schema.getUri()</option>
               	 	} else {
               	 		<option value="@schema.getUri()">@schema.getUri()</option>
@@ -95,7 +117,7 @@
                  }
               </select>
            </div>
-           
+		} else {
            <div class="form-group">
               <label>Set Parameter</label>
               <input type="text" value="@da.getParameter()" class="form-control" name="newParameter" id="newParameter" oninput="checkform()" >
@@ -103,38 +125,41 @@
            
            <div id="div_acquisition_uri" class="form-group" style="display : none">
 		   	  <label>Data Acquisition URI:</label>
- 			  <input type="text" class="form-control col-sm-6" name="newDataAcquisitionUri" id="newDataAcquisitionUri" value="@da.getUri()">
+ 			  <input type="text" class="form-control col-sm-6" name="newDataAcquisitionUri" id="newDataAcquisitionUri" >
  		   </div>
  		   
 	 	  <div id="div_startdate" class="form-group" style="display : none">
 	         <label for="startdate">Start Date/Time</label><br> 
-	         <div class="container">
-	            <div class="row">
-	               <div class='col-sm-3'>
-	                 <div class="form-group">
-	                    <div class='input-group date' id='startdate' >
-	                       <input type='text' name="newDataAcquisitionStartDate" id="newDataAcquisitionStartDate" class="form-control" />
-	                       <span class="input-group-addon">
-	                          <span class="glyphicon glyphicon-calendar"></span>
-	                       </span>
-	                    </div>
-	                 </div>
-	               </div>
-	               <script type="text/javascript">
-	                 $(function () {
-	                     $('#startdate').datetimepicker();
-	                     $('#startdate').on('dp.change', function (e) { checkform(); });
-	                 });
-	               </script>
-	            </div>
+	         <div class="row">
+	             <div class='col-sm-3'>
+	                  <div class='input-group date' id='startdate' onclick="$('#startdate').datetimepicker(); checkform();">
+	                    <input type='text' name="newStartDate" id="newStartDate" class="form-control" oninput="checkform()" />
+	                    <span class="input-group-addon">
+	                       <span class="glyphicon glyphicon-calendar"></span>
+	                    </span>
+	                  </div>
+	             </div>
 	         </div>
-	     </div>
+	      </div>
+	      
+	      <div id="div_enddate" class="form-group" style="display : none">
+	         <label for="enddate">End Date/Time</label><br> 
+	         <div class="row">
+	             <div class='col-sm-3'>
+	                  <div class='input-group date' id='enddate' onclick="$('#enddate').datetimepicker(); checkform();">
+	                    <input type='text' name="newEndDate" id="newEndDate" class="form-control" oninput="checkform()" />
+	                    <span class="input-group-addon">
+	                       <span class="glyphicon glyphicon-calendar"></span>
+	                    </span>
+	                  </div>
+	             </div>
+	         </div>
+	      </div>
+	     }
 
-           <div id="question-box">
-              <br>
-              Are your sure you want to commit changes to this data acquisition? 
-              <input class="btn btn-success" id="submitbutton" role="button" type="submit" value="Confirm editing" />
-           </div>
+         <div id="question-box">
+            <input class="btn btn-success" id="submitbutton" role="button" type="submit" value="Confirm editing" onclick="return onConfirm();"/>
+         </div>
        </form>
 
        <br>
