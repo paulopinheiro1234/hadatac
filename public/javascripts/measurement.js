@@ -21,6 +21,15 @@ function facetPrettyName(type, value) {
                value = value.substring(value.indexOf("#") + 1);
             }
             break;
+        case 'study_uri,acquisition_uri':
+            if (value.indexOf("#") > 0) {
+               value = value.substring(value.indexOf("#") + 1);
+            } else {
+               if (value.indexOf(":") > 0) {
+	          value = value.substring(value.indexOf(":") + 1);
+	       }
+	    }
+            break;
         case 'entity':
 	    value += "'s attribute";
             break;

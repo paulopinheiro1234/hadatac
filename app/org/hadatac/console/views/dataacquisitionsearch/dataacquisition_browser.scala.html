@@ -5,7 +5,8 @@
 	results : org.hadatac.data.model.AcquisitionQueryResult,
 	documentJson : String,
 	handler : org.hadatac.console.models.FacetHandler,
-	query : String
+	query : String,
+        objDetails : String
 )
 
 @import helper._
@@ -90,7 +91,7 @@
 				<div class="row placeholders"></div>
 				<div>
 					<div id="acquisition" class="tab-pane">
-						@table_acquisition(page, rows, facets, results.documents, resultsSize)
+						@table_acquisition(page, rows, facets, results.documents, resultsSize, objDetails)
 					</div>
 				</div>
 				<div class="container">
@@ -121,6 +122,11 @@
 					<div id="legend">
 						<legend>Object's Metadata</legend>
 					</div>
+					<div class="tab-pane">
+						@if(!results.documents.isEmpty) {
+							@object_details(results.documents(0))
+						}
+					</div>
 				</div>
 			</div>
 		</div>
@@ -149,7 +155,7 @@
                 //window.alert(values);
                 return disj;
         }
-        function setCheckTree(tree, values) {
+        function setCheckTree(tree, values, props) {
                 if (values != null) {
                     values = values.substring(1,values.length - 1);
                     //window.alert("listStr : <" + values + ">");
@@ -160,7 +166,8 @@
                            for (var i = 0; i < list.length; i++) {
                               list[i] = decodeURIComponent(list[i]).replace(/\&#x27;/gm,"'");
                               //window.alert("Tree item " + list[i]);
-                              var item = tree.findItem(list[i]);
+                              //window.alert("Tree pretty item " + facetPrettyName(props,list[i]));
+                              var item = tree.findItem(facetPrettyName(props,list[i]));
                               tree.setCheck(item, true);
                               //window.alert("Tree item " + item + " " + list[i]);
                            }
@@ -214,36 +221,40 @@
 	
 	var jsonTree, dataTree;
 	var treeEC;
-	jsonTree = parseSolrFacetPivotToTree("entity,characteristic");
+        var props = "entity,characteristic";
+	jsonTree = parseSolrFacetPivotToTree(props);
 	dataTree = JSON.parse(jsonTree);
 	treeEC = new dhtmlXTreeObject("treeEntityCharacteristicBox","100%","100%",0);
 	loadTree(treeEC, dataTree);
         var listEC = '@handler.valuesEC()';
-        setCheckTree(treeEC, listEC);
+        setCheckTree(treeEC, listEC, props);
 	
 	var treeS;
-	jsonTree = parseSolrFacetPivotToTree("study_uri,acquisition_uri");
+        var props = "study_uri,acquisition_uri";
+	jsonTree = parseSolrFacetPivotToTree(props);
 	dataTree = JSON.parse(jsonTree);
 	treeS = new dhtmlXTreeObject("treeStudyBox","100%","100%",0);
 	loadTree(treeS, dataTree);
         var listS = '@handler.valuesS()';
-        setCheckTree(treeS, listS);
+        setCheckTree(treeS, listS, props);
 	
 	var treeU;
-	jsonTree = parseSolrFacetFieldToTree("unit");
+        var props = "unit";
+	jsonTree = parseSolrFacetFieldToTree(props);
 	dataTree = JSON.parse(jsonTree);
 	treeU = new dhtmlXTreeObject("treeUnitBox","100%","100%",0);
 	loadTree(treeU, dataTree);
         var listU = '@handler.valuesU()';
-        setCheckTree(treeU, listU);
+        setCheckTree(treeU, listU, props);
 	
 	var treePI;
-	jsonTree = parseSolrFacetPivotToTree("platform_name,instrument_model");
+        var props = "platform_name,instrument_model";
+	jsonTree = parseSolrFacetPivotToTree(props);
 	dataTree = JSON.parse(jsonTree);
 	treePI = new dhtmlXTreeObject("treePlatformInstrumentBox","100%","100%",0);
 	loadTree(treePI, dataTree);
         var listPI = '@handler.valuesPI()';
-        setCheckTree(treePI, listPI);
+        setCheckTree(treePI, listPI, props);
 	</script>
 }
 

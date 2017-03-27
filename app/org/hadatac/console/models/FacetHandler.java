@@ -40,7 +40,7 @@ public class FacetHandler {
 	public FacetHandler() {
 	       
 
-	       System.out.println("########### FACET HANDLER CONSTRUCTOR CALLED"); 
+	       //System.out.println("########### FACET HANDLER CONSTRUCTOR CALLED"); 
 	       facetsAll = new HashMap<String, Object>();
 
 	       facetsEC  = new ArrayList<Pair>();
@@ -158,7 +158,7 @@ public class FacetHandler {
 		ObjectMapper mapper = new ObjectMapper();
 		try {
 		   String output =  mapper.writeValueAsString(this);
-		   System.out.println("facet handler toJSON(): " + output);
+		   //System.out.println("facet handler toJSON(): " + output);
                    return output;
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -197,7 +197,7 @@ public class FacetHandler {
 	    if (str == null || str.equals("")) {
 		return;
 	    }
-            System.out.println(">> loadList = <" + str + ">");
+            //System.out.println(">> loadList = <" + str + ">");
 	    if (str.indexOf(',') == -1) {
 		loadOneFacet(l,str);}
 	    else {
@@ -213,7 +213,7 @@ public class FacetHandler {
 	        if (str == null || str.equals("")) {
 		   return;
 	        }
-		System.out.println("str = [" + str + "]");			    
+		//System.out.println("str = [" + str + "]");			    
 	        // EC list
 	        str = str.substring(str.indexOf('['));
 		String ECList = str.substring(1,str.indexOf(']'));
@@ -241,10 +241,10 @@ public class FacetHandler {
 		if (PIList != null && !PIList.equals("") && !PIList.equals("{}")) {
 		    loadList(facetsPI, PIList);
 		}
-		System.out.println("ECList = <" + ECList + ">");			    
-		System.out.println("SList = <" + SList + ">");			    
-		System.out.println("UList = <" + UList + ">");			    
-		System.out.println("PIList = <" + PIList + ">");			    
+		//System.out.println("ECList = <" + ECList + ">");			    
+		//System.out.println("SList = <" + SList + ">");			    
+		//System.out.println("UList = <" + UList + ">");			    
+		//System.out.println("PIList = <" + PIList + ">");			    
 		return;
         }
 
@@ -256,7 +256,7 @@ public class FacetHandler {
 	    Iterator<Pair> i = facets.iterator();
 	    while (i.hasNext()) {
 		Pair temp = i.next();
-		System.out.println("inside pivot: " + temp.getField());
+		//System.out.println("inside pivot: " + temp.getField());
 		facetsQuery += temp.getField() + ":\"" + temp.getValue() + "\"";
 		if (i.hasNext()) {
 		    facetsQuery += " OR ";
@@ -276,7 +276,7 @@ public class FacetHandler {
 		while (i.hasNext()) {
 		        Map.Entry entry = (Map.Entry)i.next();
 		        List tmpFacets = (List<Pair>)entry.getValue();
-			System.out.println("List's name: " + entry.getKey() + " size:" + tmpFacets.size());
+			//System.out.println("List's name: " + entry.getKey() + " size:" + tmpFacets.size());
                         query_tmp = facetToSolrQuery(tmpFacets);
                         if (!query_tmp.equals("")) {
     			    if (tmpFacets.size() > 0) {

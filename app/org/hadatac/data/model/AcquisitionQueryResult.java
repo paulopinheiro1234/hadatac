@@ -23,6 +23,10 @@ public class AcquisitionQueryResult {
 		this.nDocSize = nDocSize;
 	}
 	
+        public List<Measurement> getDocuments() {
+	        return documents;
+        }
+
 	public AcquisitionQueryResult() {
 		documents = new ArrayList<Measurement>();
 		field_facets = new HashMap<String, Map<String, Long>>();

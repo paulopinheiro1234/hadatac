@@ -3,15 +3,21 @@ package org.hadatac.console.controllers.dataacquisitionsearch;
 import org.hadatac.console.controllers.AuthApplication;
 import org.hadatac.console.controllers.triplestore.UserManagement;
 import org.hadatac.console.http.JsonHandler;
+import org.hadatac.console.controllers.metadataacquisition.ViewSubject;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.StringTokenizer;
+import java.util.Set;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.HashMap;
 
 import org.hadatac.console.models.FacetHandler;
 import org.hadatac.console.models.FacetsWithCategories;
 import org.hadatac.console.models.SpatialQueryResults;
 import org.hadatac.console.models.SysUser;
+import org.hadatac.console.models.ObjectDetails;
 
 import play.data.DynamicForm;
 import play.data.Form;
@@ -98,9 +104,30 @@ public class DataAcquisitionSearch extends Controller {
     		results = Measurement.find(ownerUri, page, rows, handler);
     	}
     	System.out.println("[DataAcquisitionSearch] Total size response: " + results.getDocumentSize());
-    	
+	Set<String> setObj = new HashSet<String>();
+	ObjectDetails objDetails = new ObjectDetails();
+	if (results != null) {
+	    for (Measurement m: results.getDocuments()) {
+		System.out.println(m.getObjectUri());
+		setObj.add(m.getObjectUri());
+            }
+            for (String uri: setObj) {
+		if (uri != null) {
+    		   System.out.println(uri);
+		   String html = ViewSubject.findBasicHTML(uri);
+                   if (html != null) {
+		      objDetails.putObject(uri, html);
+		      System.out.println(html);
+                   }
+		}
+	    }
+	    System.out.println("ViewSubject: " + objDetails.toJSON());
+        }
+
     	return ok(dataacquisition_browser.render(page, rows, facets, results.getDocumentSize(), 
-    			results, results.toJSON(), handler, Measurement.buildQuery(ownerUri, page, rows, handler)));
+						 results, results.toJSON(), handler, 
+                                                 Measurement.buildQuery(ownerUri, page, rows, handler), 
+                                                 objDetails.toJSON()));
     }
 
     public static Result postIndex(int page, int rows, String facets) {
