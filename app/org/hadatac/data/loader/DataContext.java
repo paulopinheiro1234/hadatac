@@ -123,6 +123,51 @@ public class DataContext {
         return message;
 	}
 	
+	private String cleanSpecifiedStudy(int mode, String studyURI) {
+		String solrCoreName = Collections.STUDIES;
+		String message = "";
+	    String straux = "";
+	    
+        message += Feedback.println(mode,"   Documents before [clean]: " + totalDocuments(solrCoreName));
+        message += Feedback.println(mode, " ");
+
+	    String query1 = "<delete><query>studyUri:\"" + studyURI +"\"</query></delete>";
+	    String query2 = "<commit/>";
+	    
+	    String url1;
+	    String url2;
+		try {
+		    url1 = Collections.getCollectionsName(solrCoreName) + "/update?stream.body=" + URLEncoder.encode(query1, "UTF-8");
+		    url2 = Collections.getCollectionsName(solrCoreName) + "/update?stream.body=" + URLEncoder.encode(query2, "UTF-8");
+
+		    if (verbose) {
+		        message += Feedback.println(mode, url1);
+		        message += Feedback.println(mode, url2);
+		    }
+		    String[] cmd1 = {"curl", "-v", url1};
+			message += Feedback.print(mode, "    Erasing documents... ");                
+		    straux = Command.exec(mode, verbose, cmd1);
+		    if (mode == Feedback.WEB) {
+		    	message += straux;
+		    }
+		    message += Feedback.println(mode, "");
+			message += Feedback.print(mode, "   Committing... ");                
+		    String[] cmd2 = {"curl", "-v", url2};
+		    straux = Command.exec(mode, verbose, cmd2);
+		    if (mode == Feedback.WEB) {
+		    	message += straux;
+		    }
+		    message += Feedback.println(mode," ");
+		    message += Feedback.println(mode," ");
+			message += Feedback.print(mode,"   Triples after [clean]: " + totalDocuments(solrCoreName));                
+		} catch (UnsupportedEncodingException e) {
+		    System.out.println("[DataManagement] - ERROR encoding URLs");
+		    return message;
+		}
+		
+        return message;
+	}
+	
 	public String cleanDataCollections(int mode) {
 		return cleanAllDocuments(mode, Collections.DATA_COLLECTION);
 	}
@@ -137,5 +182,9 @@ public class DataContext {
 	
 	public String cleanDataAcquisitions(int mode) {
 		return cleanAllDocuments(mode, Collections.DATA_ACQUISITION);
+	}
+	
+	public String cleanStudy(int mode, String studyURI) {
+		return cleanSpecifiedStudy(mode, studyURI);
 	}
 }

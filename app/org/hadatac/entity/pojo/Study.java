@@ -588,7 +588,7 @@ public class Study {
 		
 		SolrClient solr = new HttpSolrClient(
 				Play.application().configuration().getString("hadatac.solr.data")
-				+ Collections.STUDIES_FACET);
+				+ Collections.STUDIES);
 		SolrQuery query = new SolrQuery();
 		String permission_query = "";
 		String facet_query = "";
@@ -669,7 +669,7 @@ public class Study {
 		System.out.println(uri);
 		SolrClient solr = new HttpSolrClient(
 				Play.application().configuration().getString("hadatac.solr.data")
-				+ Collections.STUDIES_FACET);
+				+ Collections.STUDIES);
 		SolrQuery query = new SolrQuery();
 		
 		query.set("q", "uri:\"" + uri + "\"");
@@ -701,7 +701,7 @@ public class Study {
 	public int delete() {
 		SolrClient solr = new HttpSolrClient(
 				Play.application().configuration().getString("hadatac.solr.data")
-				+ Collections.STUDIES_FACET);
+				+ Collections.STUDIES);
 		try {
 			UpdateResponse response = solr.deleteByQuery("uri:\"" + uri + "\"");
 			solr.commit();
@@ -722,7 +722,7 @@ public class Study {
 		try {
 			SolrClient client = new HttpSolrClient(
 					Play.application().configuration().getString("hadatac.solr.data")
-					+ Collections.STUDIES_FACET);
+					+ Collections.STUDIES);
 			if (endedAt.toString().startsWith("9999")) {
 				endedAt = DateTime.parse("9999-12-31T23:59:59.999Z");
 			}

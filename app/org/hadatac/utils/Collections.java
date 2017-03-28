@@ -8,7 +8,7 @@ public class Collections {
     public static final String DATA_COLLECTION             = "/sdc";
 	public static final String DATA_ACQUISITION            = "/measurement";
 	public static final String CONSOLE_STORE               = "/console_store";
-	public static final String STUDIES_FACET               = "/studies_facet";
+	public static final String STUDIES		               = "/studies";
 	public static final String ANNOTATION_LOG              = "/annotation_log";
 	public static final String CSV_DATASET                 = "/csv";
 	public static final String LABKEY_CREDENTIAL           = "/labkey";
@@ -65,7 +65,7 @@ public class Collections {
             case SAMPLES_ACQUISITION:
             case ANALYTES_ACQUISITION:
             case METADATA_DA:
-            case STUDIES_FACET:
+            case STUDIES:
             case SCHEMA_ATTRIBUTES:        collectionName = Play.application().configuration().getString("hadatac.solr.data") + request;
             							   break;
                                            

@@ -61,6 +61,7 @@
                      <div id="question-box">
                          <a href="@org.hadatac.console.controllers.triplestore.routes.Clean.clean("metadata")" class="btn btn-primary" role="button">Clean Metadata</a>
                          <a href="@org.hadatac.console.controllers.triplestore.routes.Clean.clean("usergraph")" class="btn btn-primary" role="button">Clean User Graph</a>
+                         <a href="@org.hadatac.console.controllers.triplestore.routes.Clean.clean("studies")" class="btn btn-primary" role="button">Clean Studies</a>
                      </div>
                  </div>
 
@@ -75,7 +76,7 @@
                   <a href="@org.hadatac.console.controllers.triplestore.routes.Clean.clean("init")" class="btn btn-warning" role="button">Back to Repository Management</a>
 	       </div>
 
-	     @if((oper=="collections") || (oper=="acquisitions") || (oper=="metadata") || (oper=="usergraph")) {
+	     @if((oper=="collections") || (oper=="acquisitions") || (oper=="metadata") || (oper=="usergraph") || (oper=="studies")) {
                 <script> 
                     var msg = "@Clean.playClean(oper)";
                     $('#msgarea').html(msg.replace(/&lt;br&gt;/g, '<br>'));
