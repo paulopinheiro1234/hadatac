@@ -74,16 +74,7 @@ public class Clean extends Controller {
 	    		             Play.application().configuration().getString("hadatac.solr.data"), 
 	    		             false);
     		result = acquisition.cleanDataAcquisitions(Feedback.WEB);
-    	} else if (oper.equals("studies")) {
-    		NameSpaces.getInstance();
-    		DataContext acquisition = new 
-	    		 DataContext("user", 
-	    		             "password",
-	    		             Play.application().configuration().getString("hadatac.solr.data"), 
-	    		             false);
-    		result = acquisition.cleanStudy(Feedback.WEB,"http://hadatac.org/kb/chear#STD-Pilot-1");
-    		// TODO: need to pull in speified study from repository management and pass as argument, rather than hardcoded as was done for testing
-    	}
+    	} 
 	     return result;
    }
 
