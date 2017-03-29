@@ -26,41 +26,41 @@ echo ""
 HADATAC_HOME=/data/git/hadatac
 HADATAC_DOWNLOAD=$HADATAC_HOME/download
 HADATAC_SOLR=/data/hadatac-solr/solr
-SOLR5_HOME=$HADATAC_SOLR/solr-5.2.1
+SOLR5_HOME=$HADATAC_SOLR/solr-6.5.0
 
 mkdir $HADATAC_HOME
 mkdir $HADATAC_DOWNLOAD
 mkdir $HADATAC_SOLR
 
-echo "=== Downloading Apache Solr 5.2.1..."
-wget -O $HADATAC_DOWNLOAD/solr-5.2.1.tgz http://archive.apache.org/dist/lucene/solr/5.2.1/solr-5.2.1.tgz
+echo "=== Downloading Apache Solr 6.5.0..."
+wget -O $HADATAC_DOWNLOAD/solr-6.5.0.tgz http://archive.apache.org/dist/lucene/solr/6.5.0/solr-6.5.0.tgz
 wait $!
-wget -O $HADATAC_DOWNLOAD/solr-5.2.1.tgz.md5 http://archive.apache.org/dist/lucene/solr/5.2.1/solr-5.2.1.tgz.md5
+wget -O $HADATAC_DOWNLOAD/solr-6.5.0.tgz.md5 http://archive.apache.org/dist/lucene/solr/6.5.0/solr-6.5.0.tgz.md5
 wait $!
-echo "=== Downloading JTS Topology Suite 1.13..."
-wget -O $HADATAC_DOWNLOAD/jts-1.13.zip https://sourceforge.net/projects/jts-topo-suite/files/jts/1.13/jts-1.13.zip
+echo "=== Downloading JTS Topology Suite 1.14..."
+wget -O $HADATAC_DOWNLOAD/jts-1.14.zip https://sourceforge.net/projects/jts-topo-suite/files/jts/1.14/jts-1.14.zip
 
-echo "=== Uncompressing Apache Solr 5.2.1..."
-tar xfz $HADATAC_DOWNLOAD/solr-5.2.1.tgz -C $HADATAC_SOLR
+echo "=== Uncompressing Apache Solr 6.5.0..."
+tar xfz $HADATAC_DOWNLOAD/solr-6.5.0.tgz -C $HADATAC_SOLR
 wait $!
-echo "=== Uncompressing JTS Topology Suite 1.13..."
-unzip -o -qq $HADATAC_DOWNLOAD/jts-1.13.zip -d $HADATAC_DOWNLOAD/jts-1.13
+echo "=== Uncompressing JTS Topology Suite 1.14..."
+unzip -o -qq $HADATAC_DOWNLOAD/jts-1.14.zip -d $HADATAC_DOWNLOAD/jts-1.14
 wait $!
 
 echo "HADATAC_SOLR=$HADATAC_SOLR" >> $HADATAC_SOLR/hadatac_solr.sh
-cat $HADATAC_SOLR/solr5.in.sh >> $HADATAC_SOLR/hadatac_solr.sh
-mv $HADATAC_SOLR/hadatac_solr.sh $HADATAC_SOLR/solr5.in.sh
+cat $HADATAC_SOLR/solr6.in.sh >> $HADATAC_SOLR/hadatac_solr.sh
+mv $HADATAC_SOLR/hadatac_solr.sh $HADATAC_SOLR/solr6.in.sh
 
 echo "HADATAC_SOLR=$HADATAC_SOLR" >> $HADATAC_SOLR/hadatac_solr.sh
-cat $HADATAC_SOLR/run_solr5.sh >> $HADATAC_SOLR/hadatac_solr.sh
-mv $HADATAC_SOLR/hadatac_solr.sh $HADATAC_SOLR/run_solr5.sh
+cat $HADATAC_SOLR/run_solr6.sh >> $HADATAC_SOLR/hadatac_solr.sh
+mv $HADATAC_SOLR/hadatac_solr.sh $HADATAC_SOLR/run_solr6.sh
 
-sh $HADATAC_SOLR/run_solr5.sh start
+sh $HADATAC_SOLR/run_solr6.sh start
 wait $!
 
-cp $HADATAC_DOWNLOAD/jts-1.13/lib/* $HADATAC_SOLR/solr-5.2.1/server/solr-webapp/webapp/WEB-INF/lib/
+cp $HADATAC_DOWNLOAD/jts-1.14/lib/* $HADATAC_SOLR/solr-6.5.0/server/solr-webapp/webapp/WEB-INF/lib/
 
-sh $HADATAC_SOLR/run_solr5.sh restart
+sh $HADATAC_SOLR/run_solr6.sh restart
 
 echo "=== Installing puppet..."
 apt-get install puppet
