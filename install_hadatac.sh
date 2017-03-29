@@ -65,7 +65,7 @@ mv $HADATAC_SOLR/hadatac_solr.sh $HADATAC_SOLR/run_solr6.sh
 sh $HADATAC_SOLR/run_solr6.sh start
 wait $!
 
-cp $HADATAC_DOWNLOAD/jts-1.13/lib/* $HADATAC_SOLR/solr-6.5.0/server/solr-webapp/webapp/WEB-INF/lib/
+cp $HADATAC_DOWNLOAD/jts-1.14/lib/* $HADATAC_SOLR/solr-6.5.0/server/solr-webapp/webapp/WEB-INF/lib/
 
 sh $HADATAC_SOLR/run_solr6.sh restart
 
