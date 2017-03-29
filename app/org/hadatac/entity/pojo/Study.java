@@ -38,7 +38,22 @@ public class Study {
 	private DateTime startedAt;
 	private DateTime endedAt;
 	
-	@Field("uri")
+	@Field("studyUri")
+	private String studyUri;
+	@Field("permission_uri")
+	private String permissionUri;
+	@Field("studyLabel")
+	private String label;
+	@Field("proj")
+	private String project;
+	@Field("studyComment")
+	private String comment;
+	@Field("institutionName")
+	private String institution;
+	@Field("agentName")
+	private String agent;
+	
+	/*@Field("uri")
 	private String uri;
 	@Field("permission_uri")
 	private String permissionUri;
@@ -86,12 +101,18 @@ public class Study {
 	private List<String> laboratory;
 	@Field("birthOutcomes")
 	private List<String> birthOutcomes;
-	
+	*/
 	// Constructer
 	public Study() {
 		startedAt = null;
 		endedAt = null;
-		numSubjects = 0;
+		permissionUri = "";
+		label = "";
+		project= "";
+		comment = "";
+		institution = "";
+		agent = "";
+/*		numSubjects = 0;
 		numSamples = 0;
 		institution = new ArrayList<String>();
 		location = new ArrayList<String>();
@@ -108,34 +129,35 @@ public class Study {
 		anthropometry = new ArrayList<String>();
 		laboratory = new ArrayList<String>();
 		birthOutcomes = new ArrayList<String>();
+		*/
 	}
 	
 	// get Methods
 	public String getUri() {
-		return uri;
+		return studyUri;
 	}
 	
 	public String getPermissionUri() {
 		return permissionUri;
 	}
 	
-	public String getName() {
+/*	public String getName() {
 		return name;
-	}
+	}*/
 	
 	public String getLabel() {
 		return label;
 	}
 	
-	public String getProjectTitle() {
-		return projectTitle;
+	public String getProject() {
+		return project;
 	}
 	
 	public String getComment() {
 		return comment;
 	}
 	
-	public String getDescription() {
+/*	public String getDescription() {
 		return description;
 	}
 	
@@ -145,13 +167,17 @@ public class Study {
 	
 	public int getNumSubjects() {
 		return numSubjects;
-	}
+	}*/
 	
-	public List<String> getInstitution() {
+	public String getInstitution() {
 		return institution;
 	}
 	
-	public List<String> getLocation() {
+	public String getAgent() {
+		return agent;
+	}
+	
+/*	public List<String> getLocation() {
 		return location;
 	}
 	
@@ -206,7 +232,7 @@ public class Study {
 	public List<String> getBirthOutcomes() {
 		return birthOutcomes;
 	}
-	
+	*/
 	// get Start Time Methods
 	public String getStartedAt() {
 		DateTimeFormatter formatter = ISODateTimeFormat.dateTime();
@@ -229,30 +255,30 @@ public class Study {
 	
 	// set Methods
 	public void setUri(String uri) {
-		this.uri = uri;
+		this.studyUri = uri;
 	}
 	
 	public void setPermissionUri(String permissionUri) {
 		this.permissionUri = permissionUri;
 	}
 	
-	public void setName(String name) {
+/*	public void setName(String name) {
 		this.name = name;
 	}
-	
+	*/
 	public void setLabel(String label) {
 		this.label = label;
 	}
 		
-	public void setProjectTitle(String projectTitle) {
-		this.projectTitle = projectTitle;
+	public void setProject(String project) {
+		this.project = project;
 	}
 
 	public void setComment(String comment) {
 		this.comment = comment;
 	}
 	
-	public String setDescription() {
+/*	public String setDescription() {
 		return description;
 	}
 	
@@ -263,12 +289,16 @@ public class Study {
 	public void setNumSubjects(int numSubjects) {
 		this.numSubjects = numSubjects;
 	}
-
-	public void setInstitution(List<String> institution) {
+*/
+	public void setInstitution(String institution) {
 		this.institution = institution;
 	}
 	
-	public void setLocation(List<String> location) {
+	public void setAgent(String agent) {
+		this.agent = agent;
+	}
+	
+/*	public void setLocation(List<String> location) {
 		this.location = location;
 	}
 	
@@ -323,7 +353,7 @@ public class Study {
 	public void setBirthOutcomes(List<String> birthOutcomes) {
 		this.birthOutcomes = birthOutcomes;
 	}
-	
+	*/
 	// set Start Time Methods
 	@Field("started_at")
 	public void setStartedAt(String startedAt) {
@@ -353,7 +383,7 @@ public class Study {
 		DateTimeFormatter formatter = ISODateTimeFormat.dateTime();
 		this.endedAt = formatter.parseDateTime(endedAt);
 	}
-	
+/*	
 	// add Methods
 	public void addInstitution(String institution) {
 		this.institution.add(institution);
@@ -414,32 +444,32 @@ public class Study {
 	public void addBirthOutcomes(String birthOutcomes) {
 		this.birthOutcomes.add(birthOutcomes);
 	}
-	
+	*/
 	public static Study convertFromSolr(SolrDocument doc) {
 		Iterator<Object> i;
 		DateTime date;
 		Study study = new Study();
 		// URI
-		study.setUri(doc.getFieldValue("uri").toString());
+		study.setUri(doc.getFieldValue("studyUri").toString());
 		// permissions
 		study.setPermissionUri(doc.getFieldValue("permission_uri").toString());
-		// name
+/*		// name
 		if (doc.getFieldValues("name") != null) {
 			study.setName(doc.getFieldValue("name").toString());
-		}
+		}*/
 		// label
-		if (doc.getFieldValues("label") != null) {
-			study.setLabel(doc.getFieldValue("label").toString());
+		if (doc.getFieldValues("studyLabel") != null) {
+			study.setLabel(doc.getFieldValue("studyLabel").toString());
 		}
 		// projectTitle
-		if (doc.getFieldValues("projectTitle") != null) {
-			study.setProjectTitle(doc.getFieldValue("projectTitle").toString());
+		if (doc.getFieldValues("proj") != null) {
+			study.setProject(doc.getFieldValue("proj").toString());
 		}
 		// comment
 		if (doc.getFieldValues("comment") != null) {
 			study.setLabel(doc.getFieldValue("comment").toString());
 		}
-		// description
+/*		// description
 		if (doc.getFieldValues("description") != null) {
 			study.setProjectTitle(doc.getFieldValue("description").toString());
 		}
@@ -450,15 +480,17 @@ public class Study {
 		// numSamples
 		if (doc.getFieldValues("numSamples") != null) {
 			study.setNumSamples(Integer.parseInt(doc.getFieldValue("numSamples").toString()));
+		}*/
+		// institution
+		if (doc.getFieldValues("institutionName") != null) {
+			study.setProject(doc.getFieldValue("institutionName").toString());
 		}
-		// institution(s)
-		if (doc.getFieldValues("institution") != null) {
-			i = doc.getFieldValues("institution").iterator();
-			while (i.hasNext()) {
-				study.addInstitution(i.next().toString());
-			}
+		
+		// institution
+		if (doc.getFieldValues("agentName") != null) {
+			study.setProject(doc.getFieldValue("agentName").toString());
 		}
-		// location(s)
+/*		// location(s)
 		if (doc.getFieldValues("location") != null) {
 			i = doc.getFieldValues("location").iterator();
 			while (i.hasNext()) {
@@ -579,7 +611,7 @@ public class Study {
 			date = new DateTime((Date)doc.getFieldValue("ended_at"));
 			study.setEndedAt(date.withZone(DateTimeZone.UTC).toString("EEE MMM dd HH:mm:ss zzz yyyy"));
 		}
-				
+	*/			
 		return study;
 	}
 	
@@ -672,7 +704,7 @@ public class Study {
 				+ Collections.STUDIES);
 		SolrQuery query = new SolrQuery();
 		
-		query.set("q", "uri:\"" + uri + "\"");
+		query.set("q", "studyUri:\"" + uri + "\"");
 		query.set("sort", "started_at asc");
 		query.set("rows", "10000000");
 		
@@ -703,7 +735,7 @@ public class Study {
 				Play.application().configuration().getString("hadatac.solr.data")
 				+ Collections.STUDIES);
 		try {
-			UpdateResponse response = solr.deleteByQuery("uri:\"" + uri + "\"");
+			UpdateResponse response = solr.deleteByQuery("studyUri:\"" + studyUri + "\"");
 			solr.commit();
 			solr.close();
 			return response.getStatus();
