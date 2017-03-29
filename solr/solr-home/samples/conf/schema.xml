@@ -26,11 +26,6 @@
     <fieldType name="long" class="solr.TrieLongField" precisionStep="0" positionIncrementGap="0"/>
     <fieldType name="double" class="solr.TrieDoubleField"/>
     <fieldType name="int" class="solr.TrieIntField" precisionStep="8"/>
-    <fieldType name="latlong" class="solr.SpatialRecursivePrefixTreeFieldType"
-               spatialContextFactory="com.spatial4j.core.context.jts.JtsSpatialContextFactory"
-               distErrPct="0.025"
-               maxDistErr="0.000009"
-               units="degrees" />
     <fieldType name="text_general" class="solr.TextField" positionIncrementGap="100" multiValued="true">
       <analyzer type="index">
         <tokenizer class="solr.StandardTokenizerFactory"/>
