@@ -1,23 +1,24 @@
-@(oper : org.hadatac.utils.State, deployment : org.hadatac.entity.pojo.Study)
+@(oper : org.hadatac.utils.State, study : org.hadatac.entity.pojo.Study)
 
 @import java.net._
 @import org.hadatac.utils._
 
 <tr>
+	<td>@if(study.getUri() != null) { @study.getUri() }</td>
 @*****
-   <td>@if(deployment.getPlatform() != null && deployment.getPlatform().getLabel() != null) { @deployment.getPlatform().getLabel() }</td> 
-   <td>@if(deployment.getInstrument() != null && deployment.getInstrument().getLabel() != null) { @deployment.getInstrument().getLabel() @if(deployment.getInstrument().getSerialNumber() != null) { (SN: @deployment.getInstrument().getSerialNumber()) }}
+   <td>@if(study.getPlatform() != null && study.getPlatform().getLabel() != null) { @study.getPlatform().getLabel() }</td> 
+   <td>@if(study.getInstrument() != null && study.getInstrument().getLabel() != null) { @study.getInstrument().getLabel() @if(study.getInstrument().getSerialNumber() != null) { (SN: @deployment.getInstrument().getSerialNumber()) }}
    </td>
    ****@
-   <td>@if(deployment.getStartedAt() != null) { @deployment.getStartedAt() }</td>
+   <td>@if(study.getStartedAt() != null) { @study.getStartedAt() }</td>
    @if(oper.getCurrent() != State.ACTIVE) {
-       <td>@if(deployment.getEndedAt() != null) { @deployment.getEndedAt() }</td>
+       <td>@if(study.getEndedAt() != null) { @study.getEndedAt() }</td>
    }
    <td>
- @*****      <a href="@org.hadatac.console.controllers.studies.routes.ViewStudy.index(URLEncoder.encode(deployment.getUri(),"UTF-8"))" class="btn-xs btn-primary" role="button">View</a> 
+ @*****      <a href="@org.hadatac.console.controllers.studies.routes.ViewStudy.index(URLEncoder.encode(study.getUri(),"UTF-8"))" class="btn-xs btn-primary" role="button">View</a> 
        @if(oper.getCurrent() == State.ACTIVE) {
-           <a href="@org.hadatac.console.controllers.studies.routes.CloseStudy.index(URLEncoder.encode(deployment.getUri(),"UTF-8"))" class="btn-xs btn-primary" role="button">Undeploy</a>
+           <a href="@org.hadatac.console.controllers.studies.routes.CloseStudy.index(URLEncoder.encode(study.getUri(),"UTF-8"))" class="btn-xs btn-primary" role="button">Undeploy</a>
        }
-       <a href="@org.hadatac.console.controllers.studies.routes.DeleteStudy.index(URLEncoder.encode(deployment.getUri(),"UTF-8"))" class="btn-xs btn-primary" role="button">Delete</a> *****@
+       <a href="@org.hadatac.console.controllers.studies.routes.DeleteStudy.index(URLEncoder.encode(study.getUri(),"UTF-8"))" class="btn-xs btn-primary" role="button">Delete</a> *****@
    </td>
 </tr>

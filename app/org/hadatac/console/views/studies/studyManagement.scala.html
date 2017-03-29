@@ -50,8 +50,9 @@
         <table class="table">
             <thead>
                  <tr>
+                 	<th>Study URI</th>
+                    <th>Deployment</th>
                     <th>Platform</th>
-                    <th>Instrument</th>
                     <th>Start DateTime</th>
                     @if(oper.getCurrent() != State.ACTIVE) {
                         <th>End Date/Time</th>
@@ -60,8 +61,8 @@
                  </tr>
             </thead>
             <tbody>
-              @for(deployment <- results){
-                  @study_entry(oper, deployment)
+              @for(study <- results){
+                  @study_entry(oper, study)
               }
             </tbody>
         </table>

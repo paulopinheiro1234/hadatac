@@ -18,6 +18,7 @@ import org.apache.jena.query.QuerySolution;
 import org.apache.jena.query.ResultSet;
 import org.apache.jena.query.ResultSetFactory;
 import org.apache.jena.query.ResultSetRewindable;
+import org.apache.jena.sparql.engine.http.QueryExceptionHTTP;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServerException;
@@ -30,6 +31,7 @@ import org.apache.solr.client.solrj.response.UpdateResponse;
 import org.apache.solr.client.solrj.response.FacetField.Count;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
+import org.hadatac.console.controllers.metadata.DynamicFunctions;
 import org.hadatac.console.models.FacetHandler;
 import org.hadatac.console.models.Pivot;
 import org.hadatac.data.model.MetadataAcquisitionQueryResult;
@@ -734,9 +736,52 @@ public class Study {
 		return list;
 	}
 	*/
+	public static Study find(String study_uri) {
+		Study returnStudy = new Study();
+		String studyQueryString = DynamicFunctions.getPrefixes() +
+		"SELECT DISTINCT ?studyUri ?studyLabel ?proj ?studyComment (group_concat( ?agentName_ ; separator = ' & ') as ?agentName) ?institutionName " + 
+		" WHERE {        ?subUri rdfs:subClassOf hasco:Study . " + 
+		"                       ?studyUri a ?subUri . " + 
+		"           ?studyUri rdfs:label ?studyLabel  . " + 
+		"			FILTER ( ?studyUri = " + DynamicFunctions.replaceURLWithPrefix(study_uri) + " ) . " +
+		"		 OPTIONAL {?studyUri hasco:hasProject ?proj} . " +
+		"        OPTIONAL { ?studyUri rdfs:comment ?studyComment } . " + 
+		"             OPTIONAL{ ?studyUri hasco:hasAgent ?agent .  " +
+		"                         ?agent foaf:name ?agentName_} . " +
+		"        OPTIONAL { ?studyUri hasco:hasInstitution ?institution . " + 
+		"                                 ?institution foaf:name ?institutionName} . " + 
+		"                             }" +
+		"GROUP BY ?studyUri ?studyLabel ?proj ?studyTitle ?studyComment ?agentName ?institutionName ";
+		
+		try {
+			Query studyQuery = QueryFactory.create(studyQueryString);
+			QueryExecution qexec = QueryExecutionFactory.sparqlService(Collections.getCollectionsName(Collections.METADATA_SPARQL), studyQuery);
+			ResultSet results = qexec.execSelect();
+			ResultSetRewindable resultsrw = ResultSetFactory.copyResults(results);
+			qexec.close();
+			while (resultsrw.hasNext()) {
+				QuerySolution soln = resultsrw.next();
+				//values = new HashMap<String, String>();
+				returnStudy.setUri(soln.get("studyUri").toString());
+				if (soln.contains("studyLabel"))
+					returnStudy.setLabel(soln.get("studyLabel").toString());
+				if (soln.contains("proj"))
+					returnStudy.setProject(soln.get("proj").toString());
+				if (soln.contains("studyComment"))
+					returnStudy.setComment(soln.get("studyComment").toString());
+				if (soln.contains("agentName"))
+					returnStudy.setAgent(soln.get("agentName").toString());
+				if (soln.contains("institutionName"))
+					returnStudy.setInstitution(soln.get("institutionName").toString());
+			}
+		} catch (QueryExceptionHTTP e) {
+			e.printStackTrace();
+		}
+		return returnStudy;
+	}
 	
-	public static Study find(String uri) {
-		List<Study> list = new ArrayList<Study>();
+	/*public static Study find(String uri) {
+		//List<Study> list = new ArrayList<Study>();
 		Study returnStudy = new Study();
 		System.out.println("uri:");
 		System.out.println(uri);
@@ -746,7 +791,7 @@ public class Study {
 		SolrQuery query = new SolrQuery();
 		
 		query.set("q", "studyUri:\"" + uri + "\"");
-		query.set("sort", "started_at asc");
+		//query.set("sort", "started_at asc");
 		query.set("rows", "10000000");
 		
 		try {
@@ -757,47 +802,69 @@ public class Study {
 			while (i.hasNext()) {
 				Study study = convertFromSolr(i.next());
 				returnStudy = study;
-				list.add(study);
+				//list.add(study);
 			}
 		} catch (Exception e) {
-			list.clear();
+			//list.clear();
 			System.out.println("[ERROR] Study.find(String) - Exception message: " + e.getMessage());
 		}
 		
 		return returnStudy;
 	}
-	
+	*/
 	public static List<Study> find(State state) {
 		List<Study> studies = new ArrayList<Study>();
 	    String queryString = "";
         if (state.getCurrent() == State.ACTIVE) { 
-    	   queryString = "PREFIX prov: <http://www.w3.org/ns/prov#>  " +
-    			   "PREFIX vstoi: <http://hadatac.org/ont/vstoi#>  " +
-    			   "SELECT ?uri WHERE { " + 
-    			   "   ?uri a vstoi:Deployment . " + 
-    			   "   FILTER NOT EXISTS { ?uri prov:endedAtTime ?enddatetime . } " + 
-    			   "} " + 
-    			   "ORDER BY DESC(?datetime) ";
+    	   queryString = DynamicFunctions.getPrefixes() +
+    			    "SELECT DISTINCT ?studyUri ?studyLabel ?proj ?studyComment (group_concat( ?agentName_ ; separator = ' & ') as ?agentName) ?institutionName " + 
+    				" WHERE {        ?subUri rdfs:subClassOf hasco:Study . " + 
+    				"                       ?studyUri a ?subUri . " + 
+    				"           ?studyUri rdfs:label ?studyLabel  . " + 
+    				"		 OPTIONAL {?studyUri hasco:hasProject ?proj} . " +
+    				"        OPTIONAL { ?studyUri rdfs:comment ?studyComment } . " + 
+    				"             OPTIONAL{ ?studyUri hasco:hasAgent ?agent .  " +
+    				"                         ?agent foaf:name ?agentName_} . " +
+    				"        OPTIONAL { ?studyUri hasco:hasInstitution ?institution . " + 
+    				"                                 ?institution foaf:name ?institutionName} . " + 
+    				"   FILTER NOT EXISTS { ?studyUri prov:endedAtTime ?enddatetime . } " + 
+     			   	"                             }" +
+    				"GROUP BY ?studyUri ?studyLabel ?proj ?studyTitle ?studyComment ?agentName ?institutionName ";
         } else {
     	   if (state.getCurrent() == State.CLOSED) {
-    		   queryString = "PREFIX prov: <http://www.w3.org/ns/prov#>  " +
-    				   "PREFIX vstoi: <http://hadatac.org/ont/vstoi#>  " +
-    				   "SELECT ?uri WHERE { " + 
-    				   "   ?uri a vstoi:Deployment . " + 
-    				   "   ?uri prov:startedAtTime ?startdatetime .  " + 
-    				   "   ?uri prov:endedAtTime ?enddatetime .  " + 
-    				   "} " +
-    				   "ORDER BY DESC(?datetime) ";
+    		   queryString = DynamicFunctions.getPrefixes() +
+       			    "SELECT ?studyUri ?studyLabel ?proj ?studyDef ?studyComment ?agentName ?institutionName " + 
+       				" WHERE {        ?subUri rdfs:subClassOf hasco:Study . " + 
+       				"                       ?studyUri a ?subUri . " + 
+       				"           ?studyUri rdfs:label ?studyLabel  . " +
+       				//"   ?studyUri prov:startedAtTime ?startdatetime .  " + 
+ 				    //"   ?studyUri prov:endedAtTime ?enddatetime .  " + 
+ 				   	"		 OPTIONAL {?studyUri hasco:hasProject ?proj} . " +
+       				"        OPTIONAL { ?studyUri skos:definition ?studyDef } . " + 
+       				"        OPTIONAL { ?studyUri rdfs:comment ?studyComment } . " + 
+       				"        OPTIONAL { ?studyUri hasco:hasAgent ?agent . " + 
+       				"                                   ?agent foaf:name ?agentName } . " + 
+       				"        OPTIONAL { ?studyUri hasco:hasInstitution ?institution . " + 
+       				"                                 ?institution foaf:name ?institutionName} . " +
+        			"                             }";// +
+       	   			//"ORDER BY DESC(?enddatetime) ";
     	   } else {
         	   if (state.getCurrent() == State.ALL) {
-        		   queryString = "PREFIX prov: <http://www.w3.org/ns/prov#>  " +
-        				   "PREFIX vstoi: <http://hadatac.org/ont/vstoi#>  " +
-        				   "SELECT ?uri WHERE { " + 
-        				   "   ?uri a vstoi:Deployment . " + 
-        				   "} " +
-        				   "ORDER BY DESC(?datetime) ";
+        		   queryString = DynamicFunctions.getPrefixes() +
+           			    "SELECT ?studyUri ?studyLabel ?proj ?studyDef ?studyComment ?agentName ?institutionName " + 
+        				" WHERE {        ?subUri rdfs:subClassOf hasco:Study . " + 
+        				"                       ?studyUri a ?subUri . " + 
+        				"           ?studyUri rdfs:label ?studyLabel  . " + 
+        				"		 OPTIONAL {?studyUri hasco:hasProject ?proj} . " +
+        				"        OPTIONAL { ?studyUri skos:definition ?studyDef } . " + 
+        				"        OPTIONAL { ?studyUri rdfs:comment ?studyComment } . " + 
+        				"        OPTIONAL { ?studyUri hasco:hasAgent ?agent . " + 
+        				"                                   ?agent foaf:name ?agentName } . " + 
+        				"        OPTIONAL { ?studyUri hasco:hasInstitution ?institution . " + 
+        				"                                 ?institution foaf:name ?institutionName} . " +
+         			   	"                             }";
         	   } else {
-        		   System.out.println("Deployment.java: no valid state specified.");
+        		   System.out.println("Study.java: no valid state specified.");
         		   return null;
         	   }
     	   }
@@ -813,8 +880,9 @@ public class Study {
 		Study study = null;
 		while (resultsrw.hasNext()) {
 			QuerySolution soln = resultsrw.next();
-			if (soln != null && soln.getResource("uri").getURI()!= null) { 
-				study = Study.find(soln.getResource("uri").getURI()); 
+			if (soln != null && soln.getResource("studyUri").getURI()!= null) { 
+				study = Study.find(soln.get("studyUri").toString());
+				System.out.println("Study URI: " + soln.get("studyUri").toString());
 			}
 			studies.add(study);
 		}
