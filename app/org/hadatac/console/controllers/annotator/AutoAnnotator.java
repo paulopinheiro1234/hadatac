@@ -150,6 +150,7 @@ public class AutoAnnotator extends Controller {
 			proc_files = DataFile.findAll(State.PROCESSED);
 			unproc_files = DataFile.findAll(State.UNPROCESSED);
 			includeUnrecognizedFiles(path_unproc, unproc_files);
+			includeUnrecognizedFiles(path_proc, proc_files);
 		}
 		else {
 			proc_files = DataFile.find(user.getEmail(), State.PROCESSED);
