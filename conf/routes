@@ -157,8 +157,6 @@ POST 	/hadatac/studies/close/form	           org.hadatac.console.controllers.stu
 GET	    /hadatac/studies/delete	    	       org.hadatac.console.controllers.studies.DeleteStudy.index(deployment_uri : String)
 POST	/hadatac/studies/delete		           org.hadatac.console.controllers.studies.DeleteStudy.postIndex(deployment_uri : String)
 POST 	/hadatac/studies/delete/form	       org.hadatac.console.controllers.studies.DeleteStudy.processForm(deployment_uri : String)
-GET	    /hadatac/studies/view			       org.hadatac.console.controllers.studies.ViewStudy.index(deployment_uri : String)
-POST	/hadatac/studies/view	               org.hadatac.console.controllers.studies.ViewStudy.postIndex(deployment_uri : String)
 GET	    /hadatac/studies/resources		       org.hadatac.console.controllers.studies.ResourceAvailability.index()
 POST	/hadatac/studies/resources	           org.hadatac.console.controllers.studies.ResourceAvailability.postIndex()
 GET	    /hadatac/studies/urigenerator		   org.hadatac.console.controllers.studies.URIGenerator.index()

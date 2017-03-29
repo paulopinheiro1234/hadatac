@@ -826,43 +826,43 @@ public class Study {
     				"             OPTIONAL{ ?studyUri hasco:hasAgent ?agent .  " +
     				"                         ?agent foaf:name ?agentName_} . " +
     				"        OPTIONAL { ?studyUri hasco:hasInstitution ?institution . " + 
-    				"                                 ?institution foaf:name ?institutionName} . " + 
+    				"                   ?institution foaf:name ?institutionName} . " + 
     				"   FILTER NOT EXISTS { ?studyUri prov:endedAtTime ?enddatetime . } " + 
      			   	"                             }" +
     				"GROUP BY ?studyUri ?studyLabel ?proj ?studyTitle ?studyComment ?agentName ?institutionName ";
         } else {
     	   if (state.getCurrent() == State.CLOSED) {
     		   queryString = DynamicFunctions.getPrefixes() +
-       			    "SELECT ?studyUri ?studyLabel ?proj ?studyDef ?studyComment ?agentName ?institutionName " + 
+       			    "SELECT ?studyUri ?studyLabel ?proj ?studyComment (group_concat( ?agentName_ ; separator = ' & ') as ?agentName) ?institutionName " + 
        				" WHERE {        ?subUri rdfs:subClassOf hasco:Study . " + 
        				"                       ?studyUri a ?subUri . " + 
        				"           ?studyUri rdfs:label ?studyLabel  . " +
        				//"   ?studyUri prov:startedAtTime ?startdatetime .  " + 
  				    //"   ?studyUri prov:endedAtTime ?enddatetime .  " + 
  				   	"		 OPTIONAL {?studyUri hasco:hasProject ?proj} . " +
-       				"        OPTIONAL { ?studyUri skos:definition ?studyDef } . " + 
        				"        OPTIONAL { ?studyUri rdfs:comment ?studyComment } . " + 
-       				"        OPTIONAL { ?studyUri hasco:hasAgent ?agent . " + 
-       				"                                   ?agent foaf:name ?agentName } . " + 
+    				"             OPTIONAL{ ?studyUri hasco:hasAgent ?agent .  " +
+    				"                         ?agent foaf:name ?agentName_} . " +
        				"        OPTIONAL { ?studyUri hasco:hasInstitution ?institution . " + 
-       				"                                 ?institution foaf:name ?institutionName} . " +
-        			"                             }";// +
+       				"                     ?institution foaf:name ?institutionName} . " +
+        			"                             }"+
+    				"GROUP BY ?studyUri ?studyLabel ?proj ?studyComment ?agentName ?institutionName ";// +
        	   			//"ORDER BY DESC(?enddatetime) ";
     	   } else {
         	   if (state.getCurrent() == State.ALL) {
         		   queryString = DynamicFunctions.getPrefixes() +
-           			    "SELECT ?studyUri ?studyLabel ?proj ?studyDef ?studyComment ?agentName ?institutionName " + 
+           			    "SELECT ?studyUri ?studyLabel ?proj ?studyComment (group_concat( ?agentName_ ; separator = ' & ') as ?agentName ) ?institutionName " + 
         				" WHERE {        ?subUri rdfs:subClassOf hasco:Study . " + 
         				"                       ?studyUri a ?subUri . " + 
         				"           ?studyUri rdfs:label ?studyLabel  . " + 
         				"		 OPTIONAL {?studyUri hasco:hasProject ?proj} . " +
-        				"        OPTIONAL { ?studyUri skos:definition ?studyDef } . " + 
         				"        OPTIONAL { ?studyUri rdfs:comment ?studyComment } . " + 
-        				"        OPTIONAL { ?studyUri hasco:hasAgent ?agent . " + 
-        				"                                   ?agent foaf:name ?agentName } . " + 
+        				"             OPTIONAL{ ?studyUri hasco:hasAgent ?agent .  " +
+        				"                         ?agent foaf:name ?agentName_} . " +
         				"        OPTIONAL { ?studyUri hasco:hasInstitution ?institution . " + 
-        				"                                 ?institution foaf:name ?institutionName} . " +
-         			   	"                             }";
+        				"                  ?institution foaf:name ?institutionName} . " +
+         			   	"                             }" +
+        				"GROUP BY ?studyUri ?studyLabel ?proj ?studyComment ?agentName ?institutionName ";
         	   } else {
         		   System.out.println("Study.java: no valid state specified.");
         		   return null;
