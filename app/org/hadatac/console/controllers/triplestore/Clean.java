@@ -66,7 +66,7 @@ public class Clean extends Controller {
 	    		             Play.application().configuration().getString("hadatac.solr.data"), 
 	    		             false);
     		result = collection.cleanDataCollections(Feedback.WEB);
-    	} else if (oper.equals("acquisitions")) {
+    	} else if (oper.equals("aquisitions")) {
     		NameSpaces.getInstance();
     		DataContext acquisition = new 
 	    		 DataContext("user", 
@@ -74,7 +74,7 @@ public class Clean extends Controller {
 	    		             Play.application().configuration().getString("hadatac.solr.data"), 
 	    		             false);
     		result = acquisition.cleanDataAcquisitions(Feedback.WEB);
-    	}
+    	} 
 	     return result;
    }
 

@@ -191,6 +191,8 @@ POST	/hadatac/annotator/file/owner/form     	   org.hadatac.console.controllers.
 # metadata store management URLs
 GET     /hadatac/ts/clean                          org.hadatac.console.controllers.triplestore.Clean.clean(oper: String)
 POST    /hadatac/ts/clean                          org.hadatac.console.controllers.triplestore.Clean.postClean(oper: String)
+GET     /hadatac/ts/cleanstudy                     org.hadatac.console.controllers.triplestore.CleanStudy.clean(oper: String)
+POST    /hadatac/ts/cleanstudy                     org.hadatac.console.controllers.triplestore.CleanStudy.postClean(oper: String)
 GET     /hadatac/ts/startstop                      org.hadatac.console.controllers.triplestore.StartStop.index(oper: String, repository: String)
 POST    /hadatac/ts/startstop                      org.hadatac.console.controllers.triplestore.StartStop.postIndex(oper: String, repository: String)
 GET     /hadatac/ts/loadont                        org.hadatac.console.controllers.triplestore.LoadOnt.loadOnt(oper: String)

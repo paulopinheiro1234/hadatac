@@ -1,0 +1,89 @@
+@(oper: String)
+
+@import helper._
+@import org.hadatac.console.views.html._
+@import org.hadatac.console.controllers.triplestore._
+@import org.hadatac.data.loader._
+@import org.hadatac.metadata.loader._
+@import org.hadatac.utils._
+@import java.net._
+@import play._
+
+@main("Study Management") {
+ 
+    <div class="container-fluid">
+      
+      <div class="row">
+
+        <div class="col-md-8 col-md-offset-1">
+
+	     <h3>Repository Management</h3>
+
+             @if(oper=="init") {
+
+                 <p>This page provides the ability to clean specific study data.<br><br></p>
+ 
+                 <h4>SOLR Home: <font color="blue">@Play.application().configuration().getString("hadatac.solr.home")</font></h4> <br>
+           
+          
+                 <h4>Metadata Repository</h4>
+                 <div id="rcorners">  
+                     Status: 
+                     @if(Repository.operational(Repository.METADATA)) {
+                         <b><font color="green">OPERATIONAL</font></b>
+                         <br>
+                         Metadata Content:  <b>@MetadataContext.playTotalTriples() triples.</b> User Graph Content:  <b>@PermissionsContext.playTotalTriples() triples.</b>
+                     } else {
+                         <b><font color="red">DOWN</font></b>
+                     } 
+                     <br><br>
+
+                     <div id="question-box">
+                         <a href="@org.hadatac.console.controllers.triplestore.routes.CleanStudy.clean("studies")" class="btn btn-primary" role="button">Clean Studies</a>
+                     </div>
+                 </div>
+
+                 <hr>
+                 
+             }
+
+         <p  style='font-family: "Lucida Console", Monaco, monospace;' id='msgarea'></p>
+         
+           <div id="end-process-box" style="display:none;">
+                  <h4>Clean complete -- check the results above to see if the clean was successful.</h4>
+                  <a href="@org.hadatac.console.controllers.triplestore.routes.Clean.clean("init")" class="btn btn-warning" role="button">Back to Repository Management</a>
+	       </div>
+
+	     @if(oper=="studies") {
+                <script> 
+                    var msg = "@CleanStudy.playClean(oper)";
+                    $('#msgarea').html(msg.replace(/&lt;br&gt;/g, '<br>'));
+                    document.getElementById('end-process-box').style.display = 'inline';
+                </script>
+	     }
+	     
+         @if(oper=="doneOk") {
+              <h4>Repository operation successfully requested.</h4>
+              <a href="@org.hadatac.console.controllers.triplestore.routes.Clean.clean("init")" class="btn btn-warning" role="button">Back to Repository Management</a>
+         }
+
+         @if(oper=="doneNotOk") {
+              <h4>Repository operation failed.</h4>
+              <a href="@org.hadatac.console.controllers.triplestore.routes.Clean.clean("init")" class="btn btn-warning" role="button">Back to Repository Management</a>
+         }
+
+         @if(oper=="init") {
+
+             <br>
+             <a href="@org.hadatac.console.controllers.routes.Portal.index()" class="btn btn-warning" role="button">Back to Main Menu</a>
+             
+         }
+
+	   </div>
+
+      </div>
+
+    </div>
+
+}
+   
