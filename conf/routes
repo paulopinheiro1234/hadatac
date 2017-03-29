@@ -145,6 +145,26 @@ GET	    /hadatac/deployments/urigenerator		   org.hadatac.console.controllers.de
 POST	/hadatac/deployments/urigenerator	       org.hadatac.console.controllers.deployments.URIGenerator.postIndex()
 POST 	/hadatac/deployments/urigenerator/form	   org.hadatac.console.controllers.deployments.URIGenerator.processForm()
 
+# deployment management
+GET	    /hadatac/studies/		    	       org.hadatac.console.controllers.studies.StudyManagement.index(oper : Int)
+POST	/hadatac/studies/     			       org.hadatac.console.controllers.studies.StudyManagement.postIndex(oper : Int)
+GET	    /hadatac/studies/new			       org.hadatac.console.controllers.studies.NewStudy.index(type : String)
+POST	/hadatac/studies/new			       org.hadatac.console.controllers.studies.NewStudy.postIndex(type : String)
+POST 	/hadatac/studies/new/form		       org.hadatac.console.controllers.studies.NewStudy.processForm()
+GET	    /hadatac/studies/close			       org.hadatac.console.controllers.studies.CloseStudy.index(deployment_uri : String)
+POST	/hadatac/studies/close		           org.hadatac.console.controllers.studies.CloseStudy.postIndex(deployment_uri : String)
+POST 	/hadatac/studies/close/form	           org.hadatac.console.controllers.studies.CloseStudy.processForm(deployment_uri : String)
+GET	    /hadatac/studies/delete	    	       org.hadatac.console.controllers.studies.DeleteStudy.index(deployment_uri : String)
+POST	/hadatac/studies/delete		           org.hadatac.console.controllers.studies.DeleteStudy.postIndex(deployment_uri : String)
+POST 	/hadatac/studies/delete/form	       org.hadatac.console.controllers.studies.DeleteStudy.processForm(deployment_uri : String)
+GET	    /hadatac/studies/view			       org.hadatac.console.controllers.studies.ViewStudy.index(deployment_uri : String)
+POST	/hadatac/studies/view	               org.hadatac.console.controllers.studies.ViewStudy.postIndex(deployment_uri : String)
+GET	    /hadatac/studies/resources		       org.hadatac.console.controllers.studies.ResourceAvailability.index()
+POST	/hadatac/studies/resources	           org.hadatac.console.controllers.studies.ResourceAvailability.postIndex()
+GET	    /hadatac/studies/urigenerator		   org.hadatac.console.controllers.studies.URIGenerator.index()
+POST	/hadatac/studies/urigenerator	       org.hadatac.console.controllers.studies.URIGenerator.postIndex()
+POST 	/hadatac/studies/urigenerator/form	   org.hadatac.console.controllers.studies.URIGenerator.processForm()
+
 # data collection management
 GET	    /hadatac/dataacquisitions/		    	   org.hadatac.console.controllers.dataacquisitionmanagement.DataAcquisitionManagement.index(oper : Int)
 POST	/hadatac/dataacquisitions/     			   org.hadatac.console.controllers.dataacquisitionmanagement.DataAcquisitionManagement.postIndex(oper : Int)

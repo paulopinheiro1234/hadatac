@@ -1,0 +1,141 @@
+@(thePlatforms   : List[org.hadatac.entity.pojo.Platform],
+  theInstruments : List[org.hadatac.entity.pojo.Instrument],
+  theDetectors   : List[org.hadatac.entity.pojo.Detector],
+  deploymentType : String)
+
+@import helper._
+@import org.hadatac.utils._
+@import org.hadatac.console.views.html._
+@import org.hadatac.console.views.html.deployments._
+@import org.hadatac.console.controllers.deployments._
+@import org.hadatac.console.controllers._
+
+@main("New Study") {
+
+	<script type="text/javascript">
+	   function checkform() {
+	      var cansubmit = true;
+	
+	      if (document.getElementById('uri').value.length == 0) {
+	          cansubmit = false;
+	      }
+	      else {
+	    	  document.getElementById('acquisition_uri').value = document.getElementById('uri').value.replace("DPL", "DA");
+	      }
+	
+	      if (document.getElementById('acquisition_uri').value.length == 0) {
+	          cansubmit = false;
+	      }
+	      
+	      if (document.getElementById('platform').value.length == 0) {
+	         cansubmit = false;
+	      }
+	         
+	      if (document.getElementById('instrument').value.length == 0) { 
+	         cansubmit = false;
+	         var instrumentSelector = document.getElementById('detector');
+	         instrumentSelector.disabled = 'disabled';
+	         for (var i = 0, l = instrumentSelector.length; i < l; i++) {
+	                instrumentSelector[i].selected = instrumentSelector[i].defaultSelected;
+			 }      
+		  } else {
+	         document.getElementById('detector').disabled = false;
+	      }
+	                
+	      if (document.getElementById('startdatetime').value.length == 0) {
+	         cansubmit = false;
+	      }
+	
+	      if (cansubmit) {
+	          document.getElementById('submitbutton').disabled = false;
+	      } else {
+	          document.getElementById('submitbutton').disabled = 'disabled';
+	      }
+	   }
+	</script>
+
+  <div class="container">
+    <h2>New @deploymentType.substring(0, 1).toUpperCase().concat(deploymentType.substring(1).toLowerCase()) Deployment</h2>
+
+    <form class="form-horizontal" name="newDeployment" method="post" action="@org.hadatac.console.controllers.studies.routes.NewStudy.processForm">
+	
+	<div class="form-group">
+		<label>URI:</label>
+ 		<input type="text" class="form-control col-sm-6" name="uri" id="uri" onchange="checkform()" >
+ 	</div>
+ 	<div class="form-group">
+		<label>Data Acquisition URI:</label>
+ 		<input type="text" class="form-control col-sm-6" name="acquisition_uri" id="acquisition_uri" onchange="checkform()" >
+ 	</div>
+ 	<div class="form-group">
+		<label>Initial Parameters: (optional)</label>
+ 		<input type="text" class="form-control col-sm-6" name="init_param" id="init_param" onchange="checkform()" >
+ 	</div>
+    <div class="form-group">
+         <label>Platform</label> 
+         <select class="form-control col-sm-6" id="platform" name="platform" onchange="checkform()" >
+            <option value=""></option>
+            @for(platform <- thePlatforms) {
+                <option value="@platform.getUri()">@platform.getLabel() @if(platform.getSerialNumber() != null) { (SN: @platform.getSerialNumber()) }</option>
+            }
+         </select>
+     </div>
+	 <div class="form-group">
+         <label>Instrument</label>
+         <select class="form-control col-sm-6" id="instrument" name="instrument" onchange="checkform()" >
+            <option value=""></option>         
+            @for(instrument <- theInstruments){
+                <option value="@instrument.getUri()">@instrument.getLabel()  @if(instrument.getSerialNumber() != null) { (SN: @instrument.getSerialNumber()) }</option>         
+            }
+         </select>
+     </div>
+	 <div class="form-group">
+         <label>Detector(s)</label>
+         <select class="form-control col-sm-6" id="detector" multiple="multiple" name="detector[]" onchange="checkform()" disabled='disabled' >
+            @for((detector) <- theDetectors){
+                <option value="@detector.getUri()">@detector.getLabel()  @if(detector.getSerialNumber() != null) { (SN: @detector.getSerialNumber()) }</option>         
+            }
+         </select>
+     </div>
+     
+	 <div class="form-group">
+         <label for="startdate">Start Date/Time</label><br> 
+         <div class="container">
+            <div class="row">
+               <div class='col-sm-3'>
+                 <div class="form-group">
+                    <div class='input-group date' id='startdate' onchange="checkform()" >
+                       <input type='text' name="startDateTime" id="startdatetime" class="form-control" />
+                       <span class="input-group-addon">
+                          <span class="glyphicon glyphicon-calendar"></span>
+                       </span>
+                    </div>
+                 </div>
+               </div>
+               <script type="text/javascript">
+                 $(function () {
+                     $('#startdate').datetimepicker();
+                     $('#startdate').on('dp.change', function (e) { checkform(); });
+                 });
+               </script>
+            </div>
+         </div>
+     </div>
+     
+     <div class="form-group" hidden="true">
+     	<input id="type" name="type" type="text" class="form-control" value="@deploymentType" hidden="true" />
+     </div>
+
+      <div class="form-group" class="col-sm-6 col-offset-3">
+          <input class="btn btn-success" role="button" id="submitbutton" type="submit" value="Create" disabled="disabled" />
+          <p> The created deployment will be saved in LabKey</p>
+      </div>
+      
+      <div class="form-group" class="col-sm-6 col-offset-3">
+           @studyButton(false) 
+      </div>
+
+   </form>
+  </div>
+
+}

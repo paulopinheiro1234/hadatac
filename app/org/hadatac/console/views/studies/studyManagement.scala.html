@@ -1,0 +1,74 @@
+@(oper : org.hadatac.utils.State,
+  results : List[org.hadatac.entity.pojo.Study])
+
+@import helper._
+@import org.hadatac.console.views.html._
+@import org.hadatac.utils._
+
+@main("Study Management") {
+
+    <h2>Study Management</h2>
+    
+    <h3>Management options</h3>
+
+    <div class="container-fluid">
+      <div class="row">
+         <div class="navbar-collapse collapse navbar-secondary">
+            @if(oper.getCurrent() == State.ACTIVE) { 
+          		<a href="@org.hadatac.console.controllers.studies.routes.StudyManagement.index(State.ACTIVE)" class="btn-sm btn-warning disabled" role="button">Active Studies</a>
+          	} else {
+          		<a href="@org.hadatac.console.controllers.studies.routes.StudyManagement.index(State.ACTIVE)" class="btn-sm btn-primary" role="button">Active Studies</a>
+          	}
+          	@if(oper.getCurrent() == State.CLOSED) {
+       		    <a href="@org.hadatac.console.controllers.studies.routes.StudyManagement.index(State.CLOSED)" class="btn-sm btn-warning disabled" role="button">Closed Studies</a>
+       		} else {
+       		    <a href="@org.hadatac.console.controllers.studies.routes.StudyManagement.index(State.CLOSED)" class="btn-sm btn-primary" role="button">Closed Studies</a>
+       		}
+          	<a href="@org.hadatac.console.controllers.studies.routes.NewStudy.index("regular")" class="btn-sm btn-primary" role="button">Create Regular Study</a>
+          	<a href="@org.hadatac.console.controllers.studies.routes.NewStudy.index("legacy")" class="btn-sm btn-primary" role="button">Create Legacy Study</a>
+       		<a href="@org.hadatac.console.controllers.studies.routes.ResourceAvailability.index()" class="btn-sm btn-primary" role="button">Instrument/Detector Availability</a>
+       		<a href="@org.hadatac.console.controllers.studies.routes.URIGenerator.index()" class="btn-sm btn-primary" role="button">Register URI Generator</a>
+         </div>
+      </div>
+   </div>
+
+   <hr>
+
+   @if(oper.getCurrent() == State.ACTIVE) {   
+      <h3>Active Studies</h3>
+   } else {
+      @if(oper.getCurrent() == State.CLOSED) {   
+         <h3>Closed Studies</h3>
+      } else {
+          @if(oper.getCurrent() == State.ALL) {  
+             <h3>All Studies</h3>
+          } 
+      }
+   }
+   
+    <div class="container-fluid">
+        <table class="table">
+            <thead>
+                 <tr>
+                    <th>Platform</th>
+                    <th>Instrument</th>
+                    <th>Start DateTime</th>
+                    @if(oper.getCurrent() != State.ACTIVE) {
+                        <th>End Date/Time</th>
+                    }
+                    <th>Operations</th>
+                 </tr>
+            </thead>
+            <tbody>
+              @for(deployment <- results){
+                  @study_entry(oper, deployment)
+              }
+            </tbody>
+        </table>
+ 
+        @mainButton(false)
+
+    </div>
+ 
+
+}

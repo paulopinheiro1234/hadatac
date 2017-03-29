@@ -1,0 +1,59 @@
+@(deployForm: Form[org.hadatac.console.models.URIGeneratorForm])
+
+@import helper._
+@import org.hadatac.utils._
+@import org.hadatac.console.views.html._
+@import org.hadatac.console.views.html.deployments._
+@import org.hadatac.console.controllers._
+@import org.hadatac.console.controllers.deployments._
+
+<head> 
+    <script type="text/javascript">
+       var datefield=document.createElement("input")
+       datefield.setAttribute("type", "date")
+       if (datefield.type!="date"){ //if browser doesn't support input type="date", load files for jQuery UI Date Picker
+           document.write('<link href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8/themes/base/jquery-ui.css" rel="stylesheet" type="text/css" />\n')
+           document.write('<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.4/jquery.min.js"><\/script>\n')
+           document.write('<script src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8/jquery-ui.min.js"><\/script>\n') 
+        }
+    </script>
+ 
+    <script>
+       if (datefield.type!="date"){ //if browser doesn't support input type="date", initialize date picker widget:
+       jQuery(function($){ //on document.ready
+           $('#birthday').datepicker();
+           })
+       }
+    </script>
+</head>
+
+@main("URI Generator Registration") {
+  <div class="container">
+    <h2>URI Generator Registration</h2>
+      
+    <form class="form-horizontal" method="post" action="@org.hadatac.console.controllers.studies.routes.URIGenerator.processForm">
+
+    <div class="form-group">
+         <label>Owner</label> 
+         <input type="text" class="form-control col-sm-6" name="ownerURI" value="@AuthApplication.getLocalUser(session()).getName()" readonly />
+         
+     </div>
+	 <div class="form-group">
+         <label>Description</label>
+         <input class="form-control col-sm-6" name="description" />
+         </select>
+     </div>
+
+      <div class="form-group class="col-sm-6 col-offset-3">
+          <input class="btn btn-success" role="button" type="submit" value="Create" />
+      </div>
+
+      <div class="form-group class="col-sm-6 col-offset-3">
+           @studyButton(false)
+      </div>
+
+   </form>    
+</div>
+
+
+}

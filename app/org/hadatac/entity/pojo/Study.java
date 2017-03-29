@@ -10,6 +10,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.apache.jena.query.Query;
+import org.apache.jena.query.QueryExecution;
+import org.apache.jena.query.QueryExecutionFactory;
+import org.apache.jena.query.QueryFactory;
+import org.apache.jena.query.QuerySolution;
+import org.apache.jena.query.ResultSet;
+import org.apache.jena.query.ResultSetFactory;
+import org.apache.jena.query.ResultSetRewindable;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServerException;
@@ -26,6 +34,7 @@ import org.hadatac.console.models.FacetHandler;
 import org.hadatac.console.models.Pivot;
 import org.hadatac.data.model.MetadataAcquisitionQueryResult;
 import org.hadatac.utils.Collections;
+import org.hadatac.utils.State;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.joda.time.format.DateTimeFormat;
@@ -694,7 +703,7 @@ public class Study {
 		return result;
 	}
 	
-	public static List<Study> find(String uri) {
+/*	public static List<Study> find(String uri) {
 		List<Study> list = new ArrayList<Study>();
 		
 		System.out.println("uri:");
@@ -723,6 +732,94 @@ public class Study {
 		}
 		
 		return list;
+	}
+	*/
+	
+	public static Study find(String uri) {
+		List<Study> list = new ArrayList<Study>();
+		Study returnStudy = new Study();
+		System.out.println("uri:");
+		System.out.println(uri);
+		SolrClient solr = new HttpSolrClient(
+				Play.application().configuration().getString("hadatac.solr.data")
+				+ Collections.STUDIES);
+		SolrQuery query = new SolrQuery();
+		
+		query.set("q", "studyUri:\"" + uri + "\"");
+		query.set("sort", "started_at asc");
+		query.set("rows", "10000000");
+		
+		try {
+			QueryResponse response = solr.query(query);
+			solr.close();
+			SolrDocumentList results = response.getResults();
+			Iterator<SolrDocument> i = results.iterator();
+			while (i.hasNext()) {
+				Study study = convertFromSolr(i.next());
+				returnStudy = study;
+				list.add(study);
+			}
+		} catch (Exception e) {
+			list.clear();
+			System.out.println("[ERROR] Study.find(String) - Exception message: " + e.getMessage());
+		}
+		
+		return returnStudy;
+	}
+	
+	public static List<Study> find(State state) {
+		List<Study> studies = new ArrayList<Study>();
+	    String queryString = "";
+        if (state.getCurrent() == State.ACTIVE) { 
+    	   queryString = "PREFIX prov: <http://www.w3.org/ns/prov#>  " +
+    			   "PREFIX vstoi: <http://hadatac.org/ont/vstoi#>  " +
+    			   "SELECT ?uri WHERE { " + 
+    			   "   ?uri a vstoi:Deployment . " + 
+    			   "   FILTER NOT EXISTS { ?uri prov:endedAtTime ?enddatetime . } " + 
+    			   "} " + 
+    			   "ORDER BY DESC(?datetime) ";
+        } else {
+    	   if (state.getCurrent() == State.CLOSED) {
+    		   queryString = "PREFIX prov: <http://www.w3.org/ns/prov#>  " +
+    				   "PREFIX vstoi: <http://hadatac.org/ont/vstoi#>  " +
+    				   "SELECT ?uri WHERE { " + 
+    				   "   ?uri a vstoi:Deployment . " + 
+    				   "   ?uri prov:startedAtTime ?startdatetime .  " + 
+    				   "   ?uri prov:endedAtTime ?enddatetime .  " + 
+    				   "} " +
+    				   "ORDER BY DESC(?datetime) ";
+    	   } else {
+        	   if (state.getCurrent() == State.ALL) {
+        		   queryString = "PREFIX prov: <http://www.w3.org/ns/prov#>  " +
+        				   "PREFIX vstoi: <http://hadatac.org/ont/vstoi#>  " +
+        				   "SELECT ?uri WHERE { " + 
+        				   "   ?uri a vstoi:Deployment . " + 
+        				   "} " +
+        				   "ORDER BY DESC(?datetime) ";
+        	   } else {
+        		   System.out.println("Deployment.java: no valid state specified.");
+        		   return null;
+        	   }
+    	   }
+        }
+		Query query = QueryFactory.create(queryString);
+		
+		QueryExecution qexec = QueryExecutionFactory.sparqlService(
+				Collections.getCollectionsName(Collections.METADATA_SPARQL), query);
+		ResultSet results = qexec.execSelect();
+		ResultSetRewindable resultsrw = ResultSetFactory.copyResults(results);
+		qexec.close();
+		
+		Study study = null;
+		while (resultsrw.hasNext()) {
+			QuerySolution soln = resultsrw.next();
+			if (soln != null && soln.getResource("uri").getURI()!= null) { 
+				study = Study.find(soln.getResource("uri").getURI()); 
+			}
+			studies.add(study);
+		}
+		
+		return studies;
 	}
 	
 	public int close(String endedAt) {
