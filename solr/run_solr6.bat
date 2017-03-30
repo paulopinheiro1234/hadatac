@@ -1,16 +1,16 @@
 echo off
-set SOLR_INSTALL_DIR=%HADATAC_SOLR%\solr-5.2.1
+set SOLR_INSTALL_DIR=%HADATAC_SOLR%\solr-6.5.0
 
 :STEP 1
 
-if EXIST "%SOLR_INSTALL_DIR%" GOTO STEP2 
+if EXIST "%SOLR_INSTALL_DIR%" GOTO STEP2
 
 echo "%SOLR_INSTALL_DIR% not found! Please check the SOLR_INSTALL_DIR setting in your %0 script."
 GOTO THEEND
 
 :STEP2
 
-set SOLR_ENV=%HADATAC_SOLR%\solr5.in.bat
+set SOLR_ENV=%HADATAC_SOLR%\solr6.in.bat
 
 if EXIST "%SOLR_ENV%" GOTO STEP3
 
