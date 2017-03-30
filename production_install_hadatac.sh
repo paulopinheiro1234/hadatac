@@ -23,16 +23,19 @@ case $response in
 esac
 
 echo ""
-HADATAC_HOME=/data/git/hadatac
+
+DATA_FOLDER=/data
+HADATAC_HOME=$DATA_FOLDER/git/hadatac
 HADATAC_DOWNLOAD=$HADATAC_HOME/download
-HADATAC_SOLR=/data/hadatac-solr/solr
+HADATAC_SOLR=$DATA_FOLDER/hadatac-solr/solr
 SOLR6_HOME=$HADATAC_SOLR/solr-6.5.0
 
-mkdir $HADATAC_HOME
-mkdir $HADATAC_DOWNLOAD
-mkdir $HADATAC_SOLR
+mkdir -p $HADATAC_HOME
+mkdir -p $HADATAC_DOWNLOAD
+mkdir -p $HADATAC_SOLR
 
 cp -R * $HADATAC_HOME
+cp -R $HADATAC_HOME/conf /data/
 
 echo "=== Downloading Apache Solr 6.5.0..."
 wget -O $HADATAC_DOWNLOAD/solr-6.5.0.tgz http://archive.apache.org/dist/lucene/solr/6.5.0/solr-6.5.0.tgz
