@@ -23,14 +23,23 @@ case $response in
 esac
 
 echo ""
-HADATAC_HOME=/data/git/hadatac
+read -r -p "Directory of installation [~/hadatac]: " response
+if [ "$response" == "" ]
+then HADATAC_HOME=~/hadatac
+else HADATAC_HOME=$response
+fi
+
+rm -rf HADATAC_HOME
+
 HADATAC_DOWNLOAD=$HADATAC_HOME/download
-HADATAC_SOLR=/data/hadatac-solr/solr
-SOLR5_HOME=$HADATAC_SOLR/solr-6.5.0
+HADATAC_SOLR=$HADATAC_HOME/solr
+SOLR6_HOME=$HADATAC_SOLR/solr-6.5.0
 
 mkdir $HADATAC_HOME
 mkdir $HADATAC_DOWNLOAD
 mkdir $HADATAC_SOLR
+
+cp -R * $HADATAC_HOME
 
 echo "=== Downloading Apache Solr 6.5.0..."
 wget -O $HADATAC_DOWNLOAD/solr-6.5.0.tgz http://archive.apache.org/dist/lucene/solr/6.5.0/solr-6.5.0.tgz
@@ -76,3 +85,8 @@ wait $!
 
 echo "=== Installing blazegraph using puppet..."
 puppet apply blazegraph.pp
+wait $!
+
+echo "=== Creating triple store namespace..."
+curl -X POST --data-binary @rwstore.properties -H 'Content-Type:text/plain' http://localhost:8080/bigdata/namespace
+wait $!

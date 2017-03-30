@@ -31,7 +31,7 @@ case $HADATAC_HOST in
         SOLR_HOME="/var/hadatac/solr"  
         GIT_HOME="/data/git/hadatac";;
     *)
-        SOLR_HOME="/var/hadatac/solr"  
+        SOLR_HOME="/data/hadatac-solr/solr"  
         GIT_HOME="/data/git/hadatac";;
 esac
 
