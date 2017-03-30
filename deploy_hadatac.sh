@@ -35,6 +35,24 @@ case $HADATAC_HOST in
         GIT_HOME="/data/git/hadatac";;
 esac
 
+echo "Changing to Hadatac Git Directory"
+echo ""
+cd ${GIT_HOME}
+echo ""
+echo "Git Pull Latest Code from GitHub"
+echo ""
+git pull
+echo ""
+
+read -r -p "Please Check Status of Git Pull. Continue deployment? [y/N] " response
+case $response in
+    [yY][eE][sS]|[yY]) 
+        ;;
+    *)
+        exit
+        ;;
+esac
+
 echo "Deploying $HADATAC_HOST"
 echo ""
 echo "Stopping Hadatac Service"
@@ -48,22 +66,13 @@ echo "Stopping Blazegraph Service"
 echo ""
 service jetty8 stop
 echo ""
-echo "Changing to Hadatac Git Directory"
-echo ""
-cd ${GIT_HOME}
-echo ""
-echo "Git pull Latest Code from GitHub"
-echo ""
-git checkout -- *
-git pull
-echo ""
+
 echo "Creating Distribution File"
 echo ""
-
 rm -rf ${GIT_HOME}/target/web/
 wait $!
 sbt clean
-wait $
+wait $!
 sbt compile
 wait $!
 sbt dist
