@@ -23,13 +23,21 @@ case $response in
 esac
 
 echo ""
-read -r -p "Directory of installation [~/hadatac]: " response
+read -r -p "Path of Data Folder [default: /data]: " response
 if [ "$response" == "" ]
-then HADATAC_HOME=~/hadatac
+then DATA_HOME=/data
+else DATA_HOME=$response
+fi
+
+echo ""
+read -r -p "Directory of installation [default: /data/hadatac-solr]: " response
+if [ "$response" == "" ]
+then HADATAC_HOME=/data/hadatac-solr
 else HADATAC_HOME=$response
 fi
 
-rm -rf HADATAC_HOME
+rm -rf $HADATAC_HOME
+wait $!
 
 HADATAC_DOWNLOAD=$HADATAC_HOME/download
 HADATAC_SOLR=$HADATAC_HOME/solr
@@ -40,6 +48,9 @@ mkdir $HADATAC_DOWNLOAD
 mkdir $HADATAC_SOLR
 
 cp -R * $HADATAC_HOME
+if [ ! -d "$DATA_HOME/conf" ]; then
+  cp -R ./conf $DATA_HOME
+fi
 
 echo "=== Downloading Apache Solr 6.5.0..."
 wget -O $HADATAC_DOWNLOAD/solr-6.5.0.tgz http://archive.apache.org/dist/lucene/solr/6.5.0/solr-6.5.0.tgz
@@ -87,6 +98,12 @@ echo "=== Installing blazegraph using puppet..."
 puppet apply blazegraph.pp
 wait $!
 
-echo "=== Creating triple store namespace..."
-curl -X POST --data-binary @rwstore.properties -H 'Content-Type:text/plain' http://localhost:8080/bigdata/namespace
+echo "=== Creating store namespace..."
+curl -X POST --data-binary @store.properties -H 'Content-Type:text/plain' http://localhost:8080/bigdata/namespace
 wait $!
+echo ""
+
+echo "=== Creating store_users namespace..."
+curl -X POST --data-binary @store_users.properties -H 'Content-Type:text/plain' http://localhost:8080/bigdata/namespace
+wait $!
+echo ""
