@@ -601,9 +601,9 @@ public class DynamicGeneration extends Controller {
 					e.printStackTrace();
 				}
 				
-				// Restart Solr 5
+				// Restart Solr 6
 				try {
-					ProcessBuilder p=new ProcessBuilder(Play.application().configuration().getString("hadatac.solr.home") + "/run_solr5.sh", "restart" );
+					ProcessBuilder p=new ProcessBuilder(Play.application().configuration().getString("hadatac.solr.home") + "/run_solr6.sh", "restart" );
 					final Process shell = p.start();
 					shell.waitFor();
 					System.out.println("Restarting Solr, EXIT STATUS: " + shell.exitValue() + "\n");
