@@ -23,19 +23,23 @@ case $response in
 esac
 
 echo ""
+read -r -p "Directory of installation [~/hadatac]: " response
+if [ "$response" == "" ]
+then HADATAC_HOME=~/hadatac
+else HADATAC_HOME=$response
+fi
 
-DATA_FOLDER=/data
-HADATAC_HOME=$DATA_FOLDER/git/hadatac
+rm -rf HADATAC_HOME
+
 HADATAC_DOWNLOAD=$HADATAC_HOME/download
-HADATAC_SOLR=$DATA_FOLDER/hadatac-solr/solr
+HADATAC_SOLR=$HADATAC_HOME/solr
 SOLR6_HOME=$HADATAC_SOLR/solr-6.5.0
 
-mkdir -p $HADATAC_HOME
-mkdir -p $HADATAC_DOWNLOAD
-mkdir -p $HADATAC_SOLR
+mkdir $HADATAC_HOME
+mkdir $HADATAC_DOWNLOAD
+mkdir $HADATAC_SOLR
 
 cp -R * $HADATAC_HOME
-cp -R $HADATAC_HOME/conf /data/
 
 echo "=== Downloading Apache Solr 6.5.0..."
 wget -O $HADATAC_DOWNLOAD/solr-6.5.0.tgz http://archive.apache.org/dist/lucene/solr/6.5.0/solr-6.5.0.tgz
