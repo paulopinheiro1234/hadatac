@@ -85,3 +85,8 @@ wait $!
 
 echo "=== Installing blazegraph using puppet..."
 puppet apply blazegraph.pp
+wait $!
+
+echo "=== Creating triple store namespace..."
+curl -X POST --data-binary @rwstore.properties -H 'Content-Type:text/plain' http://localhost:8080/bigdata/namespace
+wait $!
