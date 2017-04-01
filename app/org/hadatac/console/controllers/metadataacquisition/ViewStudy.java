@@ -22,7 +22,6 @@ import org.apache.jena.query.ResultSetFactory;
 import org.apache.jena.query.ResultSetRewindable;
 import org.apache.jena.sparql.engine.http.QueryExceptionHTTP;
 import org.hadatac.console.controllers.AuthApplication;
-import org.hadatac.console.controllers.metadata.DynamicFunctions;
 import org.hadatac.console.controllers.triplestore.UserManagement;
 import org.hadatac.console.models.SysUser;
 import org.hadatac.utils.Collections;
@@ -34,7 +33,7 @@ import be.objectify.deadbolt.java.actions.Restrict;
 public class ViewStudy extends Controller {
 	
 	public static Map<String, List<String>> findStudyIndicators(String study_uri) {
-		String indicatorQuery = ""; 
+		String indicatorQuery = "";
 		indicatorQuery += NameSpaces.getInstance().printSparqlNameSpaceList();
 		indicatorQuery += "SELECT ?studyIndicator ?label ?comment WHERE { "
 				+ "?studyIndicator rdfs:subClassOf chear:StudyIndicator . "

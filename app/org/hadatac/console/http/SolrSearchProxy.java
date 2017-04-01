@@ -27,14 +27,12 @@ public class SolrSearchProxy extends Controller {
 	
 	@Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
 	public static Result getSolrSearch(String path) {
-	    //System.out.println("path: [" + path + "]");
 		InputStream is = null;
-		URLConnection connection = null;
 		URL url = null;
 		HttpURLConnection con = null;
 
 		try {
-		    url = new URL(path.substring(0,path.indexOf('?')));
+		    url = new URL(path.substring(0, path.indexOf('?')));
 		    con = (HttpURLConnection) url.openConnection();
 		    con.setRequestMethod("POST");
 		    con.setRequestProperty("Accept-Charset", "utf-8");
@@ -43,13 +41,6 @@ public class SolrSearchProxy extends Controller {
 		    wr.writeBytes(path.substring(path.indexOf('?')+1, path.length()));
 		    wr.flush();
 		    wr.close();
-		    
-		    /*
-		    connection = new URL(path).openConnection();
-		    connection.setDoOutput(true); // Triggers POST.
-		    connection.setRequestProperty("Accept-Charset", "utf-8");
-		    connection.setRequestProperty("Content-Type", "application/x-www-form-urlencoded;charset=utf-8");
-		    */
 		} catch (Exception e) {
 		    e.printStackTrace();
 		}
@@ -62,9 +53,6 @@ public class SolrSearchProxy extends Controller {
  
 		try {
 		    is = con.getInputStream();
-		    //is = connection.getInputStream();
-		    //URL url = new URL(path);
-		    //is = url.openStream();
 		} catch (IOException e) {
 		    e.printStackTrace();
 		}
@@ -124,7 +112,7 @@ public class SolrSearchProxy extends Controller {
 	public static Result getStudyAcquisition(){
 		String path = Collections.getCollectionsName(Collections.STUDY_ACQUISITION) + 
 				request().toString().split((request().path()))[1];
-		//System.out.println(path);
+		System.out.println("Path: " + path);
 		return getSolrSearch(path);
 	}
 	

@@ -1,18 +1,13 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <schema version="1.5">
   <fields>
-    <field name="hasURI" type="string" indexed="true" stored="true"/>
-    <field name="rdfssubClassOf" type="string" indexed="true" docValues="true" />
-    <field name="dctermsidentifier" type="string" indexed="true" docValues="true" />
-    <field name="rdfslabel" type="string" indexed="true" docValues="true" />
-    <field name="skosdefinition" type="string" indexed="true" docValues="true" />
-    <field name="skoseditorialNote" type="string" indexed="true" docValues="true" />
+    <field name="studyUri" type="string" indexed="true" stored="true"/>
+    <dynamicField name="*_i" type="string" indexed="true" stored="true"/>
     <field name="_version_" type="long" indexed="true" stored="true"/>
     <field name="_text_" type="text_general" indexed="true" stored="false" multiValued="true"/>
-    <copyField source="hasURI" dest="_text_" />
   </fields>
 
-  <uniqueKey>hasURI</uniqueKey>
+  <uniqueKey>studyUri</uniqueKey>
 
   <types>
     <fieldType name="string" class="solr.StrField" />
@@ -32,6 +27,5 @@
         <filter class="solr.LowerCaseFilterFactory"/>
       </analyzer>
     </fieldType>
-
   </types>
 </schema>

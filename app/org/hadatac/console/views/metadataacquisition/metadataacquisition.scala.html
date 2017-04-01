@@ -25,15 +25,30 @@ jQuery(document).ready(function($) {
     search_index: 'solr',
     datatype: 'json',
     facets: [ 
-    @if(indicators.contains("Study Indicator")){@for(studyIndicator <- indicators.get("Study Indicator")){    {'field': '@studyIndicator.replace(" ","").replace(",","")Label', 'display': '@studyIndicator'},
+    @if(indicators.contains("Study Indicator")){ 
+    	@for(studyIndicator <- indicators.get("Study Indicator")){
+    		{
+    		'field': '@studyIndicator.replace(" ","").replace(",","")Label_i', 
+    		'display': '@studyIndicator'
+    		},
     }}],
     search_sortby: [
         {'field':'studyUri.exact', 'display':'Study URI'},
-    @if(indicators.contains("Study Indicator")){@for(studyIndicator <- indicators.get("Study Indicator")){    {'field': '@studyIndicator.replace(" ","").replace(",","")Label.exact', 'display': '@studyIndicator'},
+    @if(indicators.contains("Study Indicator")){
+    	@for(studyIndicator <- indicators.get("Study Indicator")){
+    		{
+    		'field': '@studyIndicator.replace(" ","").replace(",","")Label_i.exact', 
+    		'display': '@studyIndicator'
+    		},
     }}],
     searchbox_fieldselect: [
         {'field':'studyUri.exact', 'display':'Study URI'},
-    @if(indicators.contains("Study Indicator")){@for(studyIndicator <- indicators.get("Study Indicator")){    {'field': '@studyIndicator.replace(" ","").replace(",","")Label.exact', 'display': '@studyIndicator'},
+    @if(indicators.contains("Study Indicator")){
+    	@for(studyIndicator <- indicators.get("Study Indicator")){
+    		{
+    		'field': '@studyIndicator.replace(" ","").replace(",","")Label_i.exact', 
+    		'display': '@studyIndicator'
+    		},
     }}],
     paging: {
       size: 10
@@ -45,33 +60,33 @@ jQuery(document).ready(function($) {
         [
           {
             "pre" : "<h3>",
-            "field" : "studyLabel",
+            "field" : "studyLabel_i",
             "post" : " - "
           },
           {
             "pre" : "(",
-            "field" : "studyTitle",
+            "field" : "studyTitle_i",
             "post" : ")</h3>"
           }
         ],
         [
           {
             "pre" : "<b>Institution:</b> ",
-            "field" : "institutionName",
+            "field" : "institutionName_i",
             "post" : ", "
           }
         ],
         [
           {
             "pre" : "<b>Principal Investigator(s):</b> ",
-            "field" : "agentName",
+            "field" : "agentName_i",
             "post" : " "
           }
         ],
         [
           {
             "pre" : "\n\n",
-            "field" : "studyComment",
+            "field" : "studyComment_i",
             "post" : ""
           }
         ]

@@ -9,6 +9,7 @@ public class Collections {
 	public static final String DATA_ACQUISITION            = "/measurement";
 	public static final String CONSOLE_STORE               = "/console_store";
 	public static final String STUDIES		               = "/studies";
+	public static final String ANALYTES		               = "/analytes";
 	public static final String ANNOTATION_LOG              = "/annotation_log";
 	public static final String CSV_DATASET                 = "/csv";
 	public static final String LABKEY_CREDENTIAL           = "/labkey";

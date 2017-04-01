@@ -32,6 +32,7 @@ import org.apache.jena.riot.RDFDataMgr;
 import org.hadatac.console.controllers.AuthApplication;
 import org.hadatac.console.providers.MyUsernamePasswordAuthProvider;
 import org.hadatac.console.http.PermissionQueries;
+import org.hadatac.console.http.SolrUtils;
 import org.hadatac.console.models.UserPreRegistrationForm;
 import org.hadatac.console.models.GroupRegistrationForm;
 import org.hadatac.console.models.LinkedAccount;
@@ -238,37 +239,16 @@ public class UserManagement extends Controller {
 		return ok(ret_file);
     }
 	
-	private static boolean commitJsonDataToSolr(String solrCollection, String content) {
-		try {
-			HttpClient httpClient = HttpClientBuilder.create().build();
-		    HttpPost post = new HttpPost(solrCollection + "/update?commit=true");
-		    StringEntity entity  = new StringEntity(content, "UTF-8");
-		    entity.setContentType("application/json");
-		    post.setEntity(entity);
-		    HttpResponse response = httpClient.execute(post);
-		    System.out.println("Status: " + response.getStatusLine().getStatusCode());
-		    if (200 == response.getStatusLine().getStatusCode()) {
-		    	return true;
-		    }
-		} catch (IOException e) {
-		    e.printStackTrace();
-		} catch (Exception e) {
-		    e.printStackTrace();
-		}
-		
-		return false;
-	}
-	
 	@Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
 	public static String recoverUserAuthentication() {
 		System.out.println("Recovering User Authentication ...");
 		try {
 			JSONObject combined = (JSONObject) JSONValue.parse(new FileReader(UPLOAD_NAME_JSON));
-			if (!commitJsonDataToSolr(Play.application().configuration().getString("hadatac.solr.users") 
+			if (!SolrUtils.commitJsonDataToSolr(Play.application().configuration().getString("hadatac.solr.users") 
 					+ Collections.AUTHENTICATE_USERS, combined.get("sys_user").toString())) {
 				return "Failed to recover user authentications! ";
 			}
-			if (!commitJsonDataToSolr(Play.application().configuration().getString("hadatac.solr.users") 
+			if (!SolrUtils.commitJsonDataToSolr(Play.application().configuration().getString("hadatac.solr.users") 
 					+ Collections.AUTHENTICATE_ACCOUNTS, combined.get("linked_account").toString())) {
 				return "Failed to recover user authentications! ";
 			}
