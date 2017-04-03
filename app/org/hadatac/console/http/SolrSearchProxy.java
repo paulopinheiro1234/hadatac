@@ -112,7 +112,6 @@ public class SolrSearchProxy extends Controller {
 	public static Result getStudyAcquisition(){
 		String path = Collections.getCollectionsName(Collections.STUDY_ACQUISITION) + 
 				request().toString().split((request().path()))[1];
-		System.out.println("Path: " + path);
 		return getSolrSearch(path);
 	}
 	

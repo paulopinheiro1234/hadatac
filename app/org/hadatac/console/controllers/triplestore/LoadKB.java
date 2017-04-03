@@ -104,7 +104,7 @@ public class LoadKB extends Controller {
     	} catch (CommandException e) {
     		if (e.getMessage().equals("Unauthorized")) {
     			return ok(syncLabkey.render("login_failed",
-    					routes.LoadKB.playLoadLabkeyFolders("init", content).url(), "", false));
+    					routes.LoadKB.playLoadLabkeyFolders("init", content).url(), ""));
     		}
     	}
     	
@@ -156,19 +156,13 @@ public class LoadKB extends Controller {
     	} catch(CommandException e) {
     		if(e.getMessage().equals("Unauthorized")){
     			return ok(syncLabkey.render("login_failed",
-    					routes.LoadKB.playLoadLabkeyFolders("init", content).url(), "", false));
+    					routes.LoadKB.playLoadLabkeyFolders("init", content).url(), ""));
     		}
-    	}
-    	
-    	boolean isLoadedStudy = false;
-    	if (final_names.contains("Study")){
-    		isLoadedStudy = true;
     	}
     	
     	return ok(syncLabkey.render(oper,
     			routes.LoadKB.playLoadLabkeyFolders("init", content).url(),
-    			message, 
-    			isLoadedStudy));
+    			message));
     }
     
     @Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
@@ -201,7 +195,7 @@ public class LoadKB extends Controller {
     	} catch(CommandException e) {
     		if(e.getMessage().equals("Unauthorized")){
     			return ok(syncLabkey.render("login_failed",
-    					routes.LoadKB.playLoadLabkeyFolders("init", content).url(), "", false));
+    					routes.LoadKB.playLoadLabkeyFolders("init", content).url(), ""));
     		}
     	}
     	
@@ -237,7 +231,7 @@ public class LoadKB extends Controller {
     	} catch(CommandException e) {
     		if(e.getMessage().equals("Unauthorized")){
     			return ok(syncLabkey.render("login_failed", 
-    					routes.LoadKB.playLoadLabkeyFolders("init", content).url(), "", false));
+    					routes.LoadKB.playLoadLabkeyFolders("init", content).url(), ""));
     		}
     	}
     	
@@ -282,7 +276,7 @@ public class LoadKB extends Controller {
     	} catch(CommandException e) {
     		if(e.getMessage().equals("Unauthorized")){
     			return ok(syncLabkey.render("login_failed",
-    					routes.LoadKB.playLoadLabkeyFolders("init", content).url(), "", false));
+    					routes.LoadKB.playLoadLabkeyFolders("init", content).url(), ""));
     		}
     	}
     	return ok(getLabkeyLists.render(folder, content, retMetadataLists, retDataLists));
@@ -292,7 +286,7 @@ public class LoadKB extends Controller {
     public static Result loadLabkeyKB(String oper, String content) {
     	if (session().get("LabKeyUserName") == null && session().get("LabKeyPassword") == null) {
     		return ok(syncLabkey.render(oper,
-    				routes.LoadKB.playLoadLabkeyFolders("init", content).url(), "", false));
+    				routes.LoadKB.playLoadLabkeyFolders("init", content).url(), ""));
     	}
     	
     	return playLoadLabkeyFolders(oper, content);
@@ -305,7 +299,7 @@ public class LoadKB extends Controller {
     
     @Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
     public static Result logInLabkey(String nextCall) {
-        return ok(syncLabkey.render("init", routes.LoadKB.postLogInLabkey(nextCall).url(), "", false));
+        return ok(syncLabkey.render("init", routes.LoadKB.postLogInLabkey(nextCall).url(), ""));
     }
     
     @Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
@@ -324,7 +318,7 @@ public class LoadKB extends Controller {
     	} catch(CommandException e) {
     		if(e.getMessage().equals("Unauthorized")){
     			return ok(syncLabkey.render("login_failed", 
-    					nextCall, "", false));
+    					nextCall, ""));
     		}
     	}
     	

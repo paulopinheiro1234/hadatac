@@ -101,10 +101,15 @@ public class DynamicFunctions extends Controller {
 	}
 	
 	public static Map<String, String> getIndicatorTypes(){
-		String indicatorQuery= getPrefixes() + "SELECT DISTINCT ?indicatorType ?label ?comment WHERE { ?indicatorType rdfs:subClassOf chear:Indicator . ?indicatorType rdfs:label ?label . }";
+		String indicatorQuery= getPrefixes() 
+				+ "SELECT DISTINCT ?indicatorType ?label ?comment WHERE { "
+				+ "?indicatorType rdfs:subClassOf chear:Indicator . "
+				+ "?indicatorType rdfs:label ?label . "
+				+ "}";
 		Map<String, String> indicatorMap = new HashMap<String, String>();
 		try {
-			QueryExecution qexecInd = QueryExecutionFactory.sparqlService(Collections.getCollectionsName(Collections.METADATA_SPARQL), indicatorQuery);
+			QueryExecution qexecInd = QueryExecutionFactory.sparqlService(
+					Collections.getCollectionsName(Collections.METADATA_SPARQL), indicatorQuery);
 			ResultSet indicatorResults = qexecInd.execSelect();
 			ResultSetRewindable resultsrwIndc = ResultSetFactory.copyResults(indicatorResults);
 			qexecInd.close();
@@ -120,7 +125,6 @@ public class DynamicFunctions extends Controller {
 					indicatorMap.put(indicatorType, indicatorLabel);
 				}
 			}
-			//System.out.println("Indicator Types: " + indicatorMapSorted);
 		} catch (QueryExceptionHTTP e) {
 			e.printStackTrace();
 		}
@@ -168,21 +172,24 @@ public class DynamicFunctions extends Controller {
 		return indicatorValueMap;
 	}
 	
-	public static Map<String, List<String>> getIndicatorValuesJustLabels(Map<String, String> indicatorMap){
+	public static Map<String, List<String>> getIndicatorValuesJustLabels(
+			Map<String, String> indicatorMap){
+		
 		Map<String, List<String>> indicatorValueMap = new HashMap<String, List<String>>();
 		List<String> values = new ArrayList<String>();
-		//String indicatorValue = "";
 		String indicatorValueLabel = "";
 		for(Map.Entry<String, String> entry : indicatorMap.entrySet()){
 			values = new ArrayList<String>();
 		    String indicatorType = entry.getKey().toString();
-		    String indvIndicatorQuery = getPrefixes() + "SELECT DISTINCT ?indicator " +
-					"(MIN(?label_) AS ?label)" +
-					"WHERE { ?indicator rdfs:subClassOf " + indicatorType + " . " +
-					"?indicator rdfs:label ?label_ . " + 
-					"} GROUP BY ?indicator ?label";
+		    String indvIndicatorQuery = getPrefixes() 
+		    		+ " SELECT DISTINCT ?indicator (MIN(?label_) AS ?label) WHERE { "
+		    		+ " ?indicator rdfs:subClassOf " + indicatorType + " . "
+		    		+ " ?indicator rdfs:label ?label_ . "
+		    		+ " } "
+					+ " GROUP BY ?indicator ?label";
 		    try {
-			    QueryExecution qexecIndvInd = QueryExecutionFactory.sparqlService(Collections.getCollectionsName(Collections.METADATA_SPARQL), indvIndicatorQuery);
+			    QueryExecution qexecIndvInd = QueryExecutionFactory.sparqlService(
+			    		Collections.getCollectionsName(Collections.METADATA_SPARQL), indvIndicatorQuery);
 				ResultSet indvIndResults = qexecIndvInd.execSelect();
 				ResultSetRewindable resultsrwIndvInd = ResultSetFactory.copyResults(indvIndResults);
 				qexecIndvInd.close();
@@ -196,7 +203,6 @@ public class DynamicFunctions extends Controller {
 						System.out.println("getIndicatorValues() No Label: " + soln.toString() + "\n");
 					}
 					if (soln.contains("indicator")){
-						//indicatorValue = replaceURLWithPrefix(soln.get("indicator").toString());
 						values.add(indicatorValueLabel);
 					}
 				}

@@ -1,7 +1,6 @@
 @(oper : String,
   postAction : String,
-  result : String,
-  loadStudy : Boolean = false )
+  result : String)
 
 @import helper._
 @import org.hadatac.console.views.html._
@@ -65,12 +64,7 @@
              </div>
          }
 
-     	 @if(oper=="load" || oper=="parse") {
-     	 	 @if(loadStudy){
-     	 	 	<a href="@org.hadatac.console.controllers.metadata.routes.DynamicGeneration.index()" class="btn btn-primary" role="button">View Dynamic Generation</a>
-     	 	 	<br><br>
-     	 	 }
-         	 
+     	 @if(oper=="load" || oper=="parse") {         	 
              <p  style='font-family: "Lucida Console", Monaco, monospace;' id='msgarea'></p>
          
              <div id="end-process-box" style="display:none;">

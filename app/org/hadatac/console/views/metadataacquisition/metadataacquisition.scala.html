@@ -1,5 +1,6 @@
-@(collection_url : java.lang.String,
-indicators : Map[String,List[String]])
+@(collection_url : String,
+  indicators : List[String],
+  bAdmin : Boolean)
 
 @import helper._
 @import org.hadatac.console.views.html._
@@ -17,6 +18,7 @@ indicators : Map[String,List[String]])
 	<link rel="stylesheet" type="text/css" href="@controllers.routes.Assets.versioned("javascripts/vendor/c3-0.4.10/c3.css")"/>
 	<script type="text/javascript" src="@controllers.routes.Assets.versioned("javascripts/vendor/d3-3.5.6/d3.min.js")"></script>
 	<script type="text/javascript" src="@controllers.routes.Assets.versioned("javascripts/vendor/c3-0.4.10/c3.min.js")"></script>
+	
 	<script type="text/javascript">
 jQuery(document).ready(function($) {
   $('.facet-view-simple').each(function() {
@@ -25,31 +27,28 @@ jQuery(document).ready(function($) {
     search_index: 'solr',
     datatype: 'json',
     facets: [ 
-    @if(indicators.contains("Study Indicator")){ 
-    	@for(studyIndicator <- indicators.get("Study Indicator")){
+    	@for(studyIndicator <- indicators){
     		{
-    		'field': '@studyIndicator.replace(" ","").replace(",","")Label_i', 
+    		'field': '@studyIndicator.replace(" ","").replace(",","")_i', 
     		'display': '@studyIndicator'
     		},
-    }}],
+    }],
     search_sortby: [
         {'field':'studyUri.exact', 'display':'Study URI'},
-    @if(indicators.contains("Study Indicator")){
-    	@for(studyIndicator <- indicators.get("Study Indicator")){
+    	@for(studyIndicator <- indicators){
     		{
-    		'field': '@studyIndicator.replace(" ","").replace(",","")Label_i.exact', 
+    		'field': '@studyIndicator.replace(" ","").replace(",","")_i.exact', 
     		'display': '@studyIndicator'
     		},
-    }}],
+    }],
     searchbox_fieldselect: [
         {'field':'studyUri.exact', 'display':'Study URI'},
-    @if(indicators.contains("Study Indicator")){
-    	@for(studyIndicator <- indicators.get("Study Indicator")){
+    	@for(studyIndicator <- indicators){
     		{
-    		'field': '@studyIndicator.replace(" ","").replace(",","")Label_i.exact', 
+    		'field': '@studyIndicator.replace(" ","").replace(",","")_i.exact', 
     		'display': '@studyIndicator'
     		},
-    }}],
+    }],
     paging: {
       size: 10
     },
@@ -104,13 +103,16 @@ jQuery(document).ready(function($) {
       Study Faceted Search
       </h2>
    </div>
+   	@if(bAdmin) {
+		<a href="@org.hadatac.console.controllers.metadataacquisition.routes.MetadataAcquisition.update()" class="btn btn-primary" role="button">Update</a>
+   	}
+   <!-- Trigger the modal with a button -->
+   <button type="button" class="btn btn-info btn-lg" data-toggle="modal" data-target="#myModal">Download</button>
+   <!-- Modal -->
    <div class="content">
 	 <div class="facet-view-simple"></div>
    </div> 
    <div id="download_url" style="visibility: hidden ;">@org.hadatac.console.http.routes.SolrSearchProxy.getStudyAcquisitionDownload()</div>
-   <!-- Trigger the modal with a button -->
-   <button type="button" class="btn btn-info btn-lg" data-toggle="modal" data-target="#myModal">Download</button>
-   <!-- Modal -->
 	<div id="myModal" class="modal fade" role="dialog">
 	  <div class="modal-dialog">
 	    <!-- Modal content-->

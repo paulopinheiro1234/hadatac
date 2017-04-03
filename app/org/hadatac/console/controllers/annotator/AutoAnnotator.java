@@ -231,7 +231,7 @@ public class AutoAnnotator extends Controller {
 	@Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
     public static Result setLabKeyCredentials() {
 		return ok(syncLabkey.render("init", routes.AutoAnnotator.
-				postSetLabKeyCredentials().url(), "", false));
+				postSetLabKeyCredentials().url(), ""));
 	}
     
     @Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
@@ -251,7 +251,7 @@ public class AutoAnnotator extends Controller {
     		cred.save();
     	} catch(CommandException e) {
     		if(e.getMessage().equals("Unauthorized")){
-    			return ok(syncLabkey.render("login_failed", "", "", false));
+    			return ok(syncLabkey.render("login_failed", "", ""));
     		}
     	}
     	
