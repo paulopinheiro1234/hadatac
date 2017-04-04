@@ -53,6 +53,17 @@ case $response in
         ;;
 esac
 
+echo "Creating Distribution File"
+echo ""
+rm -rf ${GIT_HOME}/target/web/
+wait $!
+sbt clean
+wait $!
+sbt compile
+wait $!
+sbt dist
+wait $!
+
 echo "Deploying $HADATAC_HOST"
 echo ""
 echo "Stopping Hadatac Service"
@@ -66,17 +77,6 @@ echo "Stopping Blazegraph Service"
 echo ""
 service jetty8 stop
 echo ""
-
-echo "Creating Distribution File"
-echo ""
-rm -rf ${GIT_HOME}/target/web/
-wait $!
-sbt clean
-wait $!
-sbt compile
-wait $!
-sbt dist
-wait $!
 
 echo ""
 echo "Copy Distribution File to /data directory"
