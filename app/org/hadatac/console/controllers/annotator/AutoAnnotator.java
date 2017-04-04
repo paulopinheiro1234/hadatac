@@ -691,10 +691,12 @@ public class AutoAnnotator extends Controller {
     		String resumableChunkSize, 
     		String resumableCurrentChunkSize,
     		String resumableTotalSize,
+    		String resumableType,
     		String resumableIdentifier,
     		String resumableFilename,
     		String resumableRelativePath) {
-    	if (ResumableUpload.uploadFileByChunking(request(), ConfigProp.getPropertyValue("autoccsv.config", "path_unproc"))) {
+    	if (ResumableUpload.uploadFileByChunking(request(), 
+    			ConfigProp.getPropertyValue("autoccsv.config", "path_unproc"))) {
             return ok("Uploaded."); //This Chunk has been Uploaded.
         } else {
         	return status(HttpServletResponse.SC_NOT_FOUND);
@@ -707,10 +709,12 @@ public class AutoAnnotator extends Controller {
     		String resumableChunkSize, 
     		String resumableCurrentChunkSize,
     		String resumableTotalSize,
+    		String resumableType,
     		String resumableIdentifier,
     		String resumableFilename,
     		String resumableRelativePath) {
-    	if (ResumableUpload.postUploadFileByChunking(request(), ConfigProp.getPropertyValue("autoccsv.config", "path_unproc"))) {
+    	if (ResumableUpload.postUploadFileByChunking(request(), 
+    			ConfigProp.getPropertyValue("autoccsv.config", "path_unproc"))) {
     		DataFile dataFile = new DataFile();
     		dataFile.setFileName(resumableFilename);
     		dataFile.setOwnerEmail(AuthApplication.getLocalUser(session()).getEmail());
