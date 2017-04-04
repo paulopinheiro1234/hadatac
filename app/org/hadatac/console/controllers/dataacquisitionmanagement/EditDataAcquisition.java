@@ -103,45 +103,47 @@ public class EditDataAcquisition extends Controller {
         }
         
         DataAcquisition da = DataAcquisition.findByUri(acquisitionUri);
-        if (!data.getNewDataAcquisitionUri().equals("")) {
-            if (null != DataAcquisition.findByUri(data.getNewDataAcquisitionUri())) {
-            	return badRequest("Data acquisition with this uri already exists!");
+        if (null != data.getNewDataAcquisitionUri()) {
+            if (!data.getNewDataAcquisitionUri().equals("")) {
+                if (null != DataAcquisition.findByUri(data.getNewDataAcquisitionUri())) {
+                	return badRequest("Data acquisition with this uri already exists!");
+                }
+                
+            	// Create new data acquisition
+                String strStartDate = "";
+                String strEndDate = "";
+                DateFormat jsFormat = new SimpleDateFormat("MM/dd/yyyy HH:mm a");
+                DateFormat isoFormat = new SimpleDateFormat("EEE MMM dd HH:mm:ss zzz yyyy");
+        		try {
+        			Date startDate = jsFormat.parse(data.getNewStartDate());
+        			strStartDate = isoFormat.format(startDate);
+        			if (!data.getNewEndDate().equals("")) {
+        				Date endDate = jsFormat.parse(data.getNewEndDate());
+        				strEndDate = isoFormat.format(endDate);
+        			}    
+        		} catch (ParseException e) {
+        			return badRequest("Cannot parse data " + data.getNewStartDate());
+        		}
+            	da.setUri(data.getNewDataAcquisitionUri());
+            	da.setNumberDataPoints(0);
+            	da.setTriggeringEvent(TriggeringEvent.CHANGED_CONFIGURATION);
+            	da.setParameter(data.getNewParameter());
+            	da.setStartedAt(strStartDate);
+            	if (!strEndDate.equals("")) {
+            		da.setEndedAt(strEndDate);
+            	}
+            	try {
+    				int nRowsAffected = da.saveToLabKey(
+    						session().get("LabKeyUserName"), session().get("LabKeyPassword"));
+    				da.save();
+    		    	return ok(main.render("Results,", "", new Html("<h3>" 
+    		    			+ String.format("%d row(s) have been inserted in Table \"DataAcquisition\"", nRowsAffected) 
+    		    			+ "</h3>")));
+    			} catch (CommandException e) {
+    				return badRequest("Failed to insert new data acquisition to LabKey!\n"
+    						+ "Error Message: " + e.getMessage());
+    			}
             }
-            
-        	// Create new data acquisition
-            String strStartDate = "";
-            String strEndDate = "";
-            DateFormat jsFormat = new SimpleDateFormat("MM/dd/yyyy HH:mm a");
-            DateFormat isoFormat = new SimpleDateFormat("EEE MMM dd HH:mm:ss zzz yyyy");
-    		try {
-    			Date startDate = jsFormat.parse(data.getNewStartDate());
-    			strStartDate = isoFormat.format(startDate);
-    			if (!data.getNewEndDate().equals("")) {
-    				Date endDate = jsFormat.parse(data.getNewEndDate());
-    				strEndDate = isoFormat.format(endDate);
-    			}    
-    		} catch (ParseException e) {
-    			return badRequest("Cannot parse data " + data.getNewStartDate());
-    		}
-        	da.setUri(data.getNewDataAcquisitionUri());
-        	da.setNumberDataPoints(0);
-        	da.setTriggeringEvent(TriggeringEvent.CHANGED_CONFIGURATION);
-        	da.setParameter(data.getNewParameter());
-        	da.setStartedAt(strStartDate);
-        	if (!strEndDate.equals("")) {
-        		da.setEndedAt(strEndDate);
-        	}
-        	try {
-				int nRowsAffected = da.saveToLabKey(
-						session().get("LabKeyUserName"), session().get("LabKeyPassword"));
-				da.save();
-		    	return ok(main.render("Results,", "", new Html("<h3>" 
-		    			+ String.format("%d row(s) have been inserted in Table \"DataAcquisition\"", nRowsAffected) 
-		    			+ "</h3>")));
-			} catch (CommandException e) {
-				return badRequest("Failed to insert new data acquisition to LabKey!\n"
-						+ "Error Message: " + e.getMessage());
-			}
         }
         
         // Update current data acquisition
