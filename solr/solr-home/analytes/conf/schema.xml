@@ -3,6 +3,7 @@
   <fields>
     <field name="studyUri" type="string" indexed="true" stored="true"/>
     <dynamicField name="*_i" type="string" indexed="true" stored="true"/>
+    <dynamicField name="*_m" type="string" indexed="true" stored="true" multiValued="true" />
     <field name="_version_" type="long" indexed="true" stored="true"/>
     <field name="_text_" type="text_general" indexed="true" stored="false" multiValued="true"/>
   </fields>

@@ -1,9 +1,7 @@
 package org.hadatac.console.controllers.metadataacquisition;
 
-import org.apache.jena.query.Query;
 import org.apache.jena.query.QueryExecution;
 import org.apache.jena.query.QueryExecutionFactory;
-import org.apache.jena.query.QueryFactory;
 import org.apache.jena.query.QuerySolution;
 import org.apache.jena.query.ResultSet;
 import org.apache.jena.query.ResultSetFactory;
@@ -15,8 +13,6 @@ import org.hadatac.console.models.SysUser;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
 
 import play.Play;
 import play.mvc.Controller;
@@ -79,11 +75,9 @@ public class MetadataAcquisition extends Controller {
     }
     
 	public static boolean updateStudy() {
-		String initStudyQuery = NameSpaces.getInstance().printSparqlNameSpaceList() 
+		String strQuery = NameSpaces.getInstance().printSparqlNameSpaceList() 
 				+ " SELECT DISTINCT ?studyUri ?studyLabel ?proj ?studyTitle ?studyComment "
 				+ " ?indicatorLabel ?attributeLabel ?agentName ?institutionName WHERE { "
-				+ " ?subTypeUri rdfs:subClassOf hasco:Study . "
-				+ " ?studyUri a ?subTypeUri . "
 				+ " ?schemaUri hasco:isSchemaOf ?studyUri . "
 				+ " ?schemaAttribute hasneto:partOfSchema ?schemaUri . "
 				+ " ?schemaAttribute hasneto:hasAttribute ?attribute . "
@@ -102,19 +96,19 @@ public class MetadataAcquisition extends Controller {
 				+ " } ";
 		
 		QueryExecution qexecStudy = QueryExecutionFactory.sparqlService(
-				Collections.getCollectionsName(Collections.METADATA_SPARQL), initStudyQuery);
+				Collections.getCollectionsName(Collections.METADATA_SPARQL), strQuery);
 		ResultSet resultSet = qexecStudy.execSelect();
 		ResultSetRewindable resultsrwStudy = ResultSetFactory.copyResults(resultSet);
 		qexecStudy.close();
 		
-		HashMap<String, HashMap<String, String>> mapStudyInfo = new HashMap<String, HashMap<String, String>>();
+		HashMap<String, HashMap<String, Object>> mapStudyInfo = new HashMap<String, HashMap<String, Object>>();
 		ValueCellProcessing cellProc = new ValueCellProcessing();
 		while (resultsrwStudy.hasNext()) {
 			QuerySolution soln = resultsrwStudy.next();
 			String studyUri = soln.get("studyUri").toString();
-			HashMap<String, String> studyInfo = null;
+			HashMap<String, Object> studyInfo = null;
 			if (!mapStudyInfo.containsKey(studyUri)) {
-				studyInfo = new HashMap<String, String>();
+				studyInfo = new HashMap<String, Object>();
 				studyInfo.put("studyUri", studyUri);
 				mapStudyInfo.put(studyUri, studyInfo);
 			}
@@ -144,17 +138,27 @@ public class MetadataAcquisition extends Controller {
 			if (soln.contains("institutionName") && !studyInfo.containsKey("institutionName_i")){
 				studyInfo.put("institutionName_i", soln.get("institutionName").toString());
 			}
-			if (soln.contains("indicatorLabel")){
+			if (soln.contains("indicatorLabel")) {
 				String key = soln.get("indicatorLabel").toString().
-						replace(",", "").replace(" ", "") + "_i";
+						replace(",", "").replace(" ", "") + "_m";
+				String value = soln.get("attributeLabel").toString();
+				ArrayList<String> arrValues = null;
 				if (!studyInfo.containsKey(key)) {
-					studyInfo.put(key, soln.get("attributeLabel").toString());
+					arrValues = new ArrayList<String>();
+					studyInfo.put(key, arrValues);
+				}
+				else if (studyInfo.get(key) instanceof ArrayList<?>) {
+					arrValues = (ArrayList<String>)studyInfo.get(key);
+				}
+				
+				if (!arrValues.contains(value)) {
+					arrValues.add(value);
 				}
 			}
 		}
 		
 		ArrayList<JSONObject> results = new ArrayList<JSONObject>();
-		for (HashMap<String, String> info : mapStudyInfo.values()) {
+		for (HashMap<String, Object> info : mapStudyInfo.values()) {
 			results.add(new JSONObject(info));
 		}
 		
@@ -162,111 +166,9 @@ public class MetadataAcquisition extends Controller {
 				Play.application().configuration().getString("hadatac.solr.data") 
 				+ Collections.STUDIES, results.toString());
 	}
-	
-	public static void updateAnalyteIndicator() {
-		String analyteQuery = NameSpaces.getInstance().printSparqlNameSpaceList() 
-				+ " SELECT ?analyteIndicator ?label ?comment WHERE { "
-				+ " ?analyteIndicator rdfs:subClassOf chear:TargetedAnalyte . "
-				+ " OPTIONAL { ?analyteIndicator rdfs:label ?label } . "
-				+ " OPTIONAL { ?analyteIndicator rdfs:comment ?comment } . }";
-		QueryExecution qexecAnalyte = QueryExecutionFactory.sparqlService(
-				Collections.getCollectionsName(Collections.METADATA_SPARQL), analyteQuery);
-		ResultSet analyteResults = qexecAnalyte.execSelect();
-		ResultSetRewindable resultsrwAnalyte = ResultSetFactory.copyResults(analyteResults);
-		qexecAnalyte.close();
-		
-		Map<String, String> analyteMap = new TreeMap<String, String>();
-		while (resultsrwAnalyte.hasNext()) {
-			QuerySolution soln = resultsrwAnalyte.next();
-			analyteMap.put(soln.get("analyteIndicator").toString(), 
-						   soln.get("label").toString());
-		}
-		
-		SolrUtils.commitJsonDataToSolr(
-				Play.application().configuration().getString("hadatac.solr.data") 
-				+ Collections.ANALYTES, getAnalyteJson(analyteMap));
-	}
-	
-	public static String getAnalyteJson(Map<String, String> analyteMap) {
-		ArrayList<HashMap<String, String>> arrAnalyteInfo = new ArrayList<HashMap<String, String>>();
-		for(Map.Entry<String, String> entry : analyteMap.entrySet()) {
-			String analyteUriString = entry.getKey().toString();
-		    String label = entry.getValue().toString().replaceAll(" ", "").replaceAll(",", "") + "Label_i";
-			String indvAnalyteQuery = NameSpaces.getInstance().printSparqlNameSpaceList() 
-					+ "SELECT DISTINCT ?indvIndicatorUri ?label WHERE {  "
-					+ "?schemaUri hasco:isSchemaOf ?indvIndicatorUri . "
-					+ "?schemaAttribute hasneto:partOfSchema ?schemaUri . "
-					+ "?schemaAttribute hasneto:hasAttribute ?analyteIndicator . "
-					+ "?analyteIndicator rdfs:subClassOf+ <" + analyteUriString + "> . "
-                    + "?analyteIndicator rdfs:label ?label . " 
-					+ "}";
-			QueryExecution qexecIndvAnalyte = QueryExecutionFactory.sparqlService(
-					Collections.getCollectionsName(Collections.METADATA_SPARQL), indvAnalyteQuery);
-			ResultSet indvAnalyteResults = qexecIndvAnalyte.execSelect();
-			ResultSetRewindable resultsrwIndvAnalyte = ResultSetFactory.copyResults(indvAnalyteResults);
-			qexecIndvAnalyte.close();
-			while (resultsrwIndvAnalyte.hasNext()) {
-				QuerySolution soln = resultsrwIndvAnalyte.next();
-				String studyUri = soln.get("indvIndicatorUri").toString();
-				boolean bContain = false;
-				for (HashMap<String, String> info : arrAnalyteInfo) {
-					if (info.containsValue(studyUri)) {
-						info.put(label, soln.get("label").toString());
-						bContain = true;
-						break;
-					}
-				}
-				if (!bContain) {
-					HashMap<String, String> newInfo = new HashMap<String, String>();
-					newInfo.put("studyUri", studyUri);
-					newInfo.put(label, soln.get("label").toString());
-					arrAnalyteInfo.add(newInfo);
-				}
-			}
-		}
-		
-		ArrayList<JSONObject> results = new ArrayList<JSONObject>();
-		for (HashMap<String, String> info : arrAnalyteInfo) {
-			results.add(new JSONObject(info));
-		}
-
-		return results.toString();
-	}
-	
-	public static Map<String, List<String>> findSubject() {
-		String subjectQueryString = NameSpaces.getInstance().printSparqlNameSpaceList() 
-				+ " SELECT ?subjectUri ?subjectType ?subjectLabel ?cohort ?study WHERE { "
-    	        + " ?subjectUri hasco:isSubjectOf* ?cohort . "
-    	        + " ?cohort hasco:isCohortOf ?study . "
-    	        + " OPTIONAL { ?subjectUri rdfs:label ?subjectLabel } . "
-    	        + " OPTIONAL { ?subjectUri a ?subjectType } . "
-    	        + " }";		
-        
-		Query subjectQuery = QueryFactory.create(subjectQueryString);
-		QueryExecution qexec = QueryExecutionFactory.sparqlService(
-				Collections.getCollectionsName(Collections.METADATA_SPARQL), subjectQuery);
-		ResultSet results = qexec.execSelect();
-		ResultSetRewindable resultsrw = ResultSetFactory.copyResults(results);
-		qexec.close();
-		Map<String, List<String>> subjectResult = new HashMap<String, List<String>>();
-		List<String> values = new ArrayList<String>();
-		
-		while (resultsrw.hasNext()) {
-			QuerySolution soln = resultsrw.next();
-			values = new ArrayList<String>();
-			values.add("Label: " + soln.get("subjectLabel").toString());
-			values.add("Type: " + soln.get("subjectType").toString());
-			values.add("Cohort: " + soln.get("cohort").toString());
-			values.add("Study: " + soln.get("study").toString());
-			subjectResult.put(soln.get("subjectUri").toString(), values);
-		}
-		
-		return subjectResult;
-	}
 		
 	@Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
     public static Result update() {
-		updateAnalyteIndicator();
 		updateStudy();
 		
 		return redirect(routes.MetadataAcquisition.index());

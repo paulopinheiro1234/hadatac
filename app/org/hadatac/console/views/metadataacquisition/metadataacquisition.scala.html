@@ -28,7 +28,7 @@ jQuery(document).ready(function($) {
     facets: [ 
     	@for(studyIndicator <- indicators){
     		{
-    		'field': '@studyIndicator.replace(" ","").replace(",","")_i', 
+    		'field': '@studyIndicator.replace(" ","").replace(",","")_m', 
     		'display': '@studyIndicator'
     		},
     }],
@@ -36,7 +36,7 @@ jQuery(document).ready(function($) {
         {'field':'studyUri.exact', 'display':'Study URI'},
     	@for(studyIndicator <- indicators){
     		{
-    		'field': '@studyIndicator.replace(" ","").replace(",","")_i.exact', 
+    		'field': '@studyIndicator.replace(" ","").replace(",","")_m.exact', 
     		'display': '@studyIndicator'
     		},
     }],
@@ -44,7 +44,7 @@ jQuery(document).ready(function($) {
         {'field':'studyUri.exact', 'display':'Study URI'},
     	@for(studyIndicator <- indicators){
     		{
-    		'field': '@studyIndicator.replace(" ","").replace(",","")_i.exact', 
+    		'field': '@studyIndicator.replace(" ","").replace(",","")_m.exact', 
     		'display': '@studyIndicator'
     		},
     }],
