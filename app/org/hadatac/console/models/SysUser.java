@@ -389,7 +389,7 @@ public class SysUser implements Subject {
 		final SysUser sys_user = new SysUser();
 		
 		sys_user.roles.add(SecurityRole
-				.findByRoleNameSolr(org.hadatac.console.controllers.AuthApplication.DATA_OWNER_ROLE));
+				.findByRoleNameSolr(AuthApplication.DATA_OWNER_ROLE));
 		sys_user.permissions = new ArrayList<UserPermission>();
 		sys_user.active = true;
 		sys_user.lastLogin = (new Date()).toString();
@@ -427,9 +427,9 @@ public class SysUser implements Subject {
 		
 		sys_user.id_s = UUID.randomUUID().toString();
 		
-		if (SysUser.existsSolr() == false) {
+		if (!SysUser.existsSolr()) {
 			sys_user.roles.add(SecurityRole
-					.findByRoleNameSolr(org.hadatac.console.controllers.AuthApplication.DATA_MANAGER_ROLE));
+					.findByRoleNameSolr(AuthApplication.DATA_MANAGER_ROLE));
 			sys_user.emailValidated = true;
 			
 			String admin_uri = "http://localhost/users#admin";
@@ -550,7 +550,7 @@ public class SysUser implements Subject {
 			solrClient.commit();
 			solrClient.close();
 		} catch (Exception e) {
-			System.out.println("[ERROR] User.save - Exception message: " + e.getMessage());
+			e.printStackTrace();
 		}
         
         Iterator<LinkedAccount> i = linkedAccounts.iterator();
