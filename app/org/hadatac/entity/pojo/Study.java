@@ -51,96 +51,34 @@ public class Study {
 	
 	@Field("studyUri")
 	private String studyUri;
-	@Field("permission_uri")
-	private String permissionUri;
-	@Field("studyLabel")
+//	@Field("permission_uri")
+//	private String permissionUri;
+	@Field("studyLabel_i")
 	private String label;
-	@Field("proj")
+	@Field("proj_i")
 	private String project;
-	@Field("studyComment")
+	@Field("studyComment_i")
 	private String comment;
-	@Field("institutionName")
+	@Field("institutionName_i")
 	private String institution;
-	@Field("agentName")
+	@Field("agentName_i")
 	private String agent;
+	@Field("studyTitle_i")
+	private String title;
 	
-	/*@Field("uri")
-	private String uri;
-	@Field("permission_uri")
-	private String permissionUri;
-	@Field("name")
-	private String name;
-	@Field("label")
-	private String label;
-	@Field("projectTitle")
-	private String projectTitle;
-	@Field("comment")
-	private String comment;
-	@Field("description")
-	private String description;
-	@Field("numSubjects")
-	private int numSubjects;
-	@Field("numSamples")
-	private int numSamples;
-	@Field("institution")
-	private List<String> institution;
-	@Field("location")
-	private List<String> location;
-	@Field("PI")
-	private List<String> PI;
-	@Field("CI")
-	private List<String> CI;
-	@Field("demographics")
-	private List<String> demographics;
-	@Field("acculturation")
-	private List<String> acculturation;
-	@Field("occupation")
-	private List<String> occupation;
-	@Field("housingCharacteristics")
-	private List<String> housingCharacteristics;
-	@Field("ATIDU") // alcohol, tobacco, illicit drug use
-	private List<String> ATIDU;
-	@Field("socioEconomicStatus")
-	private List<String> socioEconomicStatus;
-	@Field("assessment")
-	private List<String> assessment;
-	@Field("BDN") //Behavior, Diet, and Nutrition
-	private List<String> BDN;
-	@Field("anthropometry")
-	private List<String> anthropometry;
-	@Field("laboratory")
-	private List<String> laboratory;
-	@Field("birthOutcomes")
-	private List<String> birthOutcomes;
-	*/
+	private List<DataAcquisition> dataAcquisitions;
+	
+	
 	// Constructer
 	public Study() {
 		startedAt = null;
 		endedAt = null;
-		permissionUri = "";
+//		permissionUri = "";
 		label = "";
 		project= "";
 		comment = "";
 		institution = "";
 		agent = "";
-/*		numSubjects = 0;
-		numSamples = 0;
-		institution = new ArrayList<String>();
-		location = new ArrayList<String>();
-		PI = new ArrayList<String>();
-		CI = new ArrayList<String>();
-		demographics = new ArrayList<String>();
-		acculturation = new ArrayList<String>();
-		occupation = new ArrayList<String>();
-		housingCharacteristics = new ArrayList<String>();
-		ATIDU = new ArrayList<String>();
-		socioEconomicStatus = new ArrayList<String>();
-		assessment = new ArrayList<String>();
-		BDN = new ArrayList<String>();
-		anthropometry = new ArrayList<String>();
-		laboratory = new ArrayList<String>();
-		birthOutcomes = new ArrayList<String>();
-		*/
 	}
 	
 	// get Methods
@@ -148,14 +86,10 @@ public class Study {
 		return studyUri;
 	}
 	
-	public String getPermissionUri() {
+/*	public String getPermissionUri() {
 		return permissionUri;
 	}
-	
-/*	public String getName() {
-		return name;
-	}*/
-	
+	*/
 	public String getLabel() {
 		return label;
 	}
@@ -168,11 +102,7 @@ public class Study {
 		return comment;
 	}
 	
-/*	public String getDescription() {
-		return description;
-	}
-	
-	public int getNumSamples() {
+/*	public int getNumSamples() {
 		return numSamples;
 	}
 	
@@ -188,62 +118,18 @@ public class Study {
 		return agent;
 	}
 	
-/*	public List<String> getLocation() {
-		return location;
+	public String getTitle() {
+		return title;
 	}
 	
-	public List<String> getPI() {
-		return PI;
-	}
+	public List<DataAcquisition> getDataAcquisitions() {
+    	return dataAcquisitions;
+    }
+    
+    public void setDataAcquisitions(List<DataAcquisition> dataAcquisition) {
+    	this.dataAcquisitions = dataAcquisition;
+    }
 	
-	public List<String> getCI() {
-		return CI;
-	}
-	
-	public List<String> getDemographics() {
-		return demographics;
-	}
-	
-	public List<String> getAcculturation() {
-		return acculturation;
-	}
-	
-	public List<String> getOccupation() {
-		return occupation;
-	}
-	
-	public List<String> getHousingCharacteristics() {
-		return housingCharacteristics;
-	}
-	
-	public List<String> getATIDU() {
-		return ATIDU;
-	}
-	
-	public List<String> getSocioEconomicStatus() {
-		return socioEconomicStatus;
-	}
-	
-	public List<String> getAssessment() {
-		return assessment;
-	}
-	
-	public List<String> getBDN() {
-		return BDN;
-	}
-	
-	public List<String> getAnthropometry() {
-		return anthropometry;
-	}
-	
-	public List<String> getLaboratory() {
-		return laboratory;
-	}
-	
-	public List<String> getBirthOutcomes() {
-		return birthOutcomes;
-	}
-	*/
 	// get Start Time Methods
 	public String getStartedAt() {
 		DateTimeFormatter formatter = ISODateTimeFormat.dateTime();
@@ -269,12 +155,8 @@ public class Study {
 		this.studyUri = uri;
 	}
 	
-	public void setPermissionUri(String permissionUri) {
+/*	public void setPermissionUri(String permissionUri) {
 		this.permissionUri = permissionUri;
-	}
-	
-/*	public void setName(String name) {
-		this.name = name;
 	}
 	*/
 	public void setLabel(String label) {
@@ -289,11 +171,8 @@ public class Study {
 		this.comment = comment;
 	}
 	
-/*	public String setDescription() {
-		return description;
-	}
 	
-	public void setNumSamples(int numSamples) {
+/*	public void setNumSamples(int numSamples) {
 		this.numSamples = numSamples;
 	}
 	
@@ -309,62 +188,10 @@ public class Study {
 		this.agent = agent;
 	}
 	
-/*	public void setLocation(List<String> location) {
-		this.location = location;
+	public void setTitle(String title) {
+		this.title = title;
 	}
 	
-	public void setPI(List<String> PI) {
-		this.PI = PI;
-	}
-	
-	public void setCI(List<String> CI) {
-		this.CI = CI;
-	}
-	
-	public void setDemographics(List<String> demographics) {
-		this.demographics = demographics;
-	}
-		
-	public void setAcculturation(List<String> acculturation) {
-		this.acculturation = acculturation;
-	}
-	
-	public void setOccupation(List<String> occupation) {
-		this.occupation = occupation;
-	}
-		
-	public void setHousingCharacteristics(List<String> housingCharacteristics) {
-		this.housingCharacteristics = housingCharacteristics;
-	}
-	
-	public void setATIDU(List<String> ATIDU) {
-		this.ATIDU = ATIDU;
-	}
-	
-	public void setSocioEconomicStatus(List<String> socioEconomicStatus) {
-		this.socioEconomicStatus = socioEconomicStatus;
-	}
-	
-	public void setAssessment(List<String> assessment) {
-		this.assessment = assessment;
-	}
-	
-	public void setBDN(List<String> BDN) {
-		this.BDN = BDN;
-	}
-	
-	public void setAnthropometry(List<String> anthropometry) {
-		this.anthropometry = anthropometry;
-	}
-	
-	public void setLaboratory(List<String> laboratory) {
-		this.laboratory = laboratory;
-	}
-	
-	public void setBirthOutcomes(List<String> birthOutcomes) {
-		this.birthOutcomes = birthOutcomes;
-	}
-	*/
 	// set Start Time Methods
 	@Field("started_at")
 	public void setStartedAt(String startedAt) {
@@ -394,68 +221,15 @@ public class Study {
 		DateTimeFormatter formatter = ISODateTimeFormat.dateTime();
 		this.endedAt = formatter.parseDateTime(endedAt);
 	}
-/*	
-	// add Methods
-	public void addInstitution(String institution) {
-		this.institution.add(institution);
+	
+	public static Study create(String uri) {
+		Study study = new Study();
+		
+		study.setUri(uri);
+		
+		return study;
 	}
 	
-	public void addLocation(String location) {
-		this.location.add(location);
-	}
-	
-	public void addPI(String PI) {
-		this.PI.add(PI);
-	}
-	
-	public void addCI(String CI) {
-		this.CI.add(CI);
-	}
-	
-	public void addDemographics(String demographics) {
-		this.demographics.add(demographics);
-	}
-	
-	public void addAcculturation(String acculturation) {
-		this.acculturation.add(acculturation);
-	}
-	
-	public void addOccupation(String occupation) {
-		this.occupation.add(occupation);
-	}
-	
-	public void addHousingCharacteristics(String housingCharacteristics) {
-		this.housingCharacteristics.add(housingCharacteristics);
-	}
-	
-	public void addATIDU(String ATIDU) {
-		this.ATIDU.add(ATIDU);
-	}
-	
-	public void addSocioEconomicStatus(String socioEconomicStatus) {
-		this.socioEconomicStatus.add(socioEconomicStatus);
-	}
-	
-	public void addAssessment(String assessment) {
-		this.assessment.add(assessment);
-	}
-	
-	public void addBDN(String BDN) {
-		this.BDN.add(BDN);
-	}
-	
-	public void addAnthropometry(String anthropometry) {
-		this.anthropometry.add(anthropometry);
-	}
-	
-	public void addLaboratory(String laboratory) {
-		this.laboratory.add(laboratory);
-	}
-	
-	public void addBirthOutcomes(String birthOutcomes) {
-		this.birthOutcomes.add(birthOutcomes);
-	}
-	*/
 	public static Study convertFromSolr(SolrDocument doc) {
 		Iterator<Object> i;
 		DateTime date;
@@ -463,28 +237,26 @@ public class Study {
 		// URI
 		study.setUri(doc.getFieldValue("studyUri").toString());
 		// permissions
-		study.setPermissionUri(doc.getFieldValue("permission_uri").toString());
-/*		// name
-		if (doc.getFieldValues("name") != null) {
-			study.setName(doc.getFieldValue("name").toString());
+/*		if (doc.getFieldValues("permission_uri") != null) {
+			study.setPermissionUri(doc.getFieldValue("permission_uri").toString());
 		}*/
 		// label
-		if (doc.getFieldValues("studyLabel") != null) {
-			study.setLabel(doc.getFieldValue("studyLabel").toString());
+		if (doc.getFieldValues("studyLabel_i") != null) {
+			study.setLabel(doc.getFieldValue("studyLabel_i").toString());
 		}
 		// projectTitle
-		if (doc.getFieldValues("proj") != null) {
-			study.setProject(doc.getFieldValue("proj").toString());
+		if (doc.getFieldValues("proj_i") != null) {
+			study.setProject(doc.getFieldValue("proj_i").toString());
 		}
 		// comment
-		if (doc.getFieldValues("comment") != null) {
-			study.setLabel(doc.getFieldValue("comment").toString());
+		if (doc.getFieldValues("comment_i") != null) {
+			study.setLabel(doc.getFieldValue("comment_i").toString());
 		}
-/*		// description
-		if (doc.getFieldValues("description") != null) {
-			study.setProjectTitle(doc.getFieldValue("description").toString());
+		// description
+		if (doc.getFieldValues("studyTitle_i") != null) {
+			study.setTitle(doc.getFieldValue("studyTitle_i").toString());
 		}
-		// numSubjects
+/*		// numSubjects
 		if (doc.getFieldValues("numSubjects") != null) {
 			study.setNumSubjects(Integer.parseInt(doc.getFieldValue("numSubjects").toString()));
 		}
@@ -493,136 +265,15 @@ public class Study {
 			study.setNumSamples(Integer.parseInt(doc.getFieldValue("numSamples").toString()));
 		}*/
 		// institution
-		if (doc.getFieldValues("institutionName") != null) {
-			study.setProject(doc.getFieldValue("institutionName").toString());
+		if (doc.getFieldValues("institutionName_i") != null) {
+			study.setInstitution(doc.getFieldValue("institutionName_i").toString());
 		}
 		
-		// institution
-		if (doc.getFieldValues("agentName") != null) {
-			study.setProject(doc.getFieldValue("agentName").toString());
-		}
-/*		// location(s)
-		if (doc.getFieldValues("location") != null) {
-			i = doc.getFieldValues("location").iterator();
-			while (i.hasNext()) {
-				study.addLocation(i.next().toString());
-			}
-		}
-
-		// PI(s)
-		if (doc.getFieldValues("PI") != null) {
-			i = doc.getFieldValues("PI").iterator();
-			while (i.hasNext()) {
-				study.addPI(i.next().toString());
-			}
-		}
-
-		// CI(s)
-		if (doc.getFieldValues("CI") != null) {
-			i = doc.getFieldValues("CI").iterator();
-			while (i.hasNext()) {
-				study.addCI(i.next().toString());
-			}
-		}
-
-		// demographics
-		if (doc.getFieldValues("demographics") != null) {
-			i = doc.getFieldValues("demographics").iterator();
-			while (i.hasNext()) {
-				study.addDemographics(i.next().toString());
-			}
-		}
-
-		// acculturation
-		if (doc.getFieldValues("acculturation") != null) {
-			i = doc.getFieldValues("acculturation").iterator();
-			while (i.hasNext()) {
-				study.addAcculturation(i.next().toString());
-			}
-		}
-
-		// occupation
-		if (doc.getFieldValues("occupation") != null) {
-			i = doc.getFieldValues("occupation").iterator();
-			while (i.hasNext()) {
-				study.addOccupation(i.next().toString());
-			}
-		}
-
-		// housingCharacteristics
-		if (doc.getFieldValues("housingCharacteristics") != null) {
-			i = doc.getFieldValues("housingCharacteristics").iterator();
-			while (i.hasNext()) {
-				study.addHousingCharacteristics(i.next().toString());
-			}
-		}
-
-		// ATIDU
-		if (doc.getFieldValues("ATIDU") != null) {
-			i = doc.getFieldValues("ATIDU").iterator();
-			while (i.hasNext()) {
-				study.addATIDU(i.next().toString());
-			}
-		}
-
-		// socioEconomicStatus
-		if (doc.getFieldValues("socioEconomicStatus") != null) {
-			i = doc.getFieldValues("socioEconomicStatus").iterator();
-			while (i.hasNext()) {
-				study.addSocioEconomicStatus(i.next().toString());
-			}
-		}
-
-		// assessment
-		if (doc.getFieldValues("assessment") != null) {
-			i = doc.getFieldValues("assessment").iterator();
-			while (i.hasNext()) {
-				study.addAssessment(i.next().toString());
-			}
-		}
-
-		// BDN
-		if (doc.getFieldValues("BDN") != null) {
-			i = doc.getFieldValues("BDN").iterator();
-			while (i.hasNext()) {
-				study.addBDN(i.next().toString());
-			}
-		}
-
-		// anthropometry
-		if (doc.getFieldValues("anthropometry") != null) {
-			i = doc.getFieldValues("anthropometry").iterator();
-			while (i.hasNext()) {
-				study.addAnthropometry(i.next().toString());
-			}
+		// agent
+		if (doc.getFieldValues("agentName_i") != null) {
+			study.setAgent(doc.getFieldValue("agentName_i").toString());
 		}
 		
-		// laboratory
-		if (doc.getFieldValues("laboratory") != null) {
-			i = doc.getFieldValues("laboratory").iterator();
-			while (i.hasNext()) {
-				study.addLaboratory(i.next().toString());
-			}
-		}
-		
-		// birthOutcomes
-		if (doc.getFieldValues("birthOutcomes") != null) {
-			i = doc.getFieldValues("birthOutcomes").iterator();
-			while (i.hasNext()) {
-				study.addBirthOutcomes(i.next().toString());
-			}
-		}
-		
-		if (doc.getFieldValues("started_at") != null) {
-			date = new DateTime((Date)doc.getFieldValue("started_at"));
-			study.setStartedAt(date.withZone(DateTimeZone.UTC).toString("EEE MMM dd HH:mm:ss zzz yyyy"));
-		}
-		
-		if (doc.getFieldValues("ended_at") != null) {
-			date = new DateTime((Date)doc.getFieldValue("ended_at"));
-			study.setEndedAt(date.withZone(DateTimeZone.UTC).toString("EEE MMM dd HH:mm:ss zzz yyyy"));
-		}
-	*/			
 		return study;
 	}
 	

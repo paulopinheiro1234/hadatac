@@ -26,6 +26,7 @@ import org.hadatac.entity.pojo.Deployment;
 import org.hadatac.entity.pojo.Detector;
 import org.hadatac.entity.pojo.Instrument;
 import org.hadatac.entity.pojo.Platform;
+import org.hadatac.entity.pojo.Study;
 import org.hadatac.entity.pojo.TriggeringEvent;
 import org.hadatac.metadata.loader.LabkeyDataHandler;
 import org.hadatac.metadata.loader.ValueCellProcessing;
@@ -36,7 +37,7 @@ import org.labkey.remoteapi.query.SaveRowsResponse;
 import be.objectify.deadbolt.java.actions.Group;
 import be.objectify.deadbolt.java.actions.Restrict;
 
-import org.hadatac.console.models.DeploymentForm;
+import org.hadatac.console.models.StudyForm;
 import org.hadatac.console.models.SparqlQuery;
 import org.hadatac.console.models.SparqlQueryResults;
 import org.hadatac.console.models.SysUser;
@@ -94,12 +95,12 @@ public class NewStudy extends Controller {
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
     public static Result processForm() {
     	final SysUser user = AuthApplication.getLocalUser(session());
-        Form<DeploymentForm> form = Form.form(DeploymentForm.class).bindFromRequest();
+        Form<StudyForm> form = Form.form(StudyForm.class).bindFromRequest();
         if (form.hasErrors()) {
         	return badRequest("The submitted form has errors!");
         }
         
-        DeploymentForm data = form.get();
+        StudyForm data = form.get();
 
         String dateStringFromJs = data.getStartDateTime();
         String dateString = "";
@@ -113,31 +114,26 @@ public class NewStudy extends Controller {
 			return badRequest("Cannot parse data " + dateStringFromJs);
 		}
 
-        String deploymentUri = data.getUri();
-        Deployment deployment = DataFactory.createDeployment(deploymentUri, data.getPlatform(), 
-        		data.getInstrument(), data.getDetectors(), dateString, data.getType());
+        String studyUri = data.getUri();
+        Study study = DataFactory.createStudy(studyUri, data.getDataAcquisitions(), dateString);
         
-        int triggeringEvent;
-        if (data.getType().equalsIgnoreCase("LEGACY")) {
-        	triggeringEvent = TriggeringEvent.LEGACY_DEPLOYMENT;
-        } else {
-        	triggeringEvent = TriggeringEvent.INITIAL_DEPLOYMENT;
-        }
-        String dataAcquisitionUri = data.getDataAcquisitionUri();
+        int triggeringEvent = TriggeringEvent.INITIAL_DEPLOYMENT;
+        
+//        String dataAcquisitionUri = data.getDataAcquisitionUri();
         String param = data.getInitialParameter();
-        DataAcquisition dataAcquisition = DataFactory.createDataAcquisition(
+/*        DataAcquisition dataAcquisition = DataFactory.createDataAcquisition(
         		triggeringEvent, dataAcquisitionUri, deploymentUri, 
         		param, UserManagement.getUriByEmail(user.getEmail()));
-        
+  */      
         String user_name = session().get("LabKeyUserName");
         String password = session().get("LabKeyPassword");
-        if (user_name != null && password != null) {
+ /*       if (user_name != null && password != null) {
         	try {
-        		int nRowsOfDeployment = deployment.saveToLabKey(
+        		int nRowsOfDeployment = study.saveToLabKey(
         				session().get("LabKeyUserName"), session().get("LabKeyPassword"));
         		int nRowsOfDA = dataAcquisition.saveToLabKey(
         				session().get("LabKeyUserName"), session().get("LabKeyPassword"));
-        		deployment.save();
+        		study.save();
         		dataAcquisition.save();
 		    	return ok(main.render("Results,", "", new Html("<h3>" 
 		    			+ String.format("%d row(s) have been inserted in Table \"Deployment\" \n", nRowsOfDeployment) 
@@ -148,7 +144,7 @@ public class NewStudy extends Controller {
 						+ "Error Message: " + e.getMessage());
 			}
         }
-        
+   */     
         return ok(studyConfirm.render("New Study", data));
     }
 }

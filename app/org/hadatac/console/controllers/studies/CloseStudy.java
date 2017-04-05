@@ -15,9 +15,10 @@ import play.mvc.Result;
 
 import org.hadatac.console.controllers.AuthApplication;
 import org.hadatac.console.models.DeploymentForm;
+import org.hadatac.console.models.StudyForm;
 import org.hadatac.console.views.html.studies.*;
-import org.hadatac.entity.pojo.Deployment;
-import org.hadatac.entity.pojo.Detector;
+import org.hadatac.entity.pojo.DataAcquisition;
+import org.hadatac.entity.pojo.Study;
 
 import be.objectify.deadbolt.java.actions.Group;
 import be.objectify.deadbolt.java.actions.Restrict;
@@ -26,102 +27,98 @@ import be.objectify.deadbolt.java.actions.Restrict;
 public class CloseStudy extends Controller {
 	
 	@Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    public static Result index(String deployment_uri) {
+    public static Result index(String study_uri) {
 
-    	DeploymentForm depForm = new DeploymentForm();
-    	Deployment dep = null;
+    	StudyForm studyForm = new StudyForm();
+    	Study study = null;
     	
     	try {
-    		if (deployment_uri != null) {
-			    deployment_uri = URLDecoder.decode(deployment_uri, "UTF-8");
+    		if (study_uri != null) {
+    			study_uri = URLDecoder.decode(study_uri, "UTF-8");
     		} else {
-    			deployment_uri = "";
+    			study_uri = "";
     		}
 		} catch (UnsupportedEncodingException e) {
 			e.printStackTrace();
 		}
 
-    	if (!deployment_uri.equals("")) {
+    	if (!study_uri.equals("")) {
 
-    		dep = Deployment.find(deployment_uri);
+    		study = Study.find(study_uri);
     		/*
     		 *  Add deployment information into handler
     		 */
-    		depForm.setPlatform(dep.getPlatform().getLabel());
-    		depForm.setInstrument(dep.getInstrument().getLabel());
-    		if (dep.getDetectors() != null) {
-    			Iterator<Detector> iterDetectors = dep.getDetectors().iterator();
-    			while (iterDetectors.hasNext()) {
-    				depForm.addDetector(((Detector)iterDetectors.next()).getLabel());
+    		if (study.getDataAcquisitions() != null) {
+    			Iterator<DataAcquisition> iterDataAcquisitions = study.getDataAcquisitions().iterator();
+    			while (iterDataAcquisitions.hasNext()) {
+    				studyForm.addDataAcquisition(((DataAcquisition)iterDataAcquisitions.next()).getLabel());
     			}
     		}
-    		depForm.setStartDateTime(dep.getStartedAt());
+    		studyForm.setStartDateTime(study.getStartedAt());
  
             System.out.println("closing deployment");
-            return ok(closeStudy.render(deployment_uri, depForm));
+            return ok(closeStudy.render(study_uri, studyForm));
     	}
     	
-    	return ok(closeStudy.render(deployment_uri, depForm));
+    	return ok(closeStudy.render(study_uri, studyForm));
     }
 
 	@Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    public static Result postIndex(String deployment_uri) {
-    	DeploymentForm depForm = new DeploymentForm();
-    	Deployment dep = null;
+    public static Result postIndex(String study_uri) {
+    	StudyForm studyForm = new StudyForm();
+    	Study study = null;
     	
     	try {
-    		if (deployment_uri != null) {
-			    deployment_uri = URLDecoder.decode(deployment_uri, "UTF-8");
+    		if (study_uri != null) {
+    			study_uri = URLDecoder.decode(study_uri, "UTF-8");
     		} else {
-    			deployment_uri = "";
+    			study_uri = "";
     		}
 		} catch (UnsupportedEncodingException e) {
 			e.printStackTrace();
 		}
 
-    	if (!deployment_uri.equals("")) {
+    	if (!study_uri.equals("")) {
 
-    		dep = Deployment.find(deployment_uri);
+    		study = Study.find(study_uri);
     		/*
-    		 *  Add deployment information into handler
+    		 *  Add study da information into handler
     		 */
-    		depForm.setPlatform(dep.getPlatform().getLabel());
-    		depForm.setInstrument(dep.getInstrument().getLabel());
-    		if (dep.getDetectors() != null) {
-    			Iterator<Detector> iterDetectors = dep.getDetectors().iterator();
-    			while (iterDetectors.hasNext()) {
-    				depForm.addDetector(((Detector)iterDetectors.next()).getLabel());
+    		if (study.getDataAcquisitions() != null) {
+    			Iterator<DataAcquisition> iterDataAcquisitions = study.getDataAcquisitions().iterator();
+    			while (iterDataAcquisitions.hasNext()) {
+    				studyForm.addDataAcquisition(((DataAcquisition)iterDataAcquisitions.next()).getLabel());
     			}
     		}
-    		depForm.setStartDateTime(dep.getStartedAt());
+    		studyForm.setStartDateTime(study.getStartedAt());
  
-            System.out.println("closing deployment");
-            return ok(closeStudy.render(deployment_uri, depForm));
+            System.out.println("closing study");
+            return ok(closeStudy.render(study_uri, studyForm));
     	}
-    	return ok(closeStudy.render(deployment_uri, depForm));
+    	return ok(closeStudy.render(study_uri, studyForm));
         
     }
 
 	@Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    public static Result processForm(String deployment_uri) {
-    	Deployment dep = null;
+    public static Result processForm(String study_uri) {
+    	Study study = null;
     	
     	try {
-    		if (deployment_uri != null) {
-			    deployment_uri = URLDecoder.decode(deployment_uri, "UTF-8");
+    		if (study_uri != null) {
+    			study_uri = URLDecoder.decode(study_uri, "UTF-8");
     		} else {
-    			deployment_uri = "";
+    			study_uri = "";
     		}
 		} catch (UnsupportedEncodingException e) {
 			e.printStackTrace();
 		}
 
-    	if (!deployment_uri.equals("")) {
-    		dep = Deployment.find(deployment_uri);
+    	if (!study_uri.equals("")) {
+    		study = Study.find(study_uri);
     	}
     	
-    	Form<DeploymentForm> form = Form.form(DeploymentForm.class).bindFromRequest();
-        DeploymentForm data = form.get();
+    	Form<StudyForm> form = Form.form(StudyForm.class).bindFromRequest();
+    	StudyForm data = form.get();
 
         String dateStringFromJs = data.getEndDateTime();
         String endDateString = "";
@@ -134,22 +131,20 @@ public class CloseStudy extends Controller {
 		} catch (ParseException e) {
 			e.printStackTrace();
 		}
-		dep.close(endDateString);
+		study.close(endDateString);
 		
-		data.setPlatform(dep.getPlatform().getLabel());
-		data.setInstrument(dep.getInstrument().getLabel());
-		if (dep.getDetectors() != null) {
-			Iterator<Detector> iterDetectors = dep.getDetectors().iterator();
-			while (iterDetectors.hasNext()) {
-				data.addDetector(((Detector)iterDetectors.next()).getLabel());
+		if (study.getDataAcquisitions() != null) {
+			Iterator<DataAcquisition> iterDataAcquisitions = study.getDataAcquisitions().iterator();
+			while (iterDataAcquisitions.hasNext()) {
+				data.addDataAcquisition(((DataAcquisition)iterDataAcquisitions.next()).getLabel());
 			}
 		}
-		data.setStartDateTime(dep.getStartedAt());
-		data.setEndDateTime(dep.getEndedAt());
+		data.setStartDateTime(study.getStartedAt());
+		data.setEndDateTime(study.getEndedAt());
 
         if (form.hasErrors()) {
         	System.out.println("HAS ERRORS");
-            return badRequest(closeStudy.render(deployment_uri, data));
+            return badRequest(closeStudy.render(study_uri, data));
         } else {
             return ok(closeStudy.render("Close Study", data));
         }

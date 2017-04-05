@@ -9,6 +9,7 @@ import org.hadatac.entity.pojo.Deployment;
 import org.hadatac.entity.pojo.Detector;
 import org.hadatac.entity.pojo.Instrument;
 import org.hadatac.entity.pojo.Platform;
+import org.hadatac.entity.pojo.Study;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 
@@ -73,6 +74,19 @@ public class DataFactory {
 		deployment.setStartedAtXsd(startedAt);
 		
 		return deployment;
+	}
+	
+	public static Study createStudy(String studyUri, List<String> dataAcquisionUris, String startedAt) {
+		Study study;
+		
+		study = Study.create(studyUri);
+		
+		for (int i = 0; i < dataAcquisionUris.size(); i++) {
+			study.getDataAcquisitions().add(DataAcquisition.findByUri(dataAcquisionUris.get(i)));
+		}
+		study.setStartedAtXsd(startedAt);
+		
+		return study;
 	}
 	
 	public static Deployment createLegacyDeployment(String deploymentUri, String platformUri, String instrumentUri, List<String> detectorUri, String startedAt) {

@@ -1,10 +1,10 @@
-@(deployment_uri : String, deploy: org.hadatac.console.models.DeploymentForm)
+@(study_uri : String, study: org.hadatac.console.models.StudyForm)
 
 @import helper._
 @import org.hadatac.utils._
 @import org.hadatac.console.views.html._
-@import org.hadatac.console.views.html.deployments._
-@import org.hadatac.console.controllers.deployments._
+@import org.hadatac.console.views.html.studies._
+@import org.hadatac.console.controllers.studies._
 
 <head> 
     <script type="text/javascript">
@@ -27,34 +27,21 @@
     </script>
 </head>
 
-@main("Close Deployment") {
+@main("Close Study") {
   <div class="container">
-    <h2>Close Deployment</h2>
+    <h2>Close Study</h2>
 
-    <form class="form-horizontal" method="post" action="@org.hadatac.console.controllers.deployments.routes.CloseDeployment.processForm(deployment_uri)">
+    <form class="form-horizontal" method="post" action="@org.hadatac.console.controllers.studies.routes.CloseStudy.processForm(study_uri)">
 
-    <div class="form-group">
-         <label>Platform</label> 
-         <select disabled class="form-control col-sm-6" name="platform">
-         <option value="platform">@deploy.getPlatform()</option>         
-         </select>
-
-     </div>
 	 <div class="form-group">
-         <label>Instrument</label>
-         <select disabled class="form-control col-sm-6" name="instrument">
-         <option value="instrument">@deploy.getInstrument()</option>         
-         </select>
-     </div>
-	 <div class="form-group">
-         <label>Detector(s)</label>
-         <select disabled class="form-control col-sm-6" name="detector">
-         <option value="detector">@deploy.getDetectors()</option>         
+         <label>DataAcquisition(s)</label>
+         <select disabled class="form-control col-sm-6" name="dataAcquisition">
+         <option value="dataAcquisition">@study.getDataAcquisitions()</option>         
          </select>
      </div>
 	 <div class="form-group">
          <label for="startdate">Start Date/Time</label><br> 
-         <input disabled class="col-sm-3" type="text" id="startdate" name="startDateTime" value="@deploy.getStartDateTime()" />
+         <input disabled class="col-sm-3" type="text" id="startdate" name="startDateTime" value="@study.getStartDateTime()" />
       </div>
       
 	 <div class="form-group">
@@ -85,7 +72,7 @@
      </div>
 
    </form>    
-   @deploymentButton(false)
+   @studyButton(false)
 </div>
 
 }

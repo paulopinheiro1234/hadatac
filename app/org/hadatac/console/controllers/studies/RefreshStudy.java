@@ -24,7 +24,7 @@ import org.hadatac.entity.pojo.Study;
 import be.objectify.deadbolt.java.actions.Group;
 import be.objectify.deadbolt.java.actions.Restrict;
 
-public class DeleteStudy extends Controller {
+public class RefreshStudy extends Controller {
 
 	@Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
     public static Result index(String study_uri) {
@@ -58,9 +58,9 @@ public class DeleteStudy extends Controller {
             	studyForm.setEndDateTime(study.getEndedAt());
             }
             System.out.println("delete study");
-            return ok(deleteStudy.render(study_uri, studyForm));
+            return ok(refreshStudy.render(study_uri, studyForm));
         }
-        return ok(deleteStudy.render(study_uri, studyForm));
+        return ok(refreshStudy.render(study_uri, studyForm));
     }
 
 	@Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))

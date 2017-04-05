@@ -7,9 +7,9 @@
 @import org.hadatac.console.controllers.studies._
 @import org.hadatac.console.controllers.triplestore._
 
-@main("Delete Study") {
+@main("Refresh Study") {
 <div class="container">
-   <h2>Delete Study</h2>
+   <h2>Refresh Study</h2>
 
    <form class="form-horizontal" method="post" action="@org.hadatac.console.controllers.studies.routes.DeleteStudy.processForm(study_uri)">
 
@@ -31,7 +31,7 @@
      </div>
 
      <div class="form-group class="col-sm-6 col-offset-3">
-        <input class="btn btn-success" role="button" type="submit" value="Delete" />
+        <input class="btn btn-success" role="button" type="submit" value="Refresh" />
      </div>
      
     </form>    
