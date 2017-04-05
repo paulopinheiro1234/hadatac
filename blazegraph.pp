@@ -1,7 +1,7 @@
 Exec { path => ["/usr/local/sbin","/usr/local/bin","/usr/sbin","/usr/bin","/bin"]}
 
 
-package { ["unzip", "zip", "openjdk-7-jdk", "build-essential","automake", "jetty8", "subversion"]:
+package { ["unzip", "zip", "build-essential","automake", "jetty8", "subversion"]:
   ensure => "installed"
 } ->
 file_line { "configure_jetty_start":
@@ -21,7 +21,7 @@ file_line { "configure_jetty_host_options":
 } ->
 file_line { "configure_java_home":
   path  => '/etc/default/jetty8',
-  line  => 'JAVA_HOME=/usr/lib/jvm/java-7-openjdk-amd64',
+  line  => 'JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64',
   match => 'JAVA_HOME=',
 } -> wget::fetch { "http://downloads.sourceforge.net/project/bigdata/bigdata/2.1.4/bigdata.war":
   destination => "/tmp/bigdata.war",

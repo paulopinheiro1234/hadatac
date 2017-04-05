@@ -107,3 +107,16 @@ echo "=== Creating store_users namespace..."
 curl -X POST --data-binary @store_users.properties -H 'Content-Type:text/plain' http://localhost:8080/bigdata/namespace
 wait $!
 echo ""
+
+echo "=== Installing hadatac service..."
+cp hadatac.initd /etc/init.d/
+mv /etc/init.d/hadatac.initd /etc/init.d/hadatac
+chmod 755 /etc/init.d/hadatac
+chown root:root /etc/init.d/hadatac
+update-rc.d hadatac defaults 
+wait $!
+echo ""
+
+echo ""
+echo "Installation Complete"
+echo ""
