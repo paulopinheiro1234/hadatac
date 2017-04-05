@@ -160,11 +160,6 @@ POST 	/hadatac/studies/refresh/form	       org.hadatac.console.controllers.studi
 GET	    /hadatac/studies/delete	    	       org.hadatac.console.controllers.studies.DeleteStudy.index(study_uri : String)
 POST	/hadatac/studies/delete		           org.hadatac.console.controllers.studies.DeleteStudy.postIndex(study_uri : String)
 POST 	/hadatac/studies/delete/form	       org.hadatac.console.controllers.studies.DeleteStudy.processForm(study_uri : String)
-GET	    /hadatac/studies/resources		       org.hadatac.console.controllers.studies.ResourceAvailability.index()
-POST	/hadatac/studies/resources	           org.hadatac.console.controllers.studies.ResourceAvailability.postIndex()
-GET	    /hadatac/studies/urigenerator		   org.hadatac.console.controllers.studies.URIGenerator.index()
-POST	/hadatac/studies/urigenerator	       org.hadatac.console.controllers.studies.URIGenerator.postIndex()
-POST 	/hadatac/studies/urigenerator/form	   org.hadatac.console.controllers.studies.URIGenerator.processForm()
 
 # data collection management
 GET	    /hadatac/dataacquisitions/		    	   org.hadatac.console.controllers.dataacquisitionmanagement.DataAcquisitionManagement.index(oper : Int)
