@@ -1,7 +1,7 @@
 @(da : org.hadatac.entity.pojo.DataAcquisition, 
   permissions : Map[String, String],
   ownerOptions : List[String],
-  schemas : List[org.hadatac.entity.pojo.DataAcquisitionSchema],
+  schemas : Map[String, String],
   bAdmin : Boolean,
   bChangeParam : Boolean)
 
@@ -108,11 +108,11 @@
               <label>Set Schema</label>
               <select class="form-control col-sm-6" id="newSchema" name="newSchema" >
               	<option value=""></option>
-                @for(schema <- schemas){
-                    @if(da.getSchemaUri().contains(schema.getUri().split(":")(1))) {
-                    	<option selected value="@schema.getUri()">@schema.getUri()</option>
+                @for((schemaUri, abbrvUri) <- schemas){
+                    @if(da.getSchemaUri().equals(schemaUri)) {
+                    	<option selected value="@schemaUri">@abbrvUri</option>
               	 	} else {
-              	 		<option value="@schema.getUri()">@schema.getUri()</option>
+              	 		<option value="@schemaUri">@abbrvUri</option>
               	 	}
                  }
               </select>

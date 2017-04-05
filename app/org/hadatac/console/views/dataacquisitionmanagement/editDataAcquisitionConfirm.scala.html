@@ -40,6 +40,11 @@
            } else {
            		<li><b>Current Permission:</b> @da.getPermissionUri()</li>
            }
+           @if(changedInfo.contains(da.getSchemaUri())) {
+           		<li><b>Current Schema:</b> <b><font color="blue">@da.getSchemaUri()</font></b></li>
+           } else {
+           		<li><b>Current Schema:</b> @da.getSchemaUri()</li>
+           }
        </ul>
 
        <br>

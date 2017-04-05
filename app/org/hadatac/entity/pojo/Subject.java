@@ -115,6 +115,35 @@ public class Subject {
 		
 		return null;
 	}
+	
+	public static String findCodeValue(String attr_uri, String code) {
+        String queryString = NameSpaces.getInstance().printSparqlNameSpaceList()
+                + " SELECT ?codeValue WHERE {"
+                + " ?uri hasco:hasReference <" + attr_uri + ">."
+                + " ?value hasco:isPossibleValueOf ?uri . "
+                + " ?value hasco:hasCode \"" + code + "\" . "
+                + " OPTIONAL { ?value hasco:hasCodeValue ?codeValue . }"        
+                + " }";
+        
+        Query query = QueryFactory.create(queryString);
+        QueryExecution qexec = QueryExecutionFactory.sparqlService(
+                Collections.getCollectionsName(Collections.METADATA_SPARQL), query);
+        ResultSet results = qexec.execSelect();
+        ResultSetRewindable resultsrw = ResultSetFactory.copyResults(results);
+        qexec.close();
+        
+        if (resultsrw.size() > 0) {
+            QuerySolution soln = resultsrw.next();
+            if (null != soln.getLiteral("codeValue")) {
+            	String codeValue = soln.getLiteral("codeValue").toString();
+            	if (!codeValue.equals("")) {
+            		return codeValue;
+            	}
+            }
+        }
+        
+        return null;
+    }
 }
 
 

@@ -6,8 +6,8 @@ import java.util.Map;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class ObjectDetails {
-
-        private Map<String, String> details;
+	
+	private Map<String, String> details;
 
 	public ObjectDetails() {
 	       
@@ -23,13 +23,11 @@ public class ObjectDetails {
 	public String toJSON() {
 		ObjectMapper mapper = new ObjectMapper();
 		try {
-		   String output =  mapper.writeValueAsString(details);
-		   System.out.println("ObjectDetails toJSON(): " + output);
-                   return output;
+			String output =  mapper.writeValueAsString(details);
+			return output;
 		} catch (Exception e) {
 			e.printStackTrace();
 		} 
 		return "";
 	}
-	
 }

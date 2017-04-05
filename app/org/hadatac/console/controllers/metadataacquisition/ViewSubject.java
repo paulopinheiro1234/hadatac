@@ -133,35 +133,35 @@ public class ViewSubject extends Controller {
                 return str;
 		} */
 
-        public static String findBasicHTML(String subject_uri) {
-        	System.out.println("in findBasicHTML (subject_uri): '" + subject_uri + "'" );
-                if (subject_uri == null || subject_uri.equals("")) {
-		    return null;
+	public static String findBasicHTML(String subject_uri) {
+		System.out.println("findBasicHTML (subject_uri): '" + subject_uri + "'" );
+		if (subject_uri == null || subject_uri.equals("")) {
+			return null;
 		}
-         	ResultSetRewindable resultsrw = findSubjectBasic(subject_uri); 
-		if (resultsrw == null) {
-		    return null;
-		}
-		String html = "";
-		
-		if (resultsrw.hasNext()) {
-			QuerySolution soln = resultsrw.next();
-		        html += "<table>";
-			html += "<tr> <td><b>Original ID &nbsp; &nbsp;</b></td> <td>" + soln.get("pid").toString() + "</td></tr>";
-			html += "<tr> <td><b>Internal ID</b></td> <td>" + soln.get("subjectLabel").toString() + "</td></tr>";
-			html += "<tr> <td><b>Type</b></td> <td>" + soln.get("subjectTypeLabel").toString() + "</td></tr>";
-			html += "<tr> <td><b>Cohort</b></td> <td>" + soln.get("cohortLabel").toString() + "</td></tr>";
-			html += "<tr> <td><b>Study</b></td> <td>" + soln.get("studyLabel").toString() + "</td></tr>";
-			html += "<tr> <td> &nbsp;</td> <td> &nbsp;</td></tr>";
-			html += "<tr> <td></td> <td><a href='/hadatac/metadataacquisitions/viewSubject?study_uri=" + 
-			        URLEncoder.encode(soln.get("studyUri").toString()) + 
-			        "&subject_uri=" + URLEncoder.encode(subject_uri) + 
-                                "'>(More info about object)</a></td></tr>";
-		        html += "</table>";
-		}
-		
-		return html;
-        }
+	 	ResultSetRewindable resultsrw = findSubjectBasic(subject_uri); 
+	 	if (resultsrw == null) {
+	 		return null;
+	 	}
+	 	String html = "";
+	
+	 	if (resultsrw.hasNext()) {
+	 		QuerySolution soln = resultsrw.next();
+	 		html += "<table>";
+	 		html += "<tr> <td><b>Original ID &nbsp; &nbsp;</b></td> <td>" + soln.get("pid").toString() + "</td></tr>";
+	 		html += "<tr> <td><b>Internal ID</b></td> <td>" + soln.get("subjectLabel").toString() + "</td></tr>";
+	 		html += "<tr> <td><b>Type</b></td> <td>" + soln.get("subjectTypeLabel").toString() + "</td></tr>";
+	 		html += "<tr> <td><b>Cohort</b></td> <td>" + soln.get("cohortLabel").toString() + "</td></tr>";
+	 		html += "<tr> <td><b>Study</b></td> <td>" + soln.get("studyLabel").toString() + "</td></tr>";
+	 		html += "<tr> <td> &nbsp;</td> <td> &nbsp;</td></tr>";
+	 		html += "<tr> <td></td> <td><a href='/hadatac/metadataacquisitions/viewSubject?study_uri=" 
+	 				+ URLEncoder.encode(soln.get("studyUri").toString()) 
+	 				+ "&subject_uri=" + URLEncoder.encode(subject_uri) 
+	 				+ "'>(More info about object)</a></td></tr>";
+	 		html += "</table>";
+	 	}
+	 	
+	 	return html;
+	}
 
 	public static ResultSetRewindable findSubjectBasic(String subject_uri) {
                 System.out.println("in findSubjectBasic (1): '" + subject_uri + "'");
@@ -208,7 +208,6 @@ public class ViewSubject extends Controller {
 		Map<String, List<String>> subjectResult = new HashMap<String, List<String>>();
 		List<String> values; // = new ArrayList<String>();
 		
-		ValueCellProcessing cellProc = new ValueCellProcessing();
 		while (resultsrw.hasNext()) {
 			QuerySolution soln = resultsrw.next();
 			//System.out.println("HERE IS THE RAW SOLN*********" + soln.toString());

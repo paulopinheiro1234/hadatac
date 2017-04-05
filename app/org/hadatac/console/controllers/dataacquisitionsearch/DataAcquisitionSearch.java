@@ -10,8 +10,6 @@ import java.util.List;
 import java.util.StringTokenizer;
 import java.util.Set;
 import java.util.HashSet;
-import java.util.Map;
-import java.util.HashMap;
 
 import org.hadatac.console.models.FacetHandler;
 import org.hadatac.console.models.FacetsWithCategories;
@@ -29,7 +27,6 @@ import org.hadatac.console.views.html.dataacquisitionsearch.dataacquisition_brow
 import org.hadatac.data.model.AcquisitionQueryResult;
 import org.hadatac.entity.pojo.Measurement;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class DataAcquisitionSearch extends Controller {
 
@@ -59,17 +56,6 @@ public class DataAcquisitionSearch extends Controller {
         }
     }
     
-    public static Result login(){
-    	DynamicForm formData = Form.form().bindFromRequest();
-    	String username = formData.data().get("username");
-    	String password = formData.data().get("password");
-    	
-    	session("username", username);
-    	session("password", password);
-    	    	
-    	return redirect("/");
-    }
-    
     public static List<String> getPermissions(String permissions) {
     	List<String> result = new ArrayList<String>();
     	
@@ -84,13 +70,14 @@ public class DataAcquisitionSearch extends Controller {
     }
 
     public static Result index(int page, int rows, String facets) {
-    	FacetHandler handler = new FacetHandler();;
-    	String ownerUri;
     	System.out.println("[DataAcquisitionSearch] Page: " + page + "   Rows:" + rows + "   Facets:" + facets);
-	handler.loadFacets(facets);
-	System.out.println("DataAcquisitionSearch : <" + handler.toSolrQuery() + ">");
+    	
+    	FacetHandler handler = new FacetHandler();
+    	handler.loadFacets(facets);
+    	System.out.println("DataAcquisitionSearch : <" + handler.toSolrQuery() + ">");
 
     	AcquisitionQueryResult results = null;
+    	String ownerUri;
     	final SysUser user = AuthApplication.getLocalUser(session());
     	if(null == user){
     	    ownerUri = "Public";
@@ -104,30 +91,25 @@ public class DataAcquisitionSearch extends Controller {
     		results = Measurement.find(ownerUri, page, rows, handler);
     	}
     	System.out.println("[DataAcquisitionSearch] Total size response: " + results.getDocumentSize());
-	Set<String> setObj = new HashSet<String>();
-	ObjectDetails objDetails = new ObjectDetails();
-	if (results != null) {
-	    for (Measurement m: results.getDocuments()) {
-		System.out.println(m.getObjectUri());
-		setObj.add(m.getObjectUri());
+    	Set<String> setObj = new HashSet<String>();
+    	ObjectDetails objDetails = new ObjectDetails();
+    	if (results != null) {
+    		for (Measurement m: results.getDocuments()) {
+    			setObj.add(m.getObjectUri());
             }
             for (String uri: setObj) {
-		if (uri != null) {
-    		   System.out.println(uri);
-		   String html = ViewSubject.findBasicHTML(uri);
-                   if (html != null) {
-		      objDetails.putObject(uri, html);
-		      System.out.println(html);
-                   }
-		}
-	    }
-	    System.out.println("ViewSubject: " + objDetails.toJSON());
+            	if (uri != null) {
+            		String html = ViewSubject.findBasicHTML(uri);
+            		if (html != null) {
+            			objDetails.putObject(uri, html);
+            		}
+            	}
+            }
         }
 
     	return ok(dataacquisition_browser.render(page, rows, facets, results.getDocumentSize(), 
-						 results, results.toJSON(), handler, 
-                                                 Measurement.buildQuery(ownerUri, page, rows, handler), 
-                                                 objDetails.toJSON()));
+    			results, results.toJSON(), handler, Measurement.buildQuery(ownerUri, page, rows, handler), 
+    			objDetails.toJSON()));
     }
 
     public static Result postIndex(int page, int rows, String facets) {

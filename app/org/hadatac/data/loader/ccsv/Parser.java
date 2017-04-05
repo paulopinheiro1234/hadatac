@@ -152,8 +152,16 @@ public class Parser {
 				if(record.get(measurementType.getValueColumn() - 1).isEmpty()){
 					continue;
 				}
-				else{
-					measurement.setValue(record.get(measurementType.getValueColumn() - 1));
+				else {
+					String originalValue = record.get(measurementType.getValueColumn() - 1);
+					String codeValue = Subject.findCodeValue(
+							measurementType.getCharacteristicUri(), originalValue);
+					if (null == codeValue) {
+						measurement.setValue(originalValue);
+					}
+					else {
+						measurement.setValue(codeValue);
+					}
 				}
 				
 				if(nTimeStampCol > -1){

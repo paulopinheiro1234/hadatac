@@ -43,13 +43,6 @@ public class EditDataAcquisition extends Controller {
     		return redirect(org.hadatac.console.controllers.triplestore.routes.LoadKB.logInLabkey(
     				routes.EditDataAcquisition.index(uri, bChangeParam).url()));
     	}
-    	
-		DataAcquisition dataAcquisition = new DataAcquisition();
-		ValueCellProcessing cellProc = new ValueCellProcessing();
-		List<DataAcquisitionSchema> schemas = DataAcquisitionSchema.findAll();
-		for (DataAcquisitionSchema schema : schemas) {
-			schema.setUri(cellProc.replaceNameSpaceEx(schema.getUri()));
-		}
 		
 		final SysUser sysUser = AuthApplication.getLocalUser(session());
     	try {
@@ -63,7 +56,10 @@ public class EditDataAcquisition extends Controller {
 		}
 
     	if (!uri.equals("")) {
-    		dataAcquisition = DataAcquisition.findByUri(uri);
+    		DataAcquisition dataAcquisition = DataAcquisition.findByUri(uri);
+    		if (null == dataAcquisition) {
+    			return badRequest("Invalid data acquisition URI!");
+    		}
     		
     		Map<String, String> nameList = new HashMap<String, String>();
     		User user = User.find(dataAcquisition.getOwnerUri());
@@ -77,12 +73,18 @@ public class EditDataAcquisition extends Controller {
     			}
     		}
     		
+    		Map<String, String> mapSchemas = new HashMap<String, String>();
+    		ValueCellProcessing cellProc = new ValueCellProcessing();
+    		List<DataAcquisitionSchema> schemas = DataAcquisitionSchema.findAll();
+    		for (DataAcquisitionSchema schema : schemas) {
+    			mapSchemas.put(schema.getUri(), cellProc.replaceNameSpaceEx(schema.getUri()));
+    		}
+    		
             return ok(editDataAcquisition.render(dataAcquisition, nameList, 
-            		User.getUserURIs(), schemas, sysUser.isDataManager(), bChangeParam));
+            		User.getUserURIs(), mapSchemas, sysUser.isDataManager(), bChangeParam));
     	}
     	
-    	return ok(editDataAcquisition.render(dataAcquisition, null, 
-    			User.getUserURIs(), schemas, sysUser.isDataManager(), bChangeParam));
+    	return badRequest("Invalid data acquisition URI!");
     }
 
 	@Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
@@ -93,6 +95,7 @@ public class EditDataAcquisition extends Controller {
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
     public static Result processForm(String acquisitionUri, boolean bChangeParam) {
     	final SysUser sysUser = AuthApplication.getLocalUser(session());
+    	ValueCellProcessing cellProc = new ValueCellProcessing();
     	
         Form<DataAcquisitionForm> form = Form.form(DataAcquisitionForm.class).bindFromRequest();
         DataAcquisitionForm data = form.get();
