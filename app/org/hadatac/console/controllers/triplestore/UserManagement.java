@@ -40,6 +40,7 @@ import org.hadatac.console.models.SparqlQueryResults;
 import org.hadatac.console.models.TripleDocument;
 import org.hadatac.console.views.html.triplestore.*;
 import org.hadatac.console.models.SysUser;
+import org.hadatac.console.models.TokenAction;
 import org.hadatac.entity.pojo.User;
 import org.hadatac.entity.pojo.UserGroup;
 import org.hadatac.metadata.loader.PermissionsContext;
@@ -226,9 +227,14 @@ public class UserManagement extends Controller {
 		for (int i = 0; i < linked_account.size(); i++) {
 			((JSONObject)linked_account.get(i)).remove("_version_");
 		}
+		JSONArray token = (JSONArray) JSONValue.parse(TokenAction.outputAsJson());
+		for (int i = 0; i < token.size(); i++) {
+			((JSONObject)token.get(i)).remove("_version_");
+		}
 		HashMap<String,Object> combined = new HashMap<String,Object>();
 		combined.put("sys_user", sys_user);
 		combined.put("linked_account", linked_account);
+		combined.put("token", token);
 		File ret_file = new File(getJsonPath());
 		try {
 			FileUtils.writeStringToFile(ret_file, new JSONObject(combined).toJSONString());
@@ -243,17 +249,35 @@ public class UserManagement extends Controller {
 	public static String recoverUserAuthentication() {
 		System.out.println("Recovering User Authentication ...");
 		try {
+			if (!SolrUtils.clearCollection(Play.application().configuration().getString("hadatac.solr.users") 
+					+ Collections.AUTHENTICATE_USERS)) {
+				return "Failed to clear original \"users\" collection! ";
+			}
+			if (!SolrUtils.clearCollection(Play.application().configuration().getString("hadatac.solr.users") 
+					+ Collections.AUTHENTICATE_ACCOUNTS)) {
+				return "Failed to clear original \"linked_account\" collection! ";
+			}
+			if (!SolrUtils.clearCollection(Play.application().configuration().getString("hadatac.solr.users") 
+					+ Collections.AUTHENTICATE_TOKENS)) {
+				return "Failed to clear original \"token_action\" collection! ";
+			}
+			
 			JSONObject combined = (JSONObject) JSONValue.parse(new FileReader(UPLOAD_NAME_JSON));
+			
 			if (!SolrUtils.commitJsonDataToSolr(Play.application().configuration().getString("hadatac.solr.users") 
 					+ Collections.AUTHENTICATE_USERS, combined.get("sys_user").toString())) {
-				return "Failed to recover user authentications! ";
+				return "Failed to recover \"users\" collection! ";
 			}
 			if (!SolrUtils.commitJsonDataToSolr(Play.application().configuration().getString("hadatac.solr.users") 
 					+ Collections.AUTHENTICATE_ACCOUNTS, combined.get("linked_account").toString())) {
-				return "Failed to recover user authentications! ";
+				return "Failed to recover \"linked_account\" collection! ";
+			}
+			if (!SolrUtils.commitJsonDataToSolr(Play.application().configuration().getString("hadatac.solr.users") 
+					+ Collections.AUTHENTICATE_TOKENS, combined.get("token").toString())) {
+				return "Failed to recover \"token_action\" collection! ";
 			}
 		} catch (FileNotFoundException e) {
-			e.printStackTrace();
+			return "Failed to find uploaded json file! ";
 		}
 		
 		return "Successfully recovered user authentications! ";

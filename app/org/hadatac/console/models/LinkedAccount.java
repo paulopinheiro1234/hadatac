@@ -115,7 +115,7 @@ public class LinkedAccount {
 			SolrDocumentList docs = queryResponse.getResults();
 			return JSONUtil.toJSON(docs);
 		} catch (Exception e) {
-			System.out.println("[ERROR] SysUser.outputAsJson - Exception message: " + e.getMessage());
+			System.out.println("[ERROR] LinkedAccount.outputAsJson - Exception message: " + e.getMessage());
 		}
     	
     	return "";

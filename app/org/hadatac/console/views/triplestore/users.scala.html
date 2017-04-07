@@ -60,13 +60,13 @@
                              </div>
                           </form>
                           <form name="fileUploadForm" id='upload2' method="POST" enctype="multipart/form-data" action="@org.hadatac.console.controllers.triplestore.routes.UserManagement.uploadFile("ttl")" onchange="checkform2()">
-                     		 <b>Load User Graph from turtle</b> <input type="file" class="btn btn-info" name="pic"> 
+                     		 <b>Load User Graph from turtle</b> <input type="file" class="btn btn-info" name="pic" accept=".ttl"> 
                      		 <div id='submitMessage2'  style="display:none;" >
                         		 <input type="submit" class="btn-sm btn-success" value="Parse and Load">
 	                 		 </div>
                  	  	  </form>
                  	  	  <form name="fileUploadForm" id='upload3' method="POST" enctype="multipart/form-data" action="@org.hadatac.console.controllers.triplestore.routes.UserManagement.uploadFile("json")" onchange="checkform3()">
-                     		 <b>Load User Authentication from json</b> <input type="file" class="btn btn-info" name="pic"> 
+                     		 <b>Load User Authentication from json</b> <input type="file" class="btn btn-info" name="pic" accept=".json"> 
                      		 <div id='submitMessage3'  style="display:none;" >
                         		 <input type="submit" class="btn-sm btn-success" value="Parse and Load">
 	                 		 </div>

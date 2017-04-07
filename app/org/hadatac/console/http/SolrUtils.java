@@ -7,6 +7,11 @@ import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.solr.client.solrj.SolrClient;
+import org.apache.solr.client.solrj.SolrServerException;
+import org.apache.solr.client.solrj.impl.HttpSolrClient;
+import org.apache.solr.client.solrj.response.UpdateResponse;
+
 
 public class SolrUtils {
 	
@@ -28,6 +33,25 @@ public class SolrUtils {
 		    e.printStackTrace();
 		} catch (Exception e) {
 		    e.printStackTrace();
+		}
+		
+		return false;
+	}
+	
+	public static boolean clearCollection(String solrCollection) {
+		try {
+			SolrClient solr = new HttpSolrClient(solrCollection);
+			UpdateResponse response = solr.deleteByQuery("*:*");
+			solr.commit();
+			solr.close();
+			
+			return true;
+		} catch (SolrServerException e) {
+			System.out.println("[ERROR] SolrUtils.clearCollection() - SolrServerException message: " + e.getMessage());
+		} catch (IOException e) {
+			System.out.println("[ERROR] SolrUtils.clearCollection() - IOException message: " + e.getMessage());
+		} catch (Exception e) {
+			System.out.println("[ERROR] SolrUtils.clearCollection() - Exception message: " + e.getMessage());
 		}
 		
 		return false;

@@ -15,7 +15,7 @@
     <field name="user_permission_id" type="string" indexed="true" stored="true" multiValued="true"/>
   </fields>
 
-  <uniqueKey>id</uniqueKey>
+  <uniqueKey>email</uniqueKey>
 
   <types>
     <fieldType name="string" class="solr.StrField" />

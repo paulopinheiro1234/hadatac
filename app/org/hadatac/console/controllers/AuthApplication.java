@@ -9,7 +9,6 @@ import org.hadatac.console.models.SysUser;
 import play.Routes;
 import play.data.Form;
 import play.mvc.*;
-import play.mvc.Http.Response;
 import play.mvc.Http.Session;
 import play.mvc.Result;
 
@@ -64,10 +63,8 @@ public class AuthApplication extends Controller {
 		final Form<MyLogin> filledForm = MyUsernamePasswordAuthProvider.LOGIN_FORM
 				.bindFromRequest();
 		if (filledForm.hasErrors()) {
-			// User did not fill everything properly
 			return badRequest(login.render(filledForm));
 		} else {
-			// Everything was filled
 			return UsernamePasswordAuthProvider.handleLogin(ctx());
 		}
 	}

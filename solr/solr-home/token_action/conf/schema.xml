@@ -6,8 +6,8 @@
     <field name="token" type="string" indexed="true" stored="true"/>
     <field name="target_user_id" type="string" indexed="true" stored="true"/>
     <field name="type" type="string" indexed="true" stored="true"/>
-    <field name="created" type="date" indexed="true" stored="true"/>
-    <field name="expires" type="date" indexed="true" stored="true"/>
+    <field name="created" type="string" indexed="true" stored="true"/>
+    <field name="expires" type="string" indexed="true" stored="true"/>
   </fields>
 
   <uniqueKey>id</uniqueKey>

@@ -162,9 +162,11 @@ public class MyUsernamePasswordAuthProvider
 			final MyLoginUsernamePasswordAuthUser authUser) {
 		final SysUser u = SysUser.findByUsernamePasswordIdentity(authUser);
 		if (u == null) {
+			System.out.println("User not found!");
 			return LoginResult.NOT_FOUND;
 		} else {
 			if (!u.getEmailValidated()) {
+				System.out.println("User unverified!");
 				return LoginResult.USER_UNVERIFIED;
 			} else {
 				for (final LinkedAccount acc : u.getLinkedAccounts()) {
@@ -172,12 +174,14 @@ public class MyUsernamePasswordAuthProvider
 						if (authUser.checkPassword(acc.providerUserId,
 								authUser.getPassword())) {
 							// Password was correct
+							System.out.println("User logged in!");
 							return LoginResult.USER_LOGGED_IN;
 						} else {
 							// if you don't return here,
 							// you would allow the user to have
 							// multiple passwords defined
 							// usually we don't want this
+							System.out.println("User password invalid!");
 							return LoginResult.WRONG_PASSWORD;
 						}
 					}
@@ -210,7 +214,6 @@ public class MyUsernamePasswordAuthProvider
 				login.getEmail());
 	}
 	
-
 	@Override
 	protected MyLoginUsernamePasswordAuthUser transformAuthUser(final MyUsernamePasswordAuthUser authUser, final Context context) {
 		return new MyLoginUsernamePasswordAuthUser(authUser.getEmail());
