@@ -64,9 +64,10 @@ function parseSolrFacetFieldToTree(type) {
 }
 
 function parseSolrFacetPivotToTree(type) {
-	var i, j, q, jsonTree, fields;
+	var i, j, q, n, jsonTree, fields;
 	i = 0;
-	jsonTree = '{ "id": ' + i + ', "item": [ ';
+	n = 0;
+	jsonTree = '{ "id": ' + n + ', "item": [ ';
 	fields = type.split(",");
 	
 	for (var i_pivot in json.pivot_facets[type]) {
@@ -77,7 +78,7 @@ function parseSolrFacetPivotToTree(type) {
 			jsonTree += ' ,';
 		}
 		i++;
-		jsonTree += '{ "id": ' + i + ', "text": "' + facetPrettyName(fields[0],field1.value) + ' (' + field1.count + ')"';
+		jsonTree += '{ "id": ' + ++n + ', "text": "' + facetPrettyName(fields[0],field1.value) + ' (' + field1.count + ')"';
 		jsonTree += ', "item": [ ';
 		for (var j_pivot in field1.children) {
 			var field2 = field1.children[j_pivot];
@@ -85,7 +86,7 @@ function parseSolrFacetPivotToTree(type) {
 				jsonTree += ' ,';
 			}
 			j++;
-			jsonTree += '{ "id": ' + i + j + ', "text": "' + facetPrettyName(fields[1],field2.value) + ' (' + field2.count + ')", ' + 
+			jsonTree += '{ "id": ' + ++n + ', "text": "' + facetPrettyName(fields[1],field2.value) + ' (' + field2.count + ')", ' + 
                                       '"tooltip": "' + field2.value + '" , ' + 
                                       '"userdata": [ { "name": "field", "content": "' + fields[1] + '" }, ' + 
                                       '{ "name": "value", "content": "' + field2.value + '" } ] } ';
