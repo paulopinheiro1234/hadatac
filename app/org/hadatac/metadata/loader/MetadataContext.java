@@ -93,6 +93,255 @@ public class MetadataContext implements RDFContext {
         return message; 
 	}
 	
+	public String cleanStudy(int mode, String study) {	
+	    String message = "";
+        message += Feedback.println(mode,"   Triples before [clean]: " + totalTriples());
+        message += Feedback.println(mode, " ");
+        
+        String queryString = "";
+		queryString += NameSpaces.getInstance().printSparqlNameSpaceList();
+		queryString += "DELETE {?s ?p ?o } " +
+		"WHERE " +
+		"{  " +
+		"  { " +
+		"	{  " +
+		// Study 
+		"    ?subUri rdfs:subClassOf hasco:Study . " + 
+		"  	?s a ?subUri . " +
+		"  	?s ?p ?o . " +
+		"  	FILTER (?s = " + study + ") " +
+		"  	} " +
+		"    MINUS " +
+		"    { " +
+		// Other Studies 
+		"    ?subUri rdfs:subClassOf hasco:Study . " + 
+		"  	?s a ?subUri . " +
+		"  	?s ?p ?o . " +
+		"  	FILTER (?s != " + study + ") " +
+		"    }  " +
+		"  } " +
+		"  UNION " + 
+		"  { " +
+		"	{  " +
+		// Data Acquisitions 
+		"  	?daSubUri rdfs:subClassOf hasneto:DataAcquisition . " + 
+		"  	?s a ?daSubUri. " +
+		"  	?s hasco:isDataAcquisitionOf ?study . " + 
+		"  	?s ?p ?o . " +
+		"  	FILTER (?study = " + study + ") " +
+		"  	} " +
+		"    MINUS " +
+		"    {  " +
+		// Other Data Acquisitions
+		"  	?daSubUri rdfs:subClassOf hasneto:DataAcquisition . " + 
+		"  	?s a ?daSubUri. " +
+		"  	?s hasco:isDataAcquisitionOf ?study . " + 
+		"  	?s ?p ?o . " +
+		"  	FILTER (?study != " + study + ") " +
+		"  	} " +
+		"  } " +
+		"  UNION " + 
+		"  { " +
+		"    { " +
+		// Data Acquisition Schema
+		"  	?daSubUri rdfs:subClassOf hasneto:DataAcquisition . " + 
+		"  	?da a ?daSubUri. " +
+		"    ?da hasco:isDataAcquisitionOf ?study . " + 
+		"  	?da hasco:hasSchema ?s .  " +
+		"  		?s ?p ?o . " +
+		"  FILTER (?study = " + study + ") " +
+		"    } " +
+		"    MINUS " +
+		"    { " +
+		// Other Data Acquisition Schemas
+		"  	?daSubUri rdfs:subClassOf hasneto:DataAcquisition . " + 
+		"  	?da a ?daSubUri. " +
+		"    ?da hasco:isDataAcquisitionOf ?study . " + 
+		"  	?da hasco:hasSchema ?s .  " +
+		"  	?s ?p ?o . " +
+		"  	FILTER (?study != " + study + ") " +
+		"    } " +
+		"  } " +
+		"  UNION " + 
+		"  { " +
+		"    { " +
+		// Deployment
+		"  	?daSubUri rdfs:subClassOf hasneto:DataAcquisition . " + 
+		"  	?da a ?daSubUri. " +
+		"  	?da hasco:isDataAcquisitionOf ?study . " +
+		"    ?da hasneto:hasDeployment ?s . " +
+		"  	?s ?p ?o . " +
+		"  	FILTER (?study = " + study + ") " +
+		"    } " +
+		"    MINUS " +
+		"    { " +
+		// Other Deployments
+		"  	?daSubUri rdfs:subClassOf hasneto:DataAcquisition . " + 
+		"  	?da a ?daSubUri. " +
+		"  	?da hasco:isDataAcquisitionOf ?study . " +
+		"    ?da hasneto:hasDeployment ?s . " +
+		"  	?s ?p ?o . " +
+		"  FILTER (?study != " + study + ") " +
+		"    } " +
+		"  } " +
+		"  UNION " + 
+		"  { " +
+		"    { " +
+		// Platforms 
+		"  	?daSubUri rdfs:subClassOf hasneto:DataAcquisition . " + 
+		"  	?da a ?daSubUri. " +
+		"  	?da hasco:isDataAcquisitionOf ?study . " +
+		"    ?da hasneto:hasDeployment ?deployment . " +
+		"    ?deployment vstoi:hasPlatform ?s . " +
+		"  	?s ?p ?o . " +
+		"  	FILTER (?study = " + study + ") " +
+		"  	} " +
+		"    MINUS " +
+		"    { " +
+		// Other Platforms 
+		"  	?daSubUri rdfs:subClassOf hasneto:DataAcquisition . " + 
+		"  	?da a ?daSubUri. " +
+		"  	?da hasco:isDataAcquisitionOf ?study . " +
+		"    ?da hasneto:hasDeployment ?deployment . " +
+		"    ?deployment vstoi:hasPlatform ?s . " +
+		"  	?s ?p ?o . " +
+		"  	FILTER (?study != " + study + ") " +
+		"  	} " +
+		"  }   " +
+		"  UNION  " +
+		"  { " +
+		"    { " +
+		// Instruments 
+		"  	?daSubUri rdfs:subClassOf hasneto:DataAcquisition . " + 
+		"  	?da a ?daSubUri. " +
+		"  	?da hasco:isDataAcquisitionOf ?study . " +
+		"    ?da hasneto:hasDeployment ?deployment . " +
+		"    ?deployment hasneto:hasInstrument ?s . " +
+		"  	?s ?p ?o . " +
+		"  	FILTER (?study = " + study + ") " +
+		"    } " +
+		"    MINUS " +
+		"    { " +
+		// Other Instruments 
+		"  	?daSubUri rdfs:subClassOf hasneto:DataAcquisition . " + 
+		"  	?da a ?daSubUri. " +
+		"  	?da hasco:isDataAcquisitionOf ?study . " +
+		"    ?da hasneto:hasDeployment ?deployment . " +
+		"    ?deployment hasneto:hasInstrument ?s . " +
+		"  	?s ?p ?o . " +
+		"  	FILTER (?study != " + study + ") " +
+		"    } " +
+		"  } " +
+		"  UNION  " +
+		"  { " +
+		"    { " +
+		// Detectors 
+		"  	?daSubUri rdfs:subClassOf hasneto:DataAcquisition . " + 
+		"  	?da a ?daSubUri. " +
+		"  	?da hasco:isDataAcquisitionOf ?study . " +
+		"    ?da hasneto:hasDeployment ?deployment . " +
+		"    ?deployment hasneto:hasDetector ?s . " +
+		"  	?s ?p ?o . " +
+		"  	FILTER (?study = " + study + ") " +
+		"    } " +
+		"    MINUS " +
+		"    { " +
+		// Other Detectors 
+		"  	?daSubUri rdfs:subClassOf hasneto:DataAcquisition . " + 
+		"  	?da a ?daSubUri. " +
+		"  	?da hasco:isDataAcquisitionOf ?study . " +
+		"    ?da hasneto:hasDeployment ?deployment . " +
+		"    ?deployment hasneto:hasDetector ?s . " +
+		"  	?s ?p ?o . " +
+		"  	FILTER (?study != " + study + ") " +
+		"    } " +
+		"  } " +
+		"  UNION " + 
+		"  { " +
+		"    { " +
+		// Subjects
+		"    ?subUri rdfs:subClassOf hasco:Study . " + 
+		"  	?study a ?subUri . " +
+		"    ?s hasco:isSubjectOf ?cohort . " +
+		"    ?cohort hasco:isCohortOf ?study . " +
+		"  	?s ?p ?o . " +
+		"  	FILTER (?study = " + study + ") " +
+		"    } " +
+		"    MINUS " +
+		"    { " +
+		// Other Subjects 
+		"    ?subUri rdfs:subClassOf hasco:Study . " + 
+		"  	?study a ?subUri . " +
+		"    ?s hasco:isSubjectOf ?cohort . " +
+		"    ?cohort hasco:isCohortOf ?study . " +
+		"  	?s ?p ?o . " +
+		"  	FILTER (?study != " + study + ") " +
+		"    } " +
+		"  } " +
+		"  UNION " + 
+		"  { " +
+		"    { " +
+		// Samples through Subject
+		"    ?subUri rdfs:subClassOf hasco:Study . " + 
+		"  	?study a ?subUri . " +
+		"    ?subject hasco:isSubjectOf ?cohort . " +
+		"    ?cohort hasco:isCohortOf ?study . " +
+		"    ?s hasco:isSampleOf ?subject . " +
+		"    ?s ?p ?o . " +
+		"  	FILTER (?study = " + study + ") " +
+		"    } " +
+		"    MINUS " +
+		"    { " +
+		//Other Samples through Subject
+		"    ?subUri rdfs:subClassOf hasco:Study . " + 
+		"  	?study a ?subUri . " +
+		"    ?subject hasco:isSubjectOf ?cohort . " +
+		"    ?cohort hasco:isCohortOf ?study . " +
+		"    ?s hasco:isSampleOf ?subject . " +
+		"    ?s ?p ?o . " +
+		"  	FILTER (?study != " + study + ") " +
+		"    } " +
+		"  } " +
+		"  UNION " + 
+		"  {  " +
+		"    { " +
+		// Samples through DA
+		"    ?daSubUri rdfs:subClassOf hasneto:DataAcquisition . " + 
+		"  	?da a ?daSubUri. " +
+		"  	?da hasco:isDataAcquisitionOf ?study . " + 
+		"    ?s hasco:isMeasuredObjectOf ?da . " +
+		"    ?s ?p ?o . " +
+		"  	FILTER (?study = " + study + ") " +
+		"    } " +
+		"    MINUS " +
+		"    { " +
+		// Other Samples through DA
+		"    ?daSubUri rdfs:subClassOf hasneto:DataAcquisition . " + 
+		"  	?da a ?daSubUri. " +
+		"  	?da hasco:isDataAcquisitionOf ?study . " + 
+		"    ?s hasco:isMeasuredObjectOf ?da . " +
+		"    ?s ?p ?o . " +
+		"  	FILTER (?study != " + study + ") " +
+		"    } " +
+		"  } " +
+		"} ";
+		
+		UpdateRequest req = UpdateFactory.create(queryString);
+		UpdateProcessor processor = UpdateExecutionFactory.createRemote(req, 
+				Collections.getCollectionsName(Collections.METADATA_UPDATE));
+		try {
+			processor.execute();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		message += Feedback.println(mode, " ");
+		message += Feedback.println(mode, " ");
+		message += Feedback.print(mode, "   Triples after [clean]: " + totalTriples());
+		
+        return message; 
+	}
+	
+	
 	public String getLang(String contentType) {
 		if (contentType.contains("turtle")) {
 			return "TTL";
