@@ -546,14 +546,60 @@ public class Study {
 		return this.save();
 	}
 	
-	public int delete() {
-		SolrClient solr = new HttpSolrClient(
+	public void delete() {
+		deleteStudy();
+		deleteDataCollections();
+		deleteMeasurements();
+	}
+	
+	public int deleteStudy() {
+		SolrClient study_solr = new HttpSolrClient(
 				Play.application().configuration().getString("hadatac.solr.data")
 				+ Collections.STUDIES);
 		try {
-			UpdateResponse response = solr.deleteByQuery("studyUri:\"" + studyUri + "\"");
-			solr.commit();
-			solr.close();
+			UpdateResponse response = study_solr.deleteByQuery("studyUri:\"" + studyUri + "\"");
+			study_solr.commit();
+			study_solr.close();
+			return response.getStatus();
+		} catch (SolrServerException e) {
+			System.out.println("[ERROR] Study.delete() - SolrServerException message: " + e.getMessage());
+		} catch (IOException e) {
+			System.out.println("[ERROR] Study.delete() - IOException message: " + e.getMessage());
+		} catch (Exception e) {
+			System.out.println("[ERROR] Study.delete() - Exception message: " + e.getMessage());
+		}
+		
+		return -1;
+	}
+	
+	public int deleteDataCollections() {
+		SolrClient study_solr = new HttpSolrClient(
+				Play.application().configuration().getString("hadatac.solr.data")
+				+ Collections.DATA_COLLECTION);
+		try {
+			UpdateResponse response = study_solr.deleteByQuery("study_uri:\"" + studyUri + "\"");
+			study_solr.commit();
+			study_solr.close();
+			return response.getStatus();
+		} catch (SolrServerException e) {
+			System.out.println("[ERROR] Study.delete() - SolrServerException message: " + e.getMessage());
+		} catch (IOException e) {
+			System.out.println("[ERROR] Study.delete() - IOException message: " + e.getMessage());
+		} catch (Exception e) {
+			System.out.println("[ERROR] Study.delete() - Exception message: " + e.getMessage());
+		}
+		
+		return -1;
+	}
+	
+	public int deleteMeasurements() {
+		SolrClient study_solr = new HttpSolrClient(
+				Play.application().configuration().getString("hadatac.solr.data")
+				+ Collections.DATA_ACQUISITION);
+		try {
+			UpdateResponse response = study_solr.deleteByQuery("study_uri:\"" + DynamicFunctions.replaceURLWithPrefix(studyUri) + "\"");
+			study_solr.commit();
+			study_solr.close();
 			return response.getStatus();
 		} catch (SolrServerException e) {
 			System.out.println("[ERROR] Study.delete() - SolrServerException message: " + e.getMessage());

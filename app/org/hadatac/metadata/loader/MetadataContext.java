@@ -157,6 +157,32 @@ public class MetadataContext implements RDFContext {
 		"  	?daSubUri rdfs:subClassOf hasneto:DataAcquisition . " + 
 		"  	?da a ?daSubUri. " +
 		"    ?da hasco:isDataAcquisitionOf ?study . " + 
+		"  	?da hasco:hasSchema ?schema . " +
+		"	?s a hasneto:DASchemaAttribute . " +
+		"	?s hasneto:partOfSchema ?schema . " +
+		"  	?s ?p ?o . " +
+		"  	FILTER (?study != " + study + ") " +
+		"    } " +
+		"  } "  +
+		"  UNION " + 
+		"  { " +
+		"    { " +
+		// Data Acquisition Schema Attributes
+		"  	?daSubUri rdfs:subClassOf hasneto:DataAcquisition . " + 
+		"  	?da a ?daSubUri. " +
+		"    ?da hasco:isDataAcquisitionOf ?study . " + 
+		"  	?da hasco:hasSchema ?schema . " +
+		"	?s a hasneto:DASchemaAttribute . " +
+		"	?s hasneto:partOfSchema ?schema . " +
+		"  		?s ?p ?o . " +
+		"  FILTER (?study = " + study + ") " +
+		"    } " +
+		"    MINUS " +
+		"    { " +
+		// Other Data Acquisition Schema Attributess
+		"  	?daSubUri rdfs:subClassOf hasneto:DataAcquisition . " + 
+		"  	?da a ?daSubUri. " +
+		"    ?da hasco:isDataAcquisitionOf ?study . " + 
 		"  	?da hasco:hasSchema ?s .  " +
 		"  	?s ?p ?o . " +
 		"  	FILTER (?study != " + study + ") " +
@@ -278,7 +304,7 @@ public class MetadataContext implements RDFContext {
 		"  	FILTER (?study != " + study + ") " +
 		"    } " +
 		"  } " +
-		"  UNION " + 
+/*		"  UNION " + 
 		"  { " +
 		"    { " +
 		// Samples through Subject
@@ -302,7 +328,7 @@ public class MetadataContext implements RDFContext {
 		"  	FILTER (?study != " + study + ") " +
 		"    } " +
 		"  } " +
-		"  UNION " + 
+*/		"  UNION " + 
 		"  {  " +
 		"    { " +
 		// Samples through DA
