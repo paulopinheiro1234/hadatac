@@ -232,8 +232,8 @@ GET    	/hadatac/ts/synclabkey/loadlist            org.hadatac.console.controlle
 POST    /hadatac/ts/synclabkey/loadlist            org.hadatac.console.controllers.triplestore.LoadKB.playLoadLabkeyListContent(oper: String, content: String, folder: String, listName: String)
 GET    	/hadatac/ts/synclabkey/loadacquisition     org.hadatac.console.controllers.triplestore.LoadKB.playLoadLabkeyDataAcquisition(oper: String, content: String, folder: String, list_names: java.util.List[String])
 POST    /hadatac/ts/synclabkey/loadacquisition     org.hadatac.console.controllers.triplestore.LoadKB.playLoadLabkeyDataAcquisition(oper: String, content: String, folder: String, list_names: java.util.List[String])
-GET    	/hadatac/ts/synclabkey/difftool			   org.hadatac.console.controllers.triplestore.DiffTool.index(list_names: java.util.List[String])
-POST    /hadatac/ts/synclabkey/difftool			   org.hadatac.console.controllers.triplestore.DiffTool.postIndex(list_names: java.util.List[String])
+GET    	/hadatac/ts/synclabkey/difftool			   org.hadatac.console.controllers.triplestore.DiffTool.index()
+POST    /hadatac/ts/synclabkey/difftool			   org.hadatac.console.controllers.triplestore.DiffTool.postIndex()
 
 # Permissions store management URLs
 GET     /hadatac/perm/onlinepreregister            org.hadatac.console.controllers.triplestore.UserManagement.onLinePreRegistration(oper: String)

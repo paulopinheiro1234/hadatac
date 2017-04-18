@@ -1,4 +1,9 @@
-@()
+@(Schemas : List[String], 
+  DescriptionTable: ArrayList[ArrayList[String]],
+  ListNamesDiff: ArrayList[ArrayList[String]],
+  IndividualResultsMap: Map[ String, ArrayList[ArrayList[String]] ])
+
+
 @import helper._
 @import org.hadatac.console.views.html._
 @import org.hadatac.console.controllers.triplestore._
@@ -10,328 +15,150 @@
 
 @main("Diff Tool Results") {
 <div class="container-fluid">
-<h1>Diff Tool Results</h1>
-<h3>List of values that have the same name, but different descriptions:</h3>
-<table style="width:80%">
-<tr><th>CHEAR Development</th><th></th><th>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</th><th>CHEAR Production</th><th></th></tr>
-<tr><th>Name</th><th>Description</th><th></th><th>Name</th><th>Description</th></tr>
-<tr><td>Agent</td><td> </td><td></td><td>Agent</td><td>Agents and Organizations involved in the CHEAR Project</td></tr>
-
-<tr><td>AgentType</td><td>HASCO ontologies</td><td></td><td>AgentType</td><td>HASCO Ontology: Standard Set of Agent Types</td></tr>
-
-<tr><td>AttributeReference</td><td> </td><td></td><td>AttributeReference</td><td>CHEAR - Direct Import of Pilot Data Dictionaries and initial concept mappings</td></tr>
-
-<tr><td>Cohort</td><td> </td><td></td><td>Cohort</td><td>CHEAR Ontology - List of Cohorts for Studies</td></tr>
-
-<tr><td>DASchema</td><td> </td><td></td><td>DASchema</td><td>Data Acquisition Schema List</td></tr>
-
-<tr><td>DASchemaAttribute</td><td> </td><td></td><td>DASchemaAttribute</td><td>Data Acquisition Schema Attributes - Mapping of Data Variable Values and Locations to CHEAR Concepts</td></tr>
-
-<tr><td>DataAcquisition</td><td> </td><td></td><td>DataAcquisition</td><td>Data Acquisition Method Mappings to DA Schemas</td></tr>
-
-<tr><td>DataAcquisitionType</td><td>HASCO ontologies</td><td></td><td>DataAcquisitionType</td><td>HASCO Ontology - Types of Available Data Acquisition Methods</td></tr>
-
-<tr><td>DataSet</td><td> </td><td></td><td>DataSet</td><td>Data Set Lists as related to Studies</td></tr>
-
-<tr><td>Deployment</td><td> </td><td></td><td>Deployment</td><td>Deployment and Location of Data Acquisition as related to Studies</td></tr>
-
-<tr><td>DetectorType</td><td>HASCO ontologies</td><td></td><td>DetectorType</td><td>HASCO Ontology - Standard Set of Detector Types</td></tr>
-
-</table><p>------------------------------------</p>
-<h3>Similar list names (does not account difference in description):</h3>
-Agent, AgentType, AttributeReference, Cohort, DASchema, DASchemaAttribute, DataAcquisition, DataAcquisitionType, DataSet, Deployment, Detector, DetectorType, Instrument, InstrumentType, LocalAttributeType, LocalDetectorType, LocalInstrumentPerspectiveType, LocalInstrumentType, LocalMethodType, LocalPlatformType, LocalSampleType, LocalSensingPerspectiveType, Method, ModelType, ObjectType, Platform, PlatformType, PossibleValue, Project, Sample, SampleType, SensingPerspectiveType, Study, StudyType, Subject, Unit
-
-<h4>Differences:</h4>
-Attribute, AttributeType, IndicatorType, LocalAgentIndicatorType, LocalAnalyteType, LocalAnalytes, LocalAttribute, LocalDAIndicatorType, LocalMetaclassType, LocalObjectType, LocalProcessType, LocalSampleIndicatorType, LocalScaleType, LocalScienceIndicatorType, LocalStudyIndicatorType, LocalStudyType, LocalVariableIndicatorType, OriginalAttributeReference, biomarker, main
-
-<h4>All Lines in CHEAR Development, but not in CHEAR Production:</h4><p>
-Attribute, LocalAnalytes, LocalAttribute, LocalMetaclassType, LocalObjectType, LocalProcessType, OriginalAttributeReference, biomarker, main
-</p>
-<h4>All Lines in CHEAR Production, but not in CHEAR Development:</h4><p>
-AttributeType, IndicatorType, LocalAgentIndicatorType, LocalAnalyteType, LocalDAIndicatorType, LocalSampleIndicatorType, LocalScaleType, LocalScienceIndicatorType, LocalStudyIndicatorType, LocalStudyType, LocalVariableIndicatorType
-</p><p>------------------------------------</p>
-<h2>List Name: Agent</h2>
-
-<h4>Differences:</h4>
-	<p>There are no differences between the two headers</p>
-<p>---------------------------</p>
-<h2>List Name: AgentType</h2>
-
-<h4>Differences:</h4>
-	<p>There are no differences between the two headers</p>
-<p>---------------------------</p>
-<h2>List Name: AttributeReference</h2>
-
-<h4>Differences:</h4>
-	<p>There are no differences between the two headers</p>
-<p>---------------------------</p>
-<h2>List Name: Cohort</h2>
-
-<h4>Differences:</h4>
-	<p>There are no differences between the two headers</p>
-<p>---------------------------</p>
-<h2>List Name: DASchema</h2>
-
-<h4>Differences:</h4>
-A, a
-
-<h4>All Lines in CHEAR Development, but not in CHEAR Production:</h4><p>
-A
-</p>
-<h4>All Lines in CHEAR Production, but not in CHEAR Development:</h4><p>
-a
-</p><p>---------------------------</p>
-<h2>List Name: DASchemaAttribute</h2>
-
-<h4>Differences:</h4>
-	<p>There are no differences between the two headers</p>
-<p>---------------------------</p>
-<h2>List Name: DataAcquisition</h2>
-
-<h4>Differences:</h4>
-	<p>There are no differences between the two headers</p>
-<p>---------------------------</p>
-<h2>List Name: DataAcquisitionType</h2>
-
-<h4>Differences:</h4>
-	<p>There are no differences between the two headers</p>
-<p>---------------------------</p>
-<h2>List Name: DataSet</h2>
-
-<h4>Differences:</h4>
-	<p>There are no differences between the two headers</p>
-<p>---------------------------</p>
-<h2>List Name: Deployment</h2>
-
-<h4>Differences:</h4>
-vstoi:subDeploymentOf
-
-<h4>All Lines in CHEAR Development, but not in CHEAR Production:</h4><p>
-NONE
-</p>
-<h4>All Lines in CHEAR Production, but not in CHEAR Development:</h4><p>
-vstoi:subDeploymentOf
-</p><p>---------------------------</p>
-<h2>List Name: Detector</h2>
-
-<h4>Differences:</h4>
-	<p>There are no differences between the two headers</p>
-<p>---------------------------</p>
-<h2>List Name: DetectorType</h2>
-
-<h4>Differences:</h4>
-hasneto:hasImage, hasneto:hasMaker, vstoi:hasWebDocumentation
-
-<h4>All Lines in CHEAR Development, but not in CHEAR Production:</h4><p>
-NONE
-</p>
-<h4>All Lines in CHEAR Production, but not in CHEAR Development:</h4><p>
-hasneto:hasImage, hasneto:hasMaker, vstoi:hasWebDocumentation
-</p><p>---------------------------</p>
-<h2>List Name: Instrument</h2>
-
-<h4>Differences:</h4>
-vstoi:hasSerialNumber
-
-<h4>All Lines in CHEAR Development, but not in CHEAR Production:</h4><p>
-NONE
-</p>
-<h4>All Lines in CHEAR Production, but not in CHEAR Development:</h4><p>
-vstoi:hasSerialNumber
-</p><p>---------------------------</p>
-<h2>List Name: InstrumentType</h2>
-
-<h4>Differences:</h4>
-	<p>There are no differences between the two headers</p>
-<p>---------------------------</p>
-<h2>List Name: LocalAttributeType</h2>
-
-<h4>Differences:</h4>
-dcterms:description, dcterms:identifier, hasco:approvedBy, hasco:needsApproval, prov:wasAssociatedWith, prov:wasAttributedTo, rdf:type, skos:editorialNote
-
-<h4>All Lines in CHEAR Development, but not in CHEAR Production:</h4><p>
-dcterms:identifier, rdf:type
-</p>
-<h4>All Lines in CHEAR Production, but not in CHEAR Development:</h4><p>
-dcterms:description, hasco:approvedBy, hasco:needsApproval, prov:wasAssociatedWith, prov:wasAttributedTo, skos:editorialNote
-</p><p>---------------------------</p>
-<h2>List Name: LocalDetectorType</h2>
-
-<h4>Differences:</h4>
-hasco:ApprovedBy, hasco:needsApproval, hasneto:hasImage, hasneto:hasMaker, prov:wasAssociatedWith, prov:wasAttributedTo, skos:editorialNote, vstoi:hasWebDocumentation
-
-<h4>All Lines in CHEAR Development, but not in CHEAR Production:</h4><p>
-NONE
-</p>
-<h4>All Lines in CHEAR Production, but not in CHEAR Development:</h4><p>
-hasco:ApprovedBy, hasco:needsApproval, hasneto:hasImage, hasneto:hasMaker, prov:wasAssociatedWith, prov:wasAttributedTo, skos:editorialNote, vstoi:hasWebDocumentation
-</p><p>---------------------------</p>
-<h2>List Name: LocalInstrumentPerspectiveType</h2>
-
-<h4>Differences:</h4>
-hasco:approvedBy, hasco:needsApproval, prov:wasGeneratedBy, skos:editorialNote
-
-<h4>All Lines in CHEAR Development, but not in CHEAR Production:</h4><p>
-NONE
-</p>
-<h4>All Lines in CHEAR Production, but not in CHEAR Development:</h4><p>
-hasco:approvedBy, hasco:needsApproval, prov:wasGeneratedBy, skos:editorialNote
-</p><p>---------------------------</p>
-<h2>List Name: LocalInstrumentType</h2>
-
-<h4>Differences:</h4>
-hasco:approvedBy, hasco:needsApproval, hasneto:hasImage, hasneto:hasMaker, hasneto:hasOperatingTemperatureUnit, prov:wasGeneratedBy, skos:editorialNote, vstoi:hasWebDocumentation, vstoi:maxDetachableDetectors, vstoi:maxLoggedMeasurements, vstoi:maxOperatingTemperature, vstoi:minOperatingTemperature, vstoi:numAttachedDetectors
-
-<h4>All Lines in CHEAR Development, but not in CHEAR Production:</h4><p>
-NONE
-</p>
-<h4>All Lines in CHEAR Production, but not in CHEAR Development:</h4><p>
-hasco:approvedBy, hasco:needsApproval, hasneto:hasImage, hasneto:hasMaker, hasneto:hasOperatingTemperatureUnit, prov:wasGeneratedBy, skos:editorialNote, vstoi:hasWebDocumentation, vstoi:maxDetachableDetectors, vstoi:maxLoggedMeasurements, vstoi:maxOperatingTemperature, vstoi:minOperatingTemperature, vstoi:numAttachedDetectors
-</p><p>---------------------------</p>
-<h2>List Name: LocalMethodType</h2>
-
-<h4>Differences:</h4>
-hasco:approvedBy, hasco:needsApproval, prov:wasAssociatedWith, prov:wasAttributedTo, skos:editorialNote
-
-<h4>All Lines in CHEAR Development, but not in CHEAR Production:</h4><p>
-NONE
-</p>
-<h4>All Lines in CHEAR Production, but not in CHEAR Development:</h4><p>
-hasco:approvedBy, hasco:needsApproval, prov:wasAssociatedWith, prov:wasAttributedTo, skos:editorialNote
-</p><p>---------------------------</p>
-<h2>List Name: LocalPlatformType</h2>
-
-<h4>Differences:</h4>
-hasco:approvedBy, hasco:needsApproval, hasneto:hasImage, hasneto:hasMaker, prov:wasGeneratedBy, skos:editorialNote, vstoi:hasWebDocumentation
-
-<h4>All Lines in CHEAR Development, but not in CHEAR Production:</h4><p>
-NONE
-</p>
-<h4>All Lines in CHEAR Production, but not in CHEAR Development:</h4><p>
-hasco:approvedBy, hasco:needsApproval, hasneto:hasImage, hasneto:hasMaker, prov:wasGeneratedBy, skos:editorialNote, vstoi:hasWebDocumentation
-</p><p>---------------------------</p>
-<h2>List Name: LocalSampleType</h2>
-
-<h4>Differences:</h4>
-hasco:approvedBy, hasco:needsApproval, prov:wasAssociatedWith, prov:wasAttributedTo, skos:editorialNote
-
-<h4>All Lines in CHEAR Development, but not in CHEAR Production:</h4><p>
-NONE
-</p>
-<h4>All Lines in CHEAR Production, but not in CHEAR Development:</h4><p>
-hasco:approvedBy, hasco:needsApproval, prov:wasAssociatedWith, prov:wasAttributedTo, skos:editorialNote
-</p><p>---------------------------</p>
-<h2>List Name: LocalSensingPerspectiveType</h2>
-
-<h4>Differences:</h4>
-hasco:approvedBy, hasco:needsApproval, prov:wasGeneratedBy, skos:editorialNote
-
-<h4>All Lines in CHEAR Development, but not in CHEAR Production:</h4><p>
-NONE
-</p>
-<h4>All Lines in CHEAR Production, but not in CHEAR Development:</h4><p>
-hasco:approvedBy, hasco:needsApproval, prov:wasGeneratedBy, skos:editorialNote
-</p><p>---------------------------</p>
-<h2>List Name: Method</h2>
-
-<h4>Differences:</h4>
-	<p>There are no differences between the two headers</p>
-<p>---------------------------</p>
-<h2>List Name: ModelType</h2>
-
-<h4>Differences:</h4>
-	<p>There are no differences between the two headers</p>
-<p>---------------------------</p>
-<h2>List Name: ObjectType</h2>
-
-<h4>Differences:</h4>
-	<p>There are no differences between the two headers</p>
-<p>---------------------------</p>
-<h2>List Name: Platform</h2>
-
-<h4>Differences:</h4>
-	<p>There are no differences between the two headers</p>
-<p>---------------------------</p>
-<h2>List Name: PlatformType</h2>
-
-<h4>Differences:</h4>
-	<p>There are no differences between the two headers</p>
-<p>---------------------------</p>
-<h2>List Name: PossibleValue</h2>
-
-<h4>Differences:</h4>
-	<p>There are no differences between the two headers</p>
-<p>---------------------------</p>
-<h2>List Name: Project</h2>
-
-<h4>Differences:</h4>
-A, URI, hasURI
-
-<h4>All Lines in CHEAR Development, but not in CHEAR Production:</h4><p>
-URI
-</p>
-<h4>All Lines in CHEAR Production, but not in CHEAR Development:</h4><p>
-A, hasURI
-</p><p>---------------------------</p>
-<h2>List Name: Sample</h2>
-
-<h4>Differences:</h4>
-hasco:originalID
-
-<h4>All Lines in CHEAR Development, but not in CHEAR Production:</h4><p>
-NONE
-</p>
-<h4>All Lines in CHEAR Production, but not in CHEAR Development:</h4><p>
-hasco:originalID
-</p><p>---------------------------</p>
-<h2>List Name: SampleType</h2>
-
-<h4>Differences:</h4>
-	<p>There are no differences between the two headers</p>
-<p>---------------------------</p>
-<h2>List Name: SensingPerspectiveType</h2>
-
-<h4>Differences:</h4>
-	<p>There are no differences between the two headers</p>
-<p>---------------------------</p>
-<h2>List Name: Study</h2>
-
-<h4>Differences:</h4>
-a, chear-kb:project, hasco:hasProject, rdfs:type
-
-<h4>All Lines in CHEAR Development, but not in CHEAR Production:</h4><p>
-chear-kb:project, rdfs:type
-</p>
-<h4>All Lines in CHEAR Production, but not in CHEAR Development:</h4><p>
-a, hasco:hasProject
-</p><p>---------------------------</p>
-<h2>List Name: StudyType</h2>
-
-<h4>Differences:</h4>
-	<p>There are no differences between the two headers</p>
-<p>---------------------------</p>
-<h2>List Name: Subject</h2>
-
-<h4>Differences:</h4>
-hasco:originalID
-
-<h4>All Lines in CHEAR Development, but not in CHEAR Production:</h4><p>
-NONE
-</p>
-<h4>All Lines in CHEAR Production, but not in CHEAR Development:</h4><p>
-hasco:originalID
-</p><p>---------------------------</p>
-<h2>List Name: Unit</h2>
-
-<h4>Differences:</h4>
-obo:IAO_0000115, rdfs:comment
-
-<h4>All Lines in CHEAR Development, but not in CHEAR Production:</h4><p>
-obo:IAO_0000115
-</p>
-<h4>All Lines in CHEAR Production, but not in CHEAR Development:</h4><p>
-rdfs:comment
-</p><p>---------------------------</p>
-
+	<h1><u>Diff Tool Results</u>: @Schemas.get(0) and @Schemas.get(1)</h1>
+	<style>table, th, td { border: 1px solid black;}th, td {padding: 7px;}</style>
+
+
+	<br/>
+	<h3>Project Comparison - Lists with Same Name, but Different Desciptions</h3>
+	@if(DescriptionTable.isEmpty()){
+		<p>There are no differences in the description between the lists that share the same name</p>
+	}
+	@if(!DescriptionTable.isEmpty()){
+		<table style="width:80%">
+			<tr>
+				<th>List Name</th>
+				<th>@Schemas.get(0) Description</th>
+				<th>@Schemas.get(1) Description</th>
+			</tr>
+			@for(dtarrayrow <- DescriptionTable) {
+				<tr>
+					<td>@dtarrayrow.get(0)</td>
+					<td>@dtarrayrow.get(1)</td>
+					<td>@dtarrayrow.get(2)</td>
+				</tr>
+			}
+		</table>
+	}
+	<br/>
+
+
+	<!--<h4>Similar list names (does not account difference in description):</h4>
+	@if(ListNamesDiff.get(0).isEmpty()){
+		<p>There are no Similarities between the two projects</p>
+	}
+	@if(!ListNamesDiff.get(0).isEmpty()){
+		<p>
+			@for(simListNameIter <- ListNamesDiff.get(0)) {
+				@simListNameIter, 
+			}
+		</p>
+	}
+	<br/>-->
+
+
+	<h3>Project Comparison - Lists In One Project and Not the Other</h3>
+
+	<h4>Different List Names:</h4>
+	@if(ListNamesDiff.get(1).isEmpty()){
+		<p>There are no Differences between the two projects</p>
+	}
+	@if(!ListNamesDiff.get(1).isEmpty()){
+		<table style="width:80%">
+			<tr>
+				<th>Different Lists Names</th>
+				<th>All Lists In @Schemas.get(0), but not in @Schemas.get(1)</th>
+				<th>All Lists In @Schemas.get(1), but not in @Schemas.get(0)</th>
+			</tr>
+
+			<tr>
+				@if(ListNamesDiff.get(1).isEmpty()){
+					<td>No Difference</td>
+					<td></td>
+					<td></td>
+				}
+				@if(!ListNamesDiff.get(1).isEmpty()){
+					<td>
+						@for(simListNameIter <- ListNamesDiff.get(1)) {
+							@simListNameIter, 
+						}
+					</td>
+					<td>
+						@for(simListNameIter <- ListNamesDiff.get(2)) {
+							@simListNameIter, 
+						}
+					</td>
+					<td>
+						@for(simListNameIter <- ListNamesDiff.get(3)) {
+							@simListNameIter, 
+						}
+					</td>
+				}
+			</tr>
+		</table>
+
+	}
+	<br/>
+
+	<br/><hr>
+
+	<h3>Same List Names - Project List Header Difference Results (does not account difference in description):</h3>
+	<table style="width:80%">
+		@if(ListNamesDiff.get(0).isEmpty()){
+			<p>There are no differences</p>
+		}
+
+		@if(!ListNamesDiff.get(0).isEmpty()){
+			<tr>
+				<th>List Name</th>
+				<th>Differences</th>
+				<th>In @Schemas.get(0), but not in @Schemas.get(1)</th>
+				<th>In @Schemas.get(1), but not in @Schemas.get(0)</th>
+			</tr>
+
+			
+			@for(simListNameIter <- ListNamesDiff.get(0)) {
+				<tr>
+				<!--<td>@IndividualResultsMap.get(simListNameIter)</td>-->
+				<td>@simListNameIter</td>
+				@if(IndividualResultsMap.get(simListNameIter).get(0).isEmpty()){
+					<td>N/A</td>
+					<td></td>
+					<td></td>
+				}
+				@if(!IndividualResultsMap.get(simListNameIter).get(0).isEmpty()){
+					<td>
+						@for(projectRowHDiff <- IndividualResultsMap.get(simListNameIter).get(0)){
+							@projectRowHDiff,
+						}
+					</td>
+
+					@if(IndividualResultsMap.get(simListNameIter).get(1).isEmpty()){
+						<td></td>
+					}
+					@if(!IndividualResultsMap.get(simListNameIter).get(1).isEmpty()){
+						<td>
+							@for(projectRowHDiff1 <- IndividualResultsMap.get(simListNameIter).get(1)){
+								@projectRowHDiff1,
+							}
+						</td>
+					}
+
+					@if(IndividualResultsMap.get(simListNameIter).get(2).isEmpty()){
+						<td></td>
+					}
+					@if(!IndividualResultsMap.get(simListNameIter).get(2).isEmpty()){
+						<td>
+							@for(projectRowHDiff2 <- IndividualResultsMap.get(simListNameIter).get(2)){
+								@projectRowHDiff2,
+							}
+						</td>
+					}
+
+				}
+				</tr>
+			}
+		}
+	</table>
 </div>
 }
