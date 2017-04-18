@@ -12,14 +12,28 @@ import play.data.Form;
 import play.mvc.Controller;
 import play.mvc.Result;
 
+import org.apache.jena.query.DatasetAccessor;
+import org.apache.jena.query.DatasetAccessorFactory;
+import org.apache.jena.rdf.model.Model;
+import org.apache.jena.rdf.model.StmtIterator;
+import org.apache.jena.riot.RiotNotFoundException;
+import org.apache.jena.shared.NotFoundException;
 import org.hadatac.console.controllers.AuthApplication;
+import org.hadatac.console.controllers.studies.routes;
 import org.hadatac.console.models.DeploymentForm;
 import org.hadatac.console.models.StudyForm;
 import org.hadatac.console.views.html.studies.*;
+import org.hadatac.console.views.html.triplestore.syncLabkey;
 import org.hadatac.entity.pojo.DataAcquisition;
 import org.hadatac.entity.pojo.Deployment;
 import org.hadatac.entity.pojo.Detector;
 import org.hadatac.entity.pojo.Study;
+import org.hadatac.metadata.loader.TripleProcessing;
+import org.hadatac.utils.Collections;
+import org.hadatac.utils.ConfigProp;
+import org.hadatac.utils.Feedback;
+import org.hadatac.utils.State;
+import org.labkey.remoteapi.CommandException;
 
 import be.objectify.deadbolt.java.actions.Group;
 import be.objectify.deadbolt.java.actions.Restrict;
@@ -28,9 +42,6 @@ public class RefreshStudy extends Controller {
 
 	@Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
     public static Result index(String study_uri) {
-		StudyForm studyForm = new StudyForm();
-        Study study = null;
-
         try {
             if (study_uri != null) {
             	study_uri = URLDecoder.decode(study_uri, "UTF-8");
@@ -41,71 +52,47 @@ public class RefreshStudy extends Controller {
             e.printStackTrace();
         }
 
-        if (!study_uri.equals("")) {
-
-            study = Study.find(study_uri);
-    		/*
-    		 *  Add deployment information into handler
-    		 */
-    		if (study.getDataAcquisitions() != null) {
-    			Iterator<DataAcquisition> iterDataAcquisitions = study.getDataAcquisitions().iterator();
-    			while (iterDataAcquisitions.hasNext()) {
-    				studyForm.addDataAcquisition(((DataAcquisition)iterDataAcquisitions.next()).getLabel());
-    			}
+        if (study_uri.equals("")) {
+        	return badRequest("Invalid study URI!");
+        }
+        
+        String site = ConfigProp.getPropertyValue("labkey.config", "site");
+        String path = ConfigProp.getPropertyValue("labkey.config", "folder");
+        
+    	if (session().get("LabKeyUserName") == null && session().get("LabKeyPassword") == null) {
+    		return redirect(org.hadatac.console.controllers.triplestore.routes.LoadKB.logInLabkey(
+    				routes.RefreshStudy.index(study_uri).url()));
+    	}
+        
+    	String results = "";
+    	int nTriples = 0;
+    	try {
+    		Model model = TripleProcessing.importStudy(site, session().get("LabKeyUserName"), 
+    				session().get("LabKeyPassword"), path, study_uri);
+    		DatasetAccessor accessor = DatasetAccessorFactory.createHTTP(
+    				Collections.getCollectionsName(Collections.METADATA_GRAPH));
+    		accessor.add(model);
+    		
+    		results += Feedback.println(Feedback.WEB, "Imported Triples: ");
+    		StmtIterator iter = model.listStatements();
+    		while (iter.hasNext()) {
+    			String stmt = iter.nextStatement().toString();
+    			results += Feedback.println(Feedback.WEB, stmt);
+    			nTriples++;
     		}
-    		studyForm.setStartDateTime(study.getStartedAt());
-            if (study.getEndedAt() != null) {
-            	studyForm.setEndDateTime(study.getEndedAt());
-            }
-            System.out.println("delete study");
-            return ok(refreshStudy.render(study_uri, studyForm));
-        }
-        return ok(refreshStudy.render(study_uri, studyForm));
+    	} catch (CommandException e) {
+    		if (e.getMessage().equals("Unauthorized")) {
+    			return ok(syncLabkey.render("login_failed",
+    					org.hadatac.console.controllers.studies.routes.StudyManagement.index(
+    							State.ACTIVE).url(), ""));
+    		}
+    	}
+    	
+    	return ok(refreshStudy.render(results, nTriples));
     }
 
 	@Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    public static Result postIndex(String deployment_uri) {
-        return index(deployment_uri);
-    }
-
-	@Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    public static Result processForm(String study_uri) {
-        Study study = null;
-
-        try {
-            if (study_uri != null) {
-            	study_uri = URLDecoder.decode(study_uri, "UTF-8");
-            } else {
-            	study_uri = "";
-            }
-        } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
-        }
-
-        if (!study_uri.equals("")) {
-            study = Study.find(study_uri);
-        }
-
-        Form<StudyForm> form = Form.form(StudyForm.class).bindFromRequest();
-        StudyForm data = form.get();
-
-        if (study.getDataAcquisitions() != null) {
-			Iterator<DataAcquisition> iterDataAcquisitions = study.getDataAcquisitions().iterator();
-			while (iterDataAcquisitions.hasNext()) {
-				data.addDataAcquisition(((DataAcquisition)iterDataAcquisitions.next()).getLabel());
-			}
-		}
-        data.setStartDateTime(study.getStartedAt());
-        data.setEndDateTime(study.getEndedAt());
-
-        study.delete();
-
-        //Deployment deployment = DataFactory.closeDeployment(deploymentUri, endDateString);
-        if (form.hasErrors()) {
-            System.out.println("HAS ERRORS");
-            return badRequest(closeStudy.render(study_uri, data));
-        } else {
-            return ok(studyConfirm.render("Delete Study", data));
-        }
+    public static Result postIndex(String study_uri) {
+        return index(study_uri);
     }
 }

@@ -474,7 +474,7 @@ public class AutoAnnotator extends Controller {
     private static String createPreamble(CSVAnnotationHandler handler, 
     									 String schema_uri) throws Exception {
 		String preamble = Downloads.FRAG_START_PREAMBLE;
-		preamble += NameSpaces.getInstance().printNameSpaceList();
+		preamble += NameSpaces.getInstance().printTurtleNameSpaceList();
 		preamble += "\n";
 
 		//Insert KB    	

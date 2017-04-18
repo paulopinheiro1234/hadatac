@@ -1,4 +1,5 @@
-@(study_uri : String, study: org.hadatac.console.models.StudyForm)
+@(results : String, 
+  numOfTriples : Int)
 
 @import helper._
 @import org.hadatac.utils._
@@ -8,35 +9,18 @@
 @import org.hadatac.console.controllers.triplestore._
 
 @main("Refresh Study") {
-<div class="container">
-   <h2>Refresh Study</h2>
-
-   <form class="form-horizontal" method="post" action="@org.hadatac.console.controllers.studies.routes.DeleteStudy.processForm(study_uri)">
-
-	<div class="form-group">
-         <label>DataAcquisition(s)</label>
-         <select disabled class="form-control col-sm-6" name="dataAcquisitions">
-         <option value="dataAcquisitions">@study.getDataAcquisitions()</option>         
-         </select>
-     </div>	 
-
-	 <div class="form-group">
-         <label for="startdate">Start Date/Time</label><br> 
-         <input disabled class="col-sm-3" type="text" id="startdate" name="startDateTime" value="@study.getStartDateTime()" />
-     </div>
-
-     <div class="form-group">
-         <label for="enddate">End Date/Time</label><br>
-         <input disabled class="col-sm-3" type="text" id="enddate" name="endDateTime" value="@study.getEndDateTime()" />
-     </div>
-
-     <div class="form-group class="col-sm-6 col-offset-3">
-        <input class="btn btn-success" role="button" type="submit" value="Refresh" />
-     </div>
-     
-    </form>    
-    @studyButton(false)
-
-</div>
-
+	<div class="container">
+		<h2>Refresh Study</h2>
+		<div id="end-process-box" style="display:none;">
+			<h4>Operation Refresh Study complete - Imported @numOfTriples triples: </h4>
+	    </div>
+	    <p style='font-family: "Lucida Console", Monaco, monospace;' id='msgarea'></p>
+		<script type="text/javascript">
+			var msg = "@results";
+       		var msg2 = decodeURIComponent(msg).replace(/\+/g, '&nbsp;');
+        	$('#msgarea').html(msg2.replace(/&lt;br&gt;/g, '<br>'));
+       		document.getElementById('end-process-box').style.display = 'inline';
+        </script>
+		<a href="@org.hadatac.console.controllers.studies.routes.StudyManagement.index(State.ACTIVE)" class="btn btn-primary" role="button">Back to Study Management</a>
+	</div>
 }

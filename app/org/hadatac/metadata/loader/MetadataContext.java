@@ -359,7 +359,8 @@ public class MetadataContext implements RDFContext {
 	 */
 	public Long loadLocalFile(int mode, String filePath, String contentType) {
 		Model model = ModelFactory.createDefaultModel();
-		DatasetAccessor accessor = DatasetAccessorFactory.createHTTP(kbURL + Collections.METADATA_GRAPH);
+		DatasetAccessor accessor = DatasetAccessorFactory.createHTTP(
+				kbURL + Collections.METADATA_GRAPH);
 
 		loadFileMessage = "";
 		Long total = totalTriples();

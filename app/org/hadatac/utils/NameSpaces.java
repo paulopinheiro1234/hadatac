@@ -72,12 +72,11 @@ public class NameSpaces {
 		}
 	}
 		
-	public String printNameSpaceList() {
+	public String printTurtleNameSpaceList() {
 		String ttl = "";
 	    for (Map.Entry<String, NameSpace> entry : table.entrySet()) {
 	        String abbrev = entry.getKey().toString();;
 	        NameSpace ns = entry.getValue();
-	        //System.out.println("@prefix " + abbrev + " <" + ns.toString() + "> .");
 	        ttl = ttl + "@prefix " + abbrev + ": <" + ns.getName() + "> . \n";
 	    }
 	    return ttl;
@@ -88,7 +87,6 @@ public class NameSpaces {
 	    for (Map.Entry<String, NameSpace> entry : table.entrySet()) {
 	        String abbrev = entry.getKey().toString();;
 	        NameSpace ns = entry.getValue();
-	        //System.out.println("@prefix " + abbrev + " <" + ns.toString() + "> .");
 	        ttl = ttl + "PREFIX " + abbrev + ": <" + ns.getName() + "> \n";
 	    }
 	    return ttl;
@@ -149,7 +147,7 @@ public class NameSpaces {
 
     public static void main(String[] args) {
     	NameSpaces ns = new NameSpaces();
-    	//System.out.println(ns.printNameSpaceList());
+    	System.out.println(ns.printTurtleNameSpaceList());
     }
 	
 }

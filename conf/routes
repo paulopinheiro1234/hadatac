@@ -156,7 +156,6 @@ POST	/hadatac/studies/close		           org.hadatac.console.controllers.studies.
 POST 	/hadatac/studies/close/form	           org.hadatac.console.controllers.studies.CloseStudy.processForm(study_uri : String)
 GET	    /hadatac/studies/refresh	    	   org.hadatac.console.controllers.studies.RefreshStudy.index(study_uri : String)
 POST	/hadatac/studies/refresh		       org.hadatac.console.controllers.studies.RefreshStudy.postIndex(study_uri : String)
-POST 	/hadatac/studies/refresh/form	       org.hadatac.console.controllers.studies.RefreshStudy.processForm(study_uri : String)
 GET	    /hadatac/studies/delete	    	       org.hadatac.console.controllers.studies.DeleteStudy.index(study_uri : String)
 POST	/hadatac/studies/delete		           org.hadatac.console.controllers.studies.DeleteStudy.postIndex(study_uri : String)
 POST 	/hadatac/studies/delete/form	       org.hadatac.console.controllers.studies.DeleteStudy.processForm(study_uri : String)

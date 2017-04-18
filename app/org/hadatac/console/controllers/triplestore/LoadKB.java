@@ -343,7 +343,6 @@ public class LoadKB extends Controller {
     				try {
     					FileUtils.writeByteArrayToFile(newFile, byteFile);
     				} catch (Exception e) {
-    					// TODO Auto-generated catch block
     					e.printStackTrace();
     				}
     				try {
