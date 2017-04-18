@@ -36,6 +36,7 @@ import org.hadatac.console.models.FacetHandler;
 import org.hadatac.console.models.Pivot;
 import org.hadatac.data.model.MetadataAcquisitionQueryResult;
 import org.hadatac.utils.Collections;
+import org.hadatac.utils.NameSpaces;
 import org.hadatac.utils.State;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
@@ -356,40 +357,9 @@ public class Study {
 		return result;
 	}
 	
-/*	public static List<Study> find(String uri) {
-		List<Study> list = new ArrayList<Study>();
-		
-		System.out.println("uri:");
-		System.out.println(uri);
-		SolrClient solr = new HttpSolrClient(
-				Play.application().configuration().getString("hadatac.solr.data")
-				+ Collections.STUDIES);
-		SolrQuery query = new SolrQuery();
-		
-		query.set("q", "studyUri:\"" + uri + "\"");
-		query.set("sort", "started_at asc");
-		query.set("rows", "10000000");
-		
-		try {
-			QueryResponse response = solr.query(query);
-			solr.close();
-			SolrDocumentList results = response.getResults();
-			Iterator<SolrDocument> i = results.iterator();
-			while (i.hasNext()) {
-				Study study = convertFromSolr(i.next());
-				list.add(study);
-			}
-		} catch (Exception e) {
-			list.clear();
-			System.out.println("[ERROR] Study.find(String) - Exception message: " + e.getMessage());
-		}
-		
-		return list;
-	}
-	*/
 	public static Study find(String study_uri) {
 		Study returnStudy = new Study();
-		String studyQueryString = DynamicFunctions.getPrefixes() +
+		String studyQueryString = NameSpaces.getInstance().printSparqlNameSpaceList() +
 		"SELECT DISTINCT ?studyUri ?studyLabel ?proj ?studyComment (group_concat( ?agentName_ ; separator = ' & ') as ?agentName) ?institutionName " + 
 		" WHERE {        ?subUri rdfs:subClassOf hasco:Study . " + 
 		"                       ?studyUri a ?subUri . " + 
@@ -431,43 +401,254 @@ public class Study {
 		return returnStudy;
 	}
 	
-	/*public static Study find(String uri) {
-		//List<Study> list = new ArrayList<Study>();
-		Study returnStudy = new Study();
-		System.out.println("uri:");
-		System.out.println(uri);
-		SolrClient solr = new HttpSolrClient(
-				Play.application().configuration().getString("hadatac.solr.data")
-				+ Collections.STUDIES);
-		SolrQuery query = new SolrQuery();
-		
-		query.set("q", "studyUri:\"" + uri + "\"");
-		//query.set("sort", "started_at asc");
-		query.set("rows", "10000000");
+	public static ResultSet findModel(String study) {
+		ResultSetRewindable resultsrw = null;
+		String studyQueryString = NameSpaces.getInstance().printSparqlNameSpaceList() +
+		"SELECT DISTINCT ?s ?p ?o" +
+		"WHERE " +
+		"{  " +
+		"  { " +
+		"	{  " +
+		// Study 
+		"    ?subUri rdfs:subClassOf hasco:Study . " + 
+		"  	?s a ?subUri . " +
+		"  	?s ?p ?o . " +
+		"  	FILTER (?s = " + study + ") " +
+		"  	} " +
+		"    MINUS " +
+		"    { " +
+		// Other Studies 
+		"    ?subUri rdfs:subClassOf hasco:Study . " + 
+		"  	?s a ?subUri . " +
+		"  	?s ?p ?o . " +
+		"  	FILTER (?s != " + study + ") " +
+		"    }  " +
+		"  } " +
+		"  UNION " + 
+		"  { " +
+		"	{  " +
+		// Data Acquisitions 
+		"  	?daSubUri rdfs:subClassOf hasneto:DataAcquisition . " + 
+		"  	?s a ?daSubUri. " +
+		"  	?s hasco:isDataAcquisitionOf ?study . " + 
+		"  	?s ?p ?o . " +
+		"  	FILTER (?study = " + study + ") " +
+		"  	} " +
+		"    MINUS " +
+		"    {  " +
+		// Other Data Acquisitions
+		"  	?daSubUri rdfs:subClassOf hasneto:DataAcquisition . " + 
+		"  	?s a ?daSubUri. " +
+		"  	?s hasco:isDataAcquisitionOf ?study . " + 
+		"  	?s ?p ?o . " +
+		"  	FILTER (?study != " + study + ") " +
+		"  	} " +
+		"  } " +
+		"  UNION " + 
+		"  { " +
+		"    { " +
+		// Data Acquisition Schema
+		"  	?daSubUri rdfs:subClassOf hasneto:DataAcquisition . " + 
+		"  	?da a ?daSubUri. " +
+		"    ?da hasco:isDataAcquisitionOf ?study . " + 
+		"  	?da hasco:hasSchema ?s .  " +
+		"  		?s ?p ?o . " +
+		"  FILTER (?study = " + study + ") " +
+		"    } " +
+		"    MINUS " +
+		"    { " +
+		// Other Data Acquisition Schemas
+		"  	?daSubUri rdfs:subClassOf hasneto:DataAcquisition . " + 
+		"  	?da a ?daSubUri. " +
+		"    ?da hasco:isDataAcquisitionOf ?study . " + 
+		"  	?da hasco:hasSchema ?schema . " +
+		"	?s a hasneto:DASchemaAttribute . " +
+		"	?s hasneto:partOfSchema ?schema . " +
+		"  	?s ?p ?o . " +
+		"  	FILTER (?study != " + study + ") " +
+		"    } " +
+		"  } "  +
+		"  UNION " + 
+		"  { " +
+		"    { " +
+		// Data Acquisition Schema Attributes
+		"  	?daSubUri rdfs:subClassOf hasneto:DataAcquisition . " + 
+		"  	?da a ?daSubUri. " +
+		"    ?da hasco:isDataAcquisitionOf ?study . " + 
+		"  	?da hasco:hasSchema ?schema . " +
+		"	?s a hasneto:DASchemaAttribute . " +
+		"	?s hasneto:partOfSchema ?schema . " +
+		"  		?s ?p ?o . " +
+		"  FILTER (?study = " + study + ") " +
+		"    } " +
+		"    MINUS " +
+		"    { " +
+		// Other Data Acquisition Schema Attributess
+		"  	?daSubUri rdfs:subClassOf hasneto:DataAcquisition . " + 
+		"  	?da a ?daSubUri. " +
+		"    ?da hasco:isDataAcquisitionOf ?study . " + 
+		"  	?da hasco:hasSchema ?s .  " +
+		"  	?s ?p ?o . " +
+		"  	FILTER (?study != " + study + ") " +
+		"    } " +
+		"  } " +
+		"  UNION " + 
+		"  { " +
+		"    { " +
+		// Deployment
+		"  	?daSubUri rdfs:subClassOf hasneto:DataAcquisition . " + 
+		"  	?da a ?daSubUri. " +
+		"  	?da hasco:isDataAcquisitionOf ?study . " +
+		"    ?da hasneto:hasDeployment ?s . " +
+		"  	?s ?p ?o . " +
+		"  	FILTER (?study = " + study + ") " +
+		"    } " +
+		"    MINUS " +
+		"    { " +
+		// Other Deployments
+		"  	?daSubUri rdfs:subClassOf hasneto:DataAcquisition . " + 
+		"  	?da a ?daSubUri. " +
+		"  	?da hasco:isDataAcquisitionOf ?study . " +
+		"    ?da hasneto:hasDeployment ?s . " +
+		"  	?s ?p ?o . " +
+		"  FILTER (?study != " + study + ") " +
+		"    } " +
+		"  } " +
+		"  UNION " + 
+		"  { " +
+		"    { " +
+		// Platforms 
+		"  	?daSubUri rdfs:subClassOf hasneto:DataAcquisition . " + 
+		"  	?da a ?daSubUri. " +
+		"  	?da hasco:isDataAcquisitionOf ?study . " +
+		"    ?da hasneto:hasDeployment ?deployment . " +
+		"    ?deployment vstoi:hasPlatform ?s . " +
+		"  	?s ?p ?o . " +
+		"  	FILTER (?study = " + study + ") " +
+		"  	} " +
+		"    MINUS " +
+		"    { " +
+		// Other Platforms 
+		"  	?daSubUri rdfs:subClassOf hasneto:DataAcquisition . " + 
+		"  	?da a ?daSubUri. " +
+		"  	?da hasco:isDataAcquisitionOf ?study . " +
+		"    ?da hasneto:hasDeployment ?deployment . " +
+		"    ?deployment vstoi:hasPlatform ?s . " +
+		"  	?s ?p ?o . " +
+		"  	FILTER (?study != " + study + ") " +
+		"  	} " +
+		"  }   " +
+		"  UNION  " +
+		"  { " +
+		"    { " +
+		// Instruments 
+		"  	?daSubUri rdfs:subClassOf hasneto:DataAcquisition . " + 
+		"  	?da a ?daSubUri. " +
+		"  	?da hasco:isDataAcquisitionOf ?study . " +
+		"    ?da hasneto:hasDeployment ?deployment . " +
+		"    ?deployment hasneto:hasInstrument ?s . " +
+		"  	?s ?p ?o . " +
+		"  	FILTER (?study = " + study + ") " +
+		"    } " +
+		"    MINUS " +
+		"    { " +
+		// Other Instruments 
+		"  	?daSubUri rdfs:subClassOf hasneto:DataAcquisition . " + 
+		"  	?da a ?daSubUri. " +
+		"  	?da hasco:isDataAcquisitionOf ?study . " +
+		"    ?da hasneto:hasDeployment ?deployment . " +
+		"    ?deployment hasneto:hasInstrument ?s . " +
+		"  	?s ?p ?o . " +
+		"  	FILTER (?study != " + study + ") " +
+		"    } " +
+		"  } " +
+		"  UNION  " +
+		"  { " +
+		"    { " +
+		// Detectors 
+		"  	?daSubUri rdfs:subClassOf hasneto:DataAcquisition . " + 
+		"  	?da a ?daSubUri. " +
+		"  	?da hasco:isDataAcquisitionOf ?study . " +
+		"    ?da hasneto:hasDeployment ?deployment . " +
+		"    ?deployment hasneto:hasDetector ?s . " +
+		"  	?s ?p ?o . " +
+		"  	FILTER (?study = " + study + ") " +
+		"    } " +
+		"    MINUS " +
+		"    { " +
+		// Other Detectors 
+		"  	?daSubUri rdfs:subClassOf hasneto:DataAcquisition . " + 
+		"  	?da a ?daSubUri. " +
+		"  	?da hasco:isDataAcquisitionOf ?study . " +
+		"    ?da hasneto:hasDeployment ?deployment . " +
+		"    ?deployment hasneto:hasDetector ?s . " +
+		"  	?s ?p ?o . " +
+		"  	FILTER (?study != " + study + ") " +
+		"    } " +
+		"  } " +
+		"  UNION " + 
+		"  { " +
+		"    { " +
+		// Subjects
+		"    ?subUri rdfs:subClassOf hasco:Study . " + 
+		"  	?study a ?subUri . " +
+		"    ?s hasco:isSubjectOf ?cohort . " +
+		"    ?cohort hasco:isCohortOf ?study . " +
+		"  	?s ?p ?o . " +
+		"  	FILTER (?study = " + study + ") " +
+		"    } " +
+		"    MINUS " +
+		"    { " +
+		// Other Subjects 
+		"    ?subUri rdfs:subClassOf hasco:Study . " + 
+		"  	?study a ?subUri . " +
+		"    ?s hasco:isSubjectOf ?cohort . " +
+		"    ?cohort hasco:isCohortOf ?study . " +
+		"  	?s ?p ?o . " +
+		"  	FILTER (?study != " + study + ") " +
+		"    } " +
+		"  } " +
+		"  UNION " + 
+		"  {  " +
+		"    { " +
+		// Samples through DA
+		"    ?daSubUri rdfs:subClassOf hasneto:DataAcquisition . " + 
+		"  	?da a ?daSubUri. " +
+		"  	?da hasco:isDataAcquisitionOf ?study . " + 
+		"    ?s hasco:isMeasuredObjectOf ?da . " +
+		"    ?s ?p ?o . " +
+		"  	FILTER (?study = " + study + ") " +
+		"    } " +
+		"    MINUS " +
+		"    { " +
+		// Other Samples through DA
+		"    ?daSubUri rdfs:subClassOf hasneto:DataAcquisition . " + 
+		"  	?da a ?daSubUri. " +
+		"  	?da hasco:isDataAcquisitionOf ?study . " + 
+		"    ?s hasco:isMeasuredObjectOf ?da . " +
+		"    ?s ?p ?o . " +
+		"  	FILTER (?study != " + study + ") " +
+		"    } " +
+		"  } " +
+		"} ";
 		
 		try {
-			QueryResponse response = solr.query(query);
-			solr.close();
-			SolrDocumentList results = response.getResults();
-			Iterator<SolrDocument> i = results.iterator();
-			while (i.hasNext()) {
-				Study study = convertFromSolr(i.next());
-				returnStudy = study;
-				//list.add(study);
-			}
-		} catch (Exception e) {
-			//list.clear();
-			System.out.println("[ERROR] Study.find(String) - Exception message: " + e.getMessage());
+			Query studyQuery = QueryFactory.create(studyQueryString);
+			QueryExecution qexec = QueryExecutionFactory.sparqlService(Collections.getCollectionsName(Collections.METADATA_SPARQL), studyQuery);
+			ResultSet results = qexec.execSelect();
+			resultsrw = ResultSetFactory.copyResults(results);
+			qexec.close();
+		} catch (QueryExceptionHTTP e) {
+			e.printStackTrace();
 		}
-		
-		return returnStudy;
+		return resultsrw;
 	}
-	*/
+	
 	public static List<Study> find(State state) {
 		List<Study> studies = new ArrayList<Study>();
 	    String queryString = "";
         if (state.getCurrent() == State.ACTIVE) { 
-    	   queryString = DynamicFunctions.getPrefixes() +
+    	   queryString = NameSpaces.getInstance().printSparqlNameSpaceList() +
     			    "SELECT DISTINCT ?studyUri ?studyLabel ?proj ?studyComment (group_concat( ?agentName_ ; separator = ' & ') as ?agentName) ?institutionName " + 
     				" WHERE {        ?subUri rdfs:subClassOf hasco:Study . " + 
     				"                       ?studyUri a ?subUri . " + 
@@ -483,7 +664,7 @@ public class Study {
     				"GROUP BY ?studyUri ?studyLabel ?proj ?studyTitle ?studyComment ?agentName ?institutionName ";
         } else {
     	   if (state.getCurrent() == State.CLOSED) {
-    		   queryString = DynamicFunctions.getPrefixes() +
+    		   queryString = NameSpaces.getInstance().printSparqlNameSpaceList() +
        			    "SELECT ?studyUri ?studyLabel ?proj ?studyComment (group_concat( ?agentName_ ; separator = ' & ') as ?agentName) ?institutionName " + 
        				" WHERE {        ?subUri rdfs:subClassOf hasco:Study . " + 
        				"                       ?studyUri a ?subUri . " + 
@@ -501,7 +682,7 @@ public class Study {
        	   			//"ORDER BY DESC(?enddatetime) ";
     	   } else {
         	   if (state.getCurrent() == State.ALL) {
-        		   queryString = DynamicFunctions.getPrefixes() +
+        		   queryString = NameSpaces.getInstance().printSparqlNameSpaceList() +
            			    "SELECT ?studyUri ?studyLabel ?proj ?studyComment (group_concat( ?agentName_ ; separator = ' & ') as ?agentName ) ?institutionName " + 
         				" WHERE {        ?subUri rdfs:subClassOf hasco:Study . " + 
         				"                       ?studyUri a ?subUri . " + 
