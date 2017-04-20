@@ -361,7 +361,7 @@ public class Study {
 		Study returnStudy = new Study();
 		String studyQueryString = NameSpaces.getInstance().printSparqlNameSpaceList() +
 		"SELECT DISTINCT ?studyUri ?studyLabel ?proj ?studyComment (group_concat( ?agentName_ ; separator = ' & ') as ?agentName) ?institutionName " + 
-		" WHERE {        ?subUri rdfs:subClassOf hasco:Study . " + 
+		" WHERE {        ?subUri rdfs:subClassOf* hasco:Study . " + 
 		"                       ?studyUri a ?subUri . " + 
 		"           ?studyUri rdfs:label ?studyLabel  . " + 
 		"			FILTER ( ?studyUri = " + DynamicFunctions.replaceURLWithPrefix(study_uri) + " ) . " +
@@ -410,7 +410,7 @@ public class Study {
 		"  { " +
 		"	{  " +
 		// Study 
-		"    ?subUri rdfs:subClassOf hasco:Study . " + 
+		"   ?subUri rdfs:subClassOf* hasco:Study . " + 
 		"  	?s a ?subUri . " +
 		"  	?s ?p ?o . " +
 		"  	FILTER (?s = " + study + ") " +
@@ -418,7 +418,7 @@ public class Study {
 		"    MINUS " +
 		"    { " +
 		// Other Studies 
-		"    ?subUri rdfs:subClassOf hasco:Study . " + 
+		"   ?subUri rdfs:subClassOf* hasco:Study . " + 
 		"  	?s a ?subUri . " +
 		"  	?s ?p ?o . " +
 		"  	FILTER (?s != " + study + ") " +
@@ -427,19 +427,63 @@ public class Study {
 		"  UNION " + 
 		"  { " +
 		"	{  " +
-		// Data Acquisitions 
-		"  	?daSubUri rdfs:subClassOf hasneto:DataAcquisition . " + 
-		"  	?s a ?daSubUri. " +
-		"  	?s hasco:isDataAcquisitionOf ?study . " + 
+		//  Data Acquisitions, Cohort
+		"  	?subUri rdfs:subClassOf* hasco:Study . " + 
+		"  	?study a ?subUri . " +
+		"  	?s hasco:isDataAcquisitionOf|hasco:isCohortOf ?study . " + 
 		"  	?s ?p ?o . " +
 		"  	FILTER (?study = " + study + ") " +
 		"  	} " +
 		"    MINUS " +
 		"    {  " +
-		// Other Data Acquisitions
-		"  	?daSubUri rdfs:subClassOf hasneto:DataAcquisition . " + 
-		"  	?s a ?daSubUri. " +
-		"  	?s hasco:isDataAcquisitionOf ?study . " + 
+		// Other Data Acquisitions, Cohort
+		"  	?subUri rdfs:subClassOf* hasco:Study . " + 
+		"  	?study a ?subUri . " +
+		"  	?s hasco:isDataAcquisitionOf|hasco:isCohortOf ?study . " + 
+		"  	?s ?p ?o . " +
+		"  	FILTER (?study != " + study + ") " +
+		"  	} " +
+		"  } " +
+		"  UNION " + 
+		"  { " +
+		"	{  " +
+		//  Cohort Subjects
+		"  	?subUri rdfs:subClassOf* hasco:Study . " + 
+		"  	?study a ?subUri . " +
+		"  	?cohort hasco:isCohortOf ?study . " +
+		"	?s hasco:isSubjectOf ?cohort . " +
+		"  	?s ?p ?o . " +
+		"  	FILTER (?study = " + study + ") " +
+		"  	} " +
+		"    MINUS " +
+		"    {  " +
+		// Other Cohort Subjects
+		"  	?subUri rdfs:subClassOf* hasco:Study . " + 
+		"  	?study a ?subUri . " +
+		"  	?cohort hasco:isCohortOf ?study . " +
+		"	?s hasco:isSubjectOf ?cohort . " +
+		"  	?s ?p ?o . " +
+		"  	FILTER (?study != " + study + ") " +
+		"  	} " +
+		"  } " +
+		"  UNION " + 
+		"  { " +
+		"	{  " +
+		//  Data Acquisition Schema and Deployment
+		"  	?subUri rdfs:subClassOf* hasco:Study . " + 
+		"  	?study a ?subUri . " +
+		"  	?da hasco:isDataAcquisitionOf ?study . " + 
+		"   ?da hasco:hasSchema|hasneto:hasDeployment ?s . " +
+		"  	?s ?p ?o . " +
+		"  	FILTER (?study = " + study + ") " +
+		"  	} " +
+		"    MINUS " +
+		"    {  " +
+		// Other Data Acquisition Schema and Deployment
+		"  	?subUri rdfs:subClassOf* hasco:Study . " + 
+		"  	?study a ?subUri . " +
+		"  	?da hasco:isDataAcquisitionOf ?study . " + 
+		"   ?da hasco:hasSchema|hasneto:hasDeployment ?s . " +
 		"  	?s ?p ?o . " +
 		"  	FILTER (?study != " + study + ") " +
 		"  	} " +
@@ -447,47 +491,45 @@ public class Study {
 		"  UNION " + 
 		"  { " +
 		"    { " +
-		// Data Acquisition Schema
-		"  	?daSubUri rdfs:subClassOf hasneto:DataAcquisition . " + 
-		"  	?da a ?daSubUri. " +
-		"    ?da hasco:isDataAcquisitionOf ?study . " + 
-		"  	?da hasco:hasSchema ?s .  " +
-		"  		?s ?p ?o . " +
+		// Data Acquisition Samples
+		"  	?subUri rdfs:subClassOf* hasco:Study . " + 
+		"  	?study a ?subUri . " +
+		"   ?da hasco:isDataAcquisitionOf ?study . " + 
+		"   ?s hasco:isMeasuredObjectOf ?da .  " +
+		"   ?s ?p ?o . " +
 		"  FILTER (?study = " + study + ") " +
 		"    } " +
 		"    MINUS " +
 		"    { " +
-		// Other Data Acquisition Schemas
-		"  	?daSubUri rdfs:subClassOf hasneto:DataAcquisition . " + 
-		"  	?da a ?daSubUri. " +
-		"    ?da hasco:isDataAcquisitionOf ?study . " + 
-		"  	?da hasco:hasSchema ?schema . " +
-		"	?s a hasneto:DASchemaAttribute . " +
-		"	?s hasneto:partOfSchema ?schema . " +
-		"  	?s ?p ?o . " +
+		// Other Data Acquisition Samples
+		"  	?subUri rdfs:subClassOf* hasco:Study . " + 
+		"  	?study a ?subUri . " +
+		"   ?da hasco:isDataAcquisitionOf ?study . " + 
+		"   ?s hasco:isMeasuredObjectOf ?da .  " +
+		"   ?s ?p ?o . " +
 		"  	FILTER (?study != " + study + ") " +
 		"    } " +
 		"  } "  +
 		"  UNION " + 
 		"  { " +
 		"    { " +
-		// Data Acquisition Schema Attributes
-		"  	?daSubUri rdfs:subClassOf hasneto:DataAcquisition . " + 
-		"  	?da a ?daSubUri. " +
-		"    ?da hasco:isDataAcquisitionOf ?study . " + 
-		"  	?da hasco:hasSchema ?schema . " +
-		"	?s a hasneto:DASchemaAttribute . " +
-		"	?s hasneto:partOfSchema ?schema . " +
-		"  		?s ?p ?o . " +
+		// Deployment - Platform, Instrument, detector
+		"  	?subUri rdfs:subClassOf* hasco:Study .  " + 
+		"  	?study a ?subUri . " +
+		"   ?da hasco:isDataAcquisitionOf ?study . " + 
+		"  	?da hasneto:hasDeployment ?deploy .  " +
+		"	?deploy vstoi:hasPlatform|hasneto:hasInstrument|hasneto:hasDetector ?s . " +
+		"  	?s ?p ?o . " +
 		"  FILTER (?study = " + study + ") " +
 		"    } " +
 		"    MINUS " +
 		"    { " +
-		// Other Data Acquisition Schema Attributess
-		"  	?daSubUri rdfs:subClassOf hasneto:DataAcquisition . " + 
-		"  	?da a ?daSubUri. " +
-		"    ?da hasco:isDataAcquisitionOf ?study . " + 
-		"  	?da hasco:hasSchema ?s .  " +
+		// Other Deployment - Platform, Instrument, detector
+		"  	?subUri rdfs:subClassOf* hasco:Study .  " + 
+		"  	?study a ?subUri . " +
+		"   ?da hasco:isDataAcquisitionOf ?study . " + 
+		"  	?da hasneto:hasDeployment ?deploy .  " +
+		"	?deploy vstoi:hasPlatform|hasneto:hasInstrument|hasneto:hasDetector ?s . " +
 		"  	?s ?p ?o . " +
 		"  	FILTER (?study != " + study + ") " +
 		"    } " +
@@ -495,139 +537,25 @@ public class Study {
 		"  UNION " + 
 		"  { " +
 		"    { " +
-		// Deployment
-		"  	?daSubUri rdfs:subClassOf hasneto:DataAcquisition . " + 
-		"  	?da a ?daSubUri. " +
+		// DA Schema Attribute
+		"  	?subUri rdfs:subClassOf* hasco:Study .  " + 
+		"  	?study a ?subUri . " +
 		"  	?da hasco:isDataAcquisitionOf ?study . " +
-		"    ?da hasneto:hasDeployment ?s . " +
+		"   ?da hasco:hasSchema ?schema . " +
+		"   ?s hasneto:partOfSchema ?schema . " +
 		"  	?s ?p ?o . " +
 		"  	FILTER (?study = " + study + ") " +
 		"    } " +
 		"    MINUS " +
 		"    { " +
-		// Other Deployments
-		"  	?daSubUri rdfs:subClassOf hasneto:DataAcquisition . " + 
-		"  	?da a ?daSubUri. " +
+		// Other DA Schema Attribute
+		"  	?subUri rdfs:subClassOf* hasco:Study .  " + 
+		"  	?study a ?subUri . " +
 		"  	?da hasco:isDataAcquisitionOf ?study . " +
-		"    ?da hasneto:hasDeployment ?s . " +
+		"   ?da hasco:hasSchema ?schema . " +
+		"   ?s hasneto:partOfSchema ?schema . " +
 		"  	?s ?p ?o . " +
 		"  FILTER (?study != " + study + ") " +
-		"    } " +
-		"  } " +
-		"  UNION " + 
-		"  { " +
-		"    { " +
-		// Platforms 
-		"  	?daSubUri rdfs:subClassOf hasneto:DataAcquisition . " + 
-		"  	?da a ?daSubUri. " +
-		"  	?da hasco:isDataAcquisitionOf ?study . " +
-		"    ?da hasneto:hasDeployment ?deployment . " +
-		"    ?deployment vstoi:hasPlatform ?s . " +
-		"  	?s ?p ?o . " +
-		"  	FILTER (?study = " + study + ") " +
-		"  	} " +
-		"    MINUS " +
-		"    { " +
-		// Other Platforms 
-		"  	?daSubUri rdfs:subClassOf hasneto:DataAcquisition . " + 
-		"  	?da a ?daSubUri. " +
-		"  	?da hasco:isDataAcquisitionOf ?study . " +
-		"    ?da hasneto:hasDeployment ?deployment . " +
-		"    ?deployment vstoi:hasPlatform ?s . " +
-		"  	?s ?p ?o . " +
-		"  	FILTER (?study != " + study + ") " +
-		"  	} " +
-		"  }   " +
-		"  UNION  " +
-		"  { " +
-		"    { " +
-		// Instruments 
-		"  	?daSubUri rdfs:subClassOf hasneto:DataAcquisition . " + 
-		"  	?da a ?daSubUri. " +
-		"  	?da hasco:isDataAcquisitionOf ?study . " +
-		"    ?da hasneto:hasDeployment ?deployment . " +
-		"    ?deployment hasneto:hasInstrument ?s . " +
-		"  	?s ?p ?o . " +
-		"  	FILTER (?study = " + study + ") " +
-		"    } " +
-		"    MINUS " +
-		"    { " +
-		// Other Instruments 
-		"  	?daSubUri rdfs:subClassOf hasneto:DataAcquisition . " + 
-		"  	?da a ?daSubUri. " +
-		"  	?da hasco:isDataAcquisitionOf ?study . " +
-		"    ?da hasneto:hasDeployment ?deployment . " +
-		"    ?deployment hasneto:hasInstrument ?s . " +
-		"  	?s ?p ?o . " +
-		"  	FILTER (?study != " + study + ") " +
-		"    } " +
-		"  } " +
-		"  UNION  " +
-		"  { " +
-		"    { " +
-		// Detectors 
-		"  	?daSubUri rdfs:subClassOf hasneto:DataAcquisition . " + 
-		"  	?da a ?daSubUri. " +
-		"  	?da hasco:isDataAcquisitionOf ?study . " +
-		"    ?da hasneto:hasDeployment ?deployment . " +
-		"    ?deployment hasneto:hasDetector ?s . " +
-		"  	?s ?p ?o . " +
-		"  	FILTER (?study = " + study + ") " +
-		"    } " +
-		"    MINUS " +
-		"    { " +
-		// Other Detectors 
-		"  	?daSubUri rdfs:subClassOf hasneto:DataAcquisition . " + 
-		"  	?da a ?daSubUri. " +
-		"  	?da hasco:isDataAcquisitionOf ?study . " +
-		"    ?da hasneto:hasDeployment ?deployment . " +
-		"    ?deployment hasneto:hasDetector ?s . " +
-		"  	?s ?p ?o . " +
-		"  	FILTER (?study != " + study + ") " +
-		"    } " +
-		"  } " +
-		"  UNION " + 
-		"  { " +
-		"    { " +
-		// Subjects
-		"    ?subUri rdfs:subClassOf hasco:Study . " + 
-		"  	?study a ?subUri . " +
-		"    ?s hasco:isSubjectOf ?cohort . " +
-		"    ?cohort hasco:isCohortOf ?study . " +
-		"  	?s ?p ?o . " +
-		"  	FILTER (?study = " + study + ") " +
-		"    } " +
-		"    MINUS " +
-		"    { " +
-		// Other Subjects 
-		"    ?subUri rdfs:subClassOf hasco:Study . " + 
-		"  	?study a ?subUri . " +
-		"    ?s hasco:isSubjectOf ?cohort . " +
-		"    ?cohort hasco:isCohortOf ?study . " +
-		"  	?s ?p ?o . " +
-		"  	FILTER (?study != " + study + ") " +
-		"    } " +
-		"  } " +
-		"  UNION " + 
-		"  {  " +
-		"    { " +
-		// Samples through DA
-		"    ?daSubUri rdfs:subClassOf hasneto:DataAcquisition . " + 
-		"  	?da a ?daSubUri. " +
-		"  	?da hasco:isDataAcquisitionOf ?study . " + 
-		"    ?s hasco:isMeasuredObjectOf ?da . " +
-		"    ?s ?p ?o . " +
-		"  	FILTER (?study = " + study + ") " +
-		"    } " +
-		"    MINUS " +
-		"    { " +
-		// Other Samples through DA
-		"    ?daSubUri rdfs:subClassOf hasneto:DataAcquisition . " + 
-		"  	?da a ?daSubUri. " +
-		"  	?da hasco:isDataAcquisitionOf ?study . " + 
-		"    ?s hasco:isMeasuredObjectOf ?da . " +
-		"    ?s ?p ?o . " +
-		"  	FILTER (?study != " + study + ") " +
 		"    } " +
 		"  } " +
 		"} ";
@@ -650,7 +578,7 @@ public class Study {
         if (state.getCurrent() == State.ACTIVE) { 
     	   queryString = NameSpaces.getInstance().printSparqlNameSpaceList() +
     			    "SELECT DISTINCT ?studyUri ?studyLabel ?proj ?studyComment (group_concat( ?agentName_ ; separator = ' & ') as ?agentName) ?institutionName " + 
-    				" WHERE {        ?subUri rdfs:subClassOf hasco:Study . " + 
+    				" WHERE {        ?subUri rdfs:subClassOf* hasco:Study . " + 
     				"                       ?studyUri a ?subUri . " + 
     				"           ?studyUri rdfs:label ?studyLabel  . " + 
     				"		 OPTIONAL {?studyUri hasco:hasProject ?proj} . " +
@@ -666,7 +594,7 @@ public class Study {
     	   if (state.getCurrent() == State.CLOSED) {
     		   queryString = NameSpaces.getInstance().printSparqlNameSpaceList() +
        			    "SELECT ?studyUri ?studyLabel ?proj ?studyComment (group_concat( ?agentName_ ; separator = ' & ') as ?agentName) ?institutionName " + 
-       				" WHERE {        ?subUri rdfs:subClassOf hasco:Study . " + 
+       				" WHERE {        ?subUri rdfs:subClassOf* hasco:Study . " + 
        				"                       ?studyUri a ?subUri . " + 
        				"           ?studyUri rdfs:label ?studyLabel  . " +
        				//"   ?studyUri prov:startedAtTime ?startdatetime .  " + 
@@ -684,7 +612,7 @@ public class Study {
         	   if (state.getCurrent() == State.ALL) {
         		   queryString = NameSpaces.getInstance().printSparqlNameSpaceList() +
            			    "SELECT ?studyUri ?studyLabel ?proj ?studyComment (group_concat( ?agentName_ ; separator = ' & ') as ?agentName ) ?institutionName " + 
-        				" WHERE {        ?subUri rdfs:subClassOf hasco:Study . " + 
+        				" WHERE {        ?subUri rdfs:subClassOf* hasco:Study . " + 
         				"                       ?studyUri a ?subUri . " + 
         				"           ?studyUri rdfs:label ?studyLabel  . " + 
         				"		 OPTIONAL {?studyUri hasco:hasProject ?proj} . " +
