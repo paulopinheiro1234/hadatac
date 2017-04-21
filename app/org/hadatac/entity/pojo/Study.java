@@ -20,6 +20,10 @@ import org.apache.jena.query.ResultSetFactory;
 import org.apache.jena.query.ResultSetFormatter;
 import org.apache.jena.query.ResultSetRewindable;
 import org.apache.jena.rdf.model.Model;
+import org.apache.jena.rdf.model.ModelFactory;
+import org.apache.jena.rdf.model.Property;
+import org.apache.jena.rdf.model.RDFNode;
+import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.sparql.engine.http.QueryExceptionHTTP;
 import org.apache.jena.sparql.resultset.RDFOutput;
 import org.apache.solr.client.solrj.SolrClient;
@@ -406,7 +410,7 @@ public class Study {
 	
 	public static Model findModel(String study) {
 		String studyQueryString = NameSpaces.getInstance().printSparqlNameSpaceList() +
-		"SELECT DISTINCT ?s ?p ?o" +
+		"SELECT DISTINCT ?s ?p ?o " +
 		"WHERE " +
 		"{  " +
 		"  { " +
@@ -562,20 +566,30 @@ public class Study {
 		"  } " +
 		"} ";
 		
+		Model model = ModelFactory.createDefaultModel();
 		try {
 			Query studyQuery = QueryFactory.create(studyQueryString);
-			QueryExecution qexec = QueryExecutionFactory.sparqlService(Collections.getCollectionsName(Collections.METADATA_SPARQL), studyQuery);
+			QueryExecution qexec = QueryExecutionFactory.sparqlService(
+					Collections.getCollectionsName(Collections.METADATA_SPARQL), studyQuery);
 			ResultSet results = qexec.execSelect();
 			ResultSetRewindable resultsrw = ResultSetFactory.copyResults(results);
 			qexec.close();
-			RDFOutput output = new RDFOutput();
 			
-			return output.asModel(resultsrw);
+			System.out.println("resultsrw.size(): " + resultsrw.size());
+	        while (resultsrw.hasNext()) {
+	            QuerySolution soln = resultsrw.next();
+	
+	            Resource subject = soln.getResource("s");
+	            Property property = model.createProperty(soln.getResource("p").toString());
+	            RDFNode object = soln.get("o");
+	            
+	            model.add(subject, property, object);
+	        }
 		} catch (QueryExceptionHTTP e) {
 			e.printStackTrace();
 		}
 		
-		return null;
+		return model;
 	}
 	
 	public static List<Study> find(State state) {

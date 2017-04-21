@@ -7,6 +7,7 @@ import java.io.LineNumberReader;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -22,11 +23,13 @@ import org.apache.jena.rdf.model.Selector;
 import org.apache.jena.rdf.model.SimpleSelector;
 import org.apache.jena.rdf.model.Statement;
 import org.apache.jena.rdf.model.StmtIterator;
+import org.apache.jena.rdf.model.impl.StatementImpl;
 import org.apache.jena.rdf.model.ModelFactory;
 import org.apache.jena.riot.RDFDataMgr;
 import org.hadatac.console.controllers.AuthApplication;
 import org.hadatac.console.controllers.triplestore.UserManagement;
 import org.hadatac.console.models.SysUser;
+import org.hadatac.console.views.html.deployments.newDeployment;
 import org.hadatac.entity.pojo.DataAcquisition;
 import org.hadatac.entity.pojo.Deployment;
 import org.hadatac.entity.pojo.Measurement;
@@ -44,6 +47,8 @@ public class TripleProcessing {
 	public static final String KB_FORMAT = "text/turtle";
 	
 	public static final String TTL_DIR = "tmp/ttl/";
+	
+	public static int count;
 	
 	public static String printFileWithLineNumber(int mode, String filename) {
 		String str = "";
@@ -249,12 +254,15 @@ public class TripleProcessing {
 		Model refModel = RDFDataMgr.loadModel(fileName);
 		Model targetModel = ModelFactory.createDefaultModel();
 		ValueCellProcessing cellProc = new ValueCellProcessing();
+		
+		HashSet<String> visitedNodes = new HashSet<String>();
+		
 		Selector selector = new SimpleSelector(
 				refModel.getResource(cellProc.replacePrefixEx(studyUri)), (Property)null, (RDFNode)null);
 		StmtIterator iter = refModel.listStatements(selector);
 		if (iter.hasNext()) {
 			Resource studyNode = iter.nextStatement().getSubject();
-			forwardTraverseGraph(studyNode, null, refModel, targetModel);
+			forwardTraverseGraph(studyNode, visitedNodes, refModel, targetModel);
 		}
 		
 		selector = new SimpleSelector(
@@ -262,34 +270,44 @@ public class TripleProcessing {
 		iter = refModel.listStatements(selector);
 		if (iter.hasNext()) {
 			RDFNode studyNode = iter.nextStatement().getObject();
-			backwardTraverseGraph((Resource)studyNode, refModel, targetModel);
+			backwardTraverseGraph((Resource)studyNode, visitedNodes, refModel, targetModel);
 		}
 		
 		return targetModel;
     }
     
-    private static void forwardTraverseGraph(Resource node, RDFNode ignoredNode, 
+    private static void forwardTraverseGraph(Resource node, HashSet<String> visitedNodes, 
     		Model refModel, Model targetModel) {
+    	visitedNodes.add(node.toString());
+    	
     	StmtIterator iter = node.listProperties();
     	while (iter.hasNext()) {
     		Statement stmt = iter.nextStatement();
     		RDFNode object = stmt.getObject();
-    		if (object.isResource() && object.equals(ignoredNode)) {
-    			forwardTraverseGraph((Resource)object, null, refModel, targetModel);
+    		if (object.isResource()) {
+    			if (!visitedNodes.contains(object.toString())) {
+    				targetModel.add(node, stmt.getPredicate(), object);
+    				forwardTraverseGraph((Resource)object, visitedNodes, refModel, targetModel);
+    			}
     		}
-    		targetModel.add(node, stmt.getPredicate(), object);
+    		else {
+    			targetModel.add(node, stmt.getPredicate(), object);
+    		}
     	}
     }
     
-    private static void backwardTraverseGraph(Resource node, Model refModel, Model targetModel) {
+    private static void backwardTraverseGraph(Resource node, HashSet<String> visitedNodes, 
+    		Model refModel, Model targetModel) {
     	Selector selector = new SimpleSelector(null, (Property)null, node);
     	StmtIterator iter = refModel.listStatements(selector);
     	while (iter.hasNext()) {
     		Statement stmt = iter.nextStatement();
     		Resource subject = stmt.getSubject();
-    		backwardTraverseGraph(subject, refModel, targetModel);
-    		forwardTraverseGraph(subject, node, refModel, targetModel);
+    		
     		targetModel.add(subject, stmt.getPredicate(), node);
+    		
+    		backwardTraverseGraph(subject, visitedNodes, refModel, targetModel);
+    		forwardTraverseGraph(subject, visitedNodes, refModel, targetModel);
     	}
     }
     

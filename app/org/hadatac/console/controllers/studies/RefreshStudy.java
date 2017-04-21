@@ -15,6 +15,7 @@ import play.mvc.Result;
 import org.apache.jena.query.DatasetAccessor;
 import org.apache.jena.query.DatasetAccessorFactory;
 import org.apache.jena.rdf.model.Model;
+import org.apache.jena.rdf.model.Statement;
 import org.apache.jena.rdf.model.StmtIterator;
 import org.apache.jena.riot.RiotNotFoundException;
 import org.apache.jena.riot.resultset.ResultSetReaderFactory;
@@ -86,28 +87,23 @@ public class RefreshStudy extends Controller {
     		results += Feedback.println(Feedback.WEB, "Imported Triples: ");
     		StmtIterator iter = model.listStatements();
     		while (iter.hasNext()) {
-    			String stmt = iter.nextStatement().toString();
-    			results += Feedback.println(Feedback.WEB, stmt);
+    			Statement stmt = iter.nextStatement();
+    			if (!refModel.contains(stmt)) {
+    				System.out.println(stmt.toString());
+    			}
+    			results += Feedback.println(Feedback.WEB, stmt.toString());
     			nTriples++;
     		}
     		
     		String ref_results = "";
-    		StmtIterator iterref = refModel.listStatements();
     		int nRefTriples = 0;
+    		StmtIterator iterref = refModel.listStatements();
     		while (iterref.hasNext()) {
-    			String stmt = iterref.nextStatement().toString();
-    			ref_results += stmt;
+    			Statement stmt = iterref.nextStatement();
+    			ref_results += stmt.toString();
     			nRefTriples++;
     		}
     		System.out.println(nRefTriples + " Ref Triples!");
-    		
-    		try {
-    			File file = new File("/Users/jason/Desktop/ref_results.txt");
-    			BufferedWriter output = new BufferedWriter(new FileWriter(file));
-    			output.write(ref_results);
-    		} catch (IOException e) {
-    			System.out.println("Invalid file path!re");
-			}
     		
     		if (refModel.containsAll(model)) {
     			System.out.println("refModel.containsAll(model)!");
