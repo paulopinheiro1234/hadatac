@@ -16,6 +16,7 @@ import org.apache.jena.rdf.model.Property;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdf.model.ResourceFactory;
 import org.apache.jena.rdf.model.Statement;
+import org.hadatac.metadata.loader.ValueCellProcessing;
 import org.hadatac.utils.Collections;
 import org.hadatac.utils.NameSpaces;
 import org.apache.commons.csv.CSVFormat;
@@ -156,14 +157,19 @@ public class Subject {
         return null;
     }
 	
-	public static String checkObjectUri(String attr_uri, String obj_uri) {
-		
-		String objuri = obj_uri;
+	public static String checkObjectUri(String obj_uri, String attr_uri) {
+		//System.out.println("obj_uri: " + obj_uri);
+		//System.out.println("attr_uri: " + attr_uri);
+
+		ValueCellProcessing cellProc = new ValueCellProcessing();
+		attr_uri = cellProc.replacePrefixEx(attr_uri);
+		String objUri = obj_uri;
         String queryString = NameSpaces.getInstance().printSparqlNameSpaceList()
                 + " SELECT ?s ?o WHERE {"
-                + " <" + attr_uri + "> rdfs:label ?l."
+                + " ?ar hasco:hasReference <" + attr_uri + "> . "
+                + " ?ar rdfs:label ?l ."
                 + " ?s hasco:hasAssociatedObject ?o . "
-                + " ?s rdfs:label ?l. "       
+                + " ?s rdfs:label ?l . "       
                 + " }";
         
         Query query = QueryFactory.create(queryString);
@@ -173,35 +179,35 @@ public class Subject {
         ResultSetRewindable resultsrw = ResultSetFactory.copyResults(results);
         qexec.close();
         
+        //System.out.println("resultsrw.size(): " + resultsrw.size());
         if (resultsrw.size() > 0) {
             QuerySolution soln = resultsrw.next();
-            if (null != soln.getLiteral("o")) {
-            	String attributeAssociation = soln.getLiteral("o").toString();
-            	if (attributeAssociation.equals("<http://hadatac.org/kb/chear#ObjectTypeMother>")) {
-            		String motheruri = 	obj_uri+"-mother";
+            if (null != soln.getResource("o")) {
+            	String attributeAssociation = soln.getResource("o").toString();
+            	//System.out.println("attributeAssociation: " + attributeAssociation);
+            	if (attributeAssociation.equals(cellProc.replacePrefixEx("chear-kb:ObjectTypeMother"))) {
+            		String motherUri = obj_uri + "-mother";
+            		
             		Model model = ModelFactory.createDefaultModel();
-            		DatasetAccessor accessor = DatasetAccessorFactory.createHTTP(Collections.METADATA_GRAPH);
-            		Resource subject = model.createResource(motheruri);
-            		Property predicate = model.createProperty("rdf:type");
-            		Resource object = model.createResource("http://semanticscience.org/resource/Human");
-            		Statement s = ResourceFactory.createStatement(subject, predicate, object);
-            		Property predicate2 = model.createProperty("http://hadatac.org/ont/chear#Mother");
-            		Resource object2 = model.createResource(obj_uri);
-            		Statement s2 = ResourceFactory.createStatement(subject, predicate2, object2);            		
-            		model.add(s);
-            		model.add(s2);
+            		DatasetAccessor accessor = DatasetAccessorFactory.createHTTP(
+            				Collections.getCollectionsName(Collections.METADATA_GRAPH));
+            		model.add(model.createResource(motherUri), 
+            				model.createProperty("rdf:type"),
+            				model.createResource(cellProc.replacePrefixEx("sio:Human")));
+            		
+            		model.add(model.createResource(motherUri), 
+            				model.createProperty(cellProc.replacePrefixEx("chear:Mother")),
+            				model.createResource(obj_uri));
+
             		accessor.add(model);
-            		objuri = motheruri;
+            		objUri = motherUri;
+            		//System.out.println("================================== Changed to: " + motherUri);
             	}
             }
         }
-        return objuri;
+        
+        return objUri;
     }
-	
-	
-	Model model = ModelFactory.createDefaultModel();
-	DatasetAccessor accessor = DatasetAccessorFactory.createHTTP(Collections.getCollectionsName(Collections.METADATA_SPARQL));
-	
 }
 
 

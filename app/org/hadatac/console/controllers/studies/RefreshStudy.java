@@ -17,6 +17,7 @@ import org.apache.jena.query.DatasetAccessorFactory;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.StmtIterator;
 import org.apache.jena.riot.RiotNotFoundException;
+import org.apache.jena.riot.resultset.ResultSetReaderFactory;
 import org.apache.jena.shared.NotFoundException;
 import org.hadatac.console.controllers.AuthApplication;
 import org.hadatac.console.controllers.studies.routes;
@@ -29,11 +30,17 @@ import org.hadatac.entity.pojo.Deployment;
 import org.hadatac.entity.pojo.Detector;
 import org.hadatac.entity.pojo.Study;
 import org.hadatac.metadata.loader.TripleProcessing;
+import org.hadatac.metadata.loader.ValueCellProcessing;
 import org.hadatac.utils.Collections;
 import org.hadatac.utils.ConfigProp;
 import org.hadatac.utils.Feedback;
 import org.hadatac.utils.State;
 import org.labkey.remoteapi.CommandException;
+
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 
 import be.objectify.deadbolt.java.actions.Group;
 import be.objectify.deadbolt.java.actions.Restrict;
@@ -73,6 +80,9 @@ public class RefreshStudy extends Controller {
     				Collections.getCollectionsName(Collections.METADATA_GRAPH));
     		accessor.add(model);
     		
+    		ValueCellProcessing cellProc = new ValueCellProcessing();
+    		Model refModel = Study.findModel(cellProc.replaceNameSpaceEx(study_uri));
+    		
     		results += Feedback.println(Feedback.WEB, "Imported Triples: ");
     		StmtIterator iter = model.listStatements();
     		while (iter.hasNext()) {
@@ -80,6 +90,32 @@ public class RefreshStudy extends Controller {
     			results += Feedback.println(Feedback.WEB, stmt);
     			nTriples++;
     		}
+    		
+    		String ref_results = "";
+    		StmtIterator iterref = refModel.listStatements();
+    		int nRefTriples = 0;
+    		while (iterref.hasNext()) {
+    			String stmt = iterref.nextStatement().toString();
+    			ref_results += stmt;
+    			nRefTriples++;
+    		}
+    		System.out.println(nRefTriples + " Ref Triples!");
+    		
+    		try {
+    			File file = new File("/Users/jason/Desktop/ref_results.txt");
+    			BufferedWriter output = new BufferedWriter(new FileWriter(file));
+    			output.write(ref_results);
+    		} catch (IOException e) {
+    			System.out.println("Invalid file path!re");
+			}
+    		
+    		if (refModel.containsAll(model)) {
+    			System.out.println("refModel.containsAll(model)!");
+    		}
+    		else if (model.containsAll(refModel)) {
+    			System.out.println("model.containsAll(refModel)!");
+    		}
+    		
     	} catch (CommandException e) {
     		if (e.getMessage().equals("Unauthorized")) {
     			return ok(syncLabkey.render("login_failed",

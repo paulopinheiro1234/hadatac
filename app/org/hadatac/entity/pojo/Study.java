@@ -17,8 +17,11 @@ import org.apache.jena.query.QueryFactory;
 import org.apache.jena.query.QuerySolution;
 import org.apache.jena.query.ResultSet;
 import org.apache.jena.query.ResultSetFactory;
+import org.apache.jena.query.ResultSetFormatter;
 import org.apache.jena.query.ResultSetRewindable;
+import org.apache.jena.rdf.model.Model;
 import org.apache.jena.sparql.engine.http.QueryExceptionHTTP;
+import org.apache.jena.sparql.resultset.RDFOutput;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServerException;
@@ -401,8 +404,7 @@ public class Study {
 		return returnStudy;
 	}
 	
-	public static ResultSet findModel(String study) {
-		ResultSetRewindable resultsrw = null;
+	public static Model findModel(String study) {
 		String studyQueryString = NameSpaces.getInstance().printSparqlNameSpaceList() +
 		"SELECT DISTINCT ?s ?p ?o" +
 		"WHERE " +
@@ -636,12 +638,16 @@ public class Study {
 			Query studyQuery = QueryFactory.create(studyQueryString);
 			QueryExecution qexec = QueryExecutionFactory.sparqlService(Collections.getCollectionsName(Collections.METADATA_SPARQL), studyQuery);
 			ResultSet results = qexec.execSelect();
-			resultsrw = ResultSetFactory.copyResults(results);
+			ResultSetRewindable resultsrw = ResultSetFactory.copyResults(results);
 			qexec.close();
+			RDFOutput output = new RDFOutput();
+			
+			return output.asModel(resultsrw);
 		} catch (QueryExceptionHTTP e) {
 			e.printStackTrace();
 		}
-		return resultsrw;
+		
+		return null;
 	}
 	
 	public static List<Study> find(State state) {
