@@ -1,17 +1,28 @@
 package org.hadatac.metadata.loader;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.StringTokenizer;
 
+import javax.swing.plaf.synth.SynthStyleFactory;
+
+import org.apache.jena.rdf.model.Model;
+import org.apache.jena.rdf.model.Property;
+import org.apache.jena.rdf.model.Resource;
+import org.apache.jena.sparql.function.library.print;
+import org.hadatac.console.views.html.deployments.newDeployment;
+import org.apache.jena.rdf.model.Literal;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.labkey.remoteapi.CommandException;
 import org.labkey.remoteapi.Connection;
 import org.labkey.remoteapi.query.DeleteRowsCommand;
+import org.labkey.remoteapi.query.ExecuteSqlCommand;
 import org.labkey.remoteapi.query.GetQueriesCommand;
 import org.labkey.remoteapi.query.GetQueriesResponse;
 import org.labkey.remoteapi.query.InsertRowsCommand;
@@ -21,6 +32,7 @@ import org.labkey.remoteapi.query.UpdateRowsCommand;
 import org.labkey.remoteapi.query.SaveRowsResponse;
 import org.labkey.remoteapi.security.GetContainersCommand;
 import org.labkey.remoteapi.security.GetContainersResponse;
+
 import org.labkey.remoteapi.security.EnsureLoginCommand;
 
 public class LabkeyDataHandler {
@@ -28,6 +40,7 @@ public class LabkeyDataHandler {
 			new HashMap< String, Map< String, List<PlainTriple> > >();
 	private Connection cn = null;
 	private String folder_path = "";
+	private List<String> tableNames = null;
 	
 	public static class PlainTriple {
 		public String sub;
@@ -35,7 +48,8 @@ public class LabkeyDataHandler {
 		public String obj;
 	}
 	
-	public LabkeyDataHandler(String labkey_site, String user_name, String password, String path){
+	public LabkeyDataHandler(String labkey_site, String user_name, 
+			String password, String path) {
 		cn = new Connection(labkey_site, user_name, password);
 		setFolderPath(path);
 	}
@@ -158,6 +172,119 @@ public class LabkeyDataHandler {
 		}
 		
 		return 0;
+	}
+	
+	public void selectInfoFromTables(String uri, Model model) throws CommandException {
+		if (null == tableNames) {
+			tableNames = getAllQueryNames();
+			System.out.println("tableNames: " + tableNames);
+		}
+		for (String table : tableNames) {
+			if (table.equals("StudyReport")) {
+				continue;
+			}
+			selectInfo(uri, model);
+		}
+	}
+	
+	public void selectInfo(String uri, Model model) throws CommandException {
+		ExecuteSqlCommand cmd = new ExecuteSqlCommand("lists");
+		ValueCellProcessing cellProc = new ValueCellProcessing();
+		
+		List<String> colNames = new ArrayList<String>();
+		if (null == tableNames) {
+			tableNames = getAllQueryNames();
+			System.out.println("tableNames: " + tableNames);
+		}
+		String query = String.format("SELECT * FROM ");
+		String prevTable = "";
+		for (String table : tableNames) {
+			colNames.addAll(getColumnNames(table, false));
+			if (table.equals("StudyReport")) {
+				continue;
+			}
+			if (!prevTable.equals("")) {
+				query += String.format(" JOIN %s %s on %s.hasURI=%s.hasURI", 
+						table, table.toLowerCase(), prevTable.toLowerCase(), table.toLowerCase());
+				prevTable = table;
+			}
+			else {
+				query += table + " " + table.toLowerCase();
+				prevTable = table;
+			}
+		}
+		query += " WHERE hasURI = \'" + cellProc.replaceNameSpaceEx(uri) + "\'";
+		System.out.println("\nquery: " + query);
+		cmd.setSql(query);
+		cmd.setTimeout(0);
+		try {
+			SelectRowsResponse response = cmd.execute(cn, folder_path);
+			System.out.println("response.getRows(): " + response.getRows());
+			for (Map<String, Object> row : response.getRows()){
+				String pri_key = "";
+				for (String the_key : colNames) {
+					if(the_key.toLowerCase().contains("uri")){
+						pri_key = the_key;
+					}
+				}
+				String sub = row.get(pri_key).toString();
+				if (!replaceIrregularCharacters(sub).equals(cellProc.replaceNameSpaceEx(uri))) {
+					continue;
+				}
+				
+				Resource subject = model.createResource(uri);
+				for (String pred : colNames) {
+					if (((String)pred).equals(pri_key)) {
+						continue;
+					}
+					Property predicate = model.createProperty(cellProc.replacePrefixEx(
+							replaceIrregularCharacters(pred.toString())));
+					
+					if (null == row.get(pred)) {
+						continue;
+					}
+					String cellValue = row.get(pred).toString();
+					System.out.println("cellValue: " + cellValue);
+					if (cellProc.isObjectSet(cellValue)) {
+						System.out.println("cellValue is Object Set");
+						StringTokenizer st;
+						if (cellValue.contains("&")) {
+							st = new StringTokenizer(cellValue, "&");
+						}
+						else {
+							st = new StringTokenizer(cellValue, ",");
+						}
+						while (st.hasMoreTokens()) {
+							Resource object = model.createResource(cellProc.replacePrefixEx(
+									replaceIrregularCharacters(st.nextToken().trim())));
+							model.add(subject, predicate, object);
+							selectInfoFromTables(object.getURI(), model);
+						}
+					}
+					else if (cellProc.isAbbreviatedURI(cellValue)) {
+						System.out.println("cellValue is Resource");
+						Resource object = model.createResource(cellProc.replacePrefixEx(cellValue));
+						model.add(subject, predicate, object);
+						selectInfoFromTables(object.getURI(), model);
+					}
+					else {
+						System.out.println("cellValue is Literal");
+						Literal object = model.createLiteral(
+								cellValue.replace("\n", " ").replace("\r", " ").replace("\"", "''"));
+						model.add(subject, predicate, object);
+					}
+				}
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		} catch (CommandException e) {
+			if (e.getMessage().equals("Unauthorized")) {
+				throw e;
+			}
+			else {
+				e.printStackTrace();
+			}
+		}
 	}
 	
 	public List<String> getAllQueryNames() throws CommandException {

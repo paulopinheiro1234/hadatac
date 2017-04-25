@@ -51,7 +51,8 @@ public class SubjectGenerator {
 		int count = 0;
 		String subjectCountQuery = NameSpaces.getInstance().printSparqlNameSpaceList() 
 				+ " SELECT (count(DISTINCT ?subjectURI) as ?subjectCount) WHERE { "
-				+ " ?subjectURI hasco:isSubjectOf chear-kb:CH-Pilot-" + pilotNum + " . }";
+				+ " ?subjectURI hasco:isSubjectOf chear-kb:CH-Pilot-" + pilotNum + " . "
+				+ " }";
 		QueryExecution qexecSubject = QueryExecutionFactory.sparqlService(Collections.getCollectionsName(Collections.METADATA_SPARQL), subjectCountQuery);
 		ResultSet subjectResults = qexecSubject.execSelect();
 		ResultSetRewindable resultsrwSubject = ResultSetFactory.copyResults(subjectResults);

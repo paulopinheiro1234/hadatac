@@ -17,8 +17,15 @@ import org.apache.jena.query.QueryFactory;
 import org.apache.jena.query.QuerySolution;
 import org.apache.jena.query.ResultSet;
 import org.apache.jena.query.ResultSetFactory;
+import org.apache.jena.query.ResultSetFormatter;
 import org.apache.jena.query.ResultSetRewindable;
+import org.apache.jena.rdf.model.Model;
+import org.apache.jena.rdf.model.ModelFactory;
+import org.apache.jena.rdf.model.Property;
+import org.apache.jena.rdf.model.RDFNode;
+import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.sparql.engine.http.QueryExceptionHTTP;
+import org.apache.jena.sparql.resultset.RDFOutput;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServerException;
@@ -36,6 +43,7 @@ import org.hadatac.console.models.FacetHandler;
 import org.hadatac.console.models.Pivot;
 import org.hadatac.data.model.MetadataAcquisitionQueryResult;
 import org.hadatac.utils.Collections;
+import org.hadatac.utils.NameSpaces;
 import org.hadatac.utils.State;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
@@ -356,42 +364,11 @@ public class Study {
 		return result;
 	}
 	
-/*	public static List<Study> find(String uri) {
-		List<Study> list = new ArrayList<Study>();
-		
-		System.out.println("uri:");
-		System.out.println(uri);
-		SolrClient solr = new HttpSolrClient(
-				Play.application().configuration().getString("hadatac.solr.data")
-				+ Collections.STUDIES);
-		SolrQuery query = new SolrQuery();
-		
-		query.set("q", "studyUri:\"" + uri + "\"");
-		query.set("sort", "started_at asc");
-		query.set("rows", "10000000");
-		
-		try {
-			QueryResponse response = solr.query(query);
-			solr.close();
-			SolrDocumentList results = response.getResults();
-			Iterator<SolrDocument> i = results.iterator();
-			while (i.hasNext()) {
-				Study study = convertFromSolr(i.next());
-				list.add(study);
-			}
-		} catch (Exception e) {
-			list.clear();
-			System.out.println("[ERROR] Study.find(String) - Exception message: " + e.getMessage());
-		}
-		
-		return list;
-	}
-	*/
 	public static Study find(String study_uri) {
 		Study returnStudy = new Study();
-		String studyQueryString = DynamicFunctions.getPrefixes() +
+		String studyQueryString = NameSpaces.getInstance().printSparqlNameSpaceList() +
 		"SELECT DISTINCT ?studyUri ?studyLabel ?proj ?studyComment (group_concat( ?agentName_ ; separator = ' & ') as ?agentName) ?institutionName " + 
-		" WHERE {        ?subUri rdfs:subClassOf hasco:Study . " + 
+		" WHERE {        ?subUri rdfs:subClassOf* hasco:Study . " + 
 		"                       ?studyUri a ?subUri . " + 
 		"           ?studyUri rdfs:label ?studyLabel  . " + 
 		"			FILTER ( ?studyUri = " + DynamicFunctions.replaceURLWithPrefix(study_uri) + " ) . " +
@@ -431,45 +408,197 @@ public class Study {
 		return returnStudy;
 	}
 	
-	/*public static Study find(String uri) {
-		//List<Study> list = new ArrayList<Study>();
-		Study returnStudy = new Study();
-		System.out.println("uri:");
-		System.out.println(uri);
-		SolrClient solr = new HttpSolrClient(
-				Play.application().configuration().getString("hadatac.solr.data")
-				+ Collections.STUDIES);
-		SolrQuery query = new SolrQuery();
+	public static Model findModel(String study) {
+		String studyQueryString = NameSpaces.getInstance().printSparqlNameSpaceList() +
+		"SELECT DISTINCT ?s ?p ?o " +
+		"WHERE " +
+		"{  " +
+		"  { " +
+		"	{  " +
+		// Study 
+		"   ?subUri rdfs:subClassOf* hasco:Study . " + 
+		"  	?s a ?subUri . " +
+		"  	?s ?p ?o . " +
+		"  	FILTER (?s = " + study + ") " +
+		"  	} " +
+		"    MINUS " +
+		"    { " +
+		// Other Studies 
+		"   ?subUri rdfs:subClassOf* hasco:Study . " + 
+		"  	?s a ?subUri . " +
+		"  	?s ?p ?o . " +
+		"  	FILTER (?s != " + study + ") " +
+		"    }  " +
+		"  } " +
+		"  UNION " + 
+		"  { " +
+		"	{  " +
+		//  Data Acquisitions, Cohort
+		"  	?subUri rdfs:subClassOf* hasco:Study . " + 
+		"  	?study a ?subUri . " +
+		"  	?s hasco:isDataAcquisitionOf|hasco:isCohortOf ?study . " + 
+		"  	?s ?p ?o . " +
+		"  	FILTER (?study = " + study + ") " +
+		"  	} " +
+		"    MINUS " +
+		"    {  " +
+		// Other Data Acquisitions, Cohort
+		"  	?subUri rdfs:subClassOf* hasco:Study . " + 
+		"  	?study a ?subUri . " +
+		"  	?s hasco:isDataAcquisitionOf|hasco:isCohortOf ?study . " + 
+		"  	?s ?p ?o . " +
+		"  	FILTER (?study != " + study + ") " +
+		"  	} " +
+		"  } " +
+		"  UNION " + 
+		"  { " +
+		"	{  " +
+		//  Cohort Subjects
+		"  	?subUri rdfs:subClassOf* hasco:Study . " + 
+		"  	?study a ?subUri . " +
+		"  	?cohort hasco:isCohortOf ?study . " +
+		"	?s hasco:isSubjectOf ?cohort . " +
+		"  	?s ?p ?o . " +
+		"  	FILTER (?study = " + study + ") " +
+		"  	} " +
+		"    MINUS " +
+		"    {  " +
+		// Other Cohort Subjects
+		"  	?subUri rdfs:subClassOf* hasco:Study . " + 
+		"  	?study a ?subUri . " +
+		"  	?cohort hasco:isCohortOf ?study . " +
+		"	?s hasco:isSubjectOf ?cohort . " +
+		"  	?s ?p ?o . " +
+		"  	FILTER (?study != " + study + ") " +
+		"  	} " +
+		"  } " +
+		"  UNION " + 
+		"  { " +
+		"	{  " +
+		//  Data Acquisition Schema and Deployment
+		"  	?subUri rdfs:subClassOf* hasco:Study . " + 
+		"  	?study a ?subUri . " +
+		"  	?da hasco:isDataAcquisitionOf ?study . " + 
+		"   ?da hasco:hasSchema|hasneto:hasDeployment ?s . " +
+		"  	?s ?p ?o . " +
+		"  	FILTER (?study = " + study + ") " +
+		"  	} " +
+		"    MINUS " +
+		"    {  " +
+		// Other Data Acquisition Schema and Deployment
+		"  	?subUri rdfs:subClassOf* hasco:Study . " + 
+		"  	?study a ?subUri . " +
+		"  	?da hasco:isDataAcquisitionOf ?study . " + 
+		"   ?da hasco:hasSchema|hasneto:hasDeployment ?s . " +
+		"  	?s ?p ?o . " +
+		"  	FILTER (?study != " + study + ") " +
+		"  	} " +
+		"  } " +
+		"  UNION " + 
+		"  { " +
+		"    { " +
+		// Data Acquisition Samples
+		"  	?subUri rdfs:subClassOf* hasco:Study . " + 
+		"  	?study a ?subUri . " +
+		"   ?da hasco:isDataAcquisitionOf ?study . " + 
+		"   ?s hasco:isMeasuredObjectOf ?da .  " +
+		"   ?s ?p ?o . " +
+		"  FILTER (?study = " + study + ") " +
+		"    } " +
+		"    MINUS " +
+		"    { " +
+		// Other Data Acquisition Samples
+		"  	?subUri rdfs:subClassOf* hasco:Study . " + 
+		"  	?study a ?subUri . " +
+		"   ?da hasco:isDataAcquisitionOf ?study . " + 
+		"   ?s hasco:isMeasuredObjectOf ?da .  " +
+		"   ?s ?p ?o . " +
+		"  	FILTER (?study != " + study + ") " +
+		"    } " +
+		"  } "  +
+		"  UNION " + 
+		"  { " +
+		"    { " +
+		// Deployment - Platform, Instrument, detector
+		"  	?subUri rdfs:subClassOf* hasco:Study .  " + 
+		"  	?study a ?subUri . " +
+		"   ?da hasco:isDataAcquisitionOf ?study . " + 
+		"  	?da hasneto:hasDeployment ?deploy .  " +
+		"	?deploy vstoi:hasPlatform|hasneto:hasInstrument|hasneto:hasDetector ?s . " +
+		"  	?s ?p ?o . " +
+		"  FILTER (?study = " + study + ") " +
+		"    } " +
+		"    MINUS " +
+		"    { " +
+		// Other Deployment - Platform, Instrument, detector
+		"  	?subUri rdfs:subClassOf* hasco:Study .  " + 
+		"  	?study a ?subUri . " +
+		"   ?da hasco:isDataAcquisitionOf ?study . " + 
+		"  	?da hasneto:hasDeployment ?deploy .  " +
+		"	?deploy vstoi:hasPlatform|hasneto:hasInstrument|hasneto:hasDetector ?s . " +
+		"  	?s ?p ?o . " +
+		"  	FILTER (?study != " + study + ") " +
+		"    } " +
+		"  } " +
+		"  UNION " + 
+		"  { " +
+		"    { " +
+		// DA Schema Attribute
+		"  	?subUri rdfs:subClassOf* hasco:Study .  " + 
+		"  	?study a ?subUri . " +
+		"  	?da hasco:isDataAcquisitionOf ?study . " +
+		"   ?da hasco:hasSchema ?schema . " +
+		"   ?s hasneto:partOfSchema ?schema . " +
+		"  	?s ?p ?o . " +
+		"  	FILTER (?study = " + study + ") " +
+		"    } " +
+		"    MINUS " +
+		"    { " +
+		// Other DA Schema Attribute
+		"  	?subUri rdfs:subClassOf* hasco:Study .  " + 
+		"  	?study a ?subUri . " +
+		"  	?da hasco:isDataAcquisitionOf ?study . " +
+		"   ?da hasco:hasSchema ?schema . " +
+		"   ?s hasneto:partOfSchema ?schema . " +
+		"  	?s ?p ?o . " +
+		"  FILTER (?study != " + study + ") " +
+		"    } " +
+		"  } " +
+		"} ";
 		
-		query.set("q", "studyUri:\"" + uri + "\"");
-		//query.set("sort", "started_at asc");
-		query.set("rows", "10000000");
-		
+		Model model = ModelFactory.createDefaultModel();
 		try {
-			QueryResponse response = solr.query(query);
-			solr.close();
-			SolrDocumentList results = response.getResults();
-			Iterator<SolrDocument> i = results.iterator();
-			while (i.hasNext()) {
-				Study study = convertFromSolr(i.next());
-				returnStudy = study;
-				//list.add(study);
-			}
-		} catch (Exception e) {
-			//list.clear();
-			System.out.println("[ERROR] Study.find(String) - Exception message: " + e.getMessage());
+			Query studyQuery = QueryFactory.create(studyQueryString);
+			QueryExecution qexec = QueryExecutionFactory.sparqlService(
+					Collections.getCollectionsName(Collections.METADATA_SPARQL), studyQuery);
+			ResultSet results = qexec.execSelect();
+			ResultSetRewindable resultsrw = ResultSetFactory.copyResults(results);
+			qexec.close();
+			
+			System.out.println("resultsrw.size(): " + resultsrw.size());
+	        while (resultsrw.hasNext()) {
+	            QuerySolution soln = resultsrw.next();
+	
+	            Resource subject = soln.getResource("s");
+	            Property property = model.createProperty(soln.getResource("p").toString());
+	            RDFNode object = soln.get("o");
+	            
+	            model.add(subject, property, object);
+	        }
+		} catch (QueryExceptionHTTP e) {
+			e.printStackTrace();
 		}
 		
-		return returnStudy;
+		return model;
 	}
-	*/
+	
 	public static List<Study> find(State state) {
 		List<Study> studies = new ArrayList<Study>();
 	    String queryString = "";
         if (state.getCurrent() == State.ACTIVE) { 
-    	   queryString = DynamicFunctions.getPrefixes() +
+    	   queryString = NameSpaces.getInstance().printSparqlNameSpaceList() +
     			    "SELECT DISTINCT ?studyUri ?studyLabel ?proj ?studyComment (group_concat( ?agentName_ ; separator = ' & ') as ?agentName) ?institutionName " + 
-    				" WHERE {        ?subUri rdfs:subClassOf hasco:Study . " + 
+    				" WHERE {        ?subUri rdfs:subClassOf* hasco:Study . " + 
     				"                       ?studyUri a ?subUri . " + 
     				"           ?studyUri rdfs:label ?studyLabel  . " + 
     				"		 OPTIONAL {?studyUri hasco:hasProject ?proj} . " +
@@ -483,9 +612,9 @@ public class Study {
     				"GROUP BY ?studyUri ?studyLabel ?proj ?studyTitle ?studyComment ?agentName ?institutionName ";
         } else {
     	   if (state.getCurrent() == State.CLOSED) {
-    		   queryString = DynamicFunctions.getPrefixes() +
+    		   queryString = NameSpaces.getInstance().printSparqlNameSpaceList() +
        			    "SELECT ?studyUri ?studyLabel ?proj ?studyComment (group_concat( ?agentName_ ; separator = ' & ') as ?agentName) ?institutionName " + 
-       				" WHERE {        ?subUri rdfs:subClassOf hasco:Study . " + 
+       				" WHERE {        ?subUri rdfs:subClassOf* hasco:Study . " + 
        				"                       ?studyUri a ?subUri . " + 
        				"           ?studyUri rdfs:label ?studyLabel  . " +
        				//"   ?studyUri prov:startedAtTime ?startdatetime .  " + 
@@ -501,9 +630,9 @@ public class Study {
        	   			//"ORDER BY DESC(?enddatetime) ";
     	   } else {
         	   if (state.getCurrent() == State.ALL) {
-        		   queryString = DynamicFunctions.getPrefixes() +
+        		   queryString = NameSpaces.getInstance().printSparqlNameSpaceList() +
            			    "SELECT ?studyUri ?studyLabel ?proj ?studyComment (group_concat( ?agentName_ ; separator = ' & ') as ?agentName ) ?institutionName " + 
-        				" WHERE {        ?subUri rdfs:subClassOf hasco:Study . " + 
+        				" WHERE {        ?subUri rdfs:subClassOf* hasco:Study . " + 
         				"                       ?studyUri a ?subUri . " + 
         				"           ?studyUri rdfs:label ?studyLabel  . " + 
         				"		 OPTIONAL {?studyUri hasco:hasProject ?proj} . " +
@@ -546,14 +675,60 @@ public class Study {
 		return this.save();
 	}
 	
-	public int delete() {
-		SolrClient solr = new HttpSolrClient(
+	public void delete() {
+		deleteStudy();
+		deleteDataCollections();
+		deleteMeasurements();
+	}
+	
+	public int deleteStudy() {
+		SolrClient study_solr = new HttpSolrClient(
 				Play.application().configuration().getString("hadatac.solr.data")
 				+ Collections.STUDIES);
 		try {
-			UpdateResponse response = solr.deleteByQuery("studyUri:\"" + studyUri + "\"");
-			solr.commit();
-			solr.close();
+			UpdateResponse response = study_solr.deleteByQuery("studyUri:\"" + studyUri + "\"");
+			study_solr.commit();
+			study_solr.close();
+			return response.getStatus();
+		} catch (SolrServerException e) {
+			System.out.println("[ERROR] Study.delete() - SolrServerException message: " + e.getMessage());
+		} catch (IOException e) {
+			System.out.println("[ERROR] Study.delete() - IOException message: " + e.getMessage());
+		} catch (Exception e) {
+			System.out.println("[ERROR] Study.delete() - Exception message: " + e.getMessage());
+		}
+		
+		return -1;
+	}
+	
+	public int deleteDataCollections() {
+		SolrClient study_solr = new HttpSolrClient(
+				Play.application().configuration().getString("hadatac.solr.data")
+				+ Collections.DATA_COLLECTION);
+		try {
+			UpdateResponse response = study_solr.deleteByQuery("study_uri:\"" + studyUri + "\"");
+			study_solr.commit();
+			study_solr.close();
+			return response.getStatus();
+		} catch (SolrServerException e) {
+			System.out.println("[ERROR] Study.delete() - SolrServerException message: " + e.getMessage());
+		} catch (IOException e) {
+			System.out.println("[ERROR] Study.delete() - IOException message: " + e.getMessage());
+		} catch (Exception e) {
+			System.out.println("[ERROR] Study.delete() - Exception message: " + e.getMessage());
+		}
+		
+		return -1;
+	}
+	
+	public int deleteMeasurements() {
+		SolrClient study_solr = new HttpSolrClient(
+				Play.application().configuration().getString("hadatac.solr.data")
+				+ Collections.DATA_ACQUISITION);
+		try {
+			UpdateResponse response = study_solr.deleteByQuery("study_uri:\"" + DynamicFunctions.replaceURLWithPrefix(studyUri) + "\"");
+			study_solr.commit();
+			study_solr.close();
 			return response.getStatus();
 		} catch (SolrServerException e) {
 			System.out.println("[ERROR] Study.delete() - SolrServerException message: " + e.getMessage());

@@ -19,21 +19,23 @@ case $response in
 esac
 
 HADATAC_HOST=$(hostname --long)
+SOLR_HOME="/data/hadatac-solr/solr" 
+GIT_HOME="/data/git/hadatac"
 
-case $HADATAC_HOST in
-    "chear.tw.rpi.edu")
-        SOLR_HOME="/data/hadatac-solr/solr" 
-        GIT_HOME="/data/git/hadatac" ;;
-    "chear-test.tw.rpi.edu")
-        SOLR_HOME="/data/hadatac-solr/solr"  
-        GIT_HOME="/data/git/hadatac";;
-    "case.tw.rpi.edu")
-        SOLR_HOME="/var/hadatac/solr"  
-        GIT_HOME="/data/git/hadatac";;
-    *)
-        SOLR_HOME="/data/hadatac-solr/solr"  
-        GIT_HOME="/data/git/hadatac";;
-esac
+#case $HADATAC_HOST in
+#    "chear.tw.rpi.edu")
+#        SOLR_HOME="/data/hadatac-solr/solr" 
+#        GIT_HOME="/data/git/hadatac" ;;
+#    "chear-test.tw.rpi.edu")
+#        SOLR_HOME="/data/hadatac-solr/solr"  
+#        GIT_HOME="/data/git/hadatac";;
+#    "case.tw.rpi.edu")
+#        SOLR_HOME="/data/hadatac-solr/solr"  
+#        GIT_HOME="/data/git/hadatac";;
+#    *)
+#        SOLR_HOME="/data/hadatac-solr/solr"  
+#        GIT_HOME="/data/git/hadatac";;
+#esac
 
 echo "Changing to Hadatac Git Directory"
 echo ""

@@ -438,10 +438,7 @@ public class UserManagement extends Controller {
 		message += Feedback.println(mode, "   Triples before [preregistration]: " + rdf.totalTriples());
 		message += Feedback.println(mode, " ");
 		
-		String ttl = "";
-		NameSpaces ns = NameSpaces.getInstance();
-		ttl = ttl + ns.printNameSpaceList();
-		
+		String ttl = NameSpaces.getInstance().printTurtleNameSpaceList();
 		ttl = ttl + "# properties: ";
 		for(String key : pred_value_map.keySet()){
 			ttl = ttl + "[" + key + "] ";

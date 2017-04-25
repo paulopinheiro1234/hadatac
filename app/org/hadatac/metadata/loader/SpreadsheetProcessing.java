@@ -66,9 +66,7 @@ public class SpreadsheetProcessing {
 
 			XSSFWorkbook workbook;
 			try {
-				// print the registered list of name spaces 
-				NameSpaces ns = NameSpaces.getInstance();
-				ttl = ttl + ns.printNameSpaceList();
+				ttl += NameSpaces.getInstance().printTurtleNameSpaceList();
 				
 				workbook = new XSSFWorkbook(file);
 

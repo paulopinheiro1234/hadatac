@@ -1,5 +1,7 @@
 package org.hadatac.entity.pojo;
 
+import org.apache.jena.query.DatasetAccessor;
+import org.apache.jena.query.DatasetAccessorFactory;
 import org.apache.jena.query.Query;
 import org.apache.jena.query.QueryExecution;
 import org.apache.jena.query.QueryExecutionFactory;
@@ -8,8 +10,18 @@ import org.apache.jena.query.QuerySolution;
 import org.apache.jena.query.ResultSet;
 import org.apache.jena.query.ResultSetFactory;
 import org.apache.jena.query.ResultSetRewindable;
+import org.apache.jena.rdf.model.Model;
+import org.apache.jena.rdf.model.ModelFactory;
+import org.apache.jena.rdf.model.Property;
+import org.apache.jena.rdf.model.Resource;
+import org.apache.jena.rdf.model.ResourceFactory;
+import org.apache.jena.rdf.model.Statement;
+import org.hadatac.metadata.loader.ValueCellProcessing;
 import org.hadatac.utils.Collections;
 import org.hadatac.utils.NameSpaces;
+import org.apache.commons.csv.CSVFormat;
+import org.apache.commons.csv.CSVRecord;
+
 
 public class Subject {
 	public String uri = "";
@@ -143,6 +155,58 @@ public class Subject {
         }
         
         return null;
+    }
+	
+	public static String checkObjectUri(String obj_uri, String attr_uri) {
+		//System.out.println("obj_uri: " + obj_uri);
+		//System.out.println("attr_uri: " + attr_uri);
+
+		ValueCellProcessing cellProc = new ValueCellProcessing();
+		attr_uri = cellProc.replacePrefixEx(attr_uri);
+		String objUri = obj_uri;
+        String queryString = NameSpaces.getInstance().printSparqlNameSpaceList()
+                + " SELECT ?s ?o WHERE {"
+                + " ?ar hasco:hasReference <" + attr_uri + "> . "
+                + " ?ar rdfs:label ?l ."
+                + " ?s hasco:hasAssociatedObject ?o . "
+                + " ?s rdfs:label ?l . "       
+                + " }";
+        
+        Query query = QueryFactory.create(queryString);
+        QueryExecution qexec = QueryExecutionFactory.sparqlService(
+                Collections.getCollectionsName(Collections.METADATA_SPARQL), query);
+        ResultSet results = qexec.execSelect();
+        ResultSetRewindable resultsrw = ResultSetFactory.copyResults(results);
+        qexec.close();
+        
+        //System.out.println("resultsrw.size(): " + resultsrw.size());
+        if (resultsrw.size() > 0) {
+            QuerySolution soln = resultsrw.next();
+            if (null != soln.getResource("o")) {
+            	String attributeAssociation = soln.getResource("o").toString();
+            	//System.out.println("attributeAssociation: " + attributeAssociation);
+            	if (attributeAssociation.equals(cellProc.replacePrefixEx("chear-kb:ObjectTypeMother"))) {
+            		String motherUri = obj_uri + "-mother";
+            		
+            		Model model = ModelFactory.createDefaultModel();
+            		DatasetAccessor accessor = DatasetAccessorFactory.createHTTP(
+            				Collections.getCollectionsName(Collections.METADATA_GRAPH));
+            		model.add(model.createResource(motherUri), 
+            				model.createProperty("rdf:type"),
+            				model.createResource(cellProc.replacePrefixEx("sio:Human")));
+            		
+            		model.add(model.createResource(motherUri), 
+            				model.createProperty(cellProc.replacePrefixEx("chear:Mother")),
+            				model.createResource(obj_uri));
+
+            		accessor.add(model);
+            		objUri = motherUri;
+            		//System.out.println("================================== Changed to: " + motherUri);
+            	}
+            }
+        }
+        
+        return objUri;
     }
 }
 

@@ -93,9 +93,8 @@ public class Downloads extends Controller {
             return ok(completeAnnotation.render("Annotation operation finished."));       		
     	}
     	
-    	NameSpaces ns = NameSpaces.getInstance();
     	String preamble = FRAG_START_PREAMBLE;
-    	preamble += ns.printNameSpaceList();
+    	preamble += NameSpaces.getInstance().printTurtleNameSpaceList();
     	preamble += "\n";
 
     	/* 
