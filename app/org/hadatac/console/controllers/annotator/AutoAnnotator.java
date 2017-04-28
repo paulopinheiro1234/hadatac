@@ -25,7 +25,7 @@ import org.hadatac.console.controllers.annotator.routes;
 import org.hadatac.console.controllers.annotator.AnnotationLog;
 import org.hadatac.console.http.DeploymentQueries;
 import org.hadatac.console.http.ResumableUpload;
-import org.hadatac.console.models.AssignOwnerForm;
+import org.hadatac.console.models.AssignOptionForm;
 import org.hadatac.console.models.CSVAnnotationHandler;
 import org.hadatac.console.models.LabKeyLoginForm;
 import org.hadatac.console.models.SparqlQueryResults;
@@ -175,11 +175,11 @@ public class AutoAnnotator extends Controller {
 	
 	@Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
     public static Result assignFileOwner(String ownerEmail, String selectedFile) {	
-    	return ok(assignOwner.render(Form.form(AssignOwnerForm.class),
-    								 User.getUserEmails(),
-    								 routes.AutoAnnotator.processForm(ownerEmail, selectedFile),
-    								 "Selected File",
-    								 selectedFile));
+    	return ok(assignOption.render(User.getUserEmails(),
+    			routes.AutoAnnotator.processOwnerForm(ownerEmail, selectedFile),
+    			"Owner", 
+    			"Selected File", 
+    			selectedFile));
 	}
 	
 	@Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
@@ -188,17 +188,17 @@ public class AutoAnnotator extends Controller {
 	}
 	
     @Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
-    public static Result processForm(String ownerEmail, String selectedFile) {
-        Form<AssignOwnerForm> form = Form.form(AssignOwnerForm.class).bindFromRequest();
-        AssignOwnerForm data = form.get();
+    public static Result processOwnerForm(String ownerEmail, String selectedFile) {
+        Form<AssignOptionForm> form = Form.form(AssignOptionForm.class).bindFromRequest();
+        AssignOptionForm data = form.get();
         
         if (form.hasErrors()) {
         	System.out.println("HAS ERRORS");
-            return badRequest(assignOwner.render(Form.form(AssignOwnerForm.class),
-					 User.getUserEmails(),
-					 routes.AutoAnnotator.processForm(ownerEmail, selectedFile),
-					 "Selected File",
-					 selectedFile));
+            return badRequest(assignOption.render(User.getUserEmails(),
+            		routes.AutoAnnotator.processOwnerForm(ownerEmail, selectedFile),
+            		"Owner",
+            		"Selected File",
+            		selectedFile));
         } else {
         	DataFile file = DataFile.findByName(ownerEmail, selectedFile);
             if (file == null) {
@@ -208,7 +208,58 @@ public class AutoAnnotator extends Controller {
             	file.setProcessStatus(false);
             	file.setUploadTime(new SimpleDateFormat("yyyy/MM/dd HH:mm:ss").format(new Date()));
             }
-            file.setOwnerEmail(data.getUser());
+            file.setOwnerEmail(data.getOption());
+            file.save();
+    		return redirect(routes.AutoAnnotator.index());
+        }
+    }
+    
+	@Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
+    public static Result assignDataAcquisition(String dataAcquisitionUri, String selectedFile) {
+		ValueCellProcessing cellProc = new ValueCellProcessing();
+		List<String> dataAcquisitionURIs = new ArrayList<String>();
+		DataAcquisition.findAll().forEach((da) -> dataAcquisitionURIs.add(
+				cellProc.replaceNameSpaceEx(da.getUri())));
+		
+    	return ok(assignOption.render(dataAcquisitionURIs,
+    			routes.AutoAnnotator.processDataAcquisitionForm(dataAcquisitionUri, selectedFile),
+    			"Data Acquisition",
+    			"Selected File",
+    			selectedFile));
+	}
+	
+	@Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
+    public static Result postAssignDataAcquisition(String dataAcquisitionUri, String selectedFile) {
+		return assignDataAcquisition(dataAcquisitionUri, selectedFile);
+	}
+	
+    @Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
+    public static Result processDataAcquisitionForm(String dataAcquisitionUri, String selectedFile) {
+        Form<AssignOptionForm> form = Form.form(AssignOptionForm.class).bindFromRequest();
+        AssignOptionForm data = form.get();
+        
+        ValueCellProcessing cellProc = new ValueCellProcessing();
+		List<String> dataAcquisitionURIs = new ArrayList<String>();
+		DataAcquisition.findAll().forEach((da) -> dataAcquisitionURIs.add(
+				cellProc.replaceNameSpaceEx(da.getUri())));
+        
+        if (form.hasErrors()) {
+        	System.out.println("HAS ERRORS");
+            return badRequest(assignOption.render(dataAcquisitionURIs,
+					 routes.AutoAnnotator.processDataAcquisitionForm(dataAcquisitionUri, selectedFile),
+					 "Data Acquisition",
+					 "Selected File",
+					 selectedFile));
+        } else {
+        	DataFile file = DataFile.findByName(dataAcquisitionUri, selectedFile);
+            if (file == null) {
+            	file = new DataFile();
+            	file.setFileName(selectedFile);
+            	file.setOwnerEmail(AuthApplication.getLocalUser(session()).getEmail());
+            	file.setProcessStatus(false);
+            	file.setUploadTime(new SimpleDateFormat("yyyy/MM/dd HH:mm:ss").format(new Date()));
+            }
+            file.setDataAcquisitionUri(cellProc.replacePrefixEx(data.getOption()));
             file.save();
     		return redirect(routes.AutoAnnotator.index());
         }
@@ -362,27 +413,41 @@ public class AutoAnnotator extends Controller {
 		return true;
 	}
 	
+	private static String getProperDataAcquisitionUri(String fileName) {
+		String base_name = FilenameUtils.getBaseName(fileName);
+		List<DataAcquisition> da_list = DataAcquisition.findAll();
+		for(DataAcquisition dc : da_list){
+			ValueCellProcessing cellProc = new ValueCellProcessing();
+			String abbrevUri = cellProc.replaceNameSpaceEx(dc.getUri());
+			String qname = abbrevUri.split(":")[1];
+			if(base_name.startsWith(qname)){
+				return dc.getUri();
+			}
+		}
+		
+		return null;
+	}
+	
     public static boolean annotateCSVFile(DataFile dataFile) {
-    	String file_name = dataFile.getFileName();
-    	String base_name = FilenameUtils.getBaseName(file_name);
-    	
+    	String file_name = dataFile.getFileName();    	
     	AnnotationLog log = new AnnotationLog();
     	log.setFileName(file_name);
 	
 		String dc_uri = null;
 		String deployment_uri = null;
 		String schema_uri = null;
-		List<DataAcquisition> da_list = DataAcquisition.findAll();
-		for(DataAcquisition dc : da_list){
+		
+		if (null != dataFile) {
 			ValueCellProcessing cellProc = new ValueCellProcessing();
-			String qname = cellProc.replaceNameSpaceEx(dc.getUri()).split(":")[1];
-			if(base_name.startsWith(qname)){
-				dc_uri = dc.getUri();
-				deployment_uri = dc.getDeploymentUri();
-				schema_uri = dc.getSchemaUri();
-				break;
+			DataAcquisition dataAcquisition = DataAcquisition.findByUri(
+					cellProc.replacePrefixEx(dataFile.getDataAcquisitionUri()));
+			if (null != dataAcquisition) {
+				dc_uri = dataAcquisition.getUri();
+				deployment_uri = dataAcquisition.getDeploymentUri();
+				schema_uri = dataAcquisition.getSchemaUri();
 			}
 		}
+		
 		if (dc_uri == null) {
 			log.addline(Feedback.println(Feedback.WEB, String.format("[ERROR] Cannot find the target data acquisition: %s", file_name)));
 			log.save();
@@ -720,6 +785,8 @@ public class AutoAnnotator extends Controller {
     		dataFile.setOwnerEmail(AuthApplication.getLocalUser(session()).getEmail());
     		dataFile.setProcessStatus(false);
     		dataFile.setUploadTime(new SimpleDateFormat("yyyy/MM/dd HH:mm:ss").format(new Date()));
+    		String dataAcquisitionUri = getProperDataAcquisitionUri(resumableFilename);
+    		dataFile.setDataAcquisitionUri(dataAcquisitionUri == null ? "" : dataAcquisitionUri);
     		dataFile.save();
     		return(ok("Upload finished"));
         } else {

@@ -14,6 +14,7 @@ import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.client.solrj.response.UpdateResponse;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
+import org.hadatac.metadata.loader.ValueCellProcessing;
 import org.hadatac.utils.Collections;
 import org.hadatac.utils.State;
 
@@ -22,6 +23,8 @@ import play.Play;
 public class DataFile {
 	@Field("owner_email")
 	private String ownerEmail;
+	@Field("acquisition_uri")
+	private String dataAcquisitionUri;
 	@Field("dataset_uri")
 	private String datasetUri;
 	@Field("file_name")
@@ -35,6 +38,7 @@ public class DataFile {
 	
 	public DataFile() {
 		ownerEmail = "";
+		dataAcquisitionUri = "";
 		datasetUri = "";
 		fileName = "";
 		uploadTime = "";
@@ -47,6 +51,13 @@ public class DataFile {
 	}
 	public void setOwnerEmail(String ownerEmail) {
 		this.ownerEmail = ownerEmail;
+	}
+	
+	public String getDataAcquisitionUri() {
+		return dataAcquisitionUri;
+	}
+	public void setDataAcquisitionUri(String dataAcquisitionUri) {
+		this.dataAcquisitionUri = dataAcquisitionUri;
 	}
 	
 	public String getDatasetUri() {
@@ -122,7 +133,10 @@ public class DataFile {
 	
 	public static DataFile convertFromSolr(SolrDocument doc) {
 		DataFile object = new DataFile();
+		ValueCellProcessing cellProc = new ValueCellProcessing();
+		
 		object.setOwnerEmail(doc.getFieldValue("owner_email").toString());
+		object.setDataAcquisitionUri(cellProc.replaceNameSpaceEx(doc.getFieldValue("acquisition_uri").toString()));
 		object.setDatasetUri(doc.getFieldValue("dataset_uri").toString());
 		object.setFileName(doc.getFieldValue("file_name").toString());
 		object.setProcessStatus(Boolean.parseBoolean(doc.getFieldValue("processed").toString()));

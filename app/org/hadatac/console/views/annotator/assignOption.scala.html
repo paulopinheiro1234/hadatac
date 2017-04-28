@@ -1,6 +1,6 @@
-@(assignOwnerForm : Form[org.hadatac.console.models.AssignOwnerForm],
-  ownerOptions : List[String],
+@(ownerOptions : List[String],
   action : play.mvc.Call, 
+  title : String,
   targetType : String,
   targetValue : String)
 
@@ -11,13 +11,13 @@
 @import org.hadatac.console.controllers.triplestore._
 @import org.hadatac.console.controllers._
 
-@main("Assign Owner") {
+@main("Assign " + title) {
 
 <script type="text/javascript">
    function checkform() {
       var cansubmit = true;
 
-      if (document.getElementById('user').value.length == 0) {
+      if (document.getElementById('option').value.length == 0) {
           cansubmit = false;
       }
          
@@ -30,16 +30,16 @@
 </script>
 
   <div class="container">
-    <h2>Assign Owner</h2>
+    <h2>Assign @title</h2>
 
-    <form class="form-horizontal" name="assignOwner" method="post" action="@action">
+    <form class="form-horizontal" name="assignOption" method="post" action="@action">
 
     <div class="form-group">
 		 <label>@targetType</label> <br>
 		 @targetValue <br>
 		 <br>
-         <label>New Owner</label> 
-         <select class="form-control col-sm-6" id="user" name="user" onchange="checkform()" >
+         <label>New @title</label> 
+         <select class="form-control col-sm-6" id="option" name="option" onchange="checkform()" >
             <option value=""></option>
             @for(opt <- ownerOptions) {
                 <option value="@opt">@opt</option>
@@ -48,7 +48,7 @@
      </div>
           
       <div class="form-group" class="col-sm-6 col-offset-3">
-          <input class="btn btn-success" role="button" id="submitbutton" type="submit" value="Assign Owner" disabled="disabled" />
+          <input class="btn btn-success" role="button" id="submitbutton" type="submit" value="Assign @title" disabled="disabled" />
       </div>
       
    </form>    

@@ -201,7 +201,10 @@ GET	    /hadatac/annotator/log                     org.hadatac.console.controlle
 POST	/hadatac/annotator/log                     org.hadatac.console.controllers.annotator.AutoAnnotator.checkAnnotationLog(file_name : String)
 GET	    /hadatac/annotator/file/owner		       org.hadatac.console.controllers.annotator.AutoAnnotator.assignFileOwner(ownerEmail: String, file: String)
 POST	/hadatac/annotator/file/owner     	       org.hadatac.console.controllers.annotator.AutoAnnotator.postAssignFileOwner(ownerEmail: String, file: String)
-POST	/hadatac/annotator/file/owner/form     	   org.hadatac.console.controllers.annotator.AutoAnnotator.processForm(ownerEmail: String, file : String)
+POST	/hadatac/annotator/file/owner/form     	   org.hadatac.console.controllers.annotator.AutoAnnotator.processOwnerForm(ownerEmail: String, file : String)
+GET	    /hadatac/annotator/file/acquisition		   org.hadatac.console.controllers.annotator.AutoAnnotator.assignDataAcquisition(dataAcquisitionUri: String, file: String)
+POST	/hadatac/annotator/file/acquisition        org.hadatac.console.controllers.annotator.AutoAnnotator.postAssignDataAcquisition(dataAcquisitionUri: String, file: String)
+POST	/hadatac/annotator/file/acquisition/form   org.hadatac.console.controllers.annotator.AutoAnnotator.processDataAcquisitionForm(dataAcquisitionUri: String, file : String)
 
 # metadata store management URLs
 GET     /hadatac/ts/clean                          org.hadatac.console.controllers.triplestore.Clean.clean(oper: String)
