@@ -23,7 +23,7 @@ import org.hadatac.data.api.DataFactory;
 import org.hadatac.data.loader.ccsv.Parser;
 import org.hadatac.data.loader.util.Arguments;
 import org.hadatac.data.loader.util.FileFactory;
-import org.hadatac.data.model.DatasetParsingResult;
+import org.hadatac.data.model.ParsingResult;
 import org.hadatac.utils.Feedback;
 import org.hadatac.utils.NameSpaces;
 
@@ -232,13 +232,12 @@ public class Downloads extends Controller {
 				return ok(completeAnnotation.render("Error aving CCSV file locally. Please restart form."));
 			}
 		    
-		    DatasetParsingResult result = LoadCCSV.playLoadCCSV();
+		    ParsingResult result = LoadCCSV.playLoadCCSV();
 			return ok(completeAnnotation.render(result.getMessage()));
 		    
     	}
     	
 		return ok(completeAnnotation.render("Error processing form: unspecified download operation."));
-    	
     }
 
 }

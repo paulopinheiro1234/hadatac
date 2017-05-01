@@ -24,7 +24,7 @@ import org.hadatac.console.views.html.dataacquisitionsearch.*;
 import org.hadatac.data.loader.ccsv.Parser;
 import org.hadatac.data.loader.util.Arguments;
 import org.hadatac.data.loader.util.FileFactory;
-import org.hadatac.data.model.DatasetParsingResult;
+import org.hadatac.data.model.ParsingResult;
 import org.hadatac.utils.Feedback;
 import org.kohsuke.args4j.Option;
 
@@ -42,7 +42,7 @@ public class LoadCCSV extends Controller {
     	return ok(loadCCSV.render(oper, ""));
     }
 
-    public static DatasetParsingResult playLoadCCSV() {
+    public static ParsingResult playLoadCCSV() {
     	int status = 0;
         String message = "";
 		Arguments arguments = new Arguments();
@@ -63,15 +63,15 @@ public class LoadCCSV extends Controller {
 			if (arguments.getInputType().equals("CCSV")) {
 				Parser parser = new Parser();
 				if (arguments.isPv()) {
-					DatasetParsingResult result = parser.validate(Feedback.WEB, files);
+					ParsingResult result = parser.validate(Feedback.WEB, files);
 					status = result.getStatus();
 					message += result.getMessage();
 				} else {
-					DatasetParsingResult result = parser.validate(Feedback.WEB, files);
+					ParsingResult result = parser.validate(Feedback.WEB, files);
 					status = result.getStatus();
 					message += result.getMessage();
 					if (status == 0) {
-						DatasetParsingResult result_parse = parser.index(Feedback.WEB);
+						ParsingResult result_parse = parser.index(Feedback.WEB);
 						status = result_parse.getStatus();
 						message += result_parse.getMessage();
 					}
@@ -88,7 +88,7 @@ public class LoadCCSV extends Controller {
 		}
 		
 		message += "[" + new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()) + "] end of file";
-	    return new DatasetParsingResult(status, message);
+	    return new ParsingResult(status, message);
    }
     
     @BodyParser.Of(value = BodyParser.MultipartFormData.class, maxLength = 500 * 1024 * 1024)
@@ -112,17 +112,17 @@ public class LoadCCSV extends Controller {
     				try {
     					isFile.close();
     				} catch (Exception e) {
-    					return ok (loadCCSV.render("fail", "Could not save uploaded file."));
+    					return ok(loadCCSV.render("fail", "Could not save uploaded file."));
     				}
     			} catch (Exception e) {
-    				return ok (loadCCSV.render("fail", "Could not process uploaded file."));
+    				return ok(loadCCSV.render("fail", "Could not process uploaded file."));
     			}
     		} catch (FileNotFoundException e1) {
-    			return ok (loadCCSV.render("fail", "Could not find uploaded file"));
+    			return ok(loadCCSV.render("fail", "Could not find uploaded file"));
     		}
     		return ok(loadCCSV.render("loaded", "File uploaded successfully."));
     	} else {
-    		return ok (loadCCSV.render("fail", "Error uploading file. Please try again."));
+    		return ok(loadCCSV.render("fail", "Error uploading file. Please try again."));
     	} 
     }
 }

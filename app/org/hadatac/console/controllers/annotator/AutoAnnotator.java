@@ -37,7 +37,7 @@ import org.hadatac.console.views.html.*;
 import org.hadatac.data.api.DataFactory;
 import org.hadatac.data.loader.SampleGenerator;
 import org.hadatac.data.loader.SubjectGenerator;
-import org.hadatac.data.model.DatasetParsingResult;
+import org.hadatac.data.model.ParsingResult;
 import org.hadatac.entity.pojo.DataFile;
 import org.hadatac.entity.pojo.Measurement;
 import org.hadatac.entity.pojo.DataAcquisition;
@@ -525,7 +525,7 @@ public class AutoAnnotator extends Controller {
 		}
 	    
 	    // Parse and load the generated CCSV file
-	    DatasetParsingResult result = LoadCCSV.playLoadCCSV();
+	    ParsingResult result = LoadCCSV.playLoadCCSV();
 	    log.addline(result.getMessage());
 		log.save();
 		if(result.getStatus() == 0){

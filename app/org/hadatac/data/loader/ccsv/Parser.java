@@ -15,7 +15,7 @@ import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.impl.HttpSolrClient;
 import org.hadatac.data.loader.util.FileFactory;
-import org.hadatac.data.model.DatasetParsingResult;
+import org.hadatac.data.model.ParsingResult;
 import org.hadatac.entity.pojo.DataAcquisition;
 import org.hadatac.entity.pojo.Dataset;
 import org.hadatac.entity.pojo.Deployment;
@@ -41,8 +41,8 @@ public class Parser {
 		hadatacKb = null;
 	}
 	
-	public DatasetParsingResult validate(int mode, FileFactory files) throws IOException {
-		DatasetParsingResult result = null;
+	public ParsingResult validate(int mode, FileFactory files) throws IOException {
+		ParsingResult result = null;
 		String message = "";
 		Model model;
 		String preamble;
@@ -75,10 +75,10 @@ public class Parser {
 		
 		files.closeFile("ccsv", "r");
 		
-		return new DatasetParsingResult(result.getStatus(), message);
+		return new ParsingResult(result.getStatus(), message);
 	}
 	
-	public DatasetParsingResult index(int mode) {
+	public ParsingResult index(int mode) {
 		System.out.println("indexing...");
 		
 		DataAcquisition dataAcquisition = DataAcquisition.create(hadatacCcsv, hadatacKb);
@@ -89,12 +89,12 @@ public class Parser {
 			hadatacKb.setDataAcquisition(dataAcquisition);
 		}
 		hadatacKb.getDataAcquisition().save();
-		DatasetParsingResult result = indexMeasurements();
+		ParsingResult result = indexMeasurements();
 
-		return new DatasetParsingResult(result.getStatus(), result.getMessage());
+		return new ParsingResult(result.getStatus(), result.getMessage());
 	}
 	
-	private DatasetParsingResult indexMeasurements(){
+	private ParsingResult indexMeasurements(){
 		System.out.println("indexMeasurements()...");
 		String message = "";
 		
@@ -103,7 +103,7 @@ public class Parser {
 		} catch (IOException e) {
 			e.printStackTrace();
 			message += "[ERROR] Fail to open the csv file\n";
-			return new DatasetParsingResult(1, message);
+			return new ParsingResult(1, message);
 		}
 		Iterable<CSVRecord> records = null;
 		try {
@@ -111,7 +111,7 @@ public class Parser {
 		} catch (IOException e) {
 			e.printStackTrace();
 			message += "[ERROR] Fail to parse header of the csv file\n";
-			return new DatasetParsingResult(1, message);
+			return new ParsingResult(1, message);
 		}
 		int total_count = 0;
 		int batch_size = 10000;
@@ -236,7 +236,7 @@ public class Parser {
 							System.out.println("[ERROR] SolrClient.close - e.Message: " + e1.getMessage());
 							message += "[ERROR] Fail to close solr\n";
 						}
-						return new DatasetParsingResult(1, message);
+						return new ParsingResult(1, message);
 					}
 				}
 			}
@@ -250,13 +250,13 @@ public class Parser {
 				solr.close();
 				System.out.println("[ERROR] SolrClient.commit - e.Message: " + e.getMessage());
 				message += "[ERROR] Fail to commit to solr\n";
-				return new DatasetParsingResult(1, message);
+				return new ParsingResult(1, message);
 			}
 			files.closeFile("csv", "r");
 		} catch (IOException e) {
 			e.printStackTrace();
 			message += "[ERROR] Fail to close the csv file\n";
-			return new DatasetParsingResult(1, message);
+			return new ParsingResult(1, message);
 		}
 		
 		hadatacKb.getDataAcquisition().addNumberDataPoints(total_count);
@@ -269,10 +269,10 @@ public class Parser {
 			System.out.println("[ERROR] SolrClient.close - e.Message: " + e.getMessage());
 			message += "[ERROR] Fail to close solr\n";
 		}
-		return new DatasetParsingResult(0, message);
+		return new ParsingResult(0, message);
 	}
 	
-	private DatasetParsingResult loadFromKb(int mode) {
+	private ParsingResult loadFromKb(int mode) {
 		System.out.println("loadFromKb is called!");
 		
 		String message = "";
@@ -281,7 +281,7 @@ public class Parser {
 		if (hadatacCcsv.getDataAcquisition().getStatus() > 0) {
 			if (hadatacKb.getDataAcquisition() == null) {
 				message += Feedback.println(mode, "[ERROR] Data Acquisition not found in the knowledge base.");
-				return new DatasetParsingResult(1, message);
+				return new ParsingResult(1, message);
 			} 
 			else {
 				message += Feedback.println(mode, "[OK] Data Acquisition found on the knowledge base.");
@@ -290,7 +290,7 @@ public class Parser {
 		else {
 			if (hadatacKb.getDataAcquisition() != null) {
 				message += Feedback.println(mode, "[ERROR] Data Acquisition already exists in the knowledge base.");
-				return new DatasetParsingResult(1, message);
+				return new ParsingResult(1, message);
 			} 
 			else {
 				message += Feedback.println(mode, "[OK] Data Acquisition does not exist in the knowledge base.");
@@ -335,10 +335,10 @@ public class Parser {
 		// measurement types
 		hadatacKb.getDataset().setMeasurementTypes(MeasurementType.find(hadatacCcsv));
 		
-		return new DatasetParsingResult(0, message);
+		return new ParsingResult(0, message);
 	}
 	
-	private DatasetParsingResult loadFromPreamble(int mode, Model model) {
+	private ParsingResult loadFromPreamble(int mode, Model model) {
 		String message = "";
 		
 		// load hadatac
@@ -346,7 +346,7 @@ public class Parser {
 		if (hadatacCcsv == null) {
 			System.out.println("hadatacCcsv == null");
 			message += Feedback.println(mode, "[ERROR] Preamble does not contain a single hadatac:KnowledgeBase.");
-			return new DatasetParsingResult(1, message);
+			return new ParsingResult(1, message);
 		} else {
 			System.out.println("[OK] Preamble contains a single hadatac:KnowledgeBase: <" + hadatacCcsv.getLocalName() + ">");
 			message += Feedback.println(mode, "[OK] Preamble contains a single hadatac:KnowledgeBase: <" + hadatacCcsv.getLocalName() + ">");
@@ -356,7 +356,7 @@ public class Parser {
 		hadatacCcsv.setDataset(Dataset.find(model));
 		if (hadatacCcsv.getDataset() == null) {
 			message += Feedback.println(mode, "[ERROR] Preamble does not contain a single vstoi:Dataset.");
-			return new DatasetParsingResult(1, message);
+			return new ParsingResult(1, message);
 		} else {
 			System.out.println("[OK] Preamble contains a single vstoi:Dataset: <" + hadatacCcsv.getDataset().getLocalName() + ">");
 			message += Feedback.println(mode, "[OK] Preamble contains a single vstoi:Dataset: <" + hadatacCcsv.getDataset().getLocalName() + ">");
@@ -366,7 +366,7 @@ public class Parser {
 		hadatacCcsv.setDataAcquisition(DataAcquisition.find(model, hadatacCcsv.getDataset()));;
 		if (hadatacCcsv.getDataAcquisition() == null) {
 			message += Feedback.println(mode, "[ERROR] Preamble does not contain a single hasneto:DataAcquisition.");
-			return new DatasetParsingResult(1, message);
+			return new ParsingResult(1, message);
 		} 
 		else {
 			System.out.println("[OK] Preamble contains a single hasneto:DataAcquisition: <" + 
@@ -381,7 +381,7 @@ public class Parser {
 			hadatacCcsv.setDeployment(Deployment.find(model, hadatacCcsv.getDataAcquisition()));
 			if (hadatacCcsv.getDeployment() == null) {
 				message += Feedback.println(mode, "[ERROR] This hasneto:DataAcquisition requires a vstoi:Deployment that is not specified.");
-				return new DatasetParsingResult(1, message);
+				return new ParsingResult(1, message);
 			} else {
 				message += Feedback.println(mode, "[OK] This hasneto:DataAcquisition requires a vstoi:Deployment that is specified: <" + 
 						hadatacCcsv.getDeployment().getLocalName() + ">");
@@ -395,7 +395,7 @@ public class Parser {
 		if (hadatacCcsv.getDataset().getMeasurementTypes().isEmpty()) {
 			System.out.println("Measurement is empty");
 			message += Feedback.println(mode, "[ERROR] Preamble does not contain any well described measurement types.");
-			return new DatasetParsingResult(1, message);
+			return new ParsingResult(1, message);
 		} else {
 			message += Feedback.print(mode, "[OK] Preamble contains the following well described measurement types: ");
 			Iterator<MeasurementType> i = hadatacCcsv.getDataset().getMeasurementTypes().iterator();
@@ -405,7 +405,7 @@ public class Parser {
 			message += Feedback.println(mode, "");
 		}
 		
-		return new DatasetParsingResult(0, message);
+		return new ParsingResult(0, message);
 	}
 	
 	private String getPreamble() throws IOException {

@@ -40,6 +40,7 @@ import org.hadatac.utils.Feedback;
 import org.hadatac.utils.NameSpaces;
 import org.labkey.remoteapi.CommandException;
 
+import org.hadatac.data.model.ParsingResult;
 import play.mvc.Controller;
 
 public class TripleProcessing {
@@ -311,7 +312,7 @@ public class TripleProcessing {
     	}
     }
     
-    public static String importDataAcquisition(String labkey_site, String user_name, 
+    public static ParsingResult importDataAcquisition(String labkey_site, String user_name, 
     		String password, String path, List<String> list_names) throws CommandException {
     	
     	final SysUser user = AuthApplication.getLocalUser(Controller.session());
@@ -327,7 +328,15 @@ public class TripleProcessing {
 		String ret = loadTriples(loader, list_names, mapSheets, mapPreds);
 		
 		if(!ret.equals("")){
-			return (message + ret);
+			return new ParsingResult(1, message + ret);
+		}
+		
+		String filePath = TTL_DIR + "labkey.ttl";
+		message += parseTriplesToTTL(Feedback.WEB, filePath, mapSheets, mapPreds);
+		ParsingResult isValid = verifyTTL(Feedback.WEB, filePath);
+		message += isValid.getMessage();
+		if (isValid.getStatus() != 0) {
+			return new ParsingResult(1, message);
 		}
 		
 		for(String queryName : mapSheets.keySet()){
@@ -431,6 +440,69 @@ public class TripleProcessing {
 			}
 		}
 		
+		return new ParsingResult(0, message);
+    }
+    
+    private static ParsingResult verifyTTL(int mode, String filePath) {
+		String listing = "";
+		try {
+			listing = URLEncoder.encode(SpreadsheetProcessing.printFileWithLineNumber(mode, filePath), "UTF-8");
+		} catch (UnsupportedEncodingException e) {
+			e.printStackTrace();
+		};
+		
+		String message = "";
+		message += Feedback.println(mode, " ");
+		message += Feedback.println(mode, "   Generated " + filePath + " and stored locally.");
+		try {
+			RDFDataMgr.loadModel(filePath);
+			message += Feedback.println(mode, " ");
+			message += Feedback.print(mode, "SUCCESS parsing the document!");
+			message += Feedback.println(mode, " ");
+			message += Feedback.println(mode, "==== TURTLE (TTL) CODE GENERATED FROM LABKEY ====");
+			message += listing;
+		} catch (Exception e) {
+			message += Feedback.println(mode, " ");
+			message += Feedback.print(mode, "ERROR parsing the document!");
+			message += Feedback.println(mode, " ");
+			message += e.getMessage();
+			message += Feedback.println(mode, " ");
+			message += Feedback.println(mode, " ");
+			message += Feedback.println(mode, "==== TURTLE (TTL) CODE GENERATED FROM LABKEY ====");
+			message += listing;
+			return new ParsingResult(1, message);
+		}
+		
+		return new ParsingResult(0, message);
+    }
+    
+    private static String parseTriplesToTTL(int mode, String filePath, 
+    		Map< String, Map< String, List<PlainTriple> > > mapSheets, 
+    		Map< String, List<String> > mapPreds) {
+    	
+    	String message = "";
+		message += Feedback.println(mode, "   Parsing triples from LABKEY " );
+		message += Feedback.println(mode, " ");
+		
+		String ttl = NameSpaces.getInstance().printTurtleNameSpaceList();
+		for(String queryName : mapSheets.keySet()) {
+			Map< String, List<PlainTriple> > sheet = mapSheets.get(queryName);
+			message += Feedback.print(mode, "   Processing sheet " + queryName + "  ()   ");
+			for (int i = queryName.length(); i < 25; i++) {
+				message += Feedback.print(mode, ".");
+			}
+			SpreadsheetParsingResult result = generateTTL(mode, sheet, mapPreds.get(queryName));
+			ttl = ttl + "\n# concept: " + queryName + result.getTurtle() + "\n";
+			message += result.getMessage();
+		}
+
+		try {
+			FileUtils.writeStringToFile(new File(filePath), ttl);
+		} catch (IOException e) {
+			message += e.getMessage();
+			return message;
+		}
+		
 		return message;
     }
 
@@ -450,66 +522,17 @@ public class TripleProcessing {
 				new HashMap< String, List<String> >();
 		
 		String ret = loadTriples(loader, list_names, mapSheets, mapPreds);
-		if(!ret.equals("")){
+		if(!ret.equals("")) {
 			return (message + ret);
 		}
 		
-		message += Feedback.println(mode, "   Parsing triples from LABKEY " );
-		message += Feedback.println(mode, " ");
-		
-		String ttl = NameSpaces.getInstance().printTurtleNameSpaceList();
-		for(String queryName : mapSheets.keySet()){
-			Map< String, List<PlainTriple> > sheet = mapSheets.get(queryName);
-			message += Feedback.print(mode, "   Processing sheet " + queryName + "  ()   ");
-			for (int i = queryName.length(); i < 25; i++) {
-				message += Feedback.print(mode, ".");
-			}
-			SpreadsheetParsingResult result = generateTTL(mode, sheet, mapPreds.get(queryName));
-			ttl = ttl + "\n# concept: " + queryName + result.getTurtle() + "\n";
-			message += result.getMessage();
-		}
-
-		String fileName = "";
-		try {
-			fileName = TTL_DIR + "labkey.ttl";
-			FileUtils.writeStringToFile(new File(fileName), ttl);
-		} catch (IOException e) {
-			message += e.getMessage();
-			return message;
-		}
-		
-		String listing = "";
-		try {
-			listing = URLEncoder.encode(SpreadsheetProcessing.printFileWithLineNumber(mode, fileName), "UTF-8");
-		} catch (UnsupportedEncodingException e) {
-			e.printStackTrace();
-		};
-
-		System.out.println("");
-		message += Feedback.println(mode, " ");
-		message += Feedback.println(mode, "   Generated " + fileName + " and stored locally.");
-		try {
-			RDFDataMgr.loadModel(fileName);
-			message += Feedback.println(mode, " ");
-			message += Feedback.print(mode, "SUCCESS parsing the document!");
-			message += Feedback.println(mode, " ");
-			message += Feedback.println(mode, "==== TURTLE (TTL) CODE GENERATED FROM LABKEY ====");
-			message += listing;
-		} catch (Exception e) {
-			message += Feedback.println(mode, " ");
-			message += Feedback.print(mode, "ERROR parsing the document!");
-			message += Feedback.println(mode, " ");
-			message += e.getMessage();
-			message += Feedback.println(mode, " ");
-			message += Feedback.println(mode, " ");
-			message += Feedback.println(mode, "==== TURTLE (TTL) CODE GENERATED FROM LABKEY ====");
-			message += listing;
-			return message;
-		}
+		String filePath = TTL_DIR + "labkey.ttl";
+		message += parseTriplesToTTL(mode, filePath, mapSheets, mapPreds);
+		message += verifyTTL(mode, filePath).getMessage();
 
 		if (oper.equals("load")) {
 		    message += Feedback.print(mode, "   Uploading generated file.");
-		    rdf.loadLocalFile(mode, fileName, KB_FORMAT);
+		    rdf.loadLocalFile(mode, filePath, KB_FORMAT);
 		    message += Feedback.println(mode, "");
 		    message += Feedback.println(mode, " ");
 		    message += Feedback.println(mode, "   Triples after [loading from LABKEY]: " + rdf.totalTriples());
