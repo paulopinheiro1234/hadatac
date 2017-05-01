@@ -65,8 +65,10 @@ public class DeleteStudy extends Controller {
             System.out.println("Deleting Study");
             study.delete();
             deleteStudy(DynamicFunctions.replaceURLWithPrefix(study_uri));
+            
             return ok(deleteStudy.render(study_uri, studyForm));
         }
+        
         return ok(deleteStudy.render(study_uri, studyForm));
     }
 
@@ -78,12 +80,10 @@ public class DeleteStudy extends Controller {
 	public static String deleteStudy(String studyUri) {
 		String result = "";
 		NameSpaces.getInstance();
-		MetadataContext metadata = new 
-    		 MetadataContext("user", 
-    		                 "password",
-    		                  Play.application().configuration().getString("hadatac.solr.triplestore"), 
-    		                  false);
-		result = metadata.cleanStudy(Feedback.WEB,studyUri);
+		MetadataContext metadata = new MetadataContext("user", "password", 
+				Play.application().configuration().getString("hadatac.solr.triplestore"), false);
+		result = metadata.cleanStudy(Feedback.WEB, studyUri);
+		
 		return result;
 	} 
 	
