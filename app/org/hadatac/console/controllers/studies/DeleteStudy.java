@@ -35,7 +35,7 @@ public class DeleteStudy extends Controller {
     public static Result index(String study_uri) {
 		StudyForm studyForm = new StudyForm();
         Study study = null;
-
+        String result = "";
         try {
             if (study_uri != null) {
             	study_uri = URLDecoder.decode(study_uri, "UTF-8");
@@ -64,12 +64,12 @@ public class DeleteStudy extends Controller {
             }
             System.out.println("Deleting Study");
             study.delete();
-            deleteStudy(DynamicFunctions.replaceURLWithPrefix(study_uri));
+            result = deleteStudy(DynamicFunctions.replaceURLWithPrefix(study_uri));
             
-            return ok(deleteStudy.render(study_uri, studyForm));
+            return ok(deleteStudy.render(study_uri, studyForm, result));
         }
         
-        return ok(deleteStudy.render(study_uri, studyForm));
+        return ok(deleteStudy.render(study_uri, studyForm, result));
     }
 
 	@Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))

@@ -564,6 +564,48 @@ public class Study {
 		"  FILTER (?study != " + study + ") " +
 		"    } " +
 		"  } " +
+		"  UNION  " +
+		"  { " +
+		"  	 {  " +
+		// Datasets
+		"   ?subUri rdfs:subClassOf* hasco:Study . " + 
+		"   ?study a ?subUri . " +
+		"   ?s hasco:isDatasetOf ?study . " +
+		"   ?s ?p ?o . " +
+		"   FILTER (?study = " + study + ") " +
+		"    } " +
+		"    MINUS " +
+		"    {  " +
+		// Other Datasets
+		"   ?subUri rdfs:subClassOf* hasco:Study . " + 
+		"   ?study a ?subUri . " +
+		"   ?s hasco:isDatasetOf ?study . " +
+		"   ?s ?p ?o . " +
+		"   FILTER (?study != " + study + ") " +
+		"     } " +
+		"   } " +
+		"   UNION " + 
+		"   { " +
+		"  	  {  " +
+		// Attribute References 
+		"    ?subUri rdfs:subClassOf* hasco:Study . " + 
+		"    ?study a ?subUri . " +
+		"    ?data hasco:isDatasetOf ?study . " +
+		"    ?s hasco:isAttributeReferenceOf ?data . " +
+		"    ?s ?p ?o . " +
+		"    FILTER (?study = " + study + ") " +
+		"    } " +
+		"    MINUS " +
+		"    {  " +
+		// Other Attribute References
+		"    ?subUri rdfs:subClassOf* hasco:Study . " + 
+		"    ?study a ?subUri . " +
+		"    ?data hasco:isDatasetOf ?study . " +
+		"     ?s hasco:isAttributeReferenceOf ?data . " +
+		"    ?s ?p ?o . " +
+		"    FILTER (?study != " + study + ") " +
+		"    } " +
+		"  } " +
 		"} ";
 		
 		Model model = ModelFactory.createDefaultModel();

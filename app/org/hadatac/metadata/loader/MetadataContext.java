@@ -13,12 +13,15 @@ import org.apache.jena.query.ResultSetFactory;
 import org.apache.jena.query.ResultSetRewindable;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
+import org.apache.jena.rdf.model.Statement;
+import org.apache.jena.rdf.model.StmtIterator;
 import org.apache.jena.riot.RiotNotFoundException;
 import org.apache.jena.shared.NotFoundException;
 import org.apache.jena.update.UpdateExecutionFactory;
 import org.apache.jena.update.UpdateFactory;
 import org.apache.jena.update.UpdateProcessor;
 import org.apache.jena.update.UpdateRequest;
+import org.hadatac.entity.pojo.Study;
 import org.hadatac.utils.Collections;
 import org.hadatac.utils.Feedback;
 import org.hadatac.utils.NameSpace;
@@ -97,6 +100,15 @@ public class MetadataContext implements RDFContext {
 	    String message = "";
         message += Feedback.println(mode,"   Triples before [clean]: " + totalTriples());
         message += Feedback.println(mode, " ");
+        message += Feedback.println(mode, "      Deleted the following triples: ");
+        Study studyObj = new Study();
+        Model model = studyObj.findModel(study);
+        StmtIterator iter = model.listStatements();
+		while (iter.hasNext()) {
+			Statement stmt = iter.nextStatement();
+			System.out.println(stmt.toString());
+			message += Feedback.println(mode, stmt.toString());
+		}
         
         String queryString = "";
 		queryString += NameSpaces.getInstance().printSparqlNameSpaceList();
@@ -252,6 +264,48 @@ public class MetadataContext implements RDFContext {
 		"   ?s hasneto:partOfSchema ?schema . " +
 		"  	?s ?p ?o . " +
 		"  FILTER (?study != " + study + ") " +
+		"    } " +
+		"  } " +
+		"  UNION  " +
+		"  { " +
+		"  	 {  " +
+		// Datasets
+		"   ?subUri rdfs:subClassOf* hasco:Study . " + 
+		"   ?study a ?subUri . " +
+		"   ?s hasco:isDatasetOf ?study . " +
+		"   ?s ?p ?o . " +
+		"   FILTER (?study = " + study + ") " +
+		"    } " +
+		"    MINUS " +
+		"    {  " +
+		// Other Datasets
+		"   ?subUri rdfs:subClassOf* hasco:Study . " + 
+		"   ?study a ?subUri . " +
+		"   ?s hasco:isDatasetOf ?study . " +
+		"   ?s ?p ?o . " +
+		"   FILTER (?study != " + study + ") " +
+		"     } " +
+		"   } " +
+		"   UNION " + 
+		"   { " +
+		"  	  {  " +
+		// Attribute References 
+		"    ?subUri rdfs:subClassOf* hasco:Study . " + 
+		"    ?study a ?subUri . " +
+		"    ?data hasco:isDatasetOf ?study . " +
+		"    ?s hasco:isAttributeReferenceOf ?data . " +
+		"    ?s ?p ?o . " +
+		"    FILTER (?study = " + study + ") " +
+		"    } " +
+		"    MINUS " +
+		"    {  " +
+		// Other Attribute References
+		"    ?subUri rdfs:subClassOf* hasco:Study . " + 
+		"    ?study a ?subUri . " +
+		"    ?data hasco:isDatasetOf ?study . " +
+		"     ?s hasco:isAttributeReferenceOf ?data . " +
+		"    ?s ?p ?o . " +
+		"    FILTER (?study != " + study + ") " +
 		"    } " +
 		"  } " +
 		"} ";
