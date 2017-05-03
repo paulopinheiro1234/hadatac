@@ -168,7 +168,7 @@ public class DataContext {
         return message;
 	}
 	
-	public String cleanDataCollections(int mode) {
+	public String cleanDataAcquisitions(int mode) {
 		return cleanAllDocuments(mode, Collections.DATA_COLLECTION);
 	}
 	
@@ -180,7 +180,7 @@ public class DataContext {
 		return cleanAllDocuments(mode, Collections.AUTHENTICATE_ACCOUNTS);
 	}
 	
-	public String cleanDataAcquisitions(int mode) {
+	public String cleanAcquisitionData(int mode) {
 		return cleanAllDocuments(mode, Collections.DATA_ACQUISITION);
 	}
 	

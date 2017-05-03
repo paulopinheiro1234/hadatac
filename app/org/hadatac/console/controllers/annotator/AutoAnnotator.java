@@ -18,6 +18,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
+import org.apache.jena.sparql.function.library.print;
 import org.hadatac.entity.pojo.Credential;
 import org.hadatac.console.controllers.AuthApplication;
 import org.hadatac.console.controllers.dataacquisitionsearch.LoadCCSV;
@@ -484,10 +485,18 @@ public class AutoAnnotator extends Controller {
     		 */
     		String json = DeploymentQueries.exec(DeploymentQueries.DEPLOYMENT_BY_URI, deployment_uri);
     		SparqlQueryResults results = new SparqlQueryResults(json, false);
-    		TripleDocument docDeployment = results.sparqlResults.values().iterator().next();
-    		handler = new CSVAnnotationHandler(deployment_uri, 
-    				docDeployment.get("platform"), 
-    				docDeployment.get("instrument"));
+    		Iterator<TripleDocument> iterator = results.sparqlResults.values().iterator();
+    		if (iterator.hasNext()) {
+    			TripleDocument docDeployment = iterator.next();
+        		handler = new CSVAnnotationHandler(deployment_uri, 
+        				docDeployment.get("platform"), 
+        				docDeployment.get("instrument"));
+    		} else {
+    			log.addline(Feedback.println(Feedback.WEB, String.format(
+    					"[ERROR] Could not find the deployment: %s", deployment_uri)));
+        		log.save();
+        		return false;
+    		}
     		
     		/*
     		 * Add possible detector's characteristics into handler

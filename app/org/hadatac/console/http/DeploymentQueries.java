@@ -136,7 +136,6 @@ public class DeploymentQueries {
         return q;
     }
 
-
     public static String exec(String concept, String uri) {
     	ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
     	try {

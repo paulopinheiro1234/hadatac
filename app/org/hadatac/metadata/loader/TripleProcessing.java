@@ -279,14 +279,13 @@ public class TripleProcessing {
     
     private static void forwardTraverseGraph(Resource node, HashSet<String> visitedNodes, 
     		Model refModel, Model targetModel) {
-    	visitedNodes.add(node.toString());
-    	
     	StmtIterator iter = node.listProperties();
     	while (iter.hasNext()) {
     		Statement stmt = iter.nextStatement();
     		RDFNode object = stmt.getObject();
     		if (object.isResource()) {
     			if (!visitedNodes.contains(object.toString())) {
+    				visitedNodes.add(node.toString());
     				targetModel.add(node, stmt.getPredicate(), object);
     				forwardTraverseGraph((Resource)object, visitedNodes, refModel, targetModel);
     			}
@@ -307,8 +306,8 @@ public class TripleProcessing {
     		
     		targetModel.add(subject, stmt.getPredicate(), node);
     		
-    		backwardTraverseGraph(subject, visitedNodes, refModel, targetModel);
     		forwardTraverseGraph(subject, visitedNodes, refModel, targetModel);
+    		backwardTraverseGraph(subject, visitedNodes, refModel, targetModel);
     	}
     }
     

@@ -29,7 +29,6 @@ public class Clean extends Controller {
     public static String playClean(String oper) {
     	String result = "";
     	if (oper.equals("metadata")) {
-    		NameSpaces.getInstance();
     		MetadataContext metadata = new 
 	    		 MetadataContext("user", 
 	    		                 "password",
@@ -37,7 +36,6 @@ public class Clean extends Controller {
 	    		                  false);
     		result = metadata.clean(Feedback.WEB);
     	} else if (oper.equals("usergraph")) {
-    		NameSpaces.getInstance();
     		PermissionsContext permission = new 
 	    		 PermissionsContext("user", 
 	    		                 "password",
@@ -59,23 +57,22 @@ public class Clean extends Controller {
       	    		            false);
           	result = linkedCollection.cleanDataAccounts(Feedback.WEB);
     	} else if (oper.equals("collections")) {
-    		NameSpaces.getInstance();
     		DataContext collection = new 
 	    		 DataContext("user", 
 	    		             "password",
 	    		             Play.application().configuration().getString("hadatac.solr.data"), 
 	    		             false);
-    		result = collection.cleanDataCollections(Feedback.WEB);
-    	} else if (oper.equals("aquisitions")) {
-    		NameSpaces.getInstance();
+    		result = collection.cleanDataAcquisitions(Feedback.WEB);
+    	} else if (oper.equals("acquisitions")) {
     		DataContext acquisition = new 
 	    		 DataContext("user", 
 	    		             "password",
 	    		             Play.application().configuration().getString("hadatac.solr.data"), 
 	    		             false);
-    		result = acquisition.cleanDataAcquisitions(Feedback.WEB);
+    		result = acquisition.cleanAcquisitionData(Feedback.WEB);
     	} 
-	     return result;
+	    
+    	return result;
    }
 
 }

@@ -80,7 +80,6 @@ public class Subject {
 	}
 	
 	public static Subject findSubject(String study_uri, String subject_id) {
-		Subject subject = new Subject();
 		String queryString = NameSpaces.getInstance().printSparqlNameSpaceList()
 				+ "SELECT ?uri WHERE {\n"
 				+ "  ?uri hasco:originalID \"" + subject_id + "\" .\n"
@@ -97,11 +96,13 @@ public class Subject {
 		qexec.close();
 		
 		if (resultsrw.size() >= 1) {
+			Subject subject = new Subject();
 			QuerySolution soln = resultsrw.next();
 			subject.setUri(soln.getResource("uri").getURI());
+			return subject;
 		}
 		
-		return subject;
+		return null;
 	}
 	
 	public static String findSampleUri(String study_uri, String sample_id) {
@@ -158,8 +159,8 @@ public class Subject {
     }
 	
 	public static String checkObjectUri(String obj_uri, String attr_uri) {
-		//System.out.println("obj_uri: " + obj_uri);
-		//System.out.println("attr_uri: " + attr_uri);
+		System.out.println("obj_uri: " + obj_uri);
+		System.out.println("attr_uri: " + attr_uri);
 
 		ValueCellProcessing cellProc = new ValueCellProcessing();
 		attr_uri = cellProc.replacePrefixEx(attr_uri);

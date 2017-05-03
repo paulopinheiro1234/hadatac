@@ -180,9 +180,12 @@ public class Parser {
 				measurement.setStudyUri(cellProc.replaceNameSpaceEx(hadatacKb.getDataAcquisition().getStudyUri()));
 				if(nIdCol > -1){
 					if (measurementType.getEntityUri().equals(cellProc.replacePrefixEx("sio:Human"))) {
-						String subjectUri = Subject.findSubject(measurement.getStudyUri(), record.get(nIdCol - 1)).getUri();
-						subjectUri = Subject.checkObjectUri(subjectUri, measurementType.getCharacteristicUri());
-						measurement.setObjectUri(subjectUri);
+						Subject subject = Subject.findSubject(measurement.getStudyUri(), record.get(nIdCol - 1));
+						if (null != subject) {
+							String subjectUri = subject.getUri();
+							subjectUri = Subject.checkObjectUri(subjectUri, measurementType.getCharacteristicUri());
+							measurement.setObjectUri(subjectUri);
+						}
 					}
 					else if (measurementType.getEntityUri().equals(cellProc.replacePrefixEx("sio:Sample"))) {
 						String sampleUri = Subject.findSampleUri(measurement.getStudyUri(), record.get(nIdCol - 1));
