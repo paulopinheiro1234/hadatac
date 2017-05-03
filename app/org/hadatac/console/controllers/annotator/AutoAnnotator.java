@@ -37,6 +37,7 @@ import org.hadatac.console.views.html.triplestore.*;
 import org.hadatac.console.views.html.*;
 import org.hadatac.data.api.DataFactory;
 import org.hadatac.data.loader.SampleGenerator;
+import org.hadatac.data.loader.StudyGenerator;
 import org.hadatac.data.loader.SubjectGenerator;
 import org.hadatac.data.model.ParsingResult;
 import org.hadatac.entity.pojo.DataFile;
@@ -333,6 +334,9 @@ public class AutoAnnotator extends Controller {
 			else if (file_name.startsWith("PID")) {
 				bSucceed = annotateSubjectIdFile(new File(path_unproc + "/" + file_name));
 			}
+			else if (file_name.startsWith("STD")) {
+				bSucceed = annotateStudyIdFile(new File(path_unproc + "/" + file_name));
+			}
 			if (bSucceed) {
 				//Move the file to the folder for processed files
 				File destFolder = new File(path_proc);
@@ -350,6 +354,37 @@ public class AutoAnnotator extends Controller {
 				f.delete();
 			}
 		}
+	}
+	
+	public static boolean annotateStudyIdFile(File file) {
+		StudyGenerator studyGenerator = new StudyGenerator(file);
+		List<Map<String, Object>> rows = studyGenerator.createRows();
+		String site = ConfigProp.getPropertyValue("labkey.config", "site");
+		//String path = "/" + ConfigProp.getPropertyValue("labkey.config", "folder");
+		String path = "/SIDPIDTEST";
+        Credential cred = Credential.find();
+        AnnotationLog log = new AnnotationLog();
+    	log.setFileName(file.getName());
+        if (null == cred) {
+        	log.addline(Feedback.println(Feedback.WEB, "[ERROR] No LabKey credentials are provided!"));
+    		log.save();
+    		return false;
+        }
+    	LabkeyDataHandler labkeyDataHandler = new LabkeyDataHandler(
+    			site, cred.getUserName(), cred.getPassword(), path);
+		try {
+			int nRows = labkeyDataHandler.insertRows("Study", rows);
+			log.addline(Feedback.println(Feedback.WEB, String.format(
+					"[OK] %d row(s) have been inserted into Sample table", nRows)));
+			log.addline(Feedback.println(Feedback.WEB, String.format(studyGenerator.toString())));
+    		log.save();
+		} catch (CommandException e) {
+			log.addline(Feedback.println(Feedback.WEB, "[ERROR] " + e.getMessage()));
+    		log.save();
+    		return false;
+		}
+		
+		return true;
 	}
 	
 	public static boolean annotateSampleIdFile(File file) {

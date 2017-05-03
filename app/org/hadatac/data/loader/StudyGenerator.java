@@ -65,7 +65,7 @@ public class StudyGenerator {
 	}
 	
 	private String getTitle() { 
-		return kbPrefix + "STD-" + rec.get(mapCol.get("studyTitle")); 
+		return rec.get(mapCol.get("studyTitle")); 
 	}
 	
 	private String getAims() { 
