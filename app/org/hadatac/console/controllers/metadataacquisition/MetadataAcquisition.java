@@ -47,7 +47,7 @@ public class MetadataAcquisition extends Controller {
     public static List<String> getIndicators() {
 		String initStudyQuery = NameSpaces.getInstance().printSparqlNameSpaceList() 
 				+ " SELECT DISTINCT ?indicatorLabel WHERE { "
-				+ " ?subTypeUri rdfs:subClassOf hasco:Study . "
+				+ " ?subTypeUri rdfs:subClassOf* hasco:Study . "
 				+ " ?studyUri a ?subTypeUri . "
 				+ " ?schemaUri hasco:isSchemaOf ?studyUri . "
 				+ " ?schemaAttribute hasneto:partOfSchema ?schemaUri . "
@@ -79,6 +79,8 @@ public class MetadataAcquisition extends Controller {
 				+ " SELECT DISTINCT ?studyUri ?studyLabel ?proj ?studyTitle ?studyComment "
 				+ " ?indicatorLabel ?attributeLabel ?agentName ?institutionName WHERE { "
 				+ " ?schemaUri hasco:isSchemaOf ?studyUri . "
+				+ " ?studyUri a ?subUri . "
+				+ " ?subUri rdfs:subClassOf* hasco:Study . "
 				+ " ?schemaAttribute hasneto:partOfSchema ?schemaUri . "
 				+ " ?schemaAttribute hasneto:hasAttribute ?attribute . "
 				+ " ?indicator rdfs:subClassOf chear:StudyIndicator . "

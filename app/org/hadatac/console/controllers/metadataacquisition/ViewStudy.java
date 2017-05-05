@@ -157,7 +157,7 @@ public class ViewStudy extends Controller {
 		String basicQueryString = "";
 		basicQueryString += NameSpaces.getInstance().printSparqlNameSpaceList();
 		basicQueryString += "SELECT ?studyUri ?studyLabel ?proj ?studyDef ?studyComment ?agentName ?institutionName WHERE { "
-				+ "?subUri rdfs:subClassOf hasco:Study . "
+				+ "?subUri rdfs:subClassOf* hasco:Study . "
 				+ "?studyUri a ?subUri . "
 				+ "?studyUri rdfs:label ?studyLabel . "
 				+ "FILTER ( ?studyUri = " + study_uri + " ) . "
@@ -183,12 +183,24 @@ public class ViewStudy extends Controller {
 			while (resultsrw.hasNext()) {
 				QuerySolution soln = resultsrw.next();
 				values = new ArrayList<String>();
-				values.add("Label: " + soln.get("studyLabel").toString());
-				values.add("Title: " + soln.get("studyDef").toString());
-				values.add("Project: " + cellProc.replaceNameSpaceEx(soln.get("proj").toString()));
-				values.add("Comment: " + soln.get("studyComment").toString());
-				values.add("Agent(s): " + soln.get("agentName").toString());
-				values.add("Institution: " + soln.get("institutionName").toString());
+				if(soln.contains("studyLabel")){
+					values.add("Label: " + soln.get("studyLabel").toString());
+				}
+				if(soln.contains("studyDef")){
+					values.add("Title: " + soln.get("studyDef").toString());
+				}
+				if(soln.contains("proj")){
+					values.add("Project: " + cellProc.replaceNameSpaceEx(soln.get("proj").toString()));
+				}
+				if(soln.contains("studyComment")){
+					values.add("Comment: " + soln.get("studyComment").toString());
+				}
+				if(soln.contains("agentName")){
+					values.add("Agent(s): " + soln.get("agentName").toString());
+				}
+				if(soln.contains("institutionName")){
+					values.add("Institution: " + soln.get("institutionName").toString());
+				}
 				poResult.put(study_uri, values);
 			}
 		} catch (QueryExceptionHTTP e) {
