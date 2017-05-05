@@ -423,12 +423,12 @@ public class AutoAnnotator extends Controller {
 		try {
 			int nRows = labkeyDataHandler.insertRows("Study", rows);
 			log.addline(Feedback.println(Feedback.WEB, String.format(
-					"[OK] %d row(s) have been inserted into Sample table", nRows)));
+					"[OK] %d row(s) have been inserted into Study table", nRows)));
 		} catch (CommandException e1) {
 			try {
 				int nRows = labkeyDataHandler.updateRows("Study", rows);
 				log.addline(Feedback.println(Feedback.WEB, String.format(
-						"[OK] %d row(s) have been inserted into Sample table", nRows)));
+						"[OK] %d row(s) have been inserted into Study table", nRows)));
 			} catch (CommandException e) {
 				log.addline(Feedback.println(Feedback.WEB, "[ERROR] " + e.getMessage()));
 	    		log.save();
