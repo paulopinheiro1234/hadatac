@@ -9,7 +9,7 @@ public class Feedback {
     	if (mode == COMMANDLINE) {
     		System.out.print(str);
     	} else {
-    		str = str.replace("<", "&lt;").replace(">", "&gt;");
+    		str = str.replace("<", "&lt;").replace(">", "&gt;").replace("\n", "<br>");
     		str += "<br>";
     	}
     	return str;
@@ -19,7 +19,9 @@ public class Feedback {
     	if (mode == COMMANDLINE) {
     		System.out.print(str);
     	}
-		str = str.replace("<", "&lt;").replace(">", "&gt;");
+    	else {
+    		str = str.replace("<", "&lt;").replace(">", "&gt;").replace("\n", "<br>");
+    	}
     	return str;
     }
 }	

@@ -79,22 +79,8 @@ public class RefreshStudy extends Controller {
     			nTriples++;
     		}
     		
-    		String ref_results = "";
-    		int nRefTriples = 0;
-    		StmtIterator iterref = refModel.listStatements();
-    		while (iterref.hasNext()) {
-    			Statement stmt = iterref.nextStatement();
-    			ref_results += stmt.toString();
-    			nRefTriples++;
-    		}
-    		System.out.println(nRefTriples + " Ref Triples!");
-    		
-    		if (refModel.containsAll(model)) {
-    			System.out.println("refModel.containsAll(model)!");
-    		}
-    		else if (model.containsAll(refModel)) {
-    			System.out.println("model.containsAll(refModel)!");
-    		}
+    		TripleProcessing.importDataAcquisition(site, session().get("LabKeyUserName"), 
+    				session().get("LabKeyPassword"), path, cellProc.replacePrefixEx(study_uri));
     		
     	} catch (CommandException e) {
     		if (e.getMessage().equals("Unauthorized")) {

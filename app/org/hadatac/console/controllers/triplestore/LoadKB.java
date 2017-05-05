@@ -71,25 +71,14 @@ public class LoadKB extends Controller {
     
     @Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
     public static Result playLoadLabkeyDataAcquisition(String oper, String content, 
-    		String folder, List<String> list_names) {
+    		String folder, String study_uri) {
     	System.out.println(String.format("Batch loading data acquisition from \"/%s\"...", folder));
     	
-    	List<String> final_names = new LinkedList<String>();
         String user_name = session().get("LabKeyUserName");
         String password = session().get("LabKeyPassword");
         if (user_name == null || password == null) {
         	redirect(routes.LoadKB.loadLabkeyKB("init", content));
         }
-    	if(oper.equals("init")){
-            final_names.addAll(list_names);
-    	}
-    	else if(oper.contains("load")){
-            for(String name : list_names){
-            	if(name.equals("DataAcquisition")){
-            		final_names.add(name);
-            	}
-            }
-    	}
         
         String path = String.format("/%s", folder);
         String site = ConfigProp.getPropertyValue("labkey.config", "site");
@@ -101,7 +90,7 @@ public class LoadKB extends Controller {
     			return badRequest("Cannot find corresponding URI for the current logged in user!");
     		}
     		ParsingResult result = TripleProcessing.importDataAcquisition(
-    				site, user_name, password, path, final_names);
+    				site, user_name, password, path, study_uri);
     		if (result.getStatus() != 0) {
     			return ok(labkeyLoadingResult.render(folder, oper, content, result.getMessage()));
     		}

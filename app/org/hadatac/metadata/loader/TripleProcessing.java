@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.io.LineNumberReader;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -284,9 +285,9 @@ public class TripleProcessing {
     		Statement stmt = iter.nextStatement();
     		RDFNode object = stmt.getObject();
     		if (object.isResource()) {
+    			targetModel.add(node, stmt.getPredicate(), object);
     			if (!visitedNodes.contains(object.toString())) {
     				visitedNodes.add(node.toString());
-    				targetModel.add(node, stmt.getPredicate(), object);
     				forwardTraverseGraph((Resource)object, visitedNodes, refModel, targetModel);
     			}
     		}
@@ -312,7 +313,7 @@ public class TripleProcessing {
     }
     
     public static ParsingResult importDataAcquisition(String labkey_site, String user_name, 
-    		String password, String path, List<String> list_names) throws CommandException {
+    		String password, String path, String target_study_uri) throws CommandException {
     	
     	final SysUser user = AuthApplication.getLocalUser(Controller.session());
 		String ownerUri = UserManagement.getUriByEmail(user.getEmail());
@@ -324,6 +325,8 @@ public class TripleProcessing {
 		Map< String, List<String> > mapPreds = 
 				new HashMap< String, List<String> >();
 		
+		List<String> list_names = new ArrayList<String>();
+		list_names.add("DataAcquisition");
 		String ret = loadTriples(loader, list_names, mapSheets, mapPreds);
 		
 		if(!ret.equals("")){
@@ -356,6 +359,7 @@ public class TripleProcessing {
 							Measurement.getNumByDataAcquisition(dataAcquisition));
 				}
 				
+				boolean bCanSave = true;
 				for (PlainTriple triple : sheet.get(uri)) {
 					String cellValue = triple.obj.trim();
 					String predicate = triple.pred.trim();
@@ -402,7 +406,14 @@ public class TripleProcessing {
 						dataAcquisition.setParameter(cellValue);
 					}
 					else if (predicate.equals("hasco:isDataAcquisitionOf")) {
-						dataAcquisition.setStudyUri(cellProc.convertToWholeURI(cellValue));
+						String studyUri = cellProc.convertToWholeURI(cellValue);
+						if (!target_study_uri.equals("")) {
+							if (!studyUri.equals(target_study_uri)) {
+								bCanSave = false;
+								break;
+							}
+						}
+						dataAcquisition.setStudyUri(studyUri);
 					}
 					else if (predicate.equals("hasco:hasTriggeringEvent")) {
 						dataAcquisition.setTriggeringEvent(dataAcquisition.getTriggeringEventByName(cellValue));
@@ -428,7 +439,7 @@ public class TripleProcessing {
 					}
 				}
 				
-				if (dataAcquisition.getStartedAt() == null || dataAcquisition.getStartedAt().isEmpty() 
+				if (bCanSave == false || dataAcquisition.getStartedAt() == null || dataAcquisition.getStartedAt().isEmpty() 
 						|| dataAcquisition.getDeploymentUri() == null || dataAcquisition.getDeploymentUri().isEmpty()
 						|| dataAcquisition.getSchemaUri() == null || dataAcquisition.getSchemaUri().isEmpty()) {
 					continue;

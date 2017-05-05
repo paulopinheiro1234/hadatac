@@ -14,7 +14,7 @@ public class ValueCellProcessing {
 		return str.startsWith("http");
 	}
 	
-	boolean isAbbreviatedURI(String str) {
+	public boolean isAbbreviatedURI(String str) {
 		if (str.trim().split(" ").length >= 2){
 			return false;
 		}

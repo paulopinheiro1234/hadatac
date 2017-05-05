@@ -91,6 +91,7 @@ public class DataAcquisitionSearch extends Controller {
     		results = Measurement.find(ownerUri, page, rows, handler);
     	}
     	System.out.println("[DataAcquisitionSearch] Total size response: " + results.getDocumentSize());
+    	
     	Set<String> setObj = new HashSet<String>();
     	ObjectDetails objDetails = new ObjectDetails();
     	if (results != null) {

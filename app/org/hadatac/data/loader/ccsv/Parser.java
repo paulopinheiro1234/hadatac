@@ -186,11 +186,17 @@ public class Parser {
 							subjectUri = Subject.checkObjectUri(subjectUri, measurementType.getCharacteristicUri());
 							measurement.setObjectUri(subjectUri);
 						}
+						else {
+							measurement.setObjectUri("");
+						}
 					}
 					else if (measurementType.getEntityUri().equals(cellProc.replacePrefixEx("sio:Sample"))) {
 						String sampleUri = Subject.findSampleUri(measurement.getStudyUri(), record.get(nIdCol - 1));
 						if (sampleUri != null) {
 							measurement.setObjectUri(sampleUri);
+						}
+						else {
+							measurement.setObjectUri("");
 						}
 					}
 				}

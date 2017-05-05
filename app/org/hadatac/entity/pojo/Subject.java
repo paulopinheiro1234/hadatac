@@ -159,9 +159,6 @@ public class Subject {
     }
 	
 	public static String checkObjectUri(String obj_uri, String attr_uri) {
-		System.out.println("obj_uri: " + obj_uri);
-		System.out.println("attr_uri: " + attr_uri);
-
 		ValueCellProcessing cellProc = new ValueCellProcessing();
 		attr_uri = cellProc.replacePrefixEx(attr_uri);
 		String objUri = obj_uri;

@@ -15,6 +15,7 @@ import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
 import org.hadatac.entity.pojo.Measurement;
 import org.hadatac.utils.Collections;
+import org.hadatac.utils.Feedback;
 
 import play.Play;
 
@@ -91,6 +92,7 @@ public class AnnotationLog {
 		SolrQuery query = new SolrQuery();
 		query.set("q", "file_name:\"" + file_name + "\"");
 		query.set("rows", "10000000");
+		
 		try {
 			QueryResponse response = solr.query(query);
 			solr.close();

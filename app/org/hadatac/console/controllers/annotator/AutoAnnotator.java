@@ -12,12 +12,20 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.StringTokenizer;
 
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
+import org.apache.jena.query.DatasetAccessor;
+import org.apache.jena.query.DatasetAccessorFactory;
+import org.apache.jena.rdf.model.Literal;
+import org.apache.jena.rdf.model.Model;
+import org.apache.jena.rdf.model.ModelFactory;
+import org.apache.jena.rdf.model.Property;
+import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.sparql.function.library.print;
 import org.hadatac.entity.pojo.Credential;
 import org.hadatac.console.controllers.AuthApplication;
@@ -47,6 +55,7 @@ import org.hadatac.entity.pojo.DataAcquisitionSchema;
 import org.hadatac.entity.pojo.User;
 import org.hadatac.metadata.loader.LabkeyDataHandler;
 import org.hadatac.metadata.loader.ValueCellProcessing;
+import org.hadatac.utils.Collections;
 import org.hadatac.utils.ConfigProp;
 import org.hadatac.utils.Feedback;
 import org.hadatac.utils.NameSpaces;
@@ -356,12 +365,50 @@ public class AutoAnnotator extends Controller {
 		}
 	}
 	
+	public static Model createModel(List<Map<String, Object>> rows) {
+    	Model model = ModelFactory.createDefaultModel();
+    	ValueCellProcessing cellProc = new ValueCellProcessing();
+    	for (Map<String, Object> row : rows) {
+    		Resource sub = model.createResource(cellProc.replacePrefixEx((String)row.get("hasURI")));
+    		for (String key : row.keySet()) {
+    			if (!key.equals("hasURI")) {
+    				Property pred = null;
+    				if (key.equals("a")) {
+    					pred = model.createProperty(cellProc.replacePrefixEx("rdf:type"));
+    				}
+    				else {
+    					pred = model.createProperty(cellProc.replacePrefixEx(key));
+    				}
+    				
+    				String cellValue = (String)row.get(key);
+					if (cellProc.isAbbreviatedURI(cellValue)) {
+						Resource obj = model.createResource(cellProc.replacePrefixEx(cellValue));
+						model.add(sub, pred, obj);
+					}
+					else {
+						Literal obj = model.createLiteral(
+								cellValue.replace("\n", " ").replace("\r", " ").replace("\"", "''"));
+						model.add(sub, pred, obj);
+					}
+    			}
+    		}
+    	}
+    	
+    	return model;
+    }
+	
 	public static boolean annotateStudyIdFile(File file) {
 		StudyGenerator studyGenerator = new StudyGenerator(file);
 		List<Map<String, Object>> rows = studyGenerator.createRows();
+		
+		Model model = createModel(rows);
+    	DatasetAccessor accessor = DatasetAccessorFactory.createHTTP(
+				Collections.getCollectionsName(Collections.METADATA_GRAPH));
+    	accessor.add(model);
+		
 		String site = ConfigProp.getPropertyValue("labkey.config", "site");
-		//String path = "/" + ConfigProp.getPropertyValue("labkey.config", "folder");
-		String path = "/SIDPIDTEST";
+		String path = "/" + ConfigProp.getPropertyValue("labkey.config", "folder");
+		//String path = "/SIDPIDTEST";
         Credential cred = Credential.find();
         AnnotationLog log = new AnnotationLog();
     	log.setFileName(file.getName());
@@ -370,19 +417,29 @@ public class AutoAnnotator extends Controller {
     		log.save();
     		return false;
         }
+    	
     	LabkeyDataHandler labkeyDataHandler = new LabkeyDataHandler(
     			site, cred.getUserName(), cred.getPassword(), path);
 		try {
 			int nRows = labkeyDataHandler.insertRows("Study", rows);
 			log.addline(Feedback.println(Feedback.WEB, String.format(
 					"[OK] %d row(s) have been inserted into Sample table", nRows)));
-			log.addline(Feedback.println(Feedback.WEB, String.format(studyGenerator.toString())));
-    		log.save();
-		} catch (CommandException e) {
-			log.addline(Feedback.println(Feedback.WEB, "[ERROR] " + e.getMessage()));
-    		log.save();
-    		return false;
+		} catch (CommandException e1) {
+			try {
+				int nRows = labkeyDataHandler.updateRows("Study", rows);
+				log.addline(Feedback.println(Feedback.WEB, String.format(
+						"[OK] %d row(s) have been inserted into Sample table", nRows)));
+			} catch (CommandException e) {
+				log.addline(Feedback.println(Feedback.WEB, "[ERROR] " + e.getMessage()));
+	    		log.save();
+	    		return false;
+			}
 		}
+		
+		log.addline(Feedback.println(Feedback.WEB, String.format(
+				"[OK] %d triple(s) have been committed to triple store", model.size())));
+		log.addline(Feedback.println(Feedback.WEB, String.format(studyGenerator.toString())));
+		log.save();
 		
 		return true;
 	}
@@ -390,6 +447,12 @@ public class AutoAnnotator extends Controller {
 	public static boolean annotateSampleIdFile(File file) {
 		SampleGenerator sampleGenerator = new SampleGenerator(file);
 		List<Map<String, Object>> rows = sampleGenerator.createRows();
+		
+		Model model = createModel(rows);
+    	DatasetAccessor accessor = DatasetAccessorFactory.createHTTP(
+				Collections.getCollectionsName(Collections.METADATA_GRAPH));
+    	accessor.add(model);
+		
 		String site = ConfigProp.getPropertyValue("labkey.config", "site");
 		//String path = "/" + ConfigProp.getPropertyValue("labkey.config", "folder");
 		String path = "/SIDPIDTEST";
@@ -407,20 +470,35 @@ public class AutoAnnotator extends Controller {
 			int nRows = labkeyDataHandler.insertRows("Sample", rows);
 			log.addline(Feedback.println(Feedback.WEB, String.format(
 					"[OK] %d row(s) have been inserted into Sample table", nRows)));
-			log.addline(Feedback.println(Feedback.WEB, String.format(sampleGenerator.toString())));
-    		log.save();
-		} catch (CommandException e) {
-			log.addline(Feedback.println(Feedback.WEB, "[ERROR] " + e.getMessage()));
-    		log.save();
-    		return false;
+		} catch (CommandException e1) {
+			try {
+				int nRows = labkeyDataHandler.updateRows("Sample", rows);
+				log.addline(Feedback.println(Feedback.WEB, String.format(
+						"[OK] %d row(s) have been inserted into Sample table", nRows)));
+			} catch (CommandException e) {
+				log.addline(Feedback.println(Feedback.WEB, "[ERROR] " + e.getMessage()));
+	    		log.save();
+	    		return false;
+			}
 		}
+		
+		log.addline(Feedback.println(Feedback.WEB, String.format(
+				"[OK] %d triple(s) have been committed to triple store", model.size())));
+		log.addline(Feedback.println(Feedback.WEB, String.format(sampleGenerator.toString())));
+		log.save();
 		
 		return true;
 	}
 	
-	public static boolean annotateSubjectIdFile(File file){
+	public static boolean annotateSubjectIdFile(File file) {
 		SubjectGenerator subjectGenerator = new SubjectGenerator(file);
 		List<Map<String, Object>> rows = subjectGenerator.createRows();
+		
+		Model model = createModel(rows);
+    	DatasetAccessor accessor = DatasetAccessorFactory.createHTTP(
+				Collections.getCollectionsName(Collections.METADATA_GRAPH));
+    	accessor.add(model);
+		
 		String site = ConfigProp.getPropertyValue("labkey.config", "site");
         //String path = "/" + ConfigProp.getPropertyValue("labkey.config", "folder");
         String path = "/SIDPIDTEST";
@@ -438,13 +516,22 @@ public class AutoAnnotator extends Controller {
 			int nRows = labkeyDataHandler.insertRows("Subject", rows);
 			log.addline(Feedback.println(Feedback.WEB, String.format(
 					"[OK] %d row(s) have been inserted into Subject table", nRows)));
-			log.addline(Feedback.println(Feedback.WEB, String.format(subjectGenerator.toString())));
-			log.save();
-		} catch (CommandException e) {
-			log.addline(Feedback.println(Feedback.WEB, "[ERROR] " + e.getMessage()));
-    		log.save();
-    		return false;
+		} catch (CommandException e1) {
+			try {
+				int nRows = labkeyDataHandler.updateRows("Subject", rows);
+				log.addline(Feedback.println(Feedback.WEB, String.format(
+						"[OK] %d row(s) have been inserted into Subject table", nRows)));
+			} catch (CommandException e) {
+				log.addline(Feedback.println(Feedback.WEB, "[ERROR] " + e.getMessage()));
+	    		log.save();
+	    		return false;
+			}
 		}
+		
+		log.addline(Feedback.println(Feedback.WEB, String.format(
+				"[OK] %d triple(s) have been committed to triple store", model.size())));
+		log.addline(Feedback.println(Feedback.WEB, String.format(subjectGenerator.toString())));
+		log.save();
 		
 		return true;
 	}
@@ -668,7 +755,8 @@ public class AutoAnnotator extends Controller {
     
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
     public static Result checkAnnotationLog(String file_name) {
-    	return ok(annotation_log.render(file_name));
+    	String log = AnnotationLog.find(file_name);
+    	return ok(annotation_log.render(Feedback.print(Feedback.WEB, log)));
     }
     
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))

@@ -272,8 +272,8 @@ public class Measurement {
 	    return q;
 	}
 	
-	public static AcquisitionQueryResult find(String user_uri, String study_uri, 
-											  String subject_uri, String char_uri) {
+	public static AcquisitionQueryResult findForViews(String user_uri, String study_uri, 
+													  String subject_uri, String char_uri) {
 		AcquisitionQueryResult result = new AcquisitionQueryResult();
 		
 		SolrClient solr = new HttpSolrClient(
@@ -296,11 +296,11 @@ public class Measurement {
 				result.documents.add(convertFromSolr(m.next()));
 			}
 		} catch (SolrServerException e) {
-			System.out.println("[ERROR] Measurement.find(int, int, List<String>, Map<String, String>) - SolrServerException message: " + e.getMessage());
+			System.out.println("[ERROR] Measurement.findForViews() - SolrServerException message: " + e.getMessage());
 		} catch (IOException e) {
-			System.out.println("[ERROR] Measurement.find(int, int, List<String>, Map<String, String>) - IOException message: " + e.getMessage());
+			System.out.println("[ERROR] Measurement.findForViews() - IOException message: " + e.getMessage());
 		} catch (Exception e) {
-			System.out.println("[ERROR] Measurement.find(int, int, List<String>, Map<String, String>) - Exception message: " + e.getMessage());
+			System.out.println("[ERROR] Measurement.findForViews() - Exception message: " + e.getMessage());
 		}
 		
 		return result;
@@ -322,24 +322,24 @@ public class Measurement {
         }
         
         if (handler != null) {
-	    facet_query = handler.toSolrQuery();
-            System.out.println("BuildQuery: <<" + facet_query + ">>");
-            /*Iterator<String> i = handler.facetsAnd.keySet().iterator();
-            while (i.hasNext()) {
-                String field = i.next();
-                String value = handler.facetsAnd.get(field);
-                facet_query += field + ":\"" + value + "\"";
-                if (i.hasNext()) {
-                    facet_query += " AND ";
-                }
-		}*/
+        	facet_query = handler.toSolrQuery();
         }
         
-        if (facet_query.trim().equals("")) {
-            q = acquisition_query;
+        if (acquisition_query.equals("")) {
+        	if (facet_query.trim().equals("")) {
+        		q = "*:*";
+            }
+        	else {
+        		q = facet_query;
+        	}
         }
         else {
-            q = "(" + acquisition_query + ") AND (" + facet_query + ")";
+            if (facet_query.trim().equals("") || facet_query.trim().equals("*:*")) {
+                q = acquisition_query;
+            }
+            else {
+            	q = "(" + acquisition_query + ") AND (" + facet_query + ")";
+            }
         }
         
         return q;
@@ -355,6 +355,7 @@ public class Measurement {
 		SolrQuery query = new SolrQuery();
 		
 		String q = buildQuery(user_uri, page, qtd, handler);
+		System.out.println("q: " + q);
 		query.setQuery(q);
 		query.setStart((page - 1) * qtd + 1);
 		System.out.println("Starting at: " + ((page - 1)* qtd + 1) + "    page: " + page + "     qtd: " + qtd);
@@ -438,11 +439,11 @@ public class Measurement {
 				}
 			}
 		} catch (SolrServerException e) {
-			System.out.println("[ERROR] Measurement.find(int, int, List<String>, Map<String, String>) - SolrServerException message: " + e.getMessage());
+			System.out.println("[ERROR] Measurement.find() - SolrServerException message: " + e.getMessage());
 		} catch (IOException e) {
-			System.out.println("[ERROR] Measurement.find(int, int, List<String>, Map<String, String>) - IOException message: " + e.getMessage());
+			System.out.println("[ERROR] Measurement.find() - IOException message: " + e.getMessage());
 		} catch (Exception e) {
-			System.out.println("[ERROR] Measurement.find(int, int, List<String>, Map<String, String>) - Exception message: " + e.getMessage());
+			System.out.println("[ERROR] Measurement.find() - Exception message: " + e.getMessage());
 		}
 		
 		result.setDocumentSize((long)docSize);

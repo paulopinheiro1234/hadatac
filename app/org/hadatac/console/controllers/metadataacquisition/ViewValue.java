@@ -21,7 +21,7 @@ public class ViewValue extends Controller {
 	public static List<Measurement> findValue(String user_uri, String study_uri, 
 										      String subject_uri, String char_uri) {
 		AcquisitionQueryResult result = new AcquisitionQueryResult();
-		result = Measurement.find(user_uri, study_uri, subject_uri, char_uri);
+		result = Measurement.findForViews(user_uri, study_uri, subject_uri, char_uri);
 		
 		return result.documents;
 	}
@@ -29,7 +29,6 @@ public class ViewValue extends Controller {
 	@Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
     public static Result index(String user_uri, String study_uri, 
     						   String subject_uri, String char_uri) {
-		ValueCellProcessing cellProc = new ValueCellProcessing();
 		List<Measurement> indicatorValueResults = findValue(user_uri, study_uri, subject_uri, char_uri);
 		if (indicatorValueResults == null){
 			List<Measurement> indicatorValueResults2 = new ArrayList<Measurement>();
