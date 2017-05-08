@@ -12,6 +12,7 @@ import java.util.Map;
 
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVRecord;
+import org.apache.jena.ext.com.google.common.collect.Iterators;
 import org.apache.jena.query.QueryExecution;
 import org.apache.jena.query.QueryExecutionFactory;
 import org.apache.jena.query.QuerySolution;
@@ -21,6 +22,8 @@ import org.apache.jena.query.ResultSetRewindable;
 import org.apache.jena.rdf.model.Literal;
 import org.hadatac.utils.Collections;
 import org.hadatac.utils.NameSpaces;
+
+import com.google.common.collect.Iterables;
 
 public class SubjectGenerator {
 	final String kbPrefix = "chear-kb:";
@@ -83,8 +86,17 @@ public class SubjectGenerator {
     private String getOriginalID() {
     	return rec.get(mapCol.get("subjectID"));
     }
+    
     private String getStudyUri() {
+    	return kbPrefix + "STD-Pilot-" + rec.get(mapCol.get("pilotNum"));
+    }
+    
+    private String getCohortUri() {
     	return kbPrefix + "CH-Pilot-" + rec.get(mapCol.get("pilotNum"));
+    }
+    
+    private String getCohortLabel() {
+    	return "Cohort of Pilot Study " + rec.get(mapCol.get("pilotNum"));
     }
     
     public Map<String, Object> createRow() {
@@ -93,7 +105,7 @@ public class SubjectGenerator {
     	row.put("a", getType());
     	row.put("rdfs:label", getLabel());
     	row.put("hasco:originalID", getOriginalID());
-    	row.put("hasco:isSubjectOf", getStudyUri());
+    	row.put("hasco:isSubjectOf", getCohortUri());
     	counter++;
     	
     	return row;
@@ -103,6 +115,27 @@ public class SubjectGenerator {
     	for (CSVRecord record : records) {
     		rec = record;
     		rows.add(createRow());
+    	}
+
+    	return rows;
+    }
+    
+    public Map<String, Object> createCohortRow() {
+    	Map<String, Object> row = new HashMap<String, Object>();
+    	row.put("hasURI", getCohortUri());
+    	row.put("a", "hasco:Cohort");
+    	row.put("rdfs:label", getCohortLabel());
+    	row.put("hasco:hasSize", Integer.toString(Iterables.size(records)+1));
+    	row.put("hasco:isCohortOf", getStudyUri());
+    	counter++;
+    	
+    	return row;
+    }
+    
+    public List< Map<String, Object> > createCohortRows() {
+    	for (CSVRecord record : records) {
+    		rec = record;
+    		rows.add(createCohortRow());
     	}
 
     	return rows;

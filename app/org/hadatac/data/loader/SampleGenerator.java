@@ -90,7 +90,7 @@ public class SampleGenerator {
 		if(!rec.get(mapCol.get("sampleType")).equalsIgnoreCase("NULL")){
 			return rec.get(mapCol.get("sampleType"));
 		} else {
-			return "";
+			return "sio:Sample";
 		}
 	}
 	

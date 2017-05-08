@@ -64,6 +64,10 @@ public class StudyGenerator {
 		return kbPrefix + "STD-" + rec.get(mapCol.get("studyID")); 
 	}
 	
+	private String getType() {
+		return "hasco:Study";
+	}
+	
 	private String getTitle() { 
 		return rec.get(mapCol.get("studyTitle")); 
 	}
@@ -76,18 +80,33 @@ public class StudyGenerator {
 		return rec.get(mapCol.get("studySignificance")) ; 
 	}
 	
-	private String getInstitution() {
+	private String getInstitutionUri() {
 		return kbPrefix + "ORG-" + rec.get(mapCol.get("institution")).replaceAll(" ", "-"); 
 	}
 	
-	private String getAgent() {
+	private String getInstitutionName() {
+		return rec.get(mapCol.get("institution")); 
+	}
+	
+	private String getAgentUri() {
 		return kbPrefix + "PER-" + rec.get(mapCol.get("PI")).replaceAll(" ", "-"); 
 	}
 	
-	private String getType() {
-		return "hasco:Study";
+	private String getAgentFullName() {
+		return rec.get(mapCol.get("PI")); 
 	}
 	
+	private String getAgentGivenName() {
+		return rec.get(mapCol.get("PI")).substring(0, getAgentFullName().indexOf(' ')); 
+	}
+	
+	private String getAgentFamilyName() {
+		return rec.get(mapCol.get("PI")).substring(getAgentFullName().indexOf(' ')+1); 
+	}
+	
+	private String getAgentMBox() {
+		return rec.get(mapCol.get("PIEmail")); 
+	}
     
     public Map<String, Object> createRow() {
     	Map<String, Object> row = new HashMap<String, Object>();
@@ -96,8 +115,8 @@ public class StudyGenerator {
     	row.put("rdfs:label", getTitle());
     	row.put("skos:definition", getAims());
     	row.put("rdfs:comment", getSignificance());
-    	row.put("hasco:hasAgent", getAgent());
-    	row.put("hasco:hasInstitution", getInstitution());
+    	row.put("hasco:hasAgent", getAgentUri());
+    	row.put("hasco:hasInstitution", getInstitutionUri());
     	counter++;
     	
     	return row;
@@ -111,6 +130,51 @@ public class StudyGenerator {
 
     	return rows;
     }
+    
+    public Map<String, Object> createAgentRow() {
+    	Map<String, Object> row = new HashMap<String, Object>();
+    	row.put("hasURI", getAgentUri());
+    	row.put("a", "prov:Person");
+    	row.put("foaf:name", getAgentFullName());
+    	row.put("rdfs:comment", "PI from " + getInstitutionName());
+    	row.put("foaf:familyName", getAgentFamilyName() );
+    	row.put("foaf:givenName", getAgentGivenName());
+    	row.put("foaf:mbox", getAgentMBox());
+    	row.put("foaf:member", getInstitutionUri());
+    	counter++;
+    	
+    	return row;
+    }
+    
+    public List< Map<String, Object> > createAgentRows() {
+    	for (CSVRecord record : records) {
+    		rec = record;
+    		rows.add(createAgentRow());
+    	}
+
+    	return rows;
+    }
+    
+    public Map<String, Object> createInstitutionRow() {
+    	Map<String, Object> row = new HashMap<String, Object>();
+    	row.put("hasURI", getInstitutionUri());
+    	row.put("a", "prov:Organization");
+    	row.put("foaf:name", getInstitutionName());
+    	row.put("rdfs:comment", getInstitutionName() + " Institution");
+    	counter++;
+    	
+    	return row;
+    }
+    
+    public List< Map<String, Object> > createInstitutionRows() {
+    	for (CSVRecord record : records) {
+    		rec = record;
+    		rows.add(createInstitutionRow());
+    	}
+
+    	return rows;
+    }
+    
     
     public String toString() {
     	if(rows.isEmpty()){
