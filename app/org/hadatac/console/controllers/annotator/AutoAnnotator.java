@@ -423,12 +423,12 @@ public class AutoAnnotator extends Controller {
 		try {
 			int nRows = labkeyDataHandler.insertRows("Study", rows);
 			log.addline(Feedback.println(Feedback.WEB, String.format(
-					"[OK] %d row(s) have been inserted into Study table", nRows)));
+					"[OK] %d row(s) have been inserted into the Study table", nRows)));
 		} catch (CommandException e1) {
 			try {
 				int nRows = labkeyDataHandler.updateRows("Study", rows);
 				log.addline(Feedback.println(Feedback.WEB, String.format(
-						"[OK] %d row(s) have been inserted into Study table", nRows)));
+						"[OK] %d row(s) have been inserted into the Study table", nRows)));
 			} catch (CommandException e) {
 				log.addline(Feedback.println(Feedback.WEB, "[ERROR] " + e.getMessage()));
 	    		log.save();
@@ -439,6 +439,59 @@ public class AutoAnnotator extends Controller {
 		log.addline(Feedback.println(Feedback.WEB, String.format(
 				"[OK] %d triple(s) have been committed to triple store", model.size())));
 		log.addline(Feedback.println(Feedback.WEB, String.format(studyGenerator.toString())));
+		
+		studyGenerator = new StudyGenerator(file);
+		List<Map<String, Object>> agentRows = studyGenerator.createAgentRows();
+		Model agentModel = createModel(agentRows);
+    	DatasetAccessor agentAccessor = DatasetAccessorFactory.createHTTP(
+				Collections.getCollectionsName(Collections.METADATA_GRAPH));
+    	agentAccessor.add(agentModel);
+    	
+    	try {
+			int nRows = labkeyDataHandler.insertRows("Agent", agentRows);
+			log.addline(Feedback.println(Feedback.WEB, String.format(
+					"[OK] %d row(s) have been inserted into the Agent table", nRows)));
+		} catch (CommandException e1) {
+			try {
+				int nRows = labkeyDataHandler.updateRows("Agent", agentRows);
+				log.addline(Feedback.println(Feedback.WEB, String.format(
+						"[OK] %d row(s) have been inserted into the Agent table", nRows)));
+			} catch (CommandException e) {
+				log.addline(Feedback.println(Feedback.WEB, "[ERROR] " + e.getMessage()));
+	    		log.save();
+	    		return false;
+			}
+		}
+    	
+    	log.addline(Feedback.println(Feedback.WEB, String.format(
+				"[OK] %d triple(s) have been committed to triple store", agentModel.size())));
+		log.addline(Feedback.println(Feedback.WEB, String.format(studyGenerator.toString())));
+    	
+    	studyGenerator = new StudyGenerator(file);
+    	List<Map<String, Object>> institutionRows = studyGenerator.createInstitutionRows();
+		Model institutionModel = createModel(institutionRows);
+    	DatasetAccessor institutionAccessor = DatasetAccessorFactory.createHTTP(
+				Collections.getCollectionsName(Collections.METADATA_GRAPH));
+    	institutionAccessor.add(institutionModel);
+    	try {
+			int nRows = labkeyDataHandler.insertRows("Agent", institutionRows);
+			log.addline(Feedback.println(Feedback.WEB, String.format(
+					"[OK] %d row(s) have been inserted into the Agent table", nRows)));
+		} catch (CommandException e1) {
+			try {
+				int nRows = labkeyDataHandler.updateRows("Agent", institutionRows);
+				log.addline(Feedback.println(Feedback.WEB, String.format(
+						"[OK] %d row(s) have been inserted into the Agent table", nRows)));
+			} catch (CommandException e) {
+				log.addline(Feedback.println(Feedback.WEB, "[ERROR] " + e.getMessage()));
+	    		log.save();
+	    		return false;
+			}
+		}
+    	log.addline(Feedback.println(Feedback.WEB, String.format(
+				"[OK] %d triple(s) have been committed to triple store", institutionModel.size())));
+		log.addline(Feedback.println(Feedback.WEB, String.format(studyGenerator.toString())));
+    	
 		log.save();
 		
 		return true;
@@ -469,12 +522,12 @@ public class AutoAnnotator extends Controller {
 		try {
 			int nRows = labkeyDataHandler.insertRows("Sample", rows);
 			log.addline(Feedback.println(Feedback.WEB, String.format(
-					"[OK] %d row(s) have been inserted into Sample table", nRows)));
+					"[OK] %d row(s) have been inserted into the Sample table", nRows)));
 		} catch (CommandException e1) {
 			try {
 				int nRows = labkeyDataHandler.updateRows("Sample", rows);
 				log.addline(Feedback.println(Feedback.WEB, String.format(
-						"[OK] %d row(s) have been inserted into Sample table", nRows)));
+						"[OK] %d row(s) have been inserted into the Sample table", nRows)));
 			} catch (CommandException e) {
 				log.addline(Feedback.println(Feedback.WEB, "[ERROR] " + e.getMessage()));
 	    		log.save();
@@ -515,12 +568,12 @@ public class AutoAnnotator extends Controller {
 		try {
 			int nRows = labkeyDataHandler.insertRows("Subject", rows);
 			log.addline(Feedback.println(Feedback.WEB, String.format(
-					"[OK] %d row(s) have been inserted into Subject table", nRows)));
+					"[OK] %d row(s) have been inserted into the Subject table", nRows)));
 		} catch (CommandException e1) {
 			try {
 				int nRows = labkeyDataHandler.updateRows("Subject", rows);
 				log.addline(Feedback.println(Feedback.WEB, String.format(
-						"[OK] %d row(s) have been inserted into Subject table", nRows)));
+						"[OK] %d row(s) have been inserted into the Subject table", nRows)));
 			} catch (CommandException e) {
 				log.addline(Feedback.println(Feedback.WEB, "[ERROR] " + e.getMessage()));
 	    		log.save();
@@ -531,6 +584,34 @@ public class AutoAnnotator extends Controller {
 		log.addline(Feedback.println(Feedback.WEB, String.format(
 				"[OK] %d triple(s) have been committed to triple store", model.size())));
 		log.addline(Feedback.println(Feedback.WEB, String.format(subjectGenerator.toString())));
+		
+		subjectGenerator = new SubjectGenerator(file);
+		List<Map<String, Object>> cohortRows = subjectGenerator.createCohortRows();
+		
+		Model cohortModel = createModel(cohortRows);
+    	DatasetAccessor cohortAccessor = DatasetAccessorFactory.createHTTP(
+				Collections.getCollectionsName(Collections.METADATA_GRAPH));
+    	cohortAccessor.add(cohortModel);
+    	try {
+			int nRows = labkeyDataHandler.insertRows("Cohort", cohortRows);
+			log.addline(Feedback.println(Feedback.WEB, String.format(
+					"[OK] %d row(s) have been inserted into the Cohort table", nRows)));
+		} catch (CommandException e1) {
+			try {
+				int nRows = labkeyDataHandler.updateRows("Cohort", cohortRows);
+				log.addline(Feedback.println(Feedback.WEB, String.format(
+						"[OK] %d row(s) have been inserted into the Cohort table", nRows)));
+			} catch (CommandException e) {
+				log.addline(Feedback.println(Feedback.WEB, "[ERROR] " + e.getMessage()));
+	    		log.save();
+	    		return false;
+			}
+		}
+
+		log.addline(Feedback.println(Feedback.WEB, String.format(
+				"[OK] %d triple(s) have been committed to triple store", cohortModel.size())));
+		log.addline(Feedback.println(Feedback.WEB, String.format(subjectGenerator.toString())));
+    	
 		log.save();
 		
 		return true;
