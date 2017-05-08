@@ -45,6 +45,7 @@ import org.hadatac.console.views.html.triplestore.*;
 import org.hadatac.console.views.html.*;
 import org.hadatac.data.api.DataFactory;
 import org.hadatac.data.loader.SampleGenerator;
+import org.hadatac.data.loader.SampleSubjectMapper;
 import org.hadatac.data.loader.StudyGenerator;
 import org.hadatac.data.loader.SubjectGenerator;
 import org.hadatac.data.model.ParsingResult;
@@ -346,6 +347,9 @@ public class AutoAnnotator extends Controller {
 			else if (file_name.startsWith("STD")) {
 				bSucceed = annotateStudyIdFile(new File(path_unproc + "/" + file_name));
 			}
+			else if (file_name.startsWith("MAP")) {
+				bSucceed = annotateMapFile(new File(path_unproc + "/" + file_name));
+			}
 			if (bSucceed) {
 				//Move the file to the folder for processed files
 				File destFolder = new File(path_proc);
@@ -396,6 +400,53 @@ public class AutoAnnotator extends Controller {
     	
     	return model;
     }
+	
+	public static boolean annotateMapFile(File file) {
+		SampleSubjectMapper mapper = new SampleSubjectMapper(file);
+		List<Map<String, Object>> rows = mapper.createRows();
+		
+		Model model = createModel(rows);
+    	DatasetAccessor accessor = DatasetAccessorFactory.createHTTP(
+				Collections.getCollectionsName(Collections.METADATA_GRAPH));
+    	accessor.add(model);
+		
+		String site = ConfigProp.getPropertyValue("labkey.config", "site");
+		String path = "/" + ConfigProp.getPropertyValue("labkey.config", "folder");
+		//String path = "/SIDPIDTEST";
+        Credential cred = Credential.find();
+        AnnotationLog log = new AnnotationLog();
+    	log.setFileName(file.getName());
+        if (null == cred) {
+        	log.addline(Feedback.println(Feedback.WEB, "[ERROR] No LabKey credentials are provided!"));
+    		log.save();
+    		return false;
+        }
+    	
+    	LabkeyDataHandler labkeyDataHandler = new LabkeyDataHandler(
+    			site, cred.getUserName(), cred.getPassword(), path);
+    	try {
+			int nRows = labkeyDataHandler.insertRows("Sample", rows);
+			log.addline(Feedback.println(Feedback.WEB, String.format(
+					"[OK] %d row(s) have been inserted into the Sample table", nRows)));
+		} catch (CommandException e1) {
+			try {
+			int nRows = labkeyDataHandler.updateRows("Sample", rows);
+			log.addline(Feedback.println(Feedback.WEB, String.format(
+					"[OK] %d row(s) have been updated in the Sample table", nRows)));
+			} catch (CommandException e) {
+			log.addline(Feedback.println(Feedback.WEB, "[ERROR] " + e.getMessage()));
+    		log.save();
+    		return false;
+			}
+		}
+		
+		log.addline(Feedback.println(Feedback.WEB, String.format(
+				"[OK] %d triple(s) have been committed to triple store", model.size())));
+		log.addline(Feedback.println(Feedback.WEB, String.format(mapper.toString())));
+		log.save();
+
+		return true;
+	}
 	
 	public static boolean annotateStudyIdFile(File file) {
 		StudyGenerator studyGenerator = new StudyGenerator(file);
@@ -507,8 +558,8 @@ public class AutoAnnotator extends Controller {
     	accessor.add(model);
 		
 		String site = ConfigProp.getPropertyValue("labkey.config", "site");
-		//String path = "/" + ConfigProp.getPropertyValue("labkey.config", "folder");
-		String path = "/SIDPIDTEST";
+		String path = "/" + ConfigProp.getPropertyValue("labkey.config", "folder");
+		//String path = "/SIDPIDTEST";
         Credential cred = Credential.find();
         AnnotationLog log = new AnnotationLog();
     	log.setFileName(file.getName());
@@ -553,8 +604,8 @@ public class AutoAnnotator extends Controller {
     	accessor.add(model);
 		
 		String site = ConfigProp.getPropertyValue("labkey.config", "site");
-        //String path = "/" + ConfigProp.getPropertyValue("labkey.config", "folder");
-        String path = "/SIDPIDTEST";
+        String path = "/" + ConfigProp.getPropertyValue("labkey.config", "folder");
+        //String path = "/SIDPIDTEST";
         Credential cred = Credential.find();
         AnnotationLog log = new AnnotationLog();
     	log.setFileName(file.getName());
