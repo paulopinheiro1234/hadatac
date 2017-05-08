@@ -12,7 +12,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.StringTokenizer;
 
 import javax.servlet.http.HttpServletResponse;
 
@@ -26,7 +25,6 @@ import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
 import org.apache.jena.rdf.model.Property;
 import org.apache.jena.rdf.model.Resource;
-import org.apache.jena.sparql.function.library.print;
 import org.hadatac.entity.pojo.Credential;
 import org.hadatac.console.controllers.AuthApplication;
 import org.hadatac.console.controllers.dataacquisitionsearch.LoadCCSV;
@@ -288,6 +286,16 @@ public class AutoAnnotator extends Controller {
 		}
 		
 		return redirect(routes.AutoAnnotator.index());
+	}
+	
+	@Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
+	public static Result downloadTemplates() {
+		return ok(download_templates.render());
+	}
+	
+	@Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
+	public static Result postDownloadTemplates() {
+		return postDownloadTemplates();
 	}
 	
 	@Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))

@@ -1,0 +1,38 @@
+@()
+
+@import helper._
+@import org.hadatac.console.views.html._
+@import org.hadatac.console.controllers.triplestore._
+@import org.hadatac.metadata.loader._
+@import java.net._
+
+@main("Download CSV Templates") {
+	
+	<div class="container-fluid">
+		<h4>CSV Templates:</h4>
+		Use the templates below to create csv files for the automatic annotator.
+		<table class="table">
+			<thead>
+         		<tr>
+            		<th>Templates</th>
+            		<th>Examples</th>
+         		</tr>
+         	</thead>
+			<tbody>
+    			<tr>
+    				<td><a href='@controllers.routes.Assets.versioned("example/metadata/templates/HASNetO-Template-Agents.xlsx")'>Agent Spreadsheet</a> - Used to create agents (including users) and organizations (see example Agent spreadsheet)</td>
+    				<td><a href='@controllers.routes.Assets.versioned("example/metadata/templates/HASNetO-Template-Agents.xlsx")'>Agent Spreadsheet</a></td>
+    			</tr>
+    			<tr>
+    				<td><a href='@controllers.routes.Assets.versioned("example/metadata/templates/HASNetO-Template-Agents.xlsx")'>Agent Spreadsheet</a> - Used to create agents (including users) and organizations (see example Agent spreadsheet)</td>
+    				<td><a href='@controllers.routes.Assets.versioned("example/metadata/templates/HASNetO-Template-Agents.xlsx")'>Agent Spreadsheet</a></td>
+    			</tr>
+    			<tr>
+    				<td><a href='@controllers.routes.Assets.versioned("example/metadata/templates/HASNetO-Template-Agents.xlsx")'>Agent Spreadsheet</a> - Used to create agents (including users) and organizations (see example Agent spreadsheet)</td>
+    				<td><a href='@controllers.routes.Assets.versioned("example/metadata/templates/HASNetO-Template-Agents.xlsx")'>Agent Spreadsheet</a></td>
+    			</tr>
+    		</tbody>
+    	</table>
+    	<a href="@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.index()" class="btn btn-primary" role="button">Back to Annotator</a>
+    </div>
+}
