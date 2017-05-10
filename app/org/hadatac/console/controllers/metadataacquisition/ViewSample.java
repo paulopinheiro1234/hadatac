@@ -32,6 +32,7 @@ import org.hadatac.console.models.TripleDocument;
 import org.hadatac.entity.pojo.DataAcquisition;
 import org.hadatac.entity.pojo.Deployment;
 import org.hadatac.utils.Collections;
+import org.hadatac.utils.NameSpaces;
 import org.hadatac.utils.State;
 
 import be.objectify.deadbolt.java.actions.Group;
@@ -40,7 +41,9 @@ import be.objectify.deadbolt.java.actions.Restrict;
 public class ViewSample extends Controller {
 
 	public static Map<String, String> findSampleIndicators(String sample_uri) {
-		String indicatorQuery="PREFIX rdfs:<http://www.w3.org/2000/01/rdf-schema#> PREFIX case: <http://hadatac.org/ont/case#>PREFIX chear: <http://hadatac.org/ont/chear#>SELECT ?sampleIndicator ?label ?comment WHERE { ?sampleIndicator rdfs:subClassOf chear:SampleIndicator . ?sampleIndicator rdfs:label ?label . ?sampleIndicator rdfs:comment ?comment . }";
+		String indicatorQuery=NameSpaces.getInstance().printSparqlNameSpaceList()
+				//"PREFIX rdfs:<http://www.w3.org/2000/01/rdf-schema#> PREFIX case: <http://hadatac.org/ont/case#>PREFIX chear: <http://hadatac.org/ont/chear#>"
+				+ "SELECT ?sampleIndicator ?label ?comment WHERE { ?sampleIndicator rdfs:subClassOf chear:SampleIndicator . ?sampleIndicator rdfs:label ?label . ?sampleIndicator rdfs:comment ?comment . }";
 		QueryExecution qexecInd = QueryExecutionFactory.sparqlService(Collections.getCollectionsName(Collections.METADATA_SPARQL), indicatorQuery);
 		ResultSet indicatorResults = qexecInd.execSelect();
 		ResultSetRewindable resultsrwIndc = ResultSetFactory.copyResults(indicatorResults);
@@ -61,7 +64,8 @@ public class ViewSample extends Controller {
 		    //System.out.println("Key : " + entry.getKey() + " and Value: " + entry.getValue() + "\n");
 		    String label = entry.getValue().toString().replaceAll(" ", "").replaceAll(",", "").toString() + "Label";
 
-			String indvIndicatorQuery = "PREFIX cmo: <http://purl.obolibrary.org/obo/cmo#> PREFIX chebi: <http://purl.obolibrary.org/obo/CHEBI_> PREFIX hadatac-sn: <http://hadatac.org/ont/hadatac-sn#> PREFIX owl: <http://www.w3.org/2002/07/owl#> PREFIX vstoi: <http://hadatac.org/ont/vstoi#> PREFIX case-kb: <http://hadatac.org/kb/case#> PREFIX xsd: <http://www.w3.org/2001/XMLSchema#> PREFIX skos: <http://www.w3.org/2004/02/skos/core#> PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> PREFIX chear-kb: <http://hadatac.org/kb/chear#> PREFIX dct: <http://purl.org/dc/terms/> PREFIX sio: <http://semanticscience.org/resource/> PREFIX dcterms: <http://purl.org/dc/terms/> PREFIX uo: <http://purl.obolibrary.org/obo/uo#> PREFIX hasneto: <http://hadatac.org/ont/hasneto#> PREFIX prov: <http://www.w3.org/ns/prov#> PREFIX hadatac: <http://hadatac.org/ont/hadatac#> PREFIX hasco: <http://hadatac.org/ont/hasco/> PREFIX uberon: <http://purl.obolibrary.org/obo/uberon.owl#> PREFIX chear: <http://hadatac.org/ont/chear#> PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>"
+			String indvIndicatorQuery = NameSpaces.getInstance().printSparqlNameSpaceList()
+			//"PREFIX cmo: <http://purl.obolibrary.org/obo/cmo#> PREFIX chebi: <http://purl.obolibrary.org/obo/CHEBI_> PREFIX hadatac-sn: <http://hadatac.org/ont/hadatac-sn#> PREFIX owl: <http://www.w3.org/2002/07/owl#> PREFIX vstoi: <http://hadatac.org/ont/vstoi#> PREFIX case-kb: <http://hadatac.org/kb/case#> PREFIX xsd: <http://www.w3.org/2001/XMLSchema#> PREFIX skos: <http://www.w3.org/2004/02/skos/core#> PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> PREFIX chear-kb: <http://hadatac.org/kb/chear#> PREFIX dct: <http://purl.org/dc/terms/> PREFIX sio: <http://semanticscience.org/resource/> PREFIX dcterms: <http://purl.org/dc/terms/> PREFIX uo: <http://purl.obolibrary.org/obo/uo#> PREFIX hasneto: <http://hadatac.org/ont/hasneto#> PREFIX prov: <http://www.w3.org/ns/prov#> PREFIX hadatac: <http://hadatac.org/ont/hadatac#> PREFIX hasco: <http://hadatac.org/ont/hasco/> PREFIX uberon: <http://purl.obolibrary.org/obo/uberon.owl#> PREFIX chear: <http://hadatac.org/ont/chear#> PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>"
 										+ "SELECT DISTINCT ?sindi WHERE { ?sindi rdfs:subClassOf chear:SampleIndicator . }";
 			//System.out.println(indvIndicatorQuery + "\n");
 			QueryExecution qexecIndvInd = QueryExecutionFactory.sparqlService(Collections.getCollectionsName(Collections.METADATA_SPARQL), indvIndicatorQuery);
@@ -72,7 +76,9 @@ public class ViewSample extends Controller {
 			while (resultsrwIndvInd.hasNext()) {
 				QuerySolution soln = resultsrwIndvInd.next();
 				//System.out.println("Solution: " + soln);
-				indvIndicatorString += soln.get(label).toString() + ", ";
+				if(soln.contains(label)){
+					indvIndicatorString += soln.get(label).toString() + ", ";
+				}
 				//System.out.println("Indicator String: " + indvIndicatorString);
 			}
 			if (indvIndicatorString != ""){
@@ -87,8 +93,8 @@ public class ViewSample extends Controller {
 
 		String sampleQueryString = "";
 		
-    	sampleQueryString = 
-    	"PREFIX sio: <http://semanticscience.org/resource/>" + 
+    	sampleQueryString = NameSpaces.getInstance().printSparqlNameSpaceList() +
+    	/*"PREFIX sio: <http://semanticscience.org/resource/>" + 
     	"PREFIX chear: <http://hadatac.org/ont/chear#>" + 
     	"PREFIX chear-kb: <http://hadatac.org/kb/chear#>" + 
     	"PREFIX prov: <http://www.w3.org/ns/prov#>" + 
@@ -97,12 +103,12 @@ public class ViewSample extends Controller {
     	"PREFIX dcterms: <http://purl.org/dc/terms/>" + 
     	"PREFIX rdfs:<http://www.w3.org/2000/01/rdf-schema#>" + 
     	"PREFIX skos: <http://www.w3.org/2004/02/skos/core#>" +
-    	"PREFIX foaf: <http://xmlns.com/foaf/0.1/>" + 
+    	"PREFIX foaf: <http://xmlns.com/foaf/0.1/>" + */
     	"SELECT ?sampleUri ?subjectUri ?subjectLabel ?sampleType ?sampleLabel ?freezeThaw ?storageTemp ?storageTempUnit ?cohortLabel ?object ?samplingVolume ?samplingVolumeUnit ?comment" +
 		 "WHERE {        ?subjectUri hasco:isSubjectOf* ?cohort ." +
 		 "       		?sampleUri hasco:isSampleOf ?subjectUri ." +
 		 "				?sampleUri rdfs:comment ?comment . " +
-		 "				?sampleUri hasco:isMeasuredObjectOf ?object . " +
+		 "				?sampleUri hasco:isObjectOf ?object . " +
 		 "				?sampleUri hasco:hasSamplingVolume ?samplingVolume . " +
 		 "				?sampleUri hasco:hasSamplingVolumeUnit ?samplingVolumeUnit . " +
 		 "				?sampleUri hasco:hasStorageTemperature ?storageTemp . " +

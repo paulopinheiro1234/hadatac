@@ -497,21 +497,41 @@ public class Study {
 		"  UNION " + 
 		"  { " +
 		"    { " +
-		// Data Acquisition Samples
+		// Sample Collections
 		"  	?subUri rdfs:subClassOf* hasco:Study . " + 
 		"  	?study a ?subUri . " +
-		"   ?da hasco:isDataAcquisitionOf ?study . " + 
-		"   ?s hasco:isMeasuredObjectOf ?da .  " +
+		"   ?s hasco:isSampleCollectionOf ?study . " + 
 		"   ?s ?p ?o . " +
 		"  FILTER (?study = " + study + ") " +
 		"    } " +
 		"    MINUS " +
 		"    { " +
-		// Other Data Acquisition Samples
+		// Other Sample Collections
 		"  	?subUri rdfs:subClassOf* hasco:Study . " + 
 		"  	?study a ?subUri . " +
-		"   ?da hasco:isDataAcquisitionOf ?study . " + 
-		"   ?s hasco:isMeasuredObjectOf ?da .  " +
+		"   ?s hasco:isSampleCollectionOf ?study . " + 
+		"   ?s ?p ?o . " +
+		"  	FILTER (?study != " + study + ") " +
+		"    } " +
+		"  } "  +
+		"  UNION " + 
+		"  { " +
+		"    { " +
+		// Sample Collection Samples
+		"  	?subUri rdfs:subClassOf* hasco:Study . " + 
+		"  	?study a ?subUri . " +
+		"   ?sc hasco:isSampleCollectionOf ?study . " + 
+		"   ?s hasco:isObjectOf ?sc .  " +
+		"   ?s ?p ?o . " +
+		"  FILTER (?study = " + study + ") " +
+		"    } " +
+		"    MINUS " +
+		"    { " +
+		// Other Sample Collection Samples
+		"  	?subUri rdfs:subClassOf* hasco:Study . " + 
+		"  	?study a ?subUri . " +
+		"   ?sc hasco:isSampleCollectionOf ?study . " + 
+		"   ?s hasco:isObjectOf ?sc .  " +
 		"   ?s ?p ?o . " +
 		"  	FILTER (?study != " + study + ") " +
 		"    } " +

@@ -64,8 +64,8 @@ public class SampleGenerator {
 		int count = 0;
 		String sampleCountQuery = NameSpaces.getInstance().printSparqlNameSpaceList() 
 				+ " SELECT (count(DISTINCT ?sampleURI) as ?sampleCount) WHERE { "
-				+ " ?sampleURI hasco:isMeasuredObjectOf ?DA . "
-				+ " ?DA hasco:isDataAcquisitionOf chear-kb:STD-Pilot-" + pilotNum + " . "
+				+ " ?sampleURI hasco:isObjectOf ?SC . "
+				+ " ?SC hasco:isSampleCollectionOf chear-kb:STD-Pilot-" + pilotNum + " . "
 				+ "}";
 		QueryExecution qexecSample = QueryExecutionFactory.sparqlService(
 				Collections.getCollectionsName(Collections.METADATA_SPARQL), sampleCountQuery);
@@ -212,7 +212,7 @@ public class SampleGenerator {
     	row.put("rdfs:label", getLabel());
     	row.put("hasco:originalID", getOriginalID());
     	row.put("hasco:isSampleOf", getSubjectUri());
-    	row.put("hasco:isMeasuredObjectOf", getCollectionUri());
+    	row.put("hasco:isObjectOf", getCollectionUri());
     	row.put("rdfs:comment", getComment());
     	row.put("hasco:hasSamplingMethod", getSamplingMethod());
     	row.put("hasco:hasSamplingVolume", getSamplingVolume());

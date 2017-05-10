@@ -441,7 +441,7 @@ public class DynamicFunctions extends Controller {
     	"WHERE {        ?subjectUri hasco:isSubjectOf* ?cohort ." +
     	"       		?sampleUri hasco:isSampleOf ?subjectUri ." +
     	"				?sampleUri rdfs:comment ?comment . " +
-    	"				OPTIONAL { ?sampleUri hasco:isMeasuredObjectOf ?object . " +
+    	"				OPTIONAL { ?sampleUri hasco:isObjectOf ?object . " +
     	"				?sampleUri hasco:hasSamplingVolume ?samplingVolume . " +
     	"				?sampleUri hasco:hasSamplingVolumeUnit ?samplingVolumeUnit . " +
     	"				?sampleUri hasco:hasStorageTemperature ?storageTemp . " +
@@ -506,7 +506,7 @@ public class DynamicFunctions extends Controller {
     	"WHERE {        ?subjectUri hasco:isSubjectOf* ?cohort ." +
     	"       		?sampleUri hasco:isSampleOf ?subjectUri ." +
     	"				?sampleUri rdfs:comment ?comment . " +
-    	"				OPTIONAL { ?sampleUri hasco:isMeasuredObjectOf ?object . " +
+    	"				OPTIONAL { ?sampleUri hasco:isObjectOf ?object . " +
     	"				?sampleUri hasco:hasSamplingVolume ?samplingVolume . " +
     	"				?sampleUri hasco:hasSamplingVolumeUnit ?samplingVolumeUnit . " +
     	"				?sampleUri hasco:hasStorageTemperature ?storageTemp . " +
@@ -572,7 +572,7 @@ public class DynamicFunctions extends Controller {
     			"WHERE {        ?subjectUri hasco:isSubjectOf* ?cohort ." +
     			"       		?sampleUri hasco:isSampleOf ?subjectUri ." +
     			"				?sampleUri rdfs:comment ?comment . " +
-    			"				OPTIONAL { ?sampleUri hasco:isMeasuredObjectOf ?object . " +
+    			"				OPTIONAL { ?sampleUri hasco:isObjectOf ?object . " +
     			"				?sampleUri hasco:hasSamplingVolume ?samplingVolume . " +
     			"				?sampleUri hasco:hasSamplingVolumeUnit ?samplingVolumeUnit . " +
     			"				?sampleUri hasco:hasStorageTemperature ?storageTemp . " +
