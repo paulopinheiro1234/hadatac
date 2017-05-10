@@ -597,6 +597,33 @@ public class AutoAnnotator extends Controller {
 		log.addline(Feedback.println(Feedback.WEB, String.format(
 				"[OK] %d triple(s) have been committed to triple store", model.size())));
 		log.addline(Feedback.println(Feedback.WEB, String.format(sampleGenerator.toString())));
+		
+		sampleGenerator = new SampleGenerator(file);
+		List<Map<String, Object>> collectionRows = sampleGenerator.createCollectionRows();
+		
+		Model collectionModel = createModel(collectionRows);
+    	DatasetAccessor collectionAccessor = DatasetAccessorFactory.createHTTP(
+				Collections.getCollectionsName(Collections.METADATA_GRAPH));
+    	collectionAccessor.add(collectionModel);
+    	try {
+			int nRows = labkeyDataHandler.insertRows("SampleCollection", collectionRows);
+			log.addline(Feedback.println(Feedback.WEB, String.format(
+					"[OK] %d row(s) have been inserted into the SampleCollection table", nRows)));
+		} catch (CommandException e1) {
+			try {
+				int nRows = labkeyDataHandler.updateRows("SampleCollection", collectionRows);
+				log.addline(Feedback.println(Feedback.WEB, String.format(
+						"[OK] %d row(s) have been inserted into the SampleCollection table", nRows)));
+			} catch (CommandException e) {
+				log.addline(Feedback.println(Feedback.WEB, "[ERROR] " + e.getMessage()));
+	    		log.save();
+	    		return false;
+			}
+		}
+
+		log.addline(Feedback.println(Feedback.WEB, String.format(
+				"[OK] %d triple(s) have been committed to triple store", collectionModel.size())));
+		log.addline(Feedback.println(Feedback.WEB, String.format(sampleGenerator.toString())));
 		log.save();
 		
 		return true;

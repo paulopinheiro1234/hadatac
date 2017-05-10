@@ -24,6 +24,8 @@ import org.apache.jena.rdf.model.ModelFactory;
 import org.hadatac.utils.Collections;
 import org.hadatac.utils.NameSpaces;
 
+import com.google.common.collect.Iterables;
+
 public class SampleGenerator {
 	final String kbPrefix = "chear-kb:";
 	private String dataAcquisition = "";
@@ -191,6 +193,18 @@ public class SampleGenerator {
     	}
     }
     
+    private String getStudyUri() {
+    	return kbPrefix + "STD-Pilot-" + rec.get(mapCol.get("pilotNum"));
+    }
+    
+    private String getCollectionUri() {
+    	return kbPrefix + "SC-Pilot-" + rec.get(mapCol.get("pilotNum"));
+    }
+    
+    private String getCollectionLabel() {
+    	return "Sample Collection of Pilot Study " + rec.get(mapCol.get("pilotNum"));
+    }
+    
     public Map<String, Object> createRow() {
     	Map<String, Object> row = new HashMap<String, Object>();
     	row.put("hasURI", getUri());
@@ -198,7 +212,7 @@ public class SampleGenerator {
     	row.put("rdfs:label", getLabel());
     	row.put("hasco:originalID", getOriginalID());
     	row.put("hasco:isSampleOf", getSubjectUri());
-    	row.put("hasco:isMeasuredObjectOf", getDataAcquisition());
+    	row.put("hasco:isMeasuredObjectOf", getCollectionUri());
     	row.put("rdfs:comment", getComment());
     	row.put("hasco:hasSamplingMethod", getSamplingMethod());
     	row.put("hasco:hasSamplingVolume", getSamplingVolume());
@@ -218,6 +232,27 @@ public class SampleGenerator {
     		rows.add(createRow());
     	}
     	
+    	return rows;
+    }
+    
+    public Map<String, Object> createCollectionRow() {
+    	Map<String, Object> row = new HashMap<String, Object>();
+    	row.put("hasURI", getCollectionUri());
+    	row.put("a", "hasco:SampleCollection");
+    	row.put("rdfs:label", getCollectionLabel());
+    	row.put("hasco:hasSize", Integer.toString(Iterables.size(records)+1));
+    	row.put("hasco:isSampleCollectionOf", getStudyUri());
+    	counter++;
+    	
+    	return row;
+    }
+    
+    public List< Map<String, Object> > createCollectionRows() {
+    	for (CSVRecord record : records) {
+    		rec = record;
+    		rows.add(createCollectionRow());
+    	}
+
     	return rows;
     }
     
