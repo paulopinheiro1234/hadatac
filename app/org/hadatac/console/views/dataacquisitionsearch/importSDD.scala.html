@@ -1,0 +1,59 @@
+@(oper: String, message : String)
+
+@import helper._
+@import org.hadatac.console.views.html._
+@import org.hadatac.console.controllers.dataacquisitionsearch._
+@import org.hadatac.data.loader._
+@import org.hadatac.metadata.loader._
+@import java.net._
+
+@main("Import SDD file") {
+ 
+    <div class="container-fluid">
+      
+      <div class="row">
+
+        <div class="col-md-8 col-md-offset-1">
+
+	     <h4>Load SDD file into hadatac ...</h4>
+        
+             @if(oper=="init") {
+
+              <form name="fileUploadForm" method="POST" enctype="multipart/form-data" action="@org.hadatac.console.controllers.dataacquisitionsearch.routes.ImportSDD.uploadFile()">
+                     <input type="file" class="btn btn-info" name="sddsheet">
+                     Are your sure you want to have the SDD file loaded and integrated into the labkey repository?
+                     <input type="submit" class="btn btn-success" value="Confirm">
+                     <a href="@org.hadatac.console.controllers.dataacquisitionsearch.routes.ImportSDD.importSDD("cancelled")" class="btn btn-danger" role="button">Cancel</a>
+              </form>
+            }
+
+             <p  style='font-family: "Lucida Console", Monaco, monospace;' id='msgarea'></p>
+         
+             @if(oper=="cancelled") {
+                <div id="cancel-box">
+                   <h4>Operation [Load SDD file] has been cancelled.</h4>
+                   Press OK button to return to HADataC's main page <a href="@org.hadatac.console.controllers.routes.Portal.index()" class="btn btn-primary" role="button">Ok</a>
+	        </div>
+             }
+
+             
+           <div id="end-process-box" style="display:none;">
+                  <h4>Operation [Load SDD file] complete -- check the results above to see if the clean was successful.</h4>
+                  Press OK button to return to HADataC's main page <a href="@org.hadatac.console.controllers.routes.Portal.index()" class="btn btn-primary" role="button">Ok</a>
+	       </div>
+
+     	     @if(oper=="loaded") {
+                 <script> 
+                       var msg = "@ImportSDD.playLoadSDD()";
+                       $('#msgarea').html(msg.replace(/&lt;br&gt;/g, '<br>'));
+                       document.getElementById('end-process-box').style.display = 'inline';
+                 </script> 
+              }
+
+	   </div>
+
+      </div>
+
+    </div>
+
+}

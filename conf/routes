@@ -12,6 +12,8 @@ POST	/hadatac/acquisitions                     org.hadatac.console.controllers.d
 GET	    /hadatac/acquisitions/loadccsv		      org.hadatac.console.controllers.dataacquisitionsearch.LoadCCSV.loadCCSV(oper: String)
 POST	/hadatac/acquisitions/loadccsv		      org.hadatac.console.controllers.dataacquisitionsearch.LoadCCSV.postLoadCCSV(oper: String)
 POST	/hadatac/acquisitions/loadccsv/upload	  org.hadatac.console.controllers.dataacquisitionsearch.LoadCCSV.uploadFile
+GET	    /hadatac/acquisitions/importsdd		      org.hadatac.console.controllers.dataacquisitionsearch.ImportSDD.importSDD(oper: String)
+POST	/hadatac/acquisitions/importsdd/upload	  org.hadatac.console.controllers.dataacquisitionsearch.ImportSDD.uploadFile
 
 GET	    /hadatac/metadataacquisitions/solrsearch            			org.hadatac.console.http.SolrSearchProxy.getStudyAcquisition()
 POST	/hadatac/metadataacquisitions/solrsearch   						org.hadatac.console.http.SolrSearchProxy.getStudyAcquisition()
