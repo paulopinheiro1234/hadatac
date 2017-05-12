@@ -25,7 +25,10 @@ public class AnnotationLog {
 	@Field("log")
 	private String log = "";
 	
-	public AnnotationLog() {
+	public AnnotationLog() {}
+	
+	public AnnotationLog(String file_name) {
+		this.file_name = file_name;
 	}
 
 	public String getFileName() {

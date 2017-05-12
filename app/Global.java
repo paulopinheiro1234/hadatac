@@ -102,7 +102,7 @@ public class Global extends GlobalSettings {
 		
 		// Create thread for auto ccsv annotation
 		FiniteDuration delay = FiniteDuration.create(0, TimeUnit.SECONDS);
-		FiniteDuration frequency = FiniteDuration.create(30, TimeUnit.SECONDS);
+		FiniteDuration frequency = FiniteDuration.create(15, TimeUnit.SECONDS);
 
 		Runnable annotation = new Runnable() {
 		   @Override
