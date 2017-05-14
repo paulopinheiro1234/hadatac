@@ -52,36 +52,7 @@ public class DataAcquisitionBrowser extends Controller {
     }
 	
     public static List<String> getIndicators() {
-		/*String initStudyQuery = NameSpaces.getInstance().printSparqlNameSpaceList() 
-				+ "SELECT DISTINCT ?indicator ?indicatorLabel ?attributeUri ?attributeLabel ?daSchema ?method ?deployment ?study ?comment ?startTime ?endTime WHERE { "
-				+ " ?indicator rdfs:subClassOf chear:DataAcquisitionIndicator. "
-				+ " ?indicator rdfs:label ?indicatorLabel .  "
-				+ " ?attributeSuper rdfs:subClassOf* ?indicator . " 
-				+ " ?attributeUri a ?attributeSuper . " 
-				+ " ?attributeUri rdfs:label ?attributeLabel ."
-				+ " ?attributeUri hasco:isDataAcquisitionOf ?study ."
-				+ " OPTIONAL {?attributeUri hasco:hasSchema ?daSchema . }"
-				+ " OPTIONAL {?attributeUri hasco:hasMethod ?method . }"
-				+ " OPTIONAL {?attributeUri hasneto:hasDeployment ?deployment . }"
-				+ " OPTIONAL {?attributeUri rdfs:comment ?comment . }"
-				+ " OPTIONAL {?attributeUri prov:wasAssociatedWith ?agent . }"
-				+ " OPTIONAL {?attributeUri prov:startedAtTime ?startTime . }"
-				+ " OPTIONAL {?attributeUri prov:endedAtTime ?endTime . }"
-				+ " }";
-		
-		QueryExecution qexecStudy = QueryExecutionFactory.sparqlService(
-				Collections.getCollectionsName(Collections.METADATA_SPARQL), initStudyQuery);
-		ResultSet resultSet = qexecStudy.execSelect();
-		ResultSetRewindable resultsrwStudy = ResultSetFactory.copyResults(resultSet);
-		qexecStudy.close();
-		*/
 		List<String> results = new ArrayList<String>();
-/*		while (resultsrwStudy.hasNext()) {
-			QuerySolution soln = resultsrwStudy.next();
-			if(soln.contains("indicator")){
-				results.add(soln.get("indicator").toString());
-			}
-		}*/
 		
 		results.add("daSchema");
 		results.add("method");
@@ -96,10 +67,8 @@ public class DataAcquisitionBrowser extends Controller {
 	
 	public static boolean updateDataAcquisitions() {
 		String strQuery = NameSpaces.getInstance().printSparqlNameSpaceList() 
-				+ "SELECT DISTINCT ?indicator ?indicatorLabel ?attributeUri ?attributeLabel ?daSchema ?method ?deployment ?study ?comment ?startTime ?endTime WHERE { "
-				+ " ?indicator rdfs:subClassOf chear:DataAcquisitionIndicator. "
-				+ " ?indicator rdfs:label ?indicatorLabel .  "
-				+ " ?attributeSuper rdfs:subClassOf* ?indicator . " 
+				+ "SELECT DISTINCT ?attributeUri ?attributeLabel ?daSchema ?method ?deployment ?study ?comment ?startTime ?endTime WHERE { "
+				+ " ?attributeSuper rdfs:subClassOf* hasneto:DataAcquisition . " 
 				+ " ?attributeUri a ?attributeSuper . " 
 				+ " ?attributeUri rdfs:label ?attributeLabel ."
 				+ " ?attributeUri hasco:isDataAcquisitionOf ?study ."
@@ -149,50 +118,16 @@ public class DataAcquisitionBrowser extends Controller {
 				key = "daSchema_i";
 				value = soln.get("daSchema").toString();
 				DAInfo.put(key, value);
-/*				arrValues = null;
-				if (!DAInfo.containsKey(key)) {
-					arrValues = new ArrayList<String>();
-					DAInfo.put(key, arrValues);
-				}
-				else if (DAInfo.get(key) instanceof ArrayList<?>) {
-					arrValues = (ArrayList<String>)DAInfo.get(key);
-				}
-				
-				if (!arrValues.contains(value)) {
-					arrValues.add(value);
-				}*/
 			}
 			if (soln.contains("method") && !DAInfo.containsKey("method_i")){
 				key = "method_i";
 				value = soln.get("method").toString();
 				DAInfo.put(key, value);
-/*				if (!DAInfo.containsKey(key)) {
-					arrValues = new ArrayList<String>();
-					DAInfo.put(key, arrValues);
-				}
-				else if (DAInfo.get(key) instanceof ArrayList<?>) {
-					arrValues = (ArrayList<String>)DAInfo.get(key);
-				}
-				
-				if (!arrValues.contains(value)) {
-					arrValues.add(value);
-				}*/
 			}
 			if (soln.contains("deployment") && !DAInfo.containsKey("deployment_i")){
 				key = "deployment_i";
 				value = soln.get("deployment").toString();
 				DAInfo.put(key, value);
-/*				if (!DAInfo.containsKey(key)) {
-					arrValues = new ArrayList<String>();
-					DAInfo.put(key, arrValues);
-				}
-				else if (DAInfo.get(key) instanceof ArrayList<?>) {
-					arrValues = (ArrayList<String>)DAInfo.get(key);
-				}
-				
-				if (!arrValues.contains(value)) {
-					arrValues.add(value);
-				}*/
 			}
 			if (soln.contains("comment") && !DAInfo.containsKey("comment_i")){
 				key = "comment_i";
@@ -203,49 +138,16 @@ public class DataAcquisitionBrowser extends Controller {
 				key = "agent_i";
 				value = soln.get("agent").toString();
 				DAInfo.put(key, value);
-/*				if (!DAInfo.containsKey(key)) {
-					arrValues = new ArrayList<String>();
-					DAInfo.put(key, arrValues);
-				}
-				else if (DAInfo.get(key) instanceof ArrayList<?>) {
-					arrValues = (ArrayList<String>)DAInfo.get(key);
-				}
-				
-				if (!arrValues.contains(value)) {
-					arrValues.add(value);
-				}*/
 			}
 			if (soln.contains("startTime") && !DAInfo.containsKey("startTime_i")){
 				key = "startTime_i";
 				value = soln.get("startTime").toString();
 				DAInfo.put(key, value);
-/*				if (!DAInfo.containsKey(key)) {
-					arrValues = new ArrayList<String>();
-					DAInfo.put(key, arrValues);
-				}
-				else if (DAInfo.get(key) instanceof ArrayList<?>) {
-					arrValues = (ArrayList<String>)DAInfo.get(key);
-				}
-				
-				if (!arrValues.contains(value)) {
-					arrValues.add(value);
-				}*/
 			}
 			if (soln.contains("endTime") && !DAInfo.containsKey("endTime_i")){
 				key = "endTime_i";
 				value = soln.get("endTime").toString();
 				DAInfo.put(key, value);
-/*				if (!DAInfo.containsKey(key)) {
-					arrValues = new ArrayList<String>();
-					DAInfo.put(key, arrValues);
-				}
-				else if (DAInfo.get(key) instanceof ArrayList<?>) {
-					arrValues = (ArrayList<String>)DAInfo.get(key);
-				}
-				
-				if (!arrValues.contains(value)) {
-					arrValues.add(value);
-				}*/
 			}
 		}
 		deleteFromSolr();
