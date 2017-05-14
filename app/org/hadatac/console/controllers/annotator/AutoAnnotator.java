@@ -342,6 +342,9 @@ public class AutoAnnotator extends Controller {
 		
 		for (DataFile file : unproc_files) {
 			String file_name = file.getFileName();
+			AnnotationLog log = new AnnotationLog(file_name);
+			log.addline(Feedback.println(Feedback.WEB, String.format("[OK] Processing file: %s", file_name)));
+			log.save();
 			boolean bSucceed = false;
 			if (file_name.startsWith("DA")) {
 				bSucceed = annotateCSVFile(file);
@@ -939,6 +942,10 @@ public class AutoAnnotator extends Controller {
 		if (null == dataFile) {
 			return badRequest("You do NOT have the permission to operate this file!");
 		}
+		
+		AnnotationLog log = new AnnotationLog(file_name);
+		log.addline(Feedback.println(Feedback.WEB, String.format("[OK] Moved file %s to unprocessed folder", file_name)));
+		log.save();
 		
 		Measurement.delete(dataFile.getDatasetUri());
 		List<DataAcquisition> dataAcquisitions = DataAcquisition.findAll();

@@ -1,47 +1,23 @@
 package org.hadatac.data.loader;
 
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
 import java.lang.String;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVRecord;
-import org.apache.jena.query.QueryExecution;
-import org.apache.jena.query.QueryExecutionFactory;
-import org.apache.jena.query.QuerySolution;
-import org.apache.jena.query.ResultSet;
-import org.apache.jena.query.ResultSetFactory;
-import org.apache.jena.query.ResultSetRewindable;
-import org.apache.jena.rdf.model.Literal;
-import org.hadatac.utils.Collections;
-import org.hadatac.utils.NameSpaces;
 
-public class StudyGenerator {
+public class StudyGenerator extends BasicGenerator {
 	final String kbPrefix = "chear-kb:";
-	private Iterable<CSVRecord> records = null;
-	private CSVRecord rec = null;
 	private int counter = 1; //starting index number
-	private List< Map<String, Object> > rows = new ArrayList<Map<String, Object>>();
-	private HashMap<String, String> mapCol = new HashMap<String, String>();
 	
 	public StudyGenerator(File file) {
-		try {
-			records = CSVFormat.DEFAULT.withHeader().parse(new FileReader(file));
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		initMapping();
+		super(file);
 	}
 	
-	private void initMapping() {
+	@Override
+	void initMapping() {
 		mapCol.clear();
         mapCol.put("studyID", "CHEAR Project ID");
         mapCol.put("studyTitle", "Title");
@@ -60,7 +36,7 @@ public class StudyGenerator {
         mapCol.put("DCAccessBool", "DC Access?");
 	}
 	
-	private String getUri() { 
+	private String getUri(CSVRecord rec) { 
 		return kbPrefix + "STD-" + rec.get(mapCol.get("studyID")); 
 	}
 	
@@ -68,135 +44,100 @@ public class StudyGenerator {
 		return "hasco:Study";
 	}
 	
-	private String getTitle() { 
+	private String getTitle(CSVRecord rec) { 
 		return rec.get(mapCol.get("studyTitle")); 
 	}
 	
-	private String getAims() { 
+	private String getAims(CSVRecord rec) { 
 		return rec.get(mapCol.get("studyAims")) ; 
 	}
 	
-	private String getSignificance() { 
+	private String getSignificance(CSVRecord rec) { 
 		return rec.get(mapCol.get("studySignificance")) ; 
 	}
 	
-	private String getInstitutionUri() {
+	private String getInstitutionUri(CSVRecord rec) {
 		return kbPrefix + "ORG-" + rec.get(mapCol.get("institution")).replaceAll(" ", "-"); 
 	}
 	
-	private String getInstitutionName() {
+	private String getInstitutionName(CSVRecord rec) {
 		return rec.get(mapCol.get("institution")); 
 	}
 	
-	private String getAgentUri() {
+	private String getAgentUri(CSVRecord rec) {
 		return kbPrefix + "PER-" + rec.get(mapCol.get("PI")).replaceAll(" ", "-"); 
 	}
 	
-	private String getAgentFullName() {
+	private String getAgentFullName(CSVRecord rec) {
 		return rec.get(mapCol.get("PI")); 
 	}
 	
-	private String getAgentGivenName() {
-		return rec.get(mapCol.get("PI")).substring(0, getAgentFullName().indexOf(' ')); 
+	private String getAgentGivenName(CSVRecord rec) {
+		return rec.get(mapCol.get("PI")).substring(0, getAgentFullName(rec).indexOf(' ')); 
 	}
 	
-	private String getAgentFamilyName() {
-		return rec.get(mapCol.get("PI")).substring(getAgentFullName().indexOf(' ')+1); 
+	private String getAgentFamilyName(CSVRecord rec) {
+		return rec.get(mapCol.get("PI")).substring(getAgentFullName(rec).indexOf(' ')+1); 
 	}
 	
-	private String getAgentMBox() {
+	private String getAgentMBox(CSVRecord rec) {
 		return rec.get(mapCol.get("PIEmail")); 
 	}
     
-    public Map<String, Object> createRow() {
+	@Override
+    public Map<String, Object> createRow(CSVRecord rec) {
     	Map<String, Object> row = new HashMap<String, Object>();
-    	row.put("hasURI", getUri());
+    	row.put("hasURI", getUri(rec));
     	row.put("a", getType());
-    	row.put("rdfs:label", getTitle());
-    	row.put("skos:definition", getAims());
-    	row.put("rdfs:comment", getSignificance());
-    	row.put("hasco:hasAgent", getAgentUri());
-    	row.put("hasco:hasInstitution", getInstitutionUri());
+    	row.put("rdfs:label", getTitle(rec));
+    	row.put("skos:definition", getAims(rec));
+    	row.put("rdfs:comment", getSignificance(rec));
+    	row.put("hasco:hasAgent", getAgentUri(rec));
+    	row.put("hasco:hasInstitution", getInstitutionUri(rec));
     	counter++;
     	
     	return row;
     }
     
-    public List< Map<String, Object> > createRows() {
-    	for (CSVRecord record : records) {
-    		rec = record;
-    		rows.add(createRow());
-    	}
-
-    	return rows;
-    }
-    
-    public Map<String, Object> createAgentRow() {
+    public Map<String, Object> createAgentRow(CSVRecord rec) {
     	Map<String, Object> row = new HashMap<String, Object>();
-    	row.put("hasURI", getAgentUri());
+    	row.put("hasURI", getAgentUri(rec));
     	row.put("a", "prov:Person");
-    	row.put("foaf:name", getAgentFullName());
-    	row.put("rdfs:comment", "PI from " + getInstitutionName());
-    	row.put("foaf:familyName", getAgentFamilyName() );
-    	row.put("foaf:givenName", getAgentGivenName());
-    	row.put("foaf:mbox", getAgentMBox());
-    	row.put("foaf:member", getInstitutionUri());
+    	row.put("foaf:name", getAgentFullName(rec));
+    	row.put("rdfs:comment", "PI from " + getInstitutionName(rec));
+    	row.put("foaf:familyName", getAgentFamilyName(rec));
+    	row.put("foaf:givenName", getAgentGivenName(rec));
+    	row.put("foaf:mbox", getAgentMBox(rec));
+    	row.put("foaf:member", getInstitutionUri(rec));
     	counter++;
     	
     	return row;
     }
     
     public List< Map<String, Object> > createAgentRows() {
+    	rows.clear();
     	for (CSVRecord record : records) {
-    		rec = record;
-    		rows.add(createAgentRow());
+    		rows.add(createAgentRow(record));
     	}
-
     	return rows;
     }
     
-    public Map<String, Object> createInstitutionRow() {
+    public Map<String, Object> createInstitutionRow(CSVRecord rec) {
     	Map<String, Object> row = new HashMap<String, Object>();
-    	row.put("hasURI", getInstitutionUri());
+    	row.put("hasURI", getInstitutionUri(rec));
     	row.put("a", "prov:Organization");
-    	row.put("foaf:name", getInstitutionName());
-    	row.put("rdfs:comment", getInstitutionName() + " Institution");
+    	row.put("foaf:name", getInstitutionName(rec));
+    	row.put("rdfs:comment", getInstitutionName(rec) + " Institution");
     	counter++;
     	
     	return row;
     }
     
     public List< Map<String, Object> > createInstitutionRows() {
+    	rows.clear();
     	for (CSVRecord record : records) {
-    		rec = record;
-    		rows.add(createInstitutionRow());
+    		rows.add(createInstitutionRow(record));
     	}
-
     	return rows;
-    }
-    
-    
-    public String toString() {
-    	if(rows.isEmpty()){
-    		return "";
-    	}
-    	
-    	String result = "";
-    	result = String.join(",", rows.get(0).keySet());
-    	for (Map<String, Object> row : rows) {
-    		List<String> values = new ArrayList<String>();
-    		for (String colName : rows.get(0).keySet()) {
-    			if (row.containsKey(colName)) {
-    				values.add((String)row.get(colName));
-    			}
-    			else {
-    				values.add("");
-    			}
-    		}
-    		result += "\n";
-    		result += String.join(",", values);
-    	}
-    	
-    	return result;
     }
 }

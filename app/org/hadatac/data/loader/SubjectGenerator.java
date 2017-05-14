@@ -1,18 +1,12 @@
 package org.hadatac.data.loader;
 
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
 import java.lang.String;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVRecord;
-import org.apache.jena.ext.com.google.common.collect.Iterators;
 import org.apache.jena.query.QueryExecution;
 import org.apache.jena.query.QueryExecutionFactory;
 import org.apache.jena.query.QuerySolution;
@@ -25,26 +19,16 @@ import org.hadatac.utils.NameSpaces;
 
 import com.google.common.collect.Iterables;
 
-public class SubjectGenerator {
+public class SubjectGenerator extends BasicGenerator {
 	final String kbPrefix = "chear-kb:";
-	private Iterable<CSVRecord> records = null;
-	private CSVRecord rec = null;
 	private int counter = 1; //starting index number
-	private List< Map<String, Object> > rows = new ArrayList<Map<String, Object>>();
-	private HashMap<String, String> mapCol = new HashMap<String, String>();
 	
 	public SubjectGenerator(File file) {
-		try {
-			records = CSVFormat.DEFAULT.withHeader().parse(new FileReader(file));
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		initMapping();
+		super(file);
 	}
 	
-	private void initMapping() {
+	@Override
+	void initMapping() {
 		mapCol.clear();
         mapCol.put("subjectID", "patient_id");
         mapCol.put("pilotNum", "project_id");
@@ -72,96 +56,63 @@ public class SubjectGenerator {
 		return count;
 	}
 	
-	private String getUri() { 
+	private String getUri(CSVRecord rec) { 
 		return kbPrefix + "SBJ-" + String.format("%04d", counter + getSubjectCount(rec.get(mapCol.get("pilotNum"))))
 			+ "-Pilot-" + rec.get(mapCol.get("pilotNum")); 
 	}
 	private String getType() {
 		return "sio:Human";
 	}
-	private String getLabel() {
+	private String getLabel(CSVRecord rec) {
 		return "ID " + String.format("%04d", counter + getSubjectCount(rec.get(mapCol.get("pilotNum")))) + " - Pilot " 
 			+ rec.get(mapCol.get("pilotNum"));
 	}
-    private String getOriginalID() {
+    private String getOriginalID(CSVRecord rec) {
     	return rec.get(mapCol.get("subjectID"));
     }
     
-    private String getStudyUri() {
+    private String getStudyUri(CSVRecord rec) {
     	return kbPrefix + "STD-Pilot-" + rec.get(mapCol.get("pilotNum"));
     }
     
-    private String getCohortUri() {
+    private String getCohortUri(CSVRecord rec) {
     	return kbPrefix + "CH-Pilot-" + rec.get(mapCol.get("pilotNum"));
     }
     
-    private String getCohortLabel() {
+    private String getCohortLabel(CSVRecord rec) {
     	return "Cohort of Pilot Study " + rec.get(mapCol.get("pilotNum"));
     }
     
-    public Map<String, Object> createRow() {
+    @Override
+    Map<String, Object> createRow(CSVRecord rec) {
     	Map<String, Object> row = new HashMap<String, Object>();
-    	row.put("hasURI", getUri());
+    	row.put("hasURI", getUri(rec));
     	row.put("a", getType());
-    	row.put("rdfs:label", getLabel());
-    	row.put("hasco:originalID", getOriginalID());
-    	row.put("hasco:isSubjectOf", getCohortUri());
+    	row.put("rdfs:label", getLabel(rec));
+    	row.put("hasco:originalID", getOriginalID(rec));
+    	row.put("hasco:isSubjectOf", getCohortUri(rec));
     	counter++;
     	
     	return row;
     }
     
-    public List< Map<String, Object> > createRows() {
-    	for (CSVRecord record : records) {
-    		rec = record;
-    		rows.add(createRow());
-    	}
-
-    	return rows;
-    }
-    
-    public Map<String, Object> createCohortRow() {
+    public Map<String, Object> createCohortRow(CSVRecord rec) {
     	Map<String, Object> row = new HashMap<String, Object>();
-    	row.put("hasURI", getCohortUri());
+    	row.put("hasURI", getCohortUri(rec));
     	row.put("a", "hasco:Cohort");
-    	row.put("rdfs:label", getCohortLabel());
+    	row.put("rdfs:label", getCohortLabel(rec));
     	row.put("hasco:hasSize", Integer.toString(Iterables.size(records)+1));
-    	row.put("hasco:isCohortOf", getStudyUri());
+    	row.put("hasco:isCohortOf", getStudyUri(rec));
     	counter++;
     	
     	return row;
     }
     
     public List< Map<String, Object> > createCohortRows() {
+    	rows.clear();
     	for (CSVRecord record : records) {
-    		rec = record;
-    		rows.add(createCohortRow());
+    		rows.add(createCohortRow(record));
     	}
-
     	return rows;
-    }
-    
-    public String toString() {
-    	if(rows.isEmpty()){
-    		return "";
-    	}
-    	
-    	String result = "";
-    	result = String.join(",", rows.get(0).keySet());
-    	for (Map<String, Object> row : rows) {
-    		List<String> values = new ArrayList<String>();
-    		for (String colName : rows.get(0).keySet()) {
-    			if (row.containsKey(colName)) {
-    				values.add((String)row.get(colName));
-    			}
-    			else {
-    				values.add("");
-    			}
-    		}
-    		result += "\n";
-    		result += String.join(",", values);
-    	}
-    	
-    	return result;
     }
 }
