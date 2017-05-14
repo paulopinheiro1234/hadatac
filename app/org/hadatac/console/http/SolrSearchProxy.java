@@ -157,7 +157,7 @@ public class SolrSearchProxy extends Controller {
 	
 	@Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
 	public static Result getSchemaAttributes(){
-		String path = Collections.getCollectionsName(Collections.SCHEMA_ATTRIBUTES) + 
+		String path = Collections.getCollectionsName(Collections.SA_ACQUISITION) + "/select" +
 				request().toString().split((request().path()))[1];
 		return getSolrSearch(path);
 	}
