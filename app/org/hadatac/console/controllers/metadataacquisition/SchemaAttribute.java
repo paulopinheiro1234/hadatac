@@ -4,6 +4,7 @@ import play.Play;
 import play.mvc.Controller;
 import play.mvc.Result;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -15,6 +16,10 @@ import org.apache.jena.query.QuerySolution;
 import org.apache.jena.query.ResultSet;
 import org.apache.jena.query.ResultSetFactory;
 import org.apache.jena.query.ResultSetRewindable;
+import org.apache.solr.client.solrj.SolrClient;
+import org.apache.solr.client.solrj.SolrServerException;
+import org.apache.solr.client.solrj.impl.HttpSolrClient;
+import org.apache.solr.client.solrj.response.UpdateResponse;
 import org.hadatac.console.controllers.AuthApplication;
 import org.hadatac.console.controllers.metadata.DynamicFunctions;
 import org.hadatac.console.http.SolrUtils;
@@ -164,6 +169,8 @@ public class SchemaAttribute extends Controller {
 			}
 		}
 		
+		deleteFromSolr();
+		
 		ArrayList<JSONObject> results = new ArrayList<JSONObject>();
 		for (HashMap<String, Object> info : mapDAInfo.values()) {
 			results.add(new JSONObject(info));
@@ -172,6 +179,26 @@ public class SchemaAttribute extends Controller {
 		return SolrUtils.commitJsonDataToSolr(
 				Play.application().configuration().getString("hadatac.solr.data") 
 				+ Collections.SA_ACQUISITION, results.toString());
+	}
+	
+	public static int deleteFromSolr() {
+		try {
+			SolrClient solr = new HttpSolrClient(
+					Play.application().configuration().getString("hadatac.solr.data") 
+					+ Collections.SA_ACQUISITION);
+			UpdateResponse response = solr.deleteByQuery("*:*");
+			solr.commit();
+			solr.close();
+			return response.getStatus();
+		} catch (SolrServerException e) {
+			System.out.println("[ERROR] SchemaAttribute.deleteFromSolr() - SolrServerException message: " + e.getMessage());
+		} catch (IOException e) {
+			System.out.println("[ERROR] SchemaAttribute.deleteFromSolr() - IOException message: " + e.getMessage());
+		} catch (Exception e) {
+			System.out.println("[ERROR] SchemaAttribute.deleteFromSolr() - Exception message: " + e.getMessage());
+		}
+		
+		return -1;
 	}
 	
 	@Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
