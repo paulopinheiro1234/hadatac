@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <schema version="1.5">
   <fields>
-    <field name="attributeUri" type="string" indexed="true" stored="true"/>
+    <field name="DASAttributeUri" type="string" indexed="true" stored="true"/>
     <dynamicField name="*_i" type="string" indexed="true" stored="true"/>
     <dynamicField name="*_m" type="string" indexed="true" stored="true" multiValued="true" />
     <field name="_version_" type="long" indexed="true" stored="true"/>
