@@ -146,6 +146,16 @@ public class SolrSearchProxy extends Controller {
 	}
 	
 	@Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
+	public static Result getDataAcquisition(){
+//		String path = Collections.getCollectionsName(Collections.METADATA_DA) + 
+//				request().toString().split((request().path()))[1];
+		String path = Collections.getCollectionsName(Collections.METADATA_AQUISITION) + "/select" +
+				request().toString().split((request().path()))[1];
+		System.out.println("Solr Search Path: " + path);
+		return getSolrSearch(path);
+	}
+	
+	@Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
 	public static Result getSchemaAttributes(){
 		String path = Collections.getCollectionsName(Collections.SCHEMA_ATTRIBUTES) + 
 				request().toString().split((request().path()))[1];
