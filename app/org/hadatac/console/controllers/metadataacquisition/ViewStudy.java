@@ -179,7 +179,6 @@ public class ViewStudy extends Controller {
 			ResultSetRewindable resultsrw = ResultSetFactory.copyResults(results);
 			qexec.close();
 			
-			ValueCellProcessing cellProc = new ValueCellProcessing();
 			while (resultsrw.hasNext()) {
 				QuerySolution soln = resultsrw.next();
 				values = new ArrayList<String>();
@@ -190,7 +189,7 @@ public class ViewStudy extends Controller {
 					values.add("Title: " + soln.get("studyDef").toString());
 				}
 				if(soln.contains("proj")){
-					values.add("Project: " + cellProc.replaceNameSpaceEx(soln.get("proj").toString()));
+					values.add("Project: " + ValueCellProcessing.replaceNameSpaceEx(soln.get("proj").toString()));
 				}
 				if(soln.contains("studyComment")){
 					values.add("Comment: " + soln.get("studyComment").toString());
@@ -231,7 +230,6 @@ public class ViewStudy extends Controller {
 			ResultSetRewindable resultsrw = ResultSetFactory.copyResults(results);
 			qexec2.close();
 			
-			ValueCellProcessing cellProc = new ValueCellProcessing();
 			while (resultsrw.hasNext()) {
 				QuerySolution soln = resultsrw.next();
 				values = new ArrayList<String>();
@@ -239,7 +237,7 @@ public class ViewStudy extends Controller {
 		//		values.add("Type: " + cellProc.replaceNameSpaceEx(soln.get("subjectType").toString()));
 		//		values.add("Cohort: " + soln.get("cohortLabel").toString());
 		//		values.add("Study: " + soln.get("studyLabel").toString());
-				subjectResult.put(cellProc.replaceNameSpaceEx(soln.get("subjectUri").toString()) ,values);		
+				subjectResult.put(ValueCellProcessing.replaceNameSpaceEx(soln.get("subjectUri").toString()) ,values);		
 			}
 		} catch (QueryExceptionHTTP e) {
 			e.printStackTrace();

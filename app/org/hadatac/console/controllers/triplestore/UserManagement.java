@@ -445,13 +445,12 @@ public class UserManagement extends Controller {
 		}
 		ttl = ttl + "\n\n";
 		
-		ValueCellProcessing cellProc = new ValueCellProcessing();
-		cellProc.validateNameSpace("hasURI");
-		ttl = ttl + cellProc.execCellValue(uri, "hasURI");
+		ValueCellProcessing.validateNameSpace("hasURI");
+		ttl = ttl + ValueCellProcessing.execCellValue(uri, "hasURI");
 		for(String key : pred_value_map.keySet()){
 			String value = pred_value_map.get(key);
-			cellProc.validateNameSpace(key);
-			ttl = ttl + cellProc.execCellValue(value, key);
+			ValueCellProcessing.validateNameSpace(key);
+			ttl = ttl + ValueCellProcessing.execCellValue(value, key);
 			ttl = ttl + "\n";
 		}
 		System.out.println(ttl);

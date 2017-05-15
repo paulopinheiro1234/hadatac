@@ -104,7 +104,6 @@ public class MetadataAcquisition extends Controller {
 		qexecStudy.close();
 		
 		HashMap<String, HashMap<String, Object>> mapStudyInfo = new HashMap<String, HashMap<String, Object>>();
-		ValueCellProcessing cellProc = new ValueCellProcessing();
 		while (resultsrwStudy.hasNext()) {
 			QuerySolution soln = resultsrwStudy.next();
 			String studyUri = soln.get("studyUri").toString();
@@ -122,7 +121,7 @@ public class MetadataAcquisition extends Controller {
 				studyInfo.put("studyLabel_i", "<a href=\""
 						+ Play.application().configuration().getString("hadatac.console.host_deploy") 
 						+ "/hadatac/metadataacquisitions/viewStudy?study_uri=" 
-						+ cellProc.replaceNameSpaceEx(studyInfo.get("studyUri").toString()) + "\">"
+						+ ValueCellProcessing.replaceNameSpaceEx(studyInfo.get("studyUri").toString()) + "\">"
 						+ soln.get("studyLabel").toString() + "</a>");
 			}
 			if (soln.contains("studyTitle") && !studyInfo.containsKey("studyTitle_i")) {

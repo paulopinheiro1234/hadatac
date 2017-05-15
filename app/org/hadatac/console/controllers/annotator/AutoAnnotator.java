@@ -42,6 +42,7 @@ import org.hadatac.console.views.html.annotator.*;
 import org.hadatac.console.views.html.triplestore.*;
 import org.hadatac.console.views.html.*;
 import org.hadatac.data.api.DataFactory;
+import org.hadatac.data.loader.DataAcquisitionGenerator;
 import org.hadatac.data.loader.SampleGenerator;
 import org.hadatac.data.loader.SampleSubjectMapper;
 import org.hadatac.data.loader.StudyGenerator;
@@ -226,10 +227,9 @@ public class AutoAnnotator extends Controller {
     
 	@Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
     public static Result assignDataAcquisition(String dataAcquisitionUri, String selectedFile) {
-		ValueCellProcessing cellProc = new ValueCellProcessing();
 		List<String> dataAcquisitionURIs = new ArrayList<String>();
 		DataAcquisition.findAll().forEach((da) -> dataAcquisitionURIs.add(
-				cellProc.replaceNameSpaceEx(da.getUri())));
+				ValueCellProcessing.replaceNameSpaceEx(da.getUri())));
 		
     	return ok(assignOption.render(dataAcquisitionURIs,
     			routes.AutoAnnotator.processDataAcquisitionForm(dataAcquisitionUri, selectedFile),
@@ -248,10 +248,9 @@ public class AutoAnnotator extends Controller {
         Form<AssignOptionForm> form = Form.form(AssignOptionForm.class).bindFromRequest();
         AssignOptionForm data = form.get();
         
-        ValueCellProcessing cellProc = new ValueCellProcessing();
 		List<String> dataAcquisitionURIs = new ArrayList<String>();
 		DataAcquisition.findAll().forEach((da) -> dataAcquisitionURIs.add(
-				cellProc.replaceNameSpaceEx(da.getUri())));
+				ValueCellProcessing.replaceNameSpaceEx(da.getUri())));
         
         if (form.hasErrors()) {
         	System.out.println("HAS ERRORS");
@@ -269,7 +268,7 @@ public class AutoAnnotator extends Controller {
             	file.setProcessStatus(false);
             	file.setUploadTime(new SimpleDateFormat("yyyy/MM/dd HH:mm:ss").format(new Date()));
             }
-            file.setDataAcquisitionUri(cellProc.replacePrefixEx(data.getOption()));
+            file.setDataAcquisitionUri(ValueCellProcessing.replacePrefixEx(data.getOption()));
             file.save();
     		return redirect(routes.AutoAnnotator.index());
         }
@@ -361,6 +360,9 @@ public class AutoAnnotator extends Controller {
 			else if (file_name.startsWith("MAP")) {
 				bSucceed = annotateMapFile(new File(path_unproc + "/" + file_name));
 			}
+			else if (file_name.startsWith("DA")) {
+				bSucceed = annotateMapFile(new File(path_unproc + "/" + file_name));
+			}
 			if (bSucceed) {
 				//Move the file to the folder for processed files
 				File destFolder = new File(path_proc);
@@ -382,22 +384,21 @@ public class AutoAnnotator extends Controller {
 	
 	public static Model createModel(List<Map<String, Object>> rows) {
     	Model model = ModelFactory.createDefaultModel();
-    	ValueCellProcessing cellProc = new ValueCellProcessing();
     	for (Map<String, Object> row : rows) {
-    		Resource sub = model.createResource(cellProc.replacePrefixEx((String)row.get("hasURI")));
+    		Resource sub = model.createResource(ValueCellProcessing.replacePrefixEx((String)row.get("hasURI")));
     		for (String key : row.keySet()) {
     			if (!key.equals("hasURI")) {
     				Property pred = null;
     				if (key.equals("a")) {
-    					pred = model.createProperty(cellProc.replacePrefixEx("rdf:type"));
+    					pred = model.createProperty(ValueCellProcessing.replacePrefixEx("rdf:type"));
     				}
     				else {
-    					pred = model.createProperty(cellProc.replacePrefixEx(key));
+    					pred = model.createProperty(ValueCellProcessing.replacePrefixEx(key));
     				}
     				
     				String cellValue = (String)row.get(key);
-					if (cellProc.isAbbreviatedURI(cellValue)) {
-						Resource obj = model.createResource(cellProc.replacePrefixEx(cellValue));
+					if (ValueCellProcessing.isAbbreviatedURI(cellValue)) {
+						Resource obj = model.createResource(ValueCellProcessing.replacePrefixEx(cellValue));
 						model.add(sub, pred, obj);
 					}
 					else {
@@ -706,12 +707,56 @@ public class AutoAnnotator extends Controller {
 		return true;
 	}
 	
+	public static boolean annotateDataAcquisitionFile(File file) {
+		DataAcquisitionGenerator daGenerator = new DataAcquisitionGenerator(file);
+		List<Map<String, Object>> rows = daGenerator.createRows();
+		
+		Model model = createModel(rows);
+    	DatasetAccessor accessor = DatasetAccessorFactory.createHTTP(
+				Collections.getCollectionsName(Collections.METADATA_GRAPH));
+    	accessor.add(model);
+		
+		String site = ConfigProp.getPropertyValue("labkey.config", "site");
+        String path = "/" + ConfigProp.getPropertyValue("labkey.config", "folder");
+        Credential cred = Credential.find();
+        AnnotationLog log = new AnnotationLog();
+    	log.setFileName(file.getName());
+        if (null == cred) {
+        	log.addline(Feedback.println(Feedback.WEB, "[ERROR] No LabKey credentials are provided!"));
+    		log.save();
+    		return false;
+        }
+    	LabkeyDataHandler labkeyDataHandler = new LabkeyDataHandler(
+    			site, cred.getUserName(), cred.getPassword(), path);
+		try {
+			int nRows = labkeyDataHandler.insertRows("DataAcquisition", rows);
+			log.addline(Feedback.println(Feedback.WEB, String.format(
+					"[OK] %d row(s) have been inserted into the DataAcquisition table", nRows)));
+		} catch (CommandException e1) {
+			try {
+				int nRows = labkeyDataHandler.updateRows("DataAcquisition", rows);
+				log.addline(Feedback.println(Feedback.WEB, String.format(
+						"[OK] %d row(s) have been inserted into the DataAcquisition table", nRows)));
+			} catch (CommandException e) {
+				log.addline(Feedback.println(Feedback.WEB, "[ERROR] " + e.getMessage()));
+	    		log.save();
+	    		return false;
+			}
+		}
+		
+		log.addline(Feedback.println(Feedback.WEB, String.format(
+				"[OK] %d triple(s) have been committed to triple store", model.size())));
+		log.addline(Feedback.println(Feedback.WEB, String.format(daGenerator.toString())));
+		log.save();
+
+		return true;
+	}
+	
 	private static String getProperDataAcquisitionUri(String fileName) {
 		String base_name = FilenameUtils.getBaseName(fileName);
 		List<DataAcquisition> da_list = DataAcquisition.findAll();
 		for(DataAcquisition dc : da_list){
-			ValueCellProcessing cellProc = new ValueCellProcessing();
-			String abbrevUri = cellProc.replaceNameSpaceEx(dc.getUri());
+			String abbrevUri = ValueCellProcessing.replaceNameSpaceEx(dc.getUri());
 			String qname = abbrevUri.split(":")[1];
 			if(base_name.startsWith(qname)){
 				return dc.getUri();
@@ -731,9 +776,8 @@ public class AutoAnnotator extends Controller {
 		String schema_uri = null;
 		
 		if (null != dataFile) {
-			ValueCellProcessing cellProc = new ValueCellProcessing();
 			DataAcquisition dataAcquisition = DataAcquisition.findByUri(
-					cellProc.replacePrefixEx(dataFile.getDataAcquisitionUri()));
+					ValueCellProcessing.replacePrefixEx(dataFile.getDataAcquisitionUri()));
 			if (null != dataAcquisition) {
 				dc_uri = dataAcquisition.getUri();
 				deployment_uri = dataAcquisition.getDeploymentUri();

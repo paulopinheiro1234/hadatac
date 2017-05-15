@@ -44,17 +44,16 @@ public class Parser {
 	public ParsingResult validate(int mode, FileFactory files) throws IOException {
 		ParsingResult result = null;
 		String message = "";
-		Model model;
 		String preamble;
 		
 		this.files = files;
 		files.openFile("ccsv", "r");
 		
 		preamble = getPreamble();
-		model = ModelFactory.createDefaultModel();
+		Model model = ModelFactory.createDefaultModel();
 		model.read(new ByteArrayInputStream(preamble.getBytes()), null, "TTL");
 		
-		// -- START verify if model is successfully loaded
+		// Verify if model is successfully loaded
 		if (model.isEmpty()) {
 			message += Feedback.println(mode, "[ERROR] Preamble not a well-formed Turtle.");
 			System.out.println("[ERROR] Preamble not a well-formed Turtle.");
@@ -63,7 +62,6 @@ public class Parser {
 			message += Feedback.println(mode, "[OK] Preamble a well-formed Turtle.");
 			System.out.println("[OK] Preamble a well-formed Turtle.");
 		}
-		// -- END verify if model is successfully loaded
 		
 		result = loadFromPreamble(mode, model);
 		
@@ -133,7 +131,6 @@ public class Parser {
 		boolean isSubjectPlatform = Subject.isPlatform(hadatacKb.getDeployment().getPlatform().getUri());
 		SolrClient solr = new HttpSolrClient(Play.application().configuration().
 				getString("hadatac.solr.data") + Collections.DATA_ACQUISITION);
-		ValueCellProcessing cellProc = new ValueCellProcessing();
 		for (CSVRecord record : records) {
 			Iterator<MeasurementType> iter = hadatacKb.getDataset().getMeasurementTypes().iterator();
 			while (iter.hasNext()) {
@@ -177,9 +174,9 @@ public class Parser {
 					measurement.setTimestamp("");
 				}
 				
-				measurement.setStudyUri(cellProc.replaceNameSpaceEx(hadatacKb.getDataAcquisition().getStudyUri()));
+				measurement.setStudyUri(ValueCellProcessing.replaceNameSpaceEx(hadatacKb.getDataAcquisition().getStudyUri()));
 				if(nIdCol > -1){
-					if (measurementType.getEntityUri().equals(cellProc.replacePrefixEx("sio:Human"))) {
+					if (measurementType.getEntityUri().equals(ValueCellProcessing.replacePrefixEx("sio:Human"))) {
 						Subject subject = Subject.findSubject(measurement.getStudyUri(), record.get(nIdCol - 1));
 						if (null != subject) {
 							String subjectUri = subject.getUri();
@@ -190,7 +187,7 @@ public class Parser {
 							measurement.setObjectUri("");
 						}
 					}
-					else if (measurementType.getEntityUri().equals(cellProc.replacePrefixEx("sio:Sample"))) {
+					else if (measurementType.getEntityUri().equals(ValueCellProcessing.replacePrefixEx("sio:Sample"))) {
 						String sampleUri = Subject.findSampleUri(measurement.getStudyUri(), record.get(nIdCol - 1));
 						if (sampleUri != null) {
 							measurement.setObjectUri(sampleUri);
@@ -209,8 +206,8 @@ public class Parser {
 					}
 				}
 				
-				measurement.setUri(cellProc.replacePrefixEx(measurement.getStudyUri()) + "/" 
-						+ cellProc.replaceNameSpaceEx(hadatacKb.getDataAcquisition().getUri()).split(":")[1] + "/"
+				measurement.setUri(ValueCellProcessing.replacePrefixEx(measurement.getStudyUri()) + "/" 
+						+ ValueCellProcessing.replaceNameSpaceEx(hadatacKb.getDataAcquisition().getUri()).split(":")[1] + "/"
 						+ hadatacCcsv.getDataset().getLocalName() + "/" 
 						+ measurementType.getLocalName() + "-" + total_count);
 				measurement.setOwnerUri(hadatacKb.getDataAcquisition().getOwnerUri());

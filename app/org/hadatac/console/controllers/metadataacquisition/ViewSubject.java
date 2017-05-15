@@ -94,12 +94,11 @@ public class ViewSubject extends Controller {
 				List<String> listIndicatorLabel = new ArrayList<String>();
 				while (resultsrwIndvInd.hasNext()) {
 					QuerySolution soln = resultsrwIndvInd.next();
-					ValueCellProcessing cellProc = new ValueCellProcessing();
-					if(Measurement.findForViews(findUser(), study_uri, cellProc.convertToWholeURI(subject_uri), soln.get("uri").toString()).documents.size() > 0){
+					if(Measurement.findForViews(findUser(), study_uri, ValueCellProcessing.convertToWholeURI(subject_uri), soln.get("uri").toString()).documents.size() > 0){
 						listIndicatorLabel.add(soln.get("label").toString());
-						System.out.println("HEREHERE" + Measurement.findForViews(findUser(), study_uri, cellProc.convertToWholeURI(subject_uri), soln.get("uri").toString()).documents.get(0).getObjectUri().toString() 
-								+ Measurement.findForViews(findUser(), study_uri, cellProc.convertToWholeURI(subject_uri), soln.get("uri").toString()).documents.get(0).getCharacteristic().toString()
-								+ Measurement.findForViews(findUser(), study_uri, cellProc.convertToWholeURI(subject_uri), soln.get("uri").toString()).documents.get(0).getValue().toString());
+						System.out.println("HEREHERE" + Measurement.findForViews(findUser(), study_uri, ValueCellProcessing.convertToWholeURI(subject_uri), soln.get("uri").toString()).documents.get(0).getObjectUri().toString() 
+								+ Measurement.findForViews(findUser(), study_uri, ValueCellProcessing.convertToWholeURI(subject_uri), soln.get("uri").toString()).documents.get(0).getCharacteristic().toString()
+								+ Measurement.findForViews(findUser(), study_uri, ValueCellProcessing.convertToWholeURI(subject_uri), soln.get("uri").toString()).documents.get(0).getValue().toString());
 					}
 //					listIndicatorLabel.add(soln.get("comment").toString());
 				}
@@ -296,11 +295,12 @@ public class ViewSubject extends Controller {
 	
 	public static Map<String, List<String>> findSampleMap(String subject_uri) {
 		String sampleQueryString = "";
-                if (subject_uri.startsWith("http")) {
+		if (subject_uri.startsWith("http")) {
 			subject_uri = "<" + subject_uri + ">";
 		}
-    	        sampleQueryString += NameSpaces.getInstance().printSparqlNameSpaceList();
-    	        sampleQueryString += "SELECT ?sampleUri ?subjectUri ?subjectLabel ?sampleType ?sampleLabel ?cohortLabel ?comment WHERE { "
+		
+		sampleQueryString += NameSpaces.getInstance().printSparqlNameSpaceList();
+    	sampleQueryString += "SELECT ?sampleUri ?subjectUri ?subjectLabel ?sampleType ?sampleLabel ?cohortLabel ?comment WHERE { "
 		    	+ "?subjectUri hasco:isSubjectOf* ?cohort . "
 		    	+ "?sampleUri hasco:isSampleOf ?subjectUri . "
 		    	+ "?sampleUri rdfs:comment ?comment . "
@@ -310,7 +310,7 @@ public class ViewSubject extends Controller {
 		    	+ "OPTIONAL { ?sampleUri a ?sampleType  } . "
 		    	+ "FILTER ( ?subjectUri = " + subject_uri + " ) . "
 		    	+ "}";
-    	        Query basicQuery = QueryFactory.create(sampleQueryString);
+    	Query basicQuery = QueryFactory.create(sampleQueryString);
     	
 		QueryExecution qexec = QueryExecutionFactory.sparqlService(
 				Collections.getCollectionsName(Collections.METADATA_SPARQL), basicQuery);
@@ -321,15 +321,14 @@ public class ViewSubject extends Controller {
 		Map<String, List<String>> sampleResult = new HashMap<String, List<String>>();
 		List<String> values = new ArrayList<String>();
 		
-		ValueCellProcessing cellProc = new ValueCellProcessing();
 		while (resultsrw.hasNext()) {
 			QuerySolution soln = resultsrw.next();
 			System.out.println("HERE IS THE RAW SOLN*********" + soln.toString());
 			values = new ArrayList<String>();
 			values.add("Label: " + soln.get("sampleLabel").toString());
-			values.add("Type: " + cellProc.replaceNameSpaceEx(soln.get("sampleType").toString()));
-			values.add("Sample Of: " + cellProc.replaceNameSpaceEx(soln.get("subjectLabel").toString()));
-			sampleResult.put(cellProc.replaceNameSpaceEx(soln.get("sampleUri").toString()), values);
+			values.add("Type: " + ValueCellProcessing.replaceNameSpaceEx(soln.get("sampleType").toString()));
+			values.add("Sample Of: " + ValueCellProcessing.replaceNameSpaceEx(soln.get("subjectLabel").toString()));
+			sampleResult.put(ValueCellProcessing.replaceNameSpaceEx(soln.get("sampleUri").toString()), values);
 			System.out.println("THIS IS SUBROW*********" + sampleResult);	
 		}
 
@@ -385,8 +384,7 @@ public class ViewSubject extends Controller {
 		Map<String, String> indicatorUris = findSubjectIndicatorsUri(study_uri);
 		
 		Map<String, String> showValues = new HashMap<String, String>();
-		ValueCellProcessing cellProc = new ValueCellProcessing();
-		showValues.put("subject", cellProc.convertToWholeURI(subject_uri));
+		showValues.put("subject", ValueCellProcessing.convertToWholeURI(subject_uri));
 		showValues.put("user", findUser());
 		showValues.put("study", study_uri);		
     	

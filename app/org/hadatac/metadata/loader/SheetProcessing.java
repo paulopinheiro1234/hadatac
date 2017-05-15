@@ -18,7 +18,6 @@ public class SheetProcessing {
 		String message = "";
 		
 		boolean firstRow = true;
-		ValueCellProcessing cellProc = new ValueCellProcessing();
 		Vector<String> predicates = new Vector<String>();
 
 		// Iterate through each row in the sheet
@@ -67,10 +66,10 @@ public class SheetProcessing {
 		   		    	//System.out.println("STRING");
 		   		    	if (firstRow) {
 		   		    		String newPredicate = cell.getStringCellValue();
-		   		    		cellProc.validateNameSpace(newPredicate);
+		   		    		ValueCellProcessing.validateNameSpace(newPredicate);
 		   		    		predicates.add(cell.getColumnIndex(), newPredicate);
 		   		    	} else {
-		   		    		shttl = shttl + cellProc.exec(cell, predicates);
+		   		    		shttl = shttl + ValueCellProcessing.exec(cell, predicates);
 		   		    		hasOutput = true;
 		   		    	}
 		   		    	blankRow = false;

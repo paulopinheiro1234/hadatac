@@ -74,10 +74,9 @@ public class EditDataAcquisition extends Controller {
     		}
     		
     		Map<String, String> mapSchemas = new HashMap<String, String>();
-    		ValueCellProcessing cellProc = new ValueCellProcessing();
     		List<DataAcquisitionSchema> schemas = DataAcquisitionSchema.findAll();
     		for (DataAcquisitionSchema schema : schemas) {
-    			mapSchemas.put(schema.getUri(), cellProc.replaceNameSpaceEx(schema.getUri()));
+    			mapSchemas.put(schema.getUri(), ValueCellProcessing.replaceNameSpaceEx(schema.getUri()));
     		}
     		
             return ok(editDataAcquisition.render(dataAcquisition, nameList, 
@@ -95,7 +94,6 @@ public class EditDataAcquisition extends Controller {
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
     public static Result processForm(String acquisitionUri, boolean bChangeParam) {
     	final SysUser sysUser = AuthApplication.getLocalUser(session());
-    	ValueCellProcessing cellProc = new ValueCellProcessing();
     	
         Form<DataAcquisitionForm> form = Form.form(DataAcquisitionForm.class).bindFromRequest();
         DataAcquisitionForm data = form.get();

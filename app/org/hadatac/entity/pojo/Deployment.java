@@ -455,19 +455,18 @@ public class Deployment {
     	LabkeyDataHandler loader = new LabkeyDataHandler(
     			site, user_name, password, path);
     	
-    	ValueCellProcessing cellProc = new ValueCellProcessing();
     	List<String> detectorURIs = new ArrayList<String>();
     	for (Detector detector : getDetectors()) {
-    		detectorURIs.add(cellProc.replaceNameSpaceEx(detector.getUri()));
+    		detectorURIs.add(ValueCellProcessing.replaceNameSpaceEx(detector.getUri()));
     	}
     	String detectors = String.join(", ", detectorURIs);
     	
     	List< Map<String, Object> > rows = new ArrayList< Map<String, Object> >();
     	Map<String, Object> row = new HashMap<String, Object>();
-    	row.put("hasURI", cellProc.replaceNameSpaceEx(getUri()));
+    	row.put("hasURI", ValueCellProcessing.replaceNameSpaceEx(getUri()));
     	row.put("a", "vstoi:Deployment");
-    	row.put("vstoi:hasPlatform", cellProc.replaceNameSpaceEx(getPlatform().getUri()));
-    	row.put("hasneto:hasInstrument", cellProc.replaceNameSpaceEx(getInstrument().getUri()));
+    	row.put("vstoi:hasPlatform", ValueCellProcessing.replaceNameSpaceEx(getPlatform().getUri()));
+    	row.put("hasneto:hasInstrument", ValueCellProcessing.replaceNameSpaceEx(getInstrument().getUri()));
     	row.put("hasneto:hasDetector", detectors);
     	row.put("prov:startedAtTime", getStartedAt());
     	row.put("prov:endedAtTime", getEndedAt());

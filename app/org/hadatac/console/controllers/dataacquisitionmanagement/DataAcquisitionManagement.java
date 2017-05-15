@@ -53,9 +53,8 @@ public class DataAcquisitionManagement extends Controller {
     		results = DataAcquisition.find(ownerUri, state);
     	}
     	
-    	ValueCellProcessing cellProc = new ValueCellProcessing();
 		for (DataAcquisition dataAcquisition : results) {
-			dataAcquisition.setSchemaUri(cellProc.replaceNameSpaceEx(
+			dataAcquisition.setSchemaUri(ValueCellProcessing.replaceNameSpaceEx(
 					dataAcquisition.getSchemaUri()));
 		}
 		results.sort(new Comparator<DataAcquisition>() {
@@ -82,10 +81,9 @@ public class DataAcquisitionManagement extends Controller {
 		
 		final SysUser sysUser = AuthApplication.getLocalUser(session());
 		
-		ValueCellProcessing cellProc = new ValueCellProcessing();
 		List<DataAcquisitionSchema> schemas = DataAcquisitionSchema.findAll();
 		for (DataAcquisitionSchema schema : schemas) {
-			schema.setUri(cellProc.replaceNameSpaceEx(schema.getUri()));
+			schema.setUri(ValueCellProcessing.replaceNameSpaceEx(schema.getUri()));
 		}
 		
 		Map<String, String> nameList = new HashMap<String, String>();

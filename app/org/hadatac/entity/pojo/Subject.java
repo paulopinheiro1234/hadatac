@@ -159,8 +159,7 @@ public class Subject {
     }
 	
 	public static String checkObjectUri(String obj_uri, String attr_uri) {
-		ValueCellProcessing cellProc = new ValueCellProcessing();
-		attr_uri = cellProc.replacePrefixEx(attr_uri);
+		attr_uri = ValueCellProcessing.replacePrefixEx(attr_uri);
 		String objUri = obj_uri;
         String queryString = NameSpaces.getInstance().printSparqlNameSpaceList()
                 + " SELECT ?s ?o WHERE {"
@@ -183,7 +182,7 @@ public class Subject {
             if (null != soln.getResource("o")) {
             	String attributeAssociation = soln.getResource("o").toString();
             	//System.out.println("attributeAssociation: " + attributeAssociation);
-            	if (attributeAssociation.equals(cellProc.replacePrefixEx("chear-kb:ObjectTypeMother"))) {
+            	if (attributeAssociation.equals(ValueCellProcessing.replacePrefixEx("chear-kb:ObjectTypeMother"))) {
             		String motherUri = obj_uri + "-mother";
             		
             		Model model = ModelFactory.createDefaultModel();
@@ -191,10 +190,10 @@ public class Subject {
             				Collections.getCollectionsName(Collections.METADATA_GRAPH));
             		model.add(model.createResource(motherUri), 
             				model.createProperty("rdf:type"),
-            				model.createResource(cellProc.replacePrefixEx("sio:Human")));
+            				model.createResource(ValueCellProcessing.replacePrefixEx("sio:Human")));
             		
             		model.add(model.createResource(motherUri), 
-            				model.createProperty(cellProc.replacePrefixEx("chear:Mother")),
+            				model.createProperty(ValueCellProcessing.replacePrefixEx("chear:Mother")),
             				model.createResource(obj_uri));
 
             		accessor.add(model);

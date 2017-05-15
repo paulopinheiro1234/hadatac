@@ -228,7 +228,6 @@ public class MeasurementType {
 		ResultSetRewindable resultsrw = ResultSetFactory.copyResults(results);
 		
 		resultsrw.reset();
-		ValueCellProcessing cellProc = new ValueCellProcessing();
 		while (resultsrw.hasNext()) {
 			QuerySolution soln = resultsrw.next();
 			MeasurementType measurementType = new MeasurementType();
@@ -238,15 +237,15 @@ public class MeasurementType {
 			measurementType.setCharacteristicUri(soln.getResource("char").getURI());
 			measurementType.setUnitUri(soln.getResource("unit").getURI());
 			measurementType.setValueColumn(soln.getLiteral("column").getInt());
-			if(measurementType.getCharacteristicUri().equals(cellProc.replacePrefixEx("sio:TimeStamp"))){
+			if(measurementType.getCharacteristicUri().equals(ValueCellProcessing.replacePrefixEx("sio:TimeStamp"))){
 				measurementType.setTimestampColumn(soln.getLiteral("column").getInt());
 				System.out.println("TimeStampColumn: " + soln.getLiteral("column").getInt());
 			}
-			if(measurementType.getCharacteristicUri().equals(cellProc.replacePrefixEx("sio:TimeInstant"))){
+			if(measurementType.getCharacteristicUri().equals(ValueCellProcessing.replacePrefixEx("sio:TimeInstant"))){
 				measurementType.setTimeInstantColumn(soln.getLiteral("column").getInt());
 				System.out.println("TimeInstantColumn: " + soln.getLiteral("column").getInt());
 			}
-			if(measurementType.getCharacteristicUri().equals(cellProc.replacePrefixEx("hasco:originalID"))){
+			if(measurementType.getCharacteristicUri().equals(ValueCellProcessing.replacePrefixEx("hasco:originalID"))){
 				measurementType.setIdColumn(soln.getLiteral("column").getInt());
 				System.out.println("IdColumn: " + measurementType.getIdColumn());
 			}

@@ -1032,28 +1032,27 @@ public class DataAcquisition {
     	LabkeyDataHandler loader = new LabkeyDataHandler(
     			site, user_name, password, path);
     	
-    	ValueCellProcessing cellProc = new ValueCellProcessing();
     	List<String> abbrevTypeURIs = new ArrayList<String>();
     	for (String uri : getTypeURIs()) {
-    		abbrevTypeURIs.add(cellProc.replaceNameSpaceEx(uri));
+    		abbrevTypeURIs.add(ValueCellProcessing.replaceNameSpaceEx(uri));
     	}
     	List<String> abbrevAssociatedURIs = new ArrayList<String>();
     	for (String uri : getAssociatedURIs()) {
-    		abbrevAssociatedURIs.add(cellProc.replaceNameSpaceEx(uri));
+    		abbrevAssociatedURIs.add(ValueCellProcessing.replaceNameSpaceEx(uri));
     	}
     	
     	List< Map<String, Object> > rows = new ArrayList< Map<String, Object> >();
     	Map<String, Object> row = new HashMap<String, Object>();
     	row.put("a", String.join(", ", abbrevTypeURIs));
-    	row.put("hasURI", cellProc.replaceNameSpaceEx(getUri()));
+    	row.put("hasURI", ValueCellProcessing.replaceNameSpaceEx(getUri()));
     	row.put("rdfs:label", getLabel());
     	row.put("rdfs:comment", getComment());
     	row.put("prov:startedAtTime", getStartedAt());
     	row.put("prov:used", getParameter());
     	row.put("prov:wasAssociatedWith", String.join(", ", abbrevAssociatedURIs));
-    	row.put("hasneto:hasDeployment", cellProc.replaceNameSpaceEx(getDeploymentUri()));
-    	row.put("hasco:isDataAcquisitionOf", cellProc.replaceNameSpaceEx(getStudyUri()));
-    	row.put("hasco:hasSchema", cellProc.replaceNameSpaceEx(getSchemaUri()));
+    	row.put("hasneto:hasDeployment", ValueCellProcessing.replaceNameSpaceEx(getDeploymentUri()));
+    	row.put("hasco:isDataAcquisitionOf", ValueCellProcessing.replaceNameSpaceEx(getStudyUri()));
+    	row.put("hasco:hasSchema", ValueCellProcessing.replaceNameSpaceEx(getSchemaUri()));
     	row.put("hasco:hasTriggeringEvent", getTriggeringEventName());
     	row.put("prov:endedAtTime", getEndedAt().startsWith("9999")? "" : getEndedAt());
     	rows.add(row);

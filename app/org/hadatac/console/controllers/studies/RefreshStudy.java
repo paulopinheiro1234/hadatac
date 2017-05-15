@@ -65,8 +65,7 @@ public class RefreshStudy extends Controller {
     				Collections.getCollectionsName(Collections.METADATA_GRAPH));
     		accessor.add(model);
     		
-    		ValueCellProcessing cellProc = new ValueCellProcessing();
-    		Model refModel = Study.findModel(cellProc.replaceNameSpaceEx(study_uri));
+    		Model refModel = Study.findModel(ValueCellProcessing.replaceNameSpaceEx(study_uri));
     		
     		results += Feedback.println(Feedback.WEB, "Imported Triples: ");
     		StmtIterator iter = model.listStatements();
@@ -80,7 +79,7 @@ public class RefreshStudy extends Controller {
     		}
     		
     		TripleProcessing.importDataAcquisition(site, session().get("LabKeyUserName"), 
-    				session().get("LabKeyPassword"), path, cellProc.replacePrefixEx(study_uri));
+    				session().get("LabKeyPassword"), path, ValueCellProcessing.replacePrefixEx(study_uri));
     		
     	} catch (CommandException e) {
     		if (e.getMessage().equals("Unauthorized")) {

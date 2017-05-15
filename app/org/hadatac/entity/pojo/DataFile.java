@@ -133,10 +133,9 @@ public class DataFile {
 	
 	public static DataFile convertFromSolr(SolrDocument doc) {
 		DataFile object = new DataFile();
-		ValueCellProcessing cellProc = new ValueCellProcessing();
 		
 		object.setOwnerEmail(doc.getFieldValue("owner_email").toString());
-		object.setDataAcquisitionUri(cellProc.replaceNameSpaceEx(doc.getFieldValue("acquisition_uri").toString()));
+		object.setDataAcquisitionUri(ValueCellProcessing.replaceNameSpaceEx(doc.getFieldValue("acquisition_uri").toString()));
 		object.setDatasetUri(doc.getFieldValue("dataset_uri").toString());
 		object.setFileName(doc.getFieldValue("file_name").toString());
 		object.setProcessStatus(Boolean.parseBoolean(doc.getFieldValue("processed").toString()));
