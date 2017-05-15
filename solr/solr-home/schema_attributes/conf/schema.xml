@@ -1,23 +1,14 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <schema version="1.5">
   <fields>
-    <field name="hasURI" type="string" indexed="true" stored="true"/>
-    <field name="a" type="string" indexed="true" docValues="true" />
-    <field name="rdfslabel" type="string" indexed="true" docValues="true" />
-    <field name="rdfscomment" type="string" indexed="true" docValues="true" />
-    <field name="hasnetopartOfSchema" type="string" indexed="true" docValues="true" />
-    <field name="hascohasPosition" type="string" indexed="true" stored="true"/>
-    <field name="hasnetohasEntity" type="string" indexed="true" docValues="true" />
-    <field name="hasnetohasAttribute" type="string" indexed="true" stored="true"/>
-    <field name="hasnetohasUnit" type="string" indexed="true" docValues="true" />
-    <field name="hascohasSource" type="string" indexed="true" stored="true"/>
-    <field name="hascoisPIConfirmed" type="string" indexed="true" stored="true"/>
+    <field name="DASAttributeUri" type="string" indexed="true" stored="true"/>
+    <dynamicField name="*_i" type="string" indexed="true" stored="true"/>
+    <dynamicField name="*_m" type="string" indexed="true" stored="true" multiValued="true" />
     <field name="_version_" type="long" indexed="true" stored="true"/>
     <field name="_text_" type="text_general" indexed="true" stored="false" multiValued="true"/>
-    <copyField source="hasURI" dest="_text_" />
   </fields>
 
-  <uniqueKey>hasURI</uniqueKey>
+  <uniqueKey>DASAttributeUri</uniqueKey>
 
   <types>
     <fieldType name="string" class="solr.StrField" />
@@ -37,6 +28,5 @@
         <filter class="solr.LowerCaseFilterFactory"/>
       </analyzer>
     </fieldType>
-
   </types>
 </schema>

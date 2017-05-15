@@ -5,7 +5,7 @@
 @import helper._
 @import org.hadatac.console.views.html._
 
-@main("DASA Browser Home") {
+@main("Data Acquisition Browser Home") {
 	<script type="text/javascript" src="@controllers.routes.Assets.versioned("javascripts/vendor/jquery/1.7.1/jquery-1.7.1.min.js")"></script>
 	<link rel="stylesheet" href="@controllers.routes.Assets.versioned("javascripts/vendor/bootstrap/css/bootstrap.min.css")"/>
 	<script type="text/javascript" src="@controllers.routes.Assets.versioned("javascripts/vendor/bootstrap/js/bootstrap.min.js")"></script>
@@ -33,7 +33,7 @@ jQuery(document).ready(function($) {
     		},
     }],
     search_sortby: [
-        {'field':'DASAttributeUri.exact', 'display':'DASA URI'},
+        {'field':'attributeUri.exact', 'display':'Data Acquisition URI'},
     	@for(daIndicator <- indicators){
     		{
     		'field': '@daIndicator.replace(" ","").replace(",","")_i.exact', 
@@ -41,7 +41,7 @@ jQuery(document).ready(function($) {
     		},
     }],
     searchbox_fieldselect: [
-        {'field':'DASAttributeUri.exact', 'display':'DASA URI'},
+        {'field':'attributeUri.exact', 'display':'Data Acquisition URI'},
     	@for(daIndicator <- indicators){
     		{
     		'field': '@daIndicator.replace(" ","").replace(",","")_i.exact', 
@@ -58,20 +58,22 @@ jQuery(document).ready(function($) {
         [
           {
             "pre" : "<h3>",
-            "field" : "DASAttributeLabel_i",
+            "field" : "attributeLabel_i",
             "post" : " - "
-          },
+          }
+		],
+        [
           {
-            "pre" : " ",
-            "field" : "DASAttributeUri",
-            "post" : "</h3>"
+            "pre" : "</h3><b>Start Time:</b> ",
+            "field" : "startTime_i",
+            "post" : " "
           }
         ],
         [
           {
-            "pre" : "\n\n",
-            "field" : "comment_i",
-            "post" : ""
+            "pre" : "<b>End Time:</b>",
+            "field" : "endTime_i",
+            "post" : " "
           }
         ],
         [
@@ -83,48 +85,29 @@ jQuery(document).ready(function($) {
         ],
         [
           {
-            "pre" : "<b>Enity: </b>",
-            "field" : "entity_i",
-            "post" : ""
+            "pre" : "<b>Method:</b> ",
+            "field" : "method_i",
+            "post" : ", "
           }
         ],
         [
           {
-            "pre" : "<b>Attribute: </b>",
-            "field" : "attLabel_i",
+            "pre" : "<b>Deployment:</b> ",
+            "field" : "deployment_i",
             "post" : " "
-          },
-          {
-            "pre" : "(",
-            "field" : "attribute_i",
-            "post" : ")"
           }
         ],
         [
           {
-            "pre" : "<b>Unit: </b>",
-            "field" : "unit_i",
-            "post" : ""
+            "pre" : "<b>Agent:</b> ",
+            "field" : "agent_i",
+            "post" : " "
           }
         ],
         [
           {
-            "pre" : "<b>Source: </b>",
-            "field" : "source_i",
-            "post" : ""
-          }
-        ],
-        [
-          {
-            "pre" : "<b>PI Confirmed?: </b>",
-            "field" : "piConfirmed_i",
-            "post" : ""
-          }
-        ],
-        [
-          {
-            "pre" : "<b>Position: </b>",
-            "field" : "position_i",
+            "pre" : "\n\n",
+            "field" : "comment_i",
             "post" : ""
           }
         ]
@@ -139,11 +122,11 @@ jQuery(document).ready(function($) {
     <div class="container-fluid">
     <div class="page-header">
       <h2>
-      Data Acquisition Schema Attribute Faceted Search
+      Data Acquisition Faceted Search
       </h2>
    </div>
     @if(bAdmin) {
-		<a href="@org.hadatac.console.controllers.metadataacquisition.routes.SchemaAttribute.update()" class="btn btn-primary" role="button">Update</a>
+		<a href="@org.hadatac.console.controllers.metadataacquisition.routes.DataAcquisitionBrowser.update()" class="btn btn-primary" role="button">Update</a>
    	}
    <!-- Trigger the modal with a button -->
    <button type="button" class="btn btn-info btn-lg" data-toggle="modal" data-target="#myModal">Download</button>

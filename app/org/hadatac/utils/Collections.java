@@ -7,6 +7,8 @@ public class Collections {
     // data and auxiliary data 
     public static final String DATA_COLLECTION             = "/sdc";
 	public static final String DATA_ACQUISITION            = "/measurement";
+	public static final String METADATA_AQUISITION		   = "/data_acquisitions";
+	public static final String SA_ACQUISITION           	= "/schema_attributes";
 	public static final String CONSOLE_STORE               = "/console_store";
 	public static final String STUDIES		               = "/studies";
 	public static final String ANALYTES		               = "/analytes";
@@ -44,6 +46,8 @@ public class Collections {
 		switch (request) {
             case DATA_COLLECTION:
             case DATA_ACQUISITION:
+            case METADATA_AQUISITION:
+            case SA_ACQUISITION :
             case CONSOLE_STORE:
             case URI_GENERATOR :           collectionName = Play.application().configuration().getString("hadatac.solr.data") + request;
                                            break;

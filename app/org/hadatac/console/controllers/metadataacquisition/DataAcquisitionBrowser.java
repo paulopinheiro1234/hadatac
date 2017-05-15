@@ -34,7 +34,7 @@ import be.objectify.deadbolt.java.actions.Group;
 import be.objectify.deadbolt.java.actions.Restrict;
 
 
-public class SchemaAttribute extends Controller {
+public class DataAcquisitionBrowser extends Controller {
 	
 	@Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
     public static Result index() {
@@ -43,7 +43,7 @@ public class SchemaAttribute extends Controller {
     			request().path() + "/solrsearch";
     	List<String> indicators = getIndicators();
     	
-    	return ok(schema_attributes.render(collection, indicators, user.isDataManager()));
+    	return ok(dataacquisitionbrowser.render(collection, indicators, user.isDataManager()));
     }
 
 	@Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
@@ -53,35 +53,32 @@ public class SchemaAttribute extends Controller {
 	
     public static List<String> getIndicators() {
 		List<String> results = new ArrayList<String>();
-	
+		
 		results.add("daSchema");
-		results.add("attLabel");
-		results.add("entity");
-		results.add("unit");
-		results.add("object");
-		results.add("position");
-		results.add("source");
-		results.add("piConfirmed");
+		results.add("method");
+		results.add("deployment");
+		results.add("agent");
+		results.add("startTime");
+		results.add("endTime");
 		//java.util.Collections.sort(results);
 		
 		return results; 
     }
 	
-	public static boolean updateDASchemaAttributes() {
+	public static boolean updateDataAcquisitions() {
 		String strQuery = NameSpaces.getInstance().printSparqlNameSpaceList() 
-				+ "SELECT DISTINCT ?DASAttributeUri ?DASAttributeLabel ?comment ?entity ?attribute ?attLabel ?daSchema ?position ?unit ?source ?object ?piConfirmed WHERE {  "
-				+ " ?DASAttributeUri a hasneto:DASchemaAttribute . "
-				+ " OPTIONAL { ?DASAttributeUri rdfs:label ?DASAttributeLabel . }"
-				+ " OPTIONAL {?DASAttributeUri rdfs:comment ?comment . } "
-				+ " OPTIONAL {?DASAttributeUri hasneto:partOfSchema ?daSchema . }"
-				+ " OPTIONAL {?DASAttributeUri hasco:hasPosition ?position . } "
-				+ " OPTIONAL {?DASAttributeUri hasneto:hasEntity ?entity . } "
-				+ " OPTIONAL {?DASAttributeUri hasneto:hasAssociatedObject ?object . } "
-				+ " OPTIONAL {?DASAttributeUri hasneto:hasAttribute ?attribute . "
-                + "         ?attribute rdfs:label ?attLabel . } "
-				+ " OPTIONAL {?DASAttributeUri hasneto:hasUnit ?unit . }"
-				+ " OPTIONAL {?DASAttributeUri hasco:hasSource ?source . }"
-				+ " OPTIONAL {?DASAttributeUri hasco:isPIConfirmed ?piConfirmed . }"
+				+ "SELECT DISTINCT ?attributeUri ?attributeLabel ?daSchema ?method ?deployment ?study ?comment ?startTime ?endTime WHERE { "
+				+ " ?attributeSuper rdfs:subClassOf* hasneto:DataAcquisition . " 
+				+ " ?attributeUri a ?attributeSuper . " 
+				+ " ?attributeUri rdfs:label ?attributeLabel ."
+				+ " ?attributeUri hasco:isDataAcquisitionOf ?study ."
+				+ " OPTIONAL {?attributeUri hasco:hasSchema ?daSchema . }"
+				+ " OPTIONAL {?attributeUri hasco:hasMethod ?method . }"
+				+ " OPTIONAL {?attributeUri hasneto:hasDeployment ?deployment . }"
+				+ " OPTIONAL {?attributeUri rdfs:comment ?comment . }"
+				+ " OPTIONAL {?attributeUri prov:wasAssociatedWith ?agent . }"
+				+ " OPTIONAL {?attributeUri prov:startedAtTime ?startTime . }"
+				+ " OPTIONAL {?attributeUri prov:endedAtTime ?endTime . }"
 				+ " }";
 		
 		QueryExecution qexecStudy = QueryExecutionFactory.sparqlService(
@@ -95,7 +92,7 @@ public class SchemaAttribute extends Controller {
 		while (resultsrwStudy.hasNext()) {
 			QuerySolution soln = resultsrwStudy.next();
 			System.out.println("Solution: " + soln.toString());
-			String attributeUri = soln.get("DASAttributeUri").toString();
+			String attributeUri = soln.get("attributeUri").toString();
 			HashMap<String, Object> DAInfo = null;
 			String key = "";
 			String value = "";
@@ -103,23 +100,33 @@ public class SchemaAttribute extends Controller {
 			
 			if (!mapDAInfo.containsKey(attributeUri)) {
 				DAInfo = new HashMap<String, Object>();
-				DAInfo.put("DASAttributeUri", attributeUri);
+				DAInfo.put("attributeUri", attributeUri);
 				mapDAInfo.put(attributeUri, DAInfo);
 			}
 			else {
 				DAInfo = mapDAInfo.get(attributeUri);
 			}
 			
-			if (soln.contains("DASAttributeLabel") && !DAInfo.containsKey("DASAttributeLabel_i")) {
-				DAInfo.put("DASAttributeLabel_i", "<a href=\""
+			if (soln.contains("attributeLabel") && !DAInfo.containsKey("attributeLabel_i")) {
+				DAInfo.put("attributeLabel_i", "<a href=\""
 						+ Play.application().configuration().getString("hadatac.console.host_deploy") 
-						+ "/hadatac/metadataacquisitions/viewDASA?da_uri=" 
-						+ cellProc.replaceNameSpaceEx(DAInfo.get("DASAttributeUri").toString()) + "\">"
-						+ soln.get("DASAttributeLabel").toString() + "</a>");
+						+ "/hadatac/metadataacquisitions/viewDA?da_uri=" 
+						+ cellProc.replaceNameSpaceEx(DAInfo.get("attributeUri").toString()) + "\">"
+						+ soln.get("attributeLabel").toString() + "</a>");
 			}
 			if (soln.contains("daSchema") && !DAInfo.containsKey("daSchema_i")) {
 				key = "daSchema_i";
 				value = soln.get("daSchema").toString();
+				DAInfo.put(key, value);
+			}
+			if (soln.contains("method") && !DAInfo.containsKey("method_i")){
+				key = "method_i";
+				value = soln.get("method").toString();
+				DAInfo.put(key, value);
+			}
+			if (soln.contains("deployment") && !DAInfo.containsKey("deployment_i")){
+				key = "deployment_i";
+				value = soln.get("deployment").toString();
 				DAInfo.put(key, value);
 			}
 			if (soln.contains("comment") && !DAInfo.containsKey("comment_i")){
@@ -127,48 +134,22 @@ public class SchemaAttribute extends Controller {
 				value = soln.get("comment").toString();
 				DAInfo.put(key, value);
 			}
-			if (soln.contains("entity") && !DAInfo.containsKey("entity_i")){
-				key = "entity_i";
-				value = soln.get("entity").toString();
+			if (soln.contains("agent") && !DAInfo.containsKey("agent_i")){
+				key = "agent_i";
+				value = soln.get("agent").toString();
 				DAInfo.put(key, value);
 			}
-			if (soln.contains("attribute") && !DAInfo.containsKey("attribute_i")){
-				key = "attribute_i";
-				value = soln.get("attribute").toString();
+			if (soln.contains("startTime") && !DAInfo.containsKey("startTime_i")){
+				key = "startTime_i";
+				value = soln.get("startTime").toString();
 				DAInfo.put(key, value);
 			}
-			if (soln.contains("attLabel") && !DAInfo.containsKey("attLabel_i")){
-				key = "attLabel_i";
-				value = soln.get("attLabel").toString();
-				DAInfo.put(key, value);
-			}
-			if (soln.contains("position") && !DAInfo.containsKey("position_i")){
-				key = "position_i";
-				value = soln.get("position").toString();
-				DAInfo.put(key, value);
-			}
-			if (soln.contains("unit") && !DAInfo.containsKey("unit_i")){
-				key = "unit_i";
-				value = soln.get("unit").toString();
-				DAInfo.put(key, value);
-			}
-			if (soln.contains("source") && !DAInfo.containsKey("source_i")){
-				key = "source_i";
-				value = soln.get("source").toString();
-				DAInfo.put(key, value);
-			}
-			if (soln.contains("object") && !DAInfo.containsKey("object_i")){
-				key = "object_i";
-				value = soln.get("object").toString();
-				DAInfo.put(key, value);
-			}
-			if (soln.contains("piConfirmed") && !DAInfo.containsKey("piConfirmed_i")){
-				key = "piConfirmed_i";
-				value = soln.get("piConfirmed").toString();
+			if (soln.contains("endTime") && !DAInfo.containsKey("endTime_i")){
+				key = "endTime_i";
+				value = soln.get("endTime").toString();
 				DAInfo.put(key, value);
 			}
 		}
-		
 		deleteFromSolr();
 		
 		ArrayList<JSONObject> results = new ArrayList<JSONObject>();
@@ -178,24 +159,24 @@ public class SchemaAttribute extends Controller {
 		
 		return SolrUtils.commitJsonDataToSolr(
 				Play.application().configuration().getString("hadatac.solr.data") 
-				+ Collections.SA_ACQUISITION, results.toString());
+				+ Collections.METADATA_AQUISITION, results.toString());
 	}
 	
 	public static int deleteFromSolr() {
 		try {
 			SolrClient solr = new HttpSolrClient(
 					Play.application().configuration().getString("hadatac.solr.data") 
-					+ Collections.SA_ACQUISITION);
+					+ Collections.METADATA_AQUISITION);
 			UpdateResponse response = solr.deleteByQuery("*:*");
 			solr.commit();
 			solr.close();
 			return response.getStatus();
 		} catch (SolrServerException e) {
-			System.out.println("[ERROR] SchemaAttribute.deleteFromSolr() - SolrServerException message: " + e.getMessage());
+			System.out.println("[ERROR] DataAcquisitionBroswer.deleteFromSolr() - SolrServerException message: " + e.getMessage());
 		} catch (IOException e) {
-			System.out.println("[ERROR] SchemaAttribute.deleteFromSolr() - IOException message: " + e.getMessage());
+			System.out.println("[ERROR] DataAcquisitionBroswer.deleteFromSolr() - IOException message: " + e.getMessage());
 		} catch (Exception e) {
-			System.out.println("[ERROR] SchemaAttribute.deleteFromSolr() - Exception message: " + e.getMessage());
+			System.out.println("[ERROR] DataAcquisitionBroswer.deleteFromSolr() - Exception message: " + e.getMessage());
 		}
 		
 		return -1;
@@ -203,9 +184,9 @@ public class SchemaAttribute extends Controller {
 	
 	@Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
     public static Result update() {
-		updateDASchemaAttributes();
+		updateDataAcquisitions();
 		
-		return redirect(routes.SchemaAttribute.index());
+		return redirect(routes.DataAcquisitionBrowser.index());
     }
     
     @Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
