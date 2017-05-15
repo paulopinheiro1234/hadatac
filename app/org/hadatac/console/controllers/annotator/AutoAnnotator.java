@@ -5,6 +5,7 @@ import java.io.FileInputStream;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
+import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -43,6 +44,7 @@ import org.hadatac.console.views.html.triplestore.*;
 import org.hadatac.console.views.html.*;
 import org.hadatac.data.api.DataFactory;
 import org.hadatac.data.loader.DataAcquisitionGenerator;
+import org.hadatac.data.loader.DeploymentGenerator;
 import org.hadatac.data.loader.SampleGenerator;
 import org.hadatac.data.loader.SampleSubjectMapper;
 import org.hadatac.data.loader.StudyGenerator;
@@ -361,7 +363,7 @@ public class AutoAnnotator extends Controller {
 				bSucceed = annotateMapFile(new File(path_unproc + "/" + file_name));
 			}
 			else if (file_name.startsWith("DA")) {
-				bSucceed = annotateMapFile(new File(path_unproc + "/" + file_name));
+				bSucceed = annotateDataAcquisitionFile(new File(path_unproc + "/" + file_name));
 			}
 			if (bSucceed) {
 				//Move the file to the folder for processed files
@@ -707,20 +709,13 @@ public class AutoAnnotator extends Controller {
 		return true;
 	}
 	
-	public static boolean annotateDataAcquisitionFile(File file) {
-		DataAcquisitionGenerator daGenerator = new DataAcquisitionGenerator(file);
-		List<Map<String, Object>> rows = daGenerator.createRows();
-		
-		Model model = createModel(rows);
-    	DatasetAccessor accessor = DatasetAccessorFactory.createHTTP(
-				Collections.getCollectionsName(Collections.METADATA_GRAPH));
-    	accessor.add(model);
-		
+	private static boolean commitRows(List<Map<String, Object>> rows, String contentInCSV,
+			String fileName, String tableName, boolean toTripleStore) {
 		String site = ConfigProp.getPropertyValue("labkey.config", "site");
         String path = "/" + ConfigProp.getPropertyValue("labkey.config", "folder");
         Credential cred = Credential.find();
         AnnotationLog log = new AnnotationLog();
-    	log.setFileName(file.getName());
+    	log.setFileName(fileName);
         if (null == cred) {
         	log.addline(Feedback.println(Feedback.WEB, "[ERROR] No LabKey credentials are provided!"));
     		log.save();
@@ -729,14 +724,14 @@ public class AutoAnnotator extends Controller {
     	LabkeyDataHandler labkeyDataHandler = new LabkeyDataHandler(
     			site, cred.getUserName(), cred.getPassword(), path);
 		try {
-			int nRows = labkeyDataHandler.insertRows("DataAcquisition", rows);
+			int nRows = labkeyDataHandler.insertRows(tableName, rows);
 			log.addline(Feedback.println(Feedback.WEB, String.format(
-					"[OK] %d row(s) have been inserted into the DataAcquisition table", nRows)));
+					"[OK] %d row(s) have been inserted into the %s table", nRows, tableName)));
 		} catch (CommandException e1) {
 			try {
-				int nRows = labkeyDataHandler.updateRows("DataAcquisition", rows);
+				int nRows = labkeyDataHandler.updateRows(tableName, rows);
 				log.addline(Feedback.println(Feedback.WEB, String.format(
-						"[OK] %d row(s) have been inserted into the DataAcquisition table", nRows)));
+						"[OK] %d row(s) have been inserted into the %s table", nRows, tableName)));
 			} catch (CommandException e) {
 				log.addline(Feedback.println(Feedback.WEB, "[ERROR] " + e.getMessage()));
 	    		log.save();
@@ -744,12 +739,34 @@ public class AutoAnnotator extends Controller {
 			}
 		}
 		
-		log.addline(Feedback.println(Feedback.WEB, String.format(
-				"[OK] %d triple(s) have been committed to triple store", model.size())));
-		log.addline(Feedback.println(Feedback.WEB, String.format(daGenerator.toString())));
+		if (toTripleStore) {
+			DatasetAccessor accessor = DatasetAccessorFactory.createHTTP(
+					Collections.getCollectionsName(Collections.METADATA_GRAPH));
+			Model model = createModel(rows);
+	    	accessor.add(model);
+	    	log.addline(Feedback.println(Feedback.WEB, String.format(
+					"[OK] %d triple(s) have been committed to triple store", model.size())));
+		}
+		
+		log.addline(Feedback.println(Feedback.WEB, String.format(contentInCSV)));
 		log.save();
-
+		
 		return true;
+	}
+	
+	public static boolean annotateDataAcquisitionFile(File file) {
+		DateFormat isoFormat = new SimpleDateFormat("EEE MMM dd HH:mm:ss zzz yyyy");
+    	String startTime = isoFormat.format(new Date());
+    	
+    	DataAcquisitionGenerator daGenerator = new DataAcquisitionGenerator(file, startTime);
+    	boolean bSuccess = commitRows(daGenerator.createRows(), daGenerator.toString(), file.getName(), 
+    			"DataAcquisition", true);
+    	
+    	DeploymentGenerator deploymentGenerator = new DeploymentGenerator(file, startTime);
+    	bSuccess = commitRows(deploymentGenerator.createRows(), deploymentGenerator.toString(), file.getName(), 
+    			"Deployment", true);
+
+		return bSuccess;
 	}
 	
 	private static String getProperDataAcquisitionUri(String fileName) {
@@ -958,8 +975,7 @@ public class AutoAnnotator extends Controller {
 				preamble += Downloads.FRAG_IN_DATE_TIME_STATEMENT + " " + timeStampIndex + "  . \n";  
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
-			return "";
+			throw new Exception(preamble + "\n" + e.getMessage());
 		}
 
 		preamble += Downloads.FRAG_END_PREAMBLE;
