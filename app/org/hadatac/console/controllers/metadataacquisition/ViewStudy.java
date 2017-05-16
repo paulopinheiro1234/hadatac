@@ -245,6 +245,34 @@ public class ViewStudy extends Controller {
 		
 		return subjectResult;
 	}
+	
+	public static List<String> findSampleCollection(String study_uri) {
+		String scQueryString = "";
+		scQueryString += NameSpaces.getInstance().printSparqlNameSpaceList(); 
+		scQueryString += "SELECT ?sc ?si WHERE { "
+    			+ "?sc <http://hadatac.org/ont/hasco/isSampleCollectionOf> " + study_uri + " . "
+    			+ "?si <http://hadatac.org/ont/hasco/isObjectOf> ?sc . "
+    			+ "}";
+		List<String> values = new ArrayList<String>();
+		try {
+			Query sampleQuery = QueryFactory.create(scQueryString);
+			QueryExecution qexec3 = QueryExecutionFactory.sparqlService(
+					Collections.getCollectionsName(Collections.METADATA_SPARQL), sampleQuery);
+			ResultSet results = qexec3.execSelect();
+			ResultSetRewindable resultsrw = ResultSetFactory.copyResults(results);
+			qexec3.close();
+			
+			while (resultsrw.hasNext()) {
+				QuerySolution soln = resultsrw.next();
+				values = new ArrayList<String>();
+				values.add(soln.get("si").toString());		
+			}
+		} catch (QueryExceptionHTTP e) {
+			e.printStackTrace();
+		}
+		
+		return values;
+	}
 
 	public static String findUser() {
 		String results = null;
@@ -267,11 +295,12 @@ public class ViewStudy extends Controller {
 		
 		Map<String, List<String>> poResult = findBasic(study_uri);
 		Map<String, List<String>> subjectResult = findSubject(study_uri);
+		List<String> scResult = findSampleCollection(study_uri);
 		Map<String, String> showValues = new HashMap<String, String>();
 		showValues.put("study", study_uri);
 		showValues.put("user", findUser());
         
-    	return ok(viewStudy.render(poResult, subjectResult, indicatorValues, indicatorUris, showValues));   
+    	return ok(viewStudy.render(poResult, subjectResult, indicatorValues, indicatorUris, showValues, scResult));
     }
 
 	@Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))

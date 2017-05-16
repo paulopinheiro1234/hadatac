@@ -54,7 +54,7 @@
 			<h3>Sample List</h3>
 				<ul>
 					@for(key <- sampleResult.keySet()){
-						<li><a href="@org.hadatac.console.controllers.metadataacquisition.routes.ViewSample.index(key.toString())">@key.toString()</a>
+						<li><a href="@org.hadatac.console.controllers.metadataacquisition.routes.ViewSample.index(key.toString(), showValues.get("study").toString(), showValues.get("subject").toString())">@key.toString()</a>
 							<ul>
 							@for(s <- sampleResult.get(key)) {
 							<li>@s.toString()</li>

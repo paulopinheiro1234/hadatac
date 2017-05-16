@@ -3,6 +3,8 @@ package org.hadatac.console.controllers.metadataacquisition;
 import java.io.UnsupportedEncodingException;
 
 import org.hadatac.entity.pojo.Subject;
+import org.hadatac.metadata.loader.ValueCellProcessing;
+
 import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -25,15 +27,18 @@ import org.apache.jena.query.ResultSetRewindable;
 import org.apache.jena.rdf.model.Literal;
 import org.hadatac.console.controllers.AuthApplication;
 import org.hadatac.console.controllers.deployments.*;
+import org.hadatac.console.controllers.triplestore.UserManagement;
 import org.hadatac.console.http.DeploymentQueries;
 import org.hadatac.console.models.DeploymentForm;
 import org.hadatac.console.models.SparqlQueryResults;
+import org.hadatac.console.models.SysUser;
 import org.hadatac.console.models.TripleDocument;
 import org.hadatac.entity.pojo.DataAcquisition;
 import org.hadatac.entity.pojo.Deployment;
 import org.hadatac.utils.Collections;
 import org.hadatac.utils.NameSpaces;
 import org.hadatac.utils.State;
+import org.hadatac.entity.pojo.Measurement;
 
 import be.objectify.deadbolt.java.actions.Group;
 import be.objectify.deadbolt.java.actions.Restrict;
@@ -89,7 +94,7 @@ public class ViewSample extends Controller {
 		return indicatorValues;
 	}
 	
-	public static Map<String, List<String>> findBasic(String sample_uri) {
+	public static Map<String, List<String>> findBasic(String sample_uri, String study_uri) {
 
 		String sampleQueryString = "";
 		
@@ -104,23 +109,16 @@ public class ViewSample extends Controller {
     	"PREFIX rdfs:<http://www.w3.org/2000/01/rdf-schema#>" + 
     	"PREFIX skos: <http://www.w3.org/2004/02/skos/core#>" +
     	"PREFIX foaf: <http://xmlns.com/foaf/0.1/>" + */
-    	"SELECT ?sampleUri ?subjectUri ?subjectLabel ?sampleType ?sampleLabel ?freezeThaw ?storageTemp ?storageTempUnit ?cohortLabel ?object ?samplingVolume ?samplingVolumeUnit ?comment" +
-		 "WHERE {        ?subjectUri hasco:isSubjectOf* ?cohort ." +
-		 "       		?sampleUri hasco:isSampleOf ?subjectUri ." +
-		 "				?sampleUri rdfs:comment ?comment . " +
-		 "				?sampleUri hasco:isObjectOf ?object . " +
-		 "				?sampleUri hasco:hasSamplingVolume ?samplingVolume . " +
-		 "				?sampleUri hasco:hasSamplingVolumeUnit ?samplingVolumeUnit . " +
-		 "				?sampleUri hasco:hasStorageTemperature ?storageTemp . " +
-		 "				?sampleUri hasco:hasStorageTemperatureUnit ?storageTempUnit . " +
-		 "				?sampleUri hasco:hasNumFreezeThaw ?freezeThaw . " +
-		 "				?sampleUri rdfs:comment ?comment . " +
-		 "				?cohort rdfs:label ?cohortLabel . " +
-		 "       		OPTIONAL { ?subjectUri rdfs:label ?subjectLabel } .  " + 
-		 "       		OPTIONAL { ?sampleUri rdfs:label ?sampleLabel } .  " + 
-		 "       		OPTIONAL { ?sampleUri a ?sampleType  } .  " +
-         "      FILTER (?sampleUri = " + sample_uri + " ) .  " +
-		 "                            }";		
+    	"SELECT ?originalID ?isSampleOf ?isObjectOf ?sampleType ?sampleLabel ?storageTempUnit ?samplingVolumeUnit ?comment" +
+		 "WHERE {      	" + sample_uri + "rdfs:label ?sampleLabel." +
+		 "       		" + sample_uri + "rdfs:comment ?comment." +
+		 "				" + sample_uri + "rdf:type	?sampleType." +
+		 "				" + sample_uri + "<http://hadatac.org/ont/hasco/isObjectOf> ?isObjectOf." +
+		 "				" + sample_uri + "<http://hadatac.org/ont/hasco/originalID> ?originalID." +
+		 "				" + sample_uri + "<http://hadatac.org/ont/hasco/isSampleOf> ?isSampleOf." +
+		 "				" + sample_uri + "<http://hadatac.org/ont/hasco/hasStorageTemperatureUnit> ?storageTempUnit." +
+		 "				" + sample_uri + "<http://hadatac.org/ont/hasco/hasSamplingVolumeUnit> ?samplingVolumeUnit." +
+		 "                            }";	
 	/*	
 		String basicQueryString = "";
 
@@ -148,41 +146,58 @@ public class ViewSample extends Controller {
 			QuerySolution soln = resultsrw.next();
 			System.out.println("HERE IS THE RAW SOLN*********" + soln.toString());
 			values = new ArrayList<String>();
+			values.add("OriginalID: " + soln.get("originalID").toString());
 			values.add("Label: " + soln.get("sampleLabel").toString());
 			values.add("Type: " + soln.get("sampleType").toString());
-			values.add("Sample Of: " + soln.get("subjectLabel").toString());
-			values.add("Measured Object Of: " + soln.get("object").toString());
-			values.add("Sample Volume: " + soln.get("samplingVolume").toString());
+			values.add("Object Of: " + soln.get("isObjectOf").toString());
+			values.add("Sample Of: " + soln.get("isSampleOf").toString());
 			values.add("Sample Volume Unit: " + soln.get("samplingVolumeUnit").toString());
-			values.add("Storage Temperature: " + soln.get("storageTemp").toString());
 			values.add("Storage Temperature Unit: " + soln.get("storageTempUnit").toString());
-			values.add("Freeze Thaw Count: " + soln.get("freezeThaw").toString());
-			//values.add("Comment: " + soln.get("comment").toString());
+			values.add("Comment: " + soln.get("comment").toString());
 			sampleResult.put(soln.get("sampleUri").toString(),values);	
 			System.out.println("THIS IS SUBROW*********" + sampleResult);	
 		}
 
 		return sampleResult;
 	}
-
+	
+	public static String findUser() {
+		String results = null;
+	    final SysUser user = AuthApplication.getLocalUser(session());
+	    if(null == user){
+	        results = null;
+	    }
+	    else{
+	    	results = UserManagement.getUriByEmail(user.getEmail());
+	    }
+	    System.out.println("This is the current user's uri:" + results);
+	    
+	    return results;
+	}
+	
+	public static String findValues(String sample_uri, String study_uri, String subject_uri) {
+		ValueCellProcessing cellProc = new ValueCellProcessing();
+		return Measurement.findForViews(findUser(), study_uri, cellProc.convertToWholeURI(subject_uri), sample_uri).documents.get(0).getValue().toString();
+	}
 	
 	// for /metadata HTTP GET requests
 	@Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    public static Result index(String sample_uri) {
+    public static Result index(String sample_uri, String study_uri, String subject_uri) {
 
 		Map<String, String> indicatorValues = findSampleIndicators(sample_uri);
-    	Map<String, List<String>> sampleResult = findBasic(sample_uri);
+    	Map<String, List<String>> sampleResult = findBasic(sample_uri, study_uri);
+    	String samplevalues = findValues(sample_uri, study_uri, subject_uri);
         
-    	return ok(viewSample.render(sampleResult,indicatorValues));    
+    	return ok(viewSample.render(sampleResult,indicatorValues, samplevalues));   
         
     }// /index()
 
 
     // for /metadata HTTP POST requests
 	@Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    public static Result postIndex(String sample_uri) {
+    public static Result postIndex(String sample_uri, String study_uri, String subject_uri) {
 
-		return index(sample_uri);
+		return index(sample_uri, study_uri, subject_uri);
 	}
 
 }
