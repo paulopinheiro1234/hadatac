@@ -71,7 +71,11 @@ public class DASchemaAttrGenerator extends BasicGenerator {
     }
     
     private String getUnit(CSVRecord rec) {
-    	return rec.get(mapCol.get("Unit"));
+    	if (rec.get(mapCol.get("Unit")) != null) {
+    		return rec.get(mapCol.get("Unit"));
+    	} else {
+    		return "";
+    	}
     }
     
     private String getTime(CSVRecord rec) {
