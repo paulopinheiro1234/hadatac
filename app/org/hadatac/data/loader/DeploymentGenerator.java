@@ -135,7 +135,7 @@ public class DeploymentGenerator extends BasicGenerator {
     }
     
     @Override
-    Map<String, Object> createRow(CSVRecord rec) {
+    Map<String, Object> createRow(CSVRecord rec, int rownumber) {
     	Map<String, Object> row = new HashMap<String, Object>();
     	row.put("hasURI", kbPrefix + "DPL-" + getDataAcquisitionName(rec));
     	row.put("a", "vstoi:Deployment");

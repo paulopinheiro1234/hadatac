@@ -1,8 +1,9 @@
-@(studyResult : Map[String, List[String]],
-  subjectResult	: Map[String, List[String]],
-  indicatorValues : Map[String,List[String]],
-  indicatorUris	: Map[String,String],
-  showValues : Map[String,String])
+@(studyResult	:	Map[String, List[String]],
+  subjectResult	:	Map[String, List[String]],
+  indicatorValues	:	Map[String,List[String]],
+  indicatorUris	:	Map[String,String],
+  showValues	:	Map[String,String],
+  scResult	:	List[String])
 
 @import org.hadatac.console.views.html._
 @import org.hadatac.utils._
@@ -70,6 +71,12 @@
 							}
 							</ul>
 						</li>
+					}
+				</ul>
+			<h3>Samples</h3>
+				<ul>
+					@for(i <- scResult){
+						<li>@i.toString()</li>
 					}
 				</ul>
     	</div>

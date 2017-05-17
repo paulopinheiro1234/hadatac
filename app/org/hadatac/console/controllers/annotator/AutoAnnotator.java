@@ -43,6 +43,8 @@ import org.hadatac.console.views.html.annotator.*;
 import org.hadatac.console.views.html.triplestore.*;
 import org.hadatac.console.views.html.*;
 import org.hadatac.data.api.DataFactory;
+import org.hadatac.data.loader.DASchemaAttrGenerator;
+import org.hadatac.data.loader.DASchemaGenerator;
 import org.hadatac.data.loader.DataAcquisitionGenerator;
 import org.hadatac.data.loader.DeploymentGenerator;
 import org.hadatac.data.loader.SampleGenerator;
@@ -364,6 +366,9 @@ public class AutoAnnotator extends Controller {
 			}
 			else if (file_name.startsWith("ACQ")) {
 				bSucceed = annotateDataAcquisitionFile(new File(path_unproc + "/" + file_name));
+			}
+			else if (file_name.startsWith("SDD")) {
+				bSucceed = annotateDataAcquisitionSchemaFile(new File(path_unproc + "/" + file_name));
 			}
 			if (bSucceed) {
 				//Move the file to the folder for processed files
@@ -765,6 +770,21 @@ public class AutoAnnotator extends Controller {
     	DeploymentGenerator deploymentGenerator = new DeploymentGenerator(file, startTime);
     	bSuccess = commitRows(deploymentGenerator.createRows(), deploymentGenerator.toString(), file.getName(), 
     			"Deployment", true);
+
+		return bSuccess;
+	}
+	
+	public static boolean annotateDataAcquisitionSchemaFile(File file) {
+//		DateFormat isoFormat = new SimpleDateFormat("EEE MMM dd HH:mm:ss zzz yyyy");
+//    	String startTime = isoFormat.format(new Date());
+    	
+    	DASchemaAttrGenerator dasGenerator = new DASchemaAttrGenerator(file);
+    	boolean bSuccess = commitRows(dasGenerator.createRows(), dasGenerator.toString(), file.getName(), 
+    			"DASchemaAttribute", true);
+    	
+//    	DASchemaGenerator dasGenerator = new DASchemaGenerator(file);
+//    	boolean bSuccess = commitRows(dasGenerator.createRows(), dasGenerator.toString(), file.getName(), 
+//    			"DASchemaAttribute", true);
 
 		return bSuccess;
 	}

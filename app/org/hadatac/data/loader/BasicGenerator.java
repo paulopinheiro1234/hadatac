@@ -30,12 +30,14 @@ public abstract class BasicGenerator {
 	}
 	
 	abstract void initMapping();
-    abstract Map<String, Object> createRow(CSVRecord rec);
+    abstract Map<String, Object> createRow(CSVRecord rec, int rownumber);
     
     public List< Map<String, Object> > createRows() {
     	rows.clear();
+    	int rownumber = 0;
     	for (CSVRecord record : records) {
-    		rows.add(createRow(record));
+    		rownumber = rownumber++;
+    		rows.add(createRow(record, rownumber));
     	}
     	return rows;
     }

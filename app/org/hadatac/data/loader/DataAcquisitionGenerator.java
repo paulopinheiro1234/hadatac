@@ -60,7 +60,7 @@ public class DataAcquisitionGenerator extends BasicGenerator {
     }
     
     @Override
-    Map<String, Object> createRow(CSVRecord rec) {
+    Map<String, Object> createRow(CSVRecord rec, int rownumber) {
     	Map<String, Object> row = new HashMap<String, Object>();
     	row.put("hasURI", kbPrefix + "DA-" + getDataAcquisitionName(rec));
     	row.put("a", "hasneto:DataAcquisition");
