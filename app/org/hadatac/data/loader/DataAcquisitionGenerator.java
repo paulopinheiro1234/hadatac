@@ -28,20 +28,15 @@ public class DataAcquisitionGenerator extends BasicGenerator {
 	@Override
 	void initMapping() {
 		mapCol.clear();
-        mapCol.put("DataAcquisitionName", "DA Name");
-        mapCol.put("Comment", "Comment");
-        mapCol.put("Method", "Method");
-        mapCol.put("Study", "Study");
-        mapCol.put("DataDictionaryName", "Data Dictionary Name");
-        mapCol.put("Epi/Lab", "Epi/Lab");
+        mapCol.put("DataAcquisitionName", "name");
+        mapCol.put("Method", "method");
+        mapCol.put("Study", "study");
+        mapCol.put("DataDictionaryName", "data dict");
+        mapCol.put("Epi/Lab", "epi/lab");
 	}
 	
     private String getDataAcquisitionName(CSVRecord rec) {
     	return rec.get(mapCol.get("DataAcquisitionName"));
-    }
-    
-    private String getComment(CSVRecord rec) {
-    	return rec.get(mapCol.get("Comment"));
     }
     
     private String getMethod(CSVRecord rec) {
@@ -68,9 +63,8 @@ public class DataAcquisitionGenerator extends BasicGenerator {
     Map<String, Object> createRow(CSVRecord rec) {
     	Map<String, Object> row = new HashMap<String, Object>();
     	row.put("hasURI", kbPrefix + "DA-" + getDataAcquisitionName(rec));
-    	row.put("a", "hasco:DataAcquisition");
+    	row.put("a", "hasneto:DataAcquisition");
     	row.put("rdfs:label", getDataAcquisitionName(rec));
-    	row.put("rdfs:comment", getComment(rec));
     	row.put("hasneto:hasDeployment", kbPrefix + "DPL-" + getDataAcquisitionName(rec));
     	row.put("hasco:hasMethod", "hasco:" + getMethod(rec));
     	row.put("hasco:isDataAcquisitionOf", kbPrefix + "STD-Pilot-" + getStudy(rec));
@@ -89,7 +83,6 @@ public class DataAcquisitionGenerator extends BasicGenerator {
     	DataAcquisition dataAcquisition = new DataAcquisition();
     	dataAcquisition.setUri(ValueCellProcessing.replacePrefixEx((String)row.get("hasURI")));
     	dataAcquisition.setLabel(ValueCellProcessing.replacePrefixEx((String)row.get("rdfs:label")));
-    	dataAcquisition.setComment(ValueCellProcessing.replacePrefixEx((String)row.get("rdfs:comment")));
     	dataAcquisition.setDeploymentUri(ValueCellProcessing.replacePrefixEx((String)row.get("hasneto:hasDeployment")));
     	dataAcquisition.setMethodUri(ValueCellProcessing.replacePrefixEx((String)row.get("hasco:hasMethod")));
     	dataAcquisition.setStudyUri(ValueCellProcessing.replacePrefixEx((String)row.get("hasco:isDataAcquisitionOf")));

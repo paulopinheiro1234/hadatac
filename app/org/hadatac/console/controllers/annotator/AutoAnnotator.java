@@ -362,7 +362,7 @@ public class AutoAnnotator extends Controller {
 			else if (file_name.startsWith("MAP")) {
 				bSucceed = annotateMapFile(new File(path_unproc + "/" + file_name));
 			}
-			else if (file_name.startsWith("DA")) {
+			else if (file_name.startsWith("ACQ")) {
 				bSucceed = annotateDataAcquisitionFile(new File(path_unproc + "/" + file_name));
 			}
 			if (bSucceed) {

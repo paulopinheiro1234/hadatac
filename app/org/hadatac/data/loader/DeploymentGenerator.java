@@ -36,11 +36,10 @@ public class DeploymentGenerator extends BasicGenerator {
 	@Override
 	void initMapping() {
 		mapCol.clear();
-        mapCol.put("DataAcquisitionName", "DA Name");
-        mapCol.put("Comment", "Comment");
-        mapCol.put("Method", "Method");
-        mapCol.put("Study", "Study");
-        mapCol.put("Epi/Lab", "Epi/Lab");
+        mapCol.put("DataAcquisitionName", "name");
+        mapCol.put("Method", "method");
+        mapCol.put("Study", "study");
+        mapCol.put("Epi/Lab", "epi/lab");
 	}
 	
 	private String getCohortAsPlatform(CSVRecord rec) {
