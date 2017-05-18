@@ -729,6 +729,7 @@ public class AutoAnnotator extends Controller {
     	LabkeyDataHandler labkeyDataHandler = new LabkeyDataHandler(
     			site, cred.getUserName(), cred.getPassword(), path);
 		try {
+			log.addline(Feedback.println(Feedback.WEB, "The first Row is " + rows.get(0).toString()));
 			int nRows = labkeyDataHandler.insertRows(tableName, rows);
 			log.addline(Feedback.println(Feedback.WEB, String.format(
 					"[OK] %d row(s) have been inserted into the %s table", nRows, tableName)));
