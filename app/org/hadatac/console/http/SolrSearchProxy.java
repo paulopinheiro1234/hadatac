@@ -161,4 +161,49 @@ public class SolrSearchProxy extends Controller {
 				request().toString().split((request().path()))[1];
 		return getSolrSearch(path);
 	}
+	
+	public static Result getApiStudyDownload() {
+		DynamicForm form = Form.form().bindFromRequest();
+		String request_token;
+		
+		if (form.data().size() == 0) {
+			return badRequest("[ERROR] getApiStudyDownload expects some data");
+		} else {
+	        request_token = form.get("token");
+	        if (!request_token.equals("TESTTOKEN")) {
+	        	return badRequest("[ERROR] getApiStudyDownload token mismatch");
+	        }
+	        return getStudyAcquisitionDownload();
+		}
+	}
+	
+	public static Result getApiStudyVariableDownload() {
+		DynamicForm form = Form.form().bindFromRequest();
+		String request_token;
+		
+		if (form.data().size() == 0) {
+			return badRequest("[ERROR] getApiStudyVariableDownload expects some data");
+		} else {
+	        request_token = form.get("token");
+	        if (!request_token.equals("TESTTOKEN")) {
+	        	return badRequest("[ERROR] getApiStudyVariableDownload token mismatch");
+	        }
+	        return getStudyAcquisitionDownload();
+		}
+	}
+	
+	public static Result getApiStudyVariableDataDownload() {
+		DynamicForm form = Form.form().bindFromRequest();
+		String request_token;
+		
+		if (form.data().size() == 0) {
+			return badRequest("[ERROR] getApiStudyVariableDataDownload expects some data");
+		} else {
+	        request_token = form.get("token");
+	        if (!request_token.equals("TESTTOKEN")) {
+	        	return badRequest("[ERROR] getApiStudyVariableDataDownload token mismatch");
+	        }
+	        return getStudyAcquisitionDownload();
+		}
+	}
 }

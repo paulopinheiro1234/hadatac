@@ -37,6 +37,10 @@ GET	    /hadatac/dataacquisitions/download	            				org.hadatac.console.h
 POST    /hadatac/dataacquisitions/download	            				org.hadatac.console.http.SolrSearchProxy.getDataAcquisitionDownload()
 GET		/hadatac/getIndicatorValueDownload/download						org.hadatac.console.http.SolrSearchProxy.getIndicatorValueDownload(lm:	String)
 
+POST    /hadatac/apiStudy/download										org.hadatac.console.http.SolrSearchProxy.getApiStudyDownload()
+POST    /hadatac/apiStudyVariable/download								org.hadatac.console.http.SolrSearchProxy.getApiStudyVariableDownload()
+POST    /hadatac/apiStudyVariableData/download							org.hadatac.console.http.SolrSearchProxy.getApiStudyVariableDataDownload()
+
 GET	    /hadatac/metadataacquisitions/sub1Pilot5/solrsearch				    org.hadatac.console.http.SolrSearchProxy.getSampleAcquisition()
 POST	/hadatac/metadataacquisitions/sub1Pilot5/solrsearch				    org.hadatac.console.http.SolrSearchProxy.getSampleAcquisition()
 
