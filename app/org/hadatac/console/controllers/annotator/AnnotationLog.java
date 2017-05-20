@@ -1,6 +1,8 @@
 package org.hadatac.console.controllers.annotator;
 
 import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.Iterator;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrQuery;
@@ -46,7 +48,7 @@ public class AnnotationLog {
 	}
 	
 	public void addline(String new_line) {
-		this.log += new_line;
+		this.log += (new SimpleDateFormat("yyyy-MM-dd HH:mm:ss")).format(new Date()) + " " + new_line;
 	}
 	
 	public int save() {
