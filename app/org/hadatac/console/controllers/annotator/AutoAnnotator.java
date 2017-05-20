@@ -740,6 +740,8 @@ public class AutoAnnotator extends Controller {
 						"[OK] %d row(s) have been inserted into the %s table", nRows, tableName)));
 			} catch (CommandException e) {
 				log.addline(Feedback.println(Feedback.WEB, "[ERROR] " + e.getMessage()));
+				System.out.println("rows: " + rows);
+				System.out.println(e.getMessage());
 	    		log.save();
 	    		return false;
 			}

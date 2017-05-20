@@ -36,8 +36,7 @@ public abstract class BasicGenerator {
     	rows.clear();
     	int rownumber = 0;
     	for (CSVRecord record : records) {
-    		rownumber = rownumber++;
-    		rows.add(createRow(record, rownumber));
+    		rows.add(createRow(record, ++rownumber));
     	}
     	return rows;
     }
