@@ -2,15 +2,10 @@ package org.hadatac.data.loader;
 
 import java.io.File;
 import java.lang.String;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.commons.csv.CSVRecord;
-import org.hadatac.entity.pojo.DataAcquisition;
-import org.hadatac.metadata.loader.ValueCellProcessing;
 
 public class DASchemaAttrGenerator extends BasicGenerator {
 	final String kbPrefix = "chear-kb:";
@@ -21,11 +16,6 @@ public class DASchemaAttrGenerator extends BasicGenerator {
 		super(file);
 		this.SDDName = file.getName();
 	}
-	
-//	public DASchemaGenerator(File file, String startTime) {
-//		super(file);
-//		this.startTime = startTime;
-//	}
 	
 	@Override
 	void initMapping() {
@@ -111,14 +101,14 @@ public class DASchemaAttrGenerator extends BasicGenerator {
     }
     
     @Override
-    Map<String, Object> createRow(CSVRecord rec, int rownumber) {
+    Map<String, Object> createRow(CSVRecord rec, int row_number) {
     	Map<String, Object> row = new HashMap<String, Object>();
     	row.put("hasURI", kbPrefix + "DASA-" + getDASchemaName(rec));
     	row.put("a", "hasneto:DASchemaAttribute");
     	row.put("rdfs:label", getDASchemaName(rec));
     	row.put("rdfs:comment", getLabel(rec));
     	row.put("hasneto:partOfSchema", kbPrefix + "DAS-" + SDDName);
-    	row.put("hasco:hasPosition", rownumber);
+    	row.put("hasco:hasPosition", String.valueOf(row_number));
     	row.put("hasneto:hasEntity", getEntity(rec));
     	row.put("hasneto:hasAttribute", getAttribute(rec));
     	row.put("hasneto:hasUnit", getUnit(rec));

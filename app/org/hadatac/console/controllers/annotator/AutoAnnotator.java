@@ -775,17 +775,10 @@ public class AutoAnnotator extends Controller {
 		return bSuccess;
 	}
 	
-	public static boolean annotateDataAcquisitionSchemaFile(File file) {
-//		DateFormat isoFormat = new SimpleDateFormat("EEE MMM dd HH:mm:ss zzz yyyy");
-//    	String startTime = isoFormat.format(new Date());
-    	
+	public static boolean annotateDataAcquisitionSchemaFile(File file) {    	
     	DASchemaAttrGenerator dasGenerator = new DASchemaAttrGenerator(file);
     	boolean bSuccess = commitRows(dasGenerator.createRows(), dasGenerator.toString(), file.getName(), 
     			"DASchemaAttribute", true);
-    	
-//    	DASchemaGenerator dasGenerator = new DASchemaGenerator(file);
-//    	boolean bSuccess = commitRows(dasGenerator.createRows(), dasGenerator.toString(), file.getName(), 
-//    			"DASchemaAttribute", true);
 
 		return bSuccess;
 	}
