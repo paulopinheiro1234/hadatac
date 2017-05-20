@@ -1,9 +1,7 @@
 package org.hadatac.console.controllers.annotator;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.List;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServerException;
@@ -13,9 +11,7 @@ import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.client.solrj.response.UpdateResponse;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
-import org.hadatac.entity.pojo.Measurement;
 import org.hadatac.utils.Collections;
-import org.hadatac.utils.Feedback;
 
 import play.Play;
 
@@ -43,6 +39,10 @@ public class AnnotationLog {
 	}
 	public void setLog(String log) {
 		this.log = log;
+	}
+	
+	public void resetLog() {
+		this.log = "";
 	}
 	
 	public void addline(String new_line) {
@@ -88,7 +88,7 @@ public class AnnotationLog {
 		return annotation_log;
 	}
 	
-	public static String find(String file_name) {
+	public static AnnotationLog find(String file_name) {
 		SolrClient solr = new HttpSolrClient(
 				Play.application().configuration().getString("hadatac.solr.data")
 				+ Collections.ANNOTATION_LOG);
@@ -103,13 +103,13 @@ public class AnnotationLog {
 			Iterator<SolrDocument> i = results.iterator();
 			if (i.hasNext()) {
 				AnnotationLog log = convertFromSolr(i.next());
-				return log.getLog();
+				return log;
 			}
 		} catch (Exception e) {
 			System.out.println("[ERROR] AnnotationLog.find(String) - Exception message: " + e.getMessage());
 		}
 	
-		return "";
+		return null;
 	}
 	
 	public static int delete(String file_name) {

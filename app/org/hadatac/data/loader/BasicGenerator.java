@@ -18,6 +18,8 @@ public abstract class BasicGenerator {
 	protected List< Map<String, Object> > rows = new ArrayList<Map<String, Object>>();
 	protected HashMap<String, String> mapCol = new HashMap<String, String>();
 	
+	public BasicGenerator() {}
+	
 	public BasicGenerator(File file) {
 		try {
 			records = CSVFormat.DEFAULT.withHeader().parse(new FileReader(file));
@@ -30,7 +32,11 @@ public abstract class BasicGenerator {
 	}
 	
 	abstract void initMapping();
-    abstract Map<String, Object> createRow(CSVRecord rec, int rownumber);
+    abstract Map<String, Object> createRow(CSVRecord rec, int row_number);
+    
+    public List< Map<String, Object> > getRows() {
+    	return rows;
+    }
     
     public List< Map<String, Object> > createRows() {
     	rows.clear();

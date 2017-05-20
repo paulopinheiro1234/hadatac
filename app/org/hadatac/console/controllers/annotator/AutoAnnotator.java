@@ -47,6 +47,7 @@ import org.hadatac.data.loader.DASchemaAttrGenerator;
 import org.hadatac.data.loader.DASchemaGenerator;
 import org.hadatac.data.loader.DataAcquisitionGenerator;
 import org.hadatac.data.loader.DeploymentGenerator;
+import org.hadatac.data.loader.GeneralGenerator;
 import org.hadatac.data.loader.SampleGenerator;
 import org.hadatac.data.loader.SampleSubjectMapper;
 import org.hadatac.data.loader.StudyGenerator;
@@ -717,11 +718,17 @@ public class AutoAnnotator extends Controller {
 	private static boolean commitRows(List<Map<String, Object>> rows, String contentInCSV,
 			String fileName, String tableName, boolean toTripleStore) {
 		String site = ConfigProp.getPropertyValue("labkey.config", "site");
-        String path = "/" + ConfigProp.getPropertyValue("labkey.config", "folder");
-        Credential cred = Credential.find();
-        AnnotationLog log = new AnnotationLog();
-    	log.setFileName(fileName);
+		String path = "/" + ConfigProp.getPropertyValue("labkey.config", "folder");
+		Credential cred = Credential.find();
+		
+        AnnotationLog log = AnnotationLog.find(fileName);
+        if (null == log) {
+        	log = new AnnotationLog();
+        	log.setFileName(fileName);
+        }
+        
         if (null == cred) {
+        	log.resetLog();
         	log.addline(Feedback.println(Feedback.WEB, "[ERROR] No LabKey credentials are provided!"));
     		log.save();
     		return false;
@@ -734,14 +741,13 @@ public class AutoAnnotator extends Controller {
 			log.addline(Feedback.println(Feedback.WEB, String.format(
 					"[OK] %d row(s) have been inserted into the %s table", nRows, tableName)));
 		} catch (CommandException e1) {
+			log.addline(Feedback.println(Feedback.WEB, "[ERROR] " + e1));
 			try {
 				int nRows = labkeyDataHandler.updateRows(tableName, rows);
 				log.addline(Feedback.println(Feedback.WEB, String.format(
-						"[OK] %d row(s) have been inserted into the %s table", nRows, tableName)));
+						"[OK] %d row(s) have been updated into the %s table", nRows, tableName)));
 			} catch (CommandException e) {
-				log.addline(Feedback.println(Feedback.WEB, "[ERROR] " + e.getMessage()));
-				System.out.println("rows: " + rows);
-				System.out.println(e.getMessage());
+				log.addline(Feedback.println(Feedback.WEB, "[ERROR] " + e));
 	    		log.save();
 	    		return false;
 			}
@@ -773,6 +779,21 @@ public class AutoAnnotator extends Controller {
     	DeploymentGenerator deploymentGenerator = new DeploymentGenerator(file, startTime);
     	bSuccess = commitRows(deploymentGenerator.createRows(), deploymentGenerator.toString(), file.getName(), 
     			"Deployment", true);
+    	
+    	GeneralGenerator generalGenerator = new GeneralGenerator();
+    	Map<String, Object> row = new HashMap<String, Object>();
+    	row.put("hasURI", "chear-kb:INS-GENERIC-PHYSICAL-INSTRUMENT");
+    	row.put("a", "vstoi:PhysicalInstrument");
+    	row.put("rdfs:label", "Generic Physical Instrument");
+    	generalGenerator.addRow(row);
+    	
+    	row = new HashMap<String, Object>();
+    	row.put("hasURI", "chear-kb:INS-GENERIC-QUESTIONNAIRE");
+    	row.put("a", "chear:Questionnaire");
+    	row.put("rdfs:label", "Generic Questionnaire");
+    	generalGenerator.addRow(row);
+    	bSuccess = commitRows(generalGenerator.getRows(), generalGenerator.toString(), file.getName(), 
+    			"Instrument", true);
 
 		return bSuccess;
 	}
@@ -1001,8 +1022,13 @@ public class AutoAnnotator extends Controller {
     
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
     public static Result checkAnnotationLog(String file_name) {
-    	String log = AnnotationLog.find(file_name);
-    	return ok(annotation_log.render(Feedback.print(Feedback.WEB, log)));
+    	AnnotationLog log = AnnotationLog.find(file_name);
+    	if (null == log) {
+    		return ok(annotation_log.render(Feedback.print(Feedback.WEB, "")));
+    	}
+    	else {
+    		return ok(annotation_log.render(Feedback.print(Feedback.WEB, log.getLog())));
+    	}
     }
     
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))

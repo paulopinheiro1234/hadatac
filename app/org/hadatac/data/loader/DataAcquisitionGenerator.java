@@ -40,15 +40,21 @@ public class DataAcquisitionGenerator extends BasicGenerator {
     }
     
     private String getMethod(CSVRecord rec) {
-    	return rec.get(mapCol.get("Method"));
+    	String method = rec.get(mapCol.get("Method"));
+    	if(method.equalsIgnoreCase("NULL") || method.isEmpty()) {
+    		return "";
+    	}
+    	else {
+    		return "hasco:" + method;
+    	}
     }
     
     private String getStudy(CSVRecord rec) {
-    	return rec.get(mapCol.get("Study"));
+    	return rec.get(mapCol.get("Study")).equalsIgnoreCase("NULL")? "":rec.get(mapCol.get("Study"));
     }
     
     private String getDataDictionaryName(CSVRecord rec) {
-    	return rec.get(mapCol.get("DataDictionaryName"));
+    	return rec.get(mapCol.get("DataDictionaryName")).equalsIgnoreCase("NULL")? "":rec.get(mapCol.get("DataDictionaryName"));
     }
     
     private Boolean isEpiData(CSVRecord rec) {
@@ -66,7 +72,7 @@ public class DataAcquisitionGenerator extends BasicGenerator {
     	row.put("a", "hasneto:DataAcquisition");
     	row.put("rdfs:label", getDataAcquisitionName(rec));
     	row.put("hasneto:hasDeployment", kbPrefix + "DPL-" + getDataAcquisitionName(rec));
-    	row.put("hasco:hasMethod", "hasco:" + getMethod(rec));
+    	row.put("hasco:hasMethod", getMethod(rec));
     	row.put("hasco:isDataAcquisitionOf", kbPrefix + "STD-Pilot-" + getStudy(rec));
     	if (isEpiData(rec)) {
     		row.put("hasco:hasSchema", kbPrefix + "DAS-" + getDataDictionaryName(rec));
