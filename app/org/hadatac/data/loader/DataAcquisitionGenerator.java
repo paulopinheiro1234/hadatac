@@ -2,7 +2,6 @@ package org.hadatac.data.loader;
 
 import java.io.File;
 import java.lang.String;
-import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
@@ -11,6 +10,8 @@ import java.util.Map;
 import org.apache.commons.csv.CSVRecord;
 import org.hadatac.entity.pojo.DataAcquisition;
 import org.hadatac.metadata.loader.ValueCellProcessing;
+import org.joda.time.DateTime;
+import org.joda.time.format.DateTimeFormat;
 
 public class DataAcquisitionGenerator extends BasicGenerator {
 	final String kbPrefix = "chear-kb:";
@@ -66,7 +67,7 @@ public class DataAcquisitionGenerator extends BasicGenerator {
     }
     
     @Override
-    Map<String, Object> createRow(CSVRecord rec, int rownumber) {
+    Map<String, Object> createRow(CSVRecord rec, int row_number) {
     	Map<String, Object> row = new HashMap<String, Object>();
     	row.put("hasURI", kbPrefix + "DA-" + getDataAcquisitionName(rec));
     	row.put("a", "hasneto:DataAcquisition");
@@ -74,14 +75,20 @@ public class DataAcquisitionGenerator extends BasicGenerator {
     	row.put("hasneto:hasDeployment", kbPrefix + "DPL-" + getDataAcquisitionName(rec));
     	row.put("hasco:hasMethod", getMethod(rec));
     	row.put("hasco:isDataAcquisitionOf", kbPrefix + "STD-Pilot-" + getStudy(rec));
+    	if (startTime.isEmpty()) {
+        	row.put("prov:startedAtTime", (new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'")).format(new Date()));
+    	}
+    	else {
+    		row.put("prov:startedAtTime", startTime);
+    	}
     	if (isEpiData(rec)) {
     		row.put("hasco:hasSchema", kbPrefix + "DAS-" + getDataDictionaryName(rec));
     	}
     	else if (isLabData(rec)) {
     		row.put("hasco:hasSchema", kbPrefix + "DAS-STANDARD-LAB-SCHEMA");
     	}
-    	
     	createDataAcquisition(row);
+    	
     	return row;
     }
     
@@ -93,12 +100,13 @@ public class DataAcquisitionGenerator extends BasicGenerator {
     	dataAcquisition.setMethodUri(ValueCellProcessing.replacePrefixEx((String)row.get("hasco:hasMethod")));
     	dataAcquisition.setStudyUri(ValueCellProcessing.replacePrefixEx((String)row.get("hasco:isDataAcquisitionOf")));
     	dataAcquisition.setSchemaUri(ValueCellProcessing.replacePrefixEx((String)row.get("hasco:hasSchema")));
+    	
+    	String pattern = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'";
     	if (startTime.isEmpty()) {
-    		DateFormat isoFormat = new SimpleDateFormat("EEE MMM dd HH:mm:ss zzz yyyy");
-        	dataAcquisition.setStartedAt(isoFormat.format(new Date()));
+    		dataAcquisition.setStartedAt(new DateTime(new Date()));
     	}
     	else {
-    		dataAcquisition.setStartedAt(startTime);
+    		dataAcquisition.setStartedAt(DateTimeFormat.forPattern(pattern).parseDateTime(startTime));
     	}
     	
     	dataAcquisition.save();

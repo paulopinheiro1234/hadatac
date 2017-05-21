@@ -28,6 +28,8 @@ import org.hadatac.entity.pojo.TriggeringEvent;
 import org.hadatac.entity.pojo.User;
 import org.hadatac.entity.pojo.UserGroup;
 import org.hadatac.metadata.loader.ValueCellProcessing;
+import org.joda.time.format.DateTimeFormat;
+import org.joda.time.format.DateTimeFormatter;
 import org.labkey.remoteapi.CommandException;
 
 import be.objectify.deadbolt.java.actions.Group;
@@ -111,28 +113,19 @@ public class EditDataAcquisition extends Controller {
                 }
                 
             	// Create new data acquisition
-                String strStartDate = "";
-                String strEndDate = "";
-                DateFormat jsFormat = new SimpleDateFormat("MM/dd/yyyy HH:mm a");
-                DateFormat isoFormat = new SimpleDateFormat("EEE MMM dd HH:mm:ss zzz yyyy");
-        		try {
-        			Date startDate = jsFormat.parse(data.getNewStartDate());
-        			strStartDate = isoFormat.format(startDate);
-        			if (!data.getNewEndDate().equals("")) {
-        				Date endDate = jsFormat.parse(data.getNewEndDate());
-        				strEndDate = isoFormat.format(endDate);
-        			}    
-        		} catch (ParseException e) {
-        			return badRequest("Cannot parse data " + data.getNewStartDate());
-        		}
             	da.setUri(data.getNewDataAcquisitionUri());
             	da.setNumberDataPoints(0);
             	da.setTriggeringEvent(TriggeringEvent.CHANGED_CONFIGURATION);
             	da.setParameter(data.getNewParameter());
-            	da.setStartedAt(strStartDate);
-            	if (!strEndDate.equals("")) {
-            		da.setEndedAt(strEndDate);
-            	}
+            	
+            	DateTimeFormatter isoFormat = DateTimeFormat.forPattern("MM/dd/yyyy HH:mm a");
+                da.setStartedAt(isoFormat.parseDateTime(data.getNewStartDate()));
+                
+                if (!data.getNewEndDate().equals("")) {
+                	isoFormat = DateTimeFormat.forPattern("MM/dd/yyyy HH:mm a");
+                    da.setEndedAt(isoFormat.parseDateTime(data.getNewEndDate()));
+    			}  
+                
             	try {
     				int nRowsAffected = da.saveToLabKey(
     						session().get("LabKeyUserName"), session().get("LabKeyPassword"));

@@ -289,9 +289,8 @@ public class DataAcquisition {
 		return formatter.withZone(DateTimeZone.UTC).print(startedAt);
 	}
 	@Field("started_at")
-	public void setStartedAt(String startedAt) {
-		DateTimeFormatter formatter = DateTimeFormat.forPattern("EEE MMM dd HH:mm:ss zzz yyyy");
-		this.startedAt = formatter.parseDateTime(startedAt);
+	public void setStartedAt(DateTime startedAt) {
+		this.startedAt = startedAt;
 	}
 	public void setStartedAtXsd(String startedAt) {
 		DateTimeFormatter formatter = ISODateTimeFormat.dateTimeNoMillis();
@@ -310,9 +309,8 @@ public class DataAcquisition {
 		return formatter.withZone(DateTimeZone.UTC).print(endedAt);
 	}
 	@Field("ended_at")
-	public void setEndedAt(String endedAt) {
-		DateTimeFormatter formatter = DateTimeFormat.forPattern("EEE MMM dd HH:mm:ss zzz yyyy");
-		this.endedAt = formatter.parseDateTime(endedAt);
+	public void setEndedAt(DateTime endedAt) {
+		this.endedAt = endedAt;
 	}
 	public void setEndedAtXsd(String endedAt) {
 		DateTimeFormatter formatter = ISODateTimeFormat.dateTimeNoMillis();
@@ -548,11 +546,11 @@ public class DataAcquisition {
 			}
 			if (doc.getFieldValue("started_at") != null) {
 				date = new DateTime((Date)doc.getFieldValue("started_at"));
-				dataAcquisition.setStartedAt(date.withZone(DateTimeZone.UTC).toString("EEE MMM dd HH:mm:ss zzz yyyy"));
+				dataAcquisition.setStartedAt(date.withZone(DateTimeZone.UTC));
 			}
 			if (doc.getFieldValue("ended_at") != null) {
 				date = new DateTime((Date)doc.getFieldValue("ended_at"));
-				dataAcquisition.setEndedAt(date.withZone(DateTimeZone.UTC).toString("EEE MMM dd HH:mm:ss zzz yyyy"));
+				dataAcquisition.setEndedAt(date.withZone(DateTimeZone.UTC));
 			}
 			if (doc.getFieldValues("method_uri") != null) {
 				dataAcquisition.setMethodUri(doc.getFieldValue("method_uri").toString());

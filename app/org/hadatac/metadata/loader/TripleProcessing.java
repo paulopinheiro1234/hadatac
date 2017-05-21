@@ -39,6 +39,7 @@ import org.hadatac.metadata.loader.LabkeyDataHandler.PlainTriple;
 import org.hadatac.metadata.model.SpreadsheetParsingResult;
 import org.hadatac.utils.Feedback;
 import org.hadatac.utils.NameSpaces;
+import org.joda.time.format.DateTimeFormat;
 import org.labkey.remoteapi.CommandException;
 
 import org.hadatac.data.model.ParsingResult;
@@ -392,10 +393,13 @@ public class TripleProcessing {
 						dataAcquisition.setComment(cellValue);
 					}
 					else if (predicate.equals("prov:startedAtTime")) {
-						dataAcquisition.setStartedAt(cellValue);
+						String pattern = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'";
+						System.out.println("prov:startedAtTime: " + cellValue);
+						dataAcquisition.setStartedAt(DateTimeFormat.forPattern(pattern).parseDateTime(cellValue));
 					}
 					else if (predicate.equals("prov:endedAtTime")) {
-						dataAcquisition.setEndedAt(cellValue);
+						String pattern = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'";
+						dataAcquisition.setEndedAt(DateTimeFormat.forPattern(pattern).parseDateTime(cellValue));
 					}
 					else if (predicate.equals("prov:used")) {
 						dataAcquisition.setParameter(cellValue);

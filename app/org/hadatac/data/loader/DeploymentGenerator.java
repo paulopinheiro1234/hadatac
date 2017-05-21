@@ -2,7 +2,6 @@ package org.hadatac.data.loader;
 
 import java.io.File;
 import java.lang.String;
-import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
@@ -135,15 +134,14 @@ public class DeploymentGenerator extends BasicGenerator {
     }
     
     @Override
-    Map<String, Object> createRow(CSVRecord rec, int rownumber) {
+    Map<String, Object> createRow(CSVRecord rec, int row_number) {
     	Map<String, Object> row = new HashMap<String, Object>();
     	row.put("hasURI", kbPrefix + "DPL-" + getDataAcquisitionName(rec));
     	row.put("a", "vstoi:Deployment");
     	row.put("vstoi:hasPlatform", getPlatform(rec));
     	row.put("hasneto:hasInstrument", getInstrument(rec));
     	if (startTime.isEmpty()) {
-    		DateFormat isoFormat = new SimpleDateFormat("EEE MMM dd HH:mm:ss zzz yyyy");
-        	row.put("prov:startedAtTime", isoFormat.format(new Date()));
+        	row.put("prov:startedAtTime", (new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'")).format(new Date()));
     	}
     	else {
     		row.put("prov:startedAtTime", startTime);

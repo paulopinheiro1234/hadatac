@@ -44,7 +44,6 @@ import org.hadatac.console.views.html.triplestore.*;
 import org.hadatac.console.views.html.*;
 import org.hadatac.data.api.DataFactory;
 import org.hadatac.data.loader.DASchemaAttrGenerator;
-import org.hadatac.data.loader.DASchemaGenerator;
 import org.hadatac.data.loader.DataAcquisitionGenerator;
 import org.hadatac.data.loader.DeploymentGenerator;
 import org.hadatac.data.loader.GeneralGenerator;
@@ -65,6 +64,7 @@ import org.hadatac.utils.ConfigProp;
 import org.hadatac.utils.Feedback;
 import org.hadatac.utils.NameSpaces;
 import org.hadatac.utils.State;
+import org.joda.time.DateTime;
 import org.labkey.remoteapi.CommandException;
 
 import be.objectify.deadbolt.java.actions.Group;
@@ -769,7 +769,7 @@ public class AutoAnnotator extends Controller {
 	}
 	
 	public static boolean annotateDataAcquisitionFile(File file) {
-		DateFormat isoFormat = new SimpleDateFormat("EEE MMM dd HH:mm:ss zzz yyyy");
+		DateFormat isoFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
     	String startTime = isoFormat.format(new Date());
     	
     	DataAcquisitionGenerator daGenerator = new DataAcquisitionGenerator(file, startTime);

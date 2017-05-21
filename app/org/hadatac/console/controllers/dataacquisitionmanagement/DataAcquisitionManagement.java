@@ -6,12 +6,7 @@ import org.hadatac.console.controllers.triplestore.UserManagement;
 import org.hadatac.console.models.DataAcquisitionForm;
 import org.hadatac.console.models.SysUser;
 
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Comparator;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -19,9 +14,7 @@ import java.util.Map;
 import play.data.Form;
 import play.mvc.Controller;
 import play.mvc.Result;
-import play.twirl.api.Html;
 
-import org.hadatac.console.views.html.main;
 import org.hadatac.console.views.html.dataacquisitionmanagement.*;
 import org.hadatac.entity.pojo.DataAcquisition;
 import org.hadatac.entity.pojo.DataAcquisitionSchema;
@@ -29,11 +22,10 @@ import org.hadatac.entity.pojo.Deployment;
 import org.hadatac.entity.pojo.TriggeringEvent;
 import org.hadatac.entity.pojo.User;
 import org.hadatac.entity.pojo.UserGroup;
-import org.hadatac.metadata.loader.LabkeyDataHandler;
 import org.hadatac.metadata.loader.ValueCellProcessing;
-import org.hadatac.utils.ConfigProp;
 import org.hadatac.utils.State;
-import org.labkey.remoteapi.CommandException;
+import org.joda.time.format.DateTimeFormat;
+import org.joda.time.format.DateTimeFormatter;
 
 import be.objectify.deadbolt.java.actions.Group;
 import be.objectify.deadbolt.java.actions.Restrict;
@@ -125,16 +117,8 @@ public class DataAcquisitionManagement extends Controller {
         	da.setOwnerUri(data.getNewOwner());
         }
         da.setPermissionUri(data.getNewPermission());
-        String dateString = "";
-        DateFormat jsFormat = new SimpleDateFormat("MM/dd/yyyy HH:mm a");
-		try {
-			Date dateFromJs = jsFormat.parse(data.getNewStartDate());
-	        DateFormat isoFormat = new SimpleDateFormat("EEE MMM dd HH:mm:ss zzz yyyy");
-	        dateString = isoFormat.format(dateFromJs);
-		} catch (ParseException e) {
-			return badRequest("Cannot parse data " + data.getNewStartDate());
-		}
-    	da.setStartedAt(dateString);
+        DateTimeFormatter isoFormat = DateTimeFormat.forPattern("MM/dd/yyyy HH:mm a");
+        da.setStartedAt(isoFormat.parseDateTime(data.getNewStartDate()));
     	da.save();
         
         return redirect(routes.DataAcquisitionManagement.index(State.ACTIVE));
