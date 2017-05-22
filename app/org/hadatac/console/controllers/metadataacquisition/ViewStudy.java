@@ -264,7 +264,7 @@ public class ViewStudy extends Controller {
 			
 			while (resultsrw.hasNext()) {
 				QuerySolution soln = resultsrw.next();
-				values.add(soln.get("si").toString());		
+				values.add(ValueCellProcessing.replaceNameSpaceEx(soln.get("si").toString()));	
 			}
 		} catch (QueryExceptionHTTP e) {
 			e.printStackTrace();

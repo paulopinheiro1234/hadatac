@@ -109,16 +109,15 @@ public class ViewSample extends Controller {
     	"PREFIX rdfs:<http://www.w3.org/2000/01/rdf-schema#>" + 
     	"PREFIX skos: <http://www.w3.org/2004/02/skos/core#>" +
     	"PREFIX foaf: <http://xmlns.com/foaf/0.1/>" + */
-    	"SELECT ?originalID ?isSampleOf ?isObjectOf ?sampleType ?sampleLabel ?storageTempUnit ?samplingVolumeUnit ?comment" +
-		 "WHERE {      	" + sample_uri + "rdfs:label ?sampleLabel." +
-		 "       		" + sample_uri + "rdfs:comment ?comment." +
-		 "				" + sample_uri + "rdf:type	?sampleType." +
-		 "				" + sample_uri + "<http://hadatac.org/ont/hasco/isObjectOf> ?isObjectOf." +
-		 "				" + sample_uri + "<http://hadatac.org/ont/hasco/originalID> ?originalID." +
-		 "				" + sample_uri + "<http://hadatac.org/ont/hasco/isSampleOf> ?isSampleOf." +
-		 "				" + sample_uri + "<http://hadatac.org/ont/hasco/hasStorageTemperatureUnit> ?storageTempUnit." +
-		 "				" + sample_uri + "<http://hadatac.org/ont/hasco/hasSamplingVolumeUnit> ?samplingVolumeUnit." +
-		 "                            }";	
+         "SELECT ?originalID ?isSampleOf ?isObjectOf ?sampleType ?sampleLabel ?storageTempUnit ?samplingVolumeUnit ?comment" +
+		 "WHERE {	" + sample_uri + "rdfs:label ?sampleLabel ." +
+         				sample_uri + "rdfs:comment ?comment ." +
+         				sample_uri + "rdf:type	?sampleType ." +
+         				sample_uri + "<http://hadatac.org/ont/hasco/isObjectOf> ?isObjectOf ." +
+         				sample_uri + "<http://hadatac.org/ont/hasco/originalID> ?originalID ." +
+         				sample_uri + "<http://hadatac.org/ont/hasco/isSampleOf> ?isSampleOf ." +
+         				sample_uri + "<http://hadatac.org/ont/hasco/hasStorageTemperatureUnit> ?storageTempUnit ." +
+         				sample_uri + "<http://hadatac.org/ont/hasco/hasSamplingVolumeUnit> ?samplingVolumeUnit . }";
 	/*	
 		String basicQueryString = "";
 
