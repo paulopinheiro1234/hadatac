@@ -519,7 +519,6 @@ public class AutoAnnotator extends Controller {
 			log.addline(Feedback.println(Feedback.WEB, String.format(
 					"[OK] %d row(s) have been inserted into the %s table", nRows, tableName)));
 		} catch (CommandException e1) {
-			log.addline(Feedback.println(Feedback.WEB, "[ERROR] " + e1));
 			try {
 				int nRows = labkeyDataHandler.updateRows(tableName, rows);
 				log.addline(Feedback.println(Feedback.WEB, String.format(
@@ -547,37 +546,37 @@ public class AutoAnnotator extends Controller {
 	}
 	
 	public static boolean annotateDataAcquisitionFile(File file) {
-		DateFormat isoFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
-    	String startTime = isoFormat.format(new Date());
     	boolean bSuccess = true;
-    	
     	try {
-    		DataAcquisitionGenerator daGenerator = new DataAcquisitionGenerator(file, startTime);
-        	bSuccess = commitRows(daGenerator.createRows(), daGenerator.toString(), file.getName(), 
-        			"DataAcquisition", true);
+        	GeneralGenerator generalGenerator = new GeneralGenerator();
+        	Map<String, Object> row = new HashMap<String, Object>();
+        	row.put("hasURI", "chear-kb:INS-GENERIC-PHYSICAL-INSTRUMENT");
+        	row.put("a", "vstoi:PhysicalInstrument");
+        	row.put("rdfs:label", "Generic Physical Instrument");
+        	generalGenerator.addRow(row);
+        	
+        	row = new HashMap<String, Object>();
+        	row.put("hasURI", "chear-kb:INS-GENERIC-QUESTIONNAIRE");
+        	row.put("a", "chear:Questionnaire");
+        	row.put("rdfs:label", "Generic Questionnaire");
+        	generalGenerator.addRow(row);
+        	bSuccess = commitRows(generalGenerator.getRows(), generalGenerator.toString(), file.getName(), 
+        			"Instrument", true);
+    		
+    		DateFormat isoFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
+        	String startTime = isoFormat.format(new Date());
         	
         	DeploymentGenerator deploymentGenerator = new DeploymentGenerator(file, startTime);
         	bSuccess = commitRows(deploymentGenerator.createRows(), deploymentGenerator.toString(), file.getName(), 
         			"Deployment", true);
+        	
+        	DataAcquisitionGenerator daGenerator = new DataAcquisitionGenerator(file, startTime);
+        	bSuccess = commitRows(daGenerator.createRows(), daGenerator.toString(), file.getName(), 
+        			"DataAcquisition", true);
     	} catch (Exception e) {
     		AnnotationLog.printException(e, file.getName());
     		return false;
 		}
-    	
-    	GeneralGenerator generalGenerator = new GeneralGenerator();
-    	Map<String, Object> row = new HashMap<String, Object>();
-    	row.put("hasURI", "chear-kb:INS-GENERIC-PHYSICAL-INSTRUMENT");
-    	row.put("a", "vstoi:PhysicalInstrument");
-    	row.put("rdfs:label", "Generic Physical Instrument");
-    	generalGenerator.addRow(row);
-    	
-    	row = new HashMap<String, Object>();
-    	row.put("hasURI", "chear-kb:INS-GENERIC-QUESTIONNAIRE");
-    	row.put("a", "chear:Questionnaire");
-    	row.put("rdfs:label", "Generic Questionnaire");
-    	generalGenerator.addRow(row);
-    	bSuccess = commitRows(generalGenerator.getRows(), generalGenerator.toString(), file.getName(), 
-    			"Instrument", true);
 
 		return bSuccess;
 	}
