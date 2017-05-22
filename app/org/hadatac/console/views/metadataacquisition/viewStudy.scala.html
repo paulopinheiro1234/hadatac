@@ -151,7 +151,8 @@
 				<div id="Samples" class="tabcontent">
 						<ul>
 							@for(i <- scResult){
-								<li>@i.toString()</li>
+								<li><a href="@org.hadatac.console.controllers.metadataacquisition.routes.ViewSample.index(i.toString(), showValues.get("study").toString(), "")">@i.toString()</a></li>
+								
 							}
 						</ul>
 				</div>
