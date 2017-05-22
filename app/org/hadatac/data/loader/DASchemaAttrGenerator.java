@@ -101,7 +101,7 @@ public class DASchemaAttrGenerator extends BasicGenerator {
     }
     
     @Override
-    Map<String, Object> createRow(CSVRecord rec, int row_number) {
+    Map<String, Object> createRow(CSVRecord rec, int row_number) throws Exception {
     	Map<String, Object> row = new HashMap<String, Object>();
     	row.put("hasURI", kbPrefix + "DASA-" + getDASchemaName(rec));
     	row.put("a", "hasneto:DASchemaAttribute");

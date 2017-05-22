@@ -85,7 +85,7 @@ public class StudyGenerator extends BasicGenerator {
 	}
     
 	@Override
-    public Map<String, Object> createRow(CSVRecord rec, int rownumber) {
+    public Map<String, Object> createRow(CSVRecord rec, int row_number) throws Exception {
     	Map<String, Object> row = new HashMap<String, Object>();
     	row.put("hasURI", getUri(rec));
     	row.put("a", getType());

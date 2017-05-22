@@ -422,297 +422,75 @@ public class AutoAnnotator extends Controller {
     }
 	
 	public static boolean annotateMapFile(File file) {
-		SampleSubjectMapper mapper = new SampleSubjectMapper(file);
-		List<Map<String, Object>> rows = mapper.createRows();
-		
-		Model model = createModel(rows);
-    	DatasetAccessor accessor = DatasetAccessorFactory.createHTTP(
-				Collections.getCollectionsName(Collections.METADATA_GRAPH));
-    	accessor.add(model);
-		
-		String site = ConfigProp.getPropertyValue("labkey.config", "site");
-		String path = "/" + ConfigProp.getPropertyValue("labkey.config", "folder");
-		//String path = "/SIDPIDTEST";
-        Credential cred = Credential.find();
-        AnnotationLog log = new AnnotationLog();
-    	log.setFileName(file.getName());
-        if (null == cred) {
-        	log.addline(Feedback.println(Feedback.WEB, "[ERROR] No LabKey credentials are provided!"));
-    		log.save();
-    		return false;
-        }
-    	
-    	LabkeyDataHandler labkeyDataHandler = new LabkeyDataHandler(
-    			site, cred.getUserName(), cred.getPassword(), path);
+		boolean bSuccess = true;
     	try {
-			int nRows = labkeyDataHandler.insertRows("Sample", rows);
-			log.addline(Feedback.println(Feedback.WEB, String.format(
-					"[OK] %d row(s) have been inserted into the Sample table", nRows)));
-		} catch (CommandException e1) {
-			try {
-			int nRows = labkeyDataHandler.updateRows("Sample", rows);
-			log.addline(Feedback.println(Feedback.WEB, String.format(
-					"[OK] %d row(s) have been updated in the Sample table", nRows)));
-			} catch (CommandException e) {
-			log.addline(Feedback.println(Feedback.WEB, "[ERROR] " + e.getMessage()));
-    		log.save();
+    		SampleSubjectMapper mapper = new SampleSubjectMapper(file);
+        	bSuccess = commitRows(mapper.createRows(), mapper.toString(), 
+        			file.getName(), "Sample", true);
+    	} catch (Exception e) {
+    		AnnotationLog.printException(e, file.getName());
     		return false;
-			}
 		}
 		
-		log.addline(Feedback.println(Feedback.WEB, String.format(
-				"[OK] %d triple(s) have been committed to triple store", model.size())));
-		log.addline(Feedback.println(Feedback.WEB, String.format(mapper.toString())));
-		log.save();
-
-		return true;
+		return bSuccess;
 	}
 	
 	public static boolean annotateStudyIdFile(File file) {
-		StudyGenerator studyGenerator = new StudyGenerator(file);
-		List<Map<String, Object>> rows = studyGenerator.createRows();
-		
-		Model model = createModel(rows);
-    	DatasetAccessor accessor = DatasetAccessorFactory.createHTTP(
-				Collections.getCollectionsName(Collections.METADATA_GRAPH));
-    	accessor.add(model);
-		
-		String site = ConfigProp.getPropertyValue("labkey.config", "site");
-		String path = "/" + ConfigProp.getPropertyValue("labkey.config", "folder");
-		//String path = "/SIDPIDTEST";
-        Credential cred = Credential.find();
-        AnnotationLog log = new AnnotationLog();
-    	log.setFileName(file.getName());
-        if (null == cred) {
-        	log.addline(Feedback.println(Feedback.WEB, "[ERROR] No LabKey credentials are provided!"));
-    		log.save();
+		boolean bSuccess = true;
+    	try {
+    		StudyGenerator studyGenerator = new StudyGenerator(file);
+        	bSuccess = commitRows(studyGenerator.createRows(), studyGenerator.toString(), 
+        			file.getName(), "Study", true);
+        	
+        	studyGenerator = new StudyGenerator(file);
+        	bSuccess = commitRows(studyGenerator.createAgentRows(), studyGenerator.toString(), 
+        			file.getName(), "Agent", true);
+        	
+        	studyGenerator = new StudyGenerator(file);
+        	bSuccess = commitRows(studyGenerator.createInstitutionRows(), studyGenerator.toString(), 
+        			file.getName(), "Agent", true);
+    	} catch (Exception e) {
+    		AnnotationLog.printException(e, file.getName());
     		return false;
-        }
-    	
-    	LabkeyDataHandler labkeyDataHandler = new LabkeyDataHandler(
-    			site, cred.getUserName(), cred.getPassword(), path);
-		try {
-			int nRows = labkeyDataHandler.insertRows("Study", rows);
-			log.addline(Feedback.println(Feedback.WEB, String.format(
-					"[OK] %d row(s) have been inserted into the Study table", nRows)));
-		} catch (CommandException e1) {
-			try {
-				int nRows = labkeyDataHandler.updateRows("Study", rows);
-				log.addline(Feedback.println(Feedback.WEB, String.format(
-						"[OK] %d row(s) have been inserted into the Study table", nRows)));
-			} catch (CommandException e) {
-				log.addline(Feedback.println(Feedback.WEB, "[ERROR] " + e.getMessage()));
-	    		log.save();
-	    		return false;
-			}
 		}
 		
-		log.addline(Feedback.println(Feedback.WEB, String.format(
-				"[OK] %d triple(s) have been committed to triple store", model.size())));
-		log.addline(Feedback.println(Feedback.WEB, String.format(studyGenerator.toString())));
-		
-		studyGenerator = new StudyGenerator(file);
-		List<Map<String, Object>> agentRows = studyGenerator.createAgentRows();
-		Model agentModel = createModel(agentRows);
-    	DatasetAccessor agentAccessor = DatasetAccessorFactory.createHTTP(
-				Collections.getCollectionsName(Collections.METADATA_GRAPH));
-    	agentAccessor.add(agentModel);
-    	
-    	try {
-			int nRows = labkeyDataHandler.insertRows("Agent", agentRows);
-			log.addline(Feedback.println(Feedback.WEB, String.format(
-					"[OK] %d row(s) have been inserted into the Agent table", nRows)));
-		} catch (CommandException e1) {
-			try {
-				int nRows = labkeyDataHandler.updateRows("Agent", agentRows);
-				log.addline(Feedback.println(Feedback.WEB, String.format(
-						"[OK] %d row(s) have been inserted into the Agent table", nRows)));
-			} catch (CommandException e) {
-				log.addline(Feedback.println(Feedback.WEB, "[ERROR] " + e.getMessage()));
-	    		log.save();
-	    		return false;
-			}
-		}
-    	
-    	log.addline(Feedback.println(Feedback.WEB, String.format(
-				"[OK] %d triple(s) have been committed to triple store", agentModel.size())));
-		log.addline(Feedback.println(Feedback.WEB, String.format(studyGenerator.toString())));
-    	
-    	studyGenerator = new StudyGenerator(file);
-    	List<Map<String, Object>> institutionRows = studyGenerator.createInstitutionRows();
-		Model institutionModel = createModel(institutionRows);
-    	DatasetAccessor institutionAccessor = DatasetAccessorFactory.createHTTP(
-				Collections.getCollectionsName(Collections.METADATA_GRAPH));
-    	institutionAccessor.add(institutionModel);
-    	try {
-			int nRows = labkeyDataHandler.insertRows("Agent", institutionRows);
-			log.addline(Feedback.println(Feedback.WEB, String.format(
-					"[OK] %d row(s) have been inserted into the Agent table", nRows)));
-		} catch (CommandException e1) {
-			try {
-				int nRows = labkeyDataHandler.updateRows("Agent", institutionRows);
-				log.addline(Feedback.println(Feedback.WEB, String.format(
-						"[OK] %d row(s) have been inserted into the Agent table", nRows)));
-			} catch (CommandException e) {
-				log.addline(Feedback.println(Feedback.WEB, "[ERROR] " + e.getMessage()));
-	    		log.save();
-	    		return false;
-			}
-		}
-    	log.addline(Feedback.println(Feedback.WEB, String.format(
-				"[OK] %d triple(s) have been committed to triple store", institutionModel.size())));
-		log.addline(Feedback.println(Feedback.WEB, String.format(studyGenerator.toString())));
-    	
-		log.save();
-		
-		return true;
+		return bSuccess;
 	}
 	
 	public static boolean annotateSampleIdFile(File file) {
-		SampleGenerator sampleGenerator = new SampleGenerator(file);
-		List<Map<String, Object>> rows = sampleGenerator.createRows();
-		
-		Model model = createModel(rows);
-    	DatasetAccessor accessor = DatasetAccessorFactory.createHTTP(
-				Collections.getCollectionsName(Collections.METADATA_GRAPH));
-    	accessor.add(model);
-		
-		String site = ConfigProp.getPropertyValue("labkey.config", "site");
-		String path = "/" + ConfigProp.getPropertyValue("labkey.config", "folder");
-		//String path = "/SIDPIDTEST";
-        Credential cred = Credential.find();
-        AnnotationLog log = new AnnotationLog();
-    	log.setFileName(file.getName());
-        if (null == cred) {
-        	log.addline(Feedback.println(Feedback.WEB, "[ERROR] No LabKey credentials are provided!"));
-    		log.save();
-    		return false;
-        }
-    	LabkeyDataHandler labkeyDataHandler = new LabkeyDataHandler(
-    			site, cred.getUserName(), cred.getPassword(), path);
-		try {
-			int nRows = labkeyDataHandler.insertRows("Sample", rows);
-			log.addline(Feedback.println(Feedback.WEB, String.format(
-					"[OK] %d row(s) have been inserted into the Sample table", nRows)));
-		} catch (CommandException e1) {
-			try {
-				int nRows = labkeyDataHandler.updateRows("Sample", rows);
-				log.addline(Feedback.println(Feedback.WEB, String.format(
-						"[OK] %d row(s) have been inserted into the Sample table", nRows)));
-			} catch (CommandException e) {
-				log.addline(Feedback.println(Feedback.WEB, "[ERROR] " + e.getMessage()));
-	    		log.save();
-	    		return false;
-			}
-		}
-		
-		log.addline(Feedback.println(Feedback.WEB, String.format(
-				"[OK] %d triple(s) have been committed to triple store", model.size())));
-		log.addline(Feedback.println(Feedback.WEB, String.format(sampleGenerator.toString())));
-		
-		sampleGenerator = new SampleGenerator(file);
-		List<Map<String, Object>> collectionRows = sampleGenerator.createCollectionRows();
-		
-		Model collectionModel = createModel(collectionRows);
-    	DatasetAccessor collectionAccessor = DatasetAccessorFactory.createHTTP(
-				Collections.getCollectionsName(Collections.METADATA_GRAPH));
-    	collectionAccessor.add(collectionModel);
+		boolean bSuccess = true;
     	try {
-			int nRows = labkeyDataHandler.insertRows("SampleCollection", collectionRows);
-			log.addline(Feedback.println(Feedback.WEB, String.format(
-					"[OK] %d row(s) have been inserted into the SampleCollection table", nRows)));
-		} catch (CommandException e1) {
-			try {
-				int nRows = labkeyDataHandler.updateRows("SampleCollection", collectionRows);
-				log.addline(Feedback.println(Feedback.WEB, String.format(
-						"[OK] %d row(s) have been inserted into the SampleCollection table", nRows)));
-			} catch (CommandException e) {
-				log.addline(Feedback.println(Feedback.WEB, "[ERROR] " + e.getMessage()));
-	    		log.save();
-	    		return false;
-			}
+    		SampleGenerator sampleGenerator = new SampleGenerator(file);
+        	bSuccess = commitRows(sampleGenerator.createRows(), sampleGenerator.toString(), 
+        			file.getName(), "Sample", true);
+        	
+        	sampleGenerator = new SampleGenerator(file);
+        	bSuccess = commitRows(sampleGenerator.createCollectionRows(), sampleGenerator.toString(), 
+        			file.getName(), "SampleCollection", true);
+    	} catch (Exception e) {
+    		AnnotationLog.printException(e, file.getName());
+    		return false;
 		}
-
-		log.addline(Feedback.println(Feedback.WEB, String.format(
-				"[OK] %d triple(s) have been committed to triple store", collectionModel.size())));
-		log.addline(Feedback.println(Feedback.WEB, String.format(sampleGenerator.toString())));
-		log.save();
 		
-		return true;
+		return bSuccess;
 	}
 	
 	public static boolean annotateSubjectIdFile(File file) {
-		SubjectGenerator subjectGenerator = new SubjectGenerator(file);
-		List<Map<String, Object>> rows = subjectGenerator.createRows();
-		
-		Model model = createModel(rows);
-    	DatasetAccessor accessor = DatasetAccessorFactory.createHTTP(
-				Collections.getCollectionsName(Collections.METADATA_GRAPH));
-    	accessor.add(model);
-		
-		String site = ConfigProp.getPropertyValue("labkey.config", "site");
-        String path = "/" + ConfigProp.getPropertyValue("labkey.config", "folder");
-        //String path = "/SIDPIDTEST";
-        Credential cred = Credential.find();
-        AnnotationLog log = new AnnotationLog();
-    	log.setFileName(file.getName());
-        if (null == cred) {
-        	log.addline(Feedback.println(Feedback.WEB, "[ERROR] No LabKey credentials are provided!"));
-    		log.save();
-    		return false;
-        }
-    	LabkeyDataHandler labkeyDataHandler = new LabkeyDataHandler(
-    			site, cred.getUserName(), cred.getPassword(), path);
-		try {
-			int nRows = labkeyDataHandler.insertRows("Subject", rows);
-			log.addline(Feedback.println(Feedback.WEB, String.format(
-					"[OK] %d row(s) have been inserted into the Subject table", nRows)));
-		} catch (CommandException e1) {
-			try {
-				int nRows = labkeyDataHandler.updateRows("Subject", rows);
-				log.addline(Feedback.println(Feedback.WEB, String.format(
-						"[OK] %d row(s) have been inserted into the Subject table", nRows)));
-			} catch (CommandException e) {
-				log.addline(Feedback.println(Feedback.WEB, "[ERROR] " + e.getMessage()));
-	    		log.save();
-	    		return false;
-			}
-		}
-		
-		log.addline(Feedback.println(Feedback.WEB, String.format(
-				"[OK] %d triple(s) have been committed to triple store", model.size())));
-		log.addline(Feedback.println(Feedback.WEB, String.format(subjectGenerator.toString())));
-		
-		subjectGenerator = new SubjectGenerator(file);
-		List<Map<String, Object>> cohortRows = subjectGenerator.createCohortRows();
-		
-		Model cohortModel = createModel(cohortRows);
-    	DatasetAccessor cohortAccessor = DatasetAccessorFactory.createHTTP(
-				Collections.getCollectionsName(Collections.METADATA_GRAPH));
-    	cohortAccessor.add(cohortModel);
+		boolean bSuccess = true;
     	try {
-			int nRows = labkeyDataHandler.insertRows("Cohort", cohortRows);
-			log.addline(Feedback.println(Feedback.WEB, String.format(
-					"[OK] %d row(s) have been inserted into the Cohort table", nRows)));
-		} catch (CommandException e1) {
-			try {
-				int nRows = labkeyDataHandler.updateRows("Cohort", cohortRows);
-				log.addline(Feedback.println(Feedback.WEB, String.format(
-						"[OK] %d row(s) have been inserted into the Cohort table", nRows)));
-			} catch (CommandException e) {
-				log.addline(Feedback.println(Feedback.WEB, "[ERROR] " + e.getMessage()));
-	    		log.save();
-	    		return false;
-			}
+    		SubjectGenerator subjectGenerator = new SubjectGenerator(file);
+        	bSuccess = commitRows(subjectGenerator.createRows(), subjectGenerator.toString(), 
+        			file.getName(), "Subject", true);
+        	
+        	subjectGenerator = new SubjectGenerator(file);
+        	bSuccess = commitRows(subjectGenerator.createCohortRows(), subjectGenerator.toString(), 
+        			file.getName(), "Cohort", true);
+    	} catch (Exception e) {
+    		AnnotationLog.printException(e, file.getName());
+    		return false;
 		}
-
-		log.addline(Feedback.println(Feedback.WEB, String.format(
-				"[OK] %d triple(s) have been committed to triple store", cohortModel.size())));
-		log.addline(Feedback.println(Feedback.WEB, String.format(subjectGenerator.toString())));
-    	
-		log.save();
 		
-		return true;
+		return bSuccess;
 	}
 	
 	private static boolean commitRows(List<Map<String, Object>> rows, String contentInCSV,
@@ -771,14 +549,20 @@ public class AutoAnnotator extends Controller {
 	public static boolean annotateDataAcquisitionFile(File file) {
 		DateFormat isoFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
     	String startTime = isoFormat.format(new Date());
+    	boolean bSuccess = true;
     	
-    	DataAcquisitionGenerator daGenerator = new DataAcquisitionGenerator(file, startTime);
-    	boolean bSuccess = commitRows(daGenerator.createRows(), daGenerator.toString(), file.getName(), 
-    			"DataAcquisition", true);
-    	
-    	DeploymentGenerator deploymentGenerator = new DeploymentGenerator(file, startTime);
-    	bSuccess = commitRows(deploymentGenerator.createRows(), deploymentGenerator.toString(), file.getName(), 
-    			"Deployment", true);
+    	try {
+    		DataAcquisitionGenerator daGenerator = new DataAcquisitionGenerator(file, startTime);
+        	bSuccess = commitRows(daGenerator.createRows(), daGenerator.toString(), file.getName(), 
+        			"DataAcquisition", true);
+        	
+        	DeploymentGenerator deploymentGenerator = new DeploymentGenerator(file, startTime);
+        	bSuccess = commitRows(deploymentGenerator.createRows(), deploymentGenerator.toString(), file.getName(), 
+        			"Deployment", true);
+    	} catch (Exception e) {
+    		AnnotationLog.printException(e, file.getName());
+    		return false;
+		}
     	
     	GeneralGenerator generalGenerator = new GeneralGenerator();
     	Map<String, Object> row = new HashMap<String, Object>();
@@ -798,10 +582,16 @@ public class AutoAnnotator extends Controller {
 		return bSuccess;
 	}
 	
-	public static boolean annotateDataAcquisitionSchemaFile(File file) {    	
-    	DASchemaAttrGenerator dasGenerator = new DASchemaAttrGenerator(file);
-    	boolean bSuccess = commitRows(dasGenerator.createRows(), dasGenerator.toString(), file.getName(), 
-    			"DASchemaAttribute", true);
+	public static boolean annotateDataAcquisitionSchemaFile(File file) {
+    	boolean bSuccess = true;	
+    	try {
+    		DASchemaAttrGenerator dasGenerator = new DASchemaAttrGenerator(file);
+    		bSuccess = commitRows(dasGenerator.createRows(), dasGenerator.toString(), 
+    				file.getName(), "DASchemaAttribute", true);
+    	} catch (Exception e) {
+    		AnnotationLog.printException(e, file.getName());
+    		return false;
+		}
 
 		return bSuccess;
 	}

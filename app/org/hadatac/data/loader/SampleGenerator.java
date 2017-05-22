@@ -44,7 +44,7 @@ public class SampleGenerator extends BasicGenerator {
 	}
 
 	@Override
-	Map<String, Object> createRow(CSVRecord rec, int rownumber) {
+	Map<String, Object> createRow(CSVRecord rec, int rownumber) throws Exception {
 		Map<String, Object> row = new HashMap<String, Object>();
     	row.put("hasURI", getUri(rec));
     	row.put("a", getType(rec));

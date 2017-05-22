@@ -17,12 +17,14 @@ public abstract class BasicGenerator {
 	protected Iterable<CSVRecord> records = null;
 	protected List< Map<String, Object> > rows = new ArrayList<Map<String, Object>>();
 	protected HashMap<String, String> mapCol = new HashMap<String, String>();
+	protected String fileName = "";
 	
 	public BasicGenerator() {}
 	
 	public BasicGenerator(File file) {
 		try {
 			records = CSVFormat.DEFAULT.withHeader().parse(new FileReader(file));
+			fileName = file.getName();
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
@@ -32,18 +34,19 @@ public abstract class BasicGenerator {
 	}
 	
 	abstract void initMapping();
-    abstract Map<String, Object> createRow(CSVRecord rec, int row_number);
+    abstract Map<String, Object> createRow(CSVRecord rec, int row_number) throws Exception;
     
     public List< Map<String, Object> > getRows() {
     	return rows;
     }
     
-    public List< Map<String, Object> > createRows() {
+    public List< Map<String, Object> > createRows() throws Exception {
     	rows.clear();
-    	int rownumber = 0;
+    	int row_number = 0;
     	for (CSVRecord record : records) {
-    		rows.add(createRow(record, ++rownumber));
-    	}
+        	rows.add(createRow(record, ++row_number));
+        }
+    	
     	return rows;
     }
     

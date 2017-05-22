@@ -14,6 +14,7 @@ import org.apache.solr.client.solrj.response.UpdateResponse;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
 import org.hadatac.utils.Collections;
+import org.hadatac.utils.Feedback;
 
 import play.Play;
 
@@ -76,6 +77,16 @@ public class AnnotationLog {
 			System.out.println("[ERROR] AnnotationLog.save(SolrClient) - e.Message: " + e.getMessage());
 			return -1;
 		}
+	}
+	
+	public static void printException(Exception exception, String fileName) {
+		AnnotationLog log = AnnotationLog.find(fileName);
+        if (null == log) {
+        	log = new AnnotationLog();
+        	log.setFileName(fileName);
+        }
+        log.addline(Feedback.println(Feedback.WEB, "[ERROR] " + exception.getMessage()));
+        log.save();
 	}
 	
 	public static AnnotationLog convertFromSolr(SolrDocument doc) {

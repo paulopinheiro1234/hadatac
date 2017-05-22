@@ -85,7 +85,7 @@ public class SampleSubjectMapper extends BasicGenerator {
 	}
 	
 	@Override
-	Map<String, Object> createRow(CSVRecord rec, int rownumber) {
+	Map<String, Object> createRow(CSVRecord rec, int row_number) throws Exception {
     	Map<String, Object> row = new HashMap<String, Object>();
     	row.put("hasURI", getSampleUri(rec));
     	row.put("hasco:isSampleOf", getSubjectUri(rec));

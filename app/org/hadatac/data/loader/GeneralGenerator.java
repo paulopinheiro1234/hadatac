@@ -13,7 +13,7 @@ public class GeneralGenerator extends BasicGenerator {
 	void initMapping() {}
     
     @Override
-    Map<String, Object> createRow(CSVRecord rec, int rownumber) {
+    Map<String, Object> createRow(CSVRecord rec, int row_number) throws Exception {
     	return new HashMap<String, Object>();
     }
     

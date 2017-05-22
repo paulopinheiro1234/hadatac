@@ -8,10 +8,16 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.commons.csv.CSVRecord;
+import org.hadatac.console.models.SysUser;
 import org.hadatac.entity.pojo.DataAcquisition;
+import org.hadatac.entity.pojo.Deployment;
+import org.hadatac.entity.pojo.Measurement;
+import org.hadatac.entity.pojo.TriggeringEvent;
 import org.hadatac.metadata.loader.ValueCellProcessing;
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
+
+import java.lang.Exception;
 
 public class DataAcquisitionGenerator extends BasicGenerator {
 	final String kbPrefix = "chear-kb:";
@@ -34,10 +40,21 @@ public class DataAcquisitionGenerator extends BasicGenerator {
         mapCol.put("Study", "study");
         mapCol.put("DataDictionaryName", "data dict");
         mapCol.put("Epi/Lab", "epi/lab");
+        mapCol.put("OwnerEmail", "owner email");
 	}
 	
     private String getDataAcquisitionName(CSVRecord rec) {
     	return rec.get(mapCol.get("DataAcquisitionName"));
+    }
+    
+    private String getOwnerEmail(CSVRecord rec) {
+    	String ownerEmail = rec.get(mapCol.get("OwnerEmail"));
+    	if(ownerEmail.equalsIgnoreCase("NULL") || ownerEmail.isEmpty()) {
+    		return "";
+    	}
+    	else {
+    		return ownerEmail;
+    	}
     }
     
     private String getMethod(CSVRecord rec) {
@@ -67,7 +84,7 @@ public class DataAcquisitionGenerator extends BasicGenerator {
     }
     
     @Override
-    Map<String, Object> createRow(CSVRecord rec, int row_number) {
+    Map<String, Object> createRow(CSVRecord rec, int row_number) throws Exception {
     	Map<String, Object> row = new HashMap<String, Object>();
     	row.put("hasURI", kbPrefix + "DA-" + getDataAcquisitionName(rec));
     	row.put("a", "hasneto:DataAcquisition");
@@ -77,22 +94,26 @@ public class DataAcquisitionGenerator extends BasicGenerator {
     	row.put("hasco:isDataAcquisitionOf", kbPrefix + "STD-Pilot-" + getStudy(rec));
     	if (startTime.isEmpty()) {
         	row.put("prov:startedAtTime", (new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'")).format(new Date()));
-    	}
-    	else {
+    	} else {
     		row.put("prov:startedAtTime", startTime);
     	}
     	if (isEpiData(rec)) {
     		row.put("hasco:hasSchema", kbPrefix + "DAS-" + getDataDictionaryName(rec));
-    	}
-    	else if (isLabData(rec)) {
+    	} else if (isLabData(rec)) {
     		row.put("hasco:hasSchema", kbPrefix + "DAS-STANDARD-LAB-SCHEMA");
     	}
-    	createDataAcquisition(row);
+    	
+    	String ownerEmail = getOwnerEmail(rec);
+    	if (ownerEmail.isEmpty()) {
+    		throw new Exception(String.format("Owner Email is not specified for Row %s!", row_number));
+    	}
+
+    	createDataAcquisition(row, ownerEmail, kbPrefix + "DPL-" + getDataAcquisitionName(rec));
     	
     	return row;
     }
     
-    void createDataAcquisition(Map<String, Object> row) {
+    void createDataAcquisition(Map<String, Object> row, String ownerEmail, String deploymentUri) throws Exception {
     	DataAcquisition dataAcquisition = new DataAcquisition();
     	dataAcquisition.setUri(ValueCellProcessing.replacePrefixEx((String)row.get("hasURI")));
     	dataAcquisition.setLabel(ValueCellProcessing.replacePrefixEx((String)row.get("rdfs:label")));
@@ -100,6 +121,17 @@ public class DataAcquisitionGenerator extends BasicGenerator {
     	dataAcquisition.setMethodUri(ValueCellProcessing.replacePrefixEx((String)row.get("hasco:hasMethod")));
     	dataAcquisition.setStudyUri(ValueCellProcessing.replacePrefixEx((String)row.get("hasco:isDataAcquisitionOf")));
     	dataAcquisition.setSchemaUri(ValueCellProcessing.replacePrefixEx((String)row.get("hasco:hasSchema")));
+		dataAcquisition.setTriggeringEvent(TriggeringEvent.INITIAL_DEPLOYMENT);
+		dataAcquisition.setNumberDataPoints(
+				Measurement.getNumByDataAcquisition(dataAcquisition));
+		
+		SysUser user = SysUser.findByEmail(ownerEmail);
+		if (null == user) {
+			throw new Exception(String.format("The specified owner email %s is not a valid user!", ownerEmail));
+		} else {
+			dataAcquisition.setOwnerUri(user.getUri());
+			dataAcquisition.setPermissionUri(user.getUri());
+		}
     	
     	String pattern = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'";
     	if (startTime.isEmpty()) {
@@ -108,6 +140,27 @@ public class DataAcquisitionGenerator extends BasicGenerator {
     	else {
     		dataAcquisition.setStartedAt(DateTimeFormat.forPattern(pattern).parseDateTime(startTime));
     	}
+
+		Deployment deployment = Deployment.find(deploymentUri);
+		if (deployment != null) {
+			dataAcquisition.setDeploymentUri(deploymentUri);
+			if (null != deployment.getPlatform()) {
+				dataAcquisition.setPlatformUri(deployment.getPlatform().getUri());
+				dataAcquisition.setPlatformName(deployment.getPlatform().getLabel());
+			} else {
+				throw new Exception(String.format("No platform of Deployment %s is specified!", deploymentUri));
+			}
+			
+			if (null != deployment.getInstrument()) {
+				dataAcquisition.setInstrumentUri(deployment.getInstrument().getUri());
+				dataAcquisition.setInstrumentModel(deployment.getInstrument().getLabel());
+			} else {
+				throw new Exception(String.format("No instrument of Deployment %s is specified!", deploymentUri));
+			}
+			dataAcquisition.setStartedAtXsdWithMillis(deployment.getStartedAt());
+		} else {
+			throw new Exception(String.format("Deployment %s cannot be found!", deploymentUri));
+		}
     	
     	dataAcquisition.save();
     }
