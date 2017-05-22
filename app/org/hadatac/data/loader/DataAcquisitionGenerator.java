@@ -107,8 +107,9 @@ public class DataAcquisitionGenerator extends BasicGenerator {
     	if (ownerEmail.isEmpty()) {
     		throw new Exception(String.format("Owner Email is not specified for Row %s!", row_number));
     	}
-
-    	createDataAcquisition(row, ownerEmail, kbPrefix + "DPL-" + getDataAcquisitionName(rec));
+    	
+    	String depolymentUri = ValueCellProcessing.replacePrefixEx(kbPrefix + "DPL-" + getDataAcquisitionName(rec));
+    	createDataAcquisition(row, ownerEmail, depolymentUri);
     	
     	return row;
     }
