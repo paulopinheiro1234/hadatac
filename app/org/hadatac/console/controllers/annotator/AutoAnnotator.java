@@ -44,6 +44,7 @@ import org.hadatac.console.views.html.triplestore.*;
 import org.hadatac.console.views.html.*;
 import org.hadatac.data.api.DataFactory;
 import org.hadatac.data.loader.DASchemaAttrGenerator;
+import org.hadatac.data.loader.DASchemaGenerator;
 import org.hadatac.data.loader.DataAcquisitionGenerator;
 import org.hadatac.data.loader.DeploymentGenerator;
 import org.hadatac.data.loader.GeneralGenerator;
@@ -584,9 +585,13 @@ public class AutoAnnotator extends Controller {
 	public static boolean annotateDataAcquisitionSchemaFile(File file) {
     	boolean bSuccess = true;	
     	try {
-    		DASchemaAttrGenerator dasGenerator = new DASchemaAttrGenerator(file);
-    		bSuccess = commitRows(dasGenerator.createRows(), dasGenerator.toString(), 
+    		DASchemaAttrGenerator dasaGenerator = new DASchemaAttrGenerator(file);
+    		bSuccess = commitRows(dasaGenerator.createRows(), dasaGenerator.toString(), 
     				file.getName(), "DASchemaAttribute", true);
+    		
+    		DASchemaGenerator dasGenerator = new DASchemaGenerator(file);
+    		bSuccess = commitRows(dasGenerator.createRows(), dasGenerator.toString(), 
+    				file.getName(), "DASchema", true);
     	} catch (Exception e) {
     		AnnotationLog.printException(e, file.getName());
     		return false;

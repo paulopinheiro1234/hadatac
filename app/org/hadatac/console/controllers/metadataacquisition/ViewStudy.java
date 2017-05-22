@@ -264,7 +264,6 @@ public class ViewStudy extends Controller {
 			
 			while (resultsrw.hasNext()) {
 				QuerySolution soln = resultsrw.next();
-				values = new ArrayList<String>();
 				values.add(soln.get("si").toString());		
 			}
 		} catch (QueryExceptionHTTP e) {
