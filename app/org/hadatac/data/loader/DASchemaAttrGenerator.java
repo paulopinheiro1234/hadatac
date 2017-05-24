@@ -112,7 +112,7 @@ public class DASchemaAttrGenerator extends BasicGenerator {
     	row.put("a", "hasneto:DASchemaAttribute");
     	row.put("rdfs:label", getDASchemaName(rec));
     	row.put("rdfs:comment", getLabel(rec));
-    	row.put("hasneto:partOfSchema", kbPrefix + "DAS-" + SDDName);
+    	row.put("hasneto:partOfSchema", kbPrefix + "DAS-" + SDDName.replace(".csv", ""));
     	row.put("hasco:hasPosition", getPosition(rec));
     	row.put("hasneto:hasEntity", getEntity(rec));
     	row.put("hasneto:hasAttribute", getAttribute(rec));
