@@ -32,6 +32,7 @@ public class DASchemaAttrGenerator extends BasicGenerator {
         mapCol.put("InRelationTo", "inRelationTo");
         mapCol.put("WasDerivedFrom", "wasDerivedFrom");       
         mapCol.put("WasGeneratedBy", "wasGeneratedBy");
+        mapCol.put("HasPosition", "hasPosition");
         mapCol.put("??mother", "chear-kb:ObjectTypeMother");
         mapCol.put("??child", "chear-kb:ObjectTypeChild");
         mapCol.put("??birth", "chear-kb:ObjectTypeBirth");
@@ -96,6 +97,10 @@ public class DASchemaAttrGenerator extends BasicGenerator {
     	return rec.get(mapCol.get("WasGeneratedBy"));
     }
     
+    private String getPosition(CSVRecord rec) {
+    	return rec.get(mapCol.get("HasPosition"));
+    }
+    
     private String getAssociatedObject(CSVRecord rec) {
     	return getAttributeOf(rec);
     }
@@ -108,7 +113,7 @@ public class DASchemaAttrGenerator extends BasicGenerator {
     	row.put("rdfs:label", getDASchemaName(rec));
     	row.put("rdfs:comment", getLabel(rec));
     	row.put("hasneto:partOfSchema", kbPrefix + "DAS-" + SDDName);
-    	row.put("hasco:hasPosition", String.valueOf(row_number));
+    	row.put("hasco:hasPosition", getPosition(rec));
     	row.put("hasneto:hasEntity", getEntity(rec));
     	row.put("hasneto:hasAttribute", getAttribute(rec));
     	row.put("hasneto:hasUnit", getUnit(rec));
