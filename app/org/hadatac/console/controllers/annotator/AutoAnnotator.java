@@ -589,6 +589,8 @@ public class AutoAnnotator extends Controller {
     		bSuccess = commitRows(dasaGenerator.createRows(), dasaGenerator.toString(), 
     				file.getName(), "DASchemaAttribute", true);
     		
+		System.out.println("Calling DASchemaGenerator");
+		System.out.println("Calling DASchemaGenerator input:" + file);
     		DASchemaGenerator dasGenerator = new DASchemaGenerator(file);
     		bSuccess = commitRows(dasGenerator.createRows(), dasGenerator.toString(), 
     				file.getName(), "DASchema", true);

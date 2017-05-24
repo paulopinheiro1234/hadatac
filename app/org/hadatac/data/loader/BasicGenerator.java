@@ -22,6 +22,7 @@ public abstract class BasicGenerator {
 	public BasicGenerator() {}
 	
 	public BasicGenerator(File file) {
+	    System.out.println("Inside BasicGenerator");
 		try {
 			records = CSVFormat.DEFAULT.withHeader().parse(new FileReader(file));
 			fileName = file.getName();
@@ -31,6 +32,7 @@ public abstract class BasicGenerator {
 			e.printStackTrace();
 		}
 		initMapping();
+		System.out.println("Exiting BasicGenerator");
 	}
 	
 	abstract void initMapping();

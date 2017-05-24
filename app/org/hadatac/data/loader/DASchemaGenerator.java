@@ -14,12 +14,16 @@ public class DASchemaGenerator extends BasicGenerator {
 	public DASchemaGenerator(File file) {
 		super(file);
 		this.SDDName = file.getName();
+                System.out.println("Inside DASchemaGenerator constructor()");
+                System.out.println("Inside DASchemaGenerator file inside constructor: " + SDDName);
 	}
 	
 	@Override
 	void initMapping() {
+            int pos = fileName.indexOf("PS") + 2;
+	    System.out.println("Inside initMapping: " + fileName.substring(pos, pos + 1));
 		mapCol.clear();
-        mapCol.put("Study", SDDName.substring(SDDName.indexOf("PS") + 1));
+                mapCol.put("Study", fileName.substring(pos, pos + 1));
 	}
 	
     private String getLabel() {
@@ -32,6 +36,7 @@ public class DASchemaGenerator extends BasicGenerator {
     
     @Override
     Map<String, Object> createRow(CSVRecord rec, int row_number) throws Exception {
+        System.out.println("Inside DASchemaGenerator.createRow()");
     	Map<String, Object> row = new HashMap<String, Object>();
     	row.put("hasURI", kbPrefix + "DAS-" + SDDName);
     	row.put("a", "hasco:DASchema");
