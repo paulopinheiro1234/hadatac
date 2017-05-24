@@ -265,7 +265,7 @@ public class Deployment {
 	}
 	
 	public static Deployment findFromDataAcquisition(HADataC hadatac) {
-	    System.out.println("Current URI for FIND FROM DATA ACQUISITION: " + hadatac.getDataAcquisition().getDeploymentUri());
+	        //System.out.println("Current URI for FIND FROM DATA ACQUISITION: " + hadatac.getDataAcquisition().getDeploymentUri());
 		String queryString = NameSpaces.getInstance().printSparqlNameSpaceList()
 				+ "SELECT ?startedAt ?endedAt ?detector ?instrument ?platform WHERE {\n"
 				+ "  <" + hadatac.getDataAcquisition().getDeploymentUri() + "> a vstoi:Deployment .\n"
@@ -304,7 +304,7 @@ public class Deployment {
 	}
 	
 	public static Deployment findFromPreamble(HADataC hadatac) {
-	    System.out.println("Current URI for FIND FROM PREAMBLE: " + hadatac.getDataAcquisition().getDeploymentUri());
+	        //System.out.println("Current URI for FIND FROM PREAMBLE: " + hadatac.getDataAcquisition().getDeploymentUri());
 		String queryString = NameSpaces.getInstance().printSparqlNameSpaceList() 
 				+ "SELECT ?startedAt ?endedAt ?detector ?instrument ?platform WHERE {\n"
 				+ "  <" + hadatac.getDeploymentUri() + "> a vstoi:Deployment .\n"
@@ -339,7 +339,7 @@ public class Deployment {
 	}
 	
 	public static Deployment find(String deployment_uri) {
-	        System.out.println("Current URI for FIND DEPLOYMENT: " + deployment_uri);
+	        //System.out.println("Current URI for FIND DEPLOYMENT: " + deployment_uri);
 		Deployment deployment = null;
                 String queryString = NameSpaces.getInstance().printSparqlNameSpaceList();
                 if (deployment_uri.startsWith("http")) {
@@ -433,7 +433,7 @@ public class Deployment {
 	}
 
 	public static Deployment find(Model model, DataAcquisition dataAcquisition) {
-	        System.out.println("FIND DEPLOYMENT OF DATA ACQUISITION ");
+	         //System.out.println("FIND DEPLOYMENT OF DATA ACQUISITION ");
 		String queryString = NameSpaces.getInstance().printSparqlNameSpaceList() 
 				+ "SELECT ?dp WHERE {\n"
 				+ "  ?dp hasneto:hasDataAcquisition <" + dataAcquisition.getCcsvUri() + "> .\n"
