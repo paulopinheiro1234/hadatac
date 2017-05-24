@@ -76,26 +76,32 @@ public class DataAcquisitionSchema {
     			"   OPTIONAL { ?uri hasco:hasSource ?hasSource } ." + 
     			"   OPTIONAL { ?uri hasco:isPIConfirmed ?isPIConfirmed } ." + 
     			"}";
-    	Query query = QueryFactory.create(queryString);
+    	        Query query = QueryFactory.create(queryString);
 		
-    	QueryExecution qexec = QueryExecutionFactory.sparqlService(
-			Collections.getCollectionsName(Collections.METADATA_SPARQL), query);
-    	ResultSet results = qexec.execSelect();
+    	        QueryExecution qexec = QueryExecutionFactory.sparqlService(
+		    Collections.getCollectionsName(Collections.METADATA_SPARQL), query);
+    	        ResultSet results = qexec.execSelect();
 		ResultSetRewindable resultsrw = ResultSetFactory.copyResults(results);
 		qexec.close();
+
+         	//System.out.println("Schema query: \n" + queryString);
 		
 		if (!resultsrw.hasNext()) {
 			return schema;
 		}
 		
-		schema = new DataAcquisitionSchema();
+  		schema = new DataAcquisitionSchema();
 		List<SchemaAttribute> attributes = new ArrayList<SchemaAttribute>();
 		while (resultsrw.hasNext()) {
-			QuerySolution soln = resultsrw.next();
-			if (soln.getLiteral("hasPosition") != null && soln.getLiteral("hasPosition").getString() != null &&
+		    QuerySolution soln = resultsrw.next();
+		
+		    try {
+			if (soln != null &&
+                            soln.getLiteral("hasPosition") != null && soln.getLiteral("hasPosition").getString() != null &&
 			    soln.getResource("hasEntity") != null && soln.getResource("hasEntity").getURI() != null &&
 			    soln.getResource("hasAttribute") != null && soln.getResource("hasAttribute").getURI() != null &&
 			    soln.getResource("hasUnit") != null && soln.getResource("hasUnit").getURI() != null) {
+
 			    SchemaAttribute sa = schema.new SchemaAttribute(
 					soln.getLiteral("hasPosition").getString(),
 					soln.getResource("hasEntity").getURI(),
@@ -103,9 +109,13 @@ public class DataAcquisitionSchema {
 					soln.getResource("hasUnit").getURI());
 			    attributes.add(sa);
 			}
+		    }  catch (Exception e) {
+			System.out.println("[ERROR] DataAcquisitionSchema - e.Message: " + e.getMessage());
+                    }
+
 		}
-		schema.setAttributes(attributes);
 		
+		schema.setAttributes(attributes);
 		return schema;
     }
     

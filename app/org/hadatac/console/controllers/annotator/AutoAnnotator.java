@@ -726,6 +726,7 @@ public class AutoAnnotator extends Controller {
     
     private static String createPreamble(CSVAnnotationHandler handler, 
     									 String schema_uri) throws Exception {
+	        //System.out.println("CREATING PREAMBLE FOR " + schema_uri);
 		String preamble = Downloads.FRAG_START_PREAMBLE;
 		preamble += NameSpaces.getInstance().printTurtleNameSpaceList();
 		preamble += "\n";
@@ -747,6 +748,7 @@ public class AutoAnnotator extends Controller {
 			ArrayList<String> mt_preamble = new ArrayList<String>();
 			
 			DataAcquisitionSchema schema = DataAcquisitionSchema.find(schema_uri);
+
 			if (null == schema) {
 				throw new Exception(String.format("Can not find schema %s", schema_uri));
 			}
@@ -756,6 +758,7 @@ public class AutoAnnotator extends Controller {
 				String entity = attribute.getEntity();
 				String attrib = attribute.getAttribute();
 				String unit = attribute.getUnit();
+                                //System.out.println("ATTRIBUTE: pos:" + i + " entity:" + entity + " attribute:" + attrib + " unit:" + unit);  
 
 				if (unit.equals(Downloads.FRAG_IN_DATE_TIME)) {
 					timeStampIndex = i; 

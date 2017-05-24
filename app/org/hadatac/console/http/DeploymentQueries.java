@@ -25,33 +25,42 @@ public class DeploymentQueries {
         String q = "SELECT * WHERE { ?s ?p ?o } LIMIT 10";
         switch (concept){
             case DEPLOYMENT_BY_URI :
-                q = "PREFIX rdfs:<http://www.w3.org/2000/01/rdf-schema#>" + 
-                    "PREFIX owl: <http://www.w3.org/2002/07/owl#>" +
-                    "PREFIX prov: <http://www.w3.org/ns/prov#>  " +
-        	        "PREFIX vstoi: <http://hadatac.org/ont/vstoi#>  " +
-        	        "PREFIX hasneto: <http://hadatac.org/ont/hasneto#>  " +
+                if (uri.startsWith("http")) {
+		   uri = "<" + uri + ">";
+		}
+                q = NameSpaces.getInstance().printSparqlNameSpaceList() + 
+		    //"PREFIX rdfs:<http://www.w3.org/2000/01/rdf-schema#>" + 
+                    //"PREFIX owl: <http://www.w3.org/2002/07/owl#>" +
+                    //"PREFIX prov: <http://www.w3.org/ns/prov#>  " +
+        	    //    "PREFIX vstoi: <http://hadatac.org/ont/vstoi#>  " +
+        	    //    "PREFIX hasneto: <http://hadatac.org/ont/hasneto#>  " +
                     "SELECT ?uri ?platform ?hasFirstCoordinate ?hasSecondCoordinate ?instrument ?detector ?date WHERE { " + 
-                    "   <" + uri + "> a vstoi:Deployment . " + 
-                    "   <" + uri + "> vstoi:hasPlatform ?platformuri .  " +
+                    "   " + uri + " a vstoi:Deployment . " + 
+                    "   " + uri + " vstoi:hasPlatform ?platformuri .  " +
                     "   ?platformuri rdfs:label ?platform . " +
                     "   OPTIONAL { ?platformuri hasneto:hasFirstCoordinate ?hasFirstCoordinate . } " +
                     "   OPTIONAL { ?platformuri hasneto:hasSecondCoordinate ?hasSecondCoordinate . } " +
-                    "   <" + uri + "> hasneto:hasInstrument ?instrumenturi .  " + 
+                    "   " + uri + " hasneto:hasInstrument ?instrumenturi .  " + 
                     "   ?instrumenturi rdfs:label ?instrument . " +
-                    "   OPTIONAL { <" + uri + "> hasneto:hasDetector ?detectoruri . } " + 
+                    "   OPTIONAL { " + uri + " hasneto:hasDetector ?detectoruri . } " + 
                     "   OPTIONAL { ?detectoruri rdfs:label ?detector . } " +
-                    "   <" + uri + "> prov:startedAtTime ?date .  " + 
+                    "   " + uri + " prov:startedAtTime ?date .  " + 
                     "}";
+	        //System.out.println("DEPLOYMENT_BY_URI query: " + q);
                 break;
             case DEPLOYMENT_CHARACTERISTICS_BY_URI : 
-                q = "PREFIX rdfs:<http://www.w3.org/2000/01/rdf-schema#>" + 
-                    "PREFIX owl: <http://www.w3.org/2002/07/owl#>" +
-                    "PREFIX prov: <http://www.w3.org/ns/prov#>  " +
-        	        "PREFIX vstoi: <http://hadatac.org/ont/vstoi#>  " +
-        	        "PREFIX hasneto: <http://hadatac.org/ont/hasneto#>  " +
+                if (uri.startsWith("http")) {
+		   uri = "<" + uri + ">";
+		}
+                q = NameSpaces.getInstance().printSparqlNameSpaceList() + 
+		    //"PREFIX rdfs:<http://www.w3.org/2000/01/rdf-schema#>" + 
+                    //"PREFIX owl: <http://www.w3.org/2002/07/owl#>" +
+                    //"PREFIX prov: <http://www.w3.org/ns/prov#>  " +
+        	    //    "PREFIX vstoi: <http://hadatac.org/ont/vstoi#>  " +
+        	    //    "PREFIX hasneto: <http://hadatac.org/ont/hasneto#>  " +
                     "SELECT ?deturi ?detModel ?insturi ?instModel ?sp ?ent ?char ?charName WHERE { { " + 
-                    "   <" + uri + "> a vstoi:Deployment . " + 
-                    "   <" + uri + "> hasneto:hasDetector ?deturi .  " +
+                    "   " + uri + " a vstoi:Deployment . " + 
+                    "   " + uri + " hasneto:hasDetector ?deturi .  " +
                     "   ?deturi a ?detModel . " +
                     "   ?sp vstoi:perspectiveOf ?detModel . " +
                     "   ?sp hasneto:hasPerspectiveEntity ?ent ." +
@@ -59,8 +68,8 @@ public class DeploymentQueries {
                     "   ?char rdfs:label ?charName .  " + 
                     "} " + 
                     "UNION { " + 
-                    "   <" + uri + "> a vstoi:Deployment . " + 
-                    "   <" + uri + "> hasneto:hasInstrument ?insturi .  " +
+                    "   " + uri + " a vstoi:Deployment . " + 
+                    "   " + uri + " hasneto:hasInstrument ?insturi .  " +
                     "   ?insturi a ?instModel . " +
                     "   ?sp vstoi:perspectiveOf ?instModel . " +
                     "   ?sp hasneto:hasPerspectiveEntity ?ent ." +

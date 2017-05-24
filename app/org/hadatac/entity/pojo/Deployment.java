@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.net.URLEncoder;
 
 import org.apache.jena.query.Query;
 import org.apache.jena.query.QueryExecution;
@@ -264,6 +265,7 @@ public class Deployment {
 	}
 	
 	public static Deployment findFromDataAcquisition(HADataC hadatac) {
+	    System.out.println("Current URI for FIND FROM DATA ACQUISITION: " + hadatac.getDataAcquisition().getDeploymentUri());
 		String queryString = NameSpaces.getInstance().printSparqlNameSpaceList()
 				+ "SELECT ?startedAt ?endedAt ?detector ?instrument ?platform WHERE {\n"
 				+ "  <" + hadatac.getDataAcquisition().getDeploymentUri() + "> a vstoi:Deployment .\n"
@@ -302,6 +304,7 @@ public class Deployment {
 	}
 	
 	public static Deployment findFromPreamble(HADataC hadatac) {
+	    System.out.println("Current URI for FIND FROM PREAMBLE: " + hadatac.getDataAcquisition().getDeploymentUri());
 		String queryString = NameSpaces.getInstance().printSparqlNameSpaceList() 
 				+ "SELECT ?startedAt ?endedAt ?detector ?instrument ?platform WHERE {\n"
 				+ "  <" + hadatac.getDeploymentUri() + "> a vstoi:Deployment .\n"
@@ -336,9 +339,15 @@ public class Deployment {
 	}
 	
 	public static Deployment find(String deployment_uri) {
+	        System.out.println("Current URI for FIND DEPLOYMENT: " + deployment_uri);
 		Deployment deployment = null;
-		
-		String queryString = "DESCRIBE <" + deployment_uri + ">";
+                String queryString = NameSpaces.getInstance().printSparqlNameSpaceList();
+                if (deployment_uri.startsWith("http")) {
+		    queryString += "DESCRIBE <" + deployment_uri + ">";
+		} else {
+		    queryString += "DESCRIBE " + deployment_uri;
+		}
+                //System.out.println("FIND DEPLOYMENT (queryString): " + queryString);
 		Query query = QueryFactory.create(queryString);
 		QueryExecution qexec = QueryExecutionFactory.sparqlService(
 				Play.application().configuration().getString("hadatac.solr.triplestore") 
@@ -424,6 +433,7 @@ public class Deployment {
 	}
 
 	public static Deployment find(Model model, DataAcquisition dataAcquisition) {
+	        System.out.println("FIND DEPLOYMENT OF DATA ACQUISITION ");
 		String queryString = NameSpaces.getInstance().printSparqlNameSpaceList() 
 				+ "SELECT ?dp WHERE {\n"
 				+ "  ?dp hasneto:hasDataAcquisition <" + dataAcquisition.getCcsvUri() + "> .\n"
