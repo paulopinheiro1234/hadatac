@@ -589,11 +589,22 @@ public class AutoAnnotator extends Controller {
     		bSuccess = commitRows(dasaGenerator.createRows(), dasaGenerator.toString(), 
     				file.getName(), "DASchemaAttribute", true);
     		
-		System.out.println("Calling DASchemaGenerator");
-		System.out.println("Calling DASchemaGenerator input:" + file);
-    		DASchemaGenerator dasGenerator = new DASchemaGenerator(file);
-    		bSuccess = commitRows(dasGenerator.createRows(), dasGenerator.toString(), 
-    				file.getName(), "DASchema", true);
+//			System.out.println("Calling DASchemaGenerator");
+//			System.out.println("Calling DASchemaGenerator input:" + file);
+//    		DASchemaGenerator dasGenerator = new DASchemaGenerator(file);
+        	
+        	GeneralGenerator generalGenerator = new GeneralGenerator();
+        	int pos = file.getName().indexOf("PS") + 2;
+        	Map<String, Object> row = new HashMap<String, Object>();
+        	row.put("hasURI", "chear-kb:DAS-" + file.getName());
+        	row.put("a", "hasco:DASchema");
+        	row.put("rdfs:label", "Schema for Pilot Study" + file.getName().substring(pos, pos + 1) + "EPI Data Acquisitions");
+        	row.put("rdfs:comment", "");
+        	row.put("hasco:isSchemaOf", "chear-kb:STD-Pilot-" + file.getName().substring(pos, pos + 1));
+        	generalGenerator.addRow(row);
+    		
+        	bSuccess = commitRows(generalGenerator.getRows(), generalGenerator.toString(), file.getName(), 
+        			"DASchema", true);
     	} catch (Exception e) {
     		AnnotationLog.printException(e, file.getName());
     		return false;
