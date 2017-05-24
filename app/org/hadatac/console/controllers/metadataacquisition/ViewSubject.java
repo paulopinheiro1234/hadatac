@@ -384,9 +384,9 @@ public class ViewSubject extends Controller {
 		Map<String, String> indicatorUris = findSubjectIndicatorsUri(study_uri);
 		
 		Map<String, String> showValues = new HashMap<String, String>();
-		showValues.put("subject", ValueCellProcessing.convertToWholeURI(subject_uri));
+		showValues.put("subject", subject_uri);
 		showValues.put("user", findUser());
-		showValues.put("study", study_uri);		
+		showValues.put("study", study_uri);	
     	
     	return ok(viewSubject.render(subjectResult, sampleResult, indicatorValues, indicatorUris, showValues));    
     }
