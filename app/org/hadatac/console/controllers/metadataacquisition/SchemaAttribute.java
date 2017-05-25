@@ -64,7 +64,7 @@ public class SchemaAttribute extends Controller {
 				+ " OPTIONAL {?DASAttributeUri hasneto:hasAssociatedObject ?Object . } "
 				+ " OPTIONAL {?DASAttributeUri hasneto:hasAttribute ?Attribute . "
                 + "         ?Attribute rdfs:label ?AttributeLabel . } "
-				+ " OPTIONAL {?DASAttributeUri hasneto:hasUnit ?Unit . }"
+				+ " OPTIONAL {?DASAttributeUri hasneto:hasUnit ?Unit .  }"
 				+ " OPTIONAL {?DASAttributeUri hasco:hasSource ?Source . }"
 				+ " OPTIONAL {?DASAttributeUri hasco:isPIConfirmed ?PIConfirmed . }"
 				+ " }";
