@@ -52,36 +52,76 @@ public class SchemaAttribute extends Controller {
     }
 	
     public static List<String> getIndicators() {
-		List<String> results = new ArrayList<String>();
-	
-		results.add("daSchema");
-		results.add("attLabel");
-		results.add("entity");
-		results.add("unit");
-		results.add("object");
-		results.add("position");
-		results.add("source");
-		results.add("piConfirmed");
-		//java.util.Collections.sort(results);
+    	List<String> results = new ArrayList<String>();
+    	String strQuery = NameSpaces.getInstance().printSparqlNameSpaceList() 
+				+ "SELECT DISTINCT ?DASAttributeUri ?DASAttributeLabel ?Comment ?Entity ?Attribute ?AttributeLabel ?DataAcquisitionSchema ?Position ?Unit ?Source ?Object ?PIConfirmed WHERE {  "
+				+ " ?DASAttributeUri a hasneto:DASchemaAttribute . "
+				+ " OPTIONAL { ?DASAttributeUri rdfs:label ?DASAttributeLabel . }"
+				+ " OPTIONAL {?DASAttributeUri rdfs:comment ?Comment . } "
+				+ " OPTIONAL {?DASAttributeUri hasneto:partOfSchema ?DataAcquisitionSchema . }"
+				+ " OPTIONAL {?DASAttributeUri hasco:hasPosition ?Position . } "
+				+ " OPTIONAL {?DASAttributeUri hasneto:hasEntity ?Entity . } "
+				+ " OPTIONAL {?DASAttributeUri hasneto:hasAssociatedObject ?Object . } "
+				+ " OPTIONAL {?DASAttributeUri hasneto:hasAttribute ?Attribute . "
+                + "         ?Attribute rdfs:label ?AttributeLabel . } "
+				+ " OPTIONAL {?DASAttributeUri hasneto:hasUnit ?Unit . }"
+				+ " OPTIONAL {?DASAttributeUri hasco:hasSource ?Source . }"
+				+ " OPTIONAL {?DASAttributeUri hasco:isPIConfirmed ?PIConfirmed . }"
+				+ " }";
+		
+		QueryExecution qexecStudy = QueryExecutionFactory.sparqlService(
+				Collections.getCollectionsName(Collections.METADATA_SPARQL), strQuery);
+		ResultSet resultSet = qexecStudy.execSelect();
+		ResultSetRewindable resultsrwStudy = ResultSetFactory.copyResults(resultSet);
+		qexecStudy.close();
+		while (resultsrwStudy.hasNext()) {
+			QuerySolution soln = resultsrwStudy.next();
+//			System.out.println("Solution: " + soln.toString());	
+			if (soln.contains("DataAcquisitionSchema") && !results.contains("Data Acquisition Schema")) {
+				results.add("Data Acquisition Schema");
+			}
+			if (soln.contains("Entity") && !results.contains("Entity")){
+				results.add("Entity");
+			}
+			if (soln.contains("Attribute") && !results.contains("Attribute")){
+				results.add("Attribute");
+			}
+			if (soln.contains("Position") && !results.contains("Position")){
+				results.add("Position");
+			}
+			if (soln.contains("Unit") && !results.contains("Unit")){
+				results.add("Unit");
+			}
+			if (soln.contains("Source") && !results.contains("Source")){
+				results.add("Source");
+			}
+			if (soln.contains("Object") && !results.contains("Object")){
+				results.add("Object");
+			}
+			if (soln.contains("PIConfirmed") && !results.contains("PI Confirmed")){
+				results.add("PI Confirmed");
+			}
+		}
+		java.util.Collections.sort(results);
 		
 		return results; 
     }
 	
 	public static boolean updateDASchemaAttributes() {
 		String strQuery = NameSpaces.getInstance().printSparqlNameSpaceList() 
-				+ "SELECT DISTINCT ?DASAttributeUri ?DASAttributeLabel ?comment ?entity ?attribute ?attLabel ?daSchema ?position ?unit ?source ?object ?piConfirmed WHERE {  "
+				+ "SELECT DISTINCT ?DASAttributeUri ?DASAttributeLabel ?Comment ?Entity ?Attribute ?AttributeLabel ?DataAcquisitionSchema ?Position ?Unit ?Source ?Object ?PIConfirmed WHERE {  "
 				+ " ?DASAttributeUri a hasneto:DASchemaAttribute . "
 				+ " OPTIONAL { ?DASAttributeUri rdfs:label ?DASAttributeLabel . }"
-				+ " OPTIONAL {?DASAttributeUri rdfs:comment ?comment . } "
-				+ " OPTIONAL {?DASAttributeUri hasneto:partOfSchema ?daSchema . }"
-				+ " OPTIONAL {?DASAttributeUri hasco:hasPosition ?position . } "
-				+ " OPTIONAL {?DASAttributeUri hasneto:hasEntity ?entity . } "
-				+ " OPTIONAL {?DASAttributeUri hasneto:hasAssociatedObject ?object . } "
-				+ " OPTIONAL {?DASAttributeUri hasneto:hasAttribute ?attribute . "
-                + "         ?attribute rdfs:label ?attLabel . } "
-				+ " OPTIONAL {?DASAttributeUri hasneto:hasUnit ?unit . }"
-				+ " OPTIONAL {?DASAttributeUri hasco:hasSource ?source . }"
-				+ " OPTIONAL {?DASAttributeUri hasco:isPIConfirmed ?piConfirmed . }"
+				+ " OPTIONAL {?DASAttributeUri rdfs:comment ?Comment . } "
+				+ " OPTIONAL {?DASAttributeUri hasneto:partOfSchema ?DataAcquisitionSchema . }"
+				+ " OPTIONAL {?DASAttributeUri hasco:hasPosition ?Position . } "
+				+ " OPTIONAL {?DASAttributeUri hasneto:hasEntity ?Entity . } "
+				+ " OPTIONAL {?DASAttributeUri hasneto:hasAssociatedObject ?Object . } "
+				+ " OPTIONAL {?DASAttributeUri hasneto:hasAttribute ?Attribute . "
+                + "         ?Attribute rdfs:label ?AttributeLabel . } "
+				+ " OPTIONAL {?DASAttributeUri hasneto:hasUnit ?Unit . }"
+				+ " OPTIONAL {?DASAttributeUri hasco:hasSource ?Source . }"
+				+ " OPTIONAL {?DASAttributeUri hasco:isPIConfirmed ?PIConfirmed . }"
 				+ " }";
 		
 		QueryExecution qexecStudy = QueryExecutionFactory.sparqlService(
@@ -95,7 +135,7 @@ public class SchemaAttribute extends Controller {
 		while (resultsrwStudy.hasNext()) {
 			QuerySolution soln = resultsrwStudy.next();
 			System.out.println("Solution: " + soln.toString());
-			String attributeUri = soln.get("DASAttributeUri").toString();
+			String attributeUri = DynamicFunctions.replaceURLWithPrefix(soln.get("DASAttributeUri").toString());
 			HashMap<String, Object> DAInfo = null;
 			String key = "";
 			String value = "";
@@ -117,54 +157,54 @@ public class SchemaAttribute extends Controller {
 						+ cellProc.replaceNameSpaceEx(DAInfo.get("DASAttributeUri").toString()) + "\">"
 						+ soln.get("DASAttributeLabel").toString() + "</a>");
 			}
-			if (soln.contains("daSchema") && !DAInfo.containsKey("daSchema_i")) {
-				key = "daSchema_i";
-				value = soln.get("daSchema").toString();
+			if (soln.contains("DataAcquisitionSchema") && !DAInfo.containsKey("DataAcquisitionSchema_i")) {
+				key = "DataAcquisitionSchema_i";
+				value = DynamicFunctions.replaceURLWithPrefix(soln.get("DataAcquisitionSchema").toString());
 				DAInfo.put(key, value);
 			}
-			if (soln.contains("comment") && !DAInfo.containsKey("comment_i")){
-				key = "comment_i";
-				value = soln.get("comment").toString();
+			if (soln.contains("Comment") && !DAInfo.containsKey("Comment_i")){
+				key = "Comment_i";
+				value = soln.get("Comment").toString();
 				DAInfo.put(key, value);
 			}
-			if (soln.contains("entity") && !DAInfo.containsKey("entity_i")){
-				key = "entity_i";
-				value = soln.get("entity").toString();
+			if (soln.contains("Entity") && !DAInfo.containsKey("Entity_i")){
+				key = "Entity_i";
+				value = DynamicFunctions.replaceURLWithPrefix(soln.get("Entity").toString());
 				DAInfo.put(key, value);
 			}
-			if (soln.contains("attribute") && !DAInfo.containsKey("attribute_i")){
-				key = "attribute_i";
-				value = soln.get("attribute").toString();
+			if (soln.contains("Attribute") && !DAInfo.containsKey("Attribute_i")){
+				key = "Attribute_i";
+				value = DynamicFunctions.replaceURLWithPrefix(soln.get("Attribute").toString());
 				DAInfo.put(key, value);
 			}
-			if (soln.contains("attLabel") && !DAInfo.containsKey("attLabel_i")){
-				key = "attLabel_i";
-				value = soln.get("attLabel").toString();
+			if (soln.contains("AttributeLabel") && !DAInfo.containsKey("AttributeLabel_i")){
+				key = "AttributeLabel_i";
+				value = soln.get("AttributeLabel").toString();
 				DAInfo.put(key, value);
 			}
-			if (soln.contains("position") && !DAInfo.containsKey("position_i")){
-				key = "position_i";
-				value = soln.get("position").toString();
+			if (soln.contains("Position") && !DAInfo.containsKey("Position_i")){
+				key = "Position_i";
+				value = soln.get("Position").toString();
 				DAInfo.put(key, value);
 			}
-			if (soln.contains("unit") && !DAInfo.containsKey("unit_i")){
-				key = "unit_i";
-				value = soln.get("unit").toString();
+			if (soln.contains("Unit") && !DAInfo.containsKey("Unit_i")){
+				key = "Unit_i";
+				value = DynamicFunctions.replaceURLWithPrefix(soln.get("Unit").toString());
 				DAInfo.put(key, value);
 			}
-			if (soln.contains("source") && !DAInfo.containsKey("source_i")){
-				key = "source_i";
-				value = soln.get("source").toString();
+			if (soln.contains("Source") && !DAInfo.containsKey("Source_i")){
+				key = "Source_i";
+				value = soln.get("Source").toString();
 				DAInfo.put(key, value);
 			}
-			if (soln.contains("object") && !DAInfo.containsKey("object_i")){
-				key = "object_i";
-				value = soln.get("object").toString();
+			if (soln.contains("Object") && !DAInfo.containsKey("Object_i")){
+				key = "Object_i";
+				value = DynamicFunctions.replaceURLWithPrefix(soln.get("Object").toString());
 				DAInfo.put(key, value);
 			}
-			if (soln.contains("piConfirmed") && !DAInfo.containsKey("piConfirmed_i")){
-				key = "piConfirmed_i";
-				value = soln.get("piConfirmed").toString();
+			if (soln.contains("PIConfirmed") && !DAInfo.containsKey("PIConfirmed_i")){
+				key = "PIConfirmed_i";
+				value = soln.get("PIConfirmed").toString();
 				DAInfo.put(key, value);
 			}
 		}
