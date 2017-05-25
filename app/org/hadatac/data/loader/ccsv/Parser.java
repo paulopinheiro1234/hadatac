@@ -177,7 +177,7 @@ public class Parser {
 				measurement.setStudyUri(ValueCellProcessing.replaceNameSpaceEx(hadatacKb.getDataAcquisition().getStudyUri()));
 				if(nIdCol > -1){
 					if (measurementType.getEntityUri().equals(ValueCellProcessing.replacePrefixEx("sio:Human"))) {
-						Subject subject = Subject.findSubject(measurement.getStudyUri(), record.get(nIdCol - 1));
+       						Subject subject = Subject.findSubject(measurement.getStudyUri(), record.get(nIdCol - 1));
 						if (null != subject) {
 							String subjectUri = subject.getUri();
 							subjectUri = Subject.checkObjectUri(subjectUri, measurementType.getCharacteristicUri());

@@ -147,7 +147,8 @@ public class MeasurementType {
 					measurementTypeKb.setCharacteristicLabel(soln.getLiteral("c_label").getString()); 
 				}
 				else {
-					measurementTypeKb.setCharacteristicLabel("non-label characteristic");
+				    measurementTypeKb.setCharacteristicLabel(measurementType.getCharacteristicUri().replace("http://hadatac.org/ont/chear#","").replace("http://semanticscience.org/resource/",""));
+					//measurementTypeKb.setCharacteristicLabel("non-label characteristic");
 				}
 				measurementTypeKb.setEntityUri(measurementType.getEntityUri());
 				if (soln.getLiteral("e_label") != null) {
