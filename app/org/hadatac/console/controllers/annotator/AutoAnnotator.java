@@ -600,7 +600,7 @@ public class AutoAnnotator extends Controller {
         	row.put("a", "hasco:DASchema");
         	row.put("rdfs:label", "Schema for Pilot Study" + file.getName().substring(pos, pos + 1) + "EPI Data Acquisitions");
         	row.put("rdfs:comment", "");
-        	row.put("hasco:isSchemaOf", "chear-kb:STD-Pilot-" + file.getName().substring(pos, pos + 1));
+        	row.put("hasco:isSchemaOf", "chear-kb:STD-Pilot-" + (file.getName().substring(pos, pos + 1)).replace(".csv", ""));
         	generalGenerator.addRow(row);
     		
         	bSuccess = commitRows(generalGenerator.getRows(), generalGenerator.toString(), file.getName(), 
