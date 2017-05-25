@@ -53,32 +53,19 @@ public class DataAcquisitionBrowser extends Controller {
 	
     public static List<String> getIndicators() {
 		List<String> results = new ArrayList<String>();
-		
-		results.add("daSchema");
-		results.add("method");
-		results.add("deployment");
-		results.add("agent");
-		results.add("startTime");
-		results.add("endTime");
-		//java.util.Collections.sort(results);
-		
-		return results; 
-    }
-	
-	public static boolean updateDataAcquisitions() {
 		String strQuery = NameSpaces.getInstance().printSparqlNameSpaceList() 
-				+ "SELECT DISTINCT ?attributeUri ?attributeLabel ?daSchema ?method ?deployment ?study ?comment ?startTime ?endTime WHERE { "
-				+ " ?attributeSuper rdfs:subClassOf* hasneto:DataAcquisition . " 
-				+ " ?attributeUri a ?attributeSuper . " 
-				+ " ?attributeUri rdfs:label ?attributeLabel ."
-				+ " ?attributeUri hasco:isDataAcquisitionOf ?study ."
-				+ " OPTIONAL {?attributeUri hasco:hasSchema ?daSchema . }"
-				+ " OPTIONAL {?attributeUri hasco:hasMethod ?method . }"
-				+ " OPTIONAL {?attributeUri hasneto:hasDeployment ?deployment . }"
-				+ " OPTIONAL {?attributeUri rdfs:comment ?comment . }"
-				+ " OPTIONAL {?attributeUri prov:wasAssociatedWith ?agent . }"
-				+ " OPTIONAL {?attributeUri prov:startedAtTime ?startTime . }"
-				+ " OPTIONAL {?attributeUri prov:endedAtTime ?endTime . }"
+				+ "SELECT DISTINCT ?attributeUri ?AttributeLabel ?DataAcquisitionSchema ?Method ?Deployment ?Study ?Comment ?StartTime ?EndTime WHERE { "
+				+ " ?AttributeSuper rdfs:subClassOf* hasneto:DataAcquisition . " 
+				+ " ?attributeUri a ?AttributeSuper . " 
+				+ " ?attributeUri rdfs:label ?AttributeLabel ."
+				+ " ?attributeUri hasco:isDataAcquisitionOf ?Study ."
+				+ " OPTIONAL {?attributeUri hasco:hasSchema ?DataAcquisitionSchema . }"
+				+ " OPTIONAL {?attributeUri hasco:hasMethod ?Method . }"
+				+ " OPTIONAL {?attributeUri hasneto:hasDeployment ?Deployment . }"
+				+ " OPTIONAL {?attributeUri rdfs:comment ?Comment . }"
+				+ " OPTIONAL {?attributeUri prov:wasAssociatedWith ?Agent . }"
+				+ " OPTIONAL {?attributeUri prov:startedAtTime ?StartTime . }"
+				+ " OPTIONAL {?attributeUri prov:endedAtTime ?EndTime . }"
 				+ " }";
 		
 		QueryExecution qexecStudy = QueryExecutionFactory.sparqlService(
@@ -92,7 +79,59 @@ public class DataAcquisitionBrowser extends Controller {
 		while (resultsrwStudy.hasNext()) {
 			QuerySolution soln = resultsrwStudy.next();
 			System.out.println("Solution: " + soln.toString());
-			String attributeUri = soln.get("attributeUri").toString();
+			if (soln.contains("DataAcquisitionSchema") && !results.contains("Data Acquisition Schema")) {
+				results.add("Data Acquisition Schema");			}
+			if (soln.contains("Method") && !results.contains("Method")){
+				results.add("Method");
+			}
+			if (soln.contains("Deployment") && !results.contains("Deployment")){
+				results.add("Deployment");
+			}
+			if (soln.contains("Agent") && !results.contains("Agent")){
+				results.add("Agent");
+			}
+			if (soln.contains("StartTime") && !results.contains("Start Time")){
+				results.add("Start Time");
+			}
+			if (soln.contains("EndTime") && !results.contains("End Time")){
+				results.add("End Time");
+			}
+			if (soln.contains("Study") && !results.contains("Study")){
+				results.add("Study");
+			}
+		}
+		java.util.Collections.sort(results);
+		return results; 
+    }
+	
+	public static boolean updateDataAcquisitions() {
+		String strQuery = NameSpaces.getInstance().printSparqlNameSpaceList() 
+				+ "SELECT DISTINCT ?attributeUri ?AttributeLabel ?DataAcquisitionSchema ?Method ?Deployment ?Study ?Comment ?StartTime ?EndTime WHERE { "
+				+ " ?AttributeSuper rdfs:subClassOf* hasneto:DataAcquisition . " 
+				+ " ?attributeUri a ?AttributeSuper . " 
+				+ " ?attributeUri rdfs:label ?AttributeLabel ."
+				+ " ?attributeUri hasco:isDataAcquisitionOf ?Study ."
+				+ " OPTIONAL {?attributeUri hasco:hasSchema ?DataAcquisitionSchema . }"
+				+ " OPTIONAL {?attributeUri hasco:hasMethod ?Method . }"
+				+ " OPTIONAL {?attributeUri hasneto:hasDeployment ?Deployment . }"
+				+ " OPTIONAL {?attributeUri rdfs:comment ?Comment . }"
+				+ " OPTIONAL {?attributeUri prov:wasAssociatedWith ?Agent . }"
+				+ " OPTIONAL {?attributeUri prov:startedAtTime ?StartTime . }"
+				+ " OPTIONAL {?attributeUri prov:endedAtTime ?EndTime . }"
+				+ " }";
+		
+		QueryExecution qexecStudy = QueryExecutionFactory.sparqlService(
+				Collections.getCollectionsName(Collections.METADATA_SPARQL), strQuery);
+		ResultSet resultSet = qexecStudy.execSelect();
+		ResultSetRewindable resultsrwStudy = ResultSetFactory.copyResults(resultSet);
+		qexecStudy.close();
+		
+		HashMap<String, HashMap<String, Object>> mapDAInfo = new HashMap<String, HashMap<String, Object>>();
+		ValueCellProcessing cellProc = new ValueCellProcessing();
+		while (resultsrwStudy.hasNext()) {
+			QuerySolution soln = resultsrwStudy.next();
+			System.out.println("Solution: " + soln.toString());
+			String attributeUri = DynamicFunctions.replaceURLWithPrefix(soln.get("attributeUri").toString());
 			HashMap<String, Object> DAInfo = null;
 			String key = "";
 			String value = "";
@@ -107,46 +146,46 @@ public class DataAcquisitionBrowser extends Controller {
 				DAInfo = mapDAInfo.get(attributeUri);
 			}
 			
-			if (soln.contains("attributeLabel") && !DAInfo.containsKey("attributeLabel_i")) {
-				DAInfo.put("attributeLabel_i", "<a href=\""
+			if (soln.contains("AttributeLabel") && !DAInfo.containsKey("AttributeLabel_i")) {
+				DAInfo.put("AttributeLabel_i", "<a href=\""
 						+ Play.application().configuration().getString("hadatac.console.host_deploy") 
 						+ "/hadatac/metadataacquisitions/viewDA?da_uri=" 
 						+ cellProc.replaceNameSpaceEx(DAInfo.get("attributeUri").toString()) + "\">"
-						+ soln.get("attributeLabel").toString() + "</a>");
+						+ soln.get("AttributeLabel").toString() + "</a>");
 			}
-			if (soln.contains("daSchema") && !DAInfo.containsKey("daSchema_i")) {
-				key = "daSchema_i";
-				value = soln.get("daSchema").toString();
+			if (soln.contains("DataAcquisitionSchema") && !DAInfo.containsKey("DataAcquisitionSchema_i")) {
+				key = "DataAcquisitionSchema_i";
+				value = DynamicFunctions.replaceURLWithPrefix(soln.get("DataAcquisitionSchema").toString());
 				DAInfo.put(key, value);
 			}
-			if (soln.contains("method") && !DAInfo.containsKey("method_i")){
-				key = "method_i";
-				value = soln.get("method").toString();
+			if (soln.contains("Method") && !DAInfo.containsKey("Method_i")){
+				key = "Method_i";
+				value = DynamicFunctions.replaceURLWithPrefix(soln.get("Method").toString());
 				DAInfo.put(key, value);
 			}
-			if (soln.contains("deployment") && !DAInfo.containsKey("deployment_i")){
-				key = "deployment_i";
-				value = soln.get("deployment").toString();
+			if (soln.contains("Deployment") && !DAInfo.containsKey("Deployment_i")){
+				key = "Deployment_i";
+				value = DynamicFunctions.replaceURLWithPrefix(soln.get("Deployment").toString());
 				DAInfo.put(key, value);
 			}
-			if (soln.contains("comment") && !DAInfo.containsKey("comment_i")){
-				key = "comment_i";
-				value = soln.get("comment").toString();
+			if (soln.contains("Comment") && !DAInfo.containsKey("Comment_i")){
+				key = "Comment_i";
+				value = soln.get("Comment").toString();
 				DAInfo.put(key, value);
 			}
-			if (soln.contains("agent") && !DAInfo.containsKey("agent_i")){
-				key = "agent_i";
-				value = soln.get("agent").toString();
+			if (soln.contains("Agent") && !DAInfo.containsKey("Agent_i")){
+				key = "Agent_i";
+				value = DynamicFunctions.replaceURLWithPrefix(soln.get("Agent").toString());
 				DAInfo.put(key, value);
 			}
-			if (soln.contains("startTime") && !DAInfo.containsKey("startTime_i")){
-				key = "startTime_i";
-				value = soln.get("startTime").toString();
+			if (soln.contains("StartTime") && !DAInfo.containsKey("StartTime_i")){
+				key = "StartTime_i";
+				value = soln.get("StartTime").toString();
 				DAInfo.put(key, value);
 			}
-			if (soln.contains("endTime") && !DAInfo.containsKey("endTime_i")){
-				key = "endTime_i";
-				value = soln.get("endTime").toString();
+			if (soln.contains("EndTime") && !DAInfo.containsKey("EndTime_i")){
+				key = "EndTime_i";
+				value = soln.get("EndTime").toString();
 				DAInfo.put(key, value);
 			}
 		}
