@@ -182,6 +182,11 @@ public class Parser {
 							String subjectUri = subject.getUri();
 							subjectUri = Subject.checkObjectUri(subjectUri, measurementType.getCharacteristicUri());
 							measurement.setObjectUri(subjectUri);
+                                                        if (subjectUri.indexOf("mother") > -1) {
+							    measurement.setEntity("subject mother");    
+                                                        } else {
+							    measurement.setEntity("subject");
+							}
 						}
 						else {
 							measurement.setObjectUri("");
@@ -220,7 +225,9 @@ public class Parser {
 				measurement.setInstrumentUri(hadatacKb.getDeployment().getInstrument().getUri());
 				measurement.setPlatformName(hadatacKb.getDeployment().getPlatform().getLabel());
 				measurement.setPlatformUri(hadatacKb.getDeployment().getPlatform().getUri());
-				measurement.setEntity(measurementType.getEntityLabel());
+				if (!measurement.getEntity().startsWith("subject")) {
+				    measurement.setEntity(measurementType.getEntityLabel());
+				}
 				measurement.setEntityUri(measurementType.getEntityUri());
 				measurement.setDatasetUri(hadatacCcsv.getDatasetKbUri());
 				try {

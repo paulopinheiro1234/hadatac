@@ -160,14 +160,22 @@ public class Subject {
 	
 	public static String checkObjectUri(String obj_uri, String attr_uri) {
 		attr_uri = ValueCellProcessing.replacePrefixEx(attr_uri);
+                System.out.println("attr_uri: " + attr_uri);
 		String objUri = obj_uri;
         String queryString = NameSpaces.getInstance().printSparqlNameSpaceList()
-                + " SELECT ?s ?o WHERE {"
-                + " ?ar hasco:hasReference <" + attr_uri + "> . "
-                + " ?ar rdfs:label ?l ."
-                + " ?s hasco:hasAssociatedObject ?o . "
-                + " ?s rdfs:label ?l . "       
-                + " }";
+	        + " SELECT ?ar ?obj WHERE {"
+	        + "        ?ar rdf:type hasneto:DASchemaAttribute . " 
+	        + "        ?ar hasneto:hasAttribute <" + attr_uri + "> . "
+	        + "        ?ar hasco:hasAssociatedObject ?obj  ."
+	        + " }";
+        
+        //String queryString = NameSpaces.getInstance().printSparqlNameSpaceList()
+        //        + " SELECT ?s ?o WHERE {"
+        //        + " ?ar hasco:hasReference <" + attr_uri + "> . "
+        //        + " ?ar rdfs:label ?l ."
+        //        + " ?s hasco:hasAssociatedObject ?o . "
+        //        + " ?s rdfs:label ?l . "       
+        //        + " }";
         
         Query query = QueryFactory.create(queryString);
         QueryExecution qexec = QueryExecutionFactory.sparqlService(
@@ -179,11 +187,13 @@ public class Subject {
         //System.out.println("resultsrw.size(): " + resultsrw.size());
         if (resultsrw.size() > 0) {
             QuerySolution soln = resultsrw.next();
-            if (null != soln.getResource("o")) {
-            	String attributeAssociation = soln.getResource("o").toString();
-            	//System.out.println("attributeAssociation: " + attributeAssociation);
+            if (null != soln.getResource("obj")) {
+            	String attributeAssociation = soln.getResource("obj").toString();
+            	System.out.println("attributeAssociation: " + attributeAssociation);
+            	System.out.println("attributeAssociation pair: " + ValueCellProcessing.replacePrefixEx("chear-kb:ObjectTypeMother"));
             	if (attributeAssociation.equals(ValueCellProcessing.replacePrefixEx("chear-kb:ObjectTypeMother"))) {
             		String motherUri = obj_uri + "-mother";
+            	        System.out.println("motherUri: " + motherUri);
             		
             		Model model = ModelFactory.createDefaultModel();
             		DatasetAccessor accessor = DatasetAccessorFactory.createHTTP(
@@ -198,7 +208,7 @@ public class Subject {
 
             		accessor.add(model);
             		objUri = motherUri;
-            		//System.out.println("================================== Changed to: " + motherUri);
+            		System.out.println("================================== Changed to: " + motherUri);
             	}
             }
         }
