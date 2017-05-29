@@ -168,7 +168,7 @@ public class ViewStudy extends Controller {
 				+ "			  ?agent foaf:name ?agentName } . "
 				+ "OPTIONAL { ?studyUri hasco:hasInstitution ?institution . "
 				+ "			  ?institution foaf:name ?institutionName } . "
-				+ "}" ;
+				+ "} " ;
 		Map<String, List<String>> poResult = new HashMap<String, List<String>>();
 		List<String> values = new ArrayList<String>();
 		try {
@@ -211,16 +211,17 @@ public class ViewStudy extends Controller {
 	
 	public static Map<String, List<String>> findSubject(String study_uri) {
 		String subjectQueryString = "";
-    	subjectQueryString += NameSpaces.getInstance().printSparqlNameSpaceList(); 
-    	subjectQueryString += "SELECT ?subjectUri ?subjectType ?subjectLabel ?cohortLabel ?studyLabel WHERE { "
+    	        subjectQueryString += NameSpaces.getInstance().printSparqlNameSpaceList(); 
+    	        subjectQueryString += "SELECT ?subjectUri ?subjectType ?subjectLabel ?cohortLabel ?studyLabel WHERE { "
     			+ "?subjectUri hasco:isSubjectOf* ?cohort . "
     			+ "?cohort hasco:isCohortOf " + study_uri + " . "
     			+ study_uri + " rdfs:label ?studyLabel . "
     			+ "?cohort rdfs:label ?cohortLabel . "
     			+ "OPTIONAL { ?subjectUri rdfs:label ?subjectLabel } . "
     			+ "OPTIONAL { ?subjectUri a ?subjectType } . "
-    			+ "}";		
-    	Map<String, List<String>> subjectResult = new HashMap<String, List<String>>();
+    			+ "} "
+                        + "ORDER BY ?subjectUri";		
+          	Map<String, List<String>> subjectResult = new HashMap<String, List<String>>();
 		List<String> values = new ArrayList<String>();
 		try {
 			Query subjectQuery = QueryFactory.create(subjectQueryString);
@@ -237,7 +238,7 @@ public class ViewStudy extends Controller {
 		//		values.add("Type: " + cellProc.replaceNameSpaceEx(soln.get("subjectType").toString()));
 		//		values.add("Cohort: " + soln.get("cohortLabel").toString());
 		//		values.add("Study: " + soln.get("studyLabel").toString());
-				subjectResult.put(ValueCellProcessing.replaceNameSpaceEx(soln.get("subjectUri").toString()) ,values);		
+				subjectResult.put(ValueCellProcessing.replaceNameSpaceEx(soln.get("subjectUri").toString()) ,values);
 			}
 		} catch (QueryExceptionHTTP e) {
 			e.printStackTrace();
@@ -282,7 +283,7 @@ public class ViewStudy extends Controller {
 	    else{
 	    	results = UserManagement.getUriByEmail(user.getEmail());
 	    }
-	    System.out.println("This is the current user's uri:" + results);
+	    //System.out.println("This is the current user's uri:" + results);
 	    
 	    return results;
 	}

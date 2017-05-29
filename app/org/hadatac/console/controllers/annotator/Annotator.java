@@ -29,7 +29,7 @@ import be.objectify.deadbolt.java.actions.Restrict;
 public class Annotator extends Controller {
 
 	@Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    public static Result selectDeployment() {
+        public static Result selectDeployment() {
         SparqlQuery query = new SparqlQuery();
         GetSparqlQuery query_submit = new GetSparqlQuery(query);
         SparqlQueryResults theResults;

@@ -1,9 +1,9 @@
-@(studyResult	:	Map[String, List[String]],
-  subjectResult	:	Map[String, List[String]],
-  indicatorValues	:	Map[String,List[String]],
-  indicatorUris	:	Map[String,String],
-  showValues	:	Map[String,String],
-  scResult	:	List[String])
+@(studyResult	  :	Map[String, List[String]],
+  subjectResult	  :	Map[String, List[String]],
+  indicatorValues :	Map[String,List[String]],
+  indicatorUris	  :	Map[String,String],
+  showValues	  :	Map[String,String],
+  scResult	  :	List[String])
 
 @import org.hadatac.console.views.html._
 @import org.hadatac.utils._
@@ -135,11 +135,11 @@
 				
 				<div id="Subjects" class="tabcontent">
 						<ul>        		
-							@for(key <- subjectResult.keySet()){
+							@for((key,value) <- subjectResult) { 
 								<li><a href="@org.hadatac.console.controllers.metadataacquisition.routes.ViewSubject.index(showValues.get("study").toString(), key.toString())">@key.toString()</a>
 		
 									<ul>
-									@for(s <- subjectResult.get(key)) {
+									@for(s <- value) {
 									<li>@s.toString()</li>
 									}
 									</ul>

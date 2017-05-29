@@ -14,6 +14,7 @@ import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVRecord;
 
 public abstract class BasicGenerator {
+
 	protected Iterable<CSVRecord> records = null;
 	protected List< Map<String, Object> > rows = new ArrayList<Map<String, Object>>();
 	protected HashMap<String, String> mapCol = new HashMap<String, String>();
@@ -22,7 +23,7 @@ public abstract class BasicGenerator {
 	public BasicGenerator() {}
 	
 	public BasicGenerator(File file) {
-	    System.out.println("Inside BasicGenerator");
+	        //System.out.println("Inside BasicGenerator");
 		try {
 			records = CSVFormat.DEFAULT.withHeader().parse(new FileReader(file));
 			fileName = file.getName();
@@ -32,34 +33,37 @@ public abstract class BasicGenerator {
 			e.printStackTrace();
 		}
 		initMapping();
-		System.out.println("Exiting BasicGenerator");
+		//System.out.println("Exiting BasicGenerator");
 	}
 	
 	abstract void initMapping();
-    abstract Map<String, Object> createRow(CSVRecord rec, int row_number) throws Exception;
+
+        abstract Map<String, Object> createRow(CSVRecord rec, int row_number) throws Exception;
     
-    public List< Map<String, Object> > getRows() {
-    	return rows;
-    }
-    
-    public List< Map<String, Object> > createRows() throws Exception {
-    	rows.clear();
-    	int row_number = 0;
-    	for (CSVRecord record : records) {
-        	rows.add(createRow(record, ++row_number));
+        public List< Map<String, Object> > getRows() {
+    	    return rows;
         }
-    	
-    	return rows;
-    }
     
-    public String toString() {
-    	if(rows.isEmpty()) { 
+        public List< Map<String, Object> > createRows() throws Exception {
+    	    rows.clear();
+    	    int row_number = 0;
+    	    for (CSVRecord record : records) {
+           	Map<String, Object> tempRow = new HashMap<String, Object>();
+                tempRow = createRow(record, ++row_number);
+                if (tempRow != null) {
+        	   rows.add(tempRow);
+		}
+            }
+            return rows;
+        }
+    
+        public String toString() {
+    	    if(rows.isEmpty()) { 
     		return "";
-    	}
-    	
-    	String result = "";
-    	result = String.join(",", rows.get(0).keySet());
-    	for (Map<String, Object> row : rows) {
+    	    }
+            String result = "";
+    	    result = String.join(",", rows.get(0).keySet());
+    	    for (Map<String, Object> row : rows) {
     		List<String> values = new ArrayList<String>();
     		for (String colName : rows.get(0).keySet()) {
     			if (row.containsKey(colName)) {
@@ -71,8 +75,7 @@ public abstract class BasicGenerator {
     		}
     		result += "\n";
     		result += String.join(",", values);
-    	}
-    	
-    	return result;
-    }
+    	    }
+    	    return result;
+	}
 }

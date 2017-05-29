@@ -28,8 +28,8 @@ public class SampleSubjectMapper extends BasicGenerator {
 	@Override
 	void initMapping() {
 		mapCol.clear();
-        mapCol.put("originalPID", "patient_id");
-        mapCol.put("originalSID", "specimen_id");
+                mapCol.put("originalPID", "patient_id");
+                mapCol.put("originalSID", "specimen_id");
 	}
 	
 	private String getSampleUri(CSVRecord rec) {
@@ -45,16 +45,16 @@ public class SampleSubjectMapper extends BasicGenerator {
 			ResultSet results = qexec.execSelect();
 			ResultSetRewindable resultsrw = ResultSetFactory.copyResults(results);
 			qexec.close();
-	        if(resultsrw.hasNext()) {
-	            QuerySolution soln = resultsrw.next();
-	            if(soln.contains("s")){
-	            	sampleUri = DynamicFunctions.replaceURLWithPrefix(soln.get("s").toString());
-	            }
-	        }
+	                if(resultsrw.hasNext()) {
+	                   QuerySolution soln = resultsrw.next();
+	                   if(soln.contains("s")){
+	            	     sampleUri = DynamicFunctions.replaceURLWithPrefix(soln.get("s").toString());
+	                   }
+			}
 		} catch (QueryExceptionHTTP e) {
 			e.printStackTrace();
 		}
-		System.out.println("Sample:" + sampleUri);
+		//System.out.println("Sample:" + sampleUri);
 		return sampleUri;
 	}
 	
@@ -80,15 +80,21 @@ public class SampleSubjectMapper extends BasicGenerator {
 		} catch (QueryExceptionHTTP e) {
 			e.printStackTrace();
 		}
-		System.out.println("Subject:" + subjectUri);
+		//System.out.println("Subject:" + subjectUri);
 		return subjectUri;
 	}
 	
 	@Override
 	Map<String, Object> createRow(CSVRecord rec, int row_number) throws Exception {
-    	Map<String, Object> row = new HashMap<String, Object>();
-    	row.put("hasURI", getSampleUri(rec));
-    	row.put("hasco:isSampleOf", getSubjectUri(rec));
-    	return row;
-    }
+    	     Map<String, Object> row = new HashMap<String, Object>();
+             String sampleUri = getSampleUri(rec);
+             String subjectUri = getSubjectUri(rec);
+             if (sampleUri.equals("") || subjectUri.equals("")) {
+		 System.out.println("Mapping Sample(" + sampleUri + ") <-> Subject(" + subjectUri + ") rejected");
+		 return null;
+	     }
+    	     row.put("hasURI", sampleUri);
+    	     row.put("hasco:isSampleOf", subjectUri);
+    	     return row;
+	}
 }

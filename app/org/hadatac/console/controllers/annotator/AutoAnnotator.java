@@ -373,11 +373,12 @@ public class AutoAnnotator extends Controller {
 				bSucceed = annotateDataAcquisitionSchemaFile(new File(path_unproc + "/" + file_name));
 			}
 			if (bSucceed) {
+			        //System.out.println("Succeed: Entering");
 				//Move the file to the folder for processed files
 				File destFolder = new File(path_proc);
 				if (!destFolder.exists()){
 					destFolder.mkdirs();
-			    }
+				}
 				
 				file.delete();
 
@@ -387,7 +388,8 @@ public class AutoAnnotator extends Controller {
 				File f = new File(path_unproc + "/" + file_name);
 				f.renameTo(new File(destFolder + "/" + file_name));
 				f.delete();
-			}
+		   	        //System.out.println("Succeed: Leaving");
+   			}
 		}
 	}
 	
@@ -429,6 +431,7 @@ public class AutoAnnotator extends Controller {
         	bSuccess = commitRows(mapper.createRows(), mapper.toString(), 
         			file.getName(), "Sample", true);
     	} catch (Exception e) {
+	        e.printStackTrace();
     		AnnotationLog.printException(e, file.getName());
     		return false;
 		}
@@ -464,11 +467,11 @@ public class AutoAnnotator extends Controller {
     		SampleGenerator sampleGenerator = new SampleGenerator(file);
         	bSuccess = commitRows(sampleGenerator.createRows(), sampleGenerator.toString(), 
         			file.getName(), "Sample", true);
-        	
         	sampleGenerator = new SampleGenerator(file);
         	bSuccess = commitRows(sampleGenerator.createCollectionRows(), sampleGenerator.toString(), 
         			file.getName(), "SampleCollection", true);
     	} catch (Exception e) {
+	    e.printStackTrace();
     		AnnotationLog.printException(e, file.getName());
     		return false;
 		}
@@ -500,19 +503,19 @@ public class AutoAnnotator extends Controller {
 		String path = "/" + ConfigProp.getPropertyValue("labkey.config", "folder");
 		Credential cred = Credential.find();
 		
-        AnnotationLog log = AnnotationLog.find(fileName);
-        if (null == log) {
-        	log = new AnnotationLog();
-        	log.setFileName(fileName);
-        }
+                AnnotationLog log = AnnotationLog.find(fileName);
+                if (null == log) {
+        	    log = new AnnotationLog();
+        	    log.setFileName(fileName);
+                }
         
-        if (null == cred) {
-        	log.resetLog();
-        	log.addline(Feedback.println(Feedback.WEB, "[ERROR] No LabKey credentials are provided!"));
-    		log.save();
-    		return false;
-        }
-    	LabkeyDataHandler labkeyDataHandler = new LabkeyDataHandler(
+                if (null == cred) {
+        	    log.resetLog();
+        	    log.addline(Feedback.println(Feedback.WEB, "[ERROR] No LabKey credentials are provided!"));
+    		    log.save();
+    		    return false;
+                }
+    	        LabkeyDataHandler labkeyDataHandler = new LabkeyDataHandler(
     			site, cred.getUserName(), cred.getPassword(), path);
 		try {
 			log.addline(Feedback.println(Feedback.WEB, "The first Row is " + rows.get(0).toString()));
@@ -520,14 +523,18 @@ public class AutoAnnotator extends Controller {
 			log.addline(Feedback.println(Feedback.WEB, String.format(
 					"[OK] %d row(s) have been inserted into the %s table", nRows, tableName)));
 		} catch (CommandException e1) {
-			try {
+		    //System.out.println("CommitRows inside AutoAnnotator: Exception <e1>");
+		    e1.printStackTrace();
+          		try {
 				int nRows = labkeyDataHandler.updateRows(tableName, rows);
 				log.addline(Feedback.println(Feedback.WEB, String.format(
 						"[OK] %d row(s) have been updated into the %s table", nRows, tableName)));
 			} catch (CommandException e) {
+            		    System.out.println("CommitRows inside AutoAnnotator: Exception <e>");
+			    e.printStackTrace();
 				log.addline(Feedback.println(Feedback.WEB, "[ERROR] " + e));
-	    		log.save();
-	    		return false;
+	    		        log.save();
+	    		        return false;
 			}
 		}
 		
@@ -540,7 +547,8 @@ public class AutoAnnotator extends Controller {
 					"[OK] %d triple(s) have been committed to triple store", model.size())));
 		}
 		
-		log.addline(Feedback.println(Feedback.WEB, String.format(contentInCSV)));
+		// THIS LINE IS EXCEEDING THE STORAGE CAPABILITY OF ONE CELL IN THE SOLR DATA COLLECTION FOR ANNOTATION LOG
+		//log.addline(Feedback.println(Feedback.WEB, String.format(contentInCSV)));
 		log.save();
 		
 		return true;

@@ -5,20 +5,20 @@ import play.Play;
 public class Collections {
 
     // data and auxiliary data 
-    public static final String DATA_COLLECTION             = "/sdc";
+        public static final String DATA_COLLECTION             = "/sdc";
 	public static final String DATA_ACQUISITION            = "/measurement";
-	public static final String METADATA_AQUISITION		   = "/data_acquisitions";
-	public static final String SA_ACQUISITION           	= "/schema_attributes";
+	public static final String METADATA_AQUISITION	       = "/data_acquisitions";
+	public static final String SA_ACQUISITION              = "/schema_attributes";
 	public static final String CONSOLE_STORE               = "/console_store";
-	public static final String STUDIES		               = "/studies";
-	public static final String ANALYTES		               = "/analytes";
+	public static final String STUDIES		       = "/studies";
+	public static final String ANALYTES		       = "/analytes";
 	public static final String ANNOTATION_LOG              = "/annotation_log";
 	public static final String CSV_DATASET                 = "/csv";
 	public static final String LABKEY_CREDENTIAL           = "/labkey";
 	public static final String URI_GENERATOR               = "/uri_generator";
 	public static final String STUDY_ACQUISITION           = "/studies/select";
 	public static final String SAMPLES_ACQUISITION         = "/samples/select";
-	public static final String METADATA_DA			       = "/data_acquisitions/select";
+	public static final String METADATA_DA		       = "/data_acquisitions/select";
 	public static final String SUBJECTS_ACQUISITION	       = "/subjects/select";
 	public static final String ANALYTES_ACQUISITION        = "/analytes/select";
 	public static final String SCHEMA_ATTRIBUTES           = "/schema_attributes/select";
