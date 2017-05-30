@@ -1,9 +1,14 @@
 package org.hadatac.console.controllers.annotator;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
+import java.net.URL;
 import java.net.URLDecoder;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -13,6 +18,8 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.servlet.http.HttpServletResponse;
 
@@ -45,6 +52,7 @@ import org.hadatac.console.views.html.*;
 import org.hadatac.data.api.DataFactory;
 import org.hadatac.data.loader.DASchemaAttrGenerator;
 import org.hadatac.data.loader.DASchemaGenerator;
+import org.hadatac.data.loader.DASchemaObjectGenerator;
 import org.hadatac.data.loader.DataAcquisitionGenerator;
 import org.hadatac.data.loader.DeploymentGenerator;
 import org.hadatac.data.loader.GeneralGenerator;
@@ -591,33 +599,57 @@ public class AutoAnnotator extends Controller {
 	}
 	
 	public static boolean annotateDataAcquisitionSchemaFile(File file) {
-    	boolean bSuccess = true;	
-    	try {
-    		DASchemaAttrGenerator dasaGenerator = new DASchemaAttrGenerator(file);
-    		bSuccess = commitRows(dasaGenerator.createRows(), dasaGenerator.toString(), 
-    				file.getName(), "DASchemaAttribute", true);
-    		
-//			System.out.println("Calling DASchemaGenerator");
-//			System.out.println("Calling DASchemaGenerator input:" + file);
-//    		DASchemaGenerator dasGenerator = new DASchemaGenerator(file);
-        	
-        	GeneralGenerator generalGenerator = new GeneralGenerator();
-        	int pos = file.getName().indexOf("PS") + 2;
-        	Map<String, Object> row = new HashMap<String, Object>();
-        	row.put("hasURI", "chear-kb:DAS-" + file.getName().replace(".csv",""));
-        	row.put("a", "hasco:DASchema");
-        	row.put("rdfs:label", "Schema for Pilot Study" + file.getName().substring(pos, pos + 1) + "EPI Data Acquisitions");
-        	row.put("rdfs:comment", "");
-        	row.put("hasco:isSchemaOf", "chear-kb:STD-Pilot-" + (file.getName().substring(pos, pos + 1)));
-        	generalGenerator.addRow(row);
-    		
-        	bSuccess = commitRows(generalGenerator.getRows(), generalGenerator.toString(), file.getName(), 
-        			"DASchema", true);
-    	} catch (Exception e) {
-    		AnnotationLog.printException(e, file.getName());
-    		return false;
-		}
+        
+    	boolean bSuccess = true;
+    	try{
+	        BufferedReader bufRdr;
+	        bufRdr = new BufferedReader(new FileReader(file));
+	        String line = null;
+	        HashMap<String, String> hm = new HashMap<String, String>();
+	        while((line = bufRdr.readLine()) != null) {
+	        	hm.put(line.split(",")[0], line.split(",")[1]);
+	        }
+	        URL url = new URL(hm.get("Data_Dictionary"));
+	        System.out.println(url.toString());
+	        File fff = new File(file.getName());
+	        System.out.println(fff.getAbsoluteFile());
+	        FileUtils.copyURLToFile(url, fff);
+	        bufRdr.close();
+	//        System.out.println(hm.keySet());
+	    	
+		    	try {
+		    		
+		    		DASchemaObjectGenerator dasoGenerator = new DASchemaObjectGenerator(fff);
+		    		System.out.println("Calling DASchemaObjectGenerator");
+		    		bSuccess = commitRows(dasoGenerator.createRows(), dasoGenerator.toString(), 
+		    				file.getName(), "DASchemaObject", true);
+		    		
+		    		
+		    		DASchemaAttrGenerator dasaGenerator = new DASchemaAttrGenerator(fff);
+		    		System.out.println("Calling DASchemaAttrGenerator");
+		    		bSuccess = commitRows(dasaGenerator.createRows(), dasaGenerator.toString(), 
+		    				file.getName(), "DASchemaAttribute", true);
+		        	
+		        	GeneralGenerator generalGenerator = new GeneralGenerator();
 
+		        	Map<String, Object> row = new HashMap<String, Object>();
+		        	row.put("hasURI", "chear-kb:DAS-" + file.getName().replace(".csv",""));
+		        	row.put("a", "hasco:DASchema");
+		        	row.put("rdfs:label", "Schema for Pilot Study" + file.getName().replaceAll("\\D+","") + "EPI Data Acquisitions");
+		        	row.put("rdfs:comment", "");
+		        	row.put("hasco:isSchemaOf", "chear-kb:STD-Pilot-" + file.getName().replaceAll("\\D+",""));
+		        	generalGenerator.addRow(row);
+		    		
+		        	bSuccess = commitRows(generalGenerator.getRows(), generalGenerator.toString(), file.getName(), 
+		        			"DASchema", true);
+		    	} catch (Exception e) {
+		    		AnnotationLog.printException(e, file.getName());
+		    		return false;
+				}
+	    	} catch (Exception e) {
+	    		AnnotationLog.printException(e, file.getName());
+	    		return false;
+	    	}
 		return bSuccess;
 	}
 	

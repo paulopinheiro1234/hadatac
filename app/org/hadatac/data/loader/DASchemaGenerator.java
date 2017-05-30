@@ -6,6 +6,8 @@ import java.util.Map;
 
 import org.apache.commons.csv.CSVRecord;
 
+import org.apache.commons.io.FileUtils;
+
 public class DASchemaGenerator extends BasicGenerator {
 	final String kbPrefix = "chear-kb:";
 	String startTime = "";

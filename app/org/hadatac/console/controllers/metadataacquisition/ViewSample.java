@@ -45,47 +45,27 @@ import be.objectify.deadbolt.java.actions.Restrict;
 
 public class ViewSample extends Controller {
 
-	public static Map<String, String> findSampleIndicators(String sample_uri) {
-		
-		Map<String, String> indicatorValues = new HashMap<String, String>();
-		
-		return indicatorValues;
-	}
+//	public static Map<String, String> findSampleIndicators(String sample_uri) {
+//		
+//		Map<String, String> indicatorValues = new HashMap<String, String>();
+//		
+//		return indicatorValues;
+//	}
 	
-	public static Map<String, List<String>> findBasic(String sample_uri, String study_uri) {
+	public static Map<String, List<String>> findBasic(String sample_uri) {
 
 		String sampleQueryString = "";
 		
-    	sampleQueryString = NameSpaces.getInstance().printSparqlNameSpaceList() +
-    	/*"PREFIX sio: <http://semanticscience.org/resource/>" + 
-    	"PREFIX chear: <http://hadatac.org/ont/chear#>" + 
-    	"PREFIX chear-kb: <http://hadatac.org/kb/chear#>" + 
-    	"PREFIX prov: <http://www.w3.org/ns/prov#>" + 
-    	"PREFIX hasco: <http://hadatac.org/ont/hasco/>" + 
-    	"PREFIX hasneto: <http://hadatac.org/ont/hasneto#>" + 
-    	"PREFIX dcterms: <http://purl.org/dc/terms/>" + 
-    	"PREFIX rdfs:<http://www.w3.org/2000/01/rdf-schema#>" + 
-    	"PREFIX skos: <http://www.w3.org/2004/02/skos/core#>" +
-    	"PREFIX foaf: <http://xmlns.com/foaf/0.1/>" + */
-         "SELECT ?originalID ?isSampleOf ?isObjectOf ?sampleType ?sampleLabel ?storageTempUnit ?samplingVolumeUnit ?comment" +
-		 "WHERE {	" + sample_uri + "rdfs:label ?sampleLabel . " +
-         				sample_uri + "rdfs:comment ?comment . " +
-         				sample_uri + "rdf:type	?sampleType . " +
-         				sample_uri + "<http://hadatac.org/ont/hasco/isObjectOf> ?isObjectOf . " +
-         				sample_uri + "<http://hadatac.org/ont/hasco/originalID> ?originalID . " +
-         				sample_uri + "<http://hadatac.org/ont/hasco/isSampleOf> ?isSampleOf . " +
-         				sample_uri + "<http://hadatac.org/ont/hasco/hasStorageTemperatureUnit> ?storageTempUnit . " +
-         				sample_uri + "<http://hadatac.org/ont/hasco/hasSamplingVolumeUnit> ?samplingVolumeUnit . }";
-	/*	
-		String basicQueryString = "";
-
-		basicQueryString = 
-    	
-    	"PREFIX prov: <http://www.w3.org/ns/prov#> "
-        + " PREFIX chear-kb: <http://hadatac.org/kb/chear#> "
-        + "SELECT * "
-        + "WHERE  {	" + subject_uri + " ?p ?o }";
-    */	
+    	sampleQueryString += NameSpaces.getInstance().printSparqlNameSpaceList();
+    	sampleQueryString += "SELECT ?originalID ?isSampleOf ?isObjectOf ?sampleType ?sampleLabel ?storageTempUnit ?samplingVolumeUnit ?comment WHERE { "
+    					+ sample_uri + " rdfs:label ?sampleLabel . "
+         				+ sample_uri + " rdfs:comment ?comment . "
+         				+ sample_uri + " rdf:type	?sampleType . "
+         				+ sample_uri + " <http://hadatac.org/ont/hasco/isObjectOf> ?isObjectOf . "
+         				+ sample_uri + " <http://hadatac.org/ont/hasco/originalID> ?originalID . "
+         				+ sample_uri + " <http://hadatac.org/ont/hasco/isSampleOf> ?isSampleOf . "
+         				+ sample_uri + " <http://hadatac.org/ont/hasco/hasStorageTemperatureUnit> ?storageTempUnit . "
+         				+ sample_uri + " <http://hadatac.org/ont/hasco/hasSamplingVolumeUnit> ?samplingVolumeUnit . }";
     	
         
 		//Query basicQuery = QueryFactory.create(basicQueryString);
@@ -111,8 +91,8 @@ public class ViewSample extends Controller {
 			values.add("Sample Volume Unit: " + soln.get("samplingVolumeUnit").toString());
 			values.add("Storage Temperature Unit: " + soln.get("storageTempUnit").toString());
 			values.add("Comment: " + soln.get("comment").toString());
-			sampleResult.put(soln.get("sampleUri").toString(),values);	
-			System.out.println("THIS IS SUBROW*********" + sampleResult);	
+			sampleResult.put(sample_uri,values);
+			System.out.println("THIS IS SUBROW*********" + sampleResult);
 		}
 
 		return sampleResult;
@@ -141,8 +121,8 @@ public class ViewSample extends Controller {
 	@Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
     public static Result index(String sample_uri, String study_uri, String subject_uri) {
 
-		Map<String, String> indicatorValues = findSampleIndicators(sample_uri);
-    	Map<String, List<String>> sampleResult = findBasic(sample_uri, study_uri);
+		Map<String, String> indicatorValues = new HashMap<String, String>();
+    	Map<String, List<String>> sampleResult = findBasic(sample_uri);
     	String samplevalues = findValues(sample_uri, study_uri, subject_uri);
         
     	return ok(viewSample.render(sampleResult,indicatorValues, samplevalues));   
