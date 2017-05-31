@@ -38,7 +38,7 @@ public class SubjectGenerator extends BasicGenerator {
 		int count = 0;
 		String subjectCountQuery = NameSpaces.getInstance().printSparqlNameSpaceList() 
 				+ " SELECT (count(DISTINCT ?subjectURI) as ?subjectCount) WHERE { "
-				+ " ?subjectURI hasco:isSubjectOf chear-kb:CH-Pilot-" + pilotNum + " . "
+				+ " ?subjectURI hasco:isSubjectOf chear-kb:CH-" + pilotNum + " . "
 				+ " }";
 		QueryExecution qexecSubject = QueryExecutionFactory.sparqlService(Collections.getCollectionsName(Collections.METADATA_SPARQL), subjectCountQuery);
 		ResultSet subjectResults = qexecSubject.execSelect();
@@ -58,13 +58,13 @@ public class SubjectGenerator extends BasicGenerator {
 	
 	private String getUri(CSVRecord rec) { 
 		return kbPrefix + "SBJ-" + String.format("%04d", counter + getSubjectCount(rec.get(mapCol.get("pilotNum"))))
-			+ "-Pilot-" + rec.get(mapCol.get("pilotNum")); 
+			+ "-" + rec.get(mapCol.get("pilotNum")); 
 	}
 	private String getType() {
 		return "sio:Human";
 	}
 	private String getLabel(CSVRecord rec) {
-		return "ID " + String.format("%04d", counter + getSubjectCount(rec.get(mapCol.get("pilotNum")))) + " - Pilot " 
+		return "ID " + String.format("%04d", counter + getSubjectCount(rec.get(mapCol.get("pilotNum")))) + " - " 
 			+ rec.get(mapCol.get("pilotNum"));
 	}
     private String getOriginalID(CSVRecord rec) {
@@ -72,15 +72,15 @@ public class SubjectGenerator extends BasicGenerator {
     }
     
     private String getStudyUri(CSVRecord rec) {
-    	return kbPrefix + "STD-Pilot-" + rec.get(mapCol.get("pilotNum"));
+    	return kbPrefix + "STD-" + rec.get(mapCol.get("pilotNum"));
     }
     
     private String getCohortUri(CSVRecord rec) {
-    	return kbPrefix + "CH-Pilot-" + rec.get(mapCol.get("pilotNum"));
+    	return kbPrefix + "CH-" + rec.get(mapCol.get("pilotNum"));
     }
     
     private String getCohortLabel(CSVRecord rec) {
-    	return "Cohort of Pilot Study " + rec.get(mapCol.get("pilotNum"));
+    	return "Cohort of Study " + rec.get(mapCol.get("pilotNum"));
     }
     
     @Override

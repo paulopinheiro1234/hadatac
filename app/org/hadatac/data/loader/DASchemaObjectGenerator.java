@@ -78,7 +78,7 @@ public class DASchemaObjectGenerator extends BasicGenerator {
     	if (rec.get(mapCol.get("InRelationTo")) == null || rec.get(mapCol.get("InRelationTo")).equals("")){
     		return "";
     	} else {
-    		return kbPrefix + "DASO-" + rec.get(mapCol.get("InRelationTo")).replace("??", "") + "-Pilot-Study-" + SDDName.replaceAll("\\D+","");
+    		return kbPrefix + "DASO-" + rec.get(mapCol.get("InRelationTo")).replace("??", "") + "-Study-" + SDDName.replaceAll("\\D+","");
     	}
     }
     
@@ -121,7 +121,7 @@ public class DASchemaObjectGenerator extends BasicGenerator {
     @Override
     Map<String, Object> createRow(CSVRecord rec, int row_number) throws Exception {
     	Map<String, Object> row = new HashMap<String, Object>();
-    	row.put("hasURI", kbPrefix + "DASO-" + getLabel(rec).replace("_","-").replace("??", "") + "-Pilot-Study-" + SDDName.replaceAll("\\D+",""));
+    	row.put("hasURI", kbPrefix + "DASO-" + getLabel(rec).replace("_","-").replace("??", "") + "-Study-" + SDDName.replaceAll("\\D+",""));
     	row.put("a", "hasco:DASchemaObject");
     	row.put("hasco:partOfSchema", kbPrefix + "DAS-" + SDDName.replace(".csv", ""));
     	row.put("hasco:hasEntity", getEntity(rec));

@@ -69,7 +69,7 @@ public class SampleGenerator extends BasicGenerator {
 		String sampleCountQuery = NameSpaces.getInstance().printSparqlNameSpaceList() 
 				+ " SELECT (count(DISTINCT ?sampleURI) as ?sampleCount) WHERE { "
 				+ " ?sampleURI hasco:isObjectOf ?SC . "
-				+ " ?SC hasco:isSampleCollectionOf chear-kb:STD-Pilot-" + pilotNum + " . "
+				+ " ?SC hasco:isSampleCollectionOf chear-kb:STD-" + pilotNum + " . "
 				+ "}";
 		QueryExecution qexecSample = QueryExecutionFactory.sparqlService(
 				Collections.getCollectionsName(Collections.METADATA_SPARQL), sampleCountQuery);
@@ -89,7 +89,7 @@ public class SampleGenerator extends BasicGenerator {
 	
 	private String getUri(CSVRecord rec) {
 		return kbPrefix + "SPL-" + String.format("%04d", counter + getSampleCount(rec.get(mapCol.get("pilotNum")))) 
-			+ "-Pilot-" + rec.get(mapCol.get("pilotNum")); //  + "-" + getSampleSuffix()
+			+ "-" + rec.get(mapCol.get("pilotNum")); //  + "-" + getSampleSuffix()
 	}
 	
 	private String getType(CSVRecord rec) {
@@ -101,7 +101,7 @@ public class SampleGenerator extends BasicGenerator {
 	}
 	
 	private String getLabel(CSVRecord rec) {
-		return "SID " + String.format("%04d", counter + getSampleCount(rec.get(mapCol.get("pilotNum")))) + " - Pilot " 
+		return "SID " + String.format("%04d", counter + getSampleCount(rec.get(mapCol.get("pilotNum")))) + " - " 
 			+ rec.get(mapCol.get("pilotNum")) + " " + getSampleSuffix(rec);
 	}
 	
@@ -141,7 +141,7 @@ public class SampleGenerator extends BasicGenerator {
     
     private String getComment(CSVRecord rec) {
     	return "Sample " + String.format("%04d", counter + getSampleCount(rec.get(mapCol.get("pilotNum")))) 
-    		+ " for Pilot " + rec.get(mapCol.get("pilotNum")) + " " + getSampleSuffix(rec);
+    		+ " for " + rec.get(mapCol.get("pilotNum")) + " " + getSampleSuffix(rec);
     }
     
     private String getSamplingMethod(CSVRecord rec) {
@@ -198,15 +198,15 @@ public class SampleGenerator extends BasicGenerator {
     }
     
     private String getStudyUri(CSVRecord rec) {
-    	return kbPrefix + "STD-Pilot-" + rec.get(mapCol.get("pilotNum"));
+    	return kbPrefix + "STD-" + rec.get(mapCol.get("pilotNum"));
     }
     
     private String getCollectionUri(CSVRecord rec) {
-    	return kbPrefix + "SC-Pilot-" + rec.get(mapCol.get("pilotNum"));
+    	return kbPrefix + "SC-" + rec.get(mapCol.get("pilotNum"));
     }
     
     private String getCollectionLabel(CSVRecord rec) {
-    	return "Sample Collection of Pilot Study " + rec.get(mapCol.get("pilotNum"));
+    	return "Sample Collection of Study " + rec.get(mapCol.get("pilotNum"));
     }
     
     public Map<String, Object> createCollectionRow(CSVRecord rec) {

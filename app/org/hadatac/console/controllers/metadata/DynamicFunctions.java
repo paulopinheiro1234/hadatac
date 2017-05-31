@@ -639,16 +639,16 @@ public class DynamicFunctions extends Controller {
     	Map<String,List<String>> valueMapJustLabels = getIndicatorValuesJustLabels(indicators);
     	//System.out.println("Indicator Values Just Labels: " + valueMapJustLabels + "\n");
     	//System.out.println(replaceURLWithPrefix("http://hadatac.org/ont/chear#BloodPlasma"));
-    	//System.out.println(findSubject("chear-kb:SBJ-0032-Pilot-6"));
+    	//System.out.println(findSubject("chear-kb:SBJ-0032-6"));
     	
-    	//System.out.println(findStudy("chear-kb:STD-Pilot-3"));
+    	//System.out.println(findStudy("chear-kb:STD-3"));
     	//System.out.println("Studies: " + findStudies());
     	
     	//System.out.println(findSamples());
-    	//System.out.println(findSampleBySubject("chear-kb:SBJ-0032-Pilot-6"));
-    	//System.out.println(findSample("chear-kb:SPL-0032-Pilot-6-Urine-ICP-MS"));
+    	//System.out.println(findSampleBySubject("chear-kb:SBJ-0032-6"));
+    	//System.out.println(findSample("chear-kb:SPL-0032-6-Urine-ICP-MS"));
     	
-    	//System.out.println(findSubject("chear-kb:SBJ-0032-Pilot-6"));
+    	//System.out.println(findSubject("chear-kb:SBJ-0032-6"));
     	//System.out.println(findSubjects());
     	//System.out.println(replaceTabNameWithConcept("ReproductiveHealth"));
     	//System.out.println(getPrefixes());

@@ -635,9 +635,9 @@ public class AutoAnnotator extends Controller {
 		        	Map<String, Object> row = new HashMap<String, Object>();
 		        	row.put("hasURI", "chear-kb:DAS-" + file.getName().replace(".csv",""));
 		        	row.put("a", "hasco:DASchema");
-		        	row.put("rdfs:label", "Schema for Pilot Study" + file.getName().replaceAll("\\D+","") + "EPI Data Acquisitions");
+		        	row.put("rdfs:label", "Schema for Study" + file.getName().replaceAll("\\D+","") + "EPI Data Acquisitions");
 		        	row.put("rdfs:comment", "");
-		        	row.put("hasco:isSchemaOf", "chear-kb:STD-Pilot-" + file.getName().replaceAll("\\D+",""));
+		        	row.put("hasco:isSchemaOf", "chear-kb:STD-" + file.getName().replaceAll("\\D+",""));
 		        	generalGenerator.addRow(row);
 		    		
 		        	bSuccess = commitRows(generalGenerator.getRows(), generalGenerator.toString(), file.getName(), 

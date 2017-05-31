@@ -91,7 +91,7 @@ public class DataAcquisitionGenerator extends BasicGenerator {
     	row.put("rdfs:label", getDataAcquisitionName(rec));
     	row.put("hasneto:hasDeployment", kbPrefix + "DPL-" + getDataAcquisitionName(rec));
     	row.put("hasco:hasMethod", getMethod(rec));
-    	row.put("hasco:isDataAcquisitionOf", kbPrefix + "STD-Pilot-" + getStudy(rec));
+    	row.put("hasco:isDataAcquisitionOf", kbPrefix + "STD-" + getStudy(rec));
     	if (startTime.isEmpty()) {
         	row.put("prov:startedAtTime", (new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'")).format(new Date()));
     	} else {

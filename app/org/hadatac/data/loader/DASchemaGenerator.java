@@ -29,7 +29,7 @@ public class DASchemaGenerator extends BasicGenerator {
 	}
 	
     private String getLabel() {
-    	return "Schema for Pilot Study" + mapCol.get("Study") + "EPI Data Acquisitions";
+    	return "Schema for Study " + mapCol.get("Study") + " EPI Data Acquisitions";
     }
     
     private String getComment() {
@@ -44,7 +44,7 @@ public class DASchemaGenerator extends BasicGenerator {
     	row.put("a", "hasco:DASchema");
     	row.put("rdfs:label", getLabel());
     	row.put("rdfs:comment", getComment());
-    	row.put("hasco:isSchemaOf", kbPrefix + "STD-Pilot-" + mapCol.get("Study"));
+    	row.put("hasco:isSchemaOf", kbPrefix + "STD-" + mapCol.get("Study"));
     	
     	return row;
     }

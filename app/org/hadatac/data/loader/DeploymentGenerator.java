@@ -118,7 +118,7 @@ public class DeploymentGenerator extends BasicGenerator {
     }
     
     private String getStudy(CSVRecord rec) {
-    	return kbPrefix + "STD-Pilot-" + rec.get(mapCol.get("Study"));
+    	return kbPrefix + "STD-" + rec.get(mapCol.get("Study"));
     }
     
     private String getDataDictionaryName(CSVRecord rec) {
