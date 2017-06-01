@@ -50,6 +50,7 @@ import org.hadatac.console.views.html.annotator.*;
 import org.hadatac.console.views.html.triplestore.*;
 import org.hadatac.console.views.html.*;
 import org.hadatac.data.api.DataFactory;
+import org.hadatac.data.loader.AgentGenerator;
 import org.hadatac.data.loader.DASchemaAttrGenerator;
 import org.hadatac.data.loader.DASchemaGenerator;
 import org.hadatac.data.loader.DASchemaObjectGenerator;
@@ -450,17 +451,29 @@ public class AutoAnnotator extends Controller {
 	public static boolean annotateStudyIdFile(File file) {
 		boolean bSuccess = true;
     	try {
+
     		StudyGenerator studyGenerator = new StudyGenerator(file);
         	bSuccess = commitRows(studyGenerator.createRows(), studyGenerator.toString(), 
-        			file.getName(), "Study", true);
+        			file.getName(), "Study", true);        	
         	
-        	studyGenerator = new StudyGenerator(file);
+/*        	studyGenerator = new StudyGenerator(file);
         	bSuccess = commitRows(studyGenerator.createAgentRows(), studyGenerator.toString(), 
         			file.getName(), "Agent", true);
         	
         	studyGenerator = new StudyGenerator(file);
         	bSuccess = commitRows(studyGenerator.createInstitutionRows(), studyGenerator.toString(), 
         			file.getName(), "Agent", true);
+        			*/
+    	} catch (Exception e) {
+    		AnnotationLog.printException(e, file.getName());
+    		return false;
+		}
+    	
+    	try {
+        	AgentGenerator agentGenerator = new AgentGenerator(file);
+        	bSuccess = commitRows(agentGenerator.createRows(), agentGenerator.toString(), 
+        			file.getName(), "Agent", true);
+        	
     	} catch (Exception e) {
     		AnnotationLog.printException(e, file.getName());
     		return false;

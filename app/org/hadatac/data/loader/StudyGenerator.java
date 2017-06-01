@@ -33,6 +33,17 @@ public class StudyGenerator extends BasicGenerator {
         mapCol.put("PIZipCode", "PI Zip Code");
         mapCol.put("PIEmail", "Email");
         mapCol.put("PIPhone", "PI Phone");
+        mapCol.put("CPI1FName", "Co-PI 1 First Name");
+        mapCol.put("CPI1LName", "Co-PI 1 Last Name");
+        mapCol.put("CPI1Email", "Co-PI 1 Email");
+        mapCol.put("CPI2FName", "Co-PI 2 First Name");
+        mapCol.put("CPI2LName", "Co-PI 2 Last Name");
+        mapCol.put("CPI2Email", "Co-PI 2 Email");
+        mapCol.put("contactFName", "Contact First Name");
+        mapCol.put("contactLName", "Contact Last Name");
+        mapCol.put("contactEmail", "Contact Email");
+        mapCol.put("createdDate","Project Created Date");
+        mapCol.put("updatedDate","Project Last Updated Date");
         mapCol.put("DCAccessBool", "DC Access?");
 	}
 	
@@ -57,18 +68,18 @@ public class StudyGenerator extends BasicGenerator {
 	}
 	
 	private String getInstitutionUri(CSVRecord rec) {
-		return kbPrefix + "ORG-" + rec.get(mapCol.get("institution")).replaceAll(" ", "-"); 
+		return kbPrefix + "ORG-" + rec.get(mapCol.get("institution")).replaceAll(" ", "-").replaceAll(",", "").replaceAll("'", ""); 
 	}
 	
-	private String getInstitutionName(CSVRecord rec) {
+/*	private String getInstitutionName(CSVRecord rec) {
 		return rec.get(mapCol.get("institution")); 
 	}
-	
+	*/
 	private String getAgentUri(CSVRecord rec) {
 		return kbPrefix + "PER-" + rec.get(mapCol.get("PI")).replaceAll(" ", "-"); 
 	}
 	
-	private String getAgentFullName(CSVRecord rec) {
+/*	private String getAgentFullName(CSVRecord rec) {
 		return rec.get(mapCol.get("PI")); 
 	}
 	
@@ -83,7 +94,7 @@ public class StudyGenerator extends BasicGenerator {
 	private String getAgentMBox(CSVRecord rec) {
 		return rec.get(mapCol.get("PIEmail")); 
 	}
-    
+*/    
 	@Override
     public Map<String, Object> createRow(CSVRecord rec, int row_number) throws Exception {
     	Map<String, Object> row = new HashMap<String, Object>();
@@ -92,14 +103,18 @@ public class StudyGenerator extends BasicGenerator {
     	row.put("rdfs:label", getTitle(rec));
     	row.put("skos:definition", getAims(rec));
     	row.put("rdfs:comment", getSignificance(rec));
-    	row.put("hasco:hasAgent", getAgentUri(rec));
-    	row.put("hasco:hasInstitution", getInstitutionUri(rec));
+    	if(rec.get(mapCol.get("PI")).length()>0){
+    		row.put("hasco:hasAgent", getAgentUri(rec));
+    	}
+    	if(rec.get(mapCol.get("institution")).length()>0){
+    		row.put("hasco:hasInstitution", getInstitutionUri(rec));
+    	}
     	counter++;
     	
     	return row;
     }
     
-    public Map<String, Object> createAgentRow(CSVRecord rec) {
+	/*public Map<String, Object> createAgentRow(CSVRecord rec) {
     	Map<String, Object> row = new HashMap<String, Object>();
     	row.put("hasURI", getAgentUri(rec));
     	row.put("a", "prov:Person");
@@ -139,5 +154,5 @@ public class StudyGenerator extends BasicGenerator {
     		rows.add(createInstitutionRow(record));
     	}
     	return rows;
-    }
+    }*/
 }
