@@ -91,6 +91,7 @@ public class AutoAnnotator extends Controller {
 	
 	public static HashMap<String, String> codeMappings = new HashMap<String, String>();
 	public static HashMap<String, String> entityMappings = new HashMap<String, String>();
+	public static String study_id;
 	
 	private static boolean search(String fileName, List<DataFile> pool) {
 		for (DataFile file : pool) {
@@ -638,6 +639,8 @@ public class AutoAnnotator extends Controller {
 	        
 	        BufferedReader br = new BufferedReader(new FileReader(cm));
 	        String line2 =  null;
+	        
+	        study_id = hm.get("Study_ID");
 
 	        while((line2 = br.readLine()) != null){
 	            String str[] = line2.split(",");
@@ -666,9 +669,9 @@ public class AutoAnnotator extends Controller {
 		        	Map<String, Object> row = new HashMap<String, Object>();
 		        	row.put("hasURI", "chear-kb:DAS-" + file.getName().replace(".csv",""));
 		        	row.put("a", "hasco:DASchema");
-		        	row.put("rdfs:label", "Schema for Study" + file.getName().replaceAll("\\D+","") + "EPI Data Acquisitions");
+		        	row.put("rdfs:label", "Schema for Study " + study_id + " EPI Data Acquisitions");
 		        	row.put("rdfs:comment", "");
-		        	row.put("hasco:isSchemaOf", "chear-kb:STD-" + file.getName().replaceAll("\\D+",""));
+		        	row.put("hasco:isSchemaOf", "chear-kb:STD-" + study_id);
 		        	generalGenerator.addRow(row);
 		    		
 		        	bSuccess = commitRows(generalGenerator.getRows(), generalGenerator.toString(), file.getName(), 
