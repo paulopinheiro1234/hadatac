@@ -1,7 +1,12 @@
 package org.hadatac.data.loader;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileReader;
+
 import org.apache.commons.io.FileUtils;
+import org.hadatac.console.controllers.annotator.AutoAnnotator;
+
 import java.lang.String;
 import java.util.HashMap;
 import java.util.List;
@@ -13,10 +18,30 @@ public class DASchemaAttrGenerator extends BasicGenerator {
 	final String kbPrefix = "chear-kb:";
 	String startTime = "";
 	String SDDName = "";
+	HashMap<String, String> codeMap;
+	HashMap<String, String> hasEntityMap = new HashMap<String, String>();
+	
 	
 	public DASchemaAttrGenerator(File file) {
 		super(file);
 		this.SDDName = file.getName();
+		this.codeMap = AutoAnnotator.codeMappings;
+		
+		try {
+	        BufferedReader br = new BufferedReader(new FileReader(file));
+	        String line =  null;
+	
+	        while((line = br.readLine()) != null){
+	            String str[] = line.split(",");
+	            if (str[0].contains("??")){
+	            hasEntityMap.put(str[0], str[5]);
+	            System.out.println(str[0] + "-----" + str[5]);
+	        	}
+	        }
+			br.close();
+		} catch (Exception e) {
+			
+		}
 	}
 //Column	Attribute	attributeOf	Unit	Time	Entity	Role	Relation	inRelationTo	wasDerivedFrom	wasGeneratedBy	hasPosition	
 	@Override
@@ -34,12 +59,6 @@ public class DASchemaAttrGenerator extends BasicGenerator {
         mapCol.put("WasDerivedFrom", "wasDerivedFrom");       
         mapCol.put("WasGeneratedBy", "wasGeneratedBy");
         mapCol.put("HasPosition", "hasPosition");
-//        mapCol.put("??mother", "chear-kb:ObjectTypeMother");
-//        mapCol.put("??child", "chear-kb:ObjectTypeChild");
-//        mapCol.put("??birth", "chear-kb:ObjectTypeBirth");
-//        mapCol.put("??household", "chear-kb:ObjectTypeHousehold");
-//        mapCol.put("??headhousehold", "chear-kb:ObjectTypeHeadHousehold");
-//        mapCol.put("??father", "chear-kb:ObjectTypeFather");
 	}
     
     private String getLabel(CSVRecord rec) {
@@ -55,10 +74,10 @@ public class DASchemaAttrGenerator extends BasicGenerator {
     }
     
     private String getUnit(CSVRecord rec) {
-    	if (rec.get(mapCol.get("Unit")) != null) {
-    		return rec.get(mapCol.get("Unit"));
+    	if (codeMap.containsKey(rec.get(mapCol.get("Unit")))) {
+    		return codeMap.get(rec.get(mapCol.get("Unit")));
     	} else {
-    		return "";
+    		return "obo:UO_0000186";
     	}
     }
     
@@ -67,7 +86,12 @@ public class DASchemaAttrGenerator extends BasicGenerator {
     }
     
     private String getEntity(CSVRecord rec) {
-    	return rec.get(mapCol.get("Entity"));
+    	if ((rec.get(mapCol.get("AttributeOf"))) == null || (rec.get(mapCol.get("AttributeOf"))).equals("")) {
+    		return "chear:unknownEntity";
+    	} else {
+    		return hasEntityMap.get(rec.get(mapCol.get("AttributeOf")));
+    	}
+    	
     }
     
     private String getRole(CSVRecord rec) {
@@ -127,7 +151,7 @@ public class DASchemaAttrGenerator extends BasicGenerator {
     	row.put("rdfs:comment", getLabel(rec));
     	row.put("hasneto:partOfSchema", kbPrefix + "DAS-" + SDDName.replace(".csv", ""));
     	row.put("hasco:hasPosition", getPosition(rec));
-    	row.put("hasneto:hasEntity", "");
+    	row.put("hasneto:hasEntity", getEntity(rec));
     	row.put("hasneto:hasAttribute", getAttribute(rec));
     	row.put("hasneto:hasUnit", getUnit(rec));
     	row.put("hasco:hasSource", "");

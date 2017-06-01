@@ -89,6 +89,9 @@ import play.twirl.api.Html;
 
 public class AutoAnnotator extends Controller {
 	
+	public static HashMap<String, String> codeMappings = new HashMap<String, String>();
+	public static HashMap<String, String> entityMappings = new HashMap<String, String>();
+	
 	private static boolean search(String fileName, List<DataFile> pool) {
 		for (DataFile file : pool) {
 			if (file.getFileName().equals(fileName)) {
@@ -624,21 +627,37 @@ public class AutoAnnotator extends Controller {
 	        }
 	        URL url = new URL(hm.get("Data_Dictionary"));
 	        System.out.println(url.toString());
-	        File fff = new File(file.getName());
-	        System.out.println(fff.getAbsoluteFile());
-	        FileUtils.copyURLToFile(url, fff);
+	        File dd = new File(file.getName());
+	        System.out.println(dd.getAbsoluteFile());
+	        FileUtils.copyURLToFile(url, dd); 
+	        
+	        URL url2 = new URL(hm.get("Code_Mappings"));
+	        System.out.println(url2.toString());
+	        File cm = new File(file.getName().replace(".csv", "")+"-code-mappings.csv");
+	        System.out.println(cm.getAbsoluteFile());
+	        FileUtils.copyURLToFile(url2, cm);
+	        
+	        BufferedReader br = new BufferedReader(new FileReader(cm));
+	        String line2 =  null;
+
+	        while((line2 = br.readLine()) != null){
+	            String str[] = line2.split(",");
+	            codeMappings.put(str[0], str[1]);
+	        	}
+	        
 	        bufRdr.close();
+	        br.close();
 	//        System.out.println(hm.keySet());
 	    	
 		    	try {
 		    		
-		    		DASchemaObjectGenerator dasoGenerator = new DASchemaObjectGenerator(fff);
+		    		DASchemaObjectGenerator dasoGenerator = new DASchemaObjectGenerator(dd);
 		    		System.out.println("Calling DASchemaObjectGenerator");
 		    		bSuccess = commitRows(dasoGenerator.createRows(), dasoGenerator.toString(), 
 		    				file.getName(), "DASchemaObject", true);
 		    		
 		    		
-		    		DASchemaAttrGenerator dasaGenerator = new DASchemaAttrGenerator(fff);
+		    		DASchemaAttrGenerator dasaGenerator = new DASchemaAttrGenerator(dd);
 		    		System.out.println("Calling DASchemaAttrGenerator");
 		    		bSuccess = commitRows(dasaGenerator.createRows(), dasaGenerator.toString(), 
 		    				file.getName(), "DASchemaAttribute", true);
@@ -663,6 +682,7 @@ public class AutoAnnotator extends Controller {
 	    		AnnotationLog.printException(e, file.getName());
 	    		return false;
 	    	}
+    	
 		return bSuccess;
 	}
 	
