@@ -514,38 +514,37 @@ public class AutoAnnotator extends Controller {
 		String path = "/" + ConfigProp.getPropertyValue("labkey.config", "folder");
 		Credential cred = Credential.find();
 		
-                AnnotationLog log = AnnotationLog.find(fileName);
-                if (null == log) {
-        	    log = new AnnotationLog();
-        	    log.setFileName(fileName);
-                }
+		AnnotationLog log = AnnotationLog.find(fileName);
+		if (null == log) {
+			log = new AnnotationLog();
+			log.setFileName(fileName);
+		}
         
-                if (null == cred) {
-        	    log.resetLog();
-        	    log.addline(Feedback.println(Feedback.WEB, "[ERROR] No LabKey credentials are provided!"));
-    		    log.save();
-    		    return false;
-                }
-    	        LabkeyDataHandler labkeyDataHandler = new LabkeyDataHandler(
-    			site, cred.getUserName(), cred.getPassword(), path);
+		if (null == cred) {
+			log.resetLog();
+			log.addline(Feedback.println(Feedback.WEB, "[ERROR] No LabKey credentials are provided!"));
+			log.save();
+			
+			return false;
+		}
+		
+		LabkeyDataHandler labkeyDataHandler = new LabkeyDataHandler(
+				site, cred.getUserName(), cred.getPassword(), path);
 		try {
 			log.addline(Feedback.println(Feedback.WEB, "The first Row is " + rows.get(0).toString()));
 			int nRows = labkeyDataHandler.insertRows(tableName, rows);
 			log.addline(Feedback.println(Feedback.WEB, String.format(
 					"[OK] %d row(s) have been inserted into the %s table", nRows, tableName)));
 		} catch (CommandException e1) {
-		    //System.out.println("CommitRows inside AutoAnnotator: Exception <e1>");
-		    e1.printStackTrace();
-          		try {
+          	try {
+          		labkeyDataHandler.deleteRows(tableName, rows);
 				int nRows = labkeyDataHandler.updateRows(tableName, rows);
 				log.addline(Feedback.println(Feedback.WEB, String.format(
 						"[OK] %d row(s) have been updated into the %s table", nRows, tableName)));
 			} catch (CommandException e) {
-            		    System.out.println("CommitRows inside AutoAnnotator: Exception <e>");
-			    e.printStackTrace();
-				log.addline(Feedback.println(Feedback.WEB, "[ERROR] " + e));
-	    		        log.save();
-	    		        return false;
+				log.addline(Feedback.println(Feedback.WEB, "[ERROR] CommitRows inside AutoAnnotator: " + e));
+				log.save();
+				return false;
 			}
 		}
 		
