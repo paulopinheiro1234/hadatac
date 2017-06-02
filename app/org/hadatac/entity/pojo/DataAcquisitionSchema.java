@@ -87,6 +87,7 @@ public class DataAcquisitionSchema {
          	//System.out.println("Schema query: \n" + queryString);
 		
 		if (!resultsrw.hasNext()) {
+			System.out.println("[ERROR] DataAcquisitionSchema. Could not find schema: " + schemaUri);
 			return schema;
 		}
 		
@@ -95,6 +96,8 @@ public class DataAcquisitionSchema {
 		while (resultsrw.hasNext()) {
 		    QuerySolution soln = resultsrw.next();
 		
+		    String positionStr = "";
+
 		    try {
 			if (soln != null &&
                             soln.getLiteral("hasPosition") != null && soln.getLiteral("hasPosition").getString() != null &&
@@ -102,20 +105,23 @@ public class DataAcquisitionSchema {
 			    soln.getResource("hasAttribute") != null && soln.getResource("hasAttribute").getURI() != null &&
 			    soln.getResource("hasUnit") != null && soln.getResource("hasUnit").getURI() != null) {
 
+			    positionStr = soln.getLiteral("hasPosition").getString();
+			    
 			    SchemaAttribute sa = schema.new SchemaAttribute(
-					soln.getLiteral("hasPosition").getString(),
+					positionStr,
 					soln.getResource("hasEntity").getURI(),
 					soln.getResource("hasAttribute").getURI(),
 					soln.getResource("hasUnit").getURI());
 			    attributes.add(sa);
 			}
 		    }  catch (Exception e) {
-			System.out.println("[ERROR] DataAcquisitionSchema - e.Message: " + e.getMessage());
+			System.out.println("[ERROR] DataAcquisitionSchema. Position: " + positionStr + "  e.Message: " + e.getMessage());
                     }
 
 		}
 		
 		schema.setAttributes(attributes);
+
 		return schema;
     }
     

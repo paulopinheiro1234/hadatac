@@ -654,13 +654,13 @@ public class AutoAnnotator extends Controller {
 	        	hm.put(line.split(",")[0], line.split(",")[1]);
 	        }
 	        URL url = new URL(hm.get("Data_Dictionary"));
-	        System.out.println(url.toString());
+	        //System.out.println(url.toString());
 	        File dd = new File(file.getName());
-	        System.out.println(dd.getAbsoluteFile());
+	        //System.out.println(dd.getAbsoluteFile());
 	        FileUtils.copyURLToFile(url, dd); 
 	        
 	        URL url2 = new URL(hm.get("Code_Mappings"));
-	        System.out.println(url2.toString());
+	        //System.out.println(url2.toString());
 	        File cm = new File(file.getName().replace(".csv", "")+"-code-mappings.csv");
 	        System.out.println(cm.getAbsoluteFile());
 	        FileUtils.copyURLToFile(url2, cm);
@@ -875,15 +875,17 @@ public class AutoAnnotator extends Controller {
 			}
 			
 			for (DataAcquisitionSchema.SchemaAttribute attribute : schema.getAttributes()) {
-				int i = Integer.parseInt(attribute.getPosition());
-				String entity = attribute.getEntity();
-				String attrib = attribute.getAttribute();
-				String unit = attribute.getUnit();
-                                //System.out.println("ATTRIBUTE: pos:" + i + " entity:" + entity + " attribute:" + attrib + " unit:" + unit);  
 
-				if (unit.equals(Downloads.FRAG_IN_DATE_TIME)) {
-					timeStampIndex = i; 
-				} else {
+				if (attribute.getPosition() != null && !attribute.getPosition().equals("")) {
+				   int i = Integer.parseInt(attribute.getPosition());
+				   String entity = attribute.getEntity();
+				   String attrib = attribute.getAttribute();
+				   String unit = attribute.getUnit();
+                                   //System.out.println("ATTRIBUTE: pos:" + i + " entity:" + entity + " attribute:" + attrib + " unit:" + unit);  
+
+				   if (unit.equals(Downloads.FRAG_IN_DATE_TIME)) {
+				 	timeStampIndex = i; 
+				   } else {
 					String p = "";
 					p += Downloads.FRAG_MT + aux;
 					p += Downloads.FRAG_MEASUREMENT_TYPE_PART1;
@@ -903,7 +905,9 @@ public class AutoAnnotator extends Controller {
 					aux++;
 					mt.add(i);
 					mt_preamble.add(p);
+				   }
 				}
+
 			}
 			
 			preamble += Downloads.FRAG_HAS_MEASUREMENT_TYPE;	
