@@ -15,9 +15,11 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -384,7 +386,6 @@ public class AutoAnnotator extends Controller {
 				bSucceed = annotateDataAcquisitionSchemaFile(new File(path_unproc + "/" + file_name));
 			}
 			if (bSucceed) {
-			        //System.out.println("Succeed: Entering");
 				//Move the file to the folder for processed files
 				File destFolder = new File(path_proc);
 				if (!destFolder.exists()){
@@ -399,7 +400,6 @@ public class AutoAnnotator extends Controller {
 				File f = new File(path_unproc + "/" + file_name);
 				f.renameTo(new File(destFolder + "/" + file_name));
 				f.delete();
-		   	        //System.out.println("Succeed: Leaving");
    			}
 		}
 	}
@@ -508,39 +508,67 @@ public class AutoAnnotator extends Controller {
 		return bSuccess;
 	}
 	
+	private static void checkRows(List<Map<String, Object>> rows, String primaryKey) throws Exception {
+		int i = 1;
+		Set<String> values = new HashSet<>();
+		for (Map<String, Object> row : rows) {
+			String val = (String)row.get(primaryKey);
+			if (null == val) {
+				throw new Exception(String.format("Found Row %d without URI specified!", i));
+			}
+			if (values.contains(val)) {
+				throw new Exception(String.format("Found Row %d with duplicate URIs!", i));
+			}
+			else {
+				values.add(val);
+			}
+				
+			i++;
+		}
+	}
+	
 	private static boolean commitRows(List<Map<String, Object>> rows, String contentInCSV,
 			String fileName, String tableName, boolean toTripleStore) {
-		String site = ConfigProp.getPropertyValue("labkey.config", "site");
-		String path = "/" + ConfigProp.getPropertyValue("labkey.config", "folder");
-		Credential cred = Credential.find();
-		
+
 		AnnotationLog log = AnnotationLog.find(fileName);
 		if (null == log) {
 			log = new AnnotationLog();
 			log.setFileName(fileName);
 		}
+		
+		try {
+			checkRows(rows, "hasURI");
+		} catch (Exception e) {
+			log.addline(Feedback.println(Feedback.WEB, String.format(
+					"[ERROR] Trying to commit invalid rows to LabKey Table %s: ", tableName)
+					+ e.getMessage()));
+			log.save();
+			return false;
+		}
         
+		Credential cred = Credential.find();
 		if (null == cred) {
 			log.resetLog();
 			log.addline(Feedback.println(Feedback.WEB, "[ERROR] No LabKey credentials are provided!"));
 			log.save();
-			
 			return false;
 		}
 		
+		String site = ConfigProp.getPropertyValue("labkey.config", "site");
+		String path = "/" + ConfigProp.getPropertyValue("labkey.config", "folder");
 		LabkeyDataHandler labkeyDataHandler = new LabkeyDataHandler(
 				site, cred.getUserName(), cred.getPassword(), path);
 		try {
-			log.addline(Feedback.println(Feedback.WEB, "The first Row is " + rows.get(0).toString()));
+			//log.addline(Feedback.println(Feedback.WEB, "The first Row is " + rows.get(0).toString()));
 			int nRows = labkeyDataHandler.insertRows(tableName, rows);
 			log.addline(Feedback.println(Feedback.WEB, String.format(
-					"[OK] %d row(s) have been inserted into the %s table", nRows, tableName)));
+					"[OK] %d row(s) have been inserted into Table %s ", nRows, tableName)));
 		} catch (CommandException e1) {
           	try {
           		labkeyDataHandler.deleteRows(tableName, rows);
-				int nRows = labkeyDataHandler.updateRows(tableName, rows);
+				int nRows = labkeyDataHandler.insertRows(tableName, rows);
 				log.addline(Feedback.println(Feedback.WEB, String.format(
-						"[OK] %d row(s) have been updated into the %s table", nRows, tableName)));
+						"[OK] %d row(s) have been updated into Table %s ", nRows, tableName)));
 			} catch (CommandException e) {
 				log.addline(Feedback.println(Feedback.WEB, "[ERROR] CommitRows inside AutoAnnotator: " + e));
 				log.save();
