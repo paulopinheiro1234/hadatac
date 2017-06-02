@@ -230,46 +230,82 @@ public class Measurement {
 		return -1;
 	}
 	
-	public static String buildQuery(String user_uri, String study_uri, 
-									String subject_uri, String char_uri) {
+	public static String buildQuery(String user_uri, String study_uri, String subject_uri, String char_uri) {
 	    String acquisition_query = "";
-        String facet_query = "";
-        String q = "";
-        
-        List<String> listURI = DataAcquisition.findAllAccessibleDataAcquisition(user_uri);
-        Iterator<String> iter_uri = listURI.iterator();
-        while(iter_uri.hasNext()){
-            String uri = iter_uri.next();
-            acquisition_query += "acquisition_uri" + ":\"" + uri + "\"";
-            if(iter_uri.hasNext()){
-                acquisition_query += " OR ";
+            String facet_query = "";
+            String q = "";
+          
+            List<String> listURI = DataAcquisition.findAllAccessibleDataAcquisition(user_uri);
+            Iterator<String> iter_uri = listURI.iterator();
+            while(iter_uri.hasNext()){
+                String uri = iter_uri.next();
+                acquisition_query += "acquisition_uri" + ":\"" + uri + "\"";
+                if(iter_uri.hasNext()){
+                    acquisition_query += " OR ";
+                }
             }
-        }
         
-        if(!study_uri.equals("")){
-            facet_query += "study_uri" + ":\"" + study_uri + "\"";
-        }
-        if(!subject_uri.equals("")){
+	    if (acquisition_query.equals("")) {
+	        return "";
+	    }
+
             if(!study_uri.equals("")){
-                facet_query += " AND ";
+                facet_query += "study_uri" + ":\"" + study_uri + "\"";
             }
-            facet_query += "object_uri" + ":\"" + subject_uri + "\"";
-        }
-        if(!char_uri.equals("")){
-            if(!study_uri.equals("") || !subject_uri.equals("")){
-                facet_query += " AND ";
+
+            if(!subject_uri.equals("")){
+               if(!study_uri.equals("")){
+                   facet_query += " AND ";
+               }
+               facet_query += "object_uri" + ":\"" + subject_uri + "\"";
             }
-            facet_query += "characteristic_uri" + ":\"" + char_uri + "\"";
-        }
+
+            if(!char_uri.equals("")){
+                if(!study_uri.equals("") || !subject_uri.equals("")){
+                    facet_query += " AND ";
+                }
+                facet_query += "characteristic_uri" + ":\"" + char_uri + "\"";
+            }
         
-        if (facet_query.trim().equals("")) {
-            q = acquisition_query;
-        }
-        else {
-            q = "(" + acquisition_query + ") AND (" + facet_query + ")";
-        }
+            if (facet_query.trim().equals("")) {
+                q = acquisition_query;
+            } else {
+                q = "(" + acquisition_query + ") AND (" + facet_query + ")";
+            }
 	    
 	    return q;
+	}
+	
+	public static String buildQuery(String user_uri, int page, int qtd, FacetHandler handler) {
+	    String acquisition_query = "";
+            String facet_query = "";
+            String q = "";
+        
+            List<String> listURI = DataAcquisition.findAllAccessibleDataAcquisition(user_uri);
+            Iterator<String> iter_uri = listURI.iterator();
+            while(iter_uri.hasNext()){
+               acquisition_query += "acquisition_uri:\"" + iter_uri.next() + "\"";
+               if(iter_uri.hasNext()){
+                  acquisition_query += " OR ";
+               }
+            }  
+        
+	    //System.out.println("User URI: " + user_uri + "  acquistion_qeury: <<" + acquisition_query + ">>");
+            if (acquisition_query.equals("")) {
+	       return "";
+            }
+
+            if (handler != null) {
+        	facet_query = handler.toSolrQuery();
+            }
+        
+            if (facet_query.trim().equals("") || facet_query.trim().equals("*:*")) {
+                q = acquisition_query;
+            } else {
+                q = "(" + acquisition_query + ") AND (" + facet_query + ")";
+            }
+
+            return q;
 	}
 	
 	public static AcquisitionQueryResult findForViews(String user_uri, String study_uri, 
@@ -282,6 +318,13 @@ public class Measurement {
 		SolrQuery query = new SolrQuery();
 		
 		String q = buildQuery(user_uri, study_uri, subject_uri, char_uri);
+
+		/* an empty query happens when current user is not allowed to see any data acquisition
+		 */
+		if (q.equals("")) {
+		    return result;
+		}
+
 		query.setQuery(q);
 		query.setRows(10000000);
 		query.setFacet(false);
@@ -306,45 +349,6 @@ public class Measurement {
 		return result;
 	}
 	
-	public static String buildQuery(String user_uri, int page, int qtd, FacetHandler handler) {
-	    String acquisition_query = "";
-        String facet_query = "";
-        String q = "";
-        
-        List<String> listURI = DataAcquisition.findAllAccessibleDataAcquisition(user_uri);
-        Iterator<String> iter_uri = listURI.iterator();
-        while(iter_uri.hasNext()){
-            String uri = iter_uri.next();
-            acquisition_query += "acquisition_uri" + ":\"" + uri + "\"";
-            if(iter_uri.hasNext()){
-                acquisition_query += " OR ";
-            }
-        }
-        
-        if (handler != null) {
-        	facet_query = handler.toSolrQuery();
-        }
-        
-        if (acquisition_query.equals("")) {
-        	if (facet_query.trim().equals("")) {
-        		q = "*:*";
-            }
-        	else {
-        		q = facet_query;
-        	}
-        }
-        else {
-            if (facet_query.trim().equals("") || facet_query.trim().equals("*:*")) {
-                q = acquisition_query;
-            }
-            else {
-            	q = "(" + acquisition_query + ") AND (" + facet_query + ")";
-            }
-        }
-        
-        return q;
-	}
-	
 	public static AcquisitionQueryResult find(String user_uri, int page, int qtd, FacetHandler handler) {
 		AcquisitionQueryResult result = new AcquisitionQueryResult();
 		int docSize = 0;
@@ -355,6 +359,13 @@ public class Measurement {
 		SolrQuery query = new SolrQuery();
 		
 		String q = buildQuery(user_uri, page, qtd, handler);
+
+		/* an empty query happens when current user is not allowed to see any data acquisition
+		 */
+		if (q.equals("")) {
+		    return result;
+		}
+
 		System.out.println("q: " + q);
 		query.setQuery(q);
 		query.setStart((page - 1) * qtd + 1);
@@ -399,10 +410,10 @@ public class Measurement {
 					
 					List<Pivot> parents = new ArrayList<Pivot>();
 					result.pivot_facets.put(entry.getKey(), parents);
-					System.out.println("PIVOT: " + entry.getKey());
+					//System.out.println("PIVOT: " + entry.getKey());
 					
 					List<PivotField> listPivotField = entry.getValue();
-					System.out.println("List<PivotField> size: " + listPivotField.size());
+					//System.out.println("List<PivotField> size: " + listPivotField.size());
 					Iterator<PivotField> iterParents = listPivotField.iterator();
 					
 					while (iterParents.hasNext()) {
@@ -416,9 +427,9 @@ public class Measurement {
 						parent.value = pivot.getValue().toString();
 						parent.count = pivot.getCount();
 						parents.add(parent);
-						System.out.println("PIVOT FIELD: " + pivot.getField());
-						System.out.println("PIVOT VALUE: " + pivot.getValue().toString());
-						System.out.println("PIVOT COUNT: " + pivot.getCount());
+						//System.out.println("PIVOT FIELD: " + pivot.getField());
+						//System.out.println("PIVOT VALUE: " + pivot.getValue().toString());
+						//System.out.println("PIVOT COUNT: " + pivot.getCount());
 						
 						List<PivotField> subPivotFiled = pivot.getPivot();
 						if(null != subPivotFiled){
@@ -430,9 +441,9 @@ public class Measurement {
 								child.value = pivot.getValue().toString();
 								child.count = pivot.getCount();
 								parent.children.add(child);
-								System.out.println("PIVOT FIELD: " + pivot.getField());
-								System.out.println("PIVOT VALUE: " + pivot.getValue().toString());
-								System.out.println("PIVOT COUNT: " + pivot.getCount());
+								//System.out.println("PIVOT FIELD: " + pivot.getField());
+								//System.out.println("PIVOT VALUE: " + pivot.getValue().toString());
+								//System.out.println("PIVOT COUNT: " + pivot.getCount());
 							}
 						}
 					}

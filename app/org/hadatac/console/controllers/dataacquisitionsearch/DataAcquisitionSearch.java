@@ -70,27 +70,29 @@ public class DataAcquisitionSearch extends Controller {
     }
 
     public static Result index(int page, int rows, String facets) {
-    	System.out.println("[DataAcquisitionSearch] Page: " + page + "   Rows:" + rows + "   Facets:" + facets);
+    	//System.out.println("[DataAcquisitionSearch] Page: " + page + "   Rows:" + rows + "   Facets:" + facets);
     	
     	FacetHandler handler = new FacetHandler();
     	handler.loadFacets(facets);
-    	System.out.println("DataAcquisitionSearch : <" + handler.toSolrQuery() + ">");
+    	//System.out.println("DataAcquisitionSearch : <" + handler.toSolrQuery() + ">");
 
     	AcquisitionQueryResult results = null;
     	String ownerUri;
     	final SysUser user = AuthApplication.getLocalUser(session());
     	if(null == user){
     	    ownerUri = "Public";
+          	System.out.println("User URI: NULL");
     		results = Measurement.find(ownerUri, page, rows, handler);
     	}
     	else{
     		ownerUri = UserManagement.getUriByEmail(user.getEmail());
+          	System.out.println("User URI: " + ownerUri);
     		if(null == ownerUri){
     			ownerUri = "Public";
     		}
     		results = Measurement.find(ownerUri, page, rows, handler);
     	}
-    	System.out.println("[DataAcquisitionSearch] Total size response: " + results.getDocumentSize());
+    	//System.out.println("[DataAcquisitionSearch] Total size response: " + results.getDocumentSize());
     	
     	Set<String> setObj = new HashSet<String>();
     	ObjectDetails objDetails = new ObjectDetails();
