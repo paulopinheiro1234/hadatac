@@ -37,7 +37,7 @@ public class DASchemaAttrGenerator extends BasicGenerator {
 	            String str[] = line.split(",");
 	            if (str[0].contains("??")){
 	            hasEntityMap.put(str[0], str[5]);
-	            System.out.println(str[0] + "-----" + str[5]);
+//	            System.out.println(str[0] + "-----" + str[5]);
 	        	}
 	        }
 			br.close();
