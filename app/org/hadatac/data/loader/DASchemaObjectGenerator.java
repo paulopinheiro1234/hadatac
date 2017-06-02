@@ -2,7 +2,10 @@ package org.hadatac.data.loader;
 
 import java.io.File;
 import org.apache.commons.io.FileUtils;
+import org.hadatac.console.controllers.annotator.AutoAnnotator;
+
 import java.lang.String;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -13,10 +16,12 @@ public class DASchemaObjectGenerator extends BasicGenerator {
 	final String kbPrefix = "chear-kb:";
 	String startTime = "";
 	String SDDName = "";
+	String study_id = "";
 	
 	public DASchemaObjectGenerator(File file) {
 		super(file);
 		this.SDDName = file.getName();
+		this.study_id = AutoAnnotator.study_id;
 	}
 //Column	Attribute	attributeOf	Unit	Time	Entity	Role	Relation	inRelationTo	wasDerivedFrom	wasGeneratedBy	hasPosition	
 	@Override
@@ -78,7 +83,13 @@ public class DASchemaObjectGenerator extends BasicGenerator {
     	if (rec.get(mapCol.get("InRelationTo")) == null || rec.get(mapCol.get("InRelationTo")).equals("")){
     		return "";
     	} else {
-    		return kbPrefix + "DASO-" + rec.get(mapCol.get("InRelationTo")).replace("??", "") + "-Study-" + SDDName.replaceAll("\\D+","");
+    		List<String> items = Arrays.asList(rec.get(mapCol.get("InRelationTo")).split("\\s*,\\s*"));
+    		String answer = "";
+    		for (String i : items){
+    			answer += kbPrefix + "DASO-" + i.replace("_","-").replace("??", "") + "-" + study_id + " & ";
+    		}
+    		return answer.substring(0, answer.length() - 3);
+//    		return kbPrefix + "DASO-" + items.get(0).replace("_","-").replace("??", "") + "-" + study_id;
     	}
     }
     
@@ -121,7 +132,7 @@ public class DASchemaObjectGenerator extends BasicGenerator {
     @Override
     Map<String, Object> createRow(CSVRecord rec, int row_number) throws Exception {
     	Map<String, Object> row = new HashMap<String, Object>();
-    	row.put("hasURI", kbPrefix + "DASO-" + getLabel(rec).replace("_","-").replace("??", "") + "-Study-" + SDDName.replaceAll("\\D+",""));
+    	row.put("hasURI", kbPrefix + "DASO-" + getLabel(rec).replace("_","-").replace("??", "") + "-" + study_id);
     	row.put("a", "hasco:DASchemaObject");
     	row.put("hasco:partOfSchema", kbPrefix + "DAS-" + SDDName.replace(".csv", ""));
     	row.put("hasco:hasEntity", getEntity(rec));

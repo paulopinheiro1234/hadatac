@@ -20,12 +20,14 @@ public class DASchemaAttrGenerator extends BasicGenerator {
 	String SDDName = "";
 	HashMap<String, String> codeMap;
 	HashMap<String, String> hasEntityMap = new HashMap<String, String>();
+	String study_id = "";
 	
 	
 	public DASchemaAttrGenerator(File file) {
 		super(file);
 		this.SDDName = file.getName();
 		this.codeMap = AutoAnnotator.codeMappings;
+		this.study_id = AutoAnnotator.study_id;
 		
 		try {
 	        BufferedReader br = new BufferedReader(new FileReader(file));
@@ -35,7 +37,7 @@ public class DASchemaAttrGenerator extends BasicGenerator {
 	            String str[] = line.split(",");
 	            if (str[0].contains("??")){
 	            hasEntityMap.put(str[0], str[5]);
-	            System.out.println(str[0] + "-----" + str[5]);
+//	            System.out.println(str[0] + "-----" + str[5]);
 	        	}
 	        }
 			br.close();
@@ -70,7 +72,7 @@ public class DASchemaAttrGenerator extends BasicGenerator {
     }
     
     private String getAttributeOf(CSVRecord rec) {
-    		return kbPrefix + "DASO-" + rec.get(mapCol.get("AttributeOf")).replace("??", "") + "-PS" + SDDName.replaceAll("\\D+","");
+    		return kbPrefix + "DASO-" + rec.get(mapCol.get("AttributeOf")).replace("??", "") + "-" + study_id;
     }
     
     private String getUnit(CSVRecord rec) {
