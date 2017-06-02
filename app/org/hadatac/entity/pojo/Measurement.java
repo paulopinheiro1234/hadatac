@@ -443,6 +443,7 @@ public class Measurement {
 		} catch (IOException e) {
 			System.out.println("[ERROR] Measurement.find() - IOException message: " + e.getMessage());
 		} catch (Exception e) {
+		        e.printStackTrace();
 			System.out.println("[ERROR] Measurement.find() - Exception message: " + e.getMessage());
 		}
 		
@@ -512,7 +513,9 @@ public class Measurement {
 		m.setOwnerUri(doc.getFieldValue("owner_uri").toString());
 		m.setAcquisitionUri(doc.getFieldValue("acquisition_uri").toString());
 		m.setStudyUri(doc.getFieldValue("study_uri").toString());
-		m.setObjectUri(doc.getFieldValue("object_uri").toString());
+		if (doc.getFieldValue("object_uri") != null) {
+  		    m.setObjectUri(doc.getFieldValue("object_uri").toString());
+		}
 		if (doc.getFieldValue("timestamp") != null) {
 			m.setTimestamp(doc.getFieldValue("timestamp").toString());
 		}
