@@ -164,8 +164,8 @@ public class Subject {
 		String objUri = obj_uri;
         String queryString = NameSpaces.getInstance().printSparqlNameSpaceList()
 	        + " SELECT ?ar ?obj WHERE {"
-	        + "        ?ar rdf:type hasneto:DASchemaAttribute . " 
-	        + "        ?ar hasneto:hasAttribute <" + attr_uri + "> . "
+	        + "        ?ar rdf:type hasco:DASchemaAttribute . " 
+	        + "        ?ar hasco:hasAttribute <" + attr_uri + "> . "
 	        + "        ?ar hasco:hasAssociatedObject ?obj  ."
 	        + " }";
         

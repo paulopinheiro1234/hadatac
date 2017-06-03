@@ -139,7 +139,7 @@ public class DeploymentGenerator extends BasicGenerator {
     	row.put("hasURI", kbPrefix + "DPL-" + getDataAcquisitionName(rec));
     	row.put("a", "vstoi:Deployment");
     	row.put("vstoi:hasPlatform", getPlatform(rec));
-    	row.put("hasneto:hasInstrument", getInstrument(rec));
+    	row.put("hasco:hasInstrument", getInstrument(rec));
     	if (startTime.isEmpty()) {
         	row.put("prov:startedAtTime", (new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'")).format(new Date()));
     	}
@@ -147,7 +147,7 @@ public class DeploymentGenerator extends BasicGenerator {
     		row.put("prov:startedAtTime", startTime);
     	}
     	
-    	//row.put("hasneto:hasDetector", "");
+    	//row.put("hasco:hasDetector", "");
     	//row.put("prov:endedAtTime", "");
     	//row.put("vstoi:subDeploymentOf", "");
     	

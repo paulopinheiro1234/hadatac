@@ -378,13 +378,13 @@ public class Parser {
 		// load datacollection
 		hadatacCcsv.setDataAcquisition(DataAcquisition.find(model, hadatacCcsv.getDataset()));;
 		if (hadatacCcsv.getDataAcquisition() == null) {
-			message += Feedback.println(mode, "[ERROR] Preamble does not contain a single hasneto:DataAcquisition.");
+			message += Feedback.println(mode, "[ERROR] Preamble does not contain a single hasco:DataAcquisition.");
 			return new ParsingResult(1, message);
 		} 
 		else {
-			System.out.println("[OK] Preamble contains a single hasneto:DataAcquisition: <" + 
+			System.out.println("[OK] Preamble contains a single hasco:DataAcquisition: <" + 
 								hadatacCcsv.getDataAcquisition().getLocalName() + ">");
-			message += Feedback.println(mode, "[OK] Preamble contains a single hasneto:DataAcquisition: <" + 
+			message += Feedback.println(mode, "[OK] Preamble contains a single hasco:DataAcquisition: <" + 
 								hadatacCcsv.getDataAcquisition().getLocalName() + ">");
 		}
 		
@@ -393,14 +393,14 @@ public class Parser {
 			System.out.println("Deployment find");
 			hadatacCcsv.setDeployment(Deployment.find(model, hadatacCcsv.getDataAcquisition()));
 			if (hadatacCcsv.getDeployment() == null) {
-				message += Feedback.println(mode, "[ERROR] This hasneto:DataAcquisition requires a vstoi:Deployment that is not specified.");
+				message += Feedback.println(mode, "[ERROR] This hasco:DataAcquisition requires a vstoi:Deployment that is not specified.");
 				return new ParsingResult(1, message);
 			} else {
-				message += Feedback.println(mode, "[OK] This hasneto:DataAcquisition requires a vstoi:Deployment that is specified: <" + 
+				message += Feedback.println(mode, "[OK] This hasco:DataAcquisition requires a vstoi:Deployment that is specified: <" + 
 						hadatacCcsv.getDeployment().getLocalName() + ">");
 			}
 		} else {
-			message += Feedback.println(mode, "[OK] This hasneto:DataAcquisition does not require a vstoi:Deployment in the preamble.");
+			message += Feedback.println(mode, "[OK] This hasco:DataAcquisition does not require a vstoi:Deployment in the preamble.");
 		}
 		
 		// load measurement types

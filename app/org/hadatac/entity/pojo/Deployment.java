@@ -60,9 +60,9 @@ public class Deployment {
     
     public static String PLATFORM_PREDICATE =     INDENT1 + "vstoi:hasPlatform        ";
     
-    public static String INSTRUMENT_PREDICATE =   INDENT1 + "hasneto:hasInstrument    ";
+    public static String INSTRUMENT_PREDICATE =   INDENT1 + "hasco:hasInstrument    ";
     
-    public static String DETECTOR_PREDICATE =     INDENT1 + "hasneto:hasDetector      ";
+    public static String DETECTOR_PREDICATE =     INDENT1 + "hasco:hasDetector      ";
         
     public static String START_TIME_PREDICATE =   INDENT1 + "prov:startedAtTime		  ";
     
@@ -270,9 +270,9 @@ public class Deployment {
 				+ "SELECT ?startedAt ?endedAt ?detector ?instrument ?platform WHERE {\n"
 				+ "  <" + hadatac.getDataAcquisition().getDeploymentUri() + "> a vstoi:Deployment .\n"
 				+ "  <" + hadatac.getDataAcquisition().getDeploymentUri() + "> prov:startedAtTime ?startedAt .\n"
-				+ "  <" + hadatac.getDataAcquisition().getDeploymentUri() + "> hasneto:hasInstrument ?instrument .\n"
+				+ "  <" + hadatac.getDataAcquisition().getDeploymentUri() + "> hasco:hasInstrument ?instrument .\n"
 				+ "  <" + hadatac.getDataAcquisition().getDeploymentUri() + "> vstoi:hasPlatform ?platform .\n"
-				+ "  OPTIONAL { <" + hadatac.getDataAcquisition().getDeploymentUri() + "> hasneto:hasDetector ?detector . }\n"
+				+ "  OPTIONAL { <" + hadatac.getDataAcquisition().getDeploymentUri() + "> hasco:hasDetector ?detector . }\n"
 				+ "  OPTIONAL { <" + hadatac.getDataAcquisition().getDeploymentUri() + "> prov:endedAtTime ?endedAt . }\n"
 				+ "}";
 		
@@ -309,8 +309,8 @@ public class Deployment {
 				+ "SELECT ?startedAt ?endedAt ?detector ?instrument ?platform WHERE {\n"
 				+ "  <" + hadatac.getDeploymentUri() + "> a vstoi:Deployment .\n"
 				+ "  <" + hadatac.getDeploymentUri() + "> prov:startedAtTime ?startedAt .\n"
-				+ "  <" + hadatac.getDeploymentUri() + "> hasneto:hasDetector ?detector .\n"
-				+ "  <" + hadatac.getDeploymentUri() + "> hasneto:hasInstrument ?instrument .\n"
+				+ "  <" + hadatac.getDeploymentUri() + "> hasco:hasDetector ?detector .\n"
+				+ "  <" + hadatac.getDeploymentUri() + "> hasco:hasInstrument ?instrument .\n"
 				+ "  <" + hadatac.getDeploymentUri() + "> vstoi:hasPlatform ?platform .\n"
 				+ "  OPTIONAL { <" + hadatac.getDeploymentUri() + "> prov:endedAtTime ?endedAt . }\n"
 				+ "}";
@@ -436,7 +436,7 @@ public class Deployment {
 	         //System.out.println("FIND DEPLOYMENT OF DATA ACQUISITION ");
 		String queryString = NameSpaces.getInstance().printSparqlNameSpaceList() 
 				+ "SELECT ?dp WHERE {\n"
-				+ "  ?dp hasneto:hasDataAcquisition <" + dataAcquisition.getCcsvUri() + "> .\n"
+				+ "  ?dp hasco:hasDataAcquisition <" + dataAcquisition.getCcsvUri() + "> .\n"
 				+ "}";
 		
 		Query query = QueryFactory.create(queryString);
@@ -476,8 +476,8 @@ public class Deployment {
     	row.put("hasURI", ValueCellProcessing.replaceNameSpaceEx(getUri()));
     	row.put("a", "vstoi:Deployment");
     	row.put("vstoi:hasPlatform", ValueCellProcessing.replaceNameSpaceEx(getPlatform().getUri()));
-    	row.put("hasneto:hasInstrument", ValueCellProcessing.replaceNameSpaceEx(getInstrument().getUri()));
-    	row.put("hasneto:hasDetector", detectors);
+    	row.put("hasco:hasInstrument", ValueCellProcessing.replaceNameSpaceEx(getInstrument().getUri()));
+    	row.put("hasco:hasDetector", detectors);
     	row.put("prov:startedAtTime", getStartedAt());
     	row.put("prov:endedAtTime", getEndedAt());
     	rows.add(row);

@@ -87,9 +87,9 @@ public class DataAcquisitionGenerator extends BasicGenerator {
     Map<String, Object> createRow(CSVRecord rec, int row_number) throws Exception {
     	Map<String, Object> row = new HashMap<String, Object>();
     	row.put("hasURI", kbPrefix + "DA-" + getDataAcquisitionName(rec));
-    	row.put("a", "hasneto:DataAcquisition");
+    	row.put("a", "hasco:DataAcquisition");
     	row.put("rdfs:label", getDataAcquisitionName(rec));
-    	row.put("hasneto:hasDeployment", kbPrefix + "DPL-" + getDataAcquisitionName(rec));
+    	row.put("hasco:hasDeployment", kbPrefix + "DPL-" + getDataAcquisitionName(rec));
     	row.put("hasco:hasMethod", getMethod(rec));
     	row.put("hasco:isDataAcquisitionOf", kbPrefix + "STD-" + getStudy(rec));
     	if (startTime.isEmpty()) {
@@ -118,7 +118,7 @@ public class DataAcquisitionGenerator extends BasicGenerator {
     	DataAcquisition dataAcquisition = new DataAcquisition();
     	dataAcquisition.setUri(ValueCellProcessing.replacePrefixEx((String)row.get("hasURI")));
     	dataAcquisition.setLabel(ValueCellProcessing.replacePrefixEx((String)row.get("rdfs:label")));
-    	dataAcquisition.setDeploymentUri(ValueCellProcessing.replacePrefixEx((String)row.get("hasneto:hasDeployment")));
+    	dataAcquisition.setDeploymentUri(ValueCellProcessing.replacePrefixEx((String)row.get("hasco:hasDeployment")));
     	dataAcquisition.setMethodUri(ValueCellProcessing.replacePrefixEx((String)row.get("hasco:hasMethod")));
     	dataAcquisition.setStudyUri(ValueCellProcessing.replacePrefixEx((String)row.get("hasco:isDataAcquisitionOf")));
     	dataAcquisition.setSchemaUri(ValueCellProcessing.replacePrefixEx((String)row.get("hasco:hasSchema")));

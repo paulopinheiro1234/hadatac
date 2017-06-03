@@ -67,12 +67,12 @@ public class DataAcquisitionSchema {
     	
     	String queryString = NameSpaces.getInstance().printSparqlNameSpaceList() + 
     			"SELECT ?uri ?hasPosition ?hasEntity ?hasAttribute ?hasUnit ?hasSource ?isPIConfirmed WHERE { " + 
-    			"   ?uri a hasneto:DASchemaAttribute . " + 
-    			"   ?uri hasneto:partOfSchema " + "<" + schemaUri + "> .  " + 
+    			"   ?uri a hasco:DASchemaAttribute . " + 
+    			"   ?uri hasco:partOfSchema " + "<" + schemaUri + "> .  " + 
     			"   ?uri hasco:hasPosition ?hasPosition .  " + 
-    			"   OPTIONAL { ?uri hasneto:hasEntity ?hasEntity } ." + 
-    			"   OPTIONAL { ?uri hasneto:hasAttribute ?hasAttribute } ." + 
-    			"   OPTIONAL { ?uri hasneto:hasUnit ?hasUnit } ." + 
+    			"   OPTIONAL { ?uri hasco:hasEntity ?hasEntity } ." + 
+    			"   OPTIONAL { ?uri hasco:hasAttribute ?hasAttribute } ." + 
+    			"   OPTIONAL { ?uri hasco:hasUnit ?hasUnit } ." + 
     			"   OPTIONAL { ?uri hasco:hasSource ?hasSource } ." + 
     			"   OPTIONAL { ?uri hasco:isPIConfirmed ?isPIConfirmed } ." + 
     			"}";

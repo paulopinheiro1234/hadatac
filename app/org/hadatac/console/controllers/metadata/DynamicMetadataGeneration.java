@@ -198,8 +198,8 @@ public class DynamicMetadataGeneration extends Controller {
 	
 	public static Map<String, String> getIndicatorTypes(){
 		String prefixString = NameSpaces.getInstance().printSparqlNameSpaceList().replaceAll("\n", " ");
-		//String indicatorQuery="PREFIX rdfs:<http://www.w3.org/2000/01/rdf-schema#> PREFIX chear: <http://hadatac.org/ont/chear#>SELECT DISTINCT ?indicatorType ?label ?comment WHERE { ?indicatorType rdfs:subClassOf chear:Indicator . ?indicatorType rdfs:label ?label . }";
-		String indicatorQuery=prefixString + "SELECT DISTINCT ?indicatorType ?label ?comment WHERE { ?indicatorType rdfs:subClassOf chear:Indicator . ?indicatorType rdfs:label ?label . }";
+		//String indicatorQuery="PREFIX rdfs:<http://www.w3.org/2000/01/rdf-schema#> PREFIX chear: <http://hadatac.org/ont/chear#>SELECT DISTINCT ?indicatorType ?label ?comment WHERE { ?indicatorType rdfs:subClassOf hasco:Indicator . ?indicatorType rdfs:label ?label . }";
+		String indicatorQuery=prefixString + "SELECT DISTINCT ?indicatorType ?label ?comment WHERE { ?indicatorType rdfs:subClassOf hasco:Indicator . ?indicatorType rdfs:label ?label . }";
 		QueryExecution qexecInd = QueryExecutionFactory.sparqlService(Collections.getCollectionsName(Collections.METADATA_SPARQL), indicatorQuery);
 		ResultSet indicatorResults = qexecInd.execSelect();
 		ResultSetRewindable resultsrwIndc = ResultSetFactory.copyResults(indicatorResults);
@@ -535,7 +535,7 @@ public class DynamicMetadataGeneration extends Controller {
 						"                   \"  OPTIONAL {?id dcterms:identifier ?iden} . \" + \n" +
 						"                   \"  OPTIONAL {?id rdfs:comment ?comment} . \" + \n" +
 						"                   \"  OPTIONAL {?id skos:definition ?def} . \" + \n" +
-						"                   \"  OPTIONAL {?id hasneto:hasUnit ?unit} . \" + \n" +
+						"                   \"  OPTIONAL {?id hasco:hasUnit ?unit} . \" + \n" +
 						"                   \"  OPTIONAL {?id skos:editorialNote ?note} . \" + \n" +
 						"                   \"  OPTIONAL {?id prov:wasAttributedTo ?attrTo} . \" + \n" +
 						"                   \"  OPTIONAL {?id prov:wasAssociatedWith ?assocWith} . \" + \n" +

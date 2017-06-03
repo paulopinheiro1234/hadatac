@@ -58,9 +58,9 @@ public class Downloads extends Controller {
 
     public static final String FRAG_MEASUREMENT_TYPE_PART1  = "> a hadatac:MeasurementType; ";
     public static final String FRAG_MEASUREMENT_TYPE_PART2  = " hadatac:atColumn ";
-    public static final String FRAG_MEASUREMENT_TYPE_PART3  = "; hasneto:hasEntity ";
-    public static final String FRAG_MEASUREMENT_TYPE_PART4  = "; hasneto:hasAttribute ";
-    public static final String FRAG_MEASUREMENT_TYPE_PART5  = "; hasneto:hasUnit ";
+    public static final String FRAG_MEASUREMENT_TYPE_PART3  = "; hasco:hasEntity ";
+    public static final String FRAG_MEASUREMENT_TYPE_PART4  = "; hasco:hasAttribute ";
+    public static final String FRAG_MEASUREMENT_TYPE_PART5  = "; hasco:hasUnit ";
 
     public static final String FRAG_IN_DATE_TIME            = "time:inDateTime";
     public static final String FRAG_IN_DATE_TIME_SUFFIX     = " <ts0>; ";

@@ -148,14 +148,14 @@ public class DASchemaAttrGenerator extends BasicGenerator {
     Map<String, Object> createRow(CSVRecord rec, int row_number) throws Exception {
     	Map<String, Object> row = new HashMap<String, Object>();
     	row.put("hasURI", kbPrefix + "DASA-" + getLabel(rec).replace("_","-").replace("??", "") + "-" + study_id);
-    	row.put("a", "hasneto:DASchemaAttribute");
+    	row.put("a", "hasco:DASchemaAttribute");
     	row.put("rdfs:label", getLabel(rec));
     	row.put("rdfs:comment", getLabel(rec));
-    	row.put("hasneto:partOfSchema", kbPrefix + "DAS-" + SDDName.replace(".csv", ""));
+    	row.put("hasco:partOfSchema", kbPrefix + "DAS-" + SDDName.replace(".csv", ""));
     	row.put("hasco:hasPosition", getPosition(rec));
-    	row.put("hasneto:hasEntity", getEntity(rec));
-    	row.put("hasneto:hasAttribute", getAttribute(rec));
-    	row.put("hasneto:hasUnit", getUnit(rec));
+    	row.put("hasco:hasEntity", getEntity(rec));
+    	row.put("hasco:hasAttribute", getAttribute(rec));
+    	row.put("hasco:hasUnit", getUnit(rec));
     	row.put("hasco:hasSource", "");
     	row.put("hasco:isAttributeOf", getAttributeOf(rec));
     	row.put("hasco:isVirtual", checkVirtual(rec).toString());

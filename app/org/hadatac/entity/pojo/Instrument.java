@@ -90,7 +90,7 @@ public class Instrument  implements Comparable<Instrument> {
 		    "     ?uri a ?instModel ." + 
 			"   } MINUS { " + 
 			"     ?dep_uri a vstoi:Deployment . " + 
-		    "     ?dep_uri hasneto:hasInstrument ?uri .  " +
+		    "     ?dep_uri hasco:hasInstrument ?uri .  " +
 			"     FILTER NOT EXISTS { ?dep_uri prov:endedAtTime ?enddatetime . } " + 
 			"    } " + 
 			"} " + 
@@ -122,7 +122,7 @@ public class Instrument  implements Comparable<Instrument> {
             "   ?instModel rdfs:subClassOf+ vstoi:Instrument . " + 
 		    "   ?uri a ?instModel ." + 
 			"   ?dep_uri a vstoi:Deployment . " + 
-		    "   ?dep_uri hasneto:hasInstrument ?uri .  " +
+		    "   ?dep_uri hasco:hasInstrument ?uri .  " +
 			"   FILTER NOT EXISTS { ?dep_uri prov:endedAtTime ?enddatetime . } " + 
 			"} " + 
 			"ORDER BY DESC(?datetime) ";
@@ -181,7 +181,7 @@ public class Instrument  implements Comparable<Instrument> {
 		
 		String queryString = NameSpaces.getInstance().printSparqlNameSpaceList() 
 				+ "SELECT ?instrument ?label WHERE {\n"
-				+ "  <" + hadatac.getDeploymentUri() + "> hasneto:hasInstrument ?instrument .\n"
+				+ "  <" + hadatac.getDeploymentUri() + "> hasco:hasInstrument ?instrument .\n"
 				+ "  OPTIONAL { ?instrument rdfs:label ?label . }\n"
 				+ "}";
 		

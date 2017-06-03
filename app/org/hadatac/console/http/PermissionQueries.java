@@ -35,10 +35,10 @@ public class PermissionQueries {
         	        "PREFIX hasneto: <http://hadatac.org/ont/hasneto#>  " +
                     "SELECT ?deturi ?detModel ?sp ?ec ?ecName WHERE { " + 
                     "   <" + uri + "> a vstoi:Deployment . " + 
-                    "   <" + uri + "> hasneto:hasDetector ?deturi .  " +
+                    "   <" + uri + "> hasco:hasDetector ?deturi .  " +
                     "   ?deturi a ?detModel . " +
                     "   ?sp vstoi:perspectiveOf ?detModel . " +
-                    "   ?sp hasneto:hasPerspectiveCharacteristic ?ec ." +
+                    "   ?sp hasco:hasPerspectiveCharacteristic ?ec ." +
                     "   ?ec rdfs:label ?ecName .  " + 
                     "}";
                 break;

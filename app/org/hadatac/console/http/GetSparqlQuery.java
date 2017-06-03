@@ -59,8 +59,8 @@ public class GetSparqlQuery {
                     "    ?platModel rdfs:label ?modelName ." +
                     "    ?platURI rdfs:label ?name ." + 
                     "    OPTIONAL { ?platURI vstoi:hasSerialNumber ?sn } ." + 
-                    "    OPTIONAL { ?platURI hasneto:hasFirstCoordinate ?lat ." +
-                    "               ?platURI hasneto:hasSecondCoordinate ?lng } ." +
+                    "    OPTIONAL { ?platURI hasco:hasFirstCoordinate ?lat ." +
+                    "               ?platURI hasco:hasSecondCoordinate ?lng } ." +
                     "}";
                 break;
             case "Instruments" : 
@@ -224,7 +224,7 @@ public class GetSparqlQuery {
                     " ?sp a vstoi:SensingPerspective . " +
                     " ?sp vstoi:perspectiveOf ?ofModel . " +
                     " ?ofModel rdfs:label ?ofModelName . " +
-                    " ?sp hasneto:hasPerspectiveCharacteristic ?chara ." +
+                    " ?sp hasco:hasPerspectiveCharacteristic ?chara ." +
                     " OPTIONAL { ?sp vstoi:hasAccuracyPercentage ?accpercent } ." +
                     " OPTIONAL { ?sp vstoi:hasAccuracyR2 ?accrtwo } ." +
                     " OPTIONAL { ?sp vstoi:hasOutputResolution ?outputres } ." +
@@ -254,7 +254,7 @@ public class GetSparqlQuery {
                     "SELECT ?uri ?platform ?platformName ?instrument ?instrumentName ?date WHERE { " + 
                     "   ?uri a vstoi:Deployment . " + 
                     "   ?uri vstoi:hasPlatform ?platform .  " + 
-                    "   ?uri hasneto:hasInstrument ?instrument .  " + 
+                    "   ?uri hasco:hasInstrument ?instrument .  " + 
                     "   ?uri prov:startedAtTime ?date .  " + 
                     "   OPTIONAL { ?platform rdfs:label ?platformName } ." + 
                     "   OPTIONAL { ?instrument rdfs:label ?instrumentName } ." + 
@@ -449,7 +449,7 @@ public class GetSparqlQuery {
                         "PREFIX chear: <http://hadatac.org/ont/chear#>" + 
                         "PREFIX sio: <http://semanticscience.org/resource/>" +
                     	"SELECT DISTINCT ?modelName ?superModelName ?label ?comment WHERE { " + 
-                        "   ?modelName rdfs:subClassOf* chear:Indicator . " +
+                        "   ?modelName rdfs:subClassOf* hasco:Indicator . " +
                         "   ?modelName rdfs:subClassOf ?superModelName .  " + 
                         "   OPTIONAL { ?modelName rdfs:label ?label } . " + 
                         " 	OPTIONAL { ?modelName rdfs:comment ?comment } . " +

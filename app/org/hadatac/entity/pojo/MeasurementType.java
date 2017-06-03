@@ -120,9 +120,9 @@ public class MeasurementType {
 
 			String queryString = NameSpaces.getInstance().printSparqlNameSpaceList() 
 					+ "SELECT ?dc ?c_label ?e_label WHERE {\n"
-					+ " ?dc " + "hasneto:hasAttribute" + " <" + measurementType.getCharacteristicUri() + "> .\n"
+					+ " ?dc " + "hasco:hasAttribute" + " <" + measurementType.getCharacteristicUri() + "> .\n"
 					+ "  OPTIONAL { " + "<" + measurementType.getCharacteristicUri() + "> " + "rdfs:label ?c_label . }\n"
-					+ " ?dc " + "hasneto:hasEntity" + " <" + measurementType.getEntityUri() + "> .\n"
+					+ " ?dc " + "hasco:hasEntity" + " <" + measurementType.getEntityUri() + "> .\n"
 					+ "  OPTIONAL { " + "<" + measurementType.getEntityUri() + "> " + "rdfs:label ?e_label . }\n"
 					+ "}";
 			
@@ -217,9 +217,9 @@ public class MeasurementType {
 				+ "  <" + dataset.getCcsvUri() + "> hadatac:hasMeasurementType ?mt .\n"
 				+ "  ?mt a hadatac:MeasurementType .\n"
 				+ "  ?mt hadatac:atColumn ?column .\n"
-				+ "  ?mt hasneto:hasEntity ?ent .\n"
-				+ "  ?mt hasneto:hasAttribute ?char .\n"
-				+ "  ?mt hasneto:hasUnit ?unit .\n"
+				+ "  ?mt hasco:hasEntity ?ent .\n"
+				+ "  ?mt hasco:hasAttribute ?char .\n"
+				+ "  ?mt hasco:hasUnit ?unit .\n"
 				+ "}";
 		
 		Query query = QueryFactory.create(queryString);

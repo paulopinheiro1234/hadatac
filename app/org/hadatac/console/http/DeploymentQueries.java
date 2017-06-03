@@ -38,11 +38,11 @@ public class DeploymentQueries {
                     "   " + uri + " a vstoi:Deployment . " + 
                     "   " + uri + " vstoi:hasPlatform ?platformuri .  " +
                     "   ?platformuri rdfs:label ?platform . " +
-                    "   OPTIONAL { ?platformuri hasneto:hasFirstCoordinate ?hasFirstCoordinate . } " +
-                    "   OPTIONAL { ?platformuri hasneto:hasSecondCoordinate ?hasSecondCoordinate . } " +
-                    "   " + uri + " hasneto:hasInstrument ?instrumenturi .  " + 
+                    "   OPTIONAL { ?platformuri hasco:hasFirstCoordinate ?hasFirstCoordinate . } " +
+                    "   OPTIONAL { ?platformuri hasco:hasSecondCoordinate ?hasSecondCoordinate . } " +
+                    "   " + uri + " hasco:hasInstrument ?instrumenturi .  " + 
                     "   ?instrumenturi rdfs:label ?instrument . " +
-                    "   OPTIONAL { " + uri + " hasneto:hasDetector ?detectoruri . } " + 
+                    "   OPTIONAL { " + uri + " hasco:hasDetector ?detectoruri . } " + 
                     "   OPTIONAL { ?detectoruri rdfs:label ?detector . } " +
                     "   " + uri + " prov:startedAtTime ?date .  " + 
                     "}";
@@ -60,20 +60,20 @@ public class DeploymentQueries {
         	    //    "PREFIX hasneto: <http://hadatac.org/ont/hasneto#>  " +
                     "SELECT ?deturi ?detModel ?insturi ?instModel ?sp ?ent ?char ?charName WHERE { { " + 
                     "   " + uri + " a vstoi:Deployment . " + 
-                    "   " + uri + " hasneto:hasDetector ?deturi .  " +
+                    "   " + uri + " hasco:hasDetector ?deturi .  " +
                     "   ?deturi a ?detModel . " +
                     "   ?sp vstoi:perspectiveOf ?detModel . " +
-                    "   ?sp hasneto:hasPerspectiveEntity ?ent ." +
-                    "   ?sp hasneto:hasPerspectiveCharacteristic ?char . " +
+                    "   ?sp hasco:hasPerspectiveEntity ?ent ." +
+                    "   ?sp hasco:hasPerspectiveCharacteristic ?char . " +
                     "   ?char rdfs:label ?charName .  " + 
                     "} " + 
                     "UNION { " + 
                     "   " + uri + " a vstoi:Deployment . " + 
-                    "   " + uri + " hasneto:hasInstrument ?insturi .  " +
+                    "   " + uri + " hasco:hasInstrument ?insturi .  " +
                     "   ?insturi a ?instModel . " +
                     "   ?sp vstoi:perspectiveOf ?instModel . " +
-                    "   ?sp hasneto:hasPerspectiveEntity ?ent ." +
-                    "   ?sp hasneto:hasPerspectiveCharacteristic ?char . " +
+                    "   ?sp hasco:hasPerspectiveEntity ?ent ." +
+                    "   ?sp hasco:hasPerspectiveCharacteristic ?char . " +
                     "   ?char rdfs:label ?charName .  " + 
                     "} }";
                 break;
@@ -85,7 +85,7 @@ public class DeploymentQueries {
         	        "PREFIX hasneto: <http://hadatac.org/ont/hasneto#>  " +
                     "SELECT ?deploy ?deturi ?detModel WHERE { " + 
                     "   ?deploy a vstoi:Deployment . " + 
-                    "   ?deploy hasneto:hasDetector ?deturi .  " +
+                    "   ?deploy hasco:hasDetector ?deturi .  " +
                     "   ?deturi a ?detModel . " +
                     "}";
                 break;
@@ -113,7 +113,7 @@ public class DeploymentQueries {
                     "   ?dep a vstoi:Deployment . " + 
                     "   ?dep vstoi:hasPlatform ?platformuri .  " +
                     "   ?platformuri rdfs:label ?platform . " +
-                    "   ?dep hasneto:hasInstrument ?instrumenturi .  " + 
+                    "   ?dep hasco:hasInstrument ?instrumenturi .  " + 
                     "   ?instrumenturi rdfs:label ?instrument . " +
                     "   ?dep prov:startedAtTime ?datetime .  " + 
                     "   FILTER NOT EXIST { ?dep prov:startedAtTime ?enddatetime . } " + 
@@ -130,7 +130,7 @@ public class DeploymentQueries {
                     "   ?dep a vstoi:Deployment . " + 
                     "   ?dep vstoi:hasPlatform ?platformuri .  " +
                     "   ?platformuri rdfs:label ?platform . " +
-                    "   ?dep hasneto:hasInstrument ?instrumenturi .  " + 
+                    "   ?dep hasco:hasInstrument ?instrumenturi .  " + 
                     "   ?instrumenturi rdfs:label ?instrument . " +
                     "   ?dep prov:startedAtTime ?startdatetime .  " + 
                     "   FILTER EXIST { ?dep prov:startedAtTime ?enddatetime . } " + 

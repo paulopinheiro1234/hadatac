@@ -48,7 +48,7 @@ public class GetSparqlQueryDynamic {
                 "  OPTIONAL {?id dcterms:identifier ?iden} . " + 
                 "  OPTIONAL {?id rdfs:comment ?comment} . " + 
                 "  OPTIONAL {?id skos:definition ?def} . " + 
-                "  OPTIONAL {?id hasneto:hasUnit ?unit} . " + 
+                "  OPTIONAL {?id hasco:hasUnit ?unit} . " + 
                 "  OPTIONAL {?id skos:editorialNote ?note} . " + 
                 "  OPTIONAL {?id prov:wasAttributedTo ?attrTo} . " + 
                 "  OPTIONAL {?id prov:wasAssociatedWith ?assocWith} . " + 

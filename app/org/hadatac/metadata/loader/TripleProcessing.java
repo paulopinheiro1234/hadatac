@@ -423,16 +423,20 @@ public class TripleProcessing {
 					else if (predicate.equals("hasco:hasSchema")) {
 						dataAcquisition.setSchemaUri(ValueCellProcessing.convertToWholeURI(cellValue));
 					}
-					else if (predicate.equals("hasneto:hasDeployment")) {
+					else if (predicate.equals("hasco:hasDeployment")) {
 						String deployment_uri = ValueCellProcessing.convertToWholeURI(cellValue);
 						dataAcquisition.setDeploymentUri(deployment_uri);
 						
 						Deployment deployment = Deployment.find(deployment_uri);
 						if (deployment != null) {
-							dataAcquisition.setPlatformUri(deployment.getPlatform().getUri());
-							dataAcquisition.setInstrumentUri(deployment.getInstrument().getUri());
-							dataAcquisition.setPlatformName(deployment.getPlatform().getLabel());
-							dataAcquisition.setInstrumentModel(deployment.getInstrument().getLabel());
+							if(deployment.getPlatform()!=null){
+								dataAcquisition.setPlatformUri(deployment.getPlatform().getUri());
+								dataAcquisition.setPlatformName(deployment.getPlatform().getLabel());
+							}
+							if(deployment.getInstrument()!=null){
+								dataAcquisition.setInstrumentUri(deployment.getInstrument().getUri());
+								dataAcquisition.setInstrumentModel(deployment.getInstrument().getLabel());
+							}
 							dataAcquisition.setStartedAtXsdWithMillis(deployment.getStartedAt());
 						}
 					}

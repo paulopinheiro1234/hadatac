@@ -103,7 +103,7 @@ public class DynamicFunctions extends Controller {
 	public static Map<String, String> getIndicatorTypes(){
 		String indicatorQuery= getPrefixes() 
 				+ "SELECT DISTINCT ?indicatorType ?label ?comment WHERE { "
-				+ "?indicatorType rdfs:subClassOf chear:Indicator . "
+				+ "?indicatorType rdfs:subClassOf hasco:Indicator . "
 				+ "?indicatorType rdfs:label ?label . "
 				+ "}";
 		Map<String, String> indicatorMap = new HashMap<String, String>();

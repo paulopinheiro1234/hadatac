@@ -55,13 +55,13 @@ public class DataAcquisitionBrowser extends Controller {
 		List<String> results = new ArrayList<String>();
 		String strQuery = NameSpaces.getInstance().printSparqlNameSpaceList() 
 				+ "SELECT DISTINCT ?attributeUri ?AttributeLabel ?DataAcquisitionSchema ?Method ?Deployment ?Study ?Comment ?StartTime ?EndTime WHERE { "
-				+ " ?AttributeSuper rdfs:subClassOf* hasneto:DataAcquisition . " 
+				+ " ?AttributeSuper rdfs:subClassOf* hasco:DataAcquisition . " 
 				+ " ?attributeUri a ?AttributeSuper . " 
 				+ " ?attributeUri rdfs:label ?AttributeLabel ."
 				+ " ?attributeUri hasco:isDataAcquisitionOf ?Study ."
 				+ " OPTIONAL {?attributeUri hasco:hasSchema ?DataAcquisitionSchema . }"
 				+ " OPTIONAL {?attributeUri hasco:hasMethod ?Method . }"
-				+ " OPTIONAL {?attributeUri hasneto:hasDeployment ?Deployment . }"
+				+ " OPTIONAL {?attributeUri hasco:hasDeployment ?Deployment . }"
 				+ " OPTIONAL {?attributeUri rdfs:comment ?Comment . }"
 				+ " OPTIONAL {?attributeUri prov:wasAssociatedWith ?Agent . }"
 				+ " OPTIONAL {?attributeUri prov:startedAtTime ?StartTime . }"
@@ -107,13 +107,13 @@ public class DataAcquisitionBrowser extends Controller {
 	public static boolean updateDataAcquisitions() {
 		String strQuery = NameSpaces.getInstance().printSparqlNameSpaceList() 
 				+ "SELECT DISTINCT ?attributeUri ?AttributeLabel ?DataAcquisitionSchema ?Method ?Deployment ?Study ?Comment ?StartTime ?EndTime WHERE { "
-				+ " ?AttributeSuper rdfs:subClassOf* hasneto:DataAcquisition . " 
+				+ " ?AttributeSuper rdfs:subClassOf* hasco:DataAcquisition . " 
 				+ " ?attributeUri a ?AttributeSuper . " 
 				+ " ?attributeUri rdfs:label ?AttributeLabel ."
 				+ " ?attributeUri hasco:isDataAcquisitionOf ?Study ."
 				+ " OPTIONAL {?attributeUri hasco:hasSchema ?DataAcquisitionSchema . }"
 				+ " OPTIONAL {?attributeUri hasco:hasMethod ?Method . }"
-				+ " OPTIONAL {?attributeUri hasneto:hasDeployment ?Deployment . }"
+				+ " OPTIONAL {?attributeUri hasco:hasDeployment ?Deployment . }"
 				+ " OPTIONAL {?attributeUri rdfs:comment ?Comment . }"
 				+ " OPTIONAL {?attributeUri prov:wasAssociatedWith ?Agent . }"
 				+ " OPTIONAL {?attributeUri prov:startedAtTime ?StartTime . }"

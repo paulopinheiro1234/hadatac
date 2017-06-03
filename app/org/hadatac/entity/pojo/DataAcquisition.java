@@ -844,7 +844,7 @@ public class DataAcquisition {
 		String queryString = NameSpaces.getInstance().printSparqlNameSpaceList() 
 				+ "SELECT ?dc ?startedAt ?endedAt WHERE {\n"
 				+ "  <" + dataset.getCcsvUri() + "> prov:wasGeneratedBy ?dc .\n"
-				+ "  ?dc a hasneto:DataAcquisition .\n"
+				+ "  ?dc a hasco:DataAcquisition .\n"
 				+ "  ?dc prov:startedAtTime ?startedAt .\n"
 				+ "  OPTIONAL { ?dc prov:endedAtTime ?endedAt } .\n"
 				+ "}";
@@ -1048,7 +1048,7 @@ public class DataAcquisition {
     	row.put("prov:startedAtTime", getStartedAt());
     	row.put("prov:used", getParameter());
     	row.put("prov:wasAssociatedWith", String.join(", ", abbrevAssociatedURIs));
-    	row.put("hasneto:hasDeployment", ValueCellProcessing.replaceNameSpaceEx(getDeploymentUri()));
+    	row.put("hasco:hasDeployment", ValueCellProcessing.replaceNameSpaceEx(getDeploymentUri()));
     	row.put("hasco:isDataAcquisitionOf", ValueCellProcessing.replaceNameSpaceEx(getStudyUri()));
     	row.put("hasco:hasSchema", ValueCellProcessing.replaceNameSpaceEx(getSchemaUri()));
     	row.put("hasco:hasTriggeringEvent", getTriggeringEventName());

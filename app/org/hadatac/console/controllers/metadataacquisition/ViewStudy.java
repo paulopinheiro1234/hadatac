@@ -36,7 +36,7 @@ public class ViewStudy extends Controller {
 		String indicatorQuery = "";
 		indicatorQuery += NameSpaces.getInstance().printSparqlNameSpaceList();
 		indicatorQuery += "SELECT ?studyIndicator ?label ?comment WHERE { "
-				+ "?studyIndicator rdfs:subClassOf chear:StudyIndicator . "
+				+ "?studyIndicator rdfs:subClassOf hasco:StudyIndicator . "
 				+ "?studyIndicator rdfs:label ?label . "
 				+ "?studyIndicator rdfs:comment ?comment . "
 				+ "}";
@@ -65,8 +65,8 @@ public class ViewStudy extends Controller {
 			indvIndicatorQuery += NameSpaces.getInstance().printSparqlNameSpaceList();
 			indvIndicatorQuery += "SELECT DISTINCT ?label ?uri WHERE { "
 					+ "?schemaUri hasco:isSchemaOf " + study_uri + " . "
-					+ "?schemaAttribute hasneto:partOfSchema ?schemaUri . "
-					+ "?schemaAttribute hasneto:hasAttribute ?uri . " 
+					+ "?schemaAttribute hasco:partOfSchema ?schemaUri . "
+					+ "?schemaAttribute hasco:hasAttribute ?uri . " 
 					+ "?uri rdfs:subClassOf* <" + parentIndicatorUri + "> . "
 					+ "?uri rdfs:label ?label . "
 					+ "}";
@@ -99,7 +99,7 @@ public class ViewStudy extends Controller {
 		String indicatorQuery = ""; 
 		indicatorQuery += NameSpaces.getInstance().printSparqlNameSpaceList();
 		indicatorQuery += "SELECT ?studyIndicator ?label ?comment WHERE { "
-				+ "?studyIndicator rdfs:subClassOf chear:StudyIndicator . "
+				+ "?studyIndicator rdfs:subClassOf hasco:StudyIndicator . "
 				+ "?studyIndicator rdfs:label ?label . "
 				+ "?studyIndicator rdfs:comment ?comment . "
 				+ "}";
@@ -128,8 +128,8 @@ public class ViewStudy extends Controller {
 			indvIndicatorQuery += NameSpaces.getInstance().printSparqlNameSpaceList();
 			indvIndicatorQuery += "SELECT DISTINCT ?studyUri ?label ?uri WHERE { "
 					+ "?schemaUri hasco:isSchemaOf " + study_uri + " . "
-					+ "?schemaAttribute hasneto:partOfSchema ?schemaUri . "
-					+ "?schemaAttribute hasneto:hasAttribute ?uri . "
+					+ "?schemaAttribute hasco:partOfSchema ?schemaUri . "
+					+ "?schemaAttribute hasco:hasAttribute ?uri . "
 					+ "?uri rdfs:subClassOf* <" + parentIndicatorUri + "> . " 
 					+ "?uri rdfs:label ?label . "
 					+ "}";

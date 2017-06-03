@@ -479,7 +479,7 @@ public class Study {
 		"  	?subUri rdfs:subClassOf* hasco:Study . " + 
 		"  	?study a ?subUri . " +
 		"  	?da hasco:isDataAcquisitionOf ?study . " + 
-		"   ?da hasco:hasSchema|hasneto:hasDeployment ?s . " +
+		"   ?da hasco:hasSchema|hasco:hasDeployment ?s . " +
 		"  	?s ?p ?o . " +
 		"  	FILTER (?study = " + study + ") " +
 		"  	} " +
@@ -489,7 +489,7 @@ public class Study {
 		"  	?subUri rdfs:subClassOf* hasco:Study . " + 
 		"  	?study a ?subUri . " +
 		"  	?da hasco:isDataAcquisitionOf ?study . " + 
-		"   ?da hasco:hasSchema|hasneto:hasDeployment ?s . " +
+		"   ?da hasco:hasSchema|hasco:hasDeployment ?s . " +
 		"  	?s ?p ?o . " +
 		"  	FILTER (?study != " + study + ") " +
 		"  	} " +
@@ -543,8 +543,8 @@ public class Study {
 		"  	?subUri rdfs:subClassOf* hasco:Study .  " + 
 		"  	?study a ?subUri . " +
 		"   ?da hasco:isDataAcquisitionOf ?study . " + 
-		"  	?da hasneto:hasDeployment ?deploy .  " +
-		"	?deploy vstoi:hasPlatform|hasneto:hasInstrument|hasneto:hasDetector ?s . " +
+		"  	?da hasco:hasDeployment ?deploy .  " +
+		"	?deploy vstoi:hasPlatform|hasco:hasInstrument|hasco:hasDetector ?s . " +
 		"  	?s ?p ?o . " +
 		"  FILTER (?study = " + study + ") " +
 		"    } " +
@@ -554,8 +554,8 @@ public class Study {
 		"  	?subUri rdfs:subClassOf* hasco:Study .  " + 
 		"  	?study a ?subUri . " +
 		"   ?da hasco:isDataAcquisitionOf ?study . " + 
-		"  	?da hasneto:hasDeployment ?deploy .  " +
-		"	?deploy vstoi:hasPlatform|hasneto:hasInstrument|hasneto:hasDetector ?s . " +
+		"  	?da hasco:hasDeployment ?deploy .  " +
+		"	?deploy vstoi:hasPlatform|hasco:hasInstrument|hasco:hasDetector ?s . " +
 		"  	?s ?p ?o . " +
 		"  	FILTER (?study != " + study + ") " +
 		"    } " +
@@ -568,7 +568,7 @@ public class Study {
 		"  	?study a ?subUri . " +
 		"  	?da hasco:isDataAcquisitionOf ?study . " +
 		"   ?da hasco:hasSchema ?schema . " +
-		"   ?s hasneto:partOfSchema ?schema . " +
+		"   ?s hasco:partOfSchema ?schema . " +
 		"  	?s ?p ?o . " +
 		"  	FILTER (?study = " + study + ") " +
 		"    } " +
@@ -579,7 +579,7 @@ public class Study {
 		"  	?study a ?subUri . " +
 		"  	?da hasco:isDataAcquisitionOf ?study . " +
 		"   ?da hasco:hasSchema ?schema . " +
-		"   ?s hasneto:partOfSchema ?schema . " +
+		"   ?s hasco:partOfSchema ?schema . " +
 		"  	?s ?p ?o . " +
 		"  FILTER (?study != " + study + ") " +
 		"    } " +

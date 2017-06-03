@@ -43,7 +43,7 @@ public class ViewSubject extends Controller {
 		}
 		indicatorQuery += NameSpaces.getInstance().printSparqlNameSpaceList();
 		indicatorQuery += "SELECT ?subjectIndicator ?label ?comment WHERE { "
-				+ "?subjectIndicator rdfs:subClassOf chear:StudyIndicator . "
+				+ "?subjectIndicator rdfs:subClassOf hasco:StudyIndicator . "
 				+ "?subjectIndicator rdfs:label ?label . "
 				+ "?subjectIndicator rdfs:comment ?comment . }";
 		QueryExecution qexecInd = QueryExecutionFactory.sparqlService(
@@ -68,18 +68,18 @@ public class ViewSubject extends Controller {
 			indvIndicatorQuery += NameSpaces.getInstance().printSparqlNameSpaceList();
 //			indvIndicatorQuery += "SELECT DISTINCT ?uri ?label ?comment WHERE { "
 //  					+ "?schemaUri	hasco:isSchemaOf " + study_uri + " ."
-//					+ "?uri	hasneto:partOfSchema	?schemaUri . "
-//					+ "?uri	hasneto:hasEntity		sio:Human . "
+//					+ "?uri	hasco:partOfSchema	?schemaUri . "
+//					+ "?uri	hasco:hasEntity		sio:Human . "
 //					+ "?subIndicator rdfs:subClassOf* <" + parentIndicatorUri + "> . "
-//					+ "?uri 	hasneto:hasAttribute	?subIndicator ."
+//					+ "?uri 	hasco:hasAttribute	?subIndicator ."
 //					+ "?uri rdfs:label		?label . "
 //					+ "?uri rdfs:comment	?comment ."
 //					+ "}";
 			
 			indvIndicatorQuery += "SELECT DISTINCT ?label ?uri WHERE { "
 					+ "?schemaUri hasco:isSchemaOf " + study_uri + " . "
-					+ "?schemaAttribute hasneto:partOfSchema ?schemaUri . "
-					+ "?schemaAttribute hasneto:hasAttribute ?uri . " 
+					+ "?schemaAttribute hasco:partOfSchema ?schemaUri . "
+					+ "?schemaAttribute hasco:hasAttribute ?uri . " 
 					+ "?uri rdfs:subClassOf* <" + parentIndicatorUri + "> . "
 					+ "?uri rdfs:label ?label . "
 					+ "}";
@@ -230,7 +230,7 @@ public class ViewSubject extends Controller {
 		}
 		indicatorQuery += NameSpaces.getInstance().printSparqlNameSpaceList();
 		indicatorQuery += "SELECT ?subjectIndicator ?label ?comment WHERE { "
-				+ "?subjectIndicator rdfs:subClassOf chear:StudyIndicator . "
+				+ "?subjectIndicator rdfs:subClassOf hasco:StudyIndicator . "
 				+ "?subjectIndicator rdfs:label ?label . "
 				+ "?subjectIndicator rdfs:comment ?comment . }";
 		Map<String, String> indicatorMap = new HashMap<String, String>();
@@ -258,18 +258,18 @@ public class ViewSubject extends Controller {
 			indvIndicatorQuery += NameSpaces.getInstance().printSparqlNameSpaceList();
 //			indvIndicatorQuery += "SELECT DISTINCT ?uri ?label ?comment WHERE { "
 //  					+ "?schemaUri	hasco:isSchemaOf " + study_uri + " ."
-//					+ "?uri	hasneto:partOfSchema	?schemaUri . "
-//					+ "?uri	hasneto:hasEntity		sio:Human . "
+//					+ "?uri	hasco:partOfSchema	?schemaUri . "
+//					+ "?uri	hasco:hasEntity		sio:Human . "
 //					+ "?subIndicator rdfs:subClassOf* <" + parentIndicatorUri + "> . "
-//					+ "?uri 	hasneto:hasAttribute	?subIndicator ."
+//					+ "?uri 	hasco:hasAttribute	?subIndicator ."
 //					+ "?uri rdfs:label		?label . "
 //					+ "?uri rdfs:comment	?comment ."
 //					+ "}";
 			
 			indvIndicatorQuery += "SELECT DISTINCT ?label ?uri WHERE { "
 					+ "?schemaUri hasco:isSchemaOf " + study_uri + " . "
-					+ "?schemaAttribute hasneto:partOfSchema ?schemaUri . "
-					+ "?schemaAttribute hasneto:hasAttribute ?uri . " 
+					+ "?schemaAttribute hasco:partOfSchema ?schemaUri . "
+					+ "?schemaAttribute hasco:hasAttribute ?uri . " 
 					+ "?uri rdfs:subClassOf* <" + parentIndicatorUri + "> . "
 					+ "?uri rdfs:label ?label . "
 					+ "}";
