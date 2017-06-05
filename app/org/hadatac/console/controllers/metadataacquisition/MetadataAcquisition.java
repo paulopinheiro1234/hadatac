@@ -102,7 +102,8 @@ public class MetadataAcquisition extends Controller {
 				+ " OPTIONAL{ ?studyUri hasco:hasAgent ?agent . "
 				+ "           ?agent foaf:name ?agentName } . "
 				+ " OPTIONAL{ ?studyUri hasco:hasInstitution ?institution . "
-				+ "           ?institution foaf:name ?institutionName } . "
+				+ "           ?institution foaf:name ?institutionName } . " 
+   				+ "				FILTER(lang(?attributeLabel) != 'en') "
 				+ " } ";
 		
 		QueryExecution qexecStudy = QueryExecutionFactory.sparqlService(
