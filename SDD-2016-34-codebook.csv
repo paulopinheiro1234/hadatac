@@ -1,9 +1,0 @@
-Column,Code,Label,Class
-race,0,,chear:White
-race,1,,chear:BlackOrAfricanAmerican
-race,2,,chear:OtherRace
-edu,0,high school degree or less,chear:HighSchoolOrLess
-edu,1,technical college or some college,chear:SomeCollegeorTechnicalSchool
-edu,2,college graduate,chear:CollegeGraduate
-smoke,0,no smoking in pregnancy,chear:NonSmoker
-smoke,1,some smoking in pregnancy,chear:Smoker
