@@ -91,9 +91,12 @@ public class DASchemaAttrGenerator extends BasicGenerator {
     	if ((rec.get(mapCol.get("AttributeOf"))) == null || (rec.get(mapCol.get("AttributeOf"))).equals("")) {
     		return "chear:unknownEntity";
     	} else {
-    		return hasEntityMap.get(rec.get(mapCol.get("AttributeOf")));
+        	if (codeMap.containsKey(hasEntityMap.get(rec.get(mapCol.get("AttributeOf"))))) {
+        		return codeMap.get(hasEntityMap.get(rec.get(mapCol.get("AttributeOf"))));
+        	} else {
+        		return hasEntityMap.get(rec.get(mapCol.get("AttributeOf")));
+        	}
     	}
-    	
     }
     
     private String getRole(CSVRecord rec) {
