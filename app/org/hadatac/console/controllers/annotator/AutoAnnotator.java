@@ -13,6 +13,7 @@ import java.net.URLDecoder;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -59,6 +60,7 @@ import org.hadatac.data.loader.DASchemaObjectGenerator;
 import org.hadatac.data.loader.DataAcquisitionGenerator;
 import org.hadatac.data.loader.DeploymentGenerator;
 import org.hadatac.data.loader.GeneralGenerator;
+import org.hadatac.data.loader.PVGenerator;
 import org.hadatac.data.loader.SampleGenerator;
 import org.hadatac.data.loader.SampleSubjectMapper;
 import org.hadatac.data.loader.StudyGenerator;
@@ -93,6 +95,7 @@ public class AutoAnnotator extends Controller {
 	
 	public static HashMap<String, String> codeMappings = new HashMap<String, String>();
 	public static HashMap<String, String> entityMappings = new HashMap<String, String>();
+	public static HashMap<String, List<String>> codebook = new HashMap<String, List<String>>();
 	public static String study_id;
 	
 	private static boolean search(String fileName, List<DataFile> pool) {
@@ -531,7 +534,7 @@ public class AutoAnnotator extends Controller {
 				throw new Exception(String.format("Found Row %d without URI specified!", i));
 			}
 			if (values.contains(val)) {
-				throw new Exception(String.format("Found Row %d with duplicate URIs!", i));
+				throw new Exception(String.format("Found Row %d " + val + " with duplicate URIs!", i));
 			}
 			else {
 				values.add(val);
@@ -665,18 +668,36 @@ public class AutoAnnotator extends Controller {
 	        System.out.println(cm.getAbsoluteFile());
 	        FileUtils.copyURLToFile(url2, cm);
 	        
-	        BufferedReader br = new BufferedReader(new FileReader(cm));
+	        URL url3 = new URL(hm.get("Codebook"));
+	        //System.out.println(url3.toString());
+	        File cb = new File(file.getName().replace(".csv", "")+"-codebook.csv");
+	        System.out.println(cb.getAbsoluteFile());
+	        FileUtils.copyURLToFile(url3, cb);
+	        
+	        BufferedReader bufRdr2 = new BufferedReader(new FileReader(cm));
 	        String line2 =  null;
 	        
 	        study_id = hm.get("Study_ID");
 
-	        while((line2 = br.readLine()) != null){
+	        while((line2 = bufRdr2.readLine()) != null){
 	            String str[] = line2.split(",");
 	            codeMappings.put(str[0], str[1]);
 	        	}
+	     
+	        BufferedReader bufRdr3 = new BufferedReader(new FileReader(cb));
+	        String line3 =  null;
+	        
+	        study_id = hm.get("Study_ID");
+
+	        while((line3 = bufRdr3.readLine()) != null){
+	            String[] codes = line3.split(",");
+	            List<String> codesl = Arrays.asList(codes); 
+	            codebook.put(codesl.get(0), codesl);
+	        	}
 	        
 	        bufRdr.close();
-	        br.close();
+	        bufRdr2.close();
+	        bufRdr3.close();
 	//        System.out.println(hm.keySet());
 	    	
 		    	try {
@@ -704,6 +725,13 @@ public class AutoAnnotator extends Controller {
 		    		
 		        	bSuccess = commitRows(generalGenerator.getRows(), generalGenerator.toString(), file.getName(), 
 		        			"DASchema", true);
+		        	
+		        	PVGenerator pvGenerator = new PVGenerator(cb);
+		    		System.out.println("Calling PVGenerator");
+		    		bSuccess = commitRows(pvGenerator.createRows(), pvGenerator.toString(), 
+		    				file.getName(), "PossibleValue", false);		        	
+		        	
+		        	
 		    	} catch (Exception e) {
 		    		AnnotationLog.printException(e, file.getName());
 		    		return false;
