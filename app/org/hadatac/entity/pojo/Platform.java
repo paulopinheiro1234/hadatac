@@ -114,11 +114,11 @@ public class Platform implements Comparable<Platform> {
 				platform.setLabel(object.asLiteral().getString());
 			} else if (statement.getPredicate().getURI().equals("http://hadatac.org/ont/vstoi#hasSerialNumber")) {
 				platform.setSerialNumber(object.asLiteral().getString());
-			} else if (statement.getPredicate().getURI().equals("http://hadatac.org/ont/hasneto#hasFirstCoordinate")) {
+			} else if (statement.getPredicate().getURI().equals("http://hadatac.org/ont/hasco/hasFirstCoordinate")) {
 				platform.setFirstCoordinate(object.asLiteral().getString());
-			} else if (statement.getPredicate().getURI().equals("http://hadatac.org/ont/hasneto#hasSecondCoordinate")) {
+			} else if (statement.getPredicate().getURI().equals("http://hadatac.org/ont/hasco/hasSecondCoordinate")) {
 				platform.setSecondCoordinate(object.asLiteral().getString());
-			} else if (statement.getPredicate().getURI().equals("http://hadatac.org/ont/hasneto#hasThirdCoordinate")) {
+			} else if (statement.getPredicate().getURI().equals("http://hadatac.org/ont/hasco/hasThirdCoordinate")) {
 				platform.setThirdCoordinate(object.asLiteral().getString());
 			}
 		}
@@ -161,9 +161,9 @@ public class Platform implements Comparable<Platform> {
 				+ "SELECT ?platform ?label ?lat ?lon ?ele WHERE {\n"
 				+ "  <" + hadatac.getDeploymentUri() + "> vstoi:hasPlatform ?platform .\n"
 				+ "  OPTIONAL { ?platform rdfs:label ?label . }\n"
-				+ "  OPTIONAL { ?platform <http://hadatac.org/ont/hasneto#hasFirstCoordinate> ?lat . }\n"
-				+ "  OPTIONAL { ?platform <http://hadatac.org/ont/hasneto#hasSecondCoordinate> ?lon . }\n"
-				+ "  OPTIONAL { ?platform <http://hadatac.org/ont/hasneto#hasThirdCoordinate> ?ele . }\n"
+				+ "  OPTIONAL { ?platform <http://hadatac.org/ont/hasco/hasFirstCoordinate> ?lat . }\n"
+				+ "  OPTIONAL { ?platform <http://hadatac.org/ont/hasco/hasSecondCoordinate> ?lon . }\n"
+				+ "  OPTIONAL { ?platform <http://hadatac.org/ont/hasco/hasThirdCoordinate> ?ele . }\n"
 				+ "}";
 		
 		Query query = QueryFactory.create(queryString);

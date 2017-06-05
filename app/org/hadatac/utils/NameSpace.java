@@ -15,6 +15,7 @@ public class NameSpace {
 	public static final String VSTOI                   = "vstoi";
 	public static final String PROV                    = "prov";
 	public static final String HASNETO                 = "hasneto";
+	public static final String HASCO               		= "hasco";
 	public static final String FOAF                    = "foaf";
 	public static final String HADATAC_SN              = "hadatac-sn";
 	public static final String HADATAC_ENTITIES        = "hadatac-entities";
