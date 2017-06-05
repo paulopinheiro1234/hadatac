@@ -145,14 +145,13 @@ public class DataAcquisitionGenerator extends BasicGenerator {
 		Deployment deployment = Deployment.find(deploymentUri);
 		if (deployment != null) {
 			dataAcquisition.setDeploymentUri(deploymentUri);
-			if (null != deployment.getPlatform()) {
+			if (deployment.getPlatform() != null) {
 				dataAcquisition.setPlatformUri(deployment.getPlatform().getUri());
 				dataAcquisition.setPlatformName(deployment.getPlatform().getLabel());
 			} else {
 				throw new Exception(String.format("No platform of Deployment %s is specified!", deploymentUri));
 			}
-			
-			if (null != deployment.getInstrument()) {
+			if (deployment.getInstrument() != null) {
 				dataAcquisition.setInstrumentUri(deployment.getInstrument().getUri());
 				dataAcquisition.setInstrumentModel(deployment.getInstrument().getLabel());
 			} else {

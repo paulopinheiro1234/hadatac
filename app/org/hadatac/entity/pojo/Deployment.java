@@ -363,11 +363,11 @@ public class Deployment {
 		while (stmtIterator.hasNext()) {
 			Statement statement = stmtIterator.next();
 			RDFNode object = statement.getObject();
-			if (statement.getPredicate().getURI().equals("http://hadatac.org/ont/hasneto#hasInstrument")) {
+			if (statement.getPredicate().getURI().equals("http://hadatac.org/ont/hasco/hasInstrument")) {
 				deployment.instrument = Instrument.find(object.asResource().getURI());
 			} else if (statement.getPredicate().getURI().equals("http://hadatac.org/ont/vstoi#hasPlatform")) {
 				deployment.platform = Platform.find(object.asResource().getURI());
-			} else if (statement.getPredicate().getURI().equals("http://hadatac.org/ont/hasneto#hasDetector")) {
+			} else if (statement.getPredicate().getURI().equals("http://hadatac.org/ont/hasco/hasDetector")) {
 				deployment.detectors.add(Detector.find(object.asResource().getURI()));
 			} else if (statement.getPredicate().getURI().equals("http://www.w3.org/ns/prov#startedAtTime")) {
 				deployment.setStartedAtXsdWithMillis(object.asLiteral().getString());
