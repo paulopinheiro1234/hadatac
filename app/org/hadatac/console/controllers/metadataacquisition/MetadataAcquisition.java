@@ -166,7 +166,15 @@ public class MetadataAcquisition extends Controller {
 				}
 				
 				if (!arrValues.contains(value)) {
-					arrValues.add(value);
+					boolean dupl=false;
+					for(String val : arrValues){
+						if(val.toLowerCase().equals(value.toLowerCase())){
+							dupl=true;
+						}
+					}
+					if(!dupl){
+						arrValues.add(value);	
+					}
 				}
 			}
 		}
