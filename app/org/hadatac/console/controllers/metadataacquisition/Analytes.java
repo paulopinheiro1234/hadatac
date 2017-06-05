@@ -54,7 +54,7 @@ public class Analytes extends Controller {
     public static List<String> getIndicators() {
 		String initStudyQuery = NameSpaces.getInstance().printSparqlNameSpaceList() 
 				+ " SELECT DISTINCT ?indicatorLabel WHERE { "
-				+ " ?subTypeUri rdfs:subClassOf hasco:Study . "
+				+ " ?subTypeUri rdfs:subClassOf* hasco:Study . "
 				+ " ?studyUri a ?subTypeUri . "
 				+ " ?schemaUri hasco:isSchemaOf ?studyUri . "
 				+ " ?schemaAttribute hasco:partOfSchema ?schemaUri . "
@@ -85,6 +85,8 @@ public class Analytes extends Controller {
 		String strQuery = NameSpaces.getInstance().printSparqlNameSpaceList() 
 				+ " SELECT DISTINCT ?studyUri ?studyLabel ?proj ?studyTitle ?studyComment "
 				+ " ?indicatorLabel ?attributeLabel ?agentName ?institutionName WHERE { "
+				+ " ?subTypeUri rdfs:subClassOf* hasco:Study . "
+				+ " ?studyUri a ?subTypeUri . "
 				+ " ?schemaUri hasco:isSchemaOf ?studyUri . "
 				+ " ?schemaAttribute hasco:partOfSchema ?schemaUri . "
 				+ " ?schemaAttribute hasco:hasAttribute|hasco:hasEntity ?attribute . "
@@ -146,7 +148,7 @@ public class Analytes extends Controller {
 			}
 			if (soln.contains("indicatorLabel")) {
 				String key = soln.get("indicatorLabel").toString().
-						replace(",", "").replace(" ", "") + "_m";
+						replace(",","").replace(" ", "") + "_m";
 				String value = soln.get("attributeLabel").toString();
 				ArrayList<String> arrValues = null;
 				if (!studyInfo.containsKey(key)) {
