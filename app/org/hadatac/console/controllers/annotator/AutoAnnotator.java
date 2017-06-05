@@ -534,7 +534,7 @@ public class AutoAnnotator extends Controller {
 				throw new Exception(String.format("Found Row %d without URI specified!", i));
 			}
 			if (values.contains(val)) {
-				throw new Exception(String.format("Found Row %d " + val + " with duplicate URIs!", i));
+				throw new Exception(String.format("Duplicate Concepts in Inputfile row %d :" + val + " would be duplicate URIs!", i));
 			}
 			else {
 				values.add(val);
