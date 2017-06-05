@@ -130,12 +130,13 @@ public class Subject {
 	}
 	
 	public static String findCodeValue(String attr_uri, String code) {
+		
+		System.out.println(attr_uri + "---" + code);
         String queryString = NameSpaces.getInstance().printSparqlNameSpaceList()
                 + " SELECT ?codeValue WHERE {"
-                + " ?uri hasco:hasReference <" + attr_uri + ">."
-                + " ?value hasco:isPossibleValueOf ?uri . "
-                + " ?value hasco:hasCode \"" + code + "\" . "
-                + " OPTIONAL { ?value hasco:hasCodeValue ?codeValue . }"        
+                + " ?uri hasco:isPossibleValueOf <" + attr_uri + ">. "
+                + " ?uri hasco:hasCode \"" + code + "\" . "
+                + " OPTIONAL { ?uri hasco:hasCodeValue ?codeValue . }"        
                 + " }";
         
         Query query = QueryFactory.create(queryString);
