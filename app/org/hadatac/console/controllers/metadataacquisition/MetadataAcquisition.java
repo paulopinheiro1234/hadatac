@@ -82,7 +82,7 @@ public class MetadataAcquisition extends Controller {
 	public static boolean updateStudy() {
 		String strQuery = NameSpaces.getInstance().printSparqlNameSpaceList() 
 				+ " SELECT DISTINCT ?studyUri ?studyLabel ?proj ?studyTitle ?studyComment "
-				+ " ?indicatorLabel ?attributeLabel ?agentName ?institutionName WHERE { "
+				+ " ?indicatorLabel ?attributeLabel ?roleLabel ?agentName ?institutionName WHERE { "
 				+ " ?studyUri a ?subUri . "
 				+ " ?subUri rdfs:subClassOf* hasco:Study . "
 				+ " OPTIONAL{ ?schemaAttribute hasco:partOfSchema ?schemaUri . "
@@ -92,6 +92,9 @@ public class MetadataAcquisition extends Controller {
 				+ " ?indicator rdfs:label ?indicatorLabel . " 
 				+ " ?attribute rdfs:subClassOf+ ?indicator . " 
 				+ " ?attribute rdfs:label ?attributeLabel } . " 
+				+ " OPTIONAL { ?schemaAttribute hasco:isAttributeOf ?object . "
+                + " ?object hasco:hasRole ?role . "
+                + " ?role rdfs:label ?roleLabel } . "
 				+ " OPTIONAL{ ?studyUri rdfs:label ?studyLabel } . "
 				+ " OPTIONAL{ ?studyUri hasco:hasProject ?proj } . "
 				+ " OPTIONAL{ ?studyUri skos:definition ?studyTitle } . "
@@ -147,7 +150,12 @@ public class MetadataAcquisition extends Controller {
 			if (soln.contains("indicatorLabel")) {
 				String key = soln.get("indicatorLabel").toString().
 						replace(",", "").replace(" ", "") + "_m";
-				String value = soln.get("attributeLabel").toString();
+				String value = "";
+				if (soln.contains("roleLabel")){
+					value = soln.get("roleLabel").toString() + "'s " + soln.get("attributeLabel").toString();
+				} else {
+					value = soln.get("attributeLabel").toString();
+				}
 				ArrayList<String> arrValues = null;
 				if (!studyInfo.containsKey(key)) {
 					arrValues = new ArrayList<String>();
