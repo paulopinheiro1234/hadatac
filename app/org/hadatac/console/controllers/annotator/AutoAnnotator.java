@@ -729,7 +729,7 @@ public class AutoAnnotator extends Controller {
 		        	PVGenerator pvGenerator = new PVGenerator(cb);
 		    		System.out.println("Calling PVGenerator");
 		    		bSuccess = commitRows(pvGenerator.createRows(), pvGenerator.toString(), 
-		    				file.getName(), "PossibleValue", false);		        	
+		    				file.getName(), "PossibleValue", true);		        	
 		        	
 		        	
 		    	} catch (Exception e) {

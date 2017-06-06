@@ -1,0 +1,9 @@
+Attribute,Value
+Study_Name,LifeCodes
+Study_Link,https://dx.doi.org/10.1016/j.ajog.2016.02.005
+Data_Dictionary,https://docs.google.com/spreadsheets/d/1zS4MSGAzr8YWwtDAJEHt_3xodksxq1bnGX7Cw5FO7So/export?exportFormat=csv&gid=1648234281
+Codebook,https://docs.google.com/spreadsheets/d/1zS4MSGAzr8YWwtDAJEHt_3xodksxq1bnGX7Cw5FO7So/export?exportFormat=csv&gid=453394121
+Code_Mappings,https://raw.githubusercontent.com/tetherless-world/chear-ontology/master/code_mappings.csv
+Study_ID,2016-36
+Imports,http://hadatac.org/ont/chear/
+Timeline,https://docs.google.com/spreadsheets/d/1RW8obL3IhcuIGNkpxHw6TqtwTe1s29WSFNqxJfyFfvY/export?exportFormat=csv&gid=2052996920
