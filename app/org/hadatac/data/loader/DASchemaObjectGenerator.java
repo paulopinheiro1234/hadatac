@@ -17,12 +17,10 @@ public class DASchemaObjectGenerator extends BasicGenerator {
 	String startTime = "";
 	String SDDName = "";
 	String study_id = "";
-	HashMap<String, String> codeMap;
 	
 	public DASchemaObjectGenerator(File file) {
 		super(file);
 		this.SDDName = file.getName();
-		this.codeMap = AutoAnnotator.codeMappings;
 		this.study_id = AutoAnnotator.study_id;
 	}
 //Column	Attribute	attributeOf	Unit	Time	Entity	Role	Relation	inRelationTo	wasDerivedFrom	wasGeneratedBy	hasPosition	
@@ -70,15 +68,7 @@ public class DASchemaObjectGenerator extends BasicGenerator {
     }
     
     private String getEntity(CSVRecord rec) {
-    	if ((rec.get(mapCol.get("Entity"))) == null || (rec.get(mapCol.get("Entity"))).equals("")) {
-    		return null;
-    	} else {
-        	if (codeMap.containsKey(rec.get(mapCol.get("Entity")))) {
-        		return codeMap.get(rec.get(mapCol.get("Entity")));
-        	} else {
-        		return rec.get(mapCol.get("Entity"));
-        	}
-    	}
+    	return rec.get(mapCol.get("Entity"));
     }
     
     private String getRole(CSVRecord rec) {
