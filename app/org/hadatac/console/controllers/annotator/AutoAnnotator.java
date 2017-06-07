@@ -444,7 +444,7 @@ public class AutoAnnotator extends Controller {
 		boolean bSuccess = true;
     	try {
     		SampleSubjectMapper mapper = new SampleSubjectMapper(file);
-        	bSuccess = commitRows(mapper.createRows(), mapper.toString(), 
+        	bSuccess = directUpdateRows(mapper.createRows(), mapper.toString(), 
         			file.getName(), "Sample", true);
     	} catch (Exception e) {
 	        e.printStackTrace();
@@ -543,6 +543,54 @@ public class AutoAnnotator extends Controller {
 			i++;
 		}
 	}
+	
+	private static boolean directUpdateRows(List<Map<String, Object>> rows, String contentInCSV,
+			String fileName, String tableName, boolean toTripleStore) {
+
+		AnnotationLog log = AnnotationLog.find(fileName);
+		if (null == log) {
+			log = new AnnotationLog();
+			log.setFileName(fileName);
+		}
+		        
+		Credential cred = Credential.find();
+		if (null == cred) {
+			log.resetLog();
+			log.addline(Feedback.println(Feedback.WEB, "[ERROR] No LabKey credentials are provided!"));
+			log.save();
+			return false;
+		}
+		
+		String site = ConfigProp.getPropertyValue("labkey.config", "site");
+		String path = "/" + ConfigProp.getPropertyValue("labkey.config", "folder");
+		LabkeyDataHandler labkeyDataHandler = new LabkeyDataHandler(
+				site, cred.getUserName(), cred.getPassword(), path);
+		try {
+				int nRows = labkeyDataHandler.updateRows(tableName, rows);
+				log.addline(Feedback.println(Feedback.WEB, String.format(
+						"[OK] %d row(s) have been updated into Table %s ", nRows, tableName)));
+			} catch (CommandException e) {
+				log.addline(Feedback.println(Feedback.WEB, "[ERROR] directUpdateRows inside AutoAnnotator: " + e));
+				log.save();
+				return false;
+			}
+		
+		if (toTripleStore) {
+			DatasetAccessor accessor = DatasetAccessorFactory.createHTTP(
+					Collections.getCollectionsName(Collections.METADATA_GRAPH));
+			Model model = createModel(rows);
+	    	accessor.add(model);
+	    	log.addline(Feedback.println(Feedback.WEB, String.format(
+					"[OK] %d triple(s) have been committed to triple store", model.size())));
+		}
+		
+		// THIS LINE IS EXCEEDING THE STORAGE CAPABILITY OF ONE CELL IN THE SOLR DATA COLLECTION FOR ANNOTATION LOG
+		//log.addline(Feedback.println(Feedback.WEB, String.format(contentInCSV)));
+		log.save();
+		
+		return true;
+	}
+
 	
 	private static boolean commitRows(List<Map<String, Object>> rows, String contentInCSV,
 			String fileName, String tableName, boolean toTripleStore) {
