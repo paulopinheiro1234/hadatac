@@ -112,20 +112,14 @@ public class ViewSample extends Controller {
 	    return results;
 	}
 	
-	public static String findValues(String sample_uri, String study_uri, String subject_uri) {
-		ValueCellProcessing cellProc = new ValueCellProcessing();
-		return Measurement.findForViews(findUser(), study_uri, cellProc.convertToWholeURI(subject_uri), sample_uri).documents.get(0).getValue().toString();
-	}
-	
 	// for /metadata HTTP GET requests
 	@Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
     public static Result index(String sample_uri, String study_uri, String subject_uri) {
 
 		Map<String, String> indicatorValues = new HashMap<String, String>();
     	Map<String, List<String>> sampleResult = findBasic(sample_uri);
-    	String samplevalues = findValues(sample_uri, study_uri, subject_uri);
         
-    	return ok(viewSample.render(sampleResult,indicatorValues, samplevalues));   
+    	return ok(viewSample.render(sampleResult,indicatorValues));
         
     }// /index()
 
