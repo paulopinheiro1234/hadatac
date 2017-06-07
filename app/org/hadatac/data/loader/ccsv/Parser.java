@@ -131,7 +131,27 @@ public class Parser {
 		boolean isSubjectPlatform = Subject.isPlatform(hadatacKb.getDeployment().getPlatform().getUri());
 		SolrClient solr = new HttpSolrClient(Play.application().configuration().
 				getString("hadatac.solr.data") + Collections.DATA_ACQUISITION);
+                boolean isSample;
+		String matrix = "";
+		String analyte = "";
 		for (CSVRecord record : records) {
+		        // HACK FOR JUNE20
+		        isSample = false;
+		        if (record.get(0).toLowerCase().equals("sample") ) {
+				isSample = true;
+				if (record.get(5) != null && !record.get(5).equals("")) {
+				    matrix = record.get(5);
+				    matrix = matrix.substring(0,1).toUpperCase() + matrix.substring(1).toLowerCase();
+				} else {
+				    matrix = "";
+				}
+				if (record.get(6) != null && !record.get(6).equals("")) {
+				    analyte = "concentration of " + record.get(6);
+				} else {
+				    analyte = "";
+				}
+		           System.out.println("CSV Record: matrix " + matrix + " Analyte: " + analyte);
+			}
 			Iterator<MeasurementType> iter = hadatacKb.getDataset().getMeasurementTypes().iterator();
 			while (iter.hasNext()) {
 				MeasurementType measurementType = iter.next();
@@ -219,15 +239,19 @@ public class Parser {
 				measurement.setAcquisitionUri(hadatacKb.getDataAcquisition().getUri());
 				measurement.setUnit(measurementType.getUnitLabel());
 				measurement.setUnitUri(measurementType.getUnitUri());
-				measurement.setCharacteristic(measurementType.getCharacteristicLabel());
 				measurement.setCharacteristicUri(measurementType.getCharacteristicUri());
 				measurement.setInstrumentModel(hadatacKb.getDeployment().getInstrument().getLabel());
 				measurement.setInstrumentUri(hadatacKb.getDeployment().getInstrument().getUri());
 				measurement.setPlatformName(hadatacKb.getDeployment().getPlatform().getLabel());
 				measurement.setPlatformUri(hadatacKb.getDeployment().getPlatform().getUri());
-				//if (!measurement.getEntity().startsWith("subject")) {
+				// HACK FOR JUNE 20
+				if (isSample && !matrix.equals("") && !analyte.equals("")) {
+				    measurement.setEntity(matrix);
+				    measurement.setCharacteristic(analyte);
+				} else {
 				    measurement.setEntity(measurementType.getEntityLabel());
-				    //}
+				    measurement.setCharacteristic(measurementType.getCharacteristicLabel());
+				}
 				measurement.setEntityUri(measurementType.getEntityUri());
 				measurement.setDatasetUri(hadatacCcsv.getDatasetKbUri());
 				try {
