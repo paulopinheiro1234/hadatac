@@ -603,6 +603,7 @@ public class AutoAnnotator extends Controller {
 		
 		try {
 			checkRows(rows, "hasURI");
+			System.out.println("checkRows succeed.");
 		} catch (Exception e) {
 			log.addline(Feedback.println(Feedback.WEB, String.format(
 					"[ERROR] Trying to commit invalid rows to LabKey Table %s: ", tableName)
@@ -624,14 +625,17 @@ public class AutoAnnotator extends Controller {
 		LabkeyDataHandler labkeyDataHandler = new LabkeyDataHandler(
 				site, cred.getUserName(), cred.getPassword(), path);
 		try {
-			//log.addline(Feedback.println(Feedback.WEB, "The first Row is " + rows.get(0).toString()));
+			System.out.println(rows.size());
+			log.addline(Feedback.println(Feedback.WEB, "The first Row is " + rows.get(0).toString()));
 			int nRows = labkeyDataHandler.insertRows(tableName, rows);
+			System.out.println("insert rows succeed.");
 			log.addline(Feedback.println(Feedback.WEB, String.format(
 					"[OK] %d row(s) have been inserted into Table %s ", nRows, tableName)));
 		} catch (CommandException e1) {
           	try {
           		labkeyDataHandler.deleteRows(tableName, rows);
 				int nRows = labkeyDataHandler.insertRows(tableName, rows);
+				System.out.println("update " + nRows + " rows succeed in " + tableName + " .");
 				log.addline(Feedback.println(Feedback.WEB, String.format(
 						"[OK] %d row(s) have been updated into Table %s ", nRows, tableName)));
 			} catch (CommandException e) {
@@ -694,7 +698,7 @@ public class AutoAnnotator extends Controller {
 	}
 	
 	public static boolean annotateDataAcquisitionSchemaFile(File file) {
-        
+		
     	boolean bSuccess = true;
     	try{
 	        BufferedReader bufRdr;
@@ -716,11 +720,33 @@ public class AutoAnnotator extends Controller {
 	        System.out.println(cm.getAbsoluteFile());
 	        FileUtils.copyURLToFile(url2, cm);
 	        
-	        URL url3 = new URL(hm.get("Codebook"));
-	        //System.out.println(url3.toString());
-	        File cb = new File(file.getName().replace(".csv", "")+"-codebook.csv");
-	        System.out.println(cb.getAbsoluteFile());
-	        FileUtils.copyURLToFile(url3, cb);
+	        try{
+	        	URL url3 = new URL(hm.get("Codebook"));
+		        //System.out.println(url3.toString());
+	        	File cb = new File(file.getName().replace(".csv", "")+"-codebook.csv");
+		        System.out.println(cb.getAbsoluteFile());
+		        FileUtils.copyURLToFile(url3, cb);
+		        BufferedReader bufRdr3 = new BufferedReader(new FileReader(cb));
+		        String line3 =  null;
+
+		        while((line3 = bufRdr3.readLine()) != null){
+		            String[] codes = line3.split(",");
+		            List<String> codesl = Arrays.asList(codes); 
+		            codebook.put(codesl.get(0), codesl);
+		        	}
+		        bufRdr3.close();
+		        
+	        	PVGenerator pvGenerator = new PVGenerator(cb);
+	    		System.out.println("Calling PVGenerator");
+	    		bSuccess = commitRows(pvGenerator.createRows(), pvGenerator.toString(), 
+	    				file.getName(), "PossibleValue", true);
+		        
+	        } catch (Exception e) {
+	        	
+	        	File cb = new File(file.getName().replace(".csv", "")+"-codebook.csv");
+		        System.out.println(cb.getAbsoluteFile());
+		        System.out.println(cb.length());
+			}
 	        
 	        BufferedReader bufRdr2 = new BufferedReader(new FileReader(cm));
 	        String line2 =  null;
@@ -732,20 +758,11 @@ public class AutoAnnotator extends Controller {
 	            codeMappings.put(str[0], str[1]);
 	        	}
 	     
-	        BufferedReader bufRdr3 = new BufferedReader(new FileReader(cb));
-	        String line3 =  null;
-	        
-	        study_id = hm.get("Study_ID");
 
-	        while((line3 = bufRdr3.readLine()) != null){
-	            String[] codes = line3.split(",");
-	            List<String> codesl = Arrays.asList(codes); 
-	            codebook.put(codesl.get(0), codesl);
-	        	}
 	        
 	        bufRdr.close();
 	        bufRdr2.close();
-	        bufRdr3.close();
+	        
 	//        System.out.println(hm.keySet());
 	    	
 		    	try {
@@ -762,7 +779,7 @@ public class AutoAnnotator extends Controller {
 		    				file.getName(), "DASchemaAttribute", true);
 		        	
 		        	GeneralGenerator generalGenerator = new GeneralGenerator();
-
+		        	System.out.println("Calling DASchemaGenerator");
 		        	Map<String, Object> row = new HashMap<String, Object>();
 		        	row.put("hasURI", "chear-kb:DAS-" + file.getName().replace(".csv",""));
 		        	row.put("a", "hasco:DASchema");
@@ -772,12 +789,7 @@ public class AutoAnnotator extends Controller {
 		        	generalGenerator.addRow(row);
 		    		
 		        	bSuccess = commitRows(generalGenerator.getRows(), generalGenerator.toString(), file.getName(), 
-		        			"DASchema", true);
-		        	
-		        	PVGenerator pvGenerator = new PVGenerator(cb);
-		    		System.out.println("Calling PVGenerator");
-		    		bSuccess = commitRows(pvGenerator.createRows(), pvGenerator.toString(), 
-		    				file.getName(), "PossibleValue", true);		        	
+		        			"DASchema", true);	        	
 		        	
 		        	
 		    	} catch (Exception e) {

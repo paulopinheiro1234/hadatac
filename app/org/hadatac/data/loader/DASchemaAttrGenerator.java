@@ -35,8 +35,8 @@ public class DASchemaAttrGenerator extends BasicGenerator {
 	
 	        while((line = br.readLine()) != null){
 	            String str[] = line.split(",");
-	            if (str[0].contains("??")){
-	            hasEntityMap.put(str[0], str[5]);
+	            if (str[5].length() > 0){
+	            	hasEntityMap.put(str[0], str[5]);
 //	            System.out.println(str[0] + "-----" + str[5]);
 	        	}
 	        }
@@ -94,7 +94,12 @@ public class DASchemaAttrGenerator extends BasicGenerator {
         	if (codeMap.containsKey(hasEntityMap.get(rec.get(mapCol.get("AttributeOf"))))) {
         		return codeMap.get(hasEntityMap.get(rec.get(mapCol.get("AttributeOf"))));
         	} else {
-        		return hasEntityMap.get(rec.get(mapCol.get("AttributeOf")));
+        		if (hasEntityMap.containsKey(rec.get(mapCol.get("AttributeOf")))){
+        			return hasEntityMap.get(rec.get(mapCol.get("AttributeOf")));
+        		} else {
+        			return rec.get(mapCol.get("AttributeOf"));
+        		}
+        		
         	}
     	}
     }
@@ -150,7 +155,7 @@ public class DASchemaAttrGenerator extends BasicGenerator {
     @Override
     Map<String, Object> createRow(CSVRecord rec, int row_number) throws Exception {
     	Map<String, Object> row = new HashMap<String, Object>();
-    	row.put("hasURI", kbPrefix + "DASA-" + getLabel(rec).replace("_","-").replace("??", "") + "-" + study_id);
+    	row.put("hasURI", kbPrefix + "DASA-" + getLabel(rec).trim().replace(" ", "").replace("_","-").replace("??", "") + "-" + study_id);
     	row.put("a", "hasco:DASchemaAttribute");
     	row.put("rdfs:label", getLabel(rec));
     	row.put("rdfs:comment", getLabel(rec));

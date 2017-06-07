@@ -142,7 +142,7 @@ public class DASchemaObjectGenerator extends BasicGenerator {
     @Override
     Map<String, Object> createRow(CSVRecord rec, int row_number) throws Exception {
     	Map<String, Object> row = new HashMap<String, Object>();
-    	row.put("hasURI", kbPrefix + "DASO-" + getLabel(rec).replace("_","-").replace("??", "") + "-" + study_id);
+    	row.put("hasURI", kbPrefix + "DASO-" + getLabel(rec).trim().replace(" ","").replace("_","-").replace("??", "") + "-" + study_id);
     	row.put("a", "hasco:DASchemaObject");
     	row.put("hasco:partOfSchema", kbPrefix + "DAS-" + SDDName.replace(".csv", ""));
     	row.put("hasco:hasEntity", getEntity(rec));
