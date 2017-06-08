@@ -131,10 +131,11 @@ public class Subject {
 	
 	public static String findCodeValue(String attr_uri, String code) {
 		
-		System.out.println(attr_uri + "---" + code);
+//		System.out.println(attr_uri + "---" + code);
         String queryString = NameSpaces.getInstance().printSparqlNameSpaceList()
                 + " SELECT ?codeValue WHERE {"
-                + " ?uri hasco:isPossibleValueOf <" + attr_uri + ">. "
+                + " ?attruri hasco:hasAttribute <" + attr_uri + "> . "
+                + " ?uri hasco:isPossibleValueOf ?attruri . "
                 + " ?uri hasco:hasCode \"" + code + "\" . "
                 + " OPTIONAL { ?uri hasco:hasCodeValue ?codeValue . }"        
                 + " }";
