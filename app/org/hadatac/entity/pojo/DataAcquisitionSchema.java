@@ -13,118 +13,142 @@ import org.apache.jena.query.ResultSetFactory;
 import org.apache.jena.query.ResultSetRewindable;
 import org.hadatac.utils.Collections;
 import org.hadatac.utils.NameSpaces;
+import org.hadatac.metadata.loader.ValueCellProcessing;
+import org.hadatac.entity.pojo.DataAcquisitionSchemaAttribute;
+import org.hadatac.entity.pojo.DataAcquisitionSchemaObject;
 
 public class DataAcquisitionSchema {
 
-	private String uri = "";
-    private List<SchemaAttribute> attributes = null;
+    private String uri = "";
+    private List<DataAcquisitionSchemaAttribute> attributes = null;
+    private List<DataAcquisitionSchemaObject> objects = null;
+    private int valueColumn;
+    private int timestampColumn;
+    private int timeInstantColumn;
+    private int idColumn;
+    private int elevationColumn;
     
-    public class SchemaAttribute {
-    	private String position;
-    	private String entity;
-    	private String attribute;
-    	private String unit;
-    	
-    	public SchemaAttribute(String position, String entity, String attribute, String unit) {
-    		this.position = position;
-    		this.entity = entity;
-    		this.attribute = attribute;
-    		this.unit = unit;
-		}
-    	
-    	public String getPosition() {
-    		return position;
-		}
-    	public String getEntity() {
-    		return entity;
-		}
-    	public String getAttribute() {
-    		return attribute;
-		}
-    	public String getUnit() {
-    		return unit;
-		}
+    public DataAcquisitionSchema() {
+       this.timestampColumn = -1;
+       this.timeInstantColumn = -1;
+       this.elevationColumn = -1;
+       this.idColumn = -1;
     }
-    
+	
+    public int getTimestampColumn() {
+	return timestampColumn;
+    }
+
+    public void setTimestampColumn(int timestampColumn) {
+	this.timestampColumn = timestampColumn;
+    }
+
+    public int getTimeInstantColumn() {
+	return timeInstantColumn;
+    }
+
+    public void setTimeInstantColumn(int timeInstantColumn) {
+	this.timeInstantColumn = timeInstantColumn;
+    }
+
+    public int getIdColumn() {
+	return idColumn;
+    }
+
+    public void setIdColumn(int idColumn) {
+	this.idColumn = idColumn;
+    }
+
+    public int getElevationColumn() {
+	return elevationColumn;
+    }
+
+    public void setElevationColumn(int elevationColumn) {
+	this.elevationColumn = elevationColumn;
+    }
+
     public String getUri() {
     	return uri;
-	}
+    }
+
     public void setUri(String uri) {
     	this.uri = uri;
-	}
+    }
 
-    public List<SchemaAttribute> getAttributes() {
+    public List<DataAcquisitionSchemaAttribute> getAttributes() {
     	return attributes;
     }
     
-    public void setAttributes(List<SchemaAttribute> attributes) {
-		this.attributes = attributes;
+    public void setAttributes(List<DataAcquisitionSchemaAttribute> attributes) {
+	this.attributes = attributes;
+	for (DataAcquisitionSchemaAttribute dasa : attributes) {
+	    if (dasa.getAttribute().equals(ValueCellProcessing.replacePrefixEx("sio:TimeStamp"))) {
+		setTimestampColumn(dasa.getPositionInt());
+		System.out.println("[OK] DataAcquisitionSchemat TimeStampColumn: " + dasa.getPositionInt());
+	    }
+	    if (dasa.getAttribute().equals(ValueCellProcessing.replacePrefixEx("sio:TimeInstant"))) {
+		setTimeInstantColumn(dasa.getPositionInt());
+		System.out.println("[OK] DataAcquisitionSchemat TimeInstantColumn: " + dasa.getPositionInt());
+	    }
+	    if (dasa.getAttribute().equals(ValueCellProcessing.replacePrefixEx("hasco:originalID"))) {
+		setIdColumn(dasa.getPositionInt());
+		System.out.println("[OK] DataAcquisitionSchemat IdColumn: " + dasa.getPositionInt());
+	    }
+	    System.out.println("[OK] DataAcquisitionSchemaAttribute <" + dasa.getUri() + "> is defined in the knowledge base. " + 
+		 "Entity: \""    + dasa.getEntityLabel()     + "\"; " + 
+		 "Attribute: \"" + dasa.getAttributeLabel() + "\"; " + 
+		 "Unit: \""      + dasa.getUnitLabel()       + "\"");
 	}
-    
-    public static DataAcquisitionSchema find(String schemaUri) {
-    	System.out.println("Looking for schema " + schemaUri);
-    	DataAcquisitionSchema schema = null;
-    	
-    	String queryString = NameSpaces.getInstance().printSparqlNameSpaceList() + 
-    			"SELECT ?uri ?hasPosition ?hasEntity ?hasAttribute ?hasUnit ?hasSource ?isPIConfirmed WHERE { " + 
-    			"   ?uri a hasco:DASchemaAttribute . " + 
-    			"   ?uri hasco:partOfSchema " + "<" + schemaUri + "> .  " + 
-    			"   ?uri hasco:hasPosition ?hasPosition .  " + 
-    			"   OPTIONAL { ?uri hasco:hasEntity ?hasEntity } ." + 
-    			"   OPTIONAL { ?uri hasco:hasAttribute ?hasAttribute } ." + 
-    			"   OPTIONAL { ?uri hasco:hasUnit ?hasUnit } ." + 
-    			"   OPTIONAL { ?uri hasco:hasSource ?hasSource } ." + 
-    			"   OPTIONAL { ?uri hasco:isPIConfirmed ?isPIConfirmed } ." + 
-    			"}";
-    	        Query query = QueryFactory.create(queryString);
-		
-    	        QueryExecution qexec = QueryExecutionFactory.sparqlService(
-		    Collections.getCollectionsName(Collections.METADATA_SPARQL), query);
-    	        ResultSet results = qexec.execSelect();
-		ResultSetRewindable resultsrw = ResultSetFactory.copyResults(results);
-		qexec.close();
 
-         	//System.out.println("Schema query: \n" + queryString);
-		
-		if (!resultsrw.hasNext()) {
-			System.out.println("[ERROR] DataAcquisitionSchema. Could not find schema: " + schemaUri);
-			return schema;
-		}
-		
-  		schema = new DataAcquisitionSchema();
-		List<SchemaAttribute> attributes = new ArrayList<SchemaAttribute>();
-		while (resultsrw.hasNext()) {
-		    QuerySolution soln = resultsrw.next();
-		
-		    String positionStr = "";
-
-		    try {
-			if (soln != null &&
-                            soln.getLiteral("hasPosition") != null && soln.getLiteral("hasPosition").getString() != null &&
-			    soln.getResource("hasEntity") != null && soln.getResource("hasEntity").getURI() != null &&
-			    soln.getResource("hasAttribute") != null && soln.getResource("hasAttribute").getURI() != null &&
-			    soln.getResource("hasUnit") != null && soln.getResource("hasUnit").getURI() != null) {
-
-			    positionStr = soln.getLiteral("hasPosition").getString();
-			    
-			    SchemaAttribute sa = schema.new SchemaAttribute(
-					positionStr,
-					soln.getResource("hasEntity").getURI(),
-					soln.getResource("hasAttribute").getURI(),
-					soln.getResource("hasUnit").getURI());
-			    attributes.add(sa);
-			}
-		    }  catch (Exception e) {
-			System.out.println("[ERROR] DataAcquisitionSchema. Position: " + positionStr + "  e.Message: " + e.getMessage());
-                    }
-
-		}
-		
-		schema.setAttributes(attributes);
-
-		return schema;
     }
     
+    public List<DataAcquisitionSchemaObject> getObjects() {
+    	return objects;
+    }
+    
+    public void setObjects(List<DataAcquisitionSchemaObject> objects) {
+	this.objects = objects;
+    }
+
+    public DataAcquisitionSchemaObject getObject(String dasoUri) {
+	for (DataAcquisitionSchemaObject daso : objects) {
+	    if (daso.getUri().equals(dasoUri)) {
+		return daso;
+	    }
+	}
+	return null;
+    }
+    
+    public static DataAcquisitionSchema find(String schemaUri) {
+    	System.out.println("Looking for data acquisition schema " + schemaUri);
+    	DataAcquisitionSchema schema = new DataAcquisitionSchema();
+	if (schemaUri == null || schemaUri.equals("")) {
+	    System.out.println("[ERROR] DataAcquisitionSchema URI blank or null.");
+	    return schema;
+	}
+	if (schemaUri.startsWith("http")) {
+	    schemaUri = "<" + schemaUri + ">";
+	}
+    	String queryString = NameSpaces.getInstance().printSparqlNameSpaceList() + 
+    			" ASK { " + schemaUri + " a hasco:DASchema . } ";
+    	Query query = QueryFactory.create(queryString);
+		
+    	QueryExecution qexec = QueryExecutionFactory.sparqlService(
+			Collections.getCollectionsName(Collections.METADATA_SPARQL), query);
+    	boolean uriExist = qexec.execAsk();
+        qexec.close();
+		
+	if (uriExist) {
+	    schema.setUri(schemaUri);
+	    schema.setAttributes(DataAcquisitionSchemaAttribute.findBySchema(schemaUri));
+	    schema.setObjects(DataAcquisitionSchemaObject.findBySchema(schemaUri));
+	    System.out.println("[OK] DataAcquisitionSchema " + schemaUri + " exists. It has " + schema.getAttributes().size() + " attributes and " + schema.getObjects().size() + " objects.");
+	} else {
+	    System.out.println("[ERROR] DataAcquisitionSchema could not be found.");
+	}
+	return schema;
+    }
+    	
     public static List<DataAcquisitionSchema> findAll() {
     	List<DataAcquisitionSchema> schemas = new ArrayList<DataAcquisitionSchema>();
     	
@@ -132,22 +156,19 @@ public class DataAcquisitionSchema {
     			"SELECT ?uri WHERE { " + 
     			"   ?uri a hasco:DASchema . } ";
     	Query query = QueryFactory.create(queryString);
-		
     	QueryExecution qexec = QueryExecutionFactory.sparqlService(
 			Collections.getCollectionsName(Collections.METADATA_SPARQL), query);
     	ResultSet results = qexec.execSelect();
-		ResultSetRewindable resultsrw = ResultSetFactory.copyResults(results);
-		qexec.close();
-		
-		while (resultsrw.hasNext()) {
-			QuerySolution soln = resultsrw.next();
-			if (soln != null && soln.getResource("uri").getURI() != null) { 
-				DataAcquisitionSchema schema = new DataAcquisitionSchema();
-				schema.setUri(soln.getResource("uri").getURI());
-				schemas.add(schema);
-			}
-		}
-		
-		return schemas;
+	ResultSetRewindable resultsrw = ResultSetFactory.copyResults(results);
+        qexec.close();
+	while (resultsrw.hasNext()) {
+	    QuerySolution soln = resultsrw.next();
+	    if (soln != null && soln.getResource("uri").getURI() != null) { 
+		DataAcquisitionSchema schema = new DataAcquisitionSchema();
+		schema.setUri(soln.getResource("uri").getURI());
+		schemas.add(schema);
+	    }
+	}
+	return schemas;
     }
 }
