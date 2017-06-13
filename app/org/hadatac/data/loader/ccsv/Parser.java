@@ -118,9 +118,6 @@ public class Parser {
 		}
 		int total_count = 0;
 		int batch_size = 10000;
-		int nTimeStampCol = -1;
-		int nTimeInstantCol = -1;
-		int nIdCol = -1;
 		//for(MeasurementType mt : hadatacKb.getDataset().getMeasurementTypes()){
 		//	if(mt.getTimestampColumn() > -1){
 		//		nTimeStampCol = mt.getTimestampColumn();
@@ -159,6 +156,7 @@ public class Parser {
 			    //System.out.println("CSV Record: matrix " + matrix + " Analyte: " + analyte);
 			}
 			Iterator<DataAcquisitionSchemaAttribute> iter = schema.getAttributes().iterator();
+			//System.out.println("pos. of id column: " + schema.getIdColumn());
 			//Iterator<MeasurementType> iter = hadatacKb.getDataset().getMeasurementTypes().iterator();
 			while (iter.hasNext()) {
 			        DataAcquisitionSchemaAttribute dasa = iter.next();
@@ -192,40 +190,36 @@ public class Parser {
 					int timeStamp = new BigDecimal(sTime).intValue();
 					Date time = new Date((long)timeStamp * 1000);
 					measurement.setTimestamp(time.toString());
-				}
-				else if(dasa.getPositionInt() == schema.getTimeInstantColumn()) {
+				} else if(dasa.getPositionInt() == schema.getTimeInstantColumn()) {
 				    measurement.setTimestamp(record.get(schema.getTimeInstantColumn() - 1));
-				}
-				else {
-					measurement.setTimestamp("");
+				} else {
+				    measurement.setTimestamp("");
 				}
 				
 				measurement.setStudyUri(ValueCellProcessing.replaceNameSpaceEx(hadatacKb.getDataAcquisition().getStudyUri()));
-				if(nIdCol > -1){
+				if (schema.getIdColumn() > -1){
 					if (dasa.getEntity().equals(ValueCellProcessing.replacePrefixEx("sio:Human"))) {
-       						Subject subject = Subject.findSubject(measurement.getStudyUri(), record.get(nIdCol - 1));
+					        //System.out.println("Matching reference subject: " + record.get(schema.getIdColumn() - 1));
+       						Subject subject = Subject.findSubject(measurement.getStudyUri(), record.get(schema.getIdColumn() - 1));
 						if (subject != null) {
 							String subjectUri = subject.getUri();
 							measurement.setObjectUri(subjectUri);
 						} else {
 							measurement.setObjectUri("");
 						}
-					}
-					else if (dasa.getEntity().equals(ValueCellProcessing.replacePrefixEx("sio:Sample"))) {
-						String sampleUri = Subject.findSampleUri(measurement.getStudyUri(), record.get(nIdCol - 1));
+					} else if (dasa.getEntity().equals(ValueCellProcessing.replacePrefixEx("sio:Sample"))) {
+					        //System.out.println("Matching reference sample: " + record.get(schema.getIdColumn() - 1));
+						String sampleUri = Subject.findSampleUri(measurement.getStudyUri(), record.get(schema.getIdColumn() - 1));
 						if (sampleUri != null) {
 							measurement.setObjectUri(sampleUri);
-						}
-						else {
+						} else {
 							measurement.setObjectUri("");
 						}
 					}
-				}
-				else {
+				} else {
 					if(isSubjectPlatform) {
 						measurement.setObjectUri(hadatacKb.getDeployment().getPlatform().getUri());
-					}
-					else {
+					} else {
 						measurement.setObjectUri("");
 					}
 				}
