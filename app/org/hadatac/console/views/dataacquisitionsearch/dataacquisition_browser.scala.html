@@ -65,10 +65,10 @@
 								<!-- <a href="" class="btn btn-info" role="button" id="btn_download">Confirm</a> -->
 								<form action="@org.hadatac.console.http.routes.SolrSearchProxy.getDataAcquisitionDownload()" method="post">
 								    <select name="fl" class="form-control" id="sel_format">
-									    <option value="timestamp,value">Data without Object ID</option>
-									    <option value="timestamp,value,object_uri">Data with Object ID</option>
-									    <Option value="timestamp,value,object_uri,elevation,characteristic,unit,instrument_model,plaftorm_name,entity">Data and Contextual Metadata</option>
-									    <option value="timestamp,value,object_uri,elevation,characteristic,characteristic_uri,unit,unit_uri,instrument_model,instrument_uri,plaftorm_name,platform_uri,entity,entity_uri">Data, Contextual Metadata, Contextual Metadata URI</option>
+									    <option value="timestamp,value,pid,sid">Data without Object ID</option>
+									    <option value="timestamp,value,object_uri,pid,sid">Data with Object ID</option>
+									    <Option value="timestamp,value,object_uri,pid,sid,elevation,characteristic,unit,instrument_model,plaftorm_name,entity">Data and Contextual Metadata</option>
+									    <option value="timestamp,value,object_uri,pid,sid,elevation,characteristic,characteristic_uri,unit,unit_uri,instrument_model,instrument_uri,plaftorm_name,platform_uri,entity,entity_uri">Data, Contextual Metadata, Contextual Metadata URI</option>
      								    </select>
                                                                     <input name="wt" id="wt_post" type="hidden" />
                                                                     <input name="rows" id="rows_post" type="hidden" />

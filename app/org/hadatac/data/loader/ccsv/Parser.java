@@ -207,6 +207,8 @@ public class Parser {
 						if (subject != null) {
 							String subjectUri = subject.getUri();
 							measurement.setObjectUri(subjectUri);
+							measurement.setPID(subjectUri);
+							measurement.setSID(subjectUri);
 						} else {
 							measurement.setObjectUri("");
 						}
@@ -215,6 +217,8 @@ public class Parser {
 						String sampleUri = Subject.findSampleUri(measurement.getStudyUri(), record.get(schema.getIdColumn() - 1));
 						if (sampleUri != null) {
 							measurement.setObjectUri(sampleUri);
+							measurement.setPID(sampleUri);
+							measurement.setSID(sampleUri);
 						} else {
 							measurement.setObjectUri("");
 						}
