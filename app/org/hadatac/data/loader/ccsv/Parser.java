@@ -118,21 +118,7 @@ public class Parser {
 		}
 		int total_count = 0;
 		int batch_size = 10000;
-		int nTimeStampCol = -1;
-		int nTimeInstantCol = -1;
-		int nIdCol = -1;
-		//for(MeasurementType mt : hadatacKb.getDataset().getMeasurementTypes()){
-		//	if(mt.getTimestampColumn() > -1){
-		//		nTimeStampCol = mt.getTimestampColumn();
-		//	}
-		//	if(mt.getTimeInstantColumn() > -1){
-		//		nTimeInstantCol = mt.getTimeInstantColumn();
-		//	}
-		//	if(mt.getIdColumn() > -1){
-		//		nIdCol = mt.getIdColumn();
-		//	}
-		//}
-		
+
 		boolean isSubjectPlatform = Subject.isPlatform(hadatacKb.getDeployment().getPlatform().getUri());
 		SolrClient solr = new HttpSolrClient(Play.application().configuration().
 				getString("hadatac.solr.data") + Collections.DATA_ACQUISITION);
@@ -140,9 +126,13 @@ public class Parser {
                 boolean isSubject;
 		String matrix = "";
 		String analyte = "";
+		String unitOverride = "";
+		String unitLabelOverride = "";
 		for (CSVRecord record : records) {
 		        // HACK FOR JUNE20
 		        isSample = false;
+			unitOverride = "";
+		        unitLabelOverride = "";
 		        if (record.get(0).toLowerCase().equals("sample") ) {
 				isSample = true;
 				if (record.get(5) != null && !record.get(5).equals("")) {
@@ -156,13 +146,24 @@ public class Parser {
 				} else {
 				    analyte = "";
 				}
+				if (record.get(8) != null && !record.get(8).equals("")) {
+				    switch (record.get(8).trim()) {
+				    case "µg/L":  
+					unitOverride = "http://geneontology.org/GO.format.obo-1_2.shtml#UO_0000301";
+					unitLabelOverride = "microgram per liter";
+					break;
+				    case "ppb" :  
+					unitOverride = "http://geneontology.org/GO.format.obo-1_2.shtml#UO_0000170";
+					unitLabelOverride = "parts per billion";
+					break;
+				    }
+				}
 			    //System.out.println("CSV Record: matrix " + matrix + " Analyte: " + analyte);
 			}
 			Iterator<DataAcquisitionSchemaAttribute> iter = schema.getAttributes().iterator();
-			//Iterator<MeasurementType> iter = hadatacKb.getDataset().getMeasurementTypes().iterator();
+			//System.out.println("pos. of id column: " + schema.getIdColumn());
 			while (iter.hasNext()) {
 			        DataAcquisitionSchemaAttribute dasa = iter.next();
-			        //MeasurementType measurementType = iter.next();
 				if (dasa.getPositionInt() == schema.getTimestampColumn()) {
 					continue;
 				}
@@ -192,40 +193,36 @@ public class Parser {
 					int timeStamp = new BigDecimal(sTime).intValue();
 					Date time = new Date((long)timeStamp * 1000);
 					measurement.setTimestamp(time.toString());
-				}
-				else if(dasa.getPositionInt() == schema.getTimeInstantColumn()) {
+				} else if(dasa.getPositionInt() == schema.getTimeInstantColumn()) {
 				    measurement.setTimestamp(record.get(schema.getTimeInstantColumn() - 1));
-				}
-				else {
-					measurement.setTimestamp("");
+				} else {
+				    measurement.setTimestamp("");
 				}
 				
 				measurement.setStudyUri(ValueCellProcessing.replaceNameSpaceEx(hadatacKb.getDataAcquisition().getStudyUri()));
-				if(nIdCol > -1){
+				if (schema.getIdColumn() > -1){
 					if (dasa.getEntity().equals(ValueCellProcessing.replacePrefixEx("sio:Human"))) {
-       						Subject subject = Subject.findSubject(measurement.getStudyUri(), record.get(nIdCol - 1));
+					        //System.out.println("Matching reference subject: " + record.get(schema.getIdColumn() - 1));
+       						Subject subject = Subject.findSubject(measurement.getStudyUri(), record.get(schema.getIdColumn() - 1));
 						if (subject != null) {
 							String subjectUri = subject.getUri();
 							measurement.setObjectUri(subjectUri);
 						} else {
 							measurement.setObjectUri("");
 						}
-					}
-					else if (dasa.getEntity().equals(ValueCellProcessing.replacePrefixEx("sio:Sample"))) {
-						String sampleUri = Subject.findSampleUri(measurement.getStudyUri(), record.get(nIdCol - 1));
+					} else if (dasa.getEntity().equals(ValueCellProcessing.replacePrefixEx("sio:Sample"))) {
+					        //System.out.println("Matching reference sample: " + record.get(schema.getIdColumn() - 1));
+						String sampleUri = Subject.findSampleUri(measurement.getStudyUri(), record.get(schema.getIdColumn() - 1));
 						if (sampleUri != null) {
 							measurement.setObjectUri(sampleUri);
-						}
-						else {
+						} else {
 							measurement.setObjectUri("");
 						}
 					}
-				}
-				else {
+				} else {
 					if(isSubjectPlatform) {
 						measurement.setObjectUri(hadatacKb.getDeployment().getPlatform().getUri());
-					}
-					else {
+					} else {
 						measurement.setObjectUri("");
 					}
 				}
@@ -236,8 +233,14 @@ public class Parser {
 						+ dasa.getLocalName() + "-" + total_count);
 				measurement.setOwnerUri(hadatacKb.getDataAcquisition().getOwnerUri());
 				measurement.setAcquisitionUri(hadatacKb.getDataAcquisition().getUri());
-				measurement.setUnit(dasa.getUnitLabel());
-				measurement.setUnitUri(dasa.getUnit());
+				// HACK FOR JUNE 20
+				if (isSample && !unitOverride.equals("") && !unitLabelOverride.equals("")) {
+				    measurement.setUnit(unitLabelOverride);
+				    measurement.setUnitUri(unitOverride);
+				} else {
+				    measurement.setUnit(dasa.getUnitLabel());
+				    measurement.setUnitUri(dasa.getUnit());
+				}
 				measurement.setCharacteristicUri(dasa.getAttribute());
 				measurement.setInstrumentModel(hadatacKb.getDeployment().getInstrument().getLabel());
 				measurement.setInstrumentUri(hadatacKb.getDeployment().getInstrument().getUri());
