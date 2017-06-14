@@ -17,11 +17,14 @@ import org.apache.solr.client.solrj.impl.HttpSolrClient;
 import org.hadatac.data.loader.util.FileFactory;
 import org.hadatac.data.model.ParsingResult;
 import org.hadatac.entity.pojo.DataAcquisition;
+import org.hadatac.entity.pojo.DataAcquisitionSchema;
+import org.hadatac.entity.pojo.DataAcquisitionSchemaAttribute;
+import org.hadatac.entity.pojo.DataAcquisitionSchemaObject;
 import org.hadatac.entity.pojo.Dataset;
 import org.hadatac.entity.pojo.Deployment;
 import org.hadatac.entity.pojo.HADataC;
 import org.hadatac.entity.pojo.Measurement;
-import org.hadatac.entity.pojo.MeasurementType;
+//import org.hadatac.entity.pojo.MeasurementType;
 import org.hadatac.entity.pojo.Subject;
 import org.hadatac.metadata.loader.ValueCellProcessing;
 import org.hadatac.utils.Collections;
@@ -34,11 +37,13 @@ public class Parser {
 	private FileFactory files;
 	
 	private HADataC hadatacCcsv;
-	private HADataC hadatacKb;
+        private HADataC hadatacKb;
+        private DataAcquisitionSchema schema;
 	
 	public Parser() {
 		hadatacCcsv = null;
 		hadatacKb = null;
+		schema = null;
 	}
 	
 	public ParsingResult validate(int mode, FileFactory files) throws IOException {
@@ -113,25 +118,23 @@ public class Parser {
 		}
 		int total_count = 0;
 		int batch_size = 10000;
-		int nTimeStampCol = -1;
-		int nTimeInstantCol = -1;
-		int nIdCol = -1;
-		for(MeasurementType mt : hadatacKb.getDataset().getMeasurementTypes()){
-			if(mt.getTimestampColumn() > -1){
-				nTimeStampCol = mt.getTimestampColumn();
-			}
-			if(mt.getTimeInstantColumn() > -1){
-				nTimeInstantCol = mt.getTimeInstantColumn();
-			}
-			if(mt.getIdColumn() > -1){
-				nIdCol = mt.getIdColumn();
-			}
-		}
+		//for(MeasurementType mt : hadatacKb.getDataset().getMeasurementTypes()){
+		//	if(mt.getTimestampColumn() > -1){
+		//		nTimeStampCol = mt.getTimestampColumn();
+		//	}
+		//	if(mt.getTimeInstantColumn() > -1){
+		//		nTimeInstantCol = mt.getTimeInstantColumn();
+		//	}
+		//	if(mt.getIdColumn() > -1){
+		//		nIdCol = mt.getIdColumn();
+		//	}
+		//}
 		
 		boolean isSubjectPlatform = Subject.isPlatform(hadatacKb.getDeployment().getPlatform().getUri());
 		SolrClient solr = new HttpSolrClient(Play.application().configuration().
 				getString("hadatac.solr.data") + Collections.DATA_ACQUISITION);
                 boolean isSample;
+                boolean isSubject;
 		String matrix = "";
 		String analyte = "";
 		for (CSVRecord record : records) {
@@ -150,58 +153,58 @@ public class Parser {
 				} else {
 				    analyte = "";
 				}
-		           System.out.println("CSV Record: matrix " + matrix + " Analyte: " + analyte);
+			    //System.out.println("CSV Record: matrix " + matrix + " Analyte: " + analyte);
 			}
-			Iterator<MeasurementType> iter = hadatacKb.getDataset().getMeasurementTypes().iterator();
+			Iterator<DataAcquisitionSchemaAttribute> iter = schema.getAttributes().iterator();
+			//System.out.println("pos. of id column: " + schema.getIdColumn());
+			//Iterator<MeasurementType> iter = hadatacKb.getDataset().getMeasurementTypes().iterator();
 			while (iter.hasNext()) {
-				MeasurementType measurementType = iter.next();
-				if (measurementType.getTimestampColumn() > -1) {
+			        DataAcquisitionSchemaAttribute dasa = iter.next();
+			        //MeasurementType measurementType = iter.next();
+				if (dasa.getPositionInt() == schema.getTimestampColumn()) {
 					continue;
 				}
-				if (measurementType.getTimeInstantColumn() > -1) {
+				if (dasa.getPositionInt() == schema.getTimeInstantColumn()) {
 					continue;
 				}
-				if (measurementType.getIdColumn() > -1) {
+				if (dasa.getPositionInt() == schema.getIdColumn()) {
 					continue;
 				}
 				
 				Measurement measurement = new Measurement();
-				if(record.get(measurementType.getValueColumn() - 1).isEmpty()){
+				if (dasa.getPositionInt() > -1 && record.get(dasa.getPositionInt() - 1).isEmpty()){
 					continue;
-				}
-				else {
-					String originalValue = record.get(measurementType.getValueColumn() - 1);
+				} else {
+					String originalValue = record.get(dasa.getPositionInt() - 1);
 					String codeValue = Subject.findCodeValue(
-							measurementType.getCharacteristicUri(), originalValue);
-					if (null == codeValue) {
-						measurement.setValue(originalValue);
-					}
-					else {
-						measurement.setValue(codeValue);
+							dasa.getAttribute(), originalValue);
+					if (codeValue == null) {
+					     measurement.setValue(originalValue);
+					} else {
+					     measurement.setValue(codeValue);
 					}
 				}
 				
-				if(nTimeStampCol > -1){
-					String sTime = record.get(nTimeStampCol - 1);
+				if(dasa.getPositionInt() == schema.getTimestampColumn()) {
+				        String sTime = record.get(schema.getTimestampColumn() - 1);
 					int timeStamp = new BigDecimal(sTime).intValue();
 					Date time = new Date((long)timeStamp * 1000);
 					measurement.setTimestamp(time.toString());
-				}
-				else if(nTimeInstantCol > -1){
-					measurement.setTimestamp(record.get(nTimeInstantCol - 1));
-				}
-				else {
-					measurement.setTimestamp("");
+				} else if(dasa.getPositionInt() == schema.getTimeInstantColumn()) {
+				    measurement.setTimestamp(record.get(schema.getTimeInstantColumn() - 1));
+				} else {
+				    measurement.setTimestamp("");
 				}
 				
 				measurement.setStudyUri(ValueCellProcessing.replaceNameSpaceEx(hadatacKb.getDataAcquisition().getStudyUri()));
-				if(nIdCol > -1){
-					if (measurementType.getEntityUri().equals(ValueCellProcessing.replacePrefixEx("sio:Human"))) {
-       						Subject subject = Subject.findSubject(measurement.getStudyUri(), record.get(nIdCol - 1));
-						if (null != subject) {
+				if (schema.getIdColumn() > -1){
+					if (dasa.getEntity().equals(ValueCellProcessing.replacePrefixEx("sio:Human"))) {
+					        //System.out.println("Matching reference subject: " + record.get(schema.getIdColumn() - 1));
+       						Subject subject = Subject.findSubject(measurement.getStudyUri(), record.get(schema.getIdColumn() - 1));
+						if (subject != null) {
 							String subjectUri = subject.getUri();
-							//subjectUri = Subject.checkObjectUri(subjectUri, measurementType.getCharacteristicUri());
 							measurement.setObjectUri(subjectUri);
+<<<<<<< HEAD
                                                         //if (subjectUri.indexOf("mother") > -1) {
 							//    measurement.setEntity("subject mother");    
                                                         //} else {
@@ -211,26 +214,31 @@ public class Parser {
 							measurement.setSID(subjectUri);
 						}
 						else {
+=======
+						} else {
+>>>>>>> origin/master
 							measurement.setObjectUri("");
 						}
-					}
-					else if (measurementType.getEntityUri().equals(ValueCellProcessing.replacePrefixEx("sio:Sample"))) {
-						String sampleUri = Subject.findSampleUri(measurement.getStudyUri(), record.get(nIdCol - 1));
+					} else if (dasa.getEntity().equals(ValueCellProcessing.replacePrefixEx("sio:Sample"))) {
+					        //System.out.println("Matching reference sample: " + record.get(schema.getIdColumn() - 1));
+						String sampleUri = Subject.findSampleUri(measurement.getStudyUri(), record.get(schema.getIdColumn() - 1));
 						if (sampleUri != null) {
 							measurement.setObjectUri(sampleUri);
+<<<<<<< HEAD
 							measurement.setPID(sampleUri);
 							measurement.setSID(sampleUri);
 						}
 						else {
+=======
+						} else {
+>>>>>>> origin/master
 							measurement.setObjectUri("");
 						}
 					}
-				}
-				else {
+				} else {
 					if(isSubjectPlatform) {
 						measurement.setObjectUri(hadatacKb.getDeployment().getPlatform().getUri());
-					}
-					else {
+					} else {
 						measurement.setObjectUri("");
 					}
 				}
@@ -238,25 +246,35 @@ public class Parser {
 				measurement.setUri(ValueCellProcessing.replacePrefixEx(measurement.getStudyUri()) + "/" 
 						+ ValueCellProcessing.replaceNameSpaceEx(hadatacKb.getDataAcquisition().getUri()).split(":")[1] + "/"
 						+ hadatacCcsv.getDataset().getLocalName() + "/" 
-						+ measurementType.getLocalName() + "-" + total_count);
+						+ dasa.getLocalName() + "-" + total_count);
 				measurement.setOwnerUri(hadatacKb.getDataAcquisition().getOwnerUri());
 				measurement.setAcquisitionUri(hadatacKb.getDataAcquisition().getUri());
-				measurement.setUnit(measurementType.getUnitLabel());
-				measurement.setUnitUri(measurementType.getUnitUri());
-				measurement.setCharacteristicUri(measurementType.getCharacteristicUri());
+				measurement.setUnit(dasa.getUnitLabel());
+				measurement.setUnitUri(dasa.getUnit());
+				measurement.setCharacteristicUri(dasa.getAttribute());
 				measurement.setInstrumentModel(hadatacKb.getDeployment().getInstrument().getLabel());
 				measurement.setInstrumentUri(hadatacKb.getDeployment().getInstrument().getUri());
 				measurement.setPlatformName(hadatacKb.getDeployment().getPlatform().getLabel());
 				measurement.setPlatformUri(hadatacKb.getDeployment().getPlatform().getUri());
 				// HACK FOR JUNE 20
+				//System.out.println("dasa.getEntity : <" + dasa.getEntity() + ">");
 				if (isSample && !matrix.equals("") && !analyte.equals("")) {
 				    measurement.setEntity(matrix);
 				    measurement.setCharacteristic(analyte);
+				} else if (dasa.getEntity().equals("http://semanticscience.org/resource/Human")) {
+				    String dasoUri = dasa.getObjectUri();
+				    DataAcquisitionSchemaObject daso = schema.getObject(dasoUri); 
+				    if (daso != null) {
+					measurement.setEntity(daso.getRole().substring(daso.getRole().indexOf("#") + 1));
+				    } else {
+					measurement.setEntity(dasa.getEntityLabel());
+				    }
+				    measurement.setCharacteristic(dasa.getAttributeLabel());
 				} else {
-				    measurement.setEntity(measurementType.getEntityLabel());
-				    measurement.setCharacteristic(measurementType.getCharacteristicLabel());
+				    measurement.setEntity(dasa.getEntityLabel());
+				    measurement.setCharacteristic(dasa.getAttributeLabel());
 				}
-				measurement.setEntityUri(measurementType.getEntityUri());
+				measurement.setEntityUri(dasa.getEntity());
 				measurement.setDatasetUri(hadatacCcsv.getDatasetKbUri());
 				try {
 					solr.addBean(measurement);
@@ -338,6 +356,19 @@ public class Parser {
 			}
 		}
 		
+		// data acquisition schema
+		String schemaUri = hadatacKb.getDataAcquisition().getSchemaUri();
+		if (schemaUri == null || schemaUri.equals("")) {
+		    message += Feedback.println(mode, "[ERROR] Data Acquisition Schema is not specified in the Data Acquisition.");
+		} else {
+		    schema = DataAcquisitionSchema.find(schemaUri);
+		    if  (schema != null) {
+			message += Feedback.println(mode, "[OK] Data Acquisition Schema " + schemaUri + " found in the knowledge base.");
+		    } else {
+			message += Feedback.println(mode, "[ERROR] Data Acquisition Schema " + schemaUri + " does not exist in the knowledge base.");
+		    }
+		}
+
 		// dataset
 		if (hadatacCcsv.getDataAcquisition().getStatus() > 0) {
 			if (hadatacKb.getDataAcquisition().containsDataset(hadatacCcsv.getDatasetKbUri())) {
@@ -374,7 +405,7 @@ public class Parser {
 		}
 		
 		// measurement types
-		hadatacKb.getDataset().setMeasurementTypes(MeasurementType.find(hadatacCcsv));
+		//hadatacKb.getDataset().setMeasurementTypes(MeasurementType.find(hadatacCcsv));
 		
 		return new ParsingResult(0, message);
 	}
@@ -432,19 +463,19 @@ public class Parser {
 		}
 		
 		// load measurement types
-		hadatacCcsv.getDataset().setMeasurementTypes(MeasurementType.find(model, hadatacCcsv.getDataset()));
-		if (hadatacCcsv.getDataset().getMeasurementTypes().isEmpty()) {
-			System.out.println("Measurement is empty");
-			message += Feedback.println(mode, "[ERROR] Preamble does not contain any well described measurement types.");
-			return new ParsingResult(1, message);
-		} else {
-			message += Feedback.print(mode, "[OK] Preamble contains the following well described measurement types: ");
-			Iterator<MeasurementType> i = hadatacCcsv.getDataset().getMeasurementTypes().iterator();
-			while (i.hasNext()) {
-				message += Feedback.print(mode, "<" + i.next().getLocalName() + "> ");
-			}
-			message += Feedback.println(mode, "");
-		}
+		//hadatacCcsv.getDataset().setMeasurementTypes(MeasurementType.find(model, hadatacCcsv.getDataset()));
+		//if (hadatacCcsv.getDataset().getMeasurementTypes().isEmpty()) {
+		//	System.out.println("Measurement is empty");
+		//	message += Feedback.println(mode, "[ERROR] Preamble does not contain any well described measurement types.");
+		//	return new ParsingResult(1, message);
+		//} else {
+		//	message += Feedback.print(mode, "[OK] Preamble contains the following well described measurement types: ");
+		//	Iterator<MeasurementType> i = hadatacCcsv.getDataset().getMeasurementTypes().iterator();
+		//	while (i.hasNext()) {
+		//		message += Feedback.print(mode, "<" + i.next().getLocalName() + "> ");
+		//	}
+		//	message += Feedback.println(mode, "");
+		//}
 		
 		return new ParsingResult(0, message);
 	}
