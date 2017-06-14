@@ -914,26 +914,21 @@ public class DataAcquisition {
 	
 	public static DataAcquisition create(HADataC hadatacCcsv, HADataC hadatacKb) {
 		DataAcquisition dataAcquisition = new DataAcquisition();
-		DataAcquisitionSchema schema = DataAcquisitionSchema.find(hadatacKb.getDataAcquisitionKbUri());
 		
 		dataAcquisition.setLocalName(hadatacCcsv.getDataAcquisition().getLocalName());
 		dataAcquisition.setUri(hadatacCcsv.getDataAcquisitionKbUri());
 		dataAcquisition.setStudyUri(hadatacCcsv.getDataAcquisition().getStudyUri());
 		dataAcquisition.setStartedAtXsd(hadatacCcsv.getDataAcquisition().getStartedAtXsd());
 		dataAcquisition.setEndedAtXsd(hadatacCcsv.getDataAcquisition().getEndedAtXsd());
-		//Iterator<MeasurementType> i = hadatacKb.getDataset().getMeasurementTypes().iterator();
-		if (schema != null && schema.getAttributes() != null) {
-	    	    Iterator<DataAcquisitionSchemaAttribute> i = schema.getAttributes().iterator();
-		    while (i.hasNext()) {
-		        //MeasurementType measurementType = i.next();
-		        DataAcquisitionSchemaAttribute dasa = i.next();
-			dataAcquisition.addCharacteristic(dasa.getAttributeLabel());
-			dataAcquisition.addCharacteristicUri(dasa.getAttribute());
-			dataAcquisition.addEntity(dasa.getEntityLabel());
-			dataAcquisition.addEntityUri(dasa.getEntity());
-			dataAcquisition.addUnit(dasa.getUnitLabel());
-			dataAcquisition.addUnitUri(dasa.getUnit());
-		    }
+		Iterator<MeasurementType> i = hadatacKb.getDataset().getMeasurementTypes().iterator();
+		while (i.hasNext()) {
+			MeasurementType measurementType = i.next();
+			dataAcquisition.addCharacteristic(measurementType.getCharacteristicLabel());
+			dataAcquisition.addCharacteristicUri(measurementType.getCharacteristicUri());
+			dataAcquisition.addEntity(measurementType.getEntityLabel());
+			dataAcquisition.addEntityUri(measurementType.getEntityUri());
+			dataAcquisition.addUnit(measurementType.getUnitLabel());
+			dataAcquisition.addUnitUri(measurementType.getUnitUri());
 		}
 		dataAcquisition.setDeploymentUri(hadatacKb.getDeploymentUri());
 		dataAcquisition.setInstrumentModel(hadatacKb.getDeployment().getInstrument().getLabel());

@@ -70,8 +70,6 @@ import org.hadatac.entity.pojo.DataFile;
 import org.hadatac.entity.pojo.Measurement;
 import org.hadatac.entity.pojo.DataAcquisition;
 import org.hadatac.entity.pojo.DataAcquisitionSchema;
-import org.hadatac.entity.pojo.DataAcquisitionSchemaAttribute;
-import org.hadatac.entity.pojo.DataAcquisitionSchemaObject;
 import org.hadatac.entity.pojo.User;
 import org.hadatac.metadata.loader.LabkeyDataHandler;
 import org.hadatac.metadata.loader.ValueCellProcessing;
@@ -937,7 +935,7 @@ public class AutoAnnotator extends Controller {
     
     private static String createPreamble(CSVAnnotationHandler handler, 
     									 String schema_uri) throws Exception {
-	        System.out.println("CREATING PREAMBLE FOR " + schema_uri);
+	        //System.out.println("CREATING PREAMBLE FOR " + schema_uri);
 		String preamble = Downloads.FRAG_START_PREAMBLE;
 		preamble += NameSpaces.getInstance().printTurtleNameSpaceList();
 		preamble += "\n";
@@ -953,8 +951,7 @@ public class AutoAnnotator extends Controller {
 			preamble += Downloads.FRAG_DATASET;
 			preamble += handler.getDataAcquisitionUri() + ">; ";
 
-			/*
-                        int timeStampIndex = -1;
+			int timeStampIndex = -1;
 			int aux = 0;
 			ArrayList<Integer> mt = new ArrayList<Integer>();
 			ArrayList<String> mt_preamble = new ArrayList<String>();
@@ -965,14 +962,14 @@ public class AutoAnnotator extends Controller {
 				throw new Exception(String.format("Can not find schema %s", schema_uri));
 			}
 			
-			for (DataAcquisitionSchemaAttribute attribute : schema.getAttributes()) {
+			for (DataAcquisitionSchema.SchemaAttribute attribute : schema.getAttributes()) {
 
 				if (attribute.getPosition() != null && !attribute.getPosition().equals("")) {
-				   int i = attribute.getPositionInt();
+				   int i = Integer.parseInt(attribute.getPosition());
 				   String entity = attribute.getEntity();
 				   String attrib = attribute.getAttribute();
 				   String unit = attribute.getUnit();
-                                   System.out.println("ATTRIBUTE: pos:" + i + " entity:" + entity + " attribute:" + attrib + " unit:" + unit);  
+                                   //System.out.println("ATTRIBUTE: pos:" + i + " entity:" + entity + " attribute:" + attrib + " unit:" + unit);  
 
 				   if (unit.equals(Downloads.FRAG_IN_DATE_TIME)) {
 				 	timeStampIndex = i; 
@@ -1008,26 +1005,23 @@ public class AutoAnnotator extends Controller {
 					preamble += ", ";
 				}
 			}
-			*/
 			preamble += ".\n\n";
 
 			//Insert measurement types
-			//for (String mt_str : mt_preamble) {
-			//	preamble += mt_str;
-			//}
+			for (String mt_str : mt_preamble) {
+				preamble += mt_str;
+			}
 
-			//if (timeStampIndex != -1) {
-			//	preamble += "\n";
-			//	preamble += Downloads.FRAG_IN_DATE_TIME_STATEMENT + " " + timeStampIndex + "  . \n";  
-			//}
+			if (timeStampIndex != -1) {
+				preamble += "\n";
+				preamble += Downloads.FRAG_IN_DATE_TIME_STATEMENT + " " + timeStampIndex + "  . \n";  
+			}
 		} catch (Exception e) {
 			throw new Exception(preamble + "\n" + e.getMessage());
 		}
 
 		preamble += Downloads.FRAG_END_PREAMBLE;
 		
-		System.out.println("PREAMBLE: " + preamble);
-
 		return preamble;
     }
     
