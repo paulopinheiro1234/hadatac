@@ -133,11 +133,11 @@ public class Subject {
 		
 //		System.out.println(attr_uri + "---" + code);
         String queryString = NameSpaces.getInstance().printSparqlNameSpaceList()
-                + " SELECT ?codeValue WHERE {"
+                + " SELECT ?codeClass WHERE {"
                 + " ?attruri hasco:hasAttribute <" + attr_uri + "> . "
                 + " ?uri hasco:isPossibleValueOf ?attruri . "
                 + " ?uri hasco:hasCode \"" + code + "\" . "
-                + " OPTIONAL { ?uri hasco:hasCodeValue ?codeValue . }"        
+                + " OPTIONAL { ?uri hasco:hasClass ?codeClass . }"        
                 + " }";
         
         Query query = QueryFactory.create(queryString);
@@ -149,8 +149,8 @@ public class Subject {
         
         if (resultsrw.size() > 0) {
             QuerySolution soln = resultsrw.next();
-            if (null != soln.getLiteral("codeValue")) {
-            	String codeValue = soln.getLiteral("codeValue").toString();
+            if (null != soln.getLiteral("codeClass")) {
+            	String codeValue = soln.getLiteral("codeClass").toString();
             	if (!codeValue.equals("")) {
             		return codeValue;
             	}
