@@ -10,6 +10,8 @@
     <field name="_text_" type="text_general" indexed="true" stored="false" multiValued="true"/>
     <field name="timestamp" type="string" indexed="true" stored="true" docValues="true" />
     <field name="value" type="string" indexed="true" docValues="true" />
+    <field name="pid" type="string" indexed="true" docValues="true" />
+    <field name="sid" type="string" indexed="true" docValues="true" />
     <field name="unit" type="string" indexed="true" docValues="true" />
     <field name="unit_uri" type="string" indexed="true" docValues="true" />
     <field name="entity" type="string" indexed="true" docValues="true" />

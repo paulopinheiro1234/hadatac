@@ -207,6 +207,8 @@ public class Parser {
                                                         //} else {
 							//    measurement.setEntity("subject");
 							//}
+							measurement.setPID(subjectUri);
+							measurement.setSID(subjectUri);
 						}
 						else {
 							measurement.setObjectUri("");
@@ -216,6 +218,8 @@ public class Parser {
 						String sampleUri = Subject.findSampleUri(measurement.getStudyUri(), record.get(nIdCol - 1));
 						if (sampleUri != null) {
 							measurement.setObjectUri(sampleUri);
+							measurement.setPID(sampleUri);
+							measurement.setSID(sampleUri);
 						}
 						else {
 							measurement.setObjectUri("");

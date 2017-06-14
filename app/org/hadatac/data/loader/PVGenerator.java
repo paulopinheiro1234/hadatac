@@ -70,7 +70,7 @@ public class PVGenerator extends BasicGenerator {
     @Override
     Map<String, Object> createRow(CSVRecord rec, int row_number) throws Exception {
     	Map<String, Object> row = new HashMap<String, Object>();
-    	row.put("hasURI", kbPrefix + "PV-" + getLabel(rec).replace("_","-").replace("??", "") + "-" + study_id + "-" + getCode(rec));
+    	row.put("hasURI", kbPrefix + "PV-" + getLabel(rec).replace("_","-").replace("??", "") + ("-" + study_id.replace("null", "") + "-" + getCode(rec)).replaceAll("--", "-"));
     	row.put("a", "hasco:PossibleValue");
     	row.put("hasco:hasCode", getCode(rec));
     	row.put("hasco:hasCodeValue", getCodeValue(rec));

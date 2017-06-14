@@ -8,6 +8,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.apache.jena.query.Query;
+import org.apache.jena.query.QueryExecution;
+import org.apache.jena.query.QueryExecutionFactory;
+import org.apache.jena.query.QueryFactory;
+import org.apache.jena.query.QuerySolution;
+import org.apache.jena.query.ResultSet;
+import org.apache.jena.query.ResultSetFactory;
+import org.apache.jena.query.ResultSetRewindable;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrRequest;
@@ -25,6 +33,7 @@ import org.hadatac.console.models.FacetHandler;
 import org.hadatac.console.models.Pivot;
 import org.hadatac.data.model.AcquisitionQueryResult;
 import org.hadatac.utils.Collections;
+import org.hadatac.utils.NameSpaces;
 
 import play.Play;
 
@@ -43,6 +52,10 @@ public class Measurement {
 	private String timestamp;
 	@Field("value")
 	private String value;
+	@Field("pid")
+	private String pid;
+	@Field("sid")
+	private String sid;	
 	@Field("unit")
 	private String unit;
 	@Field("unit_uri")
@@ -96,6 +109,100 @@ public class Measurement {
 
 	public String getObjectUri() {
 		return objectUri;
+	}
+	
+	public void setPID(String objectUri) {
+		this.objectUri = objectUri;
+		this.pid = getObjectPID();
+	}
+	
+	public void setSID(String objectUri) {
+		this.objectUri = objectUri;
+		this.sid = getObjectSID();
+	}
+	
+	public String getObjectPID() {
+		
+//		this.objectUri = objectUri;
+		
+        String queryString = NameSpaces.getInstance().printSparqlNameSpaceList()
+                + " SELECT ?pid WHERE {"
+                + " <" + objectUri + "> rdf:type <http://semanticscience.org/resource/Human> . "
+                + " <" + objectUri + "> <http://hadatac.org/ont/hasco/originalID> ?pid . "       
+                + " }";
+        
+        Query query = QueryFactory.create(queryString);
+        QueryExecution qexec = QueryExecutionFactory.sparqlService(
+                Collections.getCollectionsName(Collections.METADATA_SPARQL), query);
+        ResultSet results = qexec.execSelect();
+        ResultSetRewindable resultsrw = ResultSetFactory.copyResults(results);
+        qexec.close();
+        
+        if (resultsrw.size() > 0) {
+            QuerySolution soln = resultsrw.next();
+            if (null != soln.getLiteral("pid")) {
+            	String pid = soln.getLiteral("pid").toString();
+            	if (!pid.equals("")) {
+            		return pid;
+            	}
+            }
+        } else {
+        	String queryString2 = NameSpaces.getInstance().printSparqlNameSpaceList()
+                    + " SELECT ?pid WHERE {"
+                    + " <" + objectUri + "> <http://hadatac.org/ont/hasco/isSampleOf> ?sub . "
+                    + " ?sub <http://hadatac.org/ont/hasco/originalID> ?pid . "       
+                    + " }";
+            
+            Query query2 = QueryFactory.create(queryString2);
+            QueryExecution qexec2 = QueryExecutionFactory.sparqlService(
+                    Collections.getCollectionsName(Collections.METADATA_SPARQL), query2);
+            ResultSet results2 = qexec2.execSelect();
+            ResultSetRewindable resultsrw2 = ResultSetFactory.copyResults(results2);
+            qexec2.close();
+            
+            if (resultsrw2.size() > 0) {
+                QuerySolution soln2 = resultsrw2.next();
+                if (null != soln2.getLiteral("pid")) {
+                	String pid = soln2.getLiteral("pid").toString();
+                	if (!pid.equals("")) {
+                		return pid;
+                	}
+                }
+            }
+            return "";
+        }
+        return "";
+	}
+	
+	public String getObjectSID() {
+		
+//		this.objectUri = objectUri;
+		
+        String queryString = NameSpaces.getInstance().printSparqlNameSpaceList()
+                + " SELECT ?sid WHERE {"
+                + " <" + objectUri + "> <http://hadatac.org/ont/hasco/originalID> ?sid . "  
+                + " <" + objectUri + "> <http://hadatac.org/ont/hasco/isObjectOf> ?sc . "
+                + " ?sc	rdf:type <http://hadatac.org/ont/hasco/SampleCollection> . "
+                + " }";
+        
+        Query query = QueryFactory.create(queryString);
+        QueryExecution qexec = QueryExecutionFactory.sparqlService(
+                Collections.getCollectionsName(Collections.METADATA_SPARQL), query);
+        ResultSet results = qexec.execSelect();
+        ResultSetRewindable resultsrw = ResultSetFactory.copyResults(results);
+        qexec.close();
+        
+        if (resultsrw.size() > 0) {
+            QuerySolution soln = resultsrw.next();
+            if (null != soln.getLiteral("sid")) {
+            	String sid = soln.getLiteral("sid").toString();
+            	if (!sid.equals("")) {
+            		return sid;
+            	}
+            }
+        }
+        
+        return "";
 	}
 
 	public void setObjectUri(String objectUri) {
@@ -569,6 +676,8 @@ public class Measurement {
 		m.setStudyUri(doc.getFieldValue("study_uri").toString());
 		if (doc.getFieldValue("object_uri") != null) {
 			m.setObjectUri(doc.getFieldValue("object_uri").toString());
+			m.setPID(doc.getFieldValue("object_uri").toString());
+			m.setSID(doc.getFieldValue("object_uri").toString());
 		}
 		if (doc.getFieldValue("timestamp") != null) {
 			m.setTimestamp(doc.getFieldValue("timestamp").toString());
