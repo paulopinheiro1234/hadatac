@@ -168,7 +168,7 @@ public class Subject {
 	        + " SELECT ?ar ?obj WHERE {"
 	        + "        ?ar rdf:type hasco:DASchemaAttribute . " 
 	        + "        ?ar hasco:hasAttribute <" + attr_uri + "> . "
-	        + "        ?ar hasco:hasAssociatedObject ?obj  ."
+	        + "        ?ar hasco:isAttributeOf ?obj  ."
 	        + " }";
         
         //String queryString = NameSpaces.getInstance().printSparqlNameSpaceList()
@@ -192,8 +192,7 @@ public class Subject {
             if (null != soln.getResource("obj")) {
             	String attributeAssociation = soln.getResource("obj").toString();
             	System.out.println("attributeAssociation: " + attributeAssociation);
-            	System.out.println("attributeAssociation pair: " + ValueCellProcessing.replacePrefixEx("chear-kb:ObjectTypeMother"));
-            	if (attributeAssociation.equals(ValueCellProcessing.replacePrefixEx("chear-kb:ObjectTypeMother"))) {
+            	if (attributeAssociation.contains("chear-kb:DASO-mother")) {
             		String motherUri = obj_uri + "-mother";
             	        System.out.println("motherUri: " + motherUri);
             		

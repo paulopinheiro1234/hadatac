@@ -141,13 +141,17 @@ public class Measurement {
         
         if (resultsrw.size() > 0) {
             QuerySolution soln = resultsrw.next();
-            if (null != soln.getLiteral("pid")) {
-            	String pid = soln.getLiteral("pid").toString();
-            	if (!pid.equals("")) {
-            		return pid;
-            	}
-            }
-        } else {
+            try{
+		            if (null != soln.getLiteral("pid")) {
+		            	String pid = soln.getLiteral("pid").toString();
+		            	if (!pid.equals("")) {
+		            		return pid;
+		            	}
+		            }
+		        } catch (Exception e1) {
+		        	return "";
+		        }
+            } else {
         	String queryString2 = NameSpaces.getInstance().printSparqlNameSpaceList()
                     + " SELECT ?pid WHERE {"
                     + " <" + objectUri + "> <http://hadatac.org/ont/hasco/isSampleOf> ?sub . "
@@ -163,16 +167,19 @@ public class Measurement {
             
             if (resultsrw2.size() > 0) {
                 QuerySolution soln2 = resultsrw2.next();
-                if (null != soln2.getLiteral("pid")) {
-                	String pid = soln2.getLiteral("pid").toString();
-                	if (!pid.equals("")) {
-                		return pid;
-                	}
+                try{
+	                if (null != soln2.getLiteral("pid")) {
+	                	String pid = soln2.getLiteral("pid").toString();
+	                	if (!pid.equals("")) {
+	                		return pid;
+	                	}
+	                }
+                } catch (Exception e1) {
+                	return "";
                 }
             }
+            }
             return "";
-        }
-        return "";
 	}
 	
 	public String getObjectSID() {
