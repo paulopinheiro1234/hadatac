@@ -148,7 +148,7 @@ public class Parser {
 				}
 				if (record.get(8) != null && !record.get(8).equals("")) {
 				    switch (record.get(8).trim()) {
-				    case "µg/L":  
+				    case "microg/L":  
 					unitOverride = "http://geneontology.org/GO.format.obo-1_2.shtml#UO_0000301";
 					unitLabelOverride = "microgram per liter";
 					break;
