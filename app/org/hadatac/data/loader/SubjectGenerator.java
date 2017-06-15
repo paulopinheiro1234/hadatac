@@ -57,15 +57,18 @@ public class SubjectGenerator extends BasicGenerator {
 	}
 	
 	private String getUri(CSVRecord rec) { 
-		return kbPrefix + "SBJ-" + String.format("%04d", counter + getSubjectCount(rec.get(mapCol.get("pilotNum"))))
-			+ "-" + rec.get(mapCol.get("pilotNum")); 
+/*		return kbPrefix + "SBJ-" + String.format("%04d", counter + getSubjectCount(rec.get(mapCol.get("pilotNum"))))
+			+ "-" + rec.get(mapCol.get("pilotNum")); */
+		return kbPrefix + "SBJ-" + getOriginalID(rec) + "-" + rec.get(mapCol.get("pilotNum"));
 	}
 	private String getType() {
 		return "sio:Human";
 	}
 	private String getLabel(CSVRecord rec) {
-		return "ID " + String.format("%04d", counter + getSubjectCount(rec.get(mapCol.get("pilotNum")))) + " - " 
-			+ rec.get(mapCol.get("pilotNum"));
+/*		return "ID " + String.format("%04d", counter + getSubjectCount(rec.get(mapCol.get("pilotNum")))) + " - " 
+			+ rec.get(mapCol.get("pilotNum")); */
+		return "Subject ID " + getOriginalID(rec) + " - " 
+		+ rec.get(mapCol.get("pilotNum"));
 	}
     private String getOriginalID(CSVRecord rec) {
     	return rec.get(mapCol.get("subjectID"));
