@@ -149,8 +149,8 @@ public class Subject {
         
         if (resultsrw.size() > 0) {
             QuerySolution soln = resultsrw.next();
-            if (null != soln.getResource("codeClass")) {
-            	String codeValue = ValueCellProcessing.replacePrefixEx(soln.getResource("codeClass").toString());
+            if (null != soln.getLiteral("codeClass")) {
+            	String codeValue = soln.getLiteral("codeClass").toString();
             	if (!codeValue.equals("")) {
             		return codeValue;
             	}
