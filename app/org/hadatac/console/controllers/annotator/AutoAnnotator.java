@@ -710,6 +710,7 @@ public class AutoAnnotator extends Controller {
 	        while((line = bufRdr.readLine()) != null) {
 	        	hm.put(line.split(",")[0], line.split(",")[1]);
 	        }
+	        study_id = hm.get("Study_ID");
 	        URL url = new URL(hm.get("Data_Dictionary"));
 	        //System.out.println(url.toString());
 	        File dd = new File(file.getName());
@@ -737,7 +738,7 @@ public class AutoAnnotator extends Controller {
 		            codebook.put(codesl.get(0), codesl);
 		        	}
 		        bufRdr3.close();
-		        
+		        System.out.println("RIGHT BEFORE PVG: " + study_id);
 	        	PVGenerator pvGenerator = new PVGenerator(cb);
 	    		System.out.println("Calling PVGenerator");
 	    		bSuccess = commitRows(pvGenerator.createRows(), pvGenerator.toString(), 
@@ -753,7 +754,7 @@ public class AutoAnnotator extends Controller {
 	        BufferedReader bufRdr2 = new BufferedReader(new FileReader(cm));
 	        String line2 =  null;
 	        
-	        study_id = hm.get("Study_ID");
+//	        study_id = hm.get("Study_ID");
 
 	        while((line2 = bufRdr2.readLine()) != null){
 	            String str[] = line2.split(",");
@@ -768,6 +769,8 @@ public class AutoAnnotator extends Controller {
 	//        System.out.println(hm.keySet());
 	    	
 		    	try {
+		    		
+		    		study_id = hm.get("Study_ID");
 		    		
 		    		DASchemaObjectGenerator dasoGenerator = new DASchemaObjectGenerator(dd);
 		    		System.out.println("Calling DASchemaObjectGenerator");

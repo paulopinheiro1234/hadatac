@@ -30,6 +30,7 @@ public class PVGenerator extends BasicGenerator {
 		this.SDDName = file.getName();
 		this.codeMap = AutoAnnotator.codeMappings;
 		this.study_id = AutoAnnotator.study_id;
+		System.out.println("RIGHT IN PVG: " + study_id);
 		this.pvMap = AutoAnnotator.codebook;
 		
 	}
