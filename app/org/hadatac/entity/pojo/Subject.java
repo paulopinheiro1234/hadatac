@@ -150,32 +150,36 @@ public class Subject {
         if (resultsrw.size() > 0) {
             QuerySolution soln = resultsrw.next();
             if (null != soln.getResource("codeClass")) {
-            	String classUri = soln.getResource("codeClass").toString();
-            	if(!classUri.equals("")){
-            		return classUri.substring(classUri.lastIndexOf("#") + 1);
-//	            	String queryString2 = NameSpaces.getInstance().printSparqlNameSpaceList()
-//	                        + " SELECT ?label WHERE {"
-//	                        + " <" + classUri + "> rdfs:label ?label . "      
-//	                        + " }";
-//	                
-//	                Query query2 = QueryFactory.create(queryString2);
-//	                QueryExecution qexec2 = QueryExecutionFactory.sparqlService(
-//	                        Collections.getCollectionsName(Collections.METADATA_SPARQL), query2);
-//	                ResultSet results2 = qexec2.execSelect();
-//	                ResultSetRewindable resultsrw2 = ResultSetFactory.copyResults(results2);
-//	                qexec2.close();
-	            	
-	//            	select ?label where { <http://hadatac.org/ont/chear#HighSchoolOrLess> rdfs:label ?label }
-//	            	if (resultsrw2.size() > 0) {
-//	            		try{
-//		            		String classLabel = soln.getLiteral("label").toString();
-//		            		if(!classLabel.equals("")){
-//		            			return classLabel;
-//		            		}
-//	            		} catch (Exception e1) {
-//	            			return classUri;
-//	            		}
-//	            	}
+            	try{
+	            	String classUri = soln.getResource("codeClass").toString();
+	            	if(!classUri.equals("")){
+	            		return classUri.substring(classUri.lastIndexOf("#") + 1);
+	//	            	String queryString2 = NameSpaces.getInstance().printSparqlNameSpaceList()
+	//	                        + " SELECT ?label WHERE {"
+	//	                        + " <" + classUri + "> rdfs:label ?label . "      
+	//	                        + " }";
+	//	                
+	//	                Query query2 = QueryFactory.create(queryString2);
+	//	                QueryExecution qexec2 = QueryExecutionFactory.sparqlService(
+	//	                        Collections.getCollectionsName(Collections.METADATA_SPARQL), query2);
+	//	                ResultSet results2 = qexec2.execSelect();
+	//	                ResultSetRewindable resultsrw2 = ResultSetFactory.copyResults(results2);
+	//	                qexec2.close();
+		            	
+		//            	select ?label where { <http://hadatac.org/ont/chear#HighSchoolOrLess> rdfs:label ?label }
+	//	            	if (resultsrw2.size() > 0) {
+	//	            		try{
+	//		            		String classLabel = soln.getLiteral("label").toString();
+	//		            		if(!classLabel.equals("")){
+	//		            			return classLabel;
+	//		            		}
+	//	            		} catch (Exception e1) {
+	//	            			return classUri;
+	//	            		}
+	//	            	}
+	            	}
+            	} catch (Exception e1) {
+            		return null;
             	}
             }
         }
