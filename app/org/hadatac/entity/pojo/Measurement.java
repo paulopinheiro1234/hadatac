@@ -202,11 +202,15 @@ public class Measurement {
         
         if (resultsrw.size() > 0) {
             QuerySolution soln = resultsrw.next();
-            if (null != soln.getLiteral("sid")) {
-            	String sid = soln.getLiteral("sid").toString();
-            	if (!sid.equals("")) {
-            		return sid;
-            	}
+            try{
+	            if (null != soln.getLiteral("sid")) {
+	            	String sid = soln.getLiteral("sid").toString();
+	            	if (!sid.equals("")) {
+	            		return sid;
+	            	}
+	            }
+            } catch (Exception e1) {
+            	return "";
             }
         }
         
