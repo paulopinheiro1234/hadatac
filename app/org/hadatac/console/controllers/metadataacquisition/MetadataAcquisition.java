@@ -84,7 +84,7 @@ public class MetadataAcquisition extends Controller {
 	public static boolean updateStudy() {
 		String strQuery = NameSpaces.getInstance().printSparqlNameSpaceList() 
 				+ " SELECT DISTINCT ?studyUri ?studyLabel ?proj ?studyTitle ?studyComment "
-				+ " ?indicatorLabel ?attributeLabel ?roleLabel ?agentName ?institutionName WHERE { "
+				+ " ?indicatorLabel ?attributeLabel ?roleLabel ?eventLabel ?agentName ?institutionName WHERE { "
 				+ " ?studyUri a ?subUri . "
 				+ " ?subUri rdfs:subClassOf* hasco:Study . "
 				+ " OPTIONAL{ ?schemaAttribute hasco:partOfSchema ?schemaUri . "
@@ -100,6 +100,9 @@ public class MetadataAcquisition extends Controller {
 				+ " OPTIONAL { ?schemaAttribute hasco:isAttributeOf ?object . "
                 + " ?object hasco:hasRole ?role . "
                 + " ?role rdfs:label ?roleLabel } . "
+                + " OPTIONAL { ?schemaAttribute hasco:hasEvent ?event . "
+                + " ?event hasco:hasEntity ?eventEn . "
+                + " ?eventEn rdfs:label ?eventLabel } . "
 				+ " OPTIONAL{ ?studyUri rdfs:label ?studyLabel } . "
 				+ " OPTIONAL{ ?studyUri hasco:hasProject ?proj } . "
 				+ " OPTIONAL{ ?studyUri skos:definition ?studyTitle } . "
@@ -156,8 +159,14 @@ public class MetadataAcquisition extends Controller {
 				String key = soln.get("indicatorLabel").toString().
 						replace(",", "").replace(" ", "") + "_m";
 				String value = "";
-				if (soln.contains("roleLabel")){
+				if ((soln.contains("roleLabel"))&&(soln.contains("eventLabel"))){
+					value = soln.get("roleLabel").toString() + "'s " + soln.get("attributeLabel").toString() + " at " + soln.get("eventLabel").toString();
+				} 
+				else if (soln.contains("roleLabel")){
 					value = soln.get("roleLabel").toString() + "'s " + soln.get("attributeLabel").toString();
+				} 
+				else if (soln.contains("eventLabel")){
+					value = soln.get("attributeLabel").toString() + " at " + soln.get("eventLabel").toString();
 				} else {
 					value = soln.get("attributeLabel").toString();
 				}
