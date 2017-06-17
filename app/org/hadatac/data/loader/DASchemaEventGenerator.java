@@ -8,22 +8,24 @@ import org.apache.commons.io.FileUtils;
 import org.hadatac.console.controllers.annotator.AutoAnnotator;
 
 import java.lang.String;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.collections.list.SetUniqueList;
 import org.apache.commons.csv.CSVRecord;
 
-public class DASchemaAttrGenerator extends BasicGenerator {
+public class DASchemaEventGenerator extends BasicGenerator {
 	final String kbPrefix = "chear-kb:";
 	String startTime = "";
 	String SDDName = "";
+	List<String> timeList = new ArrayList<String>();
 	HashMap<String, String> codeMap;
-	HashMap<String, String> hasEntityMap = new HashMap<String, String>();
 	String study_id = "";
 	
-	
-	public DASchemaAttrGenerator(File file) {
+	public DASchemaEventGenerator(File file) {
 		super(file);
 		this.SDDName = file.getName();
 		this.codeMap = AutoAnnotator.codeMappings;
@@ -35,8 +37,8 @@ public class DASchemaAttrGenerator extends BasicGenerator {
 	
 	        while((line = br.readLine()) != null){
 	            String str[] = line.split(",");
-	            if (str[5].length() > 0){
-	            	hasEntityMap.put(str[0], str[5]);
+	            if (str[4].length() > 0){
+	            	timeList.add(str[4]);
 //	            System.out.println(str[0] + "-----" + str[5]);
 	        	}
 	        }
@@ -61,6 +63,12 @@ public class DASchemaAttrGenerator extends BasicGenerator {
         mapCol.put("WasDerivedFrom", "wasDerivedFrom");       
         mapCol.put("WasGeneratedBy", "wasGeneratedBy");
         mapCol.put("HasPosition", "hasPosition");
+//        mapCol.put("??mother", "chear-kb:ObjectTypeMother");
+//        mapCol.put("??child", "chear-kb:ObjectTypeChild");
+//        mapCol.put("??birth", "chear-kb:ObjectTypeBirth");
+//        mapCol.put("??household", "chear-kb:ObjectTypeHousehold");
+//        mapCol.put("??headhousehold", "chear-kb:ObjectTypeHeadHousehold");
+//        mapCol.put("??father", "chear-kb:ObjectTypeFather");
 	}
     
     private String getLabel(CSVRecord rec) {
@@ -69,10 +77,6 @@ public class DASchemaAttrGenerator extends BasicGenerator {
     
     private String getAttribute(CSVRecord rec) {
     	return rec.get(mapCol.get("AttributeType"));
-    }
-    
-    private String getAttributeOf(CSVRecord rec) {
-    		return kbPrefix + "DASO-" + rec.get(mapCol.get("AttributeOf")).replace("??", "") + "-" + study_id;
     }
     
     private String getUnit(CSVRecord rec) {
@@ -84,22 +88,17 @@ public class DASchemaAttrGenerator extends BasicGenerator {
     }
     
     private String getTime(CSVRecord rec) {
-    	return kbPrefix + "DASE-" + rec.get(mapCol.get("Time")).trim().replace(" ","").replace("_","-").replace("??", "") + "-" + study_id;
+    	return rec.get(mapCol.get("Time"));
     }
     
     private String getEntity(CSVRecord rec) {
-    	if ((rec.get(mapCol.get("AttributeOf"))) == null || (rec.get(mapCol.get("AttributeOf"))).equals("")) {
-    		return "chear:unknownEntity";
+    	if ((rec.get(mapCol.get("Entity"))) == null || (rec.get(mapCol.get("Entity"))).equals("")) {
+    		return null;
     	} else {
-        	if (codeMap.containsKey(hasEntityMap.get(rec.get(mapCol.get("AttributeOf"))))) {
-        		return codeMap.get(hasEntityMap.get(rec.get(mapCol.get("AttributeOf"))));
+        	if (codeMap.containsKey(rec.get(mapCol.get("Entity")))) {
+        		return codeMap.get(rec.get(mapCol.get("Entity")));
         	} else {
-        		if (hasEntityMap.containsKey(rec.get(mapCol.get("AttributeOf")))){
-        			return hasEntityMap.get(rec.get(mapCol.get("AttributeOf")));
-        		} else {
-        			return rec.get(mapCol.get("AttributeOf"));
-        		}
-        		
+        		return rec.get(mapCol.get("Entity"));
         	}
     	}
     }
@@ -113,7 +112,17 @@ public class DASchemaAttrGenerator extends BasicGenerator {
     }
     
     private String getInRelationTo(CSVRecord rec) {
-    	return rec.get(mapCol.get("InRelationTo"));
+    	if (rec.get(mapCol.get("InRelationTo")) == null || rec.get(mapCol.get("InRelationTo")).equals("")){
+    		return "";
+    	} else {
+    		List<String> items = Arrays.asList(rec.get(mapCol.get("InRelationTo")).split("\\s*,\\s*"));
+    		String answer = "";
+    		for (String i : items){
+    			answer += kbPrefix + "DASO-" + i.replace("_","-").replace("??", "") + "-" + study_id + " & ";
+    		}
+    		return answer.substring(0, answer.length() - 3);
+//    		return kbPrefix + "DASO-" + items.get(0).replace("_","-").replace("??", "") + "-" + study_id;
+    	}
     }
     
     private String getWasDerivedFrom(CSVRecord rec) {
@@ -141,9 +150,7 @@ public class DASchemaAttrGenerator extends BasicGenerator {
     	rows.clear();
     	int row_number = 0;
     	for (CSVRecord record : records) {
-    		if (getAttribute(record)  == null || getAttribute(record).equals("")){
-            	continue;
-    		} else {
+    		if (timeList.contains(getLabel(record))){
     			rows.add(createRow(record, ++row_number));
     		}
         }
@@ -155,18 +162,13 @@ public class DASchemaAttrGenerator extends BasicGenerator {
     @Override
     Map<String, Object> createRow(CSVRecord rec, int row_number) throws Exception {
     	Map<String, Object> row = new HashMap<String, Object>();
-    	row.put("hasURI", kbPrefix + "DASA-" + getLabel(rec).trim().replace(" ", "").replace("_","-").replace("??", "") + "-" + study_id);
-    	row.put("a", "hasco:DASchemaAttribute");
-    	row.put("rdfs:label", getLabel(rec));
-    	row.put("rdfs:comment", getLabel(rec));
+    	row.put("hasURI", kbPrefix + "DASE-" + getLabel(rec).trim().replace(" ","").replace("_","-").replace("??", "") + "-" + study_id);
+    	row.put("a", "hasco:DASchemaEvent");
     	row.put("hasco:partOfSchema", kbPrefix + "DAS-" + SDDName.replace(".csv", ""));
-    	row.put("hasco:hasPosition", getPosition(rec));
     	row.put("hasco:hasEntity", getEntity(rec));
-    	row.put("hasco:hasAttribute", getAttribute(rec));
     	row.put("hasco:hasUnit", getUnit(rec));
-    	row.put("hasco:hasEvent", getTime(rec));
-    	row.put("hasco:hasSource", "");
-    	row.put("hasco:isAttributeOf", getAttributeOf(rec));
+    	row.put("sio:inRelationTo", getInRelationTo(rec));
+    	row.put("sio:Relation", getRelation(rec));
     	row.put("hasco:isVirtual", checkVirtual(rec).toString());
     	row.put("hasco:isPIConfirmed", "false");
     	

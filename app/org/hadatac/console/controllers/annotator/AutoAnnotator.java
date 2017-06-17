@@ -55,6 +55,7 @@ import org.hadatac.console.views.html.*;
 import org.hadatac.data.api.DataFactory;
 import org.hadatac.data.loader.AgentGenerator;
 import org.hadatac.data.loader.DASchemaAttrGenerator;
+import org.hadatac.data.loader.DASchemaEventGenerator;
 import org.hadatac.data.loader.DASchemaGenerator;
 import org.hadatac.data.loader.DASchemaObjectGenerator;
 import org.hadatac.data.loader.DataAcquisitionGenerator;
@@ -777,7 +778,11 @@ public class AutoAnnotator extends Controller {
 		    		bSuccess = commitRows(dasoGenerator.createRows(), dasoGenerator.toString(), 
 		    				file.getName(), "DASchemaObject", true);
 		    		
-		    		
+		    		DASchemaEventGenerator daseGenerator = new DASchemaEventGenerator(dd);
+		    		System.out.println("Calling DASchemaEventGenerator");
+		    		bSuccess = commitRows(daseGenerator.createRows(), daseGenerator.toString(), 
+		    				file.getName(), "DASchemaEvent", true);
+		    		 		
 		    		DASchemaAttrGenerator dasaGenerator = new DASchemaAttrGenerator(dd);
 		    		System.out.println("Calling DASchemaAttrGenerator");
 		    		bSuccess = commitRows(dasaGenerator.createRows(), dasaGenerator.toString(), 
