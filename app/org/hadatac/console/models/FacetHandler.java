@@ -17,6 +17,7 @@ public class FacetHandler {
         public List facetsEC;
         public List facetsS;
         public List facetsU;
+        public List facetsT;
         public List facetsPI;
 	
         private class Pair {
@@ -46,11 +47,13 @@ public class FacetHandler {
 	       facetsEC  = new ArrayList<Pair>();
 	       facetsS   = new ArrayList<Pair>();
 	       facetsU   = new ArrayList<Pair>();
+	       facetsT   = new ArrayList<Pair>();
 	       facetsPI  = new ArrayList<Pair>();
 
 	       facetsAll.put("facetsEC", facetsEC);
 	       facetsAll.put("facetsS", facetsS);
 	       facetsAll.put("facetsU", facetsU);
+	       facetsAll.put("facetsT", facetsU);
 	       facetsAll.put("facetsPI", facetsPI);
 	}
 	
@@ -123,6 +126,31 @@ public class FacetHandler {
         public List<String> valuesU() {
 	    List<String> list = new ArrayList<String>();
 	       for (Object obj : facetsU) {
+                   Pair pair = (Pair)obj;
+		   list.add(pair.getValue());
+	       }
+	       return  list;
+        }
+
+	public String putFacetT(String f, String v) {
+	        Pair obj = new Pair(f, v);
+		facetsT.add(obj);
+		return obj.getValue();
+	}
+	
+	public void removeFacetT(String f, String v) {
+	    for (Object obj : facetsU) {
+		Pair temp = (Pair)obj;
+		if ((temp.getField().equals(f)) && (temp.getValue().equals(v))) {
+		   facetsT.remove(temp);
+                   break;
+		}
+	    }
+	}
+	
+        public List<String> valuesT() {
+	    List<String> list = new ArrayList<String>();
+	       for (Object obj : facetsT) {
                    Pair pair = (Pair)obj;
 		   list.add(pair.getValue());
 	       }
@@ -213,7 +241,7 @@ public class FacetHandler {
 	        if (str == null || str.equals("")) {
 		   return;
 	        }
-		//System.out.println("str = [" + str + "]");			    
+		System.out.println("str = [" + str + "]");			    
 	        // EC list
 	        str = str.substring(str.indexOf('['));
 		String ECList = str.substring(1,str.indexOf(']'));
@@ -235,15 +263,24 @@ public class FacetHandler {
 		    loadList(facetsU, UList);
 		}
 		str = str.substring(str.indexOf(']'));		    
+	        // T list
+        	str = str.substring(str.indexOf('['));
+		String TList = str.substring(1,str.indexOf(']'));		    
+		if (TList != null && !TList.equals("") && !TList.equals("{}")) {
+		    loadList(facetsT, TList);
+		}
+		str = str.substring(str.indexOf(']'));		    
                 // PI list
         	str = str.substring(str.indexOf('['));
 		String PIList = str.substring(1,str.indexOf(']'));		    
 		if (PIList != null && !PIList.equals("") && !PIList.equals("{}")) {
 		    loadList(facetsPI, PIList);
 		}
+		str = str.substring(str.indexOf(']'));		    
 		//System.out.println("ECList = <" + ECList + ">");			    
 		//System.out.println("SList = <" + SList + ">");			    
 		//System.out.println("UList = <" + UList + ">");			    
+		//System.out.println("TList = <" + TList + ">");			    
 		//System.out.println("PIList = <" + PIList + ">");			    
 		return;
         }
@@ -268,7 +305,7 @@ public class FacetHandler {
 	    return facetsQuery;
         }
 
-	public String toSolrQuery() {
+        public String toSolrQuery() {
 		String query = "";
                 String query_tmp = "";
 		int populatedLists = 0;
@@ -294,5 +331,5 @@ public class FacetHandler {
                     query = "(" + query + ")"; 
 		}
 		return query;
-	}
+	 }
 }

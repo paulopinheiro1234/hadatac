@@ -23,6 +23,7 @@ import play.mvc.Controller;
 import play.mvc.Result;
 
 import org.hadatac.console.views.formdata.FacetFormData;
+import org.hadatac.console.views.html.dataacquisitionsearch.facetOnlyBrowser;
 import org.hadatac.console.views.html.dataacquisitionsearch.dataacquisition_browser;
 import org.hadatac.data.model.AcquisitionQueryResult;
 import org.hadatac.entity.pojo.Measurement;
@@ -70,6 +71,14 @@ public class DataAcquisitionSearch extends Controller {
     }
 
     public static Result index(int page, int rows, String facets) {
+	return indexInternal(0, page, rows, facets);
+    }
+
+    public static Result indexData(int page, int rows, String facets) {
+	return indexInternal(1, page, rows, facets);
+    }
+
+    private static Result indexInternal(int mode, int page, int rows, String facets) {
     	//System.out.println("[DataAcquisitionSearch] Page: " + page + "   Rows:" + rows + "   Facets:" + facets);
     	
     	FacetHandler handler = new FacetHandler();
@@ -110,12 +119,22 @@ public class DataAcquisitionSearch extends Controller {
             }
         }
 
-    	return ok(dataacquisition_browser.render(page, rows, facets, results.getDocumentSize(), 
+	if (mode == 0) {
+	    return ok(facetOnlyBrowser.render(page, rows, facets, results.getDocumentSize(), 
     			results, results.toJSON(), handler, Measurement.buildQuery(ownerUri, page, rows, handler), 
     			objDetails.toJSON()));
+	} else {
+	    return ok(dataacquisition_browser.render(page, rows, facets, results.getDocumentSize(), 
+    			results, results.toJSON(), handler, Measurement.buildQuery(ownerUri, page, rows, handler), 
+    			objDetails.toJSON()));
+	}
     }
 
     public static Result postIndex(int page, int rows, String facets) {
     	return index(page, rows, facets);
+    }
+
+    public static Result postIndexData(int page, int rows, String facets) {
+    	return indexData(page, rows, facets);
     }
 }

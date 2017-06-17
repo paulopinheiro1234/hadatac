@@ -527,6 +527,7 @@ public class Measurement {
 		query.setFacet(true);
 		query.setFacetLimit(-1);
 		query.addFacetField("unit");
+		query.addFacetField("timestamp");
 		query.addFacetPivotField("study_uri,acquisition_uri");
 		query.addFacetPivotField("entity,characteristic");
 		query.addFacetPivotField("platform_name,instrument_model");
