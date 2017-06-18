@@ -22,6 +22,7 @@ public class DataAcquisitionSchema {
     private String uri = "";
     private List<DataAcquisitionSchemaAttribute> attributes = null;
     private List<DataAcquisitionSchemaObject> objects = null;
+    private List<DataAcquisitionSchemaEvent> events = null;
     private int valueColumn;
     private int timestampColumn;
     private int timeInstantColumn;
@@ -80,24 +81,30 @@ public class DataAcquisitionSchema {
     }
     
     public void setAttributes(List<DataAcquisitionSchemaAttribute> attributes) {
-	this.attributes = attributes;
-	for (DataAcquisitionSchemaAttribute dasa : attributes) {
-	    if (dasa.getAttribute().equals(ValueCellProcessing.replacePrefixEx("sio:TimeStamp"))) {
-		setTimestampColumn(dasa.getPositionInt());
-		System.out.println("[OK] DataAcquisitionSchemat TimeStampColumn: " + dasa.getPositionInt());
+	if (attributes == null) {
+	   System.out.println("[ERROR] No DataAcquisitionSchemaAttribute for " + uri + " is defined in the knowledge base. ");
+	} else {
+	    this.attributes = attributes;
+	    for (DataAcquisitionSchemaAttribute dasa : attributes) {
+		if (dasa.getAttribute().equals(ValueCellProcessing.replacePrefixEx("sio:TimeStamp"))) {
+		    setTimestampColumn(dasa.getPositionInt());
+		    System.out.println("[OK] DataAcquisitionSchemat TimeStampColumn: " + dasa.getPositionInt());
+		}
+		if (dasa.getAttribute().equals(ValueCellProcessing.replacePrefixEx("sio:TimeInstant"))) {
+		    setTimeInstantColumn(dasa.getPositionInt());
+		    System.out.println("[OK] DataAcquisitionSchemat TimeInstantColumn: " + dasa.getPositionInt());
+		}
+		if (dasa.getAttribute().equals(ValueCellProcessing.replacePrefixEx("hasco:originalID"))) {
+		    setIdColumn(dasa.getPositionInt());
+		    System.out.println("[OK] DataAcquisitionSchemat IdColumn: " + dasa.getPositionInt());
+		}
+		System.out.println("[OK] DataAcquisitionSchemaAttribute <" + dasa.getUri() + "> is defined in the knowledge base. " + 
+				   "Entity: \""    + dasa.getEntityLabel()     + "\"; " + 
+				   "Attribute: \"" + dasa.getAttributeLabel() + "\"; " + 
+				   "Unit: \""      + dasa.getUnitLabel()       + "\""); 
+		//System.out.println("     DataAcquisitionSchemaAttribute DASO URI: \"" + dasa.getObjectUri() + "\"");
+		//System.out.println("     DataAcquisitionSchemaAttribute DASE URI: \"" + dasa.getEventUri() + "\"");
 	    }
-	    if (dasa.getAttribute().equals(ValueCellProcessing.replacePrefixEx("sio:TimeInstant"))) {
-		setTimeInstantColumn(dasa.getPositionInt());
-		System.out.println("[OK] DataAcquisitionSchemat TimeInstantColumn: " + dasa.getPositionInt());
-	    }
-	    if (dasa.getAttribute().equals(ValueCellProcessing.replacePrefixEx("hasco:originalID"))) {
-		setIdColumn(dasa.getPositionInt());
-		System.out.println("[OK] DataAcquisitionSchemat IdColumn: " + dasa.getPositionInt());
-	    }
-	    System.out.println("[OK] DataAcquisitionSchemaAttribute <" + dasa.getUri() + "> is defined in the knowledge base. " + 
-		 "Entity: \""    + dasa.getEntityLabel()     + "\"; " + 
-		 "Attribute: \"" + dasa.getAttributeLabel() + "\"; " + 
-		 "Unit: \""      + dasa.getUnitLabel()       + "\"");
 	}
 
     }
@@ -107,13 +114,46 @@ public class DataAcquisitionSchema {
     }
     
     public void setObjects(List<DataAcquisitionSchemaObject> objects) {
-	this.objects = objects;
+	if (objects == null) {
+	   System.out.println("[WARNING] No DataAcquisitionSchemaObject for " + uri + " is defined in the knowledge base. ");
+	} else {
+	    this.objects = objects;
+	    for (DataAcquisitionSchemaObject daso : objects) {
+		System.out.println("[OK] DataAcquisitionSchemaObject <" + daso.getUri() + "> is defined in the knowledge base. " + 
+				   "Role: \""  + daso.getRole() + "\"");
+	    }
+	}
     }
 
     public DataAcquisitionSchemaObject getObject(String dasoUri) {
 	for (DataAcquisitionSchemaObject daso : objects) {
 	    if (daso.getUri().equals(dasoUri)) {
 		return daso;
+	    }
+	}
+	return null;
+    }
+    
+    public List<DataAcquisitionSchemaEvent> getEvents() {
+    	return events;
+    }
+    
+    public void setEvents(List<DataAcquisitionSchemaEvent> events) {
+	if (events == null) {
+	   System.out.println("[WARNING] No DataAcquisitionSchemaEvent for " + uri + " is defined in the knowledge base. ");
+	} else {
+	    this.events = events;
+	    for (DataAcquisitionSchemaEvent dase : events) {
+		System.out.println("[OK] DataAcquisitionSchemaEvent <" + dase.getUri() + "> is defined in the knowledge base. " + 
+				   "Label: \""  + dase.getLabel() + "\"");
+	    }
+	}
+    }
+
+    public DataAcquisitionSchemaEvent getEvent(String daseUri) {
+	for (DataAcquisitionSchemaEvent dase : events) {
+	    if (dase.getUri().equals(daseUri)) {
+		return dase;
 	    }
 	}
 	return null;
@@ -142,7 +182,11 @@ public class DataAcquisitionSchema {
 	    schema.setUri(schemaUri);
 	    schema.setAttributes(DataAcquisitionSchemaAttribute.findBySchema(schemaUri));
 	    schema.setObjects(DataAcquisitionSchemaObject.findBySchema(schemaUri));
-	    System.out.println("[OK] DataAcquisitionSchema " + schemaUri + " exists. It has " + schema.getAttributes().size() + " attributes and " + schema.getObjects().size() + " objects.");
+	    schema.setEvents(DataAcquisitionSchemaEvent.findBySchema(schemaUri));
+	    System.out.println("[OK] DataAcquisitionSchema " + schemaUri + " exists. " + 
+                               "It has " + schema.getAttributes().size() + " attributes, " + 
+                               schema.getObjects().size() + " objects, and " + 
+			       schema.getEvents().size() + " events.");
 	} else {
 	    System.out.println("[ERROR] DataAcquisitionSchema could not be found.");
 	}
@@ -171,4 +215,39 @@ public class DataAcquisitionSchema {
 	}
 	return schemas;
     }
+
+    public static String getFirstLabel (String uri) {
+	if (uri.startsWith("http")) {
+	    uri = "<" + uri + ">";
+	}
+	String queryString = NameSpaces.getInstance().printSparqlNameSpaceList() + 
+	    "SELECT ?label WHERE { " + 
+	    "  " + uri + " rdfs:label ?label ." + 
+	    "}";
+	Query query = QueryFactory.create(queryString);
+	QueryExecution qexec = QueryExecutionFactory.sparqlService(
+				    Collections.getCollectionsName(Collections.METADATA_SPARQL), query);
+	ResultSet results = qexec.execSelect();
+	ResultSetRewindable resultsrw = ResultSetFactory.copyResults(results);
+	qexec.close();
+	
+	String labelStr = "";
+	QuerySolution soln;
+	while (resultsrw.hasNext()) {
+	    soln = resultsrw.next();
+	    try {
+		if (soln.getLiteral("label") != null && soln.getLiteral("label").getString() != null) {
+		    labelStr = soln.getLiteral("label").getString();
+		}
+	    } catch (Exception e1) {
+		labelStr = "";
+	    }
+	    if (!labelStr.equals("")) {
+		break;
+	    }
+	}
+	return labelStr;
+	
+    }
+    
 }

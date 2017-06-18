@@ -20,6 +20,7 @@ import org.hadatac.entity.pojo.DataAcquisition;
 import org.hadatac.entity.pojo.DataAcquisitionSchema;
 import org.hadatac.entity.pojo.DataAcquisitionSchemaAttribute;
 import org.hadatac.entity.pojo.DataAcquisitionSchemaObject;
+import org.hadatac.entity.pojo.DataAcquisitionSchemaEvent;
 import org.hadatac.entity.pojo.Dataset;
 import org.hadatac.entity.pojo.Deployment;
 import org.hadatac.entity.pojo.HADataC;
@@ -175,12 +176,18 @@ public class Parser {
 				}
 				
 				Measurement measurement = new Measurement();
+
+				/*===================*
+                                 *                   *
+				 *   SET VALUE       *
+                                 *                   *
+				 *===================*/
+
 				if (dasa.getPositionInt() > -1 && record.get(dasa.getPositionInt() - 1).isEmpty()){
 					continue;
 				} else {
 					String originalValue = record.get(dasa.getPositionInt() - 1);
-					String codeValue = Subject.findCodeValue(
-							dasa.getAttribute(), originalValue);
+					String codeValue = Subject.findCodeValue(dasa.getAttribute(), originalValue);
 					if (codeValue == null) {
 					     measurement.setValue(originalValue);
 					} else {
@@ -188,18 +195,60 @@ public class Parser {
 					}
 				}
 				
+				/*============================*
+                                 *                            *
+				 *   SET TIME(STAMP)          *
+                                 *                            *
+				 *============================*/
+
+				/*
+				       - TimestampColumn is used for machine generated timestamp
+                                       - TimeInstantColumn is used for timestamps told to system to be timestamp, but that are not further processed
+				       - Abstract times are encoded as DASA's events, and are supposed to be strings
+				 */
+
+				// contrete time(stamps)
 				if(dasa.getPositionInt() == schema.getTimestampColumn()) {
-				        String sTime = record.get(schema.getTimestampColumn() - 1);
-					int timeStamp = new BigDecimal(sTime).intValue();
-					Date time = new Date((long)timeStamp * 1000);
-					measurement.setTimestamp(time.toString());
+				    String sTime = record.get(schema.getTimestampColumn() - 1);
+				    int timeStamp = new BigDecimal(sTime).intValue();
+				    Date time = new Date((long)timeStamp * 1000);
+				    measurement.setTimestamp(time.toString());
 				} else if(dasa.getPositionInt() == schema.getTimeInstantColumn()) {
 				    measurement.setTimestamp(record.get(schema.getTimeInstantColumn() - 1));
+
+				// abstract times 
+				} else if (dasa.getEventUri() != null && !dasa.getEventUri().equals("")) {
+				    String daseUri = dasa.getEventUri();
+				    DataAcquisitionSchemaEvent dase = schema.getEvent(daseUri); 
+				    if (dase != null) {
+					if (dase.getLabel() != null && !dase.getLabel().equals("")) {
+					    measurement.setTimestamp("At " + dase.getLabel());
+					} else if (dase.getEntity() != null && !dase.getEntity().equals("")) {
+					    measurement.setTimestamp("At " + dase.getEntity().substring(dase.getEntity().indexOf("#") + 1));
+					} else {
+					    measurement.setTimestamp("At " + daseUri);
+					}
+				    } 
+
+				// no time information
 				} else {
 				    measurement.setTimestamp("");
 				}
 				
+				/*============================*
+                                 *                            *
+				 *   SET STUDY                *
+                                 *                            *
+				 *============================*/
+
 				measurement.setStudyUri(ValueCellProcessing.replaceNameSpaceEx(hadatacKb.getDataAcquisition().getStudyUri()));
+
+				/*=============================*
+                                 *                             *
+				 *   SET OBJECT ID, PID, SID   *
+                                 *                             *
+				 *=============================*/
+
 				if (schema.getIdColumn() > -1){
 					if (dasa.getEntity().equals(ValueCellProcessing.replacePrefixEx("sio:Human"))) {
 					        //System.out.println("Matching reference subject: " + record.get(schema.getIdColumn() - 1));

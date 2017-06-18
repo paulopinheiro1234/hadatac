@@ -83,7 +83,7 @@ public class SubjectGenerator extends BasicGenerator {
     }
     
     private String getCohortLabel(CSVRecord rec) {
-    	return "Cohort of Study " + rec.get(mapCol.get("pilotNum"));
+    	return "Study Population of " + rec.get(mapCol.get("pilotNum"));
     }
     
     @Override

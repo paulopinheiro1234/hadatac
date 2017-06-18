@@ -18,18 +18,12 @@ public class DataAcquisitionSchemaEvent {
 
         private String uri;
     	private String entity;
-        private String role;
-        private String unit;
-    	private String inRelationTo;
-    	private String relation;
+        private String label;
     	
-        public DataAcquisitionSchemaEvent(String uri, String entity, String role, String unit, String inRelationTo, String relation) {
+    public DataAcquisitionSchemaEvent(String uri, String entity, String label) {
 	    this.uri = uri;
 	    this.entity = entity;
-	    this.role = role;
-	    this.inRelationTo = inRelationTo;
-	    this.relation = relation;
-	    this.unit = unit;
+	    this.label = label;
 	}
     	
         public String getUri() {
@@ -40,32 +34,19 @@ public class DataAcquisitionSchemaEvent {
 	    return entity;
 	}
 
-    	public String getRole() {
-	    return role;
-	}
-
-    	public String getUnit() {
-	    return unit;
-	}
-    	
-    	public String getInRelationTo() {
-	    return inRelationTo;
-	}
-
-    	public String getRelation() {
-	    return relation;
-	}
+        public String getLabel() {
+            return label;
+        }
 
         public static List<DataAcquisitionSchemaEvent> findBySchema (String schemaUri) {
-	    //System.out.println("Looking for data acuisition schema objectss for " + schemaUri);
+	    //System.out.println("Looking for data acuisition schema events for " + schemaUri);
 	     List<DataAcquisitionSchemaEvent> objects = new ArrayList<DataAcquisitionSchemaEvent>();
     	     String queryString = NameSpaces.getInstance().printSparqlNameSpaceList() + 
-    			"SELECT ?uri ?hasEntity ?hasRole ?inRelationTo ?relation WHERE { " + 
+    			"SELECT ?uri ?hasEntity ?label WHERE { " + 
     			"   ?uri a hasco:DASchemaEvent . " + 
     			"   ?uri hasco:partOfSchema " + schemaUri + " .  " + 
     			"   ?uri hasco:hasEntity ?hasEntity  ." + 
-    			"   OPTIONAL { ?uri sio:inRelationTo ?inRelationTo } ." + 
-    			"   OPTIONAL { ?uri sio:relation ?relation } ." + 
+    			"   OPTIONAL { ?hasEntity  rdfs:label ?label } ." + 
     			"}";
     	     Query query = QueryFactory.create(queryString);
 		
@@ -82,38 +63,23 @@ public class DataAcquisitionSchemaEvent {
 		
 	     while (resultsrw.hasNext()) {
 		  QuerySolution soln = resultsrw.next();
-		  String hasRoleStr = "";
-		  String inRelationToStr = "";
-		  String relationStr = "";
-		  String hasUnitStr = "";
+		  String entityStr = "";
+		  String entityLabelStr = "";
 		  try {
 			if (soln != null && soln.getResource("uri") != null && soln.getResource("uri").getURI() != null &&
 			    soln.getResource("hasEntity") != null && soln.getResource("hasEntity").getURI() != null) {
-			    				    
-			    try {
-				if (soln.getResource("inRelationTo") != null && soln.getResource("inRelationTo").getURI() != null) {
-				    inRelationToStr = soln.getResource("inRelationTo").getURI();
-				}
-			    } catch (Exception e1) {
-				inRelationToStr = "";
+			    
+			    entityStr = soln.getResource("hasEntity").getURI();
+
+			    entityLabelStr = DataAcquisitionSchema.getFirstLabel(entityStr); 
+			    if (entityLabelStr.equals("")) {
+				entityLabelStr = entityStr.substring(entityStr.indexOf("#") + 1);
 			    }
-			    				    
-			    try {
-				if (soln.getResource("relation") != null && soln.getResource("relation").getURI() != null) {
-				    relationStr = "";
-				}
-			    } catch (Exception e1) {
-				relationStr = "";
-			    }
-			    				    
 
 			    DataAcquisitionSchemaEvent obj = new DataAcquisitionSchemaEvent(
 					soln.getResource("uri").getURI(),
-					soln.getResource("hasEntity").getURI(),
-					hasRoleStr,
-					hasUnitStr,
-					inRelationToStr,
-					relationStr);
+					entityStr,
+					entityLabelStr);
 			    objects.add(obj);
 			}
 		  }  catch (Exception e) {

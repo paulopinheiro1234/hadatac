@@ -27,9 +27,11 @@ public class DataAcquisitionSchemaAttribute {
     	private String unit;
     	private String unitLabel;
         private String daso;
+        private String dase;
     	
     public DataAcquisitionSchemaAttribute(String uri, String localName, String position, String entity, String entityLabel, 
-                                          String attribute, String attributeLabel, String unit, String unitLabel, String daso) {
+                                          String attribute, String attributeLabel, String unit, String unitLabel, 
+                                          String daso, String dase) {
 	    this.uri = uri;
 	    this.localName = localName;
 	    this.position = position;
@@ -49,6 +51,7 @@ public class DataAcquisitionSchemaAttribute {
 	    this.unit = unit;
 	    this.unitLabel = unitLabel;
             this.daso = daso;
+            this.dase = dase;
 	}
     	
         public String getUri() {
@@ -95,40 +98,10 @@ public class DataAcquisitionSchemaAttribute {
 	    return daso;
 	}
         
-        private static String getFirstLabel (String uri) {
-     	     if (uri.startsWith("http")) {
-	        uri = "<" + uri + ">";
-	     }
-    	     String queryString = NameSpaces.getInstance().printSparqlNameSpaceList() + 
-    			"SELECT ?label WHERE { " + 
-		        "  " + uri + " rdfs:label ?label ." + 
-    			"}";
-    	     Query query = QueryFactory.create(queryString);
-	     QueryExecution qexec = QueryExecutionFactory.sparqlService(
-		    Collections.getCollectionsName(Collections.METADATA_SPARQL), query);
-    	     ResultSet results = qexec.execSelect();
-	     ResultSetRewindable resultsrw = ResultSetFactory.copyResults(results);
-	     qexec.close();
-
-	     String labelStr = "";
-	     QuerySolution soln;
-	     while (resultsrw.hasNext()) {
-		   soln = resultsrw.next();
-		   try {
-		      if (soln.getLiteral("label") != null && soln.getLiteral("label").getString() != null) {
-			    labelStr = soln.getLiteral("label").getString();
-		      }
-		   } catch (Exception e1) {
-		      labelStr = "";
-		   }
-		   if (!labelStr.equals("")) {
-		       break;
-		   }
-	     }
-	     return labelStr;
-	     
-        }
-
+    	public String getEventUri() {
+	    return dase;
+	}
+        
         public static List<DataAcquisitionSchemaAttribute> findBySchema (String schemaUri) {
 	     System.out.println("Looking for data acquisition schema attributes for " + schemaUri);
      	     if (schemaUri.startsWith("http")) {
@@ -136,7 +109,7 @@ public class DataAcquisitionSchemaAttribute {
 	     }
 	     List<DataAcquisitionSchemaAttribute> attributes = new ArrayList<DataAcquisitionSchemaAttribute>();
     	     String queryString = NameSpaces.getInstance().printSparqlNameSpaceList() + 
-    			"SELECT ?uri ?hasPosition ?hasEntity ?hasAttribute ?hasUnit ?hasDASO ?hasSource ?isPIConfirmed WHERE { " + 
+    			"SELECT ?uri ?hasPosition ?hasEntity ?hasAttribute ?hasUnit ?hasDASO ?hasDASE ?hasSource ?isPIConfirmed WHERE { " + 
     			"   ?uri a hasco:DASchemaAttribute . " + 
     			"   ?uri hasco:partOfSchema " + schemaUri + " .  " + 
     			"   ?uri hasco:hasPosition ?hasPosition .  " + 
@@ -144,6 +117,7 @@ public class DataAcquisitionSchemaAttribute {
     			"   OPTIONAL { ?uri hasco:hasAttribute ?hasAttribute } . " + 
     			"   OPTIONAL { ?uri hasco:hasUnit ?hasUnit } . " + 
     			"   OPTIONAL { ?uri hasco:isAttributeOf ?hasDASO } . " + 
+    			"   OPTIONAL { ?uri hasco:hasEvent ?hasDASE } . " + 
     			"   OPTIONAL { ?uri hasco:hasSource ?hasSource } . " + 
     			"   OPTIONAL { ?uri hasco:isPIConfirmed ?isPIConfirmed } . " + 
     			"}";
@@ -170,6 +144,7 @@ public class DataAcquisitionSchemaAttribute {
 	     String unitStr = "";
 	     String unitLabelStr = "";
 	     String dasoStr = "";
+	     String daseStr = "";
 		  
 	     while (resultsrw.hasNext()) {
 		      QuerySolution soln = resultsrw.next();
@@ -201,7 +176,7 @@ public class DataAcquisitionSchemaAttribute {
 			     entityStr = "";
 			 }
 
-			 entityLabelStr = DataAcquisitionSchemaAttribute.getFirstLabel(entityStr); 
+			 entityLabelStr = DataAcquisitionSchema.getFirstLabel(entityStr); 
 			 if (entityLabelStr.equals("")) {
 			     entityLabelStr = entityStr.substring(entityStr.indexOf("#") + 1);
 			 }
@@ -214,7 +189,7 @@ public class DataAcquisitionSchemaAttribute {
 			     attributeStr = "";
 			 }
 
-			 attributeLabelStr = DataAcquisitionSchemaAttribute.getFirstLabel(attributeStr); 
+			 attributeLabelStr = DataAcquisitionSchema.getFirstLabel(attributeStr); 
 			 if (attributeLabelStr.equals("")) {
 			     attributeLabelStr = attributeStr.substring(attributeStr.indexOf("#") + 1);
 			 }
@@ -227,7 +202,7 @@ public class DataAcquisitionSchemaAttribute {
 			     unitStr = "";
 			 }
 
-			 unitLabelStr = DataAcquisitionSchemaAttribute.getFirstLabel(unitStr); 
+			 unitLabelStr = DataAcquisitionSchema.getFirstLabel(unitStr); 
 			 if (unitLabelStr.equals("")) {
 			     unitLabelStr = unitStr.substring(unitStr.indexOf("#") + 1);
 			 }
@@ -238,6 +213,14 @@ public class DataAcquisitionSchemaAttribute {
 			     }
 			 } catch (Exception e1) {
 			     dasoStr = "";
+			 }
+
+			 try {
+			     if (soln.getResource("hasDASE") != null && soln.getResource("hasDASE").getURI() != null) {
+				 daseStr = soln.getResource("hasDASE").getURI();
+			     }
+			 } catch (Exception e1) {
+			     daseStr = "";
 			 }
 
 			 if (!uriStr.equals("") && !localNameStr.equals("")) {
@@ -251,7 +234,8 @@ public class DataAcquisitionSchemaAttribute {
 				attributeLabelStr,
 				unitStr,
 				unitLabelStr,
-				dasoStr
+				dasoStr,
+				daseStr
 			     );
 			     attributes.add(attr);
 			 } else {

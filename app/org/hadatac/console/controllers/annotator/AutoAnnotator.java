@@ -945,7 +945,7 @@ public class AutoAnnotator extends Controller {
     
     private static String createPreamble(CSVAnnotationHandler handler, 
     									 String schema_uri) throws Exception {
-	        System.out.println("CREATING PREAMBLE FOR " + schema_uri);
+	        //System.out.println("CREATING PREAMBLE FOR " + schema_uri);
 		String preamble = Downloads.FRAG_START_PREAMBLE;
 		preamble += NameSpaces.getInstance().printTurtleNameSpaceList();
 		preamble += "\n";
@@ -1034,7 +1034,7 @@ public class AutoAnnotator extends Controller {
 
 		preamble += Downloads.FRAG_END_PREAMBLE;
 		
-		System.out.println("PREAMBLE: " + preamble);
+		//System.out.println("PREAMBLE: " + preamble);
 
 		return preamble;
     }

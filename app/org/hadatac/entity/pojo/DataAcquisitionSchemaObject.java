@@ -40,6 +40,7 @@ public class DataAcquisitionSchemaObject {
 
     	public String getRole() {
 	    return role;
+
 	}
 
     	public String getInRelationTo() {
@@ -51,7 +52,7 @@ public class DataAcquisitionSchemaObject {
 	}
 
         public static List<DataAcquisitionSchemaObject> findBySchema (String schemaUri) {
-	    //System.out.println("Looking for data acuisition schema objectss for " + schemaUri);
+	    //System.out.println("Looking for data acquisition schema objectss for " + schemaUri);
 	     List<DataAcquisitionSchemaObject> objects = new ArrayList<DataAcquisitionSchemaObject>();
     	     String queryString = NameSpaces.getInstance().printSparqlNameSpaceList() + 
     			"SELECT ?uri ?hasEntity ?hasRole ?inRelationTo ?relation WHERE { " + 
@@ -109,7 +110,6 @@ public class DataAcquisitionSchemaObject {
 			    }
 			    				    
 
-			    System.out.println("daso role in dataacquisitionschema: " + hasRoleStr);
 			    DataAcquisitionSchemaObject obj = new DataAcquisitionSchemaObject(
 					soln.getResource("uri").getURI(),
 					soln.getResource("hasEntity").getURI(),

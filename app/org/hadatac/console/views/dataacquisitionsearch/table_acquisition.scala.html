@@ -34,7 +34,7 @@
 					document.getElementById('detail_instrument_model').innerHTML = json.documents[row]['instrumentModel'];
 					//document.getElementById('detail_instrument_uri').innerHTML = json.documents[row]['instrumentUri'];
 					document.getElementById('detail_platform_name').innerHTML = json.documents[row]['platformName'];
-                                        var oid = json.documents[row]['objectUri'];
+                                        <!-- var oid = json.documents[row]['objectUri']; -->
 					document.getElementById('detail_object').innerHTML = jsonDetails[oid];
 
 				}
@@ -101,8 +101,8 @@
                 <th>Value</th>
                 <th>PID</th>
                 <th>SID</th>       
-                <th>Timestamp</th>
-                <th>Object URI</th>     
+                <th>Time</th>
+                <!-- <th>Object URI</th> -->     
                 <th>Location</th>
               </tr>
             </thead>
@@ -116,7 +116,7 @@
                 	<td>@document.getObjectPID()</td>
                 	<td>@document.getObjectSID()</td>
                 	<td>@document.getTimestamp()</td>
-                	<td>@document.getObjectUri()</td>
+                	<!-- <td>@document.getObjectUri()</td> -->
                 	<td>@document.getLocation()</td>
                 </tr>
                 }

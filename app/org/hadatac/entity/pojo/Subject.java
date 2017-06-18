@@ -149,8 +149,8 @@ public class Subject {
         
         if (resultsrw.size() > 0) {
             QuerySolution soln = resultsrw.next();
-            if (null != soln.getResource("codeClass")) {
-            	try{
+            try{
+                 if (null != soln.getResource("codeClass")) {
 	            	String classUri = soln.getResource("codeClass").toString();
 	            	if(!classUri.equals("")){
 	            		return classUri.substring(classUri.lastIndexOf("#") + 1);
@@ -178,9 +178,9 @@ public class Subject {
 	//	            		}
 	//	            	}
 	            	}
-            	} catch (Exception e1) {
-            		return null;
-            	}
+		 }
+            } catch (Exception e1) {
+            	return null;
             }
         }
         
