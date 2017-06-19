@@ -96,9 +96,9 @@ public class ViewSubject extends Controller {
 					QuerySolution soln = resultsrwIndvInd.next();
 					if(Measurement.findForViews(findUser(), study_uri, ValueCellProcessing.convertToWholeURI(subject_uri), soln.get("uri").toString()).documents.size() > 0){
 						listIndicatorLabel.add(soln.get("label").toString());
-						System.out.println("HEREHERE" + Measurement.findForViews(findUser(), study_uri, ValueCellProcessing.convertToWholeURI(subject_uri), soln.get("uri").toString()).documents.get(0).getObjectUri().toString() 
-								+ Measurement.findForViews(findUser(), study_uri, ValueCellProcessing.convertToWholeURI(subject_uri), soln.get("uri").toString()).documents.get(0).getCharacteristic().toString()
-								+ Measurement.findForViews(findUser(), study_uri, ValueCellProcessing.convertToWholeURI(subject_uri), soln.get("uri").toString()).documents.get(0).getValue().toString());
+						//System.out.println("HEREHERE" + Measurement.findForViews(findUser(), study_uri, ValueCellProcessing.convertToWholeURI(subject_uri), soln.get("uri").toString()).documents.get(0).getObjectUri().toString() 
+						//+ Measurement.findForViews(findUser(), study_uri, ValueCellProcessing.convertToWholeURI(subject_uri), soln.get("uri").toString()).documents.get(0).getCharacteristic().toString()
+						//+ Measurement.findForViews(findUser(), study_uri, ValueCellProcessing.convertToWholeURI(subject_uri), soln.get("uri").toString()).documents.get(0).getValue().toString());
 					}
 //					listIndicatorLabel.add(soln.get("comment").toString());
 				}
@@ -133,7 +133,7 @@ public class ViewSubject extends Controller {
 		} */
 
 	public static String findBasicHTML(String subject_uri) {
-		System.out.println("findBasicHTML (subject_uri): '" + subject_uri + "'" );
+	        //System.out.println("findBasicHTML (subject_uri): '" + subject_uri + "'" );
 		if (subject_uri == null || subject_uri.equals("")) {
 			return null;
 		}
@@ -163,7 +163,7 @@ public class ViewSubject extends Controller {
 	}
 
 	public static ResultSetRewindable findSubjectBasic(String subject_uri) {
-                System.out.println("in findSubjectBasic (1): '" + subject_uri + "'");
+	        //System.out.println("in findSubjectBasic (1): '" + subject_uri + "'");
 		String subjectQueryString = "";
                 if (subject_uri == null || subject_uri.equals("")) {
 		    return null;
@@ -171,7 +171,7 @@ public class ViewSubject extends Controller {
 		if (subject_uri.indexOf("http") != -1) {
 		    subject_uri = "<" + subject_uri + ">";
 		}
-                System.out.println("in findSubjectBasic (2): '" + subject_uri + "'");
+                //System.out.println("in findSubjectBasic (2): '" + subject_uri + "'");
            	subjectQueryString += NameSpaces.getInstance().printSparqlNameSpaceList();
     	        subjectQueryString += "SELECT ?pid ?subjectTypeLabel ?subjectLabel ?cohortLabel ?studyUri ?studyLabel WHERE { "
     			+ subject_uri + " hasco:originalID ?pid . "
@@ -196,7 +196,7 @@ public class ViewSubject extends Controller {
 	}		
 
 	public static Map<String, List<String>> findBasic(String subject_uri) {
-        	System.out.println("in findBasic (subject_uri): '" + subject_uri + "'" );
+	        //System.out.println("in findBasic (subject_uri): '" + subject_uri + "'" );
                 if (subject_uri == null || subject_uri.equals("")) {
 		    return null;
 		}
@@ -282,7 +282,7 @@ public class ViewSubject extends Controller {
 				qexecIndvInd.close();
 				while (resultsrwIndvInd.hasNext()) {
 					QuerySolution soln = resultsrwIndvInd.next();
-					System.out.println("Solution: " + soln);
+					//System.out.println("Solution: " + soln);
 					indicatorUris.put(soln.get("label").toString(), soln.get("uri").toString());
 				}
 			} catch (QueryExceptionHTTP e) {
@@ -323,13 +323,13 @@ public class ViewSubject extends Controller {
 		
 		while (resultsrw.hasNext()) {
 			QuerySolution soln = resultsrw.next();
-			System.out.println("HERE IS THE RAW SOLN*********" + soln.toString());
+			//System.out.println("HERE IS THE RAW SOLN*********" + soln.toString());
 			values = new ArrayList<String>();
 			values.add("Label: " + soln.get("sampleLabel").toString());
 			values.add("Type: " + ValueCellProcessing.replaceNameSpaceEx(soln.get("sampleType").toString()));
 			values.add("Sample Of: " + ValueCellProcessing.replaceNameSpaceEx(soln.get("subjectLabel").toString()));
 			sampleResult.put(ValueCellProcessing.replaceNameSpaceEx(soln.get("sampleUri").toString()), values);
-			System.out.println("THIS IS SUBROW*********" + sampleResult);	
+			//System.out.println("THIS IS SUBROW*********" + sampleResult);	
 		}
 
 		return sampleResult;
@@ -354,9 +354,9 @@ public class ViewSubject extends Controller {
 		
 		while (resultsrw.hasNext()) {
 			QuerySolution soln = resultsrw.next();
-			System.out.println("HERE IS THE SAMPLES*********" + soln.toString());
+			//System.out.println("HERE IS THE SAMPLES*********" + soln.toString());
 			sampleResult.add(soln.get("s").toString());
-			System.out.println("THIS IS SUBROW*********" + sampleResult);
+			//System.out.println("THIS IS SUBROW*********" + sampleResult);
 		}
 		return sampleResult;
 	}
@@ -370,7 +370,7 @@ public class ViewSubject extends Controller {
 	    else{
 	    	results = UserManagement.getUriByEmail(user.getEmail());
 	    }
-	    System.out.println("This is the current user's uri:" + results);
+	    //System.out.println("This is the current user's uri:" + results);
 	    
 	    return results;
 	}

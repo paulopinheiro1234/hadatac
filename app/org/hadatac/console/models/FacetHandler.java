@@ -40,7 +40,6 @@ public class FacetHandler {
 
 	public FacetHandler() {
 	       
-
 	       //System.out.println("########### FACET HANDLER CONSTRUCTOR CALLED"); 
 	       facetsAll = new HashMap<String, Object>();
 
@@ -53,7 +52,7 @@ public class FacetHandler {
 	       facetsAll.put("facetsEC", facetsEC);
 	       facetsAll.put("facetsS", facetsS);
 	       facetsAll.put("facetsU", facetsU);
-	       facetsAll.put("facetsT", facetsU);
+	       facetsAll.put("facetsT", facetsT);
 	       facetsAll.put("facetsPI", facetsPI);
 	}
 	
@@ -241,7 +240,7 @@ public class FacetHandler {
 	        if (str == null || str.equals("")) {
 		   return;
 	        }
-		System.out.println("str = [" + str + "]");			    
+		//System.out.println("str = [" + str + "]");			    
 	        // EC list
 	        str = str.substring(str.indexOf('['));
 		String ECList = str.substring(1,str.indexOf(']'));

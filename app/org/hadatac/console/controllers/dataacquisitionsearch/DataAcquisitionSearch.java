@@ -90,12 +90,12 @@ public class DataAcquisitionSearch extends Controller {
     	final SysUser user = AuthApplication.getLocalUser(session());
     	if(null == user){
     	    ownerUri = "Public";
-          	System.out.println("User URI: NULL");
+	        //System.out.println("User URI: NULL");
     		results = Measurement.find(ownerUri, page, rows, handler);
     	}
     	else{
     		ownerUri = UserManagement.getUriByEmail(user.getEmail());
-          	System.out.println("User URI: " + ownerUri);
+          	//System.out.println("User URI: " + ownerUri);
     		if(null == ownerUri){
     			ownerUri = "Public";
     		}

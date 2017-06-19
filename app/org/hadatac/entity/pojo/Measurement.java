@@ -489,7 +489,7 @@ public class Measurement {
 			QueryResponse queryResponse = solr.query(query, SolrRequest.METHOD.POST);
 			solr.close();
 			SolrDocumentList results = queryResponse.getResults();
-			System.out.println("SolrDocumentList: " + results.size());
+			//System.out.println("SolrDocumentList: " + results.size());
 			Iterator<SolrDocument> m = results.iterator();
 			while (m.hasNext()) {
 				result.documents.add(convertFromSolr(m.next()));
@@ -519,10 +519,10 @@ public class Measurement {
 
 		int docSize = 0;
 		SolrQuery query = new SolrQuery();
-		System.out.println("q: " + q);
+		//System.out.println("q: " + q);
 		query.setQuery(q);
 		query.setStart((page - 1) * qtd + 1);
-		System.out.println("Starting at: " + ((page - 1) * qtd + 1) + "    page: " + page + "     qtd: " + qtd);
+		//System.out.println("Starting at: " + ((page - 1) * qtd + 1) + "    page: " + page + "     qtd: " + qtd);
 		query.setRows(qtd);
 		query.setFacet(true);
 		query.setFacetLimit(-1);
@@ -538,7 +538,7 @@ public class Measurement {
 			QueryResponse queryResponse = solr.query(query, SolrRequest.METHOD.POST);
 			solr.close();
 			SolrDocumentList results = queryResponse.getResults();
-			System.out.println("SolrDocumentList: " + results.size());
+			//System.out.println("SolrDocumentList: " + results.size());
 			Iterator<SolrDocument> m = results.iterator();
 			while (m.hasNext()) {
 				result.documents.add(convertFromSolr(m.next()));
