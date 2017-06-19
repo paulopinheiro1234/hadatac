@@ -51,16 +51,16 @@
 			cur_page = total_page;
 		}
 		function nextPage(){
-			window.location.href = "@org.hadatac.console.controllers.dataacquisitionsearch.routes.DataAcquisitionSearch.index(page + 1, rows, facets)";
+			window.location.href = "@org.hadatac.console.controllers.dataacquisitionsearch.routes.DataAcquisitionSearch.indexData(page + 1, rows, facets)";
 		}
 		function prevPage(){
-			window.location.href = "@org.hadatac.console.controllers.dataacquisitionsearch.routes.DataAcquisitionSearch.index(page - 1, rows, facets)";
+			window.location.href = "@org.hadatac.console.controllers.dataacquisitionsearch.routes.DataAcquisitionSearch.indexData(page - 1, rows, facets)";
 		}
 		function firstPage(){
-			window.location.href = "@org.hadatac.console.controllers.dataacquisitionsearch.routes.DataAcquisitionSearch.index(1, rows, facets)";
+			window.location.href = "@org.hadatac.console.controllers.dataacquisitionsearch.routes.DataAcquisitionSearch.indexData(1, rows, facets)";
 		}
 		function lastPage(){
-			window.location.href = "@org.hadatac.console.controllers.dataacquisitionsearch.routes.DataAcquisitionSearch.index(Math.ceil(resultsSize/15).intValue() + 1, rows, facets)";
+			window.location.href = "@org.hadatac.console.controllers.dataacquisitionsearch.routes.DataAcquisitionSearch.indexData(Math.ceil(resultsSize/15).intValue() + 1, rows, facets)";
 		}
 		function updatePage(){
 			if(cur_page == 1){
