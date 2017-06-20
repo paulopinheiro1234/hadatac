@@ -30,7 +30,7 @@
 			        <button type="button" class="btn btn-primary" onClick="search();">Search</button>
 			        <button type="button" class="btn btn-primary" onClick="clearSearch();">Clear Search</button>
 				<button type="button" class="btn btn-primary" data-toggle="modal" data-target="#myModal">Download</button>
-                                <a href="@org.hadatac.console.controllers.dataacquisitionsearch.routes.DataAcquisitionSearch.indexData()" id="data" class="btn btn-primary" role="button">Show Data</a>
+                                <a href="@org.hadatac.console.controllers.dataacquisitionsearch.routes.DataAcquisitionSearch.indexData(page, rows , facets)" id="data" class="btn btn-primary" role="button">Show Data</a>
 
 				<div id="download_url" style="visibility: hidden ;">@org.hadatac.console.http.routes.SolrSearchProxy.getDataAcquisitionDownload()</div>
 				
