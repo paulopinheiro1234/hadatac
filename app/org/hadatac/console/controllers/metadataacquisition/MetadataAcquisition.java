@@ -104,7 +104,8 @@ public class MetadataAcquisition extends Controller {
                 + " ?event hasco:hasEntity ?eventEn . "
                 + " ?eventEn rdfs:label ?eventLabel } . "
                 + " OPTIONAL { ?schemaAttribute hasco:hasEntity ?entity . "
-                + " ?entity rdfs:label ?entityLabel } . "
+                + " ?entity rdfs:label ?entityLabel . "
+				+ "		FILTER(lang(?entityLabel) != 'en') } . " 
 				+ " OPTIONAL{ ?studyUri rdfs:label ?studyLabel } . "
 				+ " OPTIONAL{ ?studyUri hasco:hasProject ?proj } . "
 				+ " OPTIONAL{ ?studyUri skos:definition ?studyTitle } . "
@@ -162,16 +163,31 @@ public class MetadataAcquisition extends Controller {
 						replace(",", "").replace(" ", "") + "_m";
 				String value = "";
 				if ((soln.contains("roleLabel"))&&(soln.contains("eventLabel"))&&(soln.contains("entityLabel"))){
+					if(soln.get("entityLabel").toString().toLowerCase().equals("human")||soln.get("entityLabel").toString().toLowerCase().equals("sample")){
+						value = soln.get("roleLabel").toString() + "'s " + soln.get("attributeLabel").toString() + " at " + soln.get("eventLabel").toString();
+					}
+					else{
 					value = soln.get("roleLabel").toString() + "'s " + soln.get("entityLabel").toString() + " " + soln.get("attributeLabel").toString() + " at " + soln.get("eventLabel").toString();
+					}
 				}
 				else if ((soln.contains("roleLabel"))&&(soln.contains("eventLabel"))){
 					value = soln.get("roleLabel").toString() + "'s " + soln.get("attributeLabel").toString() + " at " + soln.get("eventLabel").toString();
 				} 
 				else if ((soln.contains("roleLabel"))&&(soln.contains("entityLabel"))){
-					value = soln.get("roleLabel").toString() + "'s " + soln.get("entityLabel").toString() + " " + soln.get("attributeLabel").toString();
+					if(soln.get("entityLabel").toString().toLowerCase().equals("human")||soln.get("entityLabel").toString().toLowerCase().equals("sample")){
+						value = soln.get("roleLabel").toString() + "'s " + soln.get("attributeLabel").toString();
+					}
+					else {
+						value = soln.get("roleLabel").toString() + "'s " + soln.get("entityLabel").toString() + " " + soln.get("attributeLabel").toString();
+					}
 				} 
 				else if ((soln.contains("entityLabel"))&&(soln.contains("eventLabel"))){
-					value = soln.get("entityLabel").toString() + " " + soln.get("attributeLabel").toString() + " at " + soln.get("eventLabel").toString();
+					if(soln.get("entityLabel").toString().toLowerCase().equals("human")||soln.get("entityLabel").toString().toLowerCase().equals("sample")){
+						value = soln.get("attributeLabel").toString() + " at " + soln.get("eventLabel").toString();
+					}
+					else {
+						value = soln.get("entityLabel").toString() + " " + soln.get("attributeLabel").toString() + " at " + soln.get("eventLabel").toString();
+					}
 				} 
 				else if (soln.contains("roleLabel")){
 					value = soln.get("roleLabel").toString() + "'s " + soln.get("attributeLabel").toString();
@@ -180,11 +196,18 @@ public class MetadataAcquisition extends Controller {
 					value = soln.get("attributeLabel").toString() + " at " + soln.get("eventLabel").toString();
 				} 
 				else if (soln.contains("entityLabel")){
-					value = soln.get("entityLabel").toString() + " " + soln.get("attributeLabel").toString();
+					if(soln.get("entityLabel").toString().toLowerCase().equals("human")||soln.get("entityLabel").toString().toLowerCase().equals("sample")){
+						soln.get("attributeLabel").toString();
+					}
+					else {
+						value = soln.get("entityLabel").toString() + " " + soln.get("attributeLabel").toString();
+					}
 				} 
 				else {
 					value = soln.get("attributeLabel").toString();
 				}
+				// Remove duplicate consecutive words
+				value = value.replaceAll("(?i)\\b([a-z]+)\\b(?:\\s+\\1\\b)+", "$1");
 				ArrayList<String> arrValues = null;
 				if (!studyInfo.containsKey(key)) {
 					arrValues = new ArrayList<String>();
