@@ -685,18 +685,27 @@ public class AutoAnnotator extends Controller {
     		DateFormat isoFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
         	String startTime = isoFormat.format(new Date());
         	
-        	DeploymentGenerator deploymentGenerator = new DeploymentGenerator(file, startTime);
-        	bSuccess = commitRows(deploymentGenerator.createRows(), deploymentGenerator.toString(), file.getName(), 
-        			"Deployment", true);
-        	
-        	DataAcquisitionGenerator daGenerator = new DataAcquisitionGenerator(file, startTime);
-        	bSuccess = commitRows(daGenerator.createRows(), daGenerator.toString(), file.getName(), 
+        	try{
+        		DeploymentGenerator deploymentGenerator = new DeploymentGenerator(file, startTime);
+            	bSuccess = commitRows(deploymentGenerator.createRows(), deploymentGenerator.toString(), file.getName(), 
+            			"Deployment", true);
+        	} catch (Exception e){
+        		System.out.println("Error in annotateDataAcquisitionFile: Deployment Generator");
+        		AnnotationLog.printException(e, file.getName());
+        	}
+        	try{
+        		DataAcquisitionGenerator daGenerator = new DataAcquisitionGenerator(file, startTime);
+        		bSuccess = commitRows(daGenerator.createRows(), daGenerator.toString(), file.getName(), 
         			"DataAcquisition", true);
+        	} catch (Exception e){
+        		System.out.println("Error in annotateDataAcquisitionFile: Data Acquisition Generator");
+        		AnnotationLog.printException(e, file.getName());
+        	}
     	} catch (Exception e) {
+    		System.out.println("Error in annotateDataAcquisitionFile");
     		AnnotationLog.printException(e, file.getName());
     		return false;
 		}
-
 		return bSuccess;
 	}
 	
@@ -704,26 +713,30 @@ public class AutoAnnotator extends Controller {
 		
     	boolean bSuccess = true;
     	try{
-	        BufferedReader bufRdr;
-	        bufRdr = new BufferedReader(new FileReader(file));
-	        String line = null;
-	        HashMap<String, String> hm = new HashMap<String, String>();
-	        while((line = bufRdr.readLine()) != null) {
-	        	hm.put(line.split(",")[0], line.split(",")[1]);
-	        }
-	        study_id = hm.get("Study_ID");
-	        URL url = new URL(hm.get("Data_Dictionary"));
-	        //System.out.println(url.toString());
-	        File dd = new File(file.getName());
-	        //System.out.println(dd.getAbsoluteFile());
-	        FileUtils.copyURLToFile(url, dd); 
-	        
-	        URL url2 = new URL(hm.get("Code_Mappings"));
-	        //System.out.println(url2.toString());
-	        File cm = new File(file.getName().replace(".csv", "")+"-code-mappings.csv");
-	        System.out.println(cm.getAbsoluteFile());
-	        FileUtils.copyURLToFile(url2, cm);
-	        
+        	HashMap<String, String> hm = new HashMap<String, String>();
+    		try {
+    			BufferedReader bufRdr;
+	        	bufRdr = new BufferedReader(new FileReader(file));
+	        	String line = null;
+	        	while((line = bufRdr.readLine()) != null) {
+	        		hm.put(line.split(",")[0], line.split(",")[1]);
+	        	}
+		        bufRdr.close();
+    		} catch (Exception e) {
+    			System.out.println("Error annotateDataAcquisitionSchemaFile: Unable to Read File");
+    		}
+        	study_id = hm.get("Study_ID");
+        	URL url = new URL(hm.get("Data_Dictionary"));
+        	//System.out.println(url.toString());
+        	File dd = new File(file.getName());
+        	//System.out.println(dd.getAbsoluteFile());
+        	FileUtils.copyURLToFile(url, dd); 
+        
+        	URL url2 = new URL(hm.get("Code_Mappings"));
+        	//System.out.println(url2.toString());
+        	File cm = new File(file.getName().replace(".csv", "")+"-code-mappings.csv");
+        	System.out.println(cm.getAbsoluteFile());
+        	FileUtils.copyURLToFile(url2, cm);
 	        try{
 	        	URL url3 = new URL(hm.get("Codebook"));
 		        //System.out.println(url3.toString());
@@ -732,7 +745,7 @@ public class AutoAnnotator extends Controller {
 		        FileUtils.copyURLToFile(url3, cb);
 		        BufferedReader bufRdr3 = new BufferedReader(new FileReader(cb));
 		        String line3 =  null;
-
+		        System.out.println("Read Codebook");
 		        while((line3 = bufRdr3.readLine()) != null){
 		            String[] codes = line3.split(",");
 		            List<String> codesl = Arrays.asList(codes); 
@@ -746,7 +759,7 @@ public class AutoAnnotator extends Controller {
 	    				file.getName(), "PossibleValue", true);
 		        
 	        } catch (Exception e) {
-	        	
+	        	System.out.println("Error annotateDataAcquisitionSchemaFile: Unable to read codebook");
 	        	File cb = new File(file.getName().replace(".csv", "")+"-codebook.csv");
 		        System.out.println(cb.getAbsoluteFile());
 		        System.out.println(cb.length());
@@ -761,57 +774,74 @@ public class AutoAnnotator extends Controller {
 	            String str[] = line2.split(",");
 	            codeMappings.put(str[0], str[1]);
 	        	}
-	     
-
-	        
-	        bufRdr.close();
 	        bufRdr2.close();
 	        
 	//        System.out.println(hm.keySet());
-	    	
-		    	try {
-		    		
-		    		study_id = hm.get("Study_ID");
-		    		
-		    		DASchemaObjectGenerator dasoGenerator = new DASchemaObjectGenerator(dd);
-		    		System.out.println("Calling DASchemaObjectGenerator");
-		    		bSuccess = commitRows(dasoGenerator.createRows(), dasoGenerator.toString(), 
-		    				file.getName(), "DASchemaObject", true);
-		    		
-		    		DASchemaEventGenerator daseGenerator = new DASchemaEventGenerator(dd);
-		    		System.out.println("Calling DASchemaEventGenerator");
-		    		bSuccess = commitRows(daseGenerator.createRows(), daseGenerator.toString(), 
-		    				file.getName(), "DASchemaEvent", true);
-		    		 		
-		    		DASchemaAttrGenerator dasaGenerator = new DASchemaAttrGenerator(dd);
-		    		System.out.println("Calling DASchemaAttrGenerator");
-		    		bSuccess = commitRows(dasaGenerator.createRows(), dasaGenerator.toString(), 
-		    				file.getName(), "DASchemaAttribute", true);
-		        	
-		        	GeneralGenerator generalGenerator = new GeneralGenerator();
-		        	System.out.println("Calling DASchemaGenerator");
-		        	Map<String, Object> row = new HashMap<String, Object>();
-		        	row.put("hasURI", "chear-kb:DAS-" + file.getName().replace(".csv",""));
-		        	row.put("a", "hasco:DASchema");
-		        	row.put("rdfs:label", "Schema for Study " + study_id + " EPI Data Acquisitions");
-		        	row.put("rdfs:comment", "");
-		        	row.put("hasco:isSchemaOf", "chear-kb:STD-" + study_id);
-		        	generalGenerator.addRow(row);
-		    		
-		        	bSuccess = commitRows(generalGenerator.getRows(), generalGenerator.toString(), file.getName(), 
-		        			"DASchema", true);	        	
-		        	
-		        	
-		    	} catch (Exception e) {
-		    		AnnotationLog.printException(e, file.getName());
-		    		return false;
-				}
-	    	} catch (Exception e) {
-	    		AnnotationLog.printException(e, file.getName());
-	    		return false;
-	    	}
-    	
-		return bSuccess;
+	        try {
+
+	        	study_id = hm.get("Study_ID");
+	        	try {
+	        		DASchemaObjectGenerator dasoGenerator = new DASchemaObjectGenerator(dd);
+	        		System.out.println("Calling DASchemaObjectGenerator");
+	        		bSuccess = commitRows(dasoGenerator.createRows(), dasoGenerator.toString(), 
+	        				file.getName(), "DASchemaObject", true);
+	        	} catch (Exception e) {
+	        		System.out.println("Error annotateDataAcquisitionSchemaFile: Unable to generate DASO.");
+	        		AnnotationLog.printException(e, file.getName());
+	        		//return false;
+	        	}
+	        	try {
+	        		DASchemaEventGenerator daseGenerator = new DASchemaEventGenerator(dd);
+	        		System.out.println("Calling DASchemaEventGenerator");
+	        		bSuccess = commitRows(daseGenerator.createRows(), daseGenerator.toString(), 
+	        				file.getName(), "DASchemaEvent", true);
+	        	} catch (Exception e) {
+	        		System.out.println("Error annotateDataAcquisitionSchemaFile: Unable to generate DASE.");
+	        		AnnotationLog.printException(e, file.getName());
+	        		//return false;
+	        	}
+	        	try {
+	        		DASchemaAttrGenerator dasaGenerator = new DASchemaAttrGenerator(dd);
+	        		System.out.println("Calling DASchemaAttrGenerator");
+	        		bSuccess = commitRows(dasaGenerator.createRows(), dasaGenerator.toString(), 
+	        				file.getName(), "DASchemaAttribute", true);
+	        	} catch (Exception e) {
+	        		System.out.println("Error annotateDataAcquisitionSchemaFile: Unable to generate DASA.");
+	        		AnnotationLog.printException(e, file.getName());
+	        		return false;
+	        	}
+	        	try {
+	        		GeneralGenerator generalGenerator = new GeneralGenerator();
+	        		System.out.println("Calling DASchemaGenerator");
+	        		Map<String, Object> row = new HashMap<String, Object>();
+	        		row.put("hasURI", "chear-kb:DAS-" + file.getName().replace(".csv",""));
+	        		row.put("a", "hasco:DASchema");
+	        		row.put("rdfs:label", "Schema for Study " + study_id + " EPI Data Acquisitions");
+	        		row.put("rdfs:comment", "");
+	        		row.put("hasco:isSchemaOf", "chear-kb:STD-" + study_id);
+	        		generalGenerator.addRow(row);
+
+	        		bSuccess = commitRows(generalGenerator.getRows(), generalGenerator.toString(), file.getName(), 
+	        				"DASchema", true);	        	
+	        	} catch (Exception e) {
+	        		System.out.println("Error annotateDataAcquisitionSchemaFile: GeneralGenerator failed.");
+	        		AnnotationLog.printException(e, file.getName());
+	        		return false;
+	        	}
+
+
+	        } catch (Exception e) {
+	        	System.out.println("Error annotateDataAcquisitionSchemaFile: Unable to complete generation.");
+	        	AnnotationLog.printException(e, file.getName());
+	        	return false;
+	        }
+    	} catch (Exception e) {
+    		System.out.println("Error annotateDataAcquisitionSchemaFile: Annotation failed.");
+    		AnnotationLog.printException(e, file.getName());
+    		return false;
+    	}
+
+    	return bSuccess;
 	}
 	
 	private static String getProperDataAcquisitionUri(String fileName) {

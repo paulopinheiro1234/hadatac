@@ -42,7 +42,7 @@ public class DASchemaAttrGenerator extends BasicGenerator {
 	        }
 			br.close();
 		} catch (Exception e) {
-			
+			System.out.println("Error Reading File");			
 		}
 	}
 //Column	Attribute	attributeOf	Unit	Time	Entity	Role	Relation	inRelationTo	wasDerivedFrom	wasGeneratedBy	hasPosition	

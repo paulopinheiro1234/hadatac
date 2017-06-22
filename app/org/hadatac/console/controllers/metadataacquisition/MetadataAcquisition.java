@@ -54,8 +54,8 @@ public class MetadataAcquisition extends Controller {
 				+ " SELECT DISTINCT ?indicatorLabel WHERE { "
 				+ " ?subTypeUri rdfs:subClassOf* hasco:Study . "
 				+ " ?studyUri a ?subTypeUri . "
-//				+ " ?schemaUri hasco:isSchemaOf ?studyUri . "
-				+ " ?schemaUri a hasco:DASchema . "
+				+ " ?schemaUri hasco:isSchemaOf ?studyUri . "
+//				+ " ?schemaUri a hasco:DASchema . "
 				+ " ?schemaAttribute hasco:partOfSchema ?schemaUri . "
 				+ " ?schemaAttribute hasco:hasAttribute|hasco:hasEntity ?attribute . "
 //				+ " ?indicator rdfs:subClassOf hasco:StudyIndicator . "
@@ -84,12 +84,12 @@ public class MetadataAcquisition extends Controller {
 	public static boolean updateStudy() {
 		String strQuery = NameSpaces.getInstance().printSparqlNameSpaceList() 
 				+ " SELECT DISTINCT ?studyUri ?studyLabel ?proj ?studyTitle ?studyComment "
-				+ " ?indicatorLabel ?attributeLabel ?roleLabel ?eventLabel ?agentName ?institutionName WHERE { "
+				+ " ?indicatorLabel ?attributeLabel ?roleLabel ?eventLabel ?entityLabel ?agentName ?institutionName WHERE { "
 				+ " ?studyUri a ?subUri . "
 				+ " ?subUri rdfs:subClassOf* hasco:Study . "
 				+ " OPTIONAL{ ?schemaAttribute hasco:partOfSchema ?schemaUri . "
-				//+ " ?schemaUri hasco:isSchemaOf ?studyUri . "
-				+ " ?schemaUri a hasco:DASchema . "
+				+ " ?schemaUri hasco:isSchemaOf ?studyUri . "
+				//+ " ?schemaUri a hasco:DASchema . "
 				+ " ?schemaAttribute hasco:hasAttribute|hasco:hasEntity ?attribute . "
 				//+ " ?indicator rdfs:subClassOf hasco:StudyIndicator . "
 				+ " {  { ?indicator rdfs:subClassOf hasco:StudyIndicator } UNION { ?indicator rdfs:subClassOf hasco:SampleIndicator } } . "
@@ -99,10 +99,12 @@ public class MetadataAcquisition extends Controller {
 				+ "		FILTER(lang(?attributeLabel) != 'en') } . " 
 				+ " OPTIONAL { ?schemaAttribute hasco:isAttributeOf ?object . "
                 + " ?object hasco:hasRole ?role . "
-                + " ?role rdfs:label ?roleLabel } . "
+                + " ?role rdfs:label ?roleLabel . } . "
                 + " OPTIONAL { ?schemaAttribute hasco:hasEvent ?event . "
                 + " ?event hasco:hasEntity ?eventEn . "
                 + " ?eventEn rdfs:label ?eventLabel } . "
+                + " OPTIONAL { ?schemaAttribute hasco:hasEntity ?entity . "
+                + " ?entity rdfs:label ?entityLabel } . "
 				+ " OPTIONAL{ ?studyUri rdfs:label ?studyLabel } . "
 				+ " OPTIONAL{ ?studyUri hasco:hasProject ?proj } . "
 				+ " OPTIONAL{ ?studyUri skos:definition ?studyTitle } . "
@@ -159,15 +161,28 @@ public class MetadataAcquisition extends Controller {
 				String key = soln.get("indicatorLabel").toString().
 						replace(",", "").replace(" ", "") + "_m";
 				String value = "";
-				if ((soln.contains("roleLabel"))&&(soln.contains("eventLabel"))){
+				if ((soln.contains("roleLabel"))&&(soln.contains("eventLabel"))&&(soln.contains("entityLabel"))){
+					value = soln.get("roleLabel").toString() + "'s " + soln.get("entityLabel").toString() + " " + soln.get("attributeLabel").toString() + " at " + soln.get("eventLabel").toString();
+				}
+				else if ((soln.contains("roleLabel"))&&(soln.contains("eventLabel"))){
 					value = soln.get("roleLabel").toString() + "'s " + soln.get("attributeLabel").toString() + " at " + soln.get("eventLabel").toString();
+				} 
+				else if ((soln.contains("roleLabel"))&&(soln.contains("entityLabel"))){
+					value = soln.get("roleLabel").toString() + "'s " + soln.get("entityLabel").toString() + " " + soln.get("attributeLabel").toString();
+				} 
+				else if ((soln.contains("entityLabel"))&&(soln.contains("eventLabel"))){
+					value = soln.get("entityLabel").toString() + " " + soln.get("attributeLabel").toString() + " at " + soln.get("eventLabel").toString();
 				} 
 				else if (soln.contains("roleLabel")){
 					value = soln.get("roleLabel").toString() + "'s " + soln.get("attributeLabel").toString();
 				} 
 				else if (soln.contains("eventLabel")){
 					value = soln.get("attributeLabel").toString() + " at " + soln.get("eventLabel").toString();
-				} else {
+				} 
+				else if (soln.contains("entityLabel")){
+					value = soln.get("entityLabel").toString() + " " + soln.get("attributeLabel").toString();
+				} 
+				else {
 					value = soln.get("attributeLabel").toString();
 				}
 				ArrayList<String> arrValues = null;
