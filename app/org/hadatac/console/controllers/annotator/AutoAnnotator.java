@@ -728,19 +728,19 @@ public class AutoAnnotator extends Controller {
         	study_id = hm.get("Study_ID");
         	URL url = new URL(hm.get("Data_Dictionary"));
         	//System.out.println(url.toString());
-        	File dd = new File(file.getName());
+        	File dd = new File("sddtmp/" + file.getName());
         	//System.out.println(dd.getAbsoluteFile());
         	FileUtils.copyURLToFile(url, dd); 
         
         	URL url2 = new URL(hm.get("Code_Mappings"));
         	//System.out.println(url2.toString());
-        	File cm = new File(file.getName().replace(".csv", "")+"-code-mappings.csv");
+        	File cm = new File("sddtmp/" + file.getName().replace(".csv", "")+"-code-mappings.csv");
         	System.out.println(cm.getAbsoluteFile());
         	FileUtils.copyURLToFile(url2, cm);
 	        try{
 	        	URL url3 = new URL(hm.get("Codebook"));
 		        //System.out.println(url3.toString());
-	        	File cb = new File(file.getName().replace(".csv", "")+"-codebook.csv");
+	        	File cb = new File("sddtmp/" + file.getName().replace(".csv", "")+"-codebook.csv");
 		        System.out.println(cb.getAbsoluteFile());
 		        FileUtils.copyURLToFile(url3, cb);
 		        BufferedReader bufRdr3 = new BufferedReader(new FileReader(cb));
@@ -757,12 +757,14 @@ public class AutoAnnotator extends Controller {
 	    		System.out.println("Calling PVGenerator");
 	    		bSuccess = commitRows(pvGenerator.createRows(), pvGenerator.toString(), 
 	    				file.getName(), "PossibleValue", true);
+	    		cb.delete();
 		        
 	        } catch (Exception e) {
 	        	System.out.println("Error annotateDataAcquisitionSchemaFile: Unable to read codebook");
 	        	File cb = new File(file.getName().replace(".csv", "")+"-codebook.csv");
 		        System.out.println(cb.getAbsoluteFile());
 		        System.out.println(cb.length());
+		        cb.delete();
 			}
 	        
 	        BufferedReader bufRdr2 = new BufferedReader(new FileReader(cm));
@@ -810,6 +812,8 @@ public class AutoAnnotator extends Controller {
 	        		AnnotationLog.printException(e, file.getName());
 	        		return false;
 	        	}
+	        	dd.delete();
+	        	cm.delete();
 	        	try {
 	        		GeneralGenerator generalGenerator = new GeneralGenerator();
 	        		System.out.println("Calling DASchemaGenerator");
@@ -833,6 +837,8 @@ public class AutoAnnotator extends Controller {
 	        } catch (Exception e) {
 	        	System.out.println("Error annotateDataAcquisitionSchemaFile: Unable to complete generation.");
 	        	AnnotationLog.printException(e, file.getName());
+	        	dd.delete();
+	        	cm.delete();
 	        	return false;
 	        }
     	} catch (Exception e) {
