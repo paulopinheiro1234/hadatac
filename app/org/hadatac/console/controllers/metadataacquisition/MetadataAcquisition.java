@@ -219,7 +219,7 @@ public class MetadataAcquisition extends Controller {
 					arrValues = (ArrayList<String>)studyInfo.get(key);
 				}
 				
-				if (!arrValues.contains(value)) {
+				if ((!arrValues.contains(value))&&(value!="")) {
 					boolean dupl=false;
 					for(String val : arrValues){
 						if(val.toLowerCase().equals(value.toLowerCase())){
