@@ -84,8 +84,9 @@ public class MetadataAcquisition extends Controller {
     
 	public static boolean updateStudy() {
 		String strQuery = NameSpaces.getInstance().printSparqlNameSpaceList() 
-				+ " SELECT DISTINCT ?studyUri ?studyLabel ?proj ?studyTitle ?studyComment "
-				+ " ?indicatorLabel ?attributeLabel ?roleLabel ?eventLabel ?entityLabel ?agentName ?institutionName WHERE { "
+				+ " SELECT DISTINCT ?studyUri ?studyLabel ?proj ?studyTitle ?studyComment"
+				+ " ?indicatorLabel ?attributeLabel ?roleLabel ?eventLabel ?entityLabel" 
+				+ " ?agentName ?institutionName ?relationLabel ?relationToLabel WHERE { "
 				+ " ?studyUri a ?subUri . "
 				+ " ?subUri rdfs:subClassOf* hasco:Study . "
 				+ " OPTIONAL{ ?schemaAttribute hasco:partOfSchema ?schemaUri . "
@@ -101,7 +102,13 @@ public class MetadataAcquisition extends Controller {
 				+ "		FILTER(lang(?attributeLabel) != 'en') } . " 
 				+ " OPTIONAL { ?schemaAttribute hasco:isAttributeOf ?object . "
                 + " ?object hasco:hasRole ?role . "
-                + " ?role rdfs:label ?roleLabel . } . "
+                + " ?role rdfs:label ?roleLabel } . "
+                + " OPTIONAL { ?schemaAttribute hasco:isAttributeOf ?object . "
+                + " ?object sio:inRelationTo ?relationTo . "
+                + " ?object sio:Relation ?relation . "
+                + " ?relation rdfs:label ?relationLabel . "
+                + " ?relationTo hasco:hasRole ?relationToRole . "
+                + " ?relationToRole rdfs:label ?relationToLabel} . "
                 + " OPTIONAL { ?schemaAttribute hasco:hasEvent ?event . "
                 + " ?event hasco:hasEntity ?eventEn . "
                 + " ?eventEn rdfs:label ?eventLabel } . "
@@ -163,8 +170,27 @@ public class MetadataAcquisition extends Controller {
 			if (soln.contains("indicatorLabel")) {
 				String key = soln.get("indicatorLabel").toString().
 						replace(",", "").replace(" ", "") + "_m";
-				String value = "";
-				if ((soln.contains("roleLabel"))&&(soln.contains("eventLabel"))&&(soln.contains("entityLabel"))){
+				String value = soln.get("attributeLabel").toString();
+				String temp = "";
+				if (soln.contains("roleLabel")) {
+					temp = soln.get("roleLabel").toString() + "'s " + value;
+					value = temp.toString();
+				}
+				if (soln.contains("eventLabel")){
+					temp = value + " at " + soln.get("eventLabel").toString();
+					value = temp.toString();
+				}
+				if (soln.contains("entityLabel")){
+					if(!soln.get("entityLabel").toString().toLowerCase().equals("human")&&!soln.get("entityLabel").toString().toLowerCase().equals("sample")){
+						temp = soln.get("entityLabel").toString() + " " + value;
+						value = temp.toString();
+					}
+				}
+				if (soln.contains("relationToLabel")){
+					temp = soln.get("relationToLabel") + "'s " + value;
+					value = temp.toString();
+				}
+/*				if ((soln.contains("roleLabel"))&&(soln.contains("eventLabel"))&&(soln.contains("entityLabel"))){
 					if(soln.get("entityLabel").toString().toLowerCase().equals("human")||soln.get("entityLabel").toString().toLowerCase().equals("sample")){
 						value = soln.get("roleLabel").toString() + "'s " + soln.get("attributeLabel").toString() + " at " + soln.get("eventLabel").toString();
 					}
@@ -207,7 +233,7 @@ public class MetadataAcquisition extends Controller {
 				} 
 				else {
 					value = soln.get("attributeLabel").toString();
-				}
+				}*/
 				// Remove duplicate consecutive words
 				value = value.replaceAll("(?i)\\b([a-z]+)\\b(?:\\s+\\1\\b)+", "$1");
 				ArrayList<String> arrValues = null;
