@@ -729,7 +729,7 @@ public class AutoAnnotator extends Controller {
     		} catch (Exception e) {
     			System.out.println("Error annotateDataAcquisitionSchemaFile: Unable to Read File");
     		}
-    		if (hm.containsKey("study_id")){
+    		if (hm.containsKey("Study_ID")){
     			study_id = hm.get("Study_ID");
     		}
     		
@@ -787,8 +787,9 @@ public class AutoAnnotator extends Controller {
 			}
 	        
 	        try {
-
-	        	study_id = hm.get("Study_ID");
+	        	if (hm.containsKey("Study_ID")){
+	        		study_id = hm.get("Study_ID");
+	        	}
 	        	try {
 	        		DASchemaObjectGenerator dasoGenerator = new DASchemaObjectGenerator(dd);
 	        		System.out.println("Calling DASchemaObjectGenerator");
