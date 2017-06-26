@@ -8,6 +8,7 @@ import org.apache.commons.io.FileUtils;
 import org.hadatac.console.controllers.annotator.AutoAnnotator;
 
 import java.lang.String;
+import java.text.Normalizer;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -49,7 +50,7 @@ public class PVGenerator extends BasicGenerator {
     }
     
     private String getCode(CSVRecord rec) {
-    	return rec.get(mapCol.get("Code"));
+    	return Normalizer.normalize(rec.get(mapCol.get("Code")), Normalizer.Form.NFD).replaceAll("[^\\p{ASCII}]", "").trim();
     }
     
     private String getCodeValue(CSVRecord rec) {
