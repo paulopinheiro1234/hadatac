@@ -99,7 +99,7 @@ public class AutoAnnotator extends Controller {
 	public static HashMap<String, String> codeMappings = new HashMap<String, String>();
 	public static HashMap<String, String> entityMappings = new HashMap<String, String>();
 	public static HashMap<String, List<String>> codebook = new HashMap<String, List<String>>();
-	public static String study_id = "default-study";
+	public static String study_id;
 	
 	private static boolean search(String fileName, List<DataFile> pool) {
 		for (DataFile file : pool) {
@@ -719,42 +719,24 @@ public class AutoAnnotator extends Controller {
 	        	bufRdr = new BufferedReader(new FileReader(file));
 	        	String line = null;
 	        	while((line = bufRdr.readLine()) != null) {
-	        		try {
-	        			hm.put(line.split(",")[0], line.split(",")[1]);
-	        		} catch (Exception e) {
-	        			hm.put(line.split(",")[0], "");
-	        		}
+	        		hm.put(line.split(",")[0], line.split(",")[1]);
 	        	}
 		        bufRdr.close();
     		} catch (Exception e) {
     			System.out.println("Error annotateDataAcquisitionSchemaFile: Unable to Read File");
     		}
-    		if (hm.containsKey("study_id")){
-    			study_id = hm.get("Study_ID");
-    		}      	
+        	study_id = hm.get("Study_ID");
         	URL url = new URL(hm.get("Data_Dictionary"));
         	//System.out.println(url.toString());
         	File dd = new File("sddtmp/" + file.getName());
         	//System.out.println(dd.getAbsoluteFile());
         	FileUtils.copyURLToFile(url, dd); 
-        	
-        	if (hm.get("Code_Mappings") != ""){
-            	URL url2 = new URL(hm.get("Code_Mappings"));
-            	//System.out.println(url2.toString());
-            	File cm = new File("sddtmp/" + file.getName().replace(".csv", "")+"-code-mappings.csv");
-            	System.out.println(cm.getAbsoluteFile());
-            	FileUtils.copyURLToFile(url2, cm);
-    	        BufferedReader bufRdr2 = new BufferedReader(new FileReader(cm));
-    	        String line2 =  null;
-
-    	        while((line2 = bufRdr2.readLine()) != null){
-    	            String str[] = line2.split(",");
-    	            codeMappings.put(str[0], str[1]);
-    	        	}
-    	        bufRdr2.close();
-	        	cm.delete();
-        	}
-
+        
+        	URL url2 = new URL(hm.get("Code_Mappings"));
+        	//System.out.println(url2.toString());
+        	File cm = new File("sddtmp/" + file.getName().replace(".csv", "")+"-code-mappings.csv");
+        	System.out.println(cm.getAbsoluteFile());
+        	FileUtils.copyURLToFile(url2, cm);
 	        try{
 	        	URL url3 = new URL(hm.get("Codebook"));
 		        //System.out.println(url3.toString());
@@ -784,6 +766,17 @@ public class AutoAnnotator extends Controller {
 		        System.out.println(cb.length());
 		        cb.delete();
 			}
+	        
+	        BufferedReader bufRdr2 = new BufferedReader(new FileReader(cm));
+	        String line2 =  null;
+	        
+//	        study_id = hm.get("Study_ID");
+
+	        while((line2 = bufRdr2.readLine()) != null){
+	            String str[] = line2.split(",");
+	            codeMappings.put(str[0], str[1]);
+	        	}
+	        bufRdr2.close();
 	        
 	//        System.out.println(hm.keySet());
 	        try {
@@ -820,7 +813,7 @@ public class AutoAnnotator extends Controller {
 	        		return false;
 	        	}
 	        	dd.delete();
-	        	
+	        	cm.delete();
 	        	try {
 	        		GeneralGenerator generalGenerator = new GeneralGenerator();
 	        		System.out.println("Calling DASchemaGenerator");
@@ -845,6 +838,7 @@ public class AutoAnnotator extends Controller {
 	        	System.out.println("Error annotateDataAcquisitionSchemaFile: Unable to complete generation.");
 	        	AnnotationLog.printException(e, file.getName());
 	        	dd.delete();
+	        	cm.delete();
 	        	return false;
 	        }
     	} catch (Exception e) {
