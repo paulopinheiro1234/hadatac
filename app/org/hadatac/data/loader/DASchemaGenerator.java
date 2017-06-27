@@ -8,8 +8,10 @@ import org.apache.commons.csv.CSVRecord;
 
 import org.apache.commons.io.FileUtils;
 
+import play.Play;
+
 public class DASchemaGenerator extends BasicGenerator {
-	final String kbPrefix = "chear-kb:";
+	final String kbPrefix = Play.application().configuration().getString("hadatac.community.ont_prefix") + "-kb:";
 	String startTime = "";
 	String SDDName = "";
 	

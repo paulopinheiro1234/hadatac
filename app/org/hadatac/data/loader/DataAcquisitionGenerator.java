@@ -18,10 +18,12 @@ import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
 import org.hadatac.utils.Templates;
 
+import play.Play;
+
 import java.lang.Exception;
 
 public class DataAcquisitionGenerator extends BasicGenerator {
-	final String kbPrefix = "chear-kb:";
+	final String kbPrefix = Play.application().configuration().getString("hadatac.community.ont_prefix") + "-kb:";
 	String startTime = "";
 	
 	public DataAcquisitionGenerator(File file) {

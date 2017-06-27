@@ -10,8 +10,10 @@ import java.util.Set;
 
 import org.apache.commons.csv.CSVRecord;
 
+import play.Play;
+
 public class AgentGenerator extends BasicGenerator {
-	final String kbPrefix = "chear-kb:";
+	final String kbPrefix = Play.application().configuration().getString("hadatac.community.ont_prefix") + "-kb:";
 	private int counter = 1; //starting index number
 	
 	public AgentGenerator(File file) {

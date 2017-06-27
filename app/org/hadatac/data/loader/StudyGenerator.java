@@ -9,8 +9,10 @@ import org.hadatac.utils.Templates;
 
 import org.apache.commons.csv.CSVRecord;
 
+import play.Play;
+
 public class StudyGenerator extends BasicGenerator {
-	final String kbPrefix = "chear-kb:";
+	final String kbPrefix = Play.application().configuration().getString("hadatac.community.ont_prefix") + "-kb:";
 	private int counter = 1; //starting index number
 	
 	public StudyGenerator(File file) {

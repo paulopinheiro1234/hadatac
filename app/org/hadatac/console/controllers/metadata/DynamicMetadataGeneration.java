@@ -46,7 +46,7 @@ import org.labkey.remoteapi.Connection;
 
 public class DynamicMetadataGeneration extends Controller {
 	
-	public static void renderNavigationHTML(Map<String,String> indicatorMap){
+	/*public static void renderNavigationHTML(Map<String,String> indicatorMap){
 		String prefixString = NameSpaces.getInstance().printSparqlNameSpaceList().replaceAll("\n", " ");
 		for(Map.Entry<String, String> entry : indicatorMap.entrySet()){
 			String fileName = Play.application().configuration().getString("hadatac.console.host_deploy_location") + "/app/org/hadatac/console/views/metadata/" + entry.getValue().toString().toLowerCase().replaceAll(" ", "_") + "_navigation.scala.html";
@@ -117,7 +117,8 @@ public class DynamicMetadataGeneration extends Controller {
 			}
 		}
 	}
-	
+	*/
+	/*
 	public static void renderMetadataHTML(Map<String,String> indicatorMap){
 		String metadataBrowserString = "@()\n\n" +
 				"@import helper._\n" + 
@@ -143,7 +144,7 @@ public class DynamicMetadataGeneration extends Controller {
 			e.printStackTrace();
 		}
 	}
-	
+	*/
 /*	public static void renderMetadataEntryHTML(){
 		String metadataEntry = "@(triple : org.hadatac.console.models.OtMTripleDocument)\n\n" +
 				"@*****************************\n" +
@@ -261,7 +262,7 @@ public class DynamicMetadataGeneration extends Controller {
 		}
 		return indicatorValueMap;
 	}
-	
+	/*
 	public static void renderMetadataBrowserHTML(Map<String, String> indicatorMap){
 		String prefixString = NameSpaces.getInstance().printSparqlNameSpaceList().replaceAll("\n", " ");
 		Map<String,String> prefixMap = DynamicFunctions.getPrefixMap();
@@ -385,6 +386,7 @@ public class DynamicMetadataGeneration extends Controller {
 			e.printStackTrace();
 		}
 	}
+	*/
 	
 	public static void renderSPARQLPage(){
 		String prefixString = NameSpaces.getInstance().printSparqlNameSpaceList().replaceAll("\n", " ");
