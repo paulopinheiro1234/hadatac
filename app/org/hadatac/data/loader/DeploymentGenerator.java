@@ -19,8 +19,10 @@ import org.hadatac.metadata.loader.ValueCellProcessing;
 import org.hadatac.utils.Collections;
 import org.hadatac.utils.NameSpaces;
 
+import play.Play;
+
 public class DeploymentGenerator extends BasicGenerator {
-	final String kbPrefix = "chear-kb:";
+	final String kbPrefix = Play.application().configuration().getString("hadatac.community.ont_prefix") + "-kb:";
 	String startTime = "";
 	
 	public DeploymentGenerator(File file) {

@@ -7,6 +7,8 @@ import java.io.FileReader;
 import org.apache.commons.io.FileUtils;
 import org.hadatac.console.controllers.annotator.AutoAnnotator;
 
+import play.Play;
+
 import java.lang.String;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -18,7 +20,7 @@ import org.apache.commons.collections.list.SetUniqueList;
 import org.apache.commons.csv.CSVRecord;
 
 public class DASchemaEventGenerator extends BasicGenerator {
-	final String kbPrefix = "chear-kb:";
+	final String kbPrefix = Play.application().configuration().getString("hadatac.community.ont_prefix") + "-kb:";
 	String startTime = "";
 	String SDDName = "";
 	List<String> timeList = new ArrayList<String>();

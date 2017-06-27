@@ -19,8 +19,10 @@ import org.hadatac.utils.NameSpaces;
 
 import com.google.common.collect.Iterables;
 
+import play.Play;
+
 public class SubjectGenerator extends BasicGenerator {
-	final String kbPrefix = "chear-kb:";
+	final String kbPrefix = Play.application().configuration().getString("hadatac.community.ont_prefix") + "-kb:";
 	private int counter = 1; //starting index number
 	
 	public SubjectGenerator(File file) {
