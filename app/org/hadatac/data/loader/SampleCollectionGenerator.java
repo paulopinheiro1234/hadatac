@@ -19,9 +19,11 @@ import org.hadatac.utils.NameSpaces;
 
 import com.google.common.collect.Iterables;
 
+import play.Play;
+
 public class SampleCollectionGenerator extends BasicGenerator {
 
-    final String kbPrefix = "chear-kb:";
+	final String kbPrefix = Play.application().configuration().getString("hadatac.community.ont_prefix") + "-kb:";
     
     public SampleCollectionGenerator(File file) {
 	super(file);
