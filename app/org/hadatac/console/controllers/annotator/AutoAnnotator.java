@@ -63,6 +63,7 @@ import org.hadatac.data.loader.DeploymentGenerator;
 import org.hadatac.data.loader.GeneralGenerator;
 import org.hadatac.data.loader.PVGenerator;
 import org.hadatac.data.loader.SampleGenerator;
+import org.hadatac.data.loader.SampleCollectionGenerator;
 import org.hadatac.data.loader.SampleSubjectMapper;
 import org.hadatac.data.loader.StudyGenerator;
 import org.hadatac.data.loader.SubjectGenerator;
@@ -412,32 +413,32 @@ public class AutoAnnotator extends Controller {
 		}
 	}
 	
-	public static Model createModel(List<Map<String, Object>> rows) {
+    public static Model createModel(List<Map<String, Object>> rows) {
     	Model model = ModelFactory.createDefaultModel();
     	for (Map<String, Object> row : rows) {
-    		Resource sub = model.createResource(ValueCellProcessing.replacePrefixEx((String)row.get("hasURI")));
-    		for (String key : row.keySet()) {
-    			if (!key.equals("hasURI")) {
-    				Property pred = null;
-    				if (key.equals("a")) {
-    					pred = model.createProperty(ValueCellProcessing.replacePrefixEx("rdf:type"));
-    				}
-    				else {
-    					pred = model.createProperty(ValueCellProcessing.replacePrefixEx(key));
-    				}
-    				
-    				String cellValue = (String)row.get(key);
-					if (ValueCellProcessing.isAbbreviatedURI(cellValue)) {
-						Resource obj = model.createResource(ValueCellProcessing.replacePrefixEx(cellValue));
-						model.add(sub, pred, obj);
-					}
-					else {
-						Literal obj = model.createLiteral(
-								cellValue.replace("\n", " ").replace("\r", " ").replace("\"", "''"));
-						model.add(sub, pred, obj);
-					}
-    			}
-    		}
+	    Resource sub = model.createResource(ValueCellProcessing.replacePrefixEx((String)row.get("hasURI")));
+	    for (String key : row.keySet()) {
+		if (!key.equals("hasURI")) {
+		    Property pred = null;
+		    if (key.equals("a")) {
+			pred = model.createProperty(ValueCellProcessing.replacePrefixEx("rdf:type"));
+		    }
+		    else {
+			pred = model.createProperty(ValueCellProcessing.replacePrefixEx(key));
+		    }
+		    
+		    String cellValue = (String)row.get(key);
+		    if (ValueCellProcessing.isAbbreviatedURI(cellValue)) {
+			Resource obj = model.createResource(ValueCellProcessing.replacePrefixEx(cellValue));
+			model.add(sub, pred, obj);
+		    }
+		    else {
+			Literal obj = model.createLiteral(
+							  cellValue.replace("\n", " ").replace("\r", " ").replace("\"", "''"));
+			model.add(sub, pred, obj);
+		    }
+		}
+	    }
     	}
     	
     	return model;
@@ -474,6 +475,11 @@ public class AutoAnnotator extends Controller {
         	bSuccess = commitRows(studyGenerator.createInstitutionRows(), studyGenerator.toString(), 
         			file.getName(), "Agent", true);
         			*/
+
+    		SampleCollectionGenerator sampleCollectionGenerator = new SampleCollectionGenerator(file);
+        	bSuccess = commitRows(sampleCollectionGenerator.createRows(), sampleCollectionGenerator.toString(), 
+        			file.getName(), "SampleCollection", true);
+
     	} catch (Exception e) {
     		AnnotationLog.printException(e, file.getName());
     		return false;
@@ -498,9 +504,9 @@ public class AutoAnnotator extends Controller {
     		SampleGenerator sampleGenerator = new SampleGenerator(file);
         	bSuccess = commitRows(sampleGenerator.createRows(), sampleGenerator.toString(), 
         			file.getName(), "Sample", true);
-        	sampleGenerator = new SampleGenerator(file);
-        	bSuccess = commitRows(sampleGenerator.createCollectionRows(), sampleGenerator.toString(), 
-        			file.getName(), "SampleCollection", true);
+        	//sampleGenerator = new SampleGenerator(file);
+        	//bSuccess = commitRows(sampleGenerator.createCollectionRows(), sampleGenerator.toString(), 
+        	//		file.getName(), "SampleCollection", true);
     	} catch (Exception e) {
 	    e.printStackTrace();
     		AnnotationLog.printException(e, file.getName());
@@ -664,10 +670,10 @@ public class AutoAnnotator extends Controller {
 		return true;
 	}
 	
-	public static boolean annotateDataAcquisitionFile(File file) {
+    public static boolean annotateDataAcquisitionFile(File file) {
     	boolean bSuccess = true;
     	try {
-        	GeneralGenerator generalGenerator = new GeneralGenerator();
+	    GeneralGenerator generalGenerator = new GeneralGenerator();
         	Map<String, Object> row = new HashMap<String, Object>();
         	row.put("hasURI", "chear-kb:INS-GENERIC-PHYSICAL-INSTRUMENT");
         	row.put("a", "vstoi:PhysicalInstrument");
@@ -680,37 +686,37 @@ public class AutoAnnotator extends Controller {
         	row.put("rdfs:label", "Generic Questionnaire");
         	generalGenerator.addRow(row);
         	bSuccess = commitRows(generalGenerator.getRows(), generalGenerator.toString(), file.getName(), 
-        			"Instrument", true);
+				      "Instrument", true);
     		
     		DateFormat isoFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
         	String startTime = isoFormat.format(new Date());
-        	
+		
         	try{
-        		DeploymentGenerator deploymentGenerator = new DeploymentGenerator(file, startTime);
-            	bSuccess = commitRows(deploymentGenerator.createRows(), deploymentGenerator.toString(), file.getName(), 
-            			"Deployment", true);
+		    DeploymentGenerator deploymentGenerator = new DeploymentGenerator(file, startTime);
+		    bSuccess = commitRows(deploymentGenerator.createRows(), deploymentGenerator.toString(), file.getName(), 
+					  "Deployment", true);
         	} catch (Exception e){
-        		System.out.println("Error in annotateDataAcquisitionFile: Deployment Generator");
-        		AnnotationLog.printException(e, file.getName());
+		    System.out.println("Error in annotateDataAcquisitionFile: Deployment Generator");
+		    AnnotationLog.printException(e, file.getName());
         	}
         	try{
-        		DataAcquisitionGenerator daGenerator = new DataAcquisitionGenerator(file, startTime);
-        		bSuccess = commitRows(daGenerator.createRows(), daGenerator.toString(), file.getName(), 
-        			"DataAcquisition", true);
+		    DataAcquisitionGenerator daGenerator = new DataAcquisitionGenerator(file, startTime);
+		    bSuccess = commitRows(daGenerator.createRows(), daGenerator.toString(), file.getName(), 
+					  "DataAcquisition", true);
         	} catch (Exception e){
-        		System.out.println("Error in annotateDataAcquisitionFile: Data Acquisition Generator");
-        		AnnotationLog.printException(e, file.getName());
+		    System.out.println("Error in annotateDataAcquisitionFile: Data Acquisition Generator");
+		    AnnotationLog.printException(e, file.getName());
         	}
     	} catch (Exception e) {
-    		System.out.println("Error in annotateDataAcquisitionFile");
-    		AnnotationLog.printException(e, file.getName());
-    		return false;
-		}
-		return bSuccess;
+	    System.out.println("Error in annotateDataAcquisitionFile");
+	    AnnotationLog.printException(e, file.getName());
+	    return false;
 	}
+	return bSuccess;
+    }
+    
+    public static boolean annotateDataAcquisitionSchemaFile(File file) {
 	
-	public static boolean annotateDataAcquisitionSchemaFile(File file) {
-		
     	boolean bSuccess = true;
     	try{
         	HashMap<String, String> hm = new HashMap<String, String>();
@@ -869,55 +875,59 @@ public class AutoAnnotator extends Controller {
 		
 		return null;
 	}
-	
+    
     public static boolean annotateCSVFile(DataFile dataFile) {
     	String file_name = dataFile.getFileName();    	
     	AnnotationLog log = new AnnotationLog();
     	log.setFileName(file_name);
 	
-		String dc_uri = null;
-		String deployment_uri = null;
-		String schema_uri = null;
-		
-		if (null != dataFile) {
-			DataAcquisition dataAcquisition = DataAcquisition.findByUri(
-					ValueCellProcessing.replacePrefixEx(dataFile.getDataAcquisitionUri()));
-			if (null != dataAcquisition) {
-				dc_uri = dataAcquisition.getUri();
-				deployment_uri = dataAcquisition.getDeploymentUri();
-				schema_uri = dataAcquisition.getSchemaUri();
-			}
-		}
-		
-		if (dc_uri == null) {
-			log.addline(Feedback.println(Feedback.WEB, String.format("[ERROR] Cannot find the target data acquisition: %s", file_name)));
-			log.save();
-			return false;
-		} else {
-			log.addline(Feedback.println(Feedback.WEB, String.format("[OK] Found the target data acquisition: %s", file_name)));
-		}
-		if (schema_uri == null) {
-    		log.addline(Feedback.println(Feedback.WEB, String.format("[ERROR] No schemas specified for the data acquisition: %s", file_name)));
-    		log.save();
-    		return false;
+	String dc_uri = null;
+	String deployment_uri = null;
+	String schema_uri = null;
+	
+	if (dataFile != null) {
+	    System.out.println("dataFile: " + dataFile.getFileName());
+	    System.out.println("dataFile Uri: " + dataFile.getDataAcquisitionUri());
+	    System.out.println("dataFile replacePrefixEx: " + ValueCellProcessing.replacePrefixEx(dataFile.getDataAcquisitionUri()));
+	    DataAcquisition dataAcquisition = DataAcquisition.findByUri(
+									ValueCellProcessing.replacePrefixEx(dataFile.getDataAcquisitionUri()));
+	    System.out.println("dataAcquisition: " + dataAcquisition);
+	    if (dataAcquisition != null) {
+		dc_uri = dataAcquisition.getUri();
+		deployment_uri = dataAcquisition.getDeploymentUri();
+		schema_uri = dataAcquisition.getSchemaUri();
+	    }
+	}
+	
+	if (dc_uri == null) {
+	    log.addline(Feedback.println(Feedback.WEB, String.format("[ERROR] Cannot find target data acquisition: %s", file_name)));
+	    log.save();
+	    return false;
+	} else {
+	    log.addline(Feedback.println(Feedback.WEB, String.format("[OK] Found target data acquisition: %s", file_name)));
+	}
+	if (schema_uri == null) {
+	    log.addline(Feedback.println(Feedback.WEB, String.format("[ERROR] No schemas specified for data acquisition: %s", file_name)));
+	    log.save();
+	    return false;
     	} else {
-    		log.addline(Feedback.println(Feedback.WEB, String.format("[OK] Schema %s specified for the data acquisition: %s", schema_uri, file_name)));
+	    log.addline(Feedback.println(Feedback.WEB, String.format("[OK] Schema %s specified for data acquisition: %s", schema_uri, file_name)));
     	}
-		if (deployment_uri == null) {
-    		log.addline(Feedback.println(Feedback.WEB, String.format("[ERROR] No deployments specified for the data acquisition: %s", file_name)));
-    		log.save();
-    		return false;
+	if (deployment_uri == null) {
+	    log.addline(Feedback.println(Feedback.WEB, String.format("[ERROR] No deployments specified for data acquisition: %s", file_name)));
+	    log.save();
+	    return false;
     	} else {
-    		try {
-        		deployment_uri = URLDecoder.decode(deployment_uri, "UTF-8");
-    		} catch (UnsupportedEncodingException e) {
-    			log.addline(Feedback.println(Feedback.WEB, String.format("URL decoding error for deployment uri %s", deployment_uri)));
-    			log.save();
-    			return false;
-    		}
-    		log.addline(Feedback.println(Feedback.WEB, String.format("[OK] Deployment %s specified for the data acquisition %s", deployment_uri, file_name)));
+	    try {
+		deployment_uri = URLDecoder.decode(deployment_uri, "UTF-8");
+	    } catch (UnsupportedEncodingException e) {
+		log.addline(Feedback.println(Feedback.WEB, String.format("URL decoding error for deployment uri %s", deployment_uri)));
+		log.save();
+		return false;
+	    }
+	    log.addline(Feedback.println(Feedback.WEB, String.format("[OK] Deployment %s specified for data acquisition %s", deployment_uri, file_name)));
     	}
-		
+	
     	CSVAnnotationHandler handler = null;
     	if (!deployment_uri.equals("")) {
     		/*

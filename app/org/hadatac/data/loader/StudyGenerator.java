@@ -5,6 +5,7 @@ import java.lang.String;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import org.hadatac.utils.Templates;
 
 import org.apache.commons.csv.CSVRecord;
 
@@ -18,35 +19,35 @@ public class StudyGenerator extends BasicGenerator {
 	
 	@Override
 	void initMapping() {
-		mapCol.clear();
-        mapCol.put("studyID", "CHEAR Project ID");
-        mapCol.put("studyTitle", "Title");
-        mapCol.put("studyAims", "Specific Aims");
-        mapCol.put("studySignificance", "Significance");
-        mapCol.put("numSubjects", "Number of Participants");
-        mapCol.put("numSamples", "Number of Sample IDs");
-        mapCol.put("institution", "Institution");
-        mapCol.put("PI", "Principal Investigator");
-        mapCol.put("PIAddress", "PI Address");
-        mapCol.put("PICity", "PI City");
-        mapCol.put("PIState", "PI State");
-        mapCol.put("PIZipCode", "PI Zip Code");
-        mapCol.put("PIEmail", "Email");
-        mapCol.put("PIPhone", "PI Phone");
-        mapCol.put("CPI1FName", "Co-PI 1 First Name");
-        mapCol.put("CPI1LName", "Co-PI 1 Last Name");
-        mapCol.put("CPI1Email", "Co-PI 1 Email");
-        mapCol.put("CPI2FName", "Co-PI 2 First Name");
-        mapCol.put("CPI2LName", "Co-PI 2 Last Name");
-        mapCol.put("CPI2Email", "Co-PI 2 Email");
-        mapCol.put("contactFName", "Contact First Name");
-        mapCol.put("contactLName", "Contact Last Name");
-        mapCol.put("contactEmail", "Contact Email");
-        mapCol.put("createdDate","Project Created Date");
-        mapCol.put("updatedDate","Project Last Updated Date");
-        mapCol.put("DCAccessBool", "DC Access?");
+	    mapCol.clear();
+	    mapCol.put("studyID", Templates.STUDYID);
+	    mapCol.put("studyTitle", Templates.STUDYTITLE);
+	    mapCol.put("studyAims", Templates.STUDYAIMS);
+	    mapCol.put("studySignificance", Templates.STUDYSIGNIFICANCE);
+	    mapCol.put("numSubjects", Templates.NUMSUBJECTS);
+	    mapCol.put("numSamples", Templates.NUMSAMPLES);
+	    mapCol.put("institution", Templates.INSTITUTION);
+	    mapCol.put("PI", Templates.PI);
+	    mapCol.put("PIAddress", Templates.PIADDRESS);
+	    mapCol.put("PICity", Templates.PICITY);
+	    mapCol.put("PIState", Templates.PISTATE);
+	    mapCol.put("PIZipCode", Templates.PIZIPCODE);
+	    mapCol.put("PIEmail", Templates.PIEMAIL);
+	    mapCol.put("PIPhone", Templates.PIPHONE);
+	    mapCol.put("CPI1FName", Templates.CPI1FNAME);
+	    mapCol.put("CPI1LName", Templates.CPI1LNAME);
+	    mapCol.put("CPI1Email", Templates.CPI1EMAIL);
+	    mapCol.put("CPI2FName", Templates.CPI2FNAME);
+	    mapCol.put("CPI2LName", Templates.CPI2LNAME);
+	    mapCol.put("CPI2Email", Templates.CPI2EMAIL);
+	    mapCol.put("contactFName", Templates.CONTACTFNAME);
+	    mapCol.put("contactLName", Templates.CONTACTLNAME);
+	    mapCol.put("contactEmail", Templates.CONTACTEMAIL);
+	    mapCol.put("createdDate", Templates.CREATEDDATE);
+	    mapCol.put("updatedDate", Templates.UPDATEDDATE);
+	    mapCol.put("DCAccessBool", Templates.DCACCESSBOOL);
 	}
-	
+    
 	private String getUri(CSVRecord rec) { 
 		return kbPrefix + "STD-" + rec.get(mapCol.get("studyID")); 
 	}

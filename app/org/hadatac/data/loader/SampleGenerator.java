@@ -16,6 +16,7 @@ import org.apache.jena.query.ResultSetRewindable;
 import org.apache.jena.rdf.model.Literal;
 import org.hadatac.utils.Collections;
 import org.hadatac.utils.NameSpaces;
+import org.hadatac.utils.Templates;
 
 import com.google.common.collect.Iterables;
 
@@ -30,46 +31,46 @@ public class SampleGenerator extends BasicGenerator {
 	
 	@Override
 	void initMapping() {
-		mapCol.clear();
-        mapCol.put("sampleID", "specimen_id");
-        mapCol.put("sampleSuffix", "suffix");
-        mapCol.put("subjectID", "patient_id");
-        mapCol.put("pilotNum", "project_id");
-        mapCol.put("sampleType", "sample_type");
-		mapCol.put("samplingMethod", "sample_collection_method");
-		mapCol.put("samplingVol", "sample_quantity");
-		mapCol.put("samplingVolUnit", "sample_quantity_uom");
-		mapCol.put("storageTemp", "sample_storage_temp");
-		mapCol.put("FTcount", "sample_freeze_thaw_cycles");
+	    mapCol.clear();
+	    mapCol.put("sampleID", Templates.SAMPLEID);
+	    mapCol.put("sampleSuffix", Templates.SAMPLESUFFIX);
+	    mapCol.put("subjectID", Templates.SUBJECTID);
+	    mapCol.put("studyID", Templates.STUDYID);
+	    mapCol.put("sampleType", Templates.SAMPLETYPE);
+	    mapCol.put("samplingMethod", Templates.SAMPLINGMETHOD);
+	    mapCol.put("samplingVol", Templates.SAMPLINGVOL);
+	    mapCol.put("samplingVolUnit", Templates.SAMPLINGVOLUNIT);
+	    mapCol.put("storageTemp", Templates.STORAGETEMP);
+	    mapCol.put("FTcount", Templates.FTCOUNT);
 	}
 
 	@Override
 	Map<String, Object> createRow(CSVRecord rec, int rownumber) throws Exception {
-		Map<String, Object> row = new HashMap<String, Object>();
-    	row.put("hasURI", getUri(rec));
-    	row.put("a", getType(rec));
-    	row.put("rdfs:label", getLabel(rec));
-    	row.put("hasco:originalID", getOriginalID(rec));
-    	row.put("hasco:isSampleOf", getSubjectUri(rec));
-    	row.put("hasco:isObjectOf", getCollectionUri(rec));
-    	row.put("rdfs:comment", getComment(rec));
-    	row.put("hasco:hasSamplingMethod", getSamplingMethod(rec));
-    	row.put("hasco:hasSamplingVolume", getSamplingVolume(rec));
-    	row.put("hasco:hasSamplingVolumeUnit", getSamplingVolumeUnit(rec));
-    	row.put("hasco:hasStorageTemperature", getStorageTemperature(rec));
-    	row.put("hasco:hasStorageTemperatureUnit", getStorageTemperatureUnit());
-    	row.put("hasco:hasNumFreezeThaw", getNumFreezeThaw(rec));
-    	counter++;
-    	
-    	return row;
+	    Map<String, Object> row = new HashMap<String, Object>();
+	    row.put("hasURI", getUri(rec));
+	    row.put("a", getType(rec));
+	    row.put("rdfs:label", getLabel(rec));
+	    row.put("hasco:originalID", getOriginalID(rec));
+	    row.put("hasco:isSampleOf", getSubjectUri(rec));
+	    row.put("hasco:isObjectOf", getCollectionUri(rec));
+	    row.put("rdfs:comment", getComment(rec));
+	    row.put("hasco:hasSamplingMethod", getSamplingMethod(rec));
+	    row.put("hasco:hasSamplingVolume", getSamplingVolume(rec));
+	    row.put("hasco:hasSamplingVolumeUnit", getSamplingVolumeUnit(rec));
+	    row.put("hasco:hasStorageTemperature", getStorageTemperature(rec));
+	    row.put("hasco:hasStorageTemperatureUnit", getStorageTemperatureUnit());
+	    row.put("hasco:hasNumFreezeThaw", getNumFreezeThaw(rec));
+	    counter++;
+	    
+	    return row;
 	}
-	
-	private int getSampleCount(String pilotNum){
+    
+	private int getSampleCount(String studyID){
 		int count = 0;
 		String sampleCountQuery = NameSpaces.getInstance().printSparqlNameSpaceList() 
 				+ " SELECT (count(DISTINCT ?sampleURI) as ?sampleCount) WHERE { "
 				+ " ?sampleURI hasco:isObjectOf ?SC . "
-				+ " ?SC hasco:isSampleCollectionOf chear-kb:STD-" + pilotNum + " . "
+				+ " ?SC hasco:isSampleCollectionOf chear-kb:STD-" + studyID + " . "
 				+ "}";
 		QueryExecution qexecSample = QueryExecutionFactory.sparqlService(
 				Collections.getCollectionsName(Collections.METADATA_SPARQL), sampleCountQuery);
@@ -88,8 +89,8 @@ public class SampleGenerator extends BasicGenerator {
 	}
 	
 	private String getUri(CSVRecord rec) {
-		return kbPrefix + "SPL-" + String.format("%04d", counter + getSampleCount(rec.get(mapCol.get("pilotNum")))) 
-			+ "-" + rec.get(mapCol.get("pilotNum")); //  + "-" + getSampleSuffix()
+		return kbPrefix + "SPL-" + String.format("%04d", counter + getSampleCount(rec.get(mapCol.get("studyID")))) 
+			+ "-" + rec.get(mapCol.get("studyID")); //  + "-" + getSampleSuffix()
 	}
 	
 	private String getType(CSVRecord rec) {
@@ -101,8 +102,8 @@ public class SampleGenerator extends BasicGenerator {
 	}
 	
 	private String getLabel(CSVRecord rec) {
-		return "SID " + String.format("%04d", counter + getSampleCount(rec.get(mapCol.get("pilotNum")))) + " - " 
-			+ rec.get(mapCol.get("pilotNum")) + " " + getSampleSuffix(rec);
+		return "SID " + String.format("%04d", counter + getSampleCount(rec.get(mapCol.get("studyID")))) + " - " 
+			+ rec.get(mapCol.get("studyID")) + " " + getSampleSuffix(rec);
 	}
 	
     private String getOriginalID(CSVRecord rec) {
@@ -140,8 +141,8 @@ public class SampleGenerator extends BasicGenerator {
     }
     
     private String getComment(CSVRecord rec) {
-    	return "Sample " + String.format("%04d", counter + getSampleCount(rec.get(mapCol.get("pilotNum")))) 
-    		+ " for " + rec.get(mapCol.get("pilotNum")) + " " + getSampleSuffix(rec);
+    	return "Sample " + String.format("%04d", counter + getSampleCount(rec.get(mapCol.get("studyID")))) 
+    		+ " for " + rec.get(mapCol.get("studyID")) + " " + getSampleSuffix(rec);
     }
     
     private String getSamplingMethod(CSVRecord rec) {
@@ -198,15 +199,15 @@ public class SampleGenerator extends BasicGenerator {
     }
     
     private String getStudyUri(CSVRecord rec) {
-    	return kbPrefix + "STD-" + rec.get(mapCol.get("pilotNum"));
+    	return kbPrefix + "STD-" + rec.get(mapCol.get("studyID"));
     }
     
     private String getCollectionUri(CSVRecord rec) {
-    	return kbPrefix + "SC-" + rec.get(mapCol.get("pilotNum"));
+    	return kbPrefix + "SC-" + rec.get(mapCol.get("studyID"));
     }
     
     private String getCollectionLabel(CSVRecord rec) {
-    	return "Sample Collection of Study " + rec.get(mapCol.get("pilotNum"));
+    	return "Sample Collection of Study " + rec.get(mapCol.get("studyID"));
     }
     
     public Map<String, Object> createCollectionRow(CSVRecord rec) {
