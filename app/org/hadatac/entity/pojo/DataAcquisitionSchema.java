@@ -28,12 +28,18 @@ public class DataAcquisitionSchema {
     private int timeInstantColumn;
     private int idColumn;
     private int elevationColumn;
+    private int entityColumn;
+    private int unitColumn;
+    private int inRelationToColumn;
     
     public DataAcquisitionSchema() {
        this.timestampColumn = -1;
        this.timeInstantColumn = -1;
        this.elevationColumn = -1;
        this.idColumn = -1;
+       this.entityColumn = -1;
+       this.unitColumn = -1;
+       this.inRelationToColumn = -1;
     }
 	
     public int getTimestampColumn() {
@@ -68,6 +74,30 @@ public class DataAcquisitionSchema {
 	this.elevationColumn = elevationColumn;
     }
 
+    public int getEntityColumn() {
+	return entityColumn;
+    }
+
+    public void setEntityColumn(int entityColumn) {
+	this.entityColumn = entityColumn;
+    }
+
+    public int getUnitColumn() {
+	return unitColumn;
+    }
+
+    public void setUnitColumn(int unitColumn) {
+	this.unitColumn = unitColumn;
+    }
+
+    public int getInRelationToColumn() {
+	return inRelationToColumn;
+    }
+
+    public void setInRelationToColumn(int inRelationToColumn) {
+	this.inRelationToColumn = inRelationToColumn;
+    }
+
     public String getUri() {
     	return uri;
     }
@@ -88,15 +118,27 @@ public class DataAcquisitionSchema {
 	    for (DataAcquisitionSchemaAttribute dasa : attributes) {
 		if (dasa.getAttribute().equals(ValueCellProcessing.replacePrefixEx("sio:TimeStamp"))) {
 		    setTimestampColumn(dasa.getPositionInt());
-		    System.out.println("[OK] DataAcquisitionSchemat TimeStampColumn: " + dasa.getPositionInt());
+		    System.out.println("[OK] DataAcquisitionSchema TimeStampColumn: " + dasa.getPositionInt());
 		}
 		if (dasa.getAttribute().equals(ValueCellProcessing.replacePrefixEx("sio:TimeInstant"))) {
 		    setTimeInstantColumn(dasa.getPositionInt());
-		    System.out.println("[OK] DataAcquisitionSchemat TimeInstantColumn: " + dasa.getPositionInt());
+		    System.out.println("[OK] DataAcquisitionSchema TimeInstantColumn: " + dasa.getPositionInt());
 		}
 		if (dasa.getAttribute().equals(ValueCellProcessing.replacePrefixEx("hasco:originalID"))) {
 		    setIdColumn(dasa.getPositionInt());
-		    System.out.println("[OK] DataAcquisitionSchemat IdColumn: " + dasa.getPositionInt());
+		    System.out.println("[OK] DataAcquisitionSchema IdColumn: " + dasa.getPositionInt());
+		}
+		if (dasa.getAttribute().equals(ValueCellProcessing.replacePrefixEx("hasco:hasEntity"))) {
+		    setEntityColumn(dasa.getPositionInt());
+		    System.out.println("[OK] DataAcquisitionSchema entityColumn: " + dasa.getPositionInt());
+		}
+		if (dasa.getAttribute().equals(ValueCellProcessing.replacePrefixEx("hasco:hasUnity"))) {
+		    setUnitColumn(dasa.getPositionInt());
+		    System.out.println("[OK] DataAcquisitionSchema unityColumn: " + dasa.getPositionInt());
+		}
+		if (dasa.getAttribute().equals(ValueCellProcessing.replacePrefixEx("sio:InRelationTo"))) {
+		    setInRelationToColumn(dasa.getPositionInt());
+		    System.out.println("[OK] DataAcquisitionSchema inRelationToColumn: " + dasa.getPositionInt());
 		}
 		System.out.println("[OK] DataAcquisitionSchemaAttribute <" + dasa.getUri() + "> is defined in the knowledge base. " + 
 				   "Entity: \""    + dasa.getEntityLabel()     + "\"; " + 

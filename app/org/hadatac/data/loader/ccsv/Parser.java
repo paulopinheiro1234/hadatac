@@ -174,6 +174,15 @@ public class Parser {
 				if (dasa.getPositionInt() == schema.getIdColumn()) {
 					continue;
 				}
+				if (dasa.getPositionInt() == schema.getEntityColumn()) {
+					continue;
+				}
+				if (dasa.getPositionInt() == schema.getUnitColumn()) {
+					continue;
+				}
+				if (dasa.getPositionInt() == schema.getInRelationToColumn()) {
+					continue;
+				}
 				
 				Measurement measurement = new Measurement();
 
@@ -213,8 +222,12 @@ public class Parser {
 				    int timeStamp = new BigDecimal(sTime).intValue();
 				    Date time = new Date((long)timeStamp * 1000);
 				    measurement.setTimestamp(time.toString());
-				} else if(dasa.getPositionInt() == schema.getTimeInstantColumn()) {
-				    measurement.setTimestamp(record.get(schema.getTimeInstantColumn() - 1));
+				} else if(schema.getTimeInstantColumn() != -1) {
+				    String timeValue = record.get(schema.getTimeInstantColumn() - 1);
+				    //System.out.println("Time Instant value: " + timeValue);
+				    if (timeValue != null) {
+					measurement.setTimestamp(timeValue);
+				    }
 				}    
 				
 				// abstract times 
@@ -345,6 +358,11 @@ public class Parser {
 				    measurement.setEntity(uppercaseFirstLetter(dasa.getEntityLabel()));
 				    measurement.setCharacteristic(uppercaseFirstLetter(dasa.getAttributeLabel()));
 				}
+
+				if (schema.getEntityColumn() != -1 && !record.get(schema.getEntityColumn() - 1).equals("")) {
+				    measurement.setEntity(record.get(schema.getEntityColumn() - 1));
+				}
+
 				measurement.setEntityUri(dasa.getEntity());
 				measurement.setCharacteristicUri(dasa.getAttribute());
 				
