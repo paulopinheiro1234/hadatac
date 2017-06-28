@@ -57,7 +57,7 @@ public class DataFile {
 		return dataAcquisitionUri;
 	}
 	public void setDataAcquisitionUri(String dataAcquisitionUri) {
-         	System.out.println("inside DataFile's POJO DA: <" + dataAcquisitionUri + ">");
+	        //System.out.println("inside DataFile's POJO DA: <" + dataAcquisitionUri + ">");
 		this.dataAcquisitionUri = dataAcquisitionUri;
 	}
 	
@@ -72,7 +72,7 @@ public class DataFile {
 		return fileName;
 	}
 	public void setFileName(String fileName) {
-         	System.out.println("inside DataFile's POJO: " + fileName);
+	        //System.out.println("inside DataFile's POJO: " + fileName);
 		this.fileName = fileName;
 	}
 	

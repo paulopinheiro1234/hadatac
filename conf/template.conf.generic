@@ -1,0 +1,72 @@
+# Configure the template labels to be used to ingest metadata CSV files
+
+# STD Template (Study and SampleCollection)
+studyID=Study ID
+studyTitle=Title
+studyAims=Specific Aims
+studySignificance=Significance
+numSubjects=Number of Participants
+numSamples=Number of Sample IDs
+institution=Institution
+PI=Principal Investigator
+PIAddress=PI Address
+PICity=PI City
+PIState=PI State
+PIZipCode=PI Zip Code
+PIEmail=Email
+PIPhone=PI Phone
+CPI1FName=Co-PI 1 First Name
+CPI1LName=Co-PI 1 Last Name
+CPI1Email=Co-PI 1 Email
+CPI2FName=Co-PI 2 First Name
+CPI2LName=Co-PI 2 Last Name
+CPI2Email=Co-PI 2 Email
+contactFName=Contact First Name
+contactLName=Contact Last Name
+contactEmail=Contact Email
+createdDate=Project Created Date
+updatedDate=Project Last Updated Date
+DCAccessBool=DC Access?
+
+# ACQ (DA and DEPLOYMENT) Template
+DataAcquisitionName=da name
+Method=method
+DataDictionaryName=data dict
+Epi/Lab=epi/lab
+OwnerEmail=owner email
+
+# DASA, DASE, DASO Template (Part of SDD)
+Label=Column 
+AttributeType=Attribute
+AttributeOf=attributeOf
+Unit=Unit
+Time=Time
+Entity=Entity
+Role=Role
+Relation=Relation
+InRelationTo=inRelationTo
+WasDerivedFrom=wasDerivedFrom
+WasGeneratedBy=wasGeneratedBy
+HasPosition=hasPosition
+
+# PV Template (Part of SDD)
+Label=Column
+Code=Code
+CodeValue=Label
+Class=Class
+
+# SID Template
+sampleID=specimen_id
+sampleSuffix=suffix
+subjectID=patient_id
+sampleType=sample_type
+samplingMethod=sample_collection_method
+samplingVol=sample_quantity
+samplingVolUnit=sample_quantity_uom
+storageTemp=sample_storage_temp
+FTcount=sample_freeze_thaw_cycles
+
+# MAP Template
+originalPID=patient_id
+originalSID=specimen_id
+
