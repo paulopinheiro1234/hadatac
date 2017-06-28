@@ -107,6 +107,7 @@ cp /data/conf/hadatac.conf conf/
 cp /data/conf/labkey.config conf/
 cp /data/conf/autoccsv.config conf/
 cp /data/conf/namespaces.properties conf/
+cp /data/conf/template.conf* conf/
 cp /data/conf/play-authenticate/smtp.conf conf/play-authenticate/
 
 echo ""
