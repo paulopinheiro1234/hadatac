@@ -101,6 +101,7 @@ public class AutoAnnotator extends Controller {
 	public static HashMap<String, String> entityMappings = new HashMap<String, String>();
 	public static HashMap<String, List<String>> codebook = new HashMap<String, List<String>>();
 	public static String study_id = "default-study";
+	public static final String kbPrefix = Play.application().configuration().getString("hadatac.community.ont_prefix") + "-kb:";
 	
 	private static boolean search(String fileName, List<DataFile> pool) {
 		for (DataFile file : pool) {
@@ -675,14 +676,14 @@ public class AutoAnnotator extends Controller {
     	try {
 	    GeneralGenerator generalGenerator = new GeneralGenerator();
         	Map<String, Object> row = new HashMap<String, Object>();
-        	row.put("hasURI", "chear-kb:INS-GENERIC-PHYSICAL-INSTRUMENT");
+        	row.put("hasURI", kbPrefix + "INS-GENERIC-PHYSICAL-INSTRUMENT");
         	row.put("a", "vstoi:PhysicalInstrument");
         	row.put("rdfs:label", "Generic Physical Instrument");
         	generalGenerator.addRow(row);
         	
         	row = new HashMap<String, Object>();
-        	row.put("hasURI", "chear-kb:INS-GENERIC-QUESTIONNAIRE");
-        	row.put("a", "chear:Questionnaire");
+        	row.put("hasURI", kbPrefix + "INS-GENERIC-QUESTIONNAIRE");
+        	row.put("a", "hasco:Questionnaire");
         	row.put("rdfs:label", "Generic Questionnaire");
         	generalGenerator.addRow(row);
         	bSuccess = commitRows(generalGenerator.getRows(), generalGenerator.toString(), file.getName(), 
@@ -832,11 +833,11 @@ public class AutoAnnotator extends Controller {
 	        		GeneralGenerator generalGenerator = new GeneralGenerator();
 	        		System.out.println("Calling DASchemaGenerator");
 	        		Map<String, Object> row = new HashMap<String, Object>();
-	        		row.put("hasURI", "chear-kb:DAS-" + file.getName().replace(".csv",""));
+	        		row.put("hasURI", kbPrefix + "DAS-" + file.getName().replace(".csv",""));
 	        		row.put("a", "hasco:DASchema");
 	        		row.put("rdfs:label", "Schema for Study " + study_id + " EPI Data Acquisitions");
 	        		row.put("rdfs:comment", "");
-	        		row.put("hasco:isSchemaOf", "chear-kb:STD-" + study_id);
+	        		row.put("hasco:isSchemaOf", kbPrefix + "STD-" + study_id);
 	        		generalGenerator.addRow(row);
 
 	        		bSuccess = commitRows(generalGenerator.getRows(), generalGenerator.toString(), file.getName(), 
