@@ -130,15 +130,15 @@ public class DataAcquisitionSchema {
 		}
 		if (dasa.getAttribute().equals(ValueCellProcessing.replacePrefixEx("hasco:hasEntity"))) {
 		    setEntityColumn(dasa.getPositionInt());
-		    System.out.println("[OK] DataAcquisitionSchema entityColumn: " + dasa.getPositionInt());
+		    System.out.println("[OK] DataAcquisitionSchema EntityColumn: " + dasa.getPositionInt());
 		}
-		if (dasa.getAttribute().equals(ValueCellProcessing.replacePrefixEx("hasco:hasUnity"))) {
+		if (dasa.getAttribute().equals(ValueCellProcessing.replacePrefixEx("hasco:hasUnit"))) {
 		    setUnitColumn(dasa.getPositionInt());
-		    System.out.println("[OK] DataAcquisitionSchema unityColumn: " + dasa.getPositionInt());
+		    System.out.println("[OK] DataAcquisitionSchema UnitColumn: " + dasa.getPositionInt());
 		}
 		if (dasa.getAttribute().equals(ValueCellProcessing.replacePrefixEx("sio:InRelationTo"))) {
 		    setInRelationToColumn(dasa.getPositionInt());
-		    System.out.println("[OK] DataAcquisitionSchema inRelationToColumn: " + dasa.getPositionInt());
+		    System.out.println("[OK] DataAcquisitionSchema InRelationToColumn: " + dasa.getPositionInt());
 		}
 		System.out.println("[OK] DataAcquisitionSchemaAttribute <" + dasa.getUri() + "> is defined in the knowledge base. " + 
 				   "Entity: \""    + dasa.getEntityLabel()     + "\"; " + 

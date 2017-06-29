@@ -222,7 +222,7 @@ public class Parser {
 				    int timeStamp = new BigDecimal(sTime).intValue();
 				    Date time = new Date((long)timeStamp * 1000);
 				    measurement.setTimestamp(time.toString());
-				} else if(schema.getTimeInstantColumn() != -1) {
+				} else if (schema.getTimeInstantColumn() != -1) {
 				    String timeValue = record.get(schema.getTimeInstantColumn() - 1);
 				    //System.out.println("Time Instant value: " + timeValue);
 				    if (timeValue != null) {
@@ -318,6 +318,14 @@ public class Parser {
 				if (isSample && !unitOverride.equals("") && !unitLabelOverride.equals("")) {
 				    measurement.setUnit(uppercaseFirstLetter(unitLabelOverride));
 				    measurement.setUnitUri(unitOverride);
+				} else if (schema.getUnitColumn() != -1) {
+				    String unitValue = record.get(schema.getUnitColumn() - 1);
+				    //System.out.println("Unit value: " + unitValue);
+				    if (unitValue != null) {
+					measurement.setUnit(uppercaseFirstLetter(unitValue));
+				    } else {
+					measurement.setUnit("");
+				    }
 				} else {
 				    measurement.setUnit(uppercaseFirstLetter(dasa.getUnitLabel()));
 				    measurement.setUnitUri(dasa.getUnit());
