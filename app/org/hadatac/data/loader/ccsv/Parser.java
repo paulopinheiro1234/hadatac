@@ -323,8 +323,10 @@ public class Parser {
 				    //System.out.println("Unit value: " + unitValue);
 				    if (unitValue != null) {
 					measurement.setUnit(uppercaseFirstLetter(unitValue));
+					measurement.setUnitUri(dasa.getUnit());
 				    } else {
 					measurement.setUnit("");
+					measurement.setUnitUri(dasa.getUnit());
 				    }
 				} else {
 				    measurement.setUnit(uppercaseFirstLetter(dasa.getUnitLabel()));

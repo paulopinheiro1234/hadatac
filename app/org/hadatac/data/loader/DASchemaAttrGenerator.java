@@ -157,7 +157,7 @@ public class DASchemaAttrGenerator extends BasicGenerator {
     @Override
     Map<String, Object> createRow(CSVRecord rec, int row_number) throws Exception {
     	Map<String, Object> row = new HashMap<String, Object>();
-    	row.put("hasURI", kbPrefix + "DASA-" + getLabel(rec).trim().replace(" ", "").replace("_","-").replace("??", "") + "-" + study_id);
+    	row.put("hasURI", kbPrefix + "DASA-" + SDDName.replace(".csv", "") + "-" + getLabel(rec).trim().replace(" ", "").replace("_","-").replace("??", ""));
     	row.put("a", "hasco:DASchemaAttribute");
     	row.put("rdfs:label", getLabel(rec));
     	row.put("rdfs:comment", getLabel(rec));

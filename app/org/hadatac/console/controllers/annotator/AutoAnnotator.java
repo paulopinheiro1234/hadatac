@@ -888,12 +888,7 @@ public class AutoAnnotator extends Controller {
 	String schema_uri = null;
 	
 	if (dataFile != null) {
-	    System.out.println("dataFile: " + dataFile.getFileName());
-	    System.out.println("dataFile Uri: " + dataFile.getDataAcquisitionUri());
-	    System.out.println("dataFile replacePrefixEx: " + ValueCellProcessing.replacePrefixEx(dataFile.getDataAcquisitionUri()));
-	    DataAcquisition dataAcquisition = DataAcquisition.findByUri(
-									ValueCellProcessing.replacePrefixEx(dataFile.getDataAcquisitionUri()));
-	    System.out.println("dataAcquisition: " + dataAcquisition);
+	    DataAcquisition dataAcquisition = DataAcquisition.findByUri(ValueCellProcessing.replacePrefixEx(dataFile.getDataAcquisitionUri()));
 	    if (dataAcquisition != null) {
 		dc_uri = dataAcquisition.getUri();
 		deployment_uri = dataAcquisition.getDeploymentUri();

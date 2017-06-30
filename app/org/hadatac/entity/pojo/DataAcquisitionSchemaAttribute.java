@@ -20,6 +20,19 @@ public class DataAcquisitionSchemaAttribute {
         private String localName;
         private String position;
         private int    positionInt;
+
+        /* 
+	   tempPositionInt is set every time a new csv file is loaded. tempPositionIn = -1 indicates that the attribute is not valid for the given cvs
+	       - because an original position is out of range for the csv
+               - because there is no original position and the given localName does not match any of the labels in the CSV
+
+           tempPositionInt is set as follows:
+               - if a DASA has a position, and the position is within range for the given csv, then the temp if the 
+            
+
+         */
+
+        private int    tempPositionInt;
     	private String entity;
     	private String entityLabel;
     	private String attribute;
@@ -68,6 +81,14 @@ public class DataAcquisitionSchemaAttribute {
 
     	public int getPositionInt() {
 	    return positionInt;
+	}
+
+    	public int getTempPositionInt() {
+	    return tempPositionInt;
+	}
+
+    	public void setTempPositionInt(int tempPositionInt) {
+	    this.tempPositionInt = tempPositionInt;
 	}
 
     	public String getEntity() {
