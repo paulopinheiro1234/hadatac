@@ -16,6 +16,7 @@ import org.apache.jena.query.ResultSetRewindable;
 import org.apache.jena.rdf.model.Literal;
 import org.hadatac.utils.Collections;
 import org.hadatac.utils.NameSpaces;
+import org.hadatac.utils.Templates;
 
 import com.google.common.collect.Iterables;
 
@@ -32,7 +33,13 @@ public class SampleCollectionGenerator extends BasicGenerator {
     @Override
 	void initMapping() {
 	mapCol.clear();
-        mapCol.put("studyID", "Study ID");
+		if (this.fileName.startsWith("STD")){
+			mapCol.put("studyID", Templates.STUDYID);
+		} else if (this.fileName.startsWith("SID")){
+			mapCol.put("studyID", Templates.SAMPLESTUDYID);
+		} else {
+			mapCol.put("studyID", "Study ID");
+		}
     }
     
     private String getStudyUri(CSVRecord rec) {

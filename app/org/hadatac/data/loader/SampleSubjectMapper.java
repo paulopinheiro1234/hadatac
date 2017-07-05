@@ -49,6 +49,7 @@ public class SampleSubjectMapper extends BasicGenerator {
 	                   QuerySolution soln = resultsrw.next();
 	                   if(soln.contains("s")){
 	            	     sampleUri = DynamicFunctions.replaceURLWithPrefix(soln.get("s").toString());
+	            	     //System.out.println("Sample URI: " + sampleUri);
 	                   }
 			}
 		} catch (QueryExceptionHTTP e) {

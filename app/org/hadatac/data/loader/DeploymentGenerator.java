@@ -40,7 +40,7 @@ public class DeploymentGenerator extends BasicGenerator {
 	    mapCol.clear();
 	    mapCol.put("DataAcquisitionName", Templates.DATAACQUISITIONNAME);
 	    mapCol.put("Method", Templates.METHOD);
-	    mapCol.put("Study", Templates.STUDYID);
+	    mapCol.put("Study", Templates.DASTUDYID);
 	    mapCol.put("Epi/Lab", Templates.EPILAB);
 	}
 	

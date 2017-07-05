@@ -36,6 +36,7 @@ public class Templates {
     public static String DATAACQUISITIONNAME = ConfigProp.getPropertyValue(TEMPLATE_FILE, "DataAcquisitionName");
     public static String METHOD = ConfigProp.getPropertyValue(TEMPLATE_FILE, "Method");
     public static String DATADICTIONARYNAME = ConfigProp.getPropertyValue(TEMPLATE_FILE, "DataDictionaryName");
+    public static String DASTUDYID = ConfigProp.getPropertyValue(TEMPLATE_FILE, "DAStudyName");
     public static String EPILAB = ConfigProp.getPropertyValue(TEMPLATE_FILE, "Epi/Lab");
     public static String OWNEREMAIL = ConfigProp.getPropertyValue(TEMPLATE_FILE, "OwnerEmail");
 
@@ -58,8 +59,9 @@ public class Templates {
     public static String CODEVALUE = ConfigProp.getPropertyValue(TEMPLATE_FILE, "CodeValue");
     public static String CLASS = ConfigProp.getPropertyValue(TEMPLATE_FILE, "Class");
     
-    // SID Template                                                                                                  
-    public static String SAMPLEID = ConfigProp.getPropertyValue(TEMPLATE_FILE, "sampleID");
+    // SID Template                                                                                                    
+    public static String SAMPLEID = ConfigProp.getPropertyValue(TEMPLATE_FILE, "sampleID");                      
+    public static String SAMPLESTUDYID = ConfigProp.getPropertyValue(TEMPLATE_FILE, "sampleStudyID");
     public static String SAMPLESUFFIX = ConfigProp.getPropertyValue(TEMPLATE_FILE, "sampleSuffix");
     public static String SUBJECTID = ConfigProp.getPropertyValue(TEMPLATE_FILE, "subjectID");  // also in PID                                                                             
     public static String SAMPLETYPE = ConfigProp.getPropertyValue(TEMPLATE_FILE, "sampleType");

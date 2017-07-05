@@ -476,22 +476,28 @@ public class AutoAnnotator extends Controller {
         	bSuccess = commitRows(studyGenerator.createInstitutionRows(), studyGenerator.toString(), 
         			file.getName(), "Agent", true);
         			*/
-
+    	} catch (Exception e) {
+    		System.out.println("Error: annotateStudyIdFile() - Unable to generate study");
+    		AnnotationLog.printException(e, file.getName());
+    		return false;
+		}
+    	try {
     		SampleCollectionGenerator sampleCollectionGenerator = new SampleCollectionGenerator(file);
         	bSuccess = commitRows(sampleCollectionGenerator.createRows(), sampleCollectionGenerator.toString(), 
         			file.getName(), "SampleCollection", true);
 
     	} catch (Exception e) {
+    		System.out.println("Error: annotateStudyIdFile() - Unable to generate Sample Collection");
     		AnnotationLog.printException(e, file.getName());
-    		return false;
-		}
-    	
+    		//return false;
+		}    	
     	try {
         	AgentGenerator agentGenerator = new AgentGenerator(file);
         	bSuccess = commitRows(agentGenerator.createRows(), agentGenerator.toString(), 
         			file.getName(), "Agent", true);
         	
     	} catch (Exception e) {
+    		System.out.println("Error: annotateStudyIdFile() - Unable to generate Agent");
     		AnnotationLog.printException(e, file.getName());
     		return false;
 		}
@@ -509,25 +515,42 @@ public class AutoAnnotator extends Controller {
         	//bSuccess = commitRows(sampleGenerator.createCollectionRows(), sampleGenerator.toString(), 
         	//		file.getName(), "SampleCollection", true);
     	} catch (Exception e) {
-	    e.printStackTrace();
+    		System.out.println("Error: annotateSampleIdFile() - Unable to generate Sample");
+    		e.printStackTrace();
     		AnnotationLog.printException(e, file.getName());
     		return false;
 		}
-		
+    	try {
+    		SampleCollectionGenerator sampleCollectionGenerator = new SampleCollectionGenerator(file);
+        	commitRows(sampleCollectionGenerator.createRows(), sampleCollectionGenerator.toString(), 
+        			file.getName(), "SampleCollection", true);
+
+    	} catch (Exception e) {
+    		System.out.println("Error: annotateSampleIdFile() - Unable to generate Sample Collection");
+    		AnnotationLog.printException(e, file.getName());
+    		//return false;
+		}    	
 		return bSuccess;
 	}
 	
 	public static boolean annotateSubjectIdFile(File file) {
 		boolean bSuccess = true;
-    	try {
-    		SubjectGenerator subjectGenerator = new SubjectGenerator(file);
+		SubjectGenerator subjectGenerator = new SubjectGenerator(file);
+		try {
         	bSuccess = commitRows(subjectGenerator.createRows(), subjectGenerator.toString(), 
         			file.getName(), "Subject", true);
-        	
+    	}
+    	catch (Exception e) {
+    		System.out.println("Error: annotateSubjectIdFile() - Unable to generate Subject");
+        	AnnotationLog.printException(e, file.getName());
+        	return false;
+    	}
+        try {
         	subjectGenerator = new SubjectGenerator(file);
         	bSuccess = commitRows(subjectGenerator.createCohortRows(), subjectGenerator.toString(), 
         			file.getName(), "Cohort", true);
     	} catch (Exception e) {
+    		System.out.println("Error: annotateSubjectIdFile() - Unable to generate Cohort");
     		AnnotationLog.printException(e, file.getName());
     		return false;
 		}

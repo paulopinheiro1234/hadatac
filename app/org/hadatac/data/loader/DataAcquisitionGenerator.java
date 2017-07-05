@@ -40,7 +40,7 @@ public class DataAcquisitionGenerator extends BasicGenerator {
 	mapCol.clear();
         mapCol.put("DataAcquisitionName", Templates.DATAACQUISITIONNAME);
         mapCol.put("Method", Templates.METHOD);
-        mapCol.put("studyID", Templates.STUDYID);
+        mapCol.put("studyID", Templates.DASTUDYID);
         mapCol.put("DataDictionaryName", Templates.DATADICTIONARYNAME);
         mapCol.put("Epi/Lab", Templates.EPILAB);
         mapCol.put("OwnerEmail", Templates.OWNEREMAIL);
