@@ -2,6 +2,7 @@ package org.hadatac.entity.pojo;
 
 import java.util.List;
 import java.util.ArrayList;
+import java.util.Comparator;
 
 import org.apache.jena.query.Query;
 import org.apache.jena.query.QueryExecution;
@@ -13,40 +14,54 @@ import org.apache.jena.query.ResultSetFactory;
 import org.apache.jena.query.ResultSetRewindable;
 import org.hadatac.utils.Collections;
 import org.hadatac.utils.NameSpaces;
+import org.hadatac.utils.FirstLabel;
+import org.hadatac.entity.pojo.DataAcquisitionSchemaObject;
+import org.hadatac.entity.pojo.DataAcquisitionSchemaEvent;
+import org.hadatac.metadata.loader.ValueCellProcessing;
 
 public class DataAcquisitionSchemaAttribute {
 
-        private String uri;
-        private String localName;
-        private String position;
-        private int    positionInt;
+    private String uri;
+    private String localName;
+    private String label;
+    private String position;
+    private int    positionInt;
+    
+    /* 
+       tempPositionInt is set every time a new csv file is loaded. tempPositionIn = -1 indicates that the attribute is not valid for the given cvs
+         - because an original position is out of range for the csv
+         - because there is no original position and the given localName does not match any of the labels in the CSV
+       
+       tempPositionInt is set as follows:
+         - if a DASA has a position, and the position is within range for the given csv, then the temp if the 
+       
+    */
 
-        /* 
-	   tempPositionInt is set every time a new csv file is loaded. tempPositionIn = -1 indicates that the attribute is not valid for the given cvs
-	       - because an original position is out of range for the csv
-               - because there is no original position and the given localName does not match any of the labels in the CSV
-
-           tempPositionInt is set as follows:
-               - if a DASA has a position, and the position is within range for the given csv, then the temp if the 
-            
-
-         */
-
-        private int    tempPositionInt;
-    	private String entity;
-    	private String entityLabel;
-    	private String attribute;
-    	private String attributeLabel;
-    	private String unit;
-    	private String unitLabel;
-        private String daso;
-        private String dase;
-    	
-    public DataAcquisitionSchemaAttribute(String uri, String localName, String position, String entity, String entityLabel, 
-                                          String attribute, String attributeLabel, String unit, String unitLabel, 
-                                          String daso, String dase) {
+    private int    tempPositionInt;
+    private String entity;
+    private String entityLabel;
+    private String attribute;
+    private String attributeLabel;
+    private String unit;
+    private String unitLabel;
+    private String daseUri;
+    private String dasoUri;
+    
+    public DataAcquisitionSchemaAttribute(String uri, 
+					  String localName, 
+					  String label, 
+					  String position, 
+					  String entity, 
+					  String entityLabel, 
+                                          String attribute, 
+					  String attributeLabel, 
+					  String unit, 
+					  String unitLabel, 
+                                          String daseUri, 
+					  String dasoUri) {
 	    this.uri = uri;
 	    this.localName = localName;
+	    this.label = label;
 	    this.position = position;
 	    try {
 		if (position != null && !position.equals("")) {
@@ -63,8 +78,8 @@ public class DataAcquisitionSchemaAttribute {
 	    this.attributeLabel = attributeLabel;
 	    this.unit = unit;
 	    this.unitLabel = unitLabel;
-            this.daso = daso;
-            this.dase = dase;
+            this.daseUri = daseUri;
+            this.dasoUri = dasoUri;
 	}
     	
         public String getUri() {
@@ -73,6 +88,10 @@ public class DataAcquisitionSchemaAttribute {
 
         public String getLocalName() {
 	    return localName;
+	}
+
+        public String getLabel() {
+	    return label;
 	}
 
     	public String getPosition() {
@@ -96,6 +115,9 @@ public class DataAcquisitionSchemaAttribute {
 	}
 
     	public String getEntityLabel() {
+	    if (entityLabel.equals("")) {
+		return ValueCellProcessing.replaceNameSpaceEx(entity);
+	    }
 	    return entityLabel;
 	}
 
@@ -104,6 +126,9 @@ public class DataAcquisitionSchemaAttribute {
 	}
 
     	public String getAttributeLabel() {
+	    if (attributeLabel.equals("")) {
+		return ValueCellProcessing.replaceNameSpaceEx(attribute);
+	    }
 	    return attributeLabel;
 	}
 
@@ -112,15 +137,32 @@ public class DataAcquisitionSchemaAttribute {
 	}
         
     	public String getUnitLabel() {
+	    if (unitLabel.equals("")) {
+		return ValueCellProcessing.replaceNameSpaceEx(unit);
+	    }
 	    return unitLabel;
 	}
         
     	public String getObjectUri() {
-	    return daso;
+	    return dasoUri;
+	}
+        
+    	public DataAcquisitionSchemaObject getObject() {
+	    if (dasoUri == null || dasoUri.equals("")) {
+		return null;
+	    }
+	    return DataAcquisitionSchemaObject.find(dasoUri);
 	}
         
     	public String getEventUri() {
-	    return dase;
+	    return daseUri;
+	}
+        
+    	public DataAcquisitionSchemaEvent getEvent() {
+	    if (daseUri == null || daseUri.equals("")) {
+		return null;
+	    }
+	    return DataAcquisitionSchemaEvent.find(daseUri);
 	}
         
         public static List<DataAcquisitionSchemaAttribute> findBySchema (String schemaUri) {
@@ -130,18 +172,19 @@ public class DataAcquisitionSchemaAttribute {
 	     }
 	     List<DataAcquisitionSchemaAttribute> attributes = new ArrayList<DataAcquisitionSchemaAttribute>();
     	     String queryString = NameSpaces.getInstance().printSparqlNameSpaceList() + 
-    			"SELECT ?uri ?hasPosition ?hasEntity ?hasAttribute ?hasUnit ?hasDASO ?hasDASE ?hasSource ?isPIConfirmed WHERE { " + 
-    			"   ?uri a hasco:DASchemaAttribute . " + 
-    			"   ?uri hasco:partOfSchema " + schemaUri + " .  " + 
-    			"   ?uri hasco:hasPosition ?hasPosition .  " + 
-    			"   OPTIONAL { ?uri hasco:hasEntity ?hasEntity } . " + 
-    			"   OPTIONAL { ?uri hasco:hasAttribute ?hasAttribute } . " + 
-    			"   OPTIONAL { ?uri hasco:hasUnit ?hasUnit } . " + 
-    			"   OPTIONAL { ?uri hasco:isAttributeOf ?hasDASO } . " + 
-    			"   OPTIONAL { ?uri hasco:hasEvent ?hasDASE } . " + 
-    			"   OPTIONAL { ?uri hasco:hasSource ?hasSource } . " + 
-    			"   OPTIONAL { ?uri hasco:isPIConfirmed ?isPIConfirmed } . " + 
-    			"}";
+		 "SELECT ?uri ?hasPosition ?hasEntity ?hasAttribute " + 
+		 " ?hasUnit ?hasDASO ?hasDASE ?hasSource ?isPIConfirmed WHERE { " + 
+		 "    ?uri a hasco:DASchemaAttribute . " + 
+		 "    ?uri hasco:partOfSchema " + schemaUri + " .  " + 
+		 "    ?uri hasco:hasPosition ?hasPosition .  " + 
+		 "    OPTIONAL { ?uri hasco:hasEntity ?hasEntity } . " + 
+		 "    OPTIONAL { ?uri hasco:hasAttribute ?hasAttribute } . " + 
+		 "    OPTIONAL { ?uri hasco:hasUnit ?hasUnit } . " + 
+		 "    OPTIONAL { ?uri hasco:hasEvent ?hasDASE } . " + 
+		 "    OPTIONAL { ?uri hasco:isAttributeOf ?hasDASO } . " + 
+		 "    OPTIONAL { ?uri hasco:hasSource ?hasSource } . " + 
+		 "    OPTIONAL { ?uri hasco:isPIConfirmed ?isPIConfirmed } . " + 
+		 "} ORDER BY ?hasPosition ";
     	     Query query = QueryFactory.create(queryString);
 		
     	     QueryExecution qexec = QueryExecutionFactory.sparqlService(
@@ -157,6 +200,7 @@ public class DataAcquisitionSchemaAttribute {
 		
 	     String uriStr = "";
 	     String localNameStr = "";
+	     String labelStr = "";
 	     String positionStr = "";
 	     String entityStr = "";
 	     String entityLabelStr = "";
@@ -164,8 +208,8 @@ public class DataAcquisitionSchemaAttribute {
 	     String attributeLabelStr = "";
 	     String unitStr = "";
 	     String unitLabelStr = "";
-	     String dasoStr = "";
-	     String daseStr = "";
+	     String dasoUriStr = "";
+	     String daseUriStr = "";
 		  
 	     while (resultsrw.hasNext()) {
 		      QuerySolution soln = resultsrw.next();
@@ -175,10 +219,12 @@ public class DataAcquisitionSchemaAttribute {
 			     if (soln.getResource("uri") != null && soln.getResource("uri").getURI() != null) {
 			         uriStr = soln.getResource("uri").getURI();
 			         localNameStr = soln.getResource("uri").getLocalName();
+				 labelStr = FirstLabel.getLabel(uriStr);
 			     }
 			 } catch (Exception e1) {
 			     uriStr = "";
 			     localNameStr = "";
+			     labelStr = "";
 			 }
 
 			 try {
@@ -192,62 +238,54 @@ public class DataAcquisitionSchemaAttribute {
 			 try {
 			     if (soln.getResource("hasEntity") != null && soln.getResource("hasEntity").getURI() != null) {
 			         entityStr = soln.getResource("hasEntity").getURI();
+				 entityLabelStr = FirstLabel.getLabel(entityStr);
 			     }
 			 } catch (Exception e1) {
 			     entityStr = "";
-			 }
-
-			 entityLabelStr = DataAcquisitionSchema.getFirstLabel(entityStr); 
-			 if (entityLabelStr.equals("")) {
-			     entityLabelStr = entityStr.substring(entityStr.indexOf("#") + 1);
+			     entityLabelStr = "";
 			 }
 
 			 try {
 			     if (soln.getResource("hasAttribute") != null && soln.getResource("hasAttribute").getURI() != null) {
 			         attributeStr = soln.getResource("hasAttribute").getURI();
+				 attributeLabelStr = FirstLabel.getLabel(attributeStr);
 			     }
 			 } catch (Exception e1) {
 			     attributeStr = "";
-			 }
-
-			 attributeLabelStr = DataAcquisitionSchema.getFirstLabel(attributeStr); 
-			 if (attributeLabelStr.equals("")) {
-			     attributeLabelStr = attributeStr.substring(attributeStr.indexOf("#") + 1);
+			     attributeLabelStr = "";
 			 }
 
 			 try {
 			     if (soln.getResource("hasUnit") != null && soln.getResource("hasUnit").getURI() != null) {
 				 unitStr = soln.getResource("hasUnit").getURI();
+				 unitLabelStr = FirstLabel.getLabel(unitStr);
 			     }
 			 } catch (Exception e1) {
 			     unitStr = "";
-			 }
-
-			 unitLabelStr = DataAcquisitionSchema.getFirstLabel(unitStr); 
-			 if (unitLabelStr.equals("")) {
-			     unitLabelStr = unitStr.substring(unitStr.indexOf("#") + 1);
+			     unitLabelStr = "";
 			 }
 
 			 try {
 			     if (soln.getResource("hasDASO") != null && soln.getResource("hasDASO").getURI() != null) {
-				 dasoStr = soln.getResource("hasDASO").getURI();
+				 dasoUriStr = soln.getResource("hasDASO").getURI();
 			     }
 			 } catch (Exception e1) {
-			     dasoStr = "";
+			     dasoUriStr = "";
 			 }
 
 			 try {
 			     if (soln.getResource("hasDASE") != null && soln.getResource("hasDASE").getURI() != null) {
-				 daseStr = soln.getResource("hasDASE").getURI();
+				 daseUriStr = soln.getResource("hasDASE").getURI();
 			     }
 			 } catch (Exception e1) {
-			     daseStr = "";
+			     daseUriStr = "";
 			 }
 
 			 if (!uriStr.equals("") && !localNameStr.equals("")) {
 			     DataAcquisitionSchemaAttribute attr = new DataAcquisitionSchemaAttribute(
 			        uriStr,
 			        localNameStr,
+				labelStr,
 				positionStr,
 				entityStr,
 				entityLabelStr,
@@ -255,8 +293,8 @@ public class DataAcquisitionSchemaAttribute {
 				attributeLabelStr,
 				unitStr,
 				unitLabelStr,
-				dasoStr,
-				daseStr
+				daseUriStr,
+				dasoUriStr
 			     );
 			     attributes.add(attr);
 			 } else {
@@ -265,6 +303,7 @@ public class DataAcquisitionSchemaAttribute {
                   }
 
 	     }
+	     attributes.sort(Comparator.comparing(DataAcquisitionSchemaAttribute::getPositionInt));
 	     return attributes;
 	}
     

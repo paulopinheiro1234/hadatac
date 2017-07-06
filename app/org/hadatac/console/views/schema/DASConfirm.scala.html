@@ -1,0 +1,16 @@
+@(message: String, data : org.hadatac.console.models.DataAcquisitionSchemaForm)
+
+@import org.hadatac.console.views.html._
+@import org.hadatac.utils._
+@import org.hadatac.console.controllers.schema._
+
+@main(message) {
+    <h1>@message</h1>
+
+	<ul>
+		<li><b>Name</b>: @data.getLabel()</li>
+	</ul>
+
+    <a href="@org.hadatac.console.controllers.schema.routes.DASManagement.index()" class="btn btn-primary" role="button">Back to DA Schema Management</a>
+
+}

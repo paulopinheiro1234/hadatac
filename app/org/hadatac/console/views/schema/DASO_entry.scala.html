@@ -1,0 +1,17 @@
+@(mode: String, daso : org.hadatac.entity.pojo.DataAcquisitionSchemaObject)
+
+@import java.net._
+@import org.hadatac.utils._
+
+<tr>
+   <td>@if(daso != null && daso.getLabel() != null) { <b> @daso.getLabel() </b>}</td> 
+   <!-- <td>@if(daso != null && daso.getUri() != null) { @daso.getUriNamespace() }</td> --> 
+   <td>@if(daso != null && daso.getEntityLabel() != null) { @daso.getEntityLabel() }</td> 
+   <td>@if(daso != null && daso.getRole() != null) { @daso.getRole() }</td> 
+   <td>@if(daso != null && daso.getInRelationToLabel() != null) { @daso.getInRelationToLabel() }</td> 
+   <td>@if(daso != null && daso.getRelationLabel() != null) { @daso.getRelationLabel() }</td> 
+   @if(mode == "edit") {
+      <td><a href="" class="btn-sm btn-primary" role="button">Edit</a>
+          <a href="" class="btn-sm btn-primary" role="button">Delete</a></td>
+   }
+</tr>

@@ -3,51 +3,44 @@ package org.hadatac.data.loader;
 import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
-
+import java.util.List;
 import org.apache.commons.csv.CSVRecord;
-
 import org.apache.commons.io.FileUtils;
-
 import play.Play;
 
 public class DASchemaGenerator extends BasicGenerator {
-	final String kbPrefix = Play.application().configuration().getString("hadatac.community.ont_prefix") + "-kb:";
-	String startTime = "";
-	String SDDName = "";
-	
-	public DASchemaGenerator(File file) {
-		super(file);
-		this.SDDName = file.getName();
-                System.out.println("Inside DASchemaGenerator constructor()");
-                System.out.println("Inside DASchemaGenerator file inside constructor: " + SDDName);
-	}
-	
-	@Override
-	void initMapping() {
-            int pos = fileName.indexOf("PS") + 2;
-	    System.out.println("Inside initMapping: " + fileName.substring(pos, pos + 1));
-		mapCol.clear();
-                mapCol.put("Study", fileName.substring(pos, pos + 1));
-	}
-	
-    private String getLabel() {
-    	return "Schema for Study " + mapCol.get("Study") + " EPI Data Acquisitions";
+    final String kbPrefix = Play.application().configuration().getString("hadatac.community.ont_prefix") + "-kb:";
+    String startTime = "";
+    String SDDName = "";
+    
+    public DASchemaGenerator(File file) {
+	super(file);
     }
     
-    private String getComment() {
-    	return "";
+    @Override
+    void initMapping() {
+	mapCol.clear();
+    }
+    
+    @Override
+    public List< Map<String, Object> > createRows() throws Exception {
+	SDDName = fileName.replace("SDD-","").replace(".csv","");
+    	rows.clear();
+    	int row_number = 0;
+	for (CSVRecord record : records) {
+	    rows.add(createRow(record, ++row_number));
+	    break;
+	}
+     	return rows;
     }
     
     @Override
     Map<String, Object> createRow(CSVRecord rec, int row_number) throws Exception {
-        System.out.println("Inside DASchemaGenerator.createRow()");
     	Map<String, Object> row = new HashMap<String, Object>();
     	row.put("hasURI", kbPrefix + "DAS-" + SDDName);
     	row.put("a", "hasco:DASchema");
-    	row.put("rdfs:label", getLabel());
-    	row.put("rdfs:comment", getComment());
-    	row.put("hasco:isSchemaOf", kbPrefix + "STD-" + mapCol.get("Study"));
-    	
+    	row.put("rdfs:label", "Schema for EPI Data Acquisition");
+    	row.put("rdfs:comment", "");
     	return row;
     }
 }

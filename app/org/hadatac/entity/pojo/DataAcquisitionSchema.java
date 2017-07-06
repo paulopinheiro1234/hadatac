@@ -1,7 +1,10 @@
 package org.hadatac.entity.pojo;
 
-import java.util.List;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 
 import org.apache.jena.query.Query;
 import org.apache.jena.query.QueryExecution;
@@ -11,19 +14,43 @@ import org.apache.jena.query.QuerySolution;
 import org.apache.jena.query.ResultSet;
 import org.apache.jena.query.ResultSetFactory;
 import org.apache.jena.query.ResultSetRewindable;
+import org.apache.jena.update.UpdateExecutionFactory;
+import org.apache.jena.update.UpdateFactory;
+import org.apache.jena.update.UpdateProcessor;
+import org.apache.jena.update.UpdateRequest;
 import org.hadatac.utils.Collections;
+import org.hadatac.utils.ConfigProp;
 import org.hadatac.utils.NameSpaces;
+import org.hadatac.utils.FirstLabel;
 import org.hadatac.metadata.loader.ValueCellProcessing;
 import org.hadatac.entity.pojo.DataAcquisitionSchemaAttribute;
 import org.hadatac.entity.pojo.DataAcquisitionSchemaObject;
+import org.labkey.remoteapi.CommandException;
+
+import org.hadatac.console.controllers.AuthApplication;
+import org.hadatac.console.controllers.triplestore.routes;
+import org.hadatac.metadata.loader.LabkeyDataHandler;
+import org.hadatac.metadata.loader.ValueCellProcessing;
+
+import be.objectify.deadbolt.java.actions.Group;
+import be.objectify.deadbolt.java.actions.Restrict;
+import play.Play;
 
 public class DataAcquisitionSchema {
 
+    public static String INDENT1 = "     ";
+    public static String INSERT_LINE1 = "INSERT DATA {  ";
+    public static String DELETE_LINE1 = "DELETE WHERE {  ";
+    public static String LINE3 = INDENT1 + "a         hasco:DataAcquisitionSchema;  ";
+    public static String DELETE_LINE3 = INDENT1 + " ?p ?o . ";
+    public static String LINE_LAST = "}  ";
+    public static String PREFIX = "DAS-";
+
     private String uri = "";
+    private String label = "";
     private List<DataAcquisitionSchemaAttribute> attributes = null;
     private List<DataAcquisitionSchemaObject> objects = null;
     private List<DataAcquisitionSchemaEvent> events = null;
-    private int valueColumn;
     private int timestampColumn;
     private int timeInstantColumn;
     private int idColumn;
@@ -33,15 +60,41 @@ public class DataAcquisitionSchema {
     private int inRelationToColumn;
     
     public DataAcquisitionSchema() {
-       this.timestampColumn = -1;
-       this.timeInstantColumn = -1;
-       this.elevationColumn = -1;
-       this.idColumn = -1;
-       this.entityColumn = -1;
-       this.unitColumn = -1;
-       this.inRelationToColumn = -1;
+	this.timestampColumn = -1;
+	this.timeInstantColumn = -1;
+	this.elevationColumn = -1;
+	this.idColumn = -1;
+	this.entityColumn = -1;
+	this.unitColumn = -1;
+	this.inRelationToColumn = -1;
     }
-	
+    
+    public DataAcquisitionSchema(String uri, String label) {
+	this();
+	this.uri = uri;
+	this.label = label;
+    }
+    
+    public String getUri() {
+    	return uri.replace("<","").replace(">","");
+    }
+
+    public String getUriNamespace() {
+	return ValueCellProcessing.replaceNameSpaceEx(uri.replace("<","").replace(">",""));
+    }
+
+    public void setUri(String uri) {
+    	this.uri = uri;
+    }
+
+    public String getLabel() {
+    	return label;
+    }
+
+    public void setLabel(String label) {
+	this.label = label;
+    }
+
     public int getTimestampColumn() {
 	return timestampColumn;
     }
@@ -98,12 +151,25 @@ public class DataAcquisitionSchema {
 	this.inRelationToColumn = inRelationToColumn;
     }
 
-    public String getUri() {
-    	return uri;
+    public int getTotalDASA() {
+	if (attributes == null) {
+	    return -1;
+	}
+    	return attributes.size();
     }
 
-    public void setUri(String uri) {
-    	this.uri = uri;
+    public int getTotalDASE() {
+	if (events == null) {
+	    return -1;
+	}
+    	return events.size();
+    }
+
+    public int getTotalDASO() {
+	if (objects == null) {
+	    return -1;
+	}
+    	return objects.size();
     }
 
     public List<DataAcquisitionSchemaAttribute> getAttributes() {
@@ -202,8 +268,8 @@ public class DataAcquisitionSchema {
     }
     
     public static DataAcquisitionSchema find(String schemaUri) {
-    	System.out.println("Looking for data acquisition schema " + schemaUri);
-    	DataAcquisitionSchema schema = new DataAcquisitionSchema();
+	System.out.println("Looking for data acquisition schema " + schemaUri);
+	DataAcquisitionSchema schema = new DataAcquisitionSchema();
 	if (schemaUri == null || schemaUri.equals("")) {
 	    System.out.println("[ERROR] DataAcquisitionSchema URI blank or null.");
 	    return schema;
@@ -211,27 +277,28 @@ public class DataAcquisitionSchema {
 	if (schemaUri.startsWith("http")) {
 	    schemaUri = "<" + schemaUri + ">";
 	}
-    	String queryString = NameSpaces.getInstance().printSparqlNameSpaceList() + 
-    			" ASK { " + schemaUri + " a hasco:DASchema . } ";
-    	Query query = QueryFactory.create(queryString);
-		
-    	QueryExecution qexec = QueryExecutionFactory.sparqlService(
-			Collections.getCollectionsName(Collections.METADATA_SPARQL), query);
-    	boolean uriExist = qexec.execAsk();
+	String queryString = NameSpaces.getInstance().printSparqlNameSpaceList() + 
+	    " ASK { " + schemaUri + " a hasco:DASchema . } ";
+	Query query = QueryFactory.create(queryString);
+	
+	QueryExecution qexec = QueryExecutionFactory.sparqlService(Collections.getCollectionsName(Collections.METADATA_SPARQL), query);
+	boolean uriExist = qexec.execAsk();
         qexec.close();
-		
-	if (uriExist) {
-	    schema.setUri(schemaUri);
-	    schema.setAttributes(DataAcquisitionSchemaAttribute.findBySchema(schemaUri));
-	    schema.setObjects(DataAcquisitionSchemaObject.findBySchema(schemaUri));
-	    schema.setEvents(DataAcquisitionSchemaEvent.findBySchema(schemaUri));
-	    System.out.println("[OK] DataAcquisitionSchema " + schemaUri + " exists. " + 
-                               "It has " + schema.getAttributes().size() + " attributes, " + 
-                               schema.getObjects().size() + " objects, and " + 
-			       schema.getEvents().size() + " events.");
-	} else {
-	    System.out.println("[ERROR] DataAcquisitionSchema could not be found.");
+	
+	if (!uriExist) {
+	    System.out.println("[WARNING] DataAcquisitionSchema. Could not find schema for uri: " + schemaUri);
+	    return schema;
 	}
+	
+	schema.setUri(schemaUri);
+	schema.setLabel(FirstLabel.getLabel(schemaUri));
+	schema.setAttributes(DataAcquisitionSchemaAttribute.findBySchema(schemaUri));
+	schema.setObjects(DataAcquisitionSchemaObject.findBySchema(schemaUri));
+	schema.setEvents(DataAcquisitionSchemaEvent.findBySchema(schemaUri));
+	System.out.println("[OK] DataAcquisitionSchema " + schemaUri + " exists. " + 
+			   "It has " + schema.getAttributes().size() + " attributes, " + 
+			   schema.getObjects().size() + " objects, and " + 
+			   schema.getEvents().size() + " events.");
 	return schema;
     }
     	
@@ -250,46 +317,57 @@ public class DataAcquisitionSchema {
 	while (resultsrw.hasNext()) {
 	    QuerySolution soln = resultsrw.next();
 	    if (soln != null && soln.getResource("uri").getURI() != null) { 
-		DataAcquisitionSchema schema = new DataAcquisitionSchema();
-		schema.setUri(soln.getResource("uri").getURI());
+		DataAcquisitionSchema schema = DataAcquisitionSchema.find(soln.getResource("uri").getURI());
 		schemas.add(schema);
 	    }
 	}
 	return schemas;
     }
 
-    public static String getFirstLabel (String uri) {
-	if (uri.startsWith("http")) {
-	    uri = "<" + uri + ">";
-	}
-	String queryString = NameSpaces.getInstance().printSparqlNameSpaceList() + 
-	    "SELECT ?label WHERE { " + 
-	    "  " + uri + " rdfs:label ?label ." + 
-	    "}";
-	Query query = QueryFactory.create(queryString);
-	QueryExecution qexec = QueryExecutionFactory.sparqlService(
-				    Collections.getCollectionsName(Collections.METADATA_SPARQL), query);
-	ResultSet results = qexec.execSelect();
-	ResultSetRewindable resultsrw = ResultSetFactory.copyResults(results);
-	qexec.close();
-	
-	String labelStr = "";
-	QuerySolution soln;
-	while (resultsrw.hasNext()) {
-	    soln = resultsrw.next();
-	    try {
-		if (soln.getLiteral("label") != null && soln.getLiteral("label").getString() != null) {
-		    labelStr = soln.getLiteral("label").getString();
-		}
-	    } catch (Exception e1) {
-		labelStr = "";
-	    }
-	    if (!labelStr.equals("")) {
-		break;
-	    }
-	}
-	return labelStr;
-	
+    public static DataAcquisitionSchema create(String uri) {
+	DataAcquisitionSchema das = new DataAcquisitionSchema();
+	das.setUri(uri);
+	return das;
     }
     
+    public void save() {
+	String insert = "";
+	insert += NameSpaces.getInstance().printSparqlNameSpaceList();
+    	insert += INSERT_LINE1;
+    	insert += this.getUri() + " a hasco:DASchema . ";
+    	insert += this.getUri() + " rdfs:label  \"" + this.getLabel() + "\" . ";
+    	insert += LINE_LAST;
+	System.out.println(insert);
+    	UpdateRequest request = UpdateFactory.create(insert);
+        UpdateProcessor processor = UpdateExecutionFactory.createRemote(
+				      request, Collections.getCollectionsName(Collections.METADATA_UPDATE));
+        processor.execute();
+    }
+    
+    @Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
+    public int saveToLabKey(String user_name, String password) throws CommandException {
+	String site = ConfigProp.getPropertyValue("labkey.config", "site");
+        String path = "/" + ConfigProp.getPropertyValue("labkey.config", "folder");
+    	LabkeyDataHandler loader = new LabkeyDataHandler(site, user_name, password, path);
+    	List< Map<String, Object> > rows = new ArrayList< Map<String, Object> >();
+    	Map<String, Object> row = new HashMap<String, Object>();
+    	row.put("hasURI", ValueCellProcessing.replaceNameSpaceEx(getUri()));
+    	row.put("a", "hasco:DataAcquisitionSchema");
+    	row.put("rdfs:label", getLabel());
+    	rows.add(row);
+    	return loader.insertRows("DASchema", rows);
+    }
+
+    public void delete() {
+	String query = "";
+	query += NameSpaces.getInstance().printSparqlNameSpaceList();
+        query += DELETE_LINE1;
+    	query += "<" + this.getUri() + ">  ";
+        query += DELETE_LINE3;
+    	query += LINE_LAST;
+    	UpdateRequest request = UpdateFactory.create(query);
+        UpdateProcessor processor = UpdateExecutionFactory.createRemote(request, Collections.getCollectionsName(Collections.METADATA_UPDATE));
+        processor.execute();
+    }
+	
 }

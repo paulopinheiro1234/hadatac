@@ -1,0 +1,19 @@
+@(mode: String, dasa : org.hadatac.entity.pojo.DataAcquisitionSchemaAttribute)
+
+@import java.net._
+@import org.hadatac.utils._
+
+<tr>
+   <td>@if(dasa != null && dasa.getLabel() != null) { <b> @dasa.getLabel() </b> }</td> 
+   <td>@if(dasa != null && dasa.getPosition() != null) { @dasa.getPosition() }</td> 
+   <td>@if(dasa != null && dasa.getObject() != null && dasa.getObject().getLabel() != null) { @dasa.getObject.getLabel() }</td> 
+   <td>@if(dasa != null && dasa.getEntityLabel() != null) { @dasa.getEntityLabel() }</td> 
+   <td>@if(dasa != null && dasa.getAttributeLabel() != null) { @dasa.getAttributeLabel() }</td> 
+   <td>@if(dasa != null && dasa.getUnitLabel() != null) { @dasa.getUnitLabel() }</td> 
+   <td>@if(dasa != null && dasa.getEvent() != null && dasa.getEvent().getLabel() != null) { @dasa.getEvent().getLabel() }</td> 
+   @if(mode == "edit") {
+      <td><a href="" class="btn-sm btn-primary" role="button">Edit</a>
+          <a href="" class="btn-sm btn-primary" role="button">Delete</a></td>
+   }
+ 
+</tr>

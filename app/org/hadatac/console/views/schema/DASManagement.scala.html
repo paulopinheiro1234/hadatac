@@ -1,0 +1,48 @@
+@(results : List[org.hadatac.entity.pojo.DataAcquisitionSchema])
+
+@import helper._
+@import org.hadatac.console.views.html._
+@import org.hadatac.utils._
+
+@main("Data Acquisition Schema Management") {
+
+    <h3>Data Acquisition Schema Management</h3>
+    
+    <h4>Management options</h4>
+
+    <div class="container-fluid">
+      <div class="row">
+         <div class="navbar-collapse collapse navbar-secondary">
+          	<a href="@org.hadatac.console.controllers.schema.routes.NewDAS.index()" class="btn-sm btn-primary" role="button">Create Data Acquisition Schema</a>
+         </div>
+      </div>
+   </div>
+
+   <hr>
+
+   <h4>Existing Data Acquisition Schemas</h4>
+   
+    <div class="container-fluid">
+        <table class="table">
+            <thead>
+                 <tr>
+                    <th>Name</th>
+		    <th>No. Attributes</th>
+		    <th>No. Events</th>
+                    <th>No. Assoc. Object</th>
+                    <th>Operations</th>
+                 </tr>
+            </thead>
+            <tbody>
+              @for(das <- results){
+                  @DAS_entry(das)
+              }
+            </tbody>
+        </table>
+ 
+        @mainButton(false)
+
+    </div>
+ 
+
+}

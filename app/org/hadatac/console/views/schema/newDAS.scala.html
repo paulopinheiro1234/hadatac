@@ -1,0 +1,51 @@
+@()
+
+@import helper._
+@import org.hadatac.utils._
+@import org.hadatac.console.views.html._
+@import org.hadatac.console.views.html.schema._
+@import org.hadatac.console.controllers.schema._
+@import org.hadatac.console.controllers._
+
+@main("New Data Acquisition Schema") {
+
+	<script type="text/javascript">
+	   function checkform() {
+	      var cansubmit = true;
+	
+	      if (document.getElementById('label').value.length == 0) {
+	          cansubmit = false;
+	      }
+	
+	      if (cansubmit) {
+	          document.getElementById('submitbutton').disabled = false;
+	      } else {
+	          document.getElementById('submitbutton').disabled = 'disabled';
+	      }
+	   }
+	</script>
+
+
+  <div class="container">
+    <h2>New Data Acquisition Schema</h2>
+
+    <form class="form-horizontal" name="newDAS" method="post" action="@org.hadatac.console.controllers.schema.routes.NewDAS.processForm">
+	
+ 	<div class="form-group">
+		<label>Name:</label>
+ 		<input type="text" class="form-control col-sm-6" name="label" id="label" onchange="checkform()" >
+ 	</div>
+     
+      <div class="form-group" class="col-sm-6 col-offset-3">
+          <input class="btn btn-success" role="button" id="submitbutton" type="submit" value="Create" disabled="disabled" />
+          <p> The created data Acquisition Schema will be saved in LabKey</p>
+      </div>
+      
+      <div class="form-group" class="col-sm-6 col-offset-3">
+	<a href="@org.hadatac.console.controllers.schema.routes.DASManagement.index()" class="btn btn-primary" role="button">Back to DA Schema Management</a>
+      </div>
+
+   </form>
+  </div>
+
+}

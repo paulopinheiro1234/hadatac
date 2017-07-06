@@ -20,39 +20,36 @@ import org.apache.commons.collections.list.SetUniqueList;
 import org.apache.commons.csv.CSVRecord;
 
 public class DASchemaEventGenerator extends BasicGenerator {
-	final String kbPrefix = Play.application().configuration().getString("hadatac.community.ont_prefix") + "-kb:";
-	String startTime = "";
-	String SDDName = "";
-	List<String> timeList = new ArrayList<String>();
-	HashMap<String, String> codeMap;
-	String study_id = "";
+
+    final String kbPrefix = Play.application().configuration().getString("hadatac.community.ont_prefix") + "-kb:";
+    String startTime = "";
+    String SDDName = "";
+    List<String> timeList = new ArrayList<String>();
+    HashMap<String, String> codeMap;
+    
+    public DASchemaEventGenerator(File file) {
+	super(file);
 	
-	public DASchemaEventGenerator(File file) {
-		super(file);
-		this.SDDName = file.getName();
-		this.codeMap = AutoAnnotator.codeMappings;
-		this.study_id = AutoAnnotator.study_id;
-		
-		try {
-	        BufferedReader br = new BufferedReader(new FileReader(file));
-	        String line =  null;
-	
-	        while((line = br.readLine()) != null){
-	            String str[] = line.split(",");
-	            if (str[4].length() > 0){
-	            	timeList.add(str[4]);
-//	            System.out.println(str[0] + "-----" + str[5]);
-	        	}
-	        }
-			br.close();
-		} catch (Exception e) {
-			
+	try {
+	    BufferedReader br = new BufferedReader(new FileReader(file));
+	    String line =  null;
+	    
+	    while((line = br.readLine()) != null){
+		String str[] = line.split(",");
+		if (str[4].length() > 0){
+		    timeList.add(str[4]);
+		    //	            System.out.println(str[0] + "-----" + str[5]);
 		}
+	    }
+	    br.close();
+	} catch (Exception e) {
+	    
 	}
-//Column	Attribute	attributeOf	Unit	Time	Entity	Role	Relation	inRelationTo	wasDerivedFrom	wasGeneratedBy	hasPosition	
-	@Override
+    }
+    //Column	Attribute	attributeOf	Unit	Time	Entity	Role	Relation	inRelationTo	wasDerivedFrom	wasGeneratedBy	hasPosition	
+    @Override
 	void initMapping() {
-		mapCol.clear();
+	mapCol.clear();
         mapCol.put("Label", "Column");
         mapCol.put("AttributeType", "Attribute");
         mapCol.put("AttributeOf", "attributeOf");
@@ -65,13 +62,13 @@ public class DASchemaEventGenerator extends BasicGenerator {
         mapCol.put("WasDerivedFrom", "wasDerivedFrom");       
         mapCol.put("WasGeneratedBy", "wasGeneratedBy");
         mapCol.put("HasPosition", "hasPosition");
-//        mapCol.put("??mother", "chear-kb:ObjectTypeMother");
-//        mapCol.put("??child", "chear-kb:ObjectTypeChild");
-//        mapCol.put("??birth", "chear-kb:ObjectTypeBirth");
-//        mapCol.put("??household", "chear-kb:ObjectTypeHousehold");
-//        mapCol.put("??headhousehold", "chear-kb:ObjectTypeHeadHousehold");
-//        mapCol.put("??father", "chear-kb:ObjectTypeFather");
-	}
+	//  mapCol.put("??mother", "chear-kb:ObjectTypeMother");
+	//  mapCol.put("??child", "chear-kb:ObjectTypeChild");
+	//  mapCol.put("??birth", "chear-kb:ObjectTypeBirth");
+	//  mapCol.put("??household", "chear-kb:ObjectTypeHousehold");
+	//  mapCol.put("??headhousehold", "chear-kb:ObjectTypeHeadHousehold");
+	//  mapCol.put("??father", "chear-kb:ObjectTypeFather");
+    }
     
     private String getLabel(CSVRecord rec) {
     	return rec.get(mapCol.get("Label"));
@@ -83,9 +80,9 @@ public class DASchemaEventGenerator extends BasicGenerator {
     
     private String getUnit(CSVRecord rec) {
     	if (codeMap.containsKey(rec.get(mapCol.get("Unit")))) {
-    		return codeMap.get(rec.get(mapCol.get("Unit")));
+	    return codeMap.get(rec.get(mapCol.get("Unit")));
     	} else {
-    		return "obo:UO_0000186";
+	    return "obo:UO_0000186";
     	}
     }
     
@@ -95,13 +92,13 @@ public class DASchemaEventGenerator extends BasicGenerator {
     
     private String getEntity(CSVRecord rec) {
     	if ((rec.get(mapCol.get("Entity"))) == null || (rec.get(mapCol.get("Entity"))).equals("")) {
-    		return null;
+	    return null;
     	} else {
-        	if (codeMap.containsKey(rec.get(mapCol.get("Entity")))) {
-        		return codeMap.get(rec.get(mapCol.get("Entity")));
-        	} else {
-        		return rec.get(mapCol.get("Entity"));
-        	}
+	    if (codeMap.containsKey(rec.get(mapCol.get("Entity")))) {
+		return codeMap.get(rec.get(mapCol.get("Entity")));
+	    } else {
+		return rec.get(mapCol.get("Entity"));
+	    }
     	}
     }
     
@@ -115,15 +112,15 @@ public class DASchemaEventGenerator extends BasicGenerator {
     
     private String getInRelationTo(CSVRecord rec) {
     	if (rec.get(mapCol.get("InRelationTo")) == null || rec.get(mapCol.get("InRelationTo")).equals("")){
-    		return "";
+	    return "";
     	} else {
-    		List<String> items = Arrays.asList(rec.get(mapCol.get("InRelationTo")).split("\\s*,\\s*"));
-    		String answer = "";
-    		for (String i : items){
-    			answer += kbPrefix + "DASO-" + i.replace("_","-").replace("??", "") + "-" + study_id + " & ";
-    		}
-    		return answer.substring(0, answer.length() - 3);
-//    		return kbPrefix + "DASO-" + items.get(0).replace("_","-").replace("??", "") + "-" + study_id;
+	    List<String> items = Arrays.asList(rec.get(mapCol.get("InRelationTo")).split("\\s*,\\s*"));
+	    String answer = "";
+	    for (String i : items){
+		answer += kbPrefix + "DASO-" + i.replace("_","-").replace("??", "") +  " & ";
+	    }
+	    return answer.substring(0, answer.length() - 3);
+	    //    		return kbPrefix + "DASO-" + items.get(0).replace("_","-").replace("??", "");
     	}
     }
     
@@ -149,24 +146,27 @@ public class DASchemaEventGenerator extends BasicGenerator {
     
     @Override
     public List< Map<String, Object> > createRows() throws Exception {
+	SDDName = fileName.replace("SDD-","").replace(".csv","");
+        codeMap = AutoAnnotator.codeMappings;
     	rows.clear();
     	int row_number = 0;
     	for (CSVRecord record : records) {
-    		if (timeList.contains(getLabel(record))){
-    			rows.add(createRow(record, ++row_number));
-    		}
+	    if (timeList.contains(getLabel(record))){
+		rows.add(createRow(record, ++row_number));
+	    }
         }
-    	
     	return rows;
     }
     
- //Column	Attribute	attributeOf	Unit	Time	Entity	Role	Relation	inRelationTo	wasDerivedFrom	wasGeneratedBy	hasPosition   
+    //Column	Attribute	attributeOf	Unit	Time	Entity	Role	Relation	inRelationTo	wasDerivedFrom	wasGeneratedBy	hasPosition   
     @Override
     Map<String, Object> createRow(CSVRecord rec, int row_number) throws Exception {
     	Map<String, Object> row = new HashMap<String, Object>();
-    	row.put("hasURI", kbPrefix + "DASE-" + getLabel(rec).trim().replace(" ","").replace("_","-").replace("??", "") + "-" + study_id);
-    	row.put("a", "hasco:DASchemaEvent");
-    	row.put("hasco:partOfSchema", kbPrefix + "DAS-" + SDDName.replace(".csv", ""));
+    	row.put("hasURI", kbPrefix + "DASE-" + SDDName + "-" + getLabel(rec).trim().replace(" ","").replace("_","-").replace("??", ""));
+	row.put("a", "hasco:DASchemaEvent");
+	row.put("rdfs:label", getLabel(rec).trim().replace(" ","").replace("_","-").replace("??", "")); 
+	row.put("rdfs:comment", getLabel(rec).trim().replace(" ","").replace("_","-").replace("??", "")); 
+    	row.put("hasco:partOfSchema", kbPrefix + "DAS-" + SDDName);
     	row.put("hasco:hasEntity", getEntity(rec));
     	row.put("hasco:hasUnit", getUnit(rec));
     	row.put("sio:inRelationTo", getInRelationTo(rec));
