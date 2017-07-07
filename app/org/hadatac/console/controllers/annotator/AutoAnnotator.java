@@ -10,6 +10,9 @@ import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URL;
 import java.net.URLDecoder;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.spi.FileTypeDetector;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -36,6 +39,11 @@ import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
 import org.apache.jena.rdf.model.Property;
 import org.apache.jena.rdf.model.Resource;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.ss.usermodel.WorkbookFactory;
 import org.hadatac.entity.pojo.Credential;
 import org.hadatac.console.controllers.AuthApplication;
 import org.hadatac.console.controllers.dataacquisitionsearch.LoadCCSV;
@@ -739,23 +747,53 @@ public class AutoAnnotator extends Controller {
     public static boolean annotateDataAcquisitionSchemaFile(File file) {
 	
     	boolean bSuccess = true;
+    	System.out.println(file.getName());
+    	
     	try{
 	    HashMap<String, String> hm = new HashMap<String, String>();
-	    try {
-		BufferedReader bufRdr;
-		bufRdr = new BufferedReader(new FileReader(file));
-		String line = null;
-		while((line = bufRdr.readLine()) != null) {
+	    
+    	if(file.getName().endsWith(".csv")) {
 		    try {
-			hm.put(line.split(",")[0], line.split(",")[1]);
+			BufferedReader bufRdr;
+			bufRdr = new BufferedReader(new FileReader(file));
+			String line = null;
+			while((line = bufRdr.readLine()) != null) {
+			    try {
+				hm.put(line.split(",")[0], line.split(",")[1]);
+			    } catch (Exception e) {
+				hm.put(line.split(",")[0], "");
+			    }
+			}
+			bufRdr.close();
 		    } catch (Exception e) {
-			hm.put(line.split(",")[0], "");
+			System.out.println("Error annotateDataAcquisitionSchemaFile: Unable to Read File");
 		    }
-		}
-		bufRdr.close();
-	    } catch (Exception e) {
-		System.out.println("Error annotateDataAcquisitionSchemaFile: Unable to Read File");
-	    }
+		    
+  		} else if (file.getName().endsWith(".xlsx")){
+  			
+  	    	InputStream inp = new FileInputStream(file);
+  	        Workbook wb = WorkbookFactory.create(inp);
+  	        Sheet sheet = wb.getSheetAt(0);
+	  	   // Decide which rows to process
+	  	    int rowStart = Math.min(1, sheet.getFirstRowNum());
+	  	    int rowEnd = Math.min(7, sheet.getLastRowNum());
+	  	    System.out.println(rowStart);
+	  	    System.out.println(rowEnd);
+	
+	  	    for (int rowNum = rowStart; rowNum < rowEnd; rowNum++) {
+	  	         Row r = sheet.getRow(rowNum);
+	  	         if (r == null) {
+	  	            // This whole row is empty
+	  	            // Handle it as needed
+	  	            continue;
+	  	         } else {
+	  	        	 hm.put(r.getCell(0).getStringCellValue(), r.getCell(1).getStringCellValue());
+	  	         }
+	  	    }
+  		}
+
+			    
+			    
 	    if (hm.containsKey("Study_ID")){
 		study_id = hm.get("Study_ID");
 	    }
