@@ -75,7 +75,8 @@ public class DataAcquisitionGenerator extends BasicGenerator {
     }
     
     private String getDataDictionaryName(CSVRecord rec) {
-    	return rec.get(mapCol.get("DataDictionaryName")).equalsIgnoreCase("NULL")? "":rec.get(mapCol.get("DataDictionaryName"));
+    	String DDName = rec.get(mapCol.get("DataDictionaryName")).equalsIgnoreCase("NULL")? "":rec.get(mapCol.get("DataDictionaryName"));
+    	return DDName.replace("SDD-","");
     }
     
     private Boolean isEpiData(CSVRecord rec) {
