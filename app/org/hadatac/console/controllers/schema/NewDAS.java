@@ -10,11 +10,13 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.net.URLEncoder;
 
 import play.mvc.Controller;
 import play.mvc.Result;
 import play.twirl.api.Html;
 import play.data.*;
+import play.*;
 
 import org.hadatac.console.views.html.*;
 import org.hadatac.console.views.html.schema.*;
@@ -22,6 +24,7 @@ import org.hadatac.console.views.html.triplestore.syncLabkey;
 import org.hadatac.console.controllers.deployments.routes;
 import org.hadatac.data.api.DataFactory;
 import org.hadatac.entity.pojo.DataAcquisitionSchema;
+import org.hadatac.entity.pojo.DataAcquisitionSchemaAttribute;
 import org.hadatac.metadata.loader.LabkeyDataHandler;
 import org.hadatac.metadata.loader.ValueCellProcessing;
 import org.hadatac.utils.ConfigProp;
@@ -38,9 +41,12 @@ import org.hadatac.console.models.SysUser;
 import org.hadatac.console.controllers.AuthApplication;
 import org.hadatac.console.controllers.triplestore.UserManagement;
 import org.hadatac.console.controllers.schema.NewDAS;
+import org.hadatac.console.controllers.annotator.FileProcessing;
 
 public class NewDAS extends Controller {
 	
+    public static final String kbPrefix = Play.application().configuration().getString("hadatac.community.ont_prefix") + "-kb:";
+    
     public static SparqlQueryResults getQueryResults(String tabName) {
 	SparqlQuery query = new SparqlQuery();
         GetSparqlQuery query_submit = new GetSparqlQuery(query);
@@ -66,7 +72,11 @@ public class NewDAS extends Controller {
     
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
 	public static Result postIndex() {
-    	return index();
+    	if (session().get("LabKeyUserName") == null && session().get("LabKeyPassword") == null) {
+	    return redirect(org.hadatac.console.controllers.triplestore.routes.LoadKB.logInLabkey(
+			     org.hadatac.console.controllers.schema.routes.NewDAS.index().url()));
+    	}
+	return ok(newDAS.render());
     }
     
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
@@ -100,4 +110,55 @@ public class NewDAS extends Controller {
         
         return ok(DASConfirm.render("New Data Acquisition Schema", data));
     }
+
+    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
+	public static Result processFormFromFile(String attributes) {
+    	final SysUser user = AuthApplication.getLocalUser(session());
+        Form<DataAcquisitionSchemaForm> form = Form.form(DataAcquisitionSchemaForm.class).bindFromRequest();
+        if (form.hasErrors()) {
+	    return badRequest("The submitted form has errors!");
+        }
+        
+        DataAcquisitionSchemaForm data = form.get();
+	String[] fields;
+	
+        String label = data.getLabel().replace("DA-","").replace(".csv","").replace(".","").replace("+","-");
+        DataAcquisitionSchema das = DataFactory.createDataAcquisitionSchema(label);
+        
+	System.out.println("File Processing: [" + attributes + "]");
+	if (attributes == null || attributes.equals("")) {
+	    return ok(editDAS.render(das));	
+	}
+	fields = FileProcessing.extractFields(attributes);
+	System.out.println("# of fields: " + fields.length);
+	int pos = 0;
+	for (String attribute: fields) {
+	    //attribute = URLEncoder.encode(attribute);
+	    String finalAttribute = attribute.replace(".","").replace("+","-").replace(" ","-").replace("?","").replace("(","").replace(")","").replace("\"","");
+	    System.out.println("Label: " + finalAttribute + "  Pos: " + pos);
+	    DataAcquisitionSchemaAttribute dasa = new DataAcquisitionSchemaAttribute(kbPrefix + "DASA-" + label + "-" + finalAttribute, das.getUri());
+	    dasa.setLabel(finalAttribute);
+	    dasa.setPosition(Integer.toString(pos));
+	    das.getAttributes().add(dasa);
+	    pos++;
+	}
+	
+	das.save();
+
+        String user_name = session().get("LabKeyUserName");
+        String password = session().get("LabKeyPassword");
+        if (user_name != null && password != null) {
+	    try {
+		System.out.println("Saving DAS in Labkey");
+		int nRowsOfSchema = das.saveToLabKey(session().get("LabKeyUserName"), session().get("LabKeyPassword"));
+	    } catch (CommandException e) {
+		return badRequest("Failed to insert DA Schema to LabKey!\n"
+				  + "Error Message: " + e.getMessage());
+	    }
+        }
+        
+    	return ok(editDAS.render(das));
+	
+    }
+
 }

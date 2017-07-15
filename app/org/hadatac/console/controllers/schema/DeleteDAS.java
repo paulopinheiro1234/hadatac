@@ -20,37 +20,39 @@ import be.objectify.deadbolt.java.actions.Restrict;
 
 public class DeleteDAS extends Controller {
 
-	@Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-        public static Result index(String das_uri) {
-	    DataAcquisitionSchemaForm dasForm = new DataAcquisitionSchemaForm();
-	    DataAcquisitionSchema das = null;
-	    
-	    try {
-		if (das_uri != null) {
-		    das_uri = URLDecoder.decode(das_uri, "UTF-8");
-		} else {
-		    das_uri = "";
-		}
-	    } catch (UnsupportedEncodingException e) {
-		e.printStackTrace();
+    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
+    public static Result index(String das_uri) {
+	DataAcquisitionSchemaForm dasForm = new DataAcquisitionSchemaForm();
+	DataAcquisitionSchema das = null;
+	
+	try {
+	    if (das_uri != null) {
+		das_uri = URLDecoder.decode(das_uri, "UTF-8");
+	    } else {
+		das_uri = "";
 	    }
+	} catch (UnsupportedEncodingException e) {
+	    e.printStackTrace();
+	}
+	
+	if (!das_uri.equals("")) {
 	    
-	    if (!das_uri.equals("")) {
-		
-		das = DataAcquisitionSchema.find(das_uri);
-		System.out.println("delete data acquisition schema");
-		return ok(deleteDAS.render(das_uri, dasForm));
-	    }
+	    das = DataAcquisitionSchema.find(das_uri);
+	    System.out.println("delete data acquisition schema");
+	    dasForm.setUri(das_uri);
+	    dasForm.setLabel(das.getLabel());
 	    return ok(deleteDAS.render(das_uri, dasForm));
 	}
+	return ok(deleteDAS.render(das_uri, dasForm));
+    }
     
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-	public static Result postIndex(String das_uri) {
+    public static Result postIndex(String das_uri) {
         return index(das_uri);
     }
     
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-	public static Result processForm(String das_uri) {
+    public static Result processForm(String das_uri) {
         DataAcquisitionSchema das = null;
 	
         try {
@@ -69,15 +71,17 @@ public class DeleteDAS extends Controller {
 	
         Form<DataAcquisitionSchemaForm> form = Form.form(DataAcquisitionSchemaForm.class).bindFromRequest();
         DataAcquisitionSchemaForm data = form.get();
-	
+	data.setLabel(das.getLabel());
+
 	if (das != null) {
 	    das.delete();
 	}
 	
         if (form.hasErrors()) {
-            return badRequest(DASConfirm.render("ERROR Deleting Data Acquisition Schema", data));
+            return badRequest(DASConfirm.render("ERROR Deleting Data Acquisition Schema ", data));
         } else {
-            return ok(DASConfirm.render("Delete Data Acquisition Schema", data));
+            return ok(DASConfirm.render("Deleted Data Acquisition Schema ", data));
         }
     }
+
 }

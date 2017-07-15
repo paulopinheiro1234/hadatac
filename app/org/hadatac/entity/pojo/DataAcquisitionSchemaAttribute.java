@@ -3,6 +3,9 @@ package org.hadatac.entity.pojo;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
 
 import org.apache.jena.query.Query;
 import org.apache.jena.query.QueryExecution;
@@ -12,18 +15,37 @@ import org.apache.jena.query.QuerySolution;
 import org.apache.jena.query.ResultSet;
 import org.apache.jena.query.ResultSetFactory;
 import org.apache.jena.query.ResultSetRewindable;
+import org.apache.jena.update.UpdateExecutionFactory;
+import org.apache.jena.update.UpdateFactory;
+import org.apache.jena.update.UpdateProcessor;
+import org.apache.jena.update.UpdateRequest;
 import org.hadatac.utils.Collections;
 import org.hadatac.utils.NameSpaces;
 import org.hadatac.utils.FirstLabel;
+import org.hadatac.utils.ConfigProp;
+import org.hadatac.metadata.loader.LabkeyDataHandler;
 import org.hadatac.entity.pojo.DataAcquisitionSchemaObject;
 import org.hadatac.entity.pojo.DataAcquisitionSchemaEvent;
 import org.hadatac.metadata.loader.ValueCellProcessing;
+import org.labkey.remoteapi.CommandException;
+import be.objectify.deadbolt.java.actions.Group;
+import be.objectify.deadbolt.java.actions.Restrict;
+import org.hadatac.console.controllers.AuthApplication;
 
 public class DataAcquisitionSchemaAttribute {
+
+    public static String INDENT1 = "     ";
+    public static String INSERT_LINE1 = "INSERT DATA {  ";
+    public static String DELETE_LINE1 = "DELETE WHERE {  ";
+    public static String LINE3 = INDENT1 + "a         hasco:DASchemaAttribute;  ";
+    public static String DELETE_LINE3 = INDENT1 + " ?p ?o . ";
+    public static String LINE_LAST = "}  ";
+    public static String PREFIX = "DASA-";
 
     private String uri;
     private String localName;
     private String label;
+    private String partOfSchema;
     private String position;
     private int    positionInt;
     
@@ -47,264 +69,485 @@ public class DataAcquisitionSchemaAttribute {
     private String daseUri;
     private String dasoUri;
     
+    public DataAcquisitionSchemaAttribute(String uri, String partOfSchema) {
+	this.uri = uri;
+	this.partOfSchema = partOfSchema;
+	this.localName = "";
+	this.label = "";
+	this.position = "";
+	this.positionInt = -1;
+	this.setEntity("");
+	this.setAttribute("");
+	this.setUnit("");
+	this.daseUri = "";
+	this.dasoUri = "";
+    }
+
     public DataAcquisitionSchemaAttribute(String uri, 
 					  String localName, 
-					  String label, 
+					  String label,
+					  String partOfSchema,
 					  String position, 
 					  String entity, 
-					  String entityLabel, 
                                           String attribute, 
-					  String attributeLabel, 
 					  String unit, 
-					  String unitLabel, 
                                           String daseUri, 
 					  String dasoUri) {
-	    this.uri = uri;
-	    this.localName = localName;
-	    this.label = label;
-	    this.position = position;
-	    try {
-		if (position != null && !position.equals("")) {
-                    positionInt = Integer.parseInt(position);
-		} else {
-		    positionInt = -1;
-		}
-	    } catch (Exception e) {
+	this.uri = uri;
+	this.localName = localName;
+	this.label = label;
+	this.partOfSchema = partOfSchema;
+	this.position = position;
+	try {
+	    if (position != null && !position.equals("")) {
+		positionInt = Integer.parseInt(position);
+	    } else {
 		positionInt = -1;
 	    }
-	    this.entity = entity;
-	    this.entityLabel = entityLabel;
-	    this.attribute = attribute;
-	    this.attributeLabel = attributeLabel;
-	    this.unit = unit;
-	    this.unitLabel = unitLabel;
-            this.daseUri = daseUri;
-            this.dasoUri = dasoUri;
+	} catch (Exception e) {
+	    positionInt = -1;
 	}
-    	
-        public String getUri() {
+	this.setEntity(entity);
+	this.setAttribute(attribute);
+	this.setUnit(unit);
+	this.daseUri = daseUri;
+	this.dasoUri = dasoUri;
+    }
+    
+    public String getUri() {
+	if (uri == null) {
+	    return "";
+	} else {
 	    return uri;
 	}
+    }
+    
+    public String getUriNamespace() {
+	return ValueCellProcessing.replaceNameSpaceEx(uri.replace("<","").replace(">",""));
+    }
 
-        public String getLocalName() {
-	    return localName;
-	}
-
-        public String getLabel() {
+    public void setUri(String uri) {
+	this.uri = uri;
+    }
+    
+    public String getLocalName() {
+	return localName;
+    }
+    
+    public void setLocalName(String localName) {
+	this.localName = localName;
+    }
+    
+    public String getLabel() {
+	if (label == null) {
+	    return "";
+	} else {
 	    return label;
 	}
-
-    	public String getPosition() {
-	    return position;
+    }
+    
+    public void setLabel(String label) {
+	this.label = label;
+    }
+    
+    public String getPartOfSchema() {
+	if (partOfSchema == null) {
+	    return "";
+	} else {
+	    return partOfSchema;
 	}
-
-    	public int getPositionInt() {
-	    return positionInt;
-	}
-
-    	public int getTempPositionInt() {
-	    return tempPositionInt;
-	}
-
-    	public void setTempPositionInt(int tempPositionInt) {
-	    this.tempPositionInt = tempPositionInt;
-	}
-
-    	public String getEntity() {
+    }
+    
+    public void setPartOfSchema(String partOfSchema) {
+	this.partOfSchema = partOfSchema;
+    }
+    
+    public String getPosition() {
+	return position;
+    }
+    
+    public void setPosition(String position) {
+	this.position = position;
+    }
+    
+    public int getPositionInt() {
+	return positionInt;
+    }
+    
+    public int getTempPositionInt() {
+	return tempPositionInt;
+    }
+    
+    public void setTempPositionInt(int tempPositionInt) {
+	this.tempPositionInt = tempPositionInt;
+    }
+    
+    public String getEntity() {
+	if (entity == null) {
+	    return "";
+	} else {
 	    return entity;
 	}
-
-    	public String getEntityLabel() {
-	    if (entityLabel.equals("")) {
-		return ValueCellProcessing.replaceNameSpaceEx(entity);
-	    }
-	    return entityLabel;
+    }
+    
+    public String getEntityNamespace() {
+	if (entity == "") {
+	    return "";
 	}
+	return ValueCellProcessing.replaceNameSpaceEx(entity.replace("<","").replace(">",""));
+    }
 
-    	public String getAttribute() {
+    public void setEntity(String entity) {
+	System.out.println("Set entity: entity = <" + entity + ">"); 
+	this.entity = entity;
+	if (entity == null || entity.equals("")) {
+	    this.entityLabel = "";
+	} else {
+	    this.entityLabel = FirstLabel.getLabel(entity);
+	}
+	System.out.println("Set entity: entityLabel = <" + entityLabel + ">"); 
+    }
+    
+    public String getEntityLabel() {
+	if (!entityLabel.equals("")) {
+	    return ValueCellProcessing.replaceNameSpaceEx(entity);
+	}
+	return entityLabel;
+    }
+    
+    public String getAttribute() {
+	if (attribute == null) {
+	    return "";
+	} else {
 	    return attribute;
 	}
-
-    	public String getAttributeLabel() {
-	    if (attributeLabel.equals("")) {
-		return ValueCellProcessing.replaceNameSpaceEx(attribute);
-	    }
-	    return attributeLabel;
+    }
+    
+    public String getAttributeNamespace() {
+	if (attribute == "") {
+	    return "";
 	}
+	return ValueCellProcessing.replaceNameSpaceEx(attribute.replace("<","").replace(">",""));
+    }
 
-    	public String getUnit() {
+    public void setAttribute(String attribute) {
+	this.attribute = attribute;
+	if (attribute == null || attribute.equals("")) {
+	    this.attributeLabel =  "";
+	} else {
+	    this.attributeLabel = FirstLabel.getLabel(attribute);
+	}
+    }
+    
+    public String getAttributeLabel() {
+	if (!attributeLabel.equals("")) {
+	    return ValueCellProcessing.replaceNameSpaceEx(attribute);
+	}
+	return attributeLabel;
+    }
+    
+    public String getUnit() {
+	if (unit == null) {
+	    return "";
+	} else {
 	    return unit;
 	}
+    }
         
-    	public String getUnitLabel() {
-	    if (unitLabel.equals("")) {
-		return ValueCellProcessing.replaceNameSpaceEx(unit);
-	    }
-	    return unitLabel;
+    public String getUnitNamespace() {
+	if (unit == "") {
+	    return "";
 	}
-        
-    	public String getObjectUri() {
-	    return dasoUri;
+	return ValueCellProcessing.replaceNameSpaceEx(unit.replace("<","").replace(">",""));
+    }
+
+    public void setUnit(String unit) {
+	this.unit = unit;
+	if (unit == null || unit.equals("")) {
+	    this.unitLabel = "";
+	} else {
+	    this.unitLabel = FirstLabel.getLabel(unit);
 	}
+    }
         
-    	public DataAcquisitionSchemaObject getObject() {
-	    if (dasoUri == null || dasoUri.equals("")) {
-		return null;
-	    }
-	    return DataAcquisitionSchemaObject.find(dasoUri);
+    public String getUnitLabel() {
+	if (!unitLabel.equals("")) {
+	    return ValueCellProcessing.replaceNameSpaceEx(unit);
 	}
-        
-    	public String getEventUri() {
-	    return daseUri;
+	return unitLabel;
+    }
+    
+    public String getObjectUri() {
+	return dasoUri;
+    }
+    
+    public DataAcquisitionSchemaObject getObject() {
+	if (dasoUri == null || dasoUri.equals("")) {
+	    return null;
 	}
-        
-    	public DataAcquisitionSchemaEvent getEvent() {
-	    if (daseUri == null || daseUri.equals("")) {
-		return null;
-	    }
-	    return DataAcquisitionSchemaEvent.find(daseUri);
+	return DataAcquisitionSchemaObject.find(dasoUri);
+    }
+    
+    public String getEventUri() {
+	return daseUri;
+    }
+    
+    public DataAcquisitionSchemaEvent getEvent() {
+	if (daseUri == null || daseUri.equals("")) {
+	    return null;
 	}
-        
-        public static List<DataAcquisitionSchemaAttribute> findBySchema (String schemaUri) {
-	     System.out.println("Looking for data acquisition schema attributes for " + schemaUri);
-     	     if (schemaUri.startsWith("http")) {
-	        schemaUri = "<" + schemaUri + ">";
-	     }
-	     List<DataAcquisitionSchemaAttribute> attributes = new ArrayList<DataAcquisitionSchemaAttribute>();
-    	     String queryString = NameSpaces.getInstance().printSparqlNameSpaceList() + 
-		 "SELECT ?uri ?hasPosition ?hasEntity ?hasAttribute " + 
-		 " ?hasUnit ?hasDASO ?hasDASE ?hasSource ?isPIConfirmed WHERE { " + 
-		 "    ?uri a hasco:DASchemaAttribute . " + 
-		 "    ?uri hasco:partOfSchema " + schemaUri + " .  " + 
-		 "    ?uri hasco:hasPosition ?hasPosition .  " + 
-		 "    OPTIONAL { ?uri hasco:hasEntity ?hasEntity } . " + 
-		 "    OPTIONAL { ?uri hasco:hasAttribute ?hasAttribute } . " + 
-		 "    OPTIONAL { ?uri hasco:hasUnit ?hasUnit } . " + 
-		 "    OPTIONAL { ?uri hasco:hasEvent ?hasDASE } . " + 
-		 "    OPTIONAL { ?uri hasco:isAttributeOf ?hasDASO } . " + 
-		 "    OPTIONAL { ?uri hasco:hasSource ?hasSource } . " + 
-		 "    OPTIONAL { ?uri hasco:isPIConfirmed ?isPIConfirmed } . " + 
-		 "} ORDER BY ?hasPosition ";
-    	     Query query = QueryFactory.create(queryString);
+	return DataAcquisitionSchemaEvent.find(daseUri);
+    }
+    
+    public static DataAcquisitionSchemaAttribute find (String dasa_uri) {
+	DataAcquisitionSchemaAttribute dasa = null;
+	System.out.println("Looking for data acquisition schema attribute with URI " + dasa_uri);
+	if (dasa_uri.startsWith("http")) {
+	    dasa_uri = "<" + dasa_uri + ">";
+	}
+	String queryString = NameSpaces.getInstance().printSparqlNameSpaceList() + 
+	    "SELECT  ?hasPosition ?partOfSchema ?hasEntity ?hasAttribute " + 
+	    " ?hasUnit ?hasDASO ?hasDASE ?hasSource ?isPIConfirmed WHERE { " + 
+	    "    " + dasa_uri + " a hasco:DASchemaAttribute . " + 
+	    "    " + dasa_uri + " hasco:partOfSchema ?partOfSchema .  " + 
+	    "    " + dasa_uri + " hasco:hasPosition ?hasPosition .  " + 
+	    "    OPTIONAL { " + dasa_uri + " hasco:hasEntity ?hasEntity } . " + 
+	    "    OPTIONAL { " + dasa_uri + " hasco:hasAttribute ?hasAttribute } . " + 
+	    "    OPTIONAL { " + dasa_uri + " hasco:hasUnit ?hasUnit } . " + 
+	    "    OPTIONAL { " + dasa_uri + " hasco:hasEvent ?hasDASE } . " + 
+	    "    OPTIONAL { " + dasa_uri + " hasco:isAttributeOf ?hasDASO } . " + 
+	    "    OPTIONAL { " + dasa_uri + " hasco:hasSource ?hasSource } . " + 
+	    "    OPTIONAL { " + dasa_uri + " hasco:isPIConfirmed ?isPIConfirmed } . " + 
+	    "}";
+	Query query = QueryFactory.create(queryString);
+	
+	QueryExecution qexec = QueryExecutionFactory.sparqlService(Collections.getCollectionsName(Collections.METADATA_SPARQL), query);
+	ResultSet results = qexec.execSelect();
+	ResultSetRewindable resultsrw = ResultSetFactory.copyResults(results);
+	qexec.close();
+	
+	if (!resultsrw.hasNext()) {
+	    System.out.println("[WARNING] DataAcquisitionSchemaAttribute. Could not find DASA with URI: " + dasa_uri);
+	    return dasa;
+	}
+	
+	String localNameStr = "";
+	String labelStr = "";
+	String partOfSchemaStr = "";
+	String positionStr = "";
+	String entityStr = "";
+	String attributeStr = "";
+	String unitStr = "";
+	String dasoUriStr = "";
+	String daseUriStr = "";
+	
+	while (resultsrw.hasNext()) {
+	    QuerySolution soln = resultsrw.next();
+	    if (soln != null) {
 		
-    	     QueryExecution qexec = QueryExecutionFactory.sparqlService(
-		    Collections.getCollectionsName(Collections.METADATA_SPARQL), query);
-    	     ResultSet results = qexec.execSelect();
-	     ResultSetRewindable resultsrw = ResultSetFactory.copyResults(results);
-	     qexec.close();
+		labelStr = FirstLabel.getLabel(dasa_uri);
 
-	     if (!resultsrw.hasNext()) {
-		   System.out.println("[WARNING] DataAcquisitionSchemaAttribute. Could not find attributes for schema: " + schemaUri);
-		   return attributes;
-	     }
+		try {
+		    if (soln.getLiteral("hasPosition") != null && soln.getLiteral("hasPosition").getString() != null) {
+			positionStr = soln.getLiteral("hasPosition").getString();
+		    }
+		} catch (Exception e1) {
+		    positionStr = "";
+		}
 		
-	     String uriStr = "";
-	     String localNameStr = "";
-	     String labelStr = "";
-	     String positionStr = "";
-	     String entityStr = "";
-	     String entityLabelStr = "";
-	     String attributeStr = "";
-	     String attributeLabelStr = "";
-	     String unitStr = "";
-	     String unitLabelStr = "";
-	     String dasoUriStr = "";
-	     String daseUriStr = "";
-		  
-	     while (resultsrw.hasNext()) {
-		      QuerySolution soln = resultsrw.next();
-		      if (soln != null) {
+		try {
+		    if (soln.getResource("partOfSchema") != null && soln.getResource("partOfSchema").getURI() != null) {
+			partOfSchemaStr = soln.getResource("partOfSchema").getURI();
+		    }
+		} catch (Exception e1) {
+		    partOfSchemaStr = "";
+		}
+		
+		try {
+		    if (soln.getResource("hasEntity") != null && soln.getResource("hasEntity").getURI() != null) {
+			entityStr = soln.getResource("hasEntity").getURI();
+		    }
+		} catch (Exception e1) {
+		    entityStr = "";
+		}
+		
+		try {
+		    if (soln.getResource("hasAttribute") != null && soln.getResource("hasAttribute").getURI() != null) {
+			attributeStr = soln.getResource("hasAttribute").getURI();
+		    }
+		} catch (Exception e1) {
+		    attributeStr = "";
+		}
+		
+		try {
+		    if (soln.getResource("hasUnit") != null && soln.getResource("hasUnit").getURI() != null) {
+			unitStr = soln.getResource("hasUnit").getURI();
+		    }
+		} catch (Exception e1) {
+		    unitStr = "";
+		}
+		
+		try {
+		    if (soln.getResource("hasDASO") != null && soln.getResource("hasDASO").getURI() != null) {
+			dasoUriStr = soln.getResource("hasDASO").getURI();
+		    }
+		} catch (Exception e1) {
+		    dasoUriStr = "";
+		}
+		
+		try {
+		    if (soln.getResource("hasDASE") != null && soln.getResource("hasDASE").getURI() != null) {
+			daseUriStr = soln.getResource("hasDASE").getURI();
+		    }
+		} catch (Exception e1) {
+		    daseUriStr = "";
+		}
+		
+		dasa = new DataAcquisitionSchemaAttribute(dasa_uri,
+							  localNameStr,
+							  labelStr,
+							  partOfSchemaStr,
+							  positionStr,
+							  entityStr,
+							  attributeStr,
+							  unitStr,
+							  daseUriStr,
+							  dasoUriStr);
+	    }
 
-			 try {
-			     if (soln.getResource("uri") != null && soln.getResource("uri").getURI() != null) {
-			         uriStr = soln.getResource("uri").getURI();
-			         localNameStr = soln.getResource("uri").getLocalName();
-				 labelStr = FirstLabel.getLabel(uriStr);
-			     }
-			 } catch (Exception e1) {
-			     uriStr = "";
-			     localNameStr = "";
-			     labelStr = "";
-			 }
-
-			 try {
-			     if (soln.getLiteral("hasPosition") != null && soln.getLiteral("hasPosition").getString() != null) {
-				 positionStr = soln.getLiteral("hasPosition").getString();
-			     }
-			 } catch (Exception e1) {
-			     positionStr = "";
-			 }
-
-			 try {
-			     if (soln.getResource("hasEntity") != null && soln.getResource("hasEntity").getURI() != null) {
-			         entityStr = soln.getResource("hasEntity").getURI();
-				 entityLabelStr = FirstLabel.getLabel(entityStr);
-			     }
-			 } catch (Exception e1) {
-			     entityStr = "";
-			     entityLabelStr = "";
-			 }
-
-			 try {
-			     if (soln.getResource("hasAttribute") != null && soln.getResource("hasAttribute").getURI() != null) {
-			         attributeStr = soln.getResource("hasAttribute").getURI();
-				 attributeLabelStr = FirstLabel.getLabel(attributeStr);
-			     }
-			 } catch (Exception e1) {
-			     attributeStr = "";
-			     attributeLabelStr = "";
-			 }
-
-			 try {
-			     if (soln.getResource("hasUnit") != null && soln.getResource("hasUnit").getURI() != null) {
-				 unitStr = soln.getResource("hasUnit").getURI();
-				 unitLabelStr = FirstLabel.getLabel(unitStr);
-			     }
-			 } catch (Exception e1) {
-			     unitStr = "";
-			     unitLabelStr = "";
-			 }
-
-			 try {
-			     if (soln.getResource("hasDASO") != null && soln.getResource("hasDASO").getURI() != null) {
-				 dasoUriStr = soln.getResource("hasDASO").getURI();
-			     }
-			 } catch (Exception e1) {
-			     dasoUriStr = "";
-			 }
-
-			 try {
-			     if (soln.getResource("hasDASE") != null && soln.getResource("hasDASE").getURI() != null) {
-				 daseUriStr = soln.getResource("hasDASE").getURI();
-			     }
-			 } catch (Exception e1) {
-			     daseUriStr = "";
-			 }
-
-			 if (!uriStr.equals("") && !localNameStr.equals("")) {
-			     DataAcquisitionSchemaAttribute attr = new DataAcquisitionSchemaAttribute(
-			        uriStr,
-			        localNameStr,
-				labelStr,
-				positionStr,
-				entityStr,
-				entityLabelStr,
-				attributeStr,
-				attributeLabelStr,
-				unitStr,
-				unitLabelStr,
-				daseUriStr,
-				dasoUriStr
-			     );
-			     attributes.add(attr);
-			 } else {
-			     System.out.println("[ERROR] DataAcquisitionSchemaAttribute. URI: " + uriStr + "  Position: " + positionStr);
-			 }
-                  }
-
-	     }
-	     attributes.sort(Comparator.comparing(DataAcquisitionSchemaAttribute::getPositionInt));
-	     return attributes;
 	}
+
+	return dasa;
+	    
+    }
+    
+    public static List<DataAcquisitionSchemaAttribute> findBySchema (String schemaUri) {
+	System.out.println("Looking for data acquisition schema attributes for " + schemaUri);
+	if (schemaUri.startsWith("http")) {
+	    schemaUri = "<" + schemaUri + ">";
+	}
+	List<DataAcquisitionSchemaAttribute> attributes = new ArrayList<DataAcquisitionSchemaAttribute>();
+	String queryString = NameSpaces.getInstance().printSparqlNameSpaceList() + 
+	    "SELECT ?uri ?hasPosition ?hasEntity ?hasAttribute " + 
+	    " ?hasUnit ?hasDASO ?hasDASE ?hasSource ?isPIConfirmed WHERE { " + 
+	    "    ?uri a hasco:DASchemaAttribute . " + 
+	    "    ?uri hasco:partOfSchema " + schemaUri + " .  " + 
+	    "} ";
+	Query query = QueryFactory.create(queryString);
+	
+	QueryExecution qexec = QueryExecutionFactory.sparqlService(Collections.getCollectionsName(Collections.METADATA_SPARQL), query);
+	ResultSet results = qexec.execSelect();
+	ResultSetRewindable resultsrw = ResultSetFactory.copyResults(results);
+	qexec.close();
+	
+	if (!resultsrw.hasNext()) {
+	    System.out.println("[WARNING] DataAcquisitionSchemaAttribute. Could not find attributes for schema: " + schemaUri);
+	    return attributes;
+	}
+	
+	String uriStr = "";
+	
+	while (resultsrw.hasNext()) {
+	    QuerySolution soln = resultsrw.next();
+	    if (soln != null) {
+		
+		try {
+		    if (soln.getResource("uri") != null && soln.getResource("uri").getURI() != null) {
+			uriStr = soln.getResource("uri").getURI();
+			DataAcquisitionSchemaAttribute attr = find(uriStr);
+			attributes.add(attr);
+		    }
+		} catch (Exception e1) {
+		    System.out.println("[ERROR] DataAcquisitionSchemaAttribute. URI: " + uriStr);
+		}
+	    }
+	}
+	attributes.sort(Comparator.comparing(DataAcquisitionSchemaAttribute::getPositionInt));
+	return attributes;
+    }
+    
+    public void save() {
+	System.out.println("Saving <" + uri + ">");
+	if (uri.equals("")) {
+	    System.out.println("[ERROR] Trying to save DASA without assigning an URI");
+	    return;
+	}
+	if (partOfSchema.equals("")) {
+	    System.out.println("[ERROR] Trying to save DASA without assigning DAS's URI");
+	    return;
+	}
+	String insert = "";
+	    
+	insert += NameSpaces.getInstance().printSparqlNameSpaceList();
+    	insert += INSERT_LINE1;
+    	insert += this.getUri() + " a hasco:DASchemaAttribute . ";
+    	insert += this.getUri() + " rdfs:label  \"" + label + "\" . ";
+	if (partOfSchema.startsWith("http")) {
+	    insert += this.getUri() + " hasco:partOfSchema <" + partOfSchema + "> .  "; 
+	} else {
+	    insert += this.getUri() + " hasco:partOfSchema " + partOfSchema + " .  "; 
+	} 
+	insert += this.getUri() + " hasco:hasPosition  \"" + position + "\" . "; 
+	if (!entity.equals("")) {
+	    insert += this.getUri() + " hasco:hasEntity "  + entity + " .  ";
+	}   
+	if (!attribute.equals("")) {
+	    insert += this.getUri() + " hasco:hasAttribute " + attribute + " .  ";
+	}
+	if (!unit.equals("")) {
+	    insert += this.getUri() + " hasco:hasUnit " + unit + " .  ";
+	}
+	if (!daseUri.equals("")) {
+	    insert += this.getUri() + " hasco:hasEvent " + daseUri + " .  ";
+	}
+	if (!dasoUri.equals("")) {
+	    insert += this.getUri() + " hasco:isAttributeOf " + dasoUri + " .  ";
+	} 
+	//insert += this.getUri() + " hasco:hasSource " + " .  "; 
+	//insert += this.getUri() + " hasco:isPIConfirmed " + " .  "; 
+    	insert += LINE_LAST;
+	System.out.println("Query: <" + insert + ">");
+    	UpdateRequest request = UpdateFactory.create(insert);
+        UpdateProcessor processor = UpdateExecutionFactory.createRemote(
+				      request, Collections.getCollectionsName(Collections.METADATA_UPDATE));
+        processor.execute();
+    }
+    
+    @Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
+	public int saveToLabKey(String user_name, String password) throws CommandException {
+	String site = ConfigProp.getPropertyValue("labkey.config", "site");
+        String path = "/" + ConfigProp.getPropertyValue("labkey.config", "folder");
+    	LabkeyDataHandler loader = new LabkeyDataHandler(site, user_name, password, path);
+    	List< Map<String, Object> > rows = new ArrayList< Map<String, Object> >();
+    	Map<String, Object> row = new HashMap<String, Object>();
+    	row.put("hasURI", ValueCellProcessing.replaceNameSpaceEx(getUri()));
+    	row.put("a", "hasco:DASchemaAttribute");
+    	row.put("rdfs:label", getLabel());
+    	row.put("rdfs:comment", getLabel());
+    	row.put("hasco:partOfSchema", getPartOfSchema());
+    	row.put("hasco:hasPosition", this.getPosition());
+    	row.put("hasco:hasEntity", this.getEntity());
+    	row.put("hasco:hasAttribute", this.getAttribute());
+    	row.put("hasco:hasUnit", this.getUnit());
+    	row.put("hasco:hasEvent", this.getEvent());
+    	row.put("hasco:hasSource", "");
+    	row.put("hasco:isAttributeOf", this.getObject());
+    	row.put("hasco:isVirtual", "");
+    	row.put("hasco:isPIConfirmed", "false");
+    	rows.add(row);
+    	return loader.insertRows("DASchemaAttribute", rows);
+    }
+    
+    public void delete() {
+	String query = "";
+	query += NameSpaces.getInstance().printSparqlNameSpaceList();
+        query += DELETE_LINE1;
+    	query += "<" + this.getUri() + ">  ";
+        query += DELETE_LINE3;
+    	query += LINE_LAST;
+    	UpdateRequest request = UpdateFactory.create(query);
+        UpdateProcessor processor = UpdateExecutionFactory.createRemote(request, Collections.getCollectionsName(Collections.METADATA_UPDATE));
+        processor.execute();
+    }
     
 }

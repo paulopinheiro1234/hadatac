@@ -1,0 +1,42 @@
+@(dasa : org.hadatac.entity.pojo.DataAcquisitionSchemaAttribute,
+  changedInfo : List[String])
+
+@import helper._
+@import org.hadatac.utils._
+@import org.hadatac.console.views.html._
+@import org.hadatac.console.controllers._
+@import org.hadatac.console.controllers.schema._
+
+@main("Change Data Acquisition Schema Attribute") {
+
+    <h2>Change Data Acquisition Schema Attribute</h2>
+    
+    <h3>Listing below shows new values for Data Acquisition Schema Attribute</h3>
+
+    <div class="container-fluid">
+       <ul>
+           <li><b>URI:</b> @dasa.getUri()</li>
+           <li><b>Label:</b> @dasa.getLabel()</li>
+           @if(changedInfo.contains(dasa.getEntity())) {
+           		<li><b>Current Entity:</b> <b><font color="blue">@dasa.getEntityNamespace()</font></b></li>
+           } else {
+           		<li><b>Current Entity:</b> @dasa.getEntityNamespace()</li>
+           }
+           @if(changedInfo.contains(dasa.getAttribute())) {
+           		<li><b>Current Attribute:</b> <b><font color="blue">@dasa.getAttributeNamespace()</font></b></li>
+           } else {
+           		<li><b>Current Attribute:</b> @dasa.getAttributeNamespace()</li>
+           }
+           @if(changedInfo.contains(dasa.getUnit())) {
+           		<li><b>Current Unit:</b> <b><font color="blue">@dasa.getUnitNamespace()</font></b></li>
+           } else {
+           		<li><b>Current Unit:</b> @dasa.getUnitNamespace()</li>
+           }
+       </ul>
+
+       <br>
+       <a href="@org.hadatac.console.controllers.schema.routes.DASManagement.index()" class="btn btn-primary" role="button">Back to DA Schema Management</a>
+
+    </div>
+
+}

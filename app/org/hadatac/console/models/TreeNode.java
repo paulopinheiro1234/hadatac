@@ -2,23 +2,38 @@ package org.hadatac.console.models;
 
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 
 public class TreeNode {
 
     private String name;
+    private boolean firstVisit;
     private ArrayList<TreeNode> children;
     
     public TreeNode(String n) {
         name = n;
+	firstVisit = true;
         children = new ArrayList<TreeNode>();
     }
  
-    public ArrayList<TreeNode> getChildren() {
+    public List<TreeNode> getChildren() {
         return children;
     }
     
     public String getName() {
         return name;
+    }
+    
+    public void setName(String name) {
+        this.name = name;
+    }
+    
+    public boolean getFirstVisit() {
+        return firstVisit;
+    }
+    
+    public void setFirstVisit(boolean firstVisit) {
+        this.firstVisit = firstVisit;
     }
     
     public TreeNode hasValue(String s) {

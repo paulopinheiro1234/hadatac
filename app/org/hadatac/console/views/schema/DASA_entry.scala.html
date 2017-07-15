@@ -12,7 +12,7 @@
    <td>@if(dasa != null && dasa.getUnitLabel() != null) { @dasa.getUnitLabel() }</td> 
    <td>@if(dasa != null && dasa.getEvent() != null && dasa.getEvent().getLabel() != null) { @dasa.getEvent().getLabel() }</td> 
    @if(mode == "edit") {
-      <td><a href="" class="btn-sm btn-primary" role="button">Edit</a>
+      <td><a href="@org.hadatac.console.controllers.schema.routes.EditDASA.index(dasa.getUri())" class="btn-sm btn-primary" role="button">Edit</a>
           <a href="" class="btn-sm btn-primary" role="button">Delete</a></td>
    }
  

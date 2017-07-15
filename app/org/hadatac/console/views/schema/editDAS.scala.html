@@ -42,9 +42,11 @@
                  </tr>
                  </thead>
                  <tbody>
-                   @for(dasa <- das.getAttributes()){
-                       @DASA_entry("edit", dasa)
-                   }
+		   @if(das.getAttributes() != null) {
+                       @for(dasa <- das.getAttributes()){
+                          @DASA_entry("edit", dasa)
+                       }
+		   }
                  </tbody>
             </table>
 	    </div>
@@ -62,9 +64,11 @@
                  </tr>
                  </thead>
                  <tbody>
-                   @for(dase <- das.getEvents()){
-                       @DASE_entry("edit", dase)
-                   }
+		   @if(das.getEvents() != null) {
+                       @for(dase <- das.getEvents()){
+                           @DASE_entry("edit", dase)
+                       }
+		   }
                  </tbody>
             </table>
 	    </div>
@@ -85,8 +89,10 @@
                  </tr>
                  </thead>
                  <tbody>
-                   @for(daso <- das.getObjects()){
-                       @DASO_entry("edit", daso)
+		   @if(das.getObjects() != null) {
+                       @for(daso <- das.getObjects()){
+                           @DASO_entry("edit", daso)
+                       }
                    }
                  </tbody>
             </table>

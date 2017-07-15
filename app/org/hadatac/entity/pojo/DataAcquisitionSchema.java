@@ -41,7 +41,7 @@ public class DataAcquisitionSchema {
     public static String INDENT1 = "     ";
     public static String INSERT_LINE1 = "INSERT DATA {  ";
     public static String DELETE_LINE1 = "DELETE WHERE {  ";
-    public static String LINE3 = INDENT1 + "a         hasco:DataAcquisitionSchema;  ";
+    public static String LINE3 = INDENT1 + "a         hasco:DASchema;  ";
     public static String DELETE_LINE3 = INDENT1 + " ?p ?o . ";
     public static String LINE_LAST = "}  ";
     public static String PREFIX = "DAS-";
@@ -67,6 +67,9 @@ public class DataAcquisitionSchema {
 	this.entityColumn = -1;
 	this.unitColumn = -1;
 	this.inRelationToColumn = -1;
+	this.attributes = new ArrayList<DataAcquisitionSchemaAttribute>();
+	this.objects = new ArrayList<DataAcquisitionSchemaObject>();
+	this.events = new ArrayList<DataAcquisitionSchemaEvent>();
     }
     
     public DataAcquisitionSchema(String uri, String label) {
@@ -331,13 +334,19 @@ public class DataAcquisitionSchema {
     }
     
     public void save() {
+	// SAVING DAS's DASAs
+	for (DataAcquisitionSchemaAttribute dasa : attributes) {
+	    dasa.save();
+	}
+
+	// SAVING DAS ITSELF
 	String insert = "";
 	insert += NameSpaces.getInstance().printSparqlNameSpaceList();
     	insert += INSERT_LINE1;
     	insert += this.getUri() + " a hasco:DASchema . ";
     	insert += this.getUri() + " rdfs:label  \"" + this.getLabel() + "\" . ";
     	insert += LINE_LAST;
-	System.out.println(insert);
+	//System.out.println(insert);
     	UpdateRequest request = UpdateFactory.create(insert);
         UpdateProcessor processor = UpdateExecutionFactory.createRemote(
 				      request, Collections.getCollectionsName(Collections.METADATA_UPDATE));
@@ -346,6 +355,13 @@ public class DataAcquisitionSchema {
     
     @Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
     public int saveToLabKey(String user_name, String password) throws CommandException {
+	// SAVING DAS's DASAs
+	for (DataAcquisitionSchemaAttribute dasa : attributes) {
+	    System.out.println("Saving DASA " + dasa.getUri() + " into LabKey");
+	    dasa.saveToLabKey(user_name, password);
+	}
+
+	// SAVING DAS ITSELF
 	String site = ConfigProp.getPropertyValue("labkey.config", "site");
         String path = "/" + ConfigProp.getPropertyValue("labkey.config", "folder");
     	LabkeyDataHandler loader = new LabkeyDataHandler(site, user_name, password, path);

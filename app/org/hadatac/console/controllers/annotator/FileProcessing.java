@@ -39,20 +39,26 @@ import be.objectify.deadbolt.java.actions.Restrict;
 
 public class FileProcessing extends Controller {
 
-	private static final String UPLOAD_PATH = "tmp/uploads/";
-
-	private static String[] extractFields(String str) {
-		String line = str.substring(0, str.indexOf('\n'));
-		System.out.println("Line: [" + line + "]");
-		StringTokenizer st = new StringTokenizer(line, ",");
-		String[] fields = new String[st.countTokens()];
-		int pos = 0;
-		while (st.hasMoreElements()) {
-			fields[pos++] = (String)(st.nextElement());
-		}
-		return fields;
+    private static final String UPLOAD_PATH = "tmp/uploads/";
+    
+    public static String[] extractFields(String str) {
+	if (str == null || str.equals("")) {
+	    return null;
 	}
-	
+	String line = str;
+	if (str.indexOf('\n') >= 0) {
+	    line = str.substring(0, str.indexOf('\n'));
+	}
+	System.out.println("Line: [" + line + "]");
+	StringTokenizer st = new StringTokenizer(line, ",");
+	String[] fields = new String[st.countTokens()];
+	int pos = 0;
+	while (st.hasMoreElements()) {
+	    fields[pos++] = (String)(st.nextElement());
+	}
+	return fields;
+    }
+    
     public static SparqlQueryResults getQueryResults(String tabName) {
 	    SparqlQuery query = new SparqlQuery();
         GetSparqlQuery query_submit = new GetSparqlQuery(query);

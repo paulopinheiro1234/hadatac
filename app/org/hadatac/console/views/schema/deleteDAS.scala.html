@@ -8,25 +8,22 @@
 
 @main("Delete Data Acquisition Schema") {
 <div class="container">
-   <h2>Delete Data Acquisition Schema</h2>
+   <h3>Delete Data Acquisition Schema</h3>
 
    <form class="form-horizontal" method="post" action="@org.hadatac.console.controllers.schema.routes.DeleteDAS.processForm(das_uri)">
 
-    <div class="form-group">
-         <label>Name</label> 
-         <select disabled class="form-control col-sm-6" name="name">
-         <option value="name">@das.getLabel()</option>         
-         </select>
+     <div class="form-group">
+       <label>URI : </label> @das.getUri() <br>         
+       <label>Name : </label> @das.getLabel()         
      </div>
-
-     <div class="form-group class="col-sm-6 col-offset-3">
-        <input class="btn btn-success" role="button" type="submit" value="Delete" />
+     
+     <div class="form-group" class="col-sm-6 col-offset-3">
+	<input class="btn btn-success" role="button" type="submit" value="Delete" />
      </div>
 
     </form>   
  
     <a href="@org.hadatac.console.controllers.schema.routes.DASManagement.index()" class="btn btn-primary" role="button">Back to DA Schema Management</a>
-
 
 </div>
 
