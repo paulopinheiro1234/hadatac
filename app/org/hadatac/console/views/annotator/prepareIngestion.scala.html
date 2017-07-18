@@ -1,0 +1,147 @@
+@(filename : String, da_uri : String)
+
+@import helper._
+@import org.hadatac.utils._
+@import org.hadatac.console.views.html._
+@import org.hadatac.console.views.html.schema._
+@import org.hadatac.console.controllers.schema._
+@import org.hadatac.console.controllers._
+
+@main("Prepare Data Ingestion") {
+
+  <div class="container col-md-1">
+  </div>
+
+  <form class="form-horizontal" name="prepareIngestion" method="post">
+
+  <div class="container col-md-9">
+    <h2>Prepare Data Ingestion</h2>
+
+    <div id="rcorners" style="background-color: #DCF7FE">
+      <center><input type="submit" class="btn btn-primary btn-sm" role="button" id="selectDA" value="Select Data Acquisition"
+		     formaction="@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.assignDataAcquisition(da_uri, filename)"></input>
+    </div>
+
+    <center><b>OR</b></center>
+
+    <div id="rcorners" style="background-color: #DCF7FE">
+      <center><div>
+	<input type="submit" class="btn btn-primary btn-sm" role="button" id="createACQ" value="Create Basic Data Acquisition"></input>
+      </div></center>
+
+      <div>
+	<center><b>AND</b></center>
+      </div>
+
+      <center><div id="rcorners"   style="background-color: #B9E1EB">
+
+	  <div class="col-md-2">
+	     <input type="submit" class="btn btn-primary btn-sm" role="button"  id="selectSTD" value="Select Full Study"></input><select><option>Study</option></select>
+	  </div>
+
+	  <div class="col-md-1">
+	     <b>OR</b>
+	  </div>
+
+	  <div id="rcorners" class="col-md-8"   style="background-color: #90D0DF">
+
+	     <input type="submit" class="btn btn-primary btn-sm" role="button" id="createSTD" value="Create Basic Study"></input>
+
+	     <b>AND</b>
+
+	     <input type="submit" class="btn btn-primary btn-sm" role="button" id="createPID" value="Register Subjects"></input>
+
+	     <b>AND</b>
+
+	     <input type="submit" class="btn btn-primary btn-sm" role="button" id="createSID" value="Register Samples"></input>
+
+	  </div>
+
+          <br><br><br><br>
+
+      </div></center>
+
+      <div>
+	<center><b>AND</b></center>
+      </div>
+
+      <div id="rcorners"   style="background-color: #B9E1EB">
+
+	  <div class="col-md-2">
+	    <input type="submit" class="btn btn-primary btn-sm" role="button" id="selectDPL" value="Select Full Deployment"></input><select><option>Deployment</option></select>
+          </div>
+
+	  <div class="col-md-1">
+	    <center><b>OR</b></center>
+	  </div>
+
+	  <div id="rcorners" class="col-md-8"  style="background-color: #90D0DF">
+	    <center>
+	     <input type="submit" class="btn btn-primary btn-sm" role="button" id="createDPL" value="Create Basic Deployment"></input>
+	    </center>
+
+
+	    <center><div>
+	       <b>AND</b>
+	    </div></center>
+
+   	     <center><div id="rcorners"  style="background-color: #73B9CA">
+
+	       <input type="submit" class="btn btn-primary btn-sm" role="button" id="selectPLT" value="Select Platform"></input><select><option>Platform</option></select>
+
+	       <b>OR</b>
+
+	       <input type="submit" class="btn btn-primary btn-sm" role="button" id="createPLT" value="Create Platform"></input>
+
+             </div></center>
+
+	     <center><b>AND</b></center>
+
+	     <center><div id="rcorners"   style="background-color: #73B9CA">
+
+	       <input type="submit" class="btn btn-primary btn-sm" role="button" id="selectINS" value="Select Instrument"></input><select><option>Instrument</option></select>
+
+	       <b>OR</b>
+
+	       <input type="submit" class="btn btn-primary btn-sm" role="button" id="createINS" value="Create Instrument"></input>
+
+             </div></center>
+
+          </div>
+
+          <br><br><br><br><br><br><br><br><br><br><br><br><br>
+
+      </div>
+
+
+      <div>
+	<center><b>AND</b></center>
+      </div>
+
+      <center><div id="rcorners"  style="background-color: #B9E1EB">
+
+	  <input type="submit" class="btn btn-primary btn-sm" role="button" id="selectDAS" value="Select Schema"></input><select><option>Schema</option></select>
+
+	  <b>OR</b>
+
+	  <input type="submit" class="btn btn-primary btn-sm" role="button"  id="createDAS"
+		 formaction="@org.hadatac.console.controllers.schema.routes.NewDAS.index()" 
+		 value="Create Schema from Scratch"></input>
+
+	  <b>OR</b>
+
+	  <input type="submit" class="btn btn-primary btn-sm" role="button"  id="createDASFromFile"
+		 formaction="@org.hadatac.console.controllers.annotator.routes.SchemaFromFile.create(filename)" 
+		 value="Create Schema from File"></input>
+
+      </div></center>
+
+    </div>
+
+    <br><br><br>
+    <a href="@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.index()" class="btn btn-primary" role="button">Back to Manage CSV Annotation</a>
+
+  </div>
+  </form>
+  
+  }

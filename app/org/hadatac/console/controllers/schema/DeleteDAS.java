@@ -78,9 +78,9 @@ public class DeleteDAS extends Controller {
 	}
 	
         if (form.hasErrors()) {
-            return badRequest(DASConfirm.render("ERROR Deleting Data Acquisition Schema ", data));
+            return badRequest(DASConfirm.render("ERROR Deleting Data Acquisition Schema ", "", data.getLabel()));
         } else {
-            return ok(DASConfirm.render("Deleted Data Acquisition Schema ", data));
+            return ok(DASConfirm.render("Deleted Data Acquisition Schema ", "", data.getLabel()));
         }
     }
 

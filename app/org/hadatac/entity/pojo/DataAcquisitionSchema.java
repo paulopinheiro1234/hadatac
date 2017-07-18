@@ -1,6 +1,7 @@
 package org.hadatac.entity.pojo;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -45,6 +46,21 @@ public class DataAcquisitionSchema {
     public static String DELETE_LINE3 = INDENT1 + " ?p ?o . ";
     public static String LINE_LAST = "}  ";
     public static String PREFIX = "DAS-";
+    public static List<String> METADASA = Arrays.asList("sio:TimeStamp", 
+							"sio:TimeInstant", 
+							"hasco:originalID", 
+							"hasco:URI", 
+							"hasco:hasEntity", 
+							"hasco:hasEntityURI", 
+							"hasco:hasAttribute", 
+							"hasco:hasAttributeURI", 
+							"hasco:hasUnit", 
+							"hasco:hasUnitURI", 
+							"sio:InRelationTo",
+							"hasco:hasLOD",
+							"hasco:hasCalibration",
+							"hasco:hasElevation",
+							"hasco:hasLocation");
 
     private String uri = "";
     private String label = "";
@@ -185,6 +201,7 @@ public class DataAcquisitionSchema {
 	} else {
 	    this.attributes = attributes;
 	    for (DataAcquisitionSchemaAttribute dasa : attributes) {
+		dasa.setDataAcquisitionSchema(this);
 		if (dasa.getAttribute().equals(ValueCellProcessing.replacePrefixEx("sio:TimeStamp"))) {
 		    setTimestampColumn(dasa.getPositionInt());
 		    System.out.println("[OK] DataAcquisitionSchema TimeStampColumn: " + dasa.getPositionInt());

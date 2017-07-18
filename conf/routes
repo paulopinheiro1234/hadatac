@@ -161,6 +161,7 @@ GET	/hadatac/schema/new			       org.hadatac.console.controllers.schema.NewDAS.i
 POST	/hadatac/schema/new			       org.hadatac.console.controllers.schema.NewDAS.postIndex()
 POST 	/hadatac/schema/new/form		       org.hadatac.console.controllers.schema.NewDAS.processForm()
 POST 	/hadatac/schema/new/formfile		       org.hadatac.console.controllers.schema.NewDAS.processFormFromFile(labels: String)
+POST 	/hadatac/schema/new/formfilelabels	       org.hadatac.console.controllers.schema.NewDAS.processFormFromFileLabels(labels: String)
 GET	/hadatac/schema/delete	    	               org.hadatac.console.controllers.schema.DeleteDAS.index(das_uri : String)
 POST	/hadatac/schema/delete		               org.hadatac.console.controllers.schema.DeleteDAS.postIndex(das_uri : String)
 POST 	/hadatac/schema/delete/form	               org.hadatac.console.controllers.schema.DeleteDAS.processForm(das_uri : String)
@@ -235,8 +236,10 @@ POST	/hadatac/annotator/file/owner/form     	       org.hadatac.console.controll
 GET	/hadatac/annotator/file/acquisition	       org.hadatac.console.controllers.annotator.AutoAnnotator.assignDataAcquisition(dataAcquisitionUri: String, file: String)
 POST	/hadatac/annotator/file/acquisition            org.hadatac.console.controllers.annotator.AutoAnnotator.postAssignDataAcquisition(dataAcquisitionUri: String, file: String)
 POST	/hadatac/annotator/file/acquisition/form       org.hadatac.console.controllers.annotator.AutoAnnotator.processDataAcquisitionForm(dataAcquisitionUri: String, file : String)
-GET	/hadatac/annotator/schema                      org.hadatac.console.controllers.annotator.SchemaFromFile.create(file_name : String)
-POST	/hadatac/annotator/schema                      org.hadatac.console.controllers.annotator.SchemaFromFile.create(file_name : String)
+GET	/hadatac/annotator/schema                      org.hadatac.console.controllers.annotator.SchemaFromFile.create(filename : String)
+POST	/hadatac/annotator/schema                      org.hadatac.console.controllers.annotator.SchemaFromFile.create(filename : String)
+GET 	/hadatac/annotator/prepare		       org.hadatac.console.controllers.annotator.PrepareIngestion.create(filename: String, da_uri: String)
+POST 	/hadatac/annotator/prepare		       org.hadatac.console.controllers.annotator.PrepareIngestion.postCreate(filename: String, da_uri: String)
 
 # metadata store management URLs
 GET     /hadatac/ts/clean                              org.hadatac.console.controllers.triplestore.Clean.clean(oper: String)

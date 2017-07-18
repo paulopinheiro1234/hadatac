@@ -25,6 +25,14 @@ var svg = d3.select("treecontent").append("svg")
     .append("g")
     .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
+function resetSelection(d){
+    d._isSelected = false;
+    var children = (d.children)?d.children:d._children;
+    if(children) {
+        children.forEach(resetSelection);
+    }
+}
+
 function collapse(d) {
    if (d.children) {
       d._children = d.children;
@@ -43,11 +51,86 @@ function expand(d){
 	children.forEach(expand);
 }
 
+function exactSearchTree(obj,search,path){
+    if(obj.name === search){ //if search is found return, add the object to the path and return it                                                                                                        
+        obj._isSelected = true;  // mark is                                                                                                                                                               
+        path.push(obj);
+        return path;
+    }
+    else if(obj.children || obj._children){ //if children are collapsed d3 object will have them instantiated as _children                                                                                
+        var children = (obj.children) ? obj.children : obj._children;
+        for(var i=0;i<children.length;i++){
+            path.push(obj);// we assume this path is the right one                                                                                                                                        
+            var found = searchTree(children[i],search,path);
+            if(found){// we were right, this should return the bubbled-up path from the first if statement                                                                                                
+                return found;
+            }
+            else{//we were wrong, remove this parent from the path and continue iterating                                                                                                                 
+                path.pop();
+            }
+        }
+    }
+    else{//not the right object, return false so it will continue to iterate in the loop                                                                                                                  
+        return false;
+    }
+}
+
+function searchTree(obj,search,path){
+    if(obj.name.indexOf(search) != -1){ //if search is found return, add the object to the path and return it                                                                                             
+        obj._isSelected = true;  // mark is                                                                                                                                                               
+        lastClickD = obj;
+        path.push(obj);
+        return path;
+    }
+    else if(obj.children || obj._children){ //if children are collapsed d3 object will have them instantiated as _children                                                                                
+        var children = (obj.children) ? obj.children : obj._children;
+        for(var i=0;i<children.length;i++){
+            path.push(obj);// we assume this path is the right one                                                                                                                                        
+            var found = searchTree(children[i],search,path);
+            if(found){// we were right, this should return the bubbled-up path from the first if statement                                                                                                
+                return found;
+            }
+            else{//we were wrong, remove this parent from the path and continue iterating                                                                                                                 
+                path.pop();
+            }
+        }
+    }
+    else{//not the right object, return false so it will continue to iterate in the loop                                                                                                                  
+        return false;
+    }
+}
+
+function openPaths(paths){
+    for(var i =0;i<paths.length;i++){
+        if(paths[i].id !== "1"){//i.e. not root                                                                                                                                                           
+            paths[i].class = 'found';
+            if(paths[i]._children){ //if children are hidden: open them, otherwise: don't do anything                                                                                                     
+                paths[i].children = paths[i]._children;
+                paths[i]._children = null;
+            }
+            update(paths[i]);
+        }
+    }
+}
+
+function initialize(d) {
+    lastClikD = null;
+    resetSelection(d);
+    d.children.forEach(collapse);
+    if (document.getElementById("newAttribute").value != "") {
+        var paths = exactSearchTree(d,document.getElementById("newAttribute").value,[]);
+        if(typeof(paths) !== "undefined"){
+            openPaths(paths);
+        }
+    }
+}
+
 var flare = JSON.parse(results);
     flare.x0 = 0;
     flare.y0 = 0;
-    flare.children.forEach(collapse);
-    update(root = flare);
+    root = flare;
+    initialize(root);
+    update(root);
 
 function update(source) {
 
@@ -173,26 +256,47 @@ function click(d) {
     update(d);
 }
 
-document.getElementById("copyvalue").onclick = function() {replaceAttributeValue()};
-
-function replaceAttributeValue() {
-    $('#newAttribute').val(lastClickD.name);
-}
-
-
-document.getElementById("collapse").onclick = function() { 
+document.getElementById("collapse").onclick = function() {
+    resetSelection(root);
+    lastClickD = null;
     root.children.forEach(collapse);
     update(root);
 };
 
-document.getElementById("expand").onclick = function() { 
+document.getElementById("expand").onclick = function() {
     expand(root);
     update(root);
 };
+
+document.getElementById("reset").onclick = function() {
+    initialize(root);
+    update(root);
+};
+
+document.getElementById("findTerm").onclick = function() {
+    root.children.forEach(collapse);
+    var paths = searchTree(root,document.getElementById("searchValue").value,[]);
+    if(typeof(paths) !== "undefined"){
+        openPaths(paths);
+    }
+    else{
+        alert(document.getElementById("searchValue").value + " not found!");
+    }
+};
+
+document.getElementById("copyvalue").onclick = function() {
+    $('#newAttribute').val(lastClickD.name);
+}
 
 function color(d) {
     if (d._isSelected) return 'red';
     return d._children ? "#3182bd" : d.children ? "#c6dbef" : "#fd8d3c";
 }
+
+document.getElementById("clearAttribute").onclick = function() {
+    $('#newAttribute').val("");
+    initialize(root);
+    update(root);
+};
 
 })(d3);

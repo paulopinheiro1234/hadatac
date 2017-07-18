@@ -26,6 +26,7 @@ import org.hadatac.utils.ConfigProp;
 import org.hadatac.metadata.loader.LabkeyDataHandler;
 import org.hadatac.entity.pojo.DataAcquisitionSchemaObject;
 import org.hadatac.entity.pojo.DataAcquisitionSchemaEvent;
+import org.hadatac.entity.pojo.DataAcquisitionSchema;
 import org.hadatac.metadata.loader.ValueCellProcessing;
 import org.labkey.remoteapi.CommandException;
 import be.objectify.deadbolt.java.actions.Group;
@@ -38,7 +39,7 @@ public class DataAcquisitionSchemaAttribute {
     public static String INSERT_LINE1 = "INSERT DATA {  ";
     public static String DELETE_LINE1 = "DELETE WHERE {  ";
     public static String LINE3 = INDENT1 + "a         hasco:DASchemaAttribute;  ";
-    public static String DELETE_LINE3 = INDENT1 + " ?p ?o . ";
+    public static String DELETE_LINE3 = " ?p ?o . ";
     public static String LINE_LAST = "}  ";
     public static String PREFIX = "DASA-";
 
@@ -68,6 +69,8 @@ public class DataAcquisitionSchemaAttribute {
     private String unitLabel;
     private String daseUri;
     private String dasoUri;
+    private boolean isMeta;
+    private DataAcquisitionSchema das;
     
     public DataAcquisitionSchemaAttribute(String uri, String partOfSchema) {
 	this.uri = uri;
@@ -81,6 +84,7 @@ public class DataAcquisitionSchemaAttribute {
 	this.setUnit("");
 	this.daseUri = "";
 	this.dasoUri = "";
+	this.isMeta = false;
     }
 
     public DataAcquisitionSchemaAttribute(String uri, 
@@ -138,6 +142,10 @@ public class DataAcquisitionSchemaAttribute {
 	this.localName = localName;
     }
     
+    public void setDataAcquisitionSchema(DataAcquisitionSchema das) {
+	this.das = das;
+    }
+
     public String getLabel() {
 	if (label == null) {
 	    return "";
@@ -209,10 +217,26 @@ public class DataAcquisitionSchemaAttribute {
     }
     
     public String getEntityLabel() {
-	if (!entityLabel.equals("")) {
+	if (entityLabel.equals("")) {
 	    return ValueCellProcessing.replaceNameSpaceEx(entity);
 	}
 	return entityLabel;
+    }
+    
+    public String getAnnotatedEntity() {
+	String annotation;
+	if (entityLabel.equals("")) {
+	    if (entity == null || entity.equals("")) {
+		return "";
+	    }
+	    annotation = ValueCellProcessing.replaceNameSpaceEx(entity);
+	} else {
+	    annotation = entityLabel;
+	}
+	if (!getEntityNamespace().equals("")) {
+	    annotation += " [" + getEntityNamespace() + "]";
+	} 
+	return annotation;
     }
     
     public String getAttribute() {
@@ -237,13 +261,30 @@ public class DataAcquisitionSchemaAttribute {
 	} else {
 	    this.attributeLabel = FirstLabel.getLabel(attribute);
 	}
+        this.isMeta = (DataAcquisitionSchema.METADASA.contains(ValueCellProcessing.replaceNameSpaceEx(attribute)));
     }
     
     public String getAttributeLabel() {
-	if (!attributeLabel.equals("")) {
+	if (attributeLabel.equals("")) {
 	    return ValueCellProcessing.replaceNameSpaceEx(attribute);
 	}
 	return attributeLabel;
+    }
+    
+    public String getAnnotatedAttribute() {
+	String annotation;
+	if (attributeLabel.equals("")) {
+	    if (attribute == null || attribute.equals("")) {
+		return "";
+	    }
+	    annotation = ValueCellProcessing.replaceNameSpaceEx(attribute);
+	} else {
+	    annotation = attributeLabel;
+	}
+	if (!getAttributeNamespace().equals("")) {
+	    annotation += " [" + getAttributeNamespace() + "]";
+	} 
+	return annotation;
     }
     
     public String getUnit() {
@@ -271,10 +312,26 @@ public class DataAcquisitionSchemaAttribute {
     }
         
     public String getUnitLabel() {
-	if (!unitLabel.equals("")) {
+	if (unitLabel.equals("")) {
 	    return ValueCellProcessing.replaceNameSpaceEx(unit);
 	}
 	return unitLabel;
+    }
+    
+    public String getAnnotatedUnit() {
+	String annotation;
+	if (unitLabel.equals("")) {
+	    if (unit == null || unit.equals("")) {
+		return "";
+	    }
+	    annotation = ValueCellProcessing.replaceNameSpaceEx(unit);
+	} else {
+	    annotation = unitLabel;
+	}
+	if (!getUnitNamespace().equals("")) {
+	    annotation += " [" + getUnitNamespace() + "]";
+	} 
+	return annotation;
     }
     
     public String getObjectUri() {
@@ -288,6 +345,24 @@ public class DataAcquisitionSchemaAttribute {
 	return DataAcquisitionSchemaObject.find(dasoUri);
     }
     
+    public String getObjectViewLabel() {
+	if (isMeta) {
+	    return "";
+	}
+	if (dasoUri == null || dasoUri.equals("")) {
+	    if (das != null && das.getIdColumn() > -1) {
+		return "[value column " + das.getIdColumn() + "]";
+	    }
+	    return "";
+	} else {
+	    DataAcquisitionSchemaObject daso = DataAcquisitionSchemaObject.find(dasoUri);
+	    if (daso.getLabel() == null || daso.getLabel().equals("")) {
+		return dasoUri;
+	    }
+	    return daso.getLabel();
+	}
+    }
+    
     public String getEventUri() {
 	return daseUri;
     }
@@ -297,6 +372,24 @@ public class DataAcquisitionSchemaAttribute {
 	    return null;
 	}
 	return DataAcquisitionSchemaEvent.find(daseUri);
+    }
+    
+    public String getEventViewLabel() {
+	if (isMeta) {
+	    return "";
+	}
+	if (daseUri == null || daseUri.equals("")) {
+	    if (das != null && das.getTimestampColumn() > -1) {
+		return "[value column " + das.getTimestampColumn() + "]";
+	    }
+	    return "";
+	} else {
+	    DataAcquisitionSchemaEvent dase = DataAcquisitionSchemaEvent.find(daseUri);
+	    if (dase.getLabel() == null || dase.getLabel().equals("")) {
+		return daseUri;
+	    }
+	    return dase.getLabel();
+	}
     }
     
     public static DataAcquisitionSchemaAttribute find (String dasa_uri) {
@@ -467,6 +560,7 @@ public class DataAcquisitionSchemaAttribute {
     }
     
     public void save() {
+	delete();  // delete any existing triple for the current DASA
 	System.out.println("Saving <" + uri + ">");
 	if (uri.equals("")) {
 	    System.out.println("[ERROR] Trying to save DASA without assigning an URI");
@@ -542,7 +636,11 @@ public class DataAcquisitionSchemaAttribute {
 	String query = "";
 	query += NameSpaces.getInstance().printSparqlNameSpaceList();
         query += DELETE_LINE1;
-    	query += "<" + this.getUri() + ">  ";
+	if (this.getUri().startsWith("http")) {
+	    query += "<" + this.getUri() + ">";
+	} else {
+	    query += this.getUri();
+	}
         query += DELETE_LINE3;
     	query += LINE_LAST;
     	UpdateRequest request = UpdateFactory.create(query);

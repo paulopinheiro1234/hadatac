@@ -96,23 +96,21 @@ public class NewDAS extends Controller {
         String password = session().get("LabKeyPassword");
         if (user_name != null && password != null) {
 	    try {
-		int nRowsOfSchema = das.saveToLabKey(
-				        session().get("LabKeyUserName"), session().get("LabKeyPassword"));
+		int nRowsOfSchema = das.saveToLabKey(session().get("LabKeyUserName"), session().get("LabKeyPassword"));
 		das.save();
-		return ok(main.render("Results,", "", new Html("<h3>" 
-							       + String.format("%d row(s) have been inserted in Table \"DataAcquisitionSchema\" \n", nRowsOfSchema) 
-							       + "</h3>")));
+		return ok(DASConfirm.render("New Data Acquisition Schema", String.format("%d row(s) have been inserted in Table \"DataAcquisitionSchema\" \n", nRowsOfSchema),data.getLabel()));
 	    } catch (CommandException e) {
 		return badRequest("Failed to insert Deployment to LabKey!\n"
 				  + "Error Message: " + e.getMessage());
 	    }
-        }
-        
-        return ok(DASConfirm.render("New Data Acquisition Schema", data));
+	}
+	    
+	return ok(DASConfirm.render("New Data Acquisition Schema", "no content added to labkey", data.getLabel()));
     }
 
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
 	public static Result processFormFromFile(String attributes) {
+	System.out.println("Inside processFormFromFile()");
     	final SysUser user = AuthApplication.getLocalUser(session());
         Form<DataAcquisitionSchemaForm> form = Form.form(DataAcquisitionSchemaForm.class).bindFromRequest();
         if (form.hasErrors()) {
@@ -139,6 +137,57 @@ public class NewDAS extends Controller {
 	    DataAcquisitionSchemaAttribute dasa = new DataAcquisitionSchemaAttribute(kbPrefix + "DASA-" + label + "-" + finalAttribute, das.getUri());
 	    dasa.setLabel(finalAttribute);
 	    dasa.setPosition(Integer.toString(pos));
+	    das.getAttributes().add(dasa);
+	    pos++;
+	}
+	
+	das.save();
+
+        String user_name = session().get("LabKeyUserName");
+        String password = session().get("LabKeyPassword");
+        if (user_name != null && password != null) {
+	    try {
+		System.out.println("Saving DAS in Labkey");
+		int nRowsOfSchema = das.saveToLabKey(session().get("LabKeyUserName"), session().get("LabKeyPassword"));
+	    } catch (CommandException e) {
+		return badRequest("Failed to insert DA Schema to LabKey!\n"
+				  + "Error Message: " + e.getMessage());
+	    }
+        }
+        
+    	return ok(editDAS.render(das));
+	
+    }
+
+    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
+	public static Result processFormFromFileLabels(String attributes) {
+	System.out.println("Inside processFormFromFileLabels()");
+    	final SysUser user = AuthApplication.getLocalUser(session());
+        Form<DataAcquisitionSchemaForm> form = Form.form(DataAcquisitionSchemaForm.class).bindFromRequest();
+        if (form.hasErrors()) {
+	    return badRequest("The submitted form has errors!");
+        }
+        
+        DataAcquisitionSchemaForm data = form.get();
+	String[] fields;
+	
+        String label = data.getLabel().replace("DA-","").replace(".csv","").replace(".","").replace("+","-");
+        DataAcquisitionSchema das = DataFactory.createDataAcquisitionSchema(label);
+        
+	System.out.println("File Processing: [" + attributes + "]");
+	if (attributes == null || attributes.equals("")) {
+	    return ok(editDAS.render(das));	
+	}
+	fields = FileProcessing.extractFields(attributes);
+	System.out.println("# of fields: " + fields.length);
+	int pos = 0;
+	for (String attribute: fields) {
+	    //attribute = URLEncoder.encode(attribute);
+	    String finalAttribute = attribute.replace(".","").replace("+","-").replace(" ","-").replace("?","").replace("(","").replace(")","").replace("\"","");
+	    System.out.println("Label: " + finalAttribute + "  Pos: " + pos);
+	    DataAcquisitionSchemaAttribute dasa = new DataAcquisitionSchemaAttribute(kbPrefix + "DASA-" + label + "-" + finalAttribute, das.getUri());
+	    dasa.setLabel(finalAttribute);
+	    dasa.setPosition(Integer.toString(-1));
 	    das.getAttributes().add(dasa);
 	    pos++;
 	}
