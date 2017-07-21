@@ -1,5 +1,4 @@
-@(das        : org.hadatac.entity.pojo.DataAcquisitionSchema,
-  dasa       : org.hadatac.entity.pojo.DataAcquisitionSchemaAttribute, 
+@(das        : org.hadatac.entity.pojo.DataAcquisitionSchema, 
   entities   : org.hadatac.console.models.OtMSparqlQueryResults,
   attributes : org.hadatac.console.models.OtMSparqlQueryResults,
   units      : org.hadatac.console.models.OtMSparqlQueryResults)
@@ -9,7 +8,7 @@
 @import org.hadatac.utils._
 @import org.hadatac.metadata.loader.ValueCellProcessing
 
-@main("Edit Data Acquisition Schema Attribute") {
+@main("Create Data Acquisition Schema Attribute") {
 
 <style>
 
@@ -63,11 +62,11 @@
 
    <div class="container-fluid">
 
-      <h2>Edit Data Acquisition Schema Attribute (DASA)</h2>
+      <h2>Create Data Acquisition Schema Attribute (DASA)</h2>
     
       <div class="col-md-5 col-xs-4">
 
-	 <form class="form-horizontal" name="editForm" method="post" action="@org.hadatac.console.controllers.schema.routes.EditDASA.processForm(dasa.getUri())">
+	 <form class="form-horizontal" name="newForm" method="post" action="@org.hadatac.console.controllers.schema.routes.NewDASA.processForm(das.getUri())">
        
            <label>Operations</label><br>
            <div class="form-group">
@@ -85,23 +84,23 @@
 
            <div class="form-group">
              <label>URI</label>
-	     <input type="text" class="form-control col-sm-6" id="newUri" name="newUri" value="@dasa.getUriNamespace()" readonly>
+	     <input type="text" class="form-control col-sm-6" id="newUri" name="newUri" value="@ValueCellProcessing.replaceNameSpaceEx(das.getUri())" readonly>
            </div>
            
            <div class="form-group">
              <label>Label</label>
-	     <input type="text" class="form-control col-sm-6" id="newLabel" name="newLabel" value="@dasa.getLabel()" onchange="labelchange()">
+	     <input type="text" class="form-control col-sm-6" id="newLabel" name="newLabel" value="" onchange="labelchange()">
            </div>
            
            <div class="form-group">
              <label>Position</label>
-	     <input type="text" class="form-control col-sm-6" id="newPosition" name="newPosition" value="@dasa.getPosition()">
+	     <input type="text" class="form-control col-sm-6" id="newPosition" name="newPosition" value="">
            </div>
            
            <div class="form-group">
              <label>Entity</label>	     
              <button type="button" class="btn btn-info btn-xs" role="button" type="clearEntity"  id="clearEntity">clear</button>
-	     <input type="text" class="form-control col-sm-6" id="newEntity" name="newEntity" value="@dasa.getAnnotatedEntity()" readonly>
+	     <input type="text" class="form-control col-sm-6" id="newEntity" name="newEntity" value="" readonly>
            </div>
            
            <div class="form-group">
@@ -113,13 +112,13 @@
 	          @METADASA_entry(metadasa)
                }
 	     </select>
-             <input type="text" class="form-control col-sm-6" id="newAttribute" name="newAttribute" value="@dasa.getAnnotatedAttribute()" readonly>
+             <input type="text" class="form-control col-sm-6" id="newAttribute" name="newAttribute" value="" readonly>
            </div>
 	   
            <div class="form-group">
              <label>Unit</label>
              <button type="button" class="btn btn-info btn-xs" role="button" type="clearUnit"  id="clearUnit">clear</button>
-             <input type="text" class="form-control col-sm-6" id="newUnit" name="newUnit" value="@dasa.getAnnotatedUnit()" readonly>
+             <input type="text" class="form-control col-sm-6" id="newUnit" name="newUnit" value="" readonly>
            </div>
 	   
            <div class="form-group">
@@ -135,9 +134,9 @@
            
 	   <div class="form-group">
              <label>Updates</label> <br>
-	     <input class="btn btn-success btn-sm" role="button" type="submit" id="submit" value="Update DASA" />
+	     <input class="btn btn-success btn-sm" role="button" type="submit" id="submit" value="Create DASA" />
 	     <input class="btn btn-success btn-sm" role="button" type="copyvalue" id="copyvalue" value="Copy Selected Value" /> <br>
-	     <a href="@org.hadatac.console.controllers.schema.routes.EditDAS.index(dasa.getPartOfSchema())" class="btn btn-primary" role="button">Back to DA Schema Editing</a>
+	     <a href="@org.hadatac.console.controllers.schema.routes.EditDAS.index(das.getUri())" class="btn btn-primary" role="button">Back to DA Schema Editing</a>
 	   </div>
 
          </form>
@@ -191,7 +190,7 @@
 
             <script>
 	      function dasachange() {
-	         var x = document.getElementById("metadasaselect").value;
+	         var x = document.getElementById("metadataselect").value;
 	         $('#newEntity').val("");
 	         $('#newAttribute').val(x.substring(x.indexOf(":") + 1) + " [" + x + "]" );
 	         $('#newUnit').val("");
@@ -208,7 +207,7 @@
 	      
 	      function labelchange() {
 	         var newValue = document.getElementById("newLabel").value;
-	         var newUri = "@ValueCellProcessing.replaceNameSpaceEx(dasa.getPartOfSchema())" + "-" + newValue;
+	         var newUri = "@ValueCellProcessing.replaceNameSpaceEx(das.getUri())" + "-" + newValue;
 	         newUri = replaceAll(newUri," ","-");
 	         newUri = replaceAll(newUri,"<","");
 		 newUri = replaceAll(newUri,">","");
@@ -216,26 +215,7 @@
 	         newUri = newUri.replace("SDD-","DASA-");
 	         $('#newUri').val(newUri);
 	      };
-		   
-              document.getElementById("clearEntity").onclick = function() {
-                 $('#newEntity').val("");
-                 initialize(root);
-                 update(root);
-              };
-
-              document.getElementById("clearAttribute").onclick = function() {
-                 $('#newAttribute').val("");
-                 initialize(root);
-                 update(root);
-              };
-
-              document.getElementById("clearUnit").onclick = function() {
-                 $('#newUnit').val("");
-                 initialize(root);
-                 update(root);
-              };
-
-           </script>
+            </script>
 
       </div>
 

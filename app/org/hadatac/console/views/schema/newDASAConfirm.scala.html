@@ -1,0 +1,31 @@
+@(dasa : org.hadatac.entity.pojo.DataAcquisitionSchemaAttribute)
+
+@import helper._
+@import org.hadatac.utils._
+@import org.hadatac.console.views.html._
+@import org.hadatac.console.controllers._
+@import org.hadatac.console.controllers.schema._
+
+@main("Change Data Acquisition Schema Attribute") {
+
+    <h2>Create Data Acquisition Schema Attribute</h2>
+    
+    <h3>Listing below shows values for new Data Acquisition Schema Attribute</h3>
+
+    <div class="container-fluid">
+       <ul>
+         <li><b>URI:</b> @dasa.getUri()</li>
+         <li><b>Label:</b> @dasa.getLabel()</li>
+         <li><b>Position:</b> @dasa.getPosition()</li>
+         <li><b>Entity:</b> @dasa.getEntityNamespace()</li>
+         <li><b>Attribute:</b> @dasa.getAttributeNamespace()</li>
+         <li><b>Unit:</b> @dasa.getUnitNamespace()</li>
+       </ul>
+       
+       <br>
+       <a href="@org.hadatac.console.controllers.schema.routes.EditDAS.index(dasa.getPartOfSchema())" class="btn btn-primary" role="button">Back to DA Schema Editing</a>
+       
+    </div>
+    
+    }
+    

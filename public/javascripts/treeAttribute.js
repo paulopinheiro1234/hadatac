@@ -293,10 +293,4 @@ function color(d) {
     return d._children ? "#3182bd" : d.children ? "#c6dbef" : "#fd8d3c";
 }
 
-document.getElementById("clearAttribute").onclick = function() {
-    $('#newAttribute').val("");
-    initialize(root);
-    update(root);
-};
-
 })(d3);

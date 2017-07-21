@@ -1,0 +1,175 @@
+@(daso       : org.hadatac.entity.pojo.DataAcquisitionSchemaObject, 
+  entities   : org.hadatac.console.models.OtMSparqlQueryResults,
+  das        : org.hadatac.entity.pojo.DataAcquisitionSchema)
+
+@import org.hadatac.console.views.html._
+@import org.hadatac.entity.pojo.DataAcquisitionSchema
+@import org.hadatac.utils._
+@import org.hadatac.metadata.loader.ValueCellProcessing
+
+@main("Edit Data Acquisition Schema Object") {
+
+<style>
+
+     .node rect {
+         cursor: pointer;
+         fill: #fff;
+         fill-opacity: .5;
+         stroke: #3182bd;
+         stroke-width: 1.5px;
+      }
+
+      .node text {
+         font: 10px sans-serif;
+          pointer-events: none;
+      }
+
+      path.link {
+          fill: none;
+          stroke: #9ecae1;
+          stroke-width: 1.5px;
+      }
+
+      .tab-content {
+         border-left: 1px solid #ddd;
+         border-right: 1px solid #ddd;
+         padding: 10px;
+      }
+
+</style>
+
+<script type="text/javascript">
+  function checkform() {
+
+      alert(lasClikedD)
+      var cansubmit = true;
+  
+      if (lastClickD == null) {
+          cansubmit = false;
+      }
+  
+      if (cansubmit) {
+          document.getElementById('copyvalue').disabled = false;
+      } else {
+          document.getElementById('copyvalue').disabled = 'disabled';
+      }
+
+  }
+
+</script>
+
+
+   <div class="container-fluid">
+
+      <h2>Edit Data Acquisition Schema Object (DASO)</h2>
+    
+      <div class="col-md-5 col-xs-4">
+
+	 <form class="form-horizontal" name="editForm" method="post" action="@org.hadatac.console.controllers.schema.routes.EditDASO.processForm(daso.getUri(), das.getUri())">
+       
+           <label>Operations</label><br>
+           <div class="form-group">
+	     <button type="button" class="btn btn-info btn-sm" role="button" type="expand"       id="expand">      <span class="glyphicon glyphicon-zoom-in">  </span> Expand All</button>
+	     <button type="button" class="btn btn-info btn-sm" role="button" type="collapse"     id="collapse">    <span class="glyphicon glyphicon-zoom-out"> </span> Collapse All</button>
+	     <button type="button" class="btn btn-info btn-sm" role="button" type="previousDASO" id="previousDASO"><span class="glyphicon glyphicon-backward"> </span> Previous DASO</button>
+	     <button type="button" class="btn btn-info btn-sm" role="button" type="nextDASO"     id="nextDASO">    <span class="glyphicon glyphicon-forward">  </span> Next DASO</button>
+	     <button type="button" class="btn btn-info btn-sm" role="button" type="reset"        id="reset">       <span class="glyphicon glyphicon-refresh">  </span> Reset</button>
+	     <button type="button" class="btn btn-info btn-sm disabled" role="button" type="suggestDASO"  id="suggestDASO"> <span class="glyphicon glyphicon-info-sign">  </span> Suggest Values</button>
+	     <div>
+	       <button type="button" class="btn btn-info btn-sm" role="button" type="findTerm"     id="findTerm">    <span class="glyphicon glyphicon-search">   </span> Find Term</button>
+	       <input type="text"  id="searchValue" name="searchValue" value="">
+	     </div>
+           </div>
+
+           <div class="form-group">
+             <label>URI</label>
+	     <input type="text" class="form-control col-sm-6" id="newUri" name="newUri" value="@daso.getUriNamespace()" readonly>
+           </div>
+           
+           <div class="form-group">
+             <label>Label</label>
+	     <input type="text" class="form-control col-sm-6" id="newLabel" name="newLabel" value="@daso.getLabel()" onchange="labelchange()">
+           </div>
+           
+           <div class="form-group">
+             <label>Role</label>
+	     <input type="text" class="form-control col-sm-6" id="newRole" name="newRole" value="@daso.getRole()">
+           </div>
+           
+           <div class="form-group">
+             <label>Entity</label>	     
+             <button type="button" class="btn btn-info btn-xs" role="button" type="clearEntity"  id="clearEntity">clear</button>
+	     <input type="text" class="form-control col-sm-6" id="newEntity" name="newEntity" value="@daso.getAnnotatedEntity()" readonly>
+           </div>
+           
+           <div class="form-group">
+             <label>In Relation To</label>
+	     <select id="newInRelationTo" class="form-control col-sm-6" name="newInRelationTo">
+	       <option></option>
+               @if(daso.getInRelationToLabel().equals("DefaultObject")) {
+	            <option selected>DefaultObject</option>
+	       } else {
+	            <option>DefaultObject</option>
+	       }
+               @for(dasoaux <- das.getObjects()){
+	          @DASO_select_entry(dasoaux,daso.getInRelationToLabel())
+               }
+	     </select>
+           </div>
+           
+           <div class="form-group">
+             <label>Relation</label>
+             <input type="text" class="form-control col-sm-6" id="newRelation" name="newRelation" value="@daso.getRelationNamespace()">
+           </div>
+	   
+	   <div class="form-group">
+             <label>Updates</label> <br>
+	     <input class="btn btn-success btn-sm" role="button" type="submit" id="submit" value="Update DASO" />
+	     <input class="btn btn-success btn-sm" role="button" type="copyvalue" id="copyvalue" value="Copy Selected Value" /> <br>
+	     <a href="@org.hadatac.console.controllers.schema.routes.EditDAS.index(daso.getPartOfSchema())" class="btn btn-primary" role="button">Back to DA Schema Editing</a>
+	   </div>
+
+         </form>
+      </div>
+      <div class="col-md-7 col-xs-4">
+
+            <ul class="nav nav-tabs">
+                <li class="active"><a class="entitytab" href="#entity_tab" data-toggle="tab">Entity Hierachy</a></li>
+            </ul>
+            <div class="tab-content">
+                <treecontent></treecontent>
+                <div class="tab-pane" id="entity_tab">
+		    <div id="entityquery" data-results="@entities.treeResults"></div>
+                </div>
+            </div>
+
+            <script src="/hadatac/assets/javascripts/jquery.min.js"></script>
+            <script src="/hadatac/assets/javascripts/d3.v3.min.js"></script>
+            <script src="/hadatac/assets/javascripts/bootstrap.min.js"></script>
+            <script src="/hadatac/assets/javascripts/treeEntity.js"></script>
+            <script>
+	      function replaceAll(str, find, replace) {
+	         while (str.indexOf(find) > -1) {
+		    str = str.replace(find, replace);
+		 }
+		 return str;
+	      }
+	      
+	      function labelchange() {
+	         var newValue = document.getElementById("newLabel").value;
+	         var newUri = "@ValueCellProcessing.replaceNameSpaceEx(daso.getPartOfSchema())" + "-" + newValue;
+	         newUri = replaceAll(newUri," ","-");
+	         newUri = replaceAll(newUri,"<","");
+		 newUri = replaceAll(newUri,">","");
+		 newUri = replaceAll(newUri,"?","");
+	         newUri = newUri.replace("SDD-","DASO-");
+	         $('#newUri').val(newUri);
+	      };
+            </script>
+
+      </div>
+
+   </div>
+	 
+}
+   

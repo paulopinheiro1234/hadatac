@@ -15,10 +15,10 @@
   <form class="form-horizontal" name="prepareIngestion" method="post">
 
   <div class="container col-md-9">
-    <h2>Prepare Data Ingestion</h2>
+    <h3>Prepare Data Ingestion</h3>
 
     <div id="rcorners" style="background-color: #DCF7FE">
-      <center><input type="submit" class="btn btn-primary btn-sm" role="button" id="selectDA" value="Select Data Acquisition"
+      <center><input type="submit" class="btn btn-primary btn-sm" role="button" id="selectDA" value="Select Complete Data Acquisition"
 		     formaction="@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.assignDataAcquisition(da_uri, filename)"></input>
     </div>
 
@@ -132,13 +132,13 @@
 
 	  <input type="submit" class="btn btn-primary btn-sm" role="button"  id="createDASFromFile"
 		 formaction="@org.hadatac.console.controllers.annotator.routes.SchemaFromFile.create(filename)" 
-		 value="Create Schema from File"></input>
+		 value="Create Schema from Data File"></input>
 
       </div></center>
 
     </div>
 
-    <br><br><br>
+    <br>
     <a href="@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.index()" class="btn btn-primary" role="button">Back to Manage CSV Annotation</a>
 
   </div>

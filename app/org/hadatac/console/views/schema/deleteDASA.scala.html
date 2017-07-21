@@ -1,0 +1,34 @@
+@(dasa: org.hadatac.entity.pojo.DataAcquisitionSchemaAttribute)
+
+@import helper._
+@import org.hadatac.utils._
+@import org.hadatac.console.views.html._
+@import org.hadatac.console.views.html.schema._
+@import org.hadatac.console.controllers.schema._
+
+@main("Delete Data Acquisition Schema Attribute") {
+<div class="container">
+   <h3>Delete Data Acquisition Schema Attribute</h3>
+
+   <form class="form-horizontal" method="post" action="@org.hadatac.console.controllers.schema.routes.DeleteDASA.processForm(dasa.getUri())">
+
+     <div class="form-group">
+       <label>URI       : </label> @dasa.getUri() <br>         
+       <label>Name      : </label> @dasa.getLabel() <br>         
+       <label>Position  : </label> @dasa.getPosition() <br>         
+       <label>Entity    : </label> @dasa.getEntityLabel() <br>         
+       <label>Attribute : </label> @dasa.getAttributeLabel() <br>         
+       <label>Unit      : </label> @dasa.getUnitLabel() <br>         
+     </div>
+     
+     <div class="form-group" class="col-sm-6 col-offset-3">
+	<input class="btn btn-success" role="button" type="submit" value="Delete" />
+     </div>
+
+    </form>   
+ 
+   <a href="@org.hadatac.console.controllers.schema.routes.EditDAS.index(dasa.getPartOfSchema())" class="btn btn-primary" role="button">Back to DA Schema Editing</a>
+
+</div>
+
+}

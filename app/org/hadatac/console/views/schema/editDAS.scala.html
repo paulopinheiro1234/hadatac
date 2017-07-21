@@ -16,7 +16,9 @@
             
             <h3>Edit Data Acquisition Schema @das.getUriNamespace()</h3>
 
-            <h4>Attributes   <a href="" class="btn-sm btn-primary" role="button">Add New Attribute</a>
+            <h4>Attributes   
+	      <a href="@org.hadatac.console.controllers.schema.routes.NewDASA.index(das.getUri())" class="btn-sm btn-primary" role="button">Add New Attribute</a>
+	      <a href="@org.hadatac.console.controllers.schema.routes.MainEntity.index(das.getUri())" class="btn-sm btn-primary" role="button">Set Main Entity</a>
 	    </h4>
 
 	    <div id="rcorners">
@@ -65,7 +67,7 @@
             </table>
 	    </div>
 
-            <h4>Associated Objects <a href="" class="btn-sm btn-primary" role="button">Add New Object</a></h4>
+            <h4>Associated Objects <a href="@org.hadatac.console.controllers.schema.routes.NewDASO.index(das.getUri())" class="btn-sm btn-primary" role="button">Add New Object</a></h4>
 
 	    <div id="rcorners">
             <table class="table">

@@ -269,11 +269,6 @@ document.getElementById("expand").onclick = function() {
     update(root);
 };
 
-document.getElementById("reset").onclick = function() { 
-    initialize(root);
-    update(root);
-};
-
 document.getElementById("findTerm").onclick = function() { 
     root.children.forEach(collapse);
     var paths = searchTree(root,document.getElementById("searchValue").value,[]);
@@ -293,5 +288,11 @@ function color(d) {
     if (d._isSelected) return 'red';
     return d._children ? "#3182bd" : d.children ? "#c6dbef" : "#fd8d3c";
 }
+
+document.getElementById("clearEntity").onclick = function() {
+    $('#newEntity').val("");
+    initialize(root);
+    update(root);
+};
 
 })(d3);

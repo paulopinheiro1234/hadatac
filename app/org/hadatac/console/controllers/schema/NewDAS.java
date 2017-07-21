@@ -72,11 +72,7 @@ public class NewDAS extends Controller {
     
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
 	public static Result postIndex() {
-    	if (session().get("LabKeyUserName") == null && session().get("LabKeyPassword") == null) {
-	    return redirect(org.hadatac.console.controllers.triplestore.routes.LoadKB.logInLabkey(
-			     org.hadatac.console.controllers.schema.routes.NewDAS.index().url()));
-    	}
-	return ok(newDAS.render());
+	return index();
     }
     
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))

@@ -15,22 +15,35 @@
 
     <div class="container-fluid">
        <ul>
-           <li><b>URI:</b> @dasa.getUri()</li>
-           <li><b>Label:</b> @dasa.getLabel()</li>
-           @if(changedInfo.contains(dasa.getEntity())) {
-           		<li><b>Current Entity:</b> <b><font color="blue">@dasa.getEntityNamespace()</font></b></li>
+           @if(changedInfo.contains(dasa.getUri())) {
+                <li><b>New URI:</b> <b><font color="blue">@dasa.getUri()</font></b></li>
            } else {
-           		<li><b>Current Entity:</b> @dasa.getEntityNamespace()</li>
+                <li><b>Existing URI:</b> @dasa.getUri()</li>
+           }
+           @if(changedInfo.contains(dasa.getLabel())) {
+                <li><b>New Label:</b> <b><font color="blue">@dasa.getLabel()</font></b></li>
+           } else {
+                <li><b>Existing Label:</b> @dasa.getLabel()</li>
+           }
+           @if(changedInfo.contains(dasa.getPosition())) {
+                <li><b>New Position:</b> <b><font color="blue">@dasa.getPosition()</font></b></li>
+           } else {
+                <li><b>Existing Position:</b> @dasa.getPosition()</li>
+           }
+           @if(changedInfo.contains(dasa.getEntity())) {
+                <li><b>New Entity:</b> <b><font color="blue">@dasa.getEntityNamespace()</font></b></li>
+           } else {
+                <li><b>Existing Entity:</b> @dasa.getEntityNamespace()</li>
            }
            @if(changedInfo.contains(dasa.getAttribute())) {
-           		<li><b>Current Attribute:</b> <b><font color="blue">@dasa.getAttributeNamespace()</font></b></li>
+                <li><b>New Attribute:</b> <b><font color="blue">@dasa.getAttributeNamespace()</font></b></li>
            } else {
-           		<li><b>Current Attribute:</b> @dasa.getAttributeNamespace()</li>
+           	<li><b>Existing Attribute:</b> @dasa.getAttributeNamespace()</li>
            }
            @if(changedInfo.contains(dasa.getUnit())) {
-           		<li><b>Current Unit:</b> <b><font color="blue">@dasa.getUnitNamespace()</font></b></li>
+           	<li><b>New Unit:</b> <b><font color="blue">@dasa.getUnitNamespace()</font></b></li>
            } else {
-           		<li><b>Current Unit:</b> @dasa.getUnitNamespace()</li>
+           	<li><b>Existing Unit:</b> @dasa.getUnitNamespace()</li>
            }
        </ul>
 

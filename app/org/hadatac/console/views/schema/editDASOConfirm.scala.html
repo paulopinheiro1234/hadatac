@@ -1,0 +1,55 @@
+@(daso : org.hadatac.entity.pojo.DataAcquisitionSchemaObject,
+  changedInfo : List[String])
+
+@import helper._
+@import org.hadatac.utils._
+@import org.hadatac.console.views.html._
+@import org.hadatac.console.controllers._
+@import org.hadatac.console.controllers.schema._
+
+@main("Change Data Acquisition Schema Object") {
+
+    <h2>Change Data Acquisition Schema Object</h2>
+    
+    <h3>Listing below shows new values for Data Acquisition Schema Object</h3>
+
+    <div class="container-fluid">
+       <ul>
+           @if(changedInfo.contains(daso.getUri())) {
+                <li><b>New URI:</b> <b><font color="blue">@daso.getUri()</font></b></li>
+           } else {
+                <li><b>Existing URI:</b> @daso.getUri()</li>
+           }
+           @if(changedInfo.contains(daso.getLabel())) {
+                <li><b>New Label:</b> <b><font color="blue">@daso.getLabel()</font></b></li>
+           } else {
+                <li><b>Existing Label:</b> @daso.getLabel()</li>
+           }
+           @if(changedInfo.contains(daso.getRole())) {
+                <li><b>New Role:</b> <b><font color="blue">@daso.getRole()</font></b></li>
+           } else {
+                <li><b>Existing Role:</b> @daso.getRole()</li>
+           }
+           @if(changedInfo.contains(daso.getEntity())) {
+                <li><b>New Entity:</b> <b><font color="blue">@daso.getEntityNamespace()</font></b></li>
+           } else {
+                <li><b>Existing Entity:</b> @daso.getEntityNamespace()</li>
+           }
+           @if(changedInfo.contains(daso.getInRelationTo())) {
+                <li><b>New InRelationTo:</b> <b><font color="blue">@daso.getInRelationToNamespace()</font></b></li>
+           } else {
+           	<li><b>Existing InRelationTo:</b> @daso.getInRelationToNamespace()</li>
+           }
+           @if(changedInfo.contains(daso.getRelation())) {
+           	<li><b>New Relation:</b> <b><font color="blue">@daso.getRelationNamespace()</font></b></li>
+           } else {
+           	<li><b>Existing Relation:</b> @daso.getRelationNamespace()</li>
+           }
+       </ul>
+
+       <br>
+       <a href="@org.hadatac.console.controllers.schema.routes.EditDAS.index(daso.getPartOfSchema())" class="btn btn-primary" role="button">Back to DA Schema Editing</a>
+
+    </div>
+
+}

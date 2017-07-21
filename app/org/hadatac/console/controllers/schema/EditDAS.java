@@ -25,7 +25,11 @@ public class EditDAS extends Controller {
     // for /metadata HTTP GET requests
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
     public static Result index(String das_uri) {
-	
+    	if (session().get("LabKeyUserName") == null && session().get("LabKeyPassword") == null) {
+    		return redirect(org.hadatac.console.controllers.triplestore.routes.LoadKB.logInLabkey(
+    				routes.EditDAS.index(das_uri).url()));
+    	}
+    		
     	DataAcquisitionSchema das = null;
     	try {
 	    if (das_uri != null) {
@@ -48,22 +52,7 @@ public class EditDAS extends Controller {
     // for /metadata HTTP POST requests
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
     public static Result postIndex(String das_uri) {
-
-    	DataAcquisitionSchema das = null;
-    	try {
-	    if (das_uri != null) {
-		das_uri = URLDecoder.decode(das_uri, "UTF-8");
-	    } else {
-		das_uri = "";
-	    }
-	} catch (UnsupportedEncodingException e) {
-	    e.printStackTrace();
-	}
-	
-    	if (!das_uri.equals("")) {
-	    das = DataAcquisitionSchema.find(das_uri);
-    	}
-    	return ok(editDAS.render(das));
+    	return index(das_uri);
 	
     }// /postIndex()
 

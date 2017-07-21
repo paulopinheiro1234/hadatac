@@ -293,11 +293,4 @@ function color(d) {
     return d._children ? "#3182bd" : d.children ? "#c6dbef" : "#fd8d3c";
 }
 
-
-document.getElementById("clearUnit").onclick = function() {
-    $('#newUnit').val("");
-    initialize(root);
-    update(root);
-};
-
 })(d3);

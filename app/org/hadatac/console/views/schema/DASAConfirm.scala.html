@@ -1,0 +1,18 @@
+@(message: String, description: String, dasa : org.hadatac.entity.pojo.DataAcquisitionSchemaAttribute)
+
+@import org.hadatac.console.views.html._
+@import org.hadatac.utils._
+@import org.hadatac.console.controllers.schema._
+
+@main(message) {
+    <h3>@message</h3>
+
+    <ul>
+      <li><b>Name</b>: @dasa.getLabel()</li>
+    </ul>
+    
+    <h4>@description</h4>
+
+    <a href="@org.hadatac.console.controllers.schema.routes.EditDAS.index(dasa.getPartOfSchema())" class="btn btn-primary" role="button">Back to DA Schema Editing</a>
+       
+}

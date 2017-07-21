@@ -19,13 +19,13 @@
      }
    }</td> 
    <td>@if(dasa != null && dasa.getObjectViewLabel() != null) { @dasa.getObjectViewLabel() }</td> 
-   <td>@if(dasa != null && dasa.getEntityLabel() != null) { @dasa.getEntityLabel() }</td> 
+   <td>@if(dasa != null && dasa.getEntityViewLabel() != null) { @dasa.getEntityViewLabel() }</td> 
    <td>@if(dasa != null && dasa.getAttributeLabel() != null) { @dasa.getAttributeLabel() }</td> 
    <td>@if(dasa != null && dasa.getUnitLabel() != null) { @dasa.getUnitLabel() }</td> 
    <td>@if(dasa != null && dasa.getEventViewLabel() != null) { @dasa.getEventViewLabel() }</td> 
    @if(mode == "edit") {
       <td><a href="@org.hadatac.console.controllers.schema.routes.EditDASA.index(dasa.getUri())" class="btn-xs btn-primary" role="button">Edit</a>
-          <a href="" class="btn-xs btn-primary" role="button">Delete</a></td>
+          <a href="@org.hadatac.console.controllers.schema.routes.DeleteDASA.index(dasa.getUri())" class="btn-xs btn-primary" role="button">Delete</a></td>
    }
  
 </tr>

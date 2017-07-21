@@ -1,0 +1,10 @@
+@(daso: org.hadatac.entity.pojo.DataAcquisitionSchemaObject, selected : String)
+
+@import java.net._
+@import org.hadatac.utils._
+
+@if(daso.getRole().equals(selected)) {
+   <option selected>@daso.getRole()</option>
+} else {
+   <option>@daso.getRole()</option>
+}

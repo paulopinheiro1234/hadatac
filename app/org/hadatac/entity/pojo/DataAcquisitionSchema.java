@@ -50,18 +50,17 @@ public class DataAcquisitionSchema {
 							"sio:TimeInstant", 
 							"hasco:originalID", 
 							"hasco:URI", 
-							"hasco:hasEntity", 
-							"hasco:hasEntityURI", 
-							"hasco:hasAttribute", 
-							"hasco:hasAttributeURI", 
-							"hasco:hasUnit", 
-							"hasco:hasUnitURI", 
+							"hasco:hasMetaEntity", 
+							"hasco:hasMetaEntityURI", 
+							"hasco:hasMetaAttribute", 
+							"hasco:hasMetaAttributeURI", 
+							"hasco:hasMetaUnit", 
+							"hasco:hasMetaUnitURI", 
 							"sio:InRelationTo",
 							"hasco:hasLOD",
 							"hasco:hasCalibration",
 							"hasco:hasElevation",
 							"hasco:hasLocation");
-
     private String uri = "";
     private String label = "";
     private List<DataAcquisitionSchemaAttribute> attributes = null;
@@ -374,7 +373,7 @@ public class DataAcquisitionSchema {
     public int saveToLabKey(String user_name, String password) throws CommandException {
 	// SAVING DAS's DASAs
 	for (DataAcquisitionSchemaAttribute dasa : attributes) {
-	    System.out.println("Saving DASA " + dasa.getUri() + " into LabKey");
+	    //System.out.println("Saving DASA " + dasa.getUri() + " into LabKey");
 	    dasa.saveToLabKey(user_name, password);
 	}
 
@@ -389,6 +388,25 @@ public class DataAcquisitionSchema {
     	row.put("rdfs:label", getLabel());
     	rows.add(row);
     	return loader.insertRows("DASchema", rows);
+    }
+
+    @Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
+    public int deleteFromLabKey(String user_name, String password) throws CommandException {
+	// DELETING DAS's DASAs
+	for (DataAcquisitionSchemaAttribute dasa : attributes) {
+	    //System.out.println("Deleting DASA " + dasa.getUri() + " from LabKey");
+	    dasa.deleteFromLabKey(user_name, password);
+	}
+
+	// DELETING DAS ITSELF
+	String site = ConfigProp.getPropertyValue("labkey.config", "site");
+        String path = "/" + ConfigProp.getPropertyValue("labkey.config", "folder");
+    	LabkeyDataHandler loader = new LabkeyDataHandler(site, user_name, password, path);
+    	List< Map<String, Object> > rows = new ArrayList< Map<String, Object> >();
+    	Map<String, Object> row = new HashMap<String, Object>();
+    	row.put("hasURI", ValueCellProcessing.replaceNameSpaceEx(getUri()));
+    	rows.add(row);
+    	return loader.deleteRows("DASchema", rows);
     }
 
     public void delete() {
