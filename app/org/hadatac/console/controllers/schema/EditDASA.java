@@ -22,6 +22,7 @@ import org.hadatac.console.models.SysUser;
 import org.hadatac.console.models.DASAForm;
 import org.hadatac.entity.pojo.DataAcquisitionSchema;
 import org.hadatac.entity.pojo.DataAcquisitionSchemaAttribute;
+import org.hadatac.entity.pojo.DataAcquisitionSchemaObject;
 import org.hadatac.entity.pojo.Entity;
 import org.hadatac.entity.pojo.Attribute;
 import org.hadatac.entity.pojo.Unit;
@@ -102,8 +103,9 @@ public class EditDASA extends Controller {
 	String newObject = data.getNewObject();
 	String newEvent = data.getNewEvent();
 
-	// retrieve old DASA
+	// retrieve old DASA and corresponding DAS
         DataAcquisitionSchemaAttribute olddasa = DataAcquisitionSchemaAttribute.find(dasaUri);
+	DataAcquisitionSchema das = DataAcquisitionSchema.find(olddasa.getPartOfSchema());
 
 	// set changes
 	if (olddasa != null) {
@@ -152,7 +154,7 @@ public class EditDASA extends Controller {
 	olddasa.setEntity(newEntity);
 	olddasa.setAttribute(newAttribute);
 	olddasa.setUnit(newUnit);
-	olddasa.setObjectUri(newObject);
+	olddasa.setObjectUri(DataAcquisitionSchemaObject.findUriFromRole(data.getNewObject(),das.getObjects()));
 	olddasa.setEventUri(newEvent);
 	
 	// insert the new DASA content inside of the triplestore regardless of any change -- the previous content has already been deleted

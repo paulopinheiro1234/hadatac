@@ -25,13 +25,25 @@ import org.apache.solr.common.SolrDocumentList;
 import org.hadatac.utils.Collections;
 import org.hadatac.utils.Feedback;
 import org.hadatac.utils.ConfigProp;
-import org.hadatac.entity.pojo.DataAcquisitionSchemaAttribute;
+import org.hadatac.utils.State;
 import org.hadatac.console.views.html.annotator.*;
+import org.hadatac.console.models.AssignOptionForm;
+import org.hadatac.console.controllers.AuthApplication;
 import org.hadatac.console.controllers.annotator.FileProcessing;
+import org.hadatac.console.controllers.annotator.routes;
+import org.hadatac.entity.pojo.DataAcquisition;
+import org.hadatac.entity.pojo.DataFile;
+import org.hadatac.entity.pojo.Deployment;
+import org.hadatac.entity.pojo.DataAcquisitionSchema;
+import org.hadatac.entity.pojo.DataAcquisitionSchemaAttribute;
+import org.hadatac.entity.pojo.Study;
+import org.hadatac.entity.pojo.User;
+import org.labkey.remoteapi.CommandException;
 
 import be.objectify.deadbolt.java.actions.Group;
 import be.objectify.deadbolt.java.actions.Restrict;
 import play.Play;
+import play.data.Form;
 import play.mvc.*;
 import play.mvc.Http.*;
 import play.mvc.Result;
@@ -39,10 +51,20 @@ import play.twirl.api.Html;
 
 public class PrepareIngestion extends Controller {
 
+    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
     public static Result create(String file_name, String da_uri) {
 
+    	if (session().get("LabKeyUserName") == null && session().get("LabKeyPassword") == null) {
+    		return redirect(org.hadatac.console.controllers.triplestore.routes.LoadKB.logInLabkey(
+			        routes.PrepareIngestion.create(file_name,da_uri).url()));
+    	}
+    		
+	final String kbPrefix = Play.application().configuration().getString("hadatac.community.ont_prefix") + "-kb:";
+
 	String path = "";
 	String labels = "";
+	DataAcquisition da = null;
+	DataFile file = null;
 
 	try {
 	    file_name = URLEncoder.encode(file_name, "UTF-8");
@@ -52,24 +74,185 @@ public class PrepareIngestion extends Controller {
 	    
 	System.out.println("file <" + file_name + ">");
 
-	return ok(prepareIngestion.render(file_name, da_uri));
-    }
-    
-    public static Result postCreate(String file_name, String da_uri) {
+	file = DataFile.findByName(AuthApplication.getLocalUser(session()).getEmail(), file_name);
+	if (file == null) {
+	    return ok(prepareIngestion.render(file_name, da, "[ERROR] Could not update file records with new DA information"));
+	}
+
+	// Load associated DA
+	if (da_uri != null && !da_uri.equals("")) {
+	    da = DataAcquisition.findByUri(da_uri);
+
+	    if (da != null) {
+		return ok(prepareIngestion.render(file_name, da, "DA associated with file has been retrieved"));
+	    } else {
+		return ok(prepareIngestion.render(file_name, da, "[ERROR] Could not load assigned DA from DA's URI"));
+	    }
+	}
+
+        // OR create a new DA if the file is not associated with any existing DA
+
+        String da_label = "";
+	String new_da_uri = "";
+
+	if (!file_name.startsWith("DA-")) {
+	    da_label = "DA-" + file_name;
+	} else {
+	    da_label = file_name;
+	}
+	da_label = da_label.replace(".csv","").replace(".","").replace("+","-");
+	new_da_uri = kbPrefix + da_label;
+
+	da = new DataAcquisition();
+	da.setLabel(da_label);
+	da.setUri(new_da_uri);
+	da.save();
 	
-	String path = "";
-	String labels = "";
-
+	// save DA
 	try {
-	    file_name = URLEncoder.encode(file_name, "UTF-8");
-	} catch (Exception e) {
-	    System.out.println("[ERROR] encoding file name");
+	    da.saveToLabKey(session().get("LabKeyUserName"), session().get("LabKeyPassword"));
+	} catch (CommandException e) {
+	    System.out.println("[Warning] Creating new Data Acquisition: error from PrepareIngestion's saveToLabKey()");
+	    //return ok(prepareIngestion.render(file_name, da, "ERROR Creating new Data Acquisition. Error from PrepareIngestion's saveToLabKey()"));
 	}
-	    
-	System.out.println("file <" + file_name + ">");
 
-	return ok(prepareIngestion.render(file_name, da_uri));
+	file.setDataAcquisitionUri(da.getUri());
+	file.save();
+
+	return ok(prepareIngestion.render(file_name, da, "New data acquisition has been created to support file ingestion"));
     }
     
+    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
+    public static Result postCreate(String file_name, String da_uri) {
+	return create(file_name, da_uri);
+    }
+    
+    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
+    public static Result refine(String file_name, String da_uri, String message) {
+
+	DataAcquisition da = null;
+
+	// Load associated DA
+	if (da_uri != null && !da_uri.equals("")) {
+	    da = DataAcquisition.findByUri(da_uri);
+	    if (da != null) {
+		return ok(prepareIngestion.render(file_name, da, message));
+	    } else {
+		System.out.println("[ERROR] Could not load assigned DA from DA's URI");
+	    }
+	}
+	return badRequest("[ERROR] In PrepareIngestion.refine, cannot retrieve DA from provided URI");
+    }
+    
+    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
+    public static Result postRefine(String file_name, String da_uri, String message) {
+	return refine(file_name, da_uri, message);
+    }
+    
+    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
+    public static Result selectStudy(String file_name, String da_uri) {
+
+	State active = new State(State.ACTIVE);
+
+	List<Study> studies = Study.find(active);
+	
+	return ok(selectStudy.render(file_name, da_uri, studies));
+    }
+
+    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
+    public static Result selectDeployment(String file_name, String da_uri) {
+
+	State active = new State(State.ACTIVE);
+
+	List<Deployment> deployments = Deployment.find(active);
+	
+	return ok(selectDeployment.render(file_name, da_uri, deployments));
+    }
+
+    public static Result selectSchema(String file_name, String da_uri) {
+	return ok();
+    }
+
+    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
+    public static Result processSelectStudy(String file_name, String da_uri) {
+	Form<AssignOptionForm> form = Form.form(AssignOptionForm.class).bindFromRequest();
+	String message = "";
+        AssignOptionForm data = form.get();
+	String std_uri = data.getOption();
+	System.out.println("Showing returned option: " + std_uri);
+
+	if (std_uri != null && !std_uri.equals("")) {
+
+	    Study std = Study.find(std_uri);
+	    if (std == null) {
+		message = "ERROR - Could not retrieve study from its URI.";
+		return refine(file_name, da_uri, message);
+	    }
+
+	    DataAcquisition da = DataAcquisition.findByUri(da_uri);
+	    if (da == null) {
+		message = "ERROR - Could not retrieve Data Acquisition from its URI.";
+		return refine(file_name, da_uri, message);
+	    }
+	    
+	    da.setStudyUri(std_uri);
+	    
+	    try {
+		da.save();
+		da.saveToLabKey(session().get("LabKeyUserName"), session().get("LabKeyPassword"));
+	    } catch (CommandException e) {
+		return ok(prepareIngestion.render(file_name, da, "ERROR Updating Data Acquisition with deployment information"));
+	    }
+	}
+
+	message = "DA is now associated with study " + std_uri;
+ 	return refine(file_name, da_uri, message);
+    }
+
+    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
+    public static Result processSelectDeployment(String file_name, String da_uri) {
+	Form<AssignOptionForm> form = Form.form(AssignOptionForm.class).bindFromRequest();
+	String message = "";
+        AssignOptionForm data = form.get();
+	String dep_uri = data.getOption();
+	System.out.println("Showing returned option: " + dep_uri);
+
+	if (dep_uri != null && !dep_uri.equals("")) {
+
+	    Deployment dep = Deployment.find(dep_uri);
+	    if (dep == null) {
+		message = "ERROR - Could not retrieve Deployment from its URI.";
+		return refine(file_name, da_uri, message);
+	    }
+
+	    DataAcquisition da = DataAcquisition.findByUri(da_uri);
+	    if (da == null) {
+		message = "ERROR - Could not retrieve Data Acquisition from its URI.";
+		return refine(file_name, da_uri, message);
+	    }
+	    
+	    da.setDeploymentUri(dep_uri);
+	    
+	    try {
+		da.save();
+		da.saveToLabKey(session().get("LabKeyUserName"), session().get("LabKeyPassword"));
+	    } catch (CommandException e) {
+		return ok(prepareIngestion.render(file_name, da, "ERROR Updating Data Acquisition with deployment information"));
+	    }
+	}
+
+	message = "DA is now associated with deployment " + dep_uri;
+ 	return refine(file_name, da_uri, message);
+    }
+
+    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
+    public static Result processSelectSchema(String file_name, String da_uri) {
+	Form<AssignOptionForm> form = Form.form(AssignOptionForm.class).bindFromRequest();
+        AssignOptionForm data = form.get();
+	String das_uri = data.getOption();
+	String message = "DA is now associated with schema " + das_uri;
+	return refine(file_name, da_uri, message);
+    }
+
 }
 

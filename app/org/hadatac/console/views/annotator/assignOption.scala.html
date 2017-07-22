@@ -35,23 +35,24 @@
     <form class="form-horizontal" name="assignOption" method="post" action="@action">
 
     <div class="form-group">
-		 <label>@targetType</label> <br>
-		 @targetValue <br>
-		 <br>
-         <label>New @title</label> 
-         <select class="form-control col-sm-6" id="option" name="option" onchange="checkform()" >
-            <option value=""></option>
-            @for(opt <- ownerOptions) {
-                <option value="@opt">@opt</option>
-            }
-         </select>
-     </div>
-          
-      <div class="form-group" class="col-sm-6 col-offset-3">
-          <input class="btn btn-success" role="button" id="submitbutton" type="submit" value="Assign @title" disabled="disabled" />
-      </div>
-      
-   </form>    
-</div>
-
-}
+      <label>@targetType</label> <br>
+      @targetValue <br>
+      <br>
+      <label>New @title</label> 
+      <select class="form-control col-sm-6" id="option" name="option" onchange="checkform()" >
+        <option value=""></option>
+        @for(opt <- ownerOptions) {
+                    <option value="@opt">@opt</option>
+		    }
+      </select>
+    </div>
+    
+    <div class="form-group" class="col-sm-6 col-offset-3">
+      <input class="btn btn-success" role="button" id="submitbutton" type="submit" value="Assign @title" disabled="disabled" />
+    </div>
+    
+    </form>    
+  </div>
+  
+  }
+  

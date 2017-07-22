@@ -45,6 +45,16 @@
            } else {
            	<li><b>Existing Unit:</b> @dasa.getUnitNamespace()</li>
            }
+           @if(changedInfo.contains(dasa.getObjectUri())) {
+           	<li><b>New IsAttributeOf:</b> <b><font color="blue">@dasa.getObjectNamespace()</font></b></li>
+           } else {
+           	<li><b>Existing IsAttributeOf:</b> @dasa.getObjectNamespace()</li>
+           }
+           @if(changedInfo.contains(dasa.getEventUri())) {
+           	<li><b>New Time:</b> <b><font color="blue">@dasa.getEventNamespace()</font></b></li>
+           } else {
+           	<li><b>Existing Time:</b> @dasa.getEventNamespace()</li>
+           }
        </ul>
 
        <br>

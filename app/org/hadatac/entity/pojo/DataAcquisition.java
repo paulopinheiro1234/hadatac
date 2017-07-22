@@ -1059,7 +1059,7 @@ public class DataAcquisition {
     	row.put("hasco:hasTriggeringEvent", getTriggeringEventName());
     	row.put("prov:endedAtTime", getEndedAt().startsWith("9999")? "" : getEndedAt());
     	rows.add(row);
-    	
+
     	return loader.insertRows("DataAcquisition", rows);
     }
 }

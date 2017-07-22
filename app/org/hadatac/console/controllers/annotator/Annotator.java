@@ -47,7 +47,8 @@ public class Annotator extends Controller {
         } catch (IllegalStateException | NullPointerException e1) {
             return internalServerError(error_page.render(e1.toString(), tabName));
         }
-       return ok(selectDeployment.render(theResults));
+	//return ok(selectDeployment.render(theResults));
+	return ok();
         
     }
 
@@ -68,7 +69,8 @@ public class Annotator extends Controller {
         } catch (IllegalStateException | NullPointerException e1) {
             return internalServerError(error_page.render(e1.toString(), tabName));
         }
-        return ok(selectDeployment.render(theResults));
+        //return ok(selectDeployment.render(theResults));
+	return ok();
     }
 
 	@Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
