@@ -38,9 +38,8 @@
       <br>
       <label>New Deployment</label> 
       <select class="form-control col-sm-6" id="option" size="20" name="option" onchange="checkform()" >
-        <option value=""></option>
         @for(dep <- deploymentOptions) {
-            <option value="@dep.getUri()">@dep.getInstrument().getLabel() deployed at @dep.getPlatform().getLabel() [@dep.getUri()]</option>
+            <option value="@dep.getUri()">@dep.getInstrument().getLabel() deployed at @dep.getPlatform().getLabel()</option>
         }
       </select>
     </div>

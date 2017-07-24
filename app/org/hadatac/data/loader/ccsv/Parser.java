@@ -25,7 +25,6 @@ import org.hadatac.entity.pojo.Dataset;
 import org.hadatac.entity.pojo.Deployment;
 import org.hadatac.entity.pojo.HADataC;
 import org.hadatac.entity.pojo.Measurement;
-//import org.hadatac.entity.pojo.MeasurementType;
 import org.hadatac.entity.pojo.Subject;
 import org.hadatac.metadata.loader.ValueCellProcessing;
 import org.hadatac.utils.Collections;
@@ -61,20 +60,20 @@ public class Parser {
 		
 		// Verify if model is successfully loaded
 		if (model.isEmpty()) {
-			message += Feedback.println(mode, "[ERROR] Preamble not a well-formed Turtle.");
-			System.out.println("[ERROR] Preamble not a well-formed Turtle.");
+		    message += Feedback.println(mode, "[ERROR] Preamble not a well-formed Turtle.");
+		    System.out.println("[ERROR] Preamble not a well-formed Turtle.");
 		} 
 		else {
-			message += Feedback.println(mode, "[OK] Preamble a well-formed Turtle.");
-			System.out.println("[OK] Preamble a well-formed Turtle.");
+		    message += Feedback.println(mode, "[OK] Preamble a well-formed Turtle.");
+		    System.out.println("[OK] Preamble a well-formed Turtle.");
 		}
 		
 		result = loadFromPreamble(mode, model);
 		
 		if (result.getStatus() == 0) {
-			message += result.getMessage();
-			result = loadFromKb(mode);
-			message += result.getMessage();
+		    message += result.getMessage();
+		    result = loadFromKb(mode);
+		    message += result.getMessage();
 		}
 		
 		files.closeFile("ccsv", "r");
@@ -87,10 +86,9 @@ public class Parser {
 		
 		DataAcquisition dataAcquisition = DataAcquisition.create(hadatacCcsv, hadatacKb);
 		if (hadatacCcsv.getDataAcquisition().getStatus() > 0) {
-			hadatacKb.getDataAcquisition().merge(dataAcquisition);
-		} 
-		else {
-			hadatacKb.setDataAcquisition(dataAcquisition);
+		    hadatacKb.getDataAcquisition().merge(dataAcquisition);
+		} else {
+		    hadatacKb.setDataAcquisition(dataAcquisition);
 		}
 		hadatacKb.getDataAcquisition().save();
 		ParsingResult result = indexMeasurements();

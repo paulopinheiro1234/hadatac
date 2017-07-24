@@ -108,8 +108,10 @@ public class DataAcquisition {
 	@Field("dataset_uri")
 	private List<String> datasetURIs;
 	
+	private boolean isComplete;
 	private String ccsvUri;
 	private String localName;
+        private Deployment deployment;
 	private int status;
 	/*
 	 * 0 - DataAcquisition is a new one, its details on the preamble
@@ -125,6 +127,7 @@ public class DataAcquisition {
 		startedAt = null;
 		endedAt = null;
 		numberDataPoints = 0;
+		isComplete = false;
 		datasetURIs = new ArrayList<String>();
 		unit = new ArrayList<String>();
 		unitUri = new ArrayList<String>();
@@ -135,6 +138,7 @@ public class DataAcquisition {
 		types = new ArrayList<String>();
 		typeURIs = new ArrayList<String>();
 		associatedURIs = new ArrayList<String>();
+		deployment = null;
 	}
 
 	public String getElevation() {
@@ -231,6 +235,13 @@ public class DataAcquisition {
 	}
 	public void setPermissionUri(String permissionUri) {
 		this.permissionUri = permissionUri;
+	}
+	
+	public boolean getIsComplete() {
+		return isComplete;
+	}
+	public void setIsComplete(boolean isComplete) {
+		this.isComplete = isComplete;
 	}
 	
 	public int getTriggeringEvent() {
@@ -400,6 +411,17 @@ public class DataAcquisition {
 	}
 	public String getDeploymentUri() {
 		return deploymentUri;
+	}
+        public Deployment getDeployment() {
+	    if (deploymentUri == null || deploymentUri.equals("")) {
+		return null;
+	    }
+	    if (deployment != null) {
+		if (deployment.getUri().equals(deploymentUri)) {
+		    return deployment;
+		}
+	    }
+	    return deployment = Deployment.find(deploymentUri);
 	}
 	public void setDeploymentUri(String deploymentUri) {
 		this.deploymentUri = deploymentUri;
@@ -698,12 +720,12 @@ public class DataAcquisition {
 	}
 	
 	public static List<DataAcquisition> findAll() {
-		SolrQuery query = new SolrQuery();
-		query.set("q", "owner_uri:*");
-		query.set("sort", "started_at asc");
-		query.set("rows", "10000000");
-		
-		return findByQuery(query);
+	    SolrQuery query = new SolrQuery();
+	    query.set("q", "owner_uri:*");
+	    query.set("sort", "started_at asc");
+	    query.set("rows", "10000000");
+	    
+	    return findByQuery(query);
 	}
 	
 	public static List<DataAcquisition> findAll(State state) {
@@ -740,6 +762,7 @@ public class DataAcquisition {
 	}
 	
 	public static DataAcquisition findByUri(String dataAcquisitionUri) {
+	    System.out.println("inside findByUri: <" + dataAcquisitionUri + ">");
 		SolrQuery query = new SolrQuery();
 		query.set("q", "uri:\"" + dataAcquisitionUri + "\"");
 		query.set("sort", "started_at asc");
@@ -804,7 +827,7 @@ public class DataAcquisition {
 			SolrDocumentList docs = response.getResults();
 			Iterator<SolrDocument> i = docs.iterator();
 			while (i.hasNext()) {
-				results.add(convertFromSolr(i.next()));
+			   results.add(convertFromSolr(i.next()));
 			}
 		} catch (Exception e) {
 			results.clear();
@@ -912,7 +935,7 @@ public class DataAcquisition {
 		return null;
 	}
 	
-	public static DataAcquisition create(HADataC hadatacCcsv, HADataC hadatacKb) {
+        public static DataAcquisition create(HADataC hadatacCcsv, HADataC hadatacKb) {
 		DataAcquisition dataAcquisition = new DataAcquisition();
 		DataAcquisitionSchema schema = DataAcquisitionSchema.find(hadatacKb.getDataAcquisitionKbUri());
 		
@@ -921,11 +944,9 @@ public class DataAcquisition {
 		dataAcquisition.setStudyUri(hadatacCcsv.getDataAcquisition().getStudyUri());
 		dataAcquisition.setStartedAtXsd(hadatacCcsv.getDataAcquisition().getStartedAtXsd());
 		dataAcquisition.setEndedAtXsd(hadatacCcsv.getDataAcquisition().getEndedAtXsd());
-		//Iterator<MeasurementType> i = hadatacKb.getDataset().getMeasurementTypes().iterator();
 		if (schema != null && schema.getAttributes() != null) {
 	    	    Iterator<DataAcquisitionSchemaAttribute> i = schema.getAttributes().iterator();
 		    while (i.hasNext()) {
-		        //MeasurementType measurementType = i.next();
 		        DataAcquisitionSchemaAttribute dasa = i.next();
 			dataAcquisition.addCharacteristic(dasa.getAttributeLabel());
 			dataAcquisition.addCharacteristicUri(dasa.getAttribute());
@@ -945,7 +966,7 @@ public class DataAcquisition {
 		dataAcquisition.addDatasetUri(hadatacCcsv.getDatasetKbUri());
 		
 		return dataAcquisition;
-	}
+		}
 	
 	public void merge(DataAcquisition dataCollection) {
 		Iterator<String> i;

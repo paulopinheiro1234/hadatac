@@ -19,7 +19,7 @@
     }
   </style>
 
-  <biv>
+  <div>
     <input type="text" class="form-control col-sm-2" id="message" name="message" value="Message: @message" readonly>
   </div> 
 
@@ -40,8 +40,16 @@
 
     <div id="rcorners" style="background-color: #DCF7FE" class="paddin0 margin0" >
       
-      <center><b>Incomplete Data Acquisition to be completed : </b>@da.getUri() 
-	       <input type="submit" class="btn btn-default btn-sm" role="button" id="editDA" value="Edit"></input> </center>
+      <center><b>Incomplete Data Acquisition to be completed : </b>@ValueCellProcessing.replaceNameSpaceEx(da.getUri()) 
+	       <input type="submit" class="btn btn-default btn-sm" role="button" id="viewDA" value="View"></input> 
+	       <input type="submit" class="btn btn-default btn-sm" role="button" id="editDA" value="Edit"></input> 
+               <input type="submit" class="btn btn-success btn-sm" role="button" id="completeDA" value="Confirm Complete" 
+	       @if(da.getStudyUri() == null || da.getStudyUri().equals("") || 
+		   da.getDeploymentUri() == null || da.getDeploymentUri().equals("") ||
+		   da.getSchemaUri() == null || da.getSchemaUri().equals("")) {
+	       disabled
+	       }
+               ></input></center>
 
       </center><br>
 
@@ -76,8 +84,10 @@
          } else {
 
 	       <center><b>Associated study : </b>@ValueCellProcessing.replaceNameSpaceEx(da.getStudyUri())
-
-	       <input type="submit" class="btn btn-default btn-sm" role="button" id="clearSTD" value="Remove Association"></input> </center>
+	       <input type="submit" class="btn btn-default btn-sm" role="button" id="viewSTD" value="View">
+	       <input type="submit" class="btn btn-default btn-sm" role="button" id="editSTD" value="Edit">
+	       <input type="submit" class="btn btn-default btn-sm" role="button" id="removeSTD" value="Remove Association"
+		      formaction="@org.hadatac.console.controllers.annotator.routes.PrepareIngestion.removeAssociation(filename, da.getUri(), "Study")"></input> </center>
 
 	 }
 
@@ -137,7 +147,11 @@
           <br><br><br><br><br><br><br><br><br><br>
 	  } else {
       
-	       <center><b>Associated deployment : </b>@ValueCellProcessing.replaceNameSpaceEx(da.getDeploymentUri())</center>
+	       <center><b>Associated deployment : </b>@ValueCellProcessing.replaceNameSpaceEx(da.getDeploymentUri())
+	       <input type="submit" class="btn btn-default btn-sm" role="button" id="viewDPL" value="View">
+	       <input type="submit" class="btn btn-default btn-sm" role="button" id="editDPL" value="Edit">
+	       <input type="submit" class="btn btn-default btn-sm" role="button" id="removeDPL" value="Remove Association"
+		      formaction="@org.hadatac.console.controllers.annotator.routes.PrepareIngestion.removeAssociation(filename, da.getUri(), "Deployment")"></input> </center>
 
       	  }
 
@@ -150,8 +164,10 @@
 
       <center><div id="rcorners"  style="background-color: #B9E1EB" class="paddin0 margin0" >
 
+        @if(da.getSchemaUri() == null || da.getSchemaUri().equals("")) {
+
 	  <input type="submit" class="btn btn-primary btn-sm" role="button" id="selectDAS" value="Select Schema"
-		 formaction="@org.hadatac.console.controllers.annotator.routes.PrepareIngestion.selectSchema(da.getUri(), filename)">
+		 formaction="@org.hadatac.console.controllers.annotator.routes.PrepareIngestion.selectSchema(filename, da.getUri())">
           </input>
 
 	  <b>OR</b>
@@ -166,6 +182,16 @@
 		 formaction="@org.hadatac.console.controllers.annotator.routes.SchemaFromFile.create(filename)" 
 		 value="Create Schema from Data File"></input>
 
+       } else {
+
+	       <center><b>Associated schema : </b>@ValueCellProcessing.replaceNameSpaceEx(da.getSchemaUri())
+	       <input type="submit" class="btn btn-default btn-sm" role="button" id="viewDAS" value="View">
+	       <input type="submit" class="btn btn-default btn-sm" role="button" id="editDAS" value="Edit">
+	       <input type="submit" class="btn btn-default btn-sm" role="button" id="removeDAS" value="Remove Association"
+		      formaction="@org.hadatac.console.controllers.annotator.routes.PrepareIngestion.removeAssociation(filename, da.getUri(), "Schema")">
+	       <input type="submit" class="btn btn-default btn-sm" role="button" id="testDAS" value="Test Schema"></input>
+
+       }
       </div></center>
 
     </div>

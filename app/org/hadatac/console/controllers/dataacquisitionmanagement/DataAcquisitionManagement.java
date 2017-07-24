@@ -32,34 +32,35 @@ import be.objectify.deadbolt.java.actions.Restrict;
 
 public class DataAcquisitionManagement extends Controller {
 
-	@Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
+    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
     public static Result index(int stateId) {
-		List<DataAcquisition> results = null;
-    	State state = new State(stateId);
-    	final SysUser user = AuthApplication.getLocalUser(session());
-    	if (user.isDataManager()) {
-    		results = DataAcquisition.findAll(state);
-    	}
-    	else {
-    		String ownerUri = UserManagement.getUriByEmail(user.getEmail());
-    		results = DataAcquisition.find(ownerUri, state);
-    	}
-    	
-		for (DataAcquisition dataAcquisition : results) {
-			dataAcquisition.setSchemaUri(ValueCellProcessing.replaceNameSpaceEx(
-					dataAcquisition.getSchemaUri()));
+	System.out.println("Inside DA");
+	List<DataAcquisition> results = null;
+	State state = new State(stateId);
+	final SysUser user = AuthApplication.getLocalUser(session());
+	if (user.isDataManager()) {
+	    results = DataAcquisition.findAll(state);
+	}
+	else {
+	    String ownerUri = UserManagement.getUriByEmail(user.getEmail());
+	    results = DataAcquisition.find(ownerUri, state);
+	}
+	
+	for (DataAcquisition dataAcquisition : results) {
+	    dataAcquisition.setSchemaUri(ValueCellProcessing.replaceNameSpaceEx(
+					 dataAcquisition.getSchemaUri()));
+	}
+	results.sort(new Comparator<DataAcquisition>() {
+		@Override
+		    public int compare(DataAcquisition lhs, DataAcquisition rhs) {
+		    return lhs.getUri().compareTo(rhs.getUri());
 		}
-		results.sort(new Comparator<DataAcquisition>() {
-            @Override
-            public int compare(DataAcquisition lhs, DataAcquisition rhs) {
-                return lhs.getUri().compareTo(rhs.getUri());
-            }
-        });
-    	
-        return ok(dataAcquisitionManagement.render(state, results, user.isDataManager()));   
+	    });
+	
+    return ok(dataAcquisitionManagement.render(state, results, user.isDataManager()));   
     }
-
-	@Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
+    
+    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
     public static Result postIndex(int stateId) {
     	return index(stateId);
     }

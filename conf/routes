@@ -270,6 +270,7 @@ POST 	/hadatac/annotator/prepare/schema	       org.hadatac.console.controllers.a
 POST 	/hadatac/annotator/prepare/process/study       org.hadatac.console.controllers.annotator.PrepareIngestion.processSelectStudy(filename: String, da_uri: String)
 POST 	/hadatac/annotator/prepare/process/deployment  org.hadatac.console.controllers.annotator.PrepareIngestion.processSelectDeployment(filename: String, da_uri: String)
 POST 	/hadatac/annotator/prepare/process/schema      org.hadatac.console.controllers.annotator.PrepareIngestion.processSelectSchema(filename: String, da_uri: String)
+POST 	/hadatac/annotator/prepare/remove              org.hadatac.console.controllers.annotator.PrepareIngestion.removeAssociation(filename: String, da_uri: String, daComponent : String)
 
 # metadata store management URLs
 GET     /hadatac/ts/clean                              org.hadatac.console.controllers.triplestore.Clean.clean(oper: String)
