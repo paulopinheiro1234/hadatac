@@ -1,0 +1,47 @@
+@(study : org.hadatac.entity.pojo.Study)
+
+@import helper._
+@import org.hadatac.console.views.html._
+@import org.hadatac.utils._
+
+@main("Sample Management") {
+
+    <h3>Sample Management for Study @study.getLabel()</h3>
+    
+    <h4>Management options</h4>
+
+    <div class="container-fluid">
+      <div class="row">
+         <div class="navbar-collapse collapse navbar-secondary">
+           <a href="" class="btn btn-primary disabled" role="button">Create Subject Group</a>
+           <a href="" class="btn btn-primary disabled" role="button">Create Location Collection</a>
+           <a href="" class="btn btn-primary disabled" role="button">Create Material Collection</a>
+         </div>
+      </div>
+   </div>
+
+   <hr>
+
+   <h4>Sample Collections</h4>
+   
+    <div class="container-fluid">
+        <table class="table">
+            <thead>
+              <tr>
+                <!--  <th>Study URI</th>  -->
+                <th>Name</th>
+                <th>Type</th>
+                <th>Description</th>
+                <th>Operations</th>
+              </tr>
+            </thead>
+            <tbody>
+            </tbody>
+        </table>
+	
+	<a href="@org.hadatac.console.controllers.studies.routes.StudyManagement.index()" class="btn btn-primary" role="button">Back to Study Management</a>
+	
+    </div>
+ 
+
+}

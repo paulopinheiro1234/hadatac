@@ -167,9 +167,7 @@ public class PrepareIngestion extends Controller {
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
     public static Result selectStudy(String file_name, String da_uri) {
 
-	State active = new State(State.ACTIVE);
-
-	List<Study> studies = Study.find(active);
+	List<Study> studies = Study.find();
 	
 	return ok(selectStudy.render(file_name, da_uri, studies));
     }

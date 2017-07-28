@@ -1,0 +1,11 @@
+@(agent: org.hadatac.entity.pojo.Agent, selected : String)
+
+@import java.net._
+@import org.hadatac.utils._
+
+@if(agent.getUri().equals(selected)) {
+   <option value="@agent.getUri()" selected>@agent.getName()</option>
+} else {
+   <option value="@agent.getUri()">@agent.getName()</option>
+}
+

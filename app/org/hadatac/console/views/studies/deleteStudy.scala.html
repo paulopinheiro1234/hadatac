@@ -1,4 +1,4 @@
-@(study_uri : String, study: org.hadatac.console.models.StudyForm, results : String)
+@(study: org.hadatac.entity.pojo.Study, results : String)
 
 @import helper._
 @import org.hadatac.utils._
@@ -11,30 +11,14 @@
 <div class="container">
 <h2>Delete Study</h2>
 
-   <form class="form-horizontal" method="post" action="@org.hadatac.console.controllers.studies.routes.DeleteStudy.processForm(study_uri)">
-<!--
-	<div class="form-group">
-         <label>DataAcquisition(s)</label>
-         <select disabled class="form-control col-sm-6" name="dataAcquisitions">
-         <option value="dataAcquisitions">@study.getDataAcquisitions()</option>         
-         </select>
-     </div>	 
--->	 	<p style='font-family: "Lucida Console", Monaco, monospace;' id='msgarea'></p>
-		<script type="text/javascript">
-			var msg = "@results";
-       		var msg2 = decodeURIComponent(msg).replace(/\+/g, '&nbsp;');
-        	$('#msgarea').html(msg2.replace(/&lt;br&gt;/g, '<br>'));
-       		document.getElementById('end-process-box').style.display = 'inline';
+   <form class="form-horizontal" method="post" action="@org.hadatac.console.controllers.studies.routes.DeleteStudy.processForm(study.getUri())">
+ 	<p style='font-family: "Lucida Console", Monaco, monospace;' id='msgarea'></p>
+	<script type="text/javascript">
+	  var msg = "@results";
+       	  var msg2 = decodeURIComponent(msg).replace(/\+/g, '&nbsp;');
+          $('#msgarea').html(msg2.replace(/&lt;br&gt;/g, '<br>'));
+       	  document.getElementById('end-process-box').style.display = 'inline';
         </script>
-<!--	 <div class="form-group">
-         <label for="startdate">Start Date/Time</label><br> 
-         <input disabled class="col-sm-3" type="text" id="startdate" name="startDateTime" value="@study.getStartDateTime()" />
-     </div>
-
-     <div class="form-group">
-         <label for="enddate">End Date/Time</label><br>
-         <input disabled class="col-sm-3" type="text" id="enddate" name="endDateTime" value="@study.getEndDateTime()" />
-     </div>  -->
     </form>    
     @studyButton(false)
 

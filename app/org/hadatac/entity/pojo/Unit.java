@@ -26,35 +26,12 @@ import org.hadatac.utils.NameSpaces;
 
 import play.Play;
 
-public class Unit implements HADatAcClass, Comparable<Unit> {
-	private String uri;
-	private String superUri;
-	private String localName;
-	private String label;
-	
-	public String getUri() {
-		return uri;
-	}
-	public void setUri(String uri) {
-		this.uri = uri;
-	}
-	public String getSuperUri() {
-		return superUri;
-	}
-	public void setSuperUri(String superUri) {
-		this.superUri = superUri;
-	}
-	public String getLocalName() {
-		return localName;
-	}
-	public void setLocalName(String localName) {
-		this.localName = localName;
-	}
-	public String getLabel() {
-		return label;
-	}
-	public void setLabel(String label) {
-		this.label = label;
+public class Unit extends HADatAcClass implements Comparable<Unit> {
+
+        static String className = "uo:0000000";
+
+	public Unit () {
+	    super(className);
 	}
 	
 	public static List<Unit> find() {
@@ -134,7 +111,7 @@ public class Unit implements HADatAcClass, Comparable<Unit> {
         return this.getLocalName().compareTo(another.getLocalName());
     }
 	
-    public static String getHierarchyJson() {
+    /*public static String getHierarchyJson() {
 	String collection = "";
 	String q = 
 	    "SELECT ?id ?superId ?label ?comment WHERE { " + 
@@ -157,6 +134,6 @@ public class Unit implements HADatAcClass, Comparable<Unit> {
 	    e.printStackTrace();
 	}
     	return "";
-    }
+	} */
     
 }

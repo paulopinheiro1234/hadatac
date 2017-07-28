@@ -1,5 +1,4 @@
-@(oper : org.hadatac.utils.State, 
-study : org.hadatac.entity.pojo.Study)
+@( study : org.hadatac.entity.pojo.Study)
 
 @import play.Play
 @import org.hadatac.console.controllers.metadata._
@@ -8,24 +7,15 @@ study : org.hadatac.entity.pojo.Study)
 @import org.hadatac.utils._
 
 <tr>
-	<td>@if(study.getUri() != null) { @study.getUri() }</td>
-	<td>@if(study.getLabel() != null) { @study.getLabel() }</td>
-	<td>@if(study.getComment() != null) { @study.getComment() }</td>
-@*****
-   <td>@if(study.getPlatform() != null && study.getPlatform().getLabel() != null) { @study.getPlatform().getLabel() }</td> 
-   <td>@if(study.getInstrument() != null && study.getInstrument().getLabel() != null) { @study.getInstrument().getLabel() @if(study.getInstrument().getSerialNumber() != null) { (SN: @deployment.getInstrument().getSerialNumber()) }}
-   </td>
-   ****@
-   <td>@if(study.getStartedAt() != null) { @study.getStartedAt() }</td>
-   @if(oper.getCurrent() != State.ACTIVE) {
-       <td>@if(study.getEndedAt() != null) { @study.getEndedAt() }</td>
-   }
-   <td>
-	   <a href="@org.hadatac.console.controllers.studies.routes.RefreshStudy.index(URLEncoder.encode(study.getUri(),"UTF-8"))" class="btn-xs btn-primary" role="button">Refresh</a>
-       <a href="@Play.application().configuration().getString("hadatac.console.host_deploy")/hadatac/metadataacquisitions/viewStudy?study_uri=@DynamicFunctions.replaceURLWithPrefix(study.getUri())" class="btn-xs btn-primary" role="button">View</a> 
-       @if(oper.getCurrent() == State.ACTIVE) {
-           <!-- <a href="@org.hadatac.console.controllers.studies.routes.CloseStudy.index(URLEncoder.encode(study.getUri(),"UTF-8"))" class="btn-xs btn-primary" role="button">Close</a> -->
-       }
-       <a href="@org.hadatac.console.controllers.studies.routes.DeleteStudy.index(URLEncoder.encode(study.getUri(),"UTF-8"))" class="btn-xs btn-primary" role="button">Delete</a>
-   </td>
+  <td>@if(study.getLabel() != null) { @study.getLabel() }</td>
+  <td>@if(study.getComment() != null) { @study.getComment() }</td>
+  <td>@if(study.getStartedAt() != null) { @study.getStartedAt() }</td>
+  <td>@if(study.getEndedAt() != null) { @study.getEndedAt() }</td>
+  <td>
+    <a href="@Play.application().configuration().getString("hadatac.console.host_deploy")/hadatac/metadataacquisitions/viewStudy?study_uri=@DynamicFunctions.replaceURLWithPrefix(study.getUri())" class="btn-xs btn-primary" role="button">View</a> 
+    <a href="@org.hadatac.console.controllers.studies.routes.EditStudy.index(URLEncoder.encode(study.getUri(),"UTF-8"))" class="btn-xs btn-primary" role="button">Edit</a>
+    <a href="@org.hadatac.console.controllers.samples.routes.SampleManagement.index(URLEncoder.encode(study.getUri(),"UTF-8"))" class="btn-xs btn-primary" role="button">Samples</a>
+    <a href="@org.hadatac.console.controllers.studies.routes.RefreshStudy.index(URLEncoder.encode(study.getUri(),"UTF-8"))" class="btn-xs btn-primary" role="button">Refresh</a>
+    <a href="@org.hadatac.console.controllers.studies.routes.DeleteStudy.index(URLEncoder.encode(study.getUri(),"UTF-8"))" class="btn-xs btn-primary" role="button">Delete</a>
+  </td>
 </tr>

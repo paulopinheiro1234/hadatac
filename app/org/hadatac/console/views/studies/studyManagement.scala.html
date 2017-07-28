@@ -1,5 +1,4 @@
-@(oper : org.hadatac.utils.State,
-  results : List[org.hadatac.entity.pojo.Study])
+@(studyList : List[org.hadatac.entity.pojo.Study])
 
 @import helper._
 @import org.hadatac.console.views.html._
@@ -14,58 +13,38 @@
     <div class="container-fluid">
       <div class="row">
          <div class="navbar-collapse collapse navbar-secondary">
-            @if(oper.getCurrent() == State.ACTIVE) { 
-          		<a href="@org.hadatac.console.controllers.studies.routes.StudyManagement.index(State.ACTIVE)" class="btn-sm btn-warning disabled" role="button">Active Studies</a>
-          	} else {
-          		<a href="@org.hadatac.console.controllers.studies.routes.StudyManagement.index(State.ACTIVE)" class="btn-sm btn-primary" role="button">Active Studies</a>
-          	}
-          	@if(oper.getCurrent() == State.CLOSED) {
-       		    <a href="@org.hadatac.console.controllers.studies.routes.StudyManagement.index(State.CLOSED)" class="btn-sm btn-warning disabled" role="button">Closed Studies</a>
-       		} else {
-       		    <a href="@org.hadatac.console.controllers.studies.routes.StudyManagement.index(State.CLOSED)" class="btn-sm btn-primary" role="button">Closed Studies</a>
-       		}
-          	<!-- <a href="@org.hadatac.console.controllers.studies.routes.NewStudy.index("regular")" class="btn-sm btn-primary" role="button">Create Study</a> -->
+           <a href="@org.hadatac.console.controllers.studies.routes.NewStudy.index()" class="btn btn-primary" role="button">Create Study</a>
+           <a href="" class="btn btn-primary disabled" role="button">Manage Agents (PI's, CO-Pi's)</a>
+           <a href="" class="btn btn-primary disabled" role="button">Manage Organizations</a>
          </div>
       </div>
    </div>
 
    <hr>
 
-   @if(oper.getCurrent() == State.ACTIVE) {   
-      <h3>Active Studies</h3>
-   } else {
-      @if(oper.getCurrent() == State.CLOSED) {   
-         <h3>Closed Studies</h3>
-      } else {
-          @if(oper.getCurrent() == State.ALL) {  
-             <h3>All Studies</h3>
-          } 
-      }
-   }
+   <h3>Studies</h3>
    
     <div class="container-fluid">
         <table class="table">
             <thead>
-                 <tr>
-                 	<th>Study URI</th>
-                 	<th>Label</th>
-                    <th>Description</th>
-                    <th>Start DateTime</th>
-                    @if(oper.getCurrent() != State.ACTIVE) {
-                        <th>End Date/Time</th>
-                    }
-                    <th>Operations</th>
-                 </tr>
+              <tr>
+                <!--  <th>Study URI</th>  -->
+                <th>Name</th>
+                <th>Description</th>
+                <th>Start Date/Time</th>
+                <th>End Date/Time</th>
+                <th>Operations</th>
+              </tr>
             </thead>
             <tbody>
-              @for(study <- results){
-                  @study_entry(oper, study)
+              @for(study <- studyList){
+	         @study_entry(study)
               }
             </tbody>
         </table>
- 
+	
         @mainButton(false)
-
+	
     </div>
  
 

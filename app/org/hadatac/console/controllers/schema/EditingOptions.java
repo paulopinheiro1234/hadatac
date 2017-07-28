@@ -37,24 +37,26 @@ public class EditingOptions extends Controller {
     }
 
     public static OtMSparqlQueryResults getEntities() {
-	String json = Entity.getHierarchyJson();
+	Entity entity = new Entity();
+	String json = entity.getHierarchyJson();
 	//System.out.println("JSON: " + json);
 	OtMSparqlQueryResults entities = new OtMSparqlQueryResults(json);
         return entities;
     }
     
     public static OtMSparqlQueryResults getAttributes() {
-	String json = Attribute.getHierarchyJson();
+	Attribute attribute = new Attribute();
+	String json = attribute.getHierarchyJson();
 	//System.out.println("JSON: " + json);
 	OtMSparqlQueryResults attributes = new OtMSparqlQueryResults(json);
         return attributes;
     }
     
     public static OtMSparqlQueryResults getUnits() {
-	String json = Unit.getHierarchyJson();
+	Unit unit = new Unit();
+	String json = unit.getHierarchyJson();
 	//System.out.println("JSON: " + json);
 	OtMSparqlQueryResults units = new OtMSparqlQueryResults(json);
-	//System.out.println("Graph: " + units.treeResults);
         return units;
     }
     

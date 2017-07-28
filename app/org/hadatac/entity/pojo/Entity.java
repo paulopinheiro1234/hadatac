@@ -27,44 +27,14 @@ import org.hadatac.utils.NameSpaces;
 
 import play.Play;
 
-public class Entity implements HADatAcClass, Comparable<Entity> {
-    private String uri;
-    private String superUri;
-    private String localName;
-    private String label;
-    
-    public String getUri() {
-	return uri;
+public class Entity extends HADatAcClass implements Comparable<Entity> {
+
+    static String className = "sio:Object";
+
+    public Entity () {
+	super(className);
     }
 
-    public void setUri(String uri) {
-	this.uri = uri;
-    }
-
-    public String getSuperUri() {
-	return superUri;
-    }
-
-    public void setSuperUri(String superUri) {
-	this.superUri = superUri;
-    }
-
-    public String getLocalName() {
-	return localName;
-    }
-
-    public void setLocalName(String localName) {
-	this.localName = localName;
-    }
-
-    public String getLabel() {
-	return label;
-    }
-
-    public void setLabel(String label) {
-	this.label = label;
-    }
-    
     public static List<Entity> find() {
 	List<Entity> entities = new ArrayList<Entity>();
 	String queryString = NameSpaces.getInstance().printSparqlNameSpaceList() +
@@ -141,7 +111,7 @@ public class Entity implements HADatAcClass, Comparable<Entity> {
         return this.getLocalName().compareTo(another.getLocalName());
     }
     
-    public static String getHierarchyJson() {
+    /*    public static String getHierarchyJson() {
 	String collection = "";
 	String q = 
 	    "SELECT ?id ?superId ?label ?comment WHERE { " + 
@@ -164,7 +134,7 @@ public class Entity implements HADatAcClass, Comparable<Entity> {
 	    e.printStackTrace();
 	}
     	return "";
-    }
+	} */
     
 }
 

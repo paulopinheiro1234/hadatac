@@ -26,19 +26,19 @@ import org.hadatac.utils.NameSpaces;
 
 import play.Play;
 
-public class Attribute extends HADatAcClass implements Comparable<Attribute> {
+public class StudyType extends HADatAcClass implements Comparable<StudyType> {
 
-        static String className = "sio:Attribute";
+        static String className = "hasco:Study";
 
-	public Attribute () {
+	public StudyType () {
 	    super(className);
 	}
 
-	public static List<Attribute> find() {
-	    List<Attribute> attributes = new ArrayList<Attribute>();
+	public static List<StudyType> find() {
+	    List<StudyType> studyTypes = new ArrayList<StudyType>();
 	    String queryString = NameSpaces.getInstance().printSparqlNameSpaceList() +
 		" SELECT ?uri WHERE { " +
-		" ?uri rdfs:subClassOf* sio:Attribute . " + 
+		" ?uri rdfs:subClassOf* " + className + " . " + 
 		"} ";
 	    
 	    //System.out.println("Query: " + queryString);
@@ -51,25 +51,25 @@ public class Attribute extends HADatAcClass implements Comparable<Attribute> {
 	    
 	    while (resultsrw.hasNext()) {
 		QuerySolution soln = resultsrw.next();
-		Attribute attribute = find(soln.getResource("uri").getURI());
-		attributes.add(attribute);
+		StudyType studyType = find(soln.getResource("uri").getURI());
+		studyTypes.add(studyType);
 	    }			
 	    
-	    java.util.Collections.sort((List<Attribute>) attributes);
-	    return attributes;
+	    java.util.Collections.sort((List<StudyType>) studyTypes);
+	    return studyTypes;
 	    
 	}
 
 	public static Map<String,String> getMap() {
-	    List<Attribute> list = find();
+	    List<StudyType> list = find();
 	    Map<String,String> map = new HashMap<String,String>();
-	    for (Attribute att : list) 
-		map.put(att.getUri(),att.getLabel());
+	    for (StudyType typ: list) 
+		map.put(typ.getUri(),typ.getLabel());
 	    return map;
 	}
 
-	public static Attribute find(String uri) {
-	    Attribute attribute = null;
+	public static StudyType find(String uri) {
+	    StudyType studyType = null;
 	    Model model;
 	    Statement statement;
 	    RDFNode object;
@@ -80,29 +80,29 @@ public class Attribute extends HADatAcClass implements Comparable<Attribute> {
 								       + Collections.METADATA_SPARQL, query);
 	    model = qexec.execDescribe();
 	    
-	    attribute = new Attribute();
+	    studyType = new StudyType();
 	    StmtIterator stmtIterator = model.listStatements();
 	    
 	    while (stmtIterator.hasNext()) {
 		statement = stmtIterator.next();
 		object = statement.getObject();
 		if (statement.getPredicate().getURI().equals("http://www.w3.org/2000/01/rdf-schema#label")) {
-		    attribute.setLabel(object.asLiteral().getString());
+		    studyType.setLabel(object.asLiteral().getString());
 		} else if (statement.getPredicate().getURI().equals("http://www.w3.org/2000/01/rdf-schema#subClassOf")) {
-		    attribute.setSuperUri(object.asResource().getURI());
+		    studyType.setSuperUri(object.asResource().getURI());
 		}
 	    }
 	    
-	    attribute.setUri(uri);
-	    attribute.setLocalName(uri.substring(uri.indexOf('#') + 1));
+	    studyType.setUri(uri);
+	    studyType.setLocalName(uri.substring(uri.indexOf('#') + 1));
 	    
 	    //System.out.println(uri + " " + entity.getLocalName() + " " + entity.getSuperUri());
 	    
-	    return attribute;
+	    return studyType;
 	}
 	
 	@Override
-	    public int compareTo(Attribute another) {
+	    public int compareTo(StudyType another) {
 	    if (this.getLabel() != null && another.getLabel() != null) {
 		   return this.getLabel().compareTo(another.getLabel());
 	    }

@@ -104,5 +104,38 @@ public class TreeNode {
     			ind + "}");	    	
     }
     
+    public String toHtml(int level) {
 
+    	String ind = "";
+    	String json_children = "";
+
+    	for (int i=0; i < level; i++) {
+    		ind = ind + "   ";
+    	}
+    	
+    	if (children.size() == 0) {
+	    return(ind + " <a href=\"" + name + "\"></a> ");
+    	}
+    	
+    	json_children = "<br>" + ind + " <ul><br>";
+    	boolean firstTime = true;
+
+    	Iterator<TreeNode> nodeIterator = children.iterator();
+		while (nodeIterator.hasNext()) {
+			if (!firstTime) {
+				json_children = json_children + "<br>";
+			} else {
+				json_children = json_children + "<br>";
+			}
+    		json_children = json_children + nodeIterator.next().toHtml(level + 1);
+    		firstTime = false;
+    	}
+    	json_children = json_children + ind + "</ul><br>";
+
+    	return (ind + "<ul> " + 
+    			ind + " <a href=\"" + name + "\"></a> "  +
+    			json_children + 
+    			ind + " </ul>");	    	
+    }
+    
 }

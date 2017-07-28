@@ -1,14 +1,20 @@
-@(message: String, std : org.hadatac.entity.pojo.Study)
+@(std : org.hadatac.entity.pojo.Study)
 
-@import org.hadatac.console.views.html._
+@import helper._
 @import org.hadatac.utils._
-@import org.hadatac.console.controllers.studies._
+@import org.hadatac.console.views.html._
+@import org.hadatac.console.controllers._
+@import org.hadatac.console.controllers.schema._
 @import org.hadatac.metadata.loader.ValueCellProcessing
 
-@main(message) {
-    <h1>@message</h1>
+@main("New Study") {
 
-    <ul>
+    <h2>Create Study</h2>
+    
+    <h3>Listing below shows values for new Study</h3>
+
+    <div class="container-fluid">
+       <ul>
          <li><b>URI:</b> @ValueCellProcessing.replaceNameSpaceEx(std.getUri())</li>
          <li><b>Type:</b> @ValueCellProcessing.replaceNameSpaceEx(std.getType())</li>
          <li><b>Short Name:</b> @std.getLabel()</li>
@@ -18,9 +24,12 @@
          <li><b>Institution:</b> @if(std.getInstitution() != null) { @std.getInstitution().getName() }</li>
 	 <li><b>Start Date/Time</b>: @if(std.getStartedAt() != null) { @std.getStartedAt() }</li>
 	 <li><b>End Date/Time</b>: @if(std.getEndedAt() != null) { @std.getEndedAt() }</li>
-    </ul>
+       </ul>
+       
+       <br>
+       <a href="@org.hadatac.console.controllers.studies.routes.StudyManagement.index()" class="btn btn-primary" role="button">Back to Study Management</a>
+       
+    </div>
     
-    @studyButton(false)
-}
-
+    }
     
