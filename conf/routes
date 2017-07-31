@@ -211,11 +211,30 @@ GET	/hadatac/studies/delete	    	       	       org.hadatac.console.controllers.
 POST	/hadatac/studies/delete		               org.hadatac.console.controllers.studies.DeleteStudy.postIndex(study_uri : String)
 POST 	/hadatac/studies/delete/form	       	       org.hadatac.console.controllers.studies.DeleteStudy.processForm(study_uri : String)
 
-# samples management
-GET	/hadatac/samples/		    	       org.hadatac.console.controllers.samples.SampleManagement.index(study_uri : String)
-POST	/hadatac/samples/     			       org.hadatac.console.controllers.samples.SampleManagement.postIndex(study_uri : String)
+# sample collections management
+GET	/hadatac/sc/		    	               org.hadatac.console.controllers.samplecollections.SCManagement.index(study_uri : String)
+POST	/hadatac/sc/     			       org.hadatac.console.controllers.samplecollections.SCManagement.postIndex(study_uri : String)
+GET	/hadatac/sc/new		                       org.hadatac.console.controllers.samplecollections.NewSC.index(study_uri : String)
+POST	/hadatac/sc/new		                       org.hadatac.console.controllers.samplecollections.NewSC.postIndex(study_uri : String)
+POST 	/hadatac/sc/new/form	                       org.hadatac.console.controllers.samplecollections.NewSC.processForm(study_uri : String)
+GET	/hadatac/sc/edit			       org.hadatac.console.controllers.samplecollections.EditSC.index(study_uri : String, sc_uri : String)
+POST	/hadatac/sc/edit			       org.hadatac.console.controllers.samplecollections.EditSC.postIndex(study_uri : String, sc_uri : String)
+POST 	/hadatac/sc/edit/form		               org.hadatac.console.controllers.samplecollections.EditSC.processForm(study_uri : String)
+GET	/hadatac/sc/delete	                       org.hadatac.console.controllers.samplecollections.DeleteSC.index(study_uri : String, sc_uri : String)
+POST	/hadatac/sc/delete	                       org.hadatac.console.controllers.samplecollections.DeleteSC.postIndex(study_uri : String, sc_uri : String)
+POST 	/hadatac/sc/delete/form	                       org.hadatac.console.controllers.samplecollections.DeleteSC.processForm(study_uri : String, sc_uri : String)
 
-# data collection management
+# samples management
+GET	/hadatac/samples/		               org.hadatac.console.controllers.samples.SampleManagement.index(study_uri : String, sc_uri : String)
+POST	/hadatac/samples/		               org.hadatac.console.controllers.samples.SampleManagement.postIndex(study_uri : String, sc_uri : String)
+GET	/hadatac/samples/new		               org.hadatac.console.controllers.samples.NewSamplesFromScratch.index(study_uri : String, sc_uri : String)
+POST	/hadatac/samples/new		               org.hadatac.console.controllers.samples.NewSamplesFromScratch.postIndex(study_uri : String, sc_uri : String)
+POST 	/hadatac/samples/new/form	               org.hadatac.console.controllers.samples.NewSamplesFromScratch.processForm(study_uri : String, sc_uri : String)
+GET	/hadatac/samples/edit		               org.hadatac.console.controllers.samples.EditSample.index(study_uri : String, sc_uri : String, sp_uri : String)
+POST	/hadatac/samples/edit		               org.hadatac.console.controllers.samples.EditSample.postIndex(study_uri : String, sc_uri : String, sp_uri : String)
+POST 	/hadatac/samples/edit/form	               org.hadatac.console.controllers.samples.EditSample.processForm(study_uri : String, sc_uri : String)
+
+# data acquisition management
 GET	/hadatac/dataacquisitions/		       org.hadatac.console.controllers.dataacquisitionmanagement.DataAcquisitionManagement.index(oper : Int)
 POST	/hadatac/dataacquisitions/     		       org.hadatac.console.controllers.dataacquisitionmanagement.DataAcquisitionManagement.postIndex(oper : Int)
 GET	/hadatac/dataacquisitions/new		       org.hadatac.console.controllers.dataacquisitionmanagement.DataAcquisitionManagement.newDataAcquisition()

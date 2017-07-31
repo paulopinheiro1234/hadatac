@@ -1,0 +1,23 @@
+@(study : org.hadatac.entity.pojo.Study,
+  sc    : org.hadatac.entity.pojo.SampleCollection,
+  sp    : org.hadatac.entity.pojo.Sample)
+
+@import play.Play
+@import org.hadatac.console.controllers.metadata._
+@import org.hadatac.console.controllers.metadata.DynamicFunctions
+@import java.net._
+@import org.hadatac.utils._
+
+@if(sc != null) {
+  <tr>
+     <td>@if(sp.getLabel() != null) { @sp.getLabel() }</td>
+     <td>@if(sp.getType() != null) { @sp.getType().getLabel() }</td>
+     <td>@if(sp.getOriginalID() != null) { @sp.getOriginalID() }</td>
+     <td>@if(sp.getIsSampleOf() != null) { @sp.getIsSampleOf() }</td>
+     <td>
+        <a href="" class="btn-xs btn-primary" role="button">View</a> 
+        <a href="" class="btn-xs btn-primary" role="button">Edit</a>
+        <a href="" class="btn-xs btn-primary" role="button">Delete</a>
+     </td>
+ </tr>
+}

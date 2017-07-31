@@ -1,0 +1,22 @@
+@(study : org.hadatac.entity.pojo.Study,
+  sc    : org.hadatac.entity.pojo.SampleCollection)
+
+@import play.Play
+@import org.hadatac.console.controllers.metadata._
+@import org.hadatac.console.controllers.metadata.DynamicFunctions
+@import java.net._
+@import org.hadatac.utils._
+
+@if(sc != null) {
+  <tr>
+     <td>@if(sc.getLabel() != null) { @sc.getLabel() }</td>
+     <td>@if(sc.getType() != null) { @sc.getSampleCollectionType().getLabel() }</td>
+     <td>@if(sc.getComment() != null) { @sc.getComment() }</td>
+     <td>@sc.getSamples().size()</td>
+     <td>
+        <a href="@org.hadatac.console.controllers.samples.routes.SampleManagement.index(URLEncoder.encode(study.getUri(),"UTF-8"), URLEncoder.encode(sc.getUri(),"UTF-8"))" class="btn-xs btn-primary disabled" role="button">Manage Samples</a>
+        <a href="@org.hadatac.console.controllers.samplecollections.routes.EditSC.index(URLEncoder.encode(study.getUri(),"UTF-8"), URLEncoder.encode(sc.getUri(),"UTF-8"))" class="btn-xs btn-primary" role="button">Edit Collection</a>
+        <a href="@org.hadatac.console.controllers.samplecollections.routes.DeleteSC.index(URLEncoder.encode(study.getUri(),"UTF-8"), URLEncoder.encode(sc.getUri(),"UTF-8"))" class="btn-xs btn-primary" role="button">Delete Collection</a>
+     </td>
+ </tr>
+}

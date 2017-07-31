@@ -106,6 +106,8 @@ public class Study {
 
     private Agent institution;
 
+    private String lastId;
+
     // Constructer
 
     public Study(String studyUri,
@@ -129,6 +131,7 @@ public class Study {
 	this.setStartedAt(startDateTime);
 	this.setEndedAt(endDateTime);
 	this.dataAcquisitions = new ArrayList<DataAcquisition>();
+	this.lastId= "0";
     }
     
     public Study() {
@@ -143,6 +146,7 @@ public class Study {
 	this.setStartedAt("");
 	this.setEndedAt("");
 	this.dataAcquisitions = new ArrayList<DataAcquisition>();
+	this.lastId = "0";
     }
     
     public String getUri() {
@@ -195,6 +199,13 @@ public class Study {
     
     public String getType() {
 	return studyType;
+    }
+    
+    public long getLastId() {
+	if (this.lastId == null) {
+	    return 0;
+	}
+	return Long.parseLong(this.lastId);
     }
     
     public List<DataAcquisition> getDataAcquisitions() {
@@ -260,6 +271,19 @@ public class Study {
     
     public void setTitle(String title) {
 	this.title = title;
+    }
+    
+    public void setLastId(String lastId) {
+	this.lastId = lastId;
+    }
+    
+    public void requestId(long quantity) {
+	if (quantity > 0) {
+	    long l = Long.parseLong(this.lastId);
+	    long newL = l + quantity; 
+	    this.lastId = Long.toString(newL);
+	    save();
+	}
     }
     
     // set Start Time Methods
@@ -420,29 +444,33 @@ public class Study {
     }
     
     public static Study find(String study_uri) {
+	if (study_uri == null || study_uri.equals("")) {
+	    System.out.println("[ERROR] No valid STUDY_URI provided to retrieve Study object: " + study_uri);
+	    return null;
+	}
 	Study returnStudy = new Study();
-	String adjustedUri = study_uri;
-	if (adjustedUri.indexOf(":") == -1) {
-	    if (adjustedUri.startsWith("http")) {
-		adjustedUri = "<" + adjustedUri + ">";
-	    }
+	String prefixedUri = ValueCellProcessing.replacePrefixEx(study_uri);
+	String adjustedUri = prefixedUri;
+	if (adjustedUri.startsWith("http")) {
+	    adjustedUri = "<" + adjustedUri + ">";
 	}
 	String studyQueryString = NameSpaces.getInstance().printSparqlNameSpaceList() +
-	    "SELECT DISTINCT ?studyUri ?studyType ?studyLabel ?title ?proj ?studyComment ?agentUri ?institutionUri " + 
+	    "SELECT DISTINCT ?studyType ?studyLabel ?title ?proj ?studyComment ?agentUri ?institutionUri ?lastId" + 
 	    " WHERE {  " + 
 	    "      ?studyType rdfs:subClassOf* hasco:Study . " + 
-	    "      ?studyUri a ?studyType . " + 
-	    "      OPTIONAL { ?studyUri rdfs:label ?studyLabel } . " + 
-	    "	   FILTER   ( ?studyUri = " + DynamicFunctions.replaceURLWithPrefix(adjustedUri) + " ) . " +
-	    "	   OPTIONAL { ?studyUri hasco:hasTitle ?title } . " +
-	    "	   OPTIONAL { ?studyUri hasco:hasProject ?proj } . " +
-	    "      OPTIONAL { ?studyUri rdfs:comment ?studyComment } . " + 
-	    "      OPTIONAL { ?studyUri hasco:hasAgent ?agentUri } .  " +
-	    "      OPTIONAL { ?studyUri hasco:hasInstitution ?institutionUri } . " + 
+	    "      " + adjustedUri + " a ?studyType . " + 
+	    "      OPTIONAL { " + adjustedUri + " rdfs:label ?studyLabel } . " + 
+	    "	   OPTIONAL { " + adjustedUri + " hasco:hasTitle ?title } . " +
+	    "	   OPTIONAL { " + adjustedUri + " hasco:hasProject ?proj } . " +
+	    "      OPTIONAL { " + adjustedUri + " rdfs:comment ?studyComment } . " + 
+	    "      OPTIONAL { " + adjustedUri + " hasco:hasAgent ?agentUri } .  " +
+	    "      OPTIONAL { " + adjustedUri + " hasco:hasInstitution ?institutionUri } . " + 
+	    "      OPTIONAL { " + adjustedUri + " hasco:hasLastId ?lastId } . " + 
 	    " } " + 
-            " GROUP BY ?studyUri ?studyType ?studyLabel ?title ?proj ?studyComment ?agentUri ?institutionUri ";
+            " GROUP BY ?studyType ?studyLabel ?title ?proj ?studyComment ?agentUri ?institutionUri ?lastId ";
 	
 	try {
+	    //System.out.println("Study's find() query: " + studyQueryString);
 	    Query studyQuery = QueryFactory.create(studyQueryString);
 	    QueryExecution qexec = QueryExecutionFactory.sparqlService(Collections.getCollectionsName(Collections.METADATA_SPARQL), studyQuery);
 	    ResultSet results = qexec.execSelect();
@@ -450,7 +478,7 @@ public class Study {
 	    qexec.close();
 	    if (resultsrw.hasNext()) {
 		QuerySolution soln = resultsrw.next();
-		returnStudy.setUri(soln.get("studyUri").toString());
+		returnStudy.setUri(prefixedUri);
 		if (soln.contains("studyLabel")) {
 		    returnStudy.setLabel(soln.get("studyLabel").toString());
 		}
@@ -471,6 +499,9 @@ public class Study {
 		}
 		if (soln.contains("institutionUri")) {
 		    returnStudy.setInstitutionUri(soln.get("institutionUri").toString());
+		}
+		if (soln.contains("lastId")) {
+		    returnStudy.setLastId(soln.get("lastId").toString());
 		}
 	    }
 	} catch (QueryExceptionHTTP e) {
@@ -843,6 +874,9 @@ public class Study {
 		insert += std_uri + " hasco:hasInstitution <" + institutionUri + "> .  ";
 	    }
 	}
+	if (lastId != null) {
+	    insert += std_uri + " hasco:hasLastId  \"" + lastId + "\" .  ";
+	}
     	insert += LINE_LAST;
 	//System.out.println("Study insert query (pojo's save): <" + insert + ">");
     	UpdateRequest request = UpdateFactory.create(insert);
@@ -886,6 +920,7 @@ public class Study {
     	row.put("rdfs:comment", getComment());
     	row.put("skos:definition", "");
 	row.put("hasco:hasAgent", ValueCellProcessing.replaceNameSpaceEx(this.getAgentUri()));
+	row.put("hasco:hasLastId", getLastId());
 	row.put("hasco:hasInstitution", ValueCellProcessing.replaceNameSpaceEx(this.getInstitutionUri()));
     	rows.add(row);
 

@@ -1,0 +1,109 @@
+@(study      : org.hadatac.entity.pojo.Study,
+  scTypeList : List[org.hadatac.entity.pojo.SampleCollectionType])
+
+@import helper._
+@import org.hadatac.utils._
+@import org.hadatac.console.views.html._
+@import org.hadatac.console.controllers._
+@import org.hadatac.entity.pojo.Agent
+@import play._
+
+@main("New Sample Collection") {
+
+  <div class="container">
+    <h4>New Sample Collection for Study @study.getLabel()</h4>
+
+   <script type="text/javascript">
+     function checkform() {
+        var cansubmit = true;
+	
+	if (!document.getElementById('newLabel').value || 
+            document.getElementById('newLabel').value.length === 0) {
+	   cansubmit = false;
+	}
+
+	if (!document.getElementById('newType').value || 
+            document.getElementById('newType').value.length === 0) {
+	   cansubmit = false;
+	}
+
+	if (cansubmit) {
+	  document.getElementById('submit').disabled = false;
+	} else {
+	  document.getElementById('submit').disabled = 'disabled';
+	}
+     }
+
+     function replaceAll(str, find, replace) {
+        while (str.indexOf(find) > -1) {
+            str = str.replace(find, replace);
+        }
+        return str;
+     }
+       
+     function labelchange() {
+        var label = "@study.getLabel()";
+        label = replaceAll(label," ","-");
+	label = replaceAll(label,"<","");
+        label = replaceAll(label,">","");
+        label = replaceAll(label,"?","");
+        label = replaceAll(label,".","");
+        label = replaceAll(label,"!","");
+        label = replaceAll(label,"?","");
+        label = replaceAll(label,"'","");
+        label = replaceAll(label,"#","");
+        label = replaceAll(label,"&","");
+        label = replaceAll(label,";","");
+        label = replaceAll(label,",","");
+        var newUri = "@Play.application().configuration().getString("hadatac.community.ont_prefix")" + 
+                     "-kb:SC-" + 
+                     label + "-" + 
+                     document.getElementById("newLabel").value;
+        newUri = replaceAll(newUri," ","-");
+	newUri = replaceAll(newUri,"<","");
+        newUri = replaceAll(newUri,">","");
+        newUri = replaceAll(newUri,"?","");
+        newUri = replaceAll(newUri,".","");
+	$('#newUri').val(newUri);
+        checkform();
+     };
+
+   </script>
+
+    <form class="form-horizontal" name="newSampleColleciton" method="post" action="@org.hadatac.console.controllers.samplecollections.routes.NewSC.processForm(study.getUri())">
+	
+	<div class="form-group">
+		<label>URI:</label>
+		<input type="text" class="form-control col-sm-6" name="newUri" id="newUri" 
+		       onchange="checkform()" readonly >
+ 	</div>
+ 	<div class="form-group">
+		<label>Short Name:</label>
+ 		<input type="text" class="form-control col-sm-6" name="newLabel" id="newLabel" onchange="labelchange()" >
+ 	</div>
+	<div class="form-group">
+	        <label>Type:</label>
+	        <select id="newType" class="form-control col-sm-6" name="newType" onchange="checkform()">
+	        <option></option>
+	           @if(scTypeList != null) {
+                      @for(scType <- scTypeList){
+ 	                 @scType_select_entry(scType,"")
+                      }
+                   }
+	         </select>
+ 	</div>
+ 	<div class="form-group">
+		<label>Description</label>
+ 		<input type="text" class="form-control col-sm-6" name="newComment" id="newComment" onchange="checkform()" >
+ 	</div>
+     
+	<div class="form-group">
+	  <label>Updates</label> <br>
+	  <input class="btn btn-success btn-sm" role="button" type="submit" id="submit" value="Create Sample Collection" disabled /><br>
+	  <a href="@org.hadatac.console.controllers.samplecollections.routes.SCManagement.index(study.getUri())" class="btn btn-primary" role="button">Back to Sample Collection Management</a>
+	</div>
+     
+   </form>
+  </div>
+
+}

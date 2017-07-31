@@ -1,28 +1,32 @@
-@(study : org.hadatac.entity.pojo.Study)
+@(study  : org.hadatac.entity.pojo.Study,
+  sc     : org.hadatac.entity.pojo.SampleCollection,
+  spList : List[org.hadatac.entity.pojo.Sample])
 
 @import helper._
 @import org.hadatac.console.views.html._
 @import org.hadatac.utils._
+@import java.net.URLEncoder
 
 @main("Sample Management") {
 
-    <h3>Sample Management for Study @study.getLabel()</h3>
+  <div class="container-fluid">
+    <h3>Sample Management in Sample Collection @sc.getLabel()</h3>
     
     <h4>Management options</h4>
 
     <div class="container-fluid">
       <div class="row">
          <div class="navbar-collapse collapse navbar-secondary">
-           <a href="" class="btn btn-primary disabled" role="button">Create Subject Group</a>
-           <a href="" class="btn btn-primary disabled" role="button">Create Location Collection</a>
-           <a href="" class="btn btn-primary disabled" role="button">Create Material Collection</a>
+           <a href="@org.hadatac.console.controllers.samples.routes.NewSamplesFromScratch.index(URLEncoder.encode(study.getUri(),"UTF-8"),URLEncoder.encode(sc.getUri(),"UTF-8"))" class="btn btn-primary" role="button">Create Multiple Samples From Scratch</a>
+           <a href="" class="btn btn-primary disabled" role="button">Create Multiple Samples From File</a>
+           <a href="" class="btn btn-primary disabled" role="button">Create Single Sample</a>
          </div>
       </div>
    </div>
 
    <hr>
 
-   <h4>Sample Collections</h4>
+   <h4>Samples</h4>
    
     <div class="container-fluid">
         <table class="table">
@@ -31,17 +35,25 @@
                 <!--  <th>Study URI</th>  -->
                 <th>Name</th>
                 <th>Type</th>
-                <th>Description</th>
+                <th>Original ID</th>
+		<th>Is Sample Of</th>
                 <th>Operations</th>
               </tr>
             </thead>
             <tbody>
+	    @if(spList != null) {
+                 @for(sp <- spList){
+	            @sp_entry(study, sc, sp)
+                 }
+              } 
             </tbody>
         </table>
 	
-	<a href="@org.hadatac.console.controllers.studies.routes.StudyManagement.index()" class="btn btn-primary" role="button">Back to Study Management</a>
+
+	<a href="@org.hadatac.console.controllers.samplecollections.routes.SCManagement.index(URLEncoder.encode(study.getUri(),"UTF-8"))" class="btn btn-primary" role="button">Back to Sample Collection  Management</a>
 	
     </div>
  
+  </div>
 
 }
