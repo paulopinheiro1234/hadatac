@@ -26,16 +26,16 @@ import org.hadatac.utils.NameSpaces;
 
 import play.Play;
 
-public class SampleCollectionType extends HADatAcClass implements Comparable<SampleCollectionType> {
+public class StudyObjectType extends HADatAcClass implements Comparable<StudyObjectType> {
 
-        static String className = "hasco:SampleCollection";
+        static String className = "sio:StudyObject";
 
-	public SampleCollectionType () {
+	public StudyObjectType () {
 	    super(className);
 	}
 
-	public static List<SampleCollectionType> find() {
-	    List<SampleCollectionType> sampleCollectionTypes = new ArrayList<SampleCollectionType>();
+	public static List<StudyObjectType> find() {
+	    List<StudyObjectType> objectTypes = new ArrayList<StudyObjectType>();
 	    String queryString = NameSpaces.getInstance().printSparqlNameSpaceList() +
 		" SELECT ?uri WHERE { " +
 		" ?uri rdfs:subClassOf* " + className + " . " + 
@@ -51,26 +51,25 @@ public class SampleCollectionType extends HADatAcClass implements Comparable<Sam
 	    
 	    while (resultsrw.hasNext()) {
 		QuerySolution soln = resultsrw.next();
-		SampleCollectionType sampleCollectionType = find(soln.getResource("uri").getURI());
-		sampleCollectionTypes.add(sampleCollectionType);
-		//System.out.println("type: " + soln.getResource("uri").getURI());
+		StudyObjectType objectType = find(soln.getResource("uri").getURI());
+		objectTypes.add(objectType);
 	    }			
 	    
-	    java.util.Collections.sort((List<SampleCollectionType>) sampleCollectionTypes);
-	    return sampleCollectionTypes;
+	    java.util.Collections.sort((List<StudyObjectType>) objectTypes);
+	    return objectTypes;
 	    
 	}
 
 	public static Map<String,String> getMap() {
-	    List<SampleCollectionType> list = find();
+	    List<StudyObjectType> list = find();
 	    Map<String,String> map = new HashMap<String,String>();
-	    for (SampleCollectionType typ: list) 
+	    for (StudyObjectType typ: list) 
 		map.put(typ.getUri(),typ.getLabel());
 	    return map;
 	}
 
-	public static SampleCollectionType find(String uri) {
-	    SampleCollectionType sampleCollectionType = null;
+	public static StudyObjectType find(String uri) {
+	    StudyObjectType objectType = null;
 	    Model model;
 	    Statement statement;
 	    RDFNode object;
@@ -81,29 +80,29 @@ public class SampleCollectionType extends HADatAcClass implements Comparable<Sam
 								       + Collections.METADATA_SPARQL, query);
 	    model = qexec.execDescribe();
 	    
-	    sampleCollectionType = new SampleCollectionType();
+	    objectType = new StudyObjectType();
 	    StmtIterator stmtIterator = model.listStatements();
 	    
 	    while (stmtIterator.hasNext()) {
 		statement = stmtIterator.next();
 		object = statement.getObject();
 		if (statement.getPredicate().getURI().equals("http://www.w3.org/2000/01/rdf-schema#label")) {
-		    sampleCollectionType.setLabel(object.asLiteral().getString());
+		    objectType.setLabel(object.asLiteral().getString());
 		} else if (statement.getPredicate().getURI().equals("http://www.w3.org/2000/01/rdf-schema#subClassOf")) {
-		    sampleCollectionType.setSuperUri(object.asResource().getURI());
+		    objectType.setSuperUri(object.asResource().getURI());
 		}
 	    }
 	    
-	    sampleCollectionType.setUri(uri);
-	    sampleCollectionType.setLocalName(uri.substring(uri.indexOf('#') + 1));
+	    objectType.setUri(uri);
+	    objectType.setLocalName(uri.substring(uri.indexOf('#') + 1));
 	    
 	    //System.out.println(uri + " " + entity.getLocalName() + " " + entity.getSuperUri());
 	    
-	    return sampleCollectionType;
+	    return objectType;
 	}
 	
 	@Override
-	    public int compareTo(SampleCollectionType another) {
+	    public int compareTo(StudyObjectType another) {
 	    if (this.getLabel() != null && another.getLabel() != null) {
 		   return this.getLabel().compareTo(another.getLabel());
 	    }

@@ -1,5 +1,5 @@
 @(study      : org.hadatac.entity.pojo.Study,
-  scTypeList : List[org.hadatac.entity.pojo.SampleCollectionType])
+  ocTypeList : List[org.hadatac.entity.pojo.ObjectCollectionType])
 
 @import helper._
 @import org.hadatac.utils._
@@ -8,10 +8,10 @@
 @import org.hadatac.entity.pojo.Agent
 @import play._
 
-@main("New Sample Collection") {
+@main("New Object Collection") {
 
   <div class="container">
-    <h4>New Sample Collection for Study @study.getLabel()</h4>
+    <h4>New Object Collection for Study @study.getLabel()</h4>
 
    <script type="text/javascript">
      function checkform() {
@@ -56,7 +56,7 @@
         label = replaceAll(label,";","");
         label = replaceAll(label,",","");
         var newUri = "@Play.application().configuration().getString("hadatac.community.ont_prefix")" + 
-                     "-kb:SC-" + 
+                     "-kb:OC-" + 
                      label + "-" + 
                      document.getElementById("newLabel").value;
         newUri = replaceAll(newUri," ","-");
@@ -70,7 +70,7 @@
 
    </script>
 
-    <form class="form-horizontal" name="newSampleColleciton" method="post" action="@org.hadatac.console.controllers.samplecollections.routes.NewSC.processForm(study.getUri())">
+    <form class="form-horizontal" name="newObjectColleciton" method="post" action="@org.hadatac.console.controllers.objectcollections.routes.NewOC.processForm(study.getUri())">
 	
 	<div class="form-group">
 		<label>URI:</label>
@@ -85,9 +85,9 @@
 	        <label>Type:</label>
 	        <select id="newType" class="form-control col-sm-6" name="newType" onchange="checkform()">
 	        <option></option>
-	           @if(scTypeList != null) {
-                      @for(scType <- scTypeList){
- 	                 @scType_select_entry(scType,"")
+	           @if(ocTypeList != null) {
+                      @for(ocType <- ocTypeList){
+ 	                 @ocType_select_entry(ocType,"")
                       }
                    }
 	         </select>
@@ -99,8 +99,8 @@
      
 	<div class="form-group">
 	  <label>Updates</label> <br>
-	  <input class="btn btn-success btn-sm" role="button" type="submit" id="submit" value="Create Sample Collection" disabled /><br>
-	  <a href="@org.hadatac.console.controllers.samplecollections.routes.SCManagement.index(study.getUri())" class="btn btn-primary" role="button">Back to Sample Collection Management</a>
+	  <input class="btn btn-success btn-sm" role="button" type="submit" id="submit" value="Create Object Collection" disabled /><br>
+	  <a href="@org.hadatac.console.controllers.objectcollections.routes.OCManagement.index(study.getUri())" class="btn btn-primary" role="button">Back to Object Collection Management</a>
 	</div>
      
    </form>

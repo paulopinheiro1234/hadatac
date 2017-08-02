@@ -1,6 +1,6 @@
 @(study      : org.hadatac.entity.pojo.Study,
-  sc         : org.hadatac.entity.pojo.SampleCollection,
-  scTypeList : List[org.hadatac.entity.pojo.SampleCollectionType])
+  oc         : org.hadatac.entity.pojo.ObjectCollection,
+  ocTypeList : List[org.hadatac.entity.pojo.ObjectCollectionType])
 
 @import helper._
 @import org.hadatac.utils._
@@ -9,10 +9,10 @@
 @import org.hadatac.entity.pojo.Agent
 @import play._
 
-@main("Edit Sample Collection") {
+@main("Edit Object Collection") {
 
   <div class="container">
-    <h4>Edit Sample Collection for Study @study.getLabel()</h4>
+    <h4>Edit Object Collection for Study @study.getLabel()</h4>
 
    <script type="text/javascript">
      function checkform() {
@@ -44,7 +44,7 @@
        
      function labelchange() {
         var newUri = "@Play.application().configuration().getString("hadatac.community.ont_prefix")" + 
-                     "-kb:SC-" + 
+                     "-kb:OC-" + 
                      "@study.getLabel()" + "-" + 
                      document.getElementById("newLabel").value;
         newUri = replaceAll(newUri," ","-");
@@ -57,38 +57,42 @@
 
    </script>
 
-    <form class="form-horizontal" name="editSampleColleciton" method="post" action="@org.hadatac.console.controllers.samplecollections.routes.EditSC.processForm(study.getUri())">
+    <form class="form-horizontal" name="editObjectColleciton" method="post" action="@org.hadatac.console.controllers.objectcollections.routes.EditOC.processForm(study.getUri(),oc.getUri())">
 	
 	<div class="form-group">
 		<label>URI:</label>
 		<input type="text" class="form-control col-sm-6" name="newUri" id="newUri" 
-		       value="@sc.getUri()" onchange="checkform()" readonly >
+		       value="@oc.getUri()" onchange="checkform()" readonly >
  	</div>
  	<div class="form-group">
 		<label>Short Name:</label>
  		<input type="text" class="form-control col-sm-6" name="newLabel" id="newLabel" 
-		       value="@sc.getLabel()" onchange="labelchange()" >
+		       value="@oc.getLabel()" onchange="labelchange()" >
  	</div>
 	<div class="form-group">
 	        <label>Type:</label>
-	        <select id="newType" class="form-control col-sm-6" name="newType" value="@sc.getSampleCollectionType(),getUri()" onchange="checkform()">
+	        <select id="newType" class="form-control col-sm-6" name="newType" value="@oc.getObjectCollectionType(),getUri()" onchange="checkform()">
 	        <option></option>
-	           @if(scTypeList != null) {
-                      @for(scType <- scTypeList){
- 	                 @scType_select_entry(scType,"")
+	           @if(ocTypeList != null) {
+                      @for(ocType <- ocTypeList){
+        	          @if(oc.getObjectCollectionType().getUri() != null) {
+ 	                      @ocType_select_entry(ocType,oc.getObjectCollectionType().getUri())
+                          } else {
+ 	                      @ocType_select_entry(ocType,"")
+                          }
                       }
                    }
-	         </select>
+	        </select>
  	</div>
  	<div class="form-group">
 		<label>Description</label>
- 		<input type="text" class="form-control col-sm-6" name="newComment" id="newComment" value="@sc.getComment()" onchange="checkform()" >
+ 		<input type="text" class="form-control col-sm-6" name="newComment" id="newComment" value="@oc.getComment()" onchange="checkform()" >
  	</div>
      
 	<div class="form-group">
 	  <label>Updates</label> <br>
-	  <input class="btn btn-success btn-sm" role="button" type="submit" id="submit" value="Save Sample Collection" disabled /><br>
-	  <a href="@org.hadatac.console.controllers.samplecollections.routes.SCManagement.index(study.getUri())" class="btn btn-primary" role="button">Back to Sample Collection Management</a>
+	  <input class="btn btn-success btn-sm" role="button" type="submit" id="submit" value="Save Object Collection" disabled /><br>
+	  <a href="@org.hadatac.console.controllers.objectcollections.routes.OCManagement.index(study.getUri())" class="btn btn-primary" role="button">Back to Object Collection Management</a>
 	</div>
      
    </form>

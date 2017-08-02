@@ -1,45 +1,46 @@
 @(study  : org.hadatac.entity.pojo.Study,
-  scList : List[org.hadatac.entity.pojo.SampleCollection])
+  ocList : List[org.hadatac.entity.pojo.ObjectCollection])
 
 @import helper._
 @import org.hadatac.console.views.html._
 @import org.hadatac.utils._
 
-@main("Sample Management") {
+@main("Object Management") {
 
   <div class="container-fluid">
-    <h3>Sample Management for Study @study.getLabel()</h3>
+    <h3>Management of Study <i><font color="darkBlue"> @study.getLabel()</font></i>'s Object Collections </h3>
     
     <h4>Management options</h4>
 
     <div class="container-fluid">
       <div class="row">
          <div class="navbar-collapse collapse navbar-secondary">
-           <a href="@org.hadatac.console.controllers.samplecollections.routes.NewSC.index(study.getUri())" class="btn btn-primary" role="button">Create Sample Collection</a>
+           <a href="@org.hadatac.console.controllers.objectcollections.routes.NewOC.index(study.getUri())" class="btn btn-primary" role="button">Create Object Collection</a>
          </div>
       </div>
    </div>
 
    <hr>
 
-   <h4>Sample Collections</h4>
+   <h4>Object Collections</h4>
    
     <div class="container-fluid">
         <table class="table">
             <thead>
               <tr>
                 <!--  <th>Study URI</th>  -->
-                <th>Sample Collection Name</th>
+                <th>Object Collection Name</th>
                 <th>Type</th>
                 <th>Description</th>
-		<th># Samples</th>
+                <th>In Scope Of</th>
+		<th># Objects</th>
                 <th>Operations</th>
               </tr>
             </thead>
             <tbody>
-	      @if(scList != null) {
-                 @for(sc <- scList){
-	            @sc_entry(study,sc)
+	      @if(ocList != null) {
+                 @for(oc <- ocList){
+	            @oc_entry(study,oc)
                  }
               }
             </tbody>

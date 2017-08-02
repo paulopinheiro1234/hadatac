@@ -1,4 +1,4 @@
-package org.hadatac.console.controllers.samples;
+package org.hadatac.console.controllers.objects;
 
 import java.text.DateFormat;
 import java.text.ParseException;
@@ -16,57 +16,58 @@ import play.data.*;
 import org.hadatac.utils.ConfigProp;
 import org.hadatac.data.api.DataFactory;
 import org.hadatac.entity.pojo.Study;
-import org.hadatac.entity.pojo.SampleCollection;
+import org.hadatac.entity.pojo.ObjectCollection;
+import org.hadatac.entity.pojo.StudyObject;
 import org.hadatac.entity.pojo.Sample;
 import org.hadatac.metadata.loader.LabkeyDataHandler;
 import org.hadatac.metadata.loader.ValueCellProcessing;
 import org.hadatac.console.views.html.*;
-import org.hadatac.console.views.html.samples.*;
+import org.hadatac.console.views.html.objects.*;
 import org.hadatac.console.views.html.triplestore.syncLabkey;
-import org.hadatac.console.models.SampleCollectionForm;
+import org.hadatac.console.models.ObjectCollectionForm;
 import org.hadatac.console.models.SparqlQuery;
 import org.hadatac.console.models.SparqlQueryResults;
 import org.hadatac.console.models.SysUser;
 import org.hadatac.console.http.GetSparqlQuery;
 import org.hadatac.console.controllers.AuthApplication;
 import org.hadatac.console.controllers.triplestore.UserManagement;
-import org.hadatac.console.controllers.samples.routes;
+import org.hadatac.console.controllers.objects.routes;
 import org.labkey.remoteapi.CommandException;
 import org.labkey.remoteapi.query.SaveRowsResponse;
 import be.objectify.deadbolt.java.actions.Group;
 import be.objectify.deadbolt.java.actions.Restrict;
 
-public class SampleManagement extends Controller {
+public class ObjectManagement extends Controller {
     
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-	public static Result index(String std_uri, String sc_uri) {
+	public static Result index(String std_uri, String oc_uri) {
     	if (session().get("LabKeyUserName") == null && session().get("LabKeyPassword") == null) {
 	    return redirect(org.hadatac.console.controllers.triplestore.routes.LoadKB.logInLabkey(
-			    org.hadatac.console.controllers.samples.routes.SampleManagement.index(std_uri, sc_uri).url()));
+			    org.hadatac.console.controllers.objects.routes.ObjectManagement.index(std_uri, oc_uri).url()));
     	}
 	std_uri = URLDecoder.decode(std_uri);
-	sc_uri = URLDecoder.decode(sc_uri);
-	//System.out.println("In DeleteSC: std_uri = [" + std_uri + "]");
-	//System.out.println("In DeleteSC: sc_uri = [" + sc_uri + "]");
+	oc_uri = URLDecoder.decode(oc_uri);
+	//System.out.println("In DeleteOC: std_uri = [" + std_uri + "]");
+	//System.out.println("In DeleteOC: oc_uri = [" + oc_uri + "]");
 
 	Study study = Study.find(std_uri);
 	if (study == null) {
-	    return badRequest(sampleConfirm.render("Error listing sample collection: Study URI did not return valid URI", std_uri, null));
+	    return badRequest(objectConfirm.render("Error listing object collection: Study URI did not return valid URI", std_uri, null));
 	} 
 
-	SampleCollection sc = SampleCollection.find(sc_uri);
-	if (sc == null) {
-	    return badRequest(sampleConfirm.render("Error listing samplen: SampleCollection URI did not return valid object", std_uri, sc));
+	ObjectCollection oc = ObjectCollection.find(oc_uri);
+	if (oc == null) {
+	    return badRequest(objectConfirm.render("Error listing objectn: ObjectCollection URI did not return valid object", std_uri, oc));
 	} 
 
-	List<Sample> samples = Sample.findByCollection(sc);
+	List<StudyObject> objects = StudyObject.findByCollection(oc);
 
-    	return ok(sampleManagement.render(study, sc, samples));
+    	return ok(objectManagement.render(study, oc, objects));
     }
     
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    public static Result postIndex(String std_uri, String sc_uri) {
-    	return index(std_uri, sc_uri);
+    public static Result postIndex(String std_uri, String oc_uri) {
+    	return index(std_uri, oc_uri);
     }
     
 }

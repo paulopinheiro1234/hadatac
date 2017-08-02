@@ -1,0 +1,87 @@
+@(study       : org.hadatac.entity.pojo.Study,
+  oc          : org.hadatac.entity.pojo.ObjectCollection,
+  objTypeList : List[org.hadatac.entity.pojo.StudyObjectType])
+
+@import helper._
+@import org.hadatac.utils._
+@import org.hadatac.console.views.html._
+@import org.hadatac.console.controllers._
+@import org.hadatac.entity.pojo.Agent
+@import play._
+
+@main("New Objects") {
+
+  <div class="container">
+    <h4>New Objects for Object Collection @oc.getLabel()</h4>
+
+   <script type="text/javascript">
+     function checkform() {
+        var cansubmit = true;
+	
+	if (!document.getElementById('newQuantity').value || 
+            document.getElementById('newQuantity').value.length === 0) {
+	   cansubmit = false;
+	}
+
+	if (cansubmit) {
+	  document.getElementById('submit').disabled = false;
+	} else {
+	  document.getElementById('submit').disabled = 'disabled';
+	}
+     }
+
+     function replaceAll(str, find, replace) {
+        while (str.indexOf(find) > -1) {
+            str = str.replace(find, replace);
+        }
+        return str;
+     }
+       
+   </script>
+
+    <form class="form-horizontal" name="newObjects" method="post" action="@org.hadatac.console.controllers.objects.routes.NewObjectsFromScratch.processForm(study.getUri(),oc.getUri())">
+	
+	<div class="form-group">
+		<label>Study:</label>
+		<input type="text" class="form-control col-sm-6" name="newStudyLabel" id="newStudyUri" 
+		       value="@study.getLabel()" onchange="checkform()" readonly >
+ 	</div>
+ 	<div class="form-group">
+		<label>Object Collection:</label>
+ 		<input type="text" class="form-control col-sm-6" name="newObjectCollectionLabel" id="newObjectCollectionUri" 
+		       value="@oc.getLabel()    [@oc.getObjectCollectionType().getLabel()]" onchange="checkform()" readonly>
+ 	</div>
+	<div class="form-group">
+	        <label>Object Type:</label>  [@oc.getType]
+	        <select id="newType" class="form-control col-sm-2" name="newType" onchange="checkform()" readonly>
+		  @if(oc.getType().equals("http://hadatac.org/ont/hasco/SubjectGroup")) {
+		     <option value="http://semanticscience.org/resource/Human" selected>Human</option>
+		  } else {
+		    @if(oc.getType().equals("http://hadatac.org/ont/hasco/LocationCollection")) {
+		        <option value="http://hadatac.org/ont/hasco/Location" selected>Location</option>
+                    } else {
+                        <option></option>
+	                @if(objTypeList != null) {
+                           @for(objType <- objTypeList){
+ 	                     @objType_select_entry(objType,"")
+                           }
+                        }
+                    }
+                 }
+	         </select>
+ 	</div>
+ 	<div class="form-group">
+		<label>Number of Objects to be Created:</label>
+ 		<input type="text" class="form-control col-sm-6" name="newQuantity" id="newQuantity" onchange="checkform()" >
+ 	</div>
+     
+	<div class="form-group">
+	  <label>Updates</label> <br>
+	  <input class="btn btn-success btn-sm" role="button" type="submit" id="submit" value="Create Objects" disabled /><br>
+	  <a href="@org.hadatac.console.controllers.objects.routes.ObjectManagement.index(study.getUri(),oc.getUri())" class="btn btn-primary" role="button">Back to Object Management</a>
+	</div>
+     
+   </form>
+  </div>
+
+}

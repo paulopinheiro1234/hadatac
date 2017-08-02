@@ -33,17 +33,25 @@ import be.objectify.deadbolt.java.actions.Group;
 import be.objectify.deadbolt.java.actions.Restrict;
 import org.hadatac.console.controllers.AuthApplication;
 
-public class Sample extends StudyObject {
+public class StudyObject extends HADatAcThing {
 
     public static String INDENT1 = "     ";
     public static String INSERT_LINE1 = "INSERT DATA {  ";
     public static String DELETE_LINE1 = "DELETE WHERE {  ";
-    public static String LINE3 = INDENT1 + "a         hasco:Sample;  ";
+    public static String LINE3 = INDENT1 + "a         hasco:StudyObject;  ";
     public static String DELETE_LINE3 = " ?p ?o . ";
     public static String LINE_LAST = "}  ";
-    public static String PREFIX = "SP-";
+    public static String PREFIX = "OBJ-";
 
-    public Sample(String uri, String isMemberOf) {
+    String originalId;
+    String isFrom;
+    String isMemberOf;
+
+    public StudyObject() {
+	this("","");
+    }
+
+    public StudyObject(String uri, String isMemberOf) {
 	this.setUri(uri);
 	this.setType("");
 	this.setOriginalId("");
@@ -53,7 +61,7 @@ public class Sample extends StudyObject {
 	this.setIsFrom("");
     }
 
-    public Sample(String uri,
+    public StudyObject(String uri,
 		  String type,
 		  String originalId,
 		  String label,
@@ -69,27 +77,52 @@ public class Sample extends StudyObject {
 	this.setIsFrom(isFrom);
     }
     
-    public void setIsFrom(String isFrom) {
-	this.isFrom = isFrom;
+    public StudyObjectType getStudyObjectType() {
+	if (type == null || type.equals("")) {
+	    return null;
+	}
+	return StudyObjectType.find(type);
     }
     
-    public static Sample find(String sp_uri) {
-	Sample sp = null;
-	System.out.println("Looking for sample with URI " + sp_uri);
-	if (sp_uri.startsWith("http")) {
-	    sp_uri = "<" + sp_uri + ">";
+    public String getOriginalId() {
+    	return originalId;
+    }
+
+    public void setOriginalId(String originalId) {
+	this.originalId = originalId;
+    }
+    
+    public String getIsFrom() {
+	return isFrom;
+    }
+    
+    public void setIsFrom(String isFrom) {
+	this.isFrom = isFrom;
+    }	
+    
+    public String getIsMemberOf() {
+	return isMemberOf;
+    }
+    
+    public void setIsMemberOf(String isMemberOf) {
+	this.isMemberOf = isMemberOf;
+    }	
+    
+    public static StudyObject find(String obj_uri) {
+	StudyObject obj = null;
+	System.out.println("Looking for object with URI " + obj_uri);
+	if (obj_uri.startsWith("http")) {
+	    obj_uri = "<" + obj_uri + ">";
 	}
 	String queryString = NameSpaces.getInstance().printSparqlNameSpaceList() + 
-	    "SELECT  ?spType ?originalId ?isMemberOf ?hasLabel " + 
-	    " ?hasComment ?hasSource ?isPIConfirmed WHERE { " + 
-	    "    " + sp_uri + " a ?spType . " + 
-	    "    " + sp_uri + " hasco:isMemberOf ?isMemberOf .  " + 
-	    "    OPTIONAL { " + sp_uri + " hasco:originalID ?originalId } . " + 
-	    "    OPTIONAL { " + sp_uri + " rdfs:label ?hasLabel } . " + 
-	    "    OPTIONAL { " + sp_uri + " rdfs:comment ?hasComment } . " + 
-	    "    OPTIONAL { " + sp_uri + " hasco:isFrom ?isFrom } . " + 
-	    "    OPTIONAL { " + sp_uri + " hasco:hasSource ?hasSource } . " + 
-	    "    OPTIONAL { " + sp_uri + " hasco:isPIConfirmed ?isPIConfirmed } . " + 
+	    "SELECT  ?objType ?originalId ?isMemberOf ?hasLabel " + 
+	    " ?hasComment WHERE { " + 
+	    "    " + obj_uri + " a ?objType . " + 
+	    "    " + obj_uri + " hasco:isMemberOf ?isMemberOf .  " + 
+	    "    OPTIONAL { " + obj_uri + " hasco:originalID ?originalId } . " + 
+	    "    OPTIONAL { " + obj_uri + " rdfs:label ?hasLabel } . " + 
+	    "    OPTIONAL { " + obj_uri + " rdfs:comment ?hasComment } . " + 
+	    "    OPTIONAL { " + obj_uri + " hasco:isFrom ?isFrom } . " + 
 	    "}";
 	Query query = QueryFactory.create(queryString);
 	
@@ -99,8 +132,8 @@ public class Sample extends StudyObject {
 	qexec.close();
 	
 	if (!resultsrw.hasNext()) {
-	    System.out.println("[WARNING] Sample. Could not find SP with URI: " + sp_uri);
-	    return sp;
+	    System.out.println("[WARNING] StudyObject. Could not find OBJ with URI: " + obj_uri);
+	    return obj;
 	}
 	
 	String typeStr = "";
@@ -115,8 +148,8 @@ public class Sample extends StudyObject {
 	    if (soln != null) {
 		
 		try {
-		    if (soln.getResource("spType") != null && soln.getResource("spType").getURI() != null) {
-			typeStr = soln.getResource("spType").getURI();
+		    if (soln.getResource("objType") != null && soln.getResource("objType").getURI() != null) {
+			typeStr = soln.getResource("objType").getURI();
 		    }
 		} catch (Exception e1) {
 		    typeStr = "";
@@ -130,7 +163,7 @@ public class Sample extends StudyObject {
 		    originalIdStr = "";
 		}
 		
-		labelStr = FirstLabel.getLabel(sp_uri);
+		labelStr = FirstLabel.getLabel(obj_uri);
 
 		try {
 		    if (soln.getResource("isMemberOf") != null && soln.getResource("isMemberOf").getURI() != null) {
@@ -156,7 +189,7 @@ public class Sample extends StudyObject {
 		    isFromStr = "";
 		}
 		
-		sp = new Sample(sp_uri,
+		obj = new StudyObject(obj_uri,
 				typeStr,
 				originalIdStr,
 				labelStr,
@@ -165,20 +198,20 @@ public class Sample extends StudyObject {
 				isFromStr);
 	    }
 	}
-	return sp;
+	return obj;
     }
     
-    public static List<Sample> findSamplesByCollection(ObjectCollection oc) {
+    public static List<StudyObject> findByCollection(ObjectCollection oc) {
 	if (oc == null) {
 	    return null;
 	}
-    	List<Sample> samples = new ArrayList<Sample>();
+    	List<StudyObject> objects = new ArrayList<StudyObject>();
     	
     	String queryString = NameSpaces.getInstance().printSparqlNameSpaceList() + 
 	    "SELECT ?uri WHERE { " + 
 	    "   ?uri hasco:isMemberOf  <" + oc.getUri() + "> . " +
 	    " } ";
-	System.out.println("Sample findByCollection: " + queryString);
+	System.out.println("StudyObject findByCollection: " + queryString);
     	Query query = QueryFactory.create(queryString);
     	QueryExecution qexec = QueryExecutionFactory.sparqlService(
 			Collections.getCollectionsName(Collections.METADATA_SPARQL), query);
@@ -189,68 +222,68 @@ public class Sample extends StudyObject {
 	    QuerySolution soln = resultsrw.next();
 	    if (soln != null && soln.getResource("uri").getURI() != null) { 
 		System.out.println("URI: [" + soln.getResource("uri").getURI() + "]");
-		Sample sample = Sample.find(soln.getResource("uri").getURI());
-		samples.add(sample);
+		StudyObject object = StudyObject.find(soln.getResource("uri").getURI());
+		objects.add(object);
 	    }
 	}
-	return samples;
+	return objects;
     }
 
     public void save() {
-	delete();  // delete any existing triple for the current SP
+	delete();  // delete any existing triple for the current OBJ
 	System.out.println("Saving <" + uri + ">");
 	if (uri == null || uri.equals("")) {
-	    System.out.println("[ERROR] Trying to save SP without assigning an URI");
+	    System.out.println("[ERROR] Trying to save OBJ without assigning an URI");
 	    return;
 	}
 	if (isMemberOf == null || isMemberOf.equals("")) {
-	    System.out.println("[ERROR] Trying to save SP without assigning DAS's URI");
+	    System.out.println("[ERROR] Trying to save OBJ without assigning DAS's URI");
 	    return;
 	}
 	String insert = "";
 
-	String sp_uri = "";
+	String obj_uri = "";
 	if (this.getUri().startsWith("<")) {
-	    sp_uri = this.getUri();
+	    obj_uri = this.getUri();
 	} else {
-	    sp_uri = "<" + this.getUri() + ">";
+	    obj_uri = "<" + this.getUri() + ">";
 	}
 
 	    
 	insert += NameSpaces.getInstance().printSparqlNameSpaceList();
     	insert += INSERT_LINE1;
 	if (type.startsWith("http")) {
-	    insert += sp_uri + " a <" + type + "> . ";
+	    insert += obj_uri + " a <" + type + "> . ";
 	} else {
-	    insert += sp_uri + " a " + type + " . ";
+	    insert += obj_uri + " a " + type + " . ";
 	}
 	if (!originalId.equals("")) {
-	    insert += sp_uri + " hasco:originalID \""  + originalId + "\" .  ";
+	    insert += obj_uri + " hasco:originalId \""  + originalId + "\" .  ";
 	}   
 	if (!label.equals("")) {
-	    insert += sp_uri + " rdfs:label  \"" + label + "\" . ";
+	    insert += obj_uri + " rdfs:label  \"" + label + "\" . ";
 	}
 	if (!isMemberOf.equals("")) {
 	    if (isMemberOf.startsWith("http")) {
-		insert += sp_uri + " hasco:isMemberOf <" + isMemberOf + "> .  "; 
+		insert += obj_uri + " hasco:isMemberOf <" + isMemberOf + "> .  "; 
 	    } else {
-		insert += sp_uri + " hasco:isMemberOf " + isMemberOf + " .  "; 
+		insert += obj_uri + " hasco:isMemberOf " + isMemberOf + " .  "; 
 	    } 
 	}
 	if (!comment.equals("")) {
-	    insert += sp_uri + " hasco:hasComment \""  + comment + "\" .  ";
+	    insert += obj_uri + " hasco:hasComment \""  + comment + "\" .  ";
 	}   
 	if (!isFrom.equals("")) {
 	    if (isFrom.startsWith("http")) {
-		insert += sp_uri + " hasco:isFrom <" + isFrom + "> .  "; 
+		insert += obj_uri + " hasco:isFrom <" + isFrom + "> .  "; 
 	    } else {
-		insert += sp_uri + " hasco:isFrom " + isFrom + " .  "; 
+		insert += obj_uri + " hasco:isFrom " + isFrom + " .  "; 
 	    } 
 	}
 	//insert += this.getUri() + " hasco:hasSource " + " .  "; 
 	//insert += this.getUri() + " hasco:isPIConfirmed " + " .  "; 
     	insert += LINE_LAST;
-	System.out.println("SP insert query (pojo's save): <" + insert + ">");
+	System.out.println("OBJ insert query (pojo's save): <" + insert + ">");
     	UpdateRequest request = UpdateFactory.create(insert);
         UpdateProcessor processor = UpdateExecutionFactory.createRemote(
 				      request, Collections.getCollectionsName(Collections.METADATA_UPDATE));
@@ -271,18 +304,15 @@ public class Sample extends StudyObject {
     	row.put("hasco:isMemberOf", ValueCellProcessing.replaceNameSpaceEx(getIsMemberOf()));
     	row.put("rdfs:comment", getComment());
     	row.put("hasco:isFrom", ValueCellProcessing.replaceNameSpaceEx(getIsFrom()));
-	row.put("hasco:hasSource", "");
-    	row.put("hasco:isVirtual", "");
-    	row.put("hasco:isPIConfirmed", "false");
     	rows.add(row);
 	int totalChanged = 0;
     	try {
-	    totalChanged = loader.insertRows("Sample", rows);
+	    totalChanged = loader.insertRows("StudyObject", rows);
 	} catch (CommandException e) {
 	    try {
-		totalChanged = loader.updateRows("Sample", rows);
+		totalChanged = loader.updateRows("StudyObject", rows);
 	    } catch (CommandException e2) {
-		System.out.println("[ERROR] Could not insert or update Sample(s)");
+		System.out.println("[ERROR] Could not insert or update Object(s)");
 	    }
 	}
 	return totalChanged;
@@ -298,9 +328,9 @@ public class Sample extends StudyObject {
     	row.put("hasURI", ValueCellProcessing.replaceNameSpaceEx(getUri().replace("<","").replace(">","")));
     	rows.add(row);
 	for (Map<String,Object> str : rows) {
-	    System.out.println("deleting sample " + row.get("hasURI"));
+	    System.out.println("deleting object " + row.get("hasURI"));
 	}
-    	return loader.deleteRows("Sample", rows);
+    	return loader.deleteRows("StudyObject", rows);
     }
     
     public void delete() {
@@ -317,7 +347,7 @@ public class Sample extends StudyObject {
 	}
         query += DELETE_LINE3;
     	query += LINE_LAST;
-	//System.out.println("SPARQL query inside sp poho's delete: " + query);
+	//System.out.println("SPARQL query inside obj poho's delete: " + query);
     	UpdateRequest request = UpdateFactory.create(query);
         UpdateProcessor processor = UpdateExecutionFactory.createRemote(request, Collections.getCollectionsName(Collections.METADATA_UPDATE));
         processor.execute();

@@ -25,7 +25,7 @@ import org.hadatac.utils.ConfigProp;
 import org.hadatac.utils.NameSpaces;
 import org.hadatac.utils.FirstLabel;
 import org.hadatac.metadata.loader.ValueCellProcessing;
-import org.hadatac.entity.pojo.SampleCollection;
+import org.hadatac.entity.pojo.ObjectCollection;
 import org.labkey.remoteapi.CommandException;
 
 import org.hadatac.console.controllers.AuthApplication;
@@ -37,27 +37,29 @@ import be.objectify.deadbolt.java.actions.Group;
 import be.objectify.deadbolt.java.actions.Restrict;
 import play.Play;
 
-public class SampleCollection extends HADatAcThing {
+public class ObjectCollection extends HADatAcThing {
 
     public static String INDENT1 = "     ";
     public static String INSERT_LINE1 = "INSERT DATA {  ";
     public static String DELETE_LINE1 = "DELETE WHERE {  ";
-    public static String LINE3 = INDENT1 + "a         hasco:SampleCollection;  ";
+    public static String LINE3 = INDENT1 + "a         hasco:ObjectCollection;  ";
     public static String DELETE_LINE3 = INDENT1 + " ?p ?o . ";
     public static String LINE_LAST = "}  ";
     private String studyUri = "";
-    private List<Sample> samples = null;
+    private String inScopeOf = "";
+    private List<String> objectUris = null;
 
-    public SampleCollection() {
+    public ObjectCollection() {
 	this.uri = "";
 	this.type = "";
 	this.label = "";
 	this.comment = "";
 	this.studyUri = "";
-	this.samples = new ArrayList<Sample>();
+	this.inScopeOf = "";
+	this.objectUris = new ArrayList<String>();
     }
     
-    public SampleCollection(String uri,
+    public ObjectCollection(String uri,
 			    String type,
 			    String label,
 			    String comment,
@@ -67,15 +69,15 @@ public class SampleCollection extends HADatAcThing {
 	this.setLabel(label);
 	this.setComment(comment);
 	this.setStudyUri(studyUri);
-	this.samples = new ArrayList<Sample>();
+	this.objectUris = new ArrayList<String>();
     }
 
-    public SampleCollectionType getSampleCollectionType() {
+    public ObjectCollectionType getObjectCollectionType() {
 	if (type == null || type.equals("")) {
 	    return null;
 	}
-	SampleCollectionType scType = SampleCollectionType.find(type);
-	return scType;    
+	ObjectCollectionType ocType = ObjectCollectionType.find(type);
+	return ocType;    
     }
 
     public String getStudyUri() {
@@ -93,27 +95,27 @@ public class SampleCollection extends HADatAcThing {
 	this.studyUri = studyUri;
     }
 
-    public List<Sample> getSamples() {
-	return samples;
+    public List<String> getObjectUris() {
+	return objectUris;
     }
 
-    public void setSamples(List<Sample> samples) {
-	this.samples = samples;
+    public void setObjectUris(List<String> objectUris) {
+	this.objectUris = objectUris;
     }
 
-    public static SampleCollection find(String sc_uri) {
-	sc_uri = URLDecoder.decode(sc_uri);
-	SampleCollection sc = null;
-	//System.out.println("Looking for sample collection with URI " + sc_uri);
-	if (sc_uri.startsWith("http")) {
-	    sc_uri = "<" + sc_uri + ">";
+    public static ObjectCollection find(String oc_uri) {
+	oc_uri = URLDecoder.decode(oc_uri);
+	ObjectCollection sc = null;
+	//System.out.println("Looking for object collection with URI " + oc_uri);
+	if (oc_uri.startsWith("http")) {
+	    oc_uri = "<" + oc_uri + ">";
 	}
-	//System.out.println("In SampleCollection: [" + sc_uri + "]");
+	//System.out.println("In ObjectCollection: [" + oc_uri + "]");
 	String queryString = NameSpaces.getInstance().printSparqlNameSpaceList() + 
-	    "SELECT  ?scType ?label ?comment ?studyUri WHERE { " + 
-	    "    " + sc_uri + " a ?scType . " + 
-	    "    " + sc_uri + " hasco:isSampleCollectionOf ?studyUri .  " + 
-	    "    OPTIONAL { " + sc_uri + " rdfs:comment ?comment } . " + 
+	    "SELECT  ?ocType ?label ?comment ?studyUri WHERE { " + 
+	    "    " + oc_uri + " a ?ocType . " + 
+	    "    " + oc_uri + " hasco:isObjectCollectionOf ?studyUri .  " + 
+	    "    OPTIONAL { " + oc_uri + " rdfs:comment ?comment } . " + 
 	    "}";
 	Query query = QueryFactory.create(queryString);
 	
@@ -123,7 +125,7 @@ public class SampleCollection extends HADatAcThing {
 	qexec.close();
 	
 	if (!resultsrw.hasNext()) {
-	    System.out.println("[WARNING] SampleCollection. Could not find SC with URI: " + sc_uri);
+	    System.out.println("[WARNING] ObjectCollection. Could not find SC with URI: " + oc_uri);
 	    return sc;
 	}
 	
@@ -137,14 +139,14 @@ public class SampleCollection extends HADatAcThing {
 	    if (soln != null) {
 		
 		try {
-		    if (soln.getResource("scType") != null && soln.getResource("scType").getURI() != null) {
-			typeStr = soln.getResource("scType").getURI();
+		    if (soln.getResource("ocType") != null && soln.getResource("ocType").getURI() != null) {
+			typeStr = soln.getResource("ocType").getURI();
 		    }
 		} catch (Exception e1) {
 		    typeStr = "";
 		}
 		
-		labelStr = FirstLabel.getLabel(sc_uri);
+		labelStr = FirstLabel.getLabel(oc_uri);
 		
 		try {
 		    if (soln.getResource("studyUri") != null && soln.getResource("studyUri").getURI() != null) {
@@ -162,7 +164,7 @@ public class SampleCollection extends HADatAcThing {
 		    commentStr = "";
 		}
 		
-		sc = new SampleCollection(sc_uri,
+		sc = new ObjectCollection(oc_uri,
 					  typeStr,
 					  labelStr,
 					  commentStr,
@@ -172,40 +174,40 @@ public class SampleCollection extends HADatAcThing {
 	return sc;
     }
     	
-    public static List<SampleCollection> findAll() {
-    	List<SampleCollection> sc_list = new ArrayList<SampleCollection>();
+    public static List<ObjectCollection> findAll() {
+    	List<ObjectCollection> oc_list = new ArrayList<ObjectCollection>();
     	
     	String queryString = NameSpaces.getInstance().printSparqlNameSpaceList() + 
 	    "SELECT ?uri WHERE { " + 
-	    "   ?scType rdfs:subClassOf+ hasco:SampleCollection . " +
-	    "   ?uri a ?scType . } ";
+	    "   ?ocType rdfs:subClassOf+ hasco:ObjectCollection . " +
+	    "   ?uri a ?ocType . } ";
     	Query query = QueryFactory.create(queryString);
     	QueryExecution qexec = QueryExecutionFactory.sparqlService(
-								   Collections.getCollectionsName(Collections.METADATA_SPARQL), query);
+			       Collections.getCollectionsName(Collections.METADATA_SPARQL), query);
     	ResultSet results = qexec.execSelect();
 	ResultSetRewindable resultsrw = ResultSetFactory.copyResults(results);
         qexec.close();
 	while (resultsrw.hasNext()) {
 	    QuerySolution soln = resultsrw.next();
 	    if (soln != null && soln.getResource("uri").getURI() != null) { 
-		SampleCollection sc = SampleCollection.find(soln.getResource("uri").getURI());
-		sc_list.add(sc);
+		ObjectCollection sc = ObjectCollection.find(soln.getResource("uri").getURI());
+		oc_list.add(sc);
 	    }
 	}
-	return sc_list;
+	return oc_list;
     }
 
-    public static List<SampleCollection> findByStudy(Study study) {
+    public static List<ObjectCollection> findByStudy(Study study) {
 	if (study == null) {
 	    return null;
 	}
-    	List<SampleCollection> schemas = new ArrayList<SampleCollection>();
+    	List<ObjectCollection> schemas = new ArrayList<ObjectCollection>();
     	
     	String queryString = NameSpaces.getInstance().printSparqlNameSpaceList() + 
 	    "SELECT ?uri WHERE { " + 
-	    "   ?scType rdfs:subClassOf+ hasco:SampleCollection . " +
-	    "   ?uri a ?scType .  " +
-	    "   ?uri hasco:isSampleCollectionOf  <" + study.getUri() + "> . " +
+	    "   ?ocType rdfs:subClassOf+ hasco:ObjectCollection . " +
+	    "   ?uri a ?ocType .  " +
+	    "   ?uri hasco:isObjectCollectionOf  <" + study.getUri() + "> . " +
 	    " } ";
     	Query query = QueryFactory.create(queryString);
     	QueryExecution qexec = QueryExecutionFactory.sparqlService(
@@ -216,7 +218,7 @@ public class SampleCollection extends HADatAcThing {
 	while (resultsrw.hasNext()) {
 	    QuerySolution soln = resultsrw.next();
 	    if (soln != null && soln.getResource("uri").getURI() != null) { 
-		SampleCollection schema = SampleCollection.find(soln.getResource("uri").getURI());
+		ObjectCollection schema = ObjectCollection.find(soln.getResource("uri").getURI());
 		schemas.add(schema);
 	    }
 	}
@@ -226,24 +228,24 @@ public class SampleCollection extends HADatAcThing {
     public void save() {
 	String insert = "";
 
-	String sc_uri = "";
+	String oc_uri = "";
 	if (this.getUri().startsWith("<")) {
-	    sc_uri = this.getUri();
+	    oc_uri = this.getUri();
 	} else {
-	    sc_uri = "<" + this.getUri() + ">";
+	    oc_uri = "<" + this.getUri() + ">";
 	}
 
 	insert += NameSpaces.getInstance().printSparqlNameSpaceList();
     	insert += INSERT_LINE1;
-    	insert += sc_uri + " a <" + type + "> . ";
-    	insert += sc_uri + " rdfs:label  \"" + this.getLabel() + "\" . ";
+    	insert += oc_uri + " a <" + type + "> . ";
+    	insert += oc_uri + " rdfs:label  \"" + this.getLabel() + "\" . ";
 	if (this.getStudyUri().startsWith("http")) {
-	    insert += sc_uri + " hasco:isSampleCollectionOf  <" + this.getStudyUri() + "> . ";
+	    insert += oc_uri + " hasco:isObjectCollectionOf  <" + this.getStudyUri() + "> . ";
 	} else {
-	    insert += sc_uri + " hasco:isSampleCollectionOf  " + this.getStudyUri() + " . ";
+	    insert += oc_uri + " hasco:isObjectCollectionOf  " + this.getStudyUri() + " . ";
 	}
 	if (this.getComment() != null && !this.getComment().equals("")) {
-	    insert += sc_uri + " rdfs:comment  \"" + this.getComment() + "\" . ";
+	    insert += oc_uri + " rdfs:comment  \"" + this.getComment() + "\" . ";
 	}
     	insert += LINE_LAST;
 	//System.out.println(insert);
@@ -263,17 +265,17 @@ public class SampleCollection extends HADatAcThing {
     	row.put("hasURI", ValueCellProcessing.replaceNameSpaceEx(getUri()));
     	row.put("a", ValueCellProcessing.replaceNameSpaceEx(getType()));
     	row.put("rdfs:label", getLabel());
-    	row.put("hasco:isSampleCollectionOf", getStudyUri());
+    	row.put("hasco:isObjectCollectionOf", getStudyUri());
     	rows.add(row);
 
 	int totalChanged = 0;
     	try {
-	    totalChanged = loader.insertRows("SampleCollection", rows);
+	    totalChanged = loader.insertRows("ObjectCollection", rows);
 	} catch (CommandException e) {
 	    try {
-		totalChanged = loader.updateRows("SampleCollection", rows);
+		totalChanged = loader.updateRows("ObjectCollection", rows);
 	    } catch (CommandException e2) {
-		System.out.println("[ERROR] Could not insert or update SampleCollection(s)");
+		System.out.println("[ERROR] Could not insert or update ObjectCollection(s)");
 	    }
 	}
 	return totalChanged;
@@ -289,24 +291,24 @@ public class SampleCollection extends HADatAcThing {
     	row.put("hasURI", ValueCellProcessing.replaceNameSpaceEx(getUri().replace("<","").replace(">","")));
     	rows.add(row);
 	for (Map<String,Object> str : rows) {
-	    System.out.println("deleting Sample Collection " + row.get("hasURI"));
+	    System.out.println("deleting Object Collection " + row.get("hasURI"));
 	}
-    	return loader.deleteRows("SampleCollection", rows);
+    	return loader.deleteRows("ObjectCollection", rows);
     }
     
     public void delete() {
 	String query = "";
 
-	String sc_uri = "";
+	String oc_uri = "";
 	if (this.getUri().startsWith("<")) {
-	    sc_uri = this.getUri();
+	    oc_uri = this.getUri();
 	} else {
-	    sc_uri = "<" + this.getUri() + ">";
+	    oc_uri = "<" + this.getUri() + ">";
 	}
 
 	query += NameSpaces.getInstance().printSparqlNameSpaceList();
         query += DELETE_LINE1;
-    	query += " " + sc_uri + "  ";
+    	query += " " + oc_uri + "  ";
         query += DELETE_LINE3;
     	query += LINE_LAST;
 

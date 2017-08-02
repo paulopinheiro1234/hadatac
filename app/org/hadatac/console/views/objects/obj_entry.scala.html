@@ -1,0 +1,32 @@
+@(study : org.hadatac.entity.pojo.Study,
+  oc    : org.hadatac.entity.pojo.ObjectCollection,
+  obj   : org.hadatac.entity.pojo.StudyObject)
+
+@import play.Play
+@import org.hadatac.console.controllers.metadata._
+@import java.net._
+@import org.hadatac.utils._
+
+@if(oc != null) {
+  <tr>
+     <td>
+	<input type="text" class="form-control" name="newLabel" id="newLabel@if(obj.getUri() != null) {-@obj.getUri() }" 
+	       value="@if(obj.getLabel() != null) { @obj.getLabel() }" onchange="checkform()">
+     </td>
+     <td>
+	<input type="text" class="form-control" name="newType" id="newType@if(obj.getUri() != null) {-@obj.getUri() }" 
+	       value="@if(obj.getType() != null) { @obj.getStudyObjectType().getLabel() }" onchange="checkform()" readonly>
+     </td>
+     <td>
+	<input type="text" class="form-control" name="newOriginalId" id="newOrigonalId@if(obj.getUri() != null) {-@obj.getUri() }" 
+	       value="@if(obj.getOriginalId() != null) { @obj.getOriginalId() }" onchange="checkform()">
+     </td>
+     <td>
+	<input type="text" class="form-control" name="newIsFrom" id="newIsFrom@if(obj.getUri() != null) {-@obj.getUri() }" 
+	       value="@if(obj.getIsFrom() != null) { @obj.getIsFrom() }" onchange="checkform()" readonly>
+     </td>
+     <td>
+        <a href="" class="btn-xs btn-primary" role="button">Delete</a>
+     </td>
+ </tr>
+}

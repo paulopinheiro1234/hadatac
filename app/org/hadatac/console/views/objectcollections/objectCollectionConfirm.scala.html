@@ -1,0 +1,31 @@
+@(message   : String, 
+  study_uri : String, 
+  oc        : org.hadatac.entity.pojo.ObjectCollection)
+
+@import org.hadatac.console.views.html._
+@import org.hadatac.utils._
+@import org.hadatac.console.controllers.studies._
+@import org.hadatac.metadata.loader.ValueCellProcessing
+
+@main(message) {
+    <div class="container">
+       <h4>@message</h4>
+
+        @if(oc == null) {
+            [ERROR] No valid object to delete. 
+            <br>
+        } else  {
+            <ul>
+              <li><b>URI:</b> @ValueCellProcessing.replaceNameSpaceEx(oc.getUri())</li>
+              <li><b>Type:</b> @ValueCellProcessing.replaceNameSpaceEx(oc.getType())</li>
+              <li><b>Short Name:</b> @oc.getLabel()</li>
+              <li><b>Deocription:</b> @oc.getComment()</li>
+              <li><b>Study URI:</b> @if(oc.getStudy() != null) { @oc.getStudy().getLabel() }</li>
+           </ul>
+        }
+        <a href="@org.hadatac.console.controllers.objectcollections.routes.OCManagement.index(study_uri)" 
+           class="btn btn-primary" role="button">Back to Object Collection Management</a>
+    </div>
+}
+
+    

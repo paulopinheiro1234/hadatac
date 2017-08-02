@@ -3,16 +3,17 @@ package org.hadatac.console.models;
 import java.util.ArrayList;
 import java.util.List;
 
-public class SamplesForm {
+public class ObjectCollectionForm {
 
     public String newUri;
     public String newType;
-    public String newQuantity;
+    public String newLabel;
+    public String newComment;
 
     // STUDY information is not passed through the form since it cannot change
     //public String newStudyUri;
     
-    public SamplesForm () {
+    public ObjectCollectionForm () {
     }
     
     public String getNewUri() {
@@ -31,12 +32,20 @@ public class SamplesForm {
 	this.newType = type;
     }
     
-    public String getNewQuantity() {
-	return newQuantity;
+    public String getNewLabel() {
+	return newLabel;
     }
     
-    public void setNewQuantity(String quantity) {
-	this.newQuantity = quantity;
+    public void setNewLabel(String label) {
+	this.newLabel = label;
+    }
+    
+    public String getNewComment() {
+	return newComment;
+    }
+    
+    public void setNewComment(String comment) {
+	this.newComment = comment;
     }
     
 }

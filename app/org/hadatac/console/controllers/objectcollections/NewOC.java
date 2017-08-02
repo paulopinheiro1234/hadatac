@@ -1,4 +1,4 @@
-package org.hadatac.console.controllers.samplecollections;
+package org.hadatac.console.controllers.objectcollections;
 
 import java.text.DateFormat;
 import java.text.ParseException;
@@ -15,38 +15,38 @@ import play.data.*;
 import org.hadatac.utils.ConfigProp;
 import org.hadatac.data.api.DataFactory;
 import org.hadatac.entity.pojo.Study;
-import org.hadatac.entity.pojo.SampleCollection;
-import org.hadatac.entity.pojo.SampleCollectionType;
+import org.hadatac.entity.pojo.ObjectCollection;
+import org.hadatac.entity.pojo.ObjectCollectionType;
 import org.hadatac.metadata.loader.LabkeyDataHandler;
 import org.hadatac.metadata.loader.ValueCellProcessing;
 import org.hadatac.console.views.html.*;
-import org.hadatac.console.views.html.samplecollections.*;
+import org.hadatac.console.views.html.objectcollections.*;
 import org.hadatac.console.views.html.triplestore.syncLabkey;
-import org.hadatac.console.models.SampleCollectionForm;
+import org.hadatac.console.models.ObjectCollectionForm;
 import org.hadatac.console.models.SparqlQuery;
 import org.hadatac.console.models.SparqlQueryResults;
 import org.hadatac.console.models.SysUser;
 import org.hadatac.console.http.GetSparqlQuery;
 import org.hadatac.console.controllers.AuthApplication;
 import org.hadatac.console.controllers.triplestore.UserManagement;
-import org.hadatac.console.controllers.samples.routes;
+import org.hadatac.console.controllers.objects.routes;
 import org.labkey.remoteapi.CommandException;
 import org.labkey.remoteapi.query.SaveRowsResponse;
 import be.objectify.deadbolt.java.actions.Group;
 import be.objectify.deadbolt.java.actions.Restrict;
 
-public class NewSC extends Controller {
+public class NewOC extends Controller {
     
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
     public static Result index(String std_uri) {
     	if (session().get("LabKeyUserName") == null && session().get("LabKeyPassword") == null) {
 	    return redirect(org.hadatac.console.controllers.triplestore.routes.LoadKB.logInLabkey(
-			    org.hadatac.console.controllers.samplecollections.routes.NewSC.index(std_uri).url()));
+			    org.hadatac.console.controllers.objectcollections.routes.NewOC.index(std_uri).url()));
     	}
 	Study study = Study.find(std_uri);
-	List<SampleCollectionType> typeList = SampleCollectionType.find();
+	List<ObjectCollectionType> typeList = ObjectCollectionType.find();
 	
-    	return ok(newSampleCollection.render(study, typeList));
+    	return ok(newObjectCollection.render(study, typeList));
     }
     
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
@@ -60,8 +60,8 @@ public class NewSC extends Controller {
 	
 	Study std = Study.find(std_uri);
 	
-        Form<SampleCollectionForm> form = Form.form(SampleCollectionForm.class).bindFromRequest();
-        SampleCollectionForm data = form.get();
+        Form<ObjectCollectionForm> form = Form.form(ObjectCollectionForm.class).bindFromRequest();
+        ObjectCollectionForm data = form.get();
         
         if (form.hasErrors()) {
             return badRequest("The submitted form has errors!");
@@ -87,22 +87,22 @@ public class NewSC extends Controller {
 	String newLabel = data.getNewLabel();
 	String newComment = data.getNewComment();
 	
-        // insert current state of the SC
-	SampleCollection sc = new SampleCollection(newURI,
+        // insert current state of the OC
+	ObjectCollection oc = new ObjectCollection(newURI,
 						   newType,
 						   newLabel,
 						   newComment,
 						   newStudyUri);
 	
-	// insert the new SC content inside of the triplestore regardless of any change -- the previous content has already been deleted
-	sc.save();
+	// insert the new OC content inside of the triplestore regardless of any change -- the previous content has already been deleted
+	oc.save();
 	
-	// update/create new SC in LabKey
-	int nRowsAffected = sc.saveToLabKey(session().get("LabKeyUserName"), session().get("LabKeyPassword"));
+	// update/create new OC in LabKey
+	int nRowsAffected = oc.saveToLabKey(session().get("LabKeyUserName"), session().get("LabKeyPassword"));
 	if (nRowsAffected <= 0) {
-	    return badRequest("Failed to insert new SC to LabKey!\n");
+	    return badRequest("Failed to insert new OC to LabKey!\n");
 	}
-	return ok(sampleCollectionConfirm.render("New Sample Collection has been Generated", std_uri, sc));
+	return ok(objectCollectionConfirm.render("New Object Collection has been Generated", std_uri, oc));
     }
 
 }
