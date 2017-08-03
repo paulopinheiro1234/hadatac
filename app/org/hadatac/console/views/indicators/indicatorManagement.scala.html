@@ -1,0 +1,47 @@
+@(indicatorList : List[org.hadatac.entity.pojo.Indicator])
+
+@import helper._
+@import org.hadatac.console.views.html._
+@import org.hadatac.utils._
+
+@main("Indicator Management") {
+
+    <h3>Indicator Management</h3>
+    
+    <h4>Management options</h4>
+
+    <div class="container-fluid">
+      <div class="row">
+         <div class="navbar-collapse collapse navbar-secondary">
+           <a href="@org.hadatac.console.controllers.indicators.routes.NewIndicator.index()" class="btn btn-primary" role="button">Create Indicator</a>
+         </div>
+      </div>
+   </div>
+
+   <hr>
+
+   <h4>Indicators</h4>
+   
+    <div class="container-fluid">
+        <table class="table">
+            <thead>
+              <tr>
+                <th>Indicator URI</th>
+                <th>Label</th>
+                <th>Comment</th>
+                <th>Operations</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for(indicator <- indicatorList){
+	         	@indicator_entry(indicator)
+              }
+            </tbody>
+        </table>
+	
+        @mainButton(false)
+	
+    </div>
+ 
+
+}

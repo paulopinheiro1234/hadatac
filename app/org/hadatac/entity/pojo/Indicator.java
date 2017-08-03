@@ -1,7 +1,9 @@
 package org.hadatac.entity.pojo;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.jena.query.Query;
 import org.apache.jena.query.QueryExecution;
@@ -17,12 +19,29 @@ import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdf.model.Statement;
 import org.apache.jena.rdf.model.StmtIterator;
+import org.apache.jena.update.UpdateExecutionFactory;
+import org.apache.jena.update.UpdateFactory;
+import org.apache.jena.update.UpdateProcessor;
+import org.apache.jena.update.UpdateRequest;
+import org.hadatac.console.controllers.AuthApplication;
+import org.hadatac.metadata.loader.LabkeyDataHandler;
+import org.hadatac.metadata.loader.ValueCellProcessing;
 import org.hadatac.utils.Collections;
+import org.hadatac.utils.ConfigProp;
 import org.hadatac.utils.NameSpaces;
+import org.labkey.remoteapi.CommandException;
 
+import be.objectify.deadbolt.java.actions.Group;
+import be.objectify.deadbolt.java.actions.Restrict;
 import play.Play;
 
 public class Indicator  implements Comparable<Indicator> {
+
+    public static String INSERT_LINE1 = "INSERT DATA {  ";
+    public static String DELETE_LINE1 = "DELETE WHERE {  ";
+    public static String DELETE_LINE3 = " ?p ?o . ";
+    public static String LINE_LAST = "}  ";
+    
 	private String uri;
 	private String label;
 	private String comment;
@@ -44,6 +63,24 @@ public class Indicator  implements Comparable<Indicator> {
 	}
 	public void setComment(String comment) {
 		this.comment = comment;
+	}
+	
+	public Indicator(){
+		setUri("");
+		setLabel("");
+		setComment("");
+	}
+	
+	public Indicator(String uri){
+		setUri(uri);
+		setLabel("");
+		setComment("");
+	}
+	
+	public Indicator(String uri, String label, String comment){
+		setUri(uri);
+		setLabel(label);
+		setComment(comment);
 	}
 		
 	public static List<Indicator> find() {
@@ -162,6 +199,100 @@ public class Indicator  implements Comparable<Indicator> {
 		java.util.Collections.sort(indicators);
 		return indicators; 
     }
+    
+    public void save() {
+    	if (uri == null || uri.equals("")) {
+    	    System.out.println("[ERROR] Trying to save Indicator without assigning a URI");
+    	    return;
+    	}
+
+    	delete();  // delete any existing triple for the current study
+
+    	String insert = "";
+    	String ind_uri = "";
+
+    	if (this.getUri().startsWith("<")) {
+    	    ind_uri = this.getUri();
+    	} else {
+    	    ind_uri = "<" + this.getUri() + ">";
+    	}
+          	insert += NameSpaces.getInstance().printSparqlNameSpaceList();
+        	insert += INSERT_LINE1;
+       	if (label != null && !label.equals("")) {
+       	    insert += ind_uri + " rdfs:label \"" + label + "\" .  ";
+       	}
+    	if (comment != null && !comment.equals("")) {
+    	    insert += ind_uri + " rdfs:comment \"" + comment + "\" .  ";
+    	}
+        insert += LINE_LAST;
+    	//System.out.println("Study insert query (pojo's save): <" + insert + ">");
+        UpdateRequest request = UpdateFactory.create(insert);
+        UpdateProcessor processor = UpdateExecutionFactory.createRemote(
+    			      request, Collections.getCollectionsName(Collections.METADATA_UPDATE));
+        processor.execute();
+    }
+
+    public void delete() {
+    	String query = "";
+		if (this.getUri() == null || this.getUri().equals("")) {
+	    	return;
+		}
+		query += NameSpaces.getInstance().printSparqlNameSpaceList();
+        	query += DELETE_LINE1;
+        if (this.getUri().startsWith("http")) {
+	    	query += "<" + this.getUri() + ">";
+		} else {
+			query += this.getUri();
+		}
+        query += DELETE_LINE3;
+    	query += LINE_LAST;
+    	UpdateRequest request = UpdateFactory.create(query);
+        UpdateProcessor processor = UpdateExecutionFactory.createRemote(request, Collections.getCollectionsName(Collections.METADATA_UPDATE));
+        processor.execute();
+    }
+
+    @Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
+    public int saveToLabKey(String user_name, String password) {
+	String site = ConfigProp.getPropertyValue("labkey.config", "site");
+        String path = "/" + ConfigProp.getPropertyValue("labkey.config", "folder");
+    	LabkeyDataHandler loader = new LabkeyDataHandler(site, user_name, password, path);
+    	List< Map<String, Object> > rows = new ArrayList< Map<String, Object> >();
+    	Map<String, Object> row = new HashMap<String, Object>();
+    	row.put("hasURI", ValueCellProcessing.replaceNameSpaceEx(getUri()));
+    	row.put("rdfs:subClassOf", "hasco:Indicator");
+    	row.put("rdfs:label", getLabel());
+    	row.put("rdfs:comment", getComment());
+    	rows.add(row);
+
+	int totalChanged = 0;
+    	try {
+	    totalChanged = loader.insertRows("IndicatorType", rows);
+	} catch (CommandException e) {
+	    try {
+		totalChanged = loader.updateRows("IndicatorType", rows);
+	    } catch (CommandException e2) {
+		System.out.println("[ERROR] Could not insert or update Indicator(s)");
+	    }
+	}
+	return totalChanged;
+    }
+    
+    @Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
+    public int deleteFromLabKey(String user_name, String password) throws CommandException {
+	String site = ConfigProp.getPropertyValue("labkey.config", "site");
+        String path = "/" + ConfigProp.getPropertyValue("labkey.config", "folder");
+    	LabkeyDataHandler loader = new LabkeyDataHandler(site, user_name, password, path);
+    	List< Map<String, Object> > rows = new ArrayList< Map<String, Object> >();
+    	Map<String, Object> row = new HashMap<String, Object>();
+    	row.put("hasURI", ValueCellProcessing.replaceNameSpaceEx(getUri().replace("<","").replace(">","")));
+    	rows.add(row);
+	for (Map<String,Object> str : rows) {
+	    System.out.println("deleting Indicator " + str.get("hasURI"));
+	}
+    	return loader.deleteRows("IndicatorType", rows);
+    }
+
+
 
 	@Override
     public int compareTo(Indicator another) {

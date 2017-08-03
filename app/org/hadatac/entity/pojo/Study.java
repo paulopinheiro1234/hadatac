@@ -989,7 +989,7 @@ public class Study {
     	row.put("hasURI", ValueCellProcessing.replaceNameSpaceEx(getUri().replace("<","").replace(">","")));
     	rows.add(row);
 	for (Map<String,Object> str : rows) {
-	    System.out.println("deleting Study " + row.get("hasURI"));
+	    System.out.println("deleting Study " + str.get("hasURI"));
 	}
     	return loader.deleteRows("Study", rows);
     }

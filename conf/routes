@@ -211,6 +211,19 @@ GET	/hadatac/studies/delete	    	       	       org.hadatac.console.controllers.
 POST	/hadatac/studies/delete		               org.hadatac.console.controllers.studies.DeleteStudy.postIndex(study_uri : String)
 POST 	/hadatac/studies/delete/form	       	       org.hadatac.console.controllers.studies.DeleteStudy.processForm(study_uri : String)
 
+# indicators management
+GET	/hadatac/indicators/		    	       org.hadatac.console.controllers.indicators.IndicatorManagement.index()
+POST	/hadatac/indicators/     			       org.hadatac.console.controllers.indicators.IndicatorManagement.postIndex()
+GET	/hadatac/indicators/new			       org.hadatac.console.controllers.indicators.NewIndicator.index()
+POST	/hadatac/indicators/new			       org.hadatac.console.controllers.indicators.NewIndicator.postIndex()
+POST 	/hadatac/indicators/new/form		       org.hadatac.console.controllers.indicators.NewIndicator.processForm()
+GET	/hadatac/indicators/edit			       org.hadatac.console.controllers.indicators.EditIndicator.index(ind_uri : String)
+POST	/hadatac/indicators/edit			       org.hadatac.console.controllers.indicators.EditIndicator.postIndex(ind_uri : String)
+POST 	/hadatac/indicators/edit/form		       org.hadatac.console.controllers.indicators.EditIndicator.processForm(ind_uri : String)
+GET	/hadatac/indicators/delete	    	       	       org.hadatac.console.controllers.indicators.DeleteIndicator.index(ind_uri : String)
+POST	/hadatac/indicators/delete		               org.hadatac.console.controllers.indicators.DeleteIndicator.postIndex(ind_uri : String)
+POST 	/hadatac/indicators/delete/form	       	       org.hadatac.console.controllers.indicators.DeleteIndicator.processForm(ind_uri : String)
+
 # object collections management
 GET	/hadatac/oc/		    	               org.hadatac.console.controllers.objectcollections.OCManagement.index(study_uri : String)
 POST	/hadatac/oc/     			       org.hadatac.console.controllers.objectcollections.OCManagement.postIndex(study_uri : String)
