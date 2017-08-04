@@ -1,4 +1,5 @@
-@(study : org.hadatac.entity.pojo.Study,
+@(mode  : String,
+  study : org.hadatac.entity.pojo.Study,
   oc    : org.hadatac.entity.pojo.ObjectCollection)
 
 @import play.Play
@@ -8,16 +9,69 @@
 @import org.hadatac.utils._
 
 @if(oc != null) {
+  @if(mode.equals("subject") && oc.getType().equals("http://hadatac.org/ont/hasco/SubjectGroup")) {
   <tr>
      <td>@if(oc.getLabel() != null) { @oc.getLabel() }</td>
-     <td>@if(oc.getType() != null) { @oc.getObjectCollectionType().getLabel() }</td>
      <td>@if(oc.getComment() != null) { @oc.getComment() }</td>
-     <td></td>
+     <td>@if(oc.getSpaceScope() != null) { @oc.getSpaceScope().getLabel() }</td>
+     <td>@if(oc.getTimeScope() != null) { @oc.getTimeScope().getLabel() }</td>
      <td>@oc.getObjectUris().size()</td>
      <td>
         <a href="@org.hadatac.console.controllers.objects.routes.ObjectManagement.index(URLEncoder.encode(study.getUri(),"UTF-8"), URLEncoder.encode(oc.getUri(),"UTF-8"))" class="btn-xs btn-primary disabled" role="button">Manage Objects</a>
         <a href="@org.hadatac.console.controllers.objectcollections.routes.EditOC.index(URLEncoder.encode(study.getUri(),"UTF-8"), URLEncoder.encode(oc.getUri(),"UTF-8"))" class="btn-xs btn-primary" role="button">Edit Collection</a>
-        <a href="@org.hadatac.console.controllers.objectcollections.routes.DeleteOC.index(URLEncoder.encode(study.getUri(),"UTF-8"), URLEncoder.encode(oc.getUri(),"UTF-8"))" class="btn-xs btn-primary" role="button">Delete Collection</a>
+        @if(oc.getObjectUris().size() <= 0) {
+           <a href="@org.hadatac.console.controllers.objectcollections.routes.DeleteOC.index(URLEncoder.encode(study.getUri(),"UTF-8"), URLEncoder.encode(oc.getUri(),"UTF-8"))" class="btn-xs btn-primary" role="button">Delete Collection</a>
+	}
      </td>
  </tr>
+ }
+  @if(mode.equals("sample") && oc.getType().equals("http://hadatac.org/ont/hasco/SampleCollection")) {
+  <tr>
+     <td>@if(oc.getLabel() != null) { @oc.getLabel() }</td>
+     <td>@if(oc.getComment() != null) { @oc.getComment() }</td>
+     <td>@if(oc.getHasScope() != null) { @oc.getHasScope().getLabel() }</td>
+     <td>@if(oc.getSpaceScope() != null) { @oc.getSpaceScope().getLabel() }</td>
+     <td>@if(oc.getTimeScope() != null) { @oc.getTimeScope().getLabel() }</td>
+     <td>@oc.getObjectUris().size()</td>
+     <td>
+        <a href="@org.hadatac.console.controllers.objects.routes.ObjectManagement.index(URLEncoder.encode(study.getUri(),"UTF-8"), URLEncoder.encode(oc.getUri(),"UTF-8"))" class="btn-xs btn-primary disabled" role="button">Manage Objects</a>
+        <a href="@org.hadatac.console.controllers.objectcollections.routes.EditOC.index(URLEncoder.encode(study.getUri(),"UTF-8"), URLEncoder.encode(oc.getUri(),"UTF-8"))" class="btn-xs btn-primary" role="button">Edit Collection</a>
+        @if(oc.getObjectUris().size() <= 0) {
+           <a href="@org.hadatac.console.controllers.objectcollections.routes.DeleteOC.index(URLEncoder.encode(study.getUri(),"UTF-8"), URLEncoder.encode(oc.getUri(),"UTF-8"))" class="btn-xs btn-primary" role="button">Delete Collection</a>
+	}
+     </td>
+ </tr>
+ }
+  @if(mode.equals("location") && oc.getType().equals("http://hadatac.org/ont/hasco/LocationCollection")) {
+  <tr>
+     <td>@if(oc.getLabel() != null) { @oc.getLabel() }</td>
+     <td>@if(oc.getComment() != null) { @oc.getComment() }</td>
+     <td>@if(oc.getSpaceScope() != null) { @oc.getSpaceScope().getLabel() }</td>
+     <td>@if(oc.getTimeScope() != null) { @oc.getTimeScope().getLabel() }</td>
+     <td>@oc.getObjectUris().size()</td>
+     <td>
+        <a href="@org.hadatac.console.controllers.objects.routes.ObjectManagement.index(URLEncoder.encode(study.getUri(),"UTF-8"), URLEncoder.encode(oc.getUri(),"UTF-8"))" class="btn-xs btn-primary disabled" role="button">Manage Objects</a>
+        <a href="@org.hadatac.console.controllers.objectcollections.routes.EditOC.index(URLEncoder.encode(study.getUri(),"UTF-8"), URLEncoder.encode(oc.getUri(),"UTF-8"))" class="btn-xs btn-primary" role="button">Edit Collection</a>
+        @if(oc.getObjectUris().size() <= 0) {
+           <a href="@org.hadatac.console.controllers.objectcollections.routes.DeleteOC.index(URLEncoder.encode(study.getUri(),"UTF-8"), URLEncoder.encode(oc.getUri(),"UTF-8"))" class="btn-xs btn-primary" role="button">Delete Collection</a>
+	}
+     </td>
+ </tr>
+ }
+  @if(mode.equals("time") && oc.getType().equals("http://hadatac.org/ont/hasco/TimeCollection")) {
+  <tr>
+     <td>@if(oc.getLabel() != null) { @oc.getLabel() }</td>
+     <td>@if(oc.getComment() != null) { @oc.getComment() }</td>
+     <td>@if(oc.getSpaceScope() != null) { @oc.getSpaceScope().getLabel() }</td>
+     <td>@if(oc.getTimeScope() != null) { @oc.getTimeScope().getLabel() }</td>
+     <td>@oc.getObjectUris().size()</td>
+     <td>
+        <a href="@org.hadatac.console.controllers.objects.routes.ObjectManagement.index(URLEncoder.encode(study.getUri(),"UTF-8"), URLEncoder.encode(oc.getUri(),"UTF-8"))" class="btn-xs btn-primary disabled" role="button">Manage Objects</a>
+        <a href="@org.hadatac.console.controllers.objectcollections.routes.EditOC.index(URLEncoder.encode(study.getUri(),"UTF-8"), URLEncoder.encode(oc.getUri(),"UTF-8"))" class="btn-xs btn-primary" role="button">Edit Collection</a>
+        @if(oc.getObjectUris().size() <= 0) {
+           <a href="@org.hadatac.console.controllers.objectcollections.routes.DeleteOC.index(URLEncoder.encode(study.getUri(),"UTF-8"), URLEncoder.encode(oc.getUri(),"UTF-8"))" class="btn-xs btn-primary" role="button">Delete Collection</a>
+	}
+     </td>
+ </tr>
+ }
 }

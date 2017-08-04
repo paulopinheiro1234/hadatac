@@ -46,6 +46,8 @@ public class StudyObject extends HADatAcThing {
     String originalId;
     String isFrom;
     String isMemberOf;
+    String atLocation;
+    String atTime;
 
     public StudyObject() {
 	this("","");
@@ -59,15 +61,19 @@ public class StudyObject extends HADatAcThing {
 	this.setIsMemberOf(isMemberOf);
 	this.setComment("");
 	this.setIsFrom("");
+	this.setAtLocation("");
+	this.setAtTime("");
     }
 
     public StudyObject(String uri,
-		  String type,
-		  String originalId,
-		  String label,
-		  String isMemberOf,
-		  String comment,
-		  String isFrom) { 
+		       String type,
+		       String originalId,
+		       String label,
+		       String isMemberOf,
+		       String comment,
+		       String isFrom,
+		       String atLocation,
+		       String atTime) { 
 	this.setUri(uri);
         this.setType(type);
 	this.setOriginalId(originalId);
@@ -75,6 +81,8 @@ public class StudyObject extends HADatAcThing {
 	this.setIsMemberOf(isMemberOf);
 	this.setComment(comment);
 	this.setIsFrom(isFrom);
+	this.setAtLocation(atLocation);
+	this.setAtTime(atTime);
     }
     
     public StudyObjectType getStudyObjectType() {
@@ -92,6 +100,14 @@ public class StudyObject extends HADatAcThing {
 	this.originalId = originalId;
     }
     
+    public String getIsMemberOf() {
+	return isMemberOf;
+    }
+    
+    public void setIsMemberOf(String isMemberOf) {
+	this.isMemberOf = isMemberOf;
+    }	
+    
     public String getIsFrom() {
 	return isFrom;
     }
@@ -100,12 +116,20 @@ public class StudyObject extends HADatAcThing {
 	this.isFrom = isFrom;
     }	
     
-    public String getIsMemberOf() {
-	return isMemberOf;
+    public String getAtLocation() {
+	return atLocation;
     }
     
-    public void setIsMemberOf(String isMemberOf) {
-	this.isMemberOf = isMemberOf;
+    public void setAtLocation(String atLocation) {
+	this.atLocation = atLocation;
+    }	
+    
+    public String getAtTime() {
+	return atTime;
+    }
+    
+    public void setAtTime(String atTime) {
+	this.atTime = atTime;
     }	
     
     public static StudyObject find(String obj_uri) {
@@ -116,13 +140,15 @@ public class StudyObject extends HADatAcThing {
 	}
 	String queryString = NameSpaces.getInstance().printSparqlNameSpaceList() + 
 	    "SELECT  ?objType ?originalId ?isMemberOf ?hasLabel " + 
-	    " ?hasComment WHERE { " + 
+	    " ?hasComment ?isFrom ?atLocation ?atTime WHERE { " + 
 	    "    " + obj_uri + " a ?objType . " + 
 	    "    " + obj_uri + " hasco:isMemberOf ?isMemberOf .  " + 
 	    "    OPTIONAL { " + obj_uri + " hasco:originalID ?originalId } . " + 
 	    "    OPTIONAL { " + obj_uri + " rdfs:label ?hasLabel } . " + 
 	    "    OPTIONAL { " + obj_uri + " rdfs:comment ?hasComment } . " + 
 	    "    OPTIONAL { " + obj_uri + " hasco:isFrom ?isFrom } . " + 
+	    "    OPTIONAL { " + obj_uri + " hasco:hasAtLocation ?atLocation } . " + 
+	    "    OPTIONAL { " + obj_uri + " hasco:hasAtTime ?atTime } . " + 
 	    "}";
 	Query query = QueryFactory.create(queryString);
 	
@@ -142,6 +168,8 @@ public class StudyObject extends HADatAcThing {
 	String isMemberOfStr = "";
 	String commentStr = "";
 	String isFromStr = "";
+	String atLocationStr = "";
+	String atTimeStr = "";
 	
 	while (resultsrw.hasNext()) {
 	    QuerySolution soln = resultsrw.next();
@@ -189,13 +217,31 @@ public class StudyObject extends HADatAcThing {
 		    isFromStr = "";
 		}
 		
+		try {
+		    if (soln.getResource("atLocation") != null && soln.getResource("atLocation").getURI() != null) {
+			atLocationStr = soln.getResource("atLocation").getURI();
+		    }
+		} catch (Exception e1) {
+		    atLocationStr = "";
+		}
+		
+		try {
+		    if (soln.getResource("atTime") != null && soln.getResource("atTime").getURI() != null) {
+			atTimeStr = soln.getResource("atTime").getURI();
+		    }
+		} catch (Exception e1) {
+		    atTimeStr = "";
+		}
+		
 		obj = new StudyObject(obj_uri,
-				typeStr,
-				originalIdStr,
-				labelStr,
-				isMemberOfStr,
-				commentStr,
-				isFromStr);
+				      typeStr,
+				      originalIdStr,
+				      labelStr,
+				      isMemberOfStr,
+				      commentStr,
+				      isFromStr,
+				      atLocationStr,
+				      atTimeStr);
 	    }
 	}
 	return obj;
@@ -280,6 +326,20 @@ public class StudyObject extends HADatAcThing {
 		insert += obj_uri + " hasco:isFrom " + isFrom + " .  "; 
 	    } 
 	}
+	if (!atLocation.equals("")) {
+	    if (atLocation.startsWith("http")) {
+		insert += obj_uri + " hasco:atLocation <" + atLocation + "> .  "; 
+	    } else {
+		insert += obj_uri + " hasco:atLocation " + atLocation + " .  "; 
+	    } 
+	}
+	if (!atTime.equals("")) {
+	    if (atTime.startsWith("http")) {
+		insert += obj_uri + " hasco:atTime <" + atTime + "> .  "; 
+	    } else {
+		insert += obj_uri + " hasco:atTime " + atTime + " .  "; 
+	    } 
+	}
 	//insert += this.getUri() + " hasco:hasSource " + " .  "; 
 	//insert += this.getUri() + " hasco:isPIConfirmed " + " .  "; 
     	insert += LINE_LAST;
@@ -304,6 +364,8 @@ public class StudyObject extends HADatAcThing {
     	row.put("hasco:isMemberOf", ValueCellProcessing.replaceNameSpaceEx(getIsMemberOf()));
     	row.put("rdfs:comment", getComment());
     	row.put("hasco:isFrom", ValueCellProcessing.replaceNameSpaceEx(getIsFrom()));
+    	row.put("hasco:atlocation", ValueCellProcessing.replaceNameSpaceEx(getAtLocation()));
+    	row.put("hasco:atTime", ValueCellProcessing.replaceNameSpaceEx(getAtTime()));
     	rows.add(row);
 	int totalChanged = 0;
     	try {

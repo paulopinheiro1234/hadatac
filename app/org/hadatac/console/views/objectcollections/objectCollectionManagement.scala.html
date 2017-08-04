@@ -22,17 +22,18 @@
 
    <hr>
 
-   <h4>Object Collections</h4>
-   
     <div class="container-fluid">
-        <table class="table">
+
+      <h4>Subject Groups</h4>
+   
+        <table class="table" id="rcorners">
             <thead>
               <tr>
                 <!--  <th>Study URI</th>  -->
-                <th>Object Collection Name</th>
-                <th>Type</th>
+                <th>Name</th>
                 <th>Description</th>
-                <th>In Scope Of</th>
+                <th>Location Scope</th>
+                <th>Time Scope</th>
 		<th># Objects</th>
                 <th>Operations</th>
               </tr>
@@ -40,7 +41,77 @@
             <tbody>
 	      @if(ocList != null) {
                  @for(oc <- ocList){
-	            @oc_entry(study,oc)
+	            @oc_entry("subject",study,oc)
+                 }
+              }
+            </tbody>
+        </table>
+	
+      <h4>Sample Collections</h4>
+   
+        <table class="table" id="rcorners">
+            <thead>
+              <tr>
+                <!--  <th>Study URI</th>  -->
+                <th>Name</th>
+                <th>Description</th>
+                <th>Domain Scope</th>
+                <th>Location Scope</th>
+                <th>Time Scope</th>
+		<th># Objects</th>
+                <th>Operations</th>
+              </tr>
+            </thead>
+            <tbody>
+	      @if(ocList != null) {
+                 @for(oc <- ocList){
+	            @oc_entry("sample",study,oc)
+                 }
+              }
+            </tbody>
+        </table>
+	
+      <h4>Location Collections</h4>
+   
+        <table class="table" id="rcorners">
+            <thead>
+              <tr>
+                <!--  <th>Study URI</th>  -->
+                <th>Name</th>
+                <th>Description</th>
+                <th>Location Scope</th>
+                <th>Time Scope</th>
+		<th># Objects</th>
+                <th>Operations</th>
+              </tr>
+            </thead>
+            <tbody>
+	      @if(ocList != null) {
+                 @for(oc <- ocList){
+	            @oc_entry("location",study,oc)
+                 }
+              }
+            </tbody>
+        </table>
+	
+      <h4>Time Collections</h4>
+   
+        <table class="table" id="rcorners">
+            <thead>
+              <tr>
+                <!--  <th>Study URI</th>  -->
+                <th>Name</th>
+                <th>Description</th>
+                <th>Location Scope</th>
+                <th>Time Scope</th>
+		<th># Objects</th>
+                <th>Operations</th>
+              </tr>
+            </thead>
+            <tbody>
+	      @if(ocList != null) {
+                 @for(oc <- ocList){
+	            @oc_entry("time",study,oc)
                  }
               }
             </tbody>

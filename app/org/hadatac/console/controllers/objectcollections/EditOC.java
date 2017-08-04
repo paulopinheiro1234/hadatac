@@ -61,7 +61,9 @@ public class EditOC extends Controller {
 
 	List<ObjectCollectionType> typeList = ObjectCollectionType.find();
 
-    	return ok(editObjectCollection.render(study, oc, typeList));
+	List<ObjectCollection> objList = ObjectCollection.findByStudy(study);
+	
+    	return ok(editObjectCollection.render(study, oc, objList, objList, objList, typeList));
     }
     
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
@@ -87,6 +89,10 @@ public class EditOC extends Controller {
 	String newStudyUri = ValueCellProcessing.replacePrefixEx(std_uri);
 	String newLabel = data.getNewLabel();
 	String newComment = data.getNewComment();
+	String newHasScopeUri = data.getNewHasScopeUri();
+	System.out.println("New HasScopeUri : " + newHasScopeUri);
+	String newSpaceScopeUri = data.getNewSpaceScopeUri();
+	String newTimeScopeUri = data.getNewTimeScopeUri();
 	
 	// Verify Study and ObjectCollection information is valid
 	String newURI = null;
@@ -126,13 +132,26 @@ public class EditOC extends Controller {
 	if (oldOc.getStudyUri() == null || !oldOc.getStudyUri().equals(newStudyUri)) {
 	    changedInfos.add(newStudyUri);
 	}
+	if (oldOc.getHasScopeUri() == null || !oldOc.getHasScopeUri().equals(newHasScopeUri)) {
+	    changedInfos.add(newHasScopeUri);
+	}
+	if (oldOc.getSpaceScopeUri() == null || !oldOc.getSpaceScopeUri().equals(newSpaceScopeUri)) {
+	    changedInfos.add(newSpaceScopeUri);
+	}
+	if (oldOc.getTimeScopeUri() == null || !oldOc.getStudyUri().equals(newTimeScopeUri)) {
+	    changedInfos.add(newTimeScopeUri);
+	}
 
         // insert current state of the OC
 	ObjectCollection newOc = new ObjectCollection(newURI,
 				         	      newType,
 						      newLabel,
 						      newComment,
-						      newStudyUri);
+						      newStudyUri,
+						      newHasScopeUri,
+						      newSpaceScopeUri,
+						      newTimeScopeUri);
+	newOc.setObjectUris(oldOc.getObjectUris());
 	
 	// delete previous content and insert new OC content inside of triplestore
 	oldOc.delete();

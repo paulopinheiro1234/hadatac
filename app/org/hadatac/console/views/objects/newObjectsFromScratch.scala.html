@@ -52,23 +52,10 @@
 		       value="@oc.getLabel()    [@oc.getObjectCollectionType().getLabel()]" onchange="checkform()" readonly>
  	</div>
 	<div class="form-group">
-	        <label>Object Type:</label>  [@oc.getType]
+	        <label>Object Type:</label>
 	        <select id="newType" class="form-control col-sm-2" name="newType" onchange="checkform()" readonly>
-		  @if(oc.getType().equals("http://hadatac.org/ont/hasco/SubjectGroup")) {
-		     <option value="http://semanticscience.org/resource/Human" selected>Human</option>
-		  } else {
-		    @if(oc.getType().equals("http://hadatac.org/ont/hasco/LocationCollection")) {
-		        <option value="http://hadatac.org/ont/hasco/Location" selected>Location</option>
-                    } else {
-                        <option></option>
-	                @if(objTypeList != null) {
-                           @for(objType <- objTypeList){
- 	                     @objType_select_entry(objType,"")
-                           }
-                        }
-                    }
-                 }
-	         </select>
+		  <option value="@oc.getObjectCollectionType().getStudyObjectType().getUri()" selected>@oc.getObjectCollectionType().getStudyObjectType().getLabel()</option>
+	        </select>
  	</div>
  	<div class="form-group">
 		<label>Number of Objects to be Created:</label>

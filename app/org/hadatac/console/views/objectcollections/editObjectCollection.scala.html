@@ -1,12 +1,16 @@
-@(study      : org.hadatac.entity.pojo.Study,
-  oc         : org.hadatac.entity.pojo.ObjectCollection,
-  ocTypeList : List[org.hadatac.entity.pojo.ObjectCollectionType])
+@(study         : org.hadatac.entity.pojo.Study,
+  oc            : org.hadatac.entity.pojo.ObjectCollection,
+  ocDomainList  : List[org.hadatac.entity.pojo.ObjectCollection],
+  ocSpaceList   : List[org.hadatac.entity.pojo.ObjectCollection],
+  ocTimeList    : List[org.hadatac.entity.pojo.ObjectCollection],
+  ocTypeList    : List[org.hadatac.entity.pojo.ObjectCollectionType])
 
 @import helper._
 @import org.hadatac.utils._
 @import org.hadatac.console.views.html._
 @import org.hadatac.console.controllers._
 @import org.hadatac.entity.pojo.Agent
+@import org.hadatac.metadata.loader.ValueCellProcessing
 @import play._
 
 @main("Edit Object Collection") {
@@ -62,7 +66,7 @@
 	<div class="form-group">
 		<label>URI:</label>
 		<input type="text" class="form-control col-sm-6" name="newUri" id="newUri" 
-		       value="@oc.getUri()" onchange="checkform()" readonly >
+		       value="@ValueCellProcessing.replaceNameSpaceEx(oc.getUri())" onchange="checkform()" readonly >
  	</div>
  	<div class="form-group">
 		<label>Short Name:</label>
@@ -89,11 +93,60 @@
  		<input type="text" class="form-control col-sm-6" name="newComment" id="newComment" value="@oc.getComment()" onchange="checkform()" >
  	</div>
      
+        <div class="form-group">
+          <label>Domain Scope</label>
+	  <select id="newHasScopeUri" class="form-control col-sm-6" name="newHasScopeUri">
+	    <option></option>
+	    @if(ocDomainList != null) {
+               @for(domain <- ocDomainList){
+	           @if(oc.getHasScope() != null) {
+ 	              @oc_select_entry(domain,oc.getHasScopeUri())
+                   } else {
+ 	              @oc_select_entry(domain,"")
+                   }
+               }
+            }
+	  </select>
+        </div>
+           
+        <div class="form-group">
+          <label>Location Scope</label>
+	  <select id="newSpaceScopeUri" class="form-control col-sm-6" name="newSpaceScopeUri">
+	    <option></option>
+	    @if(ocSpaceList != null) {
+               @for(domain <- ocSpaceList){
+	           @if(oc.getSpaceScope() != null) {
+ 	              @oc_select_entry(domain,oc.getSpaceScopeUri())
+                   } else {
+ 	              @oc_select_entry(domain,"")
+                   }
+               }
+            }
+	  </select>
+        </div>
+           
+        <div class="form-group">
+          <label>Time Scope</label>
+	  <select id="newTimeScopeUri" class="form-control col-sm-6" name="newTimeScopeUri">
+	    <option></option>
+	    @if(ocTimeList != null) {
+               @for(domain <- ocTimeList){
+	           @if(oc.getTimeScope() != null) {
+ 	              @oc_select_entry(domain,oc.getTimeScopeUri())
+                   } else {
+ 	              @oc_select_entry(domain,"")
+                   }
+               }
+            }
+	  </select>
+        </div>
+           
 	<div class="form-group">
 	  <label>Updates</label> <br>
 	  <input class="btn btn-success btn-sm" role="button" type="submit" id="submit" value="Save Object Collection" disabled /><br>
 	  <a href="@org.hadatac.console.controllers.objectcollections.routes.OCManagement.index(study.getUri())" class="btn btn-primary" role="button">Back to Object Collection Management</a>
 	</div>
+	<script>checkform()</script>
      
    </form>
   </div>

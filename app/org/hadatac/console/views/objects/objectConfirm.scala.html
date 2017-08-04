@@ -1,6 +1,7 @@
 @(message   : String, 
   study_uri : String, 
-  oc        : org.hadatac.entity.pojo.ObjectCollection)
+  oc_uri    : String,
+  obj       : org.hadatac.entity.pojo.StudyObject)
 
 @import org.hadatac.console.views.html._
 @import org.hadatac.utils._
@@ -11,19 +12,18 @@
     <div class="container">
        <h4>@message</h4>
 
-        @if(oc == null) {
-            [ERROR] No valid object to delete. 
+        @if(obj == null) {
+            [ERROR] No valid object. 
             <br>
         } else  {
             <ul>
-              <li><b>URI:</b> @ValueCellProcessing.replaceNameSpaceEx(oc.getUri())</li>
-              <li><b>Type:</b> @ValueCellProcessing.replaceNameSpaceEx(oc.getType())</li>
-              <li><b>Short Name:</b> @oc.getLabel()</li>
-              <li><b>Deocription:</b> @oc.getComment()</li>
-              <li><b>Study URI:</b> @if(oc.getStudy() != null) { @oc.getStudy().getLabel() }</li>
+              <li><b>URI:</b> @ValueCellProcessing.replaceNameSpaceEx(obj.getUri())</li>
+              <li><b>Type:</b> @ValueCellProcessing.replaceNameSpaceEx(obj.getType())</li>
+              <li><b>Short Name:</b> @obj.getLabel()</li>
+              <li><b>Deocription:</b> @obj.getComment()</li>
            </ul>
         }
-        <a href="@org.hadatac.console.controllers.objects.routes.ObjectManagement.index(study_uri, oc.getUri())" 
+        <a href="@org.hadatac.console.controllers.objects.routes.ObjectManagement.index(study_uri, oc_uri)" 
            class="btn btn-primary" role="button">Back to Object Management</a>
     </div>
 }

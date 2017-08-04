@@ -1,0 +1,13 @@
+@(oc       : org.hadatac.entity.pojo.ObjectCollection, 
+  selected : String)
+
+@import java.net._
+@import org.hadatac.utils._
+
+@if(oc != null && oc.getUri() != null) {
+   @if(oc.getUri().equals(selected)) {
+      <option value="@oc.getUri()" selected>@oc.getLabel()</option>
+   } else {
+      <option value="@oc.getUri()" >@oc.getLabel()</option>
+   }
+}

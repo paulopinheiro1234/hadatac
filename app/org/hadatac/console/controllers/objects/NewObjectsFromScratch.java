@@ -18,6 +18,7 @@ import org.hadatac.data.api.DataFactory;
 import org.hadatac.entity.pojo.Study;
 import org.hadatac.entity.pojo.StudyObject;
 import org.hadatac.entity.pojo.ObjectCollection;
+import org.hadatac.entity.pojo.ObjectCollectionType;
 import org.hadatac.entity.pojo.StudyObjectType;
 import org.hadatac.metadata.loader.LabkeyDataHandler;
 import org.hadatac.metadata.loader.ValueCellProcessing;
@@ -121,16 +122,9 @@ public class NewObjectsFromScratch extends Controller {
 	if (quantity > 0) {
 	    for (int i=0; i < quantity; i++) {
 		
-		 if (oc.getType().equals("http://hadatac.org/ont/hasco/SubjectGroup")) {
-		     newURI = oc.getUri().replace("OC-","SUBJ-") + "-" + formattedCounter(nextId);
-		     newLabel = "Subject " + nextId;
-		 } else if(oc.getType().equals("http://hadatac.org/ont/hasco/LocationCollection")) {
-		     newURI = oc.getUri().replace("OC-","LOC-") + "-" + formattedCounter(nextId);
-		     newLabel = "Location " + nextId;
-		 } else {
-		     newURI = oc.getUri().replace("OC-","MAT-") + "-" + formattedCounter(nextId);
-		     newLabel = "Material " + nextId;
-                 }
+		ObjectCollectionType ocType = ObjectCollectionType.find(oc.getType());
+		newURI = oc.getUri().replace("OC-",ocType.getAcronym() + "-") + "-" + formattedCounter(nextId);
+		newLabel = ocType.getLabelFragment() + " " + nextId;
 		newComment = newLabel;
 		
 		// insert current state of the OBJ
@@ -140,7 +134,9 @@ public class NewObjectsFromScratch extends Controller {
 				      newLabel,
 				      newObjectCollectionUri,
 				      newComment,
-				      "" // IsObjectOf 
+				      "", // IsFrom 
+				      "", // AtLocation 
+				      ""  // AtTime
 				      );
 		
 		// insert the new OC content inside of the triplestore regardless of any change -- the previous content has already been deleted
@@ -158,7 +154,7 @@ public class NewObjectsFromScratch extends Controller {
 	    }
 	}
 	String message = "A total of " + quantity + " new object(s) have been Generated";
-	return ok(objectConfirm.render(message, std_uri, oc));
+	return ok(objectConfirm.render(message, std_uri, oc_uri, obj));
     }
     
     static private String formattedCounter (long value) {

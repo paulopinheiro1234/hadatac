@@ -39,10 +39,10 @@ import be.objectify.deadbolt.java.actions.Restrict;
 public class EditObject extends Controller {
     
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-	public static Result index(String std_uri, String oc_uri, String sp_id) {
+	public static Result index(String std_uri, String oc_uri, String obj_id) {
     	if (session().get("LabKeyUserName") == null && session().get("LabKeyPassword") == null) {
 	    return redirect(org.hadatac.console.controllers.triplestore.routes.LoadKB.logInLabkey(
-			    org.hadatac.console.controllers.objects.routes.EditObject.index(std_uri, oc_uri, sp_id).url()));
+			    org.hadatac.console.controllers.objects.routes.EditObject.index(std_uri, oc_uri, obj_id).url()));
     	}
 	std_uri = URLDecoder.decode(std_uri);
 	oc_uri = URLDecoder.decode(oc_uri);
@@ -56,18 +56,18 @@ public class EditObject extends Controller {
 
 	ObjectCollection oc = ObjectCollection.find(oc_uri);
 	if (oc == null) {
-	    return badRequest(objectConfirm.render("Error editing object: ObjectCollection URI did not return valid object", std_uri, oc));
+	    return badRequest(objectConfirm.render("Error editing object: ObjectCollection URI did not return valid object", std_uri, null));
 	} 
 
 	List<StudyObject> objects = StudyObject.findByCollection(oc);
 
     	//return ok(editObject.render(study, oc, objects));
-	return badRequest(objectConfirm.render("PLACEHOLDER", std_uri, oc));
+	return badRequest(objectConfirm.render("PLACEHOLDER", std_uri, null));
     }
     
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-	public static Result postIndex(String std_uri, String oc_uri, String sp_id) {
-    	return index(std_uri, oc_uri, sp_id);
+	public static Result postIndex(String std_uri, String oc_uri, String obj_id) {
+    	return index(std_uri, oc_uri, obj_id);
     }
     
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
@@ -83,42 +83,7 @@ public class EditObject extends Controller {
             return badRequest("The submitted form has errors!");
         }
         
-	// store new values
-	System.out.println("uri: " + data.getNewUri());
-	System.out.println("type: " + data.getNewType());
-	
-	String newURI = null;
-	if (data.getNewUri() == null || data.getNewUri().equals("")) {
-            return badRequest("[ERROR] New URI cannot be empty.");
-	} else {
-	    newURI = ValueCellProcessing.replacePrefixEx(data.getNewUri());
-	}
-	String newType = null;
-	if (data.getNewType() == null || data.getNewType().equals("")) {
-            return badRequest("[ERROR] New type cannot be empty.");
-	} else {
-	    newType = ValueCellProcessing.replacePrefixEx(data.getNewType());
-	}
-	String newStudyUri = ValueCellProcessing.replacePrefixEx(std_uri);
-	String newLabel = data.getNewLabel();
-	String newComment = data.getNewComment();
-	
-        // insert current state of the OC
-	ObjectCollection oc = new ObjectCollection(newURI,
-						   newType,
-						   newLabel,
-						   newComment,
-						   newStudyUri);
-	
-	// insert the new OC content inside of the triplestore regardless of any change -- the previous content has already been deleted
-	oc.save();
-	
-	// update/create new OC in LabKey
-	int nRowsAffected = oc.saveToLabKey(session().get("LabKeyUserName"), session().get("LabKeyPassword"));
-	if (nRowsAffected <= 0) {
-	    return badRequest("Failed to edit OC into LabKey!\n");
-	}
-	return ok(objectConfirm.render("Object has been Edited", std_uri, oc));
+	return ok(objectConfirm.render("Object has been Edited", std_uri, null));
     }
 
 }

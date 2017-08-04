@@ -9,6 +9,9 @@ public class ObjectCollectionForm {
     public String newType;
     public String newLabel;
     public String newComment;
+    public String newHasScopeUri;
+    public String newSpaceScopeUri;
+    public String newTimeScopeUri;
 
     // STUDY information is not passed through the form since it cannot change
     //public String newStudyUri;
@@ -46,6 +49,30 @@ public class ObjectCollectionForm {
     
     public void setNewComment(String comment) {
 	this.newComment = comment;
+    }
+    
+    public String getNewHasScopeUri() {
+	return newHasScopeUri;
+    }
+    
+    public void setNewHasScopeUri(String hasScopeUri) {
+	this.newHasScopeUri = hasScopeUri;
+    }
+    
+    public String getNewSpaceScopeUri() {
+	return newSpaceScopeUri;
+    }
+    
+    public void setNewSpaceScopeUri(String spaceScopeUri) {
+	this.newSpaceScopeUri = spaceScopeUri;
+    }
+    
+    public String getNewTimeScopeUri() {
+	return newTimeScopeUri;
+    }
+    
+    public void setNewTimeScopeUri(String timeScopeUri) {
+	this.newTimeScopeUri = timeScopeUri;
     }
     
 }

@@ -1,5 +1,8 @@
-@(study      : org.hadatac.entity.pojo.Study,
-  ocTypeList : List[org.hadatac.entity.pojo.ObjectCollectionType])
+@(study         : org.hadatac.entity.pojo.Study,
+  ocDomainList  : List[org.hadatac.entity.pojo.ObjectCollection],
+  ocSpaceList   : List[org.hadatac.entity.pojo.ObjectCollection],
+  ocTimeList    : List[org.hadatac.entity.pojo.ObjectCollection],
+  ocTypeList    : List[org.hadatac.entity.pojo.ObjectCollectionType])
 
 @import helper._
 @import org.hadatac.utils._
@@ -97,6 +100,42 @@
  		<input type="text" class="form-control col-sm-6" name="newComment" id="newComment" onchange="checkform()" >
  	</div>
      
+        <div class="form-group">
+          <label>Domain Scope</label>
+	  <select id="newHasScopeUri" class="form-control col-sm-6" name="newHasScopeUri">
+	    <option></option>
+	    @if(ocDomainList != null) {
+               @for(domain <- ocDomainList){
+ 	          @oc_select_entry(domain,"")
+               }
+            }
+	  </select>
+        </div>
+           
+        <div class="form-group">
+          <label>Location Scope</label>
+	  <select id="newSpaceScopeUri" class="form-control col-sm-6" name="newSpaceScopeUri">
+	    <option></option>
+	    @if(ocSpaceList != null) {
+               @for(domain <- ocSpaceList){
+ 	          @oc_select_entry(domain,"")
+               }
+            }
+	  </select>
+        </div>
+           
+        <div class="form-group">
+          <label>Time Scope</label>
+	  <select id="newTimeScopeUri" class="form-control col-sm-6" name="newTimeScopeUri">
+	    <option></option>
+	    @if(ocTimeList != null) {
+               @for(domain <- ocTimeList){
+ 	          @oc_select_entry(domain,"")
+               }
+            }
+	  </select>
+        </div>
+           
 	<div class="form-group">
 	  <label>Updates</label> <br>
 	  <input class="btn btn-success btn-sm" role="button" type="submit" id="submit" value="Create Object Collection" disabled /><br>

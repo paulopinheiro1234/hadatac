@@ -21,6 +21,9 @@
               <li><b>Short Name:</b> @oc.getLabel()</li>
               <li><b>Deocription:</b> @oc.getComment()</li>
               <li><b>Study URI:</b> @if(oc.getStudy() != null) { @oc.getStudy().getLabel() }</li>
+              <li><b>Domain Scope:</b> @if(oc.getHasScope() != null) { @oc.getHasScope().getLabel() }</li>
+              <li><b>Space Scope:</b> @if(oc.getSpaceScope() != null) { @oc.getSpaceScope().getLabel() }</li>
+              <li><b>Time Scope:</b> @if(oc.getTimeScope() != null) { @oc.getTimeScope().getLabel() }</li>
            </ul>
         }
         <a href="@org.hadatac.console.controllers.objectcollections.routes.OCManagement.index(study_uri)" 

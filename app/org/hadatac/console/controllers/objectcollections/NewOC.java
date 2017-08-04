@@ -45,8 +45,10 @@ public class NewOC extends Controller {
     	}
 	Study study = Study.find(std_uri);
 	List<ObjectCollectionType> typeList = ObjectCollectionType.find();
+
+	List<ObjectCollection> objList = ObjectCollection.findByStudy(study);
 	
-    	return ok(newObjectCollection.render(study, typeList));
+    	return ok(newObjectCollection.render(study, objList, objList, objList, typeList));
     }
     
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
@@ -86,13 +88,19 @@ public class NewOC extends Controller {
 	String newStudyUri = ValueCellProcessing.replacePrefixEx(std_uri);
 	String newLabel = data.getNewLabel();
 	String newComment = data.getNewComment();
+	String newHasScopeUri = data.getNewHasScopeUri();
+	String newSpaceScopeUri = data.getNewSpaceScopeUri();
+	String newTimeScopeUri = data.getNewTimeScopeUri();
 	
         // insert current state of the OC
 	ObjectCollection oc = new ObjectCollection(newURI,
 						   newType,
 						   newLabel,
 						   newComment,
-						   newStudyUri);
+						   newStudyUri,
+						   newHasScopeUri,
+						   newSpaceScopeUri,
+						   newTimeScopeUri);
 	
 	// insert the new OC content inside of the triplestore regardless of any change -- the previous content has already been deleted
 	oc.save();

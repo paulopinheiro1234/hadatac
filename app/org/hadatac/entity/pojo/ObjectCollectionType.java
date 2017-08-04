@@ -23,22 +23,60 @@ import org.apache.jena.rdf.model.Statement;
 import org.apache.jena.rdf.model.StmtIterator;
 import org.hadatac.utils.Collections;
 import org.hadatac.utils.NameSpaces;
+import org.hadatac.metadata.loader.ValueCellProcessing;
 
 import play.Play;
 
 public class ObjectCollectionType extends HADatAcClass implements Comparable<ObjectCollectionType> {
 
         static String className = "hasco:ObjectCollection";
+	String studyObjectTypeUri = "";
+	String acronym = "";
+	String labelFragment = "";
 
 	public ObjectCollectionType () {
 	    super(className);
+	    studyObjectTypeUri = "";
+	    acronym = "";
+	    labelFragment = "";
 	}
-
+	
+	public String getStudyObjectTypeUri() {
+	    return studyObjectTypeUri;
+	}
+	
+	public StudyObjectType getStudyObjectType() {
+	    if (studyObjectTypeUri == null || studyObjectTypeUri.equals("")) {
+		return null;
+	    }
+	    return StudyObjectType.find(studyObjectTypeUri);
+	}
+	
+	public void setStudyObjectTypeUri(String studyObjectTypeUri) {
+	    this.studyObjectTypeUri = studyObjectTypeUri;
+	}
+	
+	public String getAcronym() {
+	    return acronym;
+	}
+	
+	public void setAcronym(String acronym) {
+	    this.acronym = acronym;
+	}
+	
+	public String getLabelFragment() {
+	    return labelFragment;
+	}
+	
+	public void setLabelFragment(String  labelFragment) {
+	    this.labelFragment = labelFragment;
+	}
+	
 	public static List<ObjectCollectionType> find() {
 	    List<ObjectCollectionType> objectCollectionTypes = new ArrayList<ObjectCollectionType>();
 	    String queryString = NameSpaces.getInstance().printSparqlNameSpaceList() +
 		" SELECT ?uri WHERE { " +
-		" ?uri rdfs:subClassOf* " + className + " . " + 
+		"    ?uri rdfs:subClassOf* " + className + " . " + 
 		"} ";
 	    
 	    //System.out.println("Query: " + queryString);
@@ -91,6 +129,12 @@ public class ObjectCollectionType extends HADatAcClass implements Comparable<Obj
 		    objectCollectionType.setLabel(object.asLiteral().getString());
 		} else if (statement.getPredicate().getURI().equals("http://www.w3.org/2000/01/rdf-schema#subClassOf")) {
 		    objectCollectionType.setSuperUri(object.asResource().getURI());
+		} else if (statement.getPredicate().getURI().equals(ValueCellProcessing.replacePrefixEx("hasco:hasStudyObjectType"))) {
+		    objectCollectionType.setStudyObjectTypeUri(object.asResource().getURI());
+		} else if (statement.getPredicate().getURI().equals(ValueCellProcessing.replacePrefixEx("hasco:hasAcronym"))) {
+		    objectCollectionType.setAcronym(object.asLiteral().getString());
+		} else if (statement.getPredicate().getURI().equals(ValueCellProcessing.replacePrefixEx("hasco:hasStudyObjectType"))) {
+		    objectCollectionType.setLabelFragment(object.asLiteral().getString());
 		}
 	    }
 	    

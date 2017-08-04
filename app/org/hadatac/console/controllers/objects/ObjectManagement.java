@@ -52,12 +52,12 @@ public class ObjectManagement extends Controller {
 
 	Study study = Study.find(std_uri);
 	if (study == null) {
-	    return badRequest(objectConfirm.render("Error listing object collection: Study URI did not return valid URI", std_uri, null));
+	    return badRequest(objectConfirm.render("Error listing object collection: Study URI did not return valid URI", std_uri, oc_uri, null));
 	} 
 
 	ObjectCollection oc = ObjectCollection.find(oc_uri);
 	if (oc == null) {
-	    return badRequest(objectConfirm.render("Error listing objectn: ObjectCollection URI did not return valid object", std_uri, oc));
+	    return badRequest(objectConfirm.render("Error listing objectn: ObjectCollection URI did not return valid object", std_uri, oc_uri, null));
 	} 
 
 	List<StudyObject> objects = StudyObject.findByCollection(oc);
