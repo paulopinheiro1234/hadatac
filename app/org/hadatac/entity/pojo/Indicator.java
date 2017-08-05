@@ -24,6 +24,7 @@ import org.apache.jena.update.UpdateFactory;
 import org.apache.jena.update.UpdateProcessor;
 import org.apache.jena.update.UpdateRequest;
 import org.hadatac.console.controllers.AuthApplication;
+import org.hadatac.console.controllers.metadata.DynamicFunctions;
 import org.hadatac.metadata.loader.LabkeyDataHandler;
 import org.hadatac.metadata.loader.ValueCellProcessing;
 import org.hadatac.utils.Collections;
@@ -45,6 +46,7 @@ public class Indicator  implements Comparable<Indicator> {
 	private String uri;
 	private String label;
 	private String comment;
+	private String superUri;
 	
 	public String getUri() {
 		return uri;
@@ -52,6 +54,13 @@ public class Indicator  implements Comparable<Indicator> {
 	public void setUri(String uri) {
 		this.uri = uri;
 	}
+	public String getSuperUri() {
+		return superUri;
+	}
+	public void setSuperUri(String superUri) {
+		this.superUri = superUri;
+	}
+	
 	public String getLabel() {
 		return label;
 	}
@@ -67,18 +76,21 @@ public class Indicator  implements Comparable<Indicator> {
 	
 	public Indicator(){
 		setUri("");
+		setSuperUri("hasco:Indicator");
 		setLabel("");
 		setComment("");
 	}
 	
 	public Indicator(String uri){
 		setUri(uri);
+		setSuperUri("hasco:Indicator");
 		setLabel("");
 		setComment("");
 	}
 	
 	public Indicator(String uri, String label, String comment){
 		setUri(uri);
+		setSuperUri("hasco:Indicator");
 		setLabel(label);
 		setComment(comment);
 	}
@@ -205,12 +217,13 @@ public class Indicator  implements Comparable<Indicator> {
     	    System.out.println("[ERROR] Trying to save Indicator without assigning a URI");
     	    return;
     	}
-
+    	System.out.println("Indicator.save(): About to delete");
     	delete();  // delete any existing triple for the current study
 
     	String insert = "";
     	String ind_uri = "";
 
+    	System.out.println("Indicator.save(): Checking URI");
     	if (this.getUri().startsWith("<")) {
     	    ind_uri = this.getUri();
     	} else {
@@ -224,8 +237,11 @@ public class Indicator  implements Comparable<Indicator> {
     	if (comment != null && !comment.equals("")) {
     	    insert += ind_uri + " rdfs:comment \"" + comment + "\" .  ";
     	}
+    	if (superUri != null && !superUri.equals("")) {
+    	    insert += ind_uri + " rdfs:subClassOf <" + DynamicFunctions.replacePrefixWithURL(superUri) + "> .  ";
+    	}
         insert += LINE_LAST;
-    	//System.out.println("Study insert query (pojo's save): <" + insert + ">");
+    	System.out.println("Indicator (pojo's save): <" + insert + ">");
         UpdateRequest request = UpdateFactory.create(insert);
         UpdateProcessor processor = UpdateExecutionFactory.createRemote(
     			      request, Collections.getCollectionsName(Collections.METADATA_UPDATE));

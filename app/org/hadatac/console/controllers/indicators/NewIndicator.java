@@ -20,6 +20,7 @@ import org.hadatac.console.views.html.*;
 import org.hadatac.console.views.html.indicators.*;
 import org.hadatac.console.views.html.triplestore.syncLabkey;
 import org.hadatac.console.controllers.indicators.routes;
+import org.hadatac.console.controllers.metadata.DynamicFunctions;
 import org.hadatac.data.api.DataFactory;
 import org.hadatac.entity.pojo.Agent;
 import org.hadatac.entity.pojo.Indicator;
@@ -80,11 +81,11 @@ public class NewIndicator extends Controller {
 	String newComment = data.getNewComment();
 
         // insert current state of the STD
-	Indicator ind = new Indicator(newURI,
+	Indicator ind = new Indicator(DynamicFunctions.replacePrefixWithURL(newURI),
 			      newLabel,
 			      newComment);
 	
-	// insert the new indicator content inside of the triplestore regardless of any change -- the previous content has already been deleted
+	// insert the new indicator content inside of the triplestore
 	ind.save();
 	
 	// update/create new indicator in LabKey
@@ -92,6 +93,8 @@ public class NewIndicator extends Controller {
 	if (nRowsAffected <= 0) {
 	    return badRequest("Failed to insert new indicator to LabKey!\n");
 	}
+	
+	
 	return ok(newIndicatorConfirm.render(ind));
     }
 }
