@@ -37,6 +37,30 @@ function facetPrettyName(type, value) {
     return value;
 }
 
+function parseSolrRangeFacetFieldToTree(type) {
+	var i;
+	i = 0;
+        listed = 0;
+	flag = false;
+	jsonTree = '{ "id": ' + i + ', "item": [ ';
+	for (var i_field in json.date_facets[type]) {
+		i++;
+                	jsonTree += '{	"id": ' + i + ', ' +
+                				   '"userdata": [ ';
+                	/*
+	       	      jsonTree += '{ "id": ' + i + ', ' + 
+                                    '"userdata": [ { "name": "field", "content": "' + type + '" }, { "name": "value", "content": "' + i_field + '" } ], ' + 
+			  '"text": "' + facetPrettyName(type,i_field) + ' (' + field + ')" } ';
+			        */
+                	jsonTree += ' ], "text" : "' + i_field + '" } ,';
+	}
+	if (jsonTree[jsonTree.length-1] == ',') {
+		jsonTree = jsonTree.substring(0, jsonTree.length-1);
+	}
+	jsonTree += '] }';
+	return jsonTree;
+}
+
 function parseSolrFacetFieldToTree(type) {
 	var i;
 	i = 0;

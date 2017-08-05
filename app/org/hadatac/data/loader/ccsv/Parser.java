@@ -4,6 +4,10 @@ import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
+import java.time.format.DateTimeFormatter;
 import java.util.Date;
 import java.util.Iterator;
 
@@ -213,18 +217,23 @@ public class Parser {
                                        - TimeInstantColumn is used for timestamps told to system to be timestamp, but that are not further processed
 				       - Abstract times are encoded as DASA's events, and are supposed to be strings
 				 */
-
+				
+				measurement.setTimestamp(new Date(Long.MAX_VALUE).toInstant().toString());
+				measurement.setAbstractTime("");
+				
 				// contrete time(stamps)
 				if(dasa.getPositionInt() == schema.getTimestampColumn()) {
 				    String sTime = record.get(schema.getTimestampColumn() - 1);
 				    int timeStamp = new BigDecimal(sTime).intValue();
-				    Date time = new Date((long)timeStamp * 1000);
-				    measurement.setTimestamp(time.toString());
+				    measurement.setTimestamp(Instant.ofEpochSecond(timeStamp).toString());
 				} else if (schema.getTimeInstantColumn() != -1) {
 				    String timeValue = record.get(schema.getTimeInstantColumn() - 1);
 				    //System.out.println("Time Instant value: " + timeValue);
 				    if (timeValue != null) {
-					measurement.setTimestamp(timeValue);
+				    	DateTimeFormatter formatter = DateTimeFormatter.ofPattern("M/d/yy HH:mm");
+				    	LocalDateTime datetime = LocalDateTime.parse(timeValue, formatter);
+				    	measurement.setTimestamp(datetime.toInstant(ZoneOffset.UTC).toString());
+				    	//measurement.setTimestamp(timeValue);
 				    }
 				}    
 				
@@ -234,18 +243,13 @@ public class Parser {
 				    DataAcquisitionSchemaEvent dase = schema.getEvent(daseUri); 
 				    if (dase != null) {
 					if (dase.getLabel() != null && !dase.getLabel().equals("")) {
-					    measurement.setTimestamp("At " + dase.getLabel());
+					    measurement.setAbstractTime("At " + dase.getLabel());
 					} else if (dase.getEntity() != null && !dase.getEntity().equals("")) {
-					    measurement.setTimestamp("At " + dase.getEntity().substring(dase.getEntity().indexOf("#") + 1));
+					    measurement.setAbstractTime("At " + dase.getEntity().substring(dase.getEntity().indexOf("#") + 1));
 					} else {
-					    measurement.setTimestamp("At " + daseUri);
+					    measurement.setAbstractTime("At " + daseUri);
 					}
 				    } 
-				}
-				
-				// no time information
-				else {
-				    measurement.setTimestamp("");
 				}
 				
 				/*============================*

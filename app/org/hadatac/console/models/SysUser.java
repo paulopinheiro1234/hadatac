@@ -14,7 +14,6 @@ import com.feth.play.module.pa.user.FirstLastNameIdentity;
 import org.hadatac.console.controllers.AuthApplication;
 import org.hadatac.console.models.TokenAction.Type;
 import play.Play;
-import play.data.format.Formats;
 import play.data.validation.Constraints;
 
 import org.apache.solr.client.solrj.SolrClient;
@@ -26,19 +25,18 @@ import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.client.solrj.response.UpdateResponse;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
-import org.joda.time.DateTime;
-import org.joda.time.DateTimeZone;
-import org.joda.time.format.DateTimeFormat;
-import org.joda.time.format.DateTimeFormatter;
-import org.joda.time.format.ISODateTimeFormat;
 import org.noggit.JSONUtil;
 
 import java.io.IOException;
-import java.util.*;
+import java.time.Instant;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
+import java.util.UUID;
 
-import javax.swing.text.StyledEditorKit.BoldAction;
-
-import org.hadatac.entity.pojo.Measurement;
 import org.hadatac.entity.pojo.User;
 
 import org.hadatac.utils.Collections;
@@ -84,7 +82,7 @@ public class SysUser implements Subject {
 	@Field("email_validated")
 	private boolean emailValidated;
 
-	private DateTime lastLogin_j;
+	private Instant lastLogin_j;
 	
 	private List<SecurityRole> roles;
 
@@ -139,13 +137,11 @@ public class SysUser implements Subject {
 	}
 	
 	public String getLastLogin() {
-		DateTimeFormatter formatter = ISODateTimeFormat.dateTime();
-		return formatter.withZone(DateTimeZone.UTC).print(this.lastLogin_j);
+		return this.lastLogin_j.toString();
 	}
 	
 	public void setLastLogin(String lastLogin) {
-		DateTimeFormatter formatter = DateTimeFormat.forPattern("EEE MMM dd HH:mm:ss zzz yyyy");
-		lastLogin_j = formatter.parseDateTime(lastLogin);
+		lastLogin_j = Instant.parse(lastLogin);
 	}
 	
 	public boolean getActive() {
@@ -284,9 +280,10 @@ public class SysUser implements Subject {
 	
 	private static List<SysUser> getAuthUserFindSolr(
 		final AuthUserIdentity identity) {
-		SolrClient solrClient = new HttpSolrClient(
+		HttpSolrClient.Builder builder = new HttpSolrClient.Builder(
 				Play.application().configuration().getString("hadatac.solr.users") 
 				+ Collections.AUTHENTICATE_USERS);
+		SolrClient solrClient = builder.build();
 		String query = "active:true AND provider_user_id:" + identity.getId() + " AND provider_key:" + identity.getProvider();
     	SolrQuery solrQuery = new SolrQuery(query);
     	List<SysUser> users = new ArrayList<SysUser>();
@@ -343,9 +340,10 @@ public class SysUser implements Subject {
 	}
 	
 	public static SysUser findByIdSolr(final String id) {
-		SolrClient solrClient = new HttpSolrClient(
+		HttpSolrClient.Builder builder = new HttpSolrClient.Builder(
 				Play.application().configuration().getString("hadatac.solr.users") 
 				+ Collections.AUTHENTICATE_USERS);
+		SolrClient solrClient = builder.build();
 		
     	SolrQuery solrQuery = new SolrQuery("id:" + id);
     	SysUser user = null;
@@ -392,7 +390,7 @@ public class SysUser implements Subject {
 				.findByRoleNameSolr(AuthApplication.DATA_OWNER_ROLE));
 		sys_user.permissions = new ArrayList<UserPermission>();
 		sys_user.active = true;
-		sys_user.lastLogin = (new Date()).toString();
+		sys_user.lastLogin = Instant.now().toString();
 		sys_user.linkedAccounts = java.util.Collections.singletonList(LinkedAccount
 				.create(authUser));
 
@@ -462,9 +460,10 @@ public class SysUser implements Subject {
 	}
 	
 	public static boolean existsSolr() {
-		SolrClient solrClient = new HttpSolrClient(
+		HttpSolrClient.Builder builder = new HttpSolrClient.Builder(
 				Play.application().configuration().getString("hadatac.solr.users") 
 				+ Collections.AUTHENTICATE_USERS);
+		SolrClient solrClient = builder.build();
     	SolrQuery solrQuery = new SolrQuery("*:*");
     	
     	try {
@@ -488,7 +487,7 @@ public class SysUser implements Subject {
 				.findByRoleNameSolr(org.hadatac.console.controllers.AuthApplication.DATA_OWNER_ROLE));
 		sys_user.permissions = new ArrayList<UserPermission>();
 		sys_user.active = true;
-		sys_user.lastLogin = (new Date()).toString();
+		sys_user.lastLogin = Instant.now().toString();
 		sys_user.linkedAccounts = java.util.Collections.singletonList(LinkedAccount
 				.create(authUser));
 
@@ -541,9 +540,10 @@ public class SysUser implements Subject {
 	}
 	
 	public void save() {
-		SolrClient solrClient = new HttpSolrClient(
+		HttpSolrClient.Builder builder = new HttpSolrClient.Builder(
 				Play.application().configuration().getString("hadatac.solr.users") 
 				+ Collections.AUTHENTICATE_USERS);
+		SolrClient solrClient = builder.build();
         
         try {
 			solrClient.addBean(this);
@@ -563,9 +563,10 @@ public class SysUser implements Subject {
 	
 	public int delete() {
 		try {
-			SolrClient solr = new HttpSolrClient(
+			HttpSolrClient.Builder builder = new HttpSolrClient.Builder(
 					Play.application().configuration().getString("hadatac.solr.users") 
 					+ Collections.AUTHENTICATE_USERS);
+			SolrClient solr = builder.build();
 			UpdateResponse response = solr.deleteById(this.id_s);
 			solr.commit();
 			solr.close();
@@ -611,7 +612,7 @@ public class SysUser implements Subject {
 	public static void setLastLoginDate(final AuthUser knownUser) {
 		final SysUser u = SysUser.findByAuthUserIdentity(knownUser);
 		if (null != u) {
-			u.lastLogin = (new Date()).toString();
+			u.lastLogin = Instant.now().toString();
 			u.save();
 		}
 	}
@@ -634,9 +635,10 @@ public class SysUser implements Subject {
 	}
 	
 	private static List<SysUser> getEmailUserFindSolr(final String email, final String providerKey) {
-		SolrClient solrClient = new HttpSolrClient(
+		HttpSolrClient.Builder builder = new HttpSolrClient.Builder(
 				Play.application().configuration().getString("hadatac.solr.users") 
 				+ Collections.AUTHENTICATE_USERS);
+		SolrClient solrClient = builder.build();
 		String query = "email:" + email + " AND active:true";
     	SolrQuery solrQuery = new SolrQuery(query);
     	List<SysUser> users = new ArrayList<SysUser>();
@@ -664,9 +666,10 @@ public class SysUser implements Subject {
 	}
 	
 	public static String outputAsJson() {
-		SolrClient solrClient = new HttpSolrClient(
+		HttpSolrClient.Builder builder = new HttpSolrClient.Builder(
 				Play.application().configuration().getString("hadatac.solr.users") 
 				+ Collections.AUTHENTICATE_USERS);
+		SolrClient solrClient = builder.build();
 		String query = "*:*";
     	SolrQuery solrQuery = new SolrQuery(query);
     	
@@ -740,10 +743,10 @@ public class SysUser implements Subject {
 		user.firstName = doc.getFieldValue("first_name").toString();
 		user.lastName = doc.getFieldValue("last_name").toString();
 		if (null == doc.getFieldValue("last_login")) {
-			user.setLastLogin((new Date()).toString());
+			user.setLastLogin(Instant.now().toString());
 		}
 		else {
-			user.setLastLogin(doc.getFieldValue("last_login").toString());
+			user.setLastLogin(((Date)doc.getFieldValue("last_login")).toInstant().toString());
 		}
 		user.active = Boolean.parseBoolean(doc.getFieldValue("active").toString());
 		user.emailValidated = Boolean.parseBoolean(doc.getFieldValue("email_validated").toString());
