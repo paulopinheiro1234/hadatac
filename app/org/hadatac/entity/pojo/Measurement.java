@@ -60,7 +60,7 @@ public class Measurement {
 	@Field("object_uri")
 	private String objectUri;
 	private Instant timestamp;
-	@Field("abstract_time")
+	@Field("named_time")
 	private String abstractTime;
 	@Field("value")
 	private String value;
@@ -653,7 +653,7 @@ public class Measurement {
 		query.setFacetLimit(-1);
 		query.addFacetField("unit");
 		query.addDateRangeFacet("timestamp", Date.from(minTime), Date.from(maxTime), gap);
-		query.addFacetField("abstract_time");
+		query.addFacetField("named_time");
 		query.addFacetPivotField("study_uri,acquisition_uri");
 		query.addFacetPivotField("entity,characteristic");
 		query.addFacetPivotField("platform_name,instrument_model");
@@ -892,7 +892,7 @@ public class Measurement {
 		if (doc.getFieldValue("timestamp") != null) {
 			m.setTimestamp(((Date)doc.getFieldValue("timestamp")).toInstant().toString());
 		}
-		m.setAbstractTime(doc.getFieldValue("abstract_time").toString());
+		m.setAbstractTime(doc.getFieldValue("named_time").toString());
 		m.setValue(doc.getFieldValue("value").toString());
 		m.setUnit(doc.getFieldValue("unit").toString());
 		m.setUnitUri(doc.getFieldValue("unit_uri").toString());
