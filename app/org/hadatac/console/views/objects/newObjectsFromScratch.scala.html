@@ -57,11 +57,41 @@
 		  <option value="@oc.getObjectCollectionType().getStudyObjectType().getUri()" selected>@oc.getObjectCollectionType().getStudyObjectType().getLabel()</option>
 	        </select>
  	</div>
- 	<div class="form-group">
-		<label>Number of Objects to be Created:</label>
+	<div id="rcorners">
+ 	   <div class="form-group">
+		<label>Total number of objects to be created:</label>
  		<input type="text" class="form-control col-sm-6" name="newQuantity" id="newQuantity" onchange="checkform()" >
- 	</div>
+ 	   </div>
+        </div>
+
+	<center><br><b>OR</b><br><br></center>
      
+ 	<div  id="rcorners">
+	    <div class="form-group">
+		<label>Use domain collection:</label>
+ 		<input type="checkbox"  name="newUseDomain" id="newUseDomain" 
+                       onchange="checkform()" >
+ 	    </div>
+     
+ 	    <div class="form-group">
+		<label>Use location collection:</label>
+ 		<input type="checkbox" name="newUselocation" id="newUselocation" 
+		       onchange="checkform()" >
+ 	    </div>
+     
+ 	    <div class="form-group">
+		<label>Use time collection(s):</label>
+ 		<input type="checkbox" name="newUseTime" id="newUseTime" 
+		       onchange="checkform()" >
+ 	    </div>
+     
+ 	    <div class="form-group">
+		<label>Multiplier (number of times the product of contextual objects used):</label>
+ 		<input type="text" class="form-control col-sm-6" name="newMultiplier" id="newMultiplier" onchange="checkform()" >
+ 	    </div>
+        </div>
+     
+	<br>
 	<div class="form-group">
 	  <label>Updates</label> <br>
 	  <input class="btn btn-success btn-sm" role="button" type="submit" id="submit" value="Create Objects" disabled /><br>

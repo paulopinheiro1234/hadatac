@@ -46,9 +46,21 @@ public class NewOC extends Controller {
 	Study study = Study.find(std_uri);
 	List<ObjectCollectionType> typeList = ObjectCollectionType.find();
 
+	List<ObjectCollection> domainList = new ArrayList<ObjectCollection>();
+	List<ObjectCollection> locationList = new ArrayList<ObjectCollection>();
+	List<ObjectCollection> timeList = new ArrayList<ObjectCollection>();
 	List<ObjectCollection> objList = ObjectCollection.findByStudy(study);
-	
-    	return ok(newObjectCollection.render(study, objList, objList, objList, typeList));
+	for (ObjectCollection oc : objList) {
+	    if (oc.isDomainCollection()) {
+		domainList.add(oc);
+	    } else if (oc.isLocationCollection()) {
+		locationList.add(oc);
+	    } else if (oc.isTimeCollection()) {
+		timeList.add(oc);
+	    }
+	}
+
+    	return ok(newObjectCollection.render(study, domainList, locationList, timeList, typeList));
     }
     
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
@@ -89,8 +101,8 @@ public class NewOC extends Controller {
 	String newLabel = data.getNewLabel();
 	String newComment = data.getNewComment();
 	String newHasScopeUri = data.getNewHasScopeUri();
-	String newSpaceScopeUri = data.getNewSpaceScopeUri();
-	String newTimeScopeUri = data.getNewTimeScopeUri();
+	List<String> newSpaceScopeUris = data.getNewSpaceScopeUris();
+	List<String> newTimeScopeUris = data.getNewTimeScopeUris();
 	
         // insert current state of the OC
 	ObjectCollection oc = new ObjectCollection(newURI,
@@ -99,8 +111,8 @@ public class NewOC extends Controller {
 						   newComment,
 						   newStudyUri,
 						   newHasScopeUri,
-						   newSpaceScopeUri,
-						   newTimeScopeUri);
+						   newSpaceScopeUris,
+						   newTimeScopeUris);
 	
 	// insert the new OC content inside of the triplestore regardless of any change -- the previous content has already been deleted
 	oc.save();

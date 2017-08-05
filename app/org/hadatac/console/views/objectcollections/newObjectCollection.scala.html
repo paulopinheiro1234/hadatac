@@ -114,8 +114,7 @@
            
         <div class="form-group">
           <label>Location Scope</label>
-	  <select id="newSpaceScopeUri" class="form-control col-sm-6" name="newSpaceScopeUri">
-	    <option></option>
+	  <select id="newSpaceScopeUris" class="form-control col-sm-6" size="3" multiple name="newSpaceScopeUris">
 	    @if(ocSpaceList != null) {
                @for(domain <- ocSpaceList){
  	          @oc_select_entry(domain,"")
@@ -126,8 +125,7 @@
            
         <div class="form-group">
           <label>Time Scope</label>
-	  <select id="newTimeScopeUri" class="form-control col-sm-6" name="newTimeScopeUri">
-	    <option></option>
+	  <select id="newTimeScopeUris" class="form-control col-sm-6" size="3" multiple name="newTimeScopeUris">
 	    @if(ocTimeList != null) {
                @for(domain <- ocTimeList){
  	          @oc_select_entry(domain,"")

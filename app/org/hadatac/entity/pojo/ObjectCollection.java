@@ -39,7 +39,11 @@ import play.Play;
 
 public class ObjectCollection extends HADatAcThing {
 
-    public static String INDENT1 = "     ";
+    public static String DOMAIN = "http://hadatac.org/ont/hasco/SubjectGroup";
+    public static String LOCATION = "http://hadatac.org/ont/hasco/LocationCollection";
+    public static String TIME = "http://hadatac.org/ont/hasco/TimeCollection";
+
+    public static String INDENT1 = "   ";
     public static String INSERT_LINE1 = "INSERT DATA {  ";
     public static String DELETE_LINE1 = "DELETE WHERE {  ";
     public static String LINE3 = INDENT1 + "a         hasco:ObjectCollection;  ";
@@ -47,8 +51,8 @@ public class ObjectCollection extends HADatAcThing {
     public static String LINE_LAST = "}  ";
     private String studyUri = "";
     private String hasScopeUri = "";    
-    private String spaceScopeUri = "";
-    private String timeScopeUri = "";
+    private List<String> spaceScopeUris = null;
+    private List<String> timeScopeUris = null;
     private List<String> objectUris = null;
 
     public ObjectCollection() {
@@ -58,8 +62,8 @@ public class ObjectCollection extends HADatAcThing {
 	this.comment = "";
 	this.studyUri = "";
 	this.hasScopeUri = "";
-	this.spaceScopeUri = "";
-	this.timeScopeUri = "";
+	this.spaceScopeUris = new ArrayList<String>();
+	this.timeScopeUris = new ArrayList<String>();
 	this.objectUris = new ArrayList<String>();
     }
     
@@ -69,16 +73,16 @@ public class ObjectCollection extends HADatAcThing {
 			    String comment,
 			    String studyUri,
 			    String hasScopeUri,
-			    String spaceScopeUri,
-			    String timeScopeUri) {
+			    List<String> spaceScopeUris,
+			    List<String> timeScopeUris) {
 	this.setUri(uri);
 	this.setType(type);
 	this.setLabel(label);
 	this.setComment(comment);
 	this.setStudyUri(studyUri);
 	this.setHasScopeUri(hasScopeUri);
-	this.setSpaceScopeUri(spaceScopeUri);
-	this.setTimeScopeUri(timeScopeUri);
+	this.setSpaceScopeUris(spaceScopeUris);
+	this.setTimeScopeUris(timeScopeUris);
 	this.objectUris = new ArrayList<String>();
     }
 
@@ -99,6 +103,27 @@ public class ObjectCollection extends HADatAcThing {
 	    return null;
 	}
 	return Study.find(studyUri);
+    }
+
+    public boolean isDomainCollection() {
+	if (type == null || type.equals("")) {
+	    return false;
+	}
+	return type.equals(this.DOMAIN);
+    }
+
+    public boolean isLocationCollection() {
+	if (type == null || type.equals("")) {
+	    return false;
+	}
+	return type.equals(this.LOCATION);
+    }
+
+    public boolean isTimeCollection() {
+	if (type == null || type.equals("")) {
+	    return false;
+	}
+	return type.equals(this.TIME);
     }
 
     public void setStudyUri(String studyUri) {
@@ -128,34 +153,119 @@ public class ObjectCollection extends HADatAcThing {
 	this.hasScopeUri = hasScopeUri;
     }
 
-    public String getSpaceScopeUri() {
-	return spaceScopeUri;
+    public List<String> getSpaceScopeUris() {
+	return spaceScopeUris;
     }
 
-    public ObjectCollection getSpaceScope() {
-	if (spaceScopeUri == null || spaceScopeUri.equals("")) {
+    public List<ObjectCollection> getSpaceScopes() {
+	if (spaceScopeUris == null || spaceScopeUris.equals("")) {
 	    return null;
 	}
-	return ObjectCollection.find(spaceScopeUri);
+	List<ObjectCollection> spaceScopes = new ArrayList<ObjectCollection>();
+	for (String scopeUri : spaceScopeUris) {
+	    ObjectCollection oc = ObjectCollection.find(scopeUri);
+	    if (oc != null) {
+		spaceScopes.add(oc);
+	    }
+	}
+	return spaceScopes;
     }
 
-    public void setSpaceScopeUri(String spaceScopeUri) {
-	this.spaceScopeUri = spaceScopeUri;
+    public void setSpaceScopeUris(List<String> spaceScopeUris) {
+	this.spaceScopeUris = spaceScopeUris;
     }
 
-    public String getTimeScopeUri() {
-	return timeScopeUri;
+    public List<String> getTimeScopeUris() {
+	return timeScopeUris;
     }
 
-    public ObjectCollection getTimeScope() {
-	if (timeScopeUri == null || timeScopeUri.equals("")) {
+    public List<ObjectCollection> getTimeScopes() {
+	if (timeScopeUris == null || timeScopeUris.equals("")) {
 	    return null;
 	}
-	return ObjectCollection.find(timeScopeUri);
+	List<ObjectCollection> timeScopes = new ArrayList<ObjectCollection>();
+	for (String scopeUri : timeScopeUris) {
+	    ObjectCollection oc = ObjectCollection.find(scopeUri);
+	    if (oc != null) {
+		timeScopes.add(oc);
+	    }
+	}
+	return timeScopes;
     }
 
-    public void setTimeScopeUri(String timeScopeUri) {
-	this.timeScopeUri = timeScopeUri;
+    public void setTimeScopeUris(List<String> timeScopeUris) {
+	this.timeScopeUris = timeScopeUris;
+    }
+
+    private static List<String> retrieveSpaceScope (String oc_uri) {
+	List<String> scopeUris = new ArrayList<String>();
+	String scopeUri = ""; 
+	String queryString = NameSpaces.getInstance().printSparqlNameSpaceList() + 
+	    "SELECT  ?spaceScopeUri WHERE { " + 
+	    "    " + oc_uri + " hasco:hasSpaceScope ?spaceScopeUri . " + 
+	    "}";
+	Query query = QueryFactory.create(queryString);
+	
+	QueryExecution qexec = QueryExecutionFactory.sparqlService(Collections.getCollectionsName(Collections.METADATA_SPARQL), query);
+	ResultSet results = qexec.execSelect();
+	ResultSetRewindable resultsrw = ResultSetFactory.copyResults(results);
+	qexec.close();
+	
+	while (resultsrw.hasNext()) {
+	    QuerySolution soln = resultsrw.next();
+	    if (soln != null) {
+		try {
+		    if (soln.getResource("spaceScopeUri") != null && soln.getResource("spaceScopeUri").getURI() != null) {
+			scopeUri = soln.getResource("spaceScopeUri").getURI();
+			if (scopeUri != null && scopeUri.equals("")) {
+			    scopeUris.add(scopeUri);
+			}
+		    }
+		} catch (Exception e1) {
+		}
+	    }
+	}
+	return scopeUris;
+    }
+    
+    private static List<String> retrieveTimeScope (String oc_uri) {
+	List<String> scopeUris = new ArrayList<String>();
+	String scopeUri = "";
+	String queryString = NameSpaces.getInstance().printSparqlNameSpaceList() + 
+	    "SELECT  ?timeScopeUri WHERE { " + 
+	    "    " + oc_uri + " hasco:hasTimeScope ?timeScopeUri . " + 
+	    "}";
+	Query query = QueryFactory.create(queryString);
+	
+	QueryExecution qexec = QueryExecutionFactory.sparqlService(Collections.getCollectionsName(Collections.METADATA_SPARQL), query);
+	ResultSet results = qexec.execSelect();
+	ResultSetRewindable resultsrw = ResultSetFactory.copyResults(results);
+	qexec.close();
+	
+	while (resultsrw.hasNext()) {
+	    QuerySolution soln = resultsrw.next();
+	    if (soln != null) {
+		try {
+		    if (soln.getResource("timeScopeUri") != null && soln.getResource("timeScopeUri").getURI() != null) {
+			scopeUri = soln.getResource("timeScopeUri").getURI();
+			if (scopeUri != null && scopeUri.equals("")) {
+			    scopeUris.add(scopeUri);
+			}
+		    }
+		} catch (Exception e1) {
+		}
+	    }
+	}
+	return scopeUris;
+    }
+    
+    public boolean inUriList(List<String> selected) {
+	for (String str : selected) {
+	    if (uri.equals(str)) {
+		return true;
+	    }
+	}
+	return false;
     }
 
     public static ObjectCollection find(String oc_uri) {
@@ -171,8 +281,6 @@ public class ObjectCollection extends HADatAcThing {
 	    "    " + oc_uri + " hasco:isMemberOf ?studyUri .  " + 
 	    "    OPTIONAL { " + oc_uri + " rdfs:comment ?comment } . " + 
 	    "    OPTIONAL { " + oc_uri + " hasco:hasScope ?hasScopeUri } . " + 
-	    "    OPTIONAL { " + oc_uri + " hasco:hasSpaceScope ?spaceScopeUri } . " + 
-	    "    OPTIONAL { " + oc_uri + " hasco:hasTimeScope ?timeScopeUri } . " + 
 	    "}";
 	System.out.println("Search In ObjectCollection: [" + queryString + "]");
 	Query query = QueryFactory.create(queryString);
@@ -192,8 +300,8 @@ public class ObjectCollection extends HADatAcThing {
 	String studyUriStr = "";
 	String commentStr = "";
 	String hasScopeUriStr = "";
-	String spaceScopeUriStr = "";
-	String timeScopeUriStr = "";
+	List<String> spaceScopeUrisStr = new ArrayList<String>();
+	List<String> timeScopeUrisStr = new ArrayList<String>();
 	
 	while (resultsrw.hasNext()) {
 	    QuerySolution soln = resultsrw.next();
@@ -232,22 +340,10 @@ public class ObjectCollection extends HADatAcThing {
 		} catch (Exception e1) {
 		    hasScopeUriStr = "";
 		}
+
+		spaceScopeUrisStr = retrieveSpaceScope(oc_uri);
 		
-		try {
-		    if (soln.getResource("spaceScopeUri") != null && soln.getResource("spaceScopeUri").getURI() != null) {
-			spaceScopeUriStr = soln.getResource("spaceScopeUri").getURI();
-		    }
-		} catch (Exception e1) {
-		    spaceScopeUriStr = "";
-		}
-		
-		try {
-		    if (soln.getResource("timeScopeUri") != null && soln.getResource("timeScopeUri").getURI() != null) {
-			timeScopeUriStr = soln.getResource("timeScopeUri").getURI();
-		    }
-		} catch (Exception e1) {
-		    timeScopeUriStr = "";
-		}
+		timeScopeUrisStr = retrieveTimeScope(oc_uri);
 		
 		oc = new ObjectCollection(oc_uri,
 					  typeStr,
@@ -255,8 +351,8 @@ public class ObjectCollection extends HADatAcThing {
 					  commentStr,
 					  studyUriStr,
 					  hasScopeUriStr,
-					  spaceScopeUriStr,
-					  timeScopeUriStr);
+					  spaceScopeUrisStr,
+					  timeScopeUrisStr);
 	    }
 	}
 
@@ -403,18 +499,22 @@ public class ObjectCollection extends HADatAcThing {
 		insert += oc_uri + " hasco:hasScope  " + this.getHasScopeUri() + " . ";
 	    }
 	}
-	if (this.getSpaceScopeUri() != null && !this.getSpaceScopeUri().equals("")) {
-	    if (this.getSpaceScopeUri().startsWith("http")) {
-		insert += oc_uri + " hasco:hasSpaceScope  <" + this.getSpaceScopeUri() + "> . ";
-	    } else {
-		insert += oc_uri + " hasco:hasSpaceScope  " + this.getSpaceScopeUri() + " . ";
+	if (this.getSpaceScopeUris() != null && !this.getSpaceScopeUris().equals("")) {
+	    for (String spaceScope : this.getSpaceScopeUris()) {
+		if (spaceScope.startsWith("http")) {
+		    insert += oc_uri + " hasco:hasSpaceScope  <" + spaceScope + "> . ";
+		} else {
+		    insert += oc_uri + " hasco:hasSpaceScope  " + spaceScope + " . ";
+		}
 	    }
 	}
-	if (this.getTimeScopeUri() != null && !this.getTimeScopeUri().equals("")) {
-	    if (this.getTimeScopeUri().startsWith("http")) {
-		insert += oc_uri + " hasco:hasTimeScope  <" + this.getTimeScopeUri() + "> . ";
-	    } else {
-		insert += oc_uri + " hasco:hasTimeScope  " + this.getTimeScopeUri() + " . ";
+	if (this.getTimeScopeUris() != null && !this.getTimeScopeUris().equals("")) {
+	    for (String timeScope : this.getTimeScopeUris()) {
+		if (timeScope.startsWith("http")) {
+		    insert += oc_uri + " hasco:hasTimeScope  <" + timeScope + "> . ";
+		} else {
+		    insert += oc_uri + " hasco:hasTimeScope  " + timeScope + " . ";
+		}
 	    }
 	}
     	insert += LINE_LAST;

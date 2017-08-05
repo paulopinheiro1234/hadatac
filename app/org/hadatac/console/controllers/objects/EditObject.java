@@ -51,18 +51,18 @@ public class EditObject extends Controller {
 
 	Study study = Study.find(std_uri);
 	if (study == null) {
-	    return badRequest(objectConfirm.render("Error editing object: Study URI did not return valid URI", std_uri, null));
+	    return badRequest(objectConfirm.render("Error editing object: Study URI did not return valid URI", std_uri, oc_uri, null));
 	} 
 
 	ObjectCollection oc = ObjectCollection.find(oc_uri);
 	if (oc == null) {
-	    return badRequest(objectConfirm.render("Error editing object: ObjectCollection URI did not return valid object", std_uri, null));
+	    return badRequest(objectConfirm.render("Error editing object: ObjectCollection URI did not return valid object", std_uri, oc_uri, null));
 	} 
 
 	List<StudyObject> objects = StudyObject.findByCollection(oc);
 
     	//return ok(editObject.render(study, oc, objects));
-	return badRequest(objectConfirm.render("PLACEHOLDER", std_uri, null));
+	return badRequest(objectConfirm.render("PLACEHOLDER", std_uri, oc_uri, null));
     }
     
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
@@ -83,7 +83,7 @@ public class EditObject extends Controller {
             return badRequest("The submitted form has errors!");
         }
         
-	return ok(objectConfirm.render("Object has been Edited", std_uri, null));
+	return ok(objectConfirm.render("Object has been Edited", std_uri, oc_uri, null));
     }
 
 }

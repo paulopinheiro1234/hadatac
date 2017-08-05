@@ -26,6 +26,14 @@
 	       value="@if(obj.getIsFrom() != null) { @obj.getIsFrom() }" onchange="checkform()" readonly>
      </td>
      <td>
+	<input type="text" class="form-control" name="newAtLocation" id="newAtLocation@if(obj.getUri() != null) {-@obj.getUri() }" 
+	       value="@if(obj.getAtLocation() != null) { @obj.getAtLocation() }" onchange="checkform()" readonly>
+     </td>
+     <td>
+	<input type="text" class="form-control" name="newAtTime" id="newAtTime@if(obj.getUri() != null) {-@obj.getUri() }" 
+	       value="@if(obj.getAtTime() != null) { @obj.getAtTime() }" onchange="checkform()" readonly>
+     </td>
+     <td>
         <a href="" class="btn-xs btn-primary" role="button">Delete</a>
      </td>
  </tr>

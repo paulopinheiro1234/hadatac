@@ -16,6 +16,8 @@
       <div class="row">
          <div class="navbar-collapse collapse navbar-secondary">
            <a href="@org.hadatac.console.controllers.objectcollections.routes.NewOC.index(study.getUri())" class="btn btn-primary" role="button">Create Object Collection</a>
+	   <a href="" class="btn btn-primary disabled" role="button">Visualize Object Collection Graph</a>
+	   <a href="" class="btn btn-primary disabled" role="button">Visualize Object Graph</a>
          </div>
       </div>
    </div>
@@ -26,7 +28,8 @@
 
       <h4>Subject Groups</h4>
    
-        <table class="table" id="rcorners">
+      <div id="rcorners">
+        <table class="table">
             <thead>
               <tr>
                 <!--  <th>Study URI</th>  -->
@@ -46,10 +49,12 @@
               }
             </tbody>
         </table>
+      </div>
 	
       <h4>Sample Collections</h4>
    
-        <table class="table" id="rcorners">
+      <div id="rcorners">
+        <table class="table">
             <thead>
               <tr>
                 <!--  <th>Study URI</th>  -->
@@ -70,17 +75,18 @@
               }
             </tbody>
         </table>
+      </div>
 	
       <h4>Location Collections</h4>
    
-        <table class="table" id="rcorners">
+      <div id="rcorners">
+        <table class="table">
             <thead>
               <tr>
                 <!--  <th>Study URI</th>  -->
                 <th>Name</th>
                 <th>Description</th>
                 <th>Location Scope</th>
-                <th>Time Scope</th>
 		<th># Objects</th>
                 <th>Operations</th>
               </tr>
@@ -93,16 +99,17 @@
               }
             </tbody>
         </table>
+      </div>
 	
       <h4>Time Collections</h4>
    
-        <table class="table" id="rcorners">
+      <div id="rcorners">
+        <table class="table">
             <thead>
               <tr>
                 <!--  <th>Study URI</th>  -->
                 <th>Name</th>
                 <th>Description</th>
-                <th>Location Scope</th>
                 <th>Time Scope</th>
 		<th># Objects</th>
                 <th>Operations</th>
@@ -116,7 +123,8 @@
               }
             </tbody>
         </table>
-	
+      </div>
+      <br>
 	<a href="@org.hadatac.console.controllers.studies.routes.StudyManagement.index()" class="btn btn-primary" role="button">Back to Study Management</a>
 	
     </div>
