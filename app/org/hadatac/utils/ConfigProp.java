@@ -9,8 +9,6 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.Properties;
 
-import org.hadatac.console.controllers.triplestore.LoadKB;
-
 public class ConfigProp {
 	
 	private static Properties getProperties(String confFileName) {
