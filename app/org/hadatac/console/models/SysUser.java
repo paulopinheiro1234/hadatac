@@ -280,10 +280,9 @@ public class SysUser implements Subject {
 	
 	private static List<SysUser> getAuthUserFindSolr(
 		final AuthUserIdentity identity) {
-		HttpSolrClient.Builder builder = new HttpSolrClient.Builder(
+		SolrClient solrClient = new HttpSolrClient.Builder(
 				Play.application().configuration().getString("hadatac.solr.users") 
-				+ Collections.AUTHENTICATE_USERS);
-		SolrClient solrClient = builder.build();
+				+ Collections.AUTHENTICATE_USERS).build();
 		String query = "active:true AND provider_user_id:" + identity.getId() + " AND provider_key:" + identity.getProvider();
     	SolrQuery solrQuery = new SolrQuery(query);
     	List<SysUser> users = new ArrayList<SysUser>();
@@ -340,10 +339,9 @@ public class SysUser implements Subject {
 	}
 	
 	public static SysUser findByIdSolr(final String id) {
-		HttpSolrClient.Builder builder = new HttpSolrClient.Builder(
+		SolrClient solrClient = new HttpSolrClient.Builder(
 				Play.application().configuration().getString("hadatac.solr.users") 
-				+ Collections.AUTHENTICATE_USERS);
-		SolrClient solrClient = builder.build();
+				+ Collections.AUTHENTICATE_USERS).build();
 		
     	SolrQuery solrQuery = new SolrQuery("id:" + id);
     	SysUser user = null;
@@ -460,10 +458,9 @@ public class SysUser implements Subject {
 	}
 	
 	public static boolean existsSolr() {
-		HttpSolrClient.Builder builder = new HttpSolrClient.Builder(
+		SolrClient solrClient = new HttpSolrClient.Builder(
 				Play.application().configuration().getString("hadatac.solr.users") 
-				+ Collections.AUTHENTICATE_USERS);
-		SolrClient solrClient = builder.build();
+				+ Collections.AUTHENTICATE_USERS).build();
     	SolrQuery solrQuery = new SolrQuery("*:*");
     	
     	try {
@@ -540,10 +537,9 @@ public class SysUser implements Subject {
 	}
 	
 	public void save() {
-		HttpSolrClient.Builder builder = new HttpSolrClient.Builder(
+		SolrClient solrClient = new HttpSolrClient.Builder(
 				Play.application().configuration().getString("hadatac.solr.users") 
-				+ Collections.AUTHENTICATE_USERS);
-		SolrClient solrClient = builder.build();
+				+ Collections.AUTHENTICATE_USERS).build();
         
         try {
 			solrClient.addBean(this);
@@ -563,10 +559,9 @@ public class SysUser implements Subject {
 	
 	public int delete() {
 		try {
-			HttpSolrClient.Builder builder = new HttpSolrClient.Builder(
+			SolrClient solr = new HttpSolrClient.Builder(
 					Play.application().configuration().getString("hadatac.solr.users") 
-					+ Collections.AUTHENTICATE_USERS);
-			SolrClient solr = builder.build();
+					+ Collections.AUTHENTICATE_USERS).build();
 			UpdateResponse response = solr.deleteById(this.id_s);
 			solr.commit();
 			solr.close();
@@ -635,10 +630,9 @@ public class SysUser implements Subject {
 	}
 	
 	private static List<SysUser> getEmailUserFindSolr(final String email, final String providerKey) {
-		HttpSolrClient.Builder builder = new HttpSolrClient.Builder(
+		SolrClient solrClient = new HttpSolrClient.Builder(
 				Play.application().configuration().getString("hadatac.solr.users") 
-				+ Collections.AUTHENTICATE_USERS);
-		SolrClient solrClient = builder.build();
+				+ Collections.AUTHENTICATE_USERS).build();
 		String query = "email:" + email + " AND active:true";
     	SolrQuery solrQuery = new SolrQuery(query);
     	List<SysUser> users = new ArrayList<SysUser>();
@@ -666,10 +660,9 @@ public class SysUser implements Subject {
 	}
 	
 	public static String outputAsJson() {
-		HttpSolrClient.Builder builder = new HttpSolrClient.Builder(
+		SolrClient solrClient = new HttpSolrClient.Builder(
 				Play.application().configuration().getString("hadatac.solr.users") 
-				+ Collections.AUTHENTICATE_USERS);
-		SolrClient solrClient = builder.build();
+				+ Collections.AUTHENTICATE_USERS).build();
 		String query = "*:*";
     	SolrQuery solrQuery = new SolrQuery(query);
     	
@@ -746,7 +739,7 @@ public class SysUser implements Subject {
 			user.setLastLogin(Instant.now().toString());
 		}
 		else {
-			user.setLastLogin(((Date)doc.getFieldValue("last_login")).toInstant().toString());
+			user.setLastLogin(doc.getFieldValue("last_login").toString());
 		}
 		user.active = Boolean.parseBoolean(doc.getFieldValue("active").toString());
 		user.emailValidated = Boolean.parseBoolean(doc.getFieldValue("email_validated").toString());
@@ -754,7 +747,10 @@ public class SysUser implements Subject {
 		user.roles = new ArrayList<SecurityRole>();
 		Iterator<Object> i = doc.getFieldValues("security_role_id").iterator();
 		while (i.hasNext()) {
-			user.roles.add(SecurityRole.findByIdSolr(i.next().toString()));
+			SecurityRole role = SecurityRole.findByIdSolr(i.next().toString());
+			if (null != role) {
+				user.roles.add(role);
+			}
 		}
 		
 		user.permissions = new ArrayList<UserPermission>();

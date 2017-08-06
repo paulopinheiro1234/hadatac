@@ -520,9 +520,9 @@ public class DataAcquisition {
 	
 	public int save() {
 		try {
-			SolrClient client = new HttpSolrClient(
+			SolrClient client = new HttpSolrClient.Builder(
 					Play.application().configuration().getString("hadatac.solr.data") 
-					+ Collections.DATA_COLLECTION);
+					+ Collections.DATA_COLLECTION).build();
 			if (null == endedAt) {
 				endedAt = DateTime.parse("9999-12-31T23:59:59.999Z");
 			}
@@ -743,9 +743,9 @@ public class DataAcquisition {
 	
 	public static DataAcquisition findDataAcquisition(SolrQuery query) {
 		DataAcquisition dataAcquisition = null;
-		SolrClient solr = new HttpSolrClient(
+		SolrClient solr = new HttpSolrClient.Builder(
 				Play.application().configuration().getString("hadatac.solr.data") 
-				+ Collections.DATA_COLLECTION);
+				+ Collections.DATA_COLLECTION).build();
 		
 		try {
 			QueryResponse queryResponse = solr.query(query);
@@ -785,9 +785,9 @@ public class DataAcquisition {
 		try {
 			deleteMeasurementData();
 			
-			SolrClient solr = new HttpSolrClient(
+			SolrClient solr = new HttpSolrClient.Builder(
 					Play.application().configuration().getString("hadatac.solr.data") 
-					+ Collections.DATA_COLLECTION);
+					+ Collections.DATA_COLLECTION).build();
 			UpdateResponse response = solr.deleteById(this.uri);
 			solr.commit();
 			solr.close();
@@ -817,9 +817,9 @@ public class DataAcquisition {
 	public static List<DataAcquisition> findByQuery(SolrQuery query) {
 		List<DataAcquisition> results = new ArrayList<DataAcquisition>();
 		
-		SolrClient solr = new HttpSolrClient(
+		SolrClient solr = new HttpSolrClient.Builder(
 				Play.application().configuration().getString("hadatac.solr.data") 
-				+ Collections.DATA_COLLECTION);
+				+ Collections.DATA_COLLECTION).build();
 
 		try {
 			QueryResponse response = solr.query(query);

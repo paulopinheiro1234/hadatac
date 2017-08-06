@@ -56,9 +56,9 @@ public class SecurityRole implements Role {
 	}
 	
 	public static boolean existsSolr() {
-		SolrClient solrClient = new HttpSolrClient(
+		SolrClient solrClient = new HttpSolrClient.Builder(
 				Play.application().configuration().getString("hadatac.solr.users") 
-				+ Collections.AUTHENTICATE_ROLES);
+				+ Collections.AUTHENTICATE_ROLES).build();
     	SolrQuery solrQuery = new SolrQuery("*:*");
     	
     	try {
@@ -77,9 +77,9 @@ public class SecurityRole implements Role {
 	
 	public static SecurityRole findByIdSolr(String id) {
 		SecurityRole role = null;
-		SolrClient solrClient = new HttpSolrClient(
+		SolrClient solrClient = new HttpSolrClient.Builder(
 				Play.application().configuration().getString("hadatac.solr.users") 
-				+ Collections.AUTHENTICATE_ROLES);
+				+ Collections.AUTHENTICATE_ROLES).build();
     	SolrQuery solrQuery = new SolrQuery("id:" + id);
     	
     	try {
@@ -98,9 +98,9 @@ public class SecurityRole implements Role {
 	
 	public static SecurityRole findByRoleNameSolr(String roleName) {
 		SecurityRole role = null;
-		SolrClient solrClient = new HttpSolrClient(
+		SolrClient solrClient = new HttpSolrClient.Builder(
 				Play.application().configuration().getString("hadatac.solr.users") 
-				+ Collections.AUTHENTICATE_ROLES);
+				+ Collections.AUTHENTICATE_ROLES).build();
     	SolrQuery solrQuery = new SolrQuery("role_name:" + roleName);
     	
     	try {
@@ -118,9 +118,9 @@ public class SecurityRole implements Role {
 	}
 	
 	public void save() {
-		SolrClient solrClient = new HttpSolrClient(
+		SolrClient solrClient = new HttpSolrClient.Builder(
 				Play.application().configuration().getString("hadatac.solr.users") 
-				+ Collections.AUTHENTICATE_ROLES);
+				+ Collections.AUTHENTICATE_ROLES).build();
 		
 		if (this.id_s == null) {
 			this.id_s = UUID.randomUUID().toString();

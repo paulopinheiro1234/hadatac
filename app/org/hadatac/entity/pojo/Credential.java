@@ -45,9 +45,9 @@ public class Credential {
 	
 	public int save() {
 		try {
-			SolrClient client = new HttpSolrClient(
+			SolrClient client = new HttpSolrClient.Builder(
 					Play.application().configuration().getString("hadatac.solr.data") 
-					+ Collections.LABKEY_CREDENTIAL);
+					+ Collections.LABKEY_CREDENTIAL).build();
 			int status = client.addBean(this).getStatus();
 			client.commit();
 			client.close();
@@ -60,9 +60,9 @@ public class Credential {
 	
 	public int delete() {
 		try {
-			SolrClient solr = new HttpSolrClient(
+			SolrClient solr = new HttpSolrClient.Builder(
 					Play.application().configuration().getString("hadatac.solr.data") 
-					+ Collections.LABKEY_CREDENTIAL);
+					+ Collections.LABKEY_CREDENTIAL).build();
 			UpdateResponse response = solr.deleteById(this.getUserName());
 			solr.commit();
 			solr.close();
@@ -89,9 +89,9 @@ public class Credential {
 	public static List<Credential> findByQuery(SolrQuery query) {
 		List<Credential> list = new ArrayList<Credential>();
 		
-		SolrClient solr = new HttpSolrClient(
+		SolrClient solr = new HttpSolrClient.Builder(
 				Play.application().configuration().getString("hadatac.solr.data") 
-				+ Collections.LABKEY_CREDENTIAL);
+				+ Collections.LABKEY_CREDENTIAL).build();
 
 		try {
 			QueryResponse response = solr.query(query);

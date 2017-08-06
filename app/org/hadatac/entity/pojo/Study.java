@@ -376,9 +376,9 @@ public class Study {
     public static MetadataAcquisitionQueryResult find(int page, int qtd, List<String> permissions, FacetHandler handler) {
 	MetadataAcquisitionQueryResult result = new MetadataAcquisitionQueryResult();
 	
-	SolrClient solr = new HttpSolrClient(
+	SolrClient solr = new HttpSolrClient.Builder(
 					     Play.application().configuration().getString("hadatac.solr.data")
-					     + Collections.STUDIES);
+					     + Collections.STUDIES).build();
 	SolrQuery query = new SolrQuery();
 	String permission_query = "";
 	String facet_query = "";
@@ -787,9 +787,9 @@ public class Study {
     }
     
     public int deleteDataAcquisitions() {
-	SolrClient study_solr = new HttpSolrClient(
+	SolrClient study_solr = new HttpSolrClient.Builder(
 						   Play.application().configuration().getString("hadatac.solr.data")
-						   + Collections.DATA_COLLECTION);
+						   + Collections.DATA_COLLECTION).build();
 	try {
 	    UpdateResponse response = study_solr.deleteByQuery("study_uri:\"" + studyUri + "\"");
 	    study_solr.commit();
@@ -807,23 +807,23 @@ public class Study {
     }
     
     public int deleteMeasurements() {
-	SolrClient study_solr = new HttpSolrClient(
-						   Play.application().configuration().getString("hadatac.solr.data")
-						   + Collections.DATA_ACQUISITION);
-	try {
-	    UpdateResponse response = study_solr.deleteByQuery("study_uri:\"" + DynamicFunctions.replaceURLWithPrefix(studyUri) + "\"");
-	    study_solr.commit();
-	    study_solr.close();
-	    return response.getStatus();
-	} catch (SolrServerException e) {
-	    System.out.println("[ERROR] Study.delete() - SolrServerException message: " + e.getMessage());
-	} catch (IOException e) {
-	    System.out.println("[ERROR] Study.delete() - IOException message: " + e.getMessage());
-	} catch (Exception e) {
-	    System.out.println("[ERROR] Study.delete() - Exception message: " + e.getMessage());
-	}
-	
-	return -1;
+		SolrClient study_solr = new HttpSolrClient.Builder(
+							   Play.application().configuration().getString("hadatac.solr.data")
+							   + Collections.DATA_ACQUISITION).build();
+		try {
+		    UpdateResponse response = study_solr.deleteByQuery("study_uri:\"" + DynamicFunctions.replaceURLWithPrefix(studyUri) + "\"");
+		    study_solr.commit();
+		    study_solr.close();
+		    return response.getStatus();
+		} catch (SolrServerException e) {
+		    System.out.println("[ERROR] Study.delete() - SolrServerException message: " + e.getMessage());
+		} catch (IOException e) {
+		    System.out.println("[ERROR] Study.delete() - IOException message: " + e.getMessage());
+		} catch (Exception e) {
+		    System.out.println("[ERROR] Study.delete() - Exception message: " + e.getMessage());
+		}
+		
+		return -1;
     }
     
     public void save() {
@@ -888,21 +888,21 @@ public class Study {
     
     @Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
     public int saveSolr() {
-	try {
-	    SolrClient solr = new HttpSolrClient(
-				  Play.application().configuration().getString("hadatac.solr.data") +
-				  Collections.STUDIES);
-	    if (endedAt.toString().startsWith("9999")) {
-		endedAt = DateTime.parse("9999-12-31T23:59:59.999Z");
-	    }
-	    int status = solr.addBean(this).getStatus();
-	    solr.commit();
-	    solr.close();
-	    return status;
-	} catch (IOException | SolrServerException e) {
-	    System.out.println("[ERROR] Study.save(SolrClient) - e.Message: " + e.getMessage());
-	    return -1;
-	}
+		try {
+		    SolrClient solr = new HttpSolrClient.Builder(
+					  Play.application().configuration().getString("hadatac.solr.data") +
+					  Collections.STUDIES).build();
+		    if (endedAt.toString().startsWith("9999")) {
+		    	endedAt = DateTime.parse("9999-12-31T23:59:59.999Z");
+		    }
+		    int status = solr.addBean(this).getStatus();
+		    solr.commit();
+		    solr.close();
+		    return status;
+		} catch (IOException | SolrServerException e) {
+		    System.out.println("[ERROR] Study.save(SolrClient) - e.Message: " + e.getMessage());
+		    return -1;
+		}
     }
 
     @Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
@@ -960,40 +960,38 @@ public class Study {
     }
     
     public int deleteFromSolr() {
-	SolrClient study_solr = new HttpSolrClient(
-				    Play.application().configuration().getString("hadatac.solr.data") +
-				    Collections.STUDIES);
-	try {
-	    UpdateResponse response = study_solr.deleteByQuery("studyUri:\"" + studyUri + "\"");
-	    study_solr.commit();
-	    study_solr.close();
-	    return response.getStatus();
-	} catch (SolrServerException e) {
-	    System.out.println("[ERROR] Study.delete() - SolrServerException message: " + e.getMessage());
-	} catch (IOException e) {
-	    System.out.println("[ERROR] Study.delete() - IOException message: " + e.getMessage());
-	} catch (Exception e) {
-	    System.out.println("[ERROR] Study.delete() - Exception message: " + e.getMessage());
-	}
-	
-	return -1;
+    	SolrClient study_solr = new HttpSolrClient.Builder(
+					    Play.application().configuration().getString("hadatac.solr.data") +
+					    Collections.STUDIES).build();
+		try {
+		    UpdateResponse response = study_solr.deleteByQuery("studyUri:\"" + studyUri + "\"");
+		    study_solr.commit();
+		    study_solr.close();
+		    return response.getStatus();
+		} catch (SolrServerException e) {
+		    System.out.println("[ERROR] Study.delete() - SolrServerException message: " + e.getMessage());
+		} catch (IOException e) {
+		    System.out.println("[ERROR] Study.delete() - IOException message: " + e.getMessage());
+		} catch (Exception e) {
+		    System.out.println("[ERROR] Study.delete() - Exception message: " + e.getMessage());
+		}
+		
+		return -1;
     }
     
     @Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
     public int deleteFromLabKey(String user_name, String password) throws CommandException {
-	String site = ConfigProp.getPropertyValue("labkey.config", "site");
-        String path = "/" + ConfigProp.getPropertyValue("labkey.config", "folder");
-    	LabkeyDataHandler loader = new LabkeyDataHandler(site, user_name, password, path);
-    	List< Map<String, Object> > rows = new ArrayList< Map<String, Object> >();
-    	Map<String, Object> row = new HashMap<String, Object>();
-    	row.put("hasURI", ValueCellProcessing.replaceNameSpaceEx(getUri().replace("<","").replace(">","")));
-    	rows.add(row);
-	for (Map<String,Object> str : rows) {
-	    System.out.println("deleting Study " + str.get("hasURI"));
-	}
-    	return loader.deleteRows("Study", rows);
-    }
-    
-
-
+		String site = ConfigProp.getPropertyValue("labkey.config", "site");
+	        String path = "/" + ConfigProp.getPropertyValue("labkey.config", "folder");
+	    	LabkeyDataHandler loader = new LabkeyDataHandler(site, user_name, password, path);
+	    	List< Map<String, Object> > rows = new ArrayList< Map<String, Object> >();
+	    	Map<String, Object> row = new HashMap<String, Object>();
+	    	row.put("hasURI", ValueCellProcessing.replaceNameSpaceEx(getUri().replace("<","").replace(">","")));
+	    	rows.add(row);
+		for (Map<String,Object> str : rows) {
+		    System.out.println("deleting Study " + str.get("hasURI"));
+		}
+	    
+		return loader.deleteRows("Study", rows);
+		}
 }

@@ -40,8 +40,8 @@ public class SolrUtils {
 	
 	public static boolean clearCollection(String solrCollection) {
 		try {
-			SolrClient solr = new HttpSolrClient(solrCollection);
-			UpdateResponse response = solr.deleteByQuery("*:*");
+			SolrClient solr = new HttpSolrClient.Builder(solrCollection).build();
+			solr.deleteByQuery("*:*");
 			solr.commit();
 			solr.close();
 			

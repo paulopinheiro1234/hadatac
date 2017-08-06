@@ -65,7 +65,9 @@ public class Parser2 {
 	int batch_size = 10000;
 	
 	boolean isSubjectPlatform = Subject.isPlatform(da.getDeployment().getPlatform().getUri());
-	SolrClient solr = new HttpSolrClient(Play.application().configuration().getString("hadatac.solr.data") + Collections.DATA_ACQUISITION);
+	SolrClient solr = new HttpSolrClient.Builder(
+			Play.application().configuration().getString("hadatac.solr.data") 
+			+ Collections.DATA_ACQUISITION).build();
 	boolean isSample;
 	boolean isSubject;
 	String matrix = "";

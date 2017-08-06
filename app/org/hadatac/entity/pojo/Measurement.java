@@ -370,10 +370,9 @@ public class Measurement {
 	}
 
 	public int save() {
-		HttpSolrClient.Builder builder = new HttpSolrClient.Builder(
+		SolrClient solr = new HttpSolrClient.Builder(
 				Play.application().configuration().getString("hadatac.solr.data") 
-				+ Collections.DATA_ACQUISITION);
-		SolrClient solr = builder.build();
+				+ Collections.DATA_ACQUISITION).build();
 		try {
 			int status = solr.addBean(this).getStatus();
 			solr.commit();
@@ -386,10 +385,9 @@ public class Measurement {
 	}
 
 	public static int delete(String datasetUri) {
-		HttpSolrClient.Builder builder = new HttpSolrClient.Builder(
+		SolrClient solr = new HttpSolrClient.Builder(
 				Play.application().configuration().getString("hadatac.solr.data") 
-				+ Collections.DATA_ACQUISITION);
-		SolrClient solr = builder.build();
+				+ Collections.DATA_ACQUISITION).build();
 		try {
 			UpdateResponse response = solr.deleteByQuery("dataset_uri:\"" + datasetUri + "\"");
 			solr.commit();
@@ -504,14 +502,12 @@ public class Measurement {
 		query.setFacet(false);
 
 		try {
-			HttpSolrClient.Builder builder = new HttpSolrClient.Builder(
+			SolrClient solr = new HttpSolrClient.Builder(
 					Play.application().configuration().getString("hadatac.solr.data") 
-					+ Collections.DATA_ACQUISITION);
-			SolrClient solr = builder.build();
+					+ Collections.DATA_ACQUISITION).build();
 			QueryResponse queryResponse = solr.query(query, SolrRequest.METHOD.POST);
 			solr.close();
 			SolrDocumentList results = queryResponse.getResults();
-			//System.out.println("SolrDocumentList: " + results.size());
 			Iterator<SolrDocument> m = results.iterator();
 			while (m.hasNext()) {
 				result.documents.add(convertFromSolr(m.next()));
@@ -534,10 +530,9 @@ public class Measurement {
 		query.addSort(field, SolrQuery.ORDER.asc);
 		
 		try {
-			HttpSolrClient.Builder builder = new HttpSolrClient.Builder(
+			SolrClient solr = new HttpSolrClient.Builder(
 					Play.application().configuration().getString("hadatac.solr.data") 
-					+ Collections.DATA_ACQUISITION);
-			SolrClient solr = builder.build();
+					+ Collections.DATA_ACQUISITION).build();
 			
 			QueryResponse queryResponse = solr.query(query, SolrRequest.METHOD.POST);
 			solr.close();
@@ -566,10 +561,9 @@ public class Measurement {
 		query.addSort(field, SolrQuery.ORDER.desc);
 		
 		try {
-			HttpSolrClient.Builder builder = new HttpSolrClient.Builder(
+			SolrClient solr = new HttpSolrClient.Builder(
 					Play.application().configuration().getString("hadatac.solr.data") 
-					+ Collections.DATA_ACQUISITION);
-			SolrClient solr = builder.build();
+					+ Collections.DATA_ACQUISITION).build();
 			
 			QueryResponse queryResponse = solr.query(query, SolrRequest.METHOD.POST);
 			solr.close();
@@ -659,15 +653,13 @@ public class Measurement {
 		query.addFacetPivotField("platform_name,instrument_model");
 
 		try {
-			HttpSolrClient.Builder builder = new HttpSolrClient.Builder(
+			SolrClient solr = new HttpSolrClient.Builder(
 					Play.application().configuration().getString("hadatac.solr.data") 
-					+ Collections.DATA_ACQUISITION);
-			SolrClient solr = builder.build();
+					+ Collections.DATA_ACQUISITION).build();
 			System.out.println("!!!! QUERY: " + query.toQueryString());
 			QueryResponse queryResponse = solr.query(query, SolrRequest.METHOD.POST);
 			solr.close();
 			SolrDocumentList results = queryResponse.getResults();
-			//System.out.println("SolrDocumentList: " + results.size());
 			Iterator<SolrDocument> m = results.iterator();
 			while (m.hasNext()) {
 				result.documents.add(convertFromSolr(m.next()));
@@ -820,10 +812,9 @@ public class Measurement {
 	}
 
 	public static long getNumByDataAcquisition(DataAcquisition dataAcquisition) {
-		HttpSolrClient.Builder builder = new HttpSolrClient.Builder(
+		SolrClient solr = new HttpSolrClient.Builder(
 				Play.application().configuration().getString("hadatac.solr.data") 
-				+ Collections.DATA_ACQUISITION);
-		SolrClient solr = builder.build();
+				+ Collections.DATA_ACQUISITION).build();
 		SolrQuery query = new SolrQuery();
 		query.set("q", "acquisition_uri:\"" + dataAcquisition.getUri() + "\"");
 		query.set("rows", "10000000");
@@ -853,10 +844,9 @@ public class Measurement {
 	public static List<Measurement> findByDataAcquisitionUri(String acquisition_uri) {
 		List<Measurement> listMeasurement = new ArrayList<Measurement>();
 
-		HttpSolrClient.Builder builder = new HttpSolrClient.Builder(
+		SolrClient solr = new HttpSolrClient.Builder(
 				Play.application().configuration().getString("hadatac.solr.data") 
-				+ Collections.DATA_ACQUISITION);
-		SolrClient solr = builder.build();
+				+ Collections.DATA_ACQUISITION).build();
 		SolrQuery query = new SolrQuery();
 		query.set("q", "acquisition_uri:\"" + acquisition_uri + "\"");
 		query.set("rows", "10000000");

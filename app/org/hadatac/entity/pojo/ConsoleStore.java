@@ -56,9 +56,9 @@ public class ConsoleStore {
 	
 	public int save() {
 		try {
-			SolrClient client = new HttpSolrClient(
+			SolrClient client = new HttpSolrClient.Builder(
 					Play.application().configuration().getString("hadatac.solr.data") 
-					+ Collections.CONSOLE_STORE);
+					+ Collections.CONSOLE_STORE).build();
 			int status = client.addBean(this).getStatus();
 			client.commit();
 			client.close();
@@ -72,9 +72,9 @@ public class ConsoleStore {
 	public static ConsoleStore find() {
 		ConsoleStore consoleStore = null;
 		
-		SolrClient client = new HttpSolrClient(
+		SolrClient client = new HttpSolrClient.Builder(
 				Play.application().configuration().getString("hadatac.solr.data") 
-				+ Collections.CONSOLE_STORE);
+				+ Collections.CONSOLE_STORE).build();
         SolrQuery query = new SolrQuery();
         query.set("q", "*:*");
         query.set("sort", "last_dynamic_metadata_id desc");
