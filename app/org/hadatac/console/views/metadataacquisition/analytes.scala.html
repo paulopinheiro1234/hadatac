@@ -1,5 +1,5 @@
 @(collection_url : String,
-  indicators : List[String],
+  indicatorList : List[String],
   bAdmin : Boolean)
 
 @import helper._
@@ -26,7 +26,7 @@ jQuery(document).ready(function($) {
     search_index: 'solr',
     datatype: 'json',
     facets: [ 
-    	@for(studyIndicator <- indicators){    
+    	@for(studyIndicator <- indicatorList){    
     		{
     		'field': '@studyIndicator.replace(" ","").replace(",","")_m', 
     		'display': '@studyIndicator'
@@ -34,7 +34,7 @@ jQuery(document).ready(function($) {
     }],
     search_sortby: [
         {'field':'studyUri.exact', 'display':'Study URI'},
-    	@for(studyIndicator <- indicators){
+    	@for(studyIndicator <- indicatorList){
     		{
     		'field': '@studyIndicator.replace(" ","").replace(",","")_m.exact', 
     		'display': '@studyIndicator'
@@ -42,7 +42,7 @@ jQuery(document).ready(function($) {
     }],
     searchbox_fieldselect: [
         {'field':'studyUri.exact', 'display':'Study URI'},
-    	@for(studyIndicator <- indicators){
+    	@for(studyIndicator <- indicatorList){
     		{
     		'field': '@studyIndicator.replace(" ","").replace(",","")_m.exact', 
     		'display': '@studyIndicator'

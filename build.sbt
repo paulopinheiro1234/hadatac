@@ -23,7 +23,7 @@ val appDependencies = Seq(
   "org.apache.httpcomponents" % "httpclient" % "4.5.2",
   "org.apache.httpcomponents" % "fluent-hc" % "4.5.2",
   "org.apache.poi" % "poi-ooxml" % "3.14",
-  "org.apache.solr" % "solr-solrj" % "5.3.2",
+  "org.apache.solr" % "solr-solrj" % "6.5.0",
   "org.apache.jena" % "jena-core" % "3.0.1",
   "org.apache.jena" % "jena-arq" % "3.0.1",
   "args4j" % "args4j" % "2.33",

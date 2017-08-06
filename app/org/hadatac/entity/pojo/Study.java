@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.labkey.remoteapi.CommandException;
 import org.apache.jena.query.Query;
 import org.apache.jena.query.QueryExecution;
 import org.apache.jena.query.QueryExecutionFactory;
@@ -19,6 +20,10 @@ import org.apache.jena.query.ResultSet;
 import org.apache.jena.query.ResultSetFactory;
 import org.apache.jena.query.ResultSetFormatter;
 import org.apache.jena.query.ResultSetRewindable;
+import org.apache.jena.update.UpdateExecutionFactory;
+import org.apache.jena.update.UpdateFactory;
+import org.apache.jena.update.UpdateProcessor;
+import org.apache.jena.update.UpdateRequest;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
 import org.apache.jena.rdf.model.Property;
@@ -38,6 +43,7 @@ import org.apache.solr.client.solrj.response.UpdateResponse;
 import org.apache.solr.client.solrj.response.FacetField.Count;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
+import org.hadatac.entity.pojo.DataAcquisition;
 import org.hadatac.console.controllers.metadata.DynamicFunctions;
 import org.hadatac.console.models.FacetHandler;
 import org.hadatac.console.models.Pivot;
@@ -45,794 +51,949 @@ import org.hadatac.data.model.MetadataAcquisitionQueryResult;
 import org.hadatac.utils.Collections;
 import org.hadatac.utils.NameSpaces;
 import org.hadatac.utils.State;
+import org.hadatac.utils.ConfigProp;
+import org.hadatac.metadata.loader.LabkeyDataHandler;
+import org.hadatac.metadata.loader.ValueCellProcessing;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 import org.joda.time.format.ISODateTimeFormat;
+import org.hadatac.console.controllers.AuthApplication;
 
+import be.objectify.deadbolt.java.actions.Group;
+import be.objectify.deadbolt.java.actions.Restrict;
 import play.Play;
 
 public class Study {
-	private DateTime startedAt;
-	private DateTime endedAt;
-	
-	@Field("studyUri")
-	private String studyUri;
-//	@Field("permission_uri")
-//	private String permissionUri;
-	@Field("studyLabel_i")
-	private String label;
-	@Field("proj_i")
-	private String project;
-	@Field("studyComment_i")
-	private String comment;
-	@Field("institutionName_i")
-	private String institution;
-	@Field("agentName_i")
-	private String agent;
-	@Field("studyTitle_i")
-	private String title;
-	
-	private List<DataAcquisition> dataAcquisitions;
-	
-	
-	// Constructer
-	public Study() {
-		startedAt = null;
-		endedAt = null;
-//		permissionUri = "";
-		label = "";
-		project= "";
-		comment = "";
-		institution = "";
-		agent = "";
-	}
-	
-	// get Methods
-	public String getUri() {
-		return studyUri;
-	}
-	
-/*	public String getPermissionUri() {
-		return permissionUri;
-	}
-	*/
-	public String getLabel() {
-		return label;
-	}
-	
-	public String getProject() {
-		return project;
-	}
-	
-	public String getComment() {
-		return comment;
-	}
-	
-/*	public int getNumSamples() {
-		return numSamples;
-	}
-	
-	public int getNumSubjects() {
-		return numSubjects;
-	}*/
-	
-	public String getInstitution() {
-		return institution;
-	}
-	
-	public String getAgent() {
-		return agent;
-	}
-	
-	public String getTitle() {
-		return title;
-	}
-	
-	public List<DataAcquisition> getDataAcquisitions() {
-    	return dataAcquisitions;
+
+    public static String INSERT_LINE1 = "INSERT DATA {  ";
+    public static String DELETE_LINE1 = "DELETE WHERE {  ";
+    public static String DELETE_LINE3 = " ?p ?o . ";
+    public static String LINE_LAST = "}  ";
+    public static String PREFIX = "STD-";
+
+    @Field("studyUri")
+    private String studyUri;
+
+    private String studyType;
+    
+    @Field("studyLabel_i")
+    private String label;
+
+    @Field("studyTitle_i")
+    private String title;
+    
+    @Field("proj_i")
+    private String project;
+
+    @Field("studyComment_i")
+    private String comment;
+
+    @Field("institutionName_i")
+    private String institutionUri;
+
+    @Field("agentName_i")
+    private String agentUri;
+
+    private DateTime startedAt;
+
+    private DateTime endedAt;
+
+    private List<DataAcquisition> dataAcquisitions;
+
+    private Agent agent;
+
+    private Agent institution;
+
+    private String lastId;
+
+    // Constructer
+
+    public Study(String studyUri,
+		 String studyType,
+		 String label,
+		 String title,
+		 String project,
+		 String comment,
+		 String institutionUri,
+		 String agentUri,
+		 String startDateTime,
+		 String endDateTime) {
+	this.studyUri = studyUri;
+	this.studyType = studyType;
+	this.label = label;
+	this.title = title;
+	this.project = project;
+	this.comment = comment;
+	this.institutionUri = institutionUri;
+	this.agentUri = agentUri;
+	this.setStartedAt(startDateTime);
+	this.setEndedAt(endDateTime);
+	this.dataAcquisitions = new ArrayList<DataAcquisition>();
+	this.lastId= "0";
     }
     
-    public void setDataAcquisitions(List<DataAcquisition> dataAcquisition) {
-    	this.dataAcquisitions = dataAcquisition;
+    public Study() {
+	this.studyUri = "";
+	this.studyType = "";
+	this.label = "";
+	this.title = "";
+	this.project = "";
+	this.comment = "";
+	this.institutionUri = "";
+	this.agentUri = "";
+	this.setStartedAt("");
+	this.setEndedAt("");
+	this.dataAcquisitions = new ArrayList<DataAcquisition>();
+	this.lastId = "0";
+    }
+    
+    public String getUri() {
+	return studyUri;
+    }
+    
+    public String getLabel() {
+	return label;
+    }
+    
+    public String getProject() {
+	return project;
+    }
+    
+    public String getComment() {
+	return comment;
+    }
+    
+    public String getInstitutionUri() {
+	return institutionUri;
     }
 	
-	// get Start Time Methods
-	public String getStartedAt() {
-		DateTimeFormatter formatter = ISODateTimeFormat.dateTime();
-		return formatter.withZone(DateTimeZone.UTC).print(startedAt);
+    public Agent getInstitution() {
+	if (institutionUri == null || institutionUri.equals("")) {
+	    return null;
 	}
-	public String getStartedAtXsd() {
-		DateTimeFormatter formatter = ISODateTimeFormat.dateTimeNoMillis();
-		return formatter.withZone(DateTimeZone.UTC).print(startedAt);
+	if (institution != null && institution.getUri().equals(institutionUri)) {
+	    return institution;
+	}
+	return Agent.find(institutionUri);
+    }
+	
+    public String getAgentUri() {
+	return agentUri;
+    }
+    
+    public Agent getAgent() {
+	if (agentUri == null || agentUri.equals("")) {
+	    return null;
+	}
+	if (agent != null && agent.getUri().equals(agentUri)) {
+	    return agent;
+	}
+	return Agent.find(agentUri);
+    }
+	
+    public String getTitle() {
+	return title;
+    }
+    
+    public String getType() {
+	return studyType;
+    }
+    
+    public long getLastId() {
+	if (this.lastId == null) {
+	    return 0;
+	}
+	return Long.parseLong(this.lastId);
+    }
+    
+    public List<DataAcquisition> getDataAcquisitions() {
+	return dataAcquisitions;
+    }
+    
+    // get Start Time Methods
+    public String getStartedAt() {
+	DateTimeFormatter formatter = ISODateTimeFormat.dateTime();
+	return formatter.withZone(DateTimeZone.UTC).print(startedAt);
+    }
+    public String getStartedAtXsd() {
+	DateTimeFormatter formatter = ISODateTimeFormat.dateTimeNoMillis();
+	return formatter.withZone(DateTimeZone.UTC).print(startedAt);
+    }
+    
+    // get End Time Methods
+    public String getEndedAt() {
+	DateTimeFormatter formatter = ISODateTimeFormat.dateTime();
+	return formatter.withZone(DateTimeZone.UTC).print(endedAt);
+    }
+    public String getEndedAtXsd() {
+	DateTimeFormatter formatter = ISODateTimeFormat.dateTimeNoMillis();
+	return formatter.withZone(DateTimeZone.UTC).print(endedAt);
+	}    
+    
+    // set Methods
+    public void setUri(String uri) {
+	this.studyUri = uri;
+    }
+	
+    public void setType(String studyType) {
+	this.studyType = studyType;
+    }
+    
+    public void setLabel(String label) {
+	this.label = label;
+    }
+    
+    public void setProject(String project) {
+	this.project = project;
+    }
+    
+    public void setComment(String comment) {
+	this.comment = comment;
+    }
+    
+    public void setInstitutionUri(String institutionUri) {
+	if (institutionUri != null && !institutionUri.equals("")) {
+	    if (institutionUri.indexOf("http") > -1) {
+		this.institutionUri = institutionUri;
+	    }
+	}
+    }
+    
+    public void setAgentUri(String agentUri) {
+	if (agentUri != null && !agentUri.equals("")) {
+	    if (agentUri.indexOf("http") > -1) {
+		this.agentUri = agentUri;
+	    }
+	}
+    }
+    
+    public void setTitle(String title) {
+	this.title = title;
+    }
+    
+    public void setLastId(String lastId) {
+	this.lastId = lastId;
+    }
+    
+    public void requestId(long quantity) {
+	if (quantity > 0) {
+	    long l = Long.parseLong(this.lastId);
+	    long newL = l + quantity; 
+	    this.lastId = Long.toString(newL);
+	    save();
+	}
+    }
+    
+    // set Start Time Methods
+    public void setStartedAt(String startedAt) {
+	if (startedAt == null || startedAt.equals("")) {
+	    this.startedAt = null;
+	} else {
+	    DateTimeFormatter formatter = DateTimeFormat.forPattern("EEE MMM dd HH:mm:ss zzz yyyy");
+	    this.startedAt = formatter.parseDateTime(startedAt);
+	}
+    }
+
+    public void setStartedAtXsd(String startedAt) {
+	DateTimeFormatter formatter = ISODateTimeFormat.dateTimeNoMillis();
+	this.startedAt = formatter.parseDateTime(startedAt);
+    }
+
+    public void setStartedAtXsdWithMillis(String startedAt) {
+	DateTimeFormatter formatter = ISODateTimeFormat.dateTime();
+	this.startedAt = formatter.parseDateTime(startedAt);
+    }
+    
+    // set End Time Methods
+    public void setEndedAt(String endedAt) {
+	if (startedAt == null || startedAt.equals("")) {
+	    this.startedAt = null;
+	} else {
+	    DateTimeFormatter formatter = DateTimeFormat.forPattern("EEE MMM dd HH:mm:ss zzz yyyy");
+	    this.endedAt = formatter.parseDateTime(endedAt);
+	}
+    }
+
+    public void setEndedAtXsd(String endedAt) {
+	DateTimeFormatter formatter = ISODateTimeFormat.dateTimeNoMillis();
+	this.endedAt = formatter.parseDateTime(endedAt);
+    }
+
+    public void setEndedAtXsdWithMillis(String endedAt) {
+	DateTimeFormatter formatter = ISODateTimeFormat.dateTime();
+	this.endedAt = formatter.parseDateTime(endedAt);
+    }
+    
+    public void setDataAcquisitions(List<DataAcquisition> dataAcquisitions) {
+	this.dataAcquisitions = dataAcquisitions;
+    }
+    
+    public void addDataAcquisitions(DataAcquisition da) {
+	this.dataAcquisitions.add(da);
+    }
+    
+    public static Study convertFromSolr(SolrDocument doc) {
+	Iterator<Object> i;
+	DateTime date;
+	Study study = new Study();
+	// URI
+	study.setUri(doc.getFieldValue("studyUri").toString());
+	// permissions
+	/*		if (doc.getFieldValues("permission_uri") != null) {
+			study.setPermissionUri(doc.getFieldValue("permission_uri").toString());
+			}*/
+	// label
+	if (doc.getFieldValues("studyLabel_i") != null) {
+	    study.setLabel(doc.getFieldValue("studyLabel_i").toString());
+	}
+	// projectTitle
+	if (doc.getFieldValues("proj_i") != null) {
+	    study.setProject(doc.getFieldValue("proj_i").toString());
+	}
+	// comment
+	if (doc.getFieldValues("comment_i") != null) {
+	    study.setLabel(doc.getFieldValue("comment_i").toString());
+	}
+	// description
+	if (doc.getFieldValues("studyTitle_i") != null) {
+	    study.setTitle(doc.getFieldValue("studyTitle_i").toString());
+	}
+	// institutionUri
+	if (doc.getFieldValues("institutionName_i") != null) {
+	    study.setInstitutionUri(doc.getFieldValue("institutionName_i").toString());
 	}
 	
-	// get End Time Methods
-	public String getEndedAt() {
-		DateTimeFormatter formatter = ISODateTimeFormat.dateTime();
-		return formatter.withZone(DateTimeZone.UTC).print(endedAt);
-	}
-	public String getEndedAtXsd() {
-		DateTimeFormatter formatter = ISODateTimeFormat.dateTimeNoMillis();
-		return formatter.withZone(DateTimeZone.UTC).print(endedAt);
+	// agentUri
+	if (doc.getFieldValues("agentName_i") != null) {
+	    study.setAgentUri(doc.getFieldValue("agentName_i").toString());
 	}
 	
-	// set Methods
-	public void setUri(String uri) {
-		this.studyUri = uri;
+	return study;
+    }
+    
+    public static MetadataAcquisitionQueryResult find(int page, int qtd, List<String> permissions, FacetHandler handler) {
+	MetadataAcquisitionQueryResult result = new MetadataAcquisitionQueryResult();
+	
+	SolrClient solr = new HttpSolrClient(
+					     Play.application().configuration().getString("hadatac.solr.data")
+					     + Collections.STUDIES);
+	SolrQuery query = new SolrQuery();
+	String permission_query = "";
+	String facet_query = "";
+	String q;
+	
+	permission_query += "permission_uri:\"" + "PUBLIC" + "\"";
+	if (permissions != null) {
+	    Iterator<String> i = permissions.iterator();
+	    while (i.hasNext()) {
+		permission_query += " OR ";
+		permission_query += "permission_uri:\"" + i.next() + "\"";
+	    }
 	}
 	
-/*	public void setPermissionUri(String permissionUri) {
-		this.permissionUri = permissionUri;
-	}
-	*/
-	public void setLabel(String label) {
-		this.label = label;
+	if (handler != null) {
+	    facet_query = handler.toSolrQuery();
 	}
 		
-	public void setProject(String project) {
-		this.project = project;
+	if (facet_query.trim().equals("")) {
+	    facet_query = "*:*";
+	}
+	
+	q =  "(" + permission_query + ") AND (" + facet_query + ")";
+	//System.out.println("!!! QUERY: " + q);
+	query.setQuery(q);
+	query.setStart((page-1)*qtd);
+	query.setRows(qtd);
+	query.setFacet(true);
+	query.addFacetField("demographics,acculturation,occupation,housingCharacteristics,ATIDU,socioEconomicStatus,assessment,BDN,anthropometry,laboratory,birthOutcomes");
+	// See Measurement.java as an example if we wish to add the possible facet values as pivots
+	try {
+	    QueryResponse queryResponse = solr.query(query);
+	    solr.close();
+	    SolrDocumentList results = queryResponse.getResults();
+	    Iterator<SolrDocument> m = results.iterator();
+	    while (m.hasNext()) {
+		result.documents.add(convertFromSolr(m.next()));
+	    }
+	    
+	    if (queryResponse.getFacetFields() != null) {
+		Iterator<FacetField> f = queryResponse.getFacetFields().iterator();
+		while (f.hasNext()) {
+		    FacetField field = f.next();
+		    result.field_facets.put(field.getName(), new HashMap<String, Long>());
+		    Iterator<Count> v = field.getValues().iterator();
+		    while (v.hasNext()) {
+			Count count = v.next();
+			Map<String, Long> map = result.field_facets.get(field.getName());
+			map.put(count.getName(), count.getCount());
+		    }
+		}
+	    }
+	    
+	} catch (SolrServerException e) {
+	    System.out.println("[ERROR] Study.find(int, int, List<String>, Map<String, String>) - SolrServerException message: " + e.getMessage());
+	} catch (IOException e) {
+	    System.out.println("[ERROR] Study.find(int, int, List<String>, Map<String, String>) - IOException message: " + e.getMessage());
+	} catch (Exception e) {
+	    System.out.println("[ERROR] Study.find(int, int, List<String>, Map<String, String>) - Exception message: " + e.getMessage());
+	}
+	
+	return result;
+    }
+    
+    public static Study find(String study_uri) {
+	if (study_uri == null || study_uri.equals("")) {
+	    System.out.println("[ERROR] No valid STUDY_URI provided to retrieve Study object: " + study_uri);
+	    return null;
+	}
+	Study returnStudy = new Study();
+	String prefixedUri = ValueCellProcessing.replacePrefixEx(study_uri);
+	String adjustedUri = prefixedUri;
+	if (adjustedUri.startsWith("http")) {
+	    adjustedUri = "<" + adjustedUri + ">";
+	}
+	String studyQueryString = NameSpaces.getInstance().printSparqlNameSpaceList() +
+	    "SELECT DISTINCT ?studyType ?studyLabel ?title ?proj ?studyComment ?agentUri ?institutionUri ?lastId" + 
+	    " WHERE {  " + 
+	    "      ?studyType rdfs:subClassOf* hasco:Study . " + 
+	    "      " + adjustedUri + " a ?studyType . " + 
+	    "      OPTIONAL { " + adjustedUri + " rdfs:label ?studyLabel } . " + 
+	    "	   OPTIONAL { " + adjustedUri + " hasco:hasTitle ?title } . " +
+	    "	   OPTIONAL { " + adjustedUri + " hasco:hasProject ?proj } . " +
+	    "      OPTIONAL { " + adjustedUri + " rdfs:comment ?studyComment } . " + 
+	    "      OPTIONAL { " + adjustedUri + " hasco:hasAgent ?agentUri } .  " +
+	    "      OPTIONAL { " + adjustedUri + " hasco:hasInstitution ?institutionUri } . " + 
+	    "      OPTIONAL { " + adjustedUri + " hasco:hasLastId ?lastId } . " + 
+	    " } " + 
+            " GROUP BY ?studyType ?studyLabel ?title ?proj ?studyComment ?agentUri ?institutionUri ?lastId ";
+	
+	try {
+	    //System.out.println("Study's find() query: " + studyQueryString);
+	    Query studyQuery = QueryFactory.create(studyQueryString);
+	    QueryExecution qexec = QueryExecutionFactory.sparqlService(Collections.getCollectionsName(Collections.METADATA_SPARQL), studyQuery);
+	    ResultSet results = qexec.execSelect();
+	    ResultSetRewindable resultsrw = ResultSetFactory.copyResults(results);
+	    qexec.close();
+	    if (resultsrw.hasNext()) {
+		QuerySolution soln = resultsrw.next();
+		returnStudy.setUri(prefixedUri);
+		if (soln.contains("studyLabel")) {
+		    returnStudy.setLabel(soln.get("studyLabel").toString());
+		}
+		if (soln.contains("studyType")) {
+		    returnStudy.setType(soln.get("studyType").toString());
+		}
+		if (soln.contains("title")) {
+		    returnStudy.setTitle(soln.get("title").toString());
+		}
+		if (soln.contains("proj")) {
+		    returnStudy.setProject(soln.get("proj").toString());
+		}
+		if (soln.contains("studyComment")) {
+		    returnStudy.setComment(soln.get("studyComment").toString());
+		} 
+		if (soln.contains("agentUri")) {
+		    returnStudy.setAgentUri(soln.get("agentUri").toString());
+		}
+		if (soln.contains("institutionUri")) {
+		    returnStudy.setInstitutionUri(soln.get("institutionUri").toString());
+		}
+		if (soln.contains("lastId")) {
+		    returnStudy.setLastId(soln.get("lastId").toString());
+		}
+	    }
+	} catch (QueryExceptionHTTP e) {
+	    e.printStackTrace();
+	}
+	return returnStudy;
+    }
+    
+    public static Model findModel(String study) {
+	String studyQueryString = NameSpaces.getInstance().printSparqlNameSpaceList() +
+	    "SELECT DISTINCT ?s ?p ?o " +
+	    "WHERE " +
+	    "{  " +
+	    "  { " +
+	    "	{  " +
+	    // Study 
+	    "   ?subUri rdfs:subClassOf* hasco:Study . " + 
+	    "  	?s a ?subUri . " +
+	    "  	?s ?p ?o . " +
+	    "  	FILTER (?s = " + study + ") " +
+	    "  	} " +
+	    "    MINUS " +
+	    "    { " +
+	    // Other Studies 
+	    "   ?subUri rdfs:subClassOf* hasco:Study . " + 
+	    "  	?s a ?subUri . " +
+	    "  	?s ?p ?o . " +
+	    "  	FILTER (?s != " + study + ") " +
+	    "    }  " +
+	    "  } " +
+	    "  UNION " + 
+	    "  { " +
+	    "	{  " +
+	    //  Data Acquisitions, Cohort
+	    "  	?subUri rdfs:subClassOf* hasco:Study . " + 
+	    "  	?study a ?subUri . " +
+	    "  	?s hasco:isDataAcquisitionOf|hasco:isCohortOf ?study . " + 
+	    "  	?s ?p ?o . " +
+	    "  	FILTER (?study = " + study + ") " +
+	    "  	} " +
+	    "    MINUS " +
+	    "    {  " +
+	    // Other Data Acquisitions, Cohort
+	    "  	?subUri rdfs:subClassOf* hasco:Study . " + 
+	    "  	?study a ?subUri . " +
+	    "  	?s hasco:isDataAcquisitionOf|hasco:isCohortOf ?study . " + 
+	    "  	?s ?p ?o . " +
+	    "  	FILTER (?study != " + study + ") " +
+	    "  	} " +
+	    "  } " +
+	    "  UNION " + 
+	    "  { " +
+	    "	{  " +
+	    //  Cohort Subjects
+	    "  	?subUri rdfs:subClassOf* hasco:Study . " + 
+	    "  	?study a ?subUri . " +
+	    "  	?cohort hasco:isCohortOf ?study . " +
+	    "	?s hasco:isSubjectOf ?cohort . " +
+	    "  	?s ?p ?o . " +
+	    "  	FILTER (?study = " + study + ") " +
+	    "  	} " +
+	    "    MINUS " +
+	    "    {  " +
+	    // Other Cohort Subjects
+	    "  	?subUri rdfs:subClassOf* hasco:Study . " + 
+	    "  	?study a ?subUri . " +
+	    "  	?cohort hasco:isCohortOf ?study . " +
+	    "	?s hasco:isSubjectOf ?cohort . " +
+	    "  	?s ?p ?o . " +
+	    "  	FILTER (?study != " + study + ") " +
+	    "  	} " +
+	    "  } " +
+	    "  UNION " + 
+	    "  { " +
+	    "	{  " +
+	    //  Data Acquisition Schema and Deployment
+	    "  	?subUri rdfs:subClassOf* hasco:Study . " + 
+	    "  	?study a ?subUri . " +
+	    "  	?da hasco:isDataAcquisitionOf ?study . " + 
+	    "   ?da hasco:hasSchema|hasco:hasDeployment ?s . " +
+	    "  	?s ?p ?o . " +
+	    "  	FILTER (?study = " + study + ") " +
+	    "  	} " +
+	    "    MINUS " +
+	    "    {  " +
+	    // Other Data Acquisition Schema and Deployment
+	    "  	?subUri rdfs:subClassOf* hasco:Study . " + 
+	    "  	?study a ?subUri . " +
+	    "  	?da hasco:isDataAcquisitionOf ?study . " + 
+	    "   ?da hasco:hasSchema|hasco:hasDeployment ?s . " +
+	    "  	?s ?p ?o . " +
+	    "  	FILTER (?study != " + study + ") " +
+	    "  	} " +
+	    "  } " +
+	    "  UNION " + 
+	    "  { " +
+	    "    { " +
+	    // Sample Collections
+	    "  	?subUri rdfs:subClassOf* hasco:Study . " + 
+	    "  	?study a ?subUri . " +
+	    "   ?s hasco:isSampleCollectionOf ?study . " + 
+	    "   ?s ?p ?o . " +
+	    "  FILTER (?study = " + study + ") " +
+	    "    } " +
+	    "    MINUS " +
+	    "    { " +
+	    // Other Sample Collections
+	    "  	?subUri rdfs:subClassOf* hasco:Study . " + 
+	    "  	?study a ?subUri . " +
+	    "   ?s hasco:isSampleCollectionOf ?study . " + 
+	    "   ?s ?p ?o . " +
+	    "  	FILTER (?study != " + study + ") " +
+	    "    } " +
+	    "  } "  +
+	    "  UNION " + 
+	    "  { " +
+	    "    { " +
+	    // Sample Collection Samples
+	    "  	?subUri rdfs:subClassOf* hasco:Study . " + 
+	    "  	?study a ?subUri . " +
+	    "   ?sc hasco:isSampleCollectionOf ?study . " + 
+	    "   ?s hasco:isObjectOf ?sc .  " +
+	    "   ?s ?p ?o . " +
+	    "  FILTER (?study = " + study + ") " +
+	    "    } " +
+	    "    MINUS " +
+	    "    { " +
+	    // Other Sample Collection Samples
+	    "  	?subUri rdfs:subClassOf* hasco:Study . " + 
+	    "  	?study a ?subUri . " +
+	    "   ?sc hasco:isSampleCollectionOf ?study . " + 
+	    "   ?s hasco:isObjectOf ?sc .  " +
+	    "   ?s ?p ?o . " +
+	    "  	FILTER (?study != " + study + ") " +
+	    "    } " +
+	    "  } "  +
+	    "  UNION " + 
+	    "  { " +
+	    "    { " +
+	    // Deployment - Platform, Instrument, detector
+	    "  	?subUri rdfs:subClassOf* hasco:Study .  " + 
+	    "  	?study a ?subUri . " +
+	    "   ?da hasco:isDataAcquisitionOf ?study . " + 
+	    "  	?da hasco:hasDeployment ?deploy .  " +
+	    "	?deploy vstoi:hasPlatform|hasco:hasInstrument|hasco:hasDetector ?s . " +
+	    "  	?s ?p ?o . " +
+	    "  FILTER (?study = " + study + ") " +
+	    "    } " +
+	    "    MINUS " +
+	    "    { " +
+	    // Other Deployment - Platform, Instrument, detector
+	    "  	?subUri rdfs:subClassOf* hasco:Study .  " + 
+	    "  	?study a ?subUri . " +
+	    "   ?da hasco:isDataAcquisitionOf ?study . " + 
+	    "  	?da hasco:hasDeployment ?deploy .  " +
+	    "	?deploy vstoi:hasPlatform|hasco:hasInstrument|hasco:hasDetector ?s . " +
+	    "  	?s ?p ?o . " +
+	    "  	FILTER (?study != " + study + ") " +
+	    "    } " +
+	    "  } " +
+	    "  UNION " + 
+	    "  { " +
+	    "    { " +
+	    // DA Schema Attribute
+	    "  	?subUri rdfs:subClassOf* hasco:Study .  " + 
+	    "  	?study a ?subUri . " +
+	    "  	?da hasco:isDataAcquisitionOf ?study . " +
+	    "   ?da hasco:hasSchema ?schema . " +
+	    "   ?s hasco:partOfSchema ?schema . " +
+	    "  	?s ?p ?o . " +
+	    "  	FILTER (?study = " + study + ") " +
+	    "    } " +
+	    "    MINUS " +
+	    "    { " +
+	    // Other DA Schema Attribute
+	    "  	?subUri rdfs:subClassOf* hasco:Study .  " + 
+	    "  	?study a ?subUri . " +
+	    "  	?da hasco:isDataAcquisitionOf ?study . " +
+	    "   ?da hasco:hasSchema ?schema . " +
+	    "   ?s hasco:partOfSchema ?schema . " +
+	    "  	?s ?p ?o . " +
+	    "  FILTER (?study != " + study + ") " +
+	    "    } " +
+	    "  } " +
+	    "  UNION  " +
+	    "  { " +
+	    "  	 {  " +
+	    // Datasets
+	    "   ?subUri rdfs:subClassOf* hasco:Study . " + 
+	    "   ?study a ?subUri . " +
+	    "   ?s hasco:isDatasetOf ?study . " +
+	    "   ?s ?p ?o . " +
+	    "   FILTER (?study = " + study + ") " +
+	    "    } " +
+	    "    MINUS " +
+	    "    {  " +
+	    // Other Datasets
+	    "   ?subUri rdfs:subClassOf* hasco:Study . " + 
+	    "   ?study a ?subUri . " +
+	    "   ?s hasco:isDatasetOf ?study . " +
+	    "   ?s ?p ?o . " +
+	    "   FILTER (?study != " + study + ") " +
+	    "     } " +
+	    "   } " +
+	    "   UNION " + 
+	    "   { " +
+	    "  	  {  " +
+	    // Attribute References 
+	    "    ?subUri rdfs:subClassOf* hasco:Study . " + 
+	    "    ?study a ?subUri . " +
+	    "    ?data hasco:isDatasetOf ?study . " +
+	    "    ?s hasco:isAttributeReferenceOf ?data . " +
+	    "    ?s ?p ?o . " +
+	    "    FILTER (?study = " + study + ") " +
+	    "    } " +
+	    "    MINUS " +
+	    "    {  " +
+	    // Other Attribute References
+	    "    ?subUri rdfs:subClassOf* hasco:Study . " + 
+	    "    ?study a ?subUri . " +
+	    "    ?data hasco:isDatasetOf ?study . " +
+	    "     ?s hasco:isAttributeReferenceOf ?data . " +
+	    "    ?s ?p ?o . " +
+	    "    FILTER (?study != " + study + ") " +
+	    "    } " +
+	    "  } " +
+	    "} ";
+	
+	Model model = ModelFactory.createDefaultModel();
+	try {
+	    Query studyQuery = QueryFactory.create(studyQueryString);
+	    QueryExecution qexec = QueryExecutionFactory.sparqlService(
+				   Collections.getCollectionsName(Collections.METADATA_SPARQL), studyQuery);
+	    ResultSet results = qexec.execSelect();
+	    ResultSetRewindable resultsrw = ResultSetFactory.copyResults(results);
+	    qexec.close();
+	    
+	    //System.out.println("resultsrw.size(): " + resultsrw.size());
+	    while (resultsrw.hasNext()) {
+		QuerySolution soln = resultsrw.next();
+		
+		Resource subject = soln.getResource("s");
+		Property property = model.createProperty(soln.getResource("p").toString());
+		RDFNode object = soln.get("o");
+	        
+		model.add(subject, property, object);
+	    }
+	} catch (QueryExceptionHTTP e) {
+	    e.printStackTrace();
+	}
+	
+	return model;
+    }
+    
+    public static List<Study> find() {
+	List<Study> studies = new ArrayList<Study>();
+	String queryString = "";
+	queryString = NameSpaces.getInstance().printSparqlNameSpaceList() +
+	    "SELECT ?studyUri ?subUri " + 
+	    " WHERE {  ?subUri rdfs:subClassOf* hasco:Study . " + 
+	    "          ?studyUri a ?subUri . " +  
+	    " }";
+	
+	Query query = QueryFactory.create(queryString);
+	
+	QueryExecution qexec = QueryExecutionFactory.sparqlService(
+			       Collections.getCollectionsName(Collections.METADATA_SPARQL), query);
+	ResultSet results = qexec.execSelect();
+	ResultSetRewindable resultsrw = ResultSetFactory.copyResults(results);
+	qexec.close();
+	
+	Study study = null;
+	while (resultsrw.hasNext()) {
+	    QuerySolution soln = resultsrw.next();
+	    if (soln != null && soln.getResource("studyUri").getURI()!= null) { 
+		study = Study.find(soln.get("studyUri").toString());
+		//System.out.println("Study URI: " + soln.get("studyUri").toString());
+	    }
+	    studies.add(study);
+	}
+	
+	return studies;
+    }
+    
+    public int deleteDataAcquisitions() {
+	SolrClient study_solr = new HttpSolrClient(
+						   Play.application().configuration().getString("hadatac.solr.data")
+						   + Collections.DATA_COLLECTION);
+	try {
+	    UpdateResponse response = study_solr.deleteByQuery("study_uri:\"" + studyUri + "\"");
+	    study_solr.commit();
+	    study_solr.close();
+	    return response.getStatus();
+	} catch (SolrServerException e) {
+	    System.out.println("[ERROR] Study.delete() - SolrServerException message: " + e.getMessage());
+	} catch (IOException e) {
+	    System.out.println("[ERROR] Study.delete() - IOException message: " + e.getMessage());
+	} catch (Exception e) {
+	    System.out.println("[ERROR] Study.delete() - Exception message: " + e.getMessage());
+	}
+	
+	return -1;
+    }
+    
+    public int deleteMeasurements() {
+	SolrClient study_solr = new HttpSolrClient(
+						   Play.application().configuration().getString("hadatac.solr.data")
+						   + Collections.DATA_ACQUISITION);
+	try {
+	    UpdateResponse response = study_solr.deleteByQuery("study_uri:\"" + DynamicFunctions.replaceURLWithPrefix(studyUri) + "\"");
+	    study_solr.commit();
+	    study_solr.close();
+	    return response.getStatus();
+	} catch (SolrServerException e) {
+	    System.out.println("[ERROR] Study.delete() - SolrServerException message: " + e.getMessage());
+	} catch (IOException e) {
+	    System.out.println("[ERROR] Study.delete() - IOException message: " + e.getMessage());
+	} catch (Exception e) {
+	    System.out.println("[ERROR] Study.delete() - Exception message: " + e.getMessage());
+	}
+	
+	return -1;
+    }
+    
+    public void save() {
+	//System.out.println("Saving <" + uri + ">");
+	if (studyUri == null || studyUri.equals("")) {
+	    System.out.println("[ERROR] Trying to save Study without assigning an URI");
+	    return;
 	}
 
-	public void setComment(String comment) {
-		this.comment = comment;
+	delete();  // delete any existing triple for the current study
+
+	String insert = "";
+	String std_uri = "";
+
+	if (this.getUri().startsWith("<")) {
+	    std_uri = this.getUri();
+	} else {
+	    std_uri = "<" + this.getUri() + ">";
+	}
+      	insert += NameSpaces.getInstance().printSparqlNameSpaceList();
+    	insert += INSERT_LINE1;
+	if (studyType.startsWith("<")) {
+	    insert += std_uri + " a " + studyType + " . ";
+	} else {
+	    insert += std_uri + " a <" + studyType + "> . ";
+	}
+    	insert += std_uri + " rdfs:label  \"" + label + "\" . ";
+	if (title != null && !title.equals("")) {
+	    insert += std_uri + " hasco:hasTitle \"" + title + "\" .  "; 
+	} 
+	if (project != null && !project.equals("")) {
+	    insert += std_uri + " hasco:hasProject \""  + project + "\" .  ";
+	}   
+	if (comment != null && !comment.equals("")) {
+	    insert += std_uri + " rdfs:comment \"" + comment + "\" .  ";
+	}
+	if (agentUri != null && !agentUri.equals("")) {
+	    if (agentUri.startsWith("<")) {
+		insert += std_uri + " hasco:hasAgent " + agentUri + " .  ";
+	    } else {
+		insert += std_uri + " hasco:hasAgent <" + agentUri + "> .  ";
+	    }
+	}
+	if (institutionUri != null && !institutionUri.equals("")) {
+	    if (institutionUri.startsWith("<")) {
+		insert += std_uri + " hasco:hasInstitution " + institutionUri + " .  ";
+	    } else {
+		insert += std_uri + " hasco:hasInstitution <" + institutionUri + "> .  ";
+	    }
+	}
+	if (lastId != null) {
+	    insert += std_uri + " hasco:hasLastId  \"" + lastId + "\" .  ";
+	}
+    	insert += LINE_LAST;
+	//System.out.println("Study insert query (pojo's save): <" + insert + ">");
+    	UpdateRequest request = UpdateFactory.create(insert);
+        UpdateProcessor processor = UpdateExecutionFactory.createRemote(
+				      request, Collections.getCollectionsName(Collections.METADATA_UPDATE));
+        processor.execute();
+	
+    }
+    
+    @Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
+    public int saveSolr() {
+	try {
+	    SolrClient solr = new HttpSolrClient(
+				  Play.application().configuration().getString("hadatac.solr.data") +
+				  Collections.STUDIES);
+	    if (endedAt.toString().startsWith("9999")) {
+		endedAt = DateTime.parse("9999-12-31T23:59:59.999Z");
+	    }
+	    int status = solr.addBean(this).getStatus();
+	    solr.commit();
+	    solr.close();
+	    return status;
+	} catch (IOException | SolrServerException e) {
+	    System.out.println("[ERROR] Study.save(SolrClient) - e.Message: " + e.getMessage());
+	    return -1;
+	}
+    }
+
+    @Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
+    public int saveToLabKey(String user_name, String password) {
+	String site = ConfigProp.getPropertyValue("labkey.config", "site");
+        String path = "/" + ConfigProp.getPropertyValue("labkey.config", "folder");
+    	LabkeyDataHandler loader = new LabkeyDataHandler(site, user_name, password, path);
+    	List< Map<String, Object> > rows = new ArrayList< Map<String, Object> >();
+    	Map<String, Object> row = new HashMap<String, Object>();
+    	row.put("hasURI", ValueCellProcessing.replaceNameSpaceEx(getUri()));
+    	row.put("a", ValueCellProcessing.replaceNameSpaceEx(studyType));
+    	row.put("rdfs:label", getLabel());
+    	row.put("hasco:hasTitle", getTitle());
+    	row.put("hasco:hasProject", ValueCellProcessing.replaceNameSpaceEx(getProject()));
+    	row.put("rdfs:comment", getComment());
+    	row.put("skos:definition", "");
+	row.put("hasco:hasAgent", ValueCellProcessing.replaceNameSpaceEx(this.getAgentUri()));
+	row.put("hasco:hasLastId", getLastId());
+	row.put("hasco:hasInstitution", ValueCellProcessing.replaceNameSpaceEx(this.getInstitutionUri()));
+    	rows.add(row);
+
+	int totalChanged = 0;
+    	try {
+	    totalChanged = loader.insertRows("Study", rows);
+	} catch (CommandException e) {
+	    try {
+		totalChanged = loader.updateRows("Study", rows);
+	    } catch (CommandException e2) {
+		System.out.println("[ERROR] Could not insert or update Study(ies)");
+	    }
+	}
+	return totalChanged;
+    }
+    
+    public void delete() {
+	String query = "";
+	if (this.getUri() == null || this.getUri().equals("")) {
+	    return;
+	}
+	query += NameSpaces.getInstance().printSparqlNameSpaceList();
+        query += DELETE_LINE1;
+	if (this.getUri().startsWith("http")) {
+	    query += "<" + this.getUri() + ">";
+	} else {
+	    query += this.getUri();
+	}
+        query += DELETE_LINE3;
+    	query += LINE_LAST;
+	//System.out.println("SPARQL query inside dasa poho's delete: " + query);
+    	UpdateRequest request = UpdateFactory.create(query);
+        UpdateProcessor processor = UpdateExecutionFactory.createRemote(request, Collections.getCollectionsName(Collections.METADATA_UPDATE));
+        processor.execute();
+	//deleteDataAcquisitions();
+	//deleteMeasurements();
+    }
+    
+    public int deleteFromSolr() {
+	SolrClient study_solr = new HttpSolrClient(
+				    Play.application().configuration().getString("hadatac.solr.data") +
+				    Collections.STUDIES);
+	try {
+	    UpdateResponse response = study_solr.deleteByQuery("studyUri:\"" + studyUri + "\"");
+	    study_solr.commit();
+	    study_solr.close();
+	    return response.getStatus();
+	} catch (SolrServerException e) {
+	    System.out.println("[ERROR] Study.delete() - SolrServerException message: " + e.getMessage());
+	} catch (IOException e) {
+	    System.out.println("[ERROR] Study.delete() - IOException message: " + e.getMessage());
+	} catch (Exception e) {
+	    System.out.println("[ERROR] Study.delete() - Exception message: " + e.getMessage());
 	}
 	
-	
-/*	public void setNumSamples(int numSamples) {
-		this.numSamples = numSamples;
+	return -1;
+    }
+    
+    @Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
+    public int deleteFromLabKey(String user_name, String password) throws CommandException {
+	String site = ConfigProp.getPropertyValue("labkey.config", "site");
+        String path = "/" + ConfigProp.getPropertyValue("labkey.config", "folder");
+    	LabkeyDataHandler loader = new LabkeyDataHandler(site, user_name, password, path);
+    	List< Map<String, Object> > rows = new ArrayList< Map<String, Object> >();
+    	Map<String, Object> row = new HashMap<String, Object>();
+    	row.put("hasURI", ValueCellProcessing.replaceNameSpaceEx(getUri().replace("<","").replace(">","")));
+    	rows.add(row);
+	for (Map<String,Object> str : rows) {
+	    System.out.println("deleting Study " + str.get("hasURI"));
 	}
-	
-	public void setNumSubjects(int numSubjects) {
-		this.numSubjects = numSubjects;
-	}
-*/
-	public void setInstitution(String institution) {
-		this.institution = institution;
-	}
-	
-	public void setAgent(String agent) {
-		this.agent = agent;
-	}
-	
-	public void setTitle(String title) {
-		this.title = title;
-	}
-	
-	// set Start Time Methods
-	@Field("started_at")
-	public void setStartedAt(String startedAt) {
-		DateTimeFormatter formatter = DateTimeFormat.forPattern("EEE MMM dd HH:mm:ss zzz yyyy");
-		this.startedAt = formatter.parseDateTime(startedAt);
-	}
-	public void setStartedAtXsd(String startedAt) {
-		DateTimeFormatter formatter = ISODateTimeFormat.dateTimeNoMillis();
-		this.startedAt = formatter.parseDateTime(startedAt);
-	}
-	public void setStartedAtXsdWithMillis(String startedAt) {
-		DateTimeFormatter formatter = ISODateTimeFormat.dateTime();
-		this.startedAt = formatter.parseDateTime(startedAt);
-	}
-	
-	// set End Time Methods
-	@Field("ended_at")
-	public void setEndedAt(String endedAt) {
-		DateTimeFormatter formatter = DateTimeFormat.forPattern("EEE MMM dd HH:mm:ss zzz yyyy");
-		this.endedAt = formatter.parseDateTime(endedAt);
-	}
-	public void setEndedAtXsd(String endedAt) {
-		DateTimeFormatter formatter = ISODateTimeFormat.dateTimeNoMillis();
-		this.endedAt = formatter.parseDateTime(endedAt);
-	}
-	public void setEndedAtXsdWithMillis(String endedAt) {
-		DateTimeFormatter formatter = ISODateTimeFormat.dateTime();
-		this.endedAt = formatter.parseDateTime(endedAt);
-	}
-	
-	public static Study create(String uri) {
-		Study study = new Study();
-		
-		study.setUri(uri);
-		
-		return study;
-	}
-	
-	public static Study convertFromSolr(SolrDocument doc) {
-		Iterator<Object> i;
-		DateTime date;
-		Study study = new Study();
-		// URI
-		study.setUri(doc.getFieldValue("studyUri").toString());
-		// permissions
-/*		if (doc.getFieldValues("permission_uri") != null) {
-			study.setPermissionUri(doc.getFieldValue("permission_uri").toString());
-		}*/
-		// label
-		if (doc.getFieldValues("studyLabel_i") != null) {
-			study.setLabel(doc.getFieldValue("studyLabel_i").toString());
-		}
-		// projectTitle
-		if (doc.getFieldValues("proj_i") != null) {
-			study.setProject(doc.getFieldValue("proj_i").toString());
-		}
-		// comment
-		if (doc.getFieldValues("comment_i") != null) {
-			study.setLabel(doc.getFieldValue("comment_i").toString());
-		}
-		// description
-		if (doc.getFieldValues("studyTitle_i") != null) {
-			study.setTitle(doc.getFieldValue("studyTitle_i").toString());
-		}
-/*		// numSubjects
-		if (doc.getFieldValues("numSubjects") != null) {
-			study.setNumSubjects(Integer.parseInt(doc.getFieldValue("numSubjects").toString()));
-		}
-		// numSamples
-		if (doc.getFieldValues("numSamples") != null) {
-			study.setNumSamples(Integer.parseInt(doc.getFieldValue("numSamples").toString()));
-		}*/
-		// institution
-		if (doc.getFieldValues("institutionName_i") != null) {
-			study.setInstitution(doc.getFieldValue("institutionName_i").toString());
-		}
-		
-		// agent
-		if (doc.getFieldValues("agentName_i") != null) {
-			study.setAgent(doc.getFieldValue("agentName_i").toString());
-		}
-		
-		return study;
-	}
-	
-	public static MetadataAcquisitionQueryResult find(int page, int qtd, List<String> permissions, FacetHandler handler) {
-		MetadataAcquisitionQueryResult result = new MetadataAcquisitionQueryResult();
-		
-		SolrClient solr = new HttpSolrClient(
-				Play.application().configuration().getString("hadatac.solr.data")
-				+ Collections.STUDIES);
-		SolrQuery query = new SolrQuery();
-		String permission_query = "";
-		String facet_query = "";
-		String q;
-		
-		permission_query += "permission_uri:\"" + "PUBLIC" + "\"";
-		if (permissions != null) {
-			Iterator<String> i = permissions.iterator();
-			while (i.hasNext()) {
-				permission_query += " OR ";
-				permission_query += "permission_uri:\"" + i.next() + "\"";
-			}
-		}
-		
-		if (handler != null) {
-		    facet_query = handler.toSolrQuery();
-		    /* Iterator<String> i = handler.facetsAnd.keySet().iterator();
-			while (i.hasNext()) {
-				String field = i.next();
-				String value = handler.facetsAnd.get(field);
-				facet_query += field + ":\"" + value + "\"";
-				if (i.hasNext()) {
-					facet_query += " AND ";
-				}
-				} */
-		}
-		
-		if (facet_query.trim().equals("")) {
-			facet_query = "*:*";
-		}
-		
-		q =  "(" + permission_query + ") AND (" + facet_query + ")";
-		System.out.println("!!! QUERY: " + q);
-		query.setQuery(q);
-		query.setStart((page-1)*qtd);
-		query.setRows(qtd);
-		query.setFacet(true);
-		query.addFacetField("demographics,acculturation,occupation,housingCharacteristics,ATIDU,socioEconomicStatus,assessment,BDN,anthropometry,laboratory,birthOutcomes");
-		// See Measurement.java as an example if we wish to add the possible facet values as pivots
-		try {
-			QueryResponse queryResponse = solr.query(query);
-			solr.close();
-			SolrDocumentList results = queryResponse.getResults();
-			Iterator<SolrDocument> m = results.iterator();
-			while (m.hasNext()) {
-				result.documents.add(convertFromSolr(m.next()));
-			}
-			
-			if (queryResponse.getFacetFields() != null) {
-				Iterator<FacetField> f = queryResponse.getFacetFields().iterator();
-				while (f.hasNext()) {
-					FacetField field = f.next();
-					result.field_facets.put(field.getName(), new HashMap<String, Long>());
-					Iterator<Count> v = field.getValues().iterator();
-					while (v.hasNext()) {
-						Count count = v.next();
-						Map<String, Long> map = result.field_facets.get(field.getName());
-						map.put(count.getName(), count.getCount());
-					}
-				}
-			}
-			
-		} catch (SolrServerException e) {
-			System.out.println("[ERROR] Study.find(int, int, List<String>, Map<String, String>) - SolrServerException message: " + e.getMessage());
-		} catch (IOException e) {
-			System.out.println("[ERROR] Study.find(int, int, List<String>, Map<String, String>) - IOException message: " + e.getMessage());
-		} catch (Exception e) {
-			System.out.println("[ERROR] Study.find(int, int, List<String>, Map<String, String>) - Exception message: " + e.getMessage());
-		}
-		
-		return result;
-	}
-	
-	public static Study find(String study_uri) {
-		Study returnStudy = new Study();
-		String studyQueryString = NameSpaces.getInstance().printSparqlNameSpaceList() +
-		"SELECT DISTINCT ?studyUri ?studyLabel ?proj ?studyComment (group_concat( ?agentName_ ; separator = ' & ') as ?agentName) ?institutionName " + 
-		" WHERE {        ?subUri rdfs:subClassOf* hasco:Study . " + 
-		"                       ?studyUri a ?subUri . " + 
-		"           ?studyUri rdfs:label ?studyLabel  . " + 
-		"			FILTER ( ?studyUri = " + DynamicFunctions.replaceURLWithPrefix(study_uri) + " ) . " +
-		"		 OPTIONAL {?studyUri hasco:hasProject ?proj} . " +
-		"        OPTIONAL { ?studyUri rdfs:comment ?studyComment } . " + 
-		"             OPTIONAL{ ?studyUri hasco:hasAgent ?agent .  " +
-		"                         ?agent foaf:name ?agentName_} . " +
-		"        OPTIONAL { ?studyUri hasco:hasInstitution ?institution . " + 
-		"                                 ?institution foaf:name ?institutionName} . " + 
-		"                             }" +
-		"GROUP BY ?studyUri ?studyLabel ?proj ?studyTitle ?studyComment ?agentName ?institutionName ";
-		
-		try {
-			Query studyQuery = QueryFactory.create(studyQueryString);
-			QueryExecution qexec = QueryExecutionFactory.sparqlService(Collections.getCollectionsName(Collections.METADATA_SPARQL), studyQuery);
-			ResultSet results = qexec.execSelect();
-			ResultSetRewindable resultsrw = ResultSetFactory.copyResults(results);
-			qexec.close();
-			while (resultsrw.hasNext()) {
-				QuerySolution soln = resultsrw.next();
-				//values = new HashMap<String, String>();
-				returnStudy.setUri(soln.get("studyUri").toString());
-				if (soln.contains("studyLabel"))
-					returnStudy.setLabel(soln.get("studyLabel").toString());
-				if (soln.contains("proj"))
-					returnStudy.setProject(soln.get("proj").toString());
-				if (soln.contains("studyComment"))
-					returnStudy.setComment(soln.get("studyComment").toString());
-				if (soln.contains("agentName"))
-					returnStudy.setAgent(soln.get("agentName").toString());
-				if (soln.contains("institutionName"))
-					returnStudy.setInstitution(soln.get("institutionName").toString());
-			}
-		} catch (QueryExceptionHTTP e) {
-			e.printStackTrace();
-		}
-		return returnStudy;
-	}
-	
-	public static Model findModel(String study) {
-		String studyQueryString = NameSpaces.getInstance().printSparqlNameSpaceList() +
-		"SELECT DISTINCT ?s ?p ?o " +
-		"WHERE " +
-		"{  " +
-		"  { " +
-		"	{  " +
-		// Study 
-		"   ?subUri rdfs:subClassOf* hasco:Study . " + 
-		"  	?s a ?subUri . " +
-		"  	?s ?p ?o . " +
-		"  	FILTER (?s = " + study + ") " +
-		"  	} " +
-		"    MINUS " +
-		"    { " +
-		// Other Studies 
-		"   ?subUri rdfs:subClassOf* hasco:Study . " + 
-		"  	?s a ?subUri . " +
-		"  	?s ?p ?o . " +
-		"  	FILTER (?s != " + study + ") " +
-		"    }  " +
-		"  } " +
-		"  UNION " + 
-		"  { " +
-		"	{  " +
-		//  Data Acquisitions, Cohort
-		"  	?subUri rdfs:subClassOf* hasco:Study . " + 
-		"  	?study a ?subUri . " +
-		"  	?s hasco:isDataAcquisitionOf|hasco:isCohortOf ?study . " + 
-		"  	?s ?p ?o . " +
-		"  	FILTER (?study = " + study + ") " +
-		"  	} " +
-		"    MINUS " +
-		"    {  " +
-		// Other Data Acquisitions, Cohort
-		"  	?subUri rdfs:subClassOf* hasco:Study . " + 
-		"  	?study a ?subUri . " +
-		"  	?s hasco:isDataAcquisitionOf|hasco:isCohortOf ?study . " + 
-		"  	?s ?p ?o . " +
-		"  	FILTER (?study != " + study + ") " +
-		"  	} " +
-		"  } " +
-		"  UNION " + 
-		"  { " +
-		"	{  " +
-		//  Cohort Subjects
-		"  	?subUri rdfs:subClassOf* hasco:Study . " + 
-		"  	?study a ?subUri . " +
-		"  	?cohort hasco:isCohortOf ?study . " +
-		"	?s hasco:isSubjectOf ?cohort . " +
-		"  	?s ?p ?o . " +
-		"  	FILTER (?study = " + study + ") " +
-		"  	} " +
-		"    MINUS " +
-		"    {  " +
-		// Other Cohort Subjects
-		"  	?subUri rdfs:subClassOf* hasco:Study . " + 
-		"  	?study a ?subUri . " +
-		"  	?cohort hasco:isCohortOf ?study . " +
-		"	?s hasco:isSubjectOf ?cohort . " +
-		"  	?s ?p ?o . " +
-		"  	FILTER (?study != " + study + ") " +
-		"  	} " +
-		"  } " +
-		"  UNION " + 
-		"  { " +
-		"	{  " +
-		//  Data Acquisition Schema and Deployment
-		"  	?subUri rdfs:subClassOf* hasco:Study . " + 
-		"  	?study a ?subUri . " +
-		"  	?da hasco:isDataAcquisitionOf ?study . " + 
-		"   ?da hasco:hasSchema|hasco:hasDeployment ?s . " +
-		"  	?s ?p ?o . " +
-		"  	FILTER (?study = " + study + ") " +
-		"  	} " +
-		"    MINUS " +
-		"    {  " +
-		// Other Data Acquisition Schema and Deployment
-		"  	?subUri rdfs:subClassOf* hasco:Study . " + 
-		"  	?study a ?subUri . " +
-		"  	?da hasco:isDataAcquisitionOf ?study . " + 
-		"   ?da hasco:hasSchema|hasco:hasDeployment ?s . " +
-		"  	?s ?p ?o . " +
-		"  	FILTER (?study != " + study + ") " +
-		"  	} " +
-		"  } " +
-		"  UNION " + 
-		"  { " +
-		"    { " +
-		// Sample Collections
-		"  	?subUri rdfs:subClassOf* hasco:Study . " + 
-		"  	?study a ?subUri . " +
-		"   ?s hasco:isSampleCollectionOf ?study . " + 
-		"   ?s ?p ?o . " +
-		"  FILTER (?study = " + study + ") " +
-		"    } " +
-		"    MINUS " +
-		"    { " +
-		// Other Sample Collections
-		"  	?subUri rdfs:subClassOf* hasco:Study . " + 
-		"  	?study a ?subUri . " +
-		"   ?s hasco:isSampleCollectionOf ?study . " + 
-		"   ?s ?p ?o . " +
-		"  	FILTER (?study != " + study + ") " +
-		"    } " +
-		"  } "  +
-		"  UNION " + 
-		"  { " +
-		"    { " +
-		// Sample Collection Samples
-		"  	?subUri rdfs:subClassOf* hasco:Study . " + 
-		"  	?study a ?subUri . " +
-		"   ?sc hasco:isSampleCollectionOf ?study . " + 
-		"   ?s hasco:isObjectOf ?sc .  " +
-		"   ?s ?p ?o . " +
-		"  FILTER (?study = " + study + ") " +
-		"    } " +
-		"    MINUS " +
-		"    { " +
-		// Other Sample Collection Samples
-		"  	?subUri rdfs:subClassOf* hasco:Study . " + 
-		"  	?study a ?subUri . " +
-		"   ?sc hasco:isSampleCollectionOf ?study . " + 
-		"   ?s hasco:isObjectOf ?sc .  " +
-		"   ?s ?p ?o . " +
-		"  	FILTER (?study != " + study + ") " +
-		"    } " +
-		"  } "  +
-		"  UNION " + 
-		"  { " +
-		"    { " +
-		// Deployment - Platform, Instrument, detector
-		"  	?subUri rdfs:subClassOf* hasco:Study .  " + 
-		"  	?study a ?subUri . " +
-		"   ?da hasco:isDataAcquisitionOf ?study . " + 
-		"  	?da hasco:hasDeployment ?deploy .  " +
-		"	?deploy vstoi:hasPlatform|hasco:hasInstrument|hasco:hasDetector ?s . " +
-		"  	?s ?p ?o . " +
-		"  FILTER (?study = " + study + ") " +
-		"    } " +
-		"    MINUS " +
-		"    { " +
-		// Other Deployment - Platform, Instrument, detector
-		"  	?subUri rdfs:subClassOf* hasco:Study .  " + 
-		"  	?study a ?subUri . " +
-		"   ?da hasco:isDataAcquisitionOf ?study . " + 
-		"  	?da hasco:hasDeployment ?deploy .  " +
-		"	?deploy vstoi:hasPlatform|hasco:hasInstrument|hasco:hasDetector ?s . " +
-		"  	?s ?p ?o . " +
-		"  	FILTER (?study != " + study + ") " +
-		"    } " +
-		"  } " +
-		"  UNION " + 
-		"  { " +
-		"    { " +
-		// DA Schema Attribute
-		"  	?subUri rdfs:subClassOf* hasco:Study .  " + 
-		"  	?study a ?subUri . " +
-		"  	?da hasco:isDataAcquisitionOf ?study . " +
-		"   ?da hasco:hasSchema ?schema . " +
-		"   ?s hasco:partOfSchema ?schema . " +
-		"  	?s ?p ?o . " +
-		"  	FILTER (?study = " + study + ") " +
-		"    } " +
-		"    MINUS " +
-		"    { " +
-		// Other DA Schema Attribute
-		"  	?subUri rdfs:subClassOf* hasco:Study .  " + 
-		"  	?study a ?subUri . " +
-		"  	?da hasco:isDataAcquisitionOf ?study . " +
-		"   ?da hasco:hasSchema ?schema . " +
-		"   ?s hasco:partOfSchema ?schema . " +
-		"  	?s ?p ?o . " +
-		"  FILTER (?study != " + study + ") " +
-		"    } " +
-		"  } " +
-		"  UNION  " +
-		"  { " +
-		"  	 {  " +
-		// Datasets
-		"   ?subUri rdfs:subClassOf* hasco:Study . " + 
-		"   ?study a ?subUri . " +
-		"   ?s hasco:isDatasetOf ?study . " +
-		"   ?s ?p ?o . " +
-		"   FILTER (?study = " + study + ") " +
-		"    } " +
-		"    MINUS " +
-		"    {  " +
-		// Other Datasets
-		"   ?subUri rdfs:subClassOf* hasco:Study . " + 
-		"   ?study a ?subUri . " +
-		"   ?s hasco:isDatasetOf ?study . " +
-		"   ?s ?p ?o . " +
-		"   FILTER (?study != " + study + ") " +
-		"     } " +
-		"   } " +
-		"   UNION " + 
-		"   { " +
-		"  	  {  " +
-		// Attribute References 
-		"    ?subUri rdfs:subClassOf* hasco:Study . " + 
-		"    ?study a ?subUri . " +
-		"    ?data hasco:isDatasetOf ?study . " +
-		"    ?s hasco:isAttributeReferenceOf ?data . " +
-		"    ?s ?p ?o . " +
-		"    FILTER (?study = " + study + ") " +
-		"    } " +
-		"    MINUS " +
-		"    {  " +
-		// Other Attribute References
-		"    ?subUri rdfs:subClassOf* hasco:Study . " + 
-		"    ?study a ?subUri . " +
-		"    ?data hasco:isDatasetOf ?study . " +
-		"     ?s hasco:isAttributeReferenceOf ?data . " +
-		"    ?s ?p ?o . " +
-		"    FILTER (?study != " + study + ") " +
-		"    } " +
-		"  } " +
-		"} ";
-		
-		Model model = ModelFactory.createDefaultModel();
-		try {
-			Query studyQuery = QueryFactory.create(studyQueryString);
-			QueryExecution qexec = QueryExecutionFactory.sparqlService(
-					Collections.getCollectionsName(Collections.METADATA_SPARQL), studyQuery);
-			ResultSet results = qexec.execSelect();
-			ResultSetRewindable resultsrw = ResultSetFactory.copyResults(results);
-			qexec.close();
-			
-			System.out.println("resultsrw.size(): " + resultsrw.size());
-	        while (resultsrw.hasNext()) {
-	            QuerySolution soln = resultsrw.next();
-	
-	            Resource subject = soln.getResource("s");
-	            Property property = model.createProperty(soln.getResource("p").toString());
-	            RDFNode object = soln.get("o");
-	            
-	            model.add(subject, property, object);
-	        }
-		} catch (QueryExceptionHTTP e) {
-			e.printStackTrace();
-		}
-		
-		return model;
-	}
-	
-	public static List<Study> find(State state) {
-		List<Study> studies = new ArrayList<Study>();
-	    String queryString = "";
-        if (state.getCurrent() == State.ACTIVE) { 
-    	   queryString = NameSpaces.getInstance().printSparqlNameSpaceList() +
-    			    "SELECT DISTINCT ?studyUri ?studyLabel ?proj ?studyComment (group_concat( ?agentName_ ; separator = ' & ') as ?agentName) ?institutionName " + 
-    				" WHERE {        ?subUri rdfs:subClassOf* hasco:Study . " + 
-    				"                       ?studyUri a ?subUri . " + 
-    				"           ?studyUri rdfs:label ?studyLabel  . " + 
-    				"		 OPTIONAL {?studyUri hasco:hasProject ?proj} . " +
-    				"        OPTIONAL { ?studyUri rdfs:comment ?studyComment } . " + 
-    				"             OPTIONAL{ ?studyUri hasco:hasAgent ?agent .  " +
-    				"                         ?agent foaf:name ?agentName_} . " +
-    				"        OPTIONAL { ?studyUri hasco:hasInstitution ?institution . " + 
-    				"                   ?institution foaf:name ?institutionName} . " + 
-    				"   FILTER NOT EXISTS { ?studyUri prov:endedAtTime ?enddatetime . } " + 
-     			   	"                             }" +
-    				"GROUP BY ?studyUri ?studyLabel ?proj ?studyTitle ?studyComment ?agentName ?institutionName ";
-        } else {
-    	   if (state.getCurrent() == State.CLOSED) {
-    		   queryString = NameSpaces.getInstance().printSparqlNameSpaceList() +
-       			    "SELECT ?studyUri ?studyLabel ?proj ?studyComment (group_concat( ?agentName_ ; separator = ' & ') as ?agentName) ?institutionName " + 
-       				" WHERE {        ?subUri rdfs:subClassOf* hasco:Study . " + 
-       				"                       ?studyUri a ?subUri . " + 
-       				"           ?studyUri rdfs:label ?studyLabel  . " +
-       				//"   ?studyUri prov:startedAtTime ?startdatetime .  " + 
- 				    //"   ?studyUri prov:endedAtTime ?enddatetime .  " + 
- 				   	"		 OPTIONAL {?studyUri hasco:hasProject ?proj} . " +
-       				"        OPTIONAL { ?studyUri rdfs:comment ?studyComment } . " + 
-    				"             OPTIONAL{ ?studyUri hasco:hasAgent ?agent .  " +
-    				"                         ?agent foaf:name ?agentName_} . " +
-       				"        OPTIONAL { ?studyUri hasco:hasInstitution ?institution . " + 
-       				"                     ?institution foaf:name ?institutionName} . " +
-        			"                             }"+
-    				"GROUP BY ?studyUri ?studyLabel ?proj ?studyComment ?agentName ?institutionName ";// +
-       	   			//"ORDER BY DESC(?enddatetime) ";
-    	   } else {
-        	   if (state.getCurrent() == State.ALL) {
-        		   queryString = NameSpaces.getInstance().printSparqlNameSpaceList() +
-           			    "SELECT ?studyUri ?studyLabel ?proj ?studyComment (group_concat( ?agentName_ ; separator = ' & ') as ?agentName ) ?institutionName " + 
-        				" WHERE {        ?subUri rdfs:subClassOf* hasco:Study . " + 
-        				"                       ?studyUri a ?subUri . " + 
-        				"           ?studyUri rdfs:label ?studyLabel  . " + 
-        				"		 OPTIONAL {?studyUri hasco:hasProject ?proj} . " +
-        				"        OPTIONAL { ?studyUri rdfs:comment ?studyComment } . " + 
-        				"             OPTIONAL{ ?studyUri hasco:hasAgent ?agent .  " +
-        				"                         ?agent foaf:name ?agentName_} . " +
-        				"        OPTIONAL { ?studyUri hasco:hasInstitution ?institution . " + 
-        				"                  ?institution foaf:name ?institutionName} . " +
-         			   	"                             }" +
-        				"GROUP BY ?studyUri ?studyLabel ?proj ?studyComment ?agentName ?institutionName ";
-        	   } else {
-        		   System.out.println("Study.java: no valid state specified.");
-        		   return null;
-        	   }
-    	   }
-        }
-		Query query = QueryFactory.create(queryString);
-		
-		QueryExecution qexec = QueryExecutionFactory.sparqlService(
-				Collections.getCollectionsName(Collections.METADATA_SPARQL), query);
-		ResultSet results = qexec.execSelect();
-		ResultSetRewindable resultsrw = ResultSetFactory.copyResults(results);
-		qexec.close();
-		
-		Study study = null;
-		while (resultsrw.hasNext()) {
-			QuerySolution soln = resultsrw.next();
-			if (soln != null && soln.getResource("studyUri").getURI()!= null) { 
-				study = Study.find(soln.get("studyUri").toString());
-				System.out.println("Study URI: " + soln.get("studyUri").toString());
-			}
-			studies.add(study);
-		}
-		
-		return studies;
-	}
-	
-	public int close(String endedAt) {
-		this.setEndedAtXsd(endedAt);
-		return this.save();
-	}
-	
-	public void delete() {
-		deleteStudy();
-		deleteDataCollections();
-		deleteMeasurements();
-	}
-	
-	public int deleteStudy() {
-		SolrClient study_solr = new HttpSolrClient(
-				Play.application().configuration().getString("hadatac.solr.data")
-				+ Collections.STUDIES);
-		try {
-			UpdateResponse response = study_solr.deleteByQuery("studyUri:\"" + studyUri + "\"");
-			study_solr.commit();
-			study_solr.close();
-			return response.getStatus();
-		} catch (SolrServerException e) {
-			System.out.println("[ERROR] Study.delete() - SolrServerException message: " + e.getMessage());
-		} catch (IOException e) {
-			System.out.println("[ERROR] Study.delete() - IOException message: " + e.getMessage());
-		} catch (Exception e) {
-			System.out.println("[ERROR] Study.delete() - Exception message: " + e.getMessage());
-		}
-		
-		return -1;
-	}
-	
-	public int deleteDataCollections() {
-		SolrClient study_solr = new HttpSolrClient(
-				Play.application().configuration().getString("hadatac.solr.data")
-				+ Collections.DATA_COLLECTION);
-		try {
-			UpdateResponse response = study_solr.deleteByQuery("study_uri:\"" + studyUri + "\"");
-			study_solr.commit();
-			study_solr.close();
-			return response.getStatus();
-		} catch (SolrServerException e) {
-			System.out.println("[ERROR] Study.delete() - SolrServerException message: " + e.getMessage());
-		} catch (IOException e) {
-			System.out.println("[ERROR] Study.delete() - IOException message: " + e.getMessage());
-		} catch (Exception e) {
-			System.out.println("[ERROR] Study.delete() - Exception message: " + e.getMessage());
-		}
-		
-		return -1;
-	}
-	
-	public int deleteMeasurements() {
-		SolrClient study_solr = new HttpSolrClient(
-				Play.application().configuration().getString("hadatac.solr.data")
-				+ Collections.DATA_ACQUISITION);
-		try {
-			UpdateResponse response = study_solr.deleteByQuery("study_uri:\"" + DynamicFunctions.replaceURLWithPrefix(studyUri) + "\"");
-			study_solr.commit();
-			study_solr.close();
-			return response.getStatus();
-		} catch (SolrServerException e) {
-			System.out.println("[ERROR] Study.delete() - SolrServerException message: " + e.getMessage());
-		} catch (IOException e) {
-			System.out.println("[ERROR] Study.delete() - IOException message: " + e.getMessage());
-		} catch (Exception e) {
-			System.out.println("[ERROR] Study.delete() - Exception message: " + e.getMessage());
-		}
-		
-		return -1;
-	}
-	
-	public int save() {
-		try {
-			SolrClient client = new HttpSolrClient(
-					Play.application().configuration().getString("hadatac.solr.data")
-					+ Collections.STUDIES);
-			if (endedAt.toString().startsWith("9999")) {
-				endedAt = DateTime.parse("9999-12-31T23:59:59.999Z");
-			}
-			int status = client.addBean(this).getStatus();
-			client.commit();
-			client.close();
-			return status;
-		} catch (IOException | SolrServerException e) {
-			System.out.println("[ERROR] Study.save() - e.Message: " + e.getMessage());
-			return -1;
-		}
-	}
-	
-	public int save(SolrClient solr) {
-		try {
-			if (endedAt.toString().startsWith("9999")) {
-				endedAt = DateTime.parse("9999-12-31T23:59:59.999Z");
-			}
-			int status = solr.addBean(this).getStatus();
-			solr.commit();
-			solr.close();
-			return status;
-		} catch (IOException | SolrServerException e) {
-			System.out.println("[ERROR] Study.save(SolrClient) - e.Message: " + e.getMessage());
-			return -1;
-		}
-	}
+    	return loader.deleteRows("Study", rows);
+    }
+    
+
+
 }

@@ -1,11 +1,20 @@
 package org.hadatac.entity.pojo;
 
 import java.io.IOException;
-
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.time.Duration;
+import java.time.Instant;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
+import java.time.format.FormatStyle;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -19,6 +28,7 @@ import org.apache.solr.client.solrj.response.FacetField;
 import org.apache.solr.client.solrj.response.FacetField.Count;
 import org.apache.solr.client.solrj.response.PivotField;
 import org.apache.solr.client.solrj.response.QueryResponse;
+import org.apache.solr.client.solrj.response.RangeFacet;
 import org.apache.solr.client.solrj.response.UpdateResponse;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
@@ -49,8 +59,9 @@ public class Measurement {
 	private String studyUri;
 	@Field("object_uri")
 	private String objectUri;
-	@Field("timestamp")
-	private String timestamp;
+	private Instant timestamp;
+	@Field("named_time")
+	private String abstractTime;
 	@Field("value")
 	private String value;
 	@Field("pid")
@@ -262,15 +273,20 @@ public class Measurement {
 	}
 
 	public String getTimestamp() {
-		return timestamp;
+		return timestamp.toString();
 	}
 
+	@Field("timestamp")
 	public void setTimestamp(String timestamp) {
-		this.timestamp = timestamp;
+		this.timestamp = Instant.parse(timestamp);
+	}
+	
+	public String getAbstractTime() {
+		return abstractTime;
 	}
 
-	public void setTimestampXsd(String timestamp) {
-		this.timestamp = timestamp;
+	public void setAbstractTime(String abstractTime) {
+		this.abstractTime = abstractTime;
 	}
 
 	public String getValue() {
@@ -354,8 +370,10 @@ public class Measurement {
 	}
 
 	public int save() {
-		SolrClient solr = new HttpSolrClient(
-				Play.application().configuration().getString("hadatac.solr.data") + Collections.DATA_ACQUISITION);
+		HttpSolrClient.Builder builder = new HttpSolrClient.Builder(
+				Play.application().configuration().getString("hadatac.solr.data") 
+				+ Collections.DATA_ACQUISITION);
+		SolrClient solr = builder.build();
 		try {
 			int status = solr.addBean(this).getStatus();
 			solr.commit();
@@ -368,8 +386,10 @@ public class Measurement {
 	}
 
 	public static int delete(String datasetUri) {
-		SolrClient solr = new HttpSolrClient(
-				Play.application().configuration().getString("hadatac.solr.data") + Collections.DATA_ACQUISITION);
+		HttpSolrClient.Builder builder = new HttpSolrClient.Builder(
+				Play.application().configuration().getString("hadatac.solr.data") 
+				+ Collections.DATA_ACQUISITION);
+		SolrClient solr = builder.build();
 		try {
 			UpdateResponse response = solr.deleteByQuery("dataset_uri:\"" + datasetUri + "\"");
 			solr.commit();
@@ -484,8 +504,10 @@ public class Measurement {
 		query.setFacet(false);
 
 		try {
-			SolrClient solr = new HttpSolrClient(
-					Play.application().configuration().getString("hadatac.solr.data") + Collections.DATA_ACQUISITION);
+			HttpSolrClient.Builder builder = new HttpSolrClient.Builder(
+					Play.application().configuration().getString("hadatac.solr.data") 
+					+ Collections.DATA_ACQUISITION);
+			SolrClient solr = builder.build();
 			QueryResponse queryResponse = solr.query(query, SolrRequest.METHOD.POST);
 			solr.close();
 			SolrDocumentList results = queryResponse.getResults();
@@ -504,6 +526,105 @@ public class Measurement {
 
 		return result;
 	}
+	
+	public static Instant findMinTime(String field, String q) {
+		SolrQuery query = new SolrQuery();
+		query.setQuery(q);
+		query.setRows(1);
+		query.addSort(field, SolrQuery.ORDER.asc);
+		
+		try {
+			HttpSolrClient.Builder builder = new HttpSolrClient.Builder(
+					Play.application().configuration().getString("hadatac.solr.data") 
+					+ Collections.DATA_ACQUISITION);
+			SolrClient solr = builder.build();
+			
+			QueryResponse queryResponse = solr.query(query, SolrRequest.METHOD.POST);
+			solr.close();
+			
+			SolrDocumentList results = queryResponse.getResults();
+			if (results.size() == 1) {
+				Measurement m = convertFromSolr(results.get(0));
+				return Instant.parse(m.getTimestamp());
+			}
+		} catch (IOException e) {
+			System.out.println("[ERROR] Measurement.findMinTime(String, String) - IOException message: " + e.getMessage());
+		} catch (SolrServerException e) {
+			System.out.println("[ERROR] Measurement.findMinTime(String, String) - SolrServerException message: " + e.getMessage());
+		} catch (Exception e) {
+			System.out.println("[ERROR] Measurement.findMinTime(String, String) - Exception message: " + e.getMessage());
+		}
+		
+		return null;
+	}
+	
+	public static Instant findMaxTime(String field, String q) {
+		SolrQuery query = new SolrQuery();
+		query.setQuery(q);
+		query.setRows(1);
+		query.set(field, "[* TO NOW]");
+		query.addSort(field, SolrQuery.ORDER.desc);
+		
+		try {
+			HttpSolrClient.Builder builder = new HttpSolrClient.Builder(
+					Play.application().configuration().getString("hadatac.solr.data") 
+					+ Collections.DATA_ACQUISITION);
+			SolrClient solr = builder.build();
+			
+			QueryResponse queryResponse = solr.query(query, SolrRequest.METHOD.POST);
+			solr.close();
+			
+			SolrDocumentList results = queryResponse.getResults();
+			if (results.size() == 1) {
+				Measurement m = convertFromSolr(results.get(0));
+				return Instant.parse(m.getTimestamp());
+			}
+		} catch (IOException e) {
+			System.out.println("[ERROR] Measurement.findMinTime(String, String) - IOException message: " + e.getMessage());
+		} catch (SolrServerException e) {
+			System.out.println("[ERROR] Measurement.findMinTime(String, String) - SolrServerException message: " + e.getMessage());
+		} catch (Exception e) {
+			System.out.println("[ERROR] Measurement.findMinTime(String, String) - Exception message: " + e.getMessage());
+		}
+		
+		return null;
+	}
+	
+	public static String calculateTimeGap(Instant min, Instant max) {
+		Duration duration = Duration.between(min, max);
+		
+		long days = duration.toDays();
+		long weeks = days / 7;
+		long months = days / 30;
+		long years = days / 365;
+		
+		if (years > 2) {
+			return "+1YEAR";
+		}
+		if (months > 4) {
+			return "+1MONTH";
+		}
+		if (weeks > 4) {
+			return "+1WEEK";
+		}
+		if (days > 4) {
+			return "+1DAY";
+		}
+		
+		long hours = duration.toHours();
+		
+		if (hours > 4) {
+			return "+1HOUR";
+		}
+		
+		long minutes = duration.toMinutes();
+		
+		if (minutes > 4) {
+			return "+1MINUTE";
+		}
+		
+		return "+1MINUTE";
+	}
 
 	public static AcquisitionQueryResult find(String user_uri, int page, int qtd, FacetHandler handler) {
 		AcquisitionQueryResult result = new AcquisitionQueryResult();
@@ -516,6 +637,10 @@ public class Measurement {
 		if (q.equals("")) {
 			return result;
 		}
+		
+		Instant minTime = findMinTime("timestamp", q);
+		Instant maxTime = findMaxTime("timestamp", q);
+		String gap = calculateTimeGap(minTime, maxTime);
 
 		int docSize = 0;
 		SolrQuery query = new SolrQuery();
@@ -527,14 +652,18 @@ public class Measurement {
 		query.setFacet(true);
 		query.setFacetLimit(-1);
 		query.addFacetField("unit");
-		query.addFacetField("timestamp");
+		query.addDateRangeFacet("timestamp", Date.from(minTime), Date.from(maxTime), gap);
+		query.addFacetField("named_time");
 		query.addFacetPivotField("study_uri,acquisition_uri");
 		query.addFacetPivotField("entity,characteristic");
 		query.addFacetPivotField("platform_name,instrument_model");
 
 		try {
-			SolrClient solr = new HttpSolrClient(
-					Play.application().configuration().getString("hadatac.solr.data") + Collections.DATA_ACQUISITION);
+			HttpSolrClient.Builder builder = new HttpSolrClient.Builder(
+					Play.application().configuration().getString("hadatac.solr.data") 
+					+ Collections.DATA_ACQUISITION);
+			SolrClient solr = builder.build();
+			System.out.println("!!!! QUERY: " + query.toQueryString());
 			QueryResponse queryResponse = solr.query(query, SolrRequest.METHOD.POST);
 			solr.close();
 			SolrDocumentList results = queryResponse.getResults();
@@ -557,6 +686,70 @@ public class Measurement {
 					}
 				}
 			}
+
+			DateTimeFormatter formatter =
+				    DateTimeFormatter.ofLocalizedDateTime( FormatStyle.SHORT )
+				                     .withLocale( Locale.US )
+				                     .withZone( ZoneId.systemDefault() );
+			
+			if (queryResponse.getFacetRanges() != null) {
+				Iterator<RangeFacet> f = queryResponse.getFacetRanges().iterator();
+				while (f.hasNext()) {
+					RangeFacet field = f.next();
+					result.date_facets.put(field.getName(), new HashMap<String, Map<String, String>>());
+					
+					RangeFacet.Count v1;
+					RangeFacet.Count v2;
+					Instant v1inst;
+					Instant v2inst;
+					String rangeQuery;
+					String label;
+					int i = 0;
+					int j = field.getCounts().size();
+					
+					while (i < j) {
+						v1 = (RangeFacet.Count)field.getCounts().get(i);
+						v1inst = Instant.parse(v1.getValue());
+						
+						if (i == j-1) {
+							v2 = null;
+							v2inst = null;
+							rangeQuery = "[" + v1.getValue() + " TO *]";
+							label = "From " + formatter.format(v1inst) + " onwards";
+						} else {
+							v2 = (RangeFacet.Count)field.getCounts().get(i+1);
+							v2inst = Instant.parse(v2.getValue());
+							rangeQuery = "[" + v1.getValue() + " TO " + v2.getValue() + "]";
+							label = "From " + formatter.format(v1inst) + " to " + formatter.format(v2inst);
+						}
+						
+						Map<String, Map<String, String>> map = result.date_facets.get(field.getName());
+						map.put(label, new HashMap<String, String>());
+						Map<String, String> map2 = map.get(label);
+						map2.put("count", Integer.toString(v1.getCount()));
+						map2.put("gap", field.getGap().toString());
+						map2.put("query", rangeQuery);
+						//map2.put("label", label);
+						
+						i++;
+					}
+					
+					/*
+					Iterator<RangeFacet.Count> v = field.getCounts().iterator();
+					while (v.hasNext()) {
+						RangeFacet.Count count = v.next();
+						Map<String, Map<String, String>> map = result.date_facets.get(field.getName());
+						map.put(count.getValue(), new HashMap<String, String>());
+						Map<String, String> map2 = map.get(count.getValue());
+						System.out.println("!!!!!!! 2: " + count.getValue() + "   3: " + count.getCount());
+						map2.put("count", Integer.toString(count.getCount()));
+						map2.put("gap", field.getGap().toString());
+						map2.put("text", "text");
+					}*/
+				}
+			}
+			
+			System.out.println(result.toJSON());
 
 			if (queryResponse.getFacetPivot() != null) {
 				Iterator<Entry<String, List<PivotField>>> iter = queryResponse.getFacetPivot().iterator();
@@ -627,8 +820,10 @@ public class Measurement {
 	}
 
 	public static long getNumByDataAcquisition(DataAcquisition dataAcquisition) {
-		SolrClient solr = new HttpSolrClient(
-				Play.application().configuration().getString("hadatac.solr.data") + Collections.DATA_ACQUISITION);
+		HttpSolrClient.Builder builder = new HttpSolrClient.Builder(
+				Play.application().configuration().getString("hadatac.solr.data") 
+				+ Collections.DATA_ACQUISITION);
+		SolrClient solr = builder.build();
 		SolrQuery query = new SolrQuery();
 		query.set("q", "acquisition_uri:\"" + dataAcquisition.getUri() + "\"");
 		query.set("rows", "10000000");
@@ -658,8 +853,10 @@ public class Measurement {
 	public static List<Measurement> findByDataAcquisitionUri(String acquisition_uri) {
 		List<Measurement> listMeasurement = new ArrayList<Measurement>();
 
-		SolrClient solr = new HttpSolrClient(
-				Play.application().configuration().getString("hadatac.solr.data") + Collections.DATA_ACQUISITION);
+		HttpSolrClient.Builder builder = new HttpSolrClient.Builder(
+				Play.application().configuration().getString("hadatac.solr.data") 
+				+ Collections.DATA_ACQUISITION);
+		SolrClient solr = builder.build();
 		SolrQuery query = new SolrQuery();
 		query.set("q", "acquisition_uri:\"" + acquisition_uri + "\"");
 		query.set("rows", "10000000");
@@ -693,8 +890,9 @@ public class Measurement {
 			m.setSID(doc.getFieldValue("object_uri").toString());
 		}
 		if (doc.getFieldValue("timestamp") != null) {
-			m.setTimestamp(doc.getFieldValue("timestamp").toString());
+			m.setTimestamp(((Date)doc.getFieldValue("timestamp")).toInstant().toString());
 		}
+		m.setAbstractTime(doc.getFieldValue("named_time").toString());
 		m.setValue(doc.getFieldValue("value").toString());
 		m.setUnit(doc.getFieldValue("unit").toString());
 		m.setUnitUri(doc.getFieldValue("unit_uri").toString());

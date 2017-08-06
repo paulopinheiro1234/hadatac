@@ -1,31 +1,55 @@
-@(results : org.hadatac.console.models.SparqlQueryResults)
+@(file_name         : String,
+  da_uri            : String,
+  deploymentOptions : List[org.hadatac.entity.pojo.Deployment])
 
 @import helper._
+@import org.hadatac.utils._
 @import org.hadatac.console.views.html._
+@import org.hadatac.console.views.html.triplestore._
+@import org.hadatac.console.controllers.triplestore._
+@import org.hadatac.console.controllers._
 
-@main("CSV Annotator") {
+@main("Select Deployment for " + da_uri) {
 
-    <h2>CSV Annotator</h2>
-    
-    <h3>Step 1 of 3: Select Current Deployments</h3>
-   
-    <div class="container-fluid">
-        <table class="table">
-            <thead>
-                 <tr>
-                    <th>Platform</th>
-                    <th>Instrument</th>
-                    <th>Start DateTime</th>
-                    <th>Operations</th>
-                 </tr>
-            </thead>
-            <tbody>
-              @for((k, triple) <- results.sparqlResults){
-                  @deployment_option(triple)
-              }
-            </tbody>
-        </table>
+<script type="text/javascript">
+   function checkform() {
+      var cansubmit = true;
+
+      if (document.getElementById('option').value.length == 0) {
+          cansubmit = false;
+      }
+         
+      if (cansubmit) {
+          document.getElementById('submitbutton').disabled = false;
+      } else {
+          document.getElementById('submitbutton').disabled = 'disabled';
+      }
+   }
+</script>
+
+  <div class="container">
+    <h2>Select Deployment for @da_uri</h2>
+
+    <form class="form-horizontal" name="assignOption" method="post" action="@org.hadatac.console.controllers.annotator.routes.PrepareIngestion.processSelectDeployment(file_name, da_uri)">
+
+    <div class="form-group">
+      <label>Selected Data Acquisition</label> <br>
+      @da_uri<br>
+      <br>
+      <label>New Deployment</label> 
+      <select class="form-control col-sm-6" id="option" size="20" name="option" onchange="checkform()" >
+        @for(dep <- deploymentOptions) {
+            <option value="@dep.getUri()">@dep.getInstrument().getLabel() deployed at @dep.getPlatform().getLabel()</option>
+        }
+      </select>
     </div>
- 
-
-}
+    
+    <div class="form-group" class="col-sm-6 col-offset-3">
+      <input class="btn btn-success" role="button" id="submitbutton" type="submit" value="Select Deployment" disabled="disabled" />
+    </div>
+    
+    </form>    
+  </div>
+  
+  }
+  

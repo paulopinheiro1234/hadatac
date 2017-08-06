@@ -165,7 +165,7 @@
 	
 	var treeT;
         var props = "timestamp";
-	jsonTree = parseSolrFacetFieldToTree(props);
+	jsonTree = parseSolrRangeFacetFieldToTree(props);
 	dataTree = JSON.parse(jsonTree);
 	treeT = new dhtmlXTreeObject("treeTimeBox","100%","100%",0);
 	loadTree(treeT, dataTree);

@@ -1,4 +1,4 @@
-@(filename : String, da_uri : String)
+@(filename : String, da : org.hadatac.entity.pojo.DataAcquisition, message : String)
 
 @import helper._
 @import org.hadatac.utils._
@@ -6,8 +6,22 @@
 @import org.hadatac.console.views.html.schema._
 @import org.hadatac.console.controllers.schema._
 @import org.hadatac.console.controllers._
+@import org.hadatac.metadata.loader.ValueCellProcessing;
 
 @main("Prepare Data Ingestion") {
+
+  <style>
+    .paddin0 {
+        padding:10px !important
+    }
+    .margin0{
+        margin:0px; !important
+    }
+  </style>
+
+  <div>
+    <input type="text" class="form-control col-sm-2" id="message" name="message" value="Message: @message" readonly>
+  </div> 
 
   <div class="container col-md-1">
   </div>
@@ -17,33 +31,42 @@
   <div class="container col-md-9">
     <h3>Prepare Data Ingestion</h3>
 
-    <div id="rcorners" style="background-color: #DCF7FE">
+    <div id="rcorners" class="paddin0 margin0" style="background-color: #DCF7FE">
       <center><input type="submit" class="btn btn-primary btn-sm" role="button" id="selectDA" value="Select Complete Data Acquisition"
-		     formaction="@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.assignDataAcquisition(da_uri, filename)"></input>
+		     formaction="@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.assignDataAcquisition(filename, da.getUri())"></input>
     </div>
 
     <center><b>OR</b></center>
 
-    <div id="rcorners" style="background-color: #DCF7FE">
-      <center><div>
-	<input type="submit" class="btn btn-primary btn-sm" role="button" id="createACQ" value="Create Basic Data Acquisition"></input>
-      </div></center>
+    <div id="rcorners" style="background-color: #DCF7FE" class="paddin0 margin0" >
+      
+      <center><b>Incomplete Data Acquisition to be completed : </b>@ValueCellProcessing.replaceNameSpaceEx(da.getUri()) 
+	       <input type="submit" class="btn btn-default btn-sm" role="button" id="viewDA" value="View"></input> 
+	       <input type="submit" class="btn btn-default btn-sm" role="button" id="editDA" value="Edit"></input> 
+               <input type="submit" class="btn btn-success btn-sm" role="button" id="completeDA" value="Confirm Complete" 
+	       @if(da.getStudyUri() == null || da.getStudyUri().equals("") || 
+		   da.getDeploymentUri() == null || da.getDeploymentUri().equals("") ||
+		   da.getSchemaUri() == null || da.getSchemaUri().equals("")) {
+	       disabled
+	       }
+               ></input></center>
 
-      <div>
-	<center><b>AND</b></center>
-      </div>
+      </center><br>
 
-      <center><div id="rcorners"   style="background-color: #B9E1EB">
+      <center><div id="rcorners"   style="background-color: #B9E1EB" class="paddin0 margin0" >
 
+	 @if(da.getStudyUri() == null || da.getStudyUri().equals("")) {
 	  <div class="col-md-2">
-	     <input type="submit" class="btn btn-primary btn-sm" role="button"  id="selectSTD" value="Select Full Study"></input><select><option>Study</option></select>
+	     <input type="submit" class="btn btn-primary btn-sm" role="button"  id="selectSTD" value="Select Full Study"
+		    formaction="@org.hadatac.console.controllers.annotator.routes.PrepareIngestion.selectStudy(filename, da.getUri())">
+             </input>
 	  </div>
 
 	  <div class="col-md-1">
 	     <b>OR</b>
 	  </div>
 
-	  <div id="rcorners" class="col-md-8"   style="background-color: #90D0DF">
+	  <div id="rcorners" class="col-md-8 paddin0 margin0"   style="background-color: #90D0DF">
 
 	     <input type="submit" class="btn btn-primary btn-sm" role="button" id="createSTD" value="Create Basic Study"></input>
 
@@ -57,7 +80,16 @@
 
 	  </div>
 
-          <br><br><br><br>
+          <br><br><br>
+         } else {
+
+	       <center><b>Associated study : </b>@ValueCellProcessing.replaceNameSpaceEx(da.getStudyUri())
+	       <input type="submit" class="btn btn-default btn-sm" role="button" id="viewSTD" value="View">
+	       <input type="submit" class="btn btn-default btn-sm" role="button" id="editSTD" value="Edit">
+	       <input type="submit" class="btn btn-default btn-sm" role="button" id="removeSTD" value="Remove Association"
+		      formaction="@org.hadatac.console.controllers.annotator.routes.PrepareIngestion.removeAssociation(filename, da.getUri(), "Study")"></input> </center>
+
+	 }
 
       </div></center>
 
@@ -65,17 +97,20 @@
 	<center><b>AND</b></center>
       </div>
 
-      <div id="rcorners"   style="background-color: #B9E1EB">
+      <div id="rcorners"   style="background-color: #B9E1EB" class="paddin0 margin0" >
 
+	 @if(da.getDeploymentUri() == null || da.getDeploymentUri().equals("")) {
 	  <div class="col-md-2">
-	    <input type="submit" class="btn btn-primary btn-sm" role="button" id="selectDPL" value="Select Full Deployment"></input><select><option>Deployment</option></select>
+	    <input type="submit" class="btn btn-primary btn-sm" role="button" id="selectDPL" value="Select Full Deployment"
+		   formaction="@org.hadatac.console.controllers.annotator.routes.PrepareIngestion.selectDeployment(filename, da.getUri())">
+	    </input>
           </div>
 
 	  <div class="col-md-1">
 	    <center><b>OR</b></center>
 	  </div>
 
-	  <div id="rcorners" class="col-md-8"  style="background-color: #90D0DF">
+	  <div id="rcorners" class="col-md-8 paddin0 margin0"  style="background-color: #90D0DF">
 	    <center>
 	     <input type="submit" class="btn btn-primary btn-sm" role="button" id="createDPL" value="Create Basic Deployment"></input>
 	    </center>
@@ -85,9 +120,9 @@
 	       <b>AND</b>
 	    </div></center>
 
-   	     <center><div id="rcorners"  style="background-color: #73B9CA">
+   	     <center><div id="rcorners"  style="background-color: #73B9CA" class="paddin0 margin0" >
 
-	       <input type="submit" class="btn btn-primary btn-sm" role="button" id="selectPLT" value="Select Platform"></input><select><option>Platform</option></select>
+	       <input type="submit" class="btn btn-primary btn-sm" role="button" id="selectPLT" value="Select Platform"></input>
 
 	       <b>OR</b>
 
@@ -97,9 +132,9 @@
 
 	     <center><b>AND</b></center>
 
-	     <center><div id="rcorners"   style="background-color: #73B9CA">
+	     <center><div id="rcorners"   style="background-color: #73B9CA" class="paddin0 margin0" >
 
-	       <input type="submit" class="btn btn-primary btn-sm" role="button" id="selectINS" value="Select Instrument"></input><select><option>Instrument</option></select>
+	       <input type="submit" class="btn btn-primary btn-sm" role="button" id="selectINS" value="Select Instrument"></input>
 
 	       <b>OR</b>
 
@@ -109,7 +144,16 @@
 
           </div>
 
-          <br><br><br><br><br><br><br><br><br><br><br><br><br>
+          <br><br><br><br><br><br><br><br><br><br>
+	  } else {
+      
+	       <center><b>Associated deployment : </b>@ValueCellProcessing.replaceNameSpaceEx(da.getDeploymentUri())
+	       <input type="submit" class="btn btn-default btn-sm" role="button" id="viewDPL" value="View">
+	       <input type="submit" class="btn btn-default btn-sm" role="button" id="editDPL" value="Edit">
+	       <input type="submit" class="btn btn-default btn-sm" role="button" id="removeDPL" value="Remove Association"
+		      formaction="@org.hadatac.console.controllers.annotator.routes.PrepareIngestion.removeAssociation(filename, da.getUri(), "Deployment")"></input> </center>
+
+      	  }
 
       </div>
 
@@ -118,9 +162,13 @@
 	<center><b>AND</b></center>
       </div>
 
-      <center><div id="rcorners"  style="background-color: #B9E1EB">
+      <center><div id="rcorners"  style="background-color: #B9E1EB" class="paddin0 margin0" >
 
-	  <input type="submit" class="btn btn-primary btn-sm" role="button" id="selectDAS" value="Select Schema"></input><select><option>Schema</option></select>
+        @if(da.getSchemaUri() == null || da.getSchemaUri().equals("")) {
+
+	  <input type="submit" class="btn btn-primary btn-sm" role="button" id="selectDAS" value="Select Schema"
+		 formaction="@org.hadatac.console.controllers.annotator.routes.PrepareIngestion.selectSchema(filename, da.getUri())">
+          </input>
 
 	  <b>OR</b>
 
@@ -134,6 +182,16 @@
 		 formaction="@org.hadatac.console.controllers.annotator.routes.SchemaFromFile.create(filename)" 
 		 value="Create Schema from Data File"></input>
 
+       } else {
+
+	       <center><b>Associated schema : </b>@ValueCellProcessing.replaceNameSpaceEx(da.getSchemaUri())
+	       <input type="submit" class="btn btn-default btn-sm" role="button" id="viewDAS" value="View">
+	       <input type="submit" class="btn btn-default btn-sm" role="button" id="editDAS" value="Edit">
+	       <input type="submit" class="btn btn-default btn-sm" role="button" id="removeDAS" value="Remove Association"
+		      formaction="@org.hadatac.console.controllers.annotator.routes.PrepareIngestion.removeAssociation(filename, da.getUri(), "Schema")">
+	       <input type="submit" class="btn btn-default btn-sm" role="button" id="testDAS" value="Test Schema"></input>
+
+       }
       </div></center>
 
     </div>

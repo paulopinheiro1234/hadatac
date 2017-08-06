@@ -84,8 +84,7 @@ public class RefreshStudy extends Controller {
     	} catch (CommandException e) {
     		if (e.getMessage().equals("Unauthorized")) {
     			return ok(syncLabkey.render("login_failed",
-    					org.hadatac.console.controllers.studies.routes.StudyManagement.index(
-    							State.ACTIVE).url(), ""));
+    					org.hadatac.console.controllers.studies.routes.StudyManagement.index().url(), ""));
     		}
     	}
     	

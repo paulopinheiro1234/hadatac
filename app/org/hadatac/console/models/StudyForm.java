@@ -5,57 +5,97 @@ import java.util.List;
 
 public class StudyForm {
 
-	public String studyUri;
-	public String initialParam;
-    public List<String> dataAcquisitions;
-    public String startDateTime;
-    public String endDateTime;
- 
+    public String newStudyUri;
+    public String newStudyType;
+    public String newLabel;
+    public String newTitle;
+    public String newProject;
+    public String newComment;
+    public String newInstitution;
+    public String newAgent;
+    public String newStartDateTime;
+    public String newEndDateTime;
+    
     public StudyForm () {
-    	dataAcquisitions = new ArrayList<String>();
     }
     
-    public String getUri() {
-		return studyUri;
-	}
-
-	public void setUri(String uri) {
-		this.studyUri = uri;
-	}
-	
-	public String getInitialParameter() {
-		return initialParam;
-	}
-
-	public void setInitialParameter(String initialParam) {
-		this.initialParam = initialParam;
-	}
-
-    public List<String> getDataAcquisitions() {
-    	return dataAcquisitions;
+    public String getNewUri() {
+	return newStudyUri;
     }
     
-    public void setDataAcquisitions(List<String> dataAcquisition) {
-    	this.dataAcquisitions = dataAcquisition;
-    }
-
-    public void addDataAcquisition(String dataAcquisition) {
-    	this.dataAcquisitions.add(dataAcquisition);
-    }
-
-    public String getStartDateTime() {
-    	return startDateTime;
+    public void setNewUri(String uri) {
+	this.newStudyUri = uri;
     }
     
-    public void setStartDateTime(String startDateTime) {
-    	this.startDateTime = startDateTime;
-    }
-
-    public String getEndDateTime() {
-    	return endDateTime;
+    public String getNewType() {
+	return newStudyType;
     }
     
-    public void setEndDateTime(String endDateTime) {
-    	this.endDateTime = endDateTime;
+    public void setNewType(String type) {
+	this.newStudyType = type;
+    }
+    
+    public String getNewLabel() {
+	return newLabel;
+    }
+    
+    public void setNewLabel(String label) {
+	this.newLabel = label;
+    }
+    
+    public String getNewTitle() {
+	return newTitle;
+    }
+    
+    public void setNewTitle(String title) {
+	this.newTitle = title;
+    }
+    
+    public String getNewProject() {
+	return newProject;
+    }
+    
+    public void setNewProject(String project) {
+	this.newProject = project;
+    }
+    
+    public String getNewComment() {
+	return newComment;
+    }
+    
+    public void setNewComment(String comment) {
+	this.newComment = comment;
+    }
+    
+    public String getNewInstitution() {
+	return newInstitution;
+    }
+    
+    public void setNewInstitution(String institution) {
+	this.newInstitution = institution;
+    }
+    
+    public String getNewAgent() {
+	return newAgent;
+    }
+    
+    public void setNewAgent(String agent) {
+	this.newAgent = agent;
+    }
+    
+    public String getNewStartDateTime() {
+    	return newStartDateTime;
+    }
+    
+    public void setNewStartDateTime(String startDateTime) {
+    	this.newStartDateTime = startDateTime;
+    }
+    
+    public String getNewEndDateTime() {
+    	return newEndDateTime;
+    }
+    
+    public void setNewEndDateTime(String endDateTime) {
+    	this.newEndDateTime = endDateTime;
     }
 }

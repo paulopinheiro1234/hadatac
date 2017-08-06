@@ -16,19 +16,15 @@ import play.mvc.Controller;
 
 public class StudyManagement extends Controller {
 
-	@Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    public static Result index(int option) {
-    	State state = new State(option);
-    	List<Study> theResults = Study.find(state);
+    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
+    public static Result index() {
+    	List<Study> theResults = Study.find();
     	
-        return ok(studyManagement.render(state, theResults));
+        return ok(studyManagement.render(theResults));
     }
 
-	@Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    public static Result postIndex(int option) {
-        State state = new State(option);
-        List<Study> theResults = Study.find(state);
-        	
-        return ok(studyManagement.render(state, theResults));
+    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
+    public static Result postIndex() {
+        return index();
     }
 }

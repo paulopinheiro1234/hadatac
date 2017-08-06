@@ -49,7 +49,7 @@ public class DataAcquisitionSchema {
     public static List<String> METADASA = Arrays.asList("sio:TimeStamp", 
 							"sio:TimeInstant", 
 							"hasco:originalID", 
-							"hasco:URI", 
+							"hasco:uriID", 
 							"hasco:hasMetaEntity", 
 							"hasco:hasMetaEntityURI", 
 							"hasco:hasMetaAttribute", 
@@ -209,7 +209,8 @@ public class DataAcquisitionSchema {
 		    setTimeInstantColumn(dasa.getPositionInt());
 		    System.out.println("[OK] DataAcquisitionSchema TimeInstantColumn: " + dasa.getPositionInt());
 		}
-		if (dasa.getAttribute().equals(ValueCellProcessing.replacePrefixEx("hasco:originalID"))) {
+		if (dasa.getAttribute().equals(ValueCellProcessing.replacePrefixEx("hasco:originalID")) || 
+		    dasa.getAttribute().equals(ValueCellProcessing.replacePrefixEx("hasco:uriID")) ) {
 		    setIdColumn(dasa.getPositionInt());
 		    System.out.println("[OK] DataAcquisitionSchema IdColumn: " + dasa.getPositionInt());
 		}

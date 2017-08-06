@@ -1,0 +1,35 @@
+@(std_uri : String, 
+  oc      : org.hadatac.entity.pojo.ObjectCollection)
+
+@import helper._
+@import org.hadatac.utils._
+@import org.hadatac.console.views.html._
+@import org.hadatac.console.views.html.schema._
+@import org.hadatac.console.controllers.schema._
+@import org.hadatac.metadata.loader.ValueCellProcessing
+
+@main("Delete Object Collection") {
+
+   <div class="container">
+      <h4>Delete Object Collection</h4>
+      
+        <form class="form-horizontal" method="post" action="@org.hadatac.console.controllers.objectcollections.routes.DeleteOC.processForm(std_uri, oc.getUri())">
+
+        <div class="form-group">
+           <label>URI : </label> @ValueCellProcessing.replaceNameSpaceEx(oc.getUri()) <br>         
+           <label>Type : </label> @oc.getObjectCollectionType().getLabel() <br>         
+           <label>Name : </label> @oc.getLabel() <br>         
+           <label>Study : </label> @ValueCellProcessing.replaceNameSpaceEx(oc.getStudyUri()) <br>        
+        </div>
+     
+        <div class="form-group" class="col-sm-6 col-offset-3">
+	   <input class="btn btn-success" role="button" type="submit" value="Delete" />
+        </div>
+
+     </form>   
+     <br>
+     <a href="@org.hadatac.console.controllers.objectcollections.routes.OCManagement.index(std_uri)" class="btn btn-primary" role="button">Back to Sample Collection Management</a>
+
+  </div>
+
+}

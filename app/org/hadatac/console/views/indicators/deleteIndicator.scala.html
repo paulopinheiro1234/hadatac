@@ -1,0 +1,31 @@
+@(indicator: org.hadatac.entity.pojo.Indicator, results : String)
+
+@import helper._
+@import org.hadatac.utils._
+@import org.hadatac.console.views.html._
+@import org.hadatac.console.views.html.indicators._
+@import org.hadatac.console.controllers.indicators._
+@import org.hadatac.console.controllers.triplestore._
+
+@main("Delete Indicator") {
+<h2>Delete Indicator</h2>
+
+<div class="container">
+	
+	Deleted <b> @indicator.getUri </b>
+	<p> @results </p>
+	
+   
+</div>
+<form class="form-horizontal" method="post" action="@org.hadatac.console.controllers.indicators.routes.DeleteIndicator.processForm(indicator.getUri())">
+ 	<p style='font-family: "Lucida Console", Monaco, monospace;' id='msgarea'></p>
+	<script type="text/javascript">
+	  var msg = "@results";
+       	  var msg2 = decodeURIComponent(msg).replace(/\+/g, '&nbsp;');
+          $('#msgarea').html(msg2.replace(/&lt;br&gt;/g, '<br>'));
+       	  document.getElementById('end-process-box').style.display = 'inline';
+        </script>
+    </form>    
+    @indicatorButton(false)
+
+}

@@ -1,0 +1,60 @@
+@(study  : org.hadatac.entity.pojo.Study,
+  oc     : org.hadatac.entity.pojo.ObjectCollection,
+  objList : List[org.hadatac.entity.pojo.StudyObject])
+
+@import helper._
+@import org.hadatac.console.views.html._
+@import org.hadatac.utils._
+@import java.net.URLEncoder
+
+@main("Object Management") {
+
+  <div class="container-fluid">
+    <h3>Management of Objects in Collection <i><font color="darkBlue">@oc.getLabel()</i></font> (@oc.getObjectCollectionType().getLabel())</h3>
+    
+    <h4>Management options</h4>
+
+    <div class="container-fluid">
+      <div class="row">
+         <div class="navbar-collapse collapse navbar-secondary">
+           <a href="@org.hadatac.console.controllers.objects.routes.NewObjectsFromScratch.index(URLEncoder.encode(study.getUri(),"UTF-8"),URLEncoder.encode(oc.getUri(),"UTF-8"))" class="btn btn-primary" role="button">Create Multiple Objects From Scratch</a>
+           <a href="" class="btn btn-primary disabled" role="button">Create Multiple Objects From File</a>
+           <a href="" class="btn btn-primary disabled" role="button">Create Single Object</a>
+         </div>
+      </div>
+   </div>
+
+   <hr>
+
+   <h4>Objects</h4>
+   
+    <div class="container-fluid">
+        <table class="table">
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Type</th>
+                <th>Original ID</th>
+		<th>Is From</th>
+		<th>At Location</th>
+		<th>At Time</th>
+                <th>Operations</th>
+              </tr>
+            </thead>
+            <tbody>
+	    @if(objList != null) {
+                 @for(obj <- objList){
+	            @obj_entry(study, oc, obj)
+                 }
+              } 
+            </tbody>
+        </table>
+	
+	<a href="@org.hadatac.console.controllers.objects.routes.ObjectManagement.index(URLEncoder.encode(study.getUri(),"UTF-8"),URLEncoder.encode(oc.getUri(),"UTF-8"))" class="btn btn-success disabled" role="button">Save Object Collection</a><br>
+	<a href="@org.hadatac.console.controllers.objectcollections.routes.OCManagement.index(URLEncoder.encode(study.getUri(),"UTF-8"))" class="btn btn-primary" role="button">Back to Object Collection  Management</a>
+	
+    </div>
+ 
+  </div>
+
+}

@@ -26,37 +26,14 @@ import org.hadatac.utils.NameSpaces;
 
 import play.Play;
 
-public class Attribute implements HADatAcClass, Comparable<Attribute> {
-	private String uri;
-	private String superUri;
-	private String localName;
-	private String label;
-	
-	public String getUri() {
-		return uri;
+public class Attribute extends HADatAcClass implements Comparable<Attribute> {
+
+        static String className = "sio:Attribute";
+
+	public Attribute () {
+	    super(className);
 	}
-	public void setUri(String uri) {
-		this.uri = uri;
-	}
-	public String getSuperUri() {
-		return superUri;
-	}
-	public void setSuperUri(String superUri) {
-		this.superUri = superUri;
-	}
-	public String getLocalName() {
-		return localName;
-	}
-	public void setLocalName(String localName) {
-		this.localName = localName;
-	}
-	public String getLabel() {
-		return label;
-	}
-	public void setLabel(String label) {
-		this.label = label;
-	}
-	
+
 	public static List<Attribute> find() {
 	    List<Attribute> attributes = new ArrayList<Attribute>();
 	    String queryString = NameSpaces.getInstance().printSparqlNameSpaceList() +
@@ -132,29 +109,4 @@ public class Attribute implements HADatAcClass, Comparable<Attribute> {
 	    return this.getLocalName().compareTo(another.getLocalName());
 	}
 	
-    public static String getHierarchyJson() {
-	String collection = "";
-	String q = 
-	    "SELECT ?id ?superId ?label ?comment WHERE { " + 
-	    "   ?id rdfs:subClassOf* sio:Attribute . " + 
-	    "   ?id rdfs:subClassOf ?superId .  " + 
-	    "   OPTIONAL { ?id rdfs:label ?label . } " + 
-	    "   OPTIONAL { ?id rdfs:comment ?comment . } " +
-	    "}";
-    	ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-    	try {
-	    String queryString = NameSpaces.getInstance().printSparqlNameSpaceList() + q;
-	    Query query = QueryFactory.create(queryString);
-	    QueryExecution qexec = QueryExecutionFactory.sparqlService(Collections.getCollectionsName(Collections.METADATA_SPARQL), query);
-	    ResultSet results = qexec.execSelect();
-	    ResultSetFormatter.outputAsJSON(outputStream, results);
-	    qexec.close();
-	    
-	    return outputStream.toString("UTF-8");
-    	} catch (Exception e) {
-	    e.printStackTrace();
-	}
-    	return "";
-    }
-    
 }

@@ -4,6 +4,10 @@ import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
+import java.time.format.DateTimeFormatter;
 import java.util.Date;
 import java.util.Iterator;
 
@@ -25,7 +29,6 @@ import org.hadatac.entity.pojo.Dataset;
 import org.hadatac.entity.pojo.Deployment;
 import org.hadatac.entity.pojo.HADataC;
 import org.hadatac.entity.pojo.Measurement;
-//import org.hadatac.entity.pojo.MeasurementType;
 import org.hadatac.entity.pojo.Subject;
 import org.hadatac.metadata.loader.ValueCellProcessing;
 import org.hadatac.utils.Collections;
@@ -61,20 +64,20 @@ public class Parser {
 		
 		// Verify if model is successfully loaded
 		if (model.isEmpty()) {
-			message += Feedback.println(mode, "[ERROR] Preamble not a well-formed Turtle.");
-			System.out.println("[ERROR] Preamble not a well-formed Turtle.");
+		    message += Feedback.println(mode, "[ERROR] Preamble not a well-formed Turtle.");
+		    System.out.println("[ERROR] Preamble not a well-formed Turtle.");
 		} 
 		else {
-			message += Feedback.println(mode, "[OK] Preamble a well-formed Turtle.");
-			System.out.println("[OK] Preamble a well-formed Turtle.");
+		    message += Feedback.println(mode, "[OK] Preamble a well-formed Turtle.");
+		    System.out.println("[OK] Preamble a well-formed Turtle.");
 		}
 		
 		result = loadFromPreamble(mode, model);
 		
 		if (result.getStatus() == 0) {
-			message += result.getMessage();
-			result = loadFromKb(mode);
-			message += result.getMessage();
+		    message += result.getMessage();
+		    result = loadFromKb(mode);
+		    message += result.getMessage();
 		}
 		
 		files.closeFile("ccsv", "r");
@@ -87,10 +90,9 @@ public class Parser {
 		
 		DataAcquisition dataAcquisition = DataAcquisition.create(hadatacCcsv, hadatacKb);
 		if (hadatacCcsv.getDataAcquisition().getStatus() > 0) {
-			hadatacKb.getDataAcquisition().merge(dataAcquisition);
-		} 
-		else {
-			hadatacKb.setDataAcquisition(dataAcquisition);
+		    hadatacKb.getDataAcquisition().merge(dataAcquisition);
+		} else {
+		    hadatacKb.setDataAcquisition(dataAcquisition);
 		}
 		hadatacKb.getDataAcquisition().save();
 		ParsingResult result = indexMeasurements();
@@ -215,18 +217,23 @@ public class Parser {
                                        - TimeInstantColumn is used for timestamps told to system to be timestamp, but that are not further processed
 				       - Abstract times are encoded as DASA's events, and are supposed to be strings
 				 */
-
+				
+				measurement.setTimestamp(new Date(Long.MAX_VALUE).toInstant().toString());
+				measurement.setAbstractTime("");
+				
 				// contrete time(stamps)
 				if(dasa.getPositionInt() == schema.getTimestampColumn()) {
 				    String sTime = record.get(schema.getTimestampColumn() - 1);
 				    int timeStamp = new BigDecimal(sTime).intValue();
-				    Date time = new Date((long)timeStamp * 1000);
-				    measurement.setTimestamp(time.toString());
+				    measurement.setTimestamp(Instant.ofEpochSecond(timeStamp).toString());
 				} else if (schema.getTimeInstantColumn() != -1) {
 				    String timeValue = record.get(schema.getTimeInstantColumn() - 1);
 				    //System.out.println("Time Instant value: " + timeValue);
 				    if (timeValue != null) {
-					measurement.setTimestamp(timeValue);
+				    	DateTimeFormatter formatter = DateTimeFormatter.ofPattern("M/d/yy HH:mm");
+				    	LocalDateTime datetime = LocalDateTime.parse(timeValue, formatter);
+				    	measurement.setTimestamp(datetime.toInstant(ZoneOffset.UTC).toString());
+				    	//measurement.setTimestamp(timeValue);
 				    }
 				}    
 				
@@ -236,18 +243,13 @@ public class Parser {
 				    DataAcquisitionSchemaEvent dase = schema.getEvent(daseUri); 
 				    if (dase != null) {
 					if (dase.getLabel() != null && !dase.getLabel().equals("")) {
-					    measurement.setTimestamp("At " + dase.getLabel());
+					    measurement.setAbstractTime("At " + dase.getLabel());
 					} else if (dase.getEntity() != null && !dase.getEntity().equals("")) {
-					    measurement.setTimestamp("At " + dase.getEntity().substring(dase.getEntity().indexOf("#") + 1));
+					    measurement.setAbstractTime("At " + dase.getEntity().substring(dase.getEntity().indexOf("#") + 1));
 					} else {
-					    measurement.setTimestamp("At " + daseUri);
+					    measurement.setAbstractTime("At " + daseUri);
 					}
 				    } 
-				}
-				
-				// no time information
-				else {
-				    measurement.setTimestamp("");
 				}
 				
 				/*============================*

@@ -1,17 +1,26 @@
-@(message: String, data : org.hadatac.console.models.StudyForm)
+@(message: String, std : org.hadatac.entity.pojo.Study)
 
 @import org.hadatac.console.views.html._
 @import org.hadatac.utils._
 @import org.hadatac.console.controllers.studies._
+@import org.hadatac.metadata.loader.ValueCellProcessing
 
 @main(message) {
     <h1>@message</h1>
 
-	<ul>
-		<li><b>Data Acquisition(s)</b>: @data.getDataAcquisitions()</li>
-		<li><b>Start Date/Time</b>: @data.getStartDateTime()</li>
-		<li><b>End Date/Time</b>: @data.getEndDateTime()</li>
-	</ul>
-
-   @studyButton(false)
+    <ul>
+         <li><b>URI:</b> @ValueCellProcessing.replaceNameSpaceEx(std.getUri())</li>
+         <li><b>Type:</b> @ValueCellProcessing.replaceNameSpaceEx(std.getType())</li>
+         <li><b>Short Name:</b> @std.getLabel()</li>
+         <li><b>Project:</b> @std.getProject()</li>
+         <li><b>Description:</b> @std.getComment()</li>
+         <li><b>Agent:</b> @if(std.getAgent() != null) { @std.getAgent().getName() }</li>
+         <li><b>Institution:</b> @if(std.getInstitution() != null) { @std.getInstitution().getName() }</li>
+	 <li><b>Start Date/Time</b>: @if(std.getStartedAt() != null) { @std.getStartedAt() }</li>
+	 <li><b>End Date/Time</b>: @if(std.getEndedAt() != null) { @std.getEndedAt() }</li>
+    </ul>
+    
+    @studyButton(false)
 }
+
+    

@@ -1,0 +1,29 @@
+@(indicator : org.hadatac.entity.pojo.Indicator)
+
+@import helper._
+@import org.hadatac.utils._
+@import org.hadatac.console.views.html._
+@import org.hadatac.console.controllers._
+@import org.hadatac.console.controllers.schema._
+@import org.hadatac.metadata.loader.ValueCellProcessing
+
+@main("New Indicator") {
+
+    <h2>Create Indicator</h2>
+    
+    <h3>Listing below shows values for new Indicator</h3>
+
+    <div class="container-fluid">
+       <ul>
+         <li><b>URI:</b> @ValueCellProcessing.replaceNameSpaceEx(indicator.getUri())</li>
+         <li><b>Label:</b> @indicator.getLabel()</li>
+         <li><b>Comment:</b> @indicator.getComment()</li>
+       </ul>
+       
+       <br>
+       <a href="@org.hadatac.console.controllers.indicators.routes.IndicatorManagement.index()" class="btn btn-primary" role="button">Back to Indicator Management</a>
+       
+    </div>
+    
+    }
+    

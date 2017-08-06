@@ -1,0 +1,13 @@
+@(indent: Boolean)
+
+@import org.hadatac.utils._
+
+@if(indent) {
+    <div class="row">
+        <div class="col-md-12 col-md-offset-1">
+            <a href="@org.hadatac.console.controllers.indicators.routes.IndicatorManagement.index()" class="btn btn-primary" role="button">Back to Indicator Management</a>
+        </div>
+    </div>
+} else {
+    <a href="@org.hadatac.console.controllers.indicators.routes.IndicatorManagement.index()" class="btn btn-primary" role="button">Back to Indicator Management</a>
+}

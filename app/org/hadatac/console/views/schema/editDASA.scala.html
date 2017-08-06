@@ -124,11 +124,14 @@
 	   
            <div class="form-group">
              <label>Is Attribute Of</label>
-	     <select id="newIsAttributeOf" class="form-control col-sm-6" name="newIsAttributeOf">
+	     <select id="newObject" class="form-control col-sm-6" name="newObject">
 	       <option></option>
-	       <option>DefaultObject</option>
                @for(daso <- das.getObjects()){
-	          @DASO_select_entry(daso,"")
+	          @if(dasa.getObject() != null) {
+ 	             @DASO_select_entry(daso,dasa.getObject().getRole())
+                  } else {
+ 	             @DASO_select_entry(daso,"")
+                  }
                }
 	     </select>
            </div>

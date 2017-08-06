@@ -1,0 +1,55 @@
+@(file_name  : String,
+  da_uri     : String,
+  dasOptions : List[org.hadatac.entity.pojo.DataAcquisitionSchema])
+
+@import helper._
+@import org.hadatac.utils._
+@import org.hadatac.console.views.html._
+@import org.hadatac.console.views.html.triplestore._
+@import org.hadatac.console.controllers.triplestore._
+@import org.hadatac.console.controllers._
+
+@main("Select Data Acquisition Schema (DAS) for " + da_uri) {
+
+<script type="text/javascript">
+   function checkform() {
+      var cansubmit = true;
+
+      if (document.getElementById('option').value.length == 0) {
+          cansubmit = false;
+      }
+         
+      if (cansubmit) {
+          document.getElementById('submitbutton').disabled = false;
+      } else {
+          document.getElementById('submitbutton').disabled = 'disabled';
+      }
+   }
+</script>
+
+  <div class="container">
+    <h2>Select Data Acquisition Schema (DAS) for @da_uri</h2>
+
+    <form class="form-horizontal" name="assignOption" method="post" action="@org.hadatac.console.controllers.annotator.routes.PrepareIngestion.processSelectSchema(file_name, da_uri)">
+
+    <div class="form-group">
+      <label>Selected Data Acquisition</label> <br>
+      @da_uri<br>
+      <br>
+      <label>New Data Acquisition Schema</label> 
+      <select class="form-control col-sm-6" id="option" size="20" name="option" onchange="checkform()" >
+        @for(das <- dasOptions) {
+            <option value="@das.getUri()">@das.getLabel() [@das.getUri()]</option>
+        }
+      </select>
+    </div>
+    
+    <div class="form-group" class="col-sm-6 col-offset-3">
+      <input class="btn btn-success" role="button" id="submitbutton" type="submit" value="Select Data Acquisition Schema" disabled="disabled" />
+    </div>
+    
+    </form>    
+  </div>
+  
+  }
+  

@@ -393,13 +393,22 @@ public class TripleProcessing {
 						dataAcquisition.setComment(cellValue);
 					}
 					else if (predicate.equals("prov:startedAtTime")) {
+						/*
 						String pattern = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'";
 						System.out.println("prov:startedAtTime: " + cellValue);
 						dataAcquisition.setStartedAt(DateTimeFormat.forPattern(pattern).parseDateTime(cellValue));
+						*/
+						String pattern = "EEE MMM dd HH:mm:ss zzz yyyy";
+						System.out.println("prov:startedAtTime: " + cellValue);
+						dataAcquisition.setStartedAt(DateTimeFormat.forPattern(pattern).parseDateTime(cellValue.replace(" BRT ", " EDT ")));
 					}
 					else if (predicate.equals("prov:endedAtTime")) {
+						/*
 						String pattern = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'";
 						dataAcquisition.setEndedAt(DateTimeFormat.forPattern(pattern).parseDateTime(cellValue));
+						*/
+						String pattern = "EEE MMM dd HH:mm:ss zzz yyyy";
+						dataAcquisition.setEndedAt(DateTimeFormat.forPattern(pattern).parseDateTime(cellValue.replace(" BRT ", " EDT ")));
 					}
 					else if (predicate.equals("prov:used")) {
 						dataAcquisition.setParameter(cellValue);

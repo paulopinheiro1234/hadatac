@@ -1,139 +1,177 @@
-@(thePlatforms   : List[org.hadatac.entity.pojo.Platform],
-  theInstruments : List[org.hadatac.entity.pojo.Instrument],
-  theDetectors   : List[org.hadatac.entity.pojo.Detector],
-  deploymentType : String)
+@(studyType     : org.hadatac.entity.pojo.StudyType,
+  organizations : List[org.hadatac.entity.pojo.Agent],
+  persons       : List[org.hadatac.entity.pojo.Agent]) 
 
 @import helper._
 @import org.hadatac.utils._
 @import org.hadatac.console.views.html._
-@import org.hadatac.console.views.html.deployments._
-@import org.hadatac.console.controllers.deployments._
 @import org.hadatac.console.controllers._
+@import org.hadatac.entity.pojo.Agent
+@import play._
 
 @main("New Study") {
 
-	<script type="text/javascript">
-	   function checkform() {
-	      var cansubmit = true;
-	
-	      if (document.getElementById('uri').value.length == 0) {
-	          cansubmit = false;
-	      }
-	      else {
-	    	  document.getElementById('acquisition_uri').value = document.getElementById('uri').value.replace("DPL", "DA");
-	      }
-	
-	      if (document.getElementById('acquisition_uri').value.length == 0) {
-	          cansubmit = false;
-	      }
-	      
-	      if (document.getElementById('platform').value.length == 0) {
-	         cansubmit = false;
-	      }
-	         
-	      if (document.getElementById('instrument').value.length == 0) { 
-	         cansubmit = false;
-	         var instrumentSelector = document.getElementById('detector');
-	         instrumentSelector.disabled = 'disabled';
-	         for (var i = 0, l = instrumentSelector.length; i < l; i++) {
-	                instrumentSelector[i].selected = instrumentSelector[i].defaultSelected;
-			 }      
-		  } else {
-	         document.getElementById('detector').disabled = false;
-	      }
-	                
-	      if (document.getElementById('startdatetime').value.length == 0) {
-	         cansubmit = false;
-	      }
-	
-	      if (cansubmit) {
-	          document.getElementById('submitbutton').disabled = false;
-	      } else {
-	          document.getElementById('submitbutton').disabled = 'disabled';
-	      }
-	   }
-	</script>
-
   <div class="container">
-    <h2>New @deploymentType.substring(0, 1).toUpperCase().concat(deploymentType.substring(1).toLowerCase()) Deployment</h2>
+    <h2>New Study</h2>
 
-    <form class="form-horizontal" name="newDeployment" method="post" action="@org.hadatac.console.controllers.studies.routes.NewStudy.processForm">
+   <script type="text/javascript">
+     function checkform() {
+        var cansubmit = true;
+	
+	if (!document.getElementById('newLabel').value || 
+            document.getElementById('newLabel').value.length === 0) {
+	   cansubmit = false;
+	}
+
+	if ($('input[type=radio]:checked').size() === 0) {
+	  cansubmit = false;
+	}
+
+	if (cansubmit) {
+	  document.getElementById('submit').disabled = false;
+	} else {
+	  document.getElementById('submit').disabled = 'disabled';
+	}
+     }
+
+     function replaceAll(str, find, replace) {
+        while (str.indexOf(find) > -1) {
+            str = str.replace(find, replace);
+        }
+        return str;
+     }
+       
+     function labelchange() {
+        var newUri = "@Play.application().configuration().getString("hadatac.community.ont_prefix")" + "-kb:STD-" + document.getElementById("newLabel").value;
+        newUri = replaceAll(newUri," ","-");
+	newUri = replaceAll(newUri,"<","");
+        newUri = replaceAll(newUri,">","");
+        newUri = replaceAll(newUri,"?","");
+	$('#newUri').val(newUri);
+        checkform();
+     };
+
+   </script>
+   <style>
+      ul.tree li {
+        list-style-type: none;
+        position: relative;
+      }
+
+      ul.tree li ul {
+        display: none;
+      }
+
+      ul.tree li.open > ul {
+        display: block;
+      }
+
+      ul.tree li a {
+        color: black;
+        text-decoration: none;
+      }
+
+      ul.tree li a:before {
+        height: 1em;
+        padding:0 .1em;
+        font-size: .8em;
+        display: block;
+        position: absolute;
+        left: -1.3em;
+        top: .2em;
+      }
+
+      ul.tree li > a:not(:last-child):before {
+        content: '+';
+      }
+
+      ul.tree li.open > a:not(:last-child):before {
+        content: '-';
+      }
+   </style>
+
+    <form class="form-horizontal" name="newStudy" method="post" action="@org.hadatac.console.controllers.studies.routes.NewStudy.processForm()">
 	
 	<div class="form-group">
 		<label>URI:</label>
- 		<input type="text" class="form-control col-sm-6" name="uri" id="uri" onchange="checkform()" >
+		<input type="text" class="form-control col-sm-6" name="newUri" id="newUri" 
+		       onchange="checkform()" readonly >
  	</div>
  	<div class="form-group">
-		<label>Data Acquisition URI:</label>
- 		<input type="text" class="form-control col-sm-6" name="acquisition_uri" id="acquisition_uri" onchange="checkform()" >
+		<label>Short Name:</label>
+ 		<input type="text" class="form-control col-sm-6" name="newLabel" id="newLabel" onchange="labelchange()" >
+ 	</div>
+	<div class="form-group">
+	        <label>Type:</label>
+		<input type="text" class="form-control col-sm-6" name="currentType" id="currentType" 
+		       onchange="checkform()" readonly >
+		<div>
+                   (Use selector below to set/modify study type)
+                   <ul class="tree" onchange="checkform()">
+		     @tree_node(studyType.getHierarchy(),"newStudyType", "")
+                   </ul>
+                </div>
  	</div>
  	<div class="form-group">
-		<label>Initial Parameters: (optional)</label>
- 		<input type="text" class="form-control col-sm-6" name="init_param" id="init_param" onchange="checkform()" >
+		<label>Title</label>
+ 		<input type="text" class="form-control col-sm-6" name="newTitle" id="newTitle" onchange="checkform()" >
  	</div>
-    <div class="form-group">
-         <label>Platform</label> 
-         <select class="form-control col-sm-6" id="platform" name="platform" onchange="checkform()" >
-            <option value=""></option>
-            @for(platform <- thePlatforms) {
-                <option value="@platform.getUri()">@platform.getLabel() @if(platform.getSerialNumber() != null) { (SN: @platform.getSerialNumber()) }</option>
-            }
-         </select>
-     </div>
-	 <div class="form-group">
-         <label>Instrument</label>
-         <select class="form-control col-sm-6" id="instrument" name="instrument" onchange="checkform()" >
-            <option value=""></option>         
-            @for(instrument <- theInstruments){
-                <option value="@instrument.getUri()">@instrument.getLabel()  @if(instrument.getSerialNumber() != null) { (SN: @instrument.getSerialNumber()) }</option>         
-            }
-         </select>
-     </div>
-	 <div class="form-group">
-         <label>Detector(s)</label>
-         <select class="form-control col-sm-6" id="detector" multiple="multiple" name="detector[]" onchange="checkform()" disabled='disabled' >
-            @for((detector) <- theDetectors){
-                <option value="@detector.getUri()">@detector.getLabel()  @if(detector.getSerialNumber() != null) { (SN: @detector.getSerialNumber()) }</option>         
-            }
-         </select>
-     </div>
+ 	<div class="form-group">
+		<label>Project</label>
+ 		<input type="text" class="form-control col-sm-6" name="newProject" id="newProject" onchange="checkform()" >
+ 	</div>
+ 	<div class="form-group">
+		<label>Description</label>
+ 		<input type="text" class="form-control col-sm-6" name="newComment" id="newComment" onchange="checkform()" >
+ 	</div>
+ 	<div class="form-group">
+		<label>PI</label>
+	     <select id="newAgent" class="form-control col-sm-6" name="newAgent">
+	       <option></option>
+	       @if(persons != null) {
+                 @for(person <- persons){
+ 	           @agent_select_entry(person,"")
+                 }
+               } 
+             </select>
+ 	</div>
+ 	<div class="form-group">
+	     <label>Institution</label>
+	     <select id="newInstitution" class="form-control col-sm-6" name="newInstitution">
+	       <option></option>
+	       @if(organizations != null) {
+                 @for(organization <- organizations){
+ 	           @agent_select_entry(organization,"")
+                 }
+               } 
+             </select>
+ 	</div>
      
-	 <div class="form-group">
-         <label for="startdate">Start Date/Time</label><br> 
-         <div class="container">
-            <div class="row">
-               <div class='col-sm-3'>
-                 <div class="form-group">
-                    <div class='input-group date' id='startdate' onchange="checkform()" >
-                       <input type='text' name="startDateTime" id="startdatetime" class="form-control" />
-                       <span class="input-group-addon">
-                          <span class="glyphicon glyphicon-calendar"></span>
-                       </span>
-                    </div>
-                 </div>
-               </div>
-               <script type="text/javascript">
-                 $(function () {
-                     $('#startdate').datetimepicker();
-                     $('#startdate').on('dp.change', function (e) { checkform(); });
-                 });
-               </script>
-            </div>
-         </div>
-     </div>
+	<div class="form-group">
+	  <label>Updates</label> <br>
+	  <input class="btn btn-success btn-sm" role="button" type="submit" id="submit" value="Create Study" disabled /><br>
+	  <a href="@org.hadatac.console.controllers.studies.routes.StudyManagement.index()" class="btn btn-primary" role="button">Back to Study Management</a>
+	</div>
      
-     <div class="form-group" hidden="true">
-     	<input id="type" name="type" type="text" class="form-control" value="@deploymentType" hidden="true" />
-     </div>
-
-      <div class="form-group" class="col-sm-6 col-offset-3">
-          <input class="btn btn-success" role="button" id="submitbutton" type="submit" value="Create" disabled="disabled" />
-          <p> The created deployment will be saved in LabKey</p>
-      </div>
-      
-      <div class="form-group" class="col-sm-6 col-offset-3">
-           @studyButton(false) 
-      </div>
+     <script>
+       var tree = document.querySelectorAll('ul.tree a:not(:last-child)');
+       for(var i = 0; i < tree.length; i++){
+          tree[i].addEventListener('click', function(e) {
+          var parent = e.target.parentElement;
+          var classList = parent.classList;
+          if(classList.contains("open")) {
+            classList.remove('open');
+            var opensubs = parent.querySelectorAll(':scope .open');
+            for(var i = 0; i < opensubs.length; i++){
+                opensubs[i].classList.remove('open');
+            }
+          } else {
+            classList.add('open');
+          }
+         });
+       }
+     </script>
+		   
 
    </form>
   </div>

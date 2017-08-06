@@ -1,0 +1,22 @@
+@(node : org.hadatac.console.models.TreeNode, optionName : String, selected : String)
+
+@import play.Play
+@import org.hadatac.console.controllers.metadata._
+@import org.hadatac.console.controllers.metadata.DynamicFunctions
+@import java.net._
+@import org.hadatac.utils._
+@import org.hadatac.metadata.loader.ValueCellProcessing
+
+@if(!selected.equals("") && node.getName().equals(selected)) {
+   <li><a href="#"><input type="radio" name="@optionName" id="@optionName" value="@ValueCellProcessing.replaceNameSpaceEx(node.getName())" onchange="typechange()" checked>@FirstLabel.getLabel(node.getName())</a>
+} else {
+   <li><a href="#"><input type="radio" name="@optionName" id="@optionName" value="@ValueCellProcessing.replaceNameSpaceEx(node.getName())" onchange="typechange()" >@FirstLabel.getLabel(node.getName())</a>
+}
+@if(node.getChildren().size() > 0) {
+   <ul>
+     @for(child <- node.getChildren()) { 
+       @tree_node(child, optionName, selected)
+     }
+   </ul>
+}
+</li>

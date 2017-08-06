@@ -225,6 +225,9 @@ public class DataAcquisitionSchemaAttribute {
 	if (isMeta) {
 	    return "";
 	}
+	if (dasoUri != null && !dasoUri.equals("")) {
+	    return "[" + getObject().getEntityLabel() + "]";
+	}
 	if (dasoUri == null || dasoUri.equals("")) {
 	    if (das != null && das.getIdColumn() > -1) {
 		return "[inferred from DefaultObject]";
@@ -361,6 +364,13 @@ public class DataAcquisitionSchemaAttribute {
 	return DataAcquisitionSchemaObject.find(dasoUri);
     }
     
+    public String getObjectNamespace() {
+	if (dasoUri == null || dasoUri.equals("")) {
+	    return "";
+	}
+	return ValueCellProcessing.replaceNameSpaceEx(dasoUri.replace("<","").replace(">",""));
+    }
+
     public String getObjectViewLabel() {
 	if (attribute.equals(ValueCellProcessing.replaceNameSpaceEx("hasco:originalID"))) {
 	    return "[DefaultObject]";
@@ -397,6 +407,13 @@ public class DataAcquisitionSchemaAttribute {
 	return DataAcquisitionSchemaEvent.find(daseUri);
     }
     
+    public String getEventNamespace() {
+	if (daseUri == null || daseUri.equals("")) {
+	    return "";
+	}
+	return ValueCellProcessing.replaceNameSpaceEx(daseUri.replace("<","").replace(">",""));
+    }
+
     public String getEventViewLabel() {
 	if (isMeta) {
 	    return "";
@@ -615,10 +632,18 @@ public class DataAcquisitionSchemaAttribute {
 	    insert += this.getUri() + " hasco:hasUnit " + unit + " .  ";
 	}
 	if (daseUri != null && !daseUri.equals("")) {
-	    insert += this.getUri() + " hasco:hasEvent " + daseUri + " .  ";
+	    if (daseUri.startsWith("http")) {
+		insert += this.getUri() + " hasco:hasEvent <" + daseUri + "> .  ";
+	    } else {
+		insert += this.getUri() + " hasco:hasEvent " + daseUri + " .  ";
+	    }
 	}
 	if (dasoUri != null && !dasoUri.equals("")) {
-	    insert += this.getUri() + " hasco:isAttributeOf " + dasoUri + " .  ";
+	    if (dasoUri.startsWith("http")) {
+		insert += this.getUri() + " hasco:isAttributeOf <" + dasoUri + "> .  ";
+	    } else {
+		insert += this.getUri() + " hasco:isAttributeOf " + dasoUri + " .  ";
+	    }
 	} 
 	//insert += this.getUri() + " hasco:hasSource " + " .  "; 
 	//insert += this.getUri() + " hasco:isPIConfirmed " + " .  "; 

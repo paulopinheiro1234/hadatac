@@ -84,20 +84,21 @@ public class Global extends GlobalSettings {
 		// check if SOLR instances are still down, If so, show an error message
 		// TODO: implement this code
 
-        // check existence/availability of security role
+                // check existence/availability of security role
 		initialData();
 		initDirectoryStructure();
 		
 		// check if default user still have default password. If so, ask to change.
 		// TODO: implement this code
 		
-	    // check if there is at least one user is pre-registered. If not, ask to pre-register at least the main user
+	        // check if there is at least one user is pre-registered. If not, ask to pre-register at least the main user
 		// TODO: implement this code
 		
 		// (NOT SURE THIS FUNCTION SHOULD BE CALLED ON ONSTART) check if ontologies are loaded. If not ask to upload them  
 		// TODO: implement this code
 
-		// (NOT SURE THIS FUNCTION SHOULD BE CALLED ON ONSTART) check if instances are loaded. If not, show how to upload some default instances  
+		// (NOT SURE THIS FUNCTION SHOULD BE CALLED ON ONSTART) check if instances are loaded. 
+                //       If not, show how to upload some default instances  
 		// TODO: implement this code
 		
 		// Create thread for auto ccsv annotation

@@ -1,0 +1,123 @@
+@(indicator : org.hadatac.entity.pojo.Indicator ) 
+
+@import helper._
+@import play.Play
+@import org.hadatac.utils._
+@import org.hadatac.console.views.html._
+@import org.hadatac.console.controllers._
+@import org.hadatac.entity.pojo.Indicator
+@import org.hadatac.metadata.loader.ValueCellProcessing
+
+@main("Edit Indicator") {
+   <script type="text/javascript">
+     function checkform() {
+        var cansubmit = true;
+	
+        if (document.getElementById('newUri').value.length == 0) {
+          cansubmit = false;
+	}
+
+	if (document.getElementById('newLabel').value.length == 0) {
+	  cansubmit = false;
+	}
+
+	if (cansubmit) {
+	  document.getElementById('submit').disabled = false;
+	} else {
+	  document.getElementById('submit').disabled = 'disabled';
+	}
+     }
+   </script>
+   <style>
+      ul.tree li {
+        list-style-type: none;
+        position: relative;
+      }
+
+      ul.tree li ul {
+        display: none;
+      }
+
+      ul.tree li.open > ul {
+        display: block;
+      }
+
+      ul.tree li a {
+        color: black;
+        text-decoration: none;
+      }
+
+      ul.tree li a:before {
+        height: 1em;
+        padding:0 .1em;
+        font-size: .8em;
+        display: block;
+        position: absolute;
+        left: -1.3em;
+        top: .2em;
+      }
+
+      ul.tree li > a:not(:last-child):before {
+        content: '+';
+      }
+
+      ul.tree li.open > a:not(:last-child):before {
+        content: '-';
+      }
+   </style>
+  <div class="container">
+    <h2>Edit Indicator @indicator.getLabel()</h2>
+
+    <form class="form-horizontal" name="editIndicator" method="post" action="@org.hadatac.console.controllers.indicators.routes.EditIndicator.processForm(indicator.getUri())">
+	
+	<div class="form-group">
+		<label>URI:</label>
+ 		<input type="text" class="form-control col-sm-6" name="newUri" id="newUri" value="@ValueCellProcessing.replaceNameSpaceEx(indicator.getUri())" onchange="checkform()" readonly >
+ 	</div>
+ 	<div class="form-group">
+		<label>Label:</label>
+ 		<input type="text" class="form-control col-sm-6" name="newLabel" id="newLabel"  value="@indicator.getLabel()" onchange="checkform()" >
+ 	</div>
+	<div class="form-group">
+		<label>Comment:</label>
+ 		<input type="text" class="form-control col-sm-6" name="newComment" id="newComment"  value="@indicator.getComment()" onchange="checkform()" >
+ 	</div>
+	 
+	<div class="form-group">
+	  <label>Updates</label> <br>
+	  <input class="btn btn-success btn-sm" role="button" type="submit" id="submit" value="Save Indicator" /><br>
+	  <a href="@org.hadatac.console.controllers.indicators.routes.IndicatorManagement.index()" class="btn btn-primary" role="button">Back to Indicator Management</a>
+	</div>
+     
+	<script>
+        function replaceAll(str, find, replace) {
+         while (str.indexOf(find) > -1) {
+           str = str.replace(find, replace);
+         }
+         return str;
+       }
+       
+       var tree = document.querySelectorAll('ul.tree a:not(:last-child)');
+       for(var i = 0; i < tree.length; i++){
+          tree[i].addEventListener('click', function(e) {
+          var parent = e.target.parentElement;
+          var classList = parent.classList;
+          if(classList.contains("open")) {
+            classList.remove('open');
+            var opensubs = parent.querySelectorAll(':scope .open');
+            for(var i = 0; i < opensubs.length; i++){
+                opensubs[i].classList.remove('open');
+            }
+          } else {
+            classList.add('open');
+          }
+         });
+       }
+       </script>
+		   
+
+   </form>
+  </div>
+
+
+}
