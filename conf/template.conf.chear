@@ -48,7 +48,7 @@ Relation=Relation
 InRelationTo=inRelationTo
 WasDerivedFrom=wasDerivedFrom
 WasGeneratedBy=wasGeneratedBy
-HasPosition=hasPosition
+#HasPosition=hasPosition
 
 # PV Template (Part of SDD)
 Label=Column

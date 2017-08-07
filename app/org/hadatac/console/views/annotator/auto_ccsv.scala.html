@@ -5,7 +5,9 @@
 
 @import helper._
 @import org.hadatac.console.views.html._
+@import org.hadatac.console.views.html.fileviewer._
 @import org.hadatac.console.controllers.annotator._
+@import org.hadatac.console.controllers.fileviewer._
 @import org.hadatac.metadata.loader._
 @import java.net._
 
@@ -72,6 +74,10 @@
     
     <ul class="resumable-list"></ul>
     </div>
+
+    <div id="csv-preview">
+    </div>
+
     <script type="text/javascript" src="@controllers.routes.Assets.versioned("javascripts/upload.js")"></script>
 	
 	<div class="container-fluid">
@@ -99,6 +105,7 @@
     			<td>@file.getUploadTime()</td>
     			<td>@file.getProcessTime()</td>
     			<td>
+    			<a href="@org.hadatac.console.controllers.fileviewer.routes.CSVPreview.getCSVPreview(file.getOwnerEmail(), file.getFileName(), 10)" class="btn-xs btn-primary" role="button">Preview File</a>
     			<a href="@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.moveDataFile(file.getFileName())" class="btn-xs btn-primary" role="button" onclick="return confirm('Are you sure to move? If so, the ingested data from this file will be deleted as well!')" >Move to Unprocessed Folder</a>
     			<a href="@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.deleteDataFile(file.getFileName(), true)" class="btn-xs btn-primary" role="button" id="delete" onclick="return confirm('Are you sure to delete? If so, the ingested data from this file will be deleted as well!')">Delete</a>
     			<a href="@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.assignDataAcquisition(file.getDataAcquisitionUri(), file.getFileName())" class="btn-xs btn-primary" role="button">Assign Acquisition</a>

@@ -1,0 +1,26 @@
+@(headers: List[String], preview: List[String])
+
+@import helper._
+@import org.hadatac.console.views.html._
+@import org.hadatac.console.views.html.annotator._
+@import org.hadatac.console.controllers.annotator._
+@import org.hadatac.metadata.loader._
+@import java.net._
+
+
+@renderTable(headers: List[String], preview: List[String]){
+  <table>
+		<tr>
+		@for((colHead) <- headers){
+			<th>colHead</th>
+		}
+		</tr>
+		@for((prevRow) <- preview){
+		<tr>
+			@for((entry) <- prevRow.split("|")){
+			<td>entry</td>
+			}
+    </tr>
+		}    
+  </table>
+}
