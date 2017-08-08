@@ -1,4 +1,4 @@
-@(headers: List[String], preview: List[String])
+@(headers: List[String], preview: ArrayList[ArrayList[String]])
 
 @import helper._
 @import org.hadatac.console.views.html._
@@ -7,20 +7,30 @@
 @import org.hadatac.metadata.loader._
 @import java.net._
 
+@main("CSV Preview"){
+		<div id="csv-preview"; style="height:250px; overflow:auto; padding-right: 50px; padding-left: 50px;">
+			@render_table(headers,preview)
+		</div>
+}
 
-@renderTable(headers: List[String], preview: List[String]){
-  <table>
-		<tr>
-		@for((colHead) <- headers){
-			<th>colHead</th>
-		}
-		</tr>
-		@for((prevRow) <- preview){
-		<tr>
-			@for((entry) <- prevRow.split("|")){
-			<td>entry</td>
+@render_table(headers: List[String], preview: ArrayList[ArrayList[String]]) = {
+	@if(headers==null || preview==null || headers.size()<=0 || preview.size()<=0) {
+		<p>No preview to display</p>
+	} else {
+		<table class="table">
+			<tr>
+			@for((colHead) <- headers){
+				<th>@colHead</th>
 			}
-    </tr>
-		}    
-  </table>
+			</tr>
+	
+			@for((prevRow) <- preview){
+			<tr>
+			@for((entry) <- prevRow){
+				<td>@entry</td>
+			}
+		  </tr>
+			}    
+		</table>
+	}
 }
