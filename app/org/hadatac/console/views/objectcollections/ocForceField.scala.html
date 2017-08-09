@@ -1,0 +1,43 @@
+@(documentMap : String,
+  std_uri     : String)
+
+@import helper._
+@import org.hadatac.console.views.html._
+@import org.hadatac.console.views.html.objectcollections._
+
+@main("Study Object Network") {
+    <div class="container-fluid container-spaced">
+
+      <div class="row">
+         <div class="navbar-collapse collapse navbar-secondary">
+	   <a href="@org.hadatac.console.controllers.objectcollections.routes.OCForceField.index("full",std_uri)" class="btn btn-primary" role="button">Full Graph</a>
+	   <a href="@org.hadatac.console.controllers.objectcollections.routes.OCForceField.index("collections",std_uri)" class="btn btn-primary" role="button">Object Collections</a>
+	   <a href="@org.hadatac.console.controllers.objectcollections.routes.OCForceField.index("space",std_uri)" class="btn btn-primary" role="button">Spatial Objectss</a>
+	   <a href="@org.hadatac.console.controllers.objectcollections.routes.OCForceField.index("time",std_uri)" class="btn btn-primary" role="button">Temporal Objects</a>
+	 </div>
+      </div>
+      
+      <div class="row">
+	<div class="col-sm-9 col-md-9 main">
+	  <ul class="nav nav-tabs">
+	    <li class="active"><a data-toggle="tab">Study Object Graph</a></li> 
+	  </ul>
+	  <div class="tab-content tab-pane fade in active">
+	    <div id="query" data-results="@documentMap"></div>
+	    <div id="body"></div>
+	    <script src="/hadatac/assets/javascripts/d3.min.js"></script>
+	    <script src="/hadatac/assets/javascripts/d3.tip.v0.6.3.js"></script>
+	    <script type="text/javascript" src="/hadatac/assets/javascripts/forceFieldRenderer.js"></script>  					   
+	    <link type="text/css" rel="stylesheet" href="/hadatac/assets/stylesheets/forceFieldRenderer.css"/>			   
+	  </div>
+	</div>
+	
+	<div class="col-md-3 col-sm-3">
+	  <div class="tab-spacer"></div>
+	  <div id="info" class="infobox"></div>
+	</div>
+      </div>
+    </div>
+    
+}
+      

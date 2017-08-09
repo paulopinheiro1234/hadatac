@@ -16,7 +16,6 @@ POST	/hadatac/acquisitions/loadccsv		      	     org.hadatac.console.controllers
 POST	/hadatac/acquisitions/loadccsv/upload	  	     org.hadatac.console.controllers.dataacquisitionsearch.LoadCCSV.uploadFile
 GET	/hadatac/acquisitions/importsdd		      	     org.hadatac.console.controllers.dataacquisitionsearch.ImportSDD.importSDD(oper: String)
 POST	/hadatac/acquisitions/importsdd/upload	  	     org.hadatac.console.controllers.dataacquisitionsearch.ImportSDD.uploadFile
-
 GET	/hadatac/metadataacquisitions/solrsearch             org.hadatac.console.http.SolrSearchProxy.getStudyAcquisition()
 POST	/hadatac/metadataacquisitions/solrsearch   	     org.hadatac.console.http.SolrSearchProxy.getStudyAcquisition()
 GET	/hadatac/dataacquisitionbrowser/solrsearch           org.hadatac.console.http.SolrSearchProxy.getDataAcquisition()
@@ -52,7 +51,6 @@ GET	/hadatac/metadata/dynamicmetapage  	       org.hadatac.console.controllers.m
 POST	/hadatac/metadata/dynamicmetapage	       org.hadatac.console.controllers.metadata.DynamicMetadataGeneration.postIndex()
 GET	/hadatac/metadata/dynamicfunctions  	       org.hadatac.console.controllers.metadata.DynamicFunctions.index()
 POST	/hadatac/metadata/dynamicfunctions	       org.hadatac.console.controllers.metadata.DynamicFunctions.postIndex()
-
 GET	/hadatac/metadataacquisitions                  org.hadatac.console.controllers.metadataacquisition.MetadataAcquisition.index()
 POST	/hadatac/metadataacquisitions		       org.hadatac.console.controllers.metadataacquisition.MetadataAcquisition.postIndex()
 GET	/hadatac/metadataacquisitions/updatestudy      org.hadatac.console.controllers.metadataacquisition.MetadataAcquisition.update()
@@ -201,7 +199,9 @@ GET	/hadatac/studies/		    	       org.hadatac.console.controllers.studies.Study
 POST	/hadatac/studies/     			       org.hadatac.console.controllers.studies.StudyManagement.postIndex()
 GET	/hadatac/studies/new			       org.hadatac.console.controllers.studies.NewStudy.index()
 POST	/hadatac/studies/new			       org.hadatac.console.controllers.studies.NewStudy.postIndex()
-POST 	/hadatac/studies/new/form		       org.hadatac.console.controllers.studies.NewStudy.processForm()
+GET	/hadatac/studies/new/fromfile		       org.hadatac.console.controllers.studies.NewStudy.indexFromFile(filename : String)
+POST	/hadatac/studies/new/fromfile		       org.hadatac.console.controllers.studies.NewStudy.postIndexFromFile(filename : String)
+POST 	/hadatac/studies/new/form		       org.hadatac.console.controllers.studies.NewStudy.processForm(filename : String, da_uri : String)
 GET	/hadatac/studies/edit			       org.hadatac.console.controllers.studies.EditStudy.index(study_uri : String)
 POST	/hadatac/studies/edit			       org.hadatac.console.controllers.studies.EditStudy.postIndex(study_uri : String)
 POST 	/hadatac/studies/edit/form		       org.hadatac.console.controllers.studies.EditStudy.processForm(study_uri : String)
@@ -213,15 +213,15 @@ POST 	/hadatac/studies/delete/form	       	       org.hadatac.console.controller
 
 # indicators management
 GET	/hadatac/indicators/		    	       org.hadatac.console.controllers.indicators.IndicatorManagement.index()
-POST	/hadatac/indicators/     			       org.hadatac.console.controllers.indicators.IndicatorManagement.postIndex()
+POST	/hadatac/indicators/     		       org.hadatac.console.controllers.indicators.IndicatorManagement.postIndex()
 GET	/hadatac/indicators/new			       org.hadatac.console.controllers.indicators.NewIndicator.index()
 POST	/hadatac/indicators/new			       org.hadatac.console.controllers.indicators.NewIndicator.postIndex()
 POST 	/hadatac/indicators/new/form		       org.hadatac.console.controllers.indicators.NewIndicator.processForm()
-GET	/hadatac/indicators/edit			       org.hadatac.console.controllers.indicators.EditIndicator.index(ind_uri : String)
-POST	/hadatac/indicators/edit			       org.hadatac.console.controllers.indicators.EditIndicator.postIndex(ind_uri : String)
+GET	/hadatac/indicators/edit		       org.hadatac.console.controllers.indicators.EditIndicator.index(ind_uri : String)
+POST	/hadatac/indicators/edit		       org.hadatac.console.controllers.indicators.EditIndicator.postIndex(ind_uri : String)
 POST 	/hadatac/indicators/edit/form		       org.hadatac.console.controllers.indicators.EditIndicator.processForm(ind_uri : String)
-GET	/hadatac/indicators/delete	    	       	       org.hadatac.console.controllers.indicators.DeleteIndicator.index(ind_uri : String)
-POST	/hadatac/indicators/delete		               org.hadatac.console.controllers.indicators.DeleteIndicator.postIndex(ind_uri : String)
+GET	/hadatac/indicators/delete	    	       org.hadatac.console.controllers.indicators.DeleteIndicator.index(ind_uri : String)
+POST	/hadatac/indicators/delete		       org.hadatac.console.controllers.indicators.DeleteIndicator.postIndex(ind_uri : String)
 POST 	/hadatac/indicators/delete/form	       	       org.hadatac.console.controllers.indicators.DeleteIndicator.processForm(ind_uri : String)
 
 # object collections management
@@ -236,16 +236,24 @@ POST 	/hadatac/oc/edit/form		               org.hadatac.console.controllers.obje
 GET	/hadatac/oc/delete	                       org.hadatac.console.controllers.objectcollections.DeleteOC.index(study_uri : String, oc_uri : String)
 POST	/hadatac/oc/delete	                       org.hadatac.console.controllers.objectcollections.DeleteOC.postIndex(study_uri : String, oc_uri : String)
 POST 	/hadatac/oc/delete/form	                       org.hadatac.console.controllers.objectcollections.DeleteOC.processForm(study_uri : String, oc_uri : String)
+GET	/hadatac/oc/graph	                       org.hadatac.console.controllers.objectcollections.OCForceField.index(mode : String, study_uri : String)
+POST	/hadatac/oc/graph	                       org.hadatac.console.controllers.objectcollections.OCForceField.postIndex(mode : String, study_uri : String)
 
 # object management
-GET	/hadatac/objects/		               org.hadatac.console.controllers.objects.ObjectManagement.index(study_uri : String, oc_uri : String)
-POST	/hadatac/objects/		               org.hadatac.console.controllers.objects.ObjectManagement.postIndex(study_uri : String, oc_uri : String)
+GET	/hadatac/objects/		               org.hadatac.console.controllers.objects.ObjectManagement.index(study_uri : String, oc_uri : String, message : String)
+POST	/hadatac/objects/		               org.hadatac.console.controllers.objects.ObjectManagement.postIndex(study_uri : String, oc_uri : String, message : String)
+GET	/hadatac/objects/nomsg		               org.hadatac.console.controllers.objects.ObjectManagement.indexNomsg(study_uri : String, oc_uri : String)
 GET	/hadatac/objects/new		               org.hadatac.console.controllers.objects.NewObjectsFromScratch.index(study_uri : String, oc_uri : String)
 POST	/hadatac/objects/new		               org.hadatac.console.controllers.objects.NewObjectsFromScratch.postIndex(study_uri : String, oc_uri : String)
 POST 	/hadatac/objects/new/form	               org.hadatac.console.controllers.objects.NewObjectsFromScratch.processForm(study_uri : String, oc_uri : String)
-GET	/hadatac/objects/edit		               org.hadatac.console.controllers.objects.EditObject.index(study_uri : String, oc_uri : String, sp_uri : String)
-POST	/hadatac/objects/edit		               org.hadatac.console.controllers.objects.EditObject.postIndex(study_uri : String, oc_uri : String, sp_uri : String)
-POST 	/hadatac/objects/edit/form	               org.hadatac.console.controllers.objects.EditObject.processForm(study_uri : String, oc_uri : String)
+GET	/hadatac/objects/new/scopeForm		       org.hadatac.console.controllers.objects.NewObjectsFromScratch.processScopeForm(study_uri : String, oc_uri : String)
+POST	/hadatac/objects/new/scopeForm		       org.hadatac.console.controllers.objects.NewObjectsFromScratch.processScopeForm(study_uri : String, oc_uri : String)
+GET	/hadatac/objects/delete         	       org.hadatac.console.controllers.objects.DeleteObject.index(study_uri : String, oc_uri : String, obj_uri : String)
+POST	/hadatac/objects/delete	                       org.hadatac.console.controllers.objects.DeleteObject.postIndex(study_uri : String, oc_uri : String, obj_uri : String)
+GET 	/hadatac/objects/updatecollection	       org.hadatac.console.controllers.objects.ObjectManagement.updateCollectionObjects(study_uri : String, oc_uri : String, obj_uri_list : java.util.List[String])
+POST 	/hadatac/objects/updatecollection	       org.hadatac.console.controllers.objects.ObjectManagement.updateCollectionObjects(study_uri : String, oc_uri : String, obj_uri_list : java.util.List[String])
+GET 	/hadatac/objects/deletecollection	       org.hadatac.console.controllers.objects.ObjectManagement.deleteCollectionObjects(study_uri : String, oc_uri : String, obj_uri_list : java.util.List[String])
+POST 	/hadatac/objects/deletecollection	       org.hadatac.console.controllers.objects.ObjectManagement.deleteCollectionObjects(study_uri : String, oc_uri : String, obj_uri_list : java.util.List[String])
 
 # data acquisition management
 GET	/hadatac/dataacquisitions/		       org.hadatac.console.controllers.dataacquisitionmanagement.DataAcquisitionManagement.index(oper : Int)
@@ -306,6 +314,7 @@ POST 	/hadatac/annotator/prepare/create	       org.hadatac.console.controllers.a
 GET 	/hadatac/annotator/prepare/refine              org.hadatac.console.controllers.annotator.PrepareIngestion.refine(filename: String, da_uri: String, msg : String)
 POST 	/hadatac/annotator/prepare/refine	       org.hadatac.console.controllers.annotator.PrepareIngestion.postRefine(filename: String, da_uri: String, msg : String)
 POST 	/hadatac/annotator/prepare/study	       org.hadatac.console.controllers.annotator.PrepareIngestion.selectStudy(filename: String, da_uri: String)
+POST 	/hadatac/annotator/prepare/scope	       org.hadatac.console.controllers.annotator.PrepareIngestion.selectScope(filename: String, da_uri: String, std_uri : String)
 POST 	/hadatac/annotator/prepare/deployment	       org.hadatac.console.controllers.annotator.PrepareIngestion.selectDeployment(filename: String, da_uri: String)
 POST 	/hadatac/annotator/prepare/schema	       org.hadatac.console.controllers.annotator.PrepareIngestion.selectSchema(filename: String, da_uri: String)
 POST 	/hadatac/annotator/prepare/process/study       org.hadatac.console.controllers.annotator.PrepareIngestion.processSelectStudy(filename: String, da_uri: String)

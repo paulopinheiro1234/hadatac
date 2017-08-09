@@ -7,6 +7,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.net.URLDecoder;
+import java.io.ByteArrayOutputStream;
 
 import org.apache.jena.query.Query;
 import org.apache.jena.query.QueryExecution;
@@ -16,6 +17,7 @@ import org.apache.jena.query.QuerySolution;
 import org.apache.jena.query.ResultSet;
 import org.apache.jena.query.ResultSetFactory;
 import org.apache.jena.query.ResultSetRewindable;
+import org.apache.jena.query.ResultSetFormatter;
 import org.apache.jena.update.UpdateExecutionFactory;
 import org.apache.jena.update.UpdateFactory;
 import org.apache.jena.update.UpdateProcessor;
@@ -39,9 +41,10 @@ import play.Play;
 
 public class ObjectCollection extends HADatAcThing {
 
-    public static String DOMAIN = "http://hadatac.org/ont/hasco/SubjectGroup";
-    public static String LOCATION = "http://hadatac.org/ont/hasco/LocationCollection";
-    public static String TIME = "http://hadatac.org/ont/hasco/TimeCollection";
+    public static String SUBJECTCOLLECTION = "http://hadatac.org/ont/hasco/SubjectGroup";
+    public static String SAMPLECOLLECTION = "http://hadatac.org/ont/hasco/SampleCollection";
+    public static String LOCATIONCOLLECTION = "http://hadatac.org/ont/hasco/LocationCollection";
+    public static String TIMECOLLECTION = "http://hadatac.org/ont/hasco/TimeCollection";
 
     public static String INDENT1 = "   ";
     public static String INSERT_LINE1 = "INSERT DATA {  ";
@@ -109,21 +112,21 @@ public class ObjectCollection extends HADatAcThing {
 	if (type == null || type.equals("")) {
 	    return false;
 	}
-	return type.equals(this.DOMAIN);
+	return (type.equals(this.SUBJECTCOLLECTION) || type.equals(this.SAMPLECOLLECTION));
     }
 
     public boolean isLocationCollection() {
 	if (type == null || type.equals("")) {
 	    return false;
 	}
-	return type.equals(this.LOCATION);
+	return type.equals(this.LOCATIONCOLLECTION);
     }
 
     public boolean isTimeCollection() {
 	if (type == null || type.equals("")) {
 	    return false;
 	}
-	return type.equals(this.TIME);
+	return type.equals(this.TIMECOLLECTION);
     }
 
     public void setStudyUri(String studyUri) {
@@ -132,6 +135,20 @@ public class ObjectCollection extends HADatAcThing {
 
     public List<String> getObjectUris() {
 	return objectUris;
+    }
+
+    public List<StudyObject> getObjects() {
+	List<StudyObject> resp = new ArrayList<StudyObject>();
+	if (objectUris == null || objectUris.size() <=0) {
+	    return resp;
+	}
+	for (String uri : objectUris) {
+	    StudyObject obj = StudyObject.find(uri);
+	    if (obj != null) {
+		resp.add(obj);
+	    }
+	}
+	return resp;
     }
 
     public void setObjectUris(List<String> objectUris) {
@@ -197,6 +214,16 @@ public class ObjectCollection extends HADatAcThing {
 	this.timeScopeUris = timeScopeUris;
     }
 
+    public boolean inUriList(List<String> selected) {
+	String uriAdjusted = uri.replace("<","").replace(">","");
+	for (String str : selected) {
+	    if (uriAdjusted.equals(str)) {
+		return true;
+	    }
+	}
+	return false;
+    }
+
     private static List<String> retrieveSpaceScope (String oc_uri) {
 	List<String> scopeUris = new ArrayList<String>();
 	String scopeUri = ""; 
@@ -217,7 +244,7 @@ public class ObjectCollection extends HADatAcThing {
 		try {
 		    if (soln.getResource("spaceScopeUri") != null && soln.getResource("spaceScopeUri").getURI() != null) {
 			scopeUri = soln.getResource("spaceScopeUri").getURI();
-			if (scopeUri != null && scopeUri.equals("")) {
+			if (scopeUri != null && !scopeUri.equals("")) {
 			    scopeUris.add(scopeUri);
 			}
 		    }
@@ -248,7 +275,7 @@ public class ObjectCollection extends HADatAcThing {
 		try {
 		    if (soln.getResource("timeScopeUri") != null && soln.getResource("timeScopeUri").getURI() != null) {
 			scopeUri = soln.getResource("timeScopeUri").getURI();
-			if (scopeUri != null && scopeUri.equals("")) {
+			if (scopeUri != null && !scopeUri.equals("")) {
 			    scopeUris.add(scopeUri);
 			}
 		    }
@@ -259,19 +286,10 @@ public class ObjectCollection extends HADatAcThing {
 	return scopeUris;
     }
     
-    public boolean inUriList(List<String> selected) {
-	for (String str : selected) {
-	    if (uri.equals(str)) {
-		return true;
-	    }
-	}
-	return false;
-    }
-
     public static ObjectCollection find(String oc_uri) {
 	oc_uri = URLDecoder.decode(oc_uri);
 	ObjectCollection oc = null;
-	System.out.println("Looking for object collection with URI " + oc_uri);
+	//System.out.println("Looking for object collection with URI " + oc_uri);
 	if (oc_uri.startsWith("http")) {
 	    oc_uri = "<" + oc_uri + ">";
 	}
@@ -282,7 +300,7 @@ public class ObjectCollection extends HADatAcThing {
 	    "    OPTIONAL { " + oc_uri + " rdfs:comment ?comment } . " + 
 	    "    OPTIONAL { " + oc_uri + " hasco:hasScope ?hasScopeUri } . " + 
 	    "}";
-	System.out.println("Search In ObjectCollection: [" + queryString + "]");
+	//System.out.println("Search In ObjectCollection: [" + queryString + "]");
 	Query query = QueryFactory.create(queryString);
 	
 	QueryExecution qexec = QueryExecutionFactory.sparqlService(Collections.getCollectionsName(Collections.METADATA_SPARQL), query);
@@ -363,7 +381,7 @@ public class ObjectCollection extends HADatAcThing {
 	    "    ?uriMember hasco:isMemberOf " + oc_uri + " .  " + 
 	    "}";
 
-	System.out.println("Second query: " + queryMemberStr);
+	//System.out.println("Second query: " + queryMemberStr);
 	Query queryMember = QueryFactory.create(queryMemberStr);
 	QueryExecution qexecMember = QueryExecutionFactory.sparqlService(Collections.getCollectionsName(Collections.METADATA_SPARQL), queryMember);
 	ResultSet resultsMember = qexecMember.execSelect();
@@ -415,11 +433,21 @@ public class ObjectCollection extends HADatAcThing {
 	return oc_list;
     }
 
+    public static List<ObjectCollection> findDomainByStudy(Study study) {
+    	List<ObjectCollection> ocList = new ArrayList<ObjectCollection>();
+	for (ObjectCollection oc : ObjectCollection.findByStudy(study)) {
+	    if (oc.isDomainCollection()) {
+		ocList.add(oc);
+	    }
+	}
+	return ocList;
+    }
+
     public static List<ObjectCollection> findByStudy(Study study) {
 	if (study == null) {
 	    return null;
 	}
-    	List<ObjectCollection> schemas = new ArrayList<ObjectCollection>();
+    	List<ObjectCollection> ocList = new ArrayList<ObjectCollection>();
     	
     	String queryString = NameSpaces.getInstance().printSparqlNameSpaceList() + 
 	    "SELECT ?uri WHERE { " + 
@@ -427,7 +455,7 @@ public class ObjectCollection extends HADatAcThing {
 	    "   ?uri a ?ocType .  " +
 	    "   ?uri hasco:isMemberOf  <" + study.getUri() + "> . " +
 	    " } ";
-	System.out.println("Query for findByStudy : " + queryString);
+	//System.out.println("Query for findByStudy : " + queryString);
     	Query query = QueryFactory.create(queryString);
     	QueryExecution qexec = QueryExecutionFactory.sparqlService(
 			Collections.getCollectionsName(Collections.METADATA_SPARQL), query);
@@ -437,11 +465,39 @@ public class ObjectCollection extends HADatAcThing {
 	while (resultsrw.hasNext()) {
 	    QuerySolution soln = resultsrw.next();
 	    if (soln != null && soln.getResource("uri").getURI() != null) { 
-		ObjectCollection schema = ObjectCollection.find(soln.getResource("uri").getURI());
-		schemas.add(schema);
+		ObjectCollection oc = ObjectCollection.find(soln.getResource("uri").getURI());
+		ocList.add(oc);
 	    }
 	}
-	return schemas;
+	return ocList;
+    }
+
+    public static String findByStudyJSON(Study study) {
+	if (study == null) {
+	    return null;
+	}
+    	String queryString = NameSpaces.getInstance().printSparqlNameSpaceList() + 
+	    "SELECT ?uri ?label WHERE { " + 
+	    "   ?ocType rdfs:subClassOf+ hasco:ObjectCollection . " +
+	    "   ?uri a ?ocType .  " +
+	    "   ?uri hasco:isMemberOf  <" + study.getUri() + "> . " +
+	    "   OPTIONAL { ?uri rdfs:label ?label } . " +
+	    " } ";
+	Query query = QueryFactory.create(queryString);
+    			
+	QueryExecution qexec = QueryExecutionFactory.sparqlService(Collections.getCollectionsName(Collections.METADATA_SPARQL), query);
+	ResultSet results = qexec.execSelect();
+
+    	ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+	ResultSetFormatter.outputAsJSON(outputStream, results);
+	qexec.close();
+    	
+    	try {
+	    return outputStream.toString("UTF-8");
+    	} catch (Exception e) {
+	    e.printStackTrace();
+	}
+    	return "";
     }
 
     private void saveObjectUris(String oc_uri) {
@@ -463,7 +519,7 @@ public class ObjectCollection extends HADatAcThing {
 	    }
 	}
     	insert += LINE_LAST;
-	System.out.println(insert);
+	//System.out.println(insert);
     	UpdateRequest request = UpdateFactory.create(insert);
         UpdateProcessor processor = UpdateExecutionFactory.createRemote(
 				      request, Collections.getCollectionsName(Collections.METADATA_UPDATE));
@@ -518,7 +574,7 @@ public class ObjectCollection extends HADatAcThing {
 	    }
 	}
     	insert += LINE_LAST;
-	System.out.println(insert);
+	//System.out.println(insert);
     	UpdateRequest request = UpdateFactory.create(insert);
         UpdateProcessor processor = UpdateExecutionFactory.createRemote(
 				      request, Collections.getCollectionsName(Collections.METADATA_UPDATE));

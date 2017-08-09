@@ -18,10 +18,13 @@ import play.data.*;
 
 import org.hadatac.console.views.html.*;
 import org.hadatac.console.views.html.studies.*;
+import org.hadatac.console.views.html.annotator.*;
 import org.hadatac.console.views.html.triplestore.syncLabkey;
 import org.hadatac.console.controllers.studies.routes;
 import org.hadatac.data.api.DataFactory;
 import org.hadatac.entity.pojo.Agent;
+import org.hadatac.entity.pojo.DataAcquisition;
+import org.hadatac.entity.pojo.DataFile;
 import org.hadatac.entity.pojo.Study;
 import org.hadatac.entity.pojo.StudyType;
 import org.hadatac.entity.pojo.TriggeringEvent;
@@ -50,13 +53,7 @@ public class NewStudy extends Controller {
     		return redirect(org.hadatac.console.controllers.triplestore.routes.LoadKB.logInLabkey(
     				routes.NewStudy.index().url()));
     	}
-    	
-	List<Agent> organizations = Agent.findOrganizations();
-	List<Agent> persons = Agent.findPersons();
-	StudyType studyType = new StudyType();
-
-    	return ok(newStudy.render(studyType, organizations, persons));
-    	
+	return indexFromFile("");
     }
     
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
@@ -65,8 +62,35 @@ public class NewStudy extends Controller {
     }
     
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    public static Result processForm() {
-    	final SysUser sysUser = AuthApplication.getLocalUser(session());
+    public static Result indexFromFile(String filename) {
+    	if (session().get("LabKeyUserName") == null && session().get("LabKeyPassword") == null) {
+    		return redirect(org.hadatac.console.controllers.triplestore.routes.LoadKB.logInLabkey(
+    				routes.NewStudy.indexFromFile(filename).url()));
+    	}
+    	
+	List<Agent> organizations = Agent.findOrganizations();
+	List<Agent> persons = Agent.findPersons();
+	StudyType studyType = new StudyType();
+	DataFile file = null;
+	String ownerEmail = null;
+
+	if (filename != null && !filename.equals("")) {
+	    ownerEmail = AuthApplication.getLocalUser(session()).getEmail();
+	    file = DataFile.findByName(ownerEmail, filename);
+	}
+
+    	return ok(newStudy.render(studyType, organizations, persons, file));
+    	
+    }
+    
+    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
+    public static Result postIndexFromFile(String filename) {
+    	return indexFromFile(filename);
+    }
+    
+    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
+    public static Result processForm(String filename, String da_uri) {
+    final SysUser sysUser = AuthApplication.getLocalUser(session());
 	
         Form<StudyForm> form = Form.form(StudyForm.class).bindFromRequest();
         StudyForm data = form.get();
@@ -110,6 +134,25 @@ public class NewStudy extends Controller {
 	if (nRowsAffected <= 0) {
 	    return badRequest("Failed to insert new STD to LabKey!\n");
 	}
-	return ok(newStudyConfirm.render(std));
+
+	System.out.println("Inserting new Study from file. filename:  " + filename + "   da : [" + ValueCellProcessing.replacePrefixEx(da_uri) + "]");
+	System.out.println("Inserting new Study from file. Study URI : [" + std.getUri() + "]");
+	// when a new study is created in the scope of a datafile, the new study needs to be associated to the datafile's DA 
+	if (filename != null && !filename.equals("") && da_uri != null && !da_uri.equals("")) {
+	    DataAcquisition da = DataAcquisition.findByUri(ValueCellProcessing.replacePrefixEx(da_uri));
+	    if (da != null) {
+		da.setStudyUri(std.getUri());
+		try {
+		    System.out.println("Inserting new Study from file. Found DA");
+		    da.save();
+		    da.saveToLabKey(session().get("LabKeyUserName"), session().get("LabKeyPassword"));
+		} catch (CommandException e) {
+		    System.out.println("[WARNING] Could not update DA from associated DataFile when creating a new study");
+		}
+	    } else {
+		System.out.println("[WARNING] DA from associated DataFile not found when creating a new study");
+	    }
+	}
+	return ok(newStudyConfirm.render(std, filename, da_uri));
     }
 }

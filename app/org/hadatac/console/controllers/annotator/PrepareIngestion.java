@@ -37,6 +37,7 @@ import org.hadatac.entity.pojo.DataFile;
 import org.hadatac.entity.pojo.Deployment;
 import org.hadatac.entity.pojo.DataAcquisitionSchema;
 import org.hadatac.entity.pojo.DataAcquisitionSchemaAttribute;
+import org.hadatac.entity.pojo.ObjectCollection;
 import org.hadatac.entity.pojo.Study;
 import org.hadatac.entity.pojo.TriggeringEvent;
 import org.hadatac.entity.pojo.User;
@@ -173,6 +174,16 @@ public class PrepareIngestion extends Controller {
     }
 
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
+    public static Result selectScope(String file_name, String da_uri, String std_uri) {
+
+	Study study = Study.find(std_uri);
+
+	List<ObjectCollection> ocList = ObjectCollection.findDomainByStudy(study);
+	
+	return ok(selectScope.render(file_name, da_uri, ocList));
+    }
+
+    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
     public static Result selectDeployment(String file_name, String da_uri) {
 
 	State active = new State(State.ACTIVE);
@@ -182,6 +193,7 @@ public class PrepareIngestion extends Controller {
 	return ok(selectDeployment.render(file_name, da_uri, deployments));
     }
 
+    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
     public static Result selectSchema(String file_name, String da_uri) {
 
 	List<DataAcquisitionSchema> schemas = DataAcquisitionSchema.findAll();

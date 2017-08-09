@@ -1,0 +1,140 @@
+@(file_name : String,
+  da_uri    : String,
+  ocList    : List[org.hadatac.entity.pojo.ObjectCollection])
+
+@import helper._
+@import org.hadatac.utils._
+@import org.hadatac.console.views.html._
+@import org.hadatac.console.views.html.triplestore._
+@import org.hadatac.console.controllers.triplestore._
+@import org.hadatac.console.controllers._
+@import org.hadatac.metadata.loader.ValueCellProcessing;
+
+@main("Select Scope for " + da_uri) {
+
+<script type="text/javascript">
+   function checkform() {
+      var cansubmit = true;
+
+      if (document.getElementById('option').value.length == 0) {
+          cansubmit = false;
+      }
+         
+      if (cansubmit) {
+          document.getElementById('submitbutton').disabled = false;
+      } else {
+          document.getElementById('submitbutton').disabled = 'disabled';
+      }
+  }
+
+ function changecollection() {
+
+/*
+var myObj, i, j, x = "";
+myObj = {
+    "name":"John",
+    "age":30,
+    "cars": [
+        { "name":"Ford", "models":[ "Fiesta", "Focus", "Mustang" ] },
+        { "name":"BMW", "models":[ "320", "X3", "X5" ] },
+        { "name":"Fiat", "models":[ "500", "Panda" ] }
+    ]
+}
+
+for (i in myObj.cars) {
+    x += "<h2>" + myObj.cars[i].name + "</h2>";
+    for (j in myObj.cars[i].models) {
+        x += myObj.cars[i].models[j] + "<br>";
+    }
+}
+
+*/
+
+   var options, i, j, x = "";
+   options = {  //1
+      "oc" : [  //2
+      @for(oc <- ocList) {
+          {  //3
+          "ocUri" : "@oc.getUri()",
+          "obj" : [  //4
+              @for(obj <- oc.getObjects()) {
+                 { "objUri" : "@obj.getUri()", "label" : "@obj.getLabel()"}, 
+              }
+           ] //4
+           }, //3
+      }       
+   ]  //2
+   }; //1
+   var e = document.getElementById('option');
+   var field = e.options[e.selectedIndex].value;
+   //alert(field);
+   for (i in options.oc) {
+      if (options.oc[i].ocUri == field) {
+         for (j in options.oc[i].obj) {
+           x += "<option value=\"" + options.oc[i].obj[j].objUri + "\">" + options.oc[i].obj[j].label + "</option>";
+         }
+      }
+   }
+   var select = $('#objectoption');
+   select.empty().append(x);
+   //alert(x);
+   checkform();
+ } 
+</script>
+
+  <div class="container-fluid">
+    <div class="row">
+    <div class="col-md-1 col-xs-0"></div>
+    <div class="col-md-11 col-xs-8">
+    <h2>Select Data Acquisition's Scope</h2> 
+
+    The scope of a deta acquisiton can be an <i>object
+    collection</i>, like a group of subjects or a collection of
+    samples. Data acquisitions that are related to object collections
+    often include some identifier used to assign values from the files
+    to specific objects in the object collection.
+
+    The scope of a data acquisition can alse be a single <i>object</i>
+    meaning that the entire content value of the data acquisition is
+    about attributes form the scope object. An example of such king of
+    data acquisition is a complete boold count where all the values of
+    the data acquisition are related to a single subject.
+    
+    <h3>Selected Data Acquisition</h3> 
+       <ul>
+           <li>@ValueCellProcessing.replaceNameSpaceEx(da_uri)</li>
+       </ul>
+    
+    <form class="form-horizontal" name="assignOption" method="post" action="@org.hadatac.console.controllers.annotator.routes.PrepareIngestion.processSelectDeployment(file_name, da_uri)">
+
+    <div class="form-group">
+      <label>New Scope</label> <br>
+      <div class="row">
+          <div class="col-md-5 col-xs-3">
+	     <label>Object Collection Options</label> 
+	     <select class="form-control col-sm-5" id="option" size="20" name="option" onclick="changecollection()" >
+                @for(oc <- ocList) {
+                   <option value="@oc.getUri()">@oc.getLabel()</option>
+                }
+             </select>
+          </div>
+          <div  class="col-sm-5 col-xs-3">
+             <label>Object Options</label> 
+             <select class="form-control col-sm-5" id="objectoption" size="20" name="objectoption" onchange="checkform()" >
+             </select>
+          </div>
+      </div>
+    </div>
+    
+    <div class="form-group" class="col-sm-6 col-offset-3">
+      <input class="btn btn-success" role="button" id="submitbutton" type="submit" value="Select Object Collection as Scope" disabled="disabled" />
+      <input class="btn btn-success" role="button" id="submitbutton" type="submit" value="Select Object as Scope" disabled="disabled" />
+    </div>
+    
+    </form>    
+  </div>
+  </div>
+  </div>
+  
+}
+  

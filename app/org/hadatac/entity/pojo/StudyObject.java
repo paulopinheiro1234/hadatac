@@ -6,6 +6,7 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+import java.io.ByteArrayOutputStream;
 
 import org.apache.jena.query.Query;
 import org.apache.jena.query.QueryExecution;
@@ -15,6 +16,7 @@ import org.apache.jena.query.QuerySolution;
 import org.apache.jena.query.ResultSet;
 import org.apache.jena.query.ResultSetFactory;
 import org.apache.jena.query.ResultSetRewindable;
+import org.apache.jena.query.ResultSetFormatter;
 import org.apache.jena.update.UpdateExecutionFactory;
 import org.apache.jena.update.UpdateFactory;
 import org.apache.jena.update.UpdateProcessor;
@@ -35,6 +37,9 @@ import org.hadatac.console.controllers.AuthApplication;
 
 public class StudyObject extends HADatAcThing {
 
+    public static String LOCATION = "http://semanticscience.org/resource/Location";
+    public static String TIME = "http://semanticscience.org/resource/TimeInterval";
+
     public static String INDENT1 = "     ";
     public static String INSERT_LINE1 = "INSERT DATA {  ";
     public static String DELETE_LINE1 = "DELETE WHERE {  ";
@@ -44,10 +49,8 @@ public class StudyObject extends HADatAcThing {
     public static String PREFIX = "OBJ-";
 
     String originalId;
-    String isFrom;
     String isMemberOf;
-    String atLocation;
-    String atTime;
+    List<String> scopeUris;
 
     public StudyObject() {
 	this("","");
@@ -60,9 +63,7 @@ public class StudyObject extends HADatAcThing {
 	this.setLabel("");
 	this.setIsMemberOf(isMemberOf);
 	this.setComment("");
-	this.setIsFrom("");
-	this.setAtLocation("");
-	this.setAtTime("");
+	this.setScopeUris(new ArrayList<String>());
     }
 
     public StudyObject(String uri,
@@ -71,18 +72,14 @@ public class StudyObject extends HADatAcThing {
 		       String label,
 		       String isMemberOf,
 		       String comment,
-		       String isFrom,
-		       String atLocation,
-		       String atTime) { 
+		       List<String> scopeUris) { 
 	this.setUri(uri);
         this.setType(type);
 	this.setOriginalId(originalId);
 	this.setLabel(label);
 	this.setIsMemberOf(isMemberOf);
 	this.setComment(comment);
-	this.setIsFrom(isFrom);
-	this.setAtLocation(atLocation);
-	this.setAtTime(atTime);
+	this.setScopeUris(scopeUris);
     }
     
     public StudyObjectType getStudyObjectType() {
@@ -92,6 +89,20 @@ public class StudyObject extends HADatAcThing {
 	return StudyObjectType.find(type);
     }
     
+    public boolean isLocation() {
+	if (type == null || type.equals("")) {
+	    return false;
+	}
+	return (type.equals(LOCATION));
+    }
+
+    public boolean isTime() {
+	if (type == null || type.equals("")) {
+	    return false;
+	}
+	return (type.equals(TIME));
+    }
+
     public String getOriginalId() {
     	return originalId;
     }
@@ -108,33 +119,45 @@ public class StudyObject extends HADatAcThing {
 	this.isMemberOf = isMemberOf;
     }	
     
-    public String getIsFrom() {
-	return isFrom;
+    public List<String> getScopeUris() {
+	return scopeUris;
     }
     
-    public void setIsFrom(String isFrom) {
-	this.isFrom = isFrom;
+    public void setScopeUris(List<String> scopeUris) {
+	this.scopeUris = scopeUris;
     }	
     
-    public String getAtLocation() {
-	return atLocation;
+    private static List<String> retrieveScopeUris(String obj_uri) {
+	List<String> retrievedUris = new ArrayList<String>();
+	String queryString = NameSpaces.getInstance().printSparqlNameSpaceList() + 
+	    "SELECT  ?scopeUri WHERE { " + 
+	    "    " + obj_uri + " hasco:hasObjectScope ?scopeUri . " + 
+	    "}";
+	Query query = QueryFactory.create(queryString);
+	QueryExecution qexec = QueryExecutionFactory.sparqlService(Collections.getCollectionsName(Collections.METADATA_SPARQL), query);
+	ResultSet results = qexec.execSelect();
+	ResultSetRewindable resultsrw = ResultSetFactory.copyResults(results);
+	qexec.close();
+	if (!resultsrw.hasNext()) {
+	    return retrievedUris;
+	}
+	while (resultsrw.hasNext()) {
+	    QuerySolution soln = resultsrw.next();
+	    if (soln != null) {
+		try {
+		    if (soln.getResource("scopeUri") != null && soln.getResource("scopeUri").getURI() != null) {
+			retrievedUris.add(soln.getResource("scopeUri").getURI());
+		    }
+		} catch (Exception e1) {
+		}
+	    }
+	}
+	return retrievedUris;
     }
-    
-    public void setAtLocation(String atLocation) {
-	this.atLocation = atLocation;
-    }	
-    
-    public String getAtTime() {
-	return atTime;
-    }
-    
-    public void setAtTime(String atTime) {
-	this.atTime = atTime;
-    }	
     
     public static StudyObject find(String obj_uri) {
 	StudyObject obj = null;
-	System.out.println("Looking for object with URI " + obj_uri);
+	//System.out.println("Looking for object with URI " + obj_uri);
 	if (obj_uri.startsWith("http")) {
 	    obj_uri = "<" + obj_uri + ">";
 	}
@@ -146,9 +169,6 @@ public class StudyObject extends HADatAcThing {
 	    "    OPTIONAL { " + obj_uri + " hasco:originalID ?originalId } . " + 
 	    "    OPTIONAL { " + obj_uri + " rdfs:label ?hasLabel } . " + 
 	    "    OPTIONAL { " + obj_uri + " rdfs:comment ?hasComment } . " + 
-	    "    OPTIONAL { " + obj_uri + " hasco:isFrom ?isFrom } . " + 
-	    "    OPTIONAL { " + obj_uri + " hasco:hasAtLocation ?atLocation } . " + 
-	    "    OPTIONAL { " + obj_uri + " hasco:hasAtTime ?atTime } . " + 
 	    "}";
 	Query query = QueryFactory.create(queryString);
 	
@@ -164,13 +184,9 @@ public class StudyObject extends HADatAcThing {
 	
 	String typeStr = "";
 	String originalIdStr = "";
-	String labelStr = "";
 	String isMemberOfStr = "";
 	String commentStr = "";
-	String isFromStr = "";
-	String atLocationStr = "";
-	String atTimeStr = "";
-	
+
 	while (resultsrw.hasNext()) {
 	    QuerySolution soln = resultsrw.next();
 	    if (soln != null) {
@@ -191,8 +207,6 @@ public class StudyObject extends HADatAcThing {
 		    originalIdStr = "";
 		}
 		
-		labelStr = FirstLabel.getLabel(obj_uri);
-
 		try {
 		    if (soln.getResource("isMemberOf") != null && soln.getResource("isMemberOf").getURI() != null) {
 			isMemberOfStr = soln.getResource("isMemberOf").getURI();
@@ -209,39 +223,13 @@ public class StudyObject extends HADatAcThing {
 		    commentStr = "";
 		}
 		
-		try {
-		    if (soln.getResource("isFrom") != null && soln.getResource("isFrom").getURI() != null) {
-			isFromStr = soln.getResource("isFrom").getURI();
-		    }
-		} catch (Exception e1) {
-		    isFromStr = "";
-		}
-		
-		try {
-		    if (soln.getResource("atLocation") != null && soln.getResource("atLocation").getURI() != null) {
-			atLocationStr = soln.getResource("atLocation").getURI();
-		    }
-		} catch (Exception e1) {
-		    atLocationStr = "";
-		}
-		
-		try {
-		    if (soln.getResource("atTime") != null && soln.getResource("atTime").getURI() != null) {
-			atTimeStr = soln.getResource("atTime").getURI();
-		    }
-		} catch (Exception e1) {
-		    atTimeStr = "";
-		}
-		
 		obj = new StudyObject(obj_uri,
 				      typeStr,
 				      originalIdStr,
-				      labelStr,
+				      FirstLabel.getLabel(obj_uri),
 				      isMemberOfStr,
 				      commentStr,
-				      isFromStr,
-				      atLocationStr,
-				      atTimeStr);
+				      retrieveScopeUris(obj_uri));
 	    }
 	}
 	return obj;
@@ -257,7 +245,7 @@ public class StudyObject extends HADatAcThing {
 	    "SELECT ?uri WHERE { " + 
 	    "   ?uri hasco:isMemberOf  <" + oc.getUri() + "> . " +
 	    " } ";
-	System.out.println("StudyObject findByCollection: " + queryString);
+	//System.out.println("StudyObject findByCollection: " + queryString);
     	Query query = QueryFactory.create(queryString);
     	QueryExecution qexec = QueryExecutionFactory.sparqlService(
 			Collections.getCollectionsName(Collections.METADATA_SPARQL), query);
@@ -267,7 +255,7 @@ public class StudyObject extends HADatAcThing {
 	while (resultsrw.hasNext()) {
 	    QuerySolution soln = resultsrw.next();
 	    if (soln != null && soln.getResource("uri").getURI() != null) { 
-		System.out.println("URI: [" + soln.getResource("uri").getURI() + "]");
+		//System.out.println("URI: [" + soln.getResource("uri").getURI() + "]");
 		StudyObject object = StudyObject.find(soln.getResource("uri").getURI());
 		objects.add(object);
 	    }
@@ -275,9 +263,35 @@ public class StudyObject extends HADatAcThing {
 	return objects;
     }
 
+    public static String findByCollectionJSON(ObjectCollection oc) {
+	if (oc == null) {
+	    return null;
+	}
+    	String queryString = NameSpaces.getInstance().printSparqlNameSpaceList() + 
+	    "SELECT ?uri ?label WHERE { " + 
+	    "   ?uri hasco:isMemberOf  <" + oc.getUri() + "> . " +
+	    "   OPTIONAL { ?uri rdfs:label ?label } . " +
+	    " } ";
+	Query query = QueryFactory.create(queryString);
+    			
+	QueryExecution qexec = QueryExecutionFactory.sparqlService(Collections.getCollectionsName(Collections.METADATA_SPARQL), query);
+	ResultSet results = qexec.execSelect();
+
+    	ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+	ResultSetFormatter.outputAsJSON(outputStream, results);
+	qexec.close();
+    	
+    	try {
+	    return outputStream.toString("UTF-8");
+    	} catch (Exception e) {
+	    e.printStackTrace();
+	}
+    	return "";
+    }
+
     public void save() {
 	delete();  // delete any existing triple for the current OBJ
-	System.out.println("Saving <" + uri + ">");
+	//System.out.println("Saving <" + uri + ">");
 	if (uri == null || uri.equals("")) {
 	    System.out.println("[ERROR] Trying to save OBJ without assigning an URI");
 	    return;
@@ -318,32 +332,22 @@ public class StudyObject extends HADatAcThing {
 	}
 	if (!comment.equals("")) {
 	    insert += obj_uri + " hasco:hasComment \""  + comment + "\" .  ";
-	}   
-	if (!isFrom.equals("")) {
-	    if (isFrom.startsWith("http")) {
-		insert += obj_uri + " hasco:isFrom <" + isFrom + "> .  "; 
-	    } else {
-		insert += obj_uri + " hasco:isFrom " + isFrom + " .  "; 
-	    } 
 	}
-	if (!atLocation.equals("")) {
-	    if (atLocation.startsWith("http")) {
-		insert += obj_uri + " hasco:atLocation <" + atLocation + "> .  "; 
-	    } else {
-		insert += obj_uri + " hasco:atLocation " + atLocation + " .  "; 
-	    } 
-	}
-	if (!atTime.equals("")) {
-	    if (atTime.startsWith("http")) {
-		insert += obj_uri + " hasco:atTime <" + atTime + "> .  "; 
-	    } else {
-		insert += obj_uri + " hasco:atTime " + atTime + " .  "; 
+	if (scopeUris != null && scopeUris.size() > 0) {
+	    for (String scope : scopeUris) {
+		if (!scope.equals("")) {
+		    if (scope.startsWith("http")) {
+			insert += obj_uri + " hasco:hasObjectScope <" + scope + "> .  "; 
+		    } else {
+			insert += obj_uri + " hasco:hasObjectScope " + scope + " .  "; 
+		    }
+		}
 	    } 
 	}
 	//insert += this.getUri() + " hasco:hasSource " + " .  "; 
 	//insert += this.getUri() + " hasco:isPIConfirmed " + " .  "; 
     	insert += LINE_LAST;
-	System.out.println("OBJ insert query (pojo's save): <" + insert + ">");
+	//System.out.println("OBJ insert query (pojo's save): <" + insert + ">");
     	UpdateRequest request = UpdateFactory.create(insert);
         UpdateProcessor processor = UpdateExecutionFactory.createRemote(
 				      request, Collections.getCollectionsName(Collections.METADATA_UPDATE));
@@ -363,9 +367,15 @@ public class StudyObject extends HADatAcThing {
     	row.put("rdfs:label", getLabel());
     	row.put("hasco:isMemberOf", ValueCellProcessing.replaceNameSpaceEx(getIsMemberOf()));
     	row.put("rdfs:comment", getComment());
-    	row.put("hasco:isFrom", ValueCellProcessing.replaceNameSpaceEx(getIsFrom()));
-    	row.put("hasco:atlocation", ValueCellProcessing.replaceNameSpaceEx(getAtLocation()));
-    	row.put("hasco:atTime", ValueCellProcessing.replaceNameSpaceEx(getAtTime()));
+	String scopeStr = "";
+	for (int i=0; i <  scopeUris.size(); i++) {
+	    String scope = scopeUris.get(i);
+	    scopeStr += ValueCellProcessing.replaceNameSpaceEx(scope);
+	    if (i < scopeUris.size() - 1) {
+		scopeStr += " , ";
+	    }
+	}
+    	row.put("hasco:hasObjectScope",scopeStr);
     	rows.add(row);
 	int totalChanged = 0;
     	try {

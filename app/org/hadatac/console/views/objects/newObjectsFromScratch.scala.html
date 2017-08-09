@@ -7,6 +7,7 @@
 @import org.hadatac.console.views.html._
 @import org.hadatac.console.controllers._
 @import org.hadatac.entity.pojo.Agent
+@import java.net.URLEncoder
 @import play._
 
 @main("New Objects") {
@@ -17,17 +18,30 @@
    <script type="text/javascript">
      function checkform() {
         var cansubmit = true;
+        var cansubmitScope = true;
 	
 	if (!document.getElementById('newQuantity').value || 
             document.getElementById('newQuantity').value.length === 0) {
 	   cansubmit = false;
 	}
 
-	if (cansubmit) {
-	  document.getElementById('submit').disabled = false;
-	} else {
-	  document.getElementById('submit').disabled = 'disabled';
+	if (!document.getElementById('newMultiplier').value || 
+            document.getElementById('newMultiplier').value.length === 0) {
+	   cansubmitScope = false;
 	}
+
+	if (cansubmit) {
+	  document.getElementById('submitTotal').disabled = false;
+	} else {
+	  document.getElementById('submitTotal').disabled = 'disabled';
+	}
+
+	if (cansubmitScope) {
+	  document.getElementById('submitScope').disabled = false;
+	} else {
+	  document.getElementById('submitScope').disabled = 'disabled';
+	}
+
      }
 
      function replaceAll(str, find, replace) {
@@ -57,48 +71,85 @@
 		  <option value="@oc.getObjectCollectionType().getStudyObjectType().getUri()" selected>@oc.getObjectCollectionType().getStudyObjectType().getLabel()</option>
 	        </select>
  	</div>
+	<div class="form-group">
+	        <label>Default Label Prefix:</label>
+	        <input type="text" class="form-control col-sm-6" name="newLabelPrefix" id="newLabelPrefix" onchange="checkform()">
+	        </select>
+ 	</div>
 	<div id="rcorners">
  	   <div class="form-group">
 		<label>Total number of objects to be created:</label>
  		<input type="text" class="form-control col-sm-6" name="newQuantity" id="newQuantity" onchange="checkform()" >
  	   </div>
+     	   <input class="btn btn-success btn-sm" role="button" type="submit" id="submitTotal" value="Create Objects using total number" disabled /><br>
         </div>
 
-	<center><br><b>OR</b><br><br></center>
+	@if((oc.getHasScope() != null) ||
+	    ((oc.getSpaceScopes() != null) && (oc.getSpaceScopes().size() > 0)) ||
+	    ((oc.getTimeScopes() != null) && (oc.getTimeScopes().size() > 0))) {
+
+   	     <center><br><b>OR</b><br><br></center>
      
- 	<div  id="rcorners">
-	    <div class="form-group">
-		<label>Use domain collection:</label>
- 		<input type="checkbox"  name="newUseDomain" id="newUseDomain" 
-                       onchange="checkform()" >
- 	    </div>
+ 	     <div  id="rcorners">
+	        @if(oc.getHasScope() != null) {
+	           <div class="form-group">
+		      <label>Use domain collection:</label>
+ 		      <input type="checkbox"  name="useDomain" id="useDomain" 
+			     onchange="checkform()" >
+		      <ul>
+			  <li>@oc.getHasScope().getLabel() [@oc.getHasScope().getObjectUris().size() objects]</li>
+		      </ul>
+ 		   </div>
+		}
      
- 	    <div class="form-group">
-		<label>Use location collection:</label>
- 		<input type="checkbox" name="newUselocation" id="newUselocation" 
-		       onchange="checkform()" >
- 	    </div>
+		@if(oc.getSpaceScopes() != null && oc.getSpaceScopes().size() > 0) {
+ 		   <div class="form-group">
+		      <label>Use location collection:</label>
+ 		      <input type="checkbox" name="useSpace" id="useSpace" 
+			     onchange="checkform()" >
+		      <ul>
+			  @for(space <- oc.getSpaceScopes()) {
+			     <li>@space.getLabel() [@space.getObjectUris().size() objects]</li>
+		          }
+		      <ul>
+ 	           </div>
+                }
+	    
+	        @if(oc.getTimeScopes() != null && oc.getTimeScopes().size() > 0) {
+		   <div class="form-group">
+		      <label>Use time collection(s):</label>
+ 		      <input type="checkbox" name="useTime" id="useTime" 
+			     onchange="checkform()" > 
+                      <ul>
+			 @for(time <- oc.getTimeScopes()) {
+		             <li>@time.getLabel() [@time.getObjectUris().size() objects]</li>
+		         }
+		      <ul>
+ 	           </div>
+	        }
      
- 	    <div class="form-group">
-		<label>Use time collection(s):</label>
- 		<input type="checkbox" name="newUseTime" id="newUseTime" 
-		       onchange="checkform()" >
- 	    </div>
-     
- 	    <div class="form-group">
-		<label>Multiplier (number of times the product of contextual objects used):</label>
- 		<input type="text" class="form-control col-sm-6" name="newMultiplier" id="newMultiplier" onchange="checkform()" >
- 	    </div>
-        </div>
-     
+ 		   <div class="form-group">
+		      <label>Include qualifiers in label:</label>
+ 		      <input type="checkbox" name="newLabelQualifier" id="newLabelQualifier" 
+			     onchange="checkform()" >
+ 	           </div>
+ 	        <div class="form-group">
+		    <label>Multiplier (number of times the product of contextual objects used):</label>
+ 		    <input type="text" class="form-control col-sm-6" name="newMultiplier" id="newMultiplier" onchange="checkform()" >
+ 		</div>
+
+		<input formaction="@org.hadatac.console.controllers.objects.routes.NewObjectsFromScratch.processScopeForm(URLEncoder.encode(study.getUri(),"UTF-8"),URLEncoder.encode(oc.getUri(),"UTF-8"))" 
+		       class="btn btn-success btn-sm" role="button" type="submit" id="submitScope" value="Create Objects using Scopes" disabled />
+
+             </div>
+        }
 	<br>
 	<div class="form-group">
-	  <label>Updates</label> <br>
-	  <input class="btn btn-success btn-sm" role="button" type="submit" id="submit" value="Create Objects" disabled /><br>
-	  <a href="@org.hadatac.console.controllers.objects.routes.ObjectManagement.index(study.getUri(),oc.getUri())" class="btn btn-primary" role="button">Back to Object Management</a>
+	    <br>
+	    <a href="@org.hadatac.console.controllers.objects.routes.ObjectManagement.indexNomsg(study.getUri(),oc.getUri())" 
+	       class="btn btn-primary" role="button">Back to Object Management</a>
 	</div>
-     
-   </form>
+    </form>
   </div>
 
 }

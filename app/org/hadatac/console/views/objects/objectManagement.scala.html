@@ -1,6 +1,8 @@
-@(study  : org.hadatac.entity.pojo.Study,
-  oc     : org.hadatac.entity.pojo.ObjectCollection,
-  objList : List[org.hadatac.entity.pojo.StudyObject])
+@(study      : org.hadatac.entity.pojo.Study,
+  oc         : org.hadatac.entity.pojo.ObjectCollection,
+  objUriList : List[String],
+  objList    : List[org.hadatac.entity.pojo.StudyObject],
+  message    : String)
 
 @import helper._
 @import org.hadatac.console.views.html._
@@ -8,6 +10,10 @@
 @import java.net.URLEncoder
 
 @main("Object Management") {
+
+  <div>
+    <input type="text" class="form-control col-sm-2" id="message" name="message" value="Message: @message" readonly>
+  </div> <br>
 
   <div class="container-fluid">
     <h3>Management of Objects in Collection <i><font color="darkBlue">@oc.getLabel()</i></font> (@oc.getObjectCollectionType().getLabel())</h3>
@@ -17,7 +23,10 @@
     <div class="container-fluid">
       <div class="row">
          <div class="navbar-collapse collapse navbar-secondary">
-           <a href="@org.hadatac.console.controllers.objects.routes.NewObjectsFromScratch.index(URLEncoder.encode(study.getUri(),"UTF-8"),URLEncoder.encode(oc.getUri(),"UTF-8"))" class="btn btn-primary" role="button">Create Multiple Objects From Scratch</a>
+           <a href="@org.hadatac.console.controllers.objects.routes.NewObjectsFromScratch.index(URLEncoder.encode(study.getUri(),"UTF-8"),URLEncoder.encode(oc.getUri(),"UTF-8"))" 
+	      class="btn btn-primary" role="button">Create Multiple Objects From Scratch</a>
+           <a href="@org.hadatac.console.controllers.objects.routes.ObjectManagement.deleteCollectionObjects(URLEncoder.encode(study.getUri(),"UTF-8"),URLEncoder.encode(oc.getUri(),"UTF-8"),objUriList)" 
+	      class="btn btn-primary" role="button">Delete Objects in Collection</a>
            <a href="" class="btn btn-primary disabled" role="button">Create Multiple Objects From File</a>
            <a href="" class="btn btn-primary disabled" role="button">Create Single Object</a>
          </div>
@@ -28,6 +37,8 @@
 
    <h4>Objects</h4>
    
+    <form class="form-horizontal" name="newObjects" method="post" 
+	  action="@org.hadatac.console.controllers.objects.routes.ObjectManagement.updateCollectionObjects(URLEncoder.encode(study.getUri(),"UTF-8"),URLEncoder.encode(oc.getUri(),"UTF-8"),objUriList)">
     <div class="container-fluid">
         <table class="table">
             <thead>
@@ -35,9 +46,11 @@
                 <th>Name</th>
                 <th>Type</th>
                 <th>Original ID</th>
-		<th>Is From</th>
-		<th>At Location</th>
-		<th>At Time</th>
+		@if(objList.size() > 0) {
+		   @for(scope <- objList.get(0).getScopeUris()) {
+		      <th>hasScope</th>
+                   }
+                }  
                 <th>Operations</th>
               </tr>
             </thead>
@@ -49,11 +62,13 @@
               } 
             </tbody>
         </table>
-	
-	<a href="@org.hadatac.console.controllers.objects.routes.ObjectManagement.index(URLEncoder.encode(study.getUri(),"UTF-8"),URLEncoder.encode(oc.getUri(),"UTF-8"))" class="btn btn-success disabled" role="button">Save Object Collection</a><br>
-	<a href="@org.hadatac.console.controllers.objectcollections.routes.OCManagement.index(URLEncoder.encode(study.getUri(),"UTF-8"))" class="btn btn-primary" role="button">Back to Object Collection  Management</a>
+
+	<input class="btn btn-success" role="button" type="submit" id="submit" value="Update Objects"/><br>
+	<a href="@org.hadatac.console.controllers.objectcollections.routes.OCManagement.index(URLEncoder.encode(study.getUri(),"UTF-8"))" class="btn btn-primary" 
+	   role="button">Back to Object Collection  Management</a>
 	
     </div>
+    </form>
  
   </div>
 

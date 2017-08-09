@@ -96,17 +96,14 @@ public class EditOC extends Controller {
             return badRequest("The submitted form has errors!");
         }
         
-	System.out.println("uri: " + data.getNewUri());
-	System.out.println("type: " + data.getNewType());
+	//System.out.println("uri: " + data.getNewUri());
+	//System.out.println("type: " + data.getNewType());
 	String newStudyUri = ValueCellProcessing.replacePrefixEx(std_uri);
 	String newLabel = data.getNewLabel();
 	String newComment = data.getNewComment();
 	String newHasScopeUri = data.getNewHasScopeUri();
-	System.out.println("New HasScopeUri : " + newHasScopeUri);
-	List<String> newSpaceScopeUris = data.getNewSpaceScopeUris();
-	List<String> newTimeScopeUris = data.getNewTimeScopeUris();
-
-	System.out.println("=================>>>>>>>>>>>>>>>>> " + data.getNewTimeScopeUris().size());
+	List<String> newSpaceScopeUris = data.getSpaceUri();
+	List<String> newTimeScopeUris = data.getTimeUri();
 
 	// Verify Study and ObjectCollection information is valid
 	String newURI = null;

@@ -6,33 +6,32 @@
 @import org.hadatac.console.controllers.metadata._
 @import java.net._
 @import org.hadatac.utils._
+@import org.hadatac.entity.pojo.StudyObject
 
 @if(oc != null) {
   <tr>
      <td>
-	<input type="text" class="form-control" name="newLabel" id="newLabel@if(obj.getUri() != null) {-@obj.getUri() }" 
+	<input type="text" class="form-control" name="newLabel[]" id="newLabel@if(obj.getUri() != null) {-@obj.getUri() }" 
 	       value="@if(obj.getLabel() != null) { @obj.getLabel() }" onchange="checkform()">
      </td>
      <td>
-	<input type="text" class="form-control" name="newType" id="newType@if(obj.getUri() != null) {-@obj.getUri() }" 
+	<input type="text" class="form-control" name="newType[]" id="newType@if(obj.getUri() != null) {-@obj.getUri() }" 
 	       value="@if(obj.getType() != null) { @obj.getStudyObjectType().getLabel() }" onchange="checkform()" readonly>
      </td>
      <td>
-	<input type="text" class="form-control" name="newOriginalId" id="newOrigonalId@if(obj.getUri() != null) {-@obj.getUri() }" 
+	<input type="text" class="form-control" name="newOriginalId[]" id="newOrigonalId@if(obj.getUri() != null) {-@obj.getUri() }" 
 	       value="@if(obj.getOriginalId() != null) { @obj.getOriginalId() }" onchange="checkform()">
      </td>
-     <td>
-	<input type="text" class="form-control" name="newIsFrom" id="newIsFrom@if(obj.getUri() != null) {-@obj.getUri() }" 
-	       value="@if(obj.getIsFrom() != null) { @obj.getIsFrom() }" onchange="checkform()" readonly>
-     </td>
-     <td>
-	<input type="text" class="form-control" name="newAtLocation" id="newAtLocation@if(obj.getUri() != null) {-@obj.getUri() }" 
-	       value="@if(obj.getAtLocation() != null) { @obj.getAtLocation() }" onchange="checkform()" readonly>
-     </td>
-     <td>
-	<input type="text" class="form-control" name="newAtTime" id="newAtTime@if(obj.getUri() != null) {-@obj.getUri() }" 
-	       value="@if(obj.getAtTime() != null) { @obj.getAtTime() }" onchange="checkform()" readonly>
-     </td>
+
+     @if(obj.getScopeUris().size() > 0) {
+        @for(scope <- obj.getScopeUris()) {
+            <td>
+	        <input type="text" class="form-control" name="newIsFrom[]" id="newIsFrom@if(obj.getUri() != null) {-@obj.getUri() }" 
+	               value="@if(scope != null) { @StudyObject.find(scope).getLabel() }" onchange="checkform()" readonly>
+            </td>
+        }
+     }
+
      <td>
         <a href="" class="btn-xs btn-primary" role="button">Delete</a>
      </td>

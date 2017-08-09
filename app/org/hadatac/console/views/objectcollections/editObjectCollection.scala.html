@@ -110,8 +110,8 @@
         </div>
            
         <div class="form-group">
-          <label>Location Scope</label>
-	  <select id="newSpaceScopeUris" class="form-control col-sm-6" size="3" multiple name="newSpaceScopeUris">
+          <label>Location Scope</label> (multiple options allowed)
+	  <select id="spaceUri" class="form-control col-sm-6" size="3" multiple="multiple" name="spaceUri[]">
 	    @if(ocSpaceList != null) {
                @for(domain <- ocSpaceList){
 	           @if(oc.getSpaceScopes() != null) {
@@ -125,14 +125,14 @@
         </div>
            
         <div class="form-group">
-          <label>Time Scope</label>
-	  <select id="newTimeScopeUris" class="form-control col-sm-6" size="3" multiple name="newTimeScopeUris">
+          <label>Time Scope</label> (multiple options allowed)
+	  <select id="timeUri" class="form-control col-sm-6" size="3" multiple="multiple" name="timeUri[]">
 	    @if(ocTimeList != null) {
                @for(domain <- ocTimeList){
 	           @if(oc.getTimeScopes() != null) {
  	              @ocList_select_entry(domain,oc.getTimeScopeUris())
                    } else {
- 	              @oc_select_entry(domain,null)
+ 	              @ocList_select_entry(domain,null)
                    }
                }
             }
