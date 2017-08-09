@@ -10,13 +10,15 @@ public class ObjectCollectionForm {
     public String newLabel;
     public String newComment;
     public String newHasScopeUri;
-    public List<String> newSpaceScopeUris;
-    public List<String> newTimeScopeUris;
+    public List<String> spaceUri;
+    public List<String> timeUri;
 
     // STUDY information is not passed through the form since it cannot change
     //public String newStudyUri;
     
     public ObjectCollectionForm () {
+	spaceUri = new ArrayList<String>();
+	timeUri = new ArrayList<String>();
     }
     
     public String getNewUri() {
@@ -59,20 +61,28 @@ public class ObjectCollectionForm {
 	this.newHasScopeUri = hasScopeUri;
     }
     
-    public List<String> getNewSpaceScopeUris() {
-	return newSpaceScopeUris;
+    public List<String> getSpaceUri() {
+	return spaceUri;
     }
     
-    public void setNewSpaceScopeUri(List<String> spaceScopeUris) {
-	this.newSpaceScopeUris = spaceScopeUris;
+    public void spaceUri(List<String> spaceUri) {
+	this.spaceUri = spaceUri;
     }
     
-    public List<String> getNewTimeScopeUris() {
-	return newTimeScopeUris;
+    public void addSpaceUri(String spaceUri) {
+	this.spaceUri.add(spaceUri);
     }
     
-    public void setNewTimeScopeUris(List<String> timeScopeUris) {
-	this.newTimeScopeUris = timeScopeUris;
+    public List<String> getTimeUri() {
+	return timeUri;
+    }
+    
+    public void setTimeUri(List<String> timeUri) {
+	this.timeUri = timeUri;
+    }
+    
+    public void addTimeUri(String timeUri) {
+	this.timeUri.add(timeUri);
     }
     
 }

@@ -101,8 +101,8 @@ public class NewOC extends Controller {
 	String newLabel = data.getNewLabel();
 	String newComment = data.getNewComment();
 	String newHasScopeUri = data.getNewHasScopeUri();
-	List<String> newSpaceScopeUris = data.getNewSpaceScopeUris();
-	List<String> newTimeScopeUris = data.getNewTimeScopeUris();
+	List<String> newSpaceScopeUris = data.getSpaceUri();
+	List<String> newTimeScopeUris = data.getTimeUri();
 	
         // insert current state of the OC
 	ObjectCollection oc = new ObjectCollection(newURI,

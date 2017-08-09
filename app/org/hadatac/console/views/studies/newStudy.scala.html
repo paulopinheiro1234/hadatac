@@ -1,6 +1,7 @@
 @(studyType     : org.hadatac.entity.pojo.StudyType,
   organizations : List[org.hadatac.entity.pojo.Agent],
-  persons       : List[org.hadatac.entity.pojo.Agent]) 
+  persons       : List[org.hadatac.entity.pojo.Agent],
+  file          : org.hadatac.entity.pojo.DataFile) 
 
 @import helper._
 @import org.hadatac.utils._
@@ -90,7 +91,7 @@
       }
    </style>
 
-    <form class="form-horizontal" name="newStudy" method="post" action="@org.hadatac.console.controllers.studies.routes.NewStudy.processForm()">
+    <form class="form-horizontal" name="newStudy">
 	
 	<div class="form-group">
 		<label>URI:</label>
@@ -149,8 +150,16 @@
      
 	<div class="form-group">
 	  <label>Updates</label> <br>
-	  <input class="btn btn-success btn-sm" role="button" type="submit" id="submit" value="Create Study" disabled /><br>
-	  <a href="@org.hadatac.console.controllers.studies.routes.StudyManagement.index()" class="btn btn-primary" role="button">Back to Study Management</a>
+	  @if(file == null) {
+	       <input class="btn btn-success btn-sm" role="button" type="submit" id="submit" value="Create Study" disabled 
+		      formmethod="post" formaction="@org.hadatac.console.controllers.studies.routes.NewStudy.processForm("","")"/><br>
+	       <a href="@org.hadatac.console.controllers.studies.routes.StudyManagement.index()" class="btn btn-primary" role="button">Back to Study Management</a>
+          } else {
+	       <input class="btn btn-success btn-sm" role="button" type="submit" id="submit" value="Create Study" disabled 
+		      formmethod="post" formaction="@org.hadatac.console.controllers.studies.routes.NewStudy.processForm(file.getFileName(),file.getDataAcquisitionUri())"/><br>
+    	       <a href="@org.hadatac.console.controllers.annotator.routes.PrepareIngestion.create(file.getFileName(),file.getDataAcquisitionUri())" 
+		  class="btn btn-primary" role="button">Back to Prepare Ingestion</a>
+          }
 	</div>
      
      <script>

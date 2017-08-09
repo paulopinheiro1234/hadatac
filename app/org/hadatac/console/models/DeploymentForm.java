@@ -5,9 +5,9 @@ import java.util.List;
 
 public class DeploymentForm {
 
-	public String deploymentUri;
-	public String dataAcquisitionUri;
-	public String initialParam;
+    public String deploymentUri;
+    public String dataAcquisitionUri;
+    public String initialParam;
     public String platform;
     public String hasFirstCoordinate;
     public String hasSecondCoordinate;
@@ -22,45 +22,45 @@ public class DeploymentForm {
     }
     
     public String getUri() {
-		return deploymentUri;
-	}
-
-	public void setUri(String uri) {
-		this.deploymentUri = uri;
-	}
-	
-	public String getDataAcquisitionUri() {
-		return dataAcquisitionUri;
-	}
-
-	public void setDataAcquisitionUri(String dataAcquisitionUri) {
-		this.dataAcquisitionUri = dataAcquisitionUri;
-	}
-	
-	public String getInitialParameter() {
-		return initialParam;
-	}
-
-	public void setInitialParameter(String initialParam) {
-		this.initialParam = initialParam;
-	}
-	
+	return deploymentUri;
+    }
+    
+    public void setUri(String uri) {
+	this.deploymentUri = uri;
+    }
+    
+    public String getDataAcquisitionUri() {
+	return dataAcquisitionUri;
+    }
+    
+    public void setDataAcquisitionUri(String dataAcquisitionUri) {
+	this.dataAcquisitionUri = dataAcquisitionUri;
+    }
+    
+    public String getInitialParameter() {
+	return initialParam;
+    }
+    
+    public void setInitialParameter(String initialParam) {
+	this.initialParam = initialParam;
+    }
+    
     public String getType() {
-		return type;
-	}
-
-	public void setType(String type) {
-		this.type = type;
-	}
-
-	public String getPlatform() {
+	return type;
+    }
+    
+    public void setType(String type) {
+	this.type = type;
+    }
+    
+    public String getPlatform() {
     	return platform;
     }
     
     public void setPlatform(String platform) {
     	this.platform = platform;
     }
-
+    
     public String getHasFirstCoordinate() {
     	return hasFirstCoordinate;
     }

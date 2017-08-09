@@ -43,6 +43,8 @@ public class Sample extends StudyObject {
     public static String LINE_LAST = "}  ";
     public static String PREFIX = "SP-";
 
+    public String isFrom = "";
+
     public Sample(String uri, String isMemberOf) {
 	this.setUri(uri);
 	this.setType("");
@@ -71,6 +73,10 @@ public class Sample extends StudyObject {
     
     public void setIsFrom(String isFrom) {
 	this.isFrom = isFrom;
+    }
+    
+    public String getIsFrom() {
+	return this.isFrom;
     }
     
     public static Sample find(String sp_uri) {

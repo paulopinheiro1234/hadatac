@@ -29,6 +29,8 @@ import org.apache.solr.common.SolrDocumentList;
 import org.hadatac.console.controllers.AuthApplication;
 import org.hadatac.metadata.loader.LabkeyDataHandler;
 import org.hadatac.metadata.loader.ValueCellProcessing;
+import org.hadatac.entity.pojo.ObjectCollection;
+import org.hadatac.entity.pojo.StudyObject;
 import org.hadatac.utils.Collections;
 import org.hadatac.utils.ConfigProp;
 import org.hadatac.utils.NameSpaces;
@@ -107,7 +109,10 @@ public class DataAcquisition {
 	private String elevation;
 	@Field("dataset_uri")
 	private List<String> datasetURIs;
-	
+
+        private String scopeUri;
+        private String scopeName;
+    
 	private boolean isComplete;
 	private String ccsvUri;
 	private String localName;
@@ -121,6 +126,9 @@ public class DataAcquisition {
 	 * 		It should exist inside the KB as not finished yet 
 	 * 2 - DataAcquisition already exists, the preamble states its termination with endedAtTime information
 	 * 		It should exist inside the KB as not finished yet
+	 *
+	 * 99 - Data Acquisition spec is complete (anything else diferent than 99 is considered incomplete
+	 *
 	 */
 	
 	public DataAcquisition() {
@@ -139,6 +147,7 @@ public class DataAcquisition {
 		typeURIs = new ArrayList<String>();
 		associatedURIs = new ArrayList<String>();
 		deployment = null;
+		scopeUri = null;
 	}
 
 	public String getElevation() {
@@ -456,6 +465,36 @@ public class DataAcquisition {
 	public void setLocation(String location) {
 		this.location = location;
 	}
+
+	public String getScopeUri() {
+		return scopeUri;
+	}
+	public void setScopeUri(String scopeUri) {
+	    this.scopeUri = scopeUri;
+	    if (scopeUri == null || scopeUri.equals("")) {
+		return;
+	    }
+	    ObjectCollection oc = ObjectCollection.find(scopeUri);
+	    if (oc != null) {
+		if (oc.getUri().equals(scopeUri)) {
+		    scopeName = oc.getLabel();
+		    return;
+		}
+	    } else {
+		StudyObject obj = StudyObject.find(scopeUri);
+		if (obj.getUri().equals(scopeUri)) {
+		    scopeName = obj.getLabel();
+		    return;
+		}
+	    }
+	}
+       	public String getScopeName() {
+		return scopeName;
+	}
+	public void setScopeName(String scopeName) {
+		this.scopeName = scopeName;
+	}
+	
 	public List<String> getDatasetUri() {
 		return datasetURIs;
 	}
@@ -497,6 +536,7 @@ public class DataAcquisition {
 	public List<String> getAssociatedURIs() {
 		return associatedURIs;
 	}
+
 	public void setAssociatedURIs(List<String> associatedURIs) {
 		this.associatedURIs = associatedURIs;
 	}
@@ -1039,6 +1079,8 @@ public class DataAcquisition {
 		builder.append("platform_uri: " + this.platformUri + "\n");
 		builder.append("location: " + this.location + "\n");
 		builder.append("elevation: " + this.elevation + "\n");
+		builder.append("scopeUri: " + this.scopeUri + "\n");
+		builder.append("scopeName: " + this.scopeName + "\n");
 		i = datasetURIs.iterator();
 		while (i.hasNext()) {
 			builder.append("dataset_uri: " + i.next() + "\n");
@@ -1077,6 +1119,7 @@ public class DataAcquisition {
     	row.put("hasco:hasDeployment", ValueCellProcessing.replaceNameSpaceEx(getDeploymentUri()));
     	row.put("hasco:isDataAcquisitionOf", ValueCellProcessing.replaceNameSpaceEx(getStudyUri()));
     	row.put("hasco:hasSchema", ValueCellProcessing.replaceNameSpaceEx(getSchemaUri()));
+    	row.put("hasco:hasScope", ValueCellProcessing.replaceNameSpaceEx(getScopeUri()));
     	row.put("hasco:hasTriggeringEvent", getTriggeringEventName());
     	row.put("prov:endedAtTime", getEndedAt().startsWith("9999")? "" : getEndedAt());
     	rows.add(row);

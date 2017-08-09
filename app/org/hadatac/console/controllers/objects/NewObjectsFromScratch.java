@@ -25,7 +25,7 @@ import org.hadatac.metadata.loader.ValueCellProcessing;
 import org.hadatac.console.views.html.*;
 import org.hadatac.console.views.html.objects.*;
 import org.hadatac.console.views.html.triplestore.syncLabkey;
-import org.hadatac.console.models.ObjectsForm;
+import org.hadatac.console.models.NewObjectsFromScratchForm;
 import org.hadatac.console.models.SparqlQuery;
 import org.hadatac.console.models.SparqlQueryResults;
 import org.hadatac.console.models.SysUser;
@@ -81,19 +81,20 @@ public class NewObjectsFromScratch extends Controller {
 	Study std = Study.find(std_uri);
 	ObjectCollection oc = ObjectCollection.find(oc_uri);
 	
-        Form<ObjectsForm> form = Form.form(ObjectsForm.class).bindFromRequest();
-        ObjectsForm data = form.get();
+        Form<NewObjectsFromScratchForm> form = Form.form(NewObjectsFromScratchForm.class).bindFromRequest();
+        NewObjectsFromScratchForm data = form.get();
         
         if (form.hasErrors()) {
             return badRequest("The submitted form has errors!");
         }
         
 	// store new values
-	System.out.println("============================ NEW OBJECTS =======================");
-	System.out.println("Study: [" + std.getUri() + "]");
-	System.out.println("OC: [" + oc.getUri() + "]");
-	System.out.println("type: [" + data.getNewType() + "]");
-	System.out.println("Quantity : " + data.getNewQuantity());
+	//System.out.println("============================ NEW OBJECTS =======================");
+	//System.out.println("Study: [" + std.getUri() + "]");
+	//System.out.println("OC: [" + oc.getUri() + "]");
+	//System.out.println("type: [" + data.getNewType() + "]");
+	//System.out.println("Quantity : " + data.getNewQuantity());
+	//System.out.println("LabelPrefix : " + data.getNewLabelPrefix());
 	
 	long quantity = Long.parseLong(data.getNewQuantity());
 	if ((quantity > 0) && (quantity <= MAX_OBJECTS)) {
@@ -110,6 +111,7 @@ public class NewObjectsFromScratch extends Controller {
 	    newType = ValueCellProcessing.replacePrefixEx(data.getNewType());
 	}
 	String newObjectCollectionUri = ValueCellProcessing.replacePrefixEx(oc_uri);
+	String newLabelPrefix = data.getNewLabelPrefix();
 	
 	// Variable values
 	String newURI = null;
@@ -124,7 +126,11 @@ public class NewObjectsFromScratch extends Controller {
 		
 		ObjectCollectionType ocType = ObjectCollectionType.find(oc.getType());
 		newURI = oc.getUri().replace("OC-",ocType.getAcronym() + "-") + "-" + formattedCounter(nextId);
-		newLabel = ocType.getLabelFragment() + " " + nextId;
+		if (newLabelPrefix == null || newLabelPrefix.equals("")) {
+		    newLabel = Long.toString(nextId);
+		} else {
+		    newLabel = newLabelPrefix + " " + nextId;
+		}
 		newComment = newLabel;
 		
 		// insert current state of the OBJ
@@ -134,9 +140,7 @@ public class NewObjectsFromScratch extends Controller {
 				      newLabel,
 				      newObjectCollectionUri,
 				      newComment,
-				      "", // IsFrom 
-				      "", // AtLocation 
-				      ""  // AtTime
+				      new ArrayList<String>() 
 				      );
 		
 		// insert the new OC content inside of the triplestore regardless of any change -- the previous content has already been deleted
@@ -156,6 +160,212 @@ public class NewObjectsFromScratch extends Controller {
 	String message = "A total of " + quantity + " new object(s) have been Generated";
 	return ok(objectConfirm.render(message, std_uri, oc_uri, obj));
     }
+    
+    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
+    public static Result processScopeForm(String std_uri, String oc_uri) {
+    	final SysUser sysUser = AuthApplication.getLocalUser(session());
+	
+	Study std = Study.find(std_uri);
+	ObjectCollection oc = ObjectCollection.find(oc_uri);
+	
+        Form<NewObjectsFromScratchForm> form = Form.form(NewObjectsFromScratchForm.class).bindFromRequest();
+        NewObjectsFromScratchForm data = form.get();
+        
+        if (form.hasErrors()) {
+            return badRequest("The submitted form has errors!");
+        }
+        
+	// store new values
+	System.out.println("============================ NEW OBJECTS =======================");
+	System.out.println("Study: [" + std.getUri() + "]");
+	System.out.println("OC: [" + oc.getUri() + "]");
+	System.out.println("type: [" + data.getNewType() + "]");
+	System.out.println("UseDomain : " + data.getUseDomain());
+	System.out.println("UseSpace : " + data.getUseSpace());
+	System.out.println("UseTime : " + data.getUseTime());
+	System.out.println("Multiplier : " + data.getNewMultiplier());
+	
+	boolean useDomain = (data.getUseDomain() != null);
+	boolean useSpace = (data.getUseSpace() != null);
+	boolean useTime = (data.getUseTime() != null);
+	long multiplier = Long.parseLong(data.getNewMultiplier());
+	if ((multiplier > 0) && (multiplier <= MAX_OBJECTS)) {
+	    //    std.requestId(quantity);
+	}
+	String newLabelPrefix = data.getNewLabelPrefix();
+	boolean newLabelQualifier = (data.getNewLabelQualifier() != null);
+	long nextId = std.getLastId() + 1;
+	System.out.println("nextId : " + nextId);
+	long quantity = 0;
+
+	// Fixed values
+	String newType = null;
+	if (data.getNewType() == null || data.getNewType().equals("")) {
+	    return badRequest("[ERROR] New type cannot be empty.");
+	} else {
+	    newType = ValueCellProcessing.replacePrefixEx(data.getNewType());
+	}
+	String newObjectCollectionUri = ValueCellProcessing.replacePrefixEx(URLDecoder.decode(oc_uri));
+	
+	// Variable values
+	String newURI = null;
+	String newLabel = null;
+	String newComment = null;
+
+	// Object object
+	StudyObject obj = null;
+	List<String> genObjs = new ArrayList<String>();
+
+	List<ObjectCollection> allObjectCollections = new ArrayList<ObjectCollection>();
+	
+	if (multiplier > 0) {
+
+	    // Combine selected object collections
+	    if (useDomain) {
+		if (useSpace) {
+		    if (useTime) {
+			// DOMAIN + SPACE + TIME
+			//System.out.println("Selection: DOMAIN + SPACE + TIME");
+			allObjectCollections.add(oc.getHasScope());
+			allObjectCollections.addAll(oc.getSpaceScopes());
+			allObjectCollections.addAll(oc.getTimeScopes());
+	  
+		    } else {
+			// DOMAIN + SPACE
+			//System.out.println("Selection: DOMAIN + SPACE");
+			allObjectCollections.add(oc.getHasScope());
+			allObjectCollections.addAll(oc.getSpaceScopes());
+
+		    }
+		} else {
+		    if (useTime) {
+			// DOMAIN + TIME
+			//System.out.println("Selection: DOMAIN + TIME");
+			allObjectCollections.add(oc.getHasScope());
+			allObjectCollections.addAll(oc.getTimeScopes());
+
+		    } else {
+			// DOMAIN
+			//System.out.println("Selection: DOMAIN");
+			allObjectCollections.add(oc.getHasScope());
+
+		    }
+		}
+
+	    } else if (useSpace) {
+
+ 		if (useTime) {
+		    // SPACE and TIME
+			System.out.println("Selection: SPACE + TIME");
+			allObjectCollections.addAll(oc.getSpaceScopes());
+			allObjectCollections.addAll(oc.getTimeScopes());
+
+		} else {
+		    // SPACE
+			System.out.println("Selection: SPACE");
+			allObjectCollections.addAll(oc.getSpaceScopes());
+
+		}
+	    } else if (useTime) {
+		// TIME
+		System.out.println("Selection: TIME");
+		allObjectCollections.addAll(oc.getTimeScopes());
+	    }
+		
+	    // Generate the cartesian product of the scope objects
+	    List<StudyObject[]> newListArray = new ArrayList<StudyObject[]>();		
+	    for (ObjectCollection collection : allObjectCollections) {
+		int j = 0;
+		StudyObject[] newArray = new StudyObject[collection.getObjects().size()]; 
+		for (StudyObject stdObj : collection.getObjects()) {
+		    newArray[j] = stdObj;
+		    j++;
+		}
+		newListArray.add(newArray);
+	    }
+	    StudyObject[][] newMatrix = newListArray.toArray(new StudyObject[newListArray.size()][]);
+
+	    List<String> genCombinations = new ArrayList<String>();
+	    List<List<StudyObject>> genCombinationsOS = new ArrayList<List<StudyObject>>();
+	    cartesianProduct(newMatrix, 0, new StudyObject[newMatrix.length], genCombinations, genCombinationsOS);
+	    
+	    System.out.println("GENERATED COMBINATIONS");
+	    for (List<StudyObject> soCol : genCombinationsOS) {
+		for (int i=0; i < multiplier; i++) {
+		    ObjectCollectionType ocType = ObjectCollectionType.find(oc.getType());
+		    newURI = oc.getUri().replace("OC-",ocType.getAcronym() + "-") + "-" + formattedCounter(nextId);
+		    if (newLabelPrefix == null || newLabelPrefix.equals("")) {
+			newLabel = Long.toString(nextId);
+		    } else {
+			newLabel = newLabelPrefix + " " + nextId;
+		    }
+		    if (newLabelQualifier) {
+			newLabel += ":";
+			for (StudyObject so : soCol) {
+			    newLabel += " " + so.getLabel();
+			}
+		    }
+		    newComment = newLabel;
+		    
+		    //System.out.println("---- NEW OBJECT ------");
+		    //System.out.println("URI: [" + newURI + "]");
+		    //System.out.println("Type: [" + newType + "]");
+		    //System.out.println("Label: [" + newLabel + "]");
+		    //System.out.println("OC : [" + newObjectCollectionUri + "]");
+		    
+		    List<String> scopeUris = new ArrayList<String>();
+		    for (StudyObject so : soCol) {
+			scopeUris.add(so.getUri());
+			System.out.println("   - Scope: [" + so.getUri() + "]");
+		    }
+
+		    // insert current state of the OBJ
+		    obj = new StudyObject(newURI,
+					  newType,
+					  "", // Original ID
+					  newLabel,
+					  newObjectCollectionUri,
+					  newComment,
+					  scopeUris 
+					  );
+		    
+		    // insert the new OC content inside of the triplestore regardless of any change -- the previous content has already been deleted
+		    obj.save();
+		
+		    // update/create new OBJ in LabKey
+		    int nRowsAffected = obj.saveToLabKey(session().get("LabKeyUserName"), session().get("LabKeyPassword"));
+		    if (nRowsAffected <= 0) {
+		        System.out.println("[ERROR] Failed to insert new OBJ to LabKey!");
+		    }
+		    oc.getObjectUris().add(obj.getUri());
+		    
+		    nextId++;
+		    genObjs.add(newLabel);
+		}
+	    }
+	    
+	}
+	String message = "Total objects created: " + genObjs.size();
+	return ok(objectConfirm.render(message, std_uri, oc_uri, obj));
+    }
+    
+    private static void cartesianProduct(StudyObject[][] arr, int level, StudyObject[] cp, List<String> gens, List<List<StudyObject>> genOS) {
+	if (level == arr.length) {
+	    List<StudyObject> response = new ArrayList<StudyObject>();
+	    String message = "";
+	    for (StudyObject so : cp) {
+		response.add(so);
+		message += so.getLabel() + " ";
+	    }
+	    gens.add(message);
+	    genOS.add(response);
+	    return;
+	}
+	for (int i = 0; i < arr[level].length; i++) {
+	    cp[level] = arr[level][i];
+	    cartesianProduct(arr, level + 1, cp, gens, genOS);
+	}
+    }    
     
     static private String formattedCounter (long value) {
 	String strLong = Long.toString(value).trim();
