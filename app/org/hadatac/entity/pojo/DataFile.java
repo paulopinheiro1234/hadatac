@@ -99,9 +99,9 @@ public class DataFile {
 	
 	public int save() {
 		try {
-			SolrClient client = new HttpSolrClient(
+			SolrClient client = new HttpSolrClient.Builder(
 					Play.application().configuration().getString("hadatac.solr.data") 
-					+ Collections.CSV_DATASET);
+					+ Collections.CSV_DATASET).build();
 			
 			int status = client.addBean(this).getStatus();
 			client.commit();
@@ -115,9 +115,9 @@ public class DataFile {
 	
 	public int delete() {
 		try {
-			SolrClient solr = new HttpSolrClient(
+			SolrClient solr = new HttpSolrClient.Builder(
 					Play.application().configuration().getString("hadatac.solr.data") 
-					+ Collections.CSV_DATASET);
+					+ Collections.CSV_DATASET).build();
 			UpdateResponse response = solr.deleteById(this.getFileName());
 			solr.commit();
 			solr.close();
@@ -163,9 +163,9 @@ public class DataFile {
 	public static List<DataFile> findByQuery(SolrQuery query) {
 		List<DataFile> list = new ArrayList<DataFile>();
 		
-		SolrClient solr = new HttpSolrClient(
+		SolrClient solr = new HttpSolrClient.Builder(
 				Play.application().configuration().getString("hadatac.solr.data") 
-				+ Collections.CSV_DATASET);
+				+ Collections.CSV_DATASET).build();
 
 		try {
 			QueryResponse response = solr.query(query);

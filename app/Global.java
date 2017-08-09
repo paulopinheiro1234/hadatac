@@ -117,13 +117,20 @@ public class Global extends GlobalSettings {
 
 	private void initialData() {
 		if (SecurityRole.existsSolr() == false) {
-			for (final String roleName : Arrays
-					.asList(org.hadatac.console.controllers.AuthApplication.DATA_OWNER_ROLE, org.hadatac.console.controllers.AuthApplication.DATA_MANAGER_ROLE)) {
-				final SecurityRole role = new SecurityRole();
-				role.roleName = roleName;
-				role.save();
-			}
+			addSecurityRole(
+					org.hadatac.console.controllers.AuthApplication.DATA_OWNER_ROLE, 
+					"f4251649-751e-4190-b0ed-e824f3cdd6fc");
+			addSecurityRole(
+					org.hadatac.console.controllers.AuthApplication.DATA_MANAGER_ROLE,
+					"fdeff289-daee-4ecc-8c9c-3ef111cf7a06");			
 		}
+	}
+	
+	private void addSecurityRole(String roleName, String id) {
+		final SecurityRole role = new SecurityRole();
+		role.roleName = roleName;
+		role.id_s = id;
+		role.save();
 	}
 	
 	private void initDirectoryStructure(){

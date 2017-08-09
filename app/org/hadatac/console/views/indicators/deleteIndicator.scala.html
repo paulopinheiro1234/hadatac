@@ -8,10 +8,16 @@
 @import org.hadatac.console.controllers.triplestore._
 
 @main("Delete Indicator") {
-<div class="container">
 <h2>Delete Indicator</h2>
 
-   <form class="form-horizontal" method="post" action="@org.hadatac.console.controllers.indicators.routes.DeleteIndicator.processForm(indicator.getUri())">
+<div class="container">
+	
+	Deleted <b> @indicator.getUri </b>
+	<p> @results </p>
+	
+   
+</div>
+<form class="form-horizontal" method="post" action="@org.hadatac.console.controllers.indicators.routes.DeleteIndicator.processForm(indicator.getUri())">
  	<p style='font-family: "Lucida Console", Monaco, monospace;' id='msgarea'></p>
 	<script type="text/javascript">
 	  var msg = "@results";
@@ -21,7 +27,5 @@
         </script>
     </form>    
     @indicatorButton(false)
-
-</div>
 
 }

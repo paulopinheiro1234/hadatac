@@ -290,9 +290,9 @@ public class MetadataAcquisition extends Controller {
 	
 	public static int deleteFromSolr() {
 		try {
-			SolrClient solr = new HttpSolrClient(
+			SolrClient solr = new HttpSolrClient.Builder(
 					Play.application().configuration().getString("hadatac.solr.data") 
-					+ Collections.STUDIES);
+					+ Collections.STUDIES).build();
 			UpdateResponse response = solr.deleteByQuery("*:*");
 			solr.commit();
 			solr.close();

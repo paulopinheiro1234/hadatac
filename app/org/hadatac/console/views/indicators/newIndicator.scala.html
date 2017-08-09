@@ -16,13 +16,9 @@
      function checkform() {
         var cansubmit = true;
 	
-	if (!document.getElementById('newLabel').value || 
-            document.getElementById('newLabel').value.length === 0) {
+	if (!document.getElementById('newUri').value || 
+            document.getElementById('newUri').value.length === 0) {
 	   cansubmit = false;
-	}
-
-	if ($('input[type=radio]:checked').size() === 0) {
-	  cansubmit = false;
 	}
 
 	if (cansubmit) {
@@ -83,7 +79,7 @@
 	<div class="form-group">
 		<label>URI:</label>
 		<input type="text" class="form-control col-sm-6" name="newUri" id="newUri" 
-		       onchange="checkform()" readonly >
+		       onchange="checkform()" >
  	</div>
  	<div class="form-group">
 		<label>Label</label>
@@ -95,7 +91,7 @@
  	</div>
 	<div class="form-group">
 	  <label>Updates</label> <br>
-	  <input class="btn btn-success btn-sm" role="button" type="submit" id="submit" value="Create Indicator" disabled /><br>
+	  <input class="btn btn-success btn-sm" role="button" type="submit" id="submit" value="Create Indicator" /><br>
 	  <a href="@org.hadatac.console.controllers.indicators.routes.IndicatorManagement.index()" class="btn btn-primary" role="button">Back to Indicator Management</a>
 	</div>
      

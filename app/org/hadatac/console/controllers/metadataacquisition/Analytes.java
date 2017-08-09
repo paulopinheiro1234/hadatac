@@ -182,9 +182,9 @@ public class Analytes extends Controller {
 	
 	public static int deleteFromSolr() {
 		try {
-			SolrClient solr = new HttpSolrClient(
+			SolrClient solr = new HttpSolrClient.Builder(
 					Play.application().configuration().getString("hadatac.solr.data") 
-					+ Collections.ANALYTES);
+					+ Collections.ANALYTES).build();
 			UpdateResponse response = solr.deleteByQuery("*:*");
 			solr.commit();
 			solr.close();

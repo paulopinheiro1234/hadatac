@@ -54,9 +54,9 @@ public class AnnotationLog {
 	
 	public int save() {
 		try {
-			SolrClient client = new HttpSolrClient(
+			SolrClient client = new HttpSolrClient.Builder(
 					Play.application().configuration().getString("hadatac.solr.data")
-					+ Collections.ANNOTATION_LOG);
+					+ Collections.ANNOTATION_LOG).build();
 			int status = client.addBean(this).getStatus();
 			client.commit();
 			client.close();
@@ -102,9 +102,9 @@ public class AnnotationLog {
 	}
 	
 	public static AnnotationLog find(String file_name) {
-		SolrClient solr = new HttpSolrClient(
+		SolrClient solr = new HttpSolrClient.Builder(
 				Play.application().configuration().getString("hadatac.solr.data")
-				+ Collections.ANNOTATION_LOG);
+				+ Collections.ANNOTATION_LOG).build();
 		SolrQuery query = new SolrQuery();
 		query.set("q", "file_name:\"" + file_name + "\"");
 		query.set("rows", "10000000");
@@ -126,9 +126,9 @@ public class AnnotationLog {
 	}
 	
 	public static int delete(String file_name) {
-		SolrClient solr = new HttpSolrClient(
+		SolrClient solr = new HttpSolrClient.Builder(
 				Play.application().configuration().getString("hadatac.solr.data")
-				+ Collections.ANNOTATION_LOG);
+				+ Collections.ANNOTATION_LOG).build();
 		try {	
 			UpdateResponse response = solr.deleteByQuery("file_name:\"" + file_name + "\"");
 			solr.commit();

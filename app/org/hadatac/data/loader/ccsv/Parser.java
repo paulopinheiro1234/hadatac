@@ -123,10 +123,12 @@ public class Parser {
 		int batch_size = 10000;
 
 		boolean isSubjectPlatform = Subject.isPlatform(hadatacKb.getDeployment().getPlatform().getUri());
-		SolrClient solr = new HttpSolrClient(Play.application().configuration().
-				getString("hadatac.solr.data") + Collections.DATA_ACQUISITION);
-                boolean isSample;
-                boolean isSubject;
+		SolrClient solr = new HttpSolrClient.Builder(
+				Play.application().configuration().
+				getString("hadatac.solr.data") + Collections.DATA_ACQUISITION).build();
+		
+		boolean isSample;
+		boolean isSubject;
 		String matrix = "";
 		String analyte = "";
 		String unitOverride = "";

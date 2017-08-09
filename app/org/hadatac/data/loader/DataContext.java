@@ -49,7 +49,7 @@ public class DataContext {
 	}
 	
 	private Long totalDocuments(String solrCoreName) {
-		SolrClient solr = new HttpSolrClient(kbURL + solrCoreName);
+		SolrClient solr = new HttpSolrClient.Builder(kbURL + solrCoreName).build();
 		SolrQuery parameters = new SolrQuery();
 		parameters.set("q", "*:*");
 		parameters.set("rows", 0);

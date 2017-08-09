@@ -51,9 +51,9 @@ public class URIGenerator extends Controller {
     }// /postIndex()
 
     public static long getNextId() {
-        SolrClient client = new HttpSolrClient(
+        SolrClient client = new HttpSolrClient.Builder(
         		Play.application().configuration().getString("hadatac.solr.data")
-        		+ Collections.URI_GENERATOR);
+        		+ Collections.URI_GENERATOR).build();
         SolrQuery parameters = new SolrQuery();
         parameters.set("q", "*:*");
         parameters.set("sort", "generated_id desc");

@@ -203,9 +203,9 @@ public class DataAcquisitionBrowser extends Controller {
 	
 	public static int deleteFromSolr() {
 		try {
-			SolrClient solr = new HttpSolrClient(
+			SolrClient solr = new HttpSolrClient.Builder(
 					Play.application().configuration().getString("hadatac.solr.data") 
-					+ Collections.METADATA_AQUISITION);
+					+ Collections.METADATA_AQUISITION).build();
 			UpdateResponse response = solr.deleteByQuery("*:*");
 			solr.commit();
 			solr.close();
