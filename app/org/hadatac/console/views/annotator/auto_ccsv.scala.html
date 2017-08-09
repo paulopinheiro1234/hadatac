@@ -2,6 +2,7 @@
   processedFiles : List[org.hadatac.entity.pojo.DataFile],
   bStarted : Boolean,
   bAdmin : Boolean)
+(preview : Html)
 
 @import helper._
 @import org.hadatac.console.views.html._
@@ -105,7 +106,7 @@
     			<td>@file.getUploadTime()</td>
     			<td>@file.getProcessTime()</td>
     			<td>
-    			<a href="@org.hadatac.console.controllers.fileviewer.routes.CSVPreview.getCSVPreview(file.getOwnerEmail(), file.getFileName(), 10)" class="btn-xs btn-primary" role="button">Preview File</a>
+    			<a href="@org.hadatac.console.controllers.fileviewer.routes.CSVPreview.getCSVPreview(file.getOwnerEmail(), file.getFileName(), 5)" class="btn-xs btn-primary" role="button">Preview File</a>
     			<a href="@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.moveDataFile(file.getFileName())" class="btn-xs btn-primary" role="button" onclick="return confirm('Are you sure to move? If so, the ingested data from this file will be deleted as well!')" >Move to Unprocessed Folder</a>
     			<a href="@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.deleteDataFile(file.getFileName(), true)" class="btn-xs btn-primary" role="button" id="delete" onclick="return confirm('Are you sure to delete? If so, the ingested data from this file will be deleted as well!')">Delete</a>
     			<a href="@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.assignDataAcquisition(file.getDataAcquisitionUri(), file.getFileName())" class="btn-xs btn-primary" role="button">Assign Acquisition</a>

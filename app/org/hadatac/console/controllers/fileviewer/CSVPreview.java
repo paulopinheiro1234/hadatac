@@ -103,7 +103,7 @@ public class CSVPreview extends Controller{
 			Iterator it = parser.iterator();
 			CSVRecord currentRow;
 			previewList = new ArrayList<ArrayList<String>>();
-			while(rowCount < numRows){
+			while(rowCount < numRows && it.hasNext()){
 				rowCount++;
 				ArrayList<String> row = new ArrayList<String>();
 				currentRow = (CSVRecord)it.next();
