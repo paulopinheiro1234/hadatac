@@ -8,8 +8,28 @@
 @import java.net._
 
 @main("CSV Preview"){
+		<style>
+			.col-selected {
+					background: #AED6F1;
+			}
+		</style>
+
 		<script>
-			
+			function colSelect(obj){
+				//unselect
+				if (obj.classList.contains('col-selected')) {
+					obj.classList.remove('col-selected');	
+				//select
+				} else {
+					var colNumber = obj.id.split('-')[1];
+					var allCols = document.getElementsByClassName('col-selectable');
+					for (i = 0; i < allCols.length; i++) {
+						  allCols[i].classList.remove('col-selected')
+					}
+					obj.classList.add('col-selected');
+					console.log(colNumber);
+				}
+			}
 		</script>
 
 		<div id="csv-preview"; style="height:250px; overflow:auto; padding-right: 50px; padding-left: 50px;">
@@ -23,8 +43,8 @@
 	} else {
 		<table class="table">
 			<tr>
-			@for((colHead) <- headers){
-				<th>@colHead</th>
+			@for(index <- 0 until headers.size){
+				<th id="previewCol-@index" class="col-selectable" onclick="colSelect(this)">@headers(index)</th>
 			}
 			</tr>
 	

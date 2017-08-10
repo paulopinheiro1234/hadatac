@@ -306,6 +306,7 @@ POST	/hadatac/annotator/file/acquisition/form       org.hadatac.console.controll
 # file preview
 GET	/hadatac/annotator/csvpreview     	       org.hadatac.console.controllers.fileviewer.CSVPreview.getCSVPreview(ownerEmail:String, file_name:String, numRows:Int)
 POST	/hadatac/annotator/csvpreview     	       org.hadatac.console.controllers.fileviewer.CSVPreview.getCSVPreview(ownerEmail:String, file_name:String, numRows:Int)
+#POST	/hadatac/annotator/csvpreview                  org.hadatac.console.controllers.fileviewer.CSVPreview.submitColSelect(selectedCol:Int)
 
 GET	/hadatac/annotator/schema                      org.hadatac.console.controllers.annotator.SchemaFromFile.create(filename : String)
 POST	/hadatac/annotator/schema                      org.hadatac.console.controllers.annotator.SchemaFromFile.create(filename : String)

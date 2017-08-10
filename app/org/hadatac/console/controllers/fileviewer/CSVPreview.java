@@ -122,9 +122,15 @@ public class CSVPreview extends Controller{
 
 	public static Result getCSVPreview(String ownerEmail, String fileName, int numRows){
 		DataFile df = DataFile.findByName(ownerEmail, fileName);
-		System.out.println("Headers: \n" + getCSVHeaders(df));
-		System.out.println("Sample: \n" + getCSVPreview(df, numRows));
+		//System.out.println("Headers: \n" + getCSVHeaders(df));
+		//System.out.println("Sample: \n" + getCSVPreview(df, numRows));
 		return ok(csv_preview.render(getCSVHeaders(df), getCSVPreview(df, numRows)));
 	}// /getCSVPreview
+
+	public static Result generateSubjectsFromColumn(String ownerEmail, String fileName, int selectedCol){
+		
+		return ok();
+	}
+
 }
 
