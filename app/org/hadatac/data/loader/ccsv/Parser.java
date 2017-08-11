@@ -232,10 +232,10 @@ public class Parser {
 				    String timeValue = record.get(schema.getTimeInstantColumn() - 1);
 				    //System.out.println("Time Instant value: " + timeValue);
 				    if (timeValue != null) {
-				    	DateTimeFormatter formatter = DateTimeFormatter.ofPattern("M/d/yy HH:mm");
-				    	LocalDateTime datetime = LocalDateTime.parse(timeValue, formatter);
-				    	measurement.setTimestamp(datetime.toInstant(ZoneOffset.UTC).toString());
-				    	//measurement.setTimestamp(timeValue);
+				    	//DateTimeFormatter formatter = DateTimeFormatter.ofPattern("M/d/yy HH:mm");
+				    	//LocalDateTime datetime = LocalDateTime.parse(timeValue, formatter);
+				    	//measurement.setTimestamp(datetime.toInstant(ZoneOffset.UTC).toString());
+				    	measurement.setTimestamp(timeValue);
 				    }
 				}    
 				
