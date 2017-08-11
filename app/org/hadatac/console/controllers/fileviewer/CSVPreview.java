@@ -91,8 +91,6 @@ public class CSVPreview extends Controller{
 
 		ArrayList<ArrayList<String>> previewList = null;
 
-		//String filename = df.getFileName();
-		// FOR TESTING ONLY
 		String filename = path_proc + df.getFileName();
 		File toPreview = new File(filename);
 		//System.out.println("filename: " + filename);
@@ -124,13 +122,44 @@ public class CSVPreview extends Controller{
 		DataFile df = DataFile.findByName(ownerEmail, fileName);
 		//System.out.println("Headers: \n" + getCSVHeaders(df));
 		//System.out.println("Sample: \n" + getCSVPreview(df, numRows));
-		return ok(csv_preview.render(getCSVHeaders(df), getCSVPreview(df, numRows)));
+		return ok(csv_preview.render(ownerEmail, fileName, getCSVHeaders(df), getCSVPreview(df, numRows)));
 	}// /getCSVPreview
 
-	public static Result generateSubjectsFromColumn(String ownerEmail, String fileName, int selectedCol){
-		
-		return ok();
-	}
+	public static ArrayList<String> getColumn(String ownerEmail, String fileName, int selectedCol){
+		//DataFile df = DataFile.findByName(ownerEmail, fileName);
+		String filename = path_proc + fileName;
+		File toPreview = new File(filename);
+		ArrayList<String> theColumn = new ArrayList<String>();
+		try{
+			CSVParser parser = CSVParser.parse(toPreview, StandardCharsets.UTF_8, CSVFormat.RFC4180.withHeader());
+			Iterator it = parser.iterator();
+			CSVRecord currentRow;
+			String temp = "";
+			while(it.hasNext()){
+				currentRow = (CSVRecord)it.next();
+				temp = currentRow.get(selectedCol);
+				theColumn.add(temp);
+			}
+			int count = theColumn.size();
+			System.out.println("Added " + count + " rows to column list");
+			parser.close();
+		} catch(IOException e) {
+			e.printStackTrace();
+		}
+		System.out.println(theColumn);
+		return theColumn;
+	}// /getColumn
 
+	/*public static Result selectColumn(String ownerEmail, String fileName, int selectedCol){
+		DataFile df = DataFile.findByName(ownerEmail, fileName);
+		if (selectedCol < 0){
+			return badRequest(csv_preview.render(ownerEmail, fileName, getCSVHeaders(df), getCSVPreview(df, 10)));
+		}
+		else{
+			ArrayList<String> theColumn = getColumn(ownerEmail, fileName, selectedCol);
+			return redirect(routes.CSVPreview.getCSVPreview(ownerEmail, fileName, 10));
+		}
+	}// /selectColumn
+	*/
 }
 
