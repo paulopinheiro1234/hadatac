@@ -157,6 +157,10 @@ public class StudyObject extends HADatAcThing {
     
     public static StudyObject find(String obj_uri) {
 	StudyObject obj = null;
+	if (obj_uri == null || obj_uri.trim().equals("")) {
+	    return obj;
+	}
+	obj_uri = obj_uri.trim();
 	//System.out.println("Looking for object with URI " + obj_uri);
 	if (obj_uri.startsWith("http")) {
 	    obj_uri = "<" + obj_uri + ">";
@@ -170,6 +174,7 @@ public class StudyObject extends HADatAcThing {
 	    "    OPTIONAL { " + obj_uri + " rdfs:label ?hasLabel } . " + 
 	    "    OPTIONAL { " + obj_uri + " rdfs:comment ?hasComment } . " + 
 	    "}";
+	//System.out.println("Looking for object with URI " + obj_uri + " \nQuery: " + queryString);
 	Query query = QueryFactory.create(queryString);
 	
 	QueryExecution qexec = QueryExecutionFactory.sparqlService(Collections.getCollectionsName(Collections.METADATA_SPARQL), query);

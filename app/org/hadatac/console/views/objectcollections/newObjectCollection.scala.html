@@ -1,4 +1,6 @@
-@(study         : org.hadatac.entity.pojo.Study,
+@(filename      : String,
+  da_uri        : String,
+  study         : org.hadatac.entity.pojo.Study,
   ocDomainList  : List[org.hadatac.entity.pojo.ObjectCollection],
   ocSpaceList   : List[org.hadatac.entity.pojo.ObjectCollection],
   ocTimeList    : List[org.hadatac.entity.pojo.ObjectCollection],
@@ -73,7 +75,7 @@
 
    </script>
 
-    <form class="form-horizontal" name="newObjectColleciton" method="post" action="@org.hadatac.console.controllers.objectcollections.routes.NewOC.processForm(study.getUri())">
+    <form class="form-horizontal" name="newObjectColleciton" method="post" action="@org.hadatac.console.controllers.objectcollections.routes.NewOC.processForm(filename, da_uri, study.getUri())">
 	
 	<div class="form-group">
 		<label>URI:</label>
@@ -137,7 +139,7 @@
 	<div class="form-group">
 	  <label>Updates</label> <br>
 	  <input class="btn btn-success btn-sm" role="button" type="submit" id="submit" value="Create Object Collection" disabled /><br>
-	  <a href="@org.hadatac.console.controllers.objectcollections.routes.OCManagement.index(study.getUri())" class="btn btn-primary" role="button">Back to Object Collection Management</a>
+	  <a href="@org.hadatac.console.controllers.objectcollections.routes.OCManagement.index(filename, da_uri, study.getUri())" class="btn btn-primary" role="button">Back to Object Collection Management</a>
 	</div>
      
    </form>

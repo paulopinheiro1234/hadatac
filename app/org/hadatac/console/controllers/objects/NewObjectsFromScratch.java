@@ -44,10 +44,10 @@ public class NewObjectsFromScratch extends Controller {
     static final long LENGTH_CODE = 6;
 
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    public static Result index(String std_uri, String oc_uri) {
+    public static Result index(String filename, String da_uri, String std_uri, String oc_uri) {
     	if (session().get("LabKeyUserName") == null && session().get("LabKeyPassword") == null) {
 	    return redirect(org.hadatac.console.controllers.triplestore.routes.LoadKB.logInLabkey(
-			    org.hadatac.console.controllers.objects.routes.NewObjectsFromScratch.index(std_uri, oc_uri).url()));
+			    org.hadatac.console.controllers.objects.routes.NewObjectsFromScratch.index(filename, da_uri, std_uri, oc_uri).url()));
     	}
 	
 	std_uri = URLDecoder.decode(std_uri);
@@ -66,16 +66,16 @@ public class NewObjectsFromScratch extends Controller {
 	    }
 	}
 	
-    	return ok(newObjectsFromScratch.render(study, oc, typeList));
+    	return ok(newObjectsFromScratch.render(filename, da_uri, study, oc, typeList));
     }
     
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    public static Result postIndex(String std_uri, String oc_uri) {
-    	return index(std_uri, oc_uri);
+    public static Result postIndex(String filename, String da_uri, String std_uri, String oc_uri) {
+    	return index(filename, da_uri, std_uri, oc_uri);
     }
     
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    public static Result processForm(String std_uri, String oc_uri) {
+    public static Result processForm(String filename, String da_uri, String std_uri, String oc_uri) {
     	final SysUser sysUser = AuthApplication.getLocalUser(session());
 	
 	Study std = Study.find(std_uri);
@@ -158,11 +158,11 @@ public class NewObjectsFromScratch extends Controller {
 	    }
 	}
 	String message = "A total of " + quantity + " new object(s) have been Generated";
-	return ok(objectConfirm.render(message, std_uri, oc_uri, obj));
+	return ok(objectConfirm.render(message, filename, da_uri, std_uri, oc_uri, obj));
     }
     
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    public static Result processScopeForm(String std_uri, String oc_uri) {
+    public static Result processScopeForm(String filename, String da_uri, String std_uri, String oc_uri) {
     	final SysUser sysUser = AuthApplication.getLocalUser(session());
 	
 	Study std = Study.find(std_uri);
@@ -346,7 +346,7 @@ public class NewObjectsFromScratch extends Controller {
 	    
 	}
 	String message = "Total objects created: " + genObjs.size();
-	return ok(objectConfirm.render(message, std_uri, oc_uri, obj));
+	return ok(objectConfirm.render(message, filename, da_uri, std_uri, oc_uri, obj));
     }
     
     private static void cartesianProduct(StudyObject[][] arr, int level, StudyObject[] cp, List<String> gens, List<List<StudyObject>> genOS) {

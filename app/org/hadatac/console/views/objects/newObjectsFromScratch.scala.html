@@ -1,4 +1,6 @@
-@(study       : org.hadatac.entity.pojo.Study,
+@(filename    : String,
+  da_uri      : String,
+  study       : org.hadatac.entity.pojo.Study,
   oc          : org.hadatac.entity.pojo.ObjectCollection,
   objTypeList : List[org.hadatac.entity.pojo.StudyObjectType])
 
@@ -15,6 +17,9 @@
   <div class="container">
     <h4>New Objects for Object Collection @oc.getLabel()</h4>
 
+@if((oc.getHasScope() != null) ||
+   ((oc.getSpaceScopes() != null) && (oc.getSpaceScopes().size() > 0)) ||
+   ((oc.getTimeScopes() != null) && (oc.getTimeScopes().size() > 0))) {
    <script type="text/javascript">
      function checkform() {
         var cansubmit = true;
@@ -43,17 +48,37 @@
 	}
 
      }
+  </script>
+} else {
+   <script type="text/javascript">
+     function checkform() {
+        var cansubmit = true;
+	
+	if (!document.getElementById('newQuantity').value || 
+            document.getElementById('newQuantity').value.length === 0) {
+	   cansubmit = false;
+	}
 
+	if (cansubmit) {
+	  document.getElementById('submitTotal').disabled = false;
+	} else {
+	  document.getElementById('submitTotal').disabled = 'disabled';
+	}
+
+     }
+  </script>
+}
+
+   <script type="text/javascript">
      function replaceAll(str, find, replace) {
         while (str.indexOf(find) > -1) {
             str = str.replace(find, replace);
         }
         return str;
      }
-       
-   </script>
+  </script>
 
-    <form class="form-horizontal" name="newObjects" method="post" action="@org.hadatac.console.controllers.objects.routes.NewObjectsFromScratch.processForm(study.getUri(),oc.getUri())">
+    <form class="form-horizontal" name="newObjects" method="post" action="@org.hadatac.console.controllers.objects.routes.NewObjectsFromScratch.processForm(filename, da_uri, study.getUri(),oc.getUri())">
 	
 	<div class="form-group">
 		<label>Study:</label>
@@ -138,7 +163,7 @@
  		    <input type="text" class="form-control col-sm-6" name="newMultiplier" id="newMultiplier" onchange="checkform()" >
  		</div>
 
-		<input formaction="@org.hadatac.console.controllers.objects.routes.NewObjectsFromScratch.processScopeForm(URLEncoder.encode(study.getUri(),"UTF-8"),URLEncoder.encode(oc.getUri(),"UTF-8"))" 
+		<input formaction="@org.hadatac.console.controllers.objects.routes.NewObjectsFromScratch.processScopeForm(filename, da_uri, URLEncoder.encode(study.getUri(),"UTF-8"),URLEncoder.encode(oc.getUri(),"UTF-8"))" 
 		       class="btn btn-success btn-sm" role="button" type="submit" id="submitScope" value="Create Objects using Scopes" disabled />
 
              </div>
@@ -146,7 +171,7 @@
 	<br>
 	<div class="form-group">
 	    <br>
-	    <a href="@org.hadatac.console.controllers.objects.routes.ObjectManagement.indexNomsg(study.getUri(),oc.getUri())" 
+	    <a href="@org.hadatac.console.controllers.objects.routes.ObjectManagement.indexNomsg(filename, da_uri, study.getUri(),oc.getUri())" 
 	       class="btn btn-primary" role="button">Back to Object Management</a>
 	</div>
     </form>

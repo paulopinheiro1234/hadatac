@@ -6,9 +6,9 @@ public class OCNode {
     public static final int COLLECTION = 1;
     public static final int SPACECOLLECTION = 2;
     public static final int TIMECOLLECTION = 3;
-    public static final int OBJECT = 4;
-    public static final int TIMEOBJECT = 5;
-    public static final int SPACEOBJECT = 6;
+    public static final int OBJECT = 1;
+    public static final int SPACEOBJECT = 2;
+    public static final int TIMEOBJECT = 3;
     
     private String name;
     private String uri;

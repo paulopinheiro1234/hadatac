@@ -1,4 +1,6 @@
 @(documentMap : String,
+  filename    : String,
+  da_uri      : String,
   std_uri     : String)
 
 @import helper._
@@ -10,10 +12,10 @@
 
       <div class="row">
          <div class="navbar-collapse collapse navbar-secondary">
-	   <a href="@org.hadatac.console.controllers.objectcollections.routes.OCForceField.index("full",std_uri)" class="btn btn-primary" role="button">Full Graph</a>
-	   <a href="@org.hadatac.console.controllers.objectcollections.routes.OCForceField.index("collections",std_uri)" class="btn btn-primary" role="button">Object Collections</a>
-	   <a href="@org.hadatac.console.controllers.objectcollections.routes.OCForceField.index("space",std_uri)" class="btn btn-primary" role="button">Spatial Objectss</a>
-	   <a href="@org.hadatac.console.controllers.objectcollections.routes.OCForceField.index("time",std_uri)" class="btn btn-primary" role="button">Temporal Objects</a>
+	   <a href="@org.hadatac.console.controllers.objectcollections.routes.OCForceField.index("full", filename, da_uri, std_uri)" class="btn btn-primary" role="button">Full Graph</a>
+	   <a href="@org.hadatac.console.controllers.objectcollections.routes.OCForceField.index("collections", filename, da_uri,std_uri)" class="btn btn-primary" role="button">Object Collections</a>
+	   <a href="@org.hadatac.console.controllers.objectcollections.routes.OCForceField.index("space", filename, da_uri, std_uri)" class="btn btn-primary" role="button">Spatial Objectss</a>
+	   <a href="@org.hadatac.console.controllers.objectcollections.routes.OCForceField.index("time", filename, da_uri, std_uri)" class="btn btn-primary" role="button">Temporal Objects</a>
 	 </div>
       </div>
       

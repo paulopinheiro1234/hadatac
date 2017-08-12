@@ -1,4 +1,4 @@
-@( study : org.hadatac.entity.pojo.Study)
+@(study : org.hadatac.entity.pojo.Study)
 
 @import play.Play
 @import org.hadatac.console.controllers.metadata._
@@ -12,9 +12,14 @@
   <td>@if(study.getStartedAt() != null) { @study.getStartedAt() }</td>
   <td>@if(study.getEndedAt() != null) { @study.getEndedAt() }</td>
   <td>
-    <a href="@Play.application().configuration().getString("hadatac.console.host_deploy")/hadatac/metadataacquisitions/viewStudy?study_uri=@DynamicFunctions.replaceURLWithPrefix(study.getUri())" class="btn-xs btn-primary" role="button">View</a> 
-    <a href="@org.hadatac.console.controllers.studies.routes.EditStudy.index(URLEncoder.encode(study.getUri(),"UTF-8"))" class="btn-xs btn-primary" role="button">Edit</a>
-    <a href="@org.hadatac.console.controllers.objectcollections.routes.OCManagement.index(URLEncoder.encode(study.getUri(),"UTF-8"))" class="btn-xs btn-primary" role="button">Objects</a>
+    <a href="@Play.application().configuration().getString("hadatac.console.host_deploy")/hadatac/metadataacquisitions/viewStudy?study_uri=@DynamicFunctions.replaceURLWithPrefix(study.getUri())" 
+       class="btn-xs btn-primary" role="button">View</a> 
+    @defining("") { filename => @defining("") { da_uri => 
+         <a href="@org.hadatac.console.controllers.studies.routes.EditStudy.index(filename, da_uri, URLEncoder.encode(study.getUri(),"UTF-8"))"
+            class="btn-xs btn-primary" role="button">Edit</a>
+         <a href="@org.hadatac.console.controllers.objectcollections.routes.OCManagement.index(filename, da_uri, URLEncoder.encode(study.getUri(),"UTF-8"))" 
+            class="btn-xs btn-primary" role="button">Objects</a>
+    }}
     <a href="@org.hadatac.console.controllers.studies.routes.RefreshStudy.index(URLEncoder.encode(study.getUri(),"UTF-8"))" class="btn-xs btn-primary" role="button">Refresh</a>
     <a href="@org.hadatac.console.controllers.studies.routes.DeleteStudy.index(URLEncoder.encode(study.getUri(),"UTF-8"))" class="btn-xs btn-primary" role="button">Delete</a>
   </td>

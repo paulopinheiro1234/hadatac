@@ -19,18 +19,19 @@ import play.mvc.Controller;
 public class OCManagement extends Controller {
 
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    public static Result index(String std_uri) {
+    public static Result index(String filename, String da_uri, String std_uri) {
 
 	std_uri = URLDecoder.decode(std_uri);
     	Study std = Study.find(std_uri);
     	
 	List<ObjectCollection> ocList = ObjectCollection.findByStudy(std);
 
-        return ok(objectCollectionManagement.render(std, ocList));
+        return ok(objectCollectionManagement.render(filename, da_uri, std, ocList));
     }
 
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    public static Result postIndex(String std_uri) {
-        return index(std_uri);
+    public static Result postIndex(String filename, String da_uri, String std_uri) {
+        return index(filename, da_uri, std_uri);
     }
+
 }

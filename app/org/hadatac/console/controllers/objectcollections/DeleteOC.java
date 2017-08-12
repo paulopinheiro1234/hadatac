@@ -44,10 +44,10 @@ import org.hadatac.console.controllers.triplestore.UserManagement;
 public class DeleteOC extends Controller {
 	
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    public static Result index(String std_uri, String oc_uri) {
+    public static Result index(String filename, String da_uri, String std_uri, String oc_uri) {
     	if (session().get("LabKeyUserName") == null && session().get("LabKeyPassword") == null) {
     		return redirect(org.hadatac.console.controllers.triplestore.routes.LoadKB.logInLabkey(
-			        org.hadatac.console.controllers.objectcollections.routes.DeleteOC.index(std_uri, oc_uri).url()));
+				org.hadatac.console.controllers.objectcollections.routes.DeleteOC.index(filename, da_uri, std_uri, oc_uri).url()));
     	}
 
 	std_uri = URLDecoder.decode(std_uri);
@@ -57,24 +57,24 @@ public class DeleteOC extends Controller {
 
 	Study study = Study.find(std_uri);
 	if (study == null) {
-	    return badRequest(objectCollectionConfirm.render("Error deleting object collection: Study URI did not return valid URI", std_uri, null));
+	    return badRequest(objectCollectionConfirm.render("Error deleting object collection: Study URI did not return valid URI", filename, da_uri, std_uri, null));
 	} 
 
 	ObjectCollection oc = ObjectCollection.find(oc_uri);
 	if (oc == null) {
-	    return badRequest(objectCollectionConfirm.render("Error deleting object collection: ObjectCollection URI did not return valid object", std_uri, oc));
+	    return badRequest(objectCollectionConfirm.render("Error deleting object collection: ObjectCollection URI did not return valid object", filename, da_uri, std_uri, oc));
 	} 
 
-    	return ok(deleteObjectCollection.render(std_uri, oc));
+    	return ok(deleteObjectCollection.render(filename, da_uri, std_uri, oc));
     }
     
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-	public static Result postIndex(String std_uri, String oc_uri) {
-    	return index(std_uri, oc_uri);
+	public static Result postIndex(String filename, String da_uri, String std_uri, String oc_uri) {
+    	return index(filename, da_uri, std_uri, oc_uri);
     }
     
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-	public static Result processForm(String std_uri, String oc_uri) {
+	public static Result processForm(String filename, String da_uri, String std_uri, String oc_uri) {
     	final SysUser sysUser = AuthApplication.getLocalUser(session());
 	
 	Study std = Study.find(std_uri);
@@ -90,13 +90,13 @@ public class DeleteOC extends Controller {
 		    oc.delete();
 		} else {
 		    String message = "Number of deleted rows: " + deletedRows;
-		    return badRequest(objectCollectionConfirm.render("Error deleting object collection: zero deleted rows", std_uri, oc));
+		    return badRequest(objectCollectionConfirm.render("Error deleting object collection: zero deleted rows", filename, da_uri, std_uri, oc));
 		}
 	    } catch (CommandException e) {
-		return badRequest(objectCollectionConfirm.render("Error deleting object collection: LabKey", std_uri, oc));
+		return badRequest(objectCollectionConfirm.render("Error deleting object collection: LabKey", filename, da_uri, std_uri, oc));
 	    }
 	}
 	
-	return ok(objectCollectionConfirm.render("Object Collection has been Deleted",std_uri, oc));
+	return ok(objectCollectionConfirm.render("Object Collection has been Deleted", filename, da_uri, std_uri, oc));
     }
 }

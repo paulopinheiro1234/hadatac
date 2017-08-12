@@ -39,10 +39,10 @@ import be.objectify.deadbolt.java.actions.Restrict;
 public class DeleteObject extends Controller {
     
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-	public static Result index(String std_uri, String oc_uri, String obj_id) {
+	public static Result index(String filename, String da_uri, String std_uri, String oc_uri, String obj_id) {
     	if (session().get("LabKeyUserName") == null && session().get("LabKeyPassword") == null) {
 	    return redirect(org.hadatac.console.controllers.triplestore.routes.LoadKB.logInLabkey(
-			    org.hadatac.console.controllers.objects.routes.DeleteObject.index(std_uri, oc_uri, obj_id).url()));
+			    org.hadatac.console.controllers.objects.routes.DeleteObject.index(filename, da_uri, std_uri, oc_uri, obj_id).url()));
     	}
 	std_uri = URLDecoder.decode(std_uri);
 	oc_uri = URLDecoder.decode(oc_uri);
@@ -51,23 +51,23 @@ public class DeleteObject extends Controller {
 
 	Study study = Study.find(std_uri);
 	if (study == null) {
-	    return badRequest(objectConfirm.render("Error editing object: Study URI did not return valid URI", std_uri, oc_uri, null));
+	    return badRequest(objectConfirm.render("Error editing object: Study URI did not return valid URI", filename, da_uri, std_uri, oc_uri, null));
 	} 
 
 	ObjectCollection oc = ObjectCollection.find(oc_uri);
 	if (oc == null) {
-	    return badRequest(objectConfirm.render("Error editing object: ObjectCollection URI did not return valid object", std_uri, oc_uri, null));
+	    return badRequest(objectConfirm.render("Error editing object: ObjectCollection URI did not return valid object", filename, da_uri, std_uri, oc_uri, null));
 	} 
 
 	List<StudyObject> objects = StudyObject.findByCollection(oc);
 
     	//return ok(editObject.render(study, oc, objects));
-	return badRequest(objectConfirm.render("PLACEHOLDER", std_uri, oc_uri, null));
+	return badRequest(objectConfirm.render("PLACEHOLDER", filename, da_uri, std_uri, oc_uri, null));
     }
     
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-	public static Result postIndex(String std_uri, String oc_uri, String obj_id) {
-    	return index(std_uri, oc_uri, obj_id);
+	public static Result postIndex(String filename, String da_uri, String std_uri, String oc_uri, String obj_id) {
+    	return index(filename, da_uri, std_uri, oc_uri, obj_id);
     }
     
 }

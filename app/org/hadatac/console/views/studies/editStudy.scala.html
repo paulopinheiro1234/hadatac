@@ -1,4 +1,6 @@
-@(study         : org.hadatac.entity.pojo.Study,
+@(filename      : String,
+  da_uri        : String,
+  study         : org.hadatac.entity.pojo.Study,
   studyType     : org.hadatac.entity.pojo.StudyType,
   organizations : List[org.hadatac.entity.pojo.Agent],
   persons       : List[org.hadatac.entity.pojo.Agent]) 
@@ -142,7 +144,12 @@
 	<div class="form-group">
 	  <label>Updates</label> <br>
 	  <input class="btn btn-success btn-sm" role="button" type="submit" id="submit" value="Save Study" /><br>
-	  <a href="@org.hadatac.console.controllers.studies.routes.StudyManagement.index()" class="btn btn-primary" role="button">Back to Study Management</a>
+          @if(filename == null || filename.equals("") || da_uri == null || da_uri.equals("")) {
+	      <a href="@org.hadatac.console.controllers.studies.routes.StudyManagement.index()" class="btn btn-primary" role="button">Back to Study Management</a>
+          } else {
+    	    <a href="@org.hadatac.console.controllers.annotator.routes.PrepareIngestion.create(filename,da_uri)" 
+	       class="btn btn-primary" role="button">Back to Prepare Ingestion</a>
+          }
 	</div>
      
 	<script>
