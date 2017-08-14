@@ -24,7 +24,6 @@ public class Repository {
     	} else if (repository.equals(DATA)) {
 	    return ((DataContext.playTotalDataAcquisitions() != -1)&&
 		    (DataContext.playTotalMeasurements() != -1));
-	    
     	}
     	return false;
     }

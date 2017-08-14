@@ -480,18 +480,18 @@ public class DataAcquisition {
 		this.location = location;
 	}
 
-        public boolean hasScope() {
-	    if (globalScopeUri != null && !globalScopeUri.equals("")) {
-		return true;
-	    }
-	    if (localScopeUri != null && localScopeUri.size() > 0) {
-		for (String tmpUri : localScopeUri) {
-		    if (tmpUri != null && !tmpUri.equals("")) {
+	public boolean hasScope() {
+		if (globalScopeUri != null && !globalScopeUri.equals("")) {
 			return true;
-		    }
 		}
+		if (localScopeUri != null && localScopeUri.size() > 0) {
+			for (String tmpUri : localScopeUri) {
+				if (tmpUri != null && !tmpUri.equals("")) {
+					return true;
+				}
+			}
 	    }
-	    return false;
+	    	return false;
         }
 
 	public String getGlobalScopeUri() {
