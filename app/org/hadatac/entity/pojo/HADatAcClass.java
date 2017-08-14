@@ -91,6 +91,8 @@ public class HADatAcClass {
 	    ResultSet results = qexec.execSelect();
 	    ResultSetFormatter.outputAsJSON(outputStream, results);
 	    qexec.close();
+
+	    //System.out.println(outputStream.toString("UTF-8"));
 	    
 	    return outputStream.toString("UTF-8");
     	} catch (Exception e) {

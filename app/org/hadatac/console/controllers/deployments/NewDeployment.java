@@ -62,10 +62,10 @@ public class NewDeployment extends Controller {
 	}
 
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    public static Result index(String type) {
+	public static Result index(String type, String filename, String da_uri ) {
     	if (session().get("LabKeyUserName") == null && session().get("LabKeyPassword") == null) {
     		return redirect(org.hadatac.console.controllers.triplestore.routes.LoadKB.logInLabkey(
-    				routes.NewDeployment.index(type).url()));
+				routes.NewDeployment.index(type, filename, da_uri).url()));
     	}
     	
     	if (type.equalsIgnoreCase("regular")) {
@@ -73,26 +73,30 @@ public class NewDeployment extends Controller {
       			  Platform.find(),
       			  Instrument.findAvailable(),
       			  Detector.findAvailable(),
-      			  type));
+      			  type,
+                          filename, 
+                          da_uri));
     	}
     	else if (type.equalsIgnoreCase("legacy")) {
     		return ok(newDeployment.render(
       			  Platform.find(),
       			  Instrument.find(),
       			  Detector.find(),
-      			  type));
+      			  type,
+                          filename,
+                          da_uri));
     	}
     	
     	return badRequest("Invalid deployment type!");
     }
     
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    public static Result postIndex(String type) {
-    	return index(type);
+	public static Result postIndex(String type, String filename, String da_uri) {
+    	return index(type, filename, da_uri);
     }
     
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    public static Result processForm() {
+    public static Result processForm(String filename, String da_uri) {
     	final SysUser user = AuthApplication.getLocalUser(session());
         Form<DeploymentForm> form = Form.form(DeploymentForm.class).bindFromRequest();
         if (form.hasErrors()) {
@@ -149,6 +153,6 @@ public class NewDeployment extends Controller {
 			}
         }
         
-        return ok(deploymentConfirm.render("New Deployment", data));
+        return ok(deploymentConfirm.render("New Deployment", data, filename, da_uri));
     }
 }

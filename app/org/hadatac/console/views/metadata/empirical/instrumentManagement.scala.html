@@ -1,0 +1,44 @@
+@(instrumentList : List[org.hadatac.entity.pojo.Instrument])
+
+@import helper._
+@import org.hadatac.console.views.html._
+@import org.hadatac.utils._
+
+@main("Instrument Management") {
+
+    <h3>Instrument Management</h3>
+    
+    <h4>Management options</h4>
+
+    <div class="container-fluid">
+      <div class="row">
+         <div class="navbar-collapse collapse navbar-secondary">
+           <a href="" class="btn btn-primary disabled" role="button">Create Instrument</a>
+           <a href="@org.hadatac.console.controllers.metadata.empirical.routes.InstrumentTypeManagement.index()" class="btn btn-primary" role="button">Manage Instrument Types</a>
+         </div>
+      </div>
+   </div>
+
+   <hr>
+
+   <h4>Instruments</h4>
+   
+    <div class="container-fluid">
+        <table class="table">
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Type</th>
+                <th>Description</th>
+                <th>Operations</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for(instrument <- instrumentList){
+	         @ins_entry(instrument)
+              }
+            </tbody>
+        </table>
+    </div>
+
+}

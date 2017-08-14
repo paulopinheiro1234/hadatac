@@ -1,0 +1,20 @@
+@(platform : org.hadatac.entity.pojo.Platform)
+
+@import play.Play
+@import org.hadatac.console.controllers.metadata._
+@import java.net._
+@import org.hadatac.utils._
+
+<tr>
+  <td>@if(platform.getLabel() != null) { @platform.getLabel() }</td>
+  <td>@if(platform.getTypeUri() != null) { @platform.getTypeUri() }</td>
+  <td>@if(platform.getComment() != null) { @platform.getComment() }</td>
+  <td>
+    <a href=""
+       class="btn-xs btn-primary disabled" role="button">View</a> 
+    <a href=""
+       class="btn-xs btn-primary disabled" role="button">Edit</a>
+    <a href=""
+       class="btn-xs btn-primary disabled" role="button">Delete</a>
+  </td>
+</tr>

@@ -124,7 +124,7 @@ public class NewObjectsFromScratch extends Controller {
 	if (quantity > 0) {
 	    for (int i=0; i < quantity; i++) {
 		
-		ObjectCollectionType ocType = ObjectCollectionType.find(oc.getType());
+		ObjectCollectionType ocType = ObjectCollectionType.find(oc.getTypeUri());
 		newURI = oc.getUri().replace("OC-",ocType.getAcronym() + "-") + "-" + formattedCounter(nextId);
 		if (newLabelPrefix == null || newLabelPrefix.equals("")) {
 		    newLabel = Long.toString(nextId);
@@ -292,7 +292,7 @@ public class NewObjectsFromScratch extends Controller {
 	    System.out.println("GENERATED COMBINATIONS");
 	    for (List<StudyObject> soCol : genCombinationsOS) {
 		for (int i=0; i < multiplier; i++) {
-		    ObjectCollectionType ocType = ObjectCollectionType.find(oc.getType());
+		    ObjectCollectionType ocType = ObjectCollectionType.find(oc.getTypeUri());
 		    newURI = oc.getUri().replace("OC-",ocType.getAcronym() + "-") + "-" + formattedCounter(nextId);
 		    if (newLabelPrefix == null || newLabelPrefix.equals("")) {
 			newLabel = Long.toString(nextId);

@@ -1,0 +1,44 @@
+@(platformList : List[org.hadatac.entity.pojo.Platform])
+
+@import helper._
+@import org.hadatac.console.views.html._
+@import org.hadatac.utils._
+
+@main("Platform Management") {
+
+    <h3>Platform Management</h3>
+    
+    <h4>Management options</h4>
+
+    <div class="container-fluid">
+      <div class="row">
+         <div class="navbar-collapse collapse navbar-secondary">
+           <a href="" class="btn btn-primary disabled" role="button">Create Platform</a>
+           <a href="@org.hadatac.console.controllers.metadata.empirical.routes.PlatformTypeManagement.index()" class="btn btn-primary" role="button">Manage Platform Types</a>
+         </div>
+      </div>
+   </div>
+
+   <hr>
+
+   <h4>Platforms</h4>
+   
+    <div class="container-fluid">
+        <table class="table">
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Type</th>
+                <th>Description</th>
+                <th>Operations</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for(platform <- platformList){
+	         @plt_entry(platform)
+              }
+            </tbody>
+        </table>
+    </div>
+
+}
