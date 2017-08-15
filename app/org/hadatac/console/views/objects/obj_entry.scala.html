@@ -16,7 +16,7 @@
      </td>
      <td>
 	<input type="text" class="form-control" name="newType[]" id="newType@if(obj.getUri() != null) {-@obj.getUri() }" 
-	       value="@if(obj.getType() != null) { @obj.getStudyObjectType().getLabel() }" onchange="checkform()" readonly>
+	       value="@if(obj.getTypeUri() != null) { @obj.getStudyObjectType().getLabel() }" onchange="checkform()" readonly>
      </td>
      <td>
 	<input type="text" class="form-control" name="newOriginalId[]" id="newOrigonalId@if(obj.getUri() != null) {-@obj.getUri() }" 

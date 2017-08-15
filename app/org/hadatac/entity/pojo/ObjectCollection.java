@@ -60,7 +60,7 @@ public class ObjectCollection extends HADatAcThing {
 
     public ObjectCollection() {
 	this.uri = "";
-	this.type = "";
+	this.typeUri = "";
 	this.label = "";
 	this.comment = "";
 	this.studyUri = "";
@@ -71,7 +71,7 @@ public class ObjectCollection extends HADatAcThing {
     }
     
     public ObjectCollection(String uri,
-			    String type,
+			    String typeUri,
 			    String label,
 			    String comment,
 			    String studyUri,
@@ -79,7 +79,7 @@ public class ObjectCollection extends HADatAcThing {
 			    List<String> spaceScopeUris,
 			    List<String> timeScopeUris) {
 	this.setUri(uri);
-	this.setType(type);
+	this.setTypeUri(typeUri);
 	this.setLabel(label);
 	this.setComment(comment);
 	this.setStudyUri(studyUri);
@@ -90,10 +90,10 @@ public class ObjectCollection extends HADatAcThing {
     }
 
     public ObjectCollectionType getObjectCollectionType() {
-	if (type == null || type.equals("")) {
+	if (typeUri == null || typeUri.equals("")) {
 	    return null;
 	}
-	ObjectCollectionType ocType = ObjectCollectionType.find(type);
+	ObjectCollectionType ocType = ObjectCollectionType.find(typeUri);
 	return ocType;    
     }
 
@@ -109,24 +109,24 @@ public class ObjectCollection extends HADatAcThing {
     }
 
     public boolean isDomainCollection() {
-	if (type == null || type.equals("")) {
+	if (typeUri == null || typeUri.equals("")) {
 	    return false;
 	}
-	return (type.equals(this.SUBJECTCOLLECTION) || type.equals(this.SAMPLECOLLECTION));
+	return (typeUri.equals(this.SUBJECTCOLLECTION) || typeUri.equals(this.SAMPLECOLLECTION));
     }
 
     public boolean isLocationCollection() {
-	if (type == null || type.equals("")) {
+	if (typeUri == null || typeUri.equals("")) {
 	    return false;
 	}
-	return type.equals(this.LOCATIONCOLLECTION);
+	return typeUri.equals(this.LOCATIONCOLLECTION);
     }
 
     public boolean isTimeCollection() {
-	if (type == null || type.equals("")) {
+	if (typeUri == null || typeUri.equals("")) {
 	    return false;
 	}
-	return type.equals(this.TIMECOLLECTION);
+	return typeUri.equals(this.TIMECOLLECTION);
     }
 
     public void setStudyUri(String studyUri) {
@@ -538,7 +538,7 @@ public class ObjectCollection extends HADatAcThing {
 
 	insert += NameSpaces.getInstance().printSparqlNameSpaceList();
     	insert += INSERT_LINE1;
-    	insert += oc_uri + " a <" + type + "> . ";
+    	insert += oc_uri + " a <" + typeUri + "> . ";
     	insert += oc_uri + " rdfs:label  \"" + this.getLabel() + "\" . ";
 	if (this.getStudyUri().startsWith("http")) {
 	    insert += oc_uri + " hasco:isMemberOf  <" + this.getStudyUri() + "> . ";
@@ -590,7 +590,7 @@ public class ObjectCollection extends HADatAcThing {
     	List< Map<String, Object> > rows = new ArrayList< Map<String, Object> >();
     	Map<String, Object> row = new HashMap<String, Object>();
     	row.put("hasURI", ValueCellProcessing.replaceNameSpaceEx(getUri()));
-    	row.put("a", ValueCellProcessing.replaceNameSpaceEx(getType()));
+    	row.put("a", ValueCellProcessing.replaceNameSpaceEx(getTypeUri()));
     	row.put("rdfs:label", getLabel());
     	row.put("hasco:isMemberOf", getStudyUri());
     	rows.add(row);

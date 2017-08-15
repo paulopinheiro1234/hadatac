@@ -1,13 +1,27 @@
-@(indent: Boolean)
+@(indent   : Boolean,
+  filename : String,
+  da_uri   : String)
 
 @import org.hadatac.utils._
 
-@if(indent) {
-    <div class="row">
-        <div class="col-md-12 col-md-offset-1">
-            <a href="@org.hadatac.console.controllers.deployments.routes.DeploymentManagement.index(State.ACTIVE)" class="btn btn-primary" role="button">Back to Deployment Management</a>
+@if(filename == null || filename.equals("") || da_uri == null || da_uri.equals("")) {
+    @if(indent) {
+        <div class="row">
+            <div class="col-md-12 col-md-offset-1">
+               <a href="@org.hadatac.console.controllers.deployments.routes.DeploymentManagement.index(State.ACTIVE)" class="btn btn-primary" role="button">Back to Deployment Management</a>
+            </div>
         </div>
-    </div>
+    } else {
+        <a href="@org.hadatac.console.controllers.deployments.routes.DeploymentManagement.index(State.ACTIVE)" class="btn btn-primary" role="button">Back to Deployment Management</a>
+    }
 } else {
-    <a href="@org.hadatac.console.controllers.deployments.routes.DeploymentManagement.index(State.ACTIVE)" class="btn btn-primary" role="button">Back to Deployment Management</a>
+    @if(indent) {
+        <div class="row">
+            <div class="col-md-12 col-md-offset-1">
+               <a href="@org.hadatac.console.controllers.annotator.routes.PrepareIngestion.create(filename,da_uri)" class="btn btn-primary" role="button">Back to Prepare Ingestion</a>
+            </div>
+        </div>
+    } else {
+        <a href="@org.hadatac.console.controllers.annotator.routes.PrepareIngestion.create(filename,da_uri)" class="btn btn-primary" role="button">Back to Prepare Ingestion</a>
+    }
 }

@@ -131,7 +131,7 @@ public class EditOC extends Controller {
 	if (oldOc.getUri() != null && !oldOc.getUri().equals(newURI)) {
 	    changedInfos.add(newURI);
 	}
-	if (oldOc.getType() != null && !oldOc.getType().equals(newType)) {
+	if (oldOc.getTypeUri() != null && !oldOc.getTypeUri().equals(newType)) {
 	    changedInfos.add(newType);
 	}
 	if (oldOc.getLabel() != null && !oldOc.getLabel().equals(newLabel)) {

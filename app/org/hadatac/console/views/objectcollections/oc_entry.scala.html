@@ -11,7 +11,7 @@
 @import org.hadatac.utils._
 
 @if(oc != null) {
-  @if(mode.equals("subject") && oc.getType().equals("http://hadatac.org/ont/hasco/SubjectGroup")) {
+  @if(mode.equals("subject") && oc.getTypeUri().equals("http://hadatac.org/ont/hasco/SubjectGroup")) {
   <tr>
      <td>@if(oc.getLabel() != null) { @oc.getLabel() }</td>
      <td>@if(oc.getComment() != null) { @oc.getComment() }</td>
@@ -37,7 +37,7 @@
      </td>
  </tr>
  }
-  @if(mode.equals("sample") && oc.getType().equals("http://hadatac.org/ont/hasco/SampleCollection")) {
+  @if(mode.equals("sample") && oc.getTypeUri().equals("http://hadatac.org/ont/hasco/SampleCollection")) {
   <tr>
      <td>@if(oc.getLabel() != null) { @oc.getLabel() }</td>
      <td>@if(oc.getComment() != null) { @oc.getComment() }</td>
@@ -64,7 +64,7 @@
      </td>
  </tr>
  }
-  @if(mode.equals("location") && oc.getType().equals("http://hadatac.org/ont/hasco/LocationCollection")) {
+  @if(mode.equals("location") && oc.getTypeUri().equals("http://hadatac.org/ont/hasco/LocationCollection")) {
   <tr>
      <td>@if(oc.getLabel() != null) { @oc.getLabel() }</td>
      <td>@if(oc.getComment() != null) { @oc.getComment() }</td>
@@ -84,7 +84,7 @@
      </td>
  </tr>
  }
-  @if(mode.equals("time") && oc.getType().equals("http://hadatac.org/ont/hasco/TimeCollection")) {
+  @if(mode.equals("time") && oc.getTypeUri().equals("http://hadatac.org/ont/hasco/TimeCollection")) {
   <tr>
      <td>@if(oc.getLabel() != null) { @oc.getLabel() }</td>
      <td>@if(oc.getComment() != null) { @oc.getComment() }</td>

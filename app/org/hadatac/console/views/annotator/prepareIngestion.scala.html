@@ -131,14 +131,14 @@
 		 formaction="@org.hadatac.console.controllers.annotator.routes.PrepareIngestion.selectScope(filename, da.getUri(),da.getStudyUri())">
           </input>
 
-	  <b>OR</b>
+	  <b>AND</b>
 
 	  <input type="submit" class="btn btn-primary btn-sm disabled" role="button"  id="createScope"
 		 formaction="@org.hadatac.console.controllers.objectcollections.routes.OCManagement.index(filename, da.getUri(), da.getStudyUri())" 
 		 value="Create Study Objects From Scratch">
           </input>
 
-	  <b>OR</b>
+	  <b>AND</b>
 
 	  <input type="submit" class="btn btn-primary btn-sm disabled" role="button"  id="createScopeFromFile"
 		 formaction="@org.hadatac.console.controllers.schema.routes.NewDAS.index()" 
@@ -194,13 +194,17 @@
 	        <b>OR</b>
      
 	        <input type="submit" class="btn btn-primary btn-sm" role="button" id="createDPL" value="Create Deployment"
-		       formaction="@org.hadatac.console.controllers.deployments.routes.NewDeployment.index("legacy")">
+		       formaction="@org.hadatac.console.controllers.deployments.routes.NewDeployment.index("legacy", filename, da.getUri())">
                 </input>
 	    </center>
 
 	  } else {
       
-	       <center><b>Associated deployment : </b>@ValueCellProcessing.replaceNameSpaceEx(da.getDeploymentUri())
+	       @defining(da.getDeployment()) { dep => 
+	           <center><b>Associated deployment : </b> @ValueCellProcessing.replaceNameSpaceEx(dep.getUri()) <br> 
+                   Platform: @dep.getPlatform().getLabel()<br>
+                   Instrument: @dep.getInstrument().getLabel()<br>
+               }
 	       <input type="submit" class="btn btn-default btn-sm" role="button" id="viewDPL" value="View">
 	       <input type="submit" class="btn btn-default btn-sm" role="button" id="editDPL" value="Edit">
 	       <input type="submit" class="btn btn-default btn-sm" role="button" id="removeDPL" value="Remove Association"

@@ -20,10 +20,8 @@ import org.hadatac.utils.NameSpaces;
 
 import play.Play;
 
-public class Platform implements Comparable<Platform> {
-	private String uri;
-	private String localName;
-	private String label;
+public class Platform  extends HADatAcThing implements Comparable<Platform> {
+
 	private String location;
 	private String firstCoordinate;
 	private String secondCoordinate;
@@ -42,24 +40,6 @@ public class Platform implements Comparable<Platform> {
 	}
 	public void setElevation(String elevation) {
 		this.elevation = elevation;
-	}
-	public String getUri() {
-		return uri;
-	}
-	public void setUri(String uri) {
-		this.uri = uri;
-	}
-	public String getLocalName() {
-		return localName;
-	}
-	public void setLocalName(String localName) {
-		this.localName = localName;
-	}
-	public String getLabel() {
-		return label;
-	}
-	public void setLabel(String label) {
-		this.label = label;
 	}
 	public String getFirstCoordinate() {
 		return firstCoordinate;
@@ -112,6 +92,8 @@ public class Platform implements Comparable<Platform> {
 			object = statement.getObject();
 			if (statement.getPredicate().getURI().equals("http://www.w3.org/2000/01/rdf-schema#label")) {
 				platform.setLabel(object.asLiteral().getString());
+			} else if (statement.getPredicate().getURI().equals("http://www.w3.org/2000/01/rdf-schema#comments")) {
+				platform.setComment(object.asLiteral().getString());
 			} else if (statement.getPredicate().getURI().equals("http://hadatac.org/ont/vstoi#hasSerialNumber")) {
 				platform.setSerialNumber(object.asLiteral().getString());
 			} else if (statement.getPredicate().getURI().equals("http://hadatac.org/ont/hasco/hasFirstCoordinate")) {
@@ -131,10 +113,10 @@ public class Platform implements Comparable<Platform> {
 	public static List<Platform> find() {
 		List<Platform> platforms = new ArrayList<Platform>();
 		String queryString = NameSpaces.getInstance().printSparqlNameSpaceList() +
-			" SELECT ?uri WHERE { " +
-            " ?platModel rdfs:subClassOf+ vstoi:Platform . " + 
+		    " SELECT ?uri WHERE { " +
+		    " ?platModel rdfs:subClassOf+ vstoi:Platform . " + 
 		    " ?uri a ?platModel ." + 
-			"} ";
+		    "} ";
 		
 		Query query = QueryFactory.create(queryString);
 			
@@ -161,6 +143,7 @@ public class Platform implements Comparable<Platform> {
 				+ "SELECT ?platform ?label ?lat ?lon ?ele WHERE {\n"
 				+ "  <" + hadatac.getDeploymentUri() + "> vstoi:hasPlatform ?platform .\n"
 				+ "  OPTIONAL { ?platform rdfs:label ?label . }\n"
+				+ "  OPTIONAL { ?platform rdfs:comment ?comment . }\n"
 				+ "  OPTIONAL { ?platform <http://hadatac.org/ont/hasco/hasFirstCoordinate> ?lat . }\n"
 				+ "  OPTIONAL { ?platform <http://hadatac.org/ont/hasco/hasSecondCoordinate> ?lon . }\n"
 				+ "  OPTIONAL { ?platform <http://hadatac.org/ont/hasco/hasThirdCoordinate> ?ele . }\n"
@@ -175,13 +158,12 @@ public class Platform implements Comparable<Platform> {
 		if (resultsrw.size() >= 1) {
 			QuerySolution soln = resultsrw.next();
 			platform = new Platform();
-			platform.setLocalName(soln.getResource("platform").getLocalName());
 			platform.setUri(soln.getResource("platform").getURI());
 			if (soln.getLiteral("label") != null) {
 				platform.setLabel(soln.getLiteral("label").getString());
 			}
-			else {
-				platform.setLabel(soln.getResource("platform").getLocalName());
+			if(soln.getLiteral("comment") != null) {
+				platform.setComment(soln.getLiteral("comment").getString());
 			}
 			if(soln.getLiteral("lat") != null) {
 				platform.setFirstCoordinate(soln.getLiteral("lat").getString());

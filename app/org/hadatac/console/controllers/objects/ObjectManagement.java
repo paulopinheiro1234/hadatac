@@ -141,7 +141,7 @@ public class ObjectManagement extends Controller {
 
 		// update objects and add to new list
 		newObj = new StudyObject(oldObj.getUri(),
-					 oldObj.getType(),
+					 oldObj.getTypeUri(),
 					 newOriginalIds.get(i),
 					 newLabels.get(i),
 					 oldObj.getIsMemberOf(),
