@@ -318,6 +318,13 @@ POST	/hadatac/annotator/file/owner/form     	       org.hadatac.console.controll
 GET	/hadatac/annotator/file/acquisition	       org.hadatac.console.controllers.annotator.AutoAnnotator.assignDataAcquisition(dataAcquisitionUri: String, file: String)
 POST	/hadatac/annotator/file/acquisition            org.hadatac.console.controllers.annotator.AutoAnnotator.postAssignDataAcquisition(dataAcquisitionUri: String, file: String)
 POST	/hadatac/annotator/file/acquisition/form       org.hadatac.console.controllers.annotator.AutoAnnotator.processDataAcquisitionForm(dataAcquisitionUri: String, file : String)
+
+# file preview
+GET	/hadatac/annotator/csvpreview     	       org.hadatac.console.controllers.fileviewer.CSVPreview.getCSVPreview(ownerEmail:String, file_name:String, numRows:Int)
+POST	/hadatac/annotator/csvpreview     	       org.hadatac.console.controllers.fileviewer.CSVPreview.getCSVPreview(ownerEmail:String, file_name:String, numRows:Int)
+#GET	/hadatac/annotator/csvpreview/selectCol        org.hadatac.console.controllers.fileviewer.CSVPreview.selectColumn(ownerEmail:String, file_name:String, selectedCol:Int)
+#POST	/hadatac/annotator/csvpreview/selectCol        org.hadatac.console.controllers.fileviewer.CSVPreview.selectColumn(ownerEmail:String, file_name:String, selectedCol:Int)
+
 GET	/hadatac/annotator/schema                      org.hadatac.console.controllers.annotator.SchemaFromFile.create(filename : String)
 POST	/hadatac/annotator/schema                      org.hadatac.console.controllers.annotator.SchemaFromFile.create(filename : String)
 GET 	/hadatac/annotator/prepare/create              org.hadatac.console.controllers.annotator.PrepareIngestion.create(filename: String, da_uri: String)

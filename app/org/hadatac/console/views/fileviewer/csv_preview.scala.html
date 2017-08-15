@@ -1,0 +1,80 @@
+@(ownerEmail: String,
+  fileName: String,
+  headers: List[String],
+  preview: ArrayList[ArrayList[String]]
+)
+
+@import helper._
+@import org.hadatac.console.views.html._
+@import org.hadatac.console.views.html.annotator._
+@import org.hadatac.console.controllers.annotator._
+@import org.hadatac.metadata.loader._
+@import java.net._
+
+@main("CSV Preview"){
+		<style>
+			.col-selected {
+					background: #AED6F1;
+			}
+		</style>
+
+		<script>
+			var selectedColumn = -1;
+
+			function colSelect(obj){
+				var btn = document.getElementById("colSelector");
+				//unselect
+				if (obj.classList.contains('col-selected')) {
+					obj.classList.remove('col-selected');
+					//btn.classList.add('disabled');
+					//btn.setAttribute('href', '' );
+					selectedColumn = -1;
+				//select
+				} else {
+					var colNumber = obj.id.split('-')[1];
+					var allCols = document.getElementsByClassName('col-selectable');
+					for (i = 0; i < allCols.length; i++) {
+						  allCols[i].classList.remove('col-selected')
+					}
+					obj.classList.add('col-selected');
+					//btn.classList.remove('disabled');
+					selectedColumn = colNumber;
+					//link = 'org.hadatac.console.controllers.fileviewer.routes.CSVPreview.selectColumn(ownerEmail,fileName,' + selectedColumn + ')'
+					//btn.setAttribute('href', link);
+				}
+				console.log("Selected column #" + selectedColumn);
+			}
+
+		</script>
+
+		<div id="csv-preview"; style="height:250px; overflow:auto; padding-right: 50px; padding-left: 50px;">
+			@render_table(headers,preview)
+		</div>
+}
+
+@render_table(headers: List[String], preview: ArrayList[ArrayList[String]]) = {
+	@if(headers==null || preview==null || headers.size()<=0 || preview.size()<=0) {
+		<p>No preview to display</p>
+	} else {
+		<div>
+ 			<a id="colSelector" class="btn btn-primary disabled" role="button">Generate Subjects From Selected Column</a>
+		</div>
+		<div>
+			<table class="table">
+				<tr>
+				@for(index <- 0 until headers.size){
+					<th id="previewCol-@index" class="col-selectable" onclick="colSelect(this)">@headers(index)</th>
+				}
+				</tr>
+	
+				@for((prevRow) <- preview){
+				<tr>
+				@for((entry) <- prevRow){
+					<td>@entry</td>
+				}
+				</tr>
+				}    
+			</table>
+		</div>
+	}
+}
