@@ -585,6 +585,11 @@ public class Measurement {
 	}
 	
 	public static String calculateTimeGap(Instant min, Instant max) {
+
+	    if (min == null || max == null) {
+		return "+1MINUTE";
+	    }
+
 		Duration duration = Duration.between(min, max);
 		
 		long days = duration.toDays();
@@ -646,7 +651,9 @@ public class Measurement {
 		query.setFacet(true);
 		query.setFacetLimit(-1);
 		query.addFacetField("unit");
-		query.addDateRangeFacet("timestamp", Date.from(minTime), Date.from(maxTime), gap);
+		if (minTime != null && maxTime != null && gap == null) {
+		    query.addDateRangeFacet("timestamp", Date.from(minTime), Date.from(maxTime), gap); 
+		}
 		query.addFacetField("named_time");
 		query.addFacetPivotField("study_uri,acquisition_uri");
 		query.addFacetPivotField("entity,characteristic");

@@ -3,6 +3,10 @@ package org.hadatac.data.loader.ccsv;
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
+import java.time.format.DateTimeFormatter;
 import java.math.BigDecimal;
 import java.util.Date;
 import java.util.Iterator;
@@ -22,6 +26,7 @@ import org.hadatac.entity.pojo.DataAcquisitionSchemaAttribute;
 import org.hadatac.entity.pojo.DataAcquisitionSchemaObject;
 import org.hadatac.entity.pojo.DataAcquisitionSchemaEvent;
 import org.hadatac.entity.pojo.Dataset;
+import org.hadatac.entity.pojo.DataFile;
 import org.hadatac.entity.pojo.Deployment;
 import org.hadatac.entity.pojo.HADataC;
 import org.hadatac.entity.pojo.Measurement;
@@ -42,8 +47,9 @@ public class Parser2 {
 	schema = null;
     }
     
-    private ParsingResult indexMeasurements(FileFactory files, DataAcquisition da){
+    public ParsingResult indexMeasurements(FileFactory files, DataAcquisition da, DataFile dataFile){
 	System.out.println("indexMeasurements()...");
+	DataAcquisitionSchema schema = DataAcquisitionSchema.find(da.getSchemaUri());
 	String message = "";
 	
 	try {
@@ -60,7 +66,7 @@ public class Parser2 {
 	    e.printStackTrace();
 	    message += "[ERROR] Fail to parse header of the csv file\n";
 	    return new ParsingResult(1, message);
-		}
+	}
 	int total_count = 0;
 	int batch_size = 10000;
 	
@@ -74,6 +80,7 @@ public class Parser2 {
 	String analyte = "";
 	String unitOverride = "";
 	String unitLabelOverride = "";
+	System.out.println("indexMeasurements() HERE 3");
 	for (CSVRecord record : records) {
 	    // HACK FOR JUNE20
 	    isSample = false;
@@ -161,6 +168,45 @@ public class Parser2 {
 		  - Abstract times are encoded as DASA's events, and are supposed to be strings
 		*/
 		
+		measurement.setTimestamp(new Date(Long.MAX_VALUE).toInstant().toString());
+		measurement.setAbstractTime("");
+		
+		// contrete time(stamps)
+		if(dasa.getPositionInt() == schema.getTimestampColumn()) {
+		    String sTime = record.get(schema.getTimestampColumn() - 1);
+		    int timeStamp = new BigDecimal(sTime).intValue();
+		    measurement.setTimestamp(Instant.ofEpochSecond(timeStamp).toString());
+		} else if (schema.getTimeInstantColumn() != -1) {
+		    String timeValue = record.get(schema.getTimeInstantColumn() - 1);
+		    //System.out.println("Time Instant value: " + timeValue);
+		    if (timeValue != null) {
+			//DateTimeFormatter formatter = DateTimeFormatter.ofPattern("M/d/yy HH:mm");
+			//LocalDateTime datetime = LocalDateTime.parse(timeValue, formatter);
+			//measurement.setTimestamp(datetime.toInstant(ZoneOffset.UTC).toString());
+			try {
+			    measurement.setTimestamp(timeValue);
+			} catch (Exception e) {
+			    measurement.setTimestamp(new Date(Long.MAX_VALUE).toInstant().toString());
+			}
+		    }
+		}    
+		
+		// abstract times 
+		else if (dasa.getEventUri() != null && !dasa.getEventUri().equals("")) {
+		    String daseUri = dasa.getEventUri();
+		    DataAcquisitionSchemaEvent dase = schema.getEvent(daseUri); 
+		    if (dase != null) {
+			if (dase.getLabel() != null && !dase.getLabel().equals("")) {
+			    measurement.setAbstractTime("At " + dase.getLabel());
+			} else if (dase.getEntity() != null && !dase.getEntity().equals("")) {
+			    measurement.setAbstractTime("At " + dase.getEntity().substring(dase.getEntity().indexOf("#") + 1));
+			} else {
+			    measurement.setAbstractTime("At " + daseUri);
+			}
+		    } 
+		}
+		
+		/*		
 		// contrete time(stamps)
 		if(dasa.getPositionInt() == schema.getTimestampColumn()) {
 		    String sTime = record.get(schema.getTimestampColumn() - 1);
@@ -171,7 +217,11 @@ public class Parser2 {
 		    String timeValue = record.get(schema.getTimeInstantColumn() - 1);
 		    //System.out.println("Time Instant value: " + timeValue);
 		    if (timeValue != null) {
-			measurement.setTimestamp(timeValue);
+			try {
+			    measurement.setTimestamp(timeValue);
+			} catch (Exception e) {
+			    //measurement.setTimestamp("");
+			}
 		    }
 		}    
 		
@@ -194,6 +244,7 @@ public class Parser2 {
 		else {
 		    measurement.setTimestamp("");
 		}
+		*/
 		
 		/*============================*
 		 *                            *
@@ -328,8 +379,10 @@ public class Parser2 {
 		 *=================================*/
 		
 		//measurement.setDatasetUri(hadatacCcsv.getDatasetKbUri());
+		measurement.setDatasetUri(dataFile.getDatasetUri());
 		try {
 		    solr.addBean(measurement);
+		    System.out.println("indexMeasurements() ADDING VALUES");
 		} catch (IOException | SolrServerException e) {
 		    System.out.println("[ERROR] SolrClient.addBean - e.Message: " + e.getMessage());
 		}
@@ -352,6 +405,7 @@ public class Parser2 {
 		}
 	    }
 	}
+	System.out.println("indexMeasurements() HERE 7");
 	try {
 	    try {
 		System.out.println("solr.commit()...");

@@ -54,7 +54,7 @@ public class LoadCCSV extends Controller {
 	
 	File inputFile = new File(arguments.getInputPath());
 	files = new FileFactory(arguments);
-	files.setFile(inputFile, inputFile.getName());
+	files.setCCSVFile(inputFile, inputFile.getName());
 	
 	try {
 	    files.openFile("log", "w");

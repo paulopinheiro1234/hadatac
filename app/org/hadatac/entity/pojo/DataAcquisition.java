@@ -117,11 +117,7 @@ public class DataAcquisition {
         private List<String> localScopeUri;
 	@Field("localscope_name")
         private List<String> localScopeName;
-    
-	private boolean isComplete;
-	private String ccsvUri;
-	private String localName;
-        private Deployment deployment;
+	@Field("status")
 	private int status;
 	/*
 	 * 0 - DataAcquisition is a new one, its details on the preamble
@@ -132,10 +128,14 @@ public class DataAcquisition {
 	 * 2 - DataAcquisition already exists, the preamble states its termination with endedAtTime information
 	 * 		It should exist inside the KB as not finished yet
 	 *
-	 * 99 - Data Acquisition spec is complete (anything else diferent than 99 is considered incomplete
+	 * 9999 - Data Acquisition spec is complete (anything else diferent than 99 is considered incomplete
 	 *
 	 */
-	
+	    
+	private boolean isComplete;
+	private String ccsvUri;
+	private String localName;
+        private Deployment deployment;
 	public DataAcquisition() {
 		startedAt = null;
 		endedAt = null;
@@ -196,6 +196,10 @@ public class DataAcquisition {
 
 	public void setStatus(int status) {
 		this.status = status;
+	}
+
+	public boolean isComplete() {
+	    return status == 9999;
 	}
 
 	public String getUri() {
@@ -770,6 +774,9 @@ public class DataAcquisition {
 				while (i.hasNext()) {
 					dataAcquisition.addLocalScopeName(i.next().toString());
 				}
+			}
+			if (doc.getFieldValue("status") != null) {
+			    dataAcquisition.setStatus(Integer.parseInt(doc.getFieldValue("status").toString()));
 			}
 		} catch (Exception e) {
 			System.out.println("[ERROR] DataAcquisition.convertFromSolr(SolrDocument) - e.Message: " + e.getMessage());

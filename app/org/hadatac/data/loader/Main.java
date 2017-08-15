@@ -23,7 +23,7 @@ public class Main {
 		
 		inputFile = new File(arguments.getInputPath());
 		files = new FileFactory(arguments);
-		files.setFile(inputFile, inputFile.getName());
+		files.setCCSVFile(inputFile, inputFile.getName());
 		
 		files.openFile("log", "w");
 		files.writeln("log", "[START] " + arguments.getInputPath() + " generating measurements.");

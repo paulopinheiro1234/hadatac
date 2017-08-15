@@ -33,6 +33,16 @@
   <div class="container col-md-9">
     <h3>Prepare Data Ingestion</h3>
 
+ @if(da.isComplete()) {
+    <div id="rcorners" class="paddin0 margin0" style="background-color: #DCF7FE">
+      <center>
+	<b>Data Acquisition is Complete : </b>@ValueCellProcessing.replaceNameSpaceEx(da.getUri()) 
+      </center>
+    </div>
+
+ } else {
+
+
 
     @* 
      *
@@ -58,9 +68,19 @@
      *@
               <center>
 		  <b>Incomplete Data Acquisition to be completed : </b>@ValueCellProcessing.replaceNameSpaceEx(da.getUri()) 
-		  <input type="submit" class="btn btn-default btn-sm" role="button" id="viewDA" value="View"></input> 
-		  <input type="submit" class="btn btn-default btn-sm" role="button" id="editDA" value="Edit"></input> 
+		  <input type="submit" class="btn btn-default btn-sm" role="button" id="editDA" value="View/Edit" formmethod="post" 
+			 formaction="@org.hadatac.console.controllers.dataacquisitionmanagement.routes.EditDataAcquisition.index(filename,da.getUri(),false)">
+                  </input> 
+		  <input type="submit" class="btn btn-warning btn-sm" role="button" id="testIngestion" value="Test Ingestion"
+			 @if(da.getStudyUri() == null || da.getStudyUri().equals("") || 
+			    da.getDeploymentUri() == null || da.getDeploymentUri().equals("") ||
+			    !da.hasScope() ||
+			    da.getSchemaUri() == null || da.getSchemaUri().equals("")) {
+			    disabled
+                         }>
+                  </input>
 		  <input type="submit" class="btn btn-success btn-sm" role="button" id="completeDA" value="Confirm Complete" 
+			 formmethod="post" formaction="@org.hadatac.console.controllers.annotator.routes.PrepareIngestion.completeDataAcquisition(filename,da.getUri())" 
 			 @if(da.getStudyUri() == null || da.getStudyUri().equals("") || 
 			    da.getDeploymentUri() == null || da.getDeploymentUri().equals("") ||
 			    !da.hasScope() ||
@@ -96,9 +116,8 @@
 	       <center>
 	           <b>Associated study</b>: @da.getStudy().getLabel() [@ValueCellProcessing.replaceNameSpaceEx(da.getStudyUri())]
                    <br>
-	           <input type="submit" class="btn btn-default btn-sm" role="button" id="viewSTD" value="View">
 
-	           <input type="submit" class="btn btn-default btn-sm" role="button" id="editSTD" value="Edit"
+	           <input type="submit" class="btn btn-default btn-sm" role="button" id="editSTD" value="View/Edit"
 			  formaction="@org.hadatac.console.controllers.studies.routes.EditStudy.index(filename,da.getUri(),da.getStudyUri())">
 
 	           <input type="submit" class="btn btn-default btn-sm" role="button" id="removeSTD" value="Remove Association"
@@ -127,11 +146,13 @@
 	      <center>(options below are enabled after a study is selected)</center>
           }
 
-	  <input type="submit" class="btn btn-primary btn-sm disabled" role="button" id="selectScope" value="Select Study Object (or Object Collection) As Scope"
-		 formaction="@org.hadatac.console.controllers.annotator.routes.PrepareIngestion.selectScope(filename, da.getUri(),da.getStudyUri())">
-          </input>
+	  @if(da.getStudy() != null && da.getStudy().getObjectCollectionUris().size() > 0) {
+	       <input type="submit" class="btn btn-primary btn-sm disabled" role="button" id="selectScope" value="Select Study Object (or Object Collection) As Scope"
+		      formaction="@org.hadatac.console.controllers.annotator.routes.PrepareIngestion.selectScope(filename, da.getUri(),da.getStudyUri())">
+               </input>
 
-	  <b>AND</b>
+	       <b>AND</b>
+          }
 
 	  <input type="submit" class="btn btn-primary btn-sm disabled" role="button"  id="createScope"
 		 formaction="@org.hadatac.console.controllers.objectcollections.routes.OCManagement.index(filename, da.getUri(), da.getStudyUri())" 
@@ -253,7 +274,6 @@
 	       <input type="submit" class="btn btn-default btn-sm" role="button" id="editDAS" value="Edit">
 	       <input type="submit" class="btn btn-default btn-sm" role="button" id="removeDAS" value="Remove Association"
 		      formaction="@org.hadatac.console.controllers.annotator.routes.PrepareIngestion.removeAssociation(filename, da.getUri(), "Schema")">
-	       <input type="submit" class="btn btn-default btn-sm" role="button" id="testDAS" value="Test Schema"></input>
 
        }
       
@@ -269,6 +289,7 @@
 
     </div>
 
+  }  @*  END OF PREPARATION PART OF THIS FORM *@
 
     <br>
     <a href="@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.index()" class="btn btn-primary" role="button">Back to Manage CSV Annotation</a>

@@ -281,9 +281,9 @@ GET	/hadatac/dataacquisitions/delete	       org.hadatac.console.controllers.data
 POST	/hadatac/dataacquisitions/delete     	       org.hadatac.console.controllers.dataacquisitionmanagement.DeleteDataAcquisition.postIndex(oper : String, dc_uri : String)
 GET	/hadatac/dataacquisitions/deletedata	       org.hadatac.console.controllers.dataacquisitionmanagement.DeleteDataAcquisition.deleteDataPoints(dc_uri : String, oper : Int)
 POST	/hadatac/dataacquisitions/deletedata           org.hadatac.console.controllers.dataacquisitionmanagement.DeleteDataAcquisition.postDeleteDataPoints(dc_uri : String, oper : Int)
-GET	/hadatac/dataacquisitions/edit		       org.hadatac.console.controllers.dataacquisitionmanagement.EditDataAcquisition.index(uri : String, bChangeParam : Boolean)
-POST	/hadatac/dataacquisitions/edit     	       org.hadatac.console.controllers.dataacquisitionmanagement.EditDataAcquisition.postIndex(uri : String, bChangeParam : Boolean)
-POST	/hadatac/dataacquisitions/edit/form            org.hadatac.console.controllers.dataacquisitionmanagement.EditDataAcquisition.processForm(acquisitionUri : String, bChangeParam : Boolean)
+GET	/hadatac/dataacquisitions/edit		       org.hadatac.console.controllers.dataacquisitionmanagement.EditDataAcquisition.index(filename : String, uri : String, bChangeParam : Boolean)
+POST	/hadatac/dataacquisitions/edit     	       org.hadatac.console.controllers.dataacquisitionmanagement.EditDataAcquisition.postIndex(filename : String, uri : String, bChangeParam : Boolean)
+POST	/hadatac/dataacquisitions/edit/form            org.hadatac.console.controllers.dataacquisitionmanagement.EditDataAcquisition.processForm(filename : String, acquisitionUri : String, bChangeParam : Boolean)
 GET	/hadatac/dataacquisitions/search	       org.hadatac.console.controllers.dataacquisitionmanagement.SearchDataAcquisition.index(p: Int ?= 1, facets: String ?= "", facetAdd: String ?= "", facetDel: String ?= "")
 POST	/hadatac/dataacquisitions/search	       org.hadatac.console.controllers.dataacquisitionmanagement.SearchDataAcquisition.postIndex(p: Int ?= 1, facets: String ?= "", facetAdd: String ?= "", facetDel: String ?= "")
 
@@ -333,6 +333,7 @@ POST 	/hadatac/annotator/prepare/process/scope       org.hadatac.console.control
 POST 	/hadatac/annotator/prepare/process/deployment  org.hadatac.console.controllers.annotator.PrepareIngestion.processSelectDeployment(filename: String, da_uri: String)
 POST 	/hadatac/annotator/prepare/process/schema      org.hadatac.console.controllers.annotator.PrepareIngestion.processSelectSchema(filename: String, da_uri: String)
 POST 	/hadatac/annotator/prepare/remove              org.hadatac.console.controllers.annotator.PrepareIngestion.removeAssociation(filename: String, da_uri: String, daComponent : String)
+POST 	/hadatac/annotator/prepare/complete            org.hadatac.console.controllers.annotator.PrepareIngestion.completeDataAcquisition(filename: String, da_uri: String)
 
 # metadata store management URLs
 GET     /hadatac/ts/clean                              org.hadatac.console.controllers.triplestore.Clean.clean(oper: String)

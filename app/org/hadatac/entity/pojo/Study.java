@@ -100,7 +100,9 @@ public class Study {
 
     private DateTime endedAt;
 
-    private List<DataAcquisition> dataAcquisitions;
+    private List<String> dataAcquisitionUris;
+
+    private List<String> objectCollectionUris;
 
     private Agent agent;
 
@@ -130,7 +132,8 @@ public class Study {
 	this.agentUri = agentUri;
 	this.setStartedAt(startDateTime);
 	this.setEndedAt(endDateTime);
-	this.dataAcquisitions = new ArrayList<DataAcquisition>();
+	this.dataAcquisitionUris = new ArrayList<String>();
+	this.objectCollectionUris = new ArrayList<String>();
 	this.lastId= "0";
     }
     
@@ -145,7 +148,8 @@ public class Study {
 	this.agentUri = "";
 	this.setStartedAt("");
 	this.setEndedAt("");
-	this.dataAcquisitions = new ArrayList<DataAcquisition>();
+	this.dataAcquisitionUris = new ArrayList<String>();
+	this.objectCollectionUris = new ArrayList<String>();
 	this.lastId = "0";
     }
     
@@ -206,10 +210,6 @@ public class Study {
 	    return 0;
 	}
 	return Long.parseLong(this.lastId);
-    }
-    
-    public List<DataAcquisition> getDataAcquisitions() {
-	return dataAcquisitions;
     }
     
     // get Start Time Methods
@@ -326,12 +326,28 @@ public class Study {
 	this.endedAt = formatter.parseDateTime(endedAt);
     }
     
-    public void setDataAcquisitions(List<DataAcquisition> dataAcquisitions) {
-	this.dataAcquisitions = dataAcquisitions;
+    public void setDataAcquisitionUris(List<String> dataAcquisitionUris) {
+	this.dataAcquisitionUris = dataAcquisitionUris;
     }
     
-    public void addDataAcquisitions(DataAcquisition da) {
-	this.dataAcquisitions.add(da);
+    public List<String> getDataAcquisitionUris() {
+	return this.dataAcquisitionUris;
+    }
+    
+    public void addDataAcquisitionUri(String da_uri) {
+	this.dataAcquisitionUris.add(da_uri);
+    }
+    
+    public void setObjectCollectionUris(List<String> objectCollectionUris) {
+	this.objectCollectionUris = objectCollectionUris;
+    }
+    
+    public List<String>  getObjectCollectionUris() {
+	return this.objectCollectionUris;
+    }
+    
+    public void addObjectCollectionUri(String oc_uri) {
+	this.objectCollectionUris.add(oc_uri);
     }
     
     public static Study convertFromSolr(SolrDocument doc) {
@@ -443,6 +459,55 @@ public class Study {
 	return result;
     }
     
+    private static List<String> findObjectCollectionUris(String study_uri) {
+	List<String> ocList = new ArrayList<String>();
+	String queryString = NameSpaces.getInstance().printSparqlNameSpaceList() +
+	    "SELECT ?oc_uri  WHERE {  " + 
+	    "      ?oc_uri hasco:isMemberOf " + study_uri + " . " + 
+	    " } ";
+	try {
+	    Query query = QueryFactory.create(queryString);
+	    QueryExecution qexec = QueryExecutionFactory.sparqlService(Collections.getCollectionsName(Collections.METADATA_SPARQL), query);
+	    ResultSet results = qexec.execSelect();
+	    ResultSetRewindable resultsrw = ResultSetFactory.copyResults(results);
+	    qexec.close();
+	    while (resultsrw.hasNext()) {
+		QuerySolution soln = resultsrw.next();
+		if (soln.contains("oc_uri")) {
+		    ocList.add(soln.get("oc_uri").toString());
+		    System.out.println("STUDY: [" + study_uri + "]   OC: [" + soln.get("oc_uri").toString() + "]");
+		}
+	    }
+	} catch (QueryExceptionHTTP e) {
+	    e.printStackTrace();
+	}
+	return ocList;
+    }
+    
+    private static List<String> findDataAcquisitionUris(String study_uri) {
+	List<String> daList = new ArrayList<String>();
+	String queryString = NameSpaces.getInstance().printSparqlNameSpaceList() +
+	    "SELECT ?da_uri  WHERE {  " + 
+	    "      ?da_uri hasco:isDataAcquisitionOf " + study_uri + " . " + 
+	    " } ";
+	try {
+	    Query query = QueryFactory.create(queryString);
+	    QueryExecution qexec = QueryExecutionFactory.sparqlService(Collections.getCollectionsName(Collections.METADATA_SPARQL), query);
+	    ResultSet results = qexec.execSelect();
+	    ResultSetRewindable resultsrw = ResultSetFactory.copyResults(results);
+	    qexec.close();
+	    while (resultsrw.hasNext()) {
+		QuerySolution soln = resultsrw.next();
+		if (soln.contains("da_uri")) {
+		    daList.add(soln.get("da_uri").toString());
+		}
+	    }
+	} catch (QueryExceptionHTTP e) {
+	    e.printStackTrace();
+	}
+	return daList;
+    }
+    
     public static Study find(String study_uri) {
 	if (study_uri == null || study_uri.equals("")) {
 	    System.out.println("[ERROR] No valid STUDY_URI provided to retrieve Study object: " + study_uri);
@@ -504,6 +569,8 @@ public class Study {
 		    returnStudy.setLastId(soln.get("lastId").toString());
 		}
 	    }
+	    returnStudy.setDataAcquisitionUris(Study.findDataAcquisitionUris(adjustedUri));
+	    returnStudy.setObjectCollectionUris(Study.findObjectCollectionUris(adjustedUri));
 	} catch (QueryExceptionHTTP e) {
 	    e.printStackTrace();
 	}

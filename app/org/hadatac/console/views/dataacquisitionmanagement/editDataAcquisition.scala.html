@@ -1,8 +1,9 @@
-@(da : org.hadatac.entity.pojo.DataAcquisition, 
-  permissions : Map[String, String],
+@(filename     : String,
+  da           : org.hadatac.entity.pojo.DataAcquisition, 
+  permissions  : Map[String, String],
   ownerOptions : List[String],
-  schemas : Map[String, String],
-  bAdmin : Boolean,
+  schemas      : Map[String, String],
+  bAdmin       : Boolean,
   bChangeParam : Boolean)
 
 @import helper._
@@ -69,7 +70,8 @@
        }
        <li><b>Current Permission:</b> @da.getPermissionUri()</li>
 
-       <form class="form-horizontal" name="editForm" method="post" action="@org.hadatac.console.controllers.dataacquisitionmanagement.routes.EditDataAcquisition.processForm(da.getUri(), bChangeParam)">
+       <form class="form-horizontal" name="editForm" method="post" 
+	     action="@org.hadatac.console.controllers.dataacquisitionmanagement.routes.EditDataAcquisition.processForm(filename, da.getUri(), bChangeParam)">
        
        @if(!bChangeParam) {
        	 @if(bAdmin) {
@@ -108,13 +110,15 @@
               <label>Set Schema</label>
               <select class="form-control col-sm-6" id="newSchema" name="newSchema" >
               	<option value=""></option>
-                @for((schemaUri, abbrvUri) <- schemas){
-                    @if(da.getSchemaUri().equals(schemaUri)) {
-                    	<option selected value="@schemaUri">@abbrvUri</option>
+		@if(schemas != null && schemas.size() > 0) {
+                    @for((schemaUri, abbrvUri) <- schemas){
+                        @if(da.getSchemaUri() != null && da.getSchemaUri().equals(schemaUri)) {
+                    	   <option selected value="@schemaUri">@abbrvUri</option>
               	 	} else {
               	 		<option value="@schemaUri">@abbrvUri</option>
               	 	}
-                 }
+                    }
+                }
               </select>
            </div>
 		} else {
@@ -163,8 +167,13 @@
        </form>
 
        <br>
-       <a href="@org.hadatac.console.controllers.dataacquisitionmanagement.routes.DataAcquisitionManagement.index(State.ACTIVE)" class="btn btn-primary" role="button">Back to Data Acquisition Management</a>
-
+       @if(filename != null && !filename.equals("")) {
+            <a href="@org.hadatac.console.controllers.annotator.routes.PrepareIngestion.create(filename,da.getUri())" 
+	       class="btn btn-primary" role="button">Back to Prepare Ingestion</a>
+       } else {
+            <a href="@org.hadatac.console.controllers.dataacquisitionmanagement.routes.DataAcquisitionManagement.index(State.ACTIVE)" 
+	       class="btn btn-primary" role="button">Back to Data Acquisition Management</a>
+       }
     </div>
     </ul>
 }

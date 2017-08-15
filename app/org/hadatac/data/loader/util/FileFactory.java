@@ -40,8 +40,12 @@ public class FileFactory {
 		this.arguments = arguments;
 	}
 	
-	public void setFile(File file, String name) {
+	public void setCCSVFile(File file, String name) {
 		ccsvFile = file;
+		fileName = name;
+	}
+	public void setCSVFile(File file, String name) {
+		csvFile = file;
 		fileName = name;
 	}
 	
@@ -50,7 +54,7 @@ public class FileFactory {
 			ccsvFileReader = new FileReader(ccsvFile);
 			ccsvBufferedReader = new BufferedReader(ccsvFileReader);
 		} else if (type.equals("csv")) {
-			csvFile = new File(arguments.getTempPath() + fileName + ".temp.csv");
+		        //csvFile = new File(arguments.getTempPath() + fileName + ".temp.csv");
 			if (mode.equals("w")) {
 				csvFileWriter = new FileWriter(csvFile);
 				csvBufferedWriter = new BufferedWriter(csvFileWriter);
