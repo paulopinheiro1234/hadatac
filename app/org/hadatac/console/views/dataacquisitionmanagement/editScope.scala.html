@@ -1,0 +1,228 @@
+@(file_name      : String,
+  da_uri         : String,
+  ocList         : List[org.hadatac.entity.pojo.ObjectCollection],
+  labels         : List[String],
+  globalScope    : String,
+  globalScopeUri : String,
+  localScope     : List[String],
+  localScopeUri  : List[String])
+
+@import helper._
+@import java.net.URLDecoder
+@import org.hadatac.utils._
+@import org.hadatac.console.views.html._
+@import org.hadatac.console.views.html.triplestore._
+@import org.hadatac.console.controllers.triplestore._
+@import org.hadatac.console.controllers._
+@import org.hadatac.metadata.loader.ValueCellProcessing;
+
+@main("Select Scope for " + da_uri) {
+
+<script type="text/javascript">
+      function checkform() {
+          var canCopyGlobalCollection = true;
+          var canCopyGlobalObject = true;
+          var canCopyLocalObject = true;
+
+          if (document.getElementById('collectionoption').value.length == 0) {
+              canCopyGlobalCollection = false;
+          }
+         
+          if (document.getElementById('objectoption').value.length == 0) {
+              canCopyGlobalObject = false;
+          }
+         
+          if ((document.getElementById('objectoption').value.length == 0) ||
+              (document.getElementById('localoption').value.length == 0)) {
+              canCopyLocalObject = false;
+          }
+         
+          if (canCopyGlobalCollection) {
+              document.getElementById('submitcollection').disabled = false;
+          } else {
+              document.getElementById('submitcollection').disabled = 'disabled';
+          }
+
+          if (canCopyGlobalObject) {
+              document.getElementById('submitobject').disabled = false;
+          } else {
+              document.getElementById('submitobject').disabled = 'disabled';
+          }
+
+          if (canCopyLocalObject) {
+              document.getElementById('submitlocal').disabled = false;
+          } else {
+              document.getElementById('submitlocal').disabled = 'disabled';
+          }
+      }
+
+      var options = "";
+      options = {  //1
+               "oc" : [  //2
+               @for(oc <- ocList) {
+                   {  //3
+                      "ocUri" : "@oc.getUri()",
+                      "obj" : [  //4
+                          @for(obj <- oc.getObjects()) {
+                              { "objUri" : "@obj.getUri()", "label" : "@obj.getLabel()"}, 
+                          }
+                      ] //4
+                   }, //3
+               }       
+               ]  //2
+           }; //1
+
+      function changecollection() {
+           var i, j, x = "";
+           var e = document.getElementById("collectionoption");
+           var field = e.options[e.selectedIndex].value;
+           //alert(field);
+           for (i in options.oc) {
+               if (options.oc[i].ocUri == field) {
+                   for (j in options.oc[i].obj) {
+                      x += "<option value=\"" + options.oc[i].obj[j].objUri + "\">" + options.oc[i].obj[j].label + "</option>";
+                   }
+               }
+           }
+           var select = $('#objectoption');
+           select.empty().append(x);
+           //alert(x);
+           checkform();
+      }   
+
+</script>
+
+  <div class="container-fluid">
+    <div class="row">
+    <div class="col-md-1 col-xs-0"></div>
+    <div class="col-md-10 col-xs-8">
+    <h2>Select Data Acquisition's Scope</h2> 
+
+    The scope of a deta acquisiton can be an <i>object
+    collection</i>, like a group of subjects or a collection of
+    samples. Data acquisitions that are related to object collections
+    often include some identifier used to assign values from the files
+    to specific objects in the object collection.
+
+    The scope of a data acquisition can alse be a single <i>object</i>
+    meaning that the entire content value of the data acquisition is
+    about attributes form the scope object. An example of such king of
+    data acquisition is a complete boold count where all the values of
+    the data acquisition are related to a single subject.
+    
+    <h3>Selected Data Acquisition</h3> 
+       <ul>
+           <li>@ValueCellProcessing.replaceNameSpaceEx(da_uri)</li>
+       </ul>
+    
+    <form class="form-horizontal" name="assignOption" method="post" action="@org.hadatac.console.controllers.annotator.routes.PrepareIngestion.processSelectScope(file_name, da_uri)">
+
+    <div class="form-group">
+      <label>New Scope</label> <br>
+      <div class="row">
+          <div class="col-md-8 col-xs-3">
+	      <label>Global Scope:</label>
+	      <input type="text" class="form-control col-sm-8" name="newGlobalScope" id="newGlobalScope" 
+		     value="" onchange="checkform()" readonly ><br>
+	      <input type="hidden" name="newGlobalScopeUri" id="newGlobalScopeUri" value="">
+	      <input type="hidden" name="newLocalScopeUri" id="newLocalScopeUri" value="">
+	      Select either an object collection or object to assign the global scope:<br>
+	      <input class="btn btn-primary" role="button" id="submitcollection" value="Select Object Collection as Global Scope" disabled="disabled" />
+	      <input class="btn btn-primary" role="button" id="submitobject" value="Select Object as Global Scope" disabled="disabled" /> <br><br>
+          </div>
+      </div> 
+      <div class="row">
+          <div class="col-md-3 col-xs-1">
+	     <label>Local Scope</label> 
+	     <select class="form-control col-sm-3" id="mappings" size="20" name="mappings" readonly>
+	       @for(str <- localScope) {
+                  <option>@str</option>
+	       }
+             </select>	     
+	     <select type="hidden" id="mappingsUri" name="mappingsUri">
+	       @for(str <- localScopeUri) {
+                  <option>@str</option>
+	       }
+             </select>	     
+          </div>
+          <div class="col-md-2 col-xs-1">
+	     <label>Label (Position)</label> 
+	     <select class="form-control col-sm-2" id="localoption" size="20" name="localoption" onclick="changecollection()">
+	       @for(str <- labels) {
+                  <option>@str</option>
+	       }
+             </select>
+          </div>
+          <div class="col-md-2 col-xs-1">
+	     <label>Object Collections</label> 
+	     <select class="form-control col-sm-2" id="collectionoption" size="20" name="collectionoption" onclick="changecollection()" >
+                @for(oc <- ocList) {
+                   <option value="@oc.getUri()">@oc.getLabel()</option>
+                }
+             </select>
+          </div>
+          <div  class="col-sm-4 col-xs-3">
+             <label>Objects</label> 
+             <select class="form-control col-sm-4" id="objectoption" size="20" name="objectoption" onchange="checkform()" >
+             </select>
+          </div>
+      </div>
+    </div>
+    
+    <div class="form-group" class="col-sm-6 col-offset-3">
+      Select an object and a lable(position) to assing a local scope at the selected label<br>
+      <input class="btn btn-primary" role="button" id="submitlocal" value="Select Local Scope" disabled="disabled" />	          
+    </div>
+    
+    <div class="form-group" class="col-sm-6 col-offset-3">
+      <input class="btn btn-success" role="button" id="submitbutton" type="submit" value="Save Selection" disabled="disabled" />
+      <input class="btn btn-primary" role="button" id="resetbutton" type="submit" value="Reset" />
+    </div>
+    
+    <script type="text/javascript">
+      document.getElementById("submitcollection").onclick = function() {
+           var opt = document.getElementById("collectionoption");
+           if (opt.selectedIndex > -1) {
+              $('#newGlobalScope').val(opt.options[opt.selectedIndex].text);
+              $('#newGlobalScopeUri').val(opt.options[opt.selectedIndex].value);
+	      document.getElementById('submitbutton').disabled = false;
+           }
+      }
+      document.getElementById("submitobject").onclick = function() {
+           var opt = document.getElementById("objectoption");
+           if (opt.selectedIndex > -1) {
+              $('#newGlobalScope').val(opt.options[opt.selectedIndex].text);
+              $('#newGlobalScopeUri').val(opt.options[opt.selectedIndex].value);
+	      document.getElementById('submitbutton').disabled = false;
+           }
+      }
+      document.getElementById("submitlocal").onclick = function() {
+           var opt = document.getElementById("objectoption");
+           var pos = document.getElementById("localoption");
+           var lscope = document.getElementById("mappings");
+           var lscopeUri = document.getElementById("mappingsUri");
+           if (opt.selectedIndex > -1 && pos.selectedIndex > -1) {
+              lscope.options[pos.selectedIndex].text = opt.options[opt.selectedIndex].text;
+              lscopeUri.options[pos.selectedIndex].text = opt.options[opt.selectedIndex].value;
+	      document.getElementById('submitbutton').disabled = false;
+           }
+           var localStr = "";
+           //alert(lscope.options.length);           
+	   var i = 0;
+           for (i = 0; i < lscope.options.length; i++) {
+               localStr += lscopeUri.options[i].text + " , ";
+           }
+           var localScopeObj = $('#newLocalScopeUri');
+           localScopeObj.val(localStr);
+      }
+                    
+    </script>
+    
+    </form>        
+    
+    </div>
+    </div>
+  </div>
+  
+}
+  

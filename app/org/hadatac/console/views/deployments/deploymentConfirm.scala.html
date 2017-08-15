@@ -1,4 +1,7 @@
-@(message: String, data : org.hadatac.console.models.DeploymentForm)
+@(message  : String, 
+  data     : org.hadatac.console.models.DeploymentForm,
+  filename : String,
+  da_uri   : String)
 
 @import org.hadatac.console.views.html._
 @import org.hadatac.utils._
@@ -15,5 +18,5 @@
 		<li><b>End Date/Time</b>: @data.getEndDateTime()</li>
 	</ul>
 
-   @deploymentButton(false)
+   @deploymentButton(false, filename, da_uri)
 }

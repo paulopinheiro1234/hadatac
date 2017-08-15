@@ -1,7 +1,9 @@
 @(thePlatforms   : List[org.hadatac.entity.pojo.Platform],
   theInstruments : List[org.hadatac.entity.pojo.Instrument],
   theDetectors   : List[org.hadatac.entity.pojo.Detector],
-  deploymentType : String)
+  deploymentType : String,
+  filename       : String,
+  da_uri         : String)
 
 @import helper._
 @import org.hadatac.utils._
@@ -9,6 +11,7 @@
 @import org.hadatac.console.views.html.deployments._
 @import org.hadatac.console.controllers.deployments._
 @import org.hadatac.console.controllers._
+@import org.hadatac.metadata.loader.ValueCellProcessing;
 
 @main("New Deployment") {
 
@@ -55,9 +58,25 @@
 	</script>
 
   <div class="container">
-    <h2>New @deploymentType.substring(0, 1).toUpperCase().concat(deploymentType.substring(1).toLowerCase()) Deployment</h2>
+ 
+    <div class="row">
+      <div class="navbar-collapse collapse navbar-secondary">
+        <a href="@org.hadatac.console.controllers.metadata.empirical.routes.PlatformManagement.index()" class="btn btn-primary disabled" role="button">Manage Platforms</a>
+        <a href="@org.hadatac.console.controllers.metadata.empirical.routes.InstrumentManagement.index()" class="btn btn-primary disabled" role="button">Manage Instruments</a>
+      </div>
+    </div>
+ 
+    <h3>
+    @if(da_uri != null && !da_uri.equals("")) {
+         New Deployment for Data Acquisition @ValueCellProcessing.replaceNameSpaceEx(da_uri)
+    } else {
+         New @deploymentType.substring(0, 1).toUpperCase().concat(deploymentType.substring(1).toLowerCase()) Deployment
+    }
+    </h3>
 
-    <form class="form-horizontal" name="newDeployment" method="post" action="@org.hadatac.console.controllers.deployments.routes.NewDeployment.processForm">
+   <hr>
+
+    <form class="form-horizontal" name="newDeployment" method="post" action="@org.hadatac.console.controllers.deployments.routes.NewDeployment.processForm(filename, da_uri)">
 	
 	<div class="form-group">
 		<label>URI:</label>
@@ -65,7 +84,13 @@
  	</div>
  	<div class="form-group">
 		<label>Data Acquisition URI:</label>
- 		<input type="text" class="form-control col-sm-6" name="acquisition_uri" id="acquisition_uri" onchange="checkform()" >
+ 		<input type="text" name="acquisition_uri" id="acquisition_uri" 
+		       @if(da_uri != null && !da_uri.equals("")) {
+		          class="form-control col-sm-6 disabled"  value="@ValueCellProcessing.replaceNameSpaceEx(da_uri)" readonly
+		       } else {
+		          class="form-control col-sm-6" 
+		       }
+		       onchange="checkform()" >
  	</div>
  	<div class="form-group">
 		<label>Initial Parameters: (optional)</label>
@@ -132,7 +157,7 @@
       </div>
       
       <div class="form-group" class="col-sm-6 col-offset-3">
-           @deploymentButton(false) 
+           @deploymentButton(false, filename, da_uri) 
       </div>
 
    </form>

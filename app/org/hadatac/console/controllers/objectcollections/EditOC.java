@@ -39,10 +39,10 @@ import be.objectify.deadbolt.java.actions.Restrict;
 public class EditOC extends Controller {
     
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-	public static Result index(String std_uri, String oc_uri) {
+	public static Result index(String filename, String da_uri, String std_uri, String oc_uri) {
     	if (session().get("LabKeyUserName") == null && session().get("LabKeyPassword") == null) {
 	    return redirect(org.hadatac.console.controllers.triplestore.routes.LoadKB.logInLabkey(
-			    org.hadatac.console.controllers.objectcollections.routes.EditOC.index(std_uri, oc_uri).url()));
+			    org.hadatac.console.controllers.objectcollections.routes.EditOC.index(filename, da_uri, std_uri, oc_uri).url()));
     	}
 	std_uri = URLDecoder.decode(std_uri);
 	oc_uri = URLDecoder.decode(oc_uri);
@@ -51,12 +51,12 @@ public class EditOC extends Controller {
 
 	Study study = Study.find(std_uri);
 	if (study == null) {
-	    return badRequest(objectCollectionConfirm.render("Error deleting object collection: Study URI did not return valid URI", std_uri, null));
+	    return badRequest(objectCollectionConfirm.render("Error deleting object collection: Study URI did not return valid URI", filename, da_uri, std_uri, null));
 	} 
 
 	ObjectCollection oc = ObjectCollection.find(oc_uri);
 	if (oc == null) {
-	    return badRequest(objectCollectionConfirm.render("Error deleting object collection: ObjectCollection URI did not return valid object", std_uri, oc));
+	    return badRequest(objectCollectionConfirm.render("Error deleting object collection: ObjectCollection URI did not return valid object", filename, da_uri, std_uri, oc));
 	} 
 
 	List<ObjectCollectionType> typeList = ObjectCollectionType.find();
@@ -75,16 +75,16 @@ public class EditOC extends Controller {
 	    }
 	}
 
-    	return ok(editObjectCollection.render(study, oc, domainList, locationList, timeList, typeList));
+    	return ok(editObjectCollection.render(filename, da_uri, study, oc, domainList, locationList, timeList, typeList));
     }
     
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    public static Result postIndex(String std_uri, String oc_uri) {
-    	return index(std_uri, oc_uri);
+    public static Result postIndex(String filename, String da_uri, String std_uri, String oc_uri) {
+    	return index(filename, da_uri, std_uri, oc_uri);
     }
     
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    public static Result processForm(String std_uri, String oc_uri) {
+	public static Result processForm(String filename, String da_uri, String std_uri, String oc_uri) {
     	final SysUser sysUser = AuthApplication.getLocalUser(session());
         List<String> changedInfos = new ArrayList<String>();
 
@@ -131,7 +131,7 @@ public class EditOC extends Controller {
 	if (oldOc.getUri() != null && !oldOc.getUri().equals(newURI)) {
 	    changedInfos.add(newURI);
 	}
-	if (oldOc.getType() != null && !oldOc.getType().equals(newType)) {
+	if (oldOc.getTypeUri() != null && !oldOc.getTypeUri().equals(newType)) {
 	    changedInfos.add(newType);
 	}
 	if (oldOc.getLabel() != null && !oldOc.getLabel().equals(newLabel)) {
@@ -173,7 +173,7 @@ public class EditOC extends Controller {
 	if (nRowsAffected <= 0) {
 	    return badRequest("Failed to edit OC into LabKey!\n");
 	}
-	return ok(objectCollectionConfirm.render("New Object Collection has been Edited", std_uri, newOc));
+	return ok(objectCollectionConfirm.render("New Object Collection has been Edited", filename, da_uri, std_uri, newOc));
     }
 
 }

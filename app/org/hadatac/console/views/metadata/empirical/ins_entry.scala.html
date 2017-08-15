@@ -1,0 +1,20 @@
+@(instrument : org.hadatac.entity.pojo.Instrument)
+
+@import play.Play
+@import org.hadatac.console.controllers.metadata._
+@import java.net._
+@import org.hadatac.utils._
+
+<tr>
+  <td>@if(instrument.getLabel() != null) { @instrument.getLabel() }</td>
+  <td>@if(instrument.getTypeUri() != null) { @instrument.getTypeUri() }</td>
+  <td>@if(instrument.getComment() != null) { @instrument.getComment() }</td>
+  <td>
+    <a href=""
+       class="btn-xs btn-primary disabled" role="button">View</a> 
+    <a href=""
+       class="btn-xs btn-primary disabled" role="button">Edit</a>
+    <a href=""
+       class="btn-xs btn-primary disabled" role="button">Delete</a>
+  </td>
+</tr>

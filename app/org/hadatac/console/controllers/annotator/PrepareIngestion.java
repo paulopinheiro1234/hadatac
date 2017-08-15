@@ -10,6 +10,7 @@ import java.io.FileReader;
 import java.text.SimpleDateFormat;
 import java.net.URLEncoder;
 import java.util.List;
+import java.util.Arrays;
 import java.util.ArrayList;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
@@ -28,6 +29,7 @@ import org.hadatac.utils.ConfigProp;
 import org.hadatac.utils.State;
 import org.hadatac.console.views.html.annotator.*;
 import org.hadatac.console.models.AssignOptionForm;
+import org.hadatac.console.models.SelectScopeForm;
 import org.hadatac.console.controllers.AuthApplication;
 import org.hadatac.console.controllers.annotator.FileProcessing;
 import org.hadatac.console.controllers.annotator.routes;
@@ -88,6 +90,7 @@ public class PrepareIngestion extends Controller {
 	// Load associated DA
 	if (da_uri != null && !da_uri.equals("")) {
 	    da = DataAcquisition.findByUri(ValueCellProcessing.replacePrefixEx(da_uri));
+	    System.out.println("Global scope: [" + da.getGlobalScopeUri() + "]  hasScope: " + da.hasScope());
 
 	    if (da != null) {
 		return ok(prepareIngestion.render(file_name, da, "DA associated with file has been retrieved"));
@@ -167,6 +170,10 @@ public class PrepareIngestion extends Controller {
     
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
     public static Result selectStudy(String file_name, String da_uri) {
+    	if (session().get("LabKeyUserName") == null && session().get("LabKeyPassword") == null) {
+    		return redirect(org.hadatac.console.controllers.triplestore.routes.LoadKB.logInLabkey(
+			        routes.PrepareIngestion.selectStudy(file_name,da_uri).url()));
+    	}
 
 	List<Study> studies = Study.find();
 	
@@ -175,15 +182,66 @@ public class PrepareIngestion extends Controller {
 
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
     public static Result selectScope(String file_name, String da_uri, String std_uri) {
+    	if (session().get("LabKeyUserName") == null && session().get("LabKeyPassword") == null) {
+    		return redirect(org.hadatac.console.controllers.triplestore.routes.LoadKB.logInLabkey(
+				routes.PrepareIngestion.selectScope(file_name,da_uri, std_uri).url()));
+    	}
+    		
+	String[] fields = null;
+	String globalScope = null;
+	String globalScopeUri = null;
+	List<String> localScope = null;
+	List<String> localScopeUri = null;
+	String labelsStr = "";
+	String path = "";
+	String labels = "";
 
-	Study study = Study.find(std_uri);
-
-	List<ObjectCollection> ocList = ObjectCollection.findDomainByStudy(study);
+	try {
+	    file_name = URLEncoder.encode(file_name, "UTF-8");
+	} catch (Exception e) {
+	    System.out.println("[ERROR] encoding file name");
+	}
+	    
+	System.out.println("file <" + file_name + ">");
+	path = ConfigProp.getPropertyValue("autoccsv.config", "path_unproc");
+	System.out.println("Path: " + path + "  Name: " + file_name);
+	try {
+	    BufferedReader reader = new BufferedReader(new FileReader(path + "/" + file_name));
+	    StringBuilder builder = new StringBuilder();
+	    String line = reader.readLine();
+	    while (line != null) {
+		builder.append(line);
+		break;
+	    }
+	    if(!builder.toString().trim().equals("")) {
+		labels = builder.toString();
+	    }
+	} catch (Exception e) {
+	    System.out.println("Could not process uploaded file.");
+	}
+	System.out.println("selectScope: labels = <" + labels + ">");
+	if (labels != null && !labels.equals("")) {
+	    fields = FileProcessing.extractFields(labels);
+	    localScope = new ArrayList<String>();
+	    localScopeUri = new ArrayList<String>();
+	    for (String str : fields) {
+		localScope.add("no mapping");
+                localScopeUri.add("");
+	    }
+	    System.out.println("# of fields: " + fields.length);
+	}
 	
-	return ok(selectScope.render(file_name, da_uri, ocList));
+	Study study = Study.find(std_uri);
+	System.out.println("Study uri: " + std_uri);
+	System.out.println("StudygetUri(): " + study.getUri());
+	System.out.println("Study name: " + study.getLabel());
+	List<ObjectCollection> ocList = ObjectCollection.findDomainByStudy(study);
+	System.out.println("Collection list size: " + ocList.size());
+	
+	return ok(selectScope.render(file_name, da_uri, ocList, Arrays.asList(fields), globalScope, globalScopeUri, localScope, localScopeUri));
     }
-
-    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
+	    
+	    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
     public static Result selectDeployment(String file_name, String da_uri) {
 
 	State active = new State(State.ACTIVE);
@@ -235,6 +293,41 @@ public class PrepareIngestion extends Controller {
 
 	message = "DA is now associated with study " + std_uri;
  	return refine(file_name, da_uri, message);
+    }
+
+    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
+	public static Result processSelectScope(String file_name, String da_uri) {
+	Form<SelectScopeForm> form = Form.form(SelectScopeForm.class).bindFromRequest();
+	String message = "";
+        SelectScopeForm data = form.get();
+	String globalScopeUri = data.getNewGlobalScopeUri();
+	String localScopeUri = data.getNewLocalScopeUri();
+	System.out.println("Showing returned GlobalScope: [" + globalScopeUri + "]");
+	System.out.println("Showing returned LocalScope: [" + localScopeUri + "]");
+	String[] localUriStr = localScopeUri.split(",");
+        System.out.println("List of local scope uris:");
+	for (int i=0; i < localUriStr.length; i++) {
+	    localUriStr[i] = localUriStr[i].trim();
+	    System.out.println("local scope: [" + localUriStr[i] + "]");
+	}
+	List<String> localScopeUriList = Arrays.asList(localUriStr);
+        
+	DataAcquisition da = DataAcquisition.findByUri(da_uri);
+	if (da == null) {
+	    message = "ERROR - Could not retrieve Data Acquisition from its URI.";
+	    return refine(file_name, da_uri, message);
+	}
+	
+	da.setGlobalScopeUri(globalScopeUri);
+	da.setLocalScopeUri(localScopeUriList);
+	    
+	try {
+	    da.save();
+	    da.saveToLabKey(session().get("LabKeyUserName"), session().get("LabKeyPassword"));
+	} catch (CommandException e) {
+	}
+
+	return ok(prepareIngestion.render(file_name, da, "Updated Data Acquisition with scope information"));
     }
 
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
@@ -320,12 +413,27 @@ public class PrepareIngestion extends Controller {
 	}
 	
 	switch (daComponent) {
+	
+	// removing a study's relationship also removes scope information
 	case "Study":  
 	    da.setStudyUri("");
+	    da.setGlobalScopeUri("");
+	    da.setGlobalScopeName("");
+	    da.setLocalScopeUri(new ArrayList<String>());
+	    da.setLocalScopeName(new ArrayList<String>());
 	    break;
+
+	case "Scope":  
+	    da.setGlobalScopeUri("");
+	    da.setGlobalScopeName("");
+	    da.setLocalScopeUri(new ArrayList<String>());
+	    da.setLocalScopeName(new ArrayList<String>());
+	    break;
+
 	case "Deployment":  
 	    da.setDeploymentUri("");
 	    break;
+
 	case "Schema":  
 	    da.setSchemaUri("");
 	}

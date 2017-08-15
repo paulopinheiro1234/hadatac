@@ -40,15 +40,15 @@ import be.objectify.deadbolt.java.actions.Restrict;
 public class ObjectManagement extends Controller {
     
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    public static Result indexNomsg(String std_uri, String oc_uri) {
-    	return index(std_uri, oc_uri, "");
+    public static Result indexNomsg(String filename, String da_uri, String std_uri, String oc_uri) {
+    	return index(filename, da_uri, std_uri, oc_uri, "");
     }
     
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-	public static Result index(String std_uri, String oc_uri, String message) {
+    public static Result index(String filename, String da_uri, String std_uri, String oc_uri, String message) {
     	if (session().get("LabKeyUserName") == null && session().get("LabKeyPassword") == null) {
 	    return redirect(org.hadatac.console.controllers.triplestore.routes.LoadKB.logInLabkey(
-			    org.hadatac.console.controllers.objects.routes.ObjectManagement.index(std_uri, oc_uri, message).url()));
+			    org.hadatac.console.controllers.objects.routes.ObjectManagement.index(filename, da_uri, std_uri, oc_uri, message).url()));
     	}
 	std_uri = URLDecoder.decode(std_uri);
 	oc_uri = URLDecoder.decode(oc_uri);
@@ -57,12 +57,12 @@ public class ObjectManagement extends Controller {
 
 	Study study = Study.find(std_uri);
 	if (study == null) {
-	    return badRequest(objectConfirm.render("Error listing object collection: Study URI did not return valid URI", std_uri, oc_uri, null));
+	    return badRequest(objectConfirm.render("Error listing object collection: Study URI did not return valid URI", filename, da_uri, std_uri, oc_uri, null));
 	} 
 
 	ObjectCollection oc = ObjectCollection.find(oc_uri);
 	if (oc == null) {
-	    return badRequest(objectConfirm.render("Error listing objectn: ObjectCollection URI did not return valid object", std_uri, oc_uri, null));
+	    return badRequest(objectConfirm.render("Error listing objectn: ObjectCollection URI did not return valid object", filename, da_uri, std_uri, oc_uri, null));
 	} 
 
 	List<String> objUriList = new ArrayList<String>(); 
@@ -71,16 +71,16 @@ public class ObjectManagement extends Controller {
 	    objUriList.add(obj.getUri());
 	}
 
-    	return ok(objectManagement.render(study, oc, objUriList, objects, message));
+    	return ok(objectManagement.render(filename, da_uri, study, oc, objUriList, objects, message));
     }
     
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    public static Result postIndex(String std_uri, String oc_uri, String message) {
-    	return index(std_uri, oc_uri, message);
+	public static Result postIndex(String filename, String da_uri, String std_uri, String oc_uri, String message) {
+    	return index(filename, da_uri, std_uri, oc_uri, message);
     }
     
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    public static Result updateCollectionObjects(String std_uri, String oc_uri, List<String> objUriList) {
+    public static Result updateCollectionObjects(String filename, String da_uri, String std_uri, String oc_uri, List<String> objUriList) {
     	final SysUser sysUser = AuthApplication.getLocalUser(session());
 	
 	std_uri = URLDecoder.decode(std_uri);
@@ -141,7 +141,7 @@ public class ObjectManagement extends Controller {
 
 		// update objects and add to new list
 		newObj = new StudyObject(oldObj.getUri(),
-					 oldObj.getType(),
+					 oldObj.getTypeUri(),
 					 newOriginalIds.get(i),
 					 newLabels.get(i),
 					 oldObj.getIsMemberOf(),
@@ -181,11 +181,11 @@ public class ObjectManagement extends Controller {
         
 	System.out.println("Study URI leaving EditObject: " + study.getUri());
 
-    	return ok(objectManagement.render(study, oc, objUriList, newObjList, message));
+    	return ok(objectManagement.render(filename, da_uri, study, oc, objUriList, newObjList, message));
     }
 
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    public static Result deleteCollectionObjects(String std_uri, String oc_uri, List<String> objUriList) {
+    public static Result deleteCollectionObjects(String filename, String da_uri, String std_uri, String oc_uri, List<String> objUriList) {
     	final SysUser sysUser = AuthApplication.getLocalUser(session());
 	
 	std_uri = URLDecoder.decode(std_uri);
@@ -246,7 +246,7 @@ public class ObjectManagement extends Controller {
 	    message = " no object was deleted";
 	}
 	
-    	return index(study.getUri(), oc.getUri(), message);
+    	return index(filename, da_uri, study.getUri(), oc.getUri(), message);
     }
 
 }

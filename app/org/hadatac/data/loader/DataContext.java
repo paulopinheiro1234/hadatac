@@ -23,7 +23,6 @@ public class DataContext {
 	boolean verbose;
 	
 	public DataContext(String un, String pwd, String kb, boolean ver) {
-        System.out.println("Metadata management set for knowledge base at " + kb);
 	    username = un;
 	    password = pwd;
 	    kbURL = kb;

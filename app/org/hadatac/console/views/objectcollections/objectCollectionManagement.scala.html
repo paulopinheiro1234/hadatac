@@ -1,5 +1,7 @@
-@(study  : org.hadatac.entity.pojo.Study,
-  ocList : List[org.hadatac.entity.pojo.ObjectCollection])
+@(filename : String,
+  da_uri   : String,
+  study    : org.hadatac.entity.pojo.Study,
+  ocList   : List[org.hadatac.entity.pojo.ObjectCollection])
 
 @import helper._
 @import org.hadatac.console.views.html._
@@ -15,8 +17,8 @@
     <div class="container-fluid">
       <div class="row">
          <div class="navbar-collapse collapse navbar-secondary">
-           <a href="@org.hadatac.console.controllers.objectcollections.routes.NewOC.index(study.getUri())" class="btn btn-primary" role="button">Create Object Collection</a>
-	   <a href="@org.hadatac.console.controllers.objectcollections.routes.OCForceField.index("full",study.getUri())" class="btn btn-primary" role="button">Visualize Object Graph</a>
+           <a href="@org.hadatac.console.controllers.objectcollections.routes.NewOC.index(filename, da_uri, study.getUri())" class="btn btn-primary" role="button">Create Object Collection</a>
+	   <a href="@org.hadatac.console.controllers.objectcollections.routes.OCForceField.index("full", filename, da_uri, study.getUri())" class="btn btn-primary" role="button">Visualize Object Graph</a>
          </div>
       </div>
    </div>
@@ -43,7 +45,7 @@
             <tbody>
 	      @if(ocList != null) {
                  @for(oc <- ocList){
-	            @oc_entry("subject",study,oc)
+	            @oc_entry("subject", filename, da_uri, study, oc)
                  }
               }
             </tbody>
@@ -69,7 +71,7 @@
             <tbody>
 	      @if(ocList != null) {
                  @for(oc <- ocList){
-	            @oc_entry("sample",study,oc)
+	            @oc_entry("sample", filename, da_uri, study, oc)
                  }
               }
             </tbody>
@@ -93,7 +95,7 @@
             <tbody>
 	      @if(ocList != null) {
                  @for(oc <- ocList){
-	            @oc_entry("location",study,oc)
+	            @oc_entry("location", filename, da_uri, study, oc)
                  }
               }
             </tbody>
@@ -117,15 +119,21 @@
             <tbody>
 	      @if(ocList != null) {
                  @for(oc <- ocList){
-	            @oc_entry("time",study,oc)
+	            @oc_entry("time", filename, da_uri, study, oc)
                  }
               }
             </tbody>
         </table>
       </div>
       <br>
-	<a href="@org.hadatac.console.controllers.studies.routes.StudyManagement.index()" class="btn btn-primary" role="button">Back to Study Management</a>
+        @if(filename == null || filename.equals("") || da_uri == null || da_uri.equals("")) {
+              <a href="@org.hadatac.console.controllers.studies.routes.StudyManagement.index()" class="btn btn-primary" role="button">Back to Study Management</a>
+	} else {
+              <a href="@org.hadatac.console.controllers.annotator.routes.PrepareIngestion.create(filename, da_uri)" 
+		 class="btn btn-primary" role="button">Back to Prepare Ingestion</a>
+	}
 	
+
     </div>
  
   </div>

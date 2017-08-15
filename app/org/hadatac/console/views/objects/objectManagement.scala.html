@@ -1,4 +1,6 @@
-@(study      : org.hadatac.entity.pojo.Study,
+@(filename   : String,
+  da_uri     : String,
+  study      : org.hadatac.entity.pojo.Study,
   oc         : org.hadatac.entity.pojo.ObjectCollection,
   objUriList : List[String],
   objList    : List[org.hadatac.entity.pojo.StudyObject],
@@ -23,9 +25,9 @@
     <div class="container-fluid">
       <div class="row">
          <div class="navbar-collapse collapse navbar-secondary">
-           <a href="@org.hadatac.console.controllers.objects.routes.NewObjectsFromScratch.index(URLEncoder.encode(study.getUri(),"UTF-8"),URLEncoder.encode(oc.getUri(),"UTF-8"))" 
+           <a href="@org.hadatac.console.controllers.objects.routes.NewObjectsFromScratch.index(filename, da_uri, URLEncoder.encode(study.getUri(),"UTF-8"),URLEncoder.encode(oc.getUri(),"UTF-8"))" 
 	      class="btn btn-primary" role="button">Create Multiple Objects From Scratch</a>
-           <a href="@org.hadatac.console.controllers.objects.routes.ObjectManagement.deleteCollectionObjects(URLEncoder.encode(study.getUri(),"UTF-8"),URLEncoder.encode(oc.getUri(),"UTF-8"),objUriList)" 
+           <a href="@org.hadatac.console.controllers.objects.routes.ObjectManagement.deleteCollectionObjects(filename, da_uri, URLEncoder.encode(study.getUri(),"UTF-8"),URLEncoder.encode(oc.getUri(),"UTF-8"),objUriList)" 
 	      class="btn btn-primary" role="button">Delete Objects in Collection</a>
            <a href="" class="btn btn-primary disabled" role="button">Create Multiple Objects From File</a>
            <a href="" class="btn btn-primary disabled" role="button">Create Single Object</a>
@@ -38,7 +40,7 @@
    <h4>Objects</h4>
    
     <form class="form-horizontal" name="newObjects" method="post" 
-	  action="@org.hadatac.console.controllers.objects.routes.ObjectManagement.updateCollectionObjects(URLEncoder.encode(study.getUri(),"UTF-8"),URLEncoder.encode(oc.getUri(),"UTF-8"),objUriList)">
+	  action="@org.hadatac.console.controllers.objects.routes.ObjectManagement.updateCollectionObjects(filename, da_uri, URLEncoder.encode(study.getUri(),"UTF-8"),URLEncoder.encode(oc.getUri(),"UTF-8"),objUriList)">
     <div class="container-fluid">
         <table class="table">
             <thead>
@@ -64,7 +66,7 @@
         </table>
 
 	<input class="btn btn-success" role="button" type="submit" id="submit" value="Update Objects"/><br>
-	<a href="@org.hadatac.console.controllers.objectcollections.routes.OCManagement.index(URLEncoder.encode(study.getUri(),"UTF-8"))" class="btn btn-primary" 
+	<a href="@org.hadatac.console.controllers.objectcollections.routes.OCManagement.index(filename, da_uri, URLEncoder.encode(study.getUri(),"UTF-8"))" class="btn btn-primary" 
 	   role="button">Back to Object Collection  Management</a>
 	
     </div>

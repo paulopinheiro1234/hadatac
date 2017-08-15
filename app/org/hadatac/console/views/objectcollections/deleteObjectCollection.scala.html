@@ -1,5 +1,7 @@
-@(std_uri : String, 
-  oc      : org.hadatac.entity.pojo.ObjectCollection)
+@(filename : String,
+  da_uri   : String,
+  std_uri  : String, 
+  oc       : org.hadatac.entity.pojo.ObjectCollection)
 
 @import helper._
 @import org.hadatac.utils._
@@ -13,7 +15,7 @@
    <div class="container">
       <h4>Delete Object Collection</h4>
       
-        <form class="form-horizontal" method="post" action="@org.hadatac.console.controllers.objectcollections.routes.DeleteOC.processForm(std_uri, oc.getUri())">
+        <form class="form-horizontal" method="post" action="@org.hadatac.console.controllers.objectcollections.routes.DeleteOC.processForm(filename, da_uri, std_uri, oc.getUri())">
 
         <div class="form-group">
            <label>URI : </label> @ValueCellProcessing.replaceNameSpaceEx(oc.getUri()) <br>         
@@ -28,7 +30,7 @@
 
      </form>   
      <br>
-     <a href="@org.hadatac.console.controllers.objectcollections.routes.OCManagement.index(std_uri)" class="btn btn-primary" role="button">Back to Sample Collection Management</a>
+     <a href="@org.hadatac.console.controllers.objectcollections.routes.OCManagement.index(filename, da_uri, std_uri)" class="btn btn-primary" role="button">Back to Object Collection Management</a>
 
   </div>
 

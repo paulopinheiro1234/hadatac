@@ -20,7 +20,7 @@ public class OCForceFieldGraph {
     Study study = null;
     List<OCNode> objects = new ArrayList<OCNode>();
 	
-    public OCForceFieldGraph(String mode, String std_uri) {
+    public OCForceFieldGraph(String mode, String filename, String da_uri, String std_uri) {
 	if (std_uri == null || std_uri.equals("")) {
 	    return;
 	}

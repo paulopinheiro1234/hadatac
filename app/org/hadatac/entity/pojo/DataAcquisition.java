@@ -109,9 +109,14 @@ public class DataAcquisition {
 	private String elevation;
 	@Field("dataset_uri")
 	private List<String> datasetURIs;
-
-        private String scopeUri;
-        private String scopeName;
+	@Field("globalscope_uri")
+        private String globalScopeUri;
+	@Field("globalscope_name")
+        private String globalScopeName;
+	@Field("localscope_uri")
+        private List<String> localScopeUri;
+	@Field("localscope_name")
+        private List<String> localScopeName;
     
 	private boolean isComplete;
 	private String ccsvUri;
@@ -147,7 +152,10 @@ public class DataAcquisition {
 		typeURIs = new ArrayList<String>();
 		associatedURIs = new ArrayList<String>();
 		deployment = null;
-		scopeUri = null;
+		globalScopeUri = null;
+		globalScopeName = null;
+		localScopeUri = new ArrayList<String>();
+		localScopeName = new ArrayList<String>();
 	}
 
 	public String getElevation() {
@@ -227,6 +235,12 @@ public class DataAcquisition {
 	
 	public String getStudyUri() {
 		return studyUri;
+	}
+	public Study getStudy() {
+	    if (studyUri == null || studyUri.equals(""))  
+		return null;
+	    Study study = Study.find(studyUri);
+	    return study;
 	}
 	public void setStudyUri(String study_uri) {
 		this.studyUri = study_uri;
@@ -466,53 +480,97 @@ public class DataAcquisition {
 		this.location = location;
 	}
 
-	public String getScopeUri() {
-		return scopeUri;
+	public boolean hasScope() {
+		if (globalScopeUri != null && !globalScopeUri.equals("")) {
+			return true;
+		}
+		if (localScopeUri != null && localScopeUri.size() > 0) {
+			for (String tmpUri : localScopeUri) {
+				if (tmpUri != null && !tmpUri.equals("")) {
+					return true;
+				}
+			}
+	    }
+	    	return false;
+        }
+
+	public String getGlobalScopeUri() {
+		return globalScopeUri;
 	}
-	public void setScopeUri(String scopeUri) {
-	    this.scopeUri = scopeUri;
-	    if (scopeUri == null || scopeUri.equals("")) {
+	public void setGlobalScopeUri(String globalScopeUri) {
+	    this.globalScopeUri = globalScopeUri;
+	    if (globalScopeUri == null || globalScopeUri.equals("")) {
 		return;
 	    }
-	    ObjectCollection oc = ObjectCollection.find(scopeUri);
+	    ObjectCollection oc = ObjectCollection.find(globalScopeUri);
 	    if (oc != null) {
-		if (oc.getUri().equals(scopeUri)) {
-		    scopeName = oc.getLabel();
+		if (oc.getUri().equals(globalScopeUri)) {
+		    globalScopeName = oc.getLabel();
 		    return;
 		}
 	    } else {
-		StudyObject obj = StudyObject.find(scopeUri);
-		if (obj.getUri().equals(scopeUri)) {
-		    scopeName = obj.getLabel();
+		StudyObject obj = StudyObject.find(globalScopeUri);
+		if (obj.getUri().equals(globalScopeUri)) {
+		    globalScopeName = obj.getLabel();
 		    return;
 		}
 	    }
 	}
-       	public String getScopeName() {
-		return scopeName;
+       	public String getGlobalScopeName() {
+		return globalScopeName;
 	}
-	public void setScopeName(String scopeName) {
-		this.scopeName = scopeName;
+	public void setGlobalScopeName(String globalScopeName) {
+		this.globalScopeName = globalScopeName;
 	}
 	
+	public List<String> getLocalScopeUri() {
+		return localScopeUri;
+	}
+	public void setLocalScopeUri(List<String> localScopeUri) {
+	    this.localScopeUri = localScopeUri;
+	    if (localScopeUri == null || localScopeUri.size() == 0) {
+		return;
+	    }
+	    localScopeName = new ArrayList<String>();
+	    for (String objUri : localScopeUri) {
+		StudyObject obj = StudyObject.find(objUri);
+		if (obj != null && obj.getUri().equals(objUri)) {
+		    localScopeName.add(obj.getLabel());
+		} else {
+		    localScopeName.add("");
+		}
+	    }
+	}
+	public void addLocalScopeUri(String localScopeUri) {
+	    this.localScopeUri.add(localScopeUri);
+	}
+       	public List<String> getLocalScopeName() {
+	    return localScopeName;
+	}
+	public void setLocalScopeName(List<String> localScopeName) {
+	    this.localScopeName = localScopeName;
+	}
+	public void addLocalScopeName(String localScopeName) {
+	    this.localScopeName.add(localScopeName);
+	}
 	public List<String> getDatasetUri() {
-		return datasetURIs;
+	    return datasetURIs;
 	}
 	public void setDatasetUri(List<String> datasetURIs) {
-		this.datasetURIs = datasetURIs;
+	    this.datasetURIs = datasetURIs;
 	}
 	public void addDatasetUri(String dataset_uri) {
-		if (!datasetURIs.contains(dataset_uri)) {
-			datasetURIs.add(dataset_uri);
-		}
+	    if (!datasetURIs.contains(dataset_uri)) {
+		datasetURIs.add(dataset_uri);
+	    }
 	}
-	public void deleteDatasetUri(String dataset_uri) {
-		Iterator<String> iter = datasetURIs.iterator();
-		while (iter.hasNext()){
-			if (iter.next().equals(dataset_uri)) {
-				iter.remove();
-			}
+        public void deleteDatasetUri(String dataset_uri) {
+	    Iterator<String> iter = datasetURIs.iterator();
+	    while (iter.hasNext()){
+		if (iter.next().equals(dataset_uri)) {
+		    iter.remove();
 		}
+	    }
 	}
 	public void deleteAllDatasetURIs() {
 		datasetURIs.clear();
@@ -695,6 +753,24 @@ public class DataAcquisition {
 					dataAcquisition.addDatasetUri(i.next().toString());
 				}
 			}
+			if (doc.getFieldValue("globalscope_uri") != null) {
+				dataAcquisition.setGlobalScopeUri(doc.getFieldValue("globalscope_uri").toString());
+			}
+			if (doc.getFieldValue("globalscope_name") != null) {
+				dataAcquisition.setGlobalScopeName(doc.getFieldValue("globalscope_name").toString());
+			}
+			if (doc.getFieldValues("localscope_uri") != null) {
+				i = doc.getFieldValues("localscope_uri").iterator();
+				while (i.hasNext()) {
+					dataAcquisition.addLocalScopeUri(i.next().toString());
+				}
+			}
+			if (doc.getFieldValues("localscope_name") != null) {
+				i = doc.getFieldValues("localscope_name").iterator();
+				while (i.hasNext()) {
+					dataAcquisition.addLocalScopeName(i.next().toString());
+				}
+			}
 		} catch (Exception e) {
 			System.out.println("[ERROR] DataAcquisition.convertFromSolr(SolrDocument) - e.Message: " + e.getMessage());
 		}
@@ -802,18 +878,18 @@ public class DataAcquisition {
 	}
 	
 	public static DataAcquisition findByUri(String dataAcquisitionUri) {
-	    System.out.println("inside findByUri: <" + dataAcquisitionUri + ">");
-		SolrQuery query = new SolrQuery();
-		query.set("q", "uri:\"" + dataAcquisitionUri + "\"");
-		query.set("sort", "started_at asc");
-		query.set("rows", "10000000");
-		
-		List<DataAcquisition> results = findByQuery(query);
-		if (!results.isEmpty()) {
-			return results.get(0);
-		}
-
-		return null;
+	    //System.out.println("inside findByUri: <" + dataAcquisitionUri + ">");
+	    SolrQuery query = new SolrQuery();
+	    query.set("q", "uri:\"" + dataAcquisitionUri + "\"");
+	    query.set("sort", "started_at asc");
+	    query.set("rows", "10000000");
+	    
+	    List<DataAcquisition> results = findByQuery(query);
+	    if (!results.isEmpty()) {
+		return results.get(0);
+	    }
+	    
+	    return null;
 	}
 	
 	public int close(String endedAt) {
@@ -1079,11 +1155,17 @@ public class DataAcquisition {
 		builder.append("platform_uri: " + this.platformUri + "\n");
 		builder.append("location: " + this.location + "\n");
 		builder.append("elevation: " + this.elevation + "\n");
-		builder.append("scopeUri: " + this.scopeUri + "\n");
-		builder.append("scopeName: " + this.scopeName + "\n");
+		builder.append("globalScopeUri: " + this.globalScopeUri + "\n");
+		builder.append("globalScopeName: " + this.globalScopeName + "\n");
+		for (String localUri : localScopeUri) {
+		    builder.append("localScopeUri: " + localUri + "\n");
+		}
+		for (String localName : localScopeName) {
+		    builder.append("localScopeName: " + localName + "\n");
+		}
 		i = datasetURIs.iterator();
 		while (i.hasNext()) {
-			builder.append("dataset_uri: " + i.next() + "\n");
+		    builder.append("dataset_uri: " + i.next() + "\n");
 		}
 		
 		return builder.toString();
@@ -1092,7 +1174,7 @@ public class DataAcquisition {
     @Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
     public int saveToLabKey(String user_name, String password) throws CommandException {
     	
-		String site = ConfigProp.getPropertyValue("labkey.config", "site");
+	String site = ConfigProp.getPropertyValue("labkey.config", "site");
         String path = "/" + ConfigProp.getPropertyValue("labkey.config", "folder");
         
     	LabkeyDataHandler loader = new LabkeyDataHandler(
@@ -1107,6 +1189,14 @@ public class DataAcquisition {
     		abbrevAssociatedURIs.add(ValueCellProcessing.replaceNameSpaceEx(uri));
     	}
     	
+	String localUri = "";
+	Iterator<String> i = getLocalScopeUri().iterator();
+	while (i.hasNext()) {
+	    localUri += ValueCellProcessing.replaceNameSpaceEx(i.next());
+	    if (i.hasNext()) {
+		localUri += " , ";
+	    }
+	}
     	List< Map<String, Object> > rows = new ArrayList< Map<String, Object> >();
     	Map<String, Object> row = new HashMap<String, Object>();
     	row.put("a", String.join(", ", abbrevTypeURIs));
@@ -1119,7 +1209,8 @@ public class DataAcquisition {
     	row.put("hasco:hasDeployment", ValueCellProcessing.replaceNameSpaceEx(getDeploymentUri()));
     	row.put("hasco:isDataAcquisitionOf", ValueCellProcessing.replaceNameSpaceEx(getStudyUri()));
     	row.put("hasco:hasSchema", ValueCellProcessing.replaceNameSpaceEx(getSchemaUri()));
-    	row.put("hasco:hasScope", ValueCellProcessing.replaceNameSpaceEx(getScopeUri()));
+    	row.put("hasco:hasGlobalScope", ValueCellProcessing.replaceNameSpaceEx(getGlobalScopeUri()));
+    	row.put("hasco:hasLocalScope", localUri); 
     	row.put("hasco:hasTriggeringEvent", getTriggeringEventName());
     	row.put("prov:endedAtTime", getEndedAt().startsWith("9999")? "" : getEndedAt());
     	rows.add(row);

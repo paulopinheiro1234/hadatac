@@ -1,6 +1,8 @@
-@(mode  : String,
-  study : org.hadatac.entity.pojo.Study,
-  oc    : org.hadatac.entity.pojo.ObjectCollection)
+@(mode     : String,
+  filename : String,
+  da_uri   : String, 
+  study    : org.hadatac.entity.pojo.Study,
+  oc       : org.hadatac.entity.pojo.ObjectCollection)
 
 @import play.Play
 @import org.hadatac.console.controllers.metadata._
@@ -9,7 +11,7 @@
 @import org.hadatac.utils._
 
 @if(oc != null) {
-  @if(mode.equals("subject") && oc.getType().equals("http://hadatac.org/ont/hasco/SubjectGroup")) {
+  @if(mode.equals("subject") && oc.getTypeUri().equals("http://hadatac.org/ont/hasco/SubjectGroup")) {
   <tr>
      <td>@if(oc.getLabel() != null) { @oc.getLabel() }</td>
      <td>@if(oc.getComment() != null) { @oc.getComment() }</td>
@@ -27,15 +29,15 @@
      </td>
      <td>@oc.getObjectUris().size()</td>
      <td>
-        <a href="@org.hadatac.console.controllers.objects.routes.ObjectManagement.indexNomsg(URLEncoder.encode(study.getUri(),"UTF-8"), URLEncoder.encode(oc.getUri(),"UTF-8"))" class="btn-xs btn-primary disabled" role="button">Manage Objects</a>
-        <a href="@org.hadatac.console.controllers.objectcollections.routes.EditOC.index(URLEncoder.encode(study.getUri(),"UTF-8"), URLEncoder.encode(oc.getUri(),"UTF-8"))" class="btn-xs btn-primary" role="button">Edit Collection</a>
+        <a href="@org.hadatac.console.controllers.objects.routes.ObjectManagement.indexNomsg(filename, da_uri, URLEncoder.encode(study.getUri(),"UTF-8"), URLEncoder.encode(oc.getUri(),"UTF-8"))" class="btn-xs btn-primary disabled" role="button">Manage Objects</a>
+        <a href="@org.hadatac.console.controllers.objectcollections.routes.EditOC.index(filename, da_uri, URLEncoder.encode(study.getUri(),"UTF-8"), URLEncoder.encode(oc.getUri(),"UTF-8"))" class="btn-xs btn-primary" role="button">Edit Collection</a>
         @if(oc.getObjectUris().size() <= 0) {
-           <a href="@org.hadatac.console.controllers.objectcollections.routes.DeleteOC.index(URLEncoder.encode(study.getUri(),"UTF-8"), URLEncoder.encode(oc.getUri(),"UTF-8"))" class="btn-xs btn-primary" role="button">Delete Collection</a>
+           <a href="@org.hadatac.console.controllers.objectcollections.routes.DeleteOC.index(filename, da_uri, URLEncoder.encode(study.getUri(),"UTF-8"), URLEncoder.encode(oc.getUri(),"UTF-8"))" class="btn-xs btn-primary" role="button">Delete Collection</a>
 	}
      </td>
  </tr>
  }
-  @if(mode.equals("sample") && oc.getType().equals("http://hadatac.org/ont/hasco/SampleCollection")) {
+  @if(mode.equals("sample") && oc.getTypeUri().equals("http://hadatac.org/ont/hasco/SampleCollection")) {
   <tr>
      <td>@if(oc.getLabel() != null) { @oc.getLabel() }</td>
      <td>@if(oc.getComment() != null) { @oc.getComment() }</td>
@@ -54,15 +56,15 @@
      </td>
      <td>@oc.getObjectUris().size()</td>
      <td>
-        <a href="@org.hadatac.console.controllers.objects.routes.ObjectManagement.indexNomsg(URLEncoder.encode(study.getUri(),"UTF-8"), URLEncoder.encode(oc.getUri(),"UTF-8"))" class="btn-xs btn-primary disabled" role="button">Manage Objects</a>
-        <a href="@org.hadatac.console.controllers.objectcollections.routes.EditOC.index(URLEncoder.encode(study.getUri(),"UTF-8"), URLEncoder.encode(oc.getUri(),"UTF-8"))" class="btn-xs btn-primary" role="button">Edit Collection</a>
+        <a href="@org.hadatac.console.controllers.objects.routes.ObjectManagement.indexNomsg(filename, da_uri, URLEncoder.encode(study.getUri(),"UTF-8"), URLEncoder.encode(oc.getUri(),"UTF-8"))" class="btn-xs btn-primary disabled" role="button">Manage Objects</a>
+        <a href="@org.hadatac.console.controllers.objectcollections.routes.EditOC.index(filename, da_uri, URLEncoder.encode(study.getUri(),"UTF-8"), URLEncoder.encode(oc.getUri(),"UTF-8"))" class="btn-xs btn-primary" role="button">Edit Collection</a>
         @if(oc.getObjectUris().size() <= 0) {
-           <a href="@org.hadatac.console.controllers.objectcollections.routes.DeleteOC.index(URLEncoder.encode(study.getUri(),"UTF-8"), URLEncoder.encode(oc.getUri(),"UTF-8"))" class="btn-xs btn-primary" role="button">Delete Collection</a>
+           <a href="@org.hadatac.console.controllers.objectcollections.routes.DeleteOC.index(filename, da_uri, URLEncoder.encode(study.getUri(),"UTF-8"), URLEncoder.encode(oc.getUri(),"UTF-8"))" class="btn-xs btn-primary" role="button">Delete Collection</a>
 	}
      </td>
  </tr>
  }
-  @if(mode.equals("location") && oc.getType().equals("http://hadatac.org/ont/hasco/LocationCollection")) {
+  @if(mode.equals("location") && oc.getTypeUri().equals("http://hadatac.org/ont/hasco/LocationCollection")) {
   <tr>
      <td>@if(oc.getLabel() != null) { @oc.getLabel() }</td>
      <td>@if(oc.getComment() != null) { @oc.getComment() }</td>
@@ -74,15 +76,15 @@
      </td>
      <td>@oc.getObjectUris().size()</td>
      <td>
-        <a href="@org.hadatac.console.controllers.objects.routes.ObjectManagement.indexNomsg(URLEncoder.encode(study.getUri(),"UTF-8"), URLEncoder.encode(oc.getUri(),"UTF-8"))" class="btn-xs btn-primary disabled" role="button">Manage Objects</a>
-        <a href="@org.hadatac.console.controllers.objectcollections.routes.EditOC.index(URLEncoder.encode(study.getUri(),"UTF-8"), URLEncoder.encode(oc.getUri(),"UTF-8"))" class="btn-xs btn-primary" role="button">Edit Collection</a>
+        <a href="@org.hadatac.console.controllers.objects.routes.ObjectManagement.indexNomsg(filename, da_uri, URLEncoder.encode(study.getUri(),"UTF-8"), URLEncoder.encode(oc.getUri(),"UTF-8"))" class="btn-xs btn-primary disabled" role="button">Manage Objects</a>
+        <a href="@org.hadatac.console.controllers.objectcollections.routes.EditOC.index(filename, da_uri, URLEncoder.encode(study.getUri(),"UTF-8"), URLEncoder.encode(oc.getUri(),"UTF-8"))" class="btn-xs btn-primary" role="button">Edit Collection</a>
         @if(oc.getObjectUris().size() <= 0) {
-           <a href="@org.hadatac.console.controllers.objectcollections.routes.DeleteOC.index(URLEncoder.encode(study.getUri(),"UTF-8"), URLEncoder.encode(oc.getUri(),"UTF-8"))" class="btn-xs btn-primary" role="button">Delete Collection</a>
+           <a href="@org.hadatac.console.controllers.objectcollections.routes.DeleteOC.index(filename, da_uri, URLEncoder.encode(study.getUri(),"UTF-8"), URLEncoder.encode(oc.getUri(),"UTF-8"))" class="btn-xs btn-primary" role="button">Delete Collection</a>
 	}
      </td>
  </tr>
  }
-  @if(mode.equals("time") && oc.getType().equals("http://hadatac.org/ont/hasco/TimeCollection")) {
+  @if(mode.equals("time") && oc.getTypeUri().equals("http://hadatac.org/ont/hasco/TimeCollection")) {
   <tr>
      <td>@if(oc.getLabel() != null) { @oc.getLabel() }</td>
      <td>@if(oc.getComment() != null) { @oc.getComment() }</td>
@@ -94,10 +96,10 @@
      </td>
      <td>@oc.getObjectUris().size()</td>
      <td>
-        <a href="@org.hadatac.console.controllers.objects.routes.ObjectManagement.indexNomsg(URLEncoder.encode(study.getUri(),"UTF-8"), URLEncoder.encode(oc.getUri(),"UTF-8"))" class="btn-xs btn-primary disabled" role="button">Manage Objects</a>
-        <a href="@org.hadatac.console.controllers.objectcollections.routes.EditOC.index(URLEncoder.encode(study.getUri(),"UTF-8"), URLEncoder.encode(oc.getUri(),"UTF-8"))" class="btn-xs btn-primary" role="button">Edit Collection</a>
+        <a href="@org.hadatac.console.controllers.objects.routes.ObjectManagement.indexNomsg(filename, da_uri, URLEncoder.encode(study.getUri(),"UTF-8"), URLEncoder.encode(oc.getUri(),"UTF-8"))" class="btn-xs btn-primary disabled" role="button">Manage Objects</a>
+        <a href="@org.hadatac.console.controllers.objectcollections.routes.EditOC.index(filename, da_uri, URLEncoder.encode(study.getUri(),"UTF-8"), URLEncoder.encode(oc.getUri(),"UTF-8"))" class="btn-xs btn-primary" role="button">Edit Collection</a>
         @if(oc.getObjectUris().size() <= 0) {
-           <a href="@org.hadatac.console.controllers.objectcollections.routes.DeleteOC.index(URLEncoder.encode(study.getUri(),"UTF-8"), URLEncoder.encode(oc.getUri(),"UTF-8"))" class="btn-xs btn-primary" role="button">Delete Collection</a>
+           <a href="@org.hadatac.console.controllers.objectcollections.routes.DeleteOC.index(filename, da_uri, URLEncoder.encode(study.getUri(),"UTF-8"), URLEncoder.encode(oc.getUri(),"UTF-8"))" class="btn-xs btn-primary" role="button">Delete Collection</a>
 	}
      </td>
  </tr>

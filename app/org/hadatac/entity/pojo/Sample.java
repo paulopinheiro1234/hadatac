@@ -47,7 +47,7 @@ public class Sample extends StudyObject {
 
     public Sample(String uri, String isMemberOf) {
 	this.setUri(uri);
-	this.setType("");
+	this.setTypeUri("");
 	this.setOriginalId("");
 	this.setLabel("");
 	this.setIsMemberOf(isMemberOf);
@@ -56,14 +56,14 @@ public class Sample extends StudyObject {
     }
 
     public Sample(String uri,
-		  String type,
+		  String typeUri,
 		  String originalId,
 		  String label,
 		  String isMemberOf,
 		  String comment,
 		  String isFrom) { 
 	this.setUri(uri);
-        this.setType(type);
+        this.setTypeUri(typeUri);
 	this.setOriginalId(originalId);
 	this.setLabel(label);
 	this.setIsMemberOf(isMemberOf);
@@ -225,10 +225,10 @@ public class Sample extends StudyObject {
 	    
 	insert += NameSpaces.getInstance().printSparqlNameSpaceList();
     	insert += INSERT_LINE1;
-	if (type.startsWith("http")) {
-	    insert += sp_uri + " a <" + type + "> . ";
+	if (typeUri.startsWith("http")) {
+	    insert += sp_uri + " a <" + typeUri + "> . ";
 	} else {
-	    insert += sp_uri + " a " + type + " . ";
+	    insert += sp_uri + " a " + typeUri + " . ";
 	}
 	if (!originalId.equals("")) {
 	    insert += sp_uri + " hasco:originalID \""  + originalId + "\" .  ";
@@ -271,7 +271,7 @@ public class Sample extends StudyObject {
     	List< Map<String, Object> > rows = new ArrayList< Map<String, Object> >();
     	Map<String, Object> row = new HashMap<String, Object>();
     	row.put("hasURI", ValueCellProcessing.replaceNameSpaceEx(getUri()));
-    	row.put("a", ValueCellProcessing.replaceNameSpaceEx(getType()));
+    	row.put("a", ValueCellProcessing.replaceNameSpaceEx(getTypeUri()));
     	row.put("hasco:originalID", getOriginalId());
     	row.put("rdfs:label", getLabel());
     	row.put("hasco:isMemberOf", ValueCellProcessing.replaceNameSpaceEx(getIsMemberOf()));

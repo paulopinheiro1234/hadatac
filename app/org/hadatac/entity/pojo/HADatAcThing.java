@@ -5,7 +5,7 @@ import org.hadatac.metadata.loader.ValueCellProcessing;
 public class HADatAcThing {
 	
     String uri;
-    String type;
+    String typeUri;
     String label;
     String comment;
 
@@ -21,16 +21,16 @@ public class HADatAcThing {
 	this.uri = uri;
     }
     
-    public String getType() {
-	return type;
+    public String getTypeUri() {
+	return typeUri;
     }
     
     public String getTypeNamespace() {
 	return ValueCellProcessing.replaceNameSpaceEx(uri.replace("<","").replace(">",""));
     }
 
-    public void setType(String type) {
-	this.type = type;
+    public void setTypeUri(String typeUri) {
+	this.typeUri = typeUri;
     }	
     
     public String getLabel() {

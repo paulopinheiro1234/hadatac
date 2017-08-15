@@ -71,11 +71,11 @@ public class DataAcquisitionSearch extends Controller {
     }
 
     public static Result index(int page, int rows, String facets) {
-	return indexInternal(0, page, rows, facets);
+    	return indexInternal(0, page, rows, facets);
     }
 
     public static Result indexData(int page, int rows, String facets) {
-	return indexInternal(1, page, rows, facets);
+    	return indexInternal(1, page, rows, facets);
     }
 
     private static Result indexInternal(int mode, int page, int rows, String facets) {
@@ -88,7 +88,7 @@ public class DataAcquisitionSearch extends Controller {
     	AcquisitionQueryResult results = null;
     	String ownerUri;
     	final SysUser user = AuthApplication.getLocalUser(session());
-    	if(null == user){
+    	if(null == user) {
     	    ownerUri = "Public";
 	        //System.out.println("User URI: NULL");
     		results = Measurement.find(ownerUri, page, rows, handler);
@@ -119,15 +119,15 @@ public class DataAcquisitionSearch extends Controller {
             }
         }
 
-	if (mode == 0) {
-	    return ok(facetOnlyBrowser.render(page, rows, facets, results.getDocumentSize(), 
-    			results, results.toJSON(), handler, Measurement.buildQuery(ownerUri, page, rows, handler), 
-    			objDetails.toJSON()));
-	} else {
-	    return ok(dataacquisition_browser.render(page, rows, facets, results.getDocumentSize(), 
-    			results, results.toJSON(), handler, Measurement.buildQuery(ownerUri, page, rows, handler), 
-    			objDetails.toJSON()));
-	}
+		if (mode == 0) {
+		    return ok(facetOnlyBrowser.render(page, rows, facets, results.getDocumentSize(), 
+	    			results, results.toJSON(), handler, Measurement.buildQuery(ownerUri, page, rows, handler), 
+	    			objDetails.toJSON()));
+		} else {
+		    return ok(dataacquisition_browser.render(page, rows, facets, results.getDocumentSize(), 
+	    			results, results.toJSON(), handler, Measurement.buildQuery(ownerUri, page, rows, handler), 
+	    			objDetails.toJSON()));
+		}
     }
 
     public static Result postIndex(int page, int rows, String facets) {

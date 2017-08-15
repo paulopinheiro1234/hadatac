@@ -60,15 +60,16 @@ public class MetadataContext implements RDFContext {
     				"SELECT (COUNT(*) as ?tot) WHERE { ?s ?p ?o . }";
     		Query query = QueryFactory.create(queryString);
     			
-    		QueryExecution qexec = QueryExecutionFactory.sparqlService(Collections.getCollectionsName(Collections.METADATA_SPARQL), query);
+    		QueryExecution qexec = QueryExecutionFactory.sparqlService(
+    				Collections.getCollectionsName(Collections.METADATA_SPARQL), query);
     		ResultSet results = qexec.execSelect();
     		ResultSetRewindable resultsrw = ResultSetFactory.copyResults(results);
     		qexec.close();
     			
     		QuerySolution soln = resultsrw.next();
+    		
     		return Long.valueOf(soln.getLiteral("tot").getValue().toString()).longValue();
     	} catch (Exception e) {
-			e.printStackTrace();
 			return (long) -1;
 		}
     }

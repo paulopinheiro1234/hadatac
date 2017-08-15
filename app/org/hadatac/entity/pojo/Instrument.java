@@ -22,30 +22,9 @@ import org.hadatac.utils.NameSpaces;
 
 import play.Play;
 
-public class Instrument  implements Comparable<Instrument> {
-	private String uri;
-	private String localName;
-	private String label;
+public class Instrument extends HADatAcThing implements Comparable<Instrument> {
+
 	private String serialNumber;
-	
-	public String getUri() {
-		return uri;
-	}
-	public void setUri(String uri) {
-		this.uri = uri;
-	}
-	public String getLocalName() {
-		return localName;
-	}
-	public void setLocalName(String localName) {
-		this.localName = localName;
-	}
-	public String getLabel() {
-		return label;
-	}
-	public void setLabel(String label) {
-		this.label = label;
-	}
 	
 	public String getSerialNumber() {
 		return serialNumber;
@@ -58,24 +37,24 @@ public class Instrument  implements Comparable<Instrument> {
 		//System.out.println("Inside Lits<Instrument>");
 		List<Instrument> instruments = new ArrayList<Instrument>();
 		String queryString = NameSpaces.getInstance().printSparqlNameSpaceList() +
-			" SELECT ?uri WHERE { " +
-            " ?instModel rdfs:subClassOf+ vstoi:Instrument . " + 
+		    " SELECT ?uri WHERE { " +
+		    " ?instModel rdfs:subClassOf+ vstoi:Instrument . " + 
 		    " ?uri a ?instModel ." + 
-			"} ";
+		    "} ";
 		
 		Query query = QueryFactory.create(queryString);
-			
+		
 		QueryExecution qexec = QueryExecutionFactory.sparqlService(Collections.getCollectionsName(Collections.METADATA_SPARQL), query);
 		ResultSet results = qexec.execSelect();
 		ResultSetRewindable resultsrw = ResultSetFactory.copyResults(results);
 		qexec.close();
 			
 		while (resultsrw.hasNext()) {
-			QuerySolution soln = resultsrw.next();
-			Instrument instrument = find(soln.getResource("uri").getURI());
-			instruments.add(instrument);
+		    QuerySolution soln = resultsrw.next();
+		    Instrument instrument = find(soln.getResource("uri").getURI());
+		    instruments.add(instrument);
 		}			
-
+		
 		java.util.Collections.sort((List<Instrument>) instruments);
 		return instruments;
 		
@@ -85,47 +64,46 @@ public class Instrument  implements Comparable<Instrument> {
 		//System.out.println("Inside Lits<Instrument> findAvailable()");
 		List<Instrument> instruments = new ArrayList<Instrument>();
 		String queryString = NameSpaces.getInstance().printSparqlNameSpaceList() +
-			" SELECT ?uri WHERE { " +
-            "   { ?instModel rdfs:subClassOf+ vstoi:Instrument . " + 
+		    " SELECT ?uri WHERE { " +
+		    "   { ?instModel rdfs:subClassOf+ vstoi:Instrument . " + 
 		    "     ?uri a ?instModel ." + 
-			"   } MINUS { " + 
-			"     ?dep_uri a vstoi:Deployment . " + 
+		    "   } MINUS { " + 
+		    "     ?dep_uri a vstoi:Deployment . " + 
 		    "     ?dep_uri hasco:hasInstrument ?uri .  " +
-			"     FILTER NOT EXISTS { ?dep_uri prov:endedAtTime ?enddatetime . } " + 
-			"    } " + 
-			"} " + 
-			"ORDER BY DESC(?datetime) ";
+		    "     FILTER NOT EXISTS { ?dep_uri prov:endedAtTime ?enddatetime . } " + 
+		    "    } " + 
+		    "} " + 
+		    "ORDER BY DESC(?datetime) ";
 		
 		Query query = QueryFactory.create(queryString);
-			
+		
 		QueryExecution qexec = QueryExecutionFactory.sparqlService(Collections.getCollectionsName(Collections.METADATA_SPARQL), query);
 		ResultSet results = qexec.execSelect();
 		ResultSetRewindable resultsrw = ResultSetFactory.copyResults(results);
 		qexec.close();
-			
+		
 		while (resultsrw.hasNext()) {
-			QuerySolution soln = resultsrw.next();
-			Instrument instrument = find(soln.getResource("uri").getURI());
+		    QuerySolution soln = resultsrw.next();
+		    Instrument instrument = find(soln.getResource("uri").getURI());
 			instruments.add(instrument);
 		}			
-
+		
 		java.util.Collections.sort((List<Instrument>) instruments);
 		return instruments;
-		
 	}
 	
 	public static List<Instrument> findDeployed() {
-		//System.out.println("Inside Lits<Instrument> findAvailable()");
+	    //System.out.println("Inside Lits<Instrument> findAvailable()");
 		List<Instrument> instruments = new ArrayList<Instrument>();
 		String queryString = NameSpaces.getInstance().printSparqlNameSpaceList() +
-			" SELECT ?uri WHERE { " +
-            "   ?instModel rdfs:subClassOf+ vstoi:Instrument . " + 
+		    " SELECT ?uri WHERE { " +
+		    "   ?instModel rdfs:subClassOf+ vstoi:Instrument . " + 
 		    "   ?uri a ?instModel ." + 
-			"   ?dep_uri a vstoi:Deployment . " + 
+		    "   ?dep_uri a vstoi:Deployment . " + 
 		    "   ?dep_uri hasco:hasInstrument ?uri .  " +
-			"   FILTER NOT EXISTS { ?dep_uri prov:endedAtTime ?enddatetime . } " + 
-			"} " + 
-			"ORDER BY DESC(?datetime) ";
+		    "   FILTER NOT EXISTS { ?dep_uri prov:endedAtTime ?enddatetime . } " + 
+		    "} " + 
+		    "ORDER BY DESC(?datetime) ";
 		
 		Query query = QueryFactory.create(queryString);
 			
@@ -133,42 +111,43 @@ public class Instrument  implements Comparable<Instrument> {
 		ResultSet results = qexec.execSelect();
 		ResultSetRewindable resultsrw = ResultSetFactory.copyResults(results);
 		qexec.close();
-			
+		
 		while (resultsrw.hasNext()) {
-			QuerySolution soln = resultsrw.next();
-			Instrument instrument = find(soln.getResource("uri").getURI());
-			instruments.add(instrument);
+		    QuerySolution soln = resultsrw.next();
+		    Instrument instrument = find(soln.getResource("uri").getURI());
+		    instruments.add(instrument);
 		}			
 
 		java.util.Collections.sort((List<Instrument>) instruments);
 		return instruments;
-		
 	}
 	
 	public static Instrument find(String uri) {
-		Instrument instrument = null;
-		Model model;
-		Statement statement;
-		RDFNode object;
-		
-		String queryString = "DESCRIBE <" + uri + ">";
+	    Instrument instrument = null;
+	    Model model;
+	    Statement statement;
+	    RDFNode object;
+	    
+	    String queryString = "DESCRIBE <" + uri + ">";
 		Query query = QueryFactory.create(queryString);
 		QueryExecution qexec = QueryExecutionFactory.sparqlService(
-				Play.application().configuration().getString("hadatac.solr.triplestore") 
-				+ Collections.METADATA_SPARQL, query);
+				       Play.application().configuration().getString("hadatac.solr.triplestore") + 
+				       Collections.METADATA_SPARQL, query);
 		model = qexec.execDescribe();
 		
 		instrument = new Instrument();
 		StmtIterator stmtIterator = model.listStatements();
 		
 		while (stmtIterator.hasNext()) {
-			statement = stmtIterator.next();
-			object = statement.getObject();
-			if (statement.getPredicate().getURI().equals("http://www.w3.org/2000/01/rdf-schema#label")) {
-				instrument.setLabel(object.asLiteral().getString());
-			} else if (statement.getPredicate().getURI().equals("http://hadatac.org/ont/vstoi#hasSerialNumber")) {
-				instrument.setSerialNumber(object.asLiteral().getString());
-			}
+		    statement = stmtIterator.next();
+		    object = statement.getObject();
+		    if (statement.getPredicate().getURI().equals("http://www.w3.org/2000/01/rdf-schema#label")) {
+			instrument.setLabel(object.asLiteral().getString());
+		    } else if (statement.getPredicate().getURI().equals("http://hadatac.org/ont/vstoi#hasSerialNumber")) {
+			instrument.setSerialNumber(object.asLiteral().getString());
+		    } else if (statement.getPredicate().getURI().equals("http://www.w3.org/2000/01/rdf-schema#comment")) {
+			instrument.setComment(object.asLiteral().getString());
+		    }
 		}
 		
 		instrument.setUri(uri);
@@ -180,10 +159,11 @@ public class Instrument  implements Comparable<Instrument> {
 		Instrument instrument = null;
 		
 		String queryString = NameSpaces.getInstance().printSparqlNameSpaceList() 
-				+ "SELECT ?instrument ?label WHERE {\n"
-				+ "  <" + hadatac.getDeploymentUri() + "> hasco:hasInstrument ?instrument .\n"
-				+ "  OPTIONAL { ?instrument rdfs:label ?label . }\n"
-				+ "}";
+		    + "SELECT ?instrument ?label WHERE {\n"
+		    + "  <" + hadatac.getDeploymentUri() + "> hasco:hasInstrument ?instrument .\n"
+		    + "  OPTIONAL { ?instrument rdfs:label ?label . }\n"
+		    + "  OPTIONAL { ?instrument rdfs:comment ?comment . }\n"
+		    + "}";
 		
 		Query query = QueryFactory.create(queryString);
 		
@@ -193,18 +173,20 @@ public class Instrument  implements Comparable<Instrument> {
 		qexec.close();
 		
 		if (resultsrw.size() >= 1) {
-			QuerySolution soln = resultsrw.next();
-			instrument = new Instrument();
-			instrument.setLocalName(soln.getResource("instrument").getLocalName());
-			instrument.setUri(soln.getResource("instrument").getURI());
-			if (soln.getLiteral("label") != null) { instrument.setLabel(soln.getLiteral("label").getString()); }
-			else { instrument.setLabel(soln.getResource("instrument").getLocalName()); }
+		    QuerySolution soln = resultsrw.next();
+		    instrument = new Instrument();
+		    instrument.setUri(soln.getResource("instrument").getURI());
+		    if (soln.getLiteral("label") != null) { 
+			instrument.setLabel(soln.getLiteral("label").getString()); 
+		    } else if (soln.getLiteral("comment") != null) { 
+			instrument.setComment(soln.getLiteral("comment").getString()); 
+		    } 
 		}
 		
 		return instrument;
 	}
 
-	@Override
+    @Override
     public int compareTo(Instrument another) {
         return this.getLabel().compareTo(another.getLabel());
     }

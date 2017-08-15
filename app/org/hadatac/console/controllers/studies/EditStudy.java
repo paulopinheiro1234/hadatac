@@ -44,10 +44,10 @@ import org.hadatac.console.controllers.AuthApplication;
 public class EditStudy extends Controller {
 	
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    public static Result index(String std_uri) {
+	public static Result index(String filename, String da_uri, String std_uri) {
     	if (session().get("LabKeyUserName") == null && session().get("LabKeyPassword") == null) {
     		return redirect(org.hadatac.console.controllers.triplestore.routes.LoadKB.logInLabkey(
-    				routes.EditStudy.index(std_uri).url()));
+				routes.EditStudy.index(filename, da_uri, std_uri).url()));
     	}
     	
     	Study std = null;
@@ -75,12 +75,12 @@ public class EditStudy extends Controller {
             return badRequest("No URI is provided to retrieve Study");
     	}
 
-	return ok(editStudy.render(std, stdType, organizations, persons));
+	return ok(editStudy.render(filename, da_uri, std, stdType, organizations, persons));
     }
     
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    public static Result postIndex(String std_uri) {
-    	return index(std_uri);
+    public static Result postIndex(String filename, String da_uri, String std_uri) {
+    	return index(filename, da_uri, std_uri);
     }
     
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))

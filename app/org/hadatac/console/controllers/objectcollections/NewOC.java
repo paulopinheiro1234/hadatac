@@ -38,10 +38,10 @@ import be.objectify.deadbolt.java.actions.Restrict;
 public class NewOC extends Controller {
     
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    public static Result index(String std_uri) {
+    public static Result index(String filename, String da_uri, String std_uri) {
     	if (session().get("LabKeyUserName") == null && session().get("LabKeyPassword") == null) {
 	    return redirect(org.hadatac.console.controllers.triplestore.routes.LoadKB.logInLabkey(
-			    org.hadatac.console.controllers.objectcollections.routes.NewOC.index(std_uri).url()));
+			    org.hadatac.console.controllers.objectcollections.routes.NewOC.index(filename, da_uri, std_uri).url()));
     	}
 	Study study = Study.find(std_uri);
 	List<ObjectCollectionType> typeList = ObjectCollectionType.find();
@@ -60,16 +60,16 @@ public class NewOC extends Controller {
 	    }
 	}
 
-    	return ok(newObjectCollection.render(study, domainList, locationList, timeList, typeList));
+    	return ok(newObjectCollection.render(filename, da_uri, study, domainList, locationList, timeList, typeList));
     }
     
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    public static Result postIndex(String std_uri) {
-    	return index(std_uri);
+    public static Result postIndex(String filename, String da_uri, String std_uri) {
+    	return index(filename, da_uri, std_uri);
     }
     
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    public static Result processForm(String std_uri) {
+    public static Result processForm(String filename, String da_uri, String std_uri) {
     	final SysUser sysUser = AuthApplication.getLocalUser(session());
 	
 	Study std = Study.find(std_uri);
@@ -122,7 +122,7 @@ public class NewOC extends Controller {
 	if (nRowsAffected <= 0) {
 	    return badRequest("Failed to insert new OC to LabKey!\n");
 	}
-	return ok(objectCollectionConfirm.render("New Object Collection has been Generated", std_uri, oc));
+	return ok(objectCollectionConfirm.render("New Object Collection has been Generated", filename, da_uri, std_uri, oc));
     }
 
 }

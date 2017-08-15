@@ -1,4 +1,6 @@
 @(message   : String, 
+  filename  : String,
+  da_uri    : String,
   study_uri : String, 
   oc        : org.hadatac.entity.pojo.ObjectCollection)
 
@@ -17,7 +19,7 @@
         } else  {
             <ul>
               <li><b>URI:</b> @ValueCellProcessing.replaceNameSpaceEx(oc.getUri())</li>
-              <li><b>Type:</b> @ValueCellProcessing.replaceNameSpaceEx(oc.getType())</li>
+              <li><b>Type:</b> @ValueCellProcessing.replaceNameSpaceEx(oc.getTypeUri())</li>
               <li><b>Short Name:</b> @oc.getLabel()</li>
               <li><b>Deocription:</b> @oc.getComment()</li>
               <li><b>Study URI:</b> @if(oc.getStudy() != null) { @oc.getStudy().getLabel() }</li>
@@ -42,7 +44,7 @@
 	      </li>
            </ul>
         }
-        <a href="@org.hadatac.console.controllers.objectcollections.routes.OCManagement.index(study_uri)" 
+        <a href="@org.hadatac.console.controllers.objectcollections.routes.OCManagement.index(filename, da_uri, study_uri)" 
            class="btn btn-primary" role="button">Back to Object Collection Management</a>
     </div>
 }

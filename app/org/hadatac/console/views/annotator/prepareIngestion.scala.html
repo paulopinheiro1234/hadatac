@@ -63,7 +63,7 @@
 		  <input type="submit" class="btn btn-success btn-sm" role="button" id="completeDA" value="Confirm Complete" 
 			 @if(da.getStudyUri() == null || da.getStudyUri().equals("") || 
 			    da.getDeploymentUri() == null || da.getDeploymentUri().equals("") ||
-			    da.getScopeUri() == null || da.getScopeUri().equals("") ||
+			    !da.hasScope() ||
 			    da.getSchemaUri() == null || da.getSchemaUri().equals("")) {
 			    disabled
 			 }>
@@ -94,9 +94,13 @@
 	       <center>
          } else {
 	       <center>
-	           <b>Associated study : </b>@ValueCellProcessing.replaceNameSpaceEx(da.getStudyUri())
+	           <b>Associated study</b>: @da.getStudy().getLabel() [@ValueCellProcessing.replaceNameSpaceEx(da.getStudyUri())]
+                   <br>
 	           <input type="submit" class="btn btn-default btn-sm" role="button" id="viewSTD" value="View">
-	           <input type="submit" class="btn btn-default btn-sm" role="button" id="editSTD" value="Edit">
+
+	           <input type="submit" class="btn btn-default btn-sm" role="button" id="editSTD" value="Edit"
+			  formaction="@org.hadatac.console.controllers.studies.routes.EditStudy.index(filename,da.getUri(),da.getStudyUri())">
+
 	           <input type="submit" class="btn btn-default btn-sm" role="button" id="removeSTD" value="Remove Association"
 		  	  formaction="@org.hadatac.console.controllers.annotator.routes.PrepareIngestion.removeAssociation(filename, da.getUri(), "Study")">
                    </input> 
@@ -117,25 +121,24 @@
 
       <center><div id="rcorners"  style="background-color: #B9E1EB" class="paddin0 margin0" >
 
-        @if(da.getScopeUri() == null || da.getScopeUri().equals("")) {
-
+        @if(!da.hasScope()) {
 	  
 	  @if(da.getStudyUri() == null || da.getStudyUri().equals("")) {
-	        <center>(options below are enabled after a study is selected)</center>
+	      <center>(options below are enabled after a study is selected)</center>
           }
 
 	  <input type="submit" class="btn btn-primary btn-sm disabled" role="button" id="selectScope" value="Select Study Object (or Object Collection) As Scope"
 		 formaction="@org.hadatac.console.controllers.annotator.routes.PrepareIngestion.selectScope(filename, da.getUri(),da.getStudyUri())">
           </input>
 
-	  <b>OR</b>
+	  <b>AND</b>
 
 	  <input type="submit" class="btn btn-primary btn-sm disabled" role="button"  id="createScope"
-		 formaction="@org.hadatac.console.controllers.schema.routes.NewDAS.index()" 
+		 formaction="@org.hadatac.console.controllers.objectcollections.routes.OCManagement.index(filename, da.getUri(), da.getStudyUri())" 
 		 value="Create Study Objects From Scratch">
           </input>
 
-	  <b>OR</b>
+	  <b>AND</b>
 
 	  <input type="submit" class="btn btn-primary btn-sm disabled" role="button"  id="createScopeFromFile"
 		 formaction="@org.hadatac.console.controllers.schema.routes.NewDAS.index()" 
@@ -147,12 +150,25 @@
 
        } else {
 
-	       <center><b>Associated scope : </b>@ValueCellProcessing.replaceNameSpaceEx(da.getSchemaUri())
-	       <input type="submit" class="btn btn-default btn-sm" role="button" id="viewDAS" value="View">
-	       <input type="submit" class="btn btn-default btn-sm" role="button" id="editDAS" value="Edit">
-	       <input type="submit" class="btn btn-default btn-sm" role="button" id="removeDAS" value="Remove Association"
-		      formaction="@org.hadatac.console.controllers.annotator.routes.PrepareIngestion.removeAssociation(filename, da.getUri(), "Schema")">
-	       <input type="submit" class="btn btn-default btn-sm" role="button" id="testDAS" value="Test Schema"></input>
+	       <center><b>Associated scope</b> : Global : 
+               @if(da.getGlobalScopeUri() == null || da.getGlobalScopeUri().equals("")) { 
+                   none
+               } else {
+	           @da.getGlobalScopeName() [@ValueCellProcessing.replaceNameSpaceEx(da.getGlobalScopeUri())]
+               } 
+                <br> Local:  
+               @if(da.getLocalScopeUri() == null || da.getLocalScopeUri().size() <= 0) { 
+                   none
+               } else { 
+	           number of mappings: @da.getLocalScopeUri().size()
+               } 
+               <br>
+	       <input type="submit" class="btn btn-default btn-sm" role="button" id="view" value="View"
+		      formmethod="post" formaction="@org.hadatac.console.controllers.dataacquisitionmanagement.routes.DataAcquisitionScope.view(filename, da.getUri())">
+	       <input type="submit" class="btn btn-default btn-sm" role="button" id="edit" value="Edit"
+		      formmethod="post" formaction="@org.hadatac.console.controllers.dataacquisitionmanagement.routes.DataAcquisitionScope.view(filename, da.getUri())">
+	       <input type="submit" class="btn btn-default btn-sm" role="button" id="removeScope" value="Remove Association"
+		      formaction="@org.hadatac.console.controllers.annotator.routes.PrepareIngestion.removeAssociation(filename, da.getUri(), "Scope")">
 
        }
       </div></center>
@@ -178,13 +194,17 @@
 	        <b>OR</b>
      
 	        <input type="submit" class="btn btn-primary btn-sm" role="button" id="createDPL" value="Create Deployment"
-		       formaction="@org.hadatac.console.controllers.deployments.routes.NewDeployment.index("legacy")">
+		       formaction="@org.hadatac.console.controllers.deployments.routes.NewDeployment.index("legacy", filename, da.getUri())">
                 </input>
 	    </center>
 
 	  } else {
       
-	       <center><b>Associated deployment : </b>@ValueCellProcessing.replaceNameSpaceEx(da.getDeploymentUri())
+	       @defining(da.getDeployment()) { dep => 
+	           <center><b>Associated deployment : </b> @ValueCellProcessing.replaceNameSpaceEx(dep.getUri()) <br> 
+                   Platform: @dep.getPlatform().getLabel()<br>
+                   Instrument: @dep.getInstrument().getLabel()<br>
+               }
 	       <input type="submit" class="btn btn-default btn-sm" role="button" id="viewDPL" value="View">
 	       <input type="submit" class="btn btn-default btn-sm" role="button" id="editDPL" value="Edit">
 	       <input type="submit" class="btn btn-default btn-sm" role="button" id="removeDPL" value="Remove Association"

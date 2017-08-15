@@ -58,7 +58,7 @@ public class StudyObject extends HADatAcThing {
 
     public StudyObject(String uri, String isMemberOf) {
 	this.setUri(uri);
-	this.setType("");
+	this.setTypeUri("");
 	this.setOriginalId("");
 	this.setLabel("");
 	this.setIsMemberOf(isMemberOf);
@@ -67,14 +67,14 @@ public class StudyObject extends HADatAcThing {
     }
 
     public StudyObject(String uri,
-		       String type,
+		       String typeUri,
 		       String originalId,
 		       String label,
 		       String isMemberOf,
 		       String comment,
 		       List<String> scopeUris) { 
 	this.setUri(uri);
-        this.setType(type);
+        this.setTypeUri(typeUri);
 	this.setOriginalId(originalId);
 	this.setLabel(label);
 	this.setIsMemberOf(isMemberOf);
@@ -83,24 +83,24 @@ public class StudyObject extends HADatAcThing {
     }
     
     public StudyObjectType getStudyObjectType() {
-	if (type == null || type.equals("")) {
+	if (typeUri == null || typeUri.equals("")) {
 	    return null;
 	}
-	return StudyObjectType.find(type);
+	return StudyObjectType.find(typeUri);
     }
     
     public boolean isLocation() {
-	if (type == null || type.equals("")) {
+	if (typeUri == null || typeUri.equals("")) {
 	    return false;
 	}
-	return (type.equals(LOCATION));
+	return (typeUri.equals(LOCATION));
     }
 
     public boolean isTime() {
-	if (type == null || type.equals("")) {
+	if (typeUri == null || typeUri.equals("")) {
 	    return false;
 	}
-	return (type.equals(TIME));
+	return (typeUri.equals(TIME));
     }
 
     public String getOriginalId() {
@@ -157,6 +157,10 @@ public class StudyObject extends HADatAcThing {
     
     public static StudyObject find(String obj_uri) {
 	StudyObject obj = null;
+	if (obj_uri == null || obj_uri.trim().equals("")) {
+	    return obj;
+	}
+	obj_uri = obj_uri.trim();
 	//System.out.println("Looking for object with URI " + obj_uri);
 	if (obj_uri.startsWith("http")) {
 	    obj_uri = "<" + obj_uri + ">";
@@ -170,6 +174,7 @@ public class StudyObject extends HADatAcThing {
 	    "    OPTIONAL { " + obj_uri + " rdfs:label ?hasLabel } . " + 
 	    "    OPTIONAL { " + obj_uri + " rdfs:comment ?hasComment } . " + 
 	    "}";
+	//System.out.println("Looking for object with URI " + obj_uri + " \nQuery: " + queryString);
 	Query query = QueryFactory.create(queryString);
 	
 	QueryExecution qexec = QueryExecutionFactory.sparqlService(Collections.getCollectionsName(Collections.METADATA_SPARQL), query);
@@ -312,10 +317,10 @@ public class StudyObject extends HADatAcThing {
 	    
 	insert += NameSpaces.getInstance().printSparqlNameSpaceList();
     	insert += INSERT_LINE1;
-	if (type.startsWith("http")) {
-	    insert += obj_uri + " a <" + type + "> . ";
+	if (typeUri.startsWith("http")) {
+	    insert += obj_uri + " a <" + typeUri + "> . ";
 	} else {
-	    insert += obj_uri + " a " + type + " . ";
+	    insert += obj_uri + " a " + typeUri + " . ";
 	}
 	if (!originalId.equals("")) {
 	    insert += obj_uri + " hasco:originalId \""  + originalId + "\" .  ";
@@ -362,7 +367,7 @@ public class StudyObject extends HADatAcThing {
     	List< Map<String, Object> > rows = new ArrayList< Map<String, Object> >();
     	Map<String, Object> row = new HashMap<String, Object>();
     	row.put("hasURI", ValueCellProcessing.replaceNameSpaceEx(getUri()));
-    	row.put("a", ValueCellProcessing.replaceNameSpaceEx(getType()));
+    	row.put("a", ValueCellProcessing.replaceNameSpaceEx(getTypeUri()));
     	row.put("hasco:originalID", getOriginalId());
     	row.put("rdfs:label", getLabel());
     	row.put("hasco:isMemberOf", ValueCellProcessing.replaceNameSpaceEx(getIsMemberOf()));

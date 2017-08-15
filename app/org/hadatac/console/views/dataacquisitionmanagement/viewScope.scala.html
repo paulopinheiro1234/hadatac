@@ -1,0 +1,75 @@
+@(file_name      : String,
+  da_uri         : String,
+  globalScope    : String,
+  globalScopeUri : String,
+  localScope     : List[String],
+  localScopeUri  : List[String])
+
+@import helper._
+@import java.net.URLDecoder
+@import org.hadatac.utils._
+@import org.hadatac.console.views.html._
+@import org.hadatac.console.views.html.triplestore._
+@import org.hadatac.console.controllers.triplestore._
+@import org.hadatac.console.controllers._
+@import org.hadatac.metadata.loader.ValueCellProcessing;
+
+@main("View Scope of " + da_uri) {
+
+  <div class="container-fluid">
+    <div class="row">
+      <div class="col-md-1 col-xs-0"></div>
+      <div class="col-md-10 col-xs-8">
+        <h2>View Data Acquisition's Scope</h2> 
+
+        <h3>Selected Data Acquisition</h3> 
+           <ul>
+              <li>@ValueCellProcessing.replaceNameSpaceEx(da_uri)</li>
+           </ul>
+    
+        <h4>Global Scope</h4> 
+	   @if(globalScope == null || globalScope.equals("") || globalScopeUri == null || globalScopeUri.equals("")) {
+               <ul>
+                  <li><b>NO DEFINED GLOBAL SCOPE OBJECT</b></li>
+               </ul>
+	   } else {
+               <ul>
+                  <li><b>Name of object scope:</b> @globalScope</li>
+                  <li><b>Uri of object scope:</b> @ValueCellProcessing.replaceNameSpaceEx(globalScopeUri)</li>
+               </ul>
+	   }    
+        
+        <h4>Local Scope</h4> 
+           @if(localScope == null || localScopeUri == null || localScope.size() <= 0 || localScopeUri.size() <= 0) {
+               <ul>
+                  <li><b>NO DEFINED LOCAL SCOPE OBJECTS</b></li>
+               </ul>
+           } else {
+            <table class="table">
+                Local scope is positional.
+                <thead>
+                    <tr>
+                       <th>Position</th>
+                       <th>Name</th>
+                       <th>URI</th>
+                    </tr>
+                </thead>
+                <tbody>
+		    @for(index <- 0 until localScopeUri.size) {
+		        <tr>
+	                   <td>@index</td>
+         	           <td>@if(localScope != null && localScope(index) != null) { @localScope(index) }</td>
+	                   <td>@if(localScopeUri != null && localScopeUri(index) != null) { @ValueCellProcessing.replaceNameSpaceEx(localScopeUri(index)) }</td> 
+           	        </tr>
+                    }
+                </tbody>
+            </table>
+           }
+    	    <a href="@org.hadatac.console.controllers.annotator.routes.PrepareIngestion.create(file_name,da_uri)" 
+	       class="btn btn-primary" role="button">Back to Prepare Ingestion</a>
+      </div>
+    </div>
+  </div>
+  
+}
+  

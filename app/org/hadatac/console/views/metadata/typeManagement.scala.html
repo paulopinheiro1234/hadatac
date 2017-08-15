@@ -1,0 +1,151 @@
+@(conceptName        : String,
+  conceptHierarchy   : org.hadatac.console.models.OtMSparqlQueryResults)
+
+@import org.hadatac.console.views.html._
+@import org.hadatac.utils._
+@import org.hadatac.metadata.loader.ValueCellProcessing
+
+@main("Manage @conceptName Types") {
+
+<style>
+
+     .node rect {
+         cursor: pointer;
+         fill: #fff;
+         fill-opacity: .5;
+         stroke: #3182bd;
+         stroke-width: 1.5px;
+      }
+
+      .node text {
+         font: 10px sans-serif;
+          pointer-events: none;
+      }
+
+      path.link {
+          fill: none;
+          stroke: #9ecae1;
+          stroke-width: 1.5px;
+      }
+
+      .tab-content {
+         border-left: 1px solid #ddd;
+         border-right: 1px solid #ddd;
+         padding: 10px;
+      }
+
+</style>
+
+<script type="text/javascript">
+  function checkform() {
+
+      alert(lasClikedD)
+      var cansubmit = true;
+  
+      if (lastClickD == null) {
+          cansubmit = false;
+      }
+  
+      if (cansubmit) {
+          document.getElementById('copyvalue').disabled = false;
+      } else {
+          document.getElementById('copyvalue').disabled = 'disabled';
+      }
+
+  }
+
+</script>
+
+
+   <div class="container-fluid">
+
+      <h2>Manage @conceptName Types</h2>
+    
+      <div class="col-md-5 col-xs-4">
+
+	 <form class="form-horizontal" name="editForm" method="post" action="@org.hadatac.console.controllers.metadata.empirical.routes.PlatformTypeManagement.processForm()">
+       
+           <label>Operations</label><br>
+           <div class="form-group">
+	     <button type="button" class="btn btn-info btn-sm" role="button" type="expand"       id="expand">      <span class="glyphicon glyphicon-zoom-in">  </span> Expand All</button>
+	     <button type="button" class="btn btn-info btn-sm" role="button" type="collapse"     id="collapse">    <span class="glyphicon glyphicon-zoom-out"> </span> Collapse All</button>
+	     <button type="button" class="btn btn-info btn-sm" role="button" type="reset"        id="reset">       <span class="glyphicon glyphicon-refresh">  </span> Reset</button>
+	     <div>
+	       <button type="button" class="btn btn-info btn-sm" role="button" type="findTerm"     id="findTerm">    <span class="glyphicon glyphicon-search">   </span> Find Term</button>
+	       <input type="text"  id="searchValue" name="searchValue" value="">
+	     </div>
+           </div>
+
+           <div class="form-group">
+             <label>URI</label>
+	     <input type="text" class="form-control col-sm-6" id="newUri" name="newUri" readonly>
+           </div>
+           
+           <div class="form-group">
+             <label>SuperClass</label>
+	     <input type="text" class="form-control col-sm-6" id="newSuperClass" name="newSuperClass">
+           </div>
+           
+           <div class="form-group">
+             <label>Label</label>
+	     <input type="text" class="form-control col-sm-6" id="newLabel" name="newLabel">
+           </div>
+           
+          <div class="form-group">
+             <label>Description</label>
+	     <input type="text" class="form-control col-sm-6" id="newDescription" name="newLabel">
+           </div>
+           
+	   <div class="form-group">
+             <label>Updates</label> <br>
+	     <input class="btn btn-info btn-sm" role="button" type="copyvalue" id="copyvalue" value="Copy as Class" />
+	     <input class="btn btn-info btn-sm" role="button" type="submit" id="submit" value="Copy as Super Class" /> <br>
+	     <input class="btn btn-success btn-sm" role="button" type="submit" id="submit" value="Include" />
+	     <input class="btn btn-success btn-sm" role="button" type="submit" id="submit" value="Delete" /> <br><br>
+	     <a href="@org.hadatac.console.controllers.metadata.empirical.routes.PlatformManagement.index()" class="btn btn-primary btn-sm" role="button">Back to Platform Management</a>
+	   </div>
+
+         </form>
+      </div>
+      <div class="col-md-7 col-xs-4">
+
+            <ul class="nav nav-tabs">
+                <li class="active"><a class="conceptformtab" href="#concept_tab" data-toggle="tab">@conceptName Type Hierachy</a></li>
+            </ul>
+            <div class="tab-content">
+                <treecontent></treecontent>
+                <div class="tab-pane" id="concept_tab">
+		    <div id="conceptquery" data-results="@conceptHierarchy.treeResults"></div>
+                </div>
+            </div>
+
+            <script src="/hadatac/assets/javascripts/jquery.min.js"></script>
+            <script src="/hadatac/assets/javascripts/d3.v3.min.js"></script>
+            <script src="/hadatac/assets/javascripts/bootstrap.min.js"></script>
+            <script src="/hadatac/assets/javascripts/treeConcept.js"></script>
+
+            <script>
+	      function replaceAll(str, find, replace) {
+	         while (str.indexOf(find) > -1) {
+		    str = str.replace(find, replace);
+		 }
+		 return str;
+	      }
+	      
+	      function labelchange() {
+	         var newValue = document.getElementById("newLabel").value;
+	         var newUri = newValue;
+	         newUri = replaceAll(newUri," ","-");
+	         newUri = replaceAll(newUri,"<","");
+		 newUri = replaceAll(newUri,">","");
+		 newUri = replaceAll(newUri,"?","");
+	         $('#newUri').val(newUri);
+	      };
+           </script>
+
+      </div>
+
+   </div>
+	 
+}
+   

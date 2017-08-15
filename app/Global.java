@@ -74,44 +74,35 @@ public class Global extends GlobalSettings {
 				return super.onException(e);
 			}
 		});
-		
-		// check if CURL is properly installed
-		// TODO: implement this code
-		
-		// check if SOLR instances are up. If not, start them up
-		solrFirstVerification();
-		
-		// check if SOLR instances are still down, If so, show an error message
-		// TODO: implement this code
 
-                // check existence/availability of security role
+		// check existence/availability of security role
 		initialData();
 		initDirectoryStructure();
-		
+
 		// check if default user still have default password. If so, ask to change.
 		// TODO: implement this code
-		
-	        // check if there is at least one user is pre-registered. If not, ask to pre-register at least the main user
+
+		// check if there is at least one user is pre-registered. If not, ask to pre-register at least the main user
 		// TODO: implement this code
-		
+
 		// (NOT SURE THIS FUNCTION SHOULD BE CALLED ON ONSTART) check if ontologies are loaded. If not ask to upload them  
 		// TODO: implement this code
 
 		// (NOT SURE THIS FUNCTION SHOULD BE CALLED ON ONSTART) check if instances are loaded. 
-                //       If not, show how to upload some default instances  
+		//       If not, show how to upload some default instances  
 		// TODO: implement this code
-		
-		// Create thread for auto ccsv annotation
+
+		// Create thread for auto csv annotation
 		FiniteDuration delay = FiniteDuration.create(0, TimeUnit.SECONDS);
 		FiniteDuration frequency = FiniteDuration.create(15, TimeUnit.SECONDS);
 
 		Runnable annotation = new Runnable() {
-		   @Override
-		   public void run() {
-			   AutoAnnotator.autoAnnotate();
-		   }
+			@Override
+			public void run() {
+				AutoAnnotator.autoAnnotate();
+			}
 		};
-		
+
 		Akka.system().scheduler().schedule(delay, frequency, annotation, Akka.system().dispatcher());
 	}
 
@@ -125,14 +116,14 @@ public class Global extends GlobalSettings {
 					"fdeff289-daee-4ecc-8c9c-3ef111cf7a06");			
 		}
 	}
-	
+
 	private void addSecurityRole(String roleName, String id) {
 		final SecurityRole role = new SecurityRole();
 		role.roleName = roleName;
 		role.id_s = id;
 		role.save();
 	}
-	
+
 	private void initDirectoryStructure(){
 		List<String> listFolderPaths = new LinkedList<String>();
 		listFolderPaths.add("tmp");
@@ -142,32 +133,20 @@ public class Global extends GlobalSettings {
 		listFolderPaths.add("tmp/ttl");
 		listFolderPaths.add("tmp/cache");
 		listFolderPaths.add("tmp/uploads");
-    	
+
 		for(String path : listFolderPaths){
 			File folder = new File(path);
 			// if the directory does not exist, create it
-	    	if (!folder.exists()) {
-	    	    System.out.println("creating directory: " + path);
-	    	    try{
-	    	    	folder.mkdir();
-	    	    } 
-	    	    catch(SecurityException se){
-	    	    	System.out.println("Failed to create directory.");
-	    	    }
-	    	    System.out.println("DIR created");
-	    	}
-		}
-	}
-
-	private void solrFirstVerification() {
-		if (!Repository.operational(Repository.DATA)) {
-			System.out.println("Repository " + Repository.DATA + " was identified as being down");
-			Repository.startStopMetadataRepository(Repository.START, Repository.DATA);			
-			System.out.println("A startup command has been issue to epository " + Repository.DATA + ".");
-		}
-		if (!Repository.operational(Repository.METADATA)) {
-			System.out.println("Repository " + Repository.METADATA + " was identified as being down");
-			System.out.println("A startup command has been issue to epository " + Repository.METADATA + ".");
+			if (!folder.exists()) {
+				System.out.println("creating directory: " + path);
+				try{
+					folder.mkdir();
+				} 
+				catch(SecurityException se){
+					System.out.println("Failed to create directory.");
+				}
+				System.out.println("DIR created");
+			}
 		}
 	}
 }
