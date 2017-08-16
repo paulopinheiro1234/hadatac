@@ -11,7 +11,7 @@ import org.hadatac.utils.ConfigProp;
 import org.hadatac.console.views.html.annotator.*;
 import org.hadatac.console.views.html.fileviewer.*;
 import org.hadatac.console.views.html.*;
-//import org.hadatac.data.loader.util.FileFactory;
+import org.hadatac.console.controllers.AuthApplication;
 
 import java.io.File;
 import java.io.IOException;
@@ -50,116 +50,102 @@ import be.objectify.deadbolt.java.actions.Restrict;
 */
 
 public class CSVPreview extends Controller{
-//	private FileFactory files;
-	private static int defPreviewRows = 10;
-	private static String path_proc = ConfigProp.getPropertyValue("autoccsv.config", "path_proc");
-	private static String path_unproc = ConfigProp.getPropertyValue("autoccsv.config", "path_unproc");
 
-	public static ArrayList<String> getCSVHeaders(DataFile df){
-		String filename = path_proc + df.getFileName();
-		//System.out.println("filename: " + filename);
-		File toPreview = new File(filename);
-		ArrayList<String> headerList = null;
-		try{
-			CSVParser parser = CSVParser.parse(toPreview, StandardCharsets.UTF_8, CSVFormat.RFC4180.withHeader());
-			Map<String,Integer> headerMap = parser.getHeaderMap();
-			int mapSize = headerMap.size();
-			Iterator it = headerMap.entrySet().iterator();
-			headerList = new ArrayList<String>(mapSize);
-			while(it.hasNext()){
-				Map.Entry pair = (Map.Entry)it.next();
-				headerList.add((int)pair.getValue(), (String)pair.getKey());
-				it.remove();
-			}
-			parser.close();
-		} catch(IOException e) {
-			e.printStackTrace();
+    //	private FileFactory files;
+    private static int defPreviewRows = 10;
+    private static String path_proc = ConfigProp.getPropertyValue("autoccsv.config", "path_proc");
+    private static String path_unproc = ConfigProp.getPropertyValue("autoccsv.config", "path_unproc");
+    
+    public static ArrayList<String> getCSVHeaders(String folder, String fileName){
+	//System.out.println("filename: " + filename);
+	File toPreview = null;
+	if (folder.equals("proc")) {
+	    toPreview = new File(path_proc + fileName);
+	} else {
+	    toPreview = new File(path_unproc + fileName);
+	}
+	ArrayList<String> headerList = null;
+	try{
+	    CSVParser parser = CSVParser.parse(toPreview, StandardCharsets.UTF_8, CSVFormat.RFC4180.withHeader());
+	    Map<String,Integer> headerMap = parser.getHeaderMap();
+	    int mapSize = headerMap.size();
+	    Iterator it = headerMap.entrySet().iterator();
+	    headerList = new ArrayList<String>(mapSize);
+	    while(it.hasNext()){
+		Map.Entry pair = (Map.Entry)it.next();
+		headerList.add((int)pair.getValue(), (String)pair.getKey());
+		it.remove();
+	    }
+	    parser.close();
+	} catch(IOException e) {
+	    e.printStackTrace();
+	}
+	return headerList;
+    }// /getCSVHeaders
+    
+    public static ArrayList<ArrayList<String>> getCSVPreview(String folder, String fileName, int numRows){
+	ArrayList<ArrayList<String>> previewList = null;
+	File toPreview = null;
+	if (folder.equals("proc")) {
+	    toPreview = new File(path_proc + fileName);
+	} else {
+	    toPreview = new File(path_unproc + fileName);
+	}
+	System.out.println("fileName: " + fileName);
+	try{
+	    CSVParser parser = CSVParser.parse(toPreview, StandardCharsets.UTF_8, CSVFormat.RFC4180.withHeader());
+	    int rowCount = 0;
+	    int recordSize;
+	    Iterator it = parser.iterator();
+	    CSVRecord currentRow;
+	    previewList = new ArrayList<ArrayList<String>>();
+	    while(rowCount < numRows && it.hasNext()){
+		rowCount++;
+		ArrayList<String> row = new ArrayList<String>();
+		currentRow = (CSVRecord)it.next();
+		int numCols = currentRow.size();
+		for(int i=0; i<numCols; i++){
+		    row.add(currentRow.get(i));
 		}
-		return headerList;
-	}// /getCSVHeaders
-
-	public static ArrayList<ArrayList<String>> getCSVPreview(DataFile df, int numRows){
-		/* TODO: implement this using the FileFactory
-		Arguments arguments = new Arguments();
-		arguments.setInputPath(UPLOAD_NAME);
-		arguments.setInputType("CSV");
-		arguments.setOutputPath("upload/");
-		arguments.setVerbose(true);
-		arguments.setPv(false);)
-		files = new FileFactory(arguments);
-		*/
-
-		ArrayList<ArrayList<String>> previewList = null;
-
-		String filename = path_proc + df.getFileName();
-		File toPreview = new File(filename);
-		//System.out.println("filename: " + filename);
-		try{
-			CSVParser parser = CSVParser.parse(toPreview, StandardCharsets.UTF_8, CSVFormat.RFC4180.withHeader());
-			int rowCount = 0;
-			int recordSize;
-			Iterator it = parser.iterator();
-			CSVRecord currentRow;
-			previewList = new ArrayList<ArrayList<String>>();
-			while(rowCount < numRows && it.hasNext()){
-				rowCount++;
-				ArrayList<String> row = new ArrayList<String>();
-				currentRow = (CSVRecord)it.next();
-				int numCols = currentRow.size();
-				for(int i=0; i<numCols; i++){
-					row.add(currentRow.get(i));
-				}
-				previewList.add(row);
-			}
-			parser.close();
-		} catch(IOException e) {
-			e.printStackTrace();
-		}
-		return previewList;
-	}// /getCSVPreview
-
-	public static Result getCSVPreview(String ownerEmail, String fileName, int numRows){
-		DataFile df = DataFile.findByName(ownerEmail, fileName);
-		//System.out.println("Headers: \n" + getCSVHeaders(df));
-		//System.out.println("Sample: \n" + getCSVPreview(df, numRows));
-		return ok(csv_preview.render(ownerEmail, fileName, getCSVHeaders(df), getCSVPreview(df, numRows)));
-	}// /getCSVPreview
-
-	public static ArrayList<String> getColumn(String ownerEmail, String fileName, int selectedCol){
-		//DataFile df = DataFile.findByName(ownerEmail, fileName);
-		String filename = path_proc + fileName;
-		File toPreview = new File(filename);
-		ArrayList<String> theColumn = new ArrayList<String>();
-		try{
-			CSVParser parser = CSVParser.parse(toPreview, StandardCharsets.UTF_8, CSVFormat.RFC4180.withHeader());
-			Iterator it = parser.iterator();
-			CSVRecord currentRow;
-			String temp = "";
-			while(it.hasNext()){
-				currentRow = (CSVRecord)it.next();
-				temp = currentRow.get(selectedCol);
-				theColumn.add(temp);
-			}
-			int count = theColumn.size();
-			System.out.println("Added " + count + " rows to column list");
-			parser.close();
-		} catch(IOException e) {
-			e.printStackTrace();
-		}
-		System.out.println(theColumn);
-		return theColumn;
-	}// /getColumn
-
-	/*public static Result selectColumn(String ownerEmail, String fileName, int selectedCol){
-		DataFile df = DataFile.findByName(ownerEmail, fileName);
-		if (selectedCol < 0){
-			return badRequest(csv_preview.render(ownerEmail, fileName, getCSVHeaders(df), getCSVPreview(df, 10)));
-		}
-		else{
-			ArrayList<String> theColumn = getColumn(ownerEmail, fileName, selectedCol);
-			return redirect(routes.CSVPreview.getCSVPreview(ownerEmail, fileName, 10));
-		}
-	}// /selectColumn
-	*/
+		previewList.add(row);
+	    }
+	    parser.close();
+	} catch(IOException e) {
+	    e.printStackTrace();
+	}
+	return previewList;
+    }// /getCSVPreview
+    
+    public static Result getCSVPreview(String folder, String fileName, String da_uri, int numRows){
+	if (da_uri != null && !da_uri.equals("")) {
+	    return ok(csv_preview.render("selectCol", fileName, da_uri, getCSVHeaders(folder, fileName), getCSVPreview(folder, fileName, numRows)));
+	}
+	return ok(csv_preview.render("preview", fileName, da_uri, getCSVHeaders(folder, fileName), getCSVPreview(folder, fileName, numRows)));
+    }// /getCSVPreview
+    
+    public static ArrayList<String> getColumn(String ownerEmail, String fileName, int selectedCol){
+	String filename = path_proc + fileName;
+	File toPreview = new File(filename);
+	ArrayList<String> theColumn = new ArrayList<String>();
+	try{
+	    CSVParser parser = CSVParser.parse(toPreview, StandardCharsets.UTF_8, CSVFormat.RFC4180.withHeader());
+	    Iterator it = parser.iterator();
+	    CSVRecord currentRow;
+	    String temp = "";
+	    while(it.hasNext()){
+		currentRow = (CSVRecord)it.next();
+		temp = currentRow.get(selectedCol);
+		theColumn.add(temp);
+	    }
+	    int count = theColumn.size();
+	    System.out.println("Added " + count + " rows to column list");
+	    parser.close();
+	} catch(IOException e) {
+	    e.printStackTrace();
+	}
+	System.out.println(theColumn);
+	return theColumn;
+    }// /getColumn
+    
 }
 

@@ -11,6 +11,7 @@ public class StudyForm {
     public String newTitle;
     public String newProject;
     public String newComment;
+    public String newExternalSource;
     public String newInstitution;
     public String newAgent;
     public String newStartDateTime;
@@ -65,6 +66,14 @@ public class StudyForm {
     
     public void setNewComment(String comment) {
 	this.newComment = comment;
+    }
+    
+    public String getNewExternalSource() {
+	return newExternalSource;
+    }
+    
+    public void setNewExternalSource(String externalSource) {
+	this.newExternalSource = externalSource;
     }
     
     public String getNewInstitution() {

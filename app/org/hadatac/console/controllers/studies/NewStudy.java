@@ -109,6 +109,7 @@ public class NewStudy extends Controller {
 	String newTitle = data.getNewTitle();
 	String newProject = data.getNewProject();
 	String newComment = data.getNewComment();
+	String newExternalSource = data.getNewExternalSource();
 	String newInstitution = data.getNewInstitution();
 	String newAgent = data.getNewAgent();
 	String newStartDateTime = data.getNewStartDateTime();
@@ -121,6 +122,7 @@ public class NewStudy extends Controller {
 			      newTitle,
 			      newProject,
 			      newComment,
+			      newExternalSource,
 			      newInstitution,
 			      newAgent,
 			      newStartDateTime,

@@ -33,7 +33,7 @@
   <div class="container col-md-9">
     <h3>Prepare Data Ingestion</h3>
 
- @if(da.isComplete()) {
+ @if(da != null && da.isComplete()) {
     <div id="rcorners" class="paddin0 margin0" style="background-color: #DCF7FE">
       <center>
 	<b>Data Acquisition is Complete : </b>@ValueCellProcessing.replaceNameSpaceEx(da.getUri()) 
@@ -162,10 +162,9 @@
 	  <b>AND</b>
 
 	  <input type="submit" class="btn btn-primary btn-sm disabled" role="button"  id="createScopeFromFile"
-		 formaction="@org.hadatac.console.controllers.schema.routes.NewDAS.index()" 
+		 formaction="@org.hadatac.console.controllers.fileviewer.routes.CSVPreview.getCSVPreview("unproc", filename, da.getUri(), 10)" 
 		 value="Create Study Objects From Data File">
           </input>
-
 
           <br>
 

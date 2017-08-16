@@ -320,10 +320,10 @@ POST	/hadatac/annotator/file/acquisition            org.hadatac.console.controll
 POST	/hadatac/annotator/file/acquisition/form       org.hadatac.console.controllers.annotator.AutoAnnotator.processDataAcquisitionForm(dataAcquisitionUri: String, file : String)
 
 # file preview
-GET	/hadatac/annotator/csvpreview     	       org.hadatac.console.controllers.fileviewer.CSVPreview.getCSVPreview(ownerEmail:String, file_name:String, numRows:Int)
-POST	/hadatac/annotator/csvpreview     	       org.hadatac.console.controllers.fileviewer.CSVPreview.getCSVPreview(ownerEmail:String, file_name:String, numRows:Int)
-#GET	/hadatac/annotator/csvpreview/selectCol        org.hadatac.console.controllers.fileviewer.CSVPreview.selectColumn(ownerEmail:String, file_name:String, selectedCol:Int)
-#POST	/hadatac/annotator/csvpreview/selectCol        org.hadatac.console.controllers.fileviewer.CSVPreview.selectColumn(ownerEmail:String, file_name:String, selectedCol:Int)
+GET	/hadatac/annotator/csvpreview     	       org.hadatac.console.controllers.fileviewer.CSVPreview.getCSVPreview(folder : String, file_name : String, da_uri: String, numRows:Int)
+POST	/hadatac/annotator/csvpreview     	       org.hadatac.console.controllers.fileviewer.CSVPreview.getCSVPreview(folder : String, file_name : String, da_uri: String, numRows:Int)
+#GET	/hadatac/annotator/csvpreview/selectCol        org.hadatac.console.controllers.fileviewer.CSVPreview.selectColumn(file_name : String, da_uri: String)
+#POST	/hadatac/annotator/csvpreview/selectCol        org.hadatac.console.controllers.fileviewer.CSVPreview.selectColumn(file_name : String, da_uri: String)
 
 GET	/hadatac/annotator/schema                      org.hadatac.console.controllers.annotator.SchemaFromFile.create(filename : String)
 POST	/hadatac/annotator/schema                      org.hadatac.console.controllers.annotator.SchemaFromFile.create(filename : String)

@@ -90,6 +90,8 @@ public class Study {
     @Field("studyComment_i")
     private String comment;
 
+    private String externalSource;
+
     @Field("institutionName_i")
     private String institutionUri;
 
@@ -118,6 +120,7 @@ public class Study {
 		 String title,
 		 String project,
 		 String comment,
+		 String externalSource,
 		 String institutionUri,
 		 String agentUri,
 		 String startDateTime,
@@ -128,6 +131,7 @@ public class Study {
 	this.title = title;
 	this.project = project;
 	this.comment = comment;
+	this.externalSource = externalSource;
 	this.institutionUri = institutionUri;
 	this.agentUri = agentUri;
 	this.setStartedAt(startDateTime);
@@ -144,6 +148,7 @@ public class Study {
 	this.title = "";
 	this.project = "";
 	this.comment = "";
+	this.externalSource = "";
 	this.institutionUri = "";
 	this.agentUri = "";
 	this.setStartedAt("");
@@ -167,6 +172,10 @@ public class Study {
     
     public String getComment() {
 	return comment;
+    }
+    
+    public String getExternalSource() {
+	return externalSource;
     }
     
     public String getInstitutionUri() {
@@ -251,6 +260,10 @@ public class Study {
     
     public void setComment(String comment) {
 	this.comment = comment;
+    }
+    
+    public void setExternalSource(String externalSource) {
+	this.externalSource = externalSource;
     }
     
     public void setInstitutionUri(String institutionUri) {
@@ -520,7 +533,7 @@ public class Study {
 	    adjustedUri = "<" + adjustedUri + ">";
 	}
 	String studyQueryString = NameSpaces.getInstance().printSparqlNameSpaceList() +
-	    "SELECT DISTINCT ?studyType ?studyLabel ?title ?proj ?studyComment ?agentUri ?institutionUri ?lastId" + 
+	    "SELECT DISTINCT ?studyType ?studyLabel ?title ?proj ?studyComment ?external ?agentUri ?institutionUri ?lastId" + 
 	    " WHERE {  " + 
 	    "      ?studyType rdfs:subClassOf* hasco:Study . " + 
 	    "      " + adjustedUri + " a ?studyType . " + 
@@ -528,11 +541,12 @@ public class Study {
 	    "	   OPTIONAL { " + adjustedUri + " hasco:hasTitle ?title } . " +
 	    "	   OPTIONAL { " + adjustedUri + " hasco:hasProject ?proj } . " +
 	    "      OPTIONAL { " + adjustedUri + " rdfs:comment ?studyComment } . " + 
+	    "      OPTIONAL { " + adjustedUri + " hasco:hasExternalSource ?external } . " + 
 	    "      OPTIONAL { " + adjustedUri + " hasco:hasAgent ?agentUri } .  " +
 	    "      OPTIONAL { " + adjustedUri + " hasco:hasInstitution ?institutionUri } . " + 
 	    "      OPTIONAL { " + adjustedUri + " hasco:hasLastId ?lastId } . " + 
 	    " } " + 
-            " GROUP BY ?studyType ?studyLabel ?title ?proj ?studyComment ?agentUri ?institutionUri ?lastId ";
+            " GROUP BY ?studyType ?studyLabel ?title ?proj ?studyComment ?external ?agentUri ?institutionUri ?lastId ";
 	
 	try {
 	    //System.out.println("Study's find() query: " + studyQueryString);
@@ -558,6 +572,9 @@ public class Study {
 		}
 		if (soln.contains("studyComment")) {
 		    returnStudy.setComment(soln.get("studyComment").toString());
+		} 
+		if (soln.contains("external")) {
+		    returnStudy.setExternalSource(soln.get("external").toString());
 		} 
 		if (soln.contains("agentUri")) {
 		    returnStudy.setAgentUri(soln.get("agentUri").toString());
@@ -927,6 +944,9 @@ public class Study {
 	if (comment != null && !comment.equals("")) {
 	    insert += std_uri + " rdfs:comment \"" + comment + "\" .  ";
 	}
+	if (externalSource != null && !externalSource.equals("")) {
+	    insert += std_uri + " hasco:hasExternalSource \"" + externalSource + "\" .  ";
+	}
 	if (agentUri != null && !agentUri.equals("")) {
 	    if (agentUri.startsWith("<")) {
 		insert += std_uri + " hasco:hasAgent " + agentUri + " .  ";
@@ -985,6 +1005,7 @@ public class Study {
     	row.put("hasco:hasTitle", getTitle());
     	row.put("hasco:hasProject", ValueCellProcessing.replaceNameSpaceEx(getProject()));
     	row.put("rdfs:comment", getComment());
+    	row.put("hasco:hasExternalSource", getExternalSource());
     	row.put("skos:definition", "");
 	row.put("hasco:hasAgent", ValueCellProcessing.replaceNameSpaceEx(this.getAgentUri()));
 	row.put("hasco:hasLastId", getLastId());
