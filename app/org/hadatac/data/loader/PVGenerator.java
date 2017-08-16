@@ -37,14 +37,15 @@ public class PVGenerator extends BasicGenerator {
 		this.pvMap = AutoAnnotator.codebook;
 		
 	}
-	//Column	Code	Label	Class
+	//Column	Code	Label	Class	Resource
 	@Override
 	void initMapping() {
 		mapCol.clear();
         mapCol.put("Label", "Column");
         mapCol.put("Code", "Code");
-        mapCol.put("CodeValue", "Label");
+        mapCol.put("CodeLabel", "Label");
         mapCol.put("Class", "Class");
+        mapCol.put("Resource", "Resource");
 	}
     
     private String getLabel(CSVRecord rec) {
@@ -55,12 +56,16 @@ public class PVGenerator extends BasicGenerator {
     	return Normalizer.normalize(rec.get(mapCol.get("Code")), Normalizer.Form.NFD).replaceAll("[^\\p{ASCII}]", "").trim();
     }
     
-    private String getCodeValue(CSVRecord rec) {
-    		return rec.get(mapCol.get("CodeValue"));
+    private String getCodeLabel(CSVRecord rec) {
+    		return rec.get(mapCol.get("CodeLabel"));
     }
     
     private String getClass(CSVRecord rec) {
     	return rec.get(mapCol.get("Class"));
+    }
+    
+    private String getResource(CSVRecord rec) {
+    	return rec.get(mapCol.get("Resource"));
     }
     
     private Boolean checkVirtual(CSVRecord rec) {
@@ -77,8 +82,9 @@ public class PVGenerator extends BasicGenerator {
     	row.put("hasURI", kbPrefix + "PV-" + getLabel(rec).replace("_","-").replace("??", "") + ("-" + study_id.replace("null", "") + "-" + getCode(rec)).replaceAll("--", "-"));
     	row.put("a", "hasco:PossibleValue");
     	row.put("hasco:hasCode", getCode(rec));
-    	row.put("hasco:hasCodeValue", getCodeValue(rec));
+    	row.put("hasco:hasCodeLabel", getCodeLabel(rec));
     	row.put("hasco:hasClass", getClass(rec));
+    	row.put("hasco:hasResource", getResource(rec));
     	row.put("hasco:isPossibleValueOf", kbPrefix + "DASA-" + getLabel(rec).replace("_","-").replace("??", "") + "-" + study_id);
     	
     	return row;
