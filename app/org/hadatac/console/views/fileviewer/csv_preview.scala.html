@@ -5,6 +5,7 @@
 )
 
 @import helper._
+@import org.hadatac.utils._
 @import org.hadatac.console.views.html._
 @import org.hadatac.console.views.html.annotator._
 @import org.hadatac.console.controllers.annotator._
@@ -46,9 +47,24 @@
 			}
 
 		</script>
+		
+		<div><h3>Previewing @fileName</h3></div>
+
+		<div>
+ 			<a id="colSelector" class="btn btn-primary disabled" role="button">Generate Subjects From Selected Column</a>
+		</div>
 
 		<div id="csv-preview"; style="height:250px; overflow:auto; padding-right: 50px; padding-left: 50px;">
 			@render_table(headers,preview)
+		</div>
+
+    <br><br>
+
+		<div>
+			<a href="@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.index()" class="btn btn-primary" role="button">Back to CSV Management</a>
+		  <a href="@org.hadatac.console.controllers.routes.Portal.index()" class="btn btn-primary" role="button">Back to Main Page</a>
+		</div>
+
 		</div>
 }
 
@@ -56,9 +72,6 @@
 	@if(headers==null || preview==null || headers.size()<=0 || preview.size()<=0) {
 		<p>No preview to display</p>
 	} else {
-		<div>
- 			<a id="colSelector" class="btn btn-primary disabled" role="button">Generate Subjects From Selected Column</a>
-		</div>
 		<div>
 			<table class="table">
 				<tr>
