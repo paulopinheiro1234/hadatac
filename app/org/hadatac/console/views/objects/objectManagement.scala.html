@@ -26,11 +26,20 @@
       <div class="row">
          <div class="navbar-collapse collapse navbar-secondary">
            <a href="@org.hadatac.console.controllers.objects.routes.NewObjectsFromScratch.index(filename, da_uri, URLEncoder.encode(study.getUri(),"UTF-8"),URLEncoder.encode(oc.getUri(),"UTF-8"))" 
-	      class="btn btn-primary" role="button">Create Multiple Objects From Scratch</a>
-           <a href="@org.hadatac.console.controllers.objects.routes.ObjectManagement.deleteCollectionObjects(filename, da_uri, URLEncoder.encode(study.getUri(),"UTF-8"),URLEncoder.encode(oc.getUri(),"UTF-8"),objUriList)" 
-	      class="btn btn-primary" role="button">Delete Objects in Collection</a>
-           <a href="" class="btn btn-primary disabled" role="button">Create Multiple Objects From File</a>
-           <a href="" class="btn btn-primary disabled" role="button">Create Single Object</a>
+	      class="btn btn-primary" role="button">Create Objects From Scratch</a>
+	   @if(objList == null || objList.size() == 0) {
+               <a href="@org.hadatac.console.controllers.objects.routes.ObjectManagement.deleteCollectionObjects(filename, da_uri, URLEncoder.encode(study.getUri(),"UTF-8"),URLEncoder.encode(oc.getUri(),"UTF-8"),objUriList)" 
+		  class="btn btn-primary disabled" role="button">Delete Objects in Collection</a>
+	   } else {
+               <a href="@org.hadatac.console.controllers.objects.routes.ObjectManagement.deleteCollectionObjects(filename, da_uri, URLEncoder.encode(study.getUri(),"UTF-8"),URLEncoder.encode(oc.getUri(),"UTF-8"),objUriList)" 
+		  class="btn btn-primary" role="button">Delete Objects in Collection</a>
+	   }
+	   @if(filename != null && !filename.equals("")) {
+	         <input type="submit" class="btn btn-primary btn-sm" role="button"  id="createScopeFromFile" formmethod="post"
+			formaction="@org.hadatac.console.controllers.fileviewer.routes.CSVPreview.getCSVPreview("unproc", filename, da_uri, 10)" 
+			value="Create Multiple Objects From File">
+                 </input>
+	   }
          </div>
       </div>
    </div>

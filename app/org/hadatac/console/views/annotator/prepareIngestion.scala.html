@@ -74,7 +74,6 @@
 		  <input type="submit" class="btn btn-warning btn-sm" role="button" id="testIngestion" value="Test Ingestion"
 			 @if(da.getStudyUri() == null || da.getStudyUri().equals("") || 
 			    da.getDeploymentUri() == null || da.getDeploymentUri().equals("") ||
-			    !da.hasScope() ||
 			    da.getSchemaUri() == null || da.getSchemaUri().equals("")) {
 			    disabled
                          }>
@@ -83,7 +82,6 @@
 			 formmethod="post" formaction="@org.hadatac.console.controllers.annotator.routes.PrepareIngestion.completeDataAcquisition(filename,da.getUri())" 
 			 @if(da.getStudyUri() == null || da.getStudyUri().equals("") || 
 			    da.getDeploymentUri() == null || da.getDeploymentUri().equals("") ||
-			    !da.hasScope() ||
 			    da.getSchemaUri() == null || da.getSchemaUri().equals("")) {
 			    disabled
 			 }>

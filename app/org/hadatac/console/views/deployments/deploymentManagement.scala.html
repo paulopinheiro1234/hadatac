@@ -1,5 +1,7 @@
-@(oper : org.hadatac.utils.State,
-  results : List[org.hadatac.entity.pojo.Deployment])
+@(oper     : org.hadatac.utils.State,
+  filename : String,
+  da_uri   : String,
+  results  : List[org.hadatac.entity.pojo.Deployment])
 
 @import helper._
 @import org.hadatac.console.views.html._
@@ -16,19 +18,19 @@
          <div class="navbar-collapse collapse navbar-secondary">
            @defining("") { filename => @defining("") { da_uri => 
               @if(oper.getCurrent() == State.ACTIVE) { 
-                 <a href="@org.hadatac.console.controllers.deployments.routes.DeploymentManagement.index(State.ACTIVE)" class="btn-sm btn-warning disabled" role="button">Active Deployments</a>
+                 <a href="@org.hadatac.console.controllers.deployments.routes.DeploymentManagement.index(State.ACTIVE, filename, da_uri)" class="btn-sm btn-warning disabled" role="button">Active Deployments</a>
               } else {
-                 <a href="@org.hadatac.console.controllers.deployments.routes.DeploymentManagement.index(State.ACTIVE)" class="btn-sm btn-primary" role="button">Active Deployments</a>
+                 <a href="@org.hadatac.console.controllers.deployments.routes.DeploymentManagement.index(State.ACTIVE, filename, da_uri)" class="btn-sm btn-primary" role="button">Active Deployments</a>
               }
               @if(oper.getCurrent() == State.CLOSED) {
-       	         <a href="@org.hadatac.console.controllers.deployments.routes.DeploymentManagement.index(State.CLOSED)" class="btn-sm btn-warning disabled" role="button">Closed Deployments</a>
+       	         <a href="@org.hadatac.console.controllers.deployments.routes.DeploymentManagement.index(State.CLOSED, filename, da_uri)" class="btn-sm btn-warning disabled" role="button">Closed Deployments</a>
        	      } else {
-       	         <a href="@org.hadatac.console.controllers.deployments.routes.DeploymentManagement.index(State.CLOSED)" class="btn-sm btn-primary" role="button">Closed Deployments</a>
+       	         <a href="@org.hadatac.console.controllers.deployments.routes.DeploymentManagement.index(State.CLOSED, filename, da_uri)" class="btn-sm btn-primary" role="button">Closed Deployments</a>
        	      }
               <a href="@org.hadatac.console.controllers.deployments.routes.NewDeployment.index("regular", filename, da_uri)" class="btn-sm btn-primary" role="button">Create Regular Deployment</a>
               <a href="@org.hadatac.console.controllers.deployments.routes.NewDeployment.index("legacy", filename, da_uri)" class="btn-sm btn-primary" role="button">Create Legacy Deployment</a>
-       	      <a href="@org.hadatac.console.controllers.metadata.empirical.routes.PlatformManagement.index()" class="btn-sm btn-primary" role="button">Manage Platform</a>
-       	      <a href="@org.hadatac.console.controllers.metadata.empirical.routes.InstrumentManagement.index()" class="btn-sm btn-primary" role="button">Manage Instrument</a>
+       	      <a href="@org.hadatac.console.controllers.metadata.empirical.routes.PlatformManagement.index(filename, da_uri)" class="btn-sm btn-primary" role="button">Manage Platform</a>
+       	      <a href="@org.hadatac.console.controllers.metadata.empirical.routes.InstrumentManagement.index(filename, da_uri)" class="btn-sm btn-primary" role="button">Manage Instrument</a>
        	      <a href="@org.hadatac.console.controllers.deployments.routes.ResourceAvailability.index()" class="btn-sm btn-primary" role="button">Instrument/Detector Availability</a>
        	      <a href="@org.hadatac.console.controllers.deployments.routes.URIGenerator.index()" class="btn-sm btn-primary" role="button">Register URI Generator</a>
            }}

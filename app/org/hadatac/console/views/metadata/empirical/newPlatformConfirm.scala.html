@@ -1,0 +1,32 @@
+@(plt      : org.hadatac.entity.pojo.Platform,
+  filename : String,
+  da_uri   : String)
+
+@import helper._
+@import org.hadatac.utils._
+@import org.hadatac.console.views.html._
+@import org.hadatac.console.controllers._
+@import org.hadatac.console.controllers.schema._
+@import org.hadatac.metadata.loader.ValueCellProcessing
+
+@main("New Study") {
+
+    <h2>Create Platform</h2>
+    
+    <h3>Listing below shows values for new Platform</h3>
+
+    <div class="container-fluid">
+       <ul>
+         <li><b>URI:</b> @ValueCellProcessing.replaceNameSpaceEx(plt.getUri())</li>
+         <li><b>Type:</b> @ValueCellProcessing.replaceNameSpaceEx(plt.getTypeUri())</li>
+         <li><b>Short Name:</b> @plt.getLabel()</li>
+         <li><b>Description:</b> @plt.getComment()</li>
+       </ul>
+       
+       <br>
+          <a href="@org.hadatac.console.controllers.deployments.routes.DeploymentManagement.index(State.ACTIVE, filename, da_uri)" class="btn btn-primary" 
+	     role="button">Back to Deployment Management</a>
+    </div>
+    
+    }
+    

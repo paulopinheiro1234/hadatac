@@ -186,6 +186,11 @@ public class ObjectManagement extends Controller {
 
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
     public static Result deleteCollectionObjects(String filename, String da_uri, String std_uri, String oc_uri, List<String> objUriList) {
+    	if (session().get("LabKeyUserName") == null && session().get("LabKeyPassword") == null) {
+	    return redirect(org.hadatac.console.controllers.triplestore.routes.LoadKB.logInLabkey(
+			    org.hadatac.console.controllers.objects.routes.ObjectManagement.deleteCollectionObjects(filename, da_uri, std_uri, oc_uri, objUriList).url()));
+    	}
+
     	final SysUser sysUser = AuthApplication.getLocalUser(session());
 	
 	std_uri = URLDecoder.decode(std_uri);

@@ -8,20 +8,20 @@
     @if(indent) {
         <div class="row">
             <div class="col-md-12 col-md-offset-1">
-               <a href="@org.hadatac.console.controllers.deployments.routes.DeploymentManagement.index(State.ACTIVE)" class="btn btn-primary" role="button">Back to Deployment Management</a>
+               <a href="@org.hadatac.console.controllers.deployments.routes.DeploymentManagement.index(State.ACTIVE, filename, da_uri)" class="btn btn-primary" role="button">Back to Deployment Management</a>
             </div>
         </div>
     } else {
-        <a href="@org.hadatac.console.controllers.deployments.routes.DeploymentManagement.index(State.ACTIVE)" class="btn btn-primary" role="button">Back to Deployment Management</a>
+        <a href="@org.hadatac.console.controllers.deployments.routes.DeploymentManagement.index(State.ACTIVE, filename, da_uri)" class="btn btn-primary" role="button">Back to Deployment Management</a>
     }
 } else {
     @if(indent) {
         <div class="row">
             <div class="col-md-12 col-md-offset-1">
-               <a href="@org.hadatac.console.controllers.annotator.routes.PrepareIngestion.create(filename,da_uri)" class="btn btn-primary" role="button">Back to Prepare Ingestion</a>
+               <a href="@org.hadatac.console.controllers.annotator.routes.PrepareIngestion.create(filename, da_uri)" class="btn btn-primary" role="button">Back to Prepare Ingestion</a>
             </div>
         </div>
     } else {
-        <a href="@org.hadatac.console.controllers.annotator.routes.PrepareIngestion.create(filename,da_uri)" class="btn btn-primary" role="button">Back to Prepare Ingestion</a>
+        <a href="@org.hadatac.console.controllers.annotator.routes.PrepareIngestion.create(filename, da_uri)" class="btn btn-primary" role="button">Back to Prepare Ingestion</a>
     }
 }

@@ -153,7 +153,10 @@
     			<td>@file.getDataAcquisitionUri()</td>
     			<td>@file.getUploadTime()</td>
     			<td>
-    			<a href="@org.hadatac.console.controllers.annotator.routes.PrepareIngestion.create(file.getFileName(),file.getDataAcquisitionUri())" class="btn-xs btn-success" role="button">Prepare Ingestion</a>
+                        @if(file.getFileName().startsWith("DA")) {
+    			    <a href="@org.hadatac.console.controllers.annotator.routes.PrepareIngestion.create(file.getFileName(),file.getDataAcquisitionUri())" 
+			       class="btn-xs btn-success" role="button">Prepare Ingestion</a>
+			}
 			@defining("") { da_uri =>
     	                     <a href="@org.hadatac.console.controllers.fileviewer.routes.CSVPreview.getCSVPreview("unproc", file.getFileName(), da_uri, 10)" 
 				class="btn-xs btn-primary" role="button">Preview File</a>

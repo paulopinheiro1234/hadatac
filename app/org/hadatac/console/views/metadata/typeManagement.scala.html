@@ -1,4 +1,6 @@
 @(conceptName        : String,
+  filename           : String,
+  da_uri             : String,
   conceptHierarchy   : org.hadatac.console.models.OtMSparqlQueryResults)
 
 @import org.hadatac.console.views.html._
@@ -63,7 +65,7 @@
     
       <div class="col-md-5 col-xs-4">
 
-	 <form class="form-horizontal" name="editForm" method="post" action="@org.hadatac.console.controllers.metadata.empirical.routes.PlatformTypeManagement.processForm()">
+	 <form class="form-horizontal" name="editForm" method="post" action="@org.hadatac.console.controllers.metadata.empirical.routes.PlatformTypeManagement.processForm(filename, da_uri)">
        
            <label>Operations</label><br>
            <div class="form-group">
@@ -102,7 +104,8 @@
 	     <input class="btn btn-info btn-sm" role="button" type="submit" id="submit" value="Copy as Super Class" /> <br>
 	     <input class="btn btn-success btn-sm" role="button" type="submit" id="submit" value="Include" />
 	     <input class="btn btn-success btn-sm" role="button" type="submit" id="submit" value="Delete" /> <br><br>
-	     <a href="@org.hadatac.console.controllers.metadata.empirical.routes.PlatformManagement.index()" class="btn btn-primary btn-sm" role="button">Back to Platform Management</a>
+	     <a href="@org.hadatac.console.controllers.metadata.empirical.routes.PlatformManagement.index(filename, da_uri)" 
+		class="btn btn-primary btn-sm" role="button">Back to Platform Management</a>
 	   </div>
 
          </form>

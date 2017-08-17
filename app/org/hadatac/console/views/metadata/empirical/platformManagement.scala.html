@@ -1,4 +1,6 @@
-@(platformList : List[org.hadatac.entity.pojo.Platform])
+@(filename     : String,
+  da_uri       : String,
+  platformList : List[org.hadatac.entity.pojo.Platform])
 
 @import helper._
 @import org.hadatac.console.views.html._
@@ -13,8 +15,10 @@
     <div class="container-fluid">
       <div class="row">
          <div class="navbar-collapse collapse navbar-secondary">
-           <a href="" class="btn btn-primary disabled" role="button">Create Platform</a>
-           <a href="@org.hadatac.console.controllers.metadata.empirical.routes.PlatformTypeManagement.index()" class="btn btn-primary" role="button">Manage Platform Types</a>
+           <a href="@org.hadatac.console.controllers.metadata.empirical.routes.NewPlatform.index(filename, da_uri)"
+	      class="btn btn-primary" role="button">Create Platform</a>
+           <a href="@org.hadatac.console.controllers.metadata.empirical.routes.PlatformTypeManagement.index(filename, da_uri)" 
+	      class="btn btn-primary" role="button">Manage Platform Types</a>
          </div>
       </div>
    </div>

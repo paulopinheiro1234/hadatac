@@ -1,4 +1,6 @@
-@(instrumentList : List[org.hadatac.entity.pojo.Instrument])
+@(filename       : String,
+  da_uri         : String,
+  instrumentList : List[org.hadatac.entity.pojo.Instrument])
 
 @import helper._
 @import org.hadatac.console.views.html._
@@ -14,7 +16,8 @@
       <div class="row">
          <div class="navbar-collapse collapse navbar-secondary">
            <a href="" class="btn btn-primary disabled" role="button">Create Instrument</a>
-           <a href="@org.hadatac.console.controllers.metadata.empirical.routes.InstrumentTypeManagement.index()" class="btn btn-primary" role="button">Manage Instrument Types</a>
+           <a href="@org.hadatac.console.controllers.metadata.empirical.routes.InstrumentTypeManagement.index(filename, da_uri)" 
+	      class="btn btn-primary" role="button">Manage Instrument Types</a>
          </div>
       </div>
    </div>

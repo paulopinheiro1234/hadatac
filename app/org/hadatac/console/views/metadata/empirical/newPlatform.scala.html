@@ -1,0 +1,156 @@
+@(filename     : String,
+  da_uri       : String,
+  platformType : org.hadatac.entity.pojo.PlatformType)
+
+@import helper._
+@import org.hadatac.utils._
+@import org.hadatac.console.views.html._
+@import org.hadatac.console.controllers._
+@import play._
+
+@main("New Platform") {
+
+  <div class="container">
+    <h2>New Platform</h2>
+
+   <script type="text/javascript">
+     function checkform() {
+        var cansubmit = true;
+	
+	if (!document.getElementById('newLabel').value || 
+            document.getElementById('newLabel').value.length === 0) {
+	   cansubmit = false;
+	}
+
+	if ($('input[type=radio]:checked').size() === 0) {
+	  cansubmit = false;
+	}
+
+	if (cansubmit) {
+	  document.getElementById('submit').disabled = false;
+	} else {
+	  document.getElementById('submit').disabled = 'disabled';
+	}
+     }
+
+     function replaceAll(str, find, replace) {
+        while (str.indexOf(find) > -1) {
+            str = str.replace(find, replace);
+        }
+        return str;
+     }
+       
+     function labelchange() {
+        var newUri = "@Play.application().configuration().getString("hadatac.community.ont_prefix")" + "-kb:PLT-" + document.getElementById("newLabel").value;
+        newUri = replaceAll(newUri," ","-");
+	newUri = replaceAll(newUri,"<","");
+        newUri = replaceAll(newUri,">","");
+        newUri = replaceAll(newUri,"?","");
+	$('#newUri').val(newUri);
+        checkform();
+     };
+
+   </script>
+   <style>
+      ul.tree li {
+        list-style-type: none;
+        position: relative;
+      }
+
+      ul.tree li ul {
+        display: none;
+      }
+
+      ul.tree li.open > ul {
+        display: block;
+      }
+
+      ul.tree li a {
+        color: black;
+        text-decoration: none;
+      }
+
+      ul.tree li a:before {
+        height: 1em;
+        padding:0 .1em;
+        font-size: .8em;
+        display: block;
+        position: absolute;
+        left: -1.3em;
+        top: .2em;
+      }
+
+      ul.tree li > a:not(:last-child):before {
+        content: '+';
+      }
+
+      ul.tree li.open > a:not(:last-child):before {
+        content: '-';
+      }
+   </style>
+
+    <form class="form-horizontal" name="newPlatform">
+	
+	<div class="form-group">
+		<label>URI:</label>
+		<input type="text" class="form-control col-sm-6" name="newUri" id="newUri" 
+		       onchange="checkform()" readonly >
+ 	</div>
+ 	<div class="form-group">
+		<label>Short Name:</label>
+ 		<input type="text" class="form-control col-sm-6" name="newLabel" id="newLabel" onchange="labelchange()" >
+ 	</div>
+	<div class="form-group">
+	        <label>Type:</label>
+		<input type="text" class="form-control col-sm-6" name="currentType" id="currentType" 
+		       onchange="checkform()" readonly >
+		<div>
+                   (Use selector below to set/modify platform type)
+                   <ul class="tree" onchange="checkform()">
+		     @tree_node(platformType.getHierarchy(),"newPlatformType", "")
+                   </ul>
+                </div>
+ 	</div>
+ 	<div class="form-group">
+		<label>Description</label>
+ 		<input type="text" class="form-control col-sm-6" name="newComment" id="newComment" onchange="checkform()" >
+ 	</div>
+     
+	<div class="form-group">
+	  <label>Updates</label> <br>
+	  @if(filename == null) {
+	       <input class="btn btn-success btn-sm" role="button" type="submit" id="submit" value="Create Platform" disabled 
+		      formmethod="post" formaction="@org.hadatac.console.controllers.metadata.empirical.routes.NewPlatform.processForm(filename,da_uri)"/><br>
+	       <a href="@org.hadatac.console.controllers.metadata.empirical.routes.PlatformManagement.index(filename, da_uri)" class="btn btn-primary" role="button">Back to Platform Management</a>
+          } else {
+	       <input class="btn btn-success btn-sm" role="button" type="submit" id="submit" value="Create Platform" disabled 
+		      formmethod="post" formaction="@org.hadatac.console.controllers.metadata.empirical.routes.NewPlatform.processForm(filename,da_uri)"/><br>
+    	       <a href="@org.hadatac.console.controllers.annotator.routes.PrepareIngestion.create(filename,da_uri)" 
+		  class="btn btn-primary" role="button">Back to Prepare Ingestion</a>
+          }
+	</div>
+     
+     <script>
+       var tree = document.querySelectorAll('ul.tree a:not(:last-child)');
+       for(var i = 0; i < tree.length; i++){
+          tree[i].addEventListener('click', function(e) {
+          var parent = e.target.parentElement;
+          var classList = parent.classList;
+          if(classList.contains("open")) {
+            classList.remove('open');
+            var opensubs = parent.querySelectorAll(':scope .open');
+            for(var i = 0; i < opensubs.length; i++){
+                opensubs[i].classList.remove('open');
+            }
+          } else {
+            classList.add('open');
+          }
+         });
+       }
+     </script>
+		   
+
+   </form>
+  </div>
+
+}
