@@ -432,7 +432,7 @@ public class Parser2 {
 		// HACK FOR JUNE 20
 		//System.out.println("dasa.getEntity : <" + dasa.getEntity() + ">");
 
-		/* if (isSample && !matrix.equals("") && !analyte.equals("")) {
+		/*if (isSample && !matrix.equals("") && !analyte.equals("")) {
 		    measurement.setEntity(uppercaseFirstLetter(matrix));
 		    measurement.setCharacteristic(uppercaseFirstLetter(analyte));
 		} else if (dasa.getEntity().equals("http://semanticscience.org/resource/Human")) {
@@ -447,12 +447,8 @@ public class Parser2 {
 		} else {
 		    measurement.setEntity(uppercaseFirstLetter(dasa.getEntityLabel()));
 		    measurement.setCharacteristic(uppercaseFirstLetter(dasa.getAttributeLabel()));
-		} 
+		    } */
 		
-		if (!schema.getEntityLabel().equals("") && !record.get(tempPositionOfLabel(schema.getEntityLabel())).equals("")) {
-		    measurement.setEntity(record.get(tempPositionOfLabel(schema.getEntityLabel())));
-		}
-		*/
 
 		// HACK FOR AUGUST 18
 		measurement.setEntity("Subject");
@@ -460,6 +456,10 @@ public class Parser2 {
 		measurement.setCharacteristic(uppercaseFirstLetter(dasa.getAttributeLabel()));
 		measurement.setCharacteristicUri(dasa.getAttribute());
 		
+		if (!schema.getEntityLabel().equals("") && !record.get(posEntity).equals("")) {
+		    measurement.setEntity(record.get(posEntity));
+		}
+	       
 		/*=================================*
 		 *                                 *
 		 *   SET DATASET                   *
