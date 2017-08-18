@@ -47,7 +47,6 @@ import org.hadatac.utils.Collections;
 import org.hadatac.utils.NameSpaces;
 
 import com.github.jsonldjava.utils.Obj;
-import com.google.gson.Gson;
 import com.typesafe.config.ConfigException.Parse;
 
 import org.apache.jena.query.Query;
@@ -253,8 +252,7 @@ public class Measurement {
         }
         
         return "";
-	}*/	
->>>>>>> 3628b8a34a43a6b1a1dc4caea08540b452f734bb
+	}*/
 
 	public void setObjectUri(String objectUri) {
 		this.objectUri = objectUri;
