@@ -305,6 +305,8 @@ public class Parser2 {
 		}
 		*/
 		
+		measurement.setAbstractTime(record.get(1));
+
 		/*============================*
 		 *                            *
 		 *   SET STUDY                *
