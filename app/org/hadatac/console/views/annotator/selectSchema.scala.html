@@ -8,6 +8,7 @@
 @import org.hadatac.console.views.html.triplestore._
 @import org.hadatac.console.controllers.triplestore._
 @import org.hadatac.console.controllers._
+@import org.hadatac.metadata.loader.ValueCellProcessing;
 
 @main("Select Data Acquisition Schema (DAS) for " + da_uri) {
 
@@ -28,13 +29,13 @@
 </script>
 
   <div class="container">
-    <h2>Select Data Acquisition Schema (DAS) for @da_uri</h2>
+    <h2>Select Data Acquisition Schema (DAS) for @ValueCellProcessing.replaceNameSpaceEx(da_uri)</h2>
 
     <form class="form-horizontal" name="assignOption" method="post" action="@org.hadatac.console.controllers.annotator.routes.PrepareIngestion.processSelectSchema(file_name, da_uri)">
 
     <div class="form-group">
       <label>Selected Data Acquisition</label> <br>
-      @da_uri<br>
+      @ValueCellProcessing.replaceNameSpaceEx(da_uri)<br>
       <br>
       <label>New Data Acquisition Schema</label> 
       <select class="form-control col-sm-6" id="option" size="20" name="option" onchange="checkform()" >
@@ -47,6 +48,9 @@
     <div class="form-group" class="col-sm-6 col-offset-3">
       <input class="btn btn-success" role="button" id="submitbutton" type="submit" value="Select Data Acquisition Schema" disabled="disabled" />
     </div>
+    
+    <a href="@org.hadatac.console.controllers.annotator.routes.PrepareIngestion.create(file_name, da_uri)" 
+       class="btn btn-primary" role="button">Back to Prepare Ingestion</a>
     
     </form>    
   </div>

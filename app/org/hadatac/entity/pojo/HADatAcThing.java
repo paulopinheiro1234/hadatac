@@ -18,7 +18,11 @@ public class HADatAcThing {
     }
 
     public void setUri(String uri) {
-	this.uri = uri;
+	if (uri == null || uri.equals("")) {
+	    this.uri = "";
+	    return;
+	}
+	this.uri = ValueCellProcessing.replacePrefixEx(uri);
     }
     
     public String getTypeUri() {

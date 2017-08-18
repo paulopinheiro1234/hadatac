@@ -141,109 +141,120 @@ public class Measurement {
 	}
 
 	public void setPID(String objectUri) {
-		this.objectUri = objectUri;
-		this.pid = getObjectPID();
+	    //this.objectUri = objectUri;
+	    //this.pid = getObjectPID();
+	    this.pid = objectUri;
 	}
 
 	public void setSID(String objectUri) {
-		this.objectUri = objectUri;
-		this.sid = getObjectSID();
+	    //this.objectUri = objectUri;
+	    //this.sid = getObjectSID();
+	    this.sid = objectUri;
 	}
-
+	
 	public String getObjectPID() {
-
-		//		this.objectUri = objectUri;
-
-		String queryString = NameSpaces.getInstance().printSparqlNameSpaceList()
-				+ " SELECT ?pid WHERE {"
-				+ " <" + objectUri + "> rdf:type <http://semanticscience.org/resource/Human> . "
-				+ " <" + objectUri + "> <http://hadatac.org/ont/hasco/originalID> ?pid . "       
-				+ " }";
-
-		Query query = QueryFactory.create(queryString);
-		QueryExecution qexec = QueryExecutionFactory.sparqlService(
-				Collections.getCollectionsName(Collections.METADATA_SPARQL), query);
-		ResultSet results = qexec.execSelect();
-		ResultSetRewindable resultsrw = ResultSetFactory.copyResults(results);
-		qexec.close();
-
-		if (resultsrw.size() > 0) {
-			QuerySolution soln = resultsrw.next();
-			try{
-				if (null != soln.getLiteral("pid")) {
-					String pid = soln.getLiteral("pid").toString();
-					if (!pid.equals("")) {
-						return pid;
-					}
-				}
-			} catch (Exception e1) {
-				return "";
-			}
-		} else {
-			String queryString2 = NameSpaces.getInstance().printSparqlNameSpaceList()
-					+ " SELECT ?pid WHERE {"
-					+ " <" + objectUri + "> <http://hadatac.org/ont/hasco/isSampleOf> ?sub . "
-					+ " ?sub <http://hadatac.org/ont/hasco/originalID> ?pid . "       
-					+ " }";
-
-			Query query2 = QueryFactory.create(queryString2);
-			QueryExecution qexec2 = QueryExecutionFactory.sparqlService(
-					Collections.getCollectionsName(Collections.METADATA_SPARQL), query2);
-			ResultSet results2 = qexec2.execSelect();
-			ResultSetRewindable resultsrw2 = ResultSetFactory.copyResults(results2);
-			qexec2.close();
-
-			if (resultsrw2.size() > 0) {
-				QuerySolution soln2 = resultsrw2.next();
-				try{
-					if (null != soln2.getLiteral("pid")) {
-						String pid = soln2.getLiteral("pid").toString();
-						if (!pid.equals("")) {
-							return pid;
-						}
-					}
-				} catch (Exception e1) {
-					return "";
-				}
-			}
-		}
-		return "";
+	    return this.pid;
 	}
 
 	public String getObjectSID() {
+	    return this.sid;
+	}
 
-		//		this.objectUri = objectUri;
-
-		String queryString = NameSpaces.getInstance().printSparqlNameSpaceList()
-				+ " SELECT ?sid WHERE {"
-				+ " <" + objectUri + "> <http://hadatac.org/ont/hasco/originalID> ?sid . "  
-				+ " <" + objectUri + "> <http://hadatac.org/ont/hasco/isObjectOf> ?sc . "
-				+ " ?sc	rdf:type <http://hadatac.org/ont/hasco/SampleCollection> . "
-				+ " }";
-
-		Query query = QueryFactory.create(queryString);
-		QueryExecution qexec = QueryExecutionFactory.sparqlService(
-				Collections.getCollectionsName(Collections.METADATA_SPARQL), query);
-		ResultSet results = qexec.execSelect();
-		ResultSetRewindable resultsrw = ResultSetFactory.copyResults(results);
-		qexec.close();
-
-		if (resultsrw.size() > 0) {
-			QuerySolution soln = resultsrw.next();
-			try{
-				if (null != soln.getLiteral("sid")) {
-					String sid = soln.getLiteral("sid").toString();
-					if (!sid.equals("")) {
-						return sid;
-					}
-				}
-			} catch (Exception e1) {
-				return "";
-			}
-		}
-
-		return "";
-	}	
+    /*	public String getObjectPID() {
+		
+//		this.objectUri = objectUri;
+		
+        String queryString = NameSpaces.getInstance().printSparqlNameSpaceList()
+                + " SELECT ?pid WHERE {"
+                + " <" + objectUri + "> rdf:type <http://semanticscience.org/resource/Human> . "
+                + " <" + objectUri + "> <http://hadatac.org/ont/hasco/originalID> ?pid . "       
+                + " }";
+        
+        Query query = QueryFactory.create(queryString);
+        QueryExecution qexec = QueryExecutionFactory.sparqlService(
+                Collections.getCollectionsName(Collections.METADATA_SPARQL), query);
+        ResultSet results = qexec.execSelect();
+        ResultSetRewindable resultsrw = ResultSetFactory.copyResults(results);
+        qexec.close();
+        
+        if (resultsrw.size() > 0) {
+            QuerySolution soln = resultsrw.next();
+            try{
+		            if (null != soln.getLiteral("pid")) {
+		            	String pid = soln.getLiteral("pid").toString();
+		            	if (!pid.equals("")) {
+		            		return pid;
+		            	}
+		            }
+		        } catch (Exception e1) {
+		        	return "";
+		        }
+            } else {
+        	String queryString2 = NameSpaces.getInstance().printSparqlNameSpaceList()
+                    + " SELECT ?pid WHERE {"
+                    + " <" + objectUri + "> <http://hadatac.org/ont/hasco/isSampleOf> ?sub . "
+                    + " ?sub <http://hadatac.org/ont/hasco/originalID> ?pid . "       
+                    + " }";
+            
+            Query query2 = QueryFactory.create(queryString2);
+            QueryExecution qexec2 = QueryExecutionFactory.sparqlService(
+                    Collections.getCollectionsName(Collections.METADATA_SPARQL), query2);
+            ResultSet results2 = qexec2.execSelect();
+            ResultSetRewindable resultsrw2 = ResultSetFactory.copyResults(results2);
+            qexec2.close();
+            
+            if (resultsrw2.size() > 0) {
+                QuerySolution soln2 = resultsrw2.next();
+                try{
+	                if (null != soln2.getLiteral("pid")) {
+	                	String pid = soln2.getLiteral("pid").toString();
+	                	if (!pid.equals("")) {
+	                		return pid;
+	                	}
+	                }
+                } catch (Exception e1) {
+                	return "";
+                }
+            }
+            }
+            return "";
+	}
+	
+    	public String getObjectSID() {
+		
+//		this.objectUri = objectUri;
+		
+        String queryString = NameSpaces.getInstance().printSparqlNameSpaceList()
+                + " SELECT ?sid WHERE {"
+                + " <" + objectUri + "> <http://hadatac.org/ont/hasco/originalID> ?sid . "  
+                + " <" + objectUri + "> <http://hadatac.org/ont/hasco/isObjectOf> ?sc . "
+                + " ?sc	rdf:type <http://hadatac.org/ont/hasco/SampleCollection> . "
+                + " }";
+        
+        Query query = QueryFactory.create(queryString);
+        QueryExecution qexec = QueryExecutionFactory.sparqlService(
+                Collections.getCollectionsName(Collections.METADATA_SPARQL), query);
+        ResultSet results = qexec.execSelect();
+        ResultSetRewindable resultsrw = ResultSetFactory.copyResults(results);
+        qexec.close();
+        
+        if (resultsrw.size() > 0) {
+            QuerySolution soln = resultsrw.next();
+            try{
+	            if (null != soln.getLiteral("sid")) {
+	            	String sid = soln.getLiteral("sid").toString();
+	            	if (!sid.equals("")) {
+	            		return sid;
+	            	}
+	            }
+            } catch (Exception e1) {
+            	return "";
+            }
+        }
+        
+        return "";
+	}*/	
+>>>>>>> 3628b8a34a43a6b1a1dc4caea08540b452f734bb
 
 	public void setObjectUri(String objectUri) {
 		this.objectUri = objectUri;
@@ -627,6 +638,11 @@ public class Measurement {
 	}
 
 	public static String calculateTimeGap(Instant min, Instant max) {
+
+	    if (min == null || max == null) {
+		return "+1MINUTE";
+	    }
+
 		Duration duration = Duration.between(min, max);
 
 		long days = duration.toDays();
@@ -689,7 +705,9 @@ public class Measurement {
 		query.setFacet(true);
 		query.setFacetLimit(-1);
 		query.addFacetField("unit");
-		query.addDateRangeFacet("timestamp", Date.from(minTime), Date.from(maxTime), gap);
+		if (minTime != null && maxTime != null && gap == null) {
+		    query.addDateRangeFacet("timestamp", Date.from(minTime), Date.from(maxTime), gap); 
+		}
 		query.addFacetField("named_time");
 		query.addFacetPivotField("study_uri,acquisition_uri");
 		query.addFacetPivotField("entity,characteristic");

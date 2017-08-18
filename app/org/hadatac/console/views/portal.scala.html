@@ -35,29 +35,48 @@
         </div>
         <div class="col-md-3 col-xs-2">
            <h4>Metadata Recording and Data Upload</h4>  
-           <!-- <a href="" class="btn btn-primary btn-block disabled" role="button">Manage Scientific Activities</a>  -->
-           <a href="@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.index()" id="autoannotate" class="btn btn-primary btn-block" role="button">Manage Data Files</a>
-           <a href="@org.hadatac.console.controllers.studies.routes.StudyManagement.index()" id="studies" class="btn btn-primary btn-block" role="button">Manage Studies</a>
-           <a href="@org.hadatac.console.controllers.deployments.routes.DeploymentManagement.index(State.ACTIVE)" id="deployments" class="btn btn-primary btn-block" role="button">Manage Deployments (Platforms, Instruments)</a>
-           <a href="@org.hadatac.console.controllers.dataacquisitionmanagement.routes.DataAcquisitionManagement.index(State.ACTIVE)"  id="dataacquisitions" class="btn btn-primary btn-block" role="button">Manage Data Acquisitions</a>
-           <a href="@org.hadatac.console.controllers.schema.routes.DASManagement.index()" id="DAS" class="btn btn-primary btn-block" role="button">Manage Data Acquisition Schemas</a>
-           <a href="@org.hadatac.console.controllers.indicators.routes.IndicatorManagement.index()" id="indicators" class="btn btn-primary btn-block" role="button">Manage Indicators</a>
-           <!-- <a href="@org.hadatac.console.controllers.annotator.routes.Annotator.selectDeployment()"  id="annotator" class="btn btn-primary btn-block" role="button">Create CCSV from CSV</a>  -->
-           <!-- <a href="@org.hadatac.console.controllers.dataacquisitionsearch.routes.LoadCCSV.loadCCSV("init")"  id="csvloader" class="btn btn-primary btn-block" role="button">Upload CCSV</a>  -->
-           <!-- <a href="@org.hadatac.console.controllers.dataacquisitionsearch.routes.ImportSDD.importSDD("init")"  id="sddloader" class="btn btn-primary btn-block" role="button">Import SDD</a>  -->
+	   @defining("") { filename => @defining("") { da_uri => 
+                <!-- <a href="" class="btn btn-primary btn-block disabled" role="button">Manage Scientific Activities</a>  -->
+		<a href="@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.index()" 
+		   id="autoannotate" class="btn btn-primary btn-block" role="button">Manage Data Files</a>
+		<a href="@org.hadatac.console.controllers.studies.routes.StudyManagement.index()" 
+		   id="studies" class="btn btn-primary btn-block" role="button">Manage Studies</a>
+		<a href="@org.hadatac.console.controllers.deployments.routes.DeploymentManagement.index(State.ACTIVE, filename, da_uri)" 
+		   id="deployments" class="btn btn-primary btn-block" role="button">Manage Deployments (Platforms, Instruments)</a>
+		<a href="@org.hadatac.console.controllers.dataacquisitionmanagement.routes.DataAcquisitionManagement.index(State.ACTIVE)"  
+		   id="dataacquisitions" class="btn btn-primary btn-block" role="button">Manage Data Acquisitions</a>
+		<a href="@org.hadatac.console.controllers.schema.routes.DASManagement.index()" 
+		   id="DAS" class="btn btn-primary btn-block" role="button">Manage Data Acquisition Schemas</a>
+		<a href="@org.hadatac.console.controllers.indicators.routes.IndicatorManagement.index()" 
+		   id="indicators" class="btn btn-primary btn-block" role="button">Manage Indicators</a>
+                <!-- <a href="@org.hadatac.console.controllers.annotator.routes.Annotator.selectDeployment()"  
+		        id="annotator" class="btn btn-primary btn-block" role="button">Create CCSV from CSV</a>  -->
+                <!-- <a href="@org.hadatac.console.controllers.dataacquisitionsearch.routes.LoadCCSV.loadCCSV("init")"  
+		        id="csvloader" class="btn btn-primary btn-block" role="button">Upload CCSV</a>  -->
+                <!-- <a href="@org.hadatac.console.controllers.dataacquisitionsearch.routes.ImportSDD.importSDD("init")"  
+		        id="sddloader" class="btn btn-primary btn-block" role="button">Import SDD</a>  -->
+	   }}
         </div>
         @restrict(roles = anyOf(allOf("data_manager"))) {
         @defining(AuthApplication.getLocalUser(session())) { user =>
         <div class="col-md-3 col-xs-2">
            <h4>Knowledge Management</h4>  
-           <a href="@org.hadatac.console.controllers.triplestore.routes.Clean.clean("init")" class="btn btn-primary btn-block" role="button">Repository Management</a>
-@****           <a href="@org.hadatac.console.controllers.triplestore.routes.CleanStudy.clean("init")" class="btn btn-primary btn-block" role="button">Study Management</a> ****@
-           <a href="@org.hadatac.console.controllers.triplestore.routes.LoadOnt.loadOnt("init")" class="btn btn-primary btn-block" role="button">Upload Supporting Ontologies</a>
-           <a href="@org.hadatac.console.controllers.triplestore.routes.LoadKB.loadKB("init")" class="btn btn-primary btn-block" role="button">Upload Additional Knowledge</a>
-           <a href="@org.hadatac.console.controllers.triplestore.routes.LoadKB.loadLabkeyKB("init", "ontology")" class="btn btn-primary btn-block" role="button">Load Ontology from LabKey</a>
-           <a href="@org.hadatac.console.controllers.triplestore.routes.LoadKB.loadLabkeyKB("init", "knowledge")" class="btn btn-primary btn-block" role="button">Load Knowledge from LabKey</a>
-           <a href="@org.hadatac.console.controllers.triplestore.routes.UserManagement.index("init")" class="btn btn-primary btn-block" role="button">Manage Users</a>
-           <a href="@org.hadatac.console.controllers.triplestore.routes.LoadKB.loadLabkeyKB("init", "diff_tool")" class="btn btn-primary btn-block" role="button">Diff Tool</a>
+           <a href="@org.hadatac.console.controllers.triplestore.routes.Clean.clean("init")" 
+	      class="btn btn-primary btn-block" role="button">Repository Management</a>
+	   @*  <a href="@org.hadatac.console.controllers.triplestore.routes.CleanStudy.clean("init")" 
+		  class="btn btn-primary btn-block" role="button">Study Management</a> *@
+           <a href="@org.hadatac.console.controllers.triplestore.routes.LoadOnt.loadOnt("init")" 
+	      class="btn btn-primary btn-block" role="button">Upload Supporting Ontologies</a>
+           <a href="@org.hadatac.console.controllers.triplestore.routes.LoadKB.loadKB("init")" 
+	      class="btn btn-primary btn-block" role="button">Upload Additional Knowledge</a>
+           <a href="@org.hadatac.console.controllers.triplestore.routes.LoadKB.loadLabkeyKB("init", "ontology")" 
+	      class="btn btn-primary btn-block" role="button">Load Ontology from LabKey</a>
+           <a href="@org.hadatac.console.controllers.triplestore.routes.LoadKB.loadLabkeyKB("init", "knowledge")" 
+	      class="btn btn-primary btn-block" role="button">Load Knowledge from LabKey</a>
+           <a href="@org.hadatac.console.controllers.triplestore.routes.UserManagement.index("init")" 
+	      class="btn btn-primary btn-block" role="button">Manage Users</a>
+           <a href="@org.hadatac.console.controllers.triplestore.routes.LoadKB.loadLabkeyKB("init", "diff_tool")" 
+	      class="btn btn-primary btn-block" role="button">Diff Tool</a>
         </div>
            }
         } 

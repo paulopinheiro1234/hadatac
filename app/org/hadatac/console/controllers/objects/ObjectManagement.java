@@ -57,12 +57,12 @@ public class ObjectManagement extends Controller {
 
 	Study study = Study.find(std_uri);
 	if (study == null) {
-	    return badRequest(objectConfirm.render("Error listing object collection: Study URI did not return valid URI", filename, da_uri, std_uri, oc_uri, null));
+	    return badRequest(objectConfirm.render("Error listing object collection: Study URI did not return valid URI", filename, da_uri, std_uri, oc_uri));
 	} 
 
 	ObjectCollection oc = ObjectCollection.find(oc_uri);
 	if (oc == null) {
-	    return badRequest(objectConfirm.render("Error listing objectn: ObjectCollection URI did not return valid object", filename, da_uri, std_uri, oc_uri, null));
+	    return badRequest(objectConfirm.render("Error listing objectn: ObjectCollection URI did not return valid object", filename, da_uri, std_uri, oc_uri));
 	} 
 
 	List<String> objUriList = new ArrayList<String>(); 
@@ -186,6 +186,11 @@ public class ObjectManagement extends Controller {
 
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
     public static Result deleteCollectionObjects(String filename, String da_uri, String std_uri, String oc_uri, List<String> objUriList) {
+    	if (session().get("LabKeyUserName") == null && session().get("LabKeyPassword") == null) {
+	    return redirect(org.hadatac.console.controllers.triplestore.routes.LoadKB.logInLabkey(
+			    org.hadatac.console.controllers.objects.routes.ObjectManagement.deleteCollectionObjects(filename, da_uri, std_uri, oc_uri, objUriList).url()));
+    	}
+
     	final SysUser sysUser = AuthApplication.getLocalUser(session());
 	
 	std_uri = URLDecoder.decode(std_uri);

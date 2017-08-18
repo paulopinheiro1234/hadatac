@@ -38,13 +38,13 @@ import be.objectify.deadbolt.java.actions.Restrict;
 public class EditDataAcquisition extends Controller {
 	
 	@Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    public static Result index(String uri, boolean bChangeParam) {
-    	if ((session().get("LabKeyUserName") == null 
-    			|| session().get("LabKeyPassword") == null)
-    			&& bChangeParam) {
+	public static Result index(String filename, String uri, boolean bChangeParam) {
+	    if ((session().get("LabKeyUserName") == null 
+		 || session().get("LabKeyPassword") == null)
+		&& bChangeParam) {
     		return redirect(org.hadatac.console.controllers.triplestore.routes.LoadKB.logInLabkey(
-    				routes.EditDataAcquisition.index(uri, bChangeParam).url()));
-    	}
+				routes.EditDataAcquisition.index(filename, uri, bChangeParam).url()));
+	    }
 		
 		final SysUser sysUser = AuthApplication.getLocalUser(session());
     	try {
@@ -81,7 +81,7 @@ public class EditDataAcquisition extends Controller {
     			mapSchemas.put(schema.getUri(), ValueCellProcessing.replaceNameSpaceEx(schema.getUri()));
     		}
     		
-            return ok(editDataAcquisition.render(dataAcquisition, nameList, 
+		return ok(editDataAcquisition.render(filename, dataAcquisition, nameList, 
             		User.getUserURIs(), mapSchemas, sysUser.isDataManager(), bChangeParam));
     	}
     	
@@ -89,12 +89,12 @@ public class EditDataAcquisition extends Controller {
     }
 
 	@Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    public static Result postIndex(String uri, boolean bChangeParam) {
-    	return index(uri, bChangeParam);
+	public static Result postIndex(String filename, String uri, boolean bChangeParam) {
+	return index(filename, uri, bChangeParam);
     }
 	
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    public static Result processForm(String acquisitionUri, boolean bChangeParam) {
+	public static Result processForm(String filename, String acquisitionUri, boolean bChangeParam) {
     	final SysUser sysUser = AuthApplication.getLocalUser(session());
     	
         Form<DataAcquisitionForm> form = Form.form(DataAcquisitionForm.class).bindFromRequest();
@@ -168,6 +168,6 @@ public class EditDataAcquisition extends Controller {
         	da.save();
         }
         
-        return ok(editDataAcquisitionConfirm.render(da, changedInfos, sysUser.isDataManager()));
+        return ok(editDataAcquisitionConfirm.render(filename, da, changedInfos, sysUser.isDataManager()));
     }
 }

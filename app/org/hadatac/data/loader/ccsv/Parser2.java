@@ -3,9 +3,14 @@ package org.hadatac.data.loader.ccsv;
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
+import java.time.format.DateTimeFormatter;
 import java.math.BigDecimal;
 import java.util.Date;
 import java.util.Iterator;
+import java.util.List;
 
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVRecord;
@@ -22,12 +27,18 @@ import org.hadatac.entity.pojo.DataAcquisitionSchemaAttribute;
 import org.hadatac.entity.pojo.DataAcquisitionSchemaObject;
 import org.hadatac.entity.pojo.DataAcquisitionSchemaEvent;
 import org.hadatac.entity.pojo.Dataset;
+import org.hadatac.entity.pojo.DataFile;
 import org.hadatac.entity.pojo.Deployment;
 import org.hadatac.entity.pojo.HADataC;
+import org.hadatac.entity.pojo.ObjectCollection;
 import org.hadatac.entity.pojo.Measurement;
 import org.hadatac.entity.pojo.Subject;
+import org.hadatac.entity.pojo.Study;
+import org.hadatac.entity.pojo.StudyObject;
 import org.hadatac.metadata.loader.ValueCellProcessing;
+import org.hadatac.console.controllers.fileviewer.CSVPreview;
 import org.hadatac.utils.Collections;
+import org.hadatac.utils.ConfigProp;
 import org.hadatac.utils.Feedback;
 
 import play.Play;
@@ -38,12 +49,16 @@ public class Parser2 {
     
     private DataAcquisitionSchema schema;
     
+    private static String path_unproc = ConfigProp.getPropertyValue("autoccsv.config", "path_unproc");
+
     public Parser2() {
 	schema = null;
     }
     
-    private ParsingResult indexMeasurements(FileFactory files, DataAcquisition da){
+    public ParsingResult indexMeasurements(FileFactory files, DataAcquisition da, DataFile dataFile){
+
 	System.out.println("indexMeasurements()...");
+	schema = DataAcquisitionSchema.find(da.getSchemaUri());
 	String message = "";
 	
 	try {
@@ -60,7 +75,7 @@ public class Parser2 {
 	    e.printStackTrace();
 	    message += "[ERROR] Fail to parse header of the csv file\n";
 	    return new ParsingResult(1, message);
-		}
+	}
 	int total_count = 0;
 	int batch_size = 10000;
 	
@@ -74,7 +89,52 @@ public class Parser2 {
 	String analyte = "";
 	String unitOverride = "";
 	String unitLabelOverride = "";
+
+	ObjectCollection oc = null;
+	if (da.getGlobalScopeUri() != null && !da.getGlobalScopeUri().equals("")) {
+	    oc = ObjectCollection.find(da.getGlobalScopeUri());
+	    if (oc != null) {
+		for (StudyObject obj : oc.getObjects()) {
+		    System.out.println("Object " + obj.getLabel() + "  ID: "  + obj.getUri() + "   orig.: " + obj.getOriginalId());
+		}
+	    }
+	}
+
+	// ASSIGN values for tempPositionInt
+	defineTemporaryPositions(files.getFileName());
+	
+	// ASSIGN positions for MetaDASAs
+	int posTimestamp = -1;
+	int posTimeInstant = -1;
+	int posId = -1;
+	int posOriginalId = -1;
+	int posEntity = -1;
+	int posUnit = -1;
+	int posInRelation = -1;
+     	if (!schema.getTimestampLabel().equals("")) {
+	    posTimestamp = tempPositionOfLabel(schema.getTimestampLabel()); 
+	}
+	if (!schema.getTimeInstantLabel().equals("")) {
+	    posTimeInstant = tempPositionOfLabel(schema.getTimeInstantLabel()); 
+	}
+	if (!schema.getIdLabel().equals("")) {
+	    posId = tempPositionOfLabel(schema.getIdLabel()); 
+	}
+	if (!schema.getOriginalIdLabel().equals("")) {
+	    posOriginalId = tempPositionOfLabel(schema.getOriginalIdLabel()); 
+	}
+	if (!schema.getEntityLabel().equals("")) {
+	    posEntity = tempPositionOfLabel(schema.getEntityLabel()); 
+	}
+	if (!schema.getUnitLabel().equals("")) {
+	    posUnit = tempPositionOfLabel(schema.getUnitLabel()); 
+	}
+	if (!schema.getInRelationToLabel().equals("")) {
+	    posInRelation = tempPositionOfLabel(schema.getInRelationToLabel()); 
+	}
+	
 	for (CSVRecord record : records) {
+
 	    // HACK FOR JUNE20
 	    isSample = false;
 	    unitOverride = "";
@@ -106,26 +166,30 @@ public class Parser2 {
 		}
 		//System.out.println("CSV Record: matrix " + matrix + " Analyte: " + analyte);
 	    }
+
 	    Iterator<DataAcquisitionSchemaAttribute> iter = schema.getAttributes().iterator();
-	    //System.out.println("pos. of id column: " + schema.getIdColumn());
+	    //System.out.println("pos. of id column: " + schema.getIdLabel());
 	    while (iter.hasNext()) {
 		DataAcquisitionSchemaAttribute dasa = iter.next();
-		if (dasa.getPositionInt() == schema.getTimestampColumn()) {
+		if (dasa.getLabel().equals(schema.getTimestampLabel())) {
 		    continue;
 		}
-		if (dasa.getPositionInt() == schema.getTimeInstantColumn()) {
+		if (dasa.getLabel().equals(schema.getTimeInstantLabel())) {
 		    continue;
 		}
-		if (dasa.getPositionInt() == schema.getIdColumn()) {
+		if (dasa.getLabel().equals(schema.getIdLabel())) {
 		    continue;
 		}
-		if (dasa.getPositionInt() == schema.getEntityColumn()) {
+		if (dasa.getLabel().equals(schema.getOriginalIdLabel())) {
 		    continue;
 		}
-		if (dasa.getPositionInt() == schema.getUnitColumn()) {
+		if (dasa.getLabel().equals(schema.getEntityLabel())) {
 		    continue;
 		}
-		if (dasa.getPositionInt() == schema.getInRelationToColumn()) {
+		if (dasa.getLabel().equals(schema.getUnitLabel())) {
+		    continue;
+		}
+		if (dasa.getLabel().equals(schema.getInRelationToLabel())) {
 		    continue;
 		}
 		
@@ -136,11 +200,13 @@ public class Parser2 {
 		 *   SET VALUE       *
 		 *                   *
 		 *===================*/
-		
-		if (dasa.getPositionInt() > -1 && record.get(dasa.getPositionInt() - 1).isEmpty()){
+
+		if (dasa.getTempPositionInt() <= -1 || dasa.getTempPositionInt() >= record.size()) {
+		    continue;
+		} else if (record.get(dasa.getTempPositionInt()).isEmpty()) { 
 		    continue;
 		} else {
-		    String originalValue = record.get(dasa.getPositionInt() - 1);
+		    String originalValue = record.get(dasa.getTempPositionInt());
 		    String codeValue = Subject.findCodeValue(dasa.getAttribute(), originalValue);
 		    if (codeValue == null) {
 			measurement.setValue(originalValue);
@@ -156,22 +222,65 @@ public class Parser2 {
 		 *============================*/
 		
 		/*
-		  - TimestampColumn is used for machine generated timestamp
-		  - TimeInstantColumn is used for timestamps told to system to be timestamp, but that are not further processed
+		  - TimestampLabel is used for machine generated timestamp
+		  - TimeInstantLabel is used for timestamps told to system to be timestamp, but that are not further processed
 		  - Abstract times are encoded as DASA's events, and are supposed to be strings
 		*/
 		
+		measurement.setTimestamp(new Date(Long.MAX_VALUE).toInstant().toString());
+		measurement.setAbstractTime("");
+		
 		// contrete time(stamps)
-		if(dasa.getPositionInt() == schema.getTimestampColumn()) {
-		    String sTime = record.get(schema.getTimestampColumn() - 1);
+		if(dasa.getLabel() == schema.getTimestampLabel()) {
+		    String sTime = record.get(dasa.getTempPositionInt());
+		    int timeStamp = new BigDecimal(sTime).intValue();
+		    measurement.setTimestamp(Instant.ofEpochSecond(timeStamp).toString());
+		} else if (!schema.getTimeInstantLabel().equals("")) {
+		    String timeValue = record.get(tempPositionOfLabel(schema.getTimeInstantLabel()));
+		    //System.out.println("Time Instant value: " + timeValue);
+		    if (timeValue != null) {
+			//DateTimeFormatter formatter = DateTimeFormatter.ofPattern("M/d/yy HH:mm");
+			//LocalDateTime datetime = LocalDateTime.parse(timeValue, formatter);
+			//measurement.setTimestamp(datetime.toInstant(ZoneOffset.UTC).toString());
+			try {
+			    measurement.setTimestamp(timeValue);
+			} catch (Exception e) {
+			    measurement.setTimestamp(new Date(Long.MAX_VALUE).toInstant().toString());
+			}
+		    }
+		}    
+		
+		// abstract times 
+		else if (dasa.getEventUri() != null && !dasa.getEventUri().equals("")) {
+		    String daseUri = dasa.getEventUri();
+		    DataAcquisitionSchemaEvent dase = schema.getEvent(daseUri); 
+		    if (dase != null) {
+			if (dase.getLabel() != null && !dase.getLabel().equals("")) {
+			    measurement.setAbstractTime("At " + dase.getLabel());
+			} else if (dase.getEntity() != null && !dase.getEntity().equals("")) {
+			    measurement.setAbstractTime("At " + dase.getEntity().substring(dase.getEntity().indexOf("#") + 1));
+			} else {
+			    measurement.setAbstractTime("At " + daseUri);
+			}
+		    } 
+		}
+		
+		/*		
+		// contrete time(stamps)
+		if(dasa.getTempPositionInt() == schema.getTimestampColumn()) {
+		    String sTime = record.get(schema.getTimestampColumn());
 		    int timeStamp = new BigDecimal(sTime).intValue();
 		    Date time = new Date((long)timeStamp * 1000);
 		    measurement.setTimestamp(time.toString());
 		} else if (schema.getTimeInstantColumn() != -1) {
-		    String timeValue = record.get(schema.getTimeInstantColumn() - 1);
+		    String timeValue = record.get(schema.getTimeInstantColumn());
 		    //System.out.println("Time Instant value: " + timeValue);
 		    if (timeValue != null) {
-			measurement.setTimestamp(timeValue);
+			try {
+			    measurement.setTimestamp(timeValue);
+			} catch (Exception e) {
+			    //measurement.setTimestamp("");
+			}
 		    }
 		}    
 		
@@ -194,6 +303,7 @@ public class Parser2 {
 		else {
 		    measurement.setTimestamp("");
 		}
+		*/
 		
 		/*============================*
 		 *                            *
@@ -209,36 +319,62 @@ public class Parser2 {
 		 *                             *
 		 *=============================*/
 		
-		if (schema.getIdColumn() > -1){
-		    if (dasa.getEntity().equals(ValueCellProcessing.replacePrefixEx("sio:Human"))) {
-			//System.out.println("Matching reference subject: " + record.get(schema.getIdColumn() - 1));
-			Subject subject = Subject.findSubject(measurement.getStudyUri(), record.get(schema.getIdColumn() - 1));
-			if (subject != null) {
-			    String subjectUri = subject.getUri();
-			    measurement.setObjectUri(subjectUri);
-			    measurement.setPID(subjectUri);
-			    measurement.setSID(subjectUri);
-			} else {
-			    measurement.setObjectUri("");
-			}
-		    } else if (dasa.getEntity().equals(ValueCellProcessing.replacePrefixEx("sio:Sample"))) {
-			//System.out.println("Matching reference sample: " + record.get(schema.getIdColumn() - 1));
-			String sampleUri = Subject.findSampleUri(measurement.getStudyUri(), record.get(schema.getIdColumn() - 1));
-			if (sampleUri != null) {
-			    measurement.setObjectUri(sampleUri);
-			    measurement.setPID(sampleUri);
-			    measurement.setSID(sampleUri);
-			} else {
-			    measurement.setObjectUri("");
-			}
-		    }
+		if (!schema.getOriginalIdLabel().equals("")){
+		    
+		    //System.out.println("Recording....: " + record.get(posOriginalId));
+		    //String auxUri = oc.getUriFromOriginalId(record.get(tempPositionOfLabel(schema.getOriginalIdLabel())));
+		    String auxUri = record.get(posOriginalId);
+		    measurement.setObjectUri(auxUri);
+		    measurement.setPID(auxUri);
+		    measurement.setSID("");
+
+		}  else if (!schema.getIdLabel().equals("")){
+		    
+		    //String auxUri = oc.getUriFromOriginalId(record.get(tempPositionOfLabel(schema.getIdLabel())));
+		    String auxUri = record.get(posId);
+		    measurement.setObjectUri(auxUri);
+		    measurement.setPID(auxUri);
+		    measurement.setSID("");
+
 		} else {
-		    if(isSubjectPlatform) {
-			measurement.setObjectUri(da.getDeployment().getPlatform().getUri());
-		    } else {
-			measurement.setObjectUri("");
-		    }
+
+		    measurement.setObjectUri("");
+		    measurement.setPID("");
+		    measurement.setSID("");
+
 		}
+    
+		/*
+		  if (dasa.getEntity().equals(ValueCellProcessing.replacePrefixEx("sio:Human"))) {
+		  //System.out.println("Matching reference subject: " + record.get(schema.getIdColumn()));
+		  Subject subject = Subject.findSubject(measurement.getStudyUri(), record.get(schema.getIdColumn()));
+		  if (subject != null) {
+		  String subjectUri = subject.getUri();
+		  measurement.setObjectUri(subjectUri);
+		  measurement.setPID(subjectUri);
+		  measurement.setSID(subjectUri);
+		  } else {
+		  measurement.setObjectUri("");
+		  }
+		  } else if (dasa.getEntity().equals(ValueCellProcessing.replacePrefixEx("sio:Sample"))) {
+		  //System.out.println("Matching reference sample: " + record.get(schema.getIdColumn()));
+		  String sampleUri = Subject.findSampleUri(measurement.getStudyUri(), record.get(schema.getIdColumn()));
+		  if (sampleUri != null) {
+		  measurement.setObjectUri(sampleUri);
+		  measurement.setPID(sampleUri);
+		  measurement.setSID(sampleUri);
+		  } else {
+		  measurement.setObjectUri("");
+		  }
+		  }
+		  } else {
+		  if(isSubjectPlatform) {
+		  measurement.setObjectUri(da.getDeployment().getPlatform().getUri());
+		  } else {
+		  measurement.setObjectUri("");
+		  }
+		  } 
+		*/
 		
 		/*=============================*
 		 *                             *
@@ -246,10 +382,9 @@ public class Parser2 {
 		 *                             *
 		 *=============================*/
 		
-		measurement.setUri(ValueCellProcessing.replacePrefixEx(measurement.getStudyUri()) + "/" 
-				   + ValueCellProcessing.replaceNameSpaceEx(da.getUri()).split(":")[1] + "/"
-				   //+ hadatacCcsv.getDataset().getLocalName() + "/" 
-				   + dasa.getLocalName() + "-" + total_count);
+		measurement.setUri(ValueCellProcessing.replacePrefixEx(measurement.getStudyUri()) + "/" + 
+				   ValueCellProcessing.replaceNameSpaceEx(da.getUri()).split(":")[1] + "/" +
+				   dasa.getLocalName() + "-" + total_count);
 		measurement.setOwnerUri(da.getOwnerUri());
 		measurement.setAcquisitionUri(da.getUri());
 		
@@ -263,9 +398,8 @@ public class Parser2 {
 		if (isSample && !unitOverride.equals("") && !unitLabelOverride.equals("")) {
 		    measurement.setUnit(uppercaseFirstLetter(unitLabelOverride));
 		    measurement.setUnitUri(unitOverride);
-		} else if (schema.getUnitColumn() != -1) {
-		    String unitValue = record.get(schema.getUnitColumn() - 1);
-		    //System.out.println("Unit value: " + unitValue);
+		} else if (!schema.getUnitLabel().equals("")) {
+		    String unitValue = record.get(posUnit);
 		    if (unitValue != null) {
 			measurement.setUnit(uppercaseFirstLetter(unitValue));
 			measurement.setUnitUri(dasa.getUnit());
@@ -297,7 +431,8 @@ public class Parser2 {
 		
 		// HACK FOR JUNE 20
 		//System.out.println("dasa.getEntity : <" + dasa.getEntity() + ">");
-		if (isSample && !matrix.equals("") && !analyte.equals("")) {
+
+		/* if (isSample && !matrix.equals("") && !analyte.equals("")) {
 		    measurement.setEntity(uppercaseFirstLetter(matrix));
 		    measurement.setCharacteristic(uppercaseFirstLetter(analyte));
 		} else if (dasa.getEntity().equals("http://semanticscience.org/resource/Human")) {
@@ -312,13 +447,17 @@ public class Parser2 {
 		} else {
 		    measurement.setEntity(uppercaseFirstLetter(dasa.getEntityLabel()));
 		    measurement.setCharacteristic(uppercaseFirstLetter(dasa.getAttributeLabel()));
-		}
+		} 
 		
-		if (schema.getEntityColumn() != -1 && !record.get(schema.getEntityColumn() - 1).equals("")) {
-		    measurement.setEntity(record.get(schema.getEntityColumn() - 1));
+		if (!schema.getEntityLabel().equals("") && !record.get(tempPositionOfLabel(schema.getEntityLabel())).equals("")) {
+		    measurement.setEntity(record.get(tempPositionOfLabel(schema.getEntityLabel())));
 		}
-		
+		*/
+
+		// HACK FOR AUGUST 18
+		measurement.setEntity("Subject");
 		measurement.setEntityUri(dasa.getEntity());
+		measurement.setCharacteristic(uppercaseFirstLetter(dasa.getAttributeLabel()));
 		measurement.setCharacteristicUri(dasa.getAttribute());
 		
 		/*=================================*
@@ -328,11 +467,20 @@ public class Parser2 {
 		 *=================================*/
 		
 		//measurement.setDatasetUri(hadatacCcsv.getDatasetKbUri());
+		measurement.setDatasetUri(dataFile.getDatasetUri());
+		
 		try {
 		    solr.addBean(measurement);
+		    //System.out.println("indexMeasurements() ADDING VALUES");
 		} catch (IOException | SolrServerException e) {
 		    System.out.println("[ERROR] SolrClient.addBean - e.Message: " + e.getMessage());
 		}
+		
+		
+		// INTERMEDIARY COMMIT
+		
+		//System.out.println(total_count);
+
 		if((++total_count) % batch_size == 0){
 		    try {
 			System.out.println("solr.commit()...");
@@ -347,11 +495,15 @@ public class Parser2 {
 			    System.out.println("[ERROR] SolrClient.close - e.Message: " + e1.getMessage());
 			    message += "[ERROR] Fail to close solr\n";
 			}
-			return new ParsingResult(1, message);
+		    return new ParsingResult(1, message);
 		    }
 		}
 	    }
 	}
+
+	// FINAL COMMIT
+	
+	//System.out.println("indexMeasurements() HERE 7");
 	try {
 	    try {
 		System.out.println("solr.commit()...");
@@ -366,13 +518,13 @@ public class Parser2 {
 	    files.closeFile("csv", "r");
 	} catch (IOException e) {
 	    e.printStackTrace();
-	    message += "[ERROR] Fail to close the csv file\n";
-	    return new ParsingResult(1, message);
+		message += "[ERROR] Fail to close the csv file\n";
+		return new ParsingResult(1, message);
 	}
 	
 	da.addNumberDataPoints(total_count);
 	da.save();
-	
+	    
 	System.out.println("Finished indexMeasurements()");
 	try {
 	    solr.close();
@@ -382,6 +534,64 @@ public class Parser2 {
 	}
 	return new ParsingResult(0, message);
     }
+
+	
+    private void defineTemporaryPositions(String filename) {
+	
+	if (schema == null || schema.getAttributes() == null || schema.getAttributes().size() == 0) {
+	    return;
+	}
+	List<DataAcquisitionSchemaAttribute> dasas = schema.getAttributes();
+	List<String> headers = CSVPreview.getCSVHeaders(path_unproc, filename);
+
+	// reset temporary positions
+	for (DataAcquisitionSchemaAttribute dasa : dasas) {
+	    dasa.setTempPositionInt(-1);
+	}
+	
+	// match dasas and labels, assigning temporary positions
+	for (int h = 0; h < headers.size(); h++) {
+	    for (int d = 0; d < dasas.size(); d++) {
+		if (headers.get(h).equals(dasas.get(d).getLabel())) {
+		    dasas.get(d).setTempPositionInt(h);
+		}
+	    } 
+	}
+	
+	// override temporary positions with permanent positions
+	for (int i = 0; i < dasas.size(); i++) {
+	    if (dasas.get(i).getPositionInt() >= 0) {
+		dasas.get(i).setTempPositionInt(dasas.get(i).getPositionInt());
+	    } 
+	}
+	
+	// print final mapping
+	System.out.println("[Ok] Mapping of attributes and labels");
+	//for (DataAcquisitionSchemaAttribute dasa : dasas) {
+	//    System.out.println("Label: " + dasa.getLabel() + "    Position: [" + dasa.getTempPositionInt() + "]");
+	//}	
+	for (DataAcquisitionSchemaAttribute dasa : dasas) {
+	    if (dasa.getTempPositionInt() > -1) {
+		System.out.println("Label: " + dasa.getLabel() + "    Position: [" + dasa.getTempPositionInt() + "]");
+	    }
+	}	
+	
+    }
+    
+    private int tempPositionOfLabel(String label) {
+	//System.out.println("inside tempPositionOfLabel: " + label);
+	if (label == null || label.equals("")) {
+	    return -1;
+	}
+	for (DataAcquisitionSchemaAttribute dasa : schema.getAttributes()) {
+	    //System.out.println(dasa.getLabel());
+	    if (dasa.getLabel().equals(label)) {
+		return dasa.getTempPositionInt();
+	    }
+	}
+	return -1;
+    }
+
     
     private String uppercaseFirstLetter(String str) {
 	if (str == null || str.equals("")) {

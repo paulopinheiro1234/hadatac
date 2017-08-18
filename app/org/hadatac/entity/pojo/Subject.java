@@ -101,11 +101,12 @@ public class Subject extends StudyObject {
 	
 	//		System.out.println(attr_uri + "---" + code);
         String queryString = NameSpaces.getInstance().printSparqlNameSpaceList()
-	    + " SELECT ?codeClass WHERE {"
+	    + " SELECT ?codeClass ?codeResource WHERE {"
 	    + " ?attruri hasco:hasAttribute <" + attr_uri + "> . "
 	    + " ?uri hasco:isPossibleValueOf ?attruri . "
 	    + " ?uri hasco:hasCode \"" + code + "\" . "
-	    + " OPTIONAL { ?uri hasco:hasClass ?codeClass . }"        
+	    + " OPTIONAL { ?uri hasco:hasClass ?codeClass . }"
+	    + " OPTIONAL { ?uri hasco:hasResource ?codeResource . }"
 	    + " }";
         
         Query query = QueryFactory.create(queryString);
@@ -118,11 +119,20 @@ public class Subject extends StudyObject {
         if (resultsrw.size() > 0) {
             QuerySolution soln = resultsrw.next();
             try{
-		if (null != soln.getResource("codeClass")) {
-		    String classUri = soln.getResource("codeClass").toString();
+		if (null != soln.getResource("codeResource")) {
+		    String classUri = soln.getResource("codeResource").toString();
 		    if(!classUri.equals("")){
 			return classUri.substring(classUri.lastIndexOf("#") + 1);
 		    }
+		} else {
+			
+			if (null != soln.getResource("codeClass")) {
+			    String classUri = soln.getResource("codeClass").toString();
+			    if(!classUri.equals("")){
+				return classUri.substring(classUri.lastIndexOf("#") + 1);
+			    }
+			}
+			
 		}
             } catch (Exception e1) {
             	return null;

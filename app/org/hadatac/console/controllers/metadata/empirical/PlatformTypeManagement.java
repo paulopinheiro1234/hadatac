@@ -29,11 +29,10 @@ public class PlatformTypeManagement extends Controller {
 	
     // for /metadata HTTP GET requests
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    public static Result index() {
-	
-    	if (session().get("LabKeyUserName") == null && session().get("LabKeyPassword") == null) {
+    public static Result index(String filename, String da_uri) {
+	if (session().get("LabKeyUserName") == null && session().get("LabKeyPassword") == null) {
 	    return redirect(org.hadatac.console.controllers.triplestore.routes.LoadKB.logInLabkey(
-			    org.hadatac.console.controllers.metadata.empirical.routes.PlatformTypeManagement.index().url()));
+			    org.hadatac.console.controllers.metadata.empirical.routes.PlatformTypeManagement.index(filename, da_uri).url()));
     	}
 	
 	PlatformType type = new PlatformType();
@@ -41,20 +40,20 @@ public class PlatformTypeManagement extends Controller {
 	//System.out.println("JSON: " + json);
 	OtMSparqlQueryResults platformTypes = new OtMSparqlQueryResults(json);
 
-    	return ok(typeManagement.render("Platform", platformTypes));
+    	return ok(typeManagement.render("Platform", filename, da_uri, platformTypes));
 	
     }// /index()
     
     
     // for /metadata HTTP POST requests
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-	public static Result postIndex() {
-    	return index();
+	public static Result postIndex(String filename, String da_uri) {
+    	return index(filename, da_uri);
 	
     }// /postIndex()
     
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-	public static Result processForm() {
+	public static Result processForm(String filename, String da_uri) {
     	final SysUser sysUser = AuthApplication.getLocalUser(session());
 	
         Form<ConceptForm> form = Form.form(ConceptForm.class).bindFromRequest();
@@ -114,12 +113,12 @@ public class PlatformTypeManagement extends Controller {
 	//if (nRowsAffected <= 0) {
 	//    return badRequest("Failed to insert new Platform to LabKey!\n");
 	//	}
-    	return index();
+    	return index(filename, da_uri);
     }
 
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    public static Result postProcessForm() {
-  	return processForm();
+    public static Result postProcessForm(String filename, String da_uri) {
+  	return processForm(filename, da_uri);
 	
     }
 

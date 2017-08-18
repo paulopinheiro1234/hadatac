@@ -86,6 +86,7 @@ public class PrepareIngestion extends Controller {
 	if (file == null) {
 	    return ok(prepareIngestion.render(file_name, da, "[ERROR] Could not update file records with new DA information"));
 	}
+	System.out.println("DataFile's Dataset URI : [" + file.getDatasetUri() + "]");
 
 	// Load associated DA
 	if (da_uri != null && !da_uri.equals("")) {
@@ -304,13 +305,17 @@ public class PrepareIngestion extends Controller {
 	String localScopeUri = data.getNewLocalScopeUri();
 	System.out.println("Showing returned GlobalScope: [" + globalScopeUri + "]");
 	System.out.println("Showing returned LocalScope: [" + localScopeUri + "]");
-	String[] localUriStr = localScopeUri.split(",");
-        System.out.println("List of local scope uris:");
-	for (int i=0; i < localUriStr.length; i++) {
-	    localUriStr[i] = localUriStr[i].trim();
-	    System.out.println("local scope: [" + localUriStr[i] + "]");
+	String[] localUriStr = null;
+	List<String> localScopeUriList = new ArrayList<String>();
+	if (localScopeUri != null) {
+	    localUriStr = localScopeUri.split(",");
+	    System.out.println("List of local scope uris:");
+	    for (int i=0; i < localUriStr.length; i++) {
+		localUriStr[i] = localUriStr[i].trim();
+		System.out.println("local scope: [" + localUriStr[i] + "]");
+	    }
+	    localScopeUriList = Arrays.asList(localUriStr);
 	}
-	List<String> localScopeUriList = Arrays.asList(localUriStr);
         
 	DataAcquisition da = DataAcquisition.findByUri(da_uri);
 	if (da == null) {
@@ -444,6 +449,27 @@ public class PrepareIngestion extends Controller {
 	} catch (CommandException e) {
 	}
 	message = "Association with " + daComponent + " removed from the Data Acquisition.";
+	return ok(prepareIngestion.render(file_name, da, message));
+    }
+    
+    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
+    public static Result completeDataAcquisition(String file_name, String da_uri) {
+	
+	String message = "";
+	DataAcquisition da = DataAcquisition.findByUri(da_uri);
+	if (da == null) {
+	    message = "ERROR - Could not retrieve Data Acquisition from its URI.";
+	    return refine(file_name, da_uri, message);
+	}
+	
+	da.setStatus(9999);
+
+	try {
+	    da.save();
+	    da.saveToLabKey(session().get("LabKeyUserName"), session().get("LabKeyPassword"));
+	} catch (CommandException e) {
+	}
+	message = "Data Acquisition set as complete";
 	return ok(prepareIngestion.render(file_name, da, message));
     }
     

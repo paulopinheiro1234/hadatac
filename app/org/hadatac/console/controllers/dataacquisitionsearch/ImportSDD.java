@@ -29,7 +29,6 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.hadatac.console.controllers.annotator.AnnotationLog;
 import org.hadatac.console.views.html.dataacquisitionsearch.*;
-import org.hadatac.data.loader.ccsv.Parser;
 import org.hadatac.data.loader.util.Arguments;
 import org.hadatac.data.loader.util.FileFactory;
 import org.hadatac.entity.pojo.Credential;

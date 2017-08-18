@@ -1,0 +1,116 @@
+@(mode        : String,
+  fileName    : String,
+  da_uri      : String,
+  oc_uri      : String,
+  headers     : List[String],
+  preview     : ArrayList[ArrayList[String]]
+)
+
+@import helper._
+@import org.hadatac.console.views.html._
+@import org.hadatac.console.views.html.annotator._
+@import org.hadatac.console.controllers.annotator._
+@import org.hadatac.metadata.loader._
+@import java.net._
+
+@main("CSV Preview"){
+   <style>
+     .col-selected { background: #AED6F1; }
+   </style>
+
+ @if(mode.equals("selectCol")) {
+   <script>
+     var selectedColumn = -1;
+     
+     function colSelect(obj){
+         var btn = document.getElementById("colSelector");
+         //unselect
+         if (obj.classList.contains('col-selected')) {
+              obj.classList.remove('col-selected');
+              //btn.classList.add('disabled');
+              //btn.setAttribute('href', '' );
+              selectedColumn = -1;
+              //select
+          } else {
+	      var colNumber = obj.id.split('-')[1];
+              var allCols = document.getElementsByClassName('col-selectable');
+              for (i = 0; i < allCols.length; i++) {
+	         allCols[i].classList.remove('col-selected')
+	      }
+	      obj.classList.add('col-selected');
+              //btn.classList.remove('disabled');
+	      selectedColumn = colNumber;
+              document.getElementById('colSelector').disabled = false;
+	      $('#position').val(colNumber);
+	      //link = 'org.hadatac.console.controllers.fileviewer.routes.CSVPreview.selectColumn(ownerEmail,fileName,' + selectedColumn + ')'
+	      //btn.setAttribute('href', link);
+	  }
+
+      }
+    </script>
+}
+
+   <div>
+     <h3>File: @fileName</h3>
+     @if(mode.equals("selectCol")) {
+       <form>
+       <div id="rcorners">
+            <label>Selected Collection: </label> <input type="text" id="collection" name="collection" size="50" value="@ValueCellProcessing.replaceNameSpaceEx(oc_uri)"  readonly>
+            <label>Selected Column: </label> <input type="text" id="position" name="position"  readonly>
+
+	    <input type="submit" id="colSelector" name="colSelector" class="btn btn-primary" disabled="disabled"
+ 		   role="button" value="Generate Objects" formmethod="post"
+		   formaction="@org.hadatac.console.controllers.objects.routes.NewObjectsFromFile.processForm(fileName, da_uri, oc_uri)">
+            </input>
+	    <a href=""  id="reset" name="reset" class="btn btn-primary"
+ 	       role="button">Reset</a>
+      </div>
+      </form>
+      <br>      
+       Click on the column's labels to select a column with object identifiers (e.g., Subject IDs, sample IDs). 
+     }
+   </div>
+   <div id="rcorners">
+     <div id="csv-preview"; 
+	  @if(mode.equals("selectCol")) { 
+	     style="height:350px; overflow:auto; padding-right: 50px; padding-left: 50px;" 
+	  } else {
+	     style="height:500px; overflow:auto; padding-right: 50px; padding-left: 50px;" 
+	  }>
+       @render_table(headers,preview)
+     </div>
+   </div>
+   <br>
+   <div>
+       @if(da_uri != null && !da_uri.equals("")) {
+            <a href="@org.hadatac.console.controllers.annotator.routes.PrepareIngestion.create(fileName,da_uri)" 
+	       class="btn btn-primary" role="button">Back to Prepare Ingestion</a>
+       } else {
+	    <a href="@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.index()" 
+	       class="btn btn-primary" role="button">Back to Manage CSV Annotation</a>
+       }
+   </div>
+}
+
+    @render_table(headers: List[String], preview: ArrayList[ArrayList[String]]) = {
+	@if(headers==null || preview==null || headers.size()<=0 || preview.size()<=0) {
+		<p>No preview to display</p>
+	} else {
+		<div>
+	             <table class="table">
+		         <tr>
+		           @for(index <- 0 until headers.size){
+			      <th id="previewCol-@index" class="col-selectable" onclick="colSelect(this)">@headers(index)</th>
+		           }
+			 </tr>
+	                   @for((prevRow) <- preview){
+			      <tr>
+				@for((entry) <- prevRow){
+				   <td>@entry</td>
+				}
+			      </tr>
+			   }    
+		      </table>
+		</div>
+	}
+}

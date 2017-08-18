@@ -5,6 +5,8 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
+import java.io.StringWriter;
+import java.io.PrintWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
@@ -75,6 +77,9 @@ import org.hadatac.data.loader.SampleCollectionGenerator;
 import org.hadatac.data.loader.SampleSubjectMapper;
 import org.hadatac.data.loader.StudyGenerator;
 import org.hadatac.data.loader.SubjectGenerator;
+import org.hadatac.data.loader.ccsv.Parser2;
+import org.hadatac.data.loader.util.Arguments;
+import org.hadatac.data.loader.util.FileFactory;
 import org.hadatac.data.model.ParsingResult;
 import org.hadatac.entity.pojo.DataFile;
 import org.hadatac.entity.pojo.Measurement;
@@ -932,20 +937,30 @@ public class AutoAnnotator extends Controller {
 	}
 
 	public static boolean annotateCSVFile(DataFile dataFile) {
+	        System.out.println("annotateCSVFile: [" + dataFile.getFileName() + "]"); 
 		String file_name = dataFile.getFileName();    	
 		AnnotationLog log = new AnnotationLog();
 		log.setFileName(file_name);
 
+		DataAcquisition da = null;
 		String da_uri = null;
 		String deployment_uri = null;
 		String schema_uri = null;
 
 		if (dataFile != null) {
-			DataAcquisition dataAcquisition = DataAcquisition.findByUri(ValueCellProcessing.replacePrefixEx(dataFile.getDataAcquisitionUri()));
-			if (dataAcquisition != null) {
-				da_uri = dataAcquisition.getUri();
-				deployment_uri = dataAcquisition.getDeploymentUri();
-				schema_uri = dataAcquisition.getSchemaUri();
+			da = DataAcquisition.findByUri(ValueCellProcessing.replacePrefixEx(dataFile.getDataAcquisitionUri()));
+			if (da != null) {
+			    if (!da.isComplete()) {
+				log.addline(Feedback.println(Feedback.WEB, 
+					    String.format("[WARNING] Specification of associated Data Acquisition is incomplete: %s", file_name)));
+				log.save();
+				return false;
+			    } else {
+				log.addline(Feedback.println(Feedback.WEB, String.format("[OK] Specification of associated Data Acquisition is complete: %s", file_name)));
+			    }
+			    da_uri = da.getUri();
+			    deployment_uri = da.getDeploymentUri();
+			    schema_uri = da.getSchemaUri();
 			}
 		}
 
@@ -957,14 +972,14 @@ public class AutoAnnotator extends Controller {
 			log.addline(Feedback.println(Feedback.WEB, String.format("[OK] Found target data acquisition: %s", file_name)));
 		}
 		if (schema_uri == null) {
-			log.addline(Feedback.println(Feedback.WEB, String.format("[ERROR] No schemas specified for data acquisition: %s", file_name)));
+			log.addline(Feedback.println(Feedback.WEB, String.format("[ERROR] Cannot load schema specified for data acquisition: %s", file_name)));
 			log.save();
 			return false;
 		} else {
 			log.addline(Feedback.println(Feedback.WEB, String.format("[OK] Schema %s specified for data acquisition: %s", schema_uri, file_name)));
 		}
 		if (deployment_uri == null) {
-			log.addline(Feedback.println(Feedback.WEB, String.format("[ERROR] No deployments specified for data acquisition: %s", file_name)));
+			log.addline(Feedback.println(Feedback.WEB, String.format("[ERROR] Cannot load deployment specified for data acquisition: %s", file_name)));
 			log.save();
 			return false;
 		} else {
@@ -978,11 +993,10 @@ public class AutoAnnotator extends Controller {
 			log.addline(Feedback.println(Feedback.WEB, String.format("[OK] Deployment %s specified for data acquisition %s", deployment_uri, file_name)));
 		}
 
+		/*
 		CSVAnnotationHandler handler = null;
 		if (!deployment_uri.equals("")) {
-			/*
-			 *  Add deployment information into handler
-			 */
+		        // Add deployment information into handler
 			String json = DeploymentQueries.exec(DeploymentQueries.DEPLOYMENT_BY_URI, deployment_uri);
 			SparqlQueryResults results = new SparqlQueryResults(json, false);
 			Iterator<TripleDocument> iterator = results.sparqlResults.values().iterator();
@@ -998,9 +1012,7 @@ public class AutoAnnotator extends Controller {
 				return false;
 			}
 
-			/*
-			 * Add possible detector's characteristics into handler
-			 */
+			// Add possible detector's characteristics into handler
 			String dep_json = DeploymentQueries.exec(
 					DeploymentQueries.DEPLOYMENT_CHARACTERISTICS_BY_URI, deployment_uri);
 			SparqlQueryResults char_results = new SparqlQueryResults(dep_json, false);
@@ -1014,32 +1026,62 @@ public class AutoAnnotator extends Controller {
 			}
 			handler.setDeploymentCharacteristics(deploymentChars);
 
-			DataAcquisition da = DataAcquisition.findByUri(da_uri);
-			if (da != null && da.getUri() != null) {
-				handler.setDataAcquisitionUri(da.getUri());
-				handler.setDatasetUri(DataFactory.getNextDatasetURI(handler.getDataAcquisitionUri()));
-			}
-		}
+			}*/
 
 		String path_unproc = ConfigProp.getPropertyValue("autoccsv.config", "path_unproc");
-		File newFile = new File(path_unproc + file_name);
+		int status = -1;
+		String message = "";
+		Arguments arguments = new Arguments();
+		arguments.setInputPath(path_unproc + file_name);
+		arguments.setInputType("CSV");
+		arguments.setOutputPath("upload/");
+		arguments.setVerbose(true);
+		arguments.setPv(false);
+		
+		Parser2 parser = new Parser2();
+		ParsingResult result_parse;
+		File inputFile = new File(arguments.getInputPath());
+		FileFactory files = new FileFactory(arguments);
+		files.setCSVFile(inputFile, inputFile.getName());
+		
+		try {
+		    files.openFile("log", "w");
+		    files.writeln("log", "[START] " + arguments.getInputPath() + " generating measurements.");
+		} catch (Exception e) {
+		    log.addline(Feedback.println(Feedback.WEB, String.format("[ERROR] opening CSV file %s", e.getMessage())));
+		    log.save();
+		    return false;
+		}
+
+		try {
+		    if (arguments.getInputType().equals("CSV")) {
+			System.out.println("annotateCSVFile: file to be parsed [" + dataFile.getFileName() + "]"); 
+			dataFile.setDatasetUri(DataFactory.getNextDatasetURI(da.getUri()));
+			da.addDatasetUri(dataFile.getDatasetUri());
+			result_parse = parser.indexMeasurements(files, da, dataFile);
+			status = result_parse.getStatus();
+			message += result_parse.getMessage();
+		    }
+		} catch (Exception e) {
+		    StringWriter errors = new StringWriter();
+		    e.printStackTrace(new PrintWriter(errors));
+		    log.addline(Feedback.println(Feedback.WEB, String.format("[ERROR] parsing and indexing CVS file %s", errors.toString())));
+		    log.save();
+		    return false;
+		}
+
+		/*
 		try {
 			FileUtils.writeStringToFile(new File(LoadCCSV.UPLOAD_NAME), 
 					createPreamble(handler, schema_uri) + 
-					FileUtils.readFileToString(newFile, "UTF-8"));
-		} catch (Exception e) {
-			log.addline(Feedback.println(Feedback.WEB, String.format("[ERROR] %s", e.getMessage())));
-			log.save();
-			return false;
-		}
+					FileUtils.readFileToString(newFile, "UTF-8")); */
 
 		// Parse and load the generated CCSV file
-		ParsingResult result = LoadCCSV.playLoadCCSV();
-		log.addline(result.getMessage());
-		log.save();
-		if(result.getStatus() == 0){
-			dataFile.setDatasetUri(handler.getDatasetUri());
-			return true;
+		//ParsingResult result = LoadCCSV.playLoadCCSV();
+		//log.addline(result.getMessage());
+		//log.save();
+		if (status == 0) {
+		    return true;
 		}
 
 		return false;

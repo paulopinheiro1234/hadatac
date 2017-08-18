@@ -1,19 +1,17 @@
-@(studyType     : org.hadatac.entity.pojo.StudyType,
-  organizations : List[org.hadatac.entity.pojo.Agent],
-  persons       : List[org.hadatac.entity.pojo.Agent],
-  file          : org.hadatac.entity.pojo.DataFile) 
+@(filename     : String,
+  da_uri       : String,
+  platformType : org.hadatac.entity.pojo.PlatformType)
 
 @import helper._
 @import org.hadatac.utils._
 @import org.hadatac.console.views.html._
 @import org.hadatac.console.controllers._
-@import org.hadatac.entity.pojo.Agent
 @import play._
 
-@main("New Study") {
+@main("New Platform") {
 
   <div class="container">
-    <h2>New Study</h2>
+    <h2>New Platform</h2>
 
    <script type="text/javascript">
      function checkform() {
@@ -43,7 +41,7 @@
      }
        
      function labelchange() {
-        var newUri = "@Play.application().configuration().getString("hadatac.community.ont_prefix")" + "-kb:STD-" + document.getElementById("newLabel").value;
+        var newUri = "@Play.application().configuration().getString("hadatac.community.ont_prefix")" + "-kb:PLT-" + document.getElementById("newLabel").value;
         newUri = replaceAll(newUri," ","-");
 	newUri = replaceAll(newUri,"<","");
         newUri = replaceAll(newUri,">","");
@@ -91,7 +89,7 @@
       }
    </style>
 
-    <form class="form-horizontal" name="newStudy">
+    <form class="form-horizontal" name="newPlatform">
 	
 	<div class="form-group">
 		<label>URI:</label>
@@ -107,61 +105,27 @@
 		<input type="text" class="form-control col-sm-6" name="currentType" id="currentType" 
 		       onchange="checkform()" readonly >
 		<div>
-                   (Use selector below to set/modify study type)
+                   (Use selector below to set/modify platform type)
                    <ul class="tree" onchange="checkform()">
-		     @tree_node(studyType.getHierarchy(),"newStudyType", "")
+		     @tree_node(platformType.getHierarchy(),"newPlatformType", "")
                    </ul>
                 </div>
- 	</div>
- 	<div class="form-group">
-		<label>Title</label>
- 		<input type="text" class="form-control col-sm-6" name="newTitle" id="newTitle" onchange="checkform()" >
- 	</div>
- 	<div class="form-group">
-		<label>Project</label>
- 		<input type="text" class="form-control col-sm-6" name="newProject" id="newProject" onchange="checkform()" >
  	</div>
  	<div class="form-group">
 		<label>Description</label>
  		<input type="text" class="form-control col-sm-6" name="newComment" id="newComment" onchange="checkform()" >
  	</div>
- 	<div class="form-group">
-		<label>External Source</label>
- 		<input type="text" class="form-control col-sm-6" name="newExternalSource" id="newExternalSource" onchange="checkform()" >
- 	</div>
- 	<div class="form-group">
-		<label>PI</label>
-	     <select id="newAgent" class="form-control col-sm-6" name="newAgent">
-	       <option></option>
-	       @if(persons != null) {
-                 @for(person <- persons){
- 	           @agent_select_entry(person,"")
-                 }
-               } 
-             </select>
- 	</div>
- 	<div class="form-group">
-	     <label>Institution</label>
-	     <select id="newInstitution" class="form-control col-sm-6" name="newInstitution">
-	       <option></option>
-	       @if(organizations != null) {
-                 @for(organization <- organizations){
- 	           @agent_select_entry(organization,"")
-                 }
-               } 
-             </select>
- 	</div>
      
 	<div class="form-group">
 	  <label>Updates</label> <br>
-	  @if(file == null) {
-	       <input class="btn btn-success btn-sm" role="button" type="submit" id="submit" value="Create Study" disabled 
-		      formmethod="post" formaction="@org.hadatac.console.controllers.studies.routes.NewStudy.processForm("","")"/><br>
-	       <a href="@org.hadatac.console.controllers.studies.routes.StudyManagement.index()" class="btn btn-primary" role="button">Back to Study Management</a>
+	  @if(filename == null) {
+	       <input class="btn btn-success btn-sm" role="button" type="submit" id="submit" value="Create Platform" disabled 
+		      formmethod="post" formaction="@org.hadatac.console.controllers.metadata.empirical.routes.NewPlatform.processForm(filename,da_uri)"/><br>
+	       <a href="@org.hadatac.console.controllers.metadata.empirical.routes.PlatformManagement.index(filename, da_uri)" class="btn btn-primary" role="button">Back to Platform Management</a>
           } else {
-	       <input class="btn btn-success btn-sm" role="button" type="submit" id="submit" value="Create Study" disabled 
-		      formmethod="post" formaction="@org.hadatac.console.controllers.studies.routes.NewStudy.processForm(file.getFileName(),file.getDataAcquisitionUri())"/><br>
-    	       <a href="@org.hadatac.console.controllers.annotator.routes.PrepareIngestion.create(file.getFileName(),file.getDataAcquisitionUri())" 
+	       <input class="btn btn-success btn-sm" role="button" type="submit" id="submit" value="Create Platform" disabled 
+		      formmethod="post" formaction="@org.hadatac.console.controllers.metadata.empirical.routes.NewPlatform.processForm(filename,da_uri)"/><br>
+    	       <a href="@org.hadatac.console.controllers.annotator.routes.PrepareIngestion.create(filename,da_uri)" 
 		  class="btn btn-primary" role="button">Back to Prepare Ingestion</a>
           }
 	</div>

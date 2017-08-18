@@ -105,6 +105,7 @@ public class EditStudy extends Controller {
 	String newTitle = data.getNewTitle();
 	String newProject = data.getNewProject();
 	String newComment = data.getNewComment();
+	String newExternalSource = data.getNewExternalSource();
 	String newInstitution = data.getNewInstitution();
 	String newAgent = data.getNewAgent();
 	String newStartDateTime = data.getNewStartDateTime();
@@ -134,6 +135,9 @@ public class EditStudy extends Controller {
 	    if (oldStudy.getComment() == null || !oldStudy.getComment().equals(newComment)) {
 		changedInfos.add(newComment);
 	    }
+	    if (oldStudy.getExternalSource() == null || !oldStudy.getExternalSource().equals(newExternalSource)) {
+		changedInfos.add(newExternalSource);
+	    }
 	    if (oldStudy.getInstitution() == null || !oldStudy.getInstitution().equals(newInstitution)) {
 		changedInfos.add(newInstitution);
 	    }
@@ -162,6 +166,7 @@ public class EditStudy extends Controller {
 	oldStudy.setTitle(newTitle);
 	oldStudy.setProject(newProject);
 	oldStudy.setComment(newComment);
+	oldStudy.setExternalSource(newExternalSource);
 	oldStudy.setInstitutionUri(newInstitution);
 	oldStudy.setAgentUri(newAgent);
 	oldStudy.setStartedAt(newStartDateTime);
