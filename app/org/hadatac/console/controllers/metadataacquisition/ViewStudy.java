@@ -80,9 +80,9 @@ public class ViewStudy extends Controller {
 				List<String> indvIndicatorList = new ArrayList<String>();
 				while (resultsrwIndvInd.hasNext()) {
 					QuerySolution soln = resultsrwIndvInd.next();
-					System.out.println("Solution: " + soln);
-					
-					if(Measurement.findForViews(findUser(), study_uri, "", soln.get("uri").toString()).documents.size() > 0){
+					System.out.println("ViewStudy Solution: " + soln);
+					if(Measurement.findForViews(UserManagement.getCurrentUserUri(), study_uri, "", 
+							soln.get("uri").toString(), true).getDocumentSize() > 0){
 						indvIndicatorList.add(soln.get("label").toString());
 					}
 				}
@@ -142,7 +142,7 @@ public class ViewStudy extends Controller {
 				
 				while (resultsrwIndvInd.hasNext()) {
 					QuerySolution soln = resultsrwIndvInd.next();
-					System.out.println("Solution: " + soln);
+					System.out.println("ViewStudy Solution: " + soln);
 					indicatorUris.put(soln.get("label").toString(), soln.get("uri").toString());
 				}
 			} catch (QueryExceptionHTTP e) {
@@ -273,20 +273,6 @@ public class ViewStudy extends Controller {
 		
 		return values;
 	}
-
-	public static String findUser() {
-		String results = null;
-	    final SysUser user = AuthApplication.getLocalUser(session());
-	    if(null == user){
-	        results = null;
-	    }
-	    else{
-	    	results = UserManagement.getUriByEmail(user.getEmail());
-	    }
-	    //System.out.println("This is the current user's uri:" + results);
-	    
-	    return results;
-	}
 	
 	@Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
     public static Result index(String study_uri) {
@@ -298,7 +284,7 @@ public class ViewStudy extends Controller {
 		List<String> scResult = findSampleCollection(study_uri);
 		Map<String, String> showValues = new HashMap<String, String>();
 		showValues.put("study", study_uri);
-		showValues.put("user", findUser());
+		showValues.put("user", UserManagement.getCurrentUserUri());
         
     	return ok(viewStudy.render(poResult, subjectResult, indicatorValues, indicatorUris, showValues, scResult));
     }

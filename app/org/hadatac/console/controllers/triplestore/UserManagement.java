@@ -571,4 +571,16 @@ public class UserManagement extends Controller {
 		
 		return uri;
 	}
+	
+	public static String getCurrentUserUri() {
+		String uri = null;
+	    final SysUser user = AuthApplication.getLocalUser(session());
+	    if(null == user){
+	    	uri = null;
+	    }
+	    else{
+	    	uri = UserManagement.getUriByEmail(user.getEmail());
+	    }	    
+	    return uri;
+	}
 }

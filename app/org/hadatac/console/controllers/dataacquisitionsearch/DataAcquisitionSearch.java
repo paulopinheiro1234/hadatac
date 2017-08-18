@@ -1,13 +1,24 @@
 package org.hadatac.console.controllers.dataacquisitionsearch;
 
+import org.apache.jena.query.QueryExecution;
+import org.apache.jena.query.QueryExecutionFactory;
+import org.apache.jena.query.QuerySolution;
+import org.apache.jena.query.ResultSet;
+import org.apache.jena.query.ResultSetFactory;
+import org.apache.jena.query.ResultSetRewindable;
+import org.apache.jena.sparql.engine.http.QueryExceptionHTTP;
 import org.hadatac.console.controllers.AuthApplication;
+import org.hadatac.console.controllers.metadataacquisition.ViewStudy;
 import org.hadatac.console.controllers.triplestore.UserManagement;
 import org.hadatac.console.http.JsonHandler;
 import org.hadatac.console.controllers.metadataacquisition.ViewSubject;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.StringTokenizer;
+import java.util.TreeMap;
 import java.util.Set;
 import java.util.HashSet;
 
@@ -26,7 +37,12 @@ import org.hadatac.console.views.formdata.FacetFormData;
 import org.hadatac.console.views.html.dataacquisitionsearch.facetOnlyBrowser;
 import org.hadatac.console.views.html.dataacquisitionsearch.dataacquisition_browser;
 import org.hadatac.data.model.AcquisitionQueryResult;
+import org.hadatac.entity.pojo.Indicator;
 import org.hadatac.entity.pojo.Measurement;
+import org.hadatac.utils.Collections;
+import org.hadatac.utils.NameSpaces;
+
+import com.sun.glass.ui.View;
 
 
 public class DataAcquisitionSearch extends Controller {
@@ -83,25 +99,21 @@ public class DataAcquisitionSearch extends Controller {
     	
     	FacetHandler handler = new FacetHandler();
     	handler.loadFacets(facets);
-    	//System.out.println("DataAcquisitionSearch : <" + handler.toSolrQuery() + ">");
+    	System.out.println("DataAcquisitionSearch : <" + handler.toSolrQuery() + ">");
 
     	AcquisitionQueryResult results = null;
     	String ownerUri;
     	final SysUser user = AuthApplication.getLocalUser(session());
-    	if(null == user) {
+    	if (null == user) {
     	    ownerUri = "Public";
-	        //System.out.println("User URI: NULL");
-    		results = Measurement.find(ownerUri, page, rows, handler);
     	}
-    	else{
+    	else {
     		ownerUri = UserManagement.getUriByEmail(user.getEmail());
-          	//System.out.println("User URI: " + ownerUri);
     		if(null == ownerUri){
     			ownerUri = "Public";
     		}
-    		results = Measurement.find(ownerUri, page, rows, handler);
     	}
-    	//System.out.println("[DataAcquisitionSearch] Total size response: " + results.getDocumentSize());
+    	results = Measurement.find(ownerUri, page, rows, handler);
     	
     	Set<String> setObj = new HashSet<String>();
     	ObjectDetails objDetails = new ObjectDetails();

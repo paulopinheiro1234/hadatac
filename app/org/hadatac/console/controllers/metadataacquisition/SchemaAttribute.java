@@ -131,15 +131,13 @@ public class SchemaAttribute extends Controller {
 		qexecStudy.close();
 		
 		HashMap<String, HashMap<String, Object>> mapDAInfo = new HashMap<String, HashMap<String, Object>>();
-		ValueCellProcessing cellProc = new ValueCellProcessing();
 		while (resultsrwStudy.hasNext()) {
 			QuerySolution soln = resultsrwStudy.next();
-			System.out.println("Solution: " + soln.toString());
+			System.out.println("SchemaAttribute Solution: " + soln.toString());
 			String attributeUri = DynamicFunctions.replaceURLWithPrefix(soln.get("DASAttributeUri").toString());
 			HashMap<String, Object> DAInfo = null;
 			String key = "";
 			String value = "";
-			ArrayList<String> arrValues = null;
 			
 			if (!mapDAInfo.containsKey(attributeUri)) {
 				DAInfo = new HashMap<String, Object>();
@@ -154,7 +152,7 @@ public class SchemaAttribute extends Controller {
 				DAInfo.put("DASAttributeLabel_i", "<a href=\""
 						+ Play.application().configuration().getString("hadatac.console.host_deploy") 
 						+ "/hadatac/metadataacquisitions/viewDASA?da_uri=" 
-						+ cellProc.replaceNameSpaceEx(DAInfo.get("DASAttributeUri").toString()) + "\">"
+						+ ValueCellProcessing.replaceNameSpaceEx(DAInfo.get("DASAttributeUri").toString()) + "\">"
 						+ soln.get("DASAttributeLabel").toString() + "</a>");
 			}
 			if (soln.contains("DataAcquisitionSchema") && !DAInfo.containsKey("DataAcquisitionSchema_i")) {
@@ -223,9 +221,9 @@ public class SchemaAttribute extends Controller {
 	
 	public static int deleteFromSolr() {
 		try {
-			SolrClient solr = new HttpSolrClient(
+			SolrClient solr = new HttpSolrClient.Builder(
 					Play.application().configuration().getString("hadatac.solr.data") 
-					+ Collections.SA_ACQUISITION);
+					+ Collections.SA_ACQUISITION).build();
 			UpdateResponse response = solr.deleteByQuery("*:*");
 			solr.commit();
 			solr.close();
@@ -244,7 +242,6 @@ public class SchemaAttribute extends Controller {
 	@Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
     public static Result update() {
 		updateDASchemaAttributes();
-		
 		return redirect(routes.SchemaAttribute.index());
     }
     

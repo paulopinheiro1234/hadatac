@@ -1,6 +1,12 @@
 package org.hadatac.entity.pojo;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
+import java.net.URLEncoder;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -17,6 +23,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.function.BiConsumer;
 
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrQuery;
@@ -32,11 +39,17 @@ import org.apache.solr.client.solrj.response.RangeFacet;
 import org.apache.solr.client.solrj.response.UpdateResponse;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
+import org.apache.solr.common.util.NamedList;
 import org.hadatac.console.models.FacetHandler;
 import org.hadatac.console.models.Pivot;
 import org.hadatac.data.model.AcquisitionQueryResult;
 import org.hadatac.utils.Collections;
 import org.hadatac.utils.NameSpaces;
+
+import com.github.jsonldjava.utils.Obj;
+import com.google.gson.Gson;
+import com.typesafe.config.ConfigException.Parse;
+
 import org.apache.jena.query.Query;
 import org.apache.jena.query.QueryExecution;
 import org.apache.jena.query.QueryExecutionFactory;
@@ -80,6 +93,10 @@ public class Measurement {
 	private String characteristic;
 	@Field("characteristic_uri")
 	private String characteristicUri;
+	@Field("indicator")
+	private String indicator;
+	@Field("indicator_uri")
+	private String indicatorUri;
 	@Field("instrument_model")
 	private String instrumentModel;
 	@Field("instrument_uri")
@@ -122,110 +139,110 @@ public class Measurement {
 	public String getObjectUri() {
 		return objectUri;
 	}
-	
+
 	public void setPID(String objectUri) {
 		this.objectUri = objectUri;
 		this.pid = getObjectPID();
 	}
-	
+
 	public void setSID(String objectUri) {
 		this.objectUri = objectUri;
 		this.sid = getObjectSID();
 	}
-	
+
 	public String getObjectPID() {
-		
-//		this.objectUri = objectUri;
-		
-        String queryString = NameSpaces.getInstance().printSparqlNameSpaceList()
-                + " SELECT ?pid WHERE {"
-                + " <" + objectUri + "> rdf:type <http://semanticscience.org/resource/Human> . "
-                + " <" + objectUri + "> <http://hadatac.org/ont/hasco/originalID> ?pid . "       
-                + " }";
-        
-        Query query = QueryFactory.create(queryString);
-        QueryExecution qexec = QueryExecutionFactory.sparqlService(
-                Collections.getCollectionsName(Collections.METADATA_SPARQL), query);
-        ResultSet results = qexec.execSelect();
-        ResultSetRewindable resultsrw = ResultSetFactory.copyResults(results);
-        qexec.close();
-        
-        if (resultsrw.size() > 0) {
-            QuerySolution soln = resultsrw.next();
-            try{
-		            if (null != soln.getLiteral("pid")) {
-		            	String pid = soln.getLiteral("pid").toString();
-		            	if (!pid.equals("")) {
-		            		return pid;
-		            	}
-		            }
-		        } catch (Exception e1) {
-		        	return "";
-		        }
-            } else {
-        	String queryString2 = NameSpaces.getInstance().printSparqlNameSpaceList()
-                    + " SELECT ?pid WHERE {"
-                    + " <" + objectUri + "> <http://hadatac.org/ont/hasco/isSampleOf> ?sub . "
-                    + " ?sub <http://hadatac.org/ont/hasco/originalID> ?pid . "       
-                    + " }";
-            
-            Query query2 = QueryFactory.create(queryString2);
-            QueryExecution qexec2 = QueryExecutionFactory.sparqlService(
-                    Collections.getCollectionsName(Collections.METADATA_SPARQL), query2);
-            ResultSet results2 = qexec2.execSelect();
-            ResultSetRewindable resultsrw2 = ResultSetFactory.copyResults(results2);
-            qexec2.close();
-            
-            if (resultsrw2.size() > 0) {
-                QuerySolution soln2 = resultsrw2.next();
-                try{
-	                if (null != soln2.getLiteral("pid")) {
-	                	String pid = soln2.getLiteral("pid").toString();
-	                	if (!pid.equals("")) {
-	                		return pid;
-	                	}
-	                }
-                } catch (Exception e1) {
-                	return "";
-                }
-            }
-            }
-            return "";
+
+		//		this.objectUri = objectUri;
+
+		String queryString = NameSpaces.getInstance().printSparqlNameSpaceList()
+				+ " SELECT ?pid WHERE {"
+				+ " <" + objectUri + "> rdf:type <http://semanticscience.org/resource/Human> . "
+				+ " <" + objectUri + "> <http://hadatac.org/ont/hasco/originalID> ?pid . "       
+				+ " }";
+
+		Query query = QueryFactory.create(queryString);
+		QueryExecution qexec = QueryExecutionFactory.sparqlService(
+				Collections.getCollectionsName(Collections.METADATA_SPARQL), query);
+		ResultSet results = qexec.execSelect();
+		ResultSetRewindable resultsrw = ResultSetFactory.copyResults(results);
+		qexec.close();
+
+		if (resultsrw.size() > 0) {
+			QuerySolution soln = resultsrw.next();
+			try{
+				if (null != soln.getLiteral("pid")) {
+					String pid = soln.getLiteral("pid").toString();
+					if (!pid.equals("")) {
+						return pid;
+					}
+				}
+			} catch (Exception e1) {
+				return "";
+			}
+		} else {
+			String queryString2 = NameSpaces.getInstance().printSparqlNameSpaceList()
+					+ " SELECT ?pid WHERE {"
+					+ " <" + objectUri + "> <http://hadatac.org/ont/hasco/isSampleOf> ?sub . "
+					+ " ?sub <http://hadatac.org/ont/hasco/originalID> ?pid . "       
+					+ " }";
+
+			Query query2 = QueryFactory.create(queryString2);
+			QueryExecution qexec2 = QueryExecutionFactory.sparqlService(
+					Collections.getCollectionsName(Collections.METADATA_SPARQL), query2);
+			ResultSet results2 = qexec2.execSelect();
+			ResultSetRewindable resultsrw2 = ResultSetFactory.copyResults(results2);
+			qexec2.close();
+
+			if (resultsrw2.size() > 0) {
+				QuerySolution soln2 = resultsrw2.next();
+				try{
+					if (null != soln2.getLiteral("pid")) {
+						String pid = soln2.getLiteral("pid").toString();
+						if (!pid.equals("")) {
+							return pid;
+						}
+					}
+				} catch (Exception e1) {
+					return "";
+				}
+			}
+		}
+		return "";
 	}
-	
+
 	public String getObjectSID() {
-		
-//		this.objectUri = objectUri;
-		
-        String queryString = NameSpaces.getInstance().printSparqlNameSpaceList()
-                + " SELECT ?sid WHERE {"
-                + " <" + objectUri + "> <http://hadatac.org/ont/hasco/originalID> ?sid . "  
-                + " <" + objectUri + "> <http://hadatac.org/ont/hasco/isObjectOf> ?sc . "
-                + " ?sc	rdf:type <http://hadatac.org/ont/hasco/SampleCollection> . "
-                + " }";
-        
-        Query query = QueryFactory.create(queryString);
-        QueryExecution qexec = QueryExecutionFactory.sparqlService(
-                Collections.getCollectionsName(Collections.METADATA_SPARQL), query);
-        ResultSet results = qexec.execSelect();
-        ResultSetRewindable resultsrw = ResultSetFactory.copyResults(results);
-        qexec.close();
-        
-        if (resultsrw.size() > 0) {
-            QuerySolution soln = resultsrw.next();
-            try{
-	            if (null != soln.getLiteral("sid")) {
-	            	String sid = soln.getLiteral("sid").toString();
-	            	if (!sid.equals("")) {
-	            		return sid;
-	            	}
-	            }
-            } catch (Exception e1) {
-            	return "";
-            }
-        }
-        
-        return "";
+
+		//		this.objectUri = objectUri;
+
+		String queryString = NameSpaces.getInstance().printSparqlNameSpaceList()
+				+ " SELECT ?sid WHERE {"
+				+ " <" + objectUri + "> <http://hadatac.org/ont/hasco/originalID> ?sid . "  
+				+ " <" + objectUri + "> <http://hadatac.org/ont/hasco/isObjectOf> ?sc . "
+				+ " ?sc	rdf:type <http://hadatac.org/ont/hasco/SampleCollection> . "
+				+ " }";
+
+		Query query = QueryFactory.create(queryString);
+		QueryExecution qexec = QueryExecutionFactory.sparqlService(
+				Collections.getCollectionsName(Collections.METADATA_SPARQL), query);
+		ResultSet results = qexec.execSelect();
+		ResultSetRewindable resultsrw = ResultSetFactory.copyResults(results);
+		qexec.close();
+
+		if (resultsrw.size() > 0) {
+			QuerySolution soln = resultsrw.next();
+			try{
+				if (null != soln.getLiteral("sid")) {
+					String sid = soln.getLiteral("sid").toString();
+					if (!sid.equals("")) {
+						return sid;
+					}
+				}
+			} catch (Exception e1) {
+				return "";
+			}
+		}
+
+		return "";
 	}	
 
 	public void setObjectUri(String objectUri) {
@@ -280,7 +297,7 @@ public class Measurement {
 	public void setTimestamp(String timestamp) {
 		this.timestamp = Instant.parse(timestamp);
 	}
-	
+
 	public String getAbstractTime() {
 		return abstractTime;
 	}
@@ -343,6 +360,22 @@ public class Measurement {
 
 	public void setCharacteristicUri(String characteristicUri) {
 		this.characteristicUri = characteristicUri;
+	}
+
+	public String getIndicator() {
+		return indicator;
+	}
+
+	public void setIndicator(String indicator) {
+		this.indicator = indicator;
+	}
+
+	public String getIndicatorUri() {
+		return indicatorUri;
+	}
+
+	public void setIndicatorUri(String indicatorUri) {
+		this.indicatorUri = indicatorUri;
 	}
 
 	public String getLocation() {
@@ -483,8 +516,8 @@ public class Measurement {
 		return q;
 	}
 
-	public static AcquisitionQueryResult findForViews(String user_uri, String study_uri, String subject_uri,
-			String char_uri) {
+	public static AcquisitionQueryResult findForViews(String user_uri, String study_uri, 
+			String subject_uri, String char_uri, boolean bNumberOfResultsOnly) {
 		AcquisitionQueryResult result = new AcquisitionQueryResult();
 
 		String q = buildQuery(user_uri, study_uri, subject_uri, char_uri);
@@ -498,7 +531,12 @@ public class Measurement {
 
 		SolrQuery query = new SolrQuery();
 		query.setQuery(q);
-		query.setRows(10000000);
+		if (bNumberOfResultsOnly) {
+			query.setRows(0);
+		}
+		else {
+			query.setRows(10000000);
+		}
 		query.setFacet(false);
 
 		try {
@@ -508,9 +546,13 @@ public class Measurement {
 			QueryResponse queryResponse = solr.query(query, SolrRequest.METHOD.POST);
 			solr.close();
 			SolrDocumentList results = queryResponse.getResults();
-			Iterator<SolrDocument> m = results.iterator();
-			while (m.hasNext()) {
-				result.documents.add(convertFromSolr(m.next()));
+			if (bNumberOfResultsOnly) {
+				result.setDocumentSize(results.getNumFound());
+			} else {
+				Iterator<SolrDocument> m = results.iterator();
+				while (m.hasNext()) {
+					result.documents.add(convertFromSolr(m.next()));
+				}
 			}
 		} catch (SolrServerException e) {
 			System.out.println("[ERROR] Measurement.findForViews() - SolrServerException message: " + e.getMessage());
@@ -522,21 +564,21 @@ public class Measurement {
 
 		return result;
 	}
-	
+
 	public static Instant findMinTime(String field, String q) {
 		SolrQuery query = new SolrQuery();
 		query.setQuery(q);
 		query.setRows(1);
 		query.addSort(field, SolrQuery.ORDER.asc);
-		
+
 		try {
 			SolrClient solr = new HttpSolrClient.Builder(
 					Play.application().configuration().getString("hadatac.solr.data") 
 					+ Collections.DATA_ACQUISITION).build();
-			
+
 			QueryResponse queryResponse = solr.query(query, SolrRequest.METHOD.POST);
 			solr.close();
-			
+
 			SolrDocumentList results = queryResponse.getResults();
 			if (results.size() == 1) {
 				Measurement m = convertFromSolr(results.get(0));
@@ -549,25 +591,25 @@ public class Measurement {
 		} catch (Exception e) {
 			System.out.println("[ERROR] Measurement.findMinTime(String, String) - Exception message: " + e.getMessage());
 		}
-		
+
 		return null;
 	}
-	
+
 	public static Instant findMaxTime(String field, String q) {
 		SolrQuery query = new SolrQuery();
 		query.setQuery(q);
 		query.setRows(1);
 		query.set(field, "[* TO NOW]");
 		query.addSort(field, SolrQuery.ORDER.desc);
-		
+
 		try {
 			SolrClient solr = new HttpSolrClient.Builder(
 					Play.application().configuration().getString("hadatac.solr.data") 
 					+ Collections.DATA_ACQUISITION).build();
-			
+
 			QueryResponse queryResponse = solr.query(query, SolrRequest.METHOD.POST);
 			solr.close();
-			
+
 			SolrDocumentList results = queryResponse.getResults();
 			if (results.size() == 1) {
 				Measurement m = convertFromSolr(results.get(0));
@@ -580,18 +622,18 @@ public class Measurement {
 		} catch (Exception e) {
 			System.out.println("[ERROR] Measurement.findMinTime(String, String) - Exception message: " + e.getMessage());
 		}
-		
+
 		return null;
 	}
-	
+
 	public static String calculateTimeGap(Instant min, Instant max) {
 		Duration duration = Duration.between(min, max);
-		
+
 		long days = duration.toDays();
 		long weeks = days / 7;
 		long months = days / 30;
 		long years = days / 365;
-		
+
 		if (years > 2) {
 			return "+1YEAR";
 		}
@@ -604,19 +646,19 @@ public class Measurement {
 		if (days > 4) {
 			return "+1DAY";
 		}
-		
+
 		long hours = duration.toHours();
-		
+
 		if (hours > 4) {
 			return "+1HOUR";
 		}
-		
+
 		long minutes = duration.toMinutes();
-		
+
 		if (minutes > 4) {
 			return "+1MINUTE";
 		}
-		
+
 		return "+1MINUTE";
 	}
 
@@ -631,9 +673,10 @@ public class Measurement {
 		if (q.equals("")) {
 			return result;
 		}
-		
+
 		Instant minTime = findMinTime("timestamp", q);
 		Instant maxTime = findMaxTime("timestamp", q);
+
 		String gap = calculateTimeGap(minTime, maxTime);
 
 		int docSize = 0;
@@ -651,6 +694,21 @@ public class Measurement {
 		query.addFacetPivotField("study_uri,acquisition_uri");
 		query.addFacetPivotField("entity,characteristic");
 		query.addFacetPivotField("platform_name,instrument_model");
+		query.setParam("wt", "json");
+		query.setParam("json.facet", "{ "
+				+ "entity:{ "
+				+ "type: terms, "
+				+ "field: entity,"
+				+ "limit: 1000, "
+				+ "facet:{ "
+				+ "indicator: { type : terms,"
+				+ "field: indicator,"
+				+ "limit: 1000,"
+				+ "facet:{"
+				+ "characteristic: {"
+				+ "type : terms,"
+				+ "field: characteristic,"
+				+ "limit: 1000 }}}}}}");
 
 		try {
 			SolrClient solr = new HttpSolrClient.Builder(
@@ -680,16 +738,16 @@ public class Measurement {
 			}
 
 			DateTimeFormatter formatter =
-				    DateTimeFormatter.ofLocalizedDateTime( FormatStyle.SHORT )
-				                     .withLocale( Locale.US )
-				                     .withZone( ZoneId.systemDefault() );
-			
+					DateTimeFormatter.ofLocalizedDateTime( FormatStyle.SHORT )
+					.withLocale( Locale.US )
+					.withZone( ZoneId.systemDefault() );
+
 			if (queryResponse.getFacetRanges() != null) {
 				Iterator<RangeFacet> f = queryResponse.getFacetRanges().iterator();
 				while (f.hasNext()) {
 					RangeFacet field = f.next();
 					result.date_facets.put(field.getName(), new HashMap<String, Map<String, String>>());
-					
+
 					RangeFacet.Count v1;
 					RangeFacet.Count v2;
 					Instant v1inst;
@@ -698,11 +756,11 @@ public class Measurement {
 					String label;
 					int i = 0;
 					int j = field.getCounts().size();
-					
+
 					while (i < j) {
 						v1 = (RangeFacet.Count)field.getCounts().get(i);
 						v1inst = Instant.parse(v1.getValue());
-						
+
 						if (i == j-1) {
 							v2 = null;
 							v2inst = null;
@@ -714,7 +772,7 @@ public class Measurement {
 							rangeQuery = "[" + v1.getValue() + " TO " + v2.getValue() + "]";
 							label = "From " + formatter.format(v1inst) + " to " + formatter.format(v2inst);
 						}
-						
+
 						Map<String, Map<String, String>> map = result.date_facets.get(field.getName());
 						map.put(label, new HashMap<String, String>());
 						Map<String, String> map2 = map.get(label);
@@ -722,10 +780,10 @@ public class Measurement {
 						map2.put("gap", field.getGap().toString());
 						map2.put("query", rangeQuery);
 						//map2.put("label", label);
-						
+
 						i++;
 					}
-					
+
 					/*
 					Iterator<RangeFacet.Count> v = field.getCounts().iterator();
 					while (v.hasNext()) {
@@ -740,8 +798,6 @@ public class Measurement {
 					}*/
 				}
 			}
-			
-			System.out.println(result.toJSON());
 
 			if (queryResponse.getFacetPivot() != null) {
 				Iterator<Entry<String, List<PivotField>>> iter = queryResponse.getFacetPivot().iterator();
@@ -797,6 +853,9 @@ public class Measurement {
 					}
 				}
 			}
+
+			result.extra_facets = parseFacetResults(queryResponse);
+
 		} catch (SolrServerException e) {
 			System.out.println("[ERROR] Measurement.find() - SolrServerException message: " + e.getMessage());
 		} catch (IOException e) {
@@ -809,6 +868,48 @@ public class Measurement {
 		result.setDocumentSize((long) docSize);
 
 		return result;
+	}
+	
+	@SuppressWarnings("unchecked")
+	private static Pivot parseFacetResults(QueryResponse response) {
+		if (response.getResponse() != null) {
+			if (response.getResponse().get("facets") instanceof NamedList) {
+				return parsePivot(((NamedList<Object>)response.getResponse().get("facets")));
+			}
+		}
+		
+		return null;
+	}
+	
+	private static Pivot parsePivot(NamedList<Object> objects) {
+		Pivot pivot = new Pivot();
+		objects.forEach(new BiConsumer<String, Object>() {
+			
+			@SuppressWarnings("unchecked")
+			@Override
+			public void accept(String t, Object u) {
+				//System.out.println("current t: " + t);
+				//System.out.println("current u: " + u.getClass().getName());
+				if (t.equals("val")) {
+					pivot.value = (String)u;
+				} else if (t.equals("count")) {
+					pivot.count = (int)u;
+				} else {
+					if (u instanceof ArrayList<?>) {
+						for (NamedList<Object> nl : (ArrayList<NamedList<Object>>) u) {
+							pivot.children.add(parsePivot((NamedList<Object>)nl));
+						}
+					} else if (u instanceof NamedList<?>) {
+						pivot.field = (String)t;
+						for (NamedList<Object> nl : ((ArrayList<NamedList<Object>>)((NamedList<Object>)u).get("buckets"))) {
+							pivot.children.add(parsePivot((NamedList<Object>)nl));
+						}
+					}
+ 				}
+			}
+		});
+		
+		return pivot;
 	}
 
 	public static long getNumByDataAcquisition(DataAcquisition dataAcquisition) {
@@ -890,6 +991,8 @@ public class Measurement {
 		m.setEntityUri(doc.getFieldValue("entity_uri").toString());
 		m.setCharacteristic(doc.getFieldValue("characteristic").toString());
 		m.setCharacteristicUri(doc.getFieldValue("characteristic_uri").toString());
+		m.setIndicator(doc.getFieldValue("indicator").toString());
+		m.setIndicatorUri(doc.getFieldValue("indicator_uri").toString());
 		m.setInstrumentModel(doc.getFieldValue("instrument_model").toString());
 		m.setInstrumentUri(doc.getFieldValue("instrument_uri").toString());
 		m.setPlatformName(doc.getFieldValue("platform_name").toString());

@@ -21,7 +21,7 @@ public class ViewValue extends Controller {
 	public static List<Measurement> findValue(String user_uri, String study_uri, 
 										      String subject_uri, String char_uri) {
 		AcquisitionQueryResult result = new AcquisitionQueryResult();
-		result = Measurement.findForViews(user_uri, study_uri, subject_uri, char_uri);
+		result = Measurement.findForViews(user_uri, study_uri, subject_uri, char_uri, false);
 		
 		return result.documents;
 	}

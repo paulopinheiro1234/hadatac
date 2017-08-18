@@ -98,20 +98,6 @@ public class ViewSample extends Controller {
 		return sampleResult;
 	}
 	
-	public static String findUser() {
-		String results = null;
-	    final SysUser user = AuthApplication.getLocalUser(session());
-	    if(null == user){
-	        results = null;
-	    }
-	    else{
-	    	results = UserManagement.getUriByEmail(user.getEmail());
-	    }
-	    System.out.println("This is the current user's uri:" + results);
-	    
-	    return results;
-	}
-	
 	// for /metadata HTTP GET requests
 	@Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
     public static Result index(String sample_uri, String study_uri, String subject_uri) {

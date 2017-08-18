@@ -128,7 +128,6 @@ public class DataFactory {
 			if (null == consoleStore) {
 				consoleStore = new ConsoleStore();
 				consoleStore.setId(0);
-				System.out.println("Hello");
 	        	consoleStore.setTimestamp(new DateTime().withZone(DateTimeZone.UTC).
 	        			toString("EEE MMM dd HH:mm:ss zzz yyyy"));
 	        	consoleStore.setLastDynamicMetadataId(1);

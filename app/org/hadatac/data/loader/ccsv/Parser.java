@@ -10,6 +10,8 @@ import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import java.util.Date;
 import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVRecord;
@@ -28,6 +30,7 @@ import org.hadatac.entity.pojo.DataAcquisitionSchemaEvent;
 import org.hadatac.entity.pojo.Dataset;
 import org.hadatac.entity.pojo.Deployment;
 import org.hadatac.entity.pojo.HADataC;
+import org.hadatac.entity.pojo.Indicator;
 import org.hadatac.entity.pojo.Measurement;
 import org.hadatac.entity.pojo.Subject;
 import org.hadatac.metadata.loader.ValueCellProcessing;
@@ -133,6 +136,9 @@ public class Parser {
 		String analyte = "";
 		String unitOverride = "";
 		String unitLabelOverride = "";
+		
+		Map<String, Indicator> mapCharToIndicator = Indicator.findStudyIndicatorHierarchy();
+		
 		for (CSVRecord record : records) {
 		        // HACK FOR JUNE20
 		        isSample = false;
@@ -379,6 +385,10 @@ public class Parser {
 
 				measurement.setEntityUri(dasa.getEntity());
 				measurement.setCharacteristicUri(dasa.getAttribute());
+				if (mapCharToIndicator.containsKey(dasa.getAttribute())) {
+					measurement.setIndicatorUri(mapCharToIndicator.get(dasa.getAttribute()).getUri());
+					measurement.setIndicator(mapCharToIndicator.get(dasa.getAttribute()).getLabel());
+				}
 				
 				/*=================================*
                                  *                                 *

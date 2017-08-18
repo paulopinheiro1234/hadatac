@@ -169,7 +169,7 @@
 	
 	var jsonTree, dataTree;
 	var treeEC;
-        var props = "entity,characteristic";
+	var props = "entity,characteristic,characteristic_uri";
 	jsonTree = parseSolrFacetPivotToTree(props);
 	dataTree = JSON.parse(jsonTree);
 	treeEC = new dhtmlXTreeObject("treeEntityCharacteristicBox","100%","100%",0);

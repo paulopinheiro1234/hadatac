@@ -35,10 +35,10 @@ public class ViewSubject extends Controller {
 
 	public static Map<String, List<String>> findSubjectIndicators(String study_uri, String subject_uri) {
 		String indicatorQuery = "";
-                if (study_uri.startsWith("http")) {
+		if (study_uri.startsWith("http")) {
 			study_uri = "<" + study_uri + ">";
 		}
-                if (subject_uri.startsWith("http")) {
+		if (subject_uri.startsWith("http")) {
 			subject_uri = "<" + subject_uri + ">";
 		}
 		indicatorQuery += NameSpaces.getInstance().printSparqlNameSpaceList();
@@ -51,7 +51,7 @@ public class ViewSubject extends Controller {
 		ResultSet indicatorResults = qexecInd.execSelect();
 		ResultSetRewindable resultsrwIndc = ResultSetFactory.copyResults(indicatorResults);
 		qexecInd.close();
-		
+
 		Map<String, String> indicatorMap = new HashMap<String, String>();
 		String indicatorLabel = "";
 		while (resultsrwIndc.hasNext()) {
@@ -61,21 +61,11 @@ public class ViewSubject extends Controller {
 		}
 		Map<String, String> indicatorMapSorted = new TreeMap<String, String>(indicatorMap);
 		Map<String, List<String>> indicatorValues = new HashMap<String, List<String>>();
-		
+
 		for(Map.Entry<String, String> entry : indicatorMapSorted.entrySet()){
 			String parentIndicatorUri = entry.getKey();
 			String indvIndicatorQuery = "";
 			indvIndicatorQuery += NameSpaces.getInstance().printSparqlNameSpaceList();
-//			indvIndicatorQuery += "SELECT DISTINCT ?uri ?label ?comment WHERE { "
-//  					+ "?schemaUri	hasco:isSchemaOf " + study_uri + " ."
-//					+ "?uri	hasco:partOfSchema	?schemaUri . "
-//					+ "?uri	hasco:hasEntity		sio:Human . "
-//					+ "?subIndicator rdfs:subClassOf* <" + parentIndicatorUri + "> . "
-//					+ "?uri 	hasco:hasAttribute	?subIndicator ."
-//					+ "?uri rdfs:label		?label . "
-//					+ "?uri rdfs:comment	?comment ."
-//					+ "}";
-			
 			indvIndicatorQuery += "SELECT DISTINCT ?label ?uri WHERE { "
 					+ "?schemaUri hasco:isSchemaOf " + study_uri + " . "
 					+ "?schemaAttribute hasco:partOfSchema ?schemaUri . "
@@ -83,8 +73,8 @@ public class ViewSubject extends Controller {
 					+ "?uri rdfs:subClassOf* <" + parentIndicatorUri + "> . "
 					+ "?uri rdfs:label ?label . "
 					+ "}";
-			
-			
+
+
 			try {
 				QueryExecution qexecIndvInd = QueryExecutionFactory.sparqlService(
 						Collections.getCollectionsName(Collections.METADATA_SPARQL), indvIndicatorQuery);
@@ -94,13 +84,11 @@ public class ViewSubject extends Controller {
 				List<String> listIndicatorLabel = new ArrayList<String>();
 				while (resultsrwIndvInd.hasNext()) {
 					QuerySolution soln = resultsrwIndvInd.next();
-					if(Measurement.findForViews(findUser(), study_uri, ValueCellProcessing.convertToWholeURI(subject_uri), soln.get("uri").toString()).documents.size() > 0){
+					if(Measurement.findForViews(UserManagement.getCurrentUserUri(), study_uri, 
+							ValueCellProcessing.convertToWholeURI(subject_uri), 
+							soln.get("uri").toString(), true).getDocumentSize() > 0){
 						listIndicatorLabel.add(soln.get("label").toString());
-						//System.out.println("HEREHERE" + Measurement.findForViews(findUser(), study_uri, ValueCellProcessing.convertToWholeURI(subject_uri), soln.get("uri").toString()).documents.get(0).getObjectUri().toString() 
-						//+ Measurement.findForViews(findUser(), study_uri, ValueCellProcessing.convertToWholeURI(subject_uri), soln.get("uri").toString()).documents.get(0).getCharacteristic().toString()
-						//+ Measurement.findForViews(findUser(), study_uri, ValueCellProcessing.convertToWholeURI(subject_uri), soln.get("uri").toString()).documents.get(0).getValue().toString());
 					}
-//					listIndicatorLabel.add(soln.get("comment").toString());
 				}
 				indicatorValues.put(entry.getValue().toString(), listIndicatorLabel);
 			} catch (QueryExceptionHTTP e) {
@@ -109,84 +97,62 @@ public class ViewSubject extends Controller {
 		}
 		return indicatorValues;
 	}
-	
-    /* public static String findBasicHTML(String subject_uri) {
-	        String str = "";
-		System.out.println("findBasicHTML (input): <" + subject_uri + ">");
-   	        Map<String, List<String>> subjObj = findBasic(subject_uri);
-                if (subjObj != null) {
-        	    System.out.println("findBasicHTML (1)");
-		    for (String key : subjObj.keySet()) {
-		      System.out.println("findBasicHTML (key): <" + key + ">");
-		    }
-         	    List<String> values = new ArrayList<String>();
-                    values = subjObj.get(subject_uri);
-                    if (values != null) {
-                    	System.out.println("findBasicHTML (2)");
-		        for (String v : values) {
-			    str += v + "<br/>";
-		        } 
-		    }
-                }
-		System.out.println("findBasicHTML (output): <" + str + ">");
-                return str;
-		} */
 
 	public static String findBasicHTML(String subject_uri) {
-	        //System.out.println("findBasicHTML (subject_uri): '" + subject_uri + "'" );
+		//System.out.println("findBasicHTML (subject_uri): '" + subject_uri + "'" );
 		if (subject_uri == null || subject_uri.equals("")) {
 			return null;
 		}
-	 	ResultSetRewindable resultsrw = findSubjectBasic(subject_uri); 
-	 	if (resultsrw == null) {
-	 		return null;
-	 	}
-	 	String html = "";
-	
-	 	if (resultsrw.hasNext()) {
-	 		QuerySolution soln = resultsrw.next();
-	 		html += "<table>";
-	 		html += "<tr> <td><b>Original ID &nbsp; &nbsp;</b></td> <td>" + soln.get("pid").toString() + "</td></tr>";
-	 		html += "<tr> <td><b>Internal ID</b></td> <td>" + soln.get("subjectLabel").toString() + "</td></tr>";
-	 		html += "<tr> <td><b>Type</b></td> <td>" + soln.get("subjectTypeLabel").toString() + "</td></tr>";
-	 		html += "<tr> <td><b>Cohort</b></td> <td>" + soln.get("cohortLabel").toString() + "</td></tr>";
-	 		html += "<tr> <td><b>Study</b></td> <td>" + soln.get("studyLabel").toString() + "</td></tr>";
-	 		html += "<tr> <td> &nbsp;</td> <td> &nbsp;</td></tr>";
-	 		html += "<tr> <td></td> <td><a href='/hadatac/metadataacquisitions/viewSubject?study_uri=" 
-	 				+ URLEncoder.encode(soln.get("studyUri").toString()) 
-	 				+ "&subject_uri=" + URLEncoder.encode(subject_uri) 
-	 				+ "'>(More info about object)</a></td></tr>";
-	 		html += "</table>";
-	 	}
-	 	
-	 	return html;
+		ResultSetRewindable resultsrw = findSubjectBasic(subject_uri); 
+		if (resultsrw == null) {
+			return null;
+		}
+		String html = "";
+
+		if (resultsrw.hasNext()) {
+			QuerySolution soln = resultsrw.next();
+			html += "<table>";
+			html += "<tr> <td><b>Original ID &nbsp; &nbsp;</b></td> <td>" + soln.get("pid").toString() + "</td></tr>";
+			html += "<tr> <td><b>Internal ID</b></td> <td>" + soln.get("subjectLabel").toString() + "</td></tr>";
+			html += "<tr> <td><b>Type</b></td> <td>" + soln.get("subjectTypeLabel").toString() + "</td></tr>";
+			html += "<tr> <td><b>Cohort</b></td> <td>" + soln.get("cohortLabel").toString() + "</td></tr>";
+			html += "<tr> <td><b>Study</b></td> <td>" + soln.get("studyLabel").toString() + "</td></tr>";
+			html += "<tr> <td> &nbsp;</td> <td> &nbsp;</td></tr>";
+			html += "<tr> <td></td> <td><a href='/hadatac/metadataacquisitions/viewSubject?study_uri=" 
+					+ URLEncoder.encode(soln.get("studyUri").toString()) 
+					+ "&subject_uri=" + URLEncoder.encode(subject_uri) 
+					+ "'>(More info about object)</a></td></tr>";
+			html += "</table>";
+		}
+
+		return html;
 	}
 
 	public static ResultSetRewindable findSubjectBasic(String subject_uri) {
-	        //System.out.println("in findSubjectBasic (1): '" + subject_uri + "'");
+		//System.out.println("in findSubjectBasic (1): '" + subject_uri + "'");
 		String subjectQueryString = "";
-                if (subject_uri == null || subject_uri.equals("")) {
-		    return null;
+		if (subject_uri == null || subject_uri.equals("")) {
+			return null;
 		}
 		if (subject_uri.indexOf("http") != -1) {
-		    subject_uri = "<" + subject_uri + ">";
+			subject_uri = "<" + subject_uri + ">";
 		}
-                //System.out.println("in findSubjectBasic (2): '" + subject_uri + "'");
-           	subjectQueryString += NameSpaces.getInstance().printSparqlNameSpaceList();
-    	        subjectQueryString += "SELECT ?pid ?subjectTypeLabel ?subjectLabel ?cohortLabel ?studyUri ?studyLabel WHERE { "
-    			+ subject_uri + " hasco:originalID ?pid . "
-    			+ "?subjectUri hasco:isSubjectOf* ?cohort . "
-    			+ "?studyUri rdfs:label ?studyLabel . "
-    			+ "?cohort hasco:isCohortOf ?studyUri . "
-    			+ "?cohort rdfs:label ?cohortLabel . "
-    			+ "OPTIONAL { ?subjectUri rdfs:label ?subjectLabel } . "
-    			+ "OPTIONAL { ?subjectUri a ?subjectType . "
-    			+ "			  ?subjectType rdfs:label ?subjectTypeLabel } . "
-    			+ "FILTER ( ?subjectUri = " + subject_uri + " ) . "
-    			+ "}";
-		
-    	        Query basicQuery = QueryFactory.create(subjectQueryString);
-    	
+		//System.out.println("in findSubjectBasic (2): '" + subject_uri + "'");
+		subjectQueryString += NameSpaces.getInstance().printSparqlNameSpaceList();
+		subjectQueryString += "SELECT ?pid ?subjectTypeLabel ?subjectLabel ?cohortLabel ?studyUri ?studyLabel WHERE { "
+				+ subject_uri + " hasco:originalID ?pid . "
+				+ "?subjectUri hasco:isSubjectOf* ?cohort . "
+				+ "?studyUri rdfs:label ?studyLabel . "
+				+ "?cohort hasco:isCohortOf ?studyUri . "
+				+ "?cohort rdfs:label ?cohortLabel . "
+				+ "OPTIONAL { ?subjectUri rdfs:label ?subjectLabel } . "
+				+ "OPTIONAL { ?subjectUri a ?subjectType . "
+				+ "			  ?subjectType rdfs:label ?subjectTypeLabel } . "
+				+ "FILTER ( ?subjectUri = " + subject_uri + " ) . "
+				+ "}";
+
+		Query basicQuery = QueryFactory.create(subjectQueryString);
+
 		QueryExecution qexec = QueryExecutionFactory.sparqlService(
 				Collections.getCollectionsName(Collections.METADATA_SPARQL), basicQuery);
 		ResultSet results = qexec.execSelect();
@@ -196,17 +162,17 @@ public class ViewSubject extends Controller {
 	}		
 
 	public static Map<String, List<String>> findBasic(String subject_uri) {
-	        //System.out.println("in findBasic (subject_uri): '" + subject_uri + "'" );
-                if (subject_uri == null || subject_uri.equals("")) {
-		    return null;
+		//System.out.println("in findBasic (subject_uri): '" + subject_uri + "'" );
+		if (subject_uri == null || subject_uri.equals("")) {
+			return null;
 		}
-         	ResultSetRewindable resultsrw = findSubjectBasic(subject_uri); 
+		ResultSetRewindable resultsrw = findSubjectBasic(subject_uri); 
 		if (resultsrw == null) {
-		    return null;
+			return null;
 		}
 		Map<String, List<String>> subjectResult = new HashMap<String, List<String>>();
 		List<String> values; // = new ArrayList<String>();
-		
+
 		while (resultsrw.hasNext()) {
 			QuerySolution soln = resultsrw.next();
 			//System.out.println("HERE IS THE RAW SOLN*********" + soln.toString());
@@ -219,13 +185,13 @@ public class ViewSubject extends Controller {
 			subjectResult.put(subject_uri, values);
 			//System.out.println("THIS IS SUBROW*********" + subjectResult);	
 		}
-		
+
 		return subjectResult;
 	}
-	
+
 	public static Map<String, String> findSubjectIndicatorsUri(String study_uri) {
 		String indicatorQuery = "";
-                if (study_uri.startsWith("http")) {
+		if (study_uri.startsWith("http")) {
 			study_uri = "<" + study_uri + ">";
 		}
 		indicatorQuery += NameSpaces.getInstance().printSparqlNameSpaceList();
@@ -251,21 +217,11 @@ public class ViewSubject extends Controller {
 		}
 		Map<String, String> indicatorMapSorted = new TreeMap<String, String>(indicatorMap);
 		Map<String, String> indicatorUris = new HashMap<String, String>();
-		
+
 		for(Map.Entry<String, String> entry : indicatorMapSorted.entrySet()){
 			String parentIndicatorUri = entry.getKey();
 			String indvIndicatorQuery = "";
 			indvIndicatorQuery += NameSpaces.getInstance().printSparqlNameSpaceList();
-//			indvIndicatorQuery += "SELECT DISTINCT ?uri ?label ?comment WHERE { "
-//  					+ "?schemaUri	hasco:isSchemaOf " + study_uri + " ."
-//					+ "?uri	hasco:partOfSchema	?schemaUri . "
-//					+ "?uri	hasco:hasEntity		sio:Human . "
-//					+ "?subIndicator rdfs:subClassOf* <" + parentIndicatorUri + "> . "
-//					+ "?uri 	hasco:hasAttribute	?subIndicator ."
-//					+ "?uri rdfs:label		?label . "
-//					+ "?uri rdfs:comment	?comment ."
-//					+ "}";
-			
 			indvIndicatorQuery += "SELECT DISTINCT ?label ?uri WHERE { "
 					+ "?schemaUri hasco:isSchemaOf " + study_uri + " . "
 					+ "?schemaAttribute hasco:partOfSchema ?schemaUri . "
@@ -273,7 +229,7 @@ public class ViewSubject extends Controller {
 					+ "?uri rdfs:subClassOf* <" + parentIndicatorUri + "> . "
 					+ "?uri rdfs:label ?label . "
 					+ "}";
-			
+
 			try {
 				QueryExecution qexecIndvInd = QueryExecutionFactory.sparqlService(
 						Collections.getCollectionsName(Collections.METADATA_SPARQL), indvIndicatorQuery);
@@ -289,38 +245,38 @@ public class ViewSubject extends Controller {
 				e.printStackTrace();
 			}
 		}
-		
+
 		return indicatorUris;
 	}
-	
+
 	public static Map<String, List<String>> findSampleMap(String subject_uri) {
 		String sampleQueryString = "";
 		if (subject_uri.startsWith("http")) {
 			subject_uri = "<" + subject_uri + ">";
 		}
-		
+
 		sampleQueryString += NameSpaces.getInstance().printSparqlNameSpaceList();
-    	sampleQueryString += "SELECT ?sampleUri ?subjectUri ?subjectLabel ?sampleType ?sampleLabel ?cohortLabel ?comment WHERE { "
-		    	+ "?subjectUri hasco:isSubjectOf* ?cohort . "
-		    	+ "?sampleUri hasco:isSampleOf ?subjectUri . "
-		    	+ "?sampleUri rdfs:comment ?comment . "
-		    	+ "?cohort rdfs:label ?cohortLabel . "
-		    	+ "OPTIONAL { ?subjectUri rdfs:label ?subjectLabel } . "
-		    	+ "OPTIONAL { ?sampleUri rdfs:label ?sampleLabel } . "
-		    	+ "OPTIONAL { ?sampleUri a ?sampleType  } . "
-		    	+ "FILTER ( ?subjectUri = " + subject_uri + " ) . "
-		    	+ "}";
-    	Query basicQuery = QueryFactory.create(sampleQueryString);
-    	
+		sampleQueryString += "SELECT ?sampleUri ?subjectUri ?subjectLabel ?sampleType ?sampleLabel ?cohortLabel ?comment WHERE { "
+				+ "?subjectUri hasco:isSubjectOf* ?cohort . "
+				+ "?sampleUri hasco:isSampleOf ?subjectUri . "
+				+ "?sampleUri rdfs:comment ?comment . "
+				+ "?cohort rdfs:label ?cohortLabel . "
+				+ "OPTIONAL { ?subjectUri rdfs:label ?subjectLabel } . "
+				+ "OPTIONAL { ?sampleUri rdfs:label ?sampleLabel } . "
+				+ "OPTIONAL { ?sampleUri a ?sampleType  } . "
+				+ "FILTER ( ?subjectUri = " + subject_uri + " ) . "
+				+ "}";
+		Query basicQuery = QueryFactory.create(sampleQueryString);
+
 		QueryExecution qexec = QueryExecutionFactory.sparqlService(
 				Collections.getCollectionsName(Collections.METADATA_SPARQL), basicQuery);
 		ResultSet results = qexec.execSelect();
 		ResultSetRewindable resultsrw = ResultSetFactory.copyResults(results);
 		qexec.close();
-		
+
 		Map<String, List<String>> sampleResult = new HashMap<String, List<String>>();
 		List<String> values = new ArrayList<String>();
-		
+
 		while (resultsrw.hasNext()) {
 			QuerySolution soln = resultsrw.next();
 			//System.out.println("HERE IS THE RAW SOLN*********" + soln.toString());
@@ -334,24 +290,24 @@ public class ViewSubject extends Controller {
 
 		return sampleResult;
 	}
-	
+
 	public static List<String> findSample(String subject_uri) {
 		String sampleQueryString = "";
-    	sampleQueryString += NameSpaces.getInstance().printSparqlNameSpaceList();
-    	sampleQueryString += "SELECT * WHERE { "
-    			+ "?s <http://hadatac.org/ont/hasco/isSampleOf> " + subject_uri + " . "
-    			+ "}";
-        
+		sampleQueryString += NameSpaces.getInstance().printSparqlNameSpaceList();
+		sampleQueryString += "SELECT * WHERE { "
+				+ "?s <http://hadatac.org/ont/hasco/isSampleOf> " + subject_uri + " . "
+				+ "}";
+
 		Query sampleQuery = QueryFactory.create(sampleQueryString);
-		
+
 		QueryExecution qexec = QueryExecutionFactory.sparqlService(
 				Collections.getCollectionsName(Collections.METADATA_SPARQL), sampleQuery);
 		ResultSet results = qexec.execSelect();
 		ResultSetRewindable resultsrw = ResultSetFactory.copyResults(results);
 		qexec.close();
-		
+
 		List<String> sampleResult = new ArrayList<String>();
-		
+
 		while (resultsrw.hasNext()) {
 			QuerySolution soln = resultsrw.next();
 			//System.out.println("HERE IS THE SAMPLES*********" + soln.toString());
@@ -360,39 +316,25 @@ public class ViewSubject extends Controller {
 		}
 		return sampleResult;
 	}
-	
-	public static String findUser() {
-		String results = null;
-	    final SysUser user = AuthApplication.getLocalUser(session());
-	    if(null == user){
-	        results = null;
-	    }
-	    else{
-	    	results = UserManagement.getUriByEmail(user.getEmail());
-	    }
-	    //System.out.println("This is the current user's uri:" + results);
-	    
-	    return results;
-	}
-	
+
 	@Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    public static Result index(String study_uri, String subject_uri) {
+	public static Result index(String study_uri, String subject_uri) {
 		Map<String, List<String>> indicatorValues = findSubjectIndicators(study_uri, subject_uri);
-    	        Map<String, List<String>> subjectResult = findBasic(subject_uri);
-    	        Map<String, List<String>> sampleResult = findSampleMap(subject_uri);
+		Map<String, List<String>> subjectResult = findBasic(subject_uri);
+		Map<String, List<String>> sampleResult = findSampleMap(subject_uri);
 
 		Map<String, String> indicatorUris = findSubjectIndicatorsUri(study_uri);
-		
+
 		Map<String, String> showValues = new HashMap<String, String>();
 		showValues.put("subject", subject_uri);
-		showValues.put("user", findUser());
+		showValues.put("user", UserManagement.getCurrentUserUri());
 		showValues.put("study", study_uri);	
-    	
-    	return ok(viewSubject.render(subjectResult, sampleResult, indicatorValues, indicatorUris, showValues));    
-    }
+
+		return ok(viewSubject.render(subjectResult, sampleResult, indicatorValues, indicatorUris, showValues));    
+	}
 
 	@Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    public static Result postIndex(String study_uri, String subject_uri) {
+	public static Result postIndex(String study_uri, String subject_uri) {
 		return index(study_uri, subject_uri);
 	}
 }

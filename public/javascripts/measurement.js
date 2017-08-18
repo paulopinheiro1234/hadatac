@@ -122,3 +122,32 @@ function parseSolrFacetPivotToTree(type) {
 	jsonTree += '] }';
 	return jsonTree;
 }
+
+var tree_id = 0;
+function create_item(data) {
+	var item = [];
+	var children = data.children;
+	for (var i_child in children) {
+		console.log(children[i_child]);
+		var element = {};
+		element.id = tree_id;
+		tree_id++;
+		element.text = facetPrettyName(data.field, children[i_child].value) + ' (' + children[i_child].count + ')';
+		element.tooltip = children[i_child].value;
+		element.userdata = [{"name": "field", "content": children[i_child].field},
+			{"name": "value", "content": children[i_child].value}];
+		element.item = create_item(children[i_child]);
+		item.push(element);
+		console.log(element);
+	}
+	
+	return item;
+}
+
+function parseSolrFacetToTree() {
+	dataTree = { "id": tree_id, "item": create_item(json.extra_facets)};
+	console.log(dataTree);
+	return dataTree;
+}
+
+

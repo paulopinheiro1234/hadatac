@@ -78,7 +78,7 @@ public class DataAcquisitionBrowser extends Controller {
 		ValueCellProcessing cellProc = new ValueCellProcessing();
 		while (resultsrwStudy.hasNext()) {
 			QuerySolution soln = resultsrwStudy.next();
-			System.out.println("Solution: " + soln.toString());
+			System.out.println("DataAcquisitionBrowser Solution: " + soln.toString());
 			if (soln.contains("DataAcquisitionSchema") && !results.contains("Data Acquisition Schema")) {
 				results.add("Data Acquisition Schema");			}
 			if (soln.contains("Method") && !results.contains("Method")){
@@ -130,7 +130,7 @@ public class DataAcquisitionBrowser extends Controller {
 		ValueCellProcessing cellProc = new ValueCellProcessing();
 		while (resultsrwStudy.hasNext()) {
 			QuerySolution soln = resultsrwStudy.next();
-			System.out.println("Solution: " + soln.toString());
+			System.out.println("DataAcquisitionBrowser Solution: " + soln.toString());
 			String attributeUri = DynamicFunctions.replaceURLWithPrefix(soln.get("attributeUri").toString());
 			HashMap<String, Object> DAInfo = null;
 			String key = "";

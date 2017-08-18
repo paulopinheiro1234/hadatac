@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
+import org.apache.solr.common.util.NamedList;
 import org.hadatac.console.models.Pivot;
 import org.hadatac.entity.pojo.Measurement;
 
@@ -17,6 +18,7 @@ public class AcquisitionQueryResult {
 	public Map<String, Map<String, Long>> field_facets;
 	public Map<String, Map<String, Map<String, String>>> date_facets;
 	public Map<String, List<Pivot>> pivot_facets;
+	public Pivot extra_facets;
 	
 	public long getDocumentSize(){
 		return this.nDocSize;

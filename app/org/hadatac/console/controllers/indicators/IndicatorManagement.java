@@ -19,7 +19,6 @@ public class IndicatorManagement extends Controller {
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
     public static Result index() {
     	List<Indicator> theResults = Indicator.find();
-    	
         return ok(indicatorManagement.render(theResults));
     }
 

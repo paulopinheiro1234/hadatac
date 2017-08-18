@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 
 import org.apache.jena.query.Query;
 import org.apache.jena.query.QueryExecution;
@@ -19,12 +20,14 @@ import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdf.model.Statement;
 import org.apache.jena.rdf.model.StmtIterator;
+import org.apache.jena.sparql.engine.http.QueryExceptionHTTP;
 import org.apache.jena.update.UpdateExecutionFactory;
 import org.apache.jena.update.UpdateFactory;
 import org.apache.jena.update.UpdateProcessor;
 import org.apache.jena.update.UpdateRequest;
 import org.hadatac.console.controllers.AuthApplication;
 import org.hadatac.console.controllers.metadata.DynamicFunctions;
+import org.hadatac.console.controllers.triplestore.UserManagement;
 import org.hadatac.metadata.loader.LabkeyDataHandler;
 import org.hadatac.metadata.loader.ValueCellProcessing;
 import org.hadatac.utils.Collections;
@@ -212,6 +215,43 @@ public class Indicator  implements Comparable<Indicator> {
 		return indicators; 
     }
     
+    public static Map<String, Indicator> findStudyIndicatorHierarchy() {
+		String query = "";
+		query += NameSpaces.getInstance().printSparqlNameSpaceList();
+		query += "SELECT ?studyIndicator ?indicatorLabel ?attributeUri ?attributeLabel WHERE { "
+				+ "?subTypeUri rdfs:subClassOf* hasco:Study . "
+				+ "?studyUri a ?subTypeUri . "
+				+ "?schemaUri hasco:isSchemaOf ?studyUri . "
+				+ "?schemaAttribute hasco:partOfSchema ?schemaUri . "
+				+ "?schemaAttribute hasco:hasAttribute ?attributeUri . " 
+				+ "?attributeUri rdfs:subClassOf* ?studyIndicator . "
+				+ "?attributeUri rdfs:label ?attributeLabel . "
+				+ "?studyIndicator rdfs:subClassOf hasco:StudyIndicator . "
+				+ "?studyIndicator rdfs:label ?indicatorLabel . "
+				+ "}";
+		
+		Map<String, Indicator> mapCharToIndicator = new HashMap<String, Indicator>();
+		try {
+			QueryExecution qe = QueryExecutionFactory.sparqlService(
+					Collections.getCollectionsName(Collections.METADATA_SPARQL), query);
+			ResultSet resultSet = qe.execSelect();
+			ResultSetRewindable resultsrw = ResultSetFactory.copyResults(resultSet);
+			qe.close();
+			while (resultsrw.hasNext()) {
+				QuerySolution soln = resultsrw.next();
+				Indicator indicator = new Indicator();
+				indicator.setUri(soln.get("studyIndicator").toString());
+				indicator.setLabel(soln.get("indicatorLabel").toString());
+				String attrib_uri = soln.get("attributeUri").toString();
+				mapCharToIndicator.put(attrib_uri, indicator);
+			}
+		} catch (QueryExceptionHTTP e) {
+			e.printStackTrace();
+		}
+		
+		return mapCharToIndicator;
+	}
+    
     public void save() {
     	if (uri == null || uri.equals("")) {
     	    System.out.println("[ERROR] Trying to save Indicator without assigning a URI");
@@ -307,9 +347,7 @@ public class Indicator  implements Comparable<Indicator> {
 	}
     	return loader.deleteRows("IndicatorType", rows);
     }
-
-
-
+    
 	@Override
     public int compareTo(Indicator another) {
         return this.getLabel().compareTo(another.getLabel());
