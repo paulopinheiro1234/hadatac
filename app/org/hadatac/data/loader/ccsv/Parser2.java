@@ -106,6 +106,7 @@ public class Parser2 {
 	// ASSIGN positions for MetaDASAs
 	int posTimestamp = -1;
 	int posTimeInstant = -1;
+	int posNamedTime = -1;
 	int posId = -1;
 	int posOriginalId = -1;
 	int posEntity = -1;
@@ -116,6 +117,9 @@ public class Parser2 {
 	}
 	if (!schema.getTimeInstantLabel().equals("")) {
 	    posTimeInstant = tempPositionOfLabel(schema.getTimeInstantLabel()); 
+	}
+	if (!schema.getNamedTimeLabel().equals("")) {
+	    posNamedTime = tempPositionOfLabel(schema.getNamedTimeLabel()); 
 	}
 	if (!schema.getIdLabel().equals("")) {
 	    posId = tempPositionOfLabel(schema.getIdLabel()); 
@@ -177,6 +181,9 @@ public class Parser2 {
 		if (dasa.getLabel().equals(schema.getTimeInstantLabel())) {
 		    continue;
 		}
+		if (dasa.getLabel().equals(schema.getNamedTimeLabel())) {
+		    continue;
+		}
 		if (dasa.getLabel().equals(schema.getIdLabel())) {
 		    continue;
 		}
@@ -230,13 +237,15 @@ public class Parser2 {
 		measurement.setTimestamp(new Date(Long.MAX_VALUE).toInstant().toString());
 		measurement.setAbstractTime("");
 		
-		// contrete time(stamps)
+		// full-row regular (Epoch) timemestamp
 		if(dasa.getLabel() == schema.getTimestampLabel()) {
-		    String sTime = record.get(dasa.getTempPositionInt());
+		    String sTime = record.get(posTimestamp);
 		    int timeStamp = new BigDecimal(sTime).intValue();
 		    measurement.setTimestamp(Instant.ofEpochSecond(timeStamp).toString());
+
+		// full-row regular (XSD) time interval
 		} else if (!schema.getTimeInstantLabel().equals("")) {
-		    String timeValue = record.get(tempPositionOfLabel(schema.getTimeInstantLabel()));
+		    String timeValue = record.get(posTimeInstant);
 		    //System.out.println("Time Instant value: " + timeValue);
 		    if (timeValue != null) {
 			//DateTimeFormatter formatter = DateTimeFormatter.ofPattern("M/d/yy HH:mm");
@@ -246,12 +255,20 @@ public class Parser2 {
 			    measurement.setTimestamp(timeValue);
 			} catch (Exception e) {
 			    measurement.setTimestamp(new Date(Long.MAX_VALUE).toInstant().toString());
-			}
+			    }
 		    }
-		}    
-		
-		// abstract times 
-		else if (dasa.getEventUri() != null && !dasa.getEventUri().equals("")) {
+
+		// full-row named time
+		} else if (!schema.getNamedTimeLabel().equals("")) {
+		    String timeValue = record.get(posNamedTime);
+		    if (timeValue != null) {
+			measurement.setAbstractTime(timeValue);
+		    } else {
+			measurement.setAbstractTime("");
+		    }
+
+		// row-specific, SSD-named time 
+		}  else if (dasa.getEventUri() != null && !dasa.getEventUri().equals("")) {
 		    String daseUri = dasa.getEventUri();
 		    DataAcquisitionSchemaEvent dase = schema.getEvent(daseUri); 
 		    if (dase != null) {
@@ -264,7 +281,7 @@ public class Parser2 {
 			}
 		    } 
 		}
-		
+	    
 		/*		
 		// contrete time(stamps)
 		if(dasa.getTempPositionInt() == schema.getTimestampColumn()) {
@@ -301,12 +318,10 @@ public class Parser2 {
 		
 		// no time information
 		else {
-		    measurement.setTimestamp("");
+		measurement.setTimestamp("");
 		}
 		*/
 		
-		measurement.setAbstractTime(record.get(1));
-
 		/*============================*
 		 *                            *
 		 *   SET STUDY                *
