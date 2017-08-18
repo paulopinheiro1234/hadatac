@@ -135,6 +135,14 @@ public class Measurement {
 	    this.sid = objectUri;
 	}
 	
+        public String getObjectPID() {
+	    return this.pid;
+	}
+
+        public String getObjectSID() {
+	    return this.sid;
+	}
+
     /*	public String getObjectPID() {
 		
 //		this.objectUri = objectUri;
