@@ -228,8 +228,9 @@ public class Parser2 {
 		*/
 		
 		measurement.setTimestamp(new Date(Long.MAX_VALUE).toInstant().toString());
-		measurement.setAbstractTime("");
+		measurement.setAbstractTime(record.get(1));
 		
+		/*
 		// contrete time(stamps)
 		if(dasa.getLabel() == schema.getTimestampLabel()) {
 		    String sTime = record.get(dasa.getTempPositionInt());
@@ -248,7 +249,7 @@ public class Parser2 {
 			    measurement.setTimestamp(new Date(Long.MAX_VALUE).toInstant().toString());
 			}
 		    }
-		}    
+		    } */   
 		
 		// abstract times 
 		else if (dasa.getEventUri() != null && !dasa.getEventUri().equals("")) {
