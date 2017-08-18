@@ -137,6 +137,17 @@ public class ObjectCollection extends HADatAcThing {
 	return objectUris;
     }
 
+    public String getUriFromOriginalId(String originalId) {
+	if (originalId == null || originalId.equals("")) {
+	    return "";
+	}
+	for (StudyObject obj : this.getObjects()) {
+	    if (originalId.equals(obj.getOriginalId())) {
+		return obj.getUri();
+	    }
+	}
+	return "";
+    }
     public List<StudyObject> getObjects() {
 	List<StudyObject> resp = new ArrayList<StudyObject>();
 	if (objectUris == null || objectUris.size() <=0) {

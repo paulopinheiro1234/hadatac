@@ -206,7 +206,11 @@ public class DataAcquisition {
 		return uri;
 	}
 	public void setUri(String uri) {
-		this.uri = uri;
+	    if (uri == null || uri.equals("")) {
+		this.uri = "";
+		return;
+	    }
+	    this.uri = ValueCellProcessing.replacePrefixEx(uri);
 	}
 	
 	public String getParameter() {
@@ -1197,6 +1201,7 @@ public class DataAcquisition {
     	}
     	
 	String localUri = "";
+	int totalChanged = 0;
 	Iterator<String> i = getLocalScopeUri().iterator();
 	while (i.hasNext()) {
 	    localUri += ValueCellProcessing.replaceNameSpaceEx(i.next());
@@ -1222,7 +1227,17 @@ public class DataAcquisition {
     	row.put("prov:endedAtTime", getEndedAt().startsWith("9999")? "" : getEndedAt());
     	rows.add(row);
 
-    	return loader.insertRows("DataAcquisition", rows);
+    	try {
+	    totalChanged = loader.insertRows("DataAcquisition", rows);
+	} catch (CommandException e) {
+	    try {
+		totalChanged = loader.updateRows("DataAcquisition", rows);
+	    } catch (CommandException e2) {
+		System.out.println("[ERROR] Could not insert or update Data Acquisition");
+	    }
+	}
+
+    	return totalChanged;
     }
 }
 

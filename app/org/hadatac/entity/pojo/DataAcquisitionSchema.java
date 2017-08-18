@@ -38,7 +38,7 @@ import be.objectify.deadbolt.java.actions.Restrict;
 import play.Play;
 
 public class DataAcquisitionSchema {
-
+    
     public static String INDENT1 = "     ";
     public static String INSERT_LINE1 = "INSERT DATA {  ";
     public static String DELETE_LINE1 = "DELETE WHERE {  ";
@@ -48,8 +48,8 @@ public class DataAcquisitionSchema {
     public static String PREFIX = "DAS-";
     public static List<String> METADASA = Arrays.asList("sio:TimeStamp", 
 							"sio:TimeInstant", 
-							"hasco:originalID", 
-							"hasco:uriID", 
+							"hasco:originalId", 
+							"hasco:uriId", 
 							"hasco:hasMetaEntity", 
 							"hasco:hasMetaEntityURI", 
 							"hasco:hasMetaAttribute", 
@@ -66,22 +66,24 @@ public class DataAcquisitionSchema {
     private List<DataAcquisitionSchemaAttribute> attributes = null;
     private List<DataAcquisitionSchemaObject> objects = null;
     private List<DataAcquisitionSchemaEvent> events = null;
-    private int timestampColumn;
-    private int timeInstantColumn;
-    private int idColumn;
-    private int elevationColumn;
-    private int entityColumn;
-    private int unitColumn;
-    private int inRelationToColumn;
+    private String timestampLabel;
+    private String timeInstantLabel;
+    private String idLabel;
+    private String originalIdLabel;
+    private String elevationLabel;
+    private String entityLabel;
+    private String unitLabel;
+    private String inRelationToLabel;
     
     public DataAcquisitionSchema() {
-	this.timestampColumn = -1;
-	this.timeInstantColumn = -1;
-	this.elevationColumn = -1;
-	this.idColumn = -1;
-	this.entityColumn = -1;
-	this.unitColumn = -1;
-	this.inRelationToColumn = -1;
+	this.timestampLabel = "";
+	this.timeInstantLabel = "";
+	this.elevationLabel = "";
+	this.idLabel = "";
+	this.originalIdLabel = "";
+	this.entityLabel = "";
+	this.unitLabel = "";
+	this.inRelationToLabel = "";
 	this.attributes = new ArrayList<DataAcquisitionSchemaAttribute>();
 	this.objects = new ArrayList<DataAcquisitionSchemaObject>();
 	this.events = new ArrayList<DataAcquisitionSchemaEvent>();
@@ -96,135 +98,146 @@ public class DataAcquisitionSchema {
     public String getUri() {
     	return uri.replace("<","").replace(">","");
     }
-
+    
     public String getUriNamespace() {
 	return ValueCellProcessing.replaceNameSpaceEx(uri.replace("<","").replace(">",""));
     }
-
+    
     public void setUri(String uri) {
     	this.uri = uri;
     }
-
+    
     public String getLabel() {
     	return label;
     }
-
+    
     public void setLabel(String label) {
 	this.label = label;
     }
 
-    public int getTimestampColumn() {
-	return timestampColumn;
+    public String getTimestampLabel() {
+	return timestampLabel;
     }
-
-    public void setTimestampColumn(int timestampColumn) {
-	this.timestampColumn = timestampColumn;
+    
+    public void setTimestampLabel(String timestampLabel) {
+	this.timestampLabel = timestampLabel;
     }
-
-    public int getTimeInstantColumn() {
-	return timeInstantColumn;
+    
+    public String getTimeInstantLabel() {
+	return timeInstantLabel;
     }
-
-    public void setTimeInstantColumn(int timeInstantColumn) {
-	this.timeInstantColumn = timeInstantColumn;
+    
+    public void setTimeInstantLabel(String timeInstantLabel) {
+	this.timeInstantLabel = timeInstantLabel;
     }
-
-    public int getIdColumn() {
-	return idColumn;
+    
+    public String getIdLabel() {
+	return idLabel;
     }
-
-    public void setIdColumn(int idColumn) {
-	this.idColumn = idColumn;
+    
+    public void setIdLabel(String idLabel) {
+	this.idLabel = idLabel;
     }
-
-    public int getElevationColumn() {
-	return elevationColumn;
+    
+    public String getOriginalIdLabel() {
+	return originalIdLabel;
     }
-
-    public void setElevationColumn(int elevationColumn) {
-	this.elevationColumn = elevationColumn;
+    
+    public void setOriginalIdLabel(String originalIdLabel) {
+	this.originalIdLabel = originalIdLabel;
     }
-
-    public int getEntityColumn() {
-	return entityColumn;
+    
+    public String getElevationLabel() {
+	return elevationLabel;
     }
-
-    public void setEntityColumn(int entityColumn) {
-	this.entityColumn = entityColumn;
+    
+    public void setElevationLabel(String elevationLabel) {
+	this.elevationLabel = elevationLabel;
     }
-
-    public int getUnitColumn() {
-	return unitColumn;
+    
+    public String getEntityLabel() {
+	return entityLabel;
     }
-
-    public void setUnitColumn(int unitColumn) {
-	this.unitColumn = unitColumn;
+    
+    public void setEntityLabel(String entityLabel) {
+	this.entityLabel = entityLabel;
     }
-
-    public int getInRelationToColumn() {
-	return inRelationToColumn;
+    
+    public String getUnitLabel() {
+	return unitLabel;
     }
-
-    public void setInRelationToColumn(int inRelationToColumn) {
-	this.inRelationToColumn = inRelationToColumn;
+    
+    public void setUnitLabel(String unitLabel) {
+	this.unitLabel = unitLabel;
     }
-
+    
+    public String getInRelationToLabel() {
+	return inRelationToLabel;
+    }
+    
+    public void setInRelationToLabel(String inRelationToLabel) {
+	this.inRelationToLabel = inRelationToLabel;
+    }
+    
     public int getTotalDASA() {
 	if (attributes == null) {
 	    return -1;
 	}
     	return attributes.size();
     }
-
+    
     public int getTotalDASE() {
 	if (events == null) {
 	    return -1;
 	}
     	return events.size();
     }
-
+    
     public int getTotalDASO() {
 	if (objects == null) {
 	    return -1;
 	}
     	return objects.size();
     }
-
+    
     public List<DataAcquisitionSchemaAttribute> getAttributes() {
     	return attributes;
     }
     
     public void setAttributes(List<DataAcquisitionSchemaAttribute> attributes) {
 	if (attributes == null) {
-	   System.out.println("[ERROR] No DataAcquisitionSchemaAttribute for " + uri + " is defined in the knowledge base. ");
+	    System.out.println("[ERROR] No DataAcquisitionSchemaAttribute for " + uri + " is defined in the knowledge base. ");
 	} else {
 	    this.attributes = attributes;
 	    for (DataAcquisitionSchemaAttribute dasa : attributes) {
 		dasa.setDataAcquisitionSchema(this);
 		if (dasa.getAttribute().equals(ValueCellProcessing.replacePrefixEx("sio:TimeStamp"))) {
-		    setTimestampColumn(dasa.getPositionInt());
-		    System.out.println("[OK] DataAcquisitionSchema TimeStampColumn: " + dasa.getPositionInt());
+		    setTimestampLabel(dasa.getLabel());
+		    System.out.println("[OK] DataAcquisitionSchema TimeStampLabel: " + dasa.getLabel());
 		}
 		if (dasa.getAttribute().equals(ValueCellProcessing.replacePrefixEx("sio:TimeInstant"))) {
-		    setTimeInstantColumn(dasa.getPositionInt());
-		    System.out.println("[OK] DataAcquisitionSchema TimeInstantColumn: " + dasa.getPositionInt());
+		    setTimeInstantLabel(dasa.getLabel());
+		    System.out.println("[OK] DataAcquisitionSchema TimeInstantLabel: " + dasa.getLabel());
 		}
-		if (dasa.getAttribute().equals(ValueCellProcessing.replacePrefixEx("hasco:originalID")) || 
-		    dasa.getAttribute().equals(ValueCellProcessing.replacePrefixEx("hasco:uriID")) ) {
-		    setIdColumn(dasa.getPositionInt());
-		    System.out.println("[OK] DataAcquisitionSchema IdColumn: " + dasa.getPositionInt());
+		if (dasa.getAttribute().equals(ValueCellProcessing.replacePrefixEx("hasco:uriId"))) {
+		    setIdLabel(dasa.getLabel());
+		    System.out.println("[OK] DataAcquisitionSchema IdLabel: " + dasa.getLabel());
 		}
+		if (dasa.getAttribute().equals(ValueCellProcessing.replacePrefixEx("hasco:originalId"))) { 
+		    setOriginalIdLabel(dasa.getLabel());
+		    System.out.println("[OK] DataAcquisitionSchema IdLabel: " + dasa.getLabel());
+		    }
 		if (dasa.getAttribute().equals(ValueCellProcessing.replacePrefixEx("hasco:hasEntity"))) {
-		    setEntityColumn(dasa.getPositionInt());
-		    System.out.println("[OK] DataAcquisitionSchema EntityColumn: " + dasa.getPositionInt());
+		    setEntityLabel(dasa.getLabel());
+		    System.out.println("[OK] DataAcquisitionSchema EntityLabel: " + dasa.getLabel());
 		}
 		if (dasa.getAttribute().equals(ValueCellProcessing.replacePrefixEx("hasco:hasUnit"))) {
-		    setUnitColumn(dasa.getPositionInt());
-		    System.out.println("[OK] DataAcquisitionSchema UnitColumn: " + dasa.getPositionInt());
+		    setUnitLabel(dasa.getLabel());
+		    System.out.println("[OK] DataAcquisitionSchema UnitLabel: " + dasa.getLabel());
 		}
 		if (dasa.getAttribute().equals(ValueCellProcessing.replacePrefixEx("sio:InRelationTo"))) {
-		    setInRelationToColumn(dasa.getPositionInt());
-		    System.out.println("[OK] DataAcquisitionSchema InRelationToColumn: " + dasa.getPositionInt());
+		    setInRelationToLabel(dasa.getLabel());
+		    System.out.println("[OK] DataAcquisitionSchema InRelationToLabel: " + dasa.getLabel());
 		}
 		System.out.println("[OK] DataAcquisitionSchemaAttribute <" + dasa.getUri() + "> is defined in the knowledge base. " + 
 				   "Entity: \""    + dasa.getEntityLabel()     + "\"; " + 
@@ -234,7 +247,6 @@ public class DataAcquisitionSchema {
 		//System.out.println("     DataAcquisitionSchemaAttribute DASE URI: \"" + dasa.getEventUri() + "\"");
 	    }
 	}
-
     }
     
     public List<DataAcquisitionSchemaObject> getObjects() {
@@ -243,7 +255,7 @@ public class DataAcquisitionSchema {
     
     public void setObjects(List<DataAcquisitionSchemaObject> objects) {
 	if (objects == null) {
-	   System.out.println("[WARNING] No DataAcquisitionSchemaObject for " + uri + " is defined in the knowledge base. ");
+	    System.out.println("[WARNING] No DataAcquisitionSchemaObject for " + uri + " is defined in the knowledge base. ");
 	} else {
 	    this.objects = objects;
 	    for (DataAcquisitionSchemaObject daso : objects) {
@@ -252,7 +264,7 @@ public class DataAcquisitionSchema {
 	    }
 	}
     }
-
+    
     public DataAcquisitionSchemaObject getObject(String dasoUri) {
 	for (DataAcquisitionSchemaObject daso : objects) {
 	    if (daso.getUri().equals(dasoUri)) {
@@ -277,7 +289,7 @@ public class DataAcquisitionSchema {
 	    }
 	}
     }
-
+    
     public DataAcquisitionSchemaEvent getEvent(String daseUri) {
 	for (DataAcquisitionSchemaEvent dase : events) {
 	    if (dase.getUri().equals(daseUri)) {
@@ -321,16 +333,16 @@ public class DataAcquisitionSchema {
 			   schema.getEvents().size() + " events.");
 	return schema;
     }
-    	
+    
     public static List<DataAcquisitionSchema> findAll() {
     	List<DataAcquisitionSchema> schemas = new ArrayList<DataAcquisitionSchema>();
     	
     	String queryString = NameSpaces.getInstance().printSparqlNameSpaceList() + 
-    			"SELECT ?uri WHERE { " + 
-    			"   ?uri a hasco:DASchema . } ";
+	    "SELECT ?uri WHERE { " + 
+	    "   ?uri a hasco:DASchema . } ";
     	Query query = QueryFactory.create(queryString);
     	QueryExecution qexec = QueryExecutionFactory.sparqlService(
-			Collections.getCollectionsName(Collections.METADATA_SPARQL), query);
+								   Collections.getCollectionsName(Collections.METADATA_SPARQL), query);
     	ResultSet results = qexec.execSelect();
 	ResultSetRewindable resultsrw = ResultSetFactory.copyResults(results);
         qexec.close();
@@ -355,7 +367,7 @@ public class DataAcquisitionSchema {
 	for (DataAcquisitionSchemaAttribute dasa : attributes) {
 	    dasa.save();
 	}
-
+	
 	// SAVING DAS ITSELF
 	String insert = "";
 	insert += NameSpaces.getInstance().printSparqlNameSpaceList();
@@ -366,12 +378,12 @@ public class DataAcquisitionSchema {
 	//System.out.println(insert);
     	UpdateRequest request = UpdateFactory.create(insert);
         UpdateProcessor processor = UpdateExecutionFactory.createRemote(
-				      request, Collections.getCollectionsName(Collections.METADATA_UPDATE));
+									request, Collections.getCollectionsName(Collections.METADATA_UPDATE));
         processor.execute();
     }
     
     @Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
-    public int saveToLabKey(String user_name, String password) throws CommandException {
+	public int saveToLabKey(String user_name, String password) throws CommandException {
 	// SAVING DAS's DASAs
 	for (DataAcquisitionSchemaAttribute dasa : attributes) {
 	    //System.out.println("Saving DASA " + dasa.getUri() + " into LabKey");
@@ -392,13 +404,13 @@ public class DataAcquisitionSchema {
     }
 
     @Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
-    public int deleteFromLabKey(String user_name, String password) throws CommandException {
+	public int deleteFromLabKey(String user_name, String password) throws CommandException {
 	// DELETING DAS's DASAs
 	for (DataAcquisitionSchemaAttribute dasa : attributes) {
 	    //System.out.println("Deleting DASA " + dasa.getUri() + " from LabKey");
 	    dasa.deleteFromLabKey(user_name, password);
 	}
-
+	
 	// DELETING DAS ITSELF
 	String site = ConfigProp.getPropertyValue("labkey.config", "site");
         String path = "/" + ConfigProp.getPropertyValue("labkey.config", "folder");
@@ -421,5 +433,5 @@ public class DataAcquisitionSchema {
         UpdateProcessor processor = UpdateExecutionFactory.createRemote(request, Collections.getCollectionsName(Collections.METADATA_UPDATE));
         processor.execute();
     }
-	
+    
 }

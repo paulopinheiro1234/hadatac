@@ -305,13 +305,17 @@ public class PrepareIngestion extends Controller {
 	String localScopeUri = data.getNewLocalScopeUri();
 	System.out.println("Showing returned GlobalScope: [" + globalScopeUri + "]");
 	System.out.println("Showing returned LocalScope: [" + localScopeUri + "]");
-	String[] localUriStr = localScopeUri.split(",");
-        System.out.println("List of local scope uris:");
-	for (int i=0; i < localUriStr.length; i++) {
-	    localUriStr[i] = localUriStr[i].trim();
-	    System.out.println("local scope: [" + localUriStr[i] + "]");
+	String[] localUriStr = null;
+	List<String> localScopeUriList = new ArrayList<String>();
+	if (localScopeUri != null) {
+	    localUriStr = localScopeUri.split(",");
+	    System.out.println("List of local scope uris:");
+	    for (int i=0; i < localUriStr.length; i++) {
+		localUriStr[i] = localUriStr[i].trim();
+		System.out.println("local scope: [" + localUriStr[i] + "]");
+	    }
+	    localScopeUriList = Arrays.asList(localUriStr);
 	}
-	List<String> localScopeUriList = Arrays.asList(localUriStr);
         
 	DataAcquisition da = DataAcquisition.findByUri(da_uri);
 	if (da == null) {

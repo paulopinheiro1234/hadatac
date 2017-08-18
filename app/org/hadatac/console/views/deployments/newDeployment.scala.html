@@ -49,7 +49,7 @@
  	    	  document.getElementById('uri').value = newUri;
 	      }
 	
-	      if (document.getElementById('acquisition_uri').value.length == 0) {
+	      if (document.getElementById('dataAcquisitionUri').value.length == 0) {
 	          cansubmit = false;
 	      }
 	      
@@ -116,7 +116,7 @@
  	</div>
  	<div class="form-group">
 		<label>Data Acquisition URI:</label>
- 		<input type="text" name="acquisition_uri" id="acquisition_uri" 
+ 		<input type="text" name="dataAcquisitionUri" id="dataAcquisitionUri" 
 		       @if(da_uri != null && !da_uri.equals("")) {
 		          class="form-control col-sm-6 disabled"  value="@ValueCellProcessing.replaceNameSpaceEx(da_uri)" readonly
 		       } else {
@@ -130,7 +130,7 @@
  	</div>
  	<div class="form-group">
 		<label>Initial Parameters: (optional)</label>
- 		<input type="text" class="form-control col-sm-6" name="init_param" id="init_param" onchange="checkform()" >
+ 		<input type="text" class="form-control col-sm-6" name="initialParameter" id="initialParameter" onchange="checkform()" >
  	</div>
     <div class="form-group">
          <label>Platform</label> 

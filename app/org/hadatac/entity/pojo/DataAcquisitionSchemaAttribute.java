@@ -55,9 +55,6 @@ public class DataAcquisitionSchemaAttribute {
          - because an original position is out of range for the csv
          - because there is no original position and the given localName does not match any of the labels in the CSV
        
-       tempPositionInt is set as follows:
-         - if a DASA has a position, and the position is within range for the given csv, then the temp if the 
-       
     */
 
     private int    tempPositionInt;
@@ -225,11 +222,11 @@ public class DataAcquisitionSchemaAttribute {
 	if (isMeta) {
 	    return "";
 	}
-	if (dasoUri != null && !dasoUri.equals("")) {
+	if (dasoUri != null && !dasoUri.equals("") && getObject() != null) {
 	    return "[" + getObject().getEntityLabel() + "]";
 	}
 	if (dasoUri == null || dasoUri.equals("")) {
-	    if (das != null && das.getIdColumn() > -1) {
+	    if (das != null && (!das.getIdLabel().equals("") || !das.getOriginalIdLabel().equals(""))) {
 		return "[inferred from DefaultObject]";
 	    }
 	    return "";
@@ -379,13 +376,13 @@ public class DataAcquisitionSchemaAttribute {
 	    return "";
 	}
 	if (dasoUri == null || dasoUri.equals("")) {
-	    if (das != null && das.getIdColumn() > -1) {
+	    if (das != null && (!das.getIdLabel().equals("") || !das.getOriginalIdLabel().equals(""))) {
 		return "[DefaultObject]";
 	    }
 	    return "";
 	} else {
 	    DataAcquisitionSchemaObject daso = DataAcquisitionSchemaObject.find(dasoUri);
-	    if (daso.getLabel() == null || daso.getLabel().equals("")) {
+	    if (daso == null || daso.getLabel() == null || daso.getLabel().equals("")) {
 		return dasoUri;
 	    }
 	    return daso.getLabel();
@@ -419,13 +416,13 @@ public class DataAcquisitionSchemaAttribute {
 	    return "";
 	}
 	if (daseUri == null || daseUri.equals("")) {
-	    if (das != null && das.getTimestampColumn() > -1) {
-		return "[value column " + das.getTimestampColumn() + "]";
+	    if (das != null && !das.getTimestampLabel().equals("")) {
+		return "[value at label " + das.getTimestampLabel() + "]";
 	    }
 	    return "";
 	} else {
 	    DataAcquisitionSchemaEvent dase = DataAcquisitionSchemaEvent.find(daseUri);
-	    if (dase.getLabel() == null || dase.getLabel().equals("")) {
+	    if (dase == null || dase.getLabel() == null || dase.getLabel().equals("")) {
 		return daseUri;
 	    }
 	    return dase.getLabel();

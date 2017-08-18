@@ -170,7 +170,7 @@ public class StudyObject extends HADatAcThing {
 	    " ?hasComment ?isFrom ?atLocation ?atTime WHERE { " + 
 	    "    " + obj_uri + " a ?objType . " + 
 	    "    " + obj_uri + " hasco:isMemberOf ?isMemberOf .  " + 
-	    "    OPTIONAL { " + obj_uri + " hasco:originalID ?originalId } . " + 
+	    "    OPTIONAL { " + obj_uri + " hasco:originalId ?originalId } . " + 
 	    "    OPTIONAL { " + obj_uri + " rdfs:label ?hasLabel } . " + 
 	    "    OPTIONAL { " + obj_uri + " rdfs:comment ?hasComment } . " + 
 	    "}";
@@ -352,7 +352,7 @@ public class StudyObject extends HADatAcThing {
 	//insert += this.getUri() + " hasco:hasSource " + " .  "; 
 	//insert += this.getUri() + " hasco:isPIConfirmed " + " .  "; 
     	insert += LINE_LAST;
-	//System.out.println("OBJ insert query (pojo's save): <" + insert + ">");
+	System.out.println("OBJ insert query (pojo's save): <" + insert + ">");
     	UpdateRequest request = UpdateFactory.create(insert);
         UpdateProcessor processor = UpdateExecutionFactory.createRemote(
 				      request, Collections.getCollectionsName(Collections.METADATA_UPDATE));
@@ -368,7 +368,7 @@ public class StudyObject extends HADatAcThing {
     	Map<String, Object> row = new HashMap<String, Object>();
     	row.put("hasURI", ValueCellProcessing.replaceNameSpaceEx(getUri()));
     	row.put("a", ValueCellProcessing.replaceNameSpaceEx(getTypeUri()));
-    	row.put("hasco:originalID", getOriginalId());
+    	row.put("hasco:originalId", getOriginalId());
     	row.put("rdfs:label", getLabel());
     	row.put("hasco:isMemberOf", ValueCellProcessing.replaceNameSpaceEx(getIsMemberOf()));
     	row.put("rdfs:comment", getComment());

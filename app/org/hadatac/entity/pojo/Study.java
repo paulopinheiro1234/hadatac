@@ -286,11 +286,11 @@ public class Study {
 	this.title = title;
     }
     
-    public void setLastId(String lastId) {
+    private void setLastId(String lastId) {
 	this.lastId = lastId;
     }
     
-    public void requestId(long quantity) {
+    public void increaseLastId(long quantity) {
 	if (quantity > 0) {
 	    long l = Long.parseLong(this.lastId);
 	    long newL = l + quantity; 

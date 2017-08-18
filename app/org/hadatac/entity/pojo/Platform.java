@@ -162,11 +162,8 @@ public class Platform  extends HADatAcThing implements Comparable<Platform> {
 	    ResultSetRewindable resultsrw = ResultSetFactory.copyResults(results);
 	    qexec.close();
 	    
-	    System.out.println("Query: " + queryString);
-	    System.out.println("HERE1 " + resultsrw.hasNext());
 	    while (resultsrw.hasNext()) {
 		QuerySolution soln = resultsrw.next();
-		System.out.println("HERE2: " + soln.getResource("uri").getURI());
 		Platform platform = find(soln.getResource("uri").getURI());
 		platforms.add(platform);
 	    }			

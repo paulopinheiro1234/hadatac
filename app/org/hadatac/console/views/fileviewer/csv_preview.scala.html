@@ -1,6 +1,7 @@
 @(mode        : String,
   fileName    : String,
   da_uri      : String,
+  oc_uri      : String,
   headers     : List[String],
   preview     : ArrayList[ArrayList[String]]
 )
@@ -20,7 +21,7 @@
  @if(mode.equals("selectCol")) {
    <script>
      var selectedColumn = -1;
-
+     
      function colSelect(obj){
          var btn = document.getElementById("colSelector");
          //unselect
@@ -39,11 +40,12 @@
 	      obj.classList.add('col-selected');
               //btn.classList.remove('disabled');
 	      selectedColumn = colNumber;
-	      $('#selectedCol').val(colNumber);
+              document.getElementById('colSelector').disabled = false;
+	      $('#position').val(colNumber);
 	      //link = 'org.hadatac.console.controllers.fileviewer.routes.CSVPreview.selectColumn(ownerEmail,fileName,' + selectedColumn + ')'
 	      //btn.setAttribute('href', link);
 	  }
-	 console.log("Selected column #" + selectedColumn);
+
       }
     </script>
 }
@@ -51,12 +53,19 @@
    <div>
      <h3>File: @fileName</h3>
      @if(mode.equals("selectCol")) {
+       <form>
        <div id="rcorners">
-            <label>Selected Column: </label> <input type="text"  id="selectedCol" name="selectedCol"  readonly>
+            <label>Selected Collection: </label> <input type="text" id="collection" name="collection" size="50" value="@ValueCellProcessing.replaceNameSpaceEx(oc_uri)"  readonly>
+            <label>Selected Column: </label> <input type="text" id="position" name="position"  readonly>
 
-	    <a id="colSelector" class="btn btn-primary disabled"
- 	       role="button">Generate Subjects From Selected Column</a>
+	    <input type="submit" id="colSelector" name="colSelector" class="btn btn-primary" disabled="disabled"
+ 		   role="button" value="Generate Objects" formmethod="post"
+		   formaction="@org.hadatac.console.controllers.objects.routes.NewObjectsFromFile.processForm(fileName, da_uri, oc_uri)">
+            </input>
+	    <a href=""  id="reset" name="reset" class="btn btn-primary"
+ 	       role="button">Reset</a>
       </div>
+      </form>
       <br>      
        Click on the column's labels to select a column with object identifiers (e.g., Subject IDs, sample IDs). 
      }

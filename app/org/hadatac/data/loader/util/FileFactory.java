@@ -10,6 +10,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
 public class FileFactory {
+
 	File ccsvFile;
 	File csvFile;
 	File xcsvFile;
@@ -40,6 +41,10 @@ public class FileFactory {
 		this.arguments = arguments;
 	}
 	
+        public String getFileName() {
+	    return fileName;
+        }
+
 	public void setCCSVFile(File file, String name) {
 		ccsvFile = file;
 		fileName = name;

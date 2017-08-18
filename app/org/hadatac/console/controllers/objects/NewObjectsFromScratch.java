@@ -97,12 +97,15 @@ public class NewObjectsFromScratch extends Controller {
 	//System.out.println("LabelPrefix : " + data.getNewLabelPrefix());
 	
 	long quantity = Long.parseLong(data.getNewQuantity());
-	if ((quantity > 0) && (quantity <= MAX_OBJECTS)) {
-	    std.requestId(quantity);
+	if (quantity > MAX_OBJECTS) {
+            return badRequest("Your request has exceeded MAX_OBJECTS!");
 	}
 	long nextId = std.getLastId() + 1;
-	System.out.println("nextId : " + nextId);
-    
+	//System.out.println("nextId : " + nextId);
+	if (quantity > 0) {
+	    std.increaseLastId(quantity);
+	}
+
 	// Fixed values
 	String newType = null;
 	if (data.getNewType() == null || data.getNewType().equals("")) {
@@ -158,7 +161,7 @@ public class NewObjectsFromScratch extends Controller {
 	    }
 	}
 	String message = "A total of " + quantity + " new object(s) have been Generated";
-	return ok(objectConfirm.render(message, filename, da_uri, std_uri, oc_uri, obj));
+	return ok(objectConfirm.render(message, filename, da_uri, std_uri, oc_uri));
     }
     
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
@@ -189,13 +192,15 @@ public class NewObjectsFromScratch extends Controller {
 	boolean useSpace = (data.getUseSpace() != null);
 	boolean useTime = (data.getUseTime() != null);
 	long multiplier = Long.parseLong(data.getNewMultiplier());
-	if ((multiplier > 0) && (multiplier <= MAX_OBJECTS)) {
-	    //    std.requestId(quantity);
-	}
+
+        if (multiplier > MAX_OBJECTS) {
+            return badRequest("Requested number of objects exceeeds MAX OBJECTS");
+        }
+        
 	String newLabelPrefix = data.getNewLabelPrefix();
 	boolean newLabelQualifier = (data.getNewLabelQualifier() != null);
 	long nextId = std.getLastId() + 1;
-	System.out.println("nextId : " + nextId);
+	//System.out.println("nextId : " + nextId);
 	long quantity = 0;
 
 	// Fixed values
@@ -345,8 +350,13 @@ public class NewObjectsFromScratch extends Controller {
 	    }
 	    
 	}
-	String message = "Total objects created: " + genObjs.size();
-	return ok(objectConfirm.render(message, filename, da_uri, std_uri, oc_uri, obj));
+	quantity = genObjs.size();
+	String message = "Total objects created: " + quantity;
+	if (quantity > 0) {
+	    std.increaseLastId(quantity);
+	}
+	
+	return ok(objectConfirm.render(message, filename, da_uri, std_uri, oc_uri));
     }
     
     private static void cartesianProduct(StudyObject[][] arr, int level, StudyObject[] cp, List<String> gens, List<List<StudyObject>> genOS) {

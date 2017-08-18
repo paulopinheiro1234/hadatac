@@ -35,10 +35,8 @@
 		  class="btn btn-primary" role="button">Delete Objects in Collection</a>
 	   }
 	   @if(filename != null && !filename.equals("")) {
-	         <input type="submit" class="btn btn-primary btn-sm" role="button"  id="createScopeFromFile" formmethod="post"
-			formaction="@org.hadatac.console.controllers.fileviewer.routes.CSVPreview.getCSVPreview("unproc", filename, da_uri, 10)" 
-			value="Create Multiple Objects From File">
-                 </input>
+               <a href="@org.hadatac.console.controllers.fileviewer.routes.CSVPreview.getCSVPreview("unproc", filename, da_uri, oc.getUri(), 10)"
+		  class="btn btn-primary" role="button">Create Multiple Objects From File</a>
 	   }
          </div>
       </div>

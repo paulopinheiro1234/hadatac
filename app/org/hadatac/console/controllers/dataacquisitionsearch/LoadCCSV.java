@@ -21,7 +21,6 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.hadatac.console.controllers.annotator.AnnotationLog;
 import org.hadatac.console.views.html.dataacquisitionsearch.*;
-import org.hadatac.data.loader.ccsv.Parser;
 import org.hadatac.data.loader.util.Arguments;
 import org.hadatac.data.loader.util.FileFactory;
 import org.hadatac.data.model.ParsingResult;
@@ -60,7 +59,7 @@ public class LoadCCSV extends Controller {
 	    files.openFile("log", "w");
 	    files.writeln("log", "[START] " + arguments.getInputPath() + " generating measurements.");
 	    
-	    if (arguments.getInputType().equals("CCSV")) {
+	    /*   if (arguments.getInputType().equals("CCSV")) {
 		Parser parser = new Parser();
 		if (arguments.isPv()) {
 		    ParsingResult result = parser.validate(Feedback.WEB, files);
@@ -76,7 +75,7 @@ public class LoadCCSV extends Controller {
 			message += result_parse.getMessage();
 		    }
 		}
-	    }
+		} */
 	    
 	    files.writeln("log", "[END] " + arguments.getInputPath() + " generating measurements.");
 	    files.closeFile("log", "w");

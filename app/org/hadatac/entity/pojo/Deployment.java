@@ -56,7 +56,8 @@ public class Deployment {
     
     public static String DELETE_LINE3 = INDENT1 + " ?p ?o . ";
 
-    public static String LINE3_LEGACY = INDENT1 + "a         vstoi:LegacyDeployment;  ";
+    //public static String LINE3_LEGACY = INDENT1 + "a         vstoi:LegacyDeployment;  ";
+    public static String LINE3_LEGACY = INDENT1 + "a         vstoi:Deployment;  ";
     
     public static String PLATFORM_PREDICATE =     INDENT1 + "vstoi:hasPlatform        ";
     

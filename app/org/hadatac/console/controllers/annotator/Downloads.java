@@ -20,7 +20,6 @@ import org.hadatac.console.controllers.dataacquisitionsearch.LoadCCSV;
 import org.hadatac.console.models.CSVAnnotationHandler;
 import org.hadatac.console.views.html.annotator.*;
 import org.hadatac.data.api.DataFactory;
-import org.hadatac.data.loader.ccsv.Parser;
 import org.hadatac.data.loader.util.Arguments;
 import org.hadatac.data.loader.util.FileFactory;
 import org.hadatac.data.model.ParsingResult;

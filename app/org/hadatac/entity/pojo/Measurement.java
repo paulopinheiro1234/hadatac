@@ -124,16 +124,18 @@ public class Measurement {
 	}
 	
 	public void setPID(String objectUri) {
-		this.objectUri = objectUri;
-		this.pid = getObjectPID();
+	    //this.objectUri = objectUri;
+	    //this.pid = getObjectPID();
+	    this.pid = objectUri;
 	}
 	
 	public void setSID(String objectUri) {
-		this.objectUri = objectUri;
-		this.sid = getObjectSID();
+	    //this.objectUri = objectUri;
+	    //this.sid = getObjectSID();
+	    this.sid = objectUri;
 	}
 	
-	public String getObjectPID() {
+    /*	public String getObjectPID() {
 		
 //		this.objectUri = objectUri;
 		
@@ -193,7 +195,7 @@ public class Measurement {
             return "";
 	}
 	
-	public String getObjectSID() {
+    	public String getObjectSID() {
 		
 //		this.objectUri = objectUri;
 		
@@ -226,7 +228,7 @@ public class Measurement {
         }
         
         return "";
-	}	
+	}*/	
 
 	public void setObjectUri(String objectUri) {
 		this.objectUri = objectUri;

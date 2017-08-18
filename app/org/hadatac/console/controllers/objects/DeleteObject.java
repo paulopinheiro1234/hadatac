@@ -51,18 +51,18 @@ public class DeleteObject extends Controller {
 
 	Study study = Study.find(std_uri);
 	if (study == null) {
-	    return badRequest(objectConfirm.render("Error editing object: Study URI did not return valid URI", filename, da_uri, std_uri, oc_uri, null));
+	    return badRequest(objectConfirm.render("Error editing object: Study URI did not return valid URI", filename, da_uri, std_uri, oc_uri));
 	} 
 
 	ObjectCollection oc = ObjectCollection.find(oc_uri);
 	if (oc == null) {
-	    return badRequest(objectConfirm.render("Error editing object: ObjectCollection URI did not return valid object", filename, da_uri, std_uri, oc_uri, null));
+	    return badRequest(objectConfirm.render("Error editing object: ObjectCollection URI did not return valid object", filename, da_uri, std_uri, oc_uri));
 	} 
 
 	List<StudyObject> objects = StudyObject.findByCollection(oc);
 
     	//return ok(editObject.render(study, oc, objects));
-	return badRequest(objectConfirm.render("PLACEHOLDER", filename, da_uri, std_uri, oc_uri, null));
+	return badRequest(objectConfirm.render("PLACEHOLDER", filename, da_uri, std_uri, oc_uri));
     }
     
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))

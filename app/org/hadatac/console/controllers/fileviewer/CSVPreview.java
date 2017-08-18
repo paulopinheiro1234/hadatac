@@ -56,14 +56,15 @@ public class CSVPreview extends Controller{
     private static String path_proc = ConfigProp.getPropertyValue("autoccsv.config", "path_proc");
     private static String path_unproc = ConfigProp.getPropertyValue("autoccsv.config", "path_unproc");
     
-    public static ArrayList<String> getCSVHeaders(String folder, String fileName){
+    public static ArrayList<String> getCSVHeaders(String folder, String fileName) {
 	//System.out.println("filename: " + filename);
-	File toPreview = null;
+	String fullFileName = "";
 	if (folder.equals("proc")) {
-	    toPreview = new File(path_proc + fileName);
+	    fullFileName = path_proc + fileName;
 	} else {
-	    toPreview = new File(path_unproc + fileName);
+	    fullFileName = path_unproc + fileName;
 	}
+	File toPreview = new File(fullFileName);
 	ArrayList<String> headerList = null;
 	try{
 	    CSVParser parser = CSVParser.parse(toPreview, StandardCharsets.UTF_8, CSVFormat.RFC4180.withHeader());
@@ -116,11 +117,11 @@ public class CSVPreview extends Controller{
 	return previewList;
     }// /getCSVPreview
     
-    public static Result getCSVPreview(String folder, String fileName, String da_uri, int numRows){
+    public static Result getCSVPreview(String folder, String fileName, String da_uri, String oc_uri, int numRows){
 	if (da_uri != null && !da_uri.equals("")) {
-	    return ok(csv_preview.render("selectCol", fileName, da_uri, getCSVHeaders(folder, fileName), getCSVPreview(folder, fileName, numRows)));
+	    return ok(csv_preview.render("selectCol", fileName, da_uri, oc_uri, getCSVHeaders(folder, fileName), getCSVPreview(folder, fileName, numRows)));
 	}
-	return ok(csv_preview.render("preview", fileName, da_uri, getCSVHeaders(folder, fileName), getCSVPreview(folder, fileName, numRows)));
+	return ok(csv_preview.render("preview", fileName, da_uri, oc_uri, getCSVHeaders(folder, fileName), getCSVPreview(folder, fileName, numRows)));
     }// /getCSVPreview
     
     public static ArrayList<String> getColumn(String ownerEmail, String fileName, int selectedCol){
