@@ -48,6 +48,7 @@ public class DataAcquisitionSchema {
     public static String PREFIX = "DAS-";
     public static List<String> METADASA = Arrays.asList("sio:TimeStamp", 
 							"sio:TimeInstant", 
+							"hasco:namedTime", 
 							"hasco:originalId", 
 							"hasco:uriId", 
 							"hasco:hasMetaEntity", 
@@ -68,6 +69,7 @@ public class DataAcquisitionSchema {
     private List<DataAcquisitionSchemaEvent> events = null;
     private String timestampLabel;
     private String timeInstantLabel;
+    private String namedTimeLabel;
     private String idLabel;
     private String originalIdLabel;
     private String elevationLabel;
@@ -78,6 +80,7 @@ public class DataAcquisitionSchema {
     public DataAcquisitionSchema() {
 	this.timestampLabel = "";
 	this.timeInstantLabel = "";
+	this.namedTimeLabel = "";
 	this.elevationLabel = "";
 	this.idLabel = "";
 	this.originalIdLabel = "";
@@ -129,6 +132,14 @@ public class DataAcquisitionSchema {
     
     public void setTimeInstantLabel(String timeInstantLabel) {
 	this.timeInstantLabel = timeInstantLabel;
+    }
+    
+    public String getNamedTimeLabel() {
+	return namedTimeLabel;
+    }
+    
+    public void setNamedTimeLabel(String namedTimeLabel) {
+	this.namedTimeLabel = namedTimeLabel;
     }
     
     public String getIdLabel() {
@@ -218,6 +229,10 @@ public class DataAcquisitionSchema {
 		if (dasa.getAttribute().equals(ValueCellProcessing.replacePrefixEx("sio:TimeInstant"))) {
 		    setTimeInstantLabel(dasa.getLabel());
 		    System.out.println("[OK] DataAcquisitionSchema TimeInstantLabel: " + dasa.getLabel());
+		}
+		if (dasa.getAttribute().equals(ValueCellProcessing.replacePrefixEx("hasco:namedTime"))) {
+		    setNamedTimeLabel(dasa.getLabel());
+		    System.out.println("[OK] DataAcquisitionSchema NamedTimeLabel: " + dasa.getLabel());
 		}
 		if (dasa.getAttribute().equals(ValueCellProcessing.replacePrefixEx("hasco:uriId"))) {
 		    setIdLabel(dasa.getLabel());
