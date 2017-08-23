@@ -77,7 +77,7 @@ import org.hadatac.data.loader.SampleCollectionGenerator;
 import org.hadatac.data.loader.SampleSubjectMapper;
 import org.hadatac.data.loader.StudyGenerator;
 import org.hadatac.data.loader.SubjectGenerator;
-import org.hadatac.data.loader.ccsv.Parser2;
+import org.hadatac.data.loader.ccsv.Parser;
 import org.hadatac.data.loader.util.Arguments;
 import org.hadatac.data.loader.util.FileFactory;
 import org.hadatac.data.model.ParsingResult;
@@ -1038,7 +1038,7 @@ public class AutoAnnotator extends Controller {
 		arguments.setVerbose(true);
 		arguments.setPv(false);
 		
-		Parser2 parser = new Parser2();
+		Parser parser = new Parser();
 		ParsingResult result_parse;
 		File inputFile = new File(arguments.getInputPath());
 		FileFactory files = new FileFactory(arguments);

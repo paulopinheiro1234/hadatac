@@ -44,19 +44,6 @@ import org.hadatac.console.models.FacetHandler;
 import org.hadatac.console.models.Pivot;
 import org.hadatac.data.model.AcquisitionQueryResult;
 import org.hadatac.utils.Collections;
-import org.hadatac.utils.NameSpaces;
-
-import com.github.jsonldjava.utils.Obj;
-import com.typesafe.config.ConfigException.Parse;
-
-import org.apache.jena.query.Query;
-import org.apache.jena.query.QueryExecution;
-import org.apache.jena.query.QueryExecutionFactory;
-import org.apache.jena.query.QueryFactory;
-import org.apache.jena.query.QuerySolution;
-import org.apache.jena.query.ResultSet;
-import org.apache.jena.query.ResultSetFactory;
-import org.apache.jena.query.ResultSetRewindable;
 
 import play.Play;
 
@@ -92,10 +79,12 @@ public class Measurement {
 	private String characteristic;
 	@Field("characteristic_uri")
 	private String characteristicUri;
+	/*
 	@Field("indicator")
 	private String indicator;
 	@Field("indicator_uri")
 	private String indicatorUri;
+	*/
 	@Field("instrument_model")
 	private String instrumentModel;
 	@Field("instrument_uri")
@@ -140,14 +129,10 @@ public class Measurement {
 	}
 
 	public void setPID(String objectUri) {
-	    //this.objectUri = objectUri;
-	    //this.pid = getObjectPID();
 	    this.pid = objectUri;
 	}
 
 	public void setSID(String objectUri) {
-	    //this.objectUri = objectUri;
-	    //this.sid = getObjectSID();
 	    this.sid = objectUri;
 	}
 	
@@ -371,6 +356,7 @@ public class Measurement {
 		this.characteristicUri = characteristicUri;
 	}
 
+	/*
 	public String getIndicator() {
 		return indicator;
 	}
@@ -386,6 +372,7 @@ public class Measurement {
 	public void setIndicatorUri(String indicatorUri) {
 		this.indicatorUri = indicatorUri;
 	}
+	*/
 
 	public String getLocation() {
 		return location;
@@ -710,6 +697,7 @@ public class Measurement {
 		query.addFacetPivotField("study_uri,acquisition_uri");
 		query.addFacetPivotField("entity,characteristic");
 		query.addFacetPivotField("platform_name,instrument_model");
+		/*
 		query.setParam("wt", "json");
 		query.setParam("json.facet", "{ "
 				+ "entity:{ "
@@ -725,7 +713,7 @@ public class Measurement {
 				+ "type : terms,"
 				+ "field: characteristic,"
 				+ "limit: 1000 }}}}}}");
-
+		*/
 		try {
 			SolrClient solr = new HttpSolrClient.Builder(
 					Play.application().configuration().getString("hadatac.solr.data") 
@@ -870,7 +858,7 @@ public class Measurement {
 				}
 			}
 
-			result.extra_facets = parseFacetResults(queryResponse);
+			//result.extra_facets = parseFacetResults(queryResponse);
 
 		} catch (SolrServerException e) {
 			System.out.println("[ERROR] Measurement.find() - SolrServerException message: " + e.getMessage());
@@ -1007,8 +995,8 @@ public class Measurement {
 		m.setEntityUri(doc.getFieldValue("entity_uri").toString());
 		m.setCharacteristic(doc.getFieldValue("characteristic").toString());
 		m.setCharacteristicUri(doc.getFieldValue("characteristic_uri").toString());
-		m.setIndicator(doc.getFieldValue("indicator").toString());
-		m.setIndicatorUri(doc.getFieldValue("indicator_uri").toString());
+		//m.setIndicator(doc.getFieldValue("indicator").toString());
+		//m.setIndicatorUri(doc.getFieldValue("indicator_uri").toString());
 		m.setInstrumentModel(doc.getFieldValue("instrument_model").toString());
 		m.setInstrumentUri(doc.getFieldValue("instrument_uri").toString());
 		m.setPlatformName(doc.getFieldValue("platform_name").toString());

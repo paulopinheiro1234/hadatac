@@ -1,24 +1,13 @@
 package org.hadatac.console.controllers.dataacquisitionsearch;
 
-import org.apache.jena.query.QueryExecution;
-import org.apache.jena.query.QueryExecutionFactory;
-import org.apache.jena.query.QuerySolution;
-import org.apache.jena.query.ResultSet;
-import org.apache.jena.query.ResultSetFactory;
-import org.apache.jena.query.ResultSetRewindable;
-import org.apache.jena.sparql.engine.http.QueryExceptionHTTP;
 import org.hadatac.console.controllers.AuthApplication;
-import org.hadatac.console.controllers.metadataacquisition.ViewStudy;
 import org.hadatac.console.controllers.triplestore.UserManagement;
 import org.hadatac.console.http.JsonHandler;
 import org.hadatac.console.controllers.metadataacquisition.ViewSubject;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.StringTokenizer;
-import java.util.TreeMap;
 import java.util.Set;
 import java.util.HashSet;
 
@@ -28,8 +17,6 @@ import org.hadatac.console.models.SpatialQueryResults;
 import org.hadatac.console.models.SysUser;
 import org.hadatac.console.models.ObjectDetails;
 
-import play.data.DynamicForm;
-import play.data.Form;
 import play.mvc.Controller;
 import play.mvc.Result;
 
@@ -37,12 +24,7 @@ import org.hadatac.console.views.formdata.FacetFormData;
 import org.hadatac.console.views.html.dataacquisitionsearch.facetOnlyBrowser;
 import org.hadatac.console.views.html.dataacquisitionsearch.dataacquisition_browser;
 import org.hadatac.data.model.AcquisitionQueryResult;
-import org.hadatac.entity.pojo.Indicator;
 import org.hadatac.entity.pojo.Measurement;
-import org.hadatac.utils.Collections;
-import org.hadatac.utils.NameSpaces;
-
-import com.sun.glass.ui.View;
 
 
 public class DataAcquisitionSearch extends Controller {

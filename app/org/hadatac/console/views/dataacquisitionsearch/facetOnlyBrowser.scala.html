@@ -138,9 +138,9 @@
 	var jsonTree, dataTree;
 	var treeEC;
 	var props = "entity,characteristic";
-	//jsonTree = parseSolrFacetPivotToTree(props);
-	//dataTree = JSON.parse(jsonTree);
-	dataTree = parseSolrFacetToTree();
+	jsonTree = parseSolrFacetPivotToTree(props);
+	dataTree = JSON.parse(jsonTree);
+	//dataTree = parseSolrFacetToTree();
 	treeEC = new dhtmlXTreeObject("treeEntityCharacteristicBox","100%","100%",0);
 	loadTree(treeEC, dataTree);
         var listEC = '@handler.valuesEC()';
