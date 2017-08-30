@@ -148,8 +148,12 @@ public class DASchemaObjectGenerator extends BasicGenerator {
     	row.put("hasco:partOfSchema", kbPrefix + "DAS-" + SDDName);
     	row.put("hasco:hasEntity", getEntity(rec));
     	row.put("hasco:hasRole", getRole(rec));
-    	row.put("sio:inRelationTo", getInRelationTo(rec));
-    	row.put("sio:Relation", getRelation(rec));
+    	if (getRelation(rec)  == null || getRelation(rec).equals("")){
+    		row.put("sio:inRelationTo", getInRelationTo(rec));
+    	} else {
+    		row.put(getRelation(rec).toString(), getInRelationTo(rec));
+    	}
+//    	row.put("sio:inRelationTo", getInRelationTo(rec));
     	row.put("hasco:isVirtual", checkVirtual(rec).toString());
     	row.put("hasco:isPIConfirmed", "false");
     	
