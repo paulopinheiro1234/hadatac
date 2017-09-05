@@ -31,6 +31,7 @@ public class Templates {
     public static String CREATEDDATE = ConfigProp.getPropertyValue(TEMPLATE_FILE, "createdDate");
     public static String UPDATEDDATE = ConfigProp.getPropertyValue(TEMPLATE_FILE, "updatedDate");
     public static String DCACCESSBOOL = ConfigProp.getPropertyValue(TEMPLATE_FILE, "DCAccessBool");
+    public static String EXTSRC = ConfigProp.getPropertyValue(TEMPLATE_FILE, "externalSource");
 	    
     // ACQ (DA and DEPLOYMENT) Template                                                                              
     public static String DATAACQUISITIONNAME = ConfigProp.getPropertyValue(TEMPLATE_FILE, "DataAcquisitionName");

@@ -94,6 +94,10 @@ public class DASchemaAttrGenerator extends BasicGenerator {
     }
     
     private String getEntity(CSVRecord rec) {
+			/*if ((rec.get(mapCol.get("AttributeOf"))).startsWith("??"){
+				// TODO: need to handle abstract entity here!
+			}*/
+
     	if ((rec.get(mapCol.get("AttributeOf"))) == null || (rec.get(mapCol.get("AttributeOf"))).equals("")) {
 	    return "chear:unknownEntity";
     	} else {
@@ -163,12 +167,13 @@ public class DASchemaAttrGenerator extends BasicGenerator {
     	Map<String, Object> row = new HashMap<String, Object>();
 	SDDName = fileName.replace("SDD-","").replace(".csv","");
 	codeMap = AutoAnnotator.codeMappings;
-    	row.put("hasURI", kbPrefix + "DASA-" + SDDName + "-" + getLabel(rec).trim().replace(" ", "").replace("_","-").replace("??", ""));
+    	row.put("hasURI", kbPrefix + "DASA-" + "-" + getLabel(rec).trim().replace(" ", "").replace("_","-").replace("??", ""));
     	row.put("a", "hasco:DASchemaAttribute");
     	row.put("rdfs:label", getLabel(rec));
     	row.put("rdfs:comment", getLabel(rec));
     	row.put("hasco:partOfSchema", kbPrefix + "DAS-" + SDDName);
     	row.put("hasco:hasPosition", getPosition(rec));
+			//if (codeMap.containsKey(hasEntityMap.get(rec.get(mapCol.get("hasURI"))))) {
     	row.put("hasco:hasEntity", getEntity(rec));
     	row.put("hasco:hasAttribute", getAttribute(rec));
     	row.put("hasco:hasUnit", getUnit(rec));

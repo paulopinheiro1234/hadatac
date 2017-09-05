@@ -472,11 +472,14 @@ public class Parser {
 				measurement.setEntityUri(dasa.getEntity());
 				measurement.setCharacteristic(uppercaseFirstLetter(dasa.getAttributeLabel()));
 				measurement.setCharacteristicUri(dasa.getAttribute());
-
+		
+				//System.out.println("1: !schema.getEntityLabel().equals(): " + !schema.getEntityLabel().equals("") );
+				//System.out.println("2: !record.get(posEntity).equals(): " + !schema.getEntityLabel().equals("") );
 				if (!schema.getEntityLabel().equals("") && !record.get(posEntity).equals("")) {
+					//System.out.println("inside if");
 					measurement.setEntity(record.get(posEntity));
 				}
-
+			//System.out.println("Made it to 5");
 				/*=================================*
 				 *                                 *
 				 *   SET DATASET                   *
@@ -593,6 +596,9 @@ public class Parser {
 			if (dasa.getTempPositionInt() > -1) {
 				System.out.println("Label: " + dasa.getLabel() + "    Position: [" + dasa.getTempPositionInt() + "]");
 			}
+			/*else{
+				System.out.println("[ERROR] Label: " + dasa.getLabel() + "    Position: [" + dasa.getTempPositionInt() + "]");
+			}*/
 		}	
 
 	}

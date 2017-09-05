@@ -816,6 +816,7 @@ public class AutoAnnotator extends Controller {
 
 				while((line2 = bufRdr2.readLine()) != null){
 					String str[] = line2.split(",");
+					//System.out.println("Code Mapping: " + str[0] + " - " + str[1]);
 					codeMappings.put(str[0], str[1]);
 				}
 				bufRdr2.close();
