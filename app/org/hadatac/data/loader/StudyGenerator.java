@@ -48,6 +48,7 @@ public class StudyGenerator extends BasicGenerator {
 	    mapCol.put("createdDate", Templates.CREATEDDATE);
 	    mapCol.put("updatedDate", Templates.UPDATEDDATE);
 	    mapCol.put("DCAccessBool", Templates.DCACCESSBOOL);
+	    mapCol.put("externalSource", Templates.EXTSRC);
 	}
     
 	private String getUri(CSVRecord rec) { 
@@ -82,6 +83,11 @@ public class StudyGenerator extends BasicGenerator {
 		return kbPrefix + "PER-" + rec.get(mapCol.get("PI")).replaceAll(" ", "-"); 
 	}
 	
+	private String getExtSource(CSVRecord rec) {
+		System.out.println("[debug] getExtSource...");
+		return rec.get(mapCol.get("externalSource")); 
+	}
+
 /*	private String getAgentFullName(CSVRecord rec) {
 		return rec.get(mapCol.get("PI")); 
 	}
@@ -112,6 +118,9 @@ public class StudyGenerator extends BasicGenerator {
     	if(rec.get(mapCol.get("institution")).length()>0){
     		row.put("hasco:hasInstitution", getInstitutionUri(rec));
     	}
+	if(rec.get(mapCol.get("externalSource")).length()>0){
+		row.put("hasco:hasExternalSource", getExtSource(rec));
+	}
     	counter++;
     	
     	return row;
@@ -159,3 +168,4 @@ public class StudyGenerator extends BasicGenerator {
     	return rows;
     }*/
 }
+
