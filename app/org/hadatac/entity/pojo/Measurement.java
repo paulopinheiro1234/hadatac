@@ -42,7 +42,6 @@ import org.apache.solr.common.SolrDocumentList;
 import org.apache.solr.common.util.NamedList;
 import org.hadatac.console.models.FacetHandler;
 import org.hadatac.console.models.Pivot;
-import org.hadatac.console.views.html.dataacquisitionmanagement.newDataAcquisition;
 import org.hadatac.data.model.AcquisitionQueryResult;
 import org.hadatac.utils.Collections;
 
@@ -80,10 +79,6 @@ public class Measurement {
 	private String characteristic;
 	@Field("characteristic_uri")
 	private String characteristicUri;
-	@Field("indicator")
-	private String indicator;
-	@Field("indicator_uri")
-	private String indicatorUri;
 	@Field("instrument_model")
 	private String instrumentModel;
 	@Field("instrument_uri")
@@ -353,22 +348,6 @@ public class Measurement {
 
 	public void setCharacteristicUri(String characteristicUri) {
 		this.characteristicUri = characteristicUri;
-	}
-
-	public String getIndicator() {
-		return indicator;
-	}
-
-	public void setIndicator(String indicator) {
-		this.indicator = indicator;
-	}
-
-	public String getIndicatorUri() {
-		return indicatorUri;
-	}
-
-	public void setIndicatorUri(String indicatorUri) {
-		this.indicatorUri = indicatorUri;
 	}
 
 	public String getLocation() {
@@ -1056,8 +1035,6 @@ public class Measurement {
 		m.setEntityUri(doc.getFieldValue("entity_uri").toString());
 		m.setCharacteristic(doc.getFieldValue("characteristic").toString());
 		m.setCharacteristicUri(doc.getFieldValue("characteristic_uri").toString());
-		m.setIndicator(doc.getFieldValue("indicator").toString());
-		m.setIndicatorUri(doc.getFieldValue("indicator_uri").toString());
 		m.setInstrumentModel(doc.getFieldValue("instrument_model").toString());
 		m.setInstrumentUri(doc.getFieldValue("instrument_uri").toString());
 		m.setPlatformName(doc.getFieldValue("platform_name").toString());
