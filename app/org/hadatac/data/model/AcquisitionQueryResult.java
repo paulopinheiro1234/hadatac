@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
-import org.apache.solr.common.util.NamedList;
 import org.hadatac.console.models.Pivot;
 import org.hadatac.entity.pojo.Measurement;
 

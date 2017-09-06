@@ -1,334 +1,229 @@
 package org.hadatac.console.models;
 
 import java.util.HashMap;
+
 import java.util.Iterator;
 import java.util.Map;
 import java.util.List;
 import java.util.ArrayList;
-import java.util.Set;
 import java.util.StringTokenizer;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class FacetHandler {
 
-        public Map<String, Object> facetsAll;
-
-        public List facetsEC;
-        public List facetsS;
-        public List facetsU;
-        public List facetsT;
-        public List facetsPI;
+	public Map<String, Object> facetsAll;
 	
-        private class Pair {
-	    String field = "";
-            String value = "";
+	public final String ENTITY_CHARACTERISTIC_FACET = "facetsEC";
+	public final String STUDY_FACET = "facetsS";
+	public final String UNIT_FACET = "facetsU";
+	public final String TIME_FACET = "facetsT";
+	public final String PLATFORM_INSTRUMENT_FACET = "facetsPI";
 
-            Pair(String f, String v) {
-		field = f;
-		value = v;
-            }
+	private class Pair {
+		String field = "";
+		String value = "";
 
-	    String getField() {
-		return field;
-	    }
+		Pair(String f, String v) {
+			field = f;
+			value = v;
+		}
 
-	    String getValue() {
-		return value;
-	    }
-        }
+		String getField() {
+			return field;
+		}
 
-	public FacetHandler() {
-	       
-	       //System.out.println("########### FACET HANDLER CONSTRUCTOR CALLED"); 
-	       facetsAll = new HashMap<String, Object>();
+		String getValue() {
+			return value;
+		}
+	}
 
-	       facetsEC  = new ArrayList<Pair>();
-	       facetsS   = new ArrayList<Pair>();
-	       facetsU   = new ArrayList<Pair>();
-	       facetsT   = new ArrayList<Pair>();
-	       facetsPI  = new ArrayList<Pair>();
-
-	       facetsAll.put("facetsEC", facetsEC);
-	       facetsAll.put("facetsS", facetsS);
-	       facetsAll.put("facetsU", facetsU);
-	       facetsAll.put("facetsT", facetsT);
-	       facetsAll.put("facetsPI", facetsPI);
+	public FacetHandler() { 
+		facetsAll = new HashMap<String, Object>();
+		facetsAll.put(ENTITY_CHARACTERISTIC_FACET, new ArrayList<Pair>());
+		facetsAll.put(STUDY_FACET, new ArrayList<Pair>());
+		facetsAll.put(UNIT_FACET, new ArrayList<Pair>());
+		facetsAll.put(TIME_FACET, new ArrayList<Pair>());
+		facetsAll.put(PLATFORM_INSTRUMENT_FACET, new ArrayList<Pair>());
 	}
 	
-	public String putFacetEC(String f, String v) {
-	        Pair obj = new Pair(f, v);
-		facetsEC.add(obj);
+	@SuppressWarnings("unchecked")
+	public List<Pair> getFacetByName(String facetName) {
+		if (!facetsAll.containsKey(facetName)) {
+			List<Pair> facet = new ArrayList<Pair>();
+			facetsAll.put(facetName, facet);
+			return facet;
+		}
+		return (List<Pair>)facetsAll.get(facetName);
+	}
+
+	public String putFacet(String facetName, String f, String v) {
+		Pair obj = new Pair(f, v);
+		getFacetByName(facetName).add(obj);
 		return obj.getValue();
 	}
-	
-        public void removeFacetEC(String f, String v) {
-	    for (Object obj : facetsEC) {
-		Pair temp = (Pair)obj;
-		if ((temp.getField().equals(f)) && (temp.getValue().equals(v))) {
-		   facetsEC.remove(temp);
-                   break;
+
+	public void removeFacet(String facetName, String f, String v) {
+		for (Object obj : getFacetByName(facetName)) {
+			Pair temp = (Pair)obj;
+			if ((temp.getField().equals(f)) && (temp.getValue().equals(v))) {
+				getFacetByName(facetName).remove(temp);
+				break;
+			}
 		}
-	    }
 	}
 
-        public List<String> valuesEC() {
-	    List<String> list = new ArrayList<String>();
-	       for (Object obj : facetsEC) {
-                   Pair pair = (Pair)obj;
-		   list.add(pair.getValue());
-	       }
-	       return  list;
-        }
-
-	public String putFacetS(String f, String v) {
-	        Pair obj = new Pair(f, v);
-		facetsS.add(obj);
-		return obj.getValue();
-	}
-	
-	public void removeFacetS(String f, String v) {
-	    for (Object obj : facetsS) {
-		Pair temp = (Pair)obj;
-		if ((temp.getField().equals(f)) && (temp.getValue().equals(v))) {
-		   facetsS.remove(temp);
-                   break;
+	public List<String> values(String facetName) {
+		List<String> list = new ArrayList<String>();
+		for (Object obj : getFacetByName(facetName)) {
+			Pair pair = (Pair)obj;
+			list.add(pair.getValue());
 		}
-	    }
+		return  list;
 	}
-	
-        public List<String> valuesS() {
-	    List<String> list = new ArrayList<String>();
-	       for (Object obj : facetsS) {
-                   Pair pair = (Pair)obj;
-		   list.add(pair.getValue());
-	       }
-	       return  list;
-        }
-
-	public String putFacetU(String f, String v) {
-	        Pair obj = new Pair(f, v);
-		facetsU.add(obj);
-		return obj.getValue();
-	}
-	
-	public void removeFacetU(String f, String v) {
-	    for (Object obj : facetsU) {
-		Pair temp = (Pair)obj;
-		if ((temp.getField().equals(f)) && (temp.getValue().equals(v))) {
-		   facetsU.remove(temp);
-                   break;
-		}
-	    }
-	}
-	
-        public List<String> valuesU() {
-	    List<String> list = new ArrayList<String>();
-	       for (Object obj : facetsU) {
-                   Pair pair = (Pair)obj;
-		   list.add(pair.getValue());
-	       }
-	       return  list;
-        }
-
-	public String putFacetT(String f, String v) {
-	        Pair obj = new Pair(f, v);
-		facetsT.add(obj);
-		return obj.getValue();
-	}
-	
-	public void removeFacetT(String f, String v) {
-	    for (Object obj : facetsU) {
-		Pair temp = (Pair)obj;
-		if ((temp.getField().equals(f)) && (temp.getValue().equals(v))) {
-		   facetsT.remove(temp);
-                   break;
-		}
-	    }
-	}
-	
-        public List<String> valuesT() {
-	    List<String> list = new ArrayList<String>();
-	       for (Object obj : facetsT) {
-                   Pair pair = (Pair)obj;
-		   list.add(pair.getValue());
-	       }
-	       return  list;
-        }
-
-	public String putFacetPI(String f, String v) {
-	        Pair obj = new Pair(f, v);
-		facetsPI.add(obj);
-		return obj.getValue();
-	}
-	
-	public void removeFacetPI(String f, String v) {
-	    for (Object obj : facetsPI) {
-		Pair temp = (Pair)obj;
-		if ((temp.getField().equals(f)) && (temp.getValue().equals(v))) {
-		   facetsPI.remove(temp);
-                   break;
-		}
-	    }
-	}
-	
-        public List<String> valuesPI() {
-	    List<String> list = new ArrayList<String>();
-	       for (Object obj : facetsPI) {
-                   Pair pair = (Pair)obj;
-		   list.add(pair.getValue());
-	       }
-	       return  list;
-        }
 
 	public String toJSON() {
 		ObjectMapper mapper = new ObjectMapper();
 		try {
-		   String output =  mapper.writeValueAsString(this);
-		   //System.out.println("facet handler toJSON(): " + output);
-                   return output;
+			String output =  mapper.writeValueAsString(this);
+			return output;
 		} catch (Exception e) {
 			e.printStackTrace();
 		} 
 		return "";
 	}
-	
-        private void loadOneFacet(List l, String facet) {
-	    if (facet == null || facet.equals("") || facet.equals("{}")) {
-		return;
-	    }
-            String field = "";
-            String value = "";
-            if (facet.indexOf('"') >= 0) {
-	       facet = facet.substring(facet.indexOf('"') + 1);
-	       if (facet.indexOf('"') >= 0) {
-                  field = facet.substring(0,facet.indexOf('"'));
-         	  if (facet.indexOf('"') >= 0) {
-	             facet = facet.substring(facet.indexOf('"') + 1);				   
-	             if (facet.indexOf('"') >= 0) {
-  	                facet = facet.substring(facet.indexOf('"') + 1);
-                        if (facet.indexOf('"') >= 0) {
-    	                   value = facet.substring(0,facet.indexOf('"'));
+
+	private void loadOneFacet(List<Pair> l, String facet) {
+		if (facet == null || facet.equals("") || facet.equals("{}")) {
+			return;
+		}
+		String field = "";
+		String value = "";
+		if (facet.indexOf('"') >= 0) {
+			facet = facet.substring(facet.indexOf('"') + 1);
+			if (facet.indexOf('"') >= 0) {
+				field = facet.substring(0,facet.indexOf('"'));
+				if (facet.indexOf('"') >= 0) {
+					facet = facet.substring(facet.indexOf('"') + 1);				   
+					if (facet.indexOf('"') >= 0) {
+						facet = facet.substring(facet.indexOf('"') + 1);
+						if (facet.indexOf('"') >= 0) {
+							value = facet.substring(0,facet.indexOf('"'));
+						}
+					}
+				}
 			}
-                     }
-                  }
-               }
-	    }
-            if (!field.equals("") && !value.equals("")) { 
-	       Pair obj = new Pair(field, value);
-	       l.add(obj);
-	    }
-        }
+		}
+		if (!field.equals("") && !value.equals("")) { 
+			Pair obj = new Pair(field, value);
+			l.add(obj);
+		}
+	}
 
-        private void loadList(List l, String str) {
-	    if (str == null || str.equals("")) {
+	private void loadList(List<Pair> l, String str) {
+		if (str == null || str.equals("")) {
+			return;
+		}
+		//System.out.println(">> loadList = <" + str + ">");
+		if (str.indexOf(',') == -1) {
+			loadOneFacet(l,str);}
+		else {
+			StringTokenizer st = new StringTokenizer(str,",");
+			while (st.hasMoreTokens()) {
+				loadOneFacet(l, st.nextToken());
+			}	
+		}    
 		return;
-	    }
-            //System.out.println(">> loadList = <" + str + ">");
-	    if (str.indexOf(',') == -1) {
-		loadOneFacet(l,str);}
-	    else {
-	        StringTokenizer st = new StringTokenizer(str,",");
-	        while (st.hasMoreTokens()) {
-		   loadOneFacet(l, st.nextToken());
-	        }	
-	    }    
-	    return;
-        }
+	}
 
-        public void loadFacets(String str) {
-	        if (str == null || str.equals("")) {
-		   return;
-	        }
-		//System.out.println("str = [" + str + "]");			    
-	        // EC list
-	        str = str.substring(str.indexOf('['));
+	public void loadFacets(String str) {
+		if (str == null || str.equals("")) {
+			return;
+		}		    
+		// EC list
+		str = str.substring(str.indexOf('['));
 		String ECList = str.substring(1,str.indexOf(']'));
 		if (ECList != null && !ECList.equals("") && !ECList.equals("{}")) {
-		    loadList(facetsEC, ECList);
+			loadList(getFacetByName(ENTITY_CHARACTERISTIC_FACET), ECList);
 		}
 		str = str.substring(str.indexOf(']'));		    
-	        // S list
-        	str = str.substring(str.indexOf('['));
+		// S list
+		str = str.substring(str.indexOf('['));
 		String SList = str.substring(1,str.indexOf(']'));		    
 		if (SList != null && !SList.equals("") && !SList.equals("{}")) {
-		    loadList(facetsS, SList);
+			loadList(getFacetByName(STUDY_FACET), SList);
 		}
 		str = str.substring(str.indexOf(']'));		    
-	        // U list
-        	str = str.substring(str.indexOf('['));
+		// U list
+		str = str.substring(str.indexOf('['));
 		String UList = str.substring(1,str.indexOf(']'));		    
 		if (UList != null && !UList.equals("") && !UList.equals("{}")) {
-		    loadList(facetsU, UList);
+			loadList(getFacetByName(UNIT_FACET), UList);
 		}
 		str = str.substring(str.indexOf(']'));		    
-	        // T list
-        	str = str.substring(str.indexOf('['));
+		// T list
+		str = str.substring(str.indexOf('['));
 		String TList = str.substring(1,str.indexOf(']'));		    
 		if (TList != null && !TList.equals("") && !TList.equals("{}")) {
-		    loadList(facetsT, TList);
+			loadList(getFacetByName(TIME_FACET), TList);
 		}
 		str = str.substring(str.indexOf(']'));		    
-                // PI list
-        	str = str.substring(str.indexOf('['));
+		// PI list
+		str = str.substring(str.indexOf('['));
 		String PIList = str.substring(1,str.indexOf(']'));		    
 		if (PIList != null && !PIList.equals("") && !PIList.equals("{}")) {
-		    loadList(facetsPI, PIList);
+			loadList(getFacetByName(PLATFORM_INSTRUMENT_FACET), PIList);
 		}
 		str = str.substring(str.indexOf(']'));		    
-		//System.out.println("ECList = <" + ECList + ">");			    
-		//System.out.println("SList = <" + SList + ">");			    
-		//System.out.println("UList = <" + UList + ">");			    
-		//System.out.println("TList = <" + TList + ">");			    
-		//System.out.println("PIList = <" + PIList + ">");			    
 		return;
-        }
+	}
 
-        private String facetToSolrQuery(List facets) {
- 	    String facetsQuery = "";
-            if (facets == null) {
-		return facetsQuery;
-	    }
-	    Iterator<Pair> i = facets.iterator();
-	    while (i.hasNext()) {
-		Pair temp = i.next();
-		//System.out.println("inside pivot: " + temp.getField());
-		facetsQuery += temp.getField() + ":\"" + temp.getValue() + "\"";
-		if (i.hasNext()) {
-		    facetsQuery += " OR ";
+	private String facetToSolrQuery(List<Pair> facets) {
+		String facetsQuery = "";
+		if (facets == null) {
+			return facetsQuery;
 		}
-	    }
-	    if (!facetsQuery.equals("")) {
-		facetsQuery = "(" + facetsQuery + ")";
-	    }
-	    return facetsQuery;
-        }
-
-        public String toSolrQuery() {
-		String query = "";
-                String query_tmp = "";
-		int populatedLists = 0;
-		Iterator i = facetsAll.entrySet().iterator();
+		Iterator<Pair> i = facets.iterator();
 		while (i.hasNext()) {
-		        Map.Entry entry = (Map.Entry)i.next();
-		        List tmpFacets = (List<Pair>)entry.getValue();
+			Pair temp = i.next();
+			//System.out.println("inside pivot: " + temp.getField());
+			facetsQuery += temp.getField() + ":\"" + temp.getValue() + "\"";
+			if (i.hasNext()) {
+				facetsQuery += " OR ";
+			}
+		}
+		if (!facetsQuery.equals("")) {
+			facetsQuery = "(" + facetsQuery + ")";
+		}
+		return facetsQuery;
+	}
+
+	@SuppressWarnings("unchecked")
+	public String toSolrQuery() {
+		String query = "";
+		String query_tmp = "";
+		int populatedLists = 0;
+		Iterator<Map.Entry<String, Object>> i = facetsAll.entrySet().iterator();
+		while (i.hasNext()) {
+			Map.Entry<String, Object> entry = (Map.Entry<String, Object>)i.next();
+			List<Pair> tmpFacets = (List<Pair>)entry.getValue();
 			//System.out.println("List's name: " + entry.getKey() + " size:" + tmpFacets.size());
-                        query_tmp = facetToSolrQuery(tmpFacets);
-                        if (!query_tmp.equals("")) {
-    			    if (tmpFacets.size() > 0) {
-			        populatedLists++;
-			    }
-			    if (populatedLists > 1) {
-				query += " AND ";
-			    }
-			    query += query_tmp;
-                        }
+			query_tmp = facetToSolrQuery(tmpFacets);
+			if (!query_tmp.equals("")) {
+				if (tmpFacets.size() > 0) {
+					populatedLists++;
+				}
+				if (populatedLists > 1) {
+					query += " AND ";
+				}
+				query += query_tmp;
+			}
 		}
 		if (query.isEmpty()) {
-		    query = "*:*";
+			query = "*:*";
 		} else {
-                    query = "(" + query + ")"; 
+			query = "(" + query + ")"; 
 		}
 		return query;
-	 }
+	}
 }

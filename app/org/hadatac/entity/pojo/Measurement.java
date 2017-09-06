@@ -42,6 +42,7 @@ import org.apache.solr.common.SolrDocumentList;
 import org.apache.solr.common.util.NamedList;
 import org.hadatac.console.models.FacetHandler;
 import org.hadatac.console.models.Pivot;
+import org.hadatac.console.views.html.dataacquisitionmanagement.newDataAcquisition;
 import org.hadatac.data.model.AcquisitionQueryResult;
 import org.hadatac.utils.Collections;
 
@@ -79,12 +80,10 @@ public class Measurement {
 	private String characteristic;
 	@Field("characteristic_uri")
 	private String characteristicUri;
-	/*
 	@Field("indicator")
 	private String indicator;
 	@Field("indicator_uri")
 	private String indicatorUri;
-	*/
 	@Field("instrument_model")
 	private String instrumentModel;
 	@Field("instrument_uri")
@@ -356,7 +355,6 @@ public class Measurement {
 		this.characteristicUri = characteristicUri;
 	}
 
-	/*
 	public String getIndicator() {
 		return indicator;
 	}
@@ -372,7 +370,6 @@ public class Measurement {
 	public void setIndicatorUri(String indicatorUri) {
 		this.indicatorUri = indicatorUri;
 	}
-	*/
 
 	public String getLocation() {
 		return location;
@@ -697,23 +694,50 @@ public class Measurement {
 		query.addFacetPivotField("study_uri,acquisition_uri");
 		query.addFacetPivotField("entity,characteristic");
 		query.addFacetPivotField("platform_name,instrument_model");
-		/*
-		query.setParam("wt", "json");
+		
+//		query.setParam("json.facet", "{ "
+//				+ "entity:{ "
+//				+ "type: terms, "
+//				+ "field: entity,"
+//				+ "limit: 1000, "
+//				+ "facet:{ "
+//				+ "characteristic_uri: { "
+//				+ "type : terms,"
+//				+ "field: characteristic_uri,"
+//				+ "limit: 1000 }}}}");
+		
 		query.setParam("json.facet", "{ "
-				+ "entity:{ "
+				+ "indicator:{ "
 				+ "type: terms, "
-				+ "field: entity,"
+				+ "field: indicator,"
 				+ "limit: 1000, "
 				+ "facet:{ "
-				+ "indicator: { type : terms,"
-				+ "field: indicator,"
+				+ "entity: { "
+				+ "type : terms,"
+				+ "field: entity,"
 				+ "limit: 1000,"
 				+ "facet:{"
 				+ "characteristic: {"
 				+ "type : terms,"
 				+ "field: characteristic,"
 				+ "limit: 1000 }}}}}}");
-		*/
+		
+//		query.setParam("json.facet", "{ "
+//				+ "entity:{ "
+//				+ "type: terms, "
+//				+ "field: entity,"
+//				+ "limit: 1000, "
+//				+ "facet:{ "
+//				+ "indicator: { "
+//				+ "type : terms,"
+//				+ "field: indicator,"
+//				+ "limit: 1000,"
+//				+ "facet:{"
+//				+ "characteristic: {"
+//				+ "type : terms,"
+//				+ "field: characteristic,"
+//				+ "limit: 1000 }}}}}}");
+		
 		try {
 			SolrClient solr = new HttpSolrClient.Builder(
 					Play.application().configuration().getString("hadatac.solr.data") 
@@ -858,8 +882,12 @@ public class Measurement {
 				}
 			}
 
-			//result.extra_facets = parseFacetResults(queryResponse);
-
+			Pivot pivot = parseFacetResults(queryResponse);
+			System.out.println("after parseFacetResults: " + pivot);
+			//pivot = modifyFacetStructure(pivot);
+			pivot.setNullParent();
+			result.extra_facets = pivot;
+			
 		} catch (SolrServerException e) {
 			System.out.println("[ERROR] Measurement.find() - SolrServerException message: " + e.getMessage());
 		} catch (IOException e) {
@@ -872,6 +900,41 @@ public class Measurement {
 		result.setDocumentSize((long) docSize);
 
 		return result;
+	}
+	
+	private static Pivot modifyFacetStructure(Pivot refPivot) {
+		Pivot new_root_pivot = new Pivot();
+		Map<String, Indicator> mapCharToIndicator = Indicator.findStudyIndicatorHierarchy();
+		System.out.println("mapCharToIndicator: " + mapCharToIndicator);
+		Map<String, Pivot> mapIndicatorToPivot = new HashMap<String, Pivot>();
+		List<Pivot> pivots = new ArrayList<Pivot>();
+		refPivot.findByField("characteristic_uri", pivots);
+		for (Pivot p : pivots) {
+			System.out.println("p.value: " + p.value);
+			if (mapCharToIndicator.containsKey(p.value)) {
+				Indicator indicator = mapCharToIndicator.get(p.value);
+				String indicatorUri = indicator.getUri();
+				String indicatorLabel = indicator.getLabel();
+				Pivot indicator_pivot = null;
+				if (!mapIndicatorToPivot.containsKey(indicatorUri)) {
+					System.out.println("indicator: " + indicatorLabel);
+					indicator_pivot = new Pivot();
+					indicator_pivot.field = "entity";
+					indicator_pivot.value = indicatorLabel;
+					new_root_pivot.addChild(indicator_pivot);
+					mapIndicatorToPivot.put(indicatorUri, indicator_pivot);
+				} else {
+					indicator_pivot = mapIndicatorToPivot.get(indicatorUri);
+				}
+			}
+		}
+		
+		for (String indicatorUri : mapIndicatorToPivot.keySet()) {
+			Pivot indicatorPivot = mapIndicatorToPivot.get(indicatorUri);
+			refPivot.findByValue(indicatorPivot, indicatorUri);
+		}
+		
+		return new_root_pivot;
 	}
 	
 	@SuppressWarnings("unchecked")
@@ -892,8 +955,6 @@ public class Measurement {
 			@SuppressWarnings("unchecked")
 			@Override
 			public void accept(String t, Object u) {
-				//System.out.println("current t: " + t);
-				//System.out.println("current u: " + u.getClass().getName());
 				if (t.equals("val")) {
 					pivot.value = (String)u;
 				} else if (t.equals("count")) {
@@ -901,12 +962,12 @@ public class Measurement {
 				} else {
 					if (u instanceof ArrayList<?>) {
 						for (NamedList<Object> nl : (ArrayList<NamedList<Object>>) u) {
-							pivot.children.add(parsePivot((NamedList<Object>)nl));
+							pivot.addChild(parsePivot((NamedList<Object>)nl));
 						}
 					} else if (u instanceof NamedList<?>) {
 						pivot.field = (String)t;
 						for (NamedList<Object> nl : ((ArrayList<NamedList<Object>>)((NamedList<Object>)u).get("buckets"))) {
-							pivot.children.add(parsePivot((NamedList<Object>)nl));
+							pivot.addChild(parsePivot((NamedList<Object>)nl));
 						}
 					}
  				}
@@ -995,8 +1056,8 @@ public class Measurement {
 		m.setEntityUri(doc.getFieldValue("entity_uri").toString());
 		m.setCharacteristic(doc.getFieldValue("characteristic").toString());
 		m.setCharacteristicUri(doc.getFieldValue("characteristic_uri").toString());
-		//m.setIndicator(doc.getFieldValue("indicator").toString());
-		//m.setIndicatorUri(doc.getFieldValue("indicator_uri").toString());
+		m.setIndicator(doc.getFieldValue("indicator").toString());
+		m.setIndicatorUri(doc.getFieldValue("indicator_uri").toString());
 		m.setInstrumentModel(doc.getFieldValue("instrument_model").toString());
 		m.setInstrumentUri(doc.getFieldValue("instrument_uri").toString());
 		m.setPlatformName(doc.getFieldValue("platform_name").toString());

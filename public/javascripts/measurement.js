@@ -31,7 +31,7 @@ function facetPrettyName(type, value) {
 	    }
             break;
         case 'entity':
-	    value += "'s attribute";
+        	value += "'s attribute";
             break;
     }
     return value;
@@ -125,10 +125,12 @@ function parseSolrFacetPivotToTree(type) {
 
 var tree_id = 0;
 function create_item(data) {
+	if (null == data) {
+		return;
+	}
 	var item = [];
 	var children = data.children;
 	for (var i_child in children) {
-		console.log(children[i_child]);
 		var element = {};
 		element.id = tree_id;
 		tree_id++;
@@ -138,15 +140,19 @@ function create_item(data) {
 			{"name": "value", "content": children[i_child].value}];
 		element.item = create_item(children[i_child]);
 		item.push(element);
-		console.log(element);
 	}
 	
 	return item;
 }
 
 function parseSolrFacetToTree() {
-	dataTree = { "id": tree_id, "item": create_item(json.extra_facets)};
-	console.log(dataTree);
+	dataTree = {};
+	dataTree.id = tree_id++;
+	items = create_item(json.extra_facets);
+	if (null == items) {
+		items = [];
+	}
+	dataTree.item = items;
 	return dataTree;
 }
 

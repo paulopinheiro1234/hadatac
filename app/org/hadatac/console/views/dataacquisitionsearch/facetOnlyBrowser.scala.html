@@ -6,7 +6,7 @@
 	documentJson : String,
 	handler : org.hadatac.console.models.FacetHandler,
 	query : String,
-        objDetails : String
+	objDetails : String
 )
 
 @import helper._
@@ -143,7 +143,7 @@
 	//dataTree = parseSolrFacetToTree();
 	treeEC = new dhtmlXTreeObject("treeEntityCharacteristicBox","100%","100%",0);
 	loadTree(treeEC, dataTree);
-        var listEC = '@handler.valuesEC()';
+        var listEC = '@handler.values(handler.ENTITY_CHARACTERISTIC_FACET)';
         setCheckTree(treeEC, listEC, props);
 	
 	var treeS;
@@ -152,7 +152,7 @@
 	dataTree = JSON.parse(jsonTree);
 	treeS = new dhtmlXTreeObject("treeStudyBox","100%","100%",0);
 	loadTree(treeS, dataTree);
-        var listS = '@handler.valuesS()';
+        var listS = '@handler.values(handler.STUDY_FACET)';
         setCheckTree(treeS, listS, props);
 	
 	var treeU;
@@ -161,7 +161,7 @@
 	dataTree = JSON.parse(jsonTree);
 	treeU = new dhtmlXTreeObject("treeUnitBox","100%","100%",0);
 	loadTree(treeU, dataTree);
-        var listU = '@handler.valuesU()';
+        var listU = '@handler.values(handler.UNIT_FACET)';
         setCheckTree(treeU, listU, props);
 	
 	var treeT;
@@ -170,7 +170,7 @@
 	dataTree = JSON.parse(jsonTree);
 	treeT = new dhtmlXTreeObject("treeTimeBox","100%","100%",0);
 	loadTree(treeT, dataTree);
-        var listT = '@handler.valuesT()';
+        var listT = '@handler.values(handler.TIME_FACET)';
         setCheckTree(treeT, listT, props);
 	
 	var treePI;
@@ -179,7 +179,7 @@
 	dataTree = JSON.parse(jsonTree);
 	treePI = new dhtmlXTreeObject("treePlatformInstrumentBox","100%","100%",0);
 	loadTree(treePI, dataTree);
-        var listPI = '@handler.valuesPI()';
+        var listPI = '@handler.values(handler.PLATFORM_INSTRUMENT_FACET)';
         setCheckTree(treePI, listPI, props);
 	</script>
 }
