@@ -128,7 +128,8 @@ public class Parser {
 			posOriginalId = tempPositionOfLabel(schema.getOriginalIdLabel()); 
 		}
 		if (!schema.getEntityLabel().equals("")) {
-			posEntity = tempPositionOfLabel(schema.getEntityLabel()); 
+			System.out.println("[DEBUG] schema.getEntityLabel() = " + schema.getEntityLabel()); // returns "??summaryClass"
+			posEntity = tempPositionOfLabel(schema.getEntityLabel()); //tempPositionOfLabel returns -1 right now - this is bad.
 		}
 		if (!schema.getUnitLabel().equals("")) {
 			posUnit = tempPositionOfLabel(schema.getUnitLabel()); 
@@ -466,20 +467,20 @@ public class Parser {
 		    measurement.setCharacteristic(uppercaseFirstLetter(dasa.getAttributeLabel()));
 		    } */
 
-
+				// TODO: un-hack this
 				// HACK FOR AUGUST 18
-				measurement.setEntity("Subject");
+				measurement.setEntity("Subject"); // should not be hard-coded
 				measurement.setEntityUri(dasa.getEntity());
+				System.out.println("[debug]: getEntity " + dasa.getEntity());
 				measurement.setCharacteristic(uppercaseFirstLetter(dasa.getAttributeLabel()));
 				measurement.setCharacteristicUri(dasa.getAttribute());
 		
-				//System.out.println("1: !schema.getEntityLabel().equals(): " + !schema.getEntityLabel().equals("") );
-				//System.out.println("2: !record.get(posEntity).equals(): " + !schema.getEntityLabel().equals("") );
+				System.out.println("schema.getEntityLabel() = " + schema.getEntityLabel());
+				System.out.println("record.get(posEntity) = " + record.get(posEntity)); // array index out of bounds exception :c
 				if (!schema.getEntityLabel().equals("") && !record.get(posEntity).equals("")) {
-					//System.out.println("inside if");
 					measurement.setEntity(record.get(posEntity));
 				}
-			//System.out.println("Made it to 5");
+
 				/*=================================*
 				 *                                 *
 				 *   SET DATASET                   *

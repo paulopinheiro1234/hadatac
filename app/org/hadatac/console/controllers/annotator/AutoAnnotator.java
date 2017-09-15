@@ -698,7 +698,7 @@ public class AutoAnnotator extends Controller {
 		log.save();
 
 		return true;
-	}
+	}// /commitRows()
 
 	public static boolean annotateDataAcquisitionFile(File file) {
 		boolean bSuccess = true;
@@ -798,7 +798,6 @@ public class AutoAnnotator extends Controller {
 			if (hm.containsKey("Study_ID")){
 				study_id = hm.get("Study_ID");
 			}
-
 			URL url = new URL(hm.get("Data_Dictionary"));
 			//System.out.println(url.toString());
 			File dd = new File("sddtmp/" + file.getName());
@@ -858,7 +857,7 @@ public class AutoAnnotator extends Controller {
 					study_id = hm.get("Study_ID");
 				}
 				try {
-					DASchemaObjectGenerator dasoGenerator = new DASchemaObjectGenerator(dd);
+					DASchemaObjectGenerator dasoGenerator = new DASchemaObjectGenerator(dd, study_id);
 					System.out.println("Calling DASchemaObjectGenerator");
 					bSuccess = commitRows(dasoGenerator.createRows(), dasoGenerator.toString(), 
 							file.getName(), "DASchemaObject", true);
