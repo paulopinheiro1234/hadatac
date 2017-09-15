@@ -99,7 +99,6 @@ public class DASchemaObjectGenerator extends BasicGenerator {
     
 	private String getInRelationTo(CSVRecord rec) {
 		if (rec.get(mapCol.get("InRelationTo")) == null || rec.get(mapCol.get("InRelationTo")).equals("")){
-			//System.out.println("[DASO Generator]: no 'inRelationTo' found for " + rec.get(mapCol.get("Label")));
 			return "";
 		} else {
 			List<String> items = Arrays.asList(rec.get(mapCol.get("InRelationTo")).split("\\s*,\\s*"));
@@ -145,10 +144,9 @@ public class DASchemaObjectGenerator extends BasicGenerator {
 				rows.add(createRow(record, ++row_number));
 			}
 		}
-		//for(int i = 0; i < templateList.size(); i++){
-		//	System.out.println(templateList.get(i));
-		//}
-		System.out.println("[DASchemaObjectGenerator] Rows: " + rows);
+		for(int i = 0; i < templateList.size(); i++){
+			System.out.println(templateList.get(i));
+		}
 		return rows;
 	}// /createRows()
     
@@ -164,10 +162,11 @@ public class DASchemaObjectGenerator extends BasicGenerator {
     	row.put("hasco:partOfSchema", kbPrefix + "DAS-" + SDDName);
     	row.put("hasco:hasEntity", getEntity(rec));
     	row.put("hasco:hasRole", getRole(rec));
-    	if (getRelation(rec)  == null || getRelation(rec).equals("")){
+    	if (getRelation(rec)  != null || !getRelation(rec).equals("")){
+    		row.put("sio:Relation", getRelation(rec));
+    	}
+    	if (getInRelationTo(rec)  != null || !getInRelationTo(rec).equals("")){
     		row.put("sio:inRelationTo", getInRelationTo(rec));
-    	} else {
-    		row.put(getRelation(rec).toString(), getInRelationTo(rec));
     	}
 //    	row.put("sio:inRelationTo", getInRelationTo(rec));
     	row.put("hasco:isVirtual", checkVirtual(rec).toString());

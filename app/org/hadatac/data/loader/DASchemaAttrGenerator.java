@@ -73,7 +73,7 @@ public class DASchemaAttrGenerator extends BasicGenerator {
 	if (rec.get(mapCol.get("AttributeOf")) == null || rec.get(mapCol.get("AttributeOf").trim()).equals("")) {
 	    return "";
 	}
-	System.out.println("DASchemaAttrGenerator: getAttributeOf() = " + SDDName + "-" + rec.get(mapCol.get("AttributeOf")).replace("??", ""));
+	//System.out.println("DASchemaAttrGenerator: getAttributeOf() = " + SDDName + "-" + rec.get(mapCol.get("AttributeOf")).replace("??", ""));
 	return kbPrefix + "DASO-" + SDDName + "-" + rec.get(mapCol.get("AttributeOf")).replace("??", "");
     }
     
@@ -89,7 +89,7 @@ public class DASchemaAttrGenerator extends BasicGenerator {
 	if (rec.get(mapCol.get("Time")) == null || rec.get(mapCol.get("Time").trim()).equals("")) {
 	    return "";
 	}
-	System.out.println("DASchemaAttrGenerator: getTime() = " + SDDName + "-" + rec.get(mapCol.get("Time")).trim().replace(" ","").replace("_","-").replace("??", ""));
+	//System.out.println("DASchemaAttrGenerator: getTime() = " + SDDName + "-" + rec.get(mapCol.get("Time")).trim().replace(" ","").replace("_","-").replace("??", ""));
 	return kbPrefix + "DASE-" + SDDName + "-" + rec.get(mapCol.get("Time")).trim().replace(" ","").replace("_","-").replace("??", "");
     }
     
