@@ -104,6 +104,15 @@ public class DASOInstance {
 		return generatedURI;
 	}// /generateURIFromTemplate
 
+	/*
+		Study ID: default-study
+		templateURI: hbgd-kb:DASO-time_cat_infosheet-summaryClass
+		rdfs:subClassOf/hbgd-kb:DASO-time_cat_infosheet-id-key
+		rdfs:label/summaryClass
+		rdfs:type/owl:Class
+*/
+
+
 	// TODO: finish
 	/*
 	public static DASOInstance find(String URI){		

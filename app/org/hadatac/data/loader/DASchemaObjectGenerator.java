@@ -162,10 +162,10 @@ public class DASchemaObjectGenerator extends BasicGenerator {
     	row.put("hasco:partOfSchema", kbPrefix + "DAS-" + SDDName);
     	row.put("hasco:hasEntity", getEntity(rec));
     	row.put("hasco:hasRole", getRole(rec));
-    	if (getRelation(rec)  != null || !getRelation(rec).equals("")){
+    	if (getRelation(rec) != null || !getRelation(rec).equals("")){
     		row.put("sio:Relation", getRelation(rec));
     	}
-    	if (getInRelationTo(rec)  != null || !getInRelationTo(rec).equals("")){
+    	if (getInRelationTo(rec) != null || !getInRelationTo(rec).equals("")){
     		row.put("sio:inRelationTo", getInRelationTo(rec));
     	}
 //    	row.put("sio:inRelationTo", getInRelationTo(rec));

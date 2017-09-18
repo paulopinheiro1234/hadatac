@@ -3,6 +3,7 @@ package org.hadatac.data.loader;
 import java.io.File;
 import org.apache.commons.io.FileUtils;
 import org.hadatac.console.controllers.annotator.AutoAnnotator;
+import org.hadatac.entity.pojo.DASOInstance;
 import play.Play;
 import java.lang.String;
 import java.util.Arrays;
@@ -20,6 +21,7 @@ public class DASVirtualObject {
 	private Map<String,String> objRelations;
 
 	final HashMap<String,String> codeMap = AutoAnnotator.codeMappings;
+	final HashMap<String, List<String>> codebook = AutoAnnotator.codebook;
     
 	// takes the row created in DASchemaObjectGenerator
 	// iff that row is virtual
@@ -58,34 +60,48 @@ public class DASVirtualObject {
 			}
 		}
 	}// DASOVirtualObject()
+	
+	public void resetStudyID(String study_id){
+		//if(this.studyId.equals("default-study") || this.studyId.equals("")){
+			this.studyId = study_id;
+			System.out.println("[DASVirtualObject] studyId RESET to " + studyId);
+		//} else {
+		//	System.out.println("[DASVirtualObject] studyId already set to " + studyId);
+		//}
+	}
 
-	private String getEntity(CSVRecord rec) {
-		if ((rec.get(objRelations.get("Entity"))) == null || (rec.get(objRelations.get("Entity"))).equals("")) {
-			return null;
-		} else {
-			if (codeMap.containsKey(rec.get(objRelations.get("Entity")))) {
-				System.out.println("[DASVirtualObject] code matched: " + rec.get(objRelations.get("Entity"))); 
-				return codeMap.get(rec.get(objRelations.get("Entity")));
-			} else {
-				return rec.get(objRelations.get("Entity"));
+
+	/*private boolean resolveVirtualEntities(CSVRecord rec) {
+		for (Map.Entry<String, String> entry : objRelations.entrySet()) {
+			if(entry.getValue().contains("DASO")){  
+				// Check to see if there's a code mapping entry
+				if(codeMap.containsKey(entry.getValue())){
+					System.out.println("[DASVirtualObject]: entry.getValue() = " + entry.getValue());
+				}
+				// If not, get the relevant URI of the other entity
+				//else {
+				//}
 			}
 		}
-	}// getEntity()
+	}// resolveVirtualEntities()
+	*/
 
 	public String toString(){
 		String result = "";
 		result += "Study ID: " + studyId + "\n";
 		result += "templateURI: " + templateUri + "\n";
 		for (Map.Entry<String, String> entry : objRelations.entrySet()) {
-			result += entry.getKey() + "/" + entry.getValue() + "\n";
+			result += entry.getKey() + " " + entry.getValue() + "\n";
 		}	
 		return result;
 	}// /toString()
 
-	//public DASOInstance generateInstance(CSVRecord rec){
-	//	
-	//}// /generateInstance()
-
+	/*
+	// DASOInstance(String label, String type, HashMap<String,String> relations, HashMap<String,String> templateVals)
+	public DASOInstance generateInstance(CSVRecord rec){
+			
+	}// /generateInstance()
+	*/
 
 
 

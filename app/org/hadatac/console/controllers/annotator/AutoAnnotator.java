@@ -863,7 +863,7 @@ public class AutoAnnotator extends Controller {
 							file.getName(), "DASchemaObject", true);
 				} catch (Exception e) {
 					System.out.println("Error annotateDataAcquisitionSchemaFile: Unable to generate DASO.");
-					e.printStackTrace(System.out);
+					//e.printStackTrace(System.out);
 					AnnotationLog.printException(e, file.getName());
 					//return false;
 				}
