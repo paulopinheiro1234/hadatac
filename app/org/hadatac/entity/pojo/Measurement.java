@@ -1,15 +1,6 @@
 package org.hadatac.entity.pojo;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.UnsupportedEncodingException;
-import java.net.URLDecoder;
-import java.net.URLEncoder;
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.time.Duration;
 import java.time.Instant;
 import java.time.ZoneId;
@@ -40,6 +31,7 @@ import org.apache.solr.client.solrj.response.UpdateResponse;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
 import org.apache.solr.common.util.NamedList;
+import org.hadatac.console.controllers.dataacquisitionsearch.FacetTree;
 import org.hadatac.console.models.FacetHandler;
 import org.hadatac.console.models.Pivot;
 import org.hadatac.data.model.AcquisitionQueryResult;
@@ -58,6 +50,7 @@ public class Measurement {
 	private String studyUri;
 	@Field("object_uri")
 	private String objectUri;
+	@Field("timestamp")
 	private Instant timestamp;
 	@Field("named_time")
 	private String abstractTime;
@@ -123,38 +116,38 @@ public class Measurement {
 	}
 
 	public void setPID(String objectUri) {
-	    this.pid = objectUri;
+		this.pid = objectUri;
 	}
 
 	public void setSID(String objectUri) {
-	    this.sid = objectUri;
+		this.sid = objectUri;
 	}
-	
+
 	public String getObjectPID() {
-	    return this.pid;
+		return this.pid;
 	}
 
 	public String getObjectSID() {
-	    return this.sid;
+		return this.sid;
 	}
 
-    /*	public String getObjectPID() {
-		
+	/*	public String getObjectPID() {
+
 //		this.objectUri = objectUri;
-		
+
         String queryString = NameSpaces.getInstance().printSparqlNameSpaceList()
                 + " SELECT ?pid WHERE {"
                 + " <" + objectUri + "> rdf:type <http://semanticscience.org/resource/Human> . "
                 + " <" + objectUri + "> <http://hadatac.org/ont/hasco/originalID> ?pid . "       
                 + " }";
-        
+
         Query query = QueryFactory.create(queryString);
         QueryExecution qexec = QueryExecutionFactory.sparqlService(
                 Collections.getCollectionsName(Collections.METADATA_SPARQL), query);
         ResultSet results = qexec.execSelect();
         ResultSetRewindable resultsrw = ResultSetFactory.copyResults(results);
         qexec.close();
-        
+
         if (resultsrw.size() > 0) {
             QuerySolution soln = resultsrw.next();
             try{
@@ -173,14 +166,14 @@ public class Measurement {
                     + " <" + objectUri + "> <http://hadatac.org/ont/hasco/isSampleOf> ?sub . "
                     + " ?sub <http://hadatac.org/ont/hasco/originalID> ?pid . "       
                     + " }";
-            
+
             Query query2 = QueryFactory.create(queryString2);
             QueryExecution qexec2 = QueryExecutionFactory.sparqlService(
                     Collections.getCollectionsName(Collections.METADATA_SPARQL), query2);
             ResultSet results2 = qexec2.execSelect();
             ResultSetRewindable resultsrw2 = ResultSetFactory.copyResults(results2);
             qexec2.close();
-            
+
             if (resultsrw2.size() > 0) {
                 QuerySolution soln2 = resultsrw2.next();
                 try{
@@ -197,25 +190,25 @@ public class Measurement {
             }
             return "";
 	}
-	
+
     	public String getObjectSID() {
-		
+
 //		this.objectUri = objectUri;
-		
+
         String queryString = NameSpaces.getInstance().printSparqlNameSpaceList()
                 + " SELECT ?sid WHERE {"
                 + " <" + objectUri + "> <http://hadatac.org/ont/hasco/originalID> ?sid . "  
                 + " <" + objectUri + "> <http://hadatac.org/ont/hasco/isObjectOf> ?sc . "
                 + " ?sc	rdf:type <http://hadatac.org/ont/hasco/SampleCollection> . "
                 + " }";
-        
+
         Query query = QueryFactory.create(queryString);
         QueryExecution qexec = QueryExecutionFactory.sparqlService(
                 Collections.getCollectionsName(Collections.METADATA_SPARQL), query);
         ResultSet results = qexec.execSelect();
         ResultSetRewindable resultsrw = ResultSetFactory.copyResults(results);
         qexec.close();
-        
+
         if (resultsrw.size() > 0) {
             QuerySolution soln = resultsrw.next();
             try{
@@ -229,7 +222,7 @@ public class Measurement {
             	return "";
             }
         }
-        
+
         return "";
 	}*/
 
@@ -281,7 +274,6 @@ public class Measurement {
 		return timestamp.toString();
 	}
 
-	@Field("timestamp")
 	public void setTimestamp(String timestamp) {
 		this.timestamp = Instant.parse(timestamp);
 	}
@@ -469,8 +461,6 @@ public class Measurement {
 			}
 		}
 
-		// System.out.println("User URI: " + user_uri + " acquistion_qeury: <<"
-		// + acquisition_query + ">>");
 		if (acquisition_query.equals("")) {
 			return "";
 		}
@@ -600,9 +590,9 @@ public class Measurement {
 
 	public static String calculateTimeGap(Instant min, Instant max) {
 
-	    if (min == null || max == null) {
-		return "+1MINUTE";
-	    }
+		if (min == null || max == null) {
+			return "+1MINUTE";
+		}
 
 		Duration duration = Duration.between(min, max);
 
@@ -648,75 +638,29 @@ public class Measurement {
 		 * data acquisition
 		 */
 		if (q.equals("")) {
+			System.out.println("q is empty");
 			return result;
 		}
 
 		Instant minTime = findMinTime("timestamp", q);
+		System.out.println("minTime: " + minTime);
 		Instant maxTime = findMaxTime("timestamp", q);
+		System.out.println("maxTime: " + maxTime);
 
 		String gap = calculateTimeGap(minTime, maxTime);
 
 		int docSize = 0;
 		SolrQuery query = new SolrQuery();
-		//System.out.println("q: " + q);
-		query.setQuery(q);
+		query.setQuery(q);		
 		query.setStart((page - 1) * qtd + 1);
-		//System.out.println("Starting at: " + ((page - 1) * qtd + 1) + "    page: " + page + "     qtd: " + qtd);
 		query.setRows(qtd);
 		query.setFacet(true);
 		query.setFacetLimit(-1);
-		query.addFacetField("unit");
-		if (minTime != null && maxTime != null && gap == null) {
-		    query.addDateRangeFacet("timestamp", Date.from(minTime), Date.from(maxTime), gap); 
-		}
 		query.addFacetField("named_time");
-		query.addFacetPivotField("study_uri,acquisition_uri");
-		query.addFacetPivotField("entity,characteristic");
-		query.addFacetPivotField("platform_name,instrument_model");
-		
-//		query.setParam("json.facet", "{ "
-//				+ "entity:{ "
-//				+ "type: terms, "
-//				+ "field: entity,"
-//				+ "limit: 1000, "
-//				+ "facet:{ "
-//				+ "characteristic_uri: { "
-//				+ "type : terms,"
-//				+ "field: characteristic_uri,"
-//				+ "limit: 1000 }}}}");
-		
-		query.setParam("json.facet", "{ "
-				+ "indicator:{ "
-				+ "type: terms, "
-				+ "field: indicator,"
-				+ "limit: 1000, "
-				+ "facet:{ "
-				+ "entity: { "
-				+ "type : terms,"
-				+ "field: entity,"
-				+ "limit: 1000,"
-				+ "facet:{"
-				+ "characteristic: {"
-				+ "type : terms,"
-				+ "field: characteristic,"
-				+ "limit: 1000 }}}}}}");
-		
-//		query.setParam("json.facet", "{ "
-//				+ "entity:{ "
-//				+ "type: terms, "
-//				+ "field: entity,"
-//				+ "limit: 1000, "
-//				+ "facet:{ "
-//				+ "indicator: { "
-//				+ "type : terms,"
-//				+ "field: indicator,"
-//				+ "limit: 1000,"
-//				+ "facet:{"
-//				+ "characteristic: {"
-//				+ "type : terms,"
-//				+ "field: characteristic,"
-//				+ "limit: 1000 }}}}}}");
-		
+		if (minTime != null && maxTime != null && gap == null) {
+			query.addDateRangeFacet("timestamp", Date.from(minTime), Date.from(maxTime), gap); 
+		}
+
 		try {
 			SolrClient solr = new HttpSolrClient.Builder(
 					Play.application().configuration().getString("hadatac.solr.data") 
@@ -805,74 +749,36 @@ public class Measurement {
 					}*/
 				}
 			}
-
-			if (queryResponse.getFacetPivot() != null) {
-				Iterator<Entry<String, List<PivotField>>> iter = queryResponse.getFacetPivot().iterator();
-
-				while (iter.hasNext()) {
-					Entry<String, List<PivotField>> entry = iter.next();
-
-					List<Pivot> parents = new ArrayList<Pivot>();
-					result.pivot_facets.put(entry.getKey(), parents);
-					// System.out.println("PIVOT: " + entry.getKey());
-
-					List<PivotField> listPivotField = entry.getValue();
-					// System.out.println("List<PivotField> size: " +
-					// listPivotField.size());
-					Iterator<PivotField> iterParents = listPivotField.iterator();
-
-					while (iterParents.hasNext()) {
-						PivotField pivot = iterParents.next();
-
-						Pivot parent = new Pivot();
-						if (pivot.getField().equals("study_uri")) {
-							docSize += pivot.getCount();
-						}
-						parent.field = pivot.getField();
-						parent.value = pivot.getValue().toString();
-						parent.count = pivot.getCount();
-						parents.add(parent);
-						// System.out.println("PIVOT FIELD: " +
-						// pivot.getField());
-						// System.out.println("PIVOT VALUE: " +
-						// pivot.getValue().toString());
-						// System.out.println("PIVOT COUNT: " +
-						// pivot.getCount());
-
-						List<PivotField> subPivotFiled = pivot.getPivot();
-						if (null != subPivotFiled) {
-							Iterator<PivotField> iterChildren = subPivotFiled.iterator();
-							while (iterChildren.hasNext()) {
-								pivot = iterChildren.next();
-								Pivot child = new Pivot();
-								child.field = pivot.getField();
-								child.value = pivot.getValue().toString();
-								child.count = pivot.getCount();
-								parent.children.add(child);
-								// System.out.println("PIVOT FIELD: " +
-								// pivot.getField());
-								// System.out.println("PIVOT VALUE: " +
-								// pivot.getValue().toString());
-								// System.out.println("PIVOT COUNT: " +
-								// pivot.getCount());
-							}
-						}
-					}
-				}
-			}
-
-			Pivot pivot = parseFacetResults(queryResponse);
-			System.out.println("after parseFacetResults: " + pivot);
-			//pivot = modifyFacetStructure(pivot);
-			pivot.setNullParent();
-			result.extra_facets = pivot;
 			
+			FacetTree fTree = new FacetTree();
+			fTree.setTargetFacet(DataAcquisition.class);
+			fTree.addUpperFacet(Study.class);
+			Pivot pivot = getFacetStats(fTree, handler, false);
+			for (Pivot p : pivot.children) {
+				docSize += p.count;
+			}
+			result.extra_facets.put(FacetHandler.STUDY_FACET, pivot);
+			
+			fTree.setTargetFacet(AttributeInstance.class);
+			fTree.addUpperFacet(Indicator.class);
+			fTree.addUpperFacet(EntityInstance.class);
+			result.extra_facets.put(FacetHandler.ENTITY_CHARACTERISTIC_FACET, getFacetStats(fTree, handler, true));
+			
+			fTree = new FacetTree();
+			fTree.setTargetFacet(UnitInstance.class);
+			result.extra_facets.put(FacetHandler.UNIT_FACET, getFacetStats(fTree, handler, false));
+			
+			fTree = new FacetTree();
+			fTree.setTargetFacet(DataAcquisition.class);
+			fTree.addUpperFacet(Platform.class);
+			fTree.addUpperFacet(Instrument.class);
+			result.extra_facets.put(FacetHandler.PLATFORM_INSTRUMENT_FACET, getFacetStats(fTree, handler, false));
+
 		} catch (SolrServerException e) {
 			System.out.println("[ERROR] Measurement.find() - SolrServerException message: " + e.getMessage());
 		} catch (IOException e) {
 			System.out.println("[ERROR] Measurement.find() - IOException message: " + e.getMessage());
 		} catch (Exception e) {
-			e.printStackTrace();
 			System.out.println("[ERROR] Measurement.find() - Exception message: " + e.getMessage());
 		}
 
@@ -881,56 +787,30 @@ public class Measurement {
 		return result;
 	}
 	
-	private static Pivot modifyFacetStructure(Pivot refPivot) {
-		Pivot new_root_pivot = new Pivot();
-		Map<String, Indicator> mapCharToIndicator = Indicator.findStudyIndicatorHierarchy();
-		System.out.println("mapCharToIndicator: " + mapCharToIndicator);
-		Map<String, Pivot> mapIndicatorToPivot = new HashMap<String, Pivot>();
-		List<Pivot> pivots = new ArrayList<Pivot>();
-		refPivot.findByField("characteristic_uri", pivots);
-		for (Pivot p : pivots) {
-			System.out.println("p.value: " + p.value);
-			if (mapCharToIndicator.containsKey(p.value)) {
-				Indicator indicator = mapCharToIndicator.get(p.value);
-				String indicatorUri = indicator.getUri();
-				String indicatorLabel = indicator.getLabel();
-				Pivot indicator_pivot = null;
-				if (!mapIndicatorToPivot.containsKey(indicatorUri)) {
-					System.out.println("indicator: " + indicatorLabel);
-					indicator_pivot = new Pivot();
-					indicator_pivot.field = "entity";
-					indicator_pivot.value = indicatorLabel;
-					new_root_pivot.addChild(indicator_pivot);
-					mapIndicatorToPivot.put(indicatorUri, indicator_pivot);
-				} else {
-					indicator_pivot = mapIndicatorToPivot.get(indicatorUri);
-				}
-			}
-		}
+	private static Pivot getFacetStats(FacetTree fTree, FacetHandler facetHandler, 
+			boolean bStatsFromSecondLastLevel) {
+		Pivot pivot = new Pivot();
+		fTree.retrieveFacetData(0, facetHandler, pivot, new ArrayList<String>(), bStatsFromSecondLastLevel);
+		pivot.setNullParent();
 		
-		for (String indicatorUri : mapIndicatorToPivot.keySet()) {
-			Pivot indicatorPivot = mapIndicatorToPivot.get(indicatorUri);
-			refPivot.findByValue(indicatorPivot, indicatorUri);
-		}
-		
-		return new_root_pivot;
+		return pivot;
 	}
-	
+
 	@SuppressWarnings("unchecked")
-	private static Pivot parseFacetResults(QueryResponse response) {
+	public static Pivot parseFacetResults(QueryResponse response) {
 		if (response.getResponse() != null) {
 			if (response.getResponse().get("facets") instanceof NamedList) {
 				return parsePivot(((NamedList<Object>)response.getResponse().get("facets")));
 			}
 		}
-		
+
 		return null;
 	}
-	
+
 	private static Pivot parsePivot(NamedList<Object> objects) {
 		Pivot pivot = new Pivot();
 		objects.forEach(new BiConsumer<String, Object>() {
-			
+
 			@SuppressWarnings("unchecked")
 			@Override
 			public void accept(String t, Object u) {
@@ -949,10 +829,10 @@ public class Measurement {
 							pivot.addChild(parsePivot((NamedList<Object>)nl));
 						}
 					}
- 				}
+				}
 			}
 		});
-		
+
 		return pivot;
 	}
 

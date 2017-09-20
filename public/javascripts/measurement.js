@@ -145,10 +145,11 @@ function create_item(data) {
 	return item;
 }
 
-function parseSolrFacetToTree() {
+function parseSolrFacetToTree(facet_name) {
 	dataTree = {};
+	tree_id = 0;
 	dataTree.id = tree_id++;
-	items = create_item(json.extra_facets);
+	items = create_item(json.extra_facets[facet_name]);
 	if (null == items) {
 		items = [];
 	}

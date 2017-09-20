@@ -6,7 +6,11 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.List;
 import java.util.ArrayList;
-import java.util.StringTokenizer;
+
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -14,11 +18,11 @@ public class FacetHandler {
 
 	public Map<String, Object> facetsAll;
 	
-	public final String ENTITY_CHARACTERISTIC_FACET = "facetsEC";
-	public final String STUDY_FACET = "facetsS";
-	public final String UNIT_FACET = "facetsU";
-	public final String TIME_FACET = "facetsT";
-	public final String PLATFORM_INSTRUMENT_FACET = "facetsPI";
+	public static final String ENTITY_CHARACTERISTIC_FACET = "facetsEC";
+	public static final String STUDY_FACET = "facetsS";
+	public static final String UNIT_FACET = "facetsU";
+	public static final String TIME_FACET = "facetsT";
+	public static final String PLATFORM_INSTRUMENT_FACET = "facetsPI";
 
 	private class Pair {
 		String field = "";
@@ -56,6 +60,18 @@ public class FacetHandler {
 		}
 		return (List<Pair>)facetsAll.get(facetName);
 	}
+	
+	public String getTempSolrQuery(String facetName, String f, List<String> values) {
+		for (String val : values) {
+			putFacet(facetName, f, val);
+		}
+		String query = toSolrQuery();
+		for (String val : values) {
+			removeFacet(facetName, f, val);
+		}
+		
+		return query;
+	}
 
 	public String putFacet(String facetName, String f, String v) {
 		Pair obj = new Pair(f, v);
@@ -89,92 +105,38 @@ public class FacetHandler {
 			return output;
 		} catch (Exception e) {
 			e.printStackTrace();
-		} 
+		}
 		return "";
 	}
 
-	private void loadOneFacet(List<Pair> l, String facet) {
-		if (facet == null || facet.equals("") || facet.equals("{}")) {
-			return;
-		}
-		String field = "";
-		String value = "";
-		if (facet.indexOf('"') >= 0) {
-			facet = facet.substring(facet.indexOf('"') + 1);
-			if (facet.indexOf('"') >= 0) {
-				field = facet.substring(0,facet.indexOf('"'));
-				if (facet.indexOf('"') >= 0) {
-					facet = facet.substring(facet.indexOf('"') + 1);				   
-					if (facet.indexOf('"') >= 0) {
-						facet = facet.substring(facet.indexOf('"') + 1);
-						if (facet.indexOf('"') >= 0) {
-							value = facet.substring(0,facet.indexOf('"'));
-						}
-					}
+	private void loadFacet(String facetName, Object data, String solrFieldName) {
+		JSONArray arr = (JSONArray)data;
+		if (null != arr) {
+			for (int i = 0; i < arr.size(); i++) {
+				for (Object field : ((JSONObject)arr.get(i)).keySet()) {
+					Pair pair = new Pair(solrFieldName, (String)((JSONObject)arr.get(i)).get((String)field));
+					getFacetByName(facetName).add(pair);
 				}
 			}
 		}
-		if (!field.equals("") && !value.equals("")) { 
-			Pair obj = new Pair(field, value);
-			l.add(obj);
-		}
 	}
-
-	private void loadList(List<Pair> l, String str) {
-		if (str == null || str.equals("")) {
-			return;
-		}
-		//System.out.println(">> loadList = <" + str + ">");
-		if (str.indexOf(',') == -1) {
-			loadOneFacet(l,str);}
-		else {
-			StringTokenizer st = new StringTokenizer(str,",");
-			while (st.hasMoreTokens()) {
-				loadOneFacet(l, st.nextToken());
-			}	
-		}    
-		return;
-	}
-
+	
 	public void loadFacets(String str) {
 		if (str == null || str.equals("")) {
 			return;
-		}		    
-		// EC list
-		str = str.substring(str.indexOf('['));
-		String ECList = str.substring(1,str.indexOf(']'));
-		if (ECList != null && !ECList.equals("") && !ECList.equals("{}")) {
-			loadList(getFacetByName(ENTITY_CHARACTERISTIC_FACET), ECList);
 		}
-		str = str.substring(str.indexOf(']'));		    
-		// S list
-		str = str.substring(str.indexOf('['));
-		String SList = str.substring(1,str.indexOf(']'));		    
-		if (SList != null && !SList.equals("") && !SList.equals("{}")) {
-			loadList(getFacetByName(STUDY_FACET), SList);
+		
+		try {
+			JSONObject obj = (JSONObject)(new JSONParser().parse(str));
+			loadFacet(ENTITY_CHARACTERISTIC_FACET, obj.get(ENTITY_CHARACTERISTIC_FACET), "characteristic_uri");
+			loadFacet(STUDY_FACET, obj.get(STUDY_FACET), "acquisition_uri");
+			loadFacet(UNIT_FACET, obj.get(UNIT_FACET), "unit_uri");
+			loadFacet(TIME_FACET, obj.get(TIME_FACET), "timestamp");
+			loadFacet(PLATFORM_INSTRUMENT_FACET, obj.get(PLATFORM_INSTRUMENT_FACET), "instrument_uri");
+		} catch (ParseException e) {
+			e.printStackTrace();
 		}
-		str = str.substring(str.indexOf(']'));		    
-		// U list
-		str = str.substring(str.indexOf('['));
-		String UList = str.substring(1,str.indexOf(']'));		    
-		if (UList != null && !UList.equals("") && !UList.equals("{}")) {
-			loadList(getFacetByName(UNIT_FACET), UList);
-		}
-		str = str.substring(str.indexOf(']'));		    
-		// T list
-		str = str.substring(str.indexOf('['));
-		String TList = str.substring(1,str.indexOf(']'));		    
-		if (TList != null && !TList.equals("") && !TList.equals("{}")) {
-			loadList(getFacetByName(TIME_FACET), TList);
-		}
-		str = str.substring(str.indexOf(']'));		    
-		// PI list
-		str = str.substring(str.indexOf('['));
-		String PIList = str.substring(1,str.indexOf(']'));		    
-		if (PIList != null && !PIList.equals("") && !PIList.equals("{}")) {
-			loadList(getFacetByName(PLATFORM_INSTRUMENT_FACET), PIList);
-		}
-		str = str.substring(str.indexOf(']'));		    
+		
 		return;
 	}
 
@@ -183,10 +145,10 @@ public class FacetHandler {
 		if (facets == null) {
 			return facetsQuery;
 		}
+		
 		Iterator<Pair> i = facets.iterator();
 		while (i.hasNext()) {
 			Pair temp = i.next();
-			//System.out.println("inside pivot: " + temp.getField());
 			facetsQuery += temp.getField() + ":\"" + temp.getValue() + "\"";
 			if (i.hasNext()) {
 				facetsQuery += " OR ";
@@ -195,6 +157,7 @@ public class FacetHandler {
 		if (!facetsQuery.equals("")) {
 			facetsQuery = "(" + facetsQuery + ")";
 		}
+		
 		return facetsQuery;
 	}
 
@@ -203,11 +166,10 @@ public class FacetHandler {
 		String query = "";
 		String query_tmp = "";
 		int populatedLists = 0;
-		Iterator<Map.Entry<String, Object>> i = facetsAll.entrySet().iterator();
-		while (i.hasNext()) {
-			Map.Entry<String, Object> entry = (Map.Entry<String, Object>)i.next();
+		Iterator<Map.Entry<String, Object>> iter = facetsAll.entrySet().iterator();
+		while (iter.hasNext()) {			
+			Map.Entry<String, Object> entry = (Map.Entry<String, Object>)iter.next();
 			List<Pair> tmpFacets = (List<Pair>)entry.getValue();
-			//System.out.println("List's name: " + entry.getKey() + " size:" + tmpFacets.size());
 			query_tmp = facetToSolrQuery(tmpFacets);
 			if (!query_tmp.equals("")) {
 				if (tmpFacets.size() > 0) {
@@ -224,6 +186,7 @@ public class FacetHandler {
 		} else {
 			query = "(" + query + ")"; 
 		}
+		
 		return query;
 	}
 }
