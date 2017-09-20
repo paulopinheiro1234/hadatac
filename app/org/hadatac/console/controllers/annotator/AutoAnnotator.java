@@ -112,7 +112,7 @@ public class AutoAnnotator extends Controller {
 
 	public static HashMap<String, String> codeMappings = new HashMap<String, String>();
 	public static HashMap<String, String> entityMappings = new HashMap<String, String>();
-	public static HashMap<String, List<String>> codebook = new HashMap<String, List<String>>();
+	public static HashMap<String, Map<String,String>> codebook = new HashMap<String,Map<String,String>>();
 	public static String study_id = "default-study";
 	public static final String kbPrefix = Play.application().configuration().getString("hadatac.community.ont_prefix") + "-kb:";
 
@@ -689,7 +689,7 @@ public class AutoAnnotator extends Controller {
 		if (toTripleStore) {
 			DatasetAccessor accessor = DatasetAccessorFactory.createHTTP(Collections.getCollectionsName(Collections.METADATA_GRAPH));
 			Model model = createModel(rows);
-			accessor.add(model);
+			accessor.add(model); // check URI's
 			log.addline(Feedback.println(Feedback.WEB, String.format("[OK] %d triple(s) have been committed to triple store", model.size())));
 		}
 
@@ -822,6 +822,7 @@ public class AutoAnnotator extends Controller {
 				cm.delete();
 			}
 
+			//Column Code Label Class Resource
 			try{
 				URL url3 = new URL(hm.get("Codebook"));
 				//System.out.println(url3.toString());
@@ -830,25 +831,44 @@ public class AutoAnnotator extends Controller {
 				FileUtils.copyURLToFile(url3, cb);
 				BufferedReader bufRdr3 = new BufferedReader(new FileReader(cb));
 				String line3 =  null;
-				//System.out.println("Read Codebook");
+				System.out.println("Read Codebook");
+				HashMap<String,String> tempMap;
+				String workingCol = "";
+				String workingKey = "";
 				while((line3 = bufRdr3.readLine()) != null){
 					String[] codes = line3.split(",");
-					List<String> codesl = Arrays.asList(codes); 
-					codebook.put(codesl.get(0), codesl);
+					List<String> codesl = Arrays.asList(codes);
+					String tempCol = codesl.get(0);
+					if(tempCol.equals("") || tempCol == null){
+						if(codebook.containsKey(workingKey)){
+							tempMap = (HashMap)codebook.get(workingKey);
+							tempMap.put(codesl.get(1), codesl.get(4));
+							//System.out.println("[AutoAnnotator]: added to " + workingKey + ": " + codebook.get(workingKey));
+						}
+					} else {
+						workingCol = tempCol;
+						workingKey = kbPrefix + "DASO-" + file.getName().replace("SDD-","").replace(".csv","") + "-" + workingCol.trim().replace(" ","").replace("_","-").replace("??", "");
+						//System.out.println("[AutoAnnotator]: workingKey = " + workingKey);
+						tempMap = new HashMap<String,String>();
+						tempMap.put(codesl.get(1), codesl.get(4));
+						codebook.put(workingKey, tempMap);
+						//System.out.println("[AutoAnnotator]: added to " + workingKey + ": " + codebook.get(workingKey));
+					}
 				}
 				bufRdr3.close();
 				//System.out.println("RIGHT BEFORE PVG: " + study_id);
 				PVGenerator pvGenerator = new PVGenerator(cb);
 				//System.out.println("Calling PVGenerator");
-				bSuccess = commitRows(pvGenerator.createRows(), pvGenerator.toString(), 
-						file.getName(), "PossibleValue", true);
+				bSuccess = commitRows(pvGenerator.createRows(), pvGenerator.toString(), file.getName(), "PossibleValue", true); // check URI's!
 				cb.delete();
 
 			} catch (Exception e) {
 				System.out.println("Error annotateDataAcquisitionSchemaFile: Unable to read codebook");
+				//e.printStackTrace(System.out);
 				File cb = new File(file.getName().replace(".csv", "")+"-codebook.csv");
 				System.out.println(cb.getAbsoluteFile());
 				System.out.println(cb.length());
+				System.out.println("[AutoAnnotator] codebook map size = " + codebook.size());
 				cb.delete();
 			}
 

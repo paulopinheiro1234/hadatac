@@ -9,6 +9,7 @@ import java.lang.String;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
+import java.util.ArrayList;
 import java.util.Map;
 import org.apache.commons.csv.CSVRecord;
 
@@ -21,7 +22,7 @@ public class DASVirtualObject {
 	private Map<String,String> objRelations;
 
 	final HashMap<String,String> codeMap = AutoAnnotator.codeMappings;
-	final HashMap<String, List<String>> codebook = AutoAnnotator.codebook;
+	final HashMap<String, Map<String,String>> codebook = AutoAnnotator.codebook;
     
 	// takes the row created in DASchemaObjectGenerator
 	// iff that row is virtual
@@ -54,7 +55,7 @@ public class DASVirtualObject {
 			//handle an error
 		} else {
 			if(dasoRow.get("sio:Relation") == null || dasoRow.get("sio:Relation").equals("")){
-				this.objRelations.put("sio:hasAttribute", dasoRow.get("sio:inRelationTo").toString());
+				this.objRelations.put("sio:isRelatedTo", dasoRow.get("sio:inRelationTo").toString());
 			} else {
 				this.objRelations.put(dasoRow.get("sio:Relation").toString(), dasoRow.get("sio:inRelationTo").toString());
 			}
@@ -70,22 +71,31 @@ public class DASVirtualObject {
 		//}
 	}
 
+	/*public HashMap<String,DASOInstance> generateRowInstances(CSVRecord rec){
+		HashMap<String,DASOInstance> instances = new HashMap<String,DASOInstance>();
+		
+	}// /generateRowInstances
+	*/
 
-	/*private boolean resolveVirtualEntities(CSVRecord rec) {
+
+	// kbPrefix + "DASO-" + SDDName + "-" + getLabel(rec).trim().replace(" ","")
+	// TODO: finish this
+	private void resolveVirtualEntities(String rowValue) {
 		for (Map.Entry<String, String> entry : objRelations.entrySet()) {
-			if(entry.getValue().contains("DASO")){  
-				// Check to see if there's a code mapping entry
-				if(codeMap.containsKey(entry.getValue())){
-					System.out.println("[DASVirtualObject]: entry.getValue() = " + entry.getValue());
+			if(entry.getValue().contains("DASO")){
+				// Check to see if there's a codebook entry
+				if(codebook.containsKey(entry.getValue())){
+					System.out.println("[DASVirtualObject]: resolving " + entry.getValue());
+					HashMap<String,String> currentCodeColumn = (HashMap)codebook.get(entry.getValue());
+				} else {
+					// If not, get the relevant URI of the other entity
+					System.out.println("[DASVirtualObject]: " + entry.getValue() + " not found in codebook");
 				}
-				// If not, get the relevant URI of the other entity
-				//else {
-				//}
 			}
 		}
 	}// resolveVirtualEntities()
-	*/
 
+	
 	public String toString(){
 		String result = "";
 		result += "Study ID: " + studyId + "\n";
@@ -102,11 +112,5 @@ public class DASVirtualObject {
 			
 	}// /generateInstance()
 	*/
-
-
-
-
-
-
 
 }// /class

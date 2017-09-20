@@ -23,7 +23,7 @@ public class PVGenerator extends BasicGenerator {
 	String SDDName = "";
 	HashMap<String, String> codeMap;
 //	HashMap<String, String> LabelMap = new HashMap<String, String>();
-	HashMap<String, List<String>> pvMap = new HashMap<String, List<String>>();
+	HashMap<String, Map<String,String>> pvMap = new HashMap<String, Map<String,String>>();
 	String study_id = "";
 	
 	//chear-kb:PV-childsex-0
@@ -65,7 +65,13 @@ public class PVGenerator extends BasicGenerator {
     }
     
     private String getResource(CSVRecord rec) {
-    	return rec.get(mapCol.get("Resource"));
+			String result = rec.get(mapCol.get("Resource"));
+			String[] resource = result.split(":");
+			if(resource[0].length() != result.length()){
+				resource[1].replaceAll("[.,:;\"\'\\/]", "");
+		  	return resource[0] + ":" + resource[1];
+			}
+			else return result;
     }
     
     private Boolean checkVirtual(CSVRecord rec) {
@@ -79,19 +85,19 @@ public class PVGenerator extends BasicGenerator {
     @Override
     Map<String, Object> createRow(CSVRecord rec, int row_number) throws Exception {
     	Map<String, Object> row = new HashMap<String, Object>();
-	if (getResource(rec) != ""){
-		row.put("hasURI", getResource(rec));
-	}
-	else{
-    		row.put("hasURI", kbPrefix + "PV-" + getLabel(rec).replace("_","-").replace("??", "") + ("-" + study_id.replace("null", "") + "-" + getCode(rec)).replaceAll("--", "-"));
-	}
+			//if (getResource(rec) != ""){
+			//	row.put("hasURI", getResource(rec));
+			//}
+			//else{
+						row.put("hasURI", kbPrefix + "PV-" + getLabel(rec).replace("_","-").replace("??", "") + ("-" + study_id.replace("null", "") + "-" + getCode(rec)).replaceAll("--", "-").replaceAll("[.,:;\"\'\\/]", ""));
+			//}
     	row.put("a", "hasco:PossibleValue");
     	row.put("hasco:hasCode", getCode(rec));
     	row.put("hasco:hasCodeLabel", getCodeLabel(rec));
     	row.put("hasco:hasClass", getClass(rec));
     	row.put("hasco:hasResource", getResource(rec));
     	row.put("hasco:isPossibleValueOf", kbPrefix + "DASA-" + getLabel(rec).replace("_","-").replace("??", ""));
-			System.out.println("[PVGenerator] row = " + row);
+			//System.out.println("[PVGenerator] row = " + row);
     	return row;
     }
 }

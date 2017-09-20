@@ -93,23 +93,15 @@ public class DASchemaAttrGenerator extends BasicGenerator {
 	return kbPrefix + "DASE-" + SDDName + "-" + rec.get(mapCol.get("Time")).trim().replace(" ","").replace("_","-").replace("??", "");
     }
     
+	// TODO: update this to use the DASO name
     private String getEntity(CSVRecord rec) {
-
-    	if ((rec.get(mapCol.get("AttributeOf"))) == null || (rec.get(mapCol.get("AttributeOf"))).equals("")) {
-	    return "chear:unknownEntity";
-    	} else {
-	    if (codeMap.containsKey(hasEntityMap.get(rec.get(mapCol.get("AttributeOf"))))) {
-		return codeMap.get(hasEntityMap.get(rec.get(mapCol.get("AttributeOf"))));
-	    } else {
-		if (hasEntityMap.containsKey(rec.get(mapCol.get("AttributeOf")))){
-		    return hasEntityMap.get(rec.get(mapCol.get("AttributeOf")));
-		} else {
-		    return rec.get(mapCol.get("AttributeOf"));
-		}
-        	
-	    }
-    	}
-    }
+			String attrOf = rec.get(mapCol.get("AttributeOf"));
+			if (attrOf == null || attrOf.equals("")) {
+				return "chear:unknownEntity";
+			} else {
+				return kbPrefix + "DASO-" + SDDName + "-" + attrOf.trim().replace(" ","").replace("_","-").replace("??", "");
+			}
+		}// /getEntity()
     
     private String getRole(CSVRecord rec) {
     	return rec.get(mapCol.get("Role"));
