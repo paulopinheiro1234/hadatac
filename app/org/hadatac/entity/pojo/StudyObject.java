@@ -352,7 +352,7 @@ public class StudyObject extends HADatAcThing {
 	//insert += this.getUri() + " hasco:hasSource " + " .  "; 
 	//insert += this.getUri() + " hasco:isPIConfirmed " + " .  "; 
     	insert += LINE_LAST;
-	System.out.println("OBJ insert query (pojo's save): <" + insert + ">");
+	//System.out.println("OBJ insert query (pojo's save): <" + insert + ">");
     	UpdateRequest request = UpdateFactory.create(insert);
         UpdateProcessor processor = UpdateExecutionFactory.createRemote(
 				      request, Collections.getCollectionsName(Collections.METADATA_UPDATE));
@@ -368,7 +368,7 @@ public class StudyObject extends HADatAcThing {
     	Map<String, Object> row = new HashMap<String, Object>();
     	row.put("hasURI", ValueCellProcessing.replaceNameSpaceEx(getUri()));
     	row.put("a", ValueCellProcessing.replaceNameSpaceEx(getTypeUri()));
-    	row.put("hasco:originalId", getOriginalId());
+    	row.put("hasco:originalID", getOriginalId());
     	row.put("rdfs:label", getLabel());
     	row.put("hasco:isMemberOf", ValueCellProcessing.replaceNameSpaceEx(getIsMemberOf()));
     	row.put("rdfs:comment", getComment());
@@ -384,11 +384,13 @@ public class StudyObject extends HADatAcThing {
     	rows.add(row);
 	int totalChanged = 0;
     	try {
-	    totalChanged = loader.insertRows("StudyObject", rows);
+	    totalChanged = loader.insertRows("Subject", rows);
 	} catch (CommandException e) {
+		System.out.println(e);
 	    try {
-		totalChanged = loader.updateRows("StudyObject", rows);
+		totalChanged = loader.updateRows("Subject", rows);
 	    } catch (CommandException e2) {
+	    System.out.println(e2);
 		System.out.println("[ERROR] Could not insert or update Object(s)");
 	    }
 	}
