@@ -123,7 +123,7 @@ public class SubjectGenerator extends BasicGenerator {
     public void createObj(CSVRecord record) throws Exception {
 	    	
 	    	// insert current state of the OBJ
-	    	obj = new StudyObject(getUri(record), getType(), getOriginalID(record), getLabel(record), getCohortUri(record), getLabel(record), scopeUris);
+	    	obj = new StudyObject(getUri(record), "sio:Human", getOriginalID(record), getLabel(record), getCohortUri(record), getLabel(record), scopeUris);
 	        
 	    	// insert the new OC content inside of the triplestore regardless of any change -- the previous content has already been deleted
 	    	obj.save();
@@ -143,7 +143,7 @@ public class SubjectGenerator extends BasicGenerator {
     	
 	    // insert current state of the OC
 		ObjectCollection oc = new ObjectCollection(getCohortUri(records.iterator().next()),
-																getType(),
+																"http://hadatac.org/ont/hasco/SubjectGroup",
 																getCohortLabel(records.iterator().next()),
 																getCohortLabel(records.iterator().next()),
 																getStudyUri(records.iterator().next()),
