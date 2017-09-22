@@ -51,16 +51,10 @@ public class SampleGenerator extends BasicGenerator {
 	@Override
 	void initMapping() {
 	    mapCol.clear();
-	    mapCol.put("sampleID", Templates.SAMPLEID);
-	    mapCol.put("sampleSuffix", Templates.SAMPLESUFFIX);
-	    mapCol.put("subjectID", Templates.SUBJECTID);
-	    mapCol.put("studyID", Templates.SAMPLESTUDYID);
-	    mapCol.put("sampleType", Templates.SAMPLETYPE);
-	    mapCol.put("samplingMethod", Templates.SAMPLINGMETHOD);
-	    mapCol.put("samplingVol", Templates.SAMPLINGVOL);
-	    mapCol.put("samplingVolUnit", Templates.SAMPLINGVOLUNIT);
-	    mapCol.put("storageTemp", Templates.STORAGETEMP);
-	    mapCol.put("FTcount", Templates.FTCOUNT);
+	    mapCol.put("sampleID", "specimen_id");
+	    mapCol.put("studyID", "study_id");
+	    mapCol.put("sampleSuffix", "suffix");
+
 	}
 
 	@Override
