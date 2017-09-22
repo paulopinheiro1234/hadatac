@@ -250,6 +250,7 @@ public class SampleGenerator extends BasicGenerator {
 	        
 	    	// insert the new OC content inside of the triplestore regardless of any change -- the previous content has already been deleted
 	    	obj.save();
+	    	counter++;
 	    	System.out.println("obj " + getUri(record).toString() + " saved!");
 	    	// update/create new OBJ in LabKey
 	    	int nRowsAffected = obj.saveToLabKey("gychant", "labkey");
