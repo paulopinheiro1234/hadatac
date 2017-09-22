@@ -459,8 +459,7 @@ public class AutoAnnotator extends Controller {
 		boolean bSuccess = true;
 		try {
 			SampleSubjectMapper mapper = new SampleSubjectMapper(file);
-			bSuccess = directUpdateRows(mapper.createRows(), mapper.toString(), 
-					file.getName(), "StudyObject", true);
+			bSuccess = mapper.updateMappings();
 		} catch (Exception e) {
 			e.printStackTrace();
 			AnnotationLog.printException(e, file.getName());
