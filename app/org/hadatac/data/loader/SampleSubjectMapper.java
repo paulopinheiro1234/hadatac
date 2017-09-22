@@ -2,7 +2,9 @@ package org.hadatac.data.loader;
 
 import java.io.File;
 import java.lang.String;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.csv.CSVRecord;
@@ -18,6 +20,11 @@ import org.apache.jena.sparql.engine.http.QueryExceptionHTTP;
 import org.hadatac.console.controllers.metadata.DynamicFunctions;
 import org.hadatac.utils.Collections;
 import org.hadatac.utils.NameSpaces;
+import org.hadatac.entity.pojo.Study;
+import org.hadatac.entity.pojo.ObjectCollectionType;
+import org.hadatac.entity.pojo.ObjectCollection;
+import org.hadatac.entity.pojo.StudyObjectType;
+import org.hadatac.entity.pojo.StudyObject;
 
 public class SampleSubjectMapper extends BasicGenerator {
 	
@@ -36,7 +43,7 @@ public class SampleSubjectMapper extends BasicGenerator {
 		String sampleUri = "";
 		String sampleQueryString = NameSpaces.getInstance().printSparqlNameSpaceList() +
 				"SELECT ?s WHERE {" +
-				"?s hasco:originalID \"" + rec.get(mapCol.get("originalSID")) + "\"." +
+				"?s hasco:originalId \"" + rec.get(mapCol.get("originalSID")) + "\"." +
 				"}";
 		try {
 			Query sampleQuery = QueryFactory.create(sampleQueryString);
@@ -63,7 +70,7 @@ public class SampleSubjectMapper extends BasicGenerator {
 		String subjectUri = "";
 		String subjectQueryString = NameSpaces.getInstance().printSparqlNameSpaceList() +
 				"SELECT ?s WHERE {" +
-				"?s hasco:originalID \"" + rec.get(mapCol.get("originalPID")) + "\"." +
+				"?s hasco:originalId \"" + rec.get(mapCol.get("originalPID")) + "\"." +
 				"}";
 		try {
 			Query subjectQuery = QueryFactory.create(subjectQueryString);
@@ -84,6 +91,37 @@ public class SampleSubjectMapper extends BasicGenerator {
 		//System.out.println("Subject:" + subjectUri);
 		return subjectUri;
 	}
+	
+	public boolean updateMappings() throws Exception {
+		for (CSVRecord record : records) {
+			
+			if (getSampleUri(record) == ""){
+				continue;
+			} else {
+				
+				StudyObject obj = StudyObject.find(getSampleUri(record));
+				
+				List<String> scope_l = new ArrayList<String>();
+				scope_l.add(getSubjectUri(record));
+				if (obj.getScopeUris() == null || obj.getScopeUris().isEmpty()){
+					obj.setScopeUris(scope_l);
+				} else {
+					obj.getScopeUris().add(getSubjectUri(record));
+				}
+				System.out.println("Added to scopeuris.");
+				obj.save();
+				// update/create new OBJ in LabKey
+				int nRowsAffected = obj.saveToLabKey("gychant", "labkey");
+				System.out.println("nRowsAffected : " + nRowsAffected);
+				if (nRowsAffected <= 0) {
+					System.out.println("Failed to insert new OC to LabKey!\n");
+					return false;
+				}
+			}
+		}
+		return true;
+	}
+	
 	
 	@Override
 	Map<String, Object> createRow(CSVRecord rec, int row_number) throws Exception {

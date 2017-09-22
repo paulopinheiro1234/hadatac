@@ -13,7 +13,9 @@ import java.util.Map;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVRecord;
 
-public abstract class BasicGenerator {
+import play.mvc.Controller;
+
+public abstract class BasicGenerator extends Controller {
 
     protected Iterable<CSVRecord> records = null;
     protected List<Map<String, Object>> rows = new ArrayList<Map<String, Object>>();
