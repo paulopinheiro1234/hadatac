@@ -747,6 +747,7 @@ public class AutoAnnotator extends Controller {
 					}
 					bufRdr.close();
 				} catch (Exception e) {
+					e.printStackTrace();
 					System.out.println("Error annotateDataAcquisitionSchemaFile: Unable to Read File");
 				}
 

@@ -40,7 +40,7 @@ import be.objectify.deadbolt.java.actions.Restrict;
 public class FileProcessing extends Controller {
 
     private static final String UPLOAD_PATH = "tmp/uploads/";
-    
+
     public static String[] extractFields(String str) {
 	if (str == null || str.equals("")) {
 	    return null;
@@ -58,7 +58,7 @@ public class FileProcessing extends Controller {
 	}
 	return fields;
     }
-    
+
     public static SparqlQueryResults getQueryResults(String tabName) {
 	    SparqlQuery query = new SparqlQuery();
         GetSparqlQuery query_submit = new GetSparqlQuery(query);
@@ -73,7 +73,7 @@ public class FileProcessing extends Controller {
         }
 		return theResults;
 	}
-	
+
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
     @BodyParser.Of(value = BodyParser.MultipartFormData.class, maxLength = 500 * 1024 * 1024)
     public static Result uploadFile(String handler_json) {
@@ -83,16 +83,16 @@ public class FileProcessing extends Controller {
 			e.printStackTrace();
 		}
     	System.out.println(handler_json);
-    	
-    	ObjectMapper mapper = new ObjectMapper();    	
+
+    	ObjectMapper mapper = new ObjectMapper();
     	CSVAnnotationHandler handler = null;
     	try {
 			handler = mapper.readValue(handler_json, CSVAnnotationHandler.class);
 		} catch (Exception e) {
 			e.printStackTrace();
 			return ok (uploadCSV.render(null, "fail", "Lost deployment information."));
-		} 
-    	
+		}
+
         MultipartFormData body = request().body().asMultipartFormData();
 		FilePart uploadedfile = body.getFile("pic");
 		if (uploadedfile != null) {
@@ -130,7 +130,7 @@ public class FileProcessing extends Controller {
 	     	   return ok(measurementsSpec.render(handler, getQueryResults("Entities"), getQueryResults("Units")));
 		} else {
 		   return ok (uploadCSV.render(null, "fail", "Error uploading file. Please try again."));
-		} 
-    } 
-    
+		}
+    }
+
 }
