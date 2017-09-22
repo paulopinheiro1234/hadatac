@@ -384,11 +384,11 @@ public class StudyObject extends HADatAcThing {
     	rows.add(row);
 	int totalChanged = 0;
     	try {
-	    totalChanged = loader.insertRows("Subject", rows);
+	    totalChanged = loader.insertRows("StudyObject", rows);
 	} catch (CommandException e) {
 		System.out.println(e);
 	    try {
-		totalChanged = loader.updateRows("Subject", rows);
+		totalChanged = loader.updateRows("StudyObject", rows);
 	    } catch (CommandException e2) {
 	    System.out.println(e2);
 		System.out.println("[ERROR] Could not insert or update Object(s)");

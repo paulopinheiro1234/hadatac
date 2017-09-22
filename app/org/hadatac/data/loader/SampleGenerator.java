@@ -2,6 +2,7 @@ package org.hadatac.data.loader;
 
 import java.io.File;
 import java.lang.String;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -14,18 +15,34 @@ import org.apache.jena.query.ResultSet;
 import org.apache.jena.query.ResultSetFactory;
 import org.apache.jena.query.ResultSetRewindable;
 import org.apache.jena.rdf.model.Literal;
+import org.hadatac.entity.pojo.ObjectCollection;
+import org.hadatac.entity.pojo.StudyObject;
 import org.hadatac.utils.Collections;
 import org.hadatac.utils.NameSpaces;
 import org.hadatac.utils.Templates;
+import org.hadatac.entity.pojo.Study;
+import org.hadatac.entity.pojo.ObjectCollectionType;
+import org.hadatac.entity.pojo.StudyObjectType;
 
 import com.google.common.collect.Iterables;
 
 import play.Play;
+import play.mvc.Controller;
+import play.mvc.Result;
 
 public class SampleGenerator extends BasicGenerator {
 	final String kbPrefix = Play.application().configuration().getString("hadatac.community.ont_prefix") + "-kb:";
 	private String dataAcquisition = "";
 	private int counter = 1; //starting index number
+	
+	StudyObject obj = null;
+	
+    private String studyUri = "";
+    private String hasScopeUri = "";    
+    private List<String> scopeUris = new ArrayList<String>();
+    private List<String> spaceScopeUris = new ArrayList<String>();
+    private List<String> timeScopeUris = new ArrayList<String>();
+    private List<String> objectUris = new ArrayList<String>();
 	
 	public SampleGenerator(File file) {
 		super(file);
@@ -230,5 +247,58 @@ public class SampleGenerator extends BasicGenerator {
     		rows.add(createCollectionRow(record));
     	}
     	return rows;
+    }
+       
+    public void createObj(CSVRecord record) throws Exception {
+	    	
+	    	// insert current state of the OBJ
+	    	obj = new StudyObject(getUri(record), "sio:Sample", getOriginalID(record), getLabel(record), getCollectionUri(record), getLabel(record), scopeUris);
+	        
+	    	// insert the new OC content inside of the triplestore regardless of any change -- the previous content has already been deleted
+	    	obj.save();
+	    	System.out.println("obj " + getUri(record).toString() + " saved!");
+	    	// update/create new OBJ in LabKey
+	    	int nRowsAffected = obj.saveToLabKey("gychant", "labkey");
+	    	if (nRowsAffected <= 0) {
+	    	    System.out.println("[ERROR] Failed to insert new OBJ to LabKey!");
+	    	}
+	    	
+    		objectUris.add(getUri(record));
+    		System.out.println(objectUris.size());
+
+    }
+    
+    public boolean createOc() throws Exception {
+    	
+	    // insert current state of the OC
+		ObjectCollection oc = new ObjectCollection(getCollectionUri(records.iterator().next()),
+																"http://hadatac.org/ont/hasco/SampleCollection",
+																getCollectionLabel(records.iterator().next()),
+																getCollectionLabel(records.iterator().next()),
+																getStudyUri(records.iterator().next()),
+																hasScopeUri,
+																spaceScopeUris,
+																timeScopeUris);
+
+    	for (CSVRecord record : records) {
+    		
+//    		System.out.println(getUri(record));
+    		createObj(record);
+	    }
+    	
+    	oc.setObjectUris(objectUris);
+	
+		// insert the new OC content inside of the triplestore regardless of any change -- the previous content has already been deleted
+		oc.save();
+		System.out.println("oc saved!");
+		// update/create new OC in LabKey
+		int nRowsAffected = oc.saveToLabKey("gychant", "labkey");
+		System.out.println("nRowsAffected : " + nRowsAffected);
+		if (nRowsAffected <= 0) {
+			System.out.println("Failed to insert new OC to LabKey!\n");
+			return false;
+		}
+		return true;
+
     }
 }
