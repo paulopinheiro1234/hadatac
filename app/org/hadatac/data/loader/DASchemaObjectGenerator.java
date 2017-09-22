@@ -145,7 +145,7 @@ public class DASchemaObjectGenerator extends BasicGenerator {
 			}
 		}
 		for(int i = 0; i < templateList.size(); i++){
-			System.out.println(templateList.get(i));
+			System.out.println("[DAShemaObjectGenerator] " + templateList.get(i));
 		}
 		return rows;
 	}// /createRows()

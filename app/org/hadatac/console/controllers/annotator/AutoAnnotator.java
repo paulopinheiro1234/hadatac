@@ -68,6 +68,8 @@ import org.hadatac.data.loader.DASchemaAttrGenerator;
 import org.hadatac.data.loader.DASchemaEventGenerator;
 import org.hadatac.data.loader.DASchemaGenerator;
 import org.hadatac.data.loader.DASchemaObjectGenerator;
+import org.hadatac.data.loader.DASVirtualObject;
+import org.hadatac.data.loader.DASOInstanceGenerator;
 import org.hadatac.data.loader.DataAcquisitionGenerator;
 import org.hadatac.data.loader.DeploymentGenerator;
 import org.hadatac.data.loader.GeneralGenerator;
@@ -87,6 +89,7 @@ import org.hadatac.entity.pojo.DataAcquisition;
 import org.hadatac.entity.pojo.DataAcquisitionSchema;
 import org.hadatac.entity.pojo.DataAcquisitionSchemaAttribute;
 import org.hadatac.entity.pojo.DataAcquisitionSchemaObject;
+import org.hadatac.entity.pojo.DASOInstance;
 import org.hadatac.entity.pojo.User;
 import org.hadatac.metadata.loader.LabkeyDataHandler;
 import org.hadatac.metadata.loader.ValueCellProcessing;
@@ -848,7 +851,6 @@ public class AutoAnnotator extends Controller {
 					} else {
 						workingCol = tempCol;
 						workingKey = kbPrefix + "DASO-" + file.getName().replace("SDD-","").replace(".csv","") + "-" + workingCol.trim().replace(" ","").replace("_","-").replace("??", "");
-						//System.out.println("[AutoAnnotator]: workingKey = " + workingKey);
 						tempMap = new HashMap<String,String>();
 						tempMap.put(codesl.get(1), codesl.get(4));
 						codebook.put(workingKey, tempMap);
@@ -868,7 +870,7 @@ public class AutoAnnotator extends Controller {
 				File cb = new File(file.getName().replace(".csv", "")+"-codebook.csv");
 				System.out.println(cb.getAbsoluteFile());
 				System.out.println(cb.length());
-				System.out.println("[AutoAnnotator] codebook map size = " + codebook.size());
+				//System.out.println("[AutoAnnotator] codebook map size = " + codebook.size());
 				cb.delete();
 			}
 
@@ -958,7 +960,7 @@ public class AutoAnnotator extends Controller {
 	}
 
 	public static boolean annotateCSVFile(DataFile dataFile) {
-	        System.out.println("annotateCSVFile: [" + dataFile.getFileName() + "]"); 
+    System.out.println("annotateCSVFile: [" + dataFile.getFileName() + "]"); 
 		String file_name = dataFile.getFileName();    	
 		AnnotationLog log = new AnnotationLog();
 		log.setFileName(file_name);
@@ -1079,6 +1081,7 @@ public class AutoAnnotator extends Controller {
 			System.out.println("annotateCSVFile: file to be parsed [" + dataFile.getFileName() + "]"); 
 			dataFile.setDatasetUri(DataFactory.getNextDatasetURI(da.getUri()));
 			da.addDatasetUri(dataFile.getDatasetUri());
+			//DASOInstanceGenerator dasoiGen = new DASOInstanceGenerator(dataFile.getDatasetUri(), dasoGenerator.getTemplateList());
 			result_parse = parser.indexMeasurements(files, da, dataFile);
 			status = result_parse.getStatus();
 			message += result_parse.getMessage();

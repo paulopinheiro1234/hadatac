@@ -19,7 +19,7 @@ public class DASVirtualObject {
 
 	private String studyId;
 	private String templateUri;
-	private Map<String,String> objRelations;
+	private HashMap<String,String> objRelations;
 
 	final HashMap<String,String> codeMap = AutoAnnotator.codeMappings;
 	final HashMap<String, Map<String,String>> codebook = AutoAnnotator.codebook;
@@ -61,39 +61,37 @@ public class DASVirtualObject {
 			}
 		}
 	}// DASOVirtualObject()
-	
-	public void resetStudyID(String study_id){
-		//if(this.studyId.equals("default-study") || this.studyId.equals("")){
-			this.studyId = study_id;
-			System.out.println("[DASVirtualObject] studyId RESET to " + studyId);
-		//} else {
-		//	System.out.println("[DASVirtualObject] studyId already set to " + studyId);
-		//}
+
+	public HashMap<String,String> getObjRelations(){
+		return this.objRelations;
 	}
 
-	/*public HashMap<String,DASOInstance> generateRowInstances(CSVRecord rec){
-		HashMap<String,DASOInstance> instances = new HashMap<String,DASOInstance>();
-		
-	}// /generateRowInstances
+	public String getTemplateUri(){
+		return this.templateUri;
+	}
+
+	public String getStudyId(){
+		return this.studyId;
+	}
+
+	public void setStudyId(String id){
+		this.studyId = id;
+	}
+	
+	public static DASVirtualObject resetStudyId(DASVirtualObject thing, String study_id){
+		thing.setStudyId(study_id);
+		System.out.println("[DASVirtualObject] studyId RESET to " + thing.getStudyId());
+		return thing;
+	}
+
+
+	// for each
+	/*  Study ID: default-study
+			templateURI: hbgd-kb:DASO-subj_cat_infosheet-summaryClass
+			rdfs:subClassOf hbgd-kb:DASO-subj_cat_infosheet-id-key
+			rdfs:label summaryClass
+			rdfs:type owl:Class
 	*/
-
-
-	// kbPrefix + "DASO-" + SDDName + "-" + getLabel(rec).trim().replace(" ","")
-	// TODO: finish this
-	private void resolveVirtualEntities(String rowValue) {
-		for (Map.Entry<String, String> entry : objRelations.entrySet()) {
-			if(entry.getValue().contains("DASO")){
-				// Check to see if there's a codebook entry
-				if(codebook.containsKey(entry.getValue())){
-					System.out.println("[DASVirtualObject]: resolving " + entry.getValue());
-					HashMap<String,String> currentCodeColumn = (HashMap)codebook.get(entry.getValue());
-				} else {
-					// If not, get the relevant URI of the other entity
-					System.out.println("[DASVirtualObject]: " + entry.getValue() + " not found in codebook");
-				}
-			}
-		}
-	}// resolveVirtualEntities()
 
 	
 	public String toString(){

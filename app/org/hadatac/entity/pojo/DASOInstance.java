@@ -52,54 +52,59 @@ import play.Play;
 
 public class DASOInstance {
 	final String kbPrefix = Play.application().configuration().getString("hadatac.community.ont_prefix") + "-kb:";
-	static final String URI_TEMPLATE = "${prefix}${study}/${id}/attr/${modifier}";
-	
-	private String uri;
-	private String label;
-	private String type;
-	private String study;
-	private HashMap<String,String> relations;
 
-	//private String partOfSchema;
-	//private String entity;
-	//private String entityLabel;
-	//private String role;
-	//private String inRelationTo;
-	//private String inRelationToLabel;
-	//private String relation;
-	//private String relationLabel;
+	static final String URI_TEMPLATE = "${study}/${id}/${modifier}";
+	
+	private String uri; // generated here in this class
+	private String label; // provided by template+codebook
+	private String studyId; // provided by DA file
+	private String rowKey; // provided by row
+	private String type; // provided by template
+	private HashMap<String,String> relations;
 
 	public void setUri(String uri){ this.uri = uri; }
 	public void setLabel(String label){ this.label = label; }
-	public void setType(String type){ this.uri = type; }
+	public void setStudyId(String id){ this.studyId = id; }
+	public void setType(String type){ this.type = type; }
+	public void setRowKey(String row){ this.rowKey = row; }
 	public void setRelations(HashMap<String,String> relations){ this.relations = relations; }
-	//public void setTemplateValues(HashMap<String,String> vals){ this.templateValues = vals; }
 
 	public String getUri(){ return this.uri; }
 	public String getLabel(){ return this.label; }
+	public String getStudyId(){ return this.studyId; }
 	public String getType(){ return this.type; }
+	public String getRowKey(){ return this.rowKey; }
 	public HashMap<String,String> getRelations(){ return this.relations; }    
 	public String getUriNamespace() { return ValueCellProcessing.replaceNameSpaceEx(uri); }
 	//public HashMap<String,String> getTemplateValues(){ return this.templateValues; }
 
+	/*
 	public DASOInstance(String uri, String label, String type, HashMap<String,String> relations){
 		this.setUri(uri);
 		this.setLabel(label);
 		this.setType(type);
 		this.setRelations(relations);
 	}// /constructor with uri given
+	*/
 
-	public DASOInstance(String label, String type, HashMap<String,String> relations, HashMap<String,String> templateVals){
-		this.setUri(this.generateURIFromTemplate(templateVals));
+	public DASOInstance(String studyId, String label, String type, String rowKey, HashMap<String,String> relations){
+		this.setStudyId(studyId);
 		this.setLabel(label);
 		this.setType(type);
+		this.setRowKey(rowKey);
+		this.setUri(generateURI());
 		this.setRelations(relations);
 	}// /constructor needing a uri
 
-	public String generateURIFromTemplate(HashMap<String,String> templateValues){
-		// TODO: double-check necessary keys have values (do not return null)
+	public String generateURI(){
+		HashMap<String,String> templateValues = new HashMap<String,String>();
+		templateValues.put("study", this.studyId);
+		templateValues.put("id", this.rowKey);
+		// TODO: see what this needs to look like
+		templateValues.put("modifier", "");
+
 		StrSubstitutor sub = new StrSubstitutor(templateValues);
-		String generatedURI = sub.replace(URI_TEMPLATE);
+		String generatedURI = kbPrefix + sub.replace(URI_TEMPLATE);
 		System.out.println("[DASO Instance]: generated uri " + generatedURI);
 		return generatedURI;
 	}// /generateURIFromTemplate
