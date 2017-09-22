@@ -1,10 +1,14 @@
 package org.hadatac.data.loader;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileReader;
+
 import org.apache.commons.io.FileUtils;
 import org.hadatac.console.controllers.annotator.AutoAnnotator;
 import play.Play;
 import java.lang.String;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -17,9 +21,27 @@ public class DASchemaObjectGenerator extends BasicGenerator {
     String startTime = "";
     String SDDName = "";
     HashMap<String, String> codeMap;
+    List<String> timeList = new ArrayList<String>();
     
     public DASchemaObjectGenerator(File file) {
-	super(file);
+    	
+    	super(file);
+	
+		try {
+		    BufferedReader br = new BufferedReader(new FileReader(file));
+		    String line =  null;
+		    
+		    while((line = br.readLine()) != null){
+			String str[] = line.split(",");
+			if (str[4].length() > 0){
+			    timeList.add(str[4]);
+			    //	            System.out.println(str[0] + "-----" + str[5]);
+			}
+		    }
+		    br.close();
+		} catch (Exception e) {
+		    
+		}
     }
 
     //Column	Attribute	attributeOf	Unit	Time	Entity	Role	Relation	inRelationTo	wasDerivedFrom	wasGeneratedBy	hasPosition	
@@ -128,7 +150,7 @@ public class DASchemaObjectGenerator extends BasicGenerator {
     	rows.clear();
     	int row_number = 0;
     	for (CSVRecord record : records) {
-	    if (getEntity(record)  == null || getEntity(record).equals("")){
+	    if (getEntity(record)  == null || getEntity(record).equals("") || timeList.contains(getLabel(record))){
             	continue;
 	    } else {
 		rows.add(createRow(record, ++row_number));
@@ -154,7 +176,8 @@ public class DASchemaObjectGenerator extends BasicGenerator {
     	} else {
     		row.put(getRelation(rec).toString(), getInRelationTo(rec));
     	}
-//    	row.put("sio:inRelationTo", getInRelationTo(rec));
+    	row.put("sio:Relation", getRelation(rec));
+    	row.put("hasco:hasUnit", getUnit(rec));
     	row.put("hasco:isVirtual", checkVirtual(rec).toString());
     	row.put("hasco:isPIConfirmed", "false");
     	
