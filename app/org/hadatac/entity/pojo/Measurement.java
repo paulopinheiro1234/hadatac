@@ -13,7 +13,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.function.BiConsumer;
 
 import org.apache.solr.client.solrj.SolrClient;
@@ -24,7 +23,6 @@ import org.apache.solr.client.solrj.beans.Field;
 import org.apache.solr.client.solrj.impl.HttpSolrClient;
 import org.apache.solr.client.solrj.response.FacetField;
 import org.apache.solr.client.solrj.response.FacetField.Count;
-import org.apache.solr.client.solrj.response.PivotField;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.client.solrj.response.RangeFacet;
 import org.apache.solr.client.solrj.response.UpdateResponse;
@@ -759,6 +757,7 @@ public class Measurement {
 			}
 			result.extra_facets.put(FacetHandler.STUDY_FACET, pivot);
 			
+			fTree = new FacetTree();
 			fTree.setTargetFacet(AttributeInstance.class);
 			fTree.addUpperFacet(Indicator.class);
 			fTree.addUpperFacet(EntityInstance.class);

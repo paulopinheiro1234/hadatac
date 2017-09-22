@@ -281,6 +281,8 @@ public class Parser {
 						}
 					} 
 				}
+				
+				System.out.println("Test timestamp: " + measurement.getTimestamp());
 
 				/*		
 		// contrete time(stamps)
