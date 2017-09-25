@@ -528,6 +528,8 @@ public class AutoAnnotator extends Controller {
 			//sampleGenerator = new SampleGenerator(file);
 			//bSuccess = commitRows(sampleGenerator.createCollectionRows(), sampleGenerator.toString(), 
 			//		file.getName(), "SampleCollection", true);
+			System.out.println(bSuccess);
+			
 		} catch (Exception e) {
 			System.out.println("Error: annotateSampleIdFile() - Unable to generate Sample");
 			e.printStackTrace();
@@ -551,20 +553,12 @@ public class AutoAnnotator extends Controller {
 		boolean bSuccess = true;
 		SubjectGenerator subjectGenerator = new SubjectGenerator(file);
 		try {
-			bSuccess = commitRows(subjectGenerator.createRows(), subjectGenerator.toString(), 
-					file.getName(), "Subject", true);
+			bSuccess = subjectGenerator.createOc();
+			System.out.println(bSuccess);
 		}
 		catch (Exception e) {
+			System.out.println(e);
 			System.out.println("Error: annotateSubjectIdFile() - Unable to generate Subject");
-			AnnotationLog.printException(e, file.getName());
-			return false;
-		}
-		try {
-			subjectGenerator = new SubjectGenerator(file);
-			bSuccess = commitRows(subjectGenerator.createCohortRows(), subjectGenerator.toString(), 
-					file.getName(), "Cohort", true);
-		} catch (Exception e) {
-			System.out.println("Error: annotateSubjectIdFile() - Unable to generate Cohort");
 			AnnotationLog.printException(e, file.getName());
 			return false;
 		}
