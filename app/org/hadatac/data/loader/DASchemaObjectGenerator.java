@@ -51,7 +51,11 @@ public class DASchemaObjectGenerator extends BasicGenerator {
 		// mapCol.put("??father", "chear-kb:ObjectTypeFather");
 		templateList = new ArrayList<DASVirtualObject>();
 	}
-    
+   
+	public String getSDDName(){
+		return this.SDDName;
+	}
+ 
 	private String getLabel(CSVRecord rec) {
 		return rec.get(mapCol.get("Label"));
 	}
@@ -144,9 +148,9 @@ public class DASchemaObjectGenerator extends BasicGenerator {
 				rows.add(createRow(record, ++row_number));
 			}
 		}
-		for(int i = 0; i < templateList.size(); i++){
-			System.out.println("[DAShemaObjectGenerator] " + templateList.get(i));
-		}
+		//for(int i = 0; i < templateList.size(); i++){
+		//	System.out.println("[DAShemaObjectGenerator] " + templateList.get(i));
+		//}
 		return rows;
 	}// /createRows()
     
@@ -155,10 +159,10 @@ public class DASchemaObjectGenerator extends BasicGenerator {
     @Override
     Map<String, Object> createRow(CSVRecord rec, int row_number) throws Exception {
     	Map<String, Object> row = new HashMap<String, Object>();
-    	row.put("hasURI", kbPrefix + "DASO-" + SDDName + "-" + getLabel(rec).trim().replace(" ","").replace("_","-").replace("??", ""));
+    	row.put("hasURI", kbPrefix + "DASO-" + SDDName + "-" + getLabel(rec).trim().replaceAll("[ ,.]","").replace("_","-").replace("??", ""));
     	row.put("a", "hasco:DASchemaObject");
-    	row.put("rdfs:label", getLabel(rec).trim().replace(" ","").replace("_","-").replace("??", ""));
-    	row.put("rdfs:comment", getLabel(rec).trim().replace(" ","").replace("_","-").replace("??", ""));
+    	row.put("rdfs:label", getLabel(rec).trim().replace("[ ,.]","").replace("_","-").replace("??", ""));
+    	row.put("rdfs:comment", getLabel(rec).trim().replace("[ ,.]","").replace("_","-").replace("??", ""));
     	row.put("hasco:partOfSchema", kbPrefix + "DAS-" + SDDName);
     	row.put("hasco:hasEntity", getEntity(rec));
     	row.put("hasco:hasRole", getRole(rec));
@@ -174,7 +178,10 @@ public class DASchemaObjectGenerator extends BasicGenerator {
 
 			// Also generate a DASVirtualObject for each virtual column
 			if(checkVirtual(rec)){
-				templateList.add(new DASVirtualObject(studyId, row));
+				row.put("dcterms:alternativeName", getLabel(rec).trim().replace(" ",""));
+				DASVirtualObject toAdd = new DASVirtualObject(getLabel(rec).trim().replace(" ",""), row);
+				templateList.add(toAdd);
+				//System.out.println("[DASOGenerator] created template: \n" + toAdd);
 			}
     	
     	return row;

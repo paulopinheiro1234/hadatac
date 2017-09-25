@@ -25,6 +25,19 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.function.BiConsumer;
 
+import org.apache.jena.query.Query;
+import org.apache.jena.query.QueryExecution;
+import org.apache.jena.query.QueryExecutionFactory;
+import org.apache.jena.query.QueryFactory;
+import org.apache.jena.query.QuerySolution;
+import org.apache.jena.query.ResultSet;
+import org.apache.jena.query.ResultSetFactory;
+import org.apache.jena.query.ResultSetRewindable;
+import org.apache.jena.update.UpdateExecutionFactory;
+import org.apache.jena.update.UpdateFactory;
+import org.apache.jena.update.UpdateProcessor;
+import org.apache.jena.update.UpdateRequest;
+
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrRequest;
@@ -51,8 +64,15 @@ import org.hadatac.utils.Collections;
 import play.Play;
 
 public class DASOInstance {
-	final String kbPrefix = Play.application().configuration().getString("hadatac.community.ont_prefix") + "-kb:";
+	public static String INDENT1 = "     ";
+	public static String INSERT_LINE1 = "INSERT DATA {  ";
+	public static String DELETE_LINE1 = "DELETE WHERE {  ";
+	public static String LINE3 = INDENT1 + "a         hasco:DASchemaAttribute;  ";
+	public static String DELETE_LINE3 = " ?p ?o . ";
+	public static String LINE_LAST = "}  ";
 
+	final String kbPrefix = Play.application().configuration().getString("hadatac.community.ont_prefix") + "-kb:";
+	
 	static final String URI_TEMPLATE = "${study}/${id}/${modifier}";
 	
 	private String uri; // generated here in this class
@@ -60,6 +80,7 @@ public class DASOInstance {
 	private String studyId; // provided by DA file
 	private String rowKey; // provided by row
 	private String type; // provided by template
+	private String origValue;
 	private HashMap<String,String> relations;
 
 	public void setUri(String uri){ this.uri = uri; }
@@ -67,6 +88,7 @@ public class DASOInstance {
 	public void setStudyId(String id){ this.studyId = id; }
 	public void setType(String type){ this.type = type; }
 	public void setRowKey(String row){ this.rowKey = row; }
+	public void setOrigValue(String ov){ this.origValue = ov; }
 	public void setRelations(HashMap<String,String> relations){ this.relations = relations; }
 
 	public String getUri(){ return this.uri; }
@@ -74,6 +96,7 @@ public class DASOInstance {
 	public String getStudyId(){ return this.studyId; }
 	public String getType(){ return this.type; }
 	public String getRowKey(){ return this.rowKey; }
+	public String getOrigValue(){ return this.origValue; }
 	public HashMap<String,String> getRelations(){ return this.relations; }    
 	public String getUriNamespace() { return ValueCellProcessing.replaceNameSpaceEx(uri); }
 	//public HashMap<String,String> getTemplateValues(){ return this.templateValues; }
@@ -87,13 +110,14 @@ public class DASOInstance {
 	}// /constructor with uri given
 	*/
 
-	public DASOInstance(String studyId, String label, String type, String rowKey, HashMap<String,String> relations){
+	public DASOInstance(String studyId, String rowKey, String label, String type, HashMap<String,String> relations){
 		this.setStudyId(studyId);
+		this.setRowKey(rowKey);
 		this.setLabel(label);
 		this.setType(type);
-		this.setRowKey(rowKey);
-		this.setUri(generateURI());
 		this.setRelations(relations);
+		this.setOrigValue("");
+		this.setUri(generateURI());
 	}// /constructor needing a uri
 
 	public String generateURI(){
@@ -101,22 +125,62 @@ public class DASOInstance {
 		templateValues.put("study", this.studyId);
 		templateValues.put("id", this.rowKey);
 		// TODO: see what this needs to look like
-		templateValues.put("modifier", "");
-
+		if(this.rowKey.equals("summaryClass")){
+			if(this.relations.containsKey("rdfs:subClassOf")){
+				String[] temp = this.relations.get("rdfs:subClassOf").split("_",2);
+				String mod = temp[0];
+				if(temp.length > 1) mod += "/val/"+temp[1];
+				this.setOrigValue(mod);
+				templateValues.put("modifier", mod.replaceAll("[ ';.,]",""));
+			}
+			else
+				templateValues.put("modifier", "");
+		} else {
+			templateValues.put("modifier", "");
+		}
 		StrSubstitutor sub = new StrSubstitutor(templateValues);
-		String generatedURI = kbPrefix + sub.replace(URI_TEMPLATE);
-		System.out.println("[DASO Instance]: generated uri " + generatedURI);
+		String generatedURI = sub.replace(URI_TEMPLATE);
+		generatedURI = kbPrefix + generatedURI;
 		return generatedURI;
-	}// /generateURIFromTemplate
+	}// /generateURI
 
-	/*
-		Study ID: default-study
-		templateURI: hbgd-kb:DASO-time_cat_infosheet-summaryClass
-		rdfs:subClassOf/hbgd-kb:DASO-time_cat_infosheet-id-key
-		rdfs:label/summaryClass
-		rdfs:type/owl:Class
-*/
 
+	//private String uri; // generated here in this class
+	//private String label; // provided by template+codebook
+	//private String studyId; // provided by DA file
+	//private String rowKey; // provided by row
+	//private String type; // provided by template
+	//private HashMap<String,String> relations;
+
+	/*public void save() {
+		//delete();  // delete any existing triple for the current DASA
+		if (uri == null || uri.equals("")) {
+			System.out.println("[ERROR] Trying to save DASOInstance without assigning a URI");
+			return;
+		}
+		if (type == null || type.equals("")) {
+			System.out.println("[ERROR] Trying to save DASOInstance without assigning a type");
+			return;
+		}
+		String insert = "";
+		insert += NameSpaces.getInstance().printSparqlNameSpaceList();
+		insert += INSERT_LINE1;
+		insert += this.getUri() + " a " + this.getType() + " . ";
+		insert += this.getUri() + " rdfs:label  \"" + label + "\" . ";
+		if (partOfSchema.startsWith("http")) {
+			insert += this.getUri() + " hasco:partOfSchema <" + partOfSchema + "> .  "; 
+		} else {
+			insert += this.getUri() + " hasco:partOfSchema " + partOfSchema + " .  "; 
+		} 
+
+		insert += LINE_LAST;
+		//System.out.println("[DASOInstance] insert query (pojo's save): <" + insert + ">");
+		UpdateRequest request = UpdateFactory.create(insert);
+		UpdateProcessor processor = UpdateExecutionFactory.createRemote(
+			request, Collections.getCollectionsName(Collections.METADATA_UPDATE));
+		processor.execute();
+	}// /save()
+	*/
 
 	// TODO: finish
 	/*
@@ -130,5 +194,13 @@ public class DASOInstance {
 		List<DASOInstance> instances = new ArrayList<DASOInstance>();
 	}// /findByStudy
 	*/
+	
+	public String toString(){
+		String pretty = this.getUri() + "\n";
+		for(Map.Entry rel : this.getRelations().entrySet()) {
+			pretty += rel.getKey() + " : " + rel.getValue();
+		}
+		return pretty;
+	}// /toString
 
 } // /class

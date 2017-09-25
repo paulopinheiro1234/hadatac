@@ -176,7 +176,7 @@ public class DataAcquisitionSchemaObject {
     
     public void setRelation(String relation) {
 	this.relation = relation;
-	System.out.println("New RELATION : " + relation);
+	System.out.println("[DASO] New RELATION : " + relation);
 	if (relation == null || relation.equals("")) {
 	    this.relationLabel = "";
 	} else {
@@ -186,16 +186,16 @@ public class DataAcquisitionSchemaObject {
     
     public String getRelationLabel() {
 	if (relationLabel == null || relationLabel.equals("")) {
-	    System.out.println("RELATION label -- just relation : <" + relation + ">");
-	    System.out.println("RELATION label -- just relation : <" + ValueCellProcessing.replaceNameSpaceEx(relation) + ">");
+	    System.out.println("[DASO] RELATION label -- just relation : <" + relation + ">");
+	    System.out.println("[DASO] RELATION label -- just relation : <" + ValueCellProcessing.replaceNameSpaceEx(relation) + ">");
 	    return ValueCellProcessing.replaceNameSpaceEx(relation);
 	}
-	System.out.println("RELATION label : <" + relationLabel + ">");
+	System.out.println("[DASO] RELATION label : <" + relationLabel + ">");
 	return relationLabel;
     }
     
     public static DataAcquisitionSchemaObject find (String uri) {
-	System.out.println("Looking for data acquisition schema objects with uri: " + uri);
+	System.out.println("[DASO] Looking for data acquisition schema objects with uri: " + uri);
 	DataAcquisitionSchemaObject object = null;
 	String queryString = NameSpaces.getInstance().printSparqlNameSpaceList() + 
 	    "SELECT ?entity  ?partOfSchema ?role ?inRelationTo ?relation WHERE { " + 
@@ -215,7 +215,7 @@ public class DataAcquisitionSchemaObject {
 	qexec.close();
 	
 	if (!resultsrw.hasNext()) {
-	    System.out.println("[WARNING] DataAcquisitionSchemaObject. Could not find object with uri: " + uri);
+	    System.out.println("[DASO] [WARNING] Could not find object with uri: " + uri);
 	    return null;
 	}
 	
@@ -281,7 +281,7 @@ public class DataAcquisitionSchemaObject {
 							 relationStr);
 	    }
 	}  catch (Exception e) {
-	    System.out.println("[ERROR] DataAcquisitionSchemaObject. uri: e.Message: " + e.getMessage());
+	    System.out.println("[DASO] [ERROR] uri: e.Message: " + e.getMessage());
 	}
 	return object;
     }
@@ -302,7 +302,7 @@ public class DataAcquisitionSchemaObject {
 		qexec.close();
 	
 		if (!resultsrw.hasNext()) {
-			System.out.println("[WARNING] DataAcquisitionSchemaObject. Could not find objects for schema: " + schemaUri);
+			System.out.println("[DASO] [WARNING] Could not find objects for schema: " + schemaUri);
 			return objects;
 		}
 	
@@ -316,7 +316,7 @@ public class DataAcquisitionSchemaObject {
 					}
 				}
 			} catch (Exception e) {
-				System.out.println("[ERROR] DataAcquisitionSchemaObject. uri: e.Message: " + e.getMessage());
+				System.out.println("[DASO] [ERROR] uri: e.Message: " + e.getMessage());
 			}   
 		}
 		return objects;

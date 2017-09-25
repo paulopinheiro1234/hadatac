@@ -173,7 +173,6 @@ public class DASchemaEventGenerator extends BasicGenerator {
     	row.put("sio:Relation", getRelation(rec));
     	row.put("hasco:isVirtual", checkVirtual(rec).toString());
     	row.put("hasco:isPIConfirmed", "false");
-    	
     	return row;
     }
 }

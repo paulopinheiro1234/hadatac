@@ -17,8 +17,8 @@ public class DASVirtualObject {
 	final String kbPrefix = Play.application().configuration().getString("hadatac.community.ont_prefix") + "-kb:";
 	private Map<String,Object> origRow;
 
-	private String studyId;
 	private String templateUri;
+	private String originalLabel;
 	private HashMap<String,String> objRelations;
 
 	final HashMap<String,String> codeMap = AutoAnnotator.codeMappings;
@@ -26,8 +26,7 @@ public class DASVirtualObject {
     
 	// takes the row created in DASchemaObjectGenerator
 	// iff that row is virtual
-	public DASVirtualObject(String study_id, Map<String,Object> dasoRow) {
-		this.studyId = study_id;
+	public DASVirtualObject(String ogLabel, Map<String,Object> dasoRow) {
 		this.origRow = dasoRow;
 		this.objRelations = new HashMap<String,String>();
 
@@ -60,6 +59,12 @@ public class DASVirtualObject {
 				this.objRelations.put(dasoRow.get("sio:Relation").toString(), dasoRow.get("sio:inRelationTo").toString());
 			}
 		}
+		if(dasoRow.get("dcterms:alternativeName") == null || dasoRow.get("dcterms:alternativeName").equals("")){
+			//handle an error
+		} else {
+			this.originalLabel = dasoRow.get("dcterms:alternativeName").toString();
+		}
+
 	}// DASOVirtualObject()
 
 	public HashMap<String,String> getObjRelations(){
@@ -70,20 +75,9 @@ public class DASVirtualObject {
 		return this.templateUri;
 	}
 
-	public String getStudyId(){
-		return this.studyId;
+	public String getOriginalLabel(){
+		return this.originalLabel;
 	}
-
-	public void setStudyId(String id){
-		this.studyId = id;
-	}
-	
-	public static DASVirtualObject resetStudyId(DASVirtualObject thing, String study_id){
-		thing.setStudyId(study_id);
-		System.out.println("[DASVirtualObject] studyId RESET to " + thing.getStudyId());
-		return thing;
-	}
-
 
 	// for each
 	/*  Study ID: default-study
@@ -96,9 +90,9 @@ public class DASVirtualObject {
 	
 	public String toString(){
 		String result = "";
-		result += "Study ID: " + studyId + "\n";
-		result += "templateURI: " + templateUri + "\n";
-		for (Map.Entry<String, String> entry : objRelations.entrySet()) {
+		result += "templateURI: " + this.templateUri + "\n";
+		result += "column name: " + this.originalLabel + "\n";
+		for (Map.Entry<String, String> entry : this.objRelations.entrySet()) {
 			result += entry.getKey() + " " + entry.getValue() + "\n";
 		}	
 		return result;

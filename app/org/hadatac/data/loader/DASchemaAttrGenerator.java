@@ -156,7 +156,7 @@ public class DASchemaAttrGenerator extends BasicGenerator {
     	Map<String, Object> row = new HashMap<String, Object>();
 	SDDName = fileName.replace("SDD-","").replace(".csv","");
 	codeMap = AutoAnnotator.codeMappings;
-    	row.put("hasURI", kbPrefix + "DASA-" + "-" + getLabel(rec).trim().replace(" ", "").replace("_","-").replace("??", ""));
+	row.put("hasURI", kbPrefix + "DASA-" + "-" + getLabel(rec).trim().replace(" ", "").replace("_","-").replace("??", ""));
     	row.put("a", "hasco:DASchemaAttribute");
     	row.put("rdfs:label", getLabel(rec));
     	row.put("rdfs:comment", getLabel(rec));

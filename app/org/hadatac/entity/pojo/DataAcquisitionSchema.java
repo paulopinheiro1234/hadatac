@@ -315,7 +315,7 @@ public class DataAcquisitionSchema {
     }
     
     public static DataAcquisitionSchema find(String schemaUri) {
-	System.out.println("Looking for data acquisition schema " + schemaUri);
+	System.out.println("[DataAcquisitionSchema] Looking for data acquisition schema " + schemaUri);
 	DataAcquisitionSchema schema = new DataAcquisitionSchema();
 	if (schemaUri == null || schemaUri.equals("")) {
 	    System.out.println("[ERROR] DataAcquisitionSchema URI blank or null.");
@@ -333,7 +333,7 @@ public class DataAcquisitionSchema {
         qexec.close();
 	
 	if (!uriExist) {
-	    System.out.println("[WARNING] DataAcquisitionSchema. Could not find schema for uri: " + schemaUri);
+	    System.out.println("[DataAcquisitionSchema] [WARNING] Could not find schema for uri: " + schemaUri);
 	    return schema;
 	}
 	
@@ -342,7 +342,7 @@ public class DataAcquisitionSchema {
 	schema.setAttributes(DataAcquisitionSchemaAttribute.findBySchema(schemaUri));
 	schema.setObjects(DataAcquisitionSchemaObject.findBySchema(schemaUri));
 	schema.setEvents(DataAcquisitionSchemaEvent.findBySchema(schemaUri));
-	System.out.println("[OK] DataAcquisitionSchema " + schemaUri + " exists. " + 
+	System.out.println("[DataAcquisitionSchema] [OK] DataAcquisitionSchema " + schemaUri + " exists. " + 
 			   "It has " + schema.getAttributes().size() + " attributes, " + 
 			   schema.getObjects().size() + " objects, and " + 
 			   schema.getEvents().size() + " events.");

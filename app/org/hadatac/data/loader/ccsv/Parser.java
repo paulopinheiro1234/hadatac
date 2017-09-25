@@ -11,6 +11,9 @@ import java.math.BigDecimal;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
+import java.util.ArrayList;
+import java.util.Map;
+import java.util.HashMap;
 
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVRecord;
@@ -19,6 +22,8 @@ import org.apache.jena.rdf.model.ModelFactory;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.impl.HttpSolrClient;
+import org.hadatac.data.loader.DASVirtualObject;
+import org.hadatac.data.loader.DASOInstanceGenerator;
 import org.hadatac.data.loader.util.FileFactory;
 import org.hadatac.data.model.ParsingResult;
 import org.hadatac.entity.pojo.DataAcquisition;
@@ -26,6 +31,7 @@ import org.hadatac.entity.pojo.DataAcquisitionSchema;
 import org.hadatac.entity.pojo.DataAcquisitionSchemaAttribute;
 import org.hadatac.entity.pojo.DataAcquisitionSchemaObject;
 import org.hadatac.entity.pojo.DataAcquisitionSchemaEvent;
+import org.hadatac.entity.pojo.DASOInstance;
 import org.hadatac.entity.pojo.Dataset;
 import org.hadatac.entity.pojo.DataFile;
 import org.hadatac.entity.pojo.Deployment;
@@ -48,16 +54,21 @@ public class Parser {
 	private FileFactory files;
 
 	private DataAcquisitionSchema schema;
+	private List<DASVirtualObject> templateList;
 
 	private static String path_unproc = ConfigProp.getPropertyValue("autoccsv.config", "path_unproc");
 
 	public Parser() {
 		schema = null;
+		templateList = new ArrayList<DASVirtualObject>();
 	}
 
-	public ParsingResult indexMeasurements(FileFactory files, DataAcquisition da, DataFile dataFile){
-
-		System.out.println("indexMeasurements()...");
+	public ParsingResult indexMeasurements(FileFactory files, DataAcquisition da, DataFile dataFile, ArrayList<DASVirtualObject> temps){
+		templateList = temps;
+		if(templateList == null || templateList.isEmpty()){
+			System.out.println("[Parser] [WARN] no DASVirtualObject templates for this DataAcquisition. Is this correct?");
+		}
+		System.out.println("[Parser] indexMeasurements()...");
 		schema = DataAcquisitionSchema.find(da.getSchemaUri());
 		String message = "";
 
@@ -95,7 +106,7 @@ public class Parser {
 			oc = ObjectCollection.find(da.getGlobalScopeUri());
 			if (oc != null) {
 				for (StudyObject obj : oc.getObjects()) {
-					System.out.println("Object " + obj.getLabel() + "  ID: "  + obj.getUri() + "   orig.: " + obj.getOriginalId());
+					//System.out.println("Object " + obj.getLabel() + "  ID: "  + obj.getUri() + "   orig.: " + obj.getOriginalId());
 				}
 			}
 		}
@@ -125,10 +136,11 @@ public class Parser {
 			posId = tempPositionOfLabel(schema.getIdLabel()); 
 		}
 		if (!schema.getOriginalIdLabel().equals("")) {
+			System.out.println("[Parser] schema.getOriginalIdLabel() = " + schema.getOriginalIdLabel()); // 
 			posOriginalId = tempPositionOfLabel(schema.getOriginalIdLabel()); 
 		}
 		if (!schema.getEntityLabel().equals("")) {
-			System.out.println("[DEBUG] schema.getEntityLabel() = " + schema.getEntityLabel()); // returns "??summaryClass"
+			//System.out.println("[Parser] schema.getEntityLabel() = " + schema.getEntityLabel()); // returns "??summaryClass"
 			posEntity = tempPositionOfLabel(schema.getEntityLabel()); //tempPositionOfLabel returns -1 right now - this is bad.
 		}
 		if (!schema.getUnitLabel().equals("")) {
@@ -137,8 +149,27 @@ public class Parser {
 		if (!schema.getInRelationToLabel().equals("")) {
 			posInRelation = tempPositionOfLabel(schema.getInRelationToLabel()); 
 		}
+		
+		//System.out.println("[Parser] dasoiGen studyID given " + da.getStudy().getUri() );		
+		DASOInstanceGenerator dasoiGen = new DASOInstanceGenerator(da.getStudy().getUri(), (ArrayList)templateList);
+		HashMap<String,DASOInstance> rowInstances = new HashMap<String,DASOInstance>();
 
 		for (CSVRecord record : records) {
+			try{
+				// complete DASOInstances for the row FIRST
+				// so we can refer to these URI's when setting the entity and/or object
+				rowInstances.clear();
+				rowInstances = dasoiGen.generateRowInstances(record);
+			} catch(Exception e){
+				System.out.println("[Parser] [ERROR]:");
+				e.printStackTrace(System.out);
+			}
+			// rowInstances keys *should* match what is in DASchemaAttribute table's "attributeOf" field!
+			for(Map.Entry instance : rowInstances.entrySet()){
+				System.out.println("[Parser] Made an instance for " + instance.getKey() + " :\n\t" + instance.getValue());
+			}
+
+
 
 			// HACK FOR JUNE20
 			isSample = false;
@@ -208,7 +239,6 @@ public class Parser {
 				 *   SET VALUE       *
 				 *                   *
 				 *===================*/
-
 				if (dasa.getTempPositionInt() <= -1 || dasa.getTempPositionInt() >= record.size()) {
 					continue;
 				} else if (record.get(dasa.getTempPositionInt()).isEmpty()) { 
@@ -234,7 +264,6 @@ public class Parser {
 		  - TimeInstantLabel is used for timestamps told to system to be timestamp, but that are not further processed
 		  - Abstract times are encoded as DASA's events, and are supposed to be strings
 				 */
-
 				measurement.setTimestamp(new Date(Long.MAX_VALUE).toInstant().toString());
 				measurement.setAbstractTime("");
 
@@ -328,7 +357,6 @@ public class Parser {
 				 *   SET STUDY                *
 				 *                            *
 				 *============================*/
-
 				measurement.setStudyUri(ValueCellProcessing.replaceNameSpaceEx(da.getStudyUri()));
 
 				/*=============================*
@@ -336,30 +364,32 @@ public class Parser {
 				 *   SET OBJECT ID, PID, SID   *
 				 *                             *
 				 *=============================*/
-
+				System.out.println("[Parser] dasa.getObjectUri() " + dasa.getObjectUri());
+				System.out.println("[Parser] rowInstances.get(dasa.getObjectUri()) " + rowInstances.get(dasa.getObjectUri()));
+				System.out.println("[Parser] rowInstances.get(dasa.getObjectUri()).getUri() " + rowInstances.get(dasa.getObjectUri()).getUri());
 				if (!schema.getOriginalIdLabel().equals("")){
-
 					//System.out.println("Recording....: " + record.get(posOriginalId));
 					//String auxUri = oc.getUriFromOriginalId(record.get(tempPositionOfLabel(schema.getOriginalIdLabel())));
-					String auxUri = record.get(posOriginalId);
+					//String auxUri = record.get(posOriginalId);
+					String auxUri = rowInstances.get(dasa.getObjectUri()).getUri();
+					System.out.println("[Parser] " + dasa.getObjectUri() + " yields instance URI " + auxUri);
 					measurement.setObjectUri(auxUri);
 					measurement.setPID(auxUri);
 					measurement.setSID("");
-
 				}  else if (!schema.getIdLabel().equals("")){
-
 					//String auxUri = oc.getUriFromOriginalId(record.get(tempPositionOfLabel(schema.getIdLabel())));
-					String auxUri = record.get(posId);
+					//String auxUri = record.get(posId);
+					String auxUri = rowInstances.get(dasa.getObjectUri()).getUri();
+					System.out.println("[Parser] " + dasa.getObjectUri() + " yields instance URI " + auxUri);
 					measurement.setObjectUri(auxUri);
 					measurement.setPID(auxUri);
 					measurement.setSID("");
-
 				} else {
-
-					measurement.setObjectUri("");
+					String auxUri = rowInstances.get(dasa.getObjectUri()).getUri();
+					System.out.println("[Parser] " + dasa.getObjectUri() + " yields instance URI " + auxUri);
+					measurement.setObjectUri(auxUri);
 					measurement.setPID("");
 					measurement.setSID("");
-
 				}
 
 				/*
@@ -399,10 +429,15 @@ public class Parser {
 				 *   SET URI, OWNER AND DA D   *
 				 *                             *
 				 *=============================*/
-
-				measurement.setUri(ValueCellProcessing.replacePrefixEx(measurement.getStudyUri()) + "/" + 
+				//System.out.println("[Parser] Set URI, Owner and DA URI");
+				/*measurement.setUri(ValueCellProcessing.replacePrefixEx(measurement.getStudyUri()) + "/" + 
 						ValueCellProcessing.replaceNameSpaceEx(da.getUri()).split(":")[1] + "/" +
 						dasa.getLocalName() + "-" + total_count);
+				*/
+				measurement.setUri(ValueCellProcessing.replacePrefixEx(measurement.getStudyUri()) + "/" + 
+						 rowInstances.get(dasa.getObjectUri()).getLabel() + "/attr/" + 
+						 rowInstances.get(dasa.getObjectUri()).getOrigValue().replaceAll("[ ,.:]","") + "/" + 
+						 dasa.getAttributeLabel().replaceAll("[ ,.:]",""));
 				measurement.setOwnerUri(da.getOwnerUri());
 				measurement.setAcquisitionUri(da.getUri());
 
@@ -469,16 +504,16 @@ public class Parser {
 
 				// TODO: un-hack this
 				// HACK FOR AUGUST 18
-				measurement.setEntity("Subject"); // should not be hard-coded
+				measurement.setEntity(rowInstances.get(dasa.getObjectUri()).getLabel()); 
 				measurement.setEntityUri(dasa.getEntity());
-				System.out.println("[debug]: getEntity " + dasa.getEntity());
+				//System.out.println("[Parser] getEntity " + dasa.getEntity());
 				measurement.setCharacteristic(uppercaseFirstLetter(dasa.getAttributeLabel()));
 				measurement.setCharacteristicUri(dasa.getAttribute());
-		
-				System.out.println("schema.getEntityLabel() = " + schema.getEntityLabel());
-				System.out.println("record.get(posEntity) = " + record.get(posEntity)); // array index out of bounds exception :c
-				if (!schema.getEntityLabel().equals("") && !record.get(posEntity).equals("")) {
-					measurement.setEntity(record.get(posEntity));
+
+				if (posEntity > -1){
+					if(!schema.getEntityLabel().equals("") && !record.get(posEntity).equals("")) {
+						measurement.setEntity(record.get(posEntity));
+					}
 				}
 
 				/*=================================*
@@ -595,7 +630,7 @@ public class Parser {
 		//}	
 		for (DataAcquisitionSchemaAttribute dasa : dasas) {
 			if (dasa.getTempPositionInt() > -1) {
-				System.out.println("Label: " + dasa.getLabel() + "    Position: [" + dasa.getTempPositionInt() + "]");
+				//System.out.println("Label: " + dasa.getLabel() + "    Position: [" + dasa.getTempPositionInt() + "]");
 			}
 			/*else{
 				System.out.println("[ERROR] Label: " + dasa.getLabel() + "    Position: [" + dasa.getTempPositionInt() + "]");

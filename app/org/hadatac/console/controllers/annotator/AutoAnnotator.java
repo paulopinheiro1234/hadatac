@@ -116,6 +116,7 @@ public class AutoAnnotator extends Controller {
 	public static HashMap<String, String> codeMappings = new HashMap<String, String>();
 	public static HashMap<String, String> entityMappings = new HashMap<String, String>();
 	public static HashMap<String, Map<String,String>> codebook = new HashMap<String,Map<String,String>>();
+	public static HashMap<String,List<DASVirtualObject>> templateLibrary = new HashMap<String,List<DASVirtualObject>>();
 	public static String study_id = "default-study";
 	public static final String kbPrefix = Play.application().configuration().getString("hadatac.community.ont_prefix") + "-kb:";
 
@@ -866,7 +867,7 @@ public class AutoAnnotator extends Controller {
 
 			} catch (Exception e) {
 				System.out.println("Error annotateDataAcquisitionSchemaFile: Unable to read codebook");
-				//e.printStackTrace(System.out);
+				e.printStackTrace(System.out);
 				File cb = new File(file.getName().replace(".csv", "")+"-codebook.csv");
 				System.out.println(cb.getAbsoluteFile());
 				System.out.println(cb.length());
@@ -883,6 +884,9 @@ public class AutoAnnotator extends Controller {
 					System.out.println("Calling DASchemaObjectGenerator");
 					bSuccess = commitRows(dasoGenerator.createRows(), dasoGenerator.toString(), 
 							file.getName(), "DASchemaObject", true);
+					String sddId = kbPrefix + "DAS-" + dasoGenerator.getSDDName();
+					templateLibrary.put(ValueCellProcessing.replacePrefixEx(sddId),dasoGenerator.getTemplateList());
+					System.out.println("[AutoAnnotator]: adding templates for SDD " + ValueCellProcessing.replacePrefixEx(sddId));
 				} catch (Exception e) {
 					System.out.println("Error annotateDataAcquisitionSchemaFile: Unable to generate DASO.");
 					//e.printStackTrace(System.out);
@@ -965,6 +969,7 @@ public class AutoAnnotator extends Controller {
 		AnnotationLog log = new AnnotationLog();
 		log.setFileName(file_name);
 
+		ArrayList<DASVirtualObject> templateList = new ArrayList<DASVirtualObject>();
 		DataAcquisition da = null;
 		String da_uri = null;
 		String deployment_uri = null;
@@ -984,6 +989,19 @@ public class AutoAnnotator extends Controller {
 			    da_uri = da.getUri();
 			    deployment_uri = da.getDeploymentUri();
 			    schema_uri = da.getSchemaUri();
+					if(templateLibrary.containsKey(schema_uri)){
+						templateList = (ArrayList)templateLibrary.get(schema_uri);
+						System.out.println("[AutoAnnotator] Found the right template list for " + schema_uri);
+						for(DASVirtualObject item : templateList){
+							System.out.println(item);
+						}
+					} else {
+						System.out.println("[AutoAnnotator] Could not retrieve template list for " + schema_uri);
+						System.out.println("[AutoAnnotator] templateLibrary contains keys ");
+						for(String k : templateLibrary.keySet()){
+							System.out.println("\t" + k);
+						}
+					}
 			}
 		}
 
@@ -1081,8 +1099,7 @@ public class AutoAnnotator extends Controller {
 			System.out.println("annotateCSVFile: file to be parsed [" + dataFile.getFileName() + "]"); 
 			dataFile.setDatasetUri(DataFactory.getNextDatasetURI(da.getUri()));
 			da.addDatasetUri(dataFile.getDatasetUri());
-			//DASOInstanceGenerator dasoiGen = new DASOInstanceGenerator(dataFile.getDatasetUri(), dasoGenerator.getTemplateList());
-			result_parse = parser.indexMeasurements(files, da, dataFile);
+			result_parse = parser.indexMeasurements(files, da, dataFile, templateList);
 			status = result_parse.getStatus();
 			message += result_parse.getMessage();
 		    }

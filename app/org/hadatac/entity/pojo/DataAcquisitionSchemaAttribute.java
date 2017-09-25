@@ -431,7 +431,7 @@ public class DataAcquisitionSchemaAttribute {
     
     public static DataAcquisitionSchemaAttribute find (String dasa_uri) {
 	DataAcquisitionSchemaAttribute dasa = null;
-	System.out.println("Looking for data acquisition schema attribute with URI " + dasa_uri);
+	System.out.println("[DASA] Looking for data acquisition schema attribute with URI " + dasa_uri);
 	if (dasa_uri.startsWith("http")) {
 	    dasa_uri = "<" + dasa_uri + ">";
 	}
@@ -457,7 +457,7 @@ public class DataAcquisitionSchemaAttribute {
 	qexec.close();
 	
 	if (!resultsrw.hasNext()) {
-	    System.out.println("[WARNING] DataAcquisitionSchemaAttribute. Could not find DASA with URI: " + dasa_uri);
+	    System.out.println("[DASA] [WARNING] Could not find DASA with URI: " + dasa_uri);
 	    return dasa;
 	}
 	
@@ -546,13 +546,12 @@ public class DataAcquisitionSchemaAttribute {
 	    }
 
 	}
-
 	return dasa;
 	    
     }
     
     public static List<DataAcquisitionSchemaAttribute> findBySchema (String schemaUri) {
-	System.out.println("Looking for data acquisition schema attributes for " + schemaUri);
+	System.out.println("[DASA] Looking for data acquisition schema attributes for " + schemaUri);
 	if (schemaUri.startsWith("http")) {
 	    schemaUri = "<" + schemaUri + ">";
 	}
@@ -571,7 +570,7 @@ public class DataAcquisitionSchemaAttribute {
 	qexec.close();
 	
 	if (!resultsrw.hasNext()) {
-	    System.out.println("[WARNING] DataAcquisitionSchemaAttribute. Could not find attributes for schema: " + schemaUri);
+	    System.out.println("[DASA] [WARNING] Could not find attributes for schema: " + schemaUri);
 	    return attributes;
 	}
 	
@@ -588,7 +587,7 @@ public class DataAcquisitionSchemaAttribute {
 			attributes.add(attr);
 		    }
 		} catch (Exception e1) {
-		    System.out.println("[ERROR] DataAcquisitionSchemaAttribute. URI: " + uriStr);
+		    System.out.println("[DASA] [ERROR] URI: " + uriStr);
 		}
 	    }
 	}
