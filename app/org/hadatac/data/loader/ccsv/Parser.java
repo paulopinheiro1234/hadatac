@@ -22,7 +22,6 @@ import org.apache.jena.rdf.model.ModelFactory;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.impl.HttpSolrClient;
-import org.hadatac.data.loader.DASVirtualObject;
 import org.hadatac.data.loader.DASOInstanceGenerator;
 import org.hadatac.data.loader.util.FileFactory;
 import org.hadatac.data.model.ParsingResult;
@@ -31,6 +30,7 @@ import org.hadatac.entity.pojo.DataAcquisitionSchema;
 import org.hadatac.entity.pojo.DataAcquisitionSchemaAttribute;
 import org.hadatac.entity.pojo.DataAcquisitionSchemaObject;
 import org.hadatac.entity.pojo.DataAcquisitionSchemaEvent;
+import org.hadatac.entity.pojo.DASVirtualObject;
 import org.hadatac.entity.pojo.DASOInstance;
 import org.hadatac.entity.pojo.Dataset;
 import org.hadatac.entity.pojo.DataFile;
@@ -43,6 +43,7 @@ import org.hadatac.entity.pojo.Study;
 import org.hadatac.entity.pojo.StudyObject;
 import org.hadatac.metadata.loader.ValueCellProcessing;
 import org.hadatac.console.controllers.fileviewer.CSVPreview;
+import org.hadatac.console.controllers.annotator.AutoAnnotator;
 import org.hadatac.utils.Collections;
 import org.hadatac.utils.ConfigProp;
 import org.hadatac.utils.Feedback;
@@ -63,13 +64,25 @@ public class Parser {
 		templateList = new ArrayList<DASVirtualObject>();
 	}
 
-	public ParsingResult indexMeasurements(FileFactory files, DataAcquisition da, DataFile dataFile, ArrayList<DASVirtualObject> temps){
-		templateList = temps;
-		if(templateList == null || templateList.isEmpty()){
-			System.out.println("[Parser] [WARN] no DASVirtualObject templates for this DataAcquisition. Is this correct?");
-		}
+	public ParsingResult indexMeasurements(FileFactory files, DataAcquisition da, DataFile dataFile){
 		System.out.println("[Parser] indexMeasurements()...");
 		schema = DataAcquisitionSchema.find(da.getSchemaUri());
+
+		if(!AutoAnnotator.templateLibrary.containsKey(da.getSchemaUri())){
+			System.out.println("[Parser] [WARN] no DASVirtualObject templates for this DataAcquisition. Is this correct?");
+			System.out.println("[Parser] Could not retrieve template list for " + da.getSchemaUri());
+			System.out.println("[Parser] templateLibrary contains keys ");
+			for(String k : AutoAnnotator.templateLibrary.keySet()){
+				System.out.println("\t" + k);
+			}
+		} else {
+			templateList = (ArrayList)AutoAnnotator.templateLibrary.get(da.getSchemaUri());
+			System.out.println("[Parser] Found the right template list for " + da.getSchemaUri());
+			for(DASVirtualObject item : templateList){
+				System.out.println(item);
+			}
+		}
+
 		String message = "";
 
 		try {
@@ -207,6 +220,16 @@ public class Parser {
 			//System.out.println("pos. of id column: " + schema.getIdLabel());
 			while (iter.hasNext()) {
 				DataAcquisitionSchemaAttribute dasa = iter.next();
+				System.out.println("[Parser] read a DASA " + dasa.getUri() + " with label " + dasa.getLabel());
+				// why is schema.getAttributes() returning DASAs that don't belong to the schema?
+				if (!dasa.getPartOfSchema().equals(schema.getUri())){
+					//System.out.println("[Parser] .... Skipping attribute " + dasa.getPartOfSchema() + " != " + schema.getUri());
+					continue;
+				}
+				if (!record.isMapped(dasa.getLabel())) {
+					System.out.println("[Parser] .... Skipping attribute " + dasa.getLabel() + " : not in the DA file");
+					continue;
+				}
 				if (dasa.getLabel().equals(schema.getTimestampLabel())) {
 					continue;
 				}
@@ -292,6 +315,7 @@ public class Parser {
 				} else if (!schema.getNamedTimeLabel().equals("")) {
 					String timeValue = record.get(posNamedTime);
 					if (timeValue != null) {
+						System.out.println("[Parser] timeValue = " + timeValue);
 						measurement.setAbstractTime(timeValue);
 					} else {
 						measurement.setAbstractTime("");
@@ -365,29 +389,29 @@ public class Parser {
 				 *                             *
 				 *=============================*/
 				System.out.println("[Parser] dasa.getObjectUri() " + dasa.getObjectUri());
-				System.out.println("[Parser] rowInstances.get(dasa.getObjectUri()) " + rowInstances.get(dasa.getObjectUri()));
-				System.out.println("[Parser] rowInstances.get(dasa.getObjectUri()).getUri() " + rowInstances.get(dasa.getObjectUri()).getUri());
+				//System.out.println("[Parser] rowInstances.get(dasa.getObjectUri()) " + rowInstances.get(dasa.getObjectUri()));
+				//System.out.println("[Parser] rowInstances.get(dasa.getObjectUri()).getUri() " + rowInstances.get(dasa.getObjectUri()).getUri());
 				if (!schema.getOriginalIdLabel().equals("")){
 					//System.out.println("Recording....: " + record.get(posOriginalId));
 					//String auxUri = oc.getUriFromOriginalId(record.get(tempPositionOfLabel(schema.getOriginalIdLabel())));
-					//String auxUri = record.get(posOriginalId);
-					String auxUri = rowInstances.get(dasa.getObjectUri()).getUri();
-					System.out.println("[Parser] " + dasa.getObjectUri() + " yields instance URI " + auxUri);
+					String auxUri = record.get(posOriginalId);
 					measurement.setObjectUri(auxUri);
 					measurement.setPID(auxUri);
 					measurement.setSID("");
 				}  else if (!schema.getIdLabel().equals("")){
 					//String auxUri = oc.getUriFromOriginalId(record.get(tempPositionOfLabel(schema.getIdLabel())));
-					//String auxUri = record.get(posId);
-					String auxUri = rowInstances.get(dasa.getObjectUri()).getUri();
-					System.out.println("[Parser] " + dasa.getObjectUri() + " yields instance URI " + auxUri);
+					String auxUri = record.get(posId);
 					measurement.setObjectUri(auxUri);
 					measurement.setPID(auxUri);
 					measurement.setSID("");
-				} else {
+				} else if (dasa.getObjectUri() != null) {
 					String auxUri = rowInstances.get(dasa.getObjectUri()).getUri();
 					System.out.println("[Parser] " + dasa.getObjectUri() + " yields instance URI " + auxUri);
 					measurement.setObjectUri(auxUri);
+					measurement.setPID("");
+					measurement.setSID("");
+				} else {
+					measurement.setObjectUri("");
 					measurement.setPID("");
 					measurement.setSID("");
 				}
@@ -429,7 +453,7 @@ public class Parser {
 				 *   SET URI, OWNER AND DA D   *
 				 *                             *
 				 *=============================*/
-				//System.out.println("[Parser] Set URI, Owner and DA URI");
+				System.out.println("[Parser] Set URI, Owner and DA URI");
 				/*measurement.setUri(ValueCellProcessing.replacePrefixEx(measurement.getStudyUri()) + "/" + 
 						ValueCellProcessing.replaceNameSpaceEx(da.getUri()).split(":")[1] + "/" +
 						dasa.getLocalName() + "-" + total_count);
@@ -447,6 +471,7 @@ public class Parser {
 				 *                             *
 				 *=============================*/
 
+				System.out.println("[Parser] Set Unit");
 				// HACK FOR JUNE 20
 				if (isSample && !unitOverride.equals("") && !unitLabelOverride.equals("")) {
 					measurement.setUnit(uppercaseFirstLetter(unitLabelOverride));
@@ -471,6 +496,7 @@ public class Parser {
 				 *                                 *
 				 *=================================*/
 
+				System.out.println("[Parser] Set Instrument and Platform");	
 				measurement.setInstrumentModel(uppercaseFirstLetter(da.getDeployment().getInstrument().getLabel()));
 				measurement.setInstrumentUri(uppercaseFirstLetter(da.getDeployment().getInstrument().getUri()));
 				measurement.setPlatformName(uppercaseFirstLetter(da.getDeployment().getPlatform().getLabel()));
@@ -482,10 +508,11 @@ public class Parser {
 				 *                                 *
 				 *=================================*/
 
+				System.out.println("[Parser] Set Entity and Attribute");
 				// HACK FOR JUNE 20
 				//System.out.println("dasa.getEntity : <" + dasa.getEntity() + ">");
 
-				/*if (isSample && !matrix.equals("") && !analyte.equals("")) {
+				if (isSample && !matrix.equals("") && !analyte.equals("")) {
 		    measurement.setEntity(uppercaseFirstLetter(matrix));
 		    measurement.setCharacteristic(uppercaseFirstLetter(analyte));
 		} else if (dasa.getEntity().equals("http://semanticscience.org/resource/Human")) {
@@ -500,7 +527,7 @@ public class Parser {
 		} else {
 		    measurement.setEntity(uppercaseFirstLetter(dasa.getEntityLabel()));
 		    measurement.setCharacteristic(uppercaseFirstLetter(dasa.getAttributeLabel()));
-		    } */
+		    } 
 
 				// TODO: un-hack this
 				// HACK FOR AUGUST 18
@@ -591,11 +618,10 @@ public class Parser {
 			message += "[ERROR] Fail to close solr\n";
 		}
 		return new ParsingResult(0, message);
-	}
+	}// /indexMeasurements()
 
 
 	private void defineTemporaryPositions(String filename) {
-
 		if (schema == null || schema.getAttributes() == null || schema.getAttributes().size() == 0) {
 			return;
 		}
@@ -636,8 +662,7 @@ public class Parser {
 				System.out.println("[ERROR] Label: " + dasa.getLabel() + "    Position: [" + dasa.getTempPositionInt() + "]");
 			}*/
 		}	
-
-	}
+	}// /defineTemporaryPositions
 
 	private int tempPositionOfLabel(String label) {
 		//System.out.println("inside tempPositionOfLabel: " + label);

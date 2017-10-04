@@ -68,7 +68,6 @@ import org.hadatac.data.loader.DASchemaAttrGenerator;
 import org.hadatac.data.loader.DASchemaEventGenerator;
 import org.hadatac.data.loader.DASchemaGenerator;
 import org.hadatac.data.loader.DASchemaObjectGenerator;
-import org.hadatac.data.loader.DASVirtualObject;
 import org.hadatac.data.loader.DASOInstanceGenerator;
 import org.hadatac.data.loader.DataAcquisitionGenerator;
 import org.hadatac.data.loader.DeploymentGenerator;
@@ -89,6 +88,7 @@ import org.hadatac.entity.pojo.DataAcquisition;
 import org.hadatac.entity.pojo.DataAcquisitionSchema;
 import org.hadatac.entity.pojo.DataAcquisitionSchemaAttribute;
 import org.hadatac.entity.pojo.DataAcquisitionSchemaObject;
+import org.hadatac.entity.pojo.DASVirtualObject;
 import org.hadatac.entity.pojo.DASOInstance;
 import org.hadatac.entity.pojo.User;
 import org.hadatac.metadata.loader.LabkeyDataHandler;
@@ -983,19 +983,6 @@ public class AutoAnnotator extends Controller {
 			    da_uri = da.getUri();
 			    deployment_uri = da.getDeploymentUri();
 			    schema_uri = da.getSchemaUri();
-					if(templateLibrary.containsKey(schema_uri)){
-						templateList = (ArrayList)templateLibrary.get(schema_uri);
-						System.out.println("[AutoAnnotator] Found the right template list for " + schema_uri);
-						for(DASVirtualObject item : templateList){
-							System.out.println(item);
-						}
-					} else {
-						System.out.println("[AutoAnnotator] Could not retrieve template list for " + schema_uri);
-						System.out.println("[AutoAnnotator] templateLibrary contains keys ");
-						for(String k : templateLibrary.keySet()){
-							System.out.println("\t" + k);
-						}
-					}
 			}
 		}
 
@@ -1093,7 +1080,7 @@ public class AutoAnnotator extends Controller {
 			System.out.println("annotateCSVFile: file to be parsed [" + dataFile.getFileName() + "]"); 
 			dataFile.setDatasetUri(DataFactory.getNextDatasetURI(da.getUri()));
 			da.addDatasetUri(dataFile.getDatasetUri());
-			result_parse = parser.indexMeasurements(files, da, dataFile, templateList);
+			result_parse = parser.indexMeasurements(files, da, dataFile);
 			status = result_parse.getStatus();
 			message += result_parse.getMessage();
 		    }

@@ -38,28 +38,13 @@ import org.apache.jena.update.UpdateFactory;
 import org.apache.jena.update.UpdateProcessor;
 import org.apache.jena.update.UpdateRequest;
 
-import org.apache.solr.client.solrj.SolrClient;
-import org.apache.solr.client.solrj.SolrQuery;
-import org.apache.solr.client.solrj.SolrRequest;
-import org.apache.solr.client.solrj.SolrServerException;
-import org.apache.solr.client.solrj.beans.Field;
-import org.apache.solr.client.solrj.impl.HttpSolrClient;
-import org.apache.solr.client.solrj.response.FacetField;
-import org.apache.solr.client.solrj.response.FacetField.Count;
-import org.apache.solr.client.solrj.response.PivotField;
-import org.apache.solr.client.solrj.response.QueryResponse;
-import org.apache.solr.client.solrj.response.RangeFacet;
-import org.apache.solr.client.solrj.response.UpdateResponse;
-import org.apache.solr.common.SolrDocument;
-import org.apache.solr.common.SolrDocumentList;
-import org.apache.solr.common.util.NamedList;
-
 import org.apache.commons.text.StrSubstitutor;
 import org.hadatac.metadata.loader.ValueCellProcessing;
 import org.hadatac.console.models.FacetHandler;
 import org.hadatac.console.models.Pivot;
 import org.hadatac.data.model.AcquisitionQueryResult;
 import org.hadatac.utils.Collections;
+import org.hadatac.utils.NameSpaces;
 
 import play.Play;
 
@@ -118,19 +103,23 @@ public class DASOInstance {
 		this.setRelations(relations);
 		this.setOrigValue("");
 		this.setUri(generateURI());
-	}// /constructor needing a uri
+	}// /constructor
 
+
+	// this may still need some fixing
 	public String generateURI(){
 		HashMap<String,String> templateValues = new HashMap<String,String>();
 		templateValues.put("study", this.studyId);
 		templateValues.put("id", this.rowKey);
-		// TODO: see what this needs to look like
 		if(this.rowKey.equals("summaryClass")){
 			if(this.relations.containsKey("rdfs:subClassOf")){
 				String[] temp = this.relations.get("rdfs:subClassOf").split("_",2);
 				String mod = temp[0];
 				if(temp.length > 1) mod += "/val/"+temp[1];
 				this.setOrigValue(mod);
+				if(this.relations.containsKey("sio:measuredAt")){
+					mod += "/" + this.relations.get("sio:measuredAt");
+				}
 				templateValues.put("modifier", mod.replaceAll("[ ';.,]",""));
 			}
 			else
@@ -140,7 +129,7 @@ public class DASOInstance {
 		}
 		StrSubstitutor sub = new StrSubstitutor(templateValues);
 		String generatedURI = sub.replace(URI_TEMPLATE);
-		generatedURI = kbPrefix + generatedURI;
+		//generatedURI = kbPrefix + generatedURI;
 		return generatedURI;
 	}// /generateURI
 
@@ -152,13 +141,13 @@ public class DASOInstance {
 	//private String type; // provided by template
 	//private HashMap<String,String> relations;
 
-	/*public void save() {
+	public void save() {
 		//delete();  // delete any existing triple for the current DASA
-		if (uri == null || uri.equals("")) {
+		if (this.getUri() == null || this.getUri().equals("")) {
 			System.out.println("[ERROR] Trying to save DASOInstance without assigning a URI");
 			return;
 		}
-		if (type == null || type.equals("")) {
+		if (this.getType() == null || this.getType().equals("")) {
 			System.out.println("[ERROR] Trying to save DASOInstance without assigning a type");
 			return;
 		}
@@ -166,21 +155,57 @@ public class DASOInstance {
 		insert += NameSpaces.getInstance().printSparqlNameSpaceList();
 		insert += INSERT_LINE1;
 		insert += this.getUri() + " a " + this.getType() + " . ";
-		insert += this.getUri() + " rdfs:label  \"" + label + "\" . ";
-		if (partOfSchema.startsWith("http")) {
-			insert += this.getUri() + " hasco:partOfSchema <" + partOfSchema + "> .  "; 
+		insert += this.getUri() + " rdfs:label  \"" + this.getLabel() + "\" . ";
+		if (this.getStudyId().startsWith("http")) {
+			insert += this.getUri() + " sio:isPartOf <" + this.getStudyId() + "> . ";
 		} else {
-			insert += this.getUri() + " hasco:partOfSchema " + partOfSchema + " .  "; 
-		} 
-
+			insert += this.getUri() + " sio:isPartOf " + this.getStudyId() + " . ";
+		}
+		for(Map.Entry rel : this.getRelations().entrySet()){
+			String p = "";
+			String o = "";
+			String relKey = (String)rel.getKey();
+			String relVal = (String)rel.getValue();
+			if(relKey.startsWith("http")){
+				p = "<" + relKey + ">";
+			} else {
+				p = relKey;
+			}
+			if(relVal.startsWith("http")){
+				o = "<" + relVal + ">";
+			} else {
+				o = relVal;
+			}
+			insert += this.getUri() + " " + p + " " + o + " . ";
+		}
 		insert += LINE_LAST;
-		//System.out.println("[DASOInstance] insert query (pojo's save): <" + insert + ">");
-		UpdateRequest request = UpdateFactory.create(insert);
-		UpdateProcessor processor = UpdateExecutionFactory.createRemote(
-			request, Collections.getCollectionsName(Collections.METADATA_UPDATE));
-		processor.execute();
+		System.out.println("[DASOInstance] insert query (pojo's save): <" + insert + ">");
+		//UpdateRequest request = UpdateFactory.create(insert);
+		//UpdateProcessor processor = UpdateExecutionFactory.createRemote(
+		//	request, Collections.getCollectionsName(Collections.METADATA_UPDATE));
+		//processor.execute();
 	}// /save()
-	*/
+
+	public void delete() {
+		String query = "";
+		if (this.getUri() == null || this.getUri().equals("")) {
+			return;
+		}
+		query += NameSpaces.getInstance().printSparqlNameSpaceList();
+		query += DELETE_LINE1;
+		if (this.getUri().startsWith("http")) {
+			query += "<" + this.getUri() + ">";
+		} else {
+			query += this.getUri();
+		}
+		query += DELETE_LINE3;
+		query += LINE_LAST;
+		//System.out.println("SPARQL query inside dasa poho's delete: " + query);
+		//UpdateRequest request = UpdateFactory.create(query);
+		//UpdateProcessor processor = UpdateExecutionFactory.createRemote(request, Collections.getCollectionsName(Collections.METADATA_UPDATE));
+		//processor.execute();
+	}// /delete()
+	
 
 	// TODO: finish
 	/*

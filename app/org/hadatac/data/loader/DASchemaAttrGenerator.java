@@ -69,13 +69,13 @@ public class DASchemaAttrGenerator extends BasicGenerator {
     	return rec.get(mapCol.get("AttributeType"));
     }
     
-    private String getAttributeOf(CSVRecord rec) {
-	if (rec.get(mapCol.get("AttributeOf")) == null || rec.get(mapCol.get("AttributeOf").trim()).equals("")) {
-	    return "";
+	private String getAttributeOf(CSVRecord rec) {
+		if (rec.get(mapCol.get("AttributeOf")) == null || rec.get(mapCol.get("AttributeOf").trim()).equals("")) {
+			return "";
+		}
+		//System.out.println("[DASchemaAttrGenerator] getAttributeOf() = " + SDDName + "-" + rec.get(mapCol.get("AttributeOf")).replace("??", ""));
+		return kbPrefix + "DASO-" + SDDName + "-" + rec.get(mapCol.get("AttributeOf")).replace("??", "");
 	}
-	//System.out.println("DASchemaAttrGenerator: getAttributeOf() = " + SDDName + "-" + rec.get(mapCol.get("AttributeOf")).replace("??", ""));
-	return kbPrefix + "DASO-" + SDDName + "-" + rec.get(mapCol.get("AttributeOf")).replace("??", "");
-    }
     
     private String getUnit(CSVRecord rec) {
     	if (codeMap.containsKey(rec.get(mapCol.get("Unit")))) {
@@ -154,9 +154,9 @@ public class DASchemaAttrGenerator extends BasicGenerator {
     @Override
     Map<String, Object> createRow(CSVRecord rec, int row_number) throws Exception {
     	Map<String, Object> row = new HashMap<String, Object>();
-	SDDName = fileName.replace("SDD-","").replace(".csv","");
-	codeMap = AutoAnnotator.codeMappings;
-	row.put("hasURI", kbPrefix + "DASA-" + "-" + getLabel(rec).trim().replace(" ", "").replace("_","-").replace("??", ""));
+			SDDName = fileName.replace("SDD-","").replace(".csv","");
+			codeMap = AutoAnnotator.codeMappings;
+			row.put("hasURI", kbPrefix + "DASA-" + SDDName + "-" + getLabel(rec).trim().replace(" ", "").replace("_","-").replace("??", ""));
     	row.put("a", "hasco:DASchemaAttribute");
     	row.put("rdfs:label", getLabel(rec));
     	row.put("rdfs:comment", getLabel(rec));

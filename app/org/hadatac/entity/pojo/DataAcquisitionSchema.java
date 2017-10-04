@@ -224,40 +224,40 @@ public class DataAcquisitionSchema {
 		dasa.setDataAcquisitionSchema(this);
 		if (dasa.getAttribute().equals(ValueCellProcessing.replacePrefixEx("sio:TimeStamp"))) {
 		    setTimestampLabel(dasa.getLabel());
-		    System.out.println("[OK] DataAcquisitionSchema TimeStampLabel: " + dasa.getLabel());
+		    //System.out.println("[OK] DataAcquisitionSchema TimeStampLabel: " + dasa.getLabel());
 		}
 		if (dasa.getAttribute().equals(ValueCellProcessing.replacePrefixEx("sio:TimeInstant"))) {
 		    setTimeInstantLabel(dasa.getLabel());
-		    System.out.println("[OK] DataAcquisitionSchema TimeInstantLabel: " + dasa.getLabel());
+		    //System.out.println("[OK] DataAcquisitionSchema TimeInstantLabel: " + dasa.getLabel());
 		}
 		if (dasa.getAttribute().equals(ValueCellProcessing.replacePrefixEx("hasco:namedTime"))) {
 		    setNamedTimeLabel(dasa.getLabel());
-		    System.out.println("[OK] DataAcquisitionSchema NamedTimeLabel: " + dasa.getLabel());
+		    //System.out.println("[OK] DataAcquisitionSchema NamedTimeLabel: " + dasa.getLabel());
 		}
 		if (dasa.getAttribute().equals(ValueCellProcessing.replacePrefixEx("hasco:uriId"))) {
 		    setIdLabel(dasa.getLabel());
-		    System.out.println("[OK] DataAcquisitionSchema IdLabel: " + dasa.getLabel());
+		    //System.out.println("[OK] DataAcquisitionSchema IdLabel: " + dasa.getLabel());
 		}
 		if (dasa.getAttribute().equals(ValueCellProcessing.replacePrefixEx("hasco:originalId"))) { 
 		    setOriginalIdLabel(dasa.getLabel());
-		    System.out.println("[OK] DataAcquisitionSchema IdLabel: " + dasa.getLabel());
+		    //System.out.println("[OK] DataAcquisitionSchema IdLabel: " + dasa.getLabel());
 		    }
 		if (dasa.getAttribute().equals(ValueCellProcessing.replacePrefixEx("hasco:hasEntity"))) {
 		    setEntityLabel(dasa.getLabel());
-		    System.out.println("[OK] DataAcquisitionSchema EntityLabel: " + dasa.getLabel());
+		    //System.out.println("[OK] DataAcquisitionSchema EntityLabel: " + dasa.getLabel());
 		}
 		if (dasa.getAttribute().equals(ValueCellProcessing.replacePrefixEx("hasco:hasUnit"))) {
 		    setUnitLabel(dasa.getLabel());
-		    System.out.println("[OK] DataAcquisitionSchema UnitLabel: " + dasa.getLabel());
+		    //System.out.println("[OK] DataAcquisitionSchema UnitLabel: " + dasa.getLabel());
 		}
 		if (dasa.getAttribute().equals(ValueCellProcessing.replacePrefixEx("sio:InRelationTo"))) {
 		    setInRelationToLabel(dasa.getLabel());
-		    System.out.println("[OK] DataAcquisitionSchema InRelationToLabel: " + dasa.getLabel());
+		    //System.out.println("[OK] DataAcquisitionSchema InRelationToLabel: " + dasa.getLabel());
 		}
-		System.out.println("[OK] DataAcquisitionSchemaAttribute <" + dasa.getUri() + "> is defined in the knowledge base. " + 
-				   "Entity: \""    + dasa.getEntityLabel()     + "\"; " + 
-				   "Attribute: \"" + dasa.getAttributeLabel() + "\"; " + 
-				   "Unit: \""      + dasa.getUnitLabel()       + "\""); 
+		//System.out.println("[OK] DataAcquisitionSchemaAttribute <" + dasa.getUri() + "> is defined in the knowledge base. " + 
+		//		   "Entity: \""    + dasa.getEntityLabel()     + "\"; " + 
+		//		   "Attribute: \"" + dasa.getAttributeLabel() + "\"; " + 
+		//		   "Unit: \""      + dasa.getUnitLabel()       + "\""); 
 		//System.out.println("     DataAcquisitionSchemaAttribute DASO URI: \"" + dasa.getObjectUri() + "\"");
 		//System.out.println("     DataAcquisitionSchemaAttribute DASE URI: \"" + dasa.getEventUri() + "\"");
 	    }
@@ -274,8 +274,8 @@ public class DataAcquisitionSchema {
 	} else {
 	    this.objects = objects;
 	    for (DataAcquisitionSchemaObject daso : objects) {
-		System.out.println("[OK] DataAcquisitionSchemaObject <" + daso.getUri() + "> is defined in the knowledge base. " + 
-				   "Role: \""  + daso.getRole() + "\"");
+		//System.out.println("[OK] DataAcquisitionSchemaObject <" + daso.getUri() + "> is defined in the knowledge base. " + 
+		//		   "Role: \""  + daso.getRole() + "\"");
 	    }
 	}
     }
@@ -299,8 +299,8 @@ public class DataAcquisitionSchema {
 	} else {
 	    this.events = events;
 	    for (DataAcquisitionSchemaEvent dase : events) {
-		System.out.println("[OK] DataAcquisitionSchemaEvent <" + dase.getUri() + "> is defined in the knowledge base. " + 
-				   "Label: \""  + dase.getLabel() + "\"");
+		//System.out.println("[OK] DataAcquisitionSchemaEvent <" + dase.getUri() + "> is defined in the knowledge base. " + 
+		//		   "Label: \""  + dase.getLabel() + "\"");
 	    }
 	}
     }
@@ -342,10 +342,10 @@ public class DataAcquisitionSchema {
 	schema.setAttributes(DataAcquisitionSchemaAttribute.findBySchema(schemaUri));
 	schema.setObjects(DataAcquisitionSchemaObject.findBySchema(schemaUri));
 	schema.setEvents(DataAcquisitionSchemaEvent.findBySchema(schemaUri));
-	System.out.println("[DataAcquisitionSchema] [OK] DataAcquisitionSchema " + schemaUri + " exists. " + 
-			   "It has " + schema.getAttributes().size() + " attributes, " + 
-			   schema.getObjects().size() + " objects, and " + 
-			   schema.getEvents().size() + " events.");
+	//System.out.println("[DataAcquisitionSchema] [OK] DataAcquisitionSchema " + schemaUri + " exists. " + 
+	//		   "It has " + schema.getAttributes().size() + " attributes, " + 
+	//		   schema.getObjects().size() + " objects, and " + 
+	//		   schema.getEvents().size() + " events.");
 	return schema;
     }
     

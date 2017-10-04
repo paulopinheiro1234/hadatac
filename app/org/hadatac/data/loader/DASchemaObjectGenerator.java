@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.ArrayList;
 import java.util.Map;
 import org.apache.commons.csv.CSVRecord;
+import org.hadatac.entity.pojo.DASVirtualObject;
 
 public class DASchemaObjectGenerator extends BasicGenerator {
 

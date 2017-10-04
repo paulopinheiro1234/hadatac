@@ -90,9 +90,9 @@ public class DataAcquisitionSchemaAttribute {
 					  String partOfSchema,
 					  String position, 
 					  String entity, 
-                                          String attribute, 
+						String attribute, 
 					  String unit, 
-                                          String daseUri, 
+						String daseUri, 
 					  String dasoUri) {
 	this.uri = uri;
 	this.localName = localName;
@@ -431,7 +431,7 @@ public class DataAcquisitionSchemaAttribute {
     
     public static DataAcquisitionSchemaAttribute find (String dasa_uri) {
 	DataAcquisitionSchemaAttribute dasa = null;
-	System.out.println("[DASA] Looking for data acquisition schema attribute with URI " + dasa_uri);
+	//System.out.println("[DASA] Looking for data acquisition schema attribute with URI " + dasa_uri);
 	if (dasa_uri.startsWith("http")) {
 	    dasa_uri = "<" + dasa_uri + ">";
 	}
@@ -551,7 +551,7 @@ public class DataAcquisitionSchemaAttribute {
     }
     
     public static List<DataAcquisitionSchemaAttribute> findBySchema (String schemaUri) {
-	System.out.println("[DASA] Looking for data acquisition schema attributes for " + schemaUri);
+	//System.out.println("[DASA] Looking for data acquisition schema attributes for " + schemaUri);
 	if (schemaUri.startsWith("http")) {
 	    schemaUri = "<" + schemaUri + ">";
 	}

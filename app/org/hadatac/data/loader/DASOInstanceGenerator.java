@@ -5,7 +5,7 @@ import org.apache.commons.io.FileUtils;
 import org.hadatac.console.controllers.annotator.AutoAnnotator;
 import org.hadatac.entity.pojo.DASOInstance;
 import org.hadatac.entity.pojo.DataAcquisitionSchemaObject;
-import org.hadatac.data.loader.DASVirtualObject;
+import org.hadatac.entity.pojo.DASVirtualObject;
 import org.hadatac.metadata.loader.ValueCellProcessing;
 import play.Play;
 import java.lang.String;
@@ -90,7 +90,7 @@ public class DASOInstanceGenerator{
 	// private String templateUri;
 	// private Map<String,String> objRelations;
 	public HashMap<String,DASOInstance> generateRowInstances(CSVRecord rec){
-		System.out.println("[DASOInstanceGenerator] Inside generateRowInstances!");
+		//System.out.println("[DASOInstanceGenerator] Inside generateRowInstances!");
 		HashMap<String,DASOInstance> instances = new HashMap<String,DASOInstance>();
 		String tempLabel = "";
 		String tempType = "";
