@@ -240,6 +240,45 @@ public class StudyObject extends HADatAcThing {
 	return obj;
     }
     
+    public static String findUribyOriginalId(String original_id) {
+
+    	String queryString = NameSpaces.getInstance().printSparqlNameSpaceList() + 
+    	    "SELECT  ?objuri " + 
+    	    " WHERE { " + 
+    	    " ?objuri hasco:originalId " + original_id + " } . " + 
+    	    "}";
+    	//System.out.println("Looking for object with URI " + obj_uri + " \nQuery: " + queryString);
+    	Query query = QueryFactory.create(queryString);
+    	
+    	QueryExecution qexec = QueryExecutionFactory.sparqlService(Collections.getCollectionsName(Collections.METADATA_SPARQL), query);
+    	ResultSet results = qexec.execSelect();
+    	ResultSetRewindable resultsrw = ResultSetFactory.copyResults(results);
+    	qexec.close();
+    	
+    	if (!resultsrw.hasNext()) {
+    	    System.out.println("[WARNING] StudyObject. Could not find OBJ URI for: " + original_id);
+    	    return "";
+    	}
+
+    	while (resultsrw.hasNext()) {
+    	    QuerySolution soln = resultsrw.next();
+    	    if (soln != null) {
+    		
+	    		try {
+	    		    if (soln.getResource("objuri") != null) {
+	    		    	return soln.getResource("objuri").toString();
+	    		    	}
+	    			} catch (Exception e1) {
+	    			
+	    			}
+    		}
+    		
+
+    	}
+		return "";
+    }
+    
+    
     public static List<StudyObject> findByCollection(ObjectCollection oc) {
 	if (oc == null) {
 	    return null;

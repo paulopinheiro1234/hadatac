@@ -468,8 +468,8 @@ public class Parser {
 
 
 				// HACK FOR AUGUST 18
-				measurement.setEntity("Subject");
-				measurement.setEntityUri(dasa.getEntity());
+				measurement.setEntity("STUDY OBJECT");
+				measurement.setEntityUri(StudyObject.findUribyOriginalId(measurement.getValue()));
 				measurement.setCharacteristic(uppercaseFirstLetter(dasa.getAttributeLabel()));
 				measurement.setCharacteristicUri(dasa.getAttribute());
 		
