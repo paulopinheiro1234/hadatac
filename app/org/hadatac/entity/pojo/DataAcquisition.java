@@ -664,7 +664,7 @@ public class DataAcquisition extends HADatAcThing {
 	
 	public long getNumberFromSolr(List<String> values, FacetHandler facetHandler) {
 		SolrQuery query = new SolrQuery();
-		query.setQuery(facetHandler.getTempSolrQuery("ACQUISITION_URI", "acquisition_uri", values));
+		query.setQuery(facetHandler.getTempSolrQuery("ACQUISITION_URI", "acquisition_uri_str", values));
 		query.setRows(0);
 		query.setFacet(false);
 

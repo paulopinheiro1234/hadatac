@@ -1,39 +1,16 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <schema version="1.5">
   <fields>
-    <field name="uri" type="string" indexed="true" stored="true"/>
-	<field name="owner_uri" type="string" indexed="true" docValues="true" />
-	<field name="acquisition_uri" type="string" indexed="true" docValues="true" />
-	<field name="study_uri" type="string" indexed="true" docValues="true" />
-    <field name="study_name" type="string" indexed="true" stored="true" docValues="true" />
-	<field name="object_uri" type="string" indexed="true" docValues="true" />
+    <field name="uri" type="string" indexed="true" stored="true" docValues="true"/>
+    <dynamicField name="*_str" type="string" indexed="true" stored="true" docValues="true"/>
+    <dynamicField name="*_str_multi" type="string" indexed="true" stored="true" docValues="true" multiValued="true" />
+    <dynamicField name="*_date" type="date" indexed="true" stored="true" docValues="true"/>
+    <dynamicField name="*_double" type="double" indexed="true" stored="true" docValues="true"/>
+    <dynamicField name="*_latlong" type="latlong" indexed="true" />
     <field name="_version_" type="long" indexed="true" stored="true"/>
     <field name="_text_" type="text_general" indexed="true" stored="false" multiValued="true"/>
-    <field name="timestamp" type="date" indexed="true" stored="true" docValues="true" />
-    <field name="time_unit" type="string" indexed="true" stored="true" docValues="true" />
-    <field name="named_time" type="string" indexed="true" stored="true" docValues="true" />
-    <field name="value" type="string" indexed="true" docValues="true" />
-    <field name="pid" type="string" indexed="true" docValues="true" />
-    <field name="sid" type="string" indexed="true" docValues="true" />
-    <field name="unit" type="string" indexed="true" docValues="true" />
-    <field name="unit_uri" type="string" indexed="true" docValues="true" />
-    <field name="entity" type="string" indexed="true" docValues="true" />
-    <field name="entity_uri" type="string" indexed="true" docValues="true" />
-    <field name="characteristic" type="string" indexed="true" docValues="true" />
-    <field name="characteristic_uri" type="string" indexed="true" docValues="true" />
-    <field name="instrument_model" type="string" indexed="true" docValues="true" />
-    <field name="instrument_uri" type="string" indexed="true" docValues="true" />
-    <field name="platform_name" type="string" indexed="true" docValues="true" />
-    <field name="platform_uri" type="string" indexed="true" docValues="true" />
-    <field name="named_location" type="string" indexed="true" stored="true" docValues="true" />
-    <field name="location" type="latlong" indexed="true" />
-    <field name="elevation" type="double" indexed="true" stored="true" docValues="true"/>
-    <field name="dataset_uri" type="string" indexed="true" stored="true" docValues="true"/>
     <dynamicField name="JP_*" type="string" indexed="true" stored="true" />
     <copyField source="JP_*" dest="_text_" />
-    <copyField source="characteristic" dest="_text_" />
-    <copyField source="entity" dest="_text_" />
-    <copyField source="unit" dest="_text_" />
   </fields>
 
   <uniqueKey>uri</uniqueKey>
@@ -44,7 +21,7 @@
     <fieldType name="long" class="solr.TrieLongField" precisionStep="0" positionIncrementGap="0"/>
     <fieldType name="double" class="solr.TrieDoubleField"/>
     <fieldType name="int" class="solr.TrieIntField" precisionStep="8"/>
-    <fieldType name="latlong"   class="solr.SpatialRecursivePrefixTreeFieldType"
+    <fieldType name="latlong" class="solr.SpatialRecursivePrefixTreeFieldType"
                spatialContextFactory="org.locationtech.spatial4j.context.jts.JtsSpatialContextFactory"
                autoIndex="true"
                validationRule="repairBuffer0"

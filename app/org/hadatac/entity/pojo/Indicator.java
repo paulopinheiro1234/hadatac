@@ -238,7 +238,8 @@ public class Indicator extends HADatAcThing implements Comparable<Indicator> {
 		query += "SELECT ?studyIndicator ?indicatorLabel ?attributeUri ?attributeLabel WHERE { "
 				+ "?subTypeUri rdfs:subClassOf* hasco:Study . "
 				+ "?studyUri a ?subTypeUri . "
-				+ "?schemaUri hasco:isSchemaOf ?studyUri . "
+				+ "?dataAcq hasco:isDataAcquisitionOf ?studyUri . "
+				+ "?dataAcq hasco:hasSchema ?schemaUri . "
 				+ "?schemaAttribute hasco:partOfSchema ?schemaUri . "
 				+ "?schemaAttribute hasco:hasAttribute ?attributeUri . " 
 				+ "?attributeUri rdfs:subClassOf* ?studyIndicator . "
@@ -247,6 +248,7 @@ public class Indicator extends HADatAcThing implements Comparable<Indicator> {
 				+ "?studyIndicator rdfs:label ?indicatorLabel . "
 				+ "}";
 
+		System.out.println("Indicator Query: " + query);
 		Map<HADatAcThing, List<HADatAcThing>> mapIndicatorToCharList = new HashMap<HADatAcThing, List<HADatAcThing>>();
 		try {
 			QueryExecution qe = QueryExecutionFactory.sparqlService(

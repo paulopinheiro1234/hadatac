@@ -30,6 +30,7 @@ import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
 import org.apache.solr.common.util.NamedList;
 import org.hadatac.console.controllers.dataacquisitionsearch.FacetTree;
+import org.hadatac.console.http.SolrUtils;
 import org.hadatac.console.models.FacetHandler;
 import org.hadatac.console.models.Pivot;
 import org.hadatac.data.model.AcquisitionQueryResult;
@@ -40,49 +41,49 @@ import play.Play;
 public class Measurement {
 	@Field("uri")
 	private String uri;
-	@Field("owner_uri")
+	@Field("owner_uri_str")
 	private String ownerUri;
-	@Field("acquisition_uri")
+	@Field("acquisition_uri_str")
 	private String acquisitionUri;
-	@Field("study_uri")
+	@Field("study_uri_str")
 	private String studyUri;
-	@Field("object_uri")
+	@Field("object_uri_str")
 	private String objectUri;
-	@Field("timestamp")
-	private Instant timestamp;
-	@Field("named_time")
+	@Field("timestamp_date")
+	private Date timestamp;
+	@Field("named_time_str")
 	private String abstractTime;
-	@Field("value")
+	@Field("value_str")
 	private String value;
-	@Field("pid")
+	@Field("pid_str")
 	private String pid;
-	@Field("sid")
+	@Field("sid_str")
 	private String sid;
-	@Field("unit")
+	@Field("unit_str")
 	private String unit;
-	@Field("unit_uri")
+	@Field("unit_uri_str")
 	private String unitUri;
-	@Field("entity")
+	@Field("entity_str")
 	private String entity;
-	@Field("entity_uri")
+	@Field("entity_uri_str")
 	private String entityUri;
-	@Field("characteristic")
+	@Field("characteristic_str")
 	private String characteristic;
-	@Field("characteristic_uri")
+	@Field("characteristic_uri_str")
 	private String characteristicUri;
-	@Field("instrument_model")
+	@Field("instrument_model_str")
 	private String instrumentModel;
-	@Field("instrument_uri")
+	@Field("instrument_uri_str")
 	private String instrumentUri;
-	@Field("platform_name")
+	@Field("platform_name_str")
 	private String platformName;
-	@Field("platform_uri")
+	@Field("platform_uri_str")
 	private String platformUri;
-	@Field("location")
+	@Field("location_latlong")
 	private String location;
-	@Field("elevation")
+	@Field("elevation_double")
 	private double elevation;
-	@Field("dataset_uri")
+	@Field("dataset_uri_str")
 	private String datasetUri;
 
 	public String getOwnerUri() {
@@ -268,12 +269,20 @@ public class Measurement {
 		this.uri = uri;
 	}
 
-	public String getTimestamp() {
-		return timestamp.toString();
+	public Date getTimestamp() {
+		return timestamp;
 	}
 
+	public void setTimestamp(Date timestamp) {
+		this.timestamp = timestamp;
+	}
+	
+	public void setTimestamp(Instant timestamp) {
+		this.timestamp = Date.from(timestamp);
+	}
+	
 	public void setTimestamp(String timestamp) {
-		this.timestamp = Instant.parse(timestamp);
+		this.timestamp = Date.from(Instant.parse(timestamp));
 	}
 
 	public String getAbstractTime() {
@@ -408,7 +417,7 @@ public class Measurement {
 		Iterator<String> iter_uri = listURI.iterator();
 		while (iter_uri.hasNext()) {
 			String uri = iter_uri.next();
-			acquisition_query += "acquisition_uri" + ":\"" + uri + "\"";
+			acquisition_query += "acquisition_uri_str" + ":\"" + uri + "\"";
 			if (iter_uri.hasNext()) {
 				acquisition_query += " OR ";
 			}
@@ -419,21 +428,21 @@ public class Measurement {
 		}
 
 		if (!study_uri.equals("")) {
-			facet_query += "study_uri" + ":\"" + study_uri + "\"";
+			facet_query += "study_uri_str" + ":\"" + study_uri + "\"";
 		}
 
 		if (!subject_uri.equals("")) {
 			if (!study_uri.equals("")) {
 				facet_query += " AND ";
 			}
-			facet_query += "object_uri" + ":\"" + subject_uri + "\"";
+			facet_query += "object_uri_str" + ":\"" + subject_uri + "\"";
 		}
 
 		if (!char_uri.equals("")) {
 			if (!study_uri.equals("") || !subject_uri.equals("")) {
 				facet_query += " AND ";
 			}
-			facet_query += "characteristic_uri" + ":\"" + char_uri + "\"";
+			facet_query += "characteristic_uri_str" + ":\"" + char_uri + "\"";
 		}
 
 		if (facet_query.trim().equals("")) {
@@ -453,7 +462,7 @@ public class Measurement {
 		List<String> listURI = DataAcquisition.findAllAccessibleDataAcquisition(user_uri);
 		Iterator<String> iter_uri = listURI.iterator();
 		while (iter_uri.hasNext()) {
-			acquisition_query += "acquisition_uri:\"" + iter_uri.next() + "\"";
+			acquisition_query += "acquisition_uri_str:\"" + iter_uri.next() + "\"";
 			if (iter_uri.hasNext()) {
 				acquisition_query += " OR ";
 			}
@@ -525,7 +534,7 @@ public class Measurement {
 		return result;
 	}
 
-	public static Instant findMinTime(String field, String q) {
+	public static Date findMinTime(String field, String q) {
 		SolrQuery query = new SolrQuery();
 		query.setQuery(q);
 		query.setRows(1);
@@ -542,20 +551,21 @@ public class Measurement {
 			SolrDocumentList results = queryResponse.getResults();
 			if (results.size() == 1) {
 				Measurement m = convertFromSolr(results.get(0));
-				return Instant.parse(m.getTimestamp());
+				return m.getTimestamp();
 			}
 		} catch (IOException e) {
 			System.out.println("[ERROR] Measurement.findMinTime(String, String) - IOException message: " + e.getMessage());
 		} catch (SolrServerException e) {
 			System.out.println("[ERROR] Measurement.findMinTime(String, String) - SolrServerException message: " + e.getMessage());
 		} catch (Exception e) {
+			e.printStackTrace();
 			System.out.println("[ERROR] Measurement.findMinTime(String, String) - Exception message: " + e.getMessage());
 		}
 
 		return null;
 	}
 
-	public static Instant findMaxTime(String field, String q) {
+	public static Date findMaxTime(String field, String q) {
 		SolrQuery query = new SolrQuery();
 		query.setQuery(q);
 		query.setRows(1);
@@ -573,7 +583,7 @@ public class Measurement {
 			SolrDocumentList results = queryResponse.getResults();
 			if (results.size() == 1) {
 				Measurement m = convertFromSolr(results.get(0));
-				return Instant.parse(m.getTimestamp());
+				return m.getTimestamp();
 			}
 		} catch (IOException e) {
 			System.out.println("[ERROR] Measurement.findMinTime(String, String) - IOException message: " + e.getMessage());
@@ -640,12 +650,15 @@ public class Measurement {
 			return result;
 		}
 
-		Instant minTime = findMinTime("timestamp", q);
+		Date minTime = findMinTime("timestamp", q);
 		System.out.println("minTime: " + minTime);
-		Instant maxTime = findMaxTime("timestamp", q);
+		Date maxTime = findMaxTime("timestamp", q);
 		System.out.println("maxTime: " + maxTime);
-
-		String gap = calculateTimeGap(minTime, maxTime);
+		
+		String gap = null;
+		if (minTime != null && maxTime != null) {
+			gap = calculateTimeGap(minTime.toInstant(), maxTime.toInstant());
+		}
 
 		int docSize = 0;
 		SolrQuery query = new SolrQuery();
@@ -654,9 +667,9 @@ public class Measurement {
 		query.setRows(qtd);
 		query.setFacet(true);
 		query.setFacetLimit(-1);
-		query.addFacetField("named_time");
-		if (minTime != null && maxTime != null && gap == null) {
-			query.addDateRangeFacet("timestamp", Date.from(minTime), Date.from(maxTime), gap); 
+		query.addFacetField("named_time_str");
+		if (minTime != null && maxTime != null && gap != null) {
+			query.addDateRangeFacet("timestamp_date", minTime, maxTime, gap); 
 		}
 
 		try {
@@ -667,6 +680,7 @@ public class Measurement {
 			QueryResponse queryResponse = solr.query(query, SolrRequest.METHOD.POST);
 			solr.close();
 			SolrDocumentList results = queryResponse.getResults();
+			System.out.println("Num of results: " + results.getNumFound());
 			Iterator<SolrDocument> m = results.iterator();
 			while (m.hasNext()) {
 				result.documents.add(convertFromSolr(m.next()));
@@ -840,7 +854,7 @@ public class Measurement {
 				Play.application().configuration().getString("hadatac.solr.data") 
 				+ Collections.DATA_ACQUISITION).build();
 		SolrQuery query = new SolrQuery();
-		query.set("q", "acquisition_uri:\"" + dataAcquisition.getUri() + "\"");
+		query.set("q", "acquisition_uri_str:\"" + dataAcquisition.getUri() + "\"");
 		query.set("rows", "10000000");
 
 		try {
@@ -852,9 +866,7 @@ public class Measurement {
 			Iterator<SolrDocument> iter = results.iterator();
 			while (iter.hasNext()) {
 				SolrDocument doc = iter.next();
-				if (doc.getFieldValue("dataset_uri") != null) {
-					dataAcquisition.addDatasetUri(doc.getFieldValue("dataset_uri").toString());
-				}
+				dataAcquisition.addDatasetUri(SolrUtils.getFieldValue(doc, "dataset_uri_str"));
 			}
 			return results.getNumFound();
 		} catch (Exception e) {
@@ -872,7 +884,7 @@ public class Measurement {
 				Play.application().configuration().getString("hadatac.solr.data") 
 				+ Collections.DATA_ACQUISITION).build();
 		SolrQuery query = new SolrQuery();
-		query.set("q", "acquisition_uri:\"" + acquisition_uri + "\"");
+		query.set("q", "acquisition_uri_str:\"" + acquisition_uri + "\"");
 		query.set("rows", "10000000");
 
 		try {
@@ -894,38 +906,32 @@ public class Measurement {
 
 	public static Measurement convertFromSolr(SolrDocument doc) {
 		Measurement m = new Measurement();
-		m.setUri(doc.getFieldValue("uri").toString());
-		m.setOwnerUri(doc.getFieldValue("owner_uri").toString());
-		m.setAcquisitionUri(doc.getFieldValue("acquisition_uri").toString());
-		m.setStudyUri(doc.getFieldValue("study_uri").toString());
-		if (doc.getFieldValue("object_uri") != null) {
-			m.setObjectUri(doc.getFieldValue("object_uri").toString());
-			m.setPID(doc.getFieldValue("object_uri").toString());
-			m.setSID(doc.getFieldValue("object_uri").toString());
+		m.setUri(SolrUtils.getFieldValue(doc, "uri"));
+		m.setOwnerUri(SolrUtils.getFieldValue(doc, "owner_uri_str"));
+		m.setAcquisitionUri(SolrUtils.getFieldValue(doc, "acquisition_uri_str"));
+		m.setStudyUri(SolrUtils.getFieldValue(doc, "study_uri_str"));
+		m.setObjectUri(SolrUtils.getFieldValue(doc, "object_uri_str"));
+		m.setPID(SolrUtils.getFieldValue(doc, "object_uri_str"));
+		m.setSID(SolrUtils.getFieldValue(doc, "object_uri_str"));
+		m.setAbstractTime(SolrUtils.getFieldValue(doc, "named_time_str"));
+		m.setValue(SolrUtils.getFieldValue(doc, "value_str"));
+		m.setUnit(SolrUtils.getFieldValue(doc, "unit_str"));
+		m.setUnitUri(SolrUtils.getFieldValue(doc, "unit_uri_str"));
+		m.setEntity(SolrUtils.getFieldValue(doc, "entity_str"));
+		m.setEntityUri(SolrUtils.getFieldValue(doc, "entity_uri_str"));
+		m.setCharacteristic(SolrUtils.getFieldValue(doc, "characteristic_str"));
+		m.setCharacteristicUri(SolrUtils.getFieldValue(doc, "characteristic_uri_str"));
+		m.setInstrumentModel(SolrUtils.getFieldValue(doc, "instrument_model_str"));
+		m.setInstrumentUri(SolrUtils.getFieldValue(doc, "instrument_uri_str"));
+		m.setPlatformName(SolrUtils.getFieldValue(doc, "platform_name_str"));
+		m.setPlatformUri(SolrUtils.getFieldValue(doc, "platform_uri_str"));
+		m.setLocation(SolrUtils.getFieldValue(doc, "location_latlong"));
+		m.setElevation(Double.parseDouble(SolrUtils.getFieldValue(doc, "elevation_double")));
+		m.setDatasetUri(SolrUtils.getFieldValue(doc, "dataset_uri_str"));
+		if (doc.getFieldValue("timestamp_date") != null) {
+			m.setTimestamp(((Date)doc.getFieldValue("timestamp_date")));
 		}
-		if (doc.getFieldValue("timestamp") != null) {
-			m.setTimestamp(((Date)doc.getFieldValue("timestamp")).toInstant().toString());
-		}
-		m.setAbstractTime(doc.getFieldValue("named_time").toString());
-		m.setValue(doc.getFieldValue("value").toString());
-		m.setUnit(doc.getFieldValue("unit").toString());
-		m.setUnitUri(doc.getFieldValue("unit_uri").toString());
-		m.setEntity(doc.getFieldValue("entity").toString());
-		m.setEntityUri(doc.getFieldValue("entity_uri").toString());
-		m.setCharacteristic(doc.getFieldValue("characteristic").toString());
-		m.setCharacteristicUri(doc.getFieldValue("characteristic_uri").toString());
-		m.setInstrumentModel(doc.getFieldValue("instrument_model").toString());
-		m.setInstrumentUri(doc.getFieldValue("instrument_uri").toString());
-		m.setPlatformName(doc.getFieldValue("platform_name").toString());
-		m.setPlatformUri(doc.getFieldValue("platform_uri").toString());
-		if (doc.getFieldValue("location") != null) {
-			m.setLocation(doc.getFieldValue("location").toString());
-		}
-		if (doc.getFieldValue("elevation") != null) {
-			m.setElevation(Double.parseDouble(doc.getFieldValue("elevation").toString()));
-		}
-		m.setDatasetUri(doc.getFieldValue("dataset_uri").toString());
-
+		
 		return m;
 	}
 }

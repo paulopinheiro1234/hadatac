@@ -15,6 +15,7 @@ import org.apache.jena.query.ResultSet;
 import org.apache.jena.query.ResultSetFactory;
 import org.apache.jena.query.ResultSetRewindable;
 import org.apache.jena.rdf.model.Literal;
+import org.hadatac.console.http.ConfigUtils;
 import org.hadatac.entity.pojo.ObjectCollection;
 import org.hadatac.entity.pojo.StudyObject;
 import org.hadatac.utils.Collections;
@@ -31,7 +32,7 @@ import play.mvc.Controller;
 import play.mvc.Result;
 
 public class SampleGenerator extends BasicGenerator {
-	final String kbPrefix = Play.application().configuration().getString("hadatac.community.ont_prefix") + "-kb:";
+	final String kbPrefix = ConfigUtils.getKbPrefix();
 	private String dataAcquisition = "";
 	private int counter = 1; //starting index number
 	

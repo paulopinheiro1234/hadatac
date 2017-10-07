@@ -9,11 +9,12 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.csv.CSVRecord;
+import org.hadatac.console.http.ConfigUtils;
 
 import play.Play;
 
 public class AgentGenerator extends BasicGenerator {
-	final String kbPrefix = Play.application().configuration().getString("hadatac.community.ont_prefix") + "-kb:";
+	final String kbPrefix = ConfigUtils.getKbPrefix();
 	private int counter = 1; //starting index number
 	
 	public AgentGenerator(File file) {

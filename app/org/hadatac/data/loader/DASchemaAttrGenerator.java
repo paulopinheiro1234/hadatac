@@ -6,6 +6,7 @@ import java.io.FileReader;
 
 import org.apache.commons.io.FileUtils;
 import org.hadatac.console.controllers.annotator.AutoAnnotator;
+import org.hadatac.console.http.ConfigUtils;
 
 import play.Play;
 
@@ -18,7 +19,7 @@ import org.apache.commons.csv.CSVRecord;
 
 public class DASchemaAttrGenerator extends BasicGenerator {
 
-    final String kbPrefix = Play.application().configuration().getString("hadatac.community.ont_prefix") + "-kb:";
+    final String kbPrefix = ConfigUtils.getKbPrefix();
     String startTime = "";
     String SDDName = "";
     HashMap<String, String> codeMap;

@@ -35,7 +35,7 @@ public class AttributeInstance extends HADatAcThing implements Comparable<Attrib
 
 	public long getNumberFromSolr(List<String> values, FacetHandler facetHandler) {
 		SolrQuery query = new SolrQuery();
-		query.setQuery(facetHandler.getTempSolrQuery("CHAR_URI", "characteristic_uri", values));
+		query.setQuery(facetHandler.getTempSolrQuery("CHAR_URI", "characteristic_uri_str", values));
 		query.setRows(0);
 		query.setFacet(false);
 

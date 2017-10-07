@@ -24,12 +24,12 @@ public class OCNode {
     
     public String getName() {
         return name;
-    }	    
+    } 
         
     public String getURI() {
         return uri;
-    }	    
-        
+    }
+    
     public int getType() {
         return type;
     }	    

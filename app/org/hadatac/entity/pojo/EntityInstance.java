@@ -39,19 +39,19 @@ public class EntityInstance extends HADatAcThing implements Comparable<EntityIns
 	public Map<HADatAcThing, List<HADatAcThing>> getTargetFacets(
 			List<String> preValues, FacetHandler facetHandler) {
 		SolrQuery query = new SolrQuery();
-		query.setQuery(facetHandler.getTempSolrQuery("CHAR_URI", "characteristic_uri", preValues));
+		query.setQuery(facetHandler.getTempSolrQuery("CHAR_URI", "characteristic_uri_str", preValues));
 		query.setRows(0);
 		query.setFacet(true);
 		query.setFacetLimit(-1);
 		query.setParam("json.facet", "{ "
-				+ "entity_uri:{ "
+				+ "entity_uri_str:{ "
 				+ "type: terms, "
-				+ "field: entity_uri,"
+				+ "field: entity_uri_str, "
 				+ "limit: 1000, "
 				+ "facet:{ "
-				+ "characteristic_uri: { "
-				+ "type : terms,"
-				+ "field: characteristic_uri,"
+				+ "characteristic_uri_str: { "
+				+ "type : terms, "
+				+ "field: characteristic_uri_str, "
 				+ "limit: 1000}}}}");
 
 		try {

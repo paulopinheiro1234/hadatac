@@ -8,6 +8,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.commons.csv.CSVRecord;
+import org.hadatac.console.http.ConfigUtils;
 import org.hadatac.console.models.SysUser;
 import org.hadatac.entity.pojo.DataAcquisition;
 import org.hadatac.entity.pojo.Deployment;
@@ -23,7 +24,7 @@ import play.Play;
 import java.lang.Exception;
 
 public class DataAcquisitionGenerator extends BasicGenerator {
-	final String kbPrefix = Play.application().configuration().getString("hadatac.community.ont_prefix") + "-kb:";
+	final String kbPrefix = ConfigUtils.getKbPrefix();
 	String startTime = "";
 	
 	public DataAcquisitionGenerator(File file) {

@@ -2,6 +2,7 @@ package org.hadatac.data.api;
 
 import java.util.List;
 
+import org.hadatac.console.http.ConfigUtils;
 import org.hadatac.entity.pojo.ConsoleStore;
 import org.hadatac.entity.pojo.DataAcquisition;
 import org.hadatac.entity.pojo.DataAcquisitionSchema;
@@ -26,7 +27,7 @@ public class DataFactory {
     
     public static String CONSOLE_ID = "00000001";
     
-    public static final String kbPrefix = Play.application().configuration().getString("hadatac.community.ont_prefix") + "-kb:";
+    public static final String kbPrefix = ConfigUtils.getKbPrefix();
     
     public static DataAcquisition createDataAcquisition(int triggeringEvent,
 							String dataCollectionUri, 

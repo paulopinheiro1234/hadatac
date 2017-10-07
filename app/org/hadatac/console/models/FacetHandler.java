@@ -128,11 +128,11 @@ public class FacetHandler {
 		
 		try {
 			JSONObject obj = (JSONObject)(new JSONParser().parse(str));
-			loadFacet(ENTITY_CHARACTERISTIC_FACET, obj.get(ENTITY_CHARACTERISTIC_FACET), "characteristic_uri");
-			loadFacet(STUDY_FACET, obj.get(STUDY_FACET), "acquisition_uri");
-			loadFacet(UNIT_FACET, obj.get(UNIT_FACET), "unit_uri");
-			loadFacet(TIME_FACET, obj.get(TIME_FACET), "timestamp");
-			loadFacet(PLATFORM_INSTRUMENT_FACET, obj.get(PLATFORM_INSTRUMENT_FACET), "instrument_uri");
+			loadFacet(ENTITY_CHARACTERISTIC_FACET, obj.get(ENTITY_CHARACTERISTIC_FACET), "characteristic_uri_str");
+			loadFacet(STUDY_FACET, obj.get(STUDY_FACET), "acquisition_uri_str");
+			loadFacet(UNIT_FACET, obj.get(UNIT_FACET), "unit_uri_str");
+			loadFacet(TIME_FACET, obj.get(TIME_FACET), "timestamp_date");
+			loadFacet(PLATFORM_INSTRUMENT_FACET, obj.get(PLATFORM_INSTRUMENT_FACET), "instrument_uri_str");
 		} catch (ParseException e) {
 			e.printStackTrace();
 		}

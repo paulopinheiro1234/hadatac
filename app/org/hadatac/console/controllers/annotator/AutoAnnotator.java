@@ -3,18 +3,13 @@ package org.hadatac.console.controllers.annotator;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.StringWriter;
 import java.io.PrintWriter;
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URL;
 import java.net.URLDecoder;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.spi.FileTypeDetector;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -26,8 +21,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import javax.servlet.http.HttpServletResponse;
 
@@ -41,23 +34,19 @@ import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
 import org.apache.jena.rdf.model.Property;
 import org.apache.jena.rdf.model.Resource;
-import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.ss.usermodel.WorkbookFactory;
 import org.hadatac.entity.pojo.Credential;
 import org.hadatac.console.controllers.AuthApplication;
-import org.hadatac.console.controllers.dataacquisitionsearch.LoadCCSV;
 import org.hadatac.console.controllers.annotator.routes;
 import org.hadatac.console.controllers.annotator.AnnotationLog;
-import org.hadatac.console.http.DeploymentQueries;
+import org.hadatac.console.http.ConfigUtils;
 import org.hadatac.console.http.ResumableUpload;
 import org.hadatac.console.models.AssignOptionForm;
 import org.hadatac.console.models.CSVAnnotationHandler;
 import org.hadatac.console.models.LabKeyLoginForm;
-import org.hadatac.console.models.SparqlQueryResults;
-import org.hadatac.console.models.TripleDocument;
 import org.hadatac.console.models.SysUser;
 import org.hadatac.console.views.html.annotator.*;
 import org.hadatac.console.views.html.triplestore.*;
@@ -66,7 +55,6 @@ import org.hadatac.data.api.DataFactory;
 import org.hadatac.data.loader.AgentGenerator;
 import org.hadatac.data.loader.DASchemaAttrGenerator;
 import org.hadatac.data.loader.DASchemaEventGenerator;
-import org.hadatac.data.loader.DASchemaGenerator;
 import org.hadatac.data.loader.DASchemaObjectGenerator;
 import org.hadatac.data.loader.DataAcquisitionGenerator;
 import org.hadatac.data.loader.DeploymentGenerator;
@@ -84,9 +72,6 @@ import org.hadatac.data.model.ParsingResult;
 import org.hadatac.entity.pojo.DataFile;
 import org.hadatac.entity.pojo.Measurement;
 import org.hadatac.entity.pojo.DataAcquisition;
-import org.hadatac.entity.pojo.DataAcquisitionSchema;
-import org.hadatac.entity.pojo.DataAcquisitionSchemaAttribute;
-import org.hadatac.entity.pojo.DataAcquisitionSchemaObject;
 import org.hadatac.entity.pojo.User;
 import org.hadatac.metadata.loader.LabkeyDataHandler;
 import org.hadatac.metadata.loader.ValueCellProcessing;
@@ -95,18 +80,17 @@ import org.hadatac.utils.ConfigProp;
 import org.hadatac.utils.Feedback;
 import org.hadatac.utils.NameSpaces;
 import org.hadatac.utils.State;
-import org.joda.time.DateTime;
 import org.labkey.remoteapi.CommandException;
 
 import be.objectify.deadbolt.java.actions.Group;
 import be.objectify.deadbolt.java.actions.Restrict;
 import play.Play;
+import play.twirl.api.Html;
 import play.data.Form;
 import play.mvc.Controller;
 import play.mvc.Result;
 import play.mvc.BodyParser;
 import play.mvc.Http.MultipartFormData.FilePart;
-import play.twirl.api.Html;
 
 public class AutoAnnotator extends Controller {
 
@@ -114,7 +98,7 @@ public class AutoAnnotator extends Controller {
 	public static HashMap<String, String> entityMappings = new HashMap<String, String>();
 	public static HashMap<String, List<String>> codebook = new HashMap<String, List<String>>();
 	public static String study_id = "default-study";
-	public static final String kbPrefix = Play.application().configuration().getString("hadatac.community.ont_prefix") + "-kb:";
+	public static final String kbPrefix = ConfigUtils.getKbPrefix();
 
 	private static boolean search(String fileName, List<DataFile> pool) {
 		for (DataFile file : pool) {
@@ -472,19 +456,9 @@ public class AutoAnnotator extends Controller {
 	public static boolean annotateStudyIdFile(File file) {
 		boolean bSuccess = true;
 		try {
-
 			StudyGenerator studyGenerator = new StudyGenerator(file);
 			bSuccess = commitRows(studyGenerator.createRows(), studyGenerator.toString(), 
-					file.getName(), "Study", true);        	
-
-			/*        	studyGenerator = new StudyGenerator(file);
-			bSuccess = commitRows(studyGenerator.createAgentRows(), studyGenerator.toString(), 
-			file.getName(), "Agent", true);
-
-			studyGenerator = new StudyGenerator(file);
-			bSuccess = commitRows(studyGenerator.createInstitutionRows(), studyGenerator.toString(), 
-			file.getName(), "Agent", true);
-			 */
+					file.getName(), "Study", true);
 		} catch (Exception e) {
 			System.out.println("Error: annotateStudyIdFile() - Unable to generate study");
 			AnnotationLog.printException(e, file.getName());
@@ -498,7 +472,7 @@ public class AutoAnnotator extends Controller {
 		} catch (Exception e) {
 			System.out.println("Error: annotateStudyIdFile() - Unable to generate Sample Collection");
 			AnnotationLog.printException(e, file.getName());
-			//return false;
+			return false;
 		}    	
 		try {
 			AgentGenerator agentGenerator = new AgentGenerator(file);
@@ -519,15 +493,12 @@ public class AutoAnnotator extends Controller {
 		try {
 			SampleGenerator sampleGenerator = new SampleGenerator(file);
 			bSuccess = sampleGenerator.createOc();
-			System.out.println(bSuccess);
-			
 		} catch (Exception e) {
 			System.out.println("Error: annotateSampleIdFile() - Unable to generate Sample");
-			e.printStackTrace();
 			AnnotationLog.printException(e, file.getName());
 			return false;
 		}
-		
+
 		return bSuccess;
 	}
 
@@ -567,7 +538,7 @@ public class AutoAnnotator extends Controller {
 		}
 	}
 
-	private static boolean directUpdateRows(List<Map<String, Object>> rows, String contentInCSV,
+	private static boolean directUpdateRows(List<Map<String, Object>> rows, String contentInCSV, 
 			String fileName, String tableName, boolean toTripleStore) {
 
 		AnnotationLog log = AnnotationLog.find(fileName);
@@ -722,14 +693,12 @@ public class AutoAnnotator extends Controller {
 			AnnotationLog.printException(e, file.getName());
 			return false;
 		}
+		
 		return bSuccess;
 	}
 
 	public static boolean annotateDataAcquisitionSchemaFile(File file) {
-
 		boolean bSuccess = true;
-		//System.out.println(file.getName());
-
 		try{
 			HashMap<String, String> hm = new HashMap<String, String>();
 
@@ -773,9 +742,7 @@ public class AutoAnnotator extends Controller {
 					}
 				}
 			}
-
-
-
+			
 			if (hm.containsKey("Study_ID")){
 				study_id = hm.get("Study_ID");
 			}
@@ -919,7 +886,7 @@ public class AutoAnnotator extends Controller {
 	}
 
 	public static boolean annotateCSVFile(DataFile dataFile) {
-	        System.out.println("annotateCSVFile: [" + dataFile.getFileName() + "]"); 
+		System.out.println("annotateCSVFile: [" + dataFile.getFileName() + "]"); 
 		String file_name = dataFile.getFileName();    	
 		AnnotationLog log = new AnnotationLog();
 		log.setFileName(file_name);
@@ -932,17 +899,17 @@ public class AutoAnnotator extends Controller {
 		if (dataFile != null) {
 			da = DataAcquisition.findByUri(ValueCellProcessing.replacePrefixEx(dataFile.getDataAcquisitionUri()));
 			if (da != null) {
-			    if (!da.isComplete()) {
-				log.addline(Feedback.println(Feedback.WEB, 
-					    String.format("[WARNING] Specification of associated Data Acquisition is incomplete: %s", file_name)));
-				log.save();
-				return false;
-			    } else {
-				log.addline(Feedback.println(Feedback.WEB, String.format("[OK] Specification of associated Data Acquisition is complete: %s", file_name)));
-			    }
-			    da_uri = da.getUri();
-			    deployment_uri = da.getDeploymentUri();
-			    schema_uri = da.getSchemaUri();
+				if (!da.isComplete()) {
+					log.addline(Feedback.println(Feedback.WEB, 
+							String.format("[WARNING] Specification of associated Data Acquisition is incomplete: %s", file_name)));
+					log.save();
+					return false;
+				} else {
+					log.addline(Feedback.println(Feedback.WEB, String.format("[OK] Specification of associated Data Acquisition is complete: %s", file_name)));
+				}
+				da_uri = da.getUri();
+				deployment_uri = da.getDeploymentUri();
+				schema_uri = da.getSchemaUri();
 			}
 		}
 
@@ -975,41 +942,6 @@ public class AutoAnnotator extends Controller {
 			log.addline(Feedback.println(Feedback.WEB, String.format("[OK] Deployment %s specified for data acquisition %s", deployment_uri, file_name)));
 		}
 
-		/*
-		CSVAnnotationHandler handler = null;
-		if (!deployment_uri.equals("")) {
-		        // Add deployment information into handler
-			String json = DeploymentQueries.exec(DeploymentQueries.DEPLOYMENT_BY_URI, deployment_uri);
-			SparqlQueryResults results = new SparqlQueryResults(json, false);
-			Iterator<TripleDocument> iterator = results.sparqlResults.values().iterator();
-			if (iterator.hasNext()) {
-				TripleDocument docDeployment = iterator.next();
-				handler = new CSVAnnotationHandler(deployment_uri, 
-						docDeployment.get("platform"), 
-						docDeployment.get("instrument"));
-			} else {
-				log.addline(Feedback.println(Feedback.WEB, String.format(
-						"[ERROR] Could not find the deployment: %s", deployment_uri)));
-				log.save();
-				return false;
-			}
-
-			// Add possible detector's characteristics into handler
-			String dep_json = DeploymentQueries.exec(
-					DeploymentQueries.DEPLOYMENT_CHARACTERISTICS_BY_URI, deployment_uri);
-			SparqlQueryResults char_results = new SparqlQueryResults(dep_json, false);
-			Map<String,String> deploymentChars = new HashMap<String,String>();
-			Iterator<TripleDocument> iterDoc = char_results.sparqlResults.values().iterator();
-			while (iterDoc.hasNext()) {
-				TripleDocument docChar = (TripleDocument)iterDoc.next();
-				if (docChar != null && docChar.get("char") != null && docChar.get("charName") != null) {
-					deploymentChars.put((String)docChar.get("char"),(String)docChar.get("charName"));
-				}
-			}
-			handler.setDeploymentCharacteristics(deploymentChars);
-
-			}*/
-
 		String path_unproc = ConfigProp.getPropertyValue("autoccsv.config", "path_unproc");
 		int status = -1;
 		String message = "";
@@ -1019,51 +951,41 @@ public class AutoAnnotator extends Controller {
 		arguments.setOutputPath("upload/");
 		arguments.setVerbose(true);
 		arguments.setPv(false);
-		
+
 		Parser parser = new Parser();
 		ParsingResult result_parse;
 		File inputFile = new File(arguments.getInputPath());
 		FileFactory files = new FileFactory(arguments);
 		files.setCSVFile(inputFile, inputFile.getName());
-		
+
 		try {
-		    files.openFile("log", "w");
-		    files.writeln("log", "[START] " + arguments.getInputPath() + " generating measurements.");
+			files.openFile("log", "w");
+			files.writeln("log", "[START] " + arguments.getInputPath() + " generating measurements.");
 		} catch (Exception e) {
-		    log.addline(Feedback.println(Feedback.WEB, String.format("[ERROR] opening CSV file %s", e.getMessage())));
-		    log.save();
-		    return false;
+			log.addline(Feedback.println(Feedback.WEB, String.format("[ERROR] opening CSV file %s", e.getMessage())));
+			log.save();
+			return false;
 		}
 
 		try {
-		    if (arguments.getInputType().equals("CSV")) {
-			System.out.println("annotateCSVFile: file to be parsed [" + dataFile.getFileName() + "]"); 
-			dataFile.setDatasetUri(DataFactory.getNextDatasetURI(da.getUri()));
-			da.addDatasetUri(dataFile.getDatasetUri());
-			result_parse = parser.indexMeasurements(files, da, dataFile);
-			status = result_parse.getStatus();
-			message += result_parse.getMessage();
-		    }
+			if (arguments.getInputType().equals("CSV")) {
+				System.out.println("annotateCSVFile: file to be parsed [" + dataFile.getFileName() + "]"); 
+				dataFile.setDatasetUri(DataFactory.getNextDatasetURI(da.getUri()));
+				da.addDatasetUri(dataFile.getDatasetUri());
+				result_parse = parser.indexMeasurements(files, da, dataFile);
+				status = result_parse.getStatus();
+				message += result_parse.getMessage();
+			}
 		} catch (Exception e) {
-		    StringWriter errors = new StringWriter();
-		    e.printStackTrace(new PrintWriter(errors));
-		    log.addline(Feedback.println(Feedback.WEB, String.format("[ERROR] parsing and indexing CVS file %s", errors.toString())));
-		    log.save();
-		    return false;
+			StringWriter errors = new StringWriter();
+			e.printStackTrace(new PrintWriter(errors));
+			log.addline(Feedback.println(Feedback.WEB, String.format("[ERROR] parsing and indexing CSV file %s", errors.toString())));
+			log.save();
+			return false;
 		}
 
-		/*
-		try {
-			FileUtils.writeStringToFile(new File(LoadCCSV.UPLOAD_NAME), 
-					createPreamble(handler, schema_uri) + 
-					FileUtils.readFileToString(newFile, "UTF-8")); */
-
-		// Parse and load the generated CCSV file
-		//ParsingResult result = LoadCCSV.playLoadCCSV();
-		//log.addline(result.getMessage());
-		//log.save();
 		if (status == 0) {
-		    return true;
+			return true;
 		}
 
 		return false;
@@ -1071,7 +993,6 @@ public class AutoAnnotator extends Controller {
 
 	private static String createPreamble(CSVAnnotationHandler handler, 
 			String schema_uri) throws Exception {
-		//System.out.println("CREATING PREAMBLE FOR " + schema_uri);
 		String preamble = Downloads.FRAG_START_PREAMBLE;
 		preamble += NameSpaces.getInstance().printTurtleNameSpaceList();
 		preamble += "\n";
@@ -1093,7 +1014,6 @@ public class AutoAnnotator extends Controller {
 		}
 
 		preamble += Downloads.FRAG_END_PREAMBLE;
-		//System.out.println("PREAMBLE: " + preamble);
 
 		return preamble;
 	}
