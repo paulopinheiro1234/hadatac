@@ -1,10 +1,14 @@
 package org.hadatac.data.loader;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileReader;
+
 import org.apache.commons.io.FileUtils;
 import org.hadatac.console.controllers.annotator.AutoAnnotator;
 import play.Play;
 import java.lang.String;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -22,10 +26,26 @@ public class DASchemaObjectGenerator extends BasicGenerator {
 	HashMap<String, String> codeMap;
 	// the DASOGenerator object for each study will have java objects of all the templates, too
 	List<DASVirtualObject> templateList;
+  List<String> timeList = new ArrayList<String>();
     
 	public DASchemaObjectGenerator(File file, String study_id) {
 		super(file);
 		this.studyId = study_id;
+		try {
+		    BufferedReader br = new BufferedReader(new FileReader(file));
+		    String line =  null;
+		    
+		    while((line = br.readLine()) != null){
+			String str[] = line.split(",");
+			if (str[4].length() > 0){
+			    timeList.add(str[4]);
+			    System.out.println("[DASOGen] str[0] = " + str[0] + ", timeList.add(" + str[4] + ")");
+			}
+		    }
+		    br.close();
+		} catch (Exception e) {
+		    
+		}
 	}
 
 	//Column	Attribute	attributeOf	Unit	Time	Entity	Role	Relation	inRelationTo	wasDerivedFrom	wasGeneratedBy	hasPosition	
@@ -136,19 +156,19 @@ public class DASchemaObjectGenerator extends BasicGenerator {
 		return rec.get(mapCol.get("HasPosition"));
 	}
     
-	@Override
-	public List< Map<String, Object> > createRows() throws Exception {
-		SDDName = fileName.replace("SDD-","").replace(".csv","");
-		codeMap = AutoAnnotator.codeMappings;
-		rows.clear();
-		int row_number = 0;
-		for (CSVRecord record : records) {
-			if (getEntity(record)  == null || getEntity(record).equals("")){
+    @Override
+    public List< Map<String, Object> > createRows() throws Exception {
+	SDDName = fileName.replace("SDD-","").replace(".csv","");
+	codeMap = AutoAnnotator.codeMappings;
+    	rows.clear();
+    	int row_number = 0;
+    	for (CSVRecord record : records) {
+	    if (getEntity(record)  == null || getEntity(record).equals("") || timeList.contains(getLabel(record))){
 				continue;
-			} else {
-				rows.add(createRow(record, ++row_number));
-			}
-		}
+	    } else {
+		rows.add(createRow(record, ++row_number));
+	    }
+        }
 		//for(int i = 0; i < templateList.size(); i++){
 		//	System.out.println("[DAShemaObjectGenerator] " + templateList.get(i));
 		//}
@@ -173,16 +193,19 @@ public class DASchemaObjectGenerator extends BasicGenerator {
     	if (getInRelationTo(rec) != null || !getInRelationTo(rec).equals("")){
     		row.put("sio:inRelationTo", getInRelationTo(rec));
     	}
-//    	row.put("sio:inRelationTo", getInRelationTo(rec));
+    	row.put("sio:Relation", getRelation(rec));
+    	row.put("hasco:hasUnit", getUnit(rec));
     	row.put("hasco:isVirtual", checkVirtual(rec).toString());
     	row.put("hasco:isPIConfirmed", "false");
 
 			// Also generate a DASVirtualObject for each virtual column
 			if(checkVirtual(rec)){
 				row.put("dcterms:alternativeName", getLabel(rec).trim().replace(" ",""));
+				System.out.println("[DASOGen] getTime = " + getTime(rec));
+				row.put("sio:existsAt", getTime(rec));
 				DASVirtualObject toAdd = new DASVirtualObject(getLabel(rec).trim().replace(" ",""), row);
 				templateList.add(toAdd);
-				//System.out.println("[DASOGenerator] created template: \n" + toAdd);
+				System.out.println("[DASOGenerator] created template: \n" + toAdd);
 			}
     	
     	return row;

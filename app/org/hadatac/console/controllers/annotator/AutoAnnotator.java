@@ -463,8 +463,7 @@ public class AutoAnnotator extends Controller {
 		boolean bSuccess = true;
 		try {
 			SampleSubjectMapper mapper = new SampleSubjectMapper(file);
-			bSuccess = directUpdateRows(mapper.createRows(), mapper.toString(), 
-					file.getName(), "Sample", true);
+			bSuccess = mapper.updateMappings();
 		} catch (Exception e) {
 			e.printStackTrace();
 			AnnotationLog.printException(e, file.getName());
@@ -523,11 +522,7 @@ public class AutoAnnotator extends Controller {
 		boolean bSuccess = true;
 		try {
 			SampleGenerator sampleGenerator = new SampleGenerator(file);
-			bSuccess = commitRows(sampleGenerator.createRows(), sampleGenerator.toString(), 
-					file.getName(), "Sample", true);
-			//sampleGenerator = new SampleGenerator(file);
-			//bSuccess = commitRows(sampleGenerator.createCollectionRows(), sampleGenerator.toString(), 
-			//		file.getName(), "SampleCollection", true);
+			bSuccess = sampleGenerator.createOc();
 			System.out.println(bSuccess);
 			
 		} catch (Exception e) {
@@ -536,16 +531,7 @@ public class AutoAnnotator extends Controller {
 			AnnotationLog.printException(e, file.getName());
 			return false;
 		}
-		try {
-			SampleCollectionGenerator sampleCollectionGenerator = new SampleCollectionGenerator(file);
-			commitRows(sampleCollectionGenerator.createRows(), sampleCollectionGenerator.toString(), 
-					file.getName(), "SampleCollection", true);
-
-		} catch (Exception e) {
-			System.out.println("Error: annotateSampleIdFile() - Unable to generate Sample Collection");
-			AnnotationLog.printException(e, file.getName());
-			//return false;
-		}    	
+		
 		return bSuccess;
 	}
 
@@ -833,16 +819,19 @@ public class AutoAnnotator extends Controller {
 				HashMap<String,String> tempMap;
 				String workingCol = "";
 				String workingKey = "";
+				bufRdr3.readLine();
 				while((line3 = bufRdr3.readLine()) != null){
 					String[] codes = line3.split(",");
 					List<String> codesl = Arrays.asList(codes);
 					String tempCol = codesl.get(0);
-					if(tempCol.equals("") || tempCol == null){
-						if(codebook.containsKey(workingKey)){
-							tempMap = (HashMap)codebook.get(workingKey);
-							tempMap.put(codesl.get(1), codesl.get(4));
-							//System.out.println("[AutoAnnotator]: added to " + workingKey + ": " + codebook.get(workingKey));
-						}
+					if(tempCol.equals("") || tempCol == null || codebook.containsKey(workingKey)){
+						tempMap = (HashMap)codebook.get(workingKey);
+						//System.out.println("[AutoAnnotator] before " + tempMap);
+						tempMap.put(codesl.get(1), codesl.get(4));
+						//System.out.println("[AutoAnnotator] after " + tempMap);
+						codebook.put(workingKey, tempMap);
+						//System.out.println("[AutoAnnotator] added to " + workingKey + ": " + codebook.get(workingKey));
+						//System.out.println("[AutoAnnotator] size now " + codebook.get(workingKey).size());
 					} else {
 						workingCol = tempCol;
 						workingKey = kbPrefix + "DASO-" + file.getName().replace("SDD-","").replace(".csv","") + "-" + workingCol.trim().replace(" ","").replace("_","-").replace("??", "");
@@ -850,12 +839,14 @@ public class AutoAnnotator extends Controller {
 						tempMap.put(codesl.get(1), codesl.get(4));
 						codebook.put(workingKey, tempMap);
 						//System.out.println("[AutoAnnotator]: added to " + workingKey + ": " + codebook.get(workingKey));
+						//System.out.println("[AutoAnnotator]: size now " + codebook.get(workingKey).size());
 					}
 				}
 				bufRdr3.close();
 				//System.out.println("RIGHT BEFORE PVG: " + study_id);
 				PVGenerator pvGenerator = new PVGenerator(cb);
 				//System.out.println("Calling PVGenerator");
+				//System.out.println("[AutoAnnotator] made a codebook :\n" + codebook);
 				bSuccess = commitRows(pvGenerator.createRows(), pvGenerator.toString(), file.getName(), "PossibleValue", true); // check URI's!
 				cb.delete();
 

@@ -103,6 +103,8 @@ public class DASOInstance {
 		this.setRelations(relations);
 		this.setOrigValue("");
 		this.setUri(generateURI());
+
+		//this.save();
 	}// /constructor
 
 
@@ -113,12 +115,14 @@ public class DASOInstance {
 		templateValues.put("id", this.rowKey);
 		if(this.rowKey.equals("summaryClass")){
 			if(this.relations.containsKey("rdfs:subClassOf")){
-				String[] temp = this.relations.get("rdfs:subClassOf").split("_",2);
+				String t = this.relations.get("rdfs:subClassOf").split(":",2)[1];
+				String[] temp = t.split("_",2);
 				String mod = temp[0];
 				if(temp.length > 1) mod += "/val/"+temp[1];
 				this.setOrigValue(mod);
-				if(this.relations.containsKey("sio:measuredAt")){
-					mod += "/" + this.relations.get("sio:measuredAt");
+				if(this.relations.containsKey("sio:existsAt")){
+					System.out.println("[DASOInstance] time = " + this.relations.get("sio:existsAt"));
+					mod += "/time/" + this.relations.get("sio:existsAt");
 				}
 				templateValues.put("modifier", mod.replaceAll("[ ';.,]",""));
 			}
@@ -144,11 +148,11 @@ public class DASOInstance {
 	public void save() {
 		//delete();  // delete any existing triple for the current DASA
 		if (this.getUri() == null || this.getUri().equals("")) {
-			System.out.println("[ERROR] Trying to save DASOInstance without assigning a URI");
+			System.out.println("[DASOInstance] [ERROR] Trying to save DASOInstance without assigning a URI");
 			return;
 		}
 		if (this.getType() == null || this.getType().equals("")) {
-			System.out.println("[ERROR] Trying to save DASOInstance without assigning a type");
+			System.out.println("[DASOInstance] [ERROR] Trying to save DASOInstance without assigning a type");
 			return;
 		}
 		String insert = "";
@@ -200,10 +204,10 @@ public class DASOInstance {
 		}
 		query += DELETE_LINE3;
 		query += LINE_LAST;
-		//System.out.println("SPARQL query inside dasa poho's delete: " + query);
-		//UpdateRequest request = UpdateFactory.create(query);
-		//UpdateProcessor processor = UpdateExecutionFactory.createRemote(request, Collections.getCollectionsName(Collections.METADATA_UPDATE));
-		//processor.execute();
+		System.out.println("[DASOI] SPARQL query inside delete(): " + query);
+		UpdateRequest request = UpdateFactory.create(query);
+		UpdateProcessor processor = UpdateExecutionFactory.createRemote(request, Collections.getCollectionsName(Collections.METADATA_UPDATE));
+		processor.execute();
 	}// /delete()
 	
 

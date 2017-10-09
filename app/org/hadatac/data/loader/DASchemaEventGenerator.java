@@ -80,11 +80,12 @@ public class DASchemaEventGenerator extends BasicGenerator {
     
     private String getUnit(CSVRecord rec) {
     	if (codeMap.containsKey(rec.get(mapCol.get("Unit")))) {
-	    return codeMap.get(rec.get(mapCol.get("Unit")));
-    	} else {
+    		return codeMap.get(rec.get(mapCol.get("Unit")));
+    	} else if (rec.get(mapCol.get("Unit")) != null){
+    		return rec.get(mapCol.get("Unit"));
+    	}
 	    return "obo:UO_0000186";
     	}
-    }
     
     private String getTime(CSVRecord rec) {
     	return rec.get(mapCol.get("Time"));

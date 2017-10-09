@@ -146,10 +146,9 @@ public class Parser {
 			posNamedTime = tempPositionOfLabel(schema.getNamedTimeLabel()); 
 		}
 		if (!schema.getIdLabel().equals("")) {
-			posId = tempPositionOfLabel(schema.getIdLabel()); 
 		}
 		if (!schema.getOriginalIdLabel().equals("")) {
-			System.out.println("[Parser] schema.getOriginalIdLabel() = " + schema.getOriginalIdLabel()); // 
+			//System.out.println("[Parser] schema.getOriginalIdLabel() = " + schema.getOriginalIdLabel()); // 
 			posOriginalId = tempPositionOfLabel(schema.getOriginalIdLabel()); 
 		}
 		if (!schema.getEntityLabel().equals("")) {
@@ -220,14 +219,14 @@ public class Parser {
 			//System.out.println("pos. of id column: " + schema.getIdLabel());
 			while (iter.hasNext()) {
 				DataAcquisitionSchemaAttribute dasa = iter.next();
-				System.out.println("[Parser] read a DASA " + dasa.getUri() + " with label " + dasa.getLabel());
+				//System.out.println("[Parser] read a DASA " + dasa.getUri() + " with label " + dasa.getLabel());
 				// why is schema.getAttributes() returning DASAs that don't belong to the schema?
 				if (!dasa.getPartOfSchema().equals(schema.getUri())){
 					//System.out.println("[Parser] .... Skipping attribute " + dasa.getPartOfSchema() + " != " + schema.getUri());
 					continue;
 				}
 				if (!record.isMapped(dasa.getLabel())) {
-					System.out.println("[Parser] .... Skipping attribute " + dasa.getLabel() + " : not in the DA file");
+					//System.out.println("[Parser] .... Skipping attribute " + dasa.getLabel() + " : not in the DA file");
 					continue;
 				}
 				if (dasa.getLabel().equals(schema.getTimestampLabel())) {
@@ -315,7 +314,7 @@ public class Parser {
 				} else if (!schema.getNamedTimeLabel().equals("")) {
 					String timeValue = record.get(posNamedTime);
 					if (timeValue != null) {
-						System.out.println("[Parser] timeValue = " + timeValue);
+						//System.out.println("[Parser] timeValue = " + timeValue);
 						measurement.setAbstractTime(timeValue);
 					} else {
 						measurement.setAbstractTime("");
@@ -388,7 +387,7 @@ public class Parser {
 				 *   SET OBJECT ID, PID, SID   *
 				 *                             *
 				 *=============================*/
-				System.out.println("[Parser] dasa.getObjectUri() " + dasa.getObjectUri());
+				//System.out.println("[Parser] dasa.getObjectUri() " + dasa.getObjectUri());
 				//System.out.println("[Parser] rowInstances.get(dasa.getObjectUri()) " + rowInstances.get(dasa.getObjectUri()));
 				//System.out.println("[Parser] rowInstances.get(dasa.getObjectUri()).getUri() " + rowInstances.get(dasa.getObjectUri()).getUri());
 				if (!schema.getOriginalIdLabel().equals("")){
@@ -406,7 +405,7 @@ public class Parser {
 					measurement.setSID("");
 				} else if (dasa.getObjectUri() != null) {
 					String auxUri = rowInstances.get(dasa.getObjectUri()).getUri();
-					System.out.println("[Parser] " + dasa.getObjectUri() + " yields instance URI " + auxUri);
+					//System.out.println("[Parser] " + dasa.getObjectUri() + " yields instance URI " + auxUri);
 					measurement.setObjectUri(auxUri);
 					measurement.setPID("");
 					measurement.setSID("");
@@ -453,13 +452,14 @@ public class Parser {
 				 *   SET URI, OWNER AND DA D   *
 				 *                             *
 				 *=============================*/
-				System.out.println("[Parser] Set URI, Owner and DA URI");
+				//System.out.println("[Parser] Set URI, Owner and DA URI");
 				/*measurement.setUri(ValueCellProcessing.replacePrefixEx(measurement.getStudyUri()) + "/" + 
 						ValueCellProcessing.replaceNameSpaceEx(da.getUri()).split(":")[1] + "/" +
 						dasa.getLocalName() + "-" + total_count);
 				*/
 				measurement.setUri(ValueCellProcessing.replacePrefixEx(measurement.getStudyUri()) + "/" + 
 						 rowInstances.get(dasa.getObjectUri()).getLabel() + "/attr/" + 
+						// this now returns null :C
 						 rowInstances.get(dasa.getObjectUri()).getOrigValue().replaceAll("[ ,.:]","") + "/" + 
 						 dasa.getAttributeLabel().replaceAll("[ ,.:]",""));
 				measurement.setOwnerUri(da.getOwnerUri());
@@ -471,7 +471,7 @@ public class Parser {
 				 *                             *
 				 *=============================*/
 
-				System.out.println("[Parser] Set Unit");
+				//System.out.println("[Parser] Set Unit");
 				// HACK FOR JUNE 20
 				if (isSample && !unitOverride.equals("") && !unitLabelOverride.equals("")) {
 					measurement.setUnit(uppercaseFirstLetter(unitLabelOverride));
@@ -496,7 +496,7 @@ public class Parser {
 				 *                                 *
 				 *=================================*/
 
-				System.out.println("[Parser] Set Instrument and Platform");	
+				//System.out.println("[Parser] Set Instrument and Platform");	
 				measurement.setInstrumentModel(uppercaseFirstLetter(da.getDeployment().getInstrument().getLabel()));
 				measurement.setInstrumentUri(uppercaseFirstLetter(da.getDeployment().getInstrument().getUri()));
 				measurement.setPlatformName(uppercaseFirstLetter(da.getDeployment().getPlatform().getLabel()));
@@ -508,7 +508,7 @@ public class Parser {
 				 *                                 *
 				 *=================================*/
 
-				System.out.println("[Parser] Set Entity and Attribute");
+				//System.out.println("[Parser] Set Entity and Attribute");
 				// HACK FOR JUNE 20
 				//System.out.println("dasa.getEntity : <" + dasa.getEntity() + ">");
 

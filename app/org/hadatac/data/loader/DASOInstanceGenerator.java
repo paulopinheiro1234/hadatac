@@ -31,35 +31,35 @@ public class DASOInstanceGenerator{
 
 	//
 	private String resolveVirtualEntity(DASVirtualObject workingObj, String workingField, CSVRecord rec) {
-		//System.out.println("[DASVirtualObjectGen]: resolving " + workingField  + " for " + workingObj.getTemplateUri());
+		//System.out.println("[DASOInstanceGen]: resolving " + workingField  + " for " + workingObj.getTemplateUri());
 		if(workingField.contains("DASO") || workingField.startsWith("??")){
 			if(codebook.containsKey(workingField)){
 				// Check to see if there's a codebook entry
 				HashMap<String,String> cbForCol = (HashMap)codebook.get(workingField);
 				try{
 					DataAcquisitionSchemaObject toResolve = DataAcquisitionSchemaObject.find(ValueCellProcessing.convertToWholeURI(workingField));
-					//System.out.println("[DASVirtualObject] expanded " + toResolve.getLabel());
+					//System.out.println("[DASOInstanceGen] expanded " + toResolve.getLabel());
 					String colName = toResolve.getLabel();
 					if(rec.isMapped(colName)) {
 						String item = rec.get(colName);
-						//System.out.println("[DASVOGen] item " + item);
+						//System.out.println("[DASOInstanceGen] colName: " + colName + " item: " + item);
 						if (cbForCol.containsKey(item))
 							return cbForCol.get(item);
 						else return item;
 					}	else if(rec.isMapped(colName.replace("-","_"))) {
 						String item = rec.get(colName.replace("-","_"));
-						//System.out.println("[DASVOGen] item " + item);
+						//System.out.println("[DASOInstanceGen] colName: " + colName + " item: " + item);
 						if (cbForCol.containsKey(item))
 							return cbForCol.get(item);
 						else return item;
 					}
 				} catch (Exception e){
-					System.out.println("[DASVirtualObject] ERROR resolving entity: ");
+					System.out.println("[DASOInstanceGen] ERROR resolving entity: ");
 					e.printStackTrace(System.out);
 				}
 			} else {
 				// If not, fetch the appropriate row entity's URI
-				System.out.println("[DASVirtualObject]: " + workingObj.getTemplateUri() + " not found in codebook");
+				System.out.println("[DASOInstanceGen]: " + workingObj.getTemplateUri() + " not found in codebook");
 				// find the right template
 				// get that uri
 			}
@@ -114,7 +114,6 @@ public class DASOInstanceGenerator{
 						tempRelations.put(entry.getKey(), rec.get(current.getOriginalLabel()));
 					} else {
 						String resolved = resolveVirtualEntity(current, entry.getValue(), rec);
-						//System.out.println("[DASOInstanceGenerator] added relation " + entry.getKey() + " " + resolved);
 						tempRelations.put(entry.getKey(),resolved);
 					}
 				}
@@ -126,7 +125,7 @@ public class DASOInstanceGenerator{
 				instances.put(ValueCellProcessing.convertToWholeURI(current.getTemplateUri()), tempDASOI);
 				//System.out.println("[DASOInstanceGenerator] Made an instance: " + tempDASOI);
 			} else {
-				System.out.println("[DASOInstanceGenerator] WARN: row instance missing uri or type info!");
+				System.out.println("[DASOInstanceGen] WARN: row instance missing uri or type info!");
 			}
 		}// /iterate over templates
 		return instances;
