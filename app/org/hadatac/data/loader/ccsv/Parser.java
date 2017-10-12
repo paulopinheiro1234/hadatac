@@ -531,9 +531,15 @@ public class Parser {
 
 				// TODO: un-hack this
 				// HACK FOR AUGUST 18
-				measurement.setEntity(rowInstances.get(dasa.getObjectUri()).getLabel()); 
-				measurement.setEntityUri(dasa.getEntity());
+				// HEAD
+				//measurement.setEntity(rowInstances.get(dasa.getObjectUri()).getLabel()); 
+				//measurement.setEntityUri(dasa.getEntity());
 				//System.out.println("[Parser] getEntity " + dasa.getEntity());
+
+				// ORIGIN
+				measurement.setEntity("STUDY OBJECT");
+				measurement.setEntityUri(StudyObject.findUribyOriginalId(measurement.getValue()));
+
 				measurement.setCharacteristic(uppercaseFirstLetter(dasa.getAttributeLabel()));
 				measurement.setCharacteristicUri(dasa.getAttribute());
 

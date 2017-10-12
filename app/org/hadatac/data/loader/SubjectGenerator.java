@@ -164,7 +164,7 @@ public class SubjectGenerator extends BasicGenerator {
 		System.out.println("oc saved!");
 		// update/create new OC in LabKey
 		int nRowsAffected = oc.saveToLabKey("gychant", "labkey");
-		System.out.println("nRowsAffected : " + nRowsAffected);
+//		System.out.println("nRowsAffected : " + nRowsAffected);
 		if (nRowsAffected <= 0) {
 			System.out.println("Failed to insert new OC to LabKey!\n");
 			return false;
