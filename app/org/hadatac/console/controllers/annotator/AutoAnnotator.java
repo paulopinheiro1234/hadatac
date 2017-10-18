@@ -593,7 +593,7 @@ public class AutoAnnotator extends Controller {
 			log = new AnnotationLog();
 			log.setFileName(fileName);
 		}
-
+		
 		try {
 			checkRows(rows, "hasURI");
 			//System.out.println("checkRows succeed.");
@@ -773,13 +773,13 @@ public class AutoAnnotator extends Controller {
 
 			try{
 				URL url3 = new URL(hm.get("Codebook"));
-				//System.out.println(url3.toString());
+				System.out.println(url3.toString());
 				File cb = new File("sddtmp/" + file.getName().replace(".csv", "")+"-codebook.csv");
 				//System.out.println(cb.getAbsoluteFile());
 				FileUtils.copyURLToFile(url3, cb);
 				BufferedReader bufRdr3 = new BufferedReader(new FileReader(cb));
 				String line3 =  null;
-				//System.out.println("Read Codebook");
+				System.out.println("Read Codebook");
 				while((line3 = bufRdr3.readLine()) != null){
 					String[] codes = line3.split(",");
 					List<String> codesl = Arrays.asList(codes); 
@@ -788,17 +788,19 @@ public class AutoAnnotator extends Controller {
 				bufRdr3.close();
 				//System.out.println("RIGHT BEFORE PVG: " + study_id);
 				PVGenerator pvGenerator = new PVGenerator(cb);
-				//System.out.println("Calling PVGenerator");
+				System.out.println("Calling PVGenerator");
 				bSuccess = commitRows(pvGenerator.createRows(), pvGenerator.toString(), 
 						file.getName(), "PossibleValue", true);
 				cb.delete();
 
 			} catch (Exception e) {
+				e.printStackTrace();
 				System.out.println("Error annotateDataAcquisitionSchemaFile: Unable to read codebook");
 				File cb = new File(file.getName().replace(".csv", "")+"-codebook.csv");
 				System.out.println(cb.getAbsoluteFile());
 				System.out.println(cb.length());
 				cb.delete();
+				return false;
 			}
 
 			try {
