@@ -86,7 +86,7 @@ public class PVGenerator extends BasicGenerator {
 		row.put("hasco:hasCodeLabel", getCodeLabel(rec));
 		row.put("hasco:hasClass", getClass(rec));
 		row.put("hasco:hasResource", getResource(rec));
-		row.put("hasco:isPossibleValueOf", kbPrefix + "DASA-" + getLabel(rec).replace("_","-").replace("??", ""));
+		row.put("hasco:isPossibleValueOf", kbPrefix + "DASA-" + study_id + "-" + getLabel(rec).trim().replace(" ", "").replace("_","-").replace("??", ""));
 		return row;
 	}
 }
