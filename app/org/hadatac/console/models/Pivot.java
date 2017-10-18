@@ -9,6 +9,7 @@ public class Pivot {
 
 	public String field;
 	public String value;
+	public String tooltip;
 	public int count;
 
 	public Pivot() {

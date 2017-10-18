@@ -16,6 +16,7 @@ import org.apache.jena.update.UpdateExecutionFactory;
 import org.apache.jena.update.UpdateFactory;
 import org.apache.jena.update.UpdateProcessor;
 import org.apache.jena.update.UpdateRequest;
+import org.apache.solr.common.SolrDocument;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Statement;
@@ -151,6 +152,7 @@ public class Platform extends HADatAcThing implements Comparable<Platform> {
 					continue;
 				}
 				da.setUri(soln.get("dataAcquisitionUri").toString());
+				da.setLabel(soln.get("dataAcquisitionLabel").toString());
 				if (!results.containsKey(platform)) {
 					List<HADatAcThing> facets = new ArrayList<HADatAcThing>();
 					results.put(platform, facets);

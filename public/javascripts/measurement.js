@@ -135,9 +135,9 @@ function create_item(data) {
 		element.id = tree_id;
 		tree_id++;
 		element.text = facetPrettyName(data.field, children[i_child].value) + ' (' + children[i_child].count + ')';
-		element.tooltip = children[i_child].value;
+		element.tooltip = children[i_child].tooltip;
 		element.userdata = [{"name": "field", "content": children[i_child].field},
-			{"name": "value", "content": children[i_child].value}];
+			{"name": "value", "content": children[i_child].tooltip}];
 		element.item = create_item(children[i_child]);
 		item.push(element);
 	}

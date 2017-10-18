@@ -36,11 +36,7 @@
         <div class="col-md-8 col-md-offset-1">
 
          @if(oper=="init") {
-	         <h4>Load facts from LabKey into metadata store...</h4>
-
-             <div id="rcorners">
-                 The metadata store has @MetadataContext.playTotalTriples() triples. <br>
-                 
+             <div id="rcorners">                 
                  <form class="form-horizontal" name="labkeyLogin" method="post" action="@postAction" >
 
              		<div class="row">
@@ -79,16 +75,12 @@
              </script>
          }
          
-         @if(oper=="login_failed") {
-         	<h4>Load facts from LabKey into metadata store...</h4>
-         	
+         @if(oper=="login_failed") {         	
          	<script type="text/javascript">
 				alert("Invalid email address or password.");
 			</script>
              
-             <div id="rcorners">
-                 The metadata store has @MetadataContext.playTotalTriples() triples. <br>
-                 
+             <div id="rcorners">                 
                  <form class="form-horizontal" name="labkeyLogin" method="post" action="@postAction">
 
              		<div class="row">

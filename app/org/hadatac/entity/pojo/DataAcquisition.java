@@ -131,7 +131,7 @@ public class DataAcquisition extends HADatAcThing {
 	 * 2 - DataAcquisition already exists, the preamble states its termination with endedAtTime information
 	 * 		It should exist inside the KB as not finished yet
 	 *
-	 * 9999 - Data Acquisition spec is complete (anything else diferent than 99 is considered incomplete
+	 * 9999 - Data Acquisition spec is complete (anything else diferent than 9999 is considered incomplete
 	 *
 	 */
 

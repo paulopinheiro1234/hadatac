@@ -28,7 +28,6 @@ import org.labkey.remoteapi.CommandException;
 
 import be.objectify.deadbolt.java.actions.Group;
 import be.objectify.deadbolt.java.actions.Restrict;
-import play.Play;
 import play.data.Form;
 import play.mvc.*;
 import play.mvc.Result;
@@ -117,6 +116,16 @@ public class PrepareIngestion extends Controller {
 
 	@Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
 	public static Result postCreate(String file_name, String da_uri) {
+		return create(file_name, da_uri);
+	}
+	
+	@Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
+	public static Result reconfigure(String file_name, String da_uri) {
+		DataAcquisition dataAcquisition = DataAcquisition.findByUri(da_uri);
+		if (null != dataAcquisition) {
+			dataAcquisition.setStatus(0);
+			dataAcquisition.save();
+		}
 		return create(file_name, da_uri);
 	}
 

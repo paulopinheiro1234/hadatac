@@ -78,6 +78,7 @@ public class Instrument extends HADatAcThing implements Comparable<Instrument> {
 					continue;
 				}
 				da.setUri(soln.get("dataAcquisitionUri").toString());
+				da.setLabel(soln.get("dataAcquisitionLabel").toString());
 				if (!results.containsKey(instrument)) {
 					List<HADatAcThing> facets = new ArrayList<HADatAcThing>();
 					results.put(instrument, facets);

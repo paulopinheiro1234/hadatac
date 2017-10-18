@@ -7,6 +7,7 @@ import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.time.format.FormatStyle;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -58,33 +59,30 @@ public class Measurement {
 	@Field("pid_str")
 	private String pid;
 	@Field("sid_str")
-	private String sid;
-	@Field("unit_str")
-	private String unit;
+	private String sid;	
 	@Field("unit_uri_str")
 	private String unitUri;
-	@Field("entity_str")
-	private String entity;
+	@Field("dasa_uri_str")
+	private String schemaAttributeUri;
 	@Field("entity_uri_str")
-	private String entityUri;
-	@Field("characteristic_str")
-	private String characteristic;
+	private String entityUri;	
 	@Field("characteristic_uri_str")
-	private String characteristicUri;
-	@Field("instrument_model_str")
-	private String instrumentModel;
-	@Field("instrument_uri_str")
-	private String instrumentUri;
-	@Field("platform_name_str")
-	private String platformName;
-	@Field("platform_uri_str")
-	private String platformUri;
+	private String characteristicUri;	
 	@Field("location_latlong")
 	private String location;
 	@Field("elevation_double")
 	private double elevation;
 	@Field("dataset_uri_str")
 	private String datasetUri;
+	
+	// Variables that are not stored in Solr
+	private String entity;
+	private String characteristic;
+	private String unit;
+	private String platformName;
+	private String platformUri;
+	private String instrumentModel;
+	private String instrumentUri;
 
 	public String getOwnerUri() {
 		return ownerUri;
@@ -316,6 +314,14 @@ public class Measurement {
 	public void setUnitUri(String unitUri) {
 		this.unitUri = unitUri;
 	}
+	
+	public String getSchemaAttributeUri() {
+		return schemaAttributeUri;
+	}
+	
+	public void setSchemaAttributeUri(String schemaAttributeUri) {
+		this.schemaAttributeUri = schemaAttributeUri;
+	}
 
 	public String getEntity() {
 		return entity;
@@ -393,7 +399,7 @@ public class Measurement {
 				Play.application().configuration().getString("hadatac.solr.data") 
 				+ Collections.DATA_ACQUISITION).build();
 		try {
-			UpdateResponse response = solr.deleteByQuery("dataset_uri:\"" + datasetUri + "\"");
+			UpdateResponse response = solr.deleteByQuery("dataset_uri_str:\"" + datasetUri + "\"");
 			solr.commit();
 			solr.close();
 			return response.getStatus();
@@ -558,7 +564,6 @@ public class Measurement {
 		} catch (SolrServerException e) {
 			System.out.println("[ERROR] Measurement.findMinTime(String, String) - SolrServerException message: " + e.getMessage());
 		} catch (Exception e) {
-			e.printStackTrace();
 			System.out.println("[ERROR] Measurement.findMinTime(String, String) - Exception message: " + e.getMessage());
 		}
 
@@ -586,11 +591,11 @@ public class Measurement {
 				return m.getTimestamp();
 			}
 		} catch (IOException e) {
-			System.out.println("[ERROR] Measurement.findMinTime(String, String) - IOException message: " + e.getMessage());
+			System.out.println("[ERROR] Measurement.findMaxTime(String, String) - IOException message: " + e.getMessage());
 		} catch (SolrServerException e) {
-			System.out.println("[ERROR] Measurement.findMinTime(String, String) - SolrServerException message: " + e.getMessage());
+			System.out.println("[ERROR] Measurement.findMaxTime(String, String) - SolrServerException message: " + e.getMessage());
 		} catch (Exception e) {
-			System.out.println("[ERROR] Measurement.findMinTime(String, String) - Exception message: " + e.getMessage());
+			System.out.println("[ERROR] Measurement.findMaxTime(String, String) - Exception message: " + e.getMessage());
 		}
 
 		return null;
@@ -650,9 +655,9 @@ public class Measurement {
 			return result;
 		}
 
-		Date minTime = findMinTime("timestamp", q);
+		Date minTime = findMinTime("timestamp_date", q);
 		System.out.println("minTime: " + minTime);
-		Date maxTime = findMaxTime("timestamp", q);
+		Date maxTime = findMaxTime("timestamp_date", q);
 		System.out.println("maxTime: " + maxTime);
 		
 		String gap = null;
@@ -774,8 +779,11 @@ public class Measurement {
 			fTree = new FacetTree();
 			fTree.setTargetFacet(AttributeInstance.class);
 			fTree.addUpperFacet(Indicator.class);
+			fTree.addUpperFacet(EntityRole.class);
 			fTree.addUpperFacet(EntityInstance.class);
-			result.extra_facets.put(FacetHandler.ENTITY_CHARACTERISTIC_FACET, getFacetStats(fTree, handler, true));
+			pivot = getFacetStats(fTree, handler, true);
+			fTree.mergeFacetTree(1, 0, new ArrayList<Integer>(Arrays.asList(3)), null, pivot, "", null);
+			result.extra_facets.put(FacetHandler.ENTITY_CHARACTERISTIC_FACET, pivot);
 			
 			fTree = new FacetTree();
 			fTree.setTargetFacet(UnitInstance.class);
@@ -793,6 +801,7 @@ public class Measurement {
 			System.out.println("[ERROR] Measurement.find() - IOException message: " + e.getMessage());
 		} catch (Exception e) {
 			System.out.println("[ERROR] Measurement.find() - Exception message: " + e.getMessage());
+			e.printStackTrace();
 		}
 
 		result.setDocumentSize((long) docSize);
@@ -917,6 +926,7 @@ public class Measurement {
 		m.setValue(SolrUtils.getFieldValue(doc, "value_str"));
 		m.setUnit(SolrUtils.getFieldValue(doc, "unit_str"));
 		m.setUnitUri(SolrUtils.getFieldValue(doc, "unit_uri_str"));
+		m.setSchemaAttributeUri(SolrUtils.getFieldValue(doc, "dasa_uri_str"));
 		m.setEntity(SolrUtils.getFieldValue(doc, "entity_str"));
 		m.setEntityUri(SolrUtils.getFieldValue(doc, "entity_uri_str"));
 		m.setCharacteristic(SolrUtils.getFieldValue(doc, "characteristic_str"));

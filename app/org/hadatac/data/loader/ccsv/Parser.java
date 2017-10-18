@@ -41,13 +41,14 @@ public class Parser {
 
 	public ParsingResult indexMeasurements(FileFactory files, DataAcquisition da, DataFile dataFile){
 		System.out.println("indexMeasurements()...");
+		
 		schema = DataAcquisitionSchema.find(da.getSchemaUri());
 		String message = "";
 
 		try {
 			files.openFile("csv", "r");
 		} catch (IOException e) {
-			e.printStackTrace();
+			System.out.println("[ERROR] Fail to open the csv file\n");
 			message += "[ERROR] Fail to open the csv file\n";
 			return new ParsingResult(1, message);
 		}
@@ -56,7 +57,7 @@ public class Parser {
 		try {
 			records = CSVFormat.DEFAULT.withHeader().parse(files.getReader("csv"));
 		} catch (IOException e) {
-			e.printStackTrace();
+			System.out.println("[ERROR] Fail to parse header of the csv file\n");
 			message += "[ERROR] Fail to parse header of the csv file\n";
 			return new ParsingResult(1, message);
 		}
@@ -70,9 +71,6 @@ public class Parser {
 		boolean isSample;
 		String matrix = "";
 		String analyte = "";
-		String unitOverride = "";
-		String unitLabelOverride = "";
-
 		ObjectCollection oc = null;
 		if (da.getGlobalScopeUri() != null && !da.getGlobalScopeUri().equals("")) {
 			oc = ObjectCollection.find(da.getGlobalScopeUri());
@@ -116,39 +114,6 @@ public class Parser {
 		}
 
 		for (CSVRecord record : records) {
-			// HACK FOR JUNE20 >>>>>>>>>>>>>>
-			isSample = false;
-			unitOverride = "";
-			unitLabelOverride = "";
-			analyte = "";
-			if (record.get(0).toLowerCase().equals("sample") ) {
-				isSample = true;
-				if (record.get(5) != null && !record.get(5).equals("")) {
-					matrix = record.get(5);
-					matrix = matrix.substring(0,1).toUpperCase() + matrix.substring(1).toLowerCase();
-				} else {
-					matrix = "";
-				}
-				if (record.get(6) != null && !record.get(6).equals("")) {
-					analyte = "concentration of " + record.get(6);
-				} else {
-					analyte = "";
-				}
-				if (record.get(8) != null && !record.get(8).equals("")) {
-					switch (record.get(8).trim()) {
-					case "microg/L":  
-						unitOverride = "http://geneontology.org/GO.format.obo-1_2.shtml#UO_0000301";
-						unitLabelOverride = "microgram per liter";
-						break;
-					case "ppb" :  
-						unitOverride = "http://geneontology.org/GO.format.obo-1_2.shtml#UO_0000170";
-						unitLabelOverride = "parts per billion";
-						break;
-					}
-				}
-			}
-			// HACK FOR JUNE20 <<<<<<<<<<<<<<
-
 			Iterator<DataAcquisitionSchemaAttribute> iter = schema.getAttributes().iterator();
 			while (iter.hasNext()) {
 				DataAcquisitionSchemaAttribute dasa = iter.next();
@@ -185,12 +150,12 @@ public class Parser {
 				 *                   *
 				 *===================*/
 
-				if (dasa.getTempPositionInt() <= -1 || dasa.getTempPositionInt() >= record.size()) {
+				if (dasa.getTempPositionInt() <= -1 || dasa.getTempPositionInt() > record.size()) {
 					continue;
-				} else if (record.get(dasa.getTempPositionInt()).isEmpty()) { 
+				} else if (record.get(dasa.getTempPositionInt() - 1).isEmpty()) { 
 					continue;
 				} else {
-					String originalValue = record.get(dasa.getTempPositionInt());
+					String originalValue = record.get(dasa.getTempPositionInt() - 1);
 					String codeValue = Subject.findCodeValue(dasa.getAttribute(), originalValue);
 					if (codeValue == null) {
 						measurement.setValue(originalValue);
@@ -285,162 +250,155 @@ public class Parser {
 				}
 
 
-			/*=============================*
-			 *                             *
-			 *   SET URI, OWNER AND DA D   *
-			 *                             *
-			 *=============================*/
+				/*=============================*
+				 *                             *
+				 *   SET URI, OWNER AND DA URI *
+				 *                             *
+				 *=============================*/
 
-			measurement.setUri(ValueCellProcessing.replacePrefixEx(measurement.getStudyUri()) + "/" + 
-					ValueCellProcessing.replaceNameSpaceEx(da.getUri()).split(":")[1] + "/" +
-					dasa.getLocalName() + "-" + total_count);
-			measurement.setOwnerUri(da.getOwnerUri());
-			measurement.setAcquisitionUri(da.getUri());
+				measurement.setUri(ValueCellProcessing.replacePrefixEx(measurement.getStudyUri()) + "/" + 
+						ValueCellProcessing.replaceNameSpaceEx(da.getUri()).split(":")[1] + "/" +
+						dasa.getLocalName() + "-" + total_count);
+				measurement.setOwnerUri(da.getOwnerUri());
+				measurement.setAcquisitionUri(da.getUri());
 
-			/*=============================*
-			 *                             *
-			 *   SET UNIT                  *
-			 *                             *
-			 *=============================*/
-			if (isSample && !unitOverride.equals("") && !unitLabelOverride.equals("")) {
-				measurement.setUnitUri(unitOverride);
-			} else if (!schema.getUnitLabel().equals("")) {
-				String unitValue = record.get(posUnit);
-				if (unitValue != null) {
-					measurement.setUnitUri(dasa.getUnit());
+				/*=============================*
+				 *                             *
+				 *   SET UNIT                  *
+				 *                             *
+				 *=============================*/
+				if (!schema.getUnitLabel().equals("")) {
+					String unitValue = record.get(posUnit);
+					if (unitValue != null) {
+						measurement.setUnitUri(dasa.getUnit());
+					} else {
+						measurement.setUnitUri(dasa.getUnit());
+					}
 				} else {
 					measurement.setUnitUri(dasa.getUnit());
 				}
-			} else {
-				measurement.setUnitUri(dasa.getUnit());
-			}
 
-			measurement.setEntity("Subject");
-			measurement.setEntityUri(dasa.getEntity());
-			measurement.setCharacteristicUri(dasa.getAttribute());
-			if (!schema.getEntityLabel().equals("") && !record.get(posEntity).equals("")) {
-				measurement.setEntity(record.get(posEntity));
-			}
+				measurement.setSchemaAttributeUri(dasa.getUri().replace("<", "").replace(">", ""));
+				measurement.setEntityUri(dasa.getEntity());
+				measurement.setCharacteristicUri(dasa.getAttribute());
 
-			/*=================================*
-			 *                                 *
-			 *   SET DATASET                   *
-			 *                                 *
-			 *=================================*/
-			measurement.setDatasetUri(dataFile.getDatasetUri());
+				/*=================================*
+				 *                                 *
+				 *   SET DATASET                   *
+				 *                                 *
+				 *=================================*/
+				measurement.setDatasetUri(dataFile.getDatasetUri());
 
-			try {
-				solr.addBean(measurement);
-			} catch (IOException | SolrServerException e) {
-				System.out.println("[ERROR] SolrClient.addBean - e.Message: " + e.getMessage());
-			}
-
-
-			// INTERMEDIARY COMMIT
-			if((++total_count) % batch_size == 0) {
 				try {
-					System.out.println("solr.commit()...");
-					solr.commit();
-					System.out.println(String.format("[OK] Committed %s measurements!", batch_size));
-					message += String.format("[OK] Committed %s measurements!\n", batch_size);
+					solr.addBean(measurement);
 				} catch (IOException | SolrServerException e) {
-					System.out.println("[ERROR] SolrClient.commit - e.Message: " + e.getMessage());
-					message += "[ERROR] Fail to commit to solr\n";
+					System.out.println("[ERROR] SolrClient.addBean - e.Message: " + e.getMessage());
+				}
+
+				// INTERMEDIARY COMMIT
+				if((++total_count) % batch_size == 0) {
 					try {
-						solr.close();
-					} catch (IOException e1) {
-						System.out.println("[ERROR] SolrClient.close - e.Message: " + e1.getMessage());
-						message += "[ERROR] Fail to close solr\n";
+						System.out.println("solr.commit()...");
+						solr.commit();
+						System.out.println(String.format("[OK] Committed %s measurements!", batch_size));
+						message += String.format("[OK] Committed %s measurements!\n", batch_size);
+					} catch (IOException | SolrServerException e) {
+						System.out.println("[ERROR] SolrClient.commit - e.Message: " + e.getMessage());
+						message += "[ERROR] Fail to commit to solr\n";
+						try {
+							solr.close();
+						} catch (IOException e1) {
+							System.out.println("[ERROR] SolrClient.close - e.Message: " + e1.getMessage());
+							message += "[ERROR] Fail to close solr\n";
+						}
+						return new ParsingResult(1, message);
 					}
-					return new ParsingResult(1, message);
 				}
 			}
 		}
-	}
 
-	// FINAL COMMIT
-	try {
+		// FINAL COMMIT
 		try {
-			System.out.println("solr.commit()...");
-			solr.commit();
-			System.out.println(String.format("[OK] Committed %s measurements!", total_count % batch_size));
-			message += String.format("[OK] Committed %s measurements!\n", total_count % batch_size);
-		} catch (IOException | SolrServerException e) {
-			solr.close();
-			System.out.println("[ERROR] SolrClient.commit - e.Message: " + e.getMessage());
-			message += "[ERROR] Fail to commit to solr\n";
+			try {
+				System.out.println("solr.commit()...");
+				solr.commit();
+				System.out.println(String.format("[OK] Committed %s measurements!", total_count % batch_size));
+				message += String.format("[OK] Committed %s measurements!\n", total_count % batch_size);
+			} catch (IOException | SolrServerException e) {
+				solr.close();
+				System.out.println("[ERROR] SolrClient.commit - e.Message: " + e.getMessage());
+				message += "[ERROR] Fail to commit to solr\n";
+				return new ParsingResult(1, message);
+			}
+			files.closeFile("csv", "r");
+		} catch (IOException e) {
+			message += "[ERROR] Fail to close the csv file\n";
 			return new ParsingResult(1, message);
 		}
-		files.closeFile("csv", "r");
-	} catch (IOException e) {
-		e.printStackTrace();
-		message += "[ERROR] Fail to close the csv file\n";
-		return new ParsingResult(1, message);
+
+		da.addNumberDataPoints(total_count);
+		da.save();
+
+		System.out.println("Finished indexMeasurements()");
+		try {
+			solr.close();
+		} catch (IOException e) {
+			System.out.println("[ERROR] SolrClient.close - e.Message: " + e.getMessage());
+			message += "[ERROR] Fail to close solr\n";
+		}
+		return new ParsingResult(0, message);
 	}
 
-	da.addNumberDataPoints(total_count);
-	da.save();
 
-	System.out.println("Finished indexMeasurements()");
-	try {
-		solr.close();
-	} catch (IOException e) {
-		System.out.println("[ERROR] SolrClient.close - e.Message: " + e.getMessage());
-		message += "[ERROR] Fail to close solr\n";
-	}
-	return new ParsingResult(0, message);
-}
+	private void defineTemporaryPositions(String filename) {
 
+		if (schema == null || schema.getAttributes() == null || schema.getAttributes().size() == 0) {
+			return;
+		}
+		List<DataAcquisitionSchemaAttribute> dasas = schema.getAttributes();
+		List<String> headers = CSVPreview.getCSVHeaders(path_unproc, filename);
 
-private void defineTemporaryPositions(String filename) {
+		// reset temporary positions
+		for (DataAcquisitionSchemaAttribute dasa : dasas) {
+			dasa.setTempPositionInt(-1);
+		}
 
-	if (schema == null || schema.getAttributes() == null || schema.getAttributes().size() == 0) {
-		return;
-	}
-	List<DataAcquisitionSchemaAttribute> dasas = schema.getAttributes();
-	List<String> headers = CSVPreview.getCSVHeaders(path_unproc, filename);
+		// match dasas and labels, assigning temporary positions
+		for (int h = 0; h < headers.size(); h++) {
+			for (int d = 0; d < dasas.size(); d++) {
+				if (headers.get(h).equals(dasas.get(d).getLabel())) {
+					dasas.get(d).setTempPositionInt(h);
+				}
+			} 
+		}
 
-	// reset temporary positions
-	for (DataAcquisitionSchemaAttribute dasa : dasas) {
-		dasa.setTempPositionInt(-1);
-	}
-
-	// match dasas and labels, assigning temporary positions
-	for (int h = 0; h < headers.size(); h++) {
-		for (int d = 0; d < dasas.size(); d++) {
-			if (headers.get(h).equals(dasas.get(d).getLabel())) {
-				dasas.get(d).setTempPositionInt(h);
-			}
-		} 
-	}
-
-	// override temporary positions with permanent positions
-	for (int i = 0; i < dasas.size(); i++) {
-		if (dasas.get(i).getPositionInt() >= 0) {
-			dasas.get(i).setTempPositionInt(dasas.get(i).getPositionInt());
-		} 
-	}
-}
-
-private int tempPositionOfLabel(String label) {
-	if (label == null || label.equals("")) {
-		return -1;
-	}
-	for (DataAcquisitionSchemaAttribute dasa : schema.getAttributes()) {
-		if (dasa.getLabel().equals(label)) {
-			return dasa.getTempPositionInt();
+		// override temporary positions with permanent positions
+		for (int i = 0; i < dasas.size(); i++) {
+			if (dasas.get(i).getPositionInt() >= 0) {
+				dasas.get(i).setTempPositionInt(dasas.get(i).getPositionInt());
+			} 
 		}
 	}
 
-	return -1;
-}
+	private int tempPositionOfLabel(String label) {
+		if (label == null || label.equals("")) {
+			return -1;
+		}
+		for (DataAcquisitionSchemaAttribute dasa : schema.getAttributes()) {
+			if (dasa.getLabel().equals(label)) {
+				return dasa.getTempPositionInt();
+			}
+		}
 
-
-private String uppercaseFirstLetter(String str) {
-	if (str == null || str.equals("")) {
-		return str;
+		return -1;
 	}
-	return str.substring(0, 1).toUpperCase() + str.substring(1);
-}
+
+
+	private String uppercaseFirstLetter(String str) {
+		if (str == null || str.equals("")) {
+			return str;
+		}
+		return str.substring(0, 1).toUpperCase() + str.substring(1);
+	}
 
 }

@@ -76,10 +76,12 @@ public class EntityInstance extends HADatAcThing implements Comparable<EntityIns
 		for (Pivot pivot_ent : pivot.children) {
 			EntityInstance entity = new EntityInstance();
 			entity.setUri(pivot_ent.value);
+			entity.setLabel(Entity.find(pivot_ent.value).getLabel());
 			entity.setCount(pivot_ent.count);
 			for (Pivot pivot_attrib : pivot_ent.children) {
 				AttributeInstance attrib = new AttributeInstance();
 				attrib.setUri(pivot_attrib.value);
+				attrib.setLabel(Attribute.find(pivot_attrib.value).getLabel());
 				attrib.setCount(pivot_attrib.count);
 				if (!results.containsKey(entity)) {
 					List<HADatAcThing> attributes = new ArrayList<HADatAcThing>();

@@ -248,7 +248,6 @@ public class Indicator extends HADatAcThing implements Comparable<Indicator> {
 				+ "?studyIndicator rdfs:label ?indicatorLabel . "
 				+ "}";
 
-		System.out.println("Indicator Query: " + query);
 		Map<HADatAcThing, List<HADatAcThing>> mapIndicatorToCharList = new HashMap<HADatAcThing, List<HADatAcThing>>();
 		try {
 			QueryExecution qe = QueryExecutionFactory.sparqlService(

@@ -39,14 +39,14 @@ public class UnitInstance extends HADatAcThing implements Comparable<UnitInstanc
 	public Map<HADatAcThing, List<HADatAcThing>> getTargetFacets(
 			List<String> preValues, FacetHandler facetHandler) {
 		SolrQuery query = new SolrQuery();
-		query.setQuery(facetHandler.getTempSolrQuery("UNIT_URI", "unit_uri", preValues));
+		query.setQuery(facetHandler.getTempSolrQuery("UNIT_URI", "unit_uri_str", preValues));
 		query.setRows(0);
 		query.setFacet(true);
 		query.setFacetLimit(-1);
 		query.setParam("json.facet", "{ "
-				+ "unit_uri:{ "
+				+ "unit_uri_str:{ "
 				+ "type: terms, "
-				+ "field: unit_uri,"
+				+ "field: unit_uri_str,"
 				+ "limit: 1000}}");
 
 		try {
@@ -71,6 +71,7 @@ public class UnitInstance extends HADatAcThing implements Comparable<UnitInstanc
 		for (Pivot pivot_ent : pivot.children) {
 			UnitInstance unit = new UnitInstance();
 			unit.setUri(pivot_ent.value);
+			unit.setLabel(Unit.find(pivot_ent.value).getLabel());
 			unit.setCount(pivot_ent.count);
 			if (!results.containsKey(unit)) {
 				List<HADatAcThing> attributes = new ArrayList<HADatAcThing>();
