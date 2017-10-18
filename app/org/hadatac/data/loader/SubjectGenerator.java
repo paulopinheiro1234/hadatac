@@ -19,6 +19,7 @@ import org.hadatac.utils.Collections;
 import org.hadatac.utils.ConfigProp;
 import org.hadatac.utils.NameSpaces;
 import org.hadatac.console.controllers.AuthApplication;
+import org.hadatac.console.http.ConfigUtils;
 import org.hadatac.console.models.SysUser;
 import org.hadatac.entity.pojo.Study;
 import org.hadatac.entity.pojo.StudyObject;
@@ -42,7 +43,7 @@ public class SubjectGenerator extends BasicGenerator {
 
     private static String path_unproc = ConfigProp.getPropertyValue("autoccsv.config", "path_unproc");
 
-	final String kbPrefix = Play.application().configuration().getString("hadatac.community.ont_prefix") + "-kb:";
+	final String kbPrefix = ConfigUtils.getKbPrefix();
 	
 	StudyObject obj = null;
 	

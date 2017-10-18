@@ -3,12 +3,10 @@ package org.hadatac.console.controllers.objectcollections;
 
 import org.hadatac.console.controllers.AuthApplication;
 import org.hadatac.console.controllers.objectcollections.OCForceFieldGraph;
+import org.hadatac.console.views.html.objectcollections.*;
 
 import play.mvc.Controller;
 import play.mvc.Result;
-
-import org.hadatac.console.views.html.objectcollections.*;
-import org.hadatac.utils.Collections;
 
 import be.objectify.deadbolt.java.actions.Group;
 import be.objectify.deadbolt.java.actions.Restrict;

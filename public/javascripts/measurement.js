@@ -135,9 +135,9 @@ function create_item(data) {
 		element.id = tree_id;
 		tree_id++;
 		element.text = facetPrettyName(data.field, children[i_child].value) + ' (' + children[i_child].count + ')';
-		element.tooltip = children[i_child].value;
+		element.tooltip = children[i_child].tooltip;
 		element.userdata = [{"name": "field", "content": children[i_child].field},
-			{"name": "value", "content": children[i_child].value}];
+			{"name": "value", "content": children[i_child].tooltip}];
 		element.item = create_item(children[i_child]);
 		item.push(element);
 	}
@@ -145,10 +145,11 @@ function create_item(data) {
 	return item;
 }
 
-function parseSolrFacetToTree() {
+function parseSolrFacetToTree(facet_name) {
 	dataTree = {};
+	tree_id = 0;
 	dataTree.id = tree_id++;
-	items = create_item(json.extra_facets);
+	items = create_item(json.extra_facets[facet_name]);
 	if (null == items) {
 		items = [];
 	}

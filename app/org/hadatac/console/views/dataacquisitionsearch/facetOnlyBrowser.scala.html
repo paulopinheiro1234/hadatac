@@ -1,16 +1,17 @@
+@import helper._
+@import org.hadatac.console.views.html._
+@import org.hadatac.console.models.FacetHandler
+
 @(	page : Int,
 	rows : Int,
 	facets : String,
 	resultsSize : Long,
 	results : org.hadatac.data.model.AcquisitionQueryResult,
 	documentJson : String,
-	handler : org.hadatac.console.models.FacetHandler,
+	handler : FacetHandler,
 	query : String,
 	objDetails : String
 )
-
-@import helper._
-@import org.hadatac.console.views.html._
 
 @main("Simple Faceted Search") {
 	<script type="text/javascript" src="/hadatac/assets/javascripts/datasearch.js"></script>
@@ -114,6 +115,20 @@
 		tree.enableThreeStateCheckboxes(false);
 		tree.setImagePath("@controllers.routes.Assets.versioned("lib/dhtmlx/imgs/dhxtree_skyblue/")");
 		tree.setDataMode("json");
+		tree.attachEvent("onCheck", function(id) {
+			tree.setSubChecked(id, tree.isItemChecked(id));
+			var checked_items = tree.getAllChecked();
+			if (checked_items.length > 0) {
+				checked_items.split(",").forEach(function(element) {
+				if (tree.getAllSubItems(element).split(",").includes(id.toString())) {
+					if (!tree.isItemChecked(id)) {
+						tree.setCheck(element, false);
+					}
+				}
+				});	
+			}
+		});
+		tree.parse(data, "json");
 		//tree.attachEvent("onCheck",function(id) {
 			//jsonFacet['facetsAnd'][tree.getUserData(id, 'field')] = tree.getUserData(id, 'value');
 			//var url = location.protocol + '//' + location.host + location.pathname;
@@ -121,9 +136,8 @@
 			//window.location.href = encodeURI(url);
 			//return true;
 		//});
-		tree.parse(data, "json");
 		//tree.openAllItems(0);
-                tree.closeAllItems(0);
+		//tree.closeAllItems(0);
 	}
 	
 	var btn = document.getElementById("btn_download");
@@ -137,49 +151,42 @@
 	
 	var jsonTree, dataTree;
 	var treeEC;
-	var props = "entity,characteristic";
-	jsonTree = parseSolrFacetPivotToTree(props);
-	dataTree = JSON.parse(jsonTree);
-	//dataTree = parseSolrFacetToTree();
+	dataTree = parseSolrFacetToTree('@FacetHandler.ENTITY_CHARACTERISTIC_FACET');
+	//console.log("dataTree: " + JSON.stringify(dataTree));
 	treeEC = new dhtmlXTreeObject("treeEntityCharacteristicBox","100%","100%",0);
 	loadTree(treeEC, dataTree);
-        var listEC = '@handler.values(handler.ENTITY_CHARACTERISTIC_FACET)';
-        setCheckTree(treeEC, listEC, props);
+	//var listEC = '@handler.values(FacetHandler.ENTITY_CHARACTERISTIC_FACET)';
+	//setCheckTree(treeEC, listEC, props);
 	
 	var treeS;
-        var props = "study_uri,acquisition_uri";
-	jsonTree = parseSolrFacetPivotToTree(props);
-	dataTree = JSON.parse(jsonTree);
+	dataTree = parseSolrFacetToTree('@FacetHandler.STUDY_FACET');
+	console.log("dataTree: " + JSON.stringify(dataTree));
 	treeS = new dhtmlXTreeObject("treeStudyBox","100%","100%",0);
 	loadTree(treeS, dataTree);
-        var listS = '@handler.values(handler.STUDY_FACET)';
-        setCheckTree(treeS, listS, props);
+	//var listS = '@handler.values(FacetHandler.STUDY_FACET)';
+	//setCheckTree(treeS, listS, props);
 	
 	var treeU;
-        var props = "unit";
-	jsonTree = parseSolrFacetFieldToTree(props);
-	dataTree = JSON.parse(jsonTree);
+	dataTree = parseSolrFacetToTree('@FacetHandler.UNIT_FACET');
 	treeU = new dhtmlXTreeObject("treeUnitBox","100%","100%",0);
 	loadTree(treeU, dataTree);
-        var listU = '@handler.values(handler.UNIT_FACET)';
-        setCheckTree(treeU, listU, props);
+	//var listU = '@handler.values(FacetHandler.UNIT_FACET)';
+	//setCheckTree(treeU, listU, props);
 	
 	var treeT;
-        var props = "timestamp";
+	props = "timestamp";
 	jsonTree = parseSolrRangeFacetFieldToTree(props);
 	dataTree = JSON.parse(jsonTree);
 	treeT = new dhtmlXTreeObject("treeTimeBox","100%","100%",0);
 	loadTree(treeT, dataTree);
-        var listT = '@handler.values(handler.TIME_FACET)';
-        setCheckTree(treeT, listT, props);
+	//var listT = '@handler.values(FacetHandler.TIME_FACET)';
+	//setCheckTree(treeT, listT, props);
 	
 	var treePI;
-        var props = "platform_name,instrument_model";
-	jsonTree = parseSolrFacetPivotToTree(props);
-	dataTree = JSON.parse(jsonTree);
+	dataTree = parseSolrFacetToTree('@FacetHandler.PLATFORM_INSTRUMENT_FACET');
 	treePI = new dhtmlXTreeObject("treePlatformInstrumentBox","100%","100%",0);
 	loadTree(treePI, dataTree);
-        var listPI = '@handler.values(handler.PLATFORM_INSTRUMENT_FACET)';
-        setCheckTree(treePI, listPI, props);
+	//var listPI = '@handler.values(FacetHandler.PLATFORM_INSTRUMENT_FACET)';
+	//setCheckTree(treePI, listPI, props);
 	</script>
 }

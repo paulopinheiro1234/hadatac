@@ -19,6 +19,7 @@ import org.apache.jena.query.ResultSetRewindable;
 import org.apache.jena.rdf.model.Model;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrQuery;
+import org.apache.solr.client.solrj.SolrRequest;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.beans.Field;
 import org.apache.solr.client.solrj.impl.HttpSolrClient;
@@ -27,6 +28,7 @@ import org.apache.solr.client.solrj.response.UpdateResponse;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
 import org.hadatac.console.controllers.AuthApplication;
+import org.hadatac.console.models.FacetHandler;
 import org.hadatac.metadata.loader.LabkeyDataHandler;
 import org.hadatac.metadata.loader.ValueCellProcessing;
 import org.hadatac.entity.pojo.ObjectCollection;
@@ -37,7 +39,6 @@ import org.hadatac.utils.NameSpaces;
 import org.hadatac.utils.State;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
-import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 import org.joda.time.format.ISODateTimeFormat;
 import org.labkey.remoteapi.CommandException;
@@ -46,7 +47,9 @@ import be.objectify.deadbolt.java.actions.Group;
 import be.objectify.deadbolt.java.actions.Restrict;
 import play.Play;
 
-public class DataAcquisition {
+public class DataAcquisition extends HADatAcThing {
+	private static String className = "hasco:DataAcquisition";
+
 	@Field("uri")
 	private String uri;
 	@Field("label")
@@ -55,10 +58,10 @@ public class DataAcquisition {
 	private String comment;
 	@Field("used_uri")
 	private String used_uri;
-	
+
 	private DateTime startedAt;
 	private DateTime endedAt;
-	
+
 	@Field("owner_uri")
 	private String ownerUri;
 	@Field("permission_uri")
@@ -110,13 +113,13 @@ public class DataAcquisition {
 	@Field("dataset_uri")
 	private List<String> datasetURIs;
 	@Field("globalscope_uri")
-        private String globalScopeUri;
+	private String globalScopeUri;
 	@Field("globalscope_name")
-        private String globalScopeName;
+	private String globalScopeName;
 	@Field("localscope_uri")
-        private List<String> localScopeUri;
+	private List<String> localScopeUri;
 	@Field("localscope_name")
-        private List<String> localScopeName;
+	private List<String> localScopeName;
 	@Field("status")
 	private int status;
 	/*
@@ -128,14 +131,14 @@ public class DataAcquisition {
 	 * 2 - DataAcquisition already exists, the preamble states its termination with endedAtTime information
 	 * 		It should exist inside the KB as not finished yet
 	 *
-	 * 9999 - Data Acquisition spec is complete (anything else diferent than 99 is considered incomplete
+	 * 9999 - Data Acquisition spec is complete (anything else diferent than 9999 is considered incomplete
 	 *
 	 */
-	    
+
 	private boolean isComplete;
 	private String ccsvUri;
 	private String localName;
-        private Deployment deployment;
+	private Deployment deployment;
 	public DataAcquisition() {
 		startedAt = null;
 		endedAt = null;
@@ -157,6 +160,20 @@ public class DataAcquisition {
 		localScopeUri = new ArrayList<String>();
 		localScopeName = new ArrayList<String>();
 	}
+	
+	@Override
+	public boolean equals(Object o) {
+		if((o instanceof DataAcquisition) && (((DataAcquisition)o).getUri() == this.getUri())) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+
+	@Override
+	public int hashCode() {
+		return getUri().hashCode();
+	}
 
 	public String getElevation() {
 		return elevation;
@@ -165,7 +182,7 @@ public class DataAcquisition {
 	public void setElevation(String elevation) {
 		this.elevation = elevation;
 	}
-	
+
 	public String getCcsvUri() {
 		return ccsvUri;
 	}
@@ -173,7 +190,7 @@ public class DataAcquisition {
 	public void setCcsvUri(String ccsvUri) {
 		this.ccsvUri = ccsvUri;
 	}
-	
+
 	public long getNumberDataPoints() {
 		return numberDataPoints;
 	}
@@ -189,7 +206,7 @@ public class DataAcquisition {
 	public void setLocalName(String localName) {
 		this.localName = localName;
 	}
-	
+
 	public int getStatus() {
 		return status;
 	}
@@ -199,61 +216,61 @@ public class DataAcquisition {
 	}
 
 	public boolean isComplete() {
-	    return status == 9999;
+		return status == 9999;
 	}
 
 	public String getUri() {
 		return uri;
 	}
 	public void setUri(String uri) {
-	    if (uri == null || uri.equals("")) {
-		this.uri = "";
-		return;
-	    }
-	    this.uri = ValueCellProcessing.replacePrefixEx(uri);
+		if (uri == null || uri.equals("")) {
+			this.uri = "";
+			return;
+		}
+		this.uri = ValueCellProcessing.replacePrefixEx(uri);
 	}
-	
+
 	public String getParameter() {
 		return parameter;
 	}
 	public void setParameter(String parameter) {
 		this.parameter = parameter;
 	}
-	
+
 	public String getLabel() {
 		return label;
 	}
 	public void setLabel(String label) {
 		this.label = label;
 	}
-	
+
 	public String getComment() {
 		return comment;
 	}
 	public void setComment(String comment) {
 		this.comment = comment;
 	}
-	
+
 	public String getUsedUri() {
 		return used_uri;
 	}
 	public void setUsedUri(String used_uri) {
 		this.used_uri = used_uri;
 	}
-	
+
 	public String getStudyUri() {
 		return studyUri;
 	}
 	public Study getStudy() {
-	    if (studyUri == null || studyUri.equals(""))  
-		return null;
-	    Study study = Study.find(studyUri);
-	    return study;
+		if (studyUri == null || studyUri.equals(""))  
+			return null;
+		Study study = Study.find(studyUri);
+		return study;
 	}
 	public void setStudyUri(String study_uri) {
 		this.studyUri = study_uri;
 	}
-	
+
 	public String getOwnerUri() {
 		return ownerUri;
 	}
@@ -267,61 +284,61 @@ public class DataAcquisition {
 	public void setPermissionUri(String permissionUri) {
 		this.permissionUri = permissionUri;
 	}
-	
+
 	public boolean getIsComplete() {
 		return isComplete;
 	}
 	public void setIsComplete(boolean isComplete) {
 		this.isComplete = isComplete;
 	}
-	
+
 	public int getTriggeringEvent() {
 		return triggeringEvent;
 	}
 	public void setTriggeringEvent(int triggeringEvent) {
 		this.triggeringEvent = triggeringEvent;
 	}
-	
+
 	public String getTriggeringEventName() {
 		switch (triggeringEvent) {
-			case TriggeringEvent.INITIAL_DEPLOYMENT:
-				return TriggeringEvent.INITIAL_DEPLOYMENT_NAME;
-			case TriggeringEvent.LEGACY_DEPLOYMENT:
-				return TriggeringEvent.LEGACY_DEPLOYMENT_NAME;
-			case TriggeringEvent.CHANGED_CONFIGURATION:
-				return TriggeringEvent.CHANGED_CONFIGURATION_NAME;
-			case TriggeringEvent.CHANGED_OWNERSHIP:
-				return TriggeringEvent.CHANGED_OWNERSHIP_NAME;
-			case TriggeringEvent.AUTO_CALIBRATION:
-				return TriggeringEvent.AUTO_CALIBRATION_NAME;
-			case TriggeringEvent.SUSPEND_DATA_ACQUISITION:
-				return TriggeringEvent.SUSPEND_DATA_ACQUISITION_NAME;
-			case TriggeringEvent.RESUME_DATA_ACQUISITION:
-				return TriggeringEvent.RESUME_DATA_ACQUISITION_NAME;
+		case TriggeringEvent.INITIAL_DEPLOYMENT:
+			return TriggeringEvent.INITIAL_DEPLOYMENT_NAME;
+		case TriggeringEvent.LEGACY_DEPLOYMENT:
+			return TriggeringEvent.LEGACY_DEPLOYMENT_NAME;
+		case TriggeringEvent.CHANGED_CONFIGURATION:
+			return TriggeringEvent.CHANGED_CONFIGURATION_NAME;
+		case TriggeringEvent.CHANGED_OWNERSHIP:
+			return TriggeringEvent.CHANGED_OWNERSHIP_NAME;
+		case TriggeringEvent.AUTO_CALIBRATION:
+			return TriggeringEvent.AUTO_CALIBRATION_NAME;
+		case TriggeringEvent.SUSPEND_DATA_ACQUISITION:
+			return TriggeringEvent.SUSPEND_DATA_ACQUISITION_NAME;
+		case TriggeringEvent.RESUME_DATA_ACQUISITION:
+			return TriggeringEvent.RESUME_DATA_ACQUISITION_NAME;
 		}
 		return "";
 	}
 	public int getTriggeringEventByName(String name) {
 		switch (name) {
-			case TriggeringEvent.INITIAL_DEPLOYMENT_NAME:
-				return TriggeringEvent.INITIAL_DEPLOYMENT;
-			case TriggeringEvent.LEGACY_DEPLOYMENT_NAME:
-				return TriggeringEvent.LEGACY_DEPLOYMENT;
-			case TriggeringEvent.CHANGED_CONFIGURATION_NAME:
-				return TriggeringEvent.CHANGED_CONFIGURATION;
-			case TriggeringEvent.CHANGED_OWNERSHIP_NAME:
-				return TriggeringEvent.CHANGED_OWNERSHIP;
-			case TriggeringEvent.AUTO_CALIBRATION_NAME:
-				return TriggeringEvent.AUTO_CALIBRATION;
-			case TriggeringEvent.SUSPEND_DATA_ACQUISITION_NAME:
-				return TriggeringEvent.SUSPEND_DATA_ACQUISITION;
-			case TriggeringEvent.RESUME_DATA_ACQUISITION_NAME:
-				return TriggeringEvent.RESUME_DATA_ACQUISITION;
+		case TriggeringEvent.INITIAL_DEPLOYMENT_NAME:
+			return TriggeringEvent.INITIAL_DEPLOYMENT;
+		case TriggeringEvent.LEGACY_DEPLOYMENT_NAME:
+			return TriggeringEvent.LEGACY_DEPLOYMENT;
+		case TriggeringEvent.CHANGED_CONFIGURATION_NAME:
+			return TriggeringEvent.CHANGED_CONFIGURATION;
+		case TriggeringEvent.CHANGED_OWNERSHIP_NAME:
+			return TriggeringEvent.CHANGED_OWNERSHIP;
+		case TriggeringEvent.AUTO_CALIBRATION_NAME:
+			return TriggeringEvent.AUTO_CALIBRATION;
+		case TriggeringEvent.SUSPEND_DATA_ACQUISITION_NAME:
+			return TriggeringEvent.SUSPEND_DATA_ACQUISITION;
+		case TriggeringEvent.RESUME_DATA_ACQUISITION_NAME:
+			return TriggeringEvent.RESUME_DATA_ACQUISITION;
 		}
-		
+
 		return -1;
 	}
-	
+
 	public String getStartedAt() {
 		DateTimeFormatter formatter = ISODateTimeFormat.dateTime();
 		return formatter.withZone(DateTimeZone.UTC).print(startedAt);
@@ -443,16 +460,16 @@ public class DataAcquisition {
 	public String getDeploymentUri() {
 		return deploymentUri;
 	}
-        public Deployment getDeployment() {
-	    if (deploymentUri == null || deploymentUri.equals("")) {
-		return null;
-	    }
-	    if (deployment != null) {
-		if (deployment.getUri().equals(deploymentUri)) {
-		    return deployment;
+	public Deployment getDeployment() {
+		if (deploymentUri == null || deploymentUri.equals("")) {
+			return null;
 		}
-	    }
-	    return deployment = Deployment.find(deploymentUri);
+		if (deployment != null) {
+			if (deployment.getUri().equals(deploymentUri)) {
+				return deployment;
+			}
+		}
+		return deployment = Deployment.find(deploymentUri);
 	}
 	public void setDeploymentUri(String deploymentUri) {
 		this.deploymentUri = deploymentUri;
@@ -498,87 +515,87 @@ public class DataAcquisition {
 					return true;
 				}
 			}
-	    }
-	    	return false;
-        }
+		}
+		return false;
+	}
 
 	public String getGlobalScopeUri() {
 		return globalScopeUri;
 	}
 	public void setGlobalScopeUri(String globalScopeUri) {
-	    this.globalScopeUri = globalScopeUri;
-	    if (globalScopeUri == null || globalScopeUri.equals("")) {
-		return;
-	    }
-	    ObjectCollection oc = ObjectCollection.find(globalScopeUri);
-	    if (oc != null) {
-		if (oc.getUri().equals(globalScopeUri)) {
-		    globalScopeName = oc.getLabel();
-		    return;
+		this.globalScopeUri = globalScopeUri;
+		if (globalScopeUri == null || globalScopeUri.equals("")) {
+			return;
 		}
-	    } else {
-		StudyObject obj = StudyObject.find(globalScopeUri);
-		if (obj.getUri().equals(globalScopeUri)) {
-		    globalScopeName = obj.getLabel();
-		    return;
+		ObjectCollection oc = ObjectCollection.find(globalScopeUri);
+		if (oc != null) {
+			if (oc.getUri().equals(globalScopeUri)) {
+				globalScopeName = oc.getLabel();
+				return;
+			}
+		} else {
+			StudyObject obj = StudyObject.find(globalScopeUri);
+			if (obj.getUri().equals(globalScopeUri)) {
+				globalScopeName = obj.getLabel();
+				return;
+			}
 		}
-	    }
 	}
-       	public String getGlobalScopeName() {
+	public String getGlobalScopeName() {
 		return globalScopeName;
 	}
 	public void setGlobalScopeName(String globalScopeName) {
 		this.globalScopeName = globalScopeName;
 	}
-	
+
 	public List<String> getLocalScopeUri() {
 		return localScopeUri;
 	}
 	public void setLocalScopeUri(List<String> localScopeUri) {
-	    this.localScopeUri = localScopeUri;
-	    if (localScopeUri == null || localScopeUri.size() == 0) {
-		return;
-	    }
-	    localScopeName = new ArrayList<String>();
-	    for (String objUri : localScopeUri) {
-		StudyObject obj = StudyObject.find(objUri);
-		if (obj != null && obj.getUri().equals(objUri)) {
-		    localScopeName.add(obj.getLabel());
-		} else {
-		    localScopeName.add("");
+		this.localScopeUri = localScopeUri;
+		if (localScopeUri == null || localScopeUri.size() == 0) {
+			return;
 		}
-	    }
+		localScopeName = new ArrayList<String>();
+		for (String objUri : localScopeUri) {
+			StudyObject obj = StudyObject.find(objUri);
+			if (obj != null && obj.getUri().equals(objUri)) {
+				localScopeName.add(obj.getLabel());
+			} else {
+				localScopeName.add("");
+			}
+		}
 	}
 	public void addLocalScopeUri(String localScopeUri) {
-	    this.localScopeUri.add(localScopeUri);
+		this.localScopeUri.add(localScopeUri);
 	}
-       	public List<String> getLocalScopeName() {
-	    return localScopeName;
+	public List<String> getLocalScopeName() {
+		return localScopeName;
 	}
 	public void setLocalScopeName(List<String> localScopeName) {
-	    this.localScopeName = localScopeName;
+		this.localScopeName = localScopeName;
 	}
 	public void addLocalScopeName(String localScopeName) {
-	    this.localScopeName.add(localScopeName);
+		this.localScopeName.add(localScopeName);
 	}
 	public List<String> getDatasetUri() {
-	    return datasetURIs;
+		return datasetURIs;
 	}
 	public void setDatasetUri(List<String> datasetURIs) {
-	    this.datasetURIs = datasetURIs;
+		this.datasetURIs = datasetURIs;
 	}
 	public void addDatasetUri(String dataset_uri) {
-	    if (!datasetURIs.contains(dataset_uri)) {
-		datasetURIs.add(dataset_uri);
-	    }
-	}
-        public void deleteDatasetUri(String dataset_uri) {
-	    Iterator<String> iter = datasetURIs.iterator();
-	    while (iter.hasNext()){
-		if (iter.next().equals(dataset_uri)) {
-		    iter.remove();
+		if (!datasetURIs.contains(dataset_uri)) {
+			datasetURIs.add(dataset_uri);
 		}
-	    }
+	}
+	public void deleteDatasetUri(String dataset_uri) {
+		Iterator<String> iter = datasetURIs.iterator();
+		while (iter.hasNext()){
+			if (iter.next().equals(dataset_uri)) {
+				iter.remove();
+			}
+		}
 	}
 	public void deleteAllDatasetURIs() {
 		datasetURIs.clear();
@@ -586,7 +603,7 @@ public class DataAcquisition {
 	public boolean containsDataset(String uri) {
 		return datasetURIs.contains(uri);
 	}
-	
+
 	public List<String> getTypeURIs() {
 		return typeURIs;
 	}
@@ -598,7 +615,7 @@ public class DataAcquisition {
 			typeURIs.add(type_uri);
 		}
 	}
-	
+
 	public List<String> getAssociatedURIs() {
 		return associatedURIs;
 	}
@@ -611,11 +628,11 @@ public class DataAcquisition {
 			associatedURIs.add(associated_uri);
 		}
 	}
-	
+
 	public void addNumberDataPoints(long number) {
 		numberDataPoints += number;
 	}
-	
+
 	public boolean isFinished() {
 		if (endedAt == null) {
 			return false;
@@ -623,7 +640,7 @@ public class DataAcquisition {
 			return endedAt.isBeforeNow();
 		}
 	}
-	
+
 	public int save() {
 		try {
 			SolrClient client = new HttpSolrClient.Builder(
@@ -645,10 +662,31 @@ public class DataAcquisition {
 		}
 	}
 	
+	public long getNumberFromSolr(List<String> values, FacetHandler facetHandler) {
+		SolrQuery query = new SolrQuery();
+		query.setQuery(facetHandler.getTempSolrQuery("ACQUISITION_URI", "acquisition_uri_str", values));
+		query.setRows(0);
+		query.setFacet(false);
+
+		try {
+			SolrClient solr = new HttpSolrClient.Builder(
+					Play.application().configuration().getString("hadatac.solr.data") 
+					+ Collections.DATA_ACQUISITION).build();
+			QueryResponse queryResponse = solr.query(query, SolrRequest.METHOD.POST);
+			solr.close();
+			SolrDocumentList results = queryResponse.getResults();
+			return results.getNumFound();
+		} catch (Exception e) {
+			System.out.println("[ERROR] DataAcquisition.getNumberFromSolr() - Exception message: " + e.getMessage());
+		}
+
+		return -1;
+	}
+
 	public static DataAcquisition convertFromSolr(SolrDocument doc) {
 		Iterator<Object> i;
 		DateTime date;
-		
+
 		DataAcquisition dataAcquisition = new DataAcquisition();
 		try {
 			if (doc.getFieldValue("uri") != null) {
@@ -780,15 +818,15 @@ public class DataAcquisition {
 				}
 			}
 			if (doc.getFieldValue("status") != null) {
-			    dataAcquisition.setStatus(Integer.parseInt(doc.getFieldValue("status").toString()));
+				dataAcquisition.setStatus(Integer.parseInt(doc.getFieldValue("status").toString()));
 			}
 		} catch (Exception e) {
 			System.out.println("[ERROR] DataAcquisition.convertFromSolr(SolrDocument) - e.Message: " + e.getMessage());
 		}
-		
+
 		return dataAcquisition;
 	}
-	
+
 	public static List<DataAcquisition> find(String ownerUri, State state) {
 		SolrQuery query = new SolrQuery();
 		if (state.getCurrent() == State.ALL) {
@@ -815,23 +853,23 @@ public class DataAcquisition {
 		}
 		query.set("sort", "started_at asc");
 		query.set("rows", "10000000");
-		
+
 		return findByQuery(query);
 	}
-	
+
 	public static List<String> findAllAccessibleDataAcquisition(String user_uri) {
 		List<String> results = new ArrayList<String>();
 		List<String> accessLevels = new ArrayList<String>();
-		
+
 		User user = User.find(user_uri);
 		if (null != user) {
 			user.getGroupNames(accessLevels);
 		}
-		
+
 		for(DataAcquisition acquisition : findAll()) {
 			if(acquisition.getPermissionUri().equals("Public")
-			|| acquisition.getPermissionUri().equals(user_uri)
-			|| acquisition.getOwnerUri().equals(user_uri)){
+					|| acquisition.getPermissionUri().equals(user_uri)
+					|| acquisition.getOwnerUri().equals(user_uri)){
 				results.add(acquisition.getUri());
 				continue;
 			}
@@ -842,38 +880,38 @@ public class DataAcquisition {
 				}
 			}
 		}
-		
+
 		return results;
 	}
-	
+
 	public static List<DataAcquisition> findAll() {
-	    SolrQuery query = new SolrQuery();
-	    query.set("q", "owner_uri:*");
-	    query.set("sort", "started_at asc");
-	    query.set("rows", "10000000");
-	    
-	    return findByQuery(query);
+		SolrQuery query = new SolrQuery();
+		query.set("q", "owner_uri:*");
+		query.set("sort", "started_at asc");
+		query.set("rows", "10000000");
+
+		return findByQuery(query);
 	}
-	
+
 	public static List<DataAcquisition> findAll(State state) {
 		return find(null, state);
 	}
-	
+
 	public static List<DataAcquisition> find(String ownerUri) {
 		SolrQuery query = new SolrQuery();
 		query.set("q", "owner_uri:\"" + ownerUri + "\"");
 		query.set("sort", "started_at asc");
 		query.set("rows", "10000000");
-		
+
 		return findByQuery(query);
 	}
-	
+
 	public static DataAcquisition findDataAcquisition(SolrQuery query) {
 		DataAcquisition dataAcquisition = null;
 		SolrClient solr = new HttpSolrClient.Builder(
 				Play.application().configuration().getString("hadatac.solr.data") 
 				+ Collections.DATA_COLLECTION).build();
-		
+
 		try {
 			QueryResponse queryResponse = solr.query(query);
 			solr.close();
@@ -884,34 +922,34 @@ public class DataAcquisition {
 		} catch (Exception e) {
 			System.out.println("[ERROR] DataAcquisition.find(SolrQuery) - Exception message: " + e.getMessage());
 		}
-				
+
 		return dataAcquisition;
 	}
-	
+
 	public static DataAcquisition findByUri(String dataAcquisitionUri) {
-	    //System.out.println("inside findByUri: <" + dataAcquisitionUri + ">");
-	    SolrQuery query = new SolrQuery();
-	    query.set("q", "uri:\"" + dataAcquisitionUri + "\"");
-	    query.set("sort", "started_at asc");
-	    query.set("rows", "10000000");
-	    
-	    List<DataAcquisition> results = findByQuery(query);
-	    if (!results.isEmpty()) {
-		return results.get(0);
-	    }
-	    
-	    return null;
+		//System.out.println("inside findByUri: <" + dataAcquisitionUri + ">");
+		SolrQuery query = new SolrQuery();
+		query.set("q", "uri:\"" + dataAcquisitionUri + "\"");
+		query.set("sort", "started_at asc");
+		query.set("rows", "10000000");
+
+		List<DataAcquisition> results = findByQuery(query);
+		if (!results.isEmpty()) {
+			return results.get(0);
+		}
+
+		return null;
 	}
-	
+
 	public int close(String endedAt) {
 		this.setEndedAtXsd(endedAt);
 		return this.save();
 	}
-	
+
 	public int delete() {
 		try {
 			deleteMeasurementData();
-			
+
 			SolrClient solr = new HttpSolrClient.Builder(
 					Play.application().configuration().getString("hadatac.solr.data") 
 					+ Collections.DATA_COLLECTION).build();
@@ -926,10 +964,10 @@ public class DataAcquisition {
 		} catch (Exception e) {
 			System.out.println("[ERROR] DataAcquisition.delete() - Exception message: " + e.getMessage());
 		}
-		
+
 		return -1;
 	}
-	
+
 	public boolean deleteMeasurementData() {
 		Iterator<String> iter = datasetURIs.iterator();
 		while (iter.hasNext()) {
@@ -937,13 +975,13 @@ public class DataAcquisition {
 				iter.remove();
 			}
 		}
-		
+
 		return datasetURIs.isEmpty();
 	}
-	
+
 	public static List<DataAcquisition> findByQuery(SolrQuery query) {
 		List<DataAcquisition> results = new ArrayList<DataAcquisition>();
-		
+
 		SolrClient solr = new HttpSolrClient.Builder(
 				Play.application().configuration().getString("hadatac.solr.data") 
 				+ Collections.DATA_COLLECTION).build();
@@ -954,23 +992,23 @@ public class DataAcquisition {
 			SolrDocumentList docs = response.getResults();
 			Iterator<SolrDocument> i = docs.iterator();
 			while (i.hasNext()) {
-			   results.add(convertFromSolr(i.next()));
+				results.add(convertFromSolr(i.next()));
 			}
 		} catch (Exception e) {
 			results.clear();
 			System.out.println("[ERROR] DataAcquisition.findByQuery(SolrQuery) - Exception message: " + e.getMessage());
 		}
-		
+
 		return results;
 	}
-	
+
 	public static List<DataAcquisition> find(Deployment deployment, boolean active) {
 		SolrQuery query = new SolrQuery();
 		query.set("q", "deployment_uri:\"" + deployment.getUri() + "\"");
 		query.set("sort", "started_at desc");
 		query.set("rows", "10000000");
 		List<DataAcquisition> listDA = findByQuery(query);
-		
+
 		if (active == true) {
 			// Filter out inactive data acquisition
 			Iterator<DataAcquisition> iterDA = listDA.iterator();
@@ -984,12 +1022,12 @@ public class DataAcquisition {
 
 		return listDA;
 	}
-	
+
 	public static DataAcquisition find(HADataC hadatac) {
 		SolrQuery query = new SolrQuery("uri:\"" + hadatac.getDataAcquisitionKbUri() + "\"");
 		return findDataAcquisition(query);
 	}
-	
+
 	public static DataAcquisition find(Model model, Dataset dataset) {
 		String queryString = NameSpaces.getInstance().printSparqlNameSpaceList() 
 				+ "SELECT ?dc ?startedAt ?endedAt WHERE {\n"
@@ -998,12 +1036,12 @@ public class DataAcquisition {
 				+ "  ?dc prov:startedAtTime ?startedAt .\n"
 				+ "  OPTIONAL { ?dc prov:endedAtTime ?endedAt } .\n"
 				+ "}";
-		
+
 		Query query = QueryFactory.create(queryString);
 		QueryExecution qexec = QueryExecutionFactory.create(query, model);
 		ResultSet results = qexec.execSelect();
 		ResultSetRewindable resultsrw = ResultSetFactory.copyResults(results);
-		
+
 		if (resultsrw.size() >= 1) {
 			QuerySolution soln = resultsrw.next();
 			DataAcquisition dataAcquisition = new DataAcquisition();
@@ -1016,19 +1054,19 @@ public class DataAcquisition {
 			dataAcquisition.setStatus(0);
 			return dataAcquisition;
 		}
-		
+
 		queryString = NameSpaces.getInstance().printSparqlNameSpaceList()
 				+ "SELECT ?dc ?endedAt WHERE {\n"
 				+ "  <" + dataset.getCcsvUri() + "> prov:wasGeneratedBy ?dc .\n"
 				+ "  ?dc prov:endedAtTime ?endedAt .\n"
 				+ "}";
-		
+
 		query = QueryFactory.create(queryString);
-		
+
 		qexec = QueryExecutionFactory.create(query, model);
 		results = qexec.execSelect();
 		resultsrw = ResultSetFactory.copyResults(results);
-		
+
 		if (resultsrw.size() >= 1) {
 			QuerySolution soln = resultsrw.next();
 			DataAcquisition dataAcquisition = new DataAcquisition();
@@ -1038,18 +1076,18 @@ public class DataAcquisition {
 			dataAcquisition.setStatus(2);
 			return dataAcquisition;
 		}
-		
+
 		queryString = NameSpaces.getInstance().printSparqlNameSpaceList() 
 				+ "SELECT ?dc ?endedAt WHERE {\n"
 				+ "  <" + dataset.getCcsvUri() + "> prov:wasGeneratedBy ?dc .\n"
 				+ "}";
-		
+
 		query = QueryFactory.create(queryString);
-		
+
 		qexec = QueryExecutionFactory.create(query, model);
 		results = qexec.execSelect();
 		resultsrw = ResultSetFactory.copyResults(results);
-		
+
 		if (resultsrw.size() >= 1) {
 			QuerySolution soln = resultsrw.next();
 			DataAcquisition dataAcquisition = new DataAcquisition();
@@ -1058,30 +1096,30 @@ public class DataAcquisition {
 			dataAcquisition.setStatus(1);
 			return dataAcquisition;
 		}
-		
+
 		return null;
 	}
-	
-        public static DataAcquisition create(HADataC hadatacCcsv, HADataC hadatacKb) {
+
+	public static DataAcquisition create(HADataC hadatacCcsv, HADataC hadatacKb) {
 		DataAcquisition dataAcquisition = new DataAcquisition();
 		DataAcquisitionSchema schema = DataAcquisitionSchema.find(hadatacKb.getDataAcquisitionKbUri());
-		
+
 		dataAcquisition.setLocalName(hadatacCcsv.getDataAcquisition().getLocalName());
 		dataAcquisition.setUri(hadatacCcsv.getDataAcquisitionKbUri());
 		dataAcquisition.setStudyUri(hadatacCcsv.getDataAcquisition().getStudyUri());
 		dataAcquisition.setStartedAtXsd(hadatacCcsv.getDataAcquisition().getStartedAtXsd());
 		dataAcquisition.setEndedAtXsd(hadatacCcsv.getDataAcquisition().getEndedAtXsd());
 		if (schema != null && schema.getAttributes() != null) {
-	    	    Iterator<DataAcquisitionSchemaAttribute> i = schema.getAttributes().iterator();
-		    while (i.hasNext()) {
-		        DataAcquisitionSchemaAttribute dasa = i.next();
-			dataAcquisition.addCharacteristic(dasa.getAttributeLabel());
-			dataAcquisition.addCharacteristicUri(dasa.getAttribute());
-			dataAcquisition.addEntity(dasa.getEntityLabel());
-			dataAcquisition.addEntityUri(dasa.getEntity());
-			dataAcquisition.addUnit(dasa.getUnitLabel());
-			dataAcquisition.addUnitUri(dasa.getUnit());
-		    }
+			Iterator<DataAcquisitionSchemaAttribute> i = schema.getAttributes().iterator();
+			while (i.hasNext()) {
+				DataAcquisitionSchemaAttribute dasa = i.next();
+				dataAcquisition.addCharacteristic(dasa.getAttributeLabel());
+				dataAcquisition.addCharacteristicUri(dasa.getAttribute());
+				dataAcquisition.addEntity(dasa.getEntityLabel());
+				dataAcquisition.addEntityUri(dasa.getEntity());
+				dataAcquisition.addUnit(dasa.getUnitLabel());
+				dataAcquisition.addUnitUri(dasa.getUnit());
+			}
 		}
 		dataAcquisition.setDeploymentUri(hadatacKb.getDeploymentUri());
 		dataAcquisition.setInstrumentModel(hadatacKb.getDeployment().getInstrument().getLabel());
@@ -1091,13 +1129,13 @@ public class DataAcquisition {
 		dataAcquisition.setLocation(hadatacKb.getDeployment().getPlatform().getLocation());
 		dataAcquisition.setElevation(hadatacKb.getDeployment().getPlatform().getElevation());
 		dataAcquisition.addDatasetUri(hadatacCcsv.getDatasetKbUri());
-		
+
 		return dataAcquisition;
-		}
-	
+	}
+
 	public void merge(DataAcquisition dataCollection) {
 		Iterator<String> i;
-		
+
 		i = dataCollection.unit.iterator();
 		while (i.hasNext()) {
 			addUnit(i.next());
@@ -1127,7 +1165,7 @@ public class DataAcquisition {
 			addDatasetUri(i.next());
 		}
 	}
-	
+
 	public String toString() {
 		StringBuilder builder = new StringBuilder();
 		Iterator<String> i;
@@ -1169,75 +1207,75 @@ public class DataAcquisition {
 		builder.append("globalScopeUri: " + this.globalScopeUri + "\n");
 		builder.append("globalScopeName: " + this.globalScopeName + "\n");
 		for (String localUri : localScopeUri) {
-		    builder.append("localScopeUri: " + localUri + "\n");
+			builder.append("localScopeUri: " + localUri + "\n");
 		}
 		for (String localName : localScopeName) {
-		    builder.append("localScopeName: " + localName + "\n");
+			builder.append("localScopeName: " + localName + "\n");
 		}
 		i = datasetURIs.iterator();
 		while (i.hasNext()) {
-		    builder.append("dataset_uri: " + i.next() + "\n");
+			builder.append("dataset_uri: " + i.next() + "\n");
 		}
-		
+
 		return builder.toString();
 	}
-	
-    @Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
-    public int saveToLabKey(String user_name, String password) throws CommandException {
-    	
-	String site = ConfigProp.getPropertyValue("labkey.config", "site");
-        String path = "/" + ConfigProp.getPropertyValue("labkey.config", "folder");
-        
-    	LabkeyDataHandler loader = new LabkeyDataHandler(
-    			site, user_name, password, path);
-    	
-    	List<String> abbrevTypeURIs = new ArrayList<String>();
-    	for (String uri : getTypeURIs()) {
-    		abbrevTypeURIs.add(ValueCellProcessing.replaceNameSpaceEx(uri));
-    	}
-    	List<String> abbrevAssociatedURIs = new ArrayList<String>();
-    	for (String uri : getAssociatedURIs()) {
-    		abbrevAssociatedURIs.add(ValueCellProcessing.replaceNameSpaceEx(uri));
-    	}
-    	
-	String localUri = "";
-	int totalChanged = 0;
-	Iterator<String> i = getLocalScopeUri().iterator();
-	while (i.hasNext()) {
-	    localUri += ValueCellProcessing.replaceNameSpaceEx(i.next());
-	    if (i.hasNext()) {
-		localUri += " , ";
-	    }
-	}
-    	List< Map<String, Object> > rows = new ArrayList< Map<String, Object> >();
-    	Map<String, Object> row = new HashMap<String, Object>();
-    	row.put("a", String.join(", ", abbrevTypeURIs));
-    	row.put("hasURI", ValueCellProcessing.replaceNameSpaceEx(getUri()));
-    	row.put("rdfs:label", getLabel());
-    	row.put("rdfs:comment", getComment());
-    	row.put("prov:startedAtTime", getStartedAt());
-    	row.put("prov:used", getParameter());
-    	row.put("prov:wasAssociatedWith", String.join(", ", abbrevAssociatedURIs));
-    	row.put("hasco:hasDeployment", ValueCellProcessing.replaceNameSpaceEx(getDeploymentUri()));
-    	row.put("hasco:isDataAcquisitionOf", ValueCellProcessing.replaceNameSpaceEx(getStudyUri()));
-    	row.put("hasco:hasSchema", ValueCellProcessing.replaceNameSpaceEx(getSchemaUri()));
-    	row.put("hasco:hasGlobalScope", ValueCellProcessing.replaceNameSpaceEx(getGlobalScopeUri()));
-    	row.put("hasco:hasLocalScope", localUri); 
-    	row.put("hasco:hasTriggeringEvent", getTriggeringEventName());
-    	row.put("prov:endedAtTime", getEndedAt().startsWith("9999")? "" : getEndedAt());
-    	rows.add(row);
 
-    	try {
-	    totalChanged = loader.insertRows("DataAcquisition", rows);
-	} catch (CommandException e) {
-	    try {
-		totalChanged = loader.updateRows("DataAcquisition", rows);
-	    } catch (CommandException e2) {
-		System.out.println("[ERROR] Could not insert or update Data Acquisition");
-	    }
-	}
+	@Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
+	public int saveToLabKey(String user_name, String password) throws CommandException {
 
-    	return totalChanged;
-    }
+		String site = ConfigProp.getPropertyValue("labkey.config", "site");
+		String path = "/" + ConfigProp.getPropertyValue("labkey.config", "folder");
+
+		LabkeyDataHandler loader = new LabkeyDataHandler(
+				site, user_name, password, path);
+
+		List<String> abbrevTypeURIs = new ArrayList<String>();
+		for (String uri : getTypeURIs()) {
+			abbrevTypeURIs.add(ValueCellProcessing.replaceNameSpaceEx(uri));
+		}
+		List<String> abbrevAssociatedURIs = new ArrayList<String>();
+		for (String uri : getAssociatedURIs()) {
+			abbrevAssociatedURIs.add(ValueCellProcessing.replaceNameSpaceEx(uri));
+		}
+
+		String localUri = "";
+		int totalChanged = 0;
+		Iterator<String> i = getLocalScopeUri().iterator();
+		while (i.hasNext()) {
+			localUri += ValueCellProcessing.replaceNameSpaceEx(i.next());
+			if (i.hasNext()) {
+				localUri += " , ";
+			}
+		}
+		List< Map<String, Object> > rows = new ArrayList< Map<String, Object> >();
+		Map<String, Object> row = new HashMap<String, Object>();
+		row.put("a", String.join(", ", abbrevTypeURIs));
+		row.put("hasURI", ValueCellProcessing.replaceNameSpaceEx(getUri()));
+		row.put("rdfs:label", getLabel());
+		row.put("rdfs:comment", getComment());
+		row.put("prov:startedAtTime", getStartedAt());
+		row.put("prov:used", getParameter());
+		row.put("prov:wasAssociatedWith", String.join(", ", abbrevAssociatedURIs));
+		row.put("hasco:hasDeployment", ValueCellProcessing.replaceNameSpaceEx(getDeploymentUri()));
+		row.put("hasco:isDataAcquisitionOf", ValueCellProcessing.replaceNameSpaceEx(getStudyUri()));
+		row.put("hasco:hasSchema", ValueCellProcessing.replaceNameSpaceEx(getSchemaUri()));
+		row.put("hasco:hasGlobalScope", ValueCellProcessing.replaceNameSpaceEx(getGlobalScopeUri()));
+		row.put("hasco:hasLocalScope", localUri); 
+		row.put("hasco:hasTriggeringEvent", getTriggeringEventName());
+		row.put("prov:endedAtTime", getEndedAt().startsWith("9999")? "" : getEndedAt());
+		rows.add(row);
+
+		try {
+			totalChanged = loader.insertRows("DataAcquisition", rows);
+		} catch (CommandException e) {
+			try {
+				totalChanged = loader.updateRows("DataAcquisition", rows);
+			} catch (CommandException e2) {
+				System.out.println("[ERROR] Could not insert or update Data Acquisition");
+			}
+		}
+
+		return totalChanged;
+	}
 }
 

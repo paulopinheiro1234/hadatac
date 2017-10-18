@@ -13,38 +13,29 @@ import org.hadatac.utils.Collections;
 
 import play.Play;
 
+public class AttributeInstance extends HADatAcThing implements Comparable<AttributeInstance> {
 
-public class Characteristic {
-	private String uri;
-	private String label;
+	static String className = "sio:Attribute";
+
+	public AttributeInstance () {}
 	
-	public String getUri() {
-		return uri;
-	}
-	public void setUri(String uri) {
-		this.uri = uri;
-	}
-	public String getLabel() {
-		return label;
-	}
-	public void setLabel(String label) {
-		this.label = label;
-	}
-	
-	public static Characteristic find(String uri) {
-		return null;
-	}
-	
-	public static List<Characteristic> find(List<MeasurementType> list) {
-		return null;
-	}
-	
-	public long getNumberFromSolr(List<String> charURIs, FacetHandler facetHandler) {
-		for (String uri : charURIs) {
-			facetHandler.putFacet("CHAR_URI", "characteristic_uri", uri);
+	@Override
+	public boolean equals(Object o) {
+		if((o instanceof AttributeInstance) && (((AttributeInstance)o).getUri() == this.getUri())) {
+			return true;
+		} else {
+			return false;
 		}
+	}
+
+	@Override
+	public int hashCode() {
+		return getUri().hashCode();
+	}
+
+	public long getNumberFromSolr(List<String> values, FacetHandler facetHandler) {
 		SolrQuery query = new SolrQuery();
-		query.setQuery(facetHandler.toSolrQuery());
+		query.setQuery(facetHandler.getTempSolrQuery("CHAR_URI", "characteristic_uri_str", values));
 		query.setRows(0);
 		query.setFacet(false);
 
@@ -57,9 +48,17 @@ public class Characteristic {
 			SolrDocumentList results = queryResponse.getResults();
 			return results.getNumFound();
 		} catch (Exception e) {
-			System.out.println("[ERROR] Characteristic.getNumberFromSolr() - Exception message: " + e.getMessage());
+			System.out.println("[ERROR] AttributeInstance.getNumberFromSolr() - Exception message: " + e.getMessage());
 		}
-		
+
 		return -1;
+	}
+
+	@Override
+	public int compareTo(AttributeInstance another) {
+		if (this.getLabel() != null && another.getLabel() != null) {
+			return this.getLabel().compareTo(another.getLabel());
+		}
+		return this.getUri().compareTo(another.getUri());
 	}
 }

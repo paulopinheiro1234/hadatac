@@ -108,6 +108,7 @@ public class Global extends GlobalSettings {
 
 	private void initialData() {
 		if (SecurityRole.existsSolr() == false) {
+			System.out.println("SecurityRole.existsSolr() == false");
 			addSecurityRole(
 					org.hadatac.console.controllers.AuthApplication.DATA_OWNER_ROLE, 
 					"f4251649-751e-4190-b0ed-e824f3cdd6fc");

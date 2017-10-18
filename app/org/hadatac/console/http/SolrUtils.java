@@ -10,7 +10,7 @@ import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.impl.HttpSolrClient;
-import org.apache.solr.client.solrj.response.UpdateResponse;
+import org.apache.solr.common.SolrDocument;
 
 
 public class SolrUtils {
@@ -36,6 +36,15 @@ public class SolrUtils {
 		}
 		
 		return false;
+	}
+	
+	public static String getFieldValue(SolrDocument doc, String field) {
+		Object value = doc.getFieldValue(field);
+		if (null != value) {
+			return value.toString();
+		}
+		
+		return "";
 	}
 	
 	public static boolean clearCollection(String solrCollection) {

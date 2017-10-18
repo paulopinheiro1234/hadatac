@@ -67,6 +67,26 @@ public class DataAcquisitionSearch extends Controller {
     	
     	return result;
     }
+    
+    private static ObjectDetails getObjectDetails(AcquisitionQueryResult results) {
+    	Set<String> setObj = new HashSet<String>();
+    	ObjectDetails objDetails = new ObjectDetails();
+    	if (results != null) {
+    		for (Measurement m: results.getDocuments()) {
+    			setObj.add(m.getObjectUri());
+            }
+            for (String uri: setObj) {
+            	if (uri != null) {
+            		String html = ViewSubject.findBasicHTML(uri);
+            		if (html != null) {
+            			objDetails.putObject(uri, html);
+            		}
+            	}
+            }
+        }
+    	
+    	return objDetails;
+    }
 
     public static Result index(int page, int rows, String facets) {
     	return indexInternal(0, page, rows, facets);
@@ -76,9 +96,7 @@ public class DataAcquisitionSearch extends Controller {
     	return indexInternal(1, page, rows, facets);
     }
 
-    private static Result indexInternal(int mode, int page, int rows, String facets) {
-    	//System.out.println("[DataAcquisitionSearch] Page: " + page + "   Rows:" + rows + "   Facets:" + facets);
-    	
+    private static Result indexInternal(int mode, int page, int rows, String facets) {    	
     	FacetHandler handler = new FacetHandler();
     	handler.loadFacets(facets);
     	System.out.println("DataAcquisitionSearch : <" + handler.toSolrQuery() + ">");
@@ -97,21 +115,7 @@ public class DataAcquisitionSearch extends Controller {
     	}
     	results = Measurement.find(ownerUri, page, rows, handler);
     	
-    	Set<String> setObj = new HashSet<String>();
-    	ObjectDetails objDetails = new ObjectDetails();
-    	if (results != null) {
-    		for (Measurement m: results.getDocuments()) {
-    			setObj.add(m.getObjectUri());
-            }
-            for (String uri: setObj) {
-            	if (uri != null) {
-            		String html = ViewSubject.findBasicHTML(uri);
-            		if (html != null) {
-            			objDetails.putObject(uri, html);
-            		}
-            	}
-            }
-        }
+    	ObjectDetails objDetails = getObjectDetails(results);
 
 		if (mode == 0) {
 		    return ok(facetOnlyBrowser.render(page, rows, facets, results.getDocumentSize(), 

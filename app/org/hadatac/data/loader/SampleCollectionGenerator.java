@@ -14,6 +14,7 @@ import org.apache.jena.query.ResultSet;
 import org.apache.jena.query.ResultSetFactory;
 import org.apache.jena.query.ResultSetRewindable;
 import org.apache.jena.rdf.model.Literal;
+import org.hadatac.console.http.ConfigUtils;
 import org.hadatac.utils.Collections;
 import org.hadatac.utils.NameSpaces;
 import org.hadatac.utils.Templates;
@@ -24,7 +25,7 @@ import play.Play;
 
 public class SampleCollectionGenerator extends BasicGenerator {
 
-	final String kbPrefix = Play.application().configuration().getString("hadatac.community.ont_prefix") + "-kb:";
+	final String kbPrefix = ConfigUtils.getKbPrefix();
     
     public SampleCollectionGenerator(File file) {
 	super(file);

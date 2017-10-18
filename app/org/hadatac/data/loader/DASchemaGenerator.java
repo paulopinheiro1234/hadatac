@@ -6,10 +6,12 @@ import java.util.Map;
 import java.util.List;
 import org.apache.commons.csv.CSVRecord;
 import org.apache.commons.io.FileUtils;
+import org.hadatac.console.http.ConfigUtils;
+
 import play.Play;
 
 public class DASchemaGenerator extends BasicGenerator {
-    final String kbPrefix = Play.application().configuration().getString("hadatac.community.ont_prefix") + "-kb:";
+    final String kbPrefix = ConfigUtils.getKbPrefix();
     String startTime = "";
     String SDDName = "";
     

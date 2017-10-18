@@ -5,6 +5,8 @@ import java.lang.String;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import org.hadatac.console.http.ConfigUtils;
 import org.hadatac.utils.Templates;
 
 import org.apache.commons.csv.CSVRecord;
@@ -12,7 +14,7 @@ import org.apache.commons.csv.CSVRecord;
 import play.Play;
 
 public class StudyGenerator extends BasicGenerator {
-	final String kbPrefix = Play.application().configuration().getString("hadatac.community.ont_prefix") + "-kb:";
+	final String kbPrefix = ConfigUtils.getKbPrefix();
 	private int counter = 1; //starting index number
 	
 	public StudyGenerator(File file) {

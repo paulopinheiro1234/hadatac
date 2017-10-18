@@ -333,6 +333,7 @@ GET	/hadatac/annotator/schema                      org.hadatac.console.controlle
 POST	/hadatac/annotator/schema                      org.hadatac.console.controllers.annotator.SchemaFromFile.create(filename : String)
 GET 	/hadatac/annotator/prepare/create              org.hadatac.console.controllers.annotator.PrepareIngestion.create(filename: String, da_uri: String)
 POST 	/hadatac/annotator/prepare/create	       org.hadatac.console.controllers.annotator.PrepareIngestion.postCreate(filename: String, da_uri: String)
+GET     /hadatac/annotator/prepare/reconfigure              org.hadatac.console.controllers.annotator.PrepareIngestion.reconfigure(filename: String, da_uri: String)
 GET 	/hadatac/annotator/prepare/refine              org.hadatac.console.controllers.annotator.PrepareIngestion.refine(filename: String, da_uri: String, msg : String)
 POST 	/hadatac/annotator/prepare/refine	       org.hadatac.console.controllers.annotator.PrepareIngestion.postRefine(filename: String, da_uri: String, msg : String)
 POST 	/hadatac/annotator/prepare/study	       org.hadatac.console.controllers.annotator.PrepareIngestion.selectStudy(filename: String, da_uri: String)
