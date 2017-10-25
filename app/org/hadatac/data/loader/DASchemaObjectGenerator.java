@@ -181,6 +181,7 @@ public class DASchemaObjectGenerator extends BasicGenerator {
     	row.put("sio:Relation", getRelation(rec));
     	row.put("hasco:hasUnit", getUnit(rec));
     	row.put("hasco:isVirtual", checkVirtual(rec).toString());
+    	row.put("hasco:hasPosition", getPosition(rec));
     	row.put("hasco:isPIConfirmed", "false");
     	
     	return row;
