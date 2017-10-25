@@ -109,7 +109,6 @@ public class FacetTree {
 			Pivot pivot, String value, List<Pivot> retChildren) {
 		if (levelToBegin == curLevel) {
 			base = pivot;
-			retChildren = new ArrayList<Pivot>();
 		}
 		if (pivot.children.isEmpty()) {
 			pivot.value = value + " " + pivot.value;

@@ -18,172 +18,127 @@ import org.hadatac.utils.NameSpaces;
 
 
 public class Subject extends StudyObject {
-	
-    public static boolean isPlatform(String subject_uri) {
-	String queryString = NameSpaces.getInstance().printSparqlNameSpaceList()
-	    + "SELECT ?cohort WHERE {\n"
-	    + "  <" + subject_uri + "> a hasco:SubjectPlatform . \n"
-	    + "  <" + subject_uri + "> hasco:isSubjectOf ?cohort . \n"
-	    + "}";
-	
-	Query query = QueryFactory.create(queryString);
-	
-	QueryExecution qexec = QueryExecutionFactory.sparqlService(
-								   Collections.getCollectionsName(Collections.METADATA_SPARQL), query);
-	ResultSet results = qexec.execSelect();
-	ResultSetRewindable resultsrw = ResultSetFactory.copyResults(results);
-	qexec.close();
-	
-	if (resultsrw.size() >= 1) {
-	    return true;
-	}
-		
-	return false;
-	}
-    
-    public static Subject findSubject(String study_uri, String subject_id) {
-	String queryString = NameSpaces.getInstance().printSparqlNameSpaceList()
-	    + "SELECT ?uri WHERE {\n"
-	    + "  ?uri hasco:originalID \"" + subject_id + "\" .\n"
-	    + "  ?uri hasco:isSubjectOf ?cohort .\n"
-	    + "  ?cohort hasco:isCohortOf " + study_uri + " .\n"
+
+	public static boolean isPlatform(String subject_uri) {
+		String queryString = NameSpaces.getInstance().printSparqlNameSpaceList()
+				+ "SELECT ?cohort WHERE {\n"
+				+ "  <" + subject_uri + "> a hasco:SubjectPlatform . \n"
+				+ "  <" + subject_uri + "> hasco:isSubjectOf ?cohort . \n"
 				+ "}";
-	
-	Query query = QueryFactory.create(queryString);
-	
-	QueryExecution qexec = QueryExecutionFactory.sparqlService(
+
+		Query query = QueryFactory.create(queryString);
+
+		QueryExecution qexec = QueryExecutionFactory.sparqlService(
 				Collections.getCollectionsName(Collections.METADATA_SPARQL), query);
-	ResultSet results = qexec.execSelect();
-	ResultSetRewindable resultsrw = ResultSetFactory.copyResults(results);
-	qexec.close();
-	
-	if (resultsrw.size() >= 1) {
-	    Subject subject = new Subject();
-	    QuerySolution soln = resultsrw.next();
+		ResultSet results = qexec.execSelect();
+		ResultSetRewindable resultsrw = ResultSetFactory.copyResults(results);
+		qexec.close();
+
+		if (resultsrw.size() >= 1) {
+			return true;
+		}
+
+		return false;
+	}
+
+	public static Subject findSubject(String study_uri, String subject_id) {
+		String queryString = NameSpaces.getInstance().printSparqlNameSpaceList()
+				+ "SELECT ?uri WHERE {\n"
+				+ "  ?uri hasco:originalID \"" + subject_id + "\" .\n"
+				+ "  ?uri hasco:isSubjectOf ?cohort .\n"
+				+ "  ?cohort hasco:isCohortOf " + study_uri + " .\n"
+				+ "}";
+
+		Query query = QueryFactory.create(queryString);
+
+		QueryExecution qexec = QueryExecutionFactory.sparqlService(
+				Collections.getCollectionsName(Collections.METADATA_SPARQL), query);
+		ResultSet results = qexec.execSelect();
+		ResultSetRewindable resultsrw = ResultSetFactory.copyResults(results);
+		qexec.close();
+
+		if (resultsrw.size() >= 1) {
+			Subject subject = new Subject();
+			QuerySolution soln = resultsrw.next();
 			subject.setUri(soln.getResource("uri").getURI());
 			return subject;
+		}
+
+		return null;
 	}
-	
-	return null;
-    }
-    
-    public static String findSampleUri(String study_uri, String sample_id) {
-	String queryString = NameSpaces.getInstance().printSparqlNameSpaceList()
-	    + "SELECT ?sampleUri WHERE {\n"
-	    + "  ?sampleUri hasco:originalID \"" + sample_id + "\" .\n"
-	    + "  ?sampleUri hasco:isSampleOf ?subjectUri .\n"
-	    + "  ?subjectUri hasco:isSubjectOf ?cohort .\n"
-	    + "  ?cohort hasco:isCohortOf " + study_uri + " .\n"
-	    + "}";
-	
-	Query query = QueryFactory.create(queryString);
-	QueryExecution qexec = QueryExecutionFactory.sparqlService(
+
+	public static String findSampleUri(String study_uri, String sample_id) {
+		String queryString = NameSpaces.getInstance().printSparqlNameSpaceList()
+				+ "SELECT ?sampleUri WHERE {\n"
+				+ "  ?sampleUri hasco:originalID \"" + sample_id + "\" .\n"
+				+ "  ?sampleUri hasco:isSampleOf ?subjectUri .\n"
+				+ "  ?subjectUri hasco:isSubjectOf ?cohort .\n"
+				+ "  ?cohort hasco:isCohortOf " + study_uri + " .\n"
+				+ "}";
+
+		Query query = QueryFactory.create(queryString);
+		QueryExecution qexec = QueryExecutionFactory.sparqlService(
 				Collections.getCollectionsName(Collections.METADATA_SPARQL), query);
-	ResultSet results = qexec.execSelect();
-	ResultSetRewindable resultsrw = ResultSetFactory.copyResults(results);
-	qexec.close();
-	
-	if (resultsrw.size() >= 1) {
-	    QuerySolution soln = resultsrw.next();
-	    return soln.getResource("sampleUri").getURI();
+		ResultSet results = qexec.execSelect();
+		ResultSetRewindable resultsrw = ResultSetFactory.copyResults(results);
+		qexec.close();
+
+		if (resultsrw.size() >= 1) {
+			QuerySolution soln = resultsrw.next();
+			return soln.getResource("sampleUri").getURI();
 		}
-	
-	return null;
-    }
-    
-    public static String findCodeValue(String attr_uri, String code) {
-	
-	//		System.out.println(attr_uri + "---" + code);
-        String queryString = NameSpaces.getInstance().printSparqlNameSpaceList()
-	    + " SELECT ?codeClass ?codeResource WHERE {"
-	    + " ?attruri hasco:hasAttribute <" + attr_uri + "> . "
-	    + " ?uri hasco:isPossibleValueOf ?attruri . "
-	    + " ?uri hasco:hasCode \"" + code + "\" . "
-	    + " OPTIONAL { ?uri hasco:hasClass ?codeClass . }"
-	    + " OPTIONAL { ?uri hasco:hasResource ?codeResource . }"
-	    + " }";
-        
-        Query query = QueryFactory.create(queryString);
-        QueryExecution qexec = QueryExecutionFactory.sparqlService(
-								   Collections.getCollectionsName(Collections.METADATA_SPARQL), query);
-        ResultSet results = qexec.execSelect();
-        ResultSetRewindable resultsrw = ResultSetFactory.copyResults(results);
-        qexec.close();
-        
-        if (resultsrw.size() > 0) {
-            QuerySolution soln = resultsrw.next();
-            try{
-		if (null != soln.getResource("codeResource")) {
-		    String classUri = soln.getResource("codeResource").toString();
-		    if(!classUri.equals("")){
-			return classUri.substring(classUri.lastIndexOf("#") + 1);
-		    }
-		} else {
-			
-			if (null != soln.getResource("codeClass")) {
-			    String classUri = soln.getResource("codeClass").toString();
-			    if(!classUri.equals("")){
-				return classUri.substring(classUri.lastIndexOf("#") + 1);
-			    }
+
+		return null;
+	}
+
+	public static String checkObjectUri(String obj_uri, String attr_uri) {
+		attr_uri = ValueCellProcessing.replacePrefixEx(attr_uri);
+		System.out.println("attr_uri: " + attr_uri);
+		String objUri = obj_uri;
+		String queryString = NameSpaces.getInstance().printSparqlNameSpaceList()
+				+ " SELECT ?ar ?obj WHERE {"
+				+ "        ?ar rdf:type hasco:DASchemaAttribute . " 
+				+ "        ?ar hasco:hasAttribute <" + attr_uri + "> . "
+				+ "        ?ar hasco:isAttributeOf ?obj  ."
+				+ " }";
+
+		Query query = QueryFactory.create(queryString);
+		QueryExecution qexec = QueryExecutionFactory.sparqlService(
+				Collections.getCollectionsName(Collections.METADATA_SPARQL), query);
+		ResultSet results = qexec.execSelect();
+		ResultSetRewindable resultsrw = ResultSetFactory.copyResults(results);
+		qexec.close();
+
+		//System.out.println("resultsrw.size(): " + resultsrw.size());
+		if (resultsrw.size() > 0) {
+			QuerySolution soln = resultsrw.next();
+			if (null != soln.getResource("obj")) {
+				String attributeAssociation = soln.getResource("obj").toString();
+				System.out.println("attributeAssociation: " + attributeAssociation);
+				if (attributeAssociation.contains("chear-kb:DASO-mother")) {
+					String motherUri = obj_uri + "-mother";
+					System.out.println("motherUri: " + motherUri);
+
+					Model model = ModelFactory.createDefaultModel();
+					DatasetAccessor accessor = DatasetAccessorFactory.createHTTP(
+							Collections.getCollectionsName(Collections.METADATA_GRAPH));
+					model.add(model.createResource(motherUri), 
+							model.createProperty("rdf:type"),
+							model.createResource(ValueCellProcessing.replacePrefixEx("sio:Human")));
+
+					model.add(model.createResource(motherUri), 
+							model.createProperty(ValueCellProcessing.replacePrefixEx("chear:Mother")),
+							model.createResource(obj_uri));
+
+					accessor.add(model);
+					objUri = motherUri;
+					System.out.println("================================== Changed to: " + motherUri);
+				}
 			}
-			
 		}
-            } catch (Exception e1) {
-            	return null;
-            }
-        }
-        
-        return null;
-    }
-	
-    public static String checkObjectUri(String obj_uri, String attr_uri) {
-	attr_uri = ValueCellProcessing.replacePrefixEx(attr_uri);
-        System.out.println("attr_uri: " + attr_uri);
-	String objUri = obj_uri;
-        String queryString = NameSpaces.getInstance().printSparqlNameSpaceList()
-	    + " SELECT ?ar ?obj WHERE {"
-	    + "        ?ar rdf:type hasco:DASchemaAttribute . " 
-	    + "        ?ar hasco:hasAttribute <" + attr_uri + "> . "
-	    + "        ?ar hasco:isAttributeOf ?obj  ."
-	    + " }";
-        
-        Query query = QueryFactory.create(queryString);
-        QueryExecution qexec = QueryExecutionFactory.sparqlService(
-								   Collections.getCollectionsName(Collections.METADATA_SPARQL), query);
-        ResultSet results = qexec.execSelect();
-        ResultSetRewindable resultsrw = ResultSetFactory.copyResults(results);
-        qexec.close();
-        
-        //System.out.println("resultsrw.size(): " + resultsrw.size());
-        if (resultsrw.size() > 0) {
-            QuerySolution soln = resultsrw.next();
-            if (null != soln.getResource("obj")) {
-            	String attributeAssociation = soln.getResource("obj").toString();
-            	System.out.println("attributeAssociation: " + attributeAssociation);
-            	if (attributeAssociation.contains("chear-kb:DASO-mother")) {
-		    String motherUri = obj_uri + "-mother";
-		    System.out.println("motherUri: " + motherUri);
-		    
-		    Model model = ModelFactory.createDefaultModel();
-		    DatasetAccessor accessor = DatasetAccessorFactory.createHTTP(
-										 Collections.getCollectionsName(Collections.METADATA_GRAPH));
-		    model.add(model.createResource(motherUri), 
-			      model.createProperty("rdf:type"),
-			      model.createResource(ValueCellProcessing.replacePrefixEx("sio:Human")));
-		    
-		    model.add(model.createResource(motherUri), 
-			      model.createProperty(ValueCellProcessing.replacePrefixEx("chear:Mother")),
-			      model.createResource(obj_uri));
-		    
-		    accessor.add(model);
-            		objUri = motherUri;
-            		System.out.println("================================== Changed to: " + motherUri);
-            	}
-            }
-        }
-        
-        return objUri;
-    }
+
+		return objUri;
+	}
 }
 
 

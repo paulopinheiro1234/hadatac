@@ -79,7 +79,8 @@ public class PVGenerator extends BasicGenerator {
 			row.put("hasURI", getResource(rec));
 		}
 		else{
-			row.put("hasURI", kbPrefix + "PV-" + getLabel(rec).replace("_","-").replace("??", "") + ("-" + study_id.replace("null", "") + "-" + getCode(rec)).replaceAll("--", "-"));
+			row.put("hasURI", (kbPrefix + "PV-" + getLabel(rec).replace("_","-").replace("??", "") 
+					+ ("-" + study_id.replace("null", "") + "-" + getCode(rec)).replaceAll("--", "-")).replace(" ",""));
 		}
 		row.put("a", "hasco:PossibleValue");
 		row.put("hasco:hasCode", getCode(rec));

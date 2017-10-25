@@ -14,6 +14,7 @@ import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.impl.HttpSolrClient;
 import org.hadatac.data.loader.util.FileFactory;
 import org.hadatac.data.model.ParsingResult;
+import org.hadatac.entity.pojo.Attribute;
 import org.hadatac.entity.pojo.DataAcquisition;
 import org.hadatac.entity.pojo.DataAcquisitionSchema;
 import org.hadatac.entity.pojo.DataAcquisitionSchemaAttribute;
@@ -156,7 +157,7 @@ public class Parser {
 					continue;
 				} else {
 					String originalValue = record.get(dasa.getTempPositionInt() - 1);
-					String codeValue = Subject.findCodeValue(dasa.getAttribute(), originalValue);
+					String codeValue = Attribute.findCodeValue(dasa.getAttribute(), originalValue);
 					if (codeValue == null) {
 						measurement.setValue(originalValue);
 					} else {

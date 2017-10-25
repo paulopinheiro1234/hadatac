@@ -55,6 +55,49 @@ public class Attribute extends HADatAcClass implements Comparable<Attribute> {
 		return attributes;
 	}
 
+	public static String findCodeValue(String attr_uri, String code) {
+		String queryString = NameSpaces.getInstance().printSparqlNameSpaceList()
+				+ " SELECT ?codeClass ?codeResource WHERE {"
+				+ " ?attruri hasco:hasAttribute <" + attr_uri + "> . "
+				+ " ?uri hasco:isPossibleValueOf ?attruri . "
+				+ " ?uri hasco:hasCode \"" + code + "\" . "
+				+ " OPTIONAL { ?uri hasco:hasClass ?codeClass . }"
+				+ " OPTIONAL { ?uri hasco:hasResource ?codeResource . }"
+				+ " }";
+
+		Query query = QueryFactory.create(queryString);
+		QueryExecution qexec = QueryExecutionFactory.sparqlService(
+				Collections.getCollectionsName(Collections.METADATA_SPARQL), query);
+		ResultSet results = qexec.execSelect();
+		ResultSetRewindable resultsrw = ResultSetFactory.copyResults(results);
+		qexec.close();
+
+		if (resultsrw.size() > 0) {
+			QuerySolution soln = resultsrw.next();
+			try{
+				if (null != soln.getResource("codeResource")) {
+					String classUri = soln.getResource("codeResource").toString();
+					if(!classUri.equals("")){
+						return classUri.substring(classUri.lastIndexOf("#") + 1);
+					}
+				} else {
+
+					if (null != soln.getResource("codeClass")) {
+						String classUri = soln.getResource("codeClass").toString();
+						if(!classUri.equals("")){
+							return classUri.substring(classUri.lastIndexOf("#") + 1);
+						}
+					}
+
+				}
+			} catch (Exception e1) {
+				return null;
+			}
+		}
+
+		return null;
+	}
+
 	public static Map<String,String> getMap() {
 		List<Attribute> list = find();
 		Map<String,String> map = new HashMap<String,String>();
