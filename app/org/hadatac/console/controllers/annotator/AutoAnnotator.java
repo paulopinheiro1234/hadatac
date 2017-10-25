@@ -95,6 +95,7 @@ import play.mvc.Http.MultipartFormData.FilePart;
 public class AutoAnnotator extends Controller {
 
 	public static HashMap<String, String> codeMappings = new HashMap<String, String>();
+	public static HashMap<String, String> AttrORobj = new HashMap<String, String>();
 	public static HashMap<String, String> entityMappings = new HashMap<String, String>();
 	public static HashMap<String, List<String>> codebook = new HashMap<String, List<String>>();
 	public static String study_id = "default-study";
@@ -752,6 +753,14 @@ public class AutoAnnotator extends Controller {
 			File dd = new File("sddtmp/" + file.getName());
 			//System.out.println(dd.getAbsoluteFile());
 			FileUtils.copyURLToFile(url, dd);
+			BufferedReader bufRdr = new BufferedReader(new FileReader(dd));
+			String line = null;
+			
+			while((line = bufRdr.readLine()) != null){
+				String str[] = line.split(",");
+				AttrORobj.put(str[0], str[2]);
+			}
+			bufRdr.close();
 
 			if (hm.get("Code_Mappings") != ""){
 				URL url2 = new URL(hm.get("Code_Mappings"));

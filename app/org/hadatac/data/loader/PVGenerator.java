@@ -21,6 +21,7 @@ public class PVGenerator extends BasicGenerator {
 	//	HashMap<String, String> LabelMap = new HashMap<String, String>();
 	HashMap<String, List<String>> pvMap = new HashMap<String, List<String>>();
 	String study_id = "";
+	HashMap<String, String> AttrORobj;
 
 	//chear-kb:PV-childsex-0
 
@@ -31,6 +32,7 @@ public class PVGenerator extends BasicGenerator {
 		this.study_id = AutoAnnotator.study_id;
 		System.out.println("RIGHT IN PVG: " + study_id);
 		this.pvMap = AutoAnnotator.codebook;
+		this.AttrORobj = AutoAnnotator.AttrORobj;
 
 	}
 	//Column	Code	Label	Class	Resource
@@ -71,6 +73,14 @@ public class PVGenerator extends BasicGenerator {
 			return false;
 		}
 	}
+	
+	private String getPVvalue(CSVRecord rec) {
+		if (AttrORobj.containsKey(getLabel(rec))) {
+			return kbPrefix + "DASA-" + study_id + "-" + getLabel(rec).trim().replace(" ", "").replace("_","-").replace("??", "");
+		} else {
+			return kbPrefix + "DASO-" + study_id + "-" + getLabel(rec).trim().replace(" ", "").replace("_","-").replace("??", "");
+		}
+	}
 
 	@Override
 	Map<String, Object> createRow(CSVRecord rec, int row_number) throws Exception {
@@ -87,7 +97,7 @@ public class PVGenerator extends BasicGenerator {
 		row.put("hasco:hasCodeLabel", getCodeLabel(rec));
 		row.put("hasco:hasClass", getClass(rec));
 		row.put("hasco:hasResource", getResource(rec));
-		row.put("hasco:isPossibleValueOf", kbPrefix + "DASA-" + study_id + "-" + getLabel(rec).trim().replace(" ", "").replace("_","-").replace("??", ""));
+		row.put("hasco:isPossibleValueOf", getPVvalue(rec));
 		return row;
 	}
 }
