@@ -75,10 +75,14 @@ public class PVGenerator extends BasicGenerator {
 	}
 	
 	private String getPVvalue(CSVRecord rec) {
-		if (AttrORobj.containsKey(getLabel(rec))) {
-			return kbPrefix + "DASA-" + study_id + "-" + getLabel(rec).trim().replace(" ", "").replace("_","-").replace("??", "");
+		if ((getLabel(rec)).length() > 0) {
+			if (AttrORobj.containsKey(getLabel(rec))) {
+				return kbPrefix + "DASA-" + study_id + "-" + getLabel(rec).trim().replace(" ", "").replace("_","-").replace("??", "");
+			} else {
+				return kbPrefix + "DASO-" + study_id + "-" + getLabel(rec).trim().replace(" ", "").replace("_","-").replace("??", "");
+			}
 		} else {
-			return kbPrefix + "DASO-" + study_id + "-" + getLabel(rec).trim().replace(" ", "").replace("_","-").replace("??", "");
+			return "";
 		}
 	}
 
