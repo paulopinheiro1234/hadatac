@@ -77,9 +77,9 @@ public class PVGenerator extends BasicGenerator {
 	private String getPVvalue(CSVRecord rec) {
 		if ((getLabel(rec)).length() > 0) {
 			if (AttrORobj.containsKey(getLabel(rec))) {
-				return kbPrefix + "DASA-" + fileName.replace("SDD-","").replace(".csv","") + "-" + getLabel(rec).trim().replace(" ", "").replace("_","-").replace("??", "");
+				return kbPrefix + "DASA-" + fileName.replace("SDD-","").replace("codebook.csv","") + "-" + getLabel(rec).trim().replace(" ", "").replace("_","-").replace("??", "");
 			} else {
-				return kbPrefix + "DASO-" + fileName.replace("SDD-","").replace(".csv","") + "-" + getLabel(rec).trim().replace(" ", "").replace("_","-").replace("??", "");
+				return kbPrefix + "DASO-" + fileName.replace("SDD-","").replace("codebook.csv","") + "-" + getLabel(rec).trim().replace(" ", "").replace("_","-").replace("??", "");
 			}
 		} else {
 			return "";
