@@ -17,6 +17,7 @@ import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Statement;
 import org.apache.jena.rdf.model.StmtIterator;
+import org.hadatac.metadata.loader.ValueCellProcessing;
 import org.hadatac.utils.Collections;
 import org.hadatac.utils.NameSpaces;
 
@@ -55,14 +56,13 @@ public class Attribute extends HADatAcClass implements Comparable<Attribute> {
 		return attributes;
 	}
 
-	public static String findCodeValue(String attr_uri, String code) {
+	public static String findCodeValue(String dasa_uri, String code) {
 		String queryString = NameSpaces.getInstance().printSparqlNameSpaceList()
 				+ " SELECT ?codeClass ?codeResource WHERE {"
-				+ " ?attruri hasco:hasAttribute <" + attr_uri + "> . "
-				+ " ?uri hasco:isPossibleValueOf ?attruri . "
-				+ " ?uri hasco:hasCode \"" + code + "\" . "
-				+ " OPTIONAL { ?uri hasco:hasClass ?codeClass . }"
-				+ " OPTIONAL { ?uri hasco:hasResource ?codeResource . }"
+				+ " ?possibleValue a hasco:PossibleValue . "
+				+ " ?possibleValue hasco:isPossibleValueOf <" + dasa_uri + "> . "
+				+ " ?possibleValue hasco:hasCode \"" + code + "\" . "
+				+ " ?possibleValue hasco:hasClass ?codeClass . "
 				+ " }";
 
 		Query query = QueryFactory.create(queryString);
@@ -74,21 +74,12 @@ public class Attribute extends HADatAcClass implements Comparable<Attribute> {
 
 		if (resultsrw.size() > 0) {
 			QuerySolution soln = resultsrw.next();
-			try{
-				if (null != soln.getResource("codeResource")) {
-					String classUri = soln.getResource("codeResource").toString();
-					if(!classUri.equals("")){
-						return classUri.substring(classUri.lastIndexOf("#") + 1);
+			try {
+				if (null != soln.getResource("codeClass")) {
+					String classUri = soln.getResource("codeClass").toString();
+					if (classUri.length() != 0) {
+						return ValueCellProcessing.replacePrefixEx(classUri);
 					}
-				} else {
-
-					if (null != soln.getResource("codeClass")) {
-						String classUri = soln.getResource("codeClass").toString();
-						if(!classUri.equals("")){
-							return classUri.substring(classUri.lastIndexOf("#") + 1);
-						}
-					}
-
 				}
 			} catch (Exception e1) {
 				return null;

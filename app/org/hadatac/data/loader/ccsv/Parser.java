@@ -6,6 +6,8 @@ import java.math.BigDecimal;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
+import java.util.HashMap;
 
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVRecord;
@@ -19,10 +21,10 @@ import org.hadatac.entity.pojo.DataAcquisition;
 import org.hadatac.entity.pojo.DataAcquisitionSchema;
 import org.hadatac.entity.pojo.DataAcquisitionSchemaAttribute;
 import org.hadatac.entity.pojo.DataAcquisitionSchemaEvent;
+import org.hadatac.entity.pojo.DataAcquisitionSchemaObject;
 import org.hadatac.entity.pojo.DataFile;
 import org.hadatac.entity.pojo.ObjectCollection;
 import org.hadatac.entity.pojo.Measurement;
-import org.hadatac.entity.pojo.Subject;
 import org.hadatac.metadata.loader.ValueCellProcessing;
 import org.hadatac.console.controllers.fileviewer.CSVPreview;
 import org.hadatac.utils.Collections;
@@ -44,6 +46,7 @@ public class Parser {
 		System.out.println("indexMeasurements()...");
 		
 		schema = DataAcquisitionSchema.find(da.getSchemaUri());
+		Map<String, DataAcquisitionSchemaObject> mapSchemaObjects = new HashMap<String, DataAcquisitionSchemaObject>();
 		String message = "";
 
 		try {
@@ -115,9 +118,9 @@ public class Parser {
 		}
 
 		for (CSVRecord record : records) {
-			Iterator<DataAcquisitionSchemaAttribute> iter = schema.getAttributes().iterator();
-			while (iter.hasNext()) {
-				DataAcquisitionSchemaAttribute dasa = iter.next();
+			Iterator<DataAcquisitionSchemaAttribute> iterAttributes = schema.getAttributes().iterator();
+			while (iterAttributes.hasNext()) {
+				DataAcquisitionSchemaAttribute dasa = iterAttributes.next();
 				if (dasa.getLabel().equals(schema.getTimestampLabel())) {
 					continue;
 				}
@@ -280,7 +283,26 @@ public class Parser {
 				}
 				
 				measurement.setSchemaAttributeUri(dasa.getUri().replace("<", "").replace(">", ""));
-				measurement.setEntityUri(dasa.getEntity());
+				DataAcquisitionSchemaObject daso = null;
+				String dasoUri = dasa.getObjectUri();
+				if (mapSchemaObjects.containsKey(dasoUri)) {
+					daso = mapSchemaObjects.get(dasoUri);
+				} else {
+					daso = DataAcquisitionSchemaObject.find(dasoUri);
+					mapSchemaObjects.put(dasoUri, daso);
+				}
+				
+				if (null != daso && daso.getPositionInt() > 0) {
+					String dasoValue = record.get(daso.getPositionInt() - 1);
+					String codeValue = Attribute.findCodeValue(dasa.getAttribute(), dasoValue);
+					if (codeValue == null) {
+						measurement.setEntityUri(dasa.getEntity());
+					} else {
+						measurement.setEntityUri(codeValue);
+					}
+				} else {
+					measurement.setEntityUri(dasa.getEntity());
+				}
 				//measurement.setEntityUri(StudyObject.findUribyOriginalId(measurement.getValue()));
 				measurement.setCharacteristicUri(dasa.getAttribute());
 

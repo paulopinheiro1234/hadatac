@@ -1,8 +1,6 @@
 package org.hadatac.data.loader;
 
 import java.io.File;
-
-import org.hadatac.console.controllers.annotator.AutoAnnotator;
 import org.hadatac.console.http.ConfigUtils;
 
 import java.lang.String;
@@ -16,24 +14,22 @@ import org.apache.commons.csv.CSVRecord;
 public class PVGenerator extends BasicGenerator {
 	final String kbPrefix = ConfigUtils.getKbPrefix();
 	String startTime = "";
-	String SDDName = "";
+	String SDDFileName = "";
 	HashMap<String, String> codeMap;
-	//	HashMap<String, String> LabelMap = new HashMap<String, String>();
 	HashMap<String, List<String>> pvMap = new HashMap<String, List<String>>();
 	String study_id = "";
 	HashMap<String, String> AttrORobj;
 
-	//chear-kb:PV-childsex-0
-
-	public PVGenerator(File file) {
+	public PVGenerator(File file, String SDDFileName, String study_id, 
+			HashMap<String, String> codeMap, 
+			HashMap<String, List<String>> pvMap,
+			HashMap<String, String> AttrORobj) {
 		super(file);
-		this.SDDName = file.getName();
-		this.codeMap = AutoAnnotator.codeMappings;
-		this.study_id = AutoAnnotator.study_id;
-		System.out.println("RIGHT IN PVG: " + study_id);
-		this.pvMap = AutoAnnotator.codebook;
-		this.AttrORobj = AutoAnnotator.AttrORobj;
-
+		this.SDDFileName = SDDFileName;
+		this.study_id = study_id;
+		this.codeMap = codeMap;
+		this.pvMap = pvMap;
+		this.AttrORobj = AttrORobj;
 	}
 	//Column	Code	Label	Class	Resource
 	@Override
@@ -73,13 +69,14 @@ public class PVGenerator extends BasicGenerator {
 			return false;
 		}
 	}
-	
+
 	private String getPVvalue(CSVRecord rec) {
 		if ((getLabel(rec)).length() > 0) {
-			if (AttrORobj.containsKey(getLabel(rec))) {
-				return kbPrefix + "DASA-" + study_id + "-" + getLabel(rec).trim().replace(" ", "").replace("_","-").replace("??", "");
+			String colNameInSDD = getLabel(rec).replace(" ", "");
+			if (AttrORobj.containsKey(colNameInSDD) && AttrORobj.get(colNameInSDD).length() > 0) {
+				return kbPrefix + "DASA-" + SDDFileName.replace("SDD-", "").replace(".csv", "") + "-" + getLabel(rec).trim().replace(" ", "").replace("_","-").replace("??", "");
 			} else {
-				return kbPrefix + "DASO-" + study_id + "-" + getLabel(rec).trim().replace(" ", "").replace("_","-").replace("??", "");
+				return kbPrefix + "DASO-" + SDDFileName.replace("SDD-", "").replace(".csv", "") + "-" + getLabel(rec).trim().replace(" ", "").replace("_","-").replace("??", "");
 			}
 		} else {
 			return "";
@@ -87,14 +84,14 @@ public class PVGenerator extends BasicGenerator {
 	}
 
 	@Override
-	Map<String, Object> createRow(CSVRecord rec, int row_number) throws Exception {
+	Map<String, Object> createRow(CSVRecord rec, int row_number) throws Exception {	
 		Map<String, Object> row = new HashMap<String, Object>();
 		if (getResource(rec) != null && getResource(rec).length() != 0){
 			row.put("hasURI", getResource(rec));
 		}
 		else{
 			row.put("hasURI", (kbPrefix + "PV-" + getLabel(rec).replace("_","-").replace("??", "") 
-					+ ("-" + study_id.replace("null", "") + "-" + getCode(rec)).replaceAll("--", "-")).replace(" ",""));
+					+ ("-" + SDDFileName.replace("SDD-", "").replace(".csv", "") + "-" + getCode(rec)).replaceAll("--", "-")).replace(" ",""));
 		}
 		row.put("a", "hasco:PossibleValue");
 		row.put("hasco:hasCode", getCode(rec));

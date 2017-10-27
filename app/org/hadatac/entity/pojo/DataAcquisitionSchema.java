@@ -324,7 +324,8 @@ public class DataAcquisitionSchema {
 				" ASK { " + schemaUri + " a hasco:DASchema . } ";
 		Query query = QueryFactory.create(queryString);
 
-		QueryExecution qexec = QueryExecutionFactory.sparqlService(Collections.getCollectionsName(Collections.METADATA_SPARQL), query);
+		QueryExecution qexec = QueryExecutionFactory.sparqlService(
+				Collections.getCollectionsName(Collections.METADATA_SPARQL), query);
 		boolean uriExist = qexec.execAsk();
 		qexec.close();
 

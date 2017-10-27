@@ -4,11 +4,8 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 
-import org.apache.commons.io.FileUtils;
 import org.hadatac.console.controllers.annotator.AutoAnnotator;
 import org.hadatac.console.http.ConfigUtils;
-
-import play.Play;
 
 import java.lang.String;
 import java.util.HashMap;
@@ -20,7 +17,6 @@ import org.apache.commons.csv.CSVRecord;
 public class DASchemaAttrGenerator extends BasicGenerator {
 
 	final String kbPrefix = ConfigUtils.getKbPrefix();
-	String study_id = AutoAnnotator.study_id;
 	String startTime = "";
 	String SDDName = "";
 	HashMap<String, String> codeMap;
@@ -167,15 +163,14 @@ public class DASchemaAttrGenerator extends BasicGenerator {
 	@Override
 	Map<String, Object> createRow(CSVRecord rec, int row_number) throws Exception {
 		Map<String, Object> row = new HashMap<String, Object>();
-		SDDName = fileName.replace("SDD-","").replace(".csv","");
+		SDDName = fileName.replace("SDD-", "").replace(".csv", "");
 		codeMap = AutoAnnotator.codeMappings;
-		row.put("hasURI", kbPrefix + "DASA-" + study_id + "-" + getLabel(rec).trim().replace(" ", "").replace("_","-").replace("??", ""));
+		row.put("hasURI", kbPrefix + "DASA-" + SDDName + "-" + getLabel(rec).trim().replace(" ", "").replace("_","-").replace("??", ""));
 		row.put("a", "hasco:DASchemaAttribute");
 		row.put("rdfs:label", getLabel(rec));
 		row.put("rdfs:comment", getLabel(rec));
 		row.put("hasco:partOfSchema", kbPrefix + "DAS-" + SDDName);
 		row.put("hasco:hasPosition", getPosition(rec));
-		//if (codeMap.containsKey(hasEntityMap.get(rec.get(mapCol.get("hasURI"))))) {
 		row.put("hasco:hasEntity", getEntity(rec));
 		row.put("hasco:hasAttribute", getAttribute(rec));
 		row.put("hasco:hasUnit", getUnit(rec));

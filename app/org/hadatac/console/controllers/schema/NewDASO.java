@@ -72,11 +72,13 @@ public class NewDASO extends Controller {
 		String newRole = data.getNewRole();
 		String newInRelationTo = getUriFromInRelationTo(data.getNewInRelationTo(),das.getObjects());
 		String newRelation = data.getNewRelation();
+		String newPosition = "-1";
 
 		// insert current state of the DASO
 		DataAcquisitionSchemaObject daso = new DataAcquisitionSchemaObject(newURI,
 				newLabel,
 				das_uri,
+				newPosition,
 				newEntity,
 				newRole,
 				newInRelationTo,

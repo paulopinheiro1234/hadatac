@@ -699,6 +699,8 @@ public class AutoAnnotator extends Controller {
 	}
 
 	public static boolean annotateDataAcquisitionSchemaFile(File file) {
+		System.out.println("Processing data acquisition schema file ...");
+		
 		boolean bSuccess = true;
 		try{
 			HashMap<String, String> hm = new HashMap<String, String>();
@@ -760,6 +762,7 @@ public class AutoAnnotator extends Controller {
 				String str[] = line.split(",");
 				AttrORobj.put(str[0], str[2]);
 			}
+			System.out.println("AttrORobj: " + AttrORobj);
 			bufRdr.close();
 
 			if (hm.get("Code_Mappings") != ""){
@@ -783,10 +786,9 @@ public class AutoAnnotator extends Controller {
 			try{
 				URL url3 = new URL(hm.get("Codebook"));
 				System.out.println(url3.toString());
-				File cb = new File("sddtmp/" + file.getName().replace(".csv", "")+"-codebook.csv");
-				//System.out.println(cb.getAbsoluteFile());
-				FileUtils.copyURLToFile(url3, cb);
-				BufferedReader bufRdr3 = new BufferedReader(new FileReader(cb));
+				File codeBookFile = new File("sddtmp/" + file.getName().replace(".csv", "")+"-codebook.csv");
+				FileUtils.copyURLToFile(url3, codeBookFile);
+				BufferedReader bufRdr3 = new BufferedReader(new FileReader(codeBookFile));
 				String line3 =  null;
 				System.out.println("Read Codebook");
 				while((line3 = bufRdr3.readLine()) != null){
@@ -795,20 +797,20 @@ public class AutoAnnotator extends Controller {
 					codebook.put(codesl.get(0), codesl);
 				}
 				bufRdr3.close();
-				//System.out.println("RIGHT BEFORE PVG: " + study_id);
-				PVGenerator pvGenerator = new PVGenerator(cb);
+
+				PVGenerator pvGenerator = new PVGenerator(codeBookFile, file.getName(), study_id,
+						codeMappings, codebook, AttrORobj);
 				System.out.println("Calling PVGenerator");
 				bSuccess = commitRows(pvGenerator.createRows(), pvGenerator.toString(), 
 						file.getName(), "PossibleValue", true);
-				cb.delete();
-
+				codeBookFile.delete();
 			} catch (Exception e) {
 				e.printStackTrace();
 				System.out.println("Error annotateDataAcquisitionSchemaFile: Unable to read codebook");
-				File cb = new File(file.getName().replace(".csv", "")+"-codebook.csv");
-				System.out.println(cb.getAbsoluteFile());
-				System.out.println(cb.length());
-				cb.delete();
+				File codeBookFile = new File(file.getName().replace(".csv", "")+"-codebook.csv");
+				System.out.println(codeBookFile.getAbsoluteFile());
+				System.out.println(codeBookFile.length());
+				codeBookFile.delete();
 				return false;
 			}
 

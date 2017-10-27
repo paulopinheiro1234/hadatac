@@ -112,6 +112,7 @@ public class DataAcquisitionSchemaAttribute {
 		this.setUnit(unit);
 		this.daseUri = daseUri;
 		this.dasoUri = dasoUri;
+		System.out.println("dasoUri: " + dasoUri);
 	}
 
 	public String getUri() {
@@ -564,7 +565,8 @@ public class DataAcquisitionSchemaAttribute {
 				"} ";
 		Query query = QueryFactory.create(queryString);
 
-		QueryExecution qexec = QueryExecutionFactory.sparqlService(Collections.getCollectionsName(Collections.METADATA_SPARQL), query);
+		QueryExecution qexec = QueryExecutionFactory.sparqlService(
+				Collections.getCollectionsName(Collections.METADATA_SPARQL), query);
 		ResultSet results = qexec.execSelect();
 		ResultSetRewindable resultsrw = ResultSetFactory.copyResults(results);
 		qexec.close();
