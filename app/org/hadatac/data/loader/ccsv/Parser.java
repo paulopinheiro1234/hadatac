@@ -116,8 +116,12 @@ public class Parser {
 		if (!schema.getInRelationToLabel().equals("")) {
 			posInRelation = tempPositionOfLabel(schema.getInRelationToLabel()); 
 		}
-
+		
+		// Store possible values before hand to avoid frequent SPARQL queries
+		Map<String, Map<String, String>> possibleValues = DataAcquisitionSchema.findPossibleValues(da.getSchemaUri());
+		System.out.println("possibleValues: " + possibleValues);
 		for (CSVRecord record : records) {
+			System.out.println("record: " + record);
 			Iterator<DataAcquisitionSchemaAttribute> iterAttributes = schema.getAttributes().iterator();
 			while (iterAttributes.hasNext()) {
 				DataAcquisitionSchemaAttribute dasa = iterAttributes.next();
@@ -160,11 +164,14 @@ public class Parser {
 					continue;
 				} else {
 					String originalValue = record.get(dasa.getTempPositionInt() - 1);
-					String codeValue = Attribute.findCodeValue(dasa.getAttribute(), originalValue);
-					if (codeValue == null) {
-						measurement.setValue(originalValue);
+					if (possibleValues.containsKey(dasa.getAttribute())) {
+						if (possibleValues.get(dasa.getAttribute()).containsKey(originalValue.toLowerCase())) {
+							measurement.setValue(possibleValues.get(dasa.getAttribute()).get(originalValue.toLowerCase()));
+						} else {
+							measurement.setValue(originalValue);
+						}
 					} else {
-						measurement.setValue(codeValue);
+						measurement.setValue(originalValue);
 					}
 				}
 
@@ -294,14 +301,24 @@ public class Parser {
 				
 				if (null != daso && daso.getPositionInt() > 0) {
 					String dasoValue = record.get(daso.getPositionInt() - 1);
-					String codeValue = Attribute.findCodeValue(dasa.getAttribute(), dasoValue);
-					if (codeValue == null) {
-						measurement.setEntityUri(dasa.getEntity());
+					
+					//System.out.println("=====================================");
+					//System.out.println("daso.getPositionInt(): " + daso.getPositionInt());
+					//System.out.println("dasoValue: " + dasoValue);
+					//System.out.println("dasa.getObjectUri(): " + dasa.getObjectUri());
+					
+					if (possibleValues.containsKey(dasa.getObjectUri())) {
+						if (possibleValues.get(dasa.getObjectUri()).containsKey(dasoValue.toLowerCase())) {
+							//System.out.println("codeValue: " + possibleValues.get(dasa.getObjectUri()).get(dasoValue.toLowerCase()));
+							measurement.setEntityUri(possibleValues.get(dasa.getObjectUri()).get(dasoValue.toLowerCase()));
+						} else {
+							measurement.setEntityUri(dasoValue);
+						}
 					} else {
-						measurement.setEntityUri(codeValue);
-					}
+						measurement.setEntityUri(dasoValue);
+					}					
 				} else {
-					measurement.setEntityUri(dasa.getEntity());
+					measurement.setEntityUri(dasa.getObjectUri());
 				}
 				//measurement.setEntityUri(StudyObject.findUribyOriginalId(measurement.getValue()));
 				measurement.setCharacteristicUri(dasa.getAttribute());

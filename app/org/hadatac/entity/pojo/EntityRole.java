@@ -72,11 +72,11 @@ public class EntityRole extends HADatAcThing implements Comparable<EntityRole> {
 				if (soln.get("roleUri") != null && !soln.get("roleUri").toString().isEmpty()) {
 					role.setUri(soln.get("roleUri").toString());
 					role.setLabel(soln.get("roleUri").toString().split("#")[1]);
-				} else if (soln.get("relation") == null || soln.get("relation").toString().isEmpty()) {
+				} else if (soln.get("relation") != null || soln.get("relation").toString().isEmpty()) {
 					role.setUri("http://semanticscience.org/resource/Sample");
 					role.setLabel("Sample");
 				}
-				
+								
 				AttributeInstance attrib = new AttributeInstance();
 				if (!preValues.isEmpty() && !preValues.contains(soln.get("attributeUri").toString())) {
 					continue;

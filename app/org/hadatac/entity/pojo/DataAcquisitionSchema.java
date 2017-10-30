@@ -14,6 +14,7 @@ import org.apache.jena.query.QuerySolution;
 import org.apache.jena.query.ResultSet;
 import org.apache.jena.query.ResultSetFactory;
 import org.apache.jena.query.ResultSetRewindable;
+import org.apache.jena.sparql.function.library.print;
 import org.apache.jena.update.UpdateExecutionFactory;
 import org.apache.jena.update.UpdateFactory;
 import org.apache.jena.update.UpdateProcessor;
@@ -367,6 +368,62 @@ public class DataAcquisitionSchema {
 			}
 		}
 		return schemas;
+	}
+	
+	public static Map<String, Map<String, String>> findPossibleValues(String schemaUri) {
+		System.out.println("findPossibleValues is called!");
+		Map<String, Map<String, String>> mapPossibleValues = new HashMap<String, Map<String, String>>();
+		String queryString = NameSpaces.getInstance().printSparqlNameSpaceList()
+				+ " SELECT ?daso_or_dasa ?codeClass ?code ?resource WHERE { "
+				+ " ?possibleValue a hasco:PossibleValue . "
+				+ " ?possibleValue hasco:isPossibleValueOf ?daso_or_dasa . "
+				+ " ?possibleValue hasco:hasCode ?code . "
+				+ " ?daso_or_dasa hasco:partOfSchema <" + schemaUri + "> . " 
+				+ " OPTIONAL { ?possibleValue hasco:hasClass ?codeClass } . "
+				+ " OPTIONAL { ?possibleValue hasco:hasResource ?resource } . "
+				+ " }";
+
+		Query query = QueryFactory.create(queryString);
+		QueryExecution qexec = QueryExecutionFactory.sparqlService(
+				Collections.getCollectionsName(Collections.METADATA_SPARQL), query);
+		ResultSet results = qexec.execSelect();
+		ResultSetRewindable resultsrw = ResultSetFactory.copyResults(results);
+		qexec.close();
+
+		int count = 0;
+		try {
+		while (resultsrw.hasNext()) {
+			count += 1;
+			System.out.println("count: " + count);
+			
+			String classUri = "";
+			QuerySolution soln = resultsrw.next();
+			System.out.println("soln: " + soln);
+			if (soln.get("codeClass").toString().length() > 0) {
+				classUri = soln.getResource("codeClass").toString();
+			} else if (soln.get("resource").toString().length() > 0) {
+				classUri = soln.getResource("resource").toString();
+			} 
+			
+			System.out.println("hello1");
+			String daso_or_dasa = soln.getResource("daso_or_dasa").toString();
+			String code = soln.getLiteral("code").toString();
+			if (mapPossibleValues.containsKey(daso_or_dasa)) {
+				System.out.println("hello3");
+				mapPossibleValues.get(daso_or_dasa).put(code.toLowerCase(), classUri);
+			} else {
+				System.out.println("hello5");
+				Map<String, String> indvMapPossibleValues = new HashMap<String, String>();
+				indvMapPossibleValues.put(code.toLowerCase(), classUri);
+				mapPossibleValues.put(daso_or_dasa, indvMapPossibleValues);
+			}
+			System.out.println("hello2");
+		}
+		} catch (Exception e) {
+			System.out.println("My Error: " + e.getMessage());
+		}
+
+		return mapPossibleValues;
 	}
 
 	public static DataAcquisitionSchema create(String uri) {

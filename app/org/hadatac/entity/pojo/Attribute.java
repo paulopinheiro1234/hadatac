@@ -61,8 +61,9 @@ public class Attribute extends HADatAcClass implements Comparable<Attribute> {
 				+ " SELECT ?codeClass ?codeResource WHERE {"
 				+ " ?possibleValue a hasco:PossibleValue . "
 				+ " ?possibleValue hasco:isPossibleValueOf <" + dasa_uri + "> . "
-				+ " ?possibleValue hasco:hasCode \"" + code + "\" . "
+				+ " ?possibleValue hasco:hasCode ?code . "
 				+ " ?possibleValue hasco:hasClass ?codeClass . "
+				+ " FILTER (lcase(str(?code)) = \"" + code.toLowerCase() + "\") "
 				+ " }";
 
 		Query query = QueryFactory.create(queryString);
