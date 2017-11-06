@@ -5,44 +5,42 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.List;
 import org.apache.commons.csv.CSVRecord;
-import org.apache.commons.io.FileUtils;
 import org.hadatac.console.http.ConfigUtils;
 
-import play.Play;
 
 public class DASchemaGenerator extends BasicGenerator {
-    final String kbPrefix = ConfigUtils.getKbPrefix();
-    String startTime = "";
-    String SDDName = "";
-    
-    public DASchemaGenerator(File file) {
-	super(file);
-    }
-    
-    @Override
-    void initMapping() {
-	mapCol.clear();
-    }
-    
-    @Override
-    public List< Map<String, Object> > createRows() throws Exception {
-	SDDName = fileName.replace("SDD-","").replace(".csv","");
-    	rows.clear();
-    	int row_number = 0;
-	for (CSVRecord record : records) {
-	    rows.add(createRow(record, ++row_number));
-	    break;
+	final String kbPrefix = ConfigUtils.getKbPrefix();
+	String startTime = "";
+	String SDDName = "";
+
+	public DASchemaGenerator(File file) {
+		super(file);
 	}
-     	return rows;
-    }
-    
-    @Override
-    Map<String, Object> createRow(CSVRecord rec, int row_number) throws Exception {
-    	Map<String, Object> row = new HashMap<String, Object>();
-    	row.put("hasURI", kbPrefix + "DAS-" + SDDName);
-    	row.put("a", "hasco:DASchema");
-    	row.put("rdfs:label", "Schema for EPI Data Acquisition");
-    	row.put("rdfs:comment", "");
-    	return row;
-    }
+
+	@Override
+	void initMapping() {
+		mapCol.clear();
+	}
+
+	@Override
+	public List< Map<String, Object> > createRows() throws Exception {
+		SDDName = fileName.replace("SDD-", "").replace(".csv", "");
+		rows.clear();
+		int row_number = 0;
+		for (CSVRecord record : records) {
+			rows.add(createRow(record, ++row_number));
+			break;
+		}
+		return rows;
+	}
+
+	@Override
+	Map<String, Object> createRow(CSVRecord rec, int row_number) throws Exception {
+		Map<String, Object> row = new HashMap<String, Object>();
+		row.put("hasURI", kbPrefix + "DAS-" + SDDName);
+		row.put("a", "hasco:DASchema");
+		row.put("rdfs:label", "Schema for EPI Data Acquisition");
+		row.put("rdfs:comment", "");
+		return row;
+	}
 }

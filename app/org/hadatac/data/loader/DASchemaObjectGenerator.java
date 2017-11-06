@@ -58,12 +58,6 @@ public class DASchemaObjectGenerator extends BasicGenerator {
 		mapCol.put("WasDerivedFrom", "wasDerivedFrom");       
 		mapCol.put("WasGeneratedBy", "wasGeneratedBy");
 		mapCol.put("HasPosition", "hasPosition");
-		// mapCol.put("??mother", "chear-kb:ObjectTypeMother");
-		// mapCol.put("??child", "chear-kb:ObjectTypeChild");
-		// mapCol.put("??birth", "chear-kb:ObjectTypeBirth");
-		// mapCol.put("??household", "chear-kb:ObjectTypeHousehold");
-		// mapCol.put("??headhousehold", "chear-kb:ObjectTypeHeadHousehold");
-		// mapCol.put("??father", "chear-kb:ObjectTypeFather");
 	}
 
 	private String getLabel(CSVRecord rec) {

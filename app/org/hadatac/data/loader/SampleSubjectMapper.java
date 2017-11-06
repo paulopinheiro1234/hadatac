@@ -19,26 +19,28 @@ import org.apache.jena.query.ResultSetRewindable;
 import org.apache.jena.sparql.engine.http.QueryExceptionHTTP;
 import org.hadatac.console.controllers.metadata.DynamicFunctions;
 import org.hadatac.utils.Collections;
+import org.hadatac.utils.Feedback;
 import org.hadatac.utils.NameSpaces;
 import org.hadatac.entity.pojo.Study;
 import org.hadatac.entity.pojo.ObjectCollectionType;
+import org.hadatac.entity.pojo.Credential;
 import org.hadatac.entity.pojo.ObjectCollection;
 import org.hadatac.entity.pojo.StudyObjectType;
 import org.hadatac.entity.pojo.StudyObject;
 
 public class SampleSubjectMapper extends BasicGenerator {
-	
+
 	public SampleSubjectMapper(File file) {
 		super(file);
 	}
-	
+
 	@Override
 	void initMapping() {
 		mapCol.clear();
-                mapCol.put("originalPID", "patient_id");
-                mapCol.put("originalSID", "specimen_id");
+		mapCol.put("originalPID", "patient_id");
+		mapCol.put("originalSID", "specimen_id");
 	}
-	
+
 	private String getSampleUri(CSVRecord rec) {
 		String sampleUri = "";
 		String sampleQueryString = NameSpaces.getInstance().printSparqlNameSpaceList() +
@@ -52,12 +54,12 @@ public class SampleSubjectMapper extends BasicGenerator {
 			ResultSet results = qexec.execSelect();
 			ResultSetRewindable resultsrw = ResultSetFactory.copyResults(results);
 			qexec.close();
-	                if(resultsrw.hasNext()) {
-	                   QuerySolution soln = resultsrw.next();
-	                   if(soln.contains("s")){
-	            	     sampleUri = DynamicFunctions.replaceURLWithPrefix(soln.get("s").toString());
-	            	     //System.out.println("Sample URI: " + sampleUri);
-	                   }
+			if(resultsrw.hasNext()) {
+				QuerySolution soln = resultsrw.next();
+				if(soln.contains("s")){
+					sampleUri = DynamicFunctions.replaceURLWithPrefix(soln.get("s").toString());
+					//System.out.println("Sample URI: " + sampleUri);
+				}
 			}
 		} catch (QueryExceptionHTTP e) {
 			e.printStackTrace();
@@ -65,7 +67,7 @@ public class SampleSubjectMapper extends BasicGenerator {
 		//System.out.println("Sample:" + sampleUri);
 		return sampleUri;
 	}
-	
+
 	private String getSubjectUri(CSVRecord rec) {
 		String subjectUri = "";
 		String subjectQueryString = NameSpaces.getInstance().printSparqlNameSpaceList() +
@@ -79,28 +81,28 @@ public class SampleSubjectMapper extends BasicGenerator {
 			ResultSet results = qexec.execSelect();
 			ResultSetRewindable resultsrw = ResultSetFactory.copyResults(results);
 			qexec.close();
-	        if(resultsrw.hasNext()) {
-	            QuerySolution soln = resultsrw.next();
-	            if(soln.contains("s")){
-	            	subjectUri = DynamicFunctions.replaceURLWithPrefix(soln.get("s").toString());
-	            }
-	        }
+			if(resultsrw.hasNext()) {
+				QuerySolution soln = resultsrw.next();
+				if(soln.contains("s")){
+					subjectUri = DynamicFunctions.replaceURLWithPrefix(soln.get("s").toString());
+				}
+			}
 		} catch (QueryExceptionHTTP e) {
 			e.printStackTrace();
 		}
 		//System.out.println("Subject:" + subjectUri);
 		return subjectUri;
 	}
-	
+
 	public boolean updateMappings() throws Exception {
 		for (CSVRecord record : records) {
-			
+
 			if (getSampleUri(record) == ""){
 				continue;
 			} else {
-				
+
 				StudyObject obj = StudyObject.find(getSampleUri(record));
-				
+
 				List<String> scope_l = new ArrayList<String>();
 				scope_l.add(getSubjectUri(record));
 				if (obj.getScopeUris() == null || obj.getScopeUris().isEmpty()){
@@ -111,7 +113,12 @@ public class SampleSubjectMapper extends BasicGenerator {
 				System.out.println("Added to scopeuris.");
 				obj.save();
 				// update/create new OBJ in LabKey
-				int nRowsAffected = obj.saveToLabKey("gychant", "labkey");
+				Credential cred = Credential.find();
+				if (null == cred) {
+					System.out.println(Feedback.println(Feedback.WEB, "[ERROR] No LabKey credentials are provided!"));
+					return false;
+				}
+				int nRowsAffected = obj.saveToLabKey(cred.getUserName(), cred.getPassword());
 				System.out.println("nRowsAffected : " + nRowsAffected);
 				if (nRowsAffected <= 0) {
 					System.out.println("Failed to insert new OC to LabKey!\n");
@@ -121,19 +128,19 @@ public class SampleSubjectMapper extends BasicGenerator {
 		}
 		return true;
 	}
-	
-	
+
+
 	@Override
 	Map<String, Object> createRow(CSVRecord rec, int row_number) throws Exception {
-    	     Map<String, Object> row = new HashMap<String, Object>();
-             String sampleUri = getSampleUri(rec);
-             String subjectUri = getSubjectUri(rec);
-             if (sampleUri.equals("") || subjectUri.equals("")) {
-		 System.out.println("Mapping Sample(" + sampleUri + ") <-> Subject(" + subjectUri + ") rejected");
-		 return null;
-	     }
-    	     row.put("hasURI", sampleUri);
-    	     row.put("hasco:isSampleOf", subjectUri);
-    	     return row;
+		Map<String, Object> row = new HashMap<String, Object>();
+		String sampleUri = getSampleUri(rec);
+		String subjectUri = getSubjectUri(rec);
+		if (sampleUri.equals("") || subjectUri.equals("")) {
+			System.out.println("Mapping Sample(" + sampleUri + ") <-> Subject(" + subjectUri + ") rejected");
+			return null;
+		}
+		row.put("hasURI", sampleUri);
+		row.put("hasco:isSampleOf", subjectUri);
+		return row;
 	}
 }

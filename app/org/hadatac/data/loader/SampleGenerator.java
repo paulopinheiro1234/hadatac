@@ -16,9 +16,11 @@ import org.apache.jena.query.ResultSetFactory;
 import org.apache.jena.query.ResultSetRewindable;
 import org.apache.jena.rdf.model.Literal;
 import org.hadatac.console.http.ConfigUtils;
+import org.hadatac.entity.pojo.Credential;
 import org.hadatac.entity.pojo.ObjectCollection;
 import org.hadatac.entity.pojo.StudyObject;
 import org.hadatac.utils.Collections;
+import org.hadatac.utils.Feedback;
 import org.hadatac.utils.NameSpaces;
 import org.hadatac.utils.Templates;
 import org.hadatac.entity.pojo.Study;
@@ -35,50 +37,50 @@ public class SampleGenerator extends BasicGenerator {
 	final String kbPrefix = ConfigUtils.getKbPrefix();
 	private String dataAcquisition = "";
 	private int counter = 1; //starting index number
-	
+
 	StudyObject obj = null;
-	
-    private String studyUri = "";
-    private String hasScopeUri = "";    
-    private List<String> scopeUris = new ArrayList<String>();
-    private List<String> spaceScopeUris = new ArrayList<String>();
-    private List<String> timeScopeUris = new ArrayList<String>();
-    private List<String> objectUris = new ArrayList<String>();
-	
+
+	private String studyUri = "";
+	private String hasScopeUri = "";    
+	private List<String> scopeUris = new ArrayList<String>();
+	private List<String> spaceScopeUris = new ArrayList<String>();
+	private List<String> timeScopeUris = new ArrayList<String>();
+	private List<String> objectUris = new ArrayList<String>();
+
 	public SampleGenerator(File file) {
 		super(file);
 	}
-	
+
 	@Override
 	void initMapping() {
-	    mapCol.clear();
-	    mapCol.put("sampleID", "specimen_id");
-	    mapCol.put("studyID", "study_id");
-	    mapCol.put("sampleSuffix", "suffix");
+		mapCol.clear();
+		mapCol.put("sampleID", "specimen_id");
+		mapCol.put("studyID", "study_id");
+		mapCol.put("sampleSuffix", "suffix");
 
 	}
 
 	@Override
 	Map<String, Object> createRow(CSVRecord rec, int rownumber) throws Exception {
-	    Map<String, Object> row = new HashMap<String, Object>();
-	    row.put("hasURI", getUri(rec));
-	    row.put("a", getType(rec));
-	    row.put("rdfs:label", getLabel(rec));
-	    row.put("hasco:originalID", getOriginalID(rec));
-	    row.put("hasco:isSampleOf", getSubjectUri(rec));
-	    row.put("hasco:isObjectOf", getCollectionUri(rec));
-	    row.put("rdfs:comment", getComment(rec));
-	    row.put("hasco:hasSamplingMethod", getSamplingMethod(rec));
-	    row.put("hasco:hasSamplingVolume", getSamplingVolume(rec));
-	    row.put("hasco:hasSamplingVolumeUnit", getSamplingVolumeUnit(rec));
-	    row.put("hasco:hasStorageTemperature", getStorageTemperature(rec));
-	    row.put("hasco:hasStorageTemperatureUnit", getStorageTemperatureUnit());
-	    row.put("hasco:hasNumFreezeThaw", getNumFreezeThaw(rec));
-	    counter++;
-	    
-	    return row;
+		Map<String, Object> row = new HashMap<String, Object>();
+		row.put("hasURI", getUri(rec));
+		row.put("a", getType(rec));
+		row.put("rdfs:label", getLabel(rec));
+		row.put("hasco:originalID", getOriginalID(rec));
+		row.put("hasco:isSampleOf", getSubjectUri(rec));
+		row.put("hasco:isObjectOf", getCollectionUri(rec));
+		row.put("rdfs:comment", getComment(rec));
+		row.put("hasco:hasSamplingMethod", getSamplingMethod(rec));
+		row.put("hasco:hasSamplingVolume", getSamplingVolume(rec));
+		row.put("hasco:hasSamplingVolumeUnit", getSamplingVolumeUnit(rec));
+		row.put("hasco:hasStorageTemperature", getStorageTemperature(rec));
+		row.put("hasco:hasStorageTemperatureUnit", getStorageTemperatureUnit());
+		row.put("hasco:hasNumFreezeThaw", getNumFreezeThaw(rec));
+		counter++;
+
+		return row;
 	}
-    
+
 	private int getSampleCount(String studyID){
 		int count = 0;
 		String sampleCountQuery = NameSpaces.getInstance().printSparqlNameSpaceList() 
@@ -98,15 +100,15 @@ public class SampleGenerator extends BasicGenerator {
 				count += countLiteral.getInt();
 			}
 		}
-		
+
 		return count;
 	}
-	
+
 	private String getUri(CSVRecord rec) {
 		return kbPrefix + "SPL-" + String.format("%04d", counter + getSampleCount(rec.get(mapCol.get("studyID")))) 
-			+ "-" + rec.get(mapCol.get("studyID")); //  + "-" + getSampleSuffix()
+		+ "-" + rec.get(mapCol.get("studyID")); //  + "-" + getSampleSuffix()
 	}
-	
+
 	private String getType(CSVRecord rec) {
 		if(!rec.get(mapCol.get("sampleType")).equalsIgnoreCase("NULL")){
 			return rec.get(mapCol.get("sampleType"));
@@ -114,30 +116,30 @@ public class SampleGenerator extends BasicGenerator {
 			return "sio:Sample";
 		}
 	}
-	
+
 	private String getLabel(CSVRecord rec) {
 		return "SID " + String.format("%04d", counter + getSampleCount(rec.get(mapCol.get("studyID")))) + " - " 
-			+ rec.get(mapCol.get("studyID")) + " " + getSampleSuffix(rec);
+				+ rec.get(mapCol.get("studyID")) + " " + getSampleSuffix(rec);
 	}
-	
-    private String getOriginalID(CSVRecord rec) {
-    	if(!rec.get(mapCol.get("sampleID")).equalsIgnoreCase("NULL")){
-    		return rec.get(mapCol.get("sampleID"));
-    	} else {
-    		return "";
-    	}
-    }
-    
-    private String getSubjectUri(CSVRecord rec) {
-    	if (rec.get(mapCol.get("subjectID")).equalsIgnoreCase("NULL")) {
-    		return "";
-    	}
-    	
-    	String subject = "";
+
+	private String getOriginalID(CSVRecord rec) {
+		if(!rec.get(mapCol.get("sampleID")).equalsIgnoreCase("NULL")){
+			return rec.get(mapCol.get("sampleID"));
+		} else {
+			return "";
+		}
+	}
+
+	private String getSubjectUri(CSVRecord rec) {
+		if (rec.get(mapCol.get("subjectID")).equalsIgnoreCase("NULL")) {
+			return "";
+		}
+
+		String subject = "";
 		String subjectQuery = NameSpaces.getInstance().printSparqlNameSpaceList() 
 				+ " SELECT ?subjectURI WHERE { "
 				+ " ?subjectURI hasco:originalID \"" + rec.get(mapCol.get("subjectID")) + "\" . }";
-		
+
 		QueryExecution qexecSubject = QueryExecutionFactory.sparqlService(Collections.getCollectionsName(Collections.METADATA_SPARQL), subjectQuery);
 		ResultSet subjectResults = qexecSubject.execSelect();
 		ResultSetRewindable resultsrwSubject = ResultSetFactory.copyResults(subjectResults);
@@ -146,155 +148,163 @@ public class SampleGenerator extends BasicGenerator {
 			QuerySolution soln = resultsrwSubject.next();
 			subject = soln.get("subjectURI").toString();
 		}
-    	
-    	return subject;
-    }
-    
-    private String getDataAcquisition() {
-    	return dataAcquisition;
-    }
-    
-    private String getComment(CSVRecord rec) {
-    	return "Sample " + String.format("%04d", counter + getSampleCount(rec.get(mapCol.get("studyID")))) 
-    		+ " for " + rec.get(mapCol.get("studyID")) + " " + getSampleSuffix(rec);
-    }
-    
-    private String getSamplingMethod(CSVRecord rec) {
-    	if(!rec.get(mapCol.get("samplingMethod")).equalsIgnoreCase("NULL")){
-    		return rec.get(mapCol.get("samplingMethod"));
-    	} else {
-    		return "";
-    	}
-    }
-    
-    private String getSamplingVolume(CSVRecord rec) {
-    	if(!rec.get(mapCol.get("samplingVol")).equalsIgnoreCase("NULL")){
-    		return rec.get(mapCol.get("samplingVol"));
-    	} else {
-    		return "";
-    	}
-    }
-    
-    private String getSamplingVolumeUnit(CSVRecord rec) {
-    	if(!rec.get(mapCol.get("samplingVolUnit")).equalsIgnoreCase("NULL")){
-    		return rec.get(mapCol.get("samplingVolUnit"));
-    	} else {
-    		return "obo:UO_0000095"; // default volume unit
-    	}
-    }
-    
-    private String getStorageTemperature(CSVRecord rec) {
-    	if(!rec.get(mapCol.get("storageTemp")).equalsIgnoreCase("NULL")){
-    		return rec.get(mapCol.get("storageTemp"));
-    	} else {
-    		return "";
-    	}
-    }
-    
-    private String getStorageTemperatureUnit() {
-    	// defaulting to Celsius since SID file does not contain temp unit
-    	return "obo:UO_0000027";
-    }
-    
-    private String getNumFreezeThaw(CSVRecord rec) {
-    	if(!rec.get(mapCol.get("FTcount")).equalsIgnoreCase("NULL")){
-    		return rec.get("FTcount");
-    	} else {
-    		return "";
-    	}
-    }
-    
-    private String getSampleSuffix(CSVRecord rec) {
-    	if(!rec.get(mapCol.get("sampleSuffix")).equalsIgnoreCase("NULL")){
-    		return rec.get(mapCol.get("sampleSuffix"));
-    	} else {
-    		return "";
-    	}
-    }
-    
-    private String getStudyUri(CSVRecord rec) {
-    	return kbPrefix + "STD-" + rec.get(mapCol.get("studyID"));
-    }
-    
-    private String getCollectionUri(CSVRecord rec) {
-    	return kbPrefix + "SC-" + rec.get(mapCol.get("studyID"));
-    }
-    
-    private String getCollectionLabel(CSVRecord rec) {
-    	return "Sample Collection of Study " + rec.get(mapCol.get("studyID"));
-    }
-    
-    public Map<String, Object> createCollectionRow(CSVRecord rec) {
-    	Map<String, Object> row = new HashMap<String, Object>();
-    	row.put("hasURI", getCollectionUri(rec));
-    	row.put("a", "hasco:SampleCollection");
-    	row.put("rdfs:label", getCollectionLabel(rec));
-    	row.put("hasco:hasSize", Integer.toString(Iterables.size(records)+1));
-    	row.put("hasco:isSampleCollectionOf", getStudyUri(rec));
-    	counter++;
-    	
-    	return row;
-    }
-    
-    public List< Map<String, Object> > createCollectionRows() {
-    	rows.clear();
-    	for (CSVRecord record : records) {
-    		rows.add(createCollectionRow(record));
-    	}
-    	return rows;
-    }
-       
-    public void createObj(CSVRecord record) throws Exception {
-	    	
-	    	// insert current state of the OBJ
-	    	obj = new StudyObject(getUri(record), "sio:Sample", getOriginalID(record), getLabel(record), getCollectionUri(record), getLabel(record), scopeUris);
-	        
-	    	// insert the new OC content inside of the triplestore regardless of any change -- the previous content has already been deleted
-	    	obj.save();
-	    	counter++;
-	    	System.out.println("obj " + getUri(record).toString() + " saved!");
-	    	// update/create new OBJ in LabKey
-	    	int nRowsAffected = obj.saveToLabKey("gychant", "labkey");
-	    	if (nRowsAffected <= 0) {
-	    	    System.out.println("[ERROR] Failed to insert new OBJ to LabKey!");
-	    	}
-	    	
-    		objectUris.add(getUri(record));
-    		System.out.println(objectUris.size());
 
-    }
-    
-    public boolean createOc() throws Exception {
-    	
-	    // insert current state of the OC
+		return subject;
+	}
+
+	private String getDataAcquisition() {
+		return dataAcquisition;
+	}
+
+	private String getComment(CSVRecord rec) {
+		return "Sample " + String.format("%04d", counter + getSampleCount(rec.get(mapCol.get("studyID")))) 
+		+ " for " + rec.get(mapCol.get("studyID")) + " " + getSampleSuffix(rec);
+	}
+
+	private String getSamplingMethod(CSVRecord rec) {
+		if(!rec.get(mapCol.get("samplingMethod")).equalsIgnoreCase("NULL")){
+			return rec.get(mapCol.get("samplingMethod"));
+		} else {
+			return "";
+		}
+	}
+
+	private String getSamplingVolume(CSVRecord rec) {
+		if(!rec.get(mapCol.get("samplingVol")).equalsIgnoreCase("NULL")){
+			return rec.get(mapCol.get("samplingVol"));
+		} else {
+			return "";
+		}
+	}
+
+	private String getSamplingVolumeUnit(CSVRecord rec) {
+		if(!rec.get(mapCol.get("samplingVolUnit")).equalsIgnoreCase("NULL")){
+			return rec.get(mapCol.get("samplingVolUnit"));
+		} else {
+			return "obo:UO_0000095"; // default volume unit
+		}
+	}
+
+	private String getStorageTemperature(CSVRecord rec) {
+		if(!rec.get(mapCol.get("storageTemp")).equalsIgnoreCase("NULL")){
+			return rec.get(mapCol.get("storageTemp"));
+		} else {
+			return "";
+		}
+	}
+
+	private String getStorageTemperatureUnit() {
+		// defaulting to Celsius since SID file does not contain temp unit
+		return "obo:UO_0000027";
+	}
+
+	private String getNumFreezeThaw(CSVRecord rec) {
+		if(!rec.get(mapCol.get("FTcount")).equalsIgnoreCase("NULL")){
+			return rec.get("FTcount");
+		} else {
+			return "";
+		}
+	}
+
+	private String getSampleSuffix(CSVRecord rec) {
+		if(!rec.get(mapCol.get("sampleSuffix")).equalsIgnoreCase("NULL")){
+			return rec.get(mapCol.get("sampleSuffix"));
+		} else {
+			return "";
+		}
+	}
+
+	private String getStudyUri(CSVRecord rec) {
+		return kbPrefix + "STD-" + rec.get(mapCol.get("studyID"));
+	}
+
+	private String getCollectionUri(CSVRecord rec) {
+		return kbPrefix + "SC-" + rec.get(mapCol.get("studyID"));
+	}
+
+	private String getCollectionLabel(CSVRecord rec) {
+		return "Sample Collection of Study " + rec.get(mapCol.get("studyID"));
+	}
+
+	public Map<String, Object> createCollectionRow(CSVRecord rec) {
+		Map<String, Object> row = new HashMap<String, Object>();
+		row.put("hasURI", getCollectionUri(rec));
+		row.put("a", "hasco:SampleCollection");
+		row.put("rdfs:label", getCollectionLabel(rec));
+		row.put("hasco:hasSize", Integer.toString(Iterables.size(records)+1));
+		row.put("hasco:isSampleCollectionOf", getStudyUri(rec));
+		counter++;
+
+		return row;
+	}
+
+	public List< Map<String, Object> > createCollectionRows() {
+		rows.clear();
+		for (CSVRecord record : records) {
+			rows.add(createCollectionRow(record));
+		}
+		return rows;
+	}
+
+	public void createObj(CSVRecord record) throws Exception {
+		// insert current state of the OBJ
+		obj = new StudyObject(getUri(record), "sio:Sample", getOriginalID(record), 
+				getLabel(record), getCollectionUri(record), getLabel(record), scopeUris);
+
+		// insert the new OC content inside of the triplestore regardless of any change -- the previous content has already been deleted
+		obj.save();
+		counter++;
+		System.out.println("obj " + getUri(record).toString() + " saved!");
+
+		// update/create new OBJ in LabKey
+		Credential cred = Credential.find();
+		if (null == cred) {
+			System.out.println(Feedback.println(Feedback.WEB, "[ERROR] No LabKey credentials are provided!"));
+			return;
+		}
+		int nRowsAffected = obj.saveToLabKey(cred.getUserName(), cred.getPassword());
+		if (nRowsAffected <= 0) {
+			System.out.println("[ERROR] Failed to insert new OBJ to LabKey!");
+		}
+
+		objectUris.add(getUri(record));
+		System.out.println(objectUris.size());
+	}
+
+	public boolean createOc() throws Exception {
+		// insert current state of the OC
 		ObjectCollection oc = new ObjectCollection(getCollectionUri(records.iterator().next()),
-																"http://hadatac.org/ont/hasco/SampleCollection",
-																getCollectionLabel(records.iterator().next()),
-																getCollectionLabel(records.iterator().next()),
-																getStudyUri(records.iterator().next()),
-																hasScopeUri,
-																spaceScopeUris,
-																timeScopeUris);
+				"http://hadatac.org/ont/hasco/SampleCollection",
+				getCollectionLabel(records.iterator().next()),
+				getCollectionLabel(records.iterator().next()),
+				getStudyUri(records.iterator().next()),
+				hasScopeUri,
+				spaceScopeUris,
+				timeScopeUris);
 
-    	for (CSVRecord record : records) {
-    		
-//    		System.out.println(getUri(record));
-    		createObj(record);
-	    }
-    	
-    	oc.setObjectUris(objectUris);
-	
+		for (CSVRecord record : records) {
+			createObj(record);
+		}
+
+		oc.setObjectUris(objectUris);
+
 		// insert the new OC content inside of the triplestore regardless of any change -- the previous content has already been deleted
 		oc.save();
 		System.out.println("oc saved!");
+
 		// update/create new OC in LabKey
-		int nRowsAffected = oc.saveToLabKey("gychant", "labkey");
+		Credential cred = Credential.find();
+		if (null == cred) {
+			System.out.println(Feedback.println(Feedback.WEB, "[ERROR] No LabKey credentials are provided!"));
+			return false;
+		}
+		int nRowsAffected = oc.saveToLabKey(cred.getUserName(), cred.getPassword());
 		System.out.println("nRowsAffected : " + nRowsAffected);
 		if (nRowsAffected <= 0) {
 			System.out.println("Failed to insert new OC to LabKey!\n");
 			return false;
 		}
-		return true;
 
-    }
+		return true;
+	}
 }
