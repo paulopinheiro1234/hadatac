@@ -48,7 +48,7 @@ public class StudyObject extends HADatAcThing {
 	List<String> scopeUris;
 
 	public StudyObject() {
-		this("","");
+		this("", "");
 	}
 
 	public StudyObject(String uri, String isMemberOf) {
@@ -172,7 +172,8 @@ public class StudyObject extends HADatAcThing {
 		//System.out.println("Looking for object with URI " + obj_uri + " \nQuery: " + queryString);
 		Query query = QueryFactory.create(queryString);
 
-		QueryExecution qexec = QueryExecutionFactory.sparqlService(Collections.getCollectionsName(Collections.METADATA_SPARQL), query);
+		QueryExecution qexec = QueryExecutionFactory.sparqlService(
+				Collections.getCollectionsName(Collections.METADATA_SPARQL), query);
 		ResultSet results = qexec.execSelect();
 		ResultSetRewindable resultsrw = ResultSetFactory.copyResults(results);
 		qexec.close();

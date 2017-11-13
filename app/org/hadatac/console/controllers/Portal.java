@@ -4,6 +4,7 @@ import play.mvc.Controller;
 import play.mvc.Result;
 import play.twirl.api.Html;
 
+import org.hadatac.console.models.SecurityRole;
 import org.hadatac.console.views.html.main;
 import org.hadatac.console.views.html.portal;
 import org.hadatac.utils.Repository;
@@ -24,6 +25,9 @@ public class Portal extends Controller {
     						+ "HADatAC Solr is down now. Ask Administrator for further information. "
     						+ "</h4></div>")));
     	}
+    	
+    	// check existence/availability of security role
+    	SecurityRole.initialize();
     	
     	return ok(portal.render()); 
     }

@@ -390,35 +390,26 @@ public class DataAcquisitionSchema {
 		ResultSetRewindable resultsrw = ResultSetFactory.copyResults(results);
 		qexec.close();
 
-		int count = 0;
 		try {
-		while (resultsrw.hasNext()) {
-			count += 1;
-			System.out.println("count: " + count);
-			
-			String classUri = "";
-			QuerySolution soln = resultsrw.next();
-			System.out.println("soln: " + soln);
-			if (soln.get("codeClass").toString().length() > 0) {
-				classUri = soln.getResource("codeClass").toString();
-			} else if (soln.get("resource").toString().length() > 0) {
-				classUri = soln.getResource("resource").toString();
-			} 
-			
-			System.out.println("hello1");
-			String daso_or_dasa = soln.getResource("daso_or_dasa").toString();
-			String code = soln.getLiteral("code").toString();
-			if (mapPossibleValues.containsKey(daso_or_dasa)) {
-				System.out.println("hello3");
-				mapPossibleValues.get(daso_or_dasa).put(code.toLowerCase(), classUri);
-			} else {
-				System.out.println("hello5");
-				Map<String, String> indvMapPossibleValues = new HashMap<String, String>();
-				indvMapPossibleValues.put(code.toLowerCase(), classUri);
-				mapPossibleValues.put(daso_or_dasa, indvMapPossibleValues);
+			while (resultsrw.hasNext()) {				
+				String classUri = "";
+				QuerySolution soln = resultsrw.next();
+				if (soln.get("codeClass").toString().length() > 0) {
+					classUri = soln.getResource("codeClass").toString();
+				} else if (soln.get("resource").toString().length() > 0) {
+					classUri = soln.getResource("resource").toString();
+				} 
+				
+				String daso_or_dasa = soln.getResource("daso_or_dasa").toString();
+				String code = soln.getLiteral("code").toString();
+				if (mapPossibleValues.containsKey(daso_or_dasa)) {
+					mapPossibleValues.get(daso_or_dasa).put(code.toLowerCase(), classUri);
+				} else {
+					Map<String, String> indvMapPossibleValues = new HashMap<String, String>();
+					indvMapPossibleValues.put(code.toLowerCase(), classUri);
+					mapPossibleValues.put(daso_or_dasa, indvMapPossibleValues);
+				}
 			}
-			System.out.println("hello2");
-		}
 		} catch (Exception e) {
 			System.out.println("My Error: " + e.getMessage());
 		}

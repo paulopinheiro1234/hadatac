@@ -50,6 +50,25 @@ public class SecurityRole implements Role {
 	public String getName() {
 		return roleName;
 	}
+	
+	public static void initialize() {
+		if (SecurityRole.existsSolr() == false) {
+			System.out.println("SecurityRole.existsSolr() == false");
+			addSecurityRole(
+					org.hadatac.console.controllers.AuthApplication.DATA_OWNER_ROLE, 
+					"f4251649-751e-4190-b0ed-e824f3cdd6fc");
+			addSecurityRole(
+					org.hadatac.console.controllers.AuthApplication.DATA_MANAGER_ROLE,
+					"fdeff289-daee-4ecc-8c9c-3ef111cf7a06");			
+		}
+	}
+	
+	private static void addSecurityRole(String roleName, String id) {
+		final SecurityRole role = new SecurityRole();
+		role.roleName = roleName;
+		role.id_s = id;
+		role.save();
+	}
 
 	public static SecurityRole findByRoleName(String roleName) {
 		return findByRoleNameSolr(roleName);

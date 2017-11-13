@@ -11,6 +11,7 @@ import java.util.HashMap;
 
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVRecord;
+import org.apache.http.cookie.SM;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.impl.HttpSolrClient;
@@ -23,6 +24,7 @@ import org.hadatac.entity.pojo.DataAcquisitionSchemaEvent;
 import org.hadatac.entity.pojo.DataAcquisitionSchemaObject;
 import org.hadatac.entity.pojo.DataFile;
 import org.hadatac.entity.pojo.ObjectCollection;
+import org.hadatac.entity.pojo.StudyObject;
 import org.hadatac.entity.pojo.Measurement;
 import org.hadatac.metadata.loader.ValueCellProcessing;
 import org.hadatac.console.controllers.fileviewer.CSVPreview;
@@ -118,9 +120,9 @@ public class Parser {
 		
 		// Store possible values before hand to avoid frequent SPARQL queries
 		Map<String, Map<String, String>> possibleValues = DataAcquisitionSchema.findPossibleValues(da.getSchemaUri());
-		System.out.println("possibleValues: " + possibleValues);
+		//System.out.println("possibleValues: " + possibleValues);
 		for (CSVRecord record : records) {
-			System.out.println("record: " + record);
+			//System.out.println("record: " + record);
 			Iterator<DataAcquisitionSchemaAttribute> iterAttributes = schema.getAttributes().iterator();
 			while (iterAttributes.hasNext()) {
 				DataAcquisitionSchemaAttribute dasa = iterAttributes.next();
@@ -298,24 +300,50 @@ public class Parser {
 					mapSchemaObjects.put(dasoUri, daso);
 				}
 				
-				if (null != daso && daso.getPositionInt() > 0) {
-					String dasoValue = record.get(daso.getPositionInt() - 1);
-					
-					//System.out.println("=====================================");
-					//System.out.println("daso.getPositionInt(): " + daso.getPositionInt());
-					//System.out.println("dasoValue: " + dasoValue);
-					//System.out.println("dasa.getObjectUri(): " + dasa.getObjectUri());
-					
-					if (possibleValues.containsKey(dasa.getObjectUri())) {
-						if (possibleValues.get(dasa.getObjectUri()).containsKey(dasoValue.toLowerCase())) {
-							//System.out.println("codeValue: " + possibleValues.get(dasa.getObjectUri()).get(dasoValue.toLowerCase()));
-							measurement.setEntityUri(possibleValues.get(dasa.getObjectUri()).get(dasoValue.toLowerCase()));
+				if (null != daso) {
+					if (daso.getPositionInt() > 0) {
+						// values of daso exist in the columns
+						String dasoValue = record.get(daso.getPositionInt() - 1);
+						if (possibleValues.containsKey(dasa.getObjectUri())) {
+							if (possibleValues.get(dasa.getObjectUri()).containsKey(dasoValue.toLowerCase())) {
+								measurement.setEntityUri(possibleValues.get(dasa.getObjectUri()).get(dasoValue.toLowerCase()));
+							} else {
+								measurement.setEntityUri(dasoValue);
+							}
 						} else {
 							measurement.setEntityUri(dasoValue);
 						}
 					} else {
-						measurement.setEntityUri(dasoValue);
-					}					
+						// values of daso might exist in the triple store
+						if (daso.getEntity().equals(ValueCellProcessing.replacePrefixEx("sio:Human"))) {
+							System.out.println("sio:Human========================");
+							System.out.println("schema.getOriginalIdLabel(): " + schema.getOriginalIdLabel());
+							if (!schema.getOriginalIdLabel().equals("")) {
+								String originalId = record.get(posOriginalId);
+								String objectUri = StudyObject.findUribyOriginalId(originalId);
+								measurement.setObjectUri(objectUri);
+								measurement.setPID(originalId);
+							}
+						} else if (daso.getEntity().equals(ValueCellProcessing.replacePrefixEx("sio:Sample"))) {
+							System.out.println("sio:Sample========================");
+							System.out.println("schema.getOriginalIdLabel(): " + schema.getOriginalIdLabel());
+							if (!schema.getOriginalIdLabel().equals("")) {
+								String originalId = record.get(posOriginalId);
+								String sampleUri = StudyObject.findUribyOriginalId(originalId);
+								StudyObject sample = StudyObject.find(sampleUri);
+								if (null != sample) {
+									if (!sample.getScopeUris().isEmpty()) {
+										measurement.setObjectUri(sample.getScopeUris().get(0));
+										StudyObject human = StudyObject.find(sample.getScopeUris().get(0));
+										if (null != human) {
+											measurement.setPID(human.getOriginalId());
+										}
+									}
+								}
+								measurement.setSID(originalId);
+							}
+						}
+					}
 				} else {
 					measurement.setEntityUri(dasa.getObjectUri());
 				}

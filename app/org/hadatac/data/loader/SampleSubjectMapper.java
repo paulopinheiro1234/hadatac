@@ -126,9 +126,9 @@ public class SampleSubjectMapper extends BasicGenerator {
 				}
 			}
 		}
+		
 		return true;
 	}
-
 
 	@Override
 	Map<String, Object> createRow(CSVRecord rec, int row_number) throws Exception {

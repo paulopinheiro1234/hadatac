@@ -1,13 +1,11 @@
 
 import java.io.File;
-import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import org.hadatac.console.controllers.annotator.AutoAnnotator;
 import org.hadatac.console.models.SecurityRole;
-import org.hadatac.utils.Repository;
 
 import com.feth.play.module.pa.PlayAuthenticate;
 import com.feth.play.module.pa.PlayAuthenticate.Resolver;
@@ -75,8 +73,6 @@ public class Global extends GlobalSettings {
 			}
 		});
 
-		// check existence/availability of security role
-		initialData();
 		initDirectoryStructure();
 
 		// check if default user still have default password. If so, ask to change.
@@ -104,25 +100,6 @@ public class Global extends GlobalSettings {
 		};
 
 		Akka.system().scheduler().schedule(delay, frequency, annotation, Akka.system().dispatcher());
-	}
-
-	private void initialData() {
-		if (SecurityRole.existsSolr() == false) {
-			System.out.println("SecurityRole.existsSolr() == false");
-			addSecurityRole(
-					org.hadatac.console.controllers.AuthApplication.DATA_OWNER_ROLE, 
-					"f4251649-751e-4190-b0ed-e824f3cdd6fc");
-			addSecurityRole(
-					org.hadatac.console.controllers.AuthApplication.DATA_MANAGER_ROLE,
-					"fdeff289-daee-4ecc-8c9c-3ef111cf7a06");			
-		}
-	}
-
-	private void addSecurityRole(String roleName, String id) {
-		final SecurityRole role = new SecurityRole();
-		role.roleName = roleName;
-		role.id_s = id;
-		role.save();
 	}
 
 	private void initDirectoryStructure(){
