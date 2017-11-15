@@ -94,28 +94,36 @@ public class Parser {
 		int posUnit = -1;
 		int posInRelation = -1;
 		if (!schema.getTimestampLabel().equals("")) {
-			posTimestamp = tempPositionOfLabel(schema.getTimestampLabel()); 
+			posTimestamp = tempPositionOfLabel(schema.getTimestampLabel());
+			System.out.println("Finished tempPositionOfLabel!!!");
 		}
 		if (!schema.getTimeInstantLabel().equals("")) {
-			posTimeInstant = tempPositionOfLabel(schema.getTimeInstantLabel()); 
+			posTimeInstant = tempPositionOfLabel(schema.getTimeInstantLabel());
+			System.out.println("Finished tempPositionOfLabel!!!");
 		}
 		if (!schema.getNamedTimeLabel().equals("")) {
-			posNamedTime = tempPositionOfLabel(schema.getNamedTimeLabel()); 
+			posNamedTime = tempPositionOfLabel(schema.getNamedTimeLabel());
+			System.out.println("Finished tempPositionOfLabel!!!");
 		}
 		if (!schema.getIdLabel().equals("")) {
-			posId = tempPositionOfLabel(schema.getIdLabel()); 
+			posId = tempPositionOfLabel(schema.getIdLabel());
+			System.out.println("Finished tempPositionOfLabel!!!");
 		}
 		if (!schema.getOriginalIdLabel().equals("")) {
-			posOriginalId = tempPositionOfLabel(schema.getOriginalIdLabel()); 
+			posOriginalId = tempPositionOfLabel(schema.getOriginalIdLabel());
+			System.out.println("Finished tempPositionOfLabel!!!");
 		}
 		if (!schema.getEntityLabel().equals("")) {
-			posEntity = tempPositionOfLabel(schema.getEntityLabel()); 
+			posEntity = tempPositionOfLabel(schema.getEntityLabel());
+			System.out.println("Finished tempPositionOfLabel!!!");
 		}
 		if (!schema.getUnitLabel().equals("")) {
-			posUnit = tempPositionOfLabel(schema.getUnitLabel()); 
+			posUnit = tempPositionOfLabel(schema.getUnitLabel());
+			System.out.println("Finished tempPositionOfLabel!!!");
 		}
 		if (!schema.getInRelationToLabel().equals("")) {
-			posInRelation = tempPositionOfLabel(schema.getInRelationToLabel()); 
+			posInRelation = tempPositionOfLabel(schema.getInRelationToLabel());
+			System.out.println("Finished tempPositionOfLabel getInRelationToLabel !!!");
 		}
 		
 		// Store possible values before hand to avoid frequent SPARQL queries
@@ -319,8 +327,10 @@ public class Parser {
 							System.out.println("sio:Human========================");
 							System.out.println("schema.getOriginalIdLabel(): " + schema.getOriginalIdLabel());
 							if (!schema.getOriginalIdLabel().equals("")) {
-								String originalId = record.get(posOriginalId);
+								String originalId = record.get(posOriginalId - 1);
+								System.out.println("findUribyOriginalId ... ");
 								String objectUri = StudyObject.findUribyOriginalId(originalId);
+								System.out.println("objectUri: " + objectUri);
 								measurement.setObjectUri(objectUri);
 								measurement.setPID(originalId);
 							}
@@ -328,7 +338,7 @@ public class Parser {
 							System.out.println("sio:Sample========================");
 							System.out.println("schema.getOriginalIdLabel(): " + schema.getOriginalIdLabel());
 							if (!schema.getOriginalIdLabel().equals("")) {
-								String originalId = record.get(posOriginalId);
+								String originalId = record.get(posOriginalId - 1);
 								String sampleUri = StudyObject.findUribyOriginalId(originalId);
 								StudyObject sample = StudyObject.find(sampleUri);
 								if (null != sample) {

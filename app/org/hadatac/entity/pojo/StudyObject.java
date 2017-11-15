@@ -21,6 +21,7 @@ import org.apache.jena.update.UpdateProcessor;
 import org.apache.jena.update.UpdateRequest;
 import org.hadatac.utils.Collections;
 import org.hadatac.utils.NameSpaces;
+import org.jboss.netty.util.EstimatableObjectWrapper;
 import org.hadatac.utils.FirstLabel;
 import org.hadatac.utils.ConfigProp;
 import org.hadatac.metadata.loader.LabkeyDataHandler;
@@ -165,13 +166,12 @@ public class StudyObject extends HADatAcThing {
 				" ?hasComment ?isFrom ?atLocation ?atTime WHERE { " + 
 				"    " + obj_uri + " a ?objType . " + 
 				"    " + obj_uri + " hasco:isMemberOf ?isMemberOf .  " + 
-				"    OPTIONAL { " + obj_uri + " hasco:originalId ?originalId } . " + 
+				"    OPTIONAL { " + obj_uri + " hasco:originalID ?originalId } . " + 
 				"    OPTIONAL { " + obj_uri + " rdfs:label ?hasLabel } . " + 
 				"    OPTIONAL { " + obj_uri + " rdfs:comment ?hasComment } . " + 
 				"}";
-		//System.out.println("Looking for object with URI " + obj_uri + " \nQuery: " + queryString);
+		System.out.println("queryString: " + queryString);
 		Query query = QueryFactory.create(queryString);
-
 		QueryExecution qexec = QueryExecutionFactory.sparqlService(
 				Collections.getCollectionsName(Collections.METADATA_SPARQL), query);
 		ResultSet results = qexec.execSelect();
@@ -237,40 +237,30 @@ public class StudyObject extends HADatAcThing {
 	}
 
 	public static String findUribyOriginalId(String original_id) {
-
 		String queryString = NameSpaces.getInstance().printSparqlNameSpaceList() + 
-				"SELECT  ?objuri " + 
-				" WHERE { " + 
-				" ?objuri hasco:originalId " + original_id + " } . " + 
+				"SELECT  ?objuri WHERE { " + 
+				"	?objuri hasco:originalID \"" + original_id + "\" . " + 
 				"}";
-		//System.out.println("Looking for object with URI " + obj_uri + " \nQuery: " + queryString);
 		Query query = QueryFactory.create(queryString);
 
-		QueryExecution qexec = QueryExecutionFactory.sparqlService(Collections.getCollectionsName(Collections.METADATA_SPARQL), query);
+		QueryExecution qexec = QueryExecutionFactory.sparqlService(
+				Collections.getCollectionsName(Collections.METADATA_SPARQL), query);
 		ResultSet results = qexec.execSelect();
 		ResultSetRewindable resultsrw = ResultSetFactory.copyResults(results);
 		qexec.close();
 
-		if (!resultsrw.hasNext()) {
+		if (resultsrw.size() >= 1) {
+			QuerySolution soln = resultsrw.next();
+			if (soln != null) {
+				if (soln.getResource("objuri") != null) {
+					return soln.getResource("objuri").toString();
+				}
+			}
+		} else {
 			System.out.println("[WARNING] StudyObject. Could not find OBJ URI for: " + original_id);
 			return "";
 		}
-
-		while (resultsrw.hasNext()) {
-			QuerySolution soln = resultsrw.next();
-			if (soln != null) {
-
-				try {
-					if (soln.getResource("objuri") != null) {
-						return soln.getResource("objuri").toString();
-					}
-				} catch (Exception e1) {
-
-				}
-			}
-
-
-		}
+		
 		return "";
 	}
 
@@ -349,7 +339,6 @@ public class StudyObject extends HADatAcThing {
 			obj_uri = "<" + this.getUri() + ">";
 		}
 
-
 		insert += NameSpaces.getInstance().printSparqlNameSpaceList();
 		insert += INSERT_LINE1;
 		if (typeUri.startsWith("http")) {
@@ -358,7 +347,7 @@ public class StudyObject extends HADatAcThing {
 			insert += obj_uri + " a " + typeUri + " . ";
 		}
 		if (!originalId.equals("")) {
-			insert += obj_uri + " hasco:originalId \""  + originalId + "\" .  ";
+			insert += obj_uri + " hasco:originalID \""  + originalId + "\" .  ";
 		}   
 		if (!label.equals("")) {
 			insert += obj_uri + " rdfs:label  \"" + label + "\" . ";
@@ -463,7 +452,8 @@ public class StudyObject extends HADatAcThing {
 		query += LINE_LAST;
 		//System.out.println("SPARQL query inside obj poho's delete: " + query);
 		UpdateRequest request = UpdateFactory.create(query);
-		UpdateProcessor processor = UpdateExecutionFactory.createRemote(request, Collections.getCollectionsName(Collections.METADATA_UPDATE));
+		UpdateProcessor processor = UpdateExecutionFactory.createRemote(
+				request, Collections.getCollectionsName(Collections.METADATA_UPDATE));
 		processor.execute();
 	}
 

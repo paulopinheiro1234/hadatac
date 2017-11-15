@@ -107,7 +107,7 @@ public class SubjectGenerator extends BasicGenerator {
 																hasScopeUri,
 																spaceScopeUris,
 																timeScopeUris);
-
+		
     	for (CSVRecord record : records) {
     		createObj(record);
 	    }
@@ -124,8 +124,7 @@ public class SubjectGenerator extends BasicGenerator {
 			System.out.println(Feedback.println(Feedback.WEB, "[ERROR] No LabKey credentials are provided!"));
 			return false;
 		}
-		System.out.println("cred.getUserName(): " + cred.getUserName());
-		System.out.println("cred.getPassword(): " + cred.getPassword());
+		
 		int nRowsAffected = oc.saveToLabKey(cred.getUserName(), cred.getPassword());
 		if (nRowsAffected <= 0) {
 			System.out.println("Failed to insert new OC to LabKey!\n");

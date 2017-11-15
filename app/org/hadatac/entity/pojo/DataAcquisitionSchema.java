@@ -43,10 +43,11 @@ public class DataAcquisitionSchema {
 	public static String DELETE_LINE3 = INDENT1 + " ?p ?o . ";
 	public static String LINE_LAST = "}  ";
 	public static String PREFIX = "DAS-";
-	public static List<String> METADASA = Arrays.asList("sio:TimeStamp", 
+	public static List<String> METADASA = Arrays.asList(
+			"sio:TimeStamp", 
 			"sio:TimeInstant", 
 			"hasco:namedTime", 
-			"hasco:originalId", 
+			"hasco:originalID", 
 			"hasco:uriId", 
 			"hasco:hasMetaEntity", 
 			"hasco:hasMetaEntityURI", 
@@ -213,12 +214,14 @@ public class DataAcquisitionSchema {
 	}
 
 	public void setAttributes(List<DataAcquisitionSchemaAttribute> attributes) {
+		System.out.println("setAttributes is called!");
 		if (attributes == null) {
 			System.out.println("[ERROR] No DataAcquisitionSchemaAttribute for " + uri + " is defined in the knowledge base. ");
 		} else {
 			this.attributes = attributes;
 			for (DataAcquisitionSchemaAttribute dasa : attributes) {
 				dasa.setDataAcquisitionSchema(this);
+				System.out.println("dasa.getAttribute(): " + dasa.getAttribute());
 				if (dasa.getAttribute().equals(ValueCellProcessing.replacePrefixEx("sio:TimeStamp"))) {
 					setTimestampLabel(dasa.getLabel());
 					System.out.println("[OK] DataAcquisitionSchema TimeStampLabel: " + dasa.getLabel());
@@ -235,7 +238,7 @@ public class DataAcquisitionSchema {
 					setIdLabel(dasa.getLabel());
 					System.out.println("[OK] DataAcquisitionSchema IdLabel: " + dasa.getLabel());
 				}
-				if (dasa.getAttribute().equals(ValueCellProcessing.replacePrefixEx("hasco:originalId"))) { 
+				if (dasa.getAttribute().equals(ValueCellProcessing.replacePrefixEx("hasco:originalID"))) { 
 					setOriginalIdLabel(dasa.getLabel());
 					System.out.println("[OK] DataAcquisitionSchema IdLabel: " + dasa.getLabel());
 				}

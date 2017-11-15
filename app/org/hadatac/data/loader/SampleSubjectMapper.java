@@ -21,11 +21,7 @@ import org.hadatac.console.controllers.metadata.DynamicFunctions;
 import org.hadatac.utils.Collections;
 import org.hadatac.utils.Feedback;
 import org.hadatac.utils.NameSpaces;
-import org.hadatac.entity.pojo.Study;
-import org.hadatac.entity.pojo.ObjectCollectionType;
 import org.hadatac.entity.pojo.Credential;
-import org.hadatac.entity.pojo.ObjectCollection;
-import org.hadatac.entity.pojo.StudyObjectType;
 import org.hadatac.entity.pojo.StudyObject;
 
 public class SampleSubjectMapper extends BasicGenerator {
@@ -45,8 +41,9 @@ public class SampleSubjectMapper extends BasicGenerator {
 		String sampleUri = "";
 		String sampleQueryString = NameSpaces.getInstance().printSparqlNameSpaceList() +
 				"SELECT ?s WHERE {" +
-				"?s hasco:originalId \"" + rec.get(mapCol.get("originalSID")) + "\"." +
+				"?s hasco:originalID \"" + rec.get(mapCol.get("originalSID")) + "\"." +
 				"}";
+		
 		try {
 			Query sampleQuery = QueryFactory.create(sampleQueryString);
 			QueryExecution qexec = QueryExecutionFactory.sparqlService(
@@ -56,15 +53,15 @@ public class SampleSubjectMapper extends BasicGenerator {
 			qexec.close();
 			if(resultsrw.hasNext()) {
 				QuerySolution soln = resultsrw.next();
-				if(soln.contains("s")){
+				if(soln.contains("s")) {
 					sampleUri = DynamicFunctions.replaceURLWithPrefix(soln.get("s").toString());
-					//System.out.println("Sample URI: " + sampleUri);
+					System.out.println("Sample URI: " + sampleUri);
 				}
 			}
 		} catch (QueryExceptionHTTP e) {
 			e.printStackTrace();
 		}
-		//System.out.println("Sample:" + sampleUri);
+		System.out.println("getSampleUri Sample:" + sampleUri);
 		return sampleUri;
 	}
 
@@ -72,7 +69,7 @@ public class SampleSubjectMapper extends BasicGenerator {
 		String subjectUri = "";
 		String subjectQueryString = NameSpaces.getInstance().printSparqlNameSpaceList() +
 				"SELECT ?s WHERE {" +
-				"?s hasco:originalId \"" + rec.get(mapCol.get("originalPID")) + "\"." +
+				"?s hasco:originalID \"" + rec.get(mapCol.get("originalPID")) + "\"." +
 				"}";
 		try {
 			Query subjectQuery = QueryFactory.create(subjectQueryString);
@@ -90,18 +87,17 @@ public class SampleSubjectMapper extends BasicGenerator {
 		} catch (QueryExceptionHTTP e) {
 			e.printStackTrace();
 		}
-		//System.out.println("Subject:" + subjectUri);
+		
 		return subjectUri;
 	}
 
 	public boolean updateMappings() throws Exception {
 		for (CSVRecord record : records) {
-
 			if (getSampleUri(record) == ""){
 				continue;
 			} else {
-
 				StudyObject obj = StudyObject.find(getSampleUri(record));
+				System.out.println("obj: " + obj);
 
 				List<String> scope_l = new ArrayList<String>();
 				scope_l.add(getSubjectUri(record));
