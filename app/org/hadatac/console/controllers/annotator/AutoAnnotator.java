@@ -56,6 +56,7 @@ import org.hadatac.data.loader.AgentGenerator;
 import org.hadatac.data.loader.DASchemaAttrGenerator;
 import org.hadatac.data.loader.DASchemaEventGenerator;
 import org.hadatac.data.loader.DASchemaObjectGenerator;
+import org.hadatac.data.loader.DASOInstanceGenerator;
 import org.hadatac.data.loader.DataAcquisitionGenerator;
 import org.hadatac.data.loader.DeploymentGenerator;
 import org.hadatac.data.loader.GeneralGenerator;
@@ -72,6 +73,11 @@ import org.hadatac.data.model.ParsingResult;
 import org.hadatac.entity.pojo.DataFile;
 import org.hadatac.entity.pojo.Measurement;
 import org.hadatac.entity.pojo.DataAcquisition;
+import org.hadatac.entity.pojo.DataAcquisitionSchema;
+import org.hadatac.entity.pojo.DataAcquisitionSchemaAttribute;
+import org.hadatac.entity.pojo.DataAcquisitionSchemaObject;
+import org.hadatac.entity.pojo.DASVirtualObject;
+import org.hadatac.entity.pojo.DASOInstance;
 import org.hadatac.entity.pojo.User;
 import org.hadatac.metadata.loader.LabkeyDataHandler;
 import org.hadatac.metadata.loader.ValueCellProcessing;
@@ -97,7 +103,8 @@ public class AutoAnnotator extends Controller {
 	public static HashMap<String, String> codeMappings = new HashMap<String, String>();
 	public static HashMap<String, String> AttrORobj = new HashMap<String, String>();
 	public static HashMap<String, String> entityMappings = new HashMap<String, String>();
-	public static HashMap<String, List<String>> codebook = new HashMap<String, List<String>>();
+	public static HashMap<String, Map<String,String>> codebook = new HashMap<String,Map<String,String>>();
+	public static HashMap<String,List<DASVirtualObject>> templateLibrary = new HashMap<String,List<DASVirtualObject>>();
 	public static String study_id = "default-study";
 	public static final String kbPrefix = ConfigUtils.getKbPrefix();
 
@@ -638,7 +645,7 @@ public class AutoAnnotator extends Controller {
 			DatasetAccessor accessor = DatasetAccessorFactory.createHTTP(
 					Collections.getCollectionsName(Collections.METADATA_GRAPH));
 			Model model = createModel(rows);
-			accessor.add(model);
+			accessor.add(model); // check URI's
 			log.addline(Feedback.println(Feedback.WEB, String.format("[OK] %d triple(s) have been committed to triple store", model.size())));
 		}
 
@@ -647,7 +654,7 @@ public class AutoAnnotator extends Controller {
 		log.save();
 
 		return true;
-	}
+	}// /commitRows()
 
 	public static boolean annotateDataAcquisitionFile(File file) {
 		boolean bSuccess = true;
@@ -746,7 +753,6 @@ public class AutoAnnotator extends Controller {
 			if (hm.containsKey("Study_ID")){
 				study_id = hm.get("Study_ID");
 			}
-
 			URL url = new URL(hm.get("Data_Dictionary"));
 			//System.out.println(url.toString());
 			File dd = new File("sddtmp/" + file.getName());
@@ -780,6 +786,7 @@ public class AutoAnnotator extends Controller {
 				cm.delete();
 			}
 
+			//Column Code Label Class Resource
 			try{
 				URL url3 = new URL(hm.get("Codebook"));
 				System.out.println(url3.toString());
@@ -788,10 +795,31 @@ public class AutoAnnotator extends Controller {
 				BufferedReader bufRdr3 = new BufferedReader(new FileReader(codeBookFile));
 				String line3 =  null;
 				System.out.println("Read Codebook");
+
+				HashMap<String,String> tempMap;
+				String workingCol = "";
+				String workingKey = "";
 				while((line3 = bufRdr3.readLine()) != null){
 					String[] codes = line3.split(",");
-					List<String> codesl = Arrays.asList(codes); 
-					codebook.put(codesl.get(0), codesl);
+					List<String> codesl = Arrays.asList(codes);
+					String tempCol = codesl.get(0);
+					if(tempCol.equals("") || tempCol == null || codebook.containsKey(workingKey)){
+						tempMap = (HashMap)codebook.get(workingKey);
+						//System.out.println("[AutoAnnotator] before " + tempMap);
+						tempMap.put(codesl.get(1), codesl.get(4));
+						//System.out.println("[AutoAnnotator] after " + tempMap);
+						codebook.put(workingKey, tempMap);
+						//System.out.println("[AutoAnnotator] added to " + workingKey + ": " + codebook.get(workingKey));
+						//System.out.println("[AutoAnnotator] size now " + codebook.get(workingKey).size());
+					} else {
+						workingCol = tempCol;
+						workingKey = kbPrefix + "DASO-" + file.getName().replace("SDD-","").replace(".csv","") + "-" + workingCol.trim().replace(" ","").replace("_","-").replace("??", "");
+						tempMap = new HashMap<String,String>();
+						tempMap.put(codesl.get(1), codesl.get(4));
+						codebook.put(workingKey, tempMap);
+						//System.out.println("[AutoAnnotator]: added to " + workingKey + ": " + codebook.get(workingKey));
+						//System.out.println("[AutoAnnotator]: size now " + codebook.get(workingKey).size());
+					}
 				}
 				bufRdr3.close();
 
@@ -816,12 +844,16 @@ public class AutoAnnotator extends Controller {
 					study_id = hm.get("Study_ID");
 				}
 				try {
-					DASchemaObjectGenerator dasoGenerator = new DASchemaObjectGenerator(dd);
+					DASchemaObjectGenerator dasoGenerator = new DASchemaObjectGenerator(dd, study_id);
 					System.out.println("Calling DASchemaObjectGenerator");
 					bSuccess = commitRows(dasoGenerator.createRows(), dasoGenerator.toString(), 
 							file.getName(), "DASchemaObject", true);
+					String sddId = kbPrefix + "DAS-" + dasoGenerator.getSDDName();
+					templateLibrary.put(ValueCellProcessing.replacePrefixEx(sddId),dasoGenerator.getTemplateList());
+					System.out.println("[AutoAnnotator]: adding templates for SDD " + ValueCellProcessing.replacePrefixEx(sddId));
 				} catch (Exception e) {
 					System.out.println("Error annotateDataAcquisitionSchemaFile: Unable to generate DASO.");
+					//e.printStackTrace(System.out);
 					AnnotationLog.printException(e, file.getName());
 					//return false;
 				}
@@ -896,11 +928,13 @@ public class AutoAnnotator extends Controller {
 	}
 
 	public static boolean annotateCSVFile(DataFile dataFile) {
-		System.out.println("annotateCSVFile: [" + dataFile.getFileName() + "]"); 
+		System.out.println("annotateCSVFile: [" + dataFile.getFileName() + "]");
+		
 		String file_name = dataFile.getFileName();    	
 		AnnotationLog log = new AnnotationLog();
 		log.setFileName(file_name);
 
+		ArrayList<DASVirtualObject> templateList = new ArrayList<DASVirtualObject>();
 		DataAcquisition da = null;
 		String da_uri = null;
 		String deployment_uri = null;

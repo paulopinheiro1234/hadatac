@@ -436,7 +436,6 @@ public class Measurement {
 		if (!study_uri.equals("")) {
 			facet_query += "study_uri_str" + ":\"" + study_uri + "\"";
 		}
-
 		if (!subject_uri.equals("")) {
 			if (!study_uri.equals("")) {
 				facet_query += " AND ";

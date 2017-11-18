@@ -35,7 +35,6 @@ import be.objectify.deadbolt.java.actions.Group;
 import be.objectify.deadbolt.java.actions.Restrict;
 
 public class DataAcquisitionSchema {
-
 	public static String INDENT1 = "     ";
 	public static String INSERT_LINE1 = "INSERT DATA {  ";
 	public static String DELETE_LINE1 = "DELETE WHERE {  ";
@@ -551,5 +550,4 @@ public class DataAcquisitionSchema {
 		UpdateProcessor processor = UpdateExecutionFactory.createRemote(request, Collections.getCollectionsName(Collections.METADATA_UPDATE));
 		processor.execute();
 	}
-
 }

@@ -12,15 +12,19 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
+import java.util.ArrayList;
 import java.util.Map;
 import org.apache.commons.csv.CSVRecord;
+import org.hadatac.entity.pojo.DASVirtualObject;
 
 public class DASchemaObjectGenerator extends BasicGenerator {
-
 	final String kbPrefix = ConfigUtils.getKbPrefix();
 	String startTime = "";
 	String SDDName = "";
 	HashMap<String, String> codeMap;
+
+	// the DASOGenerator object for each study will have java objects of all the templates, too
+	List<DASVirtualObject> templateList = new ArrayList<DASVirtualObject>();
 	List<String> timeList = new ArrayList<String>();
 
 	public DASchemaObjectGenerator(File file) {
@@ -29,11 +33,10 @@ public class DASchemaObjectGenerator extends BasicGenerator {
 			BufferedReader br = new BufferedReader(new FileReader(file));
 			String line =  null;
 
-			while((line = br.readLine()) != null){
+			while((line = br.readLine()) != null) {
 				String str[] = line.split(",");
-				if (str[4].length() > 0){
+				if (str[4].length() > 0) {
 					timeList.add(str[4]);
-					// System.out.println(str[0] + "-----" + str[5]);
 				}
 			}
 			br.close();
@@ -118,7 +121,15 @@ public class DASchemaObjectGenerator extends BasicGenerator {
 	private String getWasGeneratedBy(CSVRecord rec) {
 		return getValueByColumnName(rec, mapCol.get("WasGeneratedBy"));
 	}
+   
+	public String getSDDName(){
+		return this.SDDName;
+	}
 
+	public List<DASVirtualObject> getTemplateList(){
+		return this.templateList;
+	}
+    
 	private Boolean checkVirtual(CSVRecord rec) {
 		if (getLabel(rec).contains("??")){
 			return true;
@@ -171,6 +182,17 @@ public class DASchemaObjectGenerator extends BasicGenerator {
 		row.put("hasco:isVirtual", checkVirtual(rec).toString());
 		row.put("hasco:hasPosition", getPosition(rec));
 		row.put("hasco:isPIConfirmed", "false");
+
+		// Also generate a DASVirtualObject for each virtual column
+		if(checkVirtual(rec)) {
+			row.put("dcterms:alternativeName", getLabel(rec).trim().replace(" ",""));
+			System.out.println("[DASOGen] getTime = " + getTime(rec));
+			row.put("sio:existsAt", getTime(rec));
+			DASVirtualObject toAdd = new DASVirtualObject(getLabel(rec).trim().replace(" ",""), row);
+			templateList.add(toAdd);
+			System.out.println("[DASOGenerator] created template: \n" + toAdd);
+		}
+
 		return row;
 	}
 }

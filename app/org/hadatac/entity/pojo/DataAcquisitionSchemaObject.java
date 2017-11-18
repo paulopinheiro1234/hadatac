@@ -470,6 +470,7 @@ public class DataAcquisitionSchemaObject {
 				System.out.println("[ERROR] Could not insert or update DASO(s)");
 			}
 		}
+
 		return totalChanged;
 	}
 
@@ -507,5 +508,5 @@ public class DataAcquisitionSchemaObject {
 		UpdateProcessor processor = UpdateExecutionFactory.createRemote(request, Collections.getCollectionsName(Collections.METADATA_UPDATE));
 		processor.execute();
 	}
-
 }
+

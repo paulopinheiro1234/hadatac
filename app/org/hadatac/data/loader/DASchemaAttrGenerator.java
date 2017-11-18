@@ -92,10 +92,6 @@ public class DASchemaAttrGenerator extends BasicGenerator {
 	}
 
 	private String getEntity(CSVRecord rec) {
-		/*if ((rec.get(mapCol.get("AttributeOf"))).startsWith("??"){
-				// TODO: need to handle abstract entity here!
-			}*/
-
 		if ((rec.get(mapCol.get("AttributeOf"))) == null || (rec.get(mapCol.get("AttributeOf"))).equals("")) {
 			return "chear:unknownEntity";
 		} else {

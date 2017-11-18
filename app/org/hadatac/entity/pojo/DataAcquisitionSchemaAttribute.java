@@ -53,7 +53,6 @@ public class DataAcquisitionSchemaAttribute {
        tempPositionInt is set every time a new csv file is loaded. tempPositionIn = -1 indicates that the attribute is not valid for the given cvs
          - because an original position is out of range for the csv
          - because there is no original position and the given localName does not match any of the labels in the CSV
-
 	 */
 
 	private int    tempPositionInt;
@@ -548,7 +547,6 @@ public class DataAcquisitionSchemaAttribute {
 		}
 
 		return dasa;
-
 	}
 
 	public static List<DataAcquisitionSchemaAttribute> findBySchema (String schemaUri) {

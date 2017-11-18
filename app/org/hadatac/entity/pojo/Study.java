@@ -1129,3 +1129,4 @@ public class Study extends HADatAcThing {
 		return loader.deleteRows("Study", rows);
 	}
 }
+
