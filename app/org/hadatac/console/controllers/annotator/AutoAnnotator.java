@@ -490,34 +490,30 @@ public class AutoAnnotator extends Controller {
 	}
 
 	public static boolean annotateSampleIdFile(File file) {
-		boolean bSuccess = true;
 		try {
 			SampleGenerator sampleGenerator = new SampleGenerator(file);
-			bSuccess = sampleGenerator.createOc();
+			sampleGenerator.createRows();
 		} catch (Exception e) {
 			System.out.println("Error: annotateSampleIdFile() - Unable to generate Sample");
 			AnnotationLog.printException(e, file.getName());
 			return false;
 		}
 
-		return bSuccess;
+		return true;
 	}
 
 	public static boolean annotateSubjectIdFile(File file) {
-		boolean bSuccess = true;
-		SubjectGenerator subjectGenerator = new SubjectGenerator(file);
 		try {
-			bSuccess = subjectGenerator.createOc();
-			System.out.println(bSuccess);
+			SubjectGenerator subjectGenerator = new SubjectGenerator(file);
+			subjectGenerator.createRows();
 		}
 		catch (Exception e) {
-			System.out.println(e);
 			System.out.println("Error: annotateSubjectIdFile() - Unable to generate Subject");
 			AnnotationLog.printException(e, file.getName());
 			return false;
 		}
-
-		return bSuccess;
+		
+		return true;
 	}
 
 	private static void checkRows(List<Map<String, Object>> rows, String primaryKey) throws Exception {
@@ -639,7 +635,8 @@ public class AutoAnnotator extends Controller {
 		}
 
 		if (toTripleStore) {
-			DatasetAccessor accessor = DatasetAccessorFactory.createHTTP(Collections.getCollectionsName(Collections.METADATA_GRAPH));
+			DatasetAccessor accessor = DatasetAccessorFactory.createHTTP(
+					Collections.getCollectionsName(Collections.METADATA_GRAPH));
 			Model model = createModel(rows);
 			accessor.add(model);
 			log.addline(Feedback.println(Feedback.WEB, String.format("[OK] %d triple(s) have been committed to triple store", model.size())));

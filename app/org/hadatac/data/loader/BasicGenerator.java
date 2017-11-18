@@ -59,8 +59,7 @@ public abstract class BasicGenerator extends Controller {
 		rows.clear();
 		int row_number = 0;
 		for (CSVRecord record : records) {
-			Map<String, Object> tempRow = new HashMap<String, Object>();
-			tempRow = createRow(record, ++row_number);
+			Map<String, Object> tempRow = createRow(record, ++row_number);
 			if (tempRow != null) {
 				rows.add(tempRow);
 			}

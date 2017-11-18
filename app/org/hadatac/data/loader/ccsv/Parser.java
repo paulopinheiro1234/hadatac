@@ -11,7 +11,6 @@ import java.util.HashMap;
 
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVRecord;
-import org.apache.http.cookie.SM;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.impl.HttpSolrClient;
@@ -24,7 +23,6 @@ import org.hadatac.entity.pojo.DataAcquisitionSchemaEvent;
 import org.hadatac.entity.pojo.DataAcquisitionSchemaObject;
 import org.hadatac.entity.pojo.DataFile;
 import org.hadatac.entity.pojo.ObjectCollection;
-import org.hadatac.entity.pojo.StudyObject;
 import org.hadatac.entity.pojo.Measurement;
 import org.hadatac.metadata.loader.ValueCellProcessing;
 import org.hadatac.console.controllers.fileviewer.CSVPreview;
@@ -128,9 +126,9 @@ public class Parser {
 		
 		// Store possible values before hand to avoid frequent SPARQL queries
 		Map<String, Map<String, String>> possibleValues = DataAcquisitionSchema.findPossibleValues(da.getSchemaUri());
+		Map<String, List<String>> mapIDStudyObjects = DataAcquisitionSchema.findIdUriMappings(da.getStudyUri());
 		//System.out.println("possibleValues: " + possibleValues);
 		for (CSVRecord record : records) {
-			//System.out.println("record: " + record);
 			Iterator<DataAcquisitionSchemaAttribute> iterAttributes = schema.getAttributes().iterator();
 			while (iterAttributes.hasNext()) {
 				DataAcquisitionSchemaAttribute dasa = iterAttributes.next();
@@ -204,8 +202,7 @@ public class Parser {
 					String sTime = record.get(posTimestamp);
 					int timeStamp = new BigDecimal(sTime).intValue();
 					measurement.setTimestamp(Instant.ofEpochSecond(timeStamp).toString());
-
-					// full-row regular (XSD) time interval
+				// full-row regular (XSD) time interval
 				} else if (!schema.getTimeInstantLabel().equals("")) {
 					String timeValue = record.get(posTimeInstant);
 					if (timeValue != null) {
@@ -252,24 +249,42 @@ public class Parser {
 				 *   SET OBJECT ID, PID, SID   *
 				 *                             *
 				 *=============================*/
-
+				
+				String id = "";
 				if (!schema.getOriginalIdLabel().equals("")) {
-					String auxUri = record.get(posOriginalId);
-					measurement.setObjectUri(auxUri);
-					measurement.setPID(auxUri);
-					measurement.setSID("");
-				}  else if (!schema.getIdLabel().equals("")) {
-					String auxUri = record.get(posId);
-					measurement.setObjectUri(auxUri);
-					measurement.setPID(auxUri);
-					measurement.setSID("");
+					id = record.get(posOriginalId - 1);
+				} else if (!schema.getIdLabel().equals("")) {
+					id = record.get(posId - 1);
+				}
+				
+				if (!id.equals("")) {
+					if (dasa.getEntity().equals(ValueCellProcessing.replacePrefixEx("sio:Human"))) {
+						if (mapIDStudyObjects.containsKey(id)) {
+							measurement.setObjectUri(mapIDStudyObjects.get(id).get(0));
+							measurement.setPID(id);
+							measurement.setSID("");
+						} else {
+							measurement.setObjectUri("");
+							measurement.setPID(id);
+							measurement.setSID("");
+						}
+					} else if (dasa.getEntity().equals(ValueCellProcessing.replacePrefixEx("sio:Sample"))) {
+						if (mapIDStudyObjects.containsKey(id)) {
+							measurement.setObjectUri(mapIDStudyObjects.get(id).get(2));
+							measurement.setPID(mapIDStudyObjects.get(id).get(1));
+							measurement.setSID(id);
+						} else {
+							measurement.setObjectUri("");
+							measurement.setPID("");
+							measurement.setSID(id);
+						}
+					}
 				} else {
 					measurement.setObjectUri("");
 					measurement.setPID("");
 					measurement.setSID("");
 				}
-
-
+				
 				/*=============================*
 				 *                             *
 				 *   SET URI, OWNER AND DA URI *
@@ -322,34 +337,20 @@ public class Parser {
 							measurement.setEntityUri(dasoValue);
 						}
 					} else {
-						// values of daso might exist in the triple store
-						if (daso.getEntity().equals(ValueCellProcessing.replacePrefixEx("sio:Human"))) {
-							System.out.println("sio:Human========================");
-							System.out.println("schema.getOriginalIdLabel(): " + schema.getOriginalIdLabel());
-							if (!schema.getOriginalIdLabel().equals("")) {
-								String originalId = record.get(posOriginalId - 1);
-								System.out.println("findUribyOriginalId ... ");
-								String objectUri = StudyObject.findUribyOriginalId(originalId);
-								System.out.println("objectUri: " + objectUri);
-								measurement.setObjectUri(objectUri);
+						if (!schema.getOriginalIdLabel().equals("")) {
+							String originalId = record.get(posOriginalId - 1);
+							// values of daso might exist in the triple store
+							if (daso.getEntity().equals(ValueCellProcessing.replacePrefixEx("sio:Human"))) {
+								System.out.println("sio:Human========================");
+								System.out.println("schema.getOriginalIdLabel(): " + schema.getOriginalIdLabel());
+								measurement.setObjectUri(mapIDStudyObjects.get(originalId).get(0));
 								measurement.setPID(originalId);
-							}
-						} else if (daso.getEntity().equals(ValueCellProcessing.replacePrefixEx("sio:Sample"))) {
-							System.out.println("sio:Sample========================");
-							System.out.println("schema.getOriginalIdLabel(): " + schema.getOriginalIdLabel());
-							if (!schema.getOriginalIdLabel().equals("")) {
-								String originalId = record.get(posOriginalId - 1);
-								String sampleUri = StudyObject.findUribyOriginalId(originalId);
-								StudyObject sample = StudyObject.find(sampleUri);
-								if (null != sample) {
-									if (!sample.getScopeUris().isEmpty()) {
-										measurement.setObjectUri(sample.getScopeUris().get(0));
-										StudyObject human = StudyObject.find(sample.getScopeUris().get(0));
-										if (null != human) {
-											measurement.setPID(human.getOriginalId());
-										}
-									}
-								}
+								measurement.setSID("");
+							} else if (daso.getEntity().equals(ValueCellProcessing.replacePrefixEx("sio:Sample"))) {
+								System.out.println("sio:Sample========================");
+								System.out.println("schema.getOriginalIdLabel(): " + schema.getOriginalIdLabel());
+								measurement.setObjectUri(mapIDStudyObjects.get(originalId).get(2));
+								measurement.setPID(mapIDStudyObjects.get(originalId).get(1));
 								measurement.setSID(originalId);
 							}
 						}

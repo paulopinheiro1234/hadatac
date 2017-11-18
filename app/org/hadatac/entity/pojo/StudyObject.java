@@ -21,7 +21,6 @@ import org.apache.jena.update.UpdateProcessor;
 import org.apache.jena.update.UpdateRequest;
 import org.hadatac.utils.Collections;
 import org.hadatac.utils.NameSpaces;
-import org.jboss.netty.util.EstimatableObjectWrapper;
 import org.hadatac.utils.FirstLabel;
 import org.hadatac.utils.ConfigProp;
 import org.hadatac.metadata.loader.LabkeyDataHandler;
@@ -170,7 +169,7 @@ public class StudyObject extends HADatAcThing {
 				"    OPTIONAL { " + obj_uri + " rdfs:label ?hasLabel } . " + 
 				"    OPTIONAL { " + obj_uri + " rdfs:comment ?hasComment } . " + 
 				"}";
-		System.out.println("queryString: " + queryString);
+
 		Query query = QueryFactory.create(queryString);
 		QueryExecution qexec = QueryExecutionFactory.sparqlService(
 				Collections.getCollectionsName(Collections.METADATA_SPARQL), query);
@@ -263,7 +262,6 @@ public class StudyObject extends HADatAcThing {
 		
 		return "";
 	}
-
 
 	public static List<StudyObject> findByCollection(ObjectCollection oc) {
 		if (oc == null) {

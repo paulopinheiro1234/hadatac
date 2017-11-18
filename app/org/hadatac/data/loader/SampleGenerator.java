@@ -57,7 +57,6 @@ public class SampleGenerator extends BasicGenerator {
 		mapCol.put("sampleID", "specimen_id");
 		mapCol.put("studyID", "study_id");
 		mapCol.put("sampleSuffix", "suffix");
-
 	}
 
 	@Override
@@ -152,10 +151,6 @@ public class SampleGenerator extends BasicGenerator {
 		return subject;
 	}
 
-	private String getDataAcquisition() {
-		return dataAcquisition;
-	}
-
 	private String getComment(CSVRecord rec) {
 		return "Sample " + String.format("%04d", counter + getSampleCount(rec.get(mapCol.get("studyID")))) 
 		+ " for " + rec.get(mapCol.get("studyID")) + " " + getSampleSuffix(rec);
@@ -226,26 +221,6 @@ public class SampleGenerator extends BasicGenerator {
 		return "Sample Collection of Study " + rec.get(mapCol.get("studyID"));
 	}
 
-	public Map<String, Object> createCollectionRow(CSVRecord rec) {
-		Map<String, Object> row = new HashMap<String, Object>();
-		row.put("hasURI", getCollectionUri(rec));
-		row.put("a", "hasco:SampleCollection");
-		row.put("rdfs:label", getCollectionLabel(rec));
-		row.put("hasco:hasSize", Integer.toString(Iterables.size(records)+1));
-		row.put("hasco:isSampleCollectionOf", getStudyUri(rec));
-		counter++;
-
-		return row;
-	}
-
-	public List< Map<String, Object> > createCollectionRows() {
-		rows.clear();
-		for (CSVRecord record : records) {
-			rows.add(createCollectionRow(record));
-		}
-		return rows;
-	}
-
 	public void createObj(CSVRecord record) throws Exception {
 		// insert current state of the OBJ
 		obj = new StudyObject(getUri(record), "sio:Sample", getOriginalID(record), 
@@ -271,20 +246,17 @@ public class SampleGenerator extends BasicGenerator {
 		System.out.println(objectUris.size());
 	}
 
-	public boolean createOc() throws Exception {
+	public boolean createOc(CSVRecord record) throws Exception {
 		// insert current state of the OC
-		ObjectCollection oc = new ObjectCollection(getCollectionUri(records.iterator().next()),
+		ObjectCollection oc = new ObjectCollection(
+				getCollectionUri(record),
 				"http://hadatac.org/ont/hasco/SampleCollection",
-				getCollectionLabel(records.iterator().next()),
-				getCollectionLabel(records.iterator().next()),
-				getStudyUri(records.iterator().next()),
+				getCollectionLabel(record),
+				getCollectionLabel(record),
+				getStudyUri(record),
 				hasScopeUri,
 				spaceScopeUris,
 				timeScopeUris);
-
-		for (CSVRecord record : records) {
-			createObj(record);
-		}
 
 		oc.setObjectUris(objectUris);
 
@@ -306,5 +278,23 @@ public class SampleGenerator extends BasicGenerator {
 		}
 
 		return true;
+	}
+	
+	@Override
+	public List< Map<String, Object> > createRows() throws Exception {
+		rows.clear();
+		boolean firstRow = true;
+		for (CSVRecord record : records) {
+			if (firstRow) {
+				if (!createOc(record)) {
+					System.out.println("[ERROR] Failed to create sample collection!");
+					break;
+				}
+				firstRow = false;
+			}
+			createObj(record);
+		}
+		
+		return rows;
 	}
 }

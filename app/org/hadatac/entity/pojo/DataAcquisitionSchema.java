@@ -419,6 +419,60 @@ public class DataAcquisitionSchema {
 
 		return mapPossibleValues;
 	}
+	
+	public static Map<String, List<String>> findIdUriMappings(String studyUri) {
+		System.out.println("findIdUriMappings is called!");
+		Map<String, List<String>> mapIdUriMappings = new HashMap<String, List<String>>();
+		String queryString = NameSpaces.getInstance().printSparqlNameSpaceList()
+				+ " SELECT ?subj_or_sample ?id ?obj ?subj_id WHERE { "
+				+ " { "
+				+ "		?subj_or_sample a sio:Human . "
+				+ " 	?subj_or_sample hasco:originalID ?id . "
+				+ " 	?subj_or_sample hasco:isMemberOf* <" + studyUri + "> . "						
+				+ " } UNION { "
+				+ "     ?subj_or_sample a sio:Sample . "
+				+ " 	?subj_or_sample hasco:originalID ?id . "
+				+ " 	?subj_or_sample hasco:isMemberOf* <" + studyUri + "> . " 
+				+ " 	?subj_or_sample hasco:hasObjectScope ?obj . "
+				+ " 	?obj hasco:originalID ?subj_id . "
+				+ " }"
+				+ " }";
+
+		Query query = QueryFactory.create(queryString);
+		QueryExecution qexec = QueryExecutionFactory.sparqlService(
+				Collections.getCollectionsName(Collections.METADATA_SPARQL), query);
+		ResultSet results = qexec.execSelect();
+		ResultSetRewindable resultsrw = ResultSetFactory.copyResults(results);
+		qexec.close();
+
+		try {
+			while (resultsrw.hasNext()) {			
+				QuerySolution soln = resultsrw.next();
+				List<String> details = new ArrayList<String>();
+				if (soln.get("subj_or_sample") != null) {
+					details.add(soln.get("subj_or_sample").toString());
+				} else {
+					details.add("");
+				}
+				if (soln.get("subj_id") != null) {
+					details.add(soln.get("subj_id").toString());
+				} else {
+					details.add("");
+				}
+				if (soln.get("obj") != null) {
+					details.add(soln.get("obj").toString());
+				} else {
+					details.add("");
+				}
+				mapIdUriMappings.put(soln.get("id").toString(), details);
+			}
+		} catch (Exception e) {
+			System.out.println("Error in findIdUriMappings(): " + e.getMessage());
+		}
+
+		System.out.println("mapIdUriMappings: " + mapIdUriMappings.keySet().size());
+		return mapIdUriMappings;
+	}
 
 	public static DataAcquisitionSchema create(String uri) {
 		DataAcquisitionSchema das = new DataAcquisitionSchema();
