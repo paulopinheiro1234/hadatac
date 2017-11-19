@@ -3,10 +3,12 @@ package org.hadatac.data.loader.ccsv;
 import java.io.IOException;
 import java.time.Instant;
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.HashMap;
 
 import org.apache.commons.csv.CSVFormat;
@@ -14,6 +16,7 @@ import org.apache.commons.csv.CSVRecord;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.impl.HttpSolrClient;
+import org.hadatac.data.loader.AnnotationWorker;
 import org.hadatac.data.loader.DASOInstanceGenerator;
 import org.hadatac.data.loader.util.FileFactory;
 import org.hadatac.data.model.ParsingResult;
@@ -54,15 +57,15 @@ public class Parser {
 		Map<String, DataAcquisitionSchemaObject> mapSchemaObjects = new HashMap<String, DataAcquisitionSchemaObject>();
 		schema = DataAcquisitionSchema.find(da.getSchemaUri());
 
-		if(!AutoAnnotator.templateLibrary.containsKey(da.getSchemaUri())){
+		if(!AnnotationWorker.templateLibrary.containsKey(da.getSchemaUri())){
 			System.out.println("[Parser] [WARN] no DASVirtualObject templates for this DataAcquisition. Is this correct?");
 			System.out.println("[Parser] Could not retrieve template list for " + da.getSchemaUri());
 			System.out.println("[Parser] templateLibrary contains keys ");
-			for(String k : AutoAnnotator.templateLibrary.keySet()){
+			for(String k : AnnotationWorker.templateLibrary.keySet()){
 				System.out.println("\t" + k);
 			}
 		} else {
-			templateList = (ArrayList)AutoAnnotator.templateLibrary.get(da.getSchemaUri());
+			templateList = AnnotationWorker.templateLibrary.get(da.getSchemaUri());
 			System.out.println("[Parser] Found the right template list for " + da.getSchemaUri());
 			for(DASVirtualObject item : templateList){
 				System.out.println(item);
@@ -151,9 +154,12 @@ public class Parser {
 		Map<String, Map<String, String>> possibleValues = DataAcquisitionSchema.findPossibleValues(da.getSchemaUri());
 		Map<String, List<String>> mapIDStudyObjects = DataAcquisitionSchema.findIdUriMappings(da.getStudyUri());
 
-		//System.out.println("[Parser] dasoiGen studyID given " + da.getStudy().getUri() );		
-		DASOInstanceGenerator dasoiGen = new DASOInstanceGenerator(da.getStudy().getUri(), (ArrayList)templateList);
-		HashMap<String,DASOInstance> rowInstances = new HashMap<String,DASOInstance>();
+		//System.out.println("[Parser] dasoiGen studyID given " + da.getStudy().getUri() );
+		
+		// Need to be fixed here by getting codeMap and codebook from sparql query
+		DASOInstanceGenerator dasoiGen = new DASOInstanceGenerator(da.getStudy().getUri(), 
+				templateList, AnnotationWorker.codeMappings, AnnotationWorker.codebook_K);
+		Map<String, DASOInstance> rowInstances = new HashMap<String,DASOInstance>();
 
 		for (CSVRecord record : records) {
 			try{
@@ -166,10 +172,9 @@ public class Parser {
 				e.printStackTrace(System.out);
 			}
 			// rowInstances keys *should* match what is in DASchemaAttribute table's "attributeOf" field!
-			for(Map.Entry instance : rowInstances.entrySet()){
+			for(Map.Entry instance : rowInstances.entrySet()) {
 				System.out.println("[Parser] Made an instance for " + instance.getKey() + " :\n\t" + instance.getValue());
 			}
-
 
 			Iterator<DataAcquisitionSchemaAttribute> iterAttributes = schema.getAttributes().iterator();
 			while (iterAttributes.hasNext()) {
@@ -274,7 +279,7 @@ public class Parser {
 					} else {
 						measurement.setAbstractTime("");
 					}
-				}  else if (dasa.getEventUri() != null && !dasa.getEventUri().equals("")) {
+				} else if (dasa.getEventUri() != null && !dasa.getEventUri().equals("")) {
 					String daseUri = dasa.getEventUri();
 					DataAcquisitionSchemaEvent dase = schema.getEvent(daseUri); 
 					if (dase != null) {

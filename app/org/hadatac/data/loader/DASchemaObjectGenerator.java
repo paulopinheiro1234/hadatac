@@ -4,7 +4,6 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 
-import org.hadatac.console.controllers.annotator.AutoAnnotator;
 import org.hadatac.console.http.ConfigUtils;
 
 import java.lang.String;
@@ -12,7 +11,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
-import java.util.ArrayList;
 import java.util.Map;
 import org.apache.commons.csv.CSVRecord;
 import org.hadatac.entity.pojo.DASVirtualObject;
@@ -21,14 +19,16 @@ public class DASchemaObjectGenerator extends BasicGenerator {
 	final String kbPrefix = ConfigUtils.getKbPrefix();
 	String startTime = "";
 	String SDDName = "";
-	HashMap<String, String> codeMap;
+	Map<String, String> codeMap;
 
 	// the DASOGenerator object for each study will have java objects of all the templates, too
 	List<DASVirtualObject> templateList = new ArrayList<DASVirtualObject>();
 	List<String> timeList = new ArrayList<String>();
 
-	public DASchemaObjectGenerator(File file) {
+	public DASchemaObjectGenerator(File file, Map<String, String> codeMap) {
 		super(file);
+		this.codeMap = codeMap;
+		
 		try {
 			BufferedReader br = new BufferedReader(new FileReader(file));
 			String line =  null;
@@ -144,8 +144,7 @@ public class DASchemaObjectGenerator extends BasicGenerator {
 
 	@Override
 	public List< Map<String, Object> > createRows() throws Exception {
-		SDDName = fileName.replace("SDD-","").replace(".csv","");
-		codeMap = AutoAnnotator.codeMappings;
+		SDDName = fileName.replace("SDD-", "").replace(".csv", "");
 		rows.clear();
 		int row_number = 0;
 		for (CSVRecord record : records) {

@@ -15,15 +15,15 @@ public class PVGenerator extends BasicGenerator {
 	final String kbPrefix = ConfigUtils.getKbPrefix();
 	String startTime = "";
 	String SDDFileName = "";
-	HashMap<String, String> codeMap;
-	HashMap<String, List<String>> pvMap = new HashMap<String, List<String>>();
+	Map<String, String> codeMap;
+	Map<String, List<String>> pvMap = new HashMap<String, List<String>>();
 	String study_id = "";
-	HashMap<String, String> AttrORobj;
+	Map<String, String> AttrORobj;
 
 	public PVGenerator(File file, String SDDFileName, String study_id, 
-			HashMap<String, String> codeMap, 
-			HashMap<String, List<String>> pvMap,
-			HashMap<String, String> AttrORobj) {
+			Map<String, String> codeMap, 
+			Map<String, List<String>> pvMap,
+			Map<String, String> AttrORobj) {
 		super(file);
 		this.SDDFileName = SDDFileName;
 		this.study_id = study_id;
@@ -31,6 +31,7 @@ public class PVGenerator extends BasicGenerator {
 		this.pvMap = pvMap;
 		this.AttrORobj = AttrORobj;
 	}
+	
 	//Column	Code	Label	Class	Resource
 	@Override
 	void initMapping() {

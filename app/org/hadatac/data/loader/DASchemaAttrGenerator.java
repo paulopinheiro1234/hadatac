@@ -4,7 +4,6 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 
-import org.hadatac.console.controllers.annotator.AutoAnnotator;
 import org.hadatac.console.http.ConfigUtils;
 
 import java.lang.String;
@@ -19,12 +18,13 @@ public class DASchemaAttrGenerator extends BasicGenerator {
 	final String kbPrefix = ConfigUtils.getKbPrefix();
 	String startTime = "";
 	String SDDName = "";
-	HashMap<String, String> codeMap;
-	HashMap<String, String> hasEntityMap = new HashMap<String, String>();
+	Map<String, String> codeMap;
+	Map<String, String> hasEntityMap = new HashMap<String, String>();
 
-	public DASchemaAttrGenerator(File file) {
+	public DASchemaAttrGenerator(File file, Map<String, String> codeMap) {
 		super(file);
-
+		this.codeMap = codeMap;
+		
 		try {
 			BufferedReader br = new BufferedReader(new FileReader(file));
 			String line =  null;
@@ -33,7 +33,6 @@ public class DASchemaAttrGenerator extends BasicGenerator {
 				String str[] = line.split(",");
 				if (str[5].length() > 0){
 					hasEntityMap.put(str[0], str[5]);
-					//	            System.out.println(str[0] + "-----" + str[5]);
 				}
 			}
 			br.close();
@@ -41,6 +40,7 @@ public class DASchemaAttrGenerator extends BasicGenerator {
 			System.out.println("Error Reading File");			
 		}
 	}
+	
 	//Column	Attribute	attributeOf	Unit	Time	Entity	Role	Relation	inRelationTo	wasDerivedFrom	wasGeneratedBy	hasPosition	
 	@Override
 	void initMapping() {
@@ -160,7 +160,6 @@ public class DASchemaAttrGenerator extends BasicGenerator {
 	Map<String, Object> createRow(CSVRecord rec, int row_number) throws Exception {
 		Map<String, Object> row = new HashMap<String, Object>();
 		SDDName = fileName.replace("SDD-", "").replace(".csv", "");
-		codeMap = AutoAnnotator.codeMappings;
 		row.put("hasURI", kbPrefix + "DASA-" + SDDName + "-" + getLabel(rec).trim().replace(" ", "").replace("_","-").replace("??", ""));
 		row.put("a", "hasco:DASchemaAttribute");
 		row.put("rdfs:label", getLabel(rec));

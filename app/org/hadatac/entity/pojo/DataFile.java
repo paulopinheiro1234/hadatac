@@ -1,10 +1,12 @@
 package org.hadatac.entity.pojo;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import org.apache.commons.io.FilenameUtils;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServerException;
@@ -212,5 +214,76 @@ public class DataFile {
 		}
 		
 		return null;
+	}
+	
+	public static boolean search(String fileName, List<DataFile> pool) {
+		for (DataFile file : pool) {
+			if (file.getFileName().equals(fileName)) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	public static void includeUnrecognizedFiles(String path, List<DataFile> ownedFiles) {		
+		File folder = new File(path);
+		if (!folder.exists()){
+			folder.mkdirs();
+		}
+
+		File[] listOfFiles = folder.listFiles();
+		for (int i = 0; i < listOfFiles.length; i++) {
+			if (listOfFiles[i].isFile() && listOfFiles[i].getName().endsWith(".csv")) {
+				if (!search(listOfFiles[i].getName(), ownedFiles)) {
+					DataFile newFile = new DataFile();
+					newFile.setFileName(listOfFiles[i].getName());
+					newFile.save();
+					ownedFiles.add(newFile);
+				}
+			}
+		}
+	}
+
+	public static void filterNonexistedFiles(String path, List<DataFile> files) {
+		File folder = new File(path);
+		if (!folder.exists()){
+			folder.mkdirs();
+		}
+
+		File[] listOfFiles = folder.listFiles();
+		Iterator<DataFile> iterFile = files.iterator();
+		while (iterFile.hasNext()) {
+			DataFile file = iterFile.next();
+			boolean isExisted = false;
+			for (int i = 0; i < listOfFiles.length; i++) {
+				if (listOfFiles[i].isFile()) {
+					if(file.getFileName().equals(listOfFiles[i].getName())) {
+						isExisted = true;
+						break;
+					}
+				}
+			}
+			if (!isExisted) {
+				iterFile.remove();
+			}
+		}
+	}
+
+	public static List<File> findFilesByExtension(String path, String ext) {
+		List<File> results = new ArrayList<File>();
+
+		File folder = new File(path);
+		if (!folder.exists()){
+			folder.mkdirs();
+		}
+
+		File[] listOfFiles = folder.listFiles();
+		for (int i = 0; i < listOfFiles.length; i++) {
+			if (listOfFiles[i].isFile() 
+					&& FilenameUtils.getExtension(listOfFiles[i].getName()).equals(ext)) {
+				results.add(listOfFiles[i]);
+			}
+		}
+		return results;
 	}
 }

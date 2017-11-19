@@ -4,8 +4,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-import org.hadatac.console.controllers.annotator.AutoAnnotator;
-import org.hadatac.console.models.SecurityRole;
+import org.hadatac.data.loader.AnnotationWorker;
 
 import com.feth.play.module.pa.PlayAuthenticate;
 import com.feth.play.module.pa.PlayAuthenticate.Resolver;
@@ -95,7 +94,7 @@ public class Global extends GlobalSettings {
 		Runnable annotation = new Runnable() {
 			@Override
 			public void run() {
-				AutoAnnotator.autoAnnotate();
+				AnnotationWorker.autoAnnotate();
 			}
 		};
 

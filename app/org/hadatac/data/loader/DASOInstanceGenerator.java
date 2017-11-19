@@ -1,32 +1,31 @@
 package org.hadatac.data.loader;
 
-import java.io.File;
-import org.apache.commons.io.FileUtils;
-import org.hadatac.console.controllers.annotator.AutoAnnotator;
 import org.hadatac.entity.pojo.DASOInstance;
 import org.hadatac.entity.pojo.DataAcquisitionSchemaObject;
 import org.hadatac.entity.pojo.DASVirtualObject;
 import org.hadatac.metadata.loader.ValueCellProcessing;
-import play.Play;
 import java.lang.String;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
-import java.util.ArrayList;
 import java.util.Map;
 import org.apache.commons.csv.CSVRecord;
 
 
 public class DASOInstanceGenerator{
 	private String studyId;
-	private ArrayList<DASVirtualObject> templateList;
+	private List<DASVirtualObject> templateList;
 
-	public static HashMap<String,String> codeMap = AutoAnnotator.codeMappings;
-	public static HashMap<String, Map<String,String>> codebook = AutoAnnotator.codebook;
+	public Map<String,String> codeMappings = null;
+	public Map<String, Map<String,String>> codebook = null;
 
-	public DASOInstanceGenerator(String studyId, ArrayList<DASVirtualObject> objs){
+	public DASOInstanceGenerator(String studyId, 
+			List<DASVirtualObject> objs,
+			Map<String, String> codeMappings, 
+			Map<String, Map<String,String>> codebook) {
 		this.studyId = studyId;
 		this.templateList = objs;
+		this.codeMappings = codeMappings;
+		this.codebook = codebook;
 	}
 
 	//
@@ -35,7 +34,7 @@ public class DASOInstanceGenerator{
 		if(workingField.contains("DASO") || workingField.startsWith("??")){
 			if(codebook.containsKey(workingField)){
 				// Check to see if there's a codebook entry
-				HashMap<String,String> cbForCol = (HashMap)codebook.get(workingField);
+				Map<String,String> cbForCol = codebook.get(workingField);
 				try{
 					DataAcquisitionSchemaObject toResolve = DataAcquisitionSchemaObject.find(ValueCellProcessing.convertToWholeURI(workingField));
 					//System.out.println("[DASOInstanceGen] expanded " + toResolve.getLabel());
@@ -91,7 +90,7 @@ public class DASOInstanceGenerator{
 	// private Map<String,String> objRelations;
 	public HashMap<String,DASOInstance> generateRowInstances(CSVRecord rec){
 		//System.out.println("[DASOInstanceGenerator] Inside generateRowInstances!");
-		HashMap<String,DASOInstance> instances = new HashMap<String,DASOInstance>();
+		HashMap<String, DASOInstance> instances = new HashMap<String,DASOInstance>();
 		String tempLabel = "";
 		String tempType = "";
 		String tempKey = "";
