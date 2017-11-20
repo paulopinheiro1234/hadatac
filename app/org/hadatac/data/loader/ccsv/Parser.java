@@ -8,11 +8,11 @@ import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.HashMap;
 
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVRecord;
+import org.apache.jena.sparql.function.library.print;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.impl.HttpSolrClient;
@@ -27,13 +27,11 @@ import org.hadatac.entity.pojo.DataAcquisitionSchemaEvent;
 import org.hadatac.entity.pojo.DataAcquisitionSchemaObject;
 import org.hadatac.entity.pojo.DASVirtualObject;
 import org.hadatac.entity.pojo.DASOInstance;
-import org.hadatac.entity.pojo.Dataset;
 import org.hadatac.entity.pojo.DataFile;
 import org.hadatac.entity.pojo.ObjectCollection;
 import org.hadatac.entity.pojo.Measurement;
 import org.hadatac.metadata.loader.ValueCellProcessing;
 import org.hadatac.console.controllers.fileviewer.CSVPreview;
-import org.hadatac.console.controllers.annotator.AutoAnnotator;
 import org.hadatac.utils.Collections;
 import org.hadatac.utils.ConfigProp;
 
@@ -153,6 +151,7 @@ public class Parser {
 		// Store possible values before hand to avoid frequent SPARQL queries
 		Map<String, Map<String, String>> possibleValues = DataAcquisitionSchema.findPossibleValues(da.getSchemaUri());
 		Map<String, List<String>> mapIDStudyObjects = DataAcquisitionSchema.findIdUriMappings(da.getStudyUri());
+		String dasoUnitUri = DataAcquisitionSchema.findByPosIndex(da.getSchemaUri(), Integer.toString(posUnit + 1));
 
 		//System.out.println("[Parser] dasoiGen studyID given " + da.getStudy().getUri() );
 		
@@ -308,9 +307,9 @@ public class Parser {
 
 				String id = "";
 				if (!schema.getOriginalIdLabel().equals("")) {
-					id = record.get(posOriginalId - 1);
+					id = record.get(posOriginalId);
 				} else if (!schema.getIdLabel().equals("")) {
-					id = record.get(posId - 1);
+					id = record.get(posId);
 				}
 				
 				if (!id.equals("")) {
@@ -325,6 +324,10 @@ public class Parser {
 							measurement.setSID("");
 						}
 					} else if (dasa.getEntity().equals(ValueCellProcessing.replacePrefixEx("sio:Sample"))) {
+						if (id.equals("C-XMC24-U-00")) {
+							System.out.println("Hello!!!");
+							System.out.println(mapIDStudyObjects.containsKey(id));
+						}
 						if (mapIDStudyObjects.containsKey(id)) {
 							measurement.setObjectUri(mapIDStudyObjects.get(id).get(2));
 							measurement.setPID(mapIDStudyObjects.get(id).get(1));
@@ -354,23 +357,12 @@ public class Parser {
 						dasa.getLocalName() + "-" + total_count);
 				measurement.setOwnerUri(da.getOwnerUri());
 				measurement.setAcquisitionUri(da.getUri());
-
-				/*=============================*
-				 *                             *
-				 *   SET UNIT                  *
-				 *                             *
-				 *=============================*/
-				if (!schema.getUnitLabel().equals("")) {
-					String unitValue = record.get(posUnit);
-					if (unitValue != null) {
-						measurement.setUnitUri(dasa.getUnit());
-					} else {
-						measurement.setUnitUri(dasa.getUnit());
-					}
-				} else {
-					measurement.setUnitUri(dasa.getUnit());
-				}
 				
+				/*======================================*
+				 *                                      *
+				 *   SET ENTITY AND CHARACTERISTIC URI  *              *
+				 *                                      *
+				 *======================================*/
 				measurement.setSchemaAttributeUri(dasa.getUri().replace("<", "").replace(">", ""));
 				DataAcquisitionSchemaObject daso = null;
 				String dasoUri = dasa.getObjectUri();
@@ -396,7 +388,7 @@ public class Parser {
 						}
 					} else {
 						if (!schema.getOriginalIdLabel().equals("")) {
-							String originalId = record.get(posOriginalId - 1);
+							String originalId = record.get(posOriginalId);
 							// values of daso might exist in the triple store
 							if (daso.getEntity().equals(ValueCellProcessing.replacePrefixEx("sio:Human"))) {
 								System.out.println("sio:Human========================");
@@ -417,6 +409,33 @@ public class Parser {
 					measurement.setEntityUri(dasa.getObjectUri());
 				}
 				measurement.setCharacteristicUri(dasa.getAttribute());
+				
+				/*=============================*
+				 *                             *
+				 *   SET UNIT                  *
+				 *                             *
+				 *=============================*/
+				if (!schema.getUnitLabel().equals("")) {
+					// unit exists in the columns
+					String unitValue = record.get(posUnit);
+					if (unitValue != null) {
+						if (possibleValues.containsKey(dasoUnitUri)) {
+							if (possibleValues.get(dasoUnitUri).containsKey(unitValue.toLowerCase())) {
+								measurement.setUnitUri(possibleValues.get(dasoUnitUri).get(unitValue.toLowerCase()));
+							} else {
+								measurement.setUnitUri("");
+							}
+						} else {
+							measurement.setUnitUri("");
+						}
+					}
+				}
+				
+				// Failed to assign units from unit daso
+				if (measurement.getUnitUri().equals("")) {
+					// Assign units from the Unit column of SDD
+					measurement.setUnitUri(dasa.getUnit());
+				}
 
 				/*=================================*
 				 *                                 *
@@ -521,7 +540,7 @@ public class Parser {
 		}
 		for (DataAcquisitionSchemaAttribute dasa : schema.getAttributes()) {
 			if (dasa.getLabel().equals(label)) {
-				return dasa.getTempPositionInt();
+				return dasa.getTempPositionInt() - 1;
 			}
 		}
 

@@ -419,6 +419,33 @@ public class DataAcquisitionSchema {
 		return mapPossibleValues;
 	}
 	
+	public static String findByPosIndex(String schemaUri, String pos) {
+		System.out.println("findByPosIndex is called!");
+		String queryString = NameSpaces.getInstance().printSparqlNameSpaceList()
+				+ " SELECT ?daso_or_dasa WHERE { "
+				+ " ?daso_or_dasa hasco:hasPosition \"" + pos + "\" . "
+				+ " ?daso_or_dasa hasco:partOfSchema <" + schemaUri + "> . "
+				+ " }";
+
+		Query query = QueryFactory.create(queryString);
+		QueryExecution qexec = QueryExecutionFactory.sparqlService(
+				Collections.getCollectionsName(Collections.METADATA_SPARQL), query);
+		ResultSet results = qexec.execSelect();
+		ResultSetRewindable resultsrw = ResultSetFactory.copyResults(results);
+		qexec.close();
+
+		try {
+			if (resultsrw.hasNext()) {
+				QuerySolution soln = resultsrw.next();
+				return soln.getResource("daso_or_dasa").toString();
+			}
+		} catch (Exception e) {
+			System.out.println("findByPosIndex() Error: " + e.getMessage());
+		}
+
+		return "";
+	}
+	
 	public static Map<String, List<String>> findIdUriMappings(String studyUri) {
 		System.out.println("findIdUriMappings is called!");
 		Map<String, List<String>> mapIdUriMappings = new HashMap<String, List<String>>();

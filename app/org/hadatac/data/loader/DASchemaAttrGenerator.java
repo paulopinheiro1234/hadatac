@@ -78,9 +78,14 @@ public class DASchemaAttrGenerator extends BasicGenerator {
 	private String getUnit(CSVRecord rec) {
 		if (codeMap.containsKey(rec.get(mapCol.get("Unit")))) {
 			return codeMap.get(rec.get(mapCol.get("Unit")));
-		} else {
+		}
+		
+		return "";
+		/*
+		else {
 			return "obo:UO_0000186";
 		}
+		*/
 	}
 
 	private String getTime(CSVRecord rec) {
