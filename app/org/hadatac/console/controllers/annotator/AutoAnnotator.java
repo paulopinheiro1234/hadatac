@@ -277,6 +277,7 @@ public class AutoAnnotator extends Controller {
 				da.save();
 			}
 		}
+		
 		dataFile.delete();
 		dataFile.setProcessStatus(false);
 		dataFile.save();
@@ -289,8 +290,20 @@ public class AutoAnnotator extends Controller {
 		}
 		File file = new File(path_proc + "/" + file_name);
 		file.renameTo(new File(destFolder + "/" + file_name));
+		deleteAddedTriples(file);
 
 		return redirect(routes.AutoAnnotator.index());
+	}
+	
+	@Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
+	public static void deleteAddedTriples(File file){
+		System.out.println("Deleting the added triples from the moving file ...");
+		// use the new function to reverse the triple generation
+		/**
+		 * Model model = createModel(rows);
+            Model defaultModel = accessor.getModel();
+            defaultModel.remove(model);
+		 */
 	}
 
 	@Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))

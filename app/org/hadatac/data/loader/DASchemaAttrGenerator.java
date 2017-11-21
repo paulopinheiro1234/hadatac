@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.csv.CSVRecord;
+import org.hadatac.metadata.loader.ValueCellProcessing;
 
 public class DASchemaAttrGenerator extends BasicGenerator {
 
@@ -76,16 +77,14 @@ public class DASchemaAttrGenerator extends BasicGenerator {
 	}
 
 	private String getUnit(CSVRecord rec) {
-		if (codeMap.containsKey(rec.get(mapCol.get("Unit")))) {
-			return codeMap.get(rec.get(mapCol.get("Unit")));
+		String original = rec.get(mapCol.get("Unit"));
+		String expansion = ValueCellProcessing.replacePrefixEx(rec.get(mapCol.get("Unit")));
+		if (original.length() != expansion.length()) {
+			return expansion;
+		} else if (codeMap.containsKey(original)) {
+			return codeMap.get(original);
 		}
-		
-		return "";
-		/*
-		else {
 			return "obo:UO_0000186";
-		}
-		*/
 	}
 
 	private String getTime(CSVRecord rec) {
