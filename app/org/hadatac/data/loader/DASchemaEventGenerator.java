@@ -23,9 +23,10 @@ public class DASchemaEventGenerator extends BasicGenerator {
 	List<String> timeList = new ArrayList<String>();
 	Map<String, String> codeMap;
 
-	public DASchemaEventGenerator(File file, Map<String, String> codeMap) {
+	public DASchemaEventGenerator(File file, String SDDName, Map<String, String> codeMap) {
 		super(file);
 		this.codeMap = codeMap;
+		this.SDDName = SDDName;
 		
 		try {
 			BufferedReader br = new BufferedReader(new FileReader(file));
@@ -144,7 +145,6 @@ public class DASchemaEventGenerator extends BasicGenerator {
 
 	@Override
 	public List< Map<String, Object> > createRows() throws Exception {
-		SDDName = fileName.replace("SDD-","").replace(".csv","");
 		rows.clear();
 		int row_number = 0;
 		for (CSVRecord record : records) {

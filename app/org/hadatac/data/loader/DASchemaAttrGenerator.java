@@ -22,9 +22,10 @@ public class DASchemaAttrGenerator extends BasicGenerator {
 	Map<String, String> codeMap;
 	Map<String, String> hasEntityMap = new HashMap<String, String>();
 
-	public DASchemaAttrGenerator(File file, Map<String, String> codeMap) {
+	public DASchemaAttrGenerator(File file, String SDDName, Map<String, String> codeMap) {
 		super(file);
 		this.codeMap = codeMap;
+		this.SDDName = SDDName;
 		
 		try {
 			BufferedReader br = new BufferedReader(new FileReader(file));
@@ -163,7 +164,6 @@ public class DASchemaAttrGenerator extends BasicGenerator {
 	@Override
 	Map<String, Object> createRow(CSVRecord rec, int row_number) throws Exception {
 		Map<String, Object> row = new HashMap<String, Object>();
-		SDDName = fileName.replace("SDD-", "").replace(".csv", "");
 		row.put("hasURI", kbPrefix + "DASA-" + SDDName + "-" + getLabel(rec).trim().replace(" ", "").replace("_","-").replace("??", ""));
 		row.put("a", "hasco:DASchemaAttribute");
 		row.put("rdfs:label", getLabel(rec));

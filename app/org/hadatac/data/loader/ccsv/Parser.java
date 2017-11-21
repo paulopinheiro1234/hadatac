@@ -12,7 +12,6 @@ import java.util.HashMap;
 
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVRecord;
-import org.apache.jena.sparql.function.library.print;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.impl.HttpSolrClient;
@@ -152,15 +151,18 @@ public class Parser {
 		Map<String, Map<String, String>> possibleValues = DataAcquisitionSchema.findPossibleValues(da.getSchemaUri());
 		Map<String, List<String>> mapIDStudyObjects = DataAcquisitionSchema.findIdUriMappings(da.getStudyUri());
 		String dasoUnitUri = DataAcquisitionSchema.findByPosIndex(da.getSchemaUri(), Integer.toString(posUnit + 1));
-
-		//System.out.println("[Parser] dasoiGen studyID given " + da.getStudy().getUri() );
 		
+		// Comment out row instance generation
+		/*
 		// Need to be fixed here by getting codeMap and codebook from sparql query
 		DASOInstanceGenerator dasoiGen = new DASOInstanceGenerator(da.getStudy().getUri(), 
 				templateList, AnnotationWorker.codeMappings, AnnotationWorker.codebook_K);
 		Map<String, DASOInstance> rowInstances = new HashMap<String,DASOInstance>();
+		*/
 
 		for (CSVRecord record : records) {
+			// Comment out row instance generation
+			/*
 			try{
 				// complete DASOInstances for the row FIRST
 				// so we can refer to these URI's when setting the entity and/or object
@@ -174,6 +176,7 @@ public class Parser {
 			for(Map.Entry instance : rowInstances.entrySet()) {
 				System.out.println("[Parser] Made an instance for " + instance.getKey() + " :\n\t" + instance.getValue());
 			}
+			*/
 
 			Iterator<DataAcquisitionSchemaAttribute> iterAttributes = schema.getAttributes().iterator();
 			while (iterAttributes.hasNext()) {
@@ -324,10 +327,6 @@ public class Parser {
 							measurement.setSID("");
 						}
 					} else if (dasa.getEntity().equals(ValueCellProcessing.replacePrefixEx("sio:Sample"))) {
-						if (id.equals("C-XMC24-U-00")) {
-							System.out.println("Hello!!!");
-							System.out.println(mapIDStudyObjects.containsKey(id));
-						}
 						if (mapIDStudyObjects.containsKey(id)) {
 							measurement.setObjectUri(mapIDStudyObjects.get(id).get(2));
 							measurement.setPID(mapIDStudyObjects.get(id).get(1));
@@ -415,26 +414,27 @@ public class Parser {
 				 *   SET UNIT                  *
 				 *                             *
 				 *=============================*/
-				if (!schema.getUnitLabel().equals("")) {
-					// unit exists in the columns
-					String unitValue = record.get(posUnit);
-					if (unitValue != null) {
-						if (possibleValues.containsKey(dasoUnitUri)) {
-							if (possibleValues.get(dasoUnitUri).containsKey(unitValue.toLowerCase())) {
-								measurement.setUnitUri(possibleValues.get(dasoUnitUri).get(unitValue.toLowerCase()));
+				if (!dasa.getUnit().equals("")) {
+					// Assign units from the Unit column of SDD
+					measurement.setUnitUri(dasa.getUnit());
+				} else {
+					if (!schema.getUnitLabel().equals("")) {
+						// unit exists in the columns
+						String unitValue = record.get(posUnit);
+						if (unitValue != null) {
+							if (possibleValues.containsKey(dasoUnitUri)) {
+								if (possibleValues.get(dasoUnitUri).containsKey(unitValue.toLowerCase())) {
+									measurement.setUnitUri(possibleValues.get(dasoUnitUri).get(unitValue.toLowerCase()));
+								} else {
+									measurement.setUnitUri("");
+								}
 							} else {
 								measurement.setUnitUri("");
 							}
-						} else {
-							measurement.setUnitUri("");
 						}
+					} else {
+						measurement.setUnitUri("");
 					}
-				}
-				
-				// Failed to assign units from unit daso
-				if (measurement.getUnitUri().equals("")) {
-					// Assign units from the Unit column of SDD
-					measurement.setUnitUri(dasa.getUnit());
 				}
 
 				/*=================================*

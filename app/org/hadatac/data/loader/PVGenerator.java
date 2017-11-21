@@ -16,20 +16,16 @@ public class PVGenerator extends BasicGenerator {
 	String startTime = "";
 	String SDDFileName = "";
 	Map<String, String> codeMap;
-	Map<String, List<String>> pvMap = new HashMap<String, List<String>>();
+	Map<String, Map<String, String>> pvMap = new HashMap<String, Map<String, String>>();
 	String study_id = "";
-	Map<String, String> AttrORobj;
+	Map<String, String> mapAttrObj;
 
 	public PVGenerator(File file, String SDDFileName, String study_id, 
-			Map<String, String> codeMap, 
-			Map<String, List<String>> pvMap,
-			Map<String, String> AttrORobj) {
+			Map<String, String> mapAttrObj) {
 		super(file);
 		this.SDDFileName = SDDFileName;
 		this.study_id = study_id;
-		this.codeMap = codeMap;
-		this.pvMap = pvMap;
-		this.AttrORobj = AttrORobj;
+		this.mapAttrObj = mapAttrObj;
 	}
 	
 	//Column	Code	Label	Class	Resource
@@ -74,7 +70,7 @@ public class PVGenerator extends BasicGenerator {
 	private String getPVvalue(CSVRecord rec) {
 		if ((getLabel(rec)).length() > 0) {
 			String colNameInSDD = getLabel(rec).replace(" ", "");
-			if (AttrORobj.containsKey(colNameInSDD) && AttrORobj.get(colNameInSDD).length() > 0) {
+			if (mapAttrObj.containsKey(colNameInSDD) && mapAttrObj.get(colNameInSDD).length() > 0) {
 				return kbPrefix + "DASA-" + SDDFileName.replace("SDD-", "").replace(".csv", "") + "-" + getLabel(rec).trim().replace(" ", "").replace("_","-").replace("??", "");
 			} else {
 				return kbPrefix + "DASO-" + SDDFileName.replace("SDD-", "").replace(".csv", "") + "-" + getLabel(rec).trim().replace(" ", "").replace("_","-").replace("??", "");
