@@ -1,11 +1,13 @@
 package org.hadatac.entity.pojo;
 
 import java.util.Map;
+
+import org.hadatac.utils.ConfigProp;
+
 import java.util.HashMap;
-import org.hadatac.console.http.ConfigUtils;
 
 public class DASVirtualObject {
-	final String kbPrefix = ConfigUtils.getKbPrefix();
+	final String kbPrefix = ConfigProp.getKbPrefix();
 	private String templateUri;
 	private String originalLabel;
 	private Map<String, String> objRelations;

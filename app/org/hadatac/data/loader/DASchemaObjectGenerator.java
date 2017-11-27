@@ -4,7 +4,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 
-import org.hadatac.console.http.ConfigUtils;
+import org.hadatac.utils.ConfigProp;
 import org.hadatac.entity.pojo.DASVirtualObject;
 
 import java.lang.String;
@@ -20,7 +20,7 @@ import org.apache.commons.csv.CSVRecord;
 
 
 public class DASchemaObjectGenerator extends BasicGenerator {
-	final String kbPrefix = ConfigUtils.getKbPrefix();
+	final String kbPrefix = ConfigProp.getKbPrefix();
 	String startTime = "";
 	String SDDName = "";
 	Map<String, String> codeMap;

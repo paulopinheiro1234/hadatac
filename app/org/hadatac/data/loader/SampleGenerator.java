@@ -15,26 +15,17 @@ import org.apache.jena.query.ResultSet;
 import org.apache.jena.query.ResultSetFactory;
 import org.apache.jena.query.ResultSetRewindable;
 import org.apache.jena.rdf.model.Literal;
-import org.hadatac.console.http.ConfigUtils;
 import org.hadatac.entity.pojo.Credential;
 import org.hadatac.entity.pojo.ObjectCollection;
 import org.hadatac.entity.pojo.StudyObject;
 import org.hadatac.utils.Collections;
+import org.hadatac.utils.ConfigProp;
 import org.hadatac.utils.Feedback;
 import org.hadatac.utils.NameSpaces;
-import org.hadatac.utils.Templates;
-import org.hadatac.entity.pojo.Study;
-import org.hadatac.entity.pojo.ObjectCollectionType;
-import org.hadatac.entity.pojo.StudyObjectType;
 
-import com.google.common.collect.Iterables;
-
-import play.Play;
-import play.mvc.Controller;
-import play.mvc.Result;
 
 public class SampleGenerator extends BasicGenerator {
-	final String kbPrefix = ConfigUtils.getKbPrefix();
+	final String kbPrefix = ConfigProp.getKbPrefix();
 	private String dataAcquisition = "";
 	private int counter = 1; //starting index number
 

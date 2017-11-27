@@ -9,7 +9,10 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.Properties;
 
+import play.Play;
+
 public class ConfigProp {
+	public static final String AUTOANNOTATOR_CONFIG_FILE = "autoccsv.config";
 	
 	private static Properties getProperties(String confFileName) {
 		Properties prop = new Properties();
@@ -48,5 +51,21 @@ public class ConfigProp {
 		} catch (URISyntaxException e) {
 			e.printStackTrace();
 		}
+	}
+	
+	public static String getKbPrefix() {
+		return Play.application().configuration().getString("hadatac.community.ont_prefix") + "-kb:";
+	}
+	
+	public static String getTemplateFileName() {
+		return getPropertyValue(AUTOANNOTATOR_CONFIG_FILE, "template_file_name");
+	}
+	
+	public static String getPathUnproc() {
+		return getPropertyValue(AUTOANNOTATOR_CONFIG_FILE, "path_unproc");
+	}
+	
+	public static String getPathProc() {
+		return getPropertyValue(AUTOANNOTATOR_CONFIG_FILE, "path_proc");
 	}
 }

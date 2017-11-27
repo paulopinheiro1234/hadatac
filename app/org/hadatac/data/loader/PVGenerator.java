@@ -1,18 +1,17 @@
 package org.hadatac.data.loader;
 
 import java.io.File;
-import org.hadatac.console.http.ConfigUtils;
+import org.hadatac.utils.ConfigProp;
 
 import java.lang.String;
 import java.text.Normalizer;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.csv.CSVRecord;
 
 public class PVGenerator extends BasicGenerator {
-	final String kbPrefix = ConfigUtils.getKbPrefix();
+	final String kbPrefix = ConfigProp.getKbPrefix();
 	String startTime = "";
 	String SDDFileName = "";
 	Map<String, String> codeMap;

@@ -8,7 +8,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.commons.csv.CSVRecord;
-import org.hadatac.console.http.ConfigUtils;
 import org.hadatac.console.models.SysUser;
 import org.hadatac.entity.pojo.DataAcquisition;
 import org.hadatac.entity.pojo.Deployment;
@@ -17,12 +16,13 @@ import org.hadatac.entity.pojo.TriggeringEvent;
 import org.hadatac.metadata.loader.ValueCellProcessing;
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
+import org.hadatac.utils.ConfigProp;
 import org.hadatac.utils.Templates;
 
 import java.lang.Exception;
 
 public class DataAcquisitionGenerator extends BasicGenerator {
-	final String kbPrefix = ConfigUtils.getKbPrefix();
+	final String kbPrefix = ConfigProp.getKbPrefix();
 	String startTime = "";
 
 	public DataAcquisitionGenerator(File file) {

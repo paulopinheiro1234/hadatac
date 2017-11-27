@@ -5,11 +5,11 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.List;
 import org.apache.commons.csv.CSVRecord;
-import org.hadatac.console.http.ConfigUtils;
+import org.hadatac.utils.ConfigProp;
 
 
 public class DASchemaGenerator extends BasicGenerator {
-	final String kbPrefix = ConfigUtils.getKbPrefix();
+	final String kbPrefix = ConfigProp.getKbPrefix();
 	String startTime = "";
 	String SDDName = "";
 

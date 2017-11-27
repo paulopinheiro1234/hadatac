@@ -14,7 +14,6 @@ import org.hadatac.console.models.SelectScopeForm;
 import org.hadatac.console.controllers.AuthApplication;
 import org.hadatac.console.controllers.annotator.FileProcessing;
 import org.hadatac.console.controllers.annotator.routes;
-import org.hadatac.console.http.ConfigUtils;
 import org.hadatac.console.models.SysUser;
 import org.hadatac.entity.pojo.DataAcquisition;
 import org.hadatac.entity.pojo.DataFile;
@@ -42,7 +41,7 @@ public class PrepareIngestion extends Controller {
 					routes.PrepareIngestion.create(file_name,da_uri).url()));
 		}
 
-		final String kbPrefix = ConfigUtils.getKbPrefix();
+		final String kbPrefix = ConfigProp.getKbPrefix();
 		String ownerEmail = "";
 		DataAcquisition da = null;
 		DataFile file = null;
@@ -186,7 +185,7 @@ public class PrepareIngestion extends Controller {
 		}
 
 		System.out.println("file <" + file_name + ">");
-		path = ConfigProp.getPropertyValue("autoccsv.config", "path_unproc");
+		path = ConfigProp.getPathUnproc();
 		System.out.println("Path: " + path + "  Name: " + file_name);
 		try {
 			BufferedReader reader = new BufferedReader(new FileReader(path + "/" + file_name));

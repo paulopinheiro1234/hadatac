@@ -4,8 +4,6 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 
-import org.hadatac.console.http.ConfigUtils;
-
 import java.lang.String;
 import java.util.HashMap;
 import java.util.List;
@@ -13,10 +11,11 @@ import java.util.Map;
 
 import org.apache.commons.csv.CSVRecord;
 import org.hadatac.metadata.loader.ValueCellProcessing;
+import org.hadatac.utils.ConfigProp;
 
 public class DASchemaAttrGenerator extends BasicGenerator {
 
-	final String kbPrefix = ConfigUtils.getKbPrefix();
+	final String kbPrefix = ConfigProp.getKbPrefix();
 	String startTime = "";
 	String SDDName = "";
 	Map<String, String> codeMap;

@@ -1,20 +1,14 @@
 package org.hadatac.data.loader;
 
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileReader;
-import java.io.InputStream;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
 import java.lang.String;
-import java.net.URL;
 import java.net.URLDecoder;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -22,7 +16,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.commons.io.FileUtils;
 import org.apache.jena.query.DatasetAccessor;
 import org.apache.jena.query.DatasetAccessorFactory;
 import org.apache.jena.rdf.model.Literal;
@@ -30,12 +23,7 @@ import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
 import org.apache.jena.rdf.model.Property;
 import org.apache.jena.rdf.model.Resource;
-import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.ss.usermodel.Sheet;
-import org.apache.poi.ss.usermodel.Workbook;
-import org.apache.poi.ss.usermodel.WorkbookFactory;
 import org.hadatac.console.controllers.annotator.AnnotationLog;
-import org.hadatac.console.http.ConfigUtils;
 import org.hadatac.data.api.DataFactory;
 import org.hadatac.data.loader.ccsv.Parser;
 import org.hadatac.data.loader.util.Arguments;
@@ -59,7 +47,7 @@ import java.lang.Exception;
 public class AnnotationWorker {
 	public static Map<String, List<DASVirtualObject>> templateLibrary = new HashMap<String, List<DASVirtualObject>>();
 	public static String study_id = "default-study";
-	public static final String kbPrefix = ConfigUtils.getKbPrefix();
+	public static final String kbPrefix = ConfigProp.getKbPrefix();
 	
 	public AnnotationWorker() {}
     
@@ -68,8 +56,8 @@ public class AnnotationWorker {
 			return;
 		}
 
-		String path_proc = ConfigProp.getPropertyValue("autoccsv.config", "path_proc");
-		String path_unproc = ConfigProp.getPropertyValue("autoccsv.config", "path_unproc");
+		String path_proc = ConfigProp.getPathProc();
+		String path_unproc = ConfigProp.getPathUnproc();
 		List<DataFile> unproc_files = DataFile.findAll(State.UNPROCESSED);
 		DataFile.filterNonexistedFiles(path_unproc, unproc_files);
 
@@ -395,7 +383,7 @@ public class AnnotationWorker {
 			log.addline(Feedback.println(Feedback.WEB, String.format("[OK] Deployment %s specified for data acquisition %s", deployment_uri, file_name)));
 		}
 
-		String path_unproc = ConfigProp.getPropertyValue("autoccsv.config", "path_unproc");
+		String path_unproc = ConfigProp.getPathUnproc();
 		int status = -1;
 		String message = "";
 		Arguments arguments = new Arguments();

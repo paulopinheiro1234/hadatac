@@ -53,8 +53,8 @@ public class AutoAnnotator extends Controller {
 		List<DataFile> proc_files = null;
 		List<DataFile> unproc_files = null;
 
-		String path_proc = ConfigProp.getPropertyValue("autoccsv.config", "path_proc");
-		String path_unproc = ConfigProp.getPropertyValue("autoccsv.config", "path_unproc");
+		String path_proc = ConfigProp.getPathProc();
+		String path_unproc = ConfigProp.getPathUnproc();
 
 		if (user.isDataManager()) {
 			proc_files = DataFile.findAll(State.PROCESSED);
@@ -282,8 +282,8 @@ public class AutoAnnotator extends Controller {
 		dataFile.setProcessStatus(false);
 		dataFile.save();
 
-		String path_proc = ConfigProp.getPropertyValue("autoccsv.config", "path_proc");
-		String path_unproc = ConfigProp.getPropertyValue("autoccsv.config", "path_unproc");
+		String path_proc = ConfigProp.getPathProc();
+		String path_unproc = ConfigProp.getPathUnproc();
 		File destFolder = new File(path_unproc);
 		if (!destFolder.exists()){
 			destFolder.mkdirs();
@@ -310,9 +310,9 @@ public class AutoAnnotator extends Controller {
 	public static Result downloadDataFile(String file_name, boolean isProcessed) {		
 		String path = ""; 
 		if(isProcessed){
-			path = ConfigProp.getPropertyValue("autoccsv.config", "path_proc");
+			path = ConfigProp.getPathProc();
 		} else {
-			path = ConfigProp.getPropertyValue("autoccsv.config", "path_unproc");
+			path = ConfigProp.getPathUnproc();
 		}
 		return ok(new File(path + "/" + file_name));
 	}
@@ -344,10 +344,10 @@ public class AutoAnnotator extends Controller {
 
 		String path = "";
 		if(isProcessed){
-			path = ConfigProp.getPropertyValue("autoccsv.config", "path_proc");
+			path = ConfigProp.getPathProc();
 		}
 		else{
-			path = ConfigProp.getPropertyValue("autoccsv.config", "path_unproc");
+			path = ConfigProp.getPathUnproc();
 		}
 
 		File file = new File(path + "/" + file_name);
@@ -359,7 +359,7 @@ public class AutoAnnotator extends Controller {
 	@Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
 	@BodyParser.Of(value = BodyParser.MultipartFormData.class, maxLength = 500 * 1024 * 1024)
 	public static Result uploadDataFile(String oper) {
-		String path = ConfigProp.getPropertyValue("autoccsv.config", "path_unproc");
+		String path = ConfigProp.getPathUnproc();
 
 		List<FilePart> fileParts = request().body().asMultipartFormData().getFiles();
 		for(FilePart filePart : fileParts) {
@@ -400,7 +400,7 @@ public class AutoAnnotator extends Controller {
 			String resumableFilename,
 			String resumableRelativePath) {
 		if (ResumableUpload.uploadFileByChunking(request(), 
-				ConfigProp.getPropertyValue("autoccsv.config", "path_unproc"))) {
+				ConfigProp.getPathUnproc())) {
 			return ok("Uploaded."); //This Chunk has been Uploaded.
 		} else {
 			return status(HttpServletResponse.SC_NOT_FOUND);
@@ -418,7 +418,7 @@ public class AutoAnnotator extends Controller {
 			String resumableFilename,
 			String resumableRelativePath) {
 		if (ResumableUpload.postUploadFileByChunking(request(), 
-				ConfigProp.getPropertyValue("autoccsv.config", "path_unproc"))) {
+				ConfigProp.getPathUnproc())) {
 			DataFile dataFile = new DataFile();
 			dataFile.setFileName(resumableFilename);
 			dataFile.setOwnerEmail(AuthApplication.getLocalUser(session()).getEmail());

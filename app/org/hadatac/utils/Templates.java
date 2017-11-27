@@ -2,7 +2,7 @@ package org.hadatac.utils;
 
 public class Templates {
 	
-    private static String TEMPLATE_FILE = "template.conf";
+    private static String TEMPLATE_FILE = ConfigProp.getTemplateFileName();
 
     // STD Template (Study and SampleCollection)                                                                     
     public static String STUDYID = ConfigProp.getPropertyValue(TEMPLATE_FILE, "studyID"); // also in ACQ, PID and SID
@@ -75,5 +75,4 @@ public class Templates {
     // MAP Template                                                                                                  
     public static String ORIGINALPID = ConfigProp.getPropertyValue(TEMPLATE_FILE, "originalPID");
     public static String ORIGINALSID = ConfigProp.getPropertyValue(TEMPLATE_FILE, "originalSID");
-
 }
