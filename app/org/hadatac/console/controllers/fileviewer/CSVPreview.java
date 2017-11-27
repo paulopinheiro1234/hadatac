@@ -19,8 +19,8 @@ import play.mvc.Result;
 
 public class CSVPreview extends Controller{
 
-	private static String path_proc = ConfigProp.getPropertyValue("autoccsv.config", "path_proc");
-	private static String path_unproc = ConfigProp.getPropertyValue("autoccsv.config", "path_unproc");
+	private static String path_proc = ConfigProp.getPathProc();
+	private static String path_unproc = ConfigProp.getPathUnproc();
 
 	public static ArrayList<String> getCSVHeaders(String folder, String fileName) {
 		//System.out.println("filename: " + filename);

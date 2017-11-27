@@ -3,18 +3,14 @@ package org.hadatac.data.loader;
 import java.io.File;
 import java.lang.String;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import org.apache.commons.csv.CSVRecord;
-import org.hadatac.console.http.ConfigUtils;
-
-import play.Play;
+import org.hadatac.utils.ConfigProp;
 
 public class AgentGenerator extends BasicGenerator {
-	final String kbPrefix = ConfigUtils.getKbPrefix();
+	final String kbPrefix = ConfigProp.getKbPrefix();
 	private int counter = 1; //starting index number
 	
 	public AgentGenerator(File file) {

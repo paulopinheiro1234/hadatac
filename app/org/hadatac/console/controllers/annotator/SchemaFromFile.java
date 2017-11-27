@@ -26,7 +26,7 @@ public class SchemaFromFile extends Controller {
 
 		//String[] fields;
 
-		path = ConfigProp.getPropertyValue("autoccsv.config", "path_unproc");
+		path = ConfigProp.getPathUnproc();
 
 		System.out.println("Path: " + path + "  Name: " + file_name);
 

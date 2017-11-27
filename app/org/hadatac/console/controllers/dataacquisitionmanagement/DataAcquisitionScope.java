@@ -1,20 +1,14 @@
 package org.hadatac.console.controllers.dataacquisitionmanagement;
 
-import java.io.UnsupportedEncodingException;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.net.URLEncoder;
-import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
-import play.data.Form;
 import play.mvc.Controller;
 import play.mvc.Result;
-import play.twirl.api.Html;
 
 import org.hadatac.console.controllers.AuthApplication;
 import org.hadatac.console.controllers.annotator.FileProcessing;
@@ -25,10 +19,8 @@ import org.hadatac.entity.pojo.DataAcquisition;
 import org.hadatac.entity.pojo.DataFile;
 import org.hadatac.entity.pojo.ObjectCollection;
 import org.hadatac.entity.pojo.Study;
-import org.hadatac.entity.pojo.StudyObject;
 import org.hadatac.metadata.loader.ValueCellProcessing;
 import org.hadatac.utils.ConfigProp;
-import org.labkey.remoteapi.CommandException;
 
 import be.objectify.deadbolt.java.actions.Group;
 import be.objectify.deadbolt.java.actions.Restrict;
@@ -85,7 +77,7 @@ public class DataAcquisitionScope extends Controller {
 	}
 	
 	//System.out.println("file <" + file_name + ">");
-	path = ConfigProp.getPropertyValue("autoccsv.config", "path_unproc");
+	path = ConfigProp.getPathUnproc();
 	//System.out.println("Path: " + path + "  Name: " + file_name);
 	try {
 	    BufferedReader reader = new BufferedReader(new FileReader(path + "/" + file_name));

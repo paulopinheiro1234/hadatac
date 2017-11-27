@@ -2,7 +2,6 @@ package org.hadatac.data.api;
 
 import java.util.List;
 
-import org.hadatac.console.http.ConfigUtils;
 import org.hadatac.entity.pojo.ConsoleStore;
 import org.hadatac.entity.pojo.DataAcquisition;
 import org.hadatac.entity.pojo.DataAcquisitionSchema;
@@ -12,6 +11,7 @@ import org.hadatac.entity.pojo.Detector;
 import org.hadatac.entity.pojo.Instrument;
 import org.hadatac.entity.pojo.Platform;
 import org.hadatac.entity.pojo.Study;
+import org.hadatac.utils.ConfigProp;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 
@@ -27,7 +27,7 @@ public class DataFactory {
     
     public static String CONSOLE_ID = "00000001";
     
-    public static final String kbPrefix = ConfigUtils.getKbPrefix();
+    public static final String kbPrefix = ConfigProp.getKbPrefix();
     
     public static DataAcquisition createDataAcquisition(int triggeringEvent,
 							String dataCollectionUri, 

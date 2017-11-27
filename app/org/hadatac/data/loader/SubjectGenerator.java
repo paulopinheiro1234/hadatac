@@ -8,8 +8,8 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.csv.CSVRecord;
+import org.hadatac.utils.ConfigProp;
 import org.hadatac.utils.Feedback;
-import org.hadatac.console.http.ConfigUtils;
 import org.hadatac.entity.pojo.StudyObject;
 import org.hadatac.entity.pojo.Credential;
 import org.hadatac.entity.pojo.ObjectCollection;
@@ -20,7 +20,7 @@ public class SubjectGenerator extends BasicGenerator {
 	static final long MAX_OBJECTS = 1000;
 	static final long LENGTH_CODE = 6;
 
-	final String kbPrefix = ConfigUtils.getKbPrefix();
+	final String kbPrefix = ConfigProp.getKbPrefix();
 
 	StudyObject obj = null;
 	private int counter = 1; //starting index number

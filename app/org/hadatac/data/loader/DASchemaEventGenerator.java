@@ -3,8 +3,7 @@ package org.hadatac.data.loader;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
-
-import org.hadatac.console.http.ConfigUtils;
+import org.hadatac.utils.ConfigProp;
 
 import java.lang.String;
 import java.util.ArrayList;
@@ -17,7 +16,7 @@ import org.apache.commons.csv.CSVRecord;
 
 public class DASchemaEventGenerator extends BasicGenerator {
 
-	final String kbPrefix = ConfigUtils.getKbPrefix();
+	final String kbPrefix = ConfigProp.getKbPrefix();
 	String startTime = "";
 	String SDDName = "";
 	List<String> timeList = new ArrayList<String>();

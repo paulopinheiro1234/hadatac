@@ -16,7 +16,6 @@ import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.impl.HttpSolrClient;
 import org.hadatac.data.loader.AnnotationWorker;
-import org.hadatac.data.loader.DASOInstanceGenerator;
 import org.hadatac.data.loader.util.FileFactory;
 import org.hadatac.data.model.ParsingResult;
 import org.hadatac.entity.pojo.DataAcquisition;
@@ -25,7 +24,6 @@ import org.hadatac.entity.pojo.DataAcquisitionSchemaAttribute;
 import org.hadatac.entity.pojo.DataAcquisitionSchemaEvent;
 import org.hadatac.entity.pojo.DataAcquisitionSchemaObject;
 import org.hadatac.entity.pojo.DASVirtualObject;
-import org.hadatac.entity.pojo.DASOInstance;
 import org.hadatac.entity.pojo.DataFile;
 import org.hadatac.entity.pojo.ObjectCollection;
 import org.hadatac.entity.pojo.Measurement;
@@ -41,7 +39,7 @@ public class Parser {
 	private DataAcquisitionSchema schema;
 	private List<DASVirtualObject> templateList;
 
-	private static String path_unproc = ConfigProp.getPropertyValue("autoccsv.config", "path_unproc");
+	private static String path_unproc = ConfigProp.getPathUnproc();
 
 	public Parser() {
 		schema = null;

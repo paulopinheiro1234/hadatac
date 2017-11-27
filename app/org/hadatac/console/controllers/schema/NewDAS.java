@@ -1,6 +1,6 @@
 package org.hadatac.console.controllers.schema;
 
-import org.hadatac.console.http.ConfigUtils;
+import org.hadatac.utils.ConfigProp;
 import org.hadatac.console.http.GetSparqlQuery;
 
 import play.mvc.Controller;
@@ -25,7 +25,7 @@ import org.hadatac.console.controllers.annotator.FileProcessing;
 
 public class NewDAS extends Controller {
 
-	public static final String kbPrefix = ConfigUtils.getKbPrefix();
+	public static final String kbPrefix = ConfigProp.getKbPrefix();
 
 	public static SparqlQueryResults getQueryResults(String tabName) {
 		SparqlQuery query = new SparqlQuery();
