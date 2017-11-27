@@ -5,6 +5,7 @@ import java.io.File;
 import java.io.FileReader;
 
 import org.hadatac.console.http.ConfigUtils;
+import org.hadatac.entity.pojo.DASVirtualObject;
 
 import java.lang.String;
 import java.util.ArrayList;
@@ -12,8 +13,11 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Iterator;
+import org.apache.commons.csv.CSVFormat;
+import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
-import org.hadatac.entity.pojo.DASVirtualObject;
+
 
 public class DASchemaObjectGenerator extends BasicGenerator {
 	final String kbPrefix = ConfigUtils.getKbPrefix();
@@ -29,19 +33,26 @@ public class DASchemaObjectGenerator extends BasicGenerator {
 		super(file);
 		this.codeMap = codeMap;
 		this.SDDName = SDDName;
-		
+
+        CSVRecord current = null;
+
 		try {
 			BufferedReader br = new BufferedReader(new FileReader(file));
-			String line =  null;
+            CSVParser dict = CSVFormat.DEFAULT.withHeader().parse(br);
+            Iterator<CSVRecord> dictIter = dict.iterator();
 
-			while((line = br.readLine()) != null) {
-				String str[] = line.split(",");
-				if (str[4].length() > 0) {
-					timeList.add(str[4]);
-				}
-			}
+			while(dictIter.hasNext()) {
+                current = dictIter.next();
+                if(current.get("Time") != null && current.get("Time") != ""){
+                    timeList.add(current.get("Time"));
+                    //System.out.println("[DASOGenerator] adding to timeList: " + current.get("Time"));
+                }
+            }
+
+            dict.close();
 			br.close();
 		} catch (Exception e) {
+            System.out.println("[DASObjectGenerator] Error opening SDD file");
 			e.printStackTrace();
 		}
 	}
@@ -86,7 +97,7 @@ public class DASchemaObjectGenerator extends BasicGenerator {
 			return null;
 		} else {
 			if (codeMap.containsKey(entity)) {
-				System.out.println("[DASO] code matched: " + entity); 
+				System.out.println("[DASOGenerator] code matched: " + entity); 
 				return codeMap.get(entity);
 			} else {
 				return entity;
@@ -148,13 +159,15 @@ public class DASchemaObjectGenerator extends BasicGenerator {
 		rows.clear();
 		int row_number = 0;
 		for (CSVRecord record : records) {
-			if (getEntity(record)  == null || getEntity(record).equals("") || timeList.contains(getLabel(record))){
+			if (getEntity(record)  == null || getEntity(record).equals("")  || timeList.contains(getLabel(record))){
+                //System.out.println("[DASOGenerator] getEntity(record) = " + getEntity(record) + ", so skipping....");
 				continue;
 			} else {
+                //System.out.println("[DASOGenerator] creating a row....");
 				rows.add(createRow(record, ++row_number));
 			}
 		}
-
+        System.out.println("[DASOGenerator] Added " + row_number + " rows!");
 		return rows;
 	}
 
@@ -185,11 +198,11 @@ public class DASchemaObjectGenerator extends BasicGenerator {
 		// Also generate a DASVirtualObject for each virtual column
 		if(checkVirtual(rec)) {
 			row.put("dcterms:alternativeName", getLabel(rec).trim().replace(" ",""));
-			System.out.println("[DASOGen] getTime = " + getTime(rec));
+			//System.out.println("[DASOGen] getTime = " + getTime(rec));
 			row.put("sio:existsAt", getTime(rec));
 			DASVirtualObject toAdd = new DASVirtualObject(getLabel(rec).trim().replace(" ",""), row);
 			templateList.add(toAdd);
-			System.out.println("[DASOGenerator] created template: \n" + toAdd);
+			//System.out.println("[DASOGenerator] created template: \n" + toAdd);
 		}
 
 		return row;

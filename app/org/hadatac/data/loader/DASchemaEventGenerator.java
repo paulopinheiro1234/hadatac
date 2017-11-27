@@ -12,7 +12,9 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
+import java.util.Iterator;
+import org.apache.commons.csv.CSVFormat;
+import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
 
 public class DASchemaEventGenerator extends BasicGenerator {
@@ -27,20 +29,27 @@ public class DASchemaEventGenerator extends BasicGenerator {
 		super(file);
 		this.codeMap = codeMap;
 		this.SDDName = SDDName;
-		
+
+        CSVRecord current = null;
+
 		try {
 			BufferedReader br = new BufferedReader(new FileReader(file));
-			String line =  null;
+            CSVParser dict = CSVFormat.DEFAULT.withHeader().parse(br);
+            Iterator<CSVRecord> dictIter = dict.iterator();
 
-			while((line = br.readLine()) != null){
-				String str[] = line.split(",");
-				if (str[4].length() > 0){
-					timeList.add(str[4]);
-				}
-			}
+			while(dictIter.hasNext()) {
+                current = dictIter.next();
+                if(current.get("Time") != null && current.get("Time") != ""){
+                    timeList.add(current.get("Time"));
+                    //System.out.println("[DASEGenerator] adding to timeList: " + current.get("Time"));
+                }
+            }
+
+            dict.close();
 			br.close();
 		} catch (Exception e) {
-
+            System.out.println("[DASEventGenerator] Error opening SDD file");
+			e.printStackTrace();
 		}
 	}
 	
