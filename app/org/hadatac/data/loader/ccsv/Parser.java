@@ -317,23 +317,20 @@ public class Parser {
 					if (dasa.getEntity().equals(ValueCellProcessing.replacePrefixEx("sio:Human"))) {
 						if (mapIDStudyObjects.containsKey(id)) {
 							measurement.setObjectUri(mapIDStudyObjects.get(id).get(0));
-							measurement.setPID(id);
-							measurement.setSID("");
 						} else {
 							measurement.setObjectUri("");
-							measurement.setPID(id);
-							measurement.setSID("");
 						}
+						measurement.setPID(id);
+						measurement.setSID("");
 					} else if (dasa.getEntity().equals(ValueCellProcessing.replacePrefixEx("sio:Sample"))) {
 						if (mapIDStudyObjects.containsKey(id)) {
 							measurement.setObjectUri(mapIDStudyObjects.get(id).get(2));
 							measurement.setPID(mapIDStudyObjects.get(id).get(1));
-							measurement.setSID(id);
 						} else {
 							measurement.setObjectUri("");
 							measurement.setPID("");
-							measurement.setSID(id);
 						}
+						measurement.setSID(id);
 					}
 				} else {
 					measurement.setObjectUri("");
@@ -390,17 +387,27 @@ public class Parser {
 							if (daso.getEntity().equals(ValueCellProcessing.replacePrefixEx("sio:Human"))) {
 								System.out.println("sio:Human========================");
 								System.out.println("schema.getOriginalIdLabel(): " + schema.getOriginalIdLabel());
-								measurement.setObjectUri(mapIDStudyObjects.get(originalId).get(0));
+								if (mapIDStudyObjects.containsKey(originalId)) {
+									measurement.setObjectUri(mapIDStudyObjects.get(originalId).get(0));
+								} else {
+									measurement.setObjectUri("");
+								}
 								measurement.setPID(originalId);
 								measurement.setSID("");
 							} else if (daso.getEntity().equals(ValueCellProcessing.replacePrefixEx("sio:Sample"))) {
 								System.out.println("sio:Sample========================");
 								System.out.println("schema.getOriginalIdLabel(): " + schema.getOriginalIdLabel());
-								measurement.setObjectUri(mapIDStudyObjects.get(originalId).get(2));
-								measurement.setPID(mapIDStudyObjects.get(originalId).get(1));
+								if (mapIDStudyObjects.containsKey(originalId)) {
+									measurement.setObjectUri(mapIDStudyObjects.get(originalId).get(2));
+									measurement.setPID(mapIDStudyObjects.get(originalId).get(1));
+								} else {
+									measurement.setObjectUri("");
+									measurement.setPID("");
+								}
 								measurement.setSID(originalId);
 							}
 						}
+						measurement.setEntityUri(daso.getEntity());
 					}
 				} else {
 					measurement.setEntityUri(dasa.getObjectUri());
