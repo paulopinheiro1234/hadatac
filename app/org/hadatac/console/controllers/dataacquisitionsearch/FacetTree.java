@@ -135,6 +135,7 @@ public class FacetTree {
 			for (Pivot child : retChildren) {
 				base.children.add(child);
 			}
+			retChildren.clear();
 		}
 		
 		return pivot;
