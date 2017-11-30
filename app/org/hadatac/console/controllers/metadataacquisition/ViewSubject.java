@@ -180,7 +180,7 @@ public class ViewSubject extends Controller {
 			values.add("Label: " + soln.get("subjectLabel").toString());
 			values.add("Type: " + soln.get("subjectTypeLabel").toString());
 			values.add("Cohort: " + soln.get("cohortLabel").toString());
-			values.add("Study: " + soln.get("studyLabel").toString());
+//			values.add("Study: " + soln.get("studyLabel").toString());
 			subjectResult.put(subject_uri, values);
 			//System.out.println("THIS IS SUBROW*********" + subjectResult);	
 		}
