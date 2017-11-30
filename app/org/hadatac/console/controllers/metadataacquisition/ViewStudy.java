@@ -79,12 +79,10 @@ public class ViewStudy extends Controller {
 				while (resultsrwIndvInd.hasNext()) {
 					QuerySolution soln = resultsrwIndvInd.next();
 					System.out.println("ViewStudy Solution: " + soln);
-					if(Measurement.findForViews(UserManagement.getCurrentUserUri(), study_uri, "", 
-							soln.get("answer").toString(), true).getDocumentSize() > 0){
-						indvIndicatorList.add(soln.get("label").toString());
-					}
+					indvIndicatorList.add(soln.get("label").toString());
 				}
-				indicatorValues.put(entry.getValue().toString(), indvIndicatorList);
+				indicatorValues.put(parentIndicatorUri, indvIndicatorList);
+				System.out.println(indvIndicatorList.toString());
 			} catch (QueryExceptionHTTP e) {
 				e.printStackTrace();
 			}
@@ -139,8 +137,9 @@ public class ViewStudy extends Controller {
 				
 				while (resultsrwIndvInd.hasNext()) {
 					QuerySolution soln = resultsrwIndvInd.next();
-					System.out.println("ViewStudy Solution: " + soln);
+//					System.out.println("ViewStudy Solution: " + soln);
 					indicatorUris.put(soln.get("label").toString(), soln.get("answer").toString());
+					System.out.println(indicatorUris.keySet().toString());					
 				}
 			} catch (QueryExceptionHTTP e) {
 				e.printStackTrace();
