@@ -141,9 +141,8 @@ public class ViewSubject extends Controller {
 		subjectQueryString += NameSpaces.getInstance().printSparqlNameSpaceList();
 		subjectQueryString += "SELECT ?pid ?subjectTypeLabel ?subjectLabel ?cohortLabel ?studyUri ?studyLabel WHERE { "
 				+ subject_uri + " hasco:originalID ?pid . "
-				+ "?subjectUri hasco:isSubjectOf* ?cohort . "
-				+ "?studyUri rdfs:label ?studyLabel . "
-				+ "?cohort hasco:isCohortOf ?studyUri . "
+				+ "?subjectUri <http://hadatac.org/ont/hasco/isMemberOf> ?cohort . "
+				+ "?cohort <http://hadatac.org/ont/hasco/isMemberOf> ?studyUri . "
 				+ "?cohort rdfs:label ?cohortLabel . "
 				+ "OPTIONAL { ?subjectUri rdfs:label ?subjectLabel } . "
 				+ "OPTIONAL { ?subjectUri a ?subjectType . "
@@ -257,10 +256,11 @@ public class ViewSubject extends Controller {
 
 		sampleQueryString += NameSpaces.getInstance().printSparqlNameSpaceList();
 		sampleQueryString += "SELECT ?sampleUri ?subjectUri ?subjectLabel ?sampleType ?sampleLabel ?cohortLabel ?comment WHERE { "
-				+ "?subjectUri hasco:isSubjectOf* ?cohort . "
-				+ "?sampleUri hasco:isSampleOf ?subjectUri . "
-				+ "?sampleUri rdfs:comment ?comment . "
-				+ "?cohort rdfs:label ?cohortLabel . "
+				+ "?subjectUri	<http://hadatac.org/ont/hasco/isMemberOf>	?cohort . "
+				+ "?sampleUri	<http://hadatac.org/ont/hasco/hasObjectScope>	?subjectUri . "
+				+ "?sampleUri	rdf:type	<http://semanticscience.org/resource/Sample> . "
+				+ "?sampleUri	rdfs:label	?comment . "
+				+ "?cohort	rdfs:label	?cohortLabel . "
 				+ "OPTIONAL { ?subjectUri rdfs:label ?subjectLabel } . "
 				+ "OPTIONAL { ?sampleUri rdfs:label ?sampleLabel } . "
 				+ "OPTIONAL { ?sampleUri a ?sampleType  } . "
@@ -295,7 +295,7 @@ public class ViewSubject extends Controller {
 		String sampleQueryString = "";
 		sampleQueryString += NameSpaces.getInstance().printSparqlNameSpaceList();
 		sampleQueryString += "SELECT * WHERE { "
-				+ "?s <http://hadatac.org/ont/hasco/isSampleOf> " + subject_uri + " . "
+				+ "?s <http://hadatac.org/ont/hasco/hasObjectScope> " + subject_uri + " . "
 				+ "}";
 
 		Query sampleQuery = QueryFactory.create(sampleQueryString);
