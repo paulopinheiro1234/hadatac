@@ -173,14 +173,14 @@
 	//var listU = '@handler.values(FacetHandler.UNIT_FACET)';
 	//setCheckTree(treeU, listU, props);
 	
-	var treeT;
-	props = "timestamp";
-	jsonTree = parseSolrRangeFacetFieldToTree(props);
-	dataTree = JSON.parse(jsonTree);
-	treeT = new dhtmlXTreeObject("treeTimeBox","100%","100%",0);
-	loadTree(treeT, dataTree);
-	//var listT = '@handler.values(FacetHandler.TIME_FACET)';
-	//setCheckTree(treeT, listT, props);
+    var treeT;
+    //jsonTree = parseSolrRangeFacetFieldToTree('@FacetHandler.TIME_FACET');
+    //dataTree = JSON.parse(jsonTree);
+    dataTree = parseSolrFacetToTree('@FacetHandler.TIME_FACET');
+    treeT = new dhtmlXTreeObject("treeTimeBox","100%","100%",0);
+    loadTree(treeT, dataTree);
+    //var listT = '@handler.values(FacetHandler.TIME_FACET)';
+    //setCheckTree(treeT, listT, props);
 	
 	var treePI;
 	dataTree = parseSolrFacetToTree('@FacetHandler.PLATFORM_INSTRUMENT_FACET');

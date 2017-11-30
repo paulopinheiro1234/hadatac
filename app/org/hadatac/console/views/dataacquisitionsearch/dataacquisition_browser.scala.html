@@ -206,9 +206,9 @@
 	//setCheckTree(treeU, listU, props);
 	
 	var treeT;
-	props = "timestamp";
-	jsonTree = parseSolrRangeFacetFieldToTree(props);
-	dataTree = JSON.parse(jsonTree);
+	//jsonTree = parseSolrRangeFacetFieldToTree('@FacetHandler.TIME_FACET');
+	//dataTree = JSON.parse(jsonTree);
+	dataTree = parseSolrFacetToTree('@FacetHandler.TIME_FACET');
 	treeT = new dhtmlXTreeObject("treeTimeBox","100%","100%",0);
 	loadTree(treeT, dataTree);
 	//var listT = '@handler.values(FacetHandler.TIME_FACET)';

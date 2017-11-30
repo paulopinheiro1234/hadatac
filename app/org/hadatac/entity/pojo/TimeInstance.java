@@ -16,15 +16,13 @@ import org.hadatac.utils.Collections;
 
 import play.Play;
 
-public class UnitInstance extends HADatAcThing implements Comparable<UnitInstance> {
+public class TimeInstance extends HADatAcThing implements Comparable<TimeInstance> {
 
-	static String className = "uo:0000000";
-
-	public UnitInstance () {}
+	public TimeInstance () {}
 	
 	@Override
 	public boolean equals(Object o) {
-		if((o instanceof UnitInstance) && (((UnitInstance)o).getUri() == this.getUri())) {
+		if((o instanceof TimeInstance) && (((TimeInstance)o).getUri() == this.getUri())) {
 			return true;
 		} else {
 			return false;
@@ -39,14 +37,14 @@ public class UnitInstance extends HADatAcThing implements Comparable<UnitInstanc
 	public Map<HADatAcThing, List<HADatAcThing>> getTargetFacets(
 			List<String> preValues, FacetHandler facetHandler) {
 		SolrQuery query = new SolrQuery();
-		query.setQuery(facetHandler.getTempSolrQuery("TIME", "unit_uri_str", preValues));
+		query.setQuery(facetHandler.getTempSolrQuery("TIME", "named_time_str", preValues));
 		query.setRows(0);
 		query.setFacet(true);
 		query.setFacetLimit(-1);
 		query.setParam("json.facet", "{ "
-				+ "unit_uri_str:{ "
+				+ "named_time_str:{ "
 				+ "type: terms, "
-				+ "field: unit_uri_str,"
+				+ "field: named_time_str,"
 				+ "limit: 1000}}");
 
 		try {
@@ -57,10 +55,10 @@ public class UnitInstance extends HADatAcThing implements Comparable<UnitInstanc
 			solr.close();
 			Pivot pivot = Measurement.parseFacetResults(queryResponse);
 			Map<HADatAcThing, List<HADatAcThing>> result = parsePivot(pivot);
-			System.out.println("UnitInstance Parse Pivot: " + result);
+			System.out.println("TimeInstance Parse Pivot: " + result);
 			return parsePivot(pivot);
 		} catch (Exception e) {
-			System.out.println("[ERROR] Unit.getTargetFacets() - Exception message: " + e.getMessage());
+			System.out.println("[ERROR] TimeInstance.getTargetFacets() - Exception message: " + e.getMessage());
 		}
 
 		return null;
@@ -69,13 +67,27 @@ public class UnitInstance extends HADatAcThing implements Comparable<UnitInstanc
 	private Map<HADatAcThing, List<HADatAcThing>> parsePivot(Pivot pivot) {
 		Map<HADatAcThing, List<HADatAcThing>> results = new HashMap<HADatAcThing, List<HADatAcThing>>();
 		for (Pivot pivot_ent : pivot.children) {
-			UnitInstance unit = new UnitInstance();
-			unit.setUri(pivot_ent.value);
-			unit.setLabel(Unit.find(pivot_ent.value).getLabel());
-			unit.setCount(pivot_ent.count);
-			if (!results.containsKey(unit)) {
+			if (pivot_ent.value.isEmpty()) {
+				continue;
+			}
+			
+			TimeInstance time = new TimeInstance();
+			if (pivot_ent.value.startsWith("http")) {
+				time.setUri(pivot_ent.value);
+				DataAcquisitionSchemaEvent dase = DataAcquisitionSchemaEvent.find(pivot_ent.value);
+				if (dase != null) {
+					time.setLabel(dase.getLabel());
+				} else {
+					time.setLabel(pivot_ent.value);
+				}
+			} else {
+				time.setUri("");
+				time.setLabel(pivot_ent.value);
+			}
+			time.setCount(pivot_ent.count);
+			if (!results.containsKey(time)) {
 				List<HADatAcThing> attributes = new ArrayList<HADatAcThing>();
-				results.put(unit, attributes);
+				results.put(time, attributes);
 			}
 		}
 
@@ -83,7 +95,7 @@ public class UnitInstance extends HADatAcThing implements Comparable<UnitInstanc
 	}
 
 	@Override
-	public int compareTo(UnitInstance another) {
+	public int compareTo(TimeInstance another) {
 		if (this.getLabel() != null && another.getLabel() != null) {
 			return this.getLabel().compareTo(another.getLabel());
 		}

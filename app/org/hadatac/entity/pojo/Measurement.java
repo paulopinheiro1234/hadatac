@@ -7,7 +7,6 @@ import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.time.format.FormatStyle;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -127,101 +126,6 @@ public class Measurement {
 	public String getObjectSID() {
 		return this.sid;
 	}
-
-	/*	public String getObjectPID() {
-
-//		this.objectUri = objectUri;
-
-        String queryString = NameSpaces.getInstance().printSparqlNameSpaceList()
-                + " SELECT ?pid WHERE {"
-                + " <" + objectUri + "> rdf:type <http://semanticscience.org/resource/Human> . "
-                + " <" + objectUri + "> <http://hadatac.org/ont/hasco/originalID> ?pid . "       
-                + " }";
-
-        Query query = QueryFactory.create(queryString);
-        QueryExecution qexec = QueryExecutionFactory.sparqlService(
-                Collections.getCollectionsName(Collections.METADATA_SPARQL), query);
-        ResultSet results = qexec.execSelect();
-        ResultSetRewindable resultsrw = ResultSetFactory.copyResults(results);
-        qexec.close();
-
-        if (resultsrw.size() > 0) {
-            QuerySolution soln = resultsrw.next();
-            try{
-		            if (null != soln.getLiteral("pid")) {
-		            	String pid = soln.getLiteral("pid").toString();
-		            	if (!pid.equals("")) {
-		            		return pid;
-		            	}
-		            }
-		        } catch (Exception e1) {
-		        	return "";
-		        }
-            } else {
-        	String queryString2 = NameSpaces.getInstance().printSparqlNameSpaceList()
-                    + " SELECT ?pid WHERE {"
-                    + " <" + objectUri + "> <http://hadatac.org/ont/hasco/isSampleOf> ?sub . "
-                    + " ?sub <http://hadatac.org/ont/hasco/originalID> ?pid . "       
-                    + " }";
-
-            Query query2 = QueryFactory.create(queryString2);
-            QueryExecution qexec2 = QueryExecutionFactory.sparqlService(
-                    Collections.getCollectionsName(Collections.METADATA_SPARQL), query2);
-            ResultSet results2 = qexec2.execSelect();
-            ResultSetRewindable resultsrw2 = ResultSetFactory.copyResults(results2);
-            qexec2.close();
-
-            if (resultsrw2.size() > 0) {
-                QuerySolution soln2 = resultsrw2.next();
-                try{
-	                if (null != soln2.getLiteral("pid")) {
-	                	String pid = soln2.getLiteral("pid").toString();
-	                	if (!pid.equals("")) {
-	                		return pid;
-	                	}
-	                }
-                } catch (Exception e1) {
-                	return "";
-                }
-            }
-            }
-            return "";
-	}
-
-    	public String getObjectSID() {
-
-//		this.objectUri = objectUri;
-
-        String queryString = NameSpaces.getInstance().printSparqlNameSpaceList()
-                + " SELECT ?sid WHERE {"
-                + " <" + objectUri + "> <http://hadatac.org/ont/hasco/originalID> ?sid . "  
-                + " <" + objectUri + "> <http://hadatac.org/ont/hasco/isObjectOf> ?sc . "
-                + " ?sc	rdf:type <http://hadatac.org/ont/hasco/SampleCollection> . "
-                + " }";
-
-        Query query = QueryFactory.create(queryString);
-        QueryExecution qexec = QueryExecutionFactory.sparqlService(
-                Collections.getCollectionsName(Collections.METADATA_SPARQL), query);
-        ResultSet results = qexec.execSelect();
-        ResultSetRewindable resultsrw = ResultSetFactory.copyResults(results);
-        qexec.close();
-
-        if (resultsrw.size() > 0) {
-            QuerySolution soln = resultsrw.next();
-            try{
-	            if (null != soln.getLiteral("sid")) {
-	            	String sid = soln.getLiteral("sid").toString();
-	            	if (!sid.equals("")) {
-	            		return sid;
-	            	}
-	            }
-            } catch (Exception e1) {
-            	return "";
-            }
-        }
-
-        return "";
-	}*/
 
 	public void setObjectUri(String objectUri) {
 		this.objectUri = objectUri;
@@ -750,19 +654,6 @@ public class Measurement {
 
 						i++;
 					}
-
-					/*
-					Iterator<RangeFacet.Count> v = field.getCounts().iterator();
-					while (v.hasNext()) {
-						RangeFacet.Count count = v.next();
-						Map<String, Map<String, String>> map = result.date_facets.get(field.getName());
-						map.put(count.getValue(), new HashMap<String, String>());
-						Map<String, String> map2 = map.get(count.getValue());
-						System.out.println("!!!!!!! 2: " + count.getValue() + "   3: " + count.getCount());
-						map2.put("count", Integer.toString(count.getCount()));
-						map2.put("gap", field.getGap().toString());
-						map2.put("text", "text");
-					}*/
 				}
 			}
 			
@@ -782,11 +673,16 @@ public class Measurement {
 			fTree.addUpperFacet(EntityInstance.class);
 			pivot = getFacetStats(fTree, handler, true);
 			fTree.mergeFacetTree(1, 0, new ArrayList<Integer>(), null, pivot, "", new ArrayList<Pivot>());
+			//pivot.setNullParent();
 			result.extra_facets.put(FacetHandler.ENTITY_CHARACTERISTIC_FACET, pivot);
 			
 			fTree = new FacetTree();
 			fTree.setTargetFacet(UnitInstance.class);
 			result.extra_facets.put(FacetHandler.UNIT_FACET, getFacetStats(fTree, handler, false));
+			
+			fTree = new FacetTree();
+			fTree.setTargetFacet(TimeInstance.class);
+			result.extra_facets.put(FacetHandler.TIME_FACET, getFacetStats(fTree, handler, false));
 			
 			fTree = new FacetTree();
 			fTree.setTargetFacet(DataAcquisition.class);

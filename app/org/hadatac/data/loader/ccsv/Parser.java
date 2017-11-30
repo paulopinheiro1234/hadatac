@@ -253,13 +253,13 @@ public class Parser {
 				measurement.setTimestamp(new Date(Long.MAX_VALUE));
 				measurement.setAbstractTime("");
 
-				// full-row regular (Epoch) timemestamp
 				if(dasa.getLabel() == schema.getTimestampLabel()) {
+					// full-row regular (Epoch) timemestamp
 					String sTime = record.get(posTimestamp);
 					int timeStamp = new BigDecimal(sTime).intValue();
 					measurement.setTimestamp(Instant.ofEpochSecond(timeStamp).toString());
-				// full-row regular (XSD) time interval
 				} else if (!schema.getTimeInstantLabel().equals("")) {
+					// full-row regular (XSD) time interval
 					String timeValue = record.get(posTimeInstant);
 					if (timeValue != null) {
 						try {
@@ -269,28 +269,16 @@ public class Parser {
 							measurement.setTimestamp(new Date(Long.MAX_VALUE).toInstant().toString());
 						}
 					}
-
-					// full-row named time
 				} else if (!schema.getNamedTimeLabel().equals("")) {
+					// full-row named time
 					String timeValue = record.get(posNamedTime);
 					if (timeValue != null) {
-						//System.out.println("[Parser] timeValue = " + timeValue);
 						measurement.setAbstractTime(timeValue);
 					} else {
 						measurement.setAbstractTime("");
 					}
 				} else if (dasa.getEventUri() != null && !dasa.getEventUri().equals("")) {
-					String daseUri = dasa.getEventUri();
-					DataAcquisitionSchemaEvent dase = schema.getEvent(daseUri); 
-					if (dase != null) {
-						if (dase.getLabel() != null && !dase.getLabel().equals("")) {
-							measurement.setAbstractTime("At " + dase.getLabel());
-						} else if (dase.getEntity() != null && !dase.getEntity().equals("")) {
-							measurement.setAbstractTime("At " + dase.getEntity().substring(dase.getEntity().indexOf("#") + 1));
-						} else {
-							measurement.setAbstractTime("At " + daseUri);
-						}
-					} 
+					measurement.setAbstractTime(dasa.getEventUri());
 				}
 
 				/*============================*

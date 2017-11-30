@@ -146,6 +146,7 @@ function create_item(data) {
 }
 
 function parseSolrFacetToTree(facet_name) {
+	console.log("facet_name: " + facet_name);
 	dataTree = {};
 	tree_id = 0;
 	dataTree.id = tree_id++;

@@ -62,7 +62,7 @@ public class EntityInstance extends HADatAcThing implements Comparable<EntityIns
 			solr.close();
 			Pivot pivot = Measurement.parseFacetResults(queryResponse);
 			Map<HADatAcThing, List<HADatAcThing>> result = parsePivot(pivot);
-			System.out.println("Parse Pivot: " + result);
+			System.out.println("EntityInstance Parse Pivot: " + result);
 			return parsePivot(pivot);
 		} catch (Exception e) {
 			System.out.println("[ERROR] Entity.getNumberFromSolr() - Exception message: " + e.getMessage());
