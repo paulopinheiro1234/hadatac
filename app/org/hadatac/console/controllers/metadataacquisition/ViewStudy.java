@@ -213,14 +213,13 @@ public class ViewStudy extends Controller {
 		String subjectQueryString = "";
     	        subjectQueryString += NameSpaces.getInstance().printSparqlNameSpaceList(); 
     	        subjectQueryString += "SELECT ?subjectUri ?subjectType ?subjectLabel ?cohortLabel ?studyLabel WHERE { "
-    			+ "?subjectUri hasco:isSubjectOf* ?cohort . "
-    			+ "?cohort hasco:isCohortOf " + study_uri + " . "
-    			+ study_uri + " rdfs:label ?studyLabel . "
+    			+ "?subjectUri hasco:isMemberOf ?cohort . "
+    			+ "?cohort hasco:isMemberOf " + study_uri + " . "
     			+ "?cohort rdfs:label ?cohortLabel . "
     			+ "OPTIONAL { ?subjectUri rdfs:label ?subjectLabel } . "
     			+ "OPTIONAL { ?subjectUri a ?subjectType } . "
     			+ "} "
-                        + "ORDER BY ?subjectUri";		
+                + "ORDER BY ?subjectUri";		
           	Map<String, List<String>> subjectResult = new HashMap<String, List<String>>();
 		List<String> values = new ArrayList<String>();
 		try {
@@ -251,8 +250,9 @@ public class ViewStudy extends Controller {
 		String scQueryString = "";
 		scQueryString += NameSpaces.getInstance().printSparqlNameSpaceList(); 
 		scQueryString += "SELECT ?sc ?si WHERE { "
-    			+ "?sc <http://hadatac.org/ont/hasco/isSampleCollectionOf> " + study_uri + " . "
-    			+ "?si <http://hadatac.org/ont/hasco/isObjectOf> ?sc . "
+    			+ "?sc	<http://hadatac.org/ont/hasco/isMemberOf> " + study_uri + " . "
+    			+ "?sc	rdf:type	<http://hadatac.org/ont/hasco/SampleCollection> . "
+    			+ "?si	<http://hadatac.org/ont/hasco/isMemberOf>	?sc . "
     			+ "}";
 		List<String> values = new ArrayList<String>();
 		try {
