@@ -112,7 +112,7 @@ public class ViewStudy extends Controller {
 			while (resultsrwIndc.hasNext()) {
 				QuerySolution soln = resultsrwIndc.next();
 				indicatorLabel = soln.get("label").toString();
-				indicatorMap.put(soln.get("studyIndicator").toString(),indicatorLabel);		
+				indicatorMap.put(soln.get("subIndicator").toString(),indicatorLabel);		
 			}
 		} catch (QueryExceptionHTTP e) {
 			e.printStackTrace();
