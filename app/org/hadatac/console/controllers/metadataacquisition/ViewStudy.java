@@ -127,7 +127,8 @@ public class ViewStudy extends Controller {
 			String indvIndicatorQuery = "";
 			indvIndicatorQuery += NameSpaces.getInstance().printSparqlNameSpaceList();
 			indvIndicatorQuery += "SELECT DISTINCT ?studyUri ?label ?uri WHERE { "
-					+ "?schemaUri hasco:isSchemaOf " + study_uri + " . "
+					+ "?daUri <http://hadatac.org/ont/hasco/hasSchema> ?schemaUri . "
+					+ "?daUri <http://hadatac.org/ont/hasco/isDataAcquisitionOf> " + study_uri + " . "
 					+ "?schemaAttribute hasco:partOfSchema ?schemaUri . "
 					+ "?schemaAttribute hasco:hasAttribute ?uri . "
 					+ "?uri rdfs:subClassOf* <" + parentIndicatorUri + "> . " 
