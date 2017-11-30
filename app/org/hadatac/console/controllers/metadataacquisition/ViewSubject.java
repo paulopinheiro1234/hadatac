@@ -139,15 +139,14 @@ public class ViewSubject extends Controller {
 		}
 		//System.out.println("in findSubjectBasic (2): '" + subject_uri + "'");
 		subjectQueryString += NameSpaces.getInstance().printSparqlNameSpaceList();
-		subjectQueryString += "SELECT ?pid ?subjectTypeLabel ?subjectLabel ?cohortLabel ?studyUri ?studyLabel WHERE { "
+		subjectQueryString += "SELECT ?pid ?subjectTypeLabel ?subjectLabel ?cohortLabel ?studyUri WHERE { "
 				+ subject_uri + " hasco:originalID ?pid . "
-				+ "?subjectUri <http://hadatac.org/ont/hasco/isMemberOf> ?cohort . "
+				+ subject_uri + " <http://hadatac.org/ont/hasco/isMemberOf> ?cohort . "
 				+ "?cohort <http://hadatac.org/ont/hasco/isMemberOf> ?studyUri . "
 				+ "?cohort rdfs:label ?cohortLabel . "
-				+ "OPTIONAL { ?subjectUri rdfs:label ?subjectLabel } . "
-				+ "OPTIONAL { ?subjectUri a ?subjectType . "
+				+ "OPTIONAL { " + subject_uri + " rdfs:label ?subjectLabel } . "
+				+ "OPTIONAL { " + subject_uri + " a ?subjectType . "
 				+ "			  ?subjectType rdfs:label ?subjectTypeLabel } . "
-				+ "FILTER ( ?subjectUri = " + subject_uri + " ) . "
 				+ "}";
 
 		Query basicQuery = QueryFactory.create(subjectQueryString);
