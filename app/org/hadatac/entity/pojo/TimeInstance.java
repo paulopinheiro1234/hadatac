@@ -22,7 +22,7 @@ public class TimeInstance extends HADatAcThing implements Comparable<TimeInstanc
 	
 	@Override
 	public boolean equals(Object o) {
-		if((o instanceof TimeInstance) && (((TimeInstance)o).getUri() == this.getUri())) {
+		if((o instanceof TimeInstance) && (((TimeInstance)o).getUri().equals(this.getUri()))) {
 			return true;
 		} else {
 			return false;

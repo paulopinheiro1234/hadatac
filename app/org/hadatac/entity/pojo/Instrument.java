@@ -37,7 +37,7 @@ public class Instrument extends HADatAcThing implements Comparable<Instrument> {
 	
 	@Override
 	public boolean equals(Object o) {
-		if((o instanceof Instrument) && (((Instrument)o).getUri() == this.getUri())) {
+		if((o instanceof Instrument) && (((Instrument)o).getUri().equals(this.getUri()))) {
 			return true;
 		} else {
 			return false;

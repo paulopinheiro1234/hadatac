@@ -1,5 +1,6 @@
 package org.hadatac.entity.pojo;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -17,6 +18,17 @@ public class HADatAcThing {
 	public Map<HADatAcThing, List<HADatAcThing>> getTargetFacets(
 			List<String> preValues, FacetHandler facetHandler) {
 		return null;
+	}
+	
+	public String stringify(List<String> preValues, boolean isUri) {
+		List<String> finalValues = new ArrayList<String>();
+		if (isUri) {
+			preValues.forEach((value) -> finalValues.add("<" + value + ">"));
+		} else {
+			preValues.forEach((value) -> finalValues.add("\"" + value + "\""));
+		}
+		
+		return String.join(" ", finalValues);
 	}
 	
 	public long getNumberFromSolr(List<String> values, FacetHandler facetHandler) {

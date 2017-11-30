@@ -24,7 +24,7 @@ public class UnitInstance extends HADatAcThing implements Comparable<UnitInstanc
 	
 	@Override
 	public boolean equals(Object o) {
-		if((o instanceof UnitInstance) && (((UnitInstance)o).getUri() == this.getUri())) {
+		if((o instanceof UnitInstance) && (((UnitInstance)o).getUri().equals(this.getUri()))) {
 			return true;
 		} else {
 			return false;

@@ -77,7 +77,8 @@ public class DataAcquisitionSearch extends Controller {
             }
             for (String uri: setObj) {
             	if (uri != null) {
-            		String html = ViewSubject.findBasicHTML(uri);
+            		String html = "";
+            		//String html = ViewSubject.findBasicHTML(uri);
             		if (html != null) {
             			objDetails.putObject(uri, html);
             		}

@@ -110,7 +110,7 @@ public class Platform extends HADatAcThing implements Comparable<Platform> {
 	
 	@Override
 	public boolean equals(Object o) {
-		if((o instanceof Platform) && (((Platform)o).getUri() == this.getUri())) {
+		if((o instanceof Platform) && (((Platform)o).getUri().equals(this.getUri()))) {
 			return true;
 		} else {
 			return false;

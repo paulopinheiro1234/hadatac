@@ -21,7 +21,7 @@ public class AttributeInstance extends HADatAcThing implements Comparable<Attrib
 	
 	@Override
 	public boolean equals(Object o) {
-		if((o instanceof AttributeInstance) && (((AttributeInstance)o).getUri() == this.getUri())) {
+		if((o instanceof AttributeInstance) && (((AttributeInstance)o).getUri().equals(this.getUri()))) {
 			return true;
 		} else {
 			return false;

@@ -24,7 +24,7 @@ public class EntityInstance extends HADatAcThing implements Comparable<EntityIns
 	
 	@Override
 	public boolean equals(Object o) {
-		if((o instanceof EntityInstance) && (((EntityInstance)o).getUri() == this.getUri())) {
+		if((o instanceof EntityInstance) && (((EntityInstance)o).getUri().equals(this.getUri()))) {
 			return true;
 		} else {
 			return false;

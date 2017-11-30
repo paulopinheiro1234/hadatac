@@ -11,8 +11,8 @@ import org.apache.jena.query.QuerySolution;
 import org.apache.jena.query.ResultSet;
 import org.apache.jena.query.ResultSetFactory;
 import org.apache.jena.query.ResultSetRewindable;
-import org.apache.jena.sparql.engine.http.QueryExceptionHTTP;
 import org.hadatac.console.models.FacetHandler;
+import org.hadatac.metadata.loader.ValueCellProcessing;
 import org.hadatac.utils.Collections;
 import org.hadatac.utils.NameSpaces;
 
@@ -24,8 +24,8 @@ public class EntityRole extends HADatAcThing implements Comparable<EntityRole> {
 	public EntityRole() {}
 	
 	@Override
-	public boolean equals(Object o) {
-		if((o instanceof EntityRole) && (((EntityRole)o).getUri() == this.getUri())) {
+	public boolean equals(Object o) {;
+		if((o instanceof EntityRole) && (((EntityRole)o).getUri().equals(this.getUri()))) {
 			return true;
 		} else {
 			return false;
@@ -38,10 +38,16 @@ public class EntityRole extends HADatAcThing implements Comparable<EntityRole> {
 	}
 	
 	public Map<HADatAcThing, List<HADatAcThing>> getTargetFacets(
-			List<String> preValues, FacetHandler facetHandler) {
+			List<String> preValues, FacetHandler facetHandler) {		
+		String valueConstraint = "";
+		if (!preValues.isEmpty()) {
+			valueConstraint = " VALUES ?attributeUri { " + stringify(preValues, true) + " } ";
+		}
+		
 		String query = "";
 		query += NameSpaces.getInstance().printSparqlNameSpaceList();
 		query += "SELECT ?roleUri ?dasoSub ?relation ?attributeUri ?attributeLabel WHERE { "
+				+ valueConstraint
 				+ "{ "
 				+ "?dasa hasco:isAttributeOf ?daso . "
 				+ "?daso hasco:hasRole ?roleUri . "
@@ -66,6 +72,32 @@ public class EntityRole extends HADatAcThing implements Comparable<EntityRole> {
 			ResultSet resultSet = qe.execSelect();
 			ResultSetRewindable resultsrw = ResultSetFactory.copyResults(resultSet);
 			qe.close();
+			
+			if (resultsrw.size() == 0) {
+				for (String value : preValues) {
+					EntityRole role = new EntityRole();
+					role.setUri(ValueCellProcessing.replacePrefix("sio:Sample"));
+					role.setLabel("Sample");
+					
+					AttributeInstance attrib = new AttributeInstance();
+					attrib.setUri(value);
+					Attribute temp_attrib = Attribute.find(value);
+					if (temp_attrib != null) {
+						attrib.setLabel(temp_attrib.getLabel());
+					} else {
+						attrib.setLabel(value.split("#")[1]);
+					}
+					
+					if (!results.containsKey(role)) {
+						List<HADatAcThing> facets = new ArrayList<HADatAcThing>();
+						results.put(role, facets);
+					}
+					if (!results.get(role).contains(attrib)) {
+						results.get(role).add(attrib);
+					}
+				}
+			}
+			
 			while (resultsrw.hasNext()) {
 				QuerySolution soln = resultsrw.next();
 				EntityRole role = new EntityRole();
@@ -73,14 +105,11 @@ public class EntityRole extends HADatAcThing implements Comparable<EntityRole> {
 					role.setUri(soln.get("roleUri").toString());
 					role.setLabel(soln.get("roleUri").toString().split("#")[1]);
 				} else if (soln.get("relation") != null || soln.get("relation").toString().isEmpty()) {
-					role.setUri("http://semanticscience.org/resource/Sample");
-					role.setLabel("Sample");
+					role.setUri(ValueCellProcessing.replacePrefix("sio:Human"));
+					role.setLabel("Human");
 				}
 								
 				AttributeInstance attrib = new AttributeInstance();
-				if (!preValues.isEmpty() && !preValues.contains(soln.get("attributeUri").toString())) {
-					continue;
-				}
 				attrib.setUri(soln.get("attributeUri").toString());
 				attrib.setLabel(soln.get("attributeLabel").toString());
 				if (!results.containsKey(role)) {
@@ -100,9 +129,6 @@ public class EntityRole extends HADatAcThing implements Comparable<EntityRole> {
 
 	@Override
 	public int compareTo(EntityRole another) {
-		if (this.getLabel() != null && another.getLabel() != null) {
-			return this.getLabel().compareTo(another.getLabel());
-		}
 		return this.getUri().compareTo(another.getUri());
 	}
 }

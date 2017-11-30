@@ -31,7 +31,7 @@ public class Pivot {
 	
 	@Override
 	public boolean equals(Object o) {
-		if((o instanceof Pivot) && (((Pivot)o).value == this.value)) {
+		if((o instanceof Pivot) && (((Pivot)o).value.equals(this.value))) {
 			return true;
 		} else {
 			return false;

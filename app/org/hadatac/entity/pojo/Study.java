@@ -355,7 +355,7 @@ public class Study extends HADatAcThing {
 	
 	@Override
 	public boolean equals(Object o) {
-		if((o instanceof Study) && (((Study)o).getUri() == this.getUri())) {
+		if((o instanceof Study) && (((Study)o).getUri().equals(this.getUri()))) {
 			return true;
 		} else {
 			return false;

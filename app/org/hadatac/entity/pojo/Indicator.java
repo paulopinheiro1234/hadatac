@@ -101,7 +101,7 @@ public class Indicator extends HADatAcThing implements Comparable<Indicator> {
 
 	@Override
 	public boolean equals(Object o) {
-		if((o instanceof Indicator) && (((Indicator)o).getUri() == this.getUri())) {
+		if((o instanceof Indicator) && (((Indicator)o).getUri().equals(this.getUri()))) {
 			return true;
 		} else {
 			return false;
@@ -231,8 +231,7 @@ public class Indicator extends HADatAcThing implements Comparable<Indicator> {
 	}
 
 	public Map<HADatAcThing, List<HADatAcThing>> getTargetFacets(
-			List<String> preValues, FacetHandler facetHandler) {
-		
+			List<String> preValues, FacetHandler facetHandler) {	
 		String query = "";
 		query += NameSpaces.getInstance().printSparqlNameSpaceList();
 		query += "SELECT ?studyIndicator ?indicatorLabel ?attributeUri ?attributeLabel WHERE { "

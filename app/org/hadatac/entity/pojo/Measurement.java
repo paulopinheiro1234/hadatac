@@ -669,11 +669,10 @@ public class Measurement {
 			fTree = new FacetTree();
 			fTree.setTargetFacet(AttributeInstance.class);
 			fTree.addUpperFacet(Indicator.class);
-			//fTree.addUpperFacet(EntityRole.class);
+			fTree.addUpperFacet(EntityRole.class);
 			fTree.addUpperFacet(EntityInstance.class);
 			pivot = getFacetStats(fTree, handler, true);
 			fTree.mergeFacetTree(1, 0, new ArrayList<Integer>(), null, pivot, "", new ArrayList<Pivot>());
-			//pivot.setNullParent();
 			result.extra_facets.put(FacetHandler.ENTITY_CHARACTERISTIC_FACET, pivot);
 			
 			fTree = new FacetTree();

@@ -163,7 +163,7 @@ public class DataAcquisition extends HADatAcThing {
 	
 	@Override
 	public boolean equals(Object o) {
-		if((o instanceof DataAcquisition) && (((DataAcquisition)o).getUri() == this.getUri())) {
+		if((o instanceof DataAcquisition) && (((DataAcquisition)o).getUri().equals(this.getUri()))) {
 			return true;
 		} else {
 			return false;
