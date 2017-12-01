@@ -33,6 +33,8 @@ import be.objectify.deadbolt.java.actions.Restrict;
 public class ViewStudy extends Controller {
 	
 	public static Map<String, List<String>> findStudyIndicators(String study_uri) {
+		
+		String das_uri = study_uri.replace("STD", "DAS");
 		String indicatorQuery = "";
 		indicatorQuery += NameSpaces.getInstance().printSparqlNameSpaceList();
 		indicatorQuery += "SELECT ?subIndicator ?label ?comment WHERE { "
@@ -65,6 +67,7 @@ public class ViewStudy extends Controller {
 			indvIndicatorQuery += NameSpaces.getInstance().printSparqlNameSpaceList();
 			indvIndicatorQuery += "SELECT DISTINCT ?label ?answer WHERE { "
 					+ "?answer rdf:type	<http://hadatac.org/ont/hasco/DASchemaAttribute> . "
+					+ "?answer <http://hadatac.org/ont/hasco/partOfSchema> " + das_uri + " . "
 					+ "<http://hadatac.org/ont/hasco/DASchemaAttribute> rdfs:subClassOf	<" + parentIndicatorUri + "> . "
 					+ "?answer rdfs:label ?label . "
 					+ "}";

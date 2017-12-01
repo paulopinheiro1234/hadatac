@@ -254,16 +254,15 @@ public class ViewSubject extends Controller {
 		}
 
 		sampleQueryString += NameSpaces.getInstance().printSparqlNameSpaceList();
-		sampleQueryString += "SELECT ?sampleUri ?subjectUri ?subjectLabel ?sampleType ?sampleLabel ?cohortLabel ?comment WHERE { "
-				+ "?subjectUri	<http://hadatac.org/ont/hasco/isMemberOf>	?cohort . "
-				+ "?sampleUri	<http://hadatac.org/ont/hasco/hasObjectScope>	?subjectUri . "
+		sampleQueryString += "SELECT ?sampleUri ?subjectLabel ?sampleType ?sampleLabel ?cohortLabel ?comment WHERE { "
+				+	subject_uri	+	"	<http://hadatac.org/ont/hasco/isMemberOf>	?cohort . "
+				+ "?sampleUri	<http://hadatac.org/ont/hasco/hasObjectScope> " + subject_uri + " . "
 				+ "?sampleUri	rdf:type	<http://semanticscience.org/resource/Sample> . "
 				+ "?sampleUri	rdfs:label	?comment . "
 				+ "?cohort	rdfs:label	?cohortLabel . "
-				+ "OPTIONAL { ?subjectUri rdfs:label ?subjectLabel } . "
+				+ "OPTIONAL { " + subject_uri + " rdfs:label ?subjectLabel } . "
 				+ "OPTIONAL { ?sampleUri rdfs:label ?sampleLabel } . "
 				+ "OPTIONAL { ?sampleUri a ?sampleType  } . "
-				+ "FILTER ( ?subjectUri = " + subject_uri + " ) . "
 				+ "}";
 		Query basicQuery = QueryFactory.create(sampleQueryString);
 
