@@ -37,7 +37,6 @@ public class Unit extends HADatAcClass implements Comparable<Unit> {
 				" ?uri rdfs:subClassOf* sio:Quantity . " + 
 				"} ";
 
-		//System.out.println("Query: " + queryString);
 		Query query = QueryFactory.create(queryString);
 
 		QueryExecution qexec = QueryExecutionFactory.sparqlService(Collections.getCollectionsName(Collections.METADATA_SPARQL), query);
@@ -77,24 +76,25 @@ public class Unit extends HADatAcClass implements Comparable<Unit> {
 				Play.application().configuration().getString("hadatac.solr.triplestore") 
 				+ Collections.METADATA_SPARQL, query);
 		model = qexec.execDescribe();
-
-		unit = new Unit();
 		StmtIterator stmtIterator = model.listStatements();
+		if (model.size() > 0) {
+			unit = new Unit();
+			while (stmtIterator.hasNext()) {
+				statement = stmtIterator.next();
+				object = statement.getObject();
+				if (statement.getPredicate().getURI().equals("http://www.w3.org/2000/01/rdf-schema#label")) {
+					unit.setLabel(object.asLiteral().getString());
+				} else if (statement.getPredicate().getURI().equals("http://www.w3.org/2000/01/rdf-schema#subClassOf")) {
+					unit.setSuperUri(object.asResource().getURI());
+				}
+			}
 
-		while (stmtIterator.hasNext()) {
-			statement = stmtIterator.next();
-			object = statement.getObject();
-			if (statement.getPredicate().getURI().equals("http://www.w3.org/2000/01/rdf-schema#label")) {
-				unit.setLabel(object.asLiteral().getString());
-			} else if (statement.getPredicate().getURI().equals("http://www.w3.org/2000/01/rdf-schema#subClassOf")) {
-				unit.setSuperUri(object.asResource().getURI());
+			unit.setUri(uri);
+			unit.setLocalName(uri.substring(uri.indexOf('#') + 1));
+			if (unit.getLabel() == null || unit.getLabel().equals("")) {
+				unit.setLabel(unit.getLocalName());
 			}
 		}
-
-		unit.setUri(uri);
-		unit.setLocalName(uri.substring(uri.indexOf('#') + 1));
-
-		//System.out.println(uri + " " + unit.getLocalName() + " " + unit.getSuperUri());
 
 		return unit;
 	}

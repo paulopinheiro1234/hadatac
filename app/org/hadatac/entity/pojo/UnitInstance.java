@@ -4,8 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import javax.annotation.Untainted;
-
 import java.util.HashMap;
 
 import org.apache.solr.client.solrj.SolrClient;
@@ -73,7 +71,12 @@ public class UnitInstance extends HADatAcThing implements Comparable<UnitInstanc
 		for (Pivot pivot_ent : pivot.children) {
 			UnitInstance unit = new UnitInstance();
 			unit.setUri(pivot_ent.value);
-			unit.setLabel(Unit.find(pivot_ent.value).getLabel());
+			Unit unit_temp = Unit.find(pivot_ent.value);
+			if (unit_temp != null) {
+				unit.setLabel(unit_temp.getLabel());
+			} else {
+				unit.setLabel("(empty)");
+			}
 			unit.setCount(pivot_ent.count);
 			unit.setField("unit_uri_str");
 			if (!results.containsKey(unit)) {
