@@ -81,6 +81,7 @@ public class EntityRole extends HADatAcThing implements Comparable<EntityRole> {
 					
 					AttributeInstance attrib = new AttributeInstance();
 					attrib.setUri(value);
+					attrib.setField("characteristic_uri_str");
 					Attribute temp_attrib = Attribute.find(value);
 					if (temp_attrib != null) {
 						attrib.setLabel(temp_attrib.getLabel());

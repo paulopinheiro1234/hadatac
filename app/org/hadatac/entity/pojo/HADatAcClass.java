@@ -1,6 +1,8 @@
 package org.hadatac.entity.pojo;
 
 import java.io.ByteArrayOutputStream;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.List;
 import java.util.ArrayList;
 import org.apache.jena.query.Query;
@@ -19,11 +21,11 @@ import org.hadatac.console.models.TreeNode;
 public class HADatAcClass {
 
 	private String className = "";
-	public  String uri;
-	public  String superUri;
-	public  String localName;
-	public  String label;
-	public  String comment;
+	public  String uri = "";
+	public  String superUri = "";
+	public  String localName = "";
+	public  String label = "";
+	public  String comment = "";
 	
 	public HADatAcClass (String currentClassName) {
 		this.className = currentClassName; 
@@ -152,6 +154,28 @@ public class HADatAcClass {
 			e.printStackTrace();
 		}
 		return new TreeNode("");
+	}
+	
+	public static String getLabelByUri(String uri, Class<?> cls) {
+		try {
+			Method method = cls.getMethod("find", String.class);
+			HADatAcClass instance = (HADatAcClass)method.invoke(null, uri);
+			if (instance != null) {
+				return instance.getLabel();
+			}
+		} catch (NoSuchMethodException e) {
+			e.printStackTrace();
+		} catch (SecurityException e) {
+			e.printStackTrace();
+		} catch (IllegalAccessException e) {
+			e.printStackTrace();
+		} catch (IllegalArgumentException e) {
+			e.printStackTrace();
+		} catch (InvocationTargetException e) {
+			e.printStackTrace();
+		}
+		
+		return "";
 	}
 
 	private TreeNode buildTree(List<TreeNode> inputTree){

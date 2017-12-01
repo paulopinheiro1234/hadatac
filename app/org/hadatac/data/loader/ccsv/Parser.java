@@ -250,7 +250,7 @@ public class Parser {
 				  - TimeInstantLabel is used for timestamps told to system to be timestamp, but that are not further processed
 				  - Abstract times are encoded as DASA's events, and are supposed to be strings
 				 */
-				measurement.setTimestamp(new Date(Long.MAX_VALUE));
+				measurement.setTimestamp(new Date(0));
 				measurement.setAbstractTime("");
 
 				if(dasa.getLabel() == schema.getTimestampLabel()) {
@@ -266,7 +266,7 @@ public class Parser {
 							measurement.setTimestamp(timeValue);
 							System.out.println("timeValue: " + timeValue);
 						} catch (Exception e) {
-							measurement.setTimestamp(new Date(Long.MAX_VALUE).toInstant().toString());
+							measurement.setTimestamp(new Date(0).toInstant().toString());
 						}
 					}
 				} else if (!schema.getNamedTimeLabel().equals("")) {
@@ -286,7 +286,7 @@ public class Parser {
 				 *   SET STUDY                *
 				 *                            *
 				 *============================*/
-				measurement.setStudyUri(ValueCellProcessing.replaceNameSpaceEx(da.getStudyUri()));
+				measurement.setStudyUri(da.getStudyUri());
 
 				/*=============================*
 				 *                             *

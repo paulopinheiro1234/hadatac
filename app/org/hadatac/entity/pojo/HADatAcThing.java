@@ -11,6 +11,7 @@ public class HADatAcThing {
 
 	String uri;
 	String typeUri;
+	String field;
 	String label;
 	String comment;
 	int count = 0;
@@ -69,6 +70,14 @@ public class HADatAcThing {
 
 	public void setLabel(String label) {
 		this.label = label;
+	}
+	
+	public String getField() {
+		return field;
+	}
+
+	public void setField(String field) {
+		this.field = field;
 	}
 	
 	public int getCount() {

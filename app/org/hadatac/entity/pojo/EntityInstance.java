@@ -62,7 +62,6 @@ public class EntityInstance extends HADatAcThing implements Comparable<EntityIns
 			solr.close();
 			Pivot pivot = Measurement.parseFacetResults(queryResponse);
 			Map<HADatAcThing, List<HADatAcThing>> result = parsePivot(pivot);
-			System.out.println("EntityInstance Parse Pivot: " + result);
 			return parsePivot(pivot);
 		} catch (Exception e) {
 			System.out.println("[ERROR] Entity.getNumberFromSolr() - Exception message: " + e.getMessage());
@@ -83,6 +82,7 @@ public class EntityInstance extends HADatAcThing implements Comparable<EntityIns
 				attrib.setUri(pivot_attrib.value);
 				attrib.setLabel(Attribute.find(pivot_attrib.value).getLabel());
 				attrib.setCount(pivot_attrib.count);
+				attrib.setField("characteristic_uri_str");
 				if (!results.containsKey(entity)) {
 					List<HADatAcThing> attributes = new ArrayList<HADatAcThing>();
 					results.put(entity, attributes);

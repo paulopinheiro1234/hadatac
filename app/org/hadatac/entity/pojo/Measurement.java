@@ -1,18 +1,11 @@
 package org.hadatac.entity.pojo;
 
 import java.io.IOException;
-import java.time.Duration;
 import java.time.Instant;
-import java.time.ZoneId;
-import java.time.format.DateTimeFormatter;
-import java.time.format.FormatStyle;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Locale;
-import java.util.Map;
 import java.util.function.BiConsumer;
 
 import org.apache.solr.client.solrj.SolrClient;
@@ -21,10 +14,7 @@ import org.apache.solr.client.solrj.SolrRequest;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.beans.Field;
 import org.apache.solr.client.solrj.impl.HttpSolrClient;
-import org.apache.solr.client.solrj.response.FacetField;
-import org.apache.solr.client.solrj.response.FacetField.Count;
 import org.apache.solr.client.solrj.response.QueryResponse;
-import org.apache.solr.client.solrj.response.RangeFacet;
 import org.apache.solr.client.solrj.response.UpdateResponse;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
@@ -443,108 +433,6 @@ public class Measurement {
 		return result;
 	}
 
-	public static Date findMinTime(String field, String q) {
-		SolrQuery query = new SolrQuery();
-		query.setQuery(q);
-		query.setRows(1);
-		query.addSort(field, SolrQuery.ORDER.asc);
-
-		try {
-			SolrClient solr = new HttpSolrClient.Builder(
-					Play.application().configuration().getString("hadatac.solr.data") 
-					+ Collections.DATA_ACQUISITION).build();
-
-			QueryResponse queryResponse = solr.query(query, SolrRequest.METHOD.POST);
-			solr.close();
-
-			SolrDocumentList results = queryResponse.getResults();
-			if (results.size() == 1) {
-				Measurement m = convertFromSolr(results.get(0));
-				return m.getTimestamp();
-			}
-		} catch (IOException e) {
-			System.out.println("[ERROR] Measurement.findMinTime(String, String) - IOException message: " + e.getMessage());
-		} catch (SolrServerException e) {
-			System.out.println("[ERROR] Measurement.findMinTime(String, String) - SolrServerException message: " + e.getMessage());
-		} catch (Exception e) {
-			System.out.println("[ERROR] Measurement.findMinTime(String, String) - Exception message: " + e.getMessage());
-		}
-
-		return null;
-	}
-
-	public static Date findMaxTime(String field, String q) {
-		SolrQuery query = new SolrQuery();
-		query.setQuery(q);
-		query.setRows(1);
-		query.set(field, "[* TO NOW]");
-		query.addSort(field, SolrQuery.ORDER.desc);
-
-		try {
-			SolrClient solr = new HttpSolrClient.Builder(
-					Play.application().configuration().getString("hadatac.solr.data") 
-					+ Collections.DATA_ACQUISITION).build();
-
-			QueryResponse queryResponse = solr.query(query, SolrRequest.METHOD.POST);
-			solr.close();
-
-			SolrDocumentList results = queryResponse.getResults();
-			if (results.size() == 1) {
-				Measurement m = convertFromSolr(results.get(0));
-				return m.getTimestamp();
-			}
-		} catch (IOException e) {
-			System.out.println("[ERROR] Measurement.findMaxTime(String, String) - IOException message: " + e.getMessage());
-		} catch (SolrServerException e) {
-			System.out.println("[ERROR] Measurement.findMaxTime(String, String) - SolrServerException message: " + e.getMessage());
-		} catch (Exception e) {
-			System.out.println("[ERROR] Measurement.findMaxTime(String, String) - Exception message: " + e.getMessage());
-		}
-
-		return null;
-	}
-
-	public static String calculateTimeGap(Instant min, Instant max) {
-
-		if (min == null || max == null) {
-			return "+1MINUTE";
-		}
-
-		Duration duration = Duration.between(min, max);
-
-		long days = duration.toDays();
-		long weeks = days / 7;
-		long months = days / 30;
-		long years = days / 365;
-
-		if (years > 2) {
-			return "+1YEAR";
-		}
-		if (months > 4) {
-			return "+1MONTH";
-		}
-		if (weeks > 4) {
-			return "+1WEEK";
-		}
-		if (days > 4) {
-			return "+1DAY";
-		}
-
-		long hours = duration.toHours();
-
-		if (hours > 4) {
-			return "+1HOUR";
-		}
-
-		long minutes = duration.toMinutes();
-
-		if (minutes > 4) {
-			return "+1MINUTE";
-		}
-
-		return "+1MINUTE";
-	}
-
 	public static AcquisitionQueryResult find(String user_uri, int page, int qtd, FacetHandler handler) {
 		AcquisitionQueryResult result = new AcquisitionQueryResult();
 
@@ -557,17 +445,7 @@ public class Measurement {
 			System.out.println("q is empty");
 			return result;
 		}
-
-		Date minTime = findMinTime("timestamp_date", q);
-		System.out.println("minTime: " + minTime);
-		Date maxTime = findMaxTime("timestamp_date", q);
-		System.out.println("maxTime: " + maxTime);
 		
-		String gap = null;
-		if (minTime != null && maxTime != null) {
-			gap = calculateTimeGap(minTime.toInstant(), maxTime.toInstant());
-		}
-
 		int docSize = 0;
 		SolrQuery query = new SolrQuery();
 		query.setQuery(q);		
@@ -575,10 +453,6 @@ public class Measurement {
 		query.setRows(qtd);
 		query.setFacet(true);
 		query.setFacetLimit(-1);
-		query.addFacetField("named_time_str");
-		if (minTime != null && maxTime != null && gap != null) {
-			query.addDateRangeFacet("timestamp_date", minTime, maxTime, gap); 
-		}
 
 		try {
 			SolrClient solr = new HttpSolrClient.Builder(
@@ -592,69 +466,6 @@ public class Measurement {
 			Iterator<SolrDocument> m = results.iterator();
 			while (m.hasNext()) {
 				result.documents.add(convertFromSolr(m.next()));
-			}
-
-			if (queryResponse.getFacetFields() != null) {
-				Iterator<FacetField> f = queryResponse.getFacetFields().iterator();
-				while (f.hasNext()) {
-					FacetField field = f.next();
-					result.field_facets.put(field.getName(), new HashMap<String, Long>());
-					Iterator<Count> v = field.getValues().iterator();
-					while (v.hasNext()) {
-						Count count = v.next();
-						Map<String, Long> map = result.field_facets.get(field.getName());
-						map.put(count.getName(), count.getCount());
-					}
-				}
-			}
-
-			DateTimeFormatter formatter =
-					DateTimeFormatter.ofLocalizedDateTime( FormatStyle.SHORT )
-					.withLocale( Locale.US )
-					.withZone( ZoneId.systemDefault() );
-
-			if (queryResponse.getFacetRanges() != null) {
-				Iterator<RangeFacet> f = queryResponse.getFacetRanges().iterator();
-				while (f.hasNext()) {
-					RangeFacet field = f.next();
-					result.date_facets.put(field.getName(), new HashMap<String, Map<String, String>>());
-
-					RangeFacet.Count v1;
-					RangeFacet.Count v2;
-					Instant v1inst;
-					Instant v2inst;
-					String rangeQuery;
-					String label;
-					int i = 0;
-					int j = field.getCounts().size();
-
-					while (i < j) {
-						v1 = (RangeFacet.Count)field.getCounts().get(i);
-						v1inst = Instant.parse(v1.getValue());
-
-						if (i == j-1) {
-							v2 = null;
-							v2inst = null;
-							rangeQuery = "[" + v1.getValue() + " TO *]";
-							label = "From " + formatter.format(v1inst) + " onwards";
-						} else {
-							v2 = (RangeFacet.Count)field.getCounts().get(i+1);
-							v2inst = Instant.parse(v2.getValue());
-							rangeQuery = "[" + v1.getValue() + " TO " + v2.getValue() + "]";
-							label = "From " + formatter.format(v1inst) + " to " + formatter.format(v2inst);
-						}
-
-						Map<String, Map<String, String>> map = result.date_facets.get(field.getName());
-						map.put(label, new HashMap<String, String>());
-						Map<String, String> map2 = map.get(label);
-						map2.put("count", Integer.toString(v1.getCount()));
-						map2.put("gap", field.getGap().toString());
-						map2.put("query", rangeQuery);
-						//map2.put("label", label);
-
-						i++;
-					}
-				}
 			}
 			
 			FacetTree fTree = new FacetTree();
@@ -716,14 +527,14 @@ public class Measurement {
 	public static Pivot parseFacetResults(QueryResponse response) {
 		if (response.getResponse() != null) {
 			if (response.getResponse().get("facets") instanceof NamedList) {
-				return parsePivot(((NamedList<Object>)response.getResponse().get("facets")));
+				return parsePivot(((NamedList<Object>)response.getResponse().get("facets")), "");
 			}
 		}
 
 		return null;
 	}
 
-	private static Pivot parsePivot(NamedList<Object> objects) {
+	private static Pivot parsePivot(NamedList<Object> objects, String field) {
 		Pivot pivot = new Pivot();
 		objects.forEach(new BiConsumer<String, Object>() {
 
@@ -731,18 +542,24 @@ public class Measurement {
 			@Override
 			public void accept(String t, Object u) {
 				if (t.equals("val")) {
-					pivot.value = (String)u;
+					if (u instanceof String) {
+						pivot.value = (String)u;
+					} else {
+						pivot.value = u.toString();
+					}
 				} else if (t.equals("count")) {
+					pivot.field = field;
 					pivot.count = (int)u;
 				} else {
 					if (u instanceof ArrayList<?>) {
 						for (NamedList<Object> nl : (ArrayList<NamedList<Object>>) u) {
-							pivot.addChild(parsePivot((NamedList<Object>)nl));
+							Pivot child = parsePivot((NamedList<Object>)nl, field);
+							pivot.addChild(child);
 						}
 					} else if (u instanceof NamedList<?>) {
-						pivot.field = (String)t;
 						for (NamedList<Object> nl : ((ArrayList<NamedList<Object>>)((NamedList<Object>)u).get("buckets"))) {
-							pivot.addChild(parsePivot((NamedList<Object>)nl));
+							Pivot child = parsePivot((NamedList<Object>)nl, t);
+							pivot.addChild(child);
 						}
 					}
 				}
@@ -811,27 +628,35 @@ public class Measurement {
 		Measurement m = new Measurement();
 		m.setUri(SolrUtils.getFieldValue(doc, "uri"));
 		m.setOwnerUri(SolrUtils.getFieldValue(doc, "owner_uri_str"));
+		m.setDatasetUri(SolrUtils.getFieldValue(doc, "dataset_uri_str"));
 		m.setAcquisitionUri(SolrUtils.getFieldValue(doc, "acquisition_uri_str"));
 		m.setStudyUri(SolrUtils.getFieldValue(doc, "study_uri_str"));
+		m.setSchemaAttributeUri(SolrUtils.getFieldValue(doc, "dasa_uri_str"));
 		m.setObjectUri(SolrUtils.getFieldValue(doc, "object_uri_str"));
 		m.setPID(SolrUtils.getFieldValue(doc, "object_uri_str"));
 		m.setSID(SolrUtils.getFieldValue(doc, "object_uri_str"));
 		m.setAbstractTime(SolrUtils.getFieldValue(doc, "named_time_str"));
 		m.setValue(SolrUtils.getFieldValue(doc, "value_str"));
-		m.setUnit(SolrUtils.getFieldValue(doc, "unit_str"));
-		m.setUnitUri(SolrUtils.getFieldValue(doc, "unit_uri_str"));
-		m.setSchemaAttributeUri(SolrUtils.getFieldValue(doc, "dasa_uri_str"));
-		m.setEntity(SolrUtils.getFieldValue(doc, "entity_str"));
+		
 		m.setEntityUri(SolrUtils.getFieldValue(doc, "entity_uri_str"));
-		m.setCharacteristic(SolrUtils.getFieldValue(doc, "characteristic_str"));
+		m.setEntity(HADatAcClass.getLabelByUri(m.getEntityUri(), Entity.class));
+		
 		m.setCharacteristicUri(SolrUtils.getFieldValue(doc, "characteristic_uri_str"));
-		m.setInstrumentModel(SolrUtils.getFieldValue(doc, "instrument_model_str"));
-		m.setInstrumentUri(SolrUtils.getFieldValue(doc, "instrument_uri_str"));
-		m.setPlatformName(SolrUtils.getFieldValue(doc, "platform_name_str"));
-		m.setPlatformUri(SolrUtils.getFieldValue(doc, "platform_uri_str"));
-		m.setLocation(SolrUtils.getFieldValue(doc, "location_latlong"));
-		m.setElevation(Double.parseDouble(SolrUtils.getFieldValue(doc, "elevation_double")));
-		m.setDatasetUri(SolrUtils.getFieldValue(doc, "dataset_uri_str"));
+		m.setCharacteristic(HADatAcClass.getLabelByUri(m.getCharacteristicUri(), Attribute.class));
+		
+		m.setUnitUri(SolrUtils.getFieldValue(doc, "unit_uri_str"));
+		m.setUnit(HADatAcClass.getLabelByUri(m.getUnitUri(), Unit.class));
+		
+		DataAcquisition da = DataAcquisition.findByUri(m.getAcquisitionUri());
+		if (da != null) {
+			m.setPlatformUri(da.getPlatformUri());
+			m.setPlatformName(da.getPlatformName());
+			m.setInstrumentUri(da.getInstrumentUri());
+			m.setInstrumentModel(da.getInstrumentModel());
+			m.setLocation(da.getLocation());
+			//m.setElevation(Double.parseDouble(da.getElevation()));
+		}
+
 		if (doc.getFieldValue("timestamp_date") != null) {
 			m.setTimestamp(((Date)doc.getFieldValue("timestamp_date")));
 		}

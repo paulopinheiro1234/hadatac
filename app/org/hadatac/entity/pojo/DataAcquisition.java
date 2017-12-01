@@ -927,7 +927,6 @@ public class DataAcquisition extends HADatAcThing {
 	}
 
 	public static DataAcquisition findByUri(String dataAcquisitionUri) {
-		//System.out.println("inside findByUri: <" + dataAcquisitionUri + ">");
 		SolrQuery query = new SolrQuery();
 		query.set("q", "uri:\"" + dataAcquisitionUri + "\"");
 		query.set("sort", "started_at asc");

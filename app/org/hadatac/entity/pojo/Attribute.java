@@ -3,6 +3,9 @@ package org.hadatac.entity.pojo;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+
+import javax.smartcardio.ATR;
+
 import java.util.HashMap;
 
 import org.apache.jena.query.Query;
@@ -125,8 +128,9 @@ public class Attribute extends HADatAcClass implements Comparable<Attribute> {
 
 		attribute.setUri(uri);
 		attribute.setLocalName(uri.substring(uri.indexOf('#') + 1));
-
-		//System.out.println(uri + " " + entity.getLocalName() + " " + entity.getSuperUri());
+		if (attribute.getLabel() == null || attribute.getLabel().equals("")) {
+			attribute.setLabel(attribute.getLocalName());
+		}
 
 		return attribute;
 	}

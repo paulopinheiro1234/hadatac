@@ -52,21 +52,21 @@ public class FacetTree {
 			for (HADatAcThing key : dict.keySet()) {
 				if (facets.isEmpty()) {
 					Pivot key_pivot = new Pivot();
-					key_pivot.field = key.getTypeUri();
+					key_pivot.field = key.getField();
 					key_pivot.value = key.getLabel();
 					key_pivot.tooltip = key.getUri();
 					key_pivot.count = key.getCount();
 					curPivot.addChild(key_pivot);
 				} else if (bStatsFromSecondLastLevel && level + 1 == facets.size()) {
 					Pivot key_pivot = new Pivot();
-					key_pivot.field = key.getTypeUri();
+					key_pivot.field = key.getField();
 					key_pivot.value = key.getLabel();
 					key_pivot.tooltip = key.getUri();
 					key_pivot.count = key.getCount();
 					curPivot.addChild(key_pivot);
 					((List<HADatAcThing>)dict.get(key)).forEach(item->{
 						Pivot item_pivot = new Pivot();
-						item_pivot.field = item.getTypeUri();
+						item_pivot.field = item.getField();
 						item_pivot.value = item.getLabel();
 						item_pivot.tooltip = item.getUri();
 						item_pivot.count = item.getCount();
@@ -78,7 +78,7 @@ public class FacetTree {
 						values.add(item.getUri());
 					});
 					Pivot pivot = new Pivot();
-					pivot.field = key.getTypeUri();
+					pivot.field = key.getField();
 					pivot.value = key.getLabel();
 					pivot.tooltip = key.getUri();
 					pivot.count = (int)dict.get(key).get(0).getNumberFromSolr(values, facetHandler);
@@ -88,7 +88,7 @@ public class FacetTree {
 							List<String> targetFacetValues = new ArrayList<String>();
 							targetFacetValues.add(item.getUri());
 							Pivot item_pivot = new Pivot();
-							item_pivot.field = item.getTypeUri();
+							item_pivot.field = item.getField();
 							item_pivot.value = item.getLabel();
 							item_pivot.tooltip = item.getUri();
 							item_pivot.count = (int)dict.get(key).get(0).getNumberFromSolr(targetFacetValues, facetHandler);

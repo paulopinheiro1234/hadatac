@@ -97,7 +97,9 @@ public class DataAcquisitionSearch extends Controller {
     	return indexInternal(1, page, rows, facets);
     }
 
-    private static Result indexInternal(int mode, int page, int rows, String facets) {    	
+    private static Result indexInternal(int mode, int page, int rows, String facets) {    
+    	System.out.println("facets: " + facets);
+    	
     	FacetHandler handler = new FacetHandler();
     	handler.loadFacets(facets);
     	System.out.println("DataAcquisitionSearch : <" + handler.toSolrQuery() + ">");

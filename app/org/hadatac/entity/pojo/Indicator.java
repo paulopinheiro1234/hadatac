@@ -262,6 +262,7 @@ public class Indicator extends HADatAcThing implements Comparable<Indicator> {
 				AttributeInstance attrib = new AttributeInstance();
 				attrib.setUri(soln.get("attributeUri").toString());
 				attrib.setLabel(soln.get("attributeLabel").toString());
+				attrib.setField("characteristic_uri_str");
 				if (!mapIndicatorToCharList.containsKey(indicator)) {
 					List<HADatAcThing> attributes = new ArrayList<HADatAcThing>();
 					mapIndicatorToCharList.put(indicator, attributes);

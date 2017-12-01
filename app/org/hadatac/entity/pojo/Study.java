@@ -394,6 +394,7 @@ public class Study extends HADatAcThing {
 				DataAcquisition da = new DataAcquisition();
 				da.setUri(soln.get("dataAcquisitionUri").toString());
 				da.setLabel(soln.get("dataAcquisitionLabel").toString());
+				da.setField("acquisition_uri_str");
 				if (!results.containsKey(study)) {
 					List<HADatAcThing> facets = new ArrayList<HADatAcThing>();
 					results.put(study, facets);

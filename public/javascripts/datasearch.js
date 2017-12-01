@@ -60,7 +60,7 @@ function search() {
 	if (tmp != null) {
 		conj['facetsPI'] = tmp;
 	}
-	console.log("conj: " + conj);	       
+	console.log("conj: " + JSON.stringify(conj));	       
 	window.location.href = location.protocol + '//' + location.host + location.pathname + '?facets=' + encodeURIComponent(JSON.stringify(conj));
 }
 
