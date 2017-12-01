@@ -107,31 +107,17 @@
 				<table style="width:80%">
 					<tr><th><h3>Indicator</h3></th><th><h3>Value</h3></th><th><h3>Data URI</h3></th></tr>
 					@for(key <- indicatorValues.keySet()){
-						@if(indicatorValues.get(key).toString() != ""){
-							@if(indicatorValues.get(key).length>0){
-							<tr><td><b>@key.toString()</b></td></tr>
+						@if(indicatorValues.get(key).length>0){
+							<tr><td><b>@key.toString().replace("http://hadatac.org/ont/","")</b></td></tr>
 								@for( i <- indicatorValues.get(key)){
-										<tr><td></td><td>@i.toString()</td><td><a href="@org.hadatac.console.controllers.metadataacquisition.routes.ViewValue.index(showValues.get("user").toString(), showValues.get("study").toString(),"",indicatorUris.get(i))"><b>@indicatorUris.get(i).toString().replace("http://hadatac.org/ont/","")</b></a><br></td></tr>
+									@if(i.length>0){
+										<tr><td></td><td>@i.toString()</td><td><a href=""><b>@indicatorUris.get(i).toString().replace("http://hadatac.org/ont/","")</b></a><br></td></tr>
+									}
 								}
-							}
 						}
 					}
 				</table>
 				</div>
-				
-<!--			<h3>Indicators</h3>
-				<ul>
-					@for(key <- indicatorValues.keySet()){
-						@if(indicatorValues.get(key).toString() != ""){
-							@if(indicatorValues.get(key).length>0){
-							<li>@key.toString()</li>
-								@for( i <- indicatorValues.get(key)){
-										<a href="@org.hadatac.console.controllers.metadataacquisition.routes.ViewValue.index(showValues.get("user").toString(), showValues.get("study").toString(),"",indicatorUris.get(i))">@i.toString()<b> (@indicatorUris.get(i))</b></a><br>
-								}
-							}
-						}
-					}
-				</ul> -->
 				
 				<div id="Subjects" class="tabcontent">
 						<ul>        		
