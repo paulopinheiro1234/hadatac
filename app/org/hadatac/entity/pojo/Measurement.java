@@ -23,6 +23,7 @@ import org.hadatac.console.controllers.dataacquisitionsearch.FacetTree;
 import org.hadatac.console.http.SolrUtils;
 import org.hadatac.console.models.FacetHandler;
 import org.hadatac.console.models.Pivot;
+import org.hadatac.console.views.html.dataacquisitionmanagement.newDataAcquisition;
 import org.hadatac.data.model.AcquisitionQueryResult;
 import org.hadatac.utils.Collections;
 
@@ -658,7 +659,11 @@ public class Measurement {
 		}
 
 		if (doc.getFieldValue("timestamp_date") != null) {
-			m.setTimestamp(((Date)doc.getFieldValue("timestamp_date")));
+			if (((Date)doc.getFieldValue("timestamp_date")).equals(new Date(0))) {
+				m.setTimestamp((Date)null);
+			} else {
+				m.setTimestamp((Date)doc.getFieldValue("timestamp_date"));
+			}
 		}
 		
 		return m;
