@@ -108,10 +108,9 @@
 					<tr><th><h3>Indicator</h3></th><th><h3>Value</h3></th><th><h3>Data URI</h3></th></tr>
 					@for(key <- indicatorValues.keySet()){
 						@if(indicatorValues.get(key).length>0){
-							<tr><td><b>@key.toString().replace("http://hadatac.org/ont/","")</b></td></tr>
 								@for( i <- indicatorValues.get(key)){
 									@if(i.length>0){
-										<tr><td></td><td>@i.toString()</td><td><a href=""><b>@indicatorUris.get(i).toString().replace("http://hadatac.org/ont/","")</b></a><br></td></tr>
+										<tr><td>@key.toString().replace("http://hadatac.org/ont/hasco/","")</td><td>@i.toString()</td><td><a href=""><b>@indicatorUris.get(i).toString().replace("http://hadatac.org/kb/chear#","")</b></a><br></td></tr>
 									}
 								}
 						}
