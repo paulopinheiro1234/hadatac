@@ -633,8 +633,8 @@ public class Measurement {
 		m.setStudyUri(SolrUtils.getFieldValue(doc, "study_uri_str"));
 		m.setSchemaAttributeUri(SolrUtils.getFieldValue(doc, "dasa_uri_str"));
 		m.setObjectUri(SolrUtils.getFieldValue(doc, "object_uri_str"));
-		m.setPID(SolrUtils.getFieldValue(doc, "object_uri_str"));
-		m.setSID(SolrUtils.getFieldValue(doc, "object_uri_str"));
+		m.setPID(SolrUtils.getFieldValue(doc, "pid_str"));
+		m.setSID(SolrUtils.getFieldValue(doc, "sid_str"));
 		m.setAbstractTime(SolrUtils.getFieldValue(doc, "named_time_str"));
 		m.setValue(SolrUtils.getFieldValue(doc, "value_str"));
 		

@@ -115,7 +115,11 @@
                 	<td>@document.getValue()</td>
                 	<td>@document.getObjectPID()</td>
                 	<td>@document.getObjectSID()</td>
-                	<td>@document.getTimestamp()</td>
+                	<td>@if(!document.getAbstractTime().equals("")) {
+                	    @document.getAbstractTime();
+                    } else {
+                        @document.getTimestamp();
+                    }</td>
                 	<td>@document.getObjectUri()</td>
                 	<td>@document.getLocation()</td>
                 </tr>
