@@ -147,11 +147,12 @@ public class DataAcquisitionBrowser extends Controller {
 			}
 			
 			if (soln.contains("AttributeLabel") && !DAInfo.containsKey("AttributeLabel_i")) {
-				DAInfo.put("AttributeLabel_i", "<a href=\""
-						+ Play.application().configuration().getString("hadatac.console.host_deploy") 
-						+ "/hadatac/metadataacquisitions/viewDA?da_uri=" 
-						+ cellProc.replaceNameSpaceEx(DAInfo.get("attributeUri").toString()) + "\">"
-						+ soln.get("AttributeLabel").toString() + "</a>");
+//				DAInfo.put("AttributeLabel_i", "<a href=\""
+//						+ Play.application().configuration().getString("hadatac.console.host_deploy") 
+//						+ "/hadatac/metadataacquisitions/viewDA?da_uri=" 
+//						+ cellProc.replaceNameSpaceEx(DAInfo.get("attributeUri").toString()) + "\">"
+//						+ soln.get("AttributeLabel").toString() + "</a>");
+				DAInfo.put("AttributeLabel_i", "<a href=\"#\">" + soln.get("AttributeLabel").toString() + "</a>");
 			}
 			if (soln.contains("DataAcquisitionSchema") && !DAInfo.containsKey("DataAcquisitionSchema_i")) {
 				key = "DataAcquisitionSchema_i";

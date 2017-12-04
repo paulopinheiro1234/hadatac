@@ -149,11 +149,12 @@ public class SchemaAttribute extends Controller {
 			}
 			
 			if (soln.contains("DASAttributeLabel") && !DAInfo.containsKey("DASAttributeLabel_i")) {
-				DAInfo.put("DASAttributeLabel_i", "<a href=\""
-						+ Play.application().configuration().getString("hadatac.console.host_deploy") 
-						+ "/hadatac/metadataacquisitions/viewDASA?da_uri=" 
-						+ ValueCellProcessing.replaceNameSpaceEx(DAInfo.get("DASAttributeUri").toString()) + "\">"
-						+ soln.get("DASAttributeLabel").toString() + "</a>");
+//				DAInfo.put("DASAttributeLabel_i", "<a href=\""
+//						+ Play.application().configuration().getString("hadatac.console.host_deploy") 
+//						+ "/hadatac/metadataacquisitions/viewDASA?da_uri=" 
+//						+ ValueCellProcessing.replaceNameSpaceEx(DAInfo.get("DASAttributeUri").toString()) + "\">"
+//						+ soln.get("DASAttributeLabel").toString() + "</a>");
+				DAInfo.put("DASAttributeLabel_i", "<a href=\"#\">" + soln.get("DASAttributeLabel").toString() + "</a>");
 			}
 			if (soln.contains("DataAcquisitionSchema") && !DAInfo.containsKey("DataAcquisitionSchema_i")) {
 				key = "DataAcquisitionSchema_i";
