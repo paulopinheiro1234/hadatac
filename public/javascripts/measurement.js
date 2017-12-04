@@ -124,7 +124,7 @@ function parseSolrFacetPivotToTree(type) {
 }
 
 var tree_id = 0;
-function create_item(data) {
+function create_item(data, selected_elems) {
 	if (null == data) {
 		return;
 	}
@@ -138,19 +138,28 @@ function create_item(data) {
 		element.tooltip = children[i_child].tooltip;
 		element.userdata = [{"name": "field", "content": children[i_child].field},
 			{"name": "value", "content": children[i_child].tooltip}];
-		element.item = create_item(children[i_child]);
+		if (selected_elems.indexOf(element.tooltip) > -1) {
+			element.checked = 1;
+		}
+		element.item = create_item(children[i_child], selected_elems);
+		for (var i = 0; i < element.item.length; i++) {
+			if (element.item[i].checked == 1) {
+				element.open = "yes";
+				break;
+			}
+		}
 		item.push(element);
 	}
 	
 	return item;
 }
 
-function parseSolrFacetToTree(facet_name) {
+function parseSolrFacetToTree(facet_name, selected_elems) {
 	console.log("facet_name: " + facet_name);
 	dataTree = {};
 	tree_id = 0;
 	dataTree.id = tree_id++;
-	items = create_item(json.extra_facets[facet_name]);
+	items = create_item(json.extra_facets[facet_name], selected_elems);
 	if (null == items) {
 		items = [];
 	}

@@ -22,18 +22,12 @@ function treeSelections(tree) {
 	return disj;
 }
 
-function setCheckTree(tree, values, props) {
+function setCheckTree(tree, values) {
 	if (values != null) {
-		values = values.substring(1,values.length - 1);
-		if (values.length > 0) {
-			var list = values.split(",");
-			if (list != null && list.length > 0) { 
-				for (var i = 0; i < list.length; i++) {
-					list[i] = decodeURIComponent(list[i]).replace(/\&#x27;/gm, "'");
-					var item = tree.findItem(facetPrettyName(props,list[i]));
-					tree.setCheck(item, true);
-				}
-			}
+		for (var i = 0; i < values.length; ++i) {
+			list[i] = decodeURIComponent(list[i]).replace(/\&#x27;/gm, "'");
+			var item = tree.findItem(facetPrettyName(props, list[i]));
+			tree.setCheck(item, true);
 		}
 	}
 }

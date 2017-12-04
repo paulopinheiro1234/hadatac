@@ -31,7 +31,8 @@ val appDependencies = Seq(
   "joda-time" % "joda-time" % "2.9.2",
   "org.jasypt" % "jasypt" % "1.9.2",
   "org.labkey" % "labkey-client-api" % "16.2.0",
-  "com.googlecode.json-simple" % "json-simple" % "1.1.1"
+  "com.googlecode.json-simple" % "json-simple" % "1.1.1",
+  "com.google.code.gson" % "gson" % "2.8.2"
 )
 
 // add resolver for deadbolt and easymail snapshots

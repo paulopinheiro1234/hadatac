@@ -13,6 +13,8 @@ import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.gson.Gson;
+
 
 public class FacetHandler {
 
@@ -89,13 +91,13 @@ public class FacetHandler {
 		}
 	}
 
-	public List<String> values(String facetName) {
-		List<String> list = new ArrayList<String>();
+	public String values(String facetName) {
+		List<String> results = new ArrayList<String>();
 		for (Object obj : getFacetByName(facetName)) {
 			Pair pair = (Pair)obj;
-			list.add(pair.getValue());
+			results.add(pair.getValue());
 		}
-		return  list;
+		return (new Gson()).toJson(results);
 	}
 
 	public String toJSON() {

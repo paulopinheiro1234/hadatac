@@ -161,15 +161,6 @@
 			}
 		});
 		tree.parse(data, "json");
-		//tree.attachEvent("onCheck",function(id) {
-			//jsonFacet['facetsAnd'][tree.getUserData(id, 'field')] = tree.getUserData(id, 'value');
-			//var url = location.protocol + '//' + location.host + location.pathname;
-			//url += '?facets=' + JSON.stringify(jsonFacet);
-			//window.location.href = encodeURI(url);
-			//return true;
-		//});
-		//tree.openAllItems(0);
-		//tree.closeAllItems(0);
 	}
 	
 	var btn = document.getElementById("btn_download");
@@ -181,45 +172,38 @@
 	document.getElementById('rows_post').value = 9999999;
 	document.getElementById('q_post').value = encodeURIComponent(document.getElementById('query').getAttribute('data-query'));
 	
-	var jsonTree, dataTree;
-	var treeEC;
-	dataTree = parseSolrFacetToTree('@FacetHandler.ENTITY_CHARACTERISTIC_FACET');
-	//console.log("dataTree: " + JSON.stringify(dataTree));
-	treeEC = new dhtmlXTreeObject("treeEntityCharacteristicBox","100%","100%",0);
-	loadTree(treeEC, dataTree);
-	//var listEC = '@handler.values(FacetHandler.ENTITY_CHARACTERISTIC_FACET)';
-	//setCheckTree(treeEC, listEC, props);
-	
-	var treeS;
-	dataTree = parseSolrFacetToTree('@FacetHandler.STUDY_FACET');
-	console.log("dataTree: " + JSON.stringify(dataTree));
-	treeS = new dhtmlXTreeObject("treeStudyBox","100%","100%",0);
-	loadTree(treeS, dataTree);
-	//var listS = '@handler.values(FacetHandler.STUDY_FACET)';
-	//setCheckTree(treeS, listS, props);
-	
-	var treeU;
-	dataTree = parseSolrFacetToTree('@FacetHandler.UNIT_FACET');
-	treeU = new dhtmlXTreeObject("treeUnitBox","100%","100%",0);
-	loadTree(treeU, dataTree);
-	//var listU = '@handler.values(FacetHandler.UNIT_FACET)';
-	//setCheckTree(treeU, listU, props);
-	
-	var treeT;
-	//jsonTree = parseSolrRangeFacetFieldToTree('@FacetHandler.TIME_FACET');
-	//dataTree = JSON.parse(jsonTree);
-	dataTree = parseSolrFacetToTree('@FacetHandler.TIME_FACET');
-	treeT = new dhtmlXTreeObject("treeTimeBox","100%","100%",0);
-	loadTree(treeT, dataTree);
-	//var listT = '@handler.values(FacetHandler.TIME_FACET)';
-	//setCheckTree(treeT, listT, props);
-	
-	var treePI;
-	dataTree = parseSolrFacetToTree('@FacetHandler.PLATFORM_INSTRUMENT_FACET');
-	treePI = new dhtmlXTreeObject("treePlatformInstrumentBox","100%","100%",0);
-	loadTree(treePI, dataTree);
-	//var listPI = '@handler.values(FacetHandler.PLATFORM_INSTRUMENT_FACET)';
-	//setCheckTree(treePI, listPI, props);
+	var jsonTree, dataTree, selected_elems;
+    var treeEC;
+    selected_elems = JSON.parse('@handler.values(FacetHandler.ENTITY_CHARACTERISTIC_FACET)'.replace(/&quot;/g,'"'));
+    dataTree = parseSolrFacetToTree('@FacetHandler.ENTITY_CHARACTERISTIC_FACET', selected_elems);
+    treeEC = new dhtmlXTreeObject("treeEntityCharacteristicBox","100%","100%",0);
+    loadTree(treeEC, dataTree);
+    
+    var treeS;
+    selected_elems = JSON.parse('@handler.values(FacetHandler.STUDY_FACET)'.replace(/&quot;/g,'"'));
+    dataTree = parseSolrFacetToTree('@FacetHandler.STUDY_FACET', selected_elems);
+    console.log("dataTree: " + JSON.stringify(dataTree));
+    treeS = new dhtmlXTreeObject("treeStudyBox","100%","100%",0);
+    loadTree(treeS, dataTree);
+    
+    var treeU;
+    selected_elems = JSON.parse('@handler.values(FacetHandler.UNIT_FACET)'.replace(/&quot;/g,'"'));
+    dataTree = parseSolrFacetToTree('@FacetHandler.UNIT_FACET', selected_elems);
+    treeU = new dhtmlXTreeObject("treeUnitBox","100%","100%",0);
+    loadTree(treeU, dataTree);
+    
+    var treeT;
+    //jsonTree = parseSolrRangeFacetFieldToTree('@FacetHandler.TIME_FACET');
+    selected_elems = JSON.parse('@handler.values(FacetHandler.TIME_FACET)'.replace(/&quot;/g,'"'));
+    dataTree = parseSolrFacetToTree('@FacetHandler.TIME_FACET', selected_elems);
+    treeT = new dhtmlXTreeObject("treeTimeBox","100%","100%",0);
+    loadTree(treeT, dataTree);
+
+    var treePI;
+    selected_elems = JSON.parse('@handler.values(FacetHandler.PLATFORM_INSTRUMENT_FACET)'.replace(/&quot;/g,'"'));
+    dataTree = parseSolrFacetToTree('@FacetHandler.PLATFORM_INSTRUMENT_FACET', selected_elems);
+    treePI = new dhtmlXTreeObject("treePlatformInstrumentBox","100%","100%",0);
+    loadTree(treePI, dataTree);
 	</script>
 }
 
