@@ -30,8 +30,9 @@
 			<div class="col-md-5 sidebar">
 			        <button type="button" class="btn btn-primary" onClick="search();">Search</button>
 			        <button type="button" class="btn btn-primary" onClick="clearSearch();">Clear Search</button>
-				<button type="button" class="btn btn-primary" data-toggle="modal" data-target="#myModal">Download</button>
-                                <a href="@org.hadatac.console.controllers.dataacquisitionsearch.routes.DataAcquisitionSearch.indexData(page, rows , facets)" id="data" class="btn btn-primary" role="button">Show Data</a>
+				<!--  <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#myModal">Download</button> -->
+				    <a href="@org.hadatac.console.controllers.dataacquisitionsearch.routes.DataAcquisitionSearch.download(facets)" id="download" class="btn btn-primary" role="button">Download</a>
+                    <a href="@org.hadatac.console.controllers.dataacquisitionsearch.routes.DataAcquisitionSearch.indexData(page, rows , facets)" id="data" class="btn btn-primary" role="button">Show Data</a>
 
 				<div id="download_url" style="visibility: hidden ;">@org.hadatac.console.http.routes.SolrSearchProxy.getDataAcquisitionDownload()</div>
 				
@@ -50,7 +51,7 @@
 								<!-- <a href="" class="btn btn-info" role="button" id="btn_download">Confirm</a> -->
 								<form action="@org.hadatac.console.http.routes.SolrSearchProxy.getDataAcquisitionDownload()" method="post">
 								    <select name="fl" class="form-control" id="sel_format">
-									    <option value="timestamp,value,pid,sid">Data without Object ID</option>
+									    <option value="timestamp_date,value_str,pid_str,sid_str">Data without Object ID</option>
 									    <option value="timestamp,value,object_uri,pid,sid">Data with Object ID</option>
 									    <Option value="timestamp,value,object_uri,pid,sid,elevation,characteristic,unit,instrument_model,plaftorm_name,entity">Data and Contextual Metadata</option>
 									    <option value="timestamp,value,object_uri,pid,sid,elevation,characteristic,characteristic_uri,unit,unit_uri,instrument_model,instrument_uri,plaftorm_name,platform_uri,entity,entity_uri">Data, Contextual Metadata, Contextual Metadata URI</option>

@@ -12,10 +12,10 @@ import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrRequest;
 import org.apache.solr.client.solrj.SolrServerException;
-import org.apache.solr.client.solrj.beans.Field;
 import org.apache.solr.client.solrj.impl.HttpSolrClient;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.client.solrj.response.UpdateResponse;
+import org.apache.solr.client.solrj.beans.Field;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
 import org.apache.solr.common.util.NamedList;
@@ -23,7 +23,6 @@ import org.hadatac.console.controllers.dataacquisitionsearch.FacetTree;
 import org.hadatac.console.http.SolrUtils;
 import org.hadatac.console.models.FacetHandler;
 import org.hadatac.console.models.Pivot;
-import org.hadatac.console.views.html.dataacquisitionmanagement.newDataAcquisition;
 import org.hadatac.data.model.AcquisitionQueryResult;
 import org.hadatac.utils.Collections;
 
@@ -73,6 +72,7 @@ public class Measurement {
 	private String platformUri;
 	private String instrumentModel;
 	private String instrumentUri;
+	private String strTimestamp;
 
 	public String getOwnerUri() {
 		return ownerUri;
@@ -168,6 +168,17 @@ public class Measurement {
 
 	public void setTimestamp(Date timestamp) {
 		this.timestamp = timestamp;
+		if (timestamp != null) {
+			this.strTimestamp = timestamp.toString();
+		}
+	}
+	
+	public String getTimestampString() {
+		return strTimestamp;
+	}
+
+	public void setTimestampString(String strTimestamp) {
+		this.strTimestamp = strTimestamp;
 	}
 	
 	public void setTimestamp(Instant timestamp) {
@@ -449,9 +460,13 @@ public class Measurement {
 		
 		int docSize = 0;
 		SolrQuery query = new SolrQuery();
-		query.setQuery(q);		
-		query.setStart((page - 1) * qtd + 1);
-		query.setRows(qtd);
+		query.setQuery(q);
+		if (page != -1) {
+			query.setStart((page - 1) * qtd + 1);
+			query.setRows(qtd);
+		} else {
+			query.setRows(99999999);
+		}
 		query.setFacet(true);
 		query.setFacetLimit(-1);
 
@@ -466,7 +481,7 @@ public class Measurement {
 			System.out.println("Num of results: " + results.getNumFound());
 			Iterator<SolrDocument> m = results.iterator();
 			while (m.hasNext()) {
-				result.documents.add(convertFromSolr(m.next()));
+				result.addDocument(convertFromSolr(m.next()));
 			}
 			
 			FacetTree fTree = new FacetTree();
@@ -667,5 +682,40 @@ public class Measurement {
 		}
 		
 		return m;
+	}
+	
+	public static String outputAsCSV(List<Measurement> measurements) {
+		String result = "";
+		// Create headers
+		java.lang.reflect.Field[] fields = Measurement.class.getDeclaredFields();
+		List<String> headers = new ArrayList<String>();
+		for (java.lang.reflect.Field field : fields) {
+			headers.add(field.getName());
+		}
+		result += String.join(",", headers) + "\n";
+		
+		// Create rows
+		for (Measurement m : measurements) {
+			result += m.toCSVRow(fields) + "\n";
+		}
+		
+		return result;
+	}
+	
+	public String toCSVRow(java.lang.reflect.Field[] fields) {
+		List<String> values = new ArrayList<String>();
+		for (java.lang.reflect.Field field : fields) {
+			try {
+				if (field.get(this) != null) {
+					values.add(field.get(this).toString());
+				}
+			} catch (IllegalArgumentException e) {
+				e.printStackTrace();
+			} catch (IllegalAccessException e) {
+				e.printStackTrace();
+			}
+		}
+		
+		return String.join(",", values);
 	}
 }

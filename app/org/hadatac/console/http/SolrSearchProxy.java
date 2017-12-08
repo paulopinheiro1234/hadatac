@@ -6,15 +6,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
 import java.net.URL;
-import java.net.URLEncoder;
-import java.net.URLConnection;
-import java.util.List;
 
 import org.hadatac.console.controllers.AuthApplication;
 import org.hadatac.utils.Collections;
-import org.hadatac.entity.pojo.Measurement;
 
 import be.objectify.deadbolt.java.actions.Group;
 import be.objectify.deadbolt.java.actions.Restrict;
@@ -90,7 +85,7 @@ public class SolrSearchProxy extends Controller {
 	    if (!request_fl.equals("")) {
 	        request_encoding += "&fl=" + request_fl; 
 	    }
-	    //System.out.println("Request: " + request_encoding);
+	    System.out.println("Request: " + request_encoding);
 	}
         String path = Collections.getCollectionsName(Collections.DATA_ACQUISITION) + "/select" +
 	    //"?" + URLEncoder.encode(request_encoding);

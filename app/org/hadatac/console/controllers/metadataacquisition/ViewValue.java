@@ -23,7 +23,7 @@ public class ViewValue extends Controller {
 		AcquisitionQueryResult result = new AcquisitionQueryResult();
 		result = Measurement.findForViews(user_uri, study_uri, subject_uri, char_uri, false);
 		
-		return result.documents;
+		return result.getDocuments();
 	}
 	
 	@Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
