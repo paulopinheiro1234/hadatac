@@ -2,14 +2,18 @@ package org.hadatac.console.controllers.dataacquisitionsearch;
 
 import org.hadatac.console.controllers.AuthApplication;
 import org.hadatac.console.controllers.triplestore.UserManagement;
+import org.hadatac.console.controllers.triplestore.routes;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.StringTokenizer;
 import java.util.Set;
 import java.util.HashSet;
+import java.util.LinkedList;
+
 import org.apache.commons.io.FileUtils;
 
 import org.hadatac.console.models.FacetHandler;
@@ -114,11 +118,11 @@ public class DataAcquisitionSearch extends Controller {
 		if (mode == 0) {
 		    return ok(facetOnlyBrowser.render(page, rows, facets, results.getDocumentSize(), 
 	    			results, results.toJSON(), handler, Measurement.buildQuery(ownerUri, page, rows, handler), 
-	    			objDetails.toJSON()));
+	    			objDetails.toJSON(), Measurement.getFieldNames()));
 		} else {
 		    return ok(dataacquisition_browser.render(page, rows, facets, results.getDocumentSize(), 
 	    			results, results.toJSON(), handler, Measurement.buildQuery(ownerUri, page, rows, handler), 
-	    			objDetails.toJSON()));
+	    			objDetails.toJSON(), Measurement.getFieldNames()));
 		}
     }
     
@@ -137,8 +141,15 @@ public class DataAcquisitionSearch extends Controller {
     			ownerUri = "Public";
     		}
     	}
+    	
+    	List<String> selectedFields = new LinkedList<String>();
+    	Map<String, String[]> name_map = request().body().asFormUrlEncoded();
+    	selectedFields.addAll(name_map.keySet());
+    	System.out.println("selectedFields: " + selectedFields);
+    	
     	AcquisitionQueryResult results = Measurement.find(ownerUri, -1, -1, handler);
-    	String csv = Measurement.outputAsCSV(results.getDocuments());
+    	
+    	String csv = Measurement.outputAsCSV(results.getDocuments(), selectedFields);
     	File file = new File("/tmp/data_search_download.csv");
     	try {
 			FileUtils.writeStringToFile(file, csv, "utf-8");

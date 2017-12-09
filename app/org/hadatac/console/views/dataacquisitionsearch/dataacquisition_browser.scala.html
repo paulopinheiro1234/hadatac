@@ -10,7 +10,8 @@
 	documentJson : String,
 	handler : org.hadatac.console.models.FacetHandler,
 	query : String,
-	objDetails : String
+	objDetails : String,
+	objFields : List[String]
 )
 
 @main("Simple Faceted Search") {
@@ -27,8 +28,8 @@
 				<center>
 					<button type="button" class="btn btn-primary" onClick="search();">Search</button>
 					<button type="button" class="btn btn-primary" onClick="clearSearch();">Clear Search</button>
-					<!--  <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#myModal">Download</button>  -->
-					<a href="@org.hadatac.console.controllers.dataacquisitionsearch.routes.DataAcquisitionSearch.download(facets)" id="download" class="btn btn-primary" role="button">Download</a>
+					<button type="button" class="btn btn-primary" data-toggle="modal" data-target="#myModal">Download</button>
+					<!-- <a href="@org.hadatac.console.controllers.dataacquisitionsearch.routes.DataAcquisitionSearch.download(facets)" id="download" class="btn btn-primary" role="button">Download</a>  -->
                     <a href="@org.hadatac.console.controllers.dataacquisitionsearch.routes.DataAcquisitionSearch.index()" id="data" class="btn btn-primary" role="button">Hide Data</a>
 				</center>
 				
@@ -59,38 +60,7 @@
 				
 				<div id="download_url" style="visibility: hidden ;">@org.hadatac.console.http.routes.SolrSearchProxy.getDataAcquisitionDownload()</div>
 				
-				<!-- Modal -->
-				<div id="myModal" class="modal fade" role="dialog">
-					<div class="modal-dialog">
-						<!-- Modal content-->
-						<div class="modal-content">
-							<div class="modal-header">
-								<button type="button" class="close" data-dismiss="modal">&times;</button>
-								<h4 class="modal-title">Download</h4>
-							</div>
-							<div class="modal-body">
-								<p>Options:</p>
-								
-								<!-- <a href="" class="btn btn-info" role="button" id="btn_download">Confirm</a> -->
-								<form action="@org.hadatac.console.http.routes.SolrSearchProxy.getDataAcquisitionDownload()" method="post">
-								    <select name="fl" class="form-control" id="sel_format">
-									    <option value="timestamp_date,value_str,pid_str,sid_str">Data without Object ID</option>
-									    <option value="timestamp,value,object_uri,pid,sid">Data with Object ID</option>
-									    <Option value="timestamp,value,object_uri,pid,sid,elevation,characteristic,unit,instrument_model,plaftorm_name,entity">Data and Contextual Metadata</option>
-									    <option value="timestamp,value,object_uri,pid,sid,elevation,characteristic,characteristic_uri,unit,unit_uri,instrument_model,instrument_uri,plaftorm_name,platform_uri,entity,entity_uri">Data, Contextual Metadata, Contextual Metadata URI</option>
-     								    </select>
-                                                                    <input name="wt" id="wt_post" type="hidden" />
-                                                                    <input name="rows" id="rows_post" type="hidden" />
-                                                                    <input name="q" id="q_post" type="hidden" />
-                                                                    <input name="mySubmit" class="btn btn-info" type="submit" value="Confirm" />
-                                                               </form>
-							</div>
-							<div class="modal-footer">
-								<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-							</div>
-						</div>
-					</div>
-				</div>
+				@downloadDialog(page, rows, facets, resultsSize, results, documentJson, handler, query, objDetails, objFields)
 			</div>
 			<div class="col-md-5 main">
 				<div id="legend">
@@ -141,71 +111,7 @@
 		</div>
 	</div>
 	
-	<script type="text/javascript" src="/hadatac/assets/javascripts/measurement.js"></script>
-	<script>
-	function loadTree(tree, data) {
-		tree.enableCheckBoxes(true, true);
-		tree.enableThreeStateCheckboxes(false);
-		tree.setImagePath("@controllers.routes.Assets.versioned("lib/dhtmlx/imgs/dhxtree_skyblue/")");
-		tree.setDataMode("json");
-		tree.attachEvent("onCheck", function(id) {
-			tree.setSubChecked(id, tree.isItemChecked(id));
-			var checked_items = tree.getAllChecked();
-			if (checked_items.length > 0) {
-				checked_items.split(",").forEach(function(element) {
-				if (tree.getAllSubItems(element).split(",").includes(id.toString())) {
-					if (!tree.isItemChecked(id)) {
-						tree.setCheck(element, false);
-					}
-				}
-				});	
-			}
-		});
-		tree.parse(data, "json");
-	}
-	
-	var btn = document.getElementById("btn_download");
-	if (btn != null) {
-		btn.href=document.getElementById("download_url").textContent+'?wt=csv&rows=9999999&q='+encodeURIComponent(document.getElementById('query').getAttribute('data-query'));
-	}
-
-	document.getElementById('wt_post').value = 'csv';
-	document.getElementById('rows_post').value = 9999999;
-	document.getElementById('q_post').value = encodeURIComponent(document.getElementById('query').getAttribute('data-query'));
-	
-	var jsonTree, dataTree, selected_elems;
-    var treeEC;
-    selected_elems = JSON.parse('@handler.values(FacetHandler.ENTITY_CHARACTERISTIC_FACET)'.replace(/&quot;/g,'"'));
-    dataTree = parseSolrFacetToTree('@FacetHandler.ENTITY_CHARACTERISTIC_FACET', selected_elems);
-    treeEC = new dhtmlXTreeObject("treeEntityCharacteristicBox","100%","100%",0);
-    loadTree(treeEC, dataTree);
-    
-    var treeS;
-    selected_elems = JSON.parse('@handler.values(FacetHandler.STUDY_FACET)'.replace(/&quot;/g,'"'));
-    dataTree = parseSolrFacetToTree('@FacetHandler.STUDY_FACET', selected_elems);
-    console.log("dataTree: " + JSON.stringify(dataTree));
-    treeS = new dhtmlXTreeObject("treeStudyBox","100%","100%",0);
-    loadTree(treeS, dataTree);
-    
-    var treeU;
-    selected_elems = JSON.parse('@handler.values(FacetHandler.UNIT_FACET)'.replace(/&quot;/g,'"'));
-    dataTree = parseSolrFacetToTree('@FacetHandler.UNIT_FACET', selected_elems);
-    treeU = new dhtmlXTreeObject("treeUnitBox","100%","100%",0);
-    loadTree(treeU, dataTree);
-    
-    var treeT;
-    //jsonTree = parseSolrRangeFacetFieldToTree('@FacetHandler.TIME_FACET');
-    selected_elems = JSON.parse('@handler.values(FacetHandler.TIME_FACET)'.replace(/&quot;/g,'"'));
-    dataTree = parseSolrFacetToTree('@FacetHandler.TIME_FACET', selected_elems);
-    treeT = new dhtmlXTreeObject("treeTimeBox","100%","100%",0);
-    loadTree(treeT, dataTree);
-
-    var treePI;
-    selected_elems = JSON.parse('@handler.values(FacetHandler.PLATFORM_INSTRUMENT_FACET)'.replace(/&quot;/g,'"'));
-    dataTree = parseSolrFacetToTree('@FacetHandler.PLATFORM_INSTRUMENT_FACET', selected_elems);
-    treePI = new dhtmlXTreeObject("treePlatformInstrumentBox","100%","100%",0);
-    loadTree(treePI, dataTree);
-	</script>
+	@facetTree(page, rows, facets, resultsSize, results, documentJson, handler, query, objDetails)
 }
 
 

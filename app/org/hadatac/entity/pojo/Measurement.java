@@ -27,6 +27,7 @@ import org.hadatac.data.model.AcquisitionQueryResult;
 import org.hadatac.utils.Collections;
 
 import play.Play;
+import scala.annotation.meta.field;
 
 public class Measurement {
 	@Field("uri")
@@ -684,35 +685,51 @@ public class Measurement {
 		return m;
 	}
 	
-	public static String outputAsCSV(List<Measurement> measurements) {
-		String result = "";
-		// Create headers
+	public static List<String> getFieldNames() {
+		List<String> results = new ArrayList<String>();
 		java.lang.reflect.Field[] fields = Measurement.class.getDeclaredFields();
-		List<String> headers = new ArrayList<String>();
 		for (java.lang.reflect.Field field : fields) {
-			headers.add(field.getName());
+			// Not include dates
+			if (field.getType() != Date.class) {
+				results.add(field.getName());
+			}
 		}
-		result += String.join(",", headers) + "\n";
+		
+		return results;
+	}
+	
+	public static String outputAsCSV(List<Measurement> measurements, List<String> fieldNames) {
+		String result = "";		
+		// Create headers
+		result += String.join(",", fieldNames) + "\n";
 		
 		// Create rows
 		for (Measurement m : measurements) {
-			result += m.toCSVRow(fields) + "\n";
+			result += m.toCSVRow(fieldNames) + "\n";
 		}
 		
 		return result;
 	}
 	
-	public String toCSVRow(java.lang.reflect.Field[] fields) {
+	public String toCSVRow(List<String> fieldNames) {
 		List<String> values = new ArrayList<String>();
-		for (java.lang.reflect.Field field : fields) {
+		for (String name : fieldNames) {
+			Object obj = null;
 			try {
-				if (field.get(this) != null) {
-					values.add(field.get(this).toString());
-				}
+				obj = Measurement.class.getDeclaredField(name).get(this);
 			} catch (IllegalArgumentException e) {
 				e.printStackTrace();
 			} catch (IllegalAccessException e) {
 				e.printStackTrace();
+			} catch (NoSuchFieldException e) {
+				e.printStackTrace();
+			} catch (SecurityException e) {
+				e.printStackTrace();
+			}
+			if (obj != null) {
+				values.add(obj.toString());
+			} else {
+				values.add("");
 			}
 		}
 		
