@@ -21,7 +21,7 @@ public class HADatAcThing {
 		return null;
 	}
 	
-	public String stringify(List<String> preValues, boolean isUri) {
+	public static String stringify(List<String> preValues, boolean isUri) {
 		List<String> finalValues = new ArrayList<String>();
 		if (isUri) {
 			preValues.forEach((value) -> finalValues.add("<" + value + ">"));

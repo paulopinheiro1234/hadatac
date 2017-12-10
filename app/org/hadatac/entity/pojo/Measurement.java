@@ -4,10 +4,20 @@ import java.io.IOException;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.function.BiConsumer;
 
+import org.apache.jena.query.QueryExecution;
+import org.apache.jena.query.QueryExecutionFactory;
+import org.apache.jena.query.QuerySolution;
+import org.apache.jena.query.ResultSet;
+import org.apache.jena.query.ResultSetFactory;
+import org.apache.jena.query.ResultSetRewindable;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrRequest;
@@ -25,9 +35,9 @@ import org.hadatac.console.models.FacetHandler;
 import org.hadatac.console.models.Pivot;
 import org.hadatac.data.model.AcquisitionQueryResult;
 import org.hadatac.utils.Collections;
+import org.hadatac.utils.NameSpaces;
 
 import play.Play;
-import scala.annotation.meta.field;
 
 public class Measurement {
 	@Field("uri")
@@ -432,7 +442,7 @@ public class Measurement {
 			} else {
 				Iterator<SolrDocument> m = results.iterator();
 				while (m.hasNext()) {
-					result.documents.add(convertFromSolr(m.next()));
+					result.documents.add(convertFromSolr(m.next(), null));
 				}
 			}
 		} catch (SolrServerException e) {
@@ -480,9 +490,22 @@ public class Measurement {
 			solr.close();
 			SolrDocumentList results = queryResponse.getResults();
 			System.out.println("Num of results: " + results.getNumFound());
-			Iterator<SolrDocument> m = results.iterator();
-			while (m.hasNext()) {
-				result.addDocument(convertFromSolr(m.next()));
+			
+			Set<String> uri_set = new HashSet<String>();
+			Iterator<SolrDocument> iterDoc = results.iterator();
+			Map<String, DataAcquisition> cachedDA = new HashMap<String, DataAcquisition>();
+			while (iterDoc.hasNext()) {
+				Measurement measurement = convertFromSolr(iterDoc.next(), cachedDA);
+				result.addDocument(measurement);
+				uri_set.add(measurement.getEntityUri());
+				uri_set.add(measurement.getCharacteristicUri());
+				uri_set.add(measurement.getUnitUri());
+			}
+			
+			// Assign labels of entity, characteristic, and units collectively
+			Map<String, String> cachedLabels = Measurement.generateCachedLabel(new ArrayList<String>(uri_set));
+			for (Measurement measurement : result.getDocuments()) {
+				measurement.setLabels(cachedLabels);
 			}
 			
 			FacetTree fTree = new FacetTree();
@@ -630,7 +653,7 @@ public class Measurement {
 			SolrDocumentList results = response.getResults();
 			Iterator<SolrDocument> i = results.iterator();
 			while (i.hasNext()) {
-				Measurement measurement = convertFromSolr(i.next());
+				Measurement measurement = convertFromSolr(i.next(), null);
 				listMeasurement.add(measurement);
 			}
 		} catch (Exception e) {
@@ -640,8 +663,62 @@ public class Measurement {
 
 		return listMeasurement;
 	}
+	
+	public static Map<String, String> generateCachedLabel(List<String> uris) {
+		Map<String, String> results = new HashMap<String, String>();
+		
+		// Set default label as local name
+		for (String uri : uris) {
+			results.put(uri, uri.substring(Math.max(uri.lastIndexOf("#"), uri.lastIndexOf("/")) + 1));
+		}
+		
+		String valueConstraint = "";
+		if (uris.isEmpty()) {
+			return results;
+		} else {
+			valueConstraint = " VALUES ?uri { " + HADatAcThing.stringify(uris, true) + " } ";
+		}
+		
+		String query = "";
+		query += NameSpaces.getInstance().printSparqlNameSpaceList();
+		query += "SELECT ?uri ?label WHERE { "
+				+ valueConstraint
+				+ " ?uri rdfs:label ?label . "
+				+ "}";
 
-	public static Measurement convertFromSolr(SolrDocument doc) {
+		try {
+			QueryExecution qe = QueryExecutionFactory.sparqlService(
+					Collections.getCollectionsName(Collections.METADATA_SPARQL), query);
+			ResultSet resultSet = qe.execSelect();
+			ResultSetRewindable resultsrw = ResultSetFactory.copyResults(resultSet);
+			qe.close();
+		
+			while (resultsrw.hasNext()) {
+				QuerySolution soln = resultsrw.next();
+				if (soln.get("label") != null && !soln.get("label").toString().isEmpty()) {
+					results.put(soln.get("uri").toString(), soln.get("label").toString());
+				}
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		
+		return results;
+	}
+	
+	public void setLabels(Map<String, String> cache) {
+		if (cache.containsKey(getEntityUri())) {
+			setEntity(cache.get(getEntityUri()));
+		}
+		if (cache.containsKey(getCharacteristicUri())) {
+			setCharacteristic(cache.get(getCharacteristicUri()));
+		}
+		if (cache.containsKey(getUnitUri())) {
+			setUnit(cache.get(getUnitUri()));
+		}
+	}
+
+	public static Measurement convertFromSolr(SolrDocument doc, Map<String, DataAcquisition> cachedDA) {
 		Measurement m = new Measurement();
 		m.setUri(SolrUtils.getFieldValue(doc, "uri"));
 		m.setOwnerUri(SolrUtils.getFieldValue(doc, "owner_uri_str"));
@@ -656,15 +733,21 @@ public class Measurement {
 		m.setValue(SolrUtils.getFieldValue(doc, "value_str"));
 		
 		m.setEntityUri(SolrUtils.getFieldValue(doc, "entity_uri_str"));
-		m.setEntity(HADatAcClass.getLabelByUri(m.getEntityUri(), Entity.class));
-		
 		m.setCharacteristicUri(SolrUtils.getFieldValue(doc, "characteristic_uri_str"));
-		m.setCharacteristic(HADatAcClass.getLabelByUri(m.getCharacteristicUri(), Attribute.class));
-		
 		m.setUnitUri(SolrUtils.getFieldValue(doc, "unit_uri_str"));
-		m.setUnit(HADatAcClass.getLabelByUri(m.getUnitUri(), Unit.class));
 		
-		DataAcquisition da = DataAcquisition.findByUri(m.getAcquisitionUri());
+		DataAcquisition da = null;
+		if (cachedDA == null) {
+			da = DataAcquisition.findByUri(m.getAcquisitionUri());
+		} else {
+			// Use cached DA
+			if (cachedDA.containsKey(m.getAcquisitionUri())) {
+				da = cachedDA.get(m.getAcquisitionUri());
+			} else {
+				da = DataAcquisition.findByUri(m.getAcquisitionUri());
+				cachedDA.put(m.getAcquisitionUri(), da);
+			}
+		}
 		if (da != null) {
 			m.setPlatformUri(da.getPlatformUri());
 			m.setPlatformName(da.getPlatformName());
@@ -704,7 +787,9 @@ public class Measurement {
 		result += String.join(",", fieldNames) + "\n";
 		
 		// Create rows
+		int i = 1;
 		for (Measurement m : measurements) {
+			System.out.println("i: " + i++);
 			result += m.toCSVRow(fieldNames) + "\n";
 		}
 		

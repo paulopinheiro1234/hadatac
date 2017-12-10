@@ -118,7 +118,7 @@ public class TimeInstance extends HADatAcThing implements Comparable<TimeInstanc
 
 			SolrDocumentList results = queryResponse.getResults();
 			if (results.size() == 1) {
-				Measurement m = Measurement.convertFromSolr(results.get(0));
+				Measurement m = Measurement.convertFromSolr(results.get(0), null);
 				return m.getTimestamp();
 			}
 		} catch (IOException e) {
@@ -149,7 +149,7 @@ public class TimeInstance extends HADatAcThing implements Comparable<TimeInstanc
 
 			SolrDocumentList results = queryResponse.getResults();
 			if (results.size() == 1) {
-				Measurement m = Measurement.convertFromSolr(results.get(0));
+				Measurement m = Measurement.convertFromSolr(results.get(0), null);
 				return m.getTimestamp();
 			}
 		} catch (IOException e) {

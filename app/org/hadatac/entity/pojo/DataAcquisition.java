@@ -996,6 +996,7 @@ public class DataAcquisition extends HADatAcThing {
 		} catch (Exception e) {
 			results.clear();
 			System.out.println("[ERROR] DataAcquisition.findByQuery(SolrQuery) - Exception message: " + e.getMessage());
+			e.printStackTrace();
 		}
 
 		return results;
