@@ -406,5 +406,10 @@ POST	/hadatac/perm/backupgraph     		       org.hadatac.console.controllers.trip
 GET	/hadatac/perm/invite		               org.hadatac.console.controllers.triplestore.UserManagement.sendInvitationEmail(user_name: String, user_email: String)
 POST	/hadatac/perm/invite     		       org.hadatac.console.controllers.triplestore.UserManagement.postSendInvitationEmail(user_name: String, user_email: String)
  
+# REST API
+GET     /hadatac/api/studies/all                          org.hadatac.console.controllers.restapi.RestApi.getStudies()
+GET     /hadatac/api/studies/:studyuri                    org.hadatac.console.controllers.restapi.RestApi.getStudy(studyuri: String)
+
+
 # Map static resources from the /public folder to the /assets URL path
 GET     /hadatac/assets/*file                          controllers.Assets.versioned(path="/public", file: Asset)
