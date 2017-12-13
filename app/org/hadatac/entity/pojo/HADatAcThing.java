@@ -41,7 +41,11 @@ public class HADatAcThing {
 	}
 
 	public String getUriNamespace() {
-		return ValueCellProcessing.replaceNameSpaceEx(uri.replace("<","").replace(">",""));
+        if(uri == "" || uri == null || uri.equals("")){
+            return "";
+        } else{
+    		return ValueCellProcessing.replaceNameSpaceEx(uri.replace("<","").replace(">",""));
+        }
 	}
 
 	public void setUri(String uri) {
@@ -57,7 +61,11 @@ public class HADatAcThing {
 	}
 
 	public String getTypeNamespace() {
-		return ValueCellProcessing.replaceNameSpaceEx(uri.replace("<","").replace(">",""));
+        if (uri == "" || uri == null || uri.equals("")){
+            return "";
+        } else {
+    		return ValueCellProcessing.replaceNameSpaceEx(uri.replace("<","").replace(">",""));
+        }
 	}
 
 	public void setTypeUri(String typeUri) {
