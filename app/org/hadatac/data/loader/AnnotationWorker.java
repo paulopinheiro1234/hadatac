@@ -70,9 +70,9 @@ public class AnnotationWorker {
 			if (file_name.startsWith("DA")) {
 				bSucceed = annotateDAFile(file);
 			}
-			else if (file_name.startsWith("SID")) {
-				bSucceed = annotateSampleIdFile(new File(path_unproc + "/" + file_name));
-			}
+//			else if (file_name.startsWith("SID")) {
+//				bSucceed = annotateSampleIdFile(new File(path_unproc + "/" + file_name));
+//			}
 			else if (file_name.startsWith("PID")) {
 				bSucceed = annotateSubjectIdFile(new File(path_unproc + "/" + file_name));
 			}
@@ -111,13 +111,21 @@ public class AnnotationWorker {
 		boolean bSuccess = true;
 		try {
 			SampleSubjectMapper mapper = new SampleSubjectMapper(file);
+			mapper.createRows();
+		} catch (Exception e) {
+			e.printStackTrace();
+			AnnotationLog.printException(e, file.getName());
+			return false;
+		}
+		try {
+			SampleSubjectMapper mapper = new SampleSubjectMapper(file);
+			System.out.println("Start Update Mappings:");
 			bSuccess = mapper.updateMappings();
 		} catch (Exception e) {
 			e.printStackTrace();
 			AnnotationLog.printException(e, file.getName());
 			return false;
 		}
-
 		return bSuccess;
 	}
 

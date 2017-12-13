@@ -2,14 +2,19 @@ package org.hadatac.console.controllers.dataacquisitionsearch;
 
 import org.hadatac.console.controllers.AuthApplication;
 import org.hadatac.console.controllers.triplestore.UserManagement;
-import org.hadatac.console.http.JsonHandler;
-import org.hadatac.console.controllers.metadataacquisition.ViewSubject;
+import org.hadatac.console.controllers.triplestore.routes;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.StringTokenizer;
 import java.util.Set;
 import java.util.HashSet;
+import java.util.LinkedList;
+
+import org.apache.commons.io.FileUtils;
 
 import org.hadatac.console.models.FacetHandler;
 import org.hadatac.console.models.FacetsWithCategories;
@@ -36,24 +41,6 @@ public class DataAcquisitionSearch extends Controller {
     public static FacetsWithCategories range_facets = new FacetsWithCategories();
     public static FacetsWithCategories cluster_facets = new FacetsWithCategories();
     public static SpatialQueryResults query_results = new SpatialQueryResults();
-    
-    //Postconditions: field_facets will be modified if there are facets in the JsonHandler
-    public static void getFacets(JsonHandler jh){
-    	//Get the facets
-        try {
-            if (jh.getFieldCountJson()) {
-                for (String key : jh.categories_and_facets.keySet()) {
-                    for (String facet : jh.categories_and_facets.get(key)){
-                        if (facet.equals("null")) {field_facets.addFacet(key, "missing"); continue;}
-                        field_facets.addFacet(key, facet);
-                    }
-                }
-            }
-        }
-        catch (Exception e){
-            e.printStackTrace();
-        }
-    }
     
     public static List<String> getPermissions(String permissions) {
     	List<String> result = new ArrayList<String>();
@@ -92,9 +79,17 @@ public class DataAcquisitionSearch extends Controller {
     public static Result index(int page, int rows, String facets) {
     	return indexInternal(0, page, rows, facets);
     }
+    
+    public static Result postIndex(int page, int rows, String facets) {
+    	return index(page, rows, facets);
+    }
 
     public static Result indexData(int page, int rows, String facets) {
     	return indexInternal(1, page, rows, facets);
+    }
+    
+    public static Result postIndexData(int page, int rows, String facets) {
+    	return indexData(page, rows, facets);
     }
 
     private static Result indexInternal(int mode, int page, int rows, String facets) {    
@@ -123,19 +118,49 @@ public class DataAcquisitionSearch extends Controller {
 		if (mode == 0) {
 		    return ok(facetOnlyBrowser.render(page, rows, facets, results.getDocumentSize(), 
 	    			results, results.toJSON(), handler, Measurement.buildQuery(ownerUri, page, rows, handler), 
-	    			objDetails.toJSON()));
+	    			objDetails.toJSON(), Measurement.getFieldNames()));
 		} else {
 		    return ok(dataacquisition_browser.render(page, rows, facets, results.getDocumentSize(), 
 	    			results, results.toJSON(), handler, Measurement.buildQuery(ownerUri, page, rows, handler), 
-	    			objDetails.toJSON()));
+	    			objDetails.toJSON(), Measurement.getFieldNames()));
 		}
     }
-
-    public static Result postIndex(int page, int rows, String facets) {
-    	return index(page, rows, facets);
+    
+    public static Result download(String facets) {
+    	FacetHandler handler = new FacetHandler();
+    	handler.loadFacets(facets);
+    	
+    	String ownerUri;
+    	final SysUser user = AuthApplication.getLocalUser(session());
+    	if (null == user) {
+    	    ownerUri = "Public";
+    	}
+    	else {
+    		ownerUri = UserManagement.getUriByEmail(user.getEmail());
+    		if(null == ownerUri){
+    			ownerUri = "Public";
+    		}
+    	}
+    	
+    	List<String> selectedFields = new LinkedList<String>();
+    	Map<String, String[]> name_map = request().body().asFormUrlEncoded();
+    	selectedFields.addAll(name_map.keySet());
+    	System.out.println("selectedFields: " + selectedFields);
+    	
+    	AcquisitionQueryResult results = Measurement.find(ownerUri, -1, -1, handler);
+    	
+    	String csv = Measurement.outputAsCSV(results.getDocuments(), selectedFields);
+    	File file = new File("/tmp/data_search_download.csv");
+    	try {
+			FileUtils.writeStringToFile(file, csv, "utf-8");
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+    	
+    	return ok(file);
     }
-
-    public static Result postIndexData(int page, int rows, String facets) {
-    	return indexData(page, rows, facets);
+    
+    public static Result postDownload(String facets) {
+    	return download(facets);
     }
 }

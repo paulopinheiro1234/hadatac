@@ -57,7 +57,6 @@ public class UnitInstance extends HADatAcThing implements Comparable<UnitInstanc
 			QueryResponse queryResponse = solr.query(query, SolrRequest.METHOD.POST);
 			solr.close();
 			Pivot pivot = Measurement.parseFacetResults(queryResponse);
-			Map<HADatAcThing, List<HADatAcThing>> result = parsePivot(pivot);
 			return parsePivot(pivot);
 		} catch (Exception e) {
 			System.out.println("[ERROR] Unit.getTargetFacets() - Exception message: " + e.getMessage());

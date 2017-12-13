@@ -996,6 +996,7 @@ public class DataAcquisition extends HADatAcThing {
 		} catch (Exception e) {
 			results.clear();
 			System.out.println("[ERROR] DataAcquisition.findByQuery(SolrQuery) - Exception message: " + e.getMessage());
+			e.printStackTrace();
 		}
 
 		return results;
@@ -1025,78 +1026,6 @@ public class DataAcquisition extends HADatAcThing {
 	public static DataAcquisition find(HADataC hadatac) {
 		SolrQuery query = new SolrQuery("uri:\"" + hadatac.getDataAcquisitionKbUri() + "\"");
 		return findDataAcquisition(query);
-	}
-
-	public static DataAcquisition find(Model model, Dataset dataset) {
-		String queryString = NameSpaces.getInstance().printSparqlNameSpaceList() 
-				+ "SELECT ?dc ?startedAt ?endedAt WHERE {\n"
-				+ "  <" + dataset.getCcsvUri() + "> prov:wasGeneratedBy ?dc .\n"
-				+ "  ?dc a hasco:DataAcquisition .\n"
-				+ "  ?dc prov:startedAtTime ?startedAt .\n"
-				+ "  OPTIONAL { ?dc prov:endedAtTime ?endedAt } .\n"
-				+ "}";
-
-		Query query = QueryFactory.create(queryString);
-		QueryExecution qexec = QueryExecutionFactory.create(query, model);
-		ResultSet results = qexec.execSelect();
-		ResultSetRewindable resultsrw = ResultSetFactory.copyResults(results);
-
-		if (resultsrw.size() >= 1) {
-			QuerySolution soln = resultsrw.next();
-			DataAcquisition dataAcquisition = new DataAcquisition();
-			dataAcquisition.setLocalName(soln.getResource("dc").getLocalName());
-			dataAcquisition.setCcsvUri(soln.getResource("dc").getURI());
-			dataAcquisition.setStartedAtXsd(soln.getLiteral("startedAt").getString());
-			if (soln.getLiteral("endedAt") != null) {
-				dataAcquisition.setEndedAtXsd(soln.getLiteral("endedAt").getString());
-			}
-			dataAcquisition.setStatus(0);
-			return dataAcquisition;
-		}
-
-		queryString = NameSpaces.getInstance().printSparqlNameSpaceList()
-				+ "SELECT ?dc ?endedAt WHERE {\n"
-				+ "  <" + dataset.getCcsvUri() + "> prov:wasGeneratedBy ?dc .\n"
-				+ "  ?dc prov:endedAtTime ?endedAt .\n"
-				+ "}";
-
-		query = QueryFactory.create(queryString);
-
-		qexec = QueryExecutionFactory.create(query, model);
-		results = qexec.execSelect();
-		resultsrw = ResultSetFactory.copyResults(results);
-
-		if (resultsrw.size() >= 1) {
-			QuerySolution soln = resultsrw.next();
-			DataAcquisition dataAcquisition = new DataAcquisition();
-			dataAcquisition.setLocalName(soln.getResource("dc").getLocalName());
-			dataAcquisition.setCcsvUri(soln.getResource("dc").getURI());
-			dataAcquisition.setEndedAtXsd(soln.getLiteral("endedAt").getString());
-			dataAcquisition.setStatus(2);
-			return dataAcquisition;
-		}
-
-		queryString = NameSpaces.getInstance().printSparqlNameSpaceList() 
-				+ "SELECT ?dc ?endedAt WHERE {\n"
-				+ "  <" + dataset.getCcsvUri() + "> prov:wasGeneratedBy ?dc .\n"
-				+ "}";
-
-		query = QueryFactory.create(queryString);
-
-		qexec = QueryExecutionFactory.create(query, model);
-		results = qexec.execSelect();
-		resultsrw = ResultSetFactory.copyResults(results);
-
-		if (resultsrw.size() >= 1) {
-			QuerySolution soln = resultsrw.next();
-			DataAcquisition dataAcquisition = new DataAcquisition();
-			dataAcquisition.setLocalName(soln.getResource("dc").getLocalName());
-			dataAcquisition.setCcsvUri(soln.getResource("dc").getURI());
-			dataAcquisition.setStatus(1);
-			return dataAcquisition;
-		}
-
-		return null;
 	}
 
 	public static DataAcquisition create(HADataC hadatacCcsv, HADataC hadatacKb) {

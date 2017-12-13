@@ -11,6 +11,8 @@ GET	/hadatac/acquisitions                     	     org.hadatac.console.controll
 POST	/hadatac/acquisitions                     	     org.hadatac.console.controllers.dataacquisitionsearch.DataAcquisitionSearch.postIndex(start: Int ?= 1, rows: Int ?= 15, facets: String ?= "")
 GET	/hadatac/acquisitions/data                     	     org.hadatac.console.controllers.dataacquisitionsearch.DataAcquisitionSearch.indexData(start: Int ?= 1, rows: Int ?= 15, facets: String ?= "")
 POST	/hadatac/acquisitions/data                     	     org.hadatac.console.controllers.dataacquisitionsearch.DataAcquisitionSearch.postIndexData(start: Int ?= 1, rows: Int ?= 15, facets: String ?= "")
+GET /hadatac/acquisitions/filedownload                       org.hadatac.console.controllers.dataacquisitionsearch.DataAcquisitionSearch.download(facets: String ?= "")
+POST    /hadatac/acquisitions/filedownload                   org.hadatac.console.controllers.dataacquisitionsearch.DataAcquisitionSearch.postDownload(facets: String ?= "")
 GET	/hadatac/acquisitions/loadccsv		      	     org.hadatac.console.controllers.dataacquisitionsearch.LoadCCSV.loadCCSV(oper: String)
 POST	/hadatac/acquisitions/loadccsv		      	     org.hadatac.console.controllers.dataacquisitionsearch.LoadCCSV.postLoadCCSV(oper: String)
 POST	/hadatac/acquisitions/loadccsv/upload	  	     org.hadatac.console.controllers.dataacquisitionsearch.LoadCCSV.uploadFile

@@ -1,0 +1,71 @@
+@import helper._
+@import org.hadatac.console.views.html._
+@import org.hadatac.console.models.FacetHandler
+
+@(	page : Int,
+	rows : Int,
+	facets : String,
+	resultsSize : Long,
+	results : org.hadatac.data.model.AcquisitionQueryResult,
+	documentJson : String,
+	handler : FacetHandler,
+	query : String,
+	objDetails : String,
+	objFields : List[String]
+)
+
+<div id="myModal" class="modal fade" role="dialog">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal">&times;</button>
+				<h4 class="modal-title">Download</h4>
+			</div>
+			<div class="modal-body">
+				<script type="text/javascript">
+                         function toggleAll(source) {
+                             var names = [];
+                             @if(objFields != null) {
+                                 @for(id <- objFields) {
+                                     names.push('@id');
+                                }
+                             }
+                             var i;
+                             for(i = 0; i < names.length; i++){
+                                 document.getElementById(names[i]).checked = source.checked;
+                             }
+                         }
+                         </script>
+				<form
+					action="@org.hadatac.console.controllers.dataacquisitionsearch.routes.DataAcquisitionSearch.download(facets)"
+					method="post">
+					<table class="table">
+						<thead>
+							<tr>
+								<th>Select Fields</th>
+								<th><label> <input type="checkbox" id="select_all"
+										onchange="toggleAll(this)" checked> Select All
+								</label></th>
+							</tr>
+						</thead>
+						<tbody>
+							@for(field <- objFields) {
+							<tr>
+								<td><input type="checkbox" name="@field" id="@field"
+									checked></td>
+								<td>@if(field != null) { @field }</td>
+							</tr>
+							}
+						</tbody>
+					</table>
+					<input class="btn btn-info" type="submit" value="Confirm" />
+				</form>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+			</div>
+		</div>
+	</div>
+</div>
+
+

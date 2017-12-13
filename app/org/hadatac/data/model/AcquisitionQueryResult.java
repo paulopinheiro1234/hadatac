@@ -18,18 +18,23 @@ public class AcquisitionQueryResult {
 	public Map<String, Map<String, Map<String, String>>> date_facets;
 	public Map<String, List<Pivot>> pivot_facets;
 	public Map<String, Pivot> extra_facets;
-	
+
 	public long getDocumentSize(){
 		return this.nDocSize;
 	}
+
 	public void setDocumentSize(long nDocSize){
 		this.nDocSize = nDocSize;
 	}
-	
-        public List<Measurement> getDocuments() {
-	        return documents;
-        }
 
+	public List<Measurement> getDocuments() {
+		return documents;
+	}
+
+	public void addDocument(Measurement doc) {
+		documents.add(doc);
+	}
+	
 	public AcquisitionQueryResult() {
 		documents = new ArrayList<Measurement>();
 		field_facets = new HashMap<String, Map<String, Long>>();
@@ -37,7 +42,7 @@ public class AcquisitionQueryResult {
 		pivot_facets = new HashMap<String, List<Pivot>>();
 		extra_facets = new HashMap<String, Pivot>();
 	}
-	
+
 	public String toJSON() {
 		ObjectMapper mapper = new ObjectMapper();
 		try {

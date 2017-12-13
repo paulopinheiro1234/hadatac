@@ -4,18 +4,28 @@ import java.io.IOException;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.function.BiConsumer;
 
+import org.apache.jena.query.QueryExecution;
+import org.apache.jena.query.QueryExecutionFactory;
+import org.apache.jena.query.QuerySolution;
+import org.apache.jena.query.ResultSet;
+import org.apache.jena.query.ResultSetFactory;
+import org.apache.jena.query.ResultSetRewindable;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrRequest;
 import org.apache.solr.client.solrj.SolrServerException;
-import org.apache.solr.client.solrj.beans.Field;
 import org.apache.solr.client.solrj.impl.HttpSolrClient;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.client.solrj.response.UpdateResponse;
+import org.apache.solr.client.solrj.beans.Field;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
 import org.apache.solr.common.util.NamedList;
@@ -23,9 +33,9 @@ import org.hadatac.console.controllers.dataacquisitionsearch.FacetTree;
 import org.hadatac.console.http.SolrUtils;
 import org.hadatac.console.models.FacetHandler;
 import org.hadatac.console.models.Pivot;
-import org.hadatac.console.views.html.dataacquisitionmanagement.newDataAcquisition;
 import org.hadatac.data.model.AcquisitionQueryResult;
 import org.hadatac.utils.Collections;
+import org.hadatac.utils.NameSpaces;
 
 import play.Play;
 
@@ -73,6 +83,7 @@ public class Measurement {
 	private String platformUri;
 	private String instrumentModel;
 	private String instrumentUri;
+	private String strTimestamp;
 
 	public String getOwnerUri() {
 		return ownerUri;
@@ -168,6 +179,17 @@ public class Measurement {
 
 	public void setTimestamp(Date timestamp) {
 		this.timestamp = timestamp;
+		if (timestamp != null) {
+			this.strTimestamp = timestamp.toString();
+		}
+	}
+	
+	public String getTimestampString() {
+		return strTimestamp;
+	}
+
+	public void setTimestampString(String strTimestamp) {
+		this.strTimestamp = strTimestamp;
 	}
 	
 	public void setTimestamp(Instant timestamp) {
@@ -420,7 +442,7 @@ public class Measurement {
 			} else {
 				Iterator<SolrDocument> m = results.iterator();
 				while (m.hasNext()) {
-					result.documents.add(convertFromSolr(m.next()));
+					result.documents.add(convertFromSolr(m.next(), null));
 				}
 			}
 		} catch (SolrServerException e) {
@@ -449,9 +471,13 @@ public class Measurement {
 		
 		int docSize = 0;
 		SolrQuery query = new SolrQuery();
-		query.setQuery(q);		
-		query.setStart((page - 1) * qtd + 1);
-		query.setRows(qtd);
+		query.setQuery(q);
+		if (page != -1) {
+			query.setStart((page - 1) * qtd + 1);
+			query.setRows(qtd);
+		} else {
+			query.setRows(99999999);
+		}
 		query.setFacet(true);
 		query.setFacetLimit(-1);
 
@@ -464,9 +490,22 @@ public class Measurement {
 			solr.close();
 			SolrDocumentList results = queryResponse.getResults();
 			System.out.println("Num of results: " + results.getNumFound());
-			Iterator<SolrDocument> m = results.iterator();
-			while (m.hasNext()) {
-				result.documents.add(convertFromSolr(m.next()));
+			
+			Set<String> uri_set = new HashSet<String>();
+			Iterator<SolrDocument> iterDoc = results.iterator();
+			Map<String, DataAcquisition> cachedDA = new HashMap<String, DataAcquisition>();
+			while (iterDoc.hasNext()) {
+				Measurement measurement = convertFromSolr(iterDoc.next(), cachedDA);
+				result.addDocument(measurement);
+				uri_set.add(measurement.getEntityUri());
+				uri_set.add(measurement.getCharacteristicUri());
+				uri_set.add(measurement.getUnitUri());
+			}
+			
+			// Assign labels of entity, characteristic, and units collectively
+			Map<String, String> cachedLabels = Measurement.generateCachedLabel(new ArrayList<String>(uri_set));
+			for (Measurement measurement : result.getDocuments()) {
+				measurement.setLabels(cachedLabels);
 			}
 			
 			FacetTree fTree = new FacetTree();
@@ -614,7 +653,7 @@ public class Measurement {
 			SolrDocumentList results = response.getResults();
 			Iterator<SolrDocument> i = results.iterator();
 			while (i.hasNext()) {
-				Measurement measurement = convertFromSolr(i.next());
+				Measurement measurement = convertFromSolr(i.next(), null);
 				listMeasurement.add(measurement);
 			}
 		} catch (Exception e) {
@@ -624,8 +663,62 @@ public class Measurement {
 
 		return listMeasurement;
 	}
+	
+	public static Map<String, String> generateCachedLabel(List<String> uris) {
+		Map<String, String> results = new HashMap<String, String>();
+		
+		// Set default label as local name
+		for (String uri : uris) {
+			results.put(uri, uri.substring(Math.max(uri.lastIndexOf("#"), uri.lastIndexOf("/")) + 1));
+		}
+		
+		String valueConstraint = "";
+		if (uris.isEmpty()) {
+			return results;
+		} else {
+			valueConstraint = " VALUES ?uri { " + HADatAcThing.stringify(uris, true) + " } ";
+		}
+		
+		String query = "";
+		query += NameSpaces.getInstance().printSparqlNameSpaceList();
+		query += "SELECT ?uri ?label WHERE { "
+				+ valueConstraint
+				+ " ?uri rdfs:label ?label . "
+				+ "}";
 
-	public static Measurement convertFromSolr(SolrDocument doc) {
+		try {
+			QueryExecution qe = QueryExecutionFactory.sparqlService(
+					Collections.getCollectionsName(Collections.METADATA_SPARQL), query);
+			ResultSet resultSet = qe.execSelect();
+			ResultSetRewindable resultsrw = ResultSetFactory.copyResults(resultSet);
+			qe.close();
+		
+			while (resultsrw.hasNext()) {
+				QuerySolution soln = resultsrw.next();
+				if (soln.get("label") != null && !soln.get("label").toString().isEmpty()) {
+					results.put(soln.get("uri").toString(), soln.get("label").toString());
+				}
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		
+		return results;
+	}
+	
+	public void setLabels(Map<String, String> cache) {
+		if (cache.containsKey(getEntityUri())) {
+			setEntity(cache.get(getEntityUri()));
+		}
+		if (cache.containsKey(getCharacteristicUri())) {
+			setCharacteristic(cache.get(getCharacteristicUri()));
+		}
+		if (cache.containsKey(getUnitUri())) {
+			setUnit(cache.get(getUnitUri()));
+		}
+	}
+
+	public static Measurement convertFromSolr(SolrDocument doc, Map<String, DataAcquisition> cachedDA) {
 		Measurement m = new Measurement();
 		m.setUri(SolrUtils.getFieldValue(doc, "uri"));
 		m.setOwnerUri(SolrUtils.getFieldValue(doc, "owner_uri_str"));
@@ -640,15 +733,21 @@ public class Measurement {
 		m.setValue(SolrUtils.getFieldValue(doc, "value_str"));
 		
 		m.setEntityUri(SolrUtils.getFieldValue(doc, "entity_uri_str"));
-		m.setEntity(HADatAcClass.getLabelByUri(m.getEntityUri(), Entity.class));
-		
 		m.setCharacteristicUri(SolrUtils.getFieldValue(doc, "characteristic_uri_str"));
-		m.setCharacteristic(HADatAcClass.getLabelByUri(m.getCharacteristicUri(), Attribute.class));
-		
 		m.setUnitUri(SolrUtils.getFieldValue(doc, "unit_uri_str"));
-		m.setUnit(HADatAcClass.getLabelByUri(m.getUnitUri(), Unit.class));
 		
-		DataAcquisition da = DataAcquisition.findByUri(m.getAcquisitionUri());
+		DataAcquisition da = null;
+		if (cachedDA == null) {
+			da = DataAcquisition.findByUri(m.getAcquisitionUri());
+		} else {
+			// Use cached DA
+			if (cachedDA.containsKey(m.getAcquisitionUri())) {
+				da = cachedDA.get(m.getAcquisitionUri());
+			} else {
+				da = DataAcquisition.findByUri(m.getAcquisitionUri());
+				cachedDA.put(m.getAcquisitionUri(), da);
+			}
+		}
 		if (da != null) {
 			m.setPlatformUri(da.getPlatformUri());
 			m.setPlatformName(da.getPlatformName());
@@ -667,5 +766,58 @@ public class Measurement {
 		}
 		
 		return m;
+	}
+	
+	public static List<String> getFieldNames() {
+		List<String> results = new ArrayList<String>();
+		java.lang.reflect.Field[] fields = Measurement.class.getDeclaredFields();
+		for (java.lang.reflect.Field field : fields) {
+			// Not include dates
+			if (field.getType() != Date.class) {
+				results.add(field.getName());
+			}
+		}
+		
+		return results;
+	}
+	
+	public static String outputAsCSV(List<Measurement> measurements, List<String> fieldNames) {
+		String result = "";		
+		// Create headers
+		result += String.join(",", fieldNames) + "\n";
+		
+		// Create rows
+		int i = 1;
+		for (Measurement m : measurements) {
+			System.out.println("i: " + i++);
+			result += m.toCSVRow(fieldNames) + "\n";
+		}
+		
+		return result;
+	}
+	
+	public String toCSVRow(List<String> fieldNames) {
+		List<String> values = new ArrayList<String>();
+		for (String name : fieldNames) {
+			Object obj = null;
+			try {
+				obj = Measurement.class.getDeclaredField(name).get(this);
+			} catch (IllegalArgumentException e) {
+				e.printStackTrace();
+			} catch (IllegalAccessException e) {
+				e.printStackTrace();
+			} catch (NoSuchFieldException e) {
+				e.printStackTrace();
+			} catch (SecurityException e) {
+				e.printStackTrace();
+			}
+			if (obj != null) {
+				values.add(obj.toString());
+			} else {
+				values.add("");
+			}
+		}
+		
+		return String.join(",", values);
 	}
 }
