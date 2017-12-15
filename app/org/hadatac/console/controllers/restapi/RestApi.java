@@ -19,25 +19,30 @@ import play.libs.Json;
 
 public class RestApi extends Controller {
 
-    //@Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
+    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
     public static Result getStudies(){
         ObjectMapper mapper = new ObjectMapper();
         List<Study> theStudies = Study.find();
         System.out.println("[RestApi] found " + theStudies.size() + " things");
-        //for (Study std : theStudies){
-        //    System.out.println("[RestApi] retreived URI " + std.getUri());
-        //}
-        JsonNode jsonObject = mapper.convertValue(theStudies, JsonNode.class);
-
-        return ok(ApiUtil.createResponse(jsonObject, true));
+        if(theStudies.size() == 0){
+            return notFound(ApiUtil.createResponse("No studies found", false));
+        } else {
+            JsonNode jsonObject = mapper.convertValue(theStudies, JsonNode.class);
+            return ok(ApiUtil.createResponse(jsonObject, true));
+        }
     }// /getStudies()
 
-    public static Result getStudy(String studyUri){
+    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
+    public static Result getStudy(String studyName){
         ObjectMapper mapper = new ObjectMapper();
-        Study result = Study.find(studyUri);
-        JsonNode jsonObject = mapper.convertValue(result, JsonNode.class);
-        
-        return ok(ApiUtil.createResponse(jsonObject, true));
+        Study result = Study.findByName(studyName);
+        System.out.println("[RestAPI] type: " + result.getType());
+        if(result == null || result.getType() == null || result.getType() == ""){
+            return notFound(ApiUtil.createResponse("Study with name/ID " + studyName + " not found", false));
+        } else {
+            JsonNode jsonObject = mapper.convertValue(result, JsonNode.class);
+            return ok(ApiUtil.createResponse(jsonObject, true));
+        }
     }// /getStudy()
 
 }// /RestApi

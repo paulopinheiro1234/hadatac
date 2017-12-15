@@ -58,6 +58,8 @@ import play.Play;
 
 public class Study extends HADatAcThing {
 	private static String className = "hasco:Study";
+
+	private static final String kbPrefix = ConfigProp.getKbPrefix();
 	
 	public static String INSERT_LINE1 = "INSERT DATA {  ";
 	public static String DELETE_LINE1 = "DELETE WHERE {  ";
@@ -641,7 +643,81 @@ public class Study extends HADatAcThing {
 			e.printStackTrace();
 		}
 		return returnStudy;
-	}
+	}// /find(studyUri)
+
+
+    // the study ID is not stored as such in the study object currently
+    // fortunately, we can use it to construct the URI
+    public static Study findByName(String studyName){
+        if (studyName == null || studyName.equals("")) {
+			System.out.println("[ERROR] No valid StudyName provided to retrieve Study object: " + studyName);
+			return null;
+		}
+		Study returnStudy = new Study();
+        String queryUri = ValueCellProcessing.replacePrefixEx(kbPrefix + "STD-" + studyName);
+		if (queryUri.startsWith("http")) {
+			queryUri = "<" + queryUri + ">";
+		}
+		String studyQueryString = NameSpaces.getInstance().printSparqlNameSpaceList() +
+				"SELECT DISTINCT ?studyType ?studyLabel ?title ?proj ?studyComment ?external ?agentUri ?institutionUri ?lastId" + 
+				" WHERE {  " + 
+				"      ?studyType rdfs:subClassOf* hasco:Study . " + 
+				"      " + queryUri + " a ?studyType . " + 
+				"      OPTIONAL { " + queryUri + " rdfs:label ?studyLabel } . " + 
+				"	   OPTIONAL { " + queryUri + " hasco:hasTitle ?title } . " +
+				"	   OPTIONAL { " + queryUri + " hasco:hasProject ?proj } . " +
+				"      OPTIONAL { " + queryUri + " rdfs:comment ?studyComment } . " + 
+				"      OPTIONAL { " + queryUri + " hasco:hasExternalSource ?external } . " + 
+				"      OPTIONAL { " + queryUri + " hasco:hasAgent ?agentUri } .  " +
+				"      OPTIONAL { " + queryUri + " hasco:hasInstitution ?institutionUri } . " + 
+				"      OPTIONAL { " + queryUri + " hasco:hasLastId ?lastId } . " + 
+				" } " + 
+				" GROUP BY ?studyType ?studyLabel ?title ?proj ?studyComment ?external ?agentUri ?institutionUri ?lastId ";
+
+		try {
+			Query studyQuery = QueryFactory.create(studyQueryString);
+			QueryExecution qexec = QueryExecutionFactory.sparqlService(Collections.getCollectionsName(Collections.METADATA_SPARQL), studyQuery);
+			ResultSet results = qexec.execSelect();
+			ResultSetRewindable resultsrw = ResultSetFactory.copyResults(results);
+			qexec.close();
+			if (resultsrw.hasNext()) {
+				QuerySolution soln = resultsrw.next();
+				returnStudy.setUri(queryUri);
+				if (soln.contains("studyLabel")) {
+					returnStudy.setLabel(soln.get("studyLabel").toString());
+				}
+				if (soln.contains("studyType")) {
+					returnStudy.setType(soln.get("studyType").toString());
+				}
+				if (soln.contains("title")) {
+					returnStudy.setTitle(soln.get("title").toString());
+				}
+				if (soln.contains("proj")) {
+					returnStudy.setProject(soln.get("proj").toString());
+				}
+				if (soln.contains("studyComment")) {
+					returnStudy.setComment(soln.get("studyComment").toString());
+				} 
+				if (soln.contains("external")) {
+					returnStudy.setExternalSource(soln.get("external").toString());
+				} 
+				if (soln.contains("agentUri")) {
+					returnStudy.setAgentUri(soln.get("agentUri").toString());
+				}
+				if (soln.contains("institutionUri")) {
+					returnStudy.setInstitutionUri(soln.get("institutionUri").toString());
+				}
+				if (soln.contains("lastId")) {
+					returnStudy.setLastId(soln.get("lastId").toString());
+				}
+			    returnStudy.setDataAcquisitionUris(Study.findDataAcquisitionUris(queryUri));
+			    returnStudy.setObjectCollectionUris(Study.findObjectCollectionUris(queryUri));
+			}// /if results.hasNext()
+		} catch (QueryExceptionHTTP e) {
+			e.printStackTrace();
+		}
+		return returnStudy;
+    }// /findByName
 
 	public static Model findModel(String study) {
 		String studyQueryString = NameSpaces.getInstance().printSparqlNameSpaceList() +
