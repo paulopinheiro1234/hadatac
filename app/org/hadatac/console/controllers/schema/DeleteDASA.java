@@ -17,7 +17,7 @@ import be.objectify.deadbolt.java.actions.Restrict;
 public class DeleteDASA extends Controller {
 
 	@Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-	public static Result index(String dasa_uri) {
+	public Result index(String dasa_uri) {
 		if (session().get("LabKeyUserName") == null && session().get("LabKeyPassword") == null) {
 			return redirect(org.hadatac.console.controllers.triplestore.routes.LoadKB.logInLabkey(
 					routes.DeleteDASA.index(dasa_uri).url()));
@@ -44,12 +44,12 @@ public class DeleteDASA extends Controller {
 	}
 
 	@Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-	public static Result postIndex(String dasa_uri) {
+	public Result postIndex(String dasa_uri) {
 		return index(dasa_uri);
 	}
 
 	@Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-	public static Result processForm(String dasa_uri) {
+	public Result processForm(String dasa_uri) {
 		if (session().get("LabKeyUserName") == null && session().get("LabKeyPassword") == null) {
 			return redirect(org.hadatac.console.controllers.triplestore.routes.LoadKB.logInLabkey(
 					routes.DeleteDASA.processForm(dasa_uri).url()));

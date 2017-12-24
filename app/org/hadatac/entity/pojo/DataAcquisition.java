@@ -8,15 +8,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.jena.query.Query;
-import org.apache.jena.query.QueryExecution;
-import org.apache.jena.query.QueryExecutionFactory;
-import org.apache.jena.query.QueryFactory;
-import org.apache.jena.query.QuerySolution;
-import org.apache.jena.query.ResultSet;
-import org.apache.jena.query.ResultSetFactory;
-import org.apache.jena.query.ResultSetRewindable;
-import org.apache.jena.rdf.model.Model;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrRequest;
@@ -35,7 +26,6 @@ import org.hadatac.entity.pojo.ObjectCollection;
 import org.hadatac.entity.pojo.StudyObject;
 import org.hadatac.utils.Collections;
 import org.hadatac.utils.ConfigProp;
-import org.hadatac.utils.NameSpaces;
 import org.hadatac.utils.State;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
@@ -43,9 +33,10 @@ import org.joda.time.format.DateTimeFormatter;
 import org.joda.time.format.ISODateTimeFormat;
 import org.labkey.remoteapi.CommandException;
 
+import com.typesafe.config.ConfigFactory;
+
 import be.objectify.deadbolt.java.actions.Group;
 import be.objectify.deadbolt.java.actions.Restrict;
-import play.Play;
 
 public class DataAcquisition extends HADatAcThing {
 	private static String className = "hasco:DataAcquisition";
@@ -644,7 +635,7 @@ public class DataAcquisition extends HADatAcThing {
 	public int save() {
 		try {
 			SolrClient client = new HttpSolrClient.Builder(
-					Play.application().configuration().getString("hadatac.solr.data") 
+					ConfigFactory.load().getString("hadatac.solr.data") 
 					+ Collections.DATA_COLLECTION).build();
 			if (null == endedAt) {
 				endedAt = DateTime.parse("9999-12-31T23:59:59.999Z");
@@ -670,7 +661,7 @@ public class DataAcquisition extends HADatAcThing {
 
 		try {
 			SolrClient solr = new HttpSolrClient.Builder(
-					Play.application().configuration().getString("hadatac.solr.data") 
+					ConfigFactory.load().getString("hadatac.solr.data") 
 					+ Collections.DATA_ACQUISITION).build();
 			QueryResponse queryResponse = solr.query(query, SolrRequest.METHOD.POST);
 			solr.close();
@@ -909,7 +900,7 @@ public class DataAcquisition extends HADatAcThing {
 	public static DataAcquisition findDataAcquisition(SolrQuery query) {
 		DataAcquisition dataAcquisition = null;
 		SolrClient solr = new HttpSolrClient.Builder(
-				Play.application().configuration().getString("hadatac.solr.data") 
+				ConfigFactory.load().getString("hadatac.solr.data") 
 				+ Collections.DATA_COLLECTION).build();
 
 		try {
@@ -950,7 +941,7 @@ public class DataAcquisition extends HADatAcThing {
 			deleteMeasurementData();
 
 			SolrClient solr = new HttpSolrClient.Builder(
-					Play.application().configuration().getString("hadatac.solr.data") 
+					ConfigFactory.load().getString("hadatac.solr.data") 
 					+ Collections.DATA_COLLECTION).build();
 			UpdateResponse response = solr.deleteById(this.uri);
 			solr.commit();
@@ -982,7 +973,7 @@ public class DataAcquisition extends HADatAcThing {
 		List<DataAcquisition> results = new ArrayList<DataAcquisition>();
 
 		SolrClient solr = new HttpSolrClient.Builder(
-				Play.application().configuration().getString("hadatac.solr.data") 
+				ConfigFactory.load().getString("hadatac.solr.data") 
 				+ Collections.DATA_COLLECTION).build();
 
 		try {

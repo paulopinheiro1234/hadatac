@@ -8,6 +8,7 @@ import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import javax.inject.Inject;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
@@ -27,13 +28,14 @@ import org.hadatac.utils.NameSpaces;
 import org.hadatac.utils.State;
 import org.labkey.remoteapi.CommandException;
 
+import com.typesafe.config.ConfigFactory;
+
 import be.objectify.deadbolt.java.actions.Group;
 import be.objectify.deadbolt.java.actions.Restrict;
-import play.Play;
 import play.data.Form;
+import play.data.FormFactory;
 import play.mvc.BodyParser;
 import play.mvc.Controller;
-import play.mvc.Http.MultipartFormData;
 import play.mvc.Http.MultipartFormData.FilePart;
 import play.mvc.Result;
 
@@ -42,13 +44,16 @@ public class LoadKB extends Controller {
 	private static final String UPLOAD_NAME = "tmp/uploads/hasneto-spreadsheet.xls";
 	private static final String UPLOAD_TURTLE_NAME = "tmp/uploads/turtle.ttl";
 	
+	@Inject
+	private FormFactory formFactory;
+	
 	@Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
-    public static Result loadKB(String oper) {
+    public Result loadKB(String oper) {
 		return ok(loadKB.render(oper, ""));
     }
 
 	@Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
-    public static Result postLoadKB(String oper) {
+    public Result postLoadKB(String oper) {
 		return ok(loadKB.render(oper, ""));
     }
 
@@ -57,7 +62,7 @@ public class LoadKB extends Controller {
 	     MetadataContext metadata = new 
 	    		 MetadataContext("user", 
 	    				         "password", 
-	    				         Play.application().configuration().getString("hadatac.solr.triplestore"), 
+	    				         ConfigFactory.load().getString("hadatac.solr.triplestore"), 
 	    				         false);
 	     String message = "";
 	     if(oper.equals("turtle")){
@@ -70,7 +75,7 @@ public class LoadKB extends Controller {
 	}
     
     @Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
-    public static Result playLoadLabkeyDataAcquisition(String oper, String content, 
+    public Result playLoadLabkeyDataAcquisition(String oper, String content, 
     		String folder, String study_uri) {
     	System.out.println(String.format("Batch loading data acquisition from \"/%s\"...", folder));
     	
@@ -106,7 +111,7 @@ public class LoadKB extends Controller {
     }
     
     @Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
-    public static Result playLoadLabkeyKB(String oper, String content, String folder, 
+    public Result playLoadLabkeyKB(String oper, String content, String folder, 
     		List<String> list_names) {
     	System.out.println(String.format("Batch loading metadata from \"/%s\"...", folder));
     	
@@ -139,7 +144,7 @@ public class LoadKB extends Controller {
     	MetadataContext metadata = new 
 	    		 MetadataContext("user", 
 	    				         "password", 
-	    				         Play.application().configuration().getString("hadatac.solr.triplestore"), 
+	    				         ConfigFactory.load().getString("hadatac.solr.triplestore"), 
 	    				         false);
     	
     	String message = "";
@@ -159,7 +164,7 @@ public class LoadKB extends Controller {
     }
     
     @Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
-    public static Result playLoadLabkeyListContent(
+    public Result playLoadLabkeyListContent(
     		String oper, String content, String folder, String list_name) {
     	System.out.println(String.format("Loading data from list \"%s\"...", list_name));
     	
@@ -176,7 +181,7 @@ public class LoadKB extends Controller {
     	MetadataContext metadata = new 
 	    		 MetadataContext("user", 
 	    				         "password", 
-	    				         Play.application().configuration().getString("hadatac.solr.triplestore"), 
+	    				         ConfigFactory.load().getString("hadatac.solr.triplestore"), 
 	    				         false);
     	
     	String message = "";
@@ -196,13 +201,13 @@ public class LoadKB extends Controller {
     }
     
     @Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
-    public static Result playLoadLabkeyFolders(String oper, String content) {
+    public Result playLoadLabkeyFolders(String oper, String content) {
     	System.out.println("Looking up LabKey folders...");
     	
     	String user_name = session().get("LabKeyUserName");
         String password = session().get("LabKeyPassword");
         if (user_name == null || password == null) {
-        	Form<LabKeyLoginForm> form = Form.form(LabKeyLoginForm.class).bindFromRequest();
+        	Form<LabKeyLoginForm> form = formFactory.form(LabKeyLoginForm.class).bindFromRequest();
             user_name = form.get().getUserName();
             password = form.get().getPassword();
         }
@@ -235,7 +240,7 @@ public class LoadKB extends Controller {
     }
     
     @Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
-    public static Result playLoadLabkeyLists(String folder, String content) {
+    public Result playLoadLabkeyLists(String folder, String content) {
     	System.out.println(String.format("Accessing LabKey lists of %s", folder));
         String user_name = session().get("LabKeyUserName");
         String password = session().get("LabKeyPassword");
@@ -276,7 +281,7 @@ public class LoadKB extends Controller {
     }
     
     @Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
-    public static Result loadLabkeyKB(String oper, String content) {
+    public Result loadLabkeyKB(String oper, String content) {
     	if (session().get("LabKeyUserName") == null && session().get("LabKeyPassword") == null) {
     		return ok(syncLabkey.render(oper,
     				routes.LoadKB.playLoadLabkeyFolders("init", content).url(), ""));
@@ -286,18 +291,18 @@ public class LoadKB extends Controller {
     }
     
     @Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
-    public static Result postLoadLabkeyKB(String oper, String content) {
+    public Result postLoadLabkeyKB(String oper, String content) {
     	return loadLabkeyKB(oper, content);
     }
     
     @Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
-    public static Result logInLabkey(String nextCall) {
+    public Result logInLabkey(String nextCall) {
         return ok(syncLabkey.render("init", routes.LoadKB.postLogInLabkey(nextCall).url(), ""));
     }
     
     @Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
-    public static Result postLogInLabkey(String nextCall) {
-    	Form<LabKeyLoginForm> form = Form.form(LabKeyLoginForm.class).bindFromRequest();
+    public Result postLogInLabkey(String nextCall) {
+    	Form<LabKeyLoginForm> form = formFactory.form(LabKeyLoginForm.class).bindFromRequest();
     	String site = ConfigProp.getPropertyValue("labkey.config", "site");
         String path = "/";
         String user_name = form.get().getUserName();
@@ -319,13 +324,12 @@ public class LoadKB extends Controller {
     }
     
     @Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
-    @BodyParser.Of(value = BodyParser.MultipartFormData.class, maxLength = 500 * 1024 * 1024)
-    public static Result uploadFile(String oper) {
+    @BodyParser.Of(value = BodyParser.MultipartFormData.class)
+    public Result uploadFile(String oper) {
     	System.out.println("uploadFile CALLED!");
-    	MultipartFormData body = request().body().asMultipartFormData();
-    	FilePart uploadedfile = body.getFile("pic");
+    	FilePart uploadedfile = request().body().asMultipartFormData().getFile("pic");
     	if (uploadedfile != null) {
-    		File file = uploadedfile.getFile();
+    		File file = (File)uploadedfile.getFile();
     		File newFile = new File(UPLOAD_NAME);
     		InputStream isFile;
     		try {
@@ -356,13 +360,12 @@ public class LoadKB extends Controller {
     }
     
     @Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
-    @BodyParser.Of(value = BodyParser.MultipartFormData.class, maxLength = 500 * 1024 * 1024)
-    public static Result uploadTurtleFile(String oper) {
+    @BodyParser.Of(value = BodyParser.MultipartFormData.class)
+    public Result uploadTurtleFile(String oper) {
     	System.out.println("uploadTurtleFile CALLED!");
-    	MultipartFormData body = request().body().asMultipartFormData();
-    	FilePart uploadedfile = body.getFile("pic");
+    	FilePart uploadedfile = request().body().asMultipartFormData().getFile("pic");
     	if (uploadedfile != null) {
-    		File file = uploadedfile.getFile();
+    		File file = (File)uploadedfile.getFile();
     		File newFile = new File(UPLOAD_TURTLE_NAME);
     		InputStream isFile;
     		try {

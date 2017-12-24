@@ -9,7 +9,7 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.Properties;
 
-import play.Play;
+import com.typesafe.config.ConfigFactory;
 
 public class ConfigProp {
 	public static final String AUTOANNOTATOR_CONFIG_FILE = "autoccsv.config";
@@ -54,7 +54,7 @@ public class ConfigProp {
 	}
 	
 	public static String getKbPrefix() {
-		return Play.application().configuration().getString("hadatac.community.ont_prefix") + "-kb:";
+		return ConfigFactory.load().getString("hadatac.community.ont_prefix") + "-kb:";
 	}
 	
 	public static String getTemplateFileName() {

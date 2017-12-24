@@ -6,10 +6,11 @@ import java.net.URLDecoder;
 import play.mvc.Controller;
 import play.mvc.Result;
 import play.data.Form;
+import play.data.FormFactory;
+import javax.inject.Inject;
 
 import org.hadatac.console.views.html.schema.*;
 import org.hadatac.console.controllers.AuthApplication;
-import org.hadatac.console.models.SysUser;
 import org.hadatac.console.models.DASAForm;
 import org.hadatac.entity.pojo.DataAcquisitionSchema;
 import org.hadatac.entity.pojo.DataAcquisitionSchemaAttribute;
@@ -18,9 +19,12 @@ import be.objectify.deadbolt.java.actions.Group;
 import be.objectify.deadbolt.java.actions.Restrict;
 
 public class MainEntity extends Controller {
+	
+	@Inject
+	private FormFactory formFactory;
 
 	@Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-	public static Result index(String das_uri) {
+	public Result index(String das_uri) {
 
 		if (session().get("LabKeyUserName") == null && session().get("LabKeyPassword") == null) {
 			return redirect(org.hadatac.console.controllers.triplestore.routes.LoadKB.logInLabkey(
@@ -48,13 +52,13 @@ public class MainEntity extends Controller {
 	}
 
 	@Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-	public static Result postIndex(String das_uri) {
+	public Result postIndex(String das_uri) {
 		return index(das_uri);
 	}
 
 	@Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-	public static Result processForm(String das_uri) {
-		Form<DASAForm> form = Form.form(DASAForm.class).bindFromRequest();
+	public Result processForm(String das_uri) {
+		Form<DASAForm> form = formFactory.form(DASAForm.class).bindFromRequest();
 		DASAForm data = form.get();
 
 		if (form.hasErrors()) {
@@ -96,7 +100,7 @@ public class MainEntity extends Controller {
 	}
 
 	@Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-	public static Result postProcessForm(String das_uri) {
+	public Result postProcessForm(String das_uri) {
 		return processForm(das_uri);
 	}
 

@@ -16,12 +16,17 @@ import be.objectify.deadbolt.java.actions.Restrict;
 import play.mvc.Controller;
 import play.mvc.Result;
 import play.data.DynamicForm;
-import play.data.Form;
+import play.data.FormFactory;
+
+import javax.inject.Inject;
 
 public class SolrSearchProxy extends Controller {
 	
+	@Inject
+	private FormFactory formFactory;
+	
 	@Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-	public static Result getSolrSearch(String path) {
+	public Result getSolrSearch(String path) {
 		InputStream is = null;
 		URL url = null;
 		HttpURLConnection con = null;
@@ -60,14 +65,14 @@ public class SolrSearchProxy extends Controller {
 	}
 	
 	@Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-	public static Result getIndicatorValueDownload(String lm) {
+	public Result getIndicatorValueDownload(String lm) {
 		File file = new File(lm);
 		return ok(file);
 	}
 	
 	@Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    public static Result getDataAcquisitionDownload(){
-	DynamicForm form = Form.form().bindFromRequest();
+    public Result getDataAcquisitionDownload(){
+	DynamicForm form = formFactory.form().bindFromRequest();
 	String request_fl;
 	String request_wt;
 	String request_rows;
@@ -95,7 +100,7 @@ public class SolrSearchProxy extends Controller {
     }
 	
 	@Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    public static Result getStudyAcquisitionDownload(){
+    public Result getStudyAcquisitionDownload(){
         String path = Collections.getCollectionsName(Collections.STUDY_ACQUISITION) + 
                 request().toString().split((request().path()))[1];
         //System.out.println(path);
@@ -104,35 +109,35 @@ public class SolrSearchProxy extends Controller {
     }
 	
 	@Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-	public static Result getStudyAcquisition(){
+	public Result getStudyAcquisition(){
 		String path = Collections.getCollectionsName(Collections.STUDY_ACQUISITION) + 
 				request().toString().split((request().path()))[1];
 		return getSolrSearch(path);
 	}
 	
 	@Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-	public static Result getSubjectAcquisition(){
+	public Result getSubjectAcquisition(){
 		String path = Collections.getCollectionsName(Collections.SUBJECTS_ACQUISITION) + 
 				request().toString().split((request().path()))[1];
 		return getSolrSearch(path);
 	}
 
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-	public static Result getSampleAcquisition(){
+	public Result getSampleAcquisition(){
 		String path = Collections.getCollectionsName(Collections.SAMPLES_ACQUISITION) + 
 				request().toString().split((request().path()))[1];
 		return getSolrSearch(path);
 	}
 	
 	@Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-	public static Result getAnalytesAcquisition(){
+	public Result getAnalytesAcquisition(){
 		String path = Collections.getCollectionsName(Collections.ANALYTES_ACQUISITION) + 
 				request().toString().split((request().path()))[1];
 		return getSolrSearch(path);
 	}
 	
 	@Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-	public static Result getMetadataDataAcquisition(){
+	public Result getMetadataDataAcquisition(){
 //		String path = Collections.getCollectionsName(Collections.METADATA_DA) + 
 //				request().toString().split((request().path()))[1];
 		String path = Collections.getCollectionsName(Collections.DATA_COLLECTION) + "/select" +
@@ -141,7 +146,7 @@ public class SolrSearchProxy extends Controller {
 	}
 	
 	@Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-	public static Result getDataAcquisition(){
+	public Result getDataAcquisition(){
 //		String path = Collections.getCollectionsName(Collections.METADATA_DA) + 
 //				request().toString().split((request().path()))[1];
 		String path = Collections.getCollectionsName(Collections.METADATA_AQUISITION) + "/select" +
@@ -151,14 +156,14 @@ public class SolrSearchProxy extends Controller {
 	}
 	
 	@Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-	public static Result getSchemaAttributes(){
+	public Result getSchemaAttributes(){
 		String path = Collections.getCollectionsName(Collections.SA_ACQUISITION) + "/select" +
 				request().toString().split((request().path()))[1];
 		return getSolrSearch(path);
 	}
 	
-	public static Result getApiStudyDownload() {
-		DynamicForm form = Form.form().bindFromRequest();
+	public Result getApiStudyDownload() {
+		DynamicForm form = formFactory.form().bindFromRequest();
 		String request_token;
 		
 		if (form.data().size() == 0) {
@@ -172,8 +177,8 @@ public class SolrSearchProxy extends Controller {
 		}
 	}
 	
-	public static Result getApiStudyVariableDownload() {
-		DynamicForm form = Form.form().bindFromRequest();
+	public Result getApiStudyVariableDownload() {
+		DynamicForm form = formFactory.form().bindFromRequest();
 		String request_token;
 		
 		if (form.data().size() == 0) {
@@ -187,8 +192,8 @@ public class SolrSearchProxy extends Controller {
 		}
 	}
 	
-	public static Result getApiStudyVariableDataDownload() {
-		DynamicForm form = Form.form().bindFromRequest();
+	public Result getApiStudyVariableDataDownload() {
+		DynamicForm form = formFactory.form().bindFromRequest();
 		String request_token;
 		
 		if (form.data().size() == 0) {

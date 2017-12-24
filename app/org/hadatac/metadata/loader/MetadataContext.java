@@ -27,7 +27,7 @@ import org.hadatac.utils.Feedback;
 import org.hadatac.utils.NameSpace;
 import org.hadatac.utils.NameSpaces;
 
-import play.Play;
+import com.typesafe.config.ConfigFactory;
 
 public class MetadataContext implements RDFContext {
 
@@ -49,7 +49,7 @@ public class MetadataContext implements RDFContext {
     public static Long playTotalTriples() {
     	MetadataContext metadata = new MetadataContext(
     			"user", "password", 
-    			Play.application().configuration().getString("hadatac.solr.triplestore"), 
+    			ConfigFactory.load().getString("hadatac.solr.triplestore"), 
     			false);
     	return metadata.totalTriples();
     }

@@ -29,7 +29,7 @@ import be.objectify.deadbolt.java.actions.Restrict;
 public class DeleteIndicator extends Controller {
 
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    public static Result index(String ind_uri) {
+    public Result index(String ind_uri) {
 
         Indicator indicator = null;
         String result = "";
@@ -58,7 +58,7 @@ public class DeleteIndicator extends Controller {
     }
 
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    public static Result postIndex(String ind_uri) {
+    public Result postIndex(String ind_uri) {
         return index(ind_uri);
 	}
 
@@ -66,16 +66,13 @@ public class DeleteIndicator extends Controller {
     public static String deleteIndicator(String ind_uri) {
     	String result = "";
 		NameSpaces.getInstance();
-//	MetadataContext metadata = new MetadataContext("user", "password", 
-//						       Play.application().configuration().getString("hadatac.solr.triplestore"), false);
-//	result = metadata.cleanIndicator(Feedback.WEB, indicatorUri);
 		Indicator newIndicator = new Indicator(ind_uri);
 		newIndicator.delete();
 		return result;
     } 
     
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    public static Result processForm(String ind_uri) {
+    public Result processForm(String ind_uri) {
         Indicator indicator = null;
 	
         try {

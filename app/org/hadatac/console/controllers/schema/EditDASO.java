@@ -8,6 +8,8 @@ import java.util.ArrayList;
 import play.mvc.Controller;
 import play.mvc.Result;
 import play.data.Form;
+import play.data.FormFactory;
+import javax.inject.Inject;
 
 import org.hadatac.console.views.html.schema.*;
 import org.hadatac.console.controllers.AuthApplication;
@@ -20,9 +22,12 @@ import be.objectify.deadbolt.java.actions.Group;
 import be.objectify.deadbolt.java.actions.Restrict;
 
 public class EditDASO extends Controller {
+	
+	@Inject
+	private FormFactory formFactory;
 
 	@Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-	public static Result index(String daso_uri, String das_uri) {
+	public Result index(String daso_uri, String das_uri) {
 
 		if (session().get("LabKeyUserName") == null && session().get("LabKeyPassword") == null) {
 			return redirect(org.hadatac.console.controllers.triplestore.routes.LoadKB.logInLabkey(
@@ -66,12 +71,12 @@ public class EditDASO extends Controller {
 	}
 
 	@Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-	public static Result postIndex(String daso_uri, String das_uri) {
+	public Result postIndex(String daso_uri, String das_uri) {
 		return index(daso_uri, das_uri);
 	}
 
 	@Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-	public static Result processForm(String daso_uri, String das_uri) {
+	public Result processForm(String daso_uri, String das_uri) {
 		
 		if (das_uri == null || das_uri.equals("")) {
 			return badRequest("Empty of null URI for DAS inside NewDASO's processForm.");
@@ -83,7 +88,7 @@ public class EditDASO extends Controller {
 			return badRequest("Empty DAS provided to NewDASO.");
 		} 
 
-		Form<DASOForm> form = Form.form(DASOForm.class).bindFromRequest();
+		Form<DASOForm> form = formFactory.form(DASOForm.class).bindFromRequest();
 		DASOForm data = form.get();
 		List<String> changedInfos = new ArrayList<String>();
 
@@ -158,7 +163,7 @@ public class EditDASO extends Controller {
 	}
 
 	@Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-	public static Result postProcessForm(String daso_uri, String das_uri) {
+	public Result postProcessForm(String daso_uri, String das_uri) {
 		return processForm(daso_uri, das_uri);
 	}
 

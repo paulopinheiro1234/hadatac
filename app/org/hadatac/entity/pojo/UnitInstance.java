@@ -15,7 +15,7 @@ import org.hadatac.console.models.FacetHandler;
 import org.hadatac.console.models.Pivot;
 import org.hadatac.utils.Collections;
 
-import play.Play;
+import com.typesafe.config.ConfigFactory;
 
 public class UnitInstance extends HADatAcThing implements Comparable<UnitInstance> {
 
@@ -52,7 +52,7 @@ public class UnitInstance extends HADatAcThing implements Comparable<UnitInstanc
 
 		try {
 			SolrClient solr = new HttpSolrClient.Builder(
-					Play.application().configuration().getString("hadatac.solr.data") 
+					ConfigFactory.load().getString("hadatac.solr.data") 
 					+ Collections.DATA_ACQUISITION).build();
 			QueryResponse queryResponse = solr.query(query, SolrRequest.METHOD.POST);
 			solr.close();

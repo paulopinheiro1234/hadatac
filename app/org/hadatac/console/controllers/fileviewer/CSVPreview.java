@@ -83,7 +83,7 @@ public class CSVPreview extends Controller{
 		return previewList;
 	}
 
-	public static Result getCSVPreview(String folder, String fileName, String da_uri, String oc_uri, int numRows){
+	public Result getCSVPreview(String folder, String fileName, String da_uri, String oc_uri, int numRows){
 		if (da_uri != null && !da_uri.equals("")) {
 			return ok(csv_preview.render("selectCol", fileName, da_uri, oc_uri, getCSVHeaders(folder, fileName), getCSVPreview(folder, fileName, numRows)));
 		}

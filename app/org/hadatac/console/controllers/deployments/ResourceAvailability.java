@@ -19,7 +19,7 @@ public class ResourceAvailability extends Controller {
 	
 	// for /metadata HTTP GET requests
 	@Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    public static Result index() {
+    public Result index() {
 
        return ok(resourceAvailability.render(Instrument.findAvailable(), Instrument.findDeployed(), Detector.findAvailable(), Detector.findDeployed()));
         
@@ -28,7 +28,7 @@ public class ResourceAvailability extends Controller {
 
     // for /metadata HTTP POST requests
 	@Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    public static Result postIndex() {
+    public Result postIndex() {
         
         return ok(resourceAvailability.render(Instrument.findAvailable(), Instrument.findDeployed(), Detector.findAvailable(), Detector.findDeployed()));
         

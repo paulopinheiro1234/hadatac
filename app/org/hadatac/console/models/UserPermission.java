@@ -11,8 +11,9 @@ import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
 import org.hadatac.utils.Collections;
 
-import play.Play;
-import be.objectify.deadbolt.core.models.Permission;
+import com.typesafe.config.ConfigFactory;
+
+import be.objectify.deadbolt.java.models.Permission;
 
 /**
  * Initial version based on work by Steve Chaloner (steve@objectify.be) for
@@ -43,7 +44,7 @@ public class UserPermission implements Permission {
 	public static UserPermission findByValueSolr(String value) {
 		UserPermission permission = null;
 		SolrClient solrClient = new HttpSolrClient.Builder(
-				Play.application().configuration().getString("hadatac.solr.users") 
+				ConfigFactory.load().getString("hadatac.solr.users") 
 				+ Collections.AUTHENTICATE_PERMISSIONS).build();
     	SolrQuery solrQuery = new SolrQuery("value:" + value);
     	
@@ -64,7 +65,7 @@ public class UserPermission implements Permission {
 	public static UserPermission findByIdSolr(String id) {
 		UserPermission permission = null;
 		SolrClient solrClient = new HttpSolrClient.Builder(
-				Play.application().configuration().getString("hadatac.solr.users") 
+				ConfigFactory.load().getString("hadatac.solr.users") 
 				+ Collections.AUTHENTICATE_PERMISSIONS).build();
     	SolrQuery solrQuery = new SolrQuery("id:" + id);
     	
@@ -84,7 +85,7 @@ public class UserPermission implements Permission {
 	
 	public void save() {
 		SolrClient solrClient = new HttpSolrClient.Builder(
-				Play.application().configuration().getString("hadatac.solr.users") 
+				ConfigFactory.load().getString("hadatac.solr.users") 
 				+ Collections.AUTHENTICATE_PERMISSIONS).build();
 		
 		if (this.id_s == null) {

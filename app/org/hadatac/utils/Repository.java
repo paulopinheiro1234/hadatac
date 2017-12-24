@@ -6,7 +6,7 @@ import org.hadatac.data.loader.DataContext;
 import org.hadatac.metadata.loader.MetadataContext;
 import org.hadatac.metadata.loader.PermissionsContext;
 
-import play.Play;
+import com.typesafe.config.ConfigFactory;
 
 public class Repository {
 
@@ -42,7 +42,7 @@ public class Repository {
 					"Invalid operation. It should be either " + START + " or " + STOP);
 			return message;
 		}
-		String home = Play.application().configuration().getString("hadatac.solr.home");
+		String home = ConfigFactory.load().getString("hadatac.solr.home");
 		if (!home.endsWith("/")) {
 			home = home + "/";
 		}
@@ -58,6 +58,5 @@ public class Repository {
 		message += Command.exec(Feedback.WEB, false, cmd);
 		return message;
 	}
-
-}	
+}
 

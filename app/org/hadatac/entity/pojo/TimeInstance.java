@@ -22,7 +22,7 @@ import org.hadatac.console.models.FacetHandler;
 import org.hadatac.console.models.Pivot;
 import org.hadatac.utils.Collections;
 
-import play.Play;
+import com.typesafe.config.ConfigFactory;
 
 public class TimeInstance extends HADatAcThing implements Comparable<TimeInstance> {
 
@@ -88,7 +88,7 @@ public class TimeInstance extends HADatAcThing implements Comparable<TimeInstanc
 
 		try {
 			SolrClient solr = new HttpSolrClient.Builder(
-					Play.application().configuration().getString("hadatac.solr.data") 
+					ConfigFactory.load().getString("hadatac.solr.data") 
 					+ Collections.DATA_ACQUISITION).build();
 			QueryResponse queryResponse = solr.query(query, SolrRequest.METHOD.POST);
 			solr.close();
@@ -110,7 +110,7 @@ public class TimeInstance extends HADatAcThing implements Comparable<TimeInstanc
 
 		try {
 			SolrClient solr = new HttpSolrClient.Builder(
-					Play.application().configuration().getString("hadatac.solr.data") 
+					ConfigFactory.load().getString("hadatac.solr.data") 
 					+ Collections.DATA_ACQUISITION).build();
 
 			QueryResponse queryResponse = solr.query(query, SolrRequest.METHOD.POST);
@@ -141,7 +141,7 @@ public class TimeInstance extends HADatAcThing implements Comparable<TimeInstanc
 
 		try {
 			SolrClient solr = new HttpSolrClient.Builder(
-					Play.application().configuration().getString("hadatac.solr.data") 
+					ConfigFactory.load().getString("hadatac.solr.data") 
 					+ Collections.DATA_ACQUISITION).build();
 
 			QueryResponse queryResponse = solr.query(query, SolrRequest.METHOD.POST);

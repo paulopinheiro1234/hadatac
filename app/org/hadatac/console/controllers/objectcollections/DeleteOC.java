@@ -18,7 +18,7 @@ import org.hadatac.console.controllers.AuthApplication;
 public class DeleteOC extends Controller {
 
 	@Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-	public static Result index(String filename, String da_uri, String std_uri, String oc_uri) {
+	public Result index(String filename, String da_uri, String std_uri, String oc_uri) {
 		if (session().get("LabKeyUserName") == null && session().get("LabKeyPassword") == null) {
 			return redirect(org.hadatac.console.controllers.triplestore.routes.LoadKB.logInLabkey(
 					org.hadatac.console.controllers.objectcollections.routes.DeleteOC.index(filename, da_uri, std_uri, oc_uri).url()));
@@ -43,12 +43,12 @@ public class DeleteOC extends Controller {
 	}
 
 	@Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-	public static Result postIndex(String filename, String da_uri, String std_uri, String oc_uri) {
+	public Result postIndex(String filename, String da_uri, String std_uri, String oc_uri) {
 		return index(filename, da_uri, std_uri, oc_uri);
 	}
 
 	@Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-	public static Result processForm(String filename, String da_uri, String std_uri, String oc_uri) {
+	public Result processForm(String filename, String da_uri, String std_uri, String oc_uri) {
 		final SysUser sysUser = AuthApplication.getLocalUser(session());
 
 		Study std = Study.find(std_uri);

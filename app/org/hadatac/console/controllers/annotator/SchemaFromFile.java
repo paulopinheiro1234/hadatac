@@ -11,7 +11,7 @@ import play.mvc.Result;
 
 public class SchemaFromFile extends Controller {
 
-	public static Result create(String file_name) {
+	public Result create(String file_name) {
 
 		String path = "";
 		String labels = "";

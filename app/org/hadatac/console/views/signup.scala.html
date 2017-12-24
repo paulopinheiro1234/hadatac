@@ -1,4 +1,5 @@
-@(signupForm: Form[_])
+@(playAuth: com.feth.play.module.pa.PlayAuthenticate, 
+    signupForm: Form[_])
 
 @import helper._
 @import org.hadatac.console.views.html._
@@ -20,7 +21,7 @@
 
             @if(signupForm.hasGlobalErrors) {
 		        <p class="alert alert-danger">
-		          @signupForm.globalError.message
+		          @signupForm.getGlobalError().get().message()
 		     	</p>
             }
 
@@ -41,7 +42,7 @@
     <div class="col-xs-6 col-xs-offset-2 col-md-4">
         @Messages("playauthenticate.signup.oauth")
         @* Display list of available providers *@
-        @_providerPartial(skipCurrent=false)
+        @_providerPartial(playAuth, skipCurrent=false)
     </div>
     -->
 

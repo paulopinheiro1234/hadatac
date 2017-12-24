@@ -152,7 +152,7 @@ public class User implements Comparable<User> {
     	insert += "<" + this.getUri() + ">  ";
     	insert += " hadatac:isMemberOfGroup " + "\"Public\" . ";
     	insert += "}  ";
-    	System.out.println("!!!! INSERT USER QUERY\n" + insert);
+    	System.out.println("!!!! INSERT USER");
         
         UpdateRequest request = UpdateFactory.create(insert);
         UpdateProcessor processor = UpdateExecutionFactory.createRemote(request, 

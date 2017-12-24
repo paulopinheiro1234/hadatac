@@ -1,18 +1,3 @@
-/*
- * Copyright 2012 Steve Chaloner
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
 package org.hadatac.console.models;
 
 import java.util.UUID;
@@ -26,8 +11,11 @@ import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
 import org.hadatac.utils.Collections;
 
-import play.Play;
-import be.objectify.deadbolt.core.models.Role;
+import com.typesafe.config.Config;
+import com.typesafe.config.ConfigFactory;
+import javax.inject.Inject;
+
+import be.objectify.deadbolt.java.models.Role;
 
 /**
  * @author Steve Chaloner (steve@objectify.be)
@@ -76,7 +64,7 @@ public class SecurityRole implements Role {
 	
 	public static boolean existsSolr() {
 		SolrClient solrClient = new HttpSolrClient.Builder(
-				Play.application().configuration().getString("hadatac.solr.users") 
+				ConfigFactory.load().getString("hadatac.solr.users") 
 				+ Collections.AUTHENTICATE_ROLES).build();
     	SolrQuery solrQuery = new SolrQuery("*:*");
     	
@@ -97,7 +85,7 @@ public class SecurityRole implements Role {
 	public static SecurityRole findByIdSolr(String id) {
 		SecurityRole role = null;
 		SolrClient solrClient = new HttpSolrClient.Builder(
-				Play.application().configuration().getString("hadatac.solr.users") 
+				ConfigFactory.load().getString("hadatac.solr.users") 
 				+ Collections.AUTHENTICATE_ROLES).build();
     	SolrQuery solrQuery = new SolrQuery("id:" + id);
     	
@@ -118,7 +106,7 @@ public class SecurityRole implements Role {
 	public static SecurityRole findByRoleNameSolr(String roleName) {
 		SecurityRole role = null;
 		SolrClient solrClient = new HttpSolrClient.Builder(
-				Play.application().configuration().getString("hadatac.solr.users") 
+				ConfigFactory.load().getString("hadatac.solr.users") 
 				+ Collections.AUTHENTICATE_ROLES).build();
     	SolrQuery solrQuery = new SolrQuery("role_name:" + roleName);
     	
@@ -138,7 +126,7 @@ public class SecurityRole implements Role {
 	
 	public void save() {
 		SolrClient solrClient = new HttpSolrClient.Builder(
-				Play.application().configuration().getString("hadatac.solr.users") 
+				ConfigFactory.load().getString("hadatac.solr.users") 
 				+ Collections.AUTHENTICATE_ROLES).build();
 		
 		if (this.id_s == null) {

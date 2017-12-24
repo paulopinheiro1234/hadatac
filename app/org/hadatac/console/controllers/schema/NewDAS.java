@@ -6,6 +6,7 @@ import org.hadatac.console.http.GetSparqlQuery;
 import play.mvc.Controller;
 import play.mvc.Result;
 import play.data.*;
+import javax.inject.Inject;
 
 import org.hadatac.console.views.html.schema.*;
 import org.hadatac.data.api.DataFactory;
@@ -26,6 +27,9 @@ import org.hadatac.console.controllers.annotator.FileProcessing;
 public class NewDAS extends Controller {
 
 	public static final String kbPrefix = ConfigProp.getKbPrefix();
+	
+	@Inject
+	private FormFactory formFactory;
 
 	public static SparqlQueryResults getQueryResults(String tabName) {
 		SparqlQuery query = new SparqlQuery();
@@ -42,7 +46,7 @@ public class NewDAS extends Controller {
 	}
 
 	@Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-	public static Result index() {
+	public Result index() {
 		if (session().get("LabKeyUserName") == null && session().get("LabKeyPassword") == null) {
 			return redirect(org.hadatac.console.controllers.triplestore.routes.LoadKB.logInLabkey(
 					org.hadatac.console.controllers.schema.routes.NewDAS.index().url()));
@@ -51,13 +55,13 @@ public class NewDAS extends Controller {
 	}
 
 	@Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-	public static Result postIndex() {
+	public Result postIndex() {
 		return index();
 	}
 
 	@Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-	public static Result processForm() {
-		Form<DataAcquisitionSchemaForm> form = Form.form(DataAcquisitionSchemaForm.class).bindFromRequest();
+	public Result processForm() {
+		Form<DataAcquisitionSchemaForm> form = formFactory.form(DataAcquisitionSchemaForm.class).bindFromRequest();
 		if (form.hasErrors()) {
 			return badRequest("The submitted form has errors!");
 		}
@@ -84,10 +88,10 @@ public class NewDAS extends Controller {
 	}
 
 	@Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-	public static Result processFormFromFile(String attributes) {
+	public Result processFormFromFile(String attributes) {
 		System.out.println("Inside processFormFromFile()");
 		
-		Form<DataAcquisitionSchemaForm> form = Form.form(DataAcquisitionSchemaForm.class).bindFromRequest();
+		Form<DataAcquisitionSchemaForm> form = formFactory.form(DataAcquisitionSchemaForm.class).bindFromRequest();
 		if (form.hasErrors()) {
 			return badRequest("The submitted form has errors!");
 		}
@@ -135,9 +139,9 @@ public class NewDAS extends Controller {
 	}
 
 	@Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-	public static Result processFormFromFileLabels(String attributes) {
+	public Result processFormFromFileLabels(String attributes) {
 		System.out.println("Inside processFormFromFileLabels()");
-		Form<DataAcquisitionSchemaForm> form = Form.form(DataAcquisitionSchemaForm.class).bindFromRequest();
+		Form<DataAcquisitionSchemaForm> form = formFactory.form(DataAcquisitionSchemaForm.class).bindFromRequest();
 		if (form.hasErrors()) {
 			return badRequest("The submitted form has errors!");
 		}

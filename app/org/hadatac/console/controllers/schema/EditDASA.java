@@ -8,6 +8,8 @@ import java.util.ArrayList;
 import play.mvc.Controller;
 import play.mvc.Result;
 import play.data.Form;
+import play.data.FormFactory;
+import javax.inject.Inject;
 
 import org.hadatac.console.views.html.schema.*;
 import org.hadatac.console.controllers.AuthApplication;
@@ -21,9 +23,11 @@ import be.objectify.deadbolt.java.actions.Group;
 import be.objectify.deadbolt.java.actions.Restrict;
 
 public class EditDASA extends Controller {
+	@Inject
+	private FormFactory formFactory;
 
 	@Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-	public static Result index(String dasa_uri) {
+	public Result index(String dasa_uri) {
 
 		if (session().get("LabKeyUserName") == null && session().get("LabKeyPassword") == null) {
 			return redirect(org.hadatac.console.controllers.triplestore.routes.LoadKB.logInLabkey(
@@ -57,13 +61,13 @@ public class EditDASA extends Controller {
 	}
 
 	@Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-	public static Result postIndex(String dasa_uri) {
+	public Result postIndex(String dasa_uri) {
 		return index(dasa_uri);
 	}
 
 	@Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-	public static Result processForm(String dasaUri) {
-		Form<DASAForm> form = Form.form(DASAForm.class).bindFromRequest();
+	public Result processForm(String dasaUri) {
+		Form<DASAForm> form = formFactory.form(DASAForm.class).bindFromRequest();
 		DASAForm data = form.get();
 		List<String> changedInfos = new ArrayList<String>();
 
@@ -150,7 +154,7 @@ public class EditDASA extends Controller {
 	}
 
 	@Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-	public static Result postProcessForm(String dasaUri) {
+	public Result postProcessForm(String dasaUri) {
 		return processForm(dasaUri);
 	}
 

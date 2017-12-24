@@ -1,6 +1,5 @@
 package org.hadatac.console.controllers.metadataacquisition;
 
-import play.Play;
 import play.mvc.Controller;
 import play.mvc.Result;
 
@@ -8,7 +7,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.apache.jena.query.QueryExecution;
 import org.apache.jena.query.QueryExecutionFactory;
@@ -30,6 +28,8 @@ import org.hadatac.utils.Collections;
 import org.hadatac.utils.NameSpaces;
 import org.json.simple.JSONObject;
 
+import com.typesafe.config.ConfigFactory;
+
 import be.objectify.deadbolt.java.actions.Group;
 import be.objectify.deadbolt.java.actions.Restrict;
 
@@ -37,9 +37,9 @@ import be.objectify.deadbolt.java.actions.Restrict;
 public class DataAcquisitionBrowser extends Controller {
 	
 	@Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    public static Result index() {
+    public Result index() {
 		final SysUser user = AuthApplication.getLocalUser(session());
-    	String collection = Play.application().configuration().getString("hadatac.console.host_deploy") + 
+    	String collection = ConfigFactory.load().getString("hadatac.console.host_deploy") + 
     			request().path() + "/solrsearch";
     	List<String> indicators = getIndicators();
     	
@@ -47,7 +47,7 @@ public class DataAcquisitionBrowser extends Controller {
     }
 
 	@Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    public static Result postIndex() {
+    public Result postIndex() {
         return index();
     }
 	
@@ -148,7 +148,7 @@ public class DataAcquisitionBrowser extends Controller {
 			
 			if (soln.contains("AttributeLabel") && !DAInfo.containsKey("AttributeLabel_i")) {
 //				DAInfo.put("AttributeLabel_i", "<a href=\""
-//						+ Play.application().configuration().getString("hadatac.console.host_deploy") 
+//						+ ConfigFactory.load().getString("hadatac.console.host_deploy") 
 //						+ "/hadatac/metadataacquisitions/viewDA?da_uri=" 
 //						+ cellProc.replaceNameSpaceEx(DAInfo.get("attributeUri").toString()) + "\">"
 //						+ soln.get("AttributeLabel").toString() + "</a>");
@@ -198,14 +198,14 @@ public class DataAcquisitionBrowser extends Controller {
 		}
 		
 		return SolrUtils.commitJsonDataToSolr(
-				Play.application().configuration().getString("hadatac.solr.data") 
+				ConfigFactory.load().getString("hadatac.solr.data") 
 				+ Collections.METADATA_AQUISITION, results.toString());
 	}
 	
 	public static int deleteFromSolr() {
 		try {
 			SolrClient solr = new HttpSolrClient.Builder(
-					Play.application().configuration().getString("hadatac.solr.data") 
+					ConfigFactory.load().getString("hadatac.solr.data") 
 					+ Collections.METADATA_AQUISITION).build();
 			UpdateResponse response = solr.deleteByQuery("*:*");
 			solr.commit();
@@ -223,14 +223,14 @@ public class DataAcquisitionBrowser extends Controller {
 	}
 	
 	@Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
-    public static Result update() {
+    public Result update() {
 		updateDataAcquisitions();
 		
 		return redirect(routes.DataAcquisitionBrowser.index());
     }
     
     @Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
-    public static Result postUpdate() {
+    public Result postUpdate() {
     	return update();
     }
 }

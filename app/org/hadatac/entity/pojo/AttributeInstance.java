@@ -11,7 +11,7 @@ import org.apache.solr.common.SolrDocumentList;
 import org.hadatac.console.models.FacetHandler;
 import org.hadatac.utils.Collections;
 
-import play.Play;
+import com.typesafe.config.ConfigFactory;
 
 public class AttributeInstance extends HADatAcThing implements Comparable<AttributeInstance> {
 
@@ -41,7 +41,7 @@ public class AttributeInstance extends HADatAcThing implements Comparable<Attrib
 
 		try {
 			SolrClient solr = new HttpSolrClient.Builder(
-					Play.application().configuration().getString("hadatac.solr.data") 
+					ConfigFactory.load().getString("hadatac.solr.data") 
 					+ Collections.DATA_ACQUISITION).build();
 			QueryResponse queryResponse = solr.query(query, SolrRequest.METHOD.POST);
 			solr.close();

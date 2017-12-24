@@ -1,10 +1,12 @@
 package org.hadatac.console.controllers.schema;
 
 import java.util.List;
+import javax.inject.Inject;
 
 import play.mvc.Controller;
 import play.mvc.Result;
 import play.data.Form;
+import play.data.FormFactory;
 
 import org.hadatac.console.views.html.schema.*;
 import org.hadatac.console.controllers.AuthApplication;
@@ -18,8 +20,11 @@ import be.objectify.deadbolt.java.actions.Restrict;
 
 public class NewDASO extends Controller {
 
+	@Inject
+	private FormFactory formFactory;
+	
 	@Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-	public static Result index(String das_uri) {
+	public Result index(String das_uri) {
 		if (session().get("LabKeyUserName") == null && session().get("LabKeyPassword") == null) {
 			return redirect(org.hadatac.console.controllers.triplestore.routes.LoadKB.logInLabkey(
 					org.hadatac.console.controllers.schema.routes.NewDASO.index(das_uri).url()));
@@ -39,12 +44,12 @@ public class NewDASO extends Controller {
 	}
 
 	@Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-	public static Result postIndex(String das_uri) {
+	public Result postIndex(String das_uri) {
 		return index(das_uri);
 	}
 
 	@Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-	public static Result processForm(String das_uri) {
+	public Result processForm(String das_uri) {
 		if (das_uri == null || das_uri.equals("")) {
 			return badRequest("Empty of null URI for DAS inside NewDASO's processForm.");
 		} 
@@ -55,7 +60,7 @@ public class NewDASO extends Controller {
 			return badRequest("Empty DAS provided to NewDASO.");
 		} 
 
-		Form<DASOForm> form = Form.form(DASOForm.class).bindFromRequest();
+		Form<DASOForm> form = formFactory.form(DASOForm.class).bindFromRequest();
 		DASOForm data = form.get();
 
 		if (form.hasErrors()) {
@@ -96,7 +101,7 @@ public class NewDASO extends Controller {
 	}
 
 	@Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-	public static Result postProcessForm(String dasoUri) {
+	public Result postProcessForm(String dasoUri) {
 		return processForm(dasoUri);
 	}
 

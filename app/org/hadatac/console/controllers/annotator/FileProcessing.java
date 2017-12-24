@@ -3,34 +3,25 @@ package org.hadatac.console.controllers.annotator;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.hadatac.console.controllers.AuthApplication;
-import org.hadatac.console.http.DeploymentQueries;
 import org.hadatac.console.http.GetSparqlQuery;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.io.InputStream;
-import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.util.StringTokenizer;
 
 import org.hadatac.console.models.SparqlQuery;
 import org.hadatac.console.models.SparqlQueryResults;
 import org.hadatac.console.models.CSVAnnotationHandler;
-import org.hadatac.console.models.TripleDocument;
 
 import play.mvc.BodyParser;
 import play.mvc.Controller;
 import play.mvc.Result;
-import play.mvc.Http.MultipartFormData;
 import play.mvc.Http.MultipartFormData.FilePart;
 
-import org.hadatac.console.views.html.error_page;
 import org.hadatac.console.views.html.annotator.*;
-
-import com.fasterxml.jackson.core.JsonParseException;
-import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import be.objectify.deadbolt.java.actions.Group;
@@ -75,14 +66,13 @@ public class FileProcessing extends Controller {
 	}
 
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    @BodyParser.Of(value = BodyParser.MultipartFormData.class, maxLength = 500 * 1024 * 1024)
-    public static Result uploadFile(String handler_json) {
+    @BodyParser.Of(value = BodyParser.MultipartFormData.class)
+    public Result uploadFile(String handler_json) {
     	try {
 			handler_json = URLDecoder.decode(handler_json, "UTF-8");
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-    	System.out.println(handler_json);
 
     	ObjectMapper mapper = new ObjectMapper();
     	CSVAnnotationHandler handler = null;
@@ -93,10 +83,9 @@ public class FileProcessing extends Controller {
 			return ok (uploadCSV.render(null, "fail", "Lost deployment information."));
 		}
 
-        MultipartFormData body = request().body().asMultipartFormData();
-		FilePart uploadedfile = body.getFile("pic");
+		FilePart uploadedfile = request().body().asMultipartFormData().getFile("pic");
 		if (uploadedfile != null) {
-		       File file = uploadedfile.getFile();
+		       File file = (File)uploadedfile.getFile();
 		       handler.setDatasetName(UPLOAD_PATH + uploadedfile.getFilename());
 		       File newFile = new File(handler.getDatasetName());
 		       InputStream isFile;

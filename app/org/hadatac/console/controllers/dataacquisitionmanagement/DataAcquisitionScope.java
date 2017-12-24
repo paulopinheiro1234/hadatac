@@ -28,7 +28,7 @@ import be.objectify.deadbolt.java.actions.Restrict;
 public class DataAcquisitionScope extends Controller {
 	
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    public static Result create(String file_name, String da_uri) {
+    public Result create(String file_name, String da_uri) {
     	if (session().get("LabKeyUserName") == null && session().get("LabKeyPassword") == null) {
 	    return redirect(org.hadatac.console.controllers.triplestore.routes.LoadKB.logInLabkey(
 			    routes.DataAcquisitionScope.create(file_name, da_uri).url()));
@@ -115,12 +115,12 @@ public class DataAcquisitionScope extends Controller {
     }
     
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    public static Result postCreate(String file_name, String da_uri) {
+    public Result postCreate(String file_name, String da_uri) {
     	return create(file_name, da_uri);
     }
     
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    public static Result view(String file_name, String da_uri) {
+    public Result view(String file_name, String da_uri) {
 	
 	DataAcquisition da = null;
 	DataFile file = null;
@@ -164,7 +164,7 @@ public class DataAcquisitionScope extends Controller {
     }
 	
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-	public static Result postView(String file_name, String da_uri) {
+	public Result postView(String file_name, String da_uri) {
     	return view(file_name, da_uri);
     }
     

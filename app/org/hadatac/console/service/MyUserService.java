@@ -1,18 +1,18 @@
 package org.hadatac.console.service;
 
 import org.hadatac.console.models.SysUser;
-import play.Application;
 
+import com.feth.play.module.pa.PlayAuthenticate;
 import com.feth.play.module.pa.user.AuthUser;
 import com.feth.play.module.pa.user.AuthUserIdentity;
-import com.feth.play.module.pa.service.UserServicePlugin;
-import com.google.inject.Inject;
+import com.feth.play.module.pa.service.AbstractUserService;
+import javax.inject.Inject;
 
-public class MyUserServicePlugin extends UserServicePlugin {
+public class MyUserService extends AbstractUserService {
 
 	@Inject
-	public MyUserServicePlugin(final Application app) {
-		super(app);
+	public MyUserService(PlayAuthenticate auth) {
+		super(auth);
 	}
 
 	@Override

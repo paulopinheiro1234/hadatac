@@ -1,14 +1,15 @@
 package org.hadatac.console.models;
 
-import be.objectify.deadbolt.core.models.Permission;
-import be.objectify.deadbolt.core.models.Role;
-import be.objectify.deadbolt.core.models.Subject;
+import be.objectify.deadbolt.java.models.Permission;
+import be.objectify.deadbolt.java.models.Role;
+import be.objectify.deadbolt.java.models.Subject;
 
 import com.feth.play.module.pa.providers.password.UsernamePasswordAuthUser;
 import com.feth.play.module.pa.user.AuthUser;
 import com.feth.play.module.pa.user.AuthUserIdentity;
 import com.feth.play.module.pa.user.EmailIdentity;
 import com.feth.play.module.pa.user.NameIdentity;
+import com.typesafe.config.ConfigFactory;
 import com.feth.play.module.pa.user.FirstLastNameIdentity;
 
 import org.hadatac.console.controllers.AuthApplication;
@@ -280,7 +281,7 @@ public class SysUser implements Subject {
 	private static List<SysUser> getAuthUserFindSolr(
 		final AuthUserIdentity identity) {
 		SolrClient solrClient = new HttpSolrClient.Builder(
-				Play.application().configuration().getString("hadatac.solr.users") 
+				ConfigFactory.load().getString("hadatac.solr.users") 
 				+ Collections.AUTHENTICATE_USERS).build();
 		String query = "active:true AND provider_user_id:" + identity.getId() + " AND provider_key:" + identity.getProvider();
     	SolrQuery solrQuery = new SolrQuery(query);
@@ -339,7 +340,7 @@ public class SysUser implements Subject {
 	
 	public static SysUser findByIdSolr(final String id) {
 		SolrClient solrClient = new HttpSolrClient.Builder(
-				Play.application().configuration().getString("hadatac.solr.users") 
+				ConfigFactory.load().getString("hadatac.solr.users") 
 				+ Collections.AUTHENTICATE_USERS).build();
 		
     	SolrQuery solrQuery = new SolrQuery("id:" + id);
@@ -458,7 +459,7 @@ public class SysUser implements Subject {
 	
 	public static boolean existsSolr() {
 		SolrClient solrClient = new HttpSolrClient.Builder(
-				Play.application().configuration().getString("hadatac.solr.users") 
+				ConfigFactory.load().getString("hadatac.solr.users") 
 				+ Collections.AUTHENTICATE_USERS).build();
     	SolrQuery solrQuery = new SolrQuery("*:*");
     	
@@ -537,7 +538,7 @@ public class SysUser implements Subject {
 	
 	public void save() {
 		SolrClient solrClient = new HttpSolrClient.Builder(
-				Play.application().configuration().getString("hadatac.solr.users") 
+				ConfigFactory.load().getString("hadatac.solr.users") 
 				+ Collections.AUTHENTICATE_USERS).build();
         
         try {
@@ -559,7 +560,7 @@ public class SysUser implements Subject {
 	public int delete() {
 		try {
 			SolrClient solr = new HttpSolrClient.Builder(
-					Play.application().configuration().getString("hadatac.solr.users") 
+					ConfigFactory.load().getString("hadatac.solr.users") 
 					+ Collections.AUTHENTICATE_USERS).build();
 			UpdateResponse response = solr.deleteById(this.id_s);
 			solr.commit();
@@ -630,7 +631,7 @@ public class SysUser implements Subject {
 	
 	private static List<SysUser> getEmailUserFindSolr(final String email, final String providerKey) {
 		SolrClient solrClient = new HttpSolrClient.Builder(
-				Play.application().configuration().getString("hadatac.solr.users") 
+				ConfigFactory.load().getString("hadatac.solr.users") 
 				+ Collections.AUTHENTICATE_USERS).build();
 		String query = "email:" + email + " AND active:true";
     	SolrQuery solrQuery = new SolrQuery(query);
@@ -660,7 +661,7 @@ public class SysUser implements Subject {
 	
 	public static String outputAsJson() {
 		SolrClient solrClient = new HttpSolrClient.Builder(
-				Play.application().configuration().getString("hadatac.solr.users") 
+				ConfigFactory.load().getString("hadatac.solr.users") 
 				+ Collections.AUTHENTICATE_USERS).build();
 		String query = "*:*";
     	SolrQuery solrQuery = new SolrQuery(query);

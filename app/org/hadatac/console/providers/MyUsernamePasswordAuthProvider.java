@@ -4,7 +4,10 @@ import com.feth.play.module.mail.Mailer.Mail.Body;
 import com.feth.play.module.pa.PlayAuthenticate;
 import com.feth.play.module.pa.providers.password.UsernamePasswordAuthProvider;
 import com.feth.play.module.pa.providers.password.UsernamePasswordAuthUser;
-import com.google.inject.Inject;
+import com.feth.play.module.mail.Mailer.MailerFactory;
+
+import com.typesafe.config.Config;
+import com.typesafe.config.ConfigFactory;
 
 import org.hadatac.console.controllers.routes;
 import org.hadatac.console.controllers.triplestore.UserManagement;
@@ -13,29 +16,35 @@ import org.hadatac.console.models.TokenAction;
 import org.hadatac.console.models.TokenAction.Type;
 import org.hadatac.console.models.SysUser;
 
-import play.Application;
 import play.Logger;
-import play.Play;
 import play.data.Form;
+import play.data.FormFactory;
 import play.data.validation.Constraints.Email;
 import play.data.validation.Constraints.MinLength;
 import play.data.validation.Constraints.Required;
 import play.i18n.Lang;
 import play.i18n.Messages;
+import play.i18n.MessagesApi;
+import play.inject.ApplicationLifecycle;
 import play.mvc.Call;
 import play.mvc.Http.Context;
 
+import javax.inject.Inject;
+import javax.inject.Singleton;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-import static play.data.Form.form;
-
-public class MyUsernamePasswordAuthProvider
-		extends
-		UsernamePasswordAuthProvider<String, MyLoginUsernamePasswordAuthUser, MyUsernamePasswordAuthUser, MyUsernamePasswordAuthProvider.MyLogin, MyUsernamePasswordAuthProvider.MySignup> {
+@Singleton
+public class MyUsernamePasswordAuthProvider extends
+		UsernamePasswordAuthProvider<
+		String, 
+		MyLoginUsernamePasswordAuthUser, 
+		MyUsernamePasswordAuthUser, 
+		MyUsernamePasswordAuthProvider.MyLogin, 
+		MyUsernamePasswordAuthProvider.MySignup> {
 
 	private static final String SETTING_KEY_VERIFICATION_LINK_SECURE = SETTING_KEY_MAIL
 			+ "." + "verificationLink.secure";
@@ -44,6 +53,15 @@ public class MyUsernamePasswordAuthProvider
 	private static final String SETTING_KEY_LINK_LOGIN_AFTER_PASSWORD_RESET = "loginAfterPasswordReset";
 
 	private static final String EMAIL_TEMPLATE_FALLBACK_LANGUAGE = "en";
+	
+	@Inject
+	FormFactory formFactory;
+	
+	@Inject
+	MessagesApi messagesApi;
+	
+	@Inject
+	Config config;
 
 	@Override
 	protected List<String> neededSettingKeys() {
@@ -53,11 +71,6 @@ public class MyUsernamePasswordAuthProvider
 		needed.add(SETTING_KEY_PASSWORD_RESET_LINK_SECURE);
 		needed.add(SETTING_KEY_LINK_LOGIN_AFTER_PASSWORD_RESET);
 		return needed;
-	}
-
-	public static MyUsernamePasswordAuthProvider getProvider() {
-		return (MyUsernamePasswordAuthProvider) PlayAuthenticate
-				.getProvider(UsernamePasswordAuthProvider.PROVIDER_KEY);
 	}
 
 	public static class MyIdentity {
@@ -81,16 +94,24 @@ public class MyUsernamePasswordAuthProvider
 
 		@Required
 		@MinLength(5)
-		public String password;
+		protected String password;
 
 		@Override
 		public String getEmail() {
 			return email;
 		}
+		
+		public void setEmail(String email) {
+			this.email = email;
+		}
 
 		@Override
 		public String getPassword() {
 			return password;
+		}
+		
+		public void setPassword(String password) {
+			this.password = password;
 		}
 	}
 
@@ -98,33 +119,68 @@ public class MyUsernamePasswordAuthProvider
 
 		@Required
 		@MinLength(5)
-		public String repeatPassword;
+		private String repeatPassword;
 
 		@Required
-		public String name;
+		private String name;
+		
+		private MessagesApi messagesApi;
+
+	    @Inject
+	    public MySignup(MessagesApi messagesApi) {
+	        this.messagesApi = messagesApi;
+	    }
 
 		public String validate() {
 			if (password == null || !password.equals(repeatPassword)) {
-				return Messages
-						.get("playauthenticate.password.signup.error.passwords_not_same");
+				return this.messagesApi.get(Lang.defaultLang(),
+						"playauthenticate.password.signup.error.passwords_not_same");
 			}
 			return null;
 		}
+		
+		public String getName() {
+			return name;
+		}
+
+		public void setName(String name) {
+			this.name = name;
+		}
+
+		public String getRepeatPassword() {
+			return repeatPassword;
+		}
+
+		public void setRepeatPassword(String repeatPassword) {
+			this.repeatPassword = repeatPassword;
+		}
 	}
 
-	public static final Form<MySignup> SIGNUP_FORM = form(MySignup.class);
-	public static final Form<MyLogin> LOGIN_FORM = form(MyLogin.class);
+	private final Form<MySignup> SIGNUP_FORM;
+	private final Form<MyLogin> LOGIN_FORM;
+	private final MyLogin login;
+	private final MySignup signup;
 
 	@Inject
-	public MyUsernamePasswordAuthProvider(Application app) {
-		super(app);
+	public MyUsernamePasswordAuthProvider(
+			final PlayAuthenticate auth, 
+			final ApplicationLifecycle lifecycle,
+			final MailerFactory mailerFactory,
+			final MyLogin login,
+			final MySignup signup) {
+		super(auth, lifecycle, mailerFactory);
+
+		this.login = login;
+		this.signup = signup;
+		this.SIGNUP_FORM = formFactory.form(MySignup.class);
+		this.LOGIN_FORM = formFactory.form(MyLogin.class);
 	}
 
-	protected Form<MySignup> getSignupForm() {
+	public Form<MySignup> getSignupForm() {
 		return SIGNUP_FORM;
 	}
 
-	protected Form<MyLogin> getLoginForm() {
+	public Form<MyLogin> getLoginForm() {
 		return LOGIN_FORM;
 	}
 
@@ -195,6 +251,16 @@ public class MyUsernamePasswordAuthProvider
 	protected Call userExists(final UsernamePasswordAuthUser authUser) {
 		return routes.Signup.exists();
 	}
+	
+	@Override
+	protected MyUsernamePasswordAuthProvider.MyLogin getLogin(final Context ctx) {
+		return this.login;
+	}
+	
+	@Override
+	protected MyUsernamePasswordAuthProvider.MySignup getSignup(final Context ctx) {
+		return this.signup;
+	}
 
 	@Override
 	protected Call userUnverified(final UsernamePasswordAuthUser authUser) {
@@ -215,21 +281,24 @@ public class MyUsernamePasswordAuthProvider
 	}
 	
 	@Override
-	protected MyLoginUsernamePasswordAuthUser transformAuthUser(final MyUsernamePasswordAuthUser authUser, final Context context) {
+	protected MyLoginUsernamePasswordAuthUser transformAuthUser(
+			final MyUsernamePasswordAuthUser authUser, final Context context) {
 		return new MyLoginUsernamePasswordAuthUser(authUser.getEmail());
 	}
 
 	@Override
 	protected String getVerifyEmailMailingSubject(
 			final MyUsernamePasswordAuthUser user, final Context ctx) {
-		return Messages.get("playauthenticate.password.verify_signup.subject");
+		return this.messagesApi.preferred(ctx.request().acceptLanguages()).at(
+				"playauthenticate.password.verify_signup.subject");
 	}
 
 	@Override
 	protected String onLoginUserNotFound(final Context context) {
 		context.flash()
 				.put(org.hadatac.console.controllers.AuthApplication.FLASH_ERROR_KEY,
-						Messages.get("playauthenticate.password.login.unknown_user_or_pw"));
+						this.messagesApi.preferred(context.request().acceptLanguages()).at(
+								"playauthenticate.password.login.unknown_user_or_pw"));
 		return super.onLoginUserNotFound(context);
 	}
 
@@ -237,12 +306,12 @@ public class MyUsernamePasswordAuthProvider
 	protected Body getVerifyEmailMailingBody(final String token,
 			final MyUsernamePasswordAuthUser user, final Context ctx) {
 
-		final boolean isSecure = getConfiguration().getBoolean(
+		final boolean isSecure = this.config.getBoolean(
 				SETTING_KEY_VERIFICATION_LINK_SECURE);
 		final String url = routes.Signup.verify(token).absoluteURL(
-				isSecure, Play.application().configuration().getString("hadatac.console.base_url"));
+				isSecure, ConfigFactory.load().getString("hadatac.console.base_url"));
 
-		final Lang lang = Lang.preferred(ctx.request().acceptLanguages());
+		final Lang lang = this.messagesApi.preferred(ctx.request().acceptLanguages()).lang();
 		final String langCode = lang.code();
 
 		final String html = getEmailTemplate(
@@ -285,7 +354,8 @@ public class MyUsernamePasswordAuthProvider
 
 	protected String getPasswordResetMailingSubject(final SysUser user,
 			final Context ctx) {
-		return Messages.get("playauthenticate.password.reset_email.subject");
+		return this.messagesApi.preferred(ctx.request().acceptLanguages()).at(
+				"playauthenticate.password.reset_email.subject");
 	}
 
 	protected Body getPasswordResetMailingBody(final String token,
@@ -294,9 +364,9 @@ public class MyUsernamePasswordAuthProvider
 		final boolean isSecure = getConfiguration().getBoolean(
 				SETTING_KEY_PASSWORD_RESET_LINK_SECURE);
 		final String url = routes.Signup.resetPassword(token).absoluteURL(
-				isSecure, Play.application().configuration().getString("hadatac.console.base_url"));
+				isSecure, ConfigFactory.load().getString("hadatac.console.base_url"));
 
-		final Lang lang = Lang.preferred(ctx.request().acceptLanguages());
+		final Lang lang = this.messagesApi.preferred(ctx.request().acceptLanguages()).lang();
 		final String langCode = lang.code();
 
 		final String html = getEmailTemplate(
@@ -313,9 +383,9 @@ public class MyUsernamePasswordAuthProvider
 		final boolean isSecure = getConfiguration().getBoolean(
 				SETTING_KEY_VERIFICATION_LINK_SECURE);
 		final String url = routes.AuthApplication.signup().absoluteURL(
-				isSecure, Play.application().configuration().getString("hadatac.console.base_url"));
+				isSecure, ConfigFactory.load().getString("hadatac.console.base_url"));
 
-		final Lang lang = Lang.preferred(ctx.request().acceptLanguages());
+		final Lang lang = this.messagesApi.preferred(ctx.request().acceptLanguages()).lang();
 		final String langCode = lang.code();
 
 		final String html = getEmailTemplate(
@@ -348,7 +418,8 @@ public class MyUsernamePasswordAuthProvider
 
 	protected String getVerifyEmailMailingSubjectAfterSignup(final SysUser user,
 			final Context ctx) {
-		return Messages.get("playauthenticate.password.verify_email.subject");
+		return this.messagesApi.preferred(ctx.request().acceptLanguages()).at(
+				"playauthenticate.password.verify_email.subject");
 	}
 
 	protected String getEmailTemplate(final String template,
@@ -400,9 +471,9 @@ public class MyUsernamePasswordAuthProvider
 		final boolean isSecure = getConfiguration().getBoolean(
 				SETTING_KEY_VERIFICATION_LINK_SECURE);
 		final String url = routes.Signup.verify(token).absoluteURL(
-				isSecure, Play.application().configuration().getString("hadatac.console.base_url"));
+				isSecure, ConfigFactory.load().getString("hadatac.console.base_url"));
 
-		final Lang lang = Lang.preferred(ctx.request().acceptLanguages());
+		final Lang lang = this.messagesApi.preferred(ctx.request().acceptLanguages()).lang();
 		final String langCode = lang.code();
 
 		final String html = getEmailTemplate(

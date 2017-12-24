@@ -17,6 +17,7 @@ import play.mvc.Controller;
 import play.mvc.Result;
 import play.twirl.api.Html;
 import play.data.*;
+import javax.inject.Inject;
 
 import org.hadatac.console.views.html.*;
 import org.hadatac.console.views.html.studies.*;
@@ -43,8 +44,11 @@ import org.hadatac.console.controllers.AuthApplication;
 
 public class EditStudy extends Controller {
 	
+	@Inject
+	private FormFactory formFactory;
+	
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-	public static Result index(String filename, String da_uri, String std_uri) {
+	public Result index(String filename, String da_uri, String std_uri) {
     	if (session().get("LabKeyUserName") == null && session().get("LabKeyPassword") == null) {
     		return redirect(org.hadatac.console.controllers.triplestore.routes.LoadKB.logInLabkey(
 				routes.EditStudy.index(filename, da_uri, std_uri).url()));
@@ -79,15 +83,15 @@ public class EditStudy extends Controller {
     }
     
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    public static Result postIndex(String filename, String da_uri, String std_uri) {
+    public Result postIndex(String filename, String da_uri, String std_uri) {
     	return index(filename, da_uri, std_uri);
     }
     
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    public static Result processForm(String std_uri) {
+    public Result processForm(String std_uri) {
     	final SysUser sysUser = AuthApplication.getLocalUser(session());
 	
-        Form<StudyForm> form = Form.form(StudyForm.class).bindFromRequest();
+        Form<StudyForm> form = formFactory.form(StudyForm.class).bindFromRequest();
         StudyForm data = form.get();
         List<String> changedInfos = new ArrayList<String>();
         

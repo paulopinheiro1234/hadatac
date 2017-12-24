@@ -32,6 +32,8 @@ import org.hadatac.console.controllers.fileviewer.CSVPreview;
 import org.hadatac.utils.Collections;
 import org.hadatac.utils.ConfigProp;
 
+import com.typesafe.config.ConfigFactory;
+
 import play.Play;
 
 public class Parser {
@@ -90,7 +92,7 @@ public class Parser {
 		int batch_size = 10000;
 
 		SolrClient solr = new HttpSolrClient.Builder(
-				Play.application().configuration().getString("hadatac.solr.data") 
+				ConfigFactory.load().getString("hadatac.solr.data") 
 				+ Collections.DATA_ACQUISITION).build();
 		boolean isSample;
 		String matrix = "";

@@ -2,42 +2,25 @@ package org.hadatac.console.controllers.objects;
 
 import java.io.File;
 import java.io.IOException;
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
-import java.net.URLDecoder;
+import javax.inject.Inject;
+
 import play.mvc.Controller;
 import play.mvc.Result;
-import play.twirl.api.Html;
 import play.data.*;
 import org.hadatac.utils.ConfigProp;
-import org.hadatac.data.api.DataFactory;
 import org.hadatac.entity.pojo.Study;
 import org.hadatac.entity.pojo.StudyObject;
 import org.hadatac.entity.pojo.ObjectCollection;
 import org.hadatac.entity.pojo.ObjectCollectionType;
-import org.hadatac.entity.pojo.StudyObjectType;
-import org.hadatac.metadata.loader.LabkeyDataHandler;
 import org.hadatac.metadata.loader.ValueCellProcessing;
 import org.hadatac.console.views.html.*;
 import org.hadatac.console.views.html.objects.*;
-import org.hadatac.console.views.html.triplestore.syncLabkey;
 import org.hadatac.console.models.NewObjectsFromFileForm;
-import org.hadatac.console.models.SparqlQuery;
-import org.hadatac.console.models.SparqlQueryResults;
 import org.hadatac.console.models.SysUser;
-import org.hadatac.console.http.GetSparqlQuery;
 import org.hadatac.console.controllers.AuthApplication;
-import org.hadatac.console.controllers.triplestore.UserManagement;
-import org.hadatac.console.controllers.objects.routes;
-import org.labkey.remoteapi.CommandException;
-import org.labkey.remoteapi.query.SaveRowsResponse;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVRecord;
 import org.apache.commons.csv.CSVParser;
@@ -51,15 +34,18 @@ public class NewObjectsFromFile extends Controller {
     static final long LENGTH_CODE = 6;
 
     private static String path_unproc = ConfigProp.getPropertyValue("autoccsv.config", "path_unproc");
+    
+    @Inject
+	private FormFactory formFactory;
 
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    public static Result processForm(String filename, String da_uri, String oc_uri) {
+    public Result processForm(String filename, String da_uri, String oc_uri) {
     	final SysUser sysUser = AuthApplication.getLocalUser(session());
 	
 	ObjectCollection oc = ObjectCollection.find(oc_uri);
 	Study study = oc.getStudy();
 	
-        Form<NewObjectsFromFileForm> form = Form.form(NewObjectsFromFileForm.class).bindFromRequest();
+        Form<NewObjectsFromFileForm> form = formFactory.form(NewObjectsFromFileForm.class).bindFromRequest();
         NewObjectsFromFileForm data = form.get();
         
         if (form.hasErrors()) {

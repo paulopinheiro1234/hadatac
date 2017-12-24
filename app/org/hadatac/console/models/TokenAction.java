@@ -20,8 +20,7 @@ import org.joda.time.format.DateTimeFormatter;
 import org.joda.time.format.ISODateTimeFormat;
 import org.noggit.JSONUtil;
 
-import play.Play;
-import play.data.format.Formats;
+import com.typesafe.config.ConfigFactory;
 
 public class TokenAction {
 
@@ -114,7 +113,7 @@ public class TokenAction {
 	
 	public static TokenAction findByTokenSolr(final String token, final Type type) {
 		SolrClient solrClient = new HttpSolrClient.Builder(
-				Play.application().configuration().getString("hadatac.solr.users")
+				ConfigFactory.load().getString("hadatac.solr.users")
 				+ Collections.AUTHENTICATE_TOKENS).build();
     	SolrQuery solrQuery = new SolrQuery("token:" + token + " AND type:" + type.name());
     	TokenAction tokenAction = null;
@@ -149,7 +148,7 @@ public class TokenAction {
 	
 	public static void deleteByUserSolr(final SysUser u, final Type type) {
 		SolrClient solrClient = new HttpSolrClient.Builder(
-				Play.application().configuration().getString("hadatac.solr.users") 
+				ConfigFactory.load().getString("hadatac.solr.users") 
 				+ Collections.AUTHENTICATE_TOKENS).build();
 		try {
 			solrClient.deleteByQuery("target_user_id:" + u.getId() + " AND type:" + type.name());
@@ -183,7 +182,7 @@ public class TokenAction {
 	
 	public void save() {
 		SolrClient solrClient = new HttpSolrClient.Builder(
-				Play.application().configuration().getString("hadatac.solr.users") 
+				ConfigFactory.load().getString("hadatac.solr.users") 
 				+ Collections.AUTHENTICATE_TOKENS).build();
         
         try {
@@ -197,7 +196,7 @@ public class TokenAction {
 	
 	public static String outputAsJson() {
 		SolrClient solrClient = new HttpSolrClient.Builder(
-				Play.application().configuration().getString("hadatac.solr.users")
+				ConfigFactory.load().getString("hadatac.solr.users")
 				+ Collections.AUTHENTICATE_TOKENS).build();
 		String query = "*:*";
     	SolrQuery solrQuery = new SolrQuery(query);

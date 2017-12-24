@@ -7,6 +7,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import javax.inject.Inject;
 
 import javax.servlet.http.HttpServletResponse;
 
@@ -39,15 +40,19 @@ import be.objectify.deadbolt.java.actions.Group;
 import be.objectify.deadbolt.java.actions.Restrict;
 import play.twirl.api.Html;
 import play.data.Form;
+import play.data.FormFactory;
 import play.mvc.Controller;
 import play.mvc.Result;
 import play.mvc.BodyParser;
 import play.mvc.Http.MultipartFormData.FilePart;
 
 public class AutoAnnotator extends Controller {
+	
+	@Inject
+	FormFactory formFactory;
 
 	@Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-	public static Result index() {		
+	public Result index() {		
 		final SysUser user = AuthApplication.getLocalUser(session());
 
 		List<DataFile> proc_files = null;
@@ -78,12 +83,12 @@ public class AutoAnnotator extends Controller {
 	}
 
 	@Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-	public static Result postIndex() {
+	public Result postIndex() {
 		return index();
 	}
 
 	@Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
-	public static Result assignFileOwner(String ownerEmail, String selectedFile) {	
+	public Result assignFileOwner(String ownerEmail, String selectedFile) {	
 		return ok(assignOption.render(User.getUserEmails(),
 				routes.AutoAnnotator.processOwnerForm(ownerEmail, selectedFile),
 				"Owner", 
@@ -92,13 +97,13 @@ public class AutoAnnotator extends Controller {
 	}
 
 	@Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
-	public static Result postAssignFileOwner(String ownerEmail, String selectedFile) {
+	public Result postAssignFileOwner(String ownerEmail, String selectedFile) {
 		return assignFileOwner(ownerEmail, selectedFile);
 	}
 
 	@Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
-	public static Result processOwnerForm(String ownerEmail, String selectedFile) {
-		Form<AssignOptionForm> form = Form.form(AssignOptionForm.class).bindFromRequest();
+	public Result processOwnerForm(String ownerEmail, String selectedFile) {
+		Form<AssignOptionForm> form = formFactory.form(AssignOptionForm.class).bindFromRequest();
 		AssignOptionForm data = form.get();
 
 		if (form.hasErrors()) {
@@ -124,7 +129,7 @@ public class AutoAnnotator extends Controller {
 	}
 
 	@Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
-	public static Result assignDataAcquisition(String dataAcquisitionUri, String selectedFile) {
+	public Result assignDataAcquisition(String dataAcquisitionUri, String selectedFile) {
 		List<String> dataAcquisitionURIs = new ArrayList<String>();
 		DataAcquisition.findAll().forEach((da) -> dataAcquisitionURIs.add(
 				ValueCellProcessing.replaceNameSpaceEx(da.getUri())));
@@ -137,13 +142,13 @@ public class AutoAnnotator extends Controller {
 	}
 
 	@Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
-	public static Result postAssignDataAcquisition(String dataAcquisitionUri, String selectedFile) {
+	public Result postAssignDataAcquisition(String dataAcquisitionUri, String selectedFile) {
 		return assignDataAcquisition(dataAcquisitionUri, selectedFile);
 	}
 
 	@Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
-	public static Result processDataAcquisitionForm(String dataAcquisitionUri, String selectedFile) {
-		Form<AssignOptionForm> form = Form.form(AssignOptionForm.class).bindFromRequest();
+	public Result processDataAcquisitionForm(String dataAcquisitionUri, String selectedFile) {
+		Form<AssignOptionForm> form = formFactory.form(AssignOptionForm.class).bindFromRequest();
 		AssignOptionForm data = form.get();
 
 		List<String> dataAcquisitionURIs = new ArrayList<String>();
@@ -173,7 +178,7 @@ public class AutoAnnotator extends Controller {
 	}
 
 	@Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
-	public static Result toggleAutoAnnotator() {
+	public Result toggleAutoAnnotator() {
 		if (ConfigProp.getPropertyValue("autoccsv.config", "auto").equals("on")) {
 			ConfigProp.setPropertyValue("autoccsv.config", "auto", "off");
 			System.out.println("Turning auto-annotation off");
@@ -187,24 +192,24 @@ public class AutoAnnotator extends Controller {
 	}
 
 	@Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-	public static Result downloadTemplates() {
+	public Result downloadTemplates() {
 		return ok(download_templates.render());
 	}
 
 	@Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-	public static Result postDownloadTemplates() {
+	public Result postDownloadTemplates() {
 		return postDownloadTemplates();
 	}
 
 	@Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
-	public static Result setLabKeyCredentials() {
+	public Result setLabKeyCredentials() {
 		return ok(syncLabkey.render("init", routes.AutoAnnotator.
 				postSetLabKeyCredentials().url(), ""));
 	}
 
 	@Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
-	public static Result postSetLabKeyCredentials() {
-		Form<LabKeyLoginForm> form = Form.form(LabKeyLoginForm.class).bindFromRequest();
+	public Result postSetLabKeyCredentials() {
+		Form<LabKeyLoginForm> form = formFactory.form(LabKeyLoginForm.class).bindFromRequest();
 		String site = ConfigProp.getPropertyValue("labkey.config", "site");
 		String path = "/";
 		String user_name = form.get().getUserName();
@@ -241,7 +246,7 @@ public class AutoAnnotator extends Controller {
 	}
 
 	@Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-	public static Result checkAnnotationLog(String file_name) {
+	public Result checkAnnotationLog(String file_name) {
 		AnnotationLog log = AnnotationLog.find(file_name);
 		if (null == log) {
 			return ok(annotation_log.render(Feedback.print(Feedback.WEB, "")));
@@ -252,7 +257,7 @@ public class AutoAnnotator extends Controller {
 	}
 
 	@Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-	public static Result moveDataFile(String file_name) {			
+	public Result moveDataFile(String file_name) {			
 		final SysUser user = AuthApplication.getLocalUser(session());
 		DataFile dataFile = null;
 		if (user.isDataManager()) {
@@ -307,7 +312,7 @@ public class AutoAnnotator extends Controller {
 	}
 
 	@Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-	public static Result downloadDataFile(String file_name, boolean isProcessed) {		
+	public Result downloadDataFile(String file_name, boolean isProcessed) {		
 		String path = ""; 
 		if(isProcessed){
 			path = ConfigProp.getPathProc();
@@ -318,7 +323,7 @@ public class AutoAnnotator extends Controller {
 	}
 
 	@Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-	public static Result deleteDataFile(String file_name, boolean isProcessed) {
+	public Result deleteDataFile(String file_name, boolean isProcessed) {
 		final SysUser user = AuthApplication.getLocalUser(session());
 		DataFile dataFile = null;
 		if (user.isDataManager()) {
@@ -357,14 +362,12 @@ public class AutoAnnotator extends Controller {
 	}
 
 	@Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
-	@BodyParser.Of(value = BodyParser.MultipartFormData.class, maxLength = 500 * 1024 * 1024)
-	public static Result uploadDataFile(String oper) {
+	@BodyParser.Of(value = BodyParser.MultipartFormData.class)
+	public Result uploadDataFile(String oper) {
 		String path = ConfigProp.getPathUnproc();
-
-		List<FilePart> fileParts = request().body().asMultipartFormData().getFiles();
-		for(FilePart filePart : fileParts) {
+		for(FilePart filePart : request().body().asMultipartFormData().getFiles()) {
 			if (filePart != null) {
-				File file = filePart.getFile();
+				File file = (File)filePart.getFile();
 				File newFile = new File(path + "/" + filePart.getFilename());
 				InputStream isFile;
 				try {
@@ -390,7 +393,7 @@ public class AutoAnnotator extends Controller {
 	}
 
 	@Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
-	public static Result uploadDataFileByChunking(
+	public Result uploadDataFileByChunking(
 			String resumableChunkNumber,
 			String resumableChunkSize, 
 			String resumableCurrentChunkSize,
@@ -408,7 +411,7 @@ public class AutoAnnotator extends Controller {
 	}
 
 	@Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
-	public static Result postUploadDataFileByChunking(
+	public Result postUploadDataFileByChunking(
 			String resumableChunkNumber, 
 			String resumableChunkSize, 
 			String resumableCurrentChunkSize,

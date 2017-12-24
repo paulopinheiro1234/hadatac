@@ -12,6 +12,7 @@
 @import org.hadatac.console.controllers._
 @import org.hadatac.entity.pojo.StudyType
 @import org.hadatac.metadata.loader.ValueCellProcessing
+@import com.typesafe.config.ConfigFactory
 
 @main("Edit Study") {
    <script type="text/javascript">
@@ -165,7 +166,7 @@
        }
        
        function labelchange() {
-          var newUri = "@Play.application().configuration().getString("hadatac.community.ont_prefix")" + "-kb:STD-" + document.getElementById("newLabel").value;
+          var newUri = "@ConfigFactory.load().getString("hadatac.community.ont_prefix")" + "-kb:STD-" + document.getElementById("newLabel").value;
           newUri = replaceAll(newUri," ","-");
 	  newUri = replaceAll(newUri,"<","");
           newUri = replaceAll(newUri,">","");

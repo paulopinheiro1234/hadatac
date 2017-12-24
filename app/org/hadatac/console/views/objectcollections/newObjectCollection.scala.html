@@ -12,6 +12,7 @@
 @import org.hadatac.console.controllers._
 @import org.hadatac.entity.pojo.Agent
 @import play._
+@import com.typesafe.config.ConfigFactory
 
 @main("New Object Collection") {
 
@@ -60,7 +61,7 @@
         label = replaceAll(label,"&","");
         label = replaceAll(label,";","");
         label = replaceAll(label,",","");
-        var newUri = "@Play.application().configuration().getString("hadatac.community.ont_prefix")" + 
+        var newUri = "@ConfigFactory.load().getString("hadatac.community.ont_prefix")" + 
                      "-kb:OC-" + 
                      label + "-" + 
                      document.getElementById("newLabel").value;

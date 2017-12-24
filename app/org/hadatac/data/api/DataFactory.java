@@ -15,7 +15,7 @@ import org.hadatac.utils.ConfigProp;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 
-import play.Play;
+import com.typesafe.config.ConfigFactory;
 
 public class DataFactory {
 
@@ -146,7 +146,7 @@ public class DataFactory {
 
     public static String getNextURI(String category) {
     	String metadataId = Long.toHexString(DataFactory.getNextDynamicMetadataId());
-    	String host = Play.application().configuration().getString("hadatac.console.host");
+    	String host = ConfigFactory.load().getString("hadatac.console.host");
     	for (int i = metadataId.length(); i <= 8; i++) {
     		metadataId = "0" + metadataId;
     	}

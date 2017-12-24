@@ -4,8 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import javax.smartcardio.ATR;
-
 import java.util.HashMap;
 
 import org.apache.jena.query.Query;
@@ -24,7 +22,7 @@ import org.hadatac.metadata.loader.ValueCellProcessing;
 import org.hadatac.utils.Collections;
 import org.hadatac.utils.NameSpaces;
 
-import play.Play;
+import com.typesafe.config.ConfigFactory;
 
 public class Attribute extends HADatAcClass implements Comparable<Attribute> {
 
@@ -109,7 +107,8 @@ public class Attribute extends HADatAcClass implements Comparable<Attribute> {
 
 		String queryString = "DESCRIBE <" + uri + ">";
 		Query query = QueryFactory.create(queryString);
-		QueryExecution qexec = QueryExecutionFactory.sparqlService(Play.application().configuration().getString("hadatac.solr.triplestore") 
+		QueryExecution qexec = QueryExecutionFactory.sparqlService(
+				ConfigFactory.load().getString("hadatac.solr.triplestore") 
 				+ Collections.METADATA_SPARQL, query);
 		model = qexec.execDescribe();
 

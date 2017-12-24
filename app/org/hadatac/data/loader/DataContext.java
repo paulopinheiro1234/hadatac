@@ -13,7 +13,7 @@ import org.hadatac.utils.Collections;
 import org.hadatac.utils.Command;
 import org.hadatac.utils.Feedback;
 
-import play.Play;
+import com.typesafe.config.ConfigFactory;
 
 public class DataContext {
 	
@@ -32,7 +32,7 @@ public class DataContext {
 	public static Long playTotalMeasurements() {
 		DataContext data = new DataContext( "user", 
 				"password",
-				Play.application().configuration().getString("hadatac.solr.data"), 
+				ConfigFactory.load().getString("hadatac.solr.data"), 
 				false);
 		
 		return data.totalMeasurements();
@@ -41,7 +41,7 @@ public class DataContext {
 	public static Long playTotalDataAcquisitions() {
 		DataContext data = new DataContext( "user", 
 				"password",
-				Play.application().configuration().getString("hadatac.solr.data"), 
+				ConfigFactory.load().getString("hadatac.solr.data"), 
 				false);
 		
 		return data.totalDataAcquisitions();

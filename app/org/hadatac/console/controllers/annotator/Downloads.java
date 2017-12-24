@@ -4,12 +4,9 @@ import java.io.File;
 import java.io.IOException;
 import java.io.StringReader;
 import java.net.URLDecoder;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.Properties;
 
-import play.Play;
 import play.mvc.*;
 import play.mvc.Http.*;
 import play.mvc.Result;
@@ -20,13 +17,11 @@ import org.hadatac.console.controllers.dataacquisitionsearch.LoadCCSV;
 import org.hadatac.console.models.CSVAnnotationHandler;
 import org.hadatac.console.views.html.annotator.*;
 import org.hadatac.data.api.DataFactory;
-import org.hadatac.data.loader.util.Arguments;
-import org.hadatac.data.loader.util.FileFactory;
 import org.hadatac.data.model.ParsingResult;
-import org.hadatac.utils.Feedback;
 import org.hadatac.utils.NameSpaces;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.typesafe.config.ConfigFactory;
 
 import be.objectify.deadbolt.java.actions.Group;
 import be.objectify.deadbolt.java.actions.Restrict;
@@ -66,7 +61,7 @@ public class Downloads extends Controller {
     public static final String FRAG_IN_DATE_TIME_STATEMENT  = "<ts0> hadatac:atColumn ";
 
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    public static Result postGenerate(String handler_json) {
+    public Result postGenerate(String handler_json) {
 
     	String oper = "";
     	
@@ -101,7 +96,7 @@ public class Downloads extends Controller {
     	 */
     	
     	preamble += FRAG_KB_PART1;
-    	preamble += Play.application().configuration().getString("hadatac.console.kb"); 
+    	preamble += ConfigFactory.load().getString("hadatac.console.kb"); 
     	preamble += FRAG_KB_PART2;
     	
     	try {

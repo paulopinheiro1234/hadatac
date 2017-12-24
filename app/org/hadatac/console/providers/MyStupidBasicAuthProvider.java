@@ -16,20 +16,28 @@
 package org.hadatac.console.providers;
 
 import play.Application;
+import play.inject.ApplicationLifecycle;
 import play.twirl.api.Content;
 import play.mvc.Http.Context;
 import org.hadatac.console.views.html.login;
 
+import com.feth.play.module.pa.PlayAuthenticate;
 import com.feth.play.module.pa.providers.wwwauth.basic.BasicAuthProvider;
 import com.feth.play.module.pa.user.AuthUser;
 import com.google.inject.Inject;
 
 /** A really simple basic auth provider that accepts one hard coded user */
 public class MyStupidBasicAuthProvider extends BasicAuthProvider {
+	
+	private MyUsernamePasswordAuthProvider provider;
 
 	@Inject
-	public MyStupidBasicAuthProvider(Application app) {
-		super(app);
+	public MyStupidBasicAuthProvider(
+			final PlayAuthenticate auth, 
+			final ApplicationLifecycle lifecycle,
+			final MyUsernamePasswordAuthProvider provider) {
+		super(auth, lifecycle);
+		this.provider = provider;
 	}
 
 	@Override
@@ -60,6 +68,6 @@ public class MyStupidBasicAuthProvider extends BasicAuthProvider {
 	/** Diplay the normal login form if HTTP authentication fails */
 	@Override
 	protected Content unauthorized(Context context) {
-		return login.render(MyUsernamePasswordAuthProvider.LOGIN_FORM);
+		return login.render(provider.getLoginForm());
 	}
 }

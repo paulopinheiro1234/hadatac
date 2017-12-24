@@ -14,6 +14,7 @@
 @import org.hadatac.entity.pojo.Agent
 @import org.hadatac.metadata.loader.ValueCellProcessing
 @import play._
+@import com.typesafe.config.ConfigFactory
 
 @main("Edit Object Collection") {
 
@@ -49,7 +50,7 @@
      }
        
      function labelchange() {
-        var newUri = "@Play.application().configuration().getString("hadatac.community.ont_prefix")" + 
+        var newUri = "@ConfigFactory.load().getString("hadatac.community.ont_prefix")" + 
                      "-kb:OC-" + 
                      "@study.getLabel()" + "-" + 
                      document.getElementById("newLabel").value;

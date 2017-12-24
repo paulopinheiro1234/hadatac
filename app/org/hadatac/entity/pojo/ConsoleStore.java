@@ -19,7 +19,7 @@ import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 import org.joda.time.format.ISODateTimeFormat;
 
-import play.Play;
+import com.typesafe.config.ConfigFactory;
 
 public class ConsoleStore {
 	@Field("id")
@@ -57,7 +57,7 @@ public class ConsoleStore {
 	public int save() {
 		try {
 			SolrClient client = new HttpSolrClient.Builder(
-					Play.application().configuration().getString("hadatac.solr.data") 
+					ConfigFactory.load().getString("hadatac.solr.data") 
 					+ Collections.CONSOLE_STORE).build();
 			int status = client.addBean(this).getStatus();
 			client.commit();
@@ -73,7 +73,7 @@ public class ConsoleStore {
 		ConsoleStore consoleStore = null;
 		
 		SolrClient client = new HttpSolrClient.Builder(
-				Play.application().configuration().getString("hadatac.solr.data") 
+				ConfigFactory.load().getString("hadatac.solr.data") 
 				+ Collections.CONSOLE_STORE).build();
         SolrQuery query = new SolrQuery();
         query.set("q", "*:*");

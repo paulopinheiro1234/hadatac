@@ -9,7 +9,7 @@ import org.hadatac.console.views.html.metadata.concepts.agent_browser;
 public class Agent extends Controller {
 	
 	// for /metadata HTTP GET requests
-    public static Result index() {
+    public Result index() {
 
     	String category = "Agents";
     	
@@ -22,7 +22,7 @@ public class Agent extends Controller {
 
 
     // for /metadata HTTP POST requests
-    public static Result postIndex() {
+    public Result postIndex() {
         
     	String category = "Agents";
     	

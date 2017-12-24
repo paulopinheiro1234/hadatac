@@ -22,9 +22,7 @@ import org.hadatac.utils.Collections;
 import org.hadatac.utils.Feedback;
 import org.hadatac.utils.NameSpaces;
 
-import play.Play;
-import play.libs.ws.*;
-import play.mvc.Call;
+import com.typesafe.config.ConfigFactory;
 
 public class PermissionsContext implements RDFContext {
 
@@ -44,7 +42,7 @@ public class PermissionsContext implements RDFContext {
     public static Long playTotalTriples() {
     	PermissionsContext permissions = new PermissionsContext(
 	    		 "user", "password", 
-	    		 Play.application().configuration().getString("hadatac.solr.permissions"),
+	    		 ConfigFactory.load().getString("hadatac.solr.permissions"),
 	    		 false);
     	return permissions.totalTriples();
     }

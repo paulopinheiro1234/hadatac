@@ -16,7 +16,7 @@ import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
 import org.hadatac.utils.Collections;
 
-import play.Play;
+import com.typesafe.config.ConfigFactory;
 
 public class Credential {
 	@Field("username")
@@ -46,7 +46,7 @@ public class Credential {
 	public int save() {
 		try {
 			SolrClient client = new HttpSolrClient.Builder(
-					Play.application().configuration().getString("hadatac.solr.data") 
+					ConfigFactory.load().getString("hadatac.solr.data") 
 					+ Collections.LABKEY_CREDENTIAL).build();
 			int status = client.addBean(this).getStatus();
 			client.commit();
@@ -61,7 +61,7 @@ public class Credential {
 	public int delete() {
 		try {
 			SolrClient solr = new HttpSolrClient.Builder(
-					Play.application().configuration().getString("hadatac.solr.data") 
+					ConfigFactory.load().getString("hadatac.solr.data") 
 					+ Collections.LABKEY_CREDENTIAL).build();
 			UpdateResponse response = solr.deleteById(this.getUserName());
 			solr.commit();
@@ -90,7 +90,7 @@ public class Credential {
 		List<Credential> list = new ArrayList<Credential>();
 		
 		SolrClient solr = new HttpSolrClient.Builder(
-				Play.application().configuration().getString("hadatac.solr.data") 
+				ConfigFactory.load().getString("hadatac.solr.data") 
 				+ Collections.LABKEY_CREDENTIAL).build();
 
 		try {

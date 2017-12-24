@@ -366,7 +366,7 @@ public class DiffTool extends Controller {
 
 
     //The main function
-    public static Result runDiffTool(List<String> list) throws Exception {
+    public Result runDiffTool(List<String> list) throws Exception {
     	
         /*if(args.length != 4){
             System.out.println("ERROR: Incorrect number of arguments");
@@ -486,7 +486,7 @@ public class DiffTool extends Controller {
     	System.out.println("Alias: " + alias);
     }
     
-    public static Result index() throws Exception {
+    public Result index() throws Exception {
     	List<String> lists = diffLoadLists();
         if(lists.size() == 2){
             //String a;
@@ -502,7 +502,7 @@ public class DiffTool extends Controller {
         }
     }
     
-    public static Result postIndex() throws Exception {
+    public Result postIndex() throws Exception {
         return index();
     }
     

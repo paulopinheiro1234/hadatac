@@ -1,35 +1,32 @@
 package org.hadatac.console.controllers.metadata.empirical;
 
-import java.io.UnsupportedEncodingException;
-import java.net.URLDecoder;
 import java.util.List;
 import java.util.ArrayList;
+import javax.inject.Inject;
 
 import play.mvc.Controller;
 import play.mvc.Result;
 import play.data.Form;
-import play.twirl.api.Html;
+import play.data.FormFactory;
 
 import org.hadatac.console.views.html.metadata.*;
 import org.hadatac.console.controllers.AuthApplication;
-import org.hadatac.console.controllers.metadata.empirical.routes;
-import org.hadatac.console.models.SparqlQueryResults;
 import org.hadatac.console.models.SysUser;
 import org.hadatac.console.models.ConceptForm;
 import org.hadatac.console.models.OtMSparqlQueryResults;
 import org.hadatac.entity.pojo.PlatformType;
-import org.hadatac.entity.pojo.Platform;
-import org.hadatac.metadata.loader.ValueCellProcessing;
-import org.labkey.remoteapi.CommandException;
 
 import be.objectify.deadbolt.java.actions.Group;
 import be.objectify.deadbolt.java.actions.Restrict;
 
 public class PlatformTypeManagement extends Controller {
 	
+	@Inject
+	private FormFactory formFactory;
+	
     // for /metadata HTTP GET requests
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    public static Result index(String filename, String da_uri) {
+    public Result index(String filename, String da_uri) {
 	if (session().get("LabKeyUserName") == null && session().get("LabKeyPassword") == null) {
 	    return redirect(org.hadatac.console.controllers.triplestore.routes.LoadKB.logInLabkey(
 			    org.hadatac.console.controllers.metadata.empirical.routes.PlatformTypeManagement.index(filename, da_uri).url()));
@@ -47,16 +44,16 @@ public class PlatformTypeManagement extends Controller {
     
     // for /metadata HTTP POST requests
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-	public static Result postIndex(String filename, String da_uri) {
+	public Result postIndex(String filename, String da_uri) {
     	return index(filename, da_uri);
 	
     }// /postIndex()
     
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-	public static Result processForm(String filename, String da_uri) {
+	public Result processForm(String filename, String da_uri) {
     	final SysUser sysUser = AuthApplication.getLocalUser(session());
 	
-        Form<ConceptForm> form = Form.form(ConceptForm.class).bindFromRequest();
+        Form<ConceptForm> form = formFactory.form(ConceptForm.class).bindFromRequest();
         ConceptForm data = form.get();
         List<String> changedInfos = new ArrayList<String>();
         
@@ -117,7 +114,7 @@ public class PlatformTypeManagement extends Controller {
     }
 
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    public static Result postProcessForm(String filename, String da_uri) {
+    public Result postProcessForm(String filename, String da_uri) {
   	return processForm(filename, da_uri);
 	
     }

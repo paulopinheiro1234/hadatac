@@ -10,10 +10,12 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import javax.inject.Inject;
 
 import play.data.Form;
 import play.mvc.Controller;
 import play.mvc.Result;
+import play.data.FormFactory;
 
 import org.hadatac.console.views.html.dataacquisitionmanagement.*;
 import org.hadatac.entity.pojo.DataAcquisition;
@@ -31,9 +33,12 @@ import be.objectify.deadbolt.java.actions.Group;
 import be.objectify.deadbolt.java.actions.Restrict;
 
 public class DataAcquisitionManagement extends Controller {
+	
+	@Inject
+	private FormFactory formFactory;
 
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    public static Result index(int stateId) {
+    public Result index(int stateId) {
 	System.out.println("Inside DA");
 	List<DataAcquisition> results = null;
 	State state = new State(stateId);
@@ -61,12 +66,12 @@ public class DataAcquisitionManagement extends Controller {
     }
     
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    public static Result postIndex(int stateId) {
+    public Result postIndex(int stateId) {
     	return index(stateId);
     }
 	
 	@Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    public static Result newDataAcquisition() {
+    public Result newDataAcquisition() {
 		if (session().get("LabKeyUserName") == null && session().get("LabKeyPassword") == null) {
     		return redirect(org.hadatac.console.controllers.triplestore.routes.LoadKB.logInLabkey(
     				routes.DataAcquisitionManagement.newDataAcquisition().url()));
@@ -90,15 +95,15 @@ public class DataAcquisitionManagement extends Controller {
     }
 	
 	@Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    public static Result postNewDataAcquisition() {
+    public Result postNewDataAcquisition() {
 		return newDataAcquisition();
 	}
 	
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    public static Result processForm() {
+    public Result processForm() {
     	final SysUser sysUser = AuthApplication.getLocalUser(session());
     	
-        Form<DataAcquisitionForm> form = Form.form(DataAcquisitionForm.class).bindFromRequest();
+        Form<DataAcquisitionForm> form = formFactory.form(DataAcquisitionForm.class).bindFromRequest();
         DataAcquisitionForm data = form.get();
         
         if (form.hasErrors()) {

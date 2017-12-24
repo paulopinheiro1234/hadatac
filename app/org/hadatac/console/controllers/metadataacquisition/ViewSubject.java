@@ -316,7 +316,7 @@ public class ViewSubject extends Controller {
 	}
 
 	@Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-	public static Result index(String study_uri, String subject_uri) {
+	public Result index(String study_uri, String subject_uri) {
 		Map<String, List<String>> indicatorValues = findSubjectIndicators(study_uri, subject_uri);
 		Map<String, List<String>> subjectResult = findBasic(subject_uri);
 		Map<String, List<String>> sampleResult = findSampleMap(subject_uri);
@@ -332,7 +332,7 @@ public class ViewSubject extends Controller {
 	}
 
 	@Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-	public static Result postIndex(String study_uri, String subject_uri) {
+	public Result postIndex(String study_uri, String subject_uri) {
 		return index(study_uri, subject_uri);
 	}
 }

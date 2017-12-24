@@ -5,13 +5,14 @@
 @import org.hadatac.console.controllers.metadata.DynamicFunctions
 @import java.net._
 @import org.hadatac.utils._
+@import com.typesafe.config.ConfigFactory
 
 <tr>
   <td>@if(indicator.getUri() != null) { @DynamicFunctions.replaceURLWithPrefix(indicator.getUri()) }</td>
   <td>@if(indicator.getLabel() != null) { @indicator.getLabel() }</td>
   <td>@if(indicator.getComment() != null) { @indicator.getComment() }</td>
   <td>
-    <!-- <a href="@Play.application().configuration().getString("hadatac.console.host_deploy")/hadatac/metadataacquisitions/viewIndicator?ind_uri=@DynamicFunctions.replaceURLWithPrefix(indicator.getUri())" class="btn-xs btn-primary" role="button">View</a> --> 
+    <!-- <a href="@ConfigFactory.load().getString("hadatac.console.host_deploy")/hadatac/metadataacquisitions/viewIndicator?ind_uri=@DynamicFunctions.replaceURLWithPrefix(indicator.getUri())" class="btn-xs btn-primary" role="button">View</a> --> 
     <a href="@org.hadatac.console.controllers.indicators.routes.EditIndicator.index(URLEncoder.encode(indicator.getUri(),"UTF-8"))" class="btn-xs btn-primary" role="button">Edit</a>
     <!-- @* <a href="@org.hadatac.console.controllers.objectcollections.routes.OCManagement.index(URLEncoder.encode(indicator.getUri(),"UTF-8"))" class="btn-xs btn-primary" role="button">Objects</a> *@ -->
     <a href="@org.hadatac.console.controllers.indicators.routes.DeleteIndicator.index(URLEncoder.encode(indicator.getUri(),"UTF-8"))" class="btn-xs btn-primary" role="button">Delete</a>

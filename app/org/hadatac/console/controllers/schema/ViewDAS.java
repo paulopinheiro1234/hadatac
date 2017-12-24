@@ -17,7 +17,7 @@ import be.objectify.deadbolt.java.actions.Restrict;
 public class ViewDAS extends Controller {
 
 	@Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-	public static Result index(String das_uri) {
+	public Result index(String das_uri) {
 		DataAcquisitionSchema das = null;
 		try {
 			if (das_uri != null) {
@@ -37,7 +37,7 @@ public class ViewDAS extends Controller {
 	}
 
 	@Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-	public static Result postIndex(String das_uri) {
+	public Result postIndex(String das_uri) {
 		return index(das_uri);
 	}
 }

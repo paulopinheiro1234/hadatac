@@ -31,7 +31,7 @@ import be.objectify.deadbolt.java.actions.Restrict;
 public class RefreshStudy extends Controller {
 
 	@Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    public static Result index(String study_uri) {
+    public Result index(String study_uri) {
         try {
             if (study_uri != null) {
             	study_uri = URLDecoder.decode(study_uri, "UTF-8");
@@ -92,7 +92,7 @@ public class RefreshStudy extends Controller {
     }
 
 	@Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    public static Result postIndex(String study_uri) {
+    public Result postIndex(String study_uri) {
         return index(study_uri);
     }
 }

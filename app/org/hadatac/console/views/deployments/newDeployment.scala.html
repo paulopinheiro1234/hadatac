@@ -12,7 +12,8 @@
 @import org.hadatac.console.views.html.deployments._
 @import org.hadatac.console.controllers.deployments._
 @import org.hadatac.console.controllers._
-@import org.hadatac.metadata.loader.ValueCellProcessing;
+@import org.hadatac.metadata.loader.ValueCellProcessing
+@import com.typesafe.config.ConfigFactory
 
 @main("New Deployment") {
 
@@ -44,7 +45,7 @@
                   nameInUri = replaceAll(nameInUri,"&","");
                   nameInUri = replaceAll(nameInUri,";","");
                   nameInUri = replaceAll(nameInUri,",","");
-                  var newUri = "@Play.application().configuration().getString("hadatac.community.ont_prefix")" + 
+                  var newUri = "@ConfigFactory.load().getString("hadatac.community.ont_prefix")" + 
                                "-kb:DPL-" + nameInUri; 
  	    	  document.getElementById('uri').value = newUri;
 	      }

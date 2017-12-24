@@ -1,3 +1,5 @@
+@(playAuth: com.feth.play.module.pa.PlayAuthenticate)
+
 @import org.hadatac.console.views.html._
 
 @main(Messages("playauthenticate.link.account.title")) {
@@ -5,7 +7,7 @@
     <h1>@Messages("playauthenticate.link.account.title")</h1>
     
     <p>
-	@_providerPartial()
+	@_providerPartial(playAuth)
     <br/>
     </p>
 }
