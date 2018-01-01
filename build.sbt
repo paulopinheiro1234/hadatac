@@ -37,7 +37,7 @@ evictionWarningOptions in update := EvictionWarningOptions.default.withWarnTrans
 resolvers += Resolver.sonatypeRepo("snapshots")
 
 lazy val root = project.in(file("."))
-  .enablePlugins(PlayJava, PlayEbean)
+  .enablePlugins(PlayJava)
   .settings(
     libraryDependencies ++= appDependencies
   )
@@ -45,10 +45,8 @@ lazy val root = project.in(file("."))
 libraryDependencies += guice
 libraryDependencies += openId
 
-//dependencyOverrides += "com.typesafe.play" % "play-ws_2.11" % "2.5.1"
-//dependencyOverrides += "com.typesafe.play" % "play_2.11" % "2.6.0"
 //dependencyOverrides += "com.typesafe.play" % "twirl-api_2.11" % "1.3.2"
-//dependencyOverrides += "com.typesafe.play" % "play-logback_2.11" % "2.5.1"
-//dependencyOverrides += "com.typesafe.play" % "play-server_2.11" % "2.5.1"
+//dependencyOverrides += "com.typesafe.play" % "play-logback_2.11" % "2.6.0"
+//dependencyOverrides += "com.typesafe.play" % "play-server_2.11" % "2.6.0"
 
 fork in run := true
