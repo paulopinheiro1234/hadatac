@@ -40,6 +40,7 @@ public class Templates {
     public static String DASTUDYID = ConfigProp.getPropertyValue(TEMPLATE_FILE, "DAStudyName");
     public static String EPILAB = ConfigProp.getPropertyValue(TEMPLATE_FILE, "Epi/Lab");
     public static String OWNEREMAIL = ConfigProp.getPropertyValue(TEMPLATE_FILE, "OwnerEmail");
+    public static String PERMISSIONURI = ConfigProp.getPropertyValue(TEMPLATE_FILE, "PermissionURI");
 
     // DASA, DASE, DASO Template (Part of SDD)                                                                       
     public static String LABEL = ConfigProp.getPropertyValue(TEMPLATE_FILE, "Label");     // also in PV                                                                                   

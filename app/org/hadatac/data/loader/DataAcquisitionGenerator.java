@@ -16,6 +16,7 @@ import org.hadatac.entity.pojo.TriggeringEvent;
 import org.hadatac.metadata.loader.ValueCellProcessing;
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
+
 import org.hadatac.utils.ConfigProp;
 import org.hadatac.utils.Templates;
 
@@ -36,21 +37,14 @@ public class DataAcquisitionGenerator extends BasicGenerator {
 
 	@Override
 	void initMapping() {
-		mapCol.clear();
-		mapCol.put("DataAcquisitionName", Templates.DATAACQUISITIONNAME);
-		mapCol.put("Method", Templates.METHOD);
-		mapCol.put("studyID", Templates.DASTUDYID);
-		mapCol.put("DataDictionaryName", Templates.DATADICTIONARYNAME);
-		mapCol.put("Epi/Lab", Templates.EPILAB);
-		mapCol.put("OwnerEmail", Templates.OWNEREMAIL);
 	}
 
 	private String getDataAcquisitionName(CSVRecord rec) {
-		return rec.get(mapCol.get("DataAcquisitionName"));
+		return getValueByColumnName(rec, Templates.DATAACQUISITIONNAME);
 	}
 
 	private String getOwnerEmail(CSVRecord rec) {
-		String ownerEmail = rec.get(mapCol.get("OwnerEmail"));
+		String ownerEmail = getValueByColumnName(rec, Templates.OWNEREMAIL);
 		if(ownerEmail.equalsIgnoreCase("NULL") || ownerEmail.isEmpty()) {
 			return "";
 		}
@@ -58,9 +52,13 @@ public class DataAcquisitionGenerator extends BasicGenerator {
 			return ownerEmail;
 		}
 	}
+	
+	private String getPermissionUri(CSVRecord rec) {
+		return getValueByColumnName(rec, Templates.PERMISSIONURI);
+	}
 
 	private String getMethod(CSVRecord rec) {
-		String method = rec.get(mapCol.get("Method"));
+		String method = getValueByColumnName(rec, Templates.METHOD);
 		if(method.equalsIgnoreCase("NULL") || method.isEmpty()) {
 			return "";
 		}
@@ -70,20 +68,22 @@ public class DataAcquisitionGenerator extends BasicGenerator {
 	}
 
 	private String getStudy(CSVRecord rec) {
-		return rec.get(mapCol.get("studyID")).equalsIgnoreCase("NULL")? "":rec.get(mapCol.get("studyID"));
+		return getValueByColumnName(rec, Templates.DASTUDYID).equalsIgnoreCase("NULL")? 
+				"" : getValueByColumnName(rec, Templates.DASTUDYID);
 	}
 
 	private String getDataDictionaryName(CSVRecord rec) {
-		String DDName = rec.get(mapCol.get("DataDictionaryName")).equalsIgnoreCase("NULL")? "":rec.get(mapCol.get("DataDictionaryName"));
+		String DDName = getValueByColumnName(rec, Templates.DATADICTIONARYNAME).equalsIgnoreCase("NULL")? 
+				"" : getValueByColumnName(rec, Templates.DATADICTIONARYNAME);
 		return DDName.replace("SDD-","");
 	}
 
 	private Boolean isEpiData(CSVRecord rec) {
-		return rec.get(mapCol.get("Epi/Lab")).equalsIgnoreCase("EPI");
+		return getValueByColumnName(rec, Templates.EPILAB).equalsIgnoreCase("EPI");
 	}
 
 	private Boolean isLabData(CSVRecord rec) {
-		return rec.get(mapCol.get("Epi/Lab")).equalsIgnoreCase("LAB");
+		return getValueByColumnName(rec, Templates.EPILAB).equalsIgnoreCase("LAB");
 	}
 
 	@Override
@@ -110,14 +110,22 @@ public class DataAcquisitionGenerator extends BasicGenerator {
 		if (ownerEmail.isEmpty()) {
 			throw new Exception(String.format("Owner Email is not specified for Row %s!", row_number));
 		}
+		
+		String permissionUri = getPermissionUri(rec);
+		if (permissionUri.isEmpty()) {
+			throw new Exception(String.format("Permission URI is not specified for Row %s!", row_number));
+		}
 
-		String depolymentUri = ValueCellProcessing.replacePrefixEx(kbPrefix + "DPL-" + getDataAcquisitionName(rec));
-		createDataAcquisition(row, ownerEmail, depolymentUri);
+		String deploymentUri = ValueCellProcessing.replacePrefixEx(kbPrefix + "DPL-" + getDataAcquisitionName(rec));
+		createDataAcquisition(row, ownerEmail, permissionUri, deploymentUri);
 
 		return row;
 	}
 
-	void createDataAcquisition(Map<String, Object> row, String ownerEmail, String deploymentUri) throws Exception {
+	void createDataAcquisition(Map<String, Object> row, 
+			String ownerEmail, 
+			String permissionUri, 
+			String deploymentUri) throws Exception {
 		DataAcquisition dataAcquisition = new DataAcquisition();
 		dataAcquisition.setUri(ValueCellProcessing.replacePrefixEx((String)row.get("hasURI")));
 		dataAcquisition.setLabel(ValueCellProcessing.replacePrefixEx((String)row.get("rdfs:label")));
@@ -134,7 +142,7 @@ public class DataAcquisitionGenerator extends BasicGenerator {
 			throw new Exception(String.format("The specified owner email %s is not a valid user!", ownerEmail));
 		} else {
 			dataAcquisition.setOwnerUri(user.getUri());
-			dataAcquisition.setPermissionUri(user.getUri());
+			dataAcquisition.setPermissionUri(permissionUri);
 		}
 
 		String pattern = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'";
@@ -167,5 +175,4 @@ public class DataAcquisitionGenerator extends BasicGenerator {
 
 		dataAcquisition.save();
 	}
-
 }
