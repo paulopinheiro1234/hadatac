@@ -29,7 +29,7 @@ public class NewOC extends Controller {
 		List<ObjectCollection> domainList = new ArrayList<ObjectCollection>();
 		List<ObjectCollection> locationList = new ArrayList<ObjectCollection>();
 		List<ObjectCollection> timeList = new ArrayList<ObjectCollection>();
-		List<ObjectCollection> objList = ObjectCollection.findByStudy(study);
+		List<ObjectCollection> objList = ObjectCollection.findByStudyUri(std_uri);
 		for (ObjectCollection oc : objList) {
 			if (oc.isDomainCollection()) {
 				domainList.add(oc);

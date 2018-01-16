@@ -48,7 +48,7 @@ public class EditOC extends Controller {
 		List<ObjectCollection> domainList = new ArrayList<ObjectCollection>();
 		List<ObjectCollection> locationList = new ArrayList<ObjectCollection>();
 		List<ObjectCollection> timeList = new ArrayList<ObjectCollection>();
-		List<ObjectCollection> objList = ObjectCollection.findByStudy(study);
+		List<ObjectCollection> objList = ObjectCollection.findByStudyUri(std_uri);
 		for (ObjectCollection objc : objList) {
 			if (objc.isDomainCollection() && !objc.getUri().equals(oc.getUri())) {
 				domainList.add(objc);

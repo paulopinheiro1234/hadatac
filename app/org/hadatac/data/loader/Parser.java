@@ -1,4 +1,4 @@
-package org.hadatac.data.loader.ccsv;
+package org.hadatac.data.loader;
 
 import java.io.IOException;
 import java.time.Instant;
@@ -15,13 +15,11 @@ import org.apache.commons.csv.CSVRecord;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.impl.HttpSolrClient;
-import org.hadatac.data.loader.AnnotationWorker;
 import org.hadatac.data.loader.util.FileFactory;
 import org.hadatac.data.model.ParsingResult;
 import org.hadatac.entity.pojo.DataAcquisition;
 import org.hadatac.entity.pojo.DataAcquisitionSchema;
 import org.hadatac.entity.pojo.DataAcquisitionSchemaAttribute;
-import org.hadatac.entity.pojo.DataAcquisitionSchemaEvent;
 import org.hadatac.entity.pojo.DataAcquisitionSchemaObject;
 import org.hadatac.entity.pojo.DASVirtualObject;
 import org.hadatac.entity.pojo.DataFile;

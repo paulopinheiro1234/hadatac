@@ -25,9 +25,9 @@ public class OCForceFieldGraph {
 		addCollectionNodes(mode, study);
 	}
 
-	private void addCollectionNodes(String mode, Study study){
+	private void addCollectionNodes(String mode, Study study) {
 
-		List<ObjectCollection> ocList = ObjectCollection.findByStudy(study);
+		List<ObjectCollection> ocList = ObjectCollection.findByStudyUri(study.getUri());
 		for (ObjectCollection oc : ocList) {			
 			int type = -1;
 			if ((mode.equals("full")  || mode.equals("space") || mode.equals("collections")) && (oc.isLocationCollection())) {

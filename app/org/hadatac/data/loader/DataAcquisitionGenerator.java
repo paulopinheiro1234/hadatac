@@ -5,13 +5,16 @@ import java.lang.String;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.csv.CSVRecord;
+import org.apache.poi.util.SystemOutLogger;
 import org.hadatac.console.models.SysUser;
 import org.hadatac.entity.pojo.DataAcquisition;
 import org.hadatac.entity.pojo.Deployment;
 import org.hadatac.entity.pojo.Measurement;
+import org.hadatac.entity.pojo.ObjectCollection;
 import org.hadatac.entity.pojo.TriggeringEvent;
 import org.hadatac.metadata.loader.ValueCellProcessing;
 import org.joda.time.DateTime;
@@ -117,7 +120,7 @@ public class DataAcquisitionGenerator extends BasicGenerator {
 		}
 
 		String deploymentUri = ValueCellProcessing.replacePrefixEx(kbPrefix + "DPL-" + getDataAcquisitionName(rec));
-		createDataAcquisition(row, ownerEmail, permissionUri, deploymentUri);
+		createDataAcquisition(row, ownerEmail, permissionUri, deploymentUri, isEpiData(rec));
 
 		return row;
 	}
@@ -125,54 +128,62 @@ public class DataAcquisitionGenerator extends BasicGenerator {
 	void createDataAcquisition(Map<String, Object> row, 
 			String ownerEmail, 
 			String permissionUri, 
-			String deploymentUri) throws Exception {
-		DataAcquisition dataAcquisition = new DataAcquisition();
-		dataAcquisition.setUri(ValueCellProcessing.replacePrefixEx((String)row.get("hasURI")));
-		dataAcquisition.setLabel(ValueCellProcessing.replacePrefixEx((String)row.get("rdfs:label")));
-		dataAcquisition.setDeploymentUri(ValueCellProcessing.replacePrefixEx((String)row.get("hasco:hasDeployment")));
-		dataAcquisition.setMethodUri(ValueCellProcessing.replacePrefixEx((String)row.get("hasco:hasMethod")));
-		dataAcquisition.setStudyUri(ValueCellProcessing.replacePrefixEx((String)row.get("hasco:isDataAcquisitionOf")));
-		dataAcquisition.setSchemaUri(ValueCellProcessing.replacePrefixEx((String)row.get("hasco:hasSchema")));
-		dataAcquisition.setTriggeringEvent(TriggeringEvent.INITIAL_DEPLOYMENT);
-		dataAcquisition.setNumberDataPoints(
-				Measurement.getNumByDataAcquisition(dataAcquisition));
-
+			String deploymentUri,
+			boolean isEpiData) throws Exception {
+		DataAcquisition da = new DataAcquisition();
+		da.setUri(ValueCellProcessing.replacePrefixEx((String)row.get("hasURI")));
+		da.setLabel(ValueCellProcessing.replacePrefixEx((String)row.get("rdfs:label")));
+		da.setDeploymentUri(ValueCellProcessing.replacePrefixEx((String)row.get("hasco:hasDeployment")));
+		da.setMethodUri(ValueCellProcessing.replacePrefixEx((String)row.get("hasco:hasMethod")));
+		da.setStudyUri(ValueCellProcessing.replacePrefixEx((String)row.get("hasco:isDataAcquisitionOf")));
+		da.setSchemaUri(ValueCellProcessing.replacePrefixEx((String)row.get("hasco:hasSchema")));
+		da.setTriggeringEvent(TriggeringEvent.INITIAL_DEPLOYMENT);
+		da.setNumberDataPoints(Measurement.getNumByDataAcquisition(da));
+		
+		for (ObjectCollection oc : ObjectCollection.findByStudyUri(da.getStudyUri())) {
+			if ((isEpiData && oc.getTypeUri().equals(ValueCellProcessing.replacePrefixEx("hasco:SubjectGroup")))
+					|| (!isEpiData && oc.getTypeUri().equals(ValueCellProcessing.replacePrefixEx("hasco:SampleCollection")))) {
+				da.setGlobalScopeUri(oc.getUri());
+				System.out.println("Set GlobalScopeUri to: " + oc.getUri());
+				break;
+			}
+		}
+		
 		SysUser user = SysUser.findByEmail(ownerEmail);
 		if (null == user) {
 			throw new Exception(String.format("The specified owner email %s is not a valid user!", ownerEmail));
 		} else {
-			dataAcquisition.setOwnerUri(user.getUri());
-			dataAcquisition.setPermissionUri(permissionUri);
+			da.setOwnerUri(user.getUri());
+			da.setPermissionUri(permissionUri);
 		}
 
 		String pattern = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'";
 		if (startTime.isEmpty()) {
-			dataAcquisition.setStartedAt(new DateTime(new Date()));
-		}
-		else {
-			dataAcquisition.setStartedAt(DateTimeFormat.forPattern(pattern).parseDateTime(startTime));
+			da.setStartedAt(new DateTime(new Date()));
+		} else {
+			da.setStartedAt(DateTimeFormat.forPattern(pattern).parseDateTime(startTime));
 		}
 
 		Deployment deployment = Deployment.find(deploymentUri);
 		if (deployment != null) {
-			dataAcquisition.setDeploymentUri(deploymentUri);
+			da.setDeploymentUri(deploymentUri);
 			if (deployment.getPlatform() != null) {
-				dataAcquisition.setPlatformUri(deployment.getPlatform().getUri());
-				dataAcquisition.setPlatformName(deployment.getPlatform().getLabel());
+				da.setPlatformUri(deployment.getPlatform().getUri());
+				da.setPlatformName(deployment.getPlatform().getLabel());
 			} else {
 				throw new Exception(String.format("No platform of Deployment %s is specified!", deploymentUri));
 			}
 			if (deployment.getInstrument() != null) {
-				dataAcquisition.setInstrumentUri(deployment.getInstrument().getUri());
-				dataAcquisition.setInstrumentModel(deployment.getInstrument().getLabel());
+				da.setInstrumentUri(deployment.getInstrument().getUri());
+				da.setInstrumentModel(deployment.getInstrument().getLabel());
 			} else {
 				throw new Exception(String.format("No instrument of Deployment %s is specified!", deploymentUri));
 			}
-			dataAcquisition.setStartedAtXsdWithMillis(deployment.getStartedAt());
+			da.setStartedAtXsdWithMillis(deployment.getStartedAt());
 		} else {
 			throw new Exception(String.format("Deployment %s cannot be found!", deploymentUri));
 		}
 
-		dataAcquisition.save();
+		da.save();
 	}
 }

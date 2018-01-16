@@ -18,7 +18,6 @@ import org.hadatac.console.views.html.dataacquisitionmanagement.*;
 import org.hadatac.entity.pojo.DataAcquisition;
 import org.hadatac.entity.pojo.DataFile;
 import org.hadatac.entity.pojo.ObjectCollection;
-import org.hadatac.entity.pojo.Study;
 import org.hadatac.metadata.loader.ValueCellProcessing;
 import org.hadatac.utils.ConfigProp;
 
@@ -66,7 +65,6 @@ public class DataAcquisitionScope extends Controller {
 	String globalScopeUri = null;
 	List<String> localScope = null;
 	List<String> localScopeUri = null;
-	String labelsStr = "";
 	String path = "";
 	String labels = "";
 	
@@ -105,10 +103,7 @@ public class DataAcquisitionScope extends Controller {
 	    //System.out.println("# of fields: " + fields.length);
 	}
 	
-	Study study = Study.find(da.getStudyUri());
-	//System.out.println("StudygetUri(): " + study.getUri());
-	//System.out.println("Study name: " + study.getLabel());
-	List<ObjectCollection> ocList = ObjectCollection.findDomainByStudy(study);
+	List<ObjectCollection> ocList = ObjectCollection.findDomainByStudyUri(da.getStudyUri());
 	//System.out.println("Collection list size: " + ocList.size());
 	
 	return ok(editScope.render(file_name, da_uri, ocList, Arrays.asList(fields), globalScope, globalScopeUri, localScope, localScopeUri));

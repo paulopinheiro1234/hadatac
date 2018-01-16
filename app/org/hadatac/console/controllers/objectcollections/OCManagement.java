@@ -27,7 +27,7 @@ public class OCManagement extends Controller {
 		}
 		Study std = Study.find(std_uri);
 
-		List<ObjectCollection> ocList = ObjectCollection.findByStudy(std);
+		List<ObjectCollection> ocList = ObjectCollection.findByStudyUri(std_uri);
 
 		return ok(objectCollectionManagement.render(filename, da_uri, std, ocList));
 	}

@@ -25,7 +25,6 @@ import org.apache.jena.rdf.model.Property;
 import org.apache.jena.rdf.model.Resource;
 import org.hadatac.console.controllers.annotator.AnnotationLog;
 import org.hadatac.data.api.DataFactory;
-import org.hadatac.data.loader.ccsv.Parser;
 import org.hadatac.data.loader.util.Arguments;
 import org.hadatac.data.loader.util.FileFactory;
 import org.hadatac.data.model.ParsingResult;
@@ -314,7 +313,7 @@ public class AnnotationWorker {
 
 		try {
 			GeneralGenerator generalGenerator = new GeneralGenerator();
-			System.out.println("Calling DASchemaGenerator");
+			System.out.println("Calling GeneralGenerator");
 			Map<String, Object> row = new HashMap<String, Object>();
 			row.put("hasURI", kbPrefix + "DAS-" + file.getName().replace("SDD-","").replace(".csv",""));
 			row.put("a", "hasco:DASchema");

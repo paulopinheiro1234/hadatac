@@ -437,9 +437,9 @@ public class ObjectCollection extends HADatAcThing {
 		return oc_list;
 	}
 
-	public static List<ObjectCollection> findDomainByStudy(Study study) {
+	public static List<ObjectCollection> findDomainByStudyUri(String studyUri) {
 		List<ObjectCollection> ocList = new ArrayList<ObjectCollection>();
-		for (ObjectCollection oc : ObjectCollection.findByStudy(study)) {
+		for (ObjectCollection oc : ObjectCollection.findByStudyUri(studyUri)) {
 			if (oc.isDomainCollection()) {
 				ocList.add(oc);
 			}
@@ -447,8 +447,8 @@ public class ObjectCollection extends HADatAcThing {
 		return ocList;
 	}
 
-	public static List<ObjectCollection> findByStudy(Study study) {
-		if (study == null) {
+	public static List<ObjectCollection> findByStudyUri(String studyUri) {
+		if (studyUri == null) {
 			return null;
 		}
 		List<ObjectCollection> ocList = new ArrayList<ObjectCollection>();
@@ -457,7 +457,7 @@ public class ObjectCollection extends HADatAcThing {
 				"SELECT ?uri WHERE { " + 
 				"   ?ocType rdfs:subClassOf+ hasco:ObjectCollection . " +
 				"   ?uri a ?ocType .  " +
-				"   ?uri hasco:isMemberOf  <" + study.getUri() + "> . " +
+				"   ?uri hasco:isMemberOf  <" + studyUri + "> . " +
 				" } ";
 		Query query = QueryFactory.create(queryString);
 		QueryExecution qexec = QueryExecutionFactory.sparqlService(
@@ -475,20 +475,21 @@ public class ObjectCollection extends HADatAcThing {
 		return ocList;
 	}
 
-	public static String findByStudyJSON(Study study) {
-		if (study == null) {
+	public static String findByStudyUriJSON(String studyUri) {
+		if (studyUri == null) {
 			return null;
 		}
 		String queryString = NameSpaces.getInstance().printSparqlNameSpaceList() + 
 				"SELECT ?uri ?label WHERE { " + 
 				"   ?ocType rdfs:subClassOf+ hasco:ObjectCollection . " +
 				"   ?uri a ?ocType .  " +
-				"   ?uri hasco:isMemberOf  <" + study.getUri() + "> . " +
+				"   ?uri hasco:isMemberOf  <" + studyUri + "> . " +
 				"   OPTIONAL { ?uri rdfs:label ?label } . " +
 				" } ";
 		Query query = QueryFactory.create(queryString);
 
-		QueryExecution qexec = QueryExecutionFactory.sparqlService(Collections.getCollectionsName(Collections.METADATA_SPARQL), query);
+		QueryExecution qexec = QueryExecutionFactory.sparqlService(
+				Collections.getCollectionsName(Collections.METADATA_SPARQL), query);
 		ResultSet results = qexec.execSelect();
 
 		ByteArrayOutputStream outputStream = new ByteArrayOutputStream();

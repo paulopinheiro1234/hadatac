@@ -30,12 +30,10 @@ import org.hadatac.entity.pojo.StudyObject;
 public class SampleSubjectMapper extends BasicGenerator {
 	
 	final String kbPrefix = ConfigProp.getKbPrefix();
-	private String dataAcquisition = "";
 	private int counter = 1; //starting index number
 
 	StudyObject obj = null;
 
-	private String studyUri = "";
 	private String hasScopeUri = "";    
 	private List<String> scopeUris = new ArrayList<String>();
 	private List<String> spaceScopeUris = new ArrayList<String>();

@@ -174,7 +174,6 @@ public class PrepareIngestion extends Controller {
 		String globalScopeUri = null;
 		List<String> localScope = null;
 		List<String> localScopeUri = null;
-		String labelsStr = "";
 		String path = "";
 		String labels = "";
 
@@ -214,13 +213,13 @@ public class PrepareIngestion extends Controller {
 		}
 
 		Study study = Study.find(std_uri);
-		System.out.println("Study uri: " + std_uri);
-		System.out.println("StudygetUri(): " + study.getUri());
+		System.out.println("Study uri: " + study.getUri());
 		System.out.println("Study name: " + study.getLabel());
-		List<ObjectCollection> ocList = ObjectCollection.findDomainByStudy(study);
+		List<ObjectCollection> ocList = ObjectCollection.findDomainByStudyUri(std_uri);
 		System.out.println("Collection list size: " + ocList.size());
 
-		return ok(selectScope.render(file_name, da_uri, ocList, Arrays.asList(fields), globalScope, globalScopeUri, localScope, localScopeUri));
+		return ok(selectScope.render(file_name, da_uri, ocList, Arrays.asList(fields), 
+				globalScope, globalScopeUri, localScope, localScopeUri));
 	}
 
 	@Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
