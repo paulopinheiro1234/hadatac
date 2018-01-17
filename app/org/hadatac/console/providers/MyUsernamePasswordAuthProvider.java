@@ -1,12 +1,11 @@
 package org.hadatac.console.providers;
 
 import com.feth.play.module.mail.Mailer.Mail.Body;
+import com.feth.play.module.mail.Mailer.MailerFactory;
 import com.feth.play.module.pa.PlayAuthenticate;
 import com.feth.play.module.pa.providers.password.UsernamePasswordAuthProvider;
 import com.feth.play.module.pa.providers.password.UsernamePasswordAuthUser;
-import com.feth.play.module.mail.Mailer.MailerFactory;
 
-import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
 
 import org.hadatac.console.controllers.routes;
@@ -23,7 +22,6 @@ import play.data.validation.Constraints.Email;
 import play.data.validation.Constraints.MinLength;
 import play.data.validation.Constraints.Required;
 import play.i18n.Lang;
-import play.i18n.Messages;
 import play.i18n.MessagesApi;
 import play.inject.ApplicationLifecycle;
 import play.mvc.Call;
@@ -59,9 +57,6 @@ public class MyUsernamePasswordAuthProvider extends
 	
 	@Inject
 	MessagesApi messagesApi;
-	
-	@Inject
-	Config config;
 
 	@Override
 	protected List<String> neededSettingKeys() {
@@ -158,20 +153,15 @@ public class MyUsernamePasswordAuthProvider extends
 
 	private final Form<MySignup> SIGNUP_FORM;
 	private final Form<MyLogin> LOGIN_FORM;
-	private final MyLogin login;
-	private final MySignup signup;
 
 	@Inject
 	public MyUsernamePasswordAuthProvider(
 			final PlayAuthenticate auth, 
+			final FormFactory formFactory,
 			final ApplicationLifecycle lifecycle,
-			final MailerFactory mailerFactory,
-			final MyLogin login,
-			final MySignup signup) {
+			final MailerFactory mailerFactory) {
 		super(auth, lifecycle, mailerFactory);
 
-		this.login = login;
-		this.signup = signup;
 		this.SIGNUP_FORM = formFactory.form(MySignup.class);
 		this.LOGIN_FORM = formFactory.form(MyLogin.class);
 	}
@@ -246,20 +236,24 @@ public class MyUsernamePasswordAuthProvider extends
 			}
 		}
 	}
-
-	@Override
-	protected Call userExists(final UsernamePasswordAuthUser authUser) {
-		return routes.Signup.exists();
-	}
 	
 	@Override
 	protected MyUsernamePasswordAuthProvider.MyLogin getLogin(final Context ctx) {
-		return this.login;
+		Context.current.set(ctx);
+		final Form<MyLogin> filledForm = LOGIN_FORM.bindFromRequest();
+		return filledForm.get();
 	}
 	
 	@Override
 	protected MyUsernamePasswordAuthProvider.MySignup getSignup(final Context ctx) {
-		return this.signup;
+		Context.current.set(ctx);
+		final Form<MySignup> filledForm = SIGNUP_FORM.bindFromRequest();
+		return filledForm.get();
+	}
+
+	@Override
+	protected Call userExists(final UsernamePasswordAuthUser authUser) {
+		return routes.Signup.exists();
 	}
 
 	@Override
@@ -306,7 +300,7 @@ public class MyUsernamePasswordAuthProvider extends
 	protected Body getVerifyEmailMailingBody(final String token,
 			final MyUsernamePasswordAuthUser user, final Context ctx) {
 
-		final boolean isSecure = this.config.getBoolean(
+		final boolean isSecure = getConfiguration().getBoolean(
 				SETTING_KEY_VERIFICATION_LINK_SECURE);
 		final String url = routes.Signup.verify(token).absoluteURL(
 				isSecure, ConfigFactory.load().getString("hadatac.console.base_url"));
