@@ -102,7 +102,7 @@ public class DataAcquisitionManagement extends Controller {
 	public Result processForm() {
 		final SysUser sysUser = AuthApplication.getLocalUser(session());
 
-		Form<DataAcquisitionForm> form = Form.form(DataAcquisitionForm.class).bindFromRequest();
+		Form<DataAcquisitionForm> form = formFactory.form(DataAcquisitionForm.class).bindFromRequest();
 		DataAcquisitionForm data = form.get();
 
 		if (form.hasErrors()) {

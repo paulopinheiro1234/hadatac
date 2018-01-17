@@ -121,6 +121,8 @@ public class MyUsernamePasswordAuthProvider extends
 		
 		private MessagesApi messagesApi;
 
+		public MySignup() {}
+		
 	    @Inject
 	    public MySignup(MessagesApi messagesApi) {
 	        this.messagesApi = messagesApi;

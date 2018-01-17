@@ -5,38 +5,28 @@ import static org.junit.Assert.assertTrue;
 
 import org.hadatac.console.controllers.triplestore.UserManagement;
 import org.hadatac.console.models.SysUser;
-import org.hadatac.console.providers.MyUsernamePasswordAuthProvider.MySignup;
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
 import org.junit.Test;
 
-import com.feth.play.module.pa.providers.password.UsernamePasswordAuthProvider;
-
-import play.data.Form;
-import play.mvc.Http.Context;
+import play.Application;
+import play.inject.guice.GuiceApplicationBuilder;
 import play.mvc.Http.RequestBuilder;
 import play.test.Helpers;
+import play.test.WithApplication;
 import static play.mvc.Http.Status.OK;
 import static play.mvc.Http.Status.SEE_OTHER;
 
 import java.util.Map;
 import java.util.HashMap;
 
-import play.test.FakeApplication;
 
-public class UserAuthTest {
-	public static FakeApplication app;
+public class UserAuthTest extends WithApplication{
+	
+	public static Application app;
 
-	@BeforeClass
-	public static void startApp() {
-	    app = Helpers.fakeApplication(Helpers.inMemoryDatabase());
-	    Helpers.start(app);
-	}
-
-	@AfterClass
-	public static void stopApp() {
-	    Helpers.stop(app);
-	}
+	@Override
+	protected Application provideApplication() {
+	    return new GuiceApplicationBuilder().build();
+	  }
 	
 	@Test
 	public void testRegisterUser() {
@@ -50,21 +40,15 @@ public class UserAuthTest {
 	
 	@Test
 	public void testSignupUnregisteredUser() {
-		MySignup signup = new MySignup();
-		signup.email = "test@gmail.com";
-		signup.name = "Test";
-		signup.password = "password";
-		signup.repeatPassword = signup.password;
-		
-		Form<MySignup> filledForm = Form.form(MySignup.class).fill(signup);
+		String email = "test@gmail.com";
 		if (SysUser.existsSolr()) {
-			assertFalse(UserManagement.isPreRegistered(filledForm.get().email));
+			assertFalse(UserManagement.isPreRegistered(email));
 		}
 	}
 	
 	@Test
 	public void testSignupRegisteredUser() {
-		String email = "test@gmail.com";
+		String email = "zcjasonliang@gmail.com";
 		Map<String, String> data = new HashMap<String, String>();
 		data.put("email", email);
 		data.put("name", "Test");
@@ -72,7 +56,7 @@ public class UserAuthTest {
 		data.put("repeatPassword", "password");
 		
 		if (SysUser.existsSolr()) {
-			assertFalse(UserManagement.isPreRegistered(email));
+			assertTrue(UserManagement.isPreRegistered(email));
 		}
 		
 		RequestBuilder request = Helpers.fakeRequest()
@@ -80,7 +64,7 @@ public class UserAuthTest {
 				.uri("/hadatac/signup")
 				.bodyForm(data);
 		
-		int status = UsernamePasswordAuthProvider.handleSignup(new Context(request)).status();
+		int status = Helpers.route(request).status();
 		if (status != SEE_OTHER) {
 			assertTrue(status == OK);
 		}
