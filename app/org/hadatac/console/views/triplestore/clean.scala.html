@@ -8,6 +8,7 @@
 @import org.hadatac.utils._
 @import java.net._
 @import play._
+@import com.typesafe.config.ConfigFactory
 
 @main("Repository Management") {
  
@@ -26,8 +27,8 @@
  
                  <h4>Configuration</h4>
                  <div id="rcorners">  
-		      SOLR Home: <b><font color="blue">@Play.application().configuration().getString("hadatac.solr.home")</font></b> <br>
-                      Base Ontology: <b><font color="blue">@Play.application().configuration().getString("hadatac.community.ont_prefix")</font></b> <br>
+		      SOLR Home: <b><font color="blue">@ConfigFactory.load().getString("hadatac.solr.home")</font></b> <br>
+                      Base Ontology: <b><font color="blue">@ConfigFactory.load().getString("hadatac.community.ont_prefix")</font></b> <br>
                  </div>
 
 		 <br>

@@ -6,6 +6,8 @@ import java.net.URLEncoder;
 import java.util.List;
 import java.util.Arrays;
 import java.util.ArrayList;
+import javax.inject.Inject;
+
 import org.hadatac.utils.ConfigProp;
 import org.hadatac.utils.State;
 import org.hadatac.console.views.html.annotator.*;
@@ -30,11 +32,15 @@ import be.objectify.deadbolt.java.actions.Restrict;
 import play.data.Form;
 import play.mvc.*;
 import play.mvc.Result;
+import play.data.FormFactory;
 
 public class PrepareIngestion extends Controller {
+	
+	@Inject
+	private FormFactory formFactory;
 
 	@Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-	public static Result create(String file_name, String da_uri) {
+	public Result create(String file_name, String da_uri) {
 
 		if (session().get("LabKeyUserName") == null && session().get("LabKeyPassword") == null) {
 			return redirect(org.hadatac.console.controllers.triplestore.routes.LoadKB.logInLabkey(
@@ -114,12 +120,12 @@ public class PrepareIngestion extends Controller {
 	}
 
 	@Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-	public static Result postCreate(String file_name, String da_uri) {
+	public Result postCreate(String file_name, String da_uri) {
 		return create(file_name, da_uri);
 	}
 	
 	@Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-	public static Result reconfigure(String file_name, String da_uri) {
+	public Result reconfigure(String file_name, String da_uri) {
 		DataAcquisition dataAcquisition = DataAcquisition.findByUri(da_uri);
 		if (null != dataAcquisition) {
 			dataAcquisition.setStatus(0);
@@ -129,7 +135,7 @@ public class PrepareIngestion extends Controller {
 	}
 
 	@Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-	public static Result refine(String file_name, String da_uri, String message) {
+	public Result refine(String file_name, String da_uri, String message) {
 
 		DataAcquisition da = null;
 
@@ -146,12 +152,12 @@ public class PrepareIngestion extends Controller {
 	}
 
 	@Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-	public static Result postRefine(String file_name, String da_uri, String message) {
+	public Result postRefine(String file_name, String da_uri, String message) {
 		return refine(file_name, da_uri, message);
 	}
 
 	@Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-	public static Result selectStudy(String file_name, String da_uri) {
+	public Result selectStudy(String file_name, String da_uri) {
 		if (session().get("LabKeyUserName") == null && session().get("LabKeyPassword") == null) {
 			return redirect(org.hadatac.console.controllers.triplestore.routes.LoadKB.logInLabkey(
 					routes.PrepareIngestion.selectStudy(file_name,da_uri).url()));
@@ -163,7 +169,7 @@ public class PrepareIngestion extends Controller {
 	}
 
 	@Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-	public static Result selectScope(String file_name, String da_uri, String std_uri) {
+	public Result selectScope(String file_name, String da_uri, String std_uri) {
 		if (session().get("LabKeyUserName") == null && session().get("LabKeyPassword") == null) {
 			return redirect(org.hadatac.console.controllers.triplestore.routes.LoadKB.logInLabkey(
 					routes.PrepareIngestion.selectScope(file_name,da_uri, std_uri).url()));
@@ -223,7 +229,7 @@ public class PrepareIngestion extends Controller {
 	}
 
 	@Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-	public static Result selectDeployment(String file_name, String da_uri) {
+	public Result selectDeployment(String file_name, String da_uri) {
 
 		State active = new State(State.ACTIVE);
 
@@ -233,7 +239,7 @@ public class PrepareIngestion extends Controller {
 	}
 
 	@Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-	public static Result selectSchema(String file_name, String da_uri) {
+	public Result selectSchema(String file_name, String da_uri) {
 
 		List<DataAcquisitionSchema> schemas = DataAcquisitionSchema.findAll();
 
@@ -241,8 +247,8 @@ public class PrepareIngestion extends Controller {
 	}
 
 	@Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-	public static Result processSelectStudy(String file_name, String da_uri) {
-		Form<AssignOptionForm> form = Form.form(AssignOptionForm.class).bindFromRequest();
+	public Result processSelectStudy(String file_name, String da_uri) {
+		Form<AssignOptionForm> form = formFactory.form(AssignOptionForm.class).bindFromRequest();
 		String message = "";
 		AssignOptionForm data = form.get();
 		String std_uri = data.getOption();
@@ -277,8 +283,8 @@ public class PrepareIngestion extends Controller {
 	}
 
 	@Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-	public static Result processSelectScope(String file_name, String da_uri) {
-		Form<SelectScopeForm> form = Form.form(SelectScopeForm.class).bindFromRequest();
+	public Result processSelectScope(String file_name, String da_uri) {
+		Form<SelectScopeForm> form = formFactory.form(SelectScopeForm.class).bindFromRequest();
 		String message = "";
 		SelectScopeForm data = form.get();
 		String globalScopeUri = data.getNewGlobalScopeUri();
@@ -316,8 +322,8 @@ public class PrepareIngestion extends Controller {
 	}
 
 	@Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-	public static Result processSelectDeployment(String file_name, String da_uri) {
-		Form<AssignOptionForm> form = Form.form(AssignOptionForm.class).bindFromRequest();
+	public Result processSelectDeployment(String file_name, String da_uri) {
+		Form<AssignOptionForm> form = formFactory.form(AssignOptionForm.class).bindFromRequest();
 		String message = "";
 		AssignOptionForm data = form.get();
 		String dep_uri = data.getOption();
@@ -352,8 +358,8 @@ public class PrepareIngestion extends Controller {
 	}
 
 	@Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-	public static Result processSelectSchema(String file_name, String da_uri) {
-		Form<AssignOptionForm> form = Form.form(AssignOptionForm.class).bindFromRequest();
+	public Result processSelectSchema(String file_name, String da_uri) {
+		Form<AssignOptionForm> form = formFactory.form(AssignOptionForm.class).bindFromRequest();
 		String message = "";
 		AssignOptionForm data = form.get();
 		String das_uri = data.getOption();
@@ -388,7 +394,7 @@ public class PrepareIngestion extends Controller {
 	}
 
 	@Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-	public static Result removeAssociation(String file_name, String da_uri, String daComponent) {
+	public Result removeAssociation(String file_name, String da_uri, String daComponent) {
 
 		String message = "";
 		DataAcquisition da = DataAcquisition.findByUri(da_uri);
@@ -433,7 +439,7 @@ public class PrepareIngestion extends Controller {
 	}
 
 	@Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-	public static Result completeDataAcquisition(String file_name, String da_uri) {
+	public Result completeDataAcquisition(String file_name, String da_uri) {
 
 		String message = "";
 		DataAcquisition da = DataAcquisition.findByUri(da_uri);

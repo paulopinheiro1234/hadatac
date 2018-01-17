@@ -14,20 +14,15 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-import play.*;
 import play.data.Form;
+import play.data.FormFactory;
 import play.mvc.*;
-import play.mvc.Http.MultipartFormData;
 import play.mvc.Http.MultipartFormData.FilePart;
+
+import javax.inject.Inject;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
-import org.apache.http.HttpResponse;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.entity.StringEntity;
-import org.apache.http.impl.client.HttpClientBuilder;
-import org.apache.jena.rdf.model.Model;
 import org.apache.jena.riot.RDFDataMgr;
 import org.hadatac.console.controllers.AuthApplication;
 import org.hadatac.console.providers.MyUsernamePasswordAuthProvider;
@@ -54,6 +49,8 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 
+import com.typesafe.config.ConfigFactory;
+
 import be.objectify.deadbolt.java.actions.Group;
 import be.objectify.deadbolt.java.actions.Restrict;
 
@@ -62,6 +59,16 @@ public class UserManagement extends Controller {
 	private static final String UPLOAD_NAME = "tmp/uploads/users-spreadsheet.xls";
 	private static final String UPLOAD_NAME_TTL = "tmp/uploads/user-graph.ttl";
 	private static final String UPLOAD_NAME_JSON = "tmp/uploads/user-auth.json";
+	
+	@Inject
+	private static FormFactory formFactory;
+	
+	private final MyUsernamePasswordAuthProvider userPaswAuthProvider;
+
+	@Inject
+	public UserManagement(final MyUsernamePasswordAuthProvider userPaswAuthProvider) {
+		this.userPaswAuthProvider = userPaswAuthProvider;
+	}
 	
 	public static String getSpreadSheetPath(){
 		return UPLOAD_NAME;
@@ -76,37 +83,37 @@ public class UserManagement extends Controller {
 	}
 
 	@Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
-	public static Result index(String oper) {
+	public Result index(String oper) {
 		return ok(users.render(oper, "", User.find(), UserGroup.find(), ""));
 	}
 
 	@Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
-	public static Result postIndex(String oper) {
+	public Result postIndex(String oper) {
 		return index(oper);
 	}
 
 	@Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
-	public static Result onLinePreRegistration(String oper) {
+	public Result onLinePreRegistration(String oper) {
 		return ok(preregister.render(oper, UserGroup.find()));
 	}
 
 	@Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
-	public static Result postOnLinePreRegistration(String oper) {
+	public Result postOnLinePreRegistration(String oper) {
 		return onLinePreRegistration(oper);
 	}
 	
 	@Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
-	public static Result onLineGroupRegistration(String oper) {
+	public Result onLineGroupRegistration(String oper) {
 		return ok(preregisterGroup.render(oper, UserGroup.find()));
 	}
 	
 	@Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
-	public static Result postOnLineGroupRegistration(String oper) {
+	public Result postOnLineGroupRegistration(String oper) {
 		return onLineGroupRegistration(oper);
 	}
 	
 	@Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
-    public static Result grantAdminPermission(String user_uri) {
+    public Result grantAdminPermission(String user_uri) {
 		try {
 			user_uri = URLDecoder.decode(user_uri, "UTF-8");
 		} catch (UnsupportedEncodingException e) {
@@ -122,12 +129,12 @@ public class UserManagement extends Controller {
     }
 	
 	@Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
-    public static Result postGrantAdminPermission(String user_uri) {
+    public Result postGrantAdminPermission(String user_uri) {
 		return grantAdminPermission(user_uri);
     }
 	
 	@Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
-    public static Result revokeAdminPermission(String user_uri) {
+    public Result revokeAdminPermission(String user_uri) {
 		try {
 			user_uri = URLDecoder.decode(user_uri, "UTF-8");
 		} catch (UnsupportedEncodingException e) {
@@ -144,24 +151,24 @@ public class UserManagement extends Controller {
     }
 	
 	@Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
-    public static Result postRevokeAdminPermission(String user_uri) {
+    public Result postRevokeAdminPermission(String user_uri) {
 		return revokeAdminPermission(user_uri);
     }
 	
 	@Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
-    public static Result assignUserAccessLevel(String user_uri, String group_uri) {
+    public Result assignUserAccessLevel(String user_uri, String group_uri) {
 		User.changeAccessLevel(user_uri, group_uri);
 		return ok(users.render("init", "", User.find(), UserGroup.find(), ""));
     }
 
 	@Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
-    public static Result postAssignUserAccessLevel(String user_uri, String group_uri) {
+    public Result postAssignUserAccessLevel(String user_uri, String group_uri) {
 		User.changeAccessLevel(user_uri, group_uri);
     	return ok(users.render("init", "", User.find(), UserGroup.find(), ""));
     }
 	
 	@Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
-    public static Result editGroup(String group_uri) {
+    public Result editGroup(String group_uri) {
 		try {
 			group_uri = URLDecoder.decode(group_uri, "UTF-8");
 		} catch (UnsupportedEncodingException e) {
@@ -172,7 +179,7 @@ public class UserManagement extends Controller {
     }
 	
 	@Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
-    public static Result postEditGroup(String group_uri) {
+    public Result postEditGroup(String group_uri) {
 		try {
 			group_uri = URLDecoder.decode(group_uri, "UTF-8");
 		} catch (UnsupportedEncodingException e) {
@@ -182,7 +189,7 @@ public class UserManagement extends Controller {
     }
 	
 	@Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
-    public static Result editUser(String user_uri) {
+    public Result editUser(String user_uri) {
 		try {
 			user_uri = URLDecoder.decode(user_uri, "UTF-8");
 		} catch (UnsupportedEncodingException e) {
@@ -192,7 +199,7 @@ public class UserManagement extends Controller {
     }
 	
 	@Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
-    public static Result postEditUser(String user_uri) {
+    public Result postEditUser(String user_uri) {
 		try {
 			user_uri = URLDecoder.decode(user_uri, "UTF-8");
 		} catch (UnsupportedEncodingException e) {
@@ -202,7 +209,7 @@ public class UserManagement extends Controller {
     }
 	
 	@Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
-    public static Result deleteUser(String user_uri, boolean deleteAuth, boolean deleteMember) {
+    public Result deleteUser(String user_uri, boolean deleteAuth, boolean deleteMember) {
 		try {
 			user_uri = URLDecoder.decode(user_uri, "UTF-8");
 		} catch (UnsupportedEncodingException e) {
@@ -213,12 +220,12 @@ public class UserManagement extends Controller {
     }
 
 	@Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
-    public static Result postDeleteUser(String user_uri, boolean deleteAuth, boolean deleteMember) {
+    public Result postDeleteUser(String user_uri, boolean deleteAuth, boolean deleteMember) {
     	return deleteUser(user_uri, deleteAuth, deleteMember);
     }
 	
 	@Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
-    public static Result backupUserAuthentication() {
+    public Result backupUserAuthentication() {
 		JSONArray sys_user = (JSONArray) JSONValue.parse(SysUser.outputAsJson());
 		for (int i = 0; i < sys_user.size(); i++) {
 			((JSONObject)sys_user.get(i)).remove("_version_");
@@ -249,30 +256,30 @@ public class UserManagement extends Controller {
 	public static String recoverUserAuthentication() {
 		System.out.println("Recovering User Authentication ...");
 		try {
-			if (!SolrUtils.clearCollection(Play.application().configuration().getString("hadatac.solr.users") 
+			if (!SolrUtils.clearCollection(ConfigFactory.load().getString("hadatac.solr.users") 
 					+ Collections.AUTHENTICATE_USERS)) {
 				return "Failed to clear original \"users\" collection! ";
 			}
-			if (!SolrUtils.clearCollection(Play.application().configuration().getString("hadatac.solr.users") 
+			if (!SolrUtils.clearCollection(ConfigFactory.load().getString("hadatac.solr.users") 
 					+ Collections.AUTHENTICATE_ACCOUNTS)) {
 				return "Failed to clear original \"linked_account\" collection! ";
 			}
-			if (!SolrUtils.clearCollection(Play.application().configuration().getString("hadatac.solr.users") 
+			if (!SolrUtils.clearCollection(ConfigFactory.load().getString("hadatac.solr.users") 
 					+ Collections.AUTHENTICATE_TOKENS)) {
 				return "Failed to clear original \"token_action\" collection! ";
 			}
 			
 			JSONObject combined = (JSONObject) JSONValue.parse(new FileReader(UPLOAD_NAME_JSON));
 			
-			if (!SolrUtils.commitJsonDataToSolr(Play.application().configuration().getString("hadatac.solr.users") 
+			if (!SolrUtils.commitJsonDataToSolr(ConfigFactory.load().getString("hadatac.solr.users") 
 					+ Collections.AUTHENTICATE_USERS, combined.get("sys_user").toString())) {
 				return "Failed to recover \"users\" collection! ";
 			}
-			if (!SolrUtils.commitJsonDataToSolr(Play.application().configuration().getString("hadatac.solr.users") 
+			if (!SolrUtils.commitJsonDataToSolr(ConfigFactory.load().getString("hadatac.solr.users") 
 					+ Collections.AUTHENTICATE_ACCOUNTS, combined.get("linked_account").toString())) {
 				return "Failed to recover \"linked_account\" collection! ";
 			}
-			if (!SolrUtils.commitJsonDataToSolr(Play.application().configuration().getString("hadatac.solr.users") 
+			if (!SolrUtils.commitJsonDataToSolr(ConfigFactory.load().getString("hadatac.solr.users") 
 					+ Collections.AUTHENTICATE_TOKENS, combined.get("token").toString())) {
 				return "Failed to recover \"token_action\" collection! ";
 			}
@@ -284,34 +291,34 @@ public class UserManagement extends Controller {
 	}
 
 	@Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
-    public static Result postBackupUserAuthentication() {
+    public Result postBackupUserAuthentication() {
     	return backupUserAuthentication();
     }
 	
 	@Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
-    public static Result backupUserGraph() {
+    public Result backupUserGraph() {
 		return ok(User.outputAsTurtle());
     }
 
 	@Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
-    public static Result postBackupUserGraph() {
+    public Result postBackupUserGraph() {
     	return backupUserGraph();
     }
 	
 	@Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
-    public static Result sendInvitationEmail(String user_name, String user_email) {
-		MyUsernamePasswordAuthProvider.getProvider().sendInvitationMailing(
+    public Result sendInvitationEmail(String user_name, String user_email) {
+		this.userPaswAuthProvider.sendInvitationMailing(
 				user_name, user_email, ctx());
 		return redirect(routes.UserManagement.index("init"));
     }
 
 	@Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
-    public static Result postSendInvitationEmail(String user_name, String user_email) {
+    public Result postSendInvitationEmail(String user_name, String user_email) {
     	return sendInvitationEmail(user_name, user_email);
     }
 	
 	@Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
-	public static Result submitPreRegistrationForm(String oper) {
+	public Result submitPreRegistrationForm(String oper) {
 		return ok(users.render(oper, "", User.find(), UserGroup.find(), "form"));
 	}
 	
@@ -324,14 +331,14 @@ public class UserManagement extends Controller {
 		PermissionsContext rdf = new PermissionsContext(
 						"user", 
 						"password", 
-						Play.application().configuration().getString("hadatac.solr.permissions"), 
+						ConfigFactory.load().getString("hadatac.solr.permissions"), 
 						false);
 		
 		if(source.equals("batch")){
 			message = SpreadsheetProcessing.generateTTL(mode, oper, rdf, UPLOAD_NAME);
 		}
 		else if(source.equals("form")){
-			Form<UserPreRegistrationForm> form = Form.form(UserPreRegistrationForm.class).bindFromRequest();
+			Form<UserPreRegistrationForm> form = formFactory.form(UserPreRegistrationForm.class).bindFromRequest();
 			UserPreRegistrationForm data = form.get();
 			String usr_uri = data.getUserUri();
 		    String given_name = data.getGivenName();
@@ -351,7 +358,7 @@ public class UserManagement extends Controller {
 			pred_value_map.put("foaf:homepage", "<" + homepage + ">");
 			pred_value_map.put("hadatac:isMemberOfGroup", group_uri);
 			
-			deleteUser(usr_uri, false, false);
+			User.deleteUser(usr_uri, false, false);
 			message = generateTTL(mode, oper, rdf, usr_uri, pred_value_map);
 		}
 		return message;
@@ -366,14 +373,14 @@ public class UserManagement extends Controller {
 		PermissionsContext rdf = new PermissionsContext(
 						"user", 
 						"password", 
-						Play.application().configuration().getString("hadatac.solr.permissions"), 
+						ConfigFactory.load().getString("hadatac.solr.permissions"), 
 						false);
 		
 		if(source.equals("batch")){
 			message = SpreadsheetProcessing.generateTTL(mode, oper, rdf, UPLOAD_NAME);
 		}
 		else if(source.equals("form")){
-			Form<GroupRegistrationForm> form = Form.form(GroupRegistrationForm.class).bindFromRequest();
+			Form<GroupRegistrationForm> form = formFactory.form(GroupRegistrationForm.class).bindFromRequest();
 			GroupRegistrationForm data = form.get();
 			String group_uri = data.getGroupUri();
 		    String group_name = data.getGroupName();
@@ -388,7 +395,7 @@ public class UserManagement extends Controller {
 			pred_value_map.put("foaf:homepage", "<" + homepage + ">");
 			pred_value_map.put("hadatac:isMemberOfGroup", parent_group_uri);
 			
-			deleteUser(group_uri, false, false);
+			User.deleteUser(group_uri, false, false);
 			
 			message = generateTTL(mode, oper, rdf, group_uri, pred_value_map);
 		}
@@ -403,10 +410,10 @@ public class UserManagement extends Controller {
 		PermissionsContext rdf = new PermissionsContext(
 						"user", 
 						"password", 
-						Play.application().configuration().getString("hadatac.solr.permissions"), 
+						ConfigFactory.load().getString("hadatac.solr.permissions"), 
 						false);
 		try {
-			Model model = RDFDataMgr.loadModel(UPLOAD_NAME_TTL);
+			RDFDataMgr.loadModel(UPLOAD_NAME_TTL);
 			message += Feedback.println(mode, " ");
 			message += Feedback.print(mode, "SUCCESS parsing the document!");
 			message += Feedback.println(mode, " ");
@@ -475,7 +482,7 @@ public class UserManagement extends Controller {
 		message += Feedback.println(mode, " ");
 		message += Feedback.println(mode, "   Generated " + fileName + " and stored locally.");
 		try {
-			Model model = RDFDataMgr.loadModel(fileName);
+			RDFDataMgr.loadModel(fileName);
 			message += Feedback.println(mode, " ");
 			message += Feedback.print(mode, "SUCCESS parsing the document!");
 			message += Feedback.println(mode, " ");
@@ -502,12 +509,11 @@ public class UserManagement extends Controller {
 	}
 
 	@Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
-	@BodyParser.Of(value = BodyParser.MultipartFormData.class, maxLength = 500 * 1024 * 1024)
-	public static Result uploadFile(String file_type) {
-		MultipartFormData body = request().body().asMultipartFormData();
-		FilePart uploadedfile = body.getFile("pic");
+	@BodyParser.Of(value = BodyParser.MultipartFormData.class)
+	public Result uploadFile(String file_type) {
+		FilePart uploadedfile = request().body().asMultipartFormData().getFile("pic");
 		if (uploadedfile != null) {
-			File file = uploadedfile.getFile();
+			File file = (File)uploadedfile.getFile();
 			String file_name = "";
 			if(file_type.equals("xls")){
 				file_name = UPLOAD_NAME;

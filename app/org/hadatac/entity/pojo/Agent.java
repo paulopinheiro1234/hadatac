@@ -12,15 +12,13 @@ import org.apache.jena.query.ResultSet;
 import org.apache.jena.query.ResultSetFactory;
 import org.apache.jena.query.ResultSetRewindable;
 import org.apache.jena.rdf.model.Model;
-import org.apache.jena.rdf.model.Property;
 import org.apache.jena.rdf.model.RDFNode;
-import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdf.model.Statement;
 import org.apache.jena.rdf.model.StmtIterator;
 import org.hadatac.utils.Collections;
 import org.hadatac.utils.NameSpaces;
 
-import play.Play;
+import com.typesafe.config.ConfigFactory;
 
 public class Agent implements Comparable<Agent> {
 
@@ -124,8 +122,8 @@ public class Agent implements Comparable<Agent> {
 	}
 	Query query = QueryFactory.create(queryString);
 	QueryExecution qexec = QueryExecutionFactory.sparqlService(
-				   Play.application().configuration().getString("hadatac.solr.triplestore") + 
-				   Collections.METADATA_SPARQL, query);
+			ConfigFactory.load().getString("hadatac.solr.triplestore") + 
+			Collections.METADATA_SPARQL, query);
 	model = qexec.execDescribe();
 	
 	agent = new Agent();

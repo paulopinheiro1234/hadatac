@@ -3,21 +3,19 @@
 # ~~~~
 
 # Home page
-GET	/hadatac/					     org.hadatac.console.controllers.Portal.index()
-POST	/hadatac/                                 	     org.hadatac.console.controllers.Portal.postIndex()
-GET	/hadatac                                  	     org.hadatac.console.controllers.Portal.index()
-POST	/hadatac                                  	     org.hadatac.console.controllers.Portal.postIndex()
-GET	/hadatac/acquisitions                     	     org.hadatac.console.controllers.dataacquisitionsearch.DataAcquisitionSearch.index(start: Int ?= 1, rows: Int ?= 15, facets: String ?= "")
-POST	/hadatac/acquisitions                     	     org.hadatac.console.controllers.dataacquisitionsearch.DataAcquisitionSearch.postIndex(start: Int ?= 1, rows: Int ?= 15, facets: String ?= "")
-GET	/hadatac/acquisitions/data                     	     org.hadatac.console.controllers.dataacquisitionsearch.DataAcquisitionSearch.indexData(start: Int ?= 1, rows: Int ?= 15, facets: String ?= "")
+GET	    /hadatac/					                     org.hadatac.console.controllers.Portal.index()
+POST    /hadatac/                                 	     org.hadatac.console.controllers.Portal.postIndex()
+GET	    /hadatac                                  	     org.hadatac.console.controllers.Portal.index()
+POST	/hadatac                                        org.hadatac.console.controllers.Portal.postIndex()
+GET	    /hadatac/acquisitions                           org.hadatac.console.controllers.dataacquisitionsearch.DataAcquisitionSearch.index(start: Int ?= 1, rows: Int ?= 15, facets: String ?= "")
+POST	/hadatac/acquisitions                     	    org.hadatac.console.controllers.dataacquisitionsearch.DataAcquisitionSearch.postIndex(start: Int ?= 1, rows: Int ?= 15, facets: String ?= "")
+GET	    /hadatac/acquisitions/data                      org.hadatac.console.controllers.dataacquisitionsearch.DataAcquisitionSearch.indexData(start: Int ?= 1, rows: Int ?= 15, facets: String ?= "")
 POST	/hadatac/acquisitions/data                     	     org.hadatac.console.controllers.dataacquisitionsearch.DataAcquisitionSearch.postIndexData(start: Int ?= 1, rows: Int ?= 15, facets: String ?= "")
-GET /hadatac/acquisitions/filedownload                       org.hadatac.console.controllers.dataacquisitionsearch.DataAcquisitionSearch.download(facets: String ?= "")
+GET     /hadatac/acquisitions/filedownload                   org.hadatac.console.controllers.dataacquisitionsearch.DataAcquisitionSearch.download(facets: String ?= "")
 POST    /hadatac/acquisitions/filedownload                   org.hadatac.console.controllers.dataacquisitionsearch.DataAcquisitionSearch.postDownload(facets: String ?= "")
 GET	/hadatac/acquisitions/loadccsv		      	     org.hadatac.console.controllers.dataacquisitionsearch.LoadCCSV.loadCCSV(oper: String)
 POST	/hadatac/acquisitions/loadccsv		      	     org.hadatac.console.controllers.dataacquisitionsearch.LoadCCSV.postLoadCCSV(oper: String)
 POST	/hadatac/acquisitions/loadccsv/upload	  	     org.hadatac.console.controllers.dataacquisitionsearch.LoadCCSV.uploadFile
-GET	/hadatac/acquisitions/importsdd		      	     org.hadatac.console.controllers.dataacquisitionsearch.ImportSDD.importSDD(oper: String)
-POST	/hadatac/acquisitions/importsdd/upload	  	     org.hadatac.console.controllers.dataacquisitionsearch.ImportSDD.uploadFile
 GET	/hadatac/metadataacquisitions/solrsearch             org.hadatac.console.http.SolrSearchProxy.getStudyAcquisition()
 POST	/hadatac/metadataacquisitions/solrsearch   	     org.hadatac.console.http.SolrSearchProxy.getStudyAcquisition()
 GET	/hadatac/dataacquisitionbrowser/solrsearch           org.hadatac.console.http.SolrSearchProxy.getDataAcquisition()
@@ -49,8 +47,6 @@ GET	/hadatac/metadata  		 	       org.hadatac.console.controllers.metadata.Metad
 POST	/hadatac/metadata			       org.hadatac.console.controllers.metadata.Metadata.postIndex()
 GET	/hadatac/metadata/metadataentry  	       org.hadatac.console.controllers.metadata.MetadataEntry.index(tabName: String)
 POST	/hadatac/metadata/metadataentry		       org.hadatac.console.controllers.metadata.MetadataEntry.postIndex(tabName: String)
-GET	/hadatac/metadata/dynamicmetapage  	       org.hadatac.console.controllers.metadata.DynamicMetadataGeneration.index()
-POST	/hadatac/metadata/dynamicmetapage	       org.hadatac.console.controllers.metadata.DynamicMetadataGeneration.postIndex()
 GET	/hadatac/metadata/dynamicfunctions  	       org.hadatac.console.controllers.metadata.DynamicFunctions.index()
 POST	/hadatac/metadata/dynamicfunctions	       org.hadatac.console.controllers.metadata.DynamicFunctions.postIndex()
 GET	/hadatac/metadataacquisitions                  org.hadatac.console.controllers.metadataacquisition.MetadataAcquisition.index()

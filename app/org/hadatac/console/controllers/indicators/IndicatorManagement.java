@@ -17,13 +17,13 @@ import play.mvc.Controller;
 public class IndicatorManagement extends Controller {
 
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    public static Result index() {
+    public Result index() {
     	List<Indicator> theResults = Indicator.find();
         return ok(indicatorManagement.render(theResults));
     }
 
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    public static Result postIndex() {
+    public Result postIndex() {
         return index();
     }
 }

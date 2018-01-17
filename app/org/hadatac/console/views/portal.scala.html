@@ -5,8 +5,9 @@
 @import org.hadatac.console.views.html._
 @import org.hadatac.console.controllers._
 @import be.objectify.deadbolt.java.views.html._
-@import be.objectify.deadbolt.core.utils.TemplateUtils._
+@import be.objectify.deadbolt.java.utils.TemplateUtils._
 @import play.api.Play
+@import com.typesafe.config.ConfigFactory
 
 @main("HADataC: Human-Aware Data Acquisition Framework") {
 
@@ -14,8 +15,8 @@
       <div class="row">
           <div class="col-md-1 col-xs-0"></div>
           <div class="col-md-8 col-xs-0">
-             <h3><font color="darkBlue">@Play.current.configuration.getString("hadatac.community.shortname") 's Human-Aware Data Acquisition Framework</font></h3>
-             @Play.current.configuration.getString("hadatac.community.description") 
+             <h3><font color="darkBlue">@ConfigFactory.load().getString("hadatac.community.shortname") 's Human-Aware Data Acquisition Framework</font></h3>
+             @ConfigFactory.load().getString("hadatac.community.description") 
              <hr>
           </div>
           <div class="col-md-1 col-xs-0"></div>
@@ -36,7 +37,6 @@
         <div class="col-md-3 col-xs-2">
            <h4>Metadata Recording and Data Upload</h4>  
 	   @defining("") { filename => @defining("") { da_uri => 
-                <!-- <a href="" class="btn btn-primary btn-block disabled" role="button">Manage Scientific Activities</a>  -->
 		<a href="@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.index()" 
 		   id="autoannotate" class="btn btn-primary btn-block" role="button">Manage Data Files</a>
 		<a href="@org.hadatac.console.controllers.studies.routes.StudyManagement.index()" 
@@ -49,16 +49,10 @@
 		   id="DAS" class="btn btn-primary btn-block" role="button">Manage Data Acquisition Schemas</a>
 		<a href="@org.hadatac.console.controllers.indicators.routes.IndicatorManagement.index()" 
 		   id="indicators" class="btn btn-primary btn-block" role="button">Manage Indicators</a>
-                <!-- <a href="@org.hadatac.console.controllers.annotator.routes.Annotator.selectDeployment()"  
-		        id="annotator" class="btn btn-primary btn-block" role="button">Create CCSV from CSV</a>  -->
-                <!-- <a href="@org.hadatac.console.controllers.dataacquisitionsearch.routes.LoadCCSV.loadCCSV("init")"  
-		        id="csvloader" class="btn btn-primary btn-block" role="button">Upload CCSV</a>  -->
-                <!-- <a href="@org.hadatac.console.controllers.dataacquisitionsearch.routes.ImportSDD.importSDD("init")"  
-		        id="sddloader" class="btn btn-primary btn-block" role="button">Import SDD</a>  -->
 	   }}
         </div>
         @restrict(roles = anyOf(allOf("data_manager"))) {
-        @defining(AuthApplication.getLocalUser(session())) { user =>
+        @defining(AuthApplication.getAuthApplication().getUserProvider().getUser(session())) { user =>
         <div class="col-md-3 col-xs-2">
            <h4>Knowledge Management</h4>  
            <a href="@org.hadatac.console.controllers.triplestore.routes.Clean.clean("init")" 
@@ -117,7 +111,7 @@
 
     <script type="text/javascript">
         $( document ).ready(function() {
-          var hasUser = ("@AuthApplication.getLocalUser(session())" != "");
+          var hasUser = ("@AuthApplication.getAuthApplication().getUserProvider().getUser(session())" != "");
           if (hasUser) {
               $('#metadatafacet').attr( 'class', 'btn btn-primary btn-block' );
               $('#subjectviewdemo').attr( 'class', 'btn btn-primary btn-block');

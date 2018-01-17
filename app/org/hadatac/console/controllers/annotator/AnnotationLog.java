@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Iterator;
+import com.typesafe.config.ConfigFactory;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServerException;
@@ -15,8 +16,6 @@ import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
 import org.hadatac.utils.Collections;
 import org.hadatac.utils.Feedback;
-
-import play.Play;
 
 public class AnnotationLog {
 	@Field("file_name")
@@ -55,7 +54,7 @@ public class AnnotationLog {
 	public int save() {
 		try {
 			SolrClient client = new HttpSolrClient.Builder(
-					Play.application().configuration().getString("hadatac.solr.data")
+					ConfigFactory.load().getString("hadatac.solr.data")
 					+ Collections.ANNOTATION_LOG).build();
 			int status = client.addBean(this).getStatus();
 			client.commit();
@@ -103,7 +102,7 @@ public class AnnotationLog {
 	
 	public static AnnotationLog find(String file_name) {
 		SolrClient solr = new HttpSolrClient.Builder(
-				Play.application().configuration().getString("hadatac.solr.data")
+				ConfigFactory.load().getString("hadatac.solr.data")
 				+ Collections.ANNOTATION_LOG).build();
 		SolrQuery query = new SolrQuery();
 		query.set("q", "file_name:\"" + file_name + "\"");
@@ -127,7 +126,7 @@ public class AnnotationLog {
 	
 	public static int delete(String file_name) {
 		SolrClient solr = new HttpSolrClient.Builder(
-				Play.application().configuration().getString("hadatac.solr.data")
+				ConfigFactory.load().getString("hadatac.solr.data")
 				+ Collections.ANNOTATION_LOG).build();
 		try {	
 			UpdateResponse response = solr.deleteByQuery("file_name:\"" + file_name + "\"");

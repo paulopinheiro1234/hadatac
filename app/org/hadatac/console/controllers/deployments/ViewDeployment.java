@@ -28,7 +28,7 @@ public class ViewDeployment extends Controller {
 	
 	// for /metadata HTTP GET requests
 	@Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    public static Result index(String deployment_uri) {
+    public Result index(String deployment_uri) {
 
     	//DeploymentForm dep = new DeploymentForm();
     	Deployment deployment = null;
@@ -56,7 +56,7 @@ public class ViewDeployment extends Controller {
 
     // for /metadata HTTP POST requests
 	@Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    public static Result postIndex(String deployment_uri) {
+    public Result postIndex(String deployment_uri) {
 
     	//DeploymentForm dep = new DeploymentForm();
     	Deployment deployment = null;

@@ -16,7 +16,6 @@ import org.apache.jena.update.UpdateExecutionFactory;
 import org.apache.jena.update.UpdateFactory;
 import org.apache.jena.update.UpdateProcessor;
 import org.apache.jena.update.UpdateRequest;
-import org.apache.solr.common.SolrDocument;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Statement;
@@ -32,7 +31,8 @@ import org.hadatac.console.models.FacetHandler;
 import org.hadatac.metadata.loader.LabkeyDataHandler;
 import org.hadatac.metadata.loader.ValueCellProcessing;
 import org.labkey.remoteapi.CommandException;
-import play.Play;
+
+import com.typesafe.config.ConfigFactory;
 
 public class Platform extends HADatAcThing implements Comparable<Platform> {
 
@@ -177,7 +177,7 @@ public class Platform extends HADatAcThing implements Comparable<Platform> {
 		String queryString = "DESCRIBE <" + uri + ">";
 		Query query = QueryFactory.create(queryString);
 		QueryExecution qexec = QueryExecutionFactory.sparqlService(
-				Play.application().configuration().getString("hadatac.solr.triplestore") 
+				ConfigFactory.load().getString("hadatac.solr.triplestore") 
 				+ Collections.METADATA_SPARQL, query);
 		model = qexec.execDescribe();
 

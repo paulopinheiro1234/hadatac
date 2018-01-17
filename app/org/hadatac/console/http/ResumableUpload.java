@@ -1,9 +1,9 @@
 package org.hadatac.console.http;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.RandomAccessFile;
-
 import play.mvc.Http.Request;
 
 public class ResumableUpload {
@@ -26,7 +26,11 @@ public class ResumableUpload {
 			//Seek to position
 	        raf.seek((nResumableChunkNumber - 1) * (long)info.resumableChunkSize);
 	        //Save to file
-	        byte[] bytes = request.body().asRaw().asBytes();
+	        File file = request.body().asRaw().asFile();
+	        byte[] bytes = new byte[(int)file.length()];
+	        FileInputStream fis = new FileInputStream(file);
+	        fis.read(bytes);
+	        fis.close();
 	        if (bytes != null) {
 	        	int read = 0;
 		        int write_size = 950 * 100;

@@ -40,6 +40,8 @@ import org.joda.time.format.DateTimeFormatter;
 import org.joda.time.format.ISODateTimeFormat;
 import org.labkey.remoteapi.CommandException;
 
+import com.typesafe.config.ConfigFactory;
+
 import be.objectify.deadbolt.java.actions.Group;
 import be.objectify.deadbolt.java.actions.Restrict;
 import play.Play;
@@ -356,8 +358,8 @@ public class Deployment {
 	//System.out.println("FIND DEPLOYMENT (queryString): " + queryString);
 	Query query = QueryFactory.create(queryString);
 	QueryExecution qexec = QueryExecutionFactory.sparqlService(
-								   Play.application().configuration().getString("hadatac.solr.triplestore") 
-								   + Collections.METADATA_SPARQL, query);
+			ConfigFactory.load().getString("hadatac.solr.triplestore") 
+			+ Collections.METADATA_SPARQL, query);
 	Model model = qexec.execDescribe();
 	
 	StmtIterator stmtIterator = model.listStatements();

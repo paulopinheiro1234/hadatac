@@ -20,7 +20,7 @@ import org.apache.jena.rdf.model.StmtIterator;
 import org.hadatac.utils.Collections;
 import org.hadatac.utils.NameSpaces;
 
-import play.Play;
+import com.typesafe.config.ConfigFactory;
 
 public class InstrumentType extends HADatAcClass implements Comparable<InstrumentType> {
 
@@ -72,7 +72,7 @@ public class InstrumentType extends HADatAcClass implements Comparable<Instrumen
 		String queryString = "DESCRIBE <" + uri + ">";
 		Query query = QueryFactory.create(queryString);
 		QueryExecution qexec = QueryExecutionFactory.sparqlService(
-				Play.application().configuration().getString("hadatac.solr.triplestore") 
+				ConfigFactory.load().getString("hadatac.solr.triplestore") 
 				+ Collections.METADATA_SPARQL, query);
 		model = qexec.execDescribe();
 

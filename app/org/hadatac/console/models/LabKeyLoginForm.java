@@ -6,11 +6,11 @@ import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Properties;
 
 import org.jasypt.util.text.BasicTextEncryptor;
 
-import play.libs.F.Option;
 import play.mvc.QueryStringBindable;
 
 public class LabKeyLoginForm implements QueryStringBindable<LabKeyLoginForm> {
@@ -40,7 +40,7 @@ public class LabKeyLoginForm implements QueryStringBindable<LabKeyLoginForm> {
     }
 
 	@Override
-	public Option<LabKeyLoginForm> bind(String key, Map<String, String[]> data) {
+	public Optional<LabKeyLoginForm> bind(String key, Map<String, String[]> data) {
 		if (data.containsKey(key + ".user") && data.containsKey(key + ".password")) {
         	String user_name_temp = data.get(key + ".user")[0];
         	String password_temp = data.get(key + ".password")[0];
@@ -48,9 +48,9 @@ public class LabKeyLoginForm implements QueryStringBindable<LabKeyLoginForm> {
 				user_name = textEncryptor.decrypt(user_name_temp);
 				password = textEncryptor.decrypt(password_temp);
 			}
-            return Option.<LabKeyLoginForm>Some(this);
+            return Optional.<LabKeyLoginForm>ofNullable(this);
         } else {
-        	return Option.<LabKeyLoginForm>None();
+        	return Optional.<LabKeyLoginForm>empty();
         }
 	}
 

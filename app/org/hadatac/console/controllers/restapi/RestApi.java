@@ -20,7 +20,7 @@ import play.libs.Json;
 public class RestApi extends Controller {
 
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    public static Result getStudies(){
+    public Result getStudies(){
         ObjectMapper mapper = new ObjectMapper();
         List<Study> theStudies = Study.find();
         System.out.println("[RestApi] found " + theStudies.size() + " things");
@@ -33,7 +33,7 @@ public class RestApi extends Controller {
     }// /getStudies()
 
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    public static Result getStudy(String studyName){
+    public Result getStudy(String studyName){
         ObjectMapper mapper = new ObjectMapper();
         Study result = Study.findByName(studyName);
         System.out.println("[RestAPI] type: " + result.getType());

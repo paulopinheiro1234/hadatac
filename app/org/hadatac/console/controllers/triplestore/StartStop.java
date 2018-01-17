@@ -13,7 +13,7 @@ import be.objectify.deadbolt.java.actions.Restrict;
 public class StartStop extends Controller {
 
 	@Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
-	public static Result index(String oper, String repository) {	    
+	public Result index(String oper, String repository) {	    
 		String message = Repository.startStopMetadataRepository(oper, repository);
 		if (message.equals("FAIL")) {
 			return ok(clean.render("doneNotOk"));
@@ -22,7 +22,7 @@ public class StartStop extends Controller {
     }
 
 	@Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
-    public static Result postIndex(String oper, String repository) {
+    public Result postIndex(String oper, String repository) {
 		String message = Repository.startStopMetadataRepository(oper, repository);
 		if (message.equals("FAIL")) {
 			return ok(clean.render("doneNotOk"));

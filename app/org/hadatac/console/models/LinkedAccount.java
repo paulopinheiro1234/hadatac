@@ -18,9 +18,8 @@ import org.apache.solr.common.SolrDocumentList;
 import org.hadatac.utils.Collections;
 import org.noggit.JSONUtil;
 
-import play.Play;
-
 import com.feth.play.module.pa.user.AuthUser;
+import com.typesafe.config.ConfigFactory;
 
 public class LinkedAccount {
 
@@ -58,7 +57,7 @@ public class LinkedAccount {
 	public static LinkedAccount findByProviderKeySolr(final SysUser user, String key) {
 		LinkedAccount account = null;
 		SolrClient solrClient = new HttpSolrClient.Builder(
-				Play.application().configuration().getString("hadatac.solr.users") 
+				ConfigFactory.load().getString("hadatac.solr.users") 
 				+ Collections.AUTHENTICATE_ACCOUNTS).build();
     	SolrQuery solrQuery = new SolrQuery("user_id:" + user.getId() + " AND provider_key:" + key);
     	
@@ -80,7 +79,7 @@ public class LinkedAccount {
 	public static List<LinkedAccount> findByIdSolr(final SysUser user) {
 		List<LinkedAccount> accounts = new ArrayList<LinkedAccount>(); 
 		SolrClient solrClient = new HttpSolrClient.Builder(
-				Play.application().configuration().getString("hadatac.solr.users")
+				ConfigFactory.load().getString("hadatac.solr.users")
 				+ Collections.AUTHENTICATE_ACCOUNTS).build();
     	SolrQuery solrQuery = new SolrQuery("user_id:" + user.getId());
     	
@@ -104,7 +103,7 @@ public class LinkedAccount {
 	
 	public static String outputAsJson() {
 		SolrClient solrClient = new HttpSolrClient.Builder(
-				Play.application().configuration().getString("hadatac.solr.users")
+				ConfigFactory.load().getString("hadatac.solr.users")
 				+ Collections.AUTHENTICATE_ACCOUNTS).build();
 		String query = "*:*";
     	SolrQuery solrQuery = new SolrQuery(query);
@@ -144,7 +143,7 @@ public class LinkedAccount {
 	
 	public void save() {
 		SolrClient solrClient = new HttpSolrClient.Builder(
-				Play.application().configuration().getString("hadatac.solr.users") 
+				ConfigFactory.load().getString("hadatac.solr.users") 
 				+ Collections.AUTHENTICATE_ACCOUNTS).build();
         try {
         	solrClient.addBean(this);
@@ -158,7 +157,7 @@ public class LinkedAccount {
 	public int delete() {
 		try {
 			SolrClient solr = new HttpSolrClient.Builder(
-					Play.application().configuration().getString("hadatac.solr.users") 
+					ConfigFactory.load().getString("hadatac.solr.users") 
 					+ Collections.AUTHENTICATE_ACCOUNTS).build();
 			UpdateResponse response = solr.deleteById(this.id_s);
 			solr.commit();

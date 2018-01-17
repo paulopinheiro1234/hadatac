@@ -15,13 +15,13 @@ import play.mvc.Controller;
 public class DASManagement extends Controller {
 
 	@Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-	public static Result index() {
+	public Result index() {
 	    List<DataAcquisitionSchema> theResults = DataAcquisitionSchema.findAll();
 	    return ok(org.hadatac.console.views.html.schema.DASManagement.render(theResults));
 	}
 
 	@Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-	public static Result postIndex() {
+	public Result postIndex() {
 	    return index();
 	}
 }

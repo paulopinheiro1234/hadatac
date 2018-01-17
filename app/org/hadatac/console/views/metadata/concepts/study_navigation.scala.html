@@ -39,7 +39,7 @@
     
         <script type="text/javascript">
         $( document ).ready(function() {
-          var hasUser = ("@AuthApplication.getLocalUser(session())" != "");
+          var hasUser = ("@AuthApplication.getAuthApplication().getUserProvider().getUser(session())" != "");
           if (hasUser) {
               $('#metadatafacet').attr( 'class', 'btn btn-primary btn-block' );
               $('#dataacquisitionfacet').attr( 'class', 'btn btn-primary btn-block' );

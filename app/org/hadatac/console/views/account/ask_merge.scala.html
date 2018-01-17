@@ -1,4 +1,5 @@
-@(acceptForm: Form[org.hadatac.console.controllers.Account.Accept], aUser: com.feth.play.module.pa.user.AuthUser, bUser: com.feth.play.module.pa.user.AuthUser)
+@import org.hadatac.console.controllers.Account
+@(acceptForm: Form[Account.Accept], aUser: com.feth.play.module.pa.user.AuthUser, bUser: com.feth.play.module.pa.user.AuthUser)
 
 @import helper._
 @import org.hadatac.console.views.html._
@@ -16,7 +17,7 @@
 
             @if(acceptForm.hasGlobalErrors) {
 		        <p class="alert alert-danger">
-		          @acceptForm.globalError.message
+		          @acceptForm.globalError.message()
 		     	</p>
             }
 

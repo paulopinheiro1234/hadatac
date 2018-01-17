@@ -17,14 +17,14 @@ import play.mvc.Controller;
 public class StudyManagement extends Controller {
 
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    public static Result index() {
+    public Result index() {
     	List<Study> theResults = Study.find();
     	
         return ok(studyManagement.render(theResults));
     }
 
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    public static Result postIndex() {
+    public Result postIndex() {
         return index();
     }
 }

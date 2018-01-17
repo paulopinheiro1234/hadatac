@@ -12,14 +12,13 @@ import java.util.Map;
 import org.apache.commons.io.IOUtils;
 import org.hadatac.utils.Collections;
 
-import play.Play;
-
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.typesafe.config.ConfigFactory;
 
 public class JsonHandler {
     
-    private String field_count_url = Play.application().configuration().getString("hadatac.solr.data") 
+    private String field_count_url = ConfigFactory.load().getString("hadatac.solr.data") 
     		+ Collections.DATA_ACQUISITION 
     		+ "/browse?wt=json&facet=true&facet.field=characteristic&facet.field=entity"
     		+ "&facet.field=unit&facet.field=platform_name&facet.field=instrument_model&rows=0";

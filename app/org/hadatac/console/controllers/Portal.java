@@ -11,7 +11,7 @@ import org.hadatac.utils.Repository;
 
 public class Portal extends Controller {
 	
-    public static Result index() {
+    public Result index() {
     	if (!Repository.operational(Repository.METADATA)) {
     		return ok(main.render("Results", "", 
     				new Html("<div class=\"container-fluid\"><h4>"
@@ -32,7 +32,7 @@ public class Portal extends Controller {
     	return ok(portal.render()); 
     }
 
-    public static Result postIndex() {
+    public Result postIndex() {
     	return ok(portal.render());
     }
 }

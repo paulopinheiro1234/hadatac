@@ -101,7 +101,7 @@ public class ViewSample extends Controller {
 	
 	// for /metadata HTTP GET requests
 	@Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    public static Result index(String sample_uri, String study_uri, String subject_uri) {
+    public Result index(String sample_uri, String study_uri, String subject_uri) {
 
 		Map<String, String> indicatorValues = new HashMap<String, String>();
     	Map<String, List<String>> sampleResult = findBasic(sample_uri);
@@ -113,7 +113,7 @@ public class ViewSample extends Controller {
 
     // for /metadata HTTP POST requests
 	@Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    public static Result postIndex(String sample_uri, String study_uri, String subject_uri) {
+    public Result postIndex(String sample_uri, String study_uri, String subject_uri) {
 
 		return index(sample_uri, study_uri, subject_uri);
 	}

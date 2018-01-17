@@ -27,7 +27,7 @@ public class ViewValue extends Controller {
 	}
 	
 	@Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    public static Result index(String user_uri, String study_uri, 
+    public Result index(String user_uri, String study_uri, 
     						   String subject_uri, String char_uri) {
 		List<Measurement> indicatorValueResults = findValue(user_uri, study_uri, subject_uri, char_uri);
 		if (indicatorValueResults == null){
@@ -70,7 +70,7 @@ public class ViewValue extends Controller {
     }
 
 	@Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    public static Result postIndex(String user_uri, String study_uri, 
+    public Result postIndex(String user_uri, String study_uri, 
     							   String subject_uri, String char_uri) {
 		return index(user_uri, study_uri, subject_uri, char_uri);
 	}

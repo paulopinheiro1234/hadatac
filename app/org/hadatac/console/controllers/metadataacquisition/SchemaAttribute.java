@@ -1,6 +1,5 @@
 package org.hadatac.console.controllers.metadataacquisition;
 
-import play.Play;
 import play.mvc.Controller;
 import play.mvc.Result;
 
@@ -8,7 +7,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.apache.jena.query.QueryExecution;
 import org.apache.jena.query.QueryExecutionFactory;
@@ -25,10 +23,11 @@ import org.hadatac.console.controllers.metadata.DynamicFunctions;
 import org.hadatac.console.http.SolrUtils;
 import org.hadatac.console.models.SysUser;
 import org.hadatac.console.views.html.metadataacquisition.*;
-import org.hadatac.metadata.loader.ValueCellProcessing;
 import org.hadatac.utils.Collections;
 import org.hadatac.utils.NameSpaces;
 import org.json.simple.JSONObject;
+
+import com.typesafe.config.ConfigFactory;
 
 import be.objectify.deadbolt.java.actions.Group;
 import be.objectify.deadbolt.java.actions.Restrict;
@@ -37,9 +36,9 @@ import be.objectify.deadbolt.java.actions.Restrict;
 public class SchemaAttribute extends Controller {
 	
 	@Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    public static Result index() {
+    public Result index() {
 		final SysUser user = AuthApplication.getLocalUser(session());
-    	String collection = Play.application().configuration().getString("hadatac.console.host_deploy") + 
+    	String collection = ConfigFactory.load().getString("hadatac.console.host_deploy") + 
     			request().path() + "/solrsearch";
     	List<String> indicators = getIndicators();
     	
@@ -47,7 +46,7 @@ public class SchemaAttribute extends Controller {
     }
 
 	@Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    public static Result postIndex() {
+    public Result postIndex() {
         return index();
     }
 	
@@ -150,7 +149,7 @@ public class SchemaAttribute extends Controller {
 			
 			if (soln.contains("DASAttributeLabel") && !DAInfo.containsKey("DASAttributeLabel_i")) {
 //				DAInfo.put("DASAttributeLabel_i", "<a href=\""
-//						+ Play.application().configuration().getString("hadatac.console.host_deploy") 
+//						+ ConfigFactory.load().getString("hadatac.console.host_deploy") 
 //						+ "/hadatac/metadataacquisitions/viewDASA?da_uri=" 
 //						+ ValueCellProcessing.replaceNameSpaceEx(DAInfo.get("DASAttributeUri").toString()) + "\">"
 //						+ soln.get("DASAttributeLabel").toString() + "</a>");
@@ -216,14 +215,14 @@ public class SchemaAttribute extends Controller {
 		}
 		
 		return SolrUtils.commitJsonDataToSolr(
-				Play.application().configuration().getString("hadatac.solr.data") 
+				ConfigFactory.load().getString("hadatac.solr.data") 
 				+ Collections.SA_ACQUISITION, results.toString());
 	}
 	
 	public static int deleteFromSolr() {
 		try {
 			SolrClient solr = new HttpSolrClient.Builder(
-					Play.application().configuration().getString("hadatac.solr.data") 
+					ConfigFactory.load().getString("hadatac.solr.data") 
 					+ Collections.SA_ACQUISITION).build();
 			UpdateResponse response = solr.deleteByQuery("*:*");
 			solr.commit();
@@ -241,13 +240,13 @@ public class SchemaAttribute extends Controller {
 	}
 	
 	@Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
-    public static Result update() {
+    public Result update() {
 		updateDASchemaAttributes();
 		return redirect(routes.SchemaAttribute.index());
     }
     
     @Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
-    public static Result postUpdate() {
+    public Result postUpdate() {
     	return update();
     }
 }

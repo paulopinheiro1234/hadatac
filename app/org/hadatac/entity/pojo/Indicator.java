@@ -32,9 +32,10 @@ import org.hadatac.utils.ConfigProp;
 import org.hadatac.utils.NameSpaces;
 import org.labkey.remoteapi.CommandException;
 
+import com.typesafe.config.ConfigFactory;
+
 import be.objectify.deadbolt.java.actions.Group;
 import be.objectify.deadbolt.java.actions.Restrict;
-import play.Play;
 
 public class Indicator extends HADatAcThing implements Comparable<Indicator> {
 
@@ -146,7 +147,7 @@ public class Indicator extends HADatAcThing implements Comparable<Indicator> {
 		String queryString = "DESCRIBE <" + uri + ">";
 		Query query = QueryFactory.create(queryString);
 		QueryExecution qexec = QueryExecutionFactory.sparqlService(
-				Play.application().configuration().getString("hadatac.solr.triplestore") 
+				ConfigFactory.load().getString("hadatac.solr.triplestore") 
 				+ Collections.METADATA_SPARQL, query);
 		model = qexec.execDescribe();
 

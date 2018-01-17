@@ -37,7 +37,7 @@ import org.hadatac.data.model.AcquisitionQueryResult;
 import org.hadatac.utils.Collections;
 import org.hadatac.utils.NameSpaces;
 
-import play.Play;
+import com.typesafe.config.ConfigFactory;
 
 public class Measurement {
 	@Field("uri")
@@ -298,7 +298,7 @@ public class Measurement {
 
 	public int save() {
 		SolrClient solr = new HttpSolrClient.Builder(
-				Play.application().configuration().getString("hadatac.solr.data") 
+				ConfigFactory.load().getString("hadatac.solr.data") 
 				+ Collections.DATA_ACQUISITION).build();
 		try {
 			int status = solr.addBean(this).getStatus();
@@ -313,7 +313,7 @@ public class Measurement {
 
 	public static int delete(String datasetUri) {
 		SolrClient solr = new HttpSolrClient.Builder(
-				Play.application().configuration().getString("hadatac.solr.data") 
+				ConfigFactory.load().getString("hadatac.solr.data") 
 				+ Collections.DATA_ACQUISITION).build();
 		try {
 			UpdateResponse response = solr.deleteByQuery("dataset_uri_str:\"" + datasetUri + "\"");
@@ -432,7 +432,7 @@ public class Measurement {
 
 		try {
 			SolrClient solr = new HttpSolrClient.Builder(
-					Play.application().configuration().getString("hadatac.solr.data") 
+					ConfigFactory.load().getString("hadatac.solr.data") 
 					+ Collections.DATA_ACQUISITION).build();
 			QueryResponse queryResponse = solr.query(query, SolrRequest.METHOD.POST);
 			solr.close();
@@ -483,7 +483,7 @@ public class Measurement {
 
 		try {
 			SolrClient solr = new HttpSolrClient.Builder(
-					Play.application().configuration().getString("hadatac.solr.data") 
+					ConfigFactory.load().getString("hadatac.solr.data") 
 					+ Collections.DATA_ACQUISITION).build();
 			System.out.println("!!!! QUERY: " + query.toQueryString());
 			QueryResponse queryResponse = solr.query(query, SolrRequest.METHOD.POST);
@@ -611,7 +611,7 @@ public class Measurement {
 
 	public static long getNumByDataAcquisition(DataAcquisition dataAcquisition) {
 		SolrClient solr = new HttpSolrClient.Builder(
-				Play.application().configuration().getString("hadatac.solr.data") 
+				ConfigFactory.load().getString("hadatac.solr.data") 
 				+ Collections.DATA_ACQUISITION).build();
 		SolrQuery query = new SolrQuery();
 		query.set("q", "acquisition_uri_str:\"" + dataAcquisition.getUri() + "\"");
@@ -641,7 +641,7 @@ public class Measurement {
 		List<Measurement> listMeasurement = new ArrayList<Measurement>();
 
 		SolrClient solr = new HttpSolrClient.Builder(
-				Play.application().configuration().getString("hadatac.solr.data") 
+				ConfigFactory.load().getString("hadatac.solr.data") 
 				+ Collections.DATA_ACQUISITION).build();
 		SolrQuery query = new SolrQuery();
 		query.set("q", "acquisition_uri_str:\"" + acquisition_uri + "\"");

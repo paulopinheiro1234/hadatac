@@ -8,6 +8,9 @@ import java.util.List;
 import java.util.Map;
 
 import org.labkey.remoteapi.CommandException;
+
+import com.typesafe.config.ConfigFactory;
+
 import org.apache.jena.query.Query;
 import org.apache.jena.query.QueryExecution;
 import org.apache.jena.query.QueryExecutionFactory;
@@ -54,7 +57,6 @@ import org.hadatac.console.controllers.AuthApplication;
 
 import be.objectify.deadbolt.java.actions.Group;
 import be.objectify.deadbolt.java.actions.Restrict;
-import play.Play;
 
 public class Study extends HADatAcThing {
 	private static String className = "hasco:Study";
@@ -455,7 +457,7 @@ public class Study extends HADatAcThing {
 		MetadataAcquisitionQueryResult result = new MetadataAcquisitionQueryResult();
 
 		SolrClient solr = new HttpSolrClient.Builder(
-				Play.application().configuration().getString("hadatac.solr.data")
+				ConfigFactory.load().getString("hadatac.solr.data")
 				+ Collections.STUDIES).build();
 		SolrQuery query = new SolrQuery();
 		String permission_query = "";
@@ -997,7 +999,7 @@ public class Study extends HADatAcThing {
 
 	public int deleteDataAcquisitions() {
 		SolrClient study_solr = new HttpSolrClient.Builder(
-				Play.application().configuration().getString("hadatac.solr.data")
+				ConfigFactory.load().getString("hadatac.solr.data")
 				+ Collections.DATA_COLLECTION).build();
 		try {
 			UpdateResponse response = study_solr.deleteByQuery("study_uri:\"" + studyUri + "\"");
@@ -1017,7 +1019,7 @@ public class Study extends HADatAcThing {
 
 	public int deleteMeasurements() {
 		SolrClient study_solr = new HttpSolrClient.Builder(
-				Play.application().configuration().getString("hadatac.solr.data")
+				ConfigFactory.load().getString("hadatac.solr.data")
 				+ Collections.DATA_ACQUISITION).build();
 		try {
 			UpdateResponse response = study_solr.deleteByQuery("study_uri:\"" + DynamicFunctions.replaceURLWithPrefix(studyUri) + "\"");
@@ -1102,7 +1104,7 @@ public class Study extends HADatAcThing {
 	public int saveSolr() {
 		try {
 			SolrClient solr = new HttpSolrClient.Builder(
-					Play.application().configuration().getString("hadatac.solr.data") +
+					ConfigFactory.load().getString("hadatac.solr.data") +
 					Collections.STUDIES).build();
 			if (endedAt.toString().startsWith("9999")) {
 				endedAt = DateTime.parse("9999-12-31T23:59:59.999Z");
@@ -1174,7 +1176,7 @@ public class Study extends HADatAcThing {
 
 	public int deleteFromSolr() {
 		SolrClient study_solr = new HttpSolrClient.Builder(
-				Play.application().configuration().getString("hadatac.solr.data") +
+				ConfigFactory.load().getString("hadatac.solr.data") +
 				Collections.STUDIES).build();
 		try {
 			UpdateResponse response = study_solr.deleteByQuery("studyUri:\"" + studyUri + "\"");

@@ -18,7 +18,7 @@ import org.hadatac.console.views.html.error_page;
 
 public class MetadataEntry extends Controller {
 	
-    public static Result index(String tabName) {
+    public Result index(String tabName) {
     	SparqlQuery query = new SparqlQuery();
         GetSparqlQueryDynamic query_submit = new GetSparqlQueryDynamic(query);
         OtMSparqlQueryResults theResults;
@@ -45,7 +45,7 @@ public class MetadataEntry extends Controller {
         return ok(metadata_browser.render(theResults, tabName, values));
     }
 
-    public static Result postIndex(String tabName) {
+    public Result postIndex(String tabName) {
     	return index(tabName);
     }
 }

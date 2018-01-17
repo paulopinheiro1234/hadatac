@@ -2,19 +2,17 @@ package org.hadatac.console.controllers.dataacquisitionmanagement;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import javax.inject.Inject;
 
 import play.data.Form;
 import play.mvc.Controller;
 import play.mvc.Result;
 import play.twirl.api.Html;
+import play.data.FormFactory;
 
 import org.hadatac.console.controllers.AuthApplication;
 import org.hadatac.console.controllers.dataacquisitionmanagement.routes;
@@ -37,8 +35,11 @@ import be.objectify.deadbolt.java.actions.Restrict;
 
 public class EditDataAcquisition extends Controller {
 	
+	@Inject
+	private FormFactory formFactory;
+	
 	@Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-	public static Result index(String filename, String uri, boolean bChangeParam) {
+	public Result index(String filename, String uri, boolean bChangeParam) {
 	    if ((session().get("LabKeyUserName") == null 
 		 || session().get("LabKeyPassword") == null)
 		&& bChangeParam) {
@@ -89,15 +90,15 @@ public class EditDataAcquisition extends Controller {
     }
 
 	@Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-	public static Result postIndex(String filename, String uri, boolean bChangeParam) {
+	public Result postIndex(String filename, String uri, boolean bChangeParam) {
 	return index(filename, uri, bChangeParam);
     }
 	
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-	public static Result processForm(String filename, String acquisitionUri, boolean bChangeParam) {
+	public Result processForm(String filename, String acquisitionUri, boolean bChangeParam) {
     	final SysUser sysUser = AuthApplication.getLocalUser(session());
     	
-        Form<DataAcquisitionForm> form = Form.form(DataAcquisitionForm.class).bindFromRequest();
+        Form<DataAcquisitionForm> form = formFactory.form(DataAcquisitionForm.class).bindFromRequest();
         DataAcquisitionForm data = form.get();
         List<String> changedInfos = new ArrayList<String>();
         

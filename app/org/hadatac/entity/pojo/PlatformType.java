@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.HashMap;
-import java.io.ByteArrayOutputStream;
 
 import org.apache.jena.query.Query;
 import org.apache.jena.query.QueryExecution;
@@ -14,17 +13,14 @@ import org.apache.jena.query.QuerySolution;
 import org.apache.jena.query.ResultSet;
 import org.apache.jena.query.ResultSetFactory;
 import org.apache.jena.query.ResultSetRewindable;
-import org.apache.jena.query.ResultSetFormatter;
 import org.apache.jena.rdf.model.Model;
-import org.apache.jena.rdf.model.Property;
 import org.apache.jena.rdf.model.RDFNode;
-import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdf.model.Statement;
 import org.apache.jena.rdf.model.StmtIterator;
 import org.hadatac.utils.Collections;
 import org.hadatac.utils.NameSpaces;
 
-import play.Play;
+import com.typesafe.config.ConfigFactory;
 
 public class PlatformType extends HADatAcClass implements Comparable<PlatformType> {
 
@@ -76,8 +72,9 @@ public class PlatformType extends HADatAcClass implements Comparable<PlatformTyp
 	    
 	    String queryString = "DESCRIBE <" + uri + ">";
 	    Query query = QueryFactory.create(queryString);
-	    QueryExecution qexec = QueryExecutionFactory.sparqlService(Play.application().configuration().getString("hadatac.solr.triplestore") 
-								       + Collections.METADATA_SPARQL, query);
+	    QueryExecution qexec = QueryExecutionFactory.sparqlService(
+	    		ConfigFactory.load().getString("hadatac.solr.triplestore") 
+	    		+ Collections.METADATA_SPARQL, query);
 	    model = qexec.execDescribe();
 	    
 	    platformType = new PlatformType();
@@ -95,8 +92,6 @@ public class PlatformType extends HADatAcClass implements Comparable<PlatformTyp
 	    
 	    platformType.setUri(uri);
 	    platformType.setLocalName(uri.substring(uri.indexOf('#') + 1));
-	    
-	    //System.out.println(uri + " " + entity.getLocalName() + " " + entity.getSuperUri());
 	    
 	    return platformType;
 	}

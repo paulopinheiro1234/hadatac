@@ -12,7 +12,7 @@ import org.hadatac.console.views.html.metadata.metadata;
 public class Metadata extends Controller {
 	
 	// for /metadata HTTP GET requests
-    public static Result index() {
+    public Result index() {
     	Map<String,String> indicators = DynamicFunctions.getIndicatorTypes();
         Map<String,List<String>> values = DynamicFunctions.getIndicatorValuesJustLabels(indicators);
         return ok(metadata.render(values));
@@ -21,7 +21,7 @@ public class Metadata extends Controller {
 
 
     // for /metadata HTTP POST requests
-    public static Result postIndex() {
+    public Result postIndex() {
         
          return index();
         

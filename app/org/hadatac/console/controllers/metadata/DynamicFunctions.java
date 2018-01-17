@@ -629,7 +629,7 @@ public class DynamicFunctions extends Controller {
 	
 	
 	// for /metadata HTTP GET requests
-    public static Result index() {
+    public Result index() {
     	Map<String,String> indicators = getIndicatorTypes();
     	//System.out.println("Indicators: " + indicators + "\n");
     	Map<String,List<String>> valueMap = getIndicatorValues(indicators);
@@ -665,7 +665,7 @@ public class DynamicFunctions extends Controller {
     }// /index()
 
     // for /metadata HTTP POST requests
-    public static Result postIndex() {
+    public Result postIndex() {
         
         return index();
         

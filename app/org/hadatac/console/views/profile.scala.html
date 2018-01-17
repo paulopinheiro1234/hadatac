@@ -1,4 +1,4 @@
-@(localUser: org.hadatac.console.models.SysUser = null)
+@(playAuth: com.feth.play.module.pa.PlayAuthenticate, localUser: org.hadatac.console.models.SysUser = null)
 
 @import com.feth.play.module.pa.views.html._
 @import org.hadatac.console.views.html._
@@ -39,7 +39,7 @@
     }
 
     <br/>
-    @currentAuth() { auth =>
+    @currentAuth(playAuth) { auth =>
         @Messages("playauthenticate.profile.logged") @_providerIcon(auth.getProvider())<br/>
         @if(auth.expires() != -1){
             @Messages("playauthenticate.profile.session", auth.getId(), AuthApplication.formatTimestamp(auth.expires()))

@@ -20,7 +20,7 @@ import org.apache.jena.rdf.model.StmtIterator;
 import org.hadatac.utils.Collections;
 import org.hadatac.utils.NameSpaces;
 
-import play.Play;
+import com.typesafe.config.ConfigFactory;
 
 public class StudyType extends HADatAcClass implements Comparable<StudyType> {
 
@@ -72,7 +72,8 @@ public class StudyType extends HADatAcClass implements Comparable<StudyType> {
 
 		String queryString = "DESCRIBE <" + uri + ">";
 		Query query = QueryFactory.create(queryString);
-		QueryExecution qexec = QueryExecutionFactory.sparqlService(Play.application().configuration().getString("hadatac.solr.triplestore") 
+		QueryExecution qexec = QueryExecutionFactory.sparqlService(
+				ConfigFactory.load().getString("hadatac.solr.triplestore") 
 				+ Collections.METADATA_SPARQL, query);
 		model = qexec.execDescribe();
 
@@ -91,8 +92,6 @@ public class StudyType extends HADatAcClass implements Comparable<StudyType> {
 
 		studyType.setUri(uri);
 		studyType.setLocalName(uri.substring(uri.indexOf('#') + 1));
-
-		//System.out.println(uri + " " + entity.getLocalName() + " " + entity.getSuperUri());
 
 		return studyType;
 	}

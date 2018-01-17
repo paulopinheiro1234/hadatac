@@ -33,9 +33,10 @@ import org.joda.time.format.DateTimeFormatter;
 import org.joda.time.format.ISODateTimeFormat;
 import org.labkey.remoteapi.CommandException;
 
+import com.typesafe.config.ConfigFactory;
+
 import be.objectify.deadbolt.java.actions.Group;
 import be.objectify.deadbolt.java.actions.Restrict;
-import play.Play;
 
 public class DataAcquisition extends HADatAcThing {
 	private static String className = "hasco:DataAcquisition";
@@ -634,7 +635,7 @@ public class DataAcquisition extends HADatAcThing {
 	public int save() {
 		try {
 			SolrClient client = new HttpSolrClient.Builder(
-					Play.application().configuration().getString("hadatac.solr.data") 
+					ConfigFactory.load().getString("hadatac.solr.data") 
 					+ Collections.DATA_COLLECTION).build();
 			if (null == endedAt) {
 				endedAt = DateTime.parse("9999-12-31T23:59:59.999Z");
@@ -660,7 +661,7 @@ public class DataAcquisition extends HADatAcThing {
 
 		try {
 			SolrClient solr = new HttpSolrClient.Builder(
-					Play.application().configuration().getString("hadatac.solr.data") 
+					ConfigFactory.load().getString("hadatac.solr.data") 
 					+ Collections.DATA_ACQUISITION).build();
 			QueryResponse queryResponse = solr.query(query, SolrRequest.METHOD.POST);
 			solr.close();
@@ -899,7 +900,7 @@ public class DataAcquisition extends HADatAcThing {
 	public static DataAcquisition findDataAcquisition(SolrQuery query) {
 		DataAcquisition dataAcquisition = null;
 		SolrClient solr = new HttpSolrClient.Builder(
-				Play.application().configuration().getString("hadatac.solr.data") 
+				ConfigFactory.load().getString("hadatac.solr.data") 
 				+ Collections.DATA_COLLECTION).build();
 
 		try {
@@ -940,7 +941,7 @@ public class DataAcquisition extends HADatAcThing {
 			deleteMeasurementData();
 
 			SolrClient solr = new HttpSolrClient.Builder(
-					Play.application().configuration().getString("hadatac.solr.data") 
+					ConfigFactory.load().getString("hadatac.solr.data") 
 					+ Collections.DATA_COLLECTION).build();
 			UpdateResponse response = solr.deleteById(this.uri);
 			solr.commit();
@@ -972,7 +973,7 @@ public class DataAcquisition extends HADatAcThing {
 		List<DataAcquisition> results = new ArrayList<DataAcquisition>();
 
 		SolrClient solr = new HttpSolrClient.Builder(
-				Play.application().configuration().getString("hadatac.solr.data") 
+				ConfigFactory.load().getString("hadatac.solr.data") 
 				+ Collections.DATA_COLLECTION).build();
 
 		try {

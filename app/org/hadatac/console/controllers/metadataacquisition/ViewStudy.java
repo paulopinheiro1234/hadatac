@@ -275,7 +275,7 @@ public class ViewStudy extends Controller {
 	}
 	
 	@Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    public static Result index(String study_uri) {
+    public Result index(String study_uri) {
 		Map<String, List<String>> indicatorValues = findStudyIndicators(study_uri);
 		Map<String, String> indicatorUris = findStudyIndicatorsUri(study_uri);
 		
@@ -290,7 +290,7 @@ public class ViewStudy extends Controller {
     }
 
 	@Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    public static Result postIndex(String study_uri) {
+    public Result postIndex(String study_uri) {
 		return index(study_uri);
 	}
 }

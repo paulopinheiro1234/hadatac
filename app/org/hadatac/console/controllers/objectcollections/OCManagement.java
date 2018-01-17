@@ -18,7 +18,7 @@ import play.mvc.Controller;
 public class OCManagement extends Controller {
 
 	@Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-	public static Result index(String filename, String da_uri, String std_uri) {
+	public Result index(String filename, String da_uri, String std_uri) {
 
 		try {
 			std_uri = URLDecoder.decode(std_uri, "UTF-8");
@@ -33,7 +33,7 @@ public class OCManagement extends Controller {
 	}
 
 	@Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-	public static Result postIndex(String filename, String da_uri, String std_uri) {
+	public Result postIndex(String filename, String da_uri, String std_uri) {
 		return index(filename, da_uri, std_uri);
 	}
 }

@@ -17,14 +17,14 @@ import play.mvc.Controller;
 public class DeploymentManagement extends Controller {
 
      @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-     public static Result index(int option, String filename, String da_uri) {
+     public Result index(int option, String filename, String da_uri) {
 	 State state = new State(option);
 	 List<Deployment> deployments = Deployment.find(state);
 	 return ok(deploymentManagement.render(state, filename, da_uri, deployments));
      }
 
      @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-     public static Result postIndex(int option, String filename, String da_uri) {
+     public Result postIndex(int option, String filename, String da_uri) {
 	 return index(option, filename, da_uri);
      }
 

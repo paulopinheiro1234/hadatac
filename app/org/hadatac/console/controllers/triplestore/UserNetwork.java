@@ -16,13 +16,13 @@ import be.objectify.deadbolt.java.actions.Restrict;
 public class UserNetwork extends Controller {
 
 	@Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
-    public static Result index() {
+    public Result index() {
     	ForceFieldQuery ffq = new ForceFieldQuery(Collections.PERMISSIONS_SPARQL);
         return ok(userNetwork.render(ffq.getQueryResult().replace("\n", " ")));
     }
 
 	@Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
-    public static Result postIndex() {
+    public Result postIndex() {
         return index();
     }
 }

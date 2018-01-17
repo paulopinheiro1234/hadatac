@@ -19,7 +19,7 @@ import be.objectify.deadbolt.java.actions.Restrict;
 public class DeleteDataAcquisition extends Controller {
 	
 	@Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    public static Result index(String oper, String uri) {
+    public Result index(String oper, String uri) {
 		DataAcquisition dc = new DataAcquisition();
     	try {
     		if (uri != null) {
@@ -50,7 +50,7 @@ public class DeleteDataAcquisition extends Controller {
     }
 
 	@Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    public static Result postIndex(String oper, String uri) {
+    public Result postIndex(String oper, String uri) {
 		return index(oper, uri);
     }
 
@@ -81,7 +81,7 @@ public class DeleteDataAcquisition extends Controller {
     	return "Data Acquisition failed to be deleted.";
     }
     
-    public static Result deleteDataPoints(String uri, int state) {
+    public Result deleteDataPoints(String uri, int state) {
     	DataAcquisition dc = new DataAcquisition();
     	try {
     		if (uri != null) {
@@ -114,7 +114,7 @@ public class DeleteDataAcquisition extends Controller {
     	return badRequest("Measurement data in this data acquisition failed to be deleted.");
     }
     
-    public static Result postDeleteDataPoints(String uri, int state) {
+    public Result postDeleteDataPoints(String uri, int state) {
     	return deleteDataPoints(uri, state);
     }
 }

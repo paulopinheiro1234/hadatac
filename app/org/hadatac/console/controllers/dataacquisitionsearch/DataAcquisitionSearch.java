@@ -2,7 +2,6 @@ package org.hadatac.console.controllers.dataacquisitionsearch;
 
 import org.hadatac.console.controllers.AuthApplication;
 import org.hadatac.console.controllers.triplestore.UserManagement;
-import org.hadatac.console.controllers.triplestore.routes;
 
 import java.io.File;
 import java.io.IOException;
@@ -10,12 +9,18 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.StringTokenizer;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionStage;
+import java.util.function.Function;
+
+import javax.servlet.http.HttpServletResponse;
+
 import java.util.Set;
 import java.util.HashSet;
 import java.util.LinkedList;
 
 import org.apache.commons.io.FileUtils;
-
+import org.apache.jena.sparql.pfunction.library.str;
 import org.hadatac.console.models.FacetHandler;
 import org.hadatac.console.models.FacetsWithCategories;
 import org.hadatac.console.models.SpatialQueryResults;
@@ -30,6 +35,8 @@ import org.hadatac.console.views.html.dataacquisitionsearch.facetOnlyBrowser;
 import org.hadatac.console.views.html.dataacquisitionsearch.dataacquisition_browser;
 import org.hadatac.data.model.AcquisitionQueryResult;
 import org.hadatac.entity.pojo.Measurement;
+
+import ch.qos.logback.core.net.SyslogOutputStream;
 
 
 public class DataAcquisitionSearch extends Controller {
@@ -76,23 +83,23 @@ public class DataAcquisitionSearch extends Controller {
     	return objDetails;
     }
 
-    public static Result index(int page, int rows, String facets) {
+    public Result index(int page, int rows, String facets) {
     	return indexInternal(0, page, rows, facets);
     }
     
-    public static Result postIndex(int page, int rows, String facets) {
+    public Result postIndex(int page, int rows, String facets) {
     	return index(page, rows, facets);
     }
 
-    public static Result indexData(int page, int rows, String facets) {
+    public Result indexData(int page, int rows, String facets) {
     	return indexInternal(1, page, rows, facets);
     }
     
-    public static Result postIndexData(int page, int rows, String facets) {
+    public Result postIndexData(int page, int rows, String facets) {
     	return indexData(page, rows, facets);
     }
 
-    private static Result indexInternal(int mode, int page, int rows, String facets) {    
+    private Result indexInternal(int mode, int page, int rows, String facets) {    
     	System.out.println("facets: " + facets);
     	
     	FacetHandler handler = new FacetHandler();
@@ -126,7 +133,7 @@ public class DataAcquisitionSearch extends Controller {
 		}
     }
     
-    public static Result download(String facets) {
+    public CompletableFuture<Result> download(String facets) {
     	FacetHandler handler = new FacetHandler();
     	handler.loadFacets(facets);
     	
@@ -149,18 +156,34 @@ public class DataAcquisitionSearch extends Controller {
     	
     	AcquisitionQueryResult results = Measurement.find(ownerUri, -1, -1, handler);
     	
-    	String csv = Measurement.outputAsCSV(results.getDocuments(), selectedFields);
-    	File file = new File("/tmp/data_search_download.csv");
-    	try {
-			FileUtils.writeStringToFile(file, csv, "utf-8");
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+    	CompletableFuture<String> futureCSV = CompletableFuture.supplyAsync(
+    			() -> Measurement.outputAsCSV(results.getDocuments(), selectedFields));
+    	return futureCSV.thenApplyAsync( csv -> 
+    		/*
+    		File file = new File("/tmp/data_search_download.csv");
+        	try {
+    			FileUtils.writeStringToFile(file, csv, "utf-8");
+    		} catch (IOException e) {
+    			e.printStackTrace();
+    		}
+        	System.out.println("finished~");
+        	*/
+        	ok(csv)
+    	);
     	
-    	return ok(file);
+    	/*
+    	CompletionStage<String> csv = Measurement.outputAsCSV(results.getDocuments(), selectedFields);
+    	
+    	CompletionStage<String> promiseOfPIValue = computePIAsynchronously();
+    	// Runs in same thread
+    	CompletionStage<Result> promiseOfResult = promiseOfPIValue.thenApply(pi ->
+    	                ok("PI value computed: " + pi)
+    	);
+    	return status(HttpServletResponse.SC_ACCEPTED);
+    	*/
     }
     
-    public static Result postDownload(String facets) {
+    public CompletionStage<Result> postDownload(String facets) {
     	return download(facets);
     }
 }

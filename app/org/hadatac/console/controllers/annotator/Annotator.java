@@ -29,7 +29,7 @@ import be.objectify.deadbolt.java.actions.Restrict;
 public class Annotator extends Controller {
 
 	@Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-        public static Result selectDeployment() {
+        public Result selectDeployment() {
         SparqlQuery query = new SparqlQuery();
         GetSparqlQuery query_submit = new GetSparqlQuery(query);
         SparqlQueryResults theResults;
@@ -53,7 +53,7 @@ public class Annotator extends Controller {
     }
 
 	@Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    public static Result postSelectDeployment() {
+    public Result postSelectDeployment() {
         SparqlQuery query = new SparqlQuery();
         GetSparqlQuery query_submit = new GetSparqlQuery(query);
         SparqlQueryResults theResults;
@@ -74,7 +74,7 @@ public class Annotator extends Controller {
     }
 
 	@Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    public static Result uploadCSV(String uri) {
+    public Result uploadCSV(String uri) {
 
     	CSVAnnotationHandler handler;
     	try {
@@ -130,7 +130,7 @@ public class Annotator extends Controller {
     }
 
 	@Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    public static Result postUploadCSV(String uri) {
+    public Result postUploadCSV(String uri) {
 
 		CSVAnnotationHandler handler;
     	try {

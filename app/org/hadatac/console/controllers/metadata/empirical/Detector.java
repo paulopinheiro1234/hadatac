@@ -16,7 +16,7 @@ import org.hadatac.console.views.html.error_page;
 public class Detector extends Controller {
 	
 	// for /metadata HTTP GET requests
-    public static Result index() {
+    public Result index() {
         SparqlQuery query = new SparqlQuery();
         GetSparqlQuery query_submit = new GetSparqlQuery(query);
         SparqlQueryResults theResults;
@@ -42,7 +42,7 @@ public class Detector extends Controller {
 
 
     // for /metadata HTTP POST requests
-    public static Result postIndex() {
+    public Result postIndex() {
         SparqlQuery query = new SparqlQuery();
         GetSparqlQuery query_submit = new GetSparqlQuery(query);
         SparqlQueryResults theResults;

@@ -2,27 +2,29 @@ organization := "org.hadatac"
 
 name := "hadatac"
 
-scalaVersion := "2.11.7"
+scalaVersion := "2.11.8"
 
 version := "1.0-SNAPSHOT"
 
 val appDependencies = Seq(
-  "be.objectify"  %% "deadbolt-java"     % "2.4.4",
-  "com.feth"      %% "play-authenticate" % "0.7.1",
+  "be.objectify" %% "deadbolt-java" % "2.5.0",
+  "com.feth" %% "play-authenticate" % "0.8.3",
   cache,
+  evolutions,
   javaWs,
   javaJdbc,
-  "org.webjars" % "bootstrap" % "3.3.6",
+  "org.webjars" % "bootstrap" % "3.2.0",
   "org.easytesting" % "fest-assert" % "1.4" % "test",
-  "com.fasterxml.jackson.core" % "jackson-core" % "2.7.2",
-  "com.fasterxml.jackson.core" % "jackson-databind" % "2.7.2",
-  "com.fasterxml.jackson.core" % "jackson-annotations" % "2.7.2",
-  "commons-io" % "commons-io" % "2.4",
-  "org.apache.commons" % "commons-csv" % "1.2",
+  "org.seleniumhq.selenium" % "selenium-java" % "2.52.0" % "test",
+  //"com.fasterxml.jackson.core" % "jackson-core" % "2.7.2",
+  //"com.fasterxml.jackson.core" % "jackson-databind" % "2.7.2",
+  //"com.fasterxml.jackson.core" % "jackson-annotations" % "2.7.2",
+  //"commons-io" % "commons-io" % "2.4",
+  //"org.apache.commons" % "commons-csv" % "1.2",
   "org.apache.commons" % "commons-text" % "1.1",
   "commons-validator" % "commons-validator" % "1.5.0",
-  "org.apache.httpcomponents" % "httpclient" % "4.5.2",
-  "org.apache.httpcomponents" % "fluent-hc" % "4.5.2",
+  //"org.apache.httpcomponents" % "httpclient" % "4.5.2",
+  //"org.apache.httpcomponents" % "fluent-hc" % "4.5.2",
   "org.apache.poi" % "poi-ooxml" % "3.14",
   "org.apache.solr" % "solr-solrj" % "6.5.0",
   "org.apache.jena" % "jena-core" % "3.0.1",
@@ -44,6 +46,9 @@ lazy val root = project.in(file("."))
     libraryDependencies ++= appDependencies
   )
 
+//libraryDependencies += guice
+//libraryDependencies += openId
 
-
-fork in run := true
+//dependencyOverrides += "com.typesafe.play" % "twirl-api_2.11" % "1.3.2"
+//dependencyOverrides += "com.typesafe.play" % "play-logback_2.11" % "2.6.0"
+//dependencyOverrides += "com.typesafe.play" % "play-server_2.11" % "2.6.0"

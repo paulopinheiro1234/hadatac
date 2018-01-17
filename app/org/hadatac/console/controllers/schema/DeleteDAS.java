@@ -2,8 +2,10 @@ package org.hadatac.console.controllers.schema;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
+import javax.inject.Inject;
 
 import play.data.Form;
+import play.data.FormFactory;
 import play.mvc.Controller;
 import play.mvc.Result;
 
@@ -17,9 +19,12 @@ import be.objectify.deadbolt.java.actions.Group;
 import be.objectify.deadbolt.java.actions.Restrict;
 
 public class DeleteDAS extends Controller {
+	
+	@Inject
+	private FormFactory formFactory;
 
 	@Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-	public static Result index(String das_uri) {
+	public Result index(String das_uri) {
 		if (session().get("LabKeyUserName") == null && session().get("LabKeyPassword") == null) {
 			return redirect(org.hadatac.console.controllers.triplestore.routes.LoadKB.logInLabkey(
 					routes.DeleteDAS.index(das_uri).url()));
@@ -50,12 +55,12 @@ public class DeleteDAS extends Controller {
 	}
 
 	@Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-	public static Result postIndex(String das_uri) {
+	public Result postIndex(String das_uri) {
 		return index(das_uri);
 	}
 
 	@Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-	public static Result processForm(String das_uri) {
+	public Result processForm(String das_uri) {
 		if (session().get("LabKeyUserName") == null && session().get("LabKeyPassword") == null) {
 			return redirect(org.hadatac.console.controllers.triplestore.routes.LoadKB.logInLabkey(
 					routes.DeleteDAS.processForm(das_uri).url()));
@@ -77,7 +82,7 @@ public class DeleteDAS extends Controller {
 			das = DataAcquisitionSchema.find(das_uri);
 		}
 
-		Form<DataAcquisitionSchemaForm> form = Form.form(DataAcquisitionSchemaForm.class).bindFromRequest();
+		Form<DataAcquisitionSchemaForm> form = formFactory.form(DataAcquisitionSchemaForm.class).bindFromRequest();
 		DataAcquisitionSchemaForm data = form.get();
 		data.setLabel(das.getLabel());
 
