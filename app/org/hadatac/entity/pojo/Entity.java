@@ -22,12 +22,17 @@ import org.hadatac.utils.NameSpaces;
 
 import com.typesafe.config.ConfigFactory;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 public class Entity extends HADatAcClass implements Comparable<Entity> {
 
 	static String className = "sio:Object";
+	
+	public List<Characteristic> characteristics;
 
 	public Entity() {
 		super(className);
+		characteristics = new ArrayList<Characteristic>();
 	}
 
 	public static List<Entity> find() {
@@ -130,6 +135,5 @@ public class Entity extends HADatAcClass implements Comparable<Entity> {
 	}
     	return "";
 	} */
-
 }
 

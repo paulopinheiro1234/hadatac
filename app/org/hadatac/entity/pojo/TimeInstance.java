@@ -122,11 +122,11 @@ public class TimeInstance extends HADatAcThing implements Comparable<TimeInstanc
 				return m.getTimestamp();
 			}
 		} catch (IOException e) {
-			System.out.println("[ERROR] Measurement.findMinTime(String, String) - IOException message: " + e.getMessage());
+			System.out.println("[ERROR] TimeInstance.findMinTime(String, String) - IOException message: " + e.getMessage());
 		} catch (SolrServerException e) {
-			System.out.println("[ERROR] Measurement.findMinTime(String, String) - SolrServerException message: " + e.getMessage());
+			System.out.println("[ERROR] TimeInstance.findMinTime(String, String) - SolrServerException message: " + e.getMessage());
 		} catch (Exception e) {
-			System.out.println("[ERROR] Measurement.findMinTime(String, String) - Exception message: " + e.getMessage());
+			System.out.println("[ERROR] TimeInstance.findMinTime(String, String) - Exception message: " + e.getMessage());
 		}
 
 		return null;
@@ -153,11 +153,11 @@ public class TimeInstance extends HADatAcThing implements Comparable<TimeInstanc
 				return m.getTimestamp();
 			}
 		} catch (IOException e) {
-			System.out.println("[ERROR] Measurement.findMaxTime(String, String) - IOException message: " + e.getMessage());
+			System.out.println("[ERROR] TimeInstance.findMaxTime(String, String) - IOException message: " + e.getMessage());
 		} catch (SolrServerException e) {
-			System.out.println("[ERROR] Measurement.findMaxTime(String, String) - SolrServerException message: " + e.getMessage());
+			System.out.println("[ERROR] TimeInstance.findMaxTime(String, String) - SolrServerException message: " + e.getMessage());
 		} catch (Exception e) {
-			System.out.println("[ERROR] Measurement.findMaxTime(String, String) - Exception message: " + e.getMessage());
+			System.out.println("[ERROR] TimeInstance.findMaxTime(String, String) - Exception message: " + e.getMessage());
 		}
 
 		return null;

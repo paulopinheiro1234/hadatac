@@ -73,8 +73,20 @@
 	      class="btn btn-primary btn-block" role="button">Diff Tool</a>
         </div>
            }
-        } 
+        }
         <div class="col-md-1 col-xs-0"></div>
+      </div>
+      <div class="row">
+        <div class="col-md-1 col-xs-0"></div>
+		@restrict(roles = anyOf(allOf("data_manager"))) {
+		@defining(AuthApplication.getLocalUser(session())) { user =>
+        <div class="col-md-3 col-xs-2">
+          <h4>Data Analysis Management</h4>  
+          <a href="@org.hadatac.console.controllers.dataanalysis.routes.FunctionManagement.index()" 
+           class="btn btn-primary btn-block" role="button">Manage Functions</a>
+        </div>
+		}
+		}
       </div>
       <div class="row">
          <div class="col-md-1 col-xs-0"></div>

@@ -237,6 +237,13 @@ GET	/hadatac/indicators/delete	    	       org.hadatac.console.controllers.indic
 POST	/hadatac/indicators/delete		       org.hadatac.console.controllers.indicators.DeleteIndicator.postIndex(ind_uri : String)
 POST 	/hadatac/indicators/delete/form	       	       org.hadatac.console.controllers.indicators.DeleteIndicator.processForm(ind_uri : String)
 
+# data analysis
+GET	/hadatac/dataanalysis/functions/       org.hadatac.console.controllers.dataanalysis.FunctionManagement.index()
+POST	/hadatac/dataanalysis/functions/   org.hadatac.console.controllers.dataanalysis.FunctionManagement.postIndex()
+GET	/hadatac/dataanalysis/functions/new    org.hadatac.console.controllers.dataanalysis.NewFunction.index()
+POST	/hadatac/dataanalysis/functions/new org.hadatac.console.controllers.dataanalysis.NewFunction.postIndex()
+POST	/hadatac/dataanalysis/functions/new/form org.hadatac.console.controllers.dataanalysis.NewFunction.processForm()
+
 # object collections management
 GET	/hadatac/oc/		    	               org.hadatac.console.controllers.objectcollections.OCManagement.index(filename : String, da_uri : String, study_uri : String)
 POST	/hadatac/oc/     			       org.hadatac.console.controllers.objectcollections.OCManagement.postIndex(filename : String, da_uri : String, study_uri : String)

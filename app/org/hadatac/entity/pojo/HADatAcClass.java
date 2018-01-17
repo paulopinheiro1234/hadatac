@@ -15,6 +15,10 @@ import org.apache.jena.query.ResultSetFactory;
 import org.apache.jena.query.ResultSetRewindable;
 import org.apache.jena.query.ResultSetFormatter;
 import org.hadatac.utils.NameSpaces;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import org.hadatac.utils.Collections;
 import org.hadatac.console.models.TreeNode;
 
@@ -28,6 +32,9 @@ public class HADatAcClass {
 	public  String comment = "";
 	
 	public HADatAcClass (String currentClassName) {
+		if (currentClassName == null) {
+			currentClassName = "";
+		}
 		this.className = currentClassName; 
 	}
 	
@@ -40,6 +47,9 @@ public class HADatAcClass {
 	}
 
 	public void setUri(String uri) {
+		if (uri == null) {
+			uri = "";
+		}
 		this.uri = uri;
 	}
 
@@ -48,6 +58,9 @@ public class HADatAcClass {
 	}
 
 	public void setSuperUri(String superUri) {
+		if (superUri == null) {
+			superUri = "";
+		}
 		this.superUri = superUri;
 	}
 
@@ -56,6 +69,9 @@ public class HADatAcClass {
 	}
 
 	public void setLabel(String label) {
+		if (label == null) {
+			label = "";
+		}
 		this.label = label;
 	}
 
@@ -64,6 +80,9 @@ public class HADatAcClass {
 	}
 
 	public void setLocalName(String localName) {
+		if (localName == null) {
+			localName = "";
+		}
 		this.localName = localName;
 	}
 
@@ -72,9 +91,13 @@ public class HADatAcClass {
 	}
 
 	public void setComment(String comment) {
+		if (comment == null) {
+			comment = "";
+		}
 		this.comment = comment;
 	}
 
+	@JsonIgnore
 	public String getHierarchyJson() {
 		//System.out.println("Inside HADatAcClass's getHierarchyJson: [" + className + "]");
 		String collection = "";
@@ -104,6 +127,7 @@ public class HADatAcClass {
 		return "";
 	}
 
+	@JsonIgnore
 	public TreeNode getHierarchy() {
 		String collection = "";
 		TreeNode newTree = null;
@@ -212,5 +236,15 @@ public class HADatAcClass {
 		return resultsTree;
 	}
 
+	public String toJSON() {
+		ObjectMapper mapper = new ObjectMapper();
+		try {
+			String output =  mapper.writeValueAsString(this);
+			return output;
+		} catch (Exception e) {
+			System.out.println("[ERROR] HADatAcClass.toJSON() - Exception message: " + e.getMessage());
+		}
+		return "";
+	}
 }
 
