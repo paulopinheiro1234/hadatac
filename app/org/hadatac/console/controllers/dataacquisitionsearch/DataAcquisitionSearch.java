@@ -4,6 +4,7 @@ import org.hadatac.console.controllers.AuthApplication;
 import org.hadatac.console.controllers.triplestore.UserManagement;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -162,7 +163,7 @@ public class DataAcquisitionSearch extends Controller {
 			e.printStackTrace();
 		}
     	
-    	return ok(file, false);
+    	return ok(csv);
     	/*
     	return CompletableFuture
     			.supplyAsync(() -> Measurement.outputAsCSV(results.getDocuments(), selectedFields))
