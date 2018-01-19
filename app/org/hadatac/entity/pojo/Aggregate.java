@@ -18,6 +18,8 @@ import org.apache.jena.rdf.model.StmtIterator;
 import org.hadatac.utils.Collections;
 import org.hadatac.utils.NameSpaces;
 
+import com.typesafe.config.ConfigFactory;
+
 import play.Play;
 
 public class Aggregate extends HADatAcClass implements Comparable<Aggregate> {
@@ -61,7 +63,8 @@ public class Aggregate extends HADatAcClass implements Comparable<Aggregate> {
 
 		String queryString = "DESCRIBE <" + uri + ">";
 		Query query = QueryFactory.create(queryString);
-		QueryExecution qexec = QueryExecutionFactory.sparqlService(Play.application().configuration().getString("hadatac.solr.triplestore") 
+		QueryExecution qexec = QueryExecutionFactory.sparqlService(
+				ConfigFactory.load().getString("hadatac.solr.triplestore") 
 				+ Collections.METADATA_SPARQL, query);
 		model = qexec.execDescribe();
 

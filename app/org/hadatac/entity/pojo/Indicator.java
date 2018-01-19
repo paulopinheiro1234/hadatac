@@ -235,17 +235,17 @@ public class Indicator extends HADatAcThing implements Comparable<Indicator> {
 			List<String> preValues, FacetHandler facetHandler) {	
 		String query = "";
 		query += NameSpaces.getInstance().printSparqlNameSpaceList();
-		query += "SELECT ?studyIndicator ?indicatorLabel ?attributeUri ?attributeLabel WHERE { "
-				+ "?subTypeUri rdfs:subClassOf* hasco:Study . "
-				+ "?studyUri a ?subTypeUri . "
-				+ "?dataAcq hasco:isDataAcquisitionOf ?studyUri . "
-				+ "?dataAcq hasco:hasSchema ?schemaUri . "
-				+ "?schemaAttribute hasco:partOfSchema ?schemaUri . "
-				+ "?schemaAttribute hasco:hasAttribute ?attributeUri . " 
-				+ "?attributeUri rdfs:subClassOf* ?studyIndicator . "
-				+ "?attributeUri rdfs:label ?attributeLabel . "
-				+ "?studyIndicator rdfs:subClassOf hasco:StudyIndicator . "
-				+ "?studyIndicator rdfs:label ?indicatorLabel . "
+		query += "SELECT ?studyIndicator ?indicatorLabel ?attributeUri ?attributeLabel WHERE { \n"
+				+ "?subTypeUri rdfs:subClassOf* hasco:Study . \n"
+				+ "?studyUri a ?subTypeUri . \n"
+				+ "?dataAcq hasco:isDataAcquisitionOf ?studyUri . \n"
+				+ "?dataAcq hasco:hasSchema ?schemaUri . \n"
+				+ "?schemaAttribute hasco:partOfSchema ?schemaUri . \n"
+				+ "?schemaAttribute hasco:hasAttribute ?attributeUri . \n" 
+				+ "?attributeUri rdfs:subClassOf* ?studyIndicator . \n"
+				+ "?attributeUri rdfs:label ?attributeLabel . \n"
+				+ "?studyIndicator rdfs:subClassOf hasco:StudyIndicator . \n"
+				+ "?studyIndicator rdfs:label ?indicatorLabel . \n"
 				+ "}";
 
 		Map<HADatAcThing, List<HADatAcThing>> mapIndicatorToCharList = new HashMap<HADatAcThing, List<HADatAcThing>>();

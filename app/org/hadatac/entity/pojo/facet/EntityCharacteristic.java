@@ -15,6 +15,7 @@ import org.hadatac.entity.pojo.Entity;
 import org.hadatac.utils.Collections;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.typesafe.config.ConfigFactory;
 
 import play.Play;
 
@@ -43,7 +44,7 @@ public class EntityCharacteristic {
 		solrQuery.set("rows", "0");
 
 		SolrClient solr = new HttpSolrClient.Builder(
-				Play.application().configuration().getString("hadatac.solr.data") 
+				ConfigFactory.load().getString("hadatac.solr.data") 
 				+ Collections.DATA_ACQUISITION).build();
 		
 		try {

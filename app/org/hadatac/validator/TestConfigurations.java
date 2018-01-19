@@ -1,25 +1,19 @@
 package org.hadatac.validator;
 
-import play.Play;
-import play.Application;
-import play.Configuration;
-
 import org.apache.commons.validator.routines.UrlValidator;
 
-import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpResponse;
-import org.apache.http.StatusLine;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.ClientProtocolException;
-import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.impl.client.HttpClientBuilder;
+
+import com.typesafe.config.ConfigFactory;
 
 import java.io.IOException;
 
 public class TestConfigurations{
-    private static HttpClient client = new DefaultHttpClient();
+    private static HttpClient client = HttpClientBuilder.create().build();
     private static UrlValidator urlvalid = new UrlValidator();
-    private static Application app = play.Play.application();
     
     private static boolean testConnection(String toTest){
         if(toTest == null){
@@ -55,19 +49,19 @@ public class TestConfigurations{
         // test Solr:
         System.out.println("Testing for Solr....");
         String data, triplestore, users;
-        data = app.configuration().getString("hadatac.solr.data");
+        data = ConfigFactory.load().getString("hadatac.solr.data");
         if(!testConnection(data)){
             System.out.println("Testing failed: Solr instance for data is invalid or unreachable.\n");
             System.out.println("Check your hadatac.conf settings for the 'data' parameter.\n");
             System.exit(-1);
         }
-        triplestore = app.configuration().getString("hadatac.solr.triplestore");
+        triplestore = ConfigFactory.load().getString("hadatac.solr.triplestore");
         if(!testConnection(triplestore)){
             System.out.println("Testing failed: SolRDF instance for metadata is invalid or unreachable.\n");
             System.out.println("Check your hadatac.conf settings for the 'triplestore' parameter.\n");
             System.exit(-1);
         }
-        users = app.configuration().getString("hadatac.solr.users");
+        users = ConfigFactory.load().getString("hadatac.solr.users");
         // Can the users server be the same as the triple store?
         if(!users.equals(data)){
             if(!testConnection(users)){

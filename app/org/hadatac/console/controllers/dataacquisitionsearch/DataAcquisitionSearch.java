@@ -133,7 +133,7 @@ public class DataAcquisitionSearch extends Controller {
 		}
     }
     
-    public CompletableFuture<Result> download(String facets) {
+    public Result download(String facets) {
     	FacetHandler handler = new FacetHandler();
     	handler.loadFacets(facets);
     	
@@ -155,11 +155,14 @@ public class DataAcquisitionSearch extends Controller {
     	System.out.println("selectedFields: " + selectedFields);
     	
     	AcquisitionQueryResult results = Measurement.find(ownerUri, -1, -1, handler);
+    	String csv = Measurement.outputAsCSV(results.getDocuments(), selectedFields);
     	
-    	CompletableFuture<String> futureCSV = CompletableFuture.supplyAsync(
-    			() -> Measurement.outputAsCSV(results.getDocuments(), selectedFields));
-    	return futureCSV.thenApplyAsync( csv -> 
-    		/*
+    	return ok(csv);
+    	/*
+    	return CompletableFuture
+    			.supplyAsync(() -> Measurement.outputAsCSV(results.getDocuments(), selectedFields))
+    			.thenApply( csv -> 
+  
     		File file = new File("/tmp/data_search_download.csv");
         	try {
     			FileUtils.writeStringToFile(file, csv, "utf-8");
@@ -167,23 +170,13 @@ public class DataAcquisitionSearch extends Controller {
     			e.printStackTrace();
     		}
         	System.out.println("finished~");
-        	*/
+        	
         	ok(csv)
     	);
-    	
-    	/*
-    	CompletionStage<String> csv = Measurement.outputAsCSV(results.getDocuments(), selectedFields);
-    	
-    	CompletionStage<String> promiseOfPIValue = computePIAsynchronously();
-    	// Runs in same thread
-    	CompletionStage<Result> promiseOfResult = promiseOfPIValue.thenApply(pi ->
-    	                ok("PI value computed: " + pi)
-    	);
-    	return status(HttpServletResponse.SC_ACCEPTED);
     	*/
     }
     
-    public CompletionStage<Result> postDownload(String facets) {
+    public Result postDownload(String facets) {
     	return download(facets);
     }
 }
