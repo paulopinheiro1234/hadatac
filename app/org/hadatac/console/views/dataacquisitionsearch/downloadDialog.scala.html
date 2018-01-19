@@ -36,7 +36,7 @@
                              }
                          }
                          </script>
-				<form action="">
+				<form method="post" action="@org.hadatac.console.controllers.dataacquisitionsearch.routes.DataAcquisitionSearch.download(facets)">
 					<table class="table">
 						<thead>
 							<tr>
@@ -58,25 +58,6 @@
 					</table>
 					<input class="btn btn-info" type="submit" value="Confirm" />
 				</form>
-				<script type="text/javascript">
-				$('form').submit(function() {
-                    var formData = {};
-                    $.each($("input[id != 'select_all']:checked"), function(){            
-                        formData[$(this).attr('name')] = ''; 
-                    });
-
-                    $.ajax({
-                        type        : 'POST',
-                        url         : '@org.hadatac.console.controllers.dataacquisitionsearch.routes.DataAcquisitionSearch.download(facets)',
-                        data        : formData,
-                        dataType    : 'text',
-                        success: function (data) {
-                            console.log("Got data!");
-                        }
-                    });
-                    return false;
-                });
-				</script>
 			</div>
 			<div class="modal-footer">
 				<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>

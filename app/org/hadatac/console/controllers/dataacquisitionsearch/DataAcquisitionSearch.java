@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.HashMap;
 import java.util.StringTokenizer;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionStage;
@@ -161,21 +162,21 @@ public class DataAcquisitionSearch extends Controller {
 			e.printStackTrace();
 		}
     	
-    	return ok(file);
+    	return ok(file, false);
     	/*
     	return CompletableFuture
     			.supplyAsync(() -> Measurement.outputAsCSV(results.getDocuments(), selectedFields))
     			.thenApply( csv -> 
   
-    		File file = new File("/tmp/data_search_download.csv");
+    		File file = new File("tmp/data_search_download.csv");
         	try {
     			FileUtils.writeStringToFile(file, csv, "utf-8");
     		} catch (IOException e) {
     			e.printStackTrace();
     		}
-        	System.out.println("finished~");
+        	System.out.println("finished csv generation ...");
         	
-        	ok(csv)
+        	ok(csv, false);
     	);
     	*/
     }
