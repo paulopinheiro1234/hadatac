@@ -154,7 +154,7 @@ public class DataAcquisitionSearch extends Controller {
     	AcquisitionQueryResult results = Measurement.find(ownerUri, -1, -1, handler);
     	String csv = Measurement.outputAsCSV(results.getDocuments(), selectedFields);
     	
-    	File file = new File("/tmp/data_search_download.csv");
+    	File file = new File("tmp/data_search_download.csv");
     	try {
 			FileUtils.writeStringToFile(file, csv, "utf-8");
 		} catch (IOException e) {
