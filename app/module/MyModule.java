@@ -8,13 +8,8 @@ import com.feth.play.module.pa.providers.openid.OpenIdAuthProvider;
 import com.google.inject.AbstractModule;
 import com.google.inject.assistedinject.FactoryModuleBuilder;
 
-import play.api.Configuration;
-import play.api.Environment;
-import play.api.inject.Binding;
-import play.api.inject.Module;
 import org.hadatac.console.providers.MyStupidBasicAuthProvider;
 import org.hadatac.console.providers.MyUsernamePasswordAuthProvider;
-import scala.collection.Seq;
 import org.hadatac.console.service.MyResolver;
 import org.hadatac.console.service.MyUserService;
 
@@ -29,6 +24,10 @@ public class MyModule extends AbstractModule {
 
 		bind(Resolver.class).to(MyResolver.class);
 		bind(MyUserService.class).asEagerSingleton();
+		
+		bind(OnStart.class).asEagerSingleton();
+		bind(MyActorSystem.class).asEagerSingleton();
+		
 		//bind(GoogleAuthProvider.class).asEagerSingleton();
 		//bind(FacebookAuthProvider.class).asEagerSingleton();
 		//bind(FoursquareAuthProvider.class).asEagerSingleton();

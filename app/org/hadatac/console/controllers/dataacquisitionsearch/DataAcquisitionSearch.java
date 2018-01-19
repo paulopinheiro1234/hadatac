@@ -20,7 +20,6 @@ import java.util.HashSet;
 import java.util.LinkedList;
 
 import org.apache.commons.io.FileUtils;
-import org.apache.jena.sparql.pfunction.library.str;
 import org.hadatac.console.models.FacetHandler;
 import org.hadatac.console.models.FacetsWithCategories;
 import org.hadatac.console.models.SpatialQueryResults;
@@ -35,8 +34,6 @@ import org.hadatac.console.views.html.dataacquisitionsearch.facetOnlyBrowser;
 import org.hadatac.console.views.html.dataacquisitionsearch.dataacquisition_browser;
 import org.hadatac.data.model.AcquisitionQueryResult;
 import org.hadatac.entity.pojo.Measurement;
-
-import ch.qos.logback.core.net.SyslogOutputStream;
 
 
 public class DataAcquisitionSearch extends Controller {
