@@ -30,6 +30,7 @@
            <a href="@org.hadatac.console.controllers.dataacquisitionsearch.routes.DataAcquisitionSearch.index()" id="data" class="btn btn-primary btn-block disabled" role="button">Search Data</a>
            <a href="@org.hadatac.console.controllers.metadataacquisition.routes.SchemaAttribute.index()" id="variables" class="btn btn-primary btn-block disabled" role="button">Search Variables</a>
            <a href="@org.hadatac.console.controllers.metadataacquisition.routes.Analytes.index()" id="analytes" class="btn btn-primary btn-block disabled" role="button">Search Analytes</a>
+           <a href="@org.hadatac.console.controllers.dataacquisitionsearch.routes.Downloader.index()" id="downloader" class="btn btn-primary btn-block disabled" role="button">Data Download</a>
            <a href="@org.hadatac.console.controllers.metadata.routes.Metadata.index()" class="btn btn-primary btn-block" role="button">Browse Metadata</a>
            <a href="" class="btn btn-primary btn-block disabled" role="button">Infer Semantic Differences</a>
            <a href="" class="btn btn-primary btn-block disabled" role="button">Show Collaboration Insight</a>
@@ -130,6 +131,7 @@
               $('#data').attr( 'class', 'btn btn-primary btn-block' );
               $('#variables').attr( 'class', 'btn btn-primary btn-block' );
               $('#analytes').attr( 'class', 'btn btn-primary btn-block' );
+              $('#downloader').attr( 'class', 'btn btn-primary btn-block' );
               $('#dataacquisitionfacet').attr( 'class', 'btn btn-primary btn-block' );
               $('#autoannotate').attr( 'class', 'btn btn-primary btn-block' );
               $('#studies').attr( 'class', 'btn btn-primary btn-block' );
@@ -146,6 +148,7 @@
               $('#data').attr( 'class', 'btn btn-primary btn-block disabled' );
               $('#variables').attr( 'class', 'btn btn-primary btn-block disabled' );
               $('#analytes').attr( 'class', 'btn btn-primary btn-block disabled' );
+              $('#downloader').attr( 'class', 'btn btn-primary btn-block disabled' );
               $('#autoannotate').attr( 'class', 'btn btn-primary btn-block disabled' );
               $('#studies').attr( 'class', 'btn btn-primary btn-block disabled' );
               $('#indicators').attr( 'class', 'btn btn-primary btn-block disabled' );

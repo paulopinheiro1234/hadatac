@@ -1,12 +1,15 @@
 package org.hadatac.console.controllers.dataacquisitionsearch;
 
 import org.hadatac.console.controllers.AuthApplication;
+import org.hadatac.console.controllers.annotator.AnnotationLog;
 import org.hadatac.console.controllers.triplestore.UserManagement;
 
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.HashMap;
@@ -31,12 +34,14 @@ import org.hadatac.console.models.ObjectDetails;
 import play.mvc.Controller;
 import play.mvc.Result;
 
+import org.hadatac.console.controllers.dataacquisitionsearch.routes;
 import org.hadatac.console.views.formdata.FacetFormData;
 import org.hadatac.console.views.html.dataacquisitionsearch.facetOnlyBrowser;
 import org.hadatac.console.views.html.dataacquisitionsearch.dataacquisition_browser;
 import org.hadatac.data.model.AcquisitionQueryResult;
+import org.hadatac.entity.pojo.DataFile;
 import org.hadatac.entity.pojo.Measurement;
-
+import org.hadatac.utils.Feedback;
 
 public class DataAcquisitionSearch extends Controller {
 
@@ -154,32 +159,10 @@ public class DataAcquisitionSearch extends Controller {
     	System.out.println("selectedFields: " + selectedFields);
     	
     	AcquisitionQueryResult results = Measurement.find(ownerUri, -1, -1, handler);
-    	String csv = Measurement.outputAsCSV(results.getDocuments(), selectedFields);
-    	
-    	File file = new File("tmp/data_search_download.csv");
-    	try {
-			FileUtils.writeStringToFile(file, csv, "utf-8");
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-    	
-    	return ok(csv);
-    	/*
-    	return CompletableFuture
-    			.supplyAsync(() -> Measurement.outputAsCSV(results.getDocuments(), selectedFields))
-    			.thenApply( csv -> 
-  
-    		File file = new File("tmp/data_search_download.csv");
-        	try {
-    			FileUtils.writeStringToFile(file, csv, "utf-8");
-    		} catch (IOException e) {
-    			e.printStackTrace();
-    		}
-        	System.out.println("finished csv generation ...");
-        	
-        	ok(csv, false);
-    	);
-    	*/
+    	CompletableFuture.supplyAsync(() -> Downloader.generateCSVFile(
+    			results.getDocuments(), facets, selectedFields, user.getEmail()));
+		
+    	return redirect(routes.Downloader.index());
     }
     
     public Result postDownload(String facets) {

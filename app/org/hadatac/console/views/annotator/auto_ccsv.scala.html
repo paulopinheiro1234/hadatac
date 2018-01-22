@@ -99,8 +99,8 @@
     				<td>@file.getOwnerEmail()</td>
     			}
     			<td>@file.getDataAcquisitionUri()</td>
-    			<td>@file.getUploadTime()</td>
-    			<td>@file.getProcessTime()</td>
+    			<td>@file.getSubmissionTime()</td>
+    			<td>@file.getCompletionTime()</td>
     			<td>
                         @defining("") { da_uri =>  @defining("") { oc_uri => 
     			    <a href="@org.hadatac.console.controllers.fileviewer.routes.CSVPreview.getCSVPreview("proc", file.getFileName(), da_uri, oc_uri, 10)" 
@@ -151,7 +151,7 @@
     				<td>@file.getOwnerEmail()</td>
     			}
     			<td>@file.getDataAcquisitionUri()</td>
-    			<td>@file.getUploadTime()</td>
+    			<td>@file.getSubmissionTime()</td>
     			<td>
                         @if(file.getFileName().startsWith("DA")) {
     			    <a href="@org.hadatac.console.controllers.annotator.routes.PrepareIngestion.create(file.getFileName(),file.getDataAcquisitionUri())" 

@@ -16,36 +16,49 @@ import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.client.solrj.response.UpdateResponse;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
+import play.Play;
+
 import org.hadatac.metadata.loader.ValueCellProcessing;
 import org.hadatac.utils.Collections;
-import org.hadatac.utils.State;
 
 import com.typesafe.config.ConfigFactory;
 
 public class DataFile {
-	@Field("owner_email")
-	private String ownerEmail;
-	@Field("acquisition_uri")
-	private String dataAcquisitionUri;
-	@Field("dataset_uri")
-	private String datasetUri;
+	
+	// Process status for auto-annotator
+	public static final String UNPROCESSED = "UNPROCESSED";
+	public static final String PROCESSED = "PROCESSED";
+	
+	// Process status for downloader
+	public static final String CREATING = "CREATING";
+	public static final String CREATED 	= "CREATED";
+	
 	@Field("file_name")
 	private String fileName;
-	@Field("processed")
-	private boolean processed;
-	@Field("upload_time")
-	private String uploadTime;
-	@Field("process_time")
-	private String processTime;
+	@Field("owner_email_str")
+	private String ownerEmail;
+	@Field("acquisition_uri_str")
+	private String dataAcquisitionUri;
+	@Field("dataset_uri_str")
+	private String datasetUri;
+	@Field("status_str")
+	private String status;
+	@Field("completion_percentage_double")
+	private double completionPercentage;
+	@Field("submission_time_str")
+	private String submissionTime;
+	@Field("completion_time_str")
+	private String completionTime;
 	
 	public DataFile() {
 		ownerEmail = "";
 		dataAcquisitionUri = "";
 		datasetUri = "";
 		fileName = "";
-		uploadTime = "";
-		processTime = "";
-		processed = false;
+		submissionTime = "";
+		completionTime = "";
+		status = "";
+		completionPercentage = 0;
 	}
 
 	public String getOwnerEmail() {
@@ -59,7 +72,6 @@ public class DataFile {
 		return dataAcquisitionUri;
 	}
 	public void setDataAcquisitionUri(String dataAcquisitionUri) {
-		//System.out.println("inside DataFile's POJO DA: <" + dataAcquisitionUri + ">");
 		this.dataAcquisitionUri = dataAcquisitionUri;
 	}
 	
@@ -74,35 +86,41 @@ public class DataFile {
 		return fileName;
 	}
 	public void setFileName(String fileName) {
-	        //System.out.println("inside DataFile's POJO: " + fileName);
 		this.fileName = fileName;
 	}
 	
-	public boolean getProcessStatus() {
-		return processed;
+	public String getStatus() {
+		return status;
 	}
-	public void setProcessStatus(boolean processed) {
-		this.processed = processed;
-	}
-	
-	public String getUploadTime() {
-		return uploadTime;
-	}
-	public void setUploadTime(String uploadTime) {
-		this.uploadTime = uploadTime;
+	public void setStatus(String status) {
+		this.status = status;
 	}
 	
-	public String getProcessTime() {
-		return processTime;
+	public double getCompletionPercentage() {
+		return completionPercentage;
 	}
-	public void setProcessTime(String processTime) {
-		this.processTime = processTime;
+	public void setCompletionPercentage(double completionPercentage) {
+		this.completionPercentage = completionPercentage;
+	}
+	
+	public String getSubmissionTime() {
+		return submissionTime;
+	}
+	public void setSubmissionTime(String submissionTime) {
+		this.submissionTime = submissionTime;
+	}
+	
+	public String getCompletionTime() {
+		return completionTime;
+	}
+	public void setCompletionTime(String completionTime) {
+		this.completionTime = completionTime;
 	}
 	
 	public int save() {
 		try {
 			SolrClient client = new HttpSolrClient.Builder(
-					ConfigFactory.load().getString("hadatac.solr.data") 
+					Play.application().configuration().getString("hadatac.solr.data") 
 					+ Collections.CSV_DATASET).build();
 			
 			int status = client.addBean(this).getStatus();
@@ -138,28 +156,16 @@ public class DataFile {
 	public static DataFile convertFromSolr(SolrDocument doc) {
 		DataFile object = new DataFile();
 		
-		object.setOwnerEmail(doc.getFieldValue("owner_email").toString());
-		object.setDataAcquisitionUri(ValueCellProcessing.replaceNameSpaceEx(doc.getFieldValue("acquisition_uri").toString()));
-		object.setDatasetUri(doc.getFieldValue("dataset_uri").toString());
 		object.setFileName(doc.getFieldValue("file_name").toString());
-		object.setProcessStatus(Boolean.parseBoolean(doc.getFieldValue("processed").toString()));
-		object.setUploadTime(doc.getFieldValue("upload_time").toString());
-		object.setProcessTime(doc.getFieldValue("process_time").toString());
+		object.setOwnerEmail(doc.getFieldValue("owner_email_str").toString());
+		object.setDataAcquisitionUri(ValueCellProcessing.replaceNameSpaceEx(doc.getFieldValue("acquisition_uri_str").toString()));
+		object.setDatasetUri(doc.getFieldValue("dataset_uri_str").toString());
+		object.setStatus(doc.getFieldValue("status_str").toString());
+		object.setCompletionPercentage(Double.parseDouble(doc.getFieldValue("completion_percentage_double").toString()));
+		object.setSubmissionTime(doc.getFieldValue("submission_time_str").toString());
+		object.setCompletionTime(doc.getFieldValue("completion_time_str").toString());
 		
 		return object;
-	}
-	
-	public static List<DataFile> find(String ownerEmail, int state) {
-		SolrQuery query = new SolrQuery();
-		if (state == State.PROCESSED) {
-			query.set("q", "owner_email:\"" + ownerEmail + "\"" + " AND " + "processed:\"true\"");
-		}
-		else if (state == State.UNPROCESSED) {
-			query.set("q", "owner_email:\"" + ownerEmail + "\"" + " AND " + "processed:\"false\"");
-		}
-		query.set("rows", "10000000");
-		
-		return findByQuery(query);
 	}
 	
 	public static List<DataFile> findByQuery(SolrQuery query) {
@@ -185,17 +191,28 @@ public class DataFile {
 		return list;
 	}
 	
-	public static List<DataFile> findAll(int state) {
-		SolrQuery query = new SolrQuery();
-		if (state == State.PROCESSED) {
-			query.set("q", "processed:\"true\"");
+	public static List<DataFile> find(String ownerEmail, String status) {
+		if (status == UNPROCESSED || status == PROCESSED) {
+			SolrQuery query = new SolrQuery();
+			query.set("q", "owner_email_str:\"" + ownerEmail + "\"" + " AND " + "status_str:\"" + status + "\"");
+			query.set("rows", "10000000");
+			return findByQuery(query);
 		}
-		else if (state == State.UNPROCESSED) {
-			query.set("q", "processed:\"false\"");
+		else {
+			return new ArrayList<DataFile>();
 		}
-		query.set("rows", "10000000");
-		
-		return findByQuery(query);
+	}
+	
+	public static List<DataFile> findAll(String status) {
+		if (status == UNPROCESSED || status == PROCESSED || status == CREATING || status == CREATED) {
+			SolrQuery query = new SolrQuery();
+			query.set("q", "status_str:\"" + status + "\"");
+			query.set("rows", "10000000");
+			return findByQuery(query);
+		}
+		else {
+			return new ArrayList<DataFile>();
+		}
 	}
 	
 	public static DataFile findByName(String ownerEmail, String fileName) {		
@@ -204,7 +221,7 @@ public class DataFile {
 			query.set("q", "file_name:\"" + fileName + "\"");
 		}
 		else {
-			query.set("q", "owner_email:\"" + ownerEmail + "\"" + " AND " + "file_name:\"" + fileName + "\"");
+			query.set("q", "owner_email_str:\"" + ownerEmail + "\"" + " AND " + "file_name:\"" + fileName + "\"");
 		}
 		query.set("rows", "10000000");
 		

@@ -2,12 +2,11 @@
 <schema version="1.5">
   <fields>
     <field name="file_name" type="string" stored="true" indexed="true" docValues="true" />
-	<field name="owner_email" type="string" stored="true" indexed="true" docValues="true" />
-	<field name="acquisition_uri" type="string" stored="true" indexed="true" docValues="true" />
-	<field name="dataset_uri" type="string" stored="true" indexed="true" docValues="true" />
-	<field name="processed" type="string" stored="true" indexed="true" docValues="true" />
-	<field name="upload_time" type="string" stored="true" indexed="true" docValues="true" />
-	<field name="process_time" type="string" stored="true" indexed="true" docValues="true" />
+	<dynamicField name="*_str" type="string" indexed="true" stored="true" docValues="true"/>
+    <dynamicField name="*_str_multi" type="string" indexed="true" stored="true" docValues="true" multiValued="true" />
+    <dynamicField name="*_date" type="date" indexed="true" stored="true" docValues="true"/>
+    <dynamicField name="*_int" type="int" indexed="true" stored="true" docValues="true"/>
+    <dynamicField name="*_double" type="double" indexed="true" stored="true" docValues="true"/>
     <field name="_version_" type="long" indexed="true" stored="true"/>
     <field name="_text_" type="text_general" indexed="true" stored="false" multiValued="true" />
   </fields>

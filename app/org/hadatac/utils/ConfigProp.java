@@ -68,4 +68,8 @@ public class ConfigProp {
 	public static String getPathProc() {
 		return getPropertyValue(AUTOANNOTATOR_CONFIG_FILE, "path_proc");
 	}
+	
+	public static String getPathDownload() {
+		return getPropertyValue(AUTOANNOTATOR_CONFIG_FILE, "path_download");
+	}
 }
