@@ -19,6 +19,7 @@ RUNNING_PID
 ~
 processed_csv/
 unprocessed_csv/
+downloaded_csv/
 sddtmp/
 conf/hadatac.conf
 conf/hadatac.conf.*

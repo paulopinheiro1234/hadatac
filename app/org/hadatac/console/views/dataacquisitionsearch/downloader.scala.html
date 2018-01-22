@@ -1,0 +1,85 @@
+@(files : List[org.hadatac.entity.pojo.DataFile], 
+  bAdmin : Boolean)
+
+@import helper._
+@import org.hadatac.console.views.html._
+@import org.hadatac.console.controllers.annotator._
+@import org.hadatac.console.controllers.dataacquisitionsearch._
+@import org.hadatac.metadata.loader._
+@import java.net._
+
+@main("Download Management") {
+	<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+		
+	<script type="text/javascript">
+	$(document).ready(function() {
+	    function checkCompletion() {
+	        $("#download_files tbody tr").each(function () {
+		        var row = $(this);
+	        	$.ajax({
+	                type: 'GET',
+	                url: '/hadatac/downloader/checkcompletion',
+	                data: { 'file_name': row.find("td:nth-child(1)").html() }, 
+	                dataType: 'json',
+	                success: function (data) {
+		                row.find("td:nth-child(5)").html(data + "%");
+	                }
+	            });
+	        });
+	    }
+	    setInterval(checkCompletion, 1000);
+	});
+    </script>
+	
+	<div class="container-fluid">
+	<table class="table" id="download_files">
+	<thead>
+         <tr>
+            <th>Data Files</th>
+            @if(bAdmin) {
+            	<th>Owner Email</th>
+            }
+            <th>Submission Time</th>
+            <th>Completion Time</th>
+            <th>Progress</th>
+            <th>Status</th>
+            <th>Operations</th>
+         </tr>
+    </thead>
+    <tbody>
+    	@for(file <- files){
+    		<tr>
+    			<td>@file.getFileName()</td>
+    			@if(bAdmin) {
+    				<td>@file.getOwnerEmail()</td>
+    			}
+    			<td>@file.getSubmissionTime()</td>
+    			<td>@file.getCompletionTime()</td>
+    			<td>@file.getCompletionPercentage().toInt%</td>
+    			<td>@file.getStatus()</td>
+    			<td>
+    			<a href="@org.hadatac.console.controllers.dataacquisitionsearch.routes.Downloader.downloadDataFile(file.getFileName())" 
+               class="btn-xs btn-primary" role="button">Download</a>
+    			<a href="@org.hadatac.console.controllers.dataacquisitionsearch.routes.Downloader.deleteDataFile(file.getFileName())" 
+			   class="btn-xs btn-primary" role="button" id="delete" onclick="return confirm('Are you sure to delete? If so, the ingested data from this file will be deleted as well!')">Delete</a>
+    			@if(bAdmin) {
+    				<a href="@org.hadatac.console.controllers.dataacquisitionsearch.routes.Downloader.assignFileOwner(file.getOwnerEmail(), file.getFileName())" 
+				   class="btn-xs btn-primary" role="button">Assign Owner</a>
+    			}
+    			<a href="@org.hadatac.console.controllers.dataacquisitionsearch.routes.Downloader.checkAnnotationLog(file.getFileName())" 
+			   class="btn-xs btn-primary" role="button">Logs</a>
+    			</td>
+    		</tr>
+    	}
+    </tbody>
+    </table>
+    @if(files.isEmpty()) {
+    	<p>No records for downloading/downloaded files</p>
+    }
+    
+    <br>
+	
+    <br><br>
+    <a href="@org.hadatac.console.controllers.routes.Portal.index()" class="btn btn-primary" role="button">Back to Main Page</a>
+	</div>
+}

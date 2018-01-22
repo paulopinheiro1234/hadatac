@@ -1,6 +1,8 @@
 package org.hadatac.entity.pojo;
 
+import java.io.File;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Date;
@@ -12,6 +14,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.function.BiConsumer;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.jena.query.QueryExecution;
 import org.apache.jena.query.QueryExecutionFactory;
 import org.apache.jena.query.QuerySolution;
@@ -781,19 +784,31 @@ public class Measurement {
 		return results;
 	}
 	
-	public static String outputAsCSV(List<Measurement> measurements, List<String> fieldNames) {
-		String result = "";		
-		// Create headers
-		result += String.join(",", fieldNames) + "\n";
-		
-		// Create rows
-		int i = 1;
-		for (Measurement m : measurements) {
-			System.out.println("i: " + i++);
-			result += m.toCSVRow(fieldNames) + "\n";
+	public static void outputAsCSV(List<Measurement> measurements, 
+			List<String> fieldNames, File file, DataFile dataFile) {		
+		try {
+			// Create headers
+			FileUtils.writeStringToFile(file, String.join(",", fieldNames) + "\n", "utf-8", true);
+			
+			// Create rows
+			int i = 1;
+			int total = measurements.size();
+			for (Measurement m : measurements) {
+				FileUtils.writeStringToFile(file, m.toCSVRow(fieldNames) + "\n", "utf-8", true);
+				double ratio = (double)i / total * 100;
+				if ((int)ratio % 5 == 0) {
+					dataFile.setCompletionPercentage(ratio);
+					dataFile.save();
+				}
+				i++;
+			}
+			dataFile.setCompletionPercentage(100);
+			dataFile.setCompletionTime(new SimpleDateFormat("yyyy/MM/dd HH:mm:ss").format(new Date()));
+			dataFile.setStatus(DataFile.CREATED);
+			dataFile.save();
+		} catch (IOException e) {
+			e.printStackTrace();
 		}
-		
-		return result;
 	}
 	
 	public String toCSVRow(List<String> fieldNames) {

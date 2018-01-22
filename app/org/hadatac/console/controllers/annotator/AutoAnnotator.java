@@ -62,13 +62,13 @@ public class AutoAnnotator extends Controller {
 		String path_unproc = ConfigProp.getPathUnproc();
 
 		if (user.isDataManager()) {
-			proc_files = DataFile.findAll(State.PROCESSED);
-			unproc_files = DataFile.findAll(State.UNPROCESSED);
+			proc_files = DataFile.findAll(DataFile.PROCESSED);
+			unproc_files = DataFile.findAll(DataFile.UNPROCESSED);
 			DataFile.includeUnrecognizedFiles(path_unproc, unproc_files);
 			DataFile.includeUnrecognizedFiles(path_proc, proc_files);
 		} else {
-			proc_files = DataFile.find(user.getEmail(), State.PROCESSED);
-			unproc_files = DataFile.find(user.getEmail(), State.UNPROCESSED);
+			proc_files = DataFile.find(user.getEmail(), DataFile.PROCESSED);
+			unproc_files = DataFile.find(user.getEmail(), DataFile.UNPROCESSED);
 		}
 
 		DataFile.filterNonexistedFiles(path_proc, proc_files);
@@ -119,8 +119,8 @@ public class AutoAnnotator extends Controller {
 				file = new DataFile();
 				file.setFileName(selectedFile);
 				file.setOwnerEmail(AuthApplication.getLocalUser(session()).getEmail());
-				file.setProcessStatus(false);
-				file.setUploadTime(new SimpleDateFormat("yyyy/MM/dd HH:mm:ss").format(new Date()));
+				file.setStatus(DataFile.UNPROCESSED);
+				file.setSubmissionTime(new SimpleDateFormat("yyyy/MM/dd HH:mm:ss").format(new Date()));
 			}
 			file.setOwnerEmail(data.getOption());
 			file.save();
@@ -168,8 +168,8 @@ public class AutoAnnotator extends Controller {
 				file = new DataFile();
 				file.setFileName(selectedFile);
 				file.setOwnerEmail(AuthApplication.getLocalUser(session()).getEmail());
-				file.setProcessStatus(false);
-				file.setUploadTime(new SimpleDateFormat("yyyy/MM/dd HH:mm:ss").format(new Date()));
+				file.setStatus(DataFile.UNPROCESSED);
+				file.setSubmissionTime(new SimpleDateFormat("yyyy/MM/dd HH:mm:ss").format(new Date()));
 			}
 			file.setDataAcquisitionUri(ValueCellProcessing.replacePrefixEx(data.getOption()));
 			file.save();
@@ -284,7 +284,7 @@ public class AutoAnnotator extends Controller {
 		}
 		
 		dataFile.delete();
-		dataFile.setProcessStatus(false);
+		dataFile.setStatus(DataFile.UNPROCESSED);
 		dataFile.save();
 
 		String path_proc = ConfigProp.getPathProc();
@@ -380,8 +380,8 @@ public class AutoAnnotator extends Controller {
 					DataFile dataFile = new DataFile();
 					dataFile.setFileName(filePart.getFilename());
 					dataFile.setOwnerEmail(AuthApplication.getLocalUser(session()).getEmail());
-					dataFile.setProcessStatus(false);
-					dataFile.setUploadTime(new SimpleDateFormat("yyyy/MM/dd HH:mm:ss").format(new Date()));
+					dataFile.setStatus(DataFile.UNPROCESSED);
+					dataFile.setSubmissionTime(new SimpleDateFormat("yyyy/MM/dd HH:mm:ss").format(new Date()));
 					dataFile.save();
 				} catch (Exception e) {
 					e.printStackTrace();
@@ -425,8 +425,8 @@ public class AutoAnnotator extends Controller {
 			DataFile dataFile = new DataFile();
 			dataFile.setFileName(resumableFilename);
 			dataFile.setOwnerEmail(AuthApplication.getLocalUser(session()).getEmail());
-			dataFile.setProcessStatus(false);
-			dataFile.setUploadTime(new SimpleDateFormat("yyyy/MM/dd HH:mm:ss").format(new Date()));
+			dataFile.setStatus(DataFile.UNPROCESSED);
+			dataFile.setSubmissionTime(new SimpleDateFormat("yyyy/MM/dd HH:mm:ss").format(new Date()));
 			String dataAcquisitionUri = getProperDataAcquisitionUri(resumableFilename);
 			dataFile.setDataAcquisitionUri(dataAcquisitionUri == null ? "" : dataAcquisitionUri);
 			dataFile.save();

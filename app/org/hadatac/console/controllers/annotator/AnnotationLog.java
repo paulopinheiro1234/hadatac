@@ -5,6 +5,9 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Iterator;
 import com.typesafe.config.ConfigFactory;
+
+import play.Play;
+
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServerException;
@@ -54,7 +57,7 @@ public class AnnotationLog {
 	public int save() {
 		try {
 			SolrClient client = new HttpSolrClient.Builder(
-					ConfigFactory.load().getString("hadatac.solr.data")
+					Play.application().configuration().getString("hadatac.solr.data")
 					+ Collections.ANNOTATION_LOG).build();
 			int status = client.addBean(this).getStatus();
 			client.commit();

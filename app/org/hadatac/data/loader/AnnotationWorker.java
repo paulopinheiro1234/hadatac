@@ -57,7 +57,7 @@ public class AnnotationWorker {
 
 		String path_proc = ConfigProp.getPathProc();
 		String path_unproc = ConfigProp.getPathUnproc();
-		List<DataFile> unproc_files = DataFile.findAll(State.UNPROCESSED);
+		List<DataFile> unproc_files = DataFile.findAll(DataFile.UNPROCESSED);
 		DataFile.filterNonexistedFiles(path_unproc, unproc_files);
 
 		for (DataFile file : unproc_files) {
@@ -96,8 +96,8 @@ public class AnnotationWorker {
 
 				file.delete();
 
-				file.setProcessStatus(true);
-				file.setProcessTime(new SimpleDateFormat("yyyy/MM/dd HH:mm:ss").format(new Date()));
+				file.setStatus(DataFile.PROCESSED);
+				file.setCompletionTime(new SimpleDateFormat("yyyy/MM/dd HH:mm:ss").format(new Date()));
 				file.save();
 				File f = new File(path_unproc + "/" + file_name);
 				f.renameTo(new File(destFolder + "/" + file_name));
