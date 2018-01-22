@@ -228,9 +228,15 @@ public class Parser {
 					continue;
 				} else {
 					String originalValue = record.get(dasa.getTempPositionInt() - 1);
-					if (possibleValues.containsKey(dasa.getAttribute())) {
-						if (possibleValues.get(dasa.getAttribute()).containsKey(originalValue.toLowerCase())) {
-							measurement.setValue(possibleValues.get(dasa.getAttribute()).get(originalValue.toLowerCase()));
+					System.out.println("originalValue " + originalValue);
+					System.out.println("dasa getAttribute " + dasa.getUri());
+					String dasa_uri_temp = dasa.getUri().replace("<", "").replace(">", "");
+					System.out.println("dasa_uri_temp " + dasa.getUri());
+					if (possibleValues.containsKey(dasa_uri_temp)) {
+						System.out.println("codebook test " + dasa.getUri() + " " + possibleValues.containsKey(dasa_uri_temp));
+						if (possibleValues.get(dasa_uri_temp).containsKey(originalValue.toLowerCase())) {
+							System.out.println("codebook test " + possibleValues.get(dasa_uri_temp) + " " + possibleValues.get(dasa_uri_temp).containsKey(originalValue.toLowerCase()));
+							measurement.setValue(possibleValues.get(dasa_uri_temp).get(originalValue.toLowerCase()));
 						} else {
 							measurement.setValue(originalValue);
 						}

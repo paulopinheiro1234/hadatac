@@ -405,11 +405,13 @@ public class DataAcquisitionSchema {
 				String daso_or_dasa = soln.getResource("daso_or_dasa").toString();
 				String code = soln.getLiteral("code").toString();
 				if (mapPossibleValues.containsKey(daso_or_dasa)) {
+					System.out.println("find pv map content " + daso_or_dasa + " " + mapPossibleValues.containsKey(daso_or_dasa));
 					mapPossibleValues.get(daso_or_dasa).put(code.toLowerCase(), classUri);
 				} else {
 					Map<String, String> indvMapPossibleValues = new HashMap<String, String>();
 					indvMapPossibleValues.put(code.toLowerCase(), classUri);
 					mapPossibleValues.put(daso_or_dasa, indvMapPossibleValues);
+					System.out.println(daso_or_dasa + " and indvMapPossibleValues " + indvMapPossibleValues.get(code.toLowerCase()));
 				}
 			}
 		} catch (Exception e) {
