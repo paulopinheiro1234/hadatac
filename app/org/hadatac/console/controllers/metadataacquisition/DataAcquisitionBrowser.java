@@ -146,46 +146,46 @@ public class DataAcquisitionBrowser extends Controller {
 				DAInfo = mapDAInfo.get(attributeUri);
 			}
 			
-			if (soln.contains("AttributeLabel") && !DAInfo.containsKey("AttributeLabel_i")) {
-//				DAInfo.put("AttributeLabel_i", "<a href=\""
+			if (soln.contains("AttributeLabel") && !DAInfo.containsKey("AttributeLabel_str")) {
+//				DAInfo.put("AttributeLabel_str", "<a href=\""
 //						+ ConfigFactory.load().getString("hadatac.console.host_deploy") 
 //						+ "/hadatac/metadataacquisitions/viewDA?da_uri=" 
 //						+ cellProc.replaceNameSpaceEx(DAInfo.get("attributeUri").toString()) + "\">"
 //						+ soln.get("AttributeLabel").toString() + "</a>");
-				DAInfo.put("AttributeLabel_i", "<a href=\"#\">" + soln.get("AttributeLabel").toString() + "</a>");
+				DAInfo.put("AttributeLabel_str", "<a href=\"#\">" + soln.get("AttributeLabel").toString() + "</a>");
 			}
-			if (soln.contains("DataAcquisitionSchema") && !DAInfo.containsKey("DataAcquisitionSchema_i")) {
-				key = "DataAcquisitionSchema_i";
+			if (soln.contains("DataAcquisitionSchema") && !DAInfo.containsKey("DataAcquisitionSchema_str")) {
+				key = "DataAcquisitionSchema_str";
 				value = DynamicFunctions.replaceURLWithPrefix(soln.get("DataAcquisitionSchema").toString());
 				DAInfo.put(key, value);
 			}
-			if (soln.contains("Method") && !DAInfo.containsKey("Method_i")){
-				key = "Method_i";
+			if (soln.contains("Method") && !DAInfo.containsKey("Method_str")){
+				key = "Method_str";
 				value = DynamicFunctions.replaceURLWithPrefix(soln.get("Method").toString());
 				DAInfo.put(key, value);
 			}
-			if (soln.contains("Deployment") && !DAInfo.containsKey("Deployment_i")){
-				key = "Deployment_i";
+			if (soln.contains("Deployment") && !DAInfo.containsKey("Deployment_str")){
+				key = "Deployment_str";
 				value = DynamicFunctions.replaceURLWithPrefix(soln.get("Deployment").toString());
 				DAInfo.put(key, value);
 			}
-			if (soln.contains("Comment") && !DAInfo.containsKey("Comment_i")){
-				key = "Comment_i";
+			if (soln.contains("Comment") && !DAInfo.containsKey("Comment_str")){
+				key = "Comment_str";
 				value = soln.get("Comment").toString();
 				DAInfo.put(key, value);
 			}
-			if (soln.contains("Agent") && !DAInfo.containsKey("Agent_i")){
-				key = "Agent_i";
+			if (soln.contains("Agent") && !DAInfo.containsKey("Agent_str")){
+				key = "Agent_str";
 				value = DynamicFunctions.replaceURLWithPrefix(soln.get("Agent").toString());
 				DAInfo.put(key, value);
 			}
-			if (soln.contains("StartTime") && !DAInfo.containsKey("StartTime_i")){
-				key = "StartTime_i";
+			if (soln.contains("StartTime") && !DAInfo.containsKey("StartTime_str")){
+				key = "StartTime_str";
 				value = soln.get("StartTime").toString();
 				DAInfo.put(key, value);
 			}
-			if (soln.contains("EndTime") && !DAInfo.containsKey("EndTime_i")){
-				key = "EndTime_i";
+			if (soln.contains("EndTime") && !DAInfo.containsKey("EndTime_str")){
+				key = "EndTime_str";
 				value = soln.get("EndTime").toString();
 				DAInfo.put(key, value);
 			}

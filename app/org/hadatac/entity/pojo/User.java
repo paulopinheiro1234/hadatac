@@ -3,8 +3,11 @@ package org.hadatac.entity.pojo;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -165,7 +168,7 @@ public class User implements Comparable<User> {
 		return user;
 	}
 	
-	public static File outputAsTurtle() {
+	public static String outputAsTurtle() {
 		String queryString = "CONSTRUCT { ?s ?p ?o } WHERE { ?s ?p ?o } ";
 		Query query = QueryFactory.create(queryString);
 		
@@ -181,8 +184,16 @@ public class User implements Comparable<User> {
 			System.out.println(e.getMessage());
 		}
 	    RDFDataMgr.write(outputStream, model, Lang.TURTLE);
+	    
+	    String result = "";
+	    try {
+	    	result = new String(Files.readAllBytes(
+					Paths.get(UserManagement.getTurtlePath())));
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
         
-		return ttl_file;
+		return result;
 	}
 	
 	public static List<String> getUserEmails() {

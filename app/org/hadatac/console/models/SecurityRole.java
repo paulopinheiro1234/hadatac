@@ -31,7 +31,7 @@ public class SecurityRole implements Role {
 	@Field("id")
 	public String id_s;
 
-	@Field("role_name")
+	@Field("role_name_str")
 	public String roleName;
 
 	@Override
@@ -108,7 +108,7 @@ public class SecurityRole implements Role {
 		SolrClient solrClient = new HttpSolrClient.Builder(
 				ConfigFactory.load().getString("hadatac.solr.users") 
 				+ Collections.AUTHENTICATE_ROLES).build();
-    	SolrQuery solrQuery = new SolrQuery("role_name:" + roleName);
+    	SolrQuery solrQuery = new SolrQuery("role_name_str:" + roleName);
     	
     	try {
 			QueryResponse queryResponse = solrClient.query(solrQuery);
@@ -145,7 +145,7 @@ public class SecurityRole implements Role {
 	private static SecurityRole convertSolrDocumentToSecurityRole(SolrDocument doc) {
 		SecurityRole role = new SecurityRole();
 		role.id_s = doc.getFieldValue("id").toString();
-		role.roleName = doc.getFieldValue("role_name").toString();
+		role.roleName = doc.getFieldValue("role_name_str").toString();
 		
 		return role;
 	}

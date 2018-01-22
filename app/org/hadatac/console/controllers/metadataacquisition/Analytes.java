@@ -127,31 +127,31 @@ public class Analytes extends Controller {
 				studyInfo = mapStudyInfo.get(studyUri);
 			}
 			
-			if (soln.contains("studyLabel") && !studyInfo.containsKey("studyLabel_i")) {
-				studyInfo.put("studyLabel_i", "<a href=\""
+			if (soln.contains("studyLabel") && !studyInfo.containsKey("studyLabel_str")) {
+				studyInfo.put("studyLabel_str", "<a href=\""
 						+ ConfigFactory.load().getString("hadatac.console.host_deploy") 
 						+ "/hadatac/metadataacquisitions/viewStudy?study_uri=" 
 						+ ValueCellProcessing.replaceNameSpaceEx(studyInfo.get("studyUri").toString()) + "\">"
 						+ soln.get("studyLabel").toString() + "</a>");
 			}
-			if (soln.contains("studyTitle") && !studyInfo.containsKey("studyTitle_i")) {
-				studyInfo.put("studyTitle_i", soln.get("studyTitle").toString());
+			if (soln.contains("studyTitle") && !studyInfo.containsKey("studyTitle_str")) {
+				studyInfo.put("studyTitle_str", soln.get("studyTitle").toString());
 			}
-			if (soln.contains("proj") && !studyInfo.containsKey("proj_i")){
-				studyInfo.put("proj_i", soln.get("proj").toString());
+			if (soln.contains("proj") && !studyInfo.containsKey("proj_str")){
+				studyInfo.put("proj_str", soln.get("proj").toString());
 			}
-			if (soln.contains("studyComment") && !studyInfo.containsKey("studyComment_i")){
-				studyInfo.put("studyComment_i", soln.get("studyComment").toString());
+			if (soln.contains("studyComment") && !studyInfo.containsKey("studyComment_str")){
+				studyInfo.put("studyComment_str", soln.get("studyComment").toString());
 			}
-			if (soln.contains("agentName") && !studyInfo.containsKey("agentName_i")){
-				studyInfo.put("agentName_i", soln.get("agentName").toString());
+			if (soln.contains("agentName") && !studyInfo.containsKey("agentName_str")){
+				studyInfo.put("agentName_str", soln.get("agentName").toString());
 			}
-			if (soln.contains("institutionName") && !studyInfo.containsKey("institutionName_i")){
-				studyInfo.put("institutionName_i", soln.get("institutionName").toString());
+			if (soln.contains("institutionName") && !studyInfo.containsKey("institutionName_str")){
+				studyInfo.put("institutionName_str", soln.get("institutionName").toString());
 			}
 			if (soln.contains("indicatorLabel")) {
 				String key = soln.get("indicatorLabel").toString().
-						replace(",","").replace(" ", "") + "_m";
+						replace(",", "").replace(" ", "") + "_str_multi";
 				String value = soln.get("attributeLabel").toString();
 				ArrayList<String> arrValues = null;
 				if (!studyInfo.containsKey(key)) {

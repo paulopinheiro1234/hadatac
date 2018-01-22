@@ -23,7 +23,7 @@ import org.hadatac.utils.Feedback;
 public class AnnotationLog {
 	@Field("file_name")
 	private String file_name = "";
-	@Field("log")
+	@Field("log_str")
 	private String log = "";
 	
 	public AnnotationLog() {}
@@ -96,8 +96,8 @@ public class AnnotationLog {
 		if(doc.getFieldValue("file_name") != null){
 			annotation_log.setFileName(doc.getFieldValue("file_name").toString());
 		}
-		if(doc.getFieldValue("log") != null){
-			annotation_log.setLog(doc.getFieldValue("log").toString());
+		if(doc.getFieldValue("log_str") != null){
+			annotation_log.setLog(doc.getFieldValue("log_str").toString());
 		}
 
 		return annotation_log;

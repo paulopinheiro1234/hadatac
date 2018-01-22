@@ -24,14 +24,6 @@ GET	    /hadatac/schemaattributes/solrsearch		     org.hadatac.console.http.Solr
 POST	/hadatac/schemaattributes/solrsearch		     org.hadatac.console.http.SolrSearchProxy.getSchemaAttributes()
 GET	    /hadatac/metadataacquisitions/analytes/solrsearch    org.hadatac.console.http.SolrSearchProxy.getAnalytesAcquisition()
 POST	/hadatac/metadataacquisitions/analytes/solrsearch    org.hadatac.console.http.SolrSearchProxy.getAnalytesAcquisition()
-GET	    /hadatac/metadataacquisitions/pilot1/solrsearch	     org.hadatac.console.http.SolrSearchProxy.getSubjectAcquisition()
-POST	/hadatac/metadataacquisitions/pilot1/solrsearch	     org.hadatac.console.http.SolrSearchProxy.getSubjectAcquisition()
-GET	    /hadatac/metadataacquisitions/pilot3/solrsearch	     org.hadatac.console.http.SolrSearchProxy.getSubjectAcquisition()
-POST	/hadatac/metadataacquisitions/pilot3/solrsearch	     org.hadatac.console.http.SolrSearchProxy.getSubjectAcquisition()
-GET	    /hadatac/metadataacquisitions/pilot5/solrsearch	     org.hadatac.console.http.SolrSearchProxy.getSubjectAcquisition()
-POST	/hadatac/metadataacquisitions/pilot5/solrsearch	     org.hadatac.console.http.SolrSearchProxy.getSubjectAcquisition()
-GET	    /hadatac/metadataacquisitions/pilot6/solrsearch	     org.hadatac.console.http.SolrSearchProxy.getSubjectAcquisition()
-POST	/hadatac/metadataacquisitions/pilot6/solrsearch	     org.hadatac.console.http.SolrSearchProxy.getSubjectAcquisition()
 GET	    /hadatac/metadataacquisitions/download	             org.hadatac.console.http.SolrSearchProxy.getStudyAcquisitionDownload()
 GET	    /hadatac/dataacquisitions/download	             org.hadatac.console.http.SolrSearchProxy.getDataAcquisitionDownload()
 POST    /hadatac/dataacquisitions/download	             org.hadatac.console.http.SolrSearchProxy.getDataAcquisitionDownload()
@@ -39,8 +31,6 @@ GET	    /hadatac/getIndicatorValueDownload/download	     org.hadatac.console.htt
 POST    /hadatac/apiStudy/download			     org.hadatac.console.http.SolrSearchProxy.getApiStudyDownload()
 POST    /hadatac/apiStudyVariable/download		     org.hadatac.console.http.SolrSearchProxy.getApiStudyVariableDownload()
 POST    /hadatac/apiStudyVariableData/download		     org.hadatac.console.http.SolrSearchProxy.getApiStudyVariableDataDownload()
-GET	    /hadatac/metadataacquisitions/sub1Pilot5/solrsearch  org.hadatac.console.http.SolrSearchProxy.getSampleAcquisition()
-POST	/hadatac/metadataacquisitions/sub1Pilot5/solrsearch  org.hadatac.console.http.SolrSearchProxy.getSampleAcquisition()
 
 # Metadata
 GET	    /hadatac/metadata  		 	       org.hadatac.console.controllers.metadata.Metadata.index()

@@ -21,7 +21,7 @@ import com.typesafe.config.ConfigFactory;
 public class Credential {
 	@Field("username")
 	private String userName;
-	@Field("password")
+	@Field("password_str")
 	private String password;
 	
 	public Credential() {
@@ -81,7 +81,7 @@ public class Credential {
 	public static Credential convertFromSolr(SolrDocument doc) {
 		Credential object = new Credential();
 		object.setUserName(doc.getFieldValue("username").toString());
-		object.setPassword(doc.getFieldValue("password").toString());
+		object.setPassword(doc.getFieldValue("password_str").toString());
 		
 		return object;
 	}

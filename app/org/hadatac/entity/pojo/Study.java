@@ -74,24 +74,24 @@ public class Study extends HADatAcThing {
 
 	private String studyType;
 
-	@Field("studyLabel_i")
+	@Field("studyLabel_str")
 	private String label;
 
-	@Field("studyTitle_i")
+	@Field("studyTitle_str")
 	private String title;
 
-	@Field("proj_i")
+	@Field("proj_str")
 	private String project;
 
-	@Field("studyComment_i")
+	@Field("studyComment_str")
 	private String comment;
 
 	private String externalSource;
 
-	@Field("institutionName_i")
+	@Field("institutionName_str")
 	private String institutionUri;
 
-	@Field("agentName_i")
+	@Field("agentName_str")
 	private String agentUri;
 
 	private DateTime startedAt;
@@ -425,29 +425,28 @@ public class Study extends HADatAcThing {
 			study.setPermissionUri(doc.getFieldValue("permission_uri").toString());
 			}*/
 		// label
-		if (doc.getFieldValues("studyLabel_i") != null) {
-			study.setLabel(doc.getFieldValue("studyLabel_i").toString());
+		if (doc.getFieldValue("studyLabel_str") != null) {
+			study.setLabel(doc.getFieldValue("studyLabel_str").toString());
 		}
 		// projectTitle
-		if (doc.getFieldValues("proj_i") != null) {
-			study.setProject(doc.getFieldValue("proj_i").toString());
+		if (doc.getFieldValue("proj_str") != null) {
+			study.setProject(doc.getFieldValue("proj_str").toString());
 		}
 		// comment
-		if (doc.getFieldValues("comment_i") != null) {
-			study.setLabel(doc.getFieldValue("comment_i").toString());
+		if (doc.getFieldValue("comment_str") != null) {
+			study.setLabel(doc.getFieldValue("comment_str").toString());
 		}
 		// description
-		if (doc.getFieldValues("studyTitle_i") != null) {
-			study.setTitle(doc.getFieldValue("studyTitle_i").toString());
+		if (doc.getFieldValue("studyTitle_str") != null) {
+			study.setTitle(doc.getFieldValue("studyTitle_str").toString());
 		}
 		// institutionUri
-		if (doc.getFieldValues("institutionName_i") != null) {
-			study.setInstitutionUri(doc.getFieldValue("institutionName_i").toString());
+		if (doc.getFieldValue("institutionName_str") != null) {
+			study.setInstitutionUri(doc.getFieldValue("institutionName_str").toString());
 		}
-
 		// agentUri
-		if (doc.getFieldValues("agentName_i") != null) {
-			study.setAgentUri(doc.getFieldValue("agentName_i").toString());
+		if (doc.getFieldValue("agentName_str") != null) {
+			study.setAgentUri(doc.getFieldValue("agentName_str").toString());
 		}
 
 		return study;

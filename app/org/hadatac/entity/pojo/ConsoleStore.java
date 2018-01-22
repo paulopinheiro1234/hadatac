@@ -25,9 +25,10 @@ public class ConsoleStore {
 	@Field("id")
 	private int id;
 	
-	@Field("last_dynamic_metadata_id")
+	@Field("last_dynamic_metadata_id_long")
 	private long lastDynamicMetadataId;
 	
+	@Field("timestamp_date")
 	private DateTime timestamp;
 	
 	public int getId() {
@@ -48,7 +49,6 @@ public class ConsoleStore {
 		return formatter.withZone(DateTimeZone.UTC).print(timestamp);
 	}
 	
-	@Field("timestamp")
 	public void setTimestamp(String timestamp) {
 		DateTimeFormatter formatter = DateTimeFormat.forPattern("EEE MMM dd HH:mm:ss zzz yyyy");
 		this.timestamp = formatter.parseDateTime(timestamp);
@@ -77,7 +77,7 @@ public class ConsoleStore {
 				+ Collections.CONSOLE_STORE).build();
         SolrQuery query = new SolrQuery();
         query.set("q", "*:*");
-        query.set("sort", "last_dynamic_metadata_id desc");
+        query.set("sort", "last_dynamic_metadata_id_long desc");
         query.set("start", "0");
         query.set("rows", "1");
         try {
@@ -89,8 +89,8 @@ public class ConsoleStore {
             	SolrDocument document = iter.next();
             	consoleStore = new ConsoleStore();
             	consoleStore.setId(Integer.parseInt(document.getFieldValue("id").toString()));
-            	consoleStore.setLastDynamicMetadataId(Long.parseLong(document.getFieldValue("last_dynamic_metadata_id").toString()));
-            	DateTime date = new DateTime((Date)document.getFieldValue("timestamp"));
+            	consoleStore.setLastDynamicMetadataId(Long.parseLong(document.getFieldValue("last_dynamic_metadata_id_long").toString()));
+            	DateTime date = new DateTime((Date)document.getFieldValue("timestamp_date"));
             	consoleStore.setTimestamp(date.withZone(DateTimeZone.UTC).toString("EEE MMM dd HH:mm:ss zzz yyyy"));
             }
         } catch (SolrServerException | IOException e) {

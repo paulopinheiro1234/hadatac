@@ -46,19 +46,19 @@ public class TokenAction {
 	@Field("id")
 	public String id_s;
 
-	@Field("token")
+	@Field("token_str")
 	public String token;
 
 	public SysUser targetUser;
 
 	public Type type;
 
-	@Field("created")
+	@Field("created_str")
 	public String created;
 	
 	public DateTime created_j;
 
-	@Field("expires")
+	@Field("expires_str")
 	public String expires;
 	
 	public DateTime expires_j;
@@ -67,7 +67,7 @@ public class TokenAction {
 		return targetUser.getId();
 	}
 	
-	@Field("target_user_id")
+	@Field("target_user_id_str")
 	public void setTargetUserId(String id_s) {
 		targetUser.setId(id_s);
 	}
@@ -76,7 +76,7 @@ public class TokenAction {
 		return type.name();
 	}
 	
-	@Field("type")
+	@Field("type_str")
 	public void setType(String name) {
 		if (name.equals("EMAIL_VERIFICATION")) {
 			type = Type.EMAIL_VERIFICATION;
@@ -90,7 +90,7 @@ public class TokenAction {
 		return formatter.withZone(DateTimeZone.UTC).print(this.created_j);
 	}
 	
-	@Field("created")
+	@Field("created_str")
 	public void setCreated(String created) {
 		DateTimeFormatter formatter = DateTimeFormat.forPattern("EEE MMM dd HH:mm:ss zzz yyyy");
 		created_j = formatter.parseDateTime(created);
@@ -101,7 +101,7 @@ public class TokenAction {
 		return formatter.withZone(DateTimeZone.UTC).print(this.expires_j);
 	}
 	
-	@Field("expires")
+	@Field("expires_str")
 	public void setExpires(String expires) {
 		DateTimeFormatter formatter = DateTimeFormat.forPattern("EEE MMM dd HH:mm:ss zzz yyyy");
 		expires_j = formatter.parseDateTime(expires);
@@ -115,7 +115,7 @@ public class TokenAction {
 		SolrClient solrClient = new HttpSolrClient.Builder(
 				ConfigFactory.load().getString("hadatac.solr.users")
 				+ Collections.AUTHENTICATE_TOKENS).build();
-    	SolrQuery solrQuery = new SolrQuery("token:" + token + " AND type:" + type.name());
+    	SolrQuery solrQuery = new SolrQuery("token_str:" + token + " AND type:" + type.name());
     	TokenAction tokenAction = null;
 		
     	try {
@@ -127,13 +127,13 @@ public class TokenAction {
 				SolrDocument doc = list.get(0);
 				tokenAction = new TokenAction();
 				tokenAction.id_s = doc.getFieldValue("id").toString();
-				tokenAction.token = doc.getFieldValue("token").toString();
-				tokenAction.setType(doc.getFieldValue("type").toString());
-				date = new DateTime(doc.getFieldValue("created"));
+				tokenAction.token = doc.getFieldValue("token_str").toString();
+				tokenAction.setType(doc.getFieldValue("type_str").toString());
+				date = new DateTime(doc.getFieldValue("created_str"));
 				tokenAction.setCreated(date.withZone(DateTimeZone.UTC).toString("EEE MMM dd HH:mm:ss zzz yyyy"));
-				date = new DateTime(doc.getFieldValue("expires"));
+				date = new DateTime(doc.getFieldValue("expires_str"));
 				tokenAction.setExpires(date.withZone(DateTimeZone.UTC).toString("EEE MMM dd HH:mm:ss zzz yyyy"));
-				tokenAction.targetUser = SysUser.findByIdSolr(doc.getFieldValue("target_user_id").toString());
+				tokenAction.targetUser = SysUser.findByIdSolr(doc.getFieldValue("target_user_id_str").toString());
 			}
 		} catch (Exception e) {
 			System.out.println("[ERROR] TokenAction.findByTokenSolr - Exception message: " + e.getMessage());
@@ -151,7 +151,7 @@ public class TokenAction {
 				ConfigFactory.load().getString("hadatac.solr.users") 
 				+ Collections.AUTHENTICATE_TOKENS).build();
 		try {
-			solrClient.deleteByQuery("target_user_id:" + u.getId() + " AND type:" + type.name());
+			solrClient.deleteByQuery("target_user_id_str:" + u.getId() + " AND type_str:" + type.name());
 			solrClient.commit();
 			solrClient.close();
 		} catch (SolrServerException | IOException e) {

@@ -43,75 +43,73 @@ public class DataAcquisition extends HADatAcThing {
 
 	@Field("uri")
 	private String uri;
-	@Field("label")
+	@Field("label_str")
 	private String label;
-	@Field("comment")
+	@Field("comment_str")
 	private String comment;
-	@Field("used_uri")
+	@Field("used_uri_str_multi")
 	private String used_uri;
 
 	private DateTime startedAt;
 	private DateTime endedAt;
 
-	@Field("owner_uri")
+	@Field("owner_uri_str")
 	private String ownerUri;
-	@Field("permission_uri")
+	@Field("permission_uri_str")
 	private String permissionUri;
-	@Field("parameter")
+	@Field("parameter_str")
 	private String parameter;
-	@Field("triggering_event")
+	@Field("triggering_event_int")
 	private int triggeringEvent;
-	@Field("nr_data_points")
+	@Field("nr_data_points_long")
 	private long numberDataPoints;
-	@Field("unit")
+	@Field("unit_str_multi")
 	private List<String> unit;
-	@Field("unit_uri")
+	@Field("unit_uri_str_multi")
 	private List<String> unitUri;
-	@Field("entity")
+	@Field("entity_str_multi")
 	private List<String> entity;
-	@Field("entity_uri")
+	@Field("entity_uri_str_multi")
 	private List<String> entityUri;
-	@Field("type")
-	private List<String> types;
-	@Field("type_uri")
+	@Field("type_uri_str_multi")
 	private List<String> typeURIs;
-	@Field("associated_uri")
+	@Field("associated_uri_str_multi")
 	private List<String> associatedURIs;
-	@Field("characteristic")
+	@Field("characteristic_str_multi")
 	private List<String> characteristic;
-	@Field("characteristic_uri")
+	@Field("characteristic_uri_str_multi")
 	private List<String> characteristicUri;
-	@Field("study_uri")
+	@Field("study_uri_str")
 	private String studyUri;
-	@Field("method_uri")
+	@Field("method_uri_str")
 	private String methodUri;
-	@Field("schema_uri")
+	@Field("schema_uri_str")
 	private String schemaUri;
-	@Field("deployment_uri")
+	@Field("deployment_uri_str")
 	private String deploymentUri;
-	@Field("instrument_model")
+	@Field("instrument_model_str")
 	private String instrumentModel;
-	@Field("instrument_uri")
+	@Field("instrument_uri_str")
 	private String instrumentUri;
-	@Field("platform_name")
+	@Field("platform_name_str")
 	private String platformName;
-	@Field("platform_uri")
+	@Field("platform_uri_str")
 	private String platformUri;
-	@Field("location")
+	@Field("location_latlong")
 	private String location;
-	@Field("elevation")
+	@Field("elevation_str")
 	private String elevation;
-	@Field("dataset_uri")
+	@Field("dataset_uri_str_multi")
 	private List<String> datasetURIs;
-	@Field("globalscope_uri")
+	@Field("globalscope_uri_str")
 	private String globalScopeUri;
-	@Field("globalscope_name")
+	@Field("globalscope_name_str")
 	private String globalScopeName;
-	@Field("localscope_uri")
+	@Field("localscope_uri_str_multi")
 	private List<String> localScopeUri;
-	@Field("localscope_name")
+	@Field("localscope_name_str_multi")
 	private List<String> localScopeName;
-	@Field("status")
+	@Field("status_int")
 	private int status;
 	/*
 	 * 0 - DataAcquisition is a new one, its details on the preamble
@@ -142,7 +140,6 @@ public class DataAcquisition extends HADatAcThing {
 		characteristicUri = new ArrayList<String>();
 		entity = new ArrayList<String>();
 		entityUri = new ArrayList<String>();
-		types = new ArrayList<String>();
 		typeURIs = new ArrayList<String>();
 		associatedURIs = new ArrayList<String>();
 		deployment = null;
@@ -338,7 +335,7 @@ public class DataAcquisition extends HADatAcThing {
 		DateTimeFormatter formatter = ISODateTimeFormat.dateTimeNoMillis();
 		return formatter.withZone(DateTimeZone.UTC).print(startedAt);
 	}
-	@Field("started_at")
+	@Field("started_at_date")
 	public void setStartedAt(DateTime startedAt) {
 		this.startedAt = startedAt;
 	}
@@ -358,7 +355,7 @@ public class DataAcquisition extends HADatAcThing {
 		DateTimeFormatter formatter = ISODateTimeFormat.dateTimeNoMillis();
 		return formatter.withZone(DateTimeZone.UTC).print(endedAt);
 	}
-	@Field("ended_at")
+	@Field("ended_at_date")
 	public void setEndedAt(DateTime endedAt) {
 		this.endedAt = endedAt;
 	}
@@ -683,133 +680,133 @@ public class DataAcquisition extends HADatAcThing {
 			if (doc.getFieldValue("uri") != null) {
 				dataAcquisition.setUri(doc.getFieldValue("uri").toString());
 			}
-			if (doc.getFieldValue("owner_uri") != null) {
-				dataAcquisition.setOwnerUri(doc.getFieldValue("owner_uri").toString());
+			if (doc.getFieldValue("owner_uri_str") != null) {
+				dataAcquisition.setOwnerUri(doc.getFieldValue("owner_uri_str").toString());
 			}
-			if (doc.getFieldValue("permission_uri") != null) {
-				dataAcquisition.setPermissionUri(doc.getFieldValue("permission_uri").toString());
+			if (doc.getFieldValue("permission_uri_str") != null) {
+				dataAcquisition.setPermissionUri(doc.getFieldValue("permission_uri_str").toString());
 			}
-			if (doc.getFieldValue("parameter") != null) {
-				dataAcquisition.setParameter(doc.getFieldValue("parameter").toString());
+			if (doc.getFieldValue("parameter_str") != null) {
+				dataAcquisition.setParameter(doc.getFieldValue("parameter_str").toString());
 			}
-			if (doc.getFieldValue("study_uri") != null) {
-				dataAcquisition.setStudyUri(doc.getFieldValue("study_uri").toString());
+			if (doc.getFieldValue("study_uri_str") != null) {
+				dataAcquisition.setStudyUri(doc.getFieldValue("study_uri_str").toString());
 			}
-			if (doc.getFieldValue("triggering_event") != null) {
-				dataAcquisition.setTriggeringEvent(Integer.parseInt(doc.getFieldValue("triggering_event").toString()));
+			if (doc.getFieldValue("triggering_event_int") != null) {
+				dataAcquisition.setTriggeringEvent(Integer.parseInt(doc.getFieldValue("triggering_event_int").toString()));
 			}
-			if (doc.getFieldValue("nr_data_points") != null) {
-				dataAcquisition.setNumberDataPoints(Long.parseLong(doc.getFieldValue("nr_data_points").toString()));
+			if (doc.getFieldValue("nr_data_points_long") != null) {
+				dataAcquisition.setNumberDataPoints(Long.parseLong(doc.getFieldValue("nr_data_points_long").toString()));
 			}
-			if (doc.getFieldValue("started_at") != null) {
-				date = new DateTime((Date)doc.getFieldValue("started_at"));
+			if (doc.getFieldValue("started_at_date") != null) {
+				date = new DateTime((Date)doc.getFieldValue("started_at_date"));
 				dataAcquisition.setStartedAt(date.withZone(DateTimeZone.UTC));
 			}
-			if (doc.getFieldValue("ended_at") != null) {
-				date = new DateTime((Date)doc.getFieldValue("ended_at"));
+			if (doc.getFieldValue("ended_at_date") != null) {
+				date = new DateTime((Date)doc.getFieldValue("ended_at_date"));
 				dataAcquisition.setEndedAt(date.withZone(DateTimeZone.UTC));
 			}
-			if (doc.getFieldValues("method_uri") != null) {
-				dataAcquisition.setMethodUri(doc.getFieldValue("method_uri").toString());
+			if (doc.getFieldValues("method_uri_str") != null) {
+				dataAcquisition.setMethodUri(doc.getFieldValue("method_uri_str").toString());
 			}
-			if (doc.getFieldValues("schema_uri") != null) {
-				dataAcquisition.setSchemaUri(doc.getFieldValue("schema_uri").toString());
+			if (doc.getFieldValues("schema_uri_str") != null) {
+				dataAcquisition.setSchemaUri(doc.getFieldValue("schema_uri_str").toString());
 			}
-			if (doc.getFieldValue("label") != null) {
-				dataAcquisition.setLabel(doc.getFieldValue("label").toString());
+			if (doc.getFieldValue("label_str") != null) {
+				dataAcquisition.setLabel(doc.getFieldValue("label_str").toString());
 			}
-			if (doc.getFieldValue("comment") != null) {
-				dataAcquisition.setComment(doc.getFieldValue("comment").toString());
+			if (doc.getFieldValue("comment_str") != null) {
+				dataAcquisition.setComment(doc.getFieldValue("comment_str").toString());
 			}
-			if (doc.getFieldValues("associated_uri") != null) {
-				i = doc.getFieldValues("associated_uri").iterator();
+			if (doc.getFieldValues("associated_uri_str_multi") != null) {
+				i = doc.getFieldValues("associated_uri_str_multi").iterator();
 				while (i.hasNext()) {
 					dataAcquisition.addAssociatedUri(i.next().toString());
 				}
 			}
-			if (doc.getFieldValues("type_uri") != null) {
-				i = doc.getFieldValues("type_uri").iterator();
+			if (doc.getFieldValues("type_uri_str_multi") != null) {
+				i = doc.getFieldValues("type_uri_str_multi").iterator();
 				while (i.hasNext()) {
 					dataAcquisition.addTypeUri(i.next().toString());
 				}
 			}
-			if (doc.getFieldValues("unit") != null) {
-				i = doc.getFieldValues("unit").iterator();
+			if (doc.getFieldValues("unit_str_multi") != null) {
+				i = doc.getFieldValues("unit_str_multi").iterator();
 				while (i.hasNext()) {
 					dataAcquisition.addUnit(i.next().toString());
 				}
 			}
-			if (doc.getFieldValues("unit_uri") != null) {
-				i = doc.getFieldValues("unit_uri").iterator();
+			if (doc.getFieldValues("unit_uri_str_multi") != null) {
+				i = doc.getFieldValues("unit_uri_str_multi").iterator();
 				while (i.hasNext()) {
 					dataAcquisition.addUnitUri(i.next().toString());
 				}
 			}
-			if (doc.getFieldValues("entity") != null) {
-				i = doc.getFieldValues("entity").iterator();
+			if (doc.getFieldValues("entity_str_multi") != null) {
+				i = doc.getFieldValues("entity_str_multi").iterator();
 				while (i.hasNext()) {
 					dataAcquisition.addEntity(i.next().toString());
 				}
 			}
-			if (doc.getFieldValues("entity_uri") != null) {
-				i = doc.getFieldValues("entity_uri").iterator();
+			if (doc.getFieldValues("entity_uri_str_multi") != null) {
+				i = doc.getFieldValues("entity_uri_str_multi").iterator();
 				while (i.hasNext()) {
 					dataAcquisition.addEntityUri(i.next().toString());
 				}
 			}
-			if (doc.getFieldValues("characteristic") != null) {
-				i = doc.getFieldValues("characteristic").iterator();
+			if (doc.getFieldValues("characteristic_str_multi") != null) {
+				i = doc.getFieldValues("characteristic_str_multi").iterator();
 				while (i.hasNext()) {
 					dataAcquisition.addCharacteristic(i.next().toString());
 				}
 			}
-			if (doc.getFieldValues("characteristic_uri") != null) {
-				i = doc.getFieldValues("characteristic_uri").iterator();
+			if (doc.getFieldValues("characteristic_uri_str_multi") != null) {
+				i = doc.getFieldValues("characteristic_uri_str_multi").iterator();
 				while (i.hasNext()) {
 					dataAcquisition.addCharacteristicUri(i.next().toString());
 				}
 			}
-			if (doc.getFieldValue("deployment_uri") != null) {
-				dataAcquisition.setDeploymentUri(doc.getFieldValue("deployment_uri").toString());
+			if (doc.getFieldValue("deployment_uri_str") != null) {
+				dataAcquisition.setDeploymentUri(doc.getFieldValue("deployment_uri_str").toString());
 			}
-			if (doc.getFieldValue("instrument_model") != null) {
-				dataAcquisition.setInstrumentModel(doc.getFieldValue("instrument_model").toString());
+			if (doc.getFieldValue("instrument_model_str") != null) {
+				dataAcquisition.setInstrumentModel(doc.getFieldValue("instrument_model_str").toString());
 			}
-			if (doc.getFieldValue("instrument_uri") != null) {
-				dataAcquisition.setInstrumentUri(doc.getFieldValue("instrument_uri").toString());
+			if (doc.getFieldValue("instrument_uri_str") != null) {
+				dataAcquisition.setInstrumentUri(doc.getFieldValue("instrument_uri_str").toString());
 			}
-			if (doc.getFieldValue("platform_name") != null) {
-				dataAcquisition.setPlatformName(doc.getFieldValue("platform_name").toString());
+			if (doc.getFieldValue("platform_name_str") != null) {
+				dataAcquisition.setPlatformName(doc.getFieldValue("platform_name_str").toString());
 			}
-			if (doc.getFieldValue("platform_uri") != null) {
-				dataAcquisition.setPlatformUri(doc.getFieldValue("platform_uri").toString());
+			if (doc.getFieldValue("platform_uri_str") != null) {
+				dataAcquisition.setPlatformUri(doc.getFieldValue("platform_uri_str").toString());
 			}
-			if (doc.getFieldValues("dataset_uri") != null) {
-				i = doc.getFieldValues("dataset_uri").iterator();
+			if (doc.getFieldValues("dataset_uri_str_multi") != null) {
+				i = doc.getFieldValues("dataset_uri_str_multi").iterator();
 				while (i.hasNext()) {
 					dataAcquisition.addDatasetUri(i.next().toString());
 				}
 			}
-			if (doc.getFieldValue("globalscope_uri") != null) {
-				dataAcquisition.setGlobalScopeUri(doc.getFieldValue("globalscope_uri").toString());
+			if (doc.getFieldValue("globalscope_uri_str") != null) {
+				dataAcquisition.setGlobalScopeUri(doc.getFieldValue("globalscope_uri_str").toString());
 			}
-			if (doc.getFieldValue("globalscope_name") != null) {
-				dataAcquisition.setGlobalScopeName(doc.getFieldValue("globalscope_name").toString());
+			if (doc.getFieldValue("globalscope_name_str") != null) {
+				dataAcquisition.setGlobalScopeName(doc.getFieldValue("globalscope_name_str").toString());
 			}
-			if (doc.getFieldValues("localscope_uri") != null) {
-				i = doc.getFieldValues("localscope_uri").iterator();
+			if (doc.getFieldValues("localscope_uri_str_multi") != null) {
+				i = doc.getFieldValues("localscope_uri_str_multi").iterator();
 				while (i.hasNext()) {
 					dataAcquisition.addLocalScopeUri(i.next().toString());
 				}
 			}
-			if (doc.getFieldValues("localscope_name") != null) {
-				i = doc.getFieldValues("localscope_name").iterator();
+			if (doc.getFieldValues("localscope_name_str_multi") != null) {
+				i = doc.getFieldValues("localscope_name_str_multi").iterator();
 				while (i.hasNext()) {
 					dataAcquisition.addLocalScopeName(i.next().toString());
 				}
 			}
-			if (doc.getFieldValue("status") != null) {
-				dataAcquisition.setStatus(Integer.parseInt(doc.getFieldValue("status").toString()));
+			if (doc.getFieldValue("status_int") != null) {
+				dataAcquisition.setStatus(Integer.parseInt(doc.getFieldValue("status_int").toString()));
 			}
 		} catch (Exception e) {
 			System.out.println("[ERROR] DataAcquisition.convertFromSolr(SolrDocument) - e.Message: " + e.getMessage());
@@ -822,27 +819,27 @@ public class DataAcquisition extends HADatAcThing {
 		SolrQuery query = new SolrQuery();
 		if (state.getCurrent() == State.ALL) {
 			if (null == ownerUri) {
-				query.set("q", "owner_uri:*");
+				query.set("q", "owner_uri_str:*");
 			}
 			else {
-				query.set("q", "owner_uri:\"" + ownerUri + "\"");
+				query.set("q", "owner_uri_str:\"" + ownerUri + "\"");
 			}
 		} else if (state.getCurrent() == State.ACTIVE) {
 			if (null == ownerUri) {
-				query.set("q", "owner_uri:* AND ended_at:\"9999-12-31T23:59:59.999Z\"");
+				query.set("q", "owner_uri_str:* AND ended_at_date:\"9999-12-31T23:59:59.999Z\"");
 			}
 			else {
-				query.set("q", "owner_uri:\"" + ownerUri + "\" AND ended_at:\"9999-12-31T23:59:59.999Z\"");
+				query.set("q", "owner_uri_str:\"" + ownerUri + "\" AND ended_at_date:\"9999-12-31T23:59:59.999Z\"");
 			}
 		} else {  // it is assumed that state is CLOSED
 			if (null == ownerUri) {
-				query.set("q", "owner_uri:* AND -ended_at:\"9999-12-31T23:59:59.999Z\"");
+				query.set("q", "owner_uri_str:* AND -ended_at_date:\"9999-12-31T23:59:59.999Z\"");
 			}
 			else {
-				query.set("q", "owner_uri:\"" + ownerUri + "\" AND -ended_at:\"9999-12-31T23:59:59.999Z\"");
+				query.set("q", "owner_uri_str:\"" + ownerUri + "\" AND -ended_at_date:\"9999-12-31T23:59:59.999Z\"");
 			}
 		}
-		query.set("sort", "started_at asc");
+		query.set("sort", "started_at_date asc");
 		query.set("rows", "10000000");
 
 		return findByQuery(query);
@@ -877,8 +874,8 @@ public class DataAcquisition extends HADatAcThing {
 
 	public static List<DataAcquisition> findAll() {
 		SolrQuery query = new SolrQuery();
-		query.set("q", "owner_uri:*");
-		query.set("sort", "started_at asc");
+		query.set("q", "owner_uri_str:*");
+		query.set("sort", "started_at_date asc");
 		query.set("rows", "10000000");
 
 		return findByQuery(query);
@@ -890,8 +887,8 @@ public class DataAcquisition extends HADatAcThing {
 
 	public static List<DataAcquisition> find(String ownerUri) {
 		SolrQuery query = new SolrQuery();
-		query.set("q", "owner_uri:\"" + ownerUri + "\"");
-		query.set("sort", "started_at asc");
+		query.set("q", "owner_uri_str:\"" + ownerUri + "\"");
+		query.set("sort", "started_at_date asc");
 		query.set("rows", "10000000");
 
 		return findByQuery(query);
@@ -920,7 +917,7 @@ public class DataAcquisition extends HADatAcThing {
 	public static DataAcquisition findByUri(String dataAcquisitionUri) {
 		SolrQuery query = new SolrQuery();
 		query.set("q", "uri:\"" + dataAcquisitionUri + "\"");
-		query.set("sort", "started_at asc");
+		query.set("sort", "started_at_date asc");
 		query.set("rows", "10000000");
 
 		List<DataAcquisition> results = findByQuery(query);
@@ -995,8 +992,8 @@ public class DataAcquisition extends HADatAcThing {
 
 	public static List<DataAcquisition> find(Deployment deployment, boolean active) {
 		SolrQuery query = new SolrQuery();
-		query.set("q", "deployment_uri:\"" + deployment.getUri() + "\"");
-		query.set("sort", "started_at desc");
+		query.set("q", "deployment_uri_str:\"" + deployment.getUri() + "\"");
+		query.set("sort", "started_at_date desc");
 		query.set("rows", "10000000");
 		List<DataAcquisition> listDA = findByQuery(query);
 

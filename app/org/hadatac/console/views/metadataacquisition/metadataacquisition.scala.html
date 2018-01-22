@@ -28,7 +28,7 @@ jQuery(document).ready(function($) {
     facets: [ 
     	@for(studyIndicator <- indicatorList){
     		{
-    		'field': '@studyIndicator.replace(" ","").replace(",","")_m', 
+    		'field': '@studyIndicator.replace(" ","").replace(",","")_str_multi', 
     		'display': '@studyIndicator'
     		},
     }],
@@ -36,7 +36,7 @@ jQuery(document).ready(function($) {
         {'field':'studyUri.exact', 'display':'Study URI'},
     	@for(studyIndicator <- indicatorList){
     		{
-    		'field': '@studyIndicator.replace(" ","").replace(",","")_m.exact', 
+    		'field': '@studyIndicator.replace(" ","").replace(",","")_str_multi.exact', 
     		'display': '@studyIndicator'
     		},
     }],
@@ -44,7 +44,7 @@ jQuery(document).ready(function($) {
         {'field':'studyUri.exact', 'display':'Study URI'},
     	@for(studyIndicator <- indicatorList){
     		{
-    		'field': '@studyIndicator.replace(" ","").replace(",","")_m.exact', 
+    		'field': '@studyIndicator.replace(" ","").replace(",","")_str_multi.exact', 
     		'display': '@studyIndicator'
     		},
     }],
@@ -58,33 +58,33 @@ jQuery(document).ready(function($) {
         [
           {
             "pre" : "<h3>",
-            "field" : "studyLabel_i",
+            "field" : "studyLabel_str",
             "post" : " - "
           },
           {
             "pre" : "(",
-            "field" : "studyTitle_i",
+            "field" : "studyTitle_str",
             "post" : ")</h3>"
           }
         ],
         [
           {
             "pre" : "<b>Institution:</b> ",
-            "field" : "institutionName_i",
+            "field" : "institutionName_str",
             "post" : ", "
           }
         ],
         [
           {
             "pre" : "<b>Principal Investigator(s):</b> ",
-            "field" : "agentName_i",
+            "field" : "agentName_str",
             "post" : " "
           }
         ],
         [
           {
             "pre" : "\n\n",
-            "field" : "studyComment_i",
+            "field" : "studyComment_str",
             "post" : ""
           }
         ]
