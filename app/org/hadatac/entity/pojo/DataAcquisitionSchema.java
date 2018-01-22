@@ -400,18 +400,45 @@ public class DataAcquisitionSchema {
 					classUri = soln.getResource("codeClass").toString();
 				} else if (soln.get("resource").toString().length() > 0) {
 					classUri = soln.getResource("resource").toString();
-				} 
+				}
+				
+				String queryString2 = NameSpaces.getInstance().printSparqlNameSpaceList()
+						+ " SELECT ?label WHERE { "
+						+ classUri + " rdfs:label ?label . "
+						+ " }";
+
+				Query query2 = QueryFactory.create(queryString2);
+				QueryExecution qexec2 = QueryExecutionFactory.sparqlService(
+						Collections.getCollectionsName(Collections.METADATA_SPARQL), query2);
+				ResultSet results2 = qexec2.execSelect();
+				ResultSetRewindable resultsrw2 = ResultSetFactory.copyResults(results2);
+				qexec2.close();
+				String classlabel = "";
+				
+				if (resultsrw2.hasNext()) {
+					QuerySolution soln2 = resultsrw2.next();
+					if (soln2.get("label").toString().length() > 0) {
+						classlabel = soln.getResource("label").toString();
+						System.out.println(classUri + " 's label is " + classlabel);
+					}
+				}
 				
 				String daso_or_dasa = soln.getResource("daso_or_dasa").toString();
 				String code = soln.getLiteral("code").toString();
 				if (mapPossibleValues.containsKey(daso_or_dasa)) {
-					System.out.println("find pv map content " + daso_or_dasa + " " + mapPossibleValues.containsKey(daso_or_dasa));
-					mapPossibleValues.get(daso_or_dasa).put(code.toLowerCase(), classUri);
+					if (classlabel.length()>0) {
+						mapPossibleValues.get(daso_or_dasa).put(code.toLowerCase(), classlabel);
+					} else {
+						mapPossibleValues.get(daso_or_dasa).put(code.toLowerCase(), classUri);
+					}
 				} else {
 					Map<String, String> indvMapPossibleValues = new HashMap<String, String>();
-					indvMapPossibleValues.put(code.toLowerCase(), classUri);
+					if (classlabel.length()>0) {
+						indvMapPossibleValues.put(code.toLowerCase(), classlabel);
+					} else {
+						indvMapPossibleValues.put(code.toLowerCase(), classUri);
+					}
 					mapPossibleValues.put(daso_or_dasa, indvMapPossibleValues);
-					System.out.println(daso_or_dasa + " and indvMapPossibleValues " + indvMapPossibleValues.get(code.toLowerCase()));
 				}
 			}
 		} catch (Exception e) {
