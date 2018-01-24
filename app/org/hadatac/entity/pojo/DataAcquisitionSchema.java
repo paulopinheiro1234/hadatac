@@ -376,10 +376,11 @@ public class DataAcquisitionSchema {
 		System.out.println("findPossibleValues is called!");
 		Map<String, Map<String, String>> mapPossibleValues = new HashMap<String, Map<String, String>>();
 		String queryString = NameSpaces.getInstance().printSparqlNameSpaceList()
-				+ " SELECT ?daso_or_dasa ?codeClass ?code ?resource WHERE { "
+				+ " SELECT ?daso_or_dasa ?codeClass ?code ?label ?resource WHERE { "
 				+ " ?possibleValue a hasco:PossibleValue . "
 				+ " ?possibleValue hasco:isPossibleValueOf ?daso_or_dasa . "
 				+ " ?possibleValue hasco:hasCode ?code . "
+				+ " ?possibleValue hasco:hasCodeLabel ?label ."
 				+ " ?daso_or_dasa hasco:partOfSchema <" + schemaUri + "> . " 
 				+ " OPTIONAL { ?possibleValue hasco:hasClass ?codeClass } . "
 				+ " OPTIONAL { ?possibleValue hasco:hasResource ?resource } . "
@@ -395,49 +396,22 @@ public class DataAcquisitionSchema {
 		try {
 			while (resultsrw.hasNext()) {				
 				String classUri = "";
+				String classLabel = "";
 				QuerySolution soln = resultsrw.next();
 				if (soln.get("codeClass").toString().length() > 0) {
 					classUri = soln.getResource("codeClass").toString();
 				} else if (soln.get("resource").toString().length() > 0) {
 					classUri = soln.getResource("resource").toString();
 				}
-				
-				String queryString2 = NameSpaces.getInstance().printSparqlNameSpaceList()
-						+ " SELECT ?label WHERE { "
-						+ classUri + " rdfs:label ?label . "
-						+ " }";
-
-				Query query2 = QueryFactory.create(queryString2);
-				QueryExecution qexec2 = QueryExecutionFactory.sparqlService(
-						Collections.getCollectionsName(Collections.METADATA_SPARQL), query2);
-				ResultSet results2 = qexec2.execSelect();
-				ResultSetRewindable resultsrw2 = ResultSetFactory.copyResults(results2);
-				qexec2.close();
-				String classlabel = "";
-				
-				if (resultsrw2.hasNext()) {
-					QuerySolution soln2 = resultsrw2.next();
-					if (soln2.get("label").toString().length() > 0) {
-						classlabel = soln.getResource("label").toString();
-						System.out.println(classUri + " 's label is " + classlabel);
-					}
-				}
+				classLabel = soln.getResource("label").toString();
 				
 				String daso_or_dasa = soln.getResource("daso_or_dasa").toString();
 				String code = soln.getLiteral("code").toString();
 				if (mapPossibleValues.containsKey(daso_or_dasa)) {
-					if (classlabel.length()>0) {
-						mapPossibleValues.get(daso_or_dasa).put(code.toLowerCase(), classlabel);
-					} else {
-						mapPossibleValues.get(daso_or_dasa).put(code.toLowerCase(), classUri);
-					}
+						mapPossibleValues.get(daso_or_dasa).put(code.toLowerCase(), classLabel);
 				} else {
 					Map<String, String> indvMapPossibleValues = new HashMap<String, String>();
-					if (classlabel.length()>0) {
-						indvMapPossibleValues.put(code.toLowerCase(), classlabel);
-					} else {
-						indvMapPossibleValues.put(code.toLowerCase(), classUri);
-					}
+					indvMapPossibleValues.put(code.toLowerCase(), classLabel);
 					mapPossibleValues.put(daso_or_dasa, indvMapPossibleValues);
 				}
 			}
