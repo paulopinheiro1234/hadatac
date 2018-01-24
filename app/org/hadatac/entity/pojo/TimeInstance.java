@@ -219,7 +219,7 @@ public class TimeInstance extends HADatAcThing implements Comparable<TimeInstanc
 				if (dase != null) {
 					time.setLabel(WordUtils.capitalize(dase.getLabel()));
 				} else {
-					time.setLabel(WordUtils.capitalize(pivot_ent.value));
+					time.setLabel(pivot_ent.value);
 				}
 			} else {
 				time.setUri("");
