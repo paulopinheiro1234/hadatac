@@ -16,7 +16,6 @@ import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.client.solrj.response.UpdateResponse;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
-import play.Play;
 
 import org.hadatac.metadata.loader.ValueCellProcessing;
 import org.hadatac.utils.Collections;
@@ -120,7 +119,7 @@ public class DataFile {
 	public int save() {
 		try {
 			SolrClient client = new HttpSolrClient.Builder(
-					Play.application().configuration().getString("hadatac.solr.data") 
+					ConfigFactory.load().getString("hadatac.solr.data") 
 					+ Collections.CSV_DATASET).build();
 			
 			int status = client.addBean(this).getStatus();

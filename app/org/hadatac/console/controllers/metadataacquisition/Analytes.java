@@ -107,6 +107,8 @@ public class Analytes extends Controller {
 				+ "           ?institution foaf:name ?institutionName } . "
 				+ " } ";
 		
+		System.out.println("updateAnalytes strQuery: " + strQuery);
+		
 		QueryExecution qexecStudy = QueryExecutionFactory.sparqlService(
 				Collections.getCollectionsName(Collections.METADATA_SPARQL), strQuery);
 		ResultSet resultSet = qexecStudy.execSelect();
