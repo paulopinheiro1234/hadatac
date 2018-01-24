@@ -33,7 +33,6 @@ import org.hadatac.metadata.loader.LabkeyDataHandler;
 import org.hadatac.metadata.loader.ValueCellProcessing;
 import org.hadatac.utils.ConfigProp;
 import org.hadatac.utils.Feedback;
-import org.hadatac.utils.State;
 import org.labkey.remoteapi.CommandException;
 
 import be.objectify.deadbolt.java.actions.Group;

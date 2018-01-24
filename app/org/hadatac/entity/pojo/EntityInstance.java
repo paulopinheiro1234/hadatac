@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.HashMap;
 
+import org.apache.commons.lang3.text.WordUtils;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrRequest;
@@ -61,7 +62,6 @@ public class EntityInstance extends HADatAcThing implements Comparable<EntityIns
 			QueryResponse queryResponse = solr.query(query, SolrRequest.METHOD.POST);
 			solr.close();
 			Pivot pivot = Measurement.parseFacetResults(queryResponse);
-			Map<HADatAcThing, List<HADatAcThing>> result = parsePivot(pivot);
 			return parsePivot(pivot);
 		} catch (Exception e) {
 			System.out.println("[ERROR] Entity.getNumberFromSolr() - Exception message: " + e.getMessage());
@@ -75,12 +75,12 @@ public class EntityInstance extends HADatAcThing implements Comparable<EntityIns
 		for (Pivot pivot_ent : pivot.children) {
 			EntityInstance entity = new EntityInstance();
 			entity.setUri(pivot_ent.value);
-			entity.setLabel(Entity.find(pivot_ent.value).getLabel());
+			entity.setLabel(WordUtils.capitalize(Entity.find(pivot_ent.value).getLabel()));
 			entity.setCount(pivot_ent.count);
 			for (Pivot pivot_attrib : pivot_ent.children) {
 				AttributeInstance attrib = new AttributeInstance();
 				attrib.setUri(pivot_attrib.value);
-				attrib.setLabel(Attribute.find(pivot_attrib.value).getLabel());
+				attrib.setLabel(WordUtils.capitalize(Attribute.find(pivot_attrib.value).getLabel()));
 				attrib.setCount(pivot_attrib.count);
 				attrib.setField("characteristic_uri_str");
 				if (!results.containsKey(entity)) {

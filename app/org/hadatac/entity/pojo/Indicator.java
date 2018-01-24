@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang3.text.WordUtils;
 import org.apache.jena.query.Query;
 import org.apache.jena.query.QueryExecution;
 import org.apache.jena.query.QueryExecutionFactory;
@@ -259,10 +260,10 @@ public class Indicator extends HADatAcThing implements Comparable<Indicator> {
 				QuerySolution soln = resultsrw.next();
 				Indicator indicator = new Indicator();
 				indicator.setUri(soln.get("studyIndicator").toString());
-				indicator.setLabel(soln.get("indicatorLabel").toString());
+				indicator.setLabel(WordUtils.capitalize(soln.get("indicatorLabel").toString()));
 				AttributeInstance attrib = new AttributeInstance();
 				attrib.setUri(soln.get("attributeUri").toString());
-				attrib.setLabel(soln.get("attributeLabel").toString());
+				attrib.setLabel(WordUtils.capitalize(soln.get("attributeLabel").toString()));
 				attrib.setField("characteristic_uri_str");
 				if (!mapIndicatorToCharList.containsKey(indicator)) {
 					List<HADatAcThing> attributes = new ArrayList<HADatAcThing>();

@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.HashMap;
 
+import org.apache.commons.lang3.text.WordUtils;
 import org.apache.jena.query.QueryExecution;
 import org.apache.jena.query.QueryExecutionFactory;
 import org.apache.jena.query.QuerySolution;
@@ -84,9 +85,9 @@ public class EntityRole extends HADatAcThing implements Comparable<EntityRole> {
 					attrib.setField("characteristic_uri_str");
 					Attribute temp_attrib = Attribute.find(value);
 					if (temp_attrib != null) {
-						attrib.setLabel(temp_attrib.getLabel());
+						attrib.setLabel(WordUtils.capitalize(temp_attrib.getLabel()));
 					} else {
-						attrib.setLabel(value.split("#")[1]);
+						attrib.setLabel(WordUtils.capitalize(value.split("#")[1]));
 					}
 					
 					if (!results.containsKey(role)) {
@@ -104,7 +105,7 @@ public class EntityRole extends HADatAcThing implements Comparable<EntityRole> {
 				EntityRole role = new EntityRole();
 				if (soln.get("roleUri") != null && !soln.get("roleUri").toString().isEmpty()) {
 					role.setUri(soln.get("roleUri").toString());
-					role.setLabel(soln.get("roleUri").toString().split("#")[1]);
+					role.setLabel(WordUtils.capitalize(soln.get("roleUri").toString().split("#")[1]));
 				} else if (soln.get("relation") != null || soln.get("relation").toString().isEmpty()) {
 					role.setUri(ValueCellProcessing.replacePrefix("sio:Human"));
 					role.setLabel("Human");
@@ -112,7 +113,7 @@ public class EntityRole extends HADatAcThing implements Comparable<EntityRole> {
 								
 				AttributeInstance attrib = new AttributeInstance();
 				attrib.setUri(soln.get("attributeUri").toString());
-				attrib.setLabel(soln.get("attributeLabel").toString());
+				attrib.setLabel(WordUtils.capitalize(soln.get("attributeLabel").toString()));
 				if (!results.containsKey(role)) {
 					List<HADatAcThing> facets = new ArrayList<HADatAcThing>();
 					results.put(role, facets);
