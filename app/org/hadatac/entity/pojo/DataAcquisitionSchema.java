@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang3.text.WordUtils;
 import org.apache.jena.query.Query;
 import org.apache.jena.query.QueryExecution;
 import org.apache.jena.query.QueryExecutionFactory;
@@ -394,7 +395,8 @@ public class DataAcquisitionSchema {
 		qexec.close();
 
 		try {
-			while (resultsrw.hasNext()) {				
+			while (resultsrw.hasNext()) {	
+//				System.out.println("it has next!!!");
 				String classUri = "";
 				String classLabel = "";
 				QuerySolution soln = resultsrw.next();
@@ -403,7 +405,8 @@ public class DataAcquisitionSchema {
 				} else if (soln.get("resource").toString().length() > 0) {
 					classUri = soln.getResource("resource").toString();
 				}
-				classLabel = soln.getResource("label").toString();
+				classLabel = WordUtils.capitalize(soln.get("label").toString());
+				System.out.println(classUri + "'s label is " + classLabel);
 				
 				String daso_or_dasa = soln.getResource("daso_or_dasa").toString();
 				String code = soln.getLiteral("code").toString();
