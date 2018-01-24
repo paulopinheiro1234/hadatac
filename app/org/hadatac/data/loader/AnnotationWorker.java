@@ -39,7 +39,6 @@ import org.labkey.remoteapi.CommandException;
 import org.hadatac.utils.Collections;
 import org.hadatac.utils.ConfigProp;
 import org.hadatac.utils.Feedback;
-import org.hadatac.utils.State;
 
 import java.lang.Exception;
 
@@ -212,21 +211,23 @@ public class AnnotationWorker {
 			DateFormat isoFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
 			String startTime = isoFormat.format(new Date());
 
-			try{
+			try {
 				DeploymentGenerator deploymentGenerator = new DeploymentGenerator(file, startTime);
 				bSuccess = commitRows(deploymentGenerator.createRows(), deploymentGenerator.toString(), file.getName(), 
 						"Deployment", true);
-			} catch (Exception e){
+			} catch (Exception e) {
 				System.out.println("Error in annotateDataAcquisitionFile: Deployment Generator");
 				AnnotationLog.printException(e, file.getName());
+				return false;
 			}
-			try{
+			try {
 				DataAcquisitionGenerator daGenerator = new DataAcquisitionGenerator(file, startTime);
 				bSuccess = commitRows(daGenerator.createRows(), daGenerator.toString(), file.getName(), 
 						"DataAcquisition", true);
-			} catch (Exception e){
+			} catch (Exception e) {
 				System.out.println("Error in annotateDataAcquisitionFile: Data Acquisition Generator");
 				AnnotationLog.printException(e, file.getName());
+				return false;
 			}
 		} catch (Exception e) {
 			System.out.println("Error in annotateDataAcquisitionFile");
