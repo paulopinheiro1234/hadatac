@@ -60,6 +60,9 @@ public class DataAcquisitionSchema {
 			"hasco:hasCalibration",
 			"hasco:hasElevation",
 			"hasco:hasLocation");
+	
+	public static Map<String, Map<String, String>> mapPossibleValues2 = new HashMap<String, Map<String, String>>();
+	
 	private String uri = "";
 	private String label = "";
 	private List<DataAcquisitionSchemaAttribute> attributes = null;
@@ -207,6 +210,10 @@ public class DataAcquisitionSchema {
 			return -1;
 		}
 		return objects.size();
+	}
+	
+	public Map<String, Map<String, String>> getMapPossibleValues() {
+		return mapPossibleValues2;
 	}
 
 	public List<DataAcquisitionSchemaAttribute> getAttributes() {
@@ -411,11 +418,15 @@ public class DataAcquisitionSchema {
 				String daso_or_dasa = soln.getResource("daso_or_dasa").toString();
 				String code = soln.getLiteral("code").toString();
 				if (mapPossibleValues.containsKey(daso_or_dasa)) {
-						mapPossibleValues.get(daso_or_dasa).put(code.toLowerCase(), classLabel);
+						mapPossibleValues.get(daso_or_dasa).put(code.toLowerCase(), classUri);
+						mapPossibleValues2.get(daso_or_dasa).put(code.toLowerCase(), classLabel);
 				} else {
 					Map<String, String> indvMapPossibleValues = new HashMap<String, String>();
-					indvMapPossibleValues.put(code.toLowerCase(), classLabel);
+					Map<String, String> indvMapPossibleValues2 = new HashMap<String, String>();
+					indvMapPossibleValues.put(code.toLowerCase(), classUri);
+					indvMapPossibleValues2.put(code.toLowerCase(), classLabel);
 					mapPossibleValues.put(daso_or_dasa, indvMapPossibleValues);
+					mapPossibleValues2.put(daso_or_dasa, indvMapPossibleValues2);
 				}
 			}
 		} catch (Exception e) {
