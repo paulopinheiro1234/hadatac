@@ -78,13 +78,13 @@ public class DASchemaAttrGenerator extends BasicGenerator {
 
 	private String getUnit(CSVRecord rec) {
 		String original = rec.get(mapCol.get("Unit"));
-		String expansion = ValueCellProcessing.replacePrefixEx(rec.get(mapCol.get("Unit")));
-		if (original.length() != expansion.length()) {
-			return expansion;
+		if (ValueCellProcessing.isValidURI(original)) {
+			return original;
 		} else if (codeMap.containsKey(original)) {
 			return codeMap.get(original);
 		}
-			return "obo:UO_0000186";
+		
+		return "obo:UO_0000186";
 	}
 
 	private String getTime(CSVRecord rec) {

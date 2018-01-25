@@ -460,7 +460,7 @@ public class AnnotationWorker {
 					}
 
 					String cellValue = (String)row.get(key);
-					if (ValueCellProcessing.isAbbreviatedURI(cellValue)) {
+					if (ValueCellProcessing.isValidURI(cellValue)) {
 						Resource obj = model.createResource(ValueCellProcessing.replacePrefixEx(cellValue));
 						model.add(sub, pred, obj);
 					}

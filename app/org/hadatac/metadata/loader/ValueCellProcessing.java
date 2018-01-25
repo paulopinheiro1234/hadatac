@@ -27,6 +27,15 @@ public class ValueCellProcessing {
 		return true;
 	}
 	
+	public static boolean isValidURI(String str) {
+		if (str.length() != replaceNameSpaceEx(str).length() 
+				|| str.length() != replacePrefixEx(str).length()) {
+			return true;
+		}
+		
+		return false;
+	}
+	
 	/*
 	 *  the method verifies if cellContent contains a set of URIs, which we call an object set. Returns true if 
 	 *  the content is regarded to be an object set.
@@ -79,7 +88,7 @@ public class ValueCellProcessing {
 	        String nsString = entry.getValue().getName();
 	        if (str.startsWith(nsString)) {
 	        	resp = str.replace(nsString, abbrev + ":");
-	        	return resp; 
+	        	return resp;
 	        }
 	    }
 	    return "<" + str + ">";

@@ -17,7 +17,7 @@ public class NameSpaces {
 	public static String CACHE_PREFIX = "copy-";
 
 
-	public static Map<String, NameSpace> table = new HashMap<String, NameSpace>(); 
+	public static Map<String, NameSpace> table = new HashMap<String, NameSpace>();
 
 	private static NameSpaces instance = null;
 
