@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
+import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 
 import play.mvc.Controller;
@@ -24,7 +25,6 @@ import org.apache.jena.query.ResultSetRewindable;
 import org.apache.jena.sparql.engine.http.QueryExceptionHTTP;
 import org.hadatac.console.controllers.AuthApplication;
 import org.hadatac.console.controllers.triplestore.UserManagement;
-import org.hadatac.console.models.SysUser;
 import org.hadatac.utils.Collections;
 import org.hadatac.utils.NameSpaces;
 
@@ -116,12 +116,15 @@ public class ViewSubject extends Controller {
 			html += "<tr> <td><b>Internal ID</b></td> <td>" + soln.get("subjectLabel").toString() + "</td></tr>";
 			html += "<tr> <td><b>Type</b></td> <td>" + soln.get("subjectTypeLabel").toString() + "</td></tr>";
 			html += "<tr> <td><b>Cohort</b></td> <td>" + soln.get("cohortLabel").toString() + "</td></tr>";
-			html += "<tr> <td><b>Study</b></td> <td>" + soln.get("studyLabel").toString() + "</td></tr>";
 			html += "<tr> <td> &nbsp;</td> <td> &nbsp;</td></tr>";
-			html += "<tr> <td></td> <td><a href='/hadatac/metadataacquisitions/viewSubject?study_uri=" 
-					+ URLEncoder.encode(soln.get("studyUri").toString()) 
-					+ "&subject_uri=" + URLEncoder.encode(subject_uri) 
-					+ "'>(More info about object)</a></td></tr>";
+			try {
+				html += "<tr> <td></td> <td><a href='/hadatac/metadataacquisitions/viewSubject?study_uri=" 
+						+ URLEncoder.encode(soln.get("studyUri").toString(), "utf-8") 
+						+ "&subject_uri=" + URLEncoder.encode(subject_uri, "utf-8") 
+						+ "'>(More info about object)</a></td></tr>";
+			} catch (UnsupportedEncodingException e) {
+				e.printStackTrace();
+			}
 			html += "</table>";
 		}
 

@@ -795,9 +795,11 @@ public class Measurement {
 			int total = measurements.size();
 			for (Measurement m : measurements) {
 				FileUtils.writeStringToFile(file, m.toCSVRow(fieldNames) + "\n", "utf-8", true);
+				int prev_ratio = 0;
 				double ratio = (double)i / total * 100;
-				if ((int)ratio % 5 == 0) {
-					dataFile.setCompletionPercentage(ratio);
+				if (((int)ratio) != prev_ratio) {
+					prev_ratio = (int)ratio;
+					dataFile.setCompletionPercentage((int)ratio);
 					dataFile.save();
 				}
 				i++;

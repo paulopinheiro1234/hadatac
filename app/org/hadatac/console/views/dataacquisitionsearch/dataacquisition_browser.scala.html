@@ -29,7 +29,6 @@
 					<button type="button" class="btn btn-primary" onClick="search();">Search</button>
 					<button type="button" class="btn btn-primary" onClick="clearSearch();">Clear Search</button>
 					<button type="button" class="btn btn-primary" data-toggle="modal" data-target="#myModal">Download</button>
-					<!-- <a href="@org.hadatac.console.controllers.dataacquisitionsearch.routes.DataAcquisitionSearch.download(facets)" id="download" class="btn btn-primary" role="button">Download</a>  -->
                     <a href="@org.hadatac.console.controllers.dataacquisitionsearch.routes.DataAcquisitionSearch.index()" id="data" class="btn btn-primary" role="button">Hide Data</a>
 				</center>
 				
@@ -79,35 +78,8 @@
 					</ul>
 				</div>
 			</div>
-			<div class="col-md-4">
-				<div class="row">
-					<div id="legend">
-						<legend>Scientific Data Details</legend>
-					</div>
-					<div class="tab-pane">
-						@if(results.documents.isEmpty) {
-							<script>alert("There is no scientific data to browse.");</script>
-						} else {
-							@measurement_details(results.documents(0))
-						}
-					</div>
-				</div>
-				<div class="row">
-					<div id="legend">
-						<legend>Detail's Metadata</legend>
-					</div>
-				</div>
-				<div class="row">
-					<div id="legend">
-						<legend>Object's Metadata</legend>
-					</div>
-					<div class="tab-pane">
-						@if(!results.documents.isEmpty) {
-							@object_details(results.documents(0))
-						}
-					</div>
-				</div>
-			</div>
+			</div> 
+			</div> 
 		</div>
 	</div>
 	

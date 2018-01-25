@@ -5,95 +5,22 @@
    resultsSize : Long,
    objDetails : String
  )
-
-	<script type="text/javascript">
-                function decodeString(encodedString) {
-                   var textArea = document.createElement('textarea');
-                   textArea.innerHTML = encodedString;
-                   return textArea.value;
-                }        
-                var details = decodeString("@objDetails");
-                console.log(details);
-                jsonDetails = JSON.parse(details);
-                console.log(jsonDetails);
-		onload = function() {
-			if (!document.getElementsByTagName || !document.createTextNode) return;
-			var rows = document.getElementById('measurementsTable').getElementsByTagName('tbody')[0].getElementsByTagName('tr');
-			for (i = 0; i < rows.length; i++) {
-				rows[i].onmouseover = function() {
-					var row = this.rowIndex - 1;
-					document.getElementById('detail_uri').innerHTML = json.documents[row]['uri'];
-					document.getElementById('detail_timestamp').innerHTML = json.documents[row]['timestamp'];
-					document.getElementById('detail_value').innerHTML = json.documents[row]['value'];
-					document.getElementById('detail_entity').innerHTML = json.documents[row]['entity'];
-					//document.getElementById('detail_entity_uri').innerHTML = json.documents[row]['entityUri'];
-					document.getElementById('detail_characteristic').innerHTML = json.documents[row]['characteristic'];
-					//document.getElementById('detail_characteristic_uri').innerHTML = json.documents[row]['characteristicUri'];
-					document.getElementById('detail_unit').innerHTML = json.documents[row]['unit'];
-					//document.getElementById('detail_unit_uri').innerHTML = json.documents[row]['unitUri'];
-					document.getElementById('detail_instrument_model').innerHTML = json.documents[row]['instrumentModel'];
-					//document.getElementById('detail_instrument_uri').innerHTML = json.documents[row]['instrumentUri'];
-					document.getElementById('detail_platform_name').innerHTML = json.documents[row]['platformName'];
-                   	//var oid = json.documents[row]['objectUri'];
-					//document.getElementById('detail_object').innerHTML = jsonDetails[oid];
-
-				}
-			}
-			
-			updatePage();
-		}
-		
-		var page_size = 15;
-		var num_results = @resultsSize;
-		var total_page = Math.ceil(num_results/page_size);
-		var cur_page = @page; 
-		if(cur_page > total_page){
-			cur_page = total_page;
-		}
-		function nextPage(){
-			window.location.href = "@org.hadatac.console.controllers.dataacquisitionsearch.routes.DataAcquisitionSearch.indexData(page + 1, rows, facets)";
-		}
-		function prevPage(){
-			window.location.href = "@org.hadatac.console.controllers.dataacquisitionsearch.routes.DataAcquisitionSearch.indexData(page - 1, rows, facets)";
-		}
-		function firstPage(){
-			window.location.href = "@org.hadatac.console.controllers.dataacquisitionsearch.routes.DataAcquisitionSearch.indexData(1, rows, facets)";
-		}
-		function lastPage(){
-			window.location.href = "@org.hadatac.console.controllers.dataacquisitionsearch.routes.DataAcquisitionSearch.indexData(Math.ceil(resultsSize/15).intValue() + 1, rows, facets)";
-		}
-		function updatePage(){
-			if(cur_page == 1){
-				document.getElementById('prevpage').disabled = true;
-				document.getElementById('firstpage').disabled = true;
-			}
-			else{
-				document.getElementById('prevpage').disabled = false;
-				document.getElementById('firstpage').disabled = false;
-			}
-			if(cur_page == total_page){
-				document.getElementById('nextpage').disabled = true;
-				document.getElementById('lastpage').disabled = true;
-			}
-			else{
-				document.getElementById('nextpage').disabled = false;
-				document.getElementById('lastpage').disabled = false;
-			}
-			
-			var pages;
-			pages = "Current Page: " + cur_page.toString() + " \/ " + total_page.toString() 
-					+ ", Number of Result: " + num_results.toString();
-			document.getElementById('pagecontrl').innerHTML = pages;
-		}
-	</script>
-
+    
+    <style>
+    .tooltip-inner {
+        min-width: 450px;
+    }
+    .popover {
+        min-width: 450px;
+    }
+    </style>
     <div class="table-responsive">
     	<button type="button" id="prevpage"class="btn btn-primary" onClick="prevPage();">Previous Page</button>
     	<button type="button" id="nextpage" class="btn btn-primary" onClick="nextPage();">Next Page</button>
     	<button type="button" id="firstpage" class="btn btn-primary" onClick="firstPage();">First Page</button>
     	<button type="button" id="lastpage"class="btn btn-primary" onClick="lastPage();">Last Page</button>
-    	<p id="pagecontrl"></p>
-    	<table class="table table-striped" id="measurementsTable">
+    	<p id="pagecontrl"></p>  	
+    	<table class="table table-hover" id="measurementsTable">
             <thead>
               <tr>
               	<th>Object</th>
@@ -109,7 +36,7 @@
 
             <tbody>
             	@for((document, index) <- documents.zipWithIndex) {
-                <tr id="@index">
+                <tr id="@index" href="#" data-toggle="tooltip" data-html="true" data-placement="top">
                     <td>@document.getEntity()</td>
                 	<td>@document.getCharacteristic()</td>
                 	<td>@document.getValue()</td>
@@ -123,11 +50,96 @@
                             @document.getTimestamp()
                         }
                     }</td>
-                	<td>@document.getObjectUri()</td>
+                	<td href="#" data-toggle="popover" data-html="true" data-placement="bottom">@document.getObjectUri()</td>
                 	<td>@document.getLocation()</td>
                 </tr>
                 }
             </tbody>
-
         </table>
     </div>
+    
+    <script type="text/javascript">
+        function decodeString(encodedString) {
+            var textArea = document.createElement('textarea');
+            textArea.innerHTML = encodedString;
+            return textArea.value;
+        }
+
+        var jsonDetails = JSON.parse(decodeString("@objDetails"));
+        
+        var page_size = 15;
+        var num_results = @resultsSize;
+        var total_page = Math.ceil(num_results / page_size);
+        var cur_page = @page;
+        if (cur_page > total_page) {
+            cur_page = total_page;
+        }
+
+        function nextPage() {
+            window.location.href = "@org.hadatac.console.controllers.dataacquisitionsearch.routes.DataAcquisitionSearch.indexData(page + 1, rows, facets)";
+        }
+
+        function prevPage() {
+            window.location.href = "@org.hadatac.console.controllers.dataacquisitionsearch.routes.DataAcquisitionSearch.indexData(page - 1, rows, facets)";
+        }
+
+        function firstPage() {
+            window.location.href = "@org.hadatac.console.controllers.dataacquisitionsearch.routes.DataAcquisitionSearch.indexData(1, rows, facets)";
+        }
+
+        function lastPage() {
+            window.location.href = "@org.hadatac.console.controllers.dataacquisitionsearch.routes.DataAcquisitionSearch.indexData(Math.ceil(resultsSize/15).intValue() + 1, rows, facets)";
+        }
+
+        function updatePage() {
+            if (cur_page == 1) {
+                document.getElementById('prevpage').disabled = true;
+                document.getElementById('firstpage').disabled = true;
+            } else {
+                document.getElementById('prevpage').disabled = false;
+                document.getElementById('firstpage').disabled = false;
+            }
+            if (cur_page == total_page) {
+                document.getElementById('nextpage').disabled = true;
+                document.getElementById('lastpage').disabled = true;
+            } else {
+                document.getElementById('nextpage').disabled = false;
+                document.getElementById('lastpage').disabled = false;
+            }
+
+            var pages;
+            pages = "Current Page: " + cur_page.toString() + " \/ " + total_page.toString() +
+                ", Number of Result: " + num_results.toString();
+            document.getElementById('pagecontrl').innerHTML = pages;
+        }
+        
+        onload = function () {
+            updatePage();
+        }
+    </script>
+    <script>
+    $(document).ready(function() { 
+        $("#measurementsTable tr").not(':first').each(function(i, el) {
+            var title = "<table>"
+                + "<tr><td><b>URI:</b></td><td>" + json.documents[i]['uri'] + "</td></tr>"
+                + "<tr><td><b>Timestamp:</b></td><td>" + (json.documents[i]['timestamp'] == null ? json.documents[i]['abstractTime'] : json.documents[i]['timestamp']) + "</td></tr>"
+                + "<tr><td><b>Value:</b></td><td>" + json.documents[i]['value'] + "</td></tr>" 
+                + "<tr><td><b>Entity:</b></td><td>" + json.documents[i]['entity'] + "</td></tr>" 
+                + "<tr><td><b>Attribute:</b></td><td>" + json.documents[i]['characteristic'] + "</td></tr>" 
+                + "<tr><td><b>Unit:</b></td><td>" + json.documents[i]['unit'] + "</td></tr>" 
+                + "<tr><td><b>Instrument model:</b></td><td>" + json.documents[i]['instrumentModel'] + "</td></tr>" 
+                + "<tr><td><b>Platform name:</b></td><td>" + json.documents[i]['platformName'] + "</td></tr>"
+                + "</table>";
+            
+        	$(el).attr("title", title);
+        });
+
+        $("#measurementsTable tr").not(':first').find("td:nth-child(7)").each(function(i, el) {
+            var content = jsonDetails[json.documents[i]['objectUri']];
+            $(el).attr("data-content", content);
+        });
+
+        $('[data-toggle="tooltip"]').tooltip();
+        $('[data-toggle="popover"]').popover();
+    });
+    </script>

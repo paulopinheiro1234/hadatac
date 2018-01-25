@@ -26,11 +26,15 @@ import play.mvc.Controller;
 import play.mvc.Result;
 
 import org.hadatac.console.controllers.dataacquisitionsearch.routes;
+import org.hadatac.console.controllers.metadataacquisition.ViewSubject;
 import org.hadatac.console.views.formdata.FacetFormData;
 import org.hadatac.console.views.html.dataacquisitionsearch.facetOnlyBrowser;
 import org.hadatac.console.views.html.dataacquisitionsearch.dataacquisition_browser;
 import org.hadatac.data.model.AcquisitionQueryResult;
 import org.hadatac.entity.pojo.Measurement;
+
+import be.objectify.deadbolt.java.actions.Group;
+import be.objectify.deadbolt.java.actions.Restrict;
 
 
 public class DataAcquisitionSearch extends Controller {
@@ -67,8 +71,7 @@ public class DataAcquisitionSearch extends Controller {
             }
             for (String uri: setObj) {
             	if (uri != null) {
-            		String html = "";
-            		//String html = ViewSubject.findBasicHTML(uri);
+            		String html = ViewSubject.findBasicHTML(uri);
             		if (html != null) {
             			objDetails.putObject(uri, html);
             		}
@@ -79,18 +82,22 @@ public class DataAcquisitionSearch extends Controller {
     	return objDetails;
     }
 
+    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
     public Result index(int page, int rows, String facets) {
     	return indexInternal(0, page, rows, facets);
     }
     
+    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
     public Result postIndex(int page, int rows, String facets) {
     	return index(page, rows, facets);
     }
 
+    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
     public Result indexData(int page, int rows, String facets) {
     	return indexInternal(1, page, rows, facets);
     }
     
+    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
     public Result postIndexData(int page, int rows, String facets) {
     	return indexData(page, rows, facets);
     }
@@ -129,6 +136,7 @@ public class DataAcquisitionSearch extends Controller {
 		}
     }
     
+    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
     public Result download(String facets) {
     	FacetHandler handler = new FacetHandler();
     	handler.loadFacets(facets);
@@ -155,9 +163,16 @@ public class DataAcquisitionSearch extends Controller {
     			results.getDocuments(), facets, selectedFields, user.getEmail()), 
     			ec.current());
 		
+    	try {
+			Thread.sleep(2000);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+    	
     	return redirect(routes.Downloader.index());
     }
     
+    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
     public Result postDownload(String facets) {
     	return download(facets);
     }
