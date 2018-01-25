@@ -122,8 +122,7 @@ public class Downloader extends Controller {
 		} else {
 			DataFile file = DataFile.findByName(ownerEmail, selectedFile);
 			if (file == null) {
-				file = new DataFile();
-				file.setFileName(selectedFile);
+				file = new DataFile(selectedFile);
 				file.setOwnerEmail(AuthApplication.getLocalUser(session()).getEmail());
 				file.setStatus(DataFile.CREATING);
 				file.setSubmissionTime(new SimpleDateFormat("yyyy/MM/dd HH:mm:ss").format(new Date()));
@@ -168,8 +167,7 @@ public class Downloader extends Controller {
 		log.addline(Feedback.println(Feedback.WEB, "Selected Fields: " + selectedFields));
 		log.save();
 		
-		DataFile dataFile = new DataFile();
-		dataFile.setFileName(fileName);
+		DataFile dataFile = new DataFile(fileName);
 		dataFile.setOwnerEmail(ownerEmail);
 		dataFile.setStatus(DataFile.CREATING);
 		dataFile.setSubmissionTime(new SimpleDateFormat("yyyy/MM/dd HH:mm:ss").format(date));

@@ -49,11 +49,11 @@ public class DataFile {
 	@Field("completion_time_str")
 	private String completionTime;
 	
-	public DataFile() {
+	public DataFile(String fileName) {
+		this.fileName = fileName;
 		ownerEmail = "";
 		dataAcquisitionUri = "";
 		datasetUri = "";
-		fileName = "";
 		submissionTime = "";
 		completionTime = "";
 		status = "";
@@ -153,9 +153,8 @@ public class DataFile {
 	}
 	
 	public static DataFile convertFromSolr(SolrDocument doc) {
-		DataFile object = new DataFile();
+		DataFile object = new DataFile(doc.getFieldValue("file_name").toString());
 		
-		object.setFileName(doc.getFieldValue("file_name").toString());
 		object.setOwnerEmail(doc.getFieldValue("owner_email_str").toString());
 		object.setDataAcquisitionUri(ValueCellProcessing.replaceNameSpaceEx(doc.getFieldValue("acquisition_uri_str").toString()));
 		object.setDatasetUri(doc.getFieldValue("dataset_uri_str").toString());
@@ -251,8 +250,7 @@ public class DataFile {
 		for (int i = 0; i < listOfFiles.length; i++) {
 			if (listOfFiles[i].isFile() && listOfFiles[i].getName().endsWith(".csv")) {
 				if (!search(listOfFiles[i].getName(), ownedFiles)) {
-					DataFile newFile = new DataFile();
-					newFile.setFileName(listOfFiles[i].getName());
+					DataFile newFile = new DataFile(listOfFiles[i].getName());
 					newFile.save();
 					ownedFiles.add(newFile);
 				}
