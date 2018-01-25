@@ -445,7 +445,7 @@ public class Measurement {
 			} else {
 				Iterator<SolrDocument> m = results.iterator();
 				while (m.hasNext()) {
-					result.documents.add(convertFromSolr(m.next(), null));
+					result.documents.add(convertFromSolr(m.next(), null, new HashMap<>()));
 				}
 			}
 		} catch (SolrServerException e) {
@@ -497,8 +497,9 @@ public class Measurement {
 			Set<String> uri_set = new HashSet<String>();
 			Iterator<SolrDocument> iterDoc = results.iterator();
 			Map<String, DataAcquisition> cachedDA = new HashMap<String, DataAcquisition>();
+			Map<String, String> mapClassLabel = generateCodeClassLabel();
 			while (iterDoc.hasNext()) {
-				Measurement measurement = convertFromSolr(iterDoc.next(), cachedDA);
+				Measurement measurement = convertFromSolr(iterDoc.next(), cachedDA, mapClassLabel);
 				result.addDocument(measurement);
 				uri_set.add(measurement.getEntityUri());
 				uri_set.add(measurement.getCharacteristicUri());
@@ -656,7 +657,7 @@ public class Measurement {
 			SolrDocumentList results = response.getResults();
 			Iterator<SolrDocument> i = results.iterator();
 			while (i.hasNext()) {
-				Measurement measurement = convertFromSolr(i.next(), null);
+				Measurement measurement = convertFromSolr(i.next(), null, new HashMap<>());
 				listMeasurement.add(measurement);
 			}
 		} catch (Exception e) {
@@ -752,7 +753,8 @@ public class Measurement {
 		}
 	}
 
-	public static Measurement convertFromSolr(SolrDocument doc, Map<String, DataAcquisition> cachedDA) {
+	public static Measurement convertFromSolr(SolrDocument doc, 
+			Map<String, DataAcquisition> cachedDA, Map<String, String> cachedURILabels) {
 		Measurement m = new Measurement();
 		m.setUri(SolrUtils.getFieldValue(doc, "uri"));
 		m.setOwnerUri(SolrUtils.getFieldValue(doc, "owner_uri_str"));
@@ -764,7 +766,13 @@ public class Measurement {
 		m.setPID(SolrUtils.getFieldValue(doc, "pid_str"));
 		m.setSID(SolrUtils.getFieldValue(doc, "sid_str"));
 		m.setAbstractTime(SolrUtils.getFieldValue(doc, "named_time_str"));
-		m.setValue(SolrUtils.getFieldValue(doc, "value_str"));
+		
+		String value = SolrUtils.getFieldValue(doc, "value_str");
+		if (cachedURILabels.containsKey(value)) {
+			m.setValue(cachedURILabels.get(value));
+		} else {
+			m.setValue(value);
+		}
 		
 		m.setEntityUri(SolrUtils.getFieldValue(doc, "entity_uri_str"));
 		m.setCharacteristicUri(SolrUtils.getFieldValue(doc, "characteristic_uri_str"));
