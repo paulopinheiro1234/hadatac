@@ -75,7 +75,7 @@ public class UnitInstance extends HADatAcThing implements Comparable<UnitInstanc
 			if (unit_temp != null) {
 				unit.setLabel(WordUtils.capitalize(unit_temp.getLabel()));
 			} else {
-				unit.setLabel("(Empty)");
+				unit.setLabel("Unitless");
 			}
 			unit.setCount(pivot_ent.count);
 			unit.setField("unit_uri_str");
