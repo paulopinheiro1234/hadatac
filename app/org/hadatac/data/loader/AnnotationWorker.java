@@ -256,9 +256,12 @@ public class AnnotationWorker {
 				"sddtmp/" + file.getName().replace(".csv", "") + "-code-mappings.csv");
 		File codeBookFile = sdd.downloadFile(mapCatalog.get("Codebook"), 
 				"sddtmp/" + file.getName().replace(".csv", "") + "-codebook.csv");
+		File timelineFile = sdd.downloadFile(mapCatalog.get("Timeline"), 
+				"sddtmp/" + file.getName().replace(".csv", "") + "-timeline.csv");
 		sdd.readDataDictionary(dictionaryFile);
 		sdd.readCodeMapping(codeMappingFile);
 		sdd.readCodebook(codeBookFile);
+		sdd.readtimelineFile(timelineFile);
 		
 		try{
 			PVGenerator pvGenerator = new PVGenerator(codeBookFile, file.getName(), 
@@ -303,11 +306,12 @@ public class AnnotationWorker {
 		}
 		
 		try {
-			DASchemaEventGenerator daseGenerator = new DASchemaEventGenerator(dictionaryFile, sddName, sdd.getCodeMapping());
+			DASchemaEventGenerator daseGenerator = new DASchemaEventGenerator(dictionaryFile, sdd.getTimeLineMap(), sddName, sdd.getCodeMapping());
 			System.out.println("Calling DASchemaEventGenerator");
 			bSuccess = commitRows(daseGenerator.createRows(), daseGenerator.toString(), 
 					file.getName(), "DASchemaEvent", true);
 		} catch (Exception e) {
+			System.out.println(e);
 			System.out.println("Error annotateDataAcquisitionSchemaFile: Unable to generate DASE.");
 			AnnotationLog.printException(e, file.getName());
 		}

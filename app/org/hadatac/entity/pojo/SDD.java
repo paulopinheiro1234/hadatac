@@ -6,7 +6,9 @@ import java.io.FileInputStream;
 import java.io.FileReader;
 import java.io.InputStream;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.csv.CSVFormat;
@@ -22,6 +24,7 @@ public class SDD {
 	private Map<String, String> codeMappings = new HashMap<String, String>();
 	private Map<String, String> mapAttrObj = new HashMap<String, String>();
 	private Map<String, Map<String, String>> codebook = new HashMap<String, Map<String, String>>();
+	private Map<String, List<String>> timelineMap = new HashMap<String, List<String>>();
 	private File sddFile = null;
 	
 	public SDD(File file) {
@@ -47,6 +50,10 @@ public class SDD {
 	
 	public Map<String, Map<String, String>> getCodebook() {
 		return codebook;
+	}
+	
+	public Map<String, List<String>> getTimeLineMap() {
+		return timelineMap;
 	}
 	
 	private void readCatalog() {
@@ -153,6 +160,28 @@ public class SDD {
 			bufRdr.close();
 		} catch (Exception e) {
 			System.out.println("Error readCodebook(): Unable to Read File");
+		}
+	}
+	
+	public void readtimelineFile(File file) {
+		Iterable<CSVRecord> records = null;
+		try {
+			BufferedReader bufRdr = new BufferedReader(new FileReader(file));
+			records = CSVFormat.DEFAULT.withHeader().parse(bufRdr);
+			for (CSVRecord record : records) {
+				if (!record.get(0).isEmpty()) {
+					String colName = record.get(0);
+					List<String> tmpList = new ArrayList<String>();
+					tmpList.add(record.get(1));
+					tmpList.add(record.get(2));
+					tmpList.add(record.get(5));
+					System.out.println(tmpList.get(0) + " " + tmpList.get(1) + " " + tmpList.get(2));
+					timelineMap.put(colName, tmpList);
+				}
+			}
+			bufRdr.close();
+		} catch (Exception e) {
+			System.out.println("Error readtimelineFile(): Unable to Read File");
 		}
 	}
 }
