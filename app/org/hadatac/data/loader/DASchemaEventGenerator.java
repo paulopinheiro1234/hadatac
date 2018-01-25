@@ -11,6 +11,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Iterator;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
@@ -23,16 +24,19 @@ public class DASchemaEventGenerator extends BasicGenerator {
 	String SDDName = "";
 	List<String> timeList = new ArrayList<String>();
 	Map<String, String> codeMap;
+	Map<String, List<String>> tlm;
 
-	public DASchemaEventGenerator(File file, String SDDName, Map<String, String> codeMap) {
-		super(file);
+	public DASchemaEventGenerator(File dd, Map<String, List<String>> tlm, String SDDName, Map<String, String> codeMap) {
+		super(dd);
 		this.codeMap = codeMap;
 		this.SDDName = SDDName;
+		this.tlm = tlm;
+		System.out.println("tlm key size : " + tlm.keySet().size());
 
         CSVRecord current = null;
 
 		try {
-			BufferedReader br = new BufferedReader(new FileReader(file));
+			BufferedReader br = new BufferedReader(new FileReader(dd));
             CSVParser dict = CSVFormat.DEFAULT.withHeader().parse(br);
             Iterator<CSVRecord> dictIter = dict.iterator();
 
@@ -160,6 +164,13 @@ public class DASchemaEventGenerator extends BasicGenerator {
 				rows.add(createRow(record, ++row_number));
 			}
 		}
+		
+		for (Entry<String, List<String>> entry : tlm.entrySet()) {
+			if (entry.getKey().startsWith("??")){
+				rows.add(createTimeLineRow(entry, ++row_number));				
+			}
+		}
+	    
 		return rows;
 	}
 
@@ -178,6 +189,25 @@ public class DASchemaEventGenerator extends BasicGenerator {
 		row.put("sio:Relation", getRelation(rec));
 		row.put("hasco:isVirtual", checkVirtual(rec).toString());
 		row.put("hasco:isPIConfirmed", "false");
+		return row;
+	}
+	
+	Map<String, Object> createTimeLineRow(Entry<String, List<String>> entry, int row_number) throws Exception {
+		Map<String, Object> row = new HashMap<String, Object>();
+		row.put("hasURI", kbPrefix + "DASE-" + SDDName + "-" + entry.getKey().trim().replace(" ","").replace("_","-").replace("??", ""));
+		row.put("a", "hasco:DASchemaEvent");
+		row.put("rdfs:label", entry.getValue().get(0));
+		row.put("rdfs:comment", entry.getValue().get(0)); 
+		row.put("hasco:partOfSchema", kbPrefix + "DAS-" + SDDName);
+		row.put("hasco:hasEntity", entry.getValue().get(1).trim().replace(" ",""));
+		System.out.println("till now all good..");
+		row.put("hasco:hasUnit", entry.getValue().get(2).trim().replace(" ",""));
+		System.out.println("till now all good2..");
+		row.put("sio:inRelationTo", "");
+		row.put("sio:Relation", "");
+		row.put("hasco:isVirtual", "true");
+		row.put("hasco:isPIConfirmed", "false");
+		System.out.println("till now all good3..");
 		return row;
 	}
 }
