@@ -160,7 +160,7 @@ public class DASchemaEventGenerator extends BasicGenerator {
 		rows.clear();
 		int row_number = 0;
 		for (CSVRecord record : records) {
-			if (timeList.contains(getLabel(record))){
+			if (timeList.contains(getLabel(record)) && getLabel(record).length()>0){
 				rows.add(createRow(record, ++row_number));
 			}
 		}
@@ -171,6 +171,11 @@ public class DASchemaEventGenerator extends BasicGenerator {
 			}
 		}
 	    
+		Iterator<Map<String, Object>> iterrrr = rows.iterator();
+		while(iterrrr.hasNext()){
+			System.out.println(iterrrr.next().entrySet().toString());
+		}
+
 		return rows;
 	}
 

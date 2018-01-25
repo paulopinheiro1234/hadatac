@@ -311,6 +311,7 @@ public class AnnotationWorker {
 			bSuccess = commitRows(daseGenerator.createRows(), daseGenerator.toString(), 
 					file.getName(), "DASchemaEvent", true);
 		} catch (Exception e) {
+			System.out.println(e);
 			System.out.println("Error annotateDataAcquisitionSchemaFile: Unable to generate DASE.");
 			AnnotationLog.printException(e, file.getName());
 		}
