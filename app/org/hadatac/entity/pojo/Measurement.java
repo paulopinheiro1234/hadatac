@@ -709,6 +709,37 @@ public class Measurement {
 		return results;
 	}
 	
+	public static Map<String, String> generateCodeClassLabel() {
+		Map<String, String> results = new HashMap<String, String>();
+		
+		String query = "";
+		query += NameSpaces.getInstance().printSparqlNameSpaceList();
+		query += "SELECT ?class ?label WHERE { "
+				+ "?possibleValue a hasco:PossibleValue .  "
+				+ "?possibleValue hasco:hasCodeLabel ?label .  "
+				+ "?possibleValue hasco:hasClass ?class .   "
+				+ "}";
+
+		try {
+			QueryExecution qe = QueryExecutionFactory.sparqlService(
+					Collections.getCollectionsName(Collections.METADATA_SPARQL), query);
+			ResultSet resultSet = qe.execSelect();
+			ResultSetRewindable resultsrw = ResultSetFactory.copyResults(resultSet);
+			qe.close();
+		
+			while (resultsrw.hasNext()) {
+				QuerySolution soln = resultsrw.next();
+				if (soln.get("label") != null && !soln.get("label").toString().isEmpty()) {
+					results.put(soln.get("class").toString(), soln.get("label").toString());
+				}
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		
+		return results;
+	}
+	
 	public void setLabels(Map<String, String> cache) {
 		if (cache.containsKey(getEntityUri())) {
 			setEntity(cache.get(getEntityUri()));
