@@ -1,21 +1,28 @@
 package org.hadatac.entity.pojo;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.InputStream;
+import java.io.StringWriter;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVRecord;
 import org.apache.commons.io.FileUtils;
+import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.ss.usermodel.WorkbookFactory;
 import org.hadatac.metadata.loader.ValueCellProcessing;
 
@@ -73,7 +80,7 @@ public class SDD {
 			try {
 				InputStream inputStream = new FileInputStream(sddFile);
 				Sheet sheet = WorkbookFactory.create(inputStream).getSheetAt(0);
-				for (int rowNum = 1; rowNum < Math.min(7, sheet.getLastRowNum()); rowNum++) {
+				for (int rowNum = 1; rowNum < 11; rowNum++) {
 					Row r = sheet.getRow(rowNum);
 					if (r == null) {
 						// This whole row is empty
@@ -81,6 +88,7 @@ public class SDD {
 						continue;
 					} else {
 						mapCatalog.put(r.getCell(0).getStringCellValue(), r.getCell(1).getStringCellValue());
+						System.out.println(r.getCell(0).getStringCellValue() + " and " + r.getCell(1).getStringCellValue());
 					}
 				}
 				inputStream.close();
@@ -100,6 +108,63 @@ public class SDD {
 			e.printStackTrace();
 			return null;
 		}
+	}
+	
+	public File readSheetfromExcel(String sheetName, Workbook wb, String fileName) {
+		
+		System.out.println(fileName);
+		if(sheetName.charAt(0) == '#')  {
+			Sheet currentsheet = wb.getSheet(sheetName.replace("#", ""));
+
+			HashMap<Integer, List<String>> filetbc = new HashMap<Integer,List<String>>();
+			Iterator<Row> ritr = currentsheet.iterator();
+			int j = 0;
+			while(ritr.hasNext()){
+				Row current_r = ritr.next();
+				List<String> row_content = new ArrayList<String>();				
+//				Iterator<Cell> citr = current_r.iterator();
+				System.out.println(current_r.getLastCellNum() + " cells in this row");
+				for(int i =0; i<current_r.getLastCellNum(); i++){
+					if(current_r.getCell(i) == null){
+						row_content.add("");
+					} else {
+						row_content.add(current_r.getCell(i).toString());
+					}
+					
+				}
+					
+				System.out.println(row_content);
+				filetbc.put(j, row_content);
+				j++;
+			}
+			try {
+				
+				FileWriter writer = new FileWriter(fileName);
+		        for (int i=0; i<filetbc.entrySet().size(); i++){
+		        	List<String> c_str = filetbc.get(i);
+		        	for (String str : c_str){
+		        		if (str.contains(", ")){
+		        			c_str.set(c_str.indexOf(str), str.replace(", ", "&"));
+		        		}
+		        	}
+		            String collect = filetbc.get(i).stream().collect(Collectors.joining(","));
+		            writer.write(collect);
+		            writer.write("\n");
+		        }
+	            writer.close();
+			    
+			} catch (Exception e) {
+				e.printStackTrace();
+				return null;
+			}
+			
+		} else {
+			System.out.println("Error readSheetfromExcel(): Contaisn illegal links in infosheet.");
+		}
+		
+	    File file = new File(fileName);
+		return file;
+		
 	}
 	
 	public void readDataDictionary(File file) {

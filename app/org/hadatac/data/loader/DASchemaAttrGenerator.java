@@ -125,6 +125,7 @@ public class DASchemaAttrGenerator extends BasicGenerator {
 	}
 
 	private String getWasDerivedFrom(CSVRecord rec) {
+		//replace & with , for excel approach
 		return rec.get(mapCol.get("WasDerivedFrom"));
 	}
 
