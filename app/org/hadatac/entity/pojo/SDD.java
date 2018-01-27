@@ -40,7 +40,7 @@ public class SDD {
 	}
 	
 	public String getName() {
-		return (sddFile.getName().split("\\.")[0]).replace("SDD-", "");
+		return (sddFile.getName().split("\\.")[0]).replace("_", "-").replace("SDD-", "");
 	}
 	
 	public Map<String, String> getCatalog() {
