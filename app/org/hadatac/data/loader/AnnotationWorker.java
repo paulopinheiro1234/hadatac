@@ -421,9 +421,9 @@ public class AnnotationWorker {
 					GeneralGenerator generalGenerator = new GeneralGenerator();
 					System.out.println("Calling GeneralGenerator");
 					Map<String, Object> row = new HashMap<String, Object>();
-					row.put("hasURI", kbPrefix + "DAS-" + file.getName().replace("SDD-","").replace(".csv",""));
+					row.put("hasURI", kbPrefix + "DAS-" + file.getName().replace("_","-").replace("SDD-","").replace(".xlsx",""));
 					row.put("a", "hasco:DASchema");
-					row.put("rdfs:label", "Schema for " + file.getName().replace("SDD-","").replace(".csv",""));
+					row.put("rdfs:label", "Schema for " + file.getName().replace("_","-").replace("SDD-","").replace(".xlsx",""));
 					row.put("rdfs:comment", "");
 					generalGenerator.addRow(row);
 
