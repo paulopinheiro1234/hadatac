@@ -129,6 +129,7 @@ public class Parser {
 			System.out.println("Finished tempPositionOfLabel!!!");
 		}
 		if (!schema.getOriginalIdLabel().equals("")) {
+			System.out.println("schema.getOriginalIdLabel() " + schema.getOriginalIdLabel());
 			posOriginalId = tempPositionOfLabel(schema.getOriginalIdLabel());
 			System.out.println("Finished tempPositionOfLabel!!!");
 		}
@@ -148,7 +149,7 @@ public class Parser {
 		// Store possible values before hand to avoid frequent SPARQL queries
 		Map<String, Map<String, String>> possibleValues = DataAcquisitionSchema.findPossibleValues(da.getSchemaUri());
 		Map<String, List<String>> mapIDStudyObjects = DataAcquisitionSchema.findIdUriMappings(da.getStudyUri());
-		String dasoUnitUri = DataAcquisitionSchema.findByPosIndex(da.getSchemaUri(), Integer.toString(posUnit + 1));
+		String dasoUnitUri = DataAcquisitionSchema.findByLabel(da.getSchemaUri(), schema.getUnitLabel());
 		
 		// Comment out row instance generation
 		/*
@@ -221,13 +222,15 @@ public class Parser {
 				 *   SET VALUE       *
 				 *                   *
 				 *===================*/
-
-				if (dasa.getTempPositionInt() <= -1 || dasa.getTempPositionInt() > record.size()) {
+				
+				System.out.println("under set value : " + dasa.getTempPositionInt() + " " + dasa.getAttribute() + " " + dasa.getLabel());
+				
+				if (dasa.getTempPositionInt() < 0 || dasa.getTempPositionInt() >= record.size()) {
 					continue;
-				} else if (record.get(dasa.getTempPositionInt() - 1).isEmpty()) { 
+				} else if (record.get(dasa.getTempPositionInt()).isEmpty()) { 
 					continue;
 				} else {
-					String originalValue = record.get(dasa.getTempPositionInt() - 1);
+					String originalValue = record.get(dasa.getTempPositionInt());
 					System.out.println("originalValue " + originalValue);
 					System.out.println("dasa getAttribute " + dasa.getUri());
 					String dasa_uri_temp = dasa.getUri().replace("<", "").replace(">", "");
@@ -302,6 +305,8 @@ public class Parser {
 
 				String id = "";
 				if (!schema.getOriginalIdLabel().equals("")) {
+					System.out.println("originalidlabel:" + schema.getOriginalIdLabel());
+					System.out.println("posOriginalId:" + posOriginalId);
 					id = record.get(posOriginalId);
 				} else if (!schema.getIdLabel().equals("")) {
 					id = record.get(posId);
@@ -534,12 +539,18 @@ public class Parser {
 	}
 
 	private int tempPositionOfLabel(String label) {
+		
+		for (DataAcquisitionSchemaAttribute dasa : schema.getAttributes()) {
+			
+			System.out.println("!!!!!!! " + dasa.getTempPositionInt() + " " + dasa.getLabel());
+		}
+		
 		if (label == null || label.equals("")) {
 			return -1;
 		}
 		for (DataAcquisitionSchemaAttribute dasa : schema.getAttributes()) {
 			if (dasa.getLabel().equals(label)) {
-				return dasa.getTempPositionInt() - 1;
+				return dasa.getTempPositionInt();
 			}
 		}
 

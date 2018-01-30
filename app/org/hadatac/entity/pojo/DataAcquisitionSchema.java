@@ -381,7 +381,7 @@ public class DataAcquisitionSchema {
 	}
 	
 	public static Map<String, Map<String, String>> findPossibleValues(String schemaUri) {
-		System.out.println("findPossibleValues is called!");
+//		System.out.println("findPossibleValues is called!");
 		Map<String, Map<String, String>> mapPossibleValues = new HashMap<String, Map<String, String>>();
 		String queryString = NameSpaces.getInstance().printSparqlNameSpaceList()
 				+ " SELECT ?daso_or_dasa ?codeClass ?code ?label ?resource WHERE { "
@@ -413,7 +413,7 @@ public class DataAcquisitionSchema {
 					classUri = soln.getResource("resource").toString();
 				}
 				classLabel = WordUtils.capitalize(soln.get("label").toString());
-				System.out.println(classUri + "'s label is " + classLabel);
+//				System.out.println(classUri + "'s label is " + classLabel);
 				
 				String daso_or_dasa = soln.getResource("daso_or_dasa").toString();
 				String code = soln.getLiteral("code").toString();
@@ -436,11 +436,11 @@ public class DataAcquisitionSchema {
 		return mapPossibleValues;
 	}
 	
-	public static String findByPosIndex(String schemaUri, String pos) {
+	public static String findByLabel(String schemaUri, String label) {
 		System.out.println("findByPosIndex is called!");
 		String queryString = NameSpaces.getInstance().printSparqlNameSpaceList()
 				+ " SELECT ?daso_or_dasa WHERE { "
-				+ " ?daso_or_dasa hasco:hasPosition \"" + pos + "\" . "
+				+ " ?daso_or_dasa rdfs:label \"" + label + "\" . "
 				+ " ?daso_or_dasa hasco:partOfSchema <" + schemaUri + "> . "
 				+ " }";
 

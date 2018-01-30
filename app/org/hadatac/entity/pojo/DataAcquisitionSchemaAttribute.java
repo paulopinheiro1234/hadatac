@@ -435,11 +435,10 @@ public class DataAcquisitionSchemaAttribute {
 			dasa_uri = "<" + dasa_uri + ">";
 		}
 		String queryString = NameSpaces.getInstance().printSparqlNameSpaceList() + 
-				"SELECT  ?hasPosition ?partOfSchema ?hasEntity ?hasAttribute " + 
+				"SELECT ?partOfSchema ?hasEntity ?hasAttribute " + 
 				" ?hasUnit ?hasDASO ?hasDASE ?hasSource ?isPIConfirmed WHERE { " + 
 				"    " + dasa_uri + " a hasco:DASchemaAttribute . " + 
 				"    " + dasa_uri + " hasco:partOfSchema ?partOfSchema .  " + 
-				"    " + dasa_uri + " hasco:hasPosition ?hasPosition .  " + 
 				"    OPTIONAL { " + dasa_uri + " hasco:hasEntity ?hasEntity } . " + 
 				"    OPTIONAL { " + dasa_uri + " hasco:hasAttribute ?hasAttribute } . " + 
 				"    OPTIONAL { " + dasa_uri + " hasco:hasUnit ?hasUnit } . " + 
@@ -475,14 +474,6 @@ public class DataAcquisitionSchemaAttribute {
 			if (soln != null) {
 
 				labelStr = FirstLabel.getLabel(dasa_uri);
-
-				try {
-					if (soln.getLiteral("hasPosition") != null && soln.getLiteral("hasPosition").getString() != null) {
-						positionStr = soln.getLiteral("hasPosition").getString();
-					}
-				} catch (Exception e1) {
-					positionStr = "";
-				}
 
 				try {
 					if (soln.getResource("partOfSchema") != null && soln.getResource("partOfSchema").getURI() != null) {
@@ -556,7 +547,7 @@ public class DataAcquisitionSchemaAttribute {
 		}
 		List<DataAcquisitionSchemaAttribute> attributes = new ArrayList<DataAcquisitionSchemaAttribute>();
 		String queryString = NameSpaces.getInstance().printSparqlNameSpaceList() + 
-				"SELECT ?uri ?hasPosition ?hasEntity ?hasAttribute " + 
+				"SELECT ?uri ?hasEntity ?hasAttribute " + 
 				" ?hasUnit ?hasDASO ?hasDASE ?hasSource ?isPIConfirmed WHERE { " + 
 				"    ?uri a hasco:DASchemaAttribute . " + 
 				"    ?uri hasco:partOfSchema " + schemaUri + " .  " + 
@@ -617,7 +608,6 @@ public class DataAcquisitionSchemaAttribute {
 		} else {
 			insert += this.getUri() + " hasco:partOfSchema " + partOfSchema + " .  "; 
 		} 
-		insert += this.getUri() + " hasco:hasPosition  \"" + position + "\" . "; 
 		if (!entity.equals("")) {
 			insert += this.getUri() + " hasco:hasEntity "  + entity + " .  ";
 		}   
@@ -663,7 +653,6 @@ public class DataAcquisitionSchemaAttribute {
 		row.put("rdfs:label", getLabel());
 		row.put("rdfs:comment", getLabel());
 		row.put("hasco:partOfSchema", ValueCellProcessing.replaceNameSpaceEx(getPartOfSchema()));
-		row.put("hasco:hasPosition", this.getPosition());
 		row.put("hasco:hasEntity", this.getEntity());
 		row.put("hasco:hasAttribute", this.getAttribute());
 		row.put("hasco:hasUnit", this.getUnit());

@@ -54,7 +54,6 @@ public class Templates {
     public static String INRELATIONTO = ConfigProp.getPropertyValue(TEMPLATE_FILE, "InRelationTo");
     public static String WASDERIVEDFROM = ConfigProp.getPropertyValue(TEMPLATE_FILE, "WasDerivedFrom");
     public static String WASGENERATEDBY = ConfigProp.getPropertyValue(TEMPLATE_FILE, "WasGeneratedBy");
-    public static String HASPOSITION = ConfigProp.getPropertyValue(TEMPLATE_FILE, "HasPosition");
     
     // PV Template (Part of SDD)                                                                                     
     public static String CODE = ConfigProp.getPropertyValue(TEMPLATE_FILE, "Code");
