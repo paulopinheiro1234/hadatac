@@ -281,13 +281,11 @@ public class AnnotationWorker {
 				System.out.println("Calling PVGenerator");
 				bSuccess = commitRows(pvGenerator.createRows(), pvGenerator.toString(), 
 						file.getName(), "PossibleValue", true);
-				codeBookFile.delete();
 			} catch (Exception e) {
 				e.printStackTrace();
 				System.out.println("Error annotateDataAcquisitionSchemaFile: Unable to read codebook");
 				System.out.println(codeBookFile.getAbsoluteFile());
 				System.out.println(codeBookFile.length());
-				codeBookFile.delete();
 				return false;
 			}
 				
@@ -370,13 +368,11 @@ public class AnnotationWorker {
 					System.out.println("Calling PVGenerator");
 					bSuccess = commitRows(pvGenerator.createRows(), pvGenerator.toString(), 
 							file.getName(), "PossibleValue", true);
-					codeBookFile.delete();
 				} catch (Exception e) {
 					e.printStackTrace();
 					System.out.println("Error annotateDataAcquisitionSchemaFile: Unable to read codebook");
 					System.out.println(codeBookFile.getAbsoluteFile());
 					System.out.println(codeBookFile.length());
-					codeBookFile.delete();
 					return false;
 				}
 					

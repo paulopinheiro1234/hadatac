@@ -121,21 +121,26 @@ public class SDD {
 			int j = 0;
 			while(ritr.hasNext()){
 				Row current_r = ritr.next();
-				List<String> row_content = new ArrayList<String>();				
-//				Iterator<Cell> citr = current_r.iterator();
-				System.out.println(current_r.getLastCellNum() + " cells in this row");
-				for(int i =0; i<current_r.getLastCellNum(); i++){
-					if(current_r.getCell(i) == null){
-						row_content.add("");
-					} else {
-						row_content.add(current_r.getCell(i).toString());
+				Iterator<Cell> citr = current_r.iterator();
+				if (citr.hasNext()){
+					if(current_r.getCell(0).toString().length()>0){
+						List<String> row_content = new ArrayList<String>();				
+//						Iterator<Cell> citr = current_r.iterator();
+						System.out.println(current_r.getLastCellNum() + " cells in this row");
+						for(int i =0; i<current_r.getLastCellNum(); i++){
+							if(current_r.getCell(i) == null){
+								row_content.add("");
+							} else {
+								row_content.add(current_r.getCell(i).toString());
+							}
+							
+						}
+							
+						System.out.println(row_content);
+						filetbc.put(j, row_content);
+						j++;
 					}
-					
 				}
-					
-				System.out.println(row_content);
-				filetbc.put(j, row_content);
-				j++;
 			}
 			try {
 				
@@ -215,10 +220,11 @@ public class SDD {
 					if (!record.get(3).isEmpty()) {
 						// Class column
 						classUri = ValueCellProcessing.replacePrefixEx(record.get(3));
-					} else {
-						// Resource column
-						classUri = ValueCellProcessing.replacePrefixEx(record.get(4));
-					}
+					} 
+//					else {
+//						// Resource column
+//						classUri = ValueCellProcessing.replacePrefixEx(record.get(4));
+//					}
 					mapCodeClass.put(record.get(1), classUri);
 				}
 			}
@@ -237,9 +243,21 @@ public class SDD {
 				if (!record.get(0).isEmpty()) {
 					String colName = record.get(0);
 					List<String> tmpList = new ArrayList<String>();
-					tmpList.add(record.get(1));
-					tmpList.add(record.get(2));
-					tmpList.add(record.get(5));
+					if (!record.get(1).isEmpty()) {
+						tmpList.add(record.get(1));
+					} else {
+						tmpList.add("null");
+					}
+					if (!record.get(2).isEmpty()) {
+						tmpList.add(record.get(2));
+					} else {
+						tmpList.add("null");
+					}
+					if (!record.get(5).isEmpty()) {
+						tmpList.add(record.get(5));
+					} else {
+						tmpList.add("null");
+					}
 					System.out.println(tmpList.get(0) + " " + tmpList.get(1) + " " + tmpList.get(2));
 					timelineMap.put(colName, tmpList);
 				}
