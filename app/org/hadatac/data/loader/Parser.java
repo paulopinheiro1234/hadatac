@@ -539,7 +539,7 @@ public class Parser {
 		}
 		for (DataAcquisitionSchemaAttribute dasa : schema.getAttributes()) {
 			if (dasa.getLabel().equals(label)) {
-				return dasa.getTempPositionInt() - 1;
+				return dasa.getTempPositionInt();
 			}
 		}
 
