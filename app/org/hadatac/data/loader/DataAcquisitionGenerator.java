@@ -10,6 +10,7 @@ import java.util.Map;
 import org.apache.commons.csv.CSVRecord;
 import org.hadatac.console.models.SysUser;
 import org.hadatac.entity.pojo.DataAcquisition;
+import org.hadatac.entity.pojo.DataAcquisitionSchema;
 import org.hadatac.entity.pojo.Deployment;
 import org.hadatac.entity.pojo.Measurement;
 import org.hadatac.entity.pojo.ObjectCollection;
@@ -101,11 +102,7 @@ public class DataAcquisitionGenerator extends BasicGenerator {
 		} else {
 			row.put("prov:startedAtTime", startTime);
 		}
-		if (isEpiData(rec)) {
-			row.put("hasco:hasSchema", kbPrefix + "DAS-" + getDataDictionaryName(rec));
-		} else if (isLabData(rec)) {
-			row.put("hasco:hasSchema", kbPrefix + "DAS-STANDARD-LAB-SCHEMA");
-		}
+		row.put("hasco:hasSchema", kbPrefix + "DAS-" + getDataDictionaryName(rec));
 
 		String ownerEmail = getOwnerEmail(rec);
 		if (ownerEmail.isEmpty()) {
@@ -118,6 +115,7 @@ public class DataAcquisitionGenerator extends BasicGenerator {
 		}
 
 		String deploymentUri = ValueCellProcessing.replacePrefixEx(kbPrefix + "DPL-" + getDataAcquisitionName(rec));
+		String schemaUri = ValueCellProcessing.replacePrefixEx(kbPrefix + "DAS-" + getDataDictionaryName(rec));
 		createDataAcquisition(row, ownerEmail, permissionUri, deploymentUri, isEpiData(rec));
 
 		return row;
@@ -180,6 +178,11 @@ public class DataAcquisitionGenerator extends BasicGenerator {
 			da.setStartedAtXsdWithMillis(deployment.getStartedAt());
 		} else {
 			throw new Exception(String.format("Deployment %s cannot be found!", deploymentUri));
+		}
+		
+		DataAcquisitionSchema schema = DataAcquisitionSchema.find(da.getSchemaUri());
+		if (schema != null) {
+			da.setStatus(9999);
 		}
 
 		da.save();
