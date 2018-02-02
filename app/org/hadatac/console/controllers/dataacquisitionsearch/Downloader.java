@@ -137,10 +137,10 @@ public class Downloader extends Controller {
 	public Result checkAnnotationLog(String file_name) {
 		AnnotationLog log = AnnotationLog.find(file_name);
 		if (null == log) {
-			return ok(annotation_log.render(Feedback.print(Feedback.WEB, "")));
+			return ok(annotation_log.render(Feedback.print(Feedback.WEB, ""), routes.Downloader.index().url()));
 		}
 		else {
-			return ok(annotation_log.render(Feedback.print(Feedback.WEB, log.getLog())));
+			return ok(annotation_log.render(Feedback.print(Feedback.WEB, log.getLog()), routes.Downloader.index().url()));
 		}
 	}
 	

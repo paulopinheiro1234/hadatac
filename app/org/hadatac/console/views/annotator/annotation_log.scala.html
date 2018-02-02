@@ -1,4 +1,5 @@
-@(log : String)
+@(log : String,
+  postAction : String)
 
 @import helper._
 @import org.hadatac.console.views.html._
@@ -22,6 +23,6 @@
 	</script>
 	
     <br><br>
-    <a href="@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.index()" class="btn btn-primary" role="button">Back</a>
+    <a href="@postAction" class="btn btn-primary" role="button">Back</a>
 	</div>
 }
