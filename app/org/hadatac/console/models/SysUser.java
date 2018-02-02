@@ -141,7 +141,11 @@ public class SysUser implements Subject {
 	}
 
 	public void setLastLogin(String lastLogin) {
-		lastLogin_j = Instant.parse(lastLogin);
+		if (!lastLogin.isEmpty()) {
+			lastLogin_j = Instant.parse(lastLogin);
+		} else {
+			lastLogin_j = Instant.now();
+		}
 	}
 
 	public boolean getActive() {
@@ -571,7 +575,7 @@ public class SysUser implements Subject {
 			SolrClient solr = new HttpSolrClient.Builder(
 					ConfigFactory.load().getString("hadatac.solr.users") 
 					+ Collections.AUTHENTICATE_USERS).build();
-			UpdateResponse response = solr.deleteById(this.id_s);
+			UpdateResponse response = solr.deleteById(this.getEmail());
 			solr.commit();
 			solr.close();
 			return response.getStatus();
