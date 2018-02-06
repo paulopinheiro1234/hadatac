@@ -119,21 +119,23 @@ public class SDD {
 			HashMap<Integer, List<String>> filetbc = new HashMap<Integer,List<String>>();
 			Iterator<Row> ritr = currentsheet.iterator();
 			int j = 0;
+			int lasycellnum = 0;
 			while(ritr.hasNext()){
 				Row current_r = ritr.next();
 				Iterator<Cell> citr = current_r.iterator();
 				if (citr.hasNext()){
 					if(current_r.getCell(0).toString().length()>0){
 						List<String> row_content = new ArrayList<String>();				
-//						Iterator<Cell> citr = current_r.iterator();
-						System.out.println(current_r.getLastCellNum() + " cells in this row");
-						for(int i =0; i<current_r.getLastCellNum(); i++){
-							if(current_r.getCell(i) == null){
+						if(j == 0){
+							lasycellnum = current_r.getLastCellNum();
+							System.out.println(lasycellnum + " cells in this row");
+						}
+						for(int i=0; i<lasycellnum; i++){
+							if(current_r.getCell(i) == null || current_r.getCell(i).toString().isEmpty()){
 								row_content.add("");
 							} else {
 								row_content.add(current_r.getCell(i).toString());
 							}
-							
 						}
 							
 						System.out.println(row_content);

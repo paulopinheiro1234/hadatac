@@ -5,6 +5,8 @@ import java.io.File;
 import java.io.FileReader;
 
 import java.lang.String;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -19,7 +21,7 @@ public class DASchemaAttrGenerator extends BasicGenerator {
 	String startTime = "";
 	String SDDName = "";
 	Map<String, String> codeMap;
-	Map<String, String> hasEntityMap = new HashMap<String, String>();
+	Map<String, List<String>> hasEntityMap = new HashMap<String, List<String>>();
 
 	public DASchemaAttrGenerator(File file, String SDDName, Map<String, String> codeMap) {
 		super(file);
@@ -28,13 +30,14 @@ public class DASchemaAttrGenerator extends BasicGenerator {
 		
 		try {
 			BufferedReader br = new BufferedReader(new FileReader(file));
-			String line =  null;
-
+			String line =  "";
 			while((line = br.readLine()) != null){
-				String str[] = line.split(",");
-				if (str[5].length() > 0){
-					hasEntityMap.put(str[0], str[5]);
-				}
+				String str[] = line.split(",", -1);
+				List<String> tmp = new ArrayList<String>();
+				tmp.add(str[2]);
+				tmp.add(str[5]);
+				hasEntityMap.put(str[0], tmp);
+				System.out.println(str[0] + " *** " + tmp);
 			}
 			br.close();
 		} catch (Exception e) {
@@ -99,14 +102,15 @@ public class DASchemaAttrGenerator extends BasicGenerator {
 			return "chear:unknownEntity";
 		} else {
 			if (codeMap.containsKey(hasEntityMap.get(getValueByColumnName(rec, mapCol.get("AttributeOf"))))) {
+				System.out.println("codeMap: " + codeMap.get(hasEntityMap.get(getValueByColumnName(rec, mapCol.get("AttributeOf")))));
 				return codeMap.get(hasEntityMap.get(getValueByColumnName(rec, mapCol.get("AttributeOf"))));
 			} else {
+//				System.out.println(hasEntityMap.get(getValueByColumnName(rec, mapCol.get("AttributeOf"))).get(1));
 				if (hasEntityMap.containsKey(getValueByColumnName(rec, mapCol.get("AttributeOf")))){
-					return hasEntityMap.get(getValueByColumnName(rec, mapCol.get("AttributeOf")));
+					return hasEntityMap.get(getValueByColumnName(rec, mapCol.get("AttributeOf"))).get(1);
 				} else {
-					return getValueByColumnName(rec, mapCol.get("AttributeOf"));
+					return "chear:unknownEntity";
 				}
-
 			}
 		}
 	}
@@ -165,6 +169,7 @@ public class DASchemaAttrGenerator extends BasicGenerator {
 		row.put("rdfs:comment", getLabel(rec));
 		row.put("hasco:partOfSchema", kbPrefix + "DAS-" + SDDName);
 		row.put("hasco:hasEntity", getEntity(rec));
+		System.out.println("hasco:hasEntity: " + getEntity(rec));
 		row.put("hasco:hasAttribute", getAttribute(rec));
 		row.put("hasco:hasUnit", getUnit(rec));
 		row.put("hasco:hasEvent", getTime(rec));
