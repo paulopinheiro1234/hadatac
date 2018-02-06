@@ -1,20 +1,19 @@
 
-function clearSearch() {
-	var url = location.protocol + '//' + location.host + location.pathname;
-	window.location.href = encodeURI(url);
-}
-
-function treeSelections(tree) {
+function treeSelections(tree, id) {
 	var disj = [];
-	var checked_items = tree.getAllChecked();
-	if (checked_items.length > 0) {
-		checked_items.split(",").forEach(function(element) {
-			if (tree.getAllSubItems(element).length == 0) {
+	var subitems = tree.getSubItems(id);
+	if (subitems.length > 0) {
+		subitems.split(",").forEach(function(element) {
+			if (tree.isItemChecked(element)) {
 				var pair = new Object();
-				pair[tree.getUserData(element, 'field')] = tree.getUserData(element, 'value');
+				pair['id'] = tree.getUserData(element, 'value');
+				pair[tree.getUserData(element, 'field')] = tree.getUserData(element, 'value');		
+				if (tree.hasChildren(element)) {
+					pair['children'] = treeSelections(tree, element);
+				}
 				disj.push(pair);
 			}
-		});	
+		});
 	} else {
 		return null;
 	}
@@ -22,40 +21,46 @@ function treeSelections(tree) {
 	return disj;
 }
 
-function setCheckTree(tree, values) {
-	if (values != null) {
-		for (var i = 0; i < values.length; ++i) {
-			list[i] = decodeURIComponent(list[i]).replace(/\&#x27;/gm, "'");
-			var item = tree.findItem(facetPrettyName(props, list[i]));
-			tree.setCheck(item, true);
-		}
+function getSelectedFacets() {
+	var facets = new Object();
+	var tmp = treeSelections(treeEC, 0);
+	if (tmp != null) {
+		facets['facetsEC'] = tmp;
 	}
+	tmp = treeSelections(treeS, 0);
+	if (tmp != null) {
+		facets['facetsS']  = tmp;
+	}
+	tmp = treeSelections(treeU, 0);
+	if (tmp != null) {
+		facets['facetsU'] = tmp;
+	}
+	tmp = treeSelections(treeT, 0);
+	if (tmp != null) {
+		facets['facetsT'] = tmp;
+	}
+	tmp = treeSelections(treePI, 0);
+	if (tmp != null) {
+		facets['facetsPI'] = tmp;
+	}
+	
+	console.log("facets: " + JSON.stringify(facets));
+	return facets;
 }
 
 function search() {
-	var conj = new Object();
-	var tmp = treeSelections(treeEC);
-	if (tmp != null) {
-		conj['facetsEC'] = tmp;
-	}
-	tmp = treeSelections(treeS);
-	if (tmp != null) {
-		conj['facetsS']  = tmp;
-	}
-	tmp = treeSelections(treeU);
-	if (tmp != null) {
-		conj['facetsU'] = tmp;
-	}
-	tmp = treeSelections(treeT);
-	if (tmp != null) {
-		conj['facetsT'] = tmp;
-	}
-	tmp = treeSelections(treePI);
-	if (tmp != null) {
-		conj['facetsPI'] = tmp;
-	}
-	console.log("conj: " + JSON.stringify(conj));	       
-	window.location.href = location.protocol + '//' + location.host + location.pathname + '?facets=' + encodeURIComponent(JSON.stringify(conj));
+	facets = getSelectedFacets();
+	$.redirect(location.pathname, {'facets': JSON.stringify(facets)});
+}
+
+function showData(page) {
+	facets = getSelectedFacets();
+	$.redirect(location.pathname + '/data?start=' + page, {'facets': JSON.stringify(facets)});
+}
+
+function clearSearch() {
+	var url = location.protocol + '//' + location.host + location.pathname;
+	window.location.href = encodeURI(url);
 }
 
 

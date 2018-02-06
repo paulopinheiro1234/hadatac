@@ -37,92 +37,6 @@ function facetPrettyName(type, value) {
     return value;
 }
 
-function parseSolrRangeFacetFieldToTree(type) {
-	var i;
-	i = 0;
-        listed = 0;
-	flag = false;
-	jsonTree = '{ "id": ' + i + ', "item": [ ';
-	for (var i_field in json.date_facets[type]) {
-		i++;
-                	jsonTree += '{	"id": ' + i + ', ' +
-                				   '"userdata": [ ';
-                	/*
-	       	      jsonTree += '{ "id": ' + i + ', ' + 
-                                    '"userdata": [ { "name": "field", "content": "' + type + '" }, { "name": "value", "content": "' + i_field + '" } ], ' + 
-			  '"text": "' + facetPrettyName(type,i_field) + ' (' + field + ')" } ';
-			        */
-                	jsonTree += ' ], "text" : "' + i_field + '" } ,';
-	}
-	if (jsonTree[jsonTree.length-1] == ',') {
-		jsonTree = jsonTree.substring(0, jsonTree.length-1);
-	}
-	jsonTree += '] }';
-	return jsonTree;
-}
-
-function parseSolrFacetFieldToTree(type) {
-	var i;
-	i = 0;
-        listed = 0;
-	flag = false;
-	jsonTree = '{ "id": ' + i + ', "item": [ ';
-	for (var i_field in json.field_facets[type]) {
-		var field = json.field_facets[type][i_field];
-                if (field > 0) {
-                    listed++;
-		}
-		//if (i != 0) {
-                if ((listed > 1) && (field > 0)) {
-			jsonTree += ' ,';
-		}
-		i++;
-                if (field > 0) {
-	       	      jsonTree += '{ "id": ' + i + ', ' + 
-                                    '"userdata": [ { "name": "field", "content": "' + type + '" }, { "name": "value", "content": "' + i_field + '" } ], ' + 
-			  '"text": "' + facetPrettyName(type,i_field) + ' (' + field + ')" } ';
-                }
-	}
-	jsonTree += '] }';
-	return jsonTree;
-}
-
-function parseSolrFacetPivotToTree(type) {
-	var i, j, q, n, jsonTree, fields;
-	i = 0;
-	n = 0;
-	jsonTree = '{ "id": ' + n + ', "item": [ ';
-	fields = type.split(",");
-	
-	for (var i_pivot in json.pivot_facets[type]) {
-		var field1 = json.pivot_facets[type][i_pivot];
-		j = 0;
-		
-		if (i != 0) {
-			jsonTree += ' ,';
-		}
-		i++;
-		jsonTree += '{ "id": ' + ++n + ', "text": "' + facetPrettyName(fields[0],field1.value) + ' (' + field1.count + ')"';
-		jsonTree += ', "item": [ ';
-		for (var j_pivot in field1.children) {
-			var field2 = field1.children[j_pivot];
-			if (j != 0) {
-				jsonTree += ' ,';
-			}
-			j++;
-			jsonTree += '{ "id": ' + ++n + ', "text": "' + facetPrettyName(fields[1],field2.value) + ' (' + field2.count + ')", ' + 
-                                      '"tooltip": "' + field2.value + '" , ' + 
-                                      '"userdata": [ { "name": "field", "content": "' + fields[1] + '" }, ' + 
-                                      '{ "name": "value", "content": "' + field2.value + '" } ] } ';
-		}
-		jsonTree += '] , "child": ' + j + ', "tooltip": "' + field1.value + '" , ' + 
-                                '"userdata": [ { "name": "field", "content": "' + fields[0] + '" }, ' + 
-                                '{ "name": "value", "content": "' + field1.value + '" } ] } ';
-	}
-	jsonTree += '] }';
-	return jsonTree;
-}
-
 var tree_id = 0;
 function create_item(data, selected_elems) {
 	if (null == data) {
@@ -139,7 +53,7 @@ function create_item(data, selected_elems) {
 		element.userdata = [{"name": "field", "content": children[i_child].field},
 			{"name": "value", "content": children[i_child].tooltip}];
 		if (selected_elems.indexOf(element.tooltip) > -1) {
-			element.checked = 1;
+			//element.checked = 1;
 		}
 		element.item = create_item(children[i_child], selected_elems);
 		for (var i = 0; i < element.item.length; i++) {
@@ -156,6 +70,7 @@ function create_item(data, selected_elems) {
 
 function parseSolrFacetToTree(facet_name, selected_elems) {
 	console.log("facet_name: " + facet_name);
+	console.log("selected_elems: " + selected_elems);
 	dataTree = {};
 	tree_id = 0;
 	dataTree.id = tree_id++;

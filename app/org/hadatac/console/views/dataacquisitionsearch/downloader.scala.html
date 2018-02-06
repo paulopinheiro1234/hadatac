@@ -22,7 +22,15 @@
 	                data: { 'file_name': row.find("td:nth-child(1)").html() }, 
 	                dataType: 'json',
 	                success: function (data) {
-		                row.find("td:nth-child(5)").html(data + "%");
+	                	@if(bAdmin) {
+		                row.find("td:nth-child(4)").html(data['CompletionTime']);
+		                row.find("td:nth-child(5)").html(data['CompletionPercentage'] + '%');
+		                row.find("td:nth-child(6)").html(data['Status']);
+		                } else {
+		                row.find("td:nth-child(3)").html(data['CompletionTime']);
+                        row.find("td:nth-child(4)").html(data['CompletionPercentage'] + '%');
+                        row.find("td:nth-child(5)").html(data['Status']);
+		                }
 	                }
 	            });
 	        });

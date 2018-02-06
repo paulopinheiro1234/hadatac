@@ -249,10 +249,10 @@ public class AutoAnnotator extends Controller {
 	public Result checkAnnotationLog(String file_name) {
 		AnnotationLog log = AnnotationLog.find(file_name);
 		if (null == log) {
-			return ok(annotation_log.render(Feedback.print(Feedback.WEB, "")));
+			return ok(annotation_log.render(Feedback.print(Feedback.WEB, ""), routes.AutoAnnotator.index().url()));
 		}
 		else {
-			return ok(annotation_log.render(Feedback.print(Feedback.WEB, log.getLog())));
+			return ok(annotation_log.render(Feedback.print(Feedback.WEB, log.getLog()), routes.AutoAnnotator.index().url()));
 		}
 	}
 
@@ -361,7 +361,7 @@ public class AutoAnnotator extends Controller {
 		return redirect(routes.AutoAnnotator.index());
 	}
 
-	@Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
+	@Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
 	@BodyParser.Of(value = BodyParser.MultipartFormData.class)
 	public Result uploadDataFile(String oper) {
 		String path = ConfigProp.getPathUnproc();
@@ -392,7 +392,7 @@ public class AutoAnnotator extends Controller {
 		return redirect(routes.AutoAnnotator.index());
 	}
 
-	@Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
+	@Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
 	public Result uploadDataFileByChunking(
 			String resumableChunkNumber,
 			String resumableChunkSize, 
@@ -410,7 +410,7 @@ public class AutoAnnotator extends Controller {
 		}
 	}
 
-	@Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
+	@Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
 	public Result postUploadDataFileByChunking(
 			String resumableChunkNumber, 
 			String resumableChunkSize, 

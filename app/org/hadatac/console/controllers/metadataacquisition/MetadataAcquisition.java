@@ -89,7 +89,7 @@ public class MetadataAcquisition extends Controller {
 		String strQuery = NameSpaces.getInstance().printSparqlNameSpaceList() 
 				+ " SELECT DISTINCT ?studyUri ?studyLabel ?proj ?studyTitle ?studyComment"
 				+ " ?indicatorLabel ?attributeLabel ?roleLabel ?eventLabel ?entityLabel" 
-				+ " ?agentName ?institutionName ?relationLabel ?relationToLabel WHERE { "
+				+ " ?agentName ?institutionName ?relationLabel ?relationTo ?relationToRole ?relationToRoleLabel WHERE { "
 				+ " ?studyUri a ?subUri . "
 				+ " ?subUri rdfs:subClassOf* hasco:Study . "
 				+ " OPTIONAL{ ?schemaAttribute hasco:partOfSchema ?schemaUri . "
@@ -113,7 +113,7 @@ public class MetadataAcquisition extends Controller {
                 + " ?object sio:Relation ?relation . "
                 + " ?relation rdfs:label ?relationLabel . "
                 + " ?relationTo hasco:hasRole ?relationToRole . "
-                + " ?relationToRole rdfs:label ?relationToLabel} . "
+                + " ?relationToRole rdfs:label ?relationToRoleLabel} . "
                 + " OPTIONAL { ?schemaAttribute hasco:hasEvent ?event . "
                 + " ?event hasco:hasEntity ?eventEn . "
                 + " ?eventEn rdfs:label ?eventLabel } . "
@@ -129,6 +129,8 @@ public class MetadataAcquisition extends Controller {
 				+ " OPTIONAL{ ?studyUri hasco:hasInstitution ?institution . "
 				+ "           ?institution foaf:name ?institutionName } . " 
 				+ " } ";
+		
+		System.out.println("strQuery: " + strQuery);
 		
 		QueryExecution qexecStudy = QueryExecutionFactory.sparqlService(
 				Collections.getCollectionsName(Collections.METADATA_SPARQL), strQuery);
@@ -191,8 +193,8 @@ public class MetadataAcquisition extends Controller {
 						value = temp.toString();
 					}
 				}
-				if (soln.contains("relationToLabel")){
-					temp = soln.get("relationToLabel") + "'s " + value;
+				if (soln.contains("relationToRoleLabel")){
+					temp = soln.get("relationToRoleLabel") + "'s " + value;
 					value = temp.toString();
 				}
 /*				if ((soln.contains("roleLabel"))&&(soln.contains("eventLabel"))&&(soln.contains("entityLabel"))){

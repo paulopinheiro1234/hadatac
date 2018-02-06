@@ -93,7 +93,7 @@
             <a href="@org.hadatac.console.controllers.triplestore.routes.UserManagement.index("init")" class="btn btn-warning" role="button">Back to Manage Users</a>
 	    	</div>
             <script> 
-                var msg = "@UserManagement.commitUserPreRegistration(source)";
+                var msg = "@message";
                 $('#msgarea').html(msg.replace(/&lt;br&gt;/g, '<br>'));
                 document.getElementById('end-process-box').style.display = 'inline';
             </script> 
@@ -106,7 +106,7 @@
             <a href="@org.hadatac.console.controllers.triplestore.routes.UserManagement.index("init")" class="btn btn-warning" role="button">Back to Manage Users</a>
 	    	</div>
             <script> 
-                var msg = "@UserManagement.commitGroupRegistration(source)";
+                var msg = "@message";
                 $('#msgarea').html(msg.replace(/&lt;br&gt;/g, '<br>'));
                 document.getElementById('end-process-box').style.display = 'inline';
             </script> 
@@ -187,7 +187,7 @@
 	    </div>
 
     	<script> 
-       		var msg = "@UserManagement.commitUserGraphRegistration()";
+       		var msg = "@message";
             $('#msgarea').html(msg.replace(/&lt;br&gt;/g, '<br>'));
            	document.getElementById('end-process-box').style.display = 'inline';
     	</script>
@@ -201,7 +201,7 @@
 	    </div>
 
     	<script>
-       		var msg = "@UserManagement.recoverUserAuthentication()";
+       		var msg = "@message";
        		$('#msgarea').html(msg.replace(/&lt;br&gt;/g, '<br>'));
            	document.getElementById('end-process-box').style.display = 'inline';
     	</script>

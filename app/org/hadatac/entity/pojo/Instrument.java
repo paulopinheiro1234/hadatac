@@ -18,6 +18,7 @@ import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Statement;
 import org.apache.jena.rdf.model.StmtIterator;
 import org.apache.jena.sparql.engine.http.QueryExceptionHTTP;
+import org.hadatac.console.models.Facet;
 import org.hadatac.console.models.FacetHandler;
 import org.hadatac.utils.Collections;
 import org.hadatac.utils.NameSpaces;
@@ -50,7 +51,7 @@ public class Instrument extends HADatAcThing implements Comparable<Instrument> {
 	}
 	
 	public Map<HADatAcThing, List<HADatAcThing>> getTargetFacets(
-			List<String> preValues, FacetHandler facetHandler) {
+			Facet facet, FacetHandler facetHandler) {
 		String query = "";
 		query += NameSpaces.getInstance().printSparqlNameSpaceList();
 		query += "SELECT ?instrumentUri ?dataAcquisitionUri ?instrumentLabel ?dataAcquisitionLabel WHERE { "
@@ -72,14 +73,18 @@ public class Instrument extends HADatAcThing implements Comparable<Instrument> {
 				Instrument instrument = new Instrument();
 				instrument.setUri(soln.get("instrumentUri").toString());
 				instrument.setLabel(soln.get("instrumentLabel").toString());
+				instrument.setField("instrument_uri_str");
 				
 				DataAcquisition da = new DataAcquisition();
-				if (!preValues.isEmpty() && !preValues.contains(soln.get("dataAcquisitionUri").toString())) {
+				/*
+				if (!preValues.isEmpty() && !preValues.get("acquisition_uri_str").contains(soln.get("dataAcquisitionUri").toString())) {
 					continue;
 				}
+				*/
 				da.setUri(soln.get("dataAcquisitionUri").toString());
 				da.setLabel(soln.get("dataAcquisitionLabel").toString());
 				da.setField("acquisition_uri_str");
+				
 				if (!results.containsKey(instrument)) {
 					List<HADatAcThing> facets = new ArrayList<HADatAcThing>();
 					results.put(instrument, facets);
@@ -96,7 +101,6 @@ public class Instrument extends HADatAcThing implements Comparable<Instrument> {
 	}
 	
 	public static List<Instrument> find() {
-		//System.out.println("Inside Lits<Instrument>");
 		List<Instrument> instruments = new ArrayList<Instrument>();
 		String queryString = NameSpaces.getInstance().printSparqlNameSpaceList() +
 		    " SELECT ?uri WHERE { " +
@@ -123,7 +127,6 @@ public class Instrument extends HADatAcThing implements Comparable<Instrument> {
 	}
 	
 	public static List<Instrument> findAvailable() {
-		//System.out.println("Inside Lits<Instrument> findAvailable()");
 		List<Instrument> instruments = new ArrayList<Instrument>();
 		String queryString = NameSpaces.getInstance().printSparqlNameSpaceList() +
 		    " SELECT ?uri WHERE { " +

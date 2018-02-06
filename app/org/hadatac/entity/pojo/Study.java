@@ -41,6 +41,7 @@ import org.apache.solr.client.solrj.response.FacetField.Count;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
 import org.hadatac.console.controllers.metadata.DynamicFunctions;
+import org.hadatac.console.models.Facet;
 import org.hadatac.console.models.FacetHandler;
 import org.hadatac.data.model.MetadataAcquisitionQueryResult;
 import org.hadatac.utils.Collections;
@@ -372,7 +373,7 @@ public class Study extends HADatAcThing {
 	}
 	
 	public Map<HADatAcThing, List<HADatAcThing>> getTargetFacets(
-			List<String> preValues, FacetHandler facetHandler) {
+			Facet facet, FacetHandler facetHandler) {
 		
 		String query = "";
 		query += NameSpaces.getInstance().printSparqlNameSpaceList();
@@ -394,11 +395,13 @@ public class Study extends HADatAcThing {
 				Study study = new Study();
 				study.setUri(soln.get("studyUri").toString());
 				study.setLabel(soln.get("studyLabel").toString());
+				study.setField("study_uri_str");
 				
 				DataAcquisition da = new DataAcquisition();
 				da.setUri(soln.get("dataAcquisitionUri").toString());
 				da.setLabel(soln.get("dataAcquisitionLabel").toString());
 				da.setField("acquisition_uri_str");
+				
 				if (!results.containsKey(study)) {
 					List<HADatAcThing> facets = new ArrayList<HADatAcThing>();
 					results.put(study, facets);
@@ -451,76 +454,6 @@ public class Study extends HADatAcThing {
 		}
 
 		return study;
-	}
-
-	public static MetadataAcquisitionQueryResult find(int page, int qtd, List<String> permissions, FacetHandler handler) {
-		MetadataAcquisitionQueryResult result = new MetadataAcquisitionQueryResult();
-
-		SolrClient solr = new HttpSolrClient.Builder(
-				ConfigFactory.load().getString("hadatac.solr.data")
-				+ Collections.STUDIES).build();
-		SolrQuery query = new SolrQuery();
-		String permission_query = "";
-		String facet_query = "";
-		String q;
-
-		permission_query += "permission_uri:\"" + "PUBLIC" + "\"";
-		if (permissions != null) {
-			Iterator<String> i = permissions.iterator();
-			while (i.hasNext()) {
-				permission_query += " OR ";
-				permission_query += "permission_uri:\"" + i.next() + "\"";
-			}
-		}
-
-		if (handler != null) {
-			facet_query = handler.toSolrQuery();
-		}
-
-		if (facet_query.trim().equals("")) {
-			facet_query = "*:*";
-		}
-
-		q =  "(" + permission_query + ") AND (" + facet_query + ")";
-		//System.out.println("!!! QUERY: " + q);
-		query.setQuery(q);
-		query.setStart((page-1)*qtd);
-		query.setRows(qtd);
-		query.setFacet(true);
-		query.addFacetField("demographics,acculturation,occupation,housingCharacteristics,ATIDU,socioEconomicStatus,assessment,BDN,anthropometry,laboratory,birthOutcomes");
-		// See Measurement.java as an example if we wish to add the possible facet values as pivots
-		try {
-			QueryResponse queryResponse = solr.query(query);
-			solr.close();
-			SolrDocumentList results = queryResponse.getResults();
-			Iterator<SolrDocument> m = results.iterator();
-			while (m.hasNext()) {
-				result.documents.add(convertFromSolr(m.next()));
-			}
-
-			if (queryResponse.getFacetFields() != null) {
-				Iterator<FacetField> f = queryResponse.getFacetFields().iterator();
-				while (f.hasNext()) {
-					FacetField field = f.next();
-					result.field_facets.put(field.getName(), new HashMap<String, Long>());
-					Iterator<Count> v = field.getValues().iterator();
-					while (v.hasNext()) {
-						Count count = v.next();
-						Map<String, Long> map = result.field_facets.get(field.getName());
-						map.put(count.getName(), count.getCount());
-					}
-				}
-			}
-
-		} catch (SolrServerException e) {
-			System.out.println("[ERROR] Study.find(int, int, List<String>, Map<String, String>) - SolrServerException message: " + e.getMessage());
-		} catch (IOException e) {
-			System.out.println("[ERROR] Study.find(int, int, List<String>, Map<String, String>) - IOException message: " + e.getMessage());
-		} catch (Exception e) {
-			System.out.println("[ERROR] Study.find(int, int, List<String>, Map<String, String>) - Exception message: " + e.getMessage());
-		}
-
-		return result;
 	}
 
 	private static List<String> findObjectCollectionUris(String study_uri) {

@@ -1,30 +1,18 @@
 package org.hadatac.console.controllers.dataacquisitionsearch;
 
 import org.hadatac.console.controllers.AuthApplication;
-import org.hadatac.console.controllers.annotator.AnnotationLog;
 import org.hadatac.console.controllers.triplestore.UserManagement;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
-import java.util.HashMap;
 import java.util.StringTokenizer;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.CompletionStage;
-import java.util.function.Function;
-
-import javax.servlet.http.HttpServletResponse;
 
 import java.util.Set;
 import java.util.HashSet;
 import java.util.LinkedList;
 
-import org.apache.commons.io.FileUtils;
 import org.hadatac.console.models.FacetHandler;
 import org.hadatac.console.models.FacetsWithCategories;
 import org.hadatac.console.models.SpatialQueryResults;
@@ -39,9 +27,10 @@ import org.hadatac.console.views.formdata.FacetFormData;
 import org.hadatac.console.views.html.dataacquisitionsearch.facetOnlyBrowser;
 import org.hadatac.console.views.html.dataacquisitionsearch.dataacquisition_browser;
 import org.hadatac.data.model.AcquisitionQueryResult;
-import org.hadatac.entity.pojo.DataFile;
 import org.hadatac.entity.pojo.Measurement;
-import org.hadatac.utils.Feedback;
+
+import be.objectify.deadbolt.java.actions.Group;
+import be.objectify.deadbolt.java.actions.Restrict;
 
 public class DataAcquisitionSearch extends Controller {
 
@@ -87,28 +76,38 @@ public class DataAcquisitionSearch extends Controller {
     	return objDetails;
     }
 
-    public Result index(int page, int rows, String facets) {
-    	return indexInternal(0, page, rows, facets);
+    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
+    public Result index(int page, int rows) {
+    	return indexInternal(0, page, rows);
     }
     
-    public Result postIndex(int page, int rows, String facets) {
-    	return index(page, rows, facets);
+    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
+    public Result postIndex(int page, int rows) {
+    	return index(page, rows);
     }
 
-    public Result indexData(int page, int rows, String facets) {
-    	return indexInternal(1, page, rows, facets);
+    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
+    public Result indexData(int page, int rows) {
+    	return indexInternal(1, page, rows);
     }
     
-    public Result postIndexData(int page, int rows, String facets) {
-    	return indexData(page, rows, facets);
+    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
+    public Result postIndexData(int page, int rows) {
+    	return indexData(page, rows);
     }
 
-    private Result indexInternal(int mode, int page, int rows, String facets) {    
-    	System.out.println("facets: " + facets);
+    private Result indexInternal(int mode, int page, int rows) {
+    	String facets = "";
+    	if (request().body().asFormUrlEncoded() != null) {
+    		facets = request().body().asFormUrlEncoded().get("facets")[0];
+    	}
+    	System.out.println("\n\n\n\n\nfacets: " + facets);
     	
-    	FacetHandler handler = new FacetHandler();
-    	handler.loadFacets(facets);
-    	System.out.println("DataAcquisitionSearch : <" + handler.toSolrQuery() + ">");
+    	FacetHandler facetHandler = new FacetHandler();
+    	facetHandler.loadFacets(facets);
+    	
+    	FacetHandler retFacetHandler = new FacetHandler();
+    	retFacetHandler.loadFacets(facets);
 
     	AcquisitionQueryResult results = null;
     	String ownerUri;
@@ -122,26 +121,29 @@ public class DataAcquisitionSearch extends Controller {
     			ownerUri = "Public";
     		}
     	}
-    	results = Measurement.find(ownerUri, page, rows, handler);
+    	results = Measurement.find(ownerUri, page, rows, facetHandler, retFacetHandler);
     	
     	ObjectDetails objDetails = getObjectDetails(results);
 
 		if (mode == 0) {
 		    return ok(facetOnlyBrowser.render(page, rows, facets, results.getDocumentSize(), 
-	    			results, results.toJSON(), handler, Measurement.buildQuery(ownerUri, page, rows, handler), 
+	    			results, results.toJSON(), facetHandler, Measurement.buildQuery(ownerUri, page, rows, facetHandler), 
 	    			objDetails.toJSON(), Measurement.getFieldNames()));
 		} else {
 		    return ok(dataacquisition_browser.render(page, rows, facets, results.getDocumentSize(), 
-	    			results, results.toJSON(), handler, Measurement.buildQuery(ownerUri, page, rows, handler), 
+	    			results, results.toJSON(), facetHandler, Measurement.buildQuery(ownerUri, page, rows, facetHandler), 
 	    			objDetails.toJSON(), Measurement.getFieldNames()));
 		}
     }
     
     public Result download(String facets) {
-    	FacetHandler handler = new FacetHandler();
-    	handler.loadFacets(facets);
+    	FacetHandler facetHandler = new FacetHandler();
+    	facetHandler.loadFacets(facets);
     	
-    	String ownerUri;
+    	FacetHandler retFacetHandler = new FacetHandler();
+    	facetHandler.loadFacets(facets);
+    	
+    	String ownerUri = "";
     	final SysUser user = AuthApplication.getLocalUser(session());
     	if (null == user) {
     	    ownerUri = "Public";
@@ -158,7 +160,7 @@ public class DataAcquisitionSearch extends Controller {
     	selectedFields.addAll(name_map.keySet());
     	System.out.println("selectedFields: " + selectedFields);
     	
-    	AcquisitionQueryResult results = Measurement.find(ownerUri, -1, -1, handler);
+    	AcquisitionQueryResult results = Measurement.find(ownerUri, -1, -1, facetHandler, retFacetHandler);
     	CompletableFuture.supplyAsync(() -> Downloader.generateCSVFile(
     			results.getDocuments(), facets, selectedFields, user.getEmail()));
 		

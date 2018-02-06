@@ -34,6 +34,7 @@ import org.apache.solr.common.SolrDocumentList;
 import org.apache.solr.common.util.NamedList;
 import org.hadatac.console.controllers.dataacquisitionsearch.FacetTree;
 import org.hadatac.console.http.SolrUtils;
+import org.hadatac.console.models.Facet;
 import org.hadatac.console.models.FacetHandler;
 import org.hadatac.console.models.Pivot;
 import org.hadatac.data.model.AcquisitionQueryResult;
@@ -459,10 +460,55 @@ public class Measurement {
 		return result;
 	}
 
-	public static AcquisitionQueryResult find(String user_uri, int page, int qtd, FacetHandler handler) {
+	public static AcquisitionQueryResult find(String user_uri, int page, int qtd, 
+			FacetHandler facetHandler, FacetHandler retFacetHandler) {
 		AcquisitionQueryResult result = new AcquisitionQueryResult();
 
-		String q = buildQuery(user_uri, page, qtd, handler);
+		System.out.println("facetHandler before: " + facetHandler.toSolrQuery());
+		// Get facet statistics
+		FacetTree fTree = new FacetTree();
+		fTree.setTargetFacet(DataAcquisition.class);
+		fTree.addUpperFacet(Study.class);
+		Pivot pivot = getFacetStats(fTree, 
+				retFacetHandler.getFacetByName(FacetHandler.STUDY_FACET), 
+				facetHandler, false);
+		result.extra_facets.put(FacetHandler.STUDY_FACET, pivot);
+		
+		fTree = new FacetTree();
+		fTree.setTargetFacet(AttributeInstance.class);
+		fTree.addUpperFacet(Indicator.class);
+		fTree.addUpperFacet(EntityRole.class);
+		fTree.addUpperFacet(EntityInstance.class);
+		pivot = getFacetStats(fTree, 
+				retFacetHandler.getFacetByName(FacetHandler.ENTITY_CHARACTERISTIC_FACET), 
+				facetHandler, true);
+		//fTree.mergeFacetTree(1, 0, new ArrayList<Integer>(), null, pivot, "", new ArrayList<Pivot>());
+		result.extra_facets.put(FacetHandler.ENTITY_CHARACTERISTIC_FACET, pivot);
+		
+		fTree = new FacetTree();
+		fTree.setTargetFacet(UnitInstance.class);
+		result.extra_facets.put(FacetHandler.UNIT_FACET, getFacetStats(fTree, 
+				retFacetHandler.getFacetByName(FacetHandler.UNIT_FACET),
+				facetHandler, false));
+		
+		fTree = new FacetTree();
+		fTree.setTargetFacet(TimeInstance.class);
+		result.extra_facets.put(FacetHandler.TIME_FACET, getFacetStats(fTree, 
+				retFacetHandler.getFacetByName(FacetHandler.TIME_FACET),
+				facetHandler, false));
+		
+		fTree = new FacetTree();
+		fTree.setTargetFacet(DataAcquisition.class);
+		fTree.addUpperFacet(Platform.class);
+		fTree.addUpperFacet(Instrument.class);
+		result.extra_facets.put(FacetHandler.PLATFORM_INSTRUMENT_FACET, getFacetStats(fTree, 
+				retFacetHandler.getFacetByName(FacetHandler.PLATFORM_INSTRUMENT_FACET),
+				facetHandler, false));
+		
+		// Get documents
+		System.out.println("facetHandler after: " + retFacetHandler.toSolrQuery());
+		long docSize = 0;
+		String q = buildQuery(user_uri, page, qtd, retFacetHandler);
 		/*
 		 * an empty query happens when current user is not allowed to see any
 		 * data acquisition
@@ -472,7 +518,6 @@ public class Measurement {
 			return result;
 		}
 		
-		int docSize = 0;
 		SolrQuery query = new SolrQuery();
 		query.setQuery(q);
 		if (page != -1) {
@@ -488,14 +533,14 @@ public class Measurement {
 			SolrClient solr = new HttpSolrClient.Builder(
 					ConfigFactory.load().getString("hadatac.solr.data") 
 					+ Collections.DATA_ACQUISITION).build();
-			System.out.println("!!!! QUERY: " + query.toQueryString());
 			QueryResponse queryResponse = solr.query(query, SolrRequest.METHOD.POST);
 			solr.close();
-			SolrDocumentList results = queryResponse.getResults();
-			System.out.println("Num of results: " + results.getNumFound());
+			SolrDocumentList docs = queryResponse.getResults();
+			docSize = docs.getNumFound();
+			System.out.println("Num of results: " + docSize);
 			
 			Set<String> uri_set = new HashSet<String>();
-			Iterator<SolrDocument> iterDoc = results.iterator();
+			Iterator<SolrDocument> iterDoc = docs.iterator();
 			Map<String, DataAcquisition> cachedDA = new HashMap<String, DataAcquisition>();
 			while (iterDoc.hasNext()) {
 				Measurement measurement = convertFromSolr(iterDoc.next(), cachedDA);
@@ -510,39 +555,6 @@ public class Measurement {
 			for (Measurement measurement : result.getDocuments()) {
 				measurement.setLabels(cachedLabels);
 			}
-			
-			FacetTree fTree = new FacetTree();
-			fTree.setTargetFacet(DataAcquisition.class);
-			fTree.addUpperFacet(Study.class);
-			Pivot pivot = getFacetStats(fTree, handler, false);
-			for (Pivot p : pivot.children) {
-				docSize += p.count;
-			}
-			result.extra_facets.put(FacetHandler.STUDY_FACET, pivot);
-			
-			fTree = new FacetTree();
-			fTree.setTargetFacet(AttributeInstance.class);
-			fTree.addUpperFacet(Indicator.class);
-			fTree.addUpperFacet(EntityRole.class);
-			fTree.addUpperFacet(EntityInstance.class);
-			pivot = getFacetStats(fTree, handler, true);
-			fTree.mergeFacetTree(1, 0, new ArrayList<Integer>(), null, pivot, "", new ArrayList<Pivot>());
-			result.extra_facets.put(FacetHandler.ENTITY_CHARACTERISTIC_FACET, pivot);
-			
-			fTree = new FacetTree();
-			fTree.setTargetFacet(UnitInstance.class);
-			result.extra_facets.put(FacetHandler.UNIT_FACET, getFacetStats(fTree, handler, false));
-			
-			fTree = new FacetTree();
-			fTree.setTargetFacet(TimeInstance.class);
-			result.extra_facets.put(FacetHandler.TIME_FACET, getFacetStats(fTree, handler, false));
-			
-			fTree = new FacetTree();
-			fTree.setTargetFacet(DataAcquisition.class);
-			fTree.addUpperFacet(Platform.class);
-			fTree.addUpperFacet(Instrument.class);
-			result.extra_facets.put(FacetHandler.PLATFORM_INSTRUMENT_FACET, getFacetStats(fTree, handler, false));
-
 		} catch (SolrServerException e) {
 			System.out.println("[ERROR] Measurement.find() - SolrServerException message: " + e.getMessage());
 		} catch (IOException e) {
@@ -552,15 +564,18 @@ public class Measurement {
 			e.printStackTrace();
 		}
 
-		result.setDocumentSize((long) docSize);
+		result.setDocumentSize(docSize);
 
 		return result;
 	}
 	
-	private static Pivot getFacetStats(FacetTree fTree, FacetHandler facetHandler, 
+	private static Pivot getFacetStats(
+			FacetTree fTree, 
+			Facet facet,
+			FacetHandler facetHandler, 
 			boolean bStatsFromSecondLastLevel) {
 		Pivot pivot = new Pivot();
-		fTree.retrieveFacetData(0, facetHandler, pivot, new ArrayList<String>(), bStatsFromSecondLastLevel);
+		fTree.retrieveFacetData(0, facet, facetHandler, pivot, bStatsFromSecondLastLevel);
 		pivot.setNullParent();
 		
 		return pivot;

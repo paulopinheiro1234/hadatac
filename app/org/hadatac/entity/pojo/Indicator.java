@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.text.WordUtils;
 import org.apache.jena.query.Query;
 import org.apache.jena.query.QueryExecution;
 import org.apache.jena.query.QueryExecutionFactory;
@@ -24,6 +25,7 @@ import org.apache.jena.update.UpdateProcessor;
 import org.apache.jena.update.UpdateRequest;
 import org.hadatac.console.controllers.AuthApplication;
 import org.hadatac.console.controllers.metadata.DynamicFunctions;
+import org.hadatac.console.models.Facet;
 import org.hadatac.console.models.FacetHandler;
 import org.hadatac.metadata.loader.LabkeyDataHandler;
 import org.hadatac.metadata.loader.ValueCellProcessing;
@@ -232,10 +234,29 @@ public class Indicator extends HADatAcThing implements Comparable<Indicator> {
 	}
 
 	public Map<HADatAcThing, List<HADatAcThing>> getTargetFacets(
-			List<String> preValues, FacetHandler facetHandler) {	
+			Facet facet, FacetHandler facetHandler) {
+		System.out.println("\nIndicator facet: " + facet.toSolrQuery());
+		
+		String valueConstraint = "";
+		if (!facet.getFacetValuesByField("indicator_uri_str").isEmpty()) {
+			valueConstraint += " VALUES ?studyIndicator { " + stringify(
+					facet.getFacetValuesByField("indicator_uri_str"), true) + " } \n ";
+		}
+		
+		if (!facet.getFacetValuesByField("characteristic_uri_str").isEmpty()) {
+			valueConstraint += " VALUES ?attributeUri { " + stringify(
+					facet.getFacetValuesByField("characteristic_uri_str"), true) + " } \n ";
+		}
+		
+		if (!facet.getFacetValuesByField("dasa_uri_str").isEmpty()) {
+			valueConstraint += " VALUES ?schemaAttribute { " + stringify(
+					facet.getFacetValuesByField("dasa_uri_str"), true) + " } \n ";
+		}
+		
 		String query = "";
 		query += NameSpaces.getInstance().printSparqlNameSpaceList();
-		query += "SELECT ?studyIndicator ?indicatorLabel ?attributeUri ?attributeLabel WHERE { \n"
+		query += "SELECT ?studyIndicator ?indicatorLabel ?schemaAttribute ?attributeUri ?attributeLabel WHERE { \n"
+				+ valueConstraint + " \n "
 				+ "?subTypeUri rdfs:subClassOf* hasco:Study . \n"
 				+ "?studyUri a ?subTypeUri . \n"
 				+ "?dataAcq hasco:isDataAcquisitionOf ?studyUri . \n"
@@ -245,9 +266,10 @@ public class Indicator extends HADatAcThing implements Comparable<Indicator> {
 				+ "?attributeUri rdfs:subClassOf* ?studyIndicator . \n"
 				+ "?attributeUri rdfs:label ?attributeLabel . \n"
 				+ "?studyIndicator rdfs:subClassOf hasco:StudyIndicator . \n"
+				//+ " { { ?studyIndicator rdfs:subClassOf hasco:StudyIndicator } UNION { ?studyIndicator rdfs:subClassOf hasco:ScienceIndicator } } . \n"
 				+ "?studyIndicator rdfs:label ?indicatorLabel . \n"
 				+ "}";
-
+		
 		Map<HADatAcThing, List<HADatAcThing>> mapIndicatorToCharList = new HashMap<HADatAcThing, List<HADatAcThing>>();
 		try {
 			QueryExecution qe = QueryExecutionFactory.sparqlService(
@@ -259,7 +281,9 @@ public class Indicator extends HADatAcThing implements Comparable<Indicator> {
 				QuerySolution soln = resultsrw.next();
 				Indicator indicator = new Indicator();
 				indicator.setUri(soln.get("studyIndicator").toString());
-				indicator.setLabel(soln.get("indicatorLabel").toString());
+				indicator.setLabel(WordUtils.capitalize(soln.get("indicatorLabel").toString()));
+				indicator.setField("indicator_uri_str");
+				
 				AttributeInstance attrib = new AttributeInstance();
 				attrib.setUri(soln.get("attributeUri").toString());
 				attrib.setLabel(soln.get("attributeLabel").toString());
@@ -271,6 +295,11 @@ public class Indicator extends HADatAcThing implements Comparable<Indicator> {
 				if (!mapIndicatorToCharList.get(indicator).contains(attrib)) {
 					mapIndicatorToCharList.get(indicator).add(attrib);
 				}
+				
+				Facet subFacet = facet.getChildById(indicator.getUri());
+				subFacet.putFacet("indicator_uri_str", indicator.getUri());
+				System.out.println("Adding indicator facet: " + indicator.getUri());
+				subFacet.putFacet("dasa_uri_str", soln.get("schemaAttribute").toString());
 			}
 		} catch (QueryExceptionHTTP e) {
 			e.printStackTrace();

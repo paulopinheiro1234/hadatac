@@ -27,6 +27,7 @@ import org.hadatac.utils.ConfigProp;
 import be.objectify.deadbolt.java.actions.Group;
 import be.objectify.deadbolt.java.actions.Restrict;
 import org.hadatac.console.controllers.AuthApplication;
+import org.hadatac.console.models.Facet;
 import org.hadatac.console.models.FacetHandler;
 import org.hadatac.metadata.loader.LabkeyDataHandler;
 import org.hadatac.metadata.loader.ValueCellProcessing;
@@ -123,7 +124,7 @@ public class Platform extends HADatAcThing implements Comparable<Platform> {
 	}
 	
 	public Map<HADatAcThing, List<HADatAcThing>> getTargetFacets(
-			List<String> preValues, FacetHandler facetHandler) {
+			Facet facet, FacetHandler facetHandler) {
 		
 		String query = "";
 		query += NameSpaces.getInstance().printSparqlNameSpaceList();
@@ -146,13 +147,17 @@ public class Platform extends HADatAcThing implements Comparable<Platform> {
 				Platform platform = new Platform();
 				platform.setUri(soln.get("platformUri").toString());
 				platform.setLabel(soln.get("platformLabel").toString());
+				platform.setField("platform_uri_str");
 				
 				DataAcquisition da = new DataAcquisition();
-				if (!preValues.isEmpty() && !preValues.contains(soln.get("dataAcquisitionUri").toString())) {
+				/*
+				if (!preValues.isEmpty() && !preValues.get("acquisition_uri_str").contains(soln.get("dataAcquisitionUri").toString())) {
 					continue;
 				}
+				*/
 				da.setUri(soln.get("dataAcquisitionUri").toString());
 				da.setLabel(soln.get("dataAcquisitionLabel").toString());
+				da.setField("acquisition_uri_str");
 				if (!results.containsKey(platform)) {
 					List<HADatAcThing> facets = new ArrayList<HADatAcThing>();
 					results.put(platform, facets);

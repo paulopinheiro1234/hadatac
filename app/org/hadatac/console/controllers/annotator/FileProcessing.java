@@ -118,8 +118,7 @@ public class FileProcessing extends Controller {
 			   }
 	     	   return ok(measurementsSpec.render(handler, getQueryResults("Entities"), getQueryResults("Units")));
 		} else {
-		   return ok (uploadCSV.render(null, "fail", "Error uploading file. Please try again."));
+			return ok (uploadCSV.render(null, "fail", "Error uploading file. Please try again."));
 		}
     }
-
 }

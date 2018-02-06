@@ -1,6 +1,7 @@
 package org.hadatac.entity.pojo;
 
 import java.util.List;
+import java.util.Map;
 
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrQuery;
@@ -9,6 +10,7 @@ import org.apache.solr.client.solrj.impl.HttpSolrClient;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.SolrDocumentList;
 import org.hadatac.console.models.FacetHandler;
+import org.hadatac.console.models.Facet;
 import org.hadatac.utils.Collections;
 
 import com.typesafe.config.ConfigFactory;
@@ -33,9 +35,12 @@ public class AttributeInstance extends HADatAcThing implements Comparable<Attrib
 		return getUri().hashCode();
 	}
 
-	public long getNumberFromSolr(List<String> values, FacetHandler facetHandler) {
+	public long getNumberFromSolr(Facet facet, FacetHandler facetHandler) {
+		System.out.println("\nAttributeInstance facet: " + facet.toSolrQuery());
+		
 		SolrQuery query = new SolrQuery();
-		query.setQuery(facetHandler.getTempSolrQuery("CHAR_URI", "characteristic_uri_str", values));
+		String strQuery = facetHandler.getTempSolrQuery(facet, FacetHandler.ENTITY_CHARACTERISTIC_FACET);
+		query.setQuery(strQuery);
 		query.setRows(0);
 		query.setFacet(false);
 

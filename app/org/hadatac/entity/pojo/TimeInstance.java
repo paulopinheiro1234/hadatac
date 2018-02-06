@@ -18,6 +18,7 @@ import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.impl.HttpSolrClient;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.SolrDocumentList;
+import org.hadatac.console.models.Facet;
 import org.hadatac.console.models.FacetHandler;
 import org.hadatac.console.models.Pivot;
 import org.hadatac.utils.Collections;
@@ -43,9 +44,9 @@ public class TimeInstance extends HADatAcThing implements Comparable<TimeInstanc
 	}
 
 	public Map<HADatAcThing, List<HADatAcThing>> getTargetFacets(
-			List<String> preValues, FacetHandler facetHandler) {
+			Facet facet, FacetHandler facetHandler) {
 		SolrQuery query = new SolrQuery();
-		String queryString = facetHandler.getTempSolrQuery("TIME", "named_time_str", preValues);
+		String queryString = facetHandler.getTempSolrQuery(facet, FacetHandler.TIME_FACET);
 		
 		SimpleDateFormat sdfDate = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
 		sdfDate.setTimeZone(TimeZone.getTimeZone("UTC"));
@@ -83,8 +84,6 @@ public class TimeInstance extends HADatAcThing implements Comparable<TimeInstanc
 		query.setFacet(true);
 		query.setFacetLimit(-1);
 		query.setParam("json.facet", param);
-		
-		//System.out.println("query.getParam(): " + query.getParams("json.facet")[0]);
 
 		try {
 			SolrClient solr = new HttpSolrClient.Builder(
@@ -92,7 +91,6 @@ public class TimeInstance extends HADatAcThing implements Comparable<TimeInstanc
 					+ Collections.DATA_ACQUISITION).build();
 			QueryResponse queryResponse = solr.query(query, SolrRequest.METHOD.POST);
 			solr.close();
-			//System.out.println("response.getResponse(): " + queryResponse.getResponse());
 			Pivot pivot = Measurement.parseFacetResults(queryResponse);
 			return parsePivot(pivot);
 		} catch (Exception e) {

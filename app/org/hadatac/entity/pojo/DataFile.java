@@ -192,7 +192,7 @@ public class DataFile {
 	}
 	
 	public static List<DataFile> find(String ownerEmail, String status) {
-		if (status == UNPROCESSED || status == PROCESSED) {
+		if (status == UNPROCESSED || status == PROCESSED || status == CREATING || status == CREATED) {
 			SolrQuery query = new SolrQuery();
 			query.set("q", "owner_email_str:\"" + ownerEmail + "\"" + " AND " + "status_str:\"" + status + "\"");
 			query.set("rows", "10000000");

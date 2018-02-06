@@ -10,6 +10,7 @@ import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrRequest;
 import org.apache.solr.client.solrj.impl.HttpSolrClient;
 import org.apache.solr.client.solrj.response.QueryResponse;
+import org.hadatac.console.models.Facet;
 import org.hadatac.console.models.FacetHandler;
 import org.hadatac.console.models.Pivot;
 import org.hadatac.utils.Collections;
@@ -37,9 +38,12 @@ public class EntityInstance extends HADatAcThing implements Comparable<EntityIns
 	}
 	
 	public Map<HADatAcThing, List<HADatAcThing>> getTargetFacets(
-			List<String> preValues, FacetHandler facetHandler) {
+			Facet facet, FacetHandler facetHandler) {
+		System.out.println("\nEntityInstance facet: " + facet.toSolrQuery());
+		
 		SolrQuery query = new SolrQuery();
-		query.setQuery(facetHandler.getTempSolrQuery("CHAR_URI", "characteristic_uri_str", preValues));
+		String strQuery = facetHandler.getTempSolrQuery(facet, FacetHandler.ENTITY_CHARACTERISTIC_FACET);
+		query.setQuery(strQuery);
 		query.setRows(0);
 		query.setFacet(true);
 		query.setFacetLimit(-1);
@@ -61,22 +65,26 @@ public class EntityInstance extends HADatAcThing implements Comparable<EntityIns
 			QueryResponse queryResponse = solr.query(query, SolrRequest.METHOD.POST);
 			solr.close();
 			Pivot pivot = Measurement.parseFacetResults(queryResponse);
-			Map<HADatAcThing, List<HADatAcThing>> result = parsePivot(pivot);
-			return parsePivot(pivot);
+			return parsePivot(pivot, facet);
 		} catch (Exception e) {
-			System.out.println("[ERROR] Entity.getNumberFromSolr() - Exception message: " + e.getMessage());
+			System.out.println("[ERROR] EntityInstance.getTargetFacets() - Exception message: " + e.getMessage());
 		}
 
 		return null;
 	}
 	
-	private Map<HADatAcThing, List<HADatAcThing>> parsePivot(Pivot pivot) {
+	private Map<HADatAcThing, List<HADatAcThing>> parsePivot(Pivot pivot, Facet facet) {
 		Map<HADatAcThing, List<HADatAcThing>> results = new HashMap<HADatAcThing, List<HADatAcThing>>();
 		for (Pivot pivot_ent : pivot.children) {
 			EntityInstance entity = new EntityInstance();
 			entity.setUri(pivot_ent.value);
 			entity.setLabel(Entity.find(pivot_ent.value).getLabel());
 			entity.setCount(pivot_ent.count);
+			entity.setField("entity_uri_str");
+			
+			Facet subFacet = facet.getChildById(entity.getUri());
+			subFacet.putFacet("entity_uri_str", entity.getUri());
+			
 			for (Pivot pivot_attrib : pivot_ent.children) {
 				AttributeInstance attrib = new AttributeInstance();
 				attrib.setUri(pivot_attrib.value);
@@ -90,6 +98,8 @@ public class EntityInstance extends HADatAcThing implements Comparable<EntityIns
 				if (!results.get(entity).contains(attrib)) {
 					results.get(entity).add(attrib);
 				}
+				
+				subFacet.putFacet("characteristic_uri_str", attrib.getUri());
 			}
 		}
 		

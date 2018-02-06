@@ -115,7 +115,7 @@ public class TokenAction {
 		SolrClient solrClient = new HttpSolrClient.Builder(
 				ConfigFactory.load().getString("hadatac.solr.users")
 				+ Collections.AUTHENTICATE_TOKENS).build();
-    	SolrQuery solrQuery = new SolrQuery("token:" + token + " AND type:" + type.name());
+    	SolrQuery solrQuery = new SolrQuery("token_str:" + token + " AND type_str:" + type.name());
     	TokenAction tokenAction = null;
 		
     	try {

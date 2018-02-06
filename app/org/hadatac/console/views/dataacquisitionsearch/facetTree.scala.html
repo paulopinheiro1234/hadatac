@@ -57,7 +57,6 @@
     loadTree(treeU, dataTree);
     
     var treeT;
-    //jsonTree = parseSolrRangeFacetFieldToTree('@FacetHandler.TIME_FACET');
     selected_elems = JSON.parse('@handler.values(FacetHandler.TIME_FACET)'.replace(/&quot;/g,'"'));
     dataTree = parseSolrFacetToTree('@FacetHandler.TIME_FACET', selected_elems);
     treeT = new dhtmlXTreeObject("treeTimeBox","100%","100%",0);

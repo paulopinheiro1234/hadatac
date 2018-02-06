@@ -11,6 +11,7 @@ import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrRequest;
 import org.apache.solr.client.solrj.impl.HttpSolrClient;
 import org.apache.solr.client.solrj.response.QueryResponse;
+import org.hadatac.console.models.Facet;
 import org.hadatac.console.models.FacetHandler;
 import org.hadatac.console.models.Pivot;
 import org.hadatac.utils.Collections;
@@ -38,9 +39,9 @@ public class UnitInstance extends HADatAcThing implements Comparable<UnitInstanc
 	}
 
 	public Map<HADatAcThing, List<HADatAcThing>> getTargetFacets(
-			List<String> preValues, FacetHandler facetHandler) {
+			Facet facet, FacetHandler facetHandler) {
 		SolrQuery query = new SolrQuery();
-		query.setQuery(facetHandler.getTempSolrQuery("TIME", "unit_uri_str", preValues));
+		query.setQuery(facetHandler.getTempSolrQuery(facet, FacetHandler.UNIT_FACET));
 		query.setRows(0);
 		query.setFacet(true);
 		query.setFacetLimit(-1);

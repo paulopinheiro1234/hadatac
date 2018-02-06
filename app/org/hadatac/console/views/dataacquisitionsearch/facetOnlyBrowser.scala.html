@@ -15,6 +15,7 @@
 )
 
 @main("Simple Faceted Search") {
+    <script type="text/javascript" src="/hadatac/assets/javascripts/jquery.redirect.js"></script>
 	<script type="text/javascript" src="/hadatac/assets/javascripts/datasearch.js"></script>
 	<div id="query" data-documents="@documentJson" data-query="@query"/>
 	<div id="facetDiv" data-documents="@handler.toJSON()"/>
@@ -32,7 +33,7 @@
 			        <button type="button" class="btn btn-primary" onClick="search();">Search</button>
 			        <button type="button" class="btn btn-primary" onClick="clearSearch();">Clear Search</button>
 				    <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#myModal">Download</button>
-                    <a href="@org.hadatac.console.controllers.dataacquisitionsearch.routes.DataAcquisitionSearch.indexData(page, rows , facets)" id="data" class="btn btn-primary" role="button">Show Data</a>
+				    <button type="button" class="btn btn-primary" onClick="showData(1);">Show Data</button>
 
 				<div id="download_url" style="visibility: hidden ;">@org.hadatac.console.http.routes.SolrSearchProxy.getDataAcquisitionDownload()</div>
 			    

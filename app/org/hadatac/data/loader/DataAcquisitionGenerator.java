@@ -106,7 +106,8 @@ public class DataAcquisitionGenerator extends BasicGenerator {
 		if (isEpiData(rec)) {
 			row.put("hasco:hasSchema", kbPrefix + "DAS-" + getDataDictionaryName(rec));
 		} else if (isLabData(rec)) {
-			row.put("hasco:hasSchema", kbPrefix + "DAS-STANDARD-LAB-SCHEMA");
+			// row.put("hasco:hasSchema", kbPrefix + "DAS-STANDARD-LAB-SCHEMA");
+			row.put("hasco:hasSchema", kbPrefix + "DAS-" + getDataDictionaryName(rec));
 		}
 
 		String ownerEmail = getOwnerEmail(rec);

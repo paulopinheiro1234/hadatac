@@ -61,7 +61,7 @@ public class UserManagement extends Controller {
 	private static final String UPLOAD_NAME_JSON = "tmp/uploads/user-auth.json";
 	
 	@Inject
-	private static FormFactory formFactory;
+	private FormFactory formFactory;
 	
 	private final MyUsernamePasswordAuthProvider userPaswAuthProvider;
 
@@ -253,7 +253,7 @@ public class UserManagement extends Controller {
     }
 	
 	@Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
-	public static String recoverUserAuthentication() {
+	public String recoverUserAuthentication() {
 		System.out.println("Recovering User Authentication ...");
 		try {
 			if (!SolrUtils.clearCollection(ConfigFactory.load().getString("hadatac.solr.users") 
@@ -319,11 +319,20 @@ public class UserManagement extends Controller {
 	
 	@Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
 	public Result submitPreRegistrationForm(String oper) {
-		return ok(users.render(oper, "", User.find(), UserGroup.find(), "form"));
+		String msg = "";
+		if (oper.equals("load_users")) {
+			msg = commitUserPreRegistration("form");
+		} else if (oper.equals("load_groups")) {
+			msg = commitGroupRegistration("form");
+		} else {
+			return badRequest("Invalid oper mode for submitting pre-registration form!");
+		}
+		
+		return ok(users.render(oper, msg, User.find(), UserGroup.find(), "form"));
 	}
 	
 	@Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
-	public static String commitUserPreRegistration(String source) {
+	public String commitUserPreRegistration(String source) {
 		System.out.println("Adding pre-registered user...");
 		int mode = Feedback.WEB;
 		String oper = "load";
@@ -334,10 +343,10 @@ public class UserManagement extends Controller {
 						ConfigFactory.load().getString("hadatac.solr.permissions"), 
 						false);
 		
-		if(source.equals("batch")){
+		if (source.equals("batch")) {
 			message = SpreadsheetProcessing.generateTTL(mode, oper, rdf, UPLOAD_NAME);
 		}
-		else if(source.equals("form")){
+		else if (source.equals("form")) {
 			Form<UserPreRegistrationForm> form = formFactory.form(UserPreRegistrationForm.class).bindFromRequest();
 			UserPreRegistrationForm data = form.get();
 			String usr_uri = data.getUserUri();
@@ -365,7 +374,7 @@ public class UserManagement extends Controller {
 	}
 	
 	@Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
-	public static String commitGroupRegistration(String source) {
+	public String commitGroupRegistration(String source) {
 		System.out.println("Adding registered group...");
 		int mode = Feedback.WEB;
 		String oper = "load";
@@ -376,10 +385,10 @@ public class UserManagement extends Controller {
 						ConfigFactory.load().getString("hadatac.solr.permissions"), 
 						false);
 		
-		if(source.equals("batch")){
+		if (source.equals("batch")) {
 			message = SpreadsheetProcessing.generateTTL(mode, oper, rdf, UPLOAD_NAME);
 		}
-		else if(source.equals("form")){
+		else if (source.equals("form")) {
 			Form<GroupRegistrationForm> form = formFactory.form(GroupRegistrationForm.class).bindFromRequest();
 			GroupRegistrationForm data = form.get();
 			String group_uri = data.getGroupUri();
@@ -403,7 +412,7 @@ public class UserManagement extends Controller {
 	}
 	
 	@Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
-	public static String commitUserGraphRegistration() {
+	public String commitUserGraphRegistration() {
 		System.out.println("Adding pre-registered user...");
 		int mode = Feedback.WEB;
 		String message = "";
@@ -466,7 +475,7 @@ public class UserManagement extends Controller {
 		try {
 			String timeStamp = new SimpleDateFormat("yyyyMMdd-HHmmss").format(new Date());
 			fileName = SpreadsheetProcessing.TTL_DIR + "HASNetO-" + timeStamp + ".ttl";
-			FileUtils.writeStringToFile(new File(fileName), ttl);
+			FileUtils.writeStringToFile(new File(fileName), ttl, "utf-8");
 		} catch (IOException e) {
 			message += e.getMessage();
 			return message;
@@ -536,11 +545,13 @@ public class UserManagement extends Controller {
 			}
 			if(file_type.equals("ttl")) {
 				System.out.println("Uploaded turtle file!");
-				return ok(users.render("loaded", "File uploaded successfully.", User.find(), UserGroup.find(), "turtle"));
+				String msg = commitUserGraphRegistration();
+				return ok(users.render("loaded", msg, User.find(), UserGroup.find(), "turtle"));
 			}
 			else if(file_type.equals("json")) {
 				System.out.println("Uploaded json file!");
-				return ok(users.render("loaded", "File uploaded successfully.", User.find(), UserGroup.find(), "json"));
+				String msg = recoverUserAuthentication();
+				return ok(users.render("loaded", msg, User.find(), UserGroup.find(), "json"));
 			}
 			else {
 				return ok(users.render("loaded", "File uploaded successfully.", User.find(), UserGroup.find(), "batch"));

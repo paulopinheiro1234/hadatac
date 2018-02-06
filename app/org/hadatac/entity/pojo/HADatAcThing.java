@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import org.hadatac.console.models.Facet;
 import org.hadatac.console.models.FacetHandler;
 import org.hadatac.metadata.loader.ValueCellProcessing;
 
@@ -17,7 +18,7 @@ public class HADatAcThing {
 	int count = 0;
 	
 	public Map<HADatAcThing, List<HADatAcThing>> getTargetFacets(
-			List<String> preValues, FacetHandler facetHandler) {
+			Facet facet, FacetHandler facetHandler) {
 		return null;
 	}
 	
@@ -32,7 +33,7 @@ public class HADatAcThing {
 		return String.join(" ", finalValues);
 	}
 	
-	public long getNumberFromSolr(List<String> values, FacetHandler facetHandler) {
+	public long getNumberFromSolr(Facet facet, FacetHandler facetHandler) {
 		return 0;
 	}
 

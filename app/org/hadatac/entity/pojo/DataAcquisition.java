@@ -19,6 +19,7 @@ import org.apache.solr.client.solrj.response.UpdateResponse;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
 import org.hadatac.console.controllers.AuthApplication;
+import org.hadatac.console.models.Facet;
 import org.hadatac.console.models.FacetHandler;
 import org.hadatac.metadata.loader.LabkeyDataHandler;
 import org.hadatac.metadata.loader.ValueCellProcessing;
@@ -653,9 +654,9 @@ public class DataAcquisition extends HADatAcThing {
 		}
 	}
 	
-	public long getNumberFromSolr(List<String> values, FacetHandler facetHandler) {
+	public long getNumberFromSolr(Facet facet, FacetHandler facetHandler) {
 		SolrQuery query = new SolrQuery();
-		query.setQuery(facetHandler.getTempSolrQuery("ACQUISITION_URI", "acquisition_uri_str", values));
+		query.setQuery(facetHandler.getTempSolrQuery(facet, FacetHandler.STUDY_FACET));
 		query.setRows(0);
 		query.setFacet(false);
 
