@@ -233,10 +233,9 @@ public class DataAcquisitionSchemaObject {
 		System.out.println("Looking for data acquisition schema objects with uri: " + uri);
 		DataAcquisitionSchemaObject object = null;
 		String queryString = NameSpaces.getInstance().printSparqlNameSpaceList() + 
-				"SELECT ?position ?entity ?partOfSchema ?role ?inRelationTo ?relation WHERE { " + 
+				"SELECT ?entity ?partOfSchema ?role ?inRelationTo ?relation WHERE { " + 
 				"   <" + uri + "> a hasco:DASchemaObject . " + 
 				"   <" + uri + "> hasco:partOfSchema ?partOfSchema . " + 
-				"   OPTIONAL { <" + uri + "> hasco:hasPosition ?position } . " + 
 				"   OPTIONAL { <" + uri + "> hasco:hasEntity ?entity } . " + 
 				"   OPTIONAL { <" + uri + "> hasco:hasRole ?role } .  " + 
 				"   OPTIONAL { <" + uri + "> sio:inRelationTo ?inRelationTo } . " + 
@@ -268,15 +267,6 @@ public class DataAcquisitionSchemaObject {
 			if (soln != null) {
 
 				labelStr = FirstLabel.getLabel(uri);
-
-				try {
-					if (soln.getLiteral("position") != null && soln.getLiteral("position").getString() != null) {
-						positionStr = soln.getLiteral("position").getString();
-					} 
-				} catch (Exception e1) {
-					positionStr = "";
-				}
-				System.out.println("positionStr: " + positionStr);
 				
 				try {
 					if (soln.getResource("entity") != null && soln.getResource("entity").getURI() != null) {

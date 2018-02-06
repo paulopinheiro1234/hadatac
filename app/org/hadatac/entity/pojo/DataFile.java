@@ -16,7 +16,6 @@ import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.client.solrj.response.UpdateResponse;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
-import play.Play;
 
 import org.hadatac.metadata.loader.ValueCellProcessing;
 import org.hadatac.utils.Collections;
@@ -43,18 +42,18 @@ public class DataFile {
 	private String datasetUri;
 	@Field("status_str")
 	private String status;
-	@Field("completion_percentage_double")
-	private double completionPercentage;
+	@Field("completion_percentage_int")
+	private int completionPercentage;
 	@Field("submission_time_str")
 	private String submissionTime;
 	@Field("completion_time_str")
 	private String completionTime;
 	
-	public DataFile() {
+	public DataFile(String fileName) {
+		this.fileName = fileName;
 		ownerEmail = "";
 		dataAcquisitionUri = "";
 		datasetUri = "";
-		fileName = "";
 		submissionTime = "";
 		completionTime = "";
 		status = "";
@@ -96,10 +95,10 @@ public class DataFile {
 		this.status = status;
 	}
 	
-	public double getCompletionPercentage() {
+	public int getCompletionPercentage() {
 		return completionPercentage;
 	}
-	public void setCompletionPercentage(double completionPercentage) {
+	public void setCompletionPercentage(int completionPercentage) {
 		this.completionPercentage = completionPercentage;
 	}
 	
@@ -120,7 +119,7 @@ public class DataFile {
 	public int save() {
 		try {
 			SolrClient client = new HttpSolrClient.Builder(
-					Play.application().configuration().getString("hadatac.solr.data") 
+					ConfigFactory.load().getString("hadatac.solr.data") 
 					+ Collections.CSV_DATASET).build();
 			
 			int status = client.addBean(this).getStatus();
@@ -154,14 +153,13 @@ public class DataFile {
 	}
 	
 	public static DataFile convertFromSolr(SolrDocument doc) {
-		DataFile object = new DataFile();
+		DataFile object = new DataFile(doc.getFieldValue("file_name").toString());
 		
-		object.setFileName(doc.getFieldValue("file_name").toString());
 		object.setOwnerEmail(doc.getFieldValue("owner_email_str").toString());
 		object.setDataAcquisitionUri(ValueCellProcessing.replaceNameSpaceEx(doc.getFieldValue("acquisition_uri_str").toString()));
 		object.setDatasetUri(doc.getFieldValue("dataset_uri_str").toString());
 		object.setStatus(doc.getFieldValue("status_str").toString());
-		object.setCompletionPercentage(Double.parseDouble(doc.getFieldValue("completion_percentage_double").toString()));
+		object.setCompletionPercentage(Integer.parseInt(doc.getFieldValue("completion_percentage_int").toString()));
 		object.setSubmissionTime(doc.getFieldValue("submission_time_str").toString());
 		object.setCompletionTime(doc.getFieldValue("completion_time_str").toString());
 		
@@ -252,8 +250,7 @@ public class DataFile {
 		for (int i = 0; i < listOfFiles.length; i++) {
 			if (listOfFiles[i].isFile() && listOfFiles[i].getName().endsWith(".csv")) {
 				if (!search(listOfFiles[i].getName(), ownedFiles)) {
-					DataFile newFile = new DataFile();
-					newFile.setFileName(listOfFiles[i].getName());
+					DataFile newFile = new DataFile(listOfFiles[i].getName());
 					newFile.save();
 					ownedFiles.add(newFile);
 				}

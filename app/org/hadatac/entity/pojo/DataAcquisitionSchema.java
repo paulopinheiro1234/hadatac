@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang3.text.WordUtils;
 import org.apache.jena.query.Query;
 import org.apache.jena.query.QueryExecution;
 import org.apache.jena.query.QueryExecutionFactory;
@@ -59,6 +60,9 @@ public class DataAcquisitionSchema {
 			"hasco:hasCalibration",
 			"hasco:hasElevation",
 			"hasco:hasLocation");
+	
+	public static Map<String, Map<String, String>> mapPossibleValues2 = new HashMap<String, Map<String, String>>();
+	
 	private String uri = "";
 	private String label = "";
 	private List<DataAcquisitionSchemaAttribute> attributes = null;
@@ -206,6 +210,10 @@ public class DataAcquisitionSchema {
 			return -1;
 		}
 		return objects.size();
+	}
+	
+	public Map<String, Map<String, String>> getMapPossibleValues() {
+		return mapPossibleValues2;
 	}
 
 	public List<DataAcquisitionSchemaAttribute> getAttributes() {
@@ -373,13 +381,14 @@ public class DataAcquisitionSchema {
 	}
 	
 	public static Map<String, Map<String, String>> findPossibleValues(String schemaUri) {
-		System.out.println("findPossibleValues is called!");
+//		System.out.println("findPossibleValues is called!");
 		Map<String, Map<String, String>> mapPossibleValues = new HashMap<String, Map<String, String>>();
 		String queryString = NameSpaces.getInstance().printSparqlNameSpaceList()
-				+ " SELECT ?daso_or_dasa ?codeClass ?code ?resource WHERE { "
+				+ " SELECT ?daso_or_dasa ?codeClass ?code ?label ?resource WHERE { "
 				+ " ?possibleValue a hasco:PossibleValue . "
 				+ " ?possibleValue hasco:isPossibleValueOf ?daso_or_dasa . "
 				+ " ?possibleValue hasco:hasCode ?code . "
+				+ " ?possibleValue hasco:hasCodeLabel ?label ."
 				+ " ?daso_or_dasa hasco:partOfSchema <" + schemaUri + "> . " 
 				+ " OPTIONAL { ?possibleValue hasco:hasClass ?codeClass } . "
 				+ " OPTIONAL { ?possibleValue hasco:hasResource ?resource } . "
@@ -393,23 +402,31 @@ public class DataAcquisitionSchema {
 		qexec.close();
 
 		try {
-			while (resultsrw.hasNext()) {				
+			while (resultsrw.hasNext()) {	
+//				System.out.println("it has next!!!");
 				String classUri = "";
+				String classLabel = "";
 				QuerySolution soln = resultsrw.next();
 				if (soln.get("codeClass").toString().length() > 0) {
 					classUri = soln.getResource("codeClass").toString();
 				} else if (soln.get("resource").toString().length() > 0) {
 					classUri = soln.getResource("resource").toString();
-				} 
+				}
+				classLabel = WordUtils.capitalize(soln.get("label").toString());
+//				System.out.println(classUri + "'s label is " + classLabel);
 				
 				String daso_or_dasa = soln.getResource("daso_or_dasa").toString();
 				String code = soln.getLiteral("code").toString();
 				if (mapPossibleValues.containsKey(daso_or_dasa)) {
-					mapPossibleValues.get(daso_or_dasa).put(code.toLowerCase(), classUri);
+						mapPossibleValues.get(daso_or_dasa).put(code.toLowerCase(), classUri);
+						mapPossibleValues2.get(daso_or_dasa).put(code.toLowerCase(), classLabel);
 				} else {
 					Map<String, String> indvMapPossibleValues = new HashMap<String, String>();
+					Map<String, String> indvMapPossibleValues2 = new HashMap<String, String>();
 					indvMapPossibleValues.put(code.toLowerCase(), classUri);
+					indvMapPossibleValues2.put(code.toLowerCase(), classLabel);
 					mapPossibleValues.put(daso_or_dasa, indvMapPossibleValues);
+					mapPossibleValues2.put(daso_or_dasa, indvMapPossibleValues2);
 				}
 			}
 		} catch (Exception e) {
@@ -419,11 +436,11 @@ public class DataAcquisitionSchema {
 		return mapPossibleValues;
 	}
 	
-	public static String findByPosIndex(String schemaUri, String pos) {
+	public static String findByLabel(String schemaUri, String label) {
 		System.out.println("findByPosIndex is called!");
 		String queryString = NameSpaces.getInstance().printSparqlNameSpaceList()
 				+ " SELECT ?daso_or_dasa WHERE { "
-				+ " ?daso_or_dasa hasco:hasPosition \"" + pos + "\" . "
+				+ " ?daso_or_dasa rdfs:label \"" + label + "\" . "
 				+ " ?daso_or_dasa hasco:partOfSchema <" + schemaUri + "> . "
 				+ " }";
 

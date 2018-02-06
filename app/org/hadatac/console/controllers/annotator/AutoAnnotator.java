@@ -33,7 +33,6 @@ import org.hadatac.metadata.loader.LabkeyDataHandler;
 import org.hadatac.metadata.loader.ValueCellProcessing;
 import org.hadatac.utils.ConfigProp;
 import org.hadatac.utils.Feedback;
-import org.hadatac.utils.State;
 import org.labkey.remoteapi.CommandException;
 
 import be.objectify.deadbolt.java.actions.Group;
@@ -116,8 +115,7 @@ public class AutoAnnotator extends Controller {
 		} else {
 			DataFile file = DataFile.findByName(ownerEmail, selectedFile);
 			if (file == null) {
-				file = new DataFile();
-				file.setFileName(selectedFile);
+				file = new DataFile(selectedFile);
 				file.setOwnerEmail(AuthApplication.getLocalUser(session()).getEmail());
 				file.setStatus(DataFile.UNPROCESSED);
 				file.setSubmissionTime(new SimpleDateFormat("yyyy/MM/dd HH:mm:ss").format(new Date()));
@@ -165,8 +163,7 @@ public class AutoAnnotator extends Controller {
 		} else {
 			DataFile file = DataFile.findByName(dataAcquisitionUri, selectedFile);
 			if (file == null) {
-				file = new DataFile();
-				file.setFileName(selectedFile);
+				file = new DataFile(selectedFile);
 				file.setOwnerEmail(AuthApplication.getLocalUser(session()).getEmail());
 				file.setStatus(DataFile.UNPROCESSED);
 				file.setSubmissionTime(new SimpleDateFormat("yyyy/MM/dd HH:mm:ss").format(new Date()));
@@ -377,8 +374,7 @@ public class AutoAnnotator extends Controller {
 					FileUtils.writeByteArrayToFile(newFile, byteFile);
 					isFile.close();
 
-					DataFile dataFile = new DataFile();
-					dataFile.setFileName(filePart.getFilename());
+					DataFile dataFile = new DataFile(filePart.getFilename());
 					dataFile.setOwnerEmail(AuthApplication.getLocalUser(session()).getEmail());
 					dataFile.setStatus(DataFile.UNPROCESSED);
 					dataFile.setSubmissionTime(new SimpleDateFormat("yyyy/MM/dd HH:mm:ss").format(new Date()));
@@ -422,8 +418,7 @@ public class AutoAnnotator extends Controller {
 			String resumableRelativePath) {
 		if (ResumableUpload.postUploadFileByChunking(request(), 
 				ConfigProp.getPathUnproc())) {
-			DataFile dataFile = new DataFile();
-			dataFile.setFileName(resumableFilename);
+			DataFile dataFile = new DataFile(resumableFilename);
 			dataFile.setOwnerEmail(AuthApplication.getLocalUser(session()).getEmail());
 			dataFile.setStatus(DataFile.UNPROCESSED);
 			dataFile.setSubmissionTime(new SimpleDateFormat("yyyy/MM/dd HH:mm:ss").format(new Date()));

@@ -72,7 +72,6 @@ public class DASchemaObjectGenerator extends BasicGenerator {
 		mapCol.put("InRelationTo", "inRelationTo");
 		mapCol.put("WasDerivedFrom", "wasDerivedFrom");       
 		mapCol.put("WasGeneratedBy", "wasGeneratedBy");
-		mapCol.put("HasPosition", "hasPosition");
 	}
 
 	private String getLabel(CSVRecord rec) {
@@ -150,10 +149,6 @@ public class DASchemaObjectGenerator extends BasicGenerator {
 		}
 	}
 
-	private String getPosition(CSVRecord rec) {
-		return getValueByColumnName(rec, mapCol.get("HasPosition"));
-	}
-
 	@Override
 	public List< Map<String, Object> > createRows() throws Exception {
 		rows.clear();
@@ -192,7 +187,6 @@ public class DASchemaObjectGenerator extends BasicGenerator {
 		}
 		row.put("hasco:hasUnit", getUnit(rec));
 		row.put("hasco:isVirtual", checkVirtual(rec).toString());
-		row.put("hasco:hasPosition", getPosition(rec));
 		row.put("hasco:isPIConfirmed", "false");
 
 		// Also generate a DASVirtualObject for each virtual column

@@ -35,7 +35,7 @@ public class PVGenerator extends BasicGenerator {
 		mapCol.put("Code", "Code");
 		mapCol.put("CodeLabel", "Label");
 		mapCol.put("Class", "Class");
-		mapCol.put("Resource", "Resource");
+//		mapCol.put("Resource", "Resource");
 	}
 
 	private String getLabel(CSVRecord rec) {
@@ -43,7 +43,12 @@ public class PVGenerator extends BasicGenerator {
 	}
 
 	private String getCode(CSVRecord rec) {
-		return Normalizer.normalize(getValueByColumnName(rec, mapCol.get("Code")), Normalizer.Form.NFD).replaceAll("[^\\p{ASCII}]", "").trim();
+		String ss = Normalizer.normalize(getValueByColumnName(rec, mapCol.get("Code")), Normalizer.Form.NFD).replaceAll("[^\\p{ASCII}]", "").trim();
+		int iend = ss.indexOf(".");
+		if (iend != -1){
+			ss = ss.substring(0 , iend);
+		}
+		return ss.trim();
 	}
 
 	private String getCodeLabel(CSVRecord rec) {
@@ -54,9 +59,9 @@ public class PVGenerator extends BasicGenerator {
 		return getValueByColumnName(rec, mapCol.get("Class"));
 	}
 
-	private String getResource(CSVRecord rec) {
-		return getValueByColumnName(rec, mapCol.get("Resource"));
-	}
+//	private String getResource(CSVRecord rec) {
+//		return getValueByColumnName(rec, mapCol.get("Resource"));
+//	}
 
 	private Boolean checkVirtual(CSVRecord rec) {
 		if (getLabel(rec).contains("??")){
@@ -70,9 +75,9 @@ public class PVGenerator extends BasicGenerator {
 		if ((getLabel(rec)).length() > 0) {
 			String colNameInSDD = getLabel(rec).replace(" ", "");
 			if (mapAttrObj.containsKey(colNameInSDD) && mapAttrObj.get(colNameInSDD).length() > 0) {
-				return kbPrefix + "DASA-" + SDDFileName.replace("SDD-", "").replace(".csv", "") + "-" + getLabel(rec).trim().replace(" ", "").replace("_","-").replace("??", "");
+				return kbPrefix + "DASA-" + SDDFileName.replace("SDD-", "").replace(".xlsx", "").replace(".csv", "") + "-" + getLabel(rec).trim().replace(" ", "").replace("_","-").replace("??", "");
 			} else {
-				return kbPrefix + "DASO-" + SDDFileName.replace("SDD-", "").replace(".csv", "") + "-" + getLabel(rec).trim().replace(" ", "").replace("_","-").replace("??", "");
+				return kbPrefix + "DASO-" + SDDFileName.replace("SDD-", "").replace(".xlsx", "").replace(".csv", "") + "-" + getLabel(rec).trim().replace(" ", "").replace("_","-").replace("??", "");
 			}
 		} else {
 			return "";
@@ -82,18 +87,17 @@ public class PVGenerator extends BasicGenerator {
 	@Override
 	Map<String, Object> createRow(CSVRecord rec, int row_number) throws Exception {	
 		Map<String, Object> row = new HashMap<String, Object>();
-		if (getResource(rec) != null && getResource(rec).length() != 0){
-			row.put("hasURI", getResource(rec));
-		}
-		else{
-			row.put("hasURI", (kbPrefix + "PV-" + getLabel(rec).replace("_","-").replace("??", "") 
-					+ ("-" + SDDFileName.replace("SDD-", "").replace(".csv", "") + "-" + getCode(rec)).replaceAll("--", "-")).replace(" ",""));
-		}
+//		if (getResource(rec) != null && getResource(rec).length() != 0){
+//			row.put("hasURI", getResource(rec));
+//		}
+//		else{
+			row.put("hasURI", (kbPrefix + "PV-" + getLabel(rec).replace("_","-").replace("??", "") + ("-" + SDDFileName.replace("SDD-", "").replace(".xlsx", "").replace(".csv", "") + "-" + getCode(rec)).replaceAll("--", "-")).replace(" ","") + "-" + row_number);
+//		}
 		row.put("a", "hasco:PossibleValue");
 		row.put("hasco:hasCode", getCode(rec));
 		row.put("hasco:hasCodeLabel", getCodeLabel(rec));
 		row.put("hasco:hasClass", getClass(rec));
-		row.put("hasco:hasResource", getResource(rec));
+//		row.put("hasco:hasResource", getResource(rec));
 		row.put("hasco:isPossibleValueOf", getPVvalue(rec));
 		return row;
 	}

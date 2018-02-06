@@ -9,6 +9,8 @@ import java.util.Map;
 import java.util.StringTokenizer;
 import java.util.concurrent.CompletableFuture;
 
+import javax.inject.Inject;
+
 import java.util.Set;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -19,10 +21,12 @@ import org.hadatac.console.models.SpatialQueryResults;
 import org.hadatac.console.models.SysUser;
 import org.hadatac.console.models.ObjectDetails;
 
+import play.libs.concurrent.HttpExecutionContext;
 import play.mvc.Controller;
 import play.mvc.Result;
 
 import org.hadatac.console.controllers.dataacquisitionsearch.routes;
+import org.hadatac.console.controllers.metadataacquisition.ViewSubject;
 import org.hadatac.console.views.formdata.FacetFormData;
 import org.hadatac.console.views.html.dataacquisitionsearch.facetOnlyBrowser;
 import org.hadatac.console.views.html.dataacquisitionsearch.dataacquisition_browser;
@@ -33,6 +37,8 @@ import be.objectify.deadbolt.java.actions.Group;
 import be.objectify.deadbolt.java.actions.Restrict;
 
 public class DataAcquisitionSearch extends Controller {
+	
+	@Inject HttpExecutionContext ec;
 
     public static FacetFormData facet_form = new FacetFormData();
     public static FacetsWithCategories field_facets = new FacetsWithCategories();
@@ -64,8 +70,7 @@ public class DataAcquisitionSearch extends Controller {
             }
             for (String uri: setObj) {
             	if (uri != null) {
-            		String html = "";
-            		//String html = ViewSubject.findBasicHTML(uri);
+            		String html = ViewSubject.findBasicHTML(uri);
             		if (html != null) {
             			objDetails.putObject(uri, html);
             		}
@@ -136,6 +141,7 @@ public class DataAcquisitionSearch extends Controller {
 		}
     }
     
+    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
     public Result download(String facets) {
     	FacetHandler facetHandler = new FacetHandler();
     	facetHandler.loadFacets(facets);
@@ -162,11 +168,19 @@ public class DataAcquisitionSearch extends Controller {
     	
     	AcquisitionQueryResult results = Measurement.find(ownerUri, -1, -1, facetHandler, retFacetHandler);
     	CompletableFuture.supplyAsync(() -> Downloader.generateCSVFile(
-    			results.getDocuments(), facets, selectedFields, user.getEmail()));
+    			results.getDocuments(), facets, selectedFields, user.getEmail()), 
+    			ec.current());
 		
+    	try {
+			Thread.sleep(2000);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+    	
     	return redirect(routes.Downloader.index());
     }
     
+    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
     public Result postDownload(String facets) {
     	return download(facets);
     }

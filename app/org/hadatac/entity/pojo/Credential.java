@@ -14,6 +14,7 @@ import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.client.solrj.response.UpdateResponse;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
+import org.hadatac.console.http.SolrUtils;
 import org.hadatac.utils.Collections;
 
 import com.typesafe.config.ConfigFactory;
@@ -21,7 +22,7 @@ import com.typesafe.config.ConfigFactory;
 public class Credential {
 	@Field("username")
 	private String userName;
-	@Field("password")
+	@Field("password_str")
 	private String password;
 	
 	public Credential() {
@@ -44,10 +45,15 @@ public class Credential {
 	}
 	
 	public int save() {
+		// Delete other credentials before saving a new one
+		SolrUtils.clearCollection(ConfigFactory.load().getString("hadatac.solr.data") 
+				+ Collections.LABKEY_CREDENTIAL);
+		
 		try {
 			SolrClient client = new HttpSolrClient.Builder(
 					ConfigFactory.load().getString("hadatac.solr.data") 
 					+ Collections.LABKEY_CREDENTIAL).build();
+			
 			int status = client.addBean(this).getStatus();
 			client.commit();
 			client.close();
@@ -60,12 +66,12 @@ public class Credential {
 	
 	public int delete() {
 		try {
-			SolrClient solr = new HttpSolrClient.Builder(
+			SolrClient client = new HttpSolrClient.Builder(
 					ConfigFactory.load().getString("hadatac.solr.data") 
 					+ Collections.LABKEY_CREDENTIAL).build();
-			UpdateResponse response = solr.deleteById(this.getUserName());
-			solr.commit();
-			solr.close();
+			UpdateResponse response = client.deleteById(this.getUserName());
+			client.commit();
+			client.close();
 			return response.getStatus();
 		} catch (SolrServerException e) {
 			System.out.println("[ERROR] Credential.delete() - SolrServerException message: " + e.getMessage());
@@ -81,7 +87,7 @@ public class Credential {
 	public static Credential convertFromSolr(SolrDocument doc) {
 		Credential object = new Credential();
 		object.setUserName(doc.getFieldValue("username").toString());
-		object.setPassword(doc.getFieldValue("password").toString());
+		object.setPassword(doc.getFieldValue("password_str").toString());
 		
 		return object;
 	}

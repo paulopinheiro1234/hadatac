@@ -11,6 +11,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Iterator;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
@@ -23,16 +24,19 @@ public class DASchemaEventGenerator extends BasicGenerator {
 	String SDDName = "";
 	List<String> timeList = new ArrayList<String>();
 	Map<String, String> codeMap;
+	Map<String, List<String>> tlm;
 
-	public DASchemaEventGenerator(File file, String SDDName, Map<String, String> codeMap) {
-		super(file);
+	public DASchemaEventGenerator(File dd, Map<String, List<String>> tlm, String SDDName, Map<String, String> codeMap) {
+		super(dd);
 		this.codeMap = codeMap;
 		this.SDDName = SDDName;
+		this.tlm = tlm;
+		System.out.println("tlm key size : " + tlm.keySet().size());
 
         CSVRecord current = null;
 
 		try {
-			BufferedReader br = new BufferedReader(new FileReader(file));
+			BufferedReader br = new BufferedReader(new FileReader(dd));
             CSVParser dict = CSVFormat.DEFAULT.withHeader().parse(br);
             Iterator<CSVRecord> dictIter = dict.iterator();
 
@@ -67,61 +71,54 @@ public class DASchemaEventGenerator extends BasicGenerator {
 		mapCol.put("InRelationTo", "inRelationTo");
 		mapCol.put("WasDerivedFrom", "wasDerivedFrom");       
 		mapCol.put("WasGeneratedBy", "wasGeneratedBy");
-		mapCol.put("HasPosition", "hasPosition");
-		//  mapCol.put("??mother", "chear-kb:ObjectTypeMother");
-		//  mapCol.put("??child", "chear-kb:ObjectTypeChild");
-		//  mapCol.put("??birth", "chear-kb:ObjectTypeBirth");
-		//  mapCol.put("??household", "chear-kb:ObjectTypeHousehold");
-		//  mapCol.put("??headhousehold", "chear-kb:ObjectTypeHeadHousehold");
-		//  mapCol.put("??father", "chear-kb:ObjectTypeFather");
 	}
 
 	private String getLabel(CSVRecord rec) {
-		return rec.get(mapCol.get("Label"));
+		return getValueByColumnName(rec, mapCol.get("Label"));
 	}
 
 	private String getAttribute(CSVRecord rec) {
-		return rec.get(mapCol.get("AttributeType"));
+		return getValueByColumnName(rec, mapCol.get("AttributeType"));
 	}
 
 	private String getUnit(CSVRecord rec) {
-		if (codeMap.containsKey(rec.get(mapCol.get("Unit")))) {
-			return codeMap.get(rec.get(mapCol.get("Unit")));
-		} else if (rec.get(mapCol.get("Unit")) != null){
-			return rec.get(mapCol.get("Unit"));
+		if (codeMap.containsKey(getValueByColumnName(rec, mapCol.get("Unit")))) {
+			return codeMap.get(getValueByColumnName(rec, mapCol.get("Unit")));
+		} else if (getValueByColumnName(rec, mapCol.get("Unit")) != null){
+			return getValueByColumnName(rec, mapCol.get("Unit"));
 		}
 		return "obo:UO_0000186";
 	}
 
 	private String getTime(CSVRecord rec) {
-		return rec.get(mapCol.get("Time"));
+		return getValueByColumnName(rec, mapCol.get("Time"));
 	}
 
 	private String getEntity(CSVRecord rec) {
-		if ((rec.get(mapCol.get("Entity"))) == null || (rec.get(mapCol.get("Entity"))).equals("")) {
+		if (getValueByColumnName(rec, mapCol.get("Entity")).equals("")) {
 			return null;
 		} else {
-			if (codeMap.containsKey(rec.get(mapCol.get("Entity")))) {
-				return codeMap.get(rec.get(mapCol.get("Entity")));
+			if (codeMap.containsKey(getValueByColumnName(rec, mapCol.get("Entity")))) {
+				return codeMap.get(getValueByColumnName(rec, mapCol.get("Entity")));
 			} else {
-				return rec.get(mapCol.get("Entity"));
+				return getValueByColumnName(rec, mapCol.get("Entity"));
 			}
 		}
 	}
 
 	private String getRole(CSVRecord rec) {
-		return rec.get(mapCol.get("Role"));
+		return getValueByColumnName(rec, mapCol.get("Role"));
 	}
 
 	private String getRelation(CSVRecord rec) {
-		return rec.get(mapCol.get("Relation"));
+		return getValueByColumnName(rec, mapCol.get("Relation"));
 	}
 
 	private String getInRelationTo(CSVRecord rec) {
-		if (rec.get(mapCol.get("InRelationTo")) == null || rec.get(mapCol.get("InRelationTo")).equals("")){
+		if (getValueByColumnName(rec, mapCol.get("InRelationTo")).equals("")){
 			return "";
 		} else {
-			List<String> items = Arrays.asList(rec.get(mapCol.get("InRelationTo")).split("\\s*,\\s*"));
+			List<String> items = Arrays.asList(getValueByColumnName(rec, mapCol.get("InRelationTo")).split("\\s*,\\s*"));
 			String answer = "";
 			for (String i : items){
 				answer += kbPrefix + "DASO-" + i.replace("_","-").replace("??", "") +  " & ";
@@ -132,11 +129,11 @@ public class DASchemaEventGenerator extends BasicGenerator {
 	}
 
 	private String getWasDerivedFrom(CSVRecord rec) {
-		return rec.get(mapCol.get("WasDerivedFrom"));
+		return getValueByColumnName(rec, mapCol.get("WasDerivedFrom"));
 	}
 
 	private String getWasGeneratedBy(CSVRecord rec) {
-		return rec.get(mapCol.get("WasGeneratedBy"));
+		return getValueByColumnName(rec, mapCol.get("WasGeneratedBy"));
 	}
 
 	private Boolean checkVirtual(CSVRecord rec) {
@@ -147,19 +144,27 @@ public class DASchemaEventGenerator extends BasicGenerator {
 		}
 	}
 
-	private String getPosition(CSVRecord rec) {
-		return rec.get(mapCol.get("HasPosition"));
-	}
-
 	@Override
 	public List< Map<String, Object> > createRows() throws Exception {
 		rows.clear();
 		int row_number = 0;
 		for (CSVRecord record : records) {
-			if (timeList.contains(getLabel(record))){
+			if (timeList.contains(getLabel(record)) && getLabel(record).length()>0){
 				rows.add(createRow(record, ++row_number));
 			}
 		}
+		
+		for (Entry<String, List<String>> entry : tlm.entrySet()) {
+			if (entry.getKey().startsWith("??")){
+				rows.add(createTimeLineRow(entry, ++row_number));				
+			}
+		}
+	    
+		Iterator<Map<String, Object>> iterrrr = rows.iterator();
+		while(iterrrr.hasNext()){
+			System.out.println(iterrrr.next().entrySet().toString());
+		}
+
 		return rows;
 	}
 
@@ -178,6 +183,25 @@ public class DASchemaEventGenerator extends BasicGenerator {
 		row.put("sio:Relation", getRelation(rec));
 		row.put("hasco:isVirtual", checkVirtual(rec).toString());
 		row.put("hasco:isPIConfirmed", "false");
+		return row;
+	}
+	
+	Map<String, Object> createTimeLineRow(Entry<String, List<String>> entry, int row_number) throws Exception {
+		Map<String, Object> row = new HashMap<String, Object>();
+		row.put("hasURI", kbPrefix + "DASE-" + SDDName + "-" + entry.getKey().trim().replace(" ","").replace("_","-").replace("??", ""));
+		row.put("a", "hasco:DASchemaEvent");
+		row.put("rdfs:label", entry.getValue().get(0));
+		row.put("rdfs:comment", entry.getValue().get(0)); 
+		row.put("hasco:partOfSchema", kbPrefix + "DAS-" + SDDName);
+		row.put("hasco:hasEntity", entry.getValue().get(1).trim().replace(" ",""));
+		System.out.println("till now all good..");
+		row.put("hasco:hasUnit", entry.getValue().get(2).trim().replace(" ",""));
+		System.out.println("till now all good2..");
+		row.put("sio:inRelationTo", "");
+		row.put("sio:Relation", "");
+		row.put("hasco:isVirtual", "true");
+		row.put("hasco:isPIConfirmed", "false");
+		System.out.println("till now all good3..");
 		return row;
 	}
 }

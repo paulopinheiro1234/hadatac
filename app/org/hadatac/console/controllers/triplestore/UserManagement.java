@@ -9,6 +9,8 @@ import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
@@ -244,12 +246,20 @@ public class UserManagement extends Controller {
 		combined.put("token", token);
 		File ret_file = new File(getJsonPath());
 		try {
-			FileUtils.writeStringToFile(ret_file, new JSONObject(combined).toJSONString());
+			FileUtils.writeStringToFile(ret_file, new JSONObject(combined).toJSONString(), "utf-8");
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 		
-		return ok(ret_file);
+		String result = "";
+	    try {
+	    	result = new String(Files.readAllBytes(
+					Paths.get(getJsonPath())));
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	    
+		return ok(result);
     }
 	
 	@Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))

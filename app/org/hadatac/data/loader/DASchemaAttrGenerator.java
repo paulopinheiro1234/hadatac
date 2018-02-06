@@ -5,6 +5,8 @@ import java.io.File;
 import java.io.FileReader;
 
 import java.lang.String;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -19,7 +21,7 @@ public class DASchemaAttrGenerator extends BasicGenerator {
 	String startTime = "";
 	String SDDName = "";
 	Map<String, String> codeMap;
-	Map<String, String> hasEntityMap = new HashMap<String, String>();
+	Map<String, List<String>> hasEntityMap = new HashMap<String, List<String>>();
 
 	public DASchemaAttrGenerator(File file, String SDDName, Map<String, String> codeMap) {
 		super(file);
@@ -28,13 +30,14 @@ public class DASchemaAttrGenerator extends BasicGenerator {
 		
 		try {
 			BufferedReader br = new BufferedReader(new FileReader(file));
-			String line =  null;
-
+			String line =  "";
 			while((line = br.readLine()) != null){
-				String str[] = line.split(",");
-				if (str[5].length() > 0){
-					hasEntityMap.put(str[0], str[5]);
-				}
+				String str[] = line.split(",", -1);
+				List<String> tmp = new ArrayList<String>();
+				tmp.add(str[2]);
+				tmp.add(str[5]);
+				hasEntityMap.put(str[0], tmp);
+				System.out.println(str[0] + " *** " + tmp);
 			}
 			br.close();
 		} catch (Exception e) {
@@ -57,79 +60,80 @@ public class DASchemaAttrGenerator extends BasicGenerator {
 		mapCol.put("InRelationTo", "inRelationTo");
 		mapCol.put("WasDerivedFrom", "wasDerivedFrom");       
 		mapCol.put("WasGeneratedBy", "wasGeneratedBy");
-		mapCol.put("HasPosition", "hasPosition");
 	}
 
 	private String getLabel(CSVRecord rec) {
-		return rec.get(mapCol.get("Label"));
+		return getValueByColumnName(rec, mapCol.get("Label"));
 	}
 
 	private String getAttribute(CSVRecord rec) {
-		return rec.get(mapCol.get("AttributeType"));
+		return getValueByColumnName(rec, mapCol.get("AttributeType"));
 	}
 
 	private String getAttributeOf(CSVRecord rec) {
-		if (rec.get(mapCol.get("AttributeOf")) == null || rec.get(mapCol.get("AttributeOf").trim()).equals("")) {
+		if (getValueByColumnName(rec, mapCol.get("AttributeOf").trim()).equals("")) {
 			return "";
 		}
 		//System.out.println("DASchemaAttrGenerator: getAttributeOf() = " + SDDName + "-" + rec.get(mapCol.get("AttributeOf")).replace("??", ""));
-		return kbPrefix + "DASO-" + SDDName + "-" + rec.get(mapCol.get("AttributeOf")).replace("??", "");
+		return kbPrefix + "DASO-" + SDDName + "-" + getValueByColumnName(rec, mapCol.get("AttributeOf")).replace("??", "");
 	}
 
 	private String getUnit(CSVRecord rec) {
-		String original = rec.get(mapCol.get("Unit"));
-		String expansion = ValueCellProcessing.replacePrefixEx(rec.get(mapCol.get("Unit")));
-		if (original.length() != expansion.length()) {
-			return expansion;
+		String original = getValueByColumnName(rec, mapCol.get("Unit"));
+		if (ValueCellProcessing.isValidURI(original)) {
+			return original;
 		} else if (codeMap.containsKey(original)) {
 			return codeMap.get(original);
 		}
-			return "obo:UO_0000186";
+		
+		return "obo:UO_0000186";
 	}
 
 	private String getTime(CSVRecord rec) {
-		if (rec.get(mapCol.get("Time")) == null || rec.get(mapCol.get("Time").trim()).equals("")) {
+		if (getValueByColumnName(rec, mapCol.get("Time").trim()).equals("")) {
 			return "";
 		}
 		//System.out.println("DASchemaAttrGenerator: getTime() = " + SDDName + "-" + rec.get(mapCol.get("Time")).trim().replace(" ","").replace("_","-").replace("??", ""));
-		return kbPrefix + "DASE-" + SDDName + "-" + rec.get(mapCol.get("Time")).trim().replace(" ","").replace("_","-").replace("??", "");
+		return kbPrefix + "DASE-" + SDDName + "-" + getValueByColumnName(rec, mapCol.get("Time")).trim().replace(" ","").replace("_","-").replace("??", "");
 	}
 
 	private String getEntity(CSVRecord rec) {
-		if ((rec.get(mapCol.get("AttributeOf"))) == null || (rec.get(mapCol.get("AttributeOf"))).equals("")) {
+		if (getValueByColumnName(rec, mapCol.get("AttributeOf")).equals("")) {
 			return "chear:unknownEntity";
 		} else {
-			if (codeMap.containsKey(hasEntityMap.get(rec.get(mapCol.get("AttributeOf"))))) {
-				return codeMap.get(hasEntityMap.get(rec.get(mapCol.get("AttributeOf"))));
+			if (codeMap.containsKey(hasEntityMap.get(getValueByColumnName(rec, mapCol.get("AttributeOf"))))) {
+				System.out.println("codeMap: " + codeMap.get(hasEntityMap.get(getValueByColumnName(rec, mapCol.get("AttributeOf")))));
+				return codeMap.get(hasEntityMap.get(getValueByColumnName(rec, mapCol.get("AttributeOf"))));
 			} else {
-				if (hasEntityMap.containsKey(rec.get(mapCol.get("AttributeOf")))){
-					return hasEntityMap.get(rec.get(mapCol.get("AttributeOf")));
+//				System.out.println(hasEntityMap.get(getValueByColumnName(rec, mapCol.get("AttributeOf"))).get(1));
+				if (hasEntityMap.containsKey(getValueByColumnName(rec, mapCol.get("AttributeOf")))){
+					return hasEntityMap.get(getValueByColumnName(rec, mapCol.get("AttributeOf"))).get(1);
 				} else {
-					return rec.get(mapCol.get("AttributeOf"));
+					return "chear:unknownEntity";
 				}
-
 			}
 		}
 	}
 
 	private String getRole(CSVRecord rec) {
-		return rec.get(mapCol.get("Role"));
+		return getValueByColumnName(rec, mapCol.get("Role"));
 	}
 
 	private String getRelation(CSVRecord rec) {
-		return rec.get(mapCol.get("Relation"));
+		return getValueByColumnName(rec, mapCol.get("Relation"));
 	}
 
 	private String getInRelationTo(CSVRecord rec) {
-		return rec.get(mapCol.get("InRelationTo"));
+		return getValueByColumnName(rec, mapCol.get("InRelationTo"));
 	}
 
 	private String getWasDerivedFrom(CSVRecord rec) {
-		return rec.get(mapCol.get("WasDerivedFrom"));
+		//replace & with , for excel approach
+		return getValueByColumnName(rec, mapCol.get("WasDerivedFrom"));
 	}
 
 	private String getWasGeneratedBy(CSVRecord rec) {
-		return rec.get(mapCol.get("WasGeneratedBy"));
+		return getValueByColumnName(rec, mapCol.get("WasGeneratedBy"));
 	}
 
 	private Boolean checkVirtual(CSVRecord rec) {
@@ -138,10 +142,6 @@ public class DASchemaAttrGenerator extends BasicGenerator {
 		} else {
 			return false;
 		}
-	}
-
-	private String getPosition(CSVRecord rec) {
-		return rec.get(mapCol.get("HasPosition"));
 	}
 
 	@Override
@@ -168,8 +168,8 @@ public class DASchemaAttrGenerator extends BasicGenerator {
 		row.put("rdfs:label", getLabel(rec));
 		row.put("rdfs:comment", getLabel(rec));
 		row.put("hasco:partOfSchema", kbPrefix + "DAS-" + SDDName);
-		row.put("hasco:hasPosition", getPosition(rec));
 		row.put("hasco:hasEntity", getEntity(rec));
+		System.out.println("hasco:hasEntity: " + getEntity(rec));
 		row.put("hasco:hasAttribute", getAttribute(rec));
 		row.put("hasco:hasUnit", getUnit(rec));
 		row.put("hasco:hasEvent", getTime(rec));

@@ -4,9 +4,8 @@ import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Iterator;
-import com.typesafe.config.ConfigFactory;
 
-import play.Play;
+import com.typesafe.config.ConfigFactory;
 
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrQuery;
@@ -23,7 +22,7 @@ import org.hadatac.utils.Feedback;
 public class AnnotationLog {
 	@Field("file_name")
 	private String file_name = "";
-	@Field("log")
+	@Field("log_str")
 	private String log = "";
 	
 	public AnnotationLog() {}
@@ -57,7 +56,7 @@ public class AnnotationLog {
 	public int save() {
 		try {
 			SolrClient client = new HttpSolrClient.Builder(
-					Play.application().configuration().getString("hadatac.solr.data")
+					ConfigFactory.load().getString("hadatac.solr.data")
 					+ Collections.ANNOTATION_LOG).build();
 			int status = client.addBean(this).getStatus();
 			client.commit();
@@ -96,8 +95,8 @@ public class AnnotationLog {
 		if(doc.getFieldValue("file_name") != null){
 			annotation_log.setFileName(doc.getFieldValue("file_name").toString());
 		}
-		if(doc.getFieldValue("log") != null){
-			annotation_log.setLog(doc.getFieldValue("log").toString());
+		if(doc.getFieldValue("log_str") != null){
+			annotation_log.setLog(doc.getFieldValue("log_str").toString());
 		}
 
 		return annotation_log;

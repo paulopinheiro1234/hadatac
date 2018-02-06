@@ -11,6 +11,7 @@ import java.util.Map;
 import java.util.TimeZone;
 import java.util.HashMap;
 
+import org.apache.commons.lang3.text.WordUtils;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrRequest;
@@ -116,7 +117,7 @@ public class TimeInstance extends HADatAcThing implements Comparable<TimeInstanc
 
 			SolrDocumentList results = queryResponse.getResults();
 			if (results.size() == 1) {
-				Measurement m = Measurement.convertFromSolr(results.get(0), null);
+				Measurement m = Measurement.convertFromSolr(results.get(0), null, new HashMap<>());
 				return m.getTimestamp();
 			}
 		} catch (IOException e) {
@@ -147,7 +148,7 @@ public class TimeInstance extends HADatAcThing implements Comparable<TimeInstanc
 
 			SolrDocumentList results = queryResponse.getResults();
 			if (results.size() == 1) {
-				Measurement m = Measurement.convertFromSolr(results.get(0), null);
+				Measurement m = Measurement.convertFromSolr(results.get(0), null, new HashMap<>());
 				return m.getTimestamp();
 			}
 		} catch (IOException e) {
@@ -214,13 +215,13 @@ public class TimeInstance extends HADatAcThing implements Comparable<TimeInstanc
 				time.setUri(pivot_ent.value);
 				DataAcquisitionSchemaEvent dase = DataAcquisitionSchemaEvent.find(pivot_ent.value);
 				if (dase != null) {
-					time.setLabel(dase.getLabel());
+					time.setLabel(WordUtils.capitalize(dase.getLabel()));
 				} else {
 					time.setLabel(pivot_ent.value);
 				}
 			} else {
 				time.setUri("");
-				time.setLabel(pivot_ent.value);
+				time.setLabel(WordUtils.capitalize(pivot_ent.value));
 			}
 			time.setCount(pivot_ent.count);
 			time.setField(pivot_ent.field);

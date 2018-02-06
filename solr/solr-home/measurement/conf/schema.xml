@@ -5,8 +5,15 @@
     <dynamicField name="*_str" type="string" indexed="true" stored="true" docValues="true"/>
     <dynamicField name="*_str_multi" type="string" indexed="true" stored="true" docValues="true" multiValued="true" />
     <dynamicField name="*_date" type="date" indexed="true" stored="true" docValues="true"/>
+    <dynamicField name="*_date_multi" type="date" indexed="true" stored="true" docValues="true" multiValued="true" />
+    <dynamicField name="*_int" type="int" indexed="true" stored="true" docValues="true"/>
+    <dynamicField name="*_int_multi" type="int" indexed="true" stored="true" docValues="true" multiValued="true" />
+    <dynamicField name="*_long" type="long" indexed="true" stored="true" docValues="true"/>
+    <dynamicField name="*_long_multi" type="long" indexed="true" stored="true" docValues="true" multiValued="true" />
     <dynamicField name="*_double" type="double" indexed="true" stored="true" docValues="true"/>
-    <dynamicField name="*_latlong" type="latlong" indexed="true" />
+    <dynamicField name="*_double_multi" type="double" indexed="true" stored="true" docValues="true" multiValued="true" />
+    <dynamicField name="*_bool" type="boolean" indexed="true" stored="true" docValues="true"/>
+    <dynamicField name="*_bool_multi" type="boolean" indexed="true" stored="true" docValues="true" multiValued="true" />
     <field name="_version_" type="long" indexed="true" stored="true"/>
     <field name="_text_" type="text_general" indexed="true" stored="false" multiValued="true"/>
     <dynamicField name="JP_*" type="string" indexed="true" stored="true" />
@@ -20,7 +27,8 @@
     <fieldType name="date" class="solr.TrieDateField" precisionStep="0" positionIncrementGap="0"/>
     <fieldType name="long" class="solr.TrieLongField" precisionStep="0" positionIncrementGap="0"/>
     <fieldType name="double" class="solr.TrieDoubleField"/>
-    <fieldType name="int" class="solr.TrieIntField" precisionStep="8"/>
+    <fieldType name="int" class="solr.TrieIntField"/>
+    <fieldType name="boolean" class="solr.BoolField" omitNorms="true"/>
     <fieldType name="latlong" class="solr.SpatialRecursivePrefixTreeFieldType"
                spatialContextFactory="org.locationtech.spatial4j.context.jts.JtsSpatialContextFactory"
                autoIndex="true"

@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.HashMap;
 
-import org.apache.commons.text.WordUtils;
+import org.apache.commons.lang3.text.WordUtils;
 import org.apache.jena.query.QueryExecution;
 import org.apache.jena.query.QueryExecutionFactory;
 import org.apache.jena.query.QuerySolution;
@@ -106,9 +106,9 @@ public class EntityRole extends HADatAcThing implements Comparable<EntityRole> {
 					attrib.setField("characteristic_uri_str");
 					Attribute temp_attrib = Attribute.find(value);
 					if (temp_attrib != null) {
-						attrib.setLabel(temp_attrib.getLabel());
+						attrib.setLabel(WordUtils.capitalize(temp_attrib.getLabel()));
 					} else {
-						attrib.setLabel(value.split("#")[1]);
+						attrib.setLabel(WordUtils.capitalize(value.split("#")[1]));
 					}
 					
 					if (!results.containsKey(role)) {

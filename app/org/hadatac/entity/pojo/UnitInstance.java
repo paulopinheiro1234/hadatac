@@ -6,6 +6,7 @@ import java.util.Map;
 
 import java.util.HashMap;
 
+import org.apache.commons.lang3.text.WordUtils;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrRequest;
@@ -73,9 +74,9 @@ public class UnitInstance extends HADatAcThing implements Comparable<UnitInstanc
 			unit.setUri(pivot_ent.value);
 			Unit unit_temp = Unit.find(pivot_ent.value);
 			if (unit_temp != null) {
-				unit.setLabel(unit_temp.getLabel());
+				unit.setLabel(WordUtils.capitalize(unit_temp.getLabel()));
 			} else {
-				unit.setLabel("(empty)");
+				unit.setLabel("(Empty)");
 			}
 			unit.setCount(pivot_ent.count);
 			unit.setField("unit_uri_str");

@@ -1,54 +1,36 @@
 package org.hadatac.console.controllers.dataacquisitionsearch;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+
 import javax.inject.Inject;
 
-import javax.servlet.http.HttpServletResponse;
-
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.FilenameUtils;
-import org.apache.commons.io.IOUtils;
-import org.hadatac.entity.pojo.Credential;
 import org.hadatac.console.controllers.AuthApplication;
 import org.hadatac.console.controllers.dataacquisitionsearch.routes;
 import org.hadatac.console.controllers.annotator.AnnotationLog;
-import org.hadatac.console.http.ResumableUpload;
 import org.hadatac.console.models.AssignOptionForm;
-import org.hadatac.console.models.LabKeyLoginForm;
 import org.hadatac.console.models.SysUser;
 import org.hadatac.console.views.html.dataacquisitionsearch.*;
-import org.hadatac.console.views.html.triplestore.*;
-import org.hadatac.console.views.html.*;
 import org.hadatac.console.views.html.annotator.annotation_log;
 import org.hadatac.console.views.html.annotator.assignOption;
 import org.hadatac.entity.pojo.DataFile;
 import org.hadatac.entity.pojo.Measurement;
-import org.hadatac.entity.pojo.DataAcquisition;
 import org.hadatac.entity.pojo.User;
-import org.hadatac.metadata.loader.LabkeyDataHandler;
-import org.hadatac.metadata.loader.ValueCellProcessing;
 import org.hadatac.utils.ConfigProp;
 import org.hadatac.utils.Feedback;
-import org.hadatac.utils.State;
-import org.labkey.remoteapi.CommandException;
 
 import be.objectify.deadbolt.java.actions.Group;
 import be.objectify.deadbolt.java.actions.Restrict;
-import play.twirl.api.Html;
 import play.data.Form;
 import play.data.FormFactory;
 import play.libs.Json;
 import play.mvc.Controller;
 import play.mvc.Result;
-import play.mvc.BodyParser;
-import play.mvc.Http.MultipartFormData.FilePart;
+
 
 public class Downloader extends Controller {
 	
@@ -140,8 +122,7 @@ public class Downloader extends Controller {
 		} else {
 			DataFile file = DataFile.findByName(ownerEmail, selectedFile);
 			if (file == null) {
-				file = new DataFile();
-				file.setFileName(selectedFile);
+				file = new DataFile(selectedFile);
 				file.setOwnerEmail(AuthApplication.getLocalUser(session()).getEmail());
 				file.setStatus(DataFile.CREATING);
 				file.setSubmissionTime(new SimpleDateFormat("yyyy/MM/dd HH:mm:ss").format(new Date()));
@@ -166,7 +147,13 @@ public class Downloader extends Controller {
 	@Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
 	public Result checkCompletion(String file_name) {
 		DataFile dataFile = DataFile.findByName(null, file_name);
-		return ok(Json.toJson(dataFile.getCompletionPercentage()));
+		
+		Map<String, Object> result = new HashMap<String, Object>();
+		result.put("CompletionPercentage", dataFile.getCompletionPercentage());
+		result.put("Status", dataFile.getStatus());
+		result.put("CompletionTime", dataFile.getCompletionTime());
+		
+		return ok(Json.toJson(result));
 	}
 	
 	public static int generateCSVFile(List<Measurement> measurements, 
@@ -180,8 +167,7 @@ public class Downloader extends Controller {
 		log.addline(Feedback.println(Feedback.WEB, "Selected Fields: " + selectedFields));
 		log.save();
 		
-		DataFile dataFile = new DataFile();
-		dataFile.setFileName(fileName);
+		DataFile dataFile = new DataFile(fileName);
 		dataFile.setOwnerEmail(ownerEmail);
 		dataFile.setStatus(DataFile.CREATING);
 		dataFile.setSubmissionTime(new SimpleDateFormat("yyyy/MM/dd HH:mm:ss").format(date));

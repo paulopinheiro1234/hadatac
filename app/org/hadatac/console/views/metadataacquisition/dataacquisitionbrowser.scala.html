@@ -28,7 +28,7 @@ jQuery(document).ready(function($) {
     facets: [ 
     	@for(daIndicator <- indicatorList){    
     		{
-    		'field': '@daIndicator.replace(" ","").replace(",","")_i', 
+    		'field': '@daIndicator.replace(" ","").replace(",","")_str', 
     		'display': '@daIndicator'
     		},
     }],
@@ -36,7 +36,7 @@ jQuery(document).ready(function($) {
         {'field':'attributeUri.exact', 'display':'Data Acquisition URI'},
     	@for(daIndicator <- indicatorList){
     		{
-    		'field': '@daIndicator.replace(" ","").replace(",","")_i.exact', 
+    		'field': '@daIndicator.replace(" ","").replace(",","")_str.exact', 
     		'display': '@daIndicator'
     		},
     }],
@@ -44,7 +44,7 @@ jQuery(document).ready(function($) {
         {'field':'attributeUri.exact', 'display':'Data Acquisition URI'},
     	@for(daIndicator <- indicatorList){
     		{
-    		'field': '@daIndicator.replace(" ","").replace(",","")_i.exact', 
+    		'field': '@daIndicator.replace(" ","").replace(",","")_str.exact', 
     		'display': '@daIndicator'
     		},
     }],
@@ -58,56 +58,56 @@ jQuery(document).ready(function($) {
         [
           {
             "pre" : "<h3>",
-            "field" : "AttributeLabel_i",
+            "field" : "AttributeLabel_str",
             "post" : " - "
           }
 		],
         [
           {
             "pre" : "</h3><b>Start Time:</b> ",
-            "field" : "StartTime_i",
+            "field" : "StartTime_str",
             "post" : " "
           }
         ],
         [
           {
             "pre" : "<b>End Time:</b>",
-            "field" : "EndTime_i",
+            "field" : "EndTime_str",
             "post" : " "
           }
         ],
         [
           {
             "pre" : "<b>Schema: </b>",
-            "field" : "DataAcquisitionSchema_i",
+            "field" : "DataAcquisitionSchema_str",
             "post" : ""
           }
         ],
         [
           {
             "pre" : "<b>Method:</b> ",
-            "field" : "Method_i",
+            "field" : "Method_str",
             "post" : ", "
           }
         ],
         [
           {
             "pre" : "<b>Deployment:</b> ",
-            "field" : "Deployment_i",
+            "field" : "Deployment_str",
             "post" : " "
           }
         ],
         [
           {
             "pre" : "<b>Agent:</b> ",
-            "field" : "Agent_i",
+            "field" : "Agent_str",
             "post" : " "
           }
         ],
         [
           {
             "pre" : "\n\n",
-            "field" : "Comment_i",
+            "field" : "Comment_str",
             "post" : ""
           }
         ]

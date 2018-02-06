@@ -2,7 +2,18 @@
 <schema version="1.5">
   <fields>
     <field name="file_name" type="string" indexed="true" stored="true"/>
-	<field name="log" type="string" indexed="true" docValues="true" />
+	<dynamicField name="*_str" type="string" indexed="true" stored="true" docValues="true"/>
+    <dynamicField name="*_str_multi" type="string" indexed="true" stored="true" docValues="true" multiValued="true" />
+    <dynamicField name="*_date" type="date" indexed="true" stored="true" docValues="true"/>
+    <dynamicField name="*_date_multi" type="date" indexed="true" stored="true" docValues="true" multiValued="true" />
+    <dynamicField name="*_int" type="int" indexed="true" stored="true" docValues="true"/>
+    <dynamicField name="*_int_multi" type="int" indexed="true" stored="true" docValues="true" multiValued="true" />
+    <dynamicField name="*_long" type="long" indexed="true" stored="true" docValues="true"/>
+    <dynamicField name="*_long_multi" type="long" indexed="true" stored="true" docValues="true" multiValued="true" />
+    <dynamicField name="*_double" type="double" indexed="true" stored="true" docValues="true"/>
+    <dynamicField name="*_double_multi" type="double" indexed="true" stored="true" docValues="true" multiValued="true" />
+    <dynamicField name="*_bool" type="boolean" indexed="true" stored="true" docValues="true"/>
+    <dynamicField name="*_bool_multi" type="boolean" indexed="true" stored="true" docValues="true" multiValued="true" />
 	<field name="_version_" type="long" indexed="true" stored="true"/>
     <field name="_text_" type="text_general" indexed="true" stored="false" multiValued="true"/>
   </fields>
@@ -15,6 +26,14 @@
     <fieldType name="long" class="solr.TrieLongField" precisionStep="0" positionIncrementGap="0"/>
     <fieldType name="double" class="solr.TrieDoubleField"/>
     <fieldType name="int" class="solr.TrieIntField"/>
+    <fieldType name="boolean" class="solr.BoolField" omitNorms="true"/>
+    <fieldType name="latlong" class="solr.SpatialRecursivePrefixTreeFieldType"
+               spatialContextFactory="org.locationtech.spatial4j.context.jts.JtsSpatialContextFactory"
+               autoIndex="true"
+               validationRule="repairBuffer0"
+               distErrPct="0.025"
+               maxDistErr="0.001"
+               distanceUnits="kilometers" />
     <fieldType name="text_general" class="solr.TextField" positionIncrementGap="100" multiValued="true">
       <analyzer type="index">
         <tokenizer class="solr.StandardTokenizerFactory"/>

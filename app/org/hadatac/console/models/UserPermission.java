@@ -30,7 +30,7 @@ public class UserPermission implements Permission {
 	@Field("id")
 	public String id_s;
 
-	@Field("value")
+	@Field("value_str")
 	public String value;
 
 	public String getValue() {
@@ -46,7 +46,7 @@ public class UserPermission implements Permission {
 		SolrClient solrClient = new HttpSolrClient.Builder(
 				ConfigFactory.load().getString("hadatac.solr.users") 
 				+ Collections.AUTHENTICATE_PERMISSIONS).build();
-    	SolrQuery solrQuery = new SolrQuery("value:" + value);
+    	SolrQuery solrQuery = new SolrQuery("value_str:" + value);
     	
     	try {
 			QueryResponse queryResponse = solrClient.query(solrQuery);
@@ -104,7 +104,7 @@ public class UserPermission implements Permission {
 	private static UserPermission convertSolrDocumentToUserPermission(SolrDocument doc) {
 		UserPermission permission = new UserPermission();
 		permission.id_s = doc.getFieldValue("id").toString();
-		permission.value = doc.getFieldValue("value").toString();
+		permission.value = doc.getFieldValue("value_str").toString();
 		
 		return permission;
 	}

@@ -28,7 +28,7 @@ jQuery(document).ready(function($) {
     facets: [ 
     	@for(daIndicator <- indicatorList){    
     		{
-    		'field': '@daIndicator.replace(" ","").replace(",","")_i', 
+    		'field': '@daIndicator.replace(" ","").replace(",","")_str', 
     		'display': '@daIndicator'
     		},
     }],
@@ -36,7 +36,7 @@ jQuery(document).ready(function($) {
         {'field':'DASAttributeUri.exact', 'display':'DASA URI'},
     	@for(daIndicator <- indicatorList){
     		{
-    		'field': '@daIndicator.replace(" ","").replace(",","")_i.exact', 
+    		'field': '@daIndicator.replace(" ","").replace(",","")_str.exact', 
     		'display': '@daIndicator'
     		},
     }],
@@ -44,7 +44,7 @@ jQuery(document).ready(function($) {
         {'field':'DASAttributeUri.exact', 'display':'DASA URI'},
     	@for(daIndicator <- indicatorList){
     		{
-    		'field': '@daIndicator.replace(" ","").replace(",","")_i.exact', 
+    		'field': '@daIndicator.replace(" ","").replace(",","")_str.exact', 
     		'display': '@daIndicator'
     		},
     }],
@@ -58,7 +58,7 @@ jQuery(document).ready(function($) {
         [
           {
             "pre" : "<h3>",
-            "field" : "DASAttributeLabel_i",
+            "field" : "DASAttributeLabel_str",
             "post" : " - "
           },
           {
@@ -70,56 +70,56 @@ jQuery(document).ready(function($) {
         [
           {
             "pre" : "</h3><b>Schema: </b>",
-            "field" : "DataAcquisitionSchema_i",
+            "field" : "DataAcquisitionSchema_str",
             "post" : ""
           }
         ],
         [
           {
             "pre" : "\n\n",
-            "field" : "Comment_i",
+            "field" : "Comment_str",
             "post" : ""
           }
         ],
         [
           {
             "pre" : "<b>Entity: </b>",
-            "field" : "Entity_i",
+            "field" : "Entity_str",
             "post" : ""
           }
         ],
         [
           {
             "pre" : "<b>Attribute: </b>",
-            "field" : "Attribute_i",
+            "field" : "Attribute_str",
             "post" : ""
           }
         ],
         [
           {
             "pre" : "<b>Unit: </b>",
-            "field" : "Unit_i",
+            "field" : "Unit_str",
             "post" : ""
           }
         ],
         [
           {
             "pre" : "<b>Source: </b>",
-            "field" : "Source_i",
+            "field" : "Source_str",
             "post" : ""
           }
         ],
         [
           {
             "pre" : "<b>PI Confirmed?: </b>",
-            "field" : "PIConfirmed_i",
+            "field" : "PIConfirmed_str",
             "post" : ""
           }
         ],
         [
           {
             "pre" : "<b>Position: </b>",
-            "field" : "Position_i",
+            "field" : "Position_str",
             "post" : ""
           }
         ]

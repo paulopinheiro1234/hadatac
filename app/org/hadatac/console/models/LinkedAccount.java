@@ -33,10 +33,10 @@ public class LinkedAccount {
 	@Field("id")
 	public String id_s;
 
-	@Field("provider_user_id")
+	@Field("provider_user_id_str")
 	public String providerUserId;
 	
-	@Field("provider_key")
+	@Field("provider_key_str")
 	public String providerKey;
 	
 	public SysUser user;
@@ -45,7 +45,7 @@ public class LinkedAccount {
 		return user.getId();
 	}
 	
-	@Field("user_id")
+	@Field("user_id_str")
 	public void setUserId(String id) {
 		user = SysUser.findByIdSolr(id);
 	}
@@ -59,7 +59,7 @@ public class LinkedAccount {
 		SolrClient solrClient = new HttpSolrClient.Builder(
 				ConfigFactory.load().getString("hadatac.solr.users") 
 				+ Collections.AUTHENTICATE_ACCOUNTS).build();
-    	SolrQuery solrQuery = new SolrQuery("user_id:" + user.getId() + " AND provider_key:" + key);
+    	SolrQuery solrQuery = new SolrQuery("user_id_str:" + user.getId() + " AND provider_key_str:" + key);
     	
     	try {
 			QueryResponse queryResponse = solrClient.query(solrQuery);
@@ -81,7 +81,7 @@ public class LinkedAccount {
 		SolrClient solrClient = new HttpSolrClient.Builder(
 				ConfigFactory.load().getString("hadatac.solr.users")
 				+ Collections.AUTHENTICATE_ACCOUNTS).build();
-    	SolrQuery solrQuery = new SolrQuery("user_id:" + user.getId());
+    	SolrQuery solrQuery = new SolrQuery("user_id_str:" + user.getId());
     	
     	try {
 			QueryResponse queryResponse = solrClient.query(solrQuery);
@@ -177,8 +177,8 @@ public class LinkedAccount {
 	private static LinkedAccount convertSolrDocumentToLinkedAccount(SolrDocument doc) {
 		LinkedAccount account = new LinkedAccount();
 		account.id_s = doc.getFieldValue("id").toString();
-		account.providerUserId = doc.getFieldValue("provider_user_id").toString();
-		account.providerKey = doc.getFieldValue("provider_key").toString();
+		account.providerUserId = doc.getFieldValue("provider_user_id_str").toString();
+		account.providerKey = doc.getFieldValue("provider_key_str").toString();
 		
 		return account;
 	}

@@ -5,14 +5,22 @@
    resultsSize : Long,
    objDetails : String
  )
-
+    
+    <style>
+    .tooltip-inner {
+        min-width: 450px;
+    }
+    .popover {
+        min-width: 450px;
+    }
+    </style>
     <div class="table-responsive">
     	<button type="button" id="prevpage"class="btn btn-primary" onClick="prevPage();">Previous Page</button>
     	<button type="button" id="nextpage" class="btn btn-primary" onClick="nextPage();">Next Page</button>
     	<button type="button" id="firstpage" class="btn btn-primary" onClick="firstPage();">First Page</button>
     	<button type="button" id="lastpage"class="btn btn-primary" onClick="lastPage();">Last Page</button>
-    	<p id="pagecontrl"></p>
-    	<table class="table table-striped" id="measurementsTable">
+    	<p id="pagecontrl"></p>  	
+    	<table class="table table-hover" id="measurementsTable">
             <thead>
               <tr>
               	<th>Object</th>
@@ -28,7 +36,7 @@
 
             <tbody>
             	@for((document, index) <- documents.zipWithIndex) {
-                <tr id="@index">
+                <tr id="@index" href="#" data-toggle="tooltip" data-html="true" data-placement="top">
                     <td>@document.getEntity()</td>
                 	<td>@document.getCharacteristic()</td>
                 	<td>@document.getValue()</td>
@@ -42,12 +50,11 @@
                             @document.getTimestamp()
                         }
                     }</td>
-                	<td>@document.getObjectUri()</td>
+                	<td href="#" data-toggle="popover" data-html="true" data-placement="bottom">@document.getObjectUri()</td>
                 	<td>@document.getLocation()</td>
                 </tr>
                 }
             </tbody>
-
         </table>
     </div>
     

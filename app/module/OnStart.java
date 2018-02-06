@@ -2,15 +2,11 @@ package module;
 import java.io.File;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-import org.hadatac.data.loader.AnnotationWorker;
-
-import play.libs.Akka;
-import scala.concurrent.duration.FiniteDuration;
+import org.hadatac.console.models.SecurityRole;
 
 @Singleton
 public class OnStart {
@@ -18,6 +14,9 @@ public class OnStart {
     @Inject
     public OnStart() {
     	initDirectoryStructure();
+    	
+    	// check existence/availability of security role
+    	SecurityRole.initialize();
 
 		// check if default user still have default password. If so, ask to change.
 		// TODO: implement this code

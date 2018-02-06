@@ -37,8 +37,8 @@ public class SubjectGenerator extends BasicGenerator {
 	@Override
 	void initMapping() {
 		mapCol.clear();
-		mapCol.put("subjectID", "patient_id");
-		mapCol.put("pilotNum", "project_id");
+		mapCol.put("subjectID", "CHEAR PID");
+		mapCol.put("pilotNum", "CHEAR Project ID");
 	}
 
 	private String getUri(CSVRecord rec) {

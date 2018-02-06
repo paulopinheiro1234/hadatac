@@ -116,20 +116,6 @@ public class SolrSearchProxy extends Controller {
 	}
 	
 	@Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-	public Result getSubjectAcquisition(){
-		String path = Collections.getCollectionsName(Collections.SUBJECTS_ACQUISITION) + 
-				request().toString().split((request().path()))[1];
-		return getSolrSearch(path);
-	}
-
-    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-	public Result getSampleAcquisition(){
-		String path = Collections.getCollectionsName(Collections.SAMPLES_ACQUISITION) + 
-				request().toString().split((request().path()))[1];
-		return getSolrSearch(path);
-	}
-	
-	@Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
 	public Result getAnalytesAcquisition(){
 		String path = Collections.getCollectionsName(Collections.ANALYTES_ACQUISITION) + 
 				request().toString().split((request().path()))[1];
