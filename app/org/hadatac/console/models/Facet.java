@@ -57,13 +57,13 @@ public class Facet {
 		if (children.containsKey(id)) {
 			facet = children.get(id);
 			facet.addFieldValues(getFieldValues());
-			System.out.println("Use existing facet for " + id + " ========== " + facet.getFacetName());
+			//System.out.println("Use existing facet for " + id + " ========== " + facet.getFacetName());
 		} else {
 			facet = new Facet(id);
 			facet.setFacetName(getFacetName());
 			facet.addFieldValues(getFieldValues());
 			addChild(facet);
-			System.out.println("Use NEW facet for " + id + " &&&&&&&&&&&&& " + facet.getFacetName());
+			//System.out.println("Use NEW facet for " + id + " &&&&&&&&&&&&& " + facet.getFacetName());
 		}
 		
 		return facet;

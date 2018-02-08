@@ -84,12 +84,7 @@ public class EntityRole extends HADatAcThing implements Comparable<EntityRole> {
 				+ "?attributeUri rdfs:label ?attributeLabel . \n"
 				+ "}}";
 		
-		//System.out.println("EntityRole query: " + query);
-		
-		facet.clearFieldValues("entity_uri_str");
-		facet.clearFieldValues("characteristic_uri_str");
-		facet.clearFieldValues("daso_uri_str");
-		facet.clearFieldValues("dasa_uri_str");
+		// System.out.println("EntityRole query: " + query);
 		
 		Map<HADatAcThing, List<HADatAcThing>> results = new HashMap<HADatAcThing, List<HADatAcThing>>();
 		try {
@@ -99,7 +94,7 @@ public class EntityRole extends HADatAcThing implements Comparable<EntityRole> {
 			ResultSetRewindable resultsrw = ResultSetFactory.copyResults(resultSet);
 			qe.close();
 			
-			if (resultsrw.size() == 0) {
+			if (resultsrw.size() == 0) {				
 				EntityRole role = new EntityRole();
 				role.setUri(ValueCellProcessing.replacePrefixEx("sio:Sample"));
 				role.setLabel("Sample");
@@ -115,7 +110,13 @@ public class EntityRole extends HADatAcThing implements Comparable<EntityRole> {
 				}
 				
 				facet.getChildById(role.getUri());
+				
 			} else {
+				facet.clearFieldValues("entity_uri_str");
+				facet.clearFieldValues("characteristic_uri_str");
+				facet.clearFieldValues("daso_uri_str");
+				facet.clearFieldValues("dasa_uri_str");
+				
 				while (resultsrw.hasNext()) {
 					QuerySolution soln = resultsrw.next();
 					if (soln.get("roleUri") != null && !soln.get("roleUri").toString().isEmpty()) {

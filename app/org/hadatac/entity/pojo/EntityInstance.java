@@ -83,7 +83,6 @@ public class EntityInstance extends HADatAcThing implements Comparable<EntityIns
 				results.put(entity, children);
 			}
 			
-			System.out.println("test: " + facet.toSolrQuery());
 			Facet subFacet = facet.getChildById(entity.getUri());
 			subFacet.putFacet("entity_uri_str", entity.getUri());
 		}
