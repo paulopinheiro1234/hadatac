@@ -14,6 +14,10 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
+import org.apache.jena.update.UpdateExecutionFactory;
+import org.apache.jena.update.UpdateFactory;
+import org.apache.jena.update.UpdateProcessor;
+import org.apache.jena.update.UpdateRequest;
 import org.hadatac.entity.pojo.Credential;
 import org.hadatac.console.controllers.AuthApplication;
 import org.hadatac.console.controllers.annotator.routes;
@@ -24,6 +28,7 @@ import org.hadatac.console.models.LabKeyLoginForm;
 import org.hadatac.console.models.SysUser;
 import org.hadatac.console.views.html.annotator.*;
 import org.hadatac.console.views.html.triplestore.*;
+import org.hadatac.data.loader.AnnotationWorker;
 import org.hadatac.console.views.html.*;
 import org.hadatac.entity.pojo.DataFile;
 import org.hadatac.entity.pojo.Measurement;
@@ -31,8 +36,10 @@ import org.hadatac.entity.pojo.DataAcquisition;
 import org.hadatac.entity.pojo.User;
 import org.hadatac.metadata.loader.LabkeyDataHandler;
 import org.hadatac.metadata.loader.ValueCellProcessing;
+import org.hadatac.utils.Collections;
 import org.hadatac.utils.ConfigProp;
 import org.hadatac.utils.Feedback;
+import org.hadatac.utils.NameSpaces;
 import org.labkey.remoteapi.CommandException;
 
 import be.objectify.deadbolt.java.actions.Group;
@@ -292,7 +299,7 @@ public class AutoAnnotator extends Controller {
 		}
 		File file = new File(path_proc + "/" + file_name);
 		file.renameTo(new File(destFolder + "/" + file_name));
-		deleteAddedTriples(file);
+		deleteAddedTriples(new File(destFolder + "/" + file_name));
 
 		return redirect(routes.AutoAnnotator.index());
 	}
@@ -300,12 +307,23 @@ public class AutoAnnotator extends Controller {
 	@Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
 	public static void deleteAddedTriples(File file){
 		System.out.println("Deleting the added triples from the moving file ...");
-		// use the new function to reverse the triple generation
-		/**
-		 * Model model = createModel(rows);
-            Model defaultModel = accessor.getModel();
-            defaultModel.remove(model);
-		 */
+		String file_name = file.getName();
+		if (file_name.startsWith("SDD")) {
+			
+			List<String> result = AnnotationWorker.getPopulatedSDDUris(file);
+			
+			for (String str:result){
+				String query = "";
+				query += NameSpaces.getInstance().printSparqlNameSpaceList();
+				query += "DELETE WHERE {  ";
+					query += str + " ?p ?o . ";
+				query += "}  ";				
+//				System.out.println(query);
+				UpdateRequest request = UpdateFactory.create(query);
+				UpdateProcessor processor = UpdateExecutionFactory.createRemote(request, Collections.getCollectionsName(Collections.METADATA_UPDATE));
+				processor.execute();
+			}
+		}
 	}
 
 	@Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
@@ -353,6 +371,7 @@ public class AutoAnnotator extends Controller {
 		}
 
 		File file = new File(path + "/" + file_name);
+		deleteAddedTriples(file);
 		file.delete();
 
 		return redirect(routes.AutoAnnotator.index());

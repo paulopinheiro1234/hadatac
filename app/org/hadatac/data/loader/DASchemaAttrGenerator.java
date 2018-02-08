@@ -158,6 +158,19 @@ public class DASchemaAttrGenerator extends BasicGenerator {
 
 		return rows;
 	}
+	
+	public List<String> createUris() throws Exception {
+		List<String> result = new ArrayList<String>();
+		for (CSVRecord record : records) {
+			if (getAttribute(record)  == null || getAttribute(record).equals("")){
+				continue;
+			} else {
+				result.add(kbPrefix + "DASA-" + SDDName + "-" + getLabel(record).trim().replace(" ", "").replace("_","-").replace("??", ""));
+			}
+		}
+		return result;
+	}
+	
 
 	//Column	Attribute	attributeOf	Unit	Time	Entity	Role	Relation	inRelationTo	wasDerivedFrom	wasGeneratedBy	hasPosition   
 	@Override

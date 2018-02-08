@@ -165,6 +165,18 @@ public class DASchemaObjectGenerator extends BasicGenerator {
         System.out.println("[DASOGenerator] Added " + row_number + " rows!");
 		return rows;
 	}
+	
+	public List<String> createUris() throws Exception {
+		List<String> result = new ArrayList<String>();
+		for (CSVRecord record : records) {
+			if (getEntity(record)  == null || getEntity(record).equals("")  || timeList.contains(getLabel(record))){
+				continue;
+			} else {
+				result.add(kbPrefix + "DASO-" + SDDName + "-" + getLabel(record).trim().replace(" ","").replace("_","-").replace("??", ""));
+			}
+		}
+		return result;
+	}
 
 	//Column	Attribute	attributeOf	Unit	Time	Entity	Role	Relation	inRelationTo	wasDerivedFrom	wasGeneratedBy	hasPosition   
 	@Override

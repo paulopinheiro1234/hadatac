@@ -66,6 +66,7 @@ public class SDD {
 	private void readCatalog() {
 		if(sddFile.getName().endsWith(".csv")) {
 			Iterable<CSVRecord> records = null;
+			System.out.println("we are here ... " + sddFile);
 			try {
 				BufferedReader bufRdr = new BufferedReader(new FileReader(sddFile));
 				records = CSVFormat.DEFAULT.withHeader().parse(bufRdr);
@@ -99,14 +100,21 @@ public class SDD {
 	}
 	
 	public File downloadFile(String fileURL, String fileName) {
-		try {
-			URL url = new URL(fileURL);
-			File file = new File(fileName);
-			FileUtils.copyURLToFile(url, file);
-			return file;
-		} catch (Exception e) {
-			e.printStackTrace();
+		System.out.println("fileURL " + fileURL + fileURL.getClass());
+		System.out.println("fileName " + fileName);
+		if(fileURL == null || fileURL.length() == 0){
+			System.out.println("I'm actually here!!!");
 			return null;
+		} else {
+			try {
+				URL url = new URL(fileURL);
+				File file = new File(fileName);
+				FileUtils.copyURLToFile(url, file);
+				return file;
+			} catch (Exception e) {
+				e.printStackTrace();
+				return null;
+			}
 		}
 	}
 	
@@ -175,98 +183,115 @@ public class SDD {
 	}
 	
 	public void readDataDictionary(File file) {
-		Iterable<CSVRecord> records = null;
-		try {
-			BufferedReader bufRdr = new BufferedReader(new FileReader(file));
-			records = CSVFormat.DEFAULT.withHeader().parse(bufRdr);
-			for (CSVRecord record : records) {
-				mapAttrObj.put(record.get(0), record.get(2));
+		if (file == null){
+			System.out.println("Error readDataDictionary(): Empty URL");
+		} else {
+			Iterable<CSVRecord> records = null;
+			try {
+				BufferedReader bufRdr = new BufferedReader(new FileReader(file));
+				records = CSVFormat.DEFAULT.withHeader().parse(bufRdr);
+				for (CSVRecord record : records) {
+					mapAttrObj.put(record.get(0), record.get(2));
+				}
+				bufRdr.close();
+				System.out.println("mapAttrObj: " + mapAttrObj);
+			} catch (Exception e) {
+				System.out.println("Error readDataDictionary(): Unable to Read File");
 			}
-			bufRdr.close();
-			System.out.println("mapAttrObj: " + mapAttrObj);
-		} catch (Exception e) {
-			System.out.println("Error readDataDictionary(): Unable to Read File");
 		}
+
 	}
 	
 	public void readCodeMapping(File file) {
-		Iterable<CSVRecord> records = null;
-		try {
-			BufferedReader bufRdr = new BufferedReader(new FileReader(file));
-			records = CSVFormat.DEFAULT.withHeader().parse(bufRdr);
-			for (CSVRecord record : records) {
-				codeMappings.put(record.get(0), record.get(1));
+		if (file == null){
+			System.out.println("Error readCodeMapping(): Empty URL");
+		} else {
+			Iterable<CSVRecord> records = null;
+			try {
+				BufferedReader bufRdr = new BufferedReader(new FileReader(file));
+				records = CSVFormat.DEFAULT.withHeader().parse(bufRdr);
+				for (CSVRecord record : records) {
+					codeMappings.put(record.get(0), record.get(1));
+				}
+				bufRdr.close();
+			} catch (Exception e) {
+				System.out.println("Error readCodeMapping(): Unable to Read File");
 			}
-			bufRdr.close();
-		} catch (Exception e) {
-			System.out.println("Error readCodeMapping(): Unable to Read File");
 		}
 	}
 	
 	public void readCodebook(File file) {
-		Iterable<CSVRecord> records = null;
-		try {
-			BufferedReader bufRdr = new BufferedReader(new FileReader(file));
-			records = CSVFormat.DEFAULT.withHeader().parse(bufRdr);
-			for (CSVRecord record : records) {
-				if (!record.get(0).isEmpty()) {
-					String colName = record.get(0);
-					Map<String, String> mapCodeClass = null;
-					if (!codebook.containsKey(colName)) {
-						mapCodeClass = new HashMap<String, String>();
-						codebook.put(colName, mapCodeClass);
-					} else {
-						mapCodeClass = codebook.get(colName);
+		if (file == null){
+			System.out.println("Error readCodebook(): Empty URL");
+		} else {
+			Iterable<CSVRecord> records = null;
+			try {
+				BufferedReader bufRdr = new BufferedReader(new FileReader(file));
+				records = CSVFormat.DEFAULT.withHeader().parse(bufRdr);
+				for (CSVRecord record : records) {
+					if (!record.get(0).isEmpty()) {
+						String colName = record.get(0);
+						Map<String, String> mapCodeClass = null;
+						if (!codebook.containsKey(colName)) {
+							mapCodeClass = new HashMap<String, String>();
+							codebook.put(colName, mapCodeClass);
+						} else {
+							mapCodeClass = codebook.get(colName);
+						}
+						String classUri = "";
+						if (!record.get(3).isEmpty()) {
+							// Class column
+							classUri = ValueCellProcessing.replacePrefixEx(record.get(3));
+						} 
+	//					else {
+	//						// Resource column
+	//						classUri = ValueCellProcessing.replacePrefixEx(record.get(4));
+	//					}
+						mapCodeClass.put(record.get(1), classUri);
 					}
-					String classUri = "";
-					if (!record.get(3).isEmpty()) {
-						// Class column
-						classUri = ValueCellProcessing.replacePrefixEx(record.get(3));
-					} 
-//					else {
-//						// Resource column
-//						classUri = ValueCellProcessing.replacePrefixEx(record.get(4));
-//					}
-					mapCodeClass.put(record.get(1), classUri);
 				}
+				bufRdr.close();
+			} catch (Exception e) {
+				System.out.println("Error readCodebook(): Unable to Read File");
 			}
-			bufRdr.close();
-		} catch (Exception e) {
-			System.out.println("Error readCodebook(): Unable to Read File");
 		}
 	}
 	
 	public void readtimelineFile(File file) {
-		Iterable<CSVRecord> records = null;
-		try {
-			BufferedReader bufRdr = new BufferedReader(new FileReader(file));
-			records = CSVFormat.DEFAULT.withHeader().parse(bufRdr);
-			for (CSVRecord record : records) {
-				if (!record.get(0).isEmpty()) {
-					String colName = record.get(0);
-					List<String> tmpList = new ArrayList<String>();
-					if (!record.get(1).isEmpty()) {
-						tmpList.add(record.get(1));
-					} else {
-						tmpList.add("null");
+		if (file == null){
+			System.out.println("Error readtimelineFile(): Empty URL");
+		} else {
+			Iterable<CSVRecord> records = null;
+			try {
+				BufferedReader bufRdr = new BufferedReader(new FileReader(file));
+				records = CSVFormat.DEFAULT.withHeader().parse(bufRdr);
+				for (CSVRecord record : records) {
+					if (!record.get(0).isEmpty()) {
+						String colName = record.get(0);
+						List<String> tmpList = new ArrayList<String>();
+						if (!record.get(1).isEmpty()) {
+							tmpList.add(record.get(1));
+						} else {
+							tmpList.add("null");
+						}
+						if (!record.get(2).isEmpty()) {
+							tmpList.add(record.get(2));
+						} else {
+							tmpList.add("null");
+						}
+						if (!record.get(5).isEmpty()) {
+							tmpList.add(record.get(5));
+						} else {
+							tmpList.add("null");
+						}
+						System.out.println(tmpList.get(0) + " " + tmpList.get(1) + " " + tmpList.get(2));
+						timelineMap.put(colName, tmpList);
 					}
-					if (!record.get(2).isEmpty()) {
-						tmpList.add(record.get(2));
-					} else {
-						tmpList.add("null");
-					}
-					if (!record.get(5).isEmpty()) {
-						tmpList.add(record.get(5));
-					} else {
-						tmpList.add("null");
-					}
-					System.out.println(tmpList.get(0) + " " + tmpList.get(1) + " " + tmpList.get(2));
-					timelineMap.put(colName, tmpList);
 				}
+				bufRdr.close();
+			} catch (Exception e) {
+				System.out.println("Error readtimelineFile(): Unable to Read File");
 			}
-			bufRdr.close();
-		} catch (Exception e) {
-			System.out.println("Error readtimelineFile(): Unable to Read File");
 		}
 	}
 }
