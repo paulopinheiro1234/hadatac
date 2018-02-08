@@ -147,6 +147,8 @@ public class Parser {
 		Map<String, List<String>> mapIDStudyObjects = DataAcquisitionSchema.findIdUriMappings(da.getStudyUri());
 		String dasoUnitUri = DataAcquisitionSchema.findByLabel(da.getSchemaUri(), schema.getUnitLabel());
 		
+		//System.out.println("possibleValues: " + possibleValues);
+		
 		// Comment out row instance generation
 		/*
 		// Need to be fixed here by getting codeMap and codebook from sparql query

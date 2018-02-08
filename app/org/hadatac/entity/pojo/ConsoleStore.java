@@ -1,6 +1,7 @@
 package org.hadatac.entity.pojo;
 
 import java.io.IOException;
+import java.time.Instant;
 import java.util.Date;
 import java.util.Iterator;
 
@@ -28,8 +29,8 @@ public class ConsoleStore {
 	@Field("last_dynamic_metadata_id_long")
 	private long lastDynamicMetadataId;
 	
-	@Field("timestamp_date")
-	private DateTime timestamp;
+	@Field("timestamp_str")
+	private String timestamp;
 	
 	public int getId() {
 		return id;
@@ -45,13 +46,11 @@ public class ConsoleStore {
 	}
 	
 	public String getTimestamp() {
-		DateTimeFormatter formatter = ISODateTimeFormat.dateTime();
-		return formatter.withZone(DateTimeZone.UTC).print(timestamp);
+		return timestamp;
 	}
 	
 	public void setTimestamp(String timestamp) {
-		DateTimeFormatter formatter = DateTimeFormat.forPattern("EEE MMM dd HH:mm:ss zzz yyyy");
-		this.timestamp = formatter.parseDateTime(timestamp);
+		this.timestamp = timestamp;
 	}
 	
 	public int save() {
@@ -90,8 +89,7 @@ public class ConsoleStore {
             	consoleStore = new ConsoleStore();
             	consoleStore.setId(Integer.parseInt(document.getFieldValue("id").toString()));
             	consoleStore.setLastDynamicMetadataId(Long.parseLong(document.getFieldValue("last_dynamic_metadata_id_long").toString()));
-            	DateTime date = new DateTime((Date)document.getFieldValue("timestamp_date"));
-            	consoleStore.setTimestamp(date.withZone(DateTimeZone.UTC).toString("EEE MMM dd HH:mm:ss zzz yyyy"));
+            	consoleStore.setTimestamp(document.getFieldValue("timestamp_str").toString());
             }
         } catch (SolrServerException | IOException e) {
         	System.out.println("[ERROR] ConsoleStore.find() - e.Message: " + e.getMessage());
