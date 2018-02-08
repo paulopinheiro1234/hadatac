@@ -7,7 +7,9 @@ import org.hadatac.utils.ConfigProp;
 
 import java.lang.String;
 import java.text.Normalizer;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.csv.CSVRecord;
@@ -88,6 +90,16 @@ public class PVGenerator extends BasicGenerator {
 		} else {
 			return "";
 		}
+	}
+	
+	public List<String> createUris() throws Exception {
+		int row_number = 0;
+		List<String> result = new ArrayList<String>();
+		for (CSVRecord record : records) {
+			result.add((kbPrefix + "PV-" + getLabel(record).replace("_","-").replace("??", "") + ("-" + SDDFileName.replace("SDD-", "").replace(".xlsx", "").replace(".csv", "") + "-" + getCode(record)).replaceAll("--", "-")).replace(" ","") + "-" + row_number);
+			++row_number;
+		}
+		return result;
 	}
 
 	@Override

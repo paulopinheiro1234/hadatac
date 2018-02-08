@@ -698,8 +698,10 @@ public class AnnotationWorker {
 					"   sddtmp/" + file.getName().replace(".csv", "") + "-dd.csv");
 			File dictionaryFile = sdd.downloadFile(mapCatalog.get("Data_Dictionary"), 
 					"sddtmp/" + file.getName().replace(".csv", "") + "-dd.csv");
+			File codeBookFile = sdd.downloadFile(mapCatalog.get("Codebook"), 
+					"sddtmp/" + file.getName().replace(".csv", "") + "-codebook.csv");
+			sdd.readCodebook(codeBookFile);
 			sdd.readDataDictionary(dictionaryFile);
-			System.out.println("it's a csv sdd 2 ...");
 
 			if (dictionaryFile != null){
 				try {
@@ -738,6 +740,17 @@ public class AnnotationWorker {
 				}
 			}
 
+			if (codeBookFile != null){
+				try {
+					PVGenerator pvGenerator = new PVGenerator(codeBookFile, file.getName(), study_id, sdd.getMapAttrObj());
+					System.out.println("Calling PVGenerator");
+					List<String> pvUris = pvGenerator.createUris();
+					result.addAll(pvUris);	
+				} catch (Exception e) {
+					AnnotationLog.printException(e, file.getName());
+				}
+			}
+			
 			try {
 				result.add(kbPrefix + "DAS-" + file.getName().replace("SDD-","").replace(".csv",""));    	
 			} catch (Exception e) {
@@ -758,6 +771,8 @@ public class AnnotationWorker {
 				
 				File dictionaryFile = sdd.readSheetfromExcel(mapCatalog.get("Data_Dictionary"), wb, "sddtmp/" + file.getName().replace(".xlsx", "") + "-dd.csv");
 				sdd.readDataDictionary(dictionaryFile);
+				File codeBookFile = sdd.readSheetfromExcel(mapCatalog.get("Codebook"), wb, "sddtmp/" + file.getName().replace(".xlsx", "") + "-codebook.csv");
+				sdd.readDataDictionary(codeBookFile);
 				
 				if (dictionaryFile != null){
 					try {
@@ -792,6 +807,17 @@ public class AnnotationWorker {
 					} catch (Exception e) {
 						System.out.println(e);
 						System.out.println("Error annotateDataAcquisitionSchemaFile: Unable to generate DASE Uris.");
+						AnnotationLog.printException(e, file.getName());
+					}
+				}
+				
+				if (codeBookFile != null){
+					try {
+						PVGenerator pvGenerator = new PVGenerator(codeBookFile, file.getName(), study_id, sdd.getMapAttrObj());
+						System.out.println("Calling PVGenerator");
+						List<String> pvUris = pvGenerator.createUris();
+						result.addAll(pvUris);	
+					} catch (Exception e) {
 						AnnotationLog.printException(e, file.getName());
 					}
 				}
