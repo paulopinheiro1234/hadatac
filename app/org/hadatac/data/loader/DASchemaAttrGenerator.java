@@ -75,7 +75,7 @@ public class DASchemaAttrGenerator extends BasicGenerator {
 			return "";
 		}
 		//System.out.println("DASchemaAttrGenerator: getAttributeOf() = " + SDDName + "-" + rec.get(mapCol.get("AttributeOf")).replace("??", ""));
-		return kbPrefix + "DASO-" + SDDName + "-" + getValueByColumnName(rec, mapCol.get("AttributeOf")).replace("??", "");
+		return kbPrefix + "DASO-" + SDDName + "-" + getValueByColumnName(rec, mapCol.get("AttributeOf")).replace(" ", "").replace("_","-").replace("??", "");
 	}
 
 	private String getUnit(CSVRecord rec) {
@@ -158,6 +158,19 @@ public class DASchemaAttrGenerator extends BasicGenerator {
 
 		return rows;
 	}
+	
+	public List<String> createUris() throws Exception {
+		List<String> result = new ArrayList<String>();
+		for (CSVRecord record : records) {
+			if (getAttribute(record)  == null || getAttribute(record).equals("")){
+				continue;
+			} else {
+				result.add(kbPrefix + "DASA-" + SDDName + "-" + getLabel(record).trim().replace(" ", "").replace("_","-").replace("??", ""));
+			}
+		}
+		return result;
+	}
+	
 
 	//Column	Attribute	attributeOf	Unit	Time	Entity	Role	Relation	inRelationTo	wasDerivedFrom	wasGeneratedBy	hasPosition   
 	@Override

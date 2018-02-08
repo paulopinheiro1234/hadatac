@@ -167,6 +167,23 @@ public class DASchemaEventGenerator extends BasicGenerator {
 
 		return rows;
 	}
+	
+	public List<String> createUris() throws Exception {
+		List<String> result = new ArrayList<String>();
+		for (CSVRecord record : records) {
+			if (timeList.contains(getLabel(record)) && getLabel(record).length()>0){
+				result.add(kbPrefix + "DASE-" + SDDName + "-" + getLabel(record).trim().replace(" ","").replace("_","-").replace("??", ""));
+			}
+		}
+		
+		for (Entry<String, List<String>> entry : tlm.entrySet()) {
+			if (entry.getKey().startsWith("??")){
+				result.add(kbPrefix + "DASE-" + SDDName + "-" + entry.getKey().trim().replace(" ","").replace("_","-").replace("??", ""));				
+			}
+		}
+		
+		return result;
+	}
 
 	//Column	Attribute	attributeOf	Unit	Time	Entity	Role	Relation	inRelationTo	wasDerivedFrom	wasGeneratedBy	hasPosition   
 	@Override
