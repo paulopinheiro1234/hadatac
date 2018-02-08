@@ -58,10 +58,9 @@ public class PVGenerator extends BasicGenerator {
 	}
 
 	private String getClass(CSVRecord rec) {
-		
-		String result = getValueByColumnName(rec, mapCol.get("Class"));
-		if (ValueCellProcessing.isAbbreviatedURI(result)){
-			return result;
+		String cls = getValueByColumnName(rec, mapCol.get("Class"));
+		if (ValueCellProcessing.isValidURI(cls)) {
+			return cls;
 		}
 		return "";
 	}
