@@ -6,7 +6,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.lang3.text.WordUtils;
 import org.apache.jena.query.Query;
 import org.apache.jena.query.QueryExecution;
 import org.apache.jena.query.QueryExecutionFactory;
@@ -15,7 +14,6 @@ import org.apache.jena.query.QuerySolution;
 import org.apache.jena.query.ResultSet;
 import org.apache.jena.query.ResultSetFactory;
 import org.apache.jena.query.ResultSetRewindable;
-import org.apache.jena.sparql.function.library.print;
 import org.apache.jena.update.UpdateExecutionFactory;
 import org.apache.jena.update.UpdateFactory;
 import org.apache.jena.update.UpdateProcessor;
@@ -30,6 +28,7 @@ import org.hadatac.entity.pojo.DataAcquisitionSchemaObject;
 import org.labkey.remoteapi.CommandException;
 
 import org.hadatac.console.controllers.AuthApplication;
+import org.hadatac.console.controllers.fileviewer.CSVPreview;
 import org.hadatac.metadata.loader.LabkeyDataHandler;
 
 import be.objectify.deadbolt.java.actions.Group;
@@ -258,9 +257,7 @@ public class DataAcquisitionSchema {
 				System.out.println("[OK] DataAcquisitionSchemaAttribute <" + dasa.getUri() + "> is defined in the knowledge base. " + 
 						"Entity: \""    + dasa.getEntityLabel()     + "\"; " + 
 						"Attribute: \"" + dasa.getAttributeLabel() + "\"; " + 
-						"Unit: \""      + dasa.getUnitLabel()       + "\""); 
-				//System.out.println("     DataAcquisitionSchemaAttribute DASO URI: \"" + dasa.getObjectUri() + "\"");
-				//System.out.println("     DataAcquisitionSchemaAttribute DASE URI: \"" + dasa.getEventUri() + "\"");
+						"Unit: \""      + dasa.getUnitLabel()       + "\"");
 			}
 		}
 	}
@@ -313,6 +310,57 @@ public class DataAcquisitionSchema {
 			}
 		}
 		return null;
+	}
+	
+	public void defineTemporaryPositions(List<String> csvHeaders) {
+		// Assign DASA positions by label matching
+		List<DataAcquisitionSchemaAttribute> listDasa = getAttributes();
+		if (listDasa != null && listDasa.size() > 0) {
+			// reset temporary positions
+			for (DataAcquisitionSchemaAttribute dasa : listDasa) {
+				dasa.setTempPositionInt(-1);
+			}
+			
+			for (int i = 0; i < csvHeaders.size(); i++) {
+				for (DataAcquisitionSchemaAttribute dasa : listDasa) {
+					if (csvHeaders.get(i).equalsIgnoreCase(dasa.getLabel())) {
+						dasa.setTempPositionInt(i);
+					}
+				}
+			}
+		}
+		
+		// Assign DASO positions by label matching
+		List<DataAcquisitionSchemaObject> listDaso = getObjects();
+		if (listDaso != null && listDaso.size() > 0) {
+			// reset temporary positions
+			for (DataAcquisitionSchemaObject daso : listDaso) {
+				daso.setTempPositionInt(-1);
+			}
+			
+			// Assign dasa positions by label matching
+			for (int i = 0; i < csvHeaders.size(); i++) {
+				for (DataAcquisitionSchemaObject daso : listDaso) {
+					if (csvHeaders.get(i).equalsIgnoreCase(daso.getLabel())) {
+						daso.setTempPositionInt(i);
+					}
+				}
+			}
+		}
+	}
+
+	public int tempPositionOfLabel(String label) {
+		if (label == null || label.equals("")) {
+			return -1;
+		}
+		
+		for (DataAcquisitionSchemaAttribute dasa : getAttributes()) {
+			if (dasa.getLabel().equalsIgnoreCase(label)) {
+				return dasa.getTempPositionInt();
+			}
+		}
+
+		return -1;
 	}
 
 	public static DataAcquisitionSchema find(String schemaUri) {
@@ -388,6 +436,8 @@ public class DataAcquisitionSchema {
 				+ " OPTIONAL { ?possibleValue hasco:hasResource ?resource } . "
 				+ " }";
 
+		System.out.println("findPossibleValues query: " + queryString);
+		
 		Query query = QueryFactory.create(queryString);
 		QueryExecution qexec = QueryExecutionFactory.sparqlService(
 				Collections.getCollectionsName(Collections.METADATA_SPARQL), query);
@@ -396,13 +446,12 @@ public class DataAcquisitionSchema {
 		qexec.close();
 
 		try {
-			while (resultsrw.hasNext()) {	
-//				System.out.println("it has next!!!");
+			while (resultsrw.hasNext()) {
 				String classUri = "";
 				QuerySolution soln = resultsrw.next();
-				if (soln.get("codeClass").toString().length() > 0) {
+				if (soln.get("codeClass") != null && soln.get("codeClass").toString().length() > 0) {
 					classUri = soln.getResource("codeClass").toString();
-				} else if (soln.get("resource").toString().length() > 0) {
+				} else if (soln.get("resource") != null && soln.get("resource").toString().length() > 0) {
 					classUri = soln.getResource("resource").toString();
 				}
 				
@@ -418,6 +467,7 @@ public class DataAcquisitionSchema {
 			}
 		} catch (Exception e) {
 			System.out.println("DataAcquisitionSchema.findPossibleValues() Error: " + e.getMessage());
+			e.printStackTrace();
 		}
 
 		return mapPossibleValues;
