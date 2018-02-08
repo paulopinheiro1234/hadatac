@@ -313,25 +313,33 @@ public class AutoAnnotator extends Controller {
 			List<String> result = AnnotationWorker.getPopulatedSDDUris(file);
 			
 			for (String str:result){
-				String query = "";
-				query += NameSpaces.getInstance().printSparqlNameSpaceList();
-				query += "DELETE WHERE {  ";
-				query += str + " ?p ?o . ";
-				query += "}  ";				
-//				System.out.println(query);
-				UpdateRequest request = UpdateFactory.create(query);
-				UpdateProcessor processor = UpdateExecutionFactory.createRemote(request, Collections.getCollectionsName(Collections.METADATA_UPDATE));
-				processor.execute();
-				
-				String query2 = "";
-				query2 += NameSpaces.getInstance().printSparqlNameSpaceList();
-				query2 += "DELETE WHERE {  ";
-				query2 += "?s ?p " + str + " . ";
-				query2 += "}  ";
-//				System.out.println(query);
-				UpdateRequest request2 = UpdateFactory.create(query2);
-				UpdateProcessor processor2 = UpdateExecutionFactory.createRemote(request2, Collections.getCollectionsName(Collections.METADATA_UPDATE));
-				processor2.execute();
+				try{
+					String query = "";
+					query += NameSpaces.getInstance().printSparqlNameSpaceList();
+					query += "DELETE WHERE {  ";
+					query += str + " ?p ?o . ";
+					query += "}  ";				
+//					System.out.println(query);
+					UpdateRequest request = UpdateFactory.create(query);
+					UpdateProcessor processor = UpdateExecutionFactory.createRemote(request, Collections.getCollectionsName(Collections.METADATA_UPDATE));
+					processor.execute();
+				} catch (Exception e) {
+					System.out.println(str + " s triple can not be deleted.");
+				}
+
+				try{
+					String query2 = "";
+					query2 += NameSpaces.getInstance().printSparqlNameSpaceList();
+					query2 += "DELETE WHERE {  ";
+					query2 += "?s ?p " + str + " . ";
+					query2 += "}  ";
+//					System.out.println(query2);
+					UpdateRequest request2 = UpdateFactory.create(query2);
+					UpdateProcessor processor2 = UpdateExecutionFactory.createRemote(request2, Collections.getCollectionsName(Collections.METADATA_UPDATE));
+					processor2.execute();
+				} catch (Exception e) {
+					System.out.println(str + " s triple can not be deleted.");
+				}
 			}
 		}
 	}

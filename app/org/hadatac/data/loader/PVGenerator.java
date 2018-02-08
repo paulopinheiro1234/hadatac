@@ -109,7 +109,7 @@ public class PVGenerator extends BasicGenerator {
 //			row.put("hasURI", getResource(rec));
 //		}
 //		else{
-			row.put("hasURI", (kbPrefix + "PV-" + getLabel(rec).replace("_","-").replace("??", "") + ("-" + SDDFileName.replace("SDD-", "").replace(".xlsx", "").replace(".csv", "") + "-" + getCode(rec)).replaceAll("--", "-")).replace(" ","") + "-" + row_number);
+			row.put("hasURI", (kbPrefix + "PV-" + getLabel(rec).replaceAll("[^A-Za-z0-9]", "-") + ("-" + SDDFileName.replace("SDD-", "").replace(".xlsx", "").replace(".csv", "") + "-" + getCode(rec)).replaceAll("--", "-")).replace(" ","").replaceAll("[^A-Za-z0-9]", "") + "-" + row_number);
 //		}
 		row.put("a", "hasco:PossibleValue");
 		row.put("hasco:hasCode", getCode(rec));
