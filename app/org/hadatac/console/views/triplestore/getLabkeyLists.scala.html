@@ -26,28 +26,7 @@
 	 	}
 	</script>
 	
-    <div class="container-fluid">
-    	@if(instance_data_list_names != null){
-        <table class="table">
-        	<thead>
-                 <tr>
-                    <th>Data Acquisition List</th>
-                 </tr>
-            </thead>
-            <tbody>
-            	@for(list_name <- instance_data_list_names){
-            		@if(list_name == "DataAcquisition") {
-            			<tr>
-            				<td>@list_name</td>
-            			</tr>
-            		}
-            	}
-            </tbody>
-        </table>
-        
-        <a href="@org.hadatac.console.controllers.triplestore.routes.LoadKB.playLoadLabkeyDataAcquisition("load", content, folder, "")" class="btn btn-primary" role="button">Load Data Acquisition</a>
-        }
-        
+    <div class="container-fluid">    
         @if(metadata_list_names != null){
    		<table class="table">
         	<thead>

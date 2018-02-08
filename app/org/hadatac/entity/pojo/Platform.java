@@ -125,15 +125,14 @@ public class Platform extends HADatAcThing implements Comparable<Platform> {
 	
 	public Map<HADatAcThing, List<HADatAcThing>> getTargetFacets(
 			Facet facet, FacetHandler facetHandler) {
-		
 		String query = "";
 		query += NameSpaces.getInstance().printSparqlNameSpaceList();
-		query += "SELECT ?platformUri ?dataAcquisitionUri ?platformLabel ?dataAcquisitionLabel WHERE { "
-				+ "?dataAcquisitionUri hasco:hasDeployment ?deploymentUri . "
-				+ "?deploymentUri vstoi:hasPlatform ?platformUri . "
-				+ "?platformUri rdfs:label ?platformLabel . "
-				+ "?dataAcquisitionUri rdfs:label ?dataAcquisitionLabel . "
-				+ "}";
+		query += "SELECT ?platformUri ?dataAcquisitionUri ?platformLabel ?dataAcquisitionLabel WHERE { \n"
+				+ " ?dataAcquisitionUri hasco:hasDeployment ?deploymentUri . \n"
+				+ " ?deploymentUri vstoi:hasPlatform ?platformUri . \n"
+				+ " ?platformUri rdfs:label ?platformLabel . \n"
+				+ " ?dataAcquisitionUri rdfs:label ?dataAcquisitionLabel . \n"
+				+ " } \n";
 
 		Map<HADatAcThing, List<HADatAcThing>> results = new HashMap<HADatAcThing, List<HADatAcThing>>();
 		try {
@@ -150,11 +149,6 @@ public class Platform extends HADatAcThing implements Comparable<Platform> {
 				platform.setField("platform_uri_str");
 				
 				DataAcquisition da = new DataAcquisition();
-				/*
-				if (!preValues.isEmpty() && !preValues.get("acquisition_uri_str").contains(soln.get("dataAcquisitionUri").toString())) {
-					continue;
-				}
-				*/
 				da.setUri(soln.get("dataAcquisitionUri").toString());
 				da.setLabel(soln.get("dataAcquisitionLabel").toString());
 				da.setField("acquisition_uri_str");
@@ -165,6 +159,10 @@ public class Platform extends HADatAcThing implements Comparable<Platform> {
 				if (!results.get(platform).contains(da)) {
 					results.get(platform).add(da);
 				}
+				
+				Facet subFacet = facet.getChildById(platform.getUri());
+				subFacet.putFacet("platform_uri_str", platform.getUri());
+				subFacet.putFacet("acquisition_uri_str", da.getUri());
 			}
 		} catch (QueryExceptionHTTP e) {
 			e.printStackTrace();

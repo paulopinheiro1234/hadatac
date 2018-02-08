@@ -30,20 +30,14 @@ import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.sparql.engine.http.QueryExceptionHTTP;
 import org.apache.solr.client.solrj.SolrClient;
-import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.beans.Field;
 import org.apache.solr.client.solrj.impl.HttpSolrClient;
-import org.apache.solr.client.solrj.response.FacetField;
-import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.client.solrj.response.UpdateResponse;
-import org.apache.solr.client.solrj.response.FacetField.Count;
 import org.apache.solr.common.SolrDocument;
-import org.apache.solr.common.SolrDocumentList;
 import org.hadatac.console.controllers.metadata.DynamicFunctions;
 import org.hadatac.console.models.Facet;
 import org.hadatac.console.models.FacetHandler;
-import org.hadatac.data.model.MetadataAcquisitionQueryResult;
 import org.hadatac.utils.Collections;
 import org.hadatac.utils.NameSpaces;
 import org.hadatac.utils.ConfigProp;
@@ -374,14 +368,24 @@ public class Study extends HADatAcThing {
 	
 	public Map<HADatAcThing, List<HADatAcThing>> getTargetFacets(
 			Facet facet, FacetHandler facetHandler) {
+		System.out.println("\nStudy facet: " + facet.toSolrQuery());
+		
+		String valueConstraint = "";
+		if (!facet.getFacetValuesByField("study_uri_str").isEmpty()) {
+			valueConstraint += " VALUES ?studyUri { " + stringify(
+					facet.getFacetValuesByField("study_uri_str"), true) + " } \n";
+		}
 		
 		String query = "";
 		query += NameSpaces.getInstance().printSparqlNameSpaceList();
-		query += "SELECT ?studyUri ?dataAcquisitionUri ?studyLabel ?dataAcquisitionLabel WHERE { "
-				+ "?dataAcquisitionUri hasco:isDataAcquisitionOf ?studyUri . "
-				+ "?studyUri rdfs:label ?studyLabel . "
-				+ "?dataAcquisitionUri rdfs:label ?dataAcquisitionLabel . "
-				+ "}";
+		query += "SELECT ?studyUri ?dataAcquisitionUri ?studyLabel ?dataAcquisitionLabel WHERE { \n"
+				+ valueConstraint + " \n"
+				+ "?dataAcquisitionUri hasco:isDataAcquisitionOf ?studyUri . \n"
+				+ "?studyUri rdfs:label ?studyLabel . \n"
+				+ "?dataAcquisitionUri rdfs:label ?dataAcquisitionLabel . \n"
+				+ "} \n";
+		
+		System.out.println("Study query: " + query);
 
 		Map<HADatAcThing, List<HADatAcThing>> results = new HashMap<HADatAcThing, List<HADatAcThing>>();
 		try {
@@ -409,6 +413,9 @@ public class Study extends HADatAcThing {
 				if (!results.get(study).contains(da)) {
 					results.get(study).add(da);
 				}
+				
+				Facet subFacet = facet.getChildById(study.getUri());
+				subFacet.putFacet("study_uri_str", study.getUri());
 			}
 		} catch (QueryExceptionHTTP e) {
 			e.printStackTrace();
@@ -418,8 +425,6 @@ public class Study extends HADatAcThing {
 	}
 
 	public static Study convertFromSolr(SolrDocument doc) {
-		Iterator<Object> i;
-		DateTime date;
 		Study study = new Study();
 		// URI
 		study.setUri(doc.getFieldValue("studyUri").toString());

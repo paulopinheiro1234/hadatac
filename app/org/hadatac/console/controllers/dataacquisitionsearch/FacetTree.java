@@ -37,14 +37,18 @@ public class FacetTree {
 	
 	public void retrieveFacetData(int level, Facet facet, 
 			FacetHandler facetHandler, 
-			Pivot curPivot, 
-			boolean bStatsFromSecondLastLevel) {
+			Pivot curPivot) {
+		System.out.println("level " + level);
+		System.out.println("facetName: " + facet.getFacetName());
+		
 		try {
 			HADatAcThing object = null;
 			if (facets.isEmpty()) {
 				object = (HADatAcThing)targetFacet.newInstance();
-			} else if (level >= facets.size()) {
+			} else if (level > facets.size()) {
 				return;
+			} else if (level == facets.size()) {
+				object = (HADatAcThing)targetFacet.newInstance();
 			} else {
 				object = (HADatAcThing)facets.get(level).newInstance();
 			}
@@ -52,51 +56,32 @@ public class FacetTree {
 			Map<HADatAcThing, List<HADatAcThing>> dict = object.getTargetFacets(facet, facetHandler);
 			for (HADatAcThing key : dict.keySet()) {
 				if (facets.isEmpty()) {
-					Pivot key_pivot = new Pivot();
-					key_pivot.field = key.getField();
-					key_pivot.value = key.getLabel();
-					key_pivot.tooltip = key.getUri();
-					key_pivot.count = key.getCount();
-					curPivot.addChild(key_pivot);
-				} else if (bStatsFromSecondLastLevel && level + 1 == facets.size()) {
-					Pivot key_pivot = new Pivot();
-					key_pivot.field = key.getField();
-					key_pivot.value = key.getLabel();
-					key_pivot.tooltip = key.getUri();
-					key_pivot.count = key.getCount();
-					curPivot.addChild(key_pivot);
-					
-					((List<HADatAcThing>)dict.get(key)).forEach(item->{
-						Pivot item_pivot = new Pivot();
-						item_pivot.field = item.getField();
-						item_pivot.value = item.getLabel();
-						item_pivot.tooltip = item.getUri();
-						item_pivot.count = item.getCount();
-						key_pivot.addChild(item_pivot);
-					});
-				} else {				
 					Pivot pivot = new Pivot();
 					pivot.field = key.getField();
 					pivot.value = key.getLabel();
 					pivot.tooltip = key.getUri();
-					pivot.count = (int)dict.get(key).get(0).getNumberFromSolr(
-							facet.getChildById(key.getUri()), facetHandler);
-					System.out.println("pivot.count: " + pivot.count);
-					curPivot.addChild(pivot);
-					if (level + 1 == facets.size()) {
-						((List<HADatAcThing>)dict.get(key)).forEach(item->{
-							Pivot item_pivot = new Pivot();
-							item_pivot.field = item.getField();
-							item_pivot.value = item.getLabel();
-							item_pivot.tooltip = item.getUri();
-							item_pivot.count = (int)dict.get(key).get(0).getNumberFromSolr(
-									facet.getChildById(item.getUri()), facetHandler);
-							System.out.println("pivot.count: " + pivot.count);
-							pivot.addChild(item_pivot);
-						});
+					pivot.count = key.getCount();
+					
+					if (pivot.count > 0) {
+						curPivot.addChild(pivot);
 					}
-					retrieveFacetData(level + 1, facet.getChildById(key.getUri()), facetHandler, pivot, bStatsFromSecondLastLevel);
-					System.out.println("retrieveFacetData for " + key.getUri());
+				} else {
+					Pivot pivot = new Pivot();
+					pivot.field = key.getField();
+					pivot.value = key.getLabel();
+					pivot.tooltip = key.getUri();
+					if (key.getCount() == 0) {
+						pivot.count = (int)dict.get(key).get(0).getNumberFromSolr(
+								facet.getChildById(key.getUri()), facetHandler);
+					} else {
+						pivot.count = key.getCount();
+					}
+					System.out.println("pivot.count: " + pivot.count);
+					if (pivot.count > 0) {
+						curPivot.addChild(pivot);
+						System.out.println("retrieveFacetData for " + key.getUri());
+						retrieveFacetData(level + 1, facet.getChildById(key.getUri()), facetHandler, pivot);
+					}
 				}
 			}
 		} catch (InstantiationException e) {

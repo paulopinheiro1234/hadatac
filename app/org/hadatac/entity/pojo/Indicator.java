@@ -256,7 +256,7 @@ public class Indicator extends HADatAcThing implements Comparable<Indicator> {
 		String query = "";
 		query += NameSpaces.getInstance().printSparqlNameSpaceList();
 		query += "SELECT ?studyIndicator ?indicatorLabel ?schemaAttribute ?attributeUri ?attributeLabel WHERE { \n"
-				+ valueConstraint + " \n "
+				+ valueConstraint + " \n"
 				+ "?subTypeUri rdfs:subClassOf* hasco:Study . \n"
 				+ "?studyUri a ?subTypeUri . \n"
 				+ "?dataAcq hasco:isDataAcquisitionOf ?studyUri . \n"
@@ -269,6 +269,8 @@ public class Indicator extends HADatAcThing implements Comparable<Indicator> {
 				//+ " { { ?studyIndicator rdfs:subClassOf hasco:StudyIndicator } UNION { ?studyIndicator rdfs:subClassOf hasco:ScienceIndicator } } . \n"
 				+ "?studyIndicator rdfs:label ?indicatorLabel . \n"
 				+ "}";
+		
+		System.out.println("Indicator query: " + query);
 		
 		Map<HADatAcThing, List<HADatAcThing>> mapIndicatorToCharList = new HashMap<HADatAcThing, List<HADatAcThing>>();
 		try {
@@ -298,7 +300,6 @@ public class Indicator extends HADatAcThing implements Comparable<Indicator> {
 				
 				Facet subFacet = facet.getChildById(indicator.getUri());
 				subFacet.putFacet("indicator_uri_str", indicator.getUri());
-				System.out.println("Adding indicator facet: " + indicator.getUri());
 				subFacet.putFacet("dasa_uri_str", soln.get("schemaAttribute").toString());
 			}
 		} catch (QueryExceptionHTTP e) {

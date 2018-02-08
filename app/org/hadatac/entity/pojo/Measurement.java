@@ -66,8 +66,10 @@ public class Measurement {
 	private String sid;	
 	@Field("unit_uri_str")
 	private String unitUri;
+	@Field("daso_uri_str")
+	private String dasoUri;
 	@Field("dasa_uri_str")
-	private String schemaAttributeUri;
+	private String dasaUri;
 	@Field("entity_uri_str")
 	private String entityUri;	
 	@Field("characteristic_uri_str")
@@ -236,12 +238,20 @@ public class Measurement {
 		this.unitUri = unitUri;
 	}
 	
-	public String getSchemaAttributeUri() {
-		return schemaAttributeUri;
+	public String getDasoUri() {
+		return dasoUri;
 	}
 	
-	public void setSchemaAttributeUri(String schemaAttributeUri) {
-		this.schemaAttributeUri = schemaAttributeUri;
+	public void setDasoUri(String dasoUri) {
+		this.dasoUri = dasoUri;
+	}
+	
+	public String getDasaUri() {
+		return dasaUri;
+	}
+	
+	public void setDasaUri(String dasaUri) {
+		this.dasaUri = dasaUri;
 	}
 
 	public String getEntity() {
@@ -399,7 +409,7 @@ public class Measurement {
 		}
 
 		if (handler != null) {
-			facet_query = handler.toSolrQuery();
+			facet_query = handler.bottommostFacetsToSolrQuery();
 		}
 
 		if (facet_query.trim().equals("") || facet_query.trim().equals("*:*")) {
@@ -460,53 +470,29 @@ public class Measurement {
 		return result;
 	}
 
-	public static AcquisitionQueryResult find(String user_uri, int page, int qtd, 
-			FacetHandler facetHandler, FacetHandler retFacetHandler) {
+	public static AcquisitionQueryResult find(String user_uri, int page, int qtd, String facets) {
 		AcquisitionQueryResult result = new AcquisitionQueryResult();
+		
+		FacetHandler facetHandler = new FacetHandler();
+    	facetHandler.loadFacets(facets);
+    	
+    	FacetHandler retFacetHandler = new FacetHandler();
+    	retFacetHandler.loadFacets(facets);
 
-		System.out.println("facetHandler before: " + facetHandler.toSolrQuery());
+		System.out.println("\nfacetHandler before: " + facetHandler.toSolrQuery());
+		
+		// Run one time
+		//getAllFacetStats(facetHandler, retFacetHandler, result, false);
+		
+		//System.out.println("\n\n\nfacetHandler after first: " + retFacetHandler.bottommostFacetsToSolrQuery());
+		//System.out.println("\nRetrieving final results =================");
+		
 		// Get facet statistics
-		FacetTree fTree = new FacetTree();
-		fTree.setTargetFacet(DataAcquisition.class);
-		fTree.addUpperFacet(Study.class);
-		Pivot pivot = getFacetStats(fTree, 
-				retFacetHandler.getFacetByName(FacetHandler.STUDY_FACET), 
-				facetHandler, false);
-		result.extra_facets.put(FacetHandler.STUDY_FACET, pivot);
-		
-		fTree = new FacetTree();
-		fTree.setTargetFacet(AttributeInstance.class);
-		fTree.addUpperFacet(Indicator.class);
-		fTree.addUpperFacet(EntityRole.class);
-		fTree.addUpperFacet(EntityInstance.class);
-		pivot = getFacetStats(fTree, 
-				retFacetHandler.getFacetByName(FacetHandler.ENTITY_CHARACTERISTIC_FACET), 
-				facetHandler, true);
-		//fTree.mergeFacetTree(1, 0, new ArrayList<Integer>(), null, pivot, "", new ArrayList<Pivot>());
-		result.extra_facets.put(FacetHandler.ENTITY_CHARACTERISTIC_FACET, pivot);
-		
-		fTree = new FacetTree();
-		fTree.setTargetFacet(UnitInstance.class);
-		result.extra_facets.put(FacetHandler.UNIT_FACET, getFacetStats(fTree, 
-				retFacetHandler.getFacetByName(FacetHandler.UNIT_FACET),
-				facetHandler, false));
-		
-		fTree = new FacetTree();
-		fTree.setTargetFacet(TimeInstance.class);
-		result.extra_facets.put(FacetHandler.TIME_FACET, getFacetStats(fTree, 
-				retFacetHandler.getFacetByName(FacetHandler.TIME_FACET),
-				facetHandler, false));
-		
-		fTree = new FacetTree();
-		fTree.setTargetFacet(DataAcquisition.class);
-		fTree.addUpperFacet(Platform.class);
-		fTree.addUpperFacet(Instrument.class);
-		result.extra_facets.put(FacetHandler.PLATFORM_INSTRUMENT_FACET, getFacetStats(fTree, 
-				retFacetHandler.getFacetByName(FacetHandler.PLATFORM_INSTRUMENT_FACET),
-				facetHandler, false));
+		//getAllFacetStats(retFacetHandler, retFacetHandler, result, true);
+		getAllFacetStats(facetHandler, retFacetHandler, result, true);
 		
 		// Get documents
-		System.out.println("facetHandler after: " + retFacetHandler.toSolrQuery());
+		System.out.println("\n\n\nfacetHandler after: " + retFacetHandler.bottommostFacetsToSolrQuery());
 		long docSize = 0;
 		String q = buildQuery(user_uri, page, qtd, retFacetHandler);
 		/*
@@ -570,13 +556,63 @@ public class Measurement {
 		return result;
 	}
 	
+	private static void getAllFacetStats(
+			FacetHandler facetHandler, 
+			FacetHandler retFacetHandler,
+			AcquisitionQueryResult result,
+			boolean bAddToResults) {
+		FacetTree fTreeS = new FacetTree();
+		fTreeS.setTargetFacet(DataAcquisition.class);
+		fTreeS.addUpperFacet(Study.class);
+		Pivot pivotS = getFacetStats(fTreeS, 
+				retFacetHandler.getFacetByName(FacetHandler.STUDY_FACET), 
+				facetHandler);
+		
+		FacetTree fTreeEC = new FacetTree();
+		fTreeEC.setTargetFacet(AttributeInstance.class);
+		fTreeEC.addUpperFacet(Indicator.class);
+		fTreeEC.addUpperFacet(EntityRole.class);
+		fTreeEC.addUpperFacet(EntityInstance.class);
+		Pivot pivotEC = getFacetStats(fTreeEC, 
+				retFacetHandler.getFacetByName(FacetHandler.ENTITY_CHARACTERISTIC_FACET), 
+				facetHandler);
+		//fTree.mergeFacetTree(1, 0, new ArrayList<Integer>(), null, pivot, "", new ArrayList<Pivot>());
+		
+		FacetTree fTreeU = new FacetTree();
+		fTreeU.setTargetFacet(UnitInstance.class);
+		Pivot pivotU = getFacetStats(fTreeU, 
+				retFacetHandler.getFacetByName(FacetHandler.UNIT_FACET),
+				facetHandler);
+		
+		FacetTree fTreeT = new FacetTree();
+		fTreeT.setTargetFacet(TimeInstance.class);
+		Pivot pivotT = getFacetStats(fTreeT, 
+				retFacetHandler.getFacetByName(FacetHandler.TIME_FACET),
+				facetHandler);
+		
+		FacetTree fTreePI = new FacetTree();
+		fTreePI.setTargetFacet(DataAcquisition.class);
+		fTreePI.addUpperFacet(Platform.class);
+		fTreePI.addUpperFacet(Instrument.class);
+		Pivot pivotPI = getFacetStats(fTreePI, 
+				retFacetHandler.getFacetByName(FacetHandler.PLATFORM_INSTRUMENT_FACET),
+				facetHandler);
+		
+		if (bAddToResults) {
+			result.extra_facets.put(FacetHandler.STUDY_FACET, pivotS);
+			result.extra_facets.put(FacetHandler.ENTITY_CHARACTERISTIC_FACET, pivotEC);
+			result.extra_facets.put(FacetHandler.UNIT_FACET, pivotU);
+			result.extra_facets.put(FacetHandler.TIME_FACET, pivotT);
+			result.extra_facets.put(FacetHandler.PLATFORM_INSTRUMENT_FACET, pivotPI);
+		}
+	}
+	
 	private static Pivot getFacetStats(
 			FacetTree fTree, 
 			Facet facet,
-			FacetHandler facetHandler, 
-			boolean bStatsFromSecondLastLevel) {
+			FacetHandler facetHandler) {
 		Pivot pivot = new Pivot();
-		fTree.retrieveFacetData(0, facet, facetHandler, pivot, bStatsFromSecondLastLevel);
+		fTree.retrieveFacetData(0, facet, facetHandler, pivot);
 		pivot.setNullParent();
 		
 		return pivot;
@@ -776,7 +812,8 @@ public class Measurement {
 		m.setDatasetUri(SolrUtils.getFieldValue(doc, "dataset_uri_str"));
 		m.setAcquisitionUri(SolrUtils.getFieldValue(doc, "acquisition_uri_str"));
 		m.setStudyUri(SolrUtils.getFieldValue(doc, "study_uri_str"));
-		m.setSchemaAttributeUri(SolrUtils.getFieldValue(doc, "dasa_uri_str"));
+		m.setDasoUri(SolrUtils.getFieldValue(doc, "daso_uri_str"));
+		m.setDasaUri(SolrUtils.getFieldValue(doc, "dasa_uri_str"));
 		m.setObjectUri(SolrUtils.getFieldValue(doc, "object_uri_str"));
 		m.setPID(SolrUtils.getFieldValue(doc, "pid_str"));
 		m.setSID(SolrUtils.getFieldValue(doc, "sid_str"));

@@ -22,21 +22,8 @@
 				<h4 class="modal-title">Download</h4>
 			</div>
 			<div class="modal-body">
-				<script type="text/javascript">
-                         function toggleAll(source) {
-                             var names = [];
-                             @if(objFields != null) {
-                                 @for(id <- objFields) {
-                                     names.push('@id');
-                                }
-                             }
-                             var i;
-                             for(i = 0; i < names.length; i++){
-                                 document.getElementById(names[i]).checked = source.checked;
-                             }
-                         }
-                         </script>
-				<form method="post" action="@org.hadatac.console.controllers.dataacquisitionsearch.routes.DataAcquisitionSearch.download(facets)">
+            
+				<form id="downloadDialogForm" method="post" action="@org.hadatac.console.controllers.dataacquisitionsearch.routes.DataAcquisitionSearch.download()">
 					<table class="table">
 						<thead>
 							<tr>
@@ -58,6 +45,29 @@
 					</table>
 					<input class="btn btn-info" type="submit" value="Confirm" />
 				</form>
+				
+			<script type="text/javascript">
+            function toggleAll(source) {
+                var names = [];
+                @if(objFields != null) {
+                    @for(id <- objFields) {
+                        names.push('@id');
+                   }
+                }
+                var i;
+                for(i = 0; i < names.length; i++){
+                    document.getElementById(names[i]).checked = source.checked;
+                }
+            }
+            
+            $("#downloadDialogForm").submit(function(eventObj) {
+                $('<input />').attr('type', 'hidden')
+                    .attr('name', "facets")
+                    .attr('value', getSelectedFacets())
+                    .appendTo(this);
+                return true;
+            });
+            </script>
 			</div>
 			<div class="modal-footer">
 				<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>

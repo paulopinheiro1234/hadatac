@@ -118,6 +118,10 @@
         }
     </script>
     <script>
+    function closePopover() {
+        $('[data-toggle="popover"]').popover('hide');
+    }
+    
     $(document).ready(function() { 
         $("#measurementsTable tr").not(':first').each(function(i, el) {
             var title = "<table>"
@@ -129,14 +133,16 @@
                 + "<tr><td><b>Unit:</b></td><td>" + json.documents[i]['unit'] + "</td></tr>" 
                 + "<tr><td><b>Instrument model:</b></td><td>" + json.documents[i]['instrumentModel'] + "</td></tr>" 
                 + "<tr><td><b>Platform name:</b></td><td>" + json.documents[i]['platformName'] + "</td></tr>"
-                + "</table>";
+                + "</table>"
+                + "<a><strong>Click Object URI to check Object Details</strong></a>";
             
         	$(el).attr("title", title);
         });
 
         $("#measurementsTable tr").not(':first').find("td:nth-child(7)").each(function(i, el) {
             var content = jsonDetails[json.documents[i]['objectUri']];
-            $(el).attr("data-content", content);
+            var closeButton = '<span class="text-info"></span><button type="button" id="close" class="close" onclick="closePopover()">&times;</button></span>';
+            $(el).attr("data-content", closeButton + content);
         });
 
         $('[data-toggle="tooltip"]').tooltip();

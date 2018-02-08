@@ -8,6 +8,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang3.text.WordUtils;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrRequest;
@@ -21,6 +22,7 @@ import org.apache.solr.common.SolrDocumentList;
 import org.hadatac.console.controllers.AuthApplication;
 import org.hadatac.console.models.Facet;
 import org.hadatac.console.models.FacetHandler;
+import org.hadatac.console.models.Pivot;
 import org.hadatac.metadata.loader.LabkeyDataHandler;
 import org.hadatac.metadata.loader.ValueCellProcessing;
 import org.hadatac.entity.pojo.ObjectCollection;
@@ -162,6 +164,13 @@ public class DataAcquisition extends HADatAcThing {
 	@Override
 	public int hashCode() {
 		return getUri().hashCode();
+	}
+	
+	public int compareTo(DataAcquisition another) {
+		if (this.getLabel() != null && another.getLabel() != null) {
+			return this.getLabel().compareTo(another.getLabel());
+		}
+		return this.getUri().compareTo(another.getUri());
 	}
 
 	public String getElevation() {
@@ -652,8 +661,12 @@ public class DataAcquisition extends HADatAcThing {
 	}
 	
 	public long getNumberFromSolr(Facet facet, FacetHandler facetHandler) {
+		System.out.println("\nDataAcquisition getNumberFromSolr facet: " + facet.toSolrQuery());
+		
 		SolrQuery query = new SolrQuery();
-		query.setQuery(facetHandler.getTempSolrQuery(facet, FacetHandler.STUDY_FACET));
+		String strQuery = facetHandler.getTempSolrQuery(facet);
+		System.out.println("strQuery: " + strQuery);
+		query.setQuery(strQuery);
 		query.setRows(0);
 		query.setFacet(false);
 
@@ -670,6 +683,59 @@ public class DataAcquisition extends HADatAcThing {
 		}
 
 		return -1;
+	}
+	
+	public Map<HADatAcThing, List<HADatAcThing>> getTargetFacets(
+			Facet facet, FacetHandler facetHandler) {
+		System.out.println("\nDataAcquisition getTargetFacets facet: " + facet.toSolrQuery());
+		
+		SolrQuery query = new SolrQuery();
+		String strQuery = facetHandler.getTempSolrQuery(facet);
+		System.out.println("strQuery: " + strQuery);
+		query.setQuery(strQuery);
+		query.setRows(0);
+		query.setFacet(true);
+		query.setFacetLimit(-1);
+		query.setParam("json.facet", "{ "
+				+ "acquisition_uri_str:{ "
+				+ "type: terms, "
+				+ "field: acquisition_uri_str, "
+				+ "limit: 1000}}");
+
+		try {
+			SolrClient solr = new HttpSolrClient.Builder(
+					ConfigFactory.load().getString("hadatac.solr.data") 
+					+ Collections.DATA_ACQUISITION).build();
+			QueryResponse queryResponse = solr.query(query, SolrRequest.METHOD.POST);
+			solr.close();
+			Pivot pivot = Measurement.parseFacetResults(queryResponse);
+			return parsePivot(pivot, facet);
+		} catch (Exception e) {
+			System.out.println("[ERROR] DataAcquisition.getTargetFacets() - Exception message: " + e.getMessage());
+		}
+
+		return null;
+	}
+	
+	private Map<HADatAcThing, List<HADatAcThing>> parsePivot(Pivot pivot, Facet facet) {
+		Map<HADatAcThing, List<HADatAcThing>> results = new HashMap<HADatAcThing, List<HADatAcThing>>();
+		for (Pivot pivot_ent : pivot.children) {
+			DataAcquisition da = new DataAcquisition();
+			da.setUri(pivot_ent.value);
+			da.setLabel(WordUtils.capitalize(DataAcquisition.findByUri(pivot_ent.value).getLabel()));
+			da.setCount(pivot_ent.count);
+			da.setField("acquisition_uri_str");
+			
+			if (!results.containsKey(da)) {
+				List<HADatAcThing> children = new ArrayList<HADatAcThing>();
+				results.put(da, children);
+			}
+			
+			Facet subFacet = facet.getChildById(da.getUri());
+			subFacet.putFacet("acquisition_uri_str", da.getUri());
+		}
+		
+		return results;
 	}
 
 	public static DataAcquisition convertFromSolr(SolrDocument doc) {

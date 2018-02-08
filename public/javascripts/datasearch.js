@@ -45,17 +45,19 @@ function getSelectedFacets() {
 	}
 	
 	console.log("facets: " + JSON.stringify(facets));
-	return facets;
+	return JSON.stringify(facets);
 }
 
 function search() {
-	facets = getSelectedFacets();
-	$.redirect(location.pathname, {'facets': JSON.stringify(facets)});
+	$.redirect(location.pathname, {'facets': getSelectedFacets()});
 }
 
 function showData(page) {
-	facets = getSelectedFacets();
-	$.redirect(location.pathname + '/data?start=' + page, {'facets': JSON.stringify(facets)});
+	$.redirect(location.pathname + '/data?start=' + page, {'facets': getSelectedFacets()});
+}
+
+function hideData(page) {
+	$.redirect(location.pathname.replace('/data', ''), {'facets': getSelectedFacets()});
 }
 
 function clearSearch() {

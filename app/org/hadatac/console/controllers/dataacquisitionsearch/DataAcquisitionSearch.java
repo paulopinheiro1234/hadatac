@@ -126,7 +126,7 @@ public class DataAcquisitionSearch extends Controller {
     			ownerUri = "Public";
     		}
     	}
-    	results = Measurement.find(ownerUri, page, rows, facetHandler, retFacetHandler);
+    	results = Measurement.find(ownerUri, page, rows, facets);
     	
     	ObjectDetails objDetails = getObjectDetails(results);
 
@@ -142,13 +142,7 @@ public class DataAcquisitionSearch extends Controller {
     }
     
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    public Result download(String facets) {
-    	FacetHandler facetHandler = new FacetHandler();
-    	facetHandler.loadFacets(facets);
-    	
-    	FacetHandler retFacetHandler = new FacetHandler();
-    	facetHandler.loadFacets(facets);
-    	
+    public Result download() {    	
     	String ownerUri = "";
     	final SysUser user = AuthApplication.getLocalUser(session());
     	if (null == user) {
@@ -161,14 +155,24 @@ public class DataAcquisitionSearch extends Controller {
     		}
     	}
     	
+    	String facets = "";
     	List<String> selectedFields = new LinkedList<String>();
     	Map<String, String[]> name_map = request().body().asFormUrlEncoded();
-    	selectedFields.addAll(name_map.keySet());
+    	if (name_map != null) {
+    		facets = name_map.get("facets")[0];
+    		
+    		List<String> keys = new ArrayList<String>(name_map.keySet());
+    		keys.remove("facets");
+    		
+    		selectedFields.addAll(keys);
+    	}
     	System.out.println("selectedFields: " + selectedFields);
     	
-    	AcquisitionQueryResult results = Measurement.find(ownerUri, -1, -1, facetHandler, retFacetHandler);
+    	AcquisitionQueryResult results = Measurement.find(ownerUri, -1, -1, facets);
+    	
+    	final String finalFacets = facets;
     	CompletableFuture.supplyAsync(() -> Downloader.generateCSVFile(
-    			results.getDocuments(), facets, selectedFields, user.getEmail()), 
+    			results.getDocuments(), finalFacets, selectedFields, user.getEmail()), 
     			ec.current());
 		
     	try {
@@ -181,7 +185,7 @@ public class DataAcquisitionSearch extends Controller {
     }
     
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    public Result postDownload(String facets) {
-    	return download(facets);
+    public Result postDownload() {
+    	return download();
     }
 }

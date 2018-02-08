@@ -32,8 +32,6 @@ import org.hadatac.utils.ConfigProp;
 
 import com.typesafe.config.ConfigFactory;
 
-import play.Play;
-
 public class Parser {
 
 	private DataAcquisitionSchema schema;
@@ -92,9 +90,7 @@ public class Parser {
 		SolrClient solr = new HttpSolrClient.Builder(
 				ConfigFactory.load().getString("hadatac.solr.data") 
 				+ Collections.DATA_ACQUISITION).build();
-		boolean isSample;
-		String matrix = "";
-		String analyte = "";
+
 		ObjectCollection oc = null;
 		if (da.getGlobalScopeUri() != null && !da.getGlobalScopeUri().equals("")) {
 			oc = ObjectCollection.find(da.getGlobalScopeUri());
@@ -223,22 +219,15 @@ public class Parser {
 				 *                   *
 				 *===================*/
 				
-				System.out.println("under set value : " + dasa.getTempPositionInt() + " " + dasa.getAttribute() + " " + dasa.getLabel());
-				
 				if (dasa.getTempPositionInt() < 0 || dasa.getTempPositionInt() >= record.size()) {
 					continue;
 				} else if (record.get(dasa.getTempPositionInt()).isEmpty()) { 
 					continue;
 				} else {
 					String originalValue = record.get(dasa.getTempPositionInt());
-					System.out.println("originalValue " + originalValue);
-					System.out.println("dasa getAttribute " + dasa.getUri());
 					String dasa_uri_temp = dasa.getUri().replace("<", "").replace(">", "");
-					System.out.println("dasa_uri_temp " + dasa.getUri());
 					if (possibleValues.containsKey(dasa_uri_temp)) {
-						System.out.println("codebook test " + dasa.getUri() + " " + possibleValues.containsKey(dasa_uri_temp));
 						if (possibleValues.get(dasa_uri_temp).containsKey(originalValue.toLowerCase())) {
-							System.out.println("codebook test " + possibleValues.get(dasa_uri_temp) + " " + possibleValues.get(dasa_uri_temp).containsKey(originalValue.toLowerCase()));
 							measurement.setValue(possibleValues.get(dasa_uri_temp).get(originalValue.toLowerCase()));
 						} else {
 							measurement.setValue(originalValue);
@@ -273,7 +262,6 @@ public class Parser {
 					if (timeValue != null) {
 						try {
 							measurement.setTimestamp(timeValue);
-							System.out.println("timeValue: " + timeValue);
 						} catch (Exception e) {
 							measurement.setTimestamp(new Date(0).toInstant().toString());
 						}
@@ -305,8 +293,6 @@ public class Parser {
 
 				String id = "";
 				if (!schema.getOriginalIdLabel().equals("")) {
-					System.out.println("originalidlabel:" + schema.getOriginalIdLabel());
-					System.out.println("posOriginalId:" + posOriginalId);
 					id = record.get(posOriginalId);
 				} else if (!schema.getIdLabel().equals("")) {
 					id = record.get(posId);
@@ -356,7 +342,9 @@ public class Parser {
 				 *   SET ENTITY AND CHARACTERISTIC URI  *              *
 				 *                                      *
 				 *======================================*/
-				measurement.setSchemaAttributeUri(dasa.getUri().replace("<", "").replace(">", ""));
+				measurement.setDasoUri(dasa.getObjectUri().replace("<", "").replace(">", ""));
+				measurement.setDasaUri(dasa.getUri().replace("<", "").replace(">", ""));
+				
 				DataAcquisitionSchemaObject daso = null;
 				String dasoUri = dasa.getObjectUri();
 				if (mapSchemaObjects.containsKey(dasoUri)) {
@@ -538,13 +526,7 @@ public class Parser {
 		}
 	}
 
-	private int tempPositionOfLabel(String label) {
-		
-		for (DataAcquisitionSchemaAttribute dasa : schema.getAttributes()) {
-			
-			System.out.println("!!!!!!! " + dasa.getTempPositionInt() + " " + dasa.getLabel());
-		}
-		
+	private int tempPositionOfLabel(String label) {		
 		if (label == null || label.equals("")) {
 			return -1;
 		}

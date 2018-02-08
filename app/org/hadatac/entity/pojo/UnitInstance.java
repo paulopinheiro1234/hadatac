@@ -42,7 +42,7 @@ public class UnitInstance extends HADatAcThing implements Comparable<UnitInstanc
 	public Map<HADatAcThing, List<HADatAcThing>> getTargetFacets(
 			Facet facet, FacetHandler facetHandler) {
 		SolrQuery query = new SolrQuery();
-		query.setQuery(facetHandler.getTempSolrQuery(facet, FacetHandler.UNIT_FACET));
+		query.setQuery(facetHandler.getTempSolrQuery(facet));
 		query.setRows(0);
 		query.setFacet(true);
 		query.setFacetLimit(-1);

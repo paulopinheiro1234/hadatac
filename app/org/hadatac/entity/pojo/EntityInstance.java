@@ -40,10 +40,10 @@ public class EntityInstance extends HADatAcThing implements Comparable<EntityIns
 	
 	public Map<HADatAcThing, List<HADatAcThing>> getTargetFacets(
 			Facet facet, FacetHandler facetHandler) {
-		System.out.println("\nEntityInstance facet: " + facet.toSolrQuery());
+		System.out.println("\nEntityInstance getTargetFacets facet: " + facet.toSolrQuery());
 		
 		SolrQuery query = new SolrQuery();
-		String strQuery = facetHandler.getTempSolrQuery(facet, FacetHandler.ENTITY_CHARACTERISTIC_FACET);
+		String strQuery = facetHandler.getTempSolrQuery(facet);
 		query.setQuery(strQuery);
 		query.setRows(0);
 		query.setFacet(true);
@@ -52,12 +52,7 @@ public class EntityInstance extends HADatAcThing implements Comparable<EntityIns
 				+ "entity_uri_str:{ "
 				+ "type: terms, "
 				+ "field: entity_uri_str, "
-				+ "limit: 1000, "
-				+ "facet:{ "
-				+ "characteristic_uri_str: { "
-				+ "type : terms, "
-				+ "field: characteristic_uri_str, "
-				+ "limit: 1000}}}}");
+				+ "limit: 1000}}");
 
 		try {
 			SolrClient solr = new HttpSolrClient.Builder(
@@ -83,25 +78,14 @@ public class EntityInstance extends HADatAcThing implements Comparable<EntityIns
 			entity.setCount(pivot_ent.count);
 			entity.setField("entity_uri_str");
 			
+			if (!results.containsKey(entity)) {
+				List<HADatAcThing> children = new ArrayList<HADatAcThing>();
+				results.put(entity, children);
+			}
+			
+			System.out.println("test: " + facet.toSolrQuery());
 			Facet subFacet = facet.getChildById(entity.getUri());
 			subFacet.putFacet("entity_uri_str", entity.getUri());
-			
-			for (Pivot pivot_attrib : pivot_ent.children) {
-				AttributeInstance attrib = new AttributeInstance();
-				attrib.setUri(pivot_attrib.value);
-				attrib.setLabel(WordUtils.capitalize(Attribute.find(pivot_attrib.value).getLabel()));
-				attrib.setCount(pivot_attrib.count);
-				attrib.setField("characteristic_uri_str");
-				if (!results.containsKey(entity)) {
-					List<HADatAcThing> attributes = new ArrayList<HADatAcThing>();
-					results.put(entity, attributes);
-				}
-				if (!results.get(entity).contains(attrib)) {
-					results.get(entity).add(attrib);
-				}
-				
-				subFacet.putFacet("characteristic_uri_str", attrib.getUri());
-			}
 		}
 		
 		return results;

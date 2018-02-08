@@ -47,7 +47,7 @@ public class TimeInstance extends HADatAcThing implements Comparable<TimeInstanc
 	public Map<HADatAcThing, List<HADatAcThing>> getTargetFacets(
 			Facet facet, FacetHandler facetHandler) {
 		SolrQuery query = new SolrQuery();
-		String queryString = facetHandler.getTempSolrQuery(facet, FacetHandler.TIME_FACET);
+		String queryString = facetHandler.getTempSolrQuery(facet);
 		
 		SimpleDateFormat sdfDate = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
 		sdfDate.setTimeZone(TimeZone.getTimeZone("UTC"));

@@ -15,22 +15,47 @@
 
 <script type="text/javascript" src="/hadatac/assets/javascripts/measurement.js"></script>
 <script>
+    function checkParentNodes(tree, root_id, child_id) {
+        if (tree.getAllSubItems(root_id).split(",").includes(child_id.toString())) {
+        	tree.setCheck(root_id, true);
+        }
+        
+        var subitems = tree.getSubItems(root_id);
+        if (subitems.length > 0) {
+            subitems.split(",").forEach(function(element) {
+            	checkParentNodes(tree, element, child_id);
+            });
+        }
+    }
+    
+    function refreshTreeCheckStatus(tree, id) {
+    	var hasCheckedSubitems = false;
+    	var subitems = tree.getSubItems(id);
+        if (subitems.length > 0) {
+        	subitems.split(",").forEach(function(element) {
+                refreshTreeCheckStatus(tree, element);
+                if (tree.isItemChecked(element)) {
+                    hasCheckedSubitems = true;
+                }
+            });
+        	
+        	if (!hasCheckedSubitems) {
+                tree.setCheck(id, false);
+            }
+        }
+    }
+   
     function loadTree(tree, data) {
         tree.enableCheckBoxes(true, true);
         tree.enableThreeStateCheckboxes(false);
         tree.setImagePath("@controllers.routes.Assets.versioned("lib/dhtmlx/imgs/dhxtree_skyblue/")");
         tree.setDataMode("json");
         tree.attachEvent("onCheck", function(id) {
-            tree.setSubChecked(id, tree.isItemChecked(id));
-            var checked_items = tree.getAllChecked();
-            if (checked_items.length > 0) {
-                checked_items.split(",").forEach(function(element) {
-                if (tree.getAllSubItems(element).split(",").includes(id.toString())) {
-                    if (!tree.isItemChecked(id)) {
-                        tree.setCheck(element, false);
-                    }
-                }
-                }); 
+        	tree.setSubChecked(id, tree.isItemChecked(id));
+            if (tree.isItemChecked(id)) {
+                checkParentNodes(tree, 0, id);
+            } else {
+            	refreshTreeCheckStatus(tree, 0);
             }
         });
         tree.parse(data, "json");

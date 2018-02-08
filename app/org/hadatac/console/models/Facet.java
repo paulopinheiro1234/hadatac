@@ -13,6 +13,7 @@ import org.json.simple.JSONObject;
 
 public class Facet {
 	private String id;
+	private String facetName;
 	private Map<String, List<String>> mapFieldValues = new HashMap<String, List<String>>();
 	private Map<String, Facet> children = new HashMap<String, Facet>();
     
@@ -20,6 +21,14 @@ public class Facet {
 	
 	public Facet(String id) {
 		this.id = id;
+	}
+	
+	public String getFacetName() {
+		return facetName;
+	}
+	
+	public void setFacetName(String facetName) {
+		this.facetName = facetName;
 	}
 	
 	public String getId() {
@@ -47,10 +56,14 @@ public class Facet {
 		Facet facet = null;
 		if (children.containsKey(id)) {
 			facet = children.get(id);
+			facet.addFieldValues(getFieldValues());
+			System.out.println("Use existing facet for " + id + " ========== " + facet.getFacetName());
 		} else {
 			facet = new Facet(id);
+			facet.setFacetName(getFacetName());
 			facet.addFieldValues(getFieldValues());
 			addChild(facet);
+			System.out.println("Use NEW facet for " + id + " &&&&&&&&&&&&& " + facet.getFacetName());
 		}
 		
 		return facet;
@@ -60,21 +73,27 @@ public class Facet {
 		children.put(facet.getId(), facet);
 	}
 	
-	public static Facet loadFacet(Object data) {
+	public static Facet loadFacet(Object data, String facetName) {
 		Facet facet = new Facet();
+		facet.setFacetName(facetName);
 		
 		JSONArray arrFacets = (JSONArray)data;
 		if (null != arrFacets) {
 			for (int i = 0; i < arrFacets.size(); i++) {
 				JSONObject subfacet = (JSONObject)arrFacets.get(i);
 				for (Object field : subfacet.keySet()) {
-					if (((String)field).equals("children")) {
-						facet.addChild(loadFacet(subfacet.get((String)field)));
-					} else if (((String)field).equals("id")) {
-						facet.setId((String)(subfacet.get((String)field)));
-					} else {
+					if (!((String)field).equals("children") && !((String)field).equals("id")) {
 						facet.putFacet((String)field, (String)(subfacet.get((String)field)));
 					}
+				}
+				
+				if (subfacet.containsKey("children")) {
+					Facet childFacet = loadFacet(subfacet.get("children"), facetName);
+					if (subfacet.containsKey("id")) {
+						childFacet.setId((String)(subfacet.get("id")));
+						childFacet.setFacetName(facetName);
+					}
+					facet.addChild(childFacet);
 				}
 			}
 		}
@@ -137,6 +156,14 @@ public class Facet {
 		mapFieldValues.get(field).remove(value);
 	}
 	
+	public void clearFieldValues(String field) {
+		Map<String, List<String>> mapFieldValues = getFieldValues();
+		if (!mapFieldValues.containsKey(field)) {
+			return;
+		}
+		mapFieldValues.remove(field);
+	}
+	
 	public List<String> values() {
 		List<String> values = new ArrayList<String>();
 		Map<String, List<String>> mapFieldValues = getFieldValues();
@@ -166,17 +193,76 @@ public class Facet {
 		
 		String facetsQuery = String.join(" AND ", fieldQueries.stream()
 				.filter(s -> !s.equals(""))
-				.map(s -> "(" + s + ")")
+				.map(s -> wrapWithParentheses(s))
 				.collect(Collectors.toList()));
 		
-		if (!facetsQuery.equals("")) {
-			facetsQuery = "(" + facetsQuery + ")";
+		return wrapWithParentheses(facetsQuery);
+	}
+	
+	public String currentLevelToSolrQuery() {
+		List<String> fieldQueries = new ArrayList<>();
+		for (String field : getFieldValues().keySet()) {
+			if (!getIgnoredFields().contains(field)) {
+				fieldQueries.add(String.join(" OR ", getFieldValues().get(field).stream().map(
+						p -> field + ":\"" + p + "\"").collect(Collectors.toList())));
+			}
 		}
 		
-		return facetsQuery;
+		String facetsQuery = String.join(" AND ", fieldQueries.stream()
+				.filter(s -> !s.equals(""))
+				.map(s -> wrapWithParentheses(s))
+				.collect(Collectors.toList()));
+		
+		return wrapWithParentheses(facetsQuery);
+	}
+	
+	private String fieldValuesToSolrQuery(Map<String, List<String>> fieldValues) {
+		List<String> fieldQueries = new ArrayList<>();
+		
+		for (String field : getFieldValues().keySet()) {
+			if (!getIgnoredFields().contains(field)) {
+				fieldQueries.add(String.join(" OR ", getFieldValues().get(field).stream().map(
+						p -> field + ":\"" + p + "\"").collect(Collectors.toList())));
+			}
+		}
+		
+		String facetsQuery = String.join(" AND ", fieldQueries.stream()
+				.filter(s -> !s.equals(""))
+				.map(s -> wrapWithParentheses(s))
+				.collect(Collectors.toList()));
+		
+		return wrapWithParentheses(facetsQuery);
+	}
+	
+	public String bottommostFacetsToSolrQuery() {
+		List<String> fieldQueries = new ArrayList<>();
+		
+		if (getChildrenAsList().isEmpty()) {
+			fieldQueries.add(fieldValuesToSolrQuery(getFieldValues()));
+		} else {
+			for (Facet f : getChildrenAsList()) {
+				fieldQueries.add(f.bottommostFacetsToSolrQuery());
+			}
+		}
+		
+		String facetsQuery = String.join(" OR ", fieldQueries.stream()
+				.filter(s -> !s.equals(""))
+				.map(s -> wrapWithParentheses(s))
+				.collect(Collectors.toList()));
+		
+		return wrapWithParentheses(facetsQuery);
+	}
+	
+	private String wrapWithParentheses(String str) {
+		if (!str.trim().equals("")) {
+			str = "(" + str + ")";
+		}
+		
+		return str;
 	}
 	
 	private List<String> getIgnoredFields() {
-		return Arrays.asList("indicator_uri_str", "entity_role_uri_str");
+		return Arrays.asList("indicator_uri_str", "entity_role_uri_str", 
+				"platform_uri_str", "instrument_uri_str");
 	}
 }

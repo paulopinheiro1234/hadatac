@@ -52,15 +52,27 @@ public class Instrument extends HADatAcThing implements Comparable<Instrument> {
 	
 	public Map<HADatAcThing, List<HADatAcThing>> getTargetFacets(
 			Facet facet, FacetHandler facetHandler) {
+		String valueConstraint = "";
+		if (!facet.getFacetValuesByField("platform_uri_str").isEmpty()) {
+			valueConstraint += " VALUES ?platformUri { " + stringify(
+					facet.getFacetValuesByField("platform_uri_str"), true) + " } \n ";
+		}
+		
 		String query = "";
 		query += NameSpaces.getInstance().printSparqlNameSpaceList();
-		query += "SELECT ?instrumentUri ?dataAcquisitionUri ?instrumentLabel ?dataAcquisitionLabel WHERE { "
-				+ "?dataAcquisitionUri hasco:hasDeployment ?deploymentUri . "
-				+ "?deploymentUri hasco:hasInstrument ?instrumentUri . "
-				+ "?instrumentUri rdfs:label ?instrumentLabel . "
-				+ "?dataAcquisitionUri rdfs:label ?dataAcquisitionLabel . "
-				+ "}";
+		query += "SELECT ?platformUri ?instrumentUri ?dataAcquisitionUri ?instrumentLabel ?dataAcquisitionLabel WHERE { \n"
+				+ valueConstraint
+				+ " ?dataAcquisitionUri hasco:hasDeployment ?deploymentUri . \n"
+				+ " ?deploymentUri vstoi:hasPlatform ?platformUri . \n"
+				+ " ?deploymentUri hasco:hasInstrument ?instrumentUri . \n"
+				+ " ?instrumentUri rdfs:label ?instrumentLabel . \n"
+				+ " ?dataAcquisitionUri rdfs:label ?dataAcquisitionLabel . \n"
+				+ " } \n";
 
+		//System.out.println("Instrument getTargetFacets query: " + query);
+		
+		facet.clearFieldValues("acquisition_uri_str");
+		
 		Map<HADatAcThing, List<HADatAcThing>> results = new HashMap<HADatAcThing, List<HADatAcThing>>();
 		try {
 			QueryExecution qe = QueryExecutionFactory.sparqlService(
@@ -76,11 +88,6 @@ public class Instrument extends HADatAcThing implements Comparable<Instrument> {
 				instrument.setField("instrument_uri_str");
 				
 				DataAcquisition da = new DataAcquisition();
-				/*
-				if (!preValues.isEmpty() && !preValues.get("acquisition_uri_str").contains(soln.get("dataAcquisitionUri").toString())) {
-					continue;
-				}
-				*/
 				da.setUri(soln.get("dataAcquisitionUri").toString());
 				da.setLabel(soln.get("dataAcquisitionLabel").toString());
 				da.setField("acquisition_uri_str");
@@ -92,6 +99,10 @@ public class Instrument extends HADatAcThing implements Comparable<Instrument> {
 				if (!results.get(instrument).contains(da)) {
 					results.get(instrument).add(da);
 				}
+				
+				Facet subFacet = facet.getChildById(instrument.getUri());
+				subFacet.putFacet("instrument_uri_str", instrument.getUri());
+				subFacet.putFacet("acquisition_uri_str", da.getUri());
 			}
 		} catch (QueryExceptionHTTP e) {
 			e.printStackTrace();
