@@ -75,7 +75,7 @@ public class DASchemaAttrGenerator extends BasicGenerator {
 			return "";
 		}
 		//System.out.println("DASchemaAttrGenerator: getAttributeOf() = " + SDDName + "-" + rec.get(mapCol.get("AttributeOf")).replace("??", ""));
-		return kbPrefix + "DASO-" + SDDName + "-" + getValueByColumnName(rec, mapCol.get("AttributeOf")).replace("??", "");
+		return kbPrefix + "DASO-" + SDDName + "-" + getValueByColumnName(rec, mapCol.get("AttributeOf")).replace(" ", "").replace("_","-").replace("??", "");
 	}
 
 	private String getUnit(CSVRecord rec) {
