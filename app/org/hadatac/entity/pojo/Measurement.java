@@ -482,14 +482,11 @@ public class Measurement {
 		System.out.println("\nfacetHandler before: " + facetHandler.toSolrQuery());
 		
 		// Run one time
-		//getAllFacetStats(facetHandler, retFacetHandler, result, false);
-		
-		//System.out.println("\n\n\nfacetHandler after first: " + retFacetHandler.bottommostFacetsToSolrQuery());
-		//System.out.println("\nRetrieving final results =================");
+		getAllFacetStats(facetHandler, retFacetHandler, result, false);
 		
 		// Get facet statistics
-		//getAllFacetStats(retFacetHandler, retFacetHandler, result, true);
-		getAllFacetStats(facetHandler, retFacetHandler, result, true);
+		getAllFacetStats(retFacetHandler, retFacetHandler, result, true);
+		//getAllFacetStats(facetHandler, retFacetHandler, result, true);
 		
 		// Get documents
 		System.out.println("\n\n\nfacetHandler after: " + retFacetHandler.bottommostFacetsToSolrQuery());
@@ -612,6 +609,7 @@ public class Measurement {
 			FacetHandler facetHandler) {
 		Pivot pivot = new Pivot();
 		fTree.retrieveFacetData(0, facet, facetHandler, pivot);
+		pivot.recomputeStats();
 		pivot.setNullParent();
 		
 		return pivot;

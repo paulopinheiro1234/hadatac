@@ -29,6 +29,21 @@ public class Pivot {
 		}
 	}
 	
+	public int recomputeStats() {
+		if (children.isEmpty()) {
+			return count;
+		}
+		
+		int cnt = 0;
+		for (Pivot child : children) {
+			cnt += child.recomputeStats();
+		}
+		
+		count = cnt;
+		
+		return count;
+	}
+	
 	@Override
 	public boolean equals(Object o) {
 		if((o instanceof Pivot) && (((Pivot)o).value.equals(this.value))) {
