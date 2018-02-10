@@ -94,7 +94,7 @@ public class EntityRole extends HADatAcThing implements Comparable<EntityRole> {
 			ResultSetRewindable resultsrw = ResultSetFactory.copyResults(resultSet);
 			qe.close();
 			
-			if (resultsrw.size() == 0) {				
+			if (resultsrw.size() == 0) {
 				EntityRole role = new EntityRole();
 				role.setUri(ValueCellProcessing.replacePrefixEx("sio:Sample"));
 				role.setLabel("Sample");
@@ -110,7 +110,6 @@ public class EntityRole extends HADatAcThing implements Comparable<EntityRole> {
 				}
 				
 				facet.getChildById(role.getUri());
-				
 			} else {
 				facet.clearFieldValues("entity_uri_str");
 				facet.clearFieldValues("characteristic_uri_str");

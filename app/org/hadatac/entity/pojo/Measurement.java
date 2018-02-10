@@ -576,7 +576,6 @@ public class Measurement {
 		Pivot pivotEC = getFacetStats(fTreeEC, 
 				retFacetHandler.getFacetByName(FacetHandler.ENTITY_CHARACTERISTIC_FACET), 
 				facetHandler);
-		//fTree.mergeFacetTree(1, 0, new ArrayList<Integer>(), null, pivot, "", new ArrayList<Pivot>());
 		
 		FacetTree fTreeU = new FacetTree();
 		fTreeU.setTargetFacet(UnitInstance.class);

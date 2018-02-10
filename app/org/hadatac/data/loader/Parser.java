@@ -351,11 +351,9 @@ public class Parser {
 				}
 				
 				if (null != daso) {
-					System.out.println("daso uri: " + daso.getUri());
-					System.out.println("daso.getTempPositionInt(): " + daso.getTempPositionInt());
 					if (daso.getTempPositionInt() > 0) {
 						// values of daso exist in the columns
-						String dasoValue = record.get(daso.getTempPositionInt() - 1);
+						String dasoValue = record.get(daso.getTempPositionInt());
 						if (possibleValues.containsKey(dasa.getObjectUri())) {
 							if (possibleValues.get(dasa.getObjectUri()).containsKey(dasoValue.toLowerCase())) {
 								measurement.setEntityUri(possibleValues.get(dasa.getObjectUri()).get(dasoValue.toLowerCase()));
@@ -370,8 +368,6 @@ public class Parser {
 							String originalId = record.get(posOriginalId);
 							// values of daso might exist in the triple store
 							if (daso.getEntity().equals(ValueCellProcessing.replacePrefixEx("sio:Human"))) {
-								//System.out.println("sio:Human========================");
-								//System.out.println("schema.getOriginalIdLabel(): " + schema.getOriginalIdLabel());
 								if (mapIDStudyObjects.containsKey(originalId)) {
 									measurement.setObjectUri(mapIDStudyObjects.get(originalId).get(0));
 								} else {
@@ -380,8 +376,6 @@ public class Parser {
 								measurement.setPID(originalId);
 								measurement.setSID("");
 							} else if (daso.getEntity().equals(ValueCellProcessing.replacePrefixEx("sio:Sample"))) {
-								//System.out.println("sio:Sample========================");
-								//System.out.println("schema.getOriginalIdLabel(): " + schema.getOriginalIdLabel());
 								if (mapIDStudyObjects.containsKey(originalId)) {
 									measurement.setObjectUri(mapIDStudyObjects.get(originalId).get(2));
 									measurement.setPID(mapIDStudyObjects.get(originalId).get(1));

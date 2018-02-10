@@ -70,6 +70,8 @@ public class EntityInstance extends HADatAcThing implements Comparable<EntityIns
 	}
 	
 	private Map<HADatAcThing, List<HADatAcThing>> parsePivot(Pivot pivot, Facet facet) {
+		facet.clearFieldValues("entity_uri_str");
+		
 		Map<HADatAcThing, List<HADatAcThing>> results = new HashMap<HADatAcThing, List<HADatAcThing>>();
 		for (Pivot pivot_ent : pivot.children) {
 			EntityInstance entity = new EntityInstance();
