@@ -750,13 +750,6 @@ public class AnnotationWorker {
 					AnnotationLog.printException(e, file.getName());
 				}
 			}
-			
-			try {
-				result.add(kbPrefix + "DAS-" + file.getName().replace("SDD-","").replace(".csv",""));    	
-			} catch (Exception e) {
-				AnnotationLog.printException(e, file.getName());
-			}
-			
 
 			System.out.println("result is ... " + result);
 			
@@ -820,12 +813,6 @@ public class AnnotationWorker {
 					} catch (Exception e) {
 						AnnotationLog.printException(e, file.getName());
 					}
-				}
-
-				try {
-					result.add(kbPrefix + "DAS-" + file.getName().replace("SDD-","").replace(".xlsx",""));    	
-				} catch (Exception e) {
-					AnnotationLog.printException(e, file.getName());
 				}
 				
 			} catch (Exception e) {
