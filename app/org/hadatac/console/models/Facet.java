@@ -57,20 +57,24 @@ public class Facet {
 		if (children.containsKey(id)) {
 			facet = children.get(id);
 			facet.addFieldValues(getFieldValues());
-			System.out.println("Use existing facet for " + id + " ========== " + facet.getFacetName());
+			//System.out.println("Use existing facet for " + id);
 		} else {
 			facet = new Facet(id);
 			facet.setFacetName(getFacetName());
 			facet.addFieldValues(getFieldValues());
 			addChild(facet);
-			System.out.println("Use NEW facet for " + id + " &&&&&&&&&&&&& " + facet.getFacetName());
+			//System.out.println("Use NEW facet for " + id);
 		}
 		
 		return facet;
 	}
 	
 	public void addChild(Facet facet) {
-		children.put(facet.getId(), facet);
+		if (children.containsKey(facet.getId())) {
+			children.get(facet.getId()).merge(facet);
+		} else {
+			children.put(facet.getId(), facet);
+		}
 	}
 	
 	public static Facet loadFacet(Object data, String facetName) {
@@ -99,6 +103,24 @@ public class Facet {
 		}
 		
 		return facet;
+	}
+	
+	public void merge(Facet facet) {
+		if (facet == null) {
+			return;
+		}
+		
+		// Merge current level
+		addFieldValues(facet.getFieldValues());
+		
+		// Merge children's levels
+		for (String id : facet.getChildren().keySet()) {
+			if (getChildren().containsKey(id)) {
+				getChildren().get(id).merge(facet.getChildren().get(id));
+			} else {
+				getChildren().put(id, facet.getChildren().get(id));
+			}
+		}
 	}
 	
 	public void tailor(Facet facet) {
@@ -187,16 +209,27 @@ public class Facet {
 			}
 		}
 		
-		for (Facet f : getChildrenAsList()) {
-			fieldQueries.add(f.toSolrQuery());
-		}
-		
-		String facetsQuery = String.join(" AND ", fieldQueries.stream()
+		String fieldQuery = String.join(" AND ", fieldQueries.stream()
 				.filter(s -> !s.equals(""))
 				.map(s -> wrapWithParentheses(s))
 				.collect(Collectors.toList()));
 		
-		return wrapWithParentheses(facetsQuery);
+		List<String> childrenQueries = new ArrayList<>();
+		for (Facet f : getChildrenAsList()) {
+			childrenQueries.add(f.toSolrQuery());
+		}
+		
+		String childrenQuery = String.join(" OR ", childrenQueries.stream()
+				.filter(s -> !s.equals(""))
+				.map(s -> wrapWithParentheses(s))
+				.collect(Collectors.toList()));
+		
+		String query = String.join(" AND ", Arrays.asList(fieldQuery, childrenQuery).stream()
+				.filter(s -> !s.equals(""))
+				.map(s -> wrapWithParentheses(s))
+				.collect(Collectors.toList()));
+		
+		return wrapWithParentheses(query);
 	}
 	
 	public String currentLevelToSolrQuery() {

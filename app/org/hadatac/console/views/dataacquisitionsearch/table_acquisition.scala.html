@@ -76,19 +76,19 @@
         }
 
         function nextPage() {
-            showData(@page + 1);
+            goToPage(@page + 1);
         }
 
         function prevPage() {
-            showData(@page - 1);
+            goToPage(@page - 1);
         }
 
         function firstPage() {
-            showData(1);
+            goToPage(1);
         }
 
         function lastPage() {
-            showData(@Math.ceil(resultsSize/15).intValue() + 1);
+            goToPage(@Math.ceil(resultsSize/15).intValue() + 1);
         }
 
         function updatePage() {

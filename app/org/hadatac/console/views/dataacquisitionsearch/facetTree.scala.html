@@ -64,7 +64,8 @@
     var jsonTree, dataTree, selected_elems;
     var treeEC;
     selected_elems = JSON.parse('@handler.values(FacetHandler.ENTITY_CHARACTERISTIC_FACET)'.replace(/&quot;/g,'"'));
-    dataTree = parseSolrFacetToTree('@FacetHandler.ENTITY_CHARACTERISTIC_FACET', selected_elems);
+    dataTree = parseSolrFacetToMergedTree('@FacetHandler.ENTITY_CHARACTERISTIC_FACET', selected_elems);
+    //dataTree = parseSolrFacetToTree('@FacetHandler.ENTITY_CHARACTERISTIC_FACET', selected_elems);
     treeEC = new dhtmlXTreeObject("treeEntityCharacteristicBox","100%","100%",0);
     loadTree(treeEC, dataTree);
     

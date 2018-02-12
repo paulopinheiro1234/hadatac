@@ -90,43 +90,5 @@ public class FacetTree {
 			e.printStackTrace();
 		}
 	}
-	
-	public Pivot mergeFacetTree(int levelToBegin, int curLevel, List<Integer> levelsToSkip, Pivot base, 
-			Pivot pivot, String value, List<Pivot> retChildren) {
-		if (levelToBegin == curLevel) {
-			base = pivot;
-		}
-		if (pivot.children.isEmpty()) {
-			pivot.value = value + " " + pivot.value;
-			retChildren.add(pivot);
-		} else {
-			for (Pivot child : pivot.children) {
-				if (curLevel <= levelToBegin) {
-					mergeFacetTree(levelToBegin, curLevel + 1, levelsToSkip, base, 
-							child, "", retChildren);
-				} else {
-					String passed_value = "";
-					if (levelsToSkip.contains(curLevel)) {
-						passed_value = value;
-					} else {
-						passed_value = value + " " + pivot.value;
-					}
-					mergeFacetTree(levelToBegin, curLevel + 1, levelsToSkip, base, 
-							child, passed_value, retChildren);
-				}
-			}
-		}
-		if (levelToBegin == curLevel) {
-			base.children.clear();
-			for (Pivot child : retChildren) {
-				if (base != child) {
-					base.children.add(child);
-				}
-			}
-			retChildren.clear();
-		}
-		
-		return pivot;
-	}
 }
 

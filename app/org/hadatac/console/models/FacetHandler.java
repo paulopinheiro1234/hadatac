@@ -15,6 +15,8 @@ import org.json.simple.parser.ParseException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
 
+import play.api.libs.json.Json;
+
 public class FacetHandler {
 	
 	public Map<String, Facet> facetsAll;
@@ -126,7 +128,7 @@ public class FacetHandler {
 			}
 		}
 		
-		facetQueries.add(facet.currentLevelToSolrQuery());
+		facetQueries.add(facet.toSolrQuery());
 		
 		String query = "";
 		query = String.join(" AND ", facetQueries.stream()

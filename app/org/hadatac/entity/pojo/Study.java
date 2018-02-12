@@ -385,7 +385,7 @@ public class Study extends HADatAcThing {
 				+ "?dataAcquisitionUri rdfs:label ?dataAcquisitionLabel . \n"
 				+ "} \n";
 		
-		System.out.println("Study query: " + query);
+		//System.out.println("Study query: " + query);
 
 		Map<HADatAcThing, List<HADatAcThing>> results = new HashMap<HADatAcThing, List<HADatAcThing>>();
 		try {

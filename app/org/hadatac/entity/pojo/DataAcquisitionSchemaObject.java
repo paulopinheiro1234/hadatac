@@ -231,18 +231,21 @@ public class DataAcquisitionSchemaObject {
 
 	public static DataAcquisitionSchemaObject find(String uri) {
 		System.out.println("Looking for data acquisition schema objects with uri: " + uri);
+		
 		DataAcquisitionSchemaObject object = null;
 		String queryString = NameSpaces.getInstance().printSparqlNameSpaceList() + 
-				"SELECT ?entity ?partOfSchema ?role ?inRelationTo ?relation WHERE { " + 
-				"   <" + uri + "> a hasco:DASchemaObject . " + 
-				"   <" + uri + "> hasco:partOfSchema ?partOfSchema . " + 
-				"   OPTIONAL { <" + uri + "> hasco:hasEntity ?entity } . " + 
-				"   OPTIONAL { <" + uri + "> hasco:hasRole ?role } .  " + 
-				"   OPTIONAL { <" + uri + "> sio:inRelationTo ?inRelationTo } . " + 
-				"   OPTIONAL { <" + uri + "> sio:relation ?relation } . " + 
+				"SELECT ?entity ?partOfSchema ?role ?inRelationTo ?relation WHERE { \n" + 
+				"   <" + uri + "> a hasco:DASchemaObject . \n" + 
+				"   <" + uri + "> hasco:partOfSchema ?partOfSchema . \n" + 
+				"   OPTIONAL { <" + uri + "> hasco:hasEntity ?entity } . \n" + 
+				"   OPTIONAL { <" + uri + "> hasco:hasRole ?role } .  \n" + 
+				"   OPTIONAL { <" + uri + "> sio:inRelationTo ?inRelationTo } . \n" + 
+				"   OPTIONAL { <" + uri + "> sio:relation ?relation } . \n" + 
 				"}";
-		Query query = QueryFactory.create(queryString);
 
+		//System.out.println("DataAcquisitionSchemaObject find(String uri) query: " + queryString);
+		
+		Query query = QueryFactory.create(queryString);
 		QueryExecution qexec = QueryExecutionFactory.sparqlService(
 				Collections.getCollectionsName(Collections.METADATA_SPARQL), query);
 		ResultSet results = qexec.execSelect();

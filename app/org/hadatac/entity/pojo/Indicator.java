@@ -255,7 +255,7 @@ public class Indicator extends HADatAcThing implements Comparable<Indicator> {
 		
 		String query = "";
 		query += NameSpaces.getInstance().printSparqlNameSpaceList();
-		query += "SELECT ?studyIndicator ?indicatorLabel ?schemaAttribute ?attributeUri ?attributeLabel WHERE { \n"
+		query += "SELECT ?studyIndicator ?indicatorLabel ?dataAcq ?schemaAttribute ?attributeUri ?attributeLabel WHERE { \n"
 				+ valueConstraint + " \n"
 				+ "?subTypeUri rdfs:subClassOf* hasco:Study . \n"
 				+ "?studyUri a ?subTypeUri . \n"
@@ -301,6 +301,7 @@ public class Indicator extends HADatAcThing implements Comparable<Indicator> {
 				Facet subFacet = facet.getChildById(indicator.getUri());
 				subFacet.putFacet("indicator_uri_str", indicator.getUri());
 				subFacet.putFacet("dasa_uri_str", soln.get("schemaAttribute").toString());
+				subFacet.putFacet("characteristic_uri_str", soln.get("attributeUri").toString());
 			}
 		} catch (QueryExceptionHTTP e) {
 			e.printStackTrace();

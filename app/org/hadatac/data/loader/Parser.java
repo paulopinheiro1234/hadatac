@@ -34,13 +34,10 @@ import com.typesafe.config.ConfigFactory;
 
 public class Parser {
 
-	private DataAcquisitionSchema schema;
-	private List<DASVirtualObject> templateList;
-
-	private static String path_unproc = ConfigProp.getPathUnproc();
+	private DataAcquisitionSchema schema = null;
+	private List<DASVirtualObject> templateList = null;
 
 	public Parser() {
-		schema = null;
 		templateList = new ArrayList<DASVirtualObject>();
 	}
 
@@ -91,13 +88,9 @@ public class Parser {
 				ConfigFactory.load().getString("hadatac.solr.data") 
 				+ Collections.DATA_ACQUISITION).build();
 
-		ObjectCollection oc = null;
-		if (da.getGlobalScopeUri() != null && !da.getGlobalScopeUri().equals("")) {
-			oc = ObjectCollection.find(da.getGlobalScopeUri());
-		}
-
 		// ASSIGN values for tempPositionInt
-		defineTemporaryPositions(files.getFileName());
+		schema.defineTemporaryPositions(CSVPreview.getCSVHeaders(
+				ConfigProp.getPathUnproc(), files.getFileName()));
 
 		// ASSIGN positions for MetaDASAs
 		int posTimestamp = -1;
@@ -109,36 +102,36 @@ public class Parser {
 		int posUnit = -1;
 		int posInRelation = -1;
 		if (!schema.getTimestampLabel().equals("")) {
-			posTimestamp = tempPositionOfLabel(schema.getTimestampLabel());
+			posTimestamp = schema.tempPositionOfLabel(schema.getTimestampLabel());
 			System.out.println("Finished tempPositionOfLabel!!!");
 		}
 		if (!schema.getTimeInstantLabel().equals("")) {
-			posTimeInstant = tempPositionOfLabel(schema.getTimeInstantLabel());
+			posTimeInstant = schema.tempPositionOfLabel(schema.getTimeInstantLabel());
 			System.out.println("Finished tempPositionOfLabel!!!");
 		}
 		if (!schema.getNamedTimeLabel().equals("")) {
-			posNamedTime = tempPositionOfLabel(schema.getNamedTimeLabel());
+			posNamedTime = schema.tempPositionOfLabel(schema.getNamedTimeLabel());
 			System.out.println("Finished tempPositionOfLabel!!!");
 		}
 		if (!schema.getIdLabel().equals("")) {
-			posId = tempPositionOfLabel(schema.getIdLabel());
+			posId = schema.tempPositionOfLabel(schema.getIdLabel());
 			System.out.println("Finished tempPositionOfLabel!!!");
 		}
 		if (!schema.getOriginalIdLabel().equals("")) {
 			System.out.println("schema.getOriginalIdLabel() " + schema.getOriginalIdLabel());
-			posOriginalId = tempPositionOfLabel(schema.getOriginalIdLabel());
+			posOriginalId = schema.tempPositionOfLabel(schema.getOriginalIdLabel());
 			System.out.println("Finished tempPositionOfLabel!!!");
 		}
 		if (!schema.getEntityLabel().equals("")) {
-			posEntity = tempPositionOfLabel(schema.getEntityLabel());
+			posEntity = schema.tempPositionOfLabel(schema.getEntityLabel());
 			System.out.println("Finished tempPositionOfLabel!!!");
 		}
 		if (!schema.getUnitLabel().equals("")) {
-			posUnit = tempPositionOfLabel(schema.getUnitLabel());
+			posUnit = schema.tempPositionOfLabel(schema.getUnitLabel());
 			System.out.println("Finished tempPositionOfLabel!!!");
 		}
 		if (!schema.getInRelationToLabel().equals("")) {
-			posInRelation = tempPositionOfLabel(schema.getInRelationToLabel());
+			posInRelation = schema.tempPositionOfLabel(schema.getInRelationToLabel());
 			System.out.println("Finished tempPositionOfLabel getInRelationToLabel !!!");
 		}
 		
@@ -146,6 +139,8 @@ public class Parser {
 		Map<String, Map<String, String>> possibleValues = DataAcquisitionSchema.findPossibleValues(da.getSchemaUri());
 		Map<String, List<String>> mapIDStudyObjects = DataAcquisitionSchema.findIdUriMappings(da.getStudyUri());
 		String dasoUnitUri = DataAcquisitionSchema.findByLabel(da.getSchemaUri(), schema.getUnitLabel());
+		
+		System.out.println("possibleValues: " + possibleValues);
 		
 		// Comment out row instance generation
 		/*
@@ -351,13 +346,14 @@ public class Parser {
 					daso = mapSchemaObjects.get(dasoUri);
 				} else {
 					daso = DataAcquisitionSchemaObject.find(dasoUri);
+					daso = schema.getObject(dasoUri);
 					mapSchemaObjects.put(dasoUri, daso);
 				}
 				
 				if (null != daso) {
-					if (daso.getPositionInt() > 0) {
+					if (daso.getTempPositionInt() > 0) {
 						// values of daso exist in the columns
-						String dasoValue = record.get(daso.getPositionInt() - 1);
+						String dasoValue = record.get(daso.getTempPositionInt());
 						if (possibleValues.containsKey(dasa.getObjectUri())) {
 							if (possibleValues.get(dasa.getObjectUri()).containsKey(dasoValue.toLowerCase())) {
 								measurement.setEntityUri(possibleValues.get(dasa.getObjectUri()).get(dasoValue.toLowerCase()));
@@ -372,8 +368,6 @@ public class Parser {
 							String originalId = record.get(posOriginalId);
 							// values of daso might exist in the triple store
 							if (daso.getEntity().equals(ValueCellProcessing.replacePrefixEx("sio:Human"))) {
-								System.out.println("sio:Human========================");
-								System.out.println("schema.getOriginalIdLabel(): " + schema.getOriginalIdLabel());
 								if (mapIDStudyObjects.containsKey(originalId)) {
 									measurement.setObjectUri(mapIDStudyObjects.get(originalId).get(0));
 								} else {
@@ -382,8 +376,6 @@ public class Parser {
 								measurement.setPID(originalId);
 								measurement.setSID("");
 							} else if (daso.getEntity().equals(ValueCellProcessing.replacePrefixEx("sio:Sample"))) {
-								System.out.println("sio:Sample========================");
-								System.out.println("schema.getOriginalIdLabel(): " + schema.getOriginalIdLabel());
 								if (mapIDStudyObjects.containsKey(originalId)) {
 									measurement.setObjectUri(mapIDStudyObjects.get(originalId).get(2));
 									measurement.setPID(mapIDStudyObjects.get(originalId).get(1));
@@ -495,56 +487,4 @@ public class Parser {
 		}
 		return new ParsingResult(0, message);
 	}
-
-
-	private void defineTemporaryPositions(String filename) {
-		if (schema == null || schema.getAttributes() == null || schema.getAttributes().size() == 0) {
-			return;
-		}
-		List<DataAcquisitionSchemaAttribute> dasas = schema.getAttributes();
-		List<String> headers = CSVPreview.getCSVHeaders(path_unproc, filename);
-
-		// reset temporary positions
-		for (DataAcquisitionSchemaAttribute dasa : dasas) {
-			dasa.setTempPositionInt(-1);
-		}
-
-		// match dasas and labels, assigning temporary positions
-		for (int h = 0; h < headers.size(); h++) {
-			for (int d = 0; d < dasas.size(); d++) {
-				if (headers.get(h).equals(dasas.get(d).getLabel())) {
-					dasas.get(d).setTempPositionInt(h);
-				}
-			} 
-		}
-
-		// override temporary positions with permanent positions
-		for (int i = 0; i < dasas.size(); i++) {
-			if (dasas.get(i).getPositionInt() >= 0) {
-				dasas.get(i).setTempPositionInt(dasas.get(i).getPositionInt());
-			} 
-		}
-	}
-
-	private int tempPositionOfLabel(String label) {		
-		if (label == null || label.equals("")) {
-			return -1;
-		}
-		for (DataAcquisitionSchemaAttribute dasa : schema.getAttributes()) {
-			if (dasa.getLabel().equals(label)) {
-				return dasa.getTempPositionInt();
-			}
-		}
-
-		return -1;
-	}
-
-
-	private String uppercaseFirstLetter(String str) {
-		if (str == null || str.equals("")) {
-			return str;
-		}
-		return str.substring(0, 1).toUpperCase() + str.substring(1);
-	}
-
 }

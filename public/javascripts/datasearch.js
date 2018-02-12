@@ -5,13 +5,17 @@ function treeSelections(tree, id) {
 	if (subitems.length > 0) {
 		subitems.split(",").forEach(function(element) {
 			if (tree.isItemChecked(element)) {
-				var pair = new Object();
-				pair['id'] = tree.getUserData(element, 'value');
-				pair[tree.getUserData(element, 'field')] = tree.getUserData(element, 'value');		
-				if (tree.hasChildren(element)) {
-					pair['children'] = treeSelections(tree, element);
+				if (tree.getUserData(element, 'facet') == undefined) {
+					var pair = new Object();
+					pair['id'] = tree.getUserData(element, 'value');
+					pair[tree.getUserData(element, 'field')] = tree.getUserData(element, 'value');		
+					if (tree.hasChildren(element)) {
+						pair['children'] = treeSelections(tree, element);
+					}
+					disj.push(pair);
+				} else {
+					disj.push(tree.getUserData(element, 'facet'));
 				}
-				disj.push(pair);
 			}
 		});
 	} else {
@@ -49,11 +53,17 @@ function getSelectedFacets() {
 }
 
 function search() {
-	$.redirect(location.pathname, {'facets': getSelectedFacets()});
+	var facets = getSelectedFacets();
+	console.log("selected facets: " + facets);
+	$.redirect(location.pathname, {'facets': facets});
 }
 
 function showData(page) {
 	$.redirect(location.pathname + '/data?start=' + page, {'facets': getSelectedFacets()});
+}
+
+function goToPage(page) {
+	$.redirect(location.pathname + '?start=' + page, {'facets': getSelectedFacets()});
 }
 
 function hideData(page) {
