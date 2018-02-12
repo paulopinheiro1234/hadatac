@@ -124,7 +124,16 @@ public class DASchemaAttrGenerator extends BasicGenerator {
 	}
 
 	private String getInRelationTo(CSVRecord rec) {
-		return getValueByColumnName(rec, mapCol.get("InRelationTo"));
+		String inRelationTo = getValueByColumnName(rec, mapCol.get("InRelationTo"));
+		if (inRelationTo.length() == 0) {
+			return "";
+		} else {
+			List<String> items = new ArrayList<String>();
+			for (String item : Arrays.asList(inRelationTo.split("\\s*,\\s*"))) {
+				items.add(kbPrefix + "DASA-" + SDDName + "-" + item.replace(" ", "").replace("_","-").replace("??", ""));
+			}
+			return String.join(" & ", items);
+		}
 	}
 
 	private String getWasDerivedFrom(CSVRecord rec) {
