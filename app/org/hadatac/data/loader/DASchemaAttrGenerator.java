@@ -130,7 +130,7 @@ public class DASchemaAttrGenerator extends BasicGenerator {
 		} else {
 			List<String> items = new ArrayList<String>();
 			for (String item : Arrays.asList(inRelationTo.split("\\s*,\\s*"))) {
-				items.add(kbPrefix + "DASA-" + SDDName + "-" + item.replace(" ", "").replace("_","-").replace("??", ""));
+				items.add(kbPrefix + "DASO-" + SDDName + "-" + item.replace(" ", "").replace("_","-").replace("??", ""));
 			}
 			return String.join(" & ", items);
 		}
