@@ -182,7 +182,14 @@ public class DASchemaAttrGenerator extends BasicGenerator {
 		row.put("rdfs:comment", getLabel(rec));
 		row.put("hasco:partOfSchema", kbPrefix + "DAS-" + SDDName);
 		row.put("hasco:hasEntity", getEntity(rec));
-		System.out.println("hasco:hasEntity: " + getEntity(rec));
+		row.put("sio:inRelationTo", getInRelationTo(rec));
+		if (getInRelationTo(rec).length() > 0) {
+			if (getRelation(rec).length() > 0) {
+				row.put("sio:Relation", getRelation(rec));
+			} else {
+				row.put("sio:Relation", "sio:inRelationTo");
+			}
+		}
 		row.put("hasco:hasAttribute", getAttribute(rec));
 		row.put("hasco:hasUnit", getUnit(rec));
 		row.put("hasco:hasEvent", getTime(rec));
