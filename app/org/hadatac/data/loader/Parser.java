@@ -345,7 +345,6 @@ public class Parser {
 				if (mapSchemaObjects.containsKey(dasoUri)) {
 					daso = mapSchemaObjects.get(dasoUri);
 				} else {
-					daso = DataAcquisitionSchemaObject.find(dasoUri);
 					daso = schema.getObject(dasoUri);
 					mapSchemaObjects.put(dasoUri, daso);
 				}
@@ -393,32 +392,59 @@ public class Parser {
 				}
 				measurement.setCharacteristicUri(dasa.getAttribute());
 				
+				/*======================================*
+				 *                                      *
+				 *   SET IN RELATION TO URI             *
+				 *                                      *
+				 *======================================*/
+				measurement.setInRelationToUri("");
+				
+				DataAcquisitionSchemaObject inRelationToDaso = null;
+				String inRelationToUri = dasa.getInRelationToUri();
+				if (mapSchemaObjects.containsKey(inRelationToUri)) {
+					inRelationToDaso = mapSchemaObjects.get(inRelationToUri);
+				} else {
+					inRelationToDaso = schema.getObject(inRelationToUri);
+					mapSchemaObjects.put(inRelationToUri, inRelationToDaso);
+				}
+				
+				if (null != inRelationToDaso) {
+					if (inRelationToDaso.getTempPositionInt() > 0) {
+						String inRelationToDasoValue = record.get(inRelationToDaso.getTempPositionInt());
+						if (possibleValues.containsKey(inRelationToUri)) {
+							if (possibleValues.get(inRelationToUri).containsKey(inRelationToDasoValue.toLowerCase())) {
+								measurement.setInRelationToUri(possibleValues.get(inRelationToUri).get(inRelationToDasoValue.toLowerCase()));
+							}
+						}
+					}
+				}
+				
 				/*=============================*
 				 *                             *
 				 *   SET UNIT                  *
 				 *                             *
 				 *=============================*/
-				if (!dasa.getUnit().equals("")) {
-					// Assign units from the Unit column of SDD
-					measurement.setUnitUri(dasa.getUnit());
-				} else {
-					if (!schema.getUnitLabel().equals("")) {
-						// unit exists in the columns
-						String unitValue = record.get(posUnit);
-						if (unitValue != null) {
-							if (possibleValues.containsKey(dasoUnitUri)) {
-								if (possibleValues.get(dasoUnitUri).containsKey(unitValue.toLowerCase())) {
-									measurement.setUnitUri(possibleValues.get(dasoUnitUri).get(unitValue.toLowerCase()));
-								} else {
-									measurement.setUnitUri("");
-								}
+				if (!schema.getUnitLabel().equals("")) {
+					// unit exists in the columns
+					String unitValue = record.get(posUnit);
+					if (unitValue != null) {
+						if (possibleValues.containsKey(dasoUnitUri)) {
+							if (possibleValues.get(dasoUnitUri).containsKey(unitValue.toLowerCase())) {
+								measurement.setUnitUri(possibleValues.get(dasoUnitUri).get(unitValue.toLowerCase()));
 							} else {
 								measurement.setUnitUri("");
 							}
+						} else {
+							measurement.setUnitUri("");
 						}
-					} else {
-						measurement.setUnitUri("");
 					}
+				} else {
+					measurement.setUnitUri("");
+				}
+				
+				if (measurement.getUnitUri().equals("") && !dasa.getUnit().equals("")) {
+					// Assign units from the Unit column of SDD
+					measurement.setUnitUri(dasa.getUnit());
 				}
 
 				/*=================================*

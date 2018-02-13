@@ -70,8 +70,10 @@ public class Measurement {
 	private String dasoUri;
 	@Field("dasa_uri_str")
 	private String dasaUri;
+	@Field("in_relation_to_uri_str")
+	private String inRelationToUri;
 	@Field("entity_uri_str")
-	private String entityUri;	
+	private String entityUri;
 	@Field("characteristic_uri_str")
 	private String characteristicUri;	
 	@Field("location_latlong")
@@ -252,6 +254,14 @@ public class Measurement {
 	
 	public void setDasaUri(String dasaUri) {
 		this.dasaUri = dasaUri;
+	}
+	
+	public String getInRelationToUri() {
+		return inRelationToUri;
+	}
+	
+	public void setInRelationToUri(String inRelationToUri) {
+		this.inRelationToUri = inRelationToUri;
 	}
 
 	public String getEntity() {
@@ -570,6 +580,7 @@ public class Measurement {
 		fTreeEC.addUpperFacet(Indicator.class);
 		fTreeEC.addUpperFacet(EntityRole.class);
 		fTreeEC.addUpperFacet(EntityInstance.class);
+		fTreeEC.addUpperFacet(InRelationToInstance.class);
 		Pivot pivotEC = getFacetStats(fTreeEC, 
 				retFacetHandler.getFacetByName(FacetHandler.ENTITY_CHARACTERISTIC_FACET), 
 				facetHandler);
@@ -812,6 +823,7 @@ public class Measurement {
 		m.setDasoUri(SolrUtils.getFieldValue(doc, "daso_uri_str"));
 		m.setDasaUri(SolrUtils.getFieldValue(doc, "dasa_uri_str"));
 		m.setObjectUri(SolrUtils.getFieldValue(doc, "object_uri_str"));
+		m.setInRelationToUri(SolrUtils.getFieldValue(doc, "in_relation_to_uri_str"));
 		m.setPID(SolrUtils.getFieldValue(doc, "pid_str"));
 		m.setSID(SolrUtils.getFieldValue(doc, "sid_str"));
 		m.setAbstractTime(SolrUtils.getFieldValue(doc, "named_time_str"));

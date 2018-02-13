@@ -64,6 +64,7 @@ public class DataAcquisitionSchemaAttribute {
 	private String unitLabel;
 	private String daseUri;
 	private String dasoUri;
+	private String inRelationToUri;
 	private boolean isMeta;
 	private DataAcquisitionSchema das;
 
@@ -297,6 +298,14 @@ public class DataAcquisitionSchemaAttribute {
 		} 
 		return annotation;
 	}
+	
+	public String getInRelationToUri() {
+		return inRelationToUri;
+	}
+	
+	public void setInRelationToUri(String inRelationToUri) {
+		this.inRelationToUri = inRelationToUri;
+	}
 
 	public String getUnit() {
 		if (unit == null) {
@@ -436,7 +445,7 @@ public class DataAcquisitionSchemaAttribute {
 		}
 		String queryString = NameSpaces.getInstance().printSparqlNameSpaceList() + 
 				"SELECT ?partOfSchema ?hasEntity ?hasAttribute " + 
-				" ?hasUnit ?hasDASO ?hasDASE ?hasSource ?isPIConfirmed WHERE { " + 
+				" ?hasUnit ?hasDASO ?hasDASE ?hasSource ?isPIConfirmed ?inRelationTo WHERE { " + 
 				"    " + dasa_uri + " a hasco:DASchemaAttribute . " + 
 				"    " + dasa_uri + " hasco:partOfSchema ?partOfSchema .  " + 
 				"    OPTIONAL { " + dasa_uri + " hasco:hasEntity ?hasEntity } . " + 
@@ -446,6 +455,7 @@ public class DataAcquisitionSchemaAttribute {
 				"    OPTIONAL { " + dasa_uri + " hasco:isAttributeOf ?hasDASO } . " + 
 				"    OPTIONAL { " + dasa_uri + " hasco:hasSource ?hasSource } . " + 
 				"    OPTIONAL { " + dasa_uri + " hasco:isPIConfirmed ?isPIConfirmed } . " + 
+				"    OPTIONAL { " + dasa_uri + " sio:inRelationTo ?inRelationTo } . " + 
 				"}";
 		Query query = QueryFactory.create(queryString);
 
@@ -468,6 +478,7 @@ public class DataAcquisitionSchemaAttribute {
 		String unitStr = "";
 		String dasoUriStr = "";
 		String daseUriStr = "";
+		String inRelationToUri = "";
 
 		while (resultsrw.hasNext()) {
 			QuerySolution soln = resultsrw.next();
@@ -522,6 +533,10 @@ public class DataAcquisitionSchemaAttribute {
 				} catch (Exception e1) {
 					daseUriStr = "";
 				}
+				
+				if (soln.get("inRelationTo") != null) {
+					inRelationToUri = soln.get("inRelationTo").toString();
+				}
 
 				dasa = new DataAcquisitionSchemaAttribute(dasa_uri,
 						localNameStr,
@@ -533,6 +548,8 @@ public class DataAcquisitionSchemaAttribute {
 						unitStr,
 						daseUriStr,
 						dasoUriStr);
+				
+				dasa.setInRelationToUri(inRelationToUri);
 			}
 
 		}
@@ -540,7 +557,7 @@ public class DataAcquisitionSchemaAttribute {
 		return dasa;
 	}
 
-	public static List<DataAcquisitionSchemaAttribute> findBySchema (String schemaUri) {
+	public static List<DataAcquisitionSchemaAttribute> findBySchema(String schemaUri) {
 		System.out.println("Looking for data acquisition schema attributes for " + schemaUri);
 		if (schemaUri.startsWith("http")) {
 			schemaUri = "<" + schemaUri + ">";
@@ -578,7 +595,8 @@ public class DataAcquisitionSchemaAttribute {
 						attributes.add(attr);
 					}
 				} catch (Exception e1) {
-					System.out.println("[ERROR] DataAcquisitionSchemaAttribute. URI: " + uriStr);
+					System.out.println("[ERROR] DataAcquisitionSchemaAttribute.findBySchema() URI: " + uriStr);
+					e1.printStackTrace();
 				}
 			}
 		}
@@ -684,9 +702,6 @@ public class DataAcquisitionSchemaAttribute {
 		Map<String, Object> row = new HashMap<String, Object>();
 		row.put("hasURI", ValueCellProcessing.replaceNameSpaceEx(getUri().replace("<","").replace(">","")));
 		rows.add(row);
-		for (Map<String,Object> str : rows) {
-			System.out.println("deleting DASA " + row.get("hasURI"));
-		}
 		return loader.deleteRows("DASchemaAttribute", rows);
 	}
 
