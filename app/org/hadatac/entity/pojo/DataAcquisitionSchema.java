@@ -430,7 +430,7 @@ public class DataAcquisitionSchema {
 				+ " ?possibleValue a hasco:PossibleValue . "
 				+ " ?possibleValue hasco:isPossibleValueOf ?daso_or_dasa . "
 				+ " ?possibleValue hasco:hasCode ?code . "
-				+ " ?possibleValue hasco:hasCodeLabel ?label ."
+				+ " ?codeClass rdfs:label ?label ."
 				+ " ?daso_or_dasa hasco:partOfSchema <" + schemaUri + "> . " 
 				+ " OPTIONAL { ?possibleValue hasco:hasClass ?codeClass } . "
 				+ " OPTIONAL { ?possibleValue hasco:hasResource ?resource } . "

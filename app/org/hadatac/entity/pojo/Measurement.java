@@ -776,8 +776,8 @@ public class Measurement {
 		query += NameSpaces.getInstance().printSparqlNameSpaceList();
 		query += "SELECT ?class ?label WHERE { "
 				+ "?possibleValue a hasco:PossibleValue .  "
-				+ "?possibleValue hasco:hasCodeLabel ?label .  "
 				+ "?possibleValue hasco:hasClass ?class .   "
+				+ "?class rdfs:label ?label .  "
 				+ "}";
 
 		try {
