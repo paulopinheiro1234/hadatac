@@ -40,7 +40,7 @@ public class AttributeInstance extends HADatAcThing implements Comparable<Attrib
 	}
 
 	public long getNumberFromSolr(Facet facet, FacetHandler facetHandler) {
-		System.out.println("\nAttributeInstance facet: " + facet.currentLevelToSolrQuery());
+		System.out.println("\nAttributeInstance facet: " + facet.toSolrQuery());
 		
 		SolrQuery query = new SolrQuery();
 		String strQuery = facetHandler.getTempSolrQuery(facet);
@@ -66,7 +66,7 @@ public class AttributeInstance extends HADatAcThing implements Comparable<Attrib
 	
 	public Map<HADatAcThing, List<HADatAcThing>> getTargetFacets(
 			Facet facet, FacetHandler facetHandler) {
-		System.out.println("\nAttributeInstance getTargetFacets facet: " + facet.currentLevelToSolrQuery());
+		System.out.println("\nAttributeInstance getTargetFacets facet: " + facet.toSolrQuery());
 		
 		SolrQuery query = new SolrQuery();
 		String strQuery = facetHandler.getTempSolrQuery(facet);

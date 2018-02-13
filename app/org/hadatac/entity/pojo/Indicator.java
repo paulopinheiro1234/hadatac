@@ -301,7 +301,6 @@ public class Indicator extends HADatAcThing implements Comparable<Indicator> {
 				Facet subFacet = facet.getChildById(indicator.getUri());
 				subFacet.putFacet("indicator_uri_str", indicator.getUri());
 				subFacet.putFacet("dasa_uri_str", soln.get("schemaAttribute").toString());
-				subFacet.putFacet("characteristic_uri_str", soln.get("attributeUri").toString());
 			}
 		} catch (QueryExceptionHTTP e) {
 			e.printStackTrace();
