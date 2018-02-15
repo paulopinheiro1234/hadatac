@@ -14,7 +14,7 @@ import play.data.FormFactory;
 import org.hadatac.entity.pojo.Study;
 import org.hadatac.entity.pojo.ObjectCollection;
 import org.hadatac.entity.pojo.ObjectCollectionType;
-import org.hadatac.metadata.loader.ValueCellProcessing;
+import org.hadatac.metadata.loader.URIUtils;
 import org.hadatac.console.views.html.objectcollections.*;
 import org.hadatac.console.models.ObjectCollectionForm;
 import org.hadatac.console.models.SysUser;
@@ -90,7 +90,7 @@ public class EditOC extends Controller {
 
 		//System.out.println("uri: " + data.getNewUri());
 		//System.out.println("type: " + data.getNewType());
-		String newStudyUri = ValueCellProcessing.replacePrefixEx(std_uri);
+		String newStudyUri = URIUtils.replacePrefixEx(std_uri);
 		String newLabel = data.getNewLabel();
 		String newComment = data.getNewComment();
 		String newHasScopeUri = data.getNewHasScopeUri();
@@ -102,13 +102,13 @@ public class EditOC extends Controller {
 		if (data.getNewUri() == null || data.getNewUri().equals("")) {
 			return badRequest("[ERROR] New URI cannot be empty.");
 		} else {
-			newURI = ValueCellProcessing.replacePrefixEx(data.getNewUri());
+			newURI = URIUtils.replacePrefixEx(data.getNewUri());
 		}
 		String newType = null;
 		if (data.getNewType() == null || data.getNewType().equals("")) {
 			return badRequest("[ERROR] New type cannot be empty.");
 		} else {
-			newType = ValueCellProcessing.replacePrefixEx(data.getNewType());
+			newType = URIUtils.replacePrefixEx(data.getNewType());
 		}
 		Study std = Study.find(std_uri);
 		if (std == null) {

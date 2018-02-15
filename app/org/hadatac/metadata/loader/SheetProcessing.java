@@ -6,7 +6,7 @@ import java.util.Vector;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
-import org.hadatac.metadata.loader.ValueCellProcessing;
+import org.hadatac.metadata.loader.URIUtils;
 import org.hadatac.metadata.model.SpreadsheetParsingResult;
 import org.hadatac.utils.Feedback;
 
@@ -66,10 +66,10 @@ public class SheetProcessing {
 		   		    	//System.out.println("STRING");
 		   		    	if (firstRow) {
 		   		    		String newPredicate = cell.getStringCellValue();
-		   		    		ValueCellProcessing.validateNameSpace(newPredicate);
+		   		    		URIUtils.validateNameSpace(newPredicate);
 		   		    		predicates.add(cell.getColumnIndex(), newPredicate);
 		   		    	} else {
-		   		    		shttl = shttl + ValueCellProcessing.exec(cell, predicates);
+		   		    		shttl = shttl + URIUtils.exec(cell, predicates);
 		   		    		hasOutput = true;
 		   		    	}
 		   		    	blankRow = false;

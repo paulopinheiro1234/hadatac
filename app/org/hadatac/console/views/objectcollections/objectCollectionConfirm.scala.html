@@ -7,7 +7,7 @@
 @import org.hadatac.console.views.html._
 @import org.hadatac.utils._
 @import org.hadatac.console.controllers.studies._
-@import org.hadatac.metadata.loader.ValueCellProcessing
+@import org.hadatac.metadata.loader.URIUtils
 
 @main(message) {
     <div class="container">
@@ -18,8 +18,8 @@
             <br>
         } else  {
             <ul>
-              <li><b>URI:</b> @ValueCellProcessing.replaceNameSpaceEx(oc.getUri())</li>
-              <li><b>Type:</b> @ValueCellProcessing.replaceNameSpaceEx(oc.getTypeUri())</li>
+              <li><b>URI:</b> @URIUtils.replaceNameSpaceEx(oc.getUri())</li>
+              <li><b>Type:</b> @URIUtils.replaceNameSpaceEx(oc.getTypeUri())</li>
               <li><b>Short Name:</b> @oc.getLabel()</li>
               <li><b>Deocription:</b> @oc.getComment()</li>
               <li><b>Study URI:</b> @if(oc.getStudy() != null) { @oc.getStudy().getLabel() }</li>

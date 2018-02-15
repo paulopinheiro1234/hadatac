@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.csv.CSVRecord;
-import org.hadatac.metadata.loader.ValueCellProcessing;
+import org.hadatac.metadata.loader.URIUtils;
 import org.hadatac.utils.ConfigProp;
 
 public class DASchemaAttrGenerator extends BasicGenerator {
@@ -80,7 +80,7 @@ public class DASchemaAttrGenerator extends BasicGenerator {
 
 	private String getUnit(CSVRecord rec) {
 		String original = getValueByColumnName(rec, mapCol.get("Unit"));
-		if (ValueCellProcessing.isValidURI(original)) {
+		if (URIUtils.isValidURI(original)) {
 			return original;
 		} else if (codeMap.containsKey(original)) {
 			return codeMap.get(original);
@@ -124,7 +124,16 @@ public class DASchemaAttrGenerator extends BasicGenerator {
 	}
 
 	private String getInRelationTo(CSVRecord rec) {
-		return getValueByColumnName(rec, mapCol.get("InRelationTo"));
+		String inRelationTo = getValueByColumnName(rec, mapCol.get("InRelationTo"));
+		if (inRelationTo.length() == 0) {
+			return "";
+		} else {
+			List<String> items = new ArrayList<String>();
+			for (String item : Arrays.asList(inRelationTo.split("\\s*,\\s*"))) {
+				items.add(kbPrefix + "DASO-" + SDDName + "-" + item.replace(" ", "").replace("_","-").replace("??", ""));
+			}
+			return String.join(" & ", items);
+		}
 	}
 
 	private String getWasDerivedFrom(CSVRecord rec) {
@@ -182,7 +191,14 @@ public class DASchemaAttrGenerator extends BasicGenerator {
 		row.put("rdfs:comment", getLabel(rec));
 		row.put("hasco:partOfSchema", kbPrefix + "DAS-" + SDDName);
 		row.put("hasco:hasEntity", getEntity(rec));
-		System.out.println("hasco:hasEntity: " + getEntity(rec));
+		row.put("sio:inRelationTo", getInRelationTo(rec));
+		if (getInRelationTo(rec).length() > 0) {
+			if (getRelation(rec).length() > 0) {
+				row.put("sio:Relation", getRelation(rec));
+			} else {
+				row.put("sio:Relation", "sio:inRelationTo");
+			}
+		}
 		row.put("hasco:hasAttribute", getAttribute(rec));
 		row.put("hasco:hasUnit", getUnit(rec));
 		row.put("hasco:hasEvent", getTime(rec));

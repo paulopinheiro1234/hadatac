@@ -14,7 +14,7 @@ import org.hadatac.console.controllers.AuthApplication;
 import org.hadatac.console.models.DASAForm;
 import org.hadatac.entity.pojo.DataAcquisitionSchema;
 import org.hadatac.entity.pojo.DataAcquisitionSchemaAttribute;
-import org.hadatac.metadata.loader.ValueCellProcessing;
+import org.hadatac.metadata.loader.URIUtils;
 
 import be.objectify.deadbolt.java.actions.Group;
 import be.objectify.deadbolt.java.actions.Restrict;
@@ -76,7 +76,7 @@ public class NewDASA extends Controller {
 		String newObject = data.getNewObject();
 		String newEvent = data.getNewEvent();
 
-		String localName = ValueCellProcessing.replacePrefix(newURI);
+		String localName = URIUtils.replacePrefix(newURI);
 		localName = localName.substring(localName.indexOf(":") + 1);
 
 		// insert current state of the DASA
@@ -112,7 +112,7 @@ public class NewDASA extends Controller {
 			return "";
 		}
 		String response = newStr.substring(newStr.indexOf("[") + 1).replace("]","");
-		//response = ValueCellProcessing.replacePrefix(response);
+		//response = URIUtils.replacePrefix(response);
 		return response;
 	}
 

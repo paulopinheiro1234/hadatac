@@ -15,7 +15,7 @@ import org.hadatac.entity.pojo.Study;
 import org.hadatac.entity.pojo.StudyObject;
 import org.hadatac.entity.pojo.ObjectCollection;
 import org.hadatac.entity.pojo.ObjectCollectionType;
-import org.hadatac.metadata.loader.ValueCellProcessing;
+import org.hadatac.metadata.loader.URIUtils;
 import org.hadatac.console.views.html.*;
 import org.hadatac.console.views.html.objects.*;
 import org.hadatac.console.models.NewObjectsFromFileForm;
@@ -74,7 +74,7 @@ public class NewObjectsFromFile extends Controller {
 	String newType = "http://semanticscience.org/resource/Human";
 	String newLabel = "";
 	String newComment = "";
-	String newObjectCollectionUri = ValueCellProcessing.replacePrefixEx(oc_uri);
+	String newObjectCollectionUri = URIUtils.replacePrefixEx(oc_uri);
 	StudyObject obj = null;
 
 	System.out.println("fileName: " + filename);
@@ -92,7 +92,7 @@ public class NewObjectsFromFile extends Controller {
 
 		// adjust object property values
 		newURI = oc.getUri().replace("OC-",ocType.getAcronym() + "-") + "-" + formattedCounter(nextId);
-		newURI = ValueCellProcessing.replacePrefixEx(newURI);
+		newURI = URIUtils.replacePrefixEx(newURI);
 		if (newLabelPrefix == null || newLabelPrefix.equals("")) {
 		    newLabel = Long.toString(nextId);
 		} else {

@@ -25,7 +25,7 @@ import org.hadatac.entity.pojo.DASVirtualObject;
 import org.hadatac.entity.pojo.DataFile;
 import org.hadatac.entity.pojo.ObjectCollection;
 import org.hadatac.entity.pojo.Measurement;
-import org.hadatac.metadata.loader.ValueCellProcessing;
+import org.hadatac.metadata.loader.URIUtils;
 import org.hadatac.console.controllers.fileviewer.CSVPreview;
 import org.hadatac.utils.Collections;
 import org.hadatac.utils.ConfigProp;
@@ -221,6 +221,7 @@ public class Parser {
 				} else {
 					String originalValue = record.get(dasa.getTempPositionInt());
 					String dasa_uri_temp = dasa.getUri().replace("<", "").replace(">", "");
+					measurement.setOriginalValue(originalValue);
 					if (possibleValues.containsKey(dasa_uri_temp)) {
 						if (possibleValues.get(dasa_uri_temp).containsKey(originalValue.toLowerCase())) {
 							measurement.setValue(possibleValues.get(dasa_uri_temp).get(originalValue.toLowerCase()));
@@ -294,7 +295,7 @@ public class Parser {
 				}
 				
 				if (!id.equals("")) {
-					if (dasa.getEntity().equals(ValueCellProcessing.replacePrefixEx("sio:Human"))) {
+					if (dasa.getEntity().equals(URIUtils.replacePrefixEx("sio:Human"))) {
 						if (mapIDStudyObjects.containsKey(id)) {
 							measurement.setObjectUri(mapIDStudyObjects.get(id).get(0));
 						} else {
@@ -302,7 +303,7 @@ public class Parser {
 						}
 						measurement.setPID(id);
 						measurement.setSID("");
-					} else if (dasa.getEntity().equals(ValueCellProcessing.replacePrefixEx("sio:Sample"))) {
+					} else if (dasa.getEntity().equals(URIUtils.replacePrefixEx("sio:Sample"))) {
 						if (mapIDStudyObjects.containsKey(id)) {
 							measurement.setObjectUri(mapIDStudyObjects.get(id).get(2));
 							measurement.setPID(mapIDStudyObjects.get(id).get(1));
@@ -326,8 +327,8 @@ public class Parser {
 				 *                             *
 				 *=============================*/
 
-				measurement.setUri(ValueCellProcessing.replacePrefixEx(measurement.getStudyUri()) + "/" + 
-						ValueCellProcessing.replaceNameSpaceEx(da.getUri()).split(":")[1] + "/" +
+				measurement.setUri(URIUtils.replacePrefixEx(measurement.getStudyUri()) + "/" + 
+						URIUtils.replaceNameSpaceEx(da.getUri()).split(":")[1] + "/" +
 						dasa.getLocalName() + "-" + total_count);
 				measurement.setOwnerUri(da.getOwnerUri());
 				measurement.setAcquisitionUri(da.getUri());
@@ -345,7 +346,6 @@ public class Parser {
 				if (mapSchemaObjects.containsKey(dasoUri)) {
 					daso = mapSchemaObjects.get(dasoUri);
 				} else {
-					daso = DataAcquisitionSchemaObject.find(dasoUri);
 					daso = schema.getObject(dasoUri);
 					mapSchemaObjects.put(dasoUri, daso);
 				}
@@ -367,7 +367,7 @@ public class Parser {
 						if (!schema.getOriginalIdLabel().equals("")) {
 							String originalId = record.get(posOriginalId);
 							// values of daso might exist in the triple store
-							if (daso.getEntity().equals(ValueCellProcessing.replacePrefixEx("sio:Human"))) {
+							if (daso.getEntity().equals(URIUtils.replacePrefixEx("sio:Human"))) {
 								if (mapIDStudyObjects.containsKey(originalId)) {
 									measurement.setObjectUri(mapIDStudyObjects.get(originalId).get(0));
 								} else {
@@ -375,7 +375,7 @@ public class Parser {
 								}
 								measurement.setPID(originalId);
 								measurement.setSID("");
-							} else if (daso.getEntity().equals(ValueCellProcessing.replacePrefixEx("sio:Sample"))) {
+							} else if (daso.getEntity().equals(URIUtils.replacePrefixEx("sio:Sample"))) {
 								if (mapIDStudyObjects.containsKey(originalId)) {
 									measurement.setObjectUri(mapIDStudyObjects.get(originalId).get(2));
 									measurement.setPID(mapIDStudyObjects.get(originalId).get(1));
@@ -393,32 +393,59 @@ public class Parser {
 				}
 				measurement.setCharacteristicUri(dasa.getAttribute());
 				
+				/*======================================*
+				 *                                      *
+				 *   SET IN RELATION TO URI             *
+				 *                                      *
+				 *======================================*/
+				measurement.setInRelationToUri("");
+				
+				DataAcquisitionSchemaObject inRelationToDaso = null;
+				String inRelationToUri = dasa.getInRelationToUri();
+				if (mapSchemaObjects.containsKey(inRelationToUri)) {
+					inRelationToDaso = mapSchemaObjects.get(inRelationToUri);
+				} else {
+					inRelationToDaso = schema.getObject(inRelationToUri);
+					mapSchemaObjects.put(inRelationToUri, inRelationToDaso);
+				}
+				
+				if (null != inRelationToDaso) {
+					if (inRelationToDaso.getTempPositionInt() > 0) {
+						String inRelationToDasoValue = record.get(inRelationToDaso.getTempPositionInt());
+						if (possibleValues.containsKey(inRelationToUri)) {
+							if (possibleValues.get(inRelationToUri).containsKey(inRelationToDasoValue.toLowerCase())) {
+								measurement.setInRelationToUri(possibleValues.get(inRelationToUri).get(inRelationToDasoValue.toLowerCase()));
+							}
+						}
+					}
+				}
+				
 				/*=============================*
 				 *                             *
 				 *   SET UNIT                  *
 				 *                             *
 				 *=============================*/
-				if (!dasa.getUnit().equals("")) {
-					// Assign units from the Unit column of SDD
-					measurement.setUnitUri(dasa.getUnit());
-				} else {
-					if (!schema.getUnitLabel().equals("")) {
-						// unit exists in the columns
-						String unitValue = record.get(posUnit);
-						if (unitValue != null) {
-							if (possibleValues.containsKey(dasoUnitUri)) {
-								if (possibleValues.get(dasoUnitUri).containsKey(unitValue.toLowerCase())) {
-									measurement.setUnitUri(possibleValues.get(dasoUnitUri).get(unitValue.toLowerCase()));
-								} else {
-									measurement.setUnitUri("");
-								}
+				if (!schema.getUnitLabel().equals("")) {
+					// unit exists in the columns
+					String unitValue = record.get(posUnit);
+					if (unitValue != null) {
+						if (possibleValues.containsKey(dasoUnitUri)) {
+							if (possibleValues.get(dasoUnitUri).containsKey(unitValue.toLowerCase())) {
+								measurement.setUnitUri(possibleValues.get(dasoUnitUri).get(unitValue.toLowerCase()));
 							} else {
 								measurement.setUnitUri("");
 							}
+						} else {
+							measurement.setUnitUri("");
 						}
-					} else {
-						measurement.setUnitUri("");
 					}
+				} else {
+					measurement.setUnitUri("");
+				}
+				
+				if (measurement.getUnitUri().equals("") && !dasa.getUnit().equals("")) {
+					// Assign units from the Unit column of SDD
+					measurement.setUnitUri(dasa.getUnit());
 				}
 
 				/*=================================*

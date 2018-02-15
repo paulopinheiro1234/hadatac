@@ -149,7 +149,7 @@ public class SchemaAttribute extends Controller {
 //				DAInfo.put("DASAttributeLabel_str", "<a href=\""
 //						+ ConfigFactory.load().getString("hadatac.console.host_deploy") 
 //						+ "/hadatac/metadataacquisitions/viewDASA?da_uri=" 
-//						+ ValueCellProcessing.replaceNameSpaceEx(DAInfo.get("DASAttributeUri").toString()) + "\">"
+//						+ URIUtils.replaceNameSpaceEx(DAInfo.get("DASAttributeUri").toString()) + "\">"
 //						+ soln.get("DASAttributeLabel").toString() + "</a>");
 				DAInfo.put("DASAttributeLabel_str", "<a href=\"#\">" + soln.get("DASAttributeLabel").toString() + "</a>");
 			}

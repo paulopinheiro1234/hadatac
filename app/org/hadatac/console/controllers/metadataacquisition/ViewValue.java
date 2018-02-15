@@ -7,7 +7,7 @@ import java.util.List;
 import play.mvc.Controller;
 import play.mvc.Result;
 import org.hadatac.entity.pojo.Measurement;
-import org.hadatac.metadata.loader.ValueCellProcessing;
+import org.hadatac.metadata.loader.URIUtils;
 import org.hadatac.console.views.html.metadataacquisition.*;
 import org.hadatac.data.model.AcquisitionQueryResult;
 import org.apache.commons.io.FileUtils;

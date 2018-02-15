@@ -7,7 +7,7 @@
 @import org.hadatac.console.views.html._
 @import org.hadatac.utils._
 @import org.hadatac.console.controllers.studies._
-@import org.hadatac.metadata.loader.ValueCellProcessing
+@import org.hadatac.metadata.loader.URIUtils
 
 @main(message) {
     <div class="container">
@@ -15,9 +15,9 @@
 
             <ul>
               <li><b>Filename:</b> filename</li>
-              <li><b>DA:</b> @ValueCellProcessing.replaceNameSpaceEx(da_uri)</li>
-              <li><b>Study:</b> @ValueCellProcessing.replaceNameSpaceEx(study_uri)</li>
-              <li><b>Collection:</b> @ValueCellProcessing.replaceNameSpaceEx(oc_uri)</li>
+              <li><b>DA:</b> @URIUtils.replaceNameSpaceEx(da_uri)</li>
+              <li><b>Study:</b> @URIUtils.replaceNameSpaceEx(study_uri)</li>
+              <li><b>Collection:</b> @URIUtils.replaceNameSpaceEx(oc_uri)</li>
            </ul>
 
         <a href="@org.hadatac.console.controllers.objects.routes.ObjectManagement.indexNomsg(filename, da_uri, study_uri, oc_uri)" 

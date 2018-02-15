@@ -3,7 +3,7 @@ package org.hadatac.console.controllers.metadataacquisition;
 import java.io.UnsupportedEncodingException;
 
 import org.hadatac.entity.pojo.Subject;
-import org.hadatac.metadata.loader.ValueCellProcessing;
+import org.hadatac.metadata.loader.URIUtils;
 
 import java.net.URLDecoder;
 import java.util.ArrayList;

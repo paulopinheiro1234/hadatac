@@ -13,7 +13,7 @@ import org.hadatac.console.controllers.AuthApplication;
 import org.hadatac.console.models.DASOForm;
 import org.hadatac.entity.pojo.DataAcquisitionSchema;
 import org.hadatac.entity.pojo.DataAcquisitionSchemaObject;
-import org.hadatac.metadata.loader.ValueCellProcessing;
+import org.hadatac.metadata.loader.URIUtils;
 
 import be.objectify.deadbolt.java.actions.Group;
 import be.objectify.deadbolt.java.actions.Restrict;
@@ -110,11 +110,11 @@ public class NewDASO extends Controller {
 			return "";
 		}
 		if (newInRelationTo.equals("DefaultObject")) {
-			return ValueCellProcessing.replacePrefix("hasco:DefaultObject");
+			return URIUtils.replacePrefix("hasco:DefaultObject");
 		}
 		for (DataAcquisitionSchemaObject daso : objects) {
 			if (daso.getRole().equals(newInRelationTo)) {
-				return ValueCellProcessing.replacePrefix(daso.getUri());
+				return URIUtils.replacePrefix(daso.getUri());
 			}
 		} 
 		return "";
@@ -125,7 +125,7 @@ public class NewDASO extends Controller {
 			return "";
 		}
 		String response = newStr.substring(newStr.indexOf("[") + 1).replace("]","");
-		//response = ValueCellProcessing.replacePrefix(response);
+		//response = URIUtils.replacePrefix(response);
 		return response;
 	}
 }

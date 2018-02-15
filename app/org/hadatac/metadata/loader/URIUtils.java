@@ -8,7 +8,7 @@ import org.apache.poi.ss.usermodel.Cell;
 import org.hadatac.utils.NameSpace;
 import org.hadatac.utils.NameSpaces;
 
-public class ValueCellProcessing {
+public class URIUtils {
 	
 	private static boolean isFullURI(String str) {
 		return str.startsWith("http");

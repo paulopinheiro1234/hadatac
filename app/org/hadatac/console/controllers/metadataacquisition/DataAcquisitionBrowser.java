@@ -23,7 +23,7 @@ import org.hadatac.console.controllers.metadata.DynamicFunctions;
 import org.hadatac.console.http.SolrUtils;
 import org.hadatac.console.models.SysUser;
 import org.hadatac.console.views.html.metadataacquisition.*;
-import org.hadatac.metadata.loader.ValueCellProcessing;
+import org.hadatac.metadata.loader.URIUtils;
 import org.hadatac.utils.Collections;
 import org.hadatac.utils.NameSpaces;
 import org.json.simple.JSONObject;
@@ -75,7 +75,7 @@ public class DataAcquisitionBrowser extends Controller {
 		qexecStudy.close();
 		
 		HashMap<String, HashMap<String, Object>> mapDAInfo = new HashMap<String, HashMap<String, Object>>();
-		ValueCellProcessing cellProc = new ValueCellProcessing();
+		URIUtils cellProc = new URIUtils();
 		while (resultsrwStudy.hasNext()) {
 			QuerySolution soln = resultsrwStudy.next();
 			System.out.println("DataAcquisitionBrowser Solution: " + soln.toString());
@@ -127,7 +127,7 @@ public class DataAcquisitionBrowser extends Controller {
 		qexecStudy.close();
 		
 		HashMap<String, HashMap<String, Object>> mapDAInfo = new HashMap<String, HashMap<String, Object>>();
-		ValueCellProcessing cellProc = new ValueCellProcessing();
+		URIUtils cellProc = new URIUtils();
 		while (resultsrwStudy.hasNext()) {
 			QuerySolution soln = resultsrwStudy.next();
 			System.out.println("DataAcquisitionBrowser Solution: " + soln.toString());

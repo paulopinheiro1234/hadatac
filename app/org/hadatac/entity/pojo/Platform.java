@@ -30,7 +30,7 @@ import org.hadatac.console.controllers.AuthApplication;
 import org.hadatac.console.models.Facet;
 import org.hadatac.console.models.FacetHandler;
 import org.hadatac.metadata.loader.LabkeyDataHandler;
-import org.hadatac.metadata.loader.ValueCellProcessing;
+import org.hadatac.metadata.loader.URIUtils;
 import org.labkey.remoteapi.CommandException;
 
 import com.typesafe.config.ConfigFactory;
@@ -329,8 +329,8 @@ public class Platform extends HADatAcThing implements Comparable<Platform> {
 		LabkeyDataHandler loader = new LabkeyDataHandler(site, user_name, password, path);
 		List< Map<String, Object> > rows = new ArrayList< Map<String, Object> >();
 		Map<String, Object> row = new HashMap<String, Object>();
-		row.put("hasURI", ValueCellProcessing.replaceNameSpaceEx(getUri()));
-		row.put("a", ValueCellProcessing.replaceNameSpaceEx(typeUri));
+		row.put("hasURI", URIUtils.replaceNameSpaceEx(getUri()));
+		row.put("a", URIUtils.replaceNameSpaceEx(typeUri));
 		row.put("rdfs:label", getLabel());
 		row.put("rdfs:comment", getComment());
 		rows.add(row);

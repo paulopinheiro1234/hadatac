@@ -43,7 +43,7 @@ import org.hadatac.entity.pojo.UserGroup;
 import org.hadatac.metadata.loader.PermissionsContext;
 import org.hadatac.metadata.loader.RDFContext;
 import org.hadatac.metadata.loader.SpreadsheetProcessing;
-import org.hadatac.metadata.loader.ValueCellProcessing;
+import org.hadatac.metadata.loader.URIUtils;
 import org.hadatac.utils.Collections;
 import org.hadatac.utils.Feedback;
 import org.hadatac.utils.NameSpaces;
@@ -471,12 +471,12 @@ public class UserManagement extends Controller {
 		}
 		ttl = ttl + "\n\n";
 		
-		ValueCellProcessing.validateNameSpace("hasURI");
-		ttl = ttl + ValueCellProcessing.execCellValue(uri, "hasURI");
+		URIUtils.validateNameSpace("hasURI");
+		ttl = ttl + URIUtils.execCellValue(uri, "hasURI");
 		for(String key : pred_value_map.keySet()){
 			String value = pred_value_map.get(key);
-			ValueCellProcessing.validateNameSpace(key);
-			ttl = ttl + ValueCellProcessing.execCellValue(value, key);
+			URIUtils.validateNameSpace(key);
+			ttl = ttl + URIUtils.execCellValue(value, key);
 			ttl = ttl + "\n";
 		}
 		System.out.println(ttl);

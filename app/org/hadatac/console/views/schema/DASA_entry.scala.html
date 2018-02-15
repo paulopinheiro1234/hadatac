@@ -3,9 +3,9 @@
 @import java.net._
 @import org.hadatac.utils._
 @import org.hadatac.entity.pojo.DataAcquisitionSchema
-@import org.hadatac.metadata.loader.ValueCellProcessing
+@import org.hadatac.metadata.loader.URIUtils
 
-@if(DataAcquisitionSchema.METADASA.contains(ValueCellProcessing.replaceNameSpaceEx(dasa.getAttribute()))){
+@if(DataAcquisitionSchema.METADASA.contains(URIUtils.replaceNameSpaceEx(dasa.getAttribute()))){
   <tr bgcolor='#FCEBDD'>
 } else {
   <tr>

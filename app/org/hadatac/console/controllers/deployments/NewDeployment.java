@@ -22,7 +22,7 @@ import org.hadatac.entity.pojo.Detector;
 import org.hadatac.entity.pojo.Instrument;
 import org.hadatac.entity.pojo.Platform;
 import org.hadatac.entity.pojo.TriggeringEvent;
-import org.hadatac.metadata.loader.ValueCellProcessing;
+import org.hadatac.metadata.loader.URIUtils;
 import org.labkey.remoteapi.CommandException;
 
 import be.objectify.deadbolt.java.actions.Group;
@@ -114,7 +114,7 @@ public class NewDeployment extends Controller {
 		}
 
 		String deploymentUri = data.getUri();
-		deploymentUri = ValueCellProcessing.replacePrefixEx(deploymentUri);
+		deploymentUri = URIUtils.replacePrefixEx(deploymentUri);
 		Deployment deployment = DataFactory.createDeployment(deploymentUri, data.getPlatform(), 
 				data.getInstrument(), data.getDetectors(), dateString, data.getType());
 
@@ -168,7 +168,7 @@ public class NewDeployment extends Controller {
 				return badRequest("Failed to insert Deployment!\n"
 						+ "Error Message: No URI for for DA");
 			}
-			dataAcquisitionUri = ValueCellProcessing.replacePrefixEx(dataAcquisitionUri);
+			dataAcquisitionUri = URIUtils.replacePrefixEx(dataAcquisitionUri);
 			String param = data.getInitialParameter();
 			System.out.println("NewDeployment: Creating new DA : [" + dataAcquisitionUri + "]");
 			DataAcquisition dataAcquisition = DataFactory.createDataAcquisition(

@@ -22,7 +22,7 @@ import org.hadatac.utils.NameSpaces;
 
 import com.typesafe.config.ConfigFactory;
 
-import org.hadatac.metadata.loader.ValueCellProcessing;
+import org.hadatac.metadata.loader.URIUtils;
 
 public class ObjectCollectionType extends HADatAcClass implements Comparable<ObjectCollectionType> {
 
@@ -127,11 +127,11 @@ public class ObjectCollectionType extends HADatAcClass implements Comparable<Obj
 				objectCollectionType.setLabel(object.asLiteral().getString());
 			} else if (statement.getPredicate().getURI().equals("http://www.w3.org/2000/01/rdf-schema#subClassOf")) {
 				objectCollectionType.setSuperUri(object.asResource().getURI());
-			} else if (statement.getPredicate().getURI().equals(ValueCellProcessing.replacePrefixEx("hasco:hasStudyObjectType"))) {
+			} else if (statement.getPredicate().getURI().equals(URIUtils.replacePrefixEx("hasco:hasStudyObjectType"))) {
 				objectCollectionType.setStudyObjectTypeUri(object.asResource().getURI());
-			} else if (statement.getPredicate().getURI().equals(ValueCellProcessing.replacePrefixEx("hasco:hasAcronym"))) {
+			} else if (statement.getPredicate().getURI().equals(URIUtils.replacePrefixEx("hasco:hasAcronym"))) {
 				objectCollectionType.setAcronym(object.asLiteral().getString());
-			} else if (statement.getPredicate().getURI().equals(ValueCellProcessing.replacePrefixEx("hasco:hasStudyObjectType"))) {
+			} else if (statement.getPredicate().getURI().equals(URIUtils.replacePrefixEx("hasco:hasStudyObjectType"))) {
 				objectCollectionType.setLabelFragment(object.asLiteral().getString());
 			}
 		}

@@ -18,7 +18,7 @@ import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Statement;
 import org.apache.jena.rdf.model.StmtIterator;
-import org.hadatac.metadata.loader.ValueCellProcessing;
+import org.hadatac.metadata.loader.URIUtils;
 import org.hadatac.utils.Collections;
 import org.hadatac.utils.NameSpaces;
 
@@ -80,7 +80,7 @@ public class Attribute extends HADatAcClass implements Comparable<Attribute> {
 				if (null != soln.getResource("codeClass")) {
 					String classUri = soln.getResource("codeClass").toString();
 					if (classUri.length() != 0) {
-						return ValueCellProcessing.replacePrefixEx(classUri);
+						return URIUtils.replacePrefixEx(classUri);
 					}
 				}
 			} catch (Exception e1) {

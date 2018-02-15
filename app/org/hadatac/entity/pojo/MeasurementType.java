@@ -15,7 +15,7 @@ import org.apache.jena.query.ResultSetRewindable;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdf.model.ResourceFactory;
-import org.hadatac.metadata.loader.ValueCellProcessing;
+import org.hadatac.metadata.loader.URIUtils;
 import org.hadatac.utils.NameSpaces;
 
 public class MeasurementType {
@@ -238,15 +238,15 @@ public class MeasurementType {
 			measurementType.setCharacteristicUri(soln.getResource("char").getURI());
 			measurementType.setUnitUri(soln.getResource("unit").getURI());
 			measurementType.setValueColumn(soln.getLiteral("column").getInt());
-			if(measurementType.getCharacteristicUri().equals(ValueCellProcessing.replacePrefixEx("sio:TimeStamp"))){
+			if(measurementType.getCharacteristicUri().equals(URIUtils.replacePrefixEx("sio:TimeStamp"))){
 				measurementType.setTimestampColumn(soln.getLiteral("column").getInt());
 				System.out.println("TimeStampColumn: " + soln.getLiteral("column").getInt());
 			}
-			if(measurementType.getCharacteristicUri().equals(ValueCellProcessing.replacePrefixEx("sio:TimeInstant"))){
+			if(measurementType.getCharacteristicUri().equals(URIUtils.replacePrefixEx("sio:TimeInstant"))){
 				measurementType.setTimeInstantColumn(soln.getLiteral("column").getInt());
 				System.out.println("TimeInstantColumn: " + soln.getLiteral("column").getInt());
 			}
-			if(measurementType.getCharacteristicUri().equals(ValueCellProcessing.replacePrefixEx("hasco:originalID"))){
+			if(measurementType.getCharacteristicUri().equals(URIUtils.replacePrefixEx("hasco:originalID"))){
 				measurementType.setIdColumn(soln.getLiteral("column").getInt());
 				System.out.println("IdColumn: " + measurementType.getIdColumn());
 			}

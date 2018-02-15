@@ -80,7 +80,7 @@ public class TripleProcessing {
 		// Prints all identified predicates as a turtle comment 
 		shttl = shttl + "# properties: ";
 		for (String pred : predicates) {
-			ValueCellProcessing.validateNameSpace(pred);
+			URIUtils.validateNameSpace(pred);
 			shttl = shttl + "[" + pred + "] ";
 		}
 		shttl = shttl + "\n";
@@ -111,13 +111,13 @@ public class TripleProcessing {
 			String predicate = triple.pred.trim();
 			
 			if(!bListSubject){
-				clttl = clttl + ValueCellProcessing.processSubjectValue(triple.sub.trim());
+				clttl = clttl + URIUtils.processSubjectValue(triple.sub.trim());
 				bListSubject = true;
 			}
 			
 			// cell has object value
 			clttl = clttl + "   " + predicate + " ";
-			if (ValueCellProcessing.isObjectSet(cellValue)) {
+			if (URIUtils.isObjectSet(cellValue)) {
 				StringTokenizer st;
 				if(cellValue.contains("&")){
 					st = new StringTokenizer(cellValue, "&");
@@ -126,14 +126,14 @@ public class TripleProcessing {
 					st = new StringTokenizer(cellValue, ",");
 				}
 				while (st.hasMoreTokens()) {
-					clttl = clttl + ValueCellProcessing.processObjectValue(st.nextToken().trim());
+					clttl = clttl + URIUtils.processObjectValue(st.nextToken().trim());
 					if (st.hasMoreTokens()){
 						clttl = clttl + ", ";
 					}
 				}
 			}
 			else{
-				clttl = clttl + ValueCellProcessing.processObjectValue(cellValue);
+				clttl = clttl + URIUtils.processObjectValue(cellValue);
 			}
 			if(iterTriple.hasNext()){
 				clttl = clttl + " ; \n";
@@ -257,7 +257,7 @@ public class TripleProcessing {
 		HashSet<String> visitedNodes = new HashSet<String>();
 		
 		Selector selector = new SimpleSelector(
-				refModel.getResource(ValueCellProcessing.replacePrefixEx(studyUri)), (Property)null, (RDFNode)null);
+				refModel.getResource(URIUtils.replacePrefixEx(studyUri)), (Property)null, (RDFNode)null);
 		StmtIterator iter = refModel.listStatements(selector);
 		if (iter.hasNext()) {
 			Resource studyNode = iter.nextStatement().getSubject();
@@ -265,7 +265,7 @@ public class TripleProcessing {
 		}
 		
 		selector = new SimpleSelector(
-				null, (Property)null, refModel.getResource(ValueCellProcessing.replacePrefixEx(studyUri)));
+				null, (Property)null, refModel.getResource(URIUtils.replacePrefixEx(studyUri)));
 		iter = refModel.listStatements(selector);
 		if (iter.hasNext()) {
 			RDFNode studyNode = iter.nextStatement().getObject();
@@ -343,7 +343,7 @@ public class TripleProcessing {
 			for (String uri : sheet.keySet()) {
 				System.out.println(String.format("Processing data acquisition %s", uri));
 				
-				String dataAcquisitionUri = ValueCellProcessing.convertToWholeURI(uri);
+				String dataAcquisitionUri = URIUtils.convertToWholeURI(uri);
 				DataAcquisition dataAcquisition = DataAcquisition.findByUri(dataAcquisitionUri);
 				if (null == dataAcquisition) {
 					dataAcquisition = new DataAcquisition();
@@ -370,7 +370,7 @@ public class TripleProcessing {
 						}
 						while (st.hasMoreTokens()) {
 							dataAcquisition.addTypeUri(
-									ValueCellProcessing.convertToWholeURI(st.nextToken().trim()));
+									URIUtils.convertToWholeURI(st.nextToken().trim()));
 						}
 					}
 					else if (predicate.equals("prov:wasAssociatedWith")) {
@@ -383,7 +383,7 @@ public class TripleProcessing {
 						}
 						while (st.hasMoreTokens()) {
 							dataAcquisition.addAssociatedUri(
-									ValueCellProcessing.convertToWholeURI(st.nextToken().trim()));
+									URIUtils.convertToWholeURI(st.nextToken().trim()));
 						}
 					}
 					else if (predicate.equals("rdfs:label")) {
@@ -412,7 +412,7 @@ public class TripleProcessing {
 						dataAcquisition.setParameter(cellValue);
 					}
 					else if (predicate.equals("hasco:isDataAcquisitionOf")) {
-						String studyUri = ValueCellProcessing.convertToWholeURI(cellValue);
+						String studyUri = URIUtils.convertToWholeURI(cellValue);
 						if (!target_study_uri.equals("")) {
 							if (!studyUri.equals(target_study_uri)) {
 								bCanSave = false;
@@ -425,13 +425,13 @@ public class TripleProcessing {
 						dataAcquisition.setTriggeringEvent(dataAcquisition.getTriggeringEventByName(cellValue));
 					}
 					else if (predicate.equals("hasco:hasMethod")) {
-						dataAcquisition.setMethodUri(ValueCellProcessing.convertToWholeURI(cellValue));
+						dataAcquisition.setMethodUri(URIUtils.convertToWholeURI(cellValue));
 					}
 					else if (predicate.equals("hasco:hasSchema")) {
-						dataAcquisition.setSchemaUri(ValueCellProcessing.convertToWholeURI(cellValue));
+						dataAcquisition.setSchemaUri(URIUtils.convertToWholeURI(cellValue));
 					}
 					else if (predicate.equals("hasco:hasDeployment")) {
-						String deployment_uri = ValueCellProcessing.convertToWholeURI(cellValue);
+						String deployment_uri = URIUtils.convertToWholeURI(cellValue);
 						dataAcquisition.setDeploymentUri(deployment_uri);
 						
 						Deployment deployment = Deployment.find(deployment_uri);

@@ -18,7 +18,7 @@ import org.hadatac.console.views.html.studies.*;
 import org.hadatac.console.views.html.triplestore.syncLabkey;
 import org.hadatac.entity.pojo.Study;
 import org.hadatac.metadata.loader.TripleProcessing;
-import org.hadatac.metadata.loader.ValueCellProcessing;
+import org.hadatac.metadata.loader.URIUtils;
 import org.hadatac.utils.Collections;
 import org.hadatac.utils.ConfigProp;
 import org.hadatac.utils.Feedback;
@@ -65,7 +65,7 @@ public class RefreshStudy extends Controller {
     				Collections.getCollectionsName(Collections.METADATA_GRAPH));
     		accessor.add(model);
     		
-    		Model refModel = Study.findModel(ValueCellProcessing.replaceNameSpaceEx(study_uri));
+    		Model refModel = Study.findModel(URIUtils.replaceNameSpaceEx(study_uri));
     		
     		results += Feedback.println(Feedback.WEB, "Imported Triples: ");
     		StmtIterator iter = model.listStatements();
@@ -79,7 +79,7 @@ public class RefreshStudy extends Controller {
     		}
     		
     		TripleProcessing.importDataAcquisition(site, session().get("LabKeyUserName"), 
-    				session().get("LabKeyPassword"), path, ValueCellProcessing.replacePrefixEx(study_uri));
+    				session().get("LabKeyPassword"), path, URIUtils.replacePrefixEx(study_uri));
     		
     	} catch (CommandException e) {
     		if (e.getMessage().equals("Unauthorized")) {

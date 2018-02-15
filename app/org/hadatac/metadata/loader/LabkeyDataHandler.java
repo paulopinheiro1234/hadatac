@@ -213,7 +213,7 @@ public class LabkeyDataHandler {
 				prevTable = table;
 			}
 		}
-		query += " WHERE hasURI = \'" + ValueCellProcessing.replaceNameSpaceEx(uri) + "\'";
+		query += " WHERE hasURI = \'" + URIUtils.replaceNameSpaceEx(uri) + "\'";
 		System.out.println("\nquery: " + query);
 		cmd.setSql(query);
 		cmd.setTimeout(0);
@@ -228,7 +228,7 @@ public class LabkeyDataHandler {
 					}
 				}
 				String sub = row.get(pri_key).toString();
-				if (!replaceIrregularCharacters(sub).equals(ValueCellProcessing.replaceNameSpaceEx(uri))) {
+				if (!replaceIrregularCharacters(sub).equals(URIUtils.replaceNameSpaceEx(uri))) {
 					continue;
 				}
 				
@@ -237,7 +237,7 @@ public class LabkeyDataHandler {
 					if (((String)pred).equals(pri_key)) {
 						continue;
 					}
-					Property predicate = model.createProperty(ValueCellProcessing.replacePrefixEx(
+					Property predicate = model.createProperty(URIUtils.replacePrefixEx(
 							replaceIrregularCharacters(pred.toString())));
 					
 					if (null == row.get(pred)) {
@@ -245,7 +245,7 @@ public class LabkeyDataHandler {
 					}
 					String cellValue = row.get(pred).toString();
 					System.out.println("cellValue: " + cellValue);
-					if (ValueCellProcessing.isObjectSet(cellValue)) {
+					if (URIUtils.isObjectSet(cellValue)) {
 						System.out.println("cellValue is Object Set");
 						StringTokenizer st;
 						if (cellValue.contains("&")) {
@@ -255,15 +255,15 @@ public class LabkeyDataHandler {
 							st = new StringTokenizer(cellValue, ",");
 						}
 						while (st.hasMoreTokens()) {
-							Resource object = model.createResource(ValueCellProcessing.replacePrefixEx(
+							Resource object = model.createResource(URIUtils.replacePrefixEx(
 									replaceIrregularCharacters(st.nextToken().trim())));
 							model.add(subject, predicate, object);
 							selectInfoFromTables(object.getURI(), model);
 						}
 					}
-					else if (ValueCellProcessing.isAbbreviatedURI(cellValue)) {
+					else if (URIUtils.isAbbreviatedURI(cellValue)) {
 						System.out.println("cellValue is Resource");
-						Resource object = model.createResource(ValueCellProcessing.replacePrefixEx(cellValue));
+						Resource object = model.createResource(URIUtils.replacePrefixEx(cellValue));
 						model.add(subject, predicate, object);
 						selectInfoFromTables(object.getURI(), model);
 					}

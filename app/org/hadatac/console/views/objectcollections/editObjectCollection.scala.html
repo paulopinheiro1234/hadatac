@@ -12,7 +12,7 @@
 @import org.hadatac.console.views.html._
 @import org.hadatac.console.controllers._
 @import org.hadatac.entity.pojo.Agent
-@import org.hadatac.metadata.loader.ValueCellProcessing
+@import org.hadatac.metadata.loader.URIUtils
 @import play._
 @import com.typesafe.config.ConfigFactory
 
@@ -69,7 +69,7 @@
 	<div class="form-group">
 		<label>URI:</label>
 		<input type="text" class="form-control col-sm-6" name="newUri" id="newUri" 
-		       value="@ValueCellProcessing.replaceNameSpaceEx(oc.getUri())" onchange="checkform()" readonly >
+		       value="@URIUtils.replaceNameSpaceEx(oc.getUri())" onchange="checkform()" readonly >
  	</div>
  	<div class="form-group">
 		<label>Short Name:</label>

@@ -26,7 +26,7 @@ import org.hadatac.metadata.loader.LabkeyDataHandler;
 import org.hadatac.entity.pojo.DataAcquisitionSchemaObject;
 import org.hadatac.entity.pojo.DataAcquisitionSchemaEvent;
 import org.hadatac.entity.pojo.DataAcquisitionSchema;
-import org.hadatac.metadata.loader.ValueCellProcessing;
+import org.hadatac.metadata.loader.URIUtils;
 import org.labkey.remoteapi.CommandException;
 import be.objectify.deadbolt.java.actions.Group;
 import be.objectify.deadbolt.java.actions.Restrict;
@@ -64,6 +64,7 @@ public class DataAcquisitionSchemaAttribute {
 	private String unitLabel;
 	private String daseUri;
 	private String dasoUri;
+	private String inRelationToUri;
 	private boolean isMeta;
 	private DataAcquisitionSchema das;
 
@@ -123,7 +124,7 @@ public class DataAcquisitionSchemaAttribute {
 	}
 
 	public String getUriNamespace() {
-		return ValueCellProcessing.replaceNameSpaceEx(uri.replace("<","").replace(">",""));
+		return URIUtils.replaceNameSpaceEx(uri.replace("<","").replace(">",""));
 	}
 
 	public void setUri(String uri) {
@@ -198,7 +199,7 @@ public class DataAcquisitionSchemaAttribute {
 		if (entity == "") {
 			return "";
 		}
-		return ValueCellProcessing.replaceNameSpaceEx(entity.replace("<","").replace(">",""));
+		return URIUtils.replaceNameSpaceEx(entity.replace("<","").replace(">",""));
 	}
 
 	public void setEntity(String entity) {
@@ -212,7 +213,7 @@ public class DataAcquisitionSchemaAttribute {
 
 	public String getEntityLabel() {
 		if (entityLabel.equals("")) {
-			return ValueCellProcessing.replaceNameSpaceEx(entity);
+			return URIUtils.replaceNameSpaceEx(entity);
 		}
 		return entityLabel;
 	}
@@ -240,7 +241,7 @@ public class DataAcquisitionSchemaAttribute {
 			if (entity == null || entity.equals("")) {
 				return "";
 			}
-			annotation = ValueCellProcessing.replaceNameSpaceEx(entity);
+			annotation = URIUtils.replaceNameSpaceEx(entity);
 		} else {
 			annotation = entityLabel;
 		}
@@ -262,7 +263,7 @@ public class DataAcquisitionSchemaAttribute {
 		if (attribute == "") {
 			return "";
 		}
-		return ValueCellProcessing.replaceNameSpaceEx(attribute.replace("<","").replace(">",""));
+		return URIUtils.replaceNameSpaceEx(attribute.replace("<","").replace(">",""));
 	}
 
 	public void setAttribute(String attribute) {
@@ -272,12 +273,12 @@ public class DataAcquisitionSchemaAttribute {
 		} else {
 			this.attributeLabel = FirstLabel.getLabel(attribute);
 		}
-		this.isMeta = (DataAcquisitionSchema.METADASA.contains(ValueCellProcessing.replaceNameSpaceEx(attribute)));
+		this.isMeta = (DataAcquisitionSchema.METADASA.contains(URIUtils.replaceNameSpaceEx(attribute)));
 	}
 
 	public String getAttributeLabel() {
 		if (attributeLabel.equals("")) {
-			return ValueCellProcessing.replaceNameSpaceEx(attribute);
+			return URIUtils.replaceNameSpaceEx(attribute);
 		}
 		return attributeLabel;
 	}
@@ -288,7 +289,7 @@ public class DataAcquisitionSchemaAttribute {
 			if (attribute == null || attribute.equals("")) {
 				return "";
 			}
-			annotation = ValueCellProcessing.replaceNameSpaceEx(attribute);
+			annotation = URIUtils.replaceNameSpaceEx(attribute);
 		} else {
 			annotation = attributeLabel;
 		}
@@ -296,6 +297,14 @@ public class DataAcquisitionSchemaAttribute {
 			annotation += " [" + getAttributeNamespace() + "]";
 		} 
 		return annotation;
+	}
+	
+	public String getInRelationToUri() {
+		return inRelationToUri;
+	}
+	
+	public void setInRelationToUri(String inRelationToUri) {
+		this.inRelationToUri = inRelationToUri;
 	}
 
 	public String getUnit() {
@@ -310,7 +319,7 @@ public class DataAcquisitionSchemaAttribute {
 		if (unit == "") {
 			return "";
 		}
-		return ValueCellProcessing.replaceNameSpaceEx(unit.replace("<","").replace(">",""));
+		return URIUtils.replaceNameSpaceEx(unit.replace("<","").replace(">",""));
 	}
 
 	public void setUnit(String unit) {
@@ -324,7 +333,7 @@ public class DataAcquisitionSchemaAttribute {
 
 	public String getUnitLabel() {
 		if (unitLabel.equals("")) {
-			return ValueCellProcessing.replaceNameSpaceEx(unit);
+			return URIUtils.replaceNameSpaceEx(unit);
 		}
 		return unitLabel;
 	}
@@ -335,7 +344,7 @@ public class DataAcquisitionSchemaAttribute {
 			if (unit == null || unit.equals("")) {
 				return "";
 			}
-			annotation = ValueCellProcessing.replaceNameSpaceEx(unit);
+			annotation = URIUtils.replaceNameSpaceEx(unit);
 		} else {
 			annotation = unitLabel;
 		}
@@ -364,11 +373,11 @@ public class DataAcquisitionSchemaAttribute {
 		if (dasoUri == null || dasoUri.equals("")) {
 			return "";
 		}
-		return ValueCellProcessing.replaceNameSpaceEx(dasoUri.replace("<","").replace(">",""));
+		return URIUtils.replaceNameSpaceEx(dasoUri.replace("<","").replace(">",""));
 	}
 
 	public String getObjectViewLabel() {
-		if (attribute.equals(ValueCellProcessing.replaceNameSpaceEx("hasco:originalID"))) {
+		if (attribute.equals(URIUtils.replaceNameSpaceEx("hasco:originalID"))) {
 			return "[DefaultObject]";
 		}
 		if (isMeta) {
@@ -407,7 +416,7 @@ public class DataAcquisitionSchemaAttribute {
 		if (daseUri == null || daseUri.equals("")) {
 			return "";
 		}
-		return ValueCellProcessing.replaceNameSpaceEx(daseUri.replace("<","").replace(">",""));
+		return URIUtils.replaceNameSpaceEx(daseUri.replace("<","").replace(">",""));
 	}
 
 	public String getEventViewLabel() {
@@ -436,7 +445,7 @@ public class DataAcquisitionSchemaAttribute {
 		}
 		String queryString = NameSpaces.getInstance().printSparqlNameSpaceList() + 
 				"SELECT ?partOfSchema ?hasEntity ?hasAttribute " + 
-				" ?hasUnit ?hasDASO ?hasDASE ?hasSource ?isPIConfirmed WHERE { " + 
+				" ?hasUnit ?hasDASO ?hasDASE ?hasSource ?isPIConfirmed ?inRelationTo WHERE { " + 
 				"    " + dasa_uri + " a hasco:DASchemaAttribute . " + 
 				"    " + dasa_uri + " hasco:partOfSchema ?partOfSchema .  " + 
 				"    OPTIONAL { " + dasa_uri + " hasco:hasEntity ?hasEntity } . " + 
@@ -446,6 +455,7 @@ public class DataAcquisitionSchemaAttribute {
 				"    OPTIONAL { " + dasa_uri + " hasco:isAttributeOf ?hasDASO } . " + 
 				"    OPTIONAL { " + dasa_uri + " hasco:hasSource ?hasSource } . " + 
 				"    OPTIONAL { " + dasa_uri + " hasco:isPIConfirmed ?isPIConfirmed } . " + 
+				"    OPTIONAL { " + dasa_uri + " sio:inRelationTo ?inRelationTo } . " + 
 				"}";
 		Query query = QueryFactory.create(queryString);
 
@@ -468,6 +478,7 @@ public class DataAcquisitionSchemaAttribute {
 		String unitStr = "";
 		String dasoUriStr = "";
 		String daseUriStr = "";
+		String inRelationToUri = "";
 
 		while (resultsrw.hasNext()) {
 			QuerySolution soln = resultsrw.next();
@@ -522,6 +533,10 @@ public class DataAcquisitionSchemaAttribute {
 				} catch (Exception e1) {
 					daseUriStr = "";
 				}
+				
+				if (soln.get("inRelationTo") != null) {
+					inRelationToUri = soln.get("inRelationTo").toString();
+				}
 
 				dasa = new DataAcquisitionSchemaAttribute(dasa_uri,
 						localNameStr,
@@ -533,6 +548,8 @@ public class DataAcquisitionSchemaAttribute {
 						unitStr,
 						daseUriStr,
 						dasoUriStr);
+				
+				dasa.setInRelationToUri(inRelationToUri);
 			}
 
 		}
@@ -644,7 +661,7 @@ public class DataAcquisitionSchemaAttribute {
 
     }// /findByStudy()
 
-	public static List<DataAcquisitionSchemaAttribute> findBySchema (String schemaUri) {
+	public static List<DataAcquisitionSchemaAttribute> findBySchema(String schemaUri) {
 		System.out.println("Looking for data acquisition schema attributes for " + schemaUri);
 		if (schemaUri.startsWith("http")) {
 			schemaUri = "<" + schemaUri + ">";
@@ -682,7 +699,8 @@ public class DataAcquisitionSchemaAttribute {
 						attributes.add(attr);
 					}
 				} catch (Exception e1) {
-					System.out.println("[ERROR] DataAcquisitionSchemaAttribute. URI: " + uriStr);
+					System.out.println("[ERROR] DataAcquisitionSchemaAttribute.findBySchema() URI: " + uriStr);
+					e1.printStackTrace();
 				}
 			}
 		}
@@ -752,17 +770,17 @@ public class DataAcquisitionSchemaAttribute {
 		LabkeyDataHandler loader = new LabkeyDataHandler(site, user_name, password, path);
 		List< Map<String, Object> > rows = new ArrayList< Map<String, Object> >();
 		Map<String, Object> row = new HashMap<String, Object>();
-		row.put("hasURI", ValueCellProcessing.replaceNameSpaceEx(getUri()));
+		row.put("hasURI", URIUtils.replaceNameSpaceEx(getUri()));
 		row.put("a", "hasco:DASchemaAttribute");
 		row.put("rdfs:label", getLabel());
 		row.put("rdfs:comment", getLabel());
-		row.put("hasco:partOfSchema", ValueCellProcessing.replaceNameSpaceEx(getPartOfSchema()));
+		row.put("hasco:partOfSchema", URIUtils.replaceNameSpaceEx(getPartOfSchema()));
 		row.put("hasco:hasEntity", this.getEntity());
 		row.put("hasco:hasAttribute", this.getAttribute());
 		row.put("hasco:hasUnit", this.getUnit());
-		row.put("hasco:hasEvent", ValueCellProcessing.replaceNameSpaceEx(daseUri));
+		row.put("hasco:hasEvent", URIUtils.replaceNameSpaceEx(daseUri));
 		row.put("hasco:hasSource", "");
-		row.put("hasco:isAttributeOf", ValueCellProcessing.replaceNameSpaceEx(dasoUri));
+		row.put("hasco:isAttributeOf", URIUtils.replaceNameSpaceEx(dasoUri));
 		row.put("hasco:isVirtual", "");
 		row.put("hasco:isPIConfirmed", "false");
 		rows.add(row);
@@ -786,11 +804,8 @@ public class DataAcquisitionSchemaAttribute {
 		LabkeyDataHandler loader = new LabkeyDataHandler(site, user_name, password, path);
 		List< Map<String, Object> > rows = new ArrayList< Map<String, Object> >();
 		Map<String, Object> row = new HashMap<String, Object>();
-		row.put("hasURI", ValueCellProcessing.replaceNameSpaceEx(getUri().replace("<","").replace(">","")));
+		row.put("hasURI", URIUtils.replaceNameSpaceEx(getUri().replace("<","").replace(">","")));
 		rows.add(row);
-		for (Map<String,Object> str : rows) {
-			System.out.println("deleting DASA " + row.get("hasURI"));
-		}
 		return loader.deleteRows("DASchemaAttribute", rows);
 	}
 

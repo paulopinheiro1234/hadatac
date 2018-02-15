@@ -12,7 +12,7 @@ import org.apache.jena.query.ResultSetFactory;
 import org.apache.jena.query.ResultSetRewindable;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
-import org.hadatac.metadata.loader.ValueCellProcessing;
+import org.hadatac.metadata.loader.URIUtils;
 import org.hadatac.utils.Collections;
 import org.hadatac.utils.NameSpaces;
 
@@ -92,7 +92,7 @@ public class Subject extends StudyObject {
 	}
 
 	public static String checkObjectUri(String obj_uri, String attr_uri) {
-		attr_uri = ValueCellProcessing.replacePrefixEx(attr_uri);
+		attr_uri = URIUtils.replacePrefixEx(attr_uri);
 		System.out.println("attr_uri: " + attr_uri);
 		String objUri = obj_uri;
 		String queryString = NameSpaces.getInstance().printSparqlNameSpaceList()
@@ -124,10 +124,10 @@ public class Subject extends StudyObject {
 							Collections.getCollectionsName(Collections.METADATA_GRAPH));
 					model.add(model.createResource(motherUri), 
 							model.createProperty("rdf:type"),
-							model.createResource(ValueCellProcessing.replacePrefixEx("sio:Human")));
+							model.createResource(URIUtils.replacePrefixEx("sio:Human")));
 
 					model.add(model.createResource(motherUri), 
-							model.createProperty(ValueCellProcessing.replacePrefixEx("chear:Mother")),
+							model.createProperty(URIUtils.replacePrefixEx("chear:Mother")),
 							model.createResource(obj_uri));
 
 					accessor.add(model);

@@ -22,7 +22,7 @@ import org.hadatac.utils.NameSpaces;
 import org.hadatac.utils.FirstLabel;
 import org.hadatac.utils.ConfigProp;
 import org.hadatac.metadata.loader.LabkeyDataHandler;
-import org.hadatac.metadata.loader.ValueCellProcessing;
+import org.hadatac.metadata.loader.URIUtils;
 import org.labkey.remoteapi.CommandException;
 import be.objectify.deadbolt.java.actions.Group;
 import be.objectify.deadbolt.java.actions.Restrict;
@@ -67,7 +67,7 @@ public class DataAcquisitionSchemaEvent {
 	}
 
 	public String getUriNamespace() {
-		return ValueCellProcessing.replaceNameSpaceEx(uri);
+		return URIUtils.replaceNameSpaceEx(uri);
 	}
 
 	public String getLabel() {
@@ -100,12 +100,12 @@ public class DataAcquisitionSchemaEvent {
 	}
 
 	public String getEntityNamespace() {
-		return ValueCellProcessing.replaceNameSpaceEx(entity);
+		return URIUtils.replaceNameSpaceEx(entity);
 	}
 
 	public String getEntityLabel() {
 		if (entityLabel.equals("")) {
-			return ValueCellProcessing.replaceNameSpaceEx(entity);
+			return URIUtils.replaceNameSpaceEx(entity);
 		}
 		return entityLabel;
 	}
@@ -122,7 +122,7 @@ public class DataAcquisitionSchemaEvent {
 		if (unit == "") {
 			return "";
 		}
-		return ValueCellProcessing.replaceNameSpaceEx(unit.replace("<","").replace(">",""));
+		return URIUtils.replaceNameSpaceEx(unit.replace("<","").replace(">",""));
 	}
 
 	public void setUnit(String unit) {
@@ -136,7 +136,7 @@ public class DataAcquisitionSchemaEvent {
 
 	public String getUnitLabel() {
 		if (unitLabel.equals("")) {
-			return ValueCellProcessing.replaceNameSpaceEx(unit);
+			return URIUtils.replaceNameSpaceEx(unit);
 		}
 		return unitLabel;
 	}
@@ -147,7 +147,7 @@ public class DataAcquisitionSchemaEvent {
 			if (unit == null || unit.equals("")) {
 				return "";
 			}
-			annotation = ValueCellProcessing.replaceNameSpaceEx(unit);
+			annotation = URIUtils.replaceNameSpaceEx(unit);
 		} else {
 			annotation = unitLabel;
 		}
@@ -309,11 +309,11 @@ public class DataAcquisitionSchemaEvent {
 		LabkeyDataHandler loader = new LabkeyDataHandler(site, user_name, password, path);
 		List< Map<String, Object> > rows = new ArrayList< Map<String, Object> >();
 		Map<String, Object> row = new HashMap<String, Object>();
-		row.put("hasURI", ValueCellProcessing.replaceNameSpaceEx(getUri()));
+		row.put("hasURI", URIUtils.replaceNameSpaceEx(getUri()));
 		row.put("a", "hasco:DASchemaEvent");
 		row.put("rdfs:label", getLabel());
 		row.put("rdfs:comment", getLabel());
-		row.put("hasco:partOfSchema", ValueCellProcessing.replaceNameSpaceEx(getPartOfSchema()));
+		row.put("hasco:partOfSchema", URIUtils.replaceNameSpaceEx(getPartOfSchema()));
 		row.put("hasco:hasEntity", this.getEntity());
 		row.put("hasco:hasUnit", this.getUnit());
 		row.put("hasco:isVirtual", "");
@@ -339,7 +339,7 @@ public class DataAcquisitionSchemaEvent {
 		LabkeyDataHandler loader = new LabkeyDataHandler(site, user_name, password, path);
 		List< Map<String, Object> > rows = new ArrayList< Map<String, Object> >();
 		Map<String, Object> row = new HashMap<String, Object>();
-		row.put("hasURI", ValueCellProcessing.replaceNameSpaceEx(getUri().replace("<","").replace(">","")));
+		row.put("hasURI", URIUtils.replaceNameSpaceEx(getUri().replace("<","").replace(">","")));
 		rows.add(row);
 		for (Map<String,Object> str : rows) {
 			System.out.println("deleting DASE " + row.get("hasURI"));

@@ -11,7 +11,7 @@ import play.mvc.Result;
 
 import org.hadatac.console.views.html.metadataacquisition.*;
 import org.hadatac.entity.pojo.Measurement;
-import org.hadatac.metadata.loader.ValueCellProcessing;
+import org.hadatac.metadata.loader.URIUtils;
 import org.apache.jena.query.Query;
 import org.apache.jena.query.QueryExecution;
 import org.apache.jena.query.QueryExecutionFactory;
@@ -188,7 +188,7 @@ public class ViewStudy extends Controller {
 					values.add("Title: " + soln.get("studyDef").toString());
 				}
 				if(soln.contains("proj")){
-					values.add("Project: " + ValueCellProcessing.replaceNameSpaceEx(soln.get("proj").toString()));
+					values.add("Project: " + URIUtils.replaceNameSpaceEx(soln.get("proj").toString()));
 				}
 				if(soln.contains("studyComment")){
 					values.add("Comment: " + soln.get("studyComment").toString());
@@ -237,7 +237,7 @@ public class ViewStudy extends Controller {
 		//		values.add("Type: " + cellProc.replaceNameSpaceEx(soln.get("subjectType").toString()));
 		//		values.add("Cohort: " + soln.get("cohortLabel").toString());
 		//		values.add("Study: " + soln.get("studyLabel").toString());
-				subjectResult.put(ValueCellProcessing.replaceNameSpaceEx(soln.get("subjectUri").toString()) ,values);
+				subjectResult.put(URIUtils.replaceNameSpaceEx(soln.get("subjectUri").toString()) ,values);
 			}
 		} catch (QueryExceptionHTTP e) {
 			e.printStackTrace();
@@ -265,7 +265,7 @@ public class ViewStudy extends Controller {
 			
 			while (resultsrw.hasNext()) {
 				QuerySolution soln = resultsrw.next();
-				values.add(ValueCellProcessing.replaceNameSpaceEx(soln.get("si").toString()));	
+				values.add(URIUtils.replaceNameSpaceEx(soln.get("si").toString()));	
 			}
 		} catch (QueryExceptionHTTP e) {
 			e.printStackTrace();

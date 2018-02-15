@@ -15,7 +15,7 @@ import org.hadatac.entity.pojo.Deployment;
 import org.hadatac.entity.pojo.Measurement;
 import org.hadatac.entity.pojo.ObjectCollection;
 import org.hadatac.entity.pojo.TriggeringEvent;
-import org.hadatac.metadata.loader.ValueCellProcessing;
+import org.hadatac.metadata.loader.URIUtils;
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
 
@@ -114,8 +114,8 @@ public class DataAcquisitionGenerator extends BasicGenerator {
 			throw new Exception(String.format("Permission URI is not specified for Row %s!", row_number));
 		}
 
-		String deploymentUri = ValueCellProcessing.replacePrefixEx(kbPrefix + "DPL-" + getDataAcquisitionName(rec));
-		String schemaUri = ValueCellProcessing.replacePrefixEx(kbPrefix + "DAS-" + getDataDictionaryName(rec));
+		String deploymentUri = URIUtils.replacePrefixEx(kbPrefix + "DPL-" + getDataAcquisitionName(rec));
+		String schemaUri = URIUtils.replacePrefixEx(kbPrefix + "DAS-" + getDataDictionaryName(rec));
 		createDataAcquisition(row, ownerEmail, permissionUri, deploymentUri, isEpiData(rec));
 
 		return row;
@@ -127,18 +127,18 @@ public class DataAcquisitionGenerator extends BasicGenerator {
 			String deploymentUri,
 			boolean isEpiData) throws Exception {
 		DataAcquisition da = new DataAcquisition();
-		da.setUri(ValueCellProcessing.replacePrefixEx((String)row.get("hasURI")));
-		da.setLabel(ValueCellProcessing.replacePrefixEx((String)row.get("rdfs:label")));
-		da.setDeploymentUri(ValueCellProcessing.replacePrefixEx((String)row.get("hasco:hasDeployment")));
-		da.setMethodUri(ValueCellProcessing.replacePrefixEx((String)row.get("hasco:hasMethod")));
-		da.setStudyUri(ValueCellProcessing.replacePrefixEx((String)row.get("hasco:isDataAcquisitionOf")));
-		da.setSchemaUri(ValueCellProcessing.replacePrefixEx((String)row.get("hasco:hasSchema")));
+		da.setUri(URIUtils.replacePrefixEx((String)row.get("hasURI")));
+		da.setLabel(URIUtils.replacePrefixEx((String)row.get("rdfs:label")));
+		da.setDeploymentUri(URIUtils.replacePrefixEx((String)row.get("hasco:hasDeployment")));
+		da.setMethodUri(URIUtils.replacePrefixEx((String)row.get("hasco:hasMethod")));
+		da.setStudyUri(URIUtils.replacePrefixEx((String)row.get("hasco:isDataAcquisitionOf")));
+		da.setSchemaUri(URIUtils.replacePrefixEx((String)row.get("hasco:hasSchema")));
 		da.setTriggeringEvent(TriggeringEvent.INITIAL_DEPLOYMENT);
 		da.setNumberDataPoints(Measurement.getNumByDataAcquisition(da));
 		
 		for (ObjectCollection oc : ObjectCollection.findByStudyUri(da.getStudyUri())) {
-			if ((isEpiData && oc.getTypeUri().equals(ValueCellProcessing.replacePrefixEx("hasco:SubjectGroup")))
-					|| (!isEpiData && oc.getTypeUri().equals(ValueCellProcessing.replacePrefixEx("hasco:SampleCollection")))) {
+			if ((isEpiData && oc.getTypeUri().equals(URIUtils.replacePrefixEx("hasco:SubjectGroup")))
+					|| (!isEpiData && oc.getTypeUri().equals(URIUtils.replacePrefixEx("hasco:SampleCollection")))) {
 				da.setGlobalScopeUri(oc.getUri());
 				System.out.println("Set GlobalScopeUri to: " + oc.getUri());
 				break;

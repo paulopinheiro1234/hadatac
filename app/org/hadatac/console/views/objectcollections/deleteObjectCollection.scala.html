@@ -8,7 +8,7 @@
 @import org.hadatac.console.views.html._
 @import org.hadatac.console.views.html.schema._
 @import org.hadatac.console.controllers.schema._
-@import org.hadatac.metadata.loader.ValueCellProcessing
+@import org.hadatac.metadata.loader.URIUtils
 
 @main("Delete Object Collection") {
 
@@ -18,10 +18,10 @@
         <form class="form-horizontal" method="post" action="@org.hadatac.console.controllers.objectcollections.routes.DeleteOC.processForm(filename, da_uri, std_uri, oc.getUri())">
 
         <div class="form-group">
-           <label>URI : </label> @ValueCellProcessing.replaceNameSpaceEx(oc.getUri()) <br>         
+           <label>URI : </label> @URIUtils.replaceNameSpaceEx(oc.getUri()) <br>         
            <label>Type : </label> @oc.getObjectCollectionType().getLabel() <br>         
            <label>Name : </label> @oc.getLabel() <br>         
-           <label>Study : </label> @ValueCellProcessing.replaceNameSpaceEx(oc.getStudyUri()) <br>        
+           <label>Study : </label> @URIUtils.replaceNameSpaceEx(oc.getStudyUri()) <br>        
         </div>
      
         <div class="form-group" class="col-sm-6 col-offset-3">

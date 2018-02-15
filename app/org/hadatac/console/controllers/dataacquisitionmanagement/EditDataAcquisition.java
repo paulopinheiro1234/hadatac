@@ -25,7 +25,7 @@ import org.hadatac.entity.pojo.DataAcquisitionSchema;
 import org.hadatac.entity.pojo.TriggeringEvent;
 import org.hadatac.entity.pojo.User;
 import org.hadatac.entity.pojo.UserGroup;
-import org.hadatac.metadata.loader.ValueCellProcessing;
+import org.hadatac.metadata.loader.URIUtils;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 import org.labkey.remoteapi.CommandException;
@@ -79,7 +79,7 @@ public class EditDataAcquisition extends Controller {
     		Map<String, String> mapSchemas = new HashMap<String, String>();
     		List<DataAcquisitionSchema> schemas = DataAcquisitionSchema.findAll();
     		for (DataAcquisitionSchema schema : schemas) {
-    			mapSchemas.put(schema.getUri(), ValueCellProcessing.replaceNameSpaceEx(schema.getUri()));
+    			mapSchemas.put(schema.getUri(), URIUtils.replaceNameSpaceEx(schema.getUri()));
     		}
     		
 		return ok(editDataAcquisition.render(filename, dataAcquisition, nameList, 

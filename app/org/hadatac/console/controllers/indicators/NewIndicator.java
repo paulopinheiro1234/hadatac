@@ -10,7 +10,7 @@ import org.hadatac.console.views.html.indicators.*;
 import org.hadatac.console.controllers.indicators.routes;
 import org.hadatac.console.controllers.metadata.DynamicFunctions;
 import org.hadatac.entity.pojo.Indicator;
-import org.hadatac.metadata.loader.ValueCellProcessing;
+import org.hadatac.metadata.loader.URIUtils;
 
 import be.objectify.deadbolt.java.actions.Group;
 import be.objectify.deadbolt.java.actions.Restrict;
@@ -53,7 +53,7 @@ public class NewIndicator extends Controller {
 		}
 
 		// store new values
-		String newURI = ValueCellProcessing.replacePrefixEx(data.getNewUri());
+		String newURI = URIUtils.replacePrefixEx(data.getNewUri());
 		if (newURI == null || newURI.equals("")) {
 			return badRequest("[ERROR] New URI cannot be empty.");
 		}

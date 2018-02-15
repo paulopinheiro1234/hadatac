@@ -24,7 +24,7 @@ import org.hadatac.console.models.Facet;
 import org.hadatac.console.models.FacetHandler;
 import org.hadatac.console.models.Pivot;
 import org.hadatac.metadata.loader.LabkeyDataHandler;
-import org.hadatac.metadata.loader.ValueCellProcessing;
+import org.hadatac.metadata.loader.URIUtils;
 import org.hadatac.entity.pojo.ObjectCollection;
 import org.hadatac.entity.pojo.StudyObject;
 import org.hadatac.utils.Collections;
@@ -225,7 +225,7 @@ public class DataAcquisition extends HADatAcThing {
 			this.uri = "";
 			return;
 		}
-		this.uri = ValueCellProcessing.replacePrefixEx(uri);
+		this.uri = URIUtils.replacePrefixEx(uri);
 	}
 
 	public String getParameter() {
@@ -1214,18 +1214,18 @@ public class DataAcquisition extends HADatAcThing {
 
 		List<String> abbrevTypeURIs = new ArrayList<String>();
 		for (String uri : getTypeURIs()) {
-			abbrevTypeURIs.add(ValueCellProcessing.replaceNameSpaceEx(uri));
+			abbrevTypeURIs.add(URIUtils.replaceNameSpaceEx(uri));
 		}
 		List<String> abbrevAssociatedURIs = new ArrayList<String>();
 		for (String uri : getAssociatedURIs()) {
-			abbrevAssociatedURIs.add(ValueCellProcessing.replaceNameSpaceEx(uri));
+			abbrevAssociatedURIs.add(URIUtils.replaceNameSpaceEx(uri));
 		}
 
 		String localUri = "";
 		int totalChanged = 0;
 		Iterator<String> i = getLocalScopeUri().iterator();
 		while (i.hasNext()) {
-			localUri += ValueCellProcessing.replaceNameSpaceEx(i.next());
+			localUri += URIUtils.replaceNameSpaceEx(i.next());
 			if (i.hasNext()) {
 				localUri += " , ";
 			}
@@ -1233,16 +1233,16 @@ public class DataAcquisition extends HADatAcThing {
 		List< Map<String, Object> > rows = new ArrayList< Map<String, Object> >();
 		Map<String, Object> row = new HashMap<String, Object>();
 		row.put("a", String.join(", ", abbrevTypeURIs));
-		row.put("hasURI", ValueCellProcessing.replaceNameSpaceEx(getUri()));
+		row.put("hasURI", URIUtils.replaceNameSpaceEx(getUri()));
 		row.put("rdfs:label", getLabel());
 		row.put("rdfs:comment", getComment());
 		row.put("prov:startedAtTime", getStartedAt());
 		row.put("prov:used", getParameter());
 		row.put("prov:wasAssociatedWith", String.join(", ", abbrevAssociatedURIs));
-		row.put("hasco:hasDeployment", ValueCellProcessing.replaceNameSpaceEx(getDeploymentUri()));
-		row.put("hasco:isDataAcquisitionOf", ValueCellProcessing.replaceNameSpaceEx(getStudyUri()));
-		row.put("hasco:hasSchema", ValueCellProcessing.replaceNameSpaceEx(getSchemaUri()));
-		row.put("hasco:hasGlobalScope", ValueCellProcessing.replaceNameSpaceEx(getGlobalScopeUri()));
+		row.put("hasco:hasDeployment", URIUtils.replaceNameSpaceEx(getDeploymentUri()));
+		row.put("hasco:isDataAcquisitionOf", URIUtils.replaceNameSpaceEx(getStudyUri()));
+		row.put("hasco:hasSchema", URIUtils.replaceNameSpaceEx(getSchemaUri()));
+		row.put("hasco:hasGlobalScope", URIUtils.replaceNameSpaceEx(getGlobalScopeUri()));
 		row.put("hasco:hasLocalScope", localUri); 
 		row.put("hasco:hasTriggeringEvent", getTriggeringEventName());
 		row.put("prov:endedAtTime", getEndedAt().startsWith("9999")? "" : getEndedAt());

@@ -22,7 +22,7 @@ import org.hadatac.utils.NameSpaces;
 import org.hadatac.utils.FirstLabel;
 import org.hadatac.utils.ConfigProp;
 import org.hadatac.metadata.loader.LabkeyDataHandler;
-import org.hadatac.metadata.loader.ValueCellProcessing;
+import org.hadatac.metadata.loader.URIUtils;
 import org.labkey.remoteapi.CommandException;
 import be.objectify.deadbolt.java.actions.Group;
 import be.objectify.deadbolt.java.actions.Restrict;
@@ -89,7 +89,7 @@ public class DataAcquisitionSchemaObject {
 	}
 
 	public String getUriNamespace() {
-		return ValueCellProcessing.replaceNameSpaceEx(uri);
+		return URIUtils.replaceNameSpaceEx(uri);
 	}
 
 	public String getLabel() {
@@ -142,12 +142,12 @@ public class DataAcquisitionSchemaObject {
 	}
 
 	public String getEntityNamespace() {
-		return ValueCellProcessing.replaceNameSpaceEx(entity);
+		return URIUtils.replaceNameSpaceEx(entity);
 	}
 
 	public String getEntityLabel() {
 		if (entity == null || entityLabel.equals("")) {
-			return ValueCellProcessing.replaceNameSpaceEx(entity);
+			return URIUtils.replaceNameSpaceEx(entity);
 		}
 		return entityLabel;
 	}
@@ -158,7 +158,7 @@ public class DataAcquisitionSchemaObject {
 			if (entity == null || entity.equals("")) {
 				return "";
 			}
-			annotation = ValueCellProcessing.replaceNameSpaceEx(entity);
+			annotation = URIUtils.replaceNameSpaceEx(entity);
 		} else {
 			annotation = entityLabel;
 		}
@@ -181,7 +181,7 @@ public class DataAcquisitionSchemaObject {
 	}
 
 	public String getInRelationToNamespace() {
-		return ValueCellProcessing.replaceNameSpaceEx(inRelationTo);
+		return URIUtils.replaceNameSpaceEx(inRelationTo);
 	}
 
 	public void setInRelationTo(String inRelationTo) {
@@ -195,7 +195,7 @@ public class DataAcquisitionSchemaObject {
 
 	public String getInRelationToLabel() {
 		if (inRelationTo == null || inRelationToLabel.equals("")) {
-			String str = ValueCellProcessing.replaceNameSpaceEx(inRelationTo);
+			String str = URIUtils.replaceNameSpaceEx(inRelationTo);
 			return str.substring(str.indexOf(":") + 1);
 		}
 		return inRelationToLabel;
@@ -206,7 +206,7 @@ public class DataAcquisitionSchemaObject {
 	}
 
 	public String getRelationNamespace() {
-		return ValueCellProcessing.replaceNameSpaceEx(relation);
+		return URIUtils.replaceNameSpaceEx(relation);
 	}
 
 	public void setRelation(String relation) {
@@ -222,8 +222,8 @@ public class DataAcquisitionSchemaObject {
 	public String getRelationLabel() {
 		if (relationLabel == null || relationLabel.equals("")) {
 			System.out.println("RELATION label -- just relation : <" + relation + ">");
-			System.out.println("RELATION label -- just relation : <" + ValueCellProcessing.replaceNameSpaceEx(relation) + ">");
-			return ValueCellProcessing.replaceNameSpaceEx(relation);
+			System.out.println("RELATION label -- just relation : <" + URIUtils.replaceNameSpaceEx(relation) + ">");
+			return URIUtils.replaceNameSpaceEx(relation);
 		}
 		System.out.println("RELATION label : <" + relationLabel + ">");
 		return relationLabel;
@@ -370,11 +370,11 @@ public class DataAcquisitionSchemaObject {
 			return "";
 		}
 		if (newInRelationTo.equals("DefaultObject")) {
-			return ValueCellProcessing.replacePrefixEx("hasco:DefaultObject");
+			return URIUtils.replacePrefixEx("hasco:DefaultObject");
 		}
 		for (DataAcquisitionSchemaObject daso : objects) {
 			if (daso.getRole().equals(newInRelationTo)) {
-				return ValueCellProcessing.replacePrefixEx(daso.getUri());
+				return URIUtils.replacePrefixEx(daso.getUri());
 			}
 		} 
 		return "";
@@ -409,7 +409,7 @@ public class DataAcquisitionSchemaObject {
 			insert += this.getUri() + " hasco:hasEntity "  + entity + " .  ";
 		}   
 		if (!inRelationTo.equals("")) {
-			String inRelationToStr =  ValueCellProcessing.replacePrefixEx(inRelationTo);
+			String inRelationToStr =  URIUtils.replacePrefixEx(inRelationTo);
 			if (inRelationToStr.startsWith("<")) {
 				insert += this.getUri() + " sio:inRelationTo " +  inRelationToStr + " .  ";
 			} else {
@@ -417,7 +417,7 @@ public class DataAcquisitionSchemaObject {
 			}
 		}
 		if (!relation.equals("")) {
-			String relationStr =  ValueCellProcessing.replacePrefixEx(relation);
+			String relationStr =  URIUtils.replacePrefixEx(relation);
 			if (relationStr.startsWith("<")) {
 				insert += this.getUri() + " sio:relation " +  relationStr + " .  ";
 			} else {
@@ -441,11 +441,11 @@ public class DataAcquisitionSchemaObject {
 		LabkeyDataHandler loader = new LabkeyDataHandler(site, user_name, password, path);
 		List< Map<String, Object> > rows = new ArrayList< Map<String, Object> >();
 		Map<String, Object> row = new HashMap<String, Object>();
-		row.put("hasURI", ValueCellProcessing.replaceNameSpaceEx(getUri()));
+		row.put("hasURI", URIUtils.replaceNameSpaceEx(getUri()));
 		row.put("a", "hasco:DASchemaObject");
 		row.put("rdfs:label", getLabel());
 		row.put("rdfs:comment", getLabel());
-		row.put("hasco:partOfSchema", ValueCellProcessing.replaceNameSpaceEx(getPartOfSchema()));
+		row.put("hasco:partOfSchema", URIUtils.replaceNameSpaceEx(getPartOfSchema()));
 		row.put("hasco:hasEntity", this.getEntity());
 		row.put("hasco:hasRole", this.getRole());
 		row.put("sio:inRelationTo", this.getInRelationTo());
@@ -474,7 +474,7 @@ public class DataAcquisitionSchemaObject {
 		LabkeyDataHandler loader = new LabkeyDataHandler(site, user_name, password, path);
 		List< Map<String, Object> > rows = new ArrayList< Map<String, Object> >();
 		Map<String, Object> row = new HashMap<String, Object>();
-		row.put("hasURI", ValueCellProcessing.replaceNameSpaceEx(getUri().replace("<","").replace(">","")));
+		row.put("hasURI", URIUtils.replaceNameSpaceEx(getUri().replace("<","").replace(">","")));
 		rows.add(row);
 		for (Map<String,Object> str : rows) {
 			System.out.println("deleting DASO " + row.get("hasURI"));
