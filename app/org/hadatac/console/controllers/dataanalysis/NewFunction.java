@@ -11,7 +11,7 @@ import org.hadatac.console.models.SysUser;
 import org.hadatac.entity.pojo.Aggregate;
 import org.hadatac.entity.pojo.Indicator;
 import org.hadatac.entity.pojo.facet.EntityCharacteristic;
-import org.hadatac.metadata.loader.ValueCellProcessing;
+import org.hadatac.metadata.loader.URIUtils;
 
 import com.google.inject.Inject;
 
@@ -54,7 +54,7 @@ public class NewFunction extends Controller {
         }
         
 		// store new values
-		String newURI = ValueCellProcessing.replacePrefixEx(data.getNewUri());
+		String newURI = URIUtils.replacePrefixEx(data.getNewUri());
 		if (newURI == null || newURI.equals("")) {
 	            return badRequest("[ERROR] New URI cannot be empty.");
 		}

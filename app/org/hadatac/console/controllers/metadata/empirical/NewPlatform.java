@@ -12,7 +12,7 @@ import org.hadatac.console.views.html.metadata.empirical.*;
 import org.hadatac.console.controllers.metadata.empirical.routes;
 import org.hadatac.entity.pojo.Platform;
 import org.hadatac.entity.pojo.PlatformType;
-import org.hadatac.metadata.loader.ValueCellProcessing;
+import org.hadatac.metadata.loader.URIUtils;
 import be.objectify.deadbolt.java.actions.Group;
 import be.objectify.deadbolt.java.actions.Restrict;
 import org.hadatac.console.models.PlatformForm;
@@ -54,11 +54,11 @@ public class NewPlatform extends Controller {
 		}
 
 		// store new values
-		String newURI = ValueCellProcessing.replacePrefixEx(data.getNewUri());
+		String newURI = URIUtils.replacePrefixEx(data.getNewUri());
 		if (newURI == null || newURI.equals("")) {
 			return badRequest("[ERROR] New URI cannot be empty.");
 		}
-		String newPlatformType = ValueCellProcessing.replacePrefixEx(data.getNewType());
+		String newPlatformType = URIUtils.replacePrefixEx(data.getNewType());
 		String newLabel = data.getNewLabel();
 		String newComment = data.getNewComment();
 
@@ -77,7 +77,7 @@ public class NewPlatform extends Controller {
 			return badRequest("Failed to insert new PLT to LabKey!\n");
 		}
 
-		System.out.println("Inserting new Platform from file. filename:  " + filename + "   da : [" + ValueCellProcessing.replacePrefixEx(da_uri) + "]");
+		System.out.println("Inserting new Platform from file. filename:  " + filename + "   da : [" + URIUtils.replacePrefixEx(da_uri) + "]");
 		System.out.println("Inserting new Platform from file. Study URI : [" + plt.getUri() + "]");
 		// when a new study is created in the scope of a datafile, the new platform needs to be associated to the datafile's DA 
 		return ok(newPlatformConfirm.render(plt, filename, da_uri));

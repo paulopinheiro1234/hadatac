@@ -8,7 +8,7 @@
 @import org.hadatac.console.views.html.schema._
 @import org.hadatac.console.controllers.schema._
 @import org.hadatac.console.controllers._
-@import org.hadatac.metadata.loader.ValueCellProcessing;
+@import org.hadatac.metadata.loader.URIUtils;
 
 @main("Prepare Data Ingestion") {
 
@@ -36,7 +36,7 @@
  @if(da != null && da.isComplete()) {
     <div id="rcorners" class="paddin0 margin0" style="background-color: #DCF7FE">
       <center>
-	<b>Data Acquisition is Complete : </b>@ValueCellProcessing.replaceNameSpaceEx(da.getUri()) 
+	<b>Data Acquisition is Complete : </b>@URIUtils.replaceNameSpaceEx(da.getUri()) 
       </center>
     </div>
 
@@ -67,7 +67,7 @@
      *
      *@
               <center>
-		  <b>Incomplete Data Acquisition to be completed : </b>@ValueCellProcessing.replaceNameSpaceEx(da.getUri()) 
+		  <b>Incomplete Data Acquisition to be completed : </b>@URIUtils.replaceNameSpaceEx(da.getUri()) 
 		  <input type="submit" class="btn btn-default btn-sm" role="button" id="editDA" value="View/Edit" formmethod="post" 
 			 formaction="@org.hadatac.console.controllers.dataacquisitionmanagement.routes.EditDataAcquisition.index(filename,da.getUri(),false)">
                   </input> 
@@ -112,7 +112,7 @@
 	       <center>
          } else {
 	       <center>
-	           <b>Associated study</b>: @da.getStudy().getLabel() [@ValueCellProcessing.replaceNameSpaceEx(da.getStudyUri())]
+	           <b>Associated study</b>: @da.getStudy().getLabel() [@URIUtils.replaceNameSpaceEx(da.getStudyUri())]
                    <br>
 
 	           <input type="submit" class="btn btn-default btn-sm" role="button" id="editSTD" value="View/Edit"
@@ -165,7 +165,7 @@
                @if(da.getGlobalScopeUri() == null || da.getGlobalScopeUri().equals("")) { 
                    none
                } else {
-	           @da.getGlobalScopeName() [@ValueCellProcessing.replaceNameSpaceEx(da.getGlobalScopeUri())]
+	           @da.getGlobalScopeName() [@URIUtils.replaceNameSpaceEx(da.getGlobalScopeUri())]
                } 
                 <br> Local:  
                @if(da.getLocalScopeUri() == null || da.getLocalScopeUri().size() <= 0) { 
@@ -212,7 +212,7 @@
 	  } else {
       
 	       @defining(da.getDeployment()) { dep => 
-	           <center><b>Associated deployment : </b> @ValueCellProcessing.replaceNameSpaceEx(dep.getUri()) <br> 
+	           <center><b>Associated deployment : </b> @URIUtils.replaceNameSpaceEx(dep.getUri()) <br> 
                    Platform: @dep.getPlatform().getLabel()<br>
                    Instrument: @dep.getInstrument().getLabel()<br>
                }
@@ -259,7 +259,7 @@
 
        } else {
 
-	       <center><b>Associated schema : </b>@ValueCellProcessing.replaceNameSpaceEx(da.getSchemaUri())
+	       <center><b>Associated schema : </b>@URIUtils.replaceNameSpaceEx(da.getSchemaUri())
 	       <input type="submit" class="btn btn-default btn-sm" role="button" id="viewDAS" value="View">
 	       <input type="submit" class="btn btn-default btn-sm" role="button" id="editDAS" value="Edit">
 	       <input type="submit" class="btn btn-default btn-sm" role="button" id="removeDAS" value="Remove Association"

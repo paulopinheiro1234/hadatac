@@ -18,7 +18,7 @@ import org.hadatac.console.views.html.dataacquisitionmanagement.*;
 import org.hadatac.entity.pojo.DataAcquisition;
 import org.hadatac.entity.pojo.DataFile;
 import org.hadatac.entity.pojo.ObjectCollection;
-import org.hadatac.metadata.loader.ValueCellProcessing;
+import org.hadatac.metadata.loader.URIUtils;
 import org.hadatac.utils.ConfigProp;
 
 import be.objectify.deadbolt.java.actions.Group;
@@ -52,7 +52,7 @@ public class DataAcquisitionScope extends Controller {
 	
 	// Load associated DA
 	if (da_uri != null && !da_uri.equals("")) {
-	    da = DataAcquisition.findByUri(ValueCellProcessing.replacePrefixEx(da_uri));
+	    da = DataAcquisition.findByUri(URIUtils.replacePrefixEx(da_uri));
 
 	    if (da == null) {
 		String message = "[ERROR] Could not load assigned DA from DA's URI : " + da_uri;
@@ -136,7 +136,7 @@ public class DataAcquisitionScope extends Controller {
 	
 	// Load associated DA
 	if (da_uri != null && !da_uri.equals("")) {
-	    da = DataAcquisition.findByUri(ValueCellProcessing.replacePrefixEx(da_uri));
+	    da = DataAcquisition.findByUri(URIUtils.replacePrefixEx(da_uri));
 
 	    if (da == null) {
 		String message = "[ERROR] Could not load assigned DA from DA's URI : " + da_uri;

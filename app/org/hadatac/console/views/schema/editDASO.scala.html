@@ -5,7 +5,7 @@
 @import org.hadatac.console.views.html._
 @import org.hadatac.entity.pojo.DataAcquisitionSchema
 @import org.hadatac.utils._
-@import org.hadatac.metadata.loader.ValueCellProcessing
+@import org.hadatac.metadata.loader.URIUtils
 
 @main("Edit Data Acquisition Schema Object") {
 
@@ -157,7 +157,7 @@
 	      
 	      function labelchange() {
 	         var newValue = document.getElementById("newLabel").value;
-	         var newUri = "@ValueCellProcessing.replaceNameSpaceEx(daso.getPartOfSchema())" + "-" + newValue;
+	         var newUri = "@URIUtils.replaceNameSpaceEx(daso.getPartOfSchema())" + "-" + newValue;
 	         newUri = replaceAll(newUri," ","-");
 	         newUri = replaceAll(newUri,"<","");
 		 newUri = replaceAll(newUri,">","");

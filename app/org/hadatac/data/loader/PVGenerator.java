@@ -2,7 +2,7 @@ package org.hadatac.data.loader;
 
 import java.io.File;
 
-import org.hadatac.metadata.loader.ValueCellProcessing;
+import org.hadatac.metadata.loader.URIUtils;
 import org.hadatac.utils.ConfigProp;
 
 import java.lang.String;
@@ -61,7 +61,7 @@ public class PVGenerator extends BasicGenerator {
 
 	private String getClass(CSVRecord rec) {
 		String cls = getValueByColumnName(rec, mapCol.get("Class"));
-		if (ValueCellProcessing.isValidURI(cls)) {
+		if (URIUtils.isValidURI(cls)) {
 			return cls;
 		}
 		return "";

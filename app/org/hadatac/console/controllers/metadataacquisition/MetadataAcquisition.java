@@ -23,7 +23,7 @@ import play.mvc.Controller;
 import play.mvc.Result;
 
 import org.hadatac.console.views.html.metadataacquisition.*;
-import org.hadatac.metadata.loader.ValueCellProcessing;
+import org.hadatac.metadata.loader.URIUtils;
 import org.hadatac.utils.Collections;
 import org.hadatac.utils.NameSpaces;
 import org.json.simple.JSONObject;
@@ -156,7 +156,7 @@ public class MetadataAcquisition extends Controller {
 				studyInfo.put("studyLabel_str", "<a href=\""
 						+ ConfigFactory.load().getString("hadatac.console.host_deploy") 
 						+ "/hadatac/metadataacquisitions/viewStudy?study_uri=" 
-						+ ValueCellProcessing.replaceNameSpaceEx(studyInfo.get("studyUri").toString()) + "\">"
+						+ URIUtils.replaceNameSpaceEx(studyInfo.get("studyUri").toString()) + "\">"
 						+ soln.get("studyLabel").toString() + "</a>");
 			}
 			if (soln.contains("studyTitle") && !studyInfo.containsKey("studyTitle_str")) {

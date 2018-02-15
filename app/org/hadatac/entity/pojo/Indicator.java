@@ -28,7 +28,7 @@ import org.hadatac.console.controllers.metadata.DynamicFunctions;
 import org.hadatac.console.models.Facet;
 import org.hadatac.console.models.FacetHandler;
 import org.hadatac.metadata.loader.LabkeyDataHandler;
-import org.hadatac.metadata.loader.ValueCellProcessing;
+import org.hadatac.metadata.loader.URIUtils;
 import org.hadatac.utils.Collections;
 import org.hadatac.utils.ConfigProp;
 import org.hadatac.utils.NameSpaces;
@@ -371,7 +371,7 @@ public class Indicator extends HADatAcThing implements Comparable<Indicator> {
 		LabkeyDataHandler loader = new LabkeyDataHandler(site, user_name, password, path);
 		List< Map<String, Object> > rows = new ArrayList< Map<String, Object> >();
 		Map<String, Object> row = new HashMap<String, Object>();
-		row.put("hasURI", ValueCellProcessing.replaceNameSpaceEx(getUri()));
+		row.put("hasURI", URIUtils.replaceNameSpaceEx(getUri()));
 		row.put("rdfs:subClassOf", "hasco:Indicator");
 		row.put("rdfs:label", getLabel());
 		row.put("rdfs:comment", getComment());
@@ -397,7 +397,7 @@ public class Indicator extends HADatAcThing implements Comparable<Indicator> {
 		LabkeyDataHandler loader = new LabkeyDataHandler(site, user_name, password, path);
 		List< Map<String, Object> > rows = new ArrayList< Map<String, Object> >();
 		Map<String, Object> row = new HashMap<String, Object>();
-		row.put("hasURI", ValueCellProcessing.replaceNameSpaceEx(getUri().replace("<","").replace(">","")));
+		row.put("hasURI", URIUtils.replaceNameSpaceEx(getUri().replace("<","").replace(">","")));
 		rows.add(row);
 		for (Map<String,Object> str : rows) {
 			System.out.println("deleting Indicator " + str.get("hasURI"));

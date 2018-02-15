@@ -6,7 +6,7 @@
 @import org.hadatac.console.views.html._
 @import org.hadatac.console.controllers._
 @import org.hadatac.entity.pojo.Indicator
-@import org.hadatac.metadata.loader.ValueCellProcessing
+@import org.hadatac.metadata.loader.URIUtils
 
 @main("Edit Indicator") {
    <script type="text/javascript">
@@ -72,7 +72,7 @@
 	
 	<div class="form-group">
 		<label>URI:</label>
- 		<input type="text" class="form-control col-sm-6" name="newUri" id="newUri" value="@ValueCellProcessing.replaceNameSpaceEx(indicator.getUri())" onchange="checkform()" readonly >
+ 		<input type="text" class="form-control col-sm-6" name="newUri" id="newUri" value="@URIUtils.replaceNameSpaceEx(indicator.getUri())" onchange="checkform()" readonly >
  	</div>
  	<div class="form-group">
 		<label>Label:</label>

@@ -5,7 +5,7 @@
 @import org.hadatac.console.views.html._
 @import org.hadatac.console.controllers._
 @import org.hadatac.console.controllers.schema._
-@import org.hadatac.metadata.loader.ValueCellProcessing
+@import org.hadatac.metadata.loader.URIUtils
 
 @main("New Indicator") {
 
@@ -15,7 +15,7 @@
 
     <div class="container-fluid">
        <ul>
-         <li><b>URI:</b> @ValueCellProcessing.replaceNameSpaceEx(indicator.getUri())</li>
+         <li><b>URI:</b> @URIUtils.replaceNameSpaceEx(indicator.getUri())</li>
          <li><b>Label:</b> @indicator.getLabel()</li>
          <li><b>Comment:</b> @indicator.getComment()</li>
        </ul>

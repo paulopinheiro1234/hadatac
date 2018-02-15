@@ -3,13 +3,13 @@
 @import org.hadatac.console.views.html._
 @import org.hadatac.utils._
 @import org.hadatac.console.controllers.indicators._
-@import org.hadatac.metadata.loader.ValueCellProcessing
+@import org.hadatac.metadata.loader.URIUtils
 
 @main(message) {
     <h1>@message</h1>
 
     <ul>
-         <li><b>URI:</b> @ValueCellProcessing.replaceNameSpaceEx(indicator.getUri())</li>
+         <li><b>URI:</b> @URIUtils.replaceNameSpaceEx(indicator.getUri())</li>
          <li><b>Short Name:</b> @indicator.getLabel()</li>
          <li><b>Description:</b> @indicator.getComment()</li>
     </ul>

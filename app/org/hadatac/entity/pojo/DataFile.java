@@ -17,7 +17,7 @@ import org.apache.solr.client.solrj.response.UpdateResponse;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
 
-import org.hadatac.metadata.loader.ValueCellProcessing;
+import org.hadatac.metadata.loader.URIUtils;
 import org.hadatac.utils.Collections;
 
 import com.typesafe.config.ConfigFactory;
@@ -156,7 +156,7 @@ public class DataFile {
 		DataFile object = new DataFile(doc.getFieldValue("file_name").toString());
 		
 		object.setOwnerEmail(doc.getFieldValue("owner_email_str").toString());
-		object.setDataAcquisitionUri(ValueCellProcessing.replaceNameSpaceEx(doc.getFieldValue("acquisition_uri_str").toString()));
+		object.setDataAcquisitionUri(URIUtils.replaceNameSpaceEx(doc.getFieldValue("acquisition_uri_str").toString()));
 		object.setDatasetUri(doc.getFieldValue("dataset_uri_str").toString());
 		object.setStatus(doc.getFieldValue("status_str").toString());
 		object.setCompletionPercentage(Integer.parseInt(doc.getFieldValue("completion_percentage_int").toString()));

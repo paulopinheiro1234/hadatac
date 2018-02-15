@@ -15,7 +15,7 @@ import org.hadatac.entity.pojo.StudyObject;
 import org.hadatac.entity.pojo.ObjectCollection;
 import org.hadatac.entity.pojo.ObjectCollectionType;
 import org.hadatac.entity.pojo.StudyObjectType;
-import org.hadatac.metadata.loader.ValueCellProcessing;
+import org.hadatac.metadata.loader.URIUtils;
 import org.hadatac.console.views.html.*;
 import org.hadatac.console.views.html.objects.*;
 import org.hadatac.console.models.NewObjectsFromScratchForm;
@@ -100,9 +100,9 @@ public class NewObjectsFromScratch extends Controller {
 	if (data.getNewType() == null || data.getNewType().equals("")) {
 	    return badRequest("[ERROR] New type cannot be empty.");
 	} else {
-	    newType = ValueCellProcessing.replacePrefixEx(data.getNewType());
+	    newType = URIUtils.replacePrefixEx(data.getNewType());
 	}
-	String newObjectCollectionUri = ValueCellProcessing.replacePrefixEx(oc_uri);
+	String newObjectCollectionUri = URIUtils.replacePrefixEx(oc_uri);
 	String newLabelPrefix = data.getNewLabelPrefix();
 	
 	// Variable values
@@ -197,9 +197,9 @@ public class NewObjectsFromScratch extends Controller {
 	if (data.getNewType() == null || data.getNewType().equals("")) {
 	    return badRequest("[ERROR] New type cannot be empty.");
 	} else {
-	    newType = ValueCellProcessing.replacePrefixEx(data.getNewType());
+	    newType = URIUtils.replacePrefixEx(data.getNewType());
 	}
-	String newObjectCollectionUri = ValueCellProcessing.replacePrefixEx(URLDecoder.decode(oc_uri));
+	String newObjectCollectionUri = URIUtils.replacePrefixEx(URLDecoder.decode(oc_uri));
 	
 	// Variable values
 	String newURI = null;

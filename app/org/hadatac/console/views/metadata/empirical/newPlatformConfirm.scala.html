@@ -7,7 +7,7 @@
 @import org.hadatac.console.views.html._
 @import org.hadatac.console.controllers._
 @import org.hadatac.console.controllers.schema._
-@import org.hadatac.metadata.loader.ValueCellProcessing
+@import org.hadatac.metadata.loader.URIUtils
 
 @main("New Study") {
 
@@ -17,8 +17,8 @@
 
     <div class="container-fluid">
        <ul>
-         <li><b>URI:</b> @ValueCellProcessing.replaceNameSpaceEx(plt.getUri())</li>
-         <li><b>Type:</b> @ValueCellProcessing.replaceNameSpaceEx(plt.getTypeUri())</li>
+         <li><b>URI:</b> @URIUtils.replaceNameSpaceEx(plt.getUri())</li>
+         <li><b>Type:</b> @URIUtils.replaceNameSpaceEx(plt.getTypeUri())</li>
          <li><b>Short Name:</b> @plt.getLabel()</li>
          <li><b>Description:</b> @plt.getComment()</li>
        </ul>

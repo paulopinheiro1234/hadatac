@@ -5,7 +5,7 @@
 @import org.hadatac.console.views.html._
 @import org.hadatac.console.controllers._
 @import org.hadatac.console.controllers.schema._
-@import org.hadatac.metadata.loader.ValueCellProcessing
+@import org.hadatac.metadata.loader.URIUtils
 
 @main("New Function") {
 
@@ -15,7 +15,7 @@
 
     <div class="container-fluid">
        <ul>
-         <li><b>URI:</b> @ValueCellProcessing.replaceNameSpaceEx(function.getUri())</li>
+         <li><b>URI:</b> @URIUtils.replaceNameSpaceEx(function.getUri())</li>
          <li><b>Label:</b> @function.getLabel()</li>
          <li><b>Comment:</b> @function.getComment()</li>
        </ul>

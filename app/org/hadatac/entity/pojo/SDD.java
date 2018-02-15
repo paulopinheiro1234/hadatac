@@ -24,7 +24,7 @@ import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.ss.usermodel.WorkbookFactory;
-import org.hadatac.metadata.loader.ValueCellProcessing;
+import org.hadatac.metadata.loader.URIUtils;
 
 public class SDD {
 	private Map<String, String> mapCatalog = new HashMap<String, String>();
@@ -241,11 +241,11 @@ public class SDD {
 						String classUri = "";
 						if (!record.get(3).isEmpty()) {
 							// Class column
-							classUri = ValueCellProcessing.replacePrefixEx(record.get(3));
+							classUri = URIUtils.replacePrefixEx(record.get(3));
 						} 
 	//					else {
 	//						// Resource column
-	//						classUri = ValueCellProcessing.replacePrefixEx(record.get(4));
+	//						classUri = URIUtils.replacePrefixEx(record.get(4));
 	//					}
 						mapCodeClass.put(record.get(1), classUri);
 					}

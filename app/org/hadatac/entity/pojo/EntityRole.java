@@ -14,7 +14,7 @@ import org.apache.jena.query.ResultSetFactory;
 import org.apache.jena.query.ResultSetRewindable;
 import org.hadatac.console.models.Facet;
 import org.hadatac.console.models.FacetHandler;
-import org.hadatac.metadata.loader.ValueCellProcessing;
+import org.hadatac.metadata.loader.URIUtils;
 import org.hadatac.utils.Collections;
 import org.hadatac.utils.NameSpaces;
 
@@ -96,7 +96,7 @@ public class EntityRole extends HADatAcThing implements Comparable<EntityRole> {
 			
 			if (resultsrw.size() == 0) {
 				EntityRole role = new EntityRole();
-				role.setUri(ValueCellProcessing.replacePrefixEx("sio:Sample"));
+				role.setUri(URIUtils.replacePrefixEx("sio:Sample"));
 				role.setLabel("Sample");
 				role.setField("entity_role_uri_str");
 				

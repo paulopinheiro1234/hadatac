@@ -14,7 +14,7 @@
 @import org.hadatac.console.views.html.triplestore._
 @import org.hadatac.console.controllers.triplestore._
 @import org.hadatac.console.controllers._
-@import org.hadatac.metadata.loader.ValueCellProcessing;
+@import org.hadatac.metadata.loader.URIUtils;
 
 @main("Select Scope for " + da_uri) {
 
@@ -112,7 +112,7 @@
     
     <h3>Selected Data Acquisition</h3> 
        <ul>
-           <li>@ValueCellProcessing.replaceNameSpaceEx(da_uri)</li>
+           <li>@URIUtils.replaceNameSpaceEx(da_uri)</li>
        </ul>
     
     <form class="form-horizontal" name="assignOption" method="post" action="@org.hadatac.console.controllers.annotator.routes.PrepareIngestion.processSelectScope(file_name, da_uri)">

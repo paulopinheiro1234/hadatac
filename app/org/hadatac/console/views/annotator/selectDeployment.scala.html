@@ -8,9 +8,9 @@
 @import org.hadatac.console.views.html.triplestore._
 @import org.hadatac.console.controllers.triplestore._
 @import org.hadatac.console.controllers._
-@import org.hadatac.metadata.loader.ValueCellProcessing;
+@import org.hadatac.metadata.loader.URIUtils;
 
-@main("Select Deployment for " + ValueCellProcessing.replaceNameSpaceEx(da_uri)) {
+@main("Select Deployment for " + URIUtils.replaceNameSpaceEx(da_uri)) {
 
 <script type="text/javascript">
    function checkform() {
@@ -29,13 +29,13 @@
 </script>
 
   <div class="container">
-    <h2>Select Deployment for @ValueCellProcessing.replaceNameSpaceEx(da_uri)</h2>
+    <h2>Select Deployment for @URIUtils.replaceNameSpaceEx(da_uri)</h2>
 
     <form class="form-horizontal" name="assignOption" method="post" action="@org.hadatac.console.controllers.annotator.routes.PrepareIngestion.processSelectDeployment(file_name, da_uri)">
 
     <div class="form-group">
       <label>Selected Data Acquisition</label> <br>
-      @ValueCellProcessing.replaceNameSpaceEx(da_uri)<br>
+      @URIUtils.replaceNameSpaceEx(da_uri)<br>
       <br>
       <label>New Deployment</label> 
       <select class="form-control col-sm-6" id="option" size="20" name="option" onchange="checkform()" >

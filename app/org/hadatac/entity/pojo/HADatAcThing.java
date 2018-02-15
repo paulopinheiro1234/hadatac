@@ -6,7 +6,7 @@ import java.util.Map;
 
 import org.hadatac.console.models.Facet;
 import org.hadatac.console.models.FacetHandler;
-import org.hadatac.metadata.loader.ValueCellProcessing;
+import org.hadatac.metadata.loader.URIUtils;
 
 public class HADatAcThing {
 
@@ -45,7 +45,7 @@ public class HADatAcThing {
         if(uri == "" || uri == null || uri.equals("")){
             return "";
         } else{
-    		return ValueCellProcessing.replaceNameSpaceEx(uri.replace("<","").replace(">",""));
+    		return URIUtils.replaceNameSpaceEx(uri.replace("<","").replace(">",""));
         }
 	}
 
@@ -54,7 +54,7 @@ public class HADatAcThing {
 			this.uri = "";
 			return;
 		}
-		this.uri = ValueCellProcessing.replacePrefixEx(uri);
+		this.uri = URIUtils.replacePrefixEx(uri);
 	}
 
 	public String getTypeUri() {
@@ -65,7 +65,7 @@ public class HADatAcThing {
         if (uri == "" || uri == null || uri.equals("")){
             return "";
         } else {
-    		return ValueCellProcessing.replaceNameSpaceEx(uri.replace("<","").replace(">",""));
+    		return URIUtils.replaceNameSpaceEx(uri.replace("<","").replace(">",""));
         }
 	}
 

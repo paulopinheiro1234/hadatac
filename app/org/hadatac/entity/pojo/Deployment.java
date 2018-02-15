@@ -28,7 +28,7 @@ import org.apache.jena.update.UpdateRequest;
 import org.hadatac.console.controllers.AuthApplication;
 import org.hadatac.console.controllers.triplestore.routes;
 import org.hadatac.metadata.loader.LabkeyDataHandler;
-import org.hadatac.metadata.loader.ValueCellProcessing;
+import org.hadatac.metadata.loader.URIUtils;
 import org.hadatac.utils.Collections;
 import org.hadatac.utils.ConfigProp;
 import org.hadatac.utils.NameSpaces;
@@ -475,16 +475,16 @@ public class Deployment {
     	
     	List<String> detectorURIs = new ArrayList<String>();
     	for (Detector detector : getDetectors()) {
-    		detectorURIs.add(ValueCellProcessing.replaceNameSpaceEx(detector.getUri()));
+    		detectorURIs.add(URIUtils.replaceNameSpaceEx(detector.getUri()));
     	}
     	String detectors = String.join(", ", detectorURIs);
     	
     	List< Map<String, Object> > rows = new ArrayList< Map<String, Object> >();
     	Map<String, Object> row = new HashMap<String, Object>();
-    	row.put("hasURI", ValueCellProcessing.replaceNameSpaceEx(getUri()));
+    	row.put("hasURI", URIUtils.replaceNameSpaceEx(getUri()));
     	row.put("a", "vstoi:Deployment");
-    	row.put("vstoi:hasPlatform", ValueCellProcessing.replaceNameSpaceEx(getPlatform().getUri()));
-    	row.put("hasco:hasInstrument", ValueCellProcessing.replaceNameSpaceEx(getInstrument().getUri()));
+    	row.put("vstoi:hasPlatform", URIUtils.replaceNameSpaceEx(getPlatform().getUri()));
+    	row.put("hasco:hasInstrument", URIUtils.replaceNameSpaceEx(getInstrument().getUri()));
     	row.put("hasco:hasDetector", detectors);
     	row.put("prov:startedAtTime", getStartedAt());
     	row.put("prov:endedAtTime", getEndedAt());

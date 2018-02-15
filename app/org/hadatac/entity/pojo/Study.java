@@ -42,7 +42,7 @@ import org.hadatac.utils.Collections;
 import org.hadatac.utils.NameSpaces;
 import org.hadatac.utils.ConfigProp;
 import org.hadatac.metadata.loader.LabkeyDataHandler;
-import org.hadatac.metadata.loader.ValueCellProcessing;
+import org.hadatac.metadata.loader.URIUtils;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.joda.time.format.DateTimeFormat;
@@ -517,7 +517,7 @@ public class Study extends HADatAcThing {
 			return null;
 		}
 		Study returnStudy = new Study();
-		String prefixedUri = ValueCellProcessing.replacePrefixEx(study_uri);
+		String prefixedUri = URIUtils.replacePrefixEx(study_uri);
 		String adjustedUri = prefixedUri;
 		if (adjustedUri.startsWith("http")) {
 			adjustedUri = "<" + adjustedUri + ">";
@@ -593,7 +593,7 @@ public class Study extends HADatAcThing {
 			return null;
 		}
 		Study returnStudy = new Study();
-        String queryUri = ValueCellProcessing.replacePrefixEx(kbPrefix + "STD-" + studyName);
+        String queryUri = URIUtils.replacePrefixEx(kbPrefix + "STD-" + studyName);
 		if (queryUri.startsWith("http")) {
 			queryUri = "<" + queryUri + ">";
 		}
@@ -1063,17 +1063,17 @@ public class Study extends HADatAcThing {
 		LabkeyDataHandler loader = new LabkeyDataHandler(site, user_name, password, path);
 		List< Map<String, Object> > rows = new ArrayList< Map<String, Object> >();
 		Map<String, Object> row = new HashMap<String, Object>();
-		row.put("hasURI", ValueCellProcessing.replaceNameSpaceEx(getUri()));
-		row.put("a", ValueCellProcessing.replaceNameSpaceEx(studyType));
+		row.put("hasURI", URIUtils.replaceNameSpaceEx(getUri()));
+		row.put("a", URIUtils.replaceNameSpaceEx(studyType));
 		row.put("rdfs:label", getLabel());
 		row.put("hasco:hasTitle", getTitle());
-		row.put("hasco:hasProject", ValueCellProcessing.replaceNameSpaceEx(getProject()));
+		row.put("hasco:hasProject", URIUtils.replaceNameSpaceEx(getProject()));
 		row.put("rdfs:comment", getComment());
 		row.put("hasco:hasExternalSource", getExternalSource());
 		row.put("skos:definition", "");
-		row.put("hasco:hasAgent", ValueCellProcessing.replaceNameSpaceEx(this.getAgentUri()));
+		row.put("hasco:hasAgent", URIUtils.replaceNameSpaceEx(this.getAgentUri()));
 		row.put("hasco:hasLastId", getLastId());
-		row.put("hasco:hasInstitution", ValueCellProcessing.replaceNameSpaceEx(this.getInstitutionUri()));
+		row.put("hasco:hasInstitution", URIUtils.replaceNameSpaceEx(this.getInstitutionUri()));
 		rows.add(row);
 
 		int totalChanged = 0;
@@ -1138,7 +1138,7 @@ public class Study extends HADatAcThing {
 		LabkeyDataHandler loader = new LabkeyDataHandler(site, user_name, password, path);
 		List< Map<String, Object> > rows = new ArrayList< Map<String, Object> >();
 		Map<String, Object> row = new HashMap<String, Object>();
-		row.put("hasURI", ValueCellProcessing.replaceNameSpaceEx(getUri().replace("<","").replace(">","")));
+		row.put("hasURI", URIUtils.replaceNameSpaceEx(getUri().replace("<","").replace(">","")));
 		rows.add(row);
 		for (Map<String,Object> str : rows) {
 			System.out.println("deleting Study " + str.get("hasURI"));

@@ -12,7 +12,7 @@
 @import org.hadatac.console.views.html.deployments._
 @import org.hadatac.console.controllers.deployments._
 @import org.hadatac.console.controllers._
-@import org.hadatac.metadata.loader.ValueCellProcessing
+@import org.hadatac.metadata.loader.URIUtils
 @import com.typesafe.config.ConfigFactory
 
 @main("New Deployment") {
@@ -88,7 +88,7 @@
 
     <h3>
     @if(da_uri != null && !da_uri.equals("")) {
-         New Deployment for Data Acquisition @ValueCellProcessing.replaceNameSpaceEx(da_uri)
+         New Deployment for Data Acquisition @URIUtils.replaceNameSpaceEx(da_uri)
     } else {
          New @deploymentType.substring(0, 1).toUpperCase().concat(deploymentType.substring(1).toLowerCase()) Deployment
     }
@@ -119,7 +119,7 @@
 		<label>Data Acquisition URI:</label>
  		<input type="text" name="dataAcquisitionUri" id="dataAcquisitionUri" 
 		       @if(da_uri != null && !da_uri.equals("")) {
-		          class="form-control col-sm-6 disabled"  value="@ValueCellProcessing.replaceNameSpaceEx(da_uri)" readonly
+		          class="form-control col-sm-6 disabled"  value="@URIUtils.replaceNameSpaceEx(da_uri)" readonly
 		       } else {
 		          class="form-control col-sm-6" 
 		       }

@@ -55,7 +55,7 @@
      @if(mode.equals("selectCol")) {
        <form>
        <div id="rcorners">
-            <label>Selected Collection: </label> <input type="text" id="collection" name="collection" size="50" value="@ValueCellProcessing.replaceNameSpaceEx(oc_uri)"  readonly>
+            <label>Selected Collection: </label> <input type="text" id="collection" name="collection" size="50" value="@URIUtils.replaceNameSpaceEx(oc_uri)"  readonly>
             <label>Selected Column: </label> <input type="text" id="position" name="position"  readonly>
 
 	    <input type="submit" id="colSelector" name="colSelector" class="btn btn-primary" disabled="disabled"

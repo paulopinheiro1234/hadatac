@@ -5,6 +5,8 @@
    resultsSize : Long,
    objDetails : String
  )
+ 
+@import org.hadatac.metadata.loader._
     
     <style>
     .tooltip-inner {
@@ -19,17 +21,19 @@
     	<button type="button" id="nextpage" class="btn btn-primary" onClick="nextPage();">Next Page</button>
     	<button type="button" id="firstpage" class="btn btn-primary" onClick="firstPage();">First Page</button>
     	<button type="button" id="lastpage"class="btn btn-primary" onClick="lastPage();">Last Page</button>
-    	<p id="pagecontrl"></p>  	
-    	<table class="table table-hover" id="measurementsTable">
+    	<p id="pagecontrl"></p>
+    	<input type="checkbox" id="toggleOriginalValue" name="original_value"/> Show Original Values
+    	<table class="table table-hover tablesorter" id="measurementsTable">
             <thead>
               <tr>
               	<th>Object</th>
                 <th>Attribute</th>
                 <th>Value</th>
+                <th class="original_value" style="display:none;">Original Value</th>
                 <th>PID</th>
-                <th>SID</th>       
-                <th>Time</th>
+                <th>SID</th>
                 <th>Object URI</th>
+                <th>Time</th>
                 <th>Location</th>
               </tr>
             </thead>
@@ -40,17 +44,17 @@
                     <td>@document.getEntity()</td>
                 	<td>@document.getCharacteristic()</td>
                 	<td>@document.getValue()</td>
+                	<td class="original_value" style="display:none;">@document.getOriginalValue()</td>
                 	<td>@document.getObjectPID()</td>
                 	<td>@document.getObjectSID()</td>
+                	<td href="#" data-toggle="popover" data-html="true" data-placement="bottom" data-container="body" class="object_uri">@URIUtils.replaceNameSpaceEx(document.getObjectUri())</td>
                 	<td>@if(!document.getAbstractTime().equals("")) {
-                	    @document.getAbstractTime()
+                	    @URIUtils.replaceNameSpaceEx(document.getAbstractTime())
                     } else {
                         @if(document.getTimestamp() != null) {
-                        } else {
                             @document.getTimestamp()
                         }
                     }</td>
-                	<td href="#" data-toggle="popover" data-html="true" data-placement="bottom">@document.getObjectUri()</td>
                 	<td>@document.getLocation()</td>
                 </tr>
                 }
@@ -58,6 +62,8 @@
         </table>
     </div>
     
+    <script type="text/javascript" src="/hadatac/assets/javascripts/jquery.tablesorter.js"></script>
+    <link href="@controllers.routes.Assets.versioned("css/blue/style.css")" rel="stylesheet">
     <script type="text/javascript">
         function decodeString(encodedString) {
             var textArea = document.createElement('textarea');
@@ -121,8 +127,19 @@
     function closePopover() {
         $('[data-toggle="popover"]').popover('hide');
     }
+
+    $("#toggleOriginalValue").change(function () {
+    	var column = "table ." + $(this).attr("name");
+        if (this.checked) {
+            $(column).show();
+        } else {
+        	$(column).hide();
+        }
+    });
     
-    $(document).ready(function() { 
+    $(document).ready(function() {
+    	$("#measurementsTable").tablesorter();
+        
         $("#measurementsTable tr").not(':first').each(function(i, el) {
             var title = "<table>"
                 + "<tr><td><b>URI:</b></td><td>" + json.documents[i]['uri'] + "</td></tr>"
@@ -139,7 +156,7 @@
         	$(el).attr("title", title);
         });
 
-        $("#measurementsTable tr").not(':first').find("td:nth-child(7)").each(function(i, el) {
+        $("#measurementsTable tr").not(':first').find(".object_uri").each(function(i, el) {
             var content = jsonDetails[json.documents[i]['objectUri']];
             var closeButton = '<span class="text-info"></span><button type="button" id="close" class="close" onclick="closePopover()">&times;</button></span>';
             $(el).attr("data-content", closeButton + content);

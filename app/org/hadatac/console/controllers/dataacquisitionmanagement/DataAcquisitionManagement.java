@@ -24,7 +24,7 @@ import org.hadatac.entity.pojo.Deployment;
 import org.hadatac.entity.pojo.TriggeringEvent;
 import org.hadatac.entity.pojo.User;
 import org.hadatac.entity.pojo.UserGroup;
-import org.hadatac.metadata.loader.ValueCellProcessing;
+import org.hadatac.metadata.loader.URIUtils;
 import org.hadatac.utils.State;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
@@ -51,7 +51,7 @@ public class DataAcquisitionManagement extends Controller {
 		}
 
 		for (DataAcquisition dataAcquisition : results) {
-			dataAcquisition.setSchemaUri(ValueCellProcessing.replaceNameSpaceEx(
+			dataAcquisition.setSchemaUri(URIUtils.replaceNameSpaceEx(
 					dataAcquisition.getSchemaUri()));
 		}
 		results.sort(new Comparator<DataAcquisition>() {
@@ -80,7 +80,7 @@ public class DataAcquisitionManagement extends Controller {
 
 		List<DataAcquisitionSchema> schemas = DataAcquisitionSchema.findAll();
 		for (DataAcquisitionSchema schema : schemas) {
-			schema.setUri(ValueCellProcessing.replaceNameSpaceEx(schema.getUri()));
+			schema.setUri(URIUtils.replaceNameSpaceEx(schema.getUri()));
 		}
 
 		Map<String, String> nameList = new HashMap<String, String>();

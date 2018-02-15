@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.csv.CSVRecord;
-import org.hadatac.metadata.loader.ValueCellProcessing;
+import org.hadatac.metadata.loader.URIUtils;
 import org.hadatac.utils.ConfigProp;
 
 public class DASchemaAttrGenerator extends BasicGenerator {
@@ -80,7 +80,7 @@ public class DASchemaAttrGenerator extends BasicGenerator {
 
 	private String getUnit(CSVRecord rec) {
 		String original = getValueByColumnName(rec, mapCol.get("Unit"));
-		if (ValueCellProcessing.isValidURI(original)) {
+		if (URIUtils.isValidURI(original)) {
 			return original;
 		} else if (codeMap.containsKey(original)) {
 			return codeMap.get(original);

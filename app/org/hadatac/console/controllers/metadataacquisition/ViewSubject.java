@@ -13,7 +13,7 @@ import play.mvc.Result;
 
 import org.hadatac.console.views.html.metadataacquisition.*;
 import org.hadatac.entity.pojo.Measurement;
-import org.hadatac.metadata.loader.ValueCellProcessing;
+import org.hadatac.metadata.loader.URIUtils;
 import org.apache.jena.query.Query;
 import org.apache.jena.query.QueryExecution;
 import org.apache.jena.query.QueryExecutionFactory;
@@ -85,7 +85,7 @@ public class ViewSubject extends Controller {
 				while (resultsrwIndvInd.hasNext()) {
 					QuerySolution soln = resultsrwIndvInd.next();
 					if(Measurement.findForViews(UserManagement.getCurrentUserUri(), study_uri, 
-							ValueCellProcessing.convertToWholeURI(subject_uri), 
+							URIUtils.convertToWholeURI(subject_uri), 
 							soln.get("uri").toString(), true).getDocumentSize() > 0){
 						listIndicatorLabel.add(soln.get("label").toString());
 					}
@@ -99,7 +99,6 @@ public class ViewSubject extends Controller {
 	}
 
 	public static String findBasicHTML(String subject_uri) {
-		//System.out.println("findBasicHTML (subject_uri): '" + subject_uri + "'" );
 		if (subject_uri == null || subject_uri.equals("")) {
 			return null;
 		}
@@ -132,7 +131,6 @@ public class ViewSubject extends Controller {
 	}
 
 	public static ResultSetRewindable findSubjectBasic(String subject_uri) {
-		//System.out.println("in findSubjectBasic (1): '" + subject_uri + "'");
 		String subjectQueryString = "";
 		if (subject_uri == null || subject_uri.equals("")) {
 			return null;
@@ -140,7 +138,7 @@ public class ViewSubject extends Controller {
 		if (subject_uri.indexOf("http") != -1) {
 			subject_uri = "<" + subject_uri + ">";
 		}
-		//System.out.println("in findSubjectBasic (2): '" + subject_uri + "'");
+		
 		subjectQueryString += NameSpaces.getInstance().printSparqlNameSpaceList();
 		subjectQueryString += "SELECT ?pid ?subjectTypeLabel ?subjectLabel ?cohortLabel ?studyUri WHERE { "
 				+ subject_uri + " hasco:originalID ?pid . "
@@ -283,9 +281,9 @@ public class ViewSubject extends Controller {
 			//System.out.println("HERE IS THE RAW SOLN*********" + soln.toString());
 			values = new ArrayList<String>();
 			values.add("Label: " + soln.get("sampleLabel").toString());
-			values.add("Type: " + ValueCellProcessing.replaceNameSpaceEx(soln.get("sampleType").toString()));
-			values.add("Sample Of: " + ValueCellProcessing.replaceNameSpaceEx(soln.get("subjectLabel").toString()));
-			sampleResult.put(ValueCellProcessing.replaceNameSpaceEx(soln.get("sampleUri").toString()), values);
+			values.add("Type: " + URIUtils.replaceNameSpaceEx(soln.get("sampleType").toString()));
+			values.add("Sample Of: " + URIUtils.replaceNameSpaceEx(soln.get("subjectLabel").toString()));
+			sampleResult.put(URIUtils.replaceNameSpaceEx(soln.get("sampleUri").toString()), values);
 			//System.out.println("THIS IS SUBROW*********" + sampleResult);	
 		}
 

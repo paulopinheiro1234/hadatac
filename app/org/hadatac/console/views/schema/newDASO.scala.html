@@ -4,7 +4,7 @@
 @import org.hadatac.console.views.html._
 @import org.hadatac.entity.pojo.DataAcquisitionSchema
 @import org.hadatac.utils._
-@import org.hadatac.metadata.loader.ValueCellProcessing
+@import org.hadatac.metadata.loader.URIUtils
 
 @main("Create Data Acquisition Schema Object") {
 
@@ -79,7 +79,7 @@
 
            <div class="form-group">
              <label>URI</label>
-	     <input type="text" class="form-control col-sm-6" id="newUri" name="newUri" value="@ValueCellProcessing.replaceNameSpaceEx(das.getUri())" readonly>
+	     <input type="text" class="form-control col-sm-6" id="newUri" name="newUri" value="@URIUtils.replaceNameSpaceEx(das.getUri())" readonly>
            </div>
            
            <div class="form-group">
@@ -159,7 +159,7 @@
 	      
 	      function labelchange() {
 	         var newValue = document.getElementById("newLabel").value;
-	         var newUri = "@ValueCellProcessing.replaceNameSpaceEx(das.getUri())" + "-" + newValue;
+	         var newUri = "@URIUtils.replaceNameSpaceEx(das.getUri())" + "-" + newValue;
 	         newUri = replaceAll(newUri," ","-");
 	         newUri = replaceAll(newUri,"<","");
 		 newUri = replaceAll(newUri,">","");

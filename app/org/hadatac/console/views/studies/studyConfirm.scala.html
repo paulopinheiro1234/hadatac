@@ -3,14 +3,14 @@
 @import org.hadatac.console.views.html._
 @import org.hadatac.utils._
 @import org.hadatac.console.controllers.studies._
-@import org.hadatac.metadata.loader.ValueCellProcessing
+@import org.hadatac.metadata.loader.URIUtils
 
 @main(message) {
     <h1>@message</h1>
 
     <ul>
-         <li><b>URI:</b> @ValueCellProcessing.replaceNameSpaceEx(std.getUri())</li>
-         <li><b>Type:</b> @ValueCellProcessing.replaceNameSpaceEx(std.getType())</li>
+         <li><b>URI:</b> @URIUtils.replaceNameSpaceEx(std.getUri())</li>
+         <li><b>Type:</b> @URIUtils.replaceNameSpaceEx(std.getType())</li>
          <li><b>Short Name:</b> @std.getLabel()</li>
          <li><b>Project:</b> @std.getProject()</li>
          <li><b>Description:</b> @std.getComment()</li>

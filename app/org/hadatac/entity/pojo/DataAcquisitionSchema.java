@@ -22,13 +22,12 @@ import org.hadatac.utils.Collections;
 import org.hadatac.utils.ConfigProp;
 import org.hadatac.utils.NameSpaces;
 import org.hadatac.utils.FirstLabel;
-import org.hadatac.metadata.loader.ValueCellProcessing;
+import org.hadatac.metadata.loader.URIUtils;
 import org.hadatac.entity.pojo.DataAcquisitionSchemaAttribute;
 import org.hadatac.entity.pojo.DataAcquisitionSchemaObject;
 import org.labkey.remoteapi.CommandException;
 
 import org.hadatac.console.controllers.AuthApplication;
-import org.hadatac.console.controllers.fileviewer.CSVPreview;
 import org.hadatac.metadata.loader.LabkeyDataHandler;
 
 import be.objectify.deadbolt.java.actions.Group;
@@ -101,7 +100,7 @@ public class DataAcquisitionSchema {
 	}
 
 	public String getUriNamespace() {
-		return ValueCellProcessing.replaceNameSpaceEx(uri.replace("<","").replace(">",""));
+		return URIUtils.replaceNameSpaceEx(uri.replace("<","").replace(">",""));
 	}
 
 	public void setUri(String uri) {
@@ -222,35 +221,35 @@ public class DataAcquisitionSchema {
 			for (DataAcquisitionSchemaAttribute dasa : attributes) {
 				dasa.setDataAcquisitionSchema(this);
 				System.out.println("dasa.getAttribute(): " + dasa.getAttribute());
-				if (dasa.getAttribute().equals(ValueCellProcessing.replacePrefixEx("sio:TimeStamp"))) {
+				if (dasa.getAttribute().equals(URIUtils.replacePrefixEx("sio:TimeStamp"))) {
 					setTimestampLabel(dasa.getLabel());
 					System.out.println("[OK] DataAcquisitionSchema TimeStampLabel: " + dasa.getLabel());
 				}
-				if (dasa.getAttribute().equals(ValueCellProcessing.replacePrefixEx("sio:TimeInstant"))) {
+				if (dasa.getAttribute().equals(URIUtils.replacePrefixEx("sio:TimeInstant"))) {
 					setTimeInstantLabel(dasa.getLabel());
 					System.out.println("[OK] DataAcquisitionSchema TimeInstantLabel: " + dasa.getLabel());
 				}
-				if (dasa.getAttribute().equals(ValueCellProcessing.replacePrefixEx("hasco:namedTime"))) {
+				if (dasa.getAttribute().equals(URIUtils.replacePrefixEx("hasco:namedTime"))) {
 					setNamedTimeLabel(dasa.getLabel());
 					System.out.println("[OK] DataAcquisitionSchema NamedTimeLabel: " + dasa.getLabel());
 				}
-				if (dasa.getAttribute().equals(ValueCellProcessing.replacePrefixEx("hasco:uriId"))) {
+				if (dasa.getAttribute().equals(URIUtils.replacePrefixEx("hasco:uriId"))) {
 					setIdLabel(dasa.getLabel());
 					System.out.println("[OK] DataAcquisitionSchema IdLabel: " + dasa.getLabel());
 				}
-				if (dasa.getAttribute().equals(ValueCellProcessing.replacePrefixEx("hasco:originalID"))) { 
+				if (dasa.getAttribute().equals(URIUtils.replacePrefixEx("hasco:originalID"))) { 
 					setOriginalIdLabel(dasa.getLabel());
 					System.out.println("[OK] DataAcquisitionSchema IdLabel: " + dasa.getLabel());
 				}
-				if (dasa.getAttribute().equals(ValueCellProcessing.replacePrefixEx("hasco:hasEntity"))) {
+				if (dasa.getAttribute().equals(URIUtils.replacePrefixEx("hasco:hasEntity"))) {
 					setEntityLabel(dasa.getLabel());
 					System.out.println("[OK] DataAcquisitionSchema EntityLabel: " + dasa.getLabel());
 				}
-				if (dasa.getAttribute().equals(ValueCellProcessing.replacePrefixEx("hasco:hasUnit"))) {
+				if (dasa.getAttribute().equals(URIUtils.replacePrefixEx("hasco:hasUnit"))) {
 					setUnitLabel(dasa.getLabel());
 					System.out.println("[OK] DataAcquisitionSchema UnitLabel: " + dasa.getLabel());
 				}
-				if (dasa.getAttribute().equals(ValueCellProcessing.replacePrefixEx("sio:InRelationTo"))) {
+				if (dasa.getAttribute().equals(URIUtils.replacePrefixEx("sio:InRelationTo"))) {
 					setInRelationToLabel(dasa.getLabel());
 					System.out.println("[OK] DataAcquisitionSchema InRelationToLabel: " + dasa.getLabel());
 				}
@@ -338,7 +337,6 @@ public class DataAcquisitionSchema {
 				daso.setTempPositionInt(-1);
 			}
 			
-			// Assign dasa positions by label matching
 			for (int i = 0; i < csvHeaders.size(); i++) {
 				for (DataAcquisitionSchemaObject daso : listDaso) {
 					if (csvHeaders.get(i).equalsIgnoreCase(daso.getLabel())) {
@@ -423,20 +421,17 @@ public class DataAcquisitionSchema {
 	}
 	
 	public static Map<String, Map<String, String>> findPossibleValues(String schemaUri) {
-//		System.out.println("findPossibleValues is called!");
 		Map<String, Map<String, String>> mapPossibleValues = new HashMap<String, Map<String, String>>();
 		String queryString = NameSpaces.getInstance().printSparqlNameSpaceList()
-				+ " SELECT ?daso_or_dasa ?codeClass ?code ?label ?resource WHERE { "
-				+ " ?possibleValue a hasco:PossibleValue . "
-				+ " ?possibleValue hasco:isPossibleValueOf ?daso_or_dasa . "
-				+ " ?possibleValue hasco:hasCode ?code . "
-				+ " ?codeClass rdfs:label ?label ."
-				+ " ?daso_or_dasa hasco:partOfSchema <" + schemaUri + "> . " 
-				+ " OPTIONAL { ?possibleValue hasco:hasClass ?codeClass } . "
-				+ " OPTIONAL { ?possibleValue hasco:hasResource ?resource } . "
+				+ " SELECT ?daso_or_dasa ?codeClass ?code ?label ?resource WHERE { \n"
+				+ " ?possibleValue a hasco:PossibleValue . \n"
+				+ " ?possibleValue hasco:isPossibleValueOf ?daso_or_dasa . \n"
+				+ " ?possibleValue hasco:hasCode ?code . \n"
+				+ " ?daso_or_dasa hasco:partOfSchema <" + schemaUri + "> . \n" 
+				+ " OPTIONAL { ?possibleValue hasco:hasClass ?codeClass } . \n"
+				+ " OPTIONAL { ?possibleValue hasco:hasResource ?resource } . \n"
 				+ " }";
-
-		System.out.println("findPossibleValues query: " + queryString);
+		//System.out.println("findPossibleValues query: " + queryString);
 		
 		Query query = QueryFactory.create(queryString);
 		QueryExecution qexec = QueryExecutionFactory.sparqlService(
@@ -594,7 +589,7 @@ public class DataAcquisitionSchema {
 		LabkeyDataHandler loader = new LabkeyDataHandler(site, user_name, password, path);
 		List< Map<String, Object> > rows = new ArrayList< Map<String, Object> >();
 		Map<String, Object> row = new HashMap<String, Object>();
-		row.put("hasURI", ValueCellProcessing.replaceNameSpaceEx(getUri()));
+		row.put("hasURI", URIUtils.replaceNameSpaceEx(getUri()));
 		row.put("a", "hasco:DataAcquisitionSchema");
 		row.put("rdfs:label", getLabel());
 		rows.add(row);
@@ -615,7 +610,7 @@ public class DataAcquisitionSchema {
 		LabkeyDataHandler loader = new LabkeyDataHandler(site, user_name, password, path);
 		List< Map<String, Object> > rows = new ArrayList< Map<String, Object> >();
 		Map<String, Object> row = new HashMap<String, Object>();
-		row.put("hasURI", ValueCellProcessing.replaceNameSpaceEx(getUri()));
+		row.put("hasURI", URIUtils.replaceNameSpaceEx(getUri()));
 		rows.add(row);
 		return loader.deleteRows("DASchema", rows);
 	}

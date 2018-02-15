@@ -16,7 +16,7 @@ import org.hadatac.entity.pojo.DataAcquisition;
 import org.hadatac.entity.pojo.DataFile;
 import org.hadatac.entity.pojo.Study;
 import org.hadatac.entity.pojo.StudyType;
-import org.hadatac.metadata.loader.ValueCellProcessing;
+import org.hadatac.metadata.loader.URIUtils;
 import org.labkey.remoteapi.CommandException;
 
 import be.objectify.deadbolt.java.actions.Group;
@@ -85,11 +85,11 @@ public class NewStudy extends Controller {
         }
         
 	// store new values
-	String newURI = ValueCellProcessing.replacePrefixEx(data.getNewUri());
+	String newURI = URIUtils.replacePrefixEx(data.getNewUri());
 	if (newURI == null || newURI.equals("")) {
             return badRequest("[ERROR] New URI cannot be empty.");
 	}
-	String newStudyType = ValueCellProcessing.replacePrefixEx(data.getNewType());
+	String newStudyType = URIUtils.replacePrefixEx(data.getNewType());
 	String newLabel = data.getNewLabel();
 	String newTitle = data.getNewTitle();
 	String newProject = data.getNewProject();
@@ -122,11 +122,11 @@ public class NewStudy extends Controller {
 	    return badRequest("Failed to insert new STD to LabKey!\n");
 	}
 
-	System.out.println("Inserting new Study from file. filename:  " + filename + "   da : [" + ValueCellProcessing.replacePrefixEx(da_uri) + "]");
+	System.out.println("Inserting new Study from file. filename:  " + filename + "   da : [" + URIUtils.replacePrefixEx(da_uri) + "]");
 	System.out.println("Inserting new Study from file. Study URI : [" + std.getUri() + "]");
 	// when a new study is created in the scope of a datafile, the new study needs to be associated to the datafile's DA 
 	if (filename != null && !filename.equals("") && da_uri != null && !da_uri.equals("")) {
-	    DataAcquisition da = DataAcquisition.findByUri(ValueCellProcessing.replacePrefixEx(da_uri));
+	    DataAcquisition da = DataAcquisition.findByUri(URIUtils.replacePrefixEx(da_uri));
 	    if (da != null) {
 		da.setStudyUri(std.getUri());
 		try {

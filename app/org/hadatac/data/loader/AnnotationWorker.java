@@ -42,7 +42,7 @@ import org.hadatac.entity.pojo.DataAcquisition;
 import org.hadatac.entity.pojo.DataFile;
 import org.hadatac.entity.pojo.SDD;
 import org.hadatac.metadata.loader.LabkeyDataHandler;
-import org.hadatac.metadata.loader.ValueCellProcessing;
+import org.hadatac.metadata.loader.URIUtils;
 import org.labkey.remoteapi.CommandException;
 import org.hadatac.utils.Collections;
 import org.hadatac.utils.ConfigProp;
@@ -311,7 +311,7 @@ public class AnnotationWorker {
 					bSuccess = commitRows(dasoGenerator.createRows(), dasoGenerator.toString(), 
 							file.getName(), "DASchemaObject", true);
 					
-					String SDDUri = ValueCellProcessing.replacePrefixEx(kbPrefix + "DAS-" + dasoGenerator.getSDDName());
+					String SDDUri = URIUtils.replacePrefixEx(kbPrefix + "DAS-" + dasoGenerator.getSDDName());
 					templateLibrary.put(SDDUri, dasoGenerator.getTemplateList());
 					System.out.println("[AutoAnnotator]: adding templates for SDD " + SDDUri);
 				} catch (Exception e) {
@@ -402,7 +402,7 @@ public class AnnotationWorker {
 					bSuccess = commitRows(dasoGenerator.createRows(), dasoGenerator.toString(), 
 							file.getName(), "DASchemaObject", true);
 					
-					String SDDUri = ValueCellProcessing.replacePrefixEx(kbPrefix + "DAS-" + dasoGenerator.getSDDName());
+					String SDDUri = URIUtils.replacePrefixEx(kbPrefix + "DAS-" + dasoGenerator.getSDDName());
 					templateLibrary.put(SDDUri, dasoGenerator.getTemplateList());
 					System.out.println("[AutoAnnotator]: adding templates for SDD " + SDDUri);
 				} catch (Exception e) {
@@ -465,7 +465,7 @@ public class AnnotationWorker {
 		String schema_uri = null;
 
 		if (dataFile != null) {
-			da = DataAcquisition.findByUri(ValueCellProcessing.replacePrefixEx(dataFile.getDataAcquisitionUri()));
+			da = DataAcquisition.findByUri(URIUtils.replacePrefixEx(dataFile.getDataAcquisitionUri()));
 			if (da != null) {
 				if (!da.isComplete()) {
 					log.addline(Feedback.println(Feedback.WEB, 
@@ -562,20 +562,20 @@ public class AnnotationWorker {
 	public static Model createModel(List<Map<String, Object>> rows) {
 		Model model = ModelFactory.createDefaultModel();
 		for (Map<String, Object> row : rows) {
-			Resource sub = model.createResource(ValueCellProcessing.replacePrefixEx((String)row.get("hasURI")));
+			Resource sub = model.createResource(URIUtils.replacePrefixEx((String)row.get("hasURI")));
 			for (String key : row.keySet()) {
 				if (!key.equals("hasURI")) {
 					Property pred = null;
 					if (key.equals("a")) {
-						pred = model.createProperty(ValueCellProcessing.replacePrefixEx("rdf:type"));
+						pred = model.createProperty(URIUtils.replacePrefixEx("rdf:type"));
 					}
 					else {
-						pred = model.createProperty(ValueCellProcessing.replacePrefixEx(key));
+						pred = model.createProperty(URIUtils.replacePrefixEx(key));
 					}
 
 					String cellValue = (String)row.get(key);
-					if (ValueCellProcessing.isValidURI(cellValue)) {
-						Resource obj = model.createResource(ValueCellProcessing.replacePrefixEx(cellValue));
+					if (URIUtils.isValidURI(cellValue)) {
+						Resource obj = model.createResource(URIUtils.replacePrefixEx(cellValue));
 						model.add(sub, pred, obj);
 					}
 					else {

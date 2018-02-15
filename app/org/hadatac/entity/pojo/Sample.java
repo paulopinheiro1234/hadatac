@@ -27,7 +27,7 @@ import org.hadatac.metadata.loader.LabkeyDataHandler;
 import org.hadatac.entity.pojo.DataAcquisitionSchemaObject;
 import org.hadatac.entity.pojo.DataAcquisitionSchemaEvent;
 import org.hadatac.entity.pojo.DataAcquisitionSchema;
-import org.hadatac.metadata.loader.ValueCellProcessing;
+import org.hadatac.metadata.loader.URIUtils;
 import org.labkey.remoteapi.CommandException;
 import be.objectify.deadbolt.java.actions.Group;
 import be.objectify.deadbolt.java.actions.Restrict;
@@ -270,13 +270,13 @@ public class Sample extends StudyObject {
     	LabkeyDataHandler loader = new LabkeyDataHandler(site, user_name, password, path);
     	List< Map<String, Object> > rows = new ArrayList< Map<String, Object> >();
     	Map<String, Object> row = new HashMap<String, Object>();
-    	row.put("hasURI", ValueCellProcessing.replaceNameSpaceEx(getUri()));
-    	row.put("a", ValueCellProcessing.replaceNameSpaceEx(getTypeUri()));
+    	row.put("hasURI", URIUtils.replaceNameSpaceEx(getUri()));
+    	row.put("a", URIUtils.replaceNameSpaceEx(getTypeUri()));
     	row.put("hasco:originalID", getOriginalId());
     	row.put("rdfs:label", getLabel());
-    	row.put("hasco:isMemberOf", ValueCellProcessing.replaceNameSpaceEx(getIsMemberOf()));
+    	row.put("hasco:isMemberOf", URIUtils.replaceNameSpaceEx(getIsMemberOf()));
     	row.put("rdfs:comment", getComment());
-    	row.put("hasco:isFrom", ValueCellProcessing.replaceNameSpaceEx(getIsFrom()));
+    	row.put("hasco:isFrom", URIUtils.replaceNameSpaceEx(getIsFrom()));
 	row.put("hasco:hasSource", "");
     	row.put("hasco:isVirtual", "");
     	row.put("hasco:isPIConfirmed", "false");
@@ -301,7 +301,7 @@ public class Sample extends StudyObject {
     	LabkeyDataHandler loader = new LabkeyDataHandler(site, user_name, password, path);
     	List< Map<String, Object> > rows = new ArrayList< Map<String, Object> >();
     	Map<String, Object> row = new HashMap<String, Object>();
-    	row.put("hasURI", ValueCellProcessing.replaceNameSpaceEx(getUri().replace("<","").replace(">","")));
+    	row.put("hasURI", URIUtils.replaceNameSpaceEx(getUri().replace("<","").replace(">","")));
     	rows.add(row);
 	for (Map<String,Object> str : rows) {
 	    System.out.println("deleting sample " + row.get("hasURI"));

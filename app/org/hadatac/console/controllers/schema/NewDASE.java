@@ -103,7 +103,7 @@ public class NewDASE extends Controller {
 			return "";
 		}
 		String response = newStr.substring(newStr.indexOf("[") + 1).replace("]","");
-		//response = ValueCellProcessing.replacePrefix(response);
+		//response = URIUtils.replacePrefix(response);
 		return response;
 	}
 }

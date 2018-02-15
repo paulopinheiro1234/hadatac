@@ -24,7 +24,7 @@ import org.hadatac.entity.pojo.DataAcquisitionSchema;
 import org.hadatac.entity.pojo.ObjectCollection;
 import org.hadatac.entity.pojo.Study;
 import org.hadatac.entity.pojo.TriggeringEvent;
-import org.hadatac.metadata.loader.ValueCellProcessing;
+import org.hadatac.metadata.loader.URIUtils;
 import org.labkey.remoteapi.CommandException;
 
 import be.objectify.deadbolt.java.actions.Group;
@@ -67,7 +67,7 @@ public class PrepareIngestion extends Controller {
 
 		// Load associated DA
 		if (da_uri != null && !da_uri.equals("")) {
-			da = DataAcquisition.findByUri(ValueCellProcessing.replacePrefixEx(da_uri));
+			da = DataAcquisition.findByUri(URIUtils.replacePrefixEx(da_uri));
 			System.out.println("Global scope: [" + da.getGlobalScopeUri() + "]  hasScope: " + da.hasScope());
 
 			if (da != null) {
@@ -94,7 +94,7 @@ public class PrepareIngestion extends Controller {
 		da = new DataAcquisition();
 		da.setTriggeringEvent(TriggeringEvent.INITIAL_DEPLOYMENT);
 		da.setLabel(da_label);
-		da.setUri(ValueCellProcessing.replacePrefixEx(new_da_uri));
+		da.setUri(URIUtils.replacePrefixEx(new_da_uri));
 
 		SysUser user = SysUser.findByEmail(ownerEmail);
 		if (user == null) {

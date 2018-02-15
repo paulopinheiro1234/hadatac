@@ -3,7 +3,7 @@ package org.hadatac.data.loader;
 import org.hadatac.entity.pojo.DASOInstance;
 import org.hadatac.entity.pojo.DataAcquisitionSchemaObject;
 import org.hadatac.entity.pojo.DASVirtualObject;
-import org.hadatac.metadata.loader.ValueCellProcessing;
+import org.hadatac.metadata.loader.URIUtils;
 import java.lang.String;
 import java.util.HashMap;
 import java.util.List;
@@ -36,7 +36,7 @@ public class DASOInstanceGenerator{
 				// Check to see if there's a codebook entry
 				Map<String,String> cbForCol = codebook.get(workingField);
 				try{
-					DataAcquisitionSchemaObject toResolve = DataAcquisitionSchemaObject.find(ValueCellProcessing.convertToWholeURI(workingField));
+					DataAcquisitionSchemaObject toResolve = DataAcquisitionSchemaObject.find(URIUtils.convertToWholeURI(workingField));
 					//System.out.println("[DASOInstanceGen] expanded " + toResolve.getLabel());
 					String colName = toResolve.getLabel();
 					if(rec.isMapped(colName)) {
@@ -121,7 +121,7 @@ public class DASOInstanceGenerator{
 			if((tempLabel!=null || !tempLabel.equals("")) && (tempType!=null || !tempType.equals(""))){
 				DASOInstance tempDASOI = new DASOInstance(this.studyId, tempKey, tempLabel, tempType, tempRelations);
 				// current.getTemplateUri() *should* match what is in DASchemaAttribute table's "attributeOf" field!
-				instances.put(ValueCellProcessing.convertToWholeURI(current.getTemplateUri()), tempDASOI);
+				instances.put(URIUtils.convertToWholeURI(current.getTemplateUri()), tempDASOI);
 				//System.out.println("[DASOInstanceGenerator] Made an instance: " + tempDASOI);
 			} else {
 				System.out.println("[DASOInstanceGen] WARN: row instance missing uri or type info!");

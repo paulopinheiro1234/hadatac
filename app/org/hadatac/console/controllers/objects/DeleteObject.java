@@ -19,7 +19,7 @@ import org.hadatac.entity.pojo.Study;
 import org.hadatac.entity.pojo.ObjectCollection;
 import org.hadatac.entity.pojo.StudyObject;
 import org.hadatac.metadata.loader.LabkeyDataHandler;
-import org.hadatac.metadata.loader.ValueCellProcessing;
+import org.hadatac.metadata.loader.URIUtils;
 import org.hadatac.console.views.html.*;
 import org.hadatac.console.views.html.objects.*;
 import org.hadatac.console.views.html.triplestore.syncLabkey;

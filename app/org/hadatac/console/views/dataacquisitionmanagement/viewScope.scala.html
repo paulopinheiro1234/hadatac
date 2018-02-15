@@ -12,7 +12,7 @@
 @import org.hadatac.console.views.html.triplestore._
 @import org.hadatac.console.controllers.triplestore._
 @import org.hadatac.console.controllers._
-@import org.hadatac.metadata.loader.ValueCellProcessing;
+@import org.hadatac.metadata.loader.URIUtils;
 
 @main("View Scope of " + da_uri) {
 
@@ -24,7 +24,7 @@
 
         <h3>Selected Data Acquisition</h3> 
            <ul>
-              <li>@ValueCellProcessing.replaceNameSpaceEx(da_uri)</li>
+              <li>@URIUtils.replaceNameSpaceEx(da_uri)</li>
            </ul>
     
         <h4>Global Scope</h4> 
@@ -35,7 +35,7 @@
 	   } else {
                <ul>
                   <li><b>Name of object scope:</b> @globalScope</li>
-                  <li><b>Uri of object scope:</b> @ValueCellProcessing.replaceNameSpaceEx(globalScopeUri)</li>
+                  <li><b>Uri of object scope:</b> @URIUtils.replaceNameSpaceEx(globalScopeUri)</li>
                </ul>
 	   }    
         
@@ -59,7 +59,7 @@
 		        <tr>
 	                   <td>@index</td>
          	           <td>@if(localScope != null && localScope(index) != null) { @localScope(index) }</td>
-	                   <td>@if(localScopeUri != null && localScopeUri(index) != null) { @ValueCellProcessing.replaceNameSpaceEx(localScopeUri(index)) }</td> 
+	                   <td>@if(localScopeUri != null && localScopeUri(index) != null) { @URIUtils.replaceNameSpaceEx(localScopeUri(index)) }</td> 
            	        </tr>
                     }
                 </tbody>

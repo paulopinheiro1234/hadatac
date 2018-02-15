@@ -60,6 +60,8 @@ public class Measurement {
 	private String abstractTime;
 	@Field("value_str")
 	private String value;
+	@Field("original_value_str")
+	private String originalValue;
 	@Field("pid_str")
 	private String pid;
 	@Field("sid_str")
@@ -222,6 +224,14 @@ public class Measurement {
 
 	public void setValue(String value) {
 		this.value = value;
+	}
+	
+	public String getOriginalValue() {
+		return originalValue;
+	}
+
+	public void setOriginalValue(String originalValue) {
+		this.originalValue = originalValue;
 	}
 
 	public String getUnit() {
@@ -774,10 +784,11 @@ public class Measurement {
 		
 		String query = "";
 		query += NameSpaces.getInstance().printSparqlNameSpaceList();
-		query += "SELECT ?class ?label WHERE { "
-				+ "?possibleValue a hasco:PossibleValue .  "
-				+ "?possibleValue hasco:hasClass ?class .   "
-				+ "?class rdfs:label ?label .  "
+		query += "SELECT ?possibleValue ?class ?codeLabel ?label WHERE { \n"
+				+ "?possibleValue a hasco:PossibleValue . \n"
+				+ "?possibleValue hasco:hasClass ?class . \n"
+				+ "OPTIONAL { ?possibleValue hasco:hasCodeLabel ?codeLabel } . \n"
+				+ "OPTIONAL { ?class rdfs:label ?label } . \n"
 				+ "}";
 
 		try {
@@ -791,6 +802,8 @@ public class Measurement {
 				QuerySolution soln = resultsrw.next();
 				if (soln.get("label") != null && !soln.get("label").toString().isEmpty()) {
 					results.put(soln.get("class").toString(), soln.get("label").toString());
+				} else if (soln.get("codeLabel") != null && !soln.get("codeLabel").toString().isEmpty()) {
+					results.put(soln.get("class").toString(), soln.get("codeLabel").toString());
 				}
 			}
 		} catch (Exception e) {
@@ -827,6 +840,7 @@ public class Measurement {
 		m.setPID(SolrUtils.getFieldValue(doc, "pid_str"));
 		m.setSID(SolrUtils.getFieldValue(doc, "sid_str"));
 		m.setAbstractTime(SolrUtils.getFieldValue(doc, "named_time_str"));
+		m.setOriginalValue(SolrUtils.getFieldValue(doc, "original_value_str"));
 		
 		String value = SolrUtils.getFieldValue(doc, "value_str");
 		if (cachedURILabels.containsKey(value)) {

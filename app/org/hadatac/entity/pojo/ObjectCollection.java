@@ -25,7 +25,7 @@ import org.hadatac.utils.Collections;
 import org.hadatac.utils.ConfigProp;
 import org.hadatac.utils.NameSpaces;
 import org.hadatac.utils.FirstLabel;
-import org.hadatac.metadata.loader.ValueCellProcessing;
+import org.hadatac.metadata.loader.URIUtils;
 import org.hadatac.entity.pojo.ObjectCollection;
 import org.labkey.remoteapi.CommandException;
 
@@ -591,8 +591,8 @@ public class ObjectCollection extends HADatAcThing {
 		LabkeyDataHandler loader = new LabkeyDataHandler(site, user_name, password, path);
 		List< Map<String, Object> > rows = new ArrayList< Map<String, Object> >();
 		Map<String, Object> row = new HashMap<String, Object>();
-		row.put("hasURI", ValueCellProcessing.replaceNameSpaceEx(getUri()));
-		row.put("a", ValueCellProcessing.replaceNameSpaceEx(getTypeUri()));
+		row.put("hasURI", URIUtils.replaceNameSpaceEx(getUri()));
+		row.put("a", URIUtils.replaceNameSpaceEx(getTypeUri()));
 		row.put("rdfs:label", getLabel());
 		row.put("hasco:isMemberOf", getStudyUri());
 		rows.add(row);
@@ -617,7 +617,7 @@ public class ObjectCollection extends HADatAcThing {
 		LabkeyDataHandler loader = new LabkeyDataHandler(site, user_name, password, path);
 		List< Map<String, Object> > rows = new ArrayList< Map<String, Object> >();
 		Map<String, Object> row = new HashMap<String, Object>();
-		row.put("hasURI", ValueCellProcessing.replaceNameSpaceEx(getUri().replace("<","").replace(">","")));
+		row.put("hasURI", URIUtils.replaceNameSpaceEx(getUri().replace("<","").replace(">","")));
 		rows.add(row);
 		return loader.deleteRows("ObjectCollection", rows);
 	}

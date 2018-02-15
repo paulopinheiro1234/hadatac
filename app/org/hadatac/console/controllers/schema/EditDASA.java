@@ -17,7 +17,7 @@ import org.hadatac.console.models.DASAForm;
 import org.hadatac.entity.pojo.DataAcquisitionSchema;
 import org.hadatac.entity.pojo.DataAcquisitionSchemaAttribute;
 import org.hadatac.entity.pojo.DataAcquisitionSchemaObject;
-import org.hadatac.metadata.loader.ValueCellProcessing;
+import org.hadatac.metadata.loader.URIUtils;
 
 import be.objectify.deadbolt.java.actions.Group;
 import be.objectify.deadbolt.java.actions.Restrict;
@@ -128,7 +128,7 @@ public class EditDASA extends Controller {
 			return badRequest("[ERRO] Failed locating existing DASA.\n");
 		}
 
-		String localName = ValueCellProcessing.replacePrefix(newURI);
+		String localName = URIUtils.replacePrefix(newURI);
 		localName = localName.substring(localName.indexOf(":") + 1);
 
 		// insert current state of the DASA

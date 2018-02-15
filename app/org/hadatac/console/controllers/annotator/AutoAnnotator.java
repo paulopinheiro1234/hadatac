@@ -35,7 +35,7 @@ import org.hadatac.entity.pojo.Measurement;
 import org.hadatac.entity.pojo.DataAcquisition;
 import org.hadatac.entity.pojo.User;
 import org.hadatac.metadata.loader.LabkeyDataHandler;
-import org.hadatac.metadata.loader.ValueCellProcessing;
+import org.hadatac.metadata.loader.URIUtils;
 import org.hadatac.utils.Collections;
 import org.hadatac.utils.ConfigProp;
 import org.hadatac.utils.Feedback;
@@ -137,7 +137,7 @@ public class AutoAnnotator extends Controller {
 	public Result assignDataAcquisition(String dataAcquisitionUri, String selectedFile) {
 		List<String> dataAcquisitionURIs = new ArrayList<String>();
 		DataAcquisition.findAll().forEach((da) -> dataAcquisitionURIs.add(
-				ValueCellProcessing.replaceNameSpaceEx(da.getUri())));
+				URIUtils.replaceNameSpaceEx(da.getUri())));
 
 		return ok(assignOption.render(dataAcquisitionURIs,
 				routes.AutoAnnotator.processDataAcquisitionForm(dataAcquisitionUri, selectedFile),
@@ -158,7 +158,7 @@ public class AutoAnnotator extends Controller {
 
 		List<String> dataAcquisitionURIs = new ArrayList<String>();
 		DataAcquisition.findAll().forEach((da) -> dataAcquisitionURIs.add(
-				ValueCellProcessing.replaceNameSpaceEx(da.getUri())));
+				URIUtils.replaceNameSpaceEx(da.getUri())));
 
 		if (form.hasErrors()) {
 			System.out.println("HAS ERRORS");
@@ -175,7 +175,7 @@ public class AutoAnnotator extends Controller {
 				file.setStatus(DataFile.UNPROCESSED);
 				file.setSubmissionTime(new SimpleDateFormat("yyyy/MM/dd HH:mm:ss").format(new Date()));
 			}
-			file.setDataAcquisitionUri(ValueCellProcessing.replacePrefixEx(data.getOption()));
+			file.setDataAcquisitionUri(URIUtils.replacePrefixEx(data.getOption()));
 			file.save();
 			return redirect(routes.AutoAnnotator.index());
 		}
@@ -240,7 +240,7 @@ public class AutoAnnotator extends Controller {
 		String base_name = FilenameUtils.getBaseName(fileName);
 		List<DataAcquisition> da_list = DataAcquisition.findAll();
 		for(DataAcquisition dc : da_list){
-			String abbrevUri = ValueCellProcessing.replaceNameSpaceEx(dc.getUri());
+			String abbrevUri = URIUtils.replaceNameSpaceEx(dc.getUri());
 			String qname = abbrevUri.split(":")[1];
 			if(base_name.startsWith(qname)){
 				return dc.getUri();

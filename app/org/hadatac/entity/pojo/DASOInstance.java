@@ -9,7 +9,7 @@ import org.apache.jena.update.UpdateProcessor;
 import org.apache.jena.update.UpdateRequest;
 
 import org.apache.commons.text.StrSubstitutor;
-import org.hadatac.metadata.loader.ValueCellProcessing;
+import org.hadatac.metadata.loader.URIUtils;
 import org.hadatac.utils.Collections;
 import org.hadatac.utils.NameSpaces;
 
@@ -50,7 +50,7 @@ public class DASOInstance {
 	public String getRowKey(){ return this.rowKey; }
 	public String getOrigValue(){ return this.origValue; }
 	public HashMap<String,String> getRelations(){ return this.relations; }    
-	public String getUriNamespace() { return ValueCellProcessing.replaceNameSpaceEx(uri); }
+	public String getUriNamespace() { return URIUtils.replaceNameSpaceEx(uri); }
 	//public HashMap<String,String> getTemplateValues(){ return this.templateValues; }
 
 	/*

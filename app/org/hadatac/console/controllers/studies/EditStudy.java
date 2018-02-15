@@ -28,7 +28,7 @@ import org.hadatac.entity.pojo.Agent;
 import org.hadatac.entity.pojo.Study;
 import org.hadatac.entity.pojo.StudyType;
 import org.hadatac.metadata.loader.LabkeyDataHandler;
-import org.hadatac.metadata.loader.ValueCellProcessing;
+import org.hadatac.metadata.loader.URIUtils;
 import org.hadatac.utils.ConfigProp;
 import org.labkey.remoteapi.CommandException;
 import org.labkey.remoteapi.query.SaveRowsResponse;
@@ -100,11 +100,11 @@ public class EditStudy extends Controller {
         }
         
 	// store new values
-	String newURI = ValueCellProcessing.replacePrefixEx(data.getNewUri());
+	String newURI = URIUtils.replacePrefixEx(data.getNewUri());
 	if (newURI == null || newURI.equals("")) {
             return badRequest("[ERROR] New URI cannot be empty.");
 	}
-	String newStudyType = ValueCellProcessing.replacePrefixEx(data.getNewType());
+	String newStudyType = URIUtils.replacePrefixEx(data.getNewType());
 	String newLabel = data.getNewLabel();
 	String newTitle = data.getNewTitle();
 	String newProject = data.getNewProject();

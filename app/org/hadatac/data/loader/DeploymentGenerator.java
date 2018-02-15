@@ -15,7 +15,7 @@ import org.apache.jena.query.ResultSet;
 import org.apache.jena.query.ResultSetFactory;
 import org.apache.jena.query.ResultSetRewindable;
 import org.apache.jena.rdf.model.RDFNode;
-import org.hadatac.metadata.loader.ValueCellProcessing;
+import org.hadatac.metadata.loader.URIUtils;
 import org.hadatac.utils.Collections;
 import org.hadatac.utils.ConfigProp;
 import org.hadatac.utils.NameSpaces;
@@ -59,7 +59,7 @@ public class DeploymentGenerator extends BasicGenerator {
 	    QuerySolution soln = resultsrw.next();
 	    RDFNode node = soln.get("cohort");
 	    if (null != node) {
-		cohort = ValueCellProcessing.replaceNameSpaceEx(node.toString());
+		cohort = URIUtils.replaceNameSpaceEx(node.toString());
 	    }
 	}
     	
@@ -82,7 +82,7 @@ public class DeploymentGenerator extends BasicGenerator {
 	    QuerySolution soln = resultsrw.next();
 	    RDFNode node = soln.get("sampleCollection");
 	    if (null != node) {
-		sampleCollection = ValueCellProcessing.replaceNameSpaceEx(node.toString());
+		sampleCollection = URIUtils.replaceNameSpaceEx(node.toString());
 	    }
 	}
     	
