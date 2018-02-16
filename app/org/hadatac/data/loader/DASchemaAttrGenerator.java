@@ -107,6 +107,9 @@ public class DASchemaAttrGenerator extends BasicGenerator {
 			} else {
 //				System.out.println(hasEntityMap.get(getValueByColumnName(rec, mapCol.get("AttributeOf"))).get(1));
 				if (hasEntityMap.containsKey(getValueByColumnName(rec, mapCol.get("AttributeOf")))){
+					if(codeMap.containsKey(hasEntityMap.get(getValueByColumnName(rec, mapCol.get("AttributeOf"))).get(1))){
+						return codeMap.get(hasEntityMap.get(getValueByColumnName(rec, mapCol.get("AttributeOf"))).get(1));
+					}
 					return hasEntityMap.get(getValueByColumnName(rec, mapCol.get("AttributeOf"))).get(1);
 				} else {
 					return "chear:unknownEntity";
