@@ -326,13 +326,14 @@ public class DataAcquisitionSchemaObject {
 		return object;
 	}
 
-	public static List<DataAcquisitionSchemaObject> findBySchema (String schemaUri) {
-		//System.out.println("Looking for data acquisition schema objectss for " + schemaUri);
+	public static List<DataAcquisitionSchemaObject> findBySchema(String schemaUri) {
+		System.out.println("Looking for data acquisition schema objects for <" + schemaUri + ">");
+		
 		List<DataAcquisitionSchemaObject> objects = new ArrayList<DataAcquisitionSchemaObject>();
 		String queryString = NameSpaces.getInstance().printSparqlNameSpaceList() + 
-				"SELECT ?uri ?label ?hasEntity ?hasRole ?inRelationTo ?relation WHERE { " + 
-				"   ?uri a hasco:DASchemaObject . " + 
-				"   ?uri hasco:partOfSchema " + schemaUri + " .  " + 
+				"SELECT ?uri ?label ?hasEntity ?hasRole ?inRelationTo ?relation WHERE { \n" + 
+				"   ?uri a hasco:DASchemaObject . \n" + 
+				"   ?uri hasco:partOfSchema <" + schemaUri + "> . \n" + 
 				"}";
 		Query query = QueryFactory.create(queryString);
 
@@ -362,6 +363,7 @@ public class DataAcquisitionSchemaObject {
 			}
 
 		}
+		
 		return objects;
 	}
 
@@ -476,9 +478,7 @@ public class DataAcquisitionSchemaObject {
 		Map<String, Object> row = new HashMap<String, Object>();
 		row.put("hasURI", URIUtils.replaceNameSpaceEx(getUri().replace("<","").replace(">","")));
 		rows.add(row);
-		for (Map<String,Object> str : rows) {
-			System.out.println("deleting DASO " + row.get("hasURI"));
-		}
+		
 		return loader.deleteRows("DASchemaObject", rows);
 	}
 

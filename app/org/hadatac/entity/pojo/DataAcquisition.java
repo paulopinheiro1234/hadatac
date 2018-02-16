@@ -877,6 +877,7 @@ public class DataAcquisition extends HADatAcThing {
 			}
 		} catch (Exception e) {
 			System.out.println("[ERROR] DataAcquisition.convertFromSolr(SolrDocument) - e.Message: " + e.getMessage());
+			e.printStackTrace();
 		}
 
 		return dataAcquisition;

@@ -122,7 +122,7 @@ public class DataAcquisitionSchemaEvent {
 		if (unit == "") {
 			return "";
 		}
-		return URIUtils.replaceNameSpaceEx(unit.replace("<","").replace(">",""));
+		return URIUtils.replaceNameSpaceEx(unit);
 	}
 
 	public void setUnit(String unit) {
@@ -226,13 +226,13 @@ public class DataAcquisitionSchemaEvent {
 		return event;
 	}
 
-	public static List<DataAcquisitionSchemaEvent> findBySchema (String schemaUri) {
+	public static List<DataAcquisitionSchemaEvent> findBySchema(String schemaUri) {
 		//System.out.println("Looking for data acuisition schema events for " + schemaUri);
 		List<DataAcquisitionSchemaEvent> events = new ArrayList<DataAcquisitionSchemaEvent>();
 		String queryString = NameSpaces.getInstance().printSparqlNameSpaceList() + 
 				"SELECT ?uri WHERE { " + 
 				"   ?uri a hasco:DASchemaEvent . " + 
-				"   ?uri hasco:partOfSchema " + schemaUri + " .  " + 
+				"   ?uri hasco:partOfSchema <" + schemaUri + "> .  " + 
 				"}";
 		Query query = QueryFactory.create(queryString);
 
@@ -265,8 +265,8 @@ public class DataAcquisitionSchemaEvent {
 	}
 
 	public void save() {
-		delete();  // delete any existing triple for the current DASE                                                        
-		//System.out.println("Saving <" + uri + ">");                                                                        
+		delete();  // delete any existing triple for the current DASE
+		
 		if (uri == null || uri.equals("")) {
 			System.out.println("[ERROR] Trying to save DASE without assigning an URI");
 			return;
@@ -341,9 +341,7 @@ public class DataAcquisitionSchemaEvent {
 		Map<String, Object> row = new HashMap<String, Object>();
 		row.put("hasURI", URIUtils.replaceNameSpaceEx(getUri().replace("<","").replace(">","")));
 		rows.add(row);
-		for (Map<String,Object> str : rows) {
-			System.out.println("deleting DASE " + row.get("hasURI"));
-		}
+		
 		return loader.deleteRows("DASchemaEvent", rows);
 	}
 

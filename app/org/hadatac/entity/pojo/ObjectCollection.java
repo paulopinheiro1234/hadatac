@@ -236,12 +236,13 @@ public class ObjectCollection extends HADatAcThing {
 		List<String> scopeUris = new ArrayList<String>();
 		String scopeUri = ""; 
 		String queryString = NameSpaces.getInstance().printSparqlNameSpaceList() + 
-				"SELECT  ?spaceScopeUri WHERE { " + 
-				"    " + oc_uri + " hasco:hasSpaceScope ?spaceScopeUri . " + 
+				"SELECT ?spaceScopeUri WHERE { \n" + 
+				" <" + oc_uri + "> hasco:hasSpaceScope ?spaceScopeUri . \n" + 
 				"}";
 		Query query = QueryFactory.create(queryString);
 
-		QueryExecution qexec = QueryExecutionFactory.sparqlService(Collections.getCollectionsName(Collections.METADATA_SPARQL), query);
+		QueryExecution qexec = QueryExecutionFactory.sparqlService(
+				Collections.getCollectionsName(Collections.METADATA_SPARQL), query);
 		ResultSet results = qexec.execSelect();
 		ResultSetRewindable resultsrw = ResultSetFactory.copyResults(results);
 		qexec.close();
@@ -260,7 +261,7 @@ public class ObjectCollection extends HADatAcThing {
 				}
 			}
 		}
-		
+
 		return scopeUris;
 	}
 
@@ -269,11 +270,12 @@ public class ObjectCollection extends HADatAcThing {
 		String scopeUri = "";
 		String queryString = NameSpaces.getInstance().printSparqlNameSpaceList() + 
 				"SELECT  ?timeScopeUri WHERE { " + 
-				"    " + oc_uri + " hasco:hasTimeScope ?timeScopeUri . " + 
+				" <" + oc_uri + "> hasco:hasTimeScope ?timeScopeUri . " + 
 				"}";
 		Query query = QueryFactory.create(queryString);
 
-		QueryExecution qexec = QueryExecutionFactory.sparqlService(Collections.getCollectionsName(Collections.METADATA_SPARQL), query);
+		QueryExecution qexec = QueryExecutionFactory.sparqlService(
+				Collections.getCollectionsName(Collections.METADATA_SPARQL), query);
 		ResultSet results = qexec.execSelect();
 		ResultSetRewindable resultsrw = ResultSetFactory.copyResults(results);
 		qexec.close();
@@ -292,7 +294,7 @@ public class ObjectCollection extends HADatAcThing {
 				}
 			}
 		}
-		
+
 		return scopeUris;
 	}
 
@@ -302,27 +304,26 @@ public class ObjectCollection extends HADatAcThing {
 		} catch (UnsupportedEncodingException e) {
 			e.printStackTrace();
 		}
-		
+
 		ObjectCollection oc = null;
-		if (oc_uri.startsWith("http")) {
-			oc_uri = "<" + oc_uri + ">";
-		}
+
 		String queryString = NameSpaces.getInstance().printSparqlNameSpaceList() + 
-				"SELECT  ?ocType ?comment ?studyUri ?hasScopeUri ?spaceScopeUri ?timeScopeUri WHERE { " + 
-				"    " + oc_uri + " a ?ocType . " + 
-				"    " + oc_uri + " hasco:isMemberOf ?studyUri .  " + 
-				"    OPTIONAL { " + oc_uri + " rdfs:comment ?comment } . " + 
-				"    OPTIONAL { " + oc_uri + " hasco:hasScope ?hasScopeUri } . " + 
+				"SELECT ?ocType ?comment ?studyUri ?hasScopeUri ?spaceScopeUri ?timeScopeUri WHERE { \n" + 
+				"    <" + oc_uri + "> a ?ocType . \n" + 
+				"    <" + oc_uri + "> hasco:isMemberOf ?studyUri . \n" + 
+				"    OPTIONAL { <" + oc_uri + "> rdfs:comment ?comment } . \n" + 
+				"    OPTIONAL { <" + oc_uri + "> hasco:hasScope ?hasScopeUri } . \n" + 
 				"}";
 		Query query = QueryFactory.create(queryString);
 
-		QueryExecution qexec = QueryExecutionFactory.sparqlService(Collections.getCollectionsName(Collections.METADATA_SPARQL), query);
+		QueryExecution qexec = QueryExecutionFactory.sparqlService(
+				Collections.getCollectionsName(Collections.METADATA_SPARQL), query);
 		ResultSet results = qexec.execSelect();
 		ResultSetRewindable resultsrw = ResultSetFactory.copyResults(results);
 		qexec.close();
 
 		if (!resultsrw.hasNext()) {
-			System.out.println("[WARNING] ObjectCollection. Could not find OC with URI: " + oc_uri);
+			System.out.println("[WARNING] ObjectCollection. Could not find OC with URI: <" + oc_uri + ">");
 			return oc;
 		}
 
@@ -382,8 +383,8 @@ public class ObjectCollection extends HADatAcThing {
 
 		// retrieve URIs of objects that are member of the collection
 		String queryMemberStr = NameSpaces.getInstance().printSparqlNameSpaceList() + 
-				"SELECT  ?uriMember WHERE { " + 
-				"    ?uriMember hasco:isMemberOf " + oc_uri + " .  " + 
+				"SELECT  ?uriMember WHERE { \n" + 
+				"    ?uriMember hasco:isMemberOf <" + oc_uri + "> . \n" + 
 				"}";
 
 		Query queryMember = QueryFactory.create(queryMemberStr);
@@ -410,7 +411,7 @@ public class ObjectCollection extends HADatAcThing {
 				}
 			}
 		}
-		
+
 		return oc;
 	}
 
@@ -454,10 +455,10 @@ public class ObjectCollection extends HADatAcThing {
 		List<ObjectCollection> ocList = new ArrayList<ObjectCollection>();
 
 		String queryString = NameSpaces.getInstance().printSparqlNameSpaceList() + 
-				"SELECT ?uri WHERE { " + 
-				"   ?ocType rdfs:subClassOf+ hasco:ObjectCollection . " +
-				"   ?uri a ?ocType .  " +
-				"   ?uri hasco:isMemberOf  <" + studyUri + "> . " +
+				"SELECT ?uri WHERE { \n" + 
+				"   ?ocType rdfs:subClassOf+ hasco:ObjectCollection . \n" +
+				"   ?uri a ?ocType . \n" +
+				"   ?uri hasco:isMemberOf <" + studyUri + "> . \n" +
 				" } ";
 		Query query = QueryFactory.create(queryString);
 		QueryExecution qexec = QueryExecutionFactory.sparqlService(
@@ -480,11 +481,11 @@ public class ObjectCollection extends HADatAcThing {
 			return null;
 		}
 		String queryString = NameSpaces.getInstance().printSparqlNameSpaceList() + 
-				"SELECT ?uri ?label WHERE { " + 
-				"   ?ocType rdfs:subClassOf+ hasco:ObjectCollection . " +
-				"   ?uri a ?ocType .  " +
-				"   ?uri hasco:isMemberOf  <" + studyUri + "> . " +
-				"   OPTIONAL { ?uri rdfs:label ?label } . " +
+				"SELECT ?uri ?label WHERE { \n" + 
+				"   ?ocType rdfs:subClassOf+ hasco:ObjectCollection . \n" +
+				"   ?uri a ?ocType . \n" +
+				"   ?uri hasco:isMemberOf <" + studyUri + "> . \n" +
+				"   OPTIONAL { ?uri rdfs:label ?label } . \n" +
 				" } ";
 		Query query = QueryFactory.create(queryString);
 

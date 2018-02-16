@@ -103,36 +103,35 @@ public class Parser {
 		int posInRelation = -1;
 		if (!schema.getTimestampLabel().equals("")) {
 			posTimestamp = schema.tempPositionOfLabel(schema.getTimestampLabel());
-			System.out.println("Finished tempPositionOfLabel!!!");
+			System.out.println("posTimestamp: " + posTimestamp);
 		}
 		if (!schema.getTimeInstantLabel().equals("")) {
 			posTimeInstant = schema.tempPositionOfLabel(schema.getTimeInstantLabel());
-			System.out.println("Finished tempPositionOfLabel!!!");
+			System.out.println("posTimeInstant: " + posTimeInstant);
 		}
 		if (!schema.getNamedTimeLabel().equals("")) {
 			posNamedTime = schema.tempPositionOfLabel(schema.getNamedTimeLabel());
-			System.out.println("Finished tempPositionOfLabel!!!");
+			System.out.println("posNamedTime: " + posNamedTime);
 		}
 		if (!schema.getIdLabel().equals("")) {
 			posId = schema.tempPositionOfLabel(schema.getIdLabel());
-			System.out.println("Finished tempPositionOfLabel!!!");
+			System.out.println("posId: " + posId);
 		}
 		if (!schema.getOriginalIdLabel().equals("")) {
-			System.out.println("schema.getOriginalIdLabel() " + schema.getOriginalIdLabel());
 			posOriginalId = schema.tempPositionOfLabel(schema.getOriginalIdLabel());
-			System.out.println("Finished tempPositionOfLabel!!!");
+			System.out.println("posOriginalId: " + posOriginalId);
 		}
 		if (!schema.getEntityLabel().equals("")) {
 			posEntity = schema.tempPositionOfLabel(schema.getEntityLabel());
-			System.out.println("Finished tempPositionOfLabel!!!");
+			System.out.println("posEntity: " + posEntity);
 		}
 		if (!schema.getUnitLabel().equals("")) {
 			posUnit = schema.tempPositionOfLabel(schema.getUnitLabel());
-			System.out.println("Finished tempPositionOfLabel!!!");
+			System.out.println("posUnit: " + posUnit);
 		}
 		if (!schema.getInRelationToLabel().equals("")) {
 			posInRelation = schema.tempPositionOfLabel(schema.getInRelationToLabel());
-			System.out.println("Finished tempPositionOfLabel getInRelationToLabel !!!");
+			System.out.println("posInRelation: " + posInRelation);
 		}
 		
 		// Store possible values before hand to avoid frequent SPARQL queries
@@ -140,7 +139,7 @@ public class Parser {
 		Map<String, List<String>> mapIDStudyObjects = DataAcquisitionSchema.findIdUriMappings(da.getStudyUri());
 		String dasoUnitUri = DataAcquisitionSchema.findByLabel(da.getSchemaUri(), schema.getUnitLabel());
 		
-		System.out.println("possibleValues: " + possibleValues);
+		//System.out.println("possibleValues: " + possibleValues);
 		
 		// Comment out row instance generation
 		/*
@@ -149,7 +148,7 @@ public class Parser {
 				templateList, AnnotationWorker.codeMappings, AnnotationWorker.codebook_K);
 		Map<String, DASOInstance> rowInstances = new HashMap<String,DASOInstance>();
 		*/
-
+		
 		for (CSVRecord record : records) {
 			// Comment out row instance generation
 			/*
@@ -169,16 +168,13 @@ public class Parser {
 			*/
 
 			Iterator<DataAcquisitionSchemaAttribute> iterAttributes = schema.getAttributes().iterator();
-			while (iterAttributes.hasNext()) {
+			while (iterAttributes.hasNext()) {				
 				DataAcquisitionSchemaAttribute dasa = iterAttributes.next();
-				//System.out.println("[Parser] read a DASA " + dasa.getUri() + " with label " + dasa.getLabel());
-				// why is schema.getAttributes() returning DASAs that don't belong to the schema?
+				
 				if (!dasa.getPartOfSchema().equals(schema.getUri())){
-					//System.out.println("[Parser] .... Skipping attribute " + dasa.getPartOfSchema() + " != " + schema.getUri());
 					continue;
 				}
 				if (!record.isMapped(dasa.getLabel())) {
-					//System.out.println("[Parser] .... Skipping attribute " + dasa.getLabel() + " : not in the DA file");
 					continue;
 				}
 				if (dasa.getLabel().equals(schema.getTimestampLabel())) {
@@ -207,7 +203,6 @@ public class Parser {
 				}
 
 				Measurement measurement = new Measurement();
-
 				/*===================*
 				 *                   *
 				 *   SET VALUE       *
@@ -259,6 +254,7 @@ public class Parser {
 						try {
 							measurement.setTimestamp(timeValue);
 						} catch (Exception e) {
+							System.out.println("Setting current time!");
 							measurement.setTimestamp(new Date(0).toInstant().toString());
 						}
 					}
@@ -273,14 +269,14 @@ public class Parser {
 				} else if (dasa.getEventUri() != null && !dasa.getEventUri().equals("")) {
 					measurement.setAbstractTime(dasa.getEventUri());
 				}
-
+				
 				/*============================*
 				 *                            *
 				 *   SET STUDY                *
 				 *                            *
 				 *============================*/
 				measurement.setStudyUri(da.getStudyUri());
-
+				
 				/*=============================*
 				 *                             *
 				 *   SET OBJECT ID, PID, SID   *
@@ -447,7 +443,7 @@ public class Parser {
 					// Assign units from the Unit column of SDD
 					measurement.setUnitUri(dasa.getUnit());
 				}
-
+				
 				/*=================================*
 				 *                                 *
 				 *   SET DATASET                   *
@@ -460,7 +456,7 @@ public class Parser {
 				} catch (IOException | SolrServerException e) {
 					System.out.println("[ERROR] SolrClient.addBean - e.Message: " + e.getMessage());
 				}
-
+				
 				// INTERMEDIARY COMMIT
 				if((++total_count) % batch_size == 0) {
 					try {

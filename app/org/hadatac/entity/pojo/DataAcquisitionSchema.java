@@ -96,11 +96,11 @@ public class DataAcquisitionSchema {
 	}
 
 	public String getUri() {
-		return uri.replace("<","").replace(">","");
+		return uri;
 	}
 
 	public String getUriNamespace() {
-		return URIUtils.replaceNameSpaceEx(uri.replace("<","").replace(">",""));
+		return URIUtils.replaceNameSpaceEx(uri);
 	}
 
 	public void setUri(String uri) {
@@ -213,13 +213,13 @@ public class DataAcquisitionSchema {
 	}
 
 	public void setAttributes(List<DataAcquisitionSchemaAttribute> attributes) {
-		System.out.println("setAttributes is called!");
 		if (attributes == null) {
 			System.out.println("[ERROR] No DataAcquisitionSchemaAttribute for " + uri + " is defined in the knowledge base. ");
 		} else {
 			this.attributes = attributes;
 			for (DataAcquisitionSchemaAttribute dasa : attributes) {
 				dasa.setDataAcquisitionSchema(this);
+				
 				System.out.println("dasa.getAttribute(): " + dasa.getAttribute());
 				if (dasa.getAttribute().equals(URIUtils.replacePrefixEx("sio:TimeStamp"))) {
 					setTimestampLabel(dasa.getLabel());
@@ -245,9 +245,21 @@ public class DataAcquisitionSchema {
 					setEntityLabel(dasa.getLabel());
 					System.out.println("[OK] DataAcquisitionSchema EntityLabel: " + dasa.getLabel());
 				}
-				if (dasa.getAttribute().equals(URIUtils.replacePrefixEx("hasco:hasUnit"))) {
-					setUnitLabel(dasa.getLabel());
-					System.out.println("[OK] DataAcquisitionSchema UnitLabel: " + dasa.getLabel());
+				if (!dasa.getInRelationToUri(URIUtils.replacePrefixEx("sio:hasUnit")).isEmpty()) {
+					String uri = dasa.getInRelationToUri(URIUtils.replacePrefixEx("sio:hasUnit"));
+					System.out.println("uri: " + uri);
+					DataAcquisitionSchemaObject dasoUnit = DataAcquisitionSchemaObject.find(uri);
+					if (dasoUnit != null) {
+						setUnitLabel(dasoUnit.getLabel());
+						System.out.println("daso unit " + dasa.getUri() + " " + dasoUnit.getLabel());
+					} else {
+						DataAcquisitionSchemaAttribute dasaUnit = DataAcquisitionSchemaAttribute.find(uri);
+						if (dasaUnit != null) {
+							setUnitLabel(dasaUnit.getLabel());
+							System.out.println("dasa unit");
+						}
+					}
+					System.out.println("[OK] DataAcquisitionSchema UnitLabel: " + getUnitLabel());
 				}
 				if (dasa.getAttribute().equals(URIUtils.replacePrefixEx("sio:InRelationTo"))) {
 					setInRelationToLabel(dasa.getLabel());
@@ -352,13 +364,26 @@ public class DataAcquisitionSchema {
 			return -1;
 		}
 		
+		int position = -1;
 		for (DataAcquisitionSchemaAttribute dasa : getAttributes()) {
 			if (dasa.getLabel().equalsIgnoreCase(label)) {
-				return dasa.getTempPositionInt();
+				position = dasa.getTempPositionInt();
+				break;
+			}
+		}
+		
+		if (position != -1) {
+			return position;
+		}
+		
+		for (DataAcquisitionSchemaObject daso : getObjects()) {
+			if (daso.getLabel().equalsIgnoreCase(label)) {
+				position = daso.getTempPositionInt();
+				break;
 			}
 		}
 
-		return -1;
+		return position;
 	}
 
 	public static DataAcquisitionSchema find(String schemaUri) {
@@ -368,11 +393,9 @@ public class DataAcquisitionSchema {
 			System.out.println("[ERROR] DataAcquisitionSchema URI blank or null.");
 			return null;
 		}
-		if (schemaUri.startsWith("http")) {
-			schemaUri = "<" + schemaUri + ">";
-		}
+		
 		String queryString = NameSpaces.getInstance().printSparqlNameSpaceList() + 
-				" ASK { " + schemaUri + " a hasco:DASchema . } ";
+				" ASK { <" + schemaUri + "> a hasco:DASchema . } ";
 		Query query = QueryFactory.create(queryString);
 
 		QueryExecution qexec = QueryExecutionFactory.sparqlService(
@@ -381,7 +404,7 @@ public class DataAcquisitionSchema {
 		qexec.close();
 
 		if (!uriExist) {
-			System.out.println("[WARNING] DataAcquisitionSchema. Could not find schema for uri: " + schemaUri);
+			System.out.println("[WARNING] DataAcquisitionSchema. Could not find schema for uri: <" + schemaUri + ">");
 			return null;
 		}
 
@@ -391,10 +414,11 @@ public class DataAcquisitionSchema {
 		schema.setAttributes(DataAcquisitionSchemaAttribute.findBySchema(schemaUri));
 		schema.setObjects(DataAcquisitionSchemaObject.findBySchema(schemaUri));
 		schema.setEvents(DataAcquisitionSchemaEvent.findBySchema(schemaUri));
-		System.out.println("[OK] DataAcquisitionSchema " + schemaUri + " exists. " + 
+		System.out.println("[OK] DataAcquisitionSchema <" + schemaUri + "> exists. " + 
 				"It has " + schema.getAttributes().size() + " attributes, " + 
 				schema.getObjects().size() + " objects, and " + 
 				schema.getEvents().size() + " events.");
+		
 		return schema;
 	}
 
@@ -470,6 +494,7 @@ public class DataAcquisitionSchema {
 	
 	public static String findByLabel(String schemaUri, String label) {
 		System.out.println("findByPosIndex is called!");
+		
 		String queryString = NameSpaces.getInstance().printSparqlNameSpaceList()
 				+ " SELECT ?daso_or_dasa WHERE { "
 				+ " ?daso_or_dasa rdfs:label \"" + label + "\" . "
@@ -483,13 +508,9 @@ public class DataAcquisitionSchema {
 		ResultSetRewindable resultsrw = ResultSetFactory.copyResults(results);
 		qexec.close();
 
-		try {
-			if (resultsrw.hasNext()) {
-				QuerySolution soln = resultsrw.next();
-				return soln.getResource("daso_or_dasa").toString();
-			}
-		} catch (Exception e) {
-			System.out.println("findByPosIndex() Error: " + e.getMessage());
+		if (resultsrw.hasNext()) {
+			QuerySolution soln = resultsrw.next();
+			return soln.get("daso_or_dasa").toString();
 		}
 
 		return "";
