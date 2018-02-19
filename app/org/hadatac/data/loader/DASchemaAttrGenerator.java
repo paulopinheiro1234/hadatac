@@ -159,15 +159,20 @@ public class DASchemaAttrGenerator extends BasicGenerator {
 	@Override
 	public List< Map<String, Object> > createRows() throws Exception {
 		rows.clear();
+		List<String> column_name = new ArrayList<String>();
 		int row_number = 0;
 		for (CSVRecord record : records) {
 			if (getAttribute(record)  == null || getAttribute(record).equals("")){
+				if (column_name.contains(getLabel(record))){
+					rows.add(createRow(record, ++row_number));
+				}
 				continue;
 			} else {
 				rows.add(createRow(record, ++row_number));
+				column_name.add(getLabel(record));
 			}
 		}
-
+		System.out.println("rows 1 " + rows);
 		return rows;
 	}
 	
@@ -194,7 +199,11 @@ public class DASchemaAttrGenerator extends BasicGenerator {
 		row.put("rdfs:comment", getLabel(rec));
 		row.put("hasco:partOfSchema", kbPrefix + "DAS-" + SDDName);
 		row.put("hasco:hasEntity", getEntity(rec));
-		row.put("sio:inRelationTo", getInRelationTo(rec));
+		if (getRelation(rec).length() > 0) {
+			row.put(getRelation(rec), getInRelationTo(rec));
+		} else {
+			row.put("sio:inRelationTo", getInRelationTo(rec));
+		}
 		if (getInRelationTo(rec).length() > 0) {
 			if (getRelation(rec).length() > 0) {
 				row.put("sio:Relation", getRelation(rec));
