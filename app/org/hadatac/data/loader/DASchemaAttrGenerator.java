@@ -22,6 +22,7 @@ public class DASchemaAttrGenerator extends BasicGenerator {
 	String SDDName = "";
 	Map<String, String> codeMap;
 	Map<String, List<String>> hasEntityMap = new HashMap<String, List<String>>();
+	Map<String, String> currentHasEntity = new HashMap<String, String>();
 
 	public DASchemaAttrGenerator(File file, String SDDName, Map<String, String> codeMap) {
 		super(file);
@@ -99,21 +100,25 @@ public class DASchemaAttrGenerator extends BasicGenerator {
 
 	private String getEntity(CSVRecord rec) {
 		if (getValueByColumnName(rec, mapCol.get("AttributeOf")).equals("")) {
+			currentHasEntity.put(getLabel(rec), "chear:unknownEntity");
 			return "chear:unknownEntity";
 		} else {
 			if (codeMap.containsKey(hasEntityMap.get(getValueByColumnName(rec, mapCol.get("AttributeOf"))))) {
 				System.out.println("codeMap: " + codeMap.get(hasEntityMap.get(getValueByColumnName(rec, mapCol.get("AttributeOf")))));
+				currentHasEntity.put(getLabel(rec), codeMap.get(hasEntityMap.get(getValueByColumnName(rec, mapCol.get("AttributeOf")))));
 				return codeMap.get(hasEntityMap.get(getValueByColumnName(rec, mapCol.get("AttributeOf"))));
 			} else {
 //				System.out.println(hasEntityMap.get(getValueByColumnName(rec, mapCol.get("AttributeOf"))).get(1));
 				if (hasEntityMap.containsKey(getValueByColumnName(rec, mapCol.get("AttributeOf")))){
 					if(codeMap.containsKey(hasEntityMap.get(getValueByColumnName(rec, mapCol.get("AttributeOf"))).get(1))){
+						currentHasEntity.put(getLabel(rec), codeMap.get(hasEntityMap.get(getValueByColumnName(rec, mapCol.get("AttributeOf"))).get(1)));
 						return codeMap.get(hasEntityMap.get(getValueByColumnName(rec, mapCol.get("AttributeOf"))).get(1));
 					}
+					currentHasEntity.put(getLabel(rec), hasEntityMap.get(getValueByColumnName(rec, mapCol.get("AttributeOf"))).get(1));
 					return hasEntityMap.get(getValueByColumnName(rec, mapCol.get("AttributeOf"))).get(1);
-				} else {
-					return "chear:unknownEntity";
 				}
+				currentHasEntity.put(getLabel(rec), "chear:unknownEntity");
+				return "chear:unknownEntity";
 			}
 		}
 	}
@@ -164,7 +169,7 @@ public class DASchemaAttrGenerator extends BasicGenerator {
 		for (CSVRecord record : records) {
 			if (getAttribute(record)  == null || getAttribute(record).equals("")){
 				if (column_name.contains(getLabel(record))){
-					rows.add(createRow(record, ++row_number));
+					rows.add(createRelationRow(record, ++row_number));
 				}
 				continue;
 			} else {
@@ -198,7 +203,9 @@ public class DASchemaAttrGenerator extends BasicGenerator {
 		row.put("rdfs:label", getLabel(rec));
 		row.put("rdfs:comment", getLabel(rec));
 		row.put("hasco:partOfSchema", kbPrefix + "DAS-" + SDDName);
-		row.put("hasco:hasEntity", getEntity(rec));
+		if (!currentHasEntity.containsKey(getLabel(rec))){
+			row.put("hasco:hasEntity", getEntity(rec));
+		}
 		if (getRelation(rec).length() > 0) {
 			row.put(getRelation(rec), getInRelationTo(rec));
 		} else {
@@ -218,6 +225,25 @@ public class DASchemaAttrGenerator extends BasicGenerator {
 		row.put("hasco:isAttributeOf", getAttributeOf(rec));
 		row.put("hasco:isVirtual", checkVirtual(rec).toString());
 		row.put("hasco:isPIConfirmed", "false");
+
+		return row;
+	}
+	
+	Map<String, Object> createRelationRow(CSVRecord rec, int row_number) throws Exception {
+		Map<String, Object> row = new HashMap<String, Object>();
+		row.put("hasURI", kbPrefix + "DASA-" + SDDName + "-" + getLabel(rec).trim().replace(" ", "").replace("_","-").replace("??", ""));
+		if (getRelation(rec).length() > 0) {
+			row.put(getRelation(rec), getInRelationTo(rec));
+		} else {
+			row.put("sio:inRelationTo", getInRelationTo(rec));
+		}
+		if (getInRelationTo(rec).length() > 0) {
+			if (getRelation(rec).length() > 0) {
+				row.put("sio:Relation", getRelation(rec));
+			} else {
+				row.put("sio:Relation", "sio:inRelationTo");
+			}
+		}
 
 		return row;
 	}
