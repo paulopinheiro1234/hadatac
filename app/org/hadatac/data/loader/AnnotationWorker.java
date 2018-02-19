@@ -620,13 +620,11 @@ public class AnnotationWorker {
 		
 		try {
 			checkRows(rows, "hasURI");
-			//System.out.println("checkRows succeed.");
 		} catch (Exception e) {
 			log.addline(Feedback.println(Feedback.WEB, String.format(
 					"[ERROR] Trying to commit invalid rows to LabKey Table %s: ", tableName)
 					+ e.getMessage()));
 			log.save();
-			return false;
 		}
 
 		Credential cred = Credential.find();
@@ -634,7 +632,6 @@ public class AnnotationWorker {
 			log.resetLog();
 			log.addline(Feedback.println(Feedback.WEB, "[ERROR] No LabKey credentials are provided!"));
 			log.save();
-			return false;
 		}
 
 		String site = ConfigProp.getPropertyValue("labkey.config", "site");
@@ -657,7 +654,6 @@ public class AnnotationWorker {
 			} catch (CommandException e) {
 				log.addline(Feedback.println(Feedback.WEB, "[ERROR] CommitRows inside AutoAnnotator: " + e));
 				log.save();
-				return false;
 			}
 		}
 
