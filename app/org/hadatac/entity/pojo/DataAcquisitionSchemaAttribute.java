@@ -447,7 +447,7 @@ public class DataAcquisitionSchemaAttribute {
 			}
 			return dase.getLabel();
 		}
-	}// /getEventViewLabel()
+	}
 
 	public static DataAcquisitionSchemaAttribute find(String dasa_uri) {
 		DataAcquisitionSchemaAttribute dasa = null;
@@ -465,8 +465,7 @@ public class DataAcquisitionSchemaAttribute {
 				"    OPTIONAL { <" + dasa_uri + "> hasco:isAttributeOf ?hasDASO } . \n" + 
 				"    OPTIONAL { <" + dasa_uri + "> hasco:hasSource ?hasSource } . \n" + 
 				"    OPTIONAL { <" + dasa_uri + "> hasco:isPIConfirmed ?isPIConfirmed } . \n" + 
-				"    OPTIONAL { <" + dasa_uri + "> sio:inRelationTo ?inRelationTo } . \n" + 
-				"    OPTIONAL { <" + dasa_uri + "> sio:Relation ?relation } . \n" +
+				"    OPTIONAL { <" + dasa_uri + "> sio:Relation ?relation . <" + dasa_uri + "> ?relation ?inRelationTo . } . \n" + 
 				"    OPTIONAL { <" + dasa_uri + "> rdfs:label ?label } . \n" +
 				"}";
 		
@@ -496,50 +495,54 @@ public class DataAcquisitionSchemaAttribute {
 		String inRelationToUri = "";
 		String relationUri = "";
 
-		QuerySolution soln = resultsrw.next();
-		labelStr = FirstLabel.getLabel(dasa_uri);
+		while (resultsrw.hasNext()) {
+			QuerySolution soln = resultsrw.next();
+			labelStr = FirstLabel.getLabel(dasa_uri);
 
-		if (soln.get("partOfSchema") != null) {
-			partOfSchemaStr = soln.get("partOfSchema").toString();
+			if (soln.get("partOfSchema") != null) {
+				partOfSchemaStr = soln.get("partOfSchema").toString();
+			}
+			if (soln.get("hasEntity") != null) {
+				entityStr = soln.get("hasEntity").toString();
+			}
+			if (soln.get("hasAttribute") != null) {
+				attributeStr = soln.get("hasAttribute").toString();
+			}
+			if (soln.get("hasUnit") != null) {
+				unitStr = soln.get("hasUnit").toString();
+			}
+			if (soln.get("hasDASO") != null) {
+				dasoUriStr = soln.get("hasDASO").toString();
+			}
+			if (soln.get("hasDASE") != null) {
+				daseUriStr = soln.get("hasDASE").toString();
+			}
+			if (soln.get("inRelationTo") != null) {
+				inRelationToUri = soln.get("inRelationTo").toString();
+			}
+			if (soln.get("relation") != null) {
+				relationUri = soln.get("relation").toString();
+			}
+			
+			if (dasa == null) {
+				dasa = new DataAcquisitionSchemaAttribute(
+						dasa_uri,
+						localNameStr,
+						labelStr,
+						partOfSchemaStr,
+						positionStr,
+						entityStr,
+						attributeStr,
+						unitStr,
+						daseUriStr,
+						dasoUriStr);
+			}
+			
+			dasa.addRelation(relationUri, inRelationToUri);
 		}
-		if (soln.get("hasEntity") != null) {
-			entityStr = soln.get("hasEntity").toString();
-		}
-		if (soln.get("hasAttribute") != null) {
-			attributeStr = soln.get("hasAttribute").toString();
-		}
-		if (soln.get("hasUnit") != null) {
-			unitStr = soln.get("hasUnit").toString();
-		}
-		if (soln.get("hasDASO") != null) {
-			dasoUriStr = soln.get("hasDASO").toString();
-		}
-		if (soln.get("hasDASE") != null) {
-			daseUriStr = soln.get("hasDASE").toString();
-		}
-		if (soln.get("inRelationTo") != null) {
-			inRelationToUri = soln.get("inRelationTo").toString();
-		}
-		if (soln.get("relation") != null) {
-			relationUri = soln.get("relation").toString();
-		}
-
-		dasa = new DataAcquisitionSchemaAttribute(
-				dasa_uri,
-				localNameStr,
-				labelStr,
-				partOfSchemaStr,
-				positionStr,
-				entityStr,
-				attributeStr,
-				unitStr,
-				daseUriStr,
-				dasoUriStr);
-		
-		dasa.addRelation(relationUri, inRelationToUri);
 
 		return dasa;
-	}// /find()
+	}
 
     public static List<DataAcquisitionSchemaAttribute> findByAttribute (String attributeUri){
 		System.out.println("Looking for data acquisition schema attributes with hasco:hasAttribute " + attributeUri);
@@ -586,14 +589,14 @@ public class DataAcquisitionSchemaAttribute {
 			}
 		}
 		attributes.sort(Comparator.comparing(DataAcquisitionSchemaAttribute::getPositionInt));
+		
 		return attributes;
-
-    }// /findByAttribute()
+    }
 
     // Given a study URI, 
     // returns a list of DASA's
     // (we need to go study -> data acqusition(s) -> data acqusition schema(s) -> data acquisition schema attributes)
-    public static List<DataAcquisitionSchemaAttribute> findByStudy (String studyUri){
+    public static List<DataAcquisitionSchemaAttribute> findByStudy(String studyUri){
 		System.out.println("Looking for data acquisition schema attributes from study " + studyUri);
 		if (studyUri.startsWith("http")) {
 			studyUri = "<" + studyUri + ">";
@@ -641,9 +644,9 @@ public class DataAcquisitionSchemaAttribute {
 			}
 		}
 		attributes.sort(Comparator.comparing(DataAcquisitionSchemaAttribute::getPositionInt));
+		
 		return attributes;
-
-    }// /findByStudy()
+    }
 
 	public static List<DataAcquisitionSchemaAttribute> findBySchema(String schemaUri) {
 		System.out.println("Looking for data acquisition schema attributes for <" + schemaUri + ">");
@@ -684,7 +687,7 @@ public class DataAcquisitionSchemaAttribute {
 		attributes.sort(Comparator.comparing(DataAcquisitionSchemaAttribute::getPositionInt));
 		
 		return attributes;
-	}// /findBySchema()
+	}
 
 	public void save() {
 		delete();  // delete any existing triple for the current DASA

@@ -549,6 +549,7 @@ public class AnnotationWorker {
 			e.printStackTrace(new PrintWriter(errors));
 			log.addline(Feedback.println(Feedback.WEB, String.format("[ERROR] parsing and indexing CSV file %s", errors.toString())));
 			log.save();
+			e.printStackTrace();
 			return false;
 		}
 

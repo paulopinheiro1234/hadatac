@@ -15,6 +15,7 @@ import org.apache.solr.client.solrj.response.QueryResponse;
 import org.hadatac.console.models.Facet;
 import org.hadatac.console.models.FacetHandler;
 import org.hadatac.console.models.Pivot;
+import org.hadatac.metadata.loader.URIUtils;
 import org.hadatac.utils.Collections;
 
 import com.typesafe.config.ConfigFactory;
@@ -72,11 +73,19 @@ public class UnitInstance extends HADatAcThing implements Comparable<UnitInstanc
 		for (Pivot pivot_ent : pivot.children) {
 			UnitInstance unit = new UnitInstance();
 			unit.setUri(pivot_ent.value);
-			Unit unit_temp = Unit.find(pivot_ent.value);
-			if (unit_temp != null) {
-				unit.setLabel(WordUtils.capitalize(unit_temp.getLabel()));
+			if (URIUtils.isValidURI(pivot_ent.value)) {
+				Unit unit_temp = Unit.find(pivot_ent.value);
+				if (unit_temp != null) {
+					unit.setLabel(WordUtils.capitalize(unit_temp.getLabel()));
+				} else {
+					unit.setLabel("(Unknown Unit)");
+				}
 			} else {
-				unit.setLabel("(Empty)");
+				if (pivot_ent.value.isEmpty()) {
+					unit.setLabel("(Unknown Unit)");
+				} else {
+					unit.setLabel(pivot_ent.value);
+				}
 			}
 			unit.setCount(pivot_ent.count);
 			unit.setField("unit_uri_str");

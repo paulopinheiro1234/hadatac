@@ -133,6 +133,8 @@ public class Platform extends HADatAcThing implements Comparable<Platform> {
 				+ " ?platformUri rdfs:label ?platformLabel . \n"
 				+ " ?dataAcquisitionUri rdfs:label ?dataAcquisitionLabel . \n"
 				+ " } \n";
+		
+		//System.out.println("Platform getTargetFacets() query: " + query);
 
 		Map<HADatAcThing, List<HADatAcThing>> results = new HashMap<HADatAcThing, List<HADatAcThing>>();
 		try {

@@ -87,7 +87,7 @@ public class DASchemaAttrGenerator extends BasicGenerator {
 			return codeMap.get(original);
 		}
 		
-		return "obo:UO_0000186";
+		return "";
 	}
 
 	private String getTime(CSVRecord rec) {

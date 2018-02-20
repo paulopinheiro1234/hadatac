@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.BiConsumer;
+import java.util.stream.Collectors;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.jena.query.QueryExecution;
@@ -38,6 +39,7 @@ import org.hadatac.console.models.Facet;
 import org.hadatac.console.models.FacetHandler;
 import org.hadatac.console.models.Pivot;
 import org.hadatac.data.model.AcquisitionQueryResult;
+import org.hadatac.metadata.loader.URIUtils;
 import org.hadatac.utils.Collections;
 import org.hadatac.utils.NameSpaces;
 
@@ -740,16 +742,22 @@ public class Measurement {
 	public static Map<String, String> generateCachedLabel(List<String> uris) {
 		Map<String, String> results = new HashMap<String, String>();
 		
+		List<String> validURIs = new ArrayList<String>();
 		// Set default label as local name
 		for (String uri : uris) {
-			results.put(uri, uri.substring(Math.max(uri.lastIndexOf("#"), uri.lastIndexOf("/")) + 1));
+			if (URIUtils.isValidURI(uri)) {
+				results.put(uri, uri.substring(Math.max(uri.lastIndexOf("#"), uri.lastIndexOf("/")) + 1));
+				validURIs.add(uri);
+			} else {
+				results.put(uri, uri);
+			}
 		}
 		
 		String valueConstraint = "";
 		if (uris.isEmpty()) {
 			return results;
 		} else {
-			valueConstraint = " VALUES ?uri { " + HADatAcThing.stringify(uris, true) + " } ";
+			valueConstraint = " VALUES ?uri { " + HADatAcThing.stringify(validURIs, true) + " } ";
 		}
 		
 		String query = "";

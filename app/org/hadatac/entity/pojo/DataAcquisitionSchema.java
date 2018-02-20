@@ -251,12 +251,10 @@ public class DataAcquisitionSchema {
 					DataAcquisitionSchemaObject dasoUnit = DataAcquisitionSchemaObject.find(uri);
 					if (dasoUnit != null) {
 						setUnitLabel(dasoUnit.getLabel());
-						System.out.println("daso unit " + dasa.getUri() + " " + dasoUnit.getLabel());
 					} else {
 						DataAcquisitionSchemaAttribute dasaUnit = DataAcquisitionSchemaAttribute.find(uri);
 						if (dasaUnit != null) {
 							setUnitLabel(dasaUnit.getLabel());
-							System.out.println("dasa unit");
 						}
 					}
 					System.out.println("[OK] DataAcquisitionSchema UnitLabel: " + getUnitLabel());
@@ -447,14 +445,16 @@ public class DataAcquisitionSchema {
 	public static Map<String, Map<String, String>> findPossibleValues(String schemaUri) {
 		Map<String, Map<String, String>> mapPossibleValues = new HashMap<String, Map<String, String>>();
 		String queryString = NameSpaces.getInstance().printSparqlNameSpaceList()
-				+ " SELECT ?daso_or_dasa ?codeClass ?code ?label ?resource WHERE { \n"
+				+ " SELECT ?daso_or_dasa ?codeClass ?code ?codeLabel ?resource WHERE { \n"
 				+ " ?possibleValue a hasco:PossibleValue . \n"
 				+ " ?possibleValue hasco:isPossibleValueOf ?daso_or_dasa . \n"
 				+ " ?possibleValue hasco:hasCode ?code . \n"
 				+ " ?daso_or_dasa hasco:partOfSchema <" + schemaUri + "> . \n" 
 				+ " OPTIONAL { ?possibleValue hasco:hasClass ?codeClass } . \n"
 				+ " OPTIONAL { ?possibleValue hasco:hasResource ?resource } . \n"
+				+ " OPTIONAL { ?possibleValue hasco:hasCodeLabel ?codeLabel } . \n"
 				+ " }";
+		
 		//System.out.println("findPossibleValues query: " + queryString);
 		
 		Query query = QueryFactory.create(queryString);
@@ -468,10 +468,13 @@ public class DataAcquisitionSchema {
 			while (resultsrw.hasNext()) {
 				String classUri = "";
 				QuerySolution soln = resultsrw.next();
-				if (soln.get("codeClass") != null && soln.get("codeClass").toString().length() > 0) {
-					classUri = soln.getResource("codeClass").toString();
-				} else if (soln.get("resource") != null && soln.get("resource").toString().length() > 0) {
-					classUri = soln.getResource("resource").toString();
+				if (soln.get("codeClass") != null && !soln.get("codeClass").toString().isEmpty()) {
+					classUri = soln.get("codeClass").toString();
+				} else if (soln.get("resource") != null && !soln.get("resource").toString().isEmpty()) {
+					classUri = soln.get("resource").toString();
+				} else if (soln.get("codeLabel") != null && !soln.get("codeLabel").toString().isEmpty()) {
+					// No code class is given, use code label instead
+					classUri = soln.get("codeLabel").toString();
 				}
 				
 				String daso_or_dasa = soln.getResource("daso_or_dasa").toString();

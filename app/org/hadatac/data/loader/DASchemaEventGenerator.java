@@ -87,7 +87,8 @@ public class DASchemaEventGenerator extends BasicGenerator {
 		} else if (getValueByColumnName(rec, mapCol.get("Unit")) != null){
 			return getValueByColumnName(rec, mapCol.get("Unit"));
 		}
-		return "obo:UO_0000186";
+		
+		return "";
 	}
 
 	private String getTime(CSVRecord rec) {

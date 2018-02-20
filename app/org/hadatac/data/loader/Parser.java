@@ -215,7 +215,7 @@ public class Parser {
 					continue;
 				} else {
 					String originalValue = record.get(dasa.getTempPositionInt());
-					String dasa_uri_temp = dasa.getUri().replace("<", "").replace(">", "");
+					String dasa_uri_temp = dasa.getUri();
 					measurement.setOriginalValue(originalValue);
 					if (possibleValues.containsKey(dasa_uri_temp)) {
 						if (possibleValues.get(dasa_uri_temp).containsKey(originalValue.toLowerCase())) {
@@ -314,8 +314,6 @@ public class Parser {
 					measurement.setPID("");
 					measurement.setSID("");
 				}
-
-				//String auxUri = rowInstances.get(dasa.getObjectUri()).getUri();
 				
 				/*=============================*
 				 *                             *
@@ -334,8 +332,8 @@ public class Parser {
 				 *   SET ENTITY AND CHARACTERISTIC URI  *              *
 				 *                                      *
 				 *======================================*/
-				measurement.setDasoUri(dasa.getObjectUri().replace("<", "").replace(">", ""));
-				measurement.setDasaUri(dasa.getUri().replace("<", "").replace(">", ""));
+				measurement.setDasoUri(dasa.getObjectUri());
+				measurement.setDasaUri(dasa.getUri());
 				
 				DataAcquisitionSchemaObject daso = null;
 				String dasoUri = dasa.getObjectUri();
@@ -397,7 +395,7 @@ public class Parser {
 				measurement.setInRelationToUri("");
 				
 				DataAcquisitionSchemaObject inRelationToDaso = null;
-				String inRelationToUri = dasa.getInRelationToUri();
+				String inRelationToUri = dasa.getInRelationToUri(URIUtils.replacePrefixEx("sio:inRelationTo"));
 				if (mapSchemaObjects.containsKey(inRelationToUri)) {
 					inRelationToDaso = mapSchemaObjects.get(inRelationToUri);
 				} else {
@@ -421,7 +419,7 @@ public class Parser {
 				 *   SET UNIT                  *
 				 *                             *
 				 *=============================*/
-				if (!schema.getUnitLabel().equals("")) {
+				if (!schema.getUnitLabel().equals("") && posUnit >= 0) {
 					// unit exists in the columns
 					String unitValue = record.get(posUnit);
 					if (unitValue != null) {
@@ -429,10 +427,10 @@ public class Parser {
 							if (possibleValues.get(dasoUnitUri).containsKey(unitValue.toLowerCase())) {
 								measurement.setUnitUri(possibleValues.get(dasoUnitUri).get(unitValue.toLowerCase()));
 							} else {
-								measurement.setUnitUri("");
+								measurement.setUnitUri(unitValue);
 							}
 						} else {
-							measurement.setUnitUri("");
+							measurement.setUnitUri(unitValue);
 						}
 					}
 				} else {
