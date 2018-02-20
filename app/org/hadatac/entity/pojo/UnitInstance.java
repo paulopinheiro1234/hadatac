@@ -78,11 +78,12 @@ public class UnitInstance extends HADatAcThing implements Comparable<UnitInstanc
 				if (unit_temp != null) {
 					unit.setLabel(WordUtils.capitalize(unit_temp.getLabel()));
 				} else {
-					unit.setLabel("(Unknown Unit)");
+					unit.setLabel(pivot_ent.value);
 				}
 			} else {
 				if (pivot_ent.value.isEmpty()) {
-					unit.setLabel("(Unknown Unit)");
+					// Skip empty unit
+					continue;
 				} else {
 					unit.setLabel(pivot_ent.value);
 				}
