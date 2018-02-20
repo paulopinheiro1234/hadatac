@@ -153,13 +153,18 @@ public class DASchemaObjectGenerator extends BasicGenerator {
 	public List< Map<String, Object> > createRows() throws Exception {
 		rows.clear();
 		int row_number = 0;
+		List<String> column_name = new ArrayList<String>();
 		for (CSVRecord record : records) {
 			if (getEntity(record)  == null || getEntity(record).equals("")  || timeList.contains(getLabel(record))){
                 //System.out.println("[DASOGenerator] getEntity(record) = " + getEntity(record) + ", so skipping....");
+				if (column_name.contains(getLabel(record))){
+					rows.add(createRelationRow(record, ++row_number));
+				}
 				continue;
 			} else {
                 //System.out.println("[DASOGenerator] creating a row....");
 				rows.add(createRow(record, ++row_number));
+				column_name.add(getLabel(record));
 			}
 		}
         System.out.println("[DASOGenerator] Added " + row_number + " rows!");
@@ -189,7 +194,11 @@ public class DASchemaObjectGenerator extends BasicGenerator {
 		row.put("hasco:partOfSchema", kbPrefix + "DAS-" + SDDName);
 		row.put("hasco:hasEntity", getEntity(rec));
 		row.put("hasco:hasRole", getRole(rec));
-		row.put("sio:inRelationTo", getInRelationTo(rec));
+		if (getRelation(rec).length() > 0) {
+			row.put(getRelation(rec), getInRelationTo(rec));
+		} else {
+			row.put("sio:inRelationTo", getInRelationTo(rec));
+		}
 		if (getInRelationTo(rec).length() > 0) {
 			if (getRelation(rec).length() > 0) {
 				row.put("sio:Relation", getRelation(rec));
@@ -211,6 +220,24 @@ public class DASchemaObjectGenerator extends BasicGenerator {
 			//System.out.println("[DASOGenerator] created template: \n" + toAdd);
 		}
 
+		return row;
+	}
+	
+	Map<String, Object> createRelationRow(CSVRecord rec, int row_number) throws Exception {
+		Map<String, Object> row = new HashMap<String, Object>();
+		row.put("hasURI", kbPrefix + "DASO-" + SDDName + "-" + getLabel(rec).trim().replace(" ","").replace("_","-").replace("??", ""));
+		if (getRelation(rec).length() > 0) {
+			row.put(getRelation(rec), getInRelationTo(rec));
+		} else {
+			row.put("sio:inRelationTo", getInRelationTo(rec));
+		}
+		if (getInRelationTo(rec).length() > 0) {
+			if (getRelation(rec).length() > 0) {
+				row.put("sio:Relation", getRelation(rec));
+			} else {
+				row.put("sio:Relation", "sio:inRelationTo");
+			}
+		}
 		return row;
 	}
 }
