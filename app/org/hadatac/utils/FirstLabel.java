@@ -21,7 +21,7 @@ public class FirstLabel {
 				"  " + uri + " rdfs:label ?label . \n" + 
 				"}";
 		
-		System.out.println("getLabel() queryString: \n" + queryString);
+		//System.out.println("getLabel() queryString: \n" + queryString);
 		
 		Query query = QueryFactory.create(queryString);
 		QueryExecution qexec = QueryExecutionFactory.sparqlService(
