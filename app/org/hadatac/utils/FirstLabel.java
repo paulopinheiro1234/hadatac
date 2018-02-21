@@ -13,12 +13,15 @@ import org.hadatac.utils.Collections;
 public class FirstLabel {
 	
 	public static String getLabel(String uri) {
+		if (uri.startsWith("http")) {
+			uri = "<" + uri + ">";
+		}
 		String queryString = NameSpaces.getInstance().printSparqlNameSpaceList() + 
 				"SELECT ?label WHERE { \n" + 
-				"  <" + uri + "> rdfs:label ?label . \n" + 
+				"  " + uri + " rdfs:label ?label . \n" + 
 				"}";
 		
-		//System.out.println("getLabel() queryString: \n" + queryString);
+		System.out.println("getLabel() queryString: \n" + queryString);
 		
 		Query query = QueryFactory.create(queryString);
 		QueryExecution qexec = QueryExecutionFactory.sparqlService(
