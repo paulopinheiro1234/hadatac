@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.InputStream;
@@ -24,6 +25,10 @@ import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.ss.usermodel.WorkbookFactory;
+import org.apache.poi.xssf.usermodel.XSSFCell;
+import org.apache.poi.xssf.usermodel.XSSFRow;
+import org.apache.poi.xssf.usermodel.XSSFSheet;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.hadatac.metadata.loader.URIUtils;
 
 public class SDD {
@@ -118,9 +123,11 @@ public class SDD {
 		}
 	}
 	
-	public File readSheetfromExcel(String sheetName, Workbook wb, String fileName) {
+	public String readSheetfromExcel(String sheetName, Workbook wb, String fileName) {
 		
 		System.out.println(fileName);
+		String excelFileName = fileName;
+
 		if(sheetName.charAt(0) == '#')  {
 			Sheet currentsheet = wb.getSheet(sheetName.replace("#", ""));
 
@@ -152,21 +159,26 @@ public class SDD {
 					}
 				}
 			}
-			try {
+			try {		
+
+				FileOutputStream fileOut = new FileOutputStream(excelFileName);
 				
-				FileWriter writer = new FileWriter(fileName);
+				XSSFWorkbook wb2 = new XSSFWorkbook();
+				XSSFSheet sheet = wb2.createSheet() ;
+				
 		        for (int i=0; i<filetbc.entrySet().size(); i++){
 		        	List<String> c_str = filetbc.get(i);
-		        	for (String str : c_str){
-		        		if (str.contains(", ")){
-		        			c_str.set(c_str.indexOf(str), str.replace(", ", "&"));
-		        		}
+		        	XSSFRow row = sheet.createRow(i);
+		        	for (int c=0; c < c_str.size(); c++){
+		        		XSSFCell cell = row.createCell(c);
+		        		cell.setCellValue(c_str.get(c));
 		        	}
-		            String collect = filetbc.get(i).stream().collect(Collectors.joining(","));
-		            writer.write(collect);
-		            writer.write("\n");
 		        }
-	            writer.close();
+				
+				wb2.write(fileOut);
+				fileOut.flush();
+				wb2.close();
+				fileOut.close();
 			    
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -177,8 +189,7 @@ public class SDD {
 			System.out.println("Error readSheetfromExcel(): Contaisn illegal links in infosheet.");
 		}
 		
-	    File file = new File(fileName);
-		return file;
+		return excelFileName;
 		
 	}
 	

@@ -22,13 +22,15 @@ public class PVGenerator extends BasicGenerator {
 	Map<String, Map<String, String>> pvMap = new HashMap<String, Map<String, String>>();
 	String study_id = "";
 	Map<String, String> mapAttrObj;
+	Map<String, String> codeMappings;
 
 	public PVGenerator(File file, String SDDFileName, String study_id, 
-			Map<String, String> mapAttrObj) {
+			Map<String, String> mapAttrObj, Map<String, String> codeMappings) {
 		super(file);
 		this.SDDFileName = SDDFileName;
 		this.study_id = study_id;
 		this.mapAttrObj = mapAttrObj;
+		this.codeMappings = codeMappings;
 	}
 	
 	//Column	Code	Label	Class	Resource
@@ -39,7 +41,12 @@ public class PVGenerator extends BasicGenerator {
 		mapCol.put("Code", "Code");
 		mapCol.put("CodeLabel", "Label");
 		mapCol.put("Class", "Class");
-//		mapCol.put("Resource", "Resource");
+		try{
+			mapCol.put("Resource", "Resource");
+		} catch (Exception e) {
+			System.out.println("THERE IS NO RESOURCE COLUMN IN THE CODEBOOK OF " + SDDFileName);
+		}
+
 	}
 
 	private String getLabel(CSVRecord rec) {
@@ -61,15 +68,27 @@ public class PVGenerator extends BasicGenerator {
 
 	private String getClass(CSVRecord rec) {
 		String cls = getValueByColumnName(rec, mapCol.get("Class"));
-		if (URIUtils.isValidURI(cls)) {
-			return cls;
+
+		System.out.println("cls " + cls + " " + URIUtils.isValidURI(cls));
+		
+		if (cls.length() > 0){
+			if (URIUtils.isValidURI(cls)) {
+				System.out.println(cls + " is valid uri!");
+				return cls;
+			}
+		} else {
+			if (codeMappings.containsKey(getResource(rec))){
+				System.out.println(getResource(rec) + " is empty so " +  codeMappings.get(getResource(rec)));
+				return codeMappings.get(getResource(rec));
+			}
 		}
+
 		return "";
 	}
 
-//	private String getResource(CSVRecord rec) {
-//		return getValueByColumnName(rec, mapCol.get("Resource"));
-//	}
+	private String getResource(CSVRecord rec) {
+		return getValueByColumnName(rec, mapCol.get("Resource"));
+	}
 
 	private Boolean checkVirtual(CSVRecord rec) {
 		if (getLabel(rec).contains("??")){
@@ -114,6 +133,7 @@ public class PVGenerator extends BasicGenerator {
 		row.put("a", "hasco:PossibleValue");
 		row.put("hasco:hasCode", getCode(rec));
 		row.put("hasco:hasCodeLabel", getCodeLabel(rec));
+		System.out.println("rec is " + rec.toString());
 		row.put("hasco:hasClass", getClass(rec));
 //		row.put("hasco:hasResource", getResource(rec));
 		row.put("hasco:isPossibleValueOf", getPVvalue(rec));
