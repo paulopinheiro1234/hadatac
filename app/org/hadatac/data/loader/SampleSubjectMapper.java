@@ -1,13 +1,11 @@
 package org.hadatac.data.loader;
 
-import java.io.File;
 import java.lang.String;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.csv.CSVRecord;
 import org.apache.jena.query.Query;
 import org.apache.jena.query.QueryExecution;
 import org.apache.jena.query.QueryExecutionFactory;
@@ -40,7 +38,7 @@ public class SampleSubjectMapper extends BasicGenerator {
 	private List<String> timeScopeUris = new ArrayList<String>();
 	private List<String> objectUris = new ArrayList<String>();
 
-	public SampleSubjectMapper(File file) {
+	public SampleSubjectMapper(RecordFile file) {
 		super(file);
 	}
 
@@ -53,7 +51,7 @@ public class SampleSubjectMapper extends BasicGenerator {
 	}
 	
 	@Override
-	Map<String, Object> createRow(CSVRecord rec, int rownumber) throws Exception {
+	Map<String, Object> createRow(Record rec, int rownumber) throws Exception {
 		Map<String, Object> row = new HashMap<String, Object>();
 		row.put("hasURI", getUri(rec));
 		row.put("a", getType(rec));
@@ -73,11 +71,11 @@ public class SampleSubjectMapper extends BasicGenerator {
 		return row;
 	}
 
-	private String getSampleUri(CSVRecord rec) {
+	private String getSampleUri(Record rec) {
 		String sampleUri = "";
 		String sampleQueryString = NameSpaces.getInstance().printSparqlNameSpaceList() +
 				"SELECT ?s WHERE {" +
-				"?s hasco:originalID \"" + rec.get(mapCol.get("originalSID")) + "\"." +
+				"?s hasco:originalID \"" + rec.getValueByColumnName(mapCol.get("originalSID")) + "\"." +
 				"}";
 		
 		try {
@@ -101,12 +99,12 @@ public class SampleSubjectMapper extends BasicGenerator {
 		return sampleUri;
 	}
 
-	private String getSubjectUri(CSVRecord rec) {
+	private String getSubjectUri(Record rec) {
 		String subjectUri = "";
 		String subjectQueryString = NameSpaces.getInstance().printSparqlNameSpaceList() +
-				"SELECT ?s WHERE {" +
-				"?s hasco:originalID \"" + rec.get(mapCol.get("originalPID")) + "\"." +
-				"}";
+				"SELECT ?s WHERE { \n" +
+				"?s hasco:originalID \"" + rec.getValueByColumnName(mapCol.get("originalPID")) + "\". \n" +
+				"} \n";
 		try {
 			Query subjectQuery = QueryFactory.create(subjectQueryString);
 			QueryExecution qexec = QueryExecutionFactory.sparqlService(
@@ -150,42 +148,42 @@ public class SampleSubjectMapper extends BasicGenerator {
 		return count;
 	}
 	
-	private String getUri(CSVRecord rec) {
-		return kbPrefix + "SPL-" + String.format("%04d", counter + getSampleCount(rec.get(mapCol.get("studyID")))) 
-		+ "-" + rec.get(mapCol.get("studyID"));
+	private String getUri(Record rec) {
+		return kbPrefix + "SPL-" + String.format("%04d", counter + getSampleCount(rec.getValueByColumnName(mapCol.get("studyID")))) 
+		+ "-" + rec.getValueByColumnName(mapCol.get("studyID"));
 	}
 
-	private String getType(CSVRecord rec) {
+	private String getType(Record rec) {
 			return "sio:Sample";
 	}
 
-	private String getLabel(CSVRecord rec) {
-		return "SID " + String.format("%04d", counter + getSampleCount(rec.get(mapCol.get("studyID")))) + " - " 
-				+ rec.get(mapCol.get("studyID"));
+	private String getLabel(Record rec) {
+		return "SID " + String.format("%04d", counter + getSampleCount(rec.getValueByColumnName(mapCol.get("studyID")))) + " - " 
+				+ rec.getValueByColumnName(mapCol.get("studyID"));
 	}
 
-	private String getOriginalID(CSVRecord rec) {
-		if(!rec.get(mapCol.get("originalSID")).equalsIgnoreCase("NULL")){
-			return rec.get(mapCol.get("originalSID"));
+	private String getOriginalID(Record rec) {
+		if(!rec.getValueByColumnName(mapCol.get("originalSID")).equalsIgnoreCase("NULL")){
+			return rec.getValueByColumnName(mapCol.get("originalSID"));
 		} else {
 			return "";
 		}
 	}
 	
-	private String getStudyUri(CSVRecord rec) {
-		return kbPrefix + "STD-" + rec.get(mapCol.get("studyID"));
+	private String getStudyUri(Record rec) {
+		return kbPrefix + "STD-" + rec.getValueByColumnName(mapCol.get("studyID"));
 	}
 
-	private String getCollectionUri(CSVRecord rec) {
-		return kbPrefix + "SC-" + rec.get(mapCol.get("studyID"));
+	private String getCollectionUri(Record rec) {
+		return kbPrefix + "SC-" + rec.getValueByColumnName(mapCol.get("studyID"));
 	}
 
-	private String getCollectionLabel(CSVRecord rec) {
-		return "Sample Collection of Study " + rec.get(mapCol.get("studyID"));
+	private String getCollectionLabel(Record rec) {
+		return "Sample Collection of Study " + rec.getValueByColumnName(mapCol.get("studyID"));
 	}
 		
 	
-	public void createObj(CSVRecord record) throws Exception {
+	public void createObj(Record record) throws Exception {
 		// insert current state of the OBJ
 		obj = new StudyObject(getUri(record), "sio:Sample", getOriginalID(record), 
 				getLabel(record), getCollectionUri(record), getLabel(record), scopeUris);
@@ -210,7 +208,7 @@ public class SampleSubjectMapper extends BasicGenerator {
 		System.out.println(objectUris.size());
 	}
 	
-	public boolean createOc(CSVRecord record) throws Exception {
+	public boolean createOc(Record record) throws Exception {
 		// insert current state of the OC
 		ObjectCollection oc = new ObjectCollection(
 				getCollectionUri(record),
@@ -248,7 +246,7 @@ public class SampleSubjectMapper extends BasicGenerator {
 	public List< Map<String, Object> > createRows() throws Exception {
 		rows.clear();
 		boolean firstRow = true;
-		for (CSVRecord record : records) {
+		for (Record record : records) {
 			if (firstRow) {
 				if (!createOc(record)) {
 					System.out.println("[ERROR] Failed to create sample collection!");
@@ -263,7 +261,7 @@ public class SampleSubjectMapper extends BasicGenerator {
 	}
 	
 	public boolean updateMappings() throws Exception {
-		for (CSVRecord record : records) {
+		for (Record record : records) {
 			if (getSampleUri(record) == ""){
 				continue;
 			} else {

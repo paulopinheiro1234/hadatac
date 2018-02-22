@@ -1,9 +1,5 @@
 package org.hadatac.data.loader;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-
 import org.hadatac.utils.ConfigProp;
 import org.hadatac.entity.pojo.DASVirtualObject;
 
@@ -13,13 +9,9 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Iterator;
-import org.apache.commons.csv.CSVFormat;
-import org.apache.commons.csv.CSVParser;
-import org.apache.commons.csv.CSVRecord;
-
 
 public class DASchemaObjectGenerator extends BasicGenerator {
+	
 	final String kbPrefix = ConfigProp.getKbPrefix();
 	String startTime = "";
 	String SDDName = "";
@@ -29,31 +21,15 @@ public class DASchemaObjectGenerator extends BasicGenerator {
 	List<DASVirtualObject> templateList = new ArrayList<DASVirtualObject>();
 	List<String> timeList = new ArrayList<String>();
 
-	public DASchemaObjectGenerator(File file, String SDDName, Map<String, String> codeMap) {
+	public DASchemaObjectGenerator(RecordFile file, String SDDName, Map<String, String> codeMap) {
 		super(file);
 		this.codeMap = codeMap;
 		this.SDDName = SDDName;
-
-        CSVRecord current = null;
-
-		try {
-			BufferedReader br = new BufferedReader(new FileReader(file));
-            CSVParser dict = CSVFormat.DEFAULT.withHeader().parse(br);
-            Iterator<CSVRecord> dictIter = dict.iterator();
-
-			while(dictIter.hasNext()) {
-                current = dictIter.next();
-                if(current.get("Time") != null && current.get("Time") != ""){
-                    timeList.add(current.get("Time"));
-                    //System.out.println("[DASOGenerator] adding to timeList: " + current.get("Time"));
-                }
+		
+		for (Record rec : file.getRecords()) {
+            if (!rec.getValueByColumnName("Time").isEmpty()) {
+                timeList.add(rec.getValueByColumnName("Time"));
             }
-
-            dict.close();
-			br.close();
-		} catch (Exception e) {
-            System.out.println("[DASObjectGenerator] Error opening SDD file");
-			e.printStackTrace();
 		}
 	}
 
@@ -74,24 +50,24 @@ public class DASchemaObjectGenerator extends BasicGenerator {
 		mapCol.put("WasGeneratedBy", "wasGeneratedBy");
 	}
 
-	private String getLabel(CSVRecord rec) {
-		return getValueByColumnName(rec, mapCol.get("Label"));
+	private String getLabel(Record rec) {
+		return rec.getValueByColumnName(mapCol.get("Label"));
 	}
 
-	private String getAttribute(CSVRecord rec) {
-		return getValueByColumnName(rec, mapCol.get("AttributeType"));
+	private String getAttribute(Record rec) {
+		return rec.getValueByColumnName(mapCol.get("AttributeType"));
 	}
 
-	private String getUnit(CSVRecord rec) {
-		return getValueByColumnName(rec, mapCol.get("Unit"));
+	private String getUnit(Record rec) {
+		return rec.getValueByColumnName(mapCol.get("Unit"));
 	}
 
-	private String getTime(CSVRecord rec) {
-		return getValueByColumnName(rec, mapCol.get("Time"));
+	private String getTime(Record rec) {
+		return rec.getValueByColumnName(mapCol.get("Time"));
 	}
 
-	private String getEntity(CSVRecord rec) {
-		String entity = getValueByColumnName(rec, mapCol.get("Entity"));
+	private String getEntity(Record rec) {
+		String entity = rec.getValueByColumnName(mapCol.get("Entity"));
 		if (entity.length() == 0) {
 			return null;
 		} else {
@@ -104,16 +80,16 @@ public class DASchemaObjectGenerator extends BasicGenerator {
 		}
 	}
 
-	private String getRole(CSVRecord rec) {
-		return getValueByColumnName(rec, mapCol.get("Role"));
+	private String getRole(Record rec) {
+		return rec.getValueByColumnName(mapCol.get("Role"));
 	}
 
-	private String getRelation(CSVRecord rec) {
-		return getValueByColumnName(rec, mapCol.get("Relation"));
+	private String getRelation(Record rec) {
+		return rec.getValueByColumnName(mapCol.get("Relation"));
 	}
 
-	private String getInRelationTo(CSVRecord rec) {
-		String inRelationTo = getValueByColumnName(rec, mapCol.get("InRelationTo"));
+	private String getInRelationTo(Record rec) {
+		String inRelationTo = rec.getValueByColumnName(mapCol.get("InRelationTo"));
 		if (inRelationTo.length() == 0) {
 			return "";
 		} else {
@@ -125,12 +101,12 @@ public class DASchemaObjectGenerator extends BasicGenerator {
 		}
 	}
 
-	private String getWasDerivedFrom(CSVRecord rec) {
-		return getValueByColumnName(rec, mapCol.get("WasDerivedFrom"));
+	private String getWasDerivedFrom(Record rec) {
+		return rec.getValueByColumnName( mapCol.get("WasDerivedFrom"));
 	}
 
-	private String getWasGeneratedBy(CSVRecord rec) {
-		return getValueByColumnName(rec, mapCol.get("WasGeneratedBy"));
+	private String getWasGeneratedBy(Record rec) {
+		return rec.getValueByColumnName(mapCol.get("WasGeneratedBy"));
 	}
    
 	public String getSDDName(){
@@ -141,7 +117,7 @@ public class DASchemaObjectGenerator extends BasicGenerator {
 		return this.templateList;
 	}
     
-	private Boolean checkVirtual(CSVRecord rec) {
+	private Boolean checkVirtual(Record rec) {
 		if (getLabel(rec).contains("??")){
 			return true;
 		} else {
@@ -154,7 +130,7 @@ public class DASchemaObjectGenerator extends BasicGenerator {
 		rows.clear();
 		int row_number = 0;
 		List<String> column_name = new ArrayList<String>();
-		for (CSVRecord record : records) {
+		for (Record record : records) {
 			if (getEntity(record)  == null || getEntity(record).equals("")  || timeList.contains(getLabel(record))){
                 //System.out.println("[DASOGenerator] getEntity(record) = " + getEntity(record) + ", so skipping....");
 				if (column_name.contains(getLabel(record))){
@@ -173,7 +149,7 @@ public class DASchemaObjectGenerator extends BasicGenerator {
 	
 	public List<String> createUris() throws Exception {
 		List<String> result = new ArrayList<String>();
-		for (CSVRecord record : records) {
+		for (Record record : records) {
 			if (getEntity(record)  == null || getEntity(record).equals("")  || timeList.contains(getLabel(record))){
 				continue;
 			} else {
@@ -185,7 +161,7 @@ public class DASchemaObjectGenerator extends BasicGenerator {
 
 	//Column	Attribute	attributeOf	Unit	Time	Entity	Role	Relation	inRelationTo	wasDerivedFrom	wasGeneratedBy	hasPosition   
 	@Override
-	Map<String, Object> createRow(CSVRecord rec, int row_number) throws Exception {
+	Map<String, Object> createRow(Record rec, int row_number) throws Exception {
 		Map<String, Object> row = new HashMap<String, Object>();
 		row.put("hasURI", kbPrefix + "DASO-" + SDDName + "-" + getLabel(rec).trim().replace(" ","").replace("_","-").replace("??", ""));
 		row.put("a", "hasco:DASchemaObject");
@@ -223,7 +199,7 @@ public class DASchemaObjectGenerator extends BasicGenerator {
 		return row;
 	}
 	
-	Map<String, Object> createRelationRow(CSVRecord rec, int row_number) throws Exception {
+	Map<String, Object> createRelationRow(Record rec, int row_number) throws Exception {
 		Map<String, Object> row = new HashMap<String, Object>();
 		row.put("hasURI", kbPrefix + "DASO-" + SDDName + "-" + getLabel(rec).trim().replace(" ","").replace("_","-").replace("??", ""));
 		if (getRelation(rec).length() > 0) {

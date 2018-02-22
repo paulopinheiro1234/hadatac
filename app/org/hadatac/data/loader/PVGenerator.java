@@ -1,7 +1,5 @@
 package org.hadatac.data.loader;
 
-import java.io.File;
-
 import org.hadatac.metadata.loader.URIUtils;
 import org.hadatac.utils.ConfigProp;
 
@@ -12,9 +10,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.csv.CSVRecord;
-
 public class PVGenerator extends BasicGenerator {
+	
 	final String kbPrefix = ConfigProp.getKbPrefix();
 	String startTime = "";
 	String SDDFileName = "";
@@ -24,7 +21,7 @@ public class PVGenerator extends BasicGenerator {
 	Map<String, String> mapAttrObj;
 	Map<String, String> codeMappings;
 
-	public PVGenerator(File file, String SDDFileName, String study_id, 
+	public PVGenerator(RecordFile file, String SDDFileName, String study_id, 
 			Map<String, String> mapAttrObj, Map<String, String> codeMappings) {
 		super(file);
 		this.SDDFileName = SDDFileName;
@@ -41,20 +38,15 @@ public class PVGenerator extends BasicGenerator {
 		mapCol.put("Code", "Code");
 		mapCol.put("CodeLabel", "Label");
 		mapCol.put("Class", "Class");
-		try{
-			mapCol.put("Resource", "Resource");
-		} catch (Exception e) {
-			System.out.println("THERE IS NO RESOURCE COLUMN IN THE CODEBOOK OF " + SDDFileName);
-		}
-
+		mapCol.put("Resource", "Resource");
 	}
 
-	private String getLabel(CSVRecord rec) {
-		return getValueByColumnName(rec, mapCol.get("Label"));
+	private String getLabel(Record rec) {
+		return rec.getValueByColumnName(mapCol.get("Label"));
 	}
 
-	private String getCode(CSVRecord rec) {
-		String ss = Normalizer.normalize(getValueByColumnName(rec, mapCol.get("Code")), Normalizer.Form.NFD).replaceAll("[^\\p{ASCII}]", "").trim();
+	private String getCode(Record rec) {
+		String ss = Normalizer.normalize(rec.getValueByColumnName(mapCol.get("Code")), Normalizer.Form.NFD).replaceAll("[^\\p{ASCII}]", "").trim();
 		int iend = ss.indexOf(".");
 		if (iend != -1){
 			ss = ss.substring(0 , iend);
@@ -62,18 +54,14 @@ public class PVGenerator extends BasicGenerator {
 		return ss.trim();
 	}
 
-	private String getCodeLabel(CSVRecord rec) {
-		return getValueByColumnName(rec, mapCol.get("CodeLabel"));
+	private String getCodeLabel(Record rec) {
+		return rec.getValueByColumnName(mapCol.get("CodeLabel"));
 	}
 
-	private String getClass(CSVRecord rec) {
-		String cls = getValueByColumnName(rec, mapCol.get("Class"));
-
-		System.out.println("cls " + cls + " " + URIUtils.isValidURI(cls));
-		
+	private String getClass(Record rec) {
+		String cls = rec.getValueByColumnName(mapCol.get("Class"));		
 		if (cls.length() > 0){
 			if (URIUtils.isValidURI(cls)) {
-				System.out.println(cls + " is valid uri!");
 				return cls;
 			}
 		} else {
@@ -86,11 +74,11 @@ public class PVGenerator extends BasicGenerator {
 		return "";
 	}
 
-	private String getResource(CSVRecord rec) {
-		return getValueByColumnName(rec, mapCol.get("Resource"));
+	private String getResource(Record rec) {
+		return rec.getValueByColumnName(mapCol.get("Resource"));
 	}
 
-	private Boolean checkVirtual(CSVRecord rec) {
+	private Boolean checkVirtual(Record rec) {
 		if (getLabel(rec).contains("??")){
 			return true;
 		} else {
@@ -98,7 +86,7 @@ public class PVGenerator extends BasicGenerator {
 		}
 	}
 
-	private String getPVvalue(CSVRecord rec) {
+	private String getPVvalue(Record rec) {
 		if ((getLabel(rec)).length() > 0) {
 			String colNameInSDD = getLabel(rec).replace(" ", "");
 			if (mapAttrObj.containsKey(colNameInSDD) && mapAttrObj.get(colNameInSDD).length() > 0) {
@@ -114,7 +102,7 @@ public class PVGenerator extends BasicGenerator {
 	public List<String> createUris() throws Exception {
 		int row_number = 0;
 		List<String> result = new ArrayList<String>();
-		for (CSVRecord record : records) {
+		for (Record record : records) {
 			result.add((kbPrefix + "PV-" + getLabel(record).replace("_","-").replace("??", "") + ("-" + SDDFileName.replace("SDD-", "").replace(".xlsx", "").replace(".csv", "") + "-" + getCode(record)).replaceAll("--", "-")).replace(" ","") + "-" + row_number);
 			++row_number;
 		}
@@ -122,21 +110,15 @@ public class PVGenerator extends BasicGenerator {
 	}
 
 	@Override
-	Map<String, Object> createRow(CSVRecord rec, int row_number) throws Exception {	
+	Map<String, Object> createRow(Record rec, int row_number) throws Exception {	
 		Map<String, Object> row = new HashMap<String, Object>();
-//		if (getResource(rec) != null && getResource(rec).length() != 0){
-//			row.put("hasURI", getResource(rec));
-//		}
-//		else{
-			row.put("hasURI", (kbPrefix + "PV-" + getLabel(rec).replaceAll("[^a-zA-Z0-9:-]", "-") + ("-" + SDDFileName.replace("SDD-", "").replace(".xlsx", "").replace(".csv", "") + "-" + getCode(rec)).replaceAll("--", "-")).replace(" ","").replaceAll("[^A-Za-z0-9:-]", "") + "-" + row_number);
-//		}
+		row.put("hasURI", (kbPrefix + "PV-" + getLabel(rec).replaceAll("[^a-zA-Z0-9:-]", "-") + ("-" + SDDFileName.replace("SDD-", "").replace(".xlsx", "").replace(".csv", "") + "-" + getCode(rec)).replaceAll("--", "-")).replace(" ","").replaceAll("[^A-Za-z0-9:-]", "") + "-" + row_number);
 		row.put("a", "hasco:PossibleValue");
 		row.put("hasco:hasCode", getCode(rec));
 		row.put("hasco:hasCodeLabel", getCodeLabel(rec));
-		System.out.println("rec is " + rec.toString());
 		row.put("hasco:hasClass", getClass(rec));
-//		row.put("hasco:hasResource", getResource(rec));
 		row.put("hasco:isPossibleValueOf", getPVvalue(rec));
+		
 		return row;
 	}
 }

@@ -1,13 +1,11 @@
 package org.hadatac.data.loader;
 
-import java.io.File;
 import java.lang.String;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.commons.csv.CSVRecord;
 import org.hadatac.console.models.SysUser;
 import org.hadatac.entity.pojo.DataAcquisition;
 import org.hadatac.entity.pojo.DataAcquisitionSchema;
@@ -28,11 +26,11 @@ public class DataAcquisitionGenerator extends BasicGenerator {
 	final String kbPrefix = ConfigProp.getKbPrefix();
 	String startTime = "";
 
-	public DataAcquisitionGenerator(File file) {
+	public DataAcquisitionGenerator(RecordFile file) {
 		super(file);
 	}
 
-	public DataAcquisitionGenerator(File file, String startTime) {
+	public DataAcquisitionGenerator(RecordFile file, String startTime) {
 		super(file);
 		this.startTime = startTime;
 	}
@@ -41,12 +39,12 @@ public class DataAcquisitionGenerator extends BasicGenerator {
 	void initMapping() {
 	}
 
-	private String getDataAcquisitionName(CSVRecord rec) {
-		return getValueByColumnName(rec, Templates.DATAACQUISITIONNAME);
+	private String getDataAcquisitionName(Record rec) {
+		return rec.getValueByColumnName(Templates.DATAACQUISITIONNAME);
 	}
 
-	private String getOwnerEmail(CSVRecord rec) {
-		String ownerEmail = getValueByColumnName(rec, Templates.OWNEREMAIL);
+	private String getOwnerEmail(Record rec) {
+		String ownerEmail = rec.getValueByColumnName(Templates.OWNEREMAIL);
 		if(ownerEmail.equalsIgnoreCase("NULL") || ownerEmail.isEmpty()) {
 			return "";
 		}
@@ -55,12 +53,12 @@ public class DataAcquisitionGenerator extends BasicGenerator {
 		}
 	}
 	
-	private String getPermissionUri(CSVRecord rec) {
-		return getValueByColumnName(rec, Templates.PERMISSIONURI);
+	private String getPermissionUri(Record rec) {
+		return rec.getValueByColumnName(Templates.PERMISSIONURI);
 	}
 
-	private String getMethod(CSVRecord rec) {
-		String method = getValueByColumnName(rec, Templates.METHOD);
+	private String getMethod(Record rec) {
+		String method = rec.getValueByColumnName(Templates.METHOD);
 		if(method.equalsIgnoreCase("NULL") || method.isEmpty()) {
 			return "";
 		}
@@ -69,27 +67,27 @@ public class DataAcquisitionGenerator extends BasicGenerator {
 		}
 	}
 
-	private String getStudy(CSVRecord rec) {
-		return getValueByColumnName(rec, Templates.DASTUDYID).equalsIgnoreCase("NULL")? 
-				"" : getValueByColumnName(rec, Templates.DASTUDYID);
+	private String getStudy(Record rec) {
+		return rec.getValueByColumnName(Templates.DASTUDYID).equalsIgnoreCase("NULL")? 
+				"" : rec.getValueByColumnName(Templates.DASTUDYID);
 	}
 
-	private String getDataDictionaryName(CSVRecord rec) {
-		String DDName = getValueByColumnName(rec, Templates.DATADICTIONARYNAME).equalsIgnoreCase("NULL")? 
-				"" : getValueByColumnName(rec, Templates.DATADICTIONARYNAME);
+	private String getDataDictionaryName(Record rec) {
+		String DDName = rec.getValueByColumnName(Templates.DATADICTIONARYNAME).equalsIgnoreCase("NULL")? 
+				"" : rec.getValueByColumnName(Templates.DATADICTIONARYNAME);
 		return DDName.replace("SDD-","");
 	}
 
-	private Boolean isEpiData(CSVRecord rec) {
-		return getValueByColumnName(rec, Templates.EPILAB).equalsIgnoreCase("EPI");
+	private Boolean isEpiData(Record rec) {
+		return rec.getValueByColumnName(Templates.EPILAB).equalsIgnoreCase("EPI");
 	}
 
-	private Boolean isLabData(CSVRecord rec) {
-		return getValueByColumnName(rec, Templates.EPILAB).equalsIgnoreCase("LAB");
+	private Boolean isLabData(Record rec) {
+		return rec.getValueByColumnName(Templates.EPILAB).equalsIgnoreCase("LAB");
 	}
 
 	@Override
-	Map<String, Object> createRow(CSVRecord rec, int row_number) throws Exception {
+	Map<String, Object> createRow(Record rec, int row_number) throws Exception {
 		Map<String, Object> row = new HashMap<String, Object>();
 		row.put("hasURI", kbPrefix + "DA-" + getDataAcquisitionName(rec));
 		row.put("a", "hasco:DataAcquisition");
@@ -115,7 +113,7 @@ public class DataAcquisitionGenerator extends BasicGenerator {
 		}
 
 		String deploymentUri = URIUtils.replacePrefixEx(kbPrefix + "DPL-" + getDataAcquisitionName(rec));
-		String schemaUri = URIUtils.replacePrefixEx(kbPrefix + "DAS-" + getDataDictionaryName(rec));
+		
 		createDataAcquisition(row, ownerEmail, permissionUri, deploymentUri, isEpiData(rec));
 
 		return row;

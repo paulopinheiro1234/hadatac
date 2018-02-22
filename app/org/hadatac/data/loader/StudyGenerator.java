@@ -1,6 +1,5 @@
 package org.hadatac.data.loader;
 
-import java.io.File;
 import java.lang.String;
 import java.util.HashMap;
 import java.util.Map;
@@ -8,13 +7,11 @@ import java.util.Map;
 import org.hadatac.utils.ConfigProp;
 import org.hadatac.utils.Templates;
 
-import org.apache.commons.csv.CSVRecord;
-
 public class StudyGenerator extends BasicGenerator {
 	final String kbPrefix = ConfigProp.getKbPrefix();
 	private int counter = 1; //starting index number
 
-	public StudyGenerator(File file) {
+	public StudyGenerator(RecordFile file) {
 		super(file);
 	}
 
@@ -50,53 +47,53 @@ public class StudyGenerator extends BasicGenerator {
 		mapCol.put("externalSource", Templates.EXTSRC);
 	}
 
-	private String getUri(CSVRecord rec) { 
-		return kbPrefix + "STD-" + getValueByColumnName(rec, mapCol.get("studyID"));
+	private String getUri(Record rec) { 
+		return kbPrefix + "STD-" + rec.getValueByColumnName(mapCol.get("studyID"));
 	}
 
 	private String getType() {
 		return "hasco:Study";
 	}
 
-	private String getTitle(CSVRecord rec) { 
-		return getValueByColumnName(rec, mapCol.get("studyTitle"));
+	private String getTitle(Record rec) {
+		return rec.getValueByColumnName(mapCol.get("studyTitle"));
 	}
 
-	private String getAims(CSVRecord rec) { 
-		return getValueByColumnName(rec, mapCol.get("studyAims"));
+	private String getAims(Record rec) {
+		return rec.getValueByColumnName(mapCol.get("studyAims"));
 	}
 
-	private String getSignificance(CSVRecord rec) {
-		return getValueByColumnName(rec, mapCol.get("studySignificance"));
+	private String getSignificance(Record rec) {
+		return rec.getValueByColumnName(mapCol.get("studySignificance"));
 	}
 
-	private String getInstitutionUri(CSVRecord rec) {
-		return kbPrefix + "ORG-" + getValueByColumnName(rec, mapCol.get("institution")).replaceAll(" ", "-").replaceAll(",", "").replaceAll("'", ""); 
+	private String getInstitutionUri(Record rec) {
+		return kbPrefix + "ORG-" + rec.getValueByColumnName(mapCol.get("institution")).replaceAll(" ", "-").replaceAll(",", "").replaceAll("'", ""); 
 	}
 
-	private String getAgentUri(CSVRecord rec) {
-		return kbPrefix + "PER-" + getValueByColumnName(rec, mapCol.get("PI")).replaceAll(" ", "-"); 
+	private String getAgentUri(Record rec) {
+		return kbPrefix + "PER-" + rec.getValueByColumnName(mapCol.get("PI")).replaceAll(" ", "-"); 
 	}
 
-	private String getExtSource(CSVRecord rec) {
-		return getValueByColumnName(rec, mapCol.get("externalSource")); 
+	private String getExtSource(Record rec) {
+		return rec.getValueByColumnName(mapCol.get("externalSource")); 
 	}
 
 	@Override
-	public Map<String, Object> createRow(CSVRecord rec, int row_number) throws Exception {
+	public Map<String, Object> createRow(Record rec, int row_number) throws Exception {
 		Map<String, Object> row = new HashMap<String, Object>();
 		row.put("hasURI", getUri(rec));
 		row.put("a", getType());
 		row.put("rdfs:label", getTitle(rec));
 		row.put("skos:definition", getAims(rec));
 		row.put("rdfs:comment", getSignificance(rec));
-		if(getValueByColumnName(rec, mapCol.get("PI")).length() > 0) {
+		if(rec.getValueByColumnName(mapCol.get("PI")).length() > 0) {
 			row.put("hasco:hasAgent", getAgentUri(rec));
 		}
-		if(getValueByColumnName(rec, mapCol.get("institution")).length() > 0) {
+		if(rec.getValueByColumnName(mapCol.get("institution")).length() > 0) {
 			row.put("hasco:hasInstitution", getInstitutionUri(rec));
 		}
-		if(getValueByColumnName(rec, mapCol.get("externalSource")).length() > 0) {
+		if(rec.getValueByColumnName(mapCol.get("externalSource")).length() > 0) {
 			row.put("hasco:hasExternalSource", getExtSource(rec));
 		}
 		counter++;

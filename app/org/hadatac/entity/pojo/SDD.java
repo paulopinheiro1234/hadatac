@@ -29,6 +29,8 @@ import org.apache.poi.xssf.usermodel.XSSFCell;
 import org.apache.poi.xssf.usermodel.XSSFRow;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.hadatac.data.loader.Record;
+import org.hadatac.data.loader.RecordFile;
 import org.hadatac.metadata.loader.URIUtils;
 
 public class SDD {
@@ -122,186 +124,67 @@ public class SDD {
 			}
 		}
 	}
-	
-	public String readSheetfromExcel(String sheetName, Workbook wb, String fileName) {
 		
-		System.out.println(fileName);
-		String excelFileName = fileName;
-
-		if(sheetName.charAt(0) == '#')  {
-			Sheet currentsheet = wb.getSheet(sheetName.replace("#", ""));
-
-			HashMap<Integer, List<String>> filetbc = new HashMap<Integer,List<String>>();
-			Iterator<Row> ritr = currentsheet.iterator();
-			int j = 0;
-			int lasycellnum = 0;
-			while(ritr.hasNext()){
-				Row current_r = ritr.next();
-				Iterator<Cell> citr = current_r.iterator();
-				if (citr.hasNext()){
-					if(current_r.getCell(0).toString().length()>0){
-						List<String> row_content = new ArrayList<String>();				
-						if(j == 0){
-							lasycellnum = current_r.getLastCellNum();
-							System.out.println(lasycellnum + " cells in this row");
-						}
-						for(int i=0; i<lasycellnum; i++){
-							if(current_r.getCell(i) == null || current_r.getCell(i).toString().isEmpty()){
-								row_content.add("");
-							} else {
-								row_content.add(current_r.getCell(i).toString());
-							}
-						}
-							
-						System.out.println(row_content);
-						filetbc.put(j, row_content);
-						j++;
-					}
-				}
-			}
-			try {		
-
-				FileOutputStream fileOut = new FileOutputStream(excelFileName);
-				
-				XSSFWorkbook wb2 = new XSSFWorkbook();
-				XSSFSheet sheet = wb2.createSheet() ;
-				
-		        for (int i=0; i<filetbc.entrySet().size(); i++){
-		        	List<String> c_str = filetbc.get(i);
-		        	XSSFRow row = sheet.createRow(i);
-		        	for (int c=0; c < c_str.size(); c++){
-		        		XSSFCell cell = row.createCell(c);
-		        		cell.setCellValue(c_str.get(c));
-		        	}
-		        }
-				
-				wb2.write(fileOut);
-				fileOut.flush();
-				wb2.close();
-				fileOut.close();
-			    
-			} catch (Exception e) {
-				e.printStackTrace();
-				return null;
-			}
-			
-		} else {
-			System.out.println("Error readSheetfromExcel(): Contaisn illegal links in infosheet.");
+	public void readDataDictionary(RecordFile file) {
+		for (Record record : file.getRecords()) {
+			mapAttrObj.put(record.getValueByColumnIndex(0), record.getValueByColumnIndex(2));
 		}
-		
-		return excelFileName;
-		
+		System.out.println("mapAttrObj: " + mapAttrObj);
 	}
 	
-	public void readDataDictionary(File file) {
-		if (file == null){
-			System.out.println("Error readDataDictionary(): Empty URL");
-		} else {
-			Iterable<CSVRecord> records = null;
-			try {
-				BufferedReader bufRdr = new BufferedReader(new FileReader(file));
-				records = CSVFormat.DEFAULT.withHeader().parse(bufRdr);
-				for (CSVRecord record : records) {
-					mapAttrObj.put(record.get(0), record.get(2));
-				}
-				bufRdr.close();
-				System.out.println("mapAttrObj: " + mapAttrObj);
-			} catch (Exception e) {
-				System.out.println("Error readDataDictionary(): Unable to Read File");
-			}
+	public void readCodeMapping(RecordFile file) {
+		for (Record record : file.getRecords()) {
+			codeMappings.put(record.getValueByColumnIndex(0), record.getValueByColumnIndex(1));
 		}
-
 	}
 	
-	public void readCodeMapping(File file) {
-		if (file == null){
-			System.out.println("Error readCodeMapping(): Empty URL");
-		} else {
-			Iterable<CSVRecord> records = null;
-			try {
-				BufferedReader bufRdr = new BufferedReader(new FileReader(file));
-				records = CSVFormat.DEFAULT.withHeader().parse(bufRdr);
-				for (CSVRecord record : records) {
-					codeMappings.put(record.get(0), record.get(1));
+	public void readCodebook(RecordFile file) {
+		for (Record record : file.getRecords()) {
+			if (!record.getValueByColumnIndex(0).isEmpty()) {
+				String colName = record.getValueByColumnIndex(0);
+				Map<String, String> mapCodeClass = null;
+				if (!codebook.containsKey(colName)) {
+					mapCodeClass = new HashMap<String, String>();
+					codebook.put(colName, mapCodeClass);
+				} else {
+					mapCodeClass = codebook.get(colName);
 				}
-				bufRdr.close();
-			} catch (Exception e) {
-				System.out.println("Error readCodeMapping(): Unable to Read File");
+				String classUri = "";
+				if (!record.getValueByColumnIndex(3).isEmpty()) {
+					// Class column
+					classUri = URIUtils.replacePrefixEx(record.getValueByColumnIndex(3));
+				} 
+//					else {
+//						// Resource column
+//						classUri = URIUtils.replacePrefixEx(record.get(4));
+//					}
+				mapCodeClass.put(record.getValueByColumnIndex(1), classUri);
 			}
 		}
 	}
 	
-	public void readCodebook(File file) {
-		if (file == null){
-			System.out.println("Error readCodebook(): Empty URL");
-		} else {
-			Iterable<CSVRecord> records = null;
-			try {
-				BufferedReader bufRdr = new BufferedReader(new FileReader(file));
-				records = CSVFormat.DEFAULT.withHeader().parse(bufRdr);
-				for (CSVRecord record : records) {
-					if (!record.get(0).isEmpty()) {
-						String colName = record.get(0);
-						Map<String, String> mapCodeClass = null;
-						if (!codebook.containsKey(colName)) {
-							mapCodeClass = new HashMap<String, String>();
-							codebook.put(colName, mapCodeClass);
-						} else {
-							mapCodeClass = codebook.get(colName);
-						}
-						String classUri = "";
-						if (!record.get(3).isEmpty()) {
-							// Class column
-							classUri = URIUtils.replacePrefixEx(record.get(3));
-						} 
-	//					else {
-	//						// Resource column
-	//						classUri = URIUtils.replacePrefixEx(record.get(4));
-	//					}
-						mapCodeClass.put(record.get(1), classUri);
-					}
+	public void readtimelineFile(RecordFile file) {
+		for (Record record : file.getRecords()) {
+			if (!record.getValueByColumnIndex(0).isEmpty()) {
+				String colName = record.getValueByColumnIndex(0);
+				List<String> tmpList = new ArrayList<String>();
+				if (!record.getValueByColumnIndex(1).isEmpty()) {
+					tmpList.add(record.getValueByColumnIndex(1));
+				} else {
+					tmpList.add("null");
 				}
-				bufRdr.close();
-			} catch (Exception e) {
-				System.out.println("Error readCodebook(): Unable to Read File");
-			}
-		}
-	}
-	
-	public void readtimelineFile(File file) {
-		if (file == null){
-			System.out.println("Error readtimelineFile(): Empty URL");
-		} else {
-			Iterable<CSVRecord> records = null;
-			try {
-				BufferedReader bufRdr = new BufferedReader(new FileReader(file));
-				records = CSVFormat.DEFAULT.withHeader().parse(bufRdr);
-				for (CSVRecord record : records) {
-					if (!record.get(0).isEmpty()) {
-						String colName = record.get(0);
-						List<String> tmpList = new ArrayList<String>();
-						if (!record.get(1).isEmpty()) {
-							tmpList.add(record.get(1));
-						} else {
-							tmpList.add("null");
-						}
-						if (!record.get(2).isEmpty()) {
-							tmpList.add(record.get(2));
-						} else {
-							tmpList.add("null");
-						}
-						if (!record.get(5).isEmpty()) {
-							tmpList.add(record.get(5));
-						} else {
-							tmpList.add("null");
-						}
-						System.out.println(tmpList.get(0) + " " + tmpList.get(1) + " " + tmpList.get(2));
-						timelineMap.put(colName, tmpList);
-					}
+				if (!record.getValueByColumnIndex(2).isEmpty()) {
+					tmpList.add(record.getValueByColumnIndex(2));
+				} else {
+					tmpList.add("null");
 				}
-				bufRdr.close();
-			} catch (Exception e) {
-				System.out.println("Error readtimelineFile(): Unable to Read File");
+				if (!record.getValueByColumnIndex(5).isEmpty()) {
+					tmpList.add(record.getValueByColumnIndex(5));
+				} else {
+					tmpList.add("null");
+				}
+				System.out.println(tmpList.get(0) + " " + tmpList.get(1) + " " + tmpList.get(2));
+				timelineMap.put(colName, tmpList);
 			}
 		}
 	}

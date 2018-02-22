@@ -1,13 +1,11 @@
 package org.hadatac.data.loader;
 
-import java.io.File;
 import java.lang.String;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.csv.CSVRecord;
 import org.apache.jena.query.QueryExecution;
 import org.apache.jena.query.QueryExecutionFactory;
 import org.apache.jena.query.QuerySolution;
@@ -26,19 +24,17 @@ import org.hadatac.utils.NameSpaces;
 
 public class SampleGenerator extends BasicGenerator {
 	final String kbPrefix = ConfigProp.getKbPrefix();
-	private String dataAcquisition = "";
 	private int counter = 1; //starting index number
 
 	StudyObject obj = null;
 
-	private String studyUri = "";
 	private String hasScopeUri = "";    
 	private List<String> scopeUris = new ArrayList<String>();
 	private List<String> spaceScopeUris = new ArrayList<String>();
 	private List<String> timeScopeUris = new ArrayList<String>();
 	private List<String> objectUris = new ArrayList<String>();
 
-	public SampleGenerator(File file) {
+	public SampleGenerator(RecordFile file) {
 		super(file);
 	}
 
@@ -51,7 +47,7 @@ public class SampleGenerator extends BasicGenerator {
 	}
 
 	@Override
-	Map<String, Object> createRow(CSVRecord rec, int rownumber) throws Exception {
+	Map<String, Object> createRow(Record rec, int rownumber) throws Exception {
 		Map<String, Object> row = new HashMap<String, Object>();
 		row.put("hasURI", getUri(rec));
 		row.put("a", getType(rec));
@@ -94,43 +90,44 @@ public class SampleGenerator extends BasicGenerator {
 		return count;
 	}
 
-	private String getUri(CSVRecord rec) {
-		return kbPrefix + "SPL-" + String.format("%04d", counter + getSampleCount(rec.get(mapCol.get("studyID")))) 
-		+ "-" + rec.get(mapCol.get("studyID")); //  + "-" + getSampleSuffix()
+	private String getUri(Record rec) {
+		return kbPrefix + "SPL-" + String.format("%04d", counter + getSampleCount(rec.getValueByColumnName(mapCol.get("studyID")))) 
+		+ "-" + rec.getValueByColumnName(mapCol.get("studyID")); //  + "-" + getSampleSuffix()
 	}
 
-	private String getType(CSVRecord rec) {
-		if(!rec.get(mapCol.get("sampleType")).equalsIgnoreCase("NULL")){
-			return rec.get(mapCol.get("sampleType"));
+	private String getType(Record rec) {
+		if(!rec.getValueByColumnName(mapCol.get("sampleType")).equalsIgnoreCase("NULL")){
+			return rec.getValueByColumnName(mapCol.get("sampleType"));
 		} else {
 			return "sio:Sample";
 		}
 	}
 
-	private String getLabel(CSVRecord rec) {
-		return "SID " + String.format("%04d", counter + getSampleCount(rec.get(mapCol.get("studyID")))) + " - " 
-				+ rec.get(mapCol.get("studyID")) + " " + getSampleSuffix(rec);
+	private String getLabel(Record rec) {
+		return "SID " + String.format("%04d", counter + getSampleCount(rec.getValueByColumnName(mapCol.get("studyID")))) + " - " 
+				+ rec.getValueByColumnName(mapCol.get("studyID")) + " " + getSampleSuffix(rec);
 	}
 
-	private String getOriginalID(CSVRecord rec) {
-		if(!rec.get(mapCol.get("sampleID")).equalsIgnoreCase("NULL")){
-			return rec.get(mapCol.get("sampleID"));
+	private String getOriginalID(Record rec) {
+		if(!rec.getValueByColumnName(mapCol.get("sampleID")).equalsIgnoreCase("NULL")){
+			return rec.getValueByColumnName(mapCol.get("sampleID"));
 		} else {
 			return "";
 		}
 	}
 
-	private String getSubjectUri(CSVRecord rec) {
-		if (rec.get(mapCol.get("subjectID")).equalsIgnoreCase("NULL")) {
+	private String getSubjectUri(Record rec) {
+		if (rec.getValueByColumnName(mapCol.get("subjectID")).equalsIgnoreCase("NULL")) {
 			return "";
 		}
 
 		String subject = "";
 		String subjectQuery = NameSpaces.getInstance().printSparqlNameSpaceList() 
 				+ " SELECT ?subjectURI WHERE { "
-				+ " ?subjectURI hasco:originalID \"" + rec.get(mapCol.get("subjectID")) + "\" . }";
+				+ " ?subjectURI hasco:originalID \"" + rec.getValueByColumnName(mapCol.get("subjectID")) + "\" . }";
 
-		QueryExecution qexecSubject = QueryExecutionFactory.sparqlService(Collections.getCollectionsName(Collections.METADATA_SPARQL), subjectQuery);
+		QueryExecution qexecSubject = QueryExecutionFactory.sparqlService(
+				Collections.getCollectionsName(Collections.METADATA_SPARQL), subjectQuery);
 		ResultSet subjectResults = qexecSubject.execSelect();
 		ResultSetRewindable resultsrwSubject = ResultSetFactory.copyResults(subjectResults);
 		qexecSubject.close();
@@ -142,38 +139,38 @@ public class SampleGenerator extends BasicGenerator {
 		return subject;
 	}
 
-	private String getComment(CSVRecord rec) {
-		return "Sample " + String.format("%04d", counter + getSampleCount(rec.get(mapCol.get("studyID")))) 
-		+ " for " + rec.get(mapCol.get("studyID")) + " " + getSampleSuffix(rec);
+	private String getComment(Record rec) {
+		return "Sample " + String.format("%04d", counter + getSampleCount(rec.getValueByColumnName(mapCol.get("studyID")))) 
+		+ " for " + rec.getValueByColumnName(mapCol.get("studyID")) + " " + getSampleSuffix(rec);
 	}
 
-	private String getSamplingMethod(CSVRecord rec) {
-		if(!rec.get(mapCol.get("samplingMethod")).equalsIgnoreCase("NULL")){
-			return rec.get(mapCol.get("samplingMethod"));
+	private String getSamplingMethod(Record rec) {
+		if(!rec.getValueByColumnName(mapCol.get("samplingMethod")).equalsIgnoreCase("NULL")){
+			return rec.getValueByColumnName(mapCol.get("samplingMethod"));
 		} else {
 			return "";
 		}
 	}
 
-	private String getSamplingVolume(CSVRecord rec) {
-		if(!rec.get(mapCol.get("samplingVol")).equalsIgnoreCase("NULL")){
-			return rec.get(mapCol.get("samplingVol"));
+	private String getSamplingVolume(Record rec) {
+		if(!rec.getValueByColumnName(mapCol.get("samplingVol")).equalsIgnoreCase("NULL")){
+			return rec.getValueByColumnName(mapCol.get("samplingVol"));
 		} else {
 			return "";
 		}
 	}
 
-	private String getSamplingVolumeUnit(CSVRecord rec) {
-		if(!rec.get(mapCol.get("samplingVolUnit")).equalsIgnoreCase("NULL")){
-			return rec.get(mapCol.get("samplingVolUnit"));
+	private String getSamplingVolumeUnit(Record rec) {
+		if(!rec.getValueByColumnName(mapCol.get("samplingVolUnit")).equalsIgnoreCase("NULL")){
+			return rec.getValueByColumnName(mapCol.get("samplingVolUnit"));
 		} else {
 			return "obo:UO_0000095"; // default volume unit
 		}
 	}
 
-	private String getStorageTemperature(CSVRecord rec) {
-		if(!rec.get(mapCol.get("storageTemp")).equalsIgnoreCase("NULL")){
-			return rec.get(mapCol.get("storageTemp"));
+	private String getStorageTemperature(Record rec) {
+		if(!rec.getValueByColumnName(mapCol.get("storageTemp")).equalsIgnoreCase("NULL")){
+			return rec.getValueByColumnName(mapCol.get("storageTemp"));
 		} else {
 			return "";
 		}
@@ -184,35 +181,35 @@ public class SampleGenerator extends BasicGenerator {
 		return "obo:UO_0000027";
 	}
 
-	private String getNumFreezeThaw(CSVRecord rec) {
-		if(!rec.get(mapCol.get("FTcount")).equalsIgnoreCase("NULL")){
-			return rec.get("FTcount");
+	private String getNumFreezeThaw(Record rec) {
+		if(!rec.getValueByColumnName(mapCol.get("FTcount")).equalsIgnoreCase("NULL")){
+			return rec.getValueByColumnName("FTcount");
 		} else {
 			return "";
 		}
 	}
 
-	private String getSampleSuffix(CSVRecord rec) {
-		if(!rec.get(mapCol.get("sampleSuffix")).equalsIgnoreCase("NULL")){
-			return rec.get(mapCol.get("sampleSuffix"));
+	private String getSampleSuffix(Record rec) {
+		if(!rec.getValueByColumnName(mapCol.get("sampleSuffix")).equalsIgnoreCase("NULL")){
+			return rec.getValueByColumnName(mapCol.get("sampleSuffix"));
 		} else {
 			return "";
 		}
 	}
 
-	private String getStudyUri(CSVRecord rec) {
-		return kbPrefix + "STD-" + rec.get(mapCol.get("studyID"));
+	private String getStudyUri(Record rec) {
+		return kbPrefix + "STD-" + rec.getValueByColumnName(mapCol.get("studyID"));
 	}
 
-	private String getCollectionUri(CSVRecord rec) {
-		return kbPrefix + "SC-" + rec.get(mapCol.get("studyID"));
+	private String getCollectionUri(Record rec) {
+		return kbPrefix + "SC-" + rec.getValueByColumnName(mapCol.get("studyID"));
 	}
 
-	private String getCollectionLabel(CSVRecord rec) {
-		return "Sample Collection of Study " + rec.get(mapCol.get("studyID"));
+	private String getCollectionLabel(Record rec) {
+		return "Sample Collection of Study " + rec.getValueByColumnName(mapCol.get("studyID"));
 	}
 
-	public void createObj(CSVRecord record) throws Exception {
+	public void createObj(Record record) throws Exception {
 		// insert current state of the OBJ
 		obj = new StudyObject(getUri(record), "sio:Sample", getOriginalID(record), 
 				getLabel(record), getCollectionUri(record), getLabel(record), scopeUris);
@@ -237,7 +234,7 @@ public class SampleGenerator extends BasicGenerator {
 		System.out.println(objectUris.size());
 	}
 
-	public boolean createOc(CSVRecord record) throws Exception {
+	public boolean createOc(Record record) throws Exception {
 		// insert current state of the OC
 		ObjectCollection oc = new ObjectCollection(
 				getCollectionUri(record),
@@ -275,7 +272,7 @@ public class SampleGenerator extends BasicGenerator {
 	public List< Map<String, Object> > createRows() throws Exception {
 		rows.clear();
 		boolean firstRow = true;
-		for (CSVRecord record : records) {
+		for (Record record : records) {
 			if (firstRow) {
 				if (!createOc(record)) {
 					System.out.println("[ERROR] Failed to create sample collection!");

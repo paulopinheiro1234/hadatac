@@ -1,13 +1,11 @@
 package org.hadatac.data.loader;
 
-import java.io.File;
 import java.lang.String;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.csv.CSVRecord;
 import org.hadatac.utils.ConfigProp;
 import org.hadatac.utils.Feedback;
 import org.hadatac.entity.pojo.StudyObject;
@@ -30,7 +28,7 @@ public class SubjectGenerator extends BasicGenerator {
 	private List<String> timeScopeUris = new ArrayList<String>();
 	private List<String> objectUris = new ArrayList<String>();
 
-	public SubjectGenerator(File file) {
+	public SubjectGenerator(RecordFile file) {
 		super(file);
 	}
 
@@ -41,7 +39,7 @@ public class SubjectGenerator extends BasicGenerator {
 		mapCol.put("pilotNum", "CHEAR Project ID");
 	}
 
-	private String getUri(CSVRecord rec) {
+	private String getUri(Record rec) {
 		return kbPrefix + "SBJ-" + getOriginalID(rec) + "-" + getPilotNum(rec);
 	}
 
@@ -49,31 +47,31 @@ public class SubjectGenerator extends BasicGenerator {
 		return "http://semanticscience.org/resource/Human";
 	}
 
-	private String getLabel(CSVRecord rec) {
+	private String getLabel(Record rec) {
 		return "Subject ID " + getOriginalID(rec) + " - " + getPilotNum(rec);
 	}
 
-	private String getOriginalID(CSVRecord rec) {
-		return getValueByColumnName(rec, mapCol.get("subjectID"));
+	private String getOriginalID(Record rec) {
+		return rec.getValueByColumnName(mapCol.get("subjectID"));
 	}
 
-	private String getPilotNum(CSVRecord rec) {
-		return getValueByColumnName(rec, mapCol.get("pilotNum"));
+	private String getPilotNum(Record rec) {
+		return rec.getValueByColumnName(mapCol.get("pilotNum"));
 	}
 
-	private String getStudyUri(CSVRecord rec) {
+	private String getStudyUri(Record rec) {
 		return kbPrefix + "STD-" + getPilotNum(rec);
 	}
 
-	private String getCohortUri(CSVRecord rec) {
+	private String getCohortUri(Record rec) {
 		return kbPrefix + "CH-" + getPilotNum(rec);
 	}
 
-	private String getCohortLabel(CSVRecord rec) {
+	private String getCohortLabel(Record rec) {
 		return "Study Population of " + getPilotNum(rec);
 	}
 
-	public void createObj(CSVRecord record) throws Exception {
+	public void createObj(Record record) throws Exception {
 		// insert current state of the OBJ
 		obj = new StudyObject(getUri(record), "sio:Human", 
 				getOriginalID(record), getLabel(record), 
@@ -98,7 +96,7 @@ public class SubjectGenerator extends BasicGenerator {
 		System.out.println(objectUris.size());
 	}
 
-	public boolean createOc(CSVRecord record) throws Exception {
+	public boolean createOc(Record record) throws Exception {
 		// insert current state of the OC
 		ObjectCollection oc = new ObjectCollection(
 				getCohortUri(record),
@@ -130,7 +128,7 @@ public class SubjectGenerator extends BasicGenerator {
 	}
 
 	@Override
-	Map<String, Object> createRow(CSVRecord rec, int row_number) throws Exception {
+	Map<String, Object> createRow(Record rec, int row_number) throws Exception {
 		Map<String, Object> row = new HashMap<String, Object>();
 		row.put("hasURI", getUri(rec));
 		row.put("a", getType());
@@ -146,7 +144,7 @@ public class SubjectGenerator extends BasicGenerator {
 	public List< Map<String, Object> > createRows() throws Exception {
 		rows.clear();
 		boolean firstRow = true;
-		for (CSVRecord record : records) {
+		for (Record record : records) {
 			if (firstRow) {
 				if (!createOc(record)) {
 					break;

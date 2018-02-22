@@ -1,8 +1,5 @@
 package org.hadatac.data.loader;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
 import org.hadatac.utils.ConfigProp;
 
 import java.lang.String;
@@ -13,9 +10,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Iterator;
-import org.apache.commons.csv.CSVFormat;
-import org.apache.commons.csv.CSVParser;
-import org.apache.commons.csv.CSVRecord;
 
 public class DASchemaEventGenerator extends BasicGenerator {
 
@@ -26,33 +20,21 @@ public class DASchemaEventGenerator extends BasicGenerator {
 	Map<String, String> codeMap;
 	Map<String, List<String>> tlm;
 
-	public DASchemaEventGenerator(File dd, Map<String, List<String>> tlm, String SDDName, Map<String, String> codeMap) {
+	public DASchemaEventGenerator(
+			RecordFile dd, 
+			Map<String, List<String>> tlm, 
+			String SDDName, 
+			Map<String, String> codeMap) {
 		super(dd);
 		this.codeMap = codeMap;
 		this.SDDName = SDDName;
 		this.tlm = tlm;
 		System.out.println("tlm key size : " + tlm.keySet().size());
-
-        CSVRecord current = null;
-
-		try {
-			BufferedReader br = new BufferedReader(new FileReader(dd));
-            CSVParser dict = CSVFormat.DEFAULT.withHeader().parse(br);
-            Iterator<CSVRecord> dictIter = dict.iterator();
-
-			while(dictIter.hasNext()) {
-                current = dictIter.next();
-                if(current.get("Time") != null && current.get("Time") != ""){
-                    timeList.add(current.get("Time"));
-                    //System.out.println("[DASEGenerator] adding to timeList: " + current.get("Time"));
-                }
+		
+		for (Record rec : dd.getRecords()) {
+			if (!rec.getValueByColumnName("Time").isEmpty()) {
+                timeList.add(rec.getValueByColumnName("Time"));
             }
-
-            dict.close();
-			br.close();
-		} catch (Exception e) {
-            System.out.println("[DASEventGenerator] Error opening SDD file");
-			e.printStackTrace();
 		}
 	}
 	
@@ -73,71 +55,70 @@ public class DASchemaEventGenerator extends BasicGenerator {
 		mapCol.put("WasGeneratedBy", "wasGeneratedBy");
 	}
 
-	private String getLabel(CSVRecord rec) {
-		return getValueByColumnName(rec, mapCol.get("Label"));
+	private String getLabel(Record rec) {
+		return rec.getValueByColumnName(mapCol.get("Label"));
 	}
 
-	private String getAttribute(CSVRecord rec) {
-		return getValueByColumnName(rec, mapCol.get("AttributeType"));
+	private String getAttribute(Record rec) {
+		return rec.getValueByColumnName(mapCol.get("AttributeType"));
 	}
 
-	private String getUnit(CSVRecord rec) {
-		if (codeMap.containsKey(getValueByColumnName(rec, mapCol.get("Unit")))) {
-			return codeMap.get(getValueByColumnName(rec, mapCol.get("Unit")));
-		} else if (getValueByColumnName(rec, mapCol.get("Unit")) != null){
-			return getValueByColumnName(rec, mapCol.get("Unit"));
+	private String getUnit(Record rec) {
+		if (codeMap.containsKey(rec.getValueByColumnName(mapCol.get("Unit")))) {
+			return codeMap.get(rec.getValueByColumnName(mapCol.get("Unit")));
+		} else if (rec.getValueByColumnName(mapCol.get("Unit")) != null){
+			return rec.getValueByColumnName(mapCol.get("Unit"));
 		}
 		
 		return "";
 	}
 
-	private String getTime(CSVRecord rec) {
-		return getValueByColumnName(rec, mapCol.get("Time"));
+	private String getTime(Record rec) {
+		return rec.getValueByColumnName(mapCol.get("Time"));
 	}
 
-	private String getEntity(CSVRecord rec) {
-		if (getValueByColumnName(rec, mapCol.get("Entity")).equals("")) {
+	private String getEntity(Record rec) {
+		if (rec.getValueByColumnName(mapCol.get("Entity")).equals("")) {
 			return null;
 		} else {
-			if (codeMap.containsKey(getValueByColumnName(rec, mapCol.get("Entity")))) {
-				return codeMap.get(getValueByColumnName(rec, mapCol.get("Entity")));
+			if (codeMap.containsKey(rec.getValueByColumnName(mapCol.get("Entity")))) {
+				return codeMap.get(rec.getValueByColumnName(mapCol.get("Entity")));
 			} else {
-				return getValueByColumnName(rec, mapCol.get("Entity"));
+				return rec.getValueByColumnName(mapCol.get("Entity"));
 			}
 		}
 	}
 
-	private String getRole(CSVRecord rec) {
-		return getValueByColumnName(rec, mapCol.get("Role"));
+	private String getRole(Record rec) {
+		return rec.getValueByColumnName(mapCol.get("Role"));
 	}
 
-	private String getRelation(CSVRecord rec) {
-		return getValueByColumnName(rec, mapCol.get("Relation"));
+	private String getRelation(Record rec) {
+		return rec.getValueByColumnName(mapCol.get("Relation"));
 	}
 
-	private String getInRelationTo(CSVRecord rec) {
-		if (getValueByColumnName(rec, mapCol.get("InRelationTo")).equals("")){
+	private String getInRelationTo(Record rec) {
+		if (rec.getValueByColumnName(mapCol.get("InRelationTo")).equals("")){
 			return "";
 		} else {
-			List<String> items = Arrays.asList(getValueByColumnName(rec, mapCol.get("InRelationTo")).split("\\s*,\\s*"));
+			List<String> items = Arrays.asList(rec.getValueByColumnName(mapCol.get("InRelationTo")).split("\\s*,\\s*"));
 			String answer = "";
 			for (String i : items){
 				answer += kbPrefix + "DASO-" + i.replace("_","-").replace("??", "") +  " & ";
 			}
 			return answer.substring(0, answer.length() - 3);
-			//    		return kbPrefix + "DASO-" + items.get(0).replace("_","-").replace("??", "");
 		}
 	}
 
-	private String getWasDerivedFrom(CSVRecord rec) {
-		return getValueByColumnName(rec, mapCol.get("WasDerivedFrom"));
+	private String getWasDerivedFrom(Record rec) {
+		return rec.getValueByColumnName(mapCol.get("WasDerivedFrom"));
 	}
 
-	private String getWasGeneratedBy(CSVRecord rec) {
-		return getValueByColumnName(rec, mapCol.get("WasGeneratedBy"));
+	private String getWasGeneratedBy(Record rec) {
+		return rec.getValueByColumnName(mapCol.get("WasGeneratedBy"));
 	}
 
-	private Boolean checkVirtual(CSVRecord rec) {
+	private Boolean checkVirtual(Record rec) {
 		if (getLabel(rec).contains("??")){
 			return true;
 		} else {
@@ -149,7 +130,7 @@ public class DASchemaEventGenerator extends BasicGenerator {
 	public List< Map<String, Object> > createRows() throws Exception {
 		rows.clear();
 		int row_number = 0;
-		for (CSVRecord record : records) {
+		for (Record record : records) {
 			if (timeList.contains(getLabel(record)) && getLabel(record).length()>0){
 				rows.add(createRow(record, ++row_number));
 			}
@@ -171,7 +152,7 @@ public class DASchemaEventGenerator extends BasicGenerator {
 	
 	public List<String> createUris() throws Exception {
 		List<String> result = new ArrayList<String>();
-		for (CSVRecord record : records) {
+		for (Record record : records) {
 			if (timeList.contains(getLabel(record)) && getLabel(record).length()>0){
 				result.add(kbPrefix + "DASE-" + SDDName + "-" + getLabel(record).trim().replace(" ","").replace("_","-").replace("??", ""));
 			}
@@ -188,7 +169,7 @@ public class DASchemaEventGenerator extends BasicGenerator {
 
 	//Column	Attribute	attributeOf	Unit	Time	Entity	Role	Relation	inRelationTo	wasDerivedFrom	wasGeneratedBy	hasPosition   
 	@Override
-	Map<String, Object> createRow(CSVRecord rec, int row_number) throws Exception {
+	Map<String, Object> createRow(Record rec, int row_number) throws Exception {
 		Map<String, Object> row = new HashMap<String, Object>();
 		row.put("hasURI", kbPrefix + "DASE-" + SDDName + "-" + getLabel(rec).trim().replace(" ","").replace("_","-").replace("??", ""));
 		row.put("a", "hasco:DASchemaEvent");

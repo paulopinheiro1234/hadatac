@@ -1,64 +1,38 @@
 package org.hadatac.data.loader;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
 import java.lang.String;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.csv.CSVFormat;
-import org.apache.commons.csv.CSVRecord;
+public abstract class BasicGenerator {
 
-import play.mvc.Controller;
-
-public abstract class BasicGenerator extends Controller {
-
-	protected Iterable<CSVRecord> records = null;
+	protected Iterable<Record> records = null;
 	protected List<Map<String, Object>> rows = new ArrayList<Map<String, Object>>();
 	protected HashMap<String, String> mapCol = new HashMap<String, String>();
 	protected String fileName = "";
 
 	public BasicGenerator() {}
 
-	public BasicGenerator(File file) {
-		try {
-			records = CSVFormat.DEFAULT.withHeader().parse(new FileReader(file));
-			fileName = file.getName();
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+	public BasicGenerator(RecordFile file) {
+		records = file.getRecords();
+		fileName = file.getFile().getName();
 		initMapping();
 	}
 
 	abstract void initMapping();
 
-	abstract Map<String, Object> createRow(CSVRecord rec, int row_number) throws Exception;
+	abstract Map<String, Object> createRow(Record rec, int row_number) throws Exception;
 
 	public List<Map<String, Object>> getRows() {
 		return rows;
-	}
-	
-	public String getValueByColumnName(CSVRecord rec, String colomnName) {
-		String value = "";
-		try {
-			value = rec.get(colomnName);
-		} catch (Exception e) {
-			System.out.println("column " + colomnName + " not found!");
-		}
-		
-		return value;
 	}
 
 	public List<Map<String, Object>> createRows() throws Exception {
 		rows.clear();
 		int row_number = 0;
-		for (CSVRecord record : records) {
+		for (Record record : records) {
 			Map<String, Object> tempRow = createRow(record, ++row_number);
 			if (tempRow != null) {
 				rows.add(tempRow);

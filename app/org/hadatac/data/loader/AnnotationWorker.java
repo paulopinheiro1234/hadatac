@@ -1,8 +1,6 @@
 package org.hadatac.data.loader;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.InputStream;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
@@ -14,7 +12,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -26,11 +23,6 @@ import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
 import org.apache.jena.rdf.model.Property;
 import org.apache.jena.rdf.model.Resource;
-import org.apache.poi.ss.usermodel.Cell;
-import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.ss.usermodel.Sheet;
-import org.apache.poi.ss.usermodel.Workbook;
-import org.apache.poi.ss.usermodel.WorkbookFactory;
 import org.hadatac.console.controllers.annotator.AnnotationLog;
 import org.hadatac.data.api.DataFactory;
 import org.hadatac.data.loader.util.Arguments;
@@ -44,6 +36,7 @@ import org.hadatac.entity.pojo.SDD;
 import org.hadatac.metadata.loader.LabkeyDataHandler;
 import org.hadatac.metadata.loader.URIUtils;
 import org.labkey.remoteapi.CommandException;
+
 import org.hadatac.utils.Collections;
 import org.hadatac.utils.ConfigProp;
 import org.hadatac.utils.Feedback;
@@ -69,31 +62,44 @@ public class AnnotationWorker {
 
 		for (DataFile file : unproc_files) {
 			String file_name = file.getFileName();
+			String filePath = path_unproc + "/" + file_name;
+			
 			AnnotationLog log = new AnnotationLog(file_name);
 			log.addline(Feedback.println(Feedback.WEB, String.format("[OK] Processing file: %s", file_name)));
 			log.save();
+			
+			RecordFile recordFile = null;
+			if (file_name.endsWith(".csv")) {
+				recordFile = new CSVRecordFile(new File(filePath));
+			} else if (file_name.endsWith(".xlsx")) {
+				recordFile = new SpreadsheetRecordFile(new File(filePath));
+			} else {
+				log.addline(Feedback.println(Feedback.WEB, String.format(
+						"[ERROR] Unknown file format: %s", file_name)));
+				log.save();
+				return;
+			}
+			
 			boolean bSucceed = false;
 			if (file_name.startsWith("DA")) {
-				bSucceed = annotateDAFile(file);
+				bSucceed = annotateDAFile(file, recordFile);
 			}
-//			else if (file_name.startsWith("SID")) {
-//				bSucceed = annotateSampleIdFile(new File(path_unproc + "/" + file_name));
-//			}
 			else if (file_name.startsWith("PID")) {
-				bSucceed = annotateSubjectIdFile(new File(path_unproc + "/" + file_name));
+				bSucceed = annotateSubjectIdFile(recordFile);
 			}
 			else if (file_name.startsWith("STD")) {
-				bSucceed = annotateStudyIdFile(new File(path_unproc + "/" + file_name));
+				bSucceed = annotateStudyIdFile(recordFile);
 			}
 			else if (file_name.startsWith("MAP")) {
-				bSucceed = annotateMapFile(new File(path_unproc + "/" + file_name));
+				bSucceed = annotateMapFile(recordFile);
 			}
 			else if (file_name.startsWith("ACQ")) {
-				bSucceed = annotateACQFile(new File(path_unproc + "/" + file_name));
+				bSucceed = annotateACQFile(recordFile);
 			}
 			else if (file_name.startsWith("SDD")) {
-				bSucceed = annotateDataAcquisitionSchemaFile(new File(path_unproc + "/" + file_name));
+				bSucceed = annotateDataAcquisitionSchemaFile(recordFile);
 			}
+			
 			if (bSucceed) {
 				//Move the file to the folder for processed files
 				File destFolder = new File(path_proc);
@@ -113,92 +119,94 @@ public class AnnotationWorker {
 		}
 	}
 	
-	public static boolean annotateMapFile(File file) {
-		boolean bSuccess = true;
+	public static boolean annotateMapFile(RecordFile file) {
+		boolean bSuccess = true;	
 		try {
 			SampleSubjectMapper mapper = new SampleSubjectMapper(file);
 			mapper.createRows();
 		} catch (Exception e) {
 			e.printStackTrace();
-			AnnotationLog.printException(e, file.getName());
+			AnnotationLog.printException(e, file.getFile().getName());
 			return false;
 		}
+		
 		try {
 			SampleSubjectMapper mapper = new SampleSubjectMapper(file);
 			System.out.println("Start Update Mappings:");
 			bSuccess = mapper.updateMappings();
 		} catch (Exception e) {
 			e.printStackTrace();
-			AnnotationLog.printException(e, file.getName());
+			AnnotationLog.printException(e, file.getFile().getName());
 			return false;
 		}
+		
 		return bSuccess;
 	}
 
-	public static boolean annotateStudyIdFile(File file) {
+	public static boolean annotateStudyIdFile(RecordFile file) {		
 		boolean bSuccess = true;
 		try {
 			StudyGenerator studyGenerator = new StudyGenerator(file);
 			bSuccess = commitRows(studyGenerator.createRows(), studyGenerator.toString(), 
-					file.getName(), "Study", true);
+					file.getFile().getName(), "Study", true);
 		} catch (Exception e) {
 			System.out.println("Error: annotateStudyIdFile() - Unable to generate study");
-			AnnotationLog.printException(e, file.getName());
+			AnnotationLog.printException(e, file.getFile().getName());
 			return false;
 		}
 		try {
 			SampleCollectionGenerator sampleCollectionGenerator = new SampleCollectionGenerator(file);
 			bSuccess = commitRows(sampleCollectionGenerator.createRows(), sampleCollectionGenerator.toString(), 
-					file.getName(), "SampleCollection", true);
+					file.getFile().getName(), "SampleCollection", true);
 
 		} catch (Exception e) {
 			System.out.println("Error: annotateStudyIdFile() - Unable to generate Sample Collection");
-			AnnotationLog.printException(e, file.getName());
+			AnnotationLog.printException(e, file.getFile().getName());
 			return false;
 		}    	
 		try {
 			AgentGenerator agentGenerator = new AgentGenerator(file);
 			bSuccess = commitRows(agentGenerator.createRows(), agentGenerator.toString(), 
-					file.getName(), "Agent", true);
+					file.getFile().getName(), "Agent", true);
 
 		} catch (Exception e) {
 			System.out.println("Error: annotateStudyIdFile() - Unable to generate Agent");
-			AnnotationLog.printException(e, file.getName());
+			AnnotationLog.printException(e, file.getFile().getName());
 			return false;
 		}
 
 		return bSuccess;
 	}
 
-	public static boolean annotateSampleIdFile(File file) {
+	public static boolean annotateSampleIdFile(RecordFile file) {
 		try {
 			SampleGenerator sampleGenerator = new SampleGenerator(file);
 			sampleGenerator.createRows();
 		} catch (Exception e) {
 			System.out.println("Error: annotateSampleIdFile() - Unable to generate Sample");
 			e.printStackTrace();
-			AnnotationLog.printException(e, file.getName());
+			AnnotationLog.printException(e, file.getFile().getName());
 			return false;
 		}
 
 		return true;
 	}
 
-	public static boolean annotateSubjectIdFile(File file) {
+	public static boolean annotateSubjectIdFile(RecordFile file) {
 		try {
 			SubjectGenerator subjectGenerator = new SubjectGenerator(file);
 			subjectGenerator.createRows();
 		}
 		catch (Exception e) {
 			System.out.println("Error: annotateSubjectIdFile() - Unable to generate Subject");
-			AnnotationLog.printException(e, file.getName());
+			AnnotationLog.printException(e, file.getFile().getName());
 			return false;
 		}
 		
 		return true;
 	}
 	
-	public static boolean annotateACQFile(File file) {
+	public static boolean annotateACQFile(RecordFile file) {
 		boolean bSuccess = true;
 		try {
 			GeneralGenerator generalGenerator = new GeneralGenerator();
@@ -213,46 +221,45 @@ public class AnnotationWorker {
 			row.put("a", "hasco:Questionnaire");
 			row.put("rdfs:label", "Generic Questionnaire");
 			generalGenerator.addRow(row);
-			bSuccess = commitRows(generalGenerator.getRows(), generalGenerator.toString(), file.getName(), 
-					"Instrument", true);
+			bSuccess = commitRows(generalGenerator.getRows(), generalGenerator.toString(), 
+					file.getFile().getName(), "Instrument", true);
 
 			DateFormat isoFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
 			String startTime = isoFormat.format(new Date());
-
+			
 			try {
 				DeploymentGenerator deploymentGenerator = new DeploymentGenerator(file, startTime);
-				bSuccess = commitRows(deploymentGenerator.createRows(), deploymentGenerator.toString(), file.getName(), 
-						"Deployment", true);
+				bSuccess = commitRows(deploymentGenerator.createRows(), deploymentGenerator.toString(), 
+						file.getFile().getName(), "Deployment", true);
 			} catch (Exception e) {
 				System.out.println("Error in annotateDataAcquisitionFile: Deployment Generator");
-				AnnotationLog.printException(e, file.getName());
+				AnnotationLog.printException(e, file.getFile().getName());
 				return false;
 			}
 			try {
 				DataAcquisitionGenerator daGenerator = new DataAcquisitionGenerator(file, startTime);
-				bSuccess = commitRows(daGenerator.createRows(), daGenerator.toString(), file.getName(), 
-						"DataAcquisition", true);
+				bSuccess = commitRows(daGenerator.createRows(), daGenerator.toString(), 
+						file.getFile().getName(), "DataAcquisition", true);
 			} catch (Exception e) {
 				System.out.println("Error in annotateDataAcquisitionFile: Data Acquisition Generator");
-				AnnotationLog.printException(e, file.getName());
+				AnnotationLog.printException(e, file.getFile().getName());
 				return false;
 			}
 		} catch (Exception e) {
 			System.out.println("Error in annotateDataAcquisitionFile");
-			AnnotationLog.printException(e, file.getName());
+			AnnotationLog.printException(e, file.getFile().getName());
 			return false;
 		}
 		
 		return bSuccess;
 	}
 
-	public static boolean annotateDataAcquisitionSchemaFile(File file) {
-		
+	public static boolean annotateDataAcquisitionSchemaFile(RecordFile file) {
 		System.out.println("Processing data acquisition schema file ...");
 		
-		String file_name = file.getName();
+		String file_name = file.getFile().getName();
 		boolean bSuccess = true;
-		SDD sdd = new SDD(file);
+		SDD sdd = new SDD(file.getFile());
 		String sddName = sdd.getName();
 		Map<String, String> mapCatalog = sdd.getCatalog();
 		
@@ -261,27 +268,29 @@ public class AnnotationWorker {
 		}
 		
 		if (file_name.endsWith(".csv")) {
+			String prefix = "sddtmp/" + file.getFile().getName().replace(".csv", "");
+			File dictionaryFile = sdd.downloadFile(mapCatalog.get("Data_Dictionary"), prefix + "-dd.csv");
+			File codeMappingFile = sdd.downloadFile(mapCatalog.get("Code_Mappings"), prefix + "-code-mappings.csv");
+			File codeBookFile = sdd.downloadFile(mapCatalog.get("Codebook"), prefix + "-codebook.csv");
+			File timelineFile = sdd.downloadFile(mapCatalog.get("Timeline"), prefix + "-timeline.csv");
 			
-			File dictionaryFile = sdd.downloadFile(mapCatalog.get("Data_Dictionary"), 
-					"sddtmp/" + file.getName().replace(".csv", "") + "-dd.csv");
-			File codeMappingFile = sdd.downloadFile(mapCatalog.get("Code_Mappings"), 
-					"sddtmp/" + file.getName().replace(".csv", "") + "-code-mappings.csv");
-			File codeBookFile = sdd.downloadFile(mapCatalog.get("Codebook"), 
-					"sddtmp/" + file.getName().replace(".csv", "") + "-codebook.csv");
-			File timelineFile = sdd.downloadFile(mapCatalog.get("Timeline"), 
-					"sddtmp/" + file.getName().replace(".csv", "") + "-timeline.csv");
-			sdd.readDataDictionary(dictionaryFile);
-			sdd.readCodeMapping(codeMappingFile);
-			sdd.readCodebook(codeBookFile);
-			sdd.readtimelineFile(timelineFile);
+			RecordFile codeMappingRecordFile = new CSVRecordFile(codeMappingFile);
+			RecordFile dictionaryRecordFile = new CSVRecordFile(dictionaryFile);
+			RecordFile codeBookRecordFile = new CSVRecordFile(codeBookFile);
+			RecordFile timelineRecordFile = new CSVRecordFile(timelineFile);
+			
+			sdd.readCodeMapping(codeMappingRecordFile);
+			sdd.readDataDictionary(dictionaryRecordFile);
+			sdd.readCodebook(codeBookRecordFile);
+			sdd.readtimelineFile(timelineRecordFile);
 			
 			if (codeBookFile != null){
 				try{
-					PVGenerator pvGenerator = new PVGenerator(codeBookFile, file.getName(), 
+					PVGenerator pvGenerator = new PVGenerator(codeBookRecordFile, file.getFile().getName(), 
 							study_id, sdd.getMapAttrObj(), sdd.getCodeMapping());
 					System.out.println("Calling PVGenerator");
 					bSuccess = commitRows(pvGenerator.createRows(), pvGenerator.toString(), 
-							file.getName(), "PossibleValue", true);
+							file.getFile().getName(), "PossibleValue", true);
 				} catch (Exception e) {
 					e.printStackTrace();
 					System.out.println("Error annotateDataAcquisitionSchemaFile: Unable to read codebook");
@@ -293,172 +302,170 @@ public class AnnotationWorker {
 
 			if (dictionaryFile != null){
 				try {
-					DASchemaAttrGenerator dasaGenerator = new DASchemaAttrGenerator(dictionaryFile, sddName, sdd.getCodeMapping());
+					DASchemaAttrGenerator dasaGenerator = new DASchemaAttrGenerator(dictionaryRecordFile, 
+							sddName, sdd.getCodeMapping());
 					System.out.println("Calling DASchemaAttrGenerator");
 					bSuccess = commitRows(dasaGenerator.createRows(), dasaGenerator.toString(), 
-							file.getName(), "DASchemaAttribute", true);
+							file.getFile().getName(), "DASchemaAttribute", true);
 				} catch (Exception e) {
+					e.printStackTrace();
 					System.out.println("Error annotateDataAcquisitionSchemaFile: Unable to generate DASA.");
-					AnnotationLog.printException(e, file.getName());
+					AnnotationLog.printException(e, file.getFile().getName());
 					return false;
 				}
 			}
 
-			if (dictionaryFile != null){
+			if (dictionaryFile != null) {
 				try {
-					DASchemaObjectGenerator dasoGenerator = new DASchemaObjectGenerator(dictionaryFile, sddName, sdd.getCodeMapping());
+					DASchemaObjectGenerator dasoGenerator = new DASchemaObjectGenerator(dictionaryRecordFile, 
+							sddName, sdd.getCodeMapping());
 					System.out.println("Calling DASchemaObjectGenerator");
 					bSuccess = commitRows(dasoGenerator.createRows(), dasoGenerator.toString(), 
-							file.getName(), "DASchemaObject", true);
+							file.getFile().getName(), "DASchemaObject", true);
 					
 					String SDDUri = URIUtils.replacePrefixEx(kbPrefix + "DAS-" + dasoGenerator.getSDDName());
 					templateLibrary.put(SDDUri, dasoGenerator.getTemplateList());
 					System.out.println("[AutoAnnotator]: adding templates for SDD " + SDDUri);
 				} catch (Exception e) {
 					System.out.println("Error annotateDataAcquisitionSchemaFile: Unable to generate DASO.");
-					AnnotationLog.printException(e, file.getName());
+					AnnotationLog.printException(e, file.getFile().getName());
 					return false;
 				}
 			}
 
-			if (dictionaryFile != null){
+			if (dictionaryFile != null) {
 				try {
-					DASchemaEventGenerator daseGenerator = new DASchemaEventGenerator(dictionaryFile, sdd.getTimeLineMap(), sddName, sdd.getCodeMapping());
+					DASchemaEventGenerator daseGenerator = new DASchemaEventGenerator(dictionaryRecordFile, 
+							sdd.getTimeLineMap(), sddName, sdd.getCodeMapping());
 					System.out.println("Calling DASchemaEventGenerator");
 					bSuccess = commitRows(daseGenerator.createRows(), daseGenerator.toString(), 
-							file.getName(), "DASchemaEvent", true);
+							file.getFile().getName(), "DASchemaEvent", true);
 				} catch (Exception e) {
 					System.out.println(e);
 					System.out.println("Error annotateDataAcquisitionSchemaFile: Unable to generate DASE.");
-					AnnotationLog.printException(e, file.getName());
+					AnnotationLog.printException(e, file.getFile().getName());
 				}
 			}
-
 
 			try {
 				GeneralGenerator generalGenerator = new GeneralGenerator();
 				System.out.println("Calling GeneralGenerator");
 				Map<String, Object> row = new HashMap<String, Object>();
-				row.put("hasURI", kbPrefix + "DAS-" + file.getName().replace("SDD-","").replace(".csv",""));
+				row.put("hasURI", kbPrefix + "DAS-" + file.getFile().getName().replace("SDD-","").replace(".csv",""));
 				row.put("a", "hasco:DASchema");
-				row.put("rdfs:label", "Schema for " + file.getName().replace("SDD-","").replace(".csv",""));
+				row.put("rdfs:label", "Schema for " + file.getFile().getName().replace("SDD-","").replace(".csv",""));
 				row.put("rdfs:comment", "");
 				generalGenerator.addRow(row);
 
 				bSuccess = commitRows(generalGenerator.getRows(), generalGenerator.toString(), 
-						file.getName(), "DASchema", true);	        	
+						file.getFile().getName(), "DASchema", true);	        	
 			} catch (Exception e) {
 				System.out.println("Error annotateDataAcquisitionSchemaFile: GeneralGenerator failed.");
-				AnnotationLog.printException(e, file.getName());
+				AnnotationLog.printException(e, file.getFile().getName());
 				return false;
 			}
 			
 		} else if (file_name.endsWith(".xlsx")) {
 			System.out.println("this is an excel sdd");
 			
-			try{
-				InputStream inp = new FileInputStream(file);
-				Workbook wb = WorkbookFactory.create(inp);
+			try {
+				File codeMappingFile = sdd.downloadFile(mapCatalog.get("Code_Mappings"), 
+						"sddtmp/" + file.getFile().getName().replace(".xlsx", "") + "-code-mappings.csv");
+				RecordFile codeBookFile = new SpreadsheetRecordFile(file.getFile(), mapCatalog.get("Codebook").replace("#", ""));
+				RecordFile dictionaryFile = new SpreadsheetRecordFile(file.getFile(), mapCatalog.get("Data_Dictionary").replace("#", ""));
 				
-//				sdd.readSheetfromExcel(mapCatalog.get("Data_Dictionary"), wb, "sddtmp/" + file.getName().replace(".xlsx", "") + "-dd.csv");
+				sdd.readCodeMapping(new CSVRecordFile(codeMappingFile));
+				sdd.readDataDictionary(dictionaryFile);
+				sdd.readCodebook(codeBookFile);
+				sdd.readtimelineFile(new SpreadsheetRecordFile(file.getFile(), mapCatalog.get("Timeline").replace("#", "")));
 				
-				String dictionaryFile = sdd.readSheetfromExcel(mapCatalog.get("Data_Dictionary"), wb, "sddtmp/" + file.getName().replace(".xlsx", "") + "-dd.xlsx");
-				File codeMappingFile = sdd.downloadFile(mapCatalog.get("Code_Mappings"), "sddtmp/" + file.getName().replace(".xlsx", "") + "-code-mappings.csv");
-				String codeBookFile = sdd.readSheetfromExcel(mapCatalog.get("Codebook"), wb, "sddtmp/" + file.getName().replace(".xlsx", "") + "-codebook.xlsx");
-				String timelineFile = sdd.readSheetfromExcel(mapCatalog.get("Timeline"), wb, "sddtmp/" + file.getName().replace(".xlsx", "") + "-timeline.xlsx");
-//				sdd.readDataDictionary(dictionaryFile);
-//				sdd.readCodeMapping(codeMappingFile);
-//				sdd.readCodebook(codeBookFile);
-//				sdd.readtimelineFile(timelineFile);
+				try {
+					PVGenerator pvGenerator = new PVGenerator(codeBookFile, file.getFile().getName(), 
+							study_id, sdd.getMapAttrObj(), sdd.getCodeMapping());
+					System.out.println("Calling PVGenerator");
+					bSuccess = commitRows(pvGenerator.createRows(), pvGenerator.toString(), 
+							file.getFile().getName(), "PossibleValue", true);
+				} catch (Exception e) {
+					e.printStackTrace();
+					System.out.println("Error annotateDataAcquisitionSchemaFile: Unable to read codebook");
+					System.out.println(file.getFile().getAbsoluteFile());
+					return false;
+				}
+					
+				try {
+					DASchemaAttrGenerator dasaGenerator = new DASchemaAttrGenerator(dictionaryFile, sddName, sdd.getCodeMapping());
+					System.out.println("Calling DASchemaAttrGenerator");
+					bSuccess = commitRows(dasaGenerator.createRows(), dasaGenerator.toString(), 
+							file.getFile().getName(), "DASchemaAttribute", true);
+				} catch (Exception e) {
+					e.printStackTrace();
+					System.out.println("Error annotateDataAcquisitionSchemaFile: Unable to generate DASA.");
+					AnnotationLog.printException(e, file.getFile().getName());
+					return false;
+				}
 				
-//				try{
-//					PVGenerator pvGenerator = new PVGenerator(codeBookFile, file.getName(), 
-//							study_id, sdd.getMapAttrObj(), sdd.getCodeMapping());
-//					System.out.println("Calling PVGenerator");
-//					bSuccess = commitRows(pvGenerator.createRows(), pvGenerator.toString(), 
-//							file.getName(), "PossibleValue", true);
-//				} catch (Exception e) {
-//					e.printStackTrace();
-//					System.out.println("Error annotateDataAcquisitionSchemaFile: Unable to read codebook");
-//					System.out.println(codeBookFile.getAbsoluteFile());
-//					System.out.println(codeBookFile.length());
-//					return false;
-//				}
-//					
-//				try {
-//					DASchemaAttrGenerator dasaGenerator = new DASchemaAttrGenerator(dictionaryFile, sddName, sdd.getCodeMapping());
-//					System.out.println("Calling DASchemaAttrGenerator");
-//					bSuccess = commitRows(dasaGenerator.createRows(), dasaGenerator.toString(), 
-//							file.getName(), "DASchemaAttribute", true);
-//				} catch (Exception e) {
-//					System.out.println("Error annotateDataAcquisitionSchemaFile: Unable to generate DASA.");
-//					AnnotationLog.printException(e, file.getName());
-//					return false;
-//				}
-//				
-//				try {
-//					DASchemaObjectGenerator dasoGenerator = new DASchemaObjectGenerator(dictionaryFile, sddName, sdd.getCodeMapping());
-//					System.out.println("Calling DASchemaObjectGenerator");
-//					bSuccess = commitRows(dasoGenerator.createRows(), dasoGenerator.toString(), 
-//							file.getName(), "DASchemaObject", true);
-//					
-//					String SDDUri = URIUtils.replacePrefixEx(kbPrefix + "DAS-" + dasoGenerator.getSDDName());
-//					templateLibrary.put(SDDUri, dasoGenerator.getTemplateList());
-//					System.out.println("[AutoAnnotator]: adding templates for SDD " + SDDUri);
-//				} catch (Exception e) {
-//					System.out.println("Error annotateDataAcquisitionSchemaFile: Unable to generate DASO.");
-//					AnnotationLog.printException(e, file.getName());
-//					return false;
-//				}
-//				
-//				try {
-//					DASchemaEventGenerator daseGenerator = new DASchemaEventGenerator(dictionaryFile, sdd.getTimeLineMap(), sddName, sdd.getCodeMapping());
-//					System.out.println("Calling DASchemaEventGenerator");
-//					bSuccess = commitRows(daseGenerator.createRows(), daseGenerator.toString(), 
-//							file.getName(), "DASchemaEvent", true);
-//				} catch (Exception e) {
-//					System.out.println(e);
-//					System.out.println("Error annotateDataAcquisitionSchemaFile: Unable to generate DASE.");
-//					AnnotationLog.printException(e, file.getName());
-//				}
-//
-//				try {
-//					GeneralGenerator generalGenerator = new GeneralGenerator();
-//					System.out.println("Calling GeneralGenerator");
-//					Map<String, Object> row = new HashMap<String, Object>();
-//					row.put("hasURI", kbPrefix + "DAS-" + file.getName().replace("_","-").replace("SDD-","").replace(".xlsx",""));
-//					row.put("a", "hasco:DASchema");
-//					row.put("rdfs:label", "Schema for " + file.getName().replace("_","-").replace("SDD-","").replace(".xlsx",""));
-//					row.put("rdfs:comment", "");
-//					generalGenerator.addRow(row);
-//
-//					bSuccess = commitRows(generalGenerator.getRows(), generalGenerator.toString(), 
-//							file.getName(), "DASchema", true);	        	
-//				} catch (Exception e) {
-//					System.out.println("Error annotateDataAcquisitionSchemaFile: GeneralGenerator failed.");
-//					AnnotationLog.printException(e, file.getName());
-//					return false;
-//				}
+				try {
+					DASchemaObjectGenerator dasoGenerator = new DASchemaObjectGenerator(dictionaryFile, sddName, sdd.getCodeMapping());
+					System.out.println("Calling DASchemaObjectGenerator");
+					bSuccess = commitRows(dasoGenerator.createRows(), dasoGenerator.toString(), 
+							file.getFile().getName(), "DASchemaObject", true);
+					
+					String SDDUri = URIUtils.replacePrefixEx(kbPrefix + "DAS-" + dasoGenerator.getSDDName());
+					templateLibrary.put(SDDUri, dasoGenerator.getTemplateList());
+					System.out.println("[AutoAnnotator]: adding templates for SDD " + SDDUri);
+				} catch (Exception e) {
+					System.out.println("Error annotateDataAcquisitionSchemaFile: Unable to generate DASO.");
+					AnnotationLog.printException(e, file.getFile().getName());
+					return false;
+				}
 				
+				try {
+					DASchemaEventGenerator daseGenerator = new DASchemaEventGenerator(dictionaryFile, 
+							sdd.getTimeLineMap(), sddName, sdd.getCodeMapping());
+					System.out.println("Calling DASchemaEventGenerator");
+					bSuccess = commitRows(daseGenerator.createRows(), daseGenerator.toString(), 
+							file.getFile().getName(), "DASchemaEvent", true);
+				} catch (Exception e) {
+					System.out.println(e);
+					System.out.println("Error annotateDataAcquisitionSchemaFile: Unable to generate DASE.");
+					AnnotationLog.printException(e, file.getFile().getName());
+				}
+
+				try {
+					GeneralGenerator generalGenerator = new GeneralGenerator();
+					System.out.println("Calling GeneralGenerator");
+					Map<String, Object> row = new HashMap<String, Object>();
+					row.put("hasURI", kbPrefix + "DAS-" + file.getFile().getName().replace("_","-").replace("SDD-","").replace(".xlsx",""));
+					row.put("a", "hasco:DASchema");
+					row.put("rdfs:label", "Schema for " + file.getFile().getName().replace("_","-").replace("SDD-","").replace(".xlsx",""));
+					row.put("rdfs:comment", "");
+					generalGenerator.addRow(row);
+
+					bSuccess = commitRows(generalGenerator.getRows(), generalGenerator.toString(), 
+							file.getFile().getName(), "DASchema", true);	        	
+				} catch (Exception e) {
+					System.out.println("Error annotateDataAcquisitionSchemaFile: GeneralGenerator failed.");
+					AnnotationLog.printException(e, file.getFile().getName());
+					return false;
+				}
 			} catch (Exception e) {
+				e.printStackTrace();
 				System.out.println("Error annotateDataAcquisitionSchemaFile: read excel failed.");
-				AnnotationLog.printException(e, file.getName());
+				AnnotationLog.printException(e, file.getFile().getName());
 				return false;
 			}
-
 		}
 
 		return bSuccess;
 	}
 	
-	public static boolean annotateDAFile(DataFile dataFile) {
+	public static boolean annotateDAFile(DataFile dataFile, RecordFile recordFile) {
 		System.out.println("annotateDAFile: [" + dataFile.getFileName() + "]");
 		
 		String file_name = dataFile.getFileName();    	
 		AnnotationLog log = new AnnotationLog();
 		log.setFileName(file_name);
-
-		ArrayList<DASVirtualObject> templateList = new ArrayList<DASVirtualObject>();
+		
 		DataAcquisition da = null;
 		String da_uri = null;
 		String deployment_uri = null;
@@ -510,40 +517,20 @@ public class AnnotationWorker {
 			log.addline(Feedback.println(Feedback.WEB, String.format("[OK] Deployment %s specified for data acquisition %s", deployment_uri, file_name)));
 		}
 
-		String path_unproc = ConfigProp.getPathUnproc();
 		int status = -1;
 		String message = "";
-		Arguments arguments = new Arguments();
-		arguments.setInputPath(path_unproc + file_name);
-		arguments.setInputType("CSV");
-		arguments.setOutputPath("upload/");
-		arguments.setVerbose(true);
-		arguments.setPv(false);
 
 		Parser parser = new Parser();
-		ParsingResult result_parse;
-		File inputFile = new File(arguments.getInputPath());
-		FileFactory files = new FileFactory(arguments);
-		files.setCSVFile(inputFile, inputFile.getName());
+		ParsingResult parsingResult;
 
 		try {
-			files.openFile("log", "w");
-			files.writeln("log", "[START] " + arguments.getInputPath() + " generating measurements.");
-		} catch (Exception e) {
-			log.addline(Feedback.println(Feedback.WEB, String.format("[ERROR] opening CSV file %s", e.getMessage())));
+			dataFile.setDatasetUri(DataFactory.getNextDatasetURI(da.getUri()));
+			da.addDatasetUri(dataFile.getDatasetUri());
+			parsingResult = parser.indexMeasurements(recordFile, da, dataFile);
+			status = parsingResult.getStatus();
+			message += parsingResult.getMessage();
+			log.addline(Feedback.println(Feedback.WEB, message));
 			log.save();
-			return false;
-		}
-
-		try {
-			if (arguments.getInputType().equals("CSV")) {
-				System.out.println("annotateCSVFile: file to be parsed [" + dataFile.getFileName() + "]"); 
-				dataFile.setDatasetUri(DataFactory.getNextDatasetURI(da.getUri()));
-				da.addDatasetUri(dataFile.getDatasetUri());
-				result_parse = parser.indexMeasurements(files, da, dataFile);
-				status = result_parse.getStatus();
-				message += result_parse.getMessage();
-			}
 		} catch (Exception e) {
 			StringWriter errors = new StringWriter();
 			e.printStackTrace(new PrintWriter(errors));
@@ -612,7 +599,6 @@ public class AnnotationWorker {
 
 	private static boolean commitRows(List<Map<String, Object>> rows, String contentInCSV,
 			String fileName, String tableName, boolean toTripleStore) {
-
 		AnnotationLog log = AnnotationLog.find(fileName);
 		if (null == log) {
 			log = new AnnotationLog();
@@ -673,9 +659,7 @@ public class AnnotationWorker {
 		return true;
 	}
 	
-	
 	public static List<String> getPopulatedSDDUris(File file) {
-		
 		System.out.println("get populated SDD Uris ...");
 		
 		String file_name = file.getName();
@@ -697,12 +681,17 @@ public class AnnotationWorker {
 					"sddtmp/" + file.getName().replace(".csv", "") + "-dd.csv");
 			File codeBookFile = sdd.downloadFile(mapCatalog.get("Codebook"), 
 					"sddtmp/" + file.getName().replace(".csv", "") + "-codebook.csv");
-			sdd.readCodebook(codeBookFile);
-			sdd.readDataDictionary(dictionaryFile);
+			
+			RecordFile codeBookRecordFile = new CSVRecordFile(codeBookFile);
+			RecordFile dictionaryRecordFile = new CSVRecordFile(dictionaryFile);
+			
+			sdd.readCodebook(codeBookRecordFile);
+			sdd.readDataDictionary(dictionaryRecordFile);
 
 			if (dictionaryFile != null){
 				try {
-					DASchemaAttrGenerator dasaGenerator = new DASchemaAttrGenerator(dictionaryFile, sddName, sdd.getCodeMapping());
+					DASchemaAttrGenerator dasaGenerator = new DASchemaAttrGenerator(dictionaryRecordFile, 
+							sddName, sdd.getCodeMapping());
 					System.out.println("Calling createUris() ... ");
 					List<String> dasaUris = dasaGenerator.createUris();
 					result.addAll(dasaUris);
@@ -714,7 +703,8 @@ public class AnnotationWorker {
 
 			if (dictionaryFile != null){
 				try {
-					DASchemaObjectGenerator dasoGenerator = new DASchemaObjectGenerator(dictionaryFile, sddName, sdd.getCodeMapping());
+					DASchemaObjectGenerator dasoGenerator = new DASchemaObjectGenerator(dictionaryRecordFile, 
+							sddName, sdd.getCodeMapping());
 					System.out.println("Calling createUris() ... ");
 					List<String> dasoUris = dasoGenerator.createUris();
 					result.addAll(dasoUris);
@@ -726,7 +716,8 @@ public class AnnotationWorker {
 
 			if (dictionaryFile != null){
 				try {
-					DASchemaEventGenerator daseGenerator = new DASchemaEventGenerator(dictionaryFile, sdd.getTimeLineMap(), sddName, sdd.getCodeMapping());
+					DASchemaEventGenerator daseGenerator = new DASchemaEventGenerator(dictionaryRecordFile, 
+							sdd.getTimeLineMap(), sddName, sdd.getCodeMapping());
 					System.out.println("Calling createUris() ... ");
 					List<String> daseUris = daseGenerator.createUris();
 					result.addAll(daseUris);
@@ -739,7 +730,8 @@ public class AnnotationWorker {
 
 			if (codeBookFile != null){
 				try {
-					PVGenerator pvGenerator = new PVGenerator(codeBookFile, file.getName(), study_id, sdd.getMapAttrObj(), sdd.getCodeMapping());
+					PVGenerator pvGenerator = new PVGenerator(codeBookRecordFile, 
+							file.getName(), study_id, sdd.getMapAttrObj(), sdd.getCodeMapping());
 					System.out.println("Calling PVGenerator");
 					List<String> pvUris = pvGenerator.createUris();
 					result.addAll(pvUris);	
@@ -752,74 +744,72 @@ public class AnnotationWorker {
 			
 		} else if (file_name.endsWith(".xlsx")) {
 			System.out.println("this is an excel sdd");
-//			
-//			try{
-//				InputStream inp = new FileInputStream(file);
-//				Workbook wb = WorkbookFactory.create(inp);
-//				
-////				sdd.readSheetfromExcel(mapCatalog.get("Data_Dictionary"), wb, "sddtmp/" + file.getName().replace(".xlsx", "") + "-dd.csv");
-//				
-//				File dictionaryFile = sdd.readSheetfromExcel(mapCatalog.get("Data_Dictionary"), wb, "sddtmp/" + file.getName().replace(".xlsx", "") + "-dd.csv");
-//				sdd.readDataDictionary(dictionaryFile);
-//				File codeBookFile = sdd.readSheetfromExcel(mapCatalog.get("Codebook"), wb, "sddtmp/" + file.getName().replace(".xlsx", "") + "-codebook.csv");
-//				sdd.readDataDictionary(codeBookFile);
-//				
-//				if (dictionaryFile != null){
-//					try {
-//						DASchemaAttrGenerator dasaGenerator = new DASchemaAttrGenerator(dictionaryFile, sddName, sdd.getCodeMapping());
-//						System.out.println("Calling createUris() ... ");
-//						List<String> dasaUris = dasaGenerator.createUris();
-//						result.addAll(dasaUris);
-//					} catch (Exception e) {
-//						System.out.println("Error createUris(): Unable to generate DASA Uris.");
-//						AnnotationLog.printException(e, file.getName());
-//					}
-//				}
-//
-//				if (dictionaryFile != null){
-//					try {
-//						DASchemaObjectGenerator dasoGenerator = new DASchemaObjectGenerator(dictionaryFile, sddName, sdd.getCodeMapping());
-//						System.out.println("Calling createUris() ... ");
-//						List<String> dasoUris = dasoGenerator.createUris();
-//						result.addAll(dasoUris);
-//					} catch (Exception e) {
-//						System.out.println("Error createUris(): Unable to generate DASO Uris.");
-//						AnnotationLog.printException(e, file.getName());
-//					}
-//				}
-//
-//				if (dictionaryFile != null){
-//					try {
-//						DASchemaEventGenerator daseGenerator = new DASchemaEventGenerator(dictionaryFile, sdd.getTimeLineMap(), sddName, sdd.getCodeMapping());
-//						System.out.println("Calling createUris() ... ");
-//						List<String> daseUris = daseGenerator.createUris();
-//						result.addAll(daseUris);
-//					} catch (Exception e) {
-//						System.out.println(e);
-//						System.out.println("Error annotateDataAcquisitionSchemaFile: Unable to generate DASE Uris.");
-//						AnnotationLog.printException(e, file.getName());
-//					}
-//				}
-//				
-//				if (codeBookFile != null){
-//					try {
-//						PVGenerator pvGenerator = new PVGenerator(codeBookFile, file.getName(), study_id, sdd.getMapAttrObj(), sdd.getCodeMapping());
-//						System.out.println("Calling PVGenerator");
-//						List<String> pvUris = pvGenerator.createUris();
-//						result.addAll(pvUris);	
-//					} catch (Exception e) {
-//						AnnotationLog.printException(e, file.getName());
-//					}
-//				}
-//				
-//			} catch (Exception e) {
-//				System.out.println("Error annotateDataAcquisitionSchemaFile: read excel failed.");
-//				AnnotationLog.printException(e, file.getName());
-//				return result;
-//			}
+			
+			try {
+				File codeMappingFile = sdd.downloadFile(mapCatalog.get("Code_Mappings"), "sddtmp/" + file.getName().replace(".xlsx", "") + "-code-mappings.csv");
+				RecordFile codeBookFile = new SpreadsheetRecordFile(file, mapCatalog.get("Codebook").replace("#", ""));
+				RecordFile dictionaryFile = new SpreadsheetRecordFile(file, mapCatalog.get("Data_Dictionary").replace("#", ""));
+				
+				sdd.readCodeMapping(new CSVRecordFile(codeMappingFile));
+				sdd.readDataDictionary(dictionaryFile);
+				sdd.readCodebook(codeBookFile);
+				sdd.readtimelineFile(new SpreadsheetRecordFile(file, mapCatalog.get("Timeline").replace("#", "")));
+				
+				if (dictionaryFile != null){
+					try {
+						DASchemaAttrGenerator dasaGenerator = new DASchemaAttrGenerator(dictionaryFile, sddName, sdd.getCodeMapping());
+						System.out.println("Calling createUris() ... ");
+						List<String> dasaUris = dasaGenerator.createUris();
+						result.addAll(dasaUris);
+					} catch (Exception e) {
+						System.out.println("Error createUris(): Unable to generate DASA Uris.");
+						AnnotationLog.printException(e, file.getName());
+					}
+				}
+
+				if (dictionaryFile != null){
+					try {
+						DASchemaObjectGenerator dasoGenerator = new DASchemaObjectGenerator(dictionaryFile, sddName, sdd.getCodeMapping());
+						System.out.println("Calling createUris() ... ");
+						List<String> dasoUris = dasoGenerator.createUris();
+						result.addAll(dasoUris);
+					} catch (Exception e) {
+						System.out.println("Error createUris(): Unable to generate DASO Uris.");
+						AnnotationLog.printException(e, file.getName());
+					}
+				}
+
+				if (dictionaryFile != null){
+					try {
+						DASchemaEventGenerator daseGenerator = new DASchemaEventGenerator(dictionaryFile, sdd.getTimeLineMap(), sddName, sdd.getCodeMapping());
+						System.out.println("Calling createUris() ... ");
+						List<String> daseUris = daseGenerator.createUris();
+						result.addAll(daseUris);
+					} catch (Exception e) {
+						System.out.println(e);
+						System.out.println("Error annotateDataAcquisitionSchemaFile: Unable to generate DASE Uris.");
+						AnnotationLog.printException(e, file.getName());
+					}
+				}
+				
+				if (codeBookFile != null){
+					try {
+						PVGenerator pvGenerator = new PVGenerator(codeBookFile, file.getName(), study_id, sdd.getMapAttrObj(), sdd.getCodeMapping());
+						System.out.println("Calling PVGenerator");
+						List<String> pvUris = pvGenerator.createUris();
+						result.addAll(pvUris);	
+					} catch (Exception e) {
+						AnnotationLog.printException(e, file.getName());
+					}
+				}
+				
+			} catch (Exception e) {
+				System.out.println("Error annotateDataAcquisitionSchemaFile: read excel failed.");
+				AnnotationLog.printException(e, file.getName());
+				return result;
+			}
 			
 			System.out.println("result is ... " + result);
-
 		}
 
 		return result;

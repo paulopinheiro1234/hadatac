@@ -85,7 +85,7 @@ public class UnitInstance extends HADatAcThing implements Comparable<UnitInstanc
 					// Skip empty unit
 					continue;
 				} else {
-					unit.setLabel(pivot_ent.value);
+					unit.setLabel(WordUtils.capitalize(pivot_ent.value));
 				}
 			}
 			unit.setCount(pivot_ent.count);

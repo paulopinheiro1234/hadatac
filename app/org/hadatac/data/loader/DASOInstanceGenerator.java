@@ -10,7 +10,6 @@ import java.util.List;
 import java.util.Map;
 import org.apache.commons.csv.CSVRecord;
 
-
 public class DASOInstanceGenerator{
 	private String studyId;
 	private List<DASVirtualObject> templateList;

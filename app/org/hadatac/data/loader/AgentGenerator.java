@@ -1,12 +1,10 @@
 package org.hadatac.data.loader;
 
-import java.io.File;
 import java.lang.String;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.csv.CSVRecord;
 import org.hadatac.utils.ConfigProp;
 import org.hadatac.utils.Templates;
 
@@ -14,7 +12,7 @@ public class AgentGenerator extends BasicGenerator {
 	final String kbPrefix = ConfigProp.getKbPrefix();
 	private int counter = 1; //starting index number
 	
-	public AgentGenerator(File file) {
+	public AgentGenerator(RecordFile file) {
 		super(file);
 	}
 	
@@ -49,95 +47,95 @@ public class AgentGenerator extends BasicGenerator {
 		mapCol.put("DCAccessBool", Templates.DCACCESSBOOL);
 	}
 	
-	private String getInstitutionUri(CSVRecord rec) {
-		return kbPrefix + "ORG-" + getValueByColumnName(rec, mapCol.get("institution")).replaceAll(" ", "-").replaceAll(",", "").replaceAll("'", "");
+	private String getInstitutionUri(Record rec) {
+		return kbPrefix + "ORG-" + rec.getValueByColumnName(mapCol.get("institution")).replaceAll(" ", "-").replaceAll(",", "").replaceAll("'", "");
 	}
 	
-	private String getInstitutionName(CSVRecord rec) {
-		return getValueByColumnName(rec, mapCol.get("institution"));
+	private String getInstitutionName(Record rec) {
+		return rec.getValueByColumnName(mapCol.get("institution"));
 	}
 	
-	private String getPIUri(CSVRecord rec) {
-		return kbPrefix + "PER-" + getValueByColumnName(rec, mapCol.get("PI")).replaceAll(" ", "-");
+	private String getPIUri(Record rec) {
+		return kbPrefix + "PER-" + rec.getValueByColumnName(mapCol.get("PI")).replaceAll(" ", "-");
 	}
 	
-	private String getPIFullName(CSVRecord rec) {
-		return getValueByColumnName(rec, mapCol.get("PI"));
+	private String getPIFullName(Record rec) {
+		return rec.getValueByColumnName(mapCol.get("PI"));
 	}
 	
-	private String getPIGivenName(CSVRecord rec) {
-		return getValueByColumnName(rec, mapCol.get("PI")).substring(0, getPIFullName(rec).indexOf(' '));
+	private String getPIGivenName(Record rec) {
+		return rec.getValueByColumnName(mapCol.get("PI")).substring(0, getPIFullName(rec).indexOf(' '));
 	}
 	
-	private String getPIFamilyName(CSVRecord rec) {
-		return getValueByColumnName(rec, mapCol.get("PI")).substring(getPIFullName(rec).indexOf(' ') + 1);
+	private String getPIFamilyName(Record rec) {
+		return rec.getValueByColumnName(mapCol.get("PI")).substring(getPIFullName(rec).indexOf(' ') + 1);
 	}
 	
-	private String getPIMBox(CSVRecord rec) {
-		return getValueByColumnName(rec, mapCol.get("PIEmail"));
+	private String getPIMBox(Record rec) {
+		return rec.getValueByColumnName(mapCol.get("PIEmail"));
 	}
 	
-	private String getCPI1Uri(CSVRecord rec) {
+	private String getCPI1Uri(Record rec) {
 		return kbPrefix + "PER-" + getCPI1FullName(rec).replaceAll(" ", "-");
 	}
 	
-	private String getCPI1FullName(CSVRecord rec) {
-		return getValueByColumnName(rec, mapCol.get("CPI1FName")) + " " + getValueByColumnName(rec, mapCol.get("CPI1LName"));
+	private String getCPI1FullName(Record rec) {
+		return rec.getValueByColumnName(mapCol.get("CPI1FName")) + " " + rec.getValueByColumnName(mapCol.get("CPI1LName"));
 	}
 	
-	private String getCPI1GivenName(CSVRecord rec) {
-		return getValueByColumnName(rec, mapCol.get("CPI1FName"));
+	private String getCPI1GivenName(Record rec) {
+		return rec.getValueByColumnName(mapCol.get("CPI1FName"));
 	}
 	
-	private String getCPI1FamilyName(CSVRecord rec) {
-		return getValueByColumnName(rec, mapCol.get("CPI1LName"));
+	private String getCPI1FamilyName(Record rec) {
+		return rec.getValueByColumnName(mapCol.get("CPI1LName"));
 	}
 	
-	private String getCPI1MBox(CSVRecord rec) {
-		return getValueByColumnName(rec, mapCol.get("CPI1Email"));
+	private String getCPI1MBox(Record rec) {
+		return rec.getValueByColumnName(mapCol.get("CPI1Email"));
 	}
     
-	private String getCPI2Uri(CSVRecord rec) {
+	private String getCPI2Uri(Record rec) {
 		return kbPrefix + "PER-" + getCPI2FullName(rec).replaceAll(" ", "-");
 	}
 	
-	private String getCPI2FullName(CSVRecord rec) {
-		return getValueByColumnName(rec, mapCol.get("CPI2FName")) + " " + getValueByColumnName(rec, mapCol.get("CPI2LName"));
+	private String getCPI2FullName(Record rec) {
+		return rec.getValueByColumnName(mapCol.get("CPI2FName")) + " " + rec.getValueByColumnName(mapCol.get("CPI2LName"));
 	}
 	
-	private String getCPI2GivenName(CSVRecord rec) {
-		return getValueByColumnName(rec, mapCol.get("CPI2FName"));
+	private String getCPI2GivenName(Record rec) {
+		return rec.getValueByColumnName(mapCol.get("CPI2FName"));
 	}
 	
-	private String getCPI2FamilyName(CSVRecord rec) {
-		return getValueByColumnName(rec, mapCol.get("CPI2LName"));
+	private String getCPI2FamilyName(Record rec) {
+		return rec.getValueByColumnName(mapCol.get("CPI2LName"));
 	}
 	
-	private String getCPI2MBox(CSVRecord rec) {
-		return getValueByColumnName(rec, mapCol.get("CPI2Email"));
+	private String getCPI2MBox(Record rec) {
+		return rec.getValueByColumnName(mapCol.get("CPI2Email"));
 	}
 	
-	private String getContactUri(CSVRecord rec) {
+	private String getContactUri(Record rec) {
 		return kbPrefix + "PER-" + getContactFullName(rec).replaceAll(" ", "-");
 	}
 	
-	private String getContactFullName(CSVRecord rec) {
-		return getValueByColumnName(rec, mapCol.get("contactFName")) + " " + getValueByColumnName(rec, mapCol.get("contactLName"));
+	private String getContactFullName(Record rec) {
+		return rec.getValueByColumnName(mapCol.get("contactFName")) + " " + rec.getValueByColumnName(mapCol.get("contactLName"));
 	}
 	
-	private String getContactGivenName(CSVRecord rec) {
-		return getValueByColumnName(rec, mapCol.get("contactFName"));
+	private String getContactGivenName(Record rec) {
+		return rec.getValueByColumnName(mapCol.get("contactFName"));
 	}
 	
-	private String getContactFamilyName(CSVRecord rec) {
-		return getValueByColumnName(rec, mapCol.get("contactLName"));
+	private String getContactFamilyName(Record rec) {
+		return rec.getValueByColumnName(mapCol.get("contactLName"));
 	}
 	
-	private String getContactMBox(CSVRecord rec) {
-		return getValueByColumnName(rec, mapCol.get("contactEmail"));
+	private String getContactMBox(Record rec) {
+		return rec.getValueByColumnName(mapCol.get("contactEmail"));
 	}
 	
-    public Map<String, Object> createPIRow(CSVRecord rec) {
+    public Map<String, Object> createPIRow(Record rec) {
     	Map<String, Object> row = new HashMap<String, Object>();
     	row.put("hasURI", getPIUri(rec));
     	row.put("a", "prov:Person");
@@ -152,7 +150,7 @@ public class AgentGenerator extends BasicGenerator {
     	return row;
     }
     
-    public Map<String, Object> createCPI1Row(CSVRecord rec) {
+    public Map<String, Object> createCPI1Row(Record rec) {
     	Map<String, Object> row = new HashMap<String, Object>();
     	row.put("hasURI", getCPI1Uri(rec));
     	row.put("a", "prov:Person");
@@ -168,7 +166,7 @@ public class AgentGenerator extends BasicGenerator {
     }
 
     
-    public Map<String, Object> createCPI2Row(CSVRecord rec) {
+    public Map<String, Object> createCPI2Row(Record rec) {
     	Map<String, Object> row = new HashMap<String, Object>();
     	row.put("hasURI", getCPI2Uri(rec));
     	row.put("a", "prov:Person");
@@ -183,7 +181,7 @@ public class AgentGenerator extends BasicGenerator {
     	return row;
     }
 
-    public Map<String, Object> createContactRow(CSVRecord rec) {
+    public Map<String, Object> createContactRow(Record rec) {
     	Map<String, Object> row = new HashMap<String, Object>();
     	row.put("hasURI", getContactUri(rec));
     	row.put("a", "prov:Person");
@@ -198,7 +196,7 @@ public class AgentGenerator extends BasicGenerator {
     	return row;
     }
 
-    public Map<String, Object> createInstitutionRow(CSVRecord rec) {
+    public Map<String, Object> createInstitutionRow(Record rec) {
     	Map<String, Object> row = new HashMap<String, Object>();
     	row.put("hasURI", getInstitutionUri(rec));
     	row.put("a", "prov:Organization");
@@ -214,13 +212,11 @@ public class AgentGenerator extends BasicGenerator {
 		boolean duplicate=false;
     	rows.clear();
     	// Currently using an inefficient way to check if row already exists in the list of rows; This should be addressed in the future
-    	for (CSVRecord record : records) {
+    	for (Record record : records) {
     		if(getPIFullName(record).length() > 0) {
     			System.out.println("Creating PI Row:" + getPIFullName(record) + ":");
     			duplicate=false;
     			for (Map<String, Object> row : rows) {
-        			//System.out.println("Comparing: " + getPIUri(record));
-        			//System.out.println("With: " + row.get("hasURI"));
     				if(row.get("hasURI").equals(getPIUri(record))) {
     					System.out.println("Found Duplicate: " + getPIUri(record));
     					duplicate=true;
@@ -306,7 +302,7 @@ public class AgentGenerator extends BasicGenerator {
     }
 
 	@Override
-	Map<String, Object> createRow(CSVRecord rec, int row_number) throws Exception {
+	Map<String, Object> createRow(Record rec, int row_number) throws Exception {
 		// TODO Auto-generated method stub
 		return null;
 	}

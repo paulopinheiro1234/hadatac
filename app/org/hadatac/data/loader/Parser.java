@@ -10,12 +10,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.HashMap;
 
-import org.apache.commons.csv.CSVFormat;
-import org.apache.commons.csv.CSVRecord;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.impl.HttpSolrClient;
-import org.hadatac.data.loader.util.FileFactory;
 import org.hadatac.data.model.ParsingResult;
 import org.hadatac.entity.pojo.DataAcquisition;
 import org.hadatac.entity.pojo.DataAcquisitionSchema;
@@ -23,12 +20,9 @@ import org.hadatac.entity.pojo.DataAcquisitionSchemaAttribute;
 import org.hadatac.entity.pojo.DataAcquisitionSchemaObject;
 import org.hadatac.entity.pojo.DASVirtualObject;
 import org.hadatac.entity.pojo.DataFile;
-import org.hadatac.entity.pojo.ObjectCollection;
 import org.hadatac.entity.pojo.Measurement;
 import org.hadatac.metadata.loader.URIUtils;
-import org.hadatac.console.controllers.fileviewer.CSVPreview;
 import org.hadatac.utils.Collections;
-import org.hadatac.utils.ConfigProp;
 
 import com.typesafe.config.ConfigFactory;
 
@@ -41,7 +35,7 @@ public class Parser {
 		templateList = new ArrayList<DASVirtualObject>();
 	}
 
-	public ParsingResult indexMeasurements(FileFactory files, DataAcquisition da, DataFile dataFile) {
+	public ParsingResult indexMeasurements(RecordFile file, DataAcquisition da, DataFile dataFile) {
 		System.out.println("[Parser] indexMeasurements()...");
 
 		Map<String, DataAcquisitionSchemaObject> mapSchemaObjects = new HashMap<String, DataAcquisitionSchemaObject>();
@@ -63,24 +57,6 @@ public class Parser {
 		}
 
 		String message = "";
-
-		try {
-			files.openFile("csv", "r");
-		} catch (IOException e) {
-			System.out.println("[ERROR] Fail to open the csv file\n");
-			message += "[ERROR] Fail to open the csv file\n";
-			return new ParsingResult(1, message);
-		}
-
-		Iterable<CSVRecord> records = null;
-		try {
-			records = CSVFormat.DEFAULT.withHeader().parse(files.getReader("csv"));
-		} catch (IOException e) {
-			System.out.println("[ERROR] Fail to parse header of the csv file\n");
-			message += "[ERROR] Fail to parse header of the csv file\n";
-			return new ParsingResult(1, message);
-		}
-
 		int total_count = 0;
 		int batch_size = 10000;
 
@@ -89,8 +65,7 @@ public class Parser {
 				+ Collections.DATA_ACQUISITION).build();
 
 		// ASSIGN values for tempPositionInt
-		schema.defineTemporaryPositions(CSVPreview.getCSVHeaders(
-				ConfigProp.getPathUnproc(), files.getFileName()));
+		schema.defineTemporaryPositions(file.getHeaders());
 
 		// ASSIGN positions for MetaDASAs
 		int posTimestamp = -1;
@@ -149,7 +124,7 @@ public class Parser {
 		Map<String, DASOInstance> rowInstances = new HashMap<String,DASOInstance>();
 		*/
 		
-		for (CSVRecord record : records) {
+		for (Record record : file.getRecords()) {
 			// Comment out row instance generation
 			/*
 			try{
@@ -172,9 +147,6 @@ public class Parser {
 				DataAcquisitionSchemaAttribute dasa = iterAttributes.next();
 				
 				if (!dasa.getPartOfSchema().equals(schema.getUri())){
-					continue;
-				}
-				if (!record.isMapped(dasa.getLabel())) {
 					continue;
 				}
 				if (dasa.getLabel().equals(schema.getTimestampLabel())) {
@@ -211,10 +183,10 @@ public class Parser {
 				
 				if (dasa.getTempPositionInt() < 0 || dasa.getTempPositionInt() >= record.size()) {
 					continue;
-				} else if (record.get(dasa.getTempPositionInt()).isEmpty()) { 
+				} else if (record.getValueByColumnIndex(dasa.getTempPositionInt()).isEmpty()) { 
 					continue;
 				} else {
-					String originalValue = record.get(dasa.getTempPositionInt());
+					String originalValue = record.getValueByColumnIndex(dasa.getTempPositionInt());
 					String dasa_uri_temp = dasa.getUri();
 					measurement.setOriginalValue(originalValue);
 					if (possibleValues.containsKey(dasa_uri_temp)) {
@@ -244,12 +216,12 @@ public class Parser {
 
 				if(dasa.getLabel() == schema.getTimestampLabel()) {
 					// full-row regular (Epoch) timemestamp
-					String sTime = record.get(posTimestamp);
+					String sTime = record.getValueByColumnIndex(posTimestamp);
 					int timeStamp = new BigDecimal(sTime).intValue();
 					measurement.setTimestamp(Instant.ofEpochSecond(timeStamp).toString());
 				} else if (!schema.getTimeInstantLabel().equals("")) {
 					// full-row regular (XSD) time interval
-					String timeValue = record.get(posTimeInstant);
+					String timeValue = record.getValueByColumnIndex(posTimeInstant);
 					if (timeValue != null) {
 						try {
 							measurement.setTimestamp(timeValue);
@@ -260,7 +232,7 @@ public class Parser {
 					}
 				} else if (!schema.getNamedTimeLabel().equals("")) {
 					// full-row named time
-					String timeValue = record.get(posNamedTime);
+					String timeValue = record.getValueByColumnIndex(posNamedTime);
 					if (timeValue != null) {
 						measurement.setAbstractTime(timeValue);
 					} else {
@@ -285,21 +257,13 @@ public class Parser {
 
 				String id = "";
 				if (!schema.getOriginalIdLabel().equals("")) {
-					id = record.get(posOriginalId);
+					id = record.getValueByColumnIndex(posOriginalId);
 				} else if (!schema.getIdLabel().equals("")) {
-					id = record.get(posId);
+					id = record.getValueByColumnIndex(posId);
 				}
 				
 				if (!id.equals("")) {
-					if (dasa.getEntity().equals(URIUtils.replacePrefixEx("sio:Human"))) {
-						if (mapIDStudyObjects.containsKey(id)) {
-							measurement.setObjectUri(mapIDStudyObjects.get(id).get(0));
-						} else {
-							measurement.setObjectUri("");
-						}
-						measurement.setPID(id);
-						measurement.setSID("");
-					} else if (dasa.getEntity().equals(URIUtils.replacePrefixEx("sio:Sample"))) {
+					if (dasa.getEntity().equals(URIUtils.replacePrefixEx("sio:Sample"))) {
 						if (mapIDStudyObjects.containsKey(id)) {
 							measurement.setObjectUri(mapIDStudyObjects.get(id).get(2));
 							measurement.setPID(mapIDStudyObjects.get(id).get(1));
@@ -308,6 +272,14 @@ public class Parser {
 							measurement.setPID("");
 						}
 						measurement.setSID(id);
+					} else {
+						if (mapIDStudyObjects.containsKey(id)) {
+							measurement.setObjectUri(mapIDStudyObjects.get(id).get(0));
+						} else {
+							measurement.setObjectUri("");
+						}
+						measurement.setPID(id);
+						measurement.setSID("");
 					}
 				} else {
 					measurement.setObjectUri("");
@@ -347,7 +319,7 @@ public class Parser {
 				if (null != daso) {
 					if (daso.getTempPositionInt() > 0) {
 						// values of daso exist in the columns
-						String dasoValue = record.get(daso.getTempPositionInt());
+						String dasoValue = record.getValueByColumnIndex(daso.getTempPositionInt());
 						if (possibleValues.containsKey(dasa.getObjectUri())) {
 							if (possibleValues.get(dasa.getObjectUri()).containsKey(dasoValue.toLowerCase())) {
 								measurement.setEntityUri(possibleValues.get(dasa.getObjectUri()).get(dasoValue.toLowerCase()));
@@ -359,7 +331,7 @@ public class Parser {
 						}
 					} else {
 						if (!schema.getOriginalIdLabel().equals("")) {
-							String originalId = record.get(posOriginalId);
+							String originalId = record.getValueByColumnIndex(posOriginalId);
 							// values of daso might exist in the triple store
 							if (daso.getEntity().equals(URIUtils.replacePrefixEx("sio:Human"))) {
 								if (mapIDStudyObjects.containsKey(originalId)) {
@@ -405,12 +377,15 @@ public class Parser {
 				
 				if (null != inRelationToDaso) {
 					if (inRelationToDaso.getTempPositionInt() > 0) {
-						String inRelationToDasoValue = record.get(inRelationToDaso.getTempPositionInt());
+						String inRelationToDasoValue = record.getValueByColumnIndex(inRelationToDaso.getTempPositionInt());
 						if (possibleValues.containsKey(inRelationToUri)) {
 							if (possibleValues.get(inRelationToUri).containsKey(inRelationToDasoValue.toLowerCase())) {
 								measurement.setInRelationToUri(possibleValues.get(inRelationToUri).get(inRelationToDasoValue.toLowerCase()));
 							}
 						}
+					} else {
+						// Assign the entity of inRelationToDaso to inRelationToUri
+						measurement.setInRelationToUri(inRelationToDaso.getEntity());
 					}
 				}
 				
@@ -421,7 +396,7 @@ public class Parser {
 				 *=============================*/
 				if (!schema.getUnitLabel().equals("") && posUnit >= 0) {
 					// unit exists in the columns
-					String unitValue = record.get(posUnit);
+					String unitValue = record.getValueByColumnIndex(posUnit);
 					if (unitValue != null) {
 						if (possibleValues.containsKey(dasoUnitUri)) {
 							if (possibleValues.get(dasoUnitUri).containsKey(unitValue.toLowerCase())) {
@@ -479,20 +454,19 @@ public class Parser {
 
 		// FINAL COMMIT
 		try {
+			System.out.println("solr.commit()...");
+			solr.commit();
+			System.out.println(String.format("[OK] Committed %s measurements!", total_count % batch_size));
+			message += String.format("[OK] Committed %s measurements!\n", total_count % batch_size);
+		} catch (IOException | SolrServerException e) {
+			System.out.println("[ERROR] SolrClient.commit - e.Message: " + e.getMessage());
+			message += "[ERROR] Fail to commit to solr\n";
 			try {
-				System.out.println("solr.commit()...");
-				solr.commit();
-				System.out.println(String.format("[OK] Committed %s measurements!", total_count % batch_size));
-				message += String.format("[OK] Committed %s measurements!\n", total_count % batch_size);
-			} catch (IOException | SolrServerException e) {
 				solr.close();
-				System.out.println("[ERROR] SolrClient.commit - e.Message: " + e.getMessage());
-				message += "[ERROR] Fail to commit to solr\n";
-				return new ParsingResult(1, message);
+			} catch (IOException e1) {
+				System.out.println("[ERROR] SolrClient.close - e.Message: " + e1.getMessage());
+				message += "[ERROR] Fail to close solr\n";
 			}
-			files.closeFile("csv", "r");
-		} catch (IOException e) {
-			message += "[ERROR] Fail to close the csv file\n";
 			return new ParsingResult(1, message);
 		}
 
@@ -506,6 +480,7 @@ public class Parser {
 			System.out.println("[ERROR] SolrClient.close - e.Message: " + e.getMessage());
 			message += "[ERROR] Fail to close solr\n";
 		}
+		
 		return new ParsingResult(0, message);
 	}
 }
