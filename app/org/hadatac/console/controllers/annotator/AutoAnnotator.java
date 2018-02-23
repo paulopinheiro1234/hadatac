@@ -30,6 +30,7 @@ import org.hadatac.console.views.html.annotator.*;
 import org.hadatac.console.views.html.triplestore.*;
 import org.hadatac.data.loader.AnnotationWorker;
 import org.hadatac.data.loader.CSVRecordFile;
+import org.hadatac.data.loader.GeneratorChain;
 import org.hadatac.data.loader.RecordFile;
 import org.hadatac.data.loader.SpreadsheetRecordFile;
 import org.hadatac.console.views.html.*;
@@ -325,38 +326,24 @@ public class AutoAnnotator extends Controller {
 		}
 		
 		String file_name = file.getName();
-		if (file_name.startsWith("SDD")) {
-			List<String> result = AnnotationWorker.getPopulatedSDDUris(recordFile);
-			
-			for (String str : result){
-				try{
-					String query = "";
-					query += NameSpaces.getInstance().printSparqlNameSpaceList();
-					query += "DELETE WHERE {  ";
-					query += str + " ?p ?o . ";
-					query += "}  ";
-					UpdateRequest request = UpdateFactory.create(query);
-					UpdateProcessor processor = UpdateExecutionFactory.createRemote(
-							request, Collections.getCollectionsName(Collections.METADATA_UPDATE));
-					processor.execute();
-				} catch (Exception e) {
-					System.out.println(str + " s triple can not be deleted.");
-				}
-
-				try{
-					String query2 = "";
-					query2 += NameSpaces.getInstance().printSparqlNameSpaceList();
-					query2 += "DELETE WHERE {  ";
-					query2 += "?s ?p " + str + " . ";
-					query2 += "}  ";
-					UpdateRequest request2 = UpdateFactory.create(query2);
-					UpdateProcessor processor2 = UpdateExecutionFactory.createRemote(request2, Collections.getCollectionsName(Collections.METADATA_UPDATE));
-					processor2.execute();
-				} catch (Exception e) {
-					System.out.println(str + " s triple can not be deleted.");
-				}
-			}
+		GeneratorChain chain = null;
+		if (file_name.startsWith("PID")) {
+			chain = AnnotationWorker.annotateSubjectIdFile(recordFile);
 		}
+		else if (file_name.startsWith("STD")) {
+			chain = AnnotationWorker.annotateStudyIdFile(recordFile);
+		}
+		else if (file_name.startsWith("MAP")) {
+			chain = AnnotationWorker.annotateMapFile(recordFile);
+		}
+		else if (file_name.startsWith("ACQ")) {
+			chain = AnnotationWorker.annotateACQFile(recordFile);
+		}
+		else if (file_name.startsWith("SDD")) {
+			chain = AnnotationWorker.annotateDataAcquisitionSchemaFile(recordFile);
+		}
+		
+		chain.deleteTriples();
 	}
 
 	@Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
@@ -383,7 +370,7 @@ public class AutoAnnotator extends Controller {
 		if (null == dataFile) {
 			return badRequest("You do NOT have the permission to operate this file!");
 		}
-
+		
 		AnnotationLog.delete(file_name);
 		Measurement.delete(dataFile.getDatasetUri());
 		List<DataAcquisition> dataAcquisitions = DataAcquisition.findAll();

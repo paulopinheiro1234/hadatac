@@ -156,4 +156,14 @@ public class SubjectGenerator extends BasicGenerator {
 		
 		return rows;
 	}
+
+	@Override
+	public String getTableName() {
+		return null;
+	}
+
+	@Override
+	public String getErrorMsg(Exception e) {
+		return null;
+	}
 }

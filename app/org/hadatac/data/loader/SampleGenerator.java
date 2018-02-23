@@ -285,4 +285,14 @@ public class SampleGenerator extends BasicGenerator {
 		
 		return rows;
 	}
+
+	@Override
+	public String getTableName() {
+		return "";
+	}
+
+	@Override
+	public String getErrorMsg(Exception e) {
+		return "";
+	}
 }

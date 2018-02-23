@@ -203,4 +203,14 @@ public class DASchemaEventGenerator extends BasicGenerator {
 		System.out.println("till now all good3..");
 		return row;
 	}
+
+	@Override
+	public String getTableName() {
+		return "DASchemaEvent";
+	}
+
+	@Override
+	public String getErrorMsg(Exception e) {
+		return "Error in DASchemaEventGenerator: " + e.getMessage();
+	}
 }

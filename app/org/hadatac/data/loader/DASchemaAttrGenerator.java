@@ -23,9 +23,9 @@ public class DASchemaAttrGenerator extends BasicGenerator {
 		super(file);
 		this.codeMap = codeMap;
 		this.SDDName = SDDName;
-		
+
 		initMapping();
-		
+
 		for (Record rec : file.getRecords()) {
 			List<String> tmp = new ArrayList<String>();
 			tmp.add(rec.getValueByColumnName(mapCol.get("AttributeOf")));
@@ -34,7 +34,7 @@ public class DASchemaAttrGenerator extends BasicGenerator {
 			System.out.println(rec.getValueByColumnName(mapCol.get("Label")) + " *** " + tmp);
 		}
 	}
-	
+
 	//Column	Attribute	attributeOf	Unit	Time	Entity	Role	Relation	inRelationTo	wasDerivedFrom	wasGeneratedBy	hasPosition	
 	@Override
 	void initMapping() {
@@ -75,7 +75,7 @@ public class DASchemaAttrGenerator extends BasicGenerator {
 		} else if (codeMap.containsKey(original)) {
 			return codeMap.get(original);
 		}
-		
+
 		return "";
 	}
 
@@ -97,7 +97,7 @@ public class DASchemaAttrGenerator extends BasicGenerator {
 				currentHasEntity.put(getLabel(rec), codeMap.get(hasEntityMap.get(rec.getValueByColumnName(mapCol.get("AttributeOf")))));
 				return codeMap.get(hasEntityMap.get(rec.getValueByColumnName(mapCol.get("AttributeOf"))));
 			} else {
-//				System.out.println(hasEntityMap.get(getValueByColumnName(rec, mapCol.get("AttributeOf"))).get(1));
+				//				System.out.println(hasEntityMap.get(getValueByColumnName(rec, mapCol.get("AttributeOf"))).get(1));
 				if (hasEntityMap.containsKey(rec.getValueByColumnName(mapCol.get("AttributeOf")))){
 					if(codeMap.containsKey(hasEntityMap.get(rec.getValueByColumnName(mapCol.get("AttributeOf"))).get(1))){
 						currentHasEntity.put(getLabel(rec), codeMap.get(hasEntityMap.get(rec.getValueByColumnName(mapCol.get("AttributeOf"))).get(1)));
@@ -110,10 +110,6 @@ public class DASchemaAttrGenerator extends BasicGenerator {
 				return "chear:unknownEntity";
 			}
 		}
-	}
-
-	private String getRole(Record rec) {
-		return rec.getValueByColumnName(mapCol.get("Role"));
 	}
 
 	private String getRelation(Record rec) {
@@ -134,7 +130,6 @@ public class DASchemaAttrGenerator extends BasicGenerator {
 	}
 
 	private String getWasDerivedFrom(Record rec) {
-		//replace & with , for excel approach
 		return rec.getValueByColumnName(mapCol.get("WasDerivedFrom"));
 	}
 
@@ -169,7 +164,7 @@ public class DASchemaAttrGenerator extends BasicGenerator {
 		System.out.println("rows 1 " + rows);
 		return rows;
 	}
-	
+
 	public List<String> createUris() throws Exception {
 		List<String> result = new ArrayList<String>();
 		for (Record record : records) {
@@ -181,7 +176,7 @@ public class DASchemaAttrGenerator extends BasicGenerator {
 		}
 		return result;
 	}
-	
+
 
 	//Column	Attribute	attributeOf	Unit	Time	Entity	Role	Relation	inRelationTo	wasDerivedFrom	wasGeneratedBy	hasPosition   
 	@Override
@@ -217,7 +212,7 @@ public class DASchemaAttrGenerator extends BasicGenerator {
 
 		return row;
 	}
-	
+
 	Map<String, Object> createRelationRow(Record rec, int row_number) throws Exception {
 		Map<String, Object> row = new HashMap<String, Object>();
 		row.put("hasURI", kbPrefix + "DASA-" + SDDName + "-" + getLabel(rec).trim().replace(" ", "").replace("_","-").replace("??", ""));
@@ -235,5 +230,15 @@ public class DASchemaAttrGenerator extends BasicGenerator {
 		}
 
 		return row;
+	}
+
+	@Override
+	public String getTableName() {
+		return "DASchemaAttribute";
+	}
+
+	@Override
+	public String getErrorMsg(Exception e) {
+		return "Error in DASchemaAttrGenerator: " + e.getMessage();
 	}
 }

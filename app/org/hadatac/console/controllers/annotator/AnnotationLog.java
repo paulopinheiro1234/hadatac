@@ -81,11 +81,7 @@ public class AnnotationLog {
 	}
 	
 	public static void printException(Exception exception, String fileName) {
-		AnnotationLog log = AnnotationLog.find(fileName);
-        if (null == log) {
-        	log = new AnnotationLog();
-        	log.setFileName(fileName);
-        }
+		AnnotationLog log = AnnotationLog.create(fileName);
         log.addline(Feedback.println(Feedback.WEB, "[ERROR] " + exception.getMessage()));
         log.save();
 	}
@@ -102,12 +98,12 @@ public class AnnotationLog {
 		return annotation_log;
 	}
 	
-	public static AnnotationLog find(String file_name) {
+	public static AnnotationLog find(String fileName) {
 		SolrClient solr = new HttpSolrClient.Builder(
 				ConfigFactory.load().getString("hadatac.solr.data")
 				+ Collections.ANNOTATION_LOG).build();
 		SolrQuery query = new SolrQuery();
-		query.set("q", "file_name:\"" + file_name + "\"");
+		query.set("q", "file_name:\"" + fileName + "\"");
 		query.set("rows", "10000000");
 		
 		try {
@@ -124,6 +120,16 @@ public class AnnotationLog {
 		}
 	
 		return null;
+	}
+	
+	public static AnnotationLog create(String fileName) {
+		AnnotationLog log = AnnotationLog.find(fileName);
+		if (null == log) {
+			log = new AnnotationLog();
+	    	log.setFileName(fileName);
+		}
+		
+    	return log;
 	}
 	
 	public static int delete(String file_name) {

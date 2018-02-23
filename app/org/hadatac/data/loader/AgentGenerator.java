@@ -307,4 +307,14 @@ public class AgentGenerator extends BasicGenerator {
 		return null;
 	}
 
+	@Override
+	public String getTableName() {
+		return "Agent";
+	}
+
+	@Override
+	public String getErrorMsg(Exception e) {
+		return "";
+	}
+
 }

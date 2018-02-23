@@ -100,5 +100,15 @@ public class StudyGenerator extends BasicGenerator {
 
 		return row;
 	}
+
+	@Override
+	public String getTableName() {
+		return "Study";
+	}
+
+	@Override
+	public String getErrorMsg(Exception e) {
+		return "";
+	}
 }
 

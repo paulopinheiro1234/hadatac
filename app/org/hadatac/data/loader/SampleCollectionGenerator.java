@@ -50,4 +50,14 @@ public class SampleCollectionGenerator extends BasicGenerator {
 
 		return row;
 	}
+
+	@Override
+	public String getTableName() {
+		return "SampleCollection";
+	}
+
+	@Override
+	public String getErrorMsg(Exception e) {
+		return "";
+	}
 }

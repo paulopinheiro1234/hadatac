@@ -294,4 +294,14 @@ public class SampleSubjectMapper extends BasicGenerator {
 		
 		return true;
 	}
+
+	@Override
+	public String getTableName() {
+		return "";
+	}
+
+	@Override
+	public String getErrorMsg(Exception e) {
+		return "";
+	}
 }

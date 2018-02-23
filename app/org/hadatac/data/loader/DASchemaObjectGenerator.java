@@ -216,4 +216,14 @@ public class DASchemaObjectGenerator extends BasicGenerator {
 		}
 		return row;
 	}
+
+	@Override
+	public String getTableName() {
+		return "DASchemaObject";
+	}
+
+	@Override
+	public String getErrorMsg(Exception e) {
+		return "Error in DASchemaObjectGenerator: " + e.getMessage();
+	}
 }

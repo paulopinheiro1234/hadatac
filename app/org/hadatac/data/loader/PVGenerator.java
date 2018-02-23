@@ -121,4 +121,14 @@ public class PVGenerator extends BasicGenerator {
 		
 		return row;
 	}
+
+	@Override
+	public String getTableName() {
+		return "PossibleValue";
+	}
+
+	@Override
+	public String getErrorMsg(Exception e) {
+		return "Error in PVGenerator: " + e.getMessage();
+	}
 }

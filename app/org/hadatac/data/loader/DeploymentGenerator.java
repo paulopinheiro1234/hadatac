@@ -177,4 +177,14 @@ public class DeploymentGenerator extends BasicGenerator {
 
 		return row;
 	}
+
+	@Override
+	public String getTableName() {
+		return "Deployment";
+	}
+
+	@Override
+	public String getErrorMsg(Exception e) {
+		return "";
+	}
 }

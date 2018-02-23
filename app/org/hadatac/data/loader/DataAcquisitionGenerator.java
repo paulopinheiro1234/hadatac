@@ -23,6 +23,7 @@ import org.hadatac.utils.Templates;
 import java.lang.Exception;
 
 public class DataAcquisitionGenerator extends BasicGenerator {
+	
 	final String kbPrefix = ConfigProp.getKbPrefix();
 	String startTime = "";
 
@@ -184,5 +185,15 @@ public class DataAcquisitionGenerator extends BasicGenerator {
 		}
 
 		da.save();
+	}
+
+	@Override
+	public String getTableName() {
+		return "DataAcquisition";
+	}
+
+	@Override
+	public String getErrorMsg(Exception e) {
+		return "";
 	}
 }
