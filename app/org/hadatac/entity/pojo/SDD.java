@@ -1,34 +1,22 @@
 package org.hadatac.entity.pojo;
 
 import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.FileReader;
-import java.io.FileWriter;
 import java.io.InputStream;
-import java.io.StringWriter;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVRecord;
 import org.apache.commons.io.FileUtils;
-import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
-import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.ss.usermodel.WorkbookFactory;
-import org.apache.poi.xssf.usermodel.XSSFCell;
-import org.apache.poi.xssf.usermodel.XSSFRow;
-import org.apache.poi.xssf.usermodel.XSSFSheet;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.hadatac.data.loader.Record;
 import org.hadatac.data.loader.RecordFile;
 import org.hadatac.metadata.loader.URIUtils;
@@ -107,10 +95,7 @@ public class SDD {
 	}
 	
 	public File downloadFile(String fileURL, String fileName) {
-		System.out.println("fileURL " + fileURL + fileURL.getClass());
-		System.out.println("fileName " + fileName);
 		if(fileURL == null || fileURL.length() == 0){
-			System.out.println("I'm actually here!!!");
 			return null;
 		} else {
 			try {
@@ -126,6 +111,10 @@ public class SDD {
 	}
 		
 	public void readDataDictionary(RecordFile file) {
+		if (!file.isValid()) {
+			return;
+		}
+		
 		for (Record record : file.getRecords()) {
 			mapAttrObj.put(record.getValueByColumnIndex(0), record.getValueByColumnIndex(2));
 		}
@@ -133,12 +122,20 @@ public class SDD {
 	}
 	
 	public void readCodeMapping(RecordFile file) {
+		if (!file.isValid()) {
+			return;
+		}
+		
 		for (Record record : file.getRecords()) {
 			codeMappings.put(record.getValueByColumnIndex(0), record.getValueByColumnIndex(1));
 		}
 	}
 	
 	public void readCodebook(RecordFile file) {
+		if (!file.isValid()) {
+			return;
+		}
+		
 		for (Record record : file.getRecords()) {
 			if (!record.getValueByColumnIndex(0).isEmpty()) {
 				String colName = record.getValueByColumnIndex(0);
@@ -164,6 +161,10 @@ public class SDD {
 	}
 	
 	public void readtimelineFile(RecordFile file) {
+		if (!file.isValid()) {
+			return;
+		}
+		
 		for (Record record : file.getRecords()) {
 			if (!record.getValueByColumnIndex(0).isEmpty()) {
 				String colName = record.getValueByColumnIndex(0);

@@ -9,4 +9,6 @@ public interface RecordFile {
 	public List<String> getHeaders();
 	
 	public File getFile();
+	
+	public boolean isValid();
 }

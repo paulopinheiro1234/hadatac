@@ -18,8 +18,6 @@ import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.ss.usermodel.WorkbookFactory;
 
-import com.avaje.ebeaninternal.server.lib.util.Str;
-
 public class SpreadsheetRecordFile implements RecordFile {
 	
 	private File file;
@@ -40,7 +38,6 @@ public class SpreadsheetRecordFile implements RecordFile {
 		try {
 			Workbook workbook = WorkbookFactory.create(new FileInputStream(file));
 			Sheet sheet = null;
-			System.out.println("sheetName: " + sheetName);
 			if (sheetName.isEmpty()) {
 				sheet = workbook.getSheetAt(0);
 			} else {
@@ -104,6 +101,30 @@ public class SpreadsheetRecordFile implements RecordFile {
 	@Override
 	public File getFile() {
 		return file;
+	}
+	
+	@Override
+	public boolean isValid() {
+		Workbook workbook = null;
+		try {
+			workbook = WorkbookFactory.create(new FileInputStream(file));
+		} catch (EncryptedDocumentException | InvalidFormatException | IOException e) {
+			e.printStackTrace();
+			return false;
+		}
+		
+		Sheet sheet = null;
+		if (sheetName.isEmpty()) {
+			try {
+				sheet = workbook.getSheetAt(0);
+			} catch (IllegalArgumentException e) {
+				System.out.println("Error in SpreadsheetRecordFile.isValid(): sheet with index 0 does NOT exist!");
+			}
+		} else {
+			sheet = workbook.getSheet(sheetName);
+		}
+		
+		return sheet != null;
 	}
 	
 	private boolean isEmptyRow(Row row) {

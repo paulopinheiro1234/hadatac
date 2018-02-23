@@ -4,15 +4,12 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.apache.commons.csv.CSVFormat;
-import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
 
 public class CSVRecordFile implements RecordFile {
@@ -63,5 +60,10 @@ public class CSVRecordFile implements RecordFile {
 	@Override
 	public File getFile() {
 		return file;
+	}
+	
+	@Override
+	public boolean isValid() {
+		return file != null;
 	}
 }

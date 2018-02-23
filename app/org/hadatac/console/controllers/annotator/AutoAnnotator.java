@@ -29,6 +29,9 @@ import org.hadatac.console.models.SysUser;
 import org.hadatac.console.views.html.annotator.*;
 import org.hadatac.console.views.html.triplestore.*;
 import org.hadatac.data.loader.AnnotationWorker;
+import org.hadatac.data.loader.CSVRecordFile;
+import org.hadatac.data.loader.RecordFile;
+import org.hadatac.data.loader.SpreadsheetRecordFile;
 import org.hadatac.console.views.html.*;
 import org.hadatac.entity.pojo.DataFile;
 import org.hadatac.entity.pojo.Measurement;
@@ -307,21 +310,34 @@ public class AutoAnnotator extends Controller {
 	@Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
 	public static void deleteAddedTriples(File file){
 		System.out.println("Deleting the added triples from the moving file ...");
+		
+		RecordFile recordFile = null;
+		if (file.getName().endsWith(".csv")) {
+			recordFile = new CSVRecordFile(file);
+		} else if (file.getName().endsWith(".xlsx")) {
+			recordFile = new SpreadsheetRecordFile(file);
+		} else {
+			AnnotationLog log = new AnnotationLog(file.getName());
+			log.addline(Feedback.println(Feedback.WEB, String.format(
+					"[ERROR] Unknown file format: %s", file.getName())));
+			log.save();
+			return;
+		}
+		
 		String file_name = file.getName();
 		if (file_name.startsWith("SDD")) {
+			List<String> result = AnnotationWorker.getPopulatedSDDUris(recordFile);
 			
-			List<String> result = AnnotationWorker.getPopulatedSDDUris(file);
-			
-			for (String str:result){
+			for (String str : result){
 				try{
 					String query = "";
 					query += NameSpaces.getInstance().printSparqlNameSpaceList();
 					query += "DELETE WHERE {  ";
 					query += str + " ?p ?o . ";
-					query += "}  ";				
-//					System.out.println(query);
+					query += "}  ";
 					UpdateRequest request = UpdateFactory.create(query);
-					UpdateProcessor processor = UpdateExecutionFactory.createRemote(request, Collections.getCollectionsName(Collections.METADATA_UPDATE));
+					UpdateProcessor processor = UpdateExecutionFactory.createRemote(
+							request, Collections.getCollectionsName(Collections.METADATA_UPDATE));
 					processor.execute();
 				} catch (Exception e) {
 					System.out.println(str + " s triple can not be deleted.");
@@ -333,7 +349,6 @@ public class AutoAnnotator extends Controller {
 					query2 += "DELETE WHERE {  ";
 					query2 += "?s ?p " + str + " . ";
 					query2 += "}  ";
-//					System.out.println(query2);
 					UpdateRequest request2 = UpdateFactory.create(query2);
 					UpdateProcessor processor2 = UpdateExecutionFactory.createRemote(request2, Collections.getCollectionsName(Collections.METADATA_UPDATE));
 					processor2.execute();
@@ -399,7 +414,7 @@ public class AutoAnnotator extends Controller {
 	@BodyParser.Of(value = BodyParser.MultipartFormData.class)
 	public Result uploadDataFile(String oper) {
 		String path = ConfigProp.getPathUnproc();
-		for(FilePart filePart : request().body().asMultipartFormData().getFiles()) {
+		for(FilePart<Object> filePart : request().body().asMultipartFormData().getFiles()) {
 			if (filePart != null) {
 				File file = (File)filePart.getFile();
 				File newFile = new File(path + "/" + filePart.getFilename());
