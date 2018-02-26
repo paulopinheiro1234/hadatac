@@ -2,7 +2,6 @@ package org.hadatac.data.loader;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 import org.hadatac.console.controllers.annotator.AnnotationLog;
 
@@ -14,43 +13,46 @@ public class GeneratorChain {
 		chain.add(generator);
 	}
 
-	public boolean generateTriples() {
-		boolean bSucceed = true;
+	public boolean generate() {
 		for (BasicGenerator generator : chain) {
-			try {
-				List<Map<String, Object>> rows = null;
-				if (generator.getRows().size() == 0) {
-					rows = generator.createRows();
-				} else {
-					rows = generator.getRows();
-				}
+			try {				
+				generator.preprocess();
+				generator.createRows();
+				generator.createObjects();
+				generator.postprocess();
 				
-				if (generator.getCommitNeeded()) {
-					bSucceed = generator.commitRowsToTripleStore(rows);
-					bSucceed = generator.commitRowsToLabKey(rows);
-				}
+				generator.commitRowsToTripleStore(generator.getRows());
+				generator.commitRowsToLabKey(generator.getRows());
+				
+				generator.commitObjectsToTripleStore(generator.getObjects());
+				generator.commitObjectsToLabKey(generator.getObjects());
+				generator.commitObjectsToSolr(generator.getObjects());
+				
 			} catch (Exception e) {
 				System.out.println(generator.getErrorMsg(e));
 				e.printStackTrace();
 				AnnotationLog.printException(e, generator.getFileName());
-				bSucceed = false;
+				return false;
 			}
 		}
 		
-		return bSucceed;
+		return true;
 	}
 	
-	public void deleteTriples() {
+	public void delete() {
 		for (BasicGenerator generator : chain) {
 			try {
-				List<Map<String, Object>> rows = null;
-				if (generator.getRows().size() == 0) {
-					rows = generator.createRows();
-				} else {
-					rows = generator.getRows();
-				}
+				generator.preprocess();
+				generator.createRows();
+				generator.createObjects();
+				generator.postprocess();
 				
-				generator.deleteRowsFromTripleStore(rows);
+				generator.deleteRowsFromTripleStore(generator.getRows());
+				generator.deleteRowsFromLabKey(generator.getRows());
+				
+				generator.deleteObjectsFromTripleStore(generator.getObjects());
+				generator.deleteObjectsFromLabKey(generator.getObjects());
+				generator.deleteObjectsFromSolr(generator.getObjects());
 			} catch (Exception e) {
 				System.out.println(generator.getErrorMsg(e));
 				e.printStackTrace();

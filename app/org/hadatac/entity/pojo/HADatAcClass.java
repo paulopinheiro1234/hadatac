@@ -100,7 +100,6 @@ public class HADatAcClass {
 	@JsonIgnore
 	public String getHierarchyJson() {
 		//System.out.println("Inside HADatAcClass's getHierarchyJson: [" + className + "]");
-		String collection = "";
 		String q = 
 				"SELECT ?id ?superId ?label ?comment WHERE { " + 
 						"   ?id rdfs:subClassOf* " + className + " . " + 
@@ -129,8 +128,6 @@ public class HADatAcClass {
 
 	@JsonIgnore
 	public TreeNode getHierarchy() {
-		String collection = "";
-		TreeNode newTree = null;
 		String node = null;
 		String superNode = null;
 		String nodeLabel = null;
@@ -141,7 +138,6 @@ public class HADatAcClass {
 						"   ?id rdfs:subClassOf ?superId .  " + 
 						"   ?id rdfs:label ?label .  " + 
 						"}";
-		ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
 		try {
 			String queryString = NameSpaces.getInstance().printSparqlNameSpaceList() + q;
 			Query query = QueryFactory.create(queryString);

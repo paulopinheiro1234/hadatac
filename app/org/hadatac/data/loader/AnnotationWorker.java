@@ -82,7 +82,7 @@ public class AnnotationWorker {
 					chain = annotateDataAcquisitionSchemaFile(recordFile);
 				}
 				
-				bSucceed = chain.generateTriples();
+				bSucceed = chain.generate();
 			}
 			
 			if (bSucceed) {
@@ -106,23 +106,7 @@ public class AnnotationWorker {
 	
 	public static GeneratorChain annotateMapFile(RecordFile file) {
 		GeneratorChain chain = new GeneratorChain();
-		boolean bSuccess = true;	
-		try {
-			SampleSubjectMapper mapper = new SampleSubjectMapper(file);
-			mapper.createRows();
-		} catch (Exception e) {
-			e.printStackTrace();
-			AnnotationLog.printException(e, file.getFile().getName());
-		}
-		
-		try {
-			SampleSubjectMapper mapper = new SampleSubjectMapper(file);
-			System.out.println("Start Update Mappings:");
-			bSuccess = mapper.updateMappings();
-		} catch (Exception e) {
-			e.printStackTrace();
-			AnnotationLog.printException(e, file.getFile().getName());
-		}
+		chain.addGenerator(new SampleSubjectMapper(file));
 		
 		return chain;
 	}
@@ -136,20 +120,16 @@ public class AnnotationWorker {
 		return chain;
 	}
 
-	public static boolean annotateSampleIdFile(RecordFile file) {
+	public static GeneratorChain annotateSampleIdFile(RecordFile file) {
 		GeneratorChain chain = new GeneratorChain();
-		SampleGenerator sampleGenerator = new SampleGenerator(file);
-		sampleGenerator.setCommitNeeded(false);
-		chain.addGenerator(sampleGenerator);
+		chain.addGenerator(new SampleGenerator(file));
 		
-		return chain.generateTriples();
+		return chain;
 	}
 
 	public static GeneratorChain annotateSubjectIdFile(RecordFile file) {
 		GeneratorChain chain = new GeneratorChain();
-		SubjectGenerator subjectGenerator = new SubjectGenerator(file);
-		subjectGenerator.setCommitNeeded(false);
-		chain.addGenerator(subjectGenerator);
+		chain.addGenerator(new SubjectGenerator(file));
 		
 		return chain;
 	}
@@ -243,7 +223,6 @@ public class AnnotationWorker {
 		row.put("rdfs:label", "Schema for " + study_id);
 		row.put("rdfs:comment", "");
 		generalGenerator.addRow(row);
-		
 		chain.addGenerator(generalGenerator);
 		
 		return chain;
@@ -335,64 +314,5 @@ public class AnnotationWorker {
 		}
 
 		return false;
-	}
-	
-	public static void getPopulatedSDDUris(RecordFile file) {
-		System.out.println("get populated SDD URIs ...");
-		
-		String file_name = file.getFile().getName();
-		SDD sdd = new SDD(file.getFile());
-		String sddName = sdd.getName();
-		
-		Map<String, String> mapCatalog = sdd.getCatalog();		
-		if (mapCatalog.containsKey("Study_ID")){
-			study_id = mapCatalog.get("Study_ID");
-		}
-		
-		RecordFile codeMappingRecordFile = null;
-		RecordFile dictionaryRecordFile = null;
-		RecordFile codeBookRecordFile = null;
-		RecordFile timelineRecordFile = null;
-		
-		File codeMappingFile = null;
-		
-		if (file_name.endsWith(".csv")) {
-			String prefix = "sddtmp/" + file.getFile().getName().replace(".csv", "");
-			File dictionaryFile = sdd.downloadFile(mapCatalog.get("Data_Dictionary"), prefix + "-dd.csv");
-			File codeBookFile = sdd.downloadFile(mapCatalog.get("Codebook"), prefix + "-codebook.csv");
-			File timelineFile = sdd.downloadFile(mapCatalog.get("Timeline"), prefix + "-timeline.csv");
-			codeMappingFile = sdd.downloadFile(mapCatalog.get("Code_Mappings"), prefix + "-code-mappings.csv");
-			
-			dictionaryRecordFile = new CSVRecordFile(dictionaryFile);
-			codeBookRecordFile = new CSVRecordFile(codeBookFile);
-			timelineRecordFile = new CSVRecordFile(timelineFile);
-		} else if (file_name.endsWith(".xlsx")) {
-			codeMappingFile = sdd.downloadFile(mapCatalog.get("Code_Mappings"), 
-					"sddtmp/" + file.getFile().getName().replace(".xlsx", "") + "-code-mappings.csv");
-			
-			codeBookRecordFile = new SpreadsheetRecordFile(file.getFile(), mapCatalog.get("Codebook").replace("#", ""));
-			dictionaryRecordFile = new SpreadsheetRecordFile(file.getFile(), mapCatalog.get("Data_Dictionary").replace("#", ""));
-			timelineRecordFile = new SpreadsheetRecordFile(file.getFile(), mapCatalog.get("Timeline").replace("#", ""));
-		}
-		
-		codeMappingRecordFile = new CSVRecordFile(codeMappingFile);
-		
-		sdd.readCodeMapping(codeMappingRecordFile);
-		sdd.readDataDictionary(dictionaryRecordFile);
-		sdd.readCodebook(codeBookRecordFile);
-		sdd.readtimelineFile(timelineRecordFile);
-				
-		GeneratorChain chain = new GeneratorChain();
-		if (dictionaryRecordFile.isValid()) {
-			chain.addGenerator(new DASchemaAttrGenerator(dictionaryRecordFile, sddName, sdd.getCodeMapping()));
-			chain.addGenerator(new DASchemaObjectGenerator(dictionaryRecordFile, sddName, sdd.getCodeMapping()));
-			chain.addGenerator(new DASchemaEventGenerator(dictionaryRecordFile, sdd.getTimeLineMap(), sddName, sdd.getCodeMapping()));
-		}
-		
-		if (codeBookRecordFile.isValid()) {
-			chain.addGenerator(new PVGenerator(codeBookRecordFile, file.getFile().getName(), study_id, sdd.getMapAttrObj(), sdd.getCodeMapping()));
-		}
-		
-		chain.deleteTriples();
 	}
 }

@@ -57,18 +57,14 @@ public class DeleteOC extends Controller {
 
 		int deletedRows = -1;
 		if (oc != null) {
-			try {
-				System.out.println("calling oc.deleteFromLabKey() from DeleteObjectCollection"); 
-				deletedRows = oc.deleteFromLabKey(session().get("LabKeyUserName"),session().get("LabKeyPassword"));
-				if (deletedRows > 0) {
-					oc.delete();
-				} else {
-					String message = "Number of deleted rows: " + deletedRows;
-					return badRequest(objectCollectionConfirm.render("Error deleting object collection: zero deleted rows", filename, da_uri, std_uri, oc));
-				}
-			} catch (CommandException e) {
-				return badRequest(objectCollectionConfirm.render("Error deleting object collection: LabKey", filename, da_uri, std_uri, oc));
-			}
+		    System.out.println("calling oc.deleteFromLabKey() from DeleteObjectCollection"); 
+            deletedRows = oc.deleteFromLabKey(session().get("LabKeyUserName"),session().get("LabKeyPassword"));
+            if (deletedRows > 0) {
+                oc.delete();
+            } else {
+                String message = "Number of deleted rows: " + deletedRows;
+                return badRequest(objectCollectionConfirm.render("Error deleting object collection: zero deleted rows", filename, da_uri, std_uri, oc));
+            }
 		}
 
 		return ok(objectCollectionConfirm.render("Object Collection has been Deleted", filename, da_uri, std_uri, oc));

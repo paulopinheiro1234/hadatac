@@ -19,9 +19,8 @@ import org.apache.jena.sparql.engine.http.QueryExceptionHTTP;
 import org.hadatac.console.controllers.metadata.DynamicFunctions;
 import org.hadatac.utils.Collections;
 import org.hadatac.utils.ConfigProp;
-import org.hadatac.utils.Feedback;
 import org.hadatac.utils.NameSpaces;
-import org.hadatac.entity.pojo.Credential;
+import org.hadatac.entity.pojo.HADatAcThing;
 import org.hadatac.entity.pojo.ObjectCollection;
 import org.hadatac.entity.pojo.StudyObject;
 
@@ -183,32 +182,17 @@ public class SampleSubjectMapper extends BasicGenerator {
 	}
 		
 	
-	public void createObj(Record record) throws Exception {
-		// insert current state of the OBJ
-		obj = new StudyObject(getUri(record), "sio:Sample", getOriginalID(record), 
+	public HADatAcThing createStudyObject(Record record) throws Exception {
+		StudyObject obj = new StudyObject(getUri(record), "sio:Sample", getOriginalID(record), 
 				getLabel(record), getCollectionUri(record), getLabel(record), scopeUris);
-
-		// insert the new OC content inside of the triplestore regardless of any change -- the previous content has already been deleted
-		obj.save();
-		counter++;
-		System.out.println("obj " + getUri(record).toString() + " saved!");
-
-		// update/create new OBJ in LabKey
-		Credential cred = Credential.find();
-		if (null == cred) {
-			System.out.println(Feedback.println(Feedback.WEB, "[ERROR] No LabKey credentials are provided!"));
-			return;
-		}
-		int nRowsAffected = obj.saveToLabKey(cred.getUserName(), cred.getPassword());
-		if (nRowsAffected <= 0) {
-			System.out.println("[ERROR] Failed to insert new OBJ to LabKey!");
-		}
 
 		objectUris.add(getUri(record));
 		System.out.println(objectUris.size());
+		
+		return obj;
 	}
 	
-	public boolean createOc(Record record) throws Exception {
+	public ObjectCollection createObjectCollection(Record record) throws Exception {
 		// insert current state of the OC
 		ObjectCollection oc = new ObjectCollection(
 				getCollectionUri(record),
@@ -221,46 +205,11 @@ public class SampleSubjectMapper extends BasicGenerator {
 				timeScopeUris);
 
 		oc.setObjectUris(objectUris);
-
-		// insert the new OC content inside of the triplestore regardless of any change -- the previous content has already been deleted
-		oc.save();
-		System.out.println("oc saved!");
-
-		// update/create new OC in LabKey
-		Credential cred = Credential.find();
-		if (null == cred) {
-			System.out.println(Feedback.println(Feedback.WEB, "[ERROR] No LabKey credentials are provided!"));
-			return false;
-		}
-		int nRowsAffected = oc.saveToLabKey(cred.getUserName(), cred.getPassword());
-		System.out.println("nRowsAffected : " + nRowsAffected);
-		if (nRowsAffected <= 0) {
-			System.out.println("Failed to insert new OC to LabKey!\n");
-			return false;
-		}
-
-		return true;
-	}
-
-	@Override
-	public List< Map<String, Object> > createRows() throws Exception {
-		rows.clear();
-		boolean firstRow = true;
-		for (Record record : records) {
-			if (firstRow) {
-				if (!createOc(record)) {
-					System.out.println("[ERROR] Failed to create sample collection!");
-					break;
-				}
-				firstRow = false;
-			}
-			createObj(record);
-		}
 		
-		return rows;
+		return oc;
 	}
 	
-	public boolean updateMappings() throws Exception {
+	public void updateMappings() throws Exception {
 		for (Record record : records) {
 			if (getSampleUri(record) == ""){
 				continue;
@@ -276,32 +225,35 @@ public class SampleSubjectMapper extends BasicGenerator {
 					obj.getScopeUris().add(getSubjectUri(record));
 				}
 				System.out.println("Added to scopeuris.");
-				obj.save();
-				// update/create new OBJ in LabKey
-				Credential cred = Credential.find();
-				if (null == cred) {
-					System.out.println(Feedback.println(Feedback.WEB, "[ERROR] No LabKey credentials are provided!"));
-					return false;
-				}
-				int nRowsAffected = obj.saveToLabKey(cred.getUserName(), cred.getPassword());
-				System.out.println("nRowsAffected : " + nRowsAffected);
-				if (nRowsAffected <= 0) {
-					System.out.println("Failed to insert new OC to LabKey!\n");
-					return false;
-				}
+				objects.add(obj);
 			}
 		}
-		
-		return true;
+	}
+	
+	@Override
+	public void preprocess() throws Exception {
+		if (!records.isEmpty()) {
+			objects.add(createObjectCollection(records.get(0)));
+		}
+	}
+	
+	@Override
+	public void postprocess() throws Exception {
+		updateMappings();
 	}
 
 	@Override
 	public String getTableName() {
-		return "";
+		return "StudyObject";
 	}
 
 	@Override
 	public String getErrorMsg(Exception e) {
 		return "";
+	}
+
+	@Override
+	HADatAcThing createObject(Record rec, int row_number) throws Exception {
+		return createStudyObject(rec);
 	}
 }

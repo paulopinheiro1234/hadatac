@@ -13,7 +13,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.BiConsumer;
-import java.util.stream.Collectors;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.jena.query.QueryExecution;
@@ -45,7 +44,7 @@ import org.hadatac.utils.NameSpaces;
 
 import com.typesafe.config.ConfigFactory;
 
-public class Measurement {
+public class Measurement extends HADatAcThing {
 	@Field("uri")
 	private String uri;
 	@Field("owner_uri_str")
@@ -332,7 +331,8 @@ public class Measurement {
 		this.datasetUri = datasetUri;
 	}
 
-	public int save() {
+	@Override
+	public int saveToSolr() {
 		SolrClient solr = new HttpSolrClient.Builder(
 				ConfigFactory.load().getString("hadatac.solr.data") 
 				+ Collections.DATA_ACQUISITION).build();
@@ -355,6 +355,14 @@ public class Measurement {
 			UpdateResponse response = solr.deleteByQuery("dataset_uri_str:\"" + datasetUri + "\"");
 			solr.commit();
 			solr.close();
+			
+			List<DataAcquisition> dataAcquisitions = DataAcquisition.findAll();
+	        for (DataAcquisition da : dataAcquisitions) {
+	            if (da.containsDataset(datasetUri)) {
+	                da.setNumberDataPoints(Measurement.getNumByDataAcquisition(da));
+	                da.saveToSolr();
+	            }
+	        }
 			return response.getStatus();
 		} catch (SolrServerException e) {
 			System.out.println("[ERROR] Measurement.delete - SolrServerException message: " + e.getMessage());
@@ -363,7 +371,7 @@ public class Measurement {
 		} catch (Exception e) {
 			System.out.println("[ERROR] Measurement.delete - Exception message: " + e.getMessage());
 		}
-
+		
 		return -1;
 	}
 

@@ -391,7 +391,8 @@ public class Indicator extends HADatAcThing implements Comparable<Indicator> {
 	}
 
 	@Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
-	public int deleteFromLabKey(String user_name, String password) throws CommandException {
+	@Override
+	public int deleteFromLabKey(String user_name, String password) {
 		String site = ConfigProp.getPropertyValue("labkey.config", "site");
 		String path = "/" + ConfigProp.getPropertyValue("labkey.config", "folder");
 		LabkeyDataHandler loader = new LabkeyDataHandler(site, user_name, password, path);
@@ -399,10 +400,17 @@ public class Indicator extends HADatAcThing implements Comparable<Indicator> {
 		Map<String, Object> row = new HashMap<String, Object>();
 		row.put("hasURI", URIUtils.replaceNameSpaceEx(getUri().replace("<","").replace(">","")));
 		rows.add(row);
-		for (Map<String,Object> str : rows) {
-			System.out.println("deleting Indicator " + str.get("hasURI"));
+		for (Map<String,Object> r : rows) {
+			System.out.println("deleting Indicator " + r.get("hasURI"));
 		}
-		return loader.deleteRows("IndicatorType", rows);
+		
+		try {
+            return loader.deleteRows("IndicatorType", rows);
+        } catch (CommandException e) {
+            System.out.println("[ERROR] Could not delete Indicator(s)");
+            e.printStackTrace();
+            return 0;
+        }
 	}
 
 	@Override

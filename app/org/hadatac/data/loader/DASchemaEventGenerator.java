@@ -127,7 +127,7 @@ public class DASchemaEventGenerator extends BasicGenerator {
 	}
 
 	@Override
-	public List< Map<String, Object> > createRows() throws Exception {
+	public void createRows() throws Exception {
 		rows.clear();
 		int row_number = 0;
 		for (Record record : records) {
@@ -146,8 +146,6 @@ public class DASchemaEventGenerator extends BasicGenerator {
 		while(iterrrr.hasNext()){
 			System.out.println(iterrrr.next().entrySet().toString());
 		}
-
-		return rows;
 	}
 	
 	public List<String> createUris() throws Exception {

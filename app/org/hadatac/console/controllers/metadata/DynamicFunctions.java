@@ -1,18 +1,11 @@
 package org.hadatac.console.controllers.metadata;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.net.URLDecoder;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
-import play.Play;
 import play.mvc.Controller;
 import play.mvc.Result;
 import org.hadatac.utils.NameSpaces;
@@ -25,7 +18,6 @@ import org.apache.jena.query.QuerySolution;
 import org.apache.jena.query.ResultSet;
 import org.apache.jena.query.ResultSetFactory;
 import org.apache.jena.query.ResultSetRewindable;
-import org.apache.jena.rdf.model.Model;
 import org.apache.jena.sparql.engine.http.QueryExceptionHTTP;
 import org.hadatac.console.controllers.AuthApplication;
 import org.hadatac.console.controllers.metadataacquisition.ViewStudy;
@@ -627,48 +619,11 @@ public class DynamicFunctions extends Controller {
 		return sampleResult;
 	}
 	
-	
-	// for /metadata HTTP GET requests
     public Result index() {
-    	Map<String,String> indicators = getIndicatorTypes();
-    	//System.out.println("Indicators: " + indicators + "\n");
-    	Map<String,List<String>> valueMap = getIndicatorValues(indicators);
-    	//System.out.println("Indicator Values: " + valueMap + "\n");
-    	Map<String,Map<String,String>> valueMapWithLabels = getIndicatorValuesAndLabels(indicators);
-    	//System.out.println("Indicator Values and Labels: " + valueMapWithLabels + "\n");
-    	Map<String,List<String>> valueMapJustLabels = getIndicatorValuesJustLabels(indicators);
-    	//System.out.println("Indicator Values Just Labels: " + valueMapJustLabels + "\n");
-    	//System.out.println(replaceURLWithPrefix("http://hadatac.org/ont/chear#BloodPlasma"));
-    	//System.out.println(findSubject("chear-kb:SBJ-0032-6"));
-    	
-    	//System.out.println(findStudy("chear-kb:STD-3"));
-    	//System.out.println("Studies: " + findStudies());
-    	
-    	//System.out.println(findSamples());
-    	//System.out.println(findSampleBySubject("chear-kb:SBJ-0032-6"));
-    	//System.out.println(findSample("chear-kb:SPL-0032-6-Urine-ICP-MS"));
-    	
-    	//System.out.println(findSubject("chear-kb:SBJ-0032-6"));
-    	//System.out.println(findSubjects());
-    	//System.out.println(replaceTabNameWithConcept("ReproductiveHealth"));
-    	//System.out.println(getPrefixes());
-    	
-    	/*SubjectGenerator sg = new SubjectGenerator(new File("/home/sabbir/Programs/java_code/pid.sys"));
-    	sg.createRows();
-    	System.out.println("Subject String: \n" + sg.toString());*/
-    	
-    	/*SampleGenerator smg = new SampleGenerator(new File("/home/sabbir/Programs/java_code/SID.sys"));
-    	smg.createRows();
-    	System.out.println("Sample String: \n" + smg.toString());*/
-    	
-        return ok(); 
-    }// /index()
+        return ok();
+    }
 
-    // for /metadata HTTP POST requests
     public Result postIndex() {
-        
-        return index();
-        
-    }// /postIndex()
-
+        return index();   
+    }
 }

@@ -382,6 +382,7 @@ public class StudyObject extends HADatAcThing {
 	}
 
 	@Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
+	@Override
 	public int saveToLabKey(String user_name, String password) {
 		String site = ConfigProp.getPropertyValue("labkey.config", "site");
 		String path = "/" + ConfigProp.getPropertyValue("labkey.config", "folder");
@@ -413,14 +414,16 @@ public class StudyObject extends HADatAcThing {
 				totalChanged = loader.updateRows("StudyObject", rows);
 			} catch (CommandException e2) {
 				System.out.println(e2);
-				System.out.println("[ERROR] Could not insert or update Object(s)");
+				System.out.println("[ERROR] Could not insert or update Study Object(s)");
 			}
 		}
+		
 		return totalChanged;
 	}
 
 	@Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
-	public int deleteFromLabKey(String user_name, String password) throws CommandException {
+	@Override
+	public int deleteFromLabKey(String user_name, String password) {
 		String site = ConfigProp.getPropertyValue("labkey.config", "site");
 		String path = "/" + ConfigProp.getPropertyValue("labkey.config", "folder");
 		LabkeyDataHandler loader = new LabkeyDataHandler(site, user_name, password, path);
@@ -428,10 +431,18 @@ public class StudyObject extends HADatAcThing {
 		Map<String, Object> row = new HashMap<String, Object>();
 		row.put("hasURI", URIUtils.replaceNameSpaceEx(getUri().replace("<","").replace(">","")));
 		rows.add(row);
-		for (Map<String,Object> str : rows) {
-			System.out.println("deleting object " + row.get("hasURI"));
+		
+		for (Map<String,Object> r : rows) {
+			System.out.println("deleting object " + r.get("hasURI"));
 		}
-		return loader.deleteRows("StudyObject", rows);
+		
+		try {
+            return loader.deleteRows("StudyObject", rows);
+        } catch (CommandException e) {
+            System.out.println("[ERROR] Could not delete Study Object(s)");
+            e.printStackTrace();
+            return 0;
+        }
 	}
 
 	public void delete() {

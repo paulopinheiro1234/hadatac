@@ -102,7 +102,7 @@ public class DASchemaObjectGenerator extends BasicGenerator {
 	}
 
 	private String getWasDerivedFrom(Record rec) {
-		return rec.getValueByColumnName( mapCol.get("WasDerivedFrom"));
+		return rec.getValueByColumnName(mapCol.get("WasDerivedFrom"));
 	}
 
 	private String getWasGeneratedBy(Record rec) {
@@ -126,7 +126,7 @@ public class DASchemaObjectGenerator extends BasicGenerator {
 	}
 
 	@Override
-	public List< Map<String, Object> > createRows() throws Exception {
+	public void createRows() throws Exception {
 		rows.clear();
 		int row_number = 0;
 		List<String> column_name = new ArrayList<String>();
@@ -143,8 +143,8 @@ public class DASchemaObjectGenerator extends BasicGenerator {
 				column_name.add(getLabel(record));
 			}
 		}
+		
         System.out.println("[DASOGenerator] Added " + row_number + " rows!");
-		return rows;
 	}
 	
 	public List<String> createUris() throws Exception {

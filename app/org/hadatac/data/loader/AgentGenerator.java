@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.hadatac.entity.pojo.HADatAcThing;
 import org.hadatac.utils.ConfigProp;
 import org.hadatac.utils.Templates;
 
@@ -208,7 +209,7 @@ public class AgentGenerator extends BasicGenerator {
     }
     
 	@Override    
-    public List< Map<String, Object> > createRows() {
+    public void createRows() throws Exception {
 		boolean duplicate=false;
     	rows.clear();
     	// Currently using an inefficient way to check if row already exists in the list of rows; This should be addressed in the future
@@ -297,15 +298,7 @@ public class AgentGenerator extends BasicGenerator {
     			}
     		}
     	}
-    	
-    	return rows;
     }
-
-	@Override
-	Map<String, Object> createRow(Record rec, int row_number) throws Exception {
-		// TODO Auto-generated method stub
-		return null;
-	}
 
 	@Override
 	public String getTableName() {
@@ -316,5 +309,4 @@ public class AgentGenerator extends BasicGenerator {
 	public String getErrorMsg(Exception e) {
 		return "";
 	}
-
 }

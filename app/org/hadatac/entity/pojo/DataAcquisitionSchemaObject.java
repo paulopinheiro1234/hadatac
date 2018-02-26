@@ -28,7 +28,7 @@ import be.objectify.deadbolt.java.actions.Group;
 import be.objectify.deadbolt.java.actions.Restrict;
 import org.hadatac.console.controllers.AuthApplication;
 
-public class DataAcquisitionSchemaObject {
+public class DataAcquisitionSchemaObject extends HADatAcThing {
 
 	public static String INDENT1 = "     ";
 	public static String INSERT_LINE1 = "INSERT DATA {  ";
@@ -437,6 +437,7 @@ public class DataAcquisitionSchemaObject {
 	}
 
 	@Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
+	@Override
 	public int saveToLabKey(String user_name, String password) {
 		String site = ConfigProp.getPropertyValue("labkey.config", "site");
 		String path = "/" + ConfigProp.getPropertyValue("labkey.config", "folder");
@@ -470,7 +471,8 @@ public class DataAcquisitionSchemaObject {
 	}
 
 	@Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
-	public int deleteFromLabKey(String user_name, String password) throws CommandException {
+	@Override
+	public int deleteFromLabKey(String user_name, String password) {
 		String site = ConfigProp.getPropertyValue("labkey.config", "site");
 		String path = "/" + ConfigProp.getPropertyValue("labkey.config", "folder");
 		LabkeyDataHandler loader = new LabkeyDataHandler(site, user_name, password, path);
@@ -479,7 +481,13 @@ public class DataAcquisitionSchemaObject {
 		row.put("hasURI", URIUtils.replaceNameSpaceEx(getUri().replace("<","").replace(">","")));
 		rows.add(row);
 		
-		return loader.deleteRows("DASchemaObject", rows);
+		try {
+            return loader.deleteRows("DASchemaObject", rows);
+        } catch (CommandException e) {
+            System.out.println("[ERROR] Could not delete DASO(s)");
+            e.printStackTrace();
+            return 0;
+        }
 	}
 
 	public void delete() {

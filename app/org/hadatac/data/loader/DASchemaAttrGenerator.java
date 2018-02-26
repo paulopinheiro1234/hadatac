@@ -146,7 +146,7 @@ public class DASchemaAttrGenerator extends BasicGenerator {
 	}
 
 	@Override
-	public List< Map<String, Object> > createRows() throws Exception {
+	public void createRows() throws Exception {
 		rows.clear();
 		List<String> column_name = new ArrayList<String>();
 		int row_number = 0;
@@ -161,8 +161,8 @@ public class DASchemaAttrGenerator extends BasicGenerator {
 				column_name.add(getLabel(record));
 			}
 		}
-		System.out.println("rows 1 " + rows);
-		return rows;
+		
+		System.out.println("rows: " + rows);
 	}
 
 	public List<String> createUris() throws Exception {

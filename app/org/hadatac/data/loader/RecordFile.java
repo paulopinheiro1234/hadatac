@@ -4,7 +4,7 @@ import java.io.File;
 import java.util.List;
 
 public interface RecordFile {
-	public Iterable<Record> getRecords();
+	public List<Record> getRecords();
 	
 	public List<String> getHeaders();
 	

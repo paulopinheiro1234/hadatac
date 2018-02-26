@@ -127,17 +127,12 @@ public class EditDataAcquisition extends Controller {
                     da.setEndedAt(isoFormat.parseDateTime(data.getNewEndDate()));
     			}  
                 
-            	try {
-    				int nRowsAffected = da.saveToLabKey(
-    						session().get("LabKeyUserName"), session().get("LabKeyPassword"));
-    				da.save();
-    		    	return ok(main.render("Results,", "", new Html("<h3>" 
-    		    			+ String.format("%d row(s) have been inserted in Table \"DataAcquisition\"", nRowsAffected) 
-    		    			+ "</h3>")));
-    			} catch (CommandException e) {
-    				return badRequest("Failed to insert new data acquisition to LabKey!\n"
-    						+ "Error Message: " + e.getMessage());
-    			}
+                da.saveToSolr();
+                int nRowsAffected = da.saveToLabKey(session().get("LabKeyUserName"), session().get("LabKeyPassword"));
+                
+                return ok(main.render("Results,", "", new Html("<h3>" 
+                        + String.format("%d row(s) have been inserted in Table \"DataAcquisition\"", nRowsAffected) 
+                        + "</h3>")));
             }
         }
         

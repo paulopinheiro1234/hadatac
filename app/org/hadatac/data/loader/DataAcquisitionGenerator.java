@@ -10,6 +10,7 @@ import org.hadatac.console.models.SysUser;
 import org.hadatac.entity.pojo.DataAcquisition;
 import org.hadatac.entity.pojo.DataAcquisitionSchema;
 import org.hadatac.entity.pojo.Deployment;
+import org.hadatac.entity.pojo.HADatAcThing;
 import org.hadatac.entity.pojo.Measurement;
 import org.hadatac.entity.pojo.ObjectCollection;
 import org.hadatac.entity.pojo.TriggeringEvent;
@@ -37,8 +38,7 @@ public class DataAcquisitionGenerator extends BasicGenerator {
 	}
 
 	@Override
-	void initMapping() {
-	}
+	void initMapping() {}
 
 	private String getDataAcquisitionName(Record rec) {
 		return rec.getValueByColumnName(Templates.DATAACQUISITIONNAME);
@@ -83,10 +83,6 @@ public class DataAcquisitionGenerator extends BasicGenerator {
 		return rec.getValueByColumnName(Templates.EPILAB).equalsIgnoreCase("EPI");
 	}
 
-	private Boolean isLabData(Record rec) {
-		return rec.getValueByColumnName(Templates.EPILAB).equalsIgnoreCase("LAB");
-	}
-
 	@Override
 	Map<String, Object> createRow(Record rec, int row_number) throws Exception {
 		Map<String, Object> row = new HashMap<String, Object>();
@@ -103,6 +99,13 @@ public class DataAcquisitionGenerator extends BasicGenerator {
 		}
 		row.put("hasco:hasSchema", kbPrefix + "DAS-" + getDataDictionaryName(rec));
 
+		return row;
+	}
+	
+	@Override
+	HADatAcThing createObject(Record rec, int row_number) throws Exception {
+		Map<String, Object> row = createRow(rec, row_number);
+		
 		String ownerEmail = getOwnerEmail(rec);
 		if (ownerEmail.isEmpty()) {
 			throw new Exception(String.format("Owner Email is not specified for Row %s!", row_number));
@@ -115,12 +118,10 @@ public class DataAcquisitionGenerator extends BasicGenerator {
 
 		String deploymentUri = URIUtils.replacePrefixEx(kbPrefix + "DPL-" + getDataAcquisitionName(rec));
 		
-		createDataAcquisition(row, ownerEmail, permissionUri, deploymentUri, isEpiData(rec));
-
-		return row;
+		return createDataAcquisition(row, ownerEmail, permissionUri, deploymentUri, isEpiData(rec));
 	}
 
-	void createDataAcquisition(Map<String, Object> row, 
+	DataAcquisition createDataAcquisition(Map<String, Object> row, 
 			String ownerEmail, 
 			String permissionUri, 
 			String deploymentUri,
@@ -183,8 +184,8 @@ public class DataAcquisitionGenerator extends BasicGenerator {
 		if (schema != null) {
 			da.setStatus(9999);
 		}
-
-		da.save();
+		
+		return da;
 	}
 
 	@Override

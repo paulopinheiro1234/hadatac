@@ -32,7 +32,7 @@ import be.objectify.deadbolt.java.actions.Group;
 import be.objectify.deadbolt.java.actions.Restrict;
 import org.hadatac.console.controllers.AuthApplication;
 
-public class DataAcquisitionSchemaAttribute {
+public class DataAcquisitionSchemaAttribute extends HADatAcThing {
 
 	public static String INDENT1 = "     ";
 	public static String INSERT_LINE1 = "INSERT DATA {  ";
@@ -779,7 +779,8 @@ public class DataAcquisitionSchemaAttribute {
 	}
 
 	@Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
-	public int deleteFromLabKey(String user_name, String password) throws CommandException {
+	@Override
+	public int deleteFromLabKey(String user_name, String password) {
 		String site = ConfigProp.getPropertyValue("labkey.config", "site");
 		String path = "/" + ConfigProp.getPropertyValue("labkey.config", "folder");
 		LabkeyDataHandler loader = new LabkeyDataHandler(site, user_name, password, path);
@@ -787,7 +788,14 @@ public class DataAcquisitionSchemaAttribute {
 		Map<String, Object> row = new HashMap<String, Object>();
 		row.put("hasURI", URIUtils.replaceNameSpaceEx(getUri().replace("<","").replace(">","")));
 		rows.add(row);
-		return loader.deleteRows("DASchemaAttribute", rows);
+		
+		try {
+            return loader.deleteRows("DASchemaAttribute", rows);
+        } catch (CommandException e) {
+            System.out.println("[ERROR] Could not delete DASA(s)");
+            e.printStackTrace();
+            return 0;
+        }
 	}
 
 	public void delete() {

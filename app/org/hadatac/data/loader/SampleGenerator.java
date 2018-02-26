@@ -269,7 +269,7 @@ public class SampleGenerator extends BasicGenerator {
 	}
 	
 	@Override
-	public List< Map<String, Object> > createRows() throws Exception {
+	public void createRows() throws Exception {
 		rows.clear();
 		boolean firstRow = true;
 		for (Record record : records) {
@@ -282,8 +282,6 @@ public class SampleGenerator extends BasicGenerator {
 			}
 			createObj(record);
 		}
-		
-		return rows;
 	}
 
 	@Override

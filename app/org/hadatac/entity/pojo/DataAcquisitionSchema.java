@@ -33,7 +33,7 @@ import org.hadatac.metadata.loader.LabkeyDataHandler;
 import be.objectify.deadbolt.java.actions.Group;
 import be.objectify.deadbolt.java.actions.Restrict;
 
-public class DataAcquisitionSchema {
+public class DataAcquisitionSchema extends HADatAcThing {
 	public static String INDENT1 = "     ";
 	public static String INSERT_LINE1 = "INSERT DATA {  ";
 	public static String DELETE_LINE1 = "DELETE WHERE {  ";
@@ -600,7 +600,7 @@ public class DataAcquisitionSchema {
 	}
 
 	@Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
-	public int saveToLabKey(String user_name, String password) throws CommandException {
+	public int saveToLabKey(String user_name, String password) {
 		// SAVING DAS's DASAs
 		for (DataAcquisitionSchemaAttribute dasa : attributes) {
 			//System.out.println("Saving DASA " + dasa.getUri() + " into LabKey");
@@ -617,11 +617,19 @@ public class DataAcquisitionSchema {
 		row.put("a", "hasco:DataAcquisitionSchema");
 		row.put("rdfs:label", getLabel());
 		rows.add(row);
-		return loader.insertRows("DASchema", rows);
+		
+		try {
+            return loader.insertRows("DASchema", rows);
+        } catch (CommandException e) {
+            System.out.println("[ERROR] Failed to insert DA Schemas to LabKey!");
+            e.printStackTrace();
+            return 0;
+        }
 	}
 
 	@Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
-	public int deleteFromLabKey(String user_name, String password) throws CommandException {
+	@Override
+	public int deleteFromLabKey(String user_name, String password) {
 		// DELETING DAS's DASAs
 		for (DataAcquisitionSchemaAttribute dasa : attributes) {
 			//System.out.println("Deleting DASA " + dasa.getUri() + " from LabKey");
@@ -636,7 +644,14 @@ public class DataAcquisitionSchema {
 		Map<String, Object> row = new HashMap<String, Object>();
 		row.put("hasURI", URIUtils.replaceNameSpaceEx(getUri()));
 		rows.add(row);
-		return loader.deleteRows("DASchema", rows);
+		
+		try {
+            return loader.deleteRows("DASchema", rows);
+        } catch (CommandException e) {
+            System.out.println("[ERROR] Failed to delete DA Schemas from LabKey!");
+            e.printStackTrace();
+            return 0;
+        }
 	}
 
 	public void delete() {

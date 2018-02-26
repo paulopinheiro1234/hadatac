@@ -73,18 +73,14 @@ public class DeleteDASA extends Controller {
 
 		int deletedRows = -1;
 		if (dasa != null) {
-			try {
-				System.out.println("calling dasa.deleteFromLabKey() from DeleteDASA"); 
-				deletedRows = dasa.deleteFromLabKey(session().get("LabKeyUserName"),session().get("LabKeyPassword"));
-				if (deletedRows > 0) {
-					dasa.delete();
-				} else {
-					String message = "Number of deleted rows: " + deletedRows;
-					return badRequest(DASAConfirm.render("ERROR Deleting Data Acquisition Schema Attribute", message, dasa));
-				}
-			} catch (CommandException e) {
-				return badRequest(DASAConfirm.render("ERROR Deleting Data Acquisition Schema Attribute", "Error from dasa.deleteFromLabKey()", dasa));
-			}
+		    System.out.println("calling dasa.deleteFromLabKey() from DeleteDASA"); 
+            deletedRows = dasa.deleteFromLabKey(session().get("LabKeyUserName"),session().get("LabKeyPassword"));
+            if (deletedRows > 0) {
+                dasa.delete();
+            } else {
+                String message = "Number of deleted rows: " + deletedRows;
+                return badRequest(DASAConfirm.render("ERROR Deleting Data Acquisition Schema Attribute", message, dasa));
+            }
 		}
 
 		return ok(DASAConfirm.render("Deleted Data Acquisition Schema Attribute", "Deleted " + deletedRows + " tuples from LabKey", dasa));

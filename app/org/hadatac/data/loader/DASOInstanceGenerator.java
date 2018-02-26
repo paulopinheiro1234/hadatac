@@ -75,7 +75,7 @@ public class DASOInstanceGenerator{
 	*/
 
 	/*@Overwrite
-	public List<Map<String,Object>> createRows(){
+	public void createRows(){
 	}// /createRows
 
 	@Override

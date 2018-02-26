@@ -103,6 +103,17 @@ public class HADatAcThing {
 
 	public void setComment(String comment) {
 		this.comment = comment;
-	}	
-
+	}
+	
+	public void save() {}
+	public void delete() {}
+	
+	public void saveToTripleStore() {}
+	public void deleteFromTripleStore() {}
+	
+	public int saveToSolr() { return 0; }
+	public int deleteFromSolr() { return 0; }
+	
+	public int saveToLabKey(String userName, String password) { return 0; }
+	public int deleteFromLabKey(String userName, String password) { return 0; }
 }
