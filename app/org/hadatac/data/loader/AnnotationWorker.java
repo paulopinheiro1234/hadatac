@@ -31,6 +31,12 @@ public class AnnotationWorker {
 	
 	public AnnotationWorker() {}
     
+	public static void scan() {
+	    DataFile.includeUnrecognizedFiles(
+	            ConfigProp.getPathUnproc(), 
+	            ConfigProp.getDefaultOwnerEmail());
+	}
+	
 	public static void autoAnnotate() {
 		if(ConfigProp.getPropertyValue("autoccsv.config", "auto").equals("off")){
 			return;
@@ -62,23 +68,23 @@ public class AnnotationWorker {
 			}
 			
 			boolean bSucceed = false;
-			if (file_name.startsWith("DA")) {
+			if (file_name.startsWith("DA-")) {
 				bSucceed = annotateDAFile(file, recordFile);
 			} else {
 				GeneratorChain chain = null;
-				if (file_name.startsWith("PID")) {
+				if (file_name.startsWith("PID-")) {
 					chain = annotateSubjectIdFile(recordFile);
 				}
-				else if (file_name.startsWith("STD")) {
+				else if (file_name.startsWith("STD-")) {
 					chain = annotateStudyIdFile(recordFile);
 				}
-				else if (file_name.startsWith("MAP")) {
+				else if (file_name.startsWith("MAP-")) {
 					chain = annotateMapFile(recordFile);
 				}
-				else if (file_name.startsWith("ACQ")) {
+				else if (file_name.startsWith("ACQ-")) {
 					chain = annotateACQFile(recordFile);
 				}
-				else if (file_name.startsWith("SDD")) {
+				else if (file_name.startsWith("SDD-")) {
 					chain = annotateDataAcquisitionSchemaFile(recordFile);
 				}
 				

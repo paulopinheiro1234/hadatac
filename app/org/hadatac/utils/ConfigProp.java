@@ -72,4 +72,8 @@ public class ConfigProp {
 	public static String getPathDownload() {
 		return getPropertyValue(AUTOANNOTATOR_CONFIG_FILE, "path_download");
 	}
+	
+	public static String getDefaultOwnerEmail() {
+        return getPropertyValue(AUTOANNOTATOR_CONFIG_FILE, "default_owner_email");
+    }
 }

@@ -1,23 +1,16 @@
 package org.hadatac.console.controllers.annotator;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.InputStream;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.Map;
+import java.util.HashMap;
 import java.util.List;
 import javax.inject.Inject;
 
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.FilenameUtils;
-import org.apache.commons.io.IOUtils;
-import org.apache.jena.update.UpdateExecutionFactory;
-import org.apache.jena.update.UpdateFactory;
-import org.apache.jena.update.UpdateProcessor;
-import org.apache.jena.update.UpdateRequest;
 import org.hadatac.entity.pojo.Credential;
 import org.hadatac.console.controllers.AuthApplication;
 import org.hadatac.console.controllers.annotator.routes;
@@ -40,10 +33,8 @@ import org.hadatac.entity.pojo.DataAcquisition;
 import org.hadatac.entity.pojo.User;
 import org.hadatac.metadata.loader.LabkeyDataHandler;
 import org.hadatac.metadata.loader.URIUtils;
-import org.hadatac.utils.Collections;
 import org.hadatac.utils.ConfigProp;
 import org.hadatac.utils.Feedback;
-import org.hadatac.utils.NameSpaces;
 import org.labkey.remoteapi.CommandException;
 
 import be.objectify.deadbolt.java.actions.Group;
@@ -51,10 +42,10 @@ import be.objectify.deadbolt.java.actions.Restrict;
 import play.twirl.api.Html;
 import play.data.Form;
 import play.data.FormFactory;
+import play.libs.Json;
 import play.mvc.Controller;
 import play.mvc.Result;
-import play.mvc.BodyParser;
-import play.mvc.Http.MultipartFormData.FilePart;
+
 
 public class AutoAnnotator extends Controller {
 
@@ -240,19 +231,6 @@ public class AutoAnnotator extends Controller {
                 new Html("<h3>Your provided credentials are valid and saved!</h3>")));
     }
 
-    private static String getProperDataAcquisitionUri(String fileName) {
-        String base_name = FilenameUtils.getBaseName(fileName);
-        List<DataAcquisition> da_list = DataAcquisition.findAll();
-        for(DataAcquisition dc : da_list){
-            String abbrevUri = URIUtils.replaceNameSpaceEx(dc.getUri());
-            String qname = abbrevUri.split(":")[1];
-            if(base_name.startsWith(qname)){
-                return dc.getUri();
-            }
-        }
-        return null;
-    }
-
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
     public Result checkAnnotationLog(String file_name) {
         AnnotationLog log = AnnotationLog.find(file_name);
@@ -262,6 +240,26 @@ public class AutoAnnotator extends Controller {
         else {
             return ok(annotation_log.render(Feedback.print(Feedback.WEB, log.getLog()), routes.AutoAnnotator.index().url()));
         }
+    }
+
+    public Result getAnnotationStatus(String fileName) {
+        DataFile dataFile = DataFile.findByName(fileName);
+        Map<String, Object> result = new HashMap<String, Object>();
+        
+        if (dataFile == null) {
+            result.put("File Name", fileName);
+            result.put("Status", "Unknown");
+            result.put("Error", "The file with the specified name cannot be retrieved. "
+                    + "Please provide a valid file name.");
+        } else {
+            result.put("File Name", dataFile.getFileName());
+            result.put("Status", dataFile.getStatus());
+            result.put("Submission Time", dataFile.getSubmissionTime());
+            result.put("Completion Time", dataFile.getCompletionTime());
+            result.put("Owner Email", dataFile.getOwnerEmail());
+        }
+
+        return ok(Json.toJson(result));
     }
 
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
@@ -281,31 +279,31 @@ public class AutoAnnotator extends Controller {
         String path_proc = ConfigProp.getPathProc();
         String path_unproc = ConfigProp.getPathUnproc();
         File file = new File(path_proc + "/" + fileName);
-        
-        if (fileName.startsWith("DA_")) {
+
+        if (fileName.startsWith("DA-")) {
             Measurement.delete(dataFile.getDatasetUri());
         } else {
             deleteAddedTriples(file);
         }
-        
+
         dataFile.setStatus(DataFile.UNPROCESSED);
         dataFile.setSubmissionTime(new SimpleDateFormat("yyyy/MM/dd HH:mm:ss").format(new Date()));
         dataFile.setCompletionTime("");
         dataFile.save();
-        
+
         File destFolder = new File(path_unproc);
         if (!destFolder.exists()){
             destFolder.mkdirs();
         }
         file.renameTo(new File(destFolder + "/" + fileName));
-        
+
         AnnotationLog log = new AnnotationLog(fileName);
         log.addline(Feedback.println(Feedback.WEB, String.format("[OK] Moved file %s to unprocessed folder", fileName)));
         log.save();
 
         return redirect(routes.AutoAnnotator.index());
     }
-    
+
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
     public Result deleteDataFile(String fileName, boolean isProcessed) {
         final SysUser user = AuthApplication.getLocalUser(session());
@@ -318,7 +316,7 @@ public class AutoAnnotator extends Controller {
         if (null == dataFile) {
             return badRequest("You do NOT have the permission to operate this file!");
         }
-        
+
         String path = "";
         if(isProcessed){
             path = ConfigProp.getPathProc();
@@ -328,14 +326,14 @@ public class AutoAnnotator extends Controller {
 
         AnnotationLog.delete(fileName);
         File file = new File(path + "/" + fileName);
-        if (fileName.startsWith("DA_")) {
+        if (fileName.startsWith("DA-")) {
             Measurement.delete(dataFile.getDatasetUri());
         } else {
             deleteAddedTriples(file);
         }
         file.delete();
         dataFile.delete();
-        
+
         return redirect(routes.AutoAnnotator.index());
     }
 
@@ -385,36 +383,6 @@ public class AutoAnnotator extends Controller {
         }
         return ok(new File(path + "/" + file_name));
     }
-    
-    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    @BodyParser.Of(value = BodyParser.MultipartFormData.class)
-    public Result uploadDataFile(String oper) {
-        String path = ConfigProp.getPathUnproc();
-        for(FilePart<Object> filePart : request().body().asMultipartFormData().getFiles()) {
-            if (filePart != null) {
-                File file = (File)filePart.getFile();
-                File newFile = new File(path + "/" + filePart.getFilename());
-                InputStream isFile;
-                try {
-                    isFile = new FileInputStream(file);
-                    byte[] byteFile;
-                    byteFile = IOUtils.toByteArray(isFile);
-                    FileUtils.writeByteArrayToFile(newFile, byteFile);
-                    isFile.close();
-
-                    DataFile dataFile = new DataFile(filePart.getFilename());
-                    dataFile.setOwnerEmail(AuthApplication.getLocalUser(session()).getEmail());
-                    dataFile.setStatus(DataFile.UNPROCESSED);
-                    dataFile.setSubmissionTime(new SimpleDateFormat("yyyy/MM/dd HH:mm:ss").format(new Date()));
-                    dataFile.save();
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
-        }
-
-        return redirect(routes.AutoAnnotator.index());
-    }
 
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
     public Result uploadDataFileByChunking(
@@ -444,15 +412,8 @@ public class AutoAnnotator extends Controller {
             String resumableIdentifier,
             String resumableFilename,
             String resumableRelativePath) {
-        if (ResumableUpload.postUploadFileByChunking(request(), 
-                ConfigProp.getPathUnproc())) {
-            DataFile dataFile = new DataFile(resumableFilename);
-            dataFile.setOwnerEmail(AuthApplication.getLocalUser(session()).getEmail());
-            dataFile.setStatus(DataFile.UNPROCESSED);
-            dataFile.setSubmissionTime(new SimpleDateFormat("yyyy/MM/dd HH:mm:ss").format(new Date()));
-            String dataAcquisitionUri = getProperDataAcquisitionUri(resumableFilename);
-            dataFile.setDataAcquisitionUri(dataAcquisitionUri == null ? "" : dataAcquisitionUri);
-            dataFile.save();
+        if (ResumableUpload.postUploadFileByChunking(request(), ConfigProp.getPathUnproc())) {
+            DataFile.create(resumableFilename, AuthApplication.getLocalUser(session()).getEmail());
             return(ok("Upload finished"));
         } else {
             return(ok("Upload"));

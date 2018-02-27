@@ -8,6 +8,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.text.WordUtils;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrQuery;
@@ -1128,6 +1129,20 @@ public class DataAcquisition extends HADatAcThing {
         dataAcquisition.addDatasetUri(hadatacCcsv.getDatasetKbUri());
 
         return dataAcquisition;
+    }
+    
+    public static String getProperDataAcquisitionUri(String fileName) {
+        String base_name = FilenameUtils.getBaseName(fileName);
+        List<DataAcquisition> da_list = findAll();
+        for(DataAcquisition da : da_list){
+            String abbrevUri = URIUtils.replaceNameSpaceEx(da.getUri());
+            String qname = abbrevUri.split(":")[1];
+            if(base_name.startsWith(qname)){
+                return da.getUri();
+            }
+        }
+        
+        return null;
     }
 
     public void merge(DataAcquisition dataCollection) {

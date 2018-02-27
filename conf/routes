@@ -311,6 +311,7 @@ GET	    /hadatac/annotator/downloadfile		       org.hadatac.console.controllers.
 POST	/hadatac/annotator/downloadfile    	       org.hadatac.console.controllers.annotator.AutoAnnotator.downloadDataFile(file_name : String, isProcessed : Boolean)
 GET	    /hadatac/annotator/log                     org.hadatac.console.controllers.annotator.AutoAnnotator.checkAnnotationLog(file_name : String)
 POST	/hadatac/annotator/log                     org.hadatac.console.controllers.annotator.AutoAnnotator.checkAnnotationLog(file_name : String)
+GET     /hadatac/annotator/queryfile               org.hadatac.console.controllers.annotator.AutoAnnotator.getAnnotationStatus(filename: String)
 GET	    /hadatac/annotator/file/owner		       org.hadatac.console.controllers.annotator.AutoAnnotator.assignFileOwner(ownerEmail: String, file: String)
 POST	/hadatac/annotator/file/owner     	       org.hadatac.console.controllers.annotator.AutoAnnotator.postAssignFileOwner(ownerEmail: String, file: String)
 POST	/hadatac/annotator/file/owner/form     	   org.hadatac.console.controllers.annotator.AutoAnnotator.processOwnerForm(ownerEmail: String, file : String)

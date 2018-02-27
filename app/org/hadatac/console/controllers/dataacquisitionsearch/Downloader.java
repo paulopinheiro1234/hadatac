@@ -146,7 +146,7 @@ public class Downloader extends Controller {
 	
 	@Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
 	public Result checkCompletion(String file_name) {
-		DataFile dataFile = DataFile.findByName(null, file_name);
+		DataFile dataFile = DataFile.findByName(file_name);
 		
 		Map<String, Object> result = new HashMap<String, Object>();
 		result.put("CompletionPercentage", dataFile.getCompletionPercentage());
