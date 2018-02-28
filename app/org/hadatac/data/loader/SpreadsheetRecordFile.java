@@ -128,15 +128,17 @@ public class SpreadsheetRecordFile implements RecordFile {
     }
 
     private boolean isEmptyRow(Row row) {
-        boolean isEmpty = true;
+        if (row == null || row.getFirstCellNum() < 0 || row.getLastCellNum() < 0) {
+            return false;
+        }
+
         for (int i = row.getFirstCellNum(); i <= row.getLastCellNum(); i++) {
             if (row.getCell(i) != null && !row.getCell(i).toString().trim().isEmpty()) {
-                isEmpty = false;
-                break;
+                return false;
             }
         }
 
-        return isEmpty;
+        return true;
     }
 
     private List<String> getRowValues(Row row) {
