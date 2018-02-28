@@ -9,7 +9,6 @@
 	results : org.hadatac.data.model.AcquisitionQueryResult,
 	documentJson : String,
 	handler : FacetHandler,
-	query : String,
 	objDetails : String,
 	objFields : List[String]
 )
@@ -17,7 +16,7 @@
 @main("Simple Faceted Search") {
     <script type="text/javascript" src="/hadatac/assets/javascripts/jquery.redirect.js"></script>
 	<script type="text/javascript" src="/hadatac/assets/javascripts/datasearch.js"></script>
-	<div id="query" data-documents="@documentJson" data-query="@query"/>
+	<div id="query" data-documents="@documentJson"/>
 	<div id="facetDiv" data-documents="@handler.toJSON()"/>
 	
 	<div class="container-fluid">
@@ -37,7 +36,7 @@
 
 				<div id="download_url" style="visibility: hidden ;">@org.hadatac.console.http.routes.SolrSearchProxy.getDataAcquisitionDownload()</div>
 			    
-			    @downloadDialog(page, rows, facets, resultsSize, results, documentJson, handler, query, objDetails, objFields)
+			    @downloadDialog(page, rows, facets, resultsSize, results, documentJson, objDetails, objFields)
 			</div>
 	        </div>
 		<div class="row">
@@ -79,5 +78,5 @@
 		</div>
 	</div>
 	
-	@facetTree(page, rows, facets, resultsSize, results, documentJson, handler, query, objDetails)
+	@facetTree(page, rows, facets, resultsSize, results, documentJson, handler, objDetails)
 }

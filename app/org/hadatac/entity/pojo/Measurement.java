@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.BiConsumer;
+import java.util.stream.Collectors;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.jena.query.QueryExecution;
@@ -420,24 +421,17 @@ public class Measurement extends HADatAcThing {
 		return q;
 	}
 
-	public static String buildQuery(String user_uri, int page, int qtd, FacetHandler handler) {
-		String acquisition_query = "";
-		String facet_query = "";
-		String q = "";
-
-		List<String> listURI = DataAcquisition.findAllAccessibleDataAcquisition(user_uri);
-		Iterator<String> iter_uri = listURI.iterator();
-		while (iter_uri.hasNext()) {
-			acquisition_query += "acquisition_uri_str:\"" + iter_uri.next() + "\"";
-			if (iter_uri.hasNext()) {
-				acquisition_query += " OR ";
-			}
-		}
+	public static String buildQuery(List<String> ownedDataAcquisitions, FacetHandler handler) {
+		String acquisition_query = String.join(" OR ", ownedDataAcquisitions.stream()
+		        .map(p -> "acquisition_uri_str:\"" + p + "\"")
+		        .collect(Collectors.toList()));
 
 		if (acquisition_query.equals("")) {
 			return "";
 		}
 
+		String facet_query = "";
+        String q = "";
 		if (handler != null) {
 			facet_query = handler.bottommostFacetsToSolrQuery();
 		}
@@ -503,13 +497,23 @@ public class Measurement extends HADatAcThing {
 	public static AcquisitionQueryResult find(String user_uri, int page, int qtd, String facets) {
 		AcquisitionQueryResult result = new AcquisitionQueryResult();
 		
+		List<String> ownedDAs = DataAcquisition.findAllAccessibleDataAcquisition(user_uri);
+		if (ownedDAs.isEmpty()) {
+		    /*
+	         * an empty query happens when current user is not allowed to see any
+	         * data acquisition
+	         */
+		    System.out.println("Not allowed to access any Data Acquisition!");
+            return result;
+		}
+		
 		FacetHandler facetHandler = new FacetHandler();
     	facetHandler.loadFacets(facets);
     	
     	FacetHandler retFacetHandler = new FacetHandler();
     	retFacetHandler.loadFacets(facets);
 
-		System.out.println("\nfacetHandler before: " + facetHandler.toSolrQuery());
+		// System.out.println("\nfacetHandler before: " + facetHandler.toSolrQuery());
 		
 		// Run one time
 		getAllFacetStats(facetHandler, retFacetHandler, result, false);
@@ -519,17 +523,10 @@ public class Measurement extends HADatAcThing {
 		//getAllFacetStats(facetHandler, retFacetHandler, result, true);
 		
 		// Get documents
-		System.out.println("\n\n\nfacetHandler after: " + retFacetHandler.bottommostFacetsToSolrQuery());
+		// System.out.println("\n\n\nfacetHandler after: " + retFacetHandler.bottommostFacetsToSolrQuery());
 		long docSize = 0;
-		String q = buildQuery(user_uri, page, qtd, retFacetHandler);
-		/*
-		 * an empty query happens when current user is not allowed to see any
-		 * data acquisition
-		 */
-		if (q.equals("")) {
-			System.out.println("q is empty");
-			return result;
-		}
+		
+		String q = buildQuery(ownedDAs, retFacetHandler);
 		
 		SolrQuery query = new SolrQuery();
 		query.setQuery(q);
