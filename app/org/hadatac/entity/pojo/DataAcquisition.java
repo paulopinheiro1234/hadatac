@@ -672,7 +672,7 @@ public class DataAcquisition extends HADatAcThing {
             return -1;
         }
     }
-    
+
     @Override
     public int deleteFromSolr() {
         try {
@@ -744,7 +744,7 @@ public class DataAcquisition extends HADatAcThing {
                     + Collections.DATA_ACQUISITION).build();
             QueryResponse queryResponse = solr.query(query, SolrRequest.METHOD.POST);
             solr.close();
-            Pivot pivot = Measurement.parseFacetResults(queryResponse);
+            Pivot pivot = Pivot.parseQueryResponse(queryResponse);
             return parsePivot(pivot, facet);
         } catch (Exception e) {
             System.out.println("[ERROR] DataAcquisition.getTargetFacets() - Exception message: " + e.getMessage());
@@ -1130,7 +1130,7 @@ public class DataAcquisition extends HADatAcThing {
 
         return dataAcquisition;
     }
-    
+
     public static String getProperDataAcquisitionUri(String fileName) {
         String base_name = FilenameUtils.getBaseName(fileName);
         List<DataAcquisition> da_list = findAll();
@@ -1141,7 +1141,7 @@ public class DataAcquisition extends HADatAcThing {
                 return da.getUri();
             }
         }
-        
+
         return null;
     }
 
@@ -1289,7 +1289,7 @@ public class DataAcquisition extends HADatAcThing {
 
         return totalChanged;
     }
-    
+
     @Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
     @Override
     public int deleteFromLabKey(String userName, String password) {
@@ -1303,7 +1303,7 @@ public class DataAcquisition extends HADatAcThing {
         Map<String, Object> row = new HashMap<String, Object>();
         row.put("hasURI", URIUtils.replaceNameSpaceEx(getUri()));
         rows.add(row);
-        
+
         try {
             return loader.deleteRows("DataAcquisition", rows);
         } catch (CommandException e) {
