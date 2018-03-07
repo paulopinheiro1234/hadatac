@@ -195,6 +195,6 @@ public class DataAcquisitionGenerator extends BasicGenerator {
 
 	@Override
 	public String getErrorMsg(Exception e) {
-		return "";
+		return "Error in DataAcquisitionGenerator: " + e.getMessage();
 	}
 }

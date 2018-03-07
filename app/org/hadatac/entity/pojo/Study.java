@@ -750,7 +750,7 @@ public class Study extends HADatAcThing {
 				// Sample Collections
 				"  	?subUri rdfs:subClassOf* hasco:Study . " + 
 				"  	?study a ?subUri . " +
-				"   ?s hasco:isSampleCollectionOf ?study . " + 
+				"   ?s hasco:isMemberOf ?study . " + 
 				"   ?s ?p ?o . " +
 				"  FILTER (?study = " + study + ") " +
 				"    } " +
@@ -759,7 +759,7 @@ public class Study extends HADatAcThing {
 				// Other Sample Collections
 				"  	?subUri rdfs:subClassOf* hasco:Study . " + 
 				"  	?study a ?subUri . " +
-				"   ?s hasco:isSampleCollectionOf ?study . " + 
+				"   ?s hasco:isMemberOf ?study . " + 
 				"   ?s ?p ?o . " +
 				"  	FILTER (?study != " + study + ") " +
 				"    } " +
@@ -770,8 +770,7 @@ public class Study extends HADatAcThing {
 				// Sample Collection Samples
 				"  	?subUri rdfs:subClassOf* hasco:Study . " + 
 				"  	?study a ?subUri . " +
-				"   ?sc hasco:isSampleCollectionOf ?study . " + 
-				"   ?s hasco:isObjectOf ?sc .  " +
+				"   ?s hasco:isMemberOf* ?study . " + 
 				"   ?s ?p ?o . " +
 				"  FILTER (?study = " + study + ") " +
 				"    } " +
@@ -780,8 +779,7 @@ public class Study extends HADatAcThing {
 				// Other Sample Collection Samples
 				"  	?subUri rdfs:subClassOf* hasco:Study . " + 
 				"  	?study a ?subUri . " +
-				"   ?sc hasco:isSampleCollectionOf ?study . " + 
-				"   ?s hasco:isObjectOf ?sc .  " +
+				"   ?s hasco:isMemberOf* ?study . " + 
 				"   ?s ?p ?o . " +
 				"  	FILTER (?study != " + study + ") " +
 				"    } " +

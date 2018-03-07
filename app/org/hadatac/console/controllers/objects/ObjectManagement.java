@@ -139,7 +139,7 @@ public class ObjectManagement extends Controller {
                     message = "Failed to delete object from LabKey";
                 }
 
-                newObj.save();
+                newObj.saveToTripleStore();
                 nRowsAffected = newObj.saveToLabKey(session().get("LabKeyUserName"), session().get("LabKeyPassword"));
                 if (nRowsAffected <= 0) {
                     message = "Failed to insert object into LabKey";

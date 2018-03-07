@@ -652,7 +652,7 @@ public class DataAcquisition extends HADatAcThing {
     }
 
     @Override
-    public int saveToSolr() {
+    public boolean saveToSolr() {
         try {
             SolrClient client = new HttpSolrClient.Builder(
                     ConfigFactory.load().getString("hadatac.solr.data") 
@@ -663,13 +663,14 @@ public class DataAcquisition extends HADatAcThing {
             else if (endedAt.toString().startsWith("9999")) {
                 endedAt = DateTime.parse("9999-12-31T23:59:59.999Z");
             }
-            int status = client.addBean(this).getStatus();
+            client.addBean(this).getStatus();
             client.commit();
             client.close();
-            return status;
+            
+            return true;
         } catch (IOException | SolrServerException e) {
             System.out.println("[ERROR] DataAcquisition.save() - e.Message: " + e.getMessage());
-            return -1;
+            return false;
         }
     }
 
@@ -1032,9 +1033,9 @@ public class DataAcquisition extends HADatAcThing {
         return null;
     }
 
-    public int close(String endedAt) {
+    public void close(String endedAt) {
         setEndedAtXsd(endedAt);
-        return saveToSolr();
+        saveToSolr();
     }
 
     public boolean deleteMeasurementData() {

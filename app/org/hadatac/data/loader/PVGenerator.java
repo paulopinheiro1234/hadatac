@@ -14,18 +14,16 @@ public class PVGenerator extends BasicGenerator {
 	
 	final String kbPrefix = ConfigProp.getKbPrefix();
 	String startTime = "";
-	String SDDFileName = "";
+	String SDDName = "";
 	Map<String, String> codeMap;
 	Map<String, Map<String, String>> pvMap = new HashMap<String, Map<String, String>>();
-	String study_id = "";
 	Map<String, String> mapAttrObj;
 	Map<String, String> codeMappings;
 
-	public PVGenerator(RecordFile file, String SDDFileName, String study_id, 
+	public PVGenerator(RecordFile file, String SDDName,  
 			Map<String, String> mapAttrObj, Map<String, String> codeMappings) {
 		super(file);
-		this.SDDFileName = SDDFileName;
-		this.study_id = study_id;
+		this.SDDName = SDDName;
 		this.mapAttrObj = mapAttrObj;
 		this.codeMappings = codeMappings;
 	}
@@ -90,9 +88,9 @@ public class PVGenerator extends BasicGenerator {
 		if ((getLabel(rec)).length() > 0) {
 			String colNameInSDD = getLabel(rec).replace(" ", "");
 			if (mapAttrObj.containsKey(colNameInSDD) && mapAttrObj.get(colNameInSDD).length() > 0) {
-				return kbPrefix + "DASA-" + SDDFileName.replace("SDD-", "").replace(".xlsx", "").replace(".csv", "") + "-" + getLabel(rec).trim().replace(" ", "").replace("_","-").replace("??", "");
+				return kbPrefix + "DASA-" + SDDName + "-" + getLabel(rec).trim().replace(" ", "").replace("_","-").replace("??", "");
 			} else {
-				return kbPrefix + "DASO-" + SDDFileName.replace("SDD-", "").replace(".xlsx", "").replace(".csv", "") + "-" + getLabel(rec).trim().replace(" ", "").replace("_","-").replace("??", "");
+				return kbPrefix + "DASO-" + SDDName + "-" + getLabel(rec).trim().replace(" ", "").replace("_","-").replace("??", "");
 			}
 		} else {
 			return "";
@@ -103,7 +101,7 @@ public class PVGenerator extends BasicGenerator {
 		int row_number = 0;
 		List<String> result = new ArrayList<String>();
 		for (Record record : records) {
-			result.add((kbPrefix + "PV-" + getLabel(record).replace("_","-").replace("??", "") + ("-" + SDDFileName.replace("SDD-", "").replace(".xlsx", "").replace(".csv", "") + "-" + getCode(record)).replaceAll("--", "-")).replace(" ","") + "-" + row_number);
+			result.add((kbPrefix + "PV-" + getLabel(record).replace("_","-").replace("??", "") + ("-" + SDDName + "-" + getCode(record)).replaceAll("--", "-")).replace(" ","") + "-" + row_number);
 			++row_number;
 		}
 		return result;
@@ -112,7 +110,7 @@ public class PVGenerator extends BasicGenerator {
 	@Override
 	Map<String, Object> createRow(Record rec, int row_number) throws Exception {	
 		Map<String, Object> row = new HashMap<String, Object>();
-		row.put("hasURI", (kbPrefix + "PV-" + getLabel(rec).replaceAll("[^a-zA-Z0-9:-]", "-") + ("-" + SDDFileName.replace("SDD-", "").replace(".xlsx", "").replace(".csv", "") + "-" + getCode(rec)).replaceAll("--", "-")).replace(" ","").replaceAll("[^A-Za-z0-9:-]", "") + "-" + row_number);
+		row.put("hasURI", (kbPrefix + "PV-" + getLabel(rec).replaceAll("[^a-zA-Z0-9:-]", "-") + ("-" + SDDName + "-" + getCode(rec)).replaceAll("--", "-")).replace(" ","").replaceAll("[^A-Za-z0-9:-]", "") + "-" + row_number);
 		row.put("a", "hasco:PossibleValue");
 		row.put("hasco:hasCode", getCode(rec));
 		row.put("hasco:hasCodeLabel", getCodeLabel(rec));

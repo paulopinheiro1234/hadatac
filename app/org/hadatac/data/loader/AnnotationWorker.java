@@ -77,7 +77,7 @@ public class AnnotationWorker {
                     chain = annotateMapFile(recordFile);
                 }
                 else if (file_name.startsWith("ACQ-")) {
-                    chain = annotateACQFile(recordFile);
+                    chain = annotateACQFile(recordFile, true);
                 }
                 else if (file_name.startsWith("SDD-")) {
                     chain = annotateDataAcquisitionSchemaFile(recordFile);
@@ -135,9 +135,9 @@ public class AnnotationWorker {
         return chain;
     }
 
-    public static GeneratorChain annotateACQFile(RecordFile file) {
-        GeneratorChain chain = new GeneratorChain();
-        GeneralGenerator generalGenerator = new GeneralGenerator("Instrument");
+    public static GeneratorChain annotateACQFile(RecordFile file, boolean bGenerate) {
+        GeneratorChain chainForInstrument = new GeneratorChain();
+        GeneralGenerator generalGenerator = new GeneralGenerator(file, "Instrument");
         Map<String, Object> row = new HashMap<String, Object>();
         row.put("hasURI", ConfigProp.getKbPrefix() + "INS-GENERIC-PHYSICAL-INSTRUMENT");
         row.put("a", "vstoi:PhysicalInstrument");
@@ -149,13 +149,24 @@ public class AnnotationWorker {
         row.put("a", "hasco:Questionnaire");
         row.put("rdfs:label", "Generic Questionnaire");
         generalGenerator.addRow(row);
+        chainForInstrument.addGenerator(generalGenerator);
+        if (bGenerate) {
+            chainForInstrument.generate();
+        } else {
+            chainForInstrument.delete();
+        }
 
-        chain.addGenerator(generalGenerator);
-
+        GeneratorChain chainForDeployment = new GeneratorChain();
         DateFormat isoFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
         String startTime = isoFormat.format(new Date());
-        chain.addGenerator(new DeploymentGenerator(file, startTime));
+        chainForDeployment.addGenerator(new DeploymentGenerator(file, startTime));
+        if (bGenerate) {
+            chainForDeployment.generate();
+        } else {
+            chainForDeployment.delete();
+        }
 
+        GeneratorChain chain = new GeneratorChain();
         chain.addGenerator(new DataAcquisitionGenerator(file, startTime));
 
         return chain;
@@ -166,11 +177,8 @@ public class AnnotationWorker {
 
         SDD sdd = new SDD(file);
 
-        String study_id = "default-study";
+        String sddName = sdd.getName();
         Map<String, String> mapCatalog = sdd.getCatalog();
-        if (mapCatalog.containsKey("Study_ID")) {
-            study_id = mapCatalog.get("Study_ID");
-        }
 
         RecordFile codeMappingRecordFile = null;
         RecordFile dictionaryRecordFile = null;
@@ -207,20 +215,20 @@ public class AnnotationWorker {
 
         GeneratorChain chain = new GeneratorChain();
         if (codeBookRecordFile.isValid()) {
-            chain.addGenerator(new PVGenerator(codeBookRecordFile, file.getFile().getName(), study_id, sdd.getMapAttrObj(), sdd.getCodeMapping()));
+            chain.addGenerator(new PVGenerator(codeBookRecordFile, sddName, sdd.getMapAttrObj(), sdd.getCodeMapping()));
         }
 
         if (dictionaryRecordFile.isValid()) {
-            chain.addGenerator(new DASchemaAttrGenerator(dictionaryRecordFile, sdd.getName(), sdd.getCodeMapping()));
-            chain.addGenerator(new DASchemaObjectGenerator(dictionaryRecordFile, sdd.getName(), sdd.getCodeMapping()));
-            chain.addGenerator(new DASchemaEventGenerator(dictionaryRecordFile, sdd.getTimeLineMap(), sdd.getName(), sdd.getCodeMapping()));
+            chain.addGenerator(new DASchemaAttrGenerator(dictionaryRecordFile, sddName, sdd.getCodeMapping()));
+            chain.addGenerator(new DASchemaObjectGenerator(dictionaryRecordFile, sddName, sdd.getCodeMapping()));
+            chain.addGenerator(new DASchemaEventGenerator(dictionaryRecordFile, sdd.getTimeLineMap(), sddName, sdd.getCodeMapping()));
         }
 
-        GeneralGenerator generalGenerator = new GeneralGenerator("DASchema");
+        GeneralGenerator generalGenerator = new GeneralGenerator(file, "DASchema");
         Map<String, Object> row = new HashMap<String, Object>();
-        row.put("hasURI", ConfigProp.getKbPrefix() + "DAS-" + study_id);
+        row.put("hasURI", ConfigProp.getKbPrefix() + "DAS-" + sddName);
         row.put("a", "hasco:DASchema");
-        row.put("rdfs:label", "Schema for " + study_id);
+        row.put("rdfs:label", "Schema for " + sddName);
         row.put("rdfs:comment", "");
         generalGenerator.addRow(row);
         chain.addGenerator(generalGenerator);

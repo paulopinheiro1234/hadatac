@@ -68,7 +68,7 @@ public class DeploymentGenerator extends BasicGenerator {
 		String sampleCollection = "";
 		String strQuery = NameSpaces.getInstance().printSparqlNameSpaceList() 
 				+ " SELECT ?sampleCollection WHERE { "
-				+ " ?sampleCollection hasco:isSampleCollectionOf " + getStudy(rec) + " . "
+				+ " ?sampleCollection hasco:isMemberOf " + getStudy(rec) + " . "
 				+ " }";
 
 		QueryExecution qe = QueryExecutionFactory.sparqlService(
@@ -171,10 +171,6 @@ public class DeploymentGenerator extends BasicGenerator {
 			row.put("prov:startedAtTime", startTime);
 		}
 
-		//row.put("hasco:hasDetector", "");
-		//row.put("prov:endedAtTime", "");
-		//row.put("vstoi:subDeploymentOf", "");
-
 		return row;
 	}
 
@@ -185,6 +181,6 @@ public class DeploymentGenerator extends BasicGenerator {
 
 	@Override
 	public String getErrorMsg(Exception e) {
-		return "";
+		return "Error in DeploymentGenerator: " + e.getMessage();
 	}
 }

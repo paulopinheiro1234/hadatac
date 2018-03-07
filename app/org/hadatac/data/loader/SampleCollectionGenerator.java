@@ -46,7 +46,7 @@ public class SampleCollectionGenerator extends BasicGenerator {
 		row.put("hasURI", getUri(rec));
 		row.put("a", "hasco:SampleCollection");
 		row.put("rdfs:label", getLabel(rec));
-		row.put("hasco:isSampleCollectionOf", getStudyUri(rec));
+		row.put("hasco:isMemberOf", getStudyUri(rec));
 
 		return row;
 	}
@@ -58,6 +58,6 @@ public class SampleCollectionGenerator extends BasicGenerator {
 
 	@Override
 	public String getErrorMsg(Exception e) {
-		return "";
+		return "Error in SampleCollectionGenerator: " + e.getMessage();
 	}
 }

@@ -211,15 +211,15 @@ public class ViewStudy extends Controller {
 	public static Map<String, List<String>> findSubject(String study_uri) {
 		String subjectQueryString = "";
     	        subjectQueryString += NameSpaces.getInstance().printSparqlNameSpaceList(); 
-    	        subjectQueryString += "SELECT ?subjectUri ?subjectType ?subjectLabel ?cohortLabel ?studyLabel WHERE { "
-    			+ "?subjectUri hasco:isMemberOf ?cohort . "
-    			+ "?cohort hasco:isMemberOf " + study_uri + " . "
-    			+ "?subjectUri rdf:type	<http://semanticscience.org/resource/Human> ."
-    			+ "?cohort rdfs:label ?cohortLabel . "
-    			+ "OPTIONAL { ?subjectUri rdfs:label ?subjectLabel } . "
-    			+ "OPTIONAL { ?subjectUri a ?subjectType } . "
-    			+ "} "
-                + "ORDER BY ?subjectUri";
+    	        subjectQueryString += "SELECT ?subjectUri ?subjectType ?subjectLabel ?cohortLabel ?studyLabel WHERE { \n"
+    			+ "?subjectUri hasco:isMemberOf ?cohort . \n"
+    			+ "?cohort hasco:isMemberOf " + study_uri + " . \n"
+    			+ "?subjectUri rdf:type	sio:Human . \n"
+    			+ "?cohort rdfs:label ?cohortLabel . \n"
+    			+ "OPTIONAL { ?subjectUri rdfs:label ?subjectLabel } . \n"
+    			+ "OPTIONAL { ?subjectUri a ?subjectType } . \n"
+    			+ "} \n"
+                + "ORDER BY ?subjectUri \n";
     	Map<String, List<String>> subjectResult = new HashMap<String, List<String>>();
 		List<String> values = new ArrayList<String>();
 		try {
@@ -234,9 +234,6 @@ public class ViewStudy extends Controller {
 				QuerySolution soln = resultsrw.next();
 				values = new ArrayList<String>();
 				values.add("Label: " + soln.get("subjectLabel").toString());
-		//		values.add("Type: " + cellProc.replaceNameSpaceEx(soln.get("subjectType").toString()));
-		//		values.add("Cohort: " + soln.get("cohortLabel").toString());
-		//		values.add("Study: " + soln.get("studyLabel").toString());
 				subjectResult.put(URIUtils.replaceNameSpaceEx(soln.get("subjectUri").toString()) ,values);
 			}
 		} catch (QueryExceptionHTTP e) {

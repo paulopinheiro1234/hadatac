@@ -108,10 +108,10 @@ public class HADatAcThing {
 	public void save() {}
 	public void delete() {}
 	
-	public void saveToTripleStore() {}
+	public boolean saveToTripleStore() { return false; }
 	public void deleteFromTripleStore() {}
 	
-	public int saveToSolr() { return 0; }
+	public boolean saveToSolr() { return false; }
 	public int deleteFromSolr() { return 0; }
 	
 	public int saveToLabKey(String userName, String password) { return 0; }

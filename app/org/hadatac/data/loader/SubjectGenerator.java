@@ -1,167 +1,97 @@
 package org.hadatac.data.loader;
 
 import java.lang.String;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 import org.hadatac.utils.ConfigProp;
-import org.hadatac.utils.Feedback;
 import org.hadatac.entity.pojo.StudyObject;
-import org.hadatac.entity.pojo.Credential;
+import org.hadatac.entity.pojo.HADatAcThing;
 import org.hadatac.entity.pojo.ObjectCollection;
 
 
 public class SubjectGenerator extends BasicGenerator {
 
-	static final long MAX_OBJECTS = 1000;
-	static final long LENGTH_CODE = 6;
+    static final long MAX_OBJECTS = 1000;
+    static final long LENGTH_CODE = 6;
 
-	final String kbPrefix = ConfigProp.getKbPrefix();
+    final String kbPrefix = ConfigProp.getKbPrefix();
+    
+    public SubjectGenerator(RecordFile file) {
+        super(file);
+    }
 
-	StudyObject obj = null;
-	private int counter = 1; //starting index number
-	private String hasScopeUri = "";    
-	private List<String> scopeUris = new ArrayList<String>();
-	private List<String> spaceScopeUris = new ArrayList<String>();
-	private List<String> timeScopeUris = new ArrayList<String>();
-	private List<String> objectUris = new ArrayList<String>();
+    @Override
+    void initMapping() {
+        mapCol.clear();
+        mapCol.put("subjectID", "CHEAR PID");
+        mapCol.put("pilotNum", "CHEAR Project ID");
+    }
 
-	public SubjectGenerator(RecordFile file) {
-		super(file);
-	}
+    private String getUri(Record rec) {
+        return kbPrefix + "SBJ-" + getOriginalID(rec) + "-" + getPilotNum(rec);
+    }
 
-	@Override
-	void initMapping() {
-		mapCol.clear();
-		mapCol.put("subjectID", "CHEAR PID");
-		mapCol.put("pilotNum", "CHEAR Project ID");
-	}
+    private String getLabel(Record rec) {
+        return "Subject ID " + getOriginalID(rec) + " - " + getPilotNum(rec);
+    }
 
-	private String getUri(Record rec) {
-		return kbPrefix + "SBJ-" + getOriginalID(rec) + "-" + getPilotNum(rec);
-	}
+    private String getOriginalID(Record rec) {
+        return rec.getValueByColumnName(mapCol.get("subjectID"));
+    }
 
-	private String getType() {
-		return "http://semanticscience.org/resource/Human";
-	}
+    private String getPilotNum(Record rec) {
+        return rec.getValueByColumnName(mapCol.get("pilotNum"));
+    }
 
-	private String getLabel(Record rec) {
-		return "Subject ID " + getOriginalID(rec) + " - " + getPilotNum(rec);
-	}
+    private String getStudyUri(Record rec) {
+        return kbPrefix + "STD-" + getPilotNum(rec);
+    }
 
-	private String getOriginalID(Record rec) {
-		return rec.getValueByColumnName(mapCol.get("subjectID"));
-	}
+    private String getCohortUri(Record rec) {
+        return kbPrefix + "CH-" + getPilotNum(rec);
+    }
 
-	private String getPilotNum(Record rec) {
-		return rec.getValueByColumnName(mapCol.get("pilotNum"));
-	}
+    private String getCohortLabel(Record rec) {
+        return "Study Population of " + getPilotNum(rec);
+    }
 
-	private String getStudyUri(Record rec) {
-		return kbPrefix + "STD-" + getPilotNum(rec);
-	}
+    public StudyObject createStudyObject(Record record) throws Exception {
+        StudyObject obj = new StudyObject(getUri(record), "sio:Human", 
+                getOriginalID(record), getLabel(record), 
+                getCohortUri(record), getLabel(record));
+        
+        return obj;
+    }
 
-	private String getCohortUri(Record rec) {
-		return kbPrefix + "CH-" + getPilotNum(rec);
-	}
+    public ObjectCollection createObjectCollection(Record record) throws Exception {
+        ObjectCollection oc = new ObjectCollection(
+                getCohortUri(record),
+                "http://hadatac.org/ont/hasco/SubjectGroup",
+                getCohortLabel(record),
+                getCohortLabel(record),
+                getStudyUri(record));
+        
+        return oc;
+    }
+    
+    @Override
+    HADatAcThing createObject(Record rec, int row_number) throws Exception {
+        return createStudyObject(rec);
+    }
 
-	private String getCohortLabel(Record rec) {
-		return "Study Population of " + getPilotNum(rec);
-	}
+    @Override
+    public void preprocess() throws Exception {
+        if (!records.isEmpty()) {
+            objects.add(createObjectCollection(records.get(0)));
+        }
+    }
 
-	public void createObj(Record record) throws Exception {
-		// insert current state of the OBJ
-		obj = new StudyObject(getUri(record), "sio:Human", 
-				getOriginalID(record), getLabel(record), 
-				getCohortUri(record), getLabel(record), scopeUris);
+    @Override
+    public String getTableName() {
+        return "StudyObject";
+    }
 
-		// insert the new OC content inside of the triplestore regardless of any change -- the previous content has already been deleted
-		obj.save();
-		System.out.println("obj " + getUri(record).toString() + " saved!");
-
-		// update/create new OBJ in LabKey
-		Credential cred = Credential.find();
-		if (null == cred) {
-			System.out.println(Feedback.println(Feedback.WEB, "[ERROR] No LabKey credentials are provided!"));
-			return;
-		}
-		int nRowsAffected = obj.saveToLabKey(cred.getUserName(), cred.getPassword());
-		if (nRowsAffected <= 0) {
-			System.out.println("[ERROR] Failed to insert new OBJ to LabKey!");
-		}
-
-		objectUris.add(getUri(record));
-		System.out.println(objectUris.size());
-	}
-
-	public boolean createOc(Record record) throws Exception {
-		// insert current state of the OC
-		ObjectCollection oc = new ObjectCollection(
-				getCohortUri(record),
-				"http://hadatac.org/ont/hasco/SubjectGroup",
-				getCohortLabel(record),
-				getCohortLabel(record),
-				getStudyUri(record),
-				hasScopeUri,
-				spaceScopeUris,
-				timeScopeUris);
-		oc.setObjectUris(objectUris);
-		oc.save();
-		System.out.println("oc saved!");
-		
-		// update/create new OC in LabKey
-		Credential cred = Credential.find();
-		if (null == cred) {
-			System.out.println(Feedback.println(Feedback.WEB, "[ERROR] No LabKey credentials are provided!"));
-			return false;
-		}
-
-		int nRowsAffected = oc.saveToLabKey(cred.getUserName(), cred.getPassword());
-		if (nRowsAffected <= 0) {
-			System.out.println("Failed to insert new OC to LabKey!\n");
-			return false;
-		}
-		
-		return true;
-	}
-
-	@Override
-	Map<String, Object> createRow(Record rec, int row_number) throws Exception {
-		Map<String, Object> row = new HashMap<String, Object>();
-		row.put("hasURI", getUri(rec));
-		row.put("a", getType());
-		row.put("rdfs:label", getLabel(rec));
-		row.put("hasco:originalID", getOriginalID(rec));
-		row.put("hasco:isSubjectOf", getCohortUri(rec));
-		counter++;
-
-		return row;
-	}
-
-	@Override
-	public void createRows() throws Exception {
-		rows.clear();
-		boolean firstRow = true;
-		for (Record record : records) {
-			if (firstRow) {
-				if (!createOc(record)) {
-					break;
-				}
-				firstRow = false;
-			}
-			createObj(record);
-		}
-	}
-
-	@Override
-	public String getTableName() {
-		return null;
-	}
-
-	@Override
-	public String getErrorMsg(Exception e) {
-		return null;
-	}
+    @Override
+    public String getErrorMsg(Exception e) {
+        return "Error in SubjectGenerator: " + e.getMessage();
+    }
 }

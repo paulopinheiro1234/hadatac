@@ -23,6 +23,7 @@ import org.hadatac.console.controllers.AuthApplication;
 import be.objectify.deadbolt.java.actions.Group;
 import be.objectify.deadbolt.java.actions.Restrict;
 
+
 public class EditOC extends Controller {
 	
 	@Inject
@@ -88,8 +89,6 @@ public class EditOC extends Controller {
 			return badRequest("The submitted form has errors!");
 		}
 
-		//System.out.println("uri: " + data.getNewUri());
-		//System.out.println("type: " + data.getNewType());
 		String newStudyUri = URIUtils.replacePrefixEx(std_uri);
 		String newLabel = data.getNewLabel();
 		String newComment = data.getNewComment();

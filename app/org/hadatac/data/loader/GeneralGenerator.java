@@ -7,7 +7,8 @@ public class GeneralGenerator extends BasicGenerator {
 	
 	private String tableName;
 	
-	public GeneralGenerator(String tableName) {
+	public GeneralGenerator(RecordFile file, String tableName) {
+	    super(file);
 		this.tableName = tableName;
 	}
 	

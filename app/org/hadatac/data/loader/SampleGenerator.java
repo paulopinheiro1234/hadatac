@@ -13,284 +13,221 @@ import org.apache.jena.query.ResultSet;
 import org.apache.jena.query.ResultSetFactory;
 import org.apache.jena.query.ResultSetRewindable;
 import org.apache.jena.rdf.model.Literal;
-import org.hadatac.entity.pojo.Credential;
+import org.hadatac.entity.pojo.HADatAcThing;
 import org.hadatac.entity.pojo.ObjectCollection;
 import org.hadatac.entity.pojo.StudyObject;
 import org.hadatac.utils.Collections;
 import org.hadatac.utils.ConfigProp;
-import org.hadatac.utils.Feedback;
 import org.hadatac.utils.NameSpaces;
 
 
 public class SampleGenerator extends BasicGenerator {
-	final String kbPrefix = ConfigProp.getKbPrefix();
-	private int counter = 1; //starting index number
+    final String kbPrefix = ConfigProp.getKbPrefix();
+    
+    private int counter = 1;
+    private String hasScopeUri = "";    
+    private List<String> scopeUris = new ArrayList<String>();
+    private List<String> spaceScopeUris = new ArrayList<String>();
+    private List<String> timeScopeUris = new ArrayList<String>();
+    private List<String> objectUris = new ArrayList<String>();
 
-	StudyObject obj = null;
+    public SampleGenerator(RecordFile file) {
+        super(file);
+    }
 
-	private String hasScopeUri = "";    
-	private List<String> scopeUris = new ArrayList<String>();
-	private List<String> spaceScopeUris = new ArrayList<String>();
-	private List<String> timeScopeUris = new ArrayList<String>();
-	private List<String> objectUris = new ArrayList<String>();
+    @Override
+    void initMapping() {
+        mapCol.clear();
+        mapCol.put("sampleID", "specimen_id");
+        mapCol.put("studyID", "study_id");
+        mapCol.put("sampleSuffix", "suffix");
+    }
 
-	public SampleGenerator(RecordFile file) {
-		super(file);
-	}
+    private int getSampleCount(String studyID){
+        int count = 0;
+        String sampleCountQuery = NameSpaces.getInstance().printSparqlNameSpaceList() 
+                + " SELECT (count(DISTINCT ?sampleURI) as ?sampleCount) WHERE { \n"
+                + " ?sampleURI hasco:isMemberOf* chear-kb:STD-" + studyID + " . \n"
+                + "}";
+        QueryExecution qexecSample = QueryExecutionFactory.sparqlService(
+                Collections.getCollectionsName(Collections.METADATA_SPARQL), sampleCountQuery);
+        ResultSet sampleResults = qexecSample.execSelect();
+        ResultSetRewindable resultsrwSample = ResultSetFactory.copyResults(sampleResults);
+        qexecSample.close();
+        if (resultsrwSample.hasNext()) {
+            QuerySolution soln = resultsrwSample.next();
+            Literal countLiteral = (Literal) soln.get("sampleCount");
+            if(countLiteral != null){ 
+                count += countLiteral.getInt();
+            }
+        }
 
-	@Override
-	void initMapping() {
-		mapCol.clear();
-		mapCol.put("sampleID", "specimen_id");
-		mapCol.put("studyID", "study_id");
-		mapCol.put("sampleSuffix", "suffix");
-	}
+        return count;
+    }
 
-	@Override
-	Map<String, Object> createRow(Record rec, int rownumber) throws Exception {
-		Map<String, Object> row = new HashMap<String, Object>();
-		row.put("hasURI", getUri(rec));
-		row.put("a", getType(rec));
-		row.put("rdfs:label", getLabel(rec));
-		row.put("hasco:originalID", getOriginalID(rec));
-		row.put("hasco:isSampleOf", getSubjectUri(rec));
-		row.put("hasco:isObjectOf", getCollectionUri(rec));
-		row.put("rdfs:comment", getComment(rec));
-		row.put("hasco:hasSamplingMethod", getSamplingMethod(rec));
-		row.put("hasco:hasSamplingVolume", getSamplingVolume(rec));
-		row.put("hasco:hasSamplingVolumeUnit", getSamplingVolumeUnit(rec));
-		row.put("hasco:hasStorageTemperature", getStorageTemperature(rec));
-		row.put("hasco:hasStorageTemperatureUnit", getStorageTemperatureUnit());
-		row.put("hasco:hasNumFreezeThaw", getNumFreezeThaw(rec));
-		counter++;
+    private String getUri(Record rec) {
+        return kbPrefix + "SPL-" + String.format("%04d", counter + getSampleCount(rec.getValueByColumnName(mapCol.get("studyID")))) 
+        + "-" + rec.getValueByColumnName(mapCol.get("studyID")); //  + "-" + getSampleSuffix()
+    }
 
-		return row;
-	}
+    private String getType(Record rec) {
+        if(!rec.getValueByColumnName(mapCol.get("sampleType")).equalsIgnoreCase("NULL")){
+            return rec.getValueByColumnName(mapCol.get("sampleType"));
+        } else {
+            return "sio:Sample";
+        }
+    }
 
-	private int getSampleCount(String studyID){
-		int count = 0;
-		String sampleCountQuery = NameSpaces.getInstance().printSparqlNameSpaceList() 
-				+ " SELECT (count(DISTINCT ?sampleURI) as ?sampleCount) WHERE { "
-				+ " ?sampleURI hasco:isObjectOf ?SC . "
-				+ " ?SC hasco:isSampleCollectionOf chear-kb:STD-" + studyID + " . "
-				+ "}";
-		QueryExecution qexecSample = QueryExecutionFactory.sparqlService(
-				Collections.getCollectionsName(Collections.METADATA_SPARQL), sampleCountQuery);
-		ResultSet sampleResults = qexecSample.execSelect();
-		ResultSetRewindable resultsrwSample = ResultSetFactory.copyResults(sampleResults);
-		qexecSample.close();
-		if (resultsrwSample.hasNext()) {
-			QuerySolution soln = resultsrwSample.next();
-			Literal countLiteral = (Literal) soln.get("sampleCount");
-			if(countLiteral != null){ 
-				count += countLiteral.getInt();
-			}
-		}
+    private String getLabel(Record rec) {
+        return "SID " + String.format("%04d", counter + getSampleCount(rec.getValueByColumnName(mapCol.get("studyID")))) + " - " 
+                + rec.getValueByColumnName(mapCol.get("studyID")) + " " + getSampleSuffix(rec);
+    }
 
-		return count;
-	}
+    private String getOriginalID(Record rec) {
+        if(!rec.getValueByColumnName(mapCol.get("sampleID")).equalsIgnoreCase("NULL")){
+            return rec.getValueByColumnName(mapCol.get("sampleID"));
+        } else {
+            return "";
+        }
+    }
 
-	private String getUri(Record rec) {
-		return kbPrefix + "SPL-" + String.format("%04d", counter + getSampleCount(rec.getValueByColumnName(mapCol.get("studyID")))) 
-		+ "-" + rec.getValueByColumnName(mapCol.get("studyID")); //  + "-" + getSampleSuffix()
-	}
+    private String getSubjectUri(Record rec) {
+        if (rec.getValueByColumnName(mapCol.get("subjectID")).equalsIgnoreCase("NULL")) {
+            return "";
+        }
 
-	private String getType(Record rec) {
-		if(!rec.getValueByColumnName(mapCol.get("sampleType")).equalsIgnoreCase("NULL")){
-			return rec.getValueByColumnName(mapCol.get("sampleType"));
-		} else {
-			return "sio:Sample";
-		}
-	}
+        String subject = "";
+        String subjectQuery = NameSpaces.getInstance().printSparqlNameSpaceList() 
+                + " SELECT ?subjectURI WHERE { "
+                + " ?subjectURI hasco:originalID \"" + rec.getValueByColumnName(mapCol.get("subjectID")) + "\" . }";
 
-	private String getLabel(Record rec) {
-		return "SID " + String.format("%04d", counter + getSampleCount(rec.getValueByColumnName(mapCol.get("studyID")))) + " - " 
-				+ rec.getValueByColumnName(mapCol.get("studyID")) + " " + getSampleSuffix(rec);
-	}
+        QueryExecution qexecSubject = QueryExecutionFactory.sparqlService(
+                Collections.getCollectionsName(Collections.METADATA_SPARQL), subjectQuery);
+        ResultSet subjectResults = qexecSubject.execSelect();
+        ResultSetRewindable resultsrwSubject = ResultSetFactory.copyResults(subjectResults);
+        qexecSubject.close();
+        if (resultsrwSubject.hasNext()) {
+            QuerySolution soln = resultsrwSubject.next();
+            subject = soln.get("subjectURI").toString();
+        }
 
-	private String getOriginalID(Record rec) {
-		if(!rec.getValueByColumnName(mapCol.get("sampleID")).equalsIgnoreCase("NULL")){
-			return rec.getValueByColumnName(mapCol.get("sampleID"));
-		} else {
-			return "";
-		}
-	}
+        return subject;
+    }
 
-	private String getSubjectUri(Record rec) {
-		if (rec.getValueByColumnName(mapCol.get("subjectID")).equalsIgnoreCase("NULL")) {
-			return "";
-		}
+    private String getComment(Record rec) {
+        return "Sample " + String.format("%04d", counter + getSampleCount(rec.getValueByColumnName(mapCol.get("studyID")))) 
+        + " for " + rec.getValueByColumnName(mapCol.get("studyID")) + " " + getSampleSuffix(rec);
+    }
 
-		String subject = "";
-		String subjectQuery = NameSpaces.getInstance().printSparqlNameSpaceList() 
-				+ " SELECT ?subjectURI WHERE { "
-				+ " ?subjectURI hasco:originalID \"" + rec.getValueByColumnName(mapCol.get("subjectID")) + "\" . }";
+    private String getSamplingMethod(Record rec) {
+        if(!rec.getValueByColumnName(mapCol.get("samplingMethod")).equalsIgnoreCase("NULL")){
+            return rec.getValueByColumnName(mapCol.get("samplingMethod"));
+        } else {
+            return "";
+        }
+    }
 
-		QueryExecution qexecSubject = QueryExecutionFactory.sparqlService(
-				Collections.getCollectionsName(Collections.METADATA_SPARQL), subjectQuery);
-		ResultSet subjectResults = qexecSubject.execSelect();
-		ResultSetRewindable resultsrwSubject = ResultSetFactory.copyResults(subjectResults);
-		qexecSubject.close();
-		if (resultsrwSubject.hasNext()) {
-			QuerySolution soln = resultsrwSubject.next();
-			subject = soln.get("subjectURI").toString();
-		}
+    private String getSamplingVolume(Record rec) {
+        if(!rec.getValueByColumnName(mapCol.get("samplingVol")).equalsIgnoreCase("NULL")){
+            return rec.getValueByColumnName(mapCol.get("samplingVol"));
+        } else {
+            return "";
+        }
+    }
 
-		return subject;
-	}
+    private String getSamplingVolumeUnit(Record rec) {
+        if(!rec.getValueByColumnName(mapCol.get("samplingVolUnit")).equalsIgnoreCase("NULL")){
+            return rec.getValueByColumnName(mapCol.get("samplingVolUnit"));
+        } else {
+            return "obo:UO_0000095"; // default volume unit
+        }
+    }
 
-	private String getComment(Record rec) {
-		return "Sample " + String.format("%04d", counter + getSampleCount(rec.getValueByColumnName(mapCol.get("studyID")))) 
-		+ " for " + rec.getValueByColumnName(mapCol.get("studyID")) + " " + getSampleSuffix(rec);
-	}
+    private String getStorageTemperature(Record rec) {
+        if(!rec.getValueByColumnName(mapCol.get("storageTemp")).equalsIgnoreCase("NULL")){
+            return rec.getValueByColumnName(mapCol.get("storageTemp"));
+        } else {
+            return "";
+        }
+    }
 
-	private String getSamplingMethod(Record rec) {
-		if(!rec.getValueByColumnName(mapCol.get("samplingMethod")).equalsIgnoreCase("NULL")){
-			return rec.getValueByColumnName(mapCol.get("samplingMethod"));
-		} else {
-			return "";
-		}
-	}
+    private String getStorageTemperatureUnit() {
+        // defaulting to Celsius since SID file does not contain temp unit
+        return "obo:UO_0000027";
+    }
 
-	private String getSamplingVolume(Record rec) {
-		if(!rec.getValueByColumnName(mapCol.get("samplingVol")).equalsIgnoreCase("NULL")){
-			return rec.getValueByColumnName(mapCol.get("samplingVol"));
-		} else {
-			return "";
-		}
-	}
+    private String getNumFreezeThaw(Record rec) {
+        if(!rec.getValueByColumnName(mapCol.get("FTcount")).equalsIgnoreCase("NULL")){
+            return rec.getValueByColumnName("FTcount");
+        } else {
+            return "";
+        }
+    }
 
-	private String getSamplingVolumeUnit(Record rec) {
-		if(!rec.getValueByColumnName(mapCol.get("samplingVolUnit")).equalsIgnoreCase("NULL")){
-			return rec.getValueByColumnName(mapCol.get("samplingVolUnit"));
-		} else {
-			return "obo:UO_0000095"; // default volume unit
-		}
-	}
+    private String getSampleSuffix(Record rec) {
+        if(!rec.getValueByColumnName(mapCol.get("sampleSuffix")).equalsIgnoreCase("NULL")){
+            return rec.getValueByColumnName(mapCol.get("sampleSuffix"));
+        } else {
+            return "";
+        }
+    }
 
-	private String getStorageTemperature(Record rec) {
-		if(!rec.getValueByColumnName(mapCol.get("storageTemp")).equalsIgnoreCase("NULL")){
-			return rec.getValueByColumnName(mapCol.get("storageTemp"));
-		} else {
-			return "";
-		}
-	}
+    private String getStudyUri(Record rec) {
+        return kbPrefix + "STD-" + rec.getValueByColumnName(mapCol.get("studyID"));
+    }
 
-	private String getStorageTemperatureUnit() {
-		// defaulting to Celsius since SID file does not contain temp unit
-		return "obo:UO_0000027";
-	}
+    private String getCollectionUri(Record rec) {
+        return kbPrefix + "SC-" + rec.getValueByColumnName(mapCol.get("studyID"));
+    }
 
-	private String getNumFreezeThaw(Record rec) {
-		if(!rec.getValueByColumnName(mapCol.get("FTcount")).equalsIgnoreCase("NULL")){
-			return rec.getValueByColumnName("FTcount");
-		} else {
-			return "";
-		}
-	}
+    private String getCollectionLabel(Record rec) {
+        return "Sample Collection of Study " + rec.getValueByColumnName(mapCol.get("studyID"));
+    }
 
-	private String getSampleSuffix(Record rec) {
-		if(!rec.getValueByColumnName(mapCol.get("sampleSuffix")).equalsIgnoreCase("NULL")){
-			return rec.getValueByColumnName(mapCol.get("sampleSuffix"));
-		} else {
-			return "";
-		}
-	}
+    public StudyObject createStudyObject(Record record) throws Exception {
+        StudyObject obj = new StudyObject(getUri(record), "sio:Sample", getOriginalID(record), 
+                getLabel(record), getCollectionUri(record), getLabel(record), scopeUris);
 
-	private String getStudyUri(Record rec) {
-		return kbPrefix + "STD-" + rec.getValueByColumnName(mapCol.get("studyID"));
-	}
+        objectUris.add(getUri(record));
+        
+        return obj;
+    }
 
-	private String getCollectionUri(Record rec) {
-		return kbPrefix + "SC-" + rec.getValueByColumnName(mapCol.get("studyID"));
-	}
+    public ObjectCollection createObjectCollection(Record record) throws Exception {
+        ObjectCollection oc = new ObjectCollection(
+                getCollectionUri(record),
+                "http://hadatac.org/ont/hasco/SampleCollection",
+                getCollectionLabel(record),
+                getCollectionLabel(record),
+                getStudyUri(record),
+                hasScopeUri,
+                spaceScopeUris,
+                timeScopeUris);
 
-	private String getCollectionLabel(Record rec) {
-		return "Sample Collection of Study " + rec.getValueByColumnName(mapCol.get("studyID"));
-	}
+        oc.setObjectUris(objectUris);
 
-	public void createObj(Record record) throws Exception {
-		// insert current state of the OBJ
-		obj = new StudyObject(getUri(record), "sio:Sample", getOriginalID(record), 
-				getLabel(record), getCollectionUri(record), getLabel(record), scopeUris);
+        return oc;
+    }
+    
+    @Override
+    HADatAcThing createObject(Record rec, int row_number) throws Exception {
+        return createStudyObject(rec);
+    }
+    
+    @Override
+    public void preprocess() throws Exception {
+        if (!records.isEmpty()) {
+            objects.add(createObjectCollection(records.get(0)));
+        }
+    }
 
-		// insert the new OC content inside of the triplestore regardless of any change -- the previous content has already been deleted
-		obj.save();
-		counter++;
-		System.out.println("obj " + getUri(record).toString() + " saved!");
+    @Override
+    public String getTableName() {
+        return "StudyObject";
+    }
 
-		// update/create new OBJ in LabKey
-		Credential cred = Credential.find();
-		if (null == cred) {
-			System.out.println(Feedback.println(Feedback.WEB, "[ERROR] No LabKey credentials are provided!"));
-			return;
-		}
-		int nRowsAffected = obj.saveToLabKey(cred.getUserName(), cred.getPassword());
-		if (nRowsAffected <= 0) {
-			System.out.println("[ERROR] Failed to insert new OBJ to LabKey!");
-		}
-
-		objectUris.add(getUri(record));
-		System.out.println(objectUris.size());
-	}
-
-	public boolean createOc(Record record) throws Exception {
-		// insert current state of the OC
-		ObjectCollection oc = new ObjectCollection(
-				getCollectionUri(record),
-				"http://hadatac.org/ont/hasco/SampleCollection",
-				getCollectionLabel(record),
-				getCollectionLabel(record),
-				getStudyUri(record),
-				hasScopeUri,
-				spaceScopeUris,
-				timeScopeUris);
-
-		oc.setObjectUris(objectUris);
-
-		// insert the new OC content inside of the triplestore regardless of any change -- the previous content has already been deleted
-		oc.save();
-		System.out.println("oc saved!");
-
-		// update/create new OC in LabKey
-		Credential cred = Credential.find();
-		if (null == cred) {
-			System.out.println(Feedback.println(Feedback.WEB, "[ERROR] No LabKey credentials are provided!"));
-			return false;
-		}
-		int nRowsAffected = oc.saveToLabKey(cred.getUserName(), cred.getPassword());
-		System.out.println("nRowsAffected : " + nRowsAffected);
-		if (nRowsAffected <= 0) {
-			System.out.println("Failed to insert new OC to LabKey!\n");
-			return false;
-		}
-
-		return true;
-	}
-	
-	@Override
-	public void createRows() throws Exception {
-		rows.clear();
-		boolean firstRow = true;
-		for (Record record : records) {
-			if (firstRow) {
-				if (!createOc(record)) {
-					System.out.println("[ERROR] Failed to create sample collection!");
-					break;
-				}
-				firstRow = false;
-			}
-			createObj(record);
-		}
-	}
-
-	@Override
-	public String getTableName() {
-		return "";
-	}
-
-	@Override
-	public String getErrorMsg(Exception e) {
-		return "";
-	}
+    @Override
+    public String getErrorMsg(Exception e) {
+        return "Error in SampleGenerator: " + e.getMessage();
+    }
 }

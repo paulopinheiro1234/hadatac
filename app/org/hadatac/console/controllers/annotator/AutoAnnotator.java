@@ -363,7 +363,7 @@ public class AutoAnnotator extends Controller {
         } else if (file_name.startsWith("MAP")) {
             chain = AnnotationWorker.annotateMapFile(recordFile);
         } else if (file_name.startsWith("ACQ")) {
-            chain = AnnotationWorker.annotateACQFile(recordFile);
+            chain = AnnotationWorker.annotateACQFile(recordFile, false);
         } else if (file_name.startsWith("SDD")) {
             chain = AnnotationWorker.annotateDataAcquisitionSchemaFile(recordFile);
         }

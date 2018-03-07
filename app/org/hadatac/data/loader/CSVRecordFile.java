@@ -11,6 +11,7 @@ import java.util.stream.Collectors;
 
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVRecord;
+import org.apache.jena.sparql.function.library.print;
 
 public class CSVRecordFile implements RecordFile {
 

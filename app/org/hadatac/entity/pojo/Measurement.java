@@ -12,7 +12,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.function.BiConsumer;
 import java.util.stream.Collectors;
 
 import org.apache.commons.io.FileUtils;
@@ -32,7 +31,6 @@ import org.apache.solr.client.solrj.response.UpdateResponse;
 import org.apache.solr.client.solrj.beans.Field;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
-import org.apache.solr.common.util.NamedList;
 import org.hadatac.console.controllers.dataacquisitionsearch.FacetTree;
 import org.hadatac.console.http.SolrUtils;
 import org.hadatac.console.models.Facet;
@@ -333,18 +331,19 @@ public class Measurement extends HADatAcThing {
     }
 
     @Override
-    public int saveToSolr() {
+    public boolean saveToSolr() {
         SolrClient solr = new HttpSolrClient.Builder(
                 ConfigFactory.load().getString("hadatac.solr.data") 
                 + Collections.DATA_ACQUISITION).build();
         try {
-            int status = solr.addBean(this).getStatus();
+            solr.addBean(this).getStatus();
             solr.commit();
             solr.close();
-            return status;
+            
+            return true;
         } catch (IOException | SolrServerException e) {
             System.out.println("[ERROR] Measurement.save - e.Message: " + e.getMessage());
-            return -1;
+            return false;
         }
     }
 

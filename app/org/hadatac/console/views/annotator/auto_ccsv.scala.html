@@ -16,11 +16,6 @@
 	<script type="text/javascript" src="@controllers.routes.Assets.versioned("javascripts/resumable.js")"></script>
 	
 	<script type="text/javascript">
-    function checkform() {
-    	if(document.getElementById('upload').value != "") {
-             document.getElementById('submitMessage').style.display = 'inline';
-	    }
-    }
     </script>
     
     <div class="container-fluid">
@@ -36,17 +31,6 @@
 	<a href="@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.setLabKeyCredentials()" class="btn btn-primary" role="button">Set LabKey Credentials for Background Process</a>
 	}
 	<a href="@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.downloadTemplates()" class="btn btn-primary" role="button">Download Templates</a>
-	
-	@*<br><br>
-    <div id="rcorners" class="col-md-3">
-    	<h4>CSV File Uploader</h4>
-    	<form name="fileUploadForm" id='upload' method="POST" enctype="multipart/form-data" action="@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.uploadDataFile("load")" onchange="checkform()">
-        	<input type="file" multiple="multiple" class="btn btn-info" name="pic"> 
-        	<div id='submitMessage'  style="display:none;" >
-        	<br>Press <input type="submit" class="btn-sm btn-success" value="Upload"> to upload the csv file to the unprocessed files. 
-        	</div>
-        </form>
-    </div>*@
     
 	<div id="frame">
     <div class="resumable-error">

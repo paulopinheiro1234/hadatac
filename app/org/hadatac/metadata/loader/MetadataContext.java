@@ -102,8 +102,8 @@ public class MetadataContext implements RDFContext {
         message += Feedback.println(mode,"   Triples before [clean]: " + totalTriples());
         message += Feedback.println(mode, " ");
         message += Feedback.println(mode, "      Deleted the following triples: ");
-        Study studyObj = new Study();
-        Model model = studyObj.findModel(study);
+        
+        Model model = Study.findModel(study);
         StmtIterator iter = model.listStatements();
 		while (iter.hasNext()) {
 			Statement stmt = iter.nextStatement();
@@ -203,7 +203,7 @@ public class MetadataContext implements RDFContext {
 		// Sample Collections
 		"  	?subUri rdfs:subClassOf* hasco:Study . " + 
 		"  	?study a ?subUri . " +
-		"   ?s hasco:isSampleCollectionOf ?study . " + 
+		"   ?s hasco:isMemberOf ?study . " + 
 		"   ?s ?p ?o . " +
 		"  FILTER (?study = " + study + ") " +
 		"    } " +
@@ -212,7 +212,7 @@ public class MetadataContext implements RDFContext {
 		// Other Sample Collections
 		"  	?subUri rdfs:subClassOf* hasco:Study . " + 
 		"  	?study a ?subUri . " +
-		"   ?s hasco:isSampleCollectionOf ?study . " + 
+		"   ?s hasco:isMemberOf ?study . " + 
 		"   ?s ?p ?o . " +
 		"  	FILTER (?study != " + study + ") " +
 		"    } " +
@@ -223,8 +223,7 @@ public class MetadataContext implements RDFContext {
 		// Sample Collection Samples
 		"  	?subUri rdfs:subClassOf* hasco:Study . " + 
 		"  	?study a ?subUri . " +
-		"   ?sc hasco:isSampleCollectionOf ?study . " + 
-		"   ?s hasco:isObjectOf ?sc .  " +
+		"   ?s hasco:isMemberOf* ?study . " + 
 		"   ?s ?p ?o . " +
 		"  FILTER (?study = " + study + ") " +
 		"    } " +
@@ -233,8 +232,7 @@ public class MetadataContext implements RDFContext {
 		// Other Sample Collection Samples
 		"  	?subUri rdfs:subClassOf* hasco:Study . " + 
 		"  	?study a ?subUri . " +
-		"   ?sc hasco:isSampleCollectionOf ?study . " + 
-		"   ?s hasco:isObjectOf ?sc .  " +
+		"   ?s hasco:isMemberOf* ?study . " + 
 		"   ?s ?p ?o . " +
 		"  	FILTER (?study != " + study + ") " +
 		"    } " +

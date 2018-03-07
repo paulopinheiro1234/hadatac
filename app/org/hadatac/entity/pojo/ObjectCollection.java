@@ -53,7 +53,7 @@ public class ObjectCollection extends HADatAcThing {
     private String hasScopeUri = "";    
     private List<String> spaceScopeUris = null;
     private List<String> timeScopeUris = null;
-    private List<String> objectUris = null;
+    private List<String> objectUris = new ArrayList<String>();
 
     public ObjectCollection() {
         this.uri = "";
@@ -64,7 +64,6 @@ public class ObjectCollection extends HADatAcThing {
         this.hasScopeUri = "";
         this.spaceScopeUris = new ArrayList<String>();
         this.timeScopeUris = new ArrayList<String>();
-        this.objectUris = new ArrayList<String>();
     }
 
     public ObjectCollection(String uri,
@@ -83,7 +82,21 @@ public class ObjectCollection extends HADatAcThing {
         this.setHasScopeUri(hasScopeUri);
         this.setSpaceScopeUris(spaceScopeUris);
         this.setTimeScopeUris(timeScopeUris);
-        this.objectUris = new ArrayList<String>();
+    }
+
+    public ObjectCollection(String uri,
+            String typeUri,
+            String label,
+            String comment,
+            String studyUri) {
+        this.setUri(uri);
+        this.setTypeUri(typeUri);
+        this.setLabel(label);
+        this.setComment(comment);
+        this.setStudyUri(studyUri);
+        this.setHasScopeUri("");
+        this.setSpaceScopeUris(spaceScopeUris);
+        this.setTimeScopeUris(timeScopeUris);
     }
 
     public ObjectCollectionType getObjectCollectionType() {
@@ -530,7 +543,8 @@ public class ObjectCollection extends HADatAcThing {
         processor.execute();
     }
 
-    public void save() {
+    @Override
+    public boolean saveToTripleStore() {
         String insert = "";
 
         String oc_uri = "";
@@ -582,7 +596,10 @@ public class ObjectCollection extends HADatAcThing {
         UpdateProcessor processor = UpdateExecutionFactory.createRemote(
                 request, Collections.getCollectionsName(Collections.METADATA_UPDATE));
         processor.execute();
+
         saveObjectUris(oc_uri);
+        
+        return true;
     }
 
     @Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
@@ -631,7 +648,8 @@ public class ObjectCollection extends HADatAcThing {
         }
     }
 
-    public void delete() {
+    @Override
+    public void deleteFromTripleStore() {
         String query = "";
 
         String oc_uri = "";
@@ -648,7 +666,8 @@ public class ObjectCollection extends HADatAcThing {
         query += LINE_LAST;
 
         UpdateRequest request = UpdateFactory.create(query);
-        UpdateProcessor processor = UpdateExecutionFactory.createRemote(request, Collections.getCollectionsName(Collections.METADATA_UPDATE));
+        UpdateProcessor processor = UpdateExecutionFactory.createRemote(
+                request, Collections.getCollectionsName(Collections.METADATA_UPDATE));
         processor.execute();
     }
 }

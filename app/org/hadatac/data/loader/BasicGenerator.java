@@ -44,8 +44,6 @@ public abstract class BasicGenerator {
     protected HashMap<String, String> mapCol = new HashMap<String, String>();
     protected String fileName = "";
 
-    public BasicGenerator() {}
-
     public BasicGenerator(RecordFile file) {
         records = file.getRecords();
         fileName = file.getFile().getName();
@@ -77,11 +75,11 @@ public abstract class BasicGenerator {
     public void preprocess() throws Exception {}
     public void postprocess() throws Exception {}
 
-    public void createRows() throws Exception {
+    public void createRows() throws Exception {        
         if (records == null) {
             return;
         }
-        
+
         int row_number = 0;
         for (Record record : records) {
             Map<String, Object> tempRow = createRow(record, ++row_number);
@@ -95,7 +93,7 @@ public abstract class BasicGenerator {
         if (records == null) {
             return;
         }
-        
+
         int row_number = 0;
         for (Record record : records) {
             HADatAcThing obj = createObject(record, ++row_number);
@@ -225,9 +223,12 @@ public abstract class BasicGenerator {
         Model model = createModel(rows);
         accessor.add(model);
 
-        AnnotationLog log = AnnotationLog.create(fileName);
-        log.addline(Feedback.println(Feedback.WEB, String.format("[OK] %d triple(s) have been committed to triple store", model.size())));
-        log.save();
+        if (model.size() > 0) {
+            AnnotationLog log = AnnotationLog.create(fileName);
+            log.addline(Feedback.println(Feedback.WEB, 
+                    String.format("[OK] %d triple(s) have been committed to triple store", model.size())));
+            log.save();
+        }
 
         return true;
     }
@@ -238,22 +239,50 @@ public abstract class BasicGenerator {
             throw new Exception("[ERROR] No LabKey credentials are provided!");
         }
 
+        int count = 0;
         for (HADatAcThing obj : objects) {
-            obj.saveToLabKey(cred.getUserName(), cred.getPassword());
+            count += obj.saveToLabKey(cred.getUserName(), cred.getPassword());
+        }
+
+        if (count > 0) {
+            AnnotationLog log = AnnotationLog.create(fileName);
+            log.addline(Feedback.println(Feedback.WEB, 
+                    String.format("[OK] %d object(s) have been committed to LabKey", count)));
+            log.save();
         }
     }
 
     public boolean commitObjectsToTripleStore(List<HADatAcThing> objects) {
+        int count = 0;
         for (HADatAcThing obj : objects) {
-            obj.saveToTripleStore();
+            if (obj.saveToTripleStore()) {
+                count++;
+            }
+        }
+
+        if (count > 0) {
+            AnnotationLog log = AnnotationLog.create(fileName);
+            log.addline(Feedback.println(Feedback.WEB, 
+                    String.format("[OK] %d object(s) have been committed to triple store", count)));
+            log.save();
         }
 
         return true;
     }
-    
+
     public boolean commitObjectsToSolr(List<HADatAcThing> objects) {
+        int count = 0;
         for (HADatAcThing obj : objects) {
-            obj.saveToSolr();
+            if (obj.saveToSolr()) {
+                count++;
+            }
+        }
+
+        if (count > 0) {
+            AnnotationLog log = AnnotationLog.create(fileName);
+            log.addline(Feedback.println(Feedback.WEB, 
+                    String.format("[OK] %d object(s) have been committed to solr", count)));
+            log.save();
         }
 
         return true;
@@ -328,7 +357,7 @@ public abstract class BasicGenerator {
 
         return true;
     }
-    
+
     public boolean deleteObjectsFromSolr(List<HADatAcThing> objects) throws Exception {
         for (HADatAcThing obj : objects) {
             obj.deleteFromSolr();

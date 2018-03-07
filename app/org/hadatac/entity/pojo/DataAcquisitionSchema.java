@@ -521,21 +521,22 @@ public class DataAcquisitionSchema extends HADatAcThing {
 	
 	public static Map<String, List<String>> findIdUriMappings(String studyUri) {
 		System.out.println("findIdUriMappings is called!");
+		
 		Map<String, List<String>> mapIdUriMappings = new HashMap<String, List<String>>();
 		String queryString = NameSpaces.getInstance().printSparqlNameSpaceList()
-				+ " SELECT ?subj_or_sample ?id ?obj ?subj_id WHERE { "
-				+ " { "
-				+ "		?subj_or_sample a sio:Human . "
-				+ " 	?subj_or_sample hasco:originalID ?id . "
-				+ " 	?subj_or_sample hasco:isMemberOf* <" + studyUri + "> . "						
-				+ " } UNION { "
-				+ "     ?subj_or_sample a sio:Sample . "
-				+ " 	?subj_or_sample hasco:originalID ?id . "
-				+ " 	?subj_or_sample hasco:isMemberOf* <" + studyUri + "> . " 
-				+ " 	?subj_or_sample hasco:hasObjectScope ?obj . "
-				+ " 	?obj hasco:originalID ?subj_id . "
-				+ " }"
-				+ " }";
+				+ " SELECT ?subj_or_sample ?id ?obj ?subj_id WHERE { \n"
+				+ " { \n"
+				+ "		?subj_or_sample a sio:Human . \n"
+				+ " 	?subj_or_sample hasco:originalID ?id . \n"
+				+ " 	?subj_or_sample hasco:isMemberOf* <" + studyUri + "> . \n"
+				+ " } UNION { \n"
+				+ "     ?subj_or_sample a sio:Sample . \n"
+				+ " 	?subj_or_sample hasco:originalID ?id . \n"
+				+ " 	?subj_or_sample hasco:isMemberOf* <" + studyUri + "> . \n"
+				+ " 	?subj_or_sample hasco:hasObjectScope ?obj . \n"
+				+ " 	?obj hasco:originalID ?subj_id . \n"
+				+ " } \n"
+				+ " } \n";
 
 		Query query = QueryFactory.create(queryString);
 		QueryExecution qexec = QueryExecutionFactory.sparqlService(
