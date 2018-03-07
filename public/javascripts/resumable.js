@@ -456,7 +456,7 @@
             // Delay 3 second and refresh current page
             setTimeout(function(){ 
             	location.reload(); 
-            }, 3000);
+            }, 20000);
           }
           break;
         case 'retry':
