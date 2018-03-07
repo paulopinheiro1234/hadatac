@@ -87,7 +87,7 @@ public class AttributeInstance extends HADatAcThing implements Comparable<Attrib
                     + Collections.DATA_ACQUISITION).build();
             QueryResponse queryResponse = solr.query(query, SolrRequest.METHOD.POST);
             solr.close();
-            Pivot pivot = Pivot.parseQueryResponse(queryResponse);
+            Pivot pivot = Pivot.parseQueryResponse(queryResponse);            
             return parsePivot(pivot, facet);
         } catch (Exception e) {
             System.out.println("[ERROR] AttributeInstance.getTargetFacets() - Exception message: " + e.getMessage());

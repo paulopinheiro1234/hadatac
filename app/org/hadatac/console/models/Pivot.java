@@ -7,8 +7,9 @@ import java.util.function.BiConsumer;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.util.NamedList;
 
+import play.libs.Json;
+
 public class Pivot {
-    public Pivot parent;
     public List<Pivot> children;
 
     public String field;
@@ -17,20 +18,11 @@ public class Pivot {
     public int count;
 
     public Pivot() {
-        parent = null;
         children = new ArrayList<Pivot>();
     }
 
     public void addChild(Pivot child) {
-        child.parent = this;
         children.add(child);
-    }
-
-    public void setNullParent() {
-        parent = null;
-        for (Pivot child : children) {
-            child.setNullParent();
-        }
     }
 
     public int recomputeStats() {
@@ -101,5 +93,10 @@ public class Pivot {
         });
 
         return pivot;
+    }
+    
+    @Override
+    public String toString() {
+        return Json.toJson(this).toString();
     }
 }

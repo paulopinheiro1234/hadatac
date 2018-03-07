@@ -637,7 +637,6 @@ public class Measurement extends HADatAcThing {
         Pivot pivot = new Pivot();
         fTree.retrieveFacetData(0, facet, facetHandler, pivot);
         pivot.recomputeStats();
-        pivot.setNullParent();
 
         return pivot;
     }
