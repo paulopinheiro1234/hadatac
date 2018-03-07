@@ -14,7 +14,7 @@ import org.apache.solr.client.solrj.response.QueryResponse;
 import org.hadatac.console.models.Facet;
 import org.hadatac.console.models.FacetHandler;
 import org.hadatac.console.models.Pivot;
-import org.hadatac.utils.Collections;
+import org.hadatac.utils.CollectionUtil;
 
 import com.typesafe.config.ConfigFactory;
 
@@ -57,7 +57,7 @@ public class EntityInstance extends HADatAcThing implements Comparable<EntityIns
         try {
             SolrClient solr = new HttpSolrClient.Builder(
                     ConfigFactory.load().getString("hadatac.solr.data") 
-                    + Collections.DATA_ACQUISITION).build();
+                    + CollectionUtil.DATA_ACQUISITION).build();
             QueryResponse queryResponse = solr.query(query, SolrRequest.METHOD.POST);
             solr.close();
             Pivot pivot = Pivot.parseQueryResponse(queryResponse);

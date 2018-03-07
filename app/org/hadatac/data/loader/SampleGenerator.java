@@ -16,7 +16,7 @@ import org.apache.jena.rdf.model.Literal;
 import org.hadatac.entity.pojo.HADatAcThing;
 import org.hadatac.entity.pojo.ObjectCollection;
 import org.hadatac.entity.pojo.StudyObject;
-import org.hadatac.utils.Collections;
+import org.hadatac.utils.CollectionUtil;
 import org.hadatac.utils.ConfigProp;
 import org.hadatac.utils.NameSpaces;
 
@@ -50,7 +50,7 @@ public class SampleGenerator extends BasicGenerator {
                 + " ?sampleURI hasco:isMemberOf* chear-kb:STD-" + studyID + " . \n"
                 + "}";
         QueryExecution qexecSample = QueryExecutionFactory.sparqlService(
-                Collections.getCollectionsName(Collections.METADATA_SPARQL), sampleCountQuery);
+                CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), sampleCountQuery);
         ResultSet sampleResults = qexecSample.execSelect();
         ResultSetRewindable resultsrwSample = ResultSetFactory.copyResults(sampleResults);
         qexecSample.close();
@@ -102,7 +102,7 @@ public class SampleGenerator extends BasicGenerator {
                 + " ?subjectURI hasco:originalID \"" + rec.getValueByColumnName(mapCol.get("subjectID")) + "\" . }";
 
         QueryExecution qexecSubject = QueryExecutionFactory.sparqlService(
-                Collections.getCollectionsName(Collections.METADATA_SPARQL), subjectQuery);
+                CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), subjectQuery);
         ResultSet subjectResults = qexecSubject.execSelect();
         ResultSetRewindable resultsrwSubject = ResultSetFactory.copyResults(subjectResults);
         qexecSubject.close();

@@ -29,7 +29,7 @@ import org.hadatac.console.controllers.AuthApplication;
 import org.hadatac.console.controllers.triplestore.routes;
 import org.hadatac.metadata.loader.LabkeyDataHandler;
 import org.hadatac.metadata.loader.URIUtils;
-import org.hadatac.utils.Collections;
+import org.hadatac.utils.CollectionUtil;
 import org.hadatac.utils.ConfigProp;
 import org.hadatac.utils.NameSpaces;
 import org.hadatac.utils.State;
@@ -217,7 +217,7 @@ public class Deployment {
         insert += LINE_LAST;
         UpdateRequest request = UpdateFactory.create(insert);
         UpdateProcessor processor = UpdateExecutionFactory.createRemote(
-                request, Collections.getCollectionsName(Collections.METADATA_UPDATE));
+                request, CollectionUtil.getCollectionsName(CollectionUtil.METADATA_UPDATE));
         processor.execute();
     }
 
@@ -230,7 +230,7 @@ public class Deployment {
             insert += END_TIME_PREDICATE + "\"" + this.getEndedAt() + TIME_XMLS + "  ";
             insert += LINE_LAST;
             UpdateRequest request = UpdateFactory.create(insert);
-            UpdateProcessor processor = UpdateExecutionFactory.createRemote(request,Collections.getCollectionsName(Collections.METADATA_UPDATE)); 
+            UpdateProcessor processor = UpdateExecutionFactory.createRemote(request,CollectionUtil.getCollectionsName(CollectionUtil.METADATA_UPDATE)); 
             processor.execute();
         }
     }
@@ -253,7 +253,7 @@ public class Deployment {
         query += DELETE_LINE3;
         query += LINE_LAST;
         UpdateRequest request = UpdateFactory.create(query);
-        UpdateProcessor processor = UpdateExecutionFactory.createRemote(request, Collections.getCollectionsName(Collections.METADATA_UPDATE));
+        UpdateProcessor processor = UpdateExecutionFactory.createRemote(request, CollectionUtil.getCollectionsName(CollectionUtil.METADATA_UPDATE));
         processor.execute();
     }
 
@@ -360,7 +360,7 @@ public class Deployment {
         Query query = QueryFactory.create(queryString);
         QueryExecution qexec = QueryExecutionFactory.sparqlService(
                 ConfigFactory.load().getString("hadatac.solr.triplestore") 
-                + Collections.METADATA_SPARQL, query);
+                + CollectionUtil.METADATA_SPARQL, query);
         Model model = qexec.execDescribe();
 
         StmtIterator stmtIterator = model.listStatements();
@@ -424,7 +424,7 @@ public class Deployment {
         Query query = QueryFactory.create(queryString);
 
         QueryExecution qexec = QueryExecutionFactory.sparqlService(
-                Collections.getCollectionsName(Collections.METADATA_SPARQL), query);
+                CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), query);
         ResultSet results = qexec.execSelect();
         ResultSetRewindable resultsrw = ResultSetFactory.copyResults(results);
         qexec.close();

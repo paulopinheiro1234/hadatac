@@ -44,7 +44,7 @@ import org.hadatac.metadata.loader.PermissionsContext;
 import org.hadatac.metadata.loader.RDFContext;
 import org.hadatac.metadata.loader.SpreadsheetProcessing;
 import org.hadatac.metadata.loader.URIUtils;
-import org.hadatac.utils.Collections;
+import org.hadatac.utils.CollectionUtil;
 import org.hadatac.utils.Feedback;
 import org.hadatac.utils.NameSpaces;
 import org.json.simple.JSONArray;
@@ -267,30 +267,30 @@ public class UserManagement extends Controller {
 		System.out.println("Recovering User Authentication ...");
 		try {
 			if (!SolrUtils.clearCollection(ConfigFactory.load().getString("hadatac.solr.users") 
-					+ Collections.AUTHENTICATE_USERS)) {
+					+ CollectionUtil.AUTHENTICATE_USERS)) {
 				return "Failed to clear original \"users\" collection! ";
 			}
 			if (!SolrUtils.clearCollection(ConfigFactory.load().getString("hadatac.solr.users") 
-					+ Collections.AUTHENTICATE_ACCOUNTS)) {
+					+ CollectionUtil.AUTHENTICATE_ACCOUNTS)) {
 				return "Failed to clear original \"linked_account\" collection! ";
 			}
 			if (!SolrUtils.clearCollection(ConfigFactory.load().getString("hadatac.solr.users") 
-					+ Collections.AUTHENTICATE_TOKENS)) {
+					+ CollectionUtil.AUTHENTICATE_TOKENS)) {
 				return "Failed to clear original \"token_action\" collection! ";
 			}
 			
 			JSONObject combined = (JSONObject) JSONValue.parse(new FileReader(UPLOAD_NAME_JSON));
 			
 			if (!SolrUtils.commitJsonDataToSolr(ConfigFactory.load().getString("hadatac.solr.users") 
-					+ Collections.AUTHENTICATE_USERS, combined.get("sys_user").toString())) {
+					+ CollectionUtil.AUTHENTICATE_USERS, combined.get("sys_user").toString())) {
 				return "Failed to recover \"users\" collection! ";
 			}
 			if (!SolrUtils.commitJsonDataToSolr(ConfigFactory.load().getString("hadatac.solr.users") 
-					+ Collections.AUTHENTICATE_ACCOUNTS, combined.get("linked_account").toString())) {
+					+ CollectionUtil.AUTHENTICATE_ACCOUNTS, combined.get("linked_account").toString())) {
 				return "Failed to recover \"linked_account\" collection! ";
 			}
 			if (!SolrUtils.commitJsonDataToSolr(ConfigFactory.load().getString("hadatac.solr.users") 
-					+ Collections.AUTHENTICATE_TOKENS, combined.get("token").toString())) {
+					+ CollectionUtil.AUTHENTICATE_TOKENS, combined.get("token").toString())) {
 				return "Failed to recover \"token_action\" collection! ";
 			}
 		} catch (FileNotFoundException e) {

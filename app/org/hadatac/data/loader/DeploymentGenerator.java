@@ -14,7 +14,7 @@ import org.apache.jena.query.ResultSetFactory;
 import org.apache.jena.query.ResultSetRewindable;
 import org.apache.jena.rdf.model.RDFNode;
 import org.hadatac.metadata.loader.URIUtils;
-import org.hadatac.utils.Collections;
+import org.hadatac.utils.CollectionUtil;
 import org.hadatac.utils.ConfigProp;
 import org.hadatac.utils.NameSpaces;
 import org.hadatac.utils.Templates;
@@ -49,7 +49,7 @@ public class DeploymentGenerator extends BasicGenerator {
 				+ " }";
 
 		QueryExecution qe = QueryExecutionFactory.sparqlService(
-				Collections.getCollectionsName(Collections.METADATA_SPARQL), strQuery);
+				CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), strQuery);
 		ResultSet resultSet = qe.execSelect();
 		ResultSetRewindable resultsrw = ResultSetFactory.copyResults(resultSet);
 		qe.close();
@@ -72,7 +72,7 @@ public class DeploymentGenerator extends BasicGenerator {
 				+ " }";
 
 		QueryExecution qe = QueryExecutionFactory.sparqlService(
-				Collections.getCollectionsName(Collections.METADATA_SPARQL), strQuery);
+				CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), strQuery);
 		ResultSet resultSet = qe.execSelect();
 		ResultSetRewindable resultsrw = ResultSetFactory.copyResults(resultSet);
 		qe.close();

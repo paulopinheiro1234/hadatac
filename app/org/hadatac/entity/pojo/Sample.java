@@ -19,7 +19,7 @@ import org.apache.jena.update.UpdateExecutionFactory;
 import org.apache.jena.update.UpdateFactory;
 import org.apache.jena.update.UpdateProcessor;
 import org.apache.jena.update.UpdateRequest;
-import org.hadatac.utils.Collections;
+import org.hadatac.utils.CollectionUtil;
 import org.hadatac.utils.NameSpaces;
 import org.hadatac.utils.FirstLabel;
 import org.hadatac.utils.ConfigProp;
@@ -99,7 +99,7 @@ public class Sample extends StudyObject {
                 "}";
         Query query = QueryFactory.create(queryString);
 
-        QueryExecution qexec = QueryExecutionFactory.sparqlService(Collections.getCollectionsName(Collections.METADATA_SPARQL), query);
+        QueryExecution qexec = QueryExecutionFactory.sparqlService(CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), query);
         ResultSet results = qexec.execSelect();
         ResultSetRewindable resultsrw = ResultSetFactory.copyResults(results);
         qexec.close();
@@ -187,7 +187,7 @@ public class Sample extends StudyObject {
         System.out.println("Sample findByCollection: " + queryString);
         Query query = QueryFactory.create(queryString);
         QueryExecution qexec = QueryExecutionFactory.sparqlService(
-                Collections.getCollectionsName(Collections.METADATA_SPARQL), query);
+                CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), query);
         ResultSet results = qexec.execSelect();
         ResultSetRewindable resultsrw = ResultSetFactory.copyResults(results);
         qexec.close();
@@ -259,7 +259,7 @@ public class Sample extends StudyObject {
         System.out.println("SP insert query (pojo's save): <" + insert + ">");
         UpdateRequest request = UpdateFactory.create(insert);
         UpdateProcessor processor = UpdateExecutionFactory.createRemote(
-                request, Collections.getCollectionsName(Collections.METADATA_UPDATE));
+                request, CollectionUtil.getCollectionsName(CollectionUtil.METADATA_UPDATE));
         processor.execute();
     }
 
@@ -334,7 +334,7 @@ public class Sample extends StudyObject {
         query += LINE_LAST;
         //System.out.println("SPARQL query inside sp poho's delete: " + query);
         UpdateRequest request = UpdateFactory.create(query);
-        UpdateProcessor processor = UpdateExecutionFactory.createRemote(request, Collections.getCollectionsName(Collections.METADATA_UPDATE));
+        UpdateProcessor processor = UpdateExecutionFactory.createRemote(request, CollectionUtil.getCollectionsName(CollectionUtil.METADATA_UPDATE));
         processor.execute();
     }
 

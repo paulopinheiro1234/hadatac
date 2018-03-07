@@ -9,7 +9,7 @@ import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.impl.HttpSolrClient;
 import org.apache.solr.client.solrj.response.QueryResponse;
-import org.hadatac.utils.Collections;
+import org.hadatac.utils.CollectionUtil;
 import org.hadatac.utils.Command;
 import org.hadatac.utils.Feedback;
 
@@ -67,15 +67,15 @@ public class DataContext {
 	}
 	
 	public Long totalMeasurements() {
-		return totalDocuments(Collections.DATA_ACQUISITION);
+		return totalDocuments(CollectionUtil.DATA_ACQUISITION);
 	}
 	
 	public Long totalUsers() {
-		return totalDocuments(Collections.AUTHENTICATE_USERS);
+		return totalDocuments(CollectionUtil.AUTHENTICATE_USERS);
 	}
 	
 	public Long totalDataAcquisitions() {
-		return totalDocuments(Collections.DATA_COLLECTION);
+		return totalDocuments(CollectionUtil.DATA_COLLECTION);
 	}
 	
 	private String cleanAllDocuments(int mode, String solrCoreName) {
@@ -91,8 +91,8 @@ public class DataContext {
 	    String url1;
 	    String url2;
 		try {
-		    url1 = Collections.getCollectionsName(solrCoreName) + "/update?stream.body=" + URLEncoder.encode(query1, "UTF-8");
-		    url2 = Collections.getCollectionsName(solrCoreName) + "/update?stream.body=" + URLEncoder.encode(query2, "UTF-8");
+		    url1 = CollectionUtil.getCollectionsName(solrCoreName) + "/update?stream.body=" + URLEncoder.encode(query1, "UTF-8");
+		    url2 = CollectionUtil.getCollectionsName(solrCoreName) + "/update?stream.body=" + URLEncoder.encode(query2, "UTF-8");
 
 		    if (verbose) {
 		        message += Feedback.println(mode, url1);
@@ -123,7 +123,7 @@ public class DataContext {
 	}
 	
 	private String cleanSpecifiedStudy(int mode, String studyURI) {
-		String solrCoreName = Collections.STUDIES;
+		String solrCoreName = CollectionUtil.STUDIES;
 		String message = "";
 	    String straux = "";
 	    
@@ -136,8 +136,8 @@ public class DataContext {
 	    String url1;
 	    String url2;
 		try {
-		    url1 = Collections.getCollectionsName(solrCoreName) + "/update?stream.body=" + URLEncoder.encode(query1, "UTF-8");
-		    url2 = Collections.getCollectionsName(solrCoreName) + "/update?stream.body=" + URLEncoder.encode(query2, "UTF-8");
+		    url1 = CollectionUtil.getCollectionsName(solrCoreName) + "/update?stream.body=" + URLEncoder.encode(query1, "UTF-8");
+		    url2 = CollectionUtil.getCollectionsName(solrCoreName) + "/update?stream.body=" + URLEncoder.encode(query2, "UTF-8");
 
 		    if (verbose) {
 		        message += Feedback.println(mode, url1);
@@ -168,19 +168,19 @@ public class DataContext {
 	}
 	
 	public String cleanDataAcquisitions(int mode) {
-		return cleanAllDocuments(mode, Collections.DATA_COLLECTION);
+		return cleanAllDocuments(mode, CollectionUtil.DATA_COLLECTION);
 	}
 	
 	public String cleanDataUsers(int mode) {
-		return cleanAllDocuments(mode, Collections.AUTHENTICATE_USERS);
+		return cleanAllDocuments(mode, CollectionUtil.AUTHENTICATE_USERS);
 	}
 	
 	public String cleanDataAccounts(int mode) {
-		return cleanAllDocuments(mode, Collections.AUTHENTICATE_ACCOUNTS);
+		return cleanAllDocuments(mode, CollectionUtil.AUTHENTICATE_ACCOUNTS);
 	}
 	
 	public String cleanAcquisitionData(int mode) {
-		return cleanAllDocuments(mode, Collections.DATA_ACQUISITION);
+		return cleanAllDocuments(mode, CollectionUtil.DATA_ACQUISITION);
 	}
 	
 	public String cleanStudy(int mode, String studyURI) {

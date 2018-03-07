@@ -9,7 +9,7 @@ import org.apache.solr.client.solrj.impl.HttpSolrClient;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
-import org.hadatac.utils.Collections;
+import org.hadatac.utils.CollectionUtil;
 
 import com.typesafe.config.ConfigFactory;
 
@@ -45,7 +45,7 @@ public class UserPermission implements Permission {
 		UserPermission permission = null;
 		SolrClient solrClient = new HttpSolrClient.Builder(
 				ConfigFactory.load().getString("hadatac.solr.users") 
-				+ Collections.AUTHENTICATE_PERMISSIONS).build();
+				+ CollectionUtil.AUTHENTICATE_PERMISSIONS).build();
     	SolrQuery solrQuery = new SolrQuery("value_str:" + value);
     	
     	try {
@@ -66,7 +66,7 @@ public class UserPermission implements Permission {
 		UserPermission permission = null;
 		SolrClient solrClient = new HttpSolrClient.Builder(
 				ConfigFactory.load().getString("hadatac.solr.users") 
-				+ Collections.AUTHENTICATE_PERMISSIONS).build();
+				+ CollectionUtil.AUTHENTICATE_PERMISSIONS).build();
     	SolrQuery solrQuery = new SolrQuery("id:" + id);
     	
     	try {
@@ -86,7 +86,7 @@ public class UserPermission implements Permission {
 	public void save() {
 		SolrClient solrClient = new HttpSolrClient.Builder(
 				ConfigFactory.load().getString("hadatac.solr.users") 
-				+ Collections.AUTHENTICATE_PERMISSIONS).build();
+				+ CollectionUtil.AUTHENTICATE_PERMISSIONS).build();
 		
 		if (this.id_s == null) {
 			this.id_s = UUID.randomUUID().toString();

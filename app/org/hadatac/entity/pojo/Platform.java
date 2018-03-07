@@ -21,7 +21,7 @@ import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Statement;
 import org.apache.jena.rdf.model.StmtIterator;
 import org.apache.jena.sparql.engine.http.QueryExceptionHTTP;
-import org.hadatac.utils.Collections;
+import org.hadatac.utils.CollectionUtil;
 import org.hadatac.utils.NameSpaces;
 import org.hadatac.utils.ConfigProp;
 import be.objectify.deadbolt.java.actions.Group;
@@ -139,7 +139,7 @@ public class Platform extends HADatAcThing implements Comparable<Platform> {
 		Map<HADatAcThing, List<HADatAcThing>> results = new HashMap<HADatAcThing, List<HADatAcThing>>();
 		try {
 			QueryExecution qe = QueryExecutionFactory.sparqlService(
-					Collections.getCollectionsName(Collections.METADATA_SPARQL), query);
+					CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), query);
 			ResultSet resultSet = qe.execSelect();
 			ResultSetRewindable resultsrw = ResultSetFactory.copyResults(resultSet);
 			qe.close();
@@ -183,7 +183,7 @@ public class Platform extends HADatAcThing implements Comparable<Platform> {
 		Query query = QueryFactory.create(queryString);
 		QueryExecution qexec = QueryExecutionFactory.sparqlService(
 				ConfigFactory.load().getString("hadatac.solr.triplestore") 
-				+ Collections.METADATA_SPARQL, query);
+				+ CollectionUtil.METADATA_SPARQL, query);
 		model = qexec.execDescribe();
 
 		platform = new Platform();
@@ -224,7 +224,7 @@ public class Platform extends HADatAcThing implements Comparable<Platform> {
 
 		Query query = QueryFactory.create(queryString);
 
-		QueryExecution qexec = QueryExecutionFactory.sparqlService(Collections.getCollectionsName(Collections.METADATA_SPARQL), query);
+		QueryExecution qexec = QueryExecutionFactory.sparqlService(CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), query);
 		ResultSet results = qexec.execSelect();
 		ResultSetRewindable resultsrw = ResultSetFactory.copyResults(results);
 		qexec.close();
@@ -319,7 +319,7 @@ public class Platform extends HADatAcThing implements Comparable<Platform> {
 		insert += LINE_LAST;
 		UpdateRequest request = UpdateFactory.create(insert);
 		UpdateProcessor processor = UpdateExecutionFactory.createRemote(
-				request, Collections.getCollectionsName(Collections.METADATA_UPDATE));
+				request, CollectionUtil.getCollectionsName(CollectionUtil.METADATA_UPDATE));
 		processor.execute();
 
 	}
@@ -365,7 +365,7 @@ public class Platform extends HADatAcThing implements Comparable<Platform> {
 		query += DELETE_LINE3;
 		query += LINE_LAST;
 		UpdateRequest request = UpdateFactory.create(query);
-		UpdateProcessor processor = UpdateExecutionFactory.createRemote(request, Collections.getCollectionsName(Collections.METADATA_UPDATE));
+		UpdateProcessor processor = UpdateExecutionFactory.createRemote(request, CollectionUtil.getCollectionsName(CollectionUtil.METADATA_UPDATE));
 		processor.execute();
 	}
 

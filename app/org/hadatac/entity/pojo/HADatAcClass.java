@@ -19,7 +19,7 @@ import org.hadatac.utils.NameSpaces;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import org.hadatac.utils.Collections;
+import org.hadatac.utils.CollectionUtil;
 import org.hadatac.console.models.TreeNode;
 
 public class HADatAcClass {
@@ -111,8 +111,8 @@ public class HADatAcClass {
 		try {
 			String queryString = NameSpaces.getInstance().printSparqlNameSpaceList() + q;
 			Query query = QueryFactory.create(queryString);
-			QueryExecution qexec = QueryExecutionFactory.sparqlService(Collections.
-					getCollectionsName(Collections.METADATA_SPARQL), query);
+			QueryExecution qexec = QueryExecutionFactory.sparqlService(CollectionUtil.
+					getCollectionsName(CollectionUtil.METADATA_SPARQL), query);
 			ResultSet results = qexec.execSelect();
 			ResultSetFormatter.outputAsJSON(outputStream, results);
 			qexec.close();
@@ -141,8 +141,8 @@ public class HADatAcClass {
 		try {
 			String queryString = NameSpaces.getInstance().printSparqlNameSpaceList() + q;
 			Query query = QueryFactory.create(queryString);
-			QueryExecution qexec = QueryExecutionFactory.sparqlService(Collections.
-					getCollectionsName(Collections.METADATA_SPARQL), query);
+			QueryExecution qexec = QueryExecutionFactory.sparqlService(CollectionUtil.
+					getCollectionsName(CollectionUtil.METADATA_SPARQL), query);
 			ResultSet results = qexec.execSelect();
 			ResultSetRewindable resultsrw = ResultSetFactory.copyResults(results);
 			qexec.close();

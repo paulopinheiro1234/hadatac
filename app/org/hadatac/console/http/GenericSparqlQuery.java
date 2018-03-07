@@ -8,7 +8,7 @@ import org.apache.jena.query.QueryExecutionFactory;
 import org.apache.jena.query.QueryFactory;
 import org.apache.jena.query.ResultSet;
 import org.apache.jena.query.ResultSetFormatter;
-import org.hadatac.utils.Collections;
+import org.hadatac.utils.CollectionUtil;
     
 public class GenericSparqlQuery {
 
@@ -21,7 +21,7 @@ public class GenericSparqlQuery {
     	try {
     		Query query = QueryFactory.create(str_query);
     		QueryExecution qexec = QueryExecutionFactory.sparqlService(
-    				Collections.getCollectionsName(Collections.METADATA_SPARQL), query);
+    				CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), query);
     		ResultSet results = qexec.execSelect();
     		
     		ResultSetFormatter.outputAsJSON(outputStream, results);

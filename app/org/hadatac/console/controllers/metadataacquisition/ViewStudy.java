@@ -24,7 +24,7 @@ import org.apache.jena.sparql.engine.http.QueryExceptionHTTP;
 import org.hadatac.console.controllers.AuthApplication;
 import org.hadatac.console.controllers.triplestore.UserManagement;
 import org.hadatac.console.models.SysUser;
-import org.hadatac.utils.Collections;
+import org.hadatac.utils.CollectionUtil;
 import org.hadatac.utils.NameSpaces;
 
 import be.objectify.deadbolt.java.actions.Group;
@@ -46,7 +46,7 @@ public class ViewStudy extends Controller {
 		String indicatorLabel = "";
 		try {
 			QueryExecution qexecInd = QueryExecutionFactory.sparqlService(
-					Collections.getCollectionsName(Collections.METADATA_SPARQL), indicatorQuery);
+					CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), indicatorQuery);
 			ResultSet indicatorResults = qexecInd.execSelect();
 			ResultSetRewindable resultsrwIndc = ResultSetFactory.copyResults(indicatorResults);
 			qexecInd.close();
@@ -74,7 +74,7 @@ public class ViewStudy extends Controller {
 			
 			try {
 				QueryExecution qexecIndvInd = QueryExecutionFactory.sparqlService(
-						Collections.getCollectionsName(Collections.METADATA_SPARQL), indvIndicatorQuery);
+						CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), indvIndicatorQuery);
 				ResultSet indvIndResults = qexecIndvInd.execSelect();
 				ResultSetRewindable resultsrwIndvInd = ResultSetFactory.copyResults(indvIndResults);
 				qexecIndvInd.close();
@@ -106,7 +106,7 @@ public class ViewStudy extends Controller {
 		String indicatorLabel = "";
 		try {
 			QueryExecution qexecInd = QueryExecutionFactory.sparqlService(
-					Collections.getCollectionsName(Collections.METADATA_SPARQL), indicatorQuery);
+					CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), indicatorQuery);
 			ResultSet indicatorResults = qexecInd.execSelect();
 			ResultSetRewindable resultsrwIndc = ResultSetFactory.copyResults(indicatorResults);
 			qexecInd.close();
@@ -133,7 +133,7 @@ public class ViewStudy extends Controller {
 			
 			try {
 				QueryExecution qexecIndvInd = QueryExecutionFactory.sparqlService(
-						Collections.getCollectionsName(Collections.METADATA_SPARQL), indvIndicatorQuery);
+						CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), indvIndicatorQuery);
 				ResultSet indvIndResults = qexecIndvInd.execSelect();
 				ResultSetRewindable resultsrwIndvInd = ResultSetFactory.copyResults(indvIndResults);
 				qexecIndvInd.close();
@@ -173,7 +173,7 @@ public class ViewStudy extends Controller {
 		try {
 			Query basicQuery = QueryFactory.create(basicQueryString);
 			QueryExecution qexec = QueryExecutionFactory.sparqlService(
-					Collections.getCollectionsName(Collections.METADATA_SPARQL), basicQuery);
+					CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), basicQuery);
 			ResultSet results = qexec.execSelect();
 			ResultSetRewindable resultsrw = ResultSetFactory.copyResults(results);
 			qexec.close();
@@ -225,7 +225,7 @@ public class ViewStudy extends Controller {
 		try {
 			Query subjectQuery = QueryFactory.create(subjectQueryString);
 			QueryExecution qexec2 = QueryExecutionFactory.sparqlService(
-					Collections.getCollectionsName(Collections.METADATA_SPARQL), subjectQuery);
+					CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), subjectQuery);
 			ResultSet results = qexec2.execSelect();
 			ResultSetRewindable resultsrw = ResultSetFactory.copyResults(results);
 			qexec2.close();
@@ -255,7 +255,7 @@ public class ViewStudy extends Controller {
 		try {
 			Query sampleQuery = QueryFactory.create(scQueryString);
 			QueryExecution qexec3 = QueryExecutionFactory.sparqlService(
-					Collections.getCollectionsName(Collections.METADATA_SPARQL), sampleQuery);
+					CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), sampleQuery);
 			ResultSet results = qexec3.execSelect();
 			ResultSetRewindable resultsrw = ResultSetFactory.copyResults(results);
 			qexec3.close();

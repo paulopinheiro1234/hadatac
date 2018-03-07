@@ -14,7 +14,7 @@ import org.apache.jena.query.ResultSetFactory;
 import org.apache.jena.query.ResultSetRewindable;
 import org.apache.jena.rdf.model.Literal;
 import org.apache.jena.sparql.engine.http.QueryExceptionHTTP;
-import org.hadatac.utils.Collections;
+import org.hadatac.utils.CollectionUtil;
 import org.hadatac.utils.ConfigProp;
 import org.hadatac.utils.NameSpaces;
 
@@ -54,7 +54,7 @@ public class SampleSubjectMapper extends BasicGenerator {
         try {
             Query sampleQuery = QueryFactory.create(queryString);
             QueryExecution qexec = QueryExecutionFactory.sparqlService(
-                    Collections.getCollectionsName(Collections.METADATA_SPARQL), sampleQuery);
+                    CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), sampleQuery);
             ResultSet results = qexec.execSelect();
             ResultSetRewindable resultsrw = ResultSetFactory.copyResults(results);
             qexec.close();
@@ -79,7 +79,7 @@ public class SampleSubjectMapper extends BasicGenerator {
                 + " ?sampleURI hasco:isMemberOf* chear-kb:STD-" + studyID + " . \n"
                 + "}";
         QueryExecution qexecSample = QueryExecutionFactory.sparqlService(
-                Collections.getCollectionsName(Collections.METADATA_SPARQL), sampleCountQuery);
+                CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), sampleCountQuery);
         ResultSet sampleResults = qexecSample.execSelect();
         ResultSetRewindable resultsrwSample = ResultSetFactory.copyResults(sampleResults);
         qexecSample.close();

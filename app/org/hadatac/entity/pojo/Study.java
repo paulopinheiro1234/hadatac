@@ -38,7 +38,7 @@ import org.apache.solr.common.SolrDocument;
 import org.hadatac.console.controllers.metadata.DynamicFunctions;
 import org.hadatac.console.models.Facet;
 import org.hadatac.console.models.FacetHandler;
-import org.hadatac.utils.Collections;
+import org.hadatac.utils.CollectionUtil;
 import org.hadatac.utils.NameSpaces;
 import org.hadatac.utils.ConfigProp;
 import org.hadatac.metadata.loader.LabkeyDataHandler;
@@ -390,7 +390,7 @@ public class Study extends HADatAcThing {
 		Map<HADatAcThing, List<HADatAcThing>> results = new HashMap<HADatAcThing, List<HADatAcThing>>();
 		try {
 			QueryExecution qe = QueryExecutionFactory.sparqlService(
-					Collections.getCollectionsName(Collections.METADATA_SPARQL), query);
+					CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), query);
 			ResultSet resultSet = qe.execSelect();
 			ResultSetRewindable resultsrw = ResultSetFactory.copyResults(resultSet);
 			qe.close();
@@ -470,7 +470,7 @@ public class Study extends HADatAcThing {
 				" } ";
 		try {
 			Query query = QueryFactory.create(queryString);
-			QueryExecution qexec = QueryExecutionFactory.sparqlService(Collections.getCollectionsName(Collections.METADATA_SPARQL), query);
+			QueryExecution qexec = QueryExecutionFactory.sparqlService(CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), query);
 			ResultSet results = qexec.execSelect();
 			ResultSetRewindable resultsrw = ResultSetFactory.copyResults(results);
 			qexec.close();
@@ -495,7 +495,7 @@ public class Study extends HADatAcThing {
 				" } ";
 		try {
 			Query query = QueryFactory.create(queryString);
-			QueryExecution qexec = QueryExecutionFactory.sparqlService(Collections.getCollectionsName(Collections.METADATA_SPARQL), query);
+			QueryExecution qexec = QueryExecutionFactory.sparqlService(CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), query);
 			ResultSet results = qexec.execSelect();
 			ResultSetRewindable resultsrw = ResultSetFactory.copyResults(results);
 			qexec.close();
@@ -541,7 +541,7 @@ public class Study extends HADatAcThing {
 		try {
 			//System.out.println("Study's find() query: " + studyQueryString);
 			Query studyQuery = QueryFactory.create(studyQueryString);
-			QueryExecution qexec = QueryExecutionFactory.sparqlService(Collections.getCollectionsName(Collections.METADATA_SPARQL), studyQuery);
+			QueryExecution qexec = QueryExecutionFactory.sparqlService(CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), studyQuery);
 			ResultSet results = qexec.execSelect();
 			ResultSetRewindable resultsrw = ResultSetFactory.copyResults(results);
 			qexec.close();
@@ -615,7 +615,7 @@ public class Study extends HADatAcThing {
 
 		try {
 			Query studyQuery = QueryFactory.create(studyQueryString);
-			QueryExecution qexec = QueryExecutionFactory.sparqlService(Collections.getCollectionsName(Collections.METADATA_SPARQL), studyQuery);
+			QueryExecution qexec = QueryExecutionFactory.sparqlService(CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), studyQuery);
 			ResultSet results = qexec.execSelect();
 			ResultSetRewindable resultsrw = ResultSetFactory.copyResults(results);
 			qexec.close();
@@ -880,7 +880,7 @@ public class Study extends HADatAcThing {
 		try {
 			Query studyQuery = QueryFactory.create(studyQueryString);
 			QueryExecution qexec = QueryExecutionFactory.sparqlService(
-					Collections.getCollectionsName(Collections.METADATA_SPARQL), studyQuery);
+					CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), studyQuery);
 			ResultSet results = qexec.execSelect();
 			ResultSetRewindable resultsrw = ResultSetFactory.copyResults(results);
 			qexec.close();
@@ -914,7 +914,7 @@ public class Study extends HADatAcThing {
 		Query query = QueryFactory.create(queryString);
 
 		QueryExecution qexec = QueryExecutionFactory.sparqlService(
-				Collections.getCollectionsName(Collections.METADATA_SPARQL), query);
+				CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), query);
 		ResultSet results = qexec.execSelect();
 		ResultSetRewindable resultsrw = ResultSetFactory.copyResults(results);
 		qexec.close();
@@ -935,7 +935,7 @@ public class Study extends HADatAcThing {
 	public int deleteDataAcquisitions() {
 		SolrClient study_solr = new HttpSolrClient.Builder(
 				ConfigFactory.load().getString("hadatac.solr.data")
-				+ Collections.DATA_COLLECTION).build();
+				+ CollectionUtil.DATA_COLLECTION).build();
 		try {
 			UpdateResponse response = study_solr.deleteByQuery("study_uri:\"" + studyUri + "\"");
 			study_solr.commit();
@@ -955,7 +955,7 @@ public class Study extends HADatAcThing {
 	public int deleteMeasurements() {
 		SolrClient study_solr = new HttpSolrClient.Builder(
 				ConfigFactory.load().getString("hadatac.solr.data")
-				+ Collections.DATA_ACQUISITION).build();
+				+ CollectionUtil.DATA_ACQUISITION).build();
 		try {
 			UpdateResponse response = study_solr.deleteByQuery("study_uri:\"" + DynamicFunctions.replaceURLWithPrefix(studyUri) + "\"");
 			study_solr.commit();
@@ -1030,7 +1030,7 @@ public class Study extends HADatAcThing {
 		//System.out.println("Study insert query (pojo's save): <" + insert + ">");
 		UpdateRequest request = UpdateFactory.create(insert);
 		UpdateProcessor processor = UpdateExecutionFactory.createRemote(
-				request, Collections.getCollectionsName(Collections.METADATA_UPDATE));
+				request, CollectionUtil.getCollectionsName(CollectionUtil.METADATA_UPDATE));
 		processor.execute();
 
 	}
@@ -1040,7 +1040,7 @@ public class Study extends HADatAcThing {
 		try {
 			SolrClient solr = new HttpSolrClient.Builder(
 					ConfigFactory.load().getString("hadatac.solr.data") +
-					Collections.STUDIES).build();
+					CollectionUtil.STUDIES).build();
 			if (endedAt.toString().startsWith("9999")) {
 				endedAt = DateTime.parse("9999-12-31T23:59:59.999Z");
 			}
@@ -1104,7 +1104,7 @@ public class Study extends HADatAcThing {
 		query += LINE_LAST;
 		//System.out.println("SPARQL query inside dasa poho's delete: " + query);
 		UpdateRequest request = UpdateFactory.create(query);
-		UpdateProcessor processor = UpdateExecutionFactory.createRemote(request, Collections.getCollectionsName(Collections.METADATA_UPDATE));
+		UpdateProcessor processor = UpdateExecutionFactory.createRemote(request, CollectionUtil.getCollectionsName(CollectionUtil.METADATA_UPDATE));
 		processor.execute();
 		//deleteDataAcquisitions();
 		//deleteMeasurements();
@@ -1113,7 +1113,7 @@ public class Study extends HADatAcThing {
 	public int deleteFromSolr() {
 		SolrClient study_solr = new HttpSolrClient.Builder(
 				ConfigFactory.load().getString("hadatac.solr.data") +
-				Collections.STUDIES).build();
+				CollectionUtil.STUDIES).build();
 		try {
 			UpdateResponse response = study_solr.deleteByQuery("studyUri:\"" + studyUri + "\"");
 			study_solr.commit();

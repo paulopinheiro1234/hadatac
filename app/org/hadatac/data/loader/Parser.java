@@ -22,7 +22,7 @@ import org.hadatac.entity.pojo.DASVirtualObject;
 import org.hadatac.entity.pojo.DataFile;
 import org.hadatac.entity.pojo.Measurement;
 import org.hadatac.metadata.loader.URIUtils;
-import org.hadatac.utils.Collections;
+import org.hadatac.utils.CollectionUtil;
 
 import com.typesafe.config.ConfigFactory;
 
@@ -64,7 +64,7 @@ public class Parser {
 
 		SolrClient solr = new HttpSolrClient.Builder(
 				ConfigFactory.load().getString("hadatac.solr.data") 
-				+ Collections.DATA_ACQUISITION).build();
+				+ CollectionUtil.DATA_ACQUISITION).build();
 
 		// ASSIGN values for tempPositionInt
 		schema.defineTemporaryPositions(file.getHeaders());

@@ -9,7 +9,7 @@ import org.apache.solr.client.solrj.impl.HttpSolrClient;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
-import org.hadatac.utils.Collections;
+import org.hadatac.utils.CollectionUtil;
 
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
@@ -65,7 +65,7 @@ public class SecurityRole implements Role {
 	public static boolean existsSolr() {
 		SolrClient solrClient = new HttpSolrClient.Builder(
 				ConfigFactory.load().getString("hadatac.solr.users") 
-				+ Collections.AUTHENTICATE_ROLES).build();
+				+ CollectionUtil.AUTHENTICATE_ROLES).build();
     	SolrQuery solrQuery = new SolrQuery("*:*");
     	
     	try {
@@ -86,7 +86,7 @@ public class SecurityRole implements Role {
 		SecurityRole role = null;
 		SolrClient solrClient = new HttpSolrClient.Builder(
 				ConfigFactory.load().getString("hadatac.solr.users") 
-				+ Collections.AUTHENTICATE_ROLES).build();
+				+ CollectionUtil.AUTHENTICATE_ROLES).build();
     	SolrQuery solrQuery = new SolrQuery("id:" + id);
     	
     	try {
@@ -107,7 +107,7 @@ public class SecurityRole implements Role {
 		SecurityRole role = null;
 		SolrClient solrClient = new HttpSolrClient.Builder(
 				ConfigFactory.load().getString("hadatac.solr.users") 
-				+ Collections.AUTHENTICATE_ROLES).build();
+				+ CollectionUtil.AUTHENTICATE_ROLES).build();
     	SolrQuery solrQuery = new SolrQuery("role_name_str:" + roleName);
     	
     	try {
@@ -127,7 +127,7 @@ public class SecurityRole implements Role {
 	public void save() {
 		SolrClient solrClient = new HttpSolrClient.Builder(
 				ConfigFactory.load().getString("hadatac.solr.users") 
-				+ Collections.AUTHENTICATE_ROLES).build();
+				+ CollectionUtil.AUTHENTICATE_ROLES).build();
 		
 		if (this.id_s == null) {
 			this.id_s = UUID.randomUUID().toString();

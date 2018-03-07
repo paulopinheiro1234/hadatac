@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
@@ -21,7 +22,7 @@ import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
 
 import org.hadatac.metadata.loader.URIUtils;
-import org.hadatac.utils.Collections;
+import org.hadatac.utils.CollectionUtil;
 
 import com.typesafe.config.ConfigFactory;
 
@@ -123,7 +124,7 @@ public class DataFile {
 		try {
 			SolrClient client = new HttpSolrClient.Builder(
 					ConfigFactory.load().getString("hadatac.solr.data") 
-					+ Collections.CSV_DATASET).build();
+					+ CollectionUtil.CSV_DATASET).build();
 			
 			int status = client.addBean(this).getStatus();
 			client.commit();
@@ -139,7 +140,7 @@ public class DataFile {
 		try {
 			SolrClient solr = new HttpSolrClient.Builder(
 					ConfigFactory.load().getString("hadatac.solr.data") 
-					+ Collections.CSV_DATASET).build();
+					+ CollectionUtil.CSV_DATASET).build();
 			UpdateResponse response = solr.deleteById(this.getFileName());
 			solr.commit();
 			solr.close();
@@ -188,7 +189,7 @@ public class DataFile {
 		
 		SolrClient solr = new HttpSolrClient.Builder(
 				ConfigFactory.load().getString("hadatac.solr.data") 
-				+ Collections.CSV_DATASET).build();
+				+ CollectionUtil.CSV_DATASET).build();
 
 		try {
 			QueryResponse response = solr.query(query);
@@ -198,6 +199,13 @@ public class DataFile {
 			while (i.hasNext()) {
 				list.add(convertFromSolr(i.next()));
 			}
+			
+			list.sort(new Comparator<DataFile>() {
+                @Override
+                public int compare(DataFile o1, DataFile o2) {
+                    return o1.getSubmissionTime().compareTo(o2.getSubmissionTime());
+                }
+            });
 		} catch (Exception e) {
 			list.clear();
 			System.out.println("[ERROR] DataFile.find(SolrQuery) - Exception message: " + e.getMessage());

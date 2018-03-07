@@ -27,7 +27,7 @@ import org.hadatac.console.views.html.metadataacquisition.*;
 import org.hadatac.data.loader.SampleGenerator;
 import org.hadatac.data.loader.SubjectGenerator;
 import org.hadatac.metadata.loader.*;
-import org.hadatac.utils.Collections;
+import org.hadatac.utils.CollectionUtil;
 import org.hadatac.utils.NameSpace;
 import org.json.simple.JSONObject;
 import org.labkey.remoteapi.query.*;
@@ -101,7 +101,7 @@ public class DynamicFunctions extends Controller {
 		Map<String, String> indicatorMap = new HashMap<String, String>();
 		try {
 			QueryExecution qexecInd = QueryExecutionFactory.sparqlService(
-					Collections.getCollectionsName(Collections.METADATA_SPARQL), indicatorQuery);
+					CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), indicatorQuery);
 			ResultSet indicatorResults = qexecInd.execSelect();
 			ResultSetRewindable resultsrwIndc = ResultSetFactory.copyResults(indicatorResults);
 			qexecInd.close();
@@ -138,7 +138,7 @@ public class DynamicFunctions extends Controller {
 					"?indicator rdfs:label ?label_ . " + 
 					"} GROUP BY ?indicator ?label";
 		    try {
-			    QueryExecution qexecIndvInd = QueryExecutionFactory.sparqlService(Collections.getCollectionsName(Collections.METADATA_SPARQL), indvIndicatorQuery);
+			    QueryExecution qexecIndvInd = QueryExecutionFactory.sparqlService(CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), indvIndicatorQuery);
 				ResultSet indvIndResults = qexecIndvInd.execSelect();
 				ResultSetRewindable resultsrwIndvInd = ResultSetFactory.copyResults(indvIndResults);
 				qexecIndvInd.close();
@@ -181,7 +181,7 @@ public class DynamicFunctions extends Controller {
 					+ " GROUP BY ?indicator ?label";
 		    try {
 			    QueryExecution qexecIndvInd = QueryExecutionFactory.sparqlService(
-			    		Collections.getCollectionsName(Collections.METADATA_SPARQL), indvIndicatorQuery);
+			    		CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), indvIndicatorQuery);
 				ResultSet indvIndResults = qexecIndvInd.execSelect();
 				ResultSetRewindable resultsrwIndvInd = ResultSetFactory.copyResults(indvIndResults);
 				qexecIndvInd.close();
@@ -220,7 +220,7 @@ public class DynamicFunctions extends Controller {
 					"?indicator rdfs:label ?label_ . " + 
 					"} GROUP BY ?indicator ?label";
 		    try {
-			    QueryExecution qexecIndvInd = QueryExecutionFactory.sparqlService(Collections.getCollectionsName(Collections.METADATA_SPARQL), indvIndicatorQuery);
+			    QueryExecution qexecIndvInd = QueryExecutionFactory.sparqlService(CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), indvIndicatorQuery);
 				ResultSet indvIndResults = qexecIndvInd.execSelect();
 				ResultSetRewindable resultsrwIndvInd = ResultSetFactory.copyResults(indvIndResults);
 				qexecIndvInd.close();
@@ -263,7 +263,7 @@ public class DynamicFunctions extends Controller {
 		
 		try {
 			Query studyQuery = QueryFactory.create(studyQueryString);
-			QueryExecution qexec = QueryExecutionFactory.sparqlService(Collections.getCollectionsName(Collections.METADATA_SPARQL), studyQuery);
+			QueryExecution qexec = QueryExecutionFactory.sparqlService(CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), studyQuery);
 			ResultSet results = qexec.execSelect();
 			ResultSetRewindable resultsrw = ResultSetFactory.copyResults(results);
 			qexec.close();
@@ -309,7 +309,7 @@ public class DynamicFunctions extends Controller {
 		"                             }" ;
 		try {
 			Query studyQuery = QueryFactory.create(studyQueryString);
-			QueryExecution qexec = QueryExecutionFactory.sparqlService(Collections.getCollectionsName(Collections.METADATA_SPARQL), studyQuery);
+			QueryExecution qexec = QueryExecutionFactory.sparqlService(CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), studyQuery);
 			ResultSet results = qexec.execSelect();
 			ResultSetRewindable resultsrw = ResultSetFactory.copyResults(results);
 			qexec.close();
@@ -353,7 +353,7 @@ public class DynamicFunctions extends Controller {
     	    	"			                             }";
     	try {
 			Query basicQuery = QueryFactory.create(subjectQueryString);
-			QueryExecution qexec = QueryExecutionFactory.sparqlService(Collections.getCollectionsName(Collections.METADATA_SPARQL), basicQuery);
+			QueryExecution qexec = QueryExecutionFactory.sparqlService(CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), basicQuery);
 			ResultSet results = qexec.execSelect();
 			ResultSetRewindable resultsrw = ResultSetFactory.copyResults(results);
 			qexec.close();
@@ -397,7 +397,7 @@ public class DynamicFunctions extends Controller {
     	    	"			                             }";
 	    try {
 	    	Query basicQuery = QueryFactory.create(subjectQueryString);
-			QueryExecution qexec = QueryExecutionFactory.sparqlService(Collections.getCollectionsName(Collections.METADATA_SPARQL), basicQuery);
+			QueryExecution qexec = QueryExecutionFactory.sparqlService(CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), basicQuery);
 			ResultSet results = qexec.execSelect();
 			ResultSetRewindable resultsrw = ResultSetFactory.copyResults(results);
 			qexec.close();			

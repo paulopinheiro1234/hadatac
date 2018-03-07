@@ -22,7 +22,7 @@ import org.apache.jena.update.UpdateFactory;
 import org.apache.jena.update.UpdateProcessor;
 import org.apache.jena.update.UpdateRequest;
 import org.hadatac.entity.pojo.Study;
-import org.hadatac.utils.Collections;
+import org.hadatac.utils.CollectionUtil;
 import org.hadatac.utils.Feedback;
 import org.hadatac.utils.NameSpace;
 import org.hadatac.utils.NameSpaces;
@@ -61,7 +61,7 @@ public class MetadataContext implements RDFContext {
     		Query query = QueryFactory.create(queryString);
     			
     		QueryExecution qexec = QueryExecutionFactory.sparqlService(
-    				Collections.getCollectionsName(Collections.METADATA_SPARQL), query);
+    				CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), query);
     		ResultSet results = qexec.execSelect();
     		ResultSetRewindable resultsrw = ResultSetFactory.copyResults(results);
     		qexec.close();
@@ -84,7 +84,7 @@ public class MetadataContext implements RDFContext {
 		queryString += "DELETE WHERE { ?s ?p ?o . } ";
 		UpdateRequest req = UpdateFactory.create(queryString);
 		UpdateProcessor processor = UpdateExecutionFactory.createRemote(req, 
-				Collections.getCollectionsName(Collections.METADATA_UPDATE));
+				CollectionUtil.getCollectionsName(CollectionUtil.METADATA_UPDATE));
 		try {
 			processor.execute();
 		} catch (Exception e) {
@@ -331,7 +331,7 @@ public class MetadataContext implements RDFContext {
 		
 		UpdateRequest req = UpdateFactory.create(queryString);
 		UpdateProcessor processor = UpdateExecutionFactory.createRemote(req, 
-				Collections.getCollectionsName(Collections.METADATA_UPDATE));
+				CollectionUtil.getCollectionsName(CollectionUtil.METADATA_UPDATE));
 		try {
 			processor.execute();
 		} catch (Exception e) {
@@ -363,7 +363,7 @@ public class MetadataContext implements RDFContext {
 	public Long loadLocalFile(int mode, String filePath, String contentType) {
 		Model model = ModelFactory.createDefaultModel();
 		DatasetAccessor accessor = DatasetAccessorFactory.createHTTP(
-				kbURL + Collections.METADATA_GRAPH);
+				kbURL + CollectionUtil.METADATA_GRAPH);
 
 		loadFileMessage = "";
 		Long total = totalTriples();

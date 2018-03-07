@@ -19,7 +19,7 @@ import org.hadatac.console.views.html.triplestore.syncLabkey;
 import org.hadatac.entity.pojo.Study;
 import org.hadatac.metadata.loader.TripleProcessing;
 import org.hadatac.metadata.loader.URIUtils;
-import org.hadatac.utils.Collections;
+import org.hadatac.utils.CollectionUtil;
 import org.hadatac.utils.ConfigProp;
 import org.hadatac.utils.Feedback;
 import org.hadatac.utils.State;
@@ -62,7 +62,7 @@ public class RefreshStudy extends Controller {
     		Model model = TripleProcessing.importStudy(site, session().get("LabKeyUserName"), 
     				session().get("LabKeyPassword"), path, study_uri);
     		DatasetAccessor accessor = DatasetAccessorFactory.createHTTP(
-    				Collections.getCollectionsName(Collections.METADATA_GRAPH));
+    				CollectionUtil.getCollectionsName(CollectionUtil.METADATA_GRAPH));
     		accessor.add(model);
     		
     		Model refModel = Study.findModel(URIUtils.replaceNameSpaceEx(study_uri));

@@ -26,7 +26,7 @@ import org.hadatac.entity.pojo.Credential;
 import org.hadatac.entity.pojo.HADatAcThing;
 import org.hadatac.metadata.loader.LabkeyDataHandler;
 import org.hadatac.metadata.loader.URIUtils;
-import org.hadatac.utils.Collections;
+import org.hadatac.utils.CollectionUtil;
 import org.hadatac.utils.ConfigProp;
 import org.hadatac.utils.Feedback;
 import org.hadatac.utils.LabKeyException;
@@ -219,7 +219,7 @@ public abstract class BasicGenerator {
 
     public boolean commitRowsToTripleStore(List<Map<String, Object>> rows) {
         DatasetAccessor accessor = DatasetAccessorFactory.createHTTP(
-                Collections.getCollectionsName(Collections.METADATA_GRAPH));
+                CollectionUtil.getCollectionsName(CollectionUtil.METADATA_GRAPH));
         Model model = createModel(rows);
         accessor.add(model);
 
@@ -309,7 +309,7 @@ public abstract class BasicGenerator {
         try {
             UpdateRequest request = UpdateFactory.create(query);
             UpdateProcessor processor = UpdateExecutionFactory.createRemote(
-                    request, Collections.getCollectionsName(Collections.METADATA_UPDATE));
+                    request, CollectionUtil.getCollectionsName(CollectionUtil.METADATA_UPDATE));
             processor.execute();
         } catch (Exception e) {
             System.out.println("[ERROR] " + e.getMessage());

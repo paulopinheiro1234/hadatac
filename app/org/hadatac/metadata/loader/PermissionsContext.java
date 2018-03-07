@@ -18,7 +18,7 @@ import org.apache.jena.update.UpdateExecutionFactory;
 import org.apache.jena.update.UpdateFactory;
 import org.apache.jena.update.UpdateProcessor;
 import org.apache.jena.update.UpdateRequest;
-import org.hadatac.utils.Collections;
+import org.hadatac.utils.CollectionUtil;
 import org.hadatac.utils.Feedback;
 import org.hadatac.utils.NameSpaces;
 
@@ -54,7 +54,7 @@ public class PermissionsContext implements RDFContext {
     		
     		Query query = QueryFactory.create(queryString);
     			
-    		QueryExecution qexec = QueryExecutionFactory.sparqlService(Collections.getCollectionsName(Collections.PERMISSIONS_SPARQL), query);
+    		QueryExecution qexec = QueryExecutionFactory.sparqlService(CollectionUtil.getCollectionsName(CollectionUtil.PERMISSIONS_SPARQL), query);
     		ResultSet results = qexec.execSelect();
     		ResultSetRewindable resultsrw = ResultSetFactory.copyResults(results);
     		qexec.close();
@@ -77,7 +77,7 @@ public class PermissionsContext implements RDFContext {
 		queryString += "DELETE WHERE { ?s ?p ?o . } ";
 		UpdateRequest req = UpdateFactory.create(queryString);
 		UpdateProcessor processor = UpdateExecutionFactory.createRemote(req, 
-				Collections.getCollectionsName(Collections.PERMISSIONS_UPDATE));
+				CollectionUtil.getCollectionsName(CollectionUtil.PERMISSIONS_UPDATE));
 		processor.execute();
 		
 		message += Feedback.println(mode, " ");
@@ -105,7 +105,7 @@ public class PermissionsContext implements RDFContext {
 	public Long loadLocalFile(int mode, String filePath, String contentType) {
 		Model model = ModelFactory.createDefaultModel();
 		DatasetAccessor accessor = DatasetAccessorFactory.createHTTP(
-				Collections.getCollectionsName(Collections.PERMISSIONS_GRAPH));		
+				CollectionUtil.getCollectionsName(CollectionUtil.PERMISSIONS_GRAPH));		
 
 		loadFileMessage = "";
 		Long total = totalTriples();

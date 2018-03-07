@@ -28,7 +28,7 @@ import org.hadatac.metadata.loader.LabkeyDataHandler;
 import org.hadatac.metadata.loader.URIUtils;
 import org.hadatac.entity.pojo.ObjectCollection;
 import org.hadatac.entity.pojo.StudyObject;
-import org.hadatac.utils.Collections;
+import org.hadatac.utils.CollectionUtil;
 import org.hadatac.utils.ConfigProp;
 import org.hadatac.utils.State;
 import org.joda.time.DateTime;
@@ -656,7 +656,7 @@ public class DataAcquisition extends HADatAcThing {
         try {
             SolrClient client = new HttpSolrClient.Builder(
                     ConfigFactory.load().getString("hadatac.solr.data") 
-                    + Collections.DATA_COLLECTION).build();
+                    + CollectionUtil.DATA_COLLECTION).build();
             if (null == endedAt) {
                 endedAt = DateTime.parse("9999-12-31T23:59:59.999Z");
             }
@@ -681,7 +681,7 @@ public class DataAcquisition extends HADatAcThing {
 
             SolrClient solr = new HttpSolrClient.Builder(
                     ConfigFactory.load().getString("hadatac.solr.data") 
-                    + Collections.DATA_COLLECTION).build();
+                    + CollectionUtil.DATA_COLLECTION).build();
             UpdateResponse response = solr.deleteById(this.uri);
             solr.commit();
             solr.close();
@@ -710,7 +710,7 @@ public class DataAcquisition extends HADatAcThing {
         try {
             SolrClient solr = new HttpSolrClient.Builder(
                     ConfigFactory.load().getString("hadatac.solr.data") 
-                    + Collections.DATA_ACQUISITION).build();
+                    + CollectionUtil.DATA_ACQUISITION).build();
             QueryResponse queryResponse = solr.query(query, SolrRequest.METHOD.POST);
             solr.close();
             SolrDocumentList results = queryResponse.getResults();
@@ -742,7 +742,7 @@ public class DataAcquisition extends HADatAcThing {
         try {
             SolrClient solr = new HttpSolrClient.Builder(
                     ConfigFactory.load().getString("hadatac.solr.data") 
-                    + Collections.DATA_ACQUISITION).build();
+                    + CollectionUtil.DATA_ACQUISITION).build();
             QueryResponse queryResponse = solr.query(query, SolrRequest.METHOD.POST);
             solr.close();
             Pivot pivot = Pivot.parseQueryResponse(queryResponse);
@@ -1003,7 +1003,7 @@ public class DataAcquisition extends HADatAcThing {
         DataAcquisition dataAcquisition = null;
         SolrClient solr = new HttpSolrClient.Builder(
                 ConfigFactory.load().getString("hadatac.solr.data") 
-                + Collections.DATA_COLLECTION).build();
+                + CollectionUtil.DATA_COLLECTION).build();
 
         try {
             QueryResponse queryResponse = solr.query(query);
@@ -1054,7 +1054,7 @@ public class DataAcquisition extends HADatAcThing {
 
         SolrClient solr = new HttpSolrClient.Builder(
                 ConfigFactory.load().getString("hadatac.solr.data") 
-                + Collections.DATA_COLLECTION).build();
+                + CollectionUtil.DATA_COLLECTION).build();
 
         try {
             QueryResponse response = solr.query(query);

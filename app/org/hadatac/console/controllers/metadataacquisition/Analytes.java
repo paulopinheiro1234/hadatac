@@ -23,7 +23,7 @@ import org.hadatac.console.http.SolrUtils;
 import org.hadatac.console.models.SysUser;
 import org.hadatac.console.views.html.metadataacquisition.*;
 import org.hadatac.metadata.loader.URIUtils;
-import org.hadatac.utils.Collections;
+import org.hadatac.utils.CollectionUtil;
 import org.hadatac.utils.NameSpaces;
 import org.json.simple.JSONObject;
 
@@ -67,7 +67,7 @@ public class Analytes extends Controller {
 				+ " }";
 		
 		QueryExecution qexecStudy = QueryExecutionFactory.sparqlService(
-				Collections.getCollectionsName(Collections.METADATA_SPARQL), initStudyQuery);
+				CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), initStudyQuery);
 		ResultSet resultSet = qexecStudy.execSelect();
 		ResultSetRewindable resultsrwStudy = ResultSetFactory.copyResults(resultSet);
 		qexecStudy.close();
@@ -110,7 +110,7 @@ public class Analytes extends Controller {
 		System.out.println("updateAnalytes strQuery: " + strQuery);
 		
 		QueryExecution qexecStudy = QueryExecutionFactory.sparqlService(
-				Collections.getCollectionsName(Collections.METADATA_SPARQL), strQuery);
+				CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), strQuery);
 		ResultSet resultSet = qexecStudy.execSelect();
 		ResultSetRewindable resultsrwStudy = ResultSetFactory.copyResults(resultSet);
 		qexecStudy.close();
@@ -178,14 +178,14 @@ public class Analytes extends Controller {
 		
 		return SolrUtils.commitJsonDataToSolr(
 				ConfigFactory.load().getString("hadatac.solr.data") 
-				+ Collections.ANALYTES, results.toString());
+				+ CollectionUtil.ANALYTES, results.toString());
 	}
 	
 	public static int deleteFromSolr() {
 		try {
 			SolrClient solr = new HttpSolrClient.Builder(
 					ConfigFactory.load().getString("hadatac.solr.data") 
-					+ Collections.ANALYTES).build();
+					+ CollectionUtil.ANALYTES).build();
 			UpdateResponse response = solr.deleteByQuery("*:*");
 			solr.commit();
 			solr.close();

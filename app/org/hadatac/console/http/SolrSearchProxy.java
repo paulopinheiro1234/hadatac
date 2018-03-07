@@ -9,7 +9,7 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 
 import org.hadatac.console.controllers.AuthApplication;
-import org.hadatac.utils.Collections;
+import org.hadatac.utils.CollectionUtil;
 
 import be.objectify.deadbolt.java.actions.Group;
 import be.objectify.deadbolt.java.actions.Restrict;
@@ -92,7 +92,7 @@ public class SolrSearchProxy extends Controller {
 	    }
 	    System.out.println("Request: " + request_encoding);
 	}
-        String path = Collections.getCollectionsName(Collections.DATA_ACQUISITION) + "/select" +
+        String path = CollectionUtil.getCollectionsName(CollectionUtil.DATA_ACQUISITION) + "/select" +
 	    //"?" + URLEncoder.encode(request_encoding);
 	    "?" + request_encoding;
             response().setContentType("text/csv");
@@ -101,7 +101,7 @@ public class SolrSearchProxy extends Controller {
 	
 	@Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
     public Result getStudyAcquisitionDownload(){
-        String path = Collections.getCollectionsName(Collections.STUDY_ACQUISITION) + 
+        String path = CollectionUtil.getCollectionsName(CollectionUtil.STUDY_ACQUISITION) + 
                 request().toString().split((request().path()))[1];
         //System.out.println(path);
         response().setContentType("text/csv");
@@ -110,14 +110,14 @@ public class SolrSearchProxy extends Controller {
 	
 	@Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
 	public Result getStudyAcquisition(){
-		String path = Collections.getCollectionsName(Collections.STUDY_ACQUISITION) + 
+		String path = CollectionUtil.getCollectionsName(CollectionUtil.STUDY_ACQUISITION) + 
 				request().toString().split((request().path()))[1];
 		return getSolrSearch(path);
 	}
 	
 	@Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
 	public Result getAnalytesAcquisition(){
-		String path = Collections.getCollectionsName(Collections.ANALYTES_ACQUISITION) + 
+		String path = CollectionUtil.getCollectionsName(CollectionUtil.ANALYTES_ACQUISITION) + 
 				request().toString().split((request().path()))[1];
 		return getSolrSearch(path);
 	}
@@ -126,7 +126,7 @@ public class SolrSearchProxy extends Controller {
 	public Result getMetadataDataAcquisition(){
 //		String path = Collections.getCollectionsName(Collections.METADATA_DA) + 
 //				request().toString().split((request().path()))[1];
-		String path = Collections.getCollectionsName(Collections.DATA_COLLECTION) + "/select" +
+		String path = CollectionUtil.getCollectionsName(CollectionUtil.DATA_COLLECTION) + "/select" +
 				request().toString().split((request().path()))[1];
 		return getSolrSearch(path);
 	}
@@ -135,7 +135,7 @@ public class SolrSearchProxy extends Controller {
 	public Result getDataAcquisition(){
 //		String path = Collections.getCollectionsName(Collections.METADATA_DA) + 
 //				request().toString().split((request().path()))[1];
-		String path = Collections.getCollectionsName(Collections.METADATA_AQUISITION) + "/select" +
+		String path = CollectionUtil.getCollectionsName(CollectionUtil.METADATA_AQUISITION) + "/select" +
 				request().toString().split((request().path()))[1];
 		System.out.println("Solr Search Path: " + path);
 		return getSolrSearch(path);
@@ -143,7 +143,7 @@ public class SolrSearchProxy extends Controller {
 	
 	@Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
 	public Result getSchemaAttributes(){
-		String path = Collections.getCollectionsName(Collections.SA_ACQUISITION) + "/select" +
+		String path = CollectionUtil.getCollectionsName(CollectionUtil.SA_ACQUISITION) + "/select" +
 				request().toString().split((request().path()))[1];
 		return getSolrSearch(path);
 	}

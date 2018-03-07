@@ -9,7 +9,7 @@ import org.apache.jena.query.ResultSet;
 import org.apache.jena.query.ResultSetFactory;
 import org.apache.jena.query.ResultSetRewindable;
 import org.apache.jena.rdf.model.Model;
-import org.hadatac.utils.Collections;
+import org.hadatac.utils.CollectionUtil;
 import org.hadatac.utils.NameSpaces;
 
 public class HADataC {
@@ -114,7 +114,7 @@ public class HADataC {
 	}
 	
 	public String getStaticMetadataSparqlURL() {
-		return Collections.getCollectionsName(Collections.METADATA_SPARQL);
+		return CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL);
 	}
 	
 	public String getDynamicMetadataURL() {
