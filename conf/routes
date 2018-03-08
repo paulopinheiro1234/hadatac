@@ -417,6 +417,7 @@ POST	/hadatac/perm/invite     		       org.hadatac.console.controllers.triplesto
 # REST API
 GET     /hadatac/api/studies/all                          org.hadatac.console.controllers.restapi.RestApi.getStudies()
 GET     /hadatac/api/studies/:studyuri                    org.hadatac.console.controllers.restapi.RestApi.getStudy(studyuri: String)
+GET     /hadatac/api/studies/variables/:studyuri          org.hadatac.console.controllers.restapi.RestApi.getVariablesInStudy(studyuri: String)
 GET     /hadatac/api/variables/:variableuri               org.hadatac.console.controllers.restapi.RestApi.getVariable(variableuri: String)
 
 
