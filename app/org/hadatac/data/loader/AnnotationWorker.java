@@ -48,7 +48,6 @@ public class AnnotationWorker {
 
             AnnotationLog log = new AnnotationLog(file_name);
             log.addline(Feedback.println(Feedback.WEB, String.format("[OK] Processing file: %s", file_name)));
-            log.save();
 
             RecordFile recordFile = null;
             if (file_name.endsWith(".csv")) {
@@ -58,7 +57,6 @@ public class AnnotationWorker {
             } else {
                 log.addline(Feedback.println(Feedback.WEB, String.format(
                         "[ERROR] Unknown file format: %s", file_name)));
-                log.save();
                 return;
             }
 
@@ -238,11 +236,10 @@ public class AnnotationWorker {
 
     public static boolean annotateDAFile(DataFile dataFile, RecordFile recordFile) {
         System.out.println("annotateDAFile: [" + dataFile.getFileName() + "]");
-
-        String file_name = dataFile.getFileName();    	
-        AnnotationLog log = new AnnotationLog();
-        log.setFileName(file_name);
-
+        
+        String file_name = dataFile.getFileName();
+        AnnotationLog log = AnnotationLog.create(file_name);
+        
         DataAcquisition da = null;
         String da_uri = null;
         String deployment_uri = null;
@@ -254,7 +251,6 @@ public class AnnotationWorker {
                 if (!da.isComplete()) {
                     log.addline(Feedback.println(Feedback.WEB, 
                             String.format("[WARNING] Specification of associated Data Acquisition is incomplete: %s", file_name)));
-                    log.save();
                     return false;
                 } else {
                     log.addline(Feedback.println(Feedback.WEB, String.format("[OK] Specification of associated Data Acquisition is complete: %s", file_name)));
@@ -267,52 +263,42 @@ public class AnnotationWorker {
 
         if (da_uri == null) {
             log.addline(Feedback.println(Feedback.WEB, String.format("[ERROR] Cannot find target data acquisition: %s", file_name)));
-            log.save();
             return false;
         } else {
             log.addline(Feedback.println(Feedback.WEB, String.format("[OK] Found target data acquisition: %s", file_name)));
         }
         if (schema_uri == null) {
             log.addline(Feedback.println(Feedback.WEB, String.format("[ERROR] Cannot load schema specified for data acquisition: %s", file_name)));
-            log.save();
             return false;
         } else {
             log.addline(Feedback.println(Feedback.WEB, String.format("[OK] Schema %s specified for data acquisition: %s", schema_uri, file_name)));
         }
         if (deployment_uri == null) {
             log.addline(Feedback.println(Feedback.WEB, String.format("[ERROR] Cannot load deployment specified for data acquisition: %s", file_name)));
-            log.save();
             return false;
         } else {
             try {
                 deployment_uri = URLDecoder.decode(deployment_uri, "UTF-8");
             } catch (UnsupportedEncodingException e) {
                 log.addline(Feedback.println(Feedback.WEB, String.format("URL decoding error for deployment uri %s", deployment_uri)));
-                log.save();
                 return false;
             }
             log.addline(Feedback.println(Feedback.WEB, String.format("[OK] Deployment %s specified for data acquisition %s", deployment_uri, file_name)));
         }
 
         int status = -1;
-        String message = "";
-
-        Parser parser = new Parser();
-        ParsingResult parsingResult;
-
+        
         try {
             dataFile.setDatasetUri(DataFactory.getNextDatasetURI(da.getUri()));
             da.addDatasetUri(dataFile.getDatasetUri());
-            parsingResult = parser.indexMeasurements(recordFile, da, dataFile);
+            
+            Parser parser = new Parser();
+            ParsingResult parsingResult = parser.indexMeasurements(recordFile, da, dataFile);
             status = parsingResult.getStatus();
-            message += parsingResult.getMessage();
-            log.addline(Feedback.println(Feedback.WEB, message));
-            log.save();
         } catch (Exception e) {
             StringWriter errors = new StringWriter();
             e.printStackTrace(new PrintWriter(errors));
             log.addline(Feedback.println(Feedback.WEB, String.format("[ERROR] parsing and indexing CSV file %s", errors.toString())));
-            log.save();
             e.printStackTrace();
             return false;
         }

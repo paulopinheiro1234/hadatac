@@ -321,7 +321,9 @@ public class DataAcquisitionSchema extends HADatAcThing {
 		return null;
 	}
 	
-	public void defineTemporaryPositions(List<String> csvHeaders) {
+	public List<String> defineTemporaryPositions(List<String> csvHeaders) {
+	    List<String> unknownHeaders = new ArrayList<String>(csvHeaders);
+	    
 		// Assign DASA positions by label matching
 		List<DataAcquisitionSchemaAttribute> listDasa = getAttributes();
 		if (listDasa != null && listDasa.size() > 0) {
@@ -334,6 +336,7 @@ public class DataAcquisitionSchema extends HADatAcThing {
 				for (DataAcquisitionSchemaAttribute dasa : listDasa) {
 					if (csvHeaders.get(i).equalsIgnoreCase(dasa.getLabel())) {
 						dasa.setTempPositionInt(i);
+						unknownHeaders.remove(csvHeaders.get(i));
 					}
 				}
 			}
@@ -351,10 +354,13 @@ public class DataAcquisitionSchema extends HADatAcThing {
 				for (DataAcquisitionSchemaObject daso : listDaso) {
 					if (csvHeaders.get(i).equalsIgnoreCase(daso.getLabel())) {
 						daso.setTempPositionInt(i);
+						unknownHeaders.remove(csvHeaders.get(i));
 					}
 				}
 			}
 		}
+		
+		return unknownHeaders;
 	}
 
 	public int tempPositionOfLabel(String label) {

@@ -51,6 +51,7 @@ public class AnnotationLog {
 	
 	public void addline(String new_line) {
 		this.log += (new SimpleDateFormat("yyyy-MM-dd HH:mm:ss")).format(new Date()) + " " + new_line;
+		save();
 	}
 	
 	public int save() {
@@ -64,18 +65,6 @@ public class AnnotationLog {
 			return status;
 		} catch (IOException | SolrServerException e) {
 			System.out.println("[ERROR] AnnotationLog.save() - e.Message: " + e.getMessage());
-			return -1;
-		}
-	}
-	
-	public int save(SolrClient solr) {
-		try {
-			int status = solr.addBean(this).getStatus();
-			solr.commit();
-			solr.close();
-			return status;
-		} catch (IOException | SolrServerException e) {
-			System.out.println("[ERROR] AnnotationLog.save(SolrClient) - e.Message: " + e.getMessage());
 			return -1;
 		}
 	}

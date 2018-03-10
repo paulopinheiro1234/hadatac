@@ -257,6 +257,7 @@ public class AutoAnnotator extends Controller {
             result.put("Submission Time", dataFile.getSubmissionTime());
             result.put("Completion Time", dataFile.getCompletionTime());
             result.put("Owner Email", dataFile.getOwnerEmail());
+            result.put("Log", AnnotationLog.create(fileName).getLog());
         }
 
         return ok(Json.toJson(result));
@@ -299,7 +300,6 @@ public class AutoAnnotator extends Controller {
 
         AnnotationLog log = new AnnotationLog(fileName);
         log.addline(Feedback.println(Feedback.WEB, String.format("[OK] Moved file %s to unprocessed folder", fileName)));
-        log.save();
 
         return redirect(routes.AutoAnnotator.index());
     }
@@ -350,7 +350,6 @@ public class AutoAnnotator extends Controller {
             AnnotationLog log = new AnnotationLog(file.getName());
             log.addline(Feedback.println(Feedback.WEB, String.format(
                     "[ERROR] Unknown file format: %s", file.getName())));
-            log.save();
             return;
         }
 

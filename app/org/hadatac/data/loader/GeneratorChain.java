@@ -22,10 +22,10 @@ public class GeneratorChain {
                 generator.postprocess();
 
                 generator.commitRowsToTripleStore(generator.getRows());
-                //generator.commitRowsToLabKey(generator.getRows());
+                generator.commitRowsToLabKey(generator.getRows());
 
                 generator.commitObjectsToTripleStore(generator.getObjects());
-                //generator.commitObjectsToLabKey(generator.getObjects());
+                generator.commitObjectsToLabKey(generator.getObjects());
                 generator.commitObjectsToSolr(generator.getObjects());
 
             } catch (Exception e) {

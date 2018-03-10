@@ -165,7 +165,6 @@ public class Downloader extends Controller {
 		AnnotationLog log = new AnnotationLog(fileName);
 		log.addline(Feedback.println(Feedback.WEB, "Facets: " + facets));
 		log.addline(Feedback.println(Feedback.WEB, "Selected Fields: " + selectedFields));
-		log.save();
 		
 		DataFile dataFile = new DataFile(fileName);
 		dataFile.setOwnerEmail(ownerEmail);

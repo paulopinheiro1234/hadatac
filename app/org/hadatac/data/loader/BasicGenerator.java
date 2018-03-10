@@ -183,14 +183,12 @@ public abstract class BasicGenerator {
             log.addline(Feedback.println(Feedback.WEB, String.format(
                     "[ERROR] Trying to commit invalid rows to LabKey Table %s: ", getTableName())
                     + e.getMessage()));
-            log.save();
         }
 
         Credential cred = Credential.find();
         if (null == cred) {
             log.resetLog();
             log.addline(Feedback.println(Feedback.WEB, "[ERROR] No LabKey credentials are provided!"));
-            log.save();
         }
 
         String site = ConfigProp.getPropertyValue("labkey.config", "site");
@@ -208,11 +206,8 @@ public abstract class BasicGenerator {
                 log.addline(Feedback.println(Feedback.WEB, String.format("[OK] %d row(s) have been updated into Table %s ", nRows, getTableName())));
             } catch (CommandException e) {
                 log.addline(Feedback.println(Feedback.WEB, "[ERROR] CommitRows inside AutoAnnotator: " + e));
-                log.save();
             }
         }
-
-        log.save();
 
         return true;
     }
@@ -227,7 +222,6 @@ public abstract class BasicGenerator {
             AnnotationLog log = AnnotationLog.create(fileName);
             log.addline(Feedback.println(Feedback.WEB, 
                     String.format("[OK] %d triple(s) have been committed to triple store", model.size())));
-            log.save();
         }
 
         return true;
@@ -248,7 +242,6 @@ public abstract class BasicGenerator {
             AnnotationLog log = AnnotationLog.create(fileName);
             log.addline(Feedback.println(Feedback.WEB, 
                     String.format("[OK] %d object(s) have been committed to LabKey", count)));
-            log.save();
         }
     }
 
@@ -264,7 +257,6 @@ public abstract class BasicGenerator {
             AnnotationLog log = AnnotationLog.create(fileName);
             log.addline(Feedback.println(Feedback.WEB, 
                     String.format("[OK] %d object(s) have been committed to triple store", count)));
-            log.save();
         }
 
         return true;
@@ -282,7 +274,6 @@ public abstract class BasicGenerator {
             AnnotationLog log = AnnotationLog.create(fileName);
             log.addline(Feedback.println(Feedback.WEB, 
                     String.format("[OK] %d object(s) have been committed to solr", count)));
-            log.save();
         }
 
         return true;
@@ -334,7 +325,6 @@ public abstract class BasicGenerator {
             labkeyDataHandler.deleteRows(getTableName(), rows);
         } catch (CommandException e) {
             log.addline(Feedback.println(Feedback.WEB, "[ERROR] Delete rows from LabKey: " + e));
-            log.save();
             throw new LabKeyException("[ERROR] Delete rows from LabKey: " + e);
         }
     }

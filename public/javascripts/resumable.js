@@ -453,10 +453,6 @@
           $.resumableObj.fire('fileProgress', $); // it's at least progress
           if($.isComplete()) {
             $.resumableObj.fire('fileSuccess', $, message);
-            // Delay 3 second and refresh current page
-            setTimeout(function(){ 
-            	location.reload(); 
-            }, 20000);
           }
           break;
         case 'retry':
