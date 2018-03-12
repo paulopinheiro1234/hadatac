@@ -146,7 +146,6 @@ public class LabkeyDataHandler {
 		InsertRowsCommand cmd = new InsertRowsCommand("lists", queryName);
 		for (Map<String, Object> row : rows) {
 			cmd.addRow(row);
-//			System.out.println(row.get("hasURI"));
 		}
 
 		try {

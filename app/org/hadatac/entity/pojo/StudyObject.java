@@ -45,7 +45,7 @@ public class StudyObject extends HADatAcThing {
 
     String originalId;
     String isMemberOf;
-    List<String> scopeUris;
+    List<String> scopeUris = new ArrayList<String>();
 
     public StudyObject() {
         this("", "");
@@ -58,7 +58,6 @@ public class StudyObject extends HADatAcThing {
         setLabel("");
         setIsMemberOf(isMemberOf);
         setComment("");
-        setScopeUris(new ArrayList<String>());
     }
 
     public StudyObject(String uri,

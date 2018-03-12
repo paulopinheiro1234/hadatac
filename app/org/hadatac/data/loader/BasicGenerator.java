@@ -176,6 +176,9 @@ public abstract class BasicGenerator {
 
     public boolean commitRowsToLabKey(List<Map<String, Object>> rows) {
         AnnotationLog log = AnnotationLog.create(fileName);
+        if (rows.isEmpty()) {
+            return true;
+        }
 
         try {
             checkRows(rows, "hasURI");
@@ -308,6 +311,10 @@ public abstract class BasicGenerator {
     }
 
     public void deleteRowsFromLabKey(List<Map<String, Object>> rows) throws Exception {
+        if (rows.isEmpty()) {
+            return;
+        }
+        
         AnnotationLog log = AnnotationLog.create(fileName);
 
         checkRows(rows, "hasURI");
