@@ -31,7 +31,7 @@ public class GeneratorChain {
             } catch (Exception e) {
                 System.out.println(generator.getErrorMsg(e));
                 e.printStackTrace();
-                AnnotationLog.printException(e, generator.getFileName());
+                AnnotationLog.printException(generator.getErrorMsg(e), generator.getFileName());
                 return false;
             }
         }

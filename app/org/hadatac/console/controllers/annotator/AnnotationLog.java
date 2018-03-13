@@ -72,8 +72,12 @@ public class AnnotationLog {
 	public static void printException(Exception exception, String fileName) {
 		AnnotationLog log = AnnotationLog.create(fileName);
         log.addline(Feedback.println(Feedback.WEB, "[ERROR] " + exception.getMessage()));
-        log.save();
 	}
+	
+	public static void printException(String message, String fileName) {
+        AnnotationLog log = AnnotationLog.create(fileName);
+        log.addline(Feedback.println(Feedback.WEB, "[ERROR] " + message));
+    }
 	
 	public static AnnotationLog convertFromSolr(SolrDocument doc) {
 		AnnotationLog annotation_log = new AnnotationLog();
