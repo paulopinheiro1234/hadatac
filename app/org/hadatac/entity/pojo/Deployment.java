@@ -5,7 +5,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.net.URLEncoder;
 
 import org.apache.jena.query.Query;
 import org.apache.jena.query.QueryExecution;
@@ -25,12 +24,9 @@ import org.apache.jena.update.UpdateExecutionFactory;
 import org.apache.jena.update.UpdateFactory;
 import org.apache.jena.update.UpdateProcessor;
 import org.apache.jena.update.UpdateRequest;
-import org.hadatac.console.controllers.AuthApplication;
-import org.hadatac.console.controllers.triplestore.routes;
 import org.hadatac.metadata.loader.LabkeyDataHandler;
 import org.hadatac.metadata.loader.URIUtils;
 import org.hadatac.utils.CollectionUtil;
-import org.hadatac.utils.ConfigProp;
 import org.hadatac.utils.NameSpaces;
 import org.hadatac.utils.State;
 import org.joda.time.DateTime;
@@ -42,11 +38,7 @@ import org.labkey.remoteapi.CommandException;
 
 import com.typesafe.config.ConfigFactory;
 
-import be.objectify.deadbolt.java.actions.Group;
-import be.objectify.deadbolt.java.actions.Restrict;
-import play.Play;
-
-public class Deployment {
+public class Deployment extends HADatAcThing {
 
     public static String INDENT1 = "     ";
 
@@ -57,8 +49,7 @@ public class Deployment {
     public static String LINE3 = INDENT1 + "a         vstoi:Deployment;  ";
 
     public static String DELETE_LINE3 = INDENT1 + " ?p ?o . ";
-
-    //public static String LINE3_LEGACY = INDENT1 + "a         vstoi:LegacyDeployment;  ";
+    
     public static String LINE3_LEGACY = INDENT1 + "a         vstoi:Deployment;  ";
 
     public static String PLATFORM_PREDICATE =     INDENT1 + "vstoi:hasPlatform        ";
@@ -194,33 +185,6 @@ public class Deployment {
         this.detectors = detectors;
     }
 
-    public void save() {
-        String insert = "";
-        insert += NameSpaces.getInstance().printSparqlNameSpaceList();
-        insert += INSERT_LINE1;
-        insert += "<" + this.getUri() + ">  ";
-        if (this.isLegacy()) {
-            insert += LINE3_LEGACY;
-        } else {
-            insert += LINE3;
-        }
-        insert += PLATFORM_PREDICATE + "<" + this.platform.getUri() + "> ;   ";
-        insert += INSTRUMENT_PREDICATE + "<" + this.instrument.getUri() + "> ;   ";
-        Iterator<Detector> i = this.detectors.iterator();
-        while (i.hasNext()) {
-            insert += DETECTOR_PREDICATE + "<" + i.next().getUri() + "> ;   ";
-        }
-        insert += START_TIME_PREDICATE + "\"" + this.getStartedAt() + TIME_XMLS + "  ";
-        if (this.endedAt != null) {
-            insert += END_TIME_PREDICATE + "\"" + this.getEndedAt() + TIME_XMLS + "  ";
-        }
-        insert += LINE_LAST;
-        UpdateRequest request = UpdateFactory.create(insert);
-        UpdateProcessor processor = UpdateExecutionFactory.createRemote(
-                request, CollectionUtil.getCollectionsName(CollectionUtil.METADATA_UPDATE));
-        processor.execute();
-    }
-
     public void saveEndedAtTime() {
         String insert = "";
         if (this.getEndedAt() != null) {
@@ -245,18 +209,6 @@ public class Deployment {
         saveEndedAtTime();
     }
 
-    public void delete() {
-        String query = "";
-        query += NameSpaces.getInstance().printSparqlNameSpaceList();
-        query += DELETE_LINE1;
-        query += "<" + this.getUri() + ">  ";
-        query += DELETE_LINE3;
-        query += LINE_LAST;
-        UpdateRequest request = UpdateFactory.create(query);
-        UpdateProcessor processor = UpdateExecutionFactory.createRemote(request, CollectionUtil.getCollectionsName(CollectionUtil.METADATA_UPDATE));
-        processor.execute();
-    }
-
     public static Deployment create(String uri) {
         Deployment deployment = new Deployment();
         deployment.setUri(uri);
@@ -273,7 +225,6 @@ public class Deployment {
     }
 
     public static Deployment findFromDataAcquisition(HADataC hadatac) {
-        //System.out.println("Current URI for FIND FROM DATA ACQUISITION: " + hadatac.getDataAcquisition().getDeploymentUri());
         String queryString = NameSpaces.getInstance().printSparqlNameSpaceList()
                 + "SELECT ?startedAt ?endedAt ?detector ?instrument ?platform WHERE {\n"
                 + "  <" + hadatac.getDataAcquisition().getDeploymentUri() + "> a vstoi:Deployment .\n"
@@ -312,7 +263,6 @@ public class Deployment {
     }
 
     public static Deployment findFromPreamble(HADataC hadatac) {
-        //System.out.println("Current URI for FIND FROM PREAMBLE: " + hadatac.getDataAcquisition().getDeploymentUri());
         String queryString = NameSpaces.getInstance().printSparqlNameSpaceList() 
                 + "SELECT ?startedAt ?endedAt ?detector ?instrument ?platform WHERE {\n"
                 + "  <" + hadatac.getDeploymentUri() + "> a vstoi:Deployment .\n"
@@ -442,7 +392,6 @@ public class Deployment {
     }
 
     public static Deployment find(Model model, DataAcquisition dataAcquisition) {
-        //System.out.println("FIND DEPLOYMENT OF DATA ACQUISITION ");
         String queryString = NameSpaces.getInstance().printSparqlNameSpaceList() 
                 + "SELECT ?dp WHERE {\n"
                 + "  ?dp hasco:hasDataAcquisition <" + dataAcquisition.getCcsvUri() + "> .\n"
@@ -465,14 +414,9 @@ public class Deployment {
         return null;
     }
 
-    @Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
-    public int saveToLabKey(String user_name, String password) throws CommandException {
-
-        String site = ConfigProp.getPropertyValue("labkey.config", "site");
-        String path = "/" + ConfigProp.getPropertyValue("labkey.config", "folder");
-
-        LabkeyDataHandler loader = new LabkeyDataHandler(
-                site, user_name, password, path);
+    @Override
+    public int saveToLabKey(String user_name, String password) {
+        LabkeyDataHandler loader = LabkeyDataHandler.createDefault(user_name, password);
 
         List<String> detectorURIs = new ArrayList<String>();
         for (Detector detector : getDetectors()) {
@@ -490,7 +434,77 @@ public class Deployment {
         row.put("prov:startedAtTime", getStartedAt());
         row.put("prov:endedAtTime", getEndedAt());
         rows.add(row);
+        
+        int totalChanged = 0;
+        try {
+            totalChanged = loader.insertRows("Deployment", rows);
+        } catch (CommandException e) {
+            try {
+                totalChanged = loader.updateRows("Deployment", rows);
+            } catch (CommandException e2) {
+                System.out.println("[ERROR] Could not insert or update Deployment(s)");
+            }
+        }
+        
+        return totalChanged;
+    }
 
-        return loader.insertRows("Deployment", rows);
+    @Override
+    public boolean saveToTripleStore() {
+        String insert = "";
+        insert += NameSpaces.getInstance().printSparqlNameSpaceList();
+        insert += INSERT_LINE1;
+        insert += "<" + this.getUri() + ">  ";
+        if (this.isLegacy()) {
+            insert += LINE3_LEGACY;
+        } else {
+            insert += LINE3;
+        }
+        insert += PLATFORM_PREDICATE + "<" + this.platform.getUri() + "> ;   ";
+        insert += INSTRUMENT_PREDICATE + "<" + this.instrument.getUri() + "> ;   ";
+        Iterator<Detector> i = this.detectors.iterator();
+        while (i.hasNext()) {
+            insert += DETECTOR_PREDICATE + "<" + i.next().getUri() + "> ;   ";
+        }
+        insert += START_TIME_PREDICATE + "\"" + this.getStartedAt() + TIME_XMLS + "  ";
+        if (this.endedAt != null) {
+            insert += END_TIME_PREDICATE + "\"" + this.getEndedAt() + TIME_XMLS + "  ";
+        }
+        insert += LINE_LAST;
+        UpdateRequest request = UpdateFactory.create(insert);
+        UpdateProcessor processor = UpdateExecutionFactory.createRemote(
+                request, CollectionUtil.getCollectionsName(CollectionUtil.METADATA_UPDATE));
+        processor.execute();
+        
+        return true;
+    }
+
+    @Override
+    public void deleteFromTripleStore() {
+        String query = "";
+        query += NameSpaces.getInstance().printSparqlNameSpaceList();
+        query += DELETE_LINE1;
+        query += "<" + this.getUri() + ">  ";
+        query += DELETE_LINE3;
+        query += LINE_LAST;
+        UpdateRequest request = UpdateFactory.create(query);
+        UpdateProcessor processor = UpdateExecutionFactory.createRemote(
+                request, CollectionUtil.getCollectionsName(CollectionUtil.METADATA_UPDATE));
+        processor.execute();
+    }
+
+    @Override
+    public boolean saveToSolr() {
+        return false;
+    }
+
+    @Override
+    public int deleteFromSolr() {
+        return 0;
+    }
+
+    @Override
+    public int deleteFromLabKey(String userName, String password) {
+        return 0;
     }
 }

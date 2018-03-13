@@ -289,13 +289,14 @@ public class Platform extends HADatAcThing implements Comparable<Platform> {
 		return platform;
 	}
 
-	public void save() {
+	@Override
+	public boolean saveToTripleStore() {
 		if (uri == null || uri.equals("")) {
 			System.out.println("[ERROR] Trying to save Platform without assigning an URI");
-			return;
+			return false;
 		}
 
-		delete();  // delete any existing triple for the current platform
+		deleteFromTripleStore();
 
 		String insert = "";
 		String plt_uri = "";
@@ -321,14 +322,13 @@ public class Platform extends HADatAcThing implements Comparable<Platform> {
 		UpdateProcessor processor = UpdateExecutionFactory.createRemote(
 				request, CollectionUtil.getCollectionsName(CollectionUtil.METADATA_UPDATE));
 		processor.execute();
-
+		
+		return true;
 	}
 
 	@Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
 	public int saveToLabKey(String user_name, String password) {
-		String site = ConfigProp.getPropertyValue("labkey.config", "site");
-		String path = "/" + ConfigProp.getPropertyValue("labkey.config", "folder");
-		LabkeyDataHandler loader = new LabkeyDataHandler(site, user_name, password, path);
+		LabkeyDataHandler loader = LabkeyDataHandler.createDefault(user_name, password);
 		List< Map<String, Object> > rows = new ArrayList< Map<String, Object> >();
 		Map<String, Object> row = new HashMap<String, Object>();
 		row.put("hasURI", URIUtils.replaceNameSpaceEx(getUri()));
@@ -350,7 +350,8 @@ public class Platform extends HADatAcThing implements Comparable<Platform> {
 		return totalChanged;
 	}
 
-	public void delete() {
+	@Override
+	public void deleteFromTripleStore() {
 		String query = "";
 		if (this.getUri() == null || this.getUri().equals("")) {
 			return;
@@ -365,7 +366,8 @@ public class Platform extends HADatAcThing implements Comparable<Platform> {
 		query += DELETE_LINE3;
 		query += LINE_LAST;
 		UpdateRequest request = UpdateFactory.create(query);
-		UpdateProcessor processor = UpdateExecutionFactory.createRemote(request, CollectionUtil.getCollectionsName(CollectionUtil.METADATA_UPDATE));
+		UpdateProcessor processor = UpdateExecutionFactory.createRemote(
+		        request, CollectionUtil.getCollectionsName(CollectionUtil.METADATA_UPDATE));
 		processor.execute();
 	}
 
@@ -374,4 +376,18 @@ public class Platform extends HADatAcThing implements Comparable<Platform> {
 		return this.getLabel().compareTo(another.getLabel());
 	}
 
+    @Override
+    public boolean saveToSolr() {
+        return false;
+    }
+
+    @Override
+    public int deleteFromSolr() {
+        return 0;
+    }
+
+    @Override
+    public int deleteFromLabKey(String userName, String password) {
+        return 0;
+    }
 }

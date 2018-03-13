@@ -20,15 +20,12 @@ import org.hadatac.utils.NameSpaces;
 
 import com.typesafe.config.ConfigFactory;
 
-import play.Play;
-
 public class Aggregate extends HADatAcClass implements Comparable<Aggregate> {
 
 	static String className = "hadatac-aggregate:aggregate";
 	
 	public Aggregate() {
 		super(className);
-		// TODO Auto-generated constructor stub
 	}
 	
 	public static List<Aggregate> find() {
@@ -92,7 +89,6 @@ public class Aggregate extends HADatAcClass implements Comparable<Aggregate> {
 
 	@Override
 	public int compareTo(Aggregate o) {
-		// TODO Auto-generated method stub
 		return 0;
 	}
 

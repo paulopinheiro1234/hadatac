@@ -22,7 +22,6 @@ import org.apache.jena.update.UpdateFactory;
 import org.apache.jena.update.UpdateProcessor;
 import org.apache.jena.update.UpdateRequest;
 import org.hadatac.utils.CollectionUtil;
-import org.hadatac.utils.ConfigProp;
 import org.hadatac.utils.NameSpaces;
 import org.hadatac.utils.FirstLabel;
 import org.hadatac.metadata.loader.URIUtils;
@@ -245,7 +244,7 @@ public class ObjectCollection extends HADatAcThing {
         return false;
     }
 
-    private static List<String> retrieveSpaceScope (String oc_uri) {
+    private static List<String> retrieveSpaceScope(String oc_uri) {
         List<String> scopeUris = new ArrayList<String>();
         String scopeUri = ""; 
         String queryString = NameSpaces.getInstance().printSparqlNameSpaceList() + 
@@ -278,7 +277,7 @@ public class ObjectCollection extends HADatAcThing {
         return scopeUris;
     }
 
-    private static List<String> retrieveTimeScope (String oc_uri) {
+    private static List<String> retrieveTimeScope(String oc_uri) {
         List<String> scopeUris = new ArrayList<String>();
         String scopeUri = "";
         String queryString = NameSpaces.getInstance().printSparqlNameSpaceList() + 
@@ -312,12 +311,6 @@ public class ObjectCollection extends HADatAcThing {
     }
 
     public static ObjectCollection find(String oc_uri) {
-        try {
-            oc_uri = URLDecoder.decode(oc_uri, "UTF-8");
-        } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
-        }
-
         ObjectCollection oc = null;
 
         String queryString = NameSpaces.getInstance().printSparqlNameSpaceList() + 
@@ -602,11 +595,9 @@ public class ObjectCollection extends HADatAcThing {
         return true;
     }
 
-    @Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
+    @Override
     public int saveToLabKey(String user_name, String password) {
-        String site = ConfigProp.getPropertyValue("labkey.config", "site");
-        String path = "/" + ConfigProp.getPropertyValue("labkey.config", "folder");
-        LabkeyDataHandler loader = new LabkeyDataHandler(site, user_name, password, path);
+        LabkeyDataHandler loader = LabkeyDataHandler.createDefault(user_name, password);
         List< Map<String, Object> > rows = new ArrayList< Map<String, Object> >();
         Map<String, Object> row = new HashMap<String, Object>();
         row.put("hasURI", URIUtils.replaceNameSpaceEx(getUri()));
@@ -628,12 +619,9 @@ public class ObjectCollection extends HADatAcThing {
         return totalChanged;
     }
 
-    @Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
     @Override
     public int deleteFromLabKey(String user_name, String password) {
-        String site = ConfigProp.getPropertyValue("labkey.config", "site");
-        String path = "/" + ConfigProp.getPropertyValue("labkey.config", "folder");
-        LabkeyDataHandler loader = new LabkeyDataHandler(site, user_name, password, path);
+        LabkeyDataHandler loader = LabkeyDataHandler.createDefault(user_name, password);
         List< Map<String, Object> > rows = new ArrayList< Map<String, Object> >();
         Map<String, Object> row = new HashMap<String, Object>();
         row.put("hasURI", URIUtils.replaceNameSpaceEx(getUri().replace("<","").replace(">","")));
@@ -669,5 +657,15 @@ public class ObjectCollection extends HADatAcThing {
         UpdateProcessor processor = UpdateExecutionFactory.createRemote(
                 request, CollectionUtil.getCollectionsName(CollectionUtil.METADATA_UPDATE));
         processor.execute();
+    }
+
+    @Override
+    public boolean saveToSolr() {
+        return false;
+    }
+
+    @Override
+    public int deleteFromSolr() {
+        return 0;
     }
 }

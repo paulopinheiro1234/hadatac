@@ -3,7 +3,6 @@ package org.hadatac.console.controllers.deployments;
 import org.hadatac.console.controllers.AuthApplication;
 import org.hadatac.console.models.URIGeneratorForm;
 
-import play.Play;
 import play.data.Form;
 import play.mvc.Controller;
 import play.mvc.Result;

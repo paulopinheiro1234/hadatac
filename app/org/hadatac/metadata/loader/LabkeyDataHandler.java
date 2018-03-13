@@ -16,6 +16,7 @@ import org.apache.jena.rdf.model.Property;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.sparql.function.library.print;
 import org.hadatac.console.views.html.deployments.newDeployment;
+import org.hadatac.utils.ConfigProp;
 import org.apache.jena.rdf.model.Literal;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -48,8 +49,16 @@ public class LabkeyDataHandler {
 		public String obj;
 	}
 	
-	public LabkeyDataHandler(String labkey_site, String user_name, 
-			String password, String path) {
+	public static LabkeyDataHandler createDefault(
+	        String user_name, String password) {
+	    String site = ConfigProp.getLabKeySite();
+        String path = ConfigProp.getLabKeyProjectPath();
+        
+        return new LabkeyDataHandler(site, path, user_name, password);
+	}
+	
+	public LabkeyDataHandler(String labkey_site, String path, 
+	        String user_name, String password) {
 		cn = new Connection(labkey_site, user_name, password);
 		setFolderPath(path);
 	}

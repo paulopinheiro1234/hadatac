@@ -1,10 +1,6 @@
 package org.hadatac.console.http;
 
 import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
-import java.util.TreeMap;
 
 import org.hadatac.console.models.SparqlQuery;
 import org.hadatac.utils.CollectionUtil;
@@ -13,13 +9,8 @@ import org.apache.jena.query.Query;
 import org.apache.jena.query.QueryExecution;
 import org.apache.jena.query.QueryExecutionFactory;
 import org.apache.jena.query.QueryFactory;
-import org.apache.jena.query.QuerySolution;
 import org.apache.jena.query.ResultSet;
-import org.apache.jena.query.ResultSetFactory;
-import org.apache.jena.query.ResultSetRewindable;
 import org.apache.jena.query.ResultSetFormatter;
-
-import play.Play;
 
 public class GetSparqlQuery {
     public String collection;

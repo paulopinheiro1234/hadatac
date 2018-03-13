@@ -106,4 +106,33 @@ public class UnitInstance extends HADatAcThing implements Comparable<UnitInstanc
         }
         return this.getUri().compareTo(another.getUri());
     }
+
+    @Override
+    public boolean saveToTripleStore() {
+        return false;
+    }
+
+    @Override
+    public void deleteFromTripleStore() {
+    }
+
+    @Override
+    public boolean saveToSolr() {
+        return false;
+    }
+
+    @Override
+    public int deleteFromSolr() {
+        return 0;
+    }
+
+    @Override
+    public int saveToLabKey(String userName, String password) {
+        return 0;
+    }
+
+    @Override
+    public int deleteFromLabKey(String userName, String password) {
+        return 0;
+    }
 }

@@ -21,175 +21,169 @@ import play.data.FormFactory;
 import javax.inject.Inject;
 
 public class SolrSearchProxy extends Controller {
-	
-	@Inject
-	private FormFactory formFactory;
-	
-	@Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-	public Result getSolrSearch(String path) {
-		InputStream is = null;
-		URL url = null;
-		HttpURLConnection con = null;
 
-		try {
-		    url = new URL(path.substring(0, path.indexOf('?')));
-		    con = (HttpURLConnection) url.openConnection();
-		    con.setRequestMethod("POST");
-		    con.setRequestProperty("Accept-Charset", "utf-8");
-		    con.setDoOutput(true);
-		    DataOutputStream wr = new DataOutputStream(con.getOutputStream());
-		    wr.writeBytes(path.substring(path.indexOf('?')+1, path.length()));
-		    wr.flush();
-		    wr.close();
-		} catch (Exception e) {
-		    e.printStackTrace();
-		}
+    @Inject
+    private FormFactory formFactory;
 
-		try (OutputStream output = con.getOutputStream()) {
-		    output.write(path.getBytes("utf-8"));
-		} catch (IOException e) {
-		    e.printStackTrace();
-		}
- 
-		try {
-		    is = con.getInputStream();
-		} catch (IOException e) {
-		    e.printStackTrace();
-		}
- 
-		if (is != null) {
-		    return ok(is);
-		} else {
-		    return ok();
-		}
-	}
-	
-	@Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-	public Result getIndicatorValueDownload(String lm) {
-		File file = new File(lm);
-		return ok(file);
-	}
-	
-	@Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    public Result getDataAcquisitionDownload(){
-	DynamicForm form = formFactory.form().bindFromRequest();
-	String request_fl;
-	String request_wt;
-	String request_rows;
-    String request_q;
-    String request_encoding = "";
+    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
+    public Result getSolrSearch(String path) {
+        InputStream is = null;
+        URL url = null;
+        HttpURLConnection con = null;
 
-	if (form.data().size() == 0) {
-	    return badRequest("[ERROR] getDataAcuisitionDownload expects some data");
+        try {
+            url = new URL(path.substring(0, path.indexOf('?')));
+            con = (HttpURLConnection) url.openConnection();
+            con.setRequestMethod("POST");
+            con.setRequestProperty("Accept-Charset", "utf-8");
+            con.setDoOutput(true);
+            DataOutputStream wr = new DataOutputStream(con.getOutputStream());
+            wr.writeBytes(path.substring(path.indexOf('?')+1, path.length()));
+            wr.flush();
+            wr.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        try (OutputStream output = con.getOutputStream()) {
+            output.write(path.getBytes("utf-8"));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        try {
+            is = con.getInputStream();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        if (is != null) {
+            return ok(is);
         } else {
-        request_fl = form.get("fl");
-	    request_wt = form.get("wt");
-	    request_rows = form.get("rows");
-	    request_q = form.get("q");
-	    request_encoding = "wt=" + request_wt + "&rows=" + request_rows + "&q=" + request_q;
-	    if (!request_fl.equals("")) {
-	        request_encoding += "&fl=" + request_fl; 
-	    }
-	    System.out.println("Request: " + request_encoding);
-	}
-        String path = CollectionUtil.getCollectionsName(CollectionUtil.DATA_ACQUISITION) + "/select" +
-	    //"?" + URLEncoder.encode(request_encoding);
-	    "?" + request_encoding;
-            response().setContentType("text/csv");
-        return getSolrSearch(path);
+            return ok();
+        }
     }
-	
-	@Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    public Result getStudyAcquisitionDownload(){
+
+    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
+    public Result getIndicatorValueDownload(String lm) {
+        File file = new File(lm);
+        return ok(file);
+    }
+
+    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
+    public Result getDataAcquisitionDownload() {
+        DynamicForm form = formFactory.form().bindFromRequest();
+        String request_fl;
+        String request_wt;
+        String request_rows;
+        String request_q;
+        String request_encoding = "";
+
+        if (form.data().size() == 0) {
+            return badRequest("[ERROR] getDataAcuisitionDownload expects some data");
+        } else {
+            request_fl = form.get("fl");
+            request_wt = form.get("wt");
+            request_rows = form.get("rows");
+            request_q = form.get("q");
+            request_encoding = "wt=" + request_wt + "&rows=" + request_rows + "&q=" + request_q;
+            if (!request_fl.equals("")) {
+                request_encoding += "&fl=" + request_fl; 
+            }
+            System.out.println("Request: " + request_encoding);
+        }
+        String path = CollectionUtil.getCollectionsName(CollectionUtil.DATA_ACQUISITION) 
+                + "/select" + "?" + request_encoding;
+
+        return getSolrSearch(path).as("text/csv");
+    }
+
+    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
+    public Result getStudyAcquisitionDownload() {
+        String path = CollectionUtil.getCollectionsName(CollectionUtil.STUDY_ACQUISITION) 
+                + request().toString().split((request().path()))[1];
+
+        return getSolrSearch(path).as("text/csv");
+    }
+
+    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
+    public Result getStudyAcquisition() {
         String path = CollectionUtil.getCollectionsName(CollectionUtil.STUDY_ACQUISITION) + 
                 request().toString().split((request().path()))[1];
-        //System.out.println(path);
-        response().setContentType("text/csv");
         return getSolrSearch(path);
     }
-	
-	@Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-	public Result getStudyAcquisition(){
-		String path = CollectionUtil.getCollectionsName(CollectionUtil.STUDY_ACQUISITION) + 
-				request().toString().split((request().path()))[1];
-		return getSolrSearch(path);
-	}
-	
-	@Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-	public Result getAnalytesAcquisition(){
-		String path = CollectionUtil.getCollectionsName(CollectionUtil.ANALYTES_ACQUISITION) + 
-				request().toString().split((request().path()))[1];
-		return getSolrSearch(path);
-	}
-	
-	@Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-	public Result getMetadataDataAcquisition(){
-//		String path = Collections.getCollectionsName(Collections.METADATA_DA) + 
-//				request().toString().split((request().path()))[1];
-		String path = CollectionUtil.getCollectionsName(CollectionUtil.DATA_COLLECTION) + "/select" +
-				request().toString().split((request().path()))[1];
-		return getSolrSearch(path);
-	}
-	
-	@Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-	public Result getDataAcquisition(){
-//		String path = Collections.getCollectionsName(Collections.METADATA_DA) + 
-//				request().toString().split((request().path()))[1];
-		String path = CollectionUtil.getCollectionsName(CollectionUtil.METADATA_AQUISITION) + "/select" +
-				request().toString().split((request().path()))[1];
-		System.out.println("Solr Search Path: " + path);
-		return getSolrSearch(path);
-	}
-	
-	@Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-	public Result getSchemaAttributes(){
-		String path = CollectionUtil.getCollectionsName(CollectionUtil.SA_ACQUISITION) + "/select" +
-				request().toString().split((request().path()))[1];
-		return getSolrSearch(path);
-	}
-	
-	public Result getApiStudyDownload() {
-		DynamicForm form = formFactory.form().bindFromRequest();
-		String request_token;
-		
-		if (form.data().size() == 0) {
-			return badRequest("[ERROR] getApiStudyDownload expects some data");
-		} else {
-	        request_token = form.get("token");
-	        if (!request_token.equals("TESTTOKEN")) {
-	        	return badRequest("[ERROR] getApiStudyDownload token mismatch");
-	        }
-	        return getStudyAcquisitionDownload();
-		}
-	}
-	
-	public Result getApiStudyVariableDownload() {
-		DynamicForm form = formFactory.form().bindFromRequest();
-		String request_token;
-		
-		if (form.data().size() == 0) {
-			return badRequest("[ERROR] getApiStudyVariableDownload expects some data");
-		} else {
-	        request_token = form.get("token");
-	        if (!request_token.equals("TESTTOKEN")) {
-	        	return badRequest("[ERROR] getApiStudyVariableDownload token mismatch");
-	        }
-	        return getStudyAcquisitionDownload();
-		}
-	}
-	
-	public Result getApiStudyVariableDataDownload() {
-		DynamicForm form = formFactory.form().bindFromRequest();
-		String request_token;
-		
-		if (form.data().size() == 0) {
-			return badRequest("[ERROR] getApiStudyVariableDataDownload expects some data");
-		} else {
-	        request_token = form.get("token");
-	        if (!request_token.equals("TESTTOKEN")) {
-	        	return badRequest("[ERROR] getApiStudyVariableDataDownload token mismatch");
-	        }
-	        return getStudyAcquisitionDownload();
-		}
-	}
+
+    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
+    public Result getAnalytesAcquisition() {
+        String path = CollectionUtil.getCollectionsName(CollectionUtil.ANALYTES_ACQUISITION) + 
+                request().toString().split((request().path()))[1];
+        return getSolrSearch(path);
+    }
+
+    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
+    public Result getMetadataDataAcquisition() {
+        String path = CollectionUtil.getCollectionsName(CollectionUtil.DATA_COLLECTION) + "/select" +
+                request().toString().split((request().path()))[1];
+        return getSolrSearch(path);
+    }
+
+    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
+    public Result getDataAcquisition() {
+        String path = CollectionUtil.getCollectionsName(CollectionUtil.METADATA_AQUISITION) + "/select" +
+                request().toString().split((request().path()))[1];
+        System.out.println("Solr Search Path: " + path);
+        return getSolrSearch(path);
+    }
+
+    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
+    public Result getSchemaAttributes() {
+        String path = CollectionUtil.getCollectionsName(CollectionUtil.SA_ACQUISITION) + "/select" +
+                request().toString().split((request().path()))[1];
+        return getSolrSearch(path);
+    }
+
+    public Result getApiStudyDownload() {
+        DynamicForm form = formFactory.form().bindFromRequest();
+        String request_token;
+
+        if (form.data().size() == 0) {
+            return badRequest("[ERROR] getApiStudyDownload expects some data");
+        } else {
+            request_token = form.get("token");
+            if (!request_token.equals("TESTTOKEN")) {
+                return badRequest("[ERROR] getApiStudyDownload token mismatch");
+            }
+            return getStudyAcquisitionDownload();
+        }
+    }
+
+    public Result getApiStudyVariableDownload() {
+        DynamicForm form = formFactory.form().bindFromRequest();
+        String request_token;
+
+        if (form.data().size() == 0) {
+            return badRequest("[ERROR] getApiStudyVariableDownload expects some data");
+        } else {
+            request_token = form.get("token");
+            if (!request_token.equals("TESTTOKEN")) {
+                return badRequest("[ERROR] getApiStudyVariableDownload token mismatch");
+            }
+            return getStudyAcquisitionDownload();
+        }
+    }
+
+    public Result getApiStudyVariableDataDownload() {
+        DynamicForm form = formFactory.form().bindFromRequest();
+        String request_token;
+
+        if (form.data().size() == 0) {
+            return badRequest("[ERROR] getApiStudyVariableDataDownload expects some data");
+        } else {
+            request_token = form.get("token");
+            if (!request_token.equals("TESTTOKEN")) {
+                return badRequest("[ERROR] getApiStudyVariableDataDownload token mismatch");
+            }
+            return getStudyAcquisitionDownload();
+        }
+    }
 }

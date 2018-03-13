@@ -21,7 +21,6 @@ import org.apache.jena.update.UpdateRequest;
 import org.hadatac.utils.CollectionUtil;
 import org.hadatac.utils.NameSpaces;
 import org.hadatac.utils.FirstLabel;
-import org.hadatac.utils.ConfigProp;
 import org.hadatac.metadata.loader.LabkeyDataHandler;
 import org.hadatac.entity.pojo.DataAcquisitionSchemaObject;
 import org.hadatac.entity.pojo.DataAcquisitionSchemaEvent;
@@ -544,7 +543,7 @@ public class DataAcquisitionSchemaAttribute extends HADatAcThing {
 		return dasa;
 	}
 
-    public static List<DataAcquisitionSchemaAttribute> findByAttribute (String attributeUri){
+    public static List<DataAcquisitionSchemaAttribute> findByAttribute(String attributeUri) {
 		System.out.println("Looking for data acquisition schema attributes with hasco:hasAttribute " + attributeUri);
 		if (attributeUri.startsWith("http")) {
 			attributeUri = "<" + attributeUri + ">";
@@ -605,7 +604,6 @@ public class DataAcquisitionSchemaAttribute extends HADatAcThing {
 		String queryString = NameSpaces.getInstance().printSparqlNameSpaceList() + 
 				"SELECT ?uri ?hasEntity ?schemaUri ?attrUri" + 
 				" ?hasUnit ?hasDASO ?hasDASE ?hasSource ?isPIConfirmed WHERE { " + 
-//				"    ?da a hasco:DataAcquisition .  " +
 				"    ?da hasco:isDataAcquisitionOf " + studyUri + " .  " +
                 "    ?da hasco:hasSchema ?schemaUri .  "+
 				"    ?uri hasco:partOfSchema ?schemaUri .  " +
@@ -688,67 +686,15 @@ public class DataAcquisitionSchemaAttribute extends HADatAcThing {
 		
 		return attributes;
 	}
-
-	public void save() {
-		delete();  // delete any existing triple for the current DASA
-		
-		if (uri == null || uri.equals("")) {
-			System.out.println("[ERROR] Trying to save DASA without assigning an URI");
-			return;
-		}
-		if (partOfSchema == null || partOfSchema.equals("")) {
-			System.out.println("[ERROR] Trying to save DASA without assigning DAS's URI");
-			return;
-		}
-		String insert = "";
-
-		insert += NameSpaces.getInstance().printSparqlNameSpaceList();
-		insert += INSERT_LINE1;
-		insert += this.getUri() + " a hasco:DASchemaAttribute . ";
-		insert += this.getUri() + " rdfs:label  \"" + label + "\" . ";
-		if (partOfSchema.startsWith("http")) {
-			insert += this.getUri() + " hasco:partOfSchema <" + partOfSchema + "> .  "; 
-		} else {
-			insert += this.getUri() + " hasco:partOfSchema " + partOfSchema + " .  "; 
-		} 
-		if (!entity.equals("")) {
-			insert += this.getUri() + " hasco:hasEntity "  + entity + " .  ";
-		}   
-		if (!attribute.equals("")) {
-			insert += this.getUri() + " hasco:hasAttribute " + attribute + " .  ";
-		}
-		if (!unit.equals("")) {
-			insert += this.getUri() + " hasco:hasUnit " + unit + " .  ";
-		}
-		if (daseUri != null && !daseUri.equals("")) {
-			if (daseUri.startsWith("http")) {
-				insert += this.getUri() + " hasco:hasEvent <" + daseUri + "> .  ";
-			} else {
-				insert += this.getUri() + " hasco:hasEvent " + daseUri + " .  ";
-			}
-		}
-		if (dasoUri != null && !dasoUri.equals("")) {
-			if (dasoUri.startsWith("http")) {
-				insert += this.getUri() + " hasco:isAttributeOf <" + dasoUri + "> .  ";
-			} else {
-				insert += this.getUri() + " hasco:isAttributeOf " + dasoUri + " .  ";
-			}
-		} 
-		//insert += this.getUri() + " hasco:hasSource " + " .  "; 
-		//insert += this.getUri() + " hasco:isPIConfirmed " + " .  "; 
-		insert += LINE_LAST;
-		System.out.println("DASA insert query (pojo's save): <" + insert + ">");
-		UpdateRequest request = UpdateFactory.create(insert);
-		UpdateProcessor processor = UpdateExecutionFactory.createRemote(
-				request, CollectionUtil.getCollectionsName(CollectionUtil.METADATA_UPDATE));
-		processor.execute();
-	}
+	
+	@Override
+    public void save() {
+        saveToTripleStore();
+    }
 
 	@Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
 	public int saveToLabKey(String user_name, String password) {
-		String site = ConfigProp.getPropertyValue("labkey.config", "site");
-		String path = "/" + ConfigProp.getPropertyValue("labkey.config", "folder");
-		LabkeyDataHandler loader = new LabkeyDataHandler(site, user_name, password, path);
+		LabkeyDataHandler loader = LabkeyDataHandler.createDefault(user_name, password);
 		List< Map<String, Object> > rows = new ArrayList< Map<String, Object> >();
 		Map<String, Object> row = new HashMap<String, Object>();
 		row.put("hasURI", URIUtils.replaceNameSpaceEx(getUri()));
@@ -781,9 +727,7 @@ public class DataAcquisitionSchemaAttribute extends HADatAcThing {
 	@Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
 	@Override
 	public int deleteFromLabKey(String user_name, String password) {
-		String site = ConfigProp.getPropertyValue("labkey.config", "site");
-		String path = "/" + ConfigProp.getPropertyValue("labkey.config", "folder");
-		LabkeyDataHandler loader = new LabkeyDataHandler(site, user_name, password, path);
+		LabkeyDataHandler loader = LabkeyDataHandler.createDefault(user_name, password);
 		List< Map<String, Object> > rows = new ArrayList< Map<String, Object> >();
 		Map<String, Object> row = new HashMap<String, Object>();
 		row.put("hasURI", URIUtils.replaceNameSpaceEx(getUri().replace("<","").replace(">","")));
@@ -798,23 +742,92 @@ public class DataAcquisitionSchemaAttribute extends HADatAcThing {
         }
 	}
 
-	public void delete() {
-		String query = "";
-		if (this.getUri() == null || this.getUri().equals("")) {
-			return;
-		}
-		query += NameSpaces.getInstance().printSparqlNameSpaceList();
-		query += DELETE_LINE1;
-		if (this.getUri().startsWith("http")) {
-			query += "<" + this.getUri() + ">";
-		} else {
-			query += this.getUri();
-		}
-		query += DELETE_LINE3;
-		query += LINE_LAST;
+    @Override
+    public boolean saveToTripleStore() {
+        deleteFromTripleStore();
+        
+        if (uri == null || uri.equals("")) {
+            System.out.println("[ERROR] Trying to save DASA without assigning an URI");
+            return false;
+        }
+        if (partOfSchema == null || partOfSchema.equals("")) {
+            System.out.println("[ERROR] Trying to save DASA without assigning DAS's URI");
+            return false;
+        }
+        
+        String insert = "";
+        insert += NameSpaces.getInstance().printSparqlNameSpaceList();
+        insert += INSERT_LINE1;
+        insert += this.getUri() + " a hasco:DASchemaAttribute . ";
+        insert += this.getUri() + " rdfs:label  \"" + label + "\" . ";
+        if (partOfSchema.startsWith("http")) {
+            insert += this.getUri() + " hasco:partOfSchema <" + partOfSchema + "> .  "; 
+        } else {
+            insert += this.getUri() + " hasco:partOfSchema " + partOfSchema + " .  "; 
+        } 
+        if (!entity.equals("")) {
+            insert += this.getUri() + " hasco:hasEntity "  + entity + " .  ";
+        }   
+        if (!attribute.equals("")) {
+            insert += this.getUri() + " hasco:hasAttribute " + attribute + " .  ";
+        }
+        if (!unit.equals("")) {
+            insert += this.getUri() + " hasco:hasUnit " + unit + " .  ";
+        }
+        if (daseUri != null && !daseUri.equals("")) {
+            if (daseUri.startsWith("http")) {
+                insert += this.getUri() + " hasco:hasEvent <" + daseUri + "> .  ";
+            } else {
+                insert += this.getUri() + " hasco:hasEvent " + daseUri + " .  ";
+            }
+        }
+        if (dasoUri != null && !dasoUri.equals("")) {
+            if (dasoUri.startsWith("http")) {
+                insert += this.getUri() + " hasco:isAttributeOf <" + dasoUri + "> .  ";
+            } else {
+                insert += this.getUri() + " hasco:isAttributeOf " + dasoUri + " .  ";
+            }
+        }
+        
+        insert += LINE_LAST;
+        System.out.println("DASA insert query (pojo's save): <" + insert + ">");
+        UpdateRequest request = UpdateFactory.create(insert);
+        UpdateProcessor processor = UpdateExecutionFactory.createRemote(
+                request, CollectionUtil.getCollectionsName(CollectionUtil.METADATA_UPDATE));
+        processor.execute();
+        
+        return true;
+    }
 
-		UpdateRequest request = UpdateFactory.create(query);
-		UpdateProcessor processor = UpdateExecutionFactory.createRemote(request, CollectionUtil.getCollectionsName(CollectionUtil.METADATA_UPDATE));
-		processor.execute();
-	}
+    @Override
+    public void deleteFromTripleStore() {
+        String query = "";
+        if (this.getUri() == null || this.getUri().equals("")) {
+            return;
+        }
+        query += NameSpaces.getInstance().printSparqlNameSpaceList();
+        query += DELETE_LINE1;
+        if (this.getUri().startsWith("http")) {
+            query += "<" + this.getUri() + ">";
+        } else {
+            query += this.getUri();
+        }
+        query += DELETE_LINE3;
+        query += LINE_LAST;
+
+        UpdateRequest request = UpdateFactory.create(query);
+        UpdateProcessor processor = UpdateExecutionFactory.createRemote(
+                request, CollectionUtil.getCollectionsName(CollectionUtil.METADATA_UPDATE));
+        processor.execute();
+    }
+
+    @Override
+    public boolean saveToSolr() {
+        return false;
+    }
+
+    @Override
+    public int deleteFromSolr() {
+        return 0;
+    }
 }

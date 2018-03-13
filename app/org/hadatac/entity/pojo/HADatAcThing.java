@@ -8,8 +8,7 @@ import org.hadatac.console.models.Facet;
 import org.hadatac.console.models.FacetHandler;
 import org.hadatac.metadata.loader.URIUtils;
 
-public class HADatAcThing {
-
+public abstract class HADatAcThing {
 	String uri;
 	String typeUri;
 	String field;
@@ -108,12 +107,12 @@ public class HADatAcThing {
 	public void save() {}
 	public void delete() {}
 	
-	public boolean saveToTripleStore() { return false; }
-	public void deleteFromTripleStore() {}
+	public abstract boolean saveToTripleStore();
+	public abstract void deleteFromTripleStore();
 	
-	public boolean saveToSolr() { return false; }
-	public int deleteFromSolr() { return 0; }
+	public abstract boolean saveToSolr();
+	public abstract int deleteFromSolr();
 	
-	public int saveToLabKey(String userName, String password) { return 0; }
-	public int deleteFromLabKey(String userName, String password) { return 0; }
+	public abstract int saveToLabKey(String userName, String password);
+	public abstract int deleteFromLabKey(String userName, String password);
 }

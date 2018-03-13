@@ -209,12 +209,10 @@ public class AutoAnnotator extends Controller {
     @Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
     public Result postSetLabKeyCredentials() {
         Form<LabKeyLoginForm> form = formFactory.form(LabKeyLoginForm.class).bindFromRequest();
-        String site = ConfigProp.getPropertyValue("labkey.config", "site");
-        String path = "/";
         String user_name = form.get().getUserName();
         String password = form.get().getPassword();
         LabkeyDataHandler loader = new LabkeyDataHandler(
-                site, user_name, password, path);
+                ConfigProp.getLabKeySite(), "/", user_name, password);
         try {
             loader.checkAuthentication();
             Credential cred = new Credential();

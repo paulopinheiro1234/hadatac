@@ -37,159 +37,144 @@ import org.hadatac.console.controllers.triplestore.UserManagement;
 
 public class NewDeployment extends Controller {
 
-	@Inject
-	FormFactory formFactory;
+    @Inject
+    FormFactory formFactory;
 
-	public static SparqlQueryResults getQueryResults(String tabName) {
-		SparqlQuery query = new SparqlQuery();
-		GetSparqlQuery query_submit = new GetSparqlQuery(query);
-		SparqlQueryResults thePlatforms = null;
-		String query_json = null;
-		try {
-			query_json = query_submit.executeQuery(tabName);
-			thePlatforms = new SparqlQueryResults(query_json, false);
-		} catch (IllegalStateException | NullPointerException e1) {
-			e1.printStackTrace();
-		}
-		return thePlatforms;
-	}
+    public static SparqlQueryResults getQueryResults(String tabName) {
+        SparqlQuery query = new SparqlQuery();
+        GetSparqlQuery query_submit = new GetSparqlQuery(query);
+        SparqlQueryResults thePlatforms = null;
+        String query_json = null;
+        try {
+            query_json = query_submit.executeQuery(tabName);
+            thePlatforms = new SparqlQueryResults(query_json, false);
+        } catch (IllegalStateException | NullPointerException e1) {
+            e1.printStackTrace();
+        }
+        return thePlatforms;
+    }
 
-	@Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-	public Result index(String type, String filename, String da_uri ) {
-		if (session().get("LabKeyUserName") == null && session().get("LabKeyPassword") == null) {
-			return redirect(org.hadatac.console.controllers.triplestore.routes.LoadKB.logInLabkey(
-					routes.NewDeployment.index(type, filename, da_uri).url()));
-		}
+    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
+    public Result index(String type, String filename, String da_uri ) {
+        if (session().get("LabKeyUserName") == null && session().get("LabKeyPassword") == null) {
+            return redirect(org.hadatac.console.controllers.triplestore.routes.LoadKB.logInLabkey(
+                    routes.NewDeployment.index(type, filename, da_uri).url()));
+        }
 
-		if (type.equalsIgnoreCase("regular")) {
-			return ok(newDeployment.render(
-					Platform.find(),
-					Instrument.findAvailable(),
-					Detector.findAvailable(),
-					type,
-					filename, 
-					da_uri));
-		}
-		else if (type.equalsIgnoreCase("legacy")) {
-			return ok(newDeployment.render(
-					Platform.find(),
-					Instrument.find(),
-					Detector.find(),
-					type,
-					filename,
-					da_uri));
-		}
+        if (type.equalsIgnoreCase("regular")) {
+            return ok(newDeployment.render(
+                    Platform.find(),
+                    Instrument.findAvailable(),
+                    Detector.findAvailable(),
+                    type,
+                    filename, 
+                    da_uri));
+        }
+        else if (type.equalsIgnoreCase("legacy")) {
+            return ok(newDeployment.render(
+                    Platform.find(),
+                    Instrument.find(),
+                    Detector.find(),
+                    type,
+                    filename,
+                    da_uri));
+        }
 
-		return badRequest("Invalid deployment type!");
-	}
+        return badRequest("Invalid deployment type!");
+    }
 
-	@Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-	public Result postIndex(String type, String filename, String da_uri) {
-		return index(type, filename, da_uri);
-	}
+    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
+    public Result postIndex(String type, String filename, String da_uri) {
+        return index(type, filename, da_uri);
+    }
 
-	@Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-	public Result processForm(String filename, String da_uri) {
-		System.out.println("==================>>>>>>>>>>>>>> NewDeployment: inside processForm");
-		System.out.println(" Filename : [" + filename + "]");
-		System.out.println(" DA_URI : [" + da_uri + "]");
-		final SysUser user = AuthApplication.getLocalUser(session());
-		Form<DeploymentForm> form = formFactory.form(DeploymentForm.class).bindFromRequest();
-		if (form.hasErrors()) {
-			return badRequest("The submitted form has errors!");
-		}
+    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
+    public Result processForm(String filename, String da_uri) {
+        final SysUser user = AuthApplication.getLocalUser(session());
+        
+        Form<DeploymentForm> form = formFactory.form(DeploymentForm.class).bindFromRequest();
+        if (form.hasErrors()) {
+            return badRequest("The submitted form has errors!");
+        }
 
-		DeploymentForm data = form.get();
+        DeploymentForm data = form.get();
 
-		String dateStringFromJs = data.getStartDateTime();
-		String dateString = "";
-		DateFormat jsFormat = new SimpleDateFormat("MM/dd/yyyy HH:mm a");
-		Date dateFromJs;
-		try {
-			dateFromJs = jsFormat.parse(dateStringFromJs);
-			DateFormat isoFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
-			dateString = isoFormat.format(dateFromJs);
-		} catch (ParseException e) {
-			return badRequest("Cannot parse data " + dateStringFromJs);
-		}
+        String dateStringFromJs = data.getStartDateTime();
+        String dateString = "";
+        DateFormat jsFormat = new SimpleDateFormat("MM/dd/yyyy HH:mm a");
+        Date dateFromJs;
+        try {
+            dateFromJs = jsFormat.parse(dateStringFromJs);
+            DateFormat isoFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
+            dateString = isoFormat.format(dateFromJs);
+        } catch (ParseException e) {
+            return badRequest("Cannot parse data " + dateStringFromJs);
+        }
 
-		String deploymentUri = data.getUri();
-		deploymentUri = URIUtils.replacePrefixEx(deploymentUri);
-		Deployment deployment = DataFactory.createDeployment(deploymentUri, data.getPlatform(), 
-				data.getInstrument(), data.getDetectors(), dateString, data.getType());
+        String deploymentUri = data.getUri();
+        deploymentUri = URIUtils.replacePrefixEx(deploymentUri);
+        Deployment deployment = DataFactory.createDeployment(deploymentUri, data.getPlatform(), 
+                data.getInstrument(), data.getDetectors(), dateString, data.getType());
 
-		int nRowsOfDeployment = 0;
-		int nRowsOfDA = 0;
+        int nRowsOfDeployment = 0;
+        int nRowsOfDA = 0;
 
-		if (da_uri != null && !da_uri.equals("")) {
+        if (da_uri != null && !da_uri.equals("")) {
+            /* 
+             *
+             *   DEPLOYMENT INFO IS ADDED TO EXISTING AND INCOMPLETE DATA ACQUISITION 
+             *
+             */
 
-			/* 
-			 *
-			 *   DEPLOYMENT INFO IS ADDED TO EXISTING AND INCOMPLETE DATA ACQUISITION 
-			 *
-			 */
+            DataAcquisition da = DataAcquisition.findByUri(da_uri);
+            if (da == null) {
+                return badRequest("Data acquisition " + da_uri + " provided by unable to be loaded");
+            }
+            System.out.println("NewDeployment: Loading existing DA : [" + da_uri + "]");
+            da.setDeploymentUri(deployment.getUri());
+            String user_name = session().get("LabKeyUserName");
+            String password = session().get("LabKeyPassword");
+            if (user_name != null && password != null) {
+                nRowsOfDeployment = deployment.saveToLabKey(session().get("LabKeyUserName"), session().get("LabKeyPassword"));
+                nRowsOfDA = da.saveToLabKey(session().get("LabKeyUserName"), session().get("LabKeyPassword"));
+                deployment.saveToTripleStore();
+                da.save();
+            }
+        } else {
+            /* 
+             *
+             *   NEW DATA ACQUISITION IS CREATED 
+             *
+             */
 
-			DataAcquisition da = DataAcquisition.findByUri(da_uri);
-			if (da == null) {
-				return badRequest("Data acquisition " + da_uri + " provided by unable to be loaded");
-			}
-			System.out.println("NewDeployment: Loading existing DA : [" + da_uri + "]");
-			da.setDeploymentUri(deployment.getUri());
-			String user_name = session().get("LabKeyUserName");
-			String password = session().get("LabKeyPassword");
-			if (user_name != null && password != null) {
-				try {
-					nRowsOfDeployment = deployment.saveToLabKey(session().get("LabKeyUserName"), session().get("LabKeyPassword"));
-					nRowsOfDA = da.saveToLabKey(session().get("LabKeyUserName"), session().get("LabKeyPassword"));
-					deployment.save();
-					da.save();
-				} catch (CommandException e) {
-					return badRequest("Failed to insert Deployment to LabKey!\n"
-							+ "Error Message: " + e.getMessage());
-				}
-			}
+            int triggeringEvent;
+            if (data.getType().equalsIgnoreCase("LEGACY")) {
+                triggeringEvent = TriggeringEvent.LEGACY_DEPLOYMENT;
+            } else {
+                triggeringEvent = TriggeringEvent.INITIAL_DEPLOYMENT;
+            }
+            String dataAcquisitionUri = data.getDataAcquisitionUri();
+            if (dataAcquisitionUri == null || dataAcquisitionUri.equals("")) {
+                return badRequest("Failed to insert Deployment!\n"
+                        + "Error Message: No URI for for DA");
+            }
+            dataAcquisitionUri = URIUtils.replacePrefixEx(dataAcquisitionUri);
+            String param = data.getInitialParameter();
+            System.out.println("NewDeployment: Creating new DA : [" + dataAcquisitionUri + "]");
+            DataAcquisition dataAcquisition = DataFactory.createDataAcquisition(
+                    triggeringEvent, dataAcquisitionUri, deploymentUri, 
+                    param, UserManagement.getUriByEmail(user.getEmail()));
 
-		} else {
-
-			/* 
-			 *
-			 *   NEW DATA ACQUISITION IS CREATED 
-			 *
-			 */
-
-			int triggeringEvent;
-			if (data.getType().equalsIgnoreCase("LEGACY")) {
-				triggeringEvent = TriggeringEvent.LEGACY_DEPLOYMENT;
-			} else {
-				triggeringEvent = TriggeringEvent.INITIAL_DEPLOYMENT;
-			}
-			String dataAcquisitionUri = data.getDataAcquisitionUri();
-			if (dataAcquisitionUri == null || dataAcquisitionUri.equals("")) {
-				return badRequest("Failed to insert Deployment!\n"
-						+ "Error Message: No URI for for DA");
-			}
-			dataAcquisitionUri = URIUtils.replacePrefixEx(dataAcquisitionUri);
-			String param = data.getInitialParameter();
-			System.out.println("NewDeployment: Creating new DA : [" + dataAcquisitionUri + "]");
-			DataAcquisition dataAcquisition = DataFactory.createDataAcquisition(
-					triggeringEvent, dataAcquisitionUri, deploymentUri, 
-					param, UserManagement.getUriByEmail(user.getEmail()));
-
-			System.out.println("NewDeployment: Showing DA: " + dataAcquisition);
-			String user_name = session().get("LabKeyUserName");
-			String password = session().get("LabKeyPassword");
-			if (user_name != null && password != null) {
-				try {
-					nRowsOfDeployment = deployment.saveToLabKey(session().get("LabKeyUserName"), session().get("LabKeyPassword"));
-					nRowsOfDA = dataAcquisition.saveToLabKey(session().get("LabKeyUserName"), session().get("LabKeyPassword"));
-					deployment.save();
-					dataAcquisition.save();
-				} catch (CommandException e) {
-					return badRequest("Failed to insert Deployment to LabKey!\n"
-							+ "Error Message: " + e.getMessage());
-				}
-			}
-		}	    
-		return ok(deploymentConfirm.render("New Deployment created. (Deployment rows: " + nRowsOfDeployment + ") (DA rows: " + nRowsOfDA + ")", data, filename, da_uri));
-	}
+            System.out.println("NewDeployment: Showing DA: " + dataAcquisition);
+            String user_name = session().get("LabKeyUserName");
+            String password = session().get("LabKeyPassword");
+            if (user_name != null && password != null) {
+                nRowsOfDeployment = deployment.saveToLabKey(session().get("LabKeyUserName"), session().get("LabKeyPassword"));
+                nRowsOfDA = dataAcquisition.saveToLabKey(session().get("LabKeyUserName"), session().get("LabKeyPassword"));
+                deployment.saveToTripleStore();
+                dataAcquisition.save();
+            }
+        }	    
+        return ok(deploymentConfirm.render("New Deployment created.", data, filename, da_uri));
+    }
 }

@@ -20,7 +20,7 @@ import org.hadatac.utils.NameSpaces;
 
 import com.typesafe.config.ConfigFactory;
 
-public class Detector implements Comparable<Detector>  {
+public class Detector extends HADatAcThing implements Comparable<Detector>  {
 	private String uri;
 	private String localName;
 	private String label;
@@ -67,7 +67,6 @@ public class Detector implements Comparable<Detector>  {
 	}
 	
 	public static List<Detector> find() {
-		//System.out.println("Inside Lits<Detector>");
 		List<Detector> detectors = new ArrayList<Detector>();
 		String queryString = NameSpaces.getInstance().printSparqlNameSpaceList() +
 			" SELECT ?uri WHERE { " +
@@ -190,8 +189,36 @@ public class Detector implements Comparable<Detector>  {
 		}			
 
 		java.util.Collections.sort((List<Detector>) detectors);
-		return detectors;
 		
+		return detectors;
 	}
-	
+
+    @Override
+    public boolean saveToTripleStore() {
+        return false;
+    }
+
+    @Override
+    public void deleteFromTripleStore() {
+    }
+
+    @Override
+    public boolean saveToSolr() {
+        return false;
+    }
+
+    @Override
+    public int deleteFromSolr() {
+        return 0;
+    }
+
+    @Override
+    public int saveToLabKey(String userName, String password) {
+        return 0;
+    }
+
+    @Override
+    public int deleteFromLabKey(String userName, String password) {
+        return 0;
+    }
 }

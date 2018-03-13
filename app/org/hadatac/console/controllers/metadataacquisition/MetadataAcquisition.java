@@ -57,12 +57,8 @@ public class MetadataAcquisition extends Controller {
 				+ " ?studyUri a ?subTypeUri . "
 				+ " ?dataAcq hasco:isDataAcquisitionOf ?studyUri ."
 				+ " ?dataAcq hasco:hasSchema ?schemaUri ."
-//				+ " ?schemaUri hasco:isSchemaOf ?studyUri . "
-//				+ " ?schemaUri a hasco:DASchema . "
 				+ " ?schemaAttribute hasco:partOfSchema ?schemaUri . "
 				+ " ?schemaAttribute hasco:hasAttribute ?attribute . "
-//				+ " ?schemaAttribute hasco:hasAttribute|hasco:hasEntity ?attribute . "
-//				+ " ?indicator rdfs:subClassOf hasco:StudyIndicator . "
 				+ " {  { ?indicator rdfs:subClassOf hasco:StudyIndicator } UNION { ?indicator rdfs:subClassOf hasco:SampleIndicator } } . "
 				+ " ?indicator rdfs:label ?indicatorLabel . " 
 				+ " ?attribute rdfs:subClassOf+ ?indicator . " 
@@ -85,6 +81,7 @@ public class MetadataAcquisition extends Controller {
 		return results; 
     }
     
+    @SuppressWarnings("unchecked")
 	public static boolean updateStudy() {
 		String strQuery = NameSpaces.getInstance().printSparqlNameSpaceList() 
 				+ " SELECT DISTINCT ?studyUri ?studyLabel ?proj ?studyTitle ?studyComment"
@@ -95,11 +92,7 @@ public class MetadataAcquisition extends Controller {
 				+ " OPTIONAL{ ?schemaAttribute hasco:partOfSchema ?schemaUri . "
 				+ " ?dataAcq hasco:isDataAcquisitionOf ?studyUri ."
 				+ " ?dataAcq hasco:hasSchema ?schemaUri ."
-//				// + " ?schemaUri hasco:isSchemaOf ?studyUri . "
-				//+ " ?schemaUri a hasco:DASchema . "
-				//+ " ?schemaAttribute hasco:hasAttribute|hasco:hasEntity ?attribute . "
 				+ " ?schemaAttribute hasco:hasAttribute ?attribute . "
-				//+ " ?indicator rdfs:subClassOf hasco:StudyIndicator . "
 				+ " {  { ?indicator rdfs:subClassOf hasco:StudyIndicator } UNION { ?indicator rdfs:subClassOf hasco:SampleIndicator } } . "
 				+ " ?indicator rdfs:label ?indicatorLabel . " 
 				+ " ?attribute rdfs:subClassOf+ ?indicator . " 
@@ -197,50 +190,6 @@ public class MetadataAcquisition extends Controller {
 					temp = soln.get("relationToRoleLabel") + "'s " + value;
 					value = temp.toString();
 				}
-/*				if ((soln.contains("roleLabel"))&&(soln.contains("eventLabel"))&&(soln.contains("entityLabel"))){
-					if(soln.get("entityLabel").toString().toLowerCase().equals("human")||soln.get("entityLabel").toString().toLowerCase().equals("sample")){
-						value = soln.get("roleLabel").toString() + "'s " + soln.get("attributeLabel").toString() + " at " + soln.get("eventLabel").toString();
-					}
-					else{
-					value = soln.get("roleLabel").toString() + "'s " + soln.get("entityLabel").toString() + " " + soln.get("attributeLabel").toString() + " at " + soln.get("eventLabel").toString();
-					}
-				}
-				else if ((soln.contains("roleLabel"))&&(soln.contains("eventLabel"))){
-					value = soln.get("roleLabel").toString() + "'s " + soln.get("attributeLabel").toString() + " at " + soln.get("eventLabel").toString();
-				} 
-				else if ((soln.contains("roleLabel"))&&(soln.contains("entityLabel"))){
-					if(soln.get("entityLabel").toString().toLowerCase().equals("human")||soln.get("entityLabel").toString().toLowerCase().equals("sample")){
-						value = soln.get("roleLabel").toString() + "'s " + soln.get("attributeLabel").toString();
-					}
-					else {
-						value = soln.get("roleLabel").toString() + "'s " + soln.get("entityLabel").toString() + " " + soln.get("attributeLabel").toString();
-					}
-				} 
-				else if ((soln.contains("entityLabel"))&&(soln.contains("eventLabel"))){
-					if(soln.get("entityLabel").toString().toLowerCase().equals("human")||soln.get("entityLabel").toString().toLowerCase().equals("sample")){
-						value = soln.get("attributeLabel").toString() + " at " + soln.get("eventLabel").toString();
-					}
-					else {
-						value = soln.get("entityLabel").toString() + " " + soln.get("attributeLabel").toString() + " at " + soln.get("eventLabel").toString();
-					}
-				} 
-				else if (soln.contains("roleLabel")){
-					value = soln.get("roleLabel").toString() + "'s " + soln.get("attributeLabel").toString();
-				} 
-				else if (soln.contains("eventLabel")){
-					value = soln.get("attributeLabel").toString() + " at " + soln.get("eventLabel").toString();
-				} 
-				else if (soln.contains("entityLabel")){
-					if(soln.get("entityLabel").toString().toLowerCase().equals("human")||soln.get("entityLabel").toString().toLowerCase().equals("sample")){
-						soln.get("attributeLabel").toString();
-					}
-					else {
-						value = soln.get("entityLabel").toString() + " " + soln.get("attributeLabel").toString();
-					}
-				} 
-				else {
-					value = soln.get("attributeLabel").toString();
-				}*/
 				// Remove duplicate consecutive words
 				value = value.replaceAll("(?i)\\b([a-z]+)\\b(?:\\s+\\1\\b)+", "$1");
 				ArrayList<String> arrValues = null;

@@ -19,7 +19,6 @@ import org.apache.jena.update.UpdateFactory;
 import org.apache.jena.update.UpdateProcessor;
 import org.apache.jena.update.UpdateRequest;
 import org.hadatac.utils.CollectionUtil;
-import org.hadatac.utils.ConfigProp;
 import org.hadatac.utils.NameSpaces;
 import org.hadatac.utils.FirstLabel;
 import org.hadatac.metadata.loader.URIUtils;
@@ -586,38 +585,15 @@ public class DataAcquisitionSchema extends HADatAcThing {
 		return das;
 	}
 
-	public void save() {
-		// SAVING DAS's DASAs
-		for (DataAcquisitionSchemaAttribute dasa : attributes) {
-			dasa.save();
-		}
-
-		// SAVING DAS ITSELF
-		String insert = "";
-		insert += NameSpaces.getInstance().printSparqlNameSpaceList();
-		insert += INSERT_LINE1;
-		insert += this.getUri() + " a hasco:DASchema . ";
-		insert += this.getUri() + " rdfs:label  \"" + this.getLabel() + "\" . ";
-		insert += LINE_LAST;
-		//System.out.println(insert);
-		UpdateRequest request = UpdateFactory.create(insert);
-		UpdateProcessor processor = UpdateExecutionFactory.createRemote(
-				request, CollectionUtil.getCollectionsName(CollectionUtil.METADATA_UPDATE));
-		processor.execute();
-	}
-
-	@Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
+	@Override
 	public int saveToLabKey(String user_name, String password) {
 		// SAVING DAS's DASAs
 		for (DataAcquisitionSchemaAttribute dasa : attributes) {
-			//System.out.println("Saving DASA " + dasa.getUri() + " into LabKey");
 			dasa.saveToLabKey(user_name, password);
 		}
 
 		// SAVING DAS ITSELF
-		String site = ConfigProp.getPropertyValue("labkey.config", "site");
-		String path = "/" + ConfigProp.getPropertyValue("labkey.config", "folder");
-		LabkeyDataHandler loader = new LabkeyDataHandler(site, user_name, password, path);
+		LabkeyDataHandler loader = LabkeyDataHandler.createDefault(user_name, password);
 		List< Map<String, Object> > rows = new ArrayList< Map<String, Object> >();
 		Map<String, Object> row = new HashMap<String, Object>();
 		row.put("hasURI", URIUtils.replaceNameSpaceEx(getUri()));
@@ -633,20 +609,16 @@ public class DataAcquisitionSchema extends HADatAcThing {
             return 0;
         }
 	}
-
-	@Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
+	
 	@Override
 	public int deleteFromLabKey(String user_name, String password) {
 		// DELETING DAS's DASAs
 		for (DataAcquisitionSchemaAttribute dasa : attributes) {
-			//System.out.println("Deleting DASA " + dasa.getUri() + " from LabKey");
 			dasa.deleteFromLabKey(user_name, password);
 		}
 
 		// DELETING DAS ITSELF
-		String site = ConfigProp.getPropertyValue("labkey.config", "site");
-		String path = "/" + ConfigProp.getPropertyValue("labkey.config", "folder");
-		LabkeyDataHandler loader = new LabkeyDataHandler(site, user_name, password, path);
+		LabkeyDataHandler loader = LabkeyDataHandler.createDefault(user_name, password);
 		List< Map<String, Object> > rows = new ArrayList< Map<String, Object> >();
 		Map<String, Object> row = new HashMap<String, Object>();
 		row.put("hasURI", URIUtils.replaceNameSpaceEx(getUri()));
@@ -661,15 +633,49 @@ public class DataAcquisitionSchema extends HADatAcThing {
         }
 	}
 
-	public void delete() {
-		String query = "";
-		query += NameSpaces.getInstance().printSparqlNameSpaceList();
-		query += DELETE_LINE1;
-		query += "<" + this.getUri() + ">  ";
-		query += DELETE_LINE3;
-		query += LINE_LAST;
-		UpdateRequest request = UpdateFactory.create(query);
-		UpdateProcessor processor = UpdateExecutionFactory.createRemote(request, CollectionUtil.getCollectionsName(CollectionUtil.METADATA_UPDATE));
-		processor.execute();
-	}
+    @Override
+    public boolean saveToTripleStore() {
+        // SAVING DAS's DASAs
+        for (DataAcquisitionSchemaAttribute dasa : attributes) {
+            dasa.saveToTripleStore();
+        }
+
+        // SAVING DAS ITSELF
+        String insert = "";
+        insert += NameSpaces.getInstance().printSparqlNameSpaceList();
+        insert += INSERT_LINE1;
+        insert += this.getUri() + " a hasco:DASchema . ";
+        insert += this.getUri() + " rdfs:label  \"" + this.getLabel() + "\" . ";
+        insert += LINE_LAST;
+        UpdateRequest request = UpdateFactory.create(insert);
+        UpdateProcessor processor = UpdateExecutionFactory.createRemote(
+                request, CollectionUtil.getCollectionsName(CollectionUtil.METADATA_UPDATE));
+        processor.execute();
+        
+        return true;
+    }
+
+    @Override
+    public void deleteFromTripleStore() {
+        String query = "";
+        query += NameSpaces.getInstance().printSparqlNameSpaceList();
+        query += DELETE_LINE1;
+        query += "<" + this.getUri() + ">  ";
+        query += DELETE_LINE3;
+        query += LINE_LAST;
+        UpdateRequest request = UpdateFactory.create(query);
+        UpdateProcessor processor = UpdateExecutionFactory.createRemote(
+                request, CollectionUtil.getCollectionsName(CollectionUtil.METADATA_UPDATE));
+        processor.execute();
+    }
+
+    @Override
+    public boolean saveToSolr() {
+        return false;
+    }
+
+    @Override
+    public int deleteFromSolr() {
+        return 0;
+    }
 }

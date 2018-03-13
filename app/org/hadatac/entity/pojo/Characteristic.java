@@ -10,10 +10,7 @@ import org.apache.jena.rdf.model.Statement;
 import org.apache.jena.rdf.model.StmtIterator;
 import org.hadatac.utils.CollectionUtil;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.typesafe.config.ConfigFactory;
-
-import play.Play;
 
 public class Characteristic extends HADatAcClass implements Comparable<Characteristic> {
 	

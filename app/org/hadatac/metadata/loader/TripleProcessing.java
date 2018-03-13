@@ -164,7 +164,7 @@ public class TripleProcessing {
     public static List<String> getLabKeyInstanceDataLists(String labkey_site, String user_name, 
     		String password, String path) throws CommandException {
     	
-    	LabkeyDataHandler loader = new LabkeyDataHandler(labkey_site, user_name, password, path);
+    	LabkeyDataHandler loader = new LabkeyDataHandler(labkey_site, path, user_name, password);
 		try {
 			List<String> queryNames = loader.getInstanceDataQueryNames();
 			return queryNames;
@@ -179,7 +179,7 @@ public class TripleProcessing {
     public static List<String> getLabKeyFolders(String labkey_site, String user_name, 
     		String password, String path) throws CommandException {
     	
-    	LabkeyDataHandler loader = new LabkeyDataHandler(labkey_site, user_name, password, path);
+    	LabkeyDataHandler loader = new LabkeyDataHandler(labkey_site, path, user_name, password);
 		try {
 			List<String> folders = loader.getSubfolders();
 			return folders;
@@ -227,10 +227,10 @@ public class TripleProcessing {
 		return message;
     }
     
-    public static Model importStudy(String labkey_site, String user_name, 
-    		String password, String path, String studyUri) throws CommandException {
+    public static Model importStudy(String labkey_site, String path, 
+            String user_name, String password, String studyUri) throws CommandException {
     	
-		LabkeyDataHandler loader = new LabkeyDataHandler(labkey_site, user_name, password, path);
+		LabkeyDataHandler loader = new LabkeyDataHandler(labkey_site, path, user_name, password);
 		Map< String, Map< String, List<PlainTriple> > > mapSheets = 
 				new HashMap< String, Map< String, List<PlainTriple> > >();
 		Map< String, List<String> > mapPreds = 
@@ -246,7 +246,7 @@ public class TripleProcessing {
 		String fileName = "";
 		try {
 			fileName = TTL_DIR + "labkey.ttl";
-			FileUtils.writeStringToFile(new File(fileName), ttl);
+			FileUtils.writeStringToFile(new File(fileName), ttl, "utf-8");
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -309,14 +309,14 @@ public class TripleProcessing {
     	}
     }
     
-    public static ParsingResult importDataAcquisition(String labkey_site, String user_name, 
-    		String password, String path, String target_study_uri) throws CommandException {
+    public static ParsingResult importDataAcquisition(String labkey_site, String path, 
+            String user_name, String password, String target_study_uri) throws CommandException {
     	
     	final SysUser user = AuthApplication.getLocalUser(Controller.session());
 		String ownerUri = UserManagement.getUriByEmail(user.getEmail());
 		
     	String message = "";
-    	LabkeyDataHandler loader = new LabkeyDataHandler(labkey_site, user_name, password, path);
+    	LabkeyDataHandler loader = new LabkeyDataHandler(labkey_site, path, user_name, password);
 		Map< String, Map< String, List<PlainTriple> > > mapSheets = 
 				new HashMap< String, Map< String, List<PlainTriple> > >();
 		Map< String, List<String> > mapPreds = 
@@ -517,7 +517,7 @@ public class TripleProcessing {
 		}
 
 		try {
-			FileUtils.writeStringToFile(new File(filePath), ttl);
+			FileUtils.writeStringToFile(new File(filePath), ttl, "utf-8");
 		} catch (IOException e) {
 			message += e.getMessage();
 			return message;
@@ -535,7 +535,7 @@ public class TripleProcessing {
 			message += Feedback.println(mode, " ");
 		}
 		
-		LabkeyDataHandler loader = new LabkeyDataHandler(labkey_site, user_name, password, path);
+		LabkeyDataHandler loader = new LabkeyDataHandler(labkey_site, path, user_name, password);
 		Map< String, Map< String, List<PlainTriple> > > mapSheets = 
 				new HashMap< String, Map< String, List<PlainTriple> > >();
 		Map< String, List<String> > mapPreds = 
