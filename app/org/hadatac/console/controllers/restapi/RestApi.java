@@ -122,7 +122,7 @@ public class RestApi extends Controller {
             QueryResponse queryResponse = solr.query(solrQuery, SolrRequest.METHOD.POST);
             solr.close();
             Pivot pivot = Pivot.parseQueryResponse(queryResponse);
-            uris = parsePivot(pivot);
+            uris = parsePivotForVars(pivot);
         } catch (Exception e) {
             System.out.println("[ERROR] RestApi.getVariablesByStudy() - Exception message: " + e.getMessage());
             return internalServerError(ApiUtil.createResponse("Encountered SOLR error!", false));
@@ -179,26 +179,31 @@ public class RestApi extends Controller {
 				temp.put("unit", soln.get("unit").toString());
 			}
             anode.add(temp);
-        }// /parse results
+        }// /parse sparql results
         System.out.println("[GetVarsInStudy] parsed " + anode.size() + " results into array");
 
         JsonNode jsonObject = mapper.convertValue(anode, JsonNode.class);
         System.out.println("[GetVarsInStudy] done");
         return ok(ApiUtil.createResponse(jsonObject, true));
-    }// /getVariablesByStudy
+    }// /getVariablesInStudy
 
-
-
-    private List<String> parsePivot (Pivot p) {
+    private List<String> parsePivotForVars (Pivot p) {
         List<String> results = new ArrayList<String>();
         String str = "";
         for (Pivot pivot_ent : p.children) {
             str = pivot_ent.value;
             results.add(str);
         }
-        //System.out.println("[getVars parsePivot] results: \n" + results);
+        //System.out.println("[getVars parsePivotForVars] results: \n" + results);
         return results;
-    }// /parsePivot()
+    }// /parsePivotForVars()
 
+
+    // Given the study URI, return the URI's and types of all object collections
+    // (not the full arrays of the collections themselves)
+    public Result getOCsInStudy(String studyUri){
+        
+        return ok();
+    }// /getOCsInStudy
 
 }// /RestApi
