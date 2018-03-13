@@ -1,8 +1,6 @@
 package org.hadatac.entity.pojo;
 
 import java.io.IOException;
-import java.time.Instant;
-import java.util.Date;
 import java.util.Iterator;
 
 import org.apache.solr.client.solrj.SolrClient;
@@ -14,15 +12,10 @@ import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
 import org.hadatac.utils.CollectionUtil;
-import org.joda.time.DateTime;
-import org.joda.time.DateTimeZone;
-import org.joda.time.format.DateTimeFormat;
-import org.joda.time.format.DateTimeFormatter;
-import org.joda.time.format.ISODateTimeFormat;
 
 import com.typesafe.config.ConfigFactory;
 
-public class ConsoleStore {
+public class ConsoleStore extends HADatAcThing {
 	@Field("id")
 	private int id;
 	
@@ -35,12 +28,15 @@ public class ConsoleStore {
 	public int getId() {
 		return id;
 	}
+	
 	public void setId(int id) {
 		this.id = id;
 	}
+	
 	public long getLastDynamicMetadataId() {
 		return lastDynamicMetadataId;
 	}
+	
 	public void setLastDynamicMetadataId(long lastDynamicMetadataId) {
 		this.lastDynamicMetadataId = lastDynamicMetadataId;
 	}
@@ -51,21 +47,6 @@ public class ConsoleStore {
 	
 	public void setTimestamp(String timestamp) {
 		this.timestamp = timestamp;
-	}
-	
-	public int save() {
-		try {
-			SolrClient client = new HttpSolrClient.Builder(
-					ConfigFactory.load().getString("hadatac.solr.data") 
-					+ CollectionUtil.CONSOLE_STORE).build();
-			int status = client.addBean(this).getStatus();
-			client.commit();
-			client.close();
-			return status;
-		} catch (IOException | SolrServerException e) {
-			System.out.println("[ERROR] ConsoleStore.save(SolrClient) - e.Message: " + e.getMessage());
-			return -1;
-		}
 	}
 	
 	public static ConsoleStore find() {
@@ -97,4 +78,44 @@ public class ConsoleStore {
 		
 		return consoleStore;
 	}
+	
+    @Override
+    public boolean saveToTripleStore() {
+        return false;
+    }
+    
+    @Override
+    public void deleteFromTripleStore() {        
+    }
+    
+    @Override
+    public boolean saveToSolr() {
+        try {
+            SolrClient client = new HttpSolrClient.Builder(
+                    ConfigFactory.load().getString("hadatac.solr.data") 
+                    + CollectionUtil.CONSOLE_STORE).build();
+            client.addBean(this).getStatus();
+            client.commit();
+            client.close();
+            return true;
+        } catch (IOException | SolrServerException e) {
+            System.out.println("[ERROR] ConsoleStore.save(SolrClient) - e.Message: " + e.getMessage());
+            return false;
+        }
+    }
+    
+    @Override
+    public int deleteFromSolr() {
+        return 0;
+    }
+    
+    @Override
+    public int saveToLabKey(String userName, String password) {
+        return 0;
+    }
+    
+    @Override
+    public int deleteFromLabKey(String userName, String password) {
+        return 0;
+    }
 }

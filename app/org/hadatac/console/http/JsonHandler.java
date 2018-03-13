@@ -17,23 +17,22 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.typesafe.config.ConfigFactory;
 
 public class JsonHandler {
-    
+
     private String field_count_url = ConfigFactory.load().getString("hadatac.solr.data") 
-    		+ CollectionUtil.DATA_ACQUISITION 
-    		+ "/browse?wt=json&facet=true&facet.field=characteristic&facet.field=entity"
-    		+ "&facet.field=unit&facet.field=platform_name&facet.field=instrument_model&rows=0";
+            + CollectionUtil.DATA_ACQUISITION 
+            + "/browse?wt=json&facet=true&facet.field=characteristic&facet.field=entity"
+            + "&facet.field=unit&facet.field=platform_name&facet.field=instrument_model&rows=0";
     public Map<String, HashMap<String, String>> categories_facets_and_counts = new HashMap<String, HashMap<String, String>>();
     public Map<String, ArrayList<String>> categories_and_facets = new HashMap<String, ArrayList<String>>();
 
     public JsonHandler() {}
 
     public Boolean getFieldCountJson() throws MalformedURLException, IOException{
-    //public String getFieldCountJson() throws MalformedURLException, IOException{
-    	String q = "&q=*%3A*";
+        String q = "&q=*%3A*";
         InputStream in = new URL( field_count_url + q ).openStream();
-        String response = new String();
+        String response = "";
         try {
-            response = IOUtils.toString( in );
+            response = IOUtils.toString(in, "utf-8");
         } 
         finally {
             IOUtils.closeQuietly(in);
@@ -54,25 +53,16 @@ public class JsonHandler {
             ArrayList<String> the_list = new ArrayList<String>();
             JsonNode category = field_count.next();
             field_category = cat_name_it.next();
-            
+
             Iterator<JsonNode> cat_it = category.iterator();
 
-            //System.out.printf("Category: %s\n", field_category);
-            
             while (cat_it.hasNext()){
                 facet = cat_it.next().asText();
-                count = cat_it.next().asText();
-                //System.out.printf("   Facet %s - Count %s\n", facet, count);
-                //HashMap <String, String> temp_map = new HashMap<String, String>();
-                //temp_map.put(facet, count);
-                //categories_facets_and_counts.put(field_category, temp_map);
                 the_list.add(facet);
             }
             categories_and_facets.put(field_category, the_list);
         }
-        //return categories_facets_and_counts;
-        return true;
-        //return field_category;
-    }// getFieldCount()
 
+        return true;
+    }
 }

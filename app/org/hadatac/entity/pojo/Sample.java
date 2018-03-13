@@ -2,9 +2,7 @@ package org.hadatac.entity.pojo;
 
 import java.util.List;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
 
 import org.apache.jena.query.Query;
@@ -24,14 +22,8 @@ import org.hadatac.utils.NameSpaces;
 import org.hadatac.utils.FirstLabel;
 import org.hadatac.utils.ConfigProp;
 import org.hadatac.metadata.loader.LabkeyDataHandler;
-import org.hadatac.entity.pojo.DataAcquisitionSchemaObject;
-import org.hadatac.entity.pojo.DataAcquisitionSchemaEvent;
-import org.hadatac.entity.pojo.DataAcquisitionSchema;
 import org.hadatac.metadata.loader.URIUtils;
 import org.labkey.remoteapi.CommandException;
-import be.objectify.deadbolt.java.actions.Group;
-import be.objectify.deadbolt.java.actions.Restrict;
-import org.hadatac.console.controllers.AuthApplication;
 
 public class Sample extends StudyObject {
 
@@ -202,19 +194,20 @@ public class Sample extends StudyObject {
         return samples;
     }
 
-    public void save() {
-        delete();  // delete any existing triple for the current SP
+    @Override
+    public boolean saveToTripleStore() {
         System.out.println("Saving <" + uri + ">");
         if (uri == null || uri.equals("")) {
             System.out.println("[ERROR] Trying to save SP without assigning an URI");
-            return;
+            return false;
         }
         if (isMemberOf == null || isMemberOf.equals("")) {
             System.out.println("[ERROR] Trying to save SP without assigning DAS's URI");
-            return;
+            return false;
         }
-        String insert = "";
-
+        
+        deleteFromTripleStore();
+        
         String sp_uri = "";
         if (this.getUri().startsWith("<")) {
             sp_uri = this.getUri();
@@ -222,7 +215,7 @@ public class Sample extends StudyObject {
             sp_uri = "<" + this.getUri() + ">";
         }
 
-
+        String insert = "";
         insert += NameSpaces.getInstance().printSparqlNameSpaceList();
         insert += INSERT_LINE1;
         if (typeUri.startsWith("http")) {
@@ -253,22 +246,19 @@ public class Sample extends StudyObject {
                 insert += sp_uri + " hasco:isFrom " + isFrom + " .  "; 
             } 
         }
-        //insert += this.getUri() + " hasco:hasSource " + " .  "; 
-        //insert += this.getUri() + " hasco:isPIConfirmed " + " .  "; 
         insert += LINE_LAST;
         System.out.println("SP insert query (pojo's save): <" + insert + ">");
         UpdateRequest request = UpdateFactory.create(insert);
         UpdateProcessor processor = UpdateExecutionFactory.createRemote(
                 request, CollectionUtil.getCollectionsName(CollectionUtil.METADATA_UPDATE));
         processor.execute();
+        
+        return true;
     }
 
-    @Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
     @Override
     public int saveToLabKey(String user_name, String password) {
-        String site = ConfigProp.getPropertyValue("labkey.config", "site");
-        String path = "/" + ConfigProp.getPropertyValue("labkey.config", "folder");
-        LabkeyDataHandler loader = new LabkeyDataHandler(site, user_name, password, path);
+        LabkeyDataHandler loader = LabkeyDataHandler.createDefault(user_name, password);
         List< Map<String, Object> > rows = new ArrayList< Map<String, Object> >();
         Map<String, Object> row = new HashMap<String, Object>();
         row.put("hasURI", URIUtils.replaceNameSpaceEx(getUri()));
@@ -295,12 +285,9 @@ public class Sample extends StudyObject {
         return totalChanged;
     }
 
-    @Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
     @Override
     public int deleteFromLabKey(String user_name, String password) {
-        String site = ConfigProp.getPropertyValue("labkey.config", "site");
-        String path = "/" + ConfigProp.getPropertyValue("labkey.config", "folder");
-        LabkeyDataHandler loader = new LabkeyDataHandler(site, user_name, password, path);
+        LabkeyDataHandler loader = LabkeyDataHandler.createDefault(user_name, password);
         List< Map<String, Object> > rows = new ArrayList< Map<String, Object> >();
         Map<String, Object> row = new HashMap<String, Object>();
         row.put("hasURI", URIUtils.replaceNameSpaceEx(getUri().replace("<","").replace(">","")));
@@ -317,8 +304,9 @@ public class Sample extends StudyObject {
             return 0;
         }
     }
-
-    public void delete() {
+    
+    @Override
+    public void deleteFromTripleStore() {
         String query = "";
         if (this.getUri() == null || this.getUri().equals("")) {
             return;
@@ -332,10 +320,9 @@ public class Sample extends StudyObject {
         }
         query += DELETE_LINE3;
         query += LINE_LAST;
-        //System.out.println("SPARQL query inside sp poho's delete: " + query);
         UpdateRequest request = UpdateFactory.create(query);
-        UpdateProcessor processor = UpdateExecutionFactory.createRemote(request, CollectionUtil.getCollectionsName(CollectionUtil.METADATA_UPDATE));
+        UpdateProcessor processor = UpdateExecutionFactory.createRemote(
+                request, CollectionUtil.getCollectionsName(CollectionUtil.METADATA_UPDATE));
         processor.execute();
     }
-
 }

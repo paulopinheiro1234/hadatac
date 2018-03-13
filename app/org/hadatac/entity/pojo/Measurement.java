@@ -916,4 +916,28 @@ public class Measurement extends HADatAcThing {
 
         return String.join(",", values);
     }
+
+    @Override
+    public boolean saveToTripleStore() {
+        return false;
+    }
+
+    @Override
+    public void deleteFromTripleStore() {  
+    }
+
+    @Override
+    public int deleteFromSolr() {
+        return 0;
+    }
+
+    @Override
+    public int saveToLabKey(String userName, String password) {
+        return 0;
+    }
+
+    @Override
+    public int deleteFromLabKey(String userName, String password) {
+        return 0;
+    }
 }

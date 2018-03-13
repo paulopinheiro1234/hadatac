@@ -47,12 +47,9 @@ import org.joda.time.DateTimeZone;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 import org.joda.time.format.ISODateTimeFormat;
-import org.hadatac.console.controllers.AuthApplication;
-
-import be.objectify.deadbolt.java.actions.Group;
-import be.objectify.deadbolt.java.actions.Restrict;
 
 public class Study extends HADatAcThing {
+    
 	private static String className = "hasco:Study";
 
 	private static final String kbPrefix = ConfigProp.getKbPrefix();
@@ -427,10 +424,6 @@ public class Study extends HADatAcThing {
 		Study study = new Study();
 		// URI
 		study.setUri(doc.getFieldValue("studyUri").toString());
-		// permissions
-		/*		if (doc.getFieldValues("permission_uri") != null) {
-			study.setPermissionUri(doc.getFieldValue("permission_uri").toString());
-			}*/
 		// label
 		if (doc.getFieldValue("studyLabel_str") != null) {
 			study.setLabel(doc.getFieldValue("studyLabel_str").toString());
@@ -614,7 +607,8 @@ public class Study extends HADatAcThing {
 
 		try {
 			Query studyQuery = QueryFactory.create(studyQueryString);
-			QueryExecution qexec = QueryExecutionFactory.sparqlService(CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), studyQuery);
+			QueryExecution qexec = QueryExecutionFactory.sparqlService(
+			        CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), studyQuery);
 			ResultSet results = qexec.execSelect();
 			ResultSetRewindable resultsrw = ResultSetFactory.copyResults(results);
 			qexec.close();
@@ -971,94 +965,15 @@ public class Study extends HADatAcThing {
 		return -1;
 	}
 
-	public void save() {
-		//System.out.println("Saving <" + uri + ">");
-		if (studyUri == null || studyUri.equals("")) {
-			System.out.println("[ERROR] Trying to save Study without assigning an URI");
-			return;
-		}
-
-		delete();  // delete any existing triple for the current study
-
-		String insert = "";
-		String std_uri = "";
-
-		if (this.getUri().startsWith("<")) {
-			std_uri = this.getUri();
-		} else {
-			std_uri = "<" + this.getUri() + ">";
-		}
-		insert += NameSpaces.getInstance().printSparqlNameSpaceList();
-		insert += INSERT_LINE1;
-		if (studyType.startsWith("<")) {
-			insert += std_uri + " a " + studyType + " . ";
-		} else {
-			insert += std_uri + " a <" + studyType + "> . ";
-		}
-		insert += std_uri + " rdfs:label  \"" + label + "\" . ";
-		if (title != null && !title.equals("")) {
-			insert += std_uri + " hasco:hasTitle \"" + title + "\" .  "; 
-		} 
-		if (project != null && !project.equals("")) {
-			insert += std_uri + " hasco:hasProject \""  + project + "\" .  ";
-		}   
-		if (comment != null && !comment.equals("")) {
-			insert += std_uri + " rdfs:comment \"" + comment + "\" .  ";
-		}
-		if (externalSource != null && !externalSource.equals("")) {
-			insert += std_uri + " hasco:hasExternalSource \"" + externalSource + "\" .  ";
-		}
-		if (agentUri != null && !agentUri.equals("")) {
-			if (agentUri.startsWith("<")) {
-				insert += std_uri + " hasco:hasAgent " + agentUri + " .  ";
-			} else {
-				insert += std_uri + " hasco:hasAgent <" + agentUri + "> .  ";
-			}
-		}
-		if (institutionUri != null && !institutionUri.equals("")) {
-			if (institutionUri.startsWith("<")) {
-				insert += std_uri + " hasco:hasInstitution " + institutionUri + " .  ";
-			} else {
-				insert += std_uri + " hasco:hasInstitution <" + institutionUri + "> .  ";
-			}
-		}
-		if (lastId != null) {
-			insert += std_uri + " hasco:hasLastId  \"" + lastId + "\" .  ";
-		}
-		insert += LINE_LAST;
-		//System.out.println("Study insert query (pojo's save): <" + insert + ">");
-		UpdateRequest request = UpdateFactory.create(insert);
-		UpdateProcessor processor = UpdateExecutionFactory.createRemote(
-				request, CollectionUtil.getCollectionsName(CollectionUtil.METADATA_UPDATE));
-		processor.execute();
-
-	}
-
-	@Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
-	public int saveSolr() {
-		try {
-			SolrClient solr = new HttpSolrClient.Builder(
-					ConfigFactory.load().getString("hadatac.solr.data") +
-					CollectionUtil.STUDIES).build();
-			if (endedAt.toString().startsWith("9999")) {
-				endedAt = DateTime.parse("9999-12-31T23:59:59.999Z");
-			}
-			int status = solr.addBean(this).getStatus();
-			solr.commit();
-			solr.close();
-			return status;
-		} catch (IOException | SolrServerException e) {
-			System.out.println("[ERROR] Study.save(SolrClient) - e.Message: " + e.getMessage());
-			return -1;
-		}
-	}
-
-	@Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
+	@Override
+    public void save() {
+        saveToTripleStore();
+        saveToSolr();
+    }
+	
 	@Override
 	public int saveToLabKey(String user_name, String password) {
-		String site = ConfigProp.getPropertyValue("labkey.config", "site");
-		String path = "/" + ConfigProp.getPropertyValue("labkey.config", "folder");
-		LabkeyDataHandler loader = new LabkeyDataHandler(site, user_name, password, path);
+		LabkeyDataHandler loader = LabkeyDataHandler.createDefault(user_name, password);
 		List< Map<String, Object> > rows = new ArrayList< Map<String, Object> >();
 		Map<String, Object> row = new HashMap<String, Object>();
 		row.put("hasURI", URIUtils.replaceNameSpaceEx(getUri()));
@@ -1087,28 +1002,7 @@ public class Study extends HADatAcThing {
 		return totalChanged;
 	}
 
-	public void delete() {
-		String query = "";
-		if (this.getUri() == null || this.getUri().equals("")) {
-			return;
-		}
-		query += NameSpaces.getInstance().printSparqlNameSpaceList();
-		query += DELETE_LINE1;
-		if (this.getUri().startsWith("http")) {
-			query += "<" + this.getUri() + ">";
-		} else {
-			query += this.getUri();
-		}
-		query += DELETE_LINE3;
-		query += LINE_LAST;
-		//System.out.println("SPARQL query inside dasa poho's delete: " + query);
-		UpdateRequest request = UpdateFactory.create(query);
-		UpdateProcessor processor = UpdateExecutionFactory.createRemote(request, CollectionUtil.getCollectionsName(CollectionUtil.METADATA_UPDATE));
-		processor.execute();
-		//deleteDataAcquisitions();
-		//deleteMeasurements();
-	}
-
+	@Override
 	public int deleteFromSolr() {
 		SolrClient study_solr = new HttpSolrClient.Builder(
 				ConfigFactory.load().getString("hadatac.solr.data") +
@@ -1129,20 +1023,14 @@ public class Study extends HADatAcThing {
 		return -1;
 	}
 
-	@Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
 	@Override
 	public int deleteFromLabKey(String user_name, String password) {
-		String site = ConfigProp.getPropertyValue("labkey.config", "site");
-		String path = "/" + ConfigProp.getPropertyValue("labkey.config", "folder");
-		LabkeyDataHandler loader = new LabkeyDataHandler(site, user_name, password, path);
+		LabkeyDataHandler loader = LabkeyDataHandler.createDefault(user_name, password);
 		List< Map<String, Object> > rows = new ArrayList< Map<String, Object> >();
 		Map<String, Object> row = new HashMap<String, Object>();
 		row.put("hasURI", URIUtils.replaceNameSpaceEx(getUri().replace("<","").replace(">","")));
 		rows.add(row);
-		for (Map<String,Object> r : rows) {
-			System.out.println("deleting Study " + r.get("hasURI"));
-		}
-
+		
 		try {
             return loader.deleteRows("Study", rows);
         } catch (CommandException e) {
@@ -1151,5 +1039,109 @@ public class Study extends HADatAcThing {
             return 0;
         }
 	}
+
+    @Override
+    public boolean saveToTripleStore() {
+        if (studyUri == null || studyUri.equals("")) {
+            System.out.println("[ERROR] Trying to save Study without assigning an URI");
+            return false;
+        }
+
+        deleteFromTripleStore();
+
+        String insert = "";
+        String std_uri = "";
+
+        if (this.getUri().startsWith("<")) {
+            std_uri = this.getUri();
+        } else {
+            std_uri = "<" + this.getUri() + ">";
+        }
+        insert += NameSpaces.getInstance().printSparqlNameSpaceList();
+        insert += INSERT_LINE1;
+        if (studyType.startsWith("<")) {
+            insert += std_uri + " a " + studyType + " . ";
+        } else {
+            insert += std_uri + " a <" + studyType + "> . ";
+        }
+        insert += std_uri + " rdfs:label  \"" + label + "\" . ";
+        if (title != null && !title.equals("")) {
+            insert += std_uri + " hasco:hasTitle \"" + title + "\" .  "; 
+        } 
+        if (project != null && !project.equals("")) {
+            insert += std_uri + " hasco:hasProject \""  + project + "\" .  ";
+        }   
+        if (comment != null && !comment.equals("")) {
+            insert += std_uri + " rdfs:comment \"" + comment + "\" .  ";
+        }
+        if (externalSource != null && !externalSource.equals("")) {
+            insert += std_uri + " hasco:hasExternalSource \"" + externalSource + "\" .  ";
+        }
+        if (agentUri != null && !agentUri.equals("")) {
+            if (agentUri.startsWith("<")) {
+                insert += std_uri + " hasco:hasAgent " + agentUri + " .  ";
+            } else {
+                insert += std_uri + " hasco:hasAgent <" + agentUri + "> .  ";
+            }
+        }
+        if (institutionUri != null && !institutionUri.equals("")) {
+            if (institutionUri.startsWith("<")) {
+                insert += std_uri + " hasco:hasInstitution " + institutionUri + " .  ";
+            } else {
+                insert += std_uri + " hasco:hasInstitution <" + institutionUri + "> .  ";
+            }
+        }
+        if (lastId != null) {
+            insert += std_uri + " hasco:hasLastId  \"" + lastId + "\" .  ";
+        }
+        insert += LINE_LAST;
+        UpdateRequest request = UpdateFactory.create(insert);
+        UpdateProcessor processor = UpdateExecutionFactory.createRemote(
+                request, CollectionUtil.getCollectionsName(CollectionUtil.METADATA_UPDATE));
+        processor.execute();
+        
+        return true;
+    }
+
+    @Override
+    public void deleteFromTripleStore() {
+        String query = "";
+        if (this.getUri() == null || this.getUri().equals("")) {
+            return;
+        }
+        query += NameSpaces.getInstance().printSparqlNameSpaceList();
+        query += DELETE_LINE1;
+        if (this.getUri().startsWith("http")) {
+            query += "<" + this.getUri() + ">";
+        } else {
+            query += this.getUri();
+        }
+        query += DELETE_LINE3;
+        query += LINE_LAST;
+        
+        UpdateRequest request = UpdateFactory.create(query);
+        UpdateProcessor processor = UpdateExecutionFactory.createRemote(
+                request, CollectionUtil.getCollectionsName(CollectionUtil.METADATA_UPDATE));
+        processor.execute();
+    }
+
+    @Override
+    public boolean saveToSolr() {
+        try {
+            SolrClient solr = new HttpSolrClient.Builder(
+                    ConfigFactory.load().getString("hadatac.solr.data") +
+                    CollectionUtil.STUDIES).build();
+            if (endedAt.toString().startsWith("9999")) {
+                endedAt = DateTime.parse("9999-12-31T23:59:59.999Z");
+            }
+            solr.addBean(this).getStatus();
+            solr.commit();
+            solr.close();
+            return true;
+        } catch (IOException | SolrServerException e) {
+            System.out.println("[ERROR] Study.saveToSolr() - e.Message: " + e.getMessage());
+            return false;
+        }
+    }
 }
 

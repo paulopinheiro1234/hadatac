@@ -93,8 +93,6 @@ public class SampleType extends HADatAcClass implements Comparable<SampleType> {
 		studyType.setUri(uri);
 		studyType.setLocalName(uri.substring(uri.indexOf('#') + 1));
 
-		//System.out.println(uri + " " + entity.getLocalName() + " " + entity.getSuperUri());
-
 		return studyType;
 	}
 
@@ -105,5 +103,4 @@ public class SampleType extends HADatAcClass implements Comparable<SampleType> {
 		}
 		return this.getLocalName().compareTo(another.getLocalName());
 	}
-
 }

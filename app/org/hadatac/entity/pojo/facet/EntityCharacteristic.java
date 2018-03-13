@@ -17,8 +17,6 @@ import org.hadatac.utils.CollectionUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.typesafe.config.ConfigFactory;
 
-import play.Play;
-
 public class EntityCharacteristic {
 	
 	public List<Entity> entities;

@@ -81,6 +81,7 @@ public class OCForceFieldGraph {
 		return -1;
 	}
 
+	@SuppressWarnings("unchecked")
 	private String toJson() {
 		JSONObject tree = new JSONObject();
 
@@ -101,8 +102,6 @@ public class OCForceFieldGraph {
 		while (ag.hasNext()) {
 			OCNode tmpObject = ag.next();
 			JSONObject edge = new JSONObject();
-			System.out.println(tmpObject.getName() + "=====");
-			System.out.println(tmpObject.getMemberOf() + "!!!!!");
 			if (!tmpObject.getMemberOf().equals("")) {
 				int ind = findObjectIndex(tmpObject.getMemberOf());
 				if (ind == -1) {
@@ -113,7 +112,6 @@ public class OCForceFieldGraph {
 					edge.put("target", ind);
 					edge.put("value", 4);
 					links.add(edge);
-
 				}
 			}
 		}

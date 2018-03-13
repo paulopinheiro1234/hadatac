@@ -20,13 +20,9 @@ import org.apache.jena.update.UpdateRequest;
 import org.hadatac.utils.CollectionUtil;
 import org.hadatac.utils.NameSpaces;
 import org.hadatac.utils.FirstLabel;
-import org.hadatac.utils.ConfigProp;
 import org.hadatac.metadata.loader.LabkeyDataHandler;
 import org.hadatac.metadata.loader.URIUtils;
 import org.labkey.remoteapi.CommandException;
-import be.objectify.deadbolt.java.actions.Group;
-import be.objectify.deadbolt.java.actions.Restrict;
-import org.hadatac.console.controllers.AuthApplication;
 
 public class DataAcquisitionSchemaObject extends HADatAcThing {
 
@@ -382,66 +378,9 @@ public class DataAcquisitionSchemaObject extends HADatAcThing {
 		return "";
 	}
 
-	public void save() {
-		delete();  // delete any existing triple for the current DASO
-		//System.out.println("Saving <" + uri + ">");
-		if (uri == null || uri.equals("")) {
-			System.out.println("[ERROR] Trying to save DASO without assigning an URI");
-			return;
-		}
-		if (partOfSchema == null || partOfSchema.equals("")) {
-			System.out.println("[ERROR] Trying to save DASO without assigning DAS's URI");
-			return;
-		}
-		String insert = "";
-
-		insert += NameSpaces.getInstance().printSparqlNameSpaceList();
-		insert += INSERT_LINE1;
-		insert += this.getUri() + " a hasco:DASchemaObject . ";
-		insert += this.getUri() + " rdfs:label  \"" + label + "\" . ";
-		if (partOfSchema.startsWith("http")) {
-			insert += this.getUri() + " hasco:partOfSchema <" + partOfSchema + "> .  "; 
-		} else {
-			insert += this.getUri() + " hasco:partOfSchema " + partOfSchema + " .  "; 
-		} 
-		if (!role.equals("")) {
-			insert += this.getUri() + " hasco:hasRole  \"" + role + "\" . "; 
-		}
-		if (!entity.equals("")) {
-			insert += this.getUri() + " hasco:hasEntity "  + entity + " .  ";
-		}   
-		if (!inRelationTo.equals("")) {
-			String inRelationToStr =  URIUtils.replacePrefixEx(inRelationTo);
-			if (inRelationToStr.startsWith("<")) {
-				insert += this.getUri() + " sio:inRelationTo " +  inRelationToStr + " .  ";
-			} else {
-				insert += this.getUri() + " sio:inRelationTo <" + inRelationToStr + "> .  ";
-			}
-		}
-		if (!relation.equals("")) {
-			String relationStr =  URIUtils.replacePrefixEx(relation);
-			if (relationStr.startsWith("<")) {
-				insert += this.getUri() + " sio:relation " +  relationStr + " .  ";
-			} else {
-				insert += this.getUri() + " sio:relation <" + relationStr + "> .  ";
-			}
-		}
-		//insert += this.getUri() + " hasco:hasSource " + " .  "; 
-		//insert += this.getUri() + " hasco:isPIConfirmed " + " .  "; 
-		insert += LINE_LAST;
-		System.out.println("DASO insert query (pojo's save): <" + insert + ">");
-		UpdateRequest request = UpdateFactory.create(insert);
-		UpdateProcessor processor = UpdateExecutionFactory.createRemote(
-				request, CollectionUtil.getCollectionsName(CollectionUtil.METADATA_UPDATE));
-		processor.execute();
-	}
-
-	@Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
 	@Override
 	public int saveToLabKey(String user_name, String password) {
-		String site = ConfigProp.getPropertyValue("labkey.config", "site");
-		String path = "/" + ConfigProp.getPropertyValue("labkey.config", "folder");
-		LabkeyDataHandler loader = new LabkeyDataHandler(site, user_name, password, path);
+		LabkeyDataHandler loader = LabkeyDataHandler.createDefault(user_name, password);
 		List< Map<String, Object> > rows = new ArrayList< Map<String, Object> >();
 		Map<String, Object> row = new HashMap<String, Object>();
 		row.put("hasURI", URIUtils.replaceNameSpaceEx(getUri()));
@@ -470,12 +409,9 @@ public class DataAcquisitionSchemaObject extends HADatAcThing {
 		return totalChanged;
 	}
 
-	@Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
 	@Override
 	public int deleteFromLabKey(String user_name, String password) {
-		String site = ConfigProp.getPropertyValue("labkey.config", "site");
-		String path = "/" + ConfigProp.getPropertyValue("labkey.config", "folder");
-		LabkeyDataHandler loader = new LabkeyDataHandler(site, user_name, password, path);
+		LabkeyDataHandler loader = LabkeyDataHandler.createDefault(user_name, password);
 		List< Map<String, Object> > rows = new ArrayList< Map<String, Object> >();
 		Map<String, Object> row = new HashMap<String, Object>();
 		row.put("hasURI", URIUtils.replaceNameSpaceEx(getUri().replace("<","").replace(">","")));
@@ -490,24 +426,90 @@ public class DataAcquisitionSchemaObject extends HADatAcThing {
         }
 	}
 
-	public void delete() {
-		String query = "";
-		if (this.getUri() == null || this.getUri().equals("")) {
-			return;
-		}
-		query += NameSpaces.getInstance().printSparqlNameSpaceList();
-		query += DELETE_LINE1;
-		if (this.getUri().startsWith("http")) {
-			query += "<" + this.getUri() + ">";
-		} else {
-			query += this.getUri();
-		}
-		query += DELETE_LINE3;
-		query += LINE_LAST;
-		//System.out.println("SPARQL query inside dasa poho's delete: " + query);
-		UpdateRequest request = UpdateFactory.create(query);
-		UpdateProcessor processor = UpdateExecutionFactory.createRemote(request, CollectionUtil.getCollectionsName(CollectionUtil.METADATA_UPDATE));
-		processor.execute();
-	}
+    @Override
+    public boolean saveToTripleStore() {
+        if (uri == null || uri.equals("")) {
+            System.out.println("[ERROR] Trying to save DASO without assigning an URI");
+            return false;
+        }
+        if (partOfSchema == null || partOfSchema.equals("")) {
+            System.out.println("[ERROR] Trying to save DASO without assigning DAS's URI");
+            return false;
+        }
+        
+        deleteFromTripleStore();
+        
+        String insert = "";
+        insert += NameSpaces.getInstance().printSparqlNameSpaceList();
+        insert += INSERT_LINE1;
+        insert += this.getUri() + " a hasco:DASchemaObject . ";
+        insert += this.getUri() + " rdfs:label  \"" + label + "\" . ";
+        if (partOfSchema.startsWith("http")) {
+            insert += this.getUri() + " hasco:partOfSchema <" + partOfSchema + "> .  "; 
+        } else {
+            insert += this.getUri() + " hasco:partOfSchema " + partOfSchema + " .  "; 
+        } 
+        if (!role.equals("")) {
+            insert += this.getUri() + " hasco:hasRole  \"" + role + "\" . "; 
+        }
+        if (!entity.equals("")) {
+            insert += this.getUri() + " hasco:hasEntity "  + entity + " .  ";
+        }   
+        if (!inRelationTo.equals("")) {
+            String inRelationToStr =  URIUtils.replacePrefixEx(inRelationTo);
+            if (inRelationToStr.startsWith("<")) {
+                insert += this.getUri() + " sio:inRelationTo " +  inRelationToStr + " .  ";
+            } else {
+                insert += this.getUri() + " sio:inRelationTo <" + inRelationToStr + "> .  ";
+            }
+        }
+        if (!relation.equals("")) {
+            String relationStr =  URIUtils.replacePrefixEx(relation);
+            if (relationStr.startsWith("<")) {
+                insert += this.getUri() + " sio:relation " +  relationStr + " .  ";
+            } else {
+                insert += this.getUri() + " sio:relation <" + relationStr + "> .  ";
+            }
+        }
+        insert += LINE_LAST;
+        System.out.println("DASO insert query (pojo's save): <" + insert + ">");
+        UpdateRequest request = UpdateFactory.create(insert);
+        UpdateProcessor processor = UpdateExecutionFactory.createRemote(
+                request, CollectionUtil.getCollectionsName(CollectionUtil.METADATA_UPDATE));
+        processor.execute();
+        
+        return true;
+    }
+
+    @Override
+    public void deleteFromTripleStore() {
+        String query = "";
+        if (this.getUri() == null || this.getUri().equals("")) {
+            return;
+        }
+        query += NameSpaces.getInstance().printSparqlNameSpaceList();
+        query += DELETE_LINE1;
+        if (getUri().startsWith("http")) {
+            query += "<" + getUri() + ">";
+        } else {
+            query += getUri();
+        }
+        query += DELETE_LINE3;
+        query += LINE_LAST;
+        UpdateRequest request = UpdateFactory.create(query);
+        UpdateProcessor processor = UpdateExecutionFactory.createRemote(
+                request, CollectionUtil.getCollectionsName(CollectionUtil.METADATA_UPDATE));
+        processor.execute();
+    }
+
+    @Override
+    public boolean saveToSolr() {
+        return false;
+    }
+
+    @Override
+    public int deleteFromSolr() {
+        return 0;
+    }
 }
 

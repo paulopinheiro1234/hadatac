@@ -106,30 +106,4 @@ public class Unit extends HADatAcClass implements Comparable<Unit> {
 		}
 		return this.getLocalName().compareTo(another.getLocalName());
 	}
-
-	/*public static String getHierarchyJson() {
-	String collection = "";
-	String q = 
-	    "SELECT ?id ?superId ?label ?comment WHERE { " + 
-	    "   ?id rdfs:subClassOf* uo:0000000 . " + 
-	    "   ?id rdfs:subClassOf ?superId .  " + 
-	    "   OPTIONAL { ?id rdfs:label ?label . } " + 
-	    "   OPTIONAL { ?id rdfs:comment ?comment . } " +
-	    "}";
-    	ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-    	try {
-	    String queryString = NameSpaces.getInstance().printSparqlNameSpaceList() + q;
-	    Query query = QueryFactory.create(queryString);
-	    QueryExecution qexec = QueryExecutionFactory.sparqlService(Collections.getCollectionsName(Collections.METADATA_SPARQL), query);
-	    ResultSet results = qexec.execSelect();
-	    ResultSetFormatter.outputAsJSON(outputStream, results);
-	    qexec.close();
-
-	    return outputStream.toString("UTF-8");
-    	} catch (Exception e) {
-	    e.printStackTrace();
-	}
-    	return "";
-	} */
-
 }

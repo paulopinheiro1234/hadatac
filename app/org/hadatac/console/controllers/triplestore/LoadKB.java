@@ -86,7 +86,7 @@ public class LoadKB extends Controller {
         }
         
         String path = String.format("/%s", folder);
-        String site = ConfigProp.getPropertyValue("labkey.config", "site");
+        String site = ConfigProp.getLabKeySite();
         
     	try {
     		final SysUser user = AuthApplication.getLocalUser(Controller.session());
@@ -95,7 +95,7 @@ public class LoadKB extends Controller {
     			return badRequest("Cannot find corresponding URI for the current logged in user!");
     		}
     		ParsingResult result = TripleProcessing.importDataAcquisition(
-    				site, user_name, password, path, study_uri);
+    				site, path, user_name, password, study_uri);
     		if (result.getStatus() != 0) {
     			return ok(labkeyLoadingResult.render(folder, oper, content, result.getMessage()));
     		}
@@ -138,7 +138,7 @@ public class LoadKB extends Controller {
     	}
 
         String path = String.format("/%s", folder);
-        String site = ConfigProp.getPropertyValue("labkey.config", "site");
+        String site = ConfigProp.getLabKeySite();
     	
     	NameSpaces.getInstance();
     	MetadataContext metadata = new 
@@ -174,7 +174,7 @@ public class LoadKB extends Controller {
         	redirect(routes.LoadKB.loadLabkeyKB("init", content));
         }
 
-        String site = ConfigProp.getPropertyValue("labkey.config", "site");
+        String site = ConfigProp.getLabKeySite();
         String path = String.format("/%s", folder);
     	
     	NameSpaces.getInstance();
@@ -212,7 +212,7 @@ public class LoadKB extends Controller {
             password = form.get().getPassword();
         }
         
-        String site = ConfigProp.getPropertyValue("labkey.config", "site");
+        String site = ConfigProp.getLabKeySite();
         String path = "/";
     	
     	List<String> folders = null;
@@ -247,7 +247,7 @@ public class LoadKB extends Controller {
         if (user_name == null || password == null) {
         	redirect(routes.LoadKB.loadLabkeyKB("init", "knowledge"));
         }
-        String site = ConfigProp.getPropertyValue("labkey.config", "site");
+        String site = ConfigProp.getLabKeySite();
         String path = String.format("/%s", folder);
     	
     	List<String> retMetadataLists = null;
@@ -303,12 +303,12 @@ public class LoadKB extends Controller {
     @Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
     public Result postLogInLabkey(String nextCall) {
     	Form<LabKeyLoginForm> form = formFactory.form(LabKeyLoginForm.class).bindFromRequest();
-    	String site = ConfigProp.getPropertyValue("labkey.config", "site");
+    	String site = ConfigProp.getLabKeySite();
         String path = "/";
         String user_name = form.get().getUserName();
         String password = form.get().getPassword();
     	LabkeyDataHandler loader = new LabkeyDataHandler(
-    			site, user_name, password, path);
+    			site, path, user_name, password);
     	try {
     		loader.checkAuthentication();
     		session().put("LabKeyUserName", user_name);

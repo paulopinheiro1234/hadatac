@@ -26,9 +26,6 @@ import org.hadatac.utils.ConfigProp;
 import org.hadatac.metadata.loader.LabkeyDataHandler;
 import org.hadatac.metadata.loader.URIUtils;
 import org.labkey.remoteapi.CommandException;
-import be.objectify.deadbolt.java.actions.Group;
-import be.objectify.deadbolt.java.actions.Restrict;
-import org.hadatac.console.controllers.AuthApplication;
 
 public class StudyObject extends HADatAcThing {
 
@@ -405,14 +402,11 @@ public class StudyObject extends HADatAcThing {
         return true;
     }
 
-    @Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
     @Override
     public int saveToLabKey(String user_name, String password) {
         System.out.println("Saving study object " + getUri() + " to LabKey");
 
-        String site = ConfigProp.getPropertyValue("labkey.config", "site");
-        String path = "/" + ConfigProp.getPropertyValue("labkey.config", "folder");
-        LabkeyDataHandler loader = new LabkeyDataHandler(site, user_name, password, path);
+        LabkeyDataHandler loader = LabkeyDataHandler.createDefault(user_name, password);
         List< Map<String, Object> > rows = new ArrayList< Map<String, Object> >();
         Map<String, Object> row = new HashMap<String, Object>();
         row.put("hasURI", URIUtils.replaceNameSpaceEx(getUri()));
@@ -447,14 +441,11 @@ public class StudyObject extends HADatAcThing {
         return totalChanged;
     }
 
-    @Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
     @Override
     public int deleteFromLabKey(String user_name, String password) {
         System.out.println("Deleting study object " + getUri() + " from LabKey");
 
-        String site = ConfigProp.getPropertyValue("labkey.config", "site");
-        String path = "/" + ConfigProp.getPropertyValue("labkey.config", "folder");
-        LabkeyDataHandler loader = new LabkeyDataHandler(site, user_name, password, path);
+        LabkeyDataHandler loader = LabkeyDataHandler.createDefault(user_name, password);
         List< Map<String, Object> > rows = new ArrayList< Map<String, Object> >();
         Map<String, Object> row = new HashMap<String, Object>();
         row.put("hasURI", URIUtils.replaceNameSpaceEx(getUri()));
@@ -491,5 +482,15 @@ public class StudyObject extends HADatAcThing {
         UpdateProcessor processor = UpdateExecutionFactory.createRemote(
                 request, CollectionUtil.getCollectionsName(CollectionUtil.METADATA_UPDATE));
         processor.execute();
+    }
+
+    @Override
+    public boolean saveToSolr() {
+        return false;
+    }
+
+    @Override
+    public int deleteFromSolr() {
+        return 0;
     }
 }

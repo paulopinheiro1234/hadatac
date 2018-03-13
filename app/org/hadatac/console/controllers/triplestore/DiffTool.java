@@ -52,8 +52,6 @@ import org.json.simple.JSONObject;
 
 import org.hadatac.utils.ConfigProp;
 
-
-import play.Play;
 import play.data.Form;
 import play.mvc.Controller;
 import play.mvc.Result;
@@ -360,55 +358,25 @@ public class DiffTool extends Controller {
 
         return returnlisty;
     }
-
-
-
-
-
+    
     //The main function
-    public Result runDiffTool(List<String> list) throws Exception {
-    	
-        /*if(args.length != 4){
-            System.out.println("ERROR: Incorrect number of arguments");
-            System.out.println(args[0]);
-            System.out.println("Usage: Schema1, Schema2, Username, Password");
-            return;
-        }
-        
-*/
-    	String site = ConfigProp.getPropertyValue("labkey.config", "site");
-    	
+    public Result runDiffTool(List<String> list) throws Exception {    	
     	String Schema1 = "";
        	String Schema2 = "";
-		if (list.size()==2) {
+		if (list.size() == 2) {
         	Schema1 = list.get(0);
         	Schema2 = list.get(1);
-		} else {
-			//Schema1 = "CHEAR Development";
-        	//Schema2 = "CHEAR Production";
-		}	
+		}
 		String username = session().get("LabKeyUserName");
         String password = session().get("LabKeyPassword");
         if (username == null || password == null) {
         	redirect(routes.LoadKB.loadLabkeyKB("init", "diff_tool"));
         }
-        Connection cn = new Connection(site, username, password);
-
-        //PrintWriter writer = new PrintWriter("./app/org/hadatac/console/views/triplestore/diff_results.scala.html", "UTF-8");
-        /*PrintWriter writer = new PrintWriter("./app/org/hadatac/console/views/triplestore/diff_results_sample.txt", "UTF-8");
-        writer.print("@()\n@import helper._\n@import org.hadatac.console.views.html._\n@import org.hadatac.console.controllers.triplestore._\n@import org.hadatac.data.loader._\n@import org.hadatac.metadata.loader._\n@import org.hadatac.utils._\n@import java.net._\n@import play._\n\n@main(\"Diff Tool Results\") {\n");
-        writer.print("<div class=\"container-fluid\">\n<h1>Diff Tool Results</h1>\n");
-        writer.println("<style>table, th, td { border: 1px solid black;}th, td {padding: 7px;}</style>");*/
-        //Map<String, Object> chear_dev_map = connect_chear_dev();
-
-        ////PrintWriter data_writer = new PrintWriter("TableDataResults.txt", "UTF-8");
+        Connection cn = new Connection(ConfigProp.getLabKeySite(), username, password);
 
         Collection<ArrayList<String>> dataArrayMain = ConnectToLabkey_List_Manager(Schema1, cn);
         Collection<ArrayList<String>> dataArraySecond = ConnectToLabkey_List_Manager(Schema2, cn);
         ArrayList<ArrayList<String>> table1List_Result = CompareListCollections(dataArrayMain, dataArraySecond, Schema1, Schema2);
-
-//        Collection<String> dataArrayH1 = ConnectToLabkey_Retrieve_List_Names(Schema1, cn);
-//        Collection<String> dataArrayH2 = ConnectToLabkey_Retrieve_List_Names(Schema2, cn);
 
         Collection<String> dataArrayH1 =  new ArrayList<String>();
         Collection<String> dataArrayH2 =  new ArrayList<String>();
@@ -422,9 +390,6 @@ public class DiffTool extends Controller {
             dataArrayH2.add(arr_iter2.get(0));
         }
         
-
-
-        //Collection<String> dataArrayCombined = CombineHeaders(dataArrayH1, dataArrayH2, writer, Schema1, Schema2);
         ArrayList<ArrayList<String>> fullHeaderResultsLists = CombineHeaders(dataArrayH1, dataArrayH2, Schema1, Schema2);
         Collection<String> dataArrayCombined = fullHeaderResultsLists.get(0);
 
@@ -432,11 +397,9 @@ public class DiffTool extends Controller {
 
         for (Iterator<String> iter = dataArrayCombined.iterator(); iter.hasNext(); ) {
             String sub_list_name = iter.next();
-            //writer.print("<h2>List Name: " + sub_list_name + "</h2>\n\n");
 
             SelectRowsCommand cmd = new SelectRowsCommand("lists", sub_list_name);
             cmd.setRequiredVersion(9.1);
-            //cmd.setSorts(Collections.singletonList(new Sort("Name")));
             SelectRowsResponse response1 = cmd.execute(cn, Schema1);
             SelectRowsResponse response2 = cmd.execute(cn, Schema2);
 
@@ -447,41 +410,11 @@ public class DiffTool extends Controller {
             ArrayList<ArrayList<String>> projectListHeadResult = CompareHeadersResult(dataArrayH11, dataArrayH22, Schema1, Schema2);
             headerIndividualResults.put(sub_list_name, projectListHeadResult);
             System.out.println(sub_list_name);
-
-            //All data comparison
-            /*
-            //List<Map<String,Object>> DataArray_File1Data = dataRetrieve_All(Schema1,sub_list_name, cn, dataArrayH11);
-            List<Map<String,Object>> DataArray_File1Data = response1.getRows();
-            //List<Map<String,Object>> DataArray_File2Data = dataRetrieve_All(Schema2,sub_list_name, cn, dataArrayH22);
-            List<Map<String,Object>> DataArray_File2Data = response2.getRows();
-            int [][] table1 = compareData_All(DataArray_File1Data, DataArray_File2Data, dataArrayH11, dataArrayH22);
-            int [][] table2 = compareData_All(DataArray_File2Data, DataArray_File1Data, dataArrayH22, dataArrayH11);
-
-            data_writer.printf("Schema Name:  " + Schema1 + "\t\tList Name: " + sub_list_name + "\n\n");
-            printDataTable(DataArray_File1Data, dataArrayH11, data_writer, table1);
-            data_writer.println("\n\n\n");
-            data_writer.printf("Schema Name:  " + Schema2 + "\t\tList Name: " + sub_list_name + "\n\n");
-            printDataTable(DataArray_File2Data, dataArrayH22, data_writer, table2);
-            data_writer.println("\n\n##############################################################################\n\n");*/
         }
-        //Iterator< Map.Entry<String, ArrayList<ArrayList<String>>> > headerIndivIter = headerIndividualResults.entrySet().iterator();
-        //Map <String, ArrayList<ArrayList<String>>> sortedMapIndivResults = new TreeMap<String, ArrayList<ArrayList<String>>>(headerIndividualResults);
-
-        /*ArrayList<String> list = new ArrayList<String>();
-        for (Iterator<String> iter_name = inputCol.iterator(); iter_name.hasNext(); ) {
-            list.add(iter_name.next());
-        }
-        Collections.sort(list);*/
-
-
-
-        //writer.close();
-        //data_writer.close()
-
+        
         return ok(diff_results.render(list, table1List_Result, fullHeaderResultsLists,headerIndividualResults));
     }
     
-    //public static void updateForm(String alias, List<String> selectedTerms) {
     public static void updateForm(String alias) {
     	System.out.println("Alias: " + alias);
     }
@@ -489,30 +422,13 @@ public class DiffTool extends Controller {
     public Result index() throws Exception {
     	List<String> lists = diffLoadLists();
         if(lists.size() == 2){
-            //String a;
-            /*runDiffTool(lists);
-            System.out.println("THE PROGRAM HAS STOPPED RUNNING");
-            return ok(diff_results.render(lists));*/
             return runDiffTool(lists);
-
-            //ArrayList<ArrayList<String>> table1List_Result = runDiffTool(lists).table1List_Result;
-        }
-        else{
+        } else{
             return ok("Incorrect number of items checked, please only check two");
         }
     }
     
     public Result postIndex() throws Exception {
         return index();
-    }
-    
+    }   
 }
-
-
-
-
-//TO DO:
-/*
-- Set-up the html file to display without the print writer
-- re-format the java file
-*/

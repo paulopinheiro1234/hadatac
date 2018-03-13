@@ -29,7 +29,6 @@ import org.hadatac.metadata.loader.URIUtils;
 import org.hadatac.entity.pojo.ObjectCollection;
 import org.hadatac.entity.pojo.StudyObject;
 import org.hadatac.utils.CollectionUtil;
-import org.hadatac.utils.ConfigProp;
 import org.hadatac.utils.State;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
@@ -644,11 +643,6 @@ public class DataAcquisition extends HADatAcThing {
     public void save() {
         saveToTripleStore();
         saveToSolr();
-
-        Credential cred = Credential.find();
-        if (null != cred) {
-            saveToLabKey(cred.getUserName(), cred.getPassword());
-        }
     }
 
     @Override
@@ -1233,14 +1227,9 @@ public class DataAcquisition extends HADatAcThing {
         return builder.toString();
     }
 
-    @Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
     @Override
     public int saveToLabKey(String userName, String password) {
-        String site = ConfigProp.getPropertyValue("labkey.config", "site");
-        String path = "/" + ConfigProp.getPropertyValue("labkey.config", "folder");
-
-        LabkeyDataHandler loader = new LabkeyDataHandler(
-                site, userName, password, path);
+        LabkeyDataHandler loader = LabkeyDataHandler.createDefault(userName, password);
 
         List<String> abbrevTypeURIs = new ArrayList<String>();
         for (String uri : getTypeURIs()) {
@@ -1291,14 +1280,9 @@ public class DataAcquisition extends HADatAcThing {
         return totalChanged;
     }
 
-    @Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
     @Override
     public int deleteFromLabKey(String userName, String password) {
-        String site = ConfigProp.getPropertyValue("labkey.config", "site");
-        String path = "/" + ConfigProp.getPropertyValue("labkey.config", "folder");
-
-        LabkeyDataHandler loader = new LabkeyDataHandler(
-                site, userName, password, path);
+        LabkeyDataHandler loader = LabkeyDataHandler.createDefault(userName, password);
 
         List< Map<String, Object> > rows = new ArrayList< Map<String, Object> >();
         Map<String, Object> row = new HashMap<String, Object>();
@@ -1313,5 +1297,13 @@ public class DataAcquisition extends HADatAcThing {
             return 0;
         }
     }
+
+    @Override
+    public boolean saveToTripleStore() {
+        return false;
+    }
+
+    @Override
+    public void deleteFromTripleStore() {}
 }
 

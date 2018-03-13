@@ -48,9 +48,6 @@ public class RefreshStudy extends Controller {
         
         DeleteStudy.deleteStudy(DynamicFunctions.replaceURLWithPrefix(study_uri));
         
-        String site = ConfigProp.getPropertyValue("labkey.config", "site");
-        String path = ConfigProp.getPropertyValue("labkey.config", "folder");
-        
     	if (session().get("LabKeyUserName") == null && session().get("LabKeyPassword") == null) {
     		return redirect(org.hadatac.console.controllers.triplestore.routes.LoadKB.logInLabkey(
     				routes.RefreshStudy.index(study_uri).url()));
@@ -59,8 +56,12 @@ public class RefreshStudy extends Controller {
     	String results = "";
     	int nTriples = 0;
     	try {
-    		Model model = TripleProcessing.importStudy(site, session().get("LabKeyUserName"), 
-    				session().get("LabKeyPassword"), path, study_uri);
+    		Model model = TripleProcessing.importStudy(
+    		        ConfigProp.getLabKeySite(), 
+    		        ConfigProp.getLabKeyProjectPath(),
+    		        session().get("LabKeyUserName"), 
+    				session().get("LabKeyPassword"),
+    				study_uri);
     		DatasetAccessor accessor = DatasetAccessorFactory.createHTTP(
     				CollectionUtil.getCollectionsName(CollectionUtil.METADATA_GRAPH));
     		accessor.add(model);
@@ -78,8 +79,12 @@ public class RefreshStudy extends Controller {
     			nTriples++;
     		}
     		
-    		TripleProcessing.importDataAcquisition(site, session().get("LabKeyUserName"), 
-    				session().get("LabKeyPassword"), path, URIUtils.replacePrefixEx(study_uri));
+    		TripleProcessing.importDataAcquisition(
+    		        ConfigProp.getLabKeySite(), 
+                    ConfigProp.getLabKeyProjectPath(), 
+    		        session().get("LabKeyUserName"), 
+    				session().get("LabKeyPassword"), 
+    				URIUtils.replacePrefixEx(study_uri));
     		
     	} catch (CommandException e) {
     		if (e.getMessage().equals("Unauthorized")) {

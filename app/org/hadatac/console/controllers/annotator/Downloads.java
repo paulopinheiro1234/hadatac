@@ -220,7 +220,7 @@ public class Downloads extends Controller {
 			}
 
 		    try {
-				FileUtils.writeStringToFile(new File(LoadCCSV.UPLOAD_NAME), preamble);
+				FileUtils.writeStringToFile(new File(LoadCCSV.UPLOAD_NAME), preamble, "utf-8");
 			} catch (IOException e) {
 				e.printStackTrace();
 				return ok(completeAnnotation.render("Error aving CCSV file locally. Please restart form."));

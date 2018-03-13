@@ -2,6 +2,7 @@ package org.hadatac.console.controllers.objects;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import javax.inject.Inject;
 
@@ -35,10 +36,14 @@ public class ObjectManagement extends Controller {
             return redirect(org.hadatac.console.controllers.triplestore.routes.LoadKB.logInLabkey(
                     org.hadatac.console.controllers.objects.routes.ObjectManagement.index(filename, da_uri, std_uri, oc_uri, message).url()));
         }
-        std_uri = URLDecoder.decode(std_uri);
-        oc_uri = URLDecoder.decode(oc_uri);
-        //System.out.println("In DeleteOC: std_uri = [" + std_uri + "]");
-        //System.out.println("In DeleteOC: oc_uri = [" + oc_uri + "]");
+        
+        try {
+            std_uri = URLDecoder.decode(std_uri, "utf-8");
+            oc_uri = URLDecoder.decode(oc_uri, "utf-8");
+        } catch (UnsupportedEncodingException e) {
+            std_uri = "";
+            oc_uri = "";
+        }
 
         Study study = Study.find(std_uri);
         if (study == null) {
@@ -68,8 +73,13 @@ public class ObjectManagement extends Controller {
     public Result updateCollectionObjects(String filename, String da_uri, String std_uri, String oc_uri, List<String> objUriList) {
         final SysUser sysUser = AuthApplication.getLocalUser(session());
 
-        std_uri = URLDecoder.decode(std_uri);
-        oc_uri = URLDecoder.decode(oc_uri);
+        try {
+            std_uri = URLDecoder.decode(std_uri, "utf-8");
+            oc_uri = URLDecoder.decode(oc_uri, "utf-8");
+        } catch (UnsupportedEncodingException e) {
+            std_uri = "";
+            oc_uri = "";
+        }
 
         System.out.println("Study URI entering 1 EditObject: [" + std_uri + "]");
         if (std_uri == null || std_uri.equals("")) {
@@ -98,7 +108,11 @@ public class ObjectManagement extends Controller {
         List<StudyObject> oldObjList = new ArrayList<StudyObject>();
         List<StudyObject> newObjList = new ArrayList<StudyObject>();
         for (String oldUri : objUriList) {
-            oldUri = URLDecoder.decode(oldUri);
+            try {
+                oldUri = URLDecoder.decode(oldUri, "utf-8");
+            } catch (UnsupportedEncodingException e) {
+                oldUri = "";
+            }
             StudyObject obj = StudyObject.find(oldUri);
             oldObjList.add(obj);
         }
@@ -176,8 +190,13 @@ public class ObjectManagement extends Controller {
 
         final SysUser sysUser = AuthApplication.getLocalUser(session());
 
-        std_uri = URLDecoder.decode(std_uri);
-        oc_uri = URLDecoder.decode(oc_uri);
+        try {
+            std_uri = URLDecoder.decode(std_uri, "utf-8");
+            oc_uri = URLDecoder.decode(oc_uri, "utf-8");
+        } catch (UnsupportedEncodingException e) {
+            std_uri = "";
+            oc_uri = "";
+        }
 
         System.out.println("Study URI entering 1 EditObject: [" + std_uri + "]");
         if (std_uri == null || std_uri.equals("")) {
@@ -205,7 +224,12 @@ public class ObjectManagement extends Controller {
         // old and new object lists
         List<StudyObject> oldObjList = new ArrayList<StudyObject>();
         for (String oldUri : objUriList) {
-            oldUri = URLDecoder.decode(oldUri);
+            try {
+                oldUri = URLDecoder.decode(oldUri, "utf-8");
+            } catch (UnsupportedEncodingException e) {
+                oldUri = "";
+            }
+            
             StudyObject obj = StudyObject.find(oldUri);
             oldObjList.add(obj);
         }

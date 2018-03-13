@@ -3,6 +3,8 @@ package org.hadatac.console.controllers.objects;
 import java.util.ArrayList;
 import java.util.List;
 import javax.inject.Inject;
+
+import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import javax.inject.Inject;
 
@@ -39,8 +41,13 @@ public class NewObjectsFromScratch extends Controller {
                     org.hadatac.console.controllers.objects.routes.NewObjectsFromScratch.index(filename, da_uri, std_uri, oc_uri).url()));
         }
 
-        std_uri = URLDecoder.decode(std_uri);
-        oc_uri = URLDecoder.decode(oc_uri);
+        try {
+            std_uri = URLDecoder.decode(std_uri, "utf-8");
+            oc_uri = URLDecoder.decode(oc_uri, "utf-8");
+        } catch (UnsupportedEncodingException e) {
+            std_uri = "";
+            oc_uri = "";
+        }
 
         Study study = Study.find(std_uri);
         ObjectCollection oc = ObjectCollection.find(oc_uri);
@@ -148,12 +155,19 @@ public class NewObjectsFromScratch extends Controller {
 
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
     public Result processScopeForm(String filename, String da_uri, String std_uri, String oc_uri) {
+        try {
+            oc_uri = URLDecoder.decode(oc_uri, "utf-8");
+        } catch (UnsupportedEncodingException e) {
+            oc_uri = "";
+        }
+        
         final SysUser sysUser = AuthApplication.getLocalUser(session());
 
         Study std = Study.find(std_uri);
         ObjectCollection oc = ObjectCollection.find(oc_uri);
 
-        Form<NewObjectsFromScratchForm> form = formFactory.form(NewObjectsFromScratchForm.class).bindFromRequest();
+        Form<NewObjectsFromScratchForm> form = formFactory.form(
+                NewObjectsFromScratchForm.class).bindFromRequest();
         NewObjectsFromScratchForm data = form.get();
 
         if (form.hasErrors()) {
@@ -182,7 +196,6 @@ public class NewObjectsFromScratch extends Controller {
         String newLabelPrefix = data.getNewLabelPrefix();
         boolean newLabelQualifier = (data.getNewLabelQualifier() != null);
         long nextId = std.getLastId() + 1;
-        //System.out.println("nextId : " + nextId);
         long quantity = 0;
 
         // Fixed values
@@ -192,7 +205,7 @@ public class NewObjectsFromScratch extends Controller {
         } else {
             newType = URIUtils.replacePrefixEx(data.getNewType());
         }
-        String newObjectCollectionUri = URIUtils.replacePrefixEx(URLDecoder.decode(oc_uri));
+        String newObjectCollectionUri = URIUtils.replacePrefixEx(oc_uri);
 
         // Variable values
         String newURI = null;

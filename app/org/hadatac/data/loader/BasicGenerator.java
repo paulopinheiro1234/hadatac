@@ -194,10 +194,8 @@ public abstract class BasicGenerator {
             log.addline(Feedback.println(Feedback.WEB, "[ERROR] No LabKey credentials are provided!"));
         }
 
-        String site = ConfigProp.getPropertyValue("labkey.config", "site");
-        String path = "/" + ConfigProp.getPropertyValue("labkey.config", "folder");
-        LabkeyDataHandler labkeyDataHandler = new LabkeyDataHandler(
-                site, cred.getUserName(), cred.getPassword(), path);
+        LabkeyDataHandler labkeyDataHandler = LabkeyDataHandler.createDefault(
+                cred.getUserName(), cred.getPassword());
         try {
             int nRows = labkeyDataHandler.insertRows(getTableName(), rows);
             log.addline(Feedback.println(Feedback.WEB, String.format(
@@ -324,10 +322,8 @@ public abstract class BasicGenerator {
             throw new LabKeyException("[ERROR] No LabKey credentials are provided!");
         }
 
-        String site = ConfigProp.getPropertyValue("labkey.config", "site");
-        String path = "/" + ConfigProp.getPropertyValue("labkey.config", "folder");
-        LabkeyDataHandler labkeyDataHandler = new LabkeyDataHandler(
-                site, cred.getUserName(), cred.getPassword(), path);
+        LabkeyDataHandler labkeyDataHandler = LabkeyDataHandler.createDefault(
+                cred.getUserName(), cred.getPassword());
         try {
             labkeyDataHandler.deleteRows(getTableName(), rows);
         } catch (CommandException e) {

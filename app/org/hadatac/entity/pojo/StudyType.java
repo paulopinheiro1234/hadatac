@@ -24,84 +24,83 @@ import com.typesafe.config.ConfigFactory;
 
 public class StudyType extends HADatAcClass implements Comparable<StudyType> {
 
-	static String className = "hasco:Study";
+    static String className = "hasco:Study";
 
-	public StudyType () {
-		super(className);
-	}
+    public StudyType () {
+        super(className);
+    }
 
-	public static List<StudyType> find() {
-		List<StudyType> studyTypes = new ArrayList<StudyType>();
-		String queryString = NameSpaces.getInstance().printSparqlNameSpaceList() +
-				" SELECT ?uri WHERE { " +
-				" ?uri rdfs:subClassOf* " + className + " . " + 
-				"} ";
+    public static List<StudyType> find() {
+        List<StudyType> studyTypes = new ArrayList<StudyType>();
+        String queryString = NameSpaces.getInstance().printSparqlNameSpaceList() +
+                " SELECT ?uri WHERE { " +
+                " ?uri rdfs:subClassOf* " + className + " . " + 
+                "} ";
 
-		//System.out.println("Query: " + queryString);
-		Query query = QueryFactory.create(queryString);
+        Query query = QueryFactory.create(queryString);
 
-		QueryExecution qexec = QueryExecutionFactory.sparqlService(CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), query);
-		ResultSet results = qexec.execSelect();
-		ResultSetRewindable resultsrw = ResultSetFactory.copyResults(results);
-		qexec.close();
+        QueryExecution qexec = QueryExecutionFactory.sparqlService(
+                CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), query);
+        ResultSet results = qexec.execSelect();
+        ResultSetRewindable resultsrw = ResultSetFactory.copyResults(results);
+        qexec.close();
 
-		while (resultsrw.hasNext()) {
-			QuerySolution soln = resultsrw.next();
-			StudyType studyType = find(soln.getResource("uri").getURI());
-			studyTypes.add(studyType);
-		}			
+        while (resultsrw.hasNext()) {
+            QuerySolution soln = resultsrw.next();
+            StudyType studyType = find(soln.getResource("uri").getURI());
+            studyTypes.add(studyType);
+        }			
 
-		java.util.Collections.sort((List<StudyType>) studyTypes);
-		return studyTypes;
+        java.util.Collections.sort((List<StudyType>) studyTypes);
+        return studyTypes;
 
-	}
+    }
 
-	public static Map<String,String> getMap() {
-		List<StudyType> list = find();
-		Map<String,String> map = new HashMap<String,String>();
-		for (StudyType typ: list) 
-			map.put(typ.getUri(),typ.getLabel());
-		return map;
-	}
+    public static Map<String,String> getMap() {
+        List<StudyType> list = find();
+        Map<String,String> map = new HashMap<String,String>();
+        for (StudyType typ: list) 
+            map.put(typ.getUri(),typ.getLabel());
+        return map;
+    }
 
-	public static StudyType find(String uri) {
-		StudyType studyType = null;
-		Model model;
-		Statement statement;
-		RDFNode object;
+    public static StudyType find(String uri) {
+        StudyType studyType = null;
+        Model model;
+        Statement statement;
+        RDFNode object;
 
-		String queryString = "DESCRIBE <" + uri + ">";
-		Query query = QueryFactory.create(queryString);
-		QueryExecution qexec = QueryExecutionFactory.sparqlService(
-				ConfigFactory.load().getString("hadatac.solr.triplestore") 
-				+ CollectionUtil.METADATA_SPARQL, query);
-		model = qexec.execDescribe();
+        String queryString = "DESCRIBE <" + uri + ">";
+        Query query = QueryFactory.create(queryString);
+        QueryExecution qexec = QueryExecutionFactory.sparqlService(
+                ConfigFactory.load().getString("hadatac.solr.triplestore") 
+                + CollectionUtil.METADATA_SPARQL, query);
+        model = qexec.execDescribe();
 
-		studyType = new StudyType();
-		StmtIterator stmtIterator = model.listStatements();
+        studyType = new StudyType();
+        StmtIterator stmtIterator = model.listStatements();
 
-		while (stmtIterator.hasNext()) {
-			statement = stmtIterator.next();
-			object = statement.getObject();
-			if (statement.getPredicate().getURI().equals("http://www.w3.org/2000/01/rdf-schema#label")) {
-				studyType.setLabel(object.asLiteral().getString());
-			} else if (statement.getPredicate().getURI().equals("http://www.w3.org/2000/01/rdf-schema#subClassOf")) {
-				studyType.setSuperUri(object.asResource().getURI());
-			}
-		}
+        while (stmtIterator.hasNext()) {
+            statement = stmtIterator.next();
+            object = statement.getObject();
+            if (statement.getPredicate().getURI().equals("http://www.w3.org/2000/01/rdf-schema#label")) {
+                studyType.setLabel(object.asLiteral().getString());
+            } else if (statement.getPredicate().getURI().equals("http://www.w3.org/2000/01/rdf-schema#subClassOf")) {
+                studyType.setSuperUri(object.asResource().getURI());
+            }
+        }
 
-		studyType.setUri(uri);
-		studyType.setLocalName(uri.substring(uri.indexOf('#') + 1));
+        studyType.setUri(uri);
+        studyType.setLocalName(uri.substring(uri.indexOf('#') + 1));
 
-		return studyType;
-	}
+        return studyType;
+    }
 
-	@Override
-	public int compareTo(StudyType another) {
-		if (this.getLabel() != null && another.getLabel() != null) {
-			return this.getLabel().compareTo(another.getLabel());
-		}
-		return this.getLocalName().compareTo(another.getLocalName());
-	}
-
+    @Override
+    public int compareTo(StudyType another) {
+        if (this.getLabel() != null && another.getLabel() != null) {
+            return this.getLabel().compareTo(another.getLabel());
+        }
+        return this.getLocalName().compareTo(another.getLocalName());
+    }
 }
