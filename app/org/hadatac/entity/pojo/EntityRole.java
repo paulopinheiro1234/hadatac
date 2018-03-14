@@ -15,7 +15,7 @@ import org.apache.jena.query.ResultSetRewindable;
 import org.hadatac.console.models.Facet;
 import org.hadatac.console.models.FacetHandler;
 import org.hadatac.metadata.loader.URIUtils;
-import org.hadatac.utils.Collections;
+import org.hadatac.utils.CollectionUtil;
 import org.hadatac.utils.NameSpaces;
 
 public class EntityRole extends HADatAcThing implements Comparable<EntityRole> {
@@ -89,7 +89,7 @@ public class EntityRole extends HADatAcThing implements Comparable<EntityRole> {
 		Map<HADatAcThing, List<HADatAcThing>> results = new HashMap<HADatAcThing, List<HADatAcThing>>();
 		try {
 			QueryExecution qe = QueryExecutionFactory.sparqlService(
-					Collections.getCollectionsName(Collections.METADATA_SPARQL), query);
+					CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), query);
 			ResultSet resultSet = qe.execSelect();
 			ResultSetRewindable resultsrw = ResultSetFactory.copyResults(resultSet);
 			qe.close();
@@ -156,5 +156,34 @@ public class EntityRole extends HADatAcThing implements Comparable<EntityRole> {
 	public int compareTo(EntityRole another) {
 		return this.getUri().compareTo(another.getUri());
 	}
+
+    @Override
+    public boolean saveToTripleStore() {
+        return false;
+    }
+
+    @Override
+    public void deleteFromTripleStore() {
+    }
+
+    @Override
+    public boolean saveToSolr() {
+        return false;
+    }
+
+    @Override
+    public int deleteFromSolr() {
+        return 0;
+    }
+
+    @Override
+    public int saveToLabKey(String userName, String password) {
+        return 0;
+    }
+
+    @Override
+    public int deleteFromLabKey(String userName, String password) {
+        return 0;
+    }
 }
 

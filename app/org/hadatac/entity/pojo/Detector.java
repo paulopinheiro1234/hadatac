@@ -15,12 +15,12 @@ import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Statement;
 import org.apache.jena.rdf.model.StmtIterator;
-import org.hadatac.utils.Collections;
+import org.hadatac.utils.CollectionUtil;
 import org.hadatac.utils.NameSpaces;
 
 import com.typesafe.config.ConfigFactory;
 
-public class Detector implements Comparable<Detector>  {
+public class Detector extends HADatAcThing implements Comparable<Detector>  {
 	private String uri;
 	private String localName;
 	private String label;
@@ -67,7 +67,6 @@ public class Detector implements Comparable<Detector>  {
 	}
 	
 	public static List<Detector> find() {
-		//System.out.println("Inside Lits<Detector>");
 		List<Detector> detectors = new ArrayList<Detector>();
 		String queryString = NameSpaces.getInstance().printSparqlNameSpaceList() +
 			" SELECT ?uri WHERE { " +
@@ -78,7 +77,7 @@ public class Detector implements Comparable<Detector>  {
 		//System.out.println("Query: " + queryString);
 		Query query = QueryFactory.create(queryString);
 			
-		QueryExecution qexec = QueryExecutionFactory.sparqlService(Collections.getCollectionsName(Collections.METADATA_SPARQL), query);
+		QueryExecution qexec = QueryExecutionFactory.sparqlService(CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), query);
 		ResultSet results = qexec.execSelect();
 		ResultSetRewindable resultsrw = ResultSetFactory.copyResults(results);
 		qexec.close();
@@ -104,7 +103,7 @@ public class Detector implements Comparable<Detector>  {
 		Query query = QueryFactory.create(queryString);
 		QueryExecution qexec = QueryExecutionFactory.sparqlService(
 				ConfigFactory.load().getString("hadatac.solr.triplestore") 
-				+ Collections.METADATA_SPARQL, query);
+				+ CollectionUtil.METADATA_SPARQL, query);
 		model = qexec.execDescribe();
 		
 		detector = new Detector();
@@ -148,7 +147,7 @@ public class Detector implements Comparable<Detector>  {
 			
 		Query query = QueryFactory.create(queryString);
 			
-		QueryExecution qexec = QueryExecutionFactory.sparqlService(Collections.getCollectionsName(Collections.METADATA_SPARQL), query);
+		QueryExecution qexec = QueryExecutionFactory.sparqlService(CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), query);
 		ResultSet results = qexec.execSelect();
 		ResultSetRewindable resultsrw = ResultSetFactory.copyResults(results);
 		qexec.close();
@@ -178,7 +177,7 @@ public class Detector implements Comparable<Detector>  {
 			
 		Query query = QueryFactory.create(queryString);
 			
-		QueryExecution qexec = QueryExecutionFactory.sparqlService(Collections.getCollectionsName(Collections.METADATA_SPARQL), query);
+		QueryExecution qexec = QueryExecutionFactory.sparqlService(CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), query);
 		ResultSet results = qexec.execSelect();
 		ResultSetRewindable resultsrw = ResultSetFactory.copyResults(results);
 		qexec.close();
@@ -190,8 +189,36 @@ public class Detector implements Comparable<Detector>  {
 		}			
 
 		java.util.Collections.sort((List<Detector>) detectors);
-		return detectors;
 		
+		return detectors;
 	}
-	
+
+    @Override
+    public boolean saveToTripleStore() {
+        return false;
+    }
+
+    @Override
+    public void deleteFromTripleStore() {
+    }
+
+    @Override
+    public boolean saveToSolr() {
+        return false;
+    }
+
+    @Override
+    public int deleteFromSolr() {
+        return 0;
+    }
+
+    @Override
+    public int saveToLabKey(String userName, String password) {
+        return 0;
+    }
+
+    @Override
+    public int deleteFromLabKey(String userName, String password) {
+        return 0;
+    }
 }

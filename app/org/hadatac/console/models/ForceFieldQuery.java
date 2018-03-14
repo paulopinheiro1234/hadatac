@@ -1,8 +1,7 @@
 package org.hadatac.console.models;
 
-import org.apache.jena.base.Sys;
 import org.hadatac.console.http.GetSparqlQuery;
-import org.hadatac.utils.Collections;
+import org.hadatac.utils.CollectionUtil;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -15,11 +14,11 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class ForceFieldQuery {
-	String collectionSource = Collections.METADATA_SPARQL;
+	String collectionSource = CollectionUtil.METADATA_SPARQL;
 	List<AgentNode> agents = new ArrayList<AgentNode>();
 	
 	public ForceFieldQuery() {
-		this(Collections.METADATA_SPARQL);
+		this(CollectionUtil.METADATA_SPARQL);
 	}
 
 	public ForceFieldQuery(String source) {
@@ -111,15 +110,15 @@ public class ForceFieldQuery {
 		return -1;
 	}
 	
+	@SuppressWarnings("unchecked")
 	private String toJson() {
 		JSONObject tree = new JSONObject();
 		
 		JSONArray nodes = new JSONArray();
-		Iterator<AgentNode> ag = agents.iterator();
-		while (ag.hasNext()) {
-			AgentNode tmpAgent = ag.next();
+		Iterator<AgentNode> iter = agents.iterator();
+		while (iter.hasNext()) {
+			AgentNode tmpAgent = iter.next();
 			JSONObject agent = new JSONObject();
-			System.out.println(tmpAgent.getName());
 			agent.put("name", tmpAgent.getName());
 			if (tmpAgent.getEmail() != null && !tmpAgent.getEmail().equals("")) {
 				agent.put("email", tmpAgent.getEmail());
@@ -130,12 +129,10 @@ public class ForceFieldQuery {
 		tree.put("nodes", nodes);
 		
 		JSONArray links = new JSONArray();
-		ag = agents.iterator();
-		while (ag.hasNext()) {
-			AgentNode tmpAgent = ag.next();
+		iter = agents.iterator();
+		while (iter.hasNext()) {
+			AgentNode tmpAgent = iter.next();
 			JSONObject edge = new JSONObject();
-			System.out.println(tmpAgent.getName() + "=====");
-			System.out.println(tmpAgent.getMemberOf() + "!!!!!");
 			if (!tmpAgent.getMemberOf().equals("")) {
 				int ind = findAgentIndex(tmpAgent.getMemberOf());
 				if (ind == -1) {
@@ -146,7 +143,6 @@ public class ForceFieldQuery {
 					edge.put("target", ind);
 					edge.put("value", 4);
 					links.add(edge);
-					
 				}
 			}
 		}

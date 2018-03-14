@@ -16,7 +16,7 @@ import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.client.solrj.response.UpdateResponse;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
-import org.hadatac.utils.Collections;
+import org.hadatac.utils.CollectionUtil;
 import org.hadatac.utils.Feedback;
 
 public class AnnotationLog {
@@ -51,13 +51,14 @@ public class AnnotationLog {
 	
 	public void addline(String new_line) {
 		this.log += (new SimpleDateFormat("yyyy-MM-dd HH:mm:ss")).format(new Date()) + " " + new_line;
+		save();
 	}
 	
 	public int save() {
 		try {
 			SolrClient client = new HttpSolrClient.Builder(
 					ConfigFactory.load().getString("hadatac.solr.data")
-					+ Collections.ANNOTATION_LOG).build();
+					+ CollectionUtil.ANNOTATION_LOG).build();
 			int status = client.addBean(this).getStatus();
 			client.commit();
 			client.close();
@@ -68,27 +69,15 @@ public class AnnotationLog {
 		}
 	}
 	
-	public int save(SolrClient solr) {
-		try {
-			int status = solr.addBean(this).getStatus();
-			solr.commit();
-			solr.close();
-			return status;
-		} catch (IOException | SolrServerException e) {
-			System.out.println("[ERROR] AnnotationLog.save(SolrClient) - e.Message: " + e.getMessage());
-			return -1;
-		}
+	public static void printException(Exception exception, String fileName) {
+		AnnotationLog log = AnnotationLog.create(fileName);
+        log.addline(Feedback.println(Feedback.WEB, "[ERROR] " + exception.getMessage()));
 	}
 	
-	public static void printException(Exception exception, String fileName) {
-		AnnotationLog log = AnnotationLog.find(fileName);
-        if (null == log) {
-        	log = new AnnotationLog();
-        	log.setFileName(fileName);
-        }
-        log.addline(Feedback.println(Feedback.WEB, "[ERROR] " + exception.getMessage()));
-        log.save();
-	}
+	public static void printException(String message, String fileName) {
+        AnnotationLog log = AnnotationLog.create(fileName);
+        log.addline(Feedback.println(Feedback.WEB, "[ERROR] " + message));
+    }
 	
 	public static AnnotationLog convertFromSolr(SolrDocument doc) {
 		AnnotationLog annotation_log = new AnnotationLog();
@@ -102,12 +91,12 @@ public class AnnotationLog {
 		return annotation_log;
 	}
 	
-	public static AnnotationLog find(String file_name) {
+	public static AnnotationLog find(String fileName) {
 		SolrClient solr = new HttpSolrClient.Builder(
 				ConfigFactory.load().getString("hadatac.solr.data")
-				+ Collections.ANNOTATION_LOG).build();
+				+ CollectionUtil.ANNOTATION_LOG).build();
 		SolrQuery query = new SolrQuery();
-		query.set("q", "file_name:\"" + file_name + "\"");
+		query.set("q", "file_name:\"" + fileName + "\"");
 		query.set("rows", "10000000");
 		
 		try {
@@ -126,10 +115,20 @@ public class AnnotationLog {
 		return null;
 	}
 	
+	public static AnnotationLog create(String fileName) {
+		AnnotationLog log = AnnotationLog.find(fileName);
+		if (null == log) {
+			log = new AnnotationLog();
+	    	log.setFileName(fileName);
+		}
+		
+    	return log;
+	}
+	
 	public static int delete(String file_name) {
 		SolrClient solr = new HttpSolrClient.Builder(
 				ConfigFactory.load().getString("hadatac.solr.data")
-				+ Collections.ANNOTATION_LOG).build();
+				+ CollectionUtil.ANNOTATION_LOG).build();
 		try {	
 			UpdateResponse response = solr.deleteByQuery("file_name:\"" + file_name + "\"");
 			solr.commit();

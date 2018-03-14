@@ -32,7 +32,7 @@ import org.apache.jena.update.UpdateRequest;
 import org.hadatac.console.controllers.triplestore.UserManagement;
 import org.hadatac.console.models.LinkedAccount;
 import org.hadatac.console.models.SysUser;
-import org.hadatac.utils.Collections;
+import org.hadatac.utils.CollectionUtil;
 import org.hadatac.utils.NameSpaces;
 
 public class User implements Comparable<User> {
@@ -159,7 +159,7 @@ public class User implements Comparable<User> {
         
         UpdateRequest request = UpdateFactory.create(insert);
         UpdateProcessor processor = UpdateExecutionFactory.createRemote(request, 
-        		Collections.getCollectionsName(Collections.PERMISSIONS_UPDATE));
+        		CollectionUtil.getCollectionsName(CollectionUtil.PERMISSIONS_UPDATE));
         processor.execute();
 	}
 	
@@ -173,7 +173,7 @@ public class User implements Comparable<User> {
 		Query query = QueryFactory.create(queryString);
 		
 		QueryExecution qexec = QueryExecutionFactory.sparqlService(
-				Collections.getCollectionsName(Collections.PERMISSIONS_SPARQL), query);
+				CollectionUtil.getCollectionsName(CollectionUtil.PERMISSIONS_SPARQL), query);
 		Model model = qexec.execConstruct();
 		
 		File ttl_file = new File(UserManagement.getTurtlePath());
@@ -226,7 +226,7 @@ public class User implements Comparable<User> {
 		Query query = QueryFactory.create(queryString);
 		
 		QueryExecution qexec = QueryExecutionFactory.sparqlService(
-				Collections.getCollectionsName(Collections.PERMISSIONS_SPARQL), query);
+				CollectionUtil.getCollectionsName(CollectionUtil.PERMISSIONS_SPARQL), query);
 		ResultSet results = qexec.execSelect();
 		ResultSetRewindable resultsrw = ResultSetFactory.copyResults(results);
 		qexec.close();
@@ -256,7 +256,7 @@ public class User implements Comparable<User> {
 		RDFNode object;
 		
 		QueryExecution qexecPrivate = QueryExecutionFactory.sparqlService(
-				Collections.getCollectionsName(Collections.PERMISSIONS_SPARQL), query);
+				CollectionUtil.getCollectionsName(CollectionUtil.PERMISSIONS_SPARQL), query);
 		modelPrivate = qexecPrivate.execDescribe();
 		if (!modelPrivate.isEmpty()) {
 			user = new User();
@@ -305,7 +305,7 @@ public class User implements Comparable<User> {
 		}
 		
 		QueryExecution qexecPublic = QueryExecutionFactory.sparqlService(
-				Collections.getCollectionsName(Collections.METADATA_SPARQL), query);
+				CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), query);
 		modelPublic = qexecPublic.execDescribe();
 		if (!modelPublic.isEmpty() && user == null) {
 			user = new User();
@@ -352,7 +352,7 @@ public class User implements Comparable<User> {
 		
 		UpdateRequest req = UpdateFactory.create(command);
 		UpdateProcessor processor = UpdateExecutionFactory.createRemote(
-				req, Collections.getCollectionsName(Collections.PERMISSIONS_UPDATE));
+				req, CollectionUtil.getCollectionsName(CollectionUtil.PERMISSIONS_UPDATE));
 		processor.execute();
 	}
 	
@@ -381,7 +381,7 @@ public class User implements Comparable<User> {
 		queryString += "DELETE WHERE { <" + uri + "> ?p ?o . } ";
 		UpdateRequest req = UpdateFactory.create(queryString);
 		UpdateProcessor processor = UpdateExecutionFactory.createRemote(
-				req, Collections.getCollectionsName(Collections.PERMISSIONS_UPDATE));
+				req, CollectionUtil.getCollectionsName(CollectionUtil.PERMISSIONS_UPDATE));
 		processor.execute();
 	}
 	

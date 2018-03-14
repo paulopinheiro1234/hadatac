@@ -40,6 +40,9 @@ val appDependencies = Seq(
 // add resolver for deadbolt and easymail snapshots
 resolvers += Resolver.sonatypeRepo("snapshots")
 
+javacOptions ++= Seq("-Xlint:deprecation")
+javacOptions ++= Seq("-Xlint:unchecked")
+
 lazy val root = project.in(file("."))
   .enablePlugins(PlayJava, PlayEbean)
   .settings(

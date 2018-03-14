@@ -110,9 +110,6 @@ public class DataAcquisitionSearch extends Controller {
     	
     	FacetHandler facetHandler = new FacetHandler();
     	facetHandler.loadFacets(facets);
-    	
-    	FacetHandler retFacetHandler = new FacetHandler();
-    	retFacetHandler.loadFacets(facets);
 
     	AcquisitionQueryResult results = null;
     	String ownerUri;
@@ -132,12 +129,10 @@ public class DataAcquisitionSearch extends Controller {
 
 		if (mode == 0) {
 		    return ok(facetOnlyBrowser.render(page, rows, facets, results.getDocumentSize(), 
-	    			results, results.toJSON(), facetHandler, Measurement.buildQuery(ownerUri, page, rows, facetHandler), 
-	    			objDetails.toJSON(), Measurement.getFieldNames()));
+	    			results, results.toJSON(), facetHandler, objDetails.toJSON(), Measurement.getFieldNames()));
 		} else {
 		    return ok(dataacquisition_browser.render(page, rows, facets, results.getDocumentSize(), 
-	    			results, results.toJSON(), facetHandler, Measurement.buildQuery(ownerUri, page, rows, facetHandler), 
-	    			objDetails.toJSON(), Measurement.getFieldNames()));
+	    			results, results.toJSON(), facetHandler,  objDetails.toJSON(), Measurement.getFieldNames()));
 		}
     }
     

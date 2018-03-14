@@ -14,7 +14,6 @@ import com.feth.play.module.pa.user.FirstLastNameIdentity;
 
 import org.hadatac.console.controllers.AuthApplication;
 import org.hadatac.console.models.TokenAction.Type;
-import play.Play;
 import play.data.validation.Constraints;
 
 import org.apache.solr.client.solrj.SolrClient;
@@ -39,7 +38,7 @@ import java.util.UUID;
 
 import org.hadatac.entity.pojo.User;
 
-import org.hadatac.utils.Collections;
+import org.hadatac.utils.CollectionUtil;
 
 /**
  * Initial version based on work by Steve Chaloner (steve@objectify.be) for
@@ -191,7 +190,8 @@ public class SysUser implements Subject {
 	}
 
 	public boolean isDataManager() {
-		SecurityRole target = SecurityRole.findByRoleNameSolr(AuthApplication.DATA_MANAGER_ROLE);
+		SecurityRole target = SecurityRole.findByRoleNameSolr(
+		        AuthApplication.DATA_MANAGER_ROLE);
 		for(SecurityRole r : roles) {
 			if(r.id_s.equals(target.id_s)){
 				return true;
@@ -286,7 +286,7 @@ public class SysUser implements Subject {
 			final AuthUserIdentity identity) {
 		SolrClient solrClient = new HttpSolrClient.Builder(
 				ConfigFactory.load().getString("hadatac.solr.users") 
-				+ Collections.AUTHENTICATE_USERS).build();
+				+ CollectionUtil.AUTHENTICATE_USERS).build();
 		String query = "active_bool:true AND provider_user_id_str:" + identity.getId() + " AND provider_key_str:" + identity.getProvider();
 		SolrQuery solrQuery = new SolrQuery(query);
 		List<SysUser> users = new ArrayList<SysUser>();
@@ -345,7 +345,7 @@ public class SysUser implements Subject {
 	public static SysUser findByIdSolr(final String id) {
 		SolrClient solrClient = new HttpSolrClient.Builder(
 				ConfigFactory.load().getString("hadatac.solr.users") 
-				+ Collections.AUTHENTICATE_USERS).build();
+				+ CollectionUtil.AUTHENTICATE_USERS).build();
 
 		SolrQuery solrQuery = new SolrQuery("id_str:" + id);
 		SysUser user = null;
@@ -460,8 +460,7 @@ public class SysUser implements Subject {
 
 		if(null == uri) {
 			sys_user.uri = "";
-		}
-		else {
+		} else {
 			sys_user.uri = uri;
 		}
 		System.out.println("sys_user before save uri: " + sys_user.uri);
@@ -473,7 +472,7 @@ public class SysUser implements Subject {
 	public static boolean existsSolr() {
 		SolrClient solrClient = new HttpSolrClient.Builder(
 				ConfigFactory.load().getString("hadatac.solr.users") 
-				+ Collections.AUTHENTICATE_USERS).build();
+				+ CollectionUtil.AUTHENTICATE_USERS).build();
 		SolrQuery solrQuery = new SolrQuery("*:*");
 
 		try {
@@ -494,7 +493,7 @@ public class SysUser implements Subject {
 		final SysUser sys_user = new SysUser();
 
 		sys_user.roles.add(SecurityRole
-				.findByRoleNameSolr(org.hadatac.console.controllers.AuthApplication.DATA_OWNER_ROLE));
+				.findByRoleNameSolr(AuthApplication.DATA_OWNER_ROLE));
 		sys_user.permissions = new ArrayList<UserPermission>();
 		sys_user.active = true;
 		sys_user.lastLogin = Instant.now().toString();
@@ -538,7 +537,7 @@ public class SysUser implements Subject {
 
 		if (SysUser.existsSolr() == false) {
 			sys_user.roles.add(SecurityRole
-					.findByRoleNameSolr(org.hadatac.console.controllers.AuthApplication.DATA_MANAGER_ROLE));
+					.findByRoleNameSolr(AuthApplication.DATA_MANAGER_ROLE));
 			sys_user.emailValidated = true;
 			user.setUri("http://localhost/users#admin");
 		}
@@ -552,7 +551,7 @@ public class SysUser implements Subject {
 	public void save() {
 		SolrClient solrClient = new HttpSolrClient.Builder(
 				ConfigFactory.load().getString("hadatac.solr.users") 
-				+ Collections.AUTHENTICATE_USERS).build();
+				+ CollectionUtil.AUTHENTICATE_USERS).build();
 
 		try {
 			solrClient.addBean(this);
@@ -574,7 +573,7 @@ public class SysUser implements Subject {
 		try {
 			SolrClient solr = new HttpSolrClient.Builder(
 					ConfigFactory.load().getString("hadatac.solr.users") 
-					+ Collections.AUTHENTICATE_USERS).build();
+					+ CollectionUtil.AUTHENTICATE_USERS).build();
 			UpdateResponse response = solr.deleteById(this.getEmail());
 			solr.commit();
 			solr.close();
@@ -645,7 +644,7 @@ public class SysUser implements Subject {
 	private static List<SysUser> getEmailUserFindSolr(final String email, final String providerKey) {
 		SolrClient solrClient = new HttpSolrClient.Builder(
 				ConfigFactory.load().getString("hadatac.solr.users") 
-				+ Collections.AUTHENTICATE_USERS).build();
+				+ CollectionUtil.AUTHENTICATE_USERS).build();
 		String query = "email:" + email + " AND active_bool:true";
 		SolrQuery solrQuery = new SolrQuery(query);
 		List<SysUser> users = new ArrayList<SysUser>();
@@ -676,7 +675,7 @@ public class SysUser implements Subject {
 	public static String outputAsJson() {
 		SolrClient solrClient = new HttpSolrClient.Builder(
 				ConfigFactory.load().getString("hadatac.solr.users") 
-				+ Collections.AUTHENTICATE_USERS).build();
+				+ CollectionUtil.AUTHENTICATE_USERS).build();
 		String query = "*:*";
 		SolrQuery solrQuery = new SolrQuery(query);
 

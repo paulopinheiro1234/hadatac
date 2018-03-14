@@ -1,13 +1,9 @@
 package org.hadatac.data.loader;
 
-import java.io.File;
 import java.lang.String;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.csv.CSVRecord;
 import org.apache.jena.query.Query;
 import org.apache.jena.query.QueryExecution;
 import org.apache.jena.query.QueryExecutionFactory;
@@ -18,282 +14,183 @@ import org.apache.jena.query.ResultSetFactory;
 import org.apache.jena.query.ResultSetRewindable;
 import org.apache.jena.rdf.model.Literal;
 import org.apache.jena.sparql.engine.http.QueryExceptionHTTP;
-import org.hadatac.console.controllers.metadata.DynamicFunctions;
-import org.hadatac.utils.Collections;
+import org.hadatac.utils.CollectionUtil;
 import org.hadatac.utils.ConfigProp;
-import org.hadatac.utils.Feedback;
 import org.hadatac.utils.NameSpaces;
-import org.hadatac.entity.pojo.Credential;
+
+import org.hadatac.entity.pojo.HADatAcThing;
 import org.hadatac.entity.pojo.ObjectCollection;
 import org.hadatac.entity.pojo.StudyObject;
 
+
 public class SampleSubjectMapper extends BasicGenerator {
-	
-	final String kbPrefix = ConfigProp.getKbPrefix();
-	private int counter = 1; //starting index number
 
-	StudyObject obj = null;
+    final String kbPrefix = ConfigProp.getKbPrefix();
+    private int counter = 1; //starting index number
+    
+    private Map<String, String> mapIdUriCache = null;
 
-	private String hasScopeUri = "";    
-	private List<String> scopeUris = new ArrayList<String>();
-	private List<String> spaceScopeUris = new ArrayList<String>();
-	private List<String> timeScopeUris = new ArrayList<String>();
-	private List<String> objectUris = new ArrayList<String>();
+    public SampleSubjectMapper(RecordFile file) {
+        super(file);
+        mapIdUriCache = getMapIdUri();
+    }
 
-	public SampleSubjectMapper(File file) {
-		super(file);
-	}
+    @Override
+    void initMapping() {
+        mapCol.clear();
+        mapCol.put("studyID", "CHEAR_Project_ID");
+        mapCol.put("originalPID", "CHEAR PID");
+        mapCol.put("originalSID", "Full SID");
+    }
 
-	@Override
-	void initMapping() {
-		mapCol.clear();
-		mapCol.put("studyID", "CHEAR_Project_ID");
-		mapCol.put("originalPID", "CHEAR PID");
-		mapCol.put("originalSID", "Full SID");
-	}
-	
-	@Override
-	Map<String, Object> createRow(CSVRecord rec, int rownumber) throws Exception {
-		Map<String, Object> row = new HashMap<String, Object>();
-		row.put("hasURI", getUri(rec));
-		row.put("a", getType(rec));
-		row.put("rdfs:label", getLabel(rec));
-		row.put("hasco:originalID", getOriginalID(rec));
-		row.put("hasco:isSampleOf", getSubjectUri(rec));
-		row.put("hasco:isObjectOf", getCollectionUri(rec));
-		row.put("rdfs:comment", getLabel(rec));
-		row.put("hasco:hasSamplingMethod", "");
-		row.put("hasco:hasSamplingVolume", "");
-		row.put("hasco:hasSamplingVolumeUnit", "");
-		row.put("hasco:hasStorageTemperature", "");
-		row.put("hasco:hasStorageTemperatureUnit", "");
-		row.put("hasco:hasNumFreezeThaw", "");
-		counter++;
+    private Map<String, String> getMapIdUri() {
+        Map<String, String> mapIdUri = new HashMap<String, String>();
 
-		return row;
-	}
+        String queryString = NameSpaces.getInstance().printSparqlNameSpaceList() +
+                "SELECT ?uri ?id WHERE { \n" +
+                " ?uri hasco:originalID ?id . \n" +
+                "}";
 
-	private String getSampleUri(CSVRecord rec) {
-		String sampleUri = "";
-		String sampleQueryString = NameSpaces.getInstance().printSparqlNameSpaceList() +
-				"SELECT ?s WHERE {" +
-				"?s hasco:originalID \"" + rec.get(mapCol.get("originalSID")) + "\"." +
-				"}";
-		
-		try {
-			Query sampleQuery = QueryFactory.create(sampleQueryString);
-			QueryExecution qexec = QueryExecutionFactory.sparqlService(
-					Collections.getCollectionsName(Collections.METADATA_SPARQL), sampleQuery);
-			ResultSet results = qexec.execSelect();
-			ResultSetRewindable resultsrw = ResultSetFactory.copyResults(results);
-			qexec.close();
-			if(resultsrw.hasNext()) {
-				QuerySolution soln = resultsrw.next();
-				if(soln.contains("s")) {
-					sampleUri = DynamicFunctions.replaceURLWithPrefix(soln.get("s").toString());
-					System.out.println("Sample URI: " + sampleUri);
-				}
-			}
-		} catch (QueryExceptionHTTP e) {
-			e.printStackTrace();
-		}
-		System.out.println("getSampleUri Sample:" + sampleUri);
-		return sampleUri;
-	}
+        try {
+            Query sampleQuery = QueryFactory.create(queryString);
+            QueryExecution qexec = QueryExecutionFactory.sparqlService(
+                    CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), sampleQuery);
+            ResultSet results = qexec.execSelect();
+            ResultSetRewindable resultsrw = ResultSetFactory.copyResults(results);
+            qexec.close();
+            
+            while (resultsrw.hasNext()) {
+                QuerySolution soln = resultsrw.next();
+                if(soln.get("id") != null && soln.get("uri") != null) {
+                    mapIdUri.put(soln.get("id").toString(), soln.get("uri").toString());
+                }
+            }
+        } catch (QueryExceptionHTTP e) {
+            e.printStackTrace();
+        }
 
-	private String getSubjectUri(CSVRecord rec) {
-		String subjectUri = "";
-		String subjectQueryString = NameSpaces.getInstance().printSparqlNameSpaceList() +
-				"SELECT ?s WHERE {" +
-				"?s hasco:originalID \"" + rec.get(mapCol.get("originalPID")) + "\"." +
-				"}";
-		try {
-			Query subjectQuery = QueryFactory.create(subjectQueryString);
-			QueryExecution qexec = QueryExecutionFactory.sparqlService(
-					Collections.getCollectionsName(Collections.METADATA_SPARQL), subjectQuery);
-			ResultSet results = qexec.execSelect();
-			ResultSetRewindable resultsrw = ResultSetFactory.copyResults(results);
-			qexec.close();
-			if(resultsrw.hasNext()) {
-				QuerySolution soln = resultsrw.next();
-				if(soln.contains("s")){
-					subjectUri = DynamicFunctions.replaceURLWithPrefix(soln.get("s").toString());
-				}
-			}
-		} catch (QueryExceptionHTTP e) {
-			e.printStackTrace();
-		}
-		
-		return subjectUri;
-	}
-	
-	private int getSampleCount(String studyID){
-		int count = 0;
-		String sampleCountQuery = NameSpaces.getInstance().printSparqlNameSpaceList() 
-				+ " SELECT (count(DISTINCT ?sampleURI) as ?sampleCount) WHERE { "
-				+ " ?sampleURI hasco:isObjectOf ?SC . "
-				+ " ?SC hasco:isSampleCollectionOf chear-kb:STD-" + studyID + " . "
-				+ "}";
-		QueryExecution qexecSample = QueryExecutionFactory.sparqlService(
-				Collections.getCollectionsName(Collections.METADATA_SPARQL), sampleCountQuery);
-		ResultSet sampleResults = qexecSample.execSelect();
-		ResultSetRewindable resultsrwSample = ResultSetFactory.copyResults(sampleResults);
-		qexecSample.close();
-		if (resultsrwSample.hasNext()) {
-			QuerySolution soln = resultsrwSample.next();
-			Literal countLiteral = (Literal) soln.get("sampleCount");
-			if(countLiteral != null){ 
-				count += countLiteral.getInt();
-			}
-		}
+        return mapIdUri;
+    }
 
-		return count;
-	}
-	
-	private String getUri(CSVRecord rec) {
-		return kbPrefix + "SPL-" + String.format("%04d", counter + getSampleCount(rec.get(mapCol.get("studyID")))) 
-		+ "-" + rec.get(mapCol.get("studyID"));
-	}
+    private int getSampleCount(String studyID){
+        int count = 0;
+        String sampleCountQuery = NameSpaces.getInstance().printSparqlNameSpaceList() 
+                + " SELECT (count(DISTINCT ?sampleURI) as ?sampleCount) WHERE { \n"
+                + " ?sampleURI hasco:isMemberOf* chear-kb:STD-" + studyID + " . \n"
+                + "}";
+        QueryExecution qexecSample = QueryExecutionFactory.sparqlService(
+                CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), sampleCountQuery);
+        ResultSet sampleResults = qexecSample.execSelect();
+        ResultSetRewindable resultsrwSample = ResultSetFactory.copyResults(sampleResults);
+        qexecSample.close();
+        if (resultsrwSample.hasNext()) {
+            QuerySolution soln = resultsrwSample.next();
+            Literal countLiteral = (Literal) soln.get("sampleCount");
+            if(countLiteral != null){ 
+                count += countLiteral.getInt();
+            }
+        }
 
-	private String getType(CSVRecord rec) {
-			return "sio:Sample";
-	}
+        return count;
+    }
 
-	private String getLabel(CSVRecord rec) {
-		return "SID " + String.format("%04d", counter + getSampleCount(rec.get(mapCol.get("studyID")))) + " - " 
-				+ rec.get(mapCol.get("studyID"));
-	}
+    private String getUri(Record rec) {
+        return kbPrefix + "SPL-" + String.format("%04d", counter + getSampleCount(rec.getValueByColumnName(mapCol.get("studyID")))) 
+        + "-" + rec.getValueByColumnName(mapCol.get("studyID"));
+    }
 
-	private String getOriginalID(CSVRecord rec) {
-		if(!rec.get(mapCol.get("originalSID")).equalsIgnoreCase("NULL")){
-			return rec.get(mapCol.get("originalSID"));
-		} else {
-			return "";
-		}
-	}
-	
-	private String getStudyUri(CSVRecord rec) {
-		return kbPrefix + "STD-" + rec.get(mapCol.get("studyID"));
-	}
+    private String getLabel(Record rec) {
+        return "SID " + String.format("%04d", counter + getSampleCount(rec.getValueByColumnName(mapCol.get("studyID")))) + " - " 
+                + rec.getValueByColumnName(mapCol.get("studyID"));
+    }
 
-	private String getCollectionUri(CSVRecord rec) {
-		return kbPrefix + "SC-" + rec.get(mapCol.get("studyID"));
-	}
+    private String getOriginalID(Record rec) {
+        if(!rec.getValueByColumnName(mapCol.get("originalSID")).equalsIgnoreCase("NULL")){
+            return rec.getValueByColumnName(mapCol.get("originalSID"));
+        } else {
+            return "";
+        }
+    }
 
-	private String getCollectionLabel(CSVRecord rec) {
-		return "Sample Collection of Study " + rec.get(mapCol.get("studyID"));
-	}
-		
-	
-	public void createObj(CSVRecord record) throws Exception {
-		// insert current state of the OBJ
-		obj = new StudyObject(getUri(record), "sio:Sample", getOriginalID(record), 
-				getLabel(record), getCollectionUri(record), getLabel(record), scopeUris);
+    private String getStudyUri(Record rec) {
+        return kbPrefix + "STD-" + rec.getValueByColumnName(mapCol.get("studyID"));
+    }
 
-		// insert the new OC content inside of the triplestore regardless of any change -- the previous content has already been deleted
-		obj.save();
-		counter++;
-		System.out.println("obj " + getUri(record).toString() + " saved!");
+    private String getCollectionUri(Record rec) {
+        return kbPrefix + "SC-" + rec.getValueByColumnName(mapCol.get("studyID"));
+    }
 
-		// update/create new OBJ in LabKey
-		Credential cred = Credential.find();
-		if (null == cred) {
-			System.out.println(Feedback.println(Feedback.WEB, "[ERROR] No LabKey credentials are provided!"));
-			return;
-		}
-		int nRowsAffected = obj.saveToLabKey(cred.getUserName(), cred.getPassword());
-		if (nRowsAffected <= 0) {
-			System.out.println("[ERROR] Failed to insert new OBJ to LabKey!");
-		}
+    private String getCollectionLabel(Record rec) {
+        return "Sample Collection of Study " + rec.getValueByColumnName(mapCol.get("studyID"));
+    }
 
-		objectUris.add(getUri(record));
-		System.out.println(objectUris.size());
-	}
-	
-	public boolean createOc(CSVRecord record) throws Exception {
-		// insert current state of the OC
-		ObjectCollection oc = new ObjectCollection(
-				getCollectionUri(record),
-				"http://hadatac.org/ont/hasco/SampleCollection",
-				getCollectionLabel(record),
-				getCollectionLabel(record),
-				getStudyUri(record),
-				hasScopeUri,
-				spaceScopeUris,
-				timeScopeUris);
 
-		oc.setObjectUris(objectUris);
+    public StudyObject createStudyObject(Record record) throws Exception {
+        StudyObject obj = new StudyObject(getUri(record), "sio:Sample", getOriginalID(record), 
+                getLabel(record), getCollectionUri(record), getLabel(record));
+        return obj;
+    }
 
-		// insert the new OC content inside of the triplestore regardless of any change -- the previous content has already been deleted
-		oc.save();
-		System.out.println("oc saved!");
+    public ObjectCollection createObjectCollection(Record record) throws Exception {
+        ObjectCollection oc = new ObjectCollection(
+                getCollectionUri(record),
+                "http://hadatac.org/ont/hasco/SampleCollection",
+                getCollectionLabel(record),
+                getCollectionLabel(record),
+                getStudyUri(record));
 
-		// update/create new OC in LabKey
-		Credential cred = Credential.find();
-		if (null == cred) {
-			System.out.println(Feedback.println(Feedback.WEB, "[ERROR] No LabKey credentials are provided!"));
-			return false;
-		}
-		int nRowsAffected = oc.saveToLabKey(cred.getUserName(), cred.getPassword());
-		System.out.println("nRowsAffected : " + nRowsAffected);
-		if (nRowsAffected <= 0) {
-			System.out.println("Failed to insert new OC to LabKey!\n");
-			return false;
-		}
+        return oc;
+    }
 
-		return true;
-	}
+    public void updateMappings() throws Exception {
+        for (Record record : records) {
+            String sid = record.getValueByColumnName(mapCol.get("originalSID"));
+            String pid = record.getValueByColumnName(mapCol.get("originalPID"));
 
-	@Override
-	public List< Map<String, Object> > createRows() throws Exception {
-		rows.clear();
-		boolean firstRow = true;
-		for (CSVRecord record : records) {
-			if (firstRow) {
-				if (!createOc(record)) {
-					System.out.println("[ERROR] Failed to create sample collection!");
-					break;
-				}
-				firstRow = false;
-			}
-			createObj(record);
-		}
-		
-		return rows;
-	}
-	
-	public boolean updateMappings() throws Exception {
-		for (CSVRecord record : records) {
-			if (getSampleUri(record) == ""){
-				continue;
-			} else {
-				StudyObject obj = StudyObject.find(getSampleUri(record));
-				System.out.println("obj: " + obj);
+            String sampleUri = "";
+            if (mapIdUriCache.containsKey(sid)) {
+                sampleUri = mapIdUriCache.get(sid);
+            }
 
-				List<String> scope_l = new ArrayList<String>();
-				scope_l.add(getSubjectUri(record));
-				if (obj.getScopeUris() == null || obj.getScopeUris().isEmpty()){
-					obj.setScopeUris(scope_l);
-				} else {
-					obj.getScopeUris().add(getSubjectUri(record));
-				}
-				System.out.println("Added to scopeuris.");
-				obj.save();
-				// update/create new OBJ in LabKey
-				Credential cred = Credential.find();
-				if (null == cred) {
-					System.out.println(Feedback.println(Feedback.WEB, "[ERROR] No LabKey credentials are provided!"));
-					return false;
-				}
-				int nRowsAffected = obj.saveToLabKey(cred.getUserName(), cred.getPassword());
-				System.out.println("nRowsAffected : " + nRowsAffected);
-				if (nRowsAffected <= 0) {
-					System.out.println("Failed to insert new OC to LabKey!\n");
-					return false;
-				}
-			}
-		}
-		
-		return true;
-	}
+            if (sampleUri.isEmpty()) {
+                continue;
+            } else {
+                if (mapIdUriCache.containsKey(pid)) {
+                    StudyObject obj = StudyObject.find(sampleUri);
+                    obj.addScopeUri(mapIdUriCache.get(pid));
+                    objects.add(obj);
+                }
+            }
+        }
+    }
+
+    @Override
+    public void preprocess() throws Exception {
+        if (!records.isEmpty()) {
+            objects.add(createObjectCollection(records.get(0)));
+        }
+    }
+
+    @Override
+    public void postprocess() throws Exception {
+        updateMappings();
+    }
+
+    @Override
+    HADatAcThing createObject(Record rec, int row_number) throws Exception {
+        System.out.println("counter: " + counter);
+        
+        counter++;
+        return createStudyObject(rec);
+    }
+
+    @Override
+    public String getTableName() {
+        return "StudyObject";
+    }
+
+    @Override
+    public String getErrorMsg(Exception e) {
+        return "Error in SampleSubjectMapper: " + e.getMessage();
+    }
 }

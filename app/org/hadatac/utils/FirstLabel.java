@@ -8,45 +8,40 @@ import org.apache.jena.query.QuerySolution;
 import org.apache.jena.query.ResultSet;
 import org.apache.jena.query.ResultSetFactory;
 import org.apache.jena.query.ResultSetRewindable;
-import org.hadatac.utils.Collections;
+import org.hadatac.utils.CollectionUtil;
 
 public class FirstLabel {
-
-    private String uri = "";
-    private String label = "";
-
-    public static String getLabel (String uri) {
-	if (uri.startsWith("http")) {
-	    uri = "<" + uri + ">";
-	}
-	String queryString = NameSpaces.getInstance().printSparqlNameSpaceList() + 
-	    "SELECT ?label WHERE { " + 
-	    "  " + uri + " rdfs:label ?label ." + 
-	    "}";
-	Query query = QueryFactory.create(queryString);
-	QueryExecution qexec = QueryExecutionFactory.sparqlService(
-				    Collections.getCollectionsName(Collections.METADATA_SPARQL), query);
-	ResultSet results = qexec.execSelect();
-	ResultSetRewindable resultsrw = ResultSetFactory.copyResults(results);
-	qexec.close();
 	
-	String labelStr = "";
-	QuerySolution soln;
-	while (resultsrw.hasNext()) {
-	    soln = resultsrw.next();
-	    try {
-		if (soln.getLiteral("label") != null && soln.getLiteral("label").getString() != null) {
-		    labelStr = soln.getLiteral("label").getString();
+	public static String getLabel(String uri) {
+		if (uri.startsWith("http")) {
+			uri = "<" + uri + ">";
 		}
-	    } catch (Exception e1) {
-		labelStr = "";
-	    }
-	    if (!labelStr.equals("")) {
-		break;
-	    }
+		String queryString = NameSpaces.getInstance().printSparqlNameSpaceList() + 
+				"SELECT ?label WHERE { \n" + 
+				"  " + uri + " rdfs:label ?label . \n" + 
+				"}";
+		
+		//System.out.println("getLabel() queryString: \n" + queryString);
+		
+		Query query = QueryFactory.create(queryString);
+		QueryExecution qexec = QueryExecutionFactory.sparqlService(
+				CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), query);
+		ResultSet results = qexec.execSelect();
+		ResultSetRewindable resultsrw = ResultSetFactory.copyResults(results);
+		qexec.close();
+
+		String labelStr = "";
+		while (resultsrw.hasNext()) {
+			QuerySolution soln = resultsrw.next();
+			if (soln.get("label") != null) {
+				labelStr = soln.get("label").toString();
+			}
+			
+			if (!labelStr.isEmpty()) {
+				break;
+			}
+		}
+		
+		return labelStr;
 	}
-	return labelStr;
-	
-    }
-    
 }

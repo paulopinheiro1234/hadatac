@@ -8,6 +8,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import play.mvc.Controller;
 import play.mvc.Result;
@@ -37,37 +38,41 @@ import be.objectify.deadbolt.java.actions.Group;
 import be.objectify.deadbolt.java.actions.Restrict;
 
 public class DeleteObject extends Controller {
-    
+
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-	public Result index(String filename, String da_uri, String std_uri, String oc_uri, String obj_id) {
-    	if (session().get("LabKeyUserName") == null && session().get("LabKeyPassword") == null) {
-	    return redirect(org.hadatac.console.controllers.triplestore.routes.LoadKB.logInLabkey(
-			    org.hadatac.console.controllers.objects.routes.DeleteObject.index(filename, da_uri, std_uri, oc_uri, obj_id).url()));
-    	}
-	std_uri = URLDecoder.decode(std_uri);
-	oc_uri = URLDecoder.decode(oc_uri);
-	//System.out.println("In DeleteOC: std_uri = [" + std_uri + "]");
-	//System.out.println("In DeleteOC: oc_uri = [" + oc_uri + "]");
+    public Result index(String filename, String da_uri, String std_uri, String oc_uri, String obj_id) {
+        if (session().get("LabKeyUserName") == null && session().get("LabKeyPassword") == null) {
+            return redirect(org.hadatac.console.controllers.triplestore.routes.LoadKB.logInLabkey(
+                    org.hadatac.console.controllers.objects.routes.DeleteObject.index(filename, da_uri, std_uri, oc_uri, obj_id).url()));
+        }
+        
+        try {
+            std_uri = URLDecoder.decode(std_uri, "utf-8");
+            oc_uri = URLDecoder.decode(oc_uri, "utf-8");
+        } catch (UnsupportedEncodingException e) {
+            std_uri = "";
+            oc_uri = "";
+        }
 
-	Study study = Study.find(std_uri);
-	if (study == null) {
-	    return badRequest(objectConfirm.render("Error editing object: Study URI did not return valid URI", filename, da_uri, std_uri, oc_uri));
-	} 
+        Study study = Study.find(std_uri);
+        if (study == null) {
+            return badRequest(objectConfirm.render("Error editing object: Study URI did not return valid URI", filename, da_uri, std_uri, oc_uri));
+        } 
 
-	ObjectCollection oc = ObjectCollection.find(oc_uri);
-	if (oc == null) {
-	    return badRequest(objectConfirm.render("Error editing object: ObjectCollection URI did not return valid object", filename, da_uri, std_uri, oc_uri));
-	} 
+        ObjectCollection oc = ObjectCollection.find(oc_uri);
+        if (oc == null) {
+            return badRequest(objectConfirm.render("Error editing object: ObjectCollection URI did not return valid object", filename, da_uri, std_uri, oc_uri));
+        } 
 
-	List<StudyObject> objects = StudyObject.findByCollection(oc);
+        List<StudyObject> objects = StudyObject.findByCollection(oc);
 
-    	//return ok(editObject.render(study, oc, objects));
-	return badRequest(objectConfirm.render("PLACEHOLDER", filename, da_uri, std_uri, oc_uri));
+        //return ok(editObject.render(study, oc, objects));
+        return badRequest(objectConfirm.render("PLACEHOLDER", filename, da_uri, std_uri, oc_uri));
     }
-    
+
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-	public Result postIndex(String filename, String da_uri, String std_uri, String oc_uri, String obj_id) {
-    	return index(filename, da_uri, std_uri, oc_uri, obj_id);
+    public Result postIndex(String filename, String da_uri, String std_uri, String oc_uri, String obj_id) {
+        return index(filename, da_uri, std_uri, oc_uri, obj_id);
     }
-    
+
 }

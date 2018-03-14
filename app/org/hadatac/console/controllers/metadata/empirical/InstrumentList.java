@@ -1,7 +1,6 @@
 package org.hadatac.console.controllers.metadata.empirical;
 
 import org.hadatac.console.http.GetSparqlQuery;
-import org.hadatac.console.http.JsonHandler;
 
 import java.io.IOException;
 import java.util.TreeMap;
@@ -19,7 +18,6 @@ import org.hadatac.console.views.html.error_page;
 
 public class InstrumentList extends Controller {
 
-    // for /metadata HTTP GET requests
     public Result index() {
         SparqlQuery query = new SparqlQuery();
         GetSparqlQuery query_submit = new GetSparqlQuery(query);
@@ -29,35 +27,15 @@ public class InstrumentList extends Controller {
         System.out.println("InstrumentList.java is requesting: " + tabName);
         try {
             query_json = query_submit.executeQuery(tabName);
-            //System.out.println("query_json = " + query_json);
             theResults = new SparqlQueryResults(query_json, false);
         } catch (IllegalStateException | NullPointerException e1) {
             return internalServerError(error_page.render(e1.toString(), tabName));
-            //e1.printStackTrace();
         }
         System.out.println("InstrumentList index() was called!");
         return ok(hierarchy_browser.render(theResults, tabName));
-    }// /index()
+    }
 
-
-    // for /metadata HTTP POST requests
     public Result postIndex() {
-        SparqlQuery query = new SparqlQuery();
-        GetSparqlQuery query_submit = new GetSparqlQuery(query);
-        SparqlQueryResults theResults;
-        String tabName = "Instruments";
-        String query_json = null;
-        System.out.println("InstrumentList.java is requesting: " + tabName);
-        try {
-            query_json = query_submit.executeQuery(tabName);
-            //System.out.println("query_json = " + query_json);
-            theResults = new SparqlQueryResults(query_json, false);
-        } catch (IllegalStateException | NullPointerException e1) {
-            return internalServerError(error_page.render(e1.toString(), tabName));
-            //e1.printStackTrace();
-        }
-        System.out.println("InstrumentList index() was called!");
-        return ok(hierarchy_browser.render(theResults, tabName));
-    }// /postIndex()
-
+        return index();
+    }
 }

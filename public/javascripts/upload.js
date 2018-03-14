@@ -40,6 +40,12 @@
       r.on('fileSuccess', function(file,message){
           // Reflect that the file upload has completed
           $('.resumable-file-'+file.uniqueIdentifier+' .resumable-file-progress').html('(completed)');
+          if (r.progress() == 1) {
+        	  console.log("All files uploaded and will refresh current page in 3 seconds");
+              setTimeout(function(){ 
+              	location.reload(); 
+              }, 3000);
+          }
         });
       r.on('fileError', function(file, message){
           // Reflect that the file upload has resulted in error

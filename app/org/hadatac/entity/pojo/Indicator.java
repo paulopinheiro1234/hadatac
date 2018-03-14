@@ -23,21 +23,16 @@ import org.apache.jena.update.UpdateExecutionFactory;
 import org.apache.jena.update.UpdateFactory;
 import org.apache.jena.update.UpdateProcessor;
 import org.apache.jena.update.UpdateRequest;
-import org.hadatac.console.controllers.AuthApplication;
 import org.hadatac.console.controllers.metadata.DynamicFunctions;
 import org.hadatac.console.models.Facet;
 import org.hadatac.console.models.FacetHandler;
 import org.hadatac.metadata.loader.LabkeyDataHandler;
 import org.hadatac.metadata.loader.URIUtils;
-import org.hadatac.utils.Collections;
-import org.hadatac.utils.ConfigProp;
+import org.hadatac.utils.CollectionUtil;
 import org.hadatac.utils.NameSpaces;
 import org.labkey.remoteapi.CommandException;
 
 import com.typesafe.config.ConfigFactory;
-
-import be.objectify.deadbolt.java.actions.Group;
-import be.objectify.deadbolt.java.actions.Restrict;
 
 public class Indicator extends HADatAcThing implements Comparable<Indicator> {
 
@@ -77,6 +72,7 @@ public class Indicator extends HADatAcThing implements Comparable<Indicator> {
 	public String getUri() {
 		return uri;
 	}
+	
 	public void setUri(String uri) {
 		this.uri = uri;
 	}
@@ -125,7 +121,7 @@ public class Indicator extends HADatAcThing implements Comparable<Indicator> {
 
 		Query query = QueryFactory.create(queryString);
 
-		QueryExecution qexec = QueryExecutionFactory.sparqlService(Collections.getCollectionsName(Collections.METADATA_SPARQL), query);
+		QueryExecution qexec = QueryExecutionFactory.sparqlService(CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), query);
 		ResultSet results = qexec.execSelect();
 		ResultSetRewindable resultsrw = ResultSetFactory.copyResults(results);
 		qexec.close();
@@ -150,7 +146,7 @@ public class Indicator extends HADatAcThing implements Comparable<Indicator> {
 		Query query = QueryFactory.create(queryString);
 		QueryExecution qexec = QueryExecutionFactory.sparqlService(
 				ConfigFactory.load().getString("hadatac.solr.triplestore") 
-				+ Collections.METADATA_SPARQL, query);
+				+ CollectionUtil.METADATA_SPARQL, query);
 		model = qexec.execDescribe();
 
 		indicator = new Indicator();
@@ -181,7 +177,7 @@ public class Indicator extends HADatAcThing implements Comparable<Indicator> {
 
 		Query query = QueryFactory.create(queryString);
 
-		QueryExecution qexec = QueryExecutionFactory.sparqlService(Collections.getCollectionsName(Collections.METADATA_SPARQL), query);
+		QueryExecution qexec = QueryExecutionFactory.sparqlService(CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), query);
 		ResultSet results = qexec.execSelect();
 		ResultSetRewindable resultsrw = ResultSetFactory.copyResults(results);
 		qexec.close();
@@ -214,7 +210,7 @@ public class Indicator extends HADatAcThing implements Comparable<Indicator> {
 				+ " }";
 
 		QueryExecution qexecStudy = QueryExecutionFactory.sparqlService(
-				Collections.getCollectionsName(Collections.METADATA_SPARQL), query);
+				CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), query);
 		ResultSet resultSet = qexecStudy.execSelect();
 		ResultSetRewindable resultsrwStudy = ResultSetFactory.copyResults(resultSet);
 		qexecStudy.close();
@@ -275,7 +271,7 @@ public class Indicator extends HADatAcThing implements Comparable<Indicator> {
 		Map<HADatAcThing, List<HADatAcThing>> mapIndicatorToCharList = new HashMap<HADatAcThing, List<HADatAcThing>>();
 		try {
 			QueryExecution qe = QueryExecutionFactory.sparqlService(
-					Collections.getCollectionsName(Collections.METADATA_SPARQL), query);
+					CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), query);
 			ResultSet resultSet = qe.execSelect();
 			ResultSetRewindable resultsrw = ResultSetFactory.copyResults(resultSet);
 			qe.close();
@@ -309,66 +305,9 @@ public class Indicator extends HADatAcThing implements Comparable<Indicator> {
 		return mapIndicatorToCharList;
 	}
 
-	public void save() {
-		if (uri == null || uri.equals("")) {
-			System.out.println("[ERROR] Trying to save Indicator without assigning a URI");
-			return;
-		}
-		System.out.println("Indicator.save(): About to delete");
-		delete();  // delete any existing triple for the current study
-
-		String insert = "";
-		String ind_uri = "";
-
-		System.out.println("Indicator.save(): Checking URI");
-		if (this.getUri().startsWith("<")) {
-			ind_uri = this.getUri();
-		} else {
-			ind_uri = "<" + this.getUri() + ">";
-		}
-		insert += NameSpaces.getInstance().printSparqlNameSpaceList();
-		insert += INSERT_LINE1;
-		if (label != null && !label.equals("")) {
-			insert += ind_uri + " rdfs:label \"" + label + "\" .  ";
-		}
-		if (comment != null && !comment.equals("")) {
-			insert += ind_uri + " rdfs:comment \"" + comment + "\" .  ";
-		}
-		if (superUri != null && !superUri.equals("")) {
-			insert += ind_uri + " rdfs:subClassOf <" + DynamicFunctions.replacePrefixWithURL(superUri) + "> .  ";
-		}
-		insert += LINE_LAST;
-		System.out.println("Indicator (pojo's save): <" + insert + ">");
-		UpdateRequest request = UpdateFactory.create(insert);
-		UpdateProcessor processor = UpdateExecutionFactory.createRemote(
-				request, Collections.getCollectionsName(Collections.METADATA_UPDATE));
-		processor.execute();
-	}
-
-	public void delete() {
-		String query = "";
-		if (this.getUri() == null || this.getUri().equals("")) {
-			return;
-		}
-		query += NameSpaces.getInstance().printSparqlNameSpaceList();
-		query += DELETE_LINE1;
-		if (this.getUri().startsWith("http")) {
-			query += "<" + this.getUri() + ">";
-		} else {
-			query += this.getUri();
-		}
-		query += DELETE_LINE3;
-		query += LINE_LAST;
-		UpdateRequest request = UpdateFactory.create(query);
-		UpdateProcessor processor = UpdateExecutionFactory.createRemote(request, Collections.getCollectionsName(Collections.METADATA_UPDATE));
-		processor.execute();
-	}
-
-	@Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
+	@Override
 	public int saveToLabKey(String user_name, String password) {
-		String site = ConfigProp.getPropertyValue("labkey.config", "site");
-		String path = "/" + ConfigProp.getPropertyValue("labkey.config", "folder");
-		LabkeyDataHandler loader = new LabkeyDataHandler(site, user_name, password, path);
+		LabkeyDataHandler loader = LabkeyDataHandler.createDefault(user_name, password);
 		List< Map<String, Object> > rows = new ArrayList< Map<String, Object> >();
 		Map<String, Object> row = new HashMap<String, Object>();
 		row.put("hasURI", URIUtils.replaceNameSpaceEx(getUri()));
@@ -390,19 +329,24 @@ public class Indicator extends HADatAcThing implements Comparable<Indicator> {
 		return totalChanged;
 	}
 
-	@Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
-	public int deleteFromLabKey(String user_name, String password) throws CommandException {
-		String site = ConfigProp.getPropertyValue("labkey.config", "site");
-		String path = "/" + ConfigProp.getPropertyValue("labkey.config", "folder");
-		LabkeyDataHandler loader = new LabkeyDataHandler(site, user_name, password, path);
+	@Override
+	public int deleteFromLabKey(String user_name, String password) {
+		LabkeyDataHandler loader = LabkeyDataHandler.createDefault(user_name, password);
 		List< Map<String, Object> > rows = new ArrayList< Map<String, Object> >();
 		Map<String, Object> row = new HashMap<String, Object>();
 		row.put("hasURI", URIUtils.replaceNameSpaceEx(getUri().replace("<","").replace(">","")));
 		rows.add(row);
-		for (Map<String,Object> str : rows) {
-			System.out.println("deleting Indicator " + str.get("hasURI"));
+		for (Map<String,Object> r : rows) {
+			System.out.println("deleting Indicator " + r.get("hasURI"));
 		}
-		return loader.deleteRows("IndicatorType", rows);
+		
+		try {
+            return loader.deleteRows("IndicatorType", rows);
+        } catch (CommandException e) {
+            System.out.println("[ERROR] Could not delete Indicator(s)");
+            e.printStackTrace();
+            return 0;
+        }
 	}
 
 	@Override
@@ -410,4 +354,72 @@ public class Indicator extends HADatAcThing implements Comparable<Indicator> {
 		return this.getLabel().compareTo(another.getLabel());
 	}
 
+    @Override
+    public boolean saveToTripleStore() {
+        if (uri == null || uri.equals("")) {
+            System.out.println("[ERROR] Trying to save Indicator without assigning a URI");
+            return false;
+        }
+        
+        deleteFromTripleStore();
+
+        String insert = "";
+        String ind_uri = "";
+
+        System.out.println("Indicator.save(): Checking URI");
+        if (this.getUri().startsWith("<")) {
+            ind_uri = this.getUri();
+        } else {
+            ind_uri = "<" + this.getUri() + ">";
+        }
+        insert += NameSpaces.getInstance().printSparqlNameSpaceList();
+        insert += INSERT_LINE1;
+        if (label != null && !label.equals("")) {
+            insert += ind_uri + " rdfs:label \"" + label + "\" .  ";
+        }
+        if (comment != null && !comment.equals("")) {
+            insert += ind_uri + " rdfs:comment \"" + comment + "\" .  ";
+        }
+        if (superUri != null && !superUri.equals("")) {
+            insert += ind_uri + " rdfs:subClassOf <" + DynamicFunctions.replacePrefixWithURL(superUri) + "> .  ";
+        }
+        insert += LINE_LAST;
+        System.out.println("Indicator (pojo's save): <" + insert + ">");
+        UpdateRequest request = UpdateFactory.create(insert);
+        UpdateProcessor processor = UpdateExecutionFactory.createRemote(
+                request, CollectionUtil.getCollectionsName(CollectionUtil.METADATA_UPDATE));
+        processor.execute();
+        
+        return true;
+    }
+
+    @Override
+    public void deleteFromTripleStore() {
+        String query = "";
+        if (this.getUri() == null || this.getUri().equals("")) {
+            return;
+        }
+        query += NameSpaces.getInstance().printSparqlNameSpaceList();
+        query += DELETE_LINE1;
+        if (this.getUri().startsWith("http")) {
+            query += "<" + this.getUri() + ">";
+        } else {
+            query += this.getUri();
+        }
+        query += DELETE_LINE3;
+        query += LINE_LAST;
+        UpdateRequest request = UpdateFactory.create(query);
+        UpdateProcessor processor = UpdateExecutionFactory.createRemote(request, CollectionUtil.getCollectionsName(CollectionUtil.METADATA_UPDATE));
+        processor.execute();
+    }
+
+    @Override
+    public boolean saveToSolr() {
+        return false;
+    }
+
+    @Override
+    public int deleteFromSolr() {
+        return 0;
+    }
 }

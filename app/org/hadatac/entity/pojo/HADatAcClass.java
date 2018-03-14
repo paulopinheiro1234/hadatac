@@ -19,7 +19,7 @@ import org.hadatac.utils.NameSpaces;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import org.hadatac.utils.Collections;
+import org.hadatac.utils.CollectionUtil;
 import org.hadatac.console.models.TreeNode;
 
 public class HADatAcClass {
@@ -100,7 +100,6 @@ public class HADatAcClass {
 	@JsonIgnore
 	public String getHierarchyJson() {
 		//System.out.println("Inside HADatAcClass's getHierarchyJson: [" + className + "]");
-		String collection = "";
 		String q = 
 				"SELECT ?id ?superId ?label ?comment WHERE { " + 
 						"   ?id rdfs:subClassOf* " + className + " . " + 
@@ -112,8 +111,8 @@ public class HADatAcClass {
 		try {
 			String queryString = NameSpaces.getInstance().printSparqlNameSpaceList() + q;
 			Query query = QueryFactory.create(queryString);
-			QueryExecution qexec = QueryExecutionFactory.sparqlService(Collections.
-					getCollectionsName(Collections.METADATA_SPARQL), query);
+			QueryExecution qexec = QueryExecutionFactory.sparqlService(CollectionUtil.
+					getCollectionsName(CollectionUtil.METADATA_SPARQL), query);
 			ResultSet results = qexec.execSelect();
 			ResultSetFormatter.outputAsJSON(outputStream, results);
 			qexec.close();
@@ -129,8 +128,6 @@ public class HADatAcClass {
 
 	@JsonIgnore
 	public TreeNode getHierarchy() {
-		String collection = "";
-		TreeNode newTree = null;
 		String node = null;
 		String superNode = null;
 		String nodeLabel = null;
@@ -141,12 +138,11 @@ public class HADatAcClass {
 						"   ?id rdfs:subClassOf ?superId .  " + 
 						"   ?id rdfs:label ?label .  " + 
 						"}";
-		ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
 		try {
 			String queryString = NameSpaces.getInstance().printSparqlNameSpaceList() + q;
 			Query query = QueryFactory.create(queryString);
-			QueryExecution qexec = QueryExecutionFactory.sparqlService(Collections.
-					getCollectionsName(Collections.METADATA_SPARQL), query);
+			QueryExecution qexec = QueryExecutionFactory.sparqlService(CollectionUtil.
+					getCollectionsName(CollectionUtil.METADATA_SPARQL), query);
 			ResultSet results = qexec.execSelect();
 			ResultSetRewindable resultsrw = ResultSetFactory.copyResults(results);
 			qexec.close();

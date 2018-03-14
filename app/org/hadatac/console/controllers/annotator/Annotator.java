@@ -28,8 +28,8 @@ import be.objectify.deadbolt.java.actions.Restrict;
 
 public class Annotator extends Controller {
 
-	@Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-        public Result selectDeployment() {
+    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
+    public Result selectDeployment() {
         SparqlQuery query = new SparqlQuery();
         GetSparqlQuery query_submit = new GetSparqlQuery(query);
         SparqlQueryResults theResults;
@@ -42,17 +42,17 @@ public class Annotator extends Controller {
             if (query_json != null && !query_json.equals("")) {
                 theResults = new SparqlQueryResults(query_json, false);
             } else {
-            	theResults = null;
+                theResults = null;
             }
         } catch (IllegalStateException | NullPointerException e1) {
             return internalServerError(error_page.render(e1.toString(), tabName));
         }
-	//return ok(selectDeployment.render(theResults));
-	return ok();
-        
+        //return ok(selectDeployment.render(theResults));
+        return ok();
+
     }
 
-	@Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
+    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
     public Result postSelectDeployment() {
         SparqlQuery query = new SparqlQuery();
         GetSparqlQuery query_submit = new GetSparqlQuery(query);
@@ -64,124 +64,122 @@ public class Annotator extends Controller {
             if (query_json != null && !query_json.equals("")) {
                 theResults = new SparqlQueryResults(query_json, false);
             } else {
-            	theResults = null;
+                theResults = null;
             }
         } catch (IllegalStateException | NullPointerException e1) {
             return internalServerError(error_page.render(e1.toString(), tabName));
         }
         //return ok(selectDeployment.render(theResults));
-	return ok();
+        return ok();
     }
 
-	@Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
+    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
     public Result uploadCSV(String uri) {
+        CSVAnnotationHandler handler;
+        try {
+            if (uri != null) {
+                uri = URLDecoder.decode(uri, "UTF-8");
+            } else {
+                uri = "";
+            }
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
+        System.out.println("uploadCSV: uri is " + uri);
+        if (!uri.equals("")) {
 
-    	CSVAnnotationHandler handler;
-    	try {
-    		if (uri != null) {
-			    uri = URLDecoder.decode(uri, "UTF-8");
-    		} else {
-    			uri = "";
-    		}
-		} catch (UnsupportedEncodingException e) {
-			e.printStackTrace();
-		}
-    	System.out.println("uploadCSV: uri is " + uri);
-    	if (!uri.equals("")) {
+            /*
+             *  Add deployment information into handler
+             */
+            String json = DeploymentQueries.exec(DeploymentQueries.DEPLOYMENT_BY_URI, uri);
+            SparqlQueryResults results = new SparqlQueryResults(json, false);
+            TripleDocument docDeployment = results.sparqlResults.values().iterator().next();
+            handler = new CSVAnnotationHandler(uri, docDeployment.get("platform"), docDeployment.get("instrument"));
 
-    		/*
-    		 *  Add deployment information into handler
-    		 */
-    		String json = DeploymentQueries.exec(DeploymentQueries.DEPLOYMENT_BY_URI, uri);
-    		SparqlQueryResults results = new SparqlQueryResults(json, false);
-    		TripleDocument docDeployment = results.sparqlResults.values().iterator().next();
-    		handler = new CSVAnnotationHandler(uri, docDeployment.get("platform"), docDeployment.get("instrument"));
-    		    		
-    		/*
-    		 * Add possible detector's characterisitcs into handler
-    		 */
-    		String dep_json = DeploymentQueries.exec(DeploymentQueries.DEPLOYMENT_CHARACTERISTICS_BY_URI, uri);
-    		System.out.println(dep_json);
-    		SparqlQueryResults results2 = new SparqlQueryResults(dep_json, false);
-    		Iterator<TripleDocument> it = results2.sparqlResults.values().iterator();
-    		Map<String,String> deploymentChars = new HashMap<String,String>();
-    		TripleDocument docChar;
-    		while (it.hasNext()) {
-    			docChar = (TripleDocument) it.next();
-    			if (docChar != null && docChar.get("char") != null && docChar.get("charName") != null) {
-    				deploymentChars.put((String)docChar.get("char"),(String)docChar.get("charName"));
-    			}
-    		}
-    		handler.setDeploymentCharacteristics(deploymentChars);
+            /*
+             * Add possible detector's characterisitcs into handler
+             */
+            String dep_json = DeploymentQueries.exec(DeploymentQueries.DEPLOYMENT_CHARACTERISTICS_BY_URI, uri);
+            System.out.println(dep_json);
+            SparqlQueryResults results2 = new SparqlQueryResults(dep_json, false);
+            Iterator<TripleDocument> it = results2.sparqlResults.values().iterator();
+            Map<String,String> deploymentChars = new HashMap<String,String>();
+            TripleDocument docChar;
+            while (it.hasNext()) {
+                docChar = (TripleDocument) it.next();
+                if (docChar != null && docChar.get("char") != null && docChar.get("charName") != null) {
+                    deploymentChars.put((String)docChar.get("char"),(String)docChar.get("charName"));
+                }
+            }
+            handler.setDeploymentCharacteristics(deploymentChars);
 
-    		/*
-    		 * Add URI of active datacollection in handler
-    		 */
-    		DataAcquisition dc = DataFactory.getActiveDataAcquisition(uri);
-    		if (dc != null && dc.getUri() != null) {
-    			handler.setDataAcquisitionUri(dc.getUri());
-    		}
-    	} else 
-    	{
-    		handler = new CSVAnnotationHandler(uri, "", "");
-    	}
+            /*
+             * Add URI of active datacollection in handler
+             */
+            DataAcquisition dc = DataFactory.getActiveDataAcquisition(uri);
+            if (dc != null && dc.getUri() != null) {
+                handler.setDataAcquisitionUri(dc.getUri());
+            }
+        } else {
+            handler = new CSVAnnotationHandler(uri, "", "");
+        }
 
-    	return ok(uploadCSV.render(handler, "init",""));   
+        return ok(uploadCSV.render(handler, "init",""));   
     }
 
-	@Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
+    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
     public Result postUploadCSV(String uri) {
 
-		CSVAnnotationHandler handler;
-    	try {
-    		if (uri != null) {
-			    uri = URLDecoder.decode(uri, "UTF-8");
-    		} else {
-    			uri = "";
-    		}
-		} catch (UnsupportedEncodingException e) {
-			e.printStackTrace();
-		}
-    	
-    	if (!uri.equals("")) {
+        CSVAnnotationHandler handler;
+        try {
+            if (uri != null) {
+                uri = URLDecoder.decode(uri, "UTF-8");
+            } else {
+                uri = "";
+            }
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
 
-    		/*
-    		 *  Add deployment information into handler
-    		 */
-    		String json = DeploymentQueries.exec(DeploymentQueries.DEPLOYMENT_BY_URI, uri);
-    		SparqlQueryResults results = new SparqlQueryResults(json, false);
-    		TripleDocument docDeployment = results.sparqlResults.values().iterator().next();
-    		handler = new CSVAnnotationHandler(uri, docDeployment.get("platform"), docDeployment.get("instrument"));
-    		
-    		/*
-    		 * Add possible detector's characterisitcs into handler
-    		 */
-    		String dep_json = DeploymentQueries.exec(DeploymentQueries.DEPLOYMENT_CHARACTERISTICS_BY_URI, uri);
-    		System.out.println(dep_json);
-    		SparqlQueryResults results2 = new SparqlQueryResults(dep_json, false);
-    		Iterator<TripleDocument> it = results2.sparqlResults.values().iterator();
-    		Map<String,String> deploymentChars = new HashMap<String,String>();
-    		TripleDocument docChar;
-    		while (it.hasNext()) {
-    			docChar = (TripleDocument) it.next();
-    			if (docChar != null && docChar.get("char") != null && docChar.get("charName") != null) {
-    				deploymentChars.put((String)docChar.get("char"),(String)docChar.get("charName"));
-    				System.out.println("EC: " + docChar.get("char") + "   ecName: " + docChar.get("charName"));
-    			}
-    		}
-    		handler.setDeploymentCharacteristics(deploymentChars);
+        if (!uri.equals("")) {
 
-    		/*
-    		 * Add URI of active datacollection in handler
-    		 */
-    		DataAcquisition dc = DataFactory.getActiveDataAcquisition(uri);
-    		if (dc != null && dc.getUri() != null) {
-    			handler.setDataAcquisitionUri(dc.getUri());
-    		}
-    	} else {
-    		handler = new CSVAnnotationHandler(uri, "", "");
-    	}
+            /*
+             *  Add deployment information into handler
+             */
+            String json = DeploymentQueries.exec(DeploymentQueries.DEPLOYMENT_BY_URI, uri);
+            SparqlQueryResults results = new SparqlQueryResults(json, false);
+            TripleDocument docDeployment = results.sparqlResults.values().iterator().next();
+            handler = new CSVAnnotationHandler(uri, docDeployment.get("platform"), docDeployment.get("instrument"));
 
-    	return ok(uploadCSV.render(handler, "init",""));
+            /*
+             * Add possible detector's characterisitcs into handler
+             */
+            String dep_json = DeploymentQueries.exec(DeploymentQueries.DEPLOYMENT_CHARACTERISTICS_BY_URI, uri);
+            System.out.println(dep_json);
+            SparqlQueryResults results2 = new SparqlQueryResults(dep_json, false);
+            Iterator<TripleDocument> it = results2.sparqlResults.values().iterator();
+            Map<String,String> deploymentChars = new HashMap<String,String>();
+            TripleDocument docChar;
+            while (it.hasNext()) {
+                docChar = (TripleDocument) it.next();
+                if (docChar != null && docChar.get("char") != null && docChar.get("charName") != null) {
+                    deploymentChars.put((String)docChar.get("char"),(String)docChar.get("charName"));
+                    System.out.println("EC: " + docChar.get("char") + "   ecName: " + docChar.get("charName"));
+                }
+            }
+            handler.setDeploymentCharacteristics(deploymentChars);
+
+            /*
+             * Add URI of active datacollection in handler
+             */
+            DataAcquisition dc = DataFactory.getActiveDataAcquisition(uri);
+            if (dc != null && dc.getUri() != null) {
+                handler.setDataAcquisitionUri(dc.getUri());
+            }
+        } else {
+            handler = new CSVAnnotationHandler(uri, "", "");
+        }
+
+        return ok(uploadCSV.render(handler, "init",""));
     }
 }

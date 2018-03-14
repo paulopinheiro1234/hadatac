@@ -10,7 +10,7 @@ import org.apache.jena.update.UpdateRequest;
 
 import org.apache.commons.text.StrSubstitutor;
 import org.hadatac.metadata.loader.URIUtils;
-import org.hadatac.utils.Collections;
+import org.hadatac.utils.CollectionUtil;
 import org.hadatac.utils.NameSpaces;
 
 import com.typesafe.config.ConfigFactory;
@@ -173,7 +173,7 @@ public class DASOInstance {
 		query += LINE_LAST;
 		System.out.println("[DASOI] SPARQL query inside delete(): " + query);
 		UpdateRequest request = UpdateFactory.create(query);
-		UpdateProcessor processor = UpdateExecutionFactory.createRemote(request, Collections.getCollectionsName(Collections.METADATA_UPDATE));
+		UpdateProcessor processor = UpdateExecutionFactory.createRemote(request, CollectionUtil.getCollectionsName(CollectionUtil.METADATA_UPDATE));
 		processor.execute();
 	}// /delete()
 	

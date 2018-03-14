@@ -22,7 +22,7 @@ import org.apache.jena.update.UpdateFactory;
 import org.apache.jena.update.UpdateProcessor;
 import org.apache.jena.update.UpdateRequest;
 import org.hadatac.entity.pojo.Study;
-import org.hadatac.utils.Collections;
+import org.hadatac.utils.CollectionUtil;
 import org.hadatac.utils.Feedback;
 import org.hadatac.utils.NameSpace;
 import org.hadatac.utils.NameSpaces;
@@ -61,7 +61,7 @@ public class MetadataContext implements RDFContext {
     		Query query = QueryFactory.create(queryString);
     			
     		QueryExecution qexec = QueryExecutionFactory.sparqlService(
-    				Collections.getCollectionsName(Collections.METADATA_SPARQL), query);
+    				CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), query);
     		ResultSet results = qexec.execSelect();
     		ResultSetRewindable resultsrw = ResultSetFactory.copyResults(results);
     		qexec.close();
@@ -84,7 +84,7 @@ public class MetadataContext implements RDFContext {
 		queryString += "DELETE WHERE { ?s ?p ?o . } ";
 		UpdateRequest req = UpdateFactory.create(queryString);
 		UpdateProcessor processor = UpdateExecutionFactory.createRemote(req, 
-				Collections.getCollectionsName(Collections.METADATA_UPDATE));
+				CollectionUtil.getCollectionsName(CollectionUtil.METADATA_UPDATE));
 		try {
 			processor.execute();
 		} catch (Exception e) {
@@ -102,8 +102,8 @@ public class MetadataContext implements RDFContext {
         message += Feedback.println(mode,"   Triples before [clean]: " + totalTriples());
         message += Feedback.println(mode, " ");
         message += Feedback.println(mode, "      Deleted the following triples: ");
-        Study studyObj = new Study();
-        Model model = studyObj.findModel(study);
+        
+        Model model = Study.findModel(study);
         StmtIterator iter = model.listStatements();
 		while (iter.hasNext()) {
 			Statement stmt = iter.nextStatement();
@@ -203,7 +203,7 @@ public class MetadataContext implements RDFContext {
 		// Sample Collections
 		"  	?subUri rdfs:subClassOf* hasco:Study . " + 
 		"  	?study a ?subUri . " +
-		"   ?s hasco:isSampleCollectionOf ?study . " + 
+		"   ?s hasco:isMemberOf ?study . " + 
 		"   ?s ?p ?o . " +
 		"  FILTER (?study = " + study + ") " +
 		"    } " +
@@ -212,7 +212,7 @@ public class MetadataContext implements RDFContext {
 		// Other Sample Collections
 		"  	?subUri rdfs:subClassOf* hasco:Study . " + 
 		"  	?study a ?subUri . " +
-		"   ?s hasco:isSampleCollectionOf ?study . " + 
+		"   ?s hasco:isMemberOf ?study . " + 
 		"   ?s ?p ?o . " +
 		"  	FILTER (?study != " + study + ") " +
 		"    } " +
@@ -223,8 +223,7 @@ public class MetadataContext implements RDFContext {
 		// Sample Collection Samples
 		"  	?subUri rdfs:subClassOf* hasco:Study . " + 
 		"  	?study a ?subUri . " +
-		"   ?sc hasco:isSampleCollectionOf ?study . " + 
-		"   ?s hasco:isObjectOf ?sc .  " +
+		"   ?s hasco:isMemberOf* ?study . " + 
 		"   ?s ?p ?o . " +
 		"  FILTER (?study = " + study + ") " +
 		"    } " +
@@ -233,8 +232,7 @@ public class MetadataContext implements RDFContext {
 		// Other Sample Collection Samples
 		"  	?subUri rdfs:subClassOf* hasco:Study . " + 
 		"  	?study a ?subUri . " +
-		"   ?sc hasco:isSampleCollectionOf ?study . " + 
-		"   ?s hasco:isObjectOf ?sc .  " +
+		"   ?s hasco:isMemberOf* ?study . " + 
 		"   ?s ?p ?o . " +
 		"  	FILTER (?study != " + study + ") " +
 		"    } " +
@@ -333,7 +331,7 @@ public class MetadataContext implements RDFContext {
 		
 		UpdateRequest req = UpdateFactory.create(queryString);
 		UpdateProcessor processor = UpdateExecutionFactory.createRemote(req, 
-				Collections.getCollectionsName(Collections.METADATA_UPDATE));
+				CollectionUtil.getCollectionsName(CollectionUtil.METADATA_UPDATE));
 		try {
 			processor.execute();
 		} catch (Exception e) {
@@ -365,7 +363,7 @@ public class MetadataContext implements RDFContext {
 	public Long loadLocalFile(int mode, String filePath, String contentType) {
 		Model model = ModelFactory.createDefaultModel();
 		DatasetAccessor accessor = DatasetAccessorFactory.createHTTP(
-				kbURL + Collections.METADATA_GRAPH);
+				kbURL + CollectionUtil.METADATA_GRAPH);
 
 		loadFileMessage = "";
 		Long total = totalTriples();

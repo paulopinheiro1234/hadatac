@@ -22,7 +22,7 @@ import play.mvc.Result;
 import play.data.FormFactory;
 
 import org.hadatac.console.views.html.deployments.*;
-import org.hadatac.utils.Collections;
+import org.hadatac.utils.CollectionUtil;
 
 import com.typesafe.config.ConfigFactory;
 
@@ -47,7 +47,7 @@ public class URIGenerator extends Controller {
 	public static long getNextId() {
 		SolrClient client = new HttpSolrClient.Builder(
 				ConfigFactory.load().getString("hadatac.solr.data")
-				+ Collections.URI_GENERATOR).build();
+				+ CollectionUtil.URI_GENERATOR).build();
 		SolrQuery parameters = new SolrQuery();
 		parameters.set("q", "*:*");
 		parameters.set("sort", "generated_id desc");

@@ -19,88 +19,86 @@ import be.objectify.deadbolt.java.actions.Group;
 import be.objectify.deadbolt.java.actions.Restrict;
 
 public class DeleteDAS extends Controller {
-	
-	@Inject
-	private FormFactory formFactory;
 
-	@Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-	public Result index(String das_uri) {
-		if (session().get("LabKeyUserName") == null && session().get("LabKeyPassword") == null) {
-			return redirect(org.hadatac.console.controllers.triplestore.routes.LoadKB.logInLabkey(
-					routes.DeleteDAS.index(das_uri).url()));
-		}
+    @Inject
+    private FormFactory formFactory;
 
-		DataAcquisitionSchemaForm dasForm = new DataAcquisitionSchemaForm();
-		DataAcquisitionSchema das = null;
+    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
+    public Result index(String das_uri) {
+        if (session().get("LabKeyUserName") == null && session().get("LabKeyPassword") == null) {
+            return redirect(org.hadatac.console.controllers.triplestore.routes.LoadKB.logInLabkey(
+                    routes.DeleteDAS.index(das_uri).url()));
+        }
 
-		try {
-			if (das_uri != null) {
-				das_uri = URLDecoder.decode(das_uri, "UTF-8");
-			} else {
-				das_uri = "";
-			}
-		} catch (UnsupportedEncodingException e) {
-			e.printStackTrace();
-		}
+        DataAcquisitionSchemaForm dasForm = new DataAcquisitionSchemaForm();
+        DataAcquisitionSchema das = null;
 
-		if (!das_uri.equals("")) {
+        try {
+            if (das_uri != null) {
+                das_uri = URLDecoder.decode(das_uri, "UTF-8");
+            } else {
+                das_uri = "";
+            }
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
 
-			das = DataAcquisitionSchema.find(das_uri);
-			System.out.println("delete data acquisition schema");
-			dasForm.setUri(das_uri);
-			dasForm.setLabel(das.getLabel());
-			return ok(deleteDAS.render(das_uri, dasForm));
-		}
-		return ok(deleteDAS.render(das_uri, dasForm));
-	}
+        if (!das_uri.equals("")) {
 
-	@Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-	public Result postIndex(String das_uri) {
-		return index(das_uri);
-	}
+            das = DataAcquisitionSchema.find(das_uri);
+            System.out.println("delete data acquisition schema");
+            dasForm.setUri(das_uri);
+            dasForm.setLabel(das.getLabel());
+            return ok(deleteDAS.render(das_uri, dasForm));
+        }
+        return ok(deleteDAS.render(das_uri, dasForm));
+    }
 
-	@Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-	public Result processForm(String das_uri) {
-		if (session().get("LabKeyUserName") == null && session().get("LabKeyPassword") == null) {
-			return redirect(org.hadatac.console.controllers.triplestore.routes.LoadKB.logInLabkey(
-					routes.DeleteDAS.processForm(das_uri).url()));
-		}
+    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
+    public Result postIndex(String das_uri) {
+        return index(das_uri);
+    }
 
-		DataAcquisitionSchema das = null;
+    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
+    public Result processForm(String das_uri) {
+        if (session().get("LabKeyUserName") == null && session().get("LabKeyPassword") == null) {
+            return redirect(org.hadatac.console.controllers.triplestore.routes.LoadKB.logInLabkey(
+                    routes.DeleteDAS.processForm(das_uri).url()));
+        }
 
-		try {
-			if (das_uri != null) {
-				das_uri = URLDecoder.decode(das_uri, "UTF-8");
-			} else {
-				das_uri = "";
-			}
-		} catch (UnsupportedEncodingException e) {
-			e.printStackTrace();
-		}
+        DataAcquisitionSchema das = null;
 
-		if (!das_uri.equals("")) {
-			das = DataAcquisitionSchema.find(das_uri);
-		}
+        try {
+            if (das_uri != null) {
+                das_uri = URLDecoder.decode(das_uri, "UTF-8");
+            } else {
+                das_uri = "";
+            }
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
 
-		Form<DataAcquisitionSchemaForm> form = formFactory.form(DataAcquisitionSchemaForm.class).bindFromRequest();
-		DataAcquisitionSchemaForm data = form.get();
-		data.setLabel(das.getLabel());
+        if (!das_uri.equals("")) {
+            das = DataAcquisitionSchema.find(das_uri);
+        }
 
-		if (das != null) {
-			try {
-				System.out.println("calling das.deleteFromLabKey() from DeleteDAS"); 
-				das.deleteFromLabKey(session().get("LabKeyUserName"),session().get("LabKeyPassword"));
-			} catch (CommandException e) {
-				return badRequest(DASConfirm.render("ERROR Deleting Data Acquisition Schema ", "Error from das.deleteFromLabKey()", data.getLabel()));
-			}
-			das.delete();
-		}
+        Form<DataAcquisitionSchemaForm> form = formFactory.form(DataAcquisitionSchemaForm.class).bindFromRequest();
+        DataAcquisitionSchemaForm data = form.get();
+        data.setLabel(das.getLabel());
 
-		if (form.hasErrors()) {
-			return badRequest(DASConfirm.render("ERROR Deleting Data Acquisition Schema ", "Error from form", data.getLabel()));
-		} else {
-			return ok(DASConfirm.render("Deleted Data Acquisition Schema ", "", data.getLabel()));
-		}
-	}
+        if (das != null) {
+            System.out.println("calling das.deleteFromLabKey() from DeleteDAS");
+            if (das.deleteFromLabKey(session().get("LabKeyUserName"), session().get("LabKeyPassword")) <= 0) {
+                return badRequest(DASConfirm.render("ERROR Deleting Data Acquisition Schema ", "Error from das.deleteFromLabKey()", data.getLabel()));
+            }
+            das.delete();
+        }
+
+        if (form.hasErrors()) {
+            return badRequest(DASConfirm.render("ERROR Deleting Data Acquisition Schema ", "Error from form", data.getLabel()));
+        } else {
+            return ok(DASConfirm.render("Deleted Data Acquisition Schema ", "", data.getLabel()));
+        }
+    }
 
 }

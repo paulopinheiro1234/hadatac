@@ -1,9 +1,7 @@
 package org.hadatac.utils;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.JsonNode;
-import play.Play;
 import play.libs.Json;
 
 
@@ -14,9 +12,8 @@ public class ApiUtil {
         if (response instanceof String) {
             result.put("body", (String) response);
         } else {
-            result.put("body", (JsonNode) response);
+            result.set("body", (JsonNode) response);
         }
         return result;
-    }// /createResponse
-
-}// 
+    }
+}

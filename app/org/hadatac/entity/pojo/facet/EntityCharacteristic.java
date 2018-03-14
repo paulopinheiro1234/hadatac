@@ -12,12 +12,10 @@ import org.apache.solr.client.solrj.response.QueryResponse;
 import org.hadatac.entity.pojo.Characteristic;
 import org.hadatac.entity.pojo.DataAcquisition;
 import org.hadatac.entity.pojo.Entity;
-import org.hadatac.utils.Collections;
+import org.hadatac.utils.CollectionUtil;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.typesafe.config.ConfigFactory;
-
-import play.Play;
 
 public class EntityCharacteristic {
 	
@@ -45,7 +43,7 @@ public class EntityCharacteristic {
 
 		SolrClient solr = new HttpSolrClient.Builder(
 				ConfigFactory.load().getString("hadatac.solr.data") 
-				+ Collections.DATA_ACQUISITION).build();
+				+ CollectionUtil.DATA_ACQUISITION).build();
 		
 		try {
 			QueryResponse response = solr.query(solrQuery);

@@ -28,118 +28,118 @@ import org.hadatac.console.controllers.AuthApplication;
 
 
 public class NewStudy extends Controller {
-	
-	@Inject
-	private FormFactory formFactory;
-	
+
+    @Inject
+    private FormFactory formFactory;
+
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
     public Result index() {
-    	if (session().get("LabKeyUserName") == null && session().get("LabKeyPassword") == null) {
-    		return redirect(org.hadatac.console.controllers.triplestore.routes.LoadKB.logInLabkey(
-    				routes.NewStudy.index().url()));
-    	}
-	return indexFromFile("");
+        if (session().get("LabKeyUserName") == null && session().get("LabKeyPassword") == null) {
+            return redirect(org.hadatac.console.controllers.triplestore.routes.LoadKB.logInLabkey(
+                    routes.NewStudy.index().url()));
+        }
+        return indexFromFile("");
     }
-    
+
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
     public Result postIndex() {
-    	return index();
+        return index();
     }
-    
+
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
     public Result indexFromFile(String filename) {
-    	if (session().get("LabKeyUserName") == null && session().get("LabKeyPassword") == null) {
-    		return redirect(org.hadatac.console.controllers.triplestore.routes.LoadKB.logInLabkey(
-    				routes.NewStudy.indexFromFile(filename).url()));
-    	}
-    	
-	List<Agent> organizations = Agent.findOrganizations();
-	List<Agent> persons = Agent.findPersons();
-	StudyType studyType = new StudyType();
-	DataFile file = null;
-	String ownerEmail = null;
+        if (session().get("LabKeyUserName") == null && session().get("LabKeyPassword") == null) {
+            return redirect(org.hadatac.console.controllers.triplestore.routes.LoadKB.logInLabkey(
+                    routes.NewStudy.indexFromFile(filename).url()));
+        }
 
-	if (filename != null && !filename.equals("")) {
-	    ownerEmail = AuthApplication.getLocalUser(session()).getEmail();
-	    file = DataFile.findByName(ownerEmail, filename);
-	}
+        List<Agent> organizations = Agent.findOrganizations();
+        List<Agent> persons = Agent.findPersons();
+        StudyType studyType = new StudyType();
+        DataFile file = null;
+        String ownerEmail = null;
 
-    	return ok(newStudy.render(studyType, organizations, persons, file));
-    	
+        if (filename != null && !filename.equals("")) {
+            ownerEmail = AuthApplication.getLocalUser(session()).getEmail();
+            file = DataFile.findByName(ownerEmail, filename);
+        }
+
+        return ok(newStudy.render(studyType, organizations, persons, file));
+
     }
-    
+
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
     public Result postIndexFromFile(String filename) {
-    	return indexFromFile(filename);
+        return indexFromFile(filename);
     }
-    
+
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
     public Result processForm(String filename, String da_uri) {
-    final SysUser sysUser = AuthApplication.getLocalUser(session());
-	
+        final SysUser sysUser = AuthApplication.getLocalUser(session());
+
         Form<StudyForm> form = formFactory.form(StudyForm.class).bindFromRequest();
         StudyForm data = form.get();
-        
+
         if (form.hasErrors()) {
             return badRequest("The submitted form has errors!");
         }
-        
-	// store new values
-	String newURI = URIUtils.replacePrefixEx(data.getNewUri());
-	if (newURI == null || newURI.equals("")) {
+
+        // store new values
+        String newURI = URIUtils.replacePrefixEx(data.getNewUri());
+        if (newURI == null || newURI.equals("")) {
             return badRequest("[ERROR] New URI cannot be empty.");
-	}
-	String newStudyType = URIUtils.replacePrefixEx(data.getNewType());
-	String newLabel = data.getNewLabel();
-	String newTitle = data.getNewTitle();
-	String newProject = data.getNewProject();
-	String newComment = data.getNewComment();
-	String newExternalSource = data.getNewExternalSource();
-	String newInstitution = data.getNewInstitution();
-	String newAgent = data.getNewAgent();
-	String newStartDateTime = data.getNewStartDateTime();
-	String newEndDateTime = data.getNewEndDateTime();
+        }
+        String newStudyType = URIUtils.replacePrefixEx(data.getNewType());
+        String newLabel = data.getNewLabel();
+        String newTitle = data.getNewTitle();
+        String newProject = data.getNewProject();
+        String newComment = data.getNewComment();
+        String newExternalSource = data.getNewExternalSource();
+        String newInstitution = data.getNewInstitution();
+        String newAgent = data.getNewAgent();
+        String newStartDateTime = data.getNewStartDateTime();
+        String newEndDateTime = data.getNewEndDateTime();
 
         // insert current state of the STD
-	Study std = new Study(newURI,
-			      newStudyType,
-			      newLabel,
-			      newTitle,
-			      newProject,
-			      newComment,
-			      newExternalSource,
-			      newInstitution,
-			      newAgent,
-			      newStartDateTime,
-			      newStartDateTime);
-	
-	// insert the new STD content inside of the triplestore regardless of any change -- the previous content has already been deleted
-	std.save();
-	
-	// update/create new STD in LabKey
-	int nRowsAffected = std.saveToLabKey(session().get("LabKeyUserName"), session().get("LabKeyPassword"));
-	if (nRowsAffected <= 0) {
-	    return badRequest("Failed to insert new STD to LabKey!\n");
-	}
+        Study std = new Study(newURI,
+                newStudyType,
+                newLabel,
+                newTitle,
+                newProject,
+                newComment,
+                newExternalSource,
+                newInstitution,
+                newAgent,
+                newStartDateTime,
+                newStartDateTime);
 
-	System.out.println("Inserting new Study from file. filename:  " + filename + "   da : [" + URIUtils.replacePrefixEx(da_uri) + "]");
-	System.out.println("Inserting new Study from file. Study URI : [" + std.getUri() + "]");
-	// when a new study is created in the scope of a datafile, the new study needs to be associated to the datafile's DA 
-	if (filename != null && !filename.equals("") && da_uri != null && !da_uri.equals("")) {
-	    DataAcquisition da = DataAcquisition.findByUri(URIUtils.replacePrefixEx(da_uri));
-	    if (da != null) {
-		da.setStudyUri(std.getUri());
-		try {
-		    System.out.println("Inserting new Study from file. Found DA");
-		    da.save();
-		    da.saveToLabKey(session().get("LabKeyUserName"), session().get("LabKeyPassword"));
-		} catch (CommandException e) {
-		    System.out.println("[WARNING] Could not update DA from associated DataFile when creating a new study");
-		}
-	    } else {
-		System.out.println("[WARNING] DA from associated DataFile not found when creating a new study");
-	    }
-	}
-	return ok(newStudyConfirm.render(std, filename, da_uri));
+        // insert the new STD content inside of the triplestore regardless of any change -- the previous content has already been deleted
+        std.save();
+
+        // update/create new STD in LabKey
+        int nRowsAffected = std.saveToLabKey(session().get("LabKeyUserName"), session().get("LabKeyPassword"));
+        if (nRowsAffected <= 0) {
+            return badRequest("Failed to insert new STD to LabKey!\n");
+        }
+
+        System.out.println("Inserting new Study from file. filename:  " + filename + "   da : [" + URIUtils.replacePrefixEx(da_uri) + "]");
+        System.out.println("Inserting new Study from file. Study URI : [" + std.getUri() + "]");
+        // when a new study is created in the scope of a datafile, the new study needs to be associated to the datafile's DA 
+        if (filename != null && !filename.equals("") && da_uri != null && !da_uri.equals("")) {
+            DataAcquisition da = DataAcquisition.findByUri(URIUtils.replacePrefixEx(da_uri));
+            if (da != null) {
+                da.setStudyUri(std.getUri());
+                
+                System.out.println("Inserting new Study from file. Found DA");
+                if (da.saveToLabKey(session().get("LabKeyUserName"), session().get("LabKeyPassword")) > 0) {
+                    da.save();
+                } else {
+                    System.out.println("[WARNING] Could not update DA from associated DataFile when creating a new study");
+                }
+            } else {
+                System.out.println("[WARNING] DA from associated DataFile not found when creating a new study");
+            }
+        }
+        return ok(newStudyConfirm.render(std, filename, da_uri));
     }
 }

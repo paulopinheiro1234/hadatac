@@ -12,6 +12,7 @@ dist
 .target
 .idea
 .idea_modules
+.DS_Store
 /bin/
 RUNNING_PID
 .cache-main

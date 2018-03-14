@@ -25,16 +25,28 @@ public class MyActorSystem {
 
 	public void schedule() {
 		// Create thread for auto csv annotation
-		FiniteDuration delay = FiniteDuration.create(0, TimeUnit.SECONDS);
-		FiniteDuration frequency = FiniteDuration.create(15, TimeUnit.SECONDS);
-
-		Runnable annotation = new Runnable() {
+		Runnable scanning = new Runnable() {
 			@Override
 			public void run() {
-				AnnotationWorker.autoAnnotate();
+			    AnnotationWorker.scan();
 			}
 		};
+		
+		Runnable annotation = new Runnable() {
+            @Override
+            public void run() {
+                AnnotationWorker.autoAnnotate();
+            }
+        };
 
-		system.scheduler().schedule(delay, frequency, annotation, system.dispatcher());
+        system.scheduler().schedule(
+                FiniteDuration.create(0, TimeUnit.SECONDS), 
+                FiniteDuration.create(5, TimeUnit.SECONDS), 
+                scanning, system.dispatcher());
+        
+		system.scheduler().schedule(
+		        FiniteDuration.create(0, TimeUnit.SECONDS), 
+                FiniteDuration.create(15, TimeUnit.SECONDS),
+                annotation, system.dispatcher());
 	}
 }

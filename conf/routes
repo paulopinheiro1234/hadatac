@@ -3,10 +3,12 @@
 # ~~~~
 
 # Home page
-GET	    /hadatac/					                     org.hadatac.console.controllers.Portal.index()
-POST    /hadatac/                                 	     org.hadatac.console.controllers.Portal.postIndex()
-GET	    /hadatac                                  	     org.hadatac.console.controllers.Portal.index()
+GET	    /hadatac/					                    org.hadatac.console.controllers.Portal.index()
+POST    /hadatac/                                 	    org.hadatac.console.controllers.Portal.postIndex()
+GET	    /hadatac                                  	    org.hadatac.console.controllers.Portal.index()
 POST	/hadatac                                        org.hadatac.console.controllers.Portal.postIndex()
+GET     /hadatac/version                                org.hadatac.console.controllers.Version.index()
+POST    /hadatac/version                                org.hadatac.console.controllers.Version.postIndex()
 GET	    /hadatac/acquisitions                           org.hadatac.console.controllers.dataacquisitionsearch.DataAcquisitionSearch.index(start: Int ?= 1, rows: Int ?= 15)
 POST	/hadatac/acquisitions                     	    org.hadatac.console.controllers.dataacquisitionsearch.DataAcquisitionSearch.postIndex(start: Int ?= 1, rows: Int ?= 15)
 GET	    /hadatac/acquisitions/data                      org.hadatac.console.controllers.dataacquisitionsearch.DataAcquisitionSearch.indexData(start: Int ?= 1, rows: Int ?= 15)
@@ -311,6 +313,7 @@ GET	    /hadatac/annotator/downloadfile		       org.hadatac.console.controllers.
 POST	/hadatac/annotator/downloadfile    	       org.hadatac.console.controllers.annotator.AutoAnnotator.downloadDataFile(file_name : String, isProcessed : Boolean)
 GET	    /hadatac/annotator/log                     org.hadatac.console.controllers.annotator.AutoAnnotator.checkAnnotationLog(file_name : String)
 POST	/hadatac/annotator/log                     org.hadatac.console.controllers.annotator.AutoAnnotator.checkAnnotationLog(file_name : String)
+GET     /hadatac/annotator/queryfile               org.hadatac.console.controllers.annotator.AutoAnnotator.getAnnotationStatus(filename: String)
 GET	    /hadatac/annotator/file/owner		       org.hadatac.console.controllers.annotator.AutoAnnotator.assignFileOwner(ownerEmail: String, file: String)
 POST	/hadatac/annotator/file/owner     	       org.hadatac.console.controllers.annotator.AutoAnnotator.postAssignFileOwner(ownerEmail: String, file: String)
 POST	/hadatac/annotator/file/owner/form     	   org.hadatac.console.controllers.annotator.AutoAnnotator.processOwnerForm(ownerEmail: String, file : String)
@@ -416,6 +419,9 @@ POST	/hadatac/perm/invite     		       org.hadatac.console.controllers.triplesto
 # REST API
 GET     /hadatac/api/studies/all                          org.hadatac.console.controllers.restapi.RestApi.getStudies()
 GET     /hadatac/api/studies/:studyuri                    org.hadatac.console.controllers.restapi.RestApi.getStudy(studyuri: String)
+GET     /hadatac/api/studies/variables/:studyuri          org.hadatac.console.controllers.restapi.RestApi.getVariablesInStudy(studyuri: String)
+GET     /hadatac/api/studies/units/:studyuri              org.hadatac.console.controllers.restapi.RestApi.getUnitsInStudy(studyuri: String)
+GET     /hadatac/api/variables/:variableuri               org.hadatac.console.controllers.restapi.RestApi.getVariable(variableuri: String)
 
 
 # Map static resources from the /public folder to the /assets URL path

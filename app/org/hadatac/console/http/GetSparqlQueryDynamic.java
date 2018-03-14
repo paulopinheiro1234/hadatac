@@ -5,7 +5,7 @@ import java.io.ByteArrayOutputStream;
 
 import org.hadatac.console.controllers.metadata.DynamicFunctions;
 import org.hadatac.console.models.SparqlQuery;
-import org.hadatac.utils.Collections;
+import org.hadatac.utils.CollectionUtil;
 import org.hadatac.utils.NameSpaces;
 import org.apache.jena.query.Query;
 import org.apache.jena.query.QueryExecution;
@@ -19,20 +19,20 @@ public class GetSparqlQueryDynamic {
     public GetSparqlQueryDynamic () {} 
 
     public GetSparqlQueryDynamic (SparqlQuery query) {
-    	this(Collections.METADATA_SPARQL, query);
+    	this(CollectionUtil.METADATA_SPARQL, query);
     }
     
     public GetSparqlQueryDynamic (String collectionSource, SparqlQuery query) {
-        this.collection = Collections.getCollectionsName(collectionSource);
+        this.collection = CollectionUtil.getCollectionsName(collectionSource);
         System.out.println("Collection: " + collection);
     }
 
     public GetSparqlQueryDynamic (SparqlQuery query, String tabName) {
-    	this(Collections.METADATA_SPARQL, query, tabName);
+    	this(CollectionUtil.METADATA_SPARQL, query, tabName);
     }
 
     public GetSparqlQueryDynamic (String collectionSource, SparqlQuery query, String tabName) {
-    	this.collection = Collections.getCollectionsName(collectionSource);
+    	this.collection = CollectionUtil.getCollectionsName(collectionSource);
         System.out.println("Collection: " + collection);
     }
     

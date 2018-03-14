@@ -18,10 +18,9 @@ import org.apache.jena.update.UpdateExecutionFactory;
 import org.apache.jena.update.UpdateFactory;
 import org.apache.jena.update.UpdateProcessor;
 import org.apache.jena.update.UpdateRequest;
-import org.hadatac.utils.Collections;
+import org.hadatac.utils.CollectionUtil;
 import org.hadatac.utils.NameSpaces;
 import org.hadatac.utils.FirstLabel;
-import org.hadatac.utils.ConfigProp;
 import org.hadatac.metadata.loader.LabkeyDataHandler;
 import org.hadatac.entity.pojo.DataAcquisitionSchemaObject;
 import org.hadatac.entity.pojo.DataAcquisitionSchemaEvent;
@@ -32,7 +31,7 @@ import be.objectify.deadbolt.java.actions.Group;
 import be.objectify.deadbolt.java.actions.Restrict;
 import org.hadatac.console.controllers.AuthApplication;
 
-public class DataAcquisitionSchemaAttribute {
+public class DataAcquisitionSchemaAttribute extends HADatAcThing {
 
 	public static String INDENT1 = "     ";
 	public static String INSERT_LINE1 = "INSERT DATA {  ";
@@ -64,7 +63,7 @@ public class DataAcquisitionSchemaAttribute {
 	private String unitLabel;
 	private String daseUri;
 	private String dasoUri;
-	private String inRelationToUri;
+	private Map<String, String> relations = new HashMap<String, String>();
 	private boolean isMeta;
 	private DataAcquisitionSchema das;
 
@@ -112,7 +111,6 @@ public class DataAcquisitionSchemaAttribute {
 		this.setUnit(unit);
 		this.daseUri = daseUri;
 		this.dasoUri = dasoUri;
-		System.out.println("dasoUri: " + dasoUri);
 	}
 
 	public String getUri() {
@@ -300,11 +298,24 @@ public class DataAcquisitionSchemaAttribute {
 	}
 	
 	public String getInRelationToUri() {
+		String inRelationToUri = "";
+		for (String key : relations.keySet()) {
+			inRelationToUri = relations.get(key);
+			break;
+		}
 		return inRelationToUri;
 	}
 	
-	public void setInRelationToUri(String inRelationToUri) {
-		this.inRelationToUri = inRelationToUri;
+	public String getInRelationToUri(String relationUri) {
+		if (relations.containsKey(relationUri)) {
+			return relations.get(relationUri);
+		}
+		
+		return "";
+	}
+	
+	public void addRelation(String relationUri, String inRelationToUri) {
+		relations.put(relationUri, inRelationToUri);
 	}
 
 	public String getUnit() {
@@ -437,35 +448,37 @@ public class DataAcquisitionSchemaAttribute {
 		}
 	}
 
-	public static DataAcquisitionSchemaAttribute find (String dasa_uri) {
+	public static DataAcquisitionSchemaAttribute find(String dasa_uri) {
 		DataAcquisitionSchemaAttribute dasa = null;
-		System.out.println("Looking for data acquisition schema attribute with URI " + dasa_uri);
-		if (dasa_uri.startsWith("http")) {
-			dasa_uri = "<" + dasa_uri + ">";
-		}
+		System.out.println("Looking for data acquisition schema attribute with URI <" + dasa_uri + ">");
+		
 		String queryString = NameSpaces.getInstance().printSparqlNameSpaceList() + 
 				"SELECT ?partOfSchema ?hasEntity ?hasAttribute " + 
-				" ?hasUnit ?hasDASO ?hasDASE ?hasSource ?isPIConfirmed ?inRelationTo WHERE { " + 
-				"    " + dasa_uri + " a hasco:DASchemaAttribute . " + 
-				"    " + dasa_uri + " hasco:partOfSchema ?partOfSchema .  " + 
-				"    OPTIONAL { " + dasa_uri + " hasco:hasEntity ?hasEntity } . " + 
-				"    OPTIONAL { " + dasa_uri + " hasco:hasAttribute ?hasAttribute } . " + 
-				"    OPTIONAL { " + dasa_uri + " hasco:hasUnit ?hasUnit } . " + 
-				"    OPTIONAL { " + dasa_uri + " hasco:hasEvent ?hasDASE } . " + 
-				"    OPTIONAL { " + dasa_uri + " hasco:isAttributeOf ?hasDASO } . " + 
-				"    OPTIONAL { " + dasa_uri + " hasco:hasSource ?hasSource } . " + 
-				"    OPTIONAL { " + dasa_uri + " hasco:isPIConfirmed ?isPIConfirmed } . " + 
-				"    OPTIONAL { " + dasa_uri + " sio:inRelationTo ?inRelationTo } . " + 
+				" ?hasUnit ?hasDASO ?hasDASE ?hasSource ?isPIConfirmed ?relation ?inRelationTo ?label WHERE { \n" + 
+				"    <" + dasa_uri + "> a hasco:DASchemaAttribute . \n" + 
+				"    <" + dasa_uri + "> hasco:partOfSchema ?partOfSchema . \n" + 
+				"    OPTIONAL { <" + dasa_uri + "> hasco:hasEntity ?hasEntity } . \n" + 
+				"    OPTIONAL { <" + dasa_uri + "> hasco:hasAttribute ?hasAttribute } . \n" + 
+				"    OPTIONAL { <" + dasa_uri + "> hasco:hasUnit ?hasUnit } . \n" + 
+				"    OPTIONAL { <" + dasa_uri + "> hasco:hasEvent ?hasDASE } . \n" + 
+				"    OPTIONAL { <" + dasa_uri + "> hasco:isAttributeOf ?hasDASO } . \n" + 
+				"    OPTIONAL { <" + dasa_uri + "> hasco:hasSource ?hasSource } . \n" + 
+				"    OPTIONAL { <" + dasa_uri + "> hasco:isPIConfirmed ?isPIConfirmed } . \n" + 
+				"    OPTIONAL { <" + dasa_uri + "> sio:Relation ?relation . <" + dasa_uri + "> ?relation ?inRelationTo . } . \n" + 
+				"    OPTIONAL { <" + dasa_uri + "> rdfs:label ?label } . \n" +
 				"}";
+		
+		//System.out.println("DataAcquisitionSchemaAttribute find() queryString: \n" + queryString);
+		
 		Query query = QueryFactory.create(queryString);
-
-		QueryExecution qexec = QueryExecutionFactory.sparqlService(Collections.getCollectionsName(Collections.METADATA_SPARQL), query);
+		QueryExecution qexec = QueryExecutionFactory.sparqlService(
+				CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), query);
 		ResultSet results = qexec.execSelect();
 		ResultSetRewindable resultsrw = ResultSetFactory.copyResults(results);
 		qexec.close();
 
 		if (!resultsrw.hasNext()) {
-			System.out.println("[WARNING] DataAcquisitionSchemaAttribute. Could not find DASA with URI: " + dasa_uri);
+			System.out.println("[WARNING] DataAcquisitionSchemaAttribute. Could not find DASA with URI: <" + dasa_uri + ">");
 			return dasa;
 		}
 
@@ -479,66 +492,40 @@ public class DataAcquisitionSchemaAttribute {
 		String dasoUriStr = "";
 		String daseUriStr = "";
 		String inRelationToUri = "";
+		String relationUri = "";
 
 		while (resultsrw.hasNext()) {
 			QuerySolution soln = resultsrw.next();
-			if (soln != null) {
+			labelStr = FirstLabel.getLabel(dasa_uri);
 
-				labelStr = FirstLabel.getLabel(dasa_uri);
-
-				try {
-					if (soln.getResource("partOfSchema") != null && soln.getResource("partOfSchema").getURI() != null) {
-						partOfSchemaStr = soln.getResource("partOfSchema").getURI();
-					}
-				} catch (Exception e1) {
-					partOfSchemaStr = "";
-				}
-
-				try {
-					if (soln.getResource("hasEntity") != null && soln.getResource("hasEntity").getURI() != null) {
-						entityStr = soln.getResource("hasEntity").getURI();
-					}
-				} catch (Exception e1) {
-					entityStr = "";
-				}
-
-				try {
-					if (soln.getResource("hasAttribute") != null && soln.getResource("hasAttribute").getURI() != null) {
-						attributeStr = soln.getResource("hasAttribute").getURI();
-					}
-				} catch (Exception e1) {
-					attributeStr = "";
-				}
-
-				try {
-					if (soln.getResource("hasUnit") != null && soln.getResource("hasUnit").getURI() != null) {
-						unitStr = soln.getResource("hasUnit").getURI();
-					}
-				} catch (Exception e1) {
-					unitStr = "";
-				}
-
-				try {
-					if (soln.getResource("hasDASO") != null && soln.getResource("hasDASO").getURI() != null) {
-						dasoUriStr = soln.getResource("hasDASO").getURI();
-					}
-				} catch (Exception e1) {
-					dasoUriStr = "";
-				}
-
-				try {
-					if (soln.getResource("hasDASE") != null && soln.getResource("hasDASE").getURI() != null) {
-						daseUriStr = soln.getResource("hasDASE").getURI();
-					}
-				} catch (Exception e1) {
-					daseUriStr = "";
-				}
-				
-				if (soln.get("inRelationTo") != null) {
-					inRelationToUri = soln.get("inRelationTo").toString();
-				}
-
-				dasa = new DataAcquisitionSchemaAttribute(dasa_uri,
+			if (soln.get("partOfSchema") != null) {
+				partOfSchemaStr = soln.get("partOfSchema").toString();
+			}
+			if (soln.get("hasEntity") != null) {
+				entityStr = soln.get("hasEntity").toString();
+			}
+			if (soln.get("hasAttribute") != null) {
+				attributeStr = soln.get("hasAttribute").toString();
+			}
+			if (soln.get("hasUnit") != null) {
+				unitStr = soln.get("hasUnit").toString();
+			}
+			if (soln.get("hasDASO") != null) {
+				dasoUriStr = soln.get("hasDASO").toString();
+			}
+			if (soln.get("hasDASE") != null) {
+				daseUriStr = soln.get("hasDASE").toString();
+			}
+			if (soln.get("inRelationTo") != null) {
+				inRelationToUri = soln.get("inRelationTo").toString();
+			}
+			if (soln.get("relation") != null) {
+				relationUri = soln.get("relation").toString();
+			}
+			
+			if (dasa == null) {
+				dasa = new DataAcquisitionSchemaAttribute(
+						dasa_uri,
 						localNameStr,
 						labelStr,
 						partOfSchemaStr,
@@ -548,41 +535,42 @@ public class DataAcquisitionSchemaAttribute {
 						unitStr,
 						daseUriStr,
 						dasoUriStr);
-				
-				dasa.setInRelationToUri(inRelationToUri);
 			}
-
+			
+			dasa.addRelation(relationUri, inRelationToUri);
 		}
 
 		return dasa;
 	}
 
-	public static List<DataAcquisitionSchemaAttribute> findBySchema(String schemaUri) {
-		System.out.println("Looking for data acquisition schema attributes for " + schemaUri);
-		if (schemaUri.startsWith("http")) {
-			schemaUri = "<" + schemaUri + ">";
+    public static List<DataAcquisitionSchemaAttribute> findByAttribute(String attributeUri) {
+		System.out.println("Looking for data acquisition schema attributes with hasco:hasAttribute " + attributeUri);
+		if (attributeUri.startsWith("http")) {
+			attributeUri = "<" + attributeUri + ">";
 		}
-		List<DataAcquisitionSchemaAttribute> attributes = new ArrayList<DataAcquisitionSchemaAttribute>();
+        List<DataAcquisitionSchemaAttribute> attributes = new ArrayList<DataAcquisitionSchemaAttribute>();
 		String queryString = NameSpaces.getInstance().printSparqlNameSpaceList() + 
-				"SELECT ?uri ?hasEntity ?hasAttribute " + 
+				"SELECT ?uri ?hasEntity ?schemaUri " + 
 				" ?hasUnit ?hasDASO ?hasDASE ?hasSource ?isPIConfirmed WHERE { " + 
 				"    ?uri a hasco:DASchemaAttribute . " + 
-				"    ?uri hasco:partOfSchema " + schemaUri + " .  " + 
+                "    ?uri hasco:hasAttribute " + attributeUri + ". " +
+				"    ?uri hasco:partOfSchema ?schemaUri .  " + 
 				"} ";
+        System.out.println("[DASA] query string = \n" + queryString);
 		Query query = QueryFactory.create(queryString);
 
-		QueryExecution qexec = QueryExecutionFactory.sparqlService(
-				Collections.getCollectionsName(Collections.METADATA_SPARQL), query);
+        QueryExecution qexec = QueryExecutionFactory.sparqlService(
+				CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), query);
 		ResultSet results = qexec.execSelect();
 		ResultSetRewindable resultsrw = ResultSetFactory.copyResults(results);
 		qexec.close();
 
 		if (!resultsrw.hasNext()) {
-			System.out.println("[WARNING] DataAcquisitionSchemaAttribute. Could not find attributes for schema: " + schemaUri);
+			System.out.println("[WARNING] DataAcquisitionSchemaAttribute. Could not find DASA's with attribute: " + attributeUri);
 			return attributes;
 		}
 
-		String uriStr = "";
+        String uriStr = "";
 
 		while (resultsrw.hasNext()) {
 			QuerySolution soln = resultsrw.next();
@@ -595,75 +583,118 @@ public class DataAcquisitionSchemaAttribute {
 						attributes.add(attr);
 					}
 				} catch (Exception e1) {
-					System.out.println("[ERROR] DataAcquisitionSchemaAttribute.findBySchema() URI: " + uriStr);
-					e1.printStackTrace();
+					System.out.println("[ERROR] DataAcquisitionSchemaAttribute. URI: " + uriStr);
 				}
 			}
 		}
 		attributes.sort(Comparator.comparing(DataAcquisitionSchemaAttribute::getPositionInt));
+		
+		return attributes;
+    }
+
+    // Given a study URI, 
+    // returns a list of DASA's
+    // (we need to go study -> data acqusition(s) -> data acqusition schema(s) -> data acquisition schema attributes)
+    public static List<DataAcquisitionSchemaAttribute> findByStudy(String studyUri){
+		System.out.println("Looking for data acquisition schema attributes from study " + studyUri);
+		if (studyUri.startsWith("http")) {
+			studyUri = "<" + studyUri + ">";
+		}
+        List<DataAcquisitionSchemaAttribute> attributes = new ArrayList<DataAcquisitionSchemaAttribute>();
+		String queryString = NameSpaces.getInstance().printSparqlNameSpaceList() + 
+				"SELECT ?uri ?hasEntity ?schemaUri ?attrUri" + 
+				" ?hasUnit ?hasDASO ?hasDASE ?hasSource ?isPIConfirmed WHERE { " + 
+				"    ?da hasco:isDataAcquisitionOf " + studyUri + " .  " +
+                "    ?da hasco:hasSchema ?schemaUri .  "+
+				"    ?uri hasco:partOfSchema ?schemaUri .  " +
+				"    ?uri a hasco:DASchemaAttribute . " + 
+                "    ?uri hasco:hasAttribute ?attrUri . " +
+				"} ";
+        System.out.println("[DASA] query string = \n" + queryString);
+		Query query = QueryFactory.create(queryString);
+
+        QueryExecution qexec = QueryExecutionFactory.sparqlService(
+				CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), query);
+		ResultSet results = qexec.execSelect();
+		ResultSetRewindable resultsrw = ResultSetFactory.copyResults(results);
+		qexec.close();
+
+		if (!resultsrw.hasNext()) {
+			System.out.println("[WARNING] DataAcquisitionSchemaAttribute. Could not find DASA's with attribute: " + studyUri);
+			return attributes;
+		}
+
+        String uriStr = "";
+
+		while (resultsrw.hasNext()) {
+			QuerySolution soln = resultsrw.next();
+			if (soln != null) {
+
+				try {
+					if (soln.getResource("uri") != null && soln.getResource("uri").getURI() != null) {
+						uriStr = soln.getResource("uri").getURI();
+						DataAcquisitionSchemaAttribute attr = find(uriStr);
+						attributes.add(attr);
+					}
+				} catch (Exception e1) {
+					System.out.println("[ERROR] DataAcquisitionSchemaAttribute. URI: " + uriStr);
+				}
+			}
+		}
+		attributes.sort(Comparator.comparing(DataAcquisitionSchemaAttribute::getPositionInt));
+		
+		return attributes;
+    }
+
+	public static List<DataAcquisitionSchemaAttribute> findBySchema(String schemaUri) {
+		System.out.println("Looking for data acquisition schema attributes for <" + schemaUri + ">");
+		
+		List<DataAcquisitionSchemaAttribute> attributes = new ArrayList<DataAcquisitionSchemaAttribute>();
+		String queryString = NameSpaces.getInstance().printSparqlNameSpaceList() + 
+				"SELECT ?uri ?hasEntity ?hasAttribute " + 
+				" ?hasUnit ?hasDASO ?hasDASE ?hasSource ?isPIConfirmed WHERE { \n" + 
+				" ?uri a hasco:DASchemaAttribute . \n" + 
+				" ?uri hasco:partOfSchema <" + schemaUri + "> . \n" + 
+				"} ";
+		Query query = QueryFactory.create(queryString);
+
+		QueryExecution qexec = QueryExecutionFactory.sparqlService(
+				CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), query);
+		ResultSet results = qexec.execSelect();
+		ResultSetRewindable resultsrw = ResultSetFactory.copyResults(results);
+		qexec.close();
+
+		if (!resultsrw.hasNext()) {
+			System.out.println("[WARNING] DataAcquisitionSchemaAttribute. Could not find attributes for schema: <" + schemaUri + ">");
+			return attributes;
+		}
+		
+		while (resultsrw.hasNext()) {
+			QuerySolution soln = resultsrw.next();
+			try {
+				if (soln.getResource("uri") != null && soln.getResource("uri").getURI() != null) {
+					String uri = soln.getResource("uri").getURI();
+					DataAcquisitionSchemaAttribute attr = find(uri);
+					attributes.add(attr);
+				}
+			} catch (Exception e1) {
+				System.out.println("[ERROR] DataAcquisitionSchemaAttribute.findBySchema() URI: <" + schemaUri + ">");
+				e1.printStackTrace();
+			}
+		}
+		attributes.sort(Comparator.comparing(DataAcquisitionSchemaAttribute::getPositionInt));
+		
 		return attributes;
 	}
-
-	public void save() {
-		delete();  // delete any existing triple for the current DASA
-		//System.out.println("Saving <" + uri + ">");
-		if (uri == null || uri.equals("")) {
-			System.out.println("[ERROR] Trying to save DASA without assigning an URI");
-			return;
-		}
-		if (partOfSchema == null || partOfSchema.equals("")) {
-			System.out.println("[ERROR] Trying to save DASA without assigning DAS's URI");
-			return;
-		}
-		String insert = "";
-
-		insert += NameSpaces.getInstance().printSparqlNameSpaceList();
-		insert += INSERT_LINE1;
-		insert += this.getUri() + " a hasco:DASchemaAttribute . ";
-		insert += this.getUri() + " rdfs:label  \"" + label + "\" . ";
-		if (partOfSchema.startsWith("http")) {
-			insert += this.getUri() + " hasco:partOfSchema <" + partOfSchema + "> .  "; 
-		} else {
-			insert += this.getUri() + " hasco:partOfSchema " + partOfSchema + " .  "; 
-		} 
-		if (!entity.equals("")) {
-			insert += this.getUri() + " hasco:hasEntity "  + entity + " .  ";
-		}   
-		if (!attribute.equals("")) {
-			insert += this.getUri() + " hasco:hasAttribute " + attribute + " .  ";
-		}
-		if (!unit.equals("")) {
-			insert += this.getUri() + " hasco:hasUnit " + unit + " .  ";
-		}
-		if (daseUri != null && !daseUri.equals("")) {
-			if (daseUri.startsWith("http")) {
-				insert += this.getUri() + " hasco:hasEvent <" + daseUri + "> .  ";
-			} else {
-				insert += this.getUri() + " hasco:hasEvent " + daseUri + " .  ";
-			}
-		}
-		if (dasoUri != null && !dasoUri.equals("")) {
-			if (dasoUri.startsWith("http")) {
-				insert += this.getUri() + " hasco:isAttributeOf <" + dasoUri + "> .  ";
-			} else {
-				insert += this.getUri() + " hasco:isAttributeOf " + dasoUri + " .  ";
-			}
-		} 
-		//insert += this.getUri() + " hasco:hasSource " + " .  "; 
-		//insert += this.getUri() + " hasco:isPIConfirmed " + " .  "; 
-		insert += LINE_LAST;
-		System.out.println("DASA insert query (pojo's save): <" + insert + ">");
-		UpdateRequest request = UpdateFactory.create(insert);
-		UpdateProcessor processor = UpdateExecutionFactory.createRemote(
-				request, Collections.getCollectionsName(Collections.METADATA_UPDATE));
-		processor.execute();
-	}
+	
+	@Override
+    public void save() {
+        saveToTripleStore();
+    }
 
 	@Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
 	public int saveToLabKey(String user_name, String password) {
-		String site = ConfigProp.getPropertyValue("labkey.config", "site");
-		String path = "/" + ConfigProp.getPropertyValue("labkey.config", "folder");
-		LabkeyDataHandler loader = new LabkeyDataHandler(site, user_name, password, path);
+		LabkeyDataHandler loader = LabkeyDataHandler.createDefault(user_name, password);
 		List< Map<String, Object> > rows = new ArrayList< Map<String, Object> >();
 		Map<String, Object> row = new HashMap<String, Object>();
 		row.put("hasURI", URIUtils.replaceNameSpaceEx(getUri()));
@@ -694,34 +725,109 @@ public class DataAcquisitionSchemaAttribute {
 	}
 
 	@Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
-	public int deleteFromLabKey(String user_name, String password) throws CommandException {
-		String site = ConfigProp.getPropertyValue("labkey.config", "site");
-		String path = "/" + ConfigProp.getPropertyValue("labkey.config", "folder");
-		LabkeyDataHandler loader = new LabkeyDataHandler(site, user_name, password, path);
+	@Override
+	public int deleteFromLabKey(String user_name, String password) {
+		LabkeyDataHandler loader = LabkeyDataHandler.createDefault(user_name, password);
 		List< Map<String, Object> > rows = new ArrayList< Map<String, Object> >();
 		Map<String, Object> row = new HashMap<String, Object>();
 		row.put("hasURI", URIUtils.replaceNameSpaceEx(getUri().replace("<","").replace(">","")));
 		rows.add(row);
-		return loader.deleteRows("DASchemaAttribute", rows);
+		
+		try {
+            return loader.deleteRows("DASchemaAttribute", rows);
+        } catch (CommandException e) {
+            System.out.println("[ERROR] Could not delete DASA(s)");
+            e.printStackTrace();
+            return 0;
+        }
 	}
 
-	public void delete() {
-		String query = "";
-		if (this.getUri() == null || this.getUri().equals("")) {
-			return;
-		}
-		query += NameSpaces.getInstance().printSparqlNameSpaceList();
-		query += DELETE_LINE1;
-		if (this.getUri().startsWith("http")) {
-			query += "<" + this.getUri() + ">";
-		} else {
-			query += this.getUri();
-		}
-		query += DELETE_LINE3;
-		query += LINE_LAST;
+    @Override
+    public boolean saveToTripleStore() {
+        deleteFromTripleStore();
+        
+        if (uri == null || uri.equals("")) {
+            System.out.println("[ERROR] Trying to save DASA without assigning an URI");
+            return false;
+        }
+        if (partOfSchema == null || partOfSchema.equals("")) {
+            System.out.println("[ERROR] Trying to save DASA without assigning DAS's URI");
+            return false;
+        }
+        
+        String insert = "";
+        insert += NameSpaces.getInstance().printSparqlNameSpaceList();
+        insert += INSERT_LINE1;
+        insert += this.getUri() + " a hasco:DASchemaAttribute . ";
+        insert += this.getUri() + " rdfs:label  \"" + label + "\" . ";
+        if (partOfSchema.startsWith("http")) {
+            insert += this.getUri() + " hasco:partOfSchema <" + partOfSchema + "> .  "; 
+        } else {
+            insert += this.getUri() + " hasco:partOfSchema " + partOfSchema + " .  "; 
+        } 
+        if (!entity.equals("")) {
+            insert += this.getUri() + " hasco:hasEntity "  + entity + " .  ";
+        }   
+        if (!attribute.equals("")) {
+            insert += this.getUri() + " hasco:hasAttribute " + attribute + " .  ";
+        }
+        if (!unit.equals("")) {
+            insert += this.getUri() + " hasco:hasUnit " + unit + " .  ";
+        }
+        if (daseUri != null && !daseUri.equals("")) {
+            if (daseUri.startsWith("http")) {
+                insert += this.getUri() + " hasco:hasEvent <" + daseUri + "> .  ";
+            } else {
+                insert += this.getUri() + " hasco:hasEvent " + daseUri + " .  ";
+            }
+        }
+        if (dasoUri != null && !dasoUri.equals("")) {
+            if (dasoUri.startsWith("http")) {
+                insert += this.getUri() + " hasco:isAttributeOf <" + dasoUri + "> .  ";
+            } else {
+                insert += this.getUri() + " hasco:isAttributeOf " + dasoUri + " .  ";
+            }
+        }
+        
+        insert += LINE_LAST;
+        System.out.println("DASA insert query (pojo's save): <" + insert + ">");
+        UpdateRequest request = UpdateFactory.create(insert);
+        UpdateProcessor processor = UpdateExecutionFactory.createRemote(
+                request, CollectionUtil.getCollectionsName(CollectionUtil.METADATA_UPDATE));
+        processor.execute();
+        
+        return true;
+    }
 
-		UpdateRequest request = UpdateFactory.create(query);
-		UpdateProcessor processor = UpdateExecutionFactory.createRemote(request, Collections.getCollectionsName(Collections.METADATA_UPDATE));
-		processor.execute();
-	}
+    @Override
+    public void deleteFromTripleStore() {
+        String query = "";
+        if (this.getUri() == null || this.getUri().equals("")) {
+            return;
+        }
+        query += NameSpaces.getInstance().printSparqlNameSpaceList();
+        query += DELETE_LINE1;
+        if (this.getUri().startsWith("http")) {
+            query += "<" + this.getUri() + ">";
+        } else {
+            query += this.getUri();
+        }
+        query += DELETE_LINE3;
+        query += LINE_LAST;
+
+        UpdateRequest request = UpdateFactory.create(query);
+        UpdateProcessor processor = UpdateExecutionFactory.createRemote(
+                request, CollectionUtil.getCollectionsName(CollectionUtil.METADATA_UPDATE));
+        processor.execute();
+    }
+
+    @Override
+    public boolean saveToSolr() {
+        return false;
+    }
+
+    @Override
+    public int deleteFromSolr() {
+        return 0;
+    }
 }

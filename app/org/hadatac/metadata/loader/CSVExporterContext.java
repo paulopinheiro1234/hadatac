@@ -16,7 +16,7 @@ import org.apache.jena.query.ResultSetRewindable;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.Statement;
 import org.apache.jena.rdf.model.StmtIterator;
-import org.hadatac.utils.Collections;
+import org.hadatac.utils.CollectionUtil;
 import org.hadatac.utils.NameSpaces;
 
 public class CSVExporterContext{
@@ -109,7 +109,7 @@ public class CSVExporterContext{
 	}
 	
 	public ResultSetRewindable getSelectQueryResult(String query){
-		String service = kbURL + Collections.METADATA_SPARQL;
+		String service = kbURL + CollectionUtil.METADATA_SPARQL;
 		QueryExecution qe = QueryExecutionFactory.sparqlService(service, query);
 		ResultSet results = qe.execSelect();
 		ResultSetRewindable resultsrw = ResultSetFactory.copyResults(results);
@@ -118,7 +118,7 @@ public class CSVExporterContext{
 	}
 	
 	public void getDescribeQueryResult(String query, Set<String> properties){
-		String service = kbURL + Collections.METADATA_SPARQL;
+		String service = kbURL + CollectionUtil.METADATA_SPARQL;
 		QueryExecution qe = QueryExecutionFactory.sparqlService(service, query);
 		
 		Model model = qe.execDescribe();

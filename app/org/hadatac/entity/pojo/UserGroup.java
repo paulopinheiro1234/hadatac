@@ -16,7 +16,7 @@ import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Statement;
 import org.apache.jena.rdf.model.StmtIterator;
 
-import org.hadatac.utils.Collections;
+import org.hadatac.utils.CollectionUtil;
 
 public class UserGroup extends User {
 	
@@ -32,7 +32,7 @@ public class UserGroup extends User {
 		RDFNode object;
 		
 		QueryExecution qexecPrivate = QueryExecutionFactory.sparqlService(
-				Collections.getCollectionsName(Collections.PERMISSIONS_SPARQL), query);
+				CollectionUtil.getCollectionsName(CollectionUtil.PERMISSIONS_SPARQL), query);
 		modelPrivate = qexecPrivate.execDescribe();
 		if (!modelPrivate.isEmpty()) {
 			user = new User();
@@ -80,7 +80,7 @@ public class UserGroup extends User {
 		    }
 		}
 		
-		QueryExecution qexecPublic = QueryExecutionFactory.sparqlService(Collections.getCollectionsName(Collections.METADATA_SPARQL), query);
+		QueryExecution qexecPublic = QueryExecutionFactory.sparqlService(CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), query);
 		modelPublic = qexecPublic.execDescribe();
 		if (!modelPublic.isEmpty()) {
 			user = new User();
@@ -113,7 +113,7 @@ public class UserGroup extends User {
 		Query query = QueryFactory.create(queryString);
 		
 		QueryExecution qexec = QueryExecutionFactory.sparqlService(
-				Collections.getCollectionsName(Collections.PERMISSIONS_SPARQL), query);
+				CollectionUtil.getCollectionsName(CollectionUtil.PERMISSIONS_SPARQL), query);
 		ResultSet results = qexec.execSelect();
 		ResultSetRewindable resultsrw = ResultSetFactory.copyResults(results);
 		qexec.close();
@@ -144,7 +144,7 @@ public class UserGroup extends User {
 		
 		Query query = QueryFactory.create(queryString);
 		
-		QueryExecution qexec = QueryExecutionFactory.sparqlService(Collections.getCollectionsName(Collections.PERMISSIONS_SPARQL), query);
+		QueryExecution qexec = QueryExecutionFactory.sparqlService(CollectionUtil.getCollectionsName(CollectionUtil.PERMISSIONS_SPARQL), query);
 		ResultSet results = qexec.execSelect();
 		ResultSetRewindable resultsrw = ResultSetFactory.copyResults(results);
 		qexec.close();

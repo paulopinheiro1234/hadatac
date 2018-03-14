@@ -35,7 +35,7 @@ import org.hadatac.console.models.SysUser;
 import org.hadatac.console.models.TripleDocument;
 import org.hadatac.entity.pojo.DataAcquisition;
 import org.hadatac.entity.pojo.Deployment;
-import org.hadatac.utils.Collections;
+import org.hadatac.utils.CollectionUtil;
 import org.hadatac.utils.NameSpaces;
 import org.hadatac.utils.State;
 import org.hadatac.entity.pojo.Measurement;
@@ -72,7 +72,7 @@ public class ViewSample extends Controller {
 		//Query basicQuery = QueryFactory.create(basicQueryString);
     	Query basicQuery = QueryFactory.create(sampleQueryString);
     	
-		QueryExecution qexec = QueryExecutionFactory.sparqlService(Collections.getCollectionsName(Collections.METADATA_SPARQL), basicQuery);
+		QueryExecution qexec = QueryExecutionFactory.sparqlService(CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), basicQuery);
 		ResultSet results = qexec.execSelect();
 		ResultSetRewindable resultsrw = ResultSetFactory.copyResults(results);
 		qexec.close();

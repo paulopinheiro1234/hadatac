@@ -1,25 +1,16 @@
 package org.hadatac.console.http;
 
 import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
-import java.util.TreeMap;
 
 import org.hadatac.console.models.SparqlQuery;
-import org.hadatac.utils.Collections;
+import org.hadatac.utils.CollectionUtil;
 import org.hadatac.utils.NameSpaces;
 import org.apache.jena.query.Query;
 import org.apache.jena.query.QueryExecution;
 import org.apache.jena.query.QueryExecutionFactory;
 import org.apache.jena.query.QueryFactory;
-import org.apache.jena.query.QuerySolution;
 import org.apache.jena.query.ResultSet;
-import org.apache.jena.query.ResultSetFactory;
-import org.apache.jena.query.ResultSetRewindable;
 import org.apache.jena.query.ResultSetFormatter;
-
-import play.Play;
 
 public class GetSparqlQuery {
     public String collection;
@@ -27,20 +18,20 @@ public class GetSparqlQuery {
     public GetSparqlQuery () {} 
 
     public GetSparqlQuery (SparqlQuery query) {
-    	this(Collections.METADATA_SPARQL, query);
+    	this(CollectionUtil.METADATA_SPARQL, query);
     }
     
     public GetSparqlQuery (String collectionSource, SparqlQuery query) {
-        this.collection = Collections.getCollectionsName(collectionSource);
+        this.collection = CollectionUtil.getCollectionsName(collectionSource);
         System.out.println("Collection: " + collection);
     }
 
     public GetSparqlQuery (SparqlQuery query, String tabName) {
-    	this(Collections.METADATA_SPARQL, query, tabName);
+    	this(CollectionUtil.METADATA_SPARQL, query, tabName);
     }
 
     public GetSparqlQuery (String collectionSource, SparqlQuery query, String tabName) {
-    	this.collection = Collections.getCollectionsName(collectionSource);
+    	this.collection = CollectionUtil.getCollectionsName(collectionSource);
         System.out.println("Collection: " + collection);
     }
     

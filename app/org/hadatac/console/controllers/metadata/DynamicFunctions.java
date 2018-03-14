@@ -1,18 +1,11 @@
 package org.hadatac.console.controllers.metadata;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.net.URLDecoder;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
-import play.Play;
 import play.mvc.Controller;
 import play.mvc.Result;
 import org.hadatac.utils.NameSpaces;
@@ -25,7 +18,6 @@ import org.apache.jena.query.QuerySolution;
 import org.apache.jena.query.ResultSet;
 import org.apache.jena.query.ResultSetFactory;
 import org.apache.jena.query.ResultSetRewindable;
-import org.apache.jena.rdf.model.Model;
 import org.apache.jena.sparql.engine.http.QueryExceptionHTTP;
 import org.hadatac.console.controllers.AuthApplication;
 import org.hadatac.console.controllers.metadataacquisition.ViewStudy;
@@ -35,7 +27,7 @@ import org.hadatac.console.views.html.metadataacquisition.*;
 import org.hadatac.data.loader.SampleGenerator;
 import org.hadatac.data.loader.SubjectGenerator;
 import org.hadatac.metadata.loader.*;
-import org.hadatac.utils.Collections;
+import org.hadatac.utils.CollectionUtil;
 import org.hadatac.utils.NameSpace;
 import org.json.simple.JSONObject;
 import org.labkey.remoteapi.query.*;
@@ -109,7 +101,7 @@ public class DynamicFunctions extends Controller {
 		Map<String, String> indicatorMap = new HashMap<String, String>();
 		try {
 			QueryExecution qexecInd = QueryExecutionFactory.sparqlService(
-					Collections.getCollectionsName(Collections.METADATA_SPARQL), indicatorQuery);
+					CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), indicatorQuery);
 			ResultSet indicatorResults = qexecInd.execSelect();
 			ResultSetRewindable resultsrwIndc = ResultSetFactory.copyResults(indicatorResults);
 			qexecInd.close();
@@ -146,7 +138,7 @@ public class DynamicFunctions extends Controller {
 					"?indicator rdfs:label ?label_ . " + 
 					"} GROUP BY ?indicator ?label";
 		    try {
-			    QueryExecution qexecIndvInd = QueryExecutionFactory.sparqlService(Collections.getCollectionsName(Collections.METADATA_SPARQL), indvIndicatorQuery);
+			    QueryExecution qexecIndvInd = QueryExecutionFactory.sparqlService(CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), indvIndicatorQuery);
 				ResultSet indvIndResults = qexecIndvInd.execSelect();
 				ResultSetRewindable resultsrwIndvInd = ResultSetFactory.copyResults(indvIndResults);
 				qexecIndvInd.close();
@@ -189,7 +181,7 @@ public class DynamicFunctions extends Controller {
 					+ " GROUP BY ?indicator ?label";
 		    try {
 			    QueryExecution qexecIndvInd = QueryExecutionFactory.sparqlService(
-			    		Collections.getCollectionsName(Collections.METADATA_SPARQL), indvIndicatorQuery);
+			    		CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), indvIndicatorQuery);
 				ResultSet indvIndResults = qexecIndvInd.execSelect();
 				ResultSetRewindable resultsrwIndvInd = ResultSetFactory.copyResults(indvIndResults);
 				qexecIndvInd.close();
@@ -228,7 +220,7 @@ public class DynamicFunctions extends Controller {
 					"?indicator rdfs:label ?label_ . " + 
 					"} GROUP BY ?indicator ?label";
 		    try {
-			    QueryExecution qexecIndvInd = QueryExecutionFactory.sparqlService(Collections.getCollectionsName(Collections.METADATA_SPARQL), indvIndicatorQuery);
+			    QueryExecution qexecIndvInd = QueryExecutionFactory.sparqlService(CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), indvIndicatorQuery);
 				ResultSet indvIndResults = qexecIndvInd.execSelect();
 				ResultSetRewindable resultsrwIndvInd = ResultSetFactory.copyResults(indvIndResults);
 				qexecIndvInd.close();
@@ -271,7 +263,7 @@ public class DynamicFunctions extends Controller {
 		
 		try {
 			Query studyQuery = QueryFactory.create(studyQueryString);
-			QueryExecution qexec = QueryExecutionFactory.sparqlService(Collections.getCollectionsName(Collections.METADATA_SPARQL), studyQuery);
+			QueryExecution qexec = QueryExecutionFactory.sparqlService(CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), studyQuery);
 			ResultSet results = qexec.execSelect();
 			ResultSetRewindable resultsrw = ResultSetFactory.copyResults(results);
 			qexec.close();
@@ -317,7 +309,7 @@ public class DynamicFunctions extends Controller {
 		"                             }" ;
 		try {
 			Query studyQuery = QueryFactory.create(studyQueryString);
-			QueryExecution qexec = QueryExecutionFactory.sparqlService(Collections.getCollectionsName(Collections.METADATA_SPARQL), studyQuery);
+			QueryExecution qexec = QueryExecutionFactory.sparqlService(CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), studyQuery);
 			ResultSet results = qexec.execSelect();
 			ResultSetRewindable resultsrw = ResultSetFactory.copyResults(results);
 			qexec.close();
@@ -361,7 +353,7 @@ public class DynamicFunctions extends Controller {
     	    	"			                             }";
     	try {
 			Query basicQuery = QueryFactory.create(subjectQueryString);
-			QueryExecution qexec = QueryExecutionFactory.sparqlService(Collections.getCollectionsName(Collections.METADATA_SPARQL), basicQuery);
+			QueryExecution qexec = QueryExecutionFactory.sparqlService(CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), basicQuery);
 			ResultSet results = qexec.execSelect();
 			ResultSetRewindable resultsrw = ResultSetFactory.copyResults(results);
 			qexec.close();
@@ -405,7 +397,7 @@ public class DynamicFunctions extends Controller {
     	    	"			                             }";
 	    try {
 	    	Query basicQuery = QueryFactory.create(subjectQueryString);
-			QueryExecution qexec = QueryExecutionFactory.sparqlService(Collections.getCollectionsName(Collections.METADATA_SPARQL), basicQuery);
+			QueryExecution qexec = QueryExecutionFactory.sparqlService(CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), basicQuery);
 			ResultSet results = qexec.execSelect();
 			ResultSetRewindable resultsrw = ResultSetFactory.copyResults(results);
 			qexec.close();			
@@ -422,8 +414,8 @@ public class DynamicFunctions extends Controller {
 					values.put("Cohort", soln.get("cohortLabel").toString());
 				if (soln.contains("studyLabel"))
 					values.put("Study", replaceURLWithPrefix(soln.get("studyLabel").toString()));
+				
 				subjectResult.put(replaceURLWithPrefix(soln.get("subjectUri").toString()),values);
-	//			System.out.println("Samples: " + sampleResult);	
 			}
 		} catch (QueryExceptionHTTP e) {
 			e.printStackTrace();
@@ -431,244 +423,11 @@ public class DynamicFunctions extends Controller {
 		return subjectResult;
 	}
 	
-	
-	public static Map<String, Map<String,String>> findSample(String sample_uri) {
-		Map<String, Map<String,String>> sampleResult = new HashMap<String, Map<String,String>>();
-		Map<String,String> values = new HashMap<String, String>();
-		String sampleQueryString = "";		
-    	sampleQueryString = getPrefixes() +
-    	"SELECT ?sampleUri ?subjectUri ?subjectLabel ?sampleType ?sampleLabel ?freezeThaw ?storageTemp ?storageTempUnit ?cohortLabel ?object ?samplingVolume ?samplingVolumeUnit ?comment" +
-    	"WHERE {        ?subjectUri hasco:isSubjectOf* ?cohort ." +
-    	"       		?sampleUri hasco:isSampleOf ?subjectUri ." +
-    	"				?sampleUri rdfs:comment ?comment . " +
-    	"				OPTIONAL { ?sampleUri hasco:isObjectOf ?object . " +
-    	"				?sampleUri hasco:hasSamplingVolume ?samplingVolume . " +
-    	"				?sampleUri hasco:hasSamplingVolumeUnit ?samplingVolumeUnit . " +
-    	"				?sampleUri hasco:hasStorageTemperature ?storageTemp . " +
-    	"				?sampleUri hasco:hasStorageTemperatureUnit ?storageTempUnit . " +
-    	"				?sampleUri hasco:hasNumFreezeThaw ?freezeThaw } . " +
-    	"				?sampleUri rdfs:comment ?comment . " +
-    	"				?cohort rdfs:label ?cohortLabel . " +
-    	"       		OPTIONAL { ?subjectUri rdfs:label ?subjectLabel } .  " + 
-    	"       		OPTIONAL { ?sampleUri rdfs:label ?sampleLabel } .  " + 
-    	"       		OPTIONAL { ?sampleUri a ?sampleType  } .  " +
-        "      FILTER (?sampleUri = " + sample_uri + " ) .  " +
-	    "                            }";
-    	try {
-	    	Query basicQuery = QueryFactory.create(sampleQueryString);
-			QueryExecution qexec = QueryExecutionFactory.sparqlService(Collections.getCollectionsName(Collections.METADATA_SPARQL), basicQuery);
-			ResultSet results = qexec.execSelect();
-			ResultSetRewindable resultsrw = ResultSetFactory.copyResults(results);
-			qexec.close();
-			
-			//?freezeThaw ?storageTemp ?storageTempUnit ?cohortLabel ?object ?samplingVolume ?samplingVolumeUnit
-			while (resultsrw.hasNext()) {
-				QuerySolution soln = resultsrw.next();
-				values = new HashMap<String, String>();
-				if (soln.contains("sampleLabel"))
-					values.put("Label", soln.get("sampleLabel").toString());
-				if (soln.contains("sampleType"))
-					values.put("Type", replaceURLWithPrefix(soln.get("sampleType").toString()));
-				if (soln.contains("subjectLabel"))
-					values.put("Subject", soln.get("subjectLabel").toString());
-				if (soln.contains("subjectUri"))
-					values.put("SubjectURI", replaceURLWithPrefix(soln.get("subjectUri").toString()));
-				if (soln.contains("comment"))
-					values.put("Comment", soln.get("comment").toString());
-				if (soln.contains("cohortLabel"))
-					values.put("Cohort", soln.get("cohortLabel").toString());
-				if (soln.contains("freezeThaw"))
-					values.put("FreezeThaw", soln.get("freezeThaw").toString());
-				if (soln.contains("storageTemp"))
-					values.put("StorageTemp", replaceURLWithPrefix(soln.get("storageTemp").toString()));
-				if (soln.contains("storageTempUnit"))
-					values.put("StorageTempUnit", replaceURLWithPrefix(soln.get("storageTempUnit").toString()));
-				if (soln.contains("object"))
-					values.put("MeasuredObject", replaceURLWithPrefix(soln.get("object").toString()));
-				if (soln.contains("samplingVolume"))
-					values.put("Volume", replaceURLWithPrefix(soln.get("samplingVolume").toString()));
-				if (soln.contains("samplingVolumeUnit"))
-					values.put("VolumeUnit", replaceURLWithPrefix(soln.get("samplingVolumeUnit").toString()));
-				sampleResult.put(replaceURLWithPrefix(soln.get("sampleUri").toString()),values);	
-	//			System.out.println("Samples: " + sampleResult);	
-			}
-    	} catch (QueryExceptionHTTP e) {
-			e.printStackTrace();
-		}
-		return sampleResult;
-	}
-	public static Map<String, Map<String,String>> findSampleBySubject(String subject_uri) {
-		Map<String, Map<String,String>> sampleResult = new HashMap<String, Map<String,String>>();
-		Map<String,String> values = new HashMap<String, String>();
-		String sampleQueryString = "";		
-    	sampleQueryString = getPrefixes() +
-    	"SELECT ?sampleUri ?subjectUri ?subjectLabel ?sampleType ?sampleLabel ?freezeThaw ?storageTemp ?storageTempUnit ?cohortLabel ?object ?samplingVolume ?samplingVolumeUnit ?comment" +
-    	"WHERE {        ?subjectUri hasco:isSubjectOf* ?cohort ." +
-    	"       		?sampleUri hasco:isSampleOf ?subjectUri ." +
-    	"				?sampleUri rdfs:comment ?comment . " +
-    	"				OPTIONAL { ?sampleUri hasco:isObjectOf ?object . " +
-    	"				?sampleUri hasco:hasSamplingVolume ?samplingVolume . " +
-    	"				?sampleUri hasco:hasSamplingVolumeUnit ?samplingVolumeUnit . " +
-    	"				?sampleUri hasco:hasStorageTemperature ?storageTemp . " +
-    	"				?sampleUri hasco:hasStorageTemperatureUnit ?storageTempUnit . " +
-    	"				?sampleUri hasco:hasNumFreezeThaw ?freezeThaw } . " +
-    	"				?sampleUri rdfs:comment ?comment . " +
-    	"				?cohort rdfs:label ?cohortLabel . " +
-    	"       		OPTIONAL { ?subjectUri rdfs:label ?subjectLabel } .  " + 
-    	"       		OPTIONAL { ?sampleUri rdfs:label ?sampleLabel } .  " + 
-    	"       		OPTIONAL { ?sampleUri a ?sampleType  } .  " +
-        "      FILTER (?subjectUri = " + subject_uri + " ) .  " +
-	    "                            }";
-    	try {
-	    	Query basicQuery = QueryFactory.create(sampleQueryString);
-			QueryExecution qexec = QueryExecutionFactory.sparqlService(Collections.getCollectionsName(Collections.METADATA_SPARQL), basicQuery);
-			ResultSet results = qexec.execSelect();
-			ResultSetRewindable resultsrw = ResultSetFactory.copyResults(results);
-			qexec.close();
-			
-			//?freezeThaw ?storageTemp ?storageTempUnit ?cohortLabel ?object ?samplingVolume ?samplingVolumeUnit
-			while (resultsrw.hasNext()) {
-				QuerySolution soln = resultsrw.next();
-				values = new HashMap<String, String>();
-				if (soln.contains("sampleLabel"))
-					values.put("Label", soln.get("sampleLabel").toString());
-				if (soln.contains("sampleType"))
-					values.put("Type", replaceURLWithPrefix(soln.get("sampleType").toString()));
-				if (soln.contains("subjectLabel"))
-					values.put("Subject", soln.get("subjectLabel").toString());
-				if (soln.contains("subjectUri"))
-					values.put("SubjectURI", replaceURLWithPrefix(soln.get("subjectUri").toString()));
-				if (soln.contains("comment"))
-					values.put("Comment", soln.get("comment").toString());
-				if (soln.contains("cohortLabel"))
-					values.put("Cohort", soln.get("cohortLabel").toString());
-				if (soln.contains("freezeThaw"))
-					values.put("FreezeThaw", soln.get("freezeThaw").toString());
-				if (soln.contains("storageTemp"))
-					values.put("StorageTemp", replaceURLWithPrefix(soln.get("storageTemp").toString()));
-				if (soln.contains("storageTempUnit"))
-					values.put("StorageTempUnit", replaceURLWithPrefix(soln.get("storageTempUnit").toString()));
-				if (soln.contains("object"))
-					values.put("MeasuredObject", replaceURLWithPrefix(soln.get("object").toString()));
-				if (soln.contains("samplingVolume"))
-					values.put("Volume", replaceURLWithPrefix(soln.get("samplingVolume").toString()));
-				if (soln.contains("samplingVolumeUnit"))
-					values.put("VolumeUnit", replaceURLWithPrefix(soln.get("samplingVolumeUnit").toString()));
-				sampleResult.put(replaceURLWithPrefix(soln.get("sampleUri").toString()),values);	
-	//			System.out.println("Samples: " + sampleResult);	
-			}
-    	} catch (QueryExceptionHTTP e) {
-			e.printStackTrace();
-		}
-		return sampleResult;
-	}
-
-	public static Map<String, Map<String,String>> findSamples() {
-		Map<String, Map<String,String>> sampleResult = new HashMap<String, Map<String,String>>();
-		Map<String,String> values = new HashMap<String, String>();
-		String sampleQueryString = "";		
-    	sampleQueryString = getPrefixes() +
-    			"SELECT ?sampleUri ?subjectUri ?subjectLabel ?sampleType ?sampleLabel ?freezeThaw ?storageTemp ?storageTempUnit ?cohortLabel ?object ?samplingVolume ?samplingVolumeUnit ?comment" +
-    			"WHERE {        ?subjectUri hasco:isSubjectOf* ?cohort ." +
-    			"       		?sampleUri hasco:isSampleOf ?subjectUri ." +
-    			"				?sampleUri rdfs:comment ?comment . " +
-    			"				OPTIONAL { ?sampleUri hasco:isObjectOf ?object . " +
-    			"				?sampleUri hasco:hasSamplingVolume ?samplingVolume . " +
-    			"				?sampleUri hasco:hasSamplingVolumeUnit ?samplingVolumeUnit . " +
-    			"				?sampleUri hasco:hasStorageTemperature ?storageTemp . " +
-    			"				?sampleUri hasco:hasStorageTemperatureUnit ?storageTempUnit . " +
-    			"				?sampleUri hasco:hasNumFreezeThaw ?freezeThaw } . " +
-    			"				?sampleUri rdfs:comment ?comment . " +
-    			"				?cohort rdfs:label ?cohortLabel . " +
-    			"       		OPTIONAL { ?subjectUri rdfs:label ?subjectLabel } .  " + 
-    			"       		OPTIONAL { ?sampleUri rdfs:label ?sampleLabel } .  " + 
-    			"       		OPTIONAL { ?sampleUri a ?sampleType  } .  " +
-    			"                            }";
-    	try {
-    		Query basicQuery = QueryFactory.create(sampleQueryString);
-			QueryExecution qexec = QueryExecutionFactory.sparqlService(Collections.getCollectionsName(Collections.METADATA_SPARQL), basicQuery);
-			ResultSet results = qexec.execSelect();
-			ResultSetRewindable resultsrw = ResultSetFactory.copyResults(results);
-			qexec.close();
-			
-			while (resultsrw.hasNext()) {
-				QuerySolution soln = resultsrw.next();
-				values = new HashMap<String, String>();
-				if (soln.contains("sampleLabel"))
-					values.put("Label", soln.get("sampleLabel").toString());
-				if (soln.contains("sampleType"))
-					values.put("Type", replaceURLWithPrefix(soln.get("sampleType").toString()));
-				if (soln.contains("subjectLabel"))
-					values.put("Subject", soln.get("subjectLabel").toString());
-				if (soln.contains("subjectUri"))
-					values.put("SubjectURI", replaceURLWithPrefix(soln.get("subjectUri").toString()));
-				if (soln.contains("comment"))
-					values.put("Comment", soln.get("comment").toString());
-				if (soln.contains("cohortLabel"))
-					values.put("Cohort", soln.get("cohortLabel").toString());
-				if (soln.contains("freezeThaw"))
-					values.put("FreezeThaw", soln.get("freezeThaw").toString());
-				if (soln.contains("storageTemp"))
-					values.put("StorageTemp", replaceURLWithPrefix(soln.get("storageTemp").toString()));
-				if (soln.contains("storageTempUnit"))
-					values.put("StorageTempUnit", replaceURLWithPrefix(soln.get("storageTempUnit").toString()));
-				if (soln.contains("object"))
-					values.put("MeasuredObject", replaceURLWithPrefix(soln.get("object").toString()));
-				if (soln.contains("samplingVolume"))
-					values.put("Volume", replaceURLWithPrefix(soln.get("samplingVolume").toString()));
-				if (soln.contains("samplingVolumeUnit"))
-					values.put("VolumeUnit", replaceURLWithPrefix(soln.get("samplingVolumeUnit").toString()));
-				sampleResult.put(replaceURLWithPrefix(soln.get("sampleUri").toString()),values);
-	//			System.out.println("Samples: " + sampleResult);	
-			}
-    	} catch (QueryExceptionHTTP e) {
-			e.printStackTrace();
-		}
-		return sampleResult;
-	}
-	
-	
-	// for /metadata HTTP GET requests
     public Result index() {
-    	Map<String,String> indicators = getIndicatorTypes();
-    	//System.out.println("Indicators: " + indicators + "\n");
-    	Map<String,List<String>> valueMap = getIndicatorValues(indicators);
-    	//System.out.println("Indicator Values: " + valueMap + "\n");
-    	Map<String,Map<String,String>> valueMapWithLabels = getIndicatorValuesAndLabels(indicators);
-    	//System.out.println("Indicator Values and Labels: " + valueMapWithLabels + "\n");
-    	Map<String,List<String>> valueMapJustLabels = getIndicatorValuesJustLabels(indicators);
-    	//System.out.println("Indicator Values Just Labels: " + valueMapJustLabels + "\n");
-    	//System.out.println(replaceURLWithPrefix("http://hadatac.org/ont/chear#BloodPlasma"));
-    	//System.out.println(findSubject("chear-kb:SBJ-0032-6"));
-    	
-    	//System.out.println(findStudy("chear-kb:STD-3"));
-    	//System.out.println("Studies: " + findStudies());
-    	
-    	//System.out.println(findSamples());
-    	//System.out.println(findSampleBySubject("chear-kb:SBJ-0032-6"));
-    	//System.out.println(findSample("chear-kb:SPL-0032-6-Urine-ICP-MS"));
-    	
-    	//System.out.println(findSubject("chear-kb:SBJ-0032-6"));
-    	//System.out.println(findSubjects());
-    	//System.out.println(replaceTabNameWithConcept("ReproductiveHealth"));
-    	//System.out.println(getPrefixes());
-    	
-    	/*SubjectGenerator sg = new SubjectGenerator(new File("/home/sabbir/Programs/java_code/pid.sys"));
-    	sg.createRows();
-    	System.out.println("Subject String: \n" + sg.toString());*/
-    	
-    	/*SampleGenerator smg = new SampleGenerator(new File("/home/sabbir/Programs/java_code/SID.sys"));
-    	smg.createRows();
-    	System.out.println("Sample String: \n" + smg.toString());*/
-    	
-        return ok(); 
-    }// /index()
+        return ok();
+    }
 
-    // for /metadata HTTP POST requests
     public Result postIndex() {
-        
-        return index();
-        
-    }// /postIndex()
-
+        return index();   
+    }
 }

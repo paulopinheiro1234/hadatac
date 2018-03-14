@@ -8,7 +8,7 @@ import org.apache.jena.query.QueryExecutionFactory;
 import org.apache.jena.query.QueryFactory;
 import org.apache.jena.query.ResultSet;
 import org.apache.jena.query.ResultSetFormatter;
-import org.hadatac.utils.Collections;
+import org.hadatac.utils.CollectionUtil;
 import org.hadatac.utils.NameSpaces;
 
 public class PermissionQueries {
@@ -57,7 +57,7 @@ public class PermissionQueries {
     		Query query = QueryFactory.create(queryString);
     			
     		QueryExecution qexec = QueryExecutionFactory.sparqlService(
-    				Collections.getCollectionsName(Collections.PERMISSIONS_SPARQL), query);
+    				CollectionUtil.getCollectionsName(CollectionUtil.PERMISSIONS_SPARQL), query);
     		ResultSet results = qexec.execSelect();
     		
     		ResultSetFormatter.outputAsJSON(outputStream, results);

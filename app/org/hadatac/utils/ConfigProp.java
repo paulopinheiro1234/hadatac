@@ -14,6 +14,8 @@ import com.typesafe.config.ConfigFactory;
 public class ConfigProp {
 	public static final String AUTOANNOTATOR_CONFIG_FILE = "autoccsv.config";
 	
+	public static final String LABKEY_CONFIG_FILE = "labkey.config";
+	
 	private static Properties getProperties(String confFileName) {
 		Properties prop = new Properties();
 		try {
@@ -72,4 +74,16 @@ public class ConfigProp {
 	public static String getPathDownload() {
 		return getPropertyValue(AUTOANNOTATOR_CONFIG_FILE, "path_download");
 	}
+	
+	public static String getDefaultOwnerEmail() {
+        return getPropertyValue(AUTOANNOTATOR_CONFIG_FILE, "default_owner_email");
+    }
+	
+	public static String getLabKeySite() {
+        return getPropertyValue(LABKEY_CONFIG_FILE, "site");
+    }
+	
+	public static String getLabKeyProjectPath() {
+        return "/" + getPropertyValue(LABKEY_CONFIG_FILE, "folder");
+    }
 }

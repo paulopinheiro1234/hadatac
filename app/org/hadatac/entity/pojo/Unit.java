@@ -17,7 +17,7 @@ import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Statement;
 import org.apache.jena.rdf.model.StmtIterator;
-import org.hadatac.utils.Collections;
+import org.hadatac.utils.CollectionUtil;
 import org.hadatac.utils.NameSpaces;
 
 import com.typesafe.config.ConfigFactory;
@@ -39,7 +39,7 @@ public class Unit extends HADatAcClass implements Comparable<Unit> {
 
 		Query query = QueryFactory.create(queryString);
 
-		QueryExecution qexec = QueryExecutionFactory.sparqlService(Collections.getCollectionsName(Collections.METADATA_SPARQL), query);
+		QueryExecution qexec = QueryExecutionFactory.sparqlService(CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), query);
 		ResultSet results = qexec.execSelect();
 		ResultSetRewindable resultsrw = ResultSetFactory.copyResults(results);
 		qexec.close();
@@ -74,7 +74,7 @@ public class Unit extends HADatAcClass implements Comparable<Unit> {
 		Query query = QueryFactory.create(queryString);
 		QueryExecution qexec = QueryExecutionFactory.sparqlService(
 				ConfigFactory.load().getString("hadatac.solr.triplestore") 
-				+ Collections.METADATA_SPARQL, query);
+				+ CollectionUtil.METADATA_SPARQL, query);
 		model = qexec.execDescribe();
 		StmtIterator stmtIterator = model.listStatements();
 		if (model.size() > 0) {
@@ -106,30 +106,4 @@ public class Unit extends HADatAcClass implements Comparable<Unit> {
 		}
 		return this.getLocalName().compareTo(another.getLocalName());
 	}
-
-	/*public static String getHierarchyJson() {
-	String collection = "";
-	String q = 
-	    "SELECT ?id ?superId ?label ?comment WHERE { " + 
-	    "   ?id rdfs:subClassOf* uo:0000000 . " + 
-	    "   ?id rdfs:subClassOf ?superId .  " + 
-	    "   OPTIONAL { ?id rdfs:label ?label . } " + 
-	    "   OPTIONAL { ?id rdfs:comment ?comment . } " +
-	    "}";
-    	ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-    	try {
-	    String queryString = NameSpaces.getInstance().printSparqlNameSpaceList() + q;
-	    Query query = QueryFactory.create(queryString);
-	    QueryExecution qexec = QueryExecutionFactory.sparqlService(Collections.getCollectionsName(Collections.METADATA_SPARQL), query);
-	    ResultSet results = qexec.execSelect();
-	    ResultSetFormatter.outputAsJSON(outputStream, results);
-	    qexec.close();
-
-	    return outputStream.toString("UTF-8");
-    	} catch (Exception e) {
-	    e.printStackTrace();
-	}
-    	return "";
-	} */
-
 }

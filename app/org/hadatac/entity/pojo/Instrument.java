@@ -20,7 +20,7 @@ import org.apache.jena.rdf.model.StmtIterator;
 import org.apache.jena.sparql.engine.http.QueryExceptionHTTP;
 import org.hadatac.console.models.Facet;
 import org.hadatac.console.models.FacetHandler;
-import org.hadatac.utils.Collections;
+import org.hadatac.utils.CollectionUtil;
 import org.hadatac.utils.NameSpaces;
 
 import com.typesafe.config.ConfigFactory;
@@ -76,7 +76,7 @@ public class Instrument extends HADatAcThing implements Comparable<Instrument> {
 		Map<HADatAcThing, List<HADatAcThing>> results = new HashMap<HADatAcThing, List<HADatAcThing>>();
 		try {
 			QueryExecution qe = QueryExecutionFactory.sparqlService(
-					Collections.getCollectionsName(Collections.METADATA_SPARQL), query);
+					CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), query);
 			ResultSet resultSet = qe.execSelect();
 			ResultSetRewindable resultsrw = ResultSetFactory.copyResults(resultSet);
 			qe.close();
@@ -121,7 +121,7 @@ public class Instrument extends HADatAcThing implements Comparable<Instrument> {
 		
 		Query query = QueryFactory.create(queryString);
 		
-		QueryExecution qexec = QueryExecutionFactory.sparqlService(Collections.getCollectionsName(Collections.METADATA_SPARQL), query);
+		QueryExecution qexec = QueryExecutionFactory.sparqlService(CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), query);
 		ResultSet results = qexec.execSelect();
 		ResultSetRewindable resultsrw = ResultSetFactory.copyResults(results);
 		qexec.close();
@@ -153,7 +153,7 @@ public class Instrument extends HADatAcThing implements Comparable<Instrument> {
 		
 		Query query = QueryFactory.create(queryString);
 		
-		QueryExecution qexec = QueryExecutionFactory.sparqlService(Collections.getCollectionsName(Collections.METADATA_SPARQL), query);
+		QueryExecution qexec = QueryExecutionFactory.sparqlService(CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), query);
 		ResultSet results = qexec.execSelect();
 		ResultSetRewindable resultsrw = ResultSetFactory.copyResults(results);
 		qexec.close();
@@ -183,7 +183,7 @@ public class Instrument extends HADatAcThing implements Comparable<Instrument> {
 		
 		Query query = QueryFactory.create(queryString);
 			
-		QueryExecution qexec = QueryExecutionFactory.sparqlService(Collections.getCollectionsName(Collections.METADATA_SPARQL), query);
+		QueryExecution qexec = QueryExecutionFactory.sparqlService(CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), query);
 		ResultSet results = qexec.execSelect();
 		ResultSetRewindable resultsrw = ResultSetFactory.copyResults(results);
 		qexec.close();
@@ -208,7 +208,7 @@ public class Instrument extends HADatAcThing implements Comparable<Instrument> {
 		Query query = QueryFactory.create(queryString);
 		QueryExecution qexec = QueryExecutionFactory.sparqlService(
 				ConfigFactory.load().getString("hadatac.solr.triplestore") + 
-				Collections.METADATA_SPARQL, query);
+				CollectionUtil.METADATA_SPARQL, query);
 		model = qexec.execDescribe();
 		
 		instrument = new Instrument();
@@ -266,5 +266,33 @@ public class Instrument extends HADatAcThing implements Comparable<Instrument> {
     public int compareTo(Instrument another) {
         return this.getLabel().compareTo(another.getLabel());
     }
-	
+    
+    @Override
+    public boolean saveToTripleStore() {
+        return false;
+    }
+    
+    @Override
+    public void deleteFromTripleStore() {
+    }
+    
+    @Override
+    public boolean saveToSolr() {
+        return false;
+    }
+    
+    @Override
+    public int deleteFromSolr() {
+        return 0;
+    }
+    
+    @Override
+    public int saveToLabKey(String userName, String password) {
+        return 0;
+    }
+    
+    @Override
+    public int deleteFromLabKey(String userName, String password) {
+        return 0;
+    }
 }

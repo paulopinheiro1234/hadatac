@@ -1,7 +1,5 @@
 package org.hadatac.entity.pojo;
 
-import org.apache.jena.query.DatasetAccessor;
-import org.apache.jena.query.DatasetAccessorFactory;
 import org.apache.jena.query.Query;
 import org.apache.jena.query.QueryExecution;
 import org.apache.jena.query.QueryExecutionFactory;
@@ -10,10 +8,7 @@ import org.apache.jena.query.QuerySolution;
 import org.apache.jena.query.ResultSet;
 import org.apache.jena.query.ResultSetFactory;
 import org.apache.jena.query.ResultSetRewindable;
-import org.apache.jena.rdf.model.Model;
-import org.apache.jena.rdf.model.ModelFactory;
-import org.hadatac.metadata.loader.URIUtils;
-import org.hadatac.utils.Collections;
+import org.hadatac.utils.CollectionUtil;
 import org.hadatac.utils.NameSpaces;
 
 
@@ -29,7 +24,7 @@ public class Subject extends StudyObject {
 		Query query = QueryFactory.create(queryString);
 
 		QueryExecution qexec = QueryExecutionFactory.sparqlService(
-				Collections.getCollectionsName(Collections.METADATA_SPARQL), query);
+				CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), query);
 		ResultSet results = qexec.execSelect();
 		ResultSetRewindable resultsrw = ResultSetFactory.copyResults(results);
 		qexec.close();
@@ -52,7 +47,7 @@ public class Subject extends StudyObject {
 		Query query = QueryFactory.create(queryString);
 
 		QueryExecution qexec = QueryExecutionFactory.sparqlService(
-				Collections.getCollectionsName(Collections.METADATA_SPARQL), query);
+				CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), query);
 		ResultSet results = qexec.execSelect();
 		ResultSetRewindable resultsrw = ResultSetFactory.copyResults(results);
 		qexec.close();
@@ -78,7 +73,7 @@ public class Subject extends StudyObject {
 
 		Query query = QueryFactory.create(queryString);
 		QueryExecution qexec = QueryExecutionFactory.sparqlService(
-				Collections.getCollectionsName(Collections.METADATA_SPARQL), query);
+				CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), query);
 		ResultSet results = qexec.execSelect();
 		ResultSetRewindable resultsrw = ResultSetFactory.copyResults(results);
 		qexec.close();
@@ -89,55 +84,6 @@ public class Subject extends StudyObject {
 		}
 
 		return null;
-	}
-
-	public static String checkObjectUri(String obj_uri, String attr_uri) {
-		attr_uri = URIUtils.replacePrefixEx(attr_uri);
-		System.out.println("attr_uri: " + attr_uri);
-		String objUri = obj_uri;
-		String queryString = NameSpaces.getInstance().printSparqlNameSpaceList()
-				+ " SELECT ?ar ?obj WHERE {"
-				+ "        ?ar rdf:type hasco:DASchemaAttribute . " 
-				+ "        ?ar hasco:hasAttribute <" + attr_uri + "> . "
-				+ "        ?ar hasco:isAttributeOf ?obj  ."
-				+ " }";
-
-		Query query = QueryFactory.create(queryString);
-		QueryExecution qexec = QueryExecutionFactory.sparqlService(
-				Collections.getCollectionsName(Collections.METADATA_SPARQL), query);
-		ResultSet results = qexec.execSelect();
-		ResultSetRewindable resultsrw = ResultSetFactory.copyResults(results);
-		qexec.close();
-
-		//System.out.println("resultsrw.size(): " + resultsrw.size());
-		if (resultsrw.size() > 0) {
-			QuerySolution soln = resultsrw.next();
-			if (null != soln.getResource("obj")) {
-				String attributeAssociation = soln.getResource("obj").toString();
-				System.out.println("attributeAssociation: " + attributeAssociation);
-				if (attributeAssociation.contains("chear-kb:DASO-mother")) {
-					String motherUri = obj_uri + "-mother";
-					System.out.println("motherUri: " + motherUri);
-
-					Model model = ModelFactory.createDefaultModel();
-					DatasetAccessor accessor = DatasetAccessorFactory.createHTTP(
-							Collections.getCollectionsName(Collections.METADATA_GRAPH));
-					model.add(model.createResource(motherUri), 
-							model.createProperty("rdf:type"),
-							model.createResource(URIUtils.replacePrefixEx("sio:Human")));
-
-					model.add(model.createResource(motherUri), 
-							model.createProperty(URIUtils.replacePrefixEx("chear:Mother")),
-							model.createResource(obj_uri));
-
-					accessor.add(model);
-					objUri = motherUri;
-					System.out.println("================================== Changed to: " + motherUri);
-				}
-			}
-		}
-
-		return objUri;
 	}
 }
 

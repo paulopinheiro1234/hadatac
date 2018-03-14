@@ -2,7 +2,7 @@ package org.hadatac.utils;
 
 import com.typesafe.config.ConfigFactory;
 
-public class Collections {
+public class CollectionUtil {
 
 	// data and auxiliary data 
 	public static final String DATA_COLLECTION             = "/sdc";

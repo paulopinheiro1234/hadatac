@@ -4,12 +4,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang3.NotImplementedException;
 import org.hadatac.console.models.Facet;
 import org.hadatac.console.models.FacetHandler;
 import org.hadatac.metadata.loader.URIUtils;
 
-public class HADatAcThing {
-
+public abstract class HADatAcThing {
 	String uri;
 	String typeUri;
 	String field;
@@ -103,6 +103,17 @@ public class HADatAcThing {
 
 	public void setComment(String comment) {
 		this.comment = comment;
-	}	
-
+	}
+	
+	public void save() { throw new NotImplementedException("Used unimplemented HADatAcThing.save() method"); }
+	public void delete() { throw new NotImplementedException("Used unimplemented HADatAcThing.delete() method"); }
+	
+	public abstract boolean saveToTripleStore();
+	public abstract void deleteFromTripleStore();
+	
+	public abstract boolean saveToSolr();
+	public abstract int deleteFromSolr();
+	
+	public abstract int saveToLabKey(String userName, String password);
+	public abstract int deleteFromLabKey(String userName, String password);
 }

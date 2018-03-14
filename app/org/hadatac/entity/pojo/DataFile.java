@@ -2,7 +2,11 @@ package org.hadatac.entity.pojo;
 
 import java.io.File;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Comparator;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 
@@ -18,7 +22,7 @@ import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
 
 import org.hadatac.metadata.loader.URIUtils;
-import org.hadatac.utils.Collections;
+import org.hadatac.utils.CollectionUtil;
 
 import com.typesafe.config.ConfigFactory;
 
@@ -120,7 +124,7 @@ public class DataFile {
 		try {
 			SolrClient client = new HttpSolrClient.Builder(
 					ConfigFactory.load().getString("hadatac.solr.data") 
-					+ Collections.CSV_DATASET).build();
+					+ CollectionUtil.CSV_DATASET).build();
 			
 			int status = client.addBean(this).getStatus();
 			client.commit();
@@ -136,7 +140,7 @@ public class DataFile {
 		try {
 			SolrClient solr = new HttpSolrClient.Builder(
 					ConfigFactory.load().getString("hadatac.solr.data") 
-					+ Collections.CSV_DATASET).build();
+					+ CollectionUtil.CSV_DATASET).build();
 			UpdateResponse response = solr.deleteById(this.getFileName());
 			solr.commit();
 			solr.close();
@@ -151,6 +155,20 @@ public class DataFile {
 		
 		return -1;
 	}
+	
+	public static void create(String fileName, String ownerEmail) {
+        DataFile dataFile = new DataFile(fileName);
+        dataFile.setOwnerEmail(ownerEmail);
+        dataFile.setStatus(DataFile.UNPROCESSED);
+        dataFile.setSubmissionTime(new SimpleDateFormat("yyyy/MM/dd HH:mm:ss").format(new Date()));
+        
+        if (fileName.startsWith("DA-")) {
+            String dataAcquisitionUri = DataAcquisition.getProperDataAcquisitionUri(fileName);
+            dataFile.setDataAcquisitionUri(dataAcquisitionUri == null ? "" : dataAcquisitionUri);
+        }
+        
+        dataFile.save();
+    }
 	
 	public static DataFile convertFromSolr(SolrDocument doc) {
 		DataFile object = new DataFile(doc.getFieldValue("file_name").toString());
@@ -171,7 +189,7 @@ public class DataFile {
 		
 		SolrClient solr = new HttpSolrClient.Builder(
 				ConfigFactory.load().getString("hadatac.solr.data") 
-				+ Collections.CSV_DATASET).build();
+				+ CollectionUtil.CSV_DATASET).build();
 
 		try {
 			QueryResponse response = solr.query(query);
@@ -181,6 +199,13 @@ public class DataFile {
 			while (i.hasNext()) {
 				list.add(convertFromSolr(i.next()));
 			}
+			
+			list.sort(new Comparator<DataFile>() {
+                @Override
+                public int compare(DataFile o1, DataFile o2) {
+                    return o1.getSubmissionTime().compareTo(o2.getSubmissionTime());
+                }
+            });
 		} catch (Exception e) {
 			list.clear();
 			System.out.println("[ERROR] DataFile.find(SolrQuery) - Exception message: " + e.getMessage());
@@ -231,6 +256,20 @@ public class DataFile {
 		return null;
 	}
 	
+	public static DataFile findByName(String fileName) {
+	    return findByName(null, fileName);
+    }
+	
+	public static boolean hasValidExtension(String fileName) {
+	    List<String> validExtensions = Arrays.asList(".csv", ".xlsx");
+	    for (String ext : validExtensions) {
+	        fileName.endsWith(ext);
+	        return true;
+	    }
+	    
+	    return false;
+	}
+	
 	public static boolean search(String fileName, List<DataFile> pool) {
 		for (DataFile file : pool) {
 			if (file.getFileName().equals(fileName)) {
@@ -248,7 +287,7 @@ public class DataFile {
 
 		File[] listOfFiles = folder.listFiles();
 		for (int i = 0; i < listOfFiles.length; i++) {
-			if (listOfFiles[i].isFile() && listOfFiles[i].getName().endsWith(".csv")) {
+			if (listOfFiles[i].isFile() && hasValidExtension(listOfFiles[i].getName())) {
 				if (!search(listOfFiles[i].getName(), ownedFiles)) {
 					DataFile newFile = new DataFile(listOfFiles[i].getName());
 					newFile.save();
@@ -257,6 +296,24 @@ public class DataFile {
 			}
 		}
 	}
+	
+	public static void includeUnrecognizedFiles(String path, String ownerEmail) {      
+        File folder = new File(path);
+        if (!folder.exists()){
+            folder.mkdirs();
+        }
+        
+        List<DataFile> unproc_files = DataFile.findAll(DataFile.UNPROCESSED);
+        
+        File[] listOfFiles = folder.listFiles();
+        for (int i = 0; i < listOfFiles.length; i++) {
+            if (listOfFiles[i].isFile() && hasValidExtension(listOfFiles[i].getName())) {
+                if (!search(listOfFiles[i].getName(), unproc_files)) {
+                    DataFile.create(listOfFiles[i].getName(), ownerEmail);
+                }
+            }
+        }
+    }
 
 	public static void filterNonexistedFiles(String path, List<DataFile> files) {
 		File folder = new File(path);

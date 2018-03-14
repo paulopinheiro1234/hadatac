@@ -15,12 +15,10 @@ import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Statement;
 import org.apache.jena.rdf.model.StmtIterator;
-import org.hadatac.utils.Collections;
+import org.hadatac.utils.CollectionUtil;
 import org.hadatac.utils.NameSpaces;
 
 import com.typesafe.config.ConfigFactory;
-
-import play.Play;
 
 public class Aggregate extends HADatAcClass implements Comparable<Aggregate> {
 
@@ -28,7 +26,6 @@ public class Aggregate extends HADatAcClass implements Comparable<Aggregate> {
 	
 	public Aggregate() {
 		super(className);
-		// TODO Auto-generated constructor stub
 	}
 	
 	public static List<Aggregate> find() {
@@ -40,7 +37,7 @@ public class Aggregate extends HADatAcClass implements Comparable<Aggregate> {
 		
 		Query query = QueryFactory.create(queryString);
 
-		QueryExecution qexec = QueryExecutionFactory.sparqlService(Collections.getCollectionsName(Collections.METADATA_SPARQL), query);
+		QueryExecution qexec = QueryExecutionFactory.sparqlService(CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), query);
 		ResultSet results = qexec.execSelect();
 		ResultSetRewindable resultsrw = ResultSetFactory.copyResults(results);
 		qexec.close();
@@ -65,7 +62,7 @@ public class Aggregate extends HADatAcClass implements Comparable<Aggregate> {
 		Query query = QueryFactory.create(queryString);
 		QueryExecution qexec = QueryExecutionFactory.sparqlService(
 				ConfigFactory.load().getString("hadatac.solr.triplestore") 
-				+ Collections.METADATA_SPARQL, query);
+				+ CollectionUtil.METADATA_SPARQL, query);
 		model = qexec.execDescribe();
 
 		aggregate = new Aggregate();
@@ -92,7 +89,6 @@ public class Aggregate extends HADatAcClass implements Comparable<Aggregate> {
 
 	@Override
 	public int compareTo(Aggregate o) {
-		// TODO Auto-generated method stub
 		return 0;
 	}
 

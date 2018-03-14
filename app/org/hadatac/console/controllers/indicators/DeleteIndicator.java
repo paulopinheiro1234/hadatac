@@ -8,7 +8,6 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Iterator;
 
-import play.Play;
 import play.data.Form;
 import play.mvc.Controller;
 import play.mvc.Result;
