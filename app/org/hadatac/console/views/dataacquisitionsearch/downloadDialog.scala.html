@@ -9,10 +9,11 @@
 	results : org.hadatac.data.model.AcquisitionQueryResult,
 	documentJson : String,
 	objDetails : String,
-	objFields : List[String]
+	objFields : List[String],
+	objOCs : List[org.hadatac.entity.pojo.ObjectCollection]
 )
 
-<div id="myModal" class="modal fade" role="dialog">
+<div id="myModalDownload" class="modal fade" role="dialog">
 	<div class="modal-dialog">
 		<div class="modal-content">
 			<div class="modal-header">
@@ -65,6 +66,14 @@
                     .appendTo(this);
                 return true;
             });
+            
+            $("#alignmentDialogForm").submit(function(eventObj) {
+                $('<input />').attr('type', 'hidden')
+                    .attr('name', "facets")
+                    .attr('value', getSelectedFacets())
+                    .appendTo(this);
+                return true;
+            });
             </script>
 			</div>
 			<div class="modal-footer">
@@ -74,4 +83,112 @@
 	</div>
 </div>
 
+<div id="myModalAlignment" class="modal fade" role="dialog">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal">&times;</button>
+				<h4 class="modal-title">Alignment</h4>
+			</div>
+			<div class="modal-body">
+				<form id="alignmentDialogForm" method="post" action="@org.hadatac.console.controllers.dataacquisitionsearch.routes.DataAcquisitionSearch.downloadAlignment()">
+					<label for="selType">Alignment criteria:</label>
+					<select class="form-control" name="selType" id="selType" onchange="criteriaChange()">
+						<option value="timestamp">Timestamp</option>
+						<option value="object">Object</option>
+					</select>
+					<label for="selOC">Object collection:</label>
+					<select class="form-control" name="selOC" id="selOC" disabled>
+						@for(oc <- objOCs) {
+							<option value="@oc.getUri()">@oc.getLabel()</option>
+						}
+					</select>
+					<label for="selAttribute">Attributes to align:</label>
+					<select multiple class="form-control" name="selAttribute" id="selAttribute" disabled>
+					</select>
+					<input class="btn btn-info" type="submit" id="submitAlignment" value="Confirm" disabled />
+				</form>
+				<script type="text/javascript">
+		            $("#alignmentDialogForm").submit(function(eventObj) {
+		                $('<input />').attr('type', 'hidden')
+		                    .attr('name', "facets")
+		                    .attr('value', getSelectedFacets())
+		                    .appendTo(this);
+		                return true;
+		            });
+	            </script>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+			</div>
+		</div>
+	</div>
+</div>
 
+<div id="myModal" class="modal fade" role="dialog">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal">&times;</button>
+				<h4 class="modal-title">Download</h4>
+			</div>
+			<div class="modal-body">
+				<button type="button" class="btn btn-default" data-toggle="modal" data-target="#myModalDownload" data-dismiss="modal">Download</button>
+				<button type="button" class="btn btn-default" data-toggle="modal" data-target="#myModalAlignment" data-dismiss="modal">Alignment</button>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+			</div>
+		</div>
+	</div>
+</div>
+
+<script type="text/javascript">
+	function checkform() {
+		var cansubmit = true;
+
+		if (cansubmit) {
+			document.getElementById('submitAlignment').disabled = false;
+		} else {
+			document.getElementById('submitAlignment').disabled = true;
+		}
+	}
+
+	function replaceAll(str, find, replace) {
+		while (str.indexOf(find) > -1) {
+			str = str.replace(find, replace);
+		}
+		return str;
+	}
+    
+	function criteriaChange() {
+		var selType = document.getElementById('selType');
+		var selOC = document.getElementById('selOC');
+		var selAttribute = document.getElementById('selAttribute');
+		var submitAlignment = document.getElementById('submitAlignment');
+		if (selType.options[selType.selectedIndex].value == 'timestamp') {
+			selOC.disabled = true;
+			selAttribute.disabled = true;
+			submitAlignment.disabled = true;
+		}
+		else {
+			selOC.disabled = false;
+			selAttribute.disabled = false;
+			submitAlignment.disabled = false;
+		}
+	}
+	
+	function ocChange() {
+		var selAttribute = document.getElementById('selAttribute');
+		removeOptions(selAttribute);
+	}
+    
+	function removeOptions(selectbox)
+	{
+		var i;
+		for(i = selectbox.options.length - 1 ; i >= 0 ; i--)
+		{
+			selectbox.remove(i);
+		}
+	}
+  </script>

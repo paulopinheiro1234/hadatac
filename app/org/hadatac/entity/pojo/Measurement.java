@@ -26,6 +26,7 @@ import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrRequest;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.impl.HttpSolrClient;
+import org.apache.solr.client.solrj.response.FacetField.Count;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.client.solrj.response.UpdateResponse;
 import org.apache.solr.client.solrj.beans.Field;
@@ -491,6 +492,197 @@ public class Measurement extends HADatAcThing {
         }
 
         return result;
+    }
+    
+    public static AcquisitionQueryResult findByObject(String user_uri, List<StudyObject> objects, String facets) {
+    	AcquisitionQueryResult result = new AcquisitionQueryResult();
+    	
+    	List<String> ownedDAs = DataAcquisition.findAllAccessibleDataAcquisition(user_uri);
+        if (ownedDAs.isEmpty()) {
+            /*
+             * an empty query happens when current user is not allowed to see any
+             * data acquisition
+             */
+            System.out.println("Not allowed to access any Data Acquisition!");
+            return result;
+        }
+        
+        FacetHandler facetHandler = new FacetHandler();
+        facetHandler.loadFacets(facets);
+
+        FacetHandler retFacetHandler = new FacetHandler();
+        retFacetHandler.loadFacets(facets);
+        
+        // System.out.println("\nfacetHandler before: " + facetHandler.toSolrQuery());
+
+        // Run one time
+        getAllFacetStats(facetHandler, retFacetHandler, result, false);
+
+        // Get facet statistics
+        getAllFacetStats(retFacetHandler, retFacetHandler, result, true);
+        //getAllFacetStats(facetHandler, retFacetHandler, result, true);
+
+        // Get documents
+        // System.out.println("\n\n\nfacetHandler after: " + retFacetHandler.bottommostFacetsToSolrQuery());
+        long docSize = 0;
+
+        String q = buildQuery(ownedDAs, retFacetHandler);
+        
+        Iterator<StudyObject> i = objects.iterator();
+        if (i.hasNext()) {
+        	q = "(" + q;
+        	q += ") AND (";
+        	while (i.hasNext()) {
+            	q += "(object_uri_str:\"" + i.next().getUri() + "\")";
+            	if (i.hasNext()) {
+            		q += " OR ";
+            	}
+            }
+        	q += ")";
+        }
+
+        SolrQuery query = new SolrQuery();
+        query.setQuery(q);
+        query.setRows(99999999);
+        query.setFacet(true);
+        query.setFacetLimit(-1);
+        query.setFacetMinCount(1);
+        query.addFacetField("characteristic_uri_str");
+
+        try {
+            SolrClient solr = new HttpSolrClient.Builder(
+                    ConfigFactory.load().getString("hadatac.solr.data") 
+                    + CollectionUtil.DATA_ACQUISITION).build();
+            QueryResponse queryResponse = solr.query(query, SolrRequest.METHOD.POST);
+            solr.close();
+            SolrDocumentList docs = queryResponse.getResults();
+            docSize = docs.getNumFound();
+            //System.out.println("Num of results: " + docSize);
+            
+            Set<String> uri_set = new HashSet<String>();
+            Iterator<SolrDocument> iterDoc = docs.iterator();
+            Map<String, DataAcquisition> cachedDA = new HashMap<String, DataAcquisition>();
+            Map<String, String> mapClassLabel = generateCodeClassLabel();
+            while (iterDoc.hasNext()) {
+                Measurement measurement = convertFromSolr(iterDoc.next(), cachedDA, mapClassLabel);
+                result.addDocument(measurement);
+                uri_set.add(measurement.getEntityUri());
+                uri_set.add(measurement.getCharacteristicUri());
+                uri_set.add(measurement.getUnitUri());
+            }
+            
+            // Populate result facet fields
+            Iterator<Count> j = queryResponse.getFacetField("characteristic_uri_str").getValues().iterator();
+            Map<String,Long> facetList = new HashMap<String,Long>();
+            while (j.hasNext()) {
+            	Count facet = j.next();
+            	facetList.put(facet.getName(), facet.getCount());
+            	System.out.println("!!!!!! " + facet.getName() + " |||| " + facet.getCount());
+            }
+            result.field_facets.put("characteristic_uri_str", facetList);
+
+            // Assign labels of entity, characteristic, and units collectively
+            Map<String, String> cachedLabels = Measurement.generateCachedLabel(new ArrayList<String>(uri_set));
+            for (Measurement measurement : result.getDocuments()) {
+                measurement.setLabels(cachedLabels);
+            }
+        } catch (SolrServerException e) {
+            System.out.println("[ERROR] Measurement.findByObject() - SolrServerException message: " + e.getMessage());
+        } catch (IOException e) {
+            System.out.println("[ERROR] Measurement.findByObject() - IOException message: " + e.getMessage());
+        } catch (Exception e) {
+            System.out.println("[ERROR] Measurement.findByObject() - Exception message: " + e.getMessage());
+            e.printStackTrace();
+        }
+
+        result.setDocumentSize(docSize);
+    	
+    	return result;
+    }
+    
+    public static AcquisitionQueryResult findByObjectAttribute(String user_uri, StudyObject object, Attribute attribute, String facets) {
+    	AcquisitionQueryResult result = new AcquisitionQueryResult();
+    	
+    	List<String> ownedDAs = DataAcquisition.findAllAccessibleDataAcquisition(user_uri);
+        if (ownedDAs.isEmpty()) {
+            /*
+             * an empty query happens when current user is not allowed to see any
+             * data acquisition
+             */
+            System.out.println("Not allowed to access any Data Acquisition!");
+            return result;
+        }
+        
+        //FacetHandler facetHandler = new FacetHandler();
+        //facetHandler.loadFacets(facets);
+
+        //FacetHandler retFacetHandler = new FacetHandler();
+        //retFacetHandler.loadFacets(facets);
+        
+        // System.out.println("\nfacetHandler before: " + facetHandler.toSolrQuery());
+
+        // Run one time
+        //getAllFacetStats(facetHandler, retFacetHandler, result, false);
+
+        // Get facet statistics
+        //getAllFacetStats(retFacetHandler, retFacetHandler, result, true);
+        //getAllFacetStats(facetHandler, retFacetHandler, result, true);
+
+        // Get documents
+        // System.out.println("\n\n\nfacetHandler after: " + retFacetHandler.bottommostFacetsToSolrQuery());
+        long docSize = 0;
+
+        String q = buildQuery(ownedDAs, null);
+       	q = "(" + q + ") AND (";
+       	q += "(object_uri_str:\"" + object.getUri() + "\")";
+       	q += " AND ";
+       	q += "(characteristic_uri_str:\"" + attribute.getUri() + "\")";
+       	q += ")";
+
+        SolrQuery query = new SolrQuery();
+        query.setQuery(q);
+        query.setRows(99999999);
+        query.setFacet(true);
+        query.setFacetLimit(-1);
+
+        try {
+            SolrClient solr = new HttpSolrClient.Builder(
+                    ConfigFactory.load().getString("hadatac.solr.data") 
+                    + CollectionUtil.DATA_ACQUISITION).build();
+            QueryResponse queryResponse = solr.query(query, SolrRequest.METHOD.POST);
+            solr.close();
+            SolrDocumentList docs = queryResponse.getResults();
+            docSize = docs.getNumFound();
+            //System.out.println("Num of results: " + docSize);
+            
+            Set<String> uri_set = new HashSet<String>();
+            Iterator<SolrDocument> iterDoc = docs.iterator();
+            Map<String, DataAcquisition> cachedDA = new HashMap<String, DataAcquisition>();
+            Map<String, String> mapClassLabel = generateCodeClassLabel();
+            while (iterDoc.hasNext()) {
+                Measurement measurement = convertFromSolr(iterDoc.next(), cachedDA, mapClassLabel);
+                result.addDocument(measurement);
+                uri_set.add(measurement.getEntityUri());
+                uri_set.add(measurement.getCharacteristicUri());
+                uri_set.add(measurement.getUnitUri());
+            }
+            // Assign labels of entity, characteristic, and units collectively
+            Map<String, String> cachedLabels = Measurement.generateCachedLabel(new ArrayList<String>(uri_set));
+            for (Measurement measurement : result.getDocuments()) {
+                measurement.setLabels(cachedLabels);
+            }
+        } catch (SolrServerException e) {
+            System.out.println("[ERROR] Measurement.findByObject() - SolrServerException message: " + e.getMessage());
+        } catch (IOException e) {
+            System.out.println("[ERROR] Measurement.findByObject() - IOException message: " + e.getMessage());
+        } catch (Exception e) {
+            System.out.println("[ERROR] Measurement.findByObject() - Exception message: " + e.getMessage());
+            e.printStackTrace();
+        }
+
+        result.setDocumentSize(docSize);
+    	
+    	return result;
     }
 
     public static AcquisitionQueryResult find(String user_uri, int page, int qtd, String facets) {

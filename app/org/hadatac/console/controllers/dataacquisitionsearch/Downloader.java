@@ -17,6 +17,7 @@ import org.hadatac.console.models.SysUser;
 import org.hadatac.console.views.html.dataacquisitionsearch.*;
 import org.hadatac.console.views.html.annotator.annotation_log;
 import org.hadatac.console.views.html.annotator.assignOption;
+import org.hadatac.entity.pojo.Alignment;
 import org.hadatac.entity.pojo.DataFile;
 import org.hadatac.entity.pojo.Measurement;
 import org.hadatac.entity.pojo.User;
@@ -173,6 +174,25 @@ public class Downloader extends Controller {
 		dataFile.save();
     	
     	Measurement.outputAsCSV(measurements, selectedFields, file, dataFile);
+    	System.out.println("Generated CSV files ...");
+		
+		return 0;
+    }
+	
+	public static int generateCSVFileAlignment(Alignment alignment, String facets, String ownerEmail, String ownerUri) {
+		Date date = new Date();
+		String fileName = "alignment_" + new SimpleDateFormat("yyyy_MM_dd_HH_mm_ss").format(date) + ".csv";
+		File file = new File(ConfigProp.getPathDownload() + "/" + fileName);
+		
+		AnnotationLog log = new AnnotationLog(fileName);
+		
+		DataFile dataFile = new DataFile(fileName);
+		dataFile.setOwnerEmail(ownerEmail);
+		dataFile.setStatus(DataFile.CREATING);
+		dataFile.setSubmissionTime(new SimpleDateFormat("yyyy/MM/dd HH:mm:ss").format(date));
+		dataFile.save();
+    	
+    	alignment.outputAsCSV(file, dataFile, facets, ownerUri);
     	System.out.println("Generated CSV files ...");
 		
 		return 0;

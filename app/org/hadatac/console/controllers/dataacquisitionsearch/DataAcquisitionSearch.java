@@ -13,6 +13,7 @@ import javax.inject.Inject;
 
 import java.util.Set;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.LinkedList;
 
 import org.hadatac.console.models.FacetHandler;
@@ -31,7 +32,11 @@ import org.hadatac.console.views.formdata.FacetFormData;
 import org.hadatac.console.views.html.dataacquisitionsearch.facetOnlyBrowser;
 import org.hadatac.console.views.html.dataacquisitionsearch.dataacquisition_browser;
 import org.hadatac.data.model.AcquisitionQueryResult;
+import org.hadatac.entity.pojo.Alignment;
+import org.hadatac.entity.pojo.Attribute;
 import org.hadatac.entity.pojo.Measurement;
+import org.hadatac.entity.pojo.ObjectCollection;
+import org.hadatac.entity.pojo.StudyObject;
 
 import be.objectify.deadbolt.java.actions.Group;
 import be.objectify.deadbolt.java.actions.Restrict;
@@ -129,10 +134,10 @@ public class DataAcquisitionSearch extends Controller {
 
 		if (mode == 0) {
 		    return ok(facetOnlyBrowser.render(page, rows, facets, results.getDocumentSize(), 
-	    			results, results.toJSON(), facetHandler, objDetails.toJSON(), Measurement.getFieldNames()));
+	    			results, results.toJSON(), facetHandler, objDetails.toJSON(), Measurement.getFieldNames(), ObjectCollection.findAll()));
 		} else {
 		    return ok(dataacquisition_browser.render(page, rows, facets, results.getDocumentSize(), 
-	    			results, results.toJSON(), facetHandler,  objDetails.toJSON(), Measurement.getFieldNames()));
+	    			results, results.toJSON(), facetHandler,  objDetails.toJSON(), Measurement.getFieldNames(), ObjectCollection.findAll()));
 		}
     }
     
@@ -180,7 +185,65 @@ public class DataAcquisitionSearch extends Controller {
     }
     
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
+    public Result downloadAlignment() {
+    	String ownerUri = "";
+    	final SysUser user = AuthApplication.getLocalUser(session());
+    	if (null == user) {
+    	    ownerUri = "Public";
+    	}
+    	else {
+    		ownerUri = UserManagement.getUriByEmail(user.getEmail());
+    		if(null == ownerUri){
+    			ownerUri = "Public";
+    		}
+    	}
+    	Alignment alignment = new Alignment();
+    	String facets = "";
+    	List<String> selectedFields = new LinkedList<String>();
+    	Map<String, String[]> name_map = request().body().asFormUrlEncoded();
+    	if (name_map != null) {
+    		facets = name_map.get("facets")[0];
+    		
+    		String oc_uri = name_map.get("selOC")[0].toString();
+    		ObjectCollection oc = ObjectCollection.find(oc_uri);
+    		List<StudyObject> objects = StudyObject.findByCollection(oc);
+    		AcquisitionQueryResult results = Measurement.findByObject(ownerUri, objects, facets);
+    		
+    		alignment.setObjects(objects);
+    		Iterator<String> i = results.field_facets.get("characteristic_uri_str").keySet().iterator();
+    		while (i.hasNext()) {
+    			Attribute attribute = Attribute.find(i.next());
+    			alignment.addAttribute(attribute);
+    		}
+    	}
+    	/*
+    	System.out.println("selectedFields: " + selectedFields);
+    	
+    	AcquisitionQueryResult results = Measurement.find(ownerUri, -1, -1, facets);
+    	*/
+
+    	final String finalFacets = facets;
+    	final String finalOwnerUri = ownerUri;
+    	CompletableFuture.supplyAsync(() -> Downloader.generateCSVFileAlignment(
+    			alignment, finalFacets, user.getEmail(), finalOwnerUri), 
+    			ec.current());
+		
+    	try {
+			Thread.sleep(2000);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+    	
+    	return redirect(routes.Downloader.index());
+    }
+    
+    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
     public Result postDownload() {
     	return download();
+    }
+    
+    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
+    public Result postDownloadAlignment() {
+    	return downloadAlignment();
     }
 }

@@ -10,7 +10,8 @@
 	documentJson : String,
 	handler : FacetHandler,
 	objDetails : String,
-	objFields : List[String]
+	objFields : List[String],
+	objOCs : List[org.hadatac.entity.pojo.ObjectCollection]
 )
 
 @main("Simple Faceted Search") {
@@ -36,7 +37,7 @@
 
 				<div id="download_url" style="visibility: hidden ;">@org.hadatac.console.http.routes.SolrSearchProxy.getDataAcquisitionDownload()</div>
 			    
-			    @downloadDialog(page, rows, facets, resultsSize, results, documentJson, objDetails, objFields)
+			    @downloadDialog(page, rows, facets, resultsSize, results, documentJson, objDetails, objFields, objOCs)
 			</div>
 	        </div>
 		<div class="row">
