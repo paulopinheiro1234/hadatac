@@ -75,9 +75,9 @@ public class EntityInstance extends HADatAcThing implements Comparable<EntityIns
         Map<HADatAcThing, List<HADatAcThing>> results = new HashMap<HADatAcThing, List<HADatAcThing>>();
         for (Pivot pivot_ent : pivot.children) {
             EntityInstance entity = new EntityInstance();
-            entity.setUri(pivot_ent.value);
-            entity.setLabel(WordUtils.capitalize(Entity.find(pivot_ent.value).getLabel()));
-            entity.setCount(pivot_ent.count);
+            entity.setUri(pivot_ent.getValue());
+            entity.setLabel(WordUtils.capitalize(Entity.find(pivot_ent.getValue()).getLabel()));
+            entity.setCount(pivot_ent.getCount());
             entity.setField("entity_uri_str");
 
             if (!results.containsKey(entity)) {

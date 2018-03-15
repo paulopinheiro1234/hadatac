@@ -752,9 +752,9 @@ public class DataAcquisition extends HADatAcThing {
         Map<HADatAcThing, List<HADatAcThing>> results = new HashMap<HADatAcThing, List<HADatAcThing>>();
         for (Pivot pivot_ent : pivot.children) {
             DataAcquisition da = new DataAcquisition();
-            da.setUri(pivot_ent.value);
-            da.setLabel(WordUtils.capitalize(DataAcquisition.findByUri(pivot_ent.value).getLabel()));
-            da.setCount(pivot_ent.count);
+            da.setUri(pivot_ent.getValue());
+            da.setLabel(WordUtils.capitalize(DataAcquisition.findByUri(pivot_ent.getValue()).getLabel()));
+            da.setCount(pivot_ent.getCount());
             da.setField("acquisition_uri_str");
 
             if (!results.containsKey(da)) {

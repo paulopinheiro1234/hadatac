@@ -72,23 +72,23 @@ public class UnitInstance extends HADatAcThing implements Comparable<UnitInstanc
         Map<HADatAcThing, List<HADatAcThing>> results = new HashMap<HADatAcThing, List<HADatAcThing>>();
         for (Pivot pivot_ent : pivot.children) {
             UnitInstance unit = new UnitInstance();
-            unit.setUri(pivot_ent.value);
-            if (URIUtils.isValidURI(pivot_ent.value)) {
-                Unit unit_temp = Unit.find(pivot_ent.value);
+            unit.setUri(pivot_ent.getValue());
+            if (URIUtils.isValidURI(pivot_ent.getValue())) {
+                Unit unit_temp = Unit.find(pivot_ent.getValue());
                 if (unit_temp != null) {
                     unit.setLabel(WordUtils.capitalize(unit_temp.getLabel()));
                 } else {
-                    unit.setLabel(pivot_ent.value);
+                    unit.setLabel(pivot_ent.getValue());
                 }
             } else {
-                if (pivot_ent.value.isEmpty()) {
+                if (pivot_ent.getValue().isEmpty()) {
                     // Skip empty unit
                     continue;
                 } else {
-                    unit.setLabel(WordUtils.capitalize(pivot_ent.value));
+                    unit.setLabel(WordUtils.capitalize(pivot_ent.getValue()));
                 }
             }
-            unit.setCount(pivot_ent.count);
+            unit.setCount(pivot_ent.getCount());
             unit.setField("unit_uri_str");
             if (!results.containsKey(unit)) {
                 List<HADatAcThing> attributes = new ArrayList<HADatAcThing>();

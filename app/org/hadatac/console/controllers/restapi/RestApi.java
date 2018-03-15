@@ -257,7 +257,7 @@ public class RestApi extends Controller {
         List<String> results = new ArrayList<String>();
         String str = "";
         for (Pivot pivot_ent : p.children) {
-            str = pivot_ent.value;
+            str = pivot_ent.getValue();
             results.add(str);
         }
         //System.out.println("[getVars parsePivotForVars] results: \n" + results);

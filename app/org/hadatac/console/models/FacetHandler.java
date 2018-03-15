@@ -26,6 +26,7 @@ public class FacetHandler {
 	public static final String UNIT_FACET = "facetsU";
 	public static final String TIME_FACET = "facetsT";
 	public static final String PLATFORM_INSTRUMENT_FACET = "facetsPI";
+	public static final String SUBJECT_CHARACTERISTIC_FACET = "facetsSC";
 
 	public FacetHandler() { 
 		facetsAll = new HashMap<String, Facet>();

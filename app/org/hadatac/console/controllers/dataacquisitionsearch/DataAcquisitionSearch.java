@@ -21,6 +21,7 @@ import org.hadatac.console.models.FacetsWithCategories;
 import org.hadatac.console.models.SpatialQueryResults;
 import org.hadatac.console.models.SysUser;
 import org.hadatac.console.models.ObjectDetails;
+import org.hadatac.console.models.Pivot;
 
 import play.libs.concurrent.HttpExecutionContext;
 import play.mvc.Controller;
@@ -143,17 +144,8 @@ public class DataAcquisitionSearch extends Controller {
     
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
     public Result download() {    	
-    	String ownerUri = "";
-    	final SysUser user = AuthApplication.getLocalUser(session());
-    	if (null == user) {
-    	    ownerUri = "Public";
-    	}
-    	else {
-    		ownerUri = UserManagement.getUriByEmail(user.getEmail());
-    		if(null == ownerUri){
-    			ownerUri = "Public";
-    		}
-    	}
+    	String ownerUri = getOwnerUri();
+    	String email = getUserEmail();
     	
     	String facets = "";
     	List<String> selectedFields = new LinkedList<String>();
@@ -172,7 +164,7 @@ public class DataAcquisitionSearch extends Controller {
     	
     	final String finalFacets = facets;
     	CompletableFuture.supplyAsync(() -> Downloader.generateCSVFile(
-    			results.getDocuments(), finalFacets, selectedFields, user.getEmail()), 
+    			results.getDocuments(), finalFacets, selectedFields, email), 
     			ec.current());
 		
     	try {
@@ -186,46 +178,27 @@ public class DataAcquisitionSearch extends Controller {
     
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
     public Result downloadAlignment() {
-    	String ownerUri = "";
-    	final SysUser user = AuthApplication.getLocalUser(session());
-    	if (null == user) {
-    	    ownerUri = "Public";
-    	}
-    	else {
-    		ownerUri = UserManagement.getUriByEmail(user.getEmail());
-    		if(null == ownerUri){
-    			ownerUri = "Public";
-    		}
-    	}
-    	Alignment alignment = new Alignment();
+    	String ownerUri = getOwnerUri();
+    	String email = getUserEmail();
+    	
     	String facets = "";
     	List<String> selectedFields = new LinkedList<String>();
     	Map<String, String[]> name_map = request().body().asFormUrlEncoded();
     	if (name_map != null) {
     		facets = name_map.get("facets")[0];
-    		
     		String oc_uri = name_map.get("selOC")[0].toString();
-    		ObjectCollection oc = ObjectCollection.find(oc_uri);
-    		List<StudyObject> objects = StudyObject.findByCollection(oc);
-    		AcquisitionQueryResult results = Measurement.findByObject(ownerUri, objects, facets);
-    		
-    		alignment.setObjects(objects);
-    		Iterator<String> i = results.field_facets.get("characteristic_uri_str").keySet().iterator();
-    		while (i.hasNext()) {
-    			Attribute attribute = Attribute.find(i.next());
-    			alignment.addAttribute(attribute);
-    		}
     	}
-    	/*
-    	System.out.println("selectedFields: " + selectedFields);
     	
     	AcquisitionQueryResult results = Measurement.find(ownerUri, -1, -1, facets);
-    	*/
-
+    	
+    	Alignment alignment = new Alignment();
+    	Pivot pivot = results.extra_facets.get(FacetHandler.SUBJECT_CHARACTERISTIC_FACET);
+    	alignment.fromPivot(pivot);
+    	
     	final String finalFacets = facets;
     	final String finalOwnerUri = ownerUri;
-    	CompletableFuture.supplyAsync(() -> Downloader.generateCSVFileAlignment(
-    			alignment, finalFacets, user.getEmail(), finalOwnerUri), 
+    	CompletableFuture.supplyAsync(() -> Downloader.generateCSVFileByAlignment(
+    	        results.getDocuments(), alignment, finalFacets, email), 
     			ec.current());
 		
     	try {
@@ -235,6 +208,30 @@ public class DataAcquisitionSearch extends Controller {
 		}
     	
     	return redirect(routes.Downloader.index());
+    }
+    
+    private String getUserEmail() {
+        final SysUser user = AuthApplication.getLocalUser(session());
+        if (null != user) {
+            return user.getEmail();
+        }
+        
+        return "";
+    }
+    
+    private String getOwnerUri() {
+        String ownerUri = "";
+        final SysUser user = AuthApplication.getLocalUser(session());
+        if (null == user) {
+            ownerUri = "Public";
+        } else {
+            ownerUri = UserManagement.getUriByEmail(user.getEmail());
+            if(null == ownerUri){
+                ownerUri = "Public";
+            }
+        }
+        
+        return ownerUri;
     }
     
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))

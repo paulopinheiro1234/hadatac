@@ -12,15 +12,47 @@ import play.libs.Json;
 public class Pivot {
     public List<Pivot> children;
 
-    public String field;
-    public String value;
-    public String tooltip;
-    public int count;
+    private String field;
+    private String value;
+    private String tooltip;
+    private int count;
 
     public Pivot() {
         children = new ArrayList<Pivot>();
     }
 
+    public String getField() {
+        return field;
+    }
+    
+    public void setField(String field) {
+        this.field = field;
+    }
+    
+    public String getValue() {
+        return value;
+    }
+    
+    public void setValue(String value) {
+        this.value = value;
+    }
+    
+    public String getTooltip() {
+        return tooltip;
+    }
+    
+    public void setTooltip(String tooltip) {
+        this.tooltip = tooltip;
+    }
+    
+    public int getCount() {
+        return count;
+    }
+    
+    public void setCount(int count) {
+        this.count = count;
+    }
+    
     public void addChild(Pivot child) {
         children.add(child);
     }

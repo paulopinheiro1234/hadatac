@@ -57,27 +57,27 @@ public class FacetTree {
 			for (HADatAcThing key : dict.keySet()) {
 				if (facets.isEmpty()) {
 					Pivot pivot = new Pivot();
-					pivot.field = key.getField();
-					pivot.value = key.getLabel();
-					pivot.tooltip = key.getUri();
-					pivot.count = key.getCount();
+					pivot.setField(key.getField());
+					pivot.setValue(key.getLabel());
+					pivot.setTooltip(key.getUri());
+					pivot.setCount(key.getCount());
 					
-					if (pivot.count > 0) {
+					if (pivot.getCount() > 0) {
 						curPivot.addChild(pivot);
 					}
 				} else {
 					Pivot pivot = new Pivot();
-					pivot.field = key.getField();
-					pivot.value = key.getLabel();
-					pivot.tooltip = key.getUri();
+					pivot.setField(key.getField());
+					pivot.setValue(key.getLabel());
+					pivot.setTooltip(key.getUri());
 					if (key.getCount() == 0) {
-						pivot.count = (int)dict.get(key).get(0).getNumberFromSolr(
-								facet.getChildById(key.getUri()), facetHandler);
+						pivot.setCount((int)dict.get(key).get(0).getNumberFromSolr(
+                                facet.getChildById(key.getUri()), facetHandler));
 					} else {
-						pivot.count = key.getCount();
+						pivot.setCount(key.getCount());
 					}
-					System.out.println("pivot.count: " + pivot.count);
-					if (pivot.count > 0) {
+					System.out.println("pivot.count: " + pivot.getCount());
+					if (pivot.getCount() > 0) {
 						curPivot.addChild(pivot);
 						System.out.println("retrieveFacetData for " + key.getUri());
 						retrieveFacetData(level + 1, facet.getChildById(key.getUri()), facetHandler, pivot);

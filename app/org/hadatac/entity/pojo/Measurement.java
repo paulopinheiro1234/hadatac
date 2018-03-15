@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -26,7 +27,6 @@ import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrRequest;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.impl.HttpSolrClient;
-import org.apache.solr.client.solrj.response.FacetField.Count;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.client.solrj.response.UpdateResponse;
 import org.apache.solr.client.solrj.beans.Field;
@@ -44,7 +44,7 @@ import org.hadatac.utils.NameSpaces;
 
 import com.typesafe.config.ConfigFactory;
 
-public class Measurement extends HADatAcThing {
+public class Measurement extends HADatAcThing implements Runnable {
     @Field("uri")
     private String uri;
     @Field("owner_uri_str")
@@ -340,7 +340,7 @@ public class Measurement extends HADatAcThing {
             solr.addBean(this).getStatus();
             solr.commit();
             solr.close();
-            
+
             return true;
         } catch (IOException | SolrServerException e) {
             System.out.println("[ERROR] Measurement.save - e.Message: " + e.getMessage());
@@ -493,197 +493,6 @@ public class Measurement extends HADatAcThing {
 
         return result;
     }
-    
-    public static AcquisitionQueryResult findByObject(String user_uri, List<StudyObject> objects, String facets) {
-    	AcquisitionQueryResult result = new AcquisitionQueryResult();
-    	
-    	List<String> ownedDAs = DataAcquisition.findAllAccessibleDataAcquisition(user_uri);
-        if (ownedDAs.isEmpty()) {
-            /*
-             * an empty query happens when current user is not allowed to see any
-             * data acquisition
-             */
-            System.out.println("Not allowed to access any Data Acquisition!");
-            return result;
-        }
-        
-        FacetHandler facetHandler = new FacetHandler();
-        facetHandler.loadFacets(facets);
-
-        FacetHandler retFacetHandler = new FacetHandler();
-        retFacetHandler.loadFacets(facets);
-        
-        // System.out.println("\nfacetHandler before: " + facetHandler.toSolrQuery());
-
-        // Run one time
-        getAllFacetStats(facetHandler, retFacetHandler, result, false);
-
-        // Get facet statistics
-        getAllFacetStats(retFacetHandler, retFacetHandler, result, true);
-        //getAllFacetStats(facetHandler, retFacetHandler, result, true);
-
-        // Get documents
-        // System.out.println("\n\n\nfacetHandler after: " + retFacetHandler.bottommostFacetsToSolrQuery());
-        long docSize = 0;
-
-        String q = buildQuery(ownedDAs, retFacetHandler);
-        
-        Iterator<StudyObject> i = objects.iterator();
-        if (i.hasNext()) {
-        	q = "(" + q;
-        	q += ") AND (";
-        	while (i.hasNext()) {
-            	q += "(object_uri_str:\"" + i.next().getUri() + "\")";
-            	if (i.hasNext()) {
-            		q += " OR ";
-            	}
-            }
-        	q += ")";
-        }
-
-        SolrQuery query = new SolrQuery();
-        query.setQuery(q);
-        query.setRows(99999999);
-        query.setFacet(true);
-        query.setFacetLimit(-1);
-        query.setFacetMinCount(1);
-        query.addFacetField("characteristic_uri_str");
-
-        try {
-            SolrClient solr = new HttpSolrClient.Builder(
-                    ConfigFactory.load().getString("hadatac.solr.data") 
-                    + CollectionUtil.DATA_ACQUISITION).build();
-            QueryResponse queryResponse = solr.query(query, SolrRequest.METHOD.POST);
-            solr.close();
-            SolrDocumentList docs = queryResponse.getResults();
-            docSize = docs.getNumFound();
-            //System.out.println("Num of results: " + docSize);
-            
-            Set<String> uri_set = new HashSet<String>();
-            Iterator<SolrDocument> iterDoc = docs.iterator();
-            Map<String, DataAcquisition> cachedDA = new HashMap<String, DataAcquisition>();
-            Map<String, String> mapClassLabel = generateCodeClassLabel();
-            while (iterDoc.hasNext()) {
-                Measurement measurement = convertFromSolr(iterDoc.next(), cachedDA, mapClassLabel);
-                result.addDocument(measurement);
-                uri_set.add(measurement.getEntityUri());
-                uri_set.add(measurement.getCharacteristicUri());
-                uri_set.add(measurement.getUnitUri());
-            }
-            
-            // Populate result facet fields
-            Iterator<Count> j = queryResponse.getFacetField("characteristic_uri_str").getValues().iterator();
-            Map<String,Long> facetList = new HashMap<String,Long>();
-            while (j.hasNext()) {
-            	Count facet = j.next();
-            	facetList.put(facet.getName(), facet.getCount());
-            	System.out.println("!!!!!! " + facet.getName() + " |||| " + facet.getCount());
-            }
-            result.field_facets.put("characteristic_uri_str", facetList);
-
-            // Assign labels of entity, characteristic, and units collectively
-            Map<String, String> cachedLabels = Measurement.generateCachedLabel(new ArrayList<String>(uri_set));
-            for (Measurement measurement : result.getDocuments()) {
-                measurement.setLabels(cachedLabels);
-            }
-        } catch (SolrServerException e) {
-            System.out.println("[ERROR] Measurement.findByObject() - SolrServerException message: " + e.getMessage());
-        } catch (IOException e) {
-            System.out.println("[ERROR] Measurement.findByObject() - IOException message: " + e.getMessage());
-        } catch (Exception e) {
-            System.out.println("[ERROR] Measurement.findByObject() - Exception message: " + e.getMessage());
-            e.printStackTrace();
-        }
-
-        result.setDocumentSize(docSize);
-    	
-    	return result;
-    }
-    
-    public static AcquisitionQueryResult findByObjectAttribute(String user_uri, StudyObject object, Attribute attribute, String facets) {
-    	AcquisitionQueryResult result = new AcquisitionQueryResult();
-    	
-    	List<String> ownedDAs = DataAcquisition.findAllAccessibleDataAcquisition(user_uri);
-        if (ownedDAs.isEmpty()) {
-            /*
-             * an empty query happens when current user is not allowed to see any
-             * data acquisition
-             */
-            System.out.println("Not allowed to access any Data Acquisition!");
-            return result;
-        }
-        
-        //FacetHandler facetHandler = new FacetHandler();
-        //facetHandler.loadFacets(facets);
-
-        //FacetHandler retFacetHandler = new FacetHandler();
-        //retFacetHandler.loadFacets(facets);
-        
-        // System.out.println("\nfacetHandler before: " + facetHandler.toSolrQuery());
-
-        // Run one time
-        //getAllFacetStats(facetHandler, retFacetHandler, result, false);
-
-        // Get facet statistics
-        //getAllFacetStats(retFacetHandler, retFacetHandler, result, true);
-        //getAllFacetStats(facetHandler, retFacetHandler, result, true);
-
-        // Get documents
-        // System.out.println("\n\n\nfacetHandler after: " + retFacetHandler.bottommostFacetsToSolrQuery());
-        long docSize = 0;
-
-        String q = buildQuery(ownedDAs, null);
-       	q = "(" + q + ") AND (";
-       	q += "(object_uri_str:\"" + object.getUri() + "\")";
-       	q += " AND ";
-       	q += "(characteristic_uri_str:\"" + attribute.getUri() + "\")";
-       	q += ")";
-
-        SolrQuery query = new SolrQuery();
-        query.setQuery(q);
-        query.setRows(99999999);
-        query.setFacet(true);
-        query.setFacetLimit(-1);
-
-        try {
-            SolrClient solr = new HttpSolrClient.Builder(
-                    ConfigFactory.load().getString("hadatac.solr.data") 
-                    + CollectionUtil.DATA_ACQUISITION).build();
-            QueryResponse queryResponse = solr.query(query, SolrRequest.METHOD.POST);
-            solr.close();
-            SolrDocumentList docs = queryResponse.getResults();
-            docSize = docs.getNumFound();
-            //System.out.println("Num of results: " + docSize);
-            
-            Set<String> uri_set = new HashSet<String>();
-            Iterator<SolrDocument> iterDoc = docs.iterator();
-            Map<String, DataAcquisition> cachedDA = new HashMap<String, DataAcquisition>();
-            Map<String, String> mapClassLabel = generateCodeClassLabel();
-            while (iterDoc.hasNext()) {
-                Measurement measurement = convertFromSolr(iterDoc.next(), cachedDA, mapClassLabel);
-                result.addDocument(measurement);
-                uri_set.add(measurement.getEntityUri());
-                uri_set.add(measurement.getCharacteristicUri());
-                uri_set.add(measurement.getUnitUri());
-            }
-            // Assign labels of entity, characteristic, and units collectively
-            Map<String, String> cachedLabels = Measurement.generateCachedLabel(new ArrayList<String>(uri_set));
-            for (Measurement measurement : result.getDocuments()) {
-                measurement.setLabels(cachedLabels);
-            }
-        } catch (SolrServerException e) {
-            System.out.println("[ERROR] Measurement.findByObject() - SolrServerException message: " + e.getMessage());
-        } catch (IOException e) {
-            System.out.println("[ERROR] Measurement.findByObject() - IOException message: " + e.getMessage());
-        } catch (Exception e) {
-            System.out.println("[ERROR] Measurement.findByObject() - Exception message: " + e.getMessage());
-            e.printStackTrace();
-        }
-
-        result.setDocumentSize(docSize);
-    	
-    	return result;
-    }
 
     public static AcquisitionQueryResult find(String user_uri, int page, int qtd, String facets) {
         AcquisitionQueryResult result = new AcquisitionQueryResult();
@@ -713,8 +522,9 @@ public class Measurement extends HADatAcThing {
         getAllFacetStats(retFacetHandler, retFacetHandler, result, true);
         //getAllFacetStats(facetHandler, retFacetHandler, result, true);
 
-        // Get documents
         // System.out.println("\n\n\nfacetHandler after: " + retFacetHandler.bottommostFacetsToSolrQuery());
+
+        // Get documents
         long docSize = 0;
 
         String q = buildQuery(ownedDAs, retFacetHandler);
@@ -729,6 +539,15 @@ public class Measurement extends HADatAcThing {
         }
         query.setFacet(true);
         query.setFacetLimit(-1);
+        query.setParam("json.facet", "{ "
+                + "object_uri_str: { "
+                + "type: terms, "
+                + "field: object_uri_str, "
+                + "limit: 100000000 }, "
+                + "characteristic_uri_str: { "
+                + "type: terms, "
+                + "field: characteristic_uri_str, "
+                + "limit: 10000 } }");
 
         try {
             SolrClient solr = new HttpSolrClient.Builder(
@@ -739,6 +558,9 @@ public class Measurement extends HADatAcThing {
             SolrDocumentList docs = queryResponse.getResults();
             docSize = docs.getNumFound();
             System.out.println("Num of results: " + docSize);
+
+            Pivot pivot = Pivot.parseQueryResponse(queryResponse);
+            result.extra_facets.put(FacetHandler.SUBJECT_CHARACTERISTIC_FACET, pivot);
 
             Set<String> uri_set = new HashSet<String>();
             Iterator<SolrDocument> iterDoc = docs.iterator();
@@ -1084,6 +906,88 @@ public class Measurement extends HADatAcThing {
         }
     }
 
+    public static void outputAsCSVByAlignment(List<Measurement> measurements, 
+            Alignment alignment, File file, DataFile dataFile) {        
+        try {  
+            List<StudyObject> objects = alignment.getObjects();
+            objects.sort(new Comparator<StudyObject>() {
+                @Override
+                public int compare(StudyObject o1, StudyObject o2) {
+                    return o1.getOriginalId().compareTo(o2.getOriginalId());
+                }
+            });
+            System.out.println("objects size: " + objects.size());
+            
+            List<Attribute> attributes = alignment.getAttributes();
+            attributes.sort(new Comparator<Attribute>() {
+                @Override
+                public int compare(Attribute o1, Attribute o2) {
+                    return o1.getLabel().compareTo(o2.getLabel());
+                }
+            });
+            System.out.println("attributes size: " + attributes.size());
+            
+            // Write headers
+            int count = 0;
+            FileUtils.writeStringToFile(file, "\"" + count++ + "-object\"", "utf-8", true);
+
+            for (Attribute attrib : attributes) {
+                FileUtils.writeStringToFile(file, ",\"" + count++ + "-" + attrib.getLabel() + "\"", "utf-8", true);
+            }
+            
+            FileUtils.writeStringToFile(file, "\n", "utf-8", true);
+            
+            // Prepare rows
+            Map<String, Map<String, String>> results = new HashMap<String, Map<String, String>>();
+
+            int i = 1;
+            int total = measurements.size();
+            for (Measurement m : measurements) {
+                if (!m.getObjectUri().isEmpty() 
+                        && alignment.containsObject(m.getObjectUri())) {
+                    String pid = alignment.getObject(m.getObjectUri()).getOriginalId();
+                    if (!results.containsKey(pid)) {
+                        results.put(pid, new HashMap<String, String>());
+                    }
+
+                    if (alignment.containsAttribute(m.getCharacteristicUri())) {
+                        results.get(pid).put(m.getCharacteristicUri(), m.getValue());
+                    }
+                }
+
+                int prev_ratio = 0;
+                double ratio = (double)i / total * 100;
+                if (((int)ratio) != prev_ratio) {
+                    prev_ratio = (int)ratio;
+                    dataFile.setCompletionPercentage((int)ratio);
+                    dataFile.save();
+                }
+                i++;
+            }
+
+            // Write rows
+            for (StudyObject obj : objects) {
+                if (results.containsKey(obj.getOriginalId())) {
+                    FileUtils.writeStringToFile(file, "\"" + obj.getOriginalId() + "\"", "utf-8", true);
+                    Map<String, String> row = results.get(obj.getOriginalId());
+                    for (Attribute attrib : attributes) {
+                        FileUtils.writeStringToFile(file, ",\"" + row.get(attrib.getUri()) + "\"", "utf-8", true);
+                    }
+                    FileUtils.writeStringToFile(file, "\n", "utf-8", true);
+                }
+            }
+            
+            System.out.println("Finished writing!");
+
+            dataFile.setCompletionPercentage(100);
+            dataFile.setCompletionTime(new SimpleDateFormat("yyyy/MM/dd HH:mm:ss").format(new Date()));
+            dataFile.setStatus(DataFile.CREATED);
+            dataFile.save();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
     public String toCSVRow(List<String> fieldNames) {
         List<String> values = new ArrayList<String>();
         for (String name : fieldNames) {
@@ -1131,5 +1035,10 @@ public class Measurement extends HADatAcThing {
     @Override
     public int deleteFromLabKey(String userName, String password) {
         return 0;
+    }
+
+    @Override
+    public void run() {
+
     }
 }

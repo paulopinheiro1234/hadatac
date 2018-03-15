@@ -16,6 +16,17 @@
 	    function checkCompletion() {
 	        $("#download_files tbody tr").each(function () {
 		        var row = $(this);
+		        var status;
+		        @if(bAdmin) {
+		            status = row.find("td:nth-child(6)").html();
+		        } else {
+		            status = row.find("td:nth-child(5)").html();
+		        }
+		        
+		        if (status == "CREATED") {
+		            return;
+		        }
+		        
 	        	$.ajax({
 	                type: 'GET',
 	                url: '/hadatac/downloader/checkcompletion',

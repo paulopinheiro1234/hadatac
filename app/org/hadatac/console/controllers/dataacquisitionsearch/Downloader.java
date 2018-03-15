@@ -23,6 +23,7 @@ import org.hadatac.entity.pojo.Measurement;
 import org.hadatac.entity.pojo.User;
 import org.hadatac.utils.ConfigProp;
 import org.hadatac.utils.Feedback;
+import org.labkey.remoteapi.assay.Run;
 
 import be.objectify.deadbolt.java.actions.Group;
 import be.objectify.deadbolt.java.actions.Restrict;
@@ -146,7 +147,7 @@ public class Downloader extends Controller {
 	}
 	
 	@Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-	public Result checkCompletion(String file_name) {
+	public Result checkCompletion(String file_name) {	    
 		DataFile dataFile = DataFile.findByName(file_name);
 		
 		Map<String, Object> result = new HashMap<String, Object>();
@@ -179,21 +180,23 @@ public class Downloader extends Controller {
 		return 0;
     }
 	
-	public static int generateCSVFileAlignment(Alignment alignment, String facets, String ownerEmail, String ownerUri) {
-		Date date = new Date();
-		String fileName = "alignment_" + new SimpleDateFormat("yyyy_MM_dd_HH_mm_ss").format(date) + ".csv";
-		File file = new File(ConfigProp.getPathDownload() + "/" + fileName);
-		
-		AnnotationLog log = new AnnotationLog(fileName);
-		
-		DataFile dataFile = new DataFile(fileName);
-		dataFile.setOwnerEmail(ownerEmail);
-		dataFile.setStatus(DataFile.CREATING);
-		dataFile.setSubmissionTime(new SimpleDateFormat("yyyy/MM/dd HH:mm:ss").format(date));
-		dataFile.save();
-    	
-    	alignment.outputAsCSV(file, dataFile, facets, ownerUri);
-    	System.out.println("Generated CSV files ...");
+	public static int generateCSVFileByAlignment(List<Measurement> measurements, 
+	        Alignment alignment, String facets, String ownerEmail) {
+	    Date date = new Date();
+        String fileName = "alignment_" + new SimpleDateFormat("yyyy_MM_dd_HH_mm_ss").format(date) + ".csv";
+        File file = new File(ConfigProp.getPathDownload() + "/" + fileName);
+        
+        AnnotationLog log = new AnnotationLog(fileName);
+        log.addline(Feedback.println(Feedback.WEB, "Facets: " + facets));
+        
+        DataFile dataFile = new DataFile(fileName);
+        dataFile.setOwnerEmail(ownerEmail);
+        dataFile.setStatus(DataFile.CREATING);
+        dataFile.setSubmissionTime(new SimpleDateFormat("yyyy/MM/dd HH:mm:ss").format(date));
+        dataFile.save();
+        
+        Measurement.outputAsCSVByAlignment(measurements, alignment, file, dataFile);
+        System.out.println("Generated CSV files ...");
 		
 		return 0;
     }

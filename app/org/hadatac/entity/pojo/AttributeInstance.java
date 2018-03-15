@@ -100,9 +100,9 @@ public class AttributeInstance extends HADatAcThing implements Comparable<Attrib
         Map<HADatAcThing, List<HADatAcThing>> results = new HashMap<HADatAcThing, List<HADatAcThing>>();
         for (Pivot pivot_ent : pivot.children) {
             AttributeInstance attrib = new AttributeInstance();
-            attrib.setUri(pivot_ent.value);
-            attrib.setLabel(WordUtils.capitalize(Attribute.find(pivot_ent.value).getLabel()));
-            attrib.setCount(pivot_ent.count);
+            attrib.setUri(pivot_ent.getValue());
+            attrib.setLabel(WordUtils.capitalize(Attribute.find(pivot_ent.getValue()).getLabel()));
+            attrib.setCount(pivot_ent.getCount());
             attrib.setField("characteristic_uri_str");
 
             if (!results.containsKey(attrib)) {

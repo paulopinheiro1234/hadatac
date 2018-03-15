@@ -73,9 +73,9 @@ public class InRelationToInstance extends HADatAcThing implements Comparable<InR
         Map<HADatAcThing, List<HADatAcThing>> results = new HashMap<HADatAcThing, List<HADatAcThing>>();
         for (Pivot pivot_ent : pivot.children) {
             InRelationToInstance object = new InRelationToInstance();
-            object.setUri(pivot_ent.value);
-            object.setLabel(WordUtils.capitalize(Entity.find(pivot_ent.value).getLabel()));
-            object.setCount(pivot_ent.count);
+            object.setUri(pivot_ent.getValue());
+            object.setLabel(WordUtils.capitalize(Entity.find(pivot_ent.getValue()).getLabel()));
+            object.setCount(pivot_ent.getCount());
             object.setField("in_relation_to_uri_str");
 
             if (!results.containsKey(object)) {

@@ -206,25 +206,25 @@ public class TimeInstance extends HADatAcThing implements Comparable<TimeInstanc
     private Map<HADatAcThing, List<HADatAcThing>> parsePivot(Pivot pivot) {
         Map<HADatAcThing, List<HADatAcThing>> results = new HashMap<HADatAcThing, List<HADatAcThing>>();
         for (Pivot pivot_ent : pivot.children) {
-            if (pivot_ent.value.isEmpty()) {
+            if (pivot_ent.getValue().isEmpty()) {
                 continue;
             }
 
             TimeInstance time = new TimeInstance();
-            if (pivot_ent.value.startsWith("http")) {
-                time.setUri(pivot_ent.value);
-                DataAcquisitionSchemaEvent dase = DataAcquisitionSchemaEvent.find(pivot_ent.value);
+            if (pivot_ent.getValue().startsWith("http")) {
+                time.setUri(pivot_ent.getValue());
+                DataAcquisitionSchemaEvent dase = DataAcquisitionSchemaEvent.find(pivot_ent.getValue());
                 if (dase != null) {
                     time.setLabel(WordUtils.capitalize(dase.getLabel()));
                 } else {
-                    time.setLabel(pivot_ent.value);
+                    time.setLabel(pivot_ent.getValue());
                 }
             } else {
                 time.setUri("");
-                time.setLabel(WordUtils.capitalize(pivot_ent.value));
+                time.setLabel(WordUtils.capitalize(pivot_ent.getValue()));
             }
-            time.setCount(pivot_ent.count);
-            time.setField(pivot_ent.field);
+            time.setCount(pivot_ent.getCount());
+            time.setField(pivot_ent.getField());
             if (!results.containsKey(time)) {
                 List<HADatAcThing> attributes = new ArrayList<HADatAcThing>();
                 results.put(time, attributes);
