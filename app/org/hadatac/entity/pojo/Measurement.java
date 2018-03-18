@@ -53,8 +53,12 @@ public class Measurement extends HADatAcThing implements Runnable {
     private String acquisitionUri;
     @Field("study_uri_str")
     private String studyUri;
+    @Field("object_collection_type_str")
+    private String objectCollectionType;
     @Field("object_uri_str")
     private String objectUri;
+    @Field("study_object_uri_str")
+    private String studyObjectUri;
     @Field("timestamp_date")
     private Date timestamp;
     @Field("named_time_str")
@@ -119,9 +123,29 @@ public class Measurement extends HADatAcThing implements Runnable {
     public void setStudyUri(String studyUri) {
         this.studyUri = studyUri;
     }
+    
+    public String getObjectCollectionType() {
+        return objectCollectionType;
+    }
+    
+    public void setObjectCollectionType(String objectCollectionType) {
+        this.objectCollectionType = objectCollectionType;
+    }
 
     public String getObjectUri() {
         return objectUri;
+    }
+    
+    public void setObjectUri(String objectUri) {
+        this.objectUri = objectUri;
+    }
+    
+    public String getStudyObjectUri() {
+        return studyObjectUri;
+    }
+    
+    public void setStudyObjectUri(String studyObjectUri) {
+        this.studyObjectUri = studyObjectUri;
     }
 
     public void setPID(String objectUri) {
@@ -138,10 +162,6 @@ public class Measurement extends HADatAcThing implements Runnable {
 
     public String getObjectSID() {
         return this.sid;
-    }
-
-    public void setObjectUri(String objectUri) {
-        this.objectUri = objectUri;
     }
 
     public String getInstrumentModel() {
@@ -548,7 +568,9 @@ public class Measurement extends HADatAcThing implements Runnable {
                 + "type: terms, "
                 + "field: characteristic_uri_str, "
                 + "limit: 10000 } }");
-
+        //query.set("group.field", "study_uri_str");
+        //query.set("group", "true");
+        
         try {
             SolrClient solr = new HttpSolrClient.Builder(
                     ConfigFactory.load().getString("hadatac.solr.data") 
@@ -559,6 +581,7 @@ public class Measurement extends HADatAcThing implements Runnable {
             docSize = docs.getNumFound();
             System.out.println("Num of results: " + docSize);
 
+            //System.out.println("\n\n\nqueryResponse: " + queryResponse);
             Pivot pivot = Pivot.parseQueryResponse(queryResponse);
             result.extra_facets.put(FacetHandler.SUBJECT_CHARACTERISTIC_FACET, pivot);
 
@@ -604,6 +627,14 @@ public class Measurement extends HADatAcThing implements Runnable {
         Pivot pivotS = getFacetStats(fTreeS, 
                 retFacetHandler.getFacetByName(FacetHandler.STUDY_FACET), 
                 facetHandler);
+        
+        FacetTree fTreeOC = new FacetTree();
+        fTreeOC.setTargetFacet(ObjectCollection.class);
+        //fTreeOC.setTargetFacet(StudyObject.class);
+        //fTreeOC.addUpperFacet(ObjectCollection.class);
+        Pivot pivotOC = getFacetStats(fTreeOC, 
+                retFacetHandler.getFacetByName(FacetHandler.OBJECT_COLLECTION_FACET), 
+                facetHandler);
 
         FacetTree fTreeEC = new FacetTree();
         fTreeEC.setTargetFacet(AttributeInstance.class);
@@ -637,6 +668,7 @@ public class Measurement extends HADatAcThing implements Runnable {
 
         if (bAddToResults) {
             result.extra_facets.put(FacetHandler.STUDY_FACET, pivotS);
+            result.extra_facets.put(FacetHandler.OBJECT_COLLECTION_FACET, pivotOC);
             result.extra_facets.put(FacetHandler.ENTITY_CHARACTERISTIC_FACET, pivotEC);
             result.extra_facets.put(FacetHandler.UNIT_FACET, pivotU);
             result.extra_facets.put(FacetHandler.TIME_FACET, pivotT);

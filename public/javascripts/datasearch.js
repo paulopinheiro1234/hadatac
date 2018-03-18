@@ -27,13 +27,18 @@ function treeSelections(tree, id) {
 
 function getSelectedFacets() {
 	var facets = new Object();
-	var tmp = treeSelections(treeEC, 0);
+	var tmp;
+	tmp = treeSelections(treeEC, 0);
 	if (tmp != null) {
 		facets['facetsEC'] = tmp;
 	}
 	tmp = treeSelections(treeS, 0);
 	if (tmp != null) {
 		facets['facetsS']  = tmp;
+	}
+	tmp = treeSelections(treeOC, 0);
+	if (tmp != null) {
+		facets['facetsOC'] = tmp;
 	}
 	tmp = treeSelections(treeU, 0);
 	if (tmp != null) {

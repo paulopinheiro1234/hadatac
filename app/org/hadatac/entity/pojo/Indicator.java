@@ -231,8 +231,7 @@ public class Indicator extends HADatAcThing implements Comparable<Indicator> {
 
 	public Map<HADatAcThing, List<HADatAcThing>> getTargetFacets(
 			Facet facet, FacetHandler facetHandler) {
-		System.out.println("\nIndicator facet: " + facet.toSolrQuery());
-		
+	    
 		String valueConstraint = "";
 		if (!facet.getFacetValuesByField("indicator_uri_str").isEmpty()) {
 			valueConstraint += " VALUES ?studyIndicator { " + stringify(
@@ -286,7 +285,9 @@ public class Indicator extends HADatAcThing implements Comparable<Indicator> {
 				attrib.setUri(soln.get("attributeUri").toString());
 				attrib.setLabel(WordUtils.capitalize(soln.get("attributeLabel").toString()));
 				attrib.setField("characteristic_uri_str");
+				
 				if (!mapIndicatorToCharList.containsKey(indicator)) {
+				    System.out.println("!mapIndicatorToCharList.containsKey(indicator): " + indicator.getUri());
 					List<HADatAcThing> attributes = new ArrayList<HADatAcThing>();
 					mapIndicatorToCharList.put(indicator, attributes);
 				}

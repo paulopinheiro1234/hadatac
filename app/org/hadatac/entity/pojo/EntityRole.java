@@ -40,7 +40,6 @@ public class EntityRole extends HADatAcThing implements Comparable<EntityRole> {
 	
 	public Map<HADatAcThing, List<HADatAcThing>> getTargetFacets(
 			Facet facet, FacetHandler facetHandler) {
-		System.out.println("\nEntityRole facet: " + facet.toSolrQuery());
 		
 		String valueConstraint = "";
 		if (!facet.getFacetValuesByField("entity_uri_str").isEmpty()) {

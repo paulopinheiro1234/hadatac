@@ -15,14 +15,13 @@ import org.json.simple.parser.ParseException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
 
-import play.api.libs.json.Json;
-
 public class FacetHandler {
 	
 	public Map<String, Facet> facetsAll;
 	
 	public static final String ENTITY_CHARACTERISTIC_FACET = "facetsEC";
 	public static final String STUDY_FACET = "facetsS";
+	public static final String OBJECT_COLLECTION_FACET = "facetsOC";
 	public static final String UNIT_FACET = "facetsU";
 	public static final String TIME_FACET = "facetsT";
 	public static final String PLATFORM_INSTRUMENT_FACET = "facetsPI";
@@ -32,6 +31,7 @@ public class FacetHandler {
 		facetsAll = new HashMap<String, Facet>();
 		facetsAll.put(ENTITY_CHARACTERISTIC_FACET, new Facet());
 		facetsAll.put(STUDY_FACET, new Facet());
+		facetsAll.put(OBJECT_COLLECTION_FACET, new Facet());
 		facetsAll.put(UNIT_FACET, new Facet());
 		facetsAll.put(TIME_FACET, new Facet());
 		facetsAll.put(PLATFORM_INSTRUMENT_FACET, new Facet());
@@ -80,7 +80,7 @@ public class FacetHandler {
 	public void loadFacets(String str) {
 		if (str == null || str.equals("")) {
 			// Default facets
-			str = "{\"facetsEC\":[],\"facetsS\":[],\"facetsU\":[],\"facetsT\":[],\"facetsPI\":[]}";
+			str = "{\"facetsEC\":[],\"facetsS\":[],\"facetsOC\":[],\"facetsU\":[],\"facetsT\":[],\"facetsPI\":[]}";
 		}
 				
 		try {
@@ -90,6 +90,9 @@ public class FacetHandler {
 			
 			facet = Facet.loadFacet(obj.get(STUDY_FACET), STUDY_FACET);
 			facetsAll.put(STUDY_FACET, facet);
+			
+			facet = Facet.loadFacet(obj.get(OBJECT_COLLECTION_FACET), OBJECT_COLLECTION_FACET);
+            facetsAll.put(OBJECT_COLLECTION_FACET, facet);
 			
 			facet = Facet.loadFacet(obj.get(UNIT_FACET), UNIT_FACET);
 			facetsAll.put(UNIT_FACET, facet);
@@ -120,6 +123,7 @@ public class FacetHandler {
 	
 	public String getTempSolrQuery(Facet facet) {
 		System.out.println("facet.getFacetName(): " + facet.getFacetName());
+		
 		List<String> facetQueries = new ArrayList<String>();
 		Iterator<Map.Entry<String, Facet>> iter = facetsAll.entrySet().iterator();
 		while (iter.hasNext()) {

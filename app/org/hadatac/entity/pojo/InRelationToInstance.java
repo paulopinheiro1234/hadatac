@@ -38,7 +38,6 @@ public class InRelationToInstance extends HADatAcThing implements Comparable<InR
 
     public Map<HADatAcThing, List<HADatAcThing>> getTargetFacets(
             Facet facet, FacetHandler facetHandler) {
-        System.out.println("\nInRelationToInstance getTargetFacets facet: " + facet.toSolrQuery());
 
         SolrQuery query = new SolrQuery();
         String strQuery = facetHandler.getTempSolrQuery(facet);

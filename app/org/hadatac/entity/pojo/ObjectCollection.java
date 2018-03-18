@@ -4,10 +4,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.net.URLDecoder;
 import java.io.ByteArrayOutputStream;
-import java.io.UnsupportedEncodingException;
 
+import org.apache.commons.lang3.text.WordUtils;
 import org.apache.jena.query.Query;
 import org.apache.jena.query.QueryExecution;
 import org.apache.jena.query.QueryExecutionFactory;
@@ -21,6 +20,11 @@ import org.apache.jena.update.UpdateExecutionFactory;
 import org.apache.jena.update.UpdateFactory;
 import org.apache.jena.update.UpdateProcessor;
 import org.apache.jena.update.UpdateRequest;
+import org.apache.solr.client.solrj.SolrClient;
+import org.apache.solr.client.solrj.SolrQuery;
+import org.apache.solr.client.solrj.SolrRequest;
+import org.apache.solr.client.solrj.impl.HttpSolrClient;
+import org.apache.solr.client.solrj.response.QueryResponse;
 import org.hadatac.utils.CollectionUtil;
 import org.hadatac.utils.NameSpaces;
 import org.hadatac.utils.FirstLabel;
@@ -28,14 +32,14 @@ import org.hadatac.metadata.loader.URIUtils;
 import org.hadatac.entity.pojo.ObjectCollection;
 import org.labkey.remoteapi.CommandException;
 
-import org.hadatac.console.controllers.AuthApplication;
+import com.typesafe.config.ConfigFactory;
+
+import org.hadatac.console.models.Facet;
+import org.hadatac.console.models.FacetHandler;
+import org.hadatac.console.models.Pivot;
 import org.hadatac.metadata.loader.LabkeyDataHandler;
 
-import be.objectify.deadbolt.java.actions.Group;
-import be.objectify.deadbolt.java.actions.Restrict;
-
-
-public class ObjectCollection extends HADatAcThing {
+public class ObjectCollection extends HADatAcThing implements Comparable<ObjectCollection> {
 
     public static String SUBJECT_COLLECTION = "http://hadatac.org/ont/hasco/SubjectGroup";
     public static String SAMPLE_COLLECTION = "http://hadatac.org/ont/hasco/SampleCollection";
@@ -96,6 +100,25 @@ public class ObjectCollection extends HADatAcThing {
         this.setHasScopeUri("");
         this.setSpaceScopeUris(spaceScopeUris);
         this.setTimeScopeUris(timeScopeUris);
+    }
+    
+    @Override
+    public boolean equals(Object o) {
+        if((o instanceof ObjectCollection) && (((ObjectCollection)o).getUri().equals(this.getUri()))) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+    
+    @Override
+    public int hashCode() {
+        return getUri().hashCode();
+    }
+    
+    @Override
+    public int compareTo(ObjectCollection another) {
+        return this.getUri().compareTo(another.getUri());
     }
 
     public ObjectCollectionType getObjectCollectionType() {
@@ -509,6 +532,61 @@ public class ObjectCollection extends HADatAcThing {
             e.printStackTrace();
         }
         return "";
+    }
+    
+    public Map<HADatAcThing, List<HADatAcThing>> getTargetFacets(
+            Facet facet, FacetHandler facetHandler) {
+        
+        SolrQuery query = new SolrQuery();
+        String strQuery = facetHandler.getTempSolrQuery(facet);
+        query.setQuery(strQuery);
+        query.setRows(0);
+        query.setFacet(true);
+        query.setFacetLimit(-1);
+        query.setParam("json.facet", "{ "
+                + "object_collection_type_str:{ "
+                + "type: terms, "
+                + "field: object_collection_type_str, "
+                + "limit: 1000}}");
+
+        try {
+            SolrClient solr = new HttpSolrClient.Builder(
+                    ConfigFactory.load().getString("hadatac.solr.data") 
+                    + CollectionUtil.DATA_ACQUISITION).build();
+            QueryResponse queryResponse = solr.query(query, SolrRequest.METHOD.POST);
+            solr.close();
+            Pivot pivot = Pivot.parseQueryResponse(queryResponse);
+            return parsePivot(pivot, facet);
+        } catch (Exception e) {
+            System.out.println("[ERROR] EntityInstance.getTargetFacets() - Exception message: " + e.getMessage());
+        }
+
+        return null;
+    }
+    
+    private Map<HADatAcThing, List<HADatAcThing>> parsePivot(Pivot pivot, Facet facet) {
+        Map<HADatAcThing, List<HADatAcThing>> results = new HashMap<HADatAcThing, List<HADatAcThing>>();
+        for (Pivot child : pivot.children) {
+            if (child.getValue().isEmpty()) {
+                continue;
+            }
+            
+            ObjectCollection oc = new ObjectCollection();
+            oc.setUri(child.getValue());
+            oc.setLabel(WordUtils.capitalize(Entity.find(child.getValue()).getLabel()));
+            oc.setCount(child.getCount());
+            oc.setField("object_collection_type_str");
+
+            if (!results.containsKey(oc)) {
+                List<HADatAcThing> children = new ArrayList<HADatAcThing>();
+                results.put(oc, children);
+            }
+
+            Facet subFacet = facet.getChildById(oc.getUri());
+            subFacet.putFacet("object_collection_type_str", oc.getUri());
+        }
+
+        return results;
     }
 
     private void saveObjectUris(String oc_uri) {

@@ -57,13 +57,11 @@ public class Facet {
 		if (children.containsKey(id)) {
 			facet = children.get(id);
 			facet.addFieldValues(getFieldValues());
-			//System.out.println("Use existing facet for " + id);
 		} else {
 			facet = new Facet(id);
 			facet.setFacetName(getFacetName());
 			facet.addFieldValues(getFieldValues());
 			addChild(facet);
-			//System.out.println("Use NEW facet for " + id);
 		}
 		
 		return facet;
@@ -204,8 +202,8 @@ public class Facet {
 		List<String> fieldQueries = new ArrayList<>();
 		for (String field : getFieldValues().keySet()) {
 			if (!getIgnoredFields().contains(field)) {
-				fieldQueries.add(String.join(" OR ", getFieldValues().get(field).stream().map(
-						p -> field + ":\"" + p + "\"").collect(Collectors.toList())));
+				fieldQueries.add(field + ":(" + String.join(", ", getFieldValues().get(field).stream().map(
+                        p -> "\"" + p + "\"").collect(Collectors.toList())) + ")");
 			}
 		}
 		
@@ -236,8 +234,8 @@ public class Facet {
 		List<String> fieldQueries = new ArrayList<>();
 		for (String field : getFieldValues().keySet()) {
 			if (!getIgnoredFields().contains(field)) {
-				fieldQueries.add(String.join(" OR ", getFieldValues().get(field).stream().map(
-						p -> field + ":\"" + p + "\"").collect(Collectors.toList())));
+			    fieldQueries.add(field + ":(" + String.join(", ", getFieldValues().get(field).stream().map(
+                        p -> "\"" + p + "\"").collect(Collectors.toList())) + ")");
 			}
 		}
 		
@@ -254,8 +252,8 @@ public class Facet {
 		
 		for (String field : getFieldValues().keySet()) {
 			if (!getIgnoredFields().contains(field)) {
-				fieldQueries.add(String.join(" OR ", getFieldValues().get(field).stream().map(
-						p -> field + ":\"" + p + "\"").collect(Collectors.toList())));
+			    fieldQueries.add(field + ":(" + String.join(", ", getFieldValues().get(field).stream().map(
+                        p -> "\"" + p + "\"").collect(Collectors.toList())) + ")");
 			}
 		}
 		

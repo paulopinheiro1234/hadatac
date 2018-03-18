@@ -263,6 +263,11 @@ public class Parser {
                  *   SET OBJECT ID, PID, SID   *
                  *                             *
                  *=============================*/
+                measurement.setObjectCollectionType("");
+                measurement.setStudyObjectUri("");
+                measurement.setObjectUri("");
+                measurement.setPID("");
+                measurement.setSID("");
 
                 String id = "";
                 if (!schema.getOriginalIdLabel().equals("")) {
@@ -274,26 +279,20 @@ public class Parser {
                 if (!id.equals("")) {
                     if (dasa.getEntity().equals(URIUtils.replacePrefixEx("sio:Sample"))) {
                         if (mapIDStudyObjects.containsKey(id)) {
+                            measurement.setStudyObjectUri(mapIDStudyObjects.get(id).get(0));
                             measurement.setObjectUri(mapIDStudyObjects.get(id).get(2));
                             measurement.setPID(mapIDStudyObjects.get(id).get(1));
-                        } else {
-                            measurement.setObjectUri("");
-                            measurement.setPID("");
                         }
+                        measurement.setObjectCollectionType(URIUtils.replacePrefixEx("hasco:SampleCollection"));
                         measurement.setSID(id);
                     } else {
                         if (mapIDStudyObjects.containsKey(id)) {
+                            measurement.setStudyObjectUri(mapIDStudyObjects.get(id).get(0));
                             measurement.setObjectUri(mapIDStudyObjects.get(id).get(0));
-                        } else {
-                            measurement.setObjectUri("");
                         }
+                        measurement.setObjectCollectionType(URIUtils.replacePrefixEx("hasco:SubjectGroup"));
                         measurement.setPID(id);
-                        measurement.setSID("");
                     }
-                } else {
-                    measurement.setObjectUri("");
-                    measurement.setPID("");
-                    measurement.setSID("");
                 }
 
                 /*=============================*
@@ -345,18 +344,12 @@ public class Parser {
                             if (daso.getEntity().equals(URIUtils.replacePrefixEx("sio:Human"))) {
                                 if (mapIDStudyObjects.containsKey(originalId)) {
                                     measurement.setObjectUri(mapIDStudyObjects.get(originalId).get(0));
-                                } else {
-                                    measurement.setObjectUri("");
                                 }
                                 measurement.setPID(originalId);
-                                measurement.setSID("");
                             } else if (daso.getEntity().equals(URIUtils.replacePrefixEx("sio:Sample"))) {
                                 if (mapIDStudyObjects.containsKey(originalId)) {
                                     measurement.setObjectUri(mapIDStudyObjects.get(originalId).get(2));
                                     measurement.setPID(mapIDStudyObjects.get(originalId).get(1));
-                                } else {
-                                    measurement.setObjectUri("");
-                                    measurement.setPID("");
                                 }
                                 measurement.setSID(originalId);
                             }

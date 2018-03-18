@@ -38,7 +38,7 @@ public class FacetTree {
 	public void retrieveFacetData(int level, Facet facet, 
 			FacetHandler facetHandler, 
 			Pivot curPivot) {
-		System.out.println("level " + level);
+		System.out.println("\n\n\nlevel " + level);
 		System.out.println("facetName: " + facet.getFacetName());
 		
 		try {

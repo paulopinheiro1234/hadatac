@@ -692,11 +692,8 @@ public class DataAcquisition extends HADatAcThing {
     }
 
     public long getNumberFromSolr(Facet facet, FacetHandler facetHandler) {
-        System.out.println("\nDataAcquisition getNumberFromSolr facet: " + facet.toSolrQuery());
-
         SolrQuery query = new SolrQuery();
         String strQuery = facetHandler.getTempSolrQuery(facet);
-        System.out.println("strQuery: " + strQuery);
         query.setQuery(strQuery);
         query.setRows(0);
         query.setFacet(false);
@@ -718,11 +715,10 @@ public class DataAcquisition extends HADatAcThing {
 
     public Map<HADatAcThing, List<HADatAcThing>> getTargetFacets(
             Facet facet, FacetHandler facetHandler) {
-        System.out.println("\nDataAcquisition getTargetFacets facet: " + facet.toSolrQuery());
 
         SolrQuery query = new SolrQuery();
         String strQuery = facetHandler.getTempSolrQuery(facet);
-        System.out.println("strQuery: " + strQuery);
+        //System.out.println("strQuery: " + strQuery);
         query.setQuery(strQuery);
         query.setRows(0);
         query.setFacet(true);

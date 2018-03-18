@@ -40,7 +40,6 @@ public class EntityInstance extends HADatAcThing implements Comparable<EntityIns
 
     public Map<HADatAcThing, List<HADatAcThing>> getTargetFacets(
             Facet facet, FacetHandler facetHandler) {
-        System.out.println("\nEntityInstance getTargetFacets facet: " + facet.toSolrQuery());
 
         SolrQuery query = new SolrQuery();
         String strQuery = facetHandler.getTempSolrQuery(facet);

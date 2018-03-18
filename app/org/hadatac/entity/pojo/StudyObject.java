@@ -19,12 +19,23 @@ import org.apache.jena.update.UpdateExecutionFactory;
 import org.apache.jena.update.UpdateFactory;
 import org.apache.jena.update.UpdateProcessor;
 import org.apache.jena.update.UpdateRequest;
+import org.apache.solr.client.solrj.SolrClient;
+import org.apache.solr.client.solrj.SolrQuery;
+import org.apache.solr.client.solrj.SolrRequest;
+import org.apache.solr.client.solrj.impl.HttpSolrClient;
+import org.apache.solr.client.solrj.response.QueryResponse;
+import org.apache.solr.common.SolrDocumentList;
 import org.hadatac.utils.CollectionUtil;
 import org.hadatac.utils.NameSpaces;
 import org.hadatac.utils.FirstLabel;
+import org.hadatac.console.models.Facet;
+import org.hadatac.console.models.FacetHandler;
+import org.hadatac.console.models.Pivot;
 import org.hadatac.metadata.loader.LabkeyDataHandler;
 import org.hadatac.metadata.loader.URIUtils;
 import org.labkey.remoteapi.CommandException;
+
+import com.typesafe.config.ConfigFactory;
 
 public class StudyObject extends HADatAcThing {
 
@@ -141,9 +152,9 @@ public class StudyObject extends HADatAcThing {
                 "SELECT  ?scopeUri WHERE { " + 
                 " <" + obj_uri + "> hasco:hasObjectScope ?scopeUri . " + 
                 "}";
-        
+
         //System.out.println("Study.retrieveScopeUris() queryString: \n" + queryString);
-        
+
         Query query = QueryFactory.create(queryString);
         QueryExecution qexec = QueryExecutionFactory.sparqlService(
                 CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), query);
@@ -298,8 +309,7 @@ public class StudyObject extends HADatAcThing {
         qexec.close();
         while (resultsrw.hasNext()) {
             QuerySolution soln = resultsrw.next();
-            if (soln != null && soln.getResource("uri").getURI() != null) { 
-                //System.out.println("URI: [" + soln.getResource("uri").getURI() + "]");
+            if (soln != null && soln.getResource("uri").getURI() != null) {
                 StudyObject object = StudyObject.find(soln.getResource("uri").getURI());
                 objects.add(object);
             }
@@ -334,10 +344,80 @@ public class StudyObject extends HADatAcThing {
         return "";
     }
 
+    public long getNumberFromSolr(Facet facet, FacetHandler facetHandler) {
+        System.out.println("\nStudyObject facet: " + facet.toSolrQuery());
+
+        SolrQuery query = new SolrQuery();
+        String strQuery = facetHandler.getTempSolrQuery(facet);
+        query.setQuery(strQuery);
+        query.setRows(0);
+        query.setFacet(false);
+
+        try {
+            SolrClient solr = new HttpSolrClient.Builder(
+                    ConfigFactory.load().getString("hadatac.solr.data") 
+                    + CollectionUtil.DATA_ACQUISITION).build();
+            QueryResponse queryResponse = solr.query(query, SolrRequest.METHOD.POST);
+            solr.close();
+            SolrDocumentList results = queryResponse.getResults();
+            return results.getNumFound();
+        } catch (Exception e) {
+            System.out.println("[ERROR] StudyObject.getNumberFromSolr() - Exception message: " + e.getMessage());
+        }
+
+        return -1;
+    }
+
+    public Map<HADatAcThing, List<HADatAcThing>> getTargetFacets(
+            Facet facet, FacetHandler facetHandler) {
+
+        SolrQuery query = new SolrQuery();
+        String strQuery = facetHandler.getTempSolrQuery(facet);
+        query.setQuery(strQuery);
+        query.setRows(0);
+        query.setFacet(true);
+        query.setFacetLimit(-1);
+        query.setParam("json.facet", "{ "
+                + "study_object_uri_str:{ "
+                + "type: terms, "
+                + "field: study_object_uri_str, "
+                + "limit: 10000000}}");
+
+        try {
+            SolrClient solr = new HttpSolrClient.Builder(
+                    ConfigFactory.load().getString("hadatac.solr.data") 
+                    + CollectionUtil.DATA_ACQUISITION).build();
+            QueryResponse queryResponse = solr.query(query, SolrRequest.METHOD.POST);
+            solr.close();
+            Pivot pivot = Pivot.parseQueryResponse(queryResponse);            
+            return parsePivot(pivot, facet);
+        } catch (Exception e) {
+            System.out.println("[ERROR] StudyObject.getTargetFacets() - Exception message: " + e.getMessage());
+        }
+
+        return null;
+    }
+
+    private Map<HADatAcThing, List<HADatAcThing>> parsePivot(Pivot pivot, Facet facet) {
+        Map<HADatAcThing, List<HADatAcThing>> results = new HashMap<HADatAcThing, List<HADatAcThing>>();
+        for (Pivot child : pivot.children) {
+            StudyObject studyObject = new StudyObject();
+            studyObject.setUri(child.getValue());
+            studyObject.setLabel(child.getValue());
+            studyObject.setCount(child.getCount());
+            studyObject.setField("study_object_uri_str");
+
+            if (!results.containsKey(studyObject)) {
+                List<HADatAcThing> children = new ArrayList<HADatAcThing>();
+                results.put(studyObject, children);
+            }
+        }
+
+        return results;
+    }
+
     @Override
     public boolean saveToTripleStore() {
-        deleteFromTripleStore();
-
         System.out.println("Saving study object " + getUri() + " to triple store");
 
         if (uri == null || uri.equals("")) {
@@ -397,7 +477,7 @@ public class StudyObject extends HADatAcThing {
         UpdateProcessor processor = UpdateExecutionFactory.createRemote(
                 request, CollectionUtil.getCollectionsName(CollectionUtil.METADATA_UPDATE));
         processor.execute();
-        
+
         return true;
     }
 

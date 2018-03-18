@@ -26,7 +26,7 @@ import org.hadatac.entity.pojo.StudyObject;
 public class SampleSubjectMapper extends BasicGenerator {
 
     final String kbPrefix = ConfigProp.getKbPrefix();
-    private int counter = 1; //starting index number
+    private int counter = 1;
     
     private Map<String, String> mapIdUriCache = null;
 
@@ -104,9 +104,17 @@ public class SampleSubjectMapper extends BasicGenerator {
                 + rec.getValueByColumnName(mapCol.get("studyID"));
     }
 
-    private String getOriginalID(Record rec) {
+    private String getOriginalSID(Record rec) {
         if(!rec.getValueByColumnName(mapCol.get("originalSID")).equalsIgnoreCase("NULL")){
             return rec.getValueByColumnName(mapCol.get("originalSID"));
+        } else {
+            return "";
+        }
+    }
+    
+    private String getOriginalPID(Record rec) {
+        if(!rec.getValueByColumnName(mapCol.get("originalPID")).equalsIgnoreCase("NULL")){
+            return rec.getValueByColumnName(mapCol.get("originalPID"));
         } else {
             return "";
         }
@@ -126,8 +134,14 @@ public class SampleSubjectMapper extends BasicGenerator {
 
 
     public StudyObject createStudyObject(Record record) throws Exception {
-        StudyObject obj = new StudyObject(getUri(record), "sio:Sample", getOriginalID(record), 
+        StudyObject obj = new StudyObject(getUri(record), "sio:Sample", getOriginalSID(record), 
                 getLabel(record), getCollectionUri(record), getLabel(record));
+        
+        String pid = getOriginalPID(record);
+        if (mapIdUriCache.containsKey(pid)) {
+            obj.addScopeUri(mapIdUriCache.get(pid));
+        }
+        
         return obj;
     }
 
@@ -142,28 +156,6 @@ public class SampleSubjectMapper extends BasicGenerator {
         return oc;
     }
 
-    public void updateMappings() throws Exception {
-        for (Record record : records) {
-            String sid = record.getValueByColumnName(mapCol.get("originalSID"));
-            String pid = record.getValueByColumnName(mapCol.get("originalPID"));
-
-            String sampleUri = "";
-            if (mapIdUriCache.containsKey(sid)) {
-                sampleUri = mapIdUriCache.get(sid);
-            }
-
-            if (sampleUri.isEmpty()) {
-                continue;
-            } else {
-                if (mapIdUriCache.containsKey(pid)) {
-                    StudyObject obj = StudyObject.find(sampleUri);
-                    obj.addScopeUri(mapIdUriCache.get(pid));
-                    objects.add(obj);
-                }
-            }
-        }
-    }
-
     @Override
     public void preprocess() throws Exception {
         if (!records.isEmpty()) {
@@ -172,12 +164,7 @@ public class SampleSubjectMapper extends BasicGenerator {
     }
 
     @Override
-    public void postprocess() throws Exception {
-        updateMappings();
-    }
-
-    @Override
-    HADatAcThing createObject(Record rec, int row_number) throws Exception {
+    public HADatAcThing createObject(Record rec, int row_number) throws Exception {
         System.out.println("counter: " + counter);
         
         counter++;

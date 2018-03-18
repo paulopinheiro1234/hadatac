@@ -65,32 +65,39 @@
     selected_elems = JSON.parse('@handler.values(FacetHandler.ENTITY_CHARACTERISTIC_FACET)'.replace(/&quot;/g,'"'));
     dataTree = parseSolrFacetToMergedTree('@FacetHandler.ENTITY_CHARACTERISTIC_FACET', selected_elems);
     //dataTree = parseSolrFacetToTree('@FacetHandler.ENTITY_CHARACTERISTIC_FACET', selected_elems);
-    treeEC = new dhtmlXTreeObject("treeEntityCharacteristicBox","100%","100%",0);
+    treeEC = new dhtmlXTreeObject("treeEntityCharacteristicBox", "100%", "100%", 0);
     loadTree(treeEC, dataTree);
     
     var treeS;
     selected_elems = JSON.parse('@handler.values(FacetHandler.STUDY_FACET)'.replace(/&quot;/g,'"'));
     dataTree = parseSolrFacetToTree('@FacetHandler.STUDY_FACET', selected_elems);
     console.log("dataTree: " + JSON.stringify(dataTree));
-    treeS = new dhtmlXTreeObject("treeStudyBox","100%","100%",0);
+    treeS = new dhtmlXTreeObject("treeStudyBox", "100%", "100%", 0);
     loadTree(treeS, dataTree);
+    
+    var treeOC;
+    selected_elems = JSON.parse('@handler.values(FacetHandler.OBJECT_COLLECTION_FACET)'.replace(/&quot;/g,'"'));
+    dataTree = parseSolrFacetToTree('@FacetHandler.OBJECT_COLLECTION_FACET', selected_elems);
+    console.log("dataTree: " + JSON.stringify(dataTree));
+    treeOC = new dhtmlXTreeObject("treeObjectCollectionBox", "100%", "100%", 0);
+    loadTree(treeOC, dataTree);
     
     var treeU;
     selected_elems = JSON.parse('@handler.values(FacetHandler.UNIT_FACET)'.replace(/&quot;/g,'"'));
     dataTree = parseSolrFacetToTree('@FacetHandler.UNIT_FACET', selected_elems);
-    treeU = new dhtmlXTreeObject("treeUnitBox","100%","100%",0);
+    treeU = new dhtmlXTreeObject("treeUnitBox", "100%", "100%", 0);
     loadTree(treeU, dataTree);
     
     var treeT;
     selected_elems = JSON.parse('@handler.values(FacetHandler.TIME_FACET)'.replace(/&quot;/g,'"'));
     dataTree = parseSolrFacetToTree('@FacetHandler.TIME_FACET', selected_elems);
-    treeT = new dhtmlXTreeObject("treeTimeBox","100%","100%",0);
+    treeT = new dhtmlXTreeObject("treeTimeBox", "100%", "100%", 0);
     loadTree(treeT, dataTree);
 
     var treePI;
     selected_elems = JSON.parse('@handler.values(FacetHandler.PLATFORM_INSTRUMENT_FACET)'.replace(/&quot;/g,'"'));
     dataTree = parseSolrFacetToTree('@FacetHandler.PLATFORM_INSTRUMENT_FACET', selected_elems);
-    treePI = new dhtmlXTreeObject("treePlatformInstrumentBox","100%","100%",0);
+    treePI = new dhtmlXTreeObject("treePlatformInstrumentBox", "100%", "100%", 0);
     loadTree(treePI, dataTree);
 </script>
 
