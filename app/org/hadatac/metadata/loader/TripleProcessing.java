@@ -30,7 +30,6 @@ import org.apache.jena.riot.RDFDataMgr;
 import org.hadatac.console.controllers.AuthApplication;
 import org.hadatac.console.controllers.triplestore.UserManagement;
 import org.hadatac.console.models.SysUser;
-import org.hadatac.console.views.html.deployments.newDeployment;
 import org.hadatac.entity.pojo.DataAcquisition;
 import org.hadatac.entity.pojo.Deployment;
 import org.hadatac.entity.pojo.Measurement;
@@ -149,7 +148,7 @@ public class TripleProcessing {
     public static List<String> getLabKeyMetadataLists(String labkey_site, String user_name, 
     		String password, String path) throws CommandException {
     	
-    	LabkeyDataHandler loader = new LabkeyDataHandler(labkey_site, user_name, password, path);
+    	LabkeyDataHandler loader = new LabkeyDataHandler(labkey_site, path, user_name, password);
 		try {
 			List<String> queryNames = loader.getMetadataQueryNames(false);
 			return queryNames;

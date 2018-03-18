@@ -9,13 +9,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.StringTokenizer;
 
-import javax.swing.plaf.synth.SynthStyleFactory;
-
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.Property;
 import org.apache.jena.rdf.model.Resource;
-import org.apache.jena.sparql.function.library.print;
-import org.hadatac.console.views.html.deployments.newDeployment;
 import org.hadatac.utils.ConfigProp;
 import org.apache.jena.rdf.model.Literal;
 import org.json.simple.JSONArray;
