@@ -9,6 +9,8 @@ import java.util.Map.Entry;
 import org.hadatac.utils.ApiUtil;
 import org.hadatac.utils.NameSpaces;
 import org.hadatac.entity.pojo.Study;
+import org.hadatac.entity.pojo.StudyObject;
+import org.hadatac.entity.pojo.ObjectCollection;
 import org.hadatac.entity.pojo.DataAcquisitionSchema;
 import org.hadatac.entity.pojo.DataAcquisitionSchemaAttribute;
 import org.hadatac.utils.State;
@@ -267,9 +269,101 @@ public class RestApi extends Controller {
 
     // Given the study URI, return the URI's and types of all object collections
     // (not the full arrays of the collections themselves)
-    public Result getOCsInStudy(String studyUri){
+    // Returning the ObjectCollection pojo includes an array of the included objects
+    //    themselves, so to avoid overload for the extremely large OC's, we parse the
+    //    query results into a smaller JSON object with URI and TYPE URI.
+    public Result getOCListInStudy(String studyUri){
+        ObjectMapper mapper = new ObjectMapper();
+        if (studyUri == null) {
+            return notFound(ApiUtil.createResponse("No study specified", false));
+        }
+        String queryString = NameSpaces.getInstance().printSparqlNameSpaceList() + 
+                "SELECT ?uri ?ocType WHERE { \n" + 
+                "   ?ocType rdfs:subClassOf+ hasco:ObjectCollection . \n" +
+                "   ?uri a ?ocType . \n" +
+                "   ?uri hasco:isMemberOf <" + studyUri + "> . \n" +
+                " } ";
+        Query query = QueryFactory.create(queryString);
+        QueryExecution qexec = QueryExecutionFactory.sparqlService(
+                CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), query);
+        ResultSet results = qexec.execSelect();
+        ResultSetRewindable resultsrw = ResultSetFactory.copyResults(results);
+        qexec.close();
+        ArrayNode anode = mapper.createArrayNode();
+
+        while (resultsrw.hasNext()) {
+            QuerySolution soln = resultsrw.next();
+            ObjectNode temp = mapper.createObjectNode();
+            if (soln.getResource("uri").getURI() != null && soln.getResource("ocType") != null) { 
+    			temp.put("uri", soln.get("uri").toString());
+    			temp.put("ocType", soln.get("ocType").toString());
+    		} else {
+                System.out.println("[GetUnitsInStudy] ERROR: Result returned without URI? Skipping....");
+                continue;
+            }
+            anode.add(temp);
+        }
+
+        System.out.println("[getOCListInStudy] parsed " + anode.size() + " results into array");
+        System.out.println("[getOCListInStudy] done");
         
-        return ok();
+        if(anode.size() < 1){
+            return notFound(ApiUtil.createResponse("No object collections found for study " + studyUri, false));
+        } else {
+            JsonNode jsonObject = mapper.convertValue(anode, JsonNode.class);
+            return ok(ApiUtil.createResponse(jsonObject, true));
+        }
     }// /getOCsInStudy
+
+
+    // test with http%3A%2F%2Fhadatac.org%2Fkb%2Fhbgd%23CH-CPP4
+    // Given the study URI, return the URI's of all StudyObjects that are subjects in that study
+    public Result getObjectCollection(String ocUri){
+        ObjectMapper mapper = new ObjectMapper();
+        ObjectCollection result = ObjectCollection.find(ocUri);
+        //System.out.println("[RestAPI] OC type: " + result.getType());
+        if(result == null){
+            return notFound(ApiUtil.createResponse("ObjectCollection with uri " + ocUri + " not found", false));
+        } else {
+            JsonNode jsonObject = mapper.convertValue(result, JsonNode.class);
+            return ok(ApiUtil.createResponse(jsonObject, true));
+        }
+    }// /getObjectCollection
+
+
+    public Result getOCSize(String ocUri){
+        ObjectCollection objs = ObjectCollection.find(ocUri);
+        if(objs == null){
+            return notFound(ApiUtil.createResponse("ObjectCollection with uri " + ocUri + " not found", false));
+        }
+        int totalResultSize = objs.getCollectionSize();
+        return ok(ApiUtil.createResponse("size: " + totalResultSize, true));        
+    }
+
+
+    //total_count, page, size
+    public Result getObjectsInCollection(String ocUri, int offset){
+        ObjectMapper mapper = new ObjectMapper();
+        int pageSize = 250;
+        ObjectCollection objs = ObjectCollection.find(ocUri);
+        if(objs == null){
+            return notFound(ApiUtil.createResponse("ObjectCollection with uri " + ocUri + " not found", false));
+        }
+        int totalResultSize = objs.getCollectionSize();
+        if(totalResultSize < 1){
+            return notFound(ApiUtil.createResponse("ObjectCollection with uri " + ocUri + " not found", false));
+        }
+        if(pageSize > 250 || pageSize < 1) {
+            pageSize = 250;
+            System.out.println("[RestAPI] getObjectsInCollection : Yikes! Resetting that page size for you!");
+        }
+        List<StudyObject> results = StudyObject.findByCollectionWithPages(objs, pageSize, offset);
+        if(results == null){
+            return notFound(ApiUtil.createResponse("ObjectCollection with URI " + ocUri + "not found", false));
+        } else {
+            JsonNode jsonObject = mapper.convertValue(results, JsonNode.class);
+            return ok(ApiUtil.createResponse(jsonObject, true));
+        }
+    }// /getObjectsInCollection
 
 }// /RestApi

@@ -317,6 +317,34 @@ public class StudyObject extends HADatAcThing {
         return objects;
     }
 
+    public static List<StudyObject> findByCollectionWithPages(ObjectCollection oc, int pageSize, int offset) {
+        if (oc == null) {
+            return null;
+        }
+        List<StudyObject> objects = new ArrayList<StudyObject>();
+        String queryString = NameSpaces.getInstance().printSparqlNameSpaceList() + 
+                "SELECT ?uri ?id WHERE { " + 
+                "   ?uri hasco:isMemberOf  <" + oc.getUri() + "> . " +
+                "   ?uri hasco:originalID  ?id . " +
+                " } ORDER BY ASC (?id)" + 
+                " LIMIT " + pageSize + 
+                " OFFSET " + offset;
+        Query query = QueryFactory.create(queryString);
+        QueryExecution qexec = QueryExecutionFactory.sparqlService(
+                CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), query);
+        ResultSet results = qexec.execSelect();
+        ResultSetRewindable resultsrw = ResultSetFactory.copyResults(results);
+        qexec.close();
+        while (resultsrw.hasNext()) {
+            QuerySolution soln = resultsrw.next();
+            if (soln != null && soln.getResource("uri").getURI() != null) {
+                StudyObject object = StudyObject.find(soln.getResource("uri").getURI());
+                objects.add(object);
+            }
+        }
+        return objects;
+    }// /findByCollectionWithPages
+
     public static String findByCollectionJSON(ObjectCollection oc) {
         if (oc == null) {
             return null;

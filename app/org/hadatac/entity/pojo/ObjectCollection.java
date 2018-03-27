@@ -267,6 +267,33 @@ public class ObjectCollection extends HADatAcThing implements Comparable<ObjectC
         return false;
     }
 
+    public int getCollectionSize(){
+        String queryString = NameSpaces.getInstance().printSparqlNameSpaceList() + 
+                "SELECT (count(*) as ?count) WHERE { " + 
+                "   ?uri hasco:isMemberOf  <" + this.getUri() + "> . " +
+                " } ";
+
+        Query query = QueryFactory.create(queryString);
+        QueryExecution qexec = QueryExecutionFactory.sparqlService(
+                CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), query);
+        ResultSet results = qexec.execSelect();
+        ResultSetRewindable resultsrw = ResultSetFactory.copyResults(results);
+        qexec.close();
+        
+        int count = 0;
+        while (resultsrw.hasNext()) {
+            QuerySolution soln = resultsrw.next();
+            if (soln != null && soln.getLiteral("count") != null) {
+                count += soln.getLiteral("count").getInt();
+            }
+            else {
+                System.out.println("[ObjectCollection] getCollectionSize(): Error!");
+                return -1;
+            }
+        }
+        return count;
+    }// /getCollectionSize()
+
     private static List<String> retrieveSpaceScope(String oc_uri) {
         List<String> scopeUris = new ArrayList<String>();
         String scopeUri = ""; 
