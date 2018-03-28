@@ -73,7 +73,7 @@ public class Parser {
         List<String> unknownHeaders = schema.defineTemporaryPositions(file.getHeaders());
         if (!unknownHeaders.isEmpty()) {
             log.addline(Feedback.println(Feedback.WEB, 
-                    "[WARNING] Failed to match the following headers: " + unknownHeaders));
+                    "[WARNING] Failed to match the following " + unknownHeaders.size() + " headers: " + unknownHeaders));
         }
 
         // ASSIGN positions for MetaDASAs
