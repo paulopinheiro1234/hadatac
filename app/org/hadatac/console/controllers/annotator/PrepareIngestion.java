@@ -25,7 +25,6 @@ import org.hadatac.entity.pojo.ObjectCollection;
 import org.hadatac.entity.pojo.Study;
 import org.hadatac.entity.pojo.TriggeringEvent;
 import org.hadatac.metadata.loader.URIUtils;
-import org.labkey.remoteapi.CommandException;
 
 import be.objectify.deadbolt.java.actions.Group;
 import be.objectify.deadbolt.java.actions.Restrict;
@@ -41,12 +40,6 @@ public class PrepareIngestion extends Controller {
 
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
     public Result create(String file_name, String da_uri) {
-
-        if (session().get("LabKeyUserName") == null && session().get("LabKeyPassword") == null) {
-            return redirect(org.hadatac.console.controllers.triplestore.routes.LoadKB.logInLabkey(
-                    routes.PrepareIngestion.create(file_name,da_uri).url()));
-        }
-
         final String kbPrefix = ConfigProp.getKbPrefix();
         String ownerEmail = "";
         DataAcquisition da = null;
@@ -61,7 +54,7 @@ public class PrepareIngestion extends Controller {
         ownerEmail = AuthApplication.getLocalUser(session()).getEmail();
         file = DataFile.findByName(ownerEmail, file_name);
         if (file == null) {
-            return ok(prepareIngestion.render(file_name, da, "[ERROR] Could not update file records with new DA information"));
+            return badRequest("[ERROR] Could not update file records with new DA information");
         }
         System.out.println("DataFile's Dataset URI : [" + file.getDatasetUri() + "]");
 
@@ -79,6 +72,11 @@ public class PrepareIngestion extends Controller {
         }
 
         // OR create a new DA if the file is not associated with any existing DA
+        
+        if (session().get("LabKeyUserName") == null && session().get("LabKeyPassword") == null) {
+            return redirect(org.hadatac.console.controllers.triplestore.routes.LoadKB.logInLabkey(
+                    routes.PrepareIngestion.create(file_name,da_uri).url()));
+        }
 
         String da_label = "";
         String new_da_uri = "";

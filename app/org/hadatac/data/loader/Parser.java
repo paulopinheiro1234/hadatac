@@ -42,9 +42,14 @@ public class Parser {
 
         AnnotationLog log = AnnotationLog.create(dataFile.getFileName());
 
-        Map<String, DataAcquisitionSchemaObject> mapSchemaObjects = new HashMap<String, DataAcquisitionSchemaObject>();
         schema = DataAcquisitionSchema.find(da.getSchemaUri());
+        if (schema == null) {
+            log.addline(Feedback.println(Feedback.WEB, "[ERROR] " + da.getSchemaUri() + " cannot be found!"));
+            return new ParsingResult(1, log.getLog());
+        }
 
+        Map<String, DataAcquisitionSchemaObject> mapSchemaObjects = new HashMap<String, DataAcquisitionSchemaObject>();
+        
         /*
 		if(!AnnotationWorker.templateLibrary.containsKey(da.getSchemaUri())){
 			System.out.println("[Parser] [WARN] no DASVirtualObject templates for this DataAcquisition. Is this correct?");

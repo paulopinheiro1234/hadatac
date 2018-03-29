@@ -14,8 +14,6 @@ import org.hadatac.entity.pojo.Instrument;
 import org.hadatac.entity.pojo.Platform;
 import org.hadatac.entity.pojo.Study;
 import org.hadatac.utils.ConfigProp;
-import org.joda.time.DateTime;
-import org.joda.time.DateTimeZone;
 
 import com.typesafe.config.ConfigFactory;
 
@@ -101,7 +99,7 @@ public class DataFactory {
 			deployment.getDetectors().add(Detector.find(detectorUri.get(i)));
 		}
 		deployment.setStartedAtXsd(startedAt);
-		deployment.save();
+		deployment.saveToTripleStore();
 
 		return deployment;
 	}
@@ -111,7 +109,7 @@ public class DataFactory {
 		String dasLabel = "Schema for " + dasName;
 		DataAcquisitionSchema das = DataAcquisitionSchema.create(dasUri);
 		das.setLabel(dasLabel);
-		das.save();
+		das.saveToTripleStore();
 		return das;
 	}
 
@@ -136,7 +134,7 @@ public class DataFactory {
 			} else {
 				consoleStore.setLastDynamicMetadataId(consoleStore.getLastDynamicMetadataId() + 1);
 			}
-			consoleStore.save();
+			consoleStore.saveToSolr();
 			return consoleStore.getLastDynamicMetadataId();
 		} catch (Exception e) {
 			System.out.println("[ERROR] DataFactory.getNextDynamicMetadataId() - e.Message: " + e.getMessage());
