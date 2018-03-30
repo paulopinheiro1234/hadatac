@@ -18,6 +18,7 @@ import org.hadatac.data.model.ParsingResult;
 import org.hadatac.entity.pojo.DataAcquisition;
 import org.hadatac.entity.pojo.DataAcquisitionSchema;
 import org.hadatac.entity.pojo.DataAcquisitionSchemaAttribute;
+import org.hadatac.entity.pojo.DataAcquisitionSchemaEvent;
 import org.hadatac.entity.pojo.DataAcquisitionSchemaObject;
 import org.hadatac.entity.pojo.DASVirtualObject;
 import org.hadatac.entity.pojo.DataFile;
@@ -49,6 +50,7 @@ public class Parser {
         }
 
         Map<String, DataAcquisitionSchemaObject> mapSchemaObjects = new HashMap<String, DataAcquisitionSchemaObject>();
+        Map<String, DataAcquisitionSchemaEvent> mapSchemaEvents = new HashMap<String, DataAcquisitionSchemaEvent>();
         
         /*
 		if(!AnnotationWorker.templateLibrary.containsKey(da.getSchemaUri())){
@@ -253,7 +255,15 @@ public class Parser {
                         measurement.setAbstractTime("");
                     }
                 } else if (dasa.getEventUri() != null && !dasa.getEventUri().equals("")) {
-                    measurement.setAbstractTime(dasa.getEventUri());
+                    DataAcquisitionSchemaEvent dase = null;
+                    String daseUri = dasa.getEventUri();
+                    if (mapSchemaEvents.containsKey(daseUri)) {
+                        dase = mapSchemaEvents.get(daseUri);
+                    } else {
+                        dase = schema.getEvent(daseUri);
+                        mapSchemaEvents.put(daseUri, dase);
+                    }
+                    measurement.setAbstractTime(dase.getEntity());
                 }
 
                 /*============================*

@@ -27,6 +27,7 @@ import org.hadatac.utils.CollectionUtil;
 
 import com.typesafe.config.ConfigFactory;
 
+
 public class TimeInstance extends HADatAcThing implements Comparable<TimeInstance> {
 
     public TimeInstance () {}
@@ -45,6 +46,7 @@ public class TimeInstance extends HADatAcThing implements Comparable<TimeInstanc
         return getUri().hashCode();
     }
 
+    @Override
     public Map<HADatAcThing, List<HADatAcThing>> getTargetFacets(
             Facet facet, FacetHandler facetHandler) {
         SolrQuery query = new SolrQuery();
@@ -214,15 +216,14 @@ public class TimeInstance extends HADatAcThing implements Comparable<TimeInstanc
             TimeInstance time = new TimeInstance();
             if (pivot_ent.getValue().startsWith("http")) {
                 time.setUri(pivot_ent.getValue());
-                DataAcquisitionSchemaEvent dase = DataAcquisitionSchemaEvent.find(pivot_ent.getValue());
-                if (dase != null) {
-                    if (!dase.getEntity().isEmpty()) {
-                        time.setLabel(URIUtils.replaceNameSpaceEx(dase.getEntity()));
-                    } else {
-                        time.setLabel(WordUtils.capitalize(dase.getLabel()));
-                    }
-                } else {
-                    time.setLabel(pivot_ent.getValue());
+                Entity entity = Entity.find(pivot_ent.getValue());
+                if (entity != null) {
+                    time.setLabel(WordUtils.capitalize(entity.getLabel()));
+                }
+                if (time.getLabel().isEmpty()) {
+                    String uri = pivot_ent.getValue();
+                    time.setLabel(WordUtils.capitalize(uri.substring(
+                            Math.max(uri.lastIndexOf("#"), uri.lastIndexOf("/")) + 1)));
                 }
             } else {
                 time.setUri("");
