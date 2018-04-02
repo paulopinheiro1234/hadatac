@@ -185,12 +185,12 @@ public class DASchemaEventGenerator extends BasicGenerator {
 	
 	Map<String, Object> createTimeLineRow(Entry<String, List<String>> entry, int row_number) throws Exception {
 		Map<String, Object> row = new HashMap<String, Object>();
-		row.put("hasURI", kbPrefix + "DASE-" + SDDName + "-" + entry.getKey().trim().replace(" ","").replace("_","-").replace("??", ""));
-		row.put("a", "hasco:DASchemaEvent");
+		row.put("hasURI", kbPrefix + "DASE-" + SDDName + "-" + entry.getKey().trim().replace(" ","").replace("_","-").replace("??", "").replace(":", "-"));
+//		row.put("a", "hasco:DASchemaEvent");
 		row.put("rdfs:label", entry.getValue().get(0));
 		row.put("rdfs:comment", entry.getValue().get(0)); 
 		row.put("hasco:partOfSchema", kbPrefix + "DAS-" + SDDName);
-		row.put("hasco:hasEntity", entry.getValue().get(1).trim().replace(" ",""));
+		row.put("a", entry.getValue().get(1).trim().replace(" ",""));
 		System.out.println("till now all good..");
 		row.put("hasco:hasUnit", entry.getValue().get(2).trim().replace(" ",""));
 		System.out.println("till now all good2..");
