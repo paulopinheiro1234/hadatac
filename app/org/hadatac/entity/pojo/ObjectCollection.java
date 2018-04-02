@@ -671,27 +671,22 @@ public class ObjectCollection extends HADatAcThing implements Comparable<ObjectC
                 insert += oc_uri + " hasco:hasScope  " + this.getHasScopeUri() + " . ";
             }
         }
-        if (this.getSpaceScopeUris() != null && this.getSpaceScopeUris().size() > 0) {
+        if (this.getSpaceScopeUris() != null && !this.getSpaceScopeUris().equals("")) {
             for (String spaceScope : this.getSpaceScopeUris()) {
-            	if (spaceScope.length() > 0){
-	                if (spaceScope.startsWith("http")) {
-	                    insert += oc_uri + " hasco:hasSpaceScope  <" + spaceScope + "> . ";
-	                } else {
-	                    insert += oc_uri + " hasco:hasSpaceScope  " + spaceScope + " . ";
-	                }
-            	}
+                if (spaceScope.startsWith("http")) {
+                    insert += oc_uri + " hasco:hasSpaceScope  <" + spaceScope + "> . ";
+                } else {
+                    insert += oc_uri + " hasco:hasSpaceScope  " + spaceScope + " . ";
+                }
             }
         }
-        if (this.getTimeScopeUris() != null && this.getTimeScopeUris().size() > 0) {
+        if (this.getTimeScopeUris() != null && !this.getTimeScopeUris().equals("")) {
             for (String timeScope : this.getTimeScopeUris()) {
-            	if (timeScope.length() > 0){
-	                if (timeScope.startsWith("http")) {
-	                    insert += oc_uri + " hasco:hasTimeScope  <" + timeScope + "> . ";
-	                } else {
-	                    insert += oc_uri + " hasco:hasTimeScope  " + timeScope + " . ";
-	                	System.out.println(oc_uri + " hasco:hasTimeScope  " + timeScope + " . ");
-	                }
-            	}
+                if (timeScope.startsWith("http")) {
+                    insert += oc_uri + " hasco:hasTimeScope  <" + timeScope + "> . ";
+                } else {
+                    insert += oc_uri + " hasco:hasTimeScope  " + timeScope + " . ";
+                }
             }
         }
         insert += LINE_LAST;

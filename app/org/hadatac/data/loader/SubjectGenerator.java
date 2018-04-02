@@ -12,13 +12,11 @@ public class SubjectGenerator extends BasicGenerator {
 
     static final long MAX_OBJECTS = 1000;
     static final long LENGTH_CODE = 6;
-    String file_name;
 
     final String kbPrefix = ConfigProp.getKbPrefix();
     
     public SubjectGenerator(RecordFile file) {
         super(file);
-        file_name = file.getFile().getName();
     }
 
     @Override
@@ -49,7 +47,7 @@ public class SubjectGenerator extends BasicGenerator {
     }
 
     private String getCohortUri(Record rec) {
-        return kbPrefix + "SOC-" + getPilotNum(rec) + "-SUBJECTS";
+        return kbPrefix + "CH-" + getPilotNum(rec);
     }
 
     private String getCohortLabel(Record rec) {
@@ -83,9 +81,7 @@ public class SubjectGenerator extends BasicGenerator {
     @Override
     public void preprocess() throws Exception {
         if (!records.isEmpty()) {
-        	if (file_name.startsWith("PID-")){
-        		objects.add(createObjectCollection(records.get(0)));
-        	}
+            objects.add(createObjectCollection(records.get(0)));
         }
     }
 

@@ -80,9 +80,6 @@ public class AnnotationWorker {
                 else if (file_name.startsWith("SDD-")) {
                     chain = annotateDataAcquisitionSchemaFile(recordFile);
                 }
-                else if (file_name.startsWith("SSD-")) {
-                    chain = annotateSSDFile(recordFile);
-                }
 
                 bSucceed = chain.generate();
             }
@@ -233,25 +230,6 @@ public class AnnotationWorker {
         row.put("rdfs:comment", "");
         generalGenerator.addRow(row);
         chain.addGenerator(generalGenerator);
-
-        return chain;
-    }
-    
-    public static GeneratorChain annotateSSDFile(RecordFile file) {
-        
-        String Pilot_Num = file.getFile().getName().replaceAll("SSD-", "");
-        System.out.println("Processing SSD file of " + Pilot_Num + "...");
-        RecordFile SSDsheet = new SpreadsheetRecordFile(file.getFile(), "SSD");
-        RecordFile SBJsheet = new SpreadsheetRecordFile(file.getFile(), "SOC-2016-34-SUBJECTS");     
-        RecordFile MOMsheet = new SpreadsheetRecordFile(file.getFile(), "SOC-2016-34-MOTHERS");
-        RecordFile SAPsheet = new SpreadsheetRecordFile(file.getFile(), "SOC-2016-34-SSAMPLES");
-        
-        GeneratorChain chain = new GeneratorChain();
-        chain.addGenerator(new SSDGenerator(SSDsheet));  
-        chain.addGenerator(new SubjectGenerator(SBJsheet));
-        chain.addGenerator(new MotherGenerator(MOMsheet));
-        chain.addGenerator(new SampleSubjectMapper(SAPsheet));
-//        chain.addGenerator(new MotherSampleGenerator());
 
         return chain;
     }
