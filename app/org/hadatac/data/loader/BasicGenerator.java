@@ -74,7 +74,7 @@ public abstract class BasicGenerator {
     public void preprocess() throws Exception {}
     public void postprocess() throws Exception {}
 
-    public void createRows() throws Exception {        
+    public void createRows() throws Exception {     
         if (records == null) {
             return;
         }

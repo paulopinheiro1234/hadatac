@@ -132,13 +132,16 @@ public class DASchemaEventGenerator extends BasicGenerator {
 		int row_number = 0;
 		for (Record record : records) {
 			if (timeList.contains(getLabel(record)) && getLabel(record).length()>0){
+				if (tlm.keySet().contains(getLabel(record))){
+					rows.add(createTEventRow(record, ++row_number));
+				}
 				rows.add(createRow(record, ++row_number));
 			}
 		}
 		
 		for (Entry<String, List<String>> entry : tlm.entrySet()) {
 			if (entry.getKey().startsWith("??")){
-				rows.add(createTimeLineRow(entry, ++row_number));				
+				rows.add(createTimeLineRow(entry, ++row_number));		
 			}
 		}
 	    
@@ -169,7 +172,7 @@ public class DASchemaEventGenerator extends BasicGenerator {
 	@Override
 	Map<String, Object> createRow(Record rec, int row_number) throws Exception {
 		Map<String, Object> row = new HashMap<String, Object>();
-		row.put("hasURI", kbPrefix + "DASE-" + SDDName + "-" + getLabel(rec).trim().replace(" ","").replace("_","-").replace("??", ""));
+		row.put("hasURI", kbPrefix + "DASE-" + SDDName + "-" + getLabel(rec).trim().replace(" ","").replace("_","-").replace("??", "").replaceAll(":", ""));
 		row.put("a", "hasco:DASchemaEvent");
 		row.put("rdfs:label", getLabel(rec).trim().replace(" ","").replace("_","-").replace("??", "")); 
 		row.put("rdfs:comment", getLabel(rec).trim().replace(" ","").replace("_","-").replace("??", "")); 
@@ -183,21 +186,33 @@ public class DASchemaEventGenerator extends BasicGenerator {
 		return row;
 	}
 	
+	Map<String, Object> createTEventRow(Record rec, int row_number) throws Exception {
+		Map<String, Object> row = new HashMap<String, Object>();
+		row.put("hasURI", kbPrefix + "DASE-" + SDDName + "-" + getLabel(rec).trim().replace(" ","").replace("_","-").replace("??", "").replaceAll(":", ""));
+		row.put("a", "hasco:DASchemaEvent");
+		row.put("rdfs:label", getLabel(rec).trim().replace(" ","").replace("_","-").replace("??", "")); 
+		row.put("rdfs:comment", getLabel(rec).trim().replace(" ","").replace("_","-").replace("??", "")); 
+		row.put("hasco:hasEntity", kbPrefix + "Visit-" + SDDName + "-" + getLabel(rec).trim().replace(" ","").replace("_","-").replace("??", ""));
+		System.out.print(kbPrefix + "Visit-" + SDDName + "-" + getLabel(rec).trim().replace(" ","").replace("_","-").replace("??", ""));
+//		row.put("hasco:hasUnit", getUnit(rec));
+//		row.put("sio:inRelationTo", getInRelationTo(rec));
+//		row.put("sio:Relation", getRelation(rec));
+//		row.put("hasco:isVirtual", checkVirtual(rec).toString());
+//		row.put("hasco:isPIConfirmed", "false");
+		return row;
+	}
+	
 	Map<String, Object> createTimeLineRow(Entry<String, List<String>> entry, int row_number) throws Exception {
 		Map<String, Object> row = new HashMap<String, Object>();
-		row.put("hasURI", kbPrefix + "DASE-" + SDDName + "-" + entry.getKey().trim().replace(" ","").replace("_","-").replace("??", ""));
-		row.put("a", "hasco:DASchemaEvent");
+		row.put("hasURI", kbPrefix + "Visit-" + SDDName + "-" + entry.getKey().trim().replace(" ","").replace("_","-").replace("??", "").replaceAll(":", ""));
+		row.put("a", "chear:Visit");
 		row.put("rdfs:label", entry.getValue().get(0));
-		row.put("rdfs:comment", entry.getValue().get(0)); 
-		row.put("hasco:partOfSchema", kbPrefix + "DAS-" + SDDName);
-		row.put("hasco:hasEntity", entry.getValue().get(1).trim().replace(" ",""));
+		System.out.println("timeline label: " + entry.getValue().get(1));
+		row.put("rdfs:comment", entry.getValue().get(0));
 		System.out.println("till now all good..");
-		row.put("hasco:hasUnit", entry.getValue().get(2).trim().replace(" ",""));
-		System.out.println("till now all good2..");
+//		row.put("hasco:hasUnit", entry.getValue().get(4).trim().replace(" ",""));
 		row.put("sio:inRelationTo", "");
 		row.put("sio:Relation", "");
-		row.put("hasco:isVirtual", "true");
-		row.put("hasco:isPIConfirmed", "false");
 		System.out.println("till now all good3..");
 		return row;
 	}
