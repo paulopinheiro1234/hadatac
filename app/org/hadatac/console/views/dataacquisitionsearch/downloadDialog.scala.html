@@ -94,19 +94,14 @@
 				<form id="alignmentDialogForm" method="post" action="@org.hadatac.console.controllers.dataacquisitionsearch.routes.DataAcquisitionSearch.downloadAlignment()">
 					<label for="selType">Alignment criteria:</label>
 					<select class="form-control" name="selType" id="selType" onchange="criteriaChange()">
-						<option value="timestamp">Timestamp</option>
+						<!--option value="timestamp">Timestamp</option-->
 						<option value="object">Object</option>
 					</select>
-					<label for="selOC">Object collection:</label>
-					<select class="form-control" name="selOC" id="selOC" disabled>
-						@for(oc <- objOCs) {
-							<option value="@oc.getUri()">@oc.getLabel()</option>
-						}
+					<label for="selOC">Object type:</label>
+					<select class="form-control" name="selObjectType" id="selObjectType">
+						<option value="subject">SUBJECT</option>
 					</select>
-					<label for="selAttribute">Attributes to align:</label>
-					<select multiple class="form-control" name="selAttribute" id="selAttribute" disabled>
-					</select>
-					<input class="btn btn-info" type="submit" id="submitAlignment" value="Confirm" disabled />
+					<input class="btn btn-info" type="submit" id="submitAlignment" value="Confirm" />
 				</form>
 				<script type="text/javascript">
 		            $("#alignmentDialogForm").submit(function(eventObj) {
@@ -163,16 +158,16 @@
     
 	function criteriaChange() {
 		var selType = document.getElementById('selType');
-		var selOC = document.getElementById('selOC');
+		var selObjectType = document.getElementById('selObjectType');
 		var selAttribute = document.getElementById('selAttribute');
 		var submitAlignment = document.getElementById('submitAlignment');
 		if (selType.options[selType.selectedIndex].value == 'timestamp') {
-			selOC.disabled = true;
+			selObjectType.disabled = true;
 			selAttribute.disabled = true;
 			submitAlignment.disabled = true;
 		}
 		else {
-			selOC.disabled = false;
+			selObjectType.disabled = false;
 			selAttribute.disabled = false;
 			submitAlignment.disabled = false;
 		}
