@@ -566,6 +566,7 @@ public class ObjectCollection extends HADatAcThing implements Comparable<ObjectC
         
         SolrQuery query = new SolrQuery();
         String strQuery = facetHandler.getTempSolrQuery(facet);
+        // System.out.println("ObjectCollection strQuery: " + strQuery);
         query.setQuery(strQuery);
         query.setRows(0);
         query.setFacet(true);

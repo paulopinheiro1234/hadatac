@@ -536,18 +536,19 @@ public class Measurement extends HADatAcThing implements Runnable {
         // System.out.println("\nfacetHandler before: " + facetHandler.toSolrQuery());
 
         // Run one time
-        getAllFacetStats(facetHandler, retFacetHandler, result, false);
+        // getAllFacetStats(facetHandler, retFacetHandler, result, false);
 
         // Get facet statistics
-        getAllFacetStats(retFacetHandler, retFacetHandler, result, true);
-        //getAllFacetStats(facetHandler, retFacetHandler, result, true);
+        // getAllFacetStats(retFacetHandler, retFacetHandler, result, true);
+        getAllFacetStats(facetHandler, retFacetHandler, result, true);
 
         // System.out.println("\n\n\nfacetHandler after: " + retFacetHandler.bottommostFacetsToSolrQuery());
 
         // Get documents
         long docSize = 0;
 
-        String q = buildQuery(ownedDAs, retFacetHandler);
+        //String q = buildQuery(ownedDAs, retFacetHandler);
+        String q = buildQuery(ownedDAs, facetHandler);
 
         SolrQuery query = new SolrQuery();
         query.setQuery(q);
@@ -654,7 +655,7 @@ public class Measurement extends HADatAcThing implements Runnable {
 
         FacetTree fTreeT = new FacetTree();
         fTreeT.setTargetFacet(TimeInstance.class);
-        //fTreeT.addUpperFacet(DASEType.class);
+        fTreeT.addUpperFacet(DASEType.class);
         Pivot pivotT = getFacetStats(fTreeT, 
                 retFacetHandler.getFacetByName(FacetHandler.TIME_FACET),
                 facetHandler);

@@ -45,9 +45,10 @@ public class TimeInstance extends HADatAcThing implements Comparable<TimeInstanc
         return getUri().hashCode();
     }
     
-    public long getNumberFromSolr(Facet facet, FacetHandler facetHandler) {
+    public long getNumberFromSolr(Facet facet, FacetHandler facetHandler) {        
         SolrQuery query = new SolrQuery();
         String strQuery = facetHandler.getTempSolrQuery(facet);
+        // System.out.println("TimeInstance strQuery: " + strQuery);
         query.setQuery(strQuery);
         query.setRows(0);
         query.setFacet(false);
@@ -69,7 +70,7 @@ public class TimeInstance extends HADatAcThing implements Comparable<TimeInstanc
 
     @Override
     public Map<HADatAcThing, List<HADatAcThing>> getTargetFacets(
-            Facet facet, FacetHandler facetHandler) {
+            Facet facet, FacetHandler facetHandler) {        
         SolrQuery query = new SolrQuery();
         String queryString = facetHandler.getTempSolrQuery(facet);
 
@@ -227,7 +228,7 @@ public class TimeInstance extends HADatAcThing implements Comparable<TimeInstanc
         return "+1MINUTE";
     }
 
-    private Map<HADatAcThing, List<HADatAcThing>> parsePivot(Pivot pivot) {
+    private Map<HADatAcThing, List<HADatAcThing>> parsePivot(Pivot pivot) {   
         Map<HADatAcThing, List<HADatAcThing>> results = new HashMap<HADatAcThing, List<HADatAcThing>>();
         for (Pivot pivot_ent : pivot.children) {
             if (pivot_ent.getValue().isEmpty()) {
@@ -237,9 +238,21 @@ public class TimeInstance extends HADatAcThing implements Comparable<TimeInstanc
             TimeInstance time = new TimeInstance();
             if (pivot_ent.getValue().startsWith("http")) {
                 time.setUri(pivot_ent.getValue());
-                Entity entity = Entity.find(pivot_ent.getValue());
-                if (entity != null) {
-                    time.setLabel(WordUtils.capitalize(entity.getLabel()));
+                DataAcquisitionSchemaEvent event = DataAcquisitionSchemaEvent.find(pivot_ent.getValue());
+                if (event != null) {
+                    if (!event.getEntity().equals("")) {
+                        Entity entity = Entity.find(event.getEntity());
+                        if (entity != null) {
+                            time.setLabel(WordUtils.capitalize(entity.getLabel()));
+                        }
+                    } else {
+                        time.setLabel(WordUtils.capitalize(event.getLabel()));
+                    }
+                } else {
+                    Entity entity = Entity.find(pivot_ent.getValue());
+                    if (entity != null) {
+                        time.setLabel(WordUtils.capitalize(entity.getLabel()));
+                    }
                 }
                 if (time.getLabel().isEmpty()) {
                     String uri = pivot_ent.getValue();

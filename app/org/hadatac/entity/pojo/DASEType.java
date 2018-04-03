@@ -46,6 +46,8 @@ public class DASEType extends HADatAcThing implements Comparable<DASEType> {
                     facet.getFacetValuesByField("dase_type_uri_str"), true) + " } \n ";
         }
         
+        facet.clearFieldValues("dase_type_uri_str");
+        
         String query = "";
         query += NameSpaces.getInstance().printSparqlNameSpaceList();
         query += "SELECT ?daseUri ?daseTypeUri ?daseLabel ?daseTypeLabel WHERE { \n"
@@ -90,7 +92,12 @@ public class DASEType extends HADatAcThing implements Comparable<DASEType> {
                 }
                 
                 Facet subFacet = facet.getChildById(daseType.getUri());
-                subFacet.putFacet("named_time_str", soln.get("daseUri").toString());
+                DataAcquisitionSchemaEvent event = DataAcquisitionSchemaEvent.find(soln.get("daseUri").toString());
+                if (event != null && event.getEntity().equals(soln.get("daseTypeUri").toString())) {
+                    subFacet.putFacet("named_time_str", soln.get("daseTypeUri").toString());
+                } else {
+                    subFacet.putFacet("named_time_str", soln.get("daseUri").toString());
+                }
             }
         } catch (QueryExceptionHTTP e) {
             e.printStackTrace();

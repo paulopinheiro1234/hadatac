@@ -260,14 +260,17 @@ public class Parser {
                     if (mapSchemaEvents.containsKey(daseUri)) {
                         dase = mapSchemaEvents.get(daseUri);
                     } else {
-                        System.out.println("daseUri: " + daseUri);
                         dase = schema.getEvent(daseUri);
                         if (dase != null) {
                             mapSchemaEvents.put(daseUri, dase);
                         }
                     }
                     if (dase != null) {
-                        measurement.setAbstractTime(dase.getUri());
+                        if (!dase.getEntity().equals("")) {
+                            measurement.setAbstractTime(dase.getEntity());
+                        } else {
+                            measurement.setAbstractTime(dase.getUri());
+                        }
                     }
                 }
 

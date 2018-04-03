@@ -209,9 +209,9 @@ public class DataAcquisitionSchemaEvent extends HADatAcThing {
 		if (!getUnitNamespace().equals("")) {
 			annotation += " [" + getUnitNamespace() + "]";
 		}
+		
 		return annotation;
 	}
-
 
 	public static DataAcquisitionSchemaEvent find(String uri) {
 		DataAcquisitionSchemaEvent event = null;
@@ -415,7 +415,6 @@ public class DataAcquisitionSchemaEvent extends HADatAcThing {
         }
    
         insert += LINE_LAST;
-        System.out.println("DASE insert query (pojo's save): <" + insert + ">");
         UpdateRequest request = UpdateFactory.create(insert);
         UpdateProcessor processor = UpdateExecutionFactory.createRemote(
                 request, CollectionUtil.getCollectionsName(CollectionUtil.METADATA_UPDATE));
