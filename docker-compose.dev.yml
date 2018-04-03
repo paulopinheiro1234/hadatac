@@ -9,3 +9,8 @@ services:
         # Map the solr admin port to the localhost in dev mode
         ports:
             - "8983:8983"
+
+    blazegraph:
+        restart: "no"
+        ports:
+            - "9999:9999"
