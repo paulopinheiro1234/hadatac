@@ -22,7 +22,6 @@ import org.apache.solr.common.SolrDocumentList;
 import org.hadatac.console.models.Facet;
 import org.hadatac.console.models.FacetHandler;
 import org.hadatac.console.models.Pivot;
-import org.hadatac.metadata.loader.URIUtils;
 import org.hadatac.utils.CollectionUtil;
 
 import com.typesafe.config.ConfigFactory;
@@ -44,6 +43,28 @@ public class TimeInstance extends HADatAcThing implements Comparable<TimeInstanc
     @Override
     public int hashCode() {
         return getUri().hashCode();
+    }
+    
+    public long getNumberFromSolr(Facet facet, FacetHandler facetHandler) {
+        SolrQuery query = new SolrQuery();
+        String strQuery = facetHandler.getTempSolrQuery(facet);
+        query.setQuery(strQuery);
+        query.setRows(0);
+        query.setFacet(false);
+
+        try {
+            SolrClient solr = new HttpSolrClient.Builder(
+                    ConfigFactory.load().getString("hadatac.solr.data") 
+                    + CollectionUtil.DATA_ACQUISITION).build();
+            QueryResponse queryResponse = solr.query(query, SolrRequest.METHOD.POST);
+            solr.close();
+            SolrDocumentList results = queryResponse.getResults();
+            return results.getNumFound();
+        } catch (Exception e) {
+            System.out.println("[ERROR] TimeInstance.getNumberFromSolr() - Exception message: " + e.getMessage());
+        }
+
+        return -1;
     }
 
     @Override

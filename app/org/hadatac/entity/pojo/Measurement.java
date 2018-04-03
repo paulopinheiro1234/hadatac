@@ -654,6 +654,7 @@ public class Measurement extends HADatAcThing implements Runnable {
 
         FacetTree fTreeT = new FacetTree();
         fTreeT.setTargetFacet(TimeInstance.class);
+        //fTreeT.addUpperFacet(DASEType.class);
         Pivot pivotT = getFacetStats(fTreeT, 
                 retFacetHandler.getFacetByName(FacetHandler.TIME_FACET),
                 facetHandler);

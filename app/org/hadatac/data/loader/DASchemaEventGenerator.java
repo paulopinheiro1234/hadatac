@@ -1,5 +1,8 @@
 package org.hadatac.data.loader;
 
+import org.hadatac.entity.pojo.DataAcquisitionSchemaEvent;
+import org.hadatac.entity.pojo.HADatAcThing;
+import org.hadatac.metadata.loader.URIUtils;
 import org.hadatac.utils.ConfigProp;
 
 import java.lang.String;
@@ -9,7 +12,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Iterator;
+import java.util.stream.Collectors;
+
 
 public class DASchemaEventGenerator extends BasicGenerator {
 
@@ -18,18 +22,18 @@ public class DASchemaEventGenerator extends BasicGenerator {
 	String SDDName = "";
 	List<String> timeList = new ArrayList<String>();
 	Map<String, String> codeMap;
-	Map<String, List<String>> tlm;
+	Map<String, Map<String, String>> mapTimeline;
 
 	public DASchemaEventGenerator(
 			RecordFile dd, 
-			Map<String, List<String>> tlm, 
+			Map<String, Map<String, String>> mapTimeline, 
 			String SDDName, 
 			Map<String, String> codeMap) {
 		super(dd);
 		this.codeMap = codeMap;
 		this.SDDName = SDDName;
-		this.tlm = tlm;
-		System.out.println("tlm key size : " + tlm.keySet().size());
+		this.mapTimeline = mapTimeline;
+		System.out.println("mapTimeline key size : " + mapTimeline.keySet().size());
 		
 		for (Record rec : dd.getRecords()) {
 			if (!rec.getValueByColumnName("Time").isEmpty()) {
@@ -102,11 +106,10 @@ public class DASchemaEventGenerator extends BasicGenerator {
 			return "";
 		} else {
 			List<String> items = Arrays.asList(rec.getValueByColumnName(mapCol.get("InRelationTo")).split("\\s*,\\s*"));
-			String answer = "";
-			for (String i : items){
-				answer += kbPrefix + "DASO-" + i.replace("_","-").replace("??", "") +  " & ";
-			}
-			return answer.substring(0, answer.length() - 3);
+			String answer = String.join(" & ", items.stream()
+			        .map(i -> kbPrefix + "DASO-" + i.replace("_", "-").replace("??", ""))
+			        .collect(Collectors.toList()));
+			return answer;
 		}
 	}
 
@@ -125,28 +128,58 @@ public class DASchemaEventGenerator extends BasicGenerator {
 			return false;
 		}
 	}
-
+	
 	@Override
-	public void createRows() throws Exception {
-		rows.clear();
-		int row_number = 0;
-		for (Record record : records) {
-			if (timeList.contains(getLabel(record)) && getLabel(record).length()>0){
-				rows.add(createRow(record, ++row_number));
-			}
-		}
-		
-		for (Entry<String, List<String>> entry : tlm.entrySet()) {
-			if (entry.getKey().startsWith("??")){
-				rows.add(createTimeLineRow(entry, ++row_number));				
-			}
-		}
+    HADatAcThing createObject(Record rec, int row_number) throws Exception {
+	    if (timeList.contains(getLabel(rec)) && getLabel(rec).length() > 0){
+	        return createDASEObject(rec);
+        }
 	    
-		Iterator<Map<String, Object>> iterrrr = rows.iterator();
-		while(iterrrr.hasNext()){
-			System.out.println(iterrrr.next().entrySet().toString());
-		}
-	}
+	    return null;
+    }
+
+    @Override
+    public void postprocess() throws Exception {
+        for (Entry<String, Map<String, String>> entry : mapTimeline.entrySet()) {
+            if (entry.getKey().startsWith("??")) {
+                objects.add(createDASEObject(entry));
+            }
+        }
+    }
+    
+    HADatAcThing createDASEObject(Record rec) throws Exception {
+        DataAcquisitionSchemaEvent dase = new DataAcquisitionSchemaEvent();
+        dase.setUri(URIUtils.replacePrefixEx(kbPrefix + "DASE-" + SDDName + "-" + getLabel(rec).trim().replace(" ", "").replace("_", "-").replace("??", "")));
+        dase.addType(URIUtils.replacePrefixEx("hasco:DASchemaEvent"));
+        dase.setLabel(getLabel(rec).trim().replace(" ","").replace("_", "-").replace("??", ""));
+        dase.setComment(getLabel(rec).trim().replace(" ","").replace("_", "-").replace("??", ""));
+        dase.setPartOfSchema(URIUtils.replacePrefixEx(kbPrefix + "DAS-" + SDDName));
+        dase.setEntity(URIUtils.replacePrefixEx(getEntity(rec)));
+        dase.setUnit(URIUtils.replacePrefixEx(getUnit(rec)));
+        dase.setInRelationToUri(URIUtils.replacePrefixEx(getInRelationTo(rec)));
+        dase.setRelationUri(URIUtils.replacePrefixEx(getRelation(rec)));
+        dase.setIsVirtual(checkVirtual(rec).toString());
+        dase.setIsPIConfirmed("false");
+        
+        return dase;
+    }
+    
+    HADatAcThing createDASEObject(Entry<String, Map<String, String>> entry) throws Exception {
+        DataAcquisitionSchemaEvent dase = new DataAcquisitionSchemaEvent();
+        dase.setUri(URIUtils.replacePrefixEx(kbPrefix + "DASE-" + SDDName + "-" + entry.getKey().trim().replace(" ", "").replace("_", "-").replace("??", "").replace(":", "-")));
+        dase.addType(URIUtils.replacePrefixEx("hasco:DASchemaEvent"));
+        dase.addType(URIUtils.replacePrefixEx(entry.getValue().get("Type").trim().replace(" ", "")));
+        dase.setLabel(entry.getValue().get("Label"));
+        dase.setComment(entry.getValue().get("Label"));
+        dase.setPartOfSchema(URIUtils.replacePrefixEx(kbPrefix + "DAS-" + SDDName));
+        dase.setUnit(URIUtils.replacePrefixEx(entry.getValue().get("Unit").trim().replace(" ", "")));
+        dase.setInRelationToUri(URIUtils.replacePrefixEx(kbPrefix + "DASO-" + SDDName + "-" + entry.getValue().get("inRelationTo").trim().replace(" ","").replace("_","-").replace("??", "").replace(":", "-")));
+        dase.setRelationUri(URIUtils.replacePrefixEx("sio:inRelationTo"));
+        dase.setIsVirtual("true");
+        dase.setIsPIConfirmed("false");
+        
+        return dase;
+    }
 	
 	public List<String> createUris() throws Exception {
 		List<String> result = new ArrayList<String>();
@@ -156,7 +189,7 @@ public class DASchemaEventGenerator extends BasicGenerator {
 			}
 		}
 		
-		for (Entry<String, List<String>> entry : tlm.entrySet()) {
+		for (Entry<String, Map<String, String>> entry : mapTimeline.entrySet()) {
 			if (entry.getKey().startsWith("??")){
 				result.add(kbPrefix + "DASE-" + SDDName + "-" + entry.getKey().trim().replace(" ","").replace("_","-").replace("??", ""));				
 			}
@@ -164,41 +197,20 @@ public class DASchemaEventGenerator extends BasicGenerator {
 		
 		return result;
 	}
-
-	//Column	Attribute	attributeOf	Unit	Time	Entity	Role	Relation	inRelationTo	wasDerivedFrom	wasGeneratedBy	hasPosition   
-	@Override
-	Map<String, Object> createRow(Record rec, int row_number) throws Exception {
-		Map<String, Object> row = new HashMap<String, Object>();
-		row.put("hasURI", kbPrefix + "DASE-" + SDDName + "-" + getLabel(rec).trim().replace(" ","").replace("_","-").replace("??", ""));
-		row.put("a", "hasco:DASchemaEvent");
-		row.put("rdfs:label", getLabel(rec).trim().replace(" ","").replace("_","-").replace("??", "")); 
-		row.put("rdfs:comment", getLabel(rec).trim().replace(" ","").replace("_","-").replace("??", "")); 
-		row.put("hasco:partOfSchema", kbPrefix + "DAS-" + SDDName);
-		row.put("hasco:hasEntity", getEntity(rec));
-		row.put("hasco:hasUnit", getUnit(rec));
-		row.put("sio:inRelationTo", getInRelationTo(rec));
-		row.put("sio:Relation", getRelation(rec));
-		row.put("hasco:isVirtual", checkVirtual(rec).toString());
-		row.put("hasco:isPIConfirmed", "false");
-		return row;
-	}
 	
-	Map<String, Object> createTimeLineRow(Entry<String, List<String>> entry, int row_number) throws Exception {
+	Map<String, Object> createTimeLineRow(Entry<String, Map<String, String>> entry, int row_number) throws Exception {
 		Map<String, Object> row = new HashMap<String, Object>();
 		row.put("hasURI", kbPrefix + "DASE-" + SDDName + "-" + entry.getKey().trim().replace(" ","").replace("_","-").replace("??", "").replace(":", "-"));
 		row.put("a", "hasco:DASchemaEvent");
-		row.put("rdfs:label", entry.getValue().get(0));
-		row.put("rdfs:comment", entry.getValue().get(0));
+		row.put("rdfs:label", entry.getValue().get("Label"));
+		row.put("rdfs:comment", entry.getValue().get("Label"));
 		row.put("hasco:partOfSchema", kbPrefix + "DAS-" + SDDName);
-		row.put("a", entry.getValue().get(1).trim().replace(" ",""));
-		System.out.println("till now all good..");
-		row.put("hasco:hasUnit", entry.getValue().get(2).trim().replace(" ",""));
-		System.out.println("till now all good2..");
-		row.put("sio:inRelationTo", "");
-		row.put("sio:Relation", "");
+		row.put("a", entry.getValue().get("Type").trim().replace(" ", ""));
+		row.put("hasco:hasUnit", entry.getValue().get("Unit").trim().replace(" ",""));
+		row.put("sio:inRelationTo", kbPrefix + "DASO-" + SDDName + "-" + entry.getValue().get("inRelationTo").trim().replace(" ","").replace("_","-").replace("??", "").replace(":", "-"));
+		row.put("sio:Relation", "sio:inRelationTo");
 		row.put("hasco:isVirtual", "true");
 		row.put("hasco:isPIConfirmed", "false");
-		System.out.println("till now all good3..");
 		return row;
 	}
 

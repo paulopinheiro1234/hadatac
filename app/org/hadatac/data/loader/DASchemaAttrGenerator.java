@@ -84,7 +84,7 @@ public class DASchemaAttrGenerator extends BasicGenerator {
             return "";
         }
         //System.out.println("DASchemaAttrGenerator: getTime() = " + SDDName + "-" + rec.get(mapCol.get("Time")).trim().replace(" ","").replace("_","-").replace("??", ""));
-        return kbPrefix + "DASE-" + SDDName + "-" + rec.getValueByColumnName(mapCol.get("Time")).trim().replace(" ","").replace("_","-").replace("??", "");
+        return kbPrefix + "DASE-" + SDDName + "-" + rec.getValueByColumnName(mapCol.get("Time")).trim().replace(" ","").replace("_","-").replace("??", "").replace(":", "-");
     }
 
     private String getEntity(Record rec) {

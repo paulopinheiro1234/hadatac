@@ -209,7 +209,7 @@ public class AnnotationWorker {
         sdd.readCodeMapping(codeMappingRecordFile);
         sdd.readDataDictionary(dictionaryRecordFile);
         sdd.readCodebook(codeBookRecordFile);
-        sdd.readtimelineFile(timelineRecordFile);
+        sdd.readTimeline(timelineRecordFile);
 
         GeneratorChain chain = new GeneratorChain();
         if (codeBookRecordFile.isValid()) {
@@ -219,7 +219,7 @@ public class AnnotationWorker {
         if (dictionaryRecordFile.isValid()) {
             chain.addGenerator(new DASchemaAttrGenerator(dictionaryRecordFile, sddName, sdd.getCodeMapping()));
             chain.addGenerator(new DASchemaObjectGenerator(dictionaryRecordFile, sddName, sdd.getCodeMapping()));
-            chain.addGenerator(new DASchemaEventGenerator(dictionaryRecordFile, sdd.getTimeLineMap(), sddName, sdd.getCodeMapping()));
+            chain.addGenerator(new DASchemaEventGenerator(dictionaryRecordFile, sdd.getTimeLine(), sddName, sdd.getCodeMapping()));
         }
 
         GeneralGenerator generalGenerator = new GeneralGenerator(file, "DASchema");
