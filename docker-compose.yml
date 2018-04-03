@@ -1,0 +1,22 @@
+version: '3'
+
+services:
+    solr:
+        build: ./solr
+        container_name: hadatac_solr
+        hostname: solr
+        restart: always
+        # environment:
+        #     - LOG4J_PROPS=/opt/solr/server/resources/log4j.properties
+        # Mount a volume in the mycores directory to persist data that is ingested.
+        volumes:
+            - hadatac-solr:/opt/solr/server/solr/mycores
+        networks:
+            - hadatac
+
+
+volumes:
+    hadatac-solr:
+
+networks:
+    hadatac:
