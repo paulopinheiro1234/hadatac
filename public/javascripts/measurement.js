@@ -42,7 +42,7 @@ function create_item(data, selected_elems) {
 	if (null == data) {
 		return;
 	}
-	var item = [];
+	var items = [];
 	var children = data.children;
 	for (var i_child in children) {
 		var element = {};
@@ -50,23 +50,46 @@ function create_item(data, selected_elems) {
 		tree_id++;
 		element.text = facetPrettyName(data.field, children[i_child].value) + ' (' + children[i_child].count + ')';
 		element.tooltip = children[i_child].tooltip;
+		var facet_content = {}
+		facet_content["id"] = children[i_child].tooltip;
+		facet_content[children[i_child].field] = children[i_child].tooltip;
 		element.userdata = [
 			{"name": "field", "content": children[i_child].field},
-			{"name": "value", "content": children[i_child].tooltip}];
+			{"name": "value", "content": children[i_child].tooltip},
+			{"name": "self_facet", "content": facet_content}];
+		
 		if (selected_elems.indexOf(element.tooltip) > -1) {
 			element.checked = 1;
 		}
 		element.item = create_item(children[i_child], selected_elems);
+		
+		if (element.item.length == 1 && element.item[0].tooltip == element.tooltip) {
+			var facet = {};
+			facet["id"] = children[i_child].tooltip;
+			facet[children[i_child].field] = children[i_child].tooltip;
+			for (var i = 0; i < element.item[0].userdata.length; i++) {
+				if (element.item[0].userdata[i]["name"] == "self_facet") {
+					facet['children'] = [element.item[0].userdata[i]["content"]];
+				}
+			}
+			element.userdata.push({"name": "facet", "content": facet});
+			element.item = [];
+		}
+		
 		for (var i = 0; i < element.item.length; i++) {
 			if (element.item[i].checked == 1) {
 				element.open = "yes";
 				break;
 			}
 		}
-		item.push(element);
+		items.push(element);
 	}
 	
-	return item;
+	items.sort(function(a, b) {
+		return a.text.localeCompare(b.text);
+	});
+	
+	return items;
 }
 
 function parseSolrFacetToTree(facet_name, selected_elems) {
@@ -182,6 +205,10 @@ function create_merged_item(data, selected_elems, curLevel,
 			}
 		}
 	}
+	
+	items.sort(function(a, b) {
+		return a.text.localeCompare(b.text);
+	});
 	
 	return items;
 }

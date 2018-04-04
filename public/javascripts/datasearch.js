@@ -6,6 +6,7 @@ function treeSelections(tree, id) {
 		subitems.split(",").forEach(function(element) {
 			if (tree.isItemChecked(element)) {
 				if (tree.getUserData(element, 'facet') == undefined) {
+					console.log("tree.getUserData(element, 'facet') == undefined");
 					var pair = new Object();
 					pair['id'] = tree.getUserData(element, 'value');
 					pair[tree.getUserData(element, 'field')] = tree.getUserData(element, 'value');		
