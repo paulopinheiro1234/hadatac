@@ -1,3 +1,6 @@
 .git/
 blazegraph/
 solr/
+project/project
+project/target
+target
