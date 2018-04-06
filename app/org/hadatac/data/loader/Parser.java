@@ -261,9 +261,17 @@ public class Parser {
                         dase = mapSchemaEvents.get(daseUri);
                     } else {
                         dase = schema.getEvent(daseUri);
-                        mapSchemaEvents.put(daseUri, dase);
+                        if (dase != null) {
+                            mapSchemaEvents.put(daseUri, dase);
+                        }
                     }
-                    measurement.setAbstractTime(dase.getEntity());
+                    if (dase != null) {
+                        if (!dase.getEntity().equals("")) {
+                            measurement.setAbstractTime(dase.getEntity());
+                        } else {
+                            measurement.setAbstractTime(dase.getUri());
+                        }
+                    }
                 }
 
                 /*============================*

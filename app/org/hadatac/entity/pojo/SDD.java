@@ -17,7 +17,7 @@ public class SDD {
 	private Map<String, String> codeMappings = new HashMap<String, String>();
 	private Map<String, String> mapAttrObj = new HashMap<String, String>();
 	private Map<String, Map<String, String>> codebook = new HashMap<String, Map<String, String>>();
-	private Map<String, List<String>> timelineMap = new HashMap<String, List<String>>();
+	private Map<String, Map<String, String>> timeline = new HashMap<String, Map<String, String>>();
 	private RecordFile file = null;
 	
 	public SDD(RecordFile file) {
@@ -45,8 +45,8 @@ public class SDD {
 		return codebook;
 	}
 	
-	public Map<String, List<String>> getTimeLineMap() {
-		return timelineMap;
+	public Map<String, Map<String, String>> getTimeLine() {
+		return timeline;
 	}
 	
 	private void readCatalog(RecordFile file) {
@@ -125,32 +125,32 @@ public class SDD {
 		}
 	}
 	
-	public void readtimelineFile(RecordFile file) {
+	public void readTimeline(RecordFile file) {
 		if (!file.isValid()) {
 			return;
 		}
 		
 		for (Record record : file.getRecords()) {
-			if (!record.getValueByColumnIndex(0).isEmpty()) {
-				String colName = record.getValueByColumnIndex(0);
-				List<String> tmpList = new ArrayList<String>();
-				if (!record.getValueByColumnIndex(1).isEmpty()) {
-					tmpList.add(record.getValueByColumnIndex(1));
-				} else {
-					tmpList.add("null");
+			if (!record.getValueByColumnName("Name").isEmpty()) {
+				String primaryKey = record.getValueByColumnName("Name");
+				
+				Map<String, String> timelineRow = new HashMap<String, String>();
+				List<String> colNames = new ArrayList<String>();
+				colNames.add("Label");
+				colNames.add("Type");
+				colNames.add("Start");
+				colNames.add("End");
+				colNames.add("Unit");
+				colNames.add("inRelationTo");
+				
+				for (String col : colNames) {
+				    if (!record.getValueByColumnName(col).isEmpty()) {
+	                    timelineRow.put(col, record.getValueByColumnName(col));
+	                } else {
+	                    timelineRow.put(col, "null");
+	                }
 				}
-				if (!record.getValueByColumnIndex(2).isEmpty()) {
-					tmpList.add(record.getValueByColumnIndex(2));
-				} else {
-					tmpList.add("null");
-				}
-				if (!record.getValueByColumnIndex(5).isEmpty()) {
-					tmpList.add(record.getValueByColumnIndex(5));
-				} else {
-					tmpList.add("null");
-				}
-				System.out.println(tmpList.get(0) + " " + tmpList.get(1) + " " + tmpList.get(2));
-				timelineMap.put(colName, tmpList);
+				timeline.put(primaryKey, timelineRow);
 			}
 		}
 	}

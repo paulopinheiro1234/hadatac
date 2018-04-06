@@ -3,6 +3,7 @@ package org.hadatac.entity.pojo;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Map;
+import java.util.stream.Collectors;
 import java.util.HashMap;
 
 import org.apache.jena.query.Query;
@@ -23,9 +24,11 @@ import org.hadatac.utils.FirstLabel;
 import org.hadatac.metadata.loader.LabkeyDataHandler;
 import org.hadatac.metadata.loader.URIUtils;
 import org.labkey.remoteapi.CommandException;
+
 import be.objectify.deadbolt.java.actions.Group;
 import be.objectify.deadbolt.java.actions.Restrict;
 import org.hadatac.console.controllers.AuthApplication;
+
 
 public class DataAcquisitionSchemaEvent extends HADatAcThing {
 
@@ -37,13 +40,21 @@ public class DataAcquisitionSchemaEvent extends HADatAcThing {
 	public static String LINE_LAST = "}  ";
 	public static String PREFIX = "DASE-";
 
-	private String uri;
-	private String label;
-	private String partOfSchema;
-	private String entity;
-	private String entityLabel;
-	private String unit;
-	private String unitLabel;
+	private String uri = "";
+	private List<String> types = new ArrayList<String>();
+	private String label = "";
+	private String partOfSchema = "";
+	private String inRelationToUri = "";
+	private String relationUri = "";
+	private String isVirtual = "";
+	private String isPIConfirmed = "";
+	private String entity = "";
+	private String entityLabel = "";
+	private String unit = "";
+	private String unitLabel = "";
+	
+	public DataAcquisitionSchemaEvent() {
+	}
 
 	public DataAcquisitionSchemaEvent(
 	        String uri, 
@@ -65,7 +76,51 @@ public class DataAcquisitionSchemaEvent extends HADatAcThing {
 	public void setUri(String uri) {
 		this.uri = uri;
 	}
+	
+	public List<String> getTypes() {
+        return types;
+    }
 
+    public void setTypes(List<String> types) {
+        this.types = types;
+    }
+
+    public void addType(String type) {
+        this.types.add(type);
+    }
+    
+    public String getInRelationToUri() {
+        return inRelationToUri;
+    }
+    
+    public void setInRelationToUri(String inRelationToUri) {
+        this.inRelationToUri = inRelationToUri;
+    }
+    
+    public String getRelationUri() {
+        return relationUri;
+    }
+    
+    public void setRelationUri(String relationUri) {
+        this.relationUri = relationUri;
+    }
+    
+    public String getIsVirtual() {
+        return isVirtual;
+    }
+    
+    public void setIsVirtual(String isVirtual) {
+        this.isVirtual = isVirtual;
+    }
+    
+    public String getIsPIConfirmed() {
+        return isPIConfirmed;
+    }
+    
+    public void setIsPIConfirmed(String isPIConfirmed) {
+        this.isPIConfirmed = isPIConfirmed;
+    }
+    
 	public String getUriNamespace() {
 		return URIUtils.replaceNameSpaceEx(uri);
 	}
@@ -154,9 +209,9 @@ public class DataAcquisitionSchemaEvent extends HADatAcThing {
 		if (!getUnitNamespace().equals("")) {
 			annotation += " [" + getUnitNamespace() + "]";
 		}
+		
 		return annotation;
 	}
-
 
 	public static DataAcquisitionSchemaEvent find(String uri) {
 		DataAcquisitionSchemaEvent event = null;
@@ -269,12 +324,16 @@ public class DataAcquisitionSchemaEvent extends HADatAcThing {
 		List< Map<String, Object> > rows = new ArrayList< Map<String, Object> >();
 		Map<String, Object> row = new HashMap<String, Object>();
 		row.put("hasURI", URIUtils.replaceNameSpaceEx(getUri()));
-		row.put("a", "hasco:DASchemaEvent");
+		row.put("a", String.join(", ", getTypes().stream()
+		        .map(uri -> URIUtils.replaceNameSpaceEx(uri))
+		        .collect(Collectors.toList())));
 		row.put("rdfs:label", getLabel());
 		row.put("rdfs:comment", getLabel());
 		row.put("hasco:partOfSchema", URIUtils.replaceNameSpaceEx(getPartOfSchema()));
-		row.put("hasco:hasEntity", this.getEntity());
-		row.put("hasco:hasUnit", this.getUnit());
+		row.put("hasco:hasEntity", URIUtils.replaceNameSpaceEx(getEntity()));
+		row.put("hasco:hasUnit", URIUtils.replaceNameSpaceEx(getUnit()));
+		row.put("sio:inRelationTo", URIUtils.replaceNameSpaceEx(getInRelationToUri()));
+        row.put("sio:Relation", URIUtils.replaceNameSpaceEx(getRelationUri()));
 		row.put("hasco:isVirtual", "");
 		row.put("hasco:isPIConfirmed", "false");
 		rows.add(row);
@@ -311,11 +370,11 @@ public class DataAcquisitionSchemaEvent extends HADatAcThing {
 
     @Override
     public boolean saveToTripleStore() {
-        if (uri == null || uri.equals("")) {
+        if (getUri() == null || getUri().equals("")) {
             System.out.println("[ERROR] Trying to save DASE without assigning an URI");
             return false;
         }
-        if (partOfSchema == null || partOfSchema.equals("")) {
+        if (getPartOfSchema() == null || getPartOfSchema().equals("")) {
             System.out.println("[ERROR] Trying to save DASE without assigning DAS's URI");
             return false;
         }
@@ -325,21 +384,37 @@ public class DataAcquisitionSchemaEvent extends HADatAcThing {
         String insert = "";
         insert += NameSpaces.getInstance().printSparqlNameSpaceList();
         insert += INSERT_LINE1;
-        insert += this.getUri() + " a hasco:DASchemaEvent . ";
-        insert += this.getUri() + " rdfs:label  \"" + label + "\" . ";
-        if (partOfSchema.startsWith("http")) {
-            insert += this.getUri() + " hasco:partOfSchema <" + partOfSchema + "> .  ";
-        } else {
-            insert += this.getUri() + " hasco:partOfSchema " + partOfSchema + " .  ";
+        insert += " <" + getUri() + "> a hasco:DASchemaEvent . ";
+        for (String type : getTypes()) {
+            insert += " <" + getUri() + "> a <" + type + "> . ";
         }
-        if (!entity.equals("")) {
-            insert += this.getUri() + " hasco:hasEntity "  + entity + " .  ";
+        insert += " <" + getUri() + "> rdfs:label \"" + getLabel() + "\" . ";
+        if (!getPartOfSchema().equals("")) {
+            insert += " <" + getUri() + "> hasco:partOfSchema <" + getPartOfSchema() + "> .  ";
         }
-        if (!unit.equals("")) {
-            insert += this.getUri() + " hasco:hasUnit " + unit + " .  ";
-        }                                                   
+        if (!getComment().equals("")) {
+            insert += " <" + getUri() + "> rdfs:comment \""  + getComment() + "\" .  ";
+        }
+        if (!getEntity().equals("")) {
+            insert += " <" + getUri() + "> hasco:hasEntity <"  + getEntity() + "> .  ";
+        }
+        if (!getUnit().equals("")) {
+            insert += " <" + getUri() + "> hasco:hasUnit <" + getUnit() + "> .  ";
+        }         
+        if (!getInRelationToUri().equals("")) {
+            insert += " <" + getUri() + "> sio:inRelationTo <" + getInRelationToUri() + "> .  ";
+        }  
+        if (!getRelationUri().equals("")) {
+            insert += " <" + getUri() + "> sio:Relation <" + getRelationUri() + "> .  ";
+        }
+        if (!getIsVirtual().equals("")) {
+            insert += " <" + getUri() + "> hasco:isVirtual \"" + getIsVirtual() + "\" .  ";
+        }
+        if (!getIsPIConfirmed().equals("")) {
+            insert += " <" + getUri() + "> hasco:isPIConfirmed \"" + getIsPIConfirmed() + "\" . ";
+        }
+   
         insert += LINE_LAST;
-        System.out.println("DASE insert query (pojo's save): <" + insert + ">");
         UpdateRequest request = UpdateFactory.create(insert);
         UpdateProcessor processor = UpdateExecutionFactory.createRemote(
                 request, CollectionUtil.getCollectionsName(CollectionUtil.METADATA_UPDATE));
@@ -351,15 +426,15 @@ public class DataAcquisitionSchemaEvent extends HADatAcThing {
     @Override
     public void deleteFromTripleStore() {
         String query = "";
-        if (this.getUri() == null || this.getUri().equals("")) {
+        if (getUri() == null || getUri().equals("")) {
             return;
         }
         query += NameSpaces.getInstance().printSparqlNameSpaceList();
         query += DELETE_LINE1;
-        if (this.getUri().startsWith("http")) {
-            query += "<" + this.getUri() + ">";
+        if (getUri().startsWith("http")) {
+            query += "<" + getUri() + ">";
         } else {
-            query += this.getUri();
+            query += getUri();
         }
         query += DELETE_LINE3;
         query += LINE_LAST;                                        

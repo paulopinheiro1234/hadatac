@@ -76,7 +76,7 @@ public class ObjectCollectionType extends HADatAcClass implements Comparable<Obj
 				"    ?uri rdfs:subClassOf* " + className + " . " + 
 				"} ";
 
-		//System.out.println("Query: " + queryString);
+		// System.out.println("Query: " + queryString);
 		Query query = QueryFactory.create(queryString);
 
 		QueryExecution qexec = QueryExecutionFactory.sparqlService(CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), query);
@@ -88,7 +88,6 @@ public class ObjectCollectionType extends HADatAcClass implements Comparable<Obj
 			QuerySolution soln = resultsrw.next();
 			ObjectCollectionType objectCollectionType = find(soln.getResource("uri").getURI());
 			objectCollectionTypes.add(objectCollectionType);
-			//System.out.println("type: " + soln.getResource("uri").getURI());
 		}			
 
 		java.util.Collections.sort((List<ObjectCollectionType>) objectCollectionTypes);
@@ -138,8 +137,6 @@ public class ObjectCollectionType extends HADatAcClass implements Comparable<Obj
 
 		objectCollectionType.setUri(uri);
 		objectCollectionType.setLocalName(uri.substring(uri.indexOf('#') + 1));
-
-		//System.out.println(uri + " " + entity.getLocalName() + " " + entity.getSuperUri());
 
 		return objectCollectionType;
 	}

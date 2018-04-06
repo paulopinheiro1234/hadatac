@@ -186,7 +186,7 @@ public class DataAcquisitionSearch extends Controller {
     	Map<String, String[]> name_map = request().body().asFormUrlEncoded();
     	if (name_map != null) {
     		facets = name_map.get("facets")[0];
-    		String oc_uri = name_map.get("selOC")[0].toString();
+    		String objectType = name_map.get("selObjectType")[0].toString();
     	}
     	
     	AcquisitionQueryResult results = Measurement.find(ownerUri, -1, -1, facets);
