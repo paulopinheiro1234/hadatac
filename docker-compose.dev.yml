@@ -14,3 +14,8 @@ services:
         restart: "no"
         ports:
             - "9999:9999"
+
+    hadatac:
+        restart: "no"
+        ports:
+            - "9000:9000"

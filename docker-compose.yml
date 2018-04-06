@@ -14,32 +14,24 @@ services:
         networks:
             - hadatac
 
-
     blazegraph:
-        image: nawer/blazegraph:2.1.4
+        build: ./blazegraph
         container_name: hadatac_blazegraph
         hostname: blazegraph
         networks:
             - hadatac
         restart: always
-        depends_on:
-            - blazegraph-seed
         environment:
             JAVA_XMS: 512m
             JAVA_XMX: 4g
         volumes:
             - hadatac-blazegraph:/var/lib/blazegraph
 
-    # Creates the store and store_users namespaces in the Blazegraph service
-    blazegraph-seed:
-        build: ./blazegraph
-        container_name: hadatac_blazegraph_seed
-        networks:
-            - hadatac
-
     hadatac:
         build: ./
         container_name: hadatac_app
+        restart: always
+        tty: true
         networks:
             - hadatac
         links:

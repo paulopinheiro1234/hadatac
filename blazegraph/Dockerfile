@@ -1,8 +1,12 @@
-FROM appropriate/curl:latest
+FROM nawer/blazegraph:2.1.4
 
-COPY store.properties /store.properties
-COPY store_users.properties /store_users.properties
+# Copy and import store and store_users namespaces
+COPY store.properties /tmp/import/store.properties
 
-# Adds the 'store' and 'store_users' namespaces to Blazegraph
-CMD curl -X POST --data-binary @store.properties -H 'Content-Type:text/plain' blazegraph:9999/blazegraph/namespace && \
-    curl -X POST --data-binary @store_users.properties -H 'Content-Type:text/plain' blazegraph:9999/blazegraph/namespace
+RUN java -cp /usr/bin/blazegraph.jar com.bigdata.rdf.store.DataLoader -quiet -namespace store /tmp/import/store.properties
+
+COPY store_users.properties /tmp/import/store_users.properties
+
+RUN java -cp /usr/bin/blazegraph.jar com.bigdata.rdf.store.DataLoader -quiet -namespace store_users /tmp/import/store_users.properties
+
+RUN rm -rf /tmp/import
