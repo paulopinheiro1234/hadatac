@@ -22,6 +22,8 @@ services:
         networks:
             - hadatac
         restart: always
+        depends_on:
+            - blazegraph-seed
         environment:
             JAVA_XMS: 512m
             JAVA_XMX: 4g
@@ -32,12 +34,20 @@ services:
     blazegraph-seed:
         build: ./blazegraph
         container_name: hadatac_blazegraph_seed
-        depends_on:
-            - blazegraph
-        links:
-            - blazegraph
         networks:
             - hadatac
+
+    hadatac:
+        build: ./
+        container_name: hadatac_app
+        networks:
+            - hadatac
+        links:
+            - blazegraph
+            - solr
+        depends_on:
+            - blazegraph
+            - solr
 
 volumes:
     hadatac-solr:
