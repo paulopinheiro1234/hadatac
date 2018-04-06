@@ -27,6 +27,7 @@ services:
         volumes:
             - hadatac-blazegraph:/var/lib/blazegraph
 
+    # the primary hadatac web app
     hadatac:
         build: ./
         container_name: hadatac_app
@@ -35,8 +36,8 @@ services:
         networks:
             - hadatac
         links:
-            - blazegraph
-            - solr
+            - blazegraph:blazegraph
+            - solr:solr
         depends_on:
             - blazegraph
             - solr
