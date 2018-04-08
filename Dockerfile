@@ -26,7 +26,7 @@ COPY ["project/plugins.sbt", "project/sbt-ui.sbt", "project/build.properties", "
 RUN (sbt compile || sbt compile || sbt compile) && \
     (sbt test:compile || sbt test:compile || sbt test:compile) && \
     rm -rf /tmp/build
-
+    
 # Copy all of the code needed
 COPY . /root/app/
 
