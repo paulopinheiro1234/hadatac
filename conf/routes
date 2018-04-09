@@ -424,7 +424,9 @@ GET     /hadatac/api/studies/:studyuri                    org.hadatac.console.co
 GET     /hadatac/api/studies/variables/:studyuri          org.hadatac.console.controllers.restapi.RestApi.getVariablesInStudy(studyuri: String)
 GET     /hadatac/api/studies/objectcollections/:studyuri  org.hadatac.console.controllers.restapi.RestApi.getOCListInStudy(studyuri: String)
 GET     /hadatac/api/studies/units/:studyuri              org.hadatac.console.controllers.restapi.RestApi.getUnitsInStudy(studyuri: String)
+GET     /hadatac/api/variables/all                        org.hadatac.console.controllers.restapi.RestApi.getAllVariables()
 GET     /hadatac/api/variables/:variableuri               org.hadatac.console.controllers.restapi.RestApi.getVariable(variableuri: String)
+GET     /hadatac/api/units/all                            org.hadatac.console.controllers.restapi.RestApi.getAllUnits()
 GET     /hadatac/api/objectcollections/size/:ocuri        org.hadatac.console.controllers.restapi.RestApi.getOCSize(ocuri: String)
 GET     /hadatac/api/objectcollections/:ocuri/:offset     org.hadatac.console.controllers.restapi.RestApi.getObjectsInCollection(ocuri: String, offset: Integer)
 
