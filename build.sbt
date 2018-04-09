@@ -45,6 +45,7 @@ javacOptions ++= Seq("-Xlint:unchecked")
 
 lazy val root = project.in(file("."))
   .enablePlugins(PlayJava, PlayEbean)
+  .enablePlugins(GitVersioning)
   .settings(
     libraryDependencies ++= appDependencies
   )
@@ -55,3 +56,6 @@ lazy val root = project.in(file("."))
 //dependencyOverrides += "com.typesafe.play" % "twirl-api_2.11" % "1.3.2"
 //dependencyOverrides += "com.typesafe.play" % "play-logback_2.11" % "2.6.0"
 //dependencyOverrides += "com.typesafe.play" % "play-server_2.11" % "2.6.0"
+
+useJGit
+
