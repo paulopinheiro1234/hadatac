@@ -12,6 +12,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.poi.poifs.property.Child;
 import org.hadatac.console.controllers.annotator.AnnotationLog;
 import org.hadatac.data.api.DataFactory;
 import org.hadatac.data.model.ParsingResult;
@@ -81,7 +82,9 @@ public class AnnotationWorker {
                     chain = annotateDataAcquisitionSchemaFile(recordFile);
                 }
 
-                bSucceed = chain.generate();
+                if (chain != null) {
+                    bSucceed = chain.generate();
+                }
             }
 
             if (bSucceed) {
