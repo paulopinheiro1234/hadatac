@@ -26,8 +26,17 @@ public class SDD {
 	}
 	
 	public String getName() {
-		return (file.getFile().getName().split("\\.")[0]).replace("_", "-").replace("SDD-", "");
+	    String sddName = mapCatalog.get("Study_ID");
+	    System.out.println("sddName: " + sddName);
+	    if (sddName == null) {
+	        return "";
+	    }
+	    return sddName;
 	}
+	
+	public String getNameFromFileName() {
+	    return (file.getFile().getName().split("\\.")[0]).replace("_", "-").replace("SDD-", "");
+    }
 	
 	public Map<String, String> getCatalog() {
 		return mapCatalog;
