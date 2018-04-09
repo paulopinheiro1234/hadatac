@@ -79,8 +79,8 @@ public class RestApi extends Controller {
         }
     }// /getStudy()
 
-    // test with https%3A%2F%2Fhbgd.tw.rpi.edu%2Fns%2FSUBJID
-    // or https%3A%2F%2Fhbgd.tw.rpi.edu%2Fns%2FHAZ
+    // test with http%3A%2F%2Fpurl.org%2Fhbgd%2Fkg%2Fns%2FSUBJID
+    // or http%3A%2F%2Fpurl.org%2Fhbgd%2Fkg%2Fns%2FHAZ
     //@Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
     public Result getVariable(String variableAttribute){
         ObjectMapper mapper = new ObjectMapper();
@@ -112,11 +112,12 @@ public class RestApi extends Controller {
         }
 
         String sparqlQueryString = NameSpaces.getInstance().printSparqlNameSpaceList() + 
-                "select distinct ?class ?label ?unit ?shortname where {" + 
+                "select distinct ?class ?label ?unit ?shortname ?unitlabel where {" + 
                 "?class rdfs:label ?label ." +
                 "?class dcterms:identifier ?shortname ." + 
                 "?dasa hasco:hasAttribute ?class ." + 
                 "?dasa hasco:hasUnit ?unit . " + 
+                "OPTIONAL { ?unit rdfs:label ?unitlabel . } " +
                 "} values ?class { " + classes + "} ";
         //System.out.println("[GetVarsInStudy] sparql query\n" + sparqlQueryString);
 		
@@ -149,6 +150,9 @@ public class RestApi extends Controller {
 			if (soln.get("unit") != null) {
 				temp.put("unit", soln.get("unit").toString());
 			}
+			if (soln.get("unitlabel") != null) {
+				temp.put("unitlabel", soln.get("unitlabel").toString());
+			}
 			if (soln.get("shortname") != null) {
 				temp.put("shortname", soln.get("shortname").toString());
 			}
@@ -160,7 +164,6 @@ public class RestApi extends Controller {
         System.out.println("[GetVarsInStudy] done");
         return ok(ApiUtil.createResponse(jsonObject, true));
     }// /getVariablesInStudy
-
 
     // This method takes the same solr query as above,
     // but instead queries the triple store for units instead of attributes
@@ -178,10 +181,11 @@ public class RestApi extends Controller {
         }
 
         String sparqlQueryString = NameSpaces.getInstance().printSparqlNameSpaceList() + 
-                "select distinct ?uri ?label where {" + 
+                "select distinct ?uri ?label ?short where {" + 
                 "?dasa hasco:hasAttribute ?class ." + 
                 "?dasa hasco:hasUnit ?uri . " + 
                 "?uri rdfs:label ?label ." +
+                "OPTIONAL { ?uri obo:hasExactSynonym ?short . }" +
                 "} values ?class { " + classes + "} ";
         //System.out.println("[GetVarsInStudy] sparql query\n" + sparqlQueryString);
 		
@@ -211,6 +215,9 @@ public class RestApi extends Controller {
 			if (soln.get("label") != null) {
 				temp.put("label", soln.get("label").toString());
 			}
+			if (soln.get("short") != null) {
+				temp.put("shortlabel", soln.get("short").toString());
+			}
             anode.add(temp);
         }// /parse sparql results
         System.out.println("[GetUnitsInStudy] parsed " + anode.size() + " results into array");
@@ -218,7 +225,138 @@ public class RestApi extends Controller {
         JsonNode jsonObject = mapper.convertValue(anode, JsonNode.class);
         System.out.println("[GetUnitsInStudy] done");
         return ok(ApiUtil.createResponse(jsonObject, true));
-    }// /getVariablesInStudy
+    }// /getUnitsInStudy
+
+    // This is the same as the study-specific method,
+    // but gets all of the variables for which we have
+    // measurements in hadatac
+    public Result getAllVariables(){
+        List<String> uris = getAllUsedVars();
+        if(uris == null){
+            return notFound(ApiUtil.createResponse("Encountered SOLR error!", false));
+        }
+
+        // Step 2: query blazegraph with those URI's to get details of those vars
+        //         and return the results with those details as a RESTful response
+        String classes = "";
+        for (String s : uris) {
+            classes += "<" + s + "> ";
+        }
+
+        String sparqlQueryString = NameSpaces.getInstance().printSparqlNameSpaceList() + 
+                "select distinct ?class ?label ?unit ?shortname ?unitlabel where {" + 
+                "?class rdfs:label ?label ." +
+                "?class dcterms:identifier ?shortname ." + 
+                "?dasa hasco:hasAttribute ?class ." + 
+                "?dasa hasco:hasUnit ?unit . " + 
+                "OPTIONAL { ?unit rdfs:label ?unitlabel . } " +
+                "} values ?class { " + classes + "} ";
+        //System.out.println("[GetAllVars] sparql query\n" + sparqlQueryString);
+		
+		Query sparqlQuery = QueryFactory.create(sparqlQueryString);
+		QueryExecution qexec = QueryExecutionFactory.sparqlService(
+				CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), sparqlQuery);
+		ResultSet results = qexec.execSelect();
+		ResultSetRewindable resultsrw = ResultSetFactory.copyResults(results);
+		qexec.close();
+
+        if(resultsrw.size() == 0){
+            return notFound(ApiUtil.createResponse("No variables found in blazegraph", false));
+        }
+        
+        ObjectMapper mapper = new ObjectMapper();
+        ArrayNode anode = mapper.createArrayNode();
+
+        while(resultsrw.hasNext()){
+            ObjectNode temp = mapper.createObjectNode();
+			QuerySolution soln = resultsrw.next();
+			if (soln.get("class") != null) {
+				temp.put("uri", soln.get("class").toString());
+			} else {
+                System.out.println("[GetAllVars] ERROR: Result returned without URI? Skipping....");
+                continue;
+            }
+			if (soln.get("label") != null) {
+				temp.put("label", soln.get("label").toString());
+			}
+			if (soln.get("unit") != null) {
+				temp.put("unit", soln.get("unit").toString());
+			}
+			if (soln.get("unitlabel") != null) {
+				temp.put("unitlabel", soln.get("unitlabel").toString());
+			}
+			if (soln.get("shortname") != null) {
+				temp.put("shortname", soln.get("shortname").toString());
+			}
+            anode.add(temp);
+        }// /parse sparql results
+        System.out.println("[GetAllVars] parsed " + anode.size() + " results into array");
+
+        JsonNode jsonObject = mapper.convertValue(anode, JsonNode.class);
+        System.out.println("[GetAllVars] done");
+        return ok(ApiUtil.createResponse(jsonObject, true));
+    }// /getAllVariables
+
+    // Mirrors the above, but returns Unit details instead of Variable details
+    public Result getAllUnits(){
+                List<String> uris = getAllUsedVars();
+        if(uris == null){
+            return notFound(ApiUtil.createResponse("Encountered SOLR error!", false));
+        }
+
+        // Step 2: query blazegraph with those URI's to get details of those vars
+        //         and return the results with those details as a RESTful response
+        String classes = "";
+        for (String s : uris) {
+            classes += "<" + s + "> ";
+        }
+
+        String sparqlQueryString = NameSpaces.getInstance().printSparqlNameSpaceList() + 
+                "select distinct ?uri ?label ?short where {" + 
+                "?dasa hasco:hasAttribute ?class ." + 
+                "?dasa hasco:hasUnit ?uri . " + 
+                "?uri rdfs:label ?label ." +
+                "OPTIONAL { ?uri obo:hasExactSynonym ?short . }" +
+                "} values ?class { " + classes + "} ";
+        //System.out.println("[GetAllUnits] sparql query\n" + sparqlQueryString);
+		
+		Query sparqlQuery = QueryFactory.create(sparqlQueryString);
+		QueryExecution qexec = QueryExecutionFactory.sparqlService(
+				CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), sparqlQuery);
+		ResultSet results = qexec.execSelect();
+		ResultSetRewindable resultsrw = ResultSetFactory.copyResults(results);
+		qexec.close();
+
+        if(resultsrw.size() == 0){
+            return notFound(ApiUtil.createResponse("No units found in blazegraph", false));
+        }
+        
+        ObjectMapper mapper = new ObjectMapper();
+        ArrayNode anode = mapper.createArrayNode();
+
+        while(resultsrw.hasNext()){
+            ObjectNode temp = mapper.createObjectNode();
+			QuerySolution soln = resultsrw.next();
+			if (soln.get("uri") != null) {
+				temp.put("uri", soln.get("uri").toString());
+			} else {
+                System.out.println("[GetAllUnits] ERROR: Result returned without URI? Skipping....");
+                continue;
+            }
+			if (soln.get("label") != null) {
+				temp.put("label", soln.get("label").toString());
+			}
+			if (soln.get("short") != null) {
+				temp.put("shortlabel", soln.get("short").toString());
+			}
+            anode.add(temp);
+        }// /parse sparql results
+        System.out.println("[GetAllUnits] parsed " + anode.size() + " results into array");
+
+        JsonNode jsonObject = mapper.convertValue(anode, JsonNode.class);
+        System.out.println("[GetAllUnits] done");
+        return ok(ApiUtil.createResponse(jsonObject, true));
+    }// /getAllUnits
 
 
     // query solr to see for what variables we have measurements
@@ -255,6 +393,38 @@ public class RestApi extends Controller {
         return uris;
     }// /getUsedVarsInStudy()
 
+    // as above, we're going to restrict to all variables used in measurements
+    // Limit here is increased to 5000
+    private List<String> getAllUsedVars(){
+        SolrQuery solrQuery = new SolrQuery();
+        //System.out.println("[GetVarsInStudy] query = " + query.getQuery());
+        solrQuery.setRows(0);
+        solrQuery.setFacet(true);
+        solrQuery.setFacetLimit(-1);
+        solrQuery.setParam("json.facet", "{ "
+                + "vars:{ "
+                + "type: terms, "
+                + "field: characteristic_uri_str, "
+            // limit is important - the default if this is left out is only 10 facets
+                + "limit: 5000}}");
+        List<String> uris = new ArrayList<String>();
+
+        try {
+            SolrClient solr = new HttpSolrClient.Builder(
+                    ConfigFactory.load().getString("hadatac.solr.data") 
+                    + CollectionUtil.DATA_ACQUISITION).build();
+            QueryResponse queryResponse = solr.query(solrQuery, SolrRequest.METHOD.POST);
+            solr.close();
+            Pivot pivot = Pivot.parseQueryResponse(queryResponse);
+            uris = parsePivotForVars(pivot);
+        } catch (Exception e) {
+            System.out.println("[ERROR] RestApi.getUsedVarsInStudy() - Exception message: " + e.getMessage());
+            return null;
+        }
+        System.out.println("[getAllUsedVars] Found " + uris.size() + " variables with measurements");
+        return uris;
+    }// getAllUsedVars
+
     private List<String> parsePivotForVars (Pivot p) {
         List<String> results = new ArrayList<String>();
         String str = "";
@@ -265,6 +435,10 @@ public class RestApi extends Controller {
         //System.out.println("[getVars parsePivotForVars] results: \n" + results);
         return results;
     }// /parsePivotForVars()
+
+
+    //public Result getIndicatorTypes(){
+    //}
 
 
     // Given the study URI, return the URI's and types of all object collections
@@ -332,12 +506,15 @@ public class RestApi extends Controller {
 
 
     public Result getOCSize(String ocUri){
+        ObjectMapper mapper = new ObjectMapper();
         ObjectCollection objs = ObjectCollection.find(ocUri);
         if(objs == null){
             return notFound(ApiUtil.createResponse("ObjectCollection with uri " + ocUri + " not found", false));
         }
         int totalResultSize = objs.getCollectionSize();
-        return ok(ApiUtil.createResponse("size: " + totalResultSize, true));        
+        ObjectNode res = mapper.createObjectNode();
+        res.put("size", totalResultSize);
+        return ok(ApiUtil.createResponse(res, true));
     }
 
 
