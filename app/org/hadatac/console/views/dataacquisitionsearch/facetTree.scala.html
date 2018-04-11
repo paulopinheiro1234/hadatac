@@ -12,6 +12,29 @@
 	objDetails : String
 )
 
+<script type="text/javascript" src="https://d3js.org/d3.v3.min.js"></script>
+<script type="text/javascript" src="https://cdn.rawgit.com/novus/nvd3/v1.8.1/build/nv.d3.min.js"></script>
+<link rel="stylesheet" type="text/css" href="https://cdn.rawgit.com/novus/nvd3/v1.8.1/build/nv.d3.css">
+<style>
+    #chartStudy svg {
+       height: 400px;
+    }
+    #chartObjectCollection svg {
+       height: 400px;
+    }
+    #chartEntityCharacteristic svg {
+       height: 400px;
+    }
+    #chartUnit svg {
+       height: 400px;
+    }
+    #chartTime svg {
+       height: 400px;
+    }
+    #chartPlatformInstrument svg {
+       height: 400px;
+    }
+</style>
 <script type="text/javascript" src="/hadatac/assets/javascripts/measurement.js"></script>
 <script>
     function checkParentNodes(tree, root_id, child_id) {
@@ -60,45 +83,83 @@
         tree.parse(data, "json");
     }
     
-    var jsonTree, dataTree, selected_elems;
-    var treeEC;
+    var jsonTree, selected_elems;
     selected_elems = JSON.parse('@handler.values(FacetHandler.ENTITY_CHARACTERISTIC_FACET)'.replace(/&quot;/g,'"'));
-    dataTree = parseSolrFacetToMergedTree('@FacetHandler.ENTITY_CHARACTERISTIC_FACET', selected_elems);
-    //dataTree = parseSolrFacetToTree('@FacetHandler.ENTITY_CHARACTERISTIC_FACET', selected_elems);
-    treeEC = new dhtmlXTreeObject("treeEntityCharacteristicBox", "100%", "100%", 0);
-    loadTree(treeEC, dataTree);
+    var dataTreeEC = parseSolrFacetToMergedTree('@FacetHandler.ENTITY_CHARACTERISTIC_FACET', selected_elems);
+    // var dataTree = parseSolrFacetToTree('@FacetHandler.ENTITY_CHARACTERISTIC_FACET', selected_elems);
+    var treeEC = new dhtmlXTreeObject("treeEntityCharacteristicBox", "100%", "100%", 0);
+    loadTree(treeEC, dataTreeEC);
     
-    var treeS;
     selected_elems = JSON.parse('@handler.values(FacetHandler.STUDY_FACET)'.replace(/&quot;/g,'"'));
-    dataTree = parseSolrFacetToTree('@FacetHandler.STUDY_FACET', selected_elems);
+    var dataTreeS = parseSolrFacetToTree('@FacetHandler.STUDY_FACET', selected_elems);
     console.log("dataTree: " + JSON.stringify(dataTree));
-    treeS = new dhtmlXTreeObject("treeStudyBox", "100%", "100%", 0);
-    loadTree(treeS, dataTree);
+    var treeS = new dhtmlXTreeObject("treeStudyBox", "100%", "100%", 0);
+    loadTree(treeS, dataTreeS);
     
-    var treeOC;
     selected_elems = JSON.parse('@handler.values(FacetHandler.OBJECT_COLLECTION_FACET)'.replace(/&quot;/g,'"'));
-    dataTree = parseSolrFacetToTree('@FacetHandler.OBJECT_COLLECTION_FACET', selected_elems);
+    var dataTreeOC = parseSolrFacetToTree('@FacetHandler.OBJECT_COLLECTION_FACET', selected_elems);
     console.log("dataTree: " + JSON.stringify(dataTree));
-    treeOC = new dhtmlXTreeObject("treeObjectCollectionBox", "100%", "100%", 0);
-    loadTree(treeOC, dataTree);
+    var treeOC = new dhtmlXTreeObject("treeObjectCollectionBox", "100%", "100%", 0);
+    loadTree(treeOC, dataTreeOC);
     
-    var treeU;
     selected_elems = JSON.parse('@handler.values(FacetHandler.UNIT_FACET)'.replace(/&quot;/g,'"'));
-    dataTree = parseSolrFacetToTree('@FacetHandler.UNIT_FACET', selected_elems);
-    treeU = new dhtmlXTreeObject("treeUnitBox", "100%", "100%", 0);
-    loadTree(treeU, dataTree);
+    var dataTreeU = parseSolrFacetToTree('@FacetHandler.UNIT_FACET', selected_elems);
+    var treeU = new dhtmlXTreeObject("treeUnitBox", "100%", "100%", 0);
+    loadTree(treeU, dataTreeU);
     
-    var treeT;
     selected_elems = JSON.parse('@handler.values(FacetHandler.TIME_FACET)'.replace(/&quot;/g,'"'));
-    dataTree = parseSolrFacetToTree('@FacetHandler.TIME_FACET', selected_elems);
-    treeT = new dhtmlXTreeObject("treeTimeBox", "100%", "100%", 0);
-    loadTree(treeT, dataTree);
+    var dataTreeT = parseSolrFacetToTree('@FacetHandler.TIME_FACET', selected_elems);
+    var treeT = new dhtmlXTreeObject("treeTimeBox", "100%", "100%", 0);
+    loadTree(treeT, dataTreeT);
 
-    var treePI;
     selected_elems = JSON.parse('@handler.values(FacetHandler.PLATFORM_INSTRUMENT_FACET)'.replace(/&quot;/g,'"'));
-    dataTree = parseSolrFacetToTree('@FacetHandler.PLATFORM_INSTRUMENT_FACET', selected_elems);
-    treePI = new dhtmlXTreeObject("treePlatformInstrumentBox", "100%", "100%", 0);
-    loadTree(treePI, dataTree);
+    var dataTreePI = parseSolrFacetToTree('@FacetHandler.PLATFORM_INSTRUMENT_FACET', selected_elems);
+    var treePI = new dhtmlXTreeObject("treePlatformInstrumentBox", "100%", "100%", 0);
+    loadTree(treePI, dataTreePI);
+    
+    function addPieChart(selector, data) {
+    	//Regular pie chart
+        nv.addGraph(function() {
+          var chart = nv.models.pieChart()
+              .x(function(d) {
+            	  var max_len = 20;
+            	  if (d.label.length > max_len) {
+            		  return d.label.substring(0, max_len) + " ... "; 
+            	  }
+            	  return d.label; })
+              .y(function(d) { return d.count; })
+              .showLabels(true)
+              .labelThreshold(.05)
+              .labelType("percent")
+              .legendPosition("top");
+          
+          chart.valueFormat(d3.format('d'));
+          chart.legend.align(false);
+        
+          d3.select(selector)
+          .datum(data)
+          .transition().duration(350)
+          .call(chart);
+        
+          return chart;
+        });
+    }
+	
+    addPieChart("#chartStudy svg", dataTreeS.item);
+    addPieChart("#chartObjectCollection svg", dataTreeOC.item);
+    addPieChart("#chartEntityCharacteristic svg", dataTreeEC.item);
+    addPieChart("#chartUnit svg", dataTreeU.item);
+    addPieChart("#chartTime svg", dataTreeT.item);
+    addPieChart("#chartPlatformInstrument svg", dataTreePI.item);
+    
+    $("#toggleCharts").click(function () {
+    	$("#charts").toggle();
+    	if ($(this).text() == "Show Charts") { 
+            $(this).text("Hide Charts"); 
+        } else { 
+            $(this).text("Show Charts"); 
+        }; 
+    });
 </script>
 
 
