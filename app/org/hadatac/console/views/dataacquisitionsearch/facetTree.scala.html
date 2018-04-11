@@ -12,31 +12,17 @@
 	objDetails : String
 )
 
-<script type="text/javascript" src="https://d3js.org/d3.v3.min.js"></script>
-<script type="text/javascript" src="https://cdn.rawgit.com/novus/nvd3/v1.8.1/build/nv.d3.min.js"></script>
-<link rel="stylesheet" type="text/css" href="https://cdn.rawgit.com/novus/nvd3/v1.8.1/build/nv.d3.css">
-<style>
-    #chartStudy svg {
-       height: 400px;
-    }
-    #chartObjectCollection svg {
-       height: 400px;
-    }
-    #chartEntityCharacteristic svg {
-       height: 400px;
-    }
-    #chartUnit svg {
-       height: 400px;
-    }
-    #chartTime svg {
-       height: 400px;
-    }
-    #chartPlatformInstrument svg {
-       height: 400px;
-    }
-</style>
+<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
 <script type="text/javascript" src="/hadatac/assets/javascripts/measurement.js"></script>
+<style>
+.goog-tooltip {
+    z-index: 999;
+}
+</style>
 <script>
+    google.charts.load('current', {'packages':['corechart']});
+    google.charts.setOnLoadCallback(drawCharts);
+
     function checkParentNodes(tree, root_id, child_id) {
         if (tree.getAllSubItems(root_id).split(",").includes(child_id.toString())) {
         	tree.setCheck(root_id, true);
@@ -117,41 +103,46 @@
     var treePI = new dhtmlXTreeObject("treePlatformInstrumentBox", "100%", "100%", 0);
     loadTree(treePI, dataTreePI);
     
-    function addPieChart(selector, data) {
-    	//Regular pie chart
-        nv.addGraph(function() {
-          var chart = nv.models.pieChart()
-              .x(function(d) {
-            	  var max_len = 20;
-            	  if (d.label.length > max_len) {
-            		  return d.label.substring(0, max_len) + " ... "; 
-            	  }
-            	  return d.label; })
-              .y(function(d) { return d.count; })
-              .showLabels(true)
-              .labelThreshold(.05)
-              .labelType("percent")
-              .legendPosition("top");
-          
-          chart.valueFormat(d3.format('d'));
-          chart.legend.align(false);
+    function drawCharts() {
+    	addPieChart("chartStudy", dataTreeS.item);
+        addPieChart("chartObjectCollection", dataTreeOC.item);
+        addPieChart("chartEntityCharacteristic", dataTreeEC.item);
+        addPieChart("chartUnit", dataTreeU.item);
+        addPieChart("chartTime", dataTreeT.item);
+        addPieChart("chartPlatformInstrument", dataTreePI.item);
+    }
+    
+    function addPieChart(elementId, data) {
+    	var dataTable = google.visualization.arrayToDataTable(getDataArray(data));
+
+        var options = {
+       		legend: {
+       			position: 'top', 
+       			alignment: 'start', 
+       			maxLines: 100,
+       			textStyle: { fontSize: 12 }
+       		}
+        };
         
-          d3.select(selector)
-          .datum(data)
-          .transition().duration(350)
-          .call(chart);
+        $("#" + elementId).height(400);
         
-          return chart;
-        });
+        var chart = new google.visualization.PieChart(document.getElementById(elementId));
+        
+        chart.draw(dataTable, options);
+    }
+    
+    function getDataArray(data) {
+    	var dataArray = [];
+    	dataArray.push(["Facet", "Count"]);
+    	for (var i = 0; i < data.length; i++) {
+    		var x = data[i].label;
+            var y = data[i].count;
+            dataArray.push([x, y]);
+    	}
+    	
+    	return dataArray;
     }
 	
-    addPieChart("#chartStudy svg", dataTreeS.item);
-    addPieChart("#chartObjectCollection svg", dataTreeOC.item);
-    addPieChart("#chartEntityCharacteristic svg", dataTreeEC.item);
-    addPieChart("#chartUnit svg", dataTreeU.item);
-    addPieChart("#chartTime svg", dataTreeT.item);
-    addPieChart("#chartPlatformInstrument svg", dataTreePI.item);
-    
     $("#toggleCharts").click(function () {
     	$("#charts").toggle();
     	if ($(this).text() == "Show Charts") { 
