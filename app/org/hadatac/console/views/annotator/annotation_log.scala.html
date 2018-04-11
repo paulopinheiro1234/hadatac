@@ -18,7 +18,7 @@
 	<script>
 		var msg = '@log';
 		var msg2 = decodeURIComponent(msg);
-       	$('#msgarea').html(msg2.replace(/&lt;br&gt;/g, '<br>').replace(/&amp;lt;/g, '<').replace(/&amp;gt;/g, '>'));
+       	$('#msgarea').html(msg2.replace(/&amp;lt;br&amp;gt;/g, '<br>').replace(/&amp;lt;/g, '&lt;').replace(/&amp;gt;/g, '&gt;'));
       	document.getElementById('end-process-box').style.display = 'inline';
 	</script>
 	
