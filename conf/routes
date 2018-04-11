@@ -419,7 +419,7 @@ GET	    /hadatac/perm/invite		               org.hadatac.console.controllers.tri
 POST	/hadatac/perm/invite     		       org.hadatac.console.controllers.triplestore.UserManagement.postSendInvitationEmail(user_name: String, user_email: String)
  
 # REST API
-GET     /hadatac/api/studies/all                          org.hadatac.console.controllers.restapi.RestApi.getStudies()
+GET     /hadatac/api/studies/all                          org.hadatac.console.controllers.restapi.RestApi.getAllStudies()
 GET     /hadatac/api/studies/:studyuri                    org.hadatac.console.controllers.restapi.RestApi.getStudy(studyuri: String)
 GET     /hadatac/api/studies/variables/:studyuri          org.hadatac.console.controllers.restapi.RestApi.getVariablesInStudy(studyuri: String)
 GET     /hadatac/api/studies/objectcollections/:studyuri  org.hadatac.console.controllers.restapi.RestApi.getOCListInStudy(studyuri: String)
@@ -429,6 +429,7 @@ GET     /hadatac/api/variables/:variableuri               org.hadatac.console.co
 GET     /hadatac/api/units/all                            org.hadatac.console.controllers.restapi.RestApi.getAllUnits()
 GET     /hadatac/api/objectcollections/size/:ocuri        org.hadatac.console.controllers.restapi.RestApi.getOCSize(ocuri: String)
 GET     /hadatac/api/objectcollections/:ocuri/:offset     org.hadatac.console.controllers.restapi.RestApi.getObjectsInCollection(ocuri: String, offset: Integer)
+GET     /hadatac/api/indicators/all                       org.hadatac.console.controllers.restapi.RestApi.getAllIndicators()
 
 
 # Map static resources from the /public folder to the /assets URL path
