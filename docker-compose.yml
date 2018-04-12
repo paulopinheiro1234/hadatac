@@ -10,7 +10,8 @@ services:
         #     - LOG4J_PROPS=/opt/solr/server/resources/log4j.properties
         # Mount a volume in the mycores directory to persist data that is ingested.
         volumes:
-            - hadatac-solr:/opt/solr/server/solr/mycores
+            # - hadatac-solr:/opt/solr/server/solr/mycores
+            - hadatac-solr:/opt/solr/server
         networks:
             - hadatac
 

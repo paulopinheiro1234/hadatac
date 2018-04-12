@@ -6,7 +6,7 @@ ENV SBT_VERSION 0.13.15
 ENV CHECKSUM 18b106d09b2874f2a538c6e1f6b20c565885b2a8051428bd6d630fb92c1c0f96
 
 # Install sbt
-RUN apk add --update bash curl openssl ca-certificates && \
+RUN apk add --update git bash curl openssl ca-certificates && \
     curl -L -o /tmp/sbt.zip https://dl.bintray.com/sbt/native-packages/sbt/${SBT_VERSION}/sbt-${SBT_VERSION}.zip && \
     openssl dgst -sha256 /tmp/sbt.zip | grep ${CHECKSUM} || (echo 'shasum mismatch' && false) && \
     mkdir -p /opt/sbt && \

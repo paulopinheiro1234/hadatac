@@ -15,15 +15,21 @@ RUN wget https://sourceforge.net/projects/jts-topo-suite/files/jts/1.14/jts-1.14
 
 #### Copy the schemas from solr-home to the mycores directory.
 # Perform the copy to the mycores directory. All cores here get created automatically.
-COPY ./solr-home /opt/solr/server/solr/mycores
+# COPY ./solr-home /opt/solr/server/solr/mycores
+#
+# # Make the solr user the owner of these files
+# USER root
+# RUN chown -R solr:solr /opt/solr/server/solr/mycores
+# #### /Copy Schemas
+# 
+# # Change back to the solr user
+# USER solr
 
-# Make the solr user the owner of these files
-USER root
-RUN chown -R solr:solr /opt/solr/server/solr/mycores
-#### /Copy Schemas
+COPY hadatac_solr.dj.zip /opt/solr/server/hadatac_solr.zip
 
-# Change back to the solr user
-USER solr
+# Unzips SOLR seed data & copies SOLR Seed data to correct director
+RUN unzip hadatac_solr.zip && cp -r hadatac_solr/. solr && rm -f hadatac_solr.zip
+
 
 # Set solr-foreground as the final command. This is the default already.
 CMD ["solr-foreground"]
