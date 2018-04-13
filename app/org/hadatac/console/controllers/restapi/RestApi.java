@@ -5,17 +5,20 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Iterator;
 
 import org.hadatac.utils.ApiUtil;
 import org.hadatac.utils.NameSpaces;
 import org.hadatac.entity.pojo.Study;
 import org.hadatac.entity.pojo.StudyObject;
+import org.hadatac.entity.pojo.Measurement;
 import org.hadatac.entity.pojo.ObjectCollection;
 import org.hadatac.entity.pojo.DataAcquisitionSchema;
 import org.hadatac.entity.pojo.DataAcquisitionSchemaAttribute;
 import org.hadatac.utils.State;
 import org.hadatac.utils.CollectionUtil;
 import org.hadatac.console.models.Pivot;
+import org.hadatac.console.http.SolrUtils;
 
 import be.objectify.deadbolt.java.actions.Group;
 import be.objectify.deadbolt.java.actions.Restrict;
@@ -150,6 +153,39 @@ public class RestApi extends Controller {
         return uris;
     }// getAllUsedVars
 
+//"study_uri_str":"http://hadatac.org/kb/hbgd#STD-CPP"
+//"dasa_uri_str":"http://hadatac.org/kb/hbgd#DASA-HBGD-SUBJ-APGAR1"
+// need to get the actual variable URI....
+    // getting measurements from solr!
+    private SolrDocumentList getSolrMeasurements(String studyUri, String variableUri){
+        //List<Measurement> listMeasurement = new ArrayList<Measurement>();
+        SolrDocumentList results = null;
+        // build Solr query!
+        SolrQuery solrQuery = new SolrQuery();
+        solrQuery.setQuery("study_uri_str:\"" + studyUri + "\"");
+        solrQuery.setQuery("characteristic_uri_str:\"" + variableUri + "\"");
+        solrQuery.setRows(10000000);
+        // make Solr query!
+        try {
+            SolrClient solr = new HttpSolrClient.Builder(
+                    ConfigFactory.load().getString("hadatac.solr.data") 
+                    + CollectionUtil.DATA_ACQUISITION).build();
+            QueryResponse queryResponse = solr.query(solrQuery, SolrRequest.METHOD.POST);
+            System.out.println("[getSolrMeasurements] res: " + queryResponse);
+            solr.close();
+
+            results = queryResponse.getResults();
+            //Iterator<SolrDocument> i = results.iterator();
+            //while (i.hasNext()) {
+            //    Measurement measurement = convertFromSolr(i.next(), null, new HashMap<>());
+            //    listMeasurement.add(measurement);
+            //}
+        } catch (Exception e) {
+            System.out.println("[RestAPI.getMeasurements] ERROR: " + e.getMessage());
+        }
+        return results;
+    }// /getSolrMeasurements()
+
 
 //*************************
 // BLAZEGRAPH QUERY METHODS
@@ -161,7 +197,7 @@ public class RestApi extends Controller {
             return null; 
         }
         String sparqlQueryString = NameSpaces.getInstance().printSparqlNameSpaceList() + 
-                "select distinct ?class ?label ?unit ?shortname ?unitlabel ?itype ?itypelabel where {" + 
+                "select distinct ?class ?label ?dasa ?unit ?shortname ?unitlabel ?itype ?itypelabel where {" + 
                 "?class rdfs:label ?label ." +
                 "?class dcterms:identifier ?shortname ." + 
                 "?dasa hasco:hasAttribute ?class ." + 
@@ -197,6 +233,9 @@ public class RestApi extends Controller {
             }
 			if (soln.get("label") != null) {
 				temp.put("label", soln.get("label").toString());
+			}
+			if (soln.get("dasa") != null) {
+				temp.put("dasa", soln.get("dasa").toString());
 			}
 			if (soln.get("unit") != null) {
 				temp.put("unit", soln.get("unit").toString());
@@ -485,7 +524,7 @@ public class RestApi extends Controller {
     public Result getOCListInStudy(String studyUri){
         ObjectMapper mapper = new ObjectMapper();
         if (studyUri == null) {
-            return notFound(ApiUtil.createResponse("No study specified", false));
+            return badRequest(ApiUtil.createResponse("No study specified", false));
         }
         String queryString = NameSpaces.getInstance().printSparqlNameSpaceList() + 
                 "SELECT ?uri ?ocType WHERE { \n" + 
@@ -609,4 +648,43 @@ public class RestApi extends Controller {
         }
     }// /getObjectsInCollection
 
+    // *************
+    // Measurements!
+    // *************
+    // :study_uri/:variable_uri/:object_uri
+    public Result getMeasurements(String studyUri, String variableUri){
+        ObjectMapper mapper = new ObjectMapper();
+        if(variableUri == null){
+            return badRequest(ApiUtil.createResponse("No variable specified", false));
+        }
+        if(studyUri == null){
+            return badRequest(ApiUtil.createResponse("No study specified", false));
+        }
+        // Solr query
+        SolrDocumentList solrResults = getSolrMeasurements(studyUri, variableUri);
+        if(solrResults.size() < 1){
+            return notFound(ApiUtil.createResponse("Solr Error: no measurmeents found", false));
+        }
+        // parse results
+        ArrayNode anode = mapper.createArrayNode();
+        Iterator<SolrDocument> i = solrResults.iterator();
+        while (i.hasNext()) {
+            SolrDocument doc = i.next();
+            ObjectNode temp = mapper.createObjectNode();
+            temp.put("measurementuri", SolrUtils.getFieldValue(doc, "uri"));
+            temp.put("studyuri", SolrUtils.getFieldValue(doc, "study_uri_str"));
+            temp.put("studyobjecturi", SolrUtils.getFieldValue(doc, "study_object_uri_str"));
+            temp.put("variableuri", SolrUtils.getFieldValue(doc, "characteristic_uri_str"));
+            temp.put("value", SolrUtils.getFieldValue(doc, "value_str"));
+            temp.put("unituri", SolrUtils.getFieldValue(doc, "unit_uri_str"));
+
+            anode.add(temp);
+        }// /parse solr results
+        if(anode == null){
+            return internalServerError(ApiUtil.createResponse("Error parsing measurments", false));
+        } else {
+            JsonNode jsonObject = mapper.convertValue(anode, JsonNode.class);
+            return ok(ApiUtil.createResponse(jsonObject, true));
+        }
+    }// /getMeasurements()
 }// /RestApi
