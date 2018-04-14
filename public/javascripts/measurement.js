@@ -50,6 +50,8 @@ function create_item(data, selected_elems) {
 		tree_id++;
 		element.text = facetPrettyName(data.field, children[i_child].value) + ' (' + children[i_child].count + ')';
 		element.tooltip = children[i_child].tooltip;
+		element.label = children[i_child].value;
+		element.count = children[i_child].count;
 		var facet_content = {}
 		facet_content["id"] = children[i_child].tooltip;
 		facet_content[children[i_child].field] = children[i_child].tooltip;
@@ -145,6 +147,8 @@ function create_merged_item(data, selected_elems, curLevel,
 	if (data.children.length == 0 && curLevel > levelToBegin) {
 		pivot.text = text.join(' ') + ' (' + data.count + ')';
 		pivot.tooltip = tooltips.join(' ');
+		pivot.label = text.join(' ');
+		pivot.count = data.count;
 		pivot.userdata.push({"name": "facet", "content": createFacet(facets, 0)});
 		retChildren.push(pivot);
 	} else {
@@ -154,6 +158,8 @@ function create_merged_item(data, selected_elems, curLevel,
 			element.id = tree_id++;
 			element.text = children[i_child].value + ' (' + children[i_child].count + ')';
 			element.tooltip = '<' + children[i_child].tooltip + '>';
+			element.label = children[i_child].value;
+			element.count = children[i_child].count;
 			element.userdata = [
 				{"name": "field", "content": children[i_child].field},
 				{"name": "value", "content": children[i_child].tooltip}];

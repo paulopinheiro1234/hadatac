@@ -68,18 +68,19 @@ public class AnnotationWorker {
                 GeneratorChain chain = null;
                 if (file_name.startsWith("PID-")) {
                     chain = annotateSubjectIdFile(recordFile);
-                }
-                else if (file_name.startsWith("STD-")) {
+                } else if (file_name.startsWith("STD-")) {
                     chain = annotateStudyIdFile(recordFile);
-                }
-                else if (file_name.startsWith("MAP-")) {
+                } else if (file_name.startsWith("MAP-")) {
                     chain = annotateMapFile(recordFile);
-                }
-                else if (file_name.startsWith("ACQ-")) {
+                } else if (file_name.startsWith("ACQ-")) {
                     chain = annotateACQFile(recordFile, true);
-                }
-                else if (file_name.startsWith("SDD-")) {
+                } else if (file_name.startsWith("SDD-")) {
                     chain = annotateDataAcquisitionSchemaFile(recordFile);
+                } else {
+                    log.addline(Feedback.println(Feedback.WEB, 
+                            "[ERROR] Unsupported file name prefix, only accept prefixes "
+                            + "STD-, PID-, MAP-, SDD-, ACQ-, DA-. "));
+                    return;
                 }
 
                 if (chain != null) {

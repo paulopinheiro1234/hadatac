@@ -167,22 +167,24 @@ public class DataAcquisitionGenerator extends BasicGenerator {
 				da.setPlatformUri(deployment.getPlatform().getUri());
 				da.setPlatformName(deployment.getPlatform().getLabel());
 			} else {
-				throw new Exception(String.format("No platform of Deployment %s is specified!", deploymentUri));
+				throw new Exception(String.format("No platform of Deployment <%s> is specified!", deploymentUri));
 			}
 			if (deployment.getInstrument() != null) {
 				da.setInstrumentUri(deployment.getInstrument().getUri());
 				da.setInstrumentModel(deployment.getInstrument().getLabel());
 			} else {
-				throw new Exception(String.format("No instrument of Deployment %s is specified!", deploymentUri));
+				throw new Exception(String.format("No instrument of Deployment <%s> is specified!", deploymentUri));
 			}
 			da.setStartedAtXsdWithMillis(deployment.getStartedAt());
 		} else {
-			throw new Exception(String.format("Deployment %s cannot be found!", deploymentUri));
+			throw new Exception(String.format("Deployment <%s> cannot be found!", deploymentUri));
 		}
 		
 		DataAcquisitionSchema schema = DataAcquisitionSchema.find(da.getSchemaUri());
 		if (schema != null) {
 			da.setStatus(9999);
+		} else {
+		    throw new Exception(String.format("SDD <%s> cannot be found. Please ingest proper SDD file first. ", da.getSchemaUri()));
 		}
 		
 		return da;
