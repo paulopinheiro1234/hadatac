@@ -76,16 +76,14 @@ public class AnnotationWorker {
                     chain = annotateACQFile(recordFile, true);
                 } else if (file_name.startsWith("SDD-")) {
                     chain = annotateDataAcquisitionSchemaFile(recordFile);
+                } else if (file_name.startsWith("SSD-")) {
+                    chain = annotateSSDFile(recordFile);
                 } else {
                     log.addline(Feedback.println(Feedback.WEB, 
                             "[ERROR] Unsupported file name prefix, only accept prefixes "
                             + "STD-, PID-, MAP-, SDD-, ACQ-, DA-. "));
                     return;
                 }
-                else if (file_name.startsWith("SSD-")) {
-                    chain = annotateSSDFile(recordFile);
-                }
-
 
                 if (chain != null) {
                     bSucceed = chain.generate();

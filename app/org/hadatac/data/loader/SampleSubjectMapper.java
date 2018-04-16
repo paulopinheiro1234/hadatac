@@ -29,16 +29,18 @@ public class SampleSubjectMapper extends BasicGenerator {
     final String kbPrefix = ConfigProp.getKbPrefix();
     private int counter = 1;
     private Map<String, String> mapIdUriCache = null;
+    String study_id;
 
     public SampleSubjectMapper(RecordFile file) {
         super(file);
         mapIdUriCache = getMapIdUri();
+        study_id = file.getFile().getName().replaceAll("SSD-", "").replaceAll(".xlsx", "");
     }
 
     @Override
     void initMapping() {
         mapCol.clear();
-        mapCol.put("studyID", "CHEAR_Project_ID");
+        mapCol.put("type", "rdf:type");
         mapCol.put("originalPID", "CHEAR PID");
         mapCol.put("originalSID", "originalID");
         try{
@@ -101,18 +103,20 @@ public class SampleSubjectMapper extends BasicGenerator {
     }
 
     private String getUri(Record rec) {
-        return kbPrefix + "SPL-" + String.format("%04d", counter + getSampleCount(rec.getValueByColumnName(mapCol.get("studyID")))) 
-        + "-" + rec.getValueByColumnName(mapCol.get("studyID"));
+        return kbPrefix + "SPL-" + getOriginalSID(rec);
+    }
+    
+    private String getType(Record rec) {
+        return rec.getValueByColumnName(mapCol.get("type"));
     }
 
     private String getLabel(Record rec) {
-        return "SID " + String.format("%04d", counter + getSampleCount(rec.getValueByColumnName(mapCol.get("studyID")))) + " - " 
-                + rec.getValueByColumnName(mapCol.get("studyID"));
+        return "Sample " + rec.getValueByColumnName(mapCol.get("originalID"));
     }
 
     private String getOriginalSID(Record rec) {
-        if(!rec.getValueByColumnName(mapCol.get("originalSID")).equalsIgnoreCase("NULL")){
-            return rec.getValueByColumnName(mapCol.get("originalSID"));
+        if(!rec.getValueByColumnName(mapCol.get("originalID")).equalsIgnoreCase("NULL")){
+            return rec.getValueByColumnName(mapCol.get("originalID"));
         } else {
             return "";
         }
@@ -127,24 +131,25 @@ public class SampleSubjectMapper extends BasicGenerator {
     }
 
     private String getStudyUri(Record rec) {
-        return kbPrefix + "STD-" + rec.getValueByColumnName(mapCol.get("studyID"));
+        return kbPrefix + "STD-" + study_id;
     }
 
     private String getCollectionUri(Record rec) {
-        return kbPrefix + "SOC-" + rec.getValueByColumnName(mapCol.get("studyID"));
+        return kbPrefix + "SOC-" + study_id + "-SAMPLES";
     }
 
     private String getCollectionLabel(Record rec) {
-        return "Sample Collection of Study " + rec.getValueByColumnName(mapCol.get("studyID"));
+        return "Sample Collection of Study " + study_id;
     }
 
 
     public StudyObject createStudyObject(Record record) throws Exception {
-        StudyObject obj = new StudyObject(getUri(record), "sio:Sample", getOriginalSID(record), 
+        StudyObject obj = new StudyObject(getUri(record), getType(record), getOriginalSID(record), 
                 getLabel(record), getCollectionUri(record), getLabel(record));
         
         String pid = getOriginalPID(record);
         if (mapIdUriCache.containsKey(pid)) {
+        	System.out.println("you a you a you a!");
             obj.addScopeUri(mapIdUriCache.get(pid));
         }
         
