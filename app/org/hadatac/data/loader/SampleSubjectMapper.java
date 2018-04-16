@@ -16,8 +16,9 @@ import org.apache.jena.rdf.model.Literal;
 import org.apache.jena.sparql.engine.http.QueryExceptionHTTP;
 import org.hadatac.utils.CollectionUtil;
 import org.hadatac.utils.ConfigProp;
+import org.hadatac.utils.Feedback;
 import org.hadatac.utils.NameSpaces;
-
+import org.hadatac.console.controllers.annotator.AnnotationLog;
 import org.hadatac.entity.pojo.HADatAcThing;
 import org.hadatac.entity.pojo.ObjectCollection;
 import org.hadatac.entity.pojo.StudyObject;
@@ -27,7 +28,6 @@ public class SampleSubjectMapper extends BasicGenerator {
 
     final String kbPrefix = ConfigProp.getKbPrefix();
     private int counter = 1;
-    
     private Map<String, String> mapIdUriCache = null;
 
     public SampleSubjectMapper(RecordFile file) {
@@ -40,7 +40,13 @@ public class SampleSubjectMapper extends BasicGenerator {
         mapCol.clear();
         mapCol.put("studyID", "CHEAR_Project_ID");
         mapCol.put("originalPID", "CHEAR PID");
-        mapCol.put("originalSID", "Full SID");
+        mapCol.put("originalSID", "originalID");
+        try{
+            mapCol.put("type", "rdf:type");
+        } catch (QueryExceptionHTTP e) {
+            e.printStackTrace();
+            System.out.println("This sheet or MAP file contains no rdf:type column");
+        }
     }
 
     private Map<String, String> getMapIdUri() {
@@ -114,7 +120,7 @@ public class SampleSubjectMapper extends BasicGenerator {
     
     private String getOriginalPID(Record rec) {
         if(!rec.getValueByColumnName(mapCol.get("originalPID")).equalsIgnoreCase("NULL")){
-            return rec.getValueByColumnName(mapCol.get("originalPID"));
+            return rec.getValueByColumnName(mapCol.get("originalPID")).replaceAll("(?<=^\\d+)\\.0*$", "");
         } else {
             return "";
         }
@@ -125,7 +131,7 @@ public class SampleSubjectMapper extends BasicGenerator {
     }
 
     private String getCollectionUri(Record rec) {
-        return kbPrefix + "SC-" + rec.getValueByColumnName(mapCol.get("studyID"));
+        return kbPrefix + "SOC-" + rec.getValueByColumnName(mapCol.get("studyID"));
     }
 
     private String getCollectionLabel(Record rec) {

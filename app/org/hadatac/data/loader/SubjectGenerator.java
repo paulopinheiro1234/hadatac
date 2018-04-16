@@ -12,11 +12,13 @@ public class SubjectGenerator extends BasicGenerator {
 
     static final long MAX_OBJECTS = 1000;
     static final long LENGTH_CODE = 6;
+    String file_name;
 
     final String kbPrefix = ConfigProp.getKbPrefix();
     
     public SubjectGenerator(RecordFile file) {
         super(file);
+        file_name = file.getFile().getName();
     }
 
     @Override
@@ -35,7 +37,7 @@ public class SubjectGenerator extends BasicGenerator {
     }
 
     private String getOriginalID(Record rec) {
-        return rec.getValueByColumnName(mapCol.get("subjectID"));
+        return rec.getValueByColumnName(mapCol.get("subjectID")).replaceAll("(?<=^\\d+)\\.0*$", "");
     }
 
     private String getPilotNum(Record rec) {
@@ -49,6 +51,11 @@ public class SubjectGenerator extends BasicGenerator {
     private String getCohortUri(Record rec) {
         return kbPrefix + "CH-" + getPilotNum(rec);
     }
+    
+    private String getSSDCohortUri(Record rec) {
+        return kbPrefix + "SOC-" + getPilotNum(rec) + "-SUBJECTS";
+    }
+
 
     private String getCohortLabel(Record rec) {
         return "Study Population of " + getPilotNum(rec);
@@ -57,14 +64,14 @@ public class SubjectGenerator extends BasicGenerator {
     public StudyObject createStudyObject(Record record) throws Exception {
         StudyObject obj = new StudyObject(getUri(record), "sio:Human", 
                 getOriginalID(record), getLabel(record), 
-                getCohortUri(record), getLabel(record));
+                getSSDCohortUri(record), getLabel(record));
         
         return obj;
     }
 
     public ObjectCollection createObjectCollection(Record record) throws Exception {
         ObjectCollection oc = new ObjectCollection(
-                getCohortUri(record),
+                getSSDCohortUri(record),
                 "http://hadatac.org/ont/hasco/SubjectGroup",
                 getCohortLabel(record),
                 getCohortLabel(record),
@@ -81,7 +88,9 @@ public class SubjectGenerator extends BasicGenerator {
     @Override
     public void preprocess() throws Exception {
         if (!records.isEmpty()) {
-            objects.add(createObjectCollection(records.get(0)));
+        	if (file_name.startsWith("PID-")){
+        		objects.add(createObjectCollection(records.get(0)));
+        	}
         }
     }
 
