@@ -111,12 +111,12 @@ public class SampleSubjectMapper extends BasicGenerator {
     }
 
     private String getLabel(Record rec) {
-        return "Sample " + rec.getValueByColumnName(mapCol.get("originalID"));
+        return "Sample " + rec.getValueByColumnName(mapCol.get("originalSID"));
     }
 
     private String getOriginalSID(Record rec) {
-        if(!rec.getValueByColumnName(mapCol.get("originalID")).equalsIgnoreCase("NULL")){
-            return rec.getValueByColumnName(mapCol.get("originalID"));
+        if(!rec.getValueByColumnName(mapCol.get("originalSID")).equalsIgnoreCase("NULL")){
+            return rec.getValueByColumnName(mapCol.get("originalSID"));
         } else {
             return "";
         }
