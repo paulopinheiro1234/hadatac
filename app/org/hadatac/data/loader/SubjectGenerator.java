@@ -13,12 +13,14 @@ public class SubjectGenerator extends BasicGenerator {
     static final long MAX_OBJECTS = 1000;
     static final long LENGTH_CODE = 6;
     String file_name;
+    String study_id;
 
     final String kbPrefix = ConfigProp.getKbPrefix();
     
     public SubjectGenerator(RecordFile file) {
         super(file);
         file_name = file.getFile().getName();
+        study_id = file.getFile().getName().replaceAll("PID-", "").replaceAll("SSD-", "").replaceAll(".xlsx", "").replaceAll(".csv", "");
     }
 
     @Override
@@ -29,11 +31,11 @@ public class SubjectGenerator extends BasicGenerator {
     }
 
     private String getUri(Record rec) {
-        return kbPrefix + "SBJ-" + getOriginalID(rec) + "-" + getPilotNum(rec);
+        return kbPrefix + "SBJ-" + getOriginalID(rec) + "-" + study_id;
     }
 
     private String getLabel(Record rec) {
-        return "Subject ID " + getOriginalID(rec) + " - " + getPilotNum(rec);
+        return "Subject ID " + getOriginalID(rec) + " - " + study_id;
     }
 
     private String getOriginalID(Record rec) {
@@ -45,20 +47,20 @@ public class SubjectGenerator extends BasicGenerator {
     }
 
     private String getStudyUri(Record rec) {
-        return kbPrefix + "STD-" + getPilotNum(rec);
+        return kbPrefix + "STD-" + study_id;
     }
 
     private String getCohortUri(Record rec) {
-        return kbPrefix + "CH-" + getPilotNum(rec);
+        return kbPrefix + "CH-" + study_id;
     }
     
     private String getSSDCohortUri(Record rec) {
-        return kbPrefix + "SOC-" + getPilotNum(rec) + "-SUBJECTS";
+        return kbPrefix + "SOC-" + study_id + "-SUBJECTS";
     }
 
 
     private String getCohortLabel(Record rec) {
-        return "Study Population of " + getPilotNum(rec);
+        return "Study Population of " + study_id;
     }
 
     public StudyObject createStudyObject(Record record) throws Exception {
