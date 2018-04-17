@@ -76,6 +76,8 @@ public class AnnotationWorker {
                     chain = annotateACQFile(recordFile, true);
                 } else if (file_name.startsWith("SDD-")) {
                     chain = annotateDataAcquisitionSchemaFile(recordFile);
+                } else if (file_name.startsWith("SSD-")) {
+                    chain = annotateSSDFile(recordFile);
                 } else {
                     log.addline(Feedback.println(Feedback.WEB, 
                             "[ERROR] Unsupported file name prefix, only accept prefixes "
@@ -117,7 +119,7 @@ public class AnnotationWorker {
     public static GeneratorChain annotateStudyIdFile(RecordFile file) {
         GeneratorChain chain = new GeneratorChain();
         chain.addGenerator(new StudyGenerator(file));
-        chain.addGenerator(new SampleCollectionGenerator(file));
+//        chain.addGenerator(new SampleCollectionGenerator(file));
         chain.addGenerator(new AgentGenerator(file));
 
         return chain;
@@ -237,6 +239,31 @@ public class AnnotationWorker {
 
         return chain;
     }
+    
+	public static GeneratorChain annotateSSDFile(RecordFile file) {
+	        
+	        String Pilot_Num = file.getFile().getName().replaceAll("SSD-", "");
+	        System.out.println("Processing SSD file of " + Pilot_Num + "...");
+	        String file_name = file.getFile().getName();
+	        AnnotationLog log = AnnotationLog.create(file_name);
+	        RecordFile SSDsheet = new SpreadsheetRecordFile(file.getFile(), "SSD");
+	        RecordFile SBJsheet = new SpreadsheetRecordFile(file.getFile(), "SOC-SUBJECTS");     
+	        RecordFile MOMsheet = new SpreadsheetRecordFile(file.getFile(), "SOC-MOTHERS");
+	        RecordFile SSAPsheet = new SpreadsheetRecordFile(file.getFile(), "SOC-SSAMPLES");
+	        RecordFile MSAPsheet = new SpreadsheetRecordFile(file.getFile(), "SOC-MSAMPLES");
+//	        RecordFile TIMEsheet = new SpreadsheetRecordFile(file.getFile(), "SOC-VISITS");
+	        
+	        GeneratorChain chain = new GeneratorChain();
+	        chain.addGenerator(new SSDGenerator(SSDsheet));
+	        chain.addGenerator(new SubjectGenerator(SBJsheet));
+	        chain.addGenerator(new MotherGenerator(MOMsheet));
+	        chain.addGenerator(new SampleSubjectMapper(SSAPsheet));
+	        chain.addGenerator(new SampleSubjectMapper(MSAPsheet));
+	//        chain.addGenerator(new MotherSampleGenerator());
+	
+	        return chain;
+	    }
+
 
     public static boolean annotateDAFile(DataFile dataFile, RecordFile recordFile) {
         System.out.println("annotateDAFile: [" + dataFile.getFileName() + "]");
