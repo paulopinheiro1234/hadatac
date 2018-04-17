@@ -30,17 +30,19 @@ public class SampleSubjectMapper extends BasicGenerator {
     private int counter = 1;
     private Map<String, String> mapIdUriCache = null;
     String study_id;
+    String file_name;
 
     public SampleSubjectMapper(RecordFile file) {
         super(file);
         mapIdUriCache = getMapIdUri();
-        study_id = file.getFile().getName().replaceAll("SSD-", "").replaceAll(".xlsx", "");
+        file_name = file.getFile().getName();
+        study_id = file.getFile().getName().replaceAll("MAP-", "").replaceAll("SSD-", "").replaceAll(".xlsx", "").replaceAll(".csv", "");
     }
 
     @Override
     void initMapping() {
         mapCol.clear();
-        mapCol.put("type", "rdf:type");
+        mapCol.put("pilotNum", "CHEAR_Project_ID");
         mapCol.put("originalPID", "CHEAR PID");
         mapCol.put("originalSID", "originalID");
         try{
@@ -130,16 +132,25 @@ public class SampleSubjectMapper extends BasicGenerator {
         }
     }
 
+    private String getPilotNum(Record rec) {
+        return rec.getValueByColumnName(mapCol.get("pilotNum"));
+    }
+
     private String getStudyUri(Record rec) {
-        return kbPrefix + "STD-" + study_id;
+    	if (file_name.startsWith("MAP-")){
+    		return getPilotNum(rec);
+    	} else if (file_name.startsWith("SSD-")){
+            return study_id;
+    	}
+		return null;
     }
 
     private String getCollectionUri(Record rec) {
-        return kbPrefix + "SOC-" + study_id + "-SAMPLES";
+        return kbPrefix + "SOC-" + getStudyUri(rec) + "-SAMPLES";
     }
 
     private String getCollectionLabel(Record rec) {
-        return "Sample Collection of Study " + study_id;
+        return "Sample Collection of Study " + getStudyUri(rec);
     }
 
 
@@ -162,7 +173,7 @@ public class SampleSubjectMapper extends BasicGenerator {
                 "http://hadatac.org/ont/hasco/SampleCollection",
                 getCollectionLabel(record),
                 getCollectionLabel(record),
-                getStudyUri(record));
+                kbPrefix + "STD-" + getStudyUri(record));
 
         return oc;
     }

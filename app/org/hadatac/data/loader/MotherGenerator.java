@@ -17,9 +17,11 @@ public class MotherGenerator extends BasicGenerator {
     static final long MAX_OBJECTS = 1000;
     static final long LENGTH_CODE = 6;
     String study_id;
+    String file_name;
     final String kbPrefix = ConfigProp.getKbPrefix();
     public MotherGenerator(RecordFile file) {
         super(file);
+        file_name = file.getFile().getName();
         study_id = file.getFile().getName().replaceAll("SSD-", "").replaceAll(".xlsx", "");
     }
 
@@ -43,7 +45,16 @@ public class MotherGenerator extends BasicGenerator {
     }
 
     private String getStudyUri(Record rec) {
-        return kbPrefix + "STD-" + study_id;
+    	if (file_name.startsWith("PID-")){
+    		return getPilotNum(rec);
+    	} else if (file_name.startsWith("SSD-")){
+            return study_id;
+    	}
+		return null;
+    }
+    
+    private String getPilotNum(Record rec) {
+        return rec.getValueByColumnName(mapCol.get("pilotNum"));
     }
 
     private String getOriginalSID(Record rec) {
