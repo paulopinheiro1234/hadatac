@@ -1,5 +1,6 @@
 package org.hadatac.data.loader;
 
+import java.io.UnsupportedEncodingException;
 import java.lang.String;
 
 import org.hadatac.utils.ConfigProp;
@@ -31,11 +32,11 @@ public class SubjectGenerator extends BasicGenerator {
     }
 
     private String getUri(Record rec) {
-        return kbPrefix + "SBJ-" + getOriginalID(rec) + "-" + study_id;
+    		return kbPrefix + "SBJ-" + getOriginalID(rec) + "-" + getStudyUri(rec);
     }
 
     private String getLabel(Record rec) {
-        return "Subject ID " + getOriginalID(rec) + " - " + study_id;
+            return "Subject ID " + getOriginalID(rec) + " - " + getStudyUri(rec);
     }
 
     private String getOriginalID(Record rec) {
@@ -47,7 +48,12 @@ public class SubjectGenerator extends BasicGenerator {
     }
 
     private String getStudyUri(Record rec) {
-        return kbPrefix + "STD-" + study_id;
+    	if (file_name.startsWith("PID-")){
+    		return getPilotNum(rec);
+    	} else if (file_name.startsWith("SSD-")){
+            return study_id;
+    	}
+		return null;
     }
 
     private String getCohortUri(Record rec) {
@@ -55,12 +61,12 @@ public class SubjectGenerator extends BasicGenerator {
     }
     
     private String getSSDCohortUri(Record rec) {
-        return kbPrefix + "SOC-" + study_id + "-SUBJECTS";
+    	return kbPrefix + "SOC-" + getStudyUri(rec) + "-SUBJECTS";
     }
 
 
     private String getCohortLabel(Record rec) {
-        return "Study Population of " + study_id;
+    	return "Study Population of " + getStudyUri(rec);
     }
 
     public StudyObject createStudyObject(Record record) throws Exception {
@@ -77,7 +83,7 @@ public class SubjectGenerator extends BasicGenerator {
                 "http://hadatac.org/ont/hasco/SubjectGroup",
                 getCohortLabel(record),
                 getCohortLabel(record),
-                getStudyUri(record));
+                kbPrefix + "STD-" + getStudyUri(record));
         
         return oc;
     }
