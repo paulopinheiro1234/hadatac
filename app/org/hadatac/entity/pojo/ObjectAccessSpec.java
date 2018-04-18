@@ -20,7 +20,6 @@ import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.client.solrj.response.UpdateResponse;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
-import org.hadatac.console.controllers.AuthApplication;
 import org.hadatac.console.models.Facet;
 import org.hadatac.console.models.FacetHandler;
 import org.hadatac.console.models.Pivot;
@@ -38,10 +37,8 @@ import org.labkey.remoteapi.CommandException;
 
 import com.typesafe.config.ConfigFactory;
 
-import be.objectify.deadbolt.java.actions.Group;
-import be.objectify.deadbolt.java.actions.Restrict;
 
-public class DataAcquisition extends HADatAcThing {
+public class ObjectAccessSpec extends HADatAcThing {
     private static final String className = "hasco:DataAcquisition";
 
     @Field("uri")
@@ -123,7 +120,7 @@ public class DataAcquisition extends HADatAcThing {
      * 2 - DataAcquisition already exists, the preamble states its termination with endedAtTime information
      * 		It should exist inside the KB as not finished yet
      *
-     * 9999 - Data Acquisition spec is complete (anything else diferent than 9999 is considered incomplete
+     * 9999 - Object Access Specification is complete (anything else diferent than 9999 is considered incomplete
      *
      */
 
@@ -131,7 +128,7 @@ public class DataAcquisition extends HADatAcThing {
     private String ccsvUri;
     private String localName;
     private Deployment deployment;
-    public DataAcquisition() {
+    public ObjectAccessSpec() {
         startedAt = null;
         endedAt = null;
         numberDataPoints = 0;
@@ -154,7 +151,7 @@ public class DataAcquisition extends HADatAcThing {
 
     @Override
     public boolean equals(Object o) {
-        if((o instanceof DataAcquisition) && (((DataAcquisition)o).getUri().equals(this.getUri()))) {
+        if((o instanceof ObjectAccessSpec) && (((ObjectAccessSpec)o).getUri().equals(this.getUri()))) {
             return true;
         } else {
             return false;
@@ -166,7 +163,7 @@ public class DataAcquisition extends HADatAcThing {
         return getUri().hashCode();
     }
 
-    public int compareTo(DataAcquisition another) {
+    public int compareTo(ObjectAccessSpec another) {
         if (this.getLabel() != null && another.getLabel() != null) {
             return this.getLabel().compareTo(another.getLabel());
         }
@@ -747,9 +744,9 @@ public class DataAcquisition extends HADatAcThing {
     private Map<HADatAcThing, List<HADatAcThing>> parsePivot(Pivot pivot, Facet facet) {
         Map<HADatAcThing, List<HADatAcThing>> results = new HashMap<HADatAcThing, List<HADatAcThing>>();
         for (Pivot pivot_ent : pivot.children) {
-            DataAcquisition da = new DataAcquisition();
+            ObjectAccessSpec da = new ObjectAccessSpec();
             da.setUri(pivot_ent.getValue());
-            da.setLabel(WordUtils.capitalize(DataAcquisition.findByUri(pivot_ent.getValue()).getLabel()));
+            da.setLabel(WordUtils.capitalize(ObjectAccessSpec.findByUri(pivot_ent.getValue()).getLabel()));
             da.setCount(pivot_ent.getCount());
             da.setField("acquisition_uri_str");
 
@@ -765,11 +762,11 @@ public class DataAcquisition extends HADatAcThing {
         return results;
     }
 
-    public static DataAcquisition convertFromSolr(SolrDocument doc) {
+    public static ObjectAccessSpec convertFromSolr(SolrDocument doc) {
         Iterator<Object> i;
         DateTime date;
 
-        DataAcquisition dataAcquisition = new DataAcquisition();
+        ObjectAccessSpec dataAcquisition = new ObjectAccessSpec();
         try {
             if (doc.getFieldValue("uri") != null) {
                 dataAcquisition.setUri(doc.getFieldValue("uri").toString());
@@ -910,7 +907,7 @@ public class DataAcquisition extends HADatAcThing {
         return dataAcquisition;
     }
 
-    public static List<DataAcquisition> find(String ownerUri, State state) {
+    public static List<ObjectAccessSpec> find(String ownerUri, State state) {
         SolrQuery query = new SolrQuery();
         if (state.getCurrent() == State.ALL) {
             if (null == ownerUri) {
@@ -949,7 +946,7 @@ public class DataAcquisition extends HADatAcThing {
             user.getGroupNames(accessLevels);
         }
 
-        for(DataAcquisition acquisition : findAll()) {
+        for(ObjectAccessSpec acquisition : findAll()) {
             if(acquisition.getPermissionUri().equals("Public")
                     || acquisition.getPermissionUri().equals(user_uri)
                     || acquisition.getOwnerUri().equals(user_uri)){
@@ -967,7 +964,7 @@ public class DataAcquisition extends HADatAcThing {
         return results;
     }
 
-    public static List<DataAcquisition> findAll() {
+    public static List<ObjectAccessSpec> findAll() {
         SolrQuery query = new SolrQuery();
         query.set("q", "owner_uri_str:*");
         query.set("sort", "started_at_date asc");
@@ -976,11 +973,11 @@ public class DataAcquisition extends HADatAcThing {
         return findByQuery(query);
     }
 
-    public static List<DataAcquisition> findAll(State state) {
+    public static List<ObjectAccessSpec> findAll(State state) {
         return find(null, state);
     }
 
-    public static List<DataAcquisition> find(String ownerUri) {
+    public static List<ObjectAccessSpec> find(String ownerUri) {
         SolrQuery query = new SolrQuery();
         query.set("q", "owner_uri_str:\"" + ownerUri + "\"");
         query.set("sort", "started_at_date asc");
@@ -989,8 +986,8 @@ public class DataAcquisition extends HADatAcThing {
         return findByQuery(query);
     }
 
-    public static DataAcquisition findDataAcquisition(SolrQuery query) {
-        DataAcquisition dataAcquisition = null;
+    public static ObjectAccessSpec findDataAcquisition(SolrQuery query) {
+        ObjectAccessSpec dataAcquisition = null;
         SolrClient solr = new HttpSolrClient.Builder(
                 ConfigFactory.load().getString("hadatac.solr.data") 
                 + CollectionUtil.DATA_COLLECTION).build();
@@ -1009,13 +1006,13 @@ public class DataAcquisition extends HADatAcThing {
         return dataAcquisition;
     }
 
-    public static DataAcquisition findByUri(String dataAcquisitionUri) {
+    public static ObjectAccessSpec findByUri(String dataAcquisitionUri) {
         SolrQuery query = new SolrQuery();
         query.set("q", "uri:\"" + dataAcquisitionUri + "\"");
         query.set("sort", "started_at_date asc");
         query.set("rows", "10000000");
 
-        List<DataAcquisition> results = findByQuery(query);
+        List<ObjectAccessSpec> results = findByQuery(query);
         if (!results.isEmpty()) {
             return results.get(0);
         }
@@ -1039,8 +1036,8 @@ public class DataAcquisition extends HADatAcThing {
         return datasetURIs.isEmpty();
     }
 
-    public static List<DataAcquisition> findByQuery(SolrQuery query) {
-        List<DataAcquisition> results = new ArrayList<DataAcquisition>();
+    public static List<ObjectAccessSpec> findByQuery(SolrQuery query) {
+        List<ObjectAccessSpec> results = new ArrayList<ObjectAccessSpec>();
 
         SolrClient solr = new HttpSolrClient.Builder(
                 ConfigFactory.load().getString("hadatac.solr.data") 
@@ -1063,18 +1060,18 @@ public class DataAcquisition extends HADatAcThing {
         return results;
     }
 
-    public static List<DataAcquisition> find(Deployment deployment, boolean active) {
+    public static List<ObjectAccessSpec> find(Deployment deployment, boolean active) {
         SolrQuery query = new SolrQuery();
         query.set("q", "deployment_uri_str:\"" + deployment.getUri() + "\"");
         query.set("sort", "started_at_date desc");
         query.set("rows", "10000000");
-        List<DataAcquisition> listDA = findByQuery(query);
+        List<ObjectAccessSpec> listDA = findByQuery(query);
 
         if (active == true) {
             // Filter out inactive data acquisition
-            Iterator<DataAcquisition> iterDA = listDA.iterator();
+            Iterator<ObjectAccessSpec> iterDA = listDA.iterator();
             while (iterDA.hasNext()) {
-                DataAcquisition dataAcquisition = iterDA.next();
+                ObjectAccessSpec dataAcquisition = iterDA.next();
                 if (dataAcquisition.isFinished() == false) {
                     iterDA.remove();
                 }
@@ -1084,13 +1081,13 @@ public class DataAcquisition extends HADatAcThing {
         return listDA;
     }
 
-    public static DataAcquisition find(HADataC hadatac) {
+    public static ObjectAccessSpec find(HADataC hadatac) {
         SolrQuery query = new SolrQuery("uri:\"" + hadatac.getDataAcquisitionKbUri() + "\"");
         return findDataAcquisition(query);
     }
 
-    public static DataAcquisition create(HADataC hadatacCcsv, HADataC hadatacKb) {
-        DataAcquisition dataAcquisition = new DataAcquisition();
+    public static ObjectAccessSpec create(HADataC hadatacCcsv, HADataC hadatacKb) {
+        ObjectAccessSpec dataAcquisition = new ObjectAccessSpec();
         DataAcquisitionSchema schema = DataAcquisitionSchema.find(hadatacKb.getDataAcquisitionKbUri());
 
         dataAcquisition.setLocalName(hadatacCcsv.getDataAcquisition().getLocalName());
@@ -1124,8 +1121,8 @@ public class DataAcquisition extends HADatAcThing {
 
     public static String getProperDataAcquisitionUri(String fileName) {
         String base_name = FilenameUtils.getBaseName(fileName);
-        List<DataAcquisition> da_list = findAll();
-        for(DataAcquisition da : da_list){
+        List<ObjectAccessSpec> da_list = findAll();
+        for(ObjectAccessSpec da : da_list){
             String abbrevUri = URIUtils.replaceNameSpaceEx(da.getUri());
             String qname = abbrevUri.split(":")[1];
             if(base_name.startsWith(qname)){
@@ -1136,7 +1133,7 @@ public class DataAcquisition extends HADatAcThing {
         return null;
     }
 
-    public void merge(DataAcquisition dataCollection) {
+    public void merge(ObjectAccessSpec dataCollection) {
         Iterator<String> i;
 
         i = dataCollection.unit.iterator();
@@ -1269,7 +1266,7 @@ public class DataAcquisition extends HADatAcThing {
             try {
                 totalChanged = loader.updateRows("DataAcquisition", rows);
             } catch (CommandException e2) {
-                System.out.println("[ERROR] Could not insert or update Data Acquisition");
+                System.out.println("[ERROR] Could not insert or update Object Access Specification");
             }
         }
 
@@ -1288,7 +1285,7 @@ public class DataAcquisition extends HADatAcThing {
         try {
             return loader.deleteRows("DataAcquisition", rows);
         } catch (CommandException e) {
-            System.out.println("[ERROR] Could not delete Data Acquisition(s)");
+            System.out.println("[ERROR] Could not delete Object Access Specification(s)");
             e.printStackTrace();
             return 0;
         }

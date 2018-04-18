@@ -150,7 +150,7 @@ public class Platform extends HADatAcThing implements Comparable<Platform> {
 				platform.setLabel(soln.get("platformLabel").toString());
 				platform.setField("platform_uri_str");
 				
-				DataAcquisition da = new DataAcquisition();
+				ObjectAccessSpec da = new ObjectAccessSpec();
 				da.setUri(soln.get("dataAcquisitionUri").toString());
 				da.setLabel(soln.get("dataAcquisitionLabel").toString());
 				da.setField("acquisition_uri_str");

@@ -377,8 +377,8 @@ public class Measurement extends HADatAcThing implements Runnable {
             solr.commit();
             solr.close();
 
-            List<DataAcquisition> dataAcquisitions = DataAcquisition.findAll();
-            for (DataAcquisition da : dataAcquisitions) {
+            List<ObjectAccessSpec> dataAcquisitions = ObjectAccessSpec.findAll();
+            for (ObjectAccessSpec da : dataAcquisitions) {
                 if (da.containsDataset(datasetUri)) {
                     da.setNumberDataPoints(Measurement.getNumByDataAcquisition(da));
                     da.saveToSolr();
@@ -401,7 +401,7 @@ public class Measurement extends HADatAcThing implements Runnable {
         String facet_query = "";
         String q = "";
 
-        List<String> listURI = DataAcquisition.findAllAccessibleDataAcquisition(user_uri);
+        List<String> listURI = ObjectAccessSpec.findAllAccessibleDataAcquisition(user_uri);
         Iterator<String> iter_uri = listURI.iterator();
         while (iter_uri.hasNext()) {
             String uri = iter_uri.next();
@@ -517,7 +517,7 @@ public class Measurement extends HADatAcThing implements Runnable {
     public static AcquisitionQueryResult find(String user_uri, int page, int qtd, String facets) {
         AcquisitionQueryResult result = new AcquisitionQueryResult();
 
-        List<String> ownedDAs = DataAcquisition.findAllAccessibleDataAcquisition(user_uri);
+        List<String> ownedDAs = ObjectAccessSpec.findAllAccessibleDataAcquisition(user_uri);
         if (ownedDAs.isEmpty()) {
             /*
              * an empty query happens when current user is not allowed to see any
@@ -588,7 +588,7 @@ public class Measurement extends HADatAcThing implements Runnable {
 
             Set<String> uri_set = new HashSet<String>();
             Iterator<SolrDocument> iterDoc = docs.iterator();
-            Map<String, DataAcquisition> cachedDA = new HashMap<String, DataAcquisition>();
+            Map<String, ObjectAccessSpec> cachedDA = new HashMap<String, ObjectAccessSpec>();
             Map<String, String> mapClassLabel = generateCodeClassLabel();
             while (iterDoc.hasNext()) {
                 Measurement measurement = convertFromSolr(iterDoc.next(), cachedDA, mapClassLabel);
@@ -623,7 +623,7 @@ public class Measurement extends HADatAcThing implements Runnable {
             AcquisitionQueryResult result,
             boolean bAddToResults) {
         FacetTree fTreeS = new FacetTree();
-        fTreeS.setTargetFacet(DataAcquisition.class);
+        fTreeS.setTargetFacet(ObjectAccessSpec.class);
         fTreeS.addUpperFacet(Study.class);
         Pivot pivotS = getFacetStats(fTreeS, 
                 retFacetHandler.getFacetByName(FacetHandler.STUDY_FACET), 
@@ -661,7 +661,7 @@ public class Measurement extends HADatAcThing implements Runnable {
                 facetHandler);
 
         FacetTree fTreePI = new FacetTree();
-        fTreePI.setTargetFacet(DataAcquisition.class);
+        fTreePI.setTargetFacet(ObjectAccessSpec.class);
         fTreePI.addUpperFacet(Platform.class);
         fTreePI.addUpperFacet(Instrument.class);
         Pivot pivotPI = getFacetStats(fTreePI, 
@@ -689,7 +689,7 @@ public class Measurement extends HADatAcThing implements Runnable {
         return pivot;
     }
 
-    public static long getNumByDataAcquisition(DataAcquisition dataAcquisition) {
+    public static long getNumByDataAcquisition(ObjectAccessSpec dataAcquisition) {
         SolrClient solr = new HttpSolrClient.Builder(
                 ConfigFactory.load().getString("hadatac.solr.data") 
                 + CollectionUtil.DATA_ACQUISITION).build();
@@ -839,7 +839,7 @@ public class Measurement extends HADatAcThing implements Runnable {
     }
 
     public static Measurement convertFromSolr(SolrDocument doc, 
-            Map<String, DataAcquisition> cachedDA, Map<String, String> cachedURILabels) {
+            Map<String, ObjectAccessSpec> cachedDA, Map<String, String> cachedURILabels) {
         Measurement m = new Measurement();
         m.setUri(SolrUtils.getFieldValue(doc, "uri"));
         m.setOwnerUri(SolrUtils.getFieldValue(doc, "owner_uri_str"));
@@ -866,15 +866,15 @@ public class Measurement extends HADatAcThing implements Runnable {
         m.setCharacteristicUri(SolrUtils.getFieldValue(doc, "characteristic_uri_str"));
         m.setUnitUri(SolrUtils.getFieldValue(doc, "unit_uri_str"));
 
-        DataAcquisition da = null;
+        ObjectAccessSpec da = null;
         if (cachedDA == null) {
-            da = DataAcquisition.findByUri(m.getAcquisitionUri());
+            da = ObjectAccessSpec.findByUri(m.getAcquisitionUri());
         } else {
             // Use cached DA
             if (cachedDA.containsKey(m.getAcquisitionUri())) {
                 da = cachedDA.get(m.getAcquisitionUri());
             } else {
-                da = DataAcquisition.findByUri(m.getAcquisitionUri());
+                da = ObjectAccessSpec.findByUri(m.getAcquisitionUri());
                 cachedDA.put(m.getAcquisitionUri(), da);
             }
         }

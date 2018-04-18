@@ -5,7 +5,7 @@ import java.util.Date;
 import java.util.List;
 
 import org.hadatac.entity.pojo.ConsoleStore;
-import org.hadatac.entity.pojo.DataAcquisition;
+import org.hadatac.entity.pojo.ObjectAccessSpec;
 import org.hadatac.entity.pojo.DataAcquisitionSchema;
 import org.hadatac.entity.pojo.Dataset;
 import org.hadatac.entity.pojo.Deployment;
@@ -29,7 +29,7 @@ public class DataFactory {
 
 	public static final String kbPrefix = ConfigProp.getKbPrefix();
 
-	public static DataAcquisition createDataAcquisition(int triggeringEvent,
+	public static ObjectAccessSpec createDataAcquisition(int triggeringEvent,
 			String dataCollectionUri, 
 			String deploymentUri, 
 			String parameter,
@@ -39,7 +39,7 @@ public class DataFactory {
 			return null;
 		}
 
-		DataAcquisition dataAcquisition = new DataAcquisition();
+		ObjectAccessSpec dataAcquisition = new ObjectAccessSpec();
 		dataAcquisition.setUri(dataCollectionUri);
 		dataAcquisition.setOwnerUri(ownerUri);
 		dataAcquisition.setParameter(parameter);
@@ -113,10 +113,10 @@ public class DataFactory {
 		return das;
 	}
 
-	public static DataAcquisition getActiveDataAcquisition(String deploymentUri) {
-		List<DataAcquisition> list;
+	public static ObjectAccessSpec getActiveDataAcquisition(String deploymentUri) {
+		List<ObjectAccessSpec> list;
 		Deployment deployment = Deployment.find(deploymentUri);
-		list = DataAcquisition.find(deployment, false);
+		list = ObjectAccessSpec.find(deployment, false);
 		if (list.isEmpty()) {
 			return null;
 		}

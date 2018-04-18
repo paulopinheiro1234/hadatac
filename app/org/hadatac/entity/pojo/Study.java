@@ -397,7 +397,7 @@ public class Study extends HADatAcThing {
 				study.setLabel(soln.get("studyLabel").toString());
 				study.setField("study_uri_str");
 				
-				DataAcquisition da = new DataAcquisition();
+				ObjectAccessSpec da = new ObjectAccessSpec();
 				da.setUri(soln.get("dataAcquisitionUri").toString());
 				da.setLabel(soln.get("dataAcquisitionLabel").toString());
 				da.setField("acquisition_uri_str");

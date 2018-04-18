@@ -16,7 +16,7 @@ import org.apache.poi.poifs.property.Child;
 import org.hadatac.console.controllers.annotator.AnnotationLog;
 import org.hadatac.data.api.DataFactory;
 import org.hadatac.data.model.ParsingResult;
-import org.hadatac.entity.pojo.DataAcquisition;
+import org.hadatac.entity.pojo.ObjectAccessSpec;
 import org.hadatac.entity.pojo.DataFile;
 import org.hadatac.entity.pojo.SDD;
 import org.hadatac.metadata.loader.URIUtils;
@@ -271,20 +271,20 @@ public class AnnotationWorker {
         String file_name = dataFile.getFileName();
         AnnotationLog log = AnnotationLog.create(file_name);
         
-        DataAcquisition da = null;
+        ObjectAccessSpec da = null;
         String da_uri = null;
         String deployment_uri = null;
         String schema_uri = null;
 
         if (dataFile != null) {
-            da = DataAcquisition.findByUri(URIUtils.replacePrefixEx(dataFile.getDataAcquisitionUri()));
+            da = ObjectAccessSpec.findByUri(URIUtils.replacePrefixEx(dataFile.getDataAcquisitionUri()));
             if (da != null) {
                 if (!da.isComplete()) {
                     log.addline(Feedback.println(Feedback.WEB, 
-                            String.format("[WARNING] Specification of associated Data Acquisition is incomplete: %s", file_name)));
+                            String.format("[WARNING] Specification of associated Object Access Specification is incomplete: %s", file_name)));
                     return false;
                 } else {
-                    log.addline(Feedback.println(Feedback.WEB, String.format("[OK] Specification of associated Data Acquisition is complete: %s", file_name)));
+                    log.addline(Feedback.println(Feedback.WEB, String.format("[OK] Specification of associated Object Access Specification is complete: %s", file_name)));
                 }
                 da_uri = da.getUri();
                 deployment_uri = da.getDeploymentUri();
