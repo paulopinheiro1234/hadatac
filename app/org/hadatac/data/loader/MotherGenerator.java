@@ -103,6 +103,7 @@ public class MotherGenerator extends BasicGenerator {
     Map<String, Object> createRow(Record rec, int row_number) throws Exception {
     	Map<String, Object> row = new HashMap<String, Object>();
         row.put("hasURI", getUri(rec));
+        row.put("a", "chear:Mother");
     	row.put("chear:Mother", kbPrefix + "SBJ-" + getOriginalSID(rec) + "-" + study_id);
     	return row;
     }
