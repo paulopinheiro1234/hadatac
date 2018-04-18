@@ -1,3 +1,5 @@
+solr/*.zip
+blazegraph/*.zip
 logs
 uploads/
 project/project
