@@ -4,6 +4,7 @@
 
 @(	page : Int,
 	rows : Int,
+	ownerUri : String,
 	facets : String,
 	resultsSize : Long,
 	results : org.hadatac.data.model.AcquisitionQueryResult,
@@ -30,15 +31,19 @@
 			   <center><font size="4"> Selected data values: <b>@resultsSize</b></font> </center> <br></br>
 			</div>
 			<div class="col-md-5 sidebar">
-			        <button type="button" class="btn btn-primary" onClick="search();">Search</button>
-			        <button type="button" class="btn btn-primary" onClick="clearSearch();">Clear Search</button>
-				    <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#myModal">Download</button>
-				    <button type="button" class="btn btn-primary" onClick="showData(1);">Show Data</button>
-				    <button type="button" class="btn btn-primary" id="toggleCharts">Hide Charts</button>
-
-				<div id="download_url" style="visibility: hidden ;">@org.hadatac.console.http.routes.SolrSearchProxy.getDataAcquisitionDownload()</div>
-			    
-			    @downloadDialog(page, rows, facets, resultsSize, results, documentJson, objDetails, objFields, objOCs)
+		        <button type="button" class="btn btn-primary" onClick="search();">Search</button>
+		        <button type="button" class="btn btn-primary" onClick="clearSearch();">Clear Search</button>
+		        @if(ownerUri != "Public") {
+		            <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#myModal">Download</button>
+		        }
+			    <button type="button" class="btn btn-primary" onClick="showData(1);">Show Data</button>
+			    <button type="button" class="btn btn-primary" id="toggleCharts">Hide Charts</button>
+	
+			    <div id="download_url" style="visibility: hidden ;">@org.hadatac.console.http.routes.SolrSearchProxy.getDataAcquisitionDownload()</div>
+		    
+		        @if(ownerUri != "Public") {
+		            @downloadDialog(page, rows, facets, resultsSize, results, documentJson, objDetails, objFields, objOCs)
+		        }
 			</div>
 	    </div>
 	    

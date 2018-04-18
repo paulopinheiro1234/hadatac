@@ -60,6 +60,10 @@ public abstract class HADatAcThing {
 	public String getTypeUri() {
 		return typeUri;
 	}
+	
+	public void setTypeUri(String typeUri) {
+        this.typeUri = typeUri;
+    }
 
 	public String getTypeNamespace() {
         if (uri == "" || uri == null || uri.equals("")){
@@ -68,10 +72,6 @@ public abstract class HADatAcThing {
     		return URIUtils.replaceNameSpaceEx(uri.replace("<","").replace(">",""));
         }
 	}
-
-	public void setTypeUri(String typeUri) {
-		this.typeUri = typeUri;
-	}	
 
 	public String getLabel() {
 		return label;

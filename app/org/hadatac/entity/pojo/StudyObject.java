@@ -52,6 +52,7 @@ public class StudyObject extends HADatAcThing {
 
     String originalId;
     String isMemberOf;
+    String roleUri;
     List<String> scopeUris = new ArrayList<String>();
 
     public StudyObject() {
@@ -116,6 +117,14 @@ public class StudyObject extends HADatAcThing {
             return false;
         }
         return (typeUri.equals(TIME));
+    }
+
+    public String getRoleUri() {
+        return roleUri;
+    }
+
+    public void setRoleUri(String roleUri) {
+        this.roleUri = roleUri;
     }
 
     public String getOriginalId() {
@@ -343,7 +352,7 @@ public class StudyObject extends HADatAcThing {
             }
         }
         return objects;
-    }// /findByCollectionWithPages
+    }
 
     public static String findByCollectionJSON(ObjectCollection oc) {
         if (oc == null) {
@@ -458,12 +467,7 @@ public class StudyObject extends HADatAcThing {
         }
         String insert = "";
 
-        String obj_uri = "";
-        if (this.getUri().startsWith("<")) {
-            obj_uri = this.getUri();
-        } else {
-            obj_uri = "<" + this.getUri() + ">";
-        }
+        String obj_uri = "<" + getUri() + ">";
 
         insert += NameSpaces.getInstance().printSparqlNameSpaceList();
         insert += INSERT_LINE1;
@@ -471,6 +475,11 @@ public class StudyObject extends HADatAcThing {
             insert += obj_uri + " a <" + typeUri + "> . ";
         } else {
             insert += obj_uri + " a " + typeUri + " . ";
+        }
+        if (roleUri.startsWith("http")) {
+            insert += obj_uri + " hasco:hasRole <" + roleUri + "> . ";
+        } else {
+            insert += obj_uri + " hasco:hasRole " + roleUri + " . ";
         }
         if (!originalId.equals("")) {
             insert += obj_uri + " hasco:originalID \""  + originalId + "\" .  ";
@@ -518,6 +527,7 @@ public class StudyObject extends HADatAcThing {
         Map<String, Object> row = new HashMap<String, Object>();
         row.put("hasURI", URIUtils.replaceNameSpaceEx(getUri()));
         row.put("a", URIUtils.replaceNameSpaceEx(getTypeUri()));
+        row.put("hasco:hasRole", URIUtils.replaceNameSpaceEx(getRoleUri()));
         row.put("hasco:originalID", getOriginalId());
         row.put("rdfs:label", getLabel());
         row.put("hasco:isMemberOf", URIUtils.replaceNameSpaceEx(getIsMemberOf()));

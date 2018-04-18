@@ -83,7 +83,7 @@ public class EntityRole extends HADatAcThing implements Comparable<EntityRole> {
 				+ "?attributeUri rdfs:label ?attributeLabel . \n"
 				+ "}}";
 		
-		// System.out.println("EntityRole query: " + query);
+		System.out.println("EntityRole query: " + query);
 		
 		Map<HADatAcThing, List<HADatAcThing>> results = new HashMap<HADatAcThing, List<HADatAcThing>>();
 		try {

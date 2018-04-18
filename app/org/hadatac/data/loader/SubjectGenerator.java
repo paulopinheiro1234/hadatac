@@ -55,10 +55,6 @@ public class SubjectGenerator extends BasicGenerator {
     	}
 		return null;
     }
-
-    private String getCohortUri(Record rec) {
-        return kbPrefix + "CH-" + study_id;
-    }
     
     private String getSSDCohortUri(Record rec) {
     	return kbPrefix + "SOC-" + getStudyUri(rec) + "-SUBJECTS";

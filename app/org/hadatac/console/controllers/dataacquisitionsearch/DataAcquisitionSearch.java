@@ -87,22 +87,22 @@ public class DataAcquisitionSearch extends Controller {
     	return objDetails;
     }
 
-    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
+    // @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
     public Result index(int page, int rows) {
     	return indexInternal(0, page, rows);
     }
     
-    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
+    // @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
     public Result postIndex(int page, int rows) {
     	return index(page, rows);
     }
 
-    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
+    // @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
     public Result indexData(int page, int rows) {
     	return indexInternal(1, page, rows);
     }
     
-    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
+    // @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
     public Result postIndexData(int page, int rows) {
     	return indexData(page, rows);
     }
@@ -134,11 +134,13 @@ public class DataAcquisitionSearch extends Controller {
     	ObjectDetails objDetails = getObjectDetails(results);
 
 		if (mode == 0) {
-		    return ok(facetOnlyBrowser.render(page, rows, facets, results.getDocumentSize(), 
-	    			results, results.toJSON(), facetHandler, objDetails.toJSON(), Measurement.getFieldNames(), ObjectCollection.findAll()));
+		    return ok(facetOnlyBrowser.render(page, rows, ownerUri, facets, results.getDocumentSize(), 
+	    			results, results.toJSON(), facetHandler, objDetails.toJSON(), 
+	    			Measurement.getFieldNames(), ObjectCollection.findAll()));
 		} else {
-		    return ok(dataacquisition_browser.render(page, rows, facets, results.getDocumentSize(), 
-	    			results, results.toJSON(), facetHandler,  objDetails.toJSON(), Measurement.getFieldNames(), ObjectCollection.findAll()));
+		    return ok(dataacquisition_browser.render(page, rows, ownerUri, facets, results.getDocumentSize(), 
+	    			results, results.toJSON(), facetHandler, objDetails.toJSON(), 
+	    			Measurement.getFieldNames(), ObjectCollection.findAll()));
 		}
     }
     

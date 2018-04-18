@@ -113,6 +113,11 @@
     }
     
     function addPieChart(elementId, data) {
+    	var element = document.getElementById(elementId);
+    	if (element == null) {
+    		return;
+    	}
+    	
     	var dataTable = google.visualization.arrayToDataTable(getDataArray(data));
 
         var options = {
@@ -126,7 +131,7 @@
         
         $("#" + elementId).height(400);
         
-        var chart = new google.visualization.PieChart(document.getElementById(elementId));
+        var chart = new google.visualization.PieChart(element);
         
         chart.draw(dataTable, options);
     }

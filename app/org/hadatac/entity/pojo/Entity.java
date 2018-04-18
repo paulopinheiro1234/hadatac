@@ -20,6 +20,7 @@ import org.apache.jena.rdf.model.StmtIterator;
 import org.hadatac.utils.CollectionUtil;
 import org.hadatac.utils.NameSpaces;
 
+import com.avaje.ebeaninternal.server.lib.util.Str;
 import com.typesafe.config.ConfigFactory;
 
 public class Entity extends HADatAcClass implements Comparable<Entity> {
@@ -56,8 +57,8 @@ public class Entity extends HADatAcClass implements Comparable<Entity> {
         }			
 
         java.util.Collections.sort((List<Entity>) entities);
+        
         return entities;
-
     }
 
     public static Map<String,String> getMap() {
@@ -66,6 +67,30 @@ public class Entity extends HADatAcClass implements Comparable<Entity> {
         for (Entity ent: list) 
             map.put(ent.getUri(),ent.getLabel());
         return map;
+    }
+    
+    public static List<String> getSubclasses(String uri) {
+        List<String> subclasses = new ArrayList<String>();
+        
+        String queryString = NameSpaces.getInstance().printSparqlNameSpaceList() 
+                + " SELECT ?uri WHERE { \n"
+                + " ?uri rdfs:subClassOf* <" + uri + "> . \n"
+                + " } \n";
+
+        Query query = QueryFactory.create(queryString);
+
+        QueryExecution qexec = QueryExecutionFactory.sparqlService(
+                CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), query);
+        ResultSet results = qexec.execSelect();
+        ResultSetRewindable resultsrw = ResultSetFactory.copyResults(results);
+        qexec.close();
+
+        while (resultsrw.hasNext()) {
+            QuerySolution soln = resultsrw.next();
+            subclasses.add(soln.get("uri").toString());
+        }
+        
+        return subclasses;
     }
 
     public static Entity find(String uri) {
