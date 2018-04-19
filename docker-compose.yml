@@ -1,30 +1,31 @@
 version: '3'
 
 services:
+    # The Hadatac Solr Service
     solr:
         build:
             context: ./solr
-            # dockerfile: Dockerfile-data
+            dockerfile: Dockerfile
         container_name: hadatac_solr
-        hostname: solr
         restart: always
-        # environment:
-        #     - LOG4J_PROPS=/opt/solr/server/resources/log4j.properties
         # Mount a volume in the mycores directory to persist data that is ingested.
         volumes:
-            # - hadatac-solr:/opt/solr/server/solr/mycores
             - hadatac-solr:/opt/solr/server
         networks:
-            - hadatac
+            hadatac:
+                aliases:
+                    - solr
 
+    # The Hadatac Blazegraph instance
     blazegraph:
         build:
             context: ./blazegraph
-            # dockerfile: Dockerfile-data
+            dockerfile: Dockerfile
         container_name: hadatac_blazegraph
-        hostname: blazegraph
         networks:
-            - hadatac
+            hadatac:
+                aliases:
+                    - blazegraph
         restart: always
         environment:
             JAVA_XMS: 512m
@@ -32,19 +33,21 @@ services:
         volumes:
             - hadatac-blazegraph:/var/lib/blazegraph
 
-    # the primary hadatac web app
+    # The primary hadatac web app
     hadatac:
         build: ./
-        container_name: hadatac_app
         restart: always
         tty: true
         ports:
             - "9000:9000"
         networks:
-            - hadatac
+            hadatac:
+                aliases:
+                    - hadatac.org
+                    - hadatac
         links:
-            - blazegraph:blazegraph
-            - solr:solr
+            - blazegraph
+            - solr
         depends_on:
             - blazegraph
             - solr

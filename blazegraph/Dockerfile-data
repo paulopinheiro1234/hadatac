@@ -1,11 +1,14 @@
 FROM nawer/blazegraph:2.1.4
 
+# Allows you to define the seed data in the docker-compose.data.yml file
 ARG SEED
 
 # Copies Blazegraph Seed ZIP
 COPY $SEED /var/lib/blazegraph/blazegraph_data.zip
 
+# Run remaining commands in this directory
 WORKDIR /var/lib/blazegraph
 
-# unzips Blazegraph Seed & removes Blazegraph Seed data zip file & installs blazegraph.jar
+# Unzip and then delete the zip file containing Blazegraph seed data
+# The zip file should contain a file named blazegraph.jnl
 RUN unzip blazegraph_data.zip && rm blazegraph_data.zip

@@ -25,5 +25,7 @@ RUN chown -R solr:solr /opt/solr/server/solr/mycores
 # Change back to the solr user
 USER solr
 
+EXPOSE 8983
+
 # Set solr-foreground as the final command. This is the default already.
 CMD ["solr-foreground"]

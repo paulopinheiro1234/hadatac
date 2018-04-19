@@ -1,5 +1,5 @@
-# Hadatac Solr
-Set of HADataC Solr collections
+# HADatAc Solr
+Set of HADatAc Solr collections
 
 ## Running with Docker Compose
 You can create a running Solr instance with the correct configuration settings using Docker and Docker Compose now.
@@ -30,7 +30,7 @@ comp build solr
 comp up -d solr
 ```
 
-This will spin up the same Solr instance, put the port in the container is not forwarded to the localhost for security.
+This will spin up the same Solr instance, but the port in the container is not forwarded to the localhost for security.
 
 ### Stopping the Service
 In either production or development mode, to stop the service you should run `comp stop solr` or `comp_dev stop solr`, respectively.
