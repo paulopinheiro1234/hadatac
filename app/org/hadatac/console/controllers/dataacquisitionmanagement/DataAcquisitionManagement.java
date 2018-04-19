@@ -18,7 +18,7 @@ import play.mvc.Result;
 import play.data.FormFactory;
 
 import org.hadatac.console.views.html.dataacquisitionmanagement.*;
-import org.hadatac.entity.pojo.DataAcquisition;
+import org.hadatac.entity.pojo.ObjectAccessSpec;
 import org.hadatac.entity.pojo.DataAcquisitionSchema;
 import org.hadatac.entity.pojo.Deployment;
 import org.hadatac.entity.pojo.TriggeringEvent;
@@ -39,24 +39,24 @@ public class DataAcquisitionManagement extends Controller {
 
 	@Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
 	public Result index(int stateId) {
-		List<DataAcquisition> results = null;
+		List<ObjectAccessSpec> results = null;
 		State state = new State(stateId);
 		final SysUser user = AuthApplication.getLocalUser(session());
 		if (user.isDataManager()) {
-			results = DataAcquisition.findAll(state);
+			results = ObjectAccessSpec.findAll(state);
 		}
 		else {
 			String ownerUri = UserManagement.getUriByEmail(user.getEmail());
-			results = DataAcquisition.find(ownerUri, state);
+			results = ObjectAccessSpec.find(ownerUri, state);
 		}
 
-		for (DataAcquisition dataAcquisition : results) {
+		for (ObjectAccessSpec dataAcquisition : results) {
 			dataAcquisition.setSchemaUri(URIUtils.replaceNameSpaceEx(
 					dataAcquisition.getSchemaUri()));
 		}
-		results.sort(new Comparator<DataAcquisition>() {
+		results.sort(new Comparator<ObjectAccessSpec>() {
 			@Override
-			public int compare(DataAcquisition lhs, DataAcquisition rhs) {
+			public int compare(ObjectAccessSpec lhs, ObjectAccessSpec rhs) {
 				return lhs.getUri().compareTo(rhs.getUri());
 			}
 		});
@@ -108,11 +108,11 @@ public class DataAcquisitionManagement extends Controller {
 		if (form.hasErrors()) {
 			return badRequest("The submitted form has errors!");
 		}
-		if (null != DataAcquisition.findByUri(data.getNewDataAcquisitionUri())) {
+		if (null != ObjectAccessSpec.findByUri(data.getNewDataAcquisitionUri())) {
 			return badRequest("Data acquisition with this uri already exists!");
 		}
 
-		DataAcquisition da = new DataAcquisition();
+		ObjectAccessSpec da = new ObjectAccessSpec();
 		da.setUri(data.getNewDataAcquisitionUri());
 		da.setNumberDataPoints(0);
 		da.setSchemaUri(data.getNewSchema());

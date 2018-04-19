@@ -10,7 +10,7 @@ import org.hadatac.console.controllers.AuthApplication;
 import org.hadatac.console.controllers.dataacquisitionmanagement.routes;
 import org.hadatac.console.models.SysUser;
 import org.hadatac.console.views.html.dataacquisitionmanagement.*;
-import org.hadatac.entity.pojo.DataAcquisition;
+import org.hadatac.entity.pojo.ObjectAccessSpec;
 import org.hadatac.entity.pojo.Measurement;
 
 import be.objectify.deadbolt.java.actions.Group;
@@ -20,7 +20,7 @@ public class DeleteDataAcquisition extends Controller {
 	
 	@Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
     public Result index(String oper, String uri) {
-		DataAcquisition dc = new DataAcquisition();
+		ObjectAccessSpec dc = new ObjectAccessSpec();
     	try {
     		if (uri != null) {
 			    uri = URLDecoder.decode(uri, "UTF-8");
@@ -37,7 +37,7 @@ public class DeleteDataAcquisition extends Controller {
     		 *  Add deployment information into handler
     		 */
     		
-    		dc = DataAcquisition.findByUri(uri);
+    		dc = ObjectAccessSpec.findByUri(uri);
     		if (dc == null) {
     			return badRequest("Incorrect data acquisition uri detected!");
     		}
@@ -55,7 +55,7 @@ public class DeleteDataAcquisition extends Controller {
     }
 
     public static String delete(String uri) {
-    	DataAcquisition dc = new DataAcquisition();
+    	ObjectAccessSpec dc = new ObjectAccessSpec();
     	try {
     		if (uri != null) {
 			    uri = URLDecoder.decode(uri, "UTF-8");
@@ -72,17 +72,17 @@ public class DeleteDataAcquisition extends Controller {
     		 *  Add deployment information into handler
     		 */
     		
-    		dc = DataAcquisition.findByUri(uri);
+    		dc = ObjectAccessSpec.findByUri(uri);
     		dc.delete();
     		
-            return "Data Acquisition deleted.";
+            return "Object Access Specification deleted.";
     	}
     	
-    	return "Data Acquisition failed to be deleted.";
+    	return "Object Access Specification failed to be deleted.";
     }
     
     public Result deleteDataPoints(String uri, int state) {
-    	DataAcquisition dc = new DataAcquisition();
+    	ObjectAccessSpec dc = new ObjectAccessSpec();
     	try {
     		if (uri != null) {
 			    uri = URLDecoder.decode(uri, "UTF-8");
@@ -99,7 +99,7 @@ public class DeleteDataAcquisition extends Controller {
     		 *  Add deployment information into handler
     		 */
     		
-    		dc = DataAcquisition.findByUri(uri);
+    		dc = ObjectAccessSpec.findByUri(uri);
     		if (!dc.deleteMeasurementData()) {
     			dc.setNumberDataPoints(Measurement.getNumByDataAcquisition(dc));
     			dc.save();

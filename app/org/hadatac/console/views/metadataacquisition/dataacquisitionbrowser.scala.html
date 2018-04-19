@@ -5,7 +5,7 @@
 @import helper._
 @import org.hadatac.console.views.html._
 
-@main("Data Acquisition Browser Home") {
+@main("Object Access Specification Browser Home") {
 	<script type="text/javascript" src="@controllers.routes.Assets.versioned("javascripts/vendor/jquery/1.7.1/jquery-1.7.1.min.js")"></script>
 	<link rel="stylesheet" href="@controllers.routes.Assets.versioned("javascripts/vendor/bootstrap/css/bootstrap.min.css")"/>
 	<script type="text/javascript" src="@controllers.routes.Assets.versioned("javascripts/vendor/bootstrap/js/bootstrap.min.js")"></script>
@@ -33,7 +33,7 @@ jQuery(document).ready(function($) {
     		},
     }],
     search_sortby: [
-        {'field':'attributeUri.exact', 'display':'Data Acquisition URI'},
+        {'field':'attributeUri.exact', 'display':'Object Access Specification URI'},
     	@for(daIndicator <- indicatorList){
     		{
     		'field': '@daIndicator.replace(" ","").replace(",","")_str.exact', 
@@ -41,7 +41,7 @@ jQuery(document).ready(function($) {
     		},
     }],
     searchbox_fieldselect: [
-        {'field':'attributeUri.exact', 'display':'Data Acquisition URI'},
+        {'field':'attributeUri.exact', 'display':'Object Access Specification URI'},
     	@for(daIndicator <- indicatorList){
     		{
     		'field': '@daIndicator.replace(" ","").replace(",","")_str.exact', 
@@ -122,7 +122,7 @@ jQuery(document).ready(function($) {
     <div class="container-fluid">
     <div class="page-header">
       <h2>
-      Data Acquisition Faceted Search
+      Object Access Specification Faceted Search
       </h2>
    </div>
     @if(bAdmin) {

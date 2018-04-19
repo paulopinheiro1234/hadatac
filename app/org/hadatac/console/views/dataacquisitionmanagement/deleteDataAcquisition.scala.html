@@ -1,5 +1,5 @@
 @(oper : String, 
-  da : org.hadatac.entity.pojo.DataAcquisition,
+  da : org.hadatac.entity.pojo.ObjectAccessSpec,
   bAdmin : Boolean)
 
 @import helper._
@@ -8,9 +8,9 @@
 @import org.hadatac.console.controllers._
 @import org.hadatac.console.controllers.dataacquisitionmanagement._
 
-@main("Delete Data Acquisition") {
+@main("Delete Object Access Specification") {
 
-    <h2>Delete Data Acquisition</h2>
+    <h2>Delete Object Access Specification</h2>
     
     <div class="container-fluid">
        <ul>
@@ -42,14 +42,14 @@
          
     @if(oper=="cancelled") {
         <div id="cancel-box">
-          <h4>Operation [Delete Data Acquisition] has been cancelled.</h4>
-          Press OK button to return to Data Acquisition Management page <a href="@org.hadatac.console.controllers.dataacquisitionmanagement.routes.DataAcquisitionManagement.index(State.ACTIVE)" class="btn btn-primary" role="button">Ok</a>
+          <h4>Operation [Delete Object Access Specification] has been cancelled.</h4>
+          Press OK button to return to Object Access Specification Management page <a href="@org.hadatac.console.controllers.dataacquisitionmanagement.routes.DataAcquisitionManagement.index(State.ACTIVE)" class="btn btn-primary" role="button">Ok</a>
 	    </div>
     }
 
              
      <div id="end-process-box" style="display:none;">
-          Press OK button to return to Data Acquisition Management page <a href="@org.hadatac.console.controllers.dataacquisitionmanagement.routes.DataAcquisitionManagement.index(State.ACTIVE)" class="btn btn-primary" role="button">Ok</a>
+          Press OK button to return to Object Access Specification Management page <a href="@org.hadatac.console.controllers.dataacquisitionmanagement.routes.DataAcquisitionManagement.index(State.ACTIVE)" class="btn btn-primary" role="button">Ok</a>
 	 </div>
 
 	 @if(oper=="confirmed") {

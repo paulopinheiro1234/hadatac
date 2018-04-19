@@ -12,7 +12,7 @@ import org.hadatac.console.views.html.studies.*;
 import org.hadatac.console.views.html.annotator.*;
 import org.hadatac.console.controllers.studies.routes;
 import org.hadatac.entity.pojo.Agent;
-import org.hadatac.entity.pojo.DataAcquisition;
+import org.hadatac.entity.pojo.ObjectAccessSpec;
 import org.hadatac.entity.pojo.DataFile;
 import org.hadatac.entity.pojo.Study;
 import org.hadatac.entity.pojo.StudyType;
@@ -126,7 +126,7 @@ public class NewStudy extends Controller {
         System.out.println("Inserting new Study from file. Study URI : [" + std.getUri() + "]");
         // when a new study is created in the scope of a datafile, the new study needs to be associated to the datafile's DA 
         if (filename != null && !filename.equals("") && da_uri != null && !da_uri.equals("")) {
-            DataAcquisition da = DataAcquisition.findByUri(URIUtils.replacePrefixEx(da_uri));
+            ObjectAccessSpec da = ObjectAccessSpec.findByUri(URIUtils.replacePrefixEx(da_uri));
             if (da != null) {
                 da.setStudyUri(std.getUri());
                 

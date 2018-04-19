@@ -17,7 +17,7 @@ import org.hadatac.console.controllers.AuthApplication;
 import org.hadatac.console.controllers.annotator.FileProcessing;
 import org.hadatac.console.controllers.annotator.routes;
 import org.hadatac.console.models.SysUser;
-import org.hadatac.entity.pojo.DataAcquisition;
+import org.hadatac.entity.pojo.ObjectAccessSpec;
 import org.hadatac.entity.pojo.DataFile;
 import org.hadatac.entity.pojo.Deployment;
 import org.hadatac.entity.pojo.DataAcquisitionSchema;
@@ -42,7 +42,7 @@ public class PrepareIngestion extends Controller {
     public Result create(String file_name, String da_uri) {
         final String kbPrefix = ConfigProp.getKbPrefix();
         String ownerEmail = "";
-        DataAcquisition da = null;
+        ObjectAccessSpec da = null;
         DataFile file = null;
 
         try {
@@ -60,7 +60,7 @@ public class PrepareIngestion extends Controller {
 
         // Load associated DA
         if (da_uri != null && !da_uri.equals("")) {
-            da = DataAcquisition.findByUri(URIUtils.replacePrefixEx(da_uri));
+            da = ObjectAccessSpec.findByUri(URIUtils.replacePrefixEx(da_uri));
             System.out.println("Global scope: [" + da.getGlobalScopeUri() + "]  hasScope: " + da.hasScope());
 
             if (da != null) {
@@ -89,7 +89,7 @@ public class PrepareIngestion extends Controller {
         da_label = da_label.replace(".csv","").replace(".","").replace("+","-");
         new_da_uri = kbPrefix + da_label;
 
-        da = new DataAcquisition();
+        da = new ObjectAccessSpec();
         da.setTriggeringEvent(TriggeringEvent.INITIAL_DEPLOYMENT);
         da.setLabel(da_label);
         da.setUri(URIUtils.replacePrefixEx(new_da_uri));
@@ -118,7 +118,7 @@ public class PrepareIngestion extends Controller {
 
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
     public Result reconfigure(String file_name, String da_uri) {
-        DataAcquisition dataAcquisition = DataAcquisition.findByUri(da_uri);
+        ObjectAccessSpec dataAcquisition = ObjectAccessSpec.findByUri(da_uri);
         if (null != dataAcquisition) {
             dataAcquisition.setStatus(0);
             dataAcquisition.save();
@@ -129,11 +129,11 @@ public class PrepareIngestion extends Controller {
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
     public Result refine(String file_name, String da_uri, String message) {
 
-        DataAcquisition da = null;
+        ObjectAccessSpec da = null;
 
         // Load associated DA
         if (da_uri != null && !da_uri.equals("")) {
-            da = DataAcquisition.findByUri(da_uri);
+            da = ObjectAccessSpec.findByUri(da_uri);
             if (da != null) {
                 return ok(prepareIngestion.render(file_name, da, message));
             } else {
@@ -254,9 +254,9 @@ public class PrepareIngestion extends Controller {
                 return refine(file_name, da_uri, message);
             }
 
-            DataAcquisition da = DataAcquisition.findByUri(da_uri);
+            ObjectAccessSpec da = ObjectAccessSpec.findByUri(da_uri);
             if (da == null) {
-                message = "ERROR - Could not retrieve Data Acquisition from its URI.";
+                message = "ERROR - Could not retrieve Object Access Specification from its URI.";
                 return refine(file_name, da_uri, message);
             }
 
@@ -265,7 +265,7 @@ public class PrepareIngestion extends Controller {
             da.saveToSolr();
             da.saveToLabKey(session().get("LabKeyUserName"), session().get("LabKeyPassword"));
 
-            return ok(prepareIngestion.render(file_name, da, "Updated Data Acquisition with deployment information"));
+            return ok(prepareIngestion.render(file_name, da, "Updated Object Access Specification with deployment information"));
         }
 
         message = "DA is now associated with study " + std_uri;
@@ -293,9 +293,9 @@ public class PrepareIngestion extends Controller {
             localScopeUriList = Arrays.asList(localUriStr);
         }
 
-        DataAcquisition da = DataAcquisition.findByUri(da_uri);
+        ObjectAccessSpec da = ObjectAccessSpec.findByUri(da_uri);
         if (da == null) {
-            message = "ERROR - Could not retrieve Data Acquisition from its URI.";
+            message = "ERROR - Could not retrieve Object Access Specification from its URI.";
             return refine(file_name, da_uri, message);
         }
 
@@ -305,7 +305,7 @@ public class PrepareIngestion extends Controller {
         da.saveToSolr();
         da.saveToLabKey(session().get("LabKeyUserName"), session().get("LabKeyPassword"));
 
-        return ok(prepareIngestion.render(file_name, da, "Updated Data Acquisition with scope information"));
+        return ok(prepareIngestion.render(file_name, da, "Updated Object Access Specification with scope information"));
     }
 
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
@@ -324,9 +324,9 @@ public class PrepareIngestion extends Controller {
                 return refine(file_name, da_uri, message);
             }
 
-            DataAcquisition da = DataAcquisition.findByUri(da_uri);
+            ObjectAccessSpec da = ObjectAccessSpec.findByUri(da_uri);
             if (da == null) {
-                message = "ERROR - Could not retrieve Data Acquisition from its URI.";
+                message = "ERROR - Could not retrieve Object Access Specification from its URI.";
                 return refine(file_name, da_uri, message);
             }
 
@@ -335,7 +335,7 @@ public class PrepareIngestion extends Controller {
             da.saveToSolr();
             da.saveToLabKey(session().get("LabKeyUserName"), session().get("LabKeyPassword"));
             
-            return ok(prepareIngestion.render(file_name, da, "Updated Data Acquisition with deployment information"));
+            return ok(prepareIngestion.render(file_name, da, "Updated Object Access Specification with deployment information"));
         }
 
         message = "DA is now associated with deployment " + dep_uri;
@@ -354,13 +354,13 @@ public class PrepareIngestion extends Controller {
 
             DataAcquisitionSchema das = DataAcquisitionSchema.find(das_uri);
             if (das == null) {
-                message = "ERROR - Could not retrieve Data Acquisition Schema from its URI.";
+                message = "ERROR - Could not retrieve Object Access Specification Schema from its URI.";
                 return refine(file_name, da_uri, message);
             }
 
-            DataAcquisition da = DataAcquisition.findByUri(da_uri);
+            ObjectAccessSpec da = ObjectAccessSpec.findByUri(da_uri);
             if (da == null) {
-                message = "ERROR - Could not retrieve Data Acquisition from its URI.";
+                message = "ERROR - Could not retrieve Object Access Specification from its URI.";
                 return refine(file_name, da_uri, message);
             }
 
@@ -369,7 +369,7 @@ public class PrepareIngestion extends Controller {
             da.saveToSolr();
             da.saveToLabKey(session().get("LabKeyUserName"), session().get("LabKeyPassword"));
             
-            return ok(prepareIngestion.render(file_name, da, "Updated Data Acquisition with data acquisition schema information"));
+            return ok(prepareIngestion.render(file_name, da, "Updated Object Access Specification with data acquisition schema information"));
         }
 
         message = "DA is now associated with data acquisition schema " + das_uri;
@@ -380,9 +380,9 @@ public class PrepareIngestion extends Controller {
     public Result removeAssociation(String file_name, String da_uri, String daComponent) {
 
         String message = "";
-        DataAcquisition da = DataAcquisition.findByUri(da_uri);
+        ObjectAccessSpec da = ObjectAccessSpec.findByUri(da_uri);
         if (da == null) {
-            message = "ERROR - Could not retrieve Data Acquisition from its URI.";
+            message = "ERROR - Could not retrieve Object Access Specification from its URI.";
             return refine(file_name, da_uri, message);
         }
 
@@ -415,7 +415,7 @@ public class PrepareIngestion extends Controller {
         da.saveToSolr();
         da.saveToLabKey(session().get("LabKeyUserName"), session().get("LabKeyPassword"));
             
-        message = "Association with " + daComponent + " removed from the Data Acquisition.";
+        message = "Association with " + daComponent + " removed from the Object Access Specification.";
         return ok(prepareIngestion.render(file_name, da, message));
     }
 
@@ -423,9 +423,9 @@ public class PrepareIngestion extends Controller {
     public Result completeDataAcquisition(String file_name, String da_uri) {
 
         String message = "";
-        DataAcquisition da = DataAcquisition.findByUri(da_uri);
+        ObjectAccessSpec da = ObjectAccessSpec.findByUri(da_uri);
         if (da == null) {
-            message = "ERROR - Could not retrieve Data Acquisition from its URI.";
+            message = "ERROR - Could not retrieve Object Access Specification from its URI.";
             return refine(file_name, da_uri, message);
         }
 
@@ -434,7 +434,7 @@ public class PrepareIngestion extends Controller {
         da.saveToSolr();
         da.saveToLabKey(session().get("LabKeyUserName"), session().get("LabKeyPassword"));
         
-        message = "Data Acquisition set as complete";
+        message = "Object Access Specification set as complete";
         return ok(prepareIngestion.render(file_name, da, message));
     }
 }

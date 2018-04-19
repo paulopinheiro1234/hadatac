@@ -15,7 +15,7 @@ import org.hadatac.console.controllers.annotator.FileProcessing;
 import org.hadatac.console.controllers.dataacquisitionmanagement.routes;
 import org.hadatac.console.views.html.*;
 import org.hadatac.console.views.html.dataacquisitionmanagement.*;
-import org.hadatac.entity.pojo.DataAcquisition;
+import org.hadatac.entity.pojo.ObjectAccessSpec;
 import org.hadatac.entity.pojo.DataFile;
 import org.hadatac.entity.pojo.ObjectCollection;
 import org.hadatac.metadata.loader.URIUtils;
@@ -33,7 +33,7 @@ public class DataAcquisitionScope extends Controller {
 			    routes.DataAcquisitionScope.create(file_name, da_uri).url()));
     	}
 	
-	DataAcquisition da = null;
+	ObjectAccessSpec da = null;
 	DataFile file = null;
 	String ownerEmail = "";
 	
@@ -52,7 +52,7 @@ public class DataAcquisitionScope extends Controller {
 	
 	// Load associated DA
 	if (da_uri != null && !da_uri.equals("")) {
-	    da = DataAcquisition.findByUri(URIUtils.replacePrefixEx(da_uri));
+	    da = ObjectAccessSpec.findByUri(URIUtils.replacePrefixEx(da_uri));
 
 	    if (da == null) {
 		String message = "[ERROR] Could not load assigned DA from DA's URI : " + da_uri;
@@ -117,7 +117,7 @@ public class DataAcquisitionScope extends Controller {
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
     public Result view(String file_name, String da_uri) {
 	
-	DataAcquisition da = null;
+	ObjectAccessSpec da = null;
 	DataFile file = null;
 	String ownerEmail = "";
 	
@@ -136,7 +136,7 @@ public class DataAcquisitionScope extends Controller {
 	
 	// Load associated DA
 	if (da_uri != null && !da_uri.equals("")) {
-	    da = DataAcquisition.findByUri(URIUtils.replacePrefixEx(da_uri));
+	    da = ObjectAccessSpec.findByUri(URIUtils.replacePrefixEx(da_uri));
 
 	    if (da == null) {
 		String message = "[ERROR] Could not load assigned DA from DA's URI : " + da_uri;

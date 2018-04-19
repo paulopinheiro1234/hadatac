@@ -33,7 +33,7 @@ import org.hadatac.console.models.DeploymentForm;
 import org.hadatac.console.models.SparqlQueryResults;
 import org.hadatac.console.models.SysUser;
 import org.hadatac.console.models.TripleDocument;
-import org.hadatac.entity.pojo.DataAcquisition;
+import org.hadatac.entity.pojo.ObjectAccessSpec;
 import org.hadatac.entity.pojo.Deployment;
 import org.hadatac.utils.CollectionUtil;
 import org.hadatac.utils.NameSpaces;

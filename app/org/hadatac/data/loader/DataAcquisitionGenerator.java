@@ -7,7 +7,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.hadatac.console.models.SysUser;
-import org.hadatac.entity.pojo.DataAcquisition;
+import org.hadatac.entity.pojo.ObjectAccessSpec;
 import org.hadatac.entity.pojo.DataAcquisitionSchema;
 import org.hadatac.entity.pojo.Deployment;
 import org.hadatac.entity.pojo.HADatAcThing;
@@ -121,12 +121,12 @@ public class DataAcquisitionGenerator extends BasicGenerator {
 		return createDataAcquisition(row, ownerEmail, permissionUri, deploymentUri, isEpiData(rec));
 	}
 
-	DataAcquisition createDataAcquisition(Map<String, Object> row, 
+	ObjectAccessSpec createDataAcquisition(Map<String, Object> row, 
 			String ownerEmail, 
 			String permissionUri, 
 			String deploymentUri,
 			boolean isEpiData) throws Exception {
-		DataAcquisition da = new DataAcquisition();
+		ObjectAccessSpec da = new ObjectAccessSpec();
 		da.setUri(URIUtils.replacePrefixEx((String)row.get("hasURI")));
 		da.setLabel(URIUtils.replacePrefixEx((String)row.get("rdfs:label")));
 		da.setDeploymentUri(URIUtils.replacePrefixEx((String)row.get("hasco:hasDeployment")));

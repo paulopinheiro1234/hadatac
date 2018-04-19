@@ -163,7 +163,7 @@ public class DataFile {
         dataFile.setSubmissionTime(new SimpleDateFormat("yyyy/MM/dd HH:mm:ss").format(new Date()));
         
         if (fileName.startsWith("DA-")) {
-            String dataAcquisitionUri = DataAcquisition.getProperDataAcquisitionUri(fileName);
+            String dataAcquisitionUri = ObjectAccessSpec.getProperDataAcquisitionUri(fileName);
             dataFile.setDataAcquisitionUri(dataAcquisitionUri == null ? "" : dataAcquisitionUri);
         }
         

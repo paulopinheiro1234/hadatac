@@ -10,7 +10,7 @@ import org.apache.solr.client.solrj.impl.HttpSolrClient;
 import org.apache.solr.client.solrj.response.PivotField;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.hadatac.entity.pojo.Characteristic;
-import org.hadatac.entity.pojo.DataAcquisition;
+import org.hadatac.entity.pojo.ObjectAccessSpec;
 import org.hadatac.entity.pojo.Entity;
 import org.hadatac.utils.CollectionUtil;
 
@@ -25,7 +25,7 @@ public class EntityCharacteristic {
 		entities = new ArrayList<Entity>();
 		
 		String dataAcquisitionQuery = "";
-		List<String> dataAcquisitions = DataAcquisition.findAllAccessibleDataAcquisition(userUri);
+		List<String> dataAcquisitions = ObjectAccessSpec.findAllAccessibleDataAcquisition(userUri);
 		Iterator<String> i = dataAcquisitions.iterator();
 		while (i.hasNext()) {
 			String dataAcquisition = i.next();

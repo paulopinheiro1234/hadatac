@@ -1,5 +1,5 @@
 @(filename     : String,
-  da           : org.hadatac.entity.pojo.DataAcquisition, 
+  da           : org.hadatac.entity.pojo.ObjectAccessSpec, 
   permissions  : Map[String, String],
   ownerOptions : List[String],
   schemas      : Map[String, String],
@@ -52,7 +52,7 @@
 		}
 	</script>
 
-    <h2>Edit Data Acquisition</h2>
+    <h2>Edit Object Access Specification</h2>
     
     <div class="container-fluid">
        <ul>
@@ -128,7 +128,7 @@
            </div>
            
            <div id="div_acquisition_uri" class="form-group" style="display : none">
-		   	  <label>Data Acquisition URI:</label>
+		   	  <label>Object Access Specification URI:</label>
  			  <input type="text" class="form-control col-sm-6" name="newDataAcquisitionUri" id="newDataAcquisitionUri" >
  		   </div>
  		   
@@ -172,7 +172,7 @@
 	       class="btn btn-primary" role="button">Back to Prepare Ingestion</a>
        } else {
             <a href="@org.hadatac.console.controllers.dataacquisitionmanagement.routes.DataAcquisitionManagement.index(State.ACTIVE)" 
-	       class="btn btn-primary" role="button">Back to Data Acquisition Management</a>
+	       class="btn btn-primary" role="button">Back to Object Access Specification Management</a>
        }
     </div>
     </ul>

@@ -16,7 +16,7 @@ import org.apache.poi.poifs.property.Child;
 import org.hadatac.console.controllers.annotator.AnnotationLog;
 import org.hadatac.data.api.DataFactory;
 import org.hadatac.data.model.ParsingResult;
-import org.hadatac.entity.pojo.DataAcquisition;
+import org.hadatac.entity.pojo.ObjectAccessSpec;
 import org.hadatac.entity.pojo.DataFile;
 import org.hadatac.entity.pojo.SDD;
 import org.hadatac.metadata.loader.URIUtils;
@@ -81,7 +81,7 @@ public class AnnotationWorker {
                 } else {
                     log.addline(Feedback.println(Feedback.WEB, 
                             "[ERROR] Unsupported file name prefix, only accept prefixes "
-                            + "STD-, PID-, MAP-, SDD-, ACQ-, DA-. "));
+                                    + "STD-, PID-, MAP-, SDD-, ACQ-, DA-. "));
                     return;
                 }
 
@@ -119,7 +119,6 @@ public class AnnotationWorker {
     public static GeneratorChain annotateStudyIdFile(RecordFile file) {
         GeneratorChain chain = new GeneratorChain();
         chain.addGenerator(new StudyGenerator(file));
-//        chain.addGenerator(new SampleCollectionGenerator(file));
         chain.addGenerator(new AgentGenerator(file));
 
         return chain;
@@ -239,52 +238,50 @@ public class AnnotationWorker {
 
         return chain;
     }
-    
-	public static GeneratorChain annotateSSDFile(RecordFile file) {
-	        
-	        String Pilot_Num = file.getFile().getName().replaceAll("SSD-", "");
-	        System.out.println("Processing SSD file of " + Pilot_Num + "...");
-	        String file_name = file.getFile().getName();
-	        AnnotationLog log = AnnotationLog.create(file_name);
-	        RecordFile SSDsheet = new SpreadsheetRecordFile(file.getFile(), "SSD");
-	        RecordFile SBJsheet = new SpreadsheetRecordFile(file.getFile(), "SOC-SUBJECTS");     
-	        RecordFile MOMsheet = new SpreadsheetRecordFile(file.getFile(), "SOC-MOTHERS");
-	        RecordFile SSAPsheet = new SpreadsheetRecordFile(file.getFile(), "SOC-SSAMPLES");
-	        RecordFile MSAPsheet = new SpreadsheetRecordFile(file.getFile(), "SOC-MSAMPLES");
-//	        RecordFile TIMEsheet = new SpreadsheetRecordFile(file.getFile(), "SOC-VISITS");
-	        
-	        GeneratorChain chain = new GeneratorChain();
-	        chain.addGenerator(new SSDGenerator(SSDsheet));
-	        chain.addGenerator(new SubjectGenerator(SBJsheet));
-	        chain.addGenerator(new MotherGenerator(MOMsheet));
-	        chain.addGenerator(new SampleSubjectMapper(SSAPsheet));
-	        chain.addGenerator(new SampleSubjectMapper(MSAPsheet));
-	//        chain.addGenerator(new MotherSampleGenerator());
-	
-	        return chain;
-	    }
+
+    public static GeneratorChain annotateSSDFile(RecordFile file) {
+        String Pilot_Num = file.getFile().getName().replaceAll("SSD-", "");
+        System.out.println("Processing SSD file of " + Pilot_Num + "...");
+
+        RecordFile SSDsheet = new SpreadsheetRecordFile(file.getFile(), "SSD");
+        RecordFile SBJsheet = new SpreadsheetRecordFile(file.getFile(), "SOC-SUBJECTS");     
+        RecordFile MOMsheet = new SpreadsheetRecordFile(file.getFile(), "SOC-MOTHERS");
+        RecordFile SSAPsheet = new SpreadsheetRecordFile(file.getFile(), "SOC-SSAMPLES");
+        RecordFile MSAPsheet = new SpreadsheetRecordFile(file.getFile(), "SOC-MSAMPLES");
+        // RecordFile TIMEsheet = new SpreadsheetRecordFile(file.getFile(), "SOC-VISITS");
+
+        GeneratorChain chain = new GeneratorChain();
+        chain.addGenerator(new SSDGenerator(SSDsheet));
+        chain.addGenerator(new SubjectGenerator(SBJsheet));
+        chain.addGenerator(new MotherGenerator(MOMsheet));
+        chain.addGenerator(new SampleSubjectMapper(SSAPsheet));
+        chain.addGenerator(new SampleSubjectMapper(MSAPsheet));
+        // chain.addGenerator(new MotherSampleGenerator());
+
+        return chain;
+    }
 
 
     public static boolean annotateDAFile(DataFile dataFile, RecordFile recordFile) {
         System.out.println("annotateDAFile: [" + dataFile.getFileName() + "]");
-        
+
         String file_name = dataFile.getFileName();
         AnnotationLog log = AnnotationLog.create(file_name);
-        
-        DataAcquisition da = null;
+
+        ObjectAccessSpec da = null;
         String da_uri = null;
         String deployment_uri = null;
         String schema_uri = null;
 
         if (dataFile != null) {
-            da = DataAcquisition.findByUri(URIUtils.replacePrefixEx(dataFile.getDataAcquisitionUri()));
+            da = ObjectAccessSpec.findByUri(URIUtils.replacePrefixEx(dataFile.getDataAcquisitionUri()));
             if (da != null) {
                 if (!da.isComplete()) {
                     log.addline(Feedback.println(Feedback.WEB, 
-                            String.format("[WARNING] Specification of associated Data Acquisition is incomplete: %s", file_name)));
+                            String.format("[WARNING] Specification of associated Object Access Specification is incomplete: %s", file_name)));
                     return false;
                 } else {
-                    log.addline(Feedback.println(Feedback.WEB, String.format("[OK] Specification of associated Data Acquisition is complete: %s", file_name)));
+                    log.addline(Feedback.println(Feedback.WEB, String.format("[OK] Specification of associated Object Access Specification is complete: %s", file_name)));
                 }
                 da_uri = da.getUri();
                 deployment_uri = da.getDeploymentUri();
@@ -318,11 +315,11 @@ public class AnnotationWorker {
         }
 
         int status = -1;
-        
+
         try {
             dataFile.setDatasetUri(DataFactory.getNextDatasetURI(da.getUri()));
             da.addDatasetUri(dataFile.getDatasetUri());
-            
+
             Parser parser = new Parser();
             ParsingResult parsingResult = parser.indexMeasurements(recordFile, da, dataFile);
             status = parsingResult.getStatus();

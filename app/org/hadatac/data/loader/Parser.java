@@ -15,7 +15,7 @@ import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.impl.HttpSolrClient;
 import org.hadatac.console.controllers.annotator.AnnotationLog;
 import org.hadatac.data.model.ParsingResult;
-import org.hadatac.entity.pojo.DataAcquisition;
+import org.hadatac.entity.pojo.ObjectAccessSpec;
 import org.hadatac.entity.pojo.DataAcquisitionSchema;
 import org.hadatac.entity.pojo.DataAcquisitionSchemaAttribute;
 import org.hadatac.entity.pojo.DataAcquisitionSchemaEvent;
@@ -38,7 +38,7 @@ public class Parser {
         templateList = new ArrayList<DASVirtualObject>();
     }
 
-    public ParsingResult indexMeasurements(RecordFile file, DataAcquisition da, DataFile dataFile) {
+    public ParsingResult indexMeasurements(RecordFile file, ObjectAccessSpec da, DataFile dataFile) {
         System.out.println("[Parser] indexMeasurements()...");
 
         AnnotationLog log = AnnotationLog.create(dataFile.getFileName());
