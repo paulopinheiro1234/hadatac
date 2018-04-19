@@ -16,7 +16,8 @@ RUN wget https://sourceforge.net/projects/jts-topo-suite/files/jts/1.14/jts-1.14
 # Change back to the solr user
 USER solr
 
-COPY hadatac_solr.dj.zip /opt/solr/server/hadatac_solr.zip
+ARG SEED
+COPY $SEED /opt/solr/server/hadatac_solr.zip
 
 # Unzips SOLR seed data & copies SOLR Seed data to correct director
 RUN unzip hadatac_solr.zip && cp -r hadatac_solr/. solr && rm -f hadatac_solr.zip
