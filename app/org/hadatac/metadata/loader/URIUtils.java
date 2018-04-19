@@ -76,6 +76,10 @@ public class URIUtils {
 		return (isFullURI(firstToken) || isAbbreviatedURI(firstToken));
 	}
 	
+	public static String getBaseName(String str) {
+	    return str.substring(Math.max(str.lastIndexOf("#"), str.lastIndexOf("/")) + 1);
+	}
+	
 	/* 
 	 *  if the argument str starts with the URI of one of the name spaces registered in NameSpaces.table, the
 	 *  URI gets replaced by the name space's abbreviation. Otherwise, the string is returned wrapper

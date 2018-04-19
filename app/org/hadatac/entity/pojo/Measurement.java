@@ -751,7 +751,7 @@ public class Measurement extends HADatAcThing implements Runnable {
         // Set default label as local name
         for (String uri : uris) {
             if (URIUtils.isValidURI(uri)) {
-                results.put(uri, uri.substring(Math.max(uri.lastIndexOf("#"), uri.lastIndexOf("/")) + 1));
+                results.put(uri, URIUtils.getBaseName(uri));
                 validURIs.add(uri);
             } else {
                 results.put(uri, uri);

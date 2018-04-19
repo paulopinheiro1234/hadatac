@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.HashMap;
+
+import org.apache.commons.lang3.text.WordUtils;
 import org.apache.jena.query.Query;
 import org.apache.jena.query.QueryExecution;
 import org.apache.jena.query.QueryExecutionFactory;
@@ -23,7 +25,6 @@ import org.apache.jena.rdf.model.StmtIterator;
 import org.apache.jena.sparql.engine.http.QueryExceptionHTTP;
 import org.hadatac.utils.CollectionUtil;
 import org.hadatac.utils.NameSpaces;
-import org.hadatac.utils.ConfigProp;
 import be.objectify.deadbolt.java.actions.Group;
 import be.objectify.deadbolt.java.actions.Restrict;
 import org.hadatac.console.controllers.AuthApplication;
@@ -134,7 +135,7 @@ public class Platform extends HADatAcThing implements Comparable<Platform> {
 				+ " ?dataAcquisitionUri rdfs:label ?dataAcquisitionLabel . \n"
 				+ " } \n";
 		
-		//System.out.println("Platform getTargetFacets() query: " + query);
+		// System.out.println("Platform getTargetFacets() query: " + query);
 
 		Map<HADatAcThing, List<HADatAcThing>> results = new HashMap<HADatAcThing, List<HADatAcThing>>();
 		try {
@@ -146,25 +147,31 @@ public class Platform extends HADatAcThing implements Comparable<Platform> {
 			while (resultsrw.hasNext()) {
 				QuerySolution soln = resultsrw.next();
 				Platform platform = new Platform();
-				platform.setUri(soln.get("platformUri").toString());
-				platform.setLabel(soln.get("platformLabel").toString());
+				String platformUri = soln.get("platformUri").toString();
+				String platformLabel = soln.get("platformLabel").toString();
+				platform.setUri(platformUri);
 				platform.setField("platform_uri_str");
+				if (platformLabel.isEmpty()) {
+				    platform.setLabel(WordUtils.capitalize(URIUtils.getBaseName(platformUri)));
+				} else {
+				    platform.setLabel(platformLabel);
+				}
 				
-				ObjectAccessSpec da = new ObjectAccessSpec();
-				da.setUri(soln.get("dataAcquisitionUri").toString());
-				da.setLabel(soln.get("dataAcquisitionLabel").toString());
-				da.setField("acquisition_uri_str");
+				ObjectAccessSpec oas = new ObjectAccessSpec();
+				oas.setUri(soln.get("dataAcquisitionUri").toString());
+				oas.setLabel(soln.get("dataAcquisitionLabel").toString());
+				oas.setField("acquisition_uri_str");
 				if (!results.containsKey(platform)) {
 					List<HADatAcThing> facets = new ArrayList<HADatAcThing>();
 					results.put(platform, facets);
 				}
-				if (!results.get(platform).contains(da)) {
-					results.get(platform).add(da);
+				if (!results.get(platform).contains(oas)) {
+					results.get(platform).add(oas);
 				}
 				
 				Facet subFacet = facet.getChildById(platform.getUri());
 				subFacet.putFacet("platform_uri_str", platform.getUri());
-				subFacet.putFacet("acquisition_uri_str", da.getUri());
+				subFacet.putFacet("acquisition_uri_str", oas.getUri());
 			}
 		} catch (QueryExceptionHTTP e) {
 			e.printStackTrace();

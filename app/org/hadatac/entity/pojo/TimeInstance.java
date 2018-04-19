@@ -22,6 +22,7 @@ import org.apache.solr.common.SolrDocumentList;
 import org.hadatac.console.models.Facet;
 import org.hadatac.console.models.FacetHandler;
 import org.hadatac.console.models.Pivot;
+import org.hadatac.metadata.loader.URIUtils;
 import org.hadatac.utils.CollectionUtil;
 
 import com.typesafe.config.ConfigFactory;
@@ -256,8 +257,7 @@ public class TimeInstance extends HADatAcThing implements Comparable<TimeInstanc
                 }
                 if (time.getLabel().isEmpty()) {
                     String uri = pivot_ent.getValue();
-                    time.setLabel(WordUtils.capitalize(uri.substring(
-                            Math.max(uri.lastIndexOf("#"), uri.lastIndexOf("/")) + 1)));
+                    time.setLabel(WordUtils.capitalize(URIUtils.getBaseName(uri)));
                 }
             } else {
                 time.setUri("");
