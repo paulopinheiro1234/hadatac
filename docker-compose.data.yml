@@ -2,7 +2,6 @@ version: '3'
 
 services:
     solr:
-        container_name: solr-data
         build:
             dockerfile: Dockerfile-data
             args:
@@ -18,7 +17,6 @@ services:
             - "8983:8983"
 
     blazegraph:
-        container_name: blazegraph-data
         build:
             dockerfile: Dockerfile-data
             args:
