@@ -8,14 +8,15 @@ services:
             - VERBOSE=yes
         # Map the solr admin port to the localhost in dev mode
         ports:
-            - "8984:8983"
+            - "8983:8983"
 
     blazegraph:
+        # Override production restart value to default
         restart: "no"
+        # Map the 9999 blazegraph port to localhost in dev mode
         ports:
-            - "9998:9999"
+            - "9999:9999"
 
     hadatac:
+        # Override production restart value to default
         restart: "no"
-        ports:
-            - "9000:9000"
