@@ -2,7 +2,9 @@ version: '3'
 
 services:
     solr:
-        build: ./solr
+        build:
+            context: ./solr
+            # dockerfile: Dockerfile-data
         container_name: hadatac_solr
         hostname: solr
         restart: always
@@ -16,7 +18,9 @@ services:
             - hadatac
 
     blazegraph:
-        build: ./blazegraph
+        build:
+            context: ./blazegraph
+            # dockerfile: Dockerfile-data
         container_name: hadatac_blazegraph
         hostname: blazegraph
         networks:

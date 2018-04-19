@@ -25,11 +25,5 @@ RUN chown -R solr:solr /opt/solr/server/solr/mycores
 # Change back to the solr user
 USER solr
 
-# COPY hadatac_solr.dj.zip /opt/solr/server/hadatac_solr.zip
-#
-# # Unzips SOLR seed data & copies SOLR Seed data to correct director
-# RUN unzip hadatac_solr.zip && cp -r hadatac_solr/. solr && rm -f hadatac_solr.zip
-
-
 # Set solr-foreground as the final command. This is the default already.
 CMD ["solr-foreground"]

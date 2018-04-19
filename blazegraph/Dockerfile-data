@@ -1,0 +1,9 @@
+FROM nawer/blazegraph:2.1.4
+
+# Copies Blazegraph Seed ZIP
+COPY blazegraph.zip /var/lib/blazegraph/blazegraph_data.zip
+
+WORKDIR /var/lib/blazegraph
+
+# unzips Blazegraph Seed & removes Blazegraph Seed data zip file & installs blazegraph.jar
+RUN unzip blazegraph_data.zip && rm blazegraph_data.zip
