@@ -4,3 +4,15 @@ solr/
 project/project
 project/target
 target
+.gitalias
+.gitignore
+*.yml
+*.sh
+*.bat
+LICENSE
+*.md
+Dockerfile
+.dockerignore
+Dockerfile-data
+hadatac.initd
+Procfile
