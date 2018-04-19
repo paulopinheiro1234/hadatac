@@ -1,4 +1,3 @@
-*.zip
 *.md
 .dockerignore
 Dockerfile
