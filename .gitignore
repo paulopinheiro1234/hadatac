@@ -1,3 +1,5 @@
+solr/*.zip
+blazegraph/*.zip
 logs
 uploads/
 project/project
@@ -22,9 +24,3 @@ processed_csv/
 unprocessed_csv/
 downloaded_csv/
 sddtmp/
-conf/hadatac.conf
-conf/hadatac.conf.*
-conf/template.conf
-conf/template.conf.*
-conf/labkey.config
-conf/labkey.config.*

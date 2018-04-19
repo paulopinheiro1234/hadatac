@@ -1,0 +1,34 @@
+version: '3'
+
+services:
+    solr:
+        build:
+            dockerfile: Dockerfile-data
+            args:
+                # Change the initial seed data.
+                # NOTE: The file must be in the build context directory i.e. ./solr
+                - SEED=solr.zip
+        # Override production restart value to default
+        restart: "no"
+        environment:
+            - VERBOSE=yes
+        # Map the solr admin port to the localhost in dev mode
+        ports:
+            - "8983:8983"
+
+    blazegraph:
+        build:
+            dockerfile: Dockerfile-data
+            args:
+                # Change the initial seed data.
+                # NOTE: The file must be in the build context directory i.e. ./blazegraph
+                - SEED=blazegraph.zip
+        # Override production restart value to default
+        restart: "no"
+        # Map the 9999 blazegraph port to localhost in dev mode
+        ports:
+            - "9999:9999"
+
+    hadatac:
+        # Override production restart value to default
+        restart: "no"

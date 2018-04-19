@@ -1,0 +1,66 @@
+### This is a file with several useful git aliases.
+### To use it in this project, from a shell in the head directory, type...
+### 	git config include.path '../.gitalias'
+###
+### Feel free to add any other useful aliases that you might use. Just make sure that
+###    you write a brief description about what it does.
+
+[alias]
+	###########################################
+	### General git aliases that are useful ###
+	###########################################
+
+	# Get the name of the current branch.
+	branch-name = rev-parse --abbrev-ref HEAD # print current branch name
+
+	# A really nice looking log of commits with color.
+	ll = log --pretty=format:"%C(yellow)%h%Cred%d\\ %Creset%s%Cblue\\ [%cn]" --decorate --numstat
+	# one-line log
+	l = log --pretty=format:"%C(yellow)%h\\ %ad%Cred%d\\ %Creset%s%Cblue\\ [%cn]" --decorate --date=short
+	# Same as ll but without colors.
+	lnc = log --pretty=format:"%h\\ %s\\ [%cn]"
+
+
+
+	pup = pull upstream master
+	pupdev = pull upstream dev
+
+	a = add
+	aa = add .
+
+	c = commit --verbose
+	ca = commit -a --verbose
+	cm = commit -m
+	cam = commit -a -m
+	m = commit --amend --verbose
+
+	d = diff
+	ds = diff --stat
+	dc = diff --cached
+
+	s = status -s
+	br = branch
+	co = checkout
+	cob = checkout -b
+
+	# list branches sorted by last modified
+	branches = "!git for-each-ref --sort='-authordate' --format='%(authordate)%09%(objectname:short)%09%(refname)' refs/heads | sed -e 's-refs/heads/--'"
+
+	# list aliases
+	la = "!git config -l | grep alias | cut -c 7-"
+
+	# Get info about the last commit made.
+	# git log -1 HEAD
+	last = log -1 HEAD
+
+	# Get info on all branches
+	branchesv = branch -v -a
+
+	# Delete a local branch e.g. git del-branch-local [branch]
+	del-branch-local = branch -D
+
+	# Delete a remote branch e.g. git del-branch-remote [branch]
+	del-branch-remote = push origin --delete
+
+	# Delete a branch locally and remotely e.g. git del-branch [branch]
+	del-branch = "!f() { git push origin --delete $1 && git branch -D $1; }; f"
