@@ -1,7 +1,10 @@
 package org.hadatac.data.loader;
 
 import java.lang.String;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.jena.query.Query;
@@ -42,14 +45,20 @@ public class SampleSubjectMapper extends BasicGenerator {
     @Override
     void initMapping() {
         mapCol.clear();
-        mapCol.put("pilotNum", "CHEAR_Project_ID");
+        mapCol.put("type", "rdf:type");
         mapCol.put("originalPID", "CHEAR PID");
         mapCol.put("originalSID", "originalID");
         try{
-            mapCol.put("type", "rdf:type");
+        	mapCol.put("pilotNum", "CHEAR_Project_ID");
         } catch (QueryExceptionHTTP e) {
             e.printStackTrace();
-            System.out.println("This sheet or MAP file contains no rdf:type column");
+            System.out.println("This sheet or MAP file contains no CHEAR_Project_ID column");
+        }
+        try{
+        	mapCol.put("timeScopeID", "timeScopeID");
+        } catch (QueryExceptionHTTP e) {
+            e.printStackTrace();
+            System.out.println("This sheet or MAP file contains no timeScopeID column");
         }
     }
 
@@ -80,6 +89,35 @@ public class SampleSubjectMapper extends BasicGenerator {
         }
 
         return mapIdUri;
+    }
+    
+    private String getSubjectType(String sbj) {
+        String answer = "";
+
+        String queryString = NameSpaces.getInstance().printSparqlNameSpaceList() +
+                "SELECT ?o WHERE { " +
+                "<" + sbj + ">" + " <http://hadatac.org/ont/hasco/hasRole>	?o ." +
+                "}";
+
+        try {
+            Query sampleQuery = QueryFactory.create(queryString);
+            QueryExecution qexec = QueryExecutionFactory.sparqlService(
+                    CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), sampleQuery);
+            ResultSet results = qexec.execSelect();
+            ResultSetRewindable resultsrw = ResultSetFactory.copyResults(results);
+            qexec.close();
+            
+            while (resultsrw.hasNext()) {
+                QuerySolution soln = resultsrw.next();
+                if(soln.get("o") != null) {
+                	answer = soln.get("o").toString();
+                }
+            }
+        } catch (QueryExceptionHTTP e) {
+            e.printStackTrace();
+        }
+
+        return answer;
     }
 
     private int getSampleCount(String studyID){
@@ -146,23 +184,40 @@ public class SampleSubjectMapper extends BasicGenerator {
     }
 
     private String getCollectionUri(Record rec) {
-        return kbPrefix + "SOC-" + getStudyUri(rec) + "-SAMPLES";
+        String pid = getOriginalPID(rec);
+        String subtype = getSubjectType(mapIdUriCache.get(pid));
+        System.out.println(subtype);
+        if (subtype.contains("Mother")){
+        	return kbPrefix + "SOC-" + getStudyUri(rec) + "-MSAMPLES";
+        } else {
+        	return kbPrefix + "SOC-" + getStudyUri(rec) + "-SSAMPLES";
+        }
     }
 
     private String getCollectionLabel(Record rec) {
         return "Sample Collection of Study " + getStudyUri(rec);
     }
+    
+    private String getTimeScopeUri(Record rec) {
+    	String ans = rec.getValueByColumnName(mapCol.get("timeScopeID"));
+    	return ans;
+    }
 
 
     public StudyObject createStudyObject(Record record) throws Exception {
-        StudyObject obj = new StudyObject(getUri(record), getType(record), getOriginalSID(record), 
-                getLabel(record), getCollectionUri(record), getLabel(record));
-        
-        String pid = getOriginalPID(record);
+    	List<String> scopeUris = new ArrayList<String>();
+    	String pid = getOriginalPID(record);
         if (mapIdUriCache.containsKey(pid)) {
-        	System.out.println("you a you a you a!");
-            obj.addScopeUri(mapIdUriCache.get(pid));
+        	scopeUris.add(mapIdUriCache.get(pid));
         }
+        if (!getTimeScopeUri(record).isEmpty()){
+        	scopeUris.add("http://hadatac.org/kb/chear#"+getTimeScopeUri(record));
+        }
+    	
+        System.out.println("scopeUris :" + scopeUris);
+        
+        StudyObject obj = new StudyObject(getUri(record), getType(record), getOriginalSID(record), 
+                getLabel(record), getCollectionUri(record), getLabel(record), scopeUris);
         
         return obj;
     }

@@ -248,7 +248,7 @@ public class AnnotationWorker {
         RecordFile MOMsheet = new SpreadsheetRecordFile(file.getFile(), "SOC-MOTHERS");
         RecordFile SSAPsheet = new SpreadsheetRecordFile(file.getFile(), "SOC-SSAMPLES");
         RecordFile MSAPsheet = new SpreadsheetRecordFile(file.getFile(), "SOC-MSAMPLES");
-        // RecordFile TIMEsheet = new SpreadsheetRecordFile(file.getFile(), "SOC-VISITS");
+        RecordFile TIMEsheet = new SpreadsheetRecordFile(file.getFile(), "SOC-VISITS");
 
         GeneratorChain chain = new GeneratorChain();
         chain.addGenerator(new SSDGenerator(SSDsheet));
