@@ -185,9 +185,7 @@ public class SampleSubjectMapper extends BasicGenerator {
 
     private String getCollectionUri(Record rec) {
         String pid = getOriginalPID(rec);
-        String subtype = getSubjectType(mapIdUriCache.get(pid));
-        System.out.println(subtype);
-        if (subtype.contains("Mother")){
+        if (AnnotationWorker.m_list.contains(pid)){
         	return kbPrefix + "SOC-" + getStudyUri(rec) + "-MSAMPLES";
         } else {
         	return kbPrefix + "SOC-" + getStudyUri(rec) + "-SSAMPLES";
@@ -207,8 +205,8 @@ public class SampleSubjectMapper extends BasicGenerator {
     public StudyObject createStudyObject(Record record) throws Exception {
     	List<String> scopeUris = new ArrayList<String>();
     	String pid = getOriginalPID(record);
-        if (mapIdUriCache.containsKey(pid)) {
-        	scopeUris.add(mapIdUriCache.get(pid));
+        if (!pid.isEmpty()) {
+        	scopeUris.add(kbPrefix + "SBJ-" + pid + "-" + study_id);
         }
         if (!getTimeScopeUri(record).isEmpty()){
         	scopeUris.add("http://hadatac.org/kb/chear#"+getTimeScopeUri(record));
