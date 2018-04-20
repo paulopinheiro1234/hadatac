@@ -86,6 +86,7 @@ public class Downloader extends Controller {
 		}
 
 		AnnotationLog.delete(file_name);
+		dataFile.setStatus(DataFile.DELETED);
 		dataFile.delete();
 
 		String path = ConfigProp.getPathDownload();
@@ -147,15 +148,21 @@ public class Downloader extends Controller {
 	}
 	
 	@Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-	public Result checkCompletion(String file_name) {	    
-		DataFile dataFile = DataFile.findByName(file_name);
-		
+	public Result checkCompletion(String file_name) {
 		Map<String, Object> result = new HashMap<String, Object>();
-		result.put("CompletionPercentage", dataFile.getCompletionPercentage());
-		result.put("Status", dataFile.getStatus());
-		result.put("CompletionTime", dataFile.getCompletionTime());
 		
-		return ok(Json.toJson(result));
+		DataFile dataFile = DataFile.findByName(file_name);
+		if (dataFile != null) {
+		    result.put("CompletionPercentage", dataFile.getCompletionPercentage());
+	        result.put("Status", dataFile.getStatus());
+	        result.put("CompletionTime", dataFile.getCompletionTime());
+		} else {
+		    result.put("CompletionPercentage", "");
+            result.put("Status", "");
+            result.put("CompletionTime", "");
+		}
+        
+        return ok(Json.toJson(result));
 	}
 	
 	public static int generateCSVFile(List<Measurement> measurements, 
@@ -174,7 +181,7 @@ public class Downloader extends Controller {
 		dataFile.setSubmissionTime(new SimpleDateFormat("yyyy/MM/dd HH:mm:ss").format(date));
 		dataFile.save();
     	
-    	Measurement.outputAsCSV(measurements, selectedFields, file, dataFile);
+    	Measurement.outputAsCSV(measurements, selectedFields, file);
     	System.out.println("Generated CSV files ...");
 		
 		return 0;

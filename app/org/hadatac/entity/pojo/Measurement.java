@@ -123,11 +123,11 @@ public class Measurement extends HADatAcThing implements Runnable {
     public void setStudyUri(String studyUri) {
         this.studyUri = studyUri;
     }
-    
+
     public String getObjectCollectionType() {
         return objectCollectionType;
     }
-    
+
     public void setObjectCollectionType(String objectCollectionType) {
         this.objectCollectionType = objectCollectionType;
     }
@@ -135,15 +135,15 @@ public class Measurement extends HADatAcThing implements Runnable {
     public String getObjectUri() {
         return objectUri;
     }
-    
+
     public void setObjectUri(String objectUri) {
         this.objectUri = objectUri;
     }
-    
+
     public String getStudyObjectUri() {
         return studyObjectUri;
     }
-    
+
     public void setStudyObjectUri(String studyObjectUri) {
         this.studyObjectUri = studyObjectUri;
     }
@@ -571,7 +571,7 @@ public class Measurement extends HADatAcThing implements Runnable {
                 + "limit: 10000 } }");
         //query.set("group.field", "study_uri_str");
         //query.set("group", "true");
-        
+
         try {
             SolrClient solr = new HttpSolrClient.Builder(
                     ConfigFactory.load().getString("hadatac.solr.data") 
@@ -628,7 +628,7 @@ public class Measurement extends HADatAcThing implements Runnable {
         Pivot pivotS = getFacetStats(fTreeS, 
                 retFacetHandler.getFacetByName(FacetHandler.STUDY_FACET), 
                 facetHandler);
-        
+
         FacetTree fTreeOC = new FacetTree();
         fTreeOC.setTargetFacet(ObjectCollection.class);
         //fTreeOC.setTargetFacet(StudyObject.class);
@@ -912,7 +912,7 @@ public class Measurement extends HADatAcThing implements Runnable {
     }
 
     public static void outputAsCSV(List<Measurement> measurements, 
-            List<String> fieldNames, File file, DataFile dataFile) {		
+            List<String> fieldNames, File file) {		
         try {
             // Create headers
             FileUtils.writeStringToFile(file, String.join(",", fieldNames) + "\n", "utf-8", true);
@@ -920,21 +920,42 @@ public class Measurement extends HADatAcThing implements Runnable {
             // Create rows
             int i = 1;
             int total = measurements.size();
+            DataFile dataFile = null;
             for (Measurement m : measurements) {
-                FileUtils.writeStringToFile(file, m.toCSVRow(fieldNames) + "\n", "utf-8", true);
+                if (file.exists()) {
+                    FileUtils.writeStringToFile(file, m.toCSVRow(fieldNames) + "\n", "utf-8", true);
+                }
                 int prev_ratio = 0;
                 double ratio = (double)i / total * 100;
                 if (((int)ratio) != prev_ratio) {
                     prev_ratio = (int)ratio;
-                    dataFile.setCompletionPercentage((int)ratio);
-                    dataFile.save();
+
+                    dataFile = DataFile.findByName(file.getName());
+                    if (dataFile != null) {
+                        if (dataFile.getStatus() == DataFile.DELETED) {
+                            dataFile.delete();
+                            return;
+                        }
+                        dataFile.setCompletionPercentage((int)ratio);
+                        dataFile.save();
+                    } else {
+                        return;
+                    }
                 }
                 i++;
             }
-            dataFile.setCompletionPercentage(100);
-            dataFile.setCompletionTime(new SimpleDateFormat("yyyy/MM/dd HH:mm:ss").format(new Date()));
-            dataFile.setStatus(DataFile.CREATED);
-            dataFile.save();
+
+            dataFile = DataFile.findByName(file.getName());
+            if (dataFile != null) {
+                if (dataFile.getStatus() == DataFile.DELETED) {
+                    dataFile.delete();
+                    return;
+                }
+                dataFile.setCompletionPercentage(100);
+                dataFile.setCompletionTime(new SimpleDateFormat("yyyy/MM/dd HH:mm:ss").format(new Date()));
+                dataFile.setStatus(DataFile.CREATED);
+                dataFile.save();
+            }
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -951,7 +972,7 @@ public class Measurement extends HADatAcThing implements Runnable {
                 }
             });
             System.out.println("objects size: " + objects.size());
-            
+
             List<Attribute> attributes = alignment.getAttributes();
             attributes.sort(new Comparator<Attribute>() {
                 @Override
@@ -960,7 +981,7 @@ public class Measurement extends HADatAcThing implements Runnable {
                 }
             });
             System.out.println("attributes size: " + attributes.size());
-            
+
             // Write headers
             int count = 0;
             FileUtils.writeStringToFile(file, "\"" + count++ + "-object\"", "utf-8", true);
@@ -968,9 +989,9 @@ public class Measurement extends HADatAcThing implements Runnable {
             for (Attribute attrib : attributes) {
                 FileUtils.writeStringToFile(file, ",\"" + count++ + "-" + attrib.getLabel() + "\"", "utf-8", true);
             }
-            
+
             FileUtils.writeStringToFile(file, "\n", "utf-8", true);
-            
+
             // Prepare rows
             Map<String, Map<String, String>> results = new HashMap<String, Map<String, String>>();
 
@@ -1010,7 +1031,7 @@ public class Measurement extends HADatAcThing implements Runnable {
                     FileUtils.writeStringToFile(file, "\n", "utf-8", true);
                 }
             }
-            
+
             System.out.println("Finished writing!");
 
             dataFile.setCompletionPercentage(100);

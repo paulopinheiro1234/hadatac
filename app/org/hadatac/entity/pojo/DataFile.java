@@ -35,6 +35,7 @@ public class DataFile {
 	// Process status for downloader
 	public static final String CREATING = "CREATING";
 	public static final String CREATED 	= "CREATED";
+    public static final String DELETED  = "DELETED";
 	
 	@Field("file_name")
 	private String fileName;
