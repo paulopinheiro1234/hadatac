@@ -1,5 +1,10 @@
 version: '3'
 
+# Use this file to override default, primary configuration in the docker-compose.yml file
+# And to load pre-ingested data into it from zip files.
+# Example use:
+# docker-compose -f docker-compose.yml -f docker-compose.data.yml [command]
+
 services:
     solr:
         build:
@@ -12,9 +17,6 @@ services:
         restart: "no"
         environment:
             - VERBOSE=yes
-        # Map the solr admin port to the localhost in dev mode
-        ports:
-            - "8983:8983"
 
     blazegraph:
         build:
@@ -25,9 +27,6 @@ services:
                 - SEED=blazegraph.zip
         # Override production restart value to default
         restart: "no"
-        # Map the 9999 blazegraph port to localhost in dev mode
-        ports:
-            - "9999:9999"
 
     hadatac:
         # Override production restart value to default
