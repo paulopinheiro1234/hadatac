@@ -7,6 +7,7 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -32,6 +33,8 @@ public class AnnotationWorker {
                 ConfigProp.getPathUnproc(), 
                 ConfigProp.getDefaultOwnerEmail());
     }
+    
+    public static List<String> m_list = new ArrayList<String>();
 
     public static void autoAnnotate() {
         if(ConfigProp.getPropertyValue("autoccsv.config", "auto").equals("off")){
@@ -248,7 +251,7 @@ public class AnnotationWorker {
         RecordFile MOMsheet = new SpreadsheetRecordFile(file.getFile(), "SOC-MOTHERS");
         RecordFile SSAPsheet = new SpreadsheetRecordFile(file.getFile(), "SOC-SSAMPLES");
         RecordFile MSAPsheet = new SpreadsheetRecordFile(file.getFile(), "SOC-MSAMPLES");
-        // RecordFile TIMEsheet = new SpreadsheetRecordFile(file.getFile(), "SOC-VISITS");
+        RecordFile TIMEsheet = new SpreadsheetRecordFile(file.getFile(), "SOC-VISITS");
 
         GeneratorChain chain = new GeneratorChain();
         chain.addGenerator(new SSDGenerator(SSDsheet));

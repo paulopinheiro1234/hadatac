@@ -52,7 +52,7 @@ public class StudyObject extends HADatAcThing {
 
     String originalId;
     String isMemberOf;
-    String roleUri;
+    String roleUri = "";
     List<String> scopeUris = new ArrayList<String>();
 
     public StudyObject() {
@@ -476,10 +476,12 @@ public class StudyObject extends HADatAcThing {
         } else {
             insert += obj_uri + " a " + typeUri + " . ";
         }
-        if (roleUri.startsWith("http")) {
-            insert += obj_uri + " hasco:hasRole <" + roleUri + "> . ";
-        } else {
-            insert += obj_uri + " hasco:hasRole " + roleUri + " . ";
+        if(!roleUri.isEmpty()){
+	        if (roleUri.startsWith("http")) {
+	            insert += obj_uri + " hasco:hasRole <" + roleUri + "> . ";
+	        } else {
+	            insert += obj_uri + " hasco:hasRole " + roleUri + " . ";
+	        }	
         }
         if (!originalId.equals("")) {
             insert += obj_uri + " hasco:originalID \""  + originalId + "\" .  ";
