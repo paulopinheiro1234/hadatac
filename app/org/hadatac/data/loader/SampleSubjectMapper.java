@@ -2,7 +2,6 @@ package org.hadatac.data.loader;
 
 import java.lang.String;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -19,9 +18,7 @@ import org.apache.jena.rdf.model.Literal;
 import org.apache.jena.sparql.engine.http.QueryExceptionHTTP;
 import org.hadatac.utils.CollectionUtil;
 import org.hadatac.utils.ConfigProp;
-import org.hadatac.utils.Feedback;
 import org.hadatac.utils.NameSpaces;
-import org.hadatac.console.controllers.annotator.AnnotationLog;
 import org.hadatac.entity.pojo.HADatAcThing;
 import org.hadatac.entity.pojo.ObjectCollection;
 import org.hadatac.entity.pojo.StudyObject;
@@ -31,13 +28,20 @@ public class SampleSubjectMapper extends BasicGenerator {
 
     final String kbPrefix = ConfigProp.getKbPrefix();
     private int counter = 1;
-    private Map<String, String> mapIdUriCache = null;
+    private Map<String, String> mapIdUriCache = new HashMap<String, String>();
     String study_id;
     String file_name;
-
+    
     public SampleSubjectMapper(RecordFile file) {
         super(file);
         mapIdUriCache = getMapIdUri();
+        file_name = file.getFile().getName();
+        study_id = file.getFile().getName().replaceAll("MAP-", "").replaceAll("SSD-", "").replaceAll(".xlsx", "").replaceAll(".csv", "");
+    }
+
+    public SampleSubjectMapper(RecordFile file, MotherGenerator motherGenerator) {
+        super(file);
+        mapIdUriCache = getMapIdUri(motherGenerator);
         file_name = file.getFile().getName();
         study_id = file.getFile().getName().replaceAll("MAP-", "").replaceAll("SSD-", "").replaceAll(".xlsx", "").replaceAll(".csv", "");
     }
@@ -60,6 +64,16 @@ public class SampleSubjectMapper extends BasicGenerator {
             e.printStackTrace();
             System.out.println("This sheet or MAP file contains no timeScopeID column");
         }
+    }
+    
+    private Map<String, String> getMapIdUri(MotherGenerator generator) {
+        Map<String, String> mapIdUri = new HashMap<String, String>();
+        for (HADatAcThing obj : generator.getObjects()) {
+            StudyObject studyObj = (StudyObject)obj;
+            mapIdUri.put(studyObj.getOriginalId(), studyObj.getUri());
+        }
+        
+        return mapIdUri;
     }
 
     private Map<String, String> getMapIdUri() {
@@ -185,7 +199,7 @@ public class SampleSubjectMapper extends BasicGenerator {
 
     private String getCollectionUri(Record rec) {
         String pid = getOriginalPID(rec);
-        if (AnnotationWorker.m_list.contains(pid)){
+        if (mapIdUriCache.containsKey(pid)) {
         	return kbPrefix + "SOC-" + getStudyUri(rec) + "-MSAMPLES";
         } else {
         	return kbPrefix + "SOC-" + getStudyUri(rec) + "-SSAMPLES";

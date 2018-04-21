@@ -7,12 +7,10 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.hadatac.utils.ConfigProp;
-import org.hadatac.entity.pojo.StudyObject;
-import org.hadatac.entity.pojo.HADatAcThing;
 import org.hadatac.entity.pojo.ObjectCollection;
 
 
-public class SSDGenerator extends BasicGenerator{
+public class SSDGenerator extends BasicGenerator {
     static final long MAX_OBJECTS = 1000;
     static final long LENGTH_CODE = 6;
 
@@ -82,12 +80,13 @@ public class SSDGenerator extends BasicGenerator{
 
     @Override
     public void preprocess() throws Exception {
+        System.out.println("records: " + records);
     	System.out.println(getUri(records.get(0)));
     	String studyUri = getUri(records.get(0));
         if (!records.isEmpty()) {
-        	Iterator<Record> iter1 = records.iterator();
-        	while(iter1.hasNext()){
-        		Record rec = iter1.next();
+        	Iterator<Record> iter = records.iterator();
+        	while(iter.hasNext()){
+        		Record rec = iter.next();
         		if(getUri(rec) != studyUri){
             		createObjectCollection(rec);
         		}
