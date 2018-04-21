@@ -31,6 +31,7 @@ public class SampleSubjectMapper extends BasicGenerator {
     private Map<String, String> mapIdUriCache = new HashMap<String, String>();
     String study_id;
     String file_name;
+    MotherGenerator motherGenerator = null;
     
     public SampleSubjectMapper(RecordFile file) {
         super(file);
@@ -41,9 +42,9 @@ public class SampleSubjectMapper extends BasicGenerator {
 
     public SampleSubjectMapper(RecordFile file, MotherGenerator motherGenerator) {
         super(file);
-        mapIdUriCache = getMapIdUri(motherGenerator);
         file_name = file.getFile().getName();
         study_id = file.getFile().getName().replaceAll("MAP-", "").replaceAll("SSD-", "").replaceAll(".xlsx", "").replaceAll(".csv", "");
+        this.motherGenerator = motherGenerator;
     }
 
     @Override
@@ -247,6 +248,10 @@ public class SampleSubjectMapper extends BasicGenerator {
 
     @Override
     public void preprocess() throws Exception {
+        if (motherGenerator != null) {
+            mapIdUriCache = getMapIdUri(motherGenerator);
+        }
+        
         if (!records.isEmpty()) {
             objects.add(createObjectCollection(records.get(0)));
         }
