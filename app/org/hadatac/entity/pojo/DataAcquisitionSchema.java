@@ -461,7 +461,7 @@ public class DataAcquisitionSchema extends HADatAcThing {
 				+ " OPTIONAL { ?possibleValue hasco:hasCodeLabel ?codeLabel } . \n"
 				+ " }";
 		
-		//System.out.println("findPossibleValues query: " + queryString);
+		// System.out.println("findPossibleValues query: " + queryString);
 		
 		Query query = QueryFactory.create(queryString);
 		QueryExecution qexec = QueryExecutionFactory.sparqlService(
