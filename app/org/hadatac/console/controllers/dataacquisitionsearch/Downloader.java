@@ -135,7 +135,7 @@ public class Downloader extends Controller {
 		}
 	}
 	
-	@Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
+        @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
 	public Result checkAnnotationLog(String file_name) {
 		AnnotationLog log = AnnotationLog.find(file_name);
 		if (null == log) {
@@ -144,17 +144,19 @@ public class Downloader extends Controller {
 		else {
 			return ok(annotation_log.render(Feedback.print(Feedback.WEB, log.getLog()), routes.Downloader.index().url()));
 		}
-	}
+        }
 	
 	@Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
 	public Result checkCompletion(String file_name) {	    
-		DataFile dataFile = DataFile.findByName(file_name);
+	        DataFile dataFile = DataFile.findByName(file_name);
 		
 		Map<String, Object> result = new HashMap<String, Object>();
-		result.put("CompletionPercentage", dataFile.getCompletionPercentage());
-		result.put("Status", dataFile.getStatus());
-		result.put("CompletionTime", dataFile.getCompletionTime());
-		
+		if (dataFile != null) {
+		    result.put("CompletionPercentage", dataFile.getCompletionPercentage());
+		    result.put("Status", dataFile.getStatus());
+		    result.put("CompletionTime", dataFile.getCompletionTime());
+		}
+
 		return ok(Json.toJson(result));
 	}
 	
@@ -174,31 +176,32 @@ public class Downloader extends Controller {
 		dataFile.setSubmissionTime(new SimpleDateFormat("yyyy/MM/dd HH:mm:ss").format(date));
 		dataFile.save();
     	
-    	Measurement.outputAsCSV(measurements, selectedFields, file, dataFile);
-    	System.out.println("Generated CSV files ...");
+		Measurement.outputAsCSV(measurements, selectedFields, file, dataFile);
+		System.out.println("Generated CSV files ...");
 		
 		return 0;
     }
 	
-	public static int generateCSVFileByAlignment(List<Measurement> measurements, 
-	        Alignment alignment, String facets, String ownerEmail) {
+	public static int generateCSVFileByAlignment(List<Measurement> measurements, String facets, String ownerEmail) {
 	    Date date = new Date();
-        String fileName = "alignment_" + new SimpleDateFormat("yyyy_MM_dd_HH_mm_ss").format(date) + ".csv";
-        File file = new File(ConfigProp.getPathDownload() + "/" + fileName);
+	    String fileName = "alignment_" + new SimpleDateFormat("yyyy_MM_dd_HH_mm_ss").format(date) + ".csv";
+	    System.out.println("Creating download " + fileName);
+	    File file = new File(ConfigProp.getPathDownload() + "/" + fileName);
         
-        AnnotationLog log = new AnnotationLog(fileName);
-        log.addline(Feedback.println(Feedback.WEB, "Facets: " + facets));
-        
-        DataFile dataFile = new DataFile(fileName);
-        dataFile.setOwnerEmail(ownerEmail);
-        dataFile.setStatus(DataFile.CREATING);
-        dataFile.setSubmissionTime(new SimpleDateFormat("yyyy/MM/dd HH:mm:ss").format(date));
-        dataFile.save();
-        
-        Measurement.outputAsCSVByAlignment(measurements, alignment, file, dataFile);
-        System.out.println("Generated CSV files ...");
-		
-		return 0;
+	    AnnotationLog log = new AnnotationLog(fileName);
+	    log.addline(Feedback.println(Feedback.WEB, "Facets: " + facets));
+	    
+	    DataFile dataFile = new DataFile(fileName);
+	    dataFile.setOwnerEmail(ownerEmail);
+	    dataFile.setStatus(DataFile.CREATING);
+	    dataFile.setSubmissionTime(new SimpleDateFormat("yyyy/MM/dd HH:mm:ss").format(date));
+	    dataFile.save();
+	    System.out.println("Created download " + fileName);
+	    
+	    Measurement.outputAsCSVByAlignment(measurements, file, dataFile);
+	    System.out.println("Generated CSV files ...");
+	    
+	    return 0;
     }
 }
 

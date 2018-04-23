@@ -190,22 +190,18 @@ public class DataAcquisitionSearch extends Controller {
     	}
     	
     	AcquisitionQueryResult results = Measurement.find(ownerUri, -1, -1, facets);
-    	
-    	Alignment alignment = new Alignment();
-    	Pivot pivot = results.extra_facets.get(FacetHandler.SUBJECT_CHARACTERISTIC_FACET);
-    	alignment.fromPivot(pivot);
-    	
+
     	final String finalFacets = facets;
     	final String finalOwnerUri = ownerUri;
     	CompletableFuture.supplyAsync(() -> Downloader.generateCSVFileByAlignment(
-    	        results.getDocuments(), alignment, finalFacets, email), 
-    			ec.current());
-		
+				      results.getDocuments(), finalFacets, email), 
+				      ec.current());
+	
     	try {
-			Thread.sleep(2000);
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		}
+	    Thread.sleep(2000);
+	} catch (InterruptedException e) {
+	    e.printStackTrace();
+	}
     	
     	return redirect(routes.Downloader.index());
     }

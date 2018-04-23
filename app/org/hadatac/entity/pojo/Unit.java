@@ -71,11 +71,16 @@ public class Unit extends HADatAcClass implements Comparable<Unit> {
 		RDFNode object;
 
 		String queryString = "DESCRIBE <" + uri + ">";
-		Query query = QueryFactory.create(queryString);
-		QueryExecution qexec = QueryExecutionFactory.sparqlService(
-				ConfigFactory.load().getString("hadatac.solr.triplestore") 
-				+ CollectionUtil.METADATA_SPARQL, query);
-		model = qexec.execDescribe();
+		try {
+		    Query query = QueryFactory.create(queryString);
+		    QueryExecution qexec = QueryExecutionFactory.sparqlService(
+					   ConfigFactory.load().getString("hadatac.solr.triplestore") 
+					   + CollectionUtil.METADATA_SPARQL, query);
+		    model = qexec.execDescribe();
+		} catch (Exception e) {
+		    System.out.println("[ERROR] Unit.find(uri) failed to execute descrive query");
+		    return null;
+		}
 		StmtIterator stmtIterator = model.listStatements();
 		if (model.size() > 0) {
 			unit = new Unit();

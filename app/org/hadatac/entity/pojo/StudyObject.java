@@ -146,7 +146,7 @@ public class StudyObject extends HADatAcThing {
         this.scopeUris.add(scopeUri);
     }
 
-    private static List<String> retrieveScopeUris(String obj_uri) {
+    public static List<String> retrieveScopeUris(String obj_uri) {
         List<String> retrievedUris = new ArrayList<String>();
         String queryString = NameSpaces.getInstance().printSparqlNameSpaceList() + 
                 "SELECT  ?scopeUri WHERE { " + 
