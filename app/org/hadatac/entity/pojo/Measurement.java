@@ -971,8 +971,11 @@ public class Measurement extends HADatAcThing implements Runnable {
         }
     }
 
-    public static void outputAsCSVByAlignment(List<Measurement> measurements, File file, DataFile dataFile) {        
+    public static void outputAsCSVByAlignment(List<Measurement> measurements, File file) {        
         try {
+            // Write empty string to create the file
+            FileUtils.writeStringToFile(file, "", "utf-8", true);
+            
             // Initiate Alignment and Results
             Alignment alignment = new Alignment();
             Map<String, Map<String, String>> results = new HashMap<String, Map<String, String>>();
@@ -982,6 +985,7 @@ public class Measurement extends HADatAcThing implements Runnable {
             int i = 1;
             int prev_ratio = 0;
             int total = measurements.size();
+            DataFile dataFile = null;
             for (Measurement m : measurements) {
                 StudyObject obj = null;
                 String replacementUri = null;
@@ -1044,8 +1048,18 @@ public class Measurement extends HADatAcThing implements Runnable {
                 if (current_ratio > prev_ratio) {
                     prev_ratio = current_ratio;
                     System.out.println("Progress: " + current_ratio + "%");
-                    dataFile.setCompletionPercentage(current_ratio);
-                    dataFile.save();
+                    
+                    dataFile = DataFile.findByName(file.getName());
+                    if (dataFile != null) {
+                        if (dataFile.getStatus() == DataFile.DELETED) {
+                            dataFile.delete();
+                            return;
+                        }
+                        dataFile.setCompletionPercentage(current_ratio);
+                        dataFile.save();
+                    } else {
+                        return;
+                    }
                 }
                 i++;
             }
@@ -1098,11 +1112,18 @@ public class Measurement extends HADatAcThing implements Runnable {
             }
 
             System.out.println("Finished writing!");
-
-            dataFile.setCompletionPercentage(100);
-            dataFile.setCompletionTime(new SimpleDateFormat("yyyy/MM/dd HH:mm:ss").format(new Date()));
-            dataFile.setStatus(DataFile.CREATED);
-            dataFile.save();
+            
+            dataFile = DataFile.findByName(file.getName());
+            if (dataFile != null) {
+                if (dataFile.getStatus() == DataFile.DELETED) {
+                    dataFile.delete();
+                    return;
+                }
+                dataFile.setCompletionPercentage(100);
+                dataFile.setCompletionTime(new SimpleDateFormat("yyyy/MM/dd HH:mm:ss").format(new Date()));
+                dataFile.setStatus(DataFile.CREATED);
+                dataFile.save();
+            }
         } catch (IOException e) {
             e.printStackTrace();
         }
