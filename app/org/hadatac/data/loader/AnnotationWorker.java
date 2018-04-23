@@ -7,6 +7,7 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -257,7 +258,7 @@ public class AnnotationWorker {
         chain.addGenerator(motherGenerator);
         chain.addGenerator(new SampleSubjectMapper(SSAPsheet, motherGenerator));
         chain.addGenerator(new SampleSubjectMapper(MSAPsheet, motherGenerator));
-        // chain.addGenerator(new MotherSampleGenerator());
+        chain.addGenerator(new TimeInstantGenerator(TIMEsheet));
 
         return chain;
     }

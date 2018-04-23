@@ -224,7 +224,7 @@ public class SampleSubjectMapper extends BasicGenerator {
             scopeUris.add(kbPrefix + "SBJ-" + pid + "-" + study_id);
         }
         if (!getTimeScopeUri(record).isEmpty()){
-            scopeUris.add("http://hadatac.org/kb/chear#"+getTimeScopeUri(record));
+        	scopeUris.add(kbPrefix + "TIME-" + getTimeScopeUri(record) + "-" + study_id);
         }
 
         System.out.println("scopeUris :" + scopeUris);
