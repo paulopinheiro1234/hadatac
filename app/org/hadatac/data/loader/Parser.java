@@ -22,6 +22,7 @@ import org.hadatac.entity.pojo.DataAcquisitionSchemaEvent;
 import org.hadatac.entity.pojo.DataAcquisitionSchemaObject;
 import org.hadatac.entity.pojo.DASVirtualObject;
 import org.hadatac.entity.pojo.DataFile;
+import org.hadatac.entity.pojo.EntityRole;
 import org.hadatac.entity.pojo.Measurement;
 import org.hadatac.metadata.loader.URIUtils;
 import org.hadatac.utils.CollectionUtil;
@@ -125,7 +126,8 @@ public class Parser {
             System.out.println("posInRelation: " + posInRelation);
         }
 
-        // Store possible values before hand to avoid frequent SPARQL queries
+        // Store necessary information before hand to avoid frequent SPARQL queries
+        Map<String, String> objRoleMappings = EntityRole.findObjRoleMappings(da.getStudyUri());
         Map<String, Map<String, String>> possibleValues = DataAcquisitionSchema.findPossibleValues(da.getSchemaUri());
         Map<String, List<String>> mapIDStudyObjects = DataAcquisitionSchema.findIdUriMappings(da.getStudyUri());
         String dasoUnitUri = DataAcquisitionSchema.findByLabel(da.getSchemaUri(), schema.getUnitLabel());
@@ -316,6 +318,17 @@ public class Parser {
                         measurement.setObjectCollectionType(URIUtils.replacePrefixEx("hasco:SubjectGroup"));
                         measurement.setPID(id);
                     }
+                }
+                
+                /*=============================*
+                 *                             *
+                 *   SET ROLE URI              *
+                 *                             *
+                 *=============================*/
+                if (objRoleMappings.containsKey(measurement.getStudyObjectUri())) {
+                    measurement.setRoleUri(objRoleMappings.get(measurement.getStudyObjectUri()));
+                } else {
+                    measurement.setRoleUri("");
                 }
 
                 /*=============================*

@@ -70,7 +70,9 @@ public class Measurement extends HADatAcThing implements Runnable {
     @Field("pid_str")
     private String pid;
     @Field("sid_str")
-    private String sid;	
+    private String sid;
+    @Field("role_uri_str")
+    private String roleUri;
     @Field("unit_uri_str")
     private String unitUri;
     @Field("daso_uri_str")
@@ -154,6 +156,14 @@ public class Measurement extends HADatAcThing implements Runnable {
 
     public void setSID(String objectUri) {
         this.sid = objectUri;
+    }
+    
+    public String getRoleUri() {
+        return roleUri;
+    }
+
+    public void setRoleUri(String roleUri) {
+        this.roleUri = roleUri;
     }
 
     public String getObjectPID() {
@@ -849,11 +859,15 @@ public class Measurement extends HADatAcThing implements Runnable {
         m.setDasoUri(SolrUtils.getFieldValue(doc, "daso_uri_str"));
         m.setDasaUri(SolrUtils.getFieldValue(doc, "dasa_uri_str"));
         m.setObjectUri(SolrUtils.getFieldValue(doc, "object_uri_str"));
+        m.setRoleUri(SolrUtils.getFieldValue(doc, "role_uri_str"));
         m.setInRelationToUri(SolrUtils.getFieldValue(doc, "in_relation_to_uri_str"));
         m.setPID(SolrUtils.getFieldValue(doc, "pid_str"));
         m.setSID(SolrUtils.getFieldValue(doc, "sid_str"));
         m.setAbstractTime(SolrUtils.getFieldValue(doc, "named_time_str"));
         m.setOriginalValue(SolrUtils.getFieldValue(doc, "original_value_str"));
+        m.setEntityUri(SolrUtils.getFieldValue(doc, "entity_uri_str"));
+        m.setCharacteristicUri(SolrUtils.getFieldValue(doc, "characteristic_uri_str"));
+        m.setUnitUri(SolrUtils.getFieldValue(doc, "unit_uri_str"));
 
         String value = SolrUtils.getFieldValue(doc, "value_str");
         if (cachedURILabels.containsKey(value)) {
@@ -861,10 +875,6 @@ public class Measurement extends HADatAcThing implements Runnable {
         } else {
             m.setValue(value);
         }
-
-        m.setEntityUri(SolrUtils.getFieldValue(doc, "entity_uri_str"));
-        m.setCharacteristicUri(SolrUtils.getFieldValue(doc, "characteristic_uri_str"));
-        m.setUnitUri(SolrUtils.getFieldValue(doc, "unit_uri_str"));
 
         ObjectAccessSpec da = null;
         if (cachedDA == null) {
