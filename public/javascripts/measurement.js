@@ -9,34 +9,6 @@ function getURLParameter(name) {
 	return decodeURIComponent((new RegExp('[?|&]' + name + '=' + '([^&;]+?)(&|#|;|$)').exec(location.search)||[,""])[1].replace(/\+/g, '%20'))||null
 }
 
-function facetPrettyName(type, value) {
-    switch(type) {
-        case 'study_uri':
-            if (value.indexOf(":") > 0) {
-	       value = value.substring(value.indexOf(":") + 1);
-	    }
-            break;
-        case 'acquisition_uri':
-            if (value.indexOf("#") > 0) {
-               value = value.substring(value.indexOf("#") + 1);
-            }
-            break;
-        case 'study_uri,acquisition_uri':
-            if (value.indexOf("#") > 0) {
-               value = value.substring(value.indexOf("#") + 1);
-            } else {
-               if (value.indexOf(":") > 0) {
-	          value = value.substring(value.indexOf(":") + 1);
-	       }
-	    }
-            break;
-        case 'entity':
-        	value += "'s attribute";
-            break;
-    }
-    return value;
-}
-
 var tree_id = 0;
 function create_item(data, selected_elems) {
 	if (null == data) {
@@ -48,7 +20,7 @@ function create_item(data, selected_elems) {
 		var element = {};
 		element.id = tree_id;
 		tree_id++;
-		element.text = facetPrettyName(data.field, children[i_child].value) + ' (' + children[i_child].count + ')';
+		element.text = children[i_child].value + ' (' + children[i_child].count + ')';
 		element.tooltip = children[i_child].tooltip;
 		element.label = children[i_child].value;
 		element.count = children[i_child].count;
@@ -137,6 +109,13 @@ function createFacet(facets, i) {
 	return null;
 }
 
+function getNodeText(node) {
+	if (node.field == "indicator_uri_str") {
+		return '<a href="/hadatac/metadata/metadataentry?tabName=' + node.value.replace(/\s/g, "") + '">' + node.value + ' (' + node.count + ')' + '</a>';
+	}
+	return node.value + ' (' + node.count + ')';
+}
+
 function create_merged_item(data, selected_elems, curLevel, 
 		levelToBegin, pivot, text, tooltips, facets, retChildren) {
 	if (null == data) {
@@ -156,7 +135,7 @@ function create_merged_item(data, selected_elems, curLevel,
 		for (var i_child in children) {	
 			var element = {};
 			element.id = tree_id++;
-			element.text = children[i_child].value + ' (' + children[i_child].count + ')';
+			element.text = getNodeText(children[i_child]);
 			element.tooltip = '<' + children[i_child].tooltip + '>';
 			element.label = children[i_child].value;
 			element.count = children[i_child].count;
