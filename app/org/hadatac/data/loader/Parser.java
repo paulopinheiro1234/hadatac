@@ -308,7 +308,7 @@ public class Parser {
                         }
                         measurement.setObjectCollectionType(URIUtils.replacePrefixEx("hasco:SampleCollection"));
                         measurement.setSID(id);
-                    } else {
+                    } else if (dasa.getEntity().equals(URIUtils.replacePrefixEx("sio:Human"))) {
                         if (mapIDStudyObjects.containsKey(id)) {
                             measurement.setStudyObjectUri(mapIDStudyObjects.get(id).get(0));
                             measurement.setObjectUri(mapIDStudyObjects.get(id).get(0));
