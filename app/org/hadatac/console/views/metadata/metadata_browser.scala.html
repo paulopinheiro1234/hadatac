@@ -12,13 +12,21 @@
 
 @main("Hierarchies") {
 
-	@for(indicatorKey <- indicatorMap.keySet()){
+  <!--	@for(indicatorKey <- indicatorMap.keySet()){
 		@for(indicators <- indicatorMap.get(indicatorKey)) {
 			@if(category == indicators.replace(" ","").replace(",","")){
 				@indicator_navigation(category,indicatorMap,indicatorKey)
 			}
 		}
-	}
+	} -->
+
+  	@for(indicatorKey <- indicatorMap.keySet()){
+		@for(indicators <- indicatorMap.get(indicatorKey)) {
+			@if(category == indicators.replace(" ","").replace(",","")){
+				@indicator_concept(category,indicatorMap,indicatorKey)
+			}
+		}
+	} 
 
     <div class="container-fluid container-spaced">
       <div class="row">
