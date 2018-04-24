@@ -1,20 +1,20 @@
 package org.hadatac.data.loader;
 
 import java.lang.String;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Iterator;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.hadatac.utils.ConfigProp;
+import org.hadatac.entity.pojo.HADatAcThing;
 import org.hadatac.entity.pojo.ObjectCollection;
+import org.hadatac.metadata.loader.URIUtils;
 
 
 public class SSDGenerator extends BasicGenerator {
-    static final long MAX_OBJECTS = 1000;
-    static final long LENGTH_CODE = 6;
 
     final String kbPrefix = ConfigProp.getKbPrefix();
+    String studyUri = "";
     
     public SSDGenerator(RecordFile file) {
         super(file);
@@ -54,44 +54,46 @@ public class SSDGenerator extends BasicGenerator {
     }
 
     private List<String> getSpaceScopeUris(Record rec) {
-    	List<String> ans = new ArrayList<String>(Arrays.asList(rec.getValueByColumnName(mapCol.get("spaceScopeUris")).split(",")));
+    	List<String> ans = Arrays.asList(rec.getValueByColumnName(mapCol.get("spaceScopeUris")).split(","))
+    	        .stream()
+                .map(s -> URIUtils.replacePrefixEx(s))
+                .collect(Collectors.toList());
     	return ans;
     }
     
     private List<String> getTimeScopeUris(Record rec) {
-    	List<String> ans = new ArrayList<String>(Arrays.asList(rec.getValueByColumnName(mapCol.get("timeScopeUris")).split(",")));
+    	List<String> ans = Arrays.asList(rec.getValueByColumnName(mapCol.get("timeScopeUris")).split(","))
+    	        .stream()
+                .map(s -> URIUtils.replacePrefixEx(s))
+                .collect(Collectors.toList());
     	return ans;
     }
 
     public ObjectCollection createObjectCollection(Record record) throws Exception {
-    	ObjectCollection oc = new ObjectCollection( getUri(record),
-    			getTypeUri(record),
+    	ObjectCollection oc = new ObjectCollection(
+    	        URIUtils.replacePrefixEx(getUri(record)),
+    	        URIUtils.replacePrefixEx(getTypeUri(record)),
     			getLabel(record),
     			getLabel(record),
-    			getStudyUri(record),
-    			gethasScopeUri(record),
+    			URIUtils.replacePrefixEx(getStudyUri(record)),
+    			URIUtils.replacePrefixEx(gethasScopeUri(record)),
                 getSpaceScopeUris(record),
-                getTimeScopeUris(record)
-                );
-//    	oc.save();
-    	oc.saveToTripleStore();
+                getTimeScopeUris(record));
         return oc;
     }
 
     @Override
     public void preprocess() throws Exception {
-        System.out.println("records: " + records);
-    	System.out.println(getUri(records.get(0)));
-    	String studyUri = getUri(records.get(0));
-        if (!records.isEmpty()) {
-        	Iterator<Record> iter = records.iterator();
-        	while(iter.hasNext()){
-        		Record rec = iter.next();
-        		if(getUri(rec) != studyUri){
-            		createObjectCollection(rec);
-        		}
-        	}
+        studyUri = getUri(records.get(0));
+    }
+    
+    @Override
+    HADatAcThing createObject(Record rec, int row_number) throws Exception {
+        if (!getUri(rec).equals(studyUri)) {
+            return createObjectCollection(rec);
         }
+        
+        return null;
     }
 
     @Override

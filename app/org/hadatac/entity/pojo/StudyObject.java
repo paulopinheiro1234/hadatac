@@ -477,11 +477,11 @@ public class StudyObject extends HADatAcThing {
             insert += obj_uri + " a " + typeUri + " . ";
         }
         if(!roleUri.isEmpty()){
-	        if (roleUri.startsWith("http")) {
-	            insert += obj_uri + " hasco:hasRole <" + roleUri + "> . ";
-	        } else {
-	            insert += obj_uri + " hasco:hasRole " + roleUri + " . ";
-	        }	
+            if (roleUri.startsWith("http")) {
+                insert += obj_uri + " hasco:hasRole <" + roleUri + "> . ";
+            } else {
+                insert += obj_uri + " hasco:hasRole " + roleUri + " . ";
+            }	
         }
         if (!originalId.equals("")) {
             insert += obj_uri + " hasco:originalID \""  + originalId + "\" .  ";
@@ -512,6 +512,7 @@ public class StudyObject extends HADatAcThing {
         }
 
         insert += LINE_LAST;
+        System.out.println("insert: " + insert);
         UpdateRequest request = UpdateFactory.create(insert);
         UpdateProcessor processor = UpdateExecutionFactory.createRemote(
                 request, CollectionUtil.getCollectionsName(CollectionUtil.METADATA_UPDATE));

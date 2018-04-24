@@ -1,6 +1,5 @@
 package org.hadatac.data.loader;
 
-import java.io.UnsupportedEncodingException;
 import java.lang.String;
 
 import org.hadatac.utils.ConfigProp;
@@ -11,8 +10,6 @@ import org.hadatac.entity.pojo.ObjectCollection;
 
 public class SubjectGenerator extends BasicGenerator {
 
-    static final long MAX_OBJECTS = 1000;
-    static final long LENGTH_CODE = 6;
     String file_name;
     String study_id;
 
