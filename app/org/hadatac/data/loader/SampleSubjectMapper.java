@@ -162,7 +162,12 @@ public class SampleSubjectMapper extends BasicGenerator {
     }
 
     private String getType(Record rec) {
-        return rec.getValueByColumnName(mapCol.get("type"));
+    	if (file_name.startsWith("MAP-")){
+    		return "sio:Sample";
+    	} else if (file_name.startsWith("SSD-")){
+    		return rec.getValueByColumnName(mapCol.get("type"));
+    	}
+    	return "sio:Sample";
     }
 
     private String getLabel(Record rec) {
@@ -200,10 +205,14 @@ public class SampleSubjectMapper extends BasicGenerator {
 
     private String getCollectionUri(Record rec) {
         String pid = getOriginalPID(rec);
-        if (mapIdUriCache.containsKey(pid)) {
-            return kbPrefix + "SOC-" + getStudyUri(rec) + "-MSAMPLES";
+        if (file_name.startsWith("SSD-")){
+	        if (mapIdUriCache.containsKey(pid)) {
+	            return kbPrefix + "SOC-" + getStudyUri(rec) + "-MSAMPLES";
+	        } else {
+	            return kbPrefix + "SOC-" + getStudyUri(rec) + "-SSAMPLES";
+	        }
         } else {
-            return kbPrefix + "SOC-" + getStudyUri(rec) + "-SSAMPLES";
+        	return kbPrefix + "SOC-" + getStudyUri(rec) + "-SSAMPLES";
         }
     }
 
@@ -250,6 +259,8 @@ public class SampleSubjectMapper extends BasicGenerator {
     public void preprocess() throws Exception {
         if (motherGenerator != null) {
             mapIdUriCache = getMapIdUri(motherGenerator);
+        } else {
+        	mapIdUriCache = getMapIdUri();
         }
 
         if (!records.isEmpty()) {
