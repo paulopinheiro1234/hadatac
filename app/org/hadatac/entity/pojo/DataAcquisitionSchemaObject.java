@@ -9,6 +9,7 @@ import org.apache.jena.query.Query;
 import org.apache.jena.query.QueryExecution;
 import org.apache.jena.query.QueryExecutionFactory;
 import org.apache.jena.query.QueryFactory;
+import org.apache.jena.query.QueryParseException;
 import org.apache.jena.query.QuerySolution;
 import org.apache.jena.query.ResultSet;
 import org.apache.jena.query.ResultSetFactory;
@@ -26,405 +27,405 @@ import org.labkey.remoteapi.CommandException;
 
 public class DataAcquisitionSchemaObject extends HADatAcThing {
 
-	public static String INDENT1 = "     ";
-	public static String INSERT_LINE1 = "INSERT DATA {  ";
-	public static String DELETE_LINE1 = "DELETE WHERE {  ";
-	public static String LINE3 = INDENT1 + "a         hasco:DASchemaObject;  ";
-	public static String DELETE_LINE3 = " ?p ?o . ";
-	public static String LINE_LAST = "}  ";
-	public static String PREFIX = "DASO-";
+    public static String INDENT1 = "     ";
+    public static String INSERT_LINE1 = "INSERT DATA {  ";
+    public static String DELETE_LINE1 = "DELETE WHERE {  ";
+    public static String LINE3 = INDENT1 + "a         hasco:DASchemaObject;  ";
+    public static String DELETE_LINE3 = " ?p ?o . ";
+    public static String LINE_LAST = "}  ";
+    public static String PREFIX = "DASO-";
 
-	private String uri;
-	private String label;
-	private String partOfSchema;
-	private String position;
-	private int positionInt;
-	private int tempPositionInt;
-	private String entity;
-	private String entityLabel;
-	private String role;
-	private String inRelationTo;
-	private String inRelationToLabel;
-	private String relation;
-	private String relationLabel;
+    private String uri;
+    private String label;
+    private String partOfSchema;
+    private String position;
+    private int positionInt;
+    private int tempPositionInt;
+    private String entity;
+    private String entityLabel;
+    private String role;
+    private String inRelationTo;
+    private String inRelationToLabel;
+    private String relation;
+    private String relationLabel;
 
-	public DataAcquisitionSchemaObject(String uri, 
-			String label, 
-			String partOfSchema,
-			String position,
-			String entity, 
-			String role, 
-			String inRelationTo, 
-			String relation) {
-		this.uri = uri;
-		this.label = label;
-		this.partOfSchema = partOfSchema;
-		this.position = position;
-		try {
-			if (position != null && !position.equals("")) {
-				positionInt = Integer.parseInt(position);
-			} else {
-				positionInt = -1;
-			}
-		} catch (Exception e) {
-			positionInt = -1;
-		}
-		System.out.println("positionInt: " + positionInt);
-		this.setEntity(entity);
-		this.role = role;
-		this.setInRelationTo(inRelationTo);
-		this.setRelation(relation);
-	}
+    public DataAcquisitionSchemaObject(String uri, 
+            String label, 
+            String partOfSchema,
+            String position,
+            String entity, 
+            String role, 
+            String inRelationTo, 
+            String relation) {
+        this.uri = uri;
+        this.label = label;
+        this.partOfSchema = partOfSchema;
+        this.position = position;
+        try {
+            if (position != null && !position.equals("")) {
+                positionInt = Integer.parseInt(position);
+            } else {
+                positionInt = -1;
+            }
+        } catch (Exception e) {
+            positionInt = -1;
+        }
+        System.out.println("positionInt: " + positionInt);
+        this.setEntity(entity);
+        this.role = role;
+        this.setInRelationTo(inRelationTo);
+        this.setRelation(relation);
+    }
 
-	public String getUri() {
-		return uri;
-	}
+    public String getUri() {
+        return uri;
+    }
 
-	public void setUri(String uri) {
-		this.uri = uri;
-	}
+    public void setUri(String uri) {
+        this.uri = uri;
+    }
 
-	public String getUriNamespace() {
-		return URIUtils.replaceNameSpaceEx(uri);
-	}
+    public String getUriNamespace() {
+        return URIUtils.replaceNameSpaceEx(uri);
+    }
 
-	public String getLabel() {
-		return label;
-	}
+    public String getLabel() {
+        return label;
+    }
 
-	public void setLabel(String label) {
-		this.label = label;
-	}
+    public void setLabel(String label) {
+        this.label = label;
+    }
 
-	public String getPartOfSchema() {
-		return partOfSchema;
-	}
+    public String getPartOfSchema() {
+        return partOfSchema;
+    }
 
-	public void setPartOfSchema(String partOfSchema) {
-		this.partOfSchema = partOfSchema;
-	}
-	
-	public String getPosition() {
-		return position;
-	}
+    public void setPartOfSchema(String partOfSchema) {
+        this.partOfSchema = partOfSchema;
+    }
 
-	public void setPosition(String position) {
-		this.position = position;
-	}
-	
-	public int getPositionInt() {
-		return positionInt;
-	}
+    public String getPosition() {
+        return position;
+    }
 
-	public int getTempPositionInt() {
-		return tempPositionInt;
-	}
+    public void setPosition(String position) {
+        this.position = position;
+    }
 
-	public void setTempPositionInt(int tempPositionInt) {
-		this.tempPositionInt = tempPositionInt;
-	}
+    public int getPositionInt() {
+        return positionInt;
+    }
 
-	public String getEntity() {
-		return entity;
-	}
+    public int getTempPositionInt() {
+        return tempPositionInt;
+    }
 
-	public void setEntity(String entity) {
-		this.entity = entity;
-		if (entity == null || entity.equals("")) {
-			this.entityLabel = "";
-		} else {
-			this.entityLabel = FirstLabel.getLabel(entity);
-		}
-	}
+    public void setTempPositionInt(int tempPositionInt) {
+        this.tempPositionInt = tempPositionInt;
+    }
 
-	public String getEntityNamespace() {
-		return URIUtils.replaceNameSpaceEx(entity);
-	}
+    public String getEntity() {
+        return entity;
+    }
 
-	public String getEntityLabel() {
-		if (entity == null || entityLabel.equals("")) {
-			return URIUtils.replaceNameSpaceEx(entity);
-		}
-		return entityLabel;
-	}
+    public void setEntity(String entity) {
+        this.entity = entity;
+        if (entity == null || entity.equals("")) {
+            this.entityLabel = "";
+        } else {
+            this.entityLabel = FirstLabel.getLabel(entity);
+        }
+    }
 
-	public String getAnnotatedEntity() {
-		String annotation;
-		if (entityLabel.equals("")) {
-			if (entity == null || entity.equals("")) {
-				return "";
-			}
-			annotation = URIUtils.replaceNameSpaceEx(entity);
-		} else {
-			annotation = entityLabel;
-		}
-		if (!getEntityNamespace().equals("")) {
-			annotation += " [" + getEntityNamespace() + "]";
-		} 
-		return annotation;
-	}
+    public String getEntityNamespace() {
+        return URIUtils.replaceNameSpaceEx(entity);
+    }
 
-	public String getRole() {
-		return role;
-	}
+    public String getEntityLabel() {
+        if (entity == null || entityLabel.equals("")) {
+            return URIUtils.replaceNameSpaceEx(entity);
+        }
+        return entityLabel;
+    }
 
-	public void setRole(String role) {
-		this.role = role;
-	}
+    public String getAnnotatedEntity() {
+        String annotation;
+        if (entityLabel.equals("")) {
+            if (entity == null || entity.equals("")) {
+                return "";
+            }
+            annotation = URIUtils.replaceNameSpaceEx(entity);
+        } else {
+            annotation = entityLabel;
+        }
+        if (!getEntityNamespace().equals("")) {
+            annotation += " [" + getEntityNamespace() + "]";
+        } 
+        return annotation;
+    }
 
-	public String getInRelationTo() {
-		return inRelationTo;
-	}
+    public String getRole() {
+        return role;
+    }
 
-	public String getInRelationToNamespace() {
-		return URIUtils.replaceNameSpaceEx(inRelationTo);
-	}
+    public void setRole(String role) {
+        this.role = role;
+    }
 
-	public void setInRelationTo(String inRelationTo) {
-		this.inRelationTo = inRelationTo;
-		if (inRelationTo == null || inRelationTo.equals("")) {
-			this.inRelationToLabel = "";
-		} else {
-			this.inRelationToLabel = FirstLabel.getLabel(inRelationTo);
-		}
-	}
+    public String getInRelationTo() {
+        return inRelationTo;
+    }
 
-	public String getInRelationToLabel() {
-		if (inRelationTo == null || inRelationToLabel.equals("")) {
-			String str = URIUtils.replaceNameSpaceEx(inRelationTo);
-			return str.substring(str.indexOf(":") + 1);
-		}
-		return inRelationToLabel;
-	}
+    public String getInRelationToNamespace() {
+        return URIUtils.replaceNameSpaceEx(inRelationTo);
+    }
 
-	public String getRelation() {
-		return relation;
-	}
+    public void setInRelationTo(String inRelationTo) {
+        this.inRelationTo = inRelationTo;
+        if (inRelationTo == null || inRelationTo.equals("")) {
+            this.inRelationToLabel = "";
+        } else {
+            this.inRelationToLabel = FirstLabel.getLabel(inRelationTo);
+        }
+    }
 
-	public String getRelationNamespace() {
-		return URIUtils.replaceNameSpaceEx(relation);
-	}
+    public String getInRelationToLabel() {
+        if (inRelationTo == null || inRelationToLabel.equals("")) {
+            String str = URIUtils.replaceNameSpaceEx(inRelationTo);
+            return str.substring(str.indexOf(":") + 1);
+        }
+        return inRelationToLabel;
+    }
 
-	public void setRelation(String relation) {
-		this.relation = relation;
-		System.out.println("New RELATION : " + relation);
-		if (relation == null || relation.equals("")) {
-			this.relationLabel = "";
-		} else {
-			this.relationLabel = FirstLabel.getLabel(relation);
-		}
-	}
+    public String getRelation() {
+        return relation;
+    }
 
-	public String getRelationLabel() {
-		if (relationLabel == null || relationLabel.equals("")) {
-			System.out.println("RELATION label -- just relation : <" + relation + ">");
-			System.out.println("RELATION label -- just relation : <" + URIUtils.replaceNameSpaceEx(relation) + ">");
-			return URIUtils.replaceNameSpaceEx(relation);
-		}
-		System.out.println("RELATION label : <" + relationLabel + ">");
-		return relationLabel;
-	}
+    public String getRelationNamespace() {
+        return URIUtils.replaceNameSpaceEx(relation);
+    }
 
-	public static DataAcquisitionSchemaObject find(String uri) {
-		System.out.println("Looking for data acquisition schema objects with uri: " + uri);
-		
-		DataAcquisitionSchemaObject object = null;
-		String queryString = NameSpaces.getInstance().printSparqlNameSpaceList() + 
-				"SELECT ?entity ?partOfSchema ?role ?inRelationTo ?relation WHERE { \n" + 
-				"   <" + uri + "> a hasco:DASchemaObject . \n" + 
-				"   <" + uri + "> hasco:partOfSchema ?partOfSchema . \n" + 
-				"   OPTIONAL { <" + uri + "> hasco:hasEntity ?entity } . \n" + 
-				"   OPTIONAL { <" + uri + "> hasco:hasRole ?role } .  \n" + 
-				"   OPTIONAL { <" + uri + "> sio:inRelationTo ?inRelationTo } . \n" + 
-				"   OPTIONAL { <" + uri + "> sio:relation ?relation } . \n" + 
-				"}";
+    public void setRelation(String relation) {
+        this.relation = relation;
+        System.out.println("New RELATION : " + relation);
+        if (relation == null || relation.equals("")) {
+            this.relationLabel = "";
+        } else {
+            this.relationLabel = FirstLabel.getLabel(relation);
+        }
+    }
 
-		//System.out.println("DataAcquisitionSchemaObject find(String uri) query: " + queryString);
-		
-		Query query = QueryFactory.create(queryString);
-		QueryExecution qexec = QueryExecutionFactory.sparqlService(
-				CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), query);
-		ResultSet results = qexec.execSelect();
-		ResultSetRewindable resultsrw = ResultSetFactory.copyResults(results);
-		qexec.close();
+    public String getRelationLabel() {
+        if (relationLabel == null || relationLabel.equals("")) {
+            System.out.println("RELATION label -- just relation : <" + relation + ">");
+            System.out.println("RELATION label -- just relation : <" + URIUtils.replaceNameSpaceEx(relation) + ">");
+            return URIUtils.replaceNameSpaceEx(relation);
+        }
+        System.out.println("RELATION label : <" + relationLabel + ">");
+        return relationLabel;
+    }
 
-		if (!resultsrw.hasNext()) {
-			System.out.println("[WARNING] DataAcquisitionSchemaObject. Could not find object with uri: " + uri);
-			return null;
-		}
+    public static DataAcquisitionSchemaObject find(String uri) {
+        System.out.println("Looking for data acquisition schema objects with uri: " + uri);
 
-		QuerySolution soln = resultsrw.next();
-		String labelStr = "";
-		String partOfSchemaStr = "";
-		String positionStr = "";
-		String entityStr = "";
-		String roleStr = "";
-		String inRelationToStr = "";
-		String relationStr = "";
+        DataAcquisitionSchemaObject object = null;
+        String queryString = NameSpaces.getInstance().printSparqlNameSpaceList() + 
+                "SELECT ?entity ?partOfSchema ?role ?inRelationTo ?relation WHERE { \n" + 
+                "   <" + uri + "> a hasco:DASchemaObject . \n" + 
+                "   <" + uri + "> hasco:partOfSchema ?partOfSchema . \n" + 
+                "   OPTIONAL { <" + uri + "> hasco:hasEntity ?entity } . \n" + 
+                "   OPTIONAL { <" + uri + "> hasco:hasRole ?role } .  \n" + 
+                "   OPTIONAL { <" + uri + "> sio:inRelationTo ?inRelationTo } . \n" + 
+                "   OPTIONAL { <" + uri + "> sio:relation ?relation } . \n" + 
+                "}";
 
-		try {
-			if (soln != null) {
+        //System.out.println("DataAcquisitionSchemaObject find(String uri) query: " + queryString);
 
-				labelStr = FirstLabel.getLabel(uri);
-				
-				try {
-					if (soln.getResource("entity") != null && soln.getResource("entity").getURI() != null) {
-						entityStr = soln.getResource("entity").getURI();
-					} 
-				} catch (Exception e1) {
-					entityStr = "";
-				}
+        Query query = QueryFactory.create(queryString);
+        QueryExecution qexec = QueryExecutionFactory.sparqlService(
+                CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), query);
+        ResultSet results = qexec.execSelect();
+        ResultSetRewindable resultsrw = ResultSetFactory.copyResults(results);
+        qexec.close();
 
-				try {
-					if (soln.getResource("partOfSchema") != null && soln.getResource("partOfSchema").getURI() != null) {
-						partOfSchemaStr = soln.getResource("partOfSchema").getURI();
-					} 
-				} catch (Exception e1) {
-					partOfSchemaStr = "";
-				}
+        if (!resultsrw.hasNext()) {
+            System.out.println("[WARNING] DataAcquisitionSchemaObject. Could not find object with uri: " + uri);
+            return null;
+        }
 
-				try {
-					if (soln.getLiteral("role") != null && soln.getLiteral("role").getString() != null) {
-						roleStr = soln.getLiteral("role").getString();
-					} 
-				} catch (Exception e1) {
-					roleStr = "";
-				}
+        QuerySolution soln = resultsrw.next();
+        String labelStr = "";
+        String partOfSchemaStr = "";
+        String positionStr = "";
+        String entityStr = "";
+        String roleStr = "";
+        String inRelationToStr = "";
+        String relationStr = "";
 
-				try {
-					if (soln.getResource("inRelationTo") != null && soln.getResource("inRelationTo").getURI() != null) {
-						inRelationToStr = soln.getResource("inRelationTo").getURI();
-					}
-				} catch (Exception e1) {
-					inRelationToStr = "";
-				}
+        try {
+            if (soln != null) {
 
-				try {
-					if (soln.getResource("relation") != null && soln.getResource("relation").getURI() != null) {
-						relationStr = soln.getResource("relation").getURI();
-					}
-				} catch (Exception e1) {
-					relationStr = "";
-				}
+                labelStr = FirstLabel.getLabel(uri);
 
-				object = new DataAcquisitionSchemaObject(uri,
-						labelStr,
-						partOfSchemaStr,
-						positionStr,
-						entityStr,
-						roleStr,
-						inRelationToStr,
-						relationStr);
-			}
-		} catch (Exception e) {
-			System.out.println("[ERROR] DataAcquisitionSchemaObject. uri: e.Message: " + e.getMessage());
-		}
-		return object;
-	}
+                try {
+                    if (soln.getResource("entity") != null && soln.getResource("entity").getURI() != null) {
+                        entityStr = soln.getResource("entity").getURI();
+                    } 
+                } catch (Exception e1) {
+                    entityStr = "";
+                }
 
-	public static List<DataAcquisitionSchemaObject> findBySchema(String schemaUri) {
-		System.out.println("Looking for data acquisition schema objects for <" + schemaUri + ">");
-		
-		List<DataAcquisitionSchemaObject> objects = new ArrayList<DataAcquisitionSchemaObject>();
-		String queryString = NameSpaces.getInstance().printSparqlNameSpaceList() + 
-				"SELECT ?uri ?label ?hasEntity ?hasRole ?inRelationTo ?relation WHERE { \n" + 
-				"   ?uri a hasco:DASchemaObject . \n" + 
-				"   ?uri hasco:partOfSchema <" + schemaUri + "> . \n" + 
-				"}";
-		Query query = QueryFactory.create(queryString);
+                try {
+                    if (soln.getResource("partOfSchema") != null && soln.getResource("partOfSchema").getURI() != null) {
+                        partOfSchemaStr = soln.getResource("partOfSchema").getURI();
+                    } 
+                } catch (Exception e1) {
+                    partOfSchemaStr = "";
+                }
 
-		QueryExecution qexec = QueryExecutionFactory.sparqlService(
-				CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), query);
-		ResultSet results = qexec.execSelect();
-		ResultSetRewindable resultsrw = ResultSetFactory.copyResults(results);
-		qexec.close();
+                try {
+                    if (soln.getLiteral("role") != null && soln.getLiteral("role").getString() != null) {
+                        roleStr = soln.getLiteral("role").getString();
+                    } 
+                } catch (Exception e1) {
+                    roleStr = "";
+                }
 
-		if (!resultsrw.hasNext()) {
-			System.out.println("[WARNING] DataAcquisitionSchemaObject. Could not find objects for schema: " + schemaUri);
-			return objects;
-		}
+                try {
+                    if (soln.getResource("inRelationTo") != null && soln.getResource("inRelationTo").getURI() != null) {
+                        inRelationToStr = soln.getResource("inRelationTo").getURI();
+                    }
+                } catch (Exception e1) {
+                    inRelationToStr = "";
+                }
 
-		while (resultsrw.hasNext()) {
-			QuerySolution soln = resultsrw.next();
-			try {
-				if (soln != null && soln.getResource("uri") != null && soln.getResource("uri").getURI() != null) {
+                try {
+                    if (soln.getResource("relation") != null && soln.getResource("relation").getURI() != null) {
+                        relationStr = soln.getResource("relation").getURI();
+                    }
+                } catch (Exception e1) {
+                    relationStr = "";
+                }
 
-					DataAcquisitionSchemaObject obj = DataAcquisitionSchemaObject.find(soln.getResource("uri").getURI());
-					if (obj != null) {
-						objects.add(obj);
-					}
-				}
-			}  catch (Exception e) {
-				System.out.println("[ERROR] DataAcquisitionSchemaObject. uri: e.Message: " + e.getMessage());
-			}
+                object = new DataAcquisitionSchemaObject(uri,
+                        labelStr,
+                        partOfSchemaStr,
+                        positionStr,
+                        entityStr,
+                        roleStr,
+                        inRelationToStr,
+                        relationStr);
+            }
+        } catch (Exception e) {
+            System.out.println("[ERROR] DataAcquisitionSchemaObject. uri: e.Message: " + e.getMessage());
+        }
+        return object;
+    }
 
-		}
-		
-		return objects;
-	}
+    public static List<DataAcquisitionSchemaObject> findBySchema(String schemaUri) {
+        System.out.println("Looking for data acquisition schema objects for <" + schemaUri + ">");
 
-	public static String findUriFromRole(String newInRelationTo, List<DataAcquisitionSchemaObject> objects) {
-		if (newInRelationTo == null) {
-			return "";
-		}
-		if (newInRelationTo.equals("DefaultObject")) {
-			return URIUtils.replacePrefixEx("hasco:DefaultObject");
-		}
-		for (DataAcquisitionSchemaObject daso : objects) {
-			if (daso.getRole().equals(newInRelationTo)) {
-				return URIUtils.replacePrefixEx(daso.getUri());
-			}
-		} 
-		return "";
-	}
+        List<DataAcquisitionSchemaObject> objects = new ArrayList<DataAcquisitionSchemaObject>();
+        String queryString = NameSpaces.getInstance().printSparqlNameSpaceList() + 
+                "SELECT ?uri ?label ?hasEntity ?hasRole ?inRelationTo ?relation WHERE { \n" + 
+                "   ?uri a hasco:DASchemaObject . \n" + 
+                "   ?uri hasco:partOfSchema <" + schemaUri + "> . \n" + 
+                "}";
+        Query query = QueryFactory.create(queryString);
 
-	@Override
-	public int saveToLabKey(String user_name, String password) {
-		LabkeyDataHandler loader = LabkeyDataHandler.createDefault(user_name, password);
-		List< Map<String, Object> > rows = new ArrayList< Map<String, Object> >();
-		Map<String, Object> row = new HashMap<String, Object>();
-		row.put("hasURI", URIUtils.replaceNameSpaceEx(getUri()));
-		row.put("a", "hasco:DASchemaObject");
-		row.put("rdfs:label", getLabel());
-		row.put("rdfs:comment", getLabel());
-		row.put("hasco:partOfSchema", URIUtils.replaceNameSpaceEx(getPartOfSchema()));
-		row.put("hasco:hasEntity", this.getEntity());
-		row.put("hasco:hasRole", this.getRole());
-		row.put("sio:inRelationTo", this.getInRelationTo());
-		row.put("sio:relation", this.getRelation());
-		row.put("hasco:isVirtual", "");
-		row.put("hasco:isPIConfirmed", "false");
-		rows.add(row);
-		int totalChanged = 0;
-		try {
-			totalChanged = loader.insertRows("DASchemaObject", rows);
-		} catch (CommandException e) {
-			try {
-				totalChanged = loader.updateRows("DASchemaObject", rows);
-			} catch (CommandException e2) {
-				System.out.println("[ERROR] Could not insert or update DASO(s)");
-			}
-		}
+        QueryExecution qexec = QueryExecutionFactory.sparqlService(
+                CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), query);
+        ResultSet results = qexec.execSelect();
+        ResultSetRewindable resultsrw = ResultSetFactory.copyResults(results);
+        qexec.close();
 
-		return totalChanged;
-	}
+        if (!resultsrw.hasNext()) {
+            System.out.println("[WARNING] DataAcquisitionSchemaObject. Could not find objects for schema: " + schemaUri);
+            return objects;
+        }
 
-	@Override
-	public int deleteFromLabKey(String user_name, String password) {
-		LabkeyDataHandler loader = LabkeyDataHandler.createDefault(user_name, password);
-		List< Map<String, Object> > rows = new ArrayList< Map<String, Object> >();
-		Map<String, Object> row = new HashMap<String, Object>();
-		row.put("hasURI", URIUtils.replaceNameSpaceEx(getUri().replace("<","").replace(">","")));
-		rows.add(row);
-		
-		try {
+        while (resultsrw.hasNext()) {
+            QuerySolution soln = resultsrw.next();
+            try {
+                if (soln != null && soln.getResource("uri") != null && soln.getResource("uri").getURI() != null) {
+
+                    DataAcquisitionSchemaObject obj = DataAcquisitionSchemaObject.find(soln.getResource("uri").getURI());
+                    if (obj != null) {
+                        objects.add(obj);
+                    }
+                }
+            }  catch (Exception e) {
+                System.out.println("[ERROR] DataAcquisitionSchemaObject. uri: e.Message: " + e.getMessage());
+            }
+
+        }
+
+        return objects;
+    }
+
+    public static String findUriFromRole(String newInRelationTo, List<DataAcquisitionSchemaObject> objects) {
+        if (newInRelationTo == null) {
+            return "";
+        }
+        if (newInRelationTo.equals("DefaultObject")) {
+            return URIUtils.replacePrefixEx("hasco:DefaultObject");
+        }
+        for (DataAcquisitionSchemaObject daso : objects) {
+            if (daso.getRole().equals(newInRelationTo)) {
+                return URIUtils.replacePrefixEx(daso.getUri());
+            }
+        } 
+        return "";
+    }
+
+    @Override
+    public int saveToLabKey(String user_name, String password) {
+        LabkeyDataHandler loader = LabkeyDataHandler.createDefault(user_name, password);
+        List< Map<String, Object> > rows = new ArrayList< Map<String, Object> >();
+        Map<String, Object> row = new HashMap<String, Object>();
+        row.put("hasURI", URIUtils.replaceNameSpaceEx(getUri()));
+        row.put("a", "hasco:DASchemaObject");
+        row.put("rdfs:label", getLabel());
+        row.put("rdfs:comment", getLabel());
+        row.put("hasco:partOfSchema", URIUtils.replaceNameSpaceEx(getPartOfSchema()));
+        row.put("hasco:hasEntity", this.getEntity());
+        row.put("hasco:hasRole", this.getRole());
+        row.put("sio:inRelationTo", this.getInRelationTo());
+        row.put("sio:relation", this.getRelation());
+        row.put("hasco:isVirtual", "");
+        row.put("hasco:isPIConfirmed", "false");
+        rows.add(row);
+        int totalChanged = 0;
+        try {
+            totalChanged = loader.insertRows("DASchemaObject", rows);
+        } catch (CommandException e) {
+            try {
+                totalChanged = loader.updateRows("DASchemaObject", rows);
+            } catch (CommandException e2) {
+                System.out.println("[ERROR] Could not insert or update DASO(s)");
+            }
+        }
+
+        return totalChanged;
+    }
+
+    @Override
+    public int deleteFromLabKey(String user_name, String password) {
+        LabkeyDataHandler loader = LabkeyDataHandler.createDefault(user_name, password);
+        List< Map<String, Object> > rows = new ArrayList< Map<String, Object> >();
+        Map<String, Object> row = new HashMap<String, Object>();
+        row.put("hasURI", URIUtils.replaceNameSpaceEx(getUri().replace("<","").replace(">","")));
+        rows.add(row);
+
+        try {
             return loader.deleteRows("DASchemaObject", rows);
         } catch (CommandException e) {
             System.out.println("[ERROR] Could not delete DASO(s)");
             e.printStackTrace();
             return 0;
         }
-	}
+    }
 
     @Override
     public boolean saveToTripleStore() {
@@ -436,9 +437,9 @@ public class DataAcquisitionSchemaObject extends HADatAcThing {
             System.out.println("[ERROR] Trying to save DASO without assigning DAS's URI");
             return false;
         }
-        
+
         deleteFromTripleStore();
-        
+
         String insert = "";
         insert += NameSpaces.getInstance().printSparqlNameSpaceList();
         insert += INSERT_LINE1;
@@ -472,12 +473,17 @@ public class DataAcquisitionSchemaObject extends HADatAcThing {
             }
         }
         insert += LINE_LAST;
-        System.out.println("DASO insert query (pojo's save): <" + insert + ">");
-        UpdateRequest request = UpdateFactory.create(insert);
-        UpdateProcessor processor = UpdateExecutionFactory.createRemote(
-                request, CollectionUtil.getCollectionsName(CollectionUtil.METADATA_UPDATE));
-        processor.execute();
-        
+
+        try {
+            UpdateRequest request = UpdateFactory.create(insert);
+            UpdateProcessor processor = UpdateExecutionFactory.createRemote(
+                    request, CollectionUtil.getCollectionsName(CollectionUtil.METADATA_UPDATE));
+            processor.execute();
+        } catch (QueryParseException e) {
+            System.out.println("QueryParseException due to update query: " + insert);
+            throw e;
+        }
+
         return true;
     }
 

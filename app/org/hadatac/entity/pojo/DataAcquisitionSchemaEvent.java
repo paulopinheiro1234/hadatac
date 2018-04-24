@@ -10,6 +10,7 @@ import org.apache.jena.query.Query;
 import org.apache.jena.query.QueryExecution;
 import org.apache.jena.query.QueryExecutionFactory;
 import org.apache.jena.query.QueryFactory;
+import org.apache.jena.query.QueryParseException;
 import org.apache.jena.query.QuerySolution;
 import org.apache.jena.query.ResultSet;
 import org.apache.jena.query.ResultSetFactory;
@@ -32,52 +33,52 @@ import org.hadatac.console.controllers.AuthApplication;
 
 public class DataAcquisitionSchemaEvent extends HADatAcThing {
 
-	public static String INDENT1 = "     ";
-	public static String INSERT_LINE1 = "INSERT DATA {  ";
-	public static String DELETE_LINE1 = "DELETE WHERE {  ";
-	public static String LINE3 = INDENT1 + "a         hasco:DASchemaEvent;  ";
-	public static String DELETE_LINE3 = " ?p ?o . ";
-	public static String LINE_LAST = "}  ";
-	public static String PREFIX = "DASE-";
+    public static String INDENT1 = "     ";
+    public static String INSERT_LINE1 = "INSERT DATA {  ";
+    public static String DELETE_LINE1 = "DELETE WHERE {  ";
+    public static String LINE3 = INDENT1 + "a         hasco:DASchemaEvent;  ";
+    public static String DELETE_LINE3 = " ?p ?o . ";
+    public static String LINE_LAST = "}  ";
+    public static String PREFIX = "DASE-";
 
-	private String uri = "";
-	private List<String> types = new ArrayList<String>();
-	private String label = "";
-	private String partOfSchema = "";
-	private String inRelationToUri = "";
-	private String relationUri = "";
-	private String isVirtual = "";
-	private String isPIConfirmed = "";
-	private String entity = "";
-	private String entityLabel = "";
-	private String unit = "";
-	private String unitLabel = "";
-	
-	public DataAcquisitionSchemaEvent() {
-	}
+    private String uri = "";
+    private List<String> types = new ArrayList<String>();
+    private String label = "";
+    private String partOfSchema = "";
+    private String inRelationToUri = "";
+    private String relationUri = "";
+    private String isVirtual = "";
+    private String isPIConfirmed = "";
+    private String entity = "";
+    private String entityLabel = "";
+    private String unit = "";
+    private String unitLabel = "";
 
-	public DataAcquisitionSchemaEvent(
-	        String uri, 
-			String label, 
-			String partOfSchema, 
-			String entity, 
-			String unit) {
-		this.uri = uri;
-		this.label = label;
-		this.partOfSchema = partOfSchema;
-		this.setEntity(entity);
-		this.setUnit(unit);
-	}
+    public DataAcquisitionSchemaEvent() {
+    }
 
-	public String getUri() {
-		return uri;
-	}
+    public DataAcquisitionSchemaEvent(
+            String uri, 
+            String label, 
+            String partOfSchema, 
+            String entity, 
+            String unit) {
+        this.uri = uri;
+        this.label = label;
+        this.partOfSchema = partOfSchema;
+        this.setEntity(entity);
+        this.setUnit(unit);
+    }
 
-	public void setUri(String uri) {
-		this.uri = uri;
-	}
-	
-	public List<String> getTypes() {
+    public String getUri() {
+        return uri;
+    }
+
+    public void setUri(String uri) {
+        this.uri = uri;
+    }
+
+    public List<String> getTypes() {
         return types;
     }
 
@@ -88,285 +89,285 @@ public class DataAcquisitionSchemaEvent extends HADatAcThing {
     public void addType(String type) {
         this.types.add(type);
     }
-    
+
     public String getInRelationToUri() {
         return inRelationToUri;
     }
-    
+
     public void setInRelationToUri(String inRelationToUri) {
         this.inRelationToUri = inRelationToUri;
     }
-    
+
     public String getRelationUri() {
         return relationUri;
     }
-    
+
     public void setRelationUri(String relationUri) {
         this.relationUri = relationUri;
     }
-    
+
     public String getIsVirtual() {
         return isVirtual;
     }
-    
+
     public void setIsVirtual(String isVirtual) {
         this.isVirtual = isVirtual;
     }
-    
+
     public String getIsPIConfirmed() {
         return isPIConfirmed;
     }
-    
+
     public void setIsPIConfirmed(String isPIConfirmed) {
         this.isPIConfirmed = isPIConfirmed;
     }
-    
-	public String getUriNamespace() {
-		return URIUtils.replaceNameSpaceEx(uri);
-	}
 
-	public String getLabel() {
-		return label;
-	}
+    public String getUriNamespace() {
+        return URIUtils.replaceNameSpaceEx(uri);
+    }
 
-	public void setLabel(String label) {
-		this.label = label;
-	}
+    public String getLabel() {
+        return label;
+    }
 
-	public String getPartOfSchema() {
-		return partOfSchema;
-	}
+    public void setLabel(String label) {
+        this.label = label;
+    }
 
-	public void setPartOfSchema(String partOfSchema) {
-		this.partOfSchema = partOfSchema;
-	}
+    public String getPartOfSchema() {
+        return partOfSchema;
+    }
 
-	public String getEntity() {
-		return entity;
-	}
+    public void setPartOfSchema(String partOfSchema) {
+        this.partOfSchema = partOfSchema;
+    }
 
-	public void setEntity(String entity) {
-		this.entity = entity;
-		if (entity == null || entity.equals("")) {
-			this.entityLabel = "";
-		} else {
-			this.entityLabel = FirstLabel.getLabel(entity);
-		}
-	}
+    public String getEntity() {
+        return entity;
+    }
 
-	public String getEntityNamespace() {
-		return URIUtils.replaceNameSpaceEx(entity);
-	}
+    public void setEntity(String entity) {
+        this.entity = entity;
+        if (entity == null || entity.equals("")) {
+            this.entityLabel = "";
+        } else {
+            this.entityLabel = FirstLabel.getLabel(entity);
+        }
+    }
 
-	public String getEntityLabel() {
-		if (entityLabel.equals("")) {
-			return URIUtils.replaceNameSpaceEx(entity);
-		}
-		return entityLabel;
-	}
+    public String getEntityNamespace() {
+        return URIUtils.replaceNameSpaceEx(entity);
+    }
 
-	public String getUnit() {
-		if (unit == null) {
-			return "";
-		} else {
-			return unit;
-		}
-	}
+    public String getEntityLabel() {
+        if (entityLabel.equals("")) {
+            return URIUtils.replaceNameSpaceEx(entity);
+        }
+        return entityLabel;
+    }
 
-	public String getUnitNamespace() {
-		if (unit == "") {
-			return "";
-		}
-		return URIUtils.replaceNameSpaceEx(unit);
-	}
+    public String getUnit() {
+        if (unit == null) {
+            return "";
+        } else {
+            return unit;
+        }
+    }
 
-	public void setUnit(String unit) {
-		this.unit = unit;
-		if (unit == null || unit.equals("")) {
-			this.unitLabel = "";
-		} else {
-			this.unitLabel = FirstLabel.getLabel(unit);
-		}
-	}
+    public String getUnitNamespace() {
+        if (unit == "") {
+            return "";
+        }
+        return URIUtils.replaceNameSpaceEx(unit);
+    }
 
-	public String getUnitLabel() {
-		if (unitLabel.equals("")) {
-			return URIUtils.replaceNameSpaceEx(unit);
-		}
-		return unitLabel;
-	}
+    public void setUnit(String unit) {
+        this.unit = unit;
+        if (unit == null || unit.equals("")) {
+            this.unitLabel = "";
+        } else {
+            this.unitLabel = FirstLabel.getLabel(unit);
+        }
+    }
 
-	public String getAnnotatedUnit() {
-		String annotation;
-		if (unitLabel.equals("")) {
-			if (unit == null || unit.equals("")) {
-				return "";
-			}
-			annotation = URIUtils.replaceNameSpaceEx(unit);
-		} else {
-			annotation = unitLabel;
-		}
-		if (!getUnitNamespace().equals("")) {
-			annotation += " [" + getUnitNamespace() + "]";
-		}
-		
-		return annotation;
-	}
+    public String getUnitLabel() {
+        if (unitLabel.equals("")) {
+            return URIUtils.replaceNameSpaceEx(unit);
+        }
+        return unitLabel;
+    }
 
-	public static DataAcquisitionSchemaEvent find(String uri) {
-		DataAcquisitionSchemaEvent event = null;
-		String queryString = NameSpaces.getInstance().printSparqlNameSpaceList() + 
-				"SELECT ?partOfSchema ?entity ?unit WHERE { " + 
-				"   <" + uri + "> a hasco:DASchemaEvent . " + 
-				"   <" + uri + "> hasco:partOfSchema ?partOfSchema. " +
-				"   OPTIONAL { <" + uri + ">  hasco:hasEntity ?entity } ." + 
-				"   OPTIONAL { <" + uri + "> hasco:hasUnit ?unit } ." + 
-				"}";
-		Query query = QueryFactory.create(queryString);
+    public String getAnnotatedUnit() {
+        String annotation;
+        if (unitLabel.equals("")) {
+            if (unit == null || unit.equals("")) {
+                return "";
+            }
+            annotation = URIUtils.replaceNameSpaceEx(unit);
+        } else {
+            annotation = unitLabel;
+        }
+        if (!getUnitNamespace().equals("")) {
+            annotation += " [" + getUnitNamespace() + "]";
+        }
 
-		QueryExecution qexec = QueryExecutionFactory.sparqlService(CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), query);
-		ResultSet results = qexec.execSelect();
-		ResultSetRewindable resultsrw = ResultSetFactory.copyResults(results);
-		qexec.close();
+        return annotation;
+    }
 
-		if (!resultsrw.hasNext()) {
-			System.out.println("[WARNING] DataAcquisitionSchemaEvent. Could not find event for uri: " + uri);
-			return event;
-		}
+    public static DataAcquisitionSchemaEvent find(String uri) {
+        DataAcquisitionSchemaEvent event = null;
+        String queryString = NameSpaces.getInstance().printSparqlNameSpaceList() + 
+                "SELECT ?partOfSchema ?entity ?unit WHERE { " + 
+                "   <" + uri + "> a hasco:DASchemaEvent . " + 
+                "   <" + uri + "> hasco:partOfSchema ?partOfSchema. " +
+                "   OPTIONAL { <" + uri + ">  hasco:hasEntity ?entity } ." + 
+                "   OPTIONAL { <" + uri + "> hasco:hasUnit ?unit } ." + 
+                "}";
+        Query query = QueryFactory.create(queryString);
 
-		QuerySolution soln = resultsrw.next();
-		String labelStr = "";
-		String partOfSchemaStr = "";
-		String entityStr = "";
-		String unitStr = "";
-		try {
-			if (soln != null) {
+        QueryExecution qexec = QueryExecutionFactory.sparqlService(CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), query);
+        ResultSet results = qexec.execSelect();
+        ResultSetRewindable resultsrw = ResultSetFactory.copyResults(results);
+        qexec.close();
 
-				labelStr = FirstLabel.getLabel(uri);
+        if (!resultsrw.hasNext()) {
+            System.out.println("[WARNING] DataAcquisitionSchemaEvent. Could not find event for uri: " + uri);
+            return event;
+        }
 
-				try {
-					if (soln.getResource("partOfSchema") != null && soln.getResource("partOfSchema").getURI() != null) {
-						partOfSchemaStr = soln.getResource("partOfSchema").getURI();
-					}
-				} catch (Exception e1) {
-					partOfSchemaStr = "";
-				}
+        QuerySolution soln = resultsrw.next();
+        String labelStr = "";
+        String partOfSchemaStr = "";
+        String entityStr = "";
+        String unitStr = "";
+        try {
+            if (soln != null) {
 
-				try {
-					if (soln.getResource("entity") != null && soln.getResource("entity").getURI() != null) {
-						entityStr = soln.getResource("entity").getURI();
-					}
-				} catch (Exception e1) {
-					entityStr = "";
-				}
+                labelStr = FirstLabel.getLabel(uri);
 
-				try {
-					if (soln.getResource("unit") != null && soln.getResource("unit").getURI() != null) {
-						unitStr = soln.getResource("unit").getURI();
-					}
-				} catch (Exception e1) {
-					unitStr = "";
-				}
+                try {
+                    if (soln.getResource("partOfSchema") != null && soln.getResource("partOfSchema").getURI() != null) {
+                        partOfSchemaStr = soln.getResource("partOfSchema").getURI();
+                    }
+                } catch (Exception e1) {
+                    partOfSchemaStr = "";
+                }
 
-				event = new DataAcquisitionSchemaEvent(uri,
-						labelStr,
-						partOfSchemaStr,
-						entityStr,
-						unitStr);
-			}
-		}  catch (Exception e) {
-			System.out.println("[ERROR] DataAcquisitionSchemaEvent. uri: e.Message: " + e.getMessage());
-		}
+                try {
+                    if (soln.getResource("entity") != null && soln.getResource("entity").getURI() != null) {
+                        entityStr = soln.getResource("entity").getURI();
+                    }
+                } catch (Exception e1) {
+                    entityStr = "";
+                }
 
-		return event;
-	}
+                try {
+                    if (soln.getResource("unit") != null && soln.getResource("unit").getURI() != null) {
+                        unitStr = soln.getResource("unit").getURI();
+                    }
+                } catch (Exception e1) {
+                    unitStr = "";
+                }
 
-	public static List<DataAcquisitionSchemaEvent> findBySchema(String schemaUri) {
-		List<DataAcquisitionSchemaEvent> events = new ArrayList<DataAcquisitionSchemaEvent>();
-		String queryString = NameSpaces.getInstance().printSparqlNameSpaceList() + 
-				"SELECT ?uri WHERE { " + 
-				"   ?uri a hasco:DASchemaEvent . " + 
-				"   ?uri hasco:partOfSchema <" + schemaUri + "> .  " + 
-				"}";
-		Query query = QueryFactory.create(queryString);
+                event = new DataAcquisitionSchemaEvent(uri,
+                        labelStr,
+                        partOfSchemaStr,
+                        entityStr,
+                        unitStr);
+            }
+        }  catch (Exception e) {
+            System.out.println("[ERROR] DataAcquisitionSchemaEvent. uri: e.Message: " + e.getMessage());
+        }
 
-		QueryExecution qexec = QueryExecutionFactory.sparqlService(CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), query);
-		ResultSet results = qexec.execSelect();
-		ResultSetRewindable resultsrw = ResultSetFactory.copyResults(results);
-		qexec.close();
+        return event;
+    }
 
-		if (!resultsrw.hasNext()) {
-			System.out.println("[WARNING] DataAcquisitionSchemaEvent. Could not find events for schema: " + schemaUri);
-			return events;
-		}
+    public static List<DataAcquisitionSchemaEvent> findBySchema(String schemaUri) {
+        List<DataAcquisitionSchemaEvent> events = new ArrayList<DataAcquisitionSchemaEvent>();
+        String queryString = NameSpaces.getInstance().printSparqlNameSpaceList() + 
+                "SELECT ?uri WHERE { " + 
+                "   ?uri a hasco:DASchemaEvent . " + 
+                "   ?uri hasco:partOfSchema <" + schemaUri + "> .  " + 
+                "}";
+        Query query = QueryFactory.create(queryString);
 
-		while (resultsrw.hasNext()) {
-			QuerySolution soln = resultsrw.next();
-			try {
-				if (soln != null && soln.getResource("uri") != null && soln.getResource("uri").getURI() != null) {
+        QueryExecution qexec = QueryExecutionFactory.sparqlService(CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), query);
+        ResultSet results = qexec.execSelect();
+        ResultSetRewindable resultsrw = ResultSetFactory.copyResults(results);
+        qexec.close();
 
-					DataAcquisitionSchemaEvent obj = DataAcquisitionSchemaEvent.find(soln.getResource("uri").getURI());
-					if (obj != null) {
-						events.add(obj);
-					}
-				}
-			}  catch (Exception e) {
-				System.out.println("[ERROR] DataAcquisitionSchemaEvent. uri: e.Message: " + e.getMessage());
-			}
+        if (!resultsrw.hasNext()) {
+            System.out.println("[WARNING] DataAcquisitionSchemaEvent. Could not find events for schema: " + schemaUri);
+            return events;
+        }
 
-		}
-		return events;
-	}
+        while (resultsrw.hasNext()) {
+            QuerySolution soln = resultsrw.next();
+            try {
+                if (soln != null && soln.getResource("uri") != null && soln.getResource("uri").getURI() != null) {
 
-	@Override
-	public int saveToLabKey(String user_name, String password) {
-		LabkeyDataHandler loader = LabkeyDataHandler.createDefault(user_name, password);
-		List< Map<String, Object> > rows = new ArrayList< Map<String, Object> >();
-		Map<String, Object> row = new HashMap<String, Object>();
-		row.put("hasURI", URIUtils.replaceNameSpaceEx(getUri()));
-		row.put("a", String.join(", ", getTypes().stream()
-		        .map(uri -> URIUtils.replaceNameSpaceEx(uri))
-		        .collect(Collectors.toList())));
-		row.put("rdfs:label", getLabel());
-		row.put("rdfs:comment", getLabel());
-		row.put("hasco:partOfSchema", URIUtils.replaceNameSpaceEx(getPartOfSchema()));
-		row.put("hasco:hasEntity", URIUtils.replaceNameSpaceEx(getEntity()));
-		row.put("hasco:hasUnit", URIUtils.replaceNameSpaceEx(getUnit()));
-		row.put("sio:inRelationTo", URIUtils.replaceNameSpaceEx(getInRelationToUri()));
+                    DataAcquisitionSchemaEvent obj = DataAcquisitionSchemaEvent.find(soln.getResource("uri").getURI());
+                    if (obj != null) {
+                        events.add(obj);
+                    }
+                }
+            }  catch (Exception e) {
+                System.out.println("[ERROR] DataAcquisitionSchemaEvent. uri: e.Message: " + e.getMessage());
+            }
+
+        }
+        return events;
+    }
+
+    @Override
+    public int saveToLabKey(String user_name, String password) {
+        LabkeyDataHandler loader = LabkeyDataHandler.createDefault(user_name, password);
+        List< Map<String, Object> > rows = new ArrayList< Map<String, Object> >();
+        Map<String, Object> row = new HashMap<String, Object>();
+        row.put("hasURI", URIUtils.replaceNameSpaceEx(getUri()));
+        row.put("a", String.join(", ", getTypes().stream()
+                .map(uri -> URIUtils.replaceNameSpaceEx(uri))
+                .collect(Collectors.toList())));
+        row.put("rdfs:label", getLabel());
+        row.put("rdfs:comment", getLabel());
+        row.put("hasco:partOfSchema", URIUtils.replaceNameSpaceEx(getPartOfSchema()));
+        row.put("hasco:hasEntity", URIUtils.replaceNameSpaceEx(getEntity()));
+        row.put("hasco:hasUnit", URIUtils.replaceNameSpaceEx(getUnit()));
+        row.put("sio:inRelationTo", URIUtils.replaceNameSpaceEx(getInRelationToUri()));
         row.put("sio:Relation", URIUtils.replaceNameSpaceEx(getRelationUri()));
-		row.put("hasco:isVirtual", "");
-		row.put("hasco:isPIConfirmed", "false");
-		rows.add(row);
-		int totalChanged = 0;
-		try {
-			totalChanged = loader.insertRows("DASchemaEvent", rows);
-		} catch (CommandException e) {
-			try {
-				totalChanged = loader.updateRows("DASchemaEvent", rows);
-			} catch (CommandException e2) {
-				System.out.println("[ERROR] Could not insert or update DASE(s)");
-			}
-		}
-		return totalChanged;
-	}
+        row.put("hasco:isVirtual", "");
+        row.put("hasco:isPIConfirmed", "false");
+        rows.add(row);
+        int totalChanged = 0;
+        try {
+            totalChanged = loader.insertRows("DASchemaEvent", rows);
+        } catch (CommandException e) {
+            try {
+                totalChanged = loader.updateRows("DASchemaEvent", rows);
+            } catch (CommandException e2) {
+                System.out.println("[ERROR] Could not insert or update DASE(s)");
+            }
+        }
+        return totalChanged;
+    }
 
-	@Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
-	@Override
-	public int deleteFromLabKey(String user_name, String password) {
-		LabkeyDataHandler loader = LabkeyDataHandler.createDefault(user_name, password);
-		List< Map<String, Object> > rows = new ArrayList< Map<String, Object> >();
-		Map<String, Object> row = new HashMap<String, Object>();
-		row.put("hasURI", URIUtils.replaceNameSpaceEx(getUri().replace("<","").replace(">","")));
-		rows.add(row);
-		
-		try {
+    @Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
+    @Override
+    public int deleteFromLabKey(String user_name, String password) {
+        LabkeyDataHandler loader = LabkeyDataHandler.createDefault(user_name, password);
+        List< Map<String, Object> > rows = new ArrayList< Map<String, Object> >();
+        Map<String, Object> row = new HashMap<String, Object>();
+        row.put("hasURI", URIUtils.replaceNameSpaceEx(getUri().replace("<","").replace(">","")));
+        rows.add(row);
+
+        try {
             return loader.deleteRows("DASchemaEvent", rows);
         } catch (CommandException e) {
             System.out.println("[ERROR] Could not delete DASE(s)");
             e.printStackTrace();
             return 0;
         }
-	}
+    }
 
     @Override
     public boolean saveToTripleStore() {
@@ -378,9 +379,9 @@ public class DataAcquisitionSchemaEvent extends HADatAcThing {
             System.out.println("[ERROR] Trying to save DASE without assigning DAS's URI");
             return false;
         }
-        
+
         deleteFromTripleStore();
-        
+
         String insert = "";
         insert += NameSpaces.getInstance().printSparqlNameSpaceList();
         insert += INSERT_LINE1;
@@ -413,13 +414,19 @@ public class DataAcquisitionSchemaEvent extends HADatAcThing {
         if (!getIsPIConfirmed().equals("")) {
             insert += " <" + getUri() + "> hasco:isPIConfirmed \"" + getIsPIConfirmed() + "\" . ";
         }
-   
+
         insert += LINE_LAST;
-        UpdateRequest request = UpdateFactory.create(insert);
-        UpdateProcessor processor = UpdateExecutionFactory.createRemote(
-                request, CollectionUtil.getCollectionsName(CollectionUtil.METADATA_UPDATE));
-        processor.execute();
-        
+
+        try {
+            UpdateRequest request = UpdateFactory.create(insert);
+            UpdateProcessor processor = UpdateExecutionFactory.createRemote(
+                    request, CollectionUtil.getCollectionsName(CollectionUtil.METADATA_UPDATE));
+            processor.execute();
+        } catch (QueryParseException e) {
+            System.out.println("QueryParseException due to update query: " + insert);
+            throw e;
+        }
+
         return true;
     }
 

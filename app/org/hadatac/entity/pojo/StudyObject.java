@@ -10,6 +10,7 @@ import org.apache.jena.query.Query;
 import org.apache.jena.query.QueryExecution;
 import org.apache.jena.query.QueryExecutionFactory;
 import org.apache.jena.query.QueryFactory;
+import org.apache.jena.query.QueryParseException;
 import org.apache.jena.query.QuerySolution;
 import org.apache.jena.query.ResultSet;
 import org.apache.jena.query.ResultSetFactory;
@@ -512,11 +513,15 @@ public class StudyObject extends HADatAcThing {
         }
 
         insert += LINE_LAST;
-        System.out.println("insert: " + insert);
-        UpdateRequest request = UpdateFactory.create(insert);
-        UpdateProcessor processor = UpdateExecutionFactory.createRemote(
-                request, CollectionUtil.getCollectionsName(CollectionUtil.METADATA_UPDATE));
-        processor.execute();
+        try {
+            UpdateRequest request = UpdateFactory.create(insert);
+            UpdateProcessor processor = UpdateExecutionFactory.createRemote(
+                    request, CollectionUtil.getCollectionsName(CollectionUtil.METADATA_UPDATE));
+            processor.execute();
+        } catch (QueryParseException e) {
+            System.out.println("QueryParseException due to update query: " + insert);
+            throw e;
+        }
 
         return true;
     }
