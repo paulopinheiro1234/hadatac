@@ -63,9 +63,8 @@ public class PVGenerator extends BasicGenerator {
 				return cls;
 			}
 		} else {
-			if (codeMappings.containsKey(getResource(rec))){
-				System.out.println(getResource(rec) + " is empty so " +  codeMappings.get(getResource(rec)));
-				return codeMappings.get(getResource(rec));
+			if (codeMappings.containsKey(getCode(rec).toLowerCase())) {
+				return codeMappings.get(getCode(rec).toLowerCase());
 			}
 		}
 

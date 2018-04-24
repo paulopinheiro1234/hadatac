@@ -10,6 +10,7 @@ import org.apache.jena.query.Query;
 import org.apache.jena.query.QueryExecution;
 import org.apache.jena.query.QueryExecutionFactory;
 import org.apache.jena.query.QueryFactory;
+import org.apache.jena.query.QueryParseException;
 import org.apache.jena.query.QuerySolution;
 import org.apache.jena.query.ResultSet;
 import org.apache.jena.query.ResultSetFactory;
@@ -38,350 +39,356 @@ import com.typesafe.config.ConfigFactory;
 
 public class Platform extends HADatAcThing implements Comparable<Platform> {
 
-	public static String INSERT_LINE1 = "INSERT DATA {  ";
-	public static String DELETE_LINE1 = "DELETE WHERE {  ";
-	public static String DELETE_LINE3 = " ?p ?o . ";
-	public static String LINE_LAST = "}  ";
-	public static String PREFIX = "PLT-";
+    public static String INSERT_LINE1 = "INSERT DATA {  ";
+    public static String DELETE_LINE1 = "DELETE WHERE {  ";
+    public static String DELETE_LINE3 = " ?p ?o . ";
+    public static String LINE_LAST = "}  ";
+    public static String PREFIX = "PLT-";
 
-	private String location;
-	private String firstCoordinate;
-	private String secondCoordinate;
-	private String thirdCoordinate;
-	private String elevation;
-	private String serialNumber;
+    private String location;
+    private String firstCoordinate;
+    private String secondCoordinate;
+    private String thirdCoordinate;
+    private String elevation;
+    private String serialNumber;
 
-	public Platform(String uri,
-			String typeUri,
-			String label,
-			String comment) {
-		this.uri = uri;
-		this.typeUri = typeUri;
-		this.label = label;
-		this.comment = comment;
-	}
+    public Platform(String uri,
+            String typeUri,
+            String label,
+            String comment) {
+        this.uri = uri;
+        this.typeUri = typeUri;
+        this.label = label;
+        this.comment = comment;
+    }
 
-	public Platform() {
-		this.uri = "";
-		this.typeUri = "";
-		this.label = "";
-		this.comment = "";
-	}
+    public Platform() {
+        this.uri = "";
+        this.typeUri = "";
+        this.label = "";
+        this.comment = "";
+    }
 
-	public String getLocation() {
-		return location;
-	}
-	public void setLocation(String location) {
-		this.location = location;
-	}
-	public String getElevation() {
-		return elevation;
-	}
-	public void setElevation(String elevation) {
-		this.elevation = elevation;
-	}
-	public String getFirstCoordinate() {
-		return firstCoordinate;
-	}
-	public void setFirstCoordinate(String firstCoordinate) {
-		this.firstCoordinate = firstCoordinate;
-	}
+    public String getLocation() {
+        return location;
+    }
+    public void setLocation(String location) {
+        this.location = location;
+    }
+    public String getElevation() {
+        return elevation;
+    }
+    public void setElevation(String elevation) {
+        this.elevation = elevation;
+    }
+    public String getFirstCoordinate() {
+        return firstCoordinate;
+    }
+    public void setFirstCoordinate(String firstCoordinate) {
+        this.firstCoordinate = firstCoordinate;
+    }
 
-	public String getSecondCoordinate() {
-		return secondCoordinate;
-	}
+    public String getSecondCoordinate() {
+        return secondCoordinate;
+    }
 
-	public void setSecondCoordinate(String secondCoordinate) {
-		this.secondCoordinate = secondCoordinate;
-	}
+    public void setSecondCoordinate(String secondCoordinate) {
+        this.secondCoordinate = secondCoordinate;
+    }
 
-	public String getThirdCoordinate() {
-		return thirdCoordinate;
-	}
+    public String getThirdCoordinate() {
+        return thirdCoordinate;
+    }
 
-	public void setThirdCoordinate(String thirdCoordinate) {
-		this.thirdCoordinate = thirdCoordinate;
-	}
+    public void setThirdCoordinate(String thirdCoordinate) {
+        this.thirdCoordinate = thirdCoordinate;
+    }
 
-	public String getSerialNumber() {
-		return serialNumber;
-	}
-	public void setSerialNumber(String serialNumber) {
-		this.serialNumber = serialNumber;
-	}
-	
-	@Override
-	public boolean equals(Object o) {
-		if((o instanceof Platform) && (((Platform)o).getUri().equals(this.getUri()))) {
-			return true;
-		} else {
-			return false;
-		}
-	}
+    public String getSerialNumber() {
+        return serialNumber;
+    }
+    public void setSerialNumber(String serialNumber) {
+        this.serialNumber = serialNumber;
+    }
 
-	@Override
-	public int hashCode() {
-		return getUri().hashCode();
-	}
-	
-	public Map<HADatAcThing, List<HADatAcThing>> getTargetFacets(
-			Facet facet, FacetHandler facetHandler) {
-		String query = "";
-		query += NameSpaces.getInstance().printSparqlNameSpaceList();
-		query += "SELECT ?platformUri ?dataAcquisitionUri ?platformLabel ?dataAcquisitionLabel WHERE { \n"
-				+ " ?dataAcquisitionUri hasco:hasDeployment ?deploymentUri . \n"
-				+ " ?deploymentUri vstoi:hasPlatform ?platformUri . \n"
-				+ " ?platformUri rdfs:label ?platformLabel . \n"
-				+ " ?dataAcquisitionUri rdfs:label ?dataAcquisitionLabel . \n"
-				+ " } \n";
-		
-		// System.out.println("Platform getTargetFacets() query: " + query);
+    @Override
+    public boolean equals(Object o) {
+        if((o instanceof Platform) && (((Platform)o).getUri().equals(this.getUri()))) {
+            return true;
+        } else {
+            return false;
+        }
+    }
 
-		Map<HADatAcThing, List<HADatAcThing>> results = new HashMap<HADatAcThing, List<HADatAcThing>>();
-		try {
-			QueryExecution qe = QueryExecutionFactory.sparqlService(
-					CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), query);
-			ResultSet resultSet = qe.execSelect();
-			ResultSetRewindable resultsrw = ResultSetFactory.copyResults(resultSet);
-			qe.close();
-			while (resultsrw.hasNext()) {
-				QuerySolution soln = resultsrw.next();
-				Platform platform = new Platform();
-				String platformUri = soln.get("platformUri").toString();
-				String platformLabel = soln.get("platformLabel").toString();
-				platform.setUri(platformUri);
-				platform.setField("platform_uri_str");
-				if (platformLabel.isEmpty()) {
-				    platform.setLabel(WordUtils.capitalize(URIUtils.getBaseName(platformUri)));
-				} else {
-				    platform.setLabel(platformLabel);
-				}
-				
-				ObjectAccessSpec oas = new ObjectAccessSpec();
-				oas.setUri(soln.get("dataAcquisitionUri").toString());
-				oas.setLabel(soln.get("dataAcquisitionLabel").toString());
-				oas.setField("acquisition_uri_str");
-				if (!results.containsKey(platform)) {
-					List<HADatAcThing> facets = new ArrayList<HADatAcThing>();
-					results.put(platform, facets);
-				}
-				if (!results.get(platform).contains(oas)) {
-					results.get(platform).add(oas);
-				}
-				
-				Facet subFacet = facet.getChildById(platform.getUri());
-				subFacet.putFacet("platform_uri_str", platform.getUri());
-				subFacet.putFacet("acquisition_uri_str", oas.getUri());
-			}
-		} catch (QueryExceptionHTTP e) {
-			e.printStackTrace();
-		}
+    @Override
+    public int hashCode() {
+        return getUri().hashCode();
+    }
 
-		return results;
-	}
+    public Map<HADatAcThing, List<HADatAcThing>> getTargetFacets(
+            Facet facet, FacetHandler facetHandler) {
+        String query = "";
+        query += NameSpaces.getInstance().printSparqlNameSpaceList();
+        query += "SELECT ?platformUri ?dataAcquisitionUri ?platformLabel ?dataAcquisitionLabel WHERE { \n"
+                + " ?dataAcquisitionUri hasco:hasDeployment ?deploymentUri . \n"
+                + " ?deploymentUri vstoi:hasPlatform ?platformUri . \n"
+                + " ?platformUri rdfs:label ?platformLabel . \n"
+                + " ?dataAcquisitionUri rdfs:label ?dataAcquisitionLabel . \n"
+                + " } \n";
 
-	public static Platform find(String uri) {
-		Platform platform = null;
-		Model model;
-		Statement statement;
-		RDFNode object;
+        // System.out.println("Platform getTargetFacets() query: " + query);
 
-		String queryString = "DESCRIBE <" + uri + ">";
-		Query query = QueryFactory.create(queryString);
-		QueryExecution qexec = QueryExecutionFactory.sparqlService(
-				ConfigFactory.load().getString("hadatac.solr.triplestore") 
-				+ CollectionUtil.METADATA_SPARQL, query);
-		model = qexec.execDescribe();
+        Map<HADatAcThing, List<HADatAcThing>> results = new HashMap<HADatAcThing, List<HADatAcThing>>();
+        try {
+            QueryExecution qe = QueryExecutionFactory.sparqlService(
+                    CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), query);
+            ResultSet resultSet = qe.execSelect();
+            ResultSetRewindable resultsrw = ResultSetFactory.copyResults(resultSet);
+            qe.close();
+            while (resultsrw.hasNext()) {
+                QuerySolution soln = resultsrw.next();
+                Platform platform = new Platform();
+                String platformUri = soln.get("platformUri").toString();
+                String platformLabel = soln.get("platformLabel").toString();
+                platform.setUri(platformUri);
+                platform.setField("platform_uri_str");
+                if (platformLabel.isEmpty()) {
+                    platform.setLabel(WordUtils.capitalize(URIUtils.getBaseName(platformUri)));
+                } else {
+                    platform.setLabel(platformLabel);
+                }
 
-		platform = new Platform();
-		StmtIterator stmtIterator = model.listStatements();
+                ObjectAccessSpec oas = new ObjectAccessSpec();
+                oas.setUri(soln.get("dataAcquisitionUri").toString());
+                oas.setLabel(soln.get("dataAcquisitionLabel").toString());
+                oas.setField("acquisition_uri_str");
+                if (!results.containsKey(platform)) {
+                    List<HADatAcThing> facets = new ArrayList<HADatAcThing>();
+                    results.put(platform, facets);
+                }
+                if (!results.get(platform).contains(oas)) {
+                    results.get(platform).add(oas);
+                }
 
-		while (stmtIterator.hasNext()) {
-			statement = stmtIterator.next();
-			object = statement.getObject();
-			if (statement.getPredicate().getURI().equals("http://www.w3.org/2000/01/rdf-schema#label")) {
-				platform.setLabel(object.asLiteral().getString());
-			} else if (statement.getPredicate().getURI().equals("http://www.w3.org/1999/02/22-rdf-syntax-ns#type")) {
-				platform.setTypeUri(object.asResource().getURI());
-			} else if (statement.getPredicate().getURI().equals("http://www.w3.org/2000/01/rdf-schema#comment")) {
-				platform.setComment(object.asLiteral().getString());
-			} else if (statement.getPredicate().getURI().equals("http://hadatac.org/ont/vstoi#hasSerialNumber")) {
-				platform.setSerialNumber(object.asLiteral().getString());
-			} else if (statement.getPredicate().getURI().equals("http://hadatac.org/ont/hasco/hasFirstCoordinate")) {
-				platform.setFirstCoordinate(object.asLiteral().getString());
-			} else if (statement.getPredicate().getURI().equals("http://hadatac.org/ont/hasco/hasSecondCoordinate")) {
-				platform.setSecondCoordinate(object.asLiteral().getString());
-			} else if (statement.getPredicate().getURI().equals("http://hadatac.org/ont/hasco/hasThirdCoordinate")) {
-				platform.setThirdCoordinate(object.asLiteral().getString());
-			}
-		}
+                Facet subFacet = facet.getChildById(platform.getUri());
+                subFacet.putFacet("platform_uri_str", platform.getUri());
+                subFacet.putFacet("acquisition_uri_str", oas.getUri());
+            }
+        } catch (QueryExceptionHTTP e) {
+            e.printStackTrace();
+        }
 
-		platform.setUri(uri);
+        return results;
+    }
 
-		return platform;
-	}
+    public static Platform find(String uri) {
+        Platform platform = null;
+        Model model;
+        Statement statement;
+        RDFNode object;
 
-	public static List<Platform> find() {
-		List<Platform> platforms = new ArrayList<Platform>();
-		String queryString = NameSpaces.getInstance().printSparqlNameSpaceList() +
-				" SELECT ?uri WHERE { " +
-				" ?platModel rdfs:subClassOf* vstoi:Platform . " + 
-				" ?uri a ?platModel ." + 
-				"} ";
+        String queryString = "DESCRIBE <" + uri + ">";
+        Query query = QueryFactory.create(queryString);
+        QueryExecution qexec = QueryExecutionFactory.sparqlService(
+                ConfigFactory.load().getString("hadatac.solr.triplestore") 
+                + CollectionUtil.METADATA_SPARQL, query);
+        model = qexec.execDescribe();
 
-		Query query = QueryFactory.create(queryString);
+        platform = new Platform();
+        StmtIterator stmtIterator = model.listStatements();
 
-		QueryExecution qexec = QueryExecutionFactory.sparqlService(CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), query);
-		ResultSet results = qexec.execSelect();
-		ResultSetRewindable resultsrw = ResultSetFactory.copyResults(results);
-		qexec.close();
+        while (stmtIterator.hasNext()) {
+            statement = stmtIterator.next();
+            object = statement.getObject();
+            if (statement.getPredicate().getURI().equals("http://www.w3.org/2000/01/rdf-schema#label")) {
+                platform.setLabel(object.asLiteral().getString());
+            } else if (statement.getPredicate().getURI().equals("http://www.w3.org/1999/02/22-rdf-syntax-ns#type")) {
+                platform.setTypeUri(object.asResource().getURI());
+            } else if (statement.getPredicate().getURI().equals("http://www.w3.org/2000/01/rdf-schema#comment")) {
+                platform.setComment(object.asLiteral().getString());
+            } else if (statement.getPredicate().getURI().equals("http://hadatac.org/ont/vstoi#hasSerialNumber")) {
+                platform.setSerialNumber(object.asLiteral().getString());
+            } else if (statement.getPredicate().getURI().equals("http://hadatac.org/ont/hasco/hasFirstCoordinate")) {
+                platform.setFirstCoordinate(object.asLiteral().getString());
+            } else if (statement.getPredicate().getURI().equals("http://hadatac.org/ont/hasco/hasSecondCoordinate")) {
+                platform.setSecondCoordinate(object.asLiteral().getString());
+            } else if (statement.getPredicate().getURI().equals("http://hadatac.org/ont/hasco/hasThirdCoordinate")) {
+                platform.setThirdCoordinate(object.asLiteral().getString());
+            }
+        }
 
-		while (resultsrw.hasNext()) {
-			QuerySolution soln = resultsrw.next();
-			Platform platform = find(soln.getResource("uri").getURI());
-			platforms.add(platform);
-		}			
+        platform.setUri(uri);
 
-		java.util.Collections.sort((List<Platform>) platforms);
+        return platform;
+    }
 
-		return platforms;
-	}
+    public static List<Platform> find() {
+        List<Platform> platforms = new ArrayList<Platform>();
+        String queryString = NameSpaces.getInstance().printSparqlNameSpaceList() +
+                " SELECT ?uri WHERE { " +
+                " ?platModel rdfs:subClassOf* vstoi:Platform . " + 
+                " ?uri a ?platModel ." + 
+                "} ";
 
-	public static Platform find(HADataC hadatac) {
-		Platform platform = null;
+        Query query = QueryFactory.create(queryString);
 
-		String queryString = NameSpaces.getInstance().printSparqlNameSpaceList()
-				+ "SELECT ?platform ?label ?lat ?lon ?ele WHERE {\n"
-				+ "  <" + hadatac.getDeploymentUri() + "> vstoi:hasPlatform ?platform .\n"
-				+ "  OPTIONAL { ?platform rdfs:label ?label . }\n"
-				+ "  OPTIONAL { ?platform rdfs:comment ?comment . }\n"
-				+ "  OPTIONAL { ?platform <http://hadatac.org/ont/hasco/hasFirstCoordinate> ?lat . }\n"
-				+ "  OPTIONAL { ?platform <http://hadatac.org/ont/hasco/hasSecondCoordinate> ?lon . }\n"
-				+ "  OPTIONAL { ?platform <http://hadatac.org/ont/hasco/hasThirdCoordinate> ?ele . }\n"
-				+ "}";
+        QueryExecution qexec = QueryExecutionFactory.sparqlService(CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), query);
+        ResultSet results = qexec.execSelect();
+        ResultSetRewindable resultsrw = ResultSetFactory.copyResults(results);
+        qexec.close();
 
-		Query query = QueryFactory.create(queryString);
-		QueryExecution qexec = QueryExecutionFactory.sparqlService(hadatac.getStaticMetadataSparqlURL(), query);
-		ResultSet results = qexec.execSelect();
-		ResultSetRewindable resultsrw = ResultSetFactory.copyResults(results);
-		qexec.close();
+        while (resultsrw.hasNext()) {
+            QuerySolution soln = resultsrw.next();
+            Platform platform = find(soln.getResource("uri").getURI());
+            platforms.add(platform);
+        }			
 
-		if (resultsrw.size() >= 1) {
-			QuerySolution soln = resultsrw.next();
-			platform = new Platform();
-			platform.setUri(soln.getResource("platform").getURI());
-			if (soln.getLiteral("label") != null) {
-				platform.setLabel(soln.getLiteral("label").getString());
-			}
-			if(soln.getLiteral("comment") != null) {
-				platform.setComment(soln.getLiteral("comment").getString());
-			}
-			if(soln.getLiteral("lat") != null) {
-				platform.setFirstCoordinate(soln.getLiteral("lat").getString());
-			}
-			if(soln.getLiteral("lon") != null) {
-				platform.setSecondCoordinate(soln.getLiteral("long").getString());
-			}
-			if(soln.getLiteral("ele") != null) {
-				platform.setThirdCoordinate(soln.getLiteral("ele").getString());
-				platform.setLocation("(" + platform.getFirstCoordinate() + ", " 
-						+ platform.getSecondCoordinate() + ", "
-						+ platform.getThirdCoordinate() + ")");
-			}
-			if (soln.getLiteral("ele") != null) {
-				platform.setElevation(soln.getLiteral("ele").getString());
-			}
-		}
+        java.util.Collections.sort((List<Platform>) platforms);
 
-		return platform;
-	}
+        return platforms;
+    }
 
-	@Override
-	public boolean saveToTripleStore() {
-		if (uri == null || uri.equals("")) {
-			System.out.println("[ERROR] Trying to save Platform without assigning an URI");
-			return false;
-		}
+    public static Platform find(HADataC hadatac) {
+        Platform platform = null;
 
-		deleteFromTripleStore();
+        String queryString = NameSpaces.getInstance().printSparqlNameSpaceList()
+                + "SELECT ?platform ?label ?lat ?lon ?ele WHERE {\n"
+                + "  <" + hadatac.getDeploymentUri() + "> vstoi:hasPlatform ?platform .\n"
+                + "  OPTIONAL { ?platform rdfs:label ?label . }\n"
+                + "  OPTIONAL { ?platform rdfs:comment ?comment . }\n"
+                + "  OPTIONAL { ?platform <http://hadatac.org/ont/hasco/hasFirstCoordinate> ?lat . }\n"
+                + "  OPTIONAL { ?platform <http://hadatac.org/ont/hasco/hasSecondCoordinate> ?lon . }\n"
+                + "  OPTIONAL { ?platform <http://hadatac.org/ont/hasco/hasThirdCoordinate> ?ele . }\n"
+                + "}";
 
-		String insert = "";
-		String plt_uri = "";
+        Query query = QueryFactory.create(queryString);
+        QueryExecution qexec = QueryExecutionFactory.sparqlService(hadatac.getStaticMetadataSparqlURL(), query);
+        ResultSet results = qexec.execSelect();
+        ResultSetRewindable resultsrw = ResultSetFactory.copyResults(results);
+        qexec.close();
 
-		if (this.getUri().startsWith("<")) {
-			plt_uri = this.getUri();
-		} else {
-			plt_uri = "<" + this.getUri() + ">";
-		}
-		insert += NameSpaces.getInstance().printSparqlNameSpaceList();
-		insert += INSERT_LINE1;
-		if (typeUri.startsWith("<")) {
-			insert += plt_uri + " a " + typeUri + " . ";
-		} else {
-			insert += plt_uri + " a <" + typeUri + "> . ";
-		}
-		insert += plt_uri + " rdfs:label  \"" + label + "\" . ";
-		if (comment != null && !comment.equals("")) {
-			insert += plt_uri + " rdfs:comment \"" + comment + "\" .  ";
-		}
-		insert += LINE_LAST;
-		UpdateRequest request = UpdateFactory.create(insert);
-		UpdateProcessor processor = UpdateExecutionFactory.createRemote(
-				request, CollectionUtil.getCollectionsName(CollectionUtil.METADATA_UPDATE));
-		processor.execute();
-		
-		return true;
-	}
+        if (resultsrw.size() >= 1) {
+            QuerySolution soln = resultsrw.next();
+            platform = new Platform();
+            platform.setUri(soln.getResource("platform").getURI());
+            if (soln.getLiteral("label") != null) {
+                platform.setLabel(soln.getLiteral("label").getString());
+            }
+            if(soln.getLiteral("comment") != null) {
+                platform.setComment(soln.getLiteral("comment").getString());
+            }
+            if(soln.getLiteral("lat") != null) {
+                platform.setFirstCoordinate(soln.getLiteral("lat").getString());
+            }
+            if(soln.getLiteral("lon") != null) {
+                platform.setSecondCoordinate(soln.getLiteral("long").getString());
+            }
+            if(soln.getLiteral("ele") != null) {
+                platform.setThirdCoordinate(soln.getLiteral("ele").getString());
+                platform.setLocation("(" + platform.getFirstCoordinate() + ", " 
+                        + platform.getSecondCoordinate() + ", "
+                        + platform.getThirdCoordinate() + ")");
+            }
+            if (soln.getLiteral("ele") != null) {
+                platform.setElevation(soln.getLiteral("ele").getString());
+            }
+        }
 
-	@Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
-	public int saveToLabKey(String user_name, String password) {
-		LabkeyDataHandler loader = LabkeyDataHandler.createDefault(user_name, password);
-		List< Map<String, Object> > rows = new ArrayList< Map<String, Object> >();
-		Map<String, Object> row = new HashMap<String, Object>();
-		row.put("hasURI", URIUtils.replaceNameSpaceEx(getUri()));
-		row.put("a", URIUtils.replaceNameSpaceEx(typeUri));
-		row.put("rdfs:label", getLabel());
-		row.put("rdfs:comment", getComment());
-		rows.add(row);
+        return platform;
+    }
 
-		int totalChanged = 0;
-		try {
-			totalChanged = loader.insertRows("Platform", rows);
-		} catch (CommandException e) {
-			try {
-				totalChanged = loader.updateRows("Platform", rows);
-			} catch (CommandException e2) {
-				System.out.println("[ERROR] Could not insert or update Platform(ies)");
-			}
-		}
-		return totalChanged;
-	}
+    @Override
+    public boolean saveToTripleStore() {
+        if (uri == null || uri.equals("")) {
+            System.out.println("[ERROR] Trying to save Platform without assigning an URI");
+            return false;
+        }
 
-	@Override
-	public void deleteFromTripleStore() {
-		String query = "";
-		if (this.getUri() == null || this.getUri().equals("")) {
-			return;
-		}
-		query += NameSpaces.getInstance().printSparqlNameSpaceList();
-		query += DELETE_LINE1;
-		if (this.getUri().startsWith("http")) {
-			query += "<" + this.getUri() + ">";
-		} else {
-			query += this.getUri();
-		}
-		query += DELETE_LINE3;
-		query += LINE_LAST;
-		UpdateRequest request = UpdateFactory.create(query);
-		UpdateProcessor processor = UpdateExecutionFactory.createRemote(
-		        request, CollectionUtil.getCollectionsName(CollectionUtil.METADATA_UPDATE));
-		processor.execute();
-	}
+        deleteFromTripleStore();
 
-	@Override
-	public int compareTo(Platform another) {
-		return this.getLabel().compareTo(another.getLabel());
-	}
+        String insert = "";
+        String plt_uri = "";
+
+        if (this.getUri().startsWith("<")) {
+            plt_uri = this.getUri();
+        } else {
+            plt_uri = "<" + this.getUri() + ">";
+        }
+        insert += NameSpaces.getInstance().printSparqlNameSpaceList();
+        insert += INSERT_LINE1;
+        if (typeUri.startsWith("<")) {
+            insert += plt_uri + " a " + typeUri + " . ";
+        } else {
+            insert += plt_uri + " a <" + typeUri + "> . ";
+        }
+        insert += plt_uri + " rdfs:label  \"" + label + "\" . ";
+        if (comment != null && !comment.equals("")) {
+            insert += plt_uri + " rdfs:comment \"" + comment + "\" .  ";
+        }
+        insert += LINE_LAST;
+
+        try {
+            UpdateRequest request = UpdateFactory.create(insert);
+            UpdateProcessor processor = UpdateExecutionFactory.createRemote(
+                    request, CollectionUtil.getCollectionsName(CollectionUtil.METADATA_UPDATE));
+            processor.execute();
+        } catch (QueryParseException e) {
+            System.out.println("QueryParseException due to update query: " + insert);
+            throw e;
+        }
+
+        return true;
+    }
+
+    @Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
+    public int saveToLabKey(String user_name, String password) {
+        LabkeyDataHandler loader = LabkeyDataHandler.createDefault(user_name, password);
+        List< Map<String, Object> > rows = new ArrayList< Map<String, Object> >();
+        Map<String, Object> row = new HashMap<String, Object>();
+        row.put("hasURI", URIUtils.replaceNameSpaceEx(getUri()));
+        row.put("a", URIUtils.replaceNameSpaceEx(typeUri));
+        row.put("rdfs:label", getLabel());
+        row.put("rdfs:comment", getComment());
+        rows.add(row);
+
+        int totalChanged = 0;
+        try {
+            totalChanged = loader.insertRows("Platform", rows);
+        } catch (CommandException e) {
+            try {
+                totalChanged = loader.updateRows("Platform", rows);
+            } catch (CommandException e2) {
+                System.out.println("[ERROR] Could not insert or update Platform(ies)");
+            }
+        }
+        return totalChanged;
+    }
+
+    @Override
+    public void deleteFromTripleStore() {
+        String query = "";
+        if (this.getUri() == null || this.getUri().equals("")) {
+            return;
+        }
+        query += NameSpaces.getInstance().printSparqlNameSpaceList();
+        query += DELETE_LINE1;
+        if (this.getUri().startsWith("http")) {
+            query += "<" + this.getUri() + ">";
+        } else {
+            query += this.getUri();
+        }
+        query += DELETE_LINE3;
+        query += LINE_LAST;
+        UpdateRequest request = UpdateFactory.create(query);
+        UpdateProcessor processor = UpdateExecutionFactory.createRemote(
+                request, CollectionUtil.getCollectionsName(CollectionUtil.METADATA_UPDATE));
+        processor.execute();
+    }
+
+    @Override
+    public int compareTo(Platform another) {
+        return this.getLabel().compareTo(another.getLabel());
+    }
 
     @Override
     public boolean saveToSolr() {

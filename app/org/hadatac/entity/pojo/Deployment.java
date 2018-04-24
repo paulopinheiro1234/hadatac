@@ -10,6 +10,7 @@ import org.apache.jena.query.Query;
 import org.apache.jena.query.QueryExecution;
 import org.apache.jena.query.QueryExecutionFactory;
 import org.apache.jena.query.QueryFactory;
+import org.apache.jena.query.QueryParseException;
 import org.apache.jena.query.QuerySolution;
 import org.apache.jena.query.ResultSet;
 import org.apache.jena.query.ResultSetFactory;
@@ -49,7 +50,7 @@ public class Deployment extends HADatAcThing {
     public static String LINE3 = INDENT1 + "a         vstoi:Deployment;  ";
 
     public static String DELETE_LINE3 = INDENT1 + " ?p ?o . ";
-    
+
     public static String LINE3_LEGACY = INDENT1 + "a         vstoi:Deployment;  ";
 
     public static String PLATFORM_PREDICATE =     INDENT1 + "vstoi:hasPlatform        ";
@@ -298,7 +299,7 @@ public class Deployment extends HADatAcThing {
 
     public static Deployment find(String deployment_uri) {
         System.out.println("Current URI for FIND DEPLOYMENT: " + deployment_uri);
-        
+
         Deployment deployment = null;
         String queryString = NameSpaces.getInstance().printSparqlNameSpaceList();
         if (deployment_uri.startsWith("http")) {
@@ -434,7 +435,7 @@ public class Deployment extends HADatAcThing {
         row.put("prov:startedAtTime", getStartedAt());
         row.put("prov:endedAtTime", getEndedAt());
         rows.add(row);
-        
+
         int totalChanged = 0;
         try {
             totalChanged = loader.insertRows("Deployment", rows);
@@ -445,7 +446,7 @@ public class Deployment extends HADatAcThing {
                 System.out.println("[ERROR] Could not insert or update Deployment(s)");
             }
         }
-        
+
         return totalChanged;
     }
 
@@ -471,11 +472,17 @@ public class Deployment extends HADatAcThing {
             insert += END_TIME_PREDICATE + "\"" + this.getEndedAt() + TIME_XMLS + "  ";
         }
         insert += LINE_LAST;
-        UpdateRequest request = UpdateFactory.create(insert);
-        UpdateProcessor processor = UpdateExecutionFactory.createRemote(
-                request, CollectionUtil.getCollectionsName(CollectionUtil.METADATA_UPDATE));
-        processor.execute();
-        
+
+        try {
+            UpdateRequest request = UpdateFactory.create(insert);
+            UpdateProcessor processor = UpdateExecutionFactory.createRemote(
+                    request, CollectionUtil.getCollectionsName(CollectionUtil.METADATA_UPDATE));
+            processor.execute();
+        } catch (QueryParseException e) {
+            System.out.println("QueryParseException due to update query: " + insert);
+            throw e;
+        }
+
         return true;
     }
 

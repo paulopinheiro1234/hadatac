@@ -9,6 +9,7 @@ import org.apache.jena.query.Query;
 import org.apache.jena.query.QueryExecution;
 import org.apache.jena.query.QueryExecutionFactory;
 import org.apache.jena.query.QueryFactory;
+import org.apache.jena.query.QueryParseException;
 import org.apache.jena.query.QuerySolution;
 import org.apache.jena.query.ResultSet;
 import org.apache.jena.query.ResultSetFactory;
@@ -205,9 +206,9 @@ public class Sample extends StudyObject {
             System.out.println("[ERROR] Trying to save SP without assigning DAS's URI");
             return false;
         }
-        
+
         deleteFromTripleStore();
-        
+
         String sp_uri = "";
         if (this.getUri().startsWith("<")) {
             sp_uri = this.getUri();
@@ -247,12 +248,17 @@ public class Sample extends StudyObject {
             } 
         }
         insert += LINE_LAST;
-        System.out.println("SP insert query (pojo's save): <" + insert + ">");
-        UpdateRequest request = UpdateFactory.create(insert);
-        UpdateProcessor processor = UpdateExecutionFactory.createRemote(
-                request, CollectionUtil.getCollectionsName(CollectionUtil.METADATA_UPDATE));
-        processor.execute();
-        
+
+        try {
+            UpdateRequest request = UpdateFactory.create(insert);
+            UpdateProcessor processor = UpdateExecutionFactory.createRemote(
+                    request, CollectionUtil.getCollectionsName(CollectionUtil.METADATA_UPDATE));
+            processor.execute();
+        } catch (QueryParseException e) {
+            System.out.println("QueryParseException due to update query: " + insert);
+            throw e;
+        }
+
         return true;
     }
 
@@ -295,7 +301,7 @@ public class Sample extends StudyObject {
         for (Map<String,Object> r : rows) {
             System.out.println("deleting sample " + r.get("hasURI"));
         }
-        
+
         try {
             return loader.deleteRows("Sample", rows);
         } catch (CommandException e) {
@@ -304,7 +310,7 @@ public class Sample extends StudyObject {
             return 0;
         }
     }
-    
+
     @Override
     public void deleteFromTripleStore() {
         String query = "";

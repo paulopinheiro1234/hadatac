@@ -101,7 +101,7 @@ public class SDD {
 		}
 		
 		for (Record record : file.getRecords()) {
-			codeMappings.put(record.getValueByColumnIndex(0), record.getValueByColumnIndex(1));
+			codeMappings.put(record.getValueByColumnIndex(0).toLowerCase(), record.getValueByColumnIndex(1));
 		}
 	}
 	

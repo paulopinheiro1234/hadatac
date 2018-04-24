@@ -7,13 +7,11 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.poi.poifs.property.Child;
 import org.hadatac.console.controllers.annotator.AnnotationLog;
 import org.hadatac.data.api.DataFactory;
 import org.hadatac.data.model.ParsingResult;
@@ -33,8 +31,6 @@ public class AnnotationWorker {
                 ConfigProp.getPathUnproc(), 
                 ConfigProp.getDefaultOwnerEmail());
     }
-    
-    public static List<String> m_list = new ArrayList<String>();
 
     public static void autoAnnotate() {
         if(ConfigProp.getPropertyValue("autoccsv.config", "auto").equals("off")){
@@ -256,14 +252,15 @@ public class AnnotationWorker {
         GeneratorChain chain = new GeneratorChain();
         chain.addGenerator(new SSDGenerator(SSDsheet));
         chain.addGenerator(new SubjectGenerator(SBJsheet));
-        chain.addGenerator(new MotherGenerator(MOMsheet));
-        chain.addGenerator(new SampleSubjectMapper(SSAPsheet));
-        chain.addGenerator(new SampleSubjectMapper(MSAPsheet));
-        // chain.addGenerator(new MotherSampleGenerator());
+        
+        MotherGenerator motherGenerator = new MotherGenerator(MOMsheet);
+        chain.addGenerator(motherGenerator);
+        chain.addGenerator(new SampleSubjectMapper(SSAPsheet, motherGenerator));
+        chain.addGenerator(new SampleSubjectMapper(MSAPsheet, motherGenerator));
+        chain.addGenerator(new TimeInstantGenerator(TIMEsheet));
 
         return chain;
     }
-
 
     public static boolean annotateDAFile(DataFile dataFile, RecordFile recordFile) {
         System.out.println("annotateDAFile: [" + dataFile.getFileName() + "]");

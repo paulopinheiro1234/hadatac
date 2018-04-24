@@ -9,6 +9,7 @@ import java.util.Map;
 
 import javax.inject.Inject;
 
+import org.apache.commons.io.FileUtils;
 import org.hadatac.console.controllers.AuthApplication;
 import org.hadatac.console.controllers.dataacquisitionsearch.routes;
 import org.hadatac.console.controllers.annotator.AnnotationLog;
@@ -35,177 +36,178 @@ import play.mvc.Result;
 
 
 public class Downloader extends Controller {
-	
-	@Inject
-	FormFactory formFactory;
 
-	@Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-	public Result index() {		
-		final SysUser user = AuthApplication.getLocalUser(session());
+    @Inject
+    FormFactory formFactory;
 
-		List<DataFile> files = null;
+    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
+    public Result index() {		
+        final SysUser user = AuthApplication.getLocalUser(session());
 
-		String path = ConfigProp.getPathDownload();
+        List<DataFile> files = null;
 
-		if (user.isDataManager()) {
-			files = DataFile.findAll(DataFile.CREATED);
-			files.addAll(DataFile.findAll(DataFile.CREATING));
-		} else {
-			files = DataFile.find(user.getEmail(), DataFile.CREATED);
-			files.addAll(DataFile.find(user.getEmail(), DataFile.CREATING));
-		}
+        String path = ConfigProp.getPathDownload();
 
-		DataFile.filterNonexistedFiles(path, files);
+        if (user.isDataManager()) {
+            files = DataFile.findAll(DataFile.CREATED);
+            files.addAll(DataFile.findAll(DataFile.CREATING));
+        } else {
+            files = DataFile.find(user.getEmail(), DataFile.CREATED);
+            files.addAll(DataFile.find(user.getEmail(), DataFile.CREATING));
+        }
 
-		return ok(downloader.render(files, user.isDataManager()));
-	}
+        DataFile.filterNonexistedFiles(path, files);
 
-	@Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-	public Result postIndex() {
-		return index();
-	}
+        return ok(downloader.render(files, user.isDataManager()));
+    }
 
-	@Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-	public Result downloadDataFile(String file_name) {
-		String path = ConfigProp.getPathDownload();
-		return ok(new File(path + "/" + file_name));
-	}
+    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
+    public Result postIndex() {
+        return index();
+    }
 
-	@Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-	public Result deleteDataFile(String file_name) {
-		final SysUser user = AuthApplication.getLocalUser(session());
-		DataFile dataFile = null;
-		if (user.isDataManager()) {
-			dataFile = DataFile.findByName(null, file_name);
-		}
-		else {
-			dataFile = DataFile.findByName(user.getEmail(), file_name);
-		}
-		if (null == dataFile) {
-			return badRequest("You do NOT have the permission to operate this file!");
-		}
+    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
+    public Result downloadDataFile(String file_name) {
+        String path = ConfigProp.getPathDownload();
+        return ok(new File(path + "/" + file_name));
+    }
 
-		AnnotationLog.delete(file_name);
-		dataFile.setStatus(DataFile.DELETED);
-		dataFile.delete();
+    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
+    public Result deleteDataFile(String file_name) {
+        final SysUser user = AuthApplication.getLocalUser(session());
+        DataFile dataFile = null;
+        if (user.isDataManager()) {
+            dataFile = DataFile.findByName(null, file_name);
+        }
+        else {
+            dataFile = DataFile.findByName(user.getEmail(), file_name);
+        }
+        if (null == dataFile) {
+            return badRequest("You do NOT have the permission to operate this file!");
+        }
 
-		String path = ConfigProp.getPathDownload();
-		File file = new File(path + "/" + file_name);
-		file.delete();
+        AnnotationLog.delete(file_name);
+        dataFile.setStatus(DataFile.DELETED);
+        dataFile.delete();
 
-		return redirect(routes.Downloader.index());
-	}
-	
-	@Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
-	public Result assignFileOwner(String ownerEmail, String selectedFile) {	
-		return ok(assignOption.render(User.getUserEmails(),
-				routes.Downloader.processOwnerForm(ownerEmail, selectedFile),
-				"Owner", 
-				"Selected File", 
-				selectedFile));
-	}
+        String path = ConfigProp.getPathDownload();
+        File file = new File(path + "/" + file_name);
+        file.delete();
 
-	@Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
-	public Result postAssignFileOwner(String ownerEmail, String selectedFile) {
-		return assignFileOwner(ownerEmail, selectedFile);
-	}
+        return redirect(routes.Downloader.index());
+    }
 
-	@Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
-	public Result processOwnerForm(String ownerEmail, String selectedFile) {
-		Form<AssignOptionForm> form = formFactory.form(AssignOptionForm.class).bindFromRequest();
-		AssignOptionForm data = form.get();
+    @Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
+    public Result assignFileOwner(String ownerEmail, String selectedFile) {	
+        return ok(assignOption.render(User.getUserEmails(),
+                routes.Downloader.processOwnerForm(ownerEmail, selectedFile),
+                "Owner", 
+                "Selected File", 
+                selectedFile));
+    }
 
-		if (form.hasErrors()) {
-			System.out.println("HAS ERRORS");
-			return badRequest(assignOption.render(User.getUserEmails(),
-					routes.Downloader.processOwnerForm(ownerEmail, selectedFile),
-					"Owner",
-					"Selected File",
-					selectedFile));
-		} else {
-			DataFile file = DataFile.findByName(ownerEmail, selectedFile);
-			if (file == null) {
-				file = new DataFile(selectedFile);
-				file.setOwnerEmail(AuthApplication.getLocalUser(session()).getEmail());
-				file.setStatus(DataFile.CREATING);
-				file.setSubmissionTime(new SimpleDateFormat("yyyy/MM/dd HH:mm:ss").format(new Date()));
-			}
-			file.setOwnerEmail(data.getOption());
-			file.save();
-			return redirect(routes.Downloader.index());
-		}
-	}
-	
-	@Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-	public Result checkAnnotationLog(String file_name) {
-		AnnotationLog log = AnnotationLog.find(file_name);
-		if (null == log) {
-			return ok(annotation_log.render(Feedback.print(Feedback.WEB, ""), routes.Downloader.index().url()));
-		}
-		else {
-			return ok(annotation_log.render(Feedback.print(Feedback.WEB, log.getLog()), routes.Downloader.index().url()));
-		}
-	}
-	
-	@Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-	public Result checkCompletion(String file_name) {
-		Map<String, Object> result = new HashMap<String, Object>();
-		
-		DataFile dataFile = DataFile.findByName(file_name);
-		if (dataFile != null) {
-		    result.put("CompletionPercentage", dataFile.getCompletionPercentage());
-	        result.put("Status", dataFile.getStatus());
-	        result.put("CompletionTime", dataFile.getCompletionTime());
-		} else {
-		    result.put("CompletionPercentage", "");
+    @Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
+    public Result postAssignFileOwner(String ownerEmail, String selectedFile) {
+        return assignFileOwner(ownerEmail, selectedFile);
+    }
+
+    @Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
+    public Result processOwnerForm(String ownerEmail, String selectedFile) {
+        Form<AssignOptionForm> form = formFactory.form(AssignOptionForm.class).bindFromRequest();
+        AssignOptionForm data = form.get();
+
+        if (form.hasErrors()) {
+            System.out.println("HAS ERRORS");
+            return badRequest(assignOption.render(User.getUserEmails(),
+                    routes.Downloader.processOwnerForm(ownerEmail, selectedFile),
+                    "Owner",
+                    "Selected File",
+                    selectedFile));
+        } else {
+            DataFile file = DataFile.findByName(ownerEmail, selectedFile);
+            if (file == null) {
+                file = new DataFile(selectedFile);
+                file.setOwnerEmail(AuthApplication.getLocalUser(session()).getEmail());
+                file.setStatus(DataFile.CREATING);
+                file.setSubmissionTime(new SimpleDateFormat("yyyy/MM/dd HH:mm:ss").format(new Date()));
+            }
+            file.setOwnerEmail(data.getOption());
+            file.save();
+            return redirect(routes.Downloader.index());
+        }
+    }
+
+    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
+    public Result checkAnnotationLog(String file_name) {
+        AnnotationLog log = AnnotationLog.find(file_name);
+        if (null == log) {
+            return ok(annotation_log.render(Feedback.print(Feedback.WEB, ""), routes.Downloader.index().url()));
+        }
+        else {
+            return ok(annotation_log.render(Feedback.print(Feedback.WEB, log.getLog()), routes.Downloader.index().url()));
+        }
+    }
+
+    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
+    public Result checkCompletion(String file_name) {
+        Map<String, Object> result = new HashMap<String, Object>();
+
+        DataFile dataFile = DataFile.findByName(file_name);
+        if (dataFile != null) {
+            result.put("CompletionPercentage", dataFile.getCompletionPercentage());
+            result.put("Status", dataFile.getStatus());
+            result.put("CompletionTime", dataFile.getCompletionTime());
+        } else {
+            result.put("CompletionPercentage", "");
             result.put("Status", "");
             result.put("CompletionTime", "");
-		}
-        
+        }
+
         return ok(Json.toJson(result));
-	}
-	
-	public static int generateCSVFile(List<Measurement> measurements, 
-			String facets, List<String> selectedFields, String ownerEmail) {
-		Date date = new Date();
-		String fileName = "download_" + new SimpleDateFormat("yyyy_MM_dd_HH_mm_ss").format(date) + ".csv";
-		File file = new File(ConfigProp.getPathDownload() + "/" + fileName);
-		
-		AnnotationLog log = new AnnotationLog(fileName);
-		log.addline(Feedback.println(Feedback.WEB, "Facets: " + facets));
-		log.addline(Feedback.println(Feedback.WEB, "Selected Fields: " + selectedFields));
-		
-		DataFile dataFile = new DataFile(fileName);
-		dataFile.setOwnerEmail(ownerEmail);
-		dataFile.setStatus(DataFile.CREATING);
-		dataFile.setSubmissionTime(new SimpleDateFormat("yyyy/MM/dd HH:mm:ss").format(date));
-		dataFile.save();
-    	
-    	Measurement.outputAsCSV(measurements, selectedFields, file);
-    	System.out.println("Generated CSV files ...");
-		
-		return 0;
     }
-	
-	public static int generateCSVFileByAlignment(List<Measurement> measurements, 
-	        Alignment alignment, String facets, String ownerEmail) {
-	    Date date = new Date();
-        String fileName = "alignment_" + new SimpleDateFormat("yyyy_MM_dd_HH_mm_ss").format(date) + ".csv";
+
+    public static int generateCSVFile(List<Measurement> measurements, 
+            String facets, List<String> selectedFields, String ownerEmail) {
+        Date date = new Date();
+        String fileName = "download_" + new SimpleDateFormat("yyyy_MM_dd_HH_mm_ss").format(date) + ".csv";
         File file = new File(ConfigProp.getPathDownload() + "/" + fileName);
-        
+
         AnnotationLog log = new AnnotationLog(fileName);
         log.addline(Feedback.println(Feedback.WEB, "Facets: " + facets));
-        
+        log.addline(Feedback.println(Feedback.WEB, "Selected Fields: " + selectedFields));
+
         DataFile dataFile = new DataFile(fileName);
         dataFile.setOwnerEmail(ownerEmail);
         dataFile.setStatus(DataFile.CREATING);
         dataFile.setSubmissionTime(new SimpleDateFormat("yyyy/MM/dd HH:mm:ss").format(date));
         dataFile.save();
-        
-        Measurement.outputAsCSVByAlignment(measurements, alignment, file, dataFile);
+
+        Measurement.outputAsCSV(measurements, selectedFields, file);
         System.out.println("Generated CSV files ...");
-		
-		return 0;
+
+        return 0;
+    }
+
+    public static int generateCSVFileByAlignment(List<Measurement> measurements, 
+            String facets, String ownerEmail) {
+        Date date = new Date();
+        String fileName = "alignment_" + new SimpleDateFormat("yyyy_MM_dd_HH_mm_ss").format(date) + ".csv";
+        File file = new File(ConfigProp.getPathDownload() + "/" + fileName);
+
+        AnnotationLog log = new AnnotationLog(fileName);
+        log.addline(Feedback.println(Feedback.WEB, "Facets: " + facets));
+
+        DataFile dataFile = new DataFile(fileName);
+        dataFile.setOwnerEmail(ownerEmail);
+        dataFile.setStatus(DataFile.CREATING);
+        dataFile.setSubmissionTime(new SimpleDateFormat("yyyy/MM/dd HH:mm:ss").format(date));
+        dataFile.save();
+        System.out.println("Created download " + fileName);
+
+        Measurement.outputAsCSVByAlignment(measurements, file);
+        System.out.println("Generated CSV files ...");
+
+        return 0;
     }
 }
 

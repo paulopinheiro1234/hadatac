@@ -70,7 +70,9 @@ public class Measurement extends HADatAcThing implements Runnable {
     @Field("pid_str")
     private String pid;
     @Field("sid_str")
-    private String sid;	
+    private String sid;
+    @Field("role_uri_str")
+    private String roleUri;
     @Field("unit_uri_str")
     private String unitUri;
     @Field("daso_uri_str")
@@ -154,6 +156,14 @@ public class Measurement extends HADatAcThing implements Runnable {
 
     public void setSID(String objectUri) {
         this.sid = objectUri;
+    }
+
+    public String getRoleUri() {
+        return roleUri;
+    }
+
+    public void setRoleUri(String roleUri) {
+        this.roleUri = roleUri;
     }
 
     public String getObjectPID() {
@@ -849,11 +859,15 @@ public class Measurement extends HADatAcThing implements Runnable {
         m.setDasoUri(SolrUtils.getFieldValue(doc, "daso_uri_str"));
         m.setDasaUri(SolrUtils.getFieldValue(doc, "dasa_uri_str"));
         m.setObjectUri(SolrUtils.getFieldValue(doc, "object_uri_str"));
+        m.setRoleUri(SolrUtils.getFieldValue(doc, "role_uri_str"));
         m.setInRelationToUri(SolrUtils.getFieldValue(doc, "in_relation_to_uri_str"));
         m.setPID(SolrUtils.getFieldValue(doc, "pid_str"));
         m.setSID(SolrUtils.getFieldValue(doc, "sid_str"));
         m.setAbstractTime(SolrUtils.getFieldValue(doc, "named_time_str"));
         m.setOriginalValue(SolrUtils.getFieldValue(doc, "original_value_str"));
+        m.setEntityUri(SolrUtils.getFieldValue(doc, "entity_uri_str"));
+        m.setCharacteristicUri(SolrUtils.getFieldValue(doc, "characteristic_uri_str"));
+        m.setUnitUri(SolrUtils.getFieldValue(doc, "unit_uri_str"));
 
         String value = SolrUtils.getFieldValue(doc, "value_str");
         if (cachedURILabels.containsKey(value)) {
@@ -861,10 +875,6 @@ public class Measurement extends HADatAcThing implements Runnable {
         } else {
             m.setValue(value);
         }
-
-        m.setEntityUri(SolrUtils.getFieldValue(doc, "entity_uri_str"));
-        m.setCharacteristicUri(SolrUtils.getFieldValue(doc, "characteristic_uri_str"));
-        m.setUnitUri(SolrUtils.getFieldValue(doc, "unit_uri_str"));
 
         ObjectAccessSpec da = null;
         if (cachedDA == null) {
@@ -912,7 +922,7 @@ public class Measurement extends HADatAcThing implements Runnable {
     }
 
     public static void outputAsCSV(List<Measurement> measurements, 
-            List<String> fieldNames, File file) {		
+            List<String> fieldNames, File file) {
         try {
             // Create headers
             FileUtils.writeStringToFile(file, String.join(",", fieldNames) + "\n", "utf-8", true);
@@ -961,9 +971,120 @@ public class Measurement extends HADatAcThing implements Runnable {
         }
     }
 
-    public static void outputAsCSVByAlignment(List<Measurement> measurements, 
-            Alignment alignment, File file, DataFile dataFile) {        
-        try {  
+    public static void outputAsCSVByAlignment(List<Measurement> measurements, File file) {        
+        try {
+            // Write empty string to create the file
+            FileUtils.writeStringToFile(file, "", "utf-8", true);
+            
+            // Initiate Alignment and Results
+            Alignment alignment = new Alignment();
+            Map<String, Map<String, String>> results = new HashMap<String, Map<String, String>>();
+
+            // Prepare rows: Measurements are compared already collected alignment attributes (role/entity/attribute/inrelationto/unit/time)
+            //               New alignment attributes are created for measurements with no corresponging alignment attributes.
+            int i = 1;
+            int prev_ratio = 0;
+            int total = measurements.size();
+            DataFile dataFile = null;
+            for (Measurement m : measurements) {
+                StudyObject obj = null;
+                String replacementUri = null;
+                StudyObject replacementObj = null;
+                if (m.getObjectUri() != null && !m.getObjectUri().equals("")) {
+                    if (!results.containsKey(m.getObjectUri())) {
+                        obj = StudyObject.find(m.getObjectUri());
+                        if (obj == null) {
+                            System.out.println("[ERROR] could not find object with uri " + m.getObjectUri());
+                        } else {
+                            Entity objEntity = Entity.find(obj.getTypeUri());
+                            List<String> scope = StudyObject.retrieveScopeUris(obj.getUri());
+                            if (scope != null && scope.size() > 0) {
+                                //for (String str : scope) {
+                                //    System.out.println("Scope for " + obj.getUri() + " is [" + str + "]");
+                                //}
+                                replacementUri = scope.get(0);
+                                if (alignment.containsObject(replacementUri)) {
+                                    replacementObj = alignment.getObject(replacementUri);
+                                } else {
+                                    replacementObj = StudyObject.find(replacementUri);
+                                }
+                            }
+                            AlignmentEntityRole entRole = new AlignmentEntityRole(objEntity,"");
+                            if (!alignment.containsRole(entRole.getKey())) {
+                                alignment.addRole(entRole);
+                            }
+                            if (replacementObj != null && replacementObj.getUri() != null && !replacementObj.getUri().equals("")) {
+                                //System.out.println("Replacing " + obj.getUri() + " [" + entRole + "] with " + replacementObj.getUri());
+                                if (!alignment.containsReplacementUri(obj.getUri())) {
+                                    alignment.addReplacementUri(obj.getUri(),replacementObj.getUri());
+                                }
+                                obj = replacementObj;
+                            }
+                            if (!alignment.containsObject(obj.getUri())) {
+                                alignment.addObject(obj);
+                                results.put(obj.getUri(), new HashMap<String, String>());
+                                results.get(m.getObjectUri()).put(alignment.objectKey(entRole), m.getObjectPID());
+                            }
+                            if (replacementUri != null) {
+                                //System.out.println("SID: " + m.getObjectSID());
+                                //results.get(m.getObjectUri()).put(alignment.objectKey(entRole), m.getObjectSID());
+                            }
+                            //System.out.println("Processing Object " + totObj++ + " with PID " + m.getObjectPID());
+                        }
+                    }
+
+                    String key = alignment.measurementKey(m);
+                    if (key != null) {
+                        results.get(alignment.replaceUri(m.getObjectUri())).put(key, m.getValue());
+                    } else {
+                        System.out.println("[ERROR] the following measurement could not match any alignment attribute (and no alignment " + 
+                                "attribute could be created for this measurement): " + 
+                                m.getEntityUri() + " " + m.getCharacteristicUri());
+                    }
+                }
+
+                double ratio = (double)i / total * 100;
+                int current_ratio = (int)ratio;
+                if (current_ratio > prev_ratio) {
+                    prev_ratio = current_ratio;
+                    System.out.println("Progress: " + current_ratio + "%");
+                    
+                    dataFile = DataFile.findByName(file.getName());
+                    if (dataFile != null) {
+                        if (dataFile.getStatus() == DataFile.DELETED) {
+                            dataFile.delete();
+                            return;
+                        }
+                        dataFile.setCompletionPercentage(current_ratio);
+                        dataFile.save();
+                    } else {
+                        return;
+                    }
+                }
+                i++;
+            }
+
+            // Write headers: Labels are derived from collected alignment attributes
+            List<AlignmentAttribute> aaList = alignment.getAlignmentAttributes();
+            aaList.sort(new Comparator<AlignmentAttribute>() {
+                @Override
+                public int compare(AlignmentAttribute o1, AlignmentAttribute o2) {
+                    return o1.toString().compareTo(o2.toString());
+                }
+            });
+            System.out.println("aligned attributes size: " + aaList.size());
+            boolean first = true;
+            for (AlignmentAttribute aa : aaList) {
+                if (first) {
+                    FileUtils.writeStringToFile(file, "\"" + aa + "\"", "utf-8", true);
+                    first = false;
+                } else {
+                    FileUtils.writeStringToFile(file, ",\"" + aa + "\"", "utf-8", true);
+                }
+            }
+            FileUtils.writeStringToFile(file, "\n", "utf-8", true);
+
+            // Sort collected objects by their original ID
             List<StudyObject> objects = alignment.getObjects();
             objects.sort(new Comparator<StudyObject>() {
                 @Override
@@ -973,71 +1094,36 @@ public class Measurement extends HADatAcThing implements Runnable {
             });
             System.out.println("objects size: " + objects.size());
 
-            List<Attribute> attributes = alignment.getAttributes();
-            attributes.sort(new Comparator<Attribute>() {
-                @Override
-                public int compare(Attribute o1, Attribute o2) {
-                    return o1.getLabel().compareTo(o2.getLabel());
-                }
-            });
-            System.out.println("attributes size: " + attributes.size());
-
-            // Write headers
-            int count = 0;
-            FileUtils.writeStringToFile(file, "\"" + count++ + "-object\"", "utf-8", true);
-
-            for (Attribute attrib : attributes) {
-                FileUtils.writeStringToFile(file, ",\"" + count++ + "-" + attrib.getLabel() + "\"", "utf-8", true);
-            }
-
-            FileUtils.writeStringToFile(file, "\n", "utf-8", true);
-
-            // Prepare rows
-            Map<String, Map<String, String>> results = new HashMap<String, Map<String, String>>();
-
-            int i = 1;
-            int total = measurements.size();
-            for (Measurement m : measurements) {
-                if (!m.getObjectUri().isEmpty() 
-                        && alignment.containsObject(m.getObjectUri())) {
-                    String pid = alignment.getObject(m.getObjectUri()).getOriginalId();
-                    if (!results.containsKey(pid)) {
-                        results.put(pid, new HashMap<String, String>());
-                    }
-
-                    if (alignment.containsAttribute(m.getCharacteristicUri())) {
-                        results.get(pid).put(m.getCharacteristicUri(), m.getValue());
-                    }
-                }
-
-                int prev_ratio = 0;
-                double ratio = (double)i / total * 100;
-                if (((int)ratio) != prev_ratio) {
-                    prev_ratio = (int)ratio;
-                    dataFile.setCompletionPercentage((int)ratio);
-                    dataFile.save();
-                }
-                i++;
-            }
-
-            // Write rows
+            // Write rows: traverse collected object. From these objects, traverse alignment objects
             for (StudyObject obj : objects) {
-                if (results.containsKey(obj.getOriginalId())) {
-                    FileUtils.writeStringToFile(file, "\"" + obj.getOriginalId() + "\"", "utf-8", true);
-                    Map<String, String> row = results.get(obj.getOriginalId());
-                    for (Attribute attrib : attributes) {
-                        FileUtils.writeStringToFile(file, ",\"" + row.get(attrib.getUri()) + "\"", "utf-8", true);
+                if (results.containsKey(obj.getUri())) {
+                    Map<String, String> row = results.get(obj.getUri());
+                    first = true;
+                    for (AlignmentAttribute aa : aaList) {
+                        if (first) {
+                            FileUtils.writeStringToFile(file, "\"" + row.get(aa.toString()) + "\"", "utf-8", true);
+                            first = false;
+                        } else {
+                            FileUtils.writeStringToFile(file, ",\"" + row.get(aa.toString()) + "\"", "utf-8", true);
+                        }
                     }
                     FileUtils.writeStringToFile(file, "\n", "utf-8", true);
                 }
             }
 
             System.out.println("Finished writing!");
-
-            dataFile.setCompletionPercentage(100);
-            dataFile.setCompletionTime(new SimpleDateFormat("yyyy/MM/dd HH:mm:ss").format(new Date()));
-            dataFile.setStatus(DataFile.CREATED);
-            dataFile.save();
+            
+            dataFile = DataFile.findByName(file.getName());
+            if (dataFile != null) {
+                if (dataFile.getStatus() == DataFile.DELETED) {
+                    dataFile.delete();
+                    return;
+                }
+                dataFile.setCompletionPercentage(100);
+                dataFile.setCompletionTime(new SimpleDateFormat("yyyy/MM/dd HH:mm:ss").format(new Date()));
+                dataFile.setStatus(DataFile.CREATED);
+                dataFile.save();
+            }
         } catch (IOException e) {
             e.printStackTrace();
         }

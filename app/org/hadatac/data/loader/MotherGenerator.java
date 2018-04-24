@@ -2,7 +2,6 @@ package org.hadatac.data.loader;
 
 import java.lang.String;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import org.hadatac.utils.ConfigProp;
@@ -59,7 +58,6 @@ public class MotherGenerator extends BasicGenerator {
                 getCohortUri(record), getLabel(record));
         obj.setRoleUri(URIUtils.replacePrefixEx("chear:Mother"));
         
-        AnnotationWorker.m_list.add(getOriginalID(record));
         return obj;
     }
     

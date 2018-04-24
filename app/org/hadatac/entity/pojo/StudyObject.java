@@ -10,6 +10,7 @@ import org.apache.jena.query.Query;
 import org.apache.jena.query.QueryExecution;
 import org.apache.jena.query.QueryExecutionFactory;
 import org.apache.jena.query.QueryFactory;
+import org.apache.jena.query.QueryParseException;
 import org.apache.jena.query.QuerySolution;
 import org.apache.jena.query.ResultSet;
 import org.apache.jena.query.ResultSetFactory;
@@ -155,7 +156,7 @@ public class StudyObject extends HADatAcThing {
         this.scopeUris.add(scopeUri);
     }
 
-    private static List<String> retrieveScopeUris(String obj_uri) {
+    public static List<String> retrieveScopeUris(String obj_uri) {
         List<String> retrievedUris = new ArrayList<String>();
         String queryString = NameSpaces.getInstance().printSparqlNameSpaceList() + 
                 "SELECT  ?scopeUri WHERE { " + 
@@ -477,11 +478,11 @@ public class StudyObject extends HADatAcThing {
             insert += obj_uri + " a " + typeUri + " . ";
         }
         if(!roleUri.isEmpty()){
-	        if (roleUri.startsWith("http")) {
-	            insert += obj_uri + " hasco:hasRole <" + roleUri + "> . ";
-	        } else {
-	            insert += obj_uri + " hasco:hasRole " + roleUri + " . ";
-	        }	
+            if (roleUri.startsWith("http")) {
+                insert += obj_uri + " hasco:hasRole <" + roleUri + "> . ";
+            } else {
+                insert += obj_uri + " hasco:hasRole " + roleUri + " . ";
+            }	
         }
         if (!originalId.equals("")) {
             insert += obj_uri + " hasco:originalID \""  + originalId + "\" .  ";
@@ -512,10 +513,15 @@ public class StudyObject extends HADatAcThing {
         }
 
         insert += LINE_LAST;
-        UpdateRequest request = UpdateFactory.create(insert);
-        UpdateProcessor processor = UpdateExecutionFactory.createRemote(
-                request, CollectionUtil.getCollectionsName(CollectionUtil.METADATA_UPDATE));
-        processor.execute();
+        try {
+            UpdateRequest request = UpdateFactory.create(insert);
+            UpdateProcessor processor = UpdateExecutionFactory.createRemote(
+                    request, CollectionUtil.getCollectionsName(CollectionUtil.METADATA_UPDATE));
+            processor.execute();
+        } catch (QueryParseException e) {
+            System.out.println("QueryParseException due to update query: " + insert);
+            throw e;
+        }
 
         return true;
     }

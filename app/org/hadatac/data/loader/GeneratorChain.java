@@ -15,19 +15,28 @@ public class GeneratorChain {
 
     public boolean generate() {
         for (BasicGenerator generator : chain) {
-            try {				
+            try {			
                 generator.preprocess();
                 generator.createRows();
                 generator.createObjects();
                 generator.postprocess();
-
+            } catch (Exception e) {
+                System.out.println(generator.getErrorMsg(e));
+                e.printStackTrace();
+                AnnotationLog.printException(generator.getErrorMsg(e), generator.getFileName());
+                return false;
+            }
+        }
+        
+        // Commit if no errors occurred
+        for (BasicGenerator generator : chain) {
+            try {
                 generator.commitRowsToTripleStore(generator.getRows());
                 //generator.commitRowsToLabKey(generator.getRows());
 
                 generator.commitObjectsToTripleStore(generator.getObjects());
                 //generator.commitObjectsToLabKey(generator.getObjects());
                 generator.commitObjectsToSolr(generator.getObjects());
-
             } catch (Exception e) {
                 System.out.println(generator.getErrorMsg(e));
                 e.printStackTrace();

@@ -6,8 +6,10 @@ import java.util.Map;
 import java.util.HashMap;
 
 import org.apache.commons.lang3.text.WordUtils;
+import org.apache.jena.query.Query;
 import org.apache.jena.query.QueryExecution;
 import org.apache.jena.query.QueryExecutionFactory;
+import org.apache.jena.query.QueryFactory;
 import org.apache.jena.query.QuerySolution;
 import org.apache.jena.query.ResultSet;
 import org.apache.jena.query.ResultSetFactory;
@@ -150,6 +152,43 @@ public class EntityRole extends HADatAcThing implements Comparable<EntityRole> {
 
 		return results;
 	}
+	
+	public static Map<String, String> findObjRoleMappings(String studyUri) {
+        Map<String, String> results = new HashMap<String, String>();        
+        String queryString = NameSpaces.getInstance().printSparqlNameSpaceList() 
+                + "SELECT ?studyObj ?roleUri WHERE { \n"
+                + "{ "
+                + "?studyObj hasco:isMemberOf ?soc . \n"
+                + "?soc a hasco:SubjectGroup . \n"
+                + "?soc hasco:isMemberOf <" + studyUri + "> . \n"
+                + "?studyObj hasco:hasRole ?roleUri . \n"
+                + "} UNION { \n"
+                + "?studyObj hasco:isMemberOf ?soc . \n"
+                + "?soc a hasco:SampleCollection . \n"
+                + "?soc hasco:isMemberOf <" + studyUri + "> . \n"
+                + "?studyObj a ?roleUri . \n"
+                + "}}";
+        
+        // System.out.println("findObjRoleMappings query: " + queryString);
+        
+        Query query = QueryFactory.create(queryString);
+        QueryExecution qexec = QueryExecutionFactory.sparqlService(
+                CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), query);
+        ResultSetRewindable resultsrw = ResultSetFactory.copyResults(qexec.execSelect());
+        qexec.close();
+
+        try {
+            while (resultsrw.hasNext()) {
+                QuerySolution soln = resultsrw.next();
+                results.put(soln.get("studyObj").toString(), soln.get("roleUri").toString());
+            }
+        } catch (Exception e) {
+            System.out.println("EntityRole.findObjRoleMappings() Error: " + e.getMessage());
+            e.printStackTrace();
+        }
+
+        return results;
+    }
 
 	@Override
 	public int compareTo(EntityRole another) {
