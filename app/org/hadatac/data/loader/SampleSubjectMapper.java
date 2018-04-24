@@ -52,7 +52,7 @@ public class SampleSubjectMapper extends BasicGenerator {
         mapCol.clear();
         mapCol.put("type", "rdf:type");
         mapCol.put("originalPID", "CHEAR PID");
-        mapCol.put("originalSID", "originalID");
+        mapCol.put("originalSID", "Full SID");
         try{
             mapCol.put("pilotNum", "CHEAR_Project_ID");
         } catch (QueryExceptionHTTP e) {
