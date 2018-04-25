@@ -318,8 +318,9 @@ public class DataAcquisitionSchemaObject extends HADatAcThing {
                         relationStr);
             }
         } catch (Exception e) {
-            System.out.println("[ERROR] DataAcquisitionSchemaObject. uri: e.Message: " + e.getMessage());
+            System.out.println("[ERROR] DataAcquisitionSchemaObject.find() e.Message: " + e.getMessage());
         }
+        
         return object;
     }
 
@@ -356,9 +357,8 @@ public class DataAcquisitionSchemaObject extends HADatAcThing {
                     }
                 }
             }  catch (Exception e) {
-                System.out.println("[ERROR] DataAcquisitionSchemaObject. uri: e.Message: " + e.getMessage());
+                System.out.println("[ERROR] DataAcquisitionSchemaObject.findBySchema() e.Message: " + e.getMessage());
             }
-
         }
 
         return objects;
