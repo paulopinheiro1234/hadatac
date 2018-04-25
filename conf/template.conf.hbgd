@@ -36,6 +36,7 @@ DAStudyName=Study ID
 DataDictionaryName=data dict
 Epi/Lab=epi/lab
 OwnerEmail=owner email
+PermissionURI=permission uri
 
 # DASA, DASE, DASO Template (Part of SDD)
 Label=Column 
