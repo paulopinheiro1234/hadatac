@@ -64,7 +64,7 @@ public class DASchemaAttrGenerator extends BasicGenerator {
         if (rec.getValueByColumnName(mapCol.get("AttributeOf").trim()).equals("")) {
             return "";
         }
-        //System.out.println("DASchemaAttrGenerator: getAttributeOf() = " + SDDName + "-" + rec.get(mapCol.get("AttributeOf")).replace("??", ""));
+        
         return kbPrefix + "DASO-" + SDDName + "-" + rec.getValueByColumnName(mapCol.get("AttributeOf")).replace(" ", "").replace("_","-").replace("??", "");
     }
 
@@ -83,28 +83,27 @@ public class DASchemaAttrGenerator extends BasicGenerator {
         if (rec.getValueByColumnName(mapCol.get("Time").trim()).equals("")) {
             return "";
         }
-        //System.out.println("DASchemaAttrGenerator: getTime() = " + SDDName + "-" + rec.get(mapCol.get("Time")).trim().replace(" ","").replace("_","-").replace("??", ""));
+        
         return kbPrefix + "DASE-" + SDDName + "-" + rec.getValueByColumnName(mapCol.get("Time")).trim().replace(" ","").replace("_","-").replace("??", "").replace(":", "-");
     }
 
     private String getEntity(Record rec) {
-        if (rec.getValueByColumnName(mapCol.get("AttributeOf")).equals("")) {
+        String daso = rec.getValueByColumnName(mapCol.get("AttributeOf"));
+        if (daso.equals("")) {
             currentHasEntity.put(getLabel(rec), "chear:unknownEntity");
             return "chear:unknownEntity";
         } else {
-            if (codeMap.containsKey(hasEntityMap.get(rec.getValueByColumnName(mapCol.get("AttributeOf"))))) {
-                System.out.println("codeMap: " + codeMap.get(hasEntityMap.get(rec.getValueByColumnName(mapCol.get("AttributeOf")))));
-                currentHasEntity.put(getLabel(rec), codeMap.get(hasEntityMap.get(rec.getValueByColumnName(mapCol.get("AttributeOf")))));
-                return codeMap.get(hasEntityMap.get(rec.getValueByColumnName(mapCol.get("AttributeOf"))));
+            if (codeMap.containsKey(hasEntityMap.get(daso))) {
+                currentHasEntity.put(getLabel(rec), codeMap.get(hasEntityMap.get(daso)));
+                return codeMap.get(hasEntityMap.get(daso));
             } else {
-                //				System.out.println(hasEntityMap.get(getValueByColumnName(rec, mapCol.get("AttributeOf"))).get(1));
-                if (hasEntityMap.containsKey(rec.getValueByColumnName(mapCol.get("AttributeOf")))){
-                    if(codeMap.containsKey(hasEntityMap.get(rec.getValueByColumnName(mapCol.get("AttributeOf"))).get(1))){
-                        currentHasEntity.put(getLabel(rec), codeMap.get(hasEntityMap.get(rec.getValueByColumnName(mapCol.get("AttributeOf"))).get(1)));
-                        return codeMap.get(hasEntityMap.get(rec.getValueByColumnName(mapCol.get("AttributeOf"))).get(1));
+                if (hasEntityMap.containsKey(daso)) {
+                    if(codeMap.containsKey(hasEntityMap.get(daso).get(1))) {
+                        currentHasEntity.put(getLabel(rec), codeMap.get(hasEntityMap.get(daso).get(1)));
+                        return codeMap.get(hasEntityMap.get(daso).get(1));
                     }
-                    currentHasEntity.put(getLabel(rec), hasEntityMap.get(rec.getValueByColumnName(mapCol.get("AttributeOf"))).get(1));
-                    return hasEntityMap.get(rec.getValueByColumnName(mapCol.get("AttributeOf"))).get(1);
+                    currentHasEntity.put(getLabel(rec), hasEntityMap.get(daso).get(1));
+                    return hasEntityMap.get(daso).get(1);
                 }
                 currentHasEntity.put(getLabel(rec), "chear:unknownEntity");
                 return "chear:unknownEntity";

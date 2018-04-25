@@ -640,7 +640,9 @@ public class Measurement extends HADatAcThing implements Runnable {
                 facetHandler);
 
         FacetTree fTreeOC = new FacetTree();
-        fTreeOC.setTargetFacet(ObjectCollection.class);
+        fTreeOC.setTargetFacet(EntityRoleFromSSD.class);
+        fTreeOC.addUpperFacet(ObjectCollection.class);
+        //fTreeOC.setTargetFacet(ObjectCollection.class);
         //fTreeOC.setTargetFacet(StudyObject.class);
         //fTreeOC.addUpperFacet(ObjectCollection.class);
         Pivot pivotOC = getFacetStats(fTreeOC, 
@@ -651,6 +653,7 @@ public class Measurement extends HADatAcThing implements Runnable {
         fTreeEC.setTargetFacet(AttributeInstance.class);
         fTreeEC.addUpperFacet(Indicator.class);
         fTreeEC.addUpperFacet(EntityRole.class);
+        //fTreeEC.addUpperFacet(EntityRoleFromSSD.class);
         fTreeEC.addUpperFacet(EntityInstance.class);
         fTreeEC.addUpperFacet(InRelationToInstance.class);
         Pivot pivotEC = getFacetStats(fTreeEC, 

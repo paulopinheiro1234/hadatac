@@ -74,6 +74,9 @@ public class AnnotationWorker {
                 } else if (file_name.startsWith("ACQ-")) {
                     chain = annotateACQFile(recordFile, true);
                 } else if (file_name.startsWith("SDD-")) {
+                    if (file_name.endsWith(".xlsx")) {
+                        recordFile = new SpreadsheetRecordFile(new File(filePath), "InfoSheet");
+                    }
                     chain = annotateDataAcquisitionSchemaFile(recordFile);
                 } else if (file_name.startsWith("SSD-")) {
                     chain = annotateSSDFile(recordFile);

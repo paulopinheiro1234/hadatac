@@ -529,17 +529,21 @@ public class DataAcquisitionSchema extends HADatAcThing {
         String queryString = NameSpaces.getInstance().printSparqlNameSpaceList()
                 + " SELECT ?subj_or_sample ?id ?obj ?subj_id WHERE { \n"
                 + " { \n"
-                + "		?subj_or_sample a sio:Human . \n"
                 + " 	?subj_or_sample hasco:originalID ?id . \n"
-                + " 	?subj_or_sample hasco:isMemberOf* <" + studyUri + "> . \n"
+                + "     ?subj_or_sample hasco:isMemberOf ?soc . \n"
+                + "     ?soc a hasco:SubjectGroup . \n"
+                + "     ?soc hasco:isMemberOf* <" + studyUri + "> . \n"
                 + " } UNION { \n"
-                + "     ?subj_or_sample a sio:Sample . \n"
                 + " 	?subj_or_sample hasco:originalID ?id . \n"
-                + " 	?subj_or_sample hasco:isMemberOf* <" + studyUri + "> . \n"
+                + "     ?subj_or_sample hasco:isMemberOf ?soc . \n"
+                + "     ?soc a hasco:SampleCollection . \n"
+                + " 	?soc hasco:isMemberOf* <" + studyUri + "> . \n"
                 + " 	?subj_or_sample hasco:hasObjectScope ?obj . \n"
                 + " 	?obj hasco:originalID ?subj_id . \n"
                 + " } \n"
                 + " } \n";
+        
+        System.out.println("findIdUriMappings() queryString: " + queryString);
 
         Query query = QueryFactory.create(queryString);
         QueryExecution qexec = QueryExecutionFactory.sparqlService(

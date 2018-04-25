@@ -362,6 +362,9 @@ public class AutoAnnotator extends Controller {
         } else if (file_name.startsWith("ACQ")) {
             chain = AnnotationWorker.annotateACQFile(recordFile, false);
         } else if (file_name.startsWith("SDD")) {
+            if (file_name.endsWith(".xlsx")) {
+                recordFile = new SpreadsheetRecordFile(file, "InfoSheet");
+            }
             chain = AnnotationWorker.annotateDataAcquisitionSchemaFile(recordFile);
         }
 
