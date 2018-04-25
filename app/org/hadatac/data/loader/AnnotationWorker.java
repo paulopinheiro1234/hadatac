@@ -292,15 +292,15 @@ public class AnnotationWorker {
         }
         try{
         	MotherGenerator motherGenerator = new MotherGenerator(MOMsheet);
-        	chain.addGenerator(new SampleSubjectMapper(SSAPsheet, motherGenerator));
+        	chain.addGenerator(new SSDSampleMapper(SSAPsheet, motherGenerator));
         } catch (Exception e) {
-        	System.out.print("SSD SSAPsheet SampleSubjectMapper failed..");
+        	System.out.print("SSD SSAPsheet SSDSampleMapper failed..");
         }
         try{
         	MotherGenerator motherGenerator = new MotherGenerator(MOMsheet);
-        	chain.addGenerator(new SampleSubjectMapper(MSAPsheet, motherGenerator));
+        	chain.addGenerator(new SSDSampleMapper(MSAPsheet, motherGenerator));
         } catch (Exception e) {
-        	System.out.print("SSD MSAPsheet SampleSubjectMapper failed..");
+        	System.out.print("SSD MSAPsheet SSDSampleMapper failed..");
         }
         try{
         	chain.addGenerator(new TimeInstantGenerator(TIMEsheet));

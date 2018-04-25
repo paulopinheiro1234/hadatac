@@ -24,7 +24,7 @@ import org.hadatac.entity.pojo.ObjectCollection;
 import org.hadatac.entity.pojo.StudyObject;
 
 
-public class SampleSubjectMapper extends BasicGenerator {
+public class SSDSampleMapper extends BasicGenerator {
 
     final String kbPrefix = ConfigProp.getKbPrefix();
     private int counter = 1;
@@ -33,11 +33,18 @@ public class SampleSubjectMapper extends BasicGenerator {
     String file_name;
     MotherGenerator motherGenerator = null;
 
-    public SampleSubjectMapper(RecordFile file) {
+    public SSDSampleMapper(RecordFile file) {
         super(file);
         mapIdUriCache = getMapIdUri();
         file_name = file.getFile().getName();
-        study_id = file.getFile().getName().replaceAll("MAP-", "").replaceAll(".xlsx", "").replaceAll(".csv", "");
+        study_id = file.getFile().getName().replaceAll("SSD-", "").replaceAll(".xlsx", "").replaceAll(".csv", "");
+    }
+
+    public SSDSampleMapper(RecordFile file, MotherGenerator motherGenerator) {
+        super(file);
+        file_name = file.getFile().getName();
+        study_id = file.getFile().getName().replaceAll("SSD-", "").replaceAll(".xlsx", "").replaceAll(".csv", "");
+        this.motherGenerator = motherGenerator;
     }
 
     @Override
@@ -45,7 +52,7 @@ public class SampleSubjectMapper extends BasicGenerator {
         mapCol.clear();
         mapCol.put("type", "rdf:type");
         mapCol.put("originalPID", "CHEAR PID");
-        mapCol.put("originalSID", "Full SID");
+        mapCol.put("originalSID", "originalID");
         try{
             mapCol.put("pilotNum", "CHEAR_Project_ID");
         } catch (QueryExceptionHTTP e) {
@@ -58,6 +65,16 @@ public class SampleSubjectMapper extends BasicGenerator {
             e.printStackTrace();
             System.out.println("This sheet or MAP file contains no timeScopeID column");
         }
+    }
+
+    private Map<String, String> getMapIdUri(MotherGenerator generator) {
+        Map<String, String> mapIdUri = new HashMap<String, String>();
+        for (HADatAcThing obj : generator.getObjects()) {
+            StudyObject studyObj = (StudyObject)obj;
+            mapIdUri.put(studyObj.getOriginalId(), studyObj.getUri());
+        }
+
+        return mapIdUri;
     }
 
     private Map<String, String> getMapIdUri() {
@@ -94,6 +111,9 @@ public class SampleSubjectMapper extends BasicGenerator {
     }
 
     private String getType(Record rec) {
+    	if (file_name.startsWith("SSD-")){
+    		return rec.getValueByColumnName(mapCol.get("type"));
+    	}
     	return "sio:Sample";
     }
 
@@ -122,11 +142,23 @@ public class SampleSubjectMapper extends BasicGenerator {
     }
 
     private String getStudyUri(Record rec) {
-            return getPilotNum(rec);
+        if (file_name.startsWith("SSD-")){
+            return study_id;
+        }
+        return null;
     }
 
     private String getCollectionUri(Record rec) {
-        return kbPrefix + "SOC-" + getStudyUri(rec) + "-SSAMPLES";
+        String pid = getOriginalPID(rec);
+        if (file_name.startsWith("SSD-")){
+	        if (mapIdUriCache.containsKey(pid)) {
+	            return kbPrefix + "SOC-" + getStudyUri(rec) + "-MSAMPLES";
+	        } else {
+	            return kbPrefix + "SOC-" + getStudyUri(rec) + "-SSAMPLES";
+	        }
+        } else {
+        	return kbPrefix + "SOC-" + getStudyUri(rec) + "-SSAMPLES";
+        }
     }
 
     private String getCollectionLabel(Record rec) {
@@ -170,7 +202,11 @@ public class SampleSubjectMapper extends BasicGenerator {
 
     @Override
     public void preprocess() throws Exception {
-        mapIdUriCache = getMapIdUri();
+        if (motherGenerator != null) {
+            mapIdUriCache = getMapIdUri(motherGenerator);
+        } else {
+        	mapIdUriCache = getMapIdUri();
+        }
 
         if (!records.isEmpty()) {
             objects.add(createObjectCollection(records.get(0)));
