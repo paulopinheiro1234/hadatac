@@ -327,7 +327,11 @@ public class AutoAnnotator extends Controller {
         if (fileName.startsWith("DA-")) {
             Measurement.delete(dataFile.getDatasetUri());
         } else {
-            deleteAddedTriples(file);
+        	try{
+        		deleteAddedTriples(file);
+        	} catch (Exception e) {
+            	System.out.print("Can not delete triples ingested by " + fileName + " ..");
+            }
         }
         file.delete();
         dataFile.delete();
