@@ -94,7 +94,7 @@ public class Attribute extends HADatAcClass implements Comparable<Attribute> {
 				+ " ?possibleValue hasco:isPossibleValueOf <" + dasa_uri + "> . "
 				+ " ?possibleValue hasco:hasCode ?code . "
 				+ " ?possibleValue hasco:hasClass ?codeClass . "
-				+ " FILTER (lcase(str(?code)) = \"" + code.toLowerCase() + "\") "
+				+ " FILTER (lcase(str(?code)) = \"" + code + "\") "
 				+ " }";
 
 		Query query = QueryFactory.create(queryString);

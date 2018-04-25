@@ -71,9 +71,9 @@ public class DASchemaObjectGenerator extends BasicGenerator {
 		if (entity.length() == 0) {
 			return null;
 		} else {
-			if (codeMap.containsKey(entity.toLowerCase())) {
+			if (codeMap.containsKey(entity)) {
 				System.out.println("[DASOGenerator] code matched: " + entity); 
-				return codeMap.get(entity.toLowerCase());
+				return codeMap.get(entity);
 			} else {
 				return entity;
 			}
