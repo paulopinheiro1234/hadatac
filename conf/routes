@@ -373,7 +373,7 @@ GET     /hadatac/ts/loadkb                             org.hadatac.console.contr
 POST    /hadatac/ts/loadkb                             org.hadatac.console.controllers.triplestore.LoadKB.postLoadKB(oper: String)
 POST    /hadatac/ts/loadkb/upload                      org.hadatac.console.controllers.triplestore.LoadKB.uploadFile(oper: String)
 POST    /hadatac/ts/loadkb/uploadturtle                org.hadatac.console.controllers.triplestore.LoadKB.uploadTurtleFile(oper: String)
-GET     /hadatac/ts/exportkb                           org.hadatac.console.controllers.triplestore.ExportKB.exportKB(oper: String)
+GET     /hadatac/ts/exportkb                           org.hadatac.console.controllers.triplestore.ExportKB.exportFile(oper: String)
 POST    /hadatac/ts/exportkb                           org.hadatac.console.controllers.triplestore.ExportKB.exportFile(oper: String)
 GET     /hadatac/ts/synclabkey                         org.hadatac.console.controllers.triplestore.LoadKB.loadLabkeyKB(oper: String, content: String)
 POST    /hadatac/ts/synclabkey                         org.hadatac.console.controllers.triplestore.LoadKB.postLoadLabkeyKB(oper: String, content: String)

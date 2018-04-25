@@ -243,21 +243,67 @@ public class AnnotationWorker {
         System.out.println("Processing SSD file of " + Pilot_Num + "...");
 
         RecordFile SSDsheet = new SpreadsheetRecordFile(file.getFile(), "SSD");
-        RecordFile SBJsheet = new SpreadsheetRecordFile(file.getFile(), "SOC-SUBJECTS");     
-        RecordFile MOMsheet = new SpreadsheetRecordFile(file.getFile(), "SOC-MOTHERS");
-        RecordFile SSAPsheet = new SpreadsheetRecordFile(file.getFile(), "SOC-SSAMPLES");
-        RecordFile MSAPsheet = new SpreadsheetRecordFile(file.getFile(), "SOC-MSAMPLES");
-        RecordFile TIMEsheet = new SpreadsheetRecordFile(file.getFile(), "SOC-VISITS");
-
+        RecordFile SBJsheet = null;
+        RecordFile MOMsheet = null;
+        RecordFile SSAPsheet = null;
+        RecordFile MSAPsheet = null;
+        RecordFile TIMEsheet = null;
+        
+        try{
+            SBJsheet = new SpreadsheetRecordFile(file.getFile(), "SOC-SUBJECTS");
+        } catch (Exception e) {
+        	System.out.print("SSD has no SOC-SUBJECTS..");
+        }
+        try{
+        	MOMsheet = new SpreadsheetRecordFile(file.getFile(), "SOC-MOTHERS");
+        } catch (Exception e) {
+        	System.out.print("SSD has no SOC-MOTHERS..");
+        }
+        try{
+        	SSAPsheet = new SpreadsheetRecordFile(file.getFile(), "SOC-SSAMPLES");
+        } catch (Exception e) {
+        	System.out.print("SSD has no SOC-SSAMPLES..");
+        }
+        try{
+        	MSAPsheet = new SpreadsheetRecordFile(file.getFile(), "SOC-MSAMPLES");
+        } catch (Exception e) {
+        	System.out.print("SSD has no SOC-MSAMPLES..");
+        }
+        try{
+        	TIMEsheet = new SpreadsheetRecordFile(file.getFile(), "SOC-VISITS");
+        } catch (Exception e) {
+        	System.out.print("SSD has no SOC-VISITS..");
+        }
         GeneratorChain chain = new GeneratorChain();
         chain.addGenerator(new SSDGenerator(SSDsheet));
-        chain.addGenerator(new SubjectGenerator(SBJsheet));
-        
-        MotherGenerator motherGenerator = new MotherGenerator(MOMsheet);
-        chain.addGenerator(motherGenerator);
-        chain.addGenerator(new SampleSubjectMapper(SSAPsheet, motherGenerator));
-        chain.addGenerator(new SampleSubjectMapper(MSAPsheet, motherGenerator));
-        chain.addGenerator(new TimeInstantGenerator(TIMEsheet));
+        try{
+        	chain.addGenerator(new SubjectGenerator(SBJsheet));
+        } catch (Exception e) {
+        	System.out.print("SSD SubjectGenerator failed..");
+        }
+        try{
+        	MotherGenerator motherGenerator = new MotherGenerator(MOMsheet);
+        	chain.addGenerator(motherGenerator);
+        } catch (Exception e) {
+        	System.out.print("SSD motherGenerator failed..");
+        }
+        try{
+        	MotherGenerator motherGenerator = new MotherGenerator(MOMsheet);
+        	chain.addGenerator(new SampleSubjectMapper(SSAPsheet, motherGenerator));
+        } catch (Exception e) {
+        	System.out.print("SSD SSAPsheet SampleSubjectMapper failed..");
+        }
+        try{
+        	MotherGenerator motherGenerator = new MotherGenerator(MOMsheet);
+        	chain.addGenerator(new SampleSubjectMapper(MSAPsheet, motherGenerator));
+        } catch (Exception e) {
+        	System.out.print("SSD MSAPsheet SampleSubjectMapper failed..");
+        }
+        try{
+        	chain.addGenerator(new TimeInstantGenerator(TIMEsheet));
+        } catch (Exception e) {
+        	System.out.print("SSD TimeInstantGenerator failed..");
+        }
 
         return chain;
     }

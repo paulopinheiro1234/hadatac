@@ -2,44 +2,63 @@ package org.hadatac.console.controllers.triplestore;
 
 import play.mvc.*;
 
+import java.io.File;
+import java.io.FileOutputStream;
+
+import org.apache.jena.query.Query;
+import org.apache.jena.query.QueryExecution;
+import org.apache.jena.query.QueryExecutionFactory;
+import org.apache.jena.query.QueryFactory;
+import org.apache.jena.rdf.model.Model;
+import org.apache.jena.rdf.model.ModelFactory;
+import org.apache.jena.riot.RDFDataMgr;
+import org.apache.jena.riot.RDFFormat;
 import org.hadatac.console.controllers.AuthApplication;
 import org.hadatac.console.views.html.triplestore.*;
-import org.hadatac.metadata.loader.CSVExporterContext;
-import org.hadatac.metadata.loader.CSVExporting;
-import org.hadatac.utils.Feedback;
+import org.hadatac.utils.CollectionUtil;
+import org.hadatac.utils.ConfigProp;
 import org.hadatac.utils.NameSpaces;
-
-import com.typesafe.config.ConfigFactory;
 
 import be.objectify.deadbolt.java.actions.Group;
 import be.objectify.deadbolt.java.actions.Restrict;
 
 public class ExportKB extends Controller {
 	
-	private static final String DOWNLOAD_CSV_FILE_NAME = "public/csv/triple.csv";
+	private static final String DOWNLOAD_FILE_NAME = "export_triples.ttl";
 
-	@Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
-	public Result exportKB(String oper) {
-		System.out.println("exportKB CALLED!");
+	@Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
+	public Result index(String oper) {
 		return ok(exportKB.render(oper, ""));
 	}
 	
-	@Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
-	public Result postExportKB(String oper) {
-		System.out.println("postExportKB CALLED!");
+	@Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
+	public Result postIndex(String oper) {
 		return ok(exportKB.render(oper, ""));
 	}
 	
-	@Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
+	@Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
 	public Result exportFile(String oper) {
-		System.out.println("exportFile CALLED!");
-		NameSpaces.getInstance();
-		CSVExporterContext metadata = new CSVExporterContext(
-				"user",
-				"password", 
-				ConfigFactory.load().getString("hadatac.solr.triplestore"), 
-				false);
-		String message = CSVExporting.generateCSV(Feedback.WEB, oper, metadata, DOWNLOAD_CSV_FILE_NAME);
-		return ok(exportKB.render("init", ""));
+	    try {
+            String queryString = NameSpaces.getInstance().printSparqlNameSpaceList() + 
+                    "CONSTRUCT { ?s ?p ?o } WHERE { ?s ?p ?o } ";
+            Query query = QueryFactory.create(queryString);
+
+            QueryExecution qexec = QueryExecutionFactory.sparqlService(
+                    CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), query);
+            Model model = qexec.execConstruct();
+            qexec.close();
+            
+            System.out.println("Model size: " + model.size());
+            
+            RDFDataMgr.write(new FileOutputStream(ConfigProp.getPathDownload() + DOWNLOAD_FILE_NAME, false), 
+                    model, RDFFormat.TURTLE);
+            
+            System.out.println("Export finished");
+            
+            return ok(new File(ConfigProp.getPathDownload() + DOWNLOAD_FILE_NAME));
+        } catch (Exception e) {
+            e.printStackTrace();
+            return badRequest("Export failed ...");
+        }
 	} 
 }
