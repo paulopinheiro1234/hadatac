@@ -67,6 +67,8 @@ GET	    /hadatac/metadataacquisitions/viewSample       org.hadatac.console.contr
 POST	/hadatac/metadataacquisitions/viewSample       org.hadatac.console.controllers.metadataacquisition.ViewSample.postIndex(sample_uri: String, study_uri: String, subject_uri: String)
 GET	    /hadatac/metadataacquisitions/viewValue	       org.hadatac.console.controllers.metadataacquisition.ViewValue.index(user_uri: String, study_uri: String, subject_uri: String, char_uri: String)
 POST	/hadatac/metadataacquisitions/viewValue	       org.hadatac.console.controllers.metadataacquisition.ViewValue.postIndex(user_uri: String, study_uri: String, subject_uri: String, char_uri: String)
+GET	    /hadatac/metadata/ont	               org.hadatac.console.controllers.metadata.BrowseOntology.index(oper : String)
+POST	/hadatac/metadataa/ont	                       org.hadatac.console.controllers.metadata.BrowseOntology.postIndex(oper : String)
 
 # Metadata concepts
 GET	    /hadatac/metadata/entity		       org.hadatac.console.controllers.metadata.concepts.Entity.index()

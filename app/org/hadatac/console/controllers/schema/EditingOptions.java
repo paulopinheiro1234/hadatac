@@ -16,12 +16,10 @@ import be.objectify.deadbolt.java.actions.Restrict;
 
 public class EditingOptions extends Controller {
 
-	@Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
 	public Result entityOptions() {
 		return ok(entityOptions.render(getEntities()));
 	}
 
-	@Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
 	public Result postEntityOptions() {
 		return ok(entityOptions.render(getEntities()));
 	}
