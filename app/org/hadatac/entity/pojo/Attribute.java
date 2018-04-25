@@ -57,6 +57,36 @@ public class Attribute extends HADatAcClass implements Comparable<Attribute> {
 		return attributes;
 	}
 
+	public static String findHarmonizedCode(String dasa_uri) {
+		String queryString = NameSpaces.getInstance().printSparqlNameSpaceList()
+				+ " SELECT ?code WHERE {"
+				+ " <" + dasa_uri + "> skos:notation ?code . "
+				+ " }";
+
+		Query query = QueryFactory.create(queryString);
+		QueryExecution qexec = QueryExecutionFactory.sparqlService(
+				CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), query);
+		ResultSet results = qexec.execSelect();
+		ResultSetRewindable resultsrw = ResultSetFactory.copyResults(results);
+		qexec.close();
+
+		if (resultsrw.size() > 0) {
+			QuerySolution soln = resultsrw.next();
+			try {
+				if (null != soln.getResource("code")) {
+					String answer = soln.getResource("code").toString();
+					if (answer.length() != 0) {
+						return answer;
+					}
+				}
+			} catch (Exception e1) {
+				return null;
+			}
+		}
+
+		return null;
+	}
+	
 	public static String findCodeValue(String dasa_uri, String code) {
 		String queryString = NameSpaces.getInstance().printSparqlNameSpaceList()
 				+ " SELECT ?codeClass ?codeResource WHERE {"
