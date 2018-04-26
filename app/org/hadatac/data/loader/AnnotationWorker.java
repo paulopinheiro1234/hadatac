@@ -76,6 +76,11 @@ public class AnnotationWorker {
                 } else if (file_name.startsWith("SDD-")) {
                     if (file_name.endsWith(".xlsx")) {
                         recordFile = new SpreadsheetRecordFile(new File(filePath), "InfoSheet");
+                        if (!recordFile.isValid()) {
+                            log.addline(Feedback.println(Feedback.WEB, 
+                                    "[ERROR] Missing InfoSheet. "));
+                            return;
+                        }
                     }
                     chain = annotateDataAcquisitionSchemaFile(recordFile);
                 } else if (file_name.startsWith("SSD-")) {
