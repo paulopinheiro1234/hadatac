@@ -123,6 +123,7 @@ function create_merged_item(data, selected_elems, curLevel,
 	}
 	
 	var items = [];
+	
 	if (data.children.length == 0 && curLevel > levelToBegin) {
 		pivot.text = text.join(' ') + ' (' + data.count + ')';
 		pivot.tooltip = tooltips.join(' ');
@@ -145,15 +146,20 @@ function create_merged_item(data, selected_elems, curLevel,
 			if (selected_elems.indexOf(children[i_child].tooltip) > -1) {
 				element.checked = 1;
 			}
-						
-			if (curLevel <= levelToBegin) {
+			
+			if (curLevel <= levelToBegin && children[i_child].children.length == 0) {	
+				element.item = [];
+				items.push(element);
+			} else if (curLevel <= levelToBegin) {				
 				element.item = create_merged_item(children[i_child], selected_elems,
 						curLevel + 1, levelToBegin, element, [], [], facets, retChildren);
 				
 				if (curLevel == levelToBegin) {
 					element.item = [];
 					for (var i in retChildren) {
-						element.item.push(retChildren[i]);
+						if (retChildren[i].id != element.id) {
+							element.item.push(retChildren[i]);
+						}
 					}
 					retChildren.length = 0;
 				}

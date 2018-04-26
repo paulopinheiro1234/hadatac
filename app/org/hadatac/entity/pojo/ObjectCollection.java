@@ -581,7 +581,13 @@ public class ObjectCollection extends HADatAcThing implements Comparable<ObjectC
 
             ObjectCollection oc = new ObjectCollection();
             oc.setUri(child.getValue());
-            oc.setLabel(WordUtils.capitalize(Entity.find(child.getValue()).getLabel()));
+            Entity entity = Entity.find(child.getValue());
+            System.out.println("child.getValue(): " + child.getValue());
+            if (entity == null || entity.getLabel().isEmpty()) {
+                oc.setLabel(WordUtils.capitalize(URIUtils.getBaseName(child.getValue())));
+            } else {
+                oc.setLabel(WordUtils.capitalize(entity.getLabel())); 
+            }
             oc.setCount(child.getCount());
             oc.setField("object_collection_type_str");
 
