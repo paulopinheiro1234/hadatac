@@ -20,6 +20,7 @@ import org.apache.solr.client.solrj.impl.HttpSolrClient;
 import org.apache.solr.client.solrj.response.UpdateResponse;
 import org.hadatac.console.controllers.AuthApplication;
 import org.hadatac.console.controllers.metadata.DynamicFunctions;
+import org.hadatac.console.http.SPARQLUtils;
 import org.hadatac.console.http.SolrUtils;
 import org.hadatac.console.models.SysUser;
 import org.hadatac.console.views.html.metadataacquisition.*;
@@ -67,11 +68,9 @@ public class SchemaAttribute extends Controller {
 				+ " OPTIONAL {?DASAttributeUri hasco:isPIConfirmed ?PIConfirmed . }"
 				+ " }";
 		
-		QueryExecution qexecStudy = QueryExecutionFactory.sparqlService(
-				CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), strQuery);
-		ResultSet resultSet = qexecStudy.execSelect();
-		ResultSetRewindable resultsrwStudy = ResultSetFactory.copyResults(resultSet);
-		qexecStudy.close();
+		ResultSetRewindable resultsrwStudy = SPARQLUtils.select(
+                CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), strQuery);
+		
 		while (resultsrwStudy.hasNext()) {
 			QuerySolution soln = resultsrwStudy.next();
 //			System.out.println("Solution: " + soln.toString());	
@@ -121,11 +120,8 @@ public class SchemaAttribute extends Controller {
 				+ " OPTIONAL {?DASAttributeUri hasco:isPIConfirmed ?PIConfirmed . }"
 				+ " }";
 		
-		QueryExecution qexecStudy = QueryExecutionFactory.sparqlService(
-				CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), strQuery);
-		ResultSet resultSet = qexecStudy.execSelect();
-		ResultSetRewindable resultsrwStudy = ResultSetFactory.copyResults(resultSet);
-		qexecStudy.close();
+		ResultSetRewindable resultsrwStudy = SPARQLUtils.select(
+                CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), strQuery);
 		
 		HashMap<String, HashMap<String, Object>> mapDAInfo = new HashMap<String, HashMap<String, Object>>();
 		while (resultsrwStudy.hasNext()) {

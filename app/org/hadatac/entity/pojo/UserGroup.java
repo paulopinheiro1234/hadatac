@@ -8,14 +8,12 @@ import org.apache.jena.query.QueryExecution;
 import org.apache.jena.query.QueryExecutionFactory;
 import org.apache.jena.query.QueryFactory;
 import org.apache.jena.query.QuerySolution;
-import org.apache.jena.query.ResultSet;
-import org.apache.jena.query.ResultSetFactory;
 import org.apache.jena.query.ResultSetRewindable;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Statement;
 import org.apache.jena.rdf.model.StmtIterator;
-
+import org.hadatac.console.http.SPARQLUtils;
 import org.hadatac.utils.CollectionUtil;
 
 public class UserGroup extends User {
@@ -49,28 +47,22 @@ public class UserGroup extends User {
 			object = statement.getObject();
 			if (statement.getPredicate().getURI().equals("http://www.w3.org/2000/01/rdf-schema#comment")) {
 				user.setComment(object.asLiteral().getString());
-		    }
-			else if (statement.getPredicate().getURI().equals("http://hadatac.org/ont/hadatac#isMemberOfGroup")) {
+		    } else if (statement.getPredicate().getURI().equals("http://hadatac.org/ont/hadatac#isMemberOfGroup")) {
 				if(object.toString().equals("Public") || object.toString().equals("")){
 					user.setImmediateGroupUri("Public");
 				}
 				else{
 					user.setImmediateGroupUri(object.asResource().toString());
 				}
-			}
-			else if (statement.getPredicate().getURI().equals("http://xmlns.com/foaf/0.1/givenName")) {
+			} else if (statement.getPredicate().getURI().equals("http://xmlns.com/foaf/0.1/givenName")) {
 				user.setGivenName(object.asLiteral().getString());
-			}
-			else if (statement.getPredicate().getURI().equals("http://xmlns.com/foaf/0.1/familyName")) {
+			} else if (statement.getPredicate().getURI().equals("http://xmlns.com/foaf/0.1/familyName")) {
 				user.setFamilyName(object.asLiteral().getString());
-			}
-			else if (statement.getPredicate().getURI().equals("http://xmlns.com/foaf/0.1/name")) {
+			} else if (statement.getPredicate().getURI().equals("http://xmlns.com/foaf/0.1/name")) {
 				user.setName(object.asLiteral().getString());
-			}
-			else if (statement.getPredicate().getURI().equals("http://xmlns.com/foaf/0.1/mbox")) {
+			} else if (statement.getPredicate().getURI().equals("http://xmlns.com/foaf/0.1/mbox")) {
 				user.setEmail(object.asLiteral().getString());
-			}
-			else if (statement.getPredicate().getURI().equals("http://xmlns.com/foaf/0.1/homepage")) {
+			} else if (statement.getPredicate().getURI().equals("http://xmlns.com/foaf/0.1/homepage")) {
 				String homepage = object.asLiteral().getString();
 				if(homepage.startsWith("<") && homepage.endsWith(">")){
 					homepage = homepage.replace("<", "");
@@ -110,13 +102,8 @@ public class UserGroup extends User {
 				"  ?uri a prov:Group . " +
 				"} ";
 		
-		Query query = QueryFactory.create(queryString);
-		
-		QueryExecution qexec = QueryExecutionFactory.sparqlService(
-				CollectionUtil.getCollectionsName(CollectionUtil.PERMISSIONS_SPARQL), query);
-		ResultSet results = qexec.execSelect();
-		ResultSetRewindable resultsrw = ResultSetFactory.copyResults(results);
-		qexec.close();
+		ResultSetRewindable resultsrw = SPARQLUtils.select(
+                CollectionUtil.getCollectionsName(CollectionUtil.PERMISSIONS_SPARQL), queryString);
 		
 		while (resultsrw.hasNext()) {
 			QuerySolution soln = resultsrw.next();
@@ -142,12 +129,8 @@ public class UserGroup extends User {
 				"  ?uri hadatac:isMemberOfGroup <" + group_uri + "> . " +
 				"} ";
 		
-		Query query = QueryFactory.create(queryString);
-		
-		QueryExecution qexec = QueryExecutionFactory.sparqlService(CollectionUtil.getCollectionsName(CollectionUtil.PERMISSIONS_SPARQL), query);
-		ResultSet results = qexec.execSelect();
-		ResultSetRewindable resultsrw = ResultSetFactory.copyResults(results);
-		qexec.close();
+		ResultSetRewindable resultsrw = SPARQLUtils.select(
+                CollectionUtil.getCollectionsName(CollectionUtil.PERMISSIONS_SPARQL), queryString);
 		
 		while (resultsrw.hasNext()) {
 			QuerySolution soln = resultsrw.next();

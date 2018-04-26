@@ -25,6 +25,7 @@ import org.apache.jena.update.UpdateExecutionFactory;
 import org.apache.jena.update.UpdateFactory;
 import org.apache.jena.update.UpdateProcessor;
 import org.apache.jena.update.UpdateRequest;
+import org.hadatac.console.http.SPARQLUtils;
 import org.hadatac.metadata.loader.LabkeyDataHandler;
 import org.hadatac.metadata.loader.URIUtils;
 import org.hadatac.utils.CollectionUtil;
@@ -235,13 +236,8 @@ public class Deployment extends HADatAcThing {
                 + "  OPTIONAL { <" + hadatac.getDataAcquisition().getDeploymentUri() + "> hasco:hasDetector ?detector . }\n"
                 + "  OPTIONAL { <" + hadatac.getDataAcquisition().getDeploymentUri() + "> prov:endedAtTime ?endedAt . }\n"
                 + "}";
-
-        Query query = QueryFactory.create(queryString);
-
-        QueryExecution qexec = QueryExecutionFactory.sparqlService(hadatac.getStaticMetadataSparqlURL(), query);
-        ResultSet results = qexec.execSelect();
-        ResultSetRewindable resultsrw = ResultSetFactory.copyResults(results);
-        qexec.close();
+        
+        ResultSetRewindable resultsrw = SPARQLUtils.select(hadatac.getStaticMetadataSparqlURL(), queryString);
 
         if (resultsrw.size() >= 1) {
             QuerySolution soln = resultsrw.next();
@@ -273,13 +269,8 @@ public class Deployment extends HADatAcThing {
                 + "  <" + hadatac.getDeploymentUri() + "> vstoi:hasPlatform ?platform .\n"
                 + "  OPTIONAL { <" + hadatac.getDeploymentUri() + "> prov:endedAtTime ?endedAt . }\n"
                 + "}";
-
-        Query query = QueryFactory.create(queryString);
-
-        QueryExecution qexec = QueryExecutionFactory.sparqlService(hadatac.getStaticMetadataSparqlURL(), query);
-        ResultSet results = qexec.execSelect();
-        ResultSetRewindable resultsrw = ResultSetFactory.copyResults(results);
-        qexec.close();
+        
+        ResultSetRewindable resultsrw = SPARQLUtils.select(hadatac.getStaticMetadataSparqlURL(), queryString);
 
         if (resultsrw.size() >= 1) {
             QuerySolution soln = resultsrw.next();
@@ -372,13 +363,9 @@ public class Deployment extends HADatAcThing {
                 }
             }
         }
-        Query query = QueryFactory.create(queryString);
-
-        QueryExecution qexec = QueryExecutionFactory.sparqlService(
-                CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), query);
-        ResultSet results = qexec.execSelect();
-        ResultSetRewindable resultsrw = ResultSetFactory.copyResults(results);
-        qexec.close();
+        
+        ResultSetRewindable resultsrw = SPARQLUtils.select(
+                CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), queryString);
 
         Deployment dep = null;
         while (resultsrw.hasNext()) {

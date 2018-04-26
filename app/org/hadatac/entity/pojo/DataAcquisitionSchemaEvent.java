@@ -29,6 +29,7 @@ import org.labkey.remoteapi.CommandException;
 import be.objectify.deadbolt.java.actions.Group;
 import be.objectify.deadbolt.java.actions.Restrict;
 import org.hadatac.console.controllers.AuthApplication;
+import org.hadatac.console.http.SPARQLUtils;
 
 
 public class DataAcquisitionSchemaEvent extends HADatAcThing {
@@ -223,12 +224,9 @@ public class DataAcquisitionSchemaEvent extends HADatAcThing {
                 "   OPTIONAL { <" + uri + ">  hasco:hasEntity ?entity } ." + 
                 "   OPTIONAL { <" + uri + "> hasco:hasUnit ?unit } ." + 
                 "}";
-        Query query = QueryFactory.create(queryString);
-
-        QueryExecution qexec = QueryExecutionFactory.sparqlService(CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), query);
-        ResultSet results = qexec.execSelect();
-        ResultSetRewindable resultsrw = ResultSetFactory.copyResults(results);
-        qexec.close();
+        
+        ResultSetRewindable resultsrw = SPARQLUtils.select(
+                CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), queryString);
 
         if (!resultsrw.hasNext()) {
             System.out.println("[WARNING] DataAcquisitionSchemaEvent. Could not find event for uri: " + uri);
@@ -289,12 +287,9 @@ public class DataAcquisitionSchemaEvent extends HADatAcThing {
                 "   ?uri a hasco:DASchemaEvent . " + 
                 "   ?uri hasco:partOfSchema <" + schemaUri + "> .  " + 
                 "}";
-        Query query = QueryFactory.create(queryString);
-
-        QueryExecution qexec = QueryExecutionFactory.sparqlService(CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), query);
-        ResultSet results = qexec.execSelect();
-        ResultSetRewindable resultsrw = ResultSetFactory.copyResults(results);
-        qexec.close();
+        
+        ResultSetRewindable resultsrw = SPARQLUtils.select(
+                CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), queryString);
 
         if (!resultsrw.hasNext()) {
             System.out.println("[WARNING] DataAcquisitionSchemaEvent. Could not find events for schema: " + schemaUri);

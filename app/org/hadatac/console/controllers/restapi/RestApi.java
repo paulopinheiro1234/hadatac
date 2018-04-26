@@ -18,6 +18,7 @@ import org.hadatac.entity.pojo.DataAcquisitionSchemaAttribute;
 import org.hadatac.utils.State;
 import org.hadatac.utils.CollectionUtil;
 import org.hadatac.console.models.Pivot;
+import org.hadatac.console.http.SPARQLUtils;
 import org.hadatac.console.http.SolrUtils;
 
 import be.objectify.deadbolt.java.actions.Group;
@@ -207,15 +208,13 @@ public class RestApi extends Controller {
                 "           ?itype rdfs:subClassOf <hasco:StudyIndicator> . " +
                 "           ?itype rdfs:label ?itypelabel . }" +
                 "} values ?class { " + classes + "} ";
+        
         //System.out.println("[VariableQuery] sparql query\n" + sparqlQueryString);
-		Query sparqlQuery = QueryFactory.create(sparqlQueryString);
-		QueryExecution qexec = QueryExecutionFactory.sparqlService(
-				CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), sparqlQuery);
-		ResultSet results = qexec.execSelect();
-		ResultSetRewindable resultsrw = ResultSetFactory.copyResults(results);
-		qexec.close();
+		
+		ResultSetRewindable resultsrw = SPARQLUtils.select(
+                CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), sparqlQueryString);
 
-        if(resultsrw.size() == 0){
+        if (resultsrw.size() == 0) {
             System.out.println("[VariableQuery] No variables found in blazegraph!");
             return null;
         }
@@ -270,12 +269,9 @@ public class RestApi extends Controller {
                 "?indicator rdfs:label ?label ." + 
                 "} values ?class { " + classes + "} ";
         //System.out.println("[VariableQuery] sparql query\n" + sparqlQueryString);
-		Query sparqlQuery = QueryFactory.create(sparqlQueryString);
-		QueryExecution qexec = QueryExecutionFactory.sparqlService(
-				CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), sparqlQuery);
-		ResultSet results = qexec.execSelect();
-		ResultSetRewindable resultsrw = ResultSetFactory.copyResults(results);
-		qexec.close();
+		
+		ResultSetRewindable resultsrw = SPARQLUtils.select(
+                CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), sparqlQueryString);
 
         if(resultsrw.size() == 0){
             System.out.println("[IndicatorQuery] No indicators found in blazegraph!");
@@ -320,14 +316,10 @@ public class RestApi extends Controller {
 
         //System.out.println("[unitsQuery] sparql query\n" + sparqlQueryString);
 		
-		Query sparqlQuery = QueryFactory.create(sparqlQueryString);
-		QueryExecution qexec = QueryExecutionFactory.sparqlService(
-				CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), sparqlQuery);
-		ResultSet results = qexec.execSelect();
-		ResultSetRewindable resultsrw = ResultSetFactory.copyResults(results);
-		qexec.close();
+		ResultSetRewindable resultsrw = SPARQLUtils.select(
+                CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), sparqlQueryString);
 
-        if(resultsrw.size() == 0){
+        if (resultsrw.size() == 0) {
             System.out.println("[unitsQuery] No units found in blazegraph!");
             return null;
         }
@@ -532,12 +524,10 @@ public class RestApi extends Controller {
                 "   ?uri a ?ocType . \n" +
                 "   ?uri hasco:isMemberOf <" + studyUri + "> . \n" +
                 " } ";
-        Query query = QueryFactory.create(queryString);
-        QueryExecution qexec = QueryExecutionFactory.sparqlService(
-                CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), query);
-        ResultSet results = qexec.execSelect();
-        ResultSetRewindable resultsrw = ResultSetFactory.copyResults(results);
-        qexec.close();
+        
+        ResultSetRewindable resultsrw = SPARQLUtils.select(
+                CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), queryString);
+        
         ArrayNode anode = mapper.createArrayNode();
 
         while (resultsrw.hasNext()) {

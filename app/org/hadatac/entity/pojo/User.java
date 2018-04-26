@@ -31,6 +31,7 @@ import org.apache.jena.update.UpdateFactory;
 import org.apache.jena.update.UpdateProcessor;
 import org.apache.jena.update.UpdateRequest;
 import org.hadatac.console.controllers.triplestore.UserManagement;
+import org.hadatac.console.http.SPARQLUtils;
 import org.hadatac.console.models.LinkedAccount;
 import org.hadatac.console.models.SysUser;
 import org.hadatac.utils.CollectionUtil;
@@ -228,14 +229,9 @@ public class User implements Comparable<User> {
                         "SELECT ?uri WHERE { " +
                         "  ?uri a foaf:Person . " +
                         "} ";
-
-        Query query = QueryFactory.create(queryString);
-
-        QueryExecution qexec = QueryExecutionFactory.sparqlService(
-                CollectionUtil.getCollectionsName(CollectionUtil.PERMISSIONS_SPARQL), query);
-        ResultSet results = qexec.execSelect();
-        ResultSetRewindable resultsrw = ResultSetFactory.copyResults(results);
-        qexec.close();
+        
+        ResultSetRewindable resultsrw = SPARQLUtils.select(
+                CollectionUtil.getCollectionsName(CollectionUtil.PERMISSIONS_SPARQL), queryString);
 
         while (resultsrw.hasNext()) {
             QuerySolution soln = resultsrw.next();

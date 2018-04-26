@@ -20,6 +20,7 @@ import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.impl.HttpSolrClient;
 import org.apache.solr.client.solrj.response.UpdateResponse;
 import org.hadatac.console.controllers.AuthApplication;
+import org.hadatac.console.http.SPARQLUtils;
 import org.hadatac.console.http.SolrUtils;
 import org.hadatac.console.models.SysUser;
 import org.hadatac.console.views.html.metadataacquisition.*;
@@ -66,11 +67,8 @@ public class Analytes extends Controller {
                 + " ?attribute rdfs:label ?attributeLabel . "
                 + " }";
 
-        QueryExecution qexecStudy = QueryExecutionFactory.sparqlService(
+        ResultSetRewindable resultsrwStudy = SPARQLUtils.select(
                 CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), queryString);
-        ResultSet resultSet = qexecStudy.execSelect();
-        ResultSetRewindable resultsrwStudy = ResultSetFactory.copyResults(resultSet);
-        qexecStudy.close();
 
         List<String> results = new ArrayList<String>();
         while (resultsrwStudy.hasNext()) {
@@ -108,12 +106,9 @@ public class Analytes extends Controller {
                 + " } ";
 
         System.out.println("updateAnalytes strQuery: " + strQuery);
-
-        QueryExecution qexecStudy = QueryExecutionFactory.sparqlService(
+        
+        ResultSetRewindable resultsrwStudy = SPARQLUtils.select(
                 CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), strQuery);
-        ResultSet resultSet = qexecStudy.execSelect();
-        ResultSetRewindable resultsrwStudy = ResultSetFactory.copyResults(resultSet);
-        qexecStudy.close();
 
         Map<String, Map<String, Object>> mapStudyInfo = new HashMap<String, Map<String, Object>>();
         while (resultsrwStudy.hasNext()) {

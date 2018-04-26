@@ -14,10 +14,8 @@ import play.mvc.Result;
 import org.hadatac.console.views.html.metadataacquisition.*;
 import org.hadatac.entity.pojo.Measurement;
 import org.hadatac.metadata.loader.URIUtils;
-import org.apache.jena.query.Query;
 import org.apache.jena.query.QueryExecution;
 import org.apache.jena.query.QueryExecutionFactory;
-import org.apache.jena.query.QueryFactory;
 import org.apache.jena.query.QuerySolution;
 import org.apache.jena.query.ResultSet;
 import org.apache.jena.query.ResultSetFactory;
@@ -25,6 +23,7 @@ import org.apache.jena.query.ResultSetRewindable;
 import org.apache.jena.sparql.engine.http.QueryExceptionHTTP;
 import org.hadatac.console.controllers.AuthApplication;
 import org.hadatac.console.controllers.triplestore.UserManagement;
+import org.hadatac.console.http.SPARQLUtils;
 import org.hadatac.utils.CollectionUtil;
 import org.hadatac.utils.NameSpaces;
 
@@ -46,11 +45,9 @@ public class ViewSubject extends Controller {
 				+ "?subjectIndicator rdfs:subClassOf hasco:StudyIndicator . "
 				+ "?subjectIndicator rdfs:label ?label . "
 				+ "?subjectIndicator rdfs:comment ?comment . }";
-		QueryExecution qexecInd = QueryExecutionFactory.sparqlService(
-				CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), indicatorQuery);
-		ResultSet indicatorResults = qexecInd.execSelect();
-		ResultSetRewindable resultsrwIndc = ResultSetFactory.copyResults(indicatorResults);
-		qexecInd.close();
+		
+		ResultSetRewindable resultsrwIndc = SPARQLUtils.select(
+                CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), indicatorQuery);
 
 		Map<String, String> indicatorMap = new HashMap<String, String>();
 		String indicatorLabel = "";
@@ -74,12 +71,10 @@ public class ViewSubject extends Controller {
 					+ "?uri rdfs:label ?label . "
 					+ "}";
 			
-			try {
-				QueryExecution qexecIndvInd = QueryExecutionFactory.sparqlService(
-						CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), indvIndicatorQuery);
-				ResultSet indvIndResults = qexecIndvInd.execSelect();
-				ResultSetRewindable resultsrwIndvInd = ResultSetFactory.copyResults(indvIndResults);
-				qexecIndvInd.close();
+			try {		
+				ResultSetRewindable resultsrwIndvInd = SPARQLUtils.select(
+		                CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), indvIndicatorQuery);
+				
 				List<String> listIndicatorLabel = new ArrayList<String>();
 				while (resultsrwIndvInd.hasNext()) {
 					QuerySolution soln = resultsrwIndvInd.next();
@@ -170,14 +165,10 @@ public class ViewSubject extends Controller {
 				+ "OPTIONAL { " + subject_uri + " a ?subjectType . "
 				+ "			  ?subjectType rdfs:label ?subjectTypeLabel } . "
 				+ "}";
-
-		Query basicQuery = QueryFactory.create(subjectQueryString);
-
-		QueryExecution qexec = QueryExecutionFactory.sparqlService(
-				CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), basicQuery);
-		ResultSet results = qexec.execSelect();
-		ResultSetRewindable resultsrw = ResultSetFactory.copyResults(results);
-		qexec.close();
+		
+		ResultSetRewindable resultsrw = SPARQLUtils.select(
+                CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), subjectQueryString);
+		
 		return resultsrw;
 	}		
 
@@ -221,12 +212,10 @@ public class ViewSubject extends Controller {
 				+ "?subjectIndicator rdfs:comment ?comment . }";
 		Map<String, String> indicatorMap = new HashMap<String, String>();
 		String indicatorLabel = "";
-		try {
-			QueryExecution qexecInd = QueryExecutionFactory.sparqlService(
-					CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), indicatorQuery);
-			ResultSet indicatorResults = qexecInd.execSelect();
-			ResultSetRewindable resultsrwIndc = ResultSetFactory.copyResults(indicatorResults);
-			qexecInd.close();
+		try {			
+			ResultSetRewindable resultsrwIndc = SPARQLUtils.select(
+                    CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), indicatorQuery);
+			
 			while (resultsrwIndc.hasNext()) {
 				QuerySolution soln = resultsrwIndc.next();
 				indicatorLabel = soln.get("label").toString();
@@ -250,15 +239,12 @@ public class ViewSubject extends Controller {
 					+ "?uri rdfs:label ?label . "
 					+ "}";
 
-			try {
-				QueryExecution qexecIndvInd = QueryExecutionFactory.sparqlService(
-						CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), indvIndicatorQuery);
-				ResultSet indvIndResults = qexecIndvInd.execSelect();
-				ResultSetRewindable resultsrwIndvInd = ResultSetFactory.copyResults(indvIndResults);
-				qexecIndvInd.close();
+			try {				
+				ResultSetRewindable resultsrwIndvInd = SPARQLUtils.select(
+		                CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), indvIndicatorQuery);
+				
 				while (resultsrwIndvInd.hasNext()) {
 					QuerySolution soln = resultsrwIndvInd.next();
-					//System.out.println("Solution: " + soln);
 					indicatorUris.put(soln.get("label").toString(), soln.get("uri").toString());
 				}
 			} catch (QueryExceptionHTTP e) {
@@ -286,13 +272,9 @@ public class ViewSubject extends Controller {
 				+ "OPTIONAL { ?sampleUri rdfs:label ?sampleLabel } . "
 				+ "OPTIONAL { ?sampleUri a ?sampleType  } . "
 				+ "}";
-		Query basicQuery = QueryFactory.create(sampleQueryString);
-
-		QueryExecution qexec = QueryExecutionFactory.sparqlService(
-				CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), basicQuery);
-		ResultSet results = qexec.execSelect();
-		ResultSetRewindable resultsrw = ResultSetFactory.copyResults(results);
-		qexec.close();
+		
+		ResultSetRewindable resultsrw = SPARQLUtils.select(
+                CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), sampleQueryString);
 
 		Map<String, List<String>> sampleResult = new HashMap<String, List<String>>();
 		List<String> values = new ArrayList<String>();
@@ -317,14 +299,9 @@ public class ViewSubject extends Controller {
 		sampleQueryString += "SELECT * WHERE { "
 				+ "?s <http://hadatac.org/ont/hasco/hasObjectScope> " + subject_uri + " . "
 				+ "}";
-
-		Query sampleQuery = QueryFactory.create(sampleQueryString);
-
-		QueryExecution qexec = QueryExecutionFactory.sparqlService(
-				CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), sampleQuery);
-		ResultSet results = qexec.execSelect();
-		ResultSetRewindable resultsrw = ResultSetFactory.copyResults(results);
-		qexec.close();
+		
+		ResultSetRewindable resultsrw = SPARQLUtils.select(
+                CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), sampleQueryString);
 
 		List<String> sampleResult = new ArrayList<String>();
 

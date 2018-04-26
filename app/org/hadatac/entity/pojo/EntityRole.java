@@ -14,6 +14,7 @@ import org.apache.jena.query.QuerySolution;
 import org.apache.jena.query.ResultSet;
 import org.apache.jena.query.ResultSetFactory;
 import org.apache.jena.query.ResultSetRewindable;
+import org.hadatac.console.http.SPARQLUtils;
 import org.hadatac.console.models.Facet;
 import org.hadatac.console.models.FacetHandler;
 import org.hadatac.metadata.loader.URIUtils;
@@ -89,11 +90,8 @@ public class EntityRole extends HADatAcThing implements Comparable<EntityRole> {
 		
 		Map<HADatAcThing, List<HADatAcThing>> results = new HashMap<HADatAcThing, List<HADatAcThing>>();
 		try {
-			QueryExecution qe = QueryExecutionFactory.sparqlService(
-					CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), query);
-			ResultSet resultSet = qe.execSelect();
-			ResultSetRewindable resultsrw = ResultSetFactory.copyResults(resultSet);
-			qe.close();
+		    ResultSetRewindable resultsrw = SPARQLUtils.select(
+	                CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), query);
 			
 			if (resultsrw.size() == 0) {
 				EntityRole role = new EntityRole();
@@ -171,11 +169,8 @@ public class EntityRole extends HADatAcThing implements Comparable<EntityRole> {
         
         // System.out.println("findObjRoleMappings query: " + queryString);
         
-        Query query = QueryFactory.create(queryString);
-        QueryExecution qexec = QueryExecutionFactory.sparqlService(
-                CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), query);
-        ResultSetRewindable resultsrw = ResultSetFactory.copyResults(qexec.execSelect());
-        qexec.close();
+        ResultSetRewindable resultsrw = SPARQLUtils.select(
+                CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), queryString);
 
         try {
             while (resultsrw.hasNext()) {

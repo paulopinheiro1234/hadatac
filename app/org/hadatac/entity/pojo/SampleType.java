@@ -17,6 +17,7 @@ import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Statement;
 import org.apache.jena.rdf.model.StmtIterator;
+import org.hadatac.console.http.SPARQLUtils;
 import org.hadatac.utils.CollectionUtil;
 import org.hadatac.utils.NameSpaces;
 
@@ -38,12 +39,9 @@ public class SampleType extends HADatAcClass implements Comparable<SampleType> {
 				"} ";
 
 		//System.out.println("Query: " + queryString);
-		Query query = QueryFactory.create(queryString);
-
-		QueryExecution qexec = QueryExecutionFactory.sparqlService(CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), query);
-		ResultSet results = qexec.execSelect();
-		ResultSetRewindable resultsrw = ResultSetFactory.copyResults(results);
-		qexec.close();
+		
+		ResultSetRewindable resultsrw = SPARQLUtils.select(
+                CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), queryString);
 
 		while (resultsrw.hasNext()) {
 			QuerySolution soln = resultsrw.next();

@@ -35,6 +35,7 @@ import org.labkey.remoteapi.CommandException;
 
 import com.typesafe.config.ConfigFactory;
 
+import org.hadatac.console.http.SPARQLUtils;
 import org.hadatac.console.models.Facet;
 import org.hadatac.console.models.FacetHandler;
 import org.hadatac.console.models.Pivot;
@@ -274,12 +275,8 @@ public class ObjectCollection extends HADatAcThing implements Comparable<ObjectC
                 "   ?uri hasco:isMemberOf  <" + this.getUri() + "> . " +
                 " } ";
 
-        Query query = QueryFactory.create(queryString);
-        QueryExecution qexec = QueryExecutionFactory.sparqlService(
-                CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), query);
-        ResultSet results = qexec.execSelect();
-        ResultSetRewindable resultsrw = ResultSetFactory.copyResults(results);
-        qexec.close();
+        ResultSetRewindable resultsrw = SPARQLUtils.select(
+                CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), queryString);
 
         int count = 0;
         while (resultsrw.hasNext()) {
@@ -302,13 +299,9 @@ public class ObjectCollection extends HADatAcThing implements Comparable<ObjectC
                 "SELECT ?spaceScopeUri WHERE { \n" + 
                 " <" + oc_uri + "> hasco:hasSpaceScope ?spaceScopeUri . \n" + 
                 "}";
-        Query query = QueryFactory.create(queryString);
 
-        QueryExecution qexec = QueryExecutionFactory.sparqlService(
-                CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), query);
-        ResultSet results = qexec.execSelect();
-        ResultSetRewindable resultsrw = ResultSetFactory.copyResults(results);
-        qexec.close();
+        ResultSetRewindable resultsrw = SPARQLUtils.select(
+                CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), queryString);
 
         while (resultsrw.hasNext()) {
             QuerySolution soln = resultsrw.next();
@@ -335,13 +328,9 @@ public class ObjectCollection extends HADatAcThing implements Comparable<ObjectC
                 "SELECT  ?timeScopeUri WHERE { " + 
                 " <" + oc_uri + "> hasco:hasTimeScope ?timeScopeUri . " + 
                 "}";
-        Query query = QueryFactory.create(queryString);
 
-        QueryExecution qexec = QueryExecutionFactory.sparqlService(
-                CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), query);
-        ResultSet results = qexec.execSelect();
-        ResultSetRewindable resultsrw = ResultSetFactory.copyResults(results);
-        qexec.close();
+        ResultSetRewindable resultsrw = SPARQLUtils.select(
+                CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), queryString);
 
         while (resultsrw.hasNext()) {
             QuerySolution soln = resultsrw.next();
@@ -371,13 +360,9 @@ public class ObjectCollection extends HADatAcThing implements Comparable<ObjectC
                 "    OPTIONAL { <" + oc_uri + "> rdfs:comment ?comment } . \n" + 
                 "    OPTIONAL { <" + oc_uri + "> hasco:hasScope ?hasScopeUri } . \n" + 
                 "}";
-        Query query = QueryFactory.create(queryString);
 
-        QueryExecution qexec = QueryExecutionFactory.sparqlService(
-                CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), query);
-        ResultSet results = qexec.execSelect();
-        ResultSetRewindable resultsrw = ResultSetFactory.copyResults(results);
-        qexec.close();
+        ResultSetRewindable resultsrw = SPARQLUtils.select(
+                CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), queryString);
 
         if (!resultsrw.hasNext()) {
             System.out.println("[WARNING] ObjectCollection. Could not find OC with URI: <" + oc_uri + ">");
@@ -444,12 +429,8 @@ public class ObjectCollection extends HADatAcThing implements Comparable<ObjectC
                 "    ?uriMember hasco:isMemberOf <" + oc_uri + "> . \n" + 
                 "}";
 
-        Query queryMember = QueryFactory.create(queryMemberStr);
-        QueryExecution qexecMember = QueryExecutionFactory.sparqlService(
-                CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), queryMember);
-        ResultSet resultsMember = qexecMember.execSelect();
-        ResultSetRewindable resultsrwMember = ResultSetFactory.copyResults(resultsMember);
-        qexecMember.close();
+        ResultSetRewindable resultsrwMember = SPARQLUtils.select(
+                CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), queryMemberStr);
 
         if (resultsrwMember.hasNext()) {
             String uriMemberStr = "";
@@ -479,12 +460,10 @@ public class ObjectCollection extends HADatAcThing implements Comparable<ObjectC
                 "SELECT ?uri WHERE { " + 
                 "   ?ocType rdfs:subClassOf+ hasco:ObjectCollection . " +
                 "   ?uri a ?ocType . } ";
-        Query query = QueryFactory.create(queryString);
-        QueryExecution qexec = QueryExecutionFactory.sparqlService(
-                CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), query);
-        ResultSet results = qexec.execSelect();
-        ResultSetRewindable resultsrw = ResultSetFactory.copyResults(results);
-        qexec.close();
+
+        ResultSetRewindable resultsrw = SPARQLUtils.select(
+                CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), queryString);
+
         while (resultsrw.hasNext()) {
             QuerySolution soln = resultsrw.next();
             if (soln != null && soln.getResource("uri").getURI() != null) { 
@@ -492,6 +471,7 @@ public class ObjectCollection extends HADatAcThing implements Comparable<ObjectC
                 oc_list.add(sc);
             }
         }
+
         return oc_list;
     }
 
@@ -517,12 +497,10 @@ public class ObjectCollection extends HADatAcThing implements Comparable<ObjectC
                 "   ?uri a ?ocType . \n" +
                 "   ?uri hasco:isMemberOf <" + studyUri + "> . \n" +
                 " } ";
-        Query query = QueryFactory.create(queryString);
-        QueryExecution qexec = QueryExecutionFactory.sparqlService(
-                CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), query);
-        ResultSet results = qexec.execSelect();
-        ResultSetRewindable resultsrw = ResultSetFactory.copyResults(results);
-        qexec.close();
+
+        ResultSetRewindable resultsrw = SPARQLUtils.select(
+                CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), queryString);
+
         while (resultsrw.hasNext()) {
             QuerySolution soln = resultsrw.next();
             if (soln != null && soln.getResource("uri").getURI() != null) { 
@@ -544,6 +522,7 @@ public class ObjectCollection extends HADatAcThing implements Comparable<ObjectC
                 "   ?uri hasco:isMemberOf <" + studyUri + "> . \n" +
                 "   OPTIONAL { ?uri rdfs:label ?label } . \n" +
                 " } ";
+
         Query query = QueryFactory.create(queryString);
 
         QueryExecution qexec = QueryExecutionFactory.sparqlService(

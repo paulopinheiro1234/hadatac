@@ -19,6 +19,7 @@ import org.apache.jena.sparql.engine.http.QueryExceptionHTTP;
 import org.hadatac.utils.CollectionUtil;
 import org.hadatac.utils.ConfigProp;
 import org.hadatac.utils.NameSpaces;
+import org.hadatac.console.http.SPARQLUtils;
 import org.hadatac.entity.pojo.HADatAcThing;
 import org.hadatac.entity.pojo.ObjectCollection;
 import org.hadatac.entity.pojo.StudyObject;
@@ -85,13 +86,9 @@ public class SSDSampleMapper extends BasicGenerator {
                 " ?uri hasco:originalID ?id . \n" +
                 "}";
 
-        try {
-            Query sampleQuery = QueryFactory.create(queryString);
-            QueryExecution qexec = QueryExecutionFactory.sparqlService(
-                    CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), sampleQuery);
-            ResultSet results = qexec.execSelect();
-            ResultSetRewindable resultsrw = ResultSetFactory.copyResults(results);
-            qexec.close();
+        try {            
+            ResultSetRewindable resultsrw = SPARQLUtils.select(
+                    CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), queryString);
 
             while (resultsrw.hasNext()) {
                 QuerySolution soln = resultsrw.next();

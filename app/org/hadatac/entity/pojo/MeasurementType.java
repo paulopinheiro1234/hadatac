@@ -15,7 +15,9 @@ import org.apache.jena.query.ResultSetRewindable;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdf.model.ResourceFactory;
+import org.hadatac.console.http.SPARQLUtils;
 import org.hadatac.metadata.loader.URIUtils;
+import org.hadatac.utils.CollectionUtil;
 import org.hadatac.utils.NameSpaces;
 
 public class MeasurementType {
@@ -126,13 +128,7 @@ public class MeasurementType {
 					+ "  OPTIONAL { " + "<" + measurementType.getEntityUri() + "> " + "rdfs:label ?e_label . }\n"
 					+ "}";
 			
-			Query query = QueryFactory.create(queryString);
-			
-			QueryExecution qexec = QueryExecutionFactory.sparqlService(
-					hadatac.getStaticMetadataSparqlURL(), query);
-			ResultSet resultset = qexec.execSelect();
-			ResultSetRewindable resultsrw = ResultSetFactory.copyResults(resultset);
-			qexec.close();
+			ResultSetRewindable resultsrw = SPARQLUtils.select(hadatac.getStaticMetadataSparqlURL(), queryString);
 			
 			measurementTypeKb.setLocalName(measurementType.getLocalName());
 			measurementTypeKb.setValueColumn(measurementType.getValueColumn());
@@ -166,11 +162,7 @@ public class MeasurementType {
 					+ "  <" + measurementType.getUnitUri() + "> rdfs:label ?u_label . \n"
 					+ "}";
 			
-			query = QueryFactory.create(queryString);
-			qexec = QueryExecutionFactory.sparqlService(hadatac.getStaticMetadataSparqlURL(), query);
-			resultset = qexec.execSelect();
-			resultsrw = ResultSetFactory.copyResults(resultset);
-			qexec.close();
+			resultsrw = SPARQLUtils.select(hadatac.getStaticMetadataSparqlURL(), queryString);
 			
 			if (resultsrw.size() >= 1) {
 				QuerySolution soln = resultsrw.next();

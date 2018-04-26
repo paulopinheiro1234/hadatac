@@ -31,6 +31,7 @@ import org.labkey.remoteapi.CommandException;
 import be.objectify.deadbolt.java.actions.Group;
 import be.objectify.deadbolt.java.actions.Restrict;
 import org.hadatac.console.controllers.AuthApplication;
+import org.hadatac.console.http.SPARQLUtils;
 
 public class DataAcquisitionSchemaAttribute extends HADatAcThing {
 
@@ -471,12 +472,8 @@ public class DataAcquisitionSchemaAttribute extends HADatAcThing {
 
         //System.out.println("DataAcquisitionSchemaAttribute find() queryString: \n" + queryString);
 
-        Query query = QueryFactory.create(queryString);
-        QueryExecution qexec = QueryExecutionFactory.sparqlService(
-                CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), query);
-        ResultSet results = qexec.execSelect();
-        ResultSetRewindable resultsrw = ResultSetFactory.copyResults(results);
-        qexec.close();
+        ResultSetRewindable resultsrw = SPARQLUtils.select(
+                CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), queryString);
 
         if (!resultsrw.hasNext()) {
             System.out.println("[WARNING] DataAcquisitionSchemaAttribute. Could not find DASA with URI: <" + dasa_uri + ">");
@@ -558,13 +555,9 @@ public class DataAcquisitionSchemaAttribute extends HADatAcThing {
                 "    ?uri hasco:partOfSchema ?schemaUri .  " + 
                 "} ";
         System.out.println("[DASA] query string = \n" + queryString);
-        Query query = QueryFactory.create(queryString);
-
-        QueryExecution qexec = QueryExecutionFactory.sparqlService(
-                CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), query);
-        ResultSet results = qexec.execSelect();
-        ResultSetRewindable resultsrw = ResultSetFactory.copyResults(results);
-        qexec.close();
+        
+        ResultSetRewindable resultsrw = SPARQLUtils.select(
+                CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), queryString);
 
         if (!resultsrw.hasNext()) {
             System.out.println("[WARNING] DataAcquisitionSchemaAttribute. Could not find DASA's with attribute: " + attributeUri);
@@ -612,13 +605,9 @@ public class DataAcquisitionSchemaAttribute extends HADatAcThing {
                 "    ?uri hasco:hasAttribute ?attrUri . " +
                 "} ";
         System.out.println("[DASA] query string = \n" + queryString);
-        Query query = QueryFactory.create(queryString);
-
-        QueryExecution qexec = QueryExecutionFactory.sparqlService(
-                CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), query);
-        ResultSet results = qexec.execSelect();
-        ResultSetRewindable resultsrw = ResultSetFactory.copyResults(results);
-        qexec.close();
+        
+        ResultSetRewindable resultsrw = SPARQLUtils.select(
+                CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), queryString);
 
         if (!resultsrw.hasNext()) {
             System.out.println("[WARNING] DataAcquisitionSchemaAttribute. Could not find DASA's with attribute: " + studyUri);
@@ -657,13 +646,9 @@ public class DataAcquisitionSchemaAttribute extends HADatAcThing {
                 " ?uri a hasco:DASchemaAttribute . \n" + 
                 " ?uri hasco:partOfSchema <" + schemaUri + "> . \n" + 
                 "} ";
-        Query query = QueryFactory.create(queryString);
-
-        QueryExecution qexec = QueryExecutionFactory.sparqlService(
-                CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), query);
-        ResultSet results = qexec.execSelect();
-        ResultSetRewindable resultsrw = ResultSetFactory.copyResults(results);
-        qexec.close();
+        
+        ResultSetRewindable resultsrw = SPARQLUtils.select(
+                CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), queryString);
 
         if (!resultsrw.hasNext()) {
             System.out.println("[WARNING] DataAcquisitionSchemaAttribute. Could not find attributes for schema: <" + schemaUri + ">");

@@ -33,6 +33,7 @@ import org.apache.solr.client.solrj.beans.Field;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
 import org.hadatac.console.controllers.dataacquisitionsearch.FacetTree;
+import org.hadatac.console.http.SPARQLUtils;
 import org.hadatac.console.http.SolrUtils;
 import org.hadatac.console.models.Facet;
 import org.hadatac.console.models.FacetHandler;
@@ -780,17 +781,14 @@ public class Measurement extends HADatAcThing implements Runnable {
 
         String query = "";
         query += NameSpaces.getInstance().printSparqlNameSpaceList();
-        query += "SELECT ?uri ?label WHERE { "
-                + valueConstraint
-                + " ?uri rdfs:label ?label . "
+        query += "SELECT ?uri ?label WHERE { \n"
+                + valueConstraint + " \n"
+                + " ?uri rdfs:label ?label . \n"
                 + "}";
 
         try {
-            QueryExecution qe = QueryExecutionFactory.sparqlService(
+            ResultSetRewindable resultsrw = SPARQLUtils.select(
                     CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), query);
-            ResultSet resultSet = qe.execSelect();
-            ResultSetRewindable resultsrw = ResultSetFactory.copyResults(resultSet);
-            qe.close();
 
             while (resultsrw.hasNext()) {
                 QuerySolution soln = resultsrw.next();
@@ -818,11 +816,8 @@ public class Measurement extends HADatAcThing implements Runnable {
                 + "}";
 
         try {
-            QueryExecution qe = QueryExecutionFactory.sparqlService(
+            ResultSetRewindable resultsrw = SPARQLUtils.select(
                     CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), query);
-            ResultSet resultSet = qe.execSelect();
-            ResultSetRewindable resultsrw = ResultSetFactory.copyResults(resultSet);
-            qe.close();
 
             while (resultsrw.hasNext()) {
                 QuerySolution soln = resultsrw.next();

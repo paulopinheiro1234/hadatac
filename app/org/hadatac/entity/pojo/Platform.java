@@ -29,6 +29,7 @@ import org.hadatac.utils.NameSpaces;
 import be.objectify.deadbolt.java.actions.Group;
 import be.objectify.deadbolt.java.actions.Restrict;
 import org.hadatac.console.controllers.AuthApplication;
+import org.hadatac.console.http.SPARQLUtils;
 import org.hadatac.console.models.Facet;
 import org.hadatac.console.models.FacetHandler;
 import org.hadatac.metadata.loader.LabkeyDataHandler;
@@ -140,11 +141,9 @@ public class Platform extends HADatAcThing implements Comparable<Platform> {
 
         Map<HADatAcThing, List<HADatAcThing>> results = new HashMap<HADatAcThing, List<HADatAcThing>>();
         try {
-            QueryExecution qe = QueryExecutionFactory.sparqlService(
+            ResultSetRewindable resultsrw = SPARQLUtils.select(
                     CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), query);
-            ResultSet resultSet = qe.execSelect();
-            ResultSetRewindable resultsrw = ResultSetFactory.copyResults(resultSet);
-            qe.close();
+            
             while (resultsrw.hasNext()) {
                 QuerySolution soln = resultsrw.next();
                 Platform platform = new Platform();
@@ -230,12 +229,8 @@ public class Platform extends HADatAcThing implements Comparable<Platform> {
                 " ?uri a ?platModel ." + 
                 "} ";
 
-        Query query = QueryFactory.create(queryString);
-
-        QueryExecution qexec = QueryExecutionFactory.sparqlService(CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), query);
-        ResultSet results = qexec.execSelect();
-        ResultSetRewindable resultsrw = ResultSetFactory.copyResults(results);
-        qexec.close();
+        ResultSetRewindable resultsrw = SPARQLUtils.select(
+                CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), queryString);
 
         while (resultsrw.hasNext()) {
             QuerySolution soln = resultsrw.next();
@@ -260,12 +255,8 @@ public class Platform extends HADatAcThing implements Comparable<Platform> {
                 + "  OPTIONAL { ?platform <http://hadatac.org/ont/hasco/hasSecondCoordinate> ?lon . }\n"
                 + "  OPTIONAL { ?platform <http://hadatac.org/ont/hasco/hasThirdCoordinate> ?ele . }\n"
                 + "}";
-
-        Query query = QueryFactory.create(queryString);
-        QueryExecution qexec = QueryExecutionFactory.sparqlService(hadatac.getStaticMetadataSparqlURL(), query);
-        ResultSet results = qexec.execSelect();
-        ResultSetRewindable resultsrw = ResultSetFactory.copyResults(results);
-        qexec.close();
+        
+        ResultSetRewindable resultsrw = SPARQLUtils.select(hadatac.getStaticMetadataSparqlURL(), queryString);
 
         if (resultsrw.size() >= 1) {
             QuerySolution soln = resultsrw.next();

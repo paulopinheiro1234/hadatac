@@ -22,6 +22,7 @@ import org.hadatac.utils.CollectionUtil;
 import org.hadatac.utils.NameSpaces;
 import org.hadatac.utils.FirstLabel;
 import org.hadatac.utils.ConfigProp;
+import org.hadatac.console.http.SPARQLUtils;
 import org.hadatac.metadata.loader.LabkeyDataHandler;
 import org.hadatac.metadata.loader.URIUtils;
 import org.labkey.remoteapi.CommandException;
@@ -90,12 +91,9 @@ public class Sample extends StudyObject {
                 "    OPTIONAL { " + sp_uri + " hasco:hasSource ?hasSource } . " + 
                 "    OPTIONAL { " + sp_uri + " hasco:isPIConfirmed ?isPIConfirmed } . " + 
                 "}";
-        Query query = QueryFactory.create(queryString);
-
-        QueryExecution qexec = QueryExecutionFactory.sparqlService(CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), query);
-        ResultSet results = qexec.execSelect();
-        ResultSetRewindable resultsrw = ResultSetFactory.copyResults(results);
-        qexec.close();
+        
+        ResultSetRewindable resultsrw = SPARQLUtils.select(
+                CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), queryString);
 
         if (!resultsrw.hasNext()) {
             System.out.println("[WARNING] Sample. Could not find SP with URI: " + sp_uri);
@@ -178,12 +176,10 @@ public class Sample extends StudyObject {
                 "   ?uri hasco:isMemberOf  <" + oc.getUri() + "> . " +
                 " } ";
         System.out.println("Sample findByCollection: " + queryString);
-        Query query = QueryFactory.create(queryString);
-        QueryExecution qexec = QueryExecutionFactory.sparqlService(
-                CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), query);
-        ResultSet results = qexec.execSelect();
-        ResultSetRewindable resultsrw = ResultSetFactory.copyResults(results);
-        qexec.close();
+        
+        ResultSetRewindable resultsrw = SPARQLUtils.select(
+                CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), queryString);
+        
         while (resultsrw.hasNext()) {
             QuerySolution soln = resultsrw.next();
             if (soln != null && soln.getResource("uri").getURI() != null) { 

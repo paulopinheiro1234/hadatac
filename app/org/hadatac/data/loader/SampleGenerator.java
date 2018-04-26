@@ -13,6 +13,7 @@ import org.apache.jena.query.ResultSet;
 import org.apache.jena.query.ResultSetFactory;
 import org.apache.jena.query.ResultSetRewindable;
 import org.apache.jena.rdf.model.Literal;
+import org.hadatac.console.http.SPARQLUtils;
 import org.hadatac.entity.pojo.HADatAcThing;
 import org.hadatac.entity.pojo.ObjectCollection;
 import org.hadatac.entity.pojo.StudyObject;
@@ -49,11 +50,10 @@ public class SampleGenerator extends BasicGenerator {
                 + " SELECT (count(DISTINCT ?sampleURI) as ?sampleCount) WHERE { \n"
                 + " ?sampleURI hasco:isMemberOf* chear-kb:STD-" + studyID + " . \n"
                 + "}";
-        QueryExecution qexecSample = QueryExecutionFactory.sparqlService(
+        
+        ResultSetRewindable resultsrwSample = SPARQLUtils.select(
                 CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), sampleCountQuery);
-        ResultSet sampleResults = qexecSample.execSelect();
-        ResultSetRewindable resultsrwSample = ResultSetFactory.copyResults(sampleResults);
-        qexecSample.close();
+        
         if (resultsrwSample.hasNext()) {
             QuerySolution soln = resultsrwSample.next();
             Literal countLiteral = (Literal) soln.get("sampleCount");
@@ -100,12 +100,10 @@ public class SampleGenerator extends BasicGenerator {
         String subjectQuery = NameSpaces.getInstance().printSparqlNameSpaceList() 
                 + " SELECT ?subjectURI WHERE { "
                 + " ?subjectURI hasco:originalID \"" + rec.getValueByColumnName(mapCol.get("subjectID")) + "\" . }";
-
-        QueryExecution qexecSubject = QueryExecutionFactory.sparqlService(
+        
+        ResultSetRewindable resultsrwSubject = SPARQLUtils.select(
                 CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), subjectQuery);
-        ResultSet subjectResults = qexecSubject.execSelect();
-        ResultSetRewindable resultsrwSubject = ResultSetFactory.copyResults(subjectResults);
-        qexecSubject.close();
+        
         if (resultsrwSubject.hasNext()) {
             QuerySolution soln = resultsrwSubject.next();
             subject = soln.get("subjectURI").toString();

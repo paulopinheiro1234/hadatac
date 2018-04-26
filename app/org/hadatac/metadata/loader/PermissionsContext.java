@@ -18,6 +18,7 @@ import org.apache.jena.update.UpdateExecutionFactory;
 import org.apache.jena.update.UpdateFactory;
 import org.apache.jena.update.UpdateProcessor;
 import org.apache.jena.update.UpdateRequest;
+import org.hadatac.console.http.SPARQLUtils;
 import org.hadatac.utils.CollectionUtil;
 import org.hadatac.utils.Feedback;
 import org.hadatac.utils.NameSpaces;
@@ -52,12 +53,8 @@ public class PermissionsContext implements RDFContext {
     		String queryString = NameSpaces.getInstance().printSparqlNameSpaceList() + 
     				"SELECT (COUNT(*) as ?tot) WHERE { ?s ?p ?o . }";
     		
-    		Query query = QueryFactory.create(queryString);
-    			
-    		QueryExecution qexec = QueryExecutionFactory.sparqlService(CollectionUtil.getCollectionsName(CollectionUtil.PERMISSIONS_SPARQL), query);
-    		ResultSet results = qexec.execSelect();
-    		ResultSetRewindable resultsrw = ResultSetFactory.copyResults(results);
-    		qexec.close();
+    		ResultSetRewindable resultsrw = SPARQLUtils.select(
+                    CollectionUtil.getCollectionsName(CollectionUtil.PERMISSIONS_SPARQL), queryString);
     		
     		QuerySolution soln = resultsrw.next();
     		return Long.valueOf(soln.getLiteral("tot").getValue().toString()).longValue();

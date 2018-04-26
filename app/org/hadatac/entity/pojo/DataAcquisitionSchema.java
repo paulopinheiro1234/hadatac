@@ -23,6 +23,7 @@ import org.hadatac.utils.CollectionUtil;
 import org.hadatac.utils.NameSpaces;
 import org.hadatac.utils.FirstLabel;
 import org.hadatac.metadata.loader.URIUtils;
+import org.hadatac.console.http.SPARQLUtils;
 import org.hadatac.entity.pojo.DataAcquisitionSchemaAttribute;
 import org.hadatac.entity.pojo.DataAcquisitionSchemaObject;
 import org.labkey.remoteapi.CommandException;
@@ -429,12 +430,10 @@ public class DataAcquisitionSchema extends HADatAcThing {
         String queryString = NameSpaces.getInstance().printSparqlNameSpaceList() + 
                 "SELECT ?uri WHERE { " + 
                 "   ?uri a hasco:DASchema . } ";
-        Query query = QueryFactory.create(queryString);
-        QueryExecution qexec = QueryExecutionFactory.sparqlService(
-                CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), query);
-        ResultSet results = qexec.execSelect();
-        ResultSetRewindable resultsrw = ResultSetFactory.copyResults(results);
-        qexec.close();
+        
+        ResultSetRewindable resultsrw = SPARQLUtils.select(
+                CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), queryString);
+        
         while (resultsrw.hasNext()) {
             QuerySolution soln = resultsrw.next();
             if (soln != null && soln.getResource("uri").getURI() != null) { 
@@ -460,12 +459,8 @@ public class DataAcquisitionSchema extends HADatAcThing {
 
         // System.out.println("findPossibleValues query: " + queryString);
 
-        Query query = QueryFactory.create(queryString);
-        QueryExecution qexec = QueryExecutionFactory.sparqlService(
-                CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), query);
-        ResultSet results = qexec.execSelect();
-        ResultSetRewindable resultsrw = ResultSetFactory.copyResults(results);
-        qexec.close();
+        ResultSetRewindable resultsrw = SPARQLUtils.select(
+                CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), queryString);
 
         try {
             while (resultsrw.hasNext()) {
@@ -507,12 +502,8 @@ public class DataAcquisitionSchema extends HADatAcThing {
                 + " ?daso_or_dasa hasco:partOfSchema <" + schemaUri + "> . "
                 + " }";
 
-        Query query = QueryFactory.create(queryString);
-        QueryExecution qexec = QueryExecutionFactory.sparqlService(
-                CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), query);
-        ResultSet results = qexec.execSelect();
-        ResultSetRewindable resultsrw = ResultSetFactory.copyResults(results);
-        qexec.close();
+        ResultSetRewindable resultsrw = SPARQLUtils.select(
+                CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), queryString);
 
         if (resultsrw.hasNext()) {
             QuerySolution soln = resultsrw.next();
@@ -545,12 +536,8 @@ public class DataAcquisitionSchema extends HADatAcThing {
         
         System.out.println("findIdUriMappings() queryString: " + queryString);
 
-        Query query = QueryFactory.create(queryString);
-        QueryExecution qexec = QueryExecutionFactory.sparqlService(
-                CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), query);
-        ResultSet results = qexec.execSelect();
-        ResultSetRewindable resultsrw = ResultSetFactory.copyResults(results);
-        qexec.close();
+        ResultSetRewindable resultsrw = SPARQLUtils.select(
+                CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), queryString);
 
         try {
             while (resultsrw.hasNext()) {			

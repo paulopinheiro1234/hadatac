@@ -23,6 +23,7 @@ import org.apache.jena.query.ResultSetRewindable;
 import org.apache.jena.sparql.engine.http.QueryExceptionHTTP;
 import org.hadatac.console.controllers.AuthApplication;
 import org.hadatac.console.controllers.triplestore.UserManagement;
+import org.hadatac.console.http.SPARQLUtils;
 import org.hadatac.console.models.SysUser;
 import org.hadatac.utils.CollectionUtil;
 import org.hadatac.utils.NameSpaces;
@@ -45,11 +46,9 @@ public class ViewStudy extends Controller {
 		Map<String, String> indicatorMap = new HashMap<String, String>();
 		String indicatorLabel = "";
 		try {
-			QueryExecution qexecInd = QueryExecutionFactory.sparqlService(
-					CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), indicatorQuery);
-			ResultSet indicatorResults = qexecInd.execSelect();
-			ResultSetRewindable resultsrwIndc = ResultSetFactory.copyResults(indicatorResults);
-			qexecInd.close();
+			ResultSetRewindable resultsrwIndc = SPARQLUtils.select(
+	                CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), indicatorQuery);
+			
 			while (resultsrwIndc.hasNext()) {
 				QuerySolution soln = resultsrwIndc.next();
 				indicatorLabel = soln.get("label").toString();
@@ -72,12 +71,10 @@ public class ViewStudy extends Controller {
 					+ "?answer rdfs:label ?label . "
 					+ "}";
 			
-			try {
-				QueryExecution qexecIndvInd = QueryExecutionFactory.sparqlService(
-						CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), indvIndicatorQuery);
-				ResultSet indvIndResults = qexecIndvInd.execSelect();
-				ResultSetRewindable resultsrwIndvInd = ResultSetFactory.copyResults(indvIndResults);
-				qexecIndvInd.close();
+			try {		
+				ResultSetRewindable resultsrwIndvInd = SPARQLUtils.select(
+		                CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), indvIndicatorQuery);
+				
 				List<String> indvIndicatorList = new ArrayList<String>();
 				while (resultsrwIndvInd.hasNext()) {
 					QuerySolution soln = resultsrwIndvInd.next();
@@ -105,11 +102,9 @@ public class ViewStudy extends Controller {
 		Map<String, String> indicatorMap = new HashMap<String, String>();
 		String indicatorLabel = "";
 		try {
-			QueryExecution qexecInd = QueryExecutionFactory.sparqlService(
-					CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), indicatorQuery);
-			ResultSet indicatorResults = qexecInd.execSelect();
-			ResultSetRewindable resultsrwIndc = ResultSetFactory.copyResults(indicatorResults);
-			qexecInd.close();
+			ResultSetRewindable resultsrwIndc = SPARQLUtils.select(
+                    CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), indicatorQuery);
+			
 			while (resultsrwIndc.hasNext()) {
 				QuerySolution soln = resultsrwIndc.next();
 				indicatorLabel = soln.get("label").toString();
@@ -131,12 +126,9 @@ public class ViewStudy extends Controller {
 					+ "?answer rdfs:label ?label . "
 					+ "}";
 			
-			try {
-				QueryExecution qexecIndvInd = QueryExecutionFactory.sparqlService(
-						CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), indvIndicatorQuery);
-				ResultSet indvIndResults = qexecIndvInd.execSelect();
-				ResultSetRewindable resultsrwIndvInd = ResultSetFactory.copyResults(indvIndResults);
-				qexecIndvInd.close();
+			try {				
+				ResultSetRewindable resultsrwIndvInd = SPARQLUtils.select(
+	                    CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), indvIndicatorQuery);
 				
 				while (resultsrwIndvInd.hasNext()) {
 					QuerySolution soln = resultsrwIndvInd.next();
@@ -170,13 +162,9 @@ public class ViewStudy extends Controller {
 				+ "} " ;
 		Map<String, List<String>> poResult = new HashMap<String, List<String>>();
 		List<String> values = new ArrayList<String>();
-		try {
-			Query basicQuery = QueryFactory.create(basicQueryString);
-			QueryExecution qexec = QueryExecutionFactory.sparqlService(
-					CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), basicQuery);
-			ResultSet results = qexec.execSelect();
-			ResultSetRewindable resultsrw = ResultSetFactory.copyResults(results);
-			qexec.close();
+		try {			
+			ResultSetRewindable resultsrw = SPARQLUtils.select(
+	                CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), basicQueryString);
 			
 			while (resultsrw.hasNext()) {
 				QuerySolution soln = resultsrw.next();
@@ -222,13 +210,9 @@ public class ViewStudy extends Controller {
                 + "ORDER BY ?subjectUri \n";
     	Map<String, List<String>> subjectResult = new HashMap<String, List<String>>();
 		List<String> values = new ArrayList<String>();
-		try {
-			Query subjectQuery = QueryFactory.create(subjectQueryString);
-			QueryExecution qexec2 = QueryExecutionFactory.sparqlService(
-					CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), subjectQuery);
-			ResultSet results = qexec2.execSelect();
-			ResultSetRewindable resultsrw = ResultSetFactory.copyResults(results);
-			qexec2.close();
+		try {			
+			ResultSetRewindable resultsrw = SPARQLUtils.select(
+                    CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), subjectQueryString);
 			
 			while (resultsrw.hasNext()) {
 				QuerySolution soln = resultsrw.next();
@@ -252,13 +236,9 @@ public class ViewStudy extends Controller {
     			+ "?si	<http://hadatac.org/ont/hasco/isMemberOf>	?sc . "
     			+ "}";
 		List<String> values = new ArrayList<String>();
-		try {
-			Query sampleQuery = QueryFactory.create(scQueryString);
-			QueryExecution qexec3 = QueryExecutionFactory.sparqlService(
-					CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), sampleQuery);
-			ResultSet results = qexec3.execSelect();
-			ResultSetRewindable resultsrw = ResultSetFactory.copyResults(results);
-			qexec3.close();
+		try {			
+			ResultSetRewindable resultsrw = SPARQLUtils.select(
+                    CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), scQueryString);
 			
 			while (resultsrw.hasNext()) {
 				QuerySolution soln = resultsrw.next();

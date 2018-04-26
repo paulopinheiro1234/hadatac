@@ -36,6 +36,7 @@ import org.apache.solr.client.solrj.impl.HttpSolrClient;
 import org.apache.solr.client.solrj.response.UpdateResponse;
 import org.apache.solr.common.SolrDocument;
 import org.hadatac.console.controllers.metadata.DynamicFunctions;
+import org.hadatac.console.http.SPARQLUtils;
 import org.hadatac.console.models.Facet;
 import org.hadatac.console.models.FacetHandler;
 import org.hadatac.utils.CollectionUtil;
@@ -386,11 +387,9 @@ public class Study extends HADatAcThing {
 
         Map<HADatAcThing, List<HADatAcThing>> results = new HashMap<HADatAcThing, List<HADatAcThing>>();
         try {
-            QueryExecution qe = QueryExecutionFactory.sparqlService(
+            ResultSetRewindable resultsrw = SPARQLUtils.select(
                     CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), query);
-            ResultSet resultSet = qe.execSelect();
-            ResultSetRewindable resultsrw = ResultSetFactory.copyResults(resultSet);
-            qe.close();
+            
             while (resultsrw.hasNext()) {
                 QuerySolution soln = resultsrw.next();
                 Study study = new Study();
@@ -462,11 +461,9 @@ public class Study extends HADatAcThing {
                 "      ?oc_uri hasco:isMemberOf " + study_uri + " . " + 
                 " } ";
         try {
-            Query query = QueryFactory.create(queryString);
-            QueryExecution qexec = QueryExecutionFactory.sparqlService(CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), query);
-            ResultSet results = qexec.execSelect();
-            ResultSetRewindable resultsrw = ResultSetFactory.copyResults(results);
-            qexec.close();
+            ResultSetRewindable resultsrw = SPARQLUtils.select(
+                    CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), queryString);
+            
             while (resultsrw.hasNext()) {
                 QuerySolution soln = resultsrw.next();
                 if (soln.contains("oc_uri")) {
@@ -487,11 +484,9 @@ public class Study extends HADatAcThing {
                 "      ?da_uri hasco:isDataAcquisitionOf " + study_uri + " . " + 
                 " } ";
         try {
-            Query query = QueryFactory.create(queryString);
-            QueryExecution qexec = QueryExecutionFactory.sparqlService(CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), query);
-            ResultSet results = qexec.execSelect();
-            ResultSetRewindable resultsrw = ResultSetFactory.copyResults(results);
-            qexec.close();
+            ResultSetRewindable resultsrw = SPARQLUtils.select(
+                    CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), queryString);
+            
             while (resultsrw.hasNext()) {
                 QuerySolution soln = resultsrw.next();
                 if (soln.contains("da_uri")) {
@@ -533,11 +528,10 @@ public class Study extends HADatAcThing {
 
         try {
             //System.out.println("Study's find() query: " + studyQueryString);
-            Query studyQuery = QueryFactory.create(studyQueryString);
-            QueryExecution qexec = QueryExecutionFactory.sparqlService(CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), studyQuery);
-            ResultSet results = qexec.execSelect();
-            ResultSetRewindable resultsrw = ResultSetFactory.copyResults(results);
-            qexec.close();
+            
+            ResultSetRewindable resultsrw = SPARQLUtils.select(
+                    CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), studyQueryString);
+            
             if (resultsrw.hasNext()) {
                 QuerySolution soln = resultsrw.next();
                 returnStudy.setUri(prefixedUri);
@@ -606,13 +600,10 @@ public class Study extends HADatAcThing {
                 " } " + 
                 " GROUP BY ?studyType ?studyLabel ?title ?proj ?studyComment ?external ?agentUri ?institutionUri ?lastId ";
 
-        try {
-            Query studyQuery = QueryFactory.create(studyQueryString);
-            QueryExecution qexec = QueryExecutionFactory.sparqlService(
-                    CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), studyQuery);
-            ResultSet results = qexec.execSelect();
-            ResultSetRewindable resultsrw = ResultSetFactory.copyResults(results);
-            qexec.close();
+        try {            
+            ResultSetRewindable resultsrw = SPARQLUtils.select(
+                    CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), studyQueryString);
+            
             if (resultsrw.hasNext()) {
                 QuerySolution soln = resultsrw.next();
                 returnStudy.setUri(queryUri);
@@ -872,14 +863,9 @@ public class Study extends HADatAcThing {
 
         Model model = ModelFactory.createDefaultModel();
         try {
-            Query studyQuery = QueryFactory.create(studyQueryString);
-            QueryExecution qexec = QueryExecutionFactory.sparqlService(
-                    CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), studyQuery);
-            ResultSet results = qexec.execSelect();
-            ResultSetRewindable resultsrw = ResultSetFactory.copyResults(results);
-            qexec.close();
+            ResultSetRewindable resultsrw = SPARQLUtils.select(
+                    CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), studyQueryString);
 
-            //System.out.println("resultsrw.size(): " + resultsrw.size());
             while (resultsrw.hasNext()) {
                 QuerySolution soln = resultsrw.next();
 
@@ -905,13 +891,8 @@ public class Study extends HADatAcThing {
                 "          ?studyUri a ?subUri . " +  
                 " }";
 
-        Query query = QueryFactory.create(queryString);
-
-        QueryExecution qexec = QueryExecutionFactory.sparqlService(
-                CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), query);
-        ResultSet results = qexec.execSelect();
-        ResultSetRewindable resultsrw = ResultSetFactory.copyResults(results);
-        qexec.close();
+        ResultSetRewindable resultsrw = SPARQLUtils.select(
+                CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), queryString);
 
         Study study = null;
         while (resultsrw.hasNext()) {

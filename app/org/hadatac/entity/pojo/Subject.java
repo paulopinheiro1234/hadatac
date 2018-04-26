@@ -1,13 +1,8 @@
 package org.hadatac.entity.pojo;
 
-import org.apache.jena.query.Query;
-import org.apache.jena.query.QueryExecution;
-import org.apache.jena.query.QueryExecutionFactory;
-import org.apache.jena.query.QueryFactory;
 import org.apache.jena.query.QuerySolution;
-import org.apache.jena.query.ResultSet;
-import org.apache.jena.query.ResultSetFactory;
 import org.apache.jena.query.ResultSetRewindable;
+import org.hadatac.console.http.SPARQLUtils;
 import org.hadatac.utils.CollectionUtil;
 import org.hadatac.utils.NameSpaces;
 
@@ -21,13 +16,8 @@ public class Subject extends StudyObject {
 				+ "  <" + subject_uri + "> hasco:isSubjectOf ?cohort . \n"
 				+ "}";
 
-		Query query = QueryFactory.create(queryString);
-
-		QueryExecution qexec = QueryExecutionFactory.sparqlService(
-				CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), query);
-		ResultSet results = qexec.execSelect();
-		ResultSetRewindable resultsrw = ResultSetFactory.copyResults(results);
-		qexec.close();
+		ResultSetRewindable resultsrw = SPARQLUtils.select(
+                CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), queryString);
 
 		if (resultsrw.size() >= 1) {
 			return true;
@@ -44,13 +34,8 @@ public class Subject extends StudyObject {
 				+ "  ?cohort hasco:isCohortOf " + study_uri + " .\n"
 				+ "}";
 
-		Query query = QueryFactory.create(queryString);
-
-		QueryExecution qexec = QueryExecutionFactory.sparqlService(
-				CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), query);
-		ResultSet results = qexec.execSelect();
-		ResultSetRewindable resultsrw = ResultSetFactory.copyResults(results);
-		qexec.close();
+		ResultSetRewindable resultsrw = SPARQLUtils.select(
+                CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), queryString);
 
 		if (resultsrw.size() >= 1) {
 			Subject subject = new Subject();
@@ -71,12 +56,8 @@ public class Subject extends StudyObject {
 				+ "  ?cohort hasco:isCohortOf " + study_uri + " .\n"
 				+ "}";
 
-		Query query = QueryFactory.create(queryString);
-		QueryExecution qexec = QueryExecutionFactory.sparqlService(
-				CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), query);
-		ResultSet results = qexec.execSelect();
-		ResultSetRewindable resultsrw = ResultSetFactory.copyResults(results);
-		qexec.close();
+		ResultSetRewindable resultsrw = SPARQLUtils.select(
+                CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), queryString);
 
 		if (resultsrw.size() >= 1) {
 			QuerySolution soln = resultsrw.next();

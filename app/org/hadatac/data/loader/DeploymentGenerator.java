@@ -13,6 +13,7 @@ import org.apache.jena.query.ResultSet;
 import org.apache.jena.query.ResultSetFactory;
 import org.apache.jena.query.ResultSetRewindable;
 import org.apache.jena.rdf.model.RDFNode;
+import org.hadatac.console.http.SPARQLUtils;
 import org.hadatac.metadata.loader.URIUtils;
 import org.hadatac.utils.CollectionUtil;
 import org.hadatac.utils.ConfigProp;
@@ -48,11 +49,9 @@ public class DeploymentGenerator extends BasicGenerator {
 				+ " ?cohort hasco:isCohortOf " + getStudy(rec) + " . "
 				+ " }";
 
-		QueryExecution qe = QueryExecutionFactory.sparqlService(
-				CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), strQuery);
-		ResultSet resultSet = qe.execSelect();
-		ResultSetRewindable resultsrw = ResultSetFactory.copyResults(resultSet);
-		qe.close();
+		ResultSetRewindable resultsrw = SPARQLUtils.select(
+                CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), strQuery);
+		
 		if (resultsrw.hasNext()) {
 			QuerySolution soln = resultsrw.next();
 			RDFNode node = soln.get("cohort");
@@ -70,12 +69,10 @@ public class DeploymentGenerator extends BasicGenerator {
 				+ " SELECT ?sampleCollection WHERE { "
 				+ " ?sampleCollection hasco:isMemberOf " + getStudy(rec) + " . "
 				+ " }";
-
-		QueryExecution qe = QueryExecutionFactory.sparqlService(
-				CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), strQuery);
-		ResultSet resultSet = qe.execSelect();
-		ResultSetRewindable resultsrw = ResultSetFactory.copyResults(resultSet);
-		qe.close();
+		
+		ResultSetRewindable resultsrw = SPARQLUtils.select(
+                CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), strQuery);
+		
 		if (resultsrw.hasNext()) {
 			QuerySolution soln = resultsrw.next();
 			RDFNode node = soln.get("sampleCollection");

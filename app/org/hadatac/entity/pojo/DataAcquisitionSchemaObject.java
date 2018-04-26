@@ -21,6 +21,7 @@ import org.apache.jena.update.UpdateRequest;
 import org.hadatac.utils.CollectionUtil;
 import org.hadatac.utils.NameSpaces;
 import org.hadatac.utils.FirstLabel;
+import org.hadatac.console.http.SPARQLUtils;
 import org.hadatac.metadata.loader.LabkeyDataHandler;
 import org.hadatac.metadata.loader.URIUtils;
 import org.labkey.remoteapi.CommandException;
@@ -241,13 +242,9 @@ public class DataAcquisitionSchemaObject extends HADatAcThing {
                 "}";
 
         //System.out.println("DataAcquisitionSchemaObject find(String uri) query: " + queryString);
-
-        Query query = QueryFactory.create(queryString);
-        QueryExecution qexec = QueryExecutionFactory.sparqlService(
-                CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), query);
-        ResultSet results = qexec.execSelect();
-        ResultSetRewindable resultsrw = ResultSetFactory.copyResults(results);
-        qexec.close();
+        
+        ResultSetRewindable resultsrw = SPARQLUtils.select(CollectionUtil.getCollectionsName(
+                CollectionUtil.METADATA_SPARQL), queryString);
 
         if (!resultsrw.hasNext()) {
             System.out.println("[WARNING] DataAcquisitionSchemaObject. Could not find object with uri: " + uri);
@@ -333,13 +330,9 @@ public class DataAcquisitionSchemaObject extends HADatAcThing {
                 "   ?uri a hasco:DASchemaObject . \n" + 
                 "   ?uri hasco:partOfSchema <" + schemaUri + "> . \n" + 
                 "}";
-        Query query = QueryFactory.create(queryString);
-
-        QueryExecution qexec = QueryExecutionFactory.sparqlService(
-                CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), query);
-        ResultSet results = qexec.execSelect();
-        ResultSetRewindable resultsrw = ResultSetFactory.copyResults(results);
-        qexec.close();
+        
+        ResultSetRewindable resultsrw = SPARQLUtils.select(
+                CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), queryString);
 
         if (!resultsrw.hasNext()) {
             System.out.println("[WARNING] DataAcquisitionSchemaObject. Could not find objects for schema: " + schemaUri);

@@ -29,6 +29,7 @@ import org.hadatac.console.controllers.AuthApplication;
 import org.hadatac.console.controllers.deployments.*;
 import org.hadatac.console.controllers.triplestore.UserManagement;
 import org.hadatac.console.http.DeploymentQueries;
+import org.hadatac.console.http.SPARQLUtils;
 import org.hadatac.console.models.DeploymentForm;
 import org.hadatac.console.models.SparqlQueryResults;
 import org.hadatac.console.models.SysUser;
@@ -68,14 +69,8 @@ public class ViewSample extends Controller {
 //         				+ sample_uri + " <http://hadatac.org/ont/hasco/hasSamplingVolumeUnit> ?samplingVolumeUnit . "
          				+ "}";
     	
-        
-		//Query basicQuery = QueryFactory.create(basicQueryString);
-    	Query basicQuery = QueryFactory.create(sampleQueryString);
-    	
-		QueryExecution qexec = QueryExecutionFactory.sparqlService(CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), basicQuery);
-		ResultSet results = qexec.execSelect();
-		ResultSetRewindable resultsrw = ResultSetFactory.copyResults(results);
-		qexec.close();
+		ResultSetRewindable resultsrw = SPARQLUtils.select(
+                CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), sampleQueryString);
 		
 		Map<String, List<String>> sampleResult = new HashMap<String, List<String>>();
 		List<String> values = new ArrayList<String>();
