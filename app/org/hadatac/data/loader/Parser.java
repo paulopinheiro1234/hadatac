@@ -316,9 +316,19 @@ public class Parser {
                             measurement.setStudyObjectUri(mapIDStudyObjects.get(id).get(0));
                             measurement.setObjectUri(mapIDStudyObjects.get(id).get(2));
                             measurement.setPID(mapIDStudyObjects.get(id).get(1));
-                            System.out.println("[Parser] mapIDStudyObjects contains an ID for a Sample");
+                            //System.out.println("[Parser] mapIDStudyObjects contains an ID for a Sample");
                         }
                         measurement.setObjectCollectionType(URIUtils.replacePrefixEx("hasco:SampleCollection"));
+                        measurement.setSID(id);
+                    } else {
+                // Added this capability for other entities that may be represented in 
+                //   the data which are neither humans nor samples
+                        //System.out.println("[Parser] DASA.getEntity: " + dasa.getEntity());
+                        if (mapIDStudyObjects.containsKey(id)) {
+                            measurement.setStudyObjectUri(mapIDStudyObjects.get(id).get(0));
+                            measurement.setObjectUri(mapIDStudyObjects.get(id).get(0));
+                            //System.out.println("[Parser] mapIDStudyObjects contains an ID for a something else");
+                        }
                         measurement.setSID(id);
                     }
                 }
@@ -409,7 +419,7 @@ public class Parser {
 
                 DataAcquisitionSchemaObject inRelationToDaso = null;
                 String inRelationToUri = dasa.getInRelationToUri(URIUtils.replacePrefixEx("sio:inRelationTo"));
-                System.out.println("[Parser] dasa.getInRelationToUri = " + dasa.getInRelationToUri(URIUtils.replacePrefixEx("sio:inRelationTo")));
+                //System.out.println("[Parser] dasa.getInRelationToUri = " + dasa.getInRelationToUri(URIUtils.replacePrefixEx("sio:inRelationTo")));
                 if (mapSchemaObjects.containsKey(inRelationToUri)) {
                     inRelationToDaso = mapSchemaObjects.get(inRelationToUri);
                 } else {

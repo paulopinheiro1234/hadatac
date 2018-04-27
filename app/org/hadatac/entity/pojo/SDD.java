@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.io.FileUtils;
+import org.hadatac.utils.Templates;
 import org.hadatac.data.loader.Record;
 import org.hadatac.data.loader.RecordFile;
 import org.hadatac.metadata.loader.URIUtils;
@@ -62,7 +63,7 @@ public class SDD {
 	    if (!file.isValid()) {
             return;
         }
-	    
+	    // This is on the infosheet
 	    for (Record record : file.getRecords()) {
 	        mapCatalog.put(record.getValueByColumnIndex(0), record.getValueByColumnIndex(1));
 	    }
@@ -90,7 +91,7 @@ public class SDD {
 		}
 		
 		for (Record record : file.getRecords()) {
-			mapAttrObj.put(record.getValueByColumnIndex(0), record.getValueByColumnIndex(2));
+			mapAttrObj.put(record.getValueByColumnName(Templates.LABEL), record.getValueByColumnName(Templates.ATTTRIBUTEOF));
 		}
 		System.out.println("[SDD] mapAttrObj: " + mapAttrObj);
 	}
@@ -101,7 +102,7 @@ public class SDD {
 		}
 		
 		for (Record record : file.getRecords()) {
-			codeMappings.put(record.getValueByColumnIndex(0), record.getValueByColumnIndex(1));
+			codeMappings.put(record.getValueByColumnName(Templates.CODE), record.getValueByColumnName(Templates.CLASS));
 		}
 	}
 	
@@ -111,8 +112,8 @@ public class SDD {
 		}
 		
 		for (Record record : file.getRecords()) {
-			if (!record.getValueByColumnIndex(0).isEmpty()) {
-				String colName = record.getValueByColumnIndex(0);
+			if (!record.getValueByColumnName(Templates.LABEL).isEmpty()) {
+				String colName = record.getValueByColumnName(Templates.LABEL);
 				Map<String, String> mapCodeClass = null;
 				if (!codebook.containsKey(colName)) {
 					mapCodeClass = new HashMap<String, String>();
@@ -121,15 +122,17 @@ public class SDD {
 					mapCodeClass = codebook.get(colName);
 				}
 				String classUri = "";
-				if (!record.getValueByColumnIndex(3).isEmpty()) {
+				if (!record.getValueByColumnName(Templates.CLASS).isEmpty()) {
 					// Class column
-					classUri = URIUtils.replacePrefixEx(record.getValueByColumnIndex(3));
+                    //System.out.println("[SDD] CLASS " + record.getValueByColumnName(Templates.CLASS));
+					classUri = URIUtils.replacePrefixEx(record.getValueByColumnName(Templates.CLASS));
 				} 
 //					else {
 //						// Resource column
 //						classUri = URIUtils.replacePrefixEx(record.get(4));
 //					}
-				mapCodeClass.put(record.getValueByColumnIndex(1), classUri);
+                //System.out.println("[SDD] CODE " + record.getValueByColumnName(Templates.CODE));
+				mapCodeClass.put(record.getValueByColumnName(Templates.CODE), classUri);
 			}
 		}
 	}

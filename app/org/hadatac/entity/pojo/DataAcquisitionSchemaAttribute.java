@@ -309,7 +309,7 @@ public class DataAcquisitionSchemaAttribute extends HADatAcThing {
     }
 
     public String getInRelationToUri(String relationUri) {
-        System.out.println("[DASA] relations: " + relations);
+        //System.out.println("[DASA] relations: " + relations);
         if (relations.containsKey(relationUri)) {
             return relations.get(relationUri);
         }
