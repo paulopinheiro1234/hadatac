@@ -132,6 +132,8 @@ public class Parser {
         Map<String, List<String>> mapIDStudyObjects = DataAcquisitionSchema.findIdUriMappings(da.getStudyUri());
         String dasoUnitUri = DataAcquisitionSchema.findByLabel(da.getSchemaUri(), schema.getUnitLabel());
 
+        //System.out.println("[Parser] mapIDStudyObjects = " + mapIDStudyObjects);
+
         //System.out.println("possibleValues: " + possibleValues);
 
         // Comment out row instance generation
@@ -314,6 +316,7 @@ public class Parser {
                             measurement.setStudyObjectUri(mapIDStudyObjects.get(id).get(0));
                             measurement.setObjectUri(mapIDStudyObjects.get(id).get(2));
                             measurement.setPID(mapIDStudyObjects.get(id).get(1));
+                            System.out.println("[Parser] mapIDStudyObjects contains an ID for a Sample");
                         }
                         measurement.setObjectCollectionType(URIUtils.replacePrefixEx("hasco:SampleCollection"));
                         measurement.setSID(id);
@@ -406,6 +409,7 @@ public class Parser {
 
                 DataAcquisitionSchemaObject inRelationToDaso = null;
                 String inRelationToUri = dasa.getInRelationToUri(URIUtils.replacePrefixEx("sio:inRelationTo"));
+                System.out.println("[Parser] dasa.getInRelationToUri = " + dasa.getInRelationToUri(URIUtils.replacePrefixEx("sio:inRelationTo")));
                 if (mapSchemaObjects.containsKey(inRelationToUri)) {
                     inRelationToDaso = mapSchemaObjects.get(inRelationToUri);
                 } else {

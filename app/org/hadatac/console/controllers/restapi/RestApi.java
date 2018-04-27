@@ -209,7 +209,7 @@ public class RestApi extends Controller {
                 "           ?itype rdfs:label ?itypelabel . }" +
                 "} values ?class { " + classes + "} ";
         
-        //System.out.println("[VariableQuery] sparql query\n" + sparqlQueryString);
+        System.out.println("[VariableQuery] sparql query\n" + sparqlQueryString);
 		
 		ResultSetRewindable resultsrw = SPARQLUtils.select(
                 CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), sparqlQueryString);
@@ -362,10 +362,22 @@ public class RestApi extends Controller {
         System.out.println("[getAllStudies] found " + theStudies.size() + " things");
         if(theStudies.size() == 0){
             return notFound(ApiUtil.createResponse("No studies found", false));
-        } else {
-            JsonNode jsonObject = mapper.convertValue(theStudies, JsonNode.class);
-            return ok(ApiUtil.createResponse(jsonObject, true));
         }
+        ArrayNode fResult = mapper.createArrayNode();
+        for(Study st : theStudies){
+            ObjectNode temp = mapper.createObjectNode();
+            List<String> vars = getUsedVarsInStudy(st.getUri());
+            ArrayNode anode = mapper.convertValue(vars, ArrayNode.class);
+            //ArrayNode anode = variableQuery(formatQueryValues(uris));
+            if(anode == null){
+                System.out.println("[RestApi] WARN: no variables found for study " + st.getUri());
+            }
+            temp.set("study_info", mapper.convertValue(theStudies, JsonNode.class));
+            temp.set("variable_uris", anode);
+            fResult.add(temp);
+        }
+        JsonNode jsonObject = mapper.convertValue(theStudies, JsonNode.class);
+        return ok(ApiUtil.createResponse(jsonObject, true));
     }// /getAllStudies()
 
     // **********
@@ -449,10 +461,20 @@ public class RestApi extends Controller {
         System.out.println("[RestAPI] type: " + result.getType());
         if(result == null || result.getType() == null || result.getType() == ""){
             return notFound(ApiUtil.createResponse("Study with name/ID " + studyUri + " not found", false));
-        } else {
-            JsonNode jsonObject = mapper.convertValue(result, JsonNode.class);
-            return ok(ApiUtil.createResponse(jsonObject, true));
+        } 
+        // get the list of variables in that study
+        // serialize the Study object first as ObjectNode
+        //   as JsonNode is immutable and meant to be read-only
+        ObjectNode obj = mapper.convertValue(result, ObjectNode.class);
+        List<String> vars = getUsedVarsInStudy(studyUri);
+        ArrayNode anode = mapper.convertValue(vars, ArrayNode.class);
+        //ArrayNode anode = variableQuery(formatQueryValues(uris));
+        if(anode == null){
+            System.out.println("[RestApi] WARN: no variables found for study " + studyUri);
         }
+        obj.set("variable_uris", anode);
+        JsonNode jsonObject = mapper.convertValue(obj, JsonNode.class);
+        return ok(ApiUtil.createResponse(jsonObject, true));
     }// /getStudy()
 
     // **********

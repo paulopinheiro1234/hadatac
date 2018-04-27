@@ -92,7 +92,7 @@ public class SDD {
 		for (Record record : file.getRecords()) {
 			mapAttrObj.put(record.getValueByColumnIndex(0), record.getValueByColumnIndex(2));
 		}
-		System.out.println("mapAttrObj: " + mapAttrObj);
+		System.out.println("[SDD] mapAttrObj: " + mapAttrObj);
 	}
 	
 	public void readCodeMapping(RecordFile file) {
