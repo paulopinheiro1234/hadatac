@@ -19,6 +19,7 @@ import org.apache.jena.sparql.engine.http.QueryExceptionHTTP;
 import org.hadatac.utils.CollectionUtil;
 import org.hadatac.utils.ConfigProp;
 import org.hadatac.utils.NameSpaces;
+import org.hadatac.utils.Templates;
 import org.hadatac.console.http.SPARQLUtils;
 import org.hadatac.entity.pojo.HADatAcThing;
 import org.hadatac.entity.pojo.ObjectCollection;
@@ -44,17 +45,17 @@ public class SampleSubjectMapper extends BasicGenerator {
     @Override
     void initMapping() {
         mapCol.clear();
-        mapCol.put("type", "rdf:type");
-        mapCol.put("originalPID", "CHEAR PID");
-        mapCol.put("originalSID", "Full SID");
+        mapCol.put("type", Templates.OBJECTTYPE);
+        mapCol.put("originalPID", Templates.ORIGINALPID);
+        mapCol.put("originalSID", Templates.ORIGINALSID);
         try{
-            mapCol.put("pilotNum", "CHEAR_Project_ID");
+            mapCol.put("pilotNum", Templates.MAPSTUDYID);
         } catch (QueryExceptionHTTP e) {
             e.printStackTrace();
             System.out.println("This sheet or MAP file contains no CHEAR_Project_ID column");
         }
         try{
-            mapCol.put("timeScopeID", "timeScopeID");
+            mapCol.put("timeScopeID", Templates.TIMESCOPEID);
         } catch (QueryExceptionHTTP e) {
             e.printStackTrace();
             System.out.println("This sheet or MAP file contains no timeScopeID column");

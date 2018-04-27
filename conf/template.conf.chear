@@ -70,6 +70,9 @@ storageTemp=sample_storage_temp
 FTcount=sample_freeze_thaw_cycles
 
 # MAP Template
-originalPID=patient_id
-originalSID=specimen_id
+originalPID=CHEAR PID
+originalSID=Full SID
+objectype=rdf:type
+studyId=CHEAR_Project_ID
+timeScope=timeScopeID
 

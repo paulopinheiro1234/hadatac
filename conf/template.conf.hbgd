@@ -71,4 +71,7 @@ FTcount=sample_freeze_thaw_cycles
 # MAP Template
 originalPID=patient_id
 originalSID=specimen_id
+objectype=rdf:type
+studyId=study_id
+timeScope=timeScopeID
 

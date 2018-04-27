@@ -75,4 +75,7 @@ public class Templates {
     // MAP Template                                                                                                  
     public static String ORIGINALPID = ConfigProp.getPropertyValue(TEMPLATE_FILE, "originalPID");
     public static String ORIGINALSID = ConfigProp.getPropertyValue(TEMPLATE_FILE, "originalSID");
+    public static String OBJECTTYPE = ConfigProp.getPropertyValue(TEMPLATE_FILE, "objecttype");
+    public static String MAPSTUDYID = ConfigProp.getPropertyValue(TEMPLATE_FILE, "studyId");
+    public static String TIMESCOPEID = ConfigProp.getPropertyValue(TEMPLATE_FILE, "timeScope");
 }
