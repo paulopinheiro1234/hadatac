@@ -44,6 +44,10 @@ public class SpreadsheetRecordFile implements RecordFile {
                 sheet = workbook.getSheet(sheetName);
             }
 
+            if (sheet == null) {
+                return null;
+            }
+            
             Iterator<Row> rows = sheet.iterator();
 
             Iterable<Row> iterable = () -> rows;

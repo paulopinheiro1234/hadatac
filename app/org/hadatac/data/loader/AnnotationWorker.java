@@ -251,51 +251,38 @@ public class AnnotationWorker {
         System.out.println("Processing SSD file of " + Pilot_Num + "...");
 
         RecordFile SSDsheet = new SpreadsheetRecordFile(file.getFile(), "SSD");
-        RecordFile SBJsheet = null;
-        RecordFile MOMsheet = null;
-        RecordFile SSAPsheet = null;
-        RecordFile MSAPsheet = null;
-        RecordFile TIMEsheet = null;
-        MotherGenerator motherGenerator = null;
-        
-        SBJsheet = new SpreadsheetRecordFile(file.getFile(), "SOC-SUBJECTS");
+        RecordFile SBJsheet = new SpreadsheetRecordFile(file.getFile(), "SOC-SUBJECTS");
+        RecordFile MOMsheet = new SpreadsheetRecordFile(file.getFile(), "SOC-MOTHERS");
+        RecordFile SSAPsheet = new SpreadsheetRecordFile(file.getFile(), "SOC-SSAMPLES");
+        RecordFile MSAPsheet = new SpreadsheetRecordFile(file.getFile(), "SOC-MSAMPLES");
+        RecordFile TIMEsheet = new SpreadsheetRecordFile(file.getFile(), "SOC-VISITS");
 
-        MOMsheet = new SpreadsheetRecordFile(file.getFile(), "SOC-MOTHERS");
-
-        SSAPsheet = new SpreadsheetRecordFile(file.getFile(), "SOC-SSAMPLES");
-
-
-        MSAPsheet = new SpreadsheetRecordFile(file.getFile(), "SOC-MSAMPLES");
-
-        TIMEsheet = new SpreadsheetRecordFile(file.getFile(), "SOC-VISITS");
-        
         GeneratorChain chain = new GeneratorChain();
-        chain.addGenerator(new SSDGenerator(SSDsheet));
-        try{
-        	chain.addGenerator(new SubjectGenerator(SBJsheet));
-        } catch (Exception e) {
-        	System.out.print("SSD SubjectGenerator failed..");
+        if (SSDsheet.isValid()) {
+            chain.addGenerator(new SSDGenerator(SSDsheet));
+        } else {
+            chain.setInvalid();
+            AnnotationLog.printException("Cannot sheet SSD ", file.getFile().getName());
         }
-        try{
-        	motherGenerator = new MotherGenerator(MOMsheet);
-        	chain.addGenerator(motherGenerator);
-        } catch (Exception e) {
-        	System.out.print("SSD motherGenerator failed..");
+        if (SBJsheet.isValid()) {
+            chain.addGenerator(new SubjectGenerator(SBJsheet));
+        } else {
+            chain.setInvalid();
+            AnnotationLog.printException("Cannot sheet SOC-SUBJECTS ", file.getFile().getName());
         }
-        try{
-        	chain.addGenerator(new SSDSampleMapper(SSAPsheet));
-        } catch (Exception e) {
-        	System.out.print("SSD SSAPsheet SSDSampleMapper failed..");
+        if (SSAPsheet.isValid()) {
+            chain.addGenerator(new SSDSampleMapper(SSAPsheet));
+        } else {
+            chain.setInvalid();
+            AnnotationLog.printException("Cannot sheet SOC-SSAMPLES ", file.getFile().getName());
         }
-        try{
-        	chain.addGenerator(new SSDSampleMapper(MSAPsheet, motherGenerator));
-        } catch (Exception e) {
-        	System.out.print("SSD MSAPsheet SSDSampleMapper failed..");
-        }
-        try{
-        	chain.addGenerator(new TimeInstantGenerator(TIMEsheet));
-        } catch (Exception e) {
-        	System.out.print("SSD TimeInstantGenerator failed..");
+        if (MOMsheet.isValid()) {
+            MotherGenerator motherGenerator = new MotherGenerator(MOMsheet);
+            chain.addGenerator(motherGenerator);
+            chain.addGenerator(new SSDSampleMapper(MSAPsheet, motherGenerator));
+        } else {
+            chain.setInvalid();
+            AnnotationLog.printException("Cannot sheet SOC-MOTHERS ", file.getFile().getName());
         }
 
         return chain;

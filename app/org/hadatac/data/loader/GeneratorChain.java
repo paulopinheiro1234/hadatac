@@ -8,12 +8,25 @@ import org.hadatac.console.controllers.annotator.AnnotationLog;
 public class GeneratorChain {
 
     private List<BasicGenerator> chain = new ArrayList<BasicGenerator>();
+    private boolean bValid = true;
+    
+    public boolean isValid() {
+        return bValid;
+    }
+    
+    public void setInvalid() {
+        bValid = false;
+    }
 
     public void addGenerator(BasicGenerator generator) {
         chain.add(generator);
     }
 
     public boolean generate() {
+        if (!isValid()) {
+            return false;
+        }
+        
         for (BasicGenerator generator : chain) {
             try {			
                 generator.preprocess();
