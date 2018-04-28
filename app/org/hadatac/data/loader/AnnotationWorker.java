@@ -261,19 +261,19 @@ public class AnnotationWorker {
         if (SSDsheet.isValid()) {
             chain.addGenerator(new SSDGenerator(SSDsheet));
         } else {
-            chain.setInvalid();
+            //chain.setInvalid();
             AnnotationLog.printException("Cannot sheet SSD ", file.getFile().getName());
         }
         if (SBJsheet.isValid()) {
             chain.addGenerator(new SubjectGenerator(SBJsheet));
         } else {
-            chain.setInvalid();
+            //chain.setInvalid();
             AnnotationLog.printException("Cannot sheet SOC-SUBJECTS ", file.getFile().getName());
         }
         if (SSAPsheet.isValid()) {
             chain.addGenerator(new SSDSampleMapper(SSAPsheet));
         } else {
-            chain.setInvalid();
+            //chain.setInvalid();
             AnnotationLog.printException("Cannot sheet SOC-SSAMPLES ", file.getFile().getName());
         }
         if (MOMsheet.isValid()) {
@@ -281,7 +281,7 @@ public class AnnotationWorker {
             chain.addGenerator(motherGenerator);
             chain.addGenerator(new SSDSampleMapper(MSAPsheet, motherGenerator));
         } else {
-            chain.setInvalid();
+            //chain.setInvalid();
             AnnotationLog.printException("Cannot sheet SOC-MOTHERS ", file.getFile().getName());
         }
 
