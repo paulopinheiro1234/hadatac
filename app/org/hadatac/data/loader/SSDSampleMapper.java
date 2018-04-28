@@ -46,6 +46,8 @@ public class SSDSampleMapper extends BasicGenerator {
         file_name = file.getFile().getName();
         study_id = file.getFile().getName().replaceAll("SSD-", "").replaceAll(".xlsx", "").replaceAll(".csv", "");
         this.motherGenerator = motherGenerator;
+        mapIdUriCache = getMapIdUri(motherGenerator);
+        System.out.println("zhe ge di fangh shuchu shi 0 :" + motherGenerator.getObjects().size());
     }
 
     @Override
