@@ -253,6 +253,7 @@ public class Parser {
                 } else if (!schema.getNamedTimeLabel().equals("")) {
                     // full-row named time
                     String timeValue = record.getValueByColumnIndex(posNamedTime);
+                    System.out.println("[Parser] timeValue: " + timeValue);
                     if (timeValue != null) {
                         measurement.setAbstractTime(timeValue);
                     } else {
@@ -261,9 +262,12 @@ public class Parser {
                 } else if (dasa.getEventUri() != null && !dasa.getEventUri().equals("")) {
                     DataAcquisitionSchemaEvent dase = null;
                     String daseUri = dasa.getEventUri();
+                    //System.out.println("[Parser] Using a DASE....");
                     if (mapSchemaEvents.containsKey(daseUri)) {
+                        //System.out.println("[Parser] DASE in mapSchemaEvents");
                         dase = mapSchemaEvents.get(daseUri);
                     } else {
+                        //System.out.println("[Parser] DASE in schema, adding to mapSchemaEvents");
                         dase = schema.getEvent(daseUri);
                         if (dase != null) {
                             mapSchemaEvents.put(daseUri, dase);
@@ -272,8 +276,10 @@ public class Parser {
                     if (dase != null) {
                         if (!dase.getEntity().equals("")) {
                             measurement.setAbstractTime(dase.getEntity());
+                            System.out.println("[Parser] abstract time set to getEntity");
                         } else {
                             measurement.setAbstractTime(dase.getUri());
+                            System.out.println("[Parser] abstract time set to getUri");
                         }
                     }
                 }
