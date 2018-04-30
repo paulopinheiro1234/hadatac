@@ -64,6 +64,8 @@ public class Measurement extends HADatAcThing implements Runnable {
     private String value;
     @Field("original_value_str")
     private String originalValue;
+    @Field("lod_str")
+    private String levelOfDetection;
     @Field("pid_str")
     private String pid;
     @Field("sid_str")
@@ -260,6 +262,14 @@ public class Measurement extends HADatAcThing implements Runnable {
 
     public void setOriginalValue(String originalValue) {
         this.originalValue = originalValue;
+    }
+    
+    public String getLevelOfDetection() {
+        return levelOfDetection;
+    }
+
+    public void setLevelOfDetection(String levelOfDetection) {
+        this.levelOfDetection = levelOfDetection;
     }
 
     public String getUnit() {

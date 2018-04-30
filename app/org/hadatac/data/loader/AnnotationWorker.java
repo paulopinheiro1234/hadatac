@@ -7,6 +7,7 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -41,8 +42,18 @@ public class AnnotationWorker {
         String path_unproc = ConfigProp.getPathUnproc();
         List<DataFile> unproc_files = DataFile.findAll(DataFile.UNPROCESSED);
         DataFile.filterNonexistedFiles(path_unproc, unproc_files);
+        
+        unproc_files.sort(new Comparator<DataFile>() {
+            @Override
+            public int compare(DataFile o1, DataFile o2) {
+                return o1.getLastProcessTime().compareTo(o2.getLastProcessTime());
+            }
+        });
 
         for (DataFile file : unproc_files) {
+            file.setLastProcessTime(new SimpleDateFormat("yyyy/MM/dd HH:mm:ss").format(new Date()));
+            file.save();
+            
             String file_name = file.getFileName();
             String filePath = path_unproc + "/" + file_name;
 
@@ -50,12 +61,10 @@ public class AnnotationWorker {
             log.addline(Feedback.println(Feedback.WEB, String.format("[OK] Processing file: %s", file_name)));
 
             RecordFile recordFile = null;
-            int sheetNumber = 0;
             if (file_name.endsWith(".csv")) {
                 recordFile = new CSVRecordFile(new File(filePath));
             } else if (file_name.endsWith(".xlsx")) {
                 recordFile = new SpreadsheetRecordFile(new File(filePath));
-                sheetNumber = recordFile.getSheetNumber();
             } else {
                 log.addline(Feedback.println(Feedback.WEB, String.format(
                         "[ERROR] Unknown file format: %s", file_name)));
@@ -68,7 +77,7 @@ public class AnnotationWorker {
             } else {
                 GeneratorChain chain = null;
                 if (file_name.startsWith("PID-")) {
-                	if (sheetNumber > 1){
+                	if (recordFile.getNumberOfSheets() > 1) {
                 		log.addline(Feedback.println(Feedback.WEB, 
                                 "[ERROR] PID file has more than one sheet. "));
                 		return;
@@ -77,7 +86,7 @@ public class AnnotationWorker {
                 } else if (file_name.startsWith("STD-")) {
                     chain = annotateStudyIdFile(recordFile);
                 } else if (file_name.startsWith("MAP-")) {
-                	if (sheetNumber > 1){
+                	if (recordFile.getNumberOfSheets() > 1) {
                 		log.addline(Feedback.println(Feedback.WEB, 
                                 "[ERROR] MAP file has more than one sheet. "));
                 		return;

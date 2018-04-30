@@ -12,8 +12,6 @@ import org.apache.jena.query.QueryExecutionFactory;
 import org.apache.jena.query.QueryFactory;
 import org.apache.jena.query.QueryParseException;
 import org.apache.jena.query.QuerySolution;
-import org.apache.jena.query.ResultSet;
-import org.apache.jena.query.ResultSetFactory;
 import org.apache.jena.query.ResultSetRewindable;
 import org.apache.jena.update.UpdateExecutionFactory;
 import org.apache.jena.update.UpdateFactory;
@@ -58,36 +56,24 @@ public class DataAcquisitionSchema extends HADatAcThing {
 
     private String uri = "";
     private String label = "";
-    private List<DataAcquisitionSchemaAttribute> attributes = null;
-    private List<DataAcquisitionSchemaObject> objects = null;
-    private List<DataAcquisitionSchemaEvent> events = null;
-    private String timestampLabel;
-    private String timeInstantLabel;
-    private String namedTimeLabel;
-    private String idLabel;
-    private String originalIdLabel;
-    private String elevationLabel;
-    private String entityLabel;
-    private String unitLabel;
-    private String inRelationToLabel;
+    private String timestampLabel = "";
+    private String timeInstantLabel = "";
+    private String namedTimeLabel = "";
+    private String idLabel = "";
+    private String originalIdLabel = "";
+    private String elevationLabel = "";
+    private String entityLabel = "";
+    private String unitLabel = "";
+    private String inRelationToLabel = "";
+    private String lodLabel = "";
+    private List<DataAcquisitionSchemaAttribute> attributes = new ArrayList<DataAcquisitionSchemaAttribute>();
+    private List<DataAcquisitionSchemaObject> objects = new ArrayList<DataAcquisitionSchemaObject>();
+    private List<DataAcquisitionSchemaEvent> events = new ArrayList<DataAcquisitionSchemaEvent>();
 
     public DataAcquisitionSchema() {
-        this.timestampLabel = "";
-        this.timeInstantLabel = "";
-        this.namedTimeLabel = "";
-        this.elevationLabel = "";
-        this.idLabel = "";
-        this.originalIdLabel = "";
-        this.entityLabel = "";
-        this.unitLabel = "";
-        this.inRelationToLabel = "";
-        this.attributes = new ArrayList<DataAcquisitionSchemaAttribute>();
-        this.objects = new ArrayList<DataAcquisitionSchemaObject>();
-        this.events = new ArrayList<DataAcquisitionSchemaEvent>();
     }
 
     public DataAcquisitionSchema(String uri, String label) {
-        this();
         this.uri = uri;
         this.label = label;
     }
@@ -150,6 +136,14 @@ public class DataAcquisitionSchema extends HADatAcThing {
 
     public void setOriginalIdLabel(String originalIdLabel) {
         this.originalIdLabel = originalIdLabel;
+    }
+    
+    public String getLODLabel() {
+        return lodLabel;
+    }
+
+    public void setLODLabel(String lodLabel) {
+        this.lodLabel = lodLabel;
     }
 
     public String getElevationLabel() {
@@ -233,6 +227,10 @@ public class DataAcquisitionSchema extends HADatAcThing {
                 if (dasa.getAttribute().equals(URIUtils.replacePrefixEx("hasco:uriId"))) {
                     setIdLabel(dasa.getLabel());
                     System.out.println("[OK] DataAcquisitionSchema IdLabel: " + dasa.getLabel());
+                }
+                if (dasa.getAttribute().equals(URIUtils.replacePrefixEx("chear:LevelOfDetection"))) {
+                    setLODLabel(dasa.getLabel());
+                    System.out.println("[OK] DataAcquisitionSchema LODLabel: " + dasa.getLabel());
                 }
                 if (dasa.getAttribute().equals(URIUtils.replacePrefixEx("hasco:originalID")) 
                         || Entity.getSubclasses(URIUtils.replacePrefixEx("hasco:originalID")).contains(dasa.getAttribute())) { 

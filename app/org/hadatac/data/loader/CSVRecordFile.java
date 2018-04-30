@@ -1,7 +1,6 @@
 package org.hadatac.data.loader;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
@@ -12,8 +11,7 @@ import java.util.stream.Collectors;
 
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVRecord;
-import org.apache.poi.ss.usermodel.Workbook;
-import org.apache.poi.ss.usermodel.WorkbookFactory;
+
 
 public class CSVRecordFile implements RecordFile {
 
@@ -39,7 +37,7 @@ public class CSVRecordFile implements RecordFile {
         }).collect(Collectors.toList());
     }
     
-    public int getSheetNumber() {
+    public int getNumberOfSheets() {
         return 1;
     }
 

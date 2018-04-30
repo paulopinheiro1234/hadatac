@@ -72,7 +72,7 @@ public class SpreadsheetRecordFile implements RecordFile {
     }
     
     @Override
-    public int getSheetNumber() {
+    public int getNumberOfSheets() {
         try {
             Workbook workbook = WorkbookFactory.create(new FileInputStream(file));
             return workbook.getNumberOfSheets();
