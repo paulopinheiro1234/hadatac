@@ -70,6 +70,17 @@ public class SpreadsheetRecordFile implements RecordFile {
 
         return null;
     }
+    
+    @Override
+    public int getSheetNumber() {
+        try {
+            Workbook workbook = WorkbookFactory.create(new FileInputStream(file));
+            return workbook.getNumberOfSheets();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return 1;
+    }
 
     @Override
     public List<String> getHeaders() {

@@ -50,10 +50,12 @@ public class AnnotationWorker {
             log.addline(Feedback.println(Feedback.WEB, String.format("[OK] Processing file: %s", file_name)));
 
             RecordFile recordFile = null;
+            int sheetNumber = 0;
             if (file_name.endsWith(".csv")) {
                 recordFile = new CSVRecordFile(new File(filePath));
             } else if (file_name.endsWith(".xlsx")) {
                 recordFile = new SpreadsheetRecordFile(new File(filePath));
+                sheetNumber = recordFile.getSheetNumber();
             } else {
                 log.addline(Feedback.println(Feedback.WEB, String.format(
                         "[ERROR] Unknown file format: %s", file_name)));
@@ -66,10 +68,20 @@ public class AnnotationWorker {
             } else {
                 GeneratorChain chain = null;
                 if (file_name.startsWith("PID-")) {
+                	if (sheetNumber > 1){
+                		log.addline(Feedback.println(Feedback.WEB, 
+                                "[ERROR] PID file has more than one sheet. "));
+                		return;
+                	}
                     chain = annotateSubjectIdFile(recordFile);
                 } else if (file_name.startsWith("STD-")) {
                     chain = annotateStudyIdFile(recordFile);
                 } else if (file_name.startsWith("MAP-")) {
+                	if (sheetNumber > 1){
+                		log.addline(Feedback.println(Feedback.WEB, 
+                                "[ERROR] MAP file has more than one sheet. "));
+                		return;
+                	}
                     chain = annotateMapFile(recordFile);
                 } else if (file_name.startsWith("ACQ-")) {
                     chain = annotateACQFile(recordFile, true);
