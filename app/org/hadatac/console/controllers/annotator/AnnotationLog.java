@@ -79,6 +79,11 @@ public class AnnotationLog {
         log.addline(Feedback.println(Feedback.WEB, "[ERROR] " + message));
     }
 	
+	public static void println(String message, String fileName) {
+        AnnotationLog log = AnnotationLog.create(fileName);
+        log.addline(Feedback.println(Feedback.WEB, "[LOG] " + message));
+    }
+	
 	public static AnnotationLog convertFromSolr(SolrDocument doc) {
 		AnnotationLog annotation_log = new AnnotationLog();
 		if(doc.getFieldValue("file_name") != null){
