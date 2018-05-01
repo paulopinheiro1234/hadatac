@@ -20,6 +20,7 @@ import org.hadatac.utils.CollectionUtil;
 import org.hadatac.utils.ConfigProp;
 import org.hadatac.utils.NameSpaces;
 import org.hadatac.utils.Templates;
+import org.hadatac.console.controllers.annotator.AnnotationLog;
 import org.hadatac.console.http.SPARQLUtils;
 import org.hadatac.entity.pojo.HADatAcThing;
 import org.hadatac.entity.pojo.ObjectCollection;
@@ -151,7 +152,6 @@ public class SampleSubjectMapper extends BasicGenerator {
 
         StudyObject obj = new StudyObject(getUri(record), getType(record), getOriginalSID(record), 
                 getLabel(record), getCollectionUri(record), getLabel(record), scopeUris);
-
         return obj;
     }
 
@@ -162,7 +162,7 @@ public class SampleSubjectMapper extends BasicGenerator {
                 getCollectionLabel(record),
                 getCollectionLabel(record),
                 kbPrefix + "STD-" + getStudyUri(record));
-
+        AnnotationLog.println("ObjectCollection:" + getCollectionUri(record) + " has been created as a hasco:SampleCollection by createObjectCollection().", file_name);
         return oc;
     }
 
@@ -178,7 +178,6 @@ public class SampleSubjectMapper extends BasicGenerator {
     @Override
     public HADatAcThing createObject(Record rec, int row_number) throws Exception {
         System.out.println("counter: " + counter);
-
         counter++;
         return createStudyObject(rec);
     }

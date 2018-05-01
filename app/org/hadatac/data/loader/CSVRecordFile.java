@@ -12,6 +12,7 @@ import java.util.stream.Collectors;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVRecord;
 
+
 public class CSVRecordFile implements RecordFile {
 
     private File file;
@@ -34,6 +35,10 @@ public class CSVRecordFile implements RecordFile {
         return records.stream().map(rec -> {
             return new CSVFileRecord(rec);
         }).collect(Collectors.toList());
+    }
+    
+    public int getNumberOfSheets() {
+        return 1;
     }
 
     @Override

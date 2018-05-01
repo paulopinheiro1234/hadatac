@@ -78,7 +78,13 @@
     <tbody>
     	@for(file <- processedFiles){
     		<tr>
-    			<td>@file.getFileName()</td>
+    		    @if(AnnotationLog.create(file.getFileName()).getLog().contains("[ERROR]")) {
+                    <td bgcolor="#FF9999">@file.getFileName()</td>
+                } else { @if(AnnotationLog.create(file.getFileName()).getLog().contains("[WARNING]")) {
+                    <td bgcolor="#FFFF99">@file.getFileName()</td>
+                } else {
+                    <td>@file.getFileName()</td>
+                }}
     			@if(bAdmin) {
     				<td>@file.getOwnerEmail()</td>
     			}
@@ -128,9 +134,15 @@
          </tr>
     </thead>
     <tbody>
-    	@for(file <- unprocessedFiles){
-    		<tr>
-    			<td>@file.getFileName()</td>
+    	@for(file <- unprocessedFiles) {
+    	    <tr>
+    			@if(AnnotationLog.create(file.getFileName()).getLog().contains("[ERROR]")) {
+                    <td bgcolor="#FF9999">@file.getFileName()</td>
+                } else { @if(AnnotationLog.create(file.getFileName()).getLog().contains("[WARNING]")) {
+                    <td bgcolor="#FFFF99">@file.getFileName()</td>
+                } else {
+                    <td>@file.getFileName()</td>
+                }}
     			@if(bAdmin) {
     				<td>@file.getOwnerEmail()</td>
     			}

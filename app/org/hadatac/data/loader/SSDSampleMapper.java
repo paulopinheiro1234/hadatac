@@ -46,6 +46,7 @@ public class SSDSampleMapper extends BasicGenerator {
         file_name = file.getFile().getName();
         study_id = file.getFile().getName().replaceAll("SSD-", "").replaceAll(".xlsx", "").replaceAll(".csv", "");
         this.motherGenerator = motherGenerator;
+        mapIdUriCache = getMapIdUri(motherGenerator);
     }
 
     @Override
@@ -213,7 +214,6 @@ public class SSDSampleMapper extends BasicGenerator {
     @Override
     public HADatAcThing createObject(Record rec, int row_number) throws Exception {
         System.out.println("counter: " + counter);
-
         counter++;
         return createStudyObject(rec);
     }

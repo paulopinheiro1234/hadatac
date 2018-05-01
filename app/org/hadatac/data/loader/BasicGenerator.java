@@ -92,14 +92,16 @@ public abstract class BasicGenerator {
         if (records == null) {
             return;
         }
-
+        int counter = 0;
         int row_number = 0;
         for (Record record : records) {
             HADatAcThing obj = createObject(record, ++row_number);
             if (obj != null) {
                 objects.add(obj);
+                counter ++;
             }
         }
+        AnnotationLog.println(counter + " Study Objects has been created by the createObjects() in the active generator", fileName);
     }
 
     public String toString() {

@@ -46,7 +46,7 @@ public class TimeInstantGenerator extends BasicGenerator {
 
     public StudyObject createStudyObject(Record record) throws Exception {
         StudyObject obj = new StudyObject(getUri(record), getType(record), 
-                getOriginalID(record), "", 
+                getOriginalID(record), "TIME-" + getOriginalID(record) + "-" + study_id, 
                 getCollectionUri(record), "");
         return obj;
     }

@@ -93,6 +93,7 @@ public class Parser {
         int posEntity = -1;
         int posUnit = -1;
         int posInRelation = -1;
+        int posLOD = -1;
         if (!schema.getTimestampLabel().equals("")) {
             posTimestamp = schema.tempPositionOfLabel(schema.getTimestampLabel());
             System.out.println("posTimestamp: " + posTimestamp);
@@ -124,6 +125,10 @@ public class Parser {
         if (!schema.getInRelationToLabel().equals("")) {
             posInRelation = schema.tempPositionOfLabel(schema.getInRelationToLabel());
             System.out.println("posInRelation: " + posInRelation);
+        }
+        if (!schema.getLODLabel().equals("")) {
+            posLOD = schema.tempPositionOfLabel(schema.getLODLabel());
+            System.out.println("posLOD: " + posLOD);
         }
 
         // Store necessary information before hand to avoid frequent SPARQL queries
@@ -193,6 +198,9 @@ public class Parser {
                 if (dasa.getLabel().equals(schema.getInRelationToLabel())) {
                     continue;
                 }
+                if (dasa.getLabel().equals(schema.getLODLabel())) {
+                    continue;
+                }
 
                 Measurement measurement = new Measurement();
                 /*===================*
@@ -218,6 +226,16 @@ public class Parser {
                     } else {
                         measurement.setValue(originalValue);
                     }
+                }
+                
+                /*========================*
+                 *                        *
+                 * SET LEVEL OF DETECTION *
+                 *                        *
+                 *========================*/
+                measurement.setLevelOfDetection("");
+                if (!schema.getLODLabel().equals("") && posLOD >= 0) {
+                    measurement.setLevelOfDetection(record.getValueByColumnIndex(posLOD));
                 }
 
                 /*============================*

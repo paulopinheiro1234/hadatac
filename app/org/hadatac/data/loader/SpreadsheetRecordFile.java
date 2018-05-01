@@ -44,6 +44,10 @@ public class SpreadsheetRecordFile implements RecordFile {
                 sheet = workbook.getSheet(sheetName);
             }
 
+            if (sheet == null) {
+                return null;
+            }
+            
             Iterator<Row> rows = sheet.iterator();
 
             Iterable<Row> iterable = () -> rows;
@@ -65,6 +69,17 @@ public class SpreadsheetRecordFile implements RecordFile {
         }
 
         return null;
+    }
+    
+    @Override
+    public int getNumberOfSheets() {
+        try {
+            Workbook workbook = WorkbookFactory.create(new FileInputStream(file));
+            return workbook.getNumberOfSheets();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return 1;
     }
 
     @Override

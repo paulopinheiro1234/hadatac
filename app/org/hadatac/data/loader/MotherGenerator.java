@@ -57,7 +57,7 @@ public class MotherGenerator extends BasicGenerator {
                 getOriginalID(record), getLabel(record), 
                 getCohortUri(record), getLabel(record));
         obj.setRoleUri(URIUtils.replacePrefixEx("chear:Mother"));
-        
+        obj.addScopeUri(kbPrefix + "SBJ-" + getOriginalSID(record) + "-" + study_id);
         return obj;
     }
     

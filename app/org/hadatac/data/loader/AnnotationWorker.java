@@ -7,6 +7,7 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -41,8 +42,18 @@ public class AnnotationWorker {
         String path_unproc = ConfigProp.getPathUnproc();
         List<DataFile> unproc_files = DataFile.findAll(DataFile.UNPROCESSED);
         DataFile.filterNonexistedFiles(path_unproc, unproc_files);
+        
+        unproc_files.sort(new Comparator<DataFile>() {
+            @Override
+            public int compare(DataFile o1, DataFile o2) {
+                return o1.getLastProcessTime().compareTo(o2.getLastProcessTime());
+            }
+        });
 
         for (DataFile file : unproc_files) {
+            file.setLastProcessTime(new SimpleDateFormat("yyyy/MM/dd HH:mm:ss").format(new Date()));
+            file.save();
+            
             String file_name = file.getFileName();
             String filePath = path_unproc + "/" + file_name;
 
@@ -66,10 +77,20 @@ public class AnnotationWorker {
             } else {
                 GeneratorChain chain = null;
                 if (file_name.startsWith("PID-")) {
+                	if (recordFile.getNumberOfSheets() > 1) {
+                		log.addline(Feedback.println(Feedback.WEB, 
+                                "[ERROR] PID file has more than one sheet. "));
+                		return;
+                	}
                     chain = annotateSubjectIdFile(recordFile);
                 } else if (file_name.startsWith("STD-")) {
                     chain = annotateStudyIdFile(recordFile);
                 } else if (file_name.startsWith("MAP-")) {
+                	if (recordFile.getNumberOfSheets() > 1) {
+                		log.addline(Feedback.println(Feedback.WEB, 
+                                "[ERROR] MAP file has more than one sheet. "));
+                		return;
+                	}
                     chain = annotateMapFile(recordFile);
                 } else if (file_name.startsWith("ACQ-")) {
                     chain = annotateACQFile(recordFile, true);
@@ -251,68 +272,45 @@ public class AnnotationWorker {
         System.out.println("Processing SSD file of " + Pilot_Num + "...");
 
         RecordFile SSDsheet = new SpreadsheetRecordFile(file.getFile(), "SSD");
-        RecordFile SBJsheet = null;
-        RecordFile MOMsheet = null;
-        RecordFile SSAPsheet = null;
-        RecordFile MSAPsheet = null;
-        RecordFile TIMEsheet = null;
-        
-        try{
-            SBJsheet = new SpreadsheetRecordFile(file.getFile(), "SOC-SUBJECTS");
-        } catch (Exception e) {
-        	System.out.print("SSD has no SOC-SUBJECTS..");
-        }
-        try{
-        	MOMsheet = new SpreadsheetRecordFile(file.getFile(), "SOC-MOTHERS");
-        } catch (Exception e) {
-        	System.out.print("SSD has no SOC-MOTHERS..");
-        }
-        try{
-        	SSAPsheet = new SpreadsheetRecordFile(file.getFile(), "SOC-SSAMPLES");
-        } catch (Exception e) {
-        	System.out.print("SSD has no SOC-SSAMPLES..");
-        }
-        try{
-        	MSAPsheet = new SpreadsheetRecordFile(file.getFile(), "SOC-MSAMPLES");
-        } catch (Exception e) {
-        	System.out.print("SSD has no SOC-MSAMPLES..");
-        }
-        try{
-        	TIMEsheet = new SpreadsheetRecordFile(file.getFile(), "SOC-VISITS");
-        } catch (Exception e) {
-        	System.out.print("SSD has no SOC-VISITS..");
-        }
-        GeneratorChain chain = new GeneratorChain();
-        chain.addGenerator(new SSDGenerator(SSDsheet));
-        try{
-        	chain.addGenerator(new SubjectGenerator(SBJsheet));
-        } catch (Exception e) {
-        	System.out.print("SSD SubjectGenerator failed..");
-        }
-        try{
-        	MotherGenerator motherGenerator = new MotherGenerator(MOMsheet);
-        	chain.addGenerator(motherGenerator);
-        } catch (Exception e) {
-        	System.out.print("SSD motherGenerator failed..");
-        }
-        try{
-        	MotherGenerator motherGenerator = new MotherGenerator(MOMsheet);
-        	chain.addGenerator(new SSDSampleMapper(SSAPsheet, motherGenerator));
-        } catch (Exception e) {
-        	System.out.print("SSD SSAPsheet SSDSampleMapper failed..");
-        }
-        try{
-        	MotherGenerator motherGenerator = new MotherGenerator(MOMsheet);
-        	chain.addGenerator(new SSDSampleMapper(MSAPsheet, motherGenerator));
-        } catch (Exception e) {
-        	System.out.print("SSD MSAPsheet SSDSampleMapper failed..");
-        }
-        try{
-        	chain.addGenerator(new TimeInstantGenerator(TIMEsheet));
-        } catch (Exception e) {
-        	System.out.print("SSD TimeInstantGenerator failed..");
-        }
+        RecordFile SBJsheet = new SpreadsheetRecordFile(file.getFile(), "SOC-SUBJECTS");
+        RecordFile MOMsheet = new SpreadsheetRecordFile(file.getFile(), "SOC-MOTHERS");
+        RecordFile SSAPsheet = new SpreadsheetRecordFile(file.getFile(), "SOC-SSAMPLES");
+        RecordFile MSAPsheet = new SpreadsheetRecordFile(file.getFile(), "SOC-MSAMPLES");
+        RecordFile TIMEsheet = new SpreadsheetRecordFile(file.getFile(), "SOC-VISITS");
 
+        GeneratorChain chain = new GeneratorChain();
+        if (SSDsheet.isValid()) {
+            chain.addGenerator(new SSDGenerator(SSDsheet));
+        } else {
+            //chain.setInvalid();
+            AnnotationLog.printException("Cannot sheet SSD ", file.getFile().getName());
+        }
+        if (SBJsheet.isValid()) {
+            chain.addGenerator(new SubjectGenerator(SBJsheet));
+        } else {
+            //chain.setInvalid();
+            AnnotationLog.printException("Cannot sheet SOC-SUBJECTS ", file.getFile().getName());
+        }
+        if (SSAPsheet.isValid()) {
+            chain.addGenerator(new SSDSampleMapper(SSAPsheet));
+        } 
+        else {
+            //chain.setInvalid();
+            AnnotationLog.printException("Cannot sheet SOC-SSAMPLES ", file.getFile().getName());
+        }
+        if (MOMsheet.isValid()) {
+            MotherGenerator motherGenerator = new MotherGenerator(MOMsheet);
+            chain.addGenerator(motherGenerator);
+            chain.addGenerator(new SSDSampleMapper(MSAPsheet, motherGenerator));
+        } else {
+            //chain.setInvalid();
+            AnnotationLog.printException("Cannot sheet SOC-MOTHERS ", file.getFile().getName());
+        }
+        if (TIMEsheet.isValid()) {
+        	chain.addGenerator(new TimeInstantGenerator(TIMEsheet));
+        } else {
+        	AnnotationLog.printException("Cannot sheet SOC-VISITS ", file.getFile().getName());
+        }
         return chain;
     }
 

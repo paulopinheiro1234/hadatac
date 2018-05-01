@@ -80,7 +80,7 @@ public class AutoAnnotator extends Controller {
             bStarted = true;
         }
 
-        return ok(auto_ccsv.render(unproc_files, proc_files, bStarted, user.isDataManager()));
+        return ok(autoAnnotator.render(unproc_files, proc_files, bStarted, user.isDataManager()));
     }
 
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))

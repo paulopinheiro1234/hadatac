@@ -20,7 +20,7 @@ import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.client.solrj.response.UpdateResponse;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
-
+import org.hadatac.console.http.SolrUtils;
 import org.hadatac.metadata.loader.URIUtils;
 import org.hadatac.utils.CollectionUtil;
 
@@ -38,31 +38,26 @@ public class DataFile {
     public static final String DELETED  = "DELETED";
 	
 	@Field("file_name")
-	private String fileName;
+	private String fileName = "";
 	@Field("owner_email_str")
-	private String ownerEmail;
+	private String ownerEmail = "";
 	@Field("acquisition_uri_str")
-	private String dataAcquisitionUri;
+	private String dataAcquisitionUri = "";
 	@Field("dataset_uri_str")
-	private String datasetUri;
+	private String datasetUri = "";
 	@Field("status_str")
-	private String status;
+	private String status = "";
 	@Field("completion_percentage_int")
-	private int completionPercentage;
+	private int completionPercentage = 0;
 	@Field("submission_time_str")
-	private String submissionTime;
+	private String submissionTime = "";
 	@Field("completion_time_str")
-	private String completionTime;
+	private String completionTime = "";
+	@Field("last_processed_time_str")
+    private String lastProcessTime = "";
 	
 	public DataFile(String fileName) {
 		this.fileName = fileName;
-		ownerEmail = "";
-		dataAcquisitionUri = "";
-		datasetUri = "";
-		submissionTime = "";
-		completionTime = "";
-		status = "";
-		completionPercentage = 0;
 	}
 
 	public String getOwnerEmail() {
@@ -121,6 +116,13 @@ public class DataFile {
 		this.completionTime = completionTime;
 	}
 	
+	public String getLastProcessTime() {
+        return lastProcessTime;
+    }
+    public void setLastProcessTime(String lastProcessTime) {
+        this.lastProcessTime = lastProcessTime;
+    }
+	
 	public int save() {
 		try {
 			SolrClient client = new HttpSolrClient.Builder(
@@ -174,13 +176,14 @@ public class DataFile {
 	public static DataFile convertFromSolr(SolrDocument doc) {
 		DataFile object = new DataFile(doc.getFieldValue("file_name").toString());
 		
-		object.setOwnerEmail(doc.getFieldValue("owner_email_str").toString());
-		object.setDataAcquisitionUri(URIUtils.replaceNameSpaceEx(doc.getFieldValue("acquisition_uri_str").toString()));
-		object.setDatasetUri(doc.getFieldValue("dataset_uri_str").toString());
-		object.setStatus(doc.getFieldValue("status_str").toString());
-		object.setCompletionPercentage(Integer.parseInt(doc.getFieldValue("completion_percentage_int").toString()));
-		object.setSubmissionTime(doc.getFieldValue("submission_time_str").toString());
-		object.setCompletionTime(doc.getFieldValue("completion_time_str").toString());
+		object.setOwnerEmail(SolrUtils.getFieldValue(doc, "owner_email_str").toString());
+		object.setDataAcquisitionUri(URIUtils.replaceNameSpaceEx(SolrUtils.getFieldValue(doc, "acquisition_uri_str").toString()));
+		object.setDatasetUri(SolrUtils.getFieldValue(doc, "dataset_uri_str").toString());
+		object.setStatus(SolrUtils.getFieldValue(doc, "status_str").toString());
+		object.setCompletionPercentage(Integer.parseInt(SolrUtils.getFieldValue(doc, "completion_percentage_int").toString()));
+		object.setSubmissionTime(SolrUtils.getFieldValue(doc, "submission_time_str").toString());
+		object.setCompletionTime(SolrUtils.getFieldValue(doc, "completion_time_str").toString());
+		object.setLastProcessTime(SolrUtils.getFieldValue(doc, "last_processed_time_str").toString());
 		
 		return object;
 	}
