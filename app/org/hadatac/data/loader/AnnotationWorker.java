@@ -293,7 +293,8 @@ public class AnnotationWorker {
         }
         if (SSAPsheet.isValid()) {
             chain.addGenerator(new SSDSampleMapper(SSAPsheet));
-        } else {
+        } 
+        else {
             //chain.setInvalid();
             AnnotationLog.printException("Cannot sheet SOC-SSAMPLES ", file.getFile().getName());
         }
@@ -305,7 +306,11 @@ public class AnnotationWorker {
             //chain.setInvalid();
             AnnotationLog.printException("Cannot sheet SOC-MOTHERS ", file.getFile().getName());
         }
-
+        if (TIMEsheet.isValid()) {
+        	chain.addGenerator(new TimeInstantGenerator(TIMEsheet));
+        } else {
+        	AnnotationLog.printException("Cannot sheet SOC-VISITS ", file.getFile().getName());
+        }
         return chain;
     }
 
