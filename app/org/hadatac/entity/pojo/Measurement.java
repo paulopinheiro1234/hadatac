@@ -60,6 +60,10 @@ public class Measurement extends HADatAcThing implements Runnable {
     private Date timestamp;
     @Field("named_time_str")
     private String abstractTime;
+    @Field("time_value_double")
+    private String timeValue;
+    @Field("time_value_unit_uri_str")
+    private String timeValueUnitUri;
     @Field("value_str")
     private String value;
     @Field("original_value_str")
@@ -246,6 +250,22 @@ public class Measurement extends HADatAcThing implements Runnable {
 
     public void setAbstractTime(String abstractTime) {
         this.abstractTime = abstractTime;
+    }
+
+    public String getTimeValue() {
+        return this.timeValue;
+    }
+
+    public void setTimeValue(String timeValue) {
+        this.timeValue = timeValue;
+    }
+
+    public String getTimeValueUnitUri() {
+        return platformUri;
+    }
+
+    public void setTimeValueUnitUri(String uri) {
+        this.timeValueUnitUri = uri;
     }
 
     public String getValue() {
@@ -868,6 +888,8 @@ public class Measurement extends HADatAcThing implements Runnable {
         m.setPID(SolrUtils.getFieldValue(doc, "pid_str"));
         m.setSID(SolrUtils.getFieldValue(doc, "sid_str"));
         m.setAbstractTime(SolrUtils.getFieldValue(doc, "named_time_str"));
+        m.setTimeValue(SolrUtils.getFieldValue(doc, "time_value_double"));
+        m.setTimeValueUnitUri(SolrUtils.getFieldValue(doc, "time_value_unit_uri_double"));
         m.setOriginalValue(SolrUtils.getFieldValue(doc, "original_value_str"));
         m.setEntityUri(SolrUtils.getFieldValue(doc, "entity_uri_str"));
         m.setCharacteristicUri(SolrUtils.getFieldValue(doc, "characteristic_uri_str"));

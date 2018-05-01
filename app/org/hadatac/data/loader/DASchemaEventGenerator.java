@@ -152,7 +152,7 @@ public class DASchemaEventGenerator extends BasicGenerator {
         dase.setUri(URIUtils.replacePrefixEx(kbPrefix + "DASE-" + SDDName + "-" + getLabel(rec).trim().replace(" ", "").replace("_", "-").replace("??", "")));
         dase.addType(URIUtils.replacePrefixEx("hasco:DASchemaEvent"));
         dase.setLabel(getLabel(rec).trim().replace(" ","").replace("_", "-").replace("??", ""));
-        dase.setComment(getLabel(rec).trim().replace(" ","").replace("_", "-").replace("??", ""));
+        dase.setComment(getLabel(rec));
         dase.setPartOfSchema(URIUtils.replacePrefixEx(kbPrefix + "DAS-" + SDDName));
         dase.setEntity(URIUtils.replacePrefixEx(getEntity(rec)));
         dase.setUnit(URIUtils.replacePrefixEx(getUnit(rec)));
