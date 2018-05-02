@@ -299,19 +299,17 @@ public class Parser {
                             measurement.setAbstractTime(dase.getUri());
                             System.out.println("[Parser] abstract time set to getUri");
                         }
-                        if (dase.getIsVirtual() != "true") {
-                            String columnName = dase.getComment();
-                            if (columnName != null && columnName.length() > 0) {
-                                String sTimeValue = record.getValueByColumnName(columnName);
-                                // parse out the value, if available.
-                                //double timeValue = new BigDecimal(sTimeValue).doubleValue();
-                                measurement.setTimeValue(sTimeValue);
-                                String unitURI = dase.getUnit();
-                                if (unitURI != null && unitURI.length() > 0) {
-                                    measurement.setTimeValueUnitUri(unitURI);
-                                }
+                        String columnName = dase.getComment();
+                        String sTimeValue = record.getValueByColumnName(columnName);
+                        if (sTimeValue != null && sTimeValue.length() > 0) {
+                            measurement.setTimeValue(sTimeValue);
+                            System.out.println("[Parser] Extracted time value "+sTimeValue+ " from column "+columnName);
+                            String unitURI = dase.getUnit();
+                            if (unitURI != null && unitURI.length() > 0) {
+                                measurement.setTimeValueUnitUri(unitURI);
                             }
                         }
+                        System.out.println("[Parser] Did the time value work?"); 
                     }
                 }
 
