@@ -308,6 +308,15 @@ public class DataAcquisitionSchemaAttribute extends HADatAcThing {
         return inRelationToUri;
     }
 
+    public String getInRelationToLabel() {
+	String inRelationTo = getInRelationToUri();
+        if (inRelationTo == null || inRelationTo.equals("")) {
+            return "";
+        } else {
+            return FirstLabel.getLabel(inRelationTo);
+        }
+    }
+
     public String getInRelationToUri(String relationUri) {
         if (relations.containsKey(relationUri)) {
             return relations.get(relationUri);
