@@ -101,7 +101,7 @@ public abstract class BasicGenerator {
                 counter ++;
             }
         }
-        AnnotationLog.println(counter + " Study Objects has been created by the createObjects() in the active generator", fileName);
+        AnnotationLog.println(counter + " Study Objects has been created by the createObjects() in the " + getTableName() + " generator", fileName);
     }
 
     public String toString() {
