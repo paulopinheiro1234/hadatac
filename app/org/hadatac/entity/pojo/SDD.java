@@ -112,10 +112,12 @@ public class SDD {
 				if (checkCellValue(record.getValueByColumnName("attributeOf"))){
 					mapAttrObj.put(record.getValueByColumnIndex(0), record.getValueByColumnName("attributeOf"));
 				} else {
-					AnnotationLog.printException("The Dictionary Mapping has incorrect content " + record.getValueByColumnName("attributeOf") + "in \"attributeOf\" column.", sddfile.getFile().getName());	
+					AnnotationLog.printException("The Dictionary Mapping has incorrect content " + record.getValueByColumnName("attributeOf") + "in \"attributeOf\" column.", sddfile.getFile().getName());
+					return;
 				}
 			} else {
 				AnnotationLog.printException("The Dictionary Mapping has incorrect content " + record.getValueByColumnName("Column") + "in \"Column\" column.", sddfile.getFile().getName());
+				return;
 			}
 		}
 		AnnotationLog.println("The Dictionary Mapping has correct content under \"Column\" and \"attributeOf\" columns.", sddfile.getFile().getName());
