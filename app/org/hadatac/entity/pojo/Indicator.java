@@ -278,7 +278,6 @@ public class Indicator extends HADatAcThing implements Comparable<Indicator> {
                 attrib.setField("characteristic_uri_str");
 
                 if (!mapIndicatorToCharList.containsKey(indicator)) {
-                    System.out.println("!mapIndicatorToCharList.containsKey(indicator): " + indicator.getUri());
                     List<HADatAcThing> attributes = new ArrayList<HADatAcThing>();
                     mapIndicatorToCharList.put(indicator, attributes);
                 }
