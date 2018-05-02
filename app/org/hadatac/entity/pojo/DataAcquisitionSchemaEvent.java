@@ -324,7 +324,7 @@ public class DataAcquisitionSchemaEvent extends HADatAcThing {
                 .map(uri -> URIUtils.replaceNameSpaceEx(uri))
                 .collect(Collectors.toList())));
         row.put("rdfs:label", getLabel());
-        row.put("rdfs:comment", getLabel());
+        row.put("rdfs:comment", getComment());
         row.put("hasco:partOfSchema", URIUtils.replaceNameSpaceEx(getPartOfSchema()));
         row.put("hasco:hasEntity", URIUtils.replaceNameSpaceEx(getEntity()));
         row.put("hasco:hasUnit", URIUtils.replaceNameSpaceEx(getUnit()));

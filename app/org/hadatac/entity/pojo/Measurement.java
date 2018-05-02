@@ -879,7 +879,7 @@ public class Measurement extends HADatAcThing implements Runnable {
         m.setSID(SolrUtils.getFieldValue(doc, "sid_str"));
         m.setAbstractTime(SolrUtils.getFieldValue(doc, "named_time_str"));
         m.setTimeValue(SolrUtils.getFieldValue(doc, "time_value_double"));
-        m.setTimeValueUnitUri(SolrUtils.getFieldValue(doc, "time_value_unit_uri_double"));
+        m.setTimeValueUnitUri(SolrUtils.getFieldValue(doc, "time_value_unit_uri_str"));
         m.setOriginalValue(SolrUtils.getFieldValue(doc, "original_value_str"));
         m.setEntityUri(SolrUtils.getFieldValue(doc, "entity_uri_str"));
         m.setCharacteristicUri(SolrUtils.getFieldValue(doc, "characteristic_uri_str"));
