@@ -1039,7 +1039,13 @@ public class Measurement extends HADatAcThing implements Runnable {
 
                     String key = alignment.measurementKey(m);
                     if (key != null) {
-                        results.get(alignment.replaceUri(m.getObjectUri())).put(key, m.getValue());
+			String finalValue = "";
+			if (alignment.containsCode(m.getCharacteristicUri())) {
+			    finalValue = alignment.getCode(m.getCharacteristicUri());
+			} else {
+			    finalValue = m.getValue();
+			}
+                        results.get(alignment.replaceUri(m.getObjectUri())).put(key, finalValue);
                     } else {
                         System.out.println("[ERROR] the following measurement could not match any alignment attribute (and no alignment " + 
                                 "attribute could be created for this measurement): " + 
