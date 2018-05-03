@@ -22,12 +22,12 @@ public class EntityRole extends HADatAcThing implements Comparable<EntityRole> {
     public EntityRole() {}
 
     @Override
-    public boolean equals(Object o) {;
-    if((o instanceof EntityRole) && (((EntityRole)o).getUri().equals(this.getUri()))) {
-        return true;
-    } else {
-        return false;
-    }
+    public boolean equals(Object o) {
+        if((o instanceof EntityRole) && (((EntityRole)o).getUri().equals(this.getUri()))) {
+            return true;
+        } else {
+            return false;
+        }
     }
 
     @Override
@@ -80,7 +80,7 @@ public class EntityRole extends HADatAcThing implements Comparable<EntityRole> {
                 + "?attributeUri rdfs:label ?attributeLabel . \n"
                 + "}} \n";
 
-        // System.out.println("EntityRole query: " + query);
+        System.out.println("EntityRole query: " + query);
 
         Map<HADatAcThing, List<HADatAcThing>> results = new HashMap<HADatAcThing, List<HADatAcThing>>();
         try {
@@ -114,14 +114,14 @@ public class EntityRole extends HADatAcThing implements Comparable<EntityRole> {
                     EntityRole role = new EntityRole();
                     if (soln.get("roleUri") != null && !soln.get("roleUri").toString().isEmpty()) {
                         role.setUri(soln.get("roleUri").toString());
-                        role.setLabel(WordUtils.capitalize(soln.get("roleUri").toString().split("#")[1]));
+                        role.setLabel(WordUtils.capitalize(URIUtils.getBaseName(soln.get("roleUri").toString())));
                         role.setField("entity_role_uri_str");
                     } else {
                         role.setUri(URIUtils.replacePrefixEx("sio:Sample"));
                         role.setLabel("Sample");
                         role.setField("entity_role_uri_str");
                     }
-                    
+
                     AttributeInstance attrib = new AttributeInstance();
                     attrib.setUri(soln.get("attributeUri").toString());
                     attrib.setLabel(WordUtils.capitalize(soln.get("attributeLabel").toString()));
