@@ -33,8 +33,6 @@ import org.hadatac.utils.LabKeyException;
 import org.hadatac.utils.NameSpaces;
 import org.labkey.remoteapi.CommandException;
 
-import com.avaje.ebeaninternal.server.lib.util.Str;
-
 
 public abstract class BasicGenerator {
 
@@ -95,7 +93,7 @@ public abstract class BasicGenerator {
         if (records == null) {
             return;
         }
-             
+
         int counter = 0;
         int row_number = 0;
         for (Record record : records) {
@@ -105,7 +103,7 @@ public abstract class BasicGenerator {
                 counter ++;
             }
         }
-        
+
         Map<String, Integer> mapStats = new HashMap<String, Integer>();
         for (HADatAcThing obj : objects) {
             String clsName = obj.getClass().getSimpleName();
@@ -332,7 +330,7 @@ public abstract class BasicGenerator {
         if (rows.isEmpty()) {
             return;
         }
-        
+
         AnnotationLog log = AnnotationLog.create(fileName);
 
         checkRows(rows, "hasURI");

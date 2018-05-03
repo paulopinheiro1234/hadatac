@@ -207,8 +207,11 @@ public class AnnotationWorker {
         System.out.println("Processing data acquisition schema file ...");
 
         SDD sdd = new SDD(file);
-
+        String file_name = file.getFile().getName();
         String sddName = sdd.getName();
+        if (sddName == ""){
+            AnnotationLog.printException("This SDD has no Study_ID filled.", file_name);
+        }
         Map<String, String> mapCatalog = sdd.getCatalog();
 
         RecordFile codeMappingRecordFile = null;
@@ -258,6 +261,7 @@ public class AnnotationWorker {
         GeneralGenerator generalGenerator = new GeneralGenerator(file, "DASchema");
         Map<String, Object> row = new HashMap<String, Object>();
         row.put("hasURI", ConfigProp.getKbPrefix() + "DAS-" + sddName);
+        AnnotationLog.println("This SDD is assigned with uri: " + ConfigProp.getKbPrefix() + "DAS-" + sddName + " and is of type hasco:DASchema", file.getFile().getName());
         row.put("a", "hasco:DASchema");
         row.put("rdfs:label", "Schema for " + sddName);
         row.put("rdfs:comment", "");

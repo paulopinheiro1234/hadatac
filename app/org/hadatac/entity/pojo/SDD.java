@@ -8,9 +8,12 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.io.FileUtils;
+import org.hadatac.console.controllers.annotator.AnnotationLog;
+import org.hadatac.data.loader.AnnotationWorker;
 import org.hadatac.data.loader.Record;
 import org.hadatac.data.loader.RecordFile;
 import org.hadatac.metadata.loader.URIUtils;
+import org.hadatac.utils.ConfigProp;
 
 public class SDD {
 	private Map<String, String> mapCatalog = new HashMap<String, String>();
@@ -18,10 +21,10 @@ public class SDD {
 	private Map<String, String> mapAttrObj = new HashMap<String, String>();
 	private Map<String, Map<String, String>> codebook = new HashMap<String, Map<String, String>>();
 	private Map<String, Map<String, String>> timeline = new HashMap<String, Map<String, String>>();
-	private RecordFile file = null;
+	private RecordFile sddfile = null;
 	
 	public SDD(RecordFile file) {
-		this.file = file;
+		this.sddfile = file;
 		readCatalog(file);
 	}
 	
@@ -35,7 +38,11 @@ public class SDD {
 	}
 	
 	public String getNameFromFileName() {
-	    return (file.getFile().getName().split("\\.")[0]).replace("_", "-").replace("SDD-", "");
+	    return (sddfile.getFile().getName().split("\\.")[0]).replace("_", "-").replace("SDD-", "");
+    }
+	
+	public String getFileName() {
+	    return sddfile.getFile().getName();
     }
 	
 	public Map<String, String> getCatalog() {
@@ -83,15 +90,37 @@ public class SDD {
 			}
 		}
 	}
+	
+	public boolean checkCellValue(String str) {
+		if(str.contains(",")){
+			return false;
+		}
+		if(str.contains(" ")){
+			return false;
+		}
+		return true;
+	}
 		
 	public void readDataDictionary(RecordFile file) {
+		
 		if (!file.isValid()) {
 			return;
 		}
-		
+        AnnotationLog.println("The Dictionary Mapping has " + file.getHeaders().size() + " columns.", sddfile.getFile().getName());
 		for (Record record : file.getRecords()) {
-			mapAttrObj.put(record.getValueByColumnIndex(0), record.getValueByColumnIndex(2));
+			if (checkCellValue(record.getValueByColumnIndex(0))){
+				if (checkCellValue(record.getValueByColumnName("attributeOf"))){
+					mapAttrObj.put(record.getValueByColumnIndex(0), record.getValueByColumnName("attributeOf"));
+				} else {
+					AnnotationLog.printException("The Dictionary Mapping has incorrect content " + record.getValueByColumnName("attributeOf") + "in \"attributeOf\" column.", sddfile.getFile().getName());
+					return;
+				}
+			} else {
+				AnnotationLog.printException("The Dictionary Mapping has incorrect content " + record.getValueByColumnName("Column") + "in \"Column\" column.", sddfile.getFile().getName());
+				return;
+			}
 		}
+		AnnotationLog.println("The Dictionary Mapping has correct content under \"Column\" and \"attributeOf\" columns.", sddfile.getFile().getName());
 		System.out.println("mapAttrObj: " + mapAttrObj);
 	}
 	

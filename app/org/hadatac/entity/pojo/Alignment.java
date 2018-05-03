@@ -24,6 +24,7 @@ public class Alignment {
     private Map<String, AlignmentEntityRole> roles;
     private Map<String, AlignmentAttribute> alignAttrs;
     private Map<String, String> replacementUris;
+    private Map<String, String> hCodeBook;
 
     Attribute ID = new Attribute();
     AttributeInRelationTo ID_IRT = new AttributeInRelationTo(ID, null);
@@ -36,6 +37,7 @@ public class Alignment {
         roles = new HashMap<String, AlignmentEntityRole>();
         alignAttrs = new HashMap<String, AlignmentAttribute>();
         replacementUris = new HashMap<String, String>();
+	hCodeBook = new HashMap<String, String>();
         ID.setLabel("ID");
     }
 
@@ -47,7 +49,6 @@ public class Alignment {
             }
         }
     }
-
 
     /* objectKey adds a new object identifier into aligment attributes
      */
@@ -143,6 +144,14 @@ public class Alignment {
             System.out.println("[ERROR] retrieving attribute " + m.getCharacteristicUri());
             return null;
         }
+	if (m.getDasaUri() != null && !m.getDasaUri().equals("")) {
+	    if (!containsCode(m.getDasaUri())) {
+		String code = Attribute.findHarmonizedCode(m.getDasaUri());
+		if (code != null && !code.equals("")) {
+		    addCode(m.getCharacteristicUri(), code);
+		}
+	    }
+	}
 
         if (!mInRelationTo.equals("")) {
             System.out.println("Adding the following inRelationTo " + mInRelationTo);
@@ -192,6 +201,9 @@ public class Alignment {
         return replacementUris.containsKey(uri);
     }
 
+    public boolean containsCode(String uri) {
+        return hCodeBook.containsKey(uri);
+    }
 
     /* GET INDIVIDUAL METHODS
      */
@@ -204,6 +216,9 @@ public class Alignment {
         return roles.get(key);
     }
 
+    public String getCode(String key) {
+        return hCodeBook.get(key);
+    }
 
     /* GET LIST METHODS
      */ 
@@ -218,6 +233,10 @@ public class Alignment {
 
     public List<AlignmentAttribute> getAlignmentAttributes() {
         return new ArrayList<AlignmentAttribute>(alignAttrs.values());
+    }
+
+    public List<String> getCodes() {
+        return new ArrayList<String>(hCodeBook.values());
     }
 
     /* ADD METHODS
@@ -236,6 +255,10 @@ public class Alignment {
         System.out.println("Adding NEW ROLE: " + entRole);
         AlignmentAttribute newAA = new AlignmentAttribute(entRole,ID_IRT);
         alignAttrs.put(newAA.getKey(),newAA);
+    }
+
+    public void addCode(String attrUri, String code) {
+        hCodeBook.put(attrUri, code);
     }
 
     public String inferRole(Measurement m) {
