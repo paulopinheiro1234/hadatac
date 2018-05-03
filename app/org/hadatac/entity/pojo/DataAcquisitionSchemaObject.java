@@ -167,7 +167,7 @@ public class DataAcquisitionSchemaObject extends HADatAcThing {
     }
 
     public String getRole() {
-        return role;
+        return this.role;
     }
 
     public void setRole(String role) {
@@ -282,8 +282,9 @@ public class DataAcquisitionSchemaObject extends HADatAcThing {
                 }
 
                 try {
-                    if (soln.getLiteral("role") != null && soln.getLiteral("role").getString() != null) {
-                        roleStr = soln.getLiteral("role").getString();
+                    if (soln.getResource("role") != null && soln.getResource("role").getURI() != null) {
+                    	roleStr = soln.getResource("role").getURI();
+                        //roleStr = soln.getLiteral("role").getString();
                     } 
                 } catch (Exception e1) {
                     roleStr = "";
