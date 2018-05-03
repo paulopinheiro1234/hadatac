@@ -7,6 +7,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.apache.jena.query.DatasetAccessor;
 import org.apache.jena.query.DatasetAccessorFactory;
@@ -31,6 +32,8 @@ import org.hadatac.utils.Feedback;
 import org.hadatac.utils.LabKeyException;
 import org.hadatac.utils.NameSpaces;
 import org.labkey.remoteapi.CommandException;
+
+import com.avaje.ebeaninternal.server.lib.util.Str;
 
 
 public abstract class BasicGenerator {
@@ -92,6 +95,7 @@ public abstract class BasicGenerator {
         if (records == null) {
             return;
         }
+             
         int counter = 0;
         int row_number = 0;
         for (Record record : records) {
@@ -101,7 +105,22 @@ public abstract class BasicGenerator {
                 counter ++;
             }
         }
-        AnnotationLog.println(counter + " Study Objects has been created by the createObjects() in the active generator", fileName);
+        
+        Map<String, Integer> mapStats = new HashMap<String, Integer>();
+        for (HADatAcThing obj : objects) {
+            String clsName = obj.getClass().getSimpleName();
+            if (mapStats.containsKey(clsName)) {
+                mapStats.put(clsName, mapStats.get(clsName) + 1);
+            } else {
+                mapStats.put(clsName, 1);
+            }
+        }
+        String results = String.join(" and ", mapStats.entrySet().stream()
+                .map(e -> e.getValue() + " " + e.getKey() + "(s)")
+                .collect(Collectors.toList()));
+        if (!results.isEmpty()) {
+            AnnotationLog.println(results + " have been created. ", fileName);
+        }
     }
 
     public String toString() {

@@ -45,9 +45,9 @@ public class SubjectGenerator extends BasicGenerator {
     }
 
     private String getStudyUri(Record rec) {
-    	if (file_name.startsWith("PID-")){
+    	if (file_name.startsWith("PID-")) {
     		return getPilotNum(rec);
-    	} else if (file_name.startsWith("SSD-")){
+    	} else if (file_name.startsWith("SSD-")) {
             return study_id;
     	}
 		return null;
@@ -89,7 +89,7 @@ public class SubjectGenerator extends BasicGenerator {
     @Override
     public void preprocess() throws Exception {
         if (!records.isEmpty()) {
-        	if (file_name.startsWith("PID-")){
+        	if (file_name.startsWith("PID-")) {
         		objects.add(createObjectCollection(records.get(0)));
         	}
         }
