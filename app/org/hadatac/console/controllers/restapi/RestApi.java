@@ -758,7 +758,8 @@ public class RestApi extends Controller {
             temp.put("variableuri", SolrUtils.getFieldValue(doc, "characteristic_uri_str"));
             temp.put("value", SolrUtils.getFieldValue(doc, "value_str"));
             temp.put("unituri", SolrUtils.getFieldValue(doc, "unit_uri_str"));
-            temp.put("atTime", SolrUtils.getFieldValue(doc, "named_time_str"));
+            temp.put("timeValue", SolrUtils.getFieldValue(doc, "time_value_double"));
+            temp.put("timeUnit", SolrUtils.getFieldValue(doc, "time_value_unit_uri_str"));
 
             anode.add(temp);
         }// /parse solr results
@@ -796,7 +797,8 @@ public class RestApi extends Controller {
             temp.put("variableuri", SolrUtils.getFieldValue(doc, "characteristic_uri_str"));
             temp.put("value", SolrUtils.getFieldValue(doc, "value_str"));
             temp.put("unituri", SolrUtils.getFieldValue(doc, "unit_uri_str"));
-            temp.put("atTime", SolrUtils.getFieldValue(doc, "named_time_str"));
+            temp.put("timeValue", SolrUtils.getFieldValue(doc, "time_value_double"));
+            temp.put("timeUnit", SolrUtils.getFieldValue(doc, "time_value_unit_uri_str"));
 
             anode.add(temp);
         }// /parse solr results

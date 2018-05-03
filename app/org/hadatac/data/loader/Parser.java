@@ -299,7 +299,7 @@ public class Parser {
                             measurement.setAbstractTime(dase.getUri());
                             System.out.println("[Parser] abstract time set to getUri");
                         }
-                        String columnName = dase.getComment();
+                        String columnName = dase.getLabel();
                         String sTimeValue = record.getValueByColumnName(columnName);
                         if (sTimeValue != null && sTimeValue.length() > 0) {
                             measurement.setTimeValue(sTimeValue);

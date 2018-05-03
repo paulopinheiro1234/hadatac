@@ -388,7 +388,7 @@ public class DataAcquisitionSchemaEvent extends HADatAcThing {
         if (!getPartOfSchema().equals("")) {
             insert += " <" + getUri() + "> hasco:partOfSchema <" + getPartOfSchema() + "> .  ";
         }
-        if (!getComment().equals("")) {
+        if (getComment() != null && !getComment().equals("")) {
             insert += " <" + getUri() + "> rdfs:comment \""  + getComment() + "\" .  ";
         }
         if (!getEntity().equals("")) {
