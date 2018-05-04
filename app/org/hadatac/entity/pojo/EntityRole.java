@@ -136,13 +136,11 @@ public class EntityRole extends HADatAcThing implements Comparable<EntityRole> {
 
                     Facet subFacet = facet.getChildById(role.getUri());
                     subFacet.putFacet("entity_role_uri_str", role.getUri());
-
-		    if (!role.getUri().equals(URIUtils.replacePrefixEx("sio:Sample"))) {
-			subFacet.putFacet("entity_uri_str", soln.get("entityUri").toString());
-		    }
-
                     subFacet.putFacet("daso_uri_str", soln.get("daso").toString());
                     subFacet.putFacet("dasa_uri_str", soln.get("dasa").toString());
+                    if (!role.getUri().equals(URIUtils.replacePrefixEx("sio:Sample"))) {
+                        subFacet.putFacet("entity_uri_str", soln.get("entityUri").toString());
+                    }
                 }
             }
         } catch (Exception e) {
