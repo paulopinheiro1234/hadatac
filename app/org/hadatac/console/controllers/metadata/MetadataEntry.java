@@ -17,35 +17,30 @@ import org.hadatac.console.views.html.metadata.metadata_browser;
 import org.hadatac.console.views.html.error_page;
 
 public class MetadataEntry extends Controller {
-	
+
     public Result index(String tabName) {
-    	SparqlQuery query = new SparqlQuery();
+        SparqlQuery query = new SparqlQuery();
         GetSparqlQueryDynamic query_submit = new GetSparqlQueryDynamic(query);
         OtMSparqlQueryResults theResults;
         String query_json = null;
         System.out.println("MetadataEntry.java is requesting: " + tabName);
         try {
             query_json = query_submit.executeQuery(tabName);
-            //System.out.println("Pre Conversion: " + query_json + "\n");
+            if (query_json.isEmpty()) {
+                return badRequest();
+            }
             theResults = new OtMSparqlQueryResults(query_json, true, tabName);
-            //System.out.println("Results: " + theResults.json + "\n");
-            
         } catch (IllegalStateException | NullPointerException | IOException e1) {
             return internalServerError(error_page.render(e1.toString(), tabName));
         }
-        System.out.println(tabName + " index() was called!");
-    	
-    	//List<org.hadatac.entity.pojo.Entity> entities = org.hadatac.entity.pojo.Entity.find();
+
         Map<String,String> indicators = DynamicFunctions.getIndicatorTypes();
         Map<String,List<String>> values = DynamicFunctions.getIndicatorValuesJustLabels(indicators);
-        /*for (String key : theResults.sparqlResults.keySet()){
-        	System.out.println(theResults.sparqlResults.get(key).toString());
-        }
-        System.out.println(theResults.treeResults);*/
+
         return ok(metadata_browser.render(theResults, tabName, values));
     }
 
     public Result postIndex(String tabName) {
-    	return index(tabName);
+        return index(tabName);
     }
 }
