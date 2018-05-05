@@ -41,6 +41,8 @@ GET	    /hadatac/metadata  		 	                   org.hadatac.console.controller
 POST	/hadatac/metadata			                   org.hadatac.console.controllers.metadata.Metadata.postIndex()
 GET	    /hadatac/metadata/metadataentry  	           org.hadatac.console.controllers.metadata.MetadataEntry.index(tabName: String)
 POST	/hadatac/metadata/metadataentry		           org.hadatac.console.controllers.metadata.MetadataEntry.postIndex(tabName: String)
+GET     /hadatac/metadata/metadataentrybyuri           org.hadatac.console.controllers.metadata.MetadataEntry.indexByUri(uri: String)
+POST    /hadatac/metadata/metadataentrybyuri           org.hadatac.console.controllers.metadata.MetadataEntry.postIndexByUri(uri: String)
 GET	    /hadatac/metadata/dynamicfunctions  	       org.hadatac.console.controllers.metadata.DynamicFunctions.index()
 POST	/hadatac/metadata/dynamicfunctions	           org.hadatac.console.controllers.metadata.DynamicFunctions.postIndex()
 GET	    /hadatac/metadataacquisitions                  org.hadatac.console.controllers.metadataacquisition.MetadataAcquisition.index()

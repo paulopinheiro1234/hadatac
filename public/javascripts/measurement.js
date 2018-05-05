@@ -112,7 +112,7 @@ function createFacet(facets, i) {
 function getNodeText(node) {
 	if (node.field == "indicator_uri_str") {
 		if (json.indicators.includes(node.tooltip)) {
-			var url = '/hadatac/metadata/metadataentry?tabName=' + node.value.replace(/\s/g, "");
+			var url = '/hadatac/metadata/metadataentrybyuri?uri=' + encodeURIComponent(node.tooltip);
 			return '<a href="' + url + '">' + node.value + ' (' + node.count + ')' + '</a>';
 		}
 	}

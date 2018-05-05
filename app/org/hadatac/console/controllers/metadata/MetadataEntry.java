@@ -1,5 +1,6 @@
 package org.hadatac.console.controllers.metadata;
 
+import org.hadatac.entity.pojo.Indicator;
 import org.hadatac.console.http.GetSparqlQueryDynamic;
 
 import java.io.IOException;
@@ -34,13 +35,30 @@ public class MetadataEntry extends Controller {
             return internalServerError(error_page.render(e1.toString(), tabName));
         }
 
-        Map<String,String> indicators = DynamicFunctions.getIndicatorTypes();
-        Map<String,List<String>> values = DynamicFunctions.getIndicatorValuesJustLabels(indicators);
+        Map<String, String> indicators = DynamicFunctions.getIndicatorTypes();
+        Map<String, List<String>> values = DynamicFunctions.getIndicatorValuesJustLabels(indicators);
 
         return ok(metadata_browser.render(theResults, tabName, values));
     }
 
     public Result postIndex(String tabName) {
         return index(tabName);
+    }
+    
+    public Result indexByUri(String uri) {
+        System.out.println("Request indicator URI: " + uri);
+        
+        Indicator indicator = Indicator.find(uri);
+        if (indicator == null) {
+            return badRequest();
+        }
+        
+        String tabName = indicator.getLabel().replace(" ", "");
+        
+        return index(tabName);
+    }
+
+    public Result postIndexByUri(String uri) {
+        return indexByUri(uri);
     }
 }
