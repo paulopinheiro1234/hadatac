@@ -40,7 +40,9 @@ public class AnnotationWorker {
 
         String path_proc = ConfigProp.getPathProc();
         String path_unproc = ConfigProp.getPathUnproc();
+        List<DataFile> proc_files = DataFile.findAll(DataFile.PROCESSED);
         List<DataFile> unproc_files = DataFile.findAll(DataFile.UNPROCESSED);
+        DataFile.filterNonexistedFiles(path_proc, proc_files);
         DataFile.filterNonexistedFiles(path_unproc, unproc_files);
         
         unproc_files.sort(new Comparator<DataFile>() {
@@ -56,8 +58,15 @@ public class AnnotationWorker {
             
             String file_name = file.getFileName();
             String filePath = path_unproc + "/" + file_name;
-
             AnnotationLog log = new AnnotationLog(file_name);
+            
+            if (proc_files.contains(file)) {
+                log.addline(Feedback.println(Feedback.WEB, String.format(
+                        "[ERROR] Already processed a file with the same name %s . "
+                        + "Please delete the old file before moving forward ", file_name)));
+                return;
+            }
+
             log.addline(Feedback.println(Feedback.WEB, String.format("[OK] Processing file: %s", file_name)));
 
             RecordFile recordFile = null;
