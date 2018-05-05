@@ -45,6 +45,7 @@ public class DataAcquisitionSchemaObject extends HADatAcThing {
     private String entity;
     private String entityLabel;
     private String role;
+    private String roleLabel;
     private String inRelationTo;
     private String inRelationToLabel;
     private String relation;
@@ -73,7 +74,7 @@ public class DataAcquisitionSchemaObject extends HADatAcThing {
         }
         System.out.println("positionInt: " + positionInt);
         this.setEntity(entity);
-        this.role = role;
+        this.setRole(role);
         this.setInRelationTo(inRelationTo);
         this.setRelation(relation);
     }
@@ -149,6 +150,13 @@ public class DataAcquisitionSchemaObject extends HADatAcThing {
         }
         return entityLabel;
     }
+    
+    public String getRoleLabel() {
+        if (role == null || roleLabel.equals("")) {
+            return URIUtils.replaceNameSpaceEx(role);
+        }
+        return roleLabel;
+    }
 
     public String getAnnotatedEntity() {
         String annotation;
@@ -171,7 +179,14 @@ public class DataAcquisitionSchemaObject extends HADatAcThing {
     }
 
     public void setRole(String role) {
-        this.role = role;
+        //this.role = role;
+    	this.role = role;
+        System.out.println("New ROLE : " + role);
+        if (role == null || role.equals("")) {
+            this.roleLabel = "";
+        } else {
+            this.roleLabel = FirstLabel.getLabel(role);
+        }
     }
 
     public String getInRelationTo() {
@@ -238,7 +253,7 @@ public class DataAcquisitionSchemaObject extends HADatAcThing {
                 "   OPTIONAL { <" + uri + "> hasco:hasEntity ?entity } . \n" + 
                 "   OPTIONAL { <" + uri + "> hasco:hasRole ?role } .  \n" + 
                 "   OPTIONAL { <" + uri + "> sio:inRelationTo ?inRelationTo } . \n" + 
-                "   OPTIONAL { <" + uri + "> sio:relation ?relation } . \n" + 
+                "   OPTIONAL { <" + uri + "> sio:Relation ?relation } . \n" + 
                 "}";
 
         //System.out.println("DataAcquisitionSchemaObject find(String uri) query: " + queryString);
@@ -284,7 +299,6 @@ public class DataAcquisitionSchemaObject extends HADatAcThing {
                 try {
                     if (soln.getResource("role") != null && soln.getResource("role").getURI() != null) {
                     	roleStr = soln.getResource("role").getURI();
-                        //roleStr = soln.getLiteral("role").getString();
                     } 
                 } catch (Exception e1) {
                     roleStr = "";
