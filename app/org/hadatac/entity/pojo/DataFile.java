@@ -59,6 +59,19 @@ public class DataFile {
 	public DataFile(String fileName) {
 		this.fileName = fileName;
 	}
+	
+	@Override
+	public int hashCode() {
+	    return fileName.hashCode();
+	}
+	
+	@Override
+	public boolean equals(Object o) {
+	    if (o instanceof DataFile) {
+	        return fileName.equals(((DataFile) o).fileName);
+	    }
+	    return false;
+	}
 
 	public String getOwnerEmail() {
 		return ownerEmail;

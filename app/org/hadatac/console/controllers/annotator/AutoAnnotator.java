@@ -322,7 +322,6 @@ public class AutoAnnotator extends Controller {
             path = ConfigProp.getPathUnproc();
         }
 
-        AnnotationLog.delete(fileName);
         File file = new File(path + "/" + fileName);
         if (fileName.startsWith("DA-")) {
             Measurement.delete(dataFile.getDatasetUri());
@@ -335,6 +334,7 @@ public class AutoAnnotator extends Controller {
         }
         file.delete();
         dataFile.delete();
+        AnnotationLog.delete(fileName);
 
         return redirect(routes.AutoAnnotator.index());
     }
@@ -416,6 +416,10 @@ public class AutoAnnotator extends Controller {
             String resumableIdentifier,
             String resumableFilename,
             String resumableRelativePath) {
+        if (DataFile.findByName(resumableFilename) != null) {
+            return badRequest("<a style=\"color:#cc3300; font-size: x-large;\">A file with this name already exists!</a>");
+        }
+        
         if (ResumableUpload.postUploadFileByChunking(request(), ConfigProp.getPathUnproc())) {
             DataFile.create(resumableFilename, AuthApplication.getLocalUser(session()).getEmail());
             return(ok("Upload finished"));
