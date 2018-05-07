@@ -3,10 +3,12 @@
 # ~~~~
 
 # Home page
-GET	    /hadatac/					                    org.hadatac.console.controllers.Portal.index()
-POST    /hadatac/                                 	    org.hadatac.console.controllers.Portal.postIndex()
-GET	    /hadatac                                  	    org.hadatac.console.controllers.Portal.index()
+GET	/hadatac/					org.hadatac.console.controllers.Portal.index()
+POST    /hadatac/					org.hadatac.console.controllers.Portal.postIndex()
+GET	/hadatac                                  	org.hadatac.console.controllers.Portal.index()
 POST	/hadatac                                        org.hadatac.console.controllers.Portal.postIndex()
+GET	/hadatac/dash					org.hadatac.console.controllers.Dashboard.index()
+POST    /hadatac/dash                                 	org.hadatac.console.controllers.Dashboard.postIndex()
 GET     /hadatac/version                                org.hadatac.console.controllers.Version.index()
 POST    /hadatac/version                                org.hadatac.console.controllers.Version.postIndex()
 GET	    /hadatac/acquisitions                           org.hadatac.console.controllers.dataacquisitionsearch.DataAcquisitionSearch.index(start: Int ?= 1, rows: Int ?= 15)
