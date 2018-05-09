@@ -4,6 +4,7 @@ import java.lang.String;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.hadatac.metadata.loader.URIUtils;
 import org.hadatac.utils.ConfigProp;
 import org.hadatac.utils.Templates;
 
@@ -47,7 +48,9 @@ public class SampleCollectionGenerator extends BasicGenerator {
 		row.put("a", "hasco:SampleCollection");
 		row.put("rdfs:label", getLabel(rec));
 		row.put("hasco:isMemberOf", getStudyUri(rec));
-
+		
+		setStudyUri(URIUtils.replacePrefixEx(getStudyUri(rec)));
+		
 		return row;
 	}
 

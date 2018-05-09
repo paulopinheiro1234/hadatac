@@ -6,11 +6,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.jena.query.QueryExecution;
-import org.apache.jena.query.QueryExecutionFactory;
 import org.apache.jena.query.QuerySolution;
-import org.apache.jena.query.ResultSet;
-import org.apache.jena.query.ResultSetFactory;
 import org.apache.jena.query.ResultSetRewindable;
 import org.apache.jena.rdf.model.RDFNode;
 import org.hadatac.console.http.SPARQLUtils;
@@ -167,6 +163,8 @@ public class DeploymentGenerator extends BasicGenerator {
 		else {
 			row.put("prov:startedAtTime", startTime);
 		}
+		
+		setStudyUri(URIUtils.replacePrefixEx(getStudy(rec)));
 
 		return row;
 	}

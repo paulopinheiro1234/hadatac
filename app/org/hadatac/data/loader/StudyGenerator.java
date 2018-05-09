@@ -4,12 +4,12 @@ import java.lang.String;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.hadatac.metadata.loader.URIUtils;
 import org.hadatac.utils.ConfigProp;
 import org.hadatac.utils.Templates;
 
 public class StudyGenerator extends BasicGenerator {
 	final String kbPrefix = ConfigProp.getKbPrefix();
-	private int counter = 1; //starting index number
 
 	public StudyGenerator(RecordFile file) {
 		super(file);
@@ -96,7 +96,8 @@ public class StudyGenerator extends BasicGenerator {
 		if(rec.getValueByColumnName(mapCol.get("externalSource")).length() > 0) {
 			row.put("hasco:hasExternalSource", getExtSource(rec));
 		}
-		counter++;
+		
+		setStudyUri(URIUtils.replacePrefixEx(getUri(rec)));
 
 		return row;
 	}
@@ -108,7 +109,7 @@ public class StudyGenerator extends BasicGenerator {
 
 	@Override
 	public String getErrorMsg(Exception e) {
-		return "";
+		return "Error in StudyGenerator: " + e.getMessage();
 	}
 }
 

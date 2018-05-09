@@ -6,15 +6,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.jena.query.Query;
-import org.apache.jena.query.QueryExecution;
-import org.apache.jena.query.QueryExecutionFactory;
-import org.apache.jena.query.QueryFactory;
 import org.apache.jena.query.QuerySolution;
-import org.apache.jena.query.ResultSet;
-import org.apache.jena.query.ResultSetFactory;
 import org.apache.jena.query.ResultSetRewindable;
-import org.apache.jena.rdf.model.Literal;
 import org.apache.jena.sparql.engine.http.QueryExceptionHTTP;
 import org.hadatac.utils.CollectionUtil;
 import org.hadatac.utils.ConfigProp;
@@ -25,6 +18,7 @@ import org.hadatac.console.http.SPARQLUtils;
 import org.hadatac.entity.pojo.HADatAcThing;
 import org.hadatac.entity.pojo.ObjectCollection;
 import org.hadatac.entity.pojo.StudyObject;
+import org.hadatac.metadata.loader.URIUtils;
 
 
 public class SampleSubjectMapper extends BasicGenerator {
@@ -120,16 +114,16 @@ public class SampleSubjectMapper extends BasicGenerator {
         return rec.getValueByColumnName(mapCol.get("pilotNum"));
     }
 
-    private String getStudyUri(Record rec) {
+    private String getStudyId(Record rec) {
             return getPilotNum(rec);
     }
 
     private String getCollectionUri(Record rec) {
-        return kbPrefix + "SOC-" + getStudyUri(rec) + "-SSAMPLES";
+        return kbPrefix + "SOC-" + getStudyId(rec) + "-SSAMPLES";
     }
 
     private String getCollectionLabel(Record rec) {
-        return "Sample Collection of Study " + getStudyUri(rec);
+        return "Sample Collection of Study " + getStudyId(rec);
     }
 
     private String getTimeScopeUri(Record rec) {
@@ -161,8 +155,12 @@ public class SampleSubjectMapper extends BasicGenerator {
                 "http://hadatac.org/ont/hasco/SampleCollection",
                 getCollectionLabel(record),
                 getCollectionLabel(record),
-                kbPrefix + "STD-" + getStudyUri(record));
-        AnnotationLog.println("ObjectCollection:" + getCollectionUri(record) + " has been created as a hasco:SampleCollection by createObjectCollection().", file_name);
+                kbPrefix + "STD-" + getStudyId(record));
+        
+        setStudyUri(URIUtils.replacePrefixEx(kbPrefix + "STD-" + getStudyId(record)));
+        
+        AnnotationLog.println("ObjectCollection:" + getCollectionUri(record) + 
+                " has been created as a hasco:SampleCollection by createObjectCollection().", file_name);
         return oc;
     }
 

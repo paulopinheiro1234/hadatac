@@ -8,7 +8,16 @@ import org.hadatac.console.controllers.annotator.AnnotationLog;
 public class GeneratorChain {
 
     private List<BasicGenerator> chain = new ArrayList<BasicGenerator>();
+    private String studyUri = "";
     private boolean bValid = true;
+    
+    public String getStudyUri() {
+        return studyUri;
+    }
+    
+    public void setStudyUri(String studyUri) {
+        this.studyUri = studyUri;
+    }
     
     public boolean isValid() {
         return bValid;
@@ -55,6 +64,12 @@ public class GeneratorChain {
                 e.printStackTrace();
                 AnnotationLog.printException(generator.getErrorMsg(e), generator.getFileName());
                 return false;
+            }
+        }
+        
+        for (BasicGenerator generator : chain) {
+            if (!generator.getStudyUri().equals("")) {
+                setStudyUri(generator.getStudyUri());
             }
         }
 
