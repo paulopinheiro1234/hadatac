@@ -87,6 +87,9 @@ public class MetadataContext implements RDFContext {
         } catch (Exception e) {
             e.printStackTrace();
         }
+
+	NameSpaces.getInstance().loadedOntologies.clear();
+
         message += Feedback.println(mode, " ");
         message += Feedback.println(mode, " ");
         message += Feedback.print(mode, "   Triples after [clean]: " + totalTriples());
@@ -411,6 +414,8 @@ public class MetadataContext implements RDFContext {
                     loadLocalFile(mode, filePath, entry.getValue().getType());
                     message += loadFileMessage;
                     Long newTotal = totalTriples();
+		    Long newAddition = newTotal - total;
+		    NameSpaces.getInstance().loadedOntologies.put(abbrev, Integer.valueOf(newAddition.intValue()));
                     message += Feedback.println(mode, "   Added " + (newTotal - total) + " triples.");
 
                     total = newTotal;

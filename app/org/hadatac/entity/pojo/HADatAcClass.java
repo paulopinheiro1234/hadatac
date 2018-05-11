@@ -97,7 +97,32 @@ public class HADatAcClass {
 		this.comment = comment;
 	}
 
-	@JsonIgnore
+        public static int getNumberClasses() {
+	    String query = "";
+	    query += NameSpaces.getInstance().printSparqlNameSpaceList();
+	    query += "select (COUNT(?categ) as ?tot) where " +  
+		     " { SELECT ?c (COUNT(?c) as ?categ) " +
+		     "     WHERE {" + 
+                     "             [] a ?c . " +
+	             "     } " +
+                     " GROUP BY ?c " + 
+		     " }";
+	    
+	    try {
+		ResultSetRewindable resultsrw = SPARQLUtils.select(
+						CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), query);
+		
+		if (resultsrw.hasNext()) {
+		    QuerySolution soln = resultsrw.next();
+		    return Integer.parseInt(soln.getLiteral("tot").getString());
+		}
+	    } catch (Exception e) {
+		e.printStackTrace();
+	    }
+	    return -1;
+	}
+    
+        @JsonIgnore
 	public String getHierarchyJson() {
 		//System.out.println("Inside HADatAcClass's getHierarchyJson: [" + className + "]");
 		String q = 

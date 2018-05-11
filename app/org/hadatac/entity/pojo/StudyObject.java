@@ -157,6 +157,27 @@ public class StudyObject extends HADatAcThing {
         this.scopeUris.add(scopeUri);
     }
 
+    public static int getNumberStudyObjects() {
+        String query = "";
+        query += NameSpaces.getInstance().printSparqlNameSpaceList();
+        query += " select (count(?obj) as ?tot) where " + 
+	         " { ?obj hasco:isMemberOf ?collection . ?obj a ?objType . " + 
+                 " FILTER NOT EXISTS { ?objType rdfs:subClassOf* hasco:ObjectCollection . } " + 
+	         "}";
+        try {
+            ResultSetRewindable resultsrw = SPARQLUtils.select(
+                    CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), query);
+            
+            if (resultsrw.hasNext()) {
+                QuerySolution soln = resultsrw.next();
+                return Integer.parseInt(soln.getLiteral("tot").getString());
+	    }
+	} catch (Exception e) {
+	    e.printStackTrace();
+	}
+	return -1;
+    }
+
     public static List<String> retrieveScopeUris(String obj_uri) {
         List<String> retrievedUris = new ArrayList<String>();
         String queryString = NameSpaces.getInstance().printSparqlNameSpaceList() + 

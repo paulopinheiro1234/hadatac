@@ -6,6 +6,7 @@ import play.twirl.api.Html;
 
 import org.hadatac.console.views.html.main;
 import org.hadatac.console.views.html.dashboard;
+import org.hadatac.utils.NameSpaces;
 import org.hadatac.utils.Repository;
 
 public class Dashboard extends Controller {
@@ -24,7 +25,10 @@ public class Dashboard extends Controller {
     						+ "HADatAC Solr is down now. Ask Administrator for further information. "
     						+ "</h4></div>")));
     	}
-    	
+	
+	NameSpaces ns = NameSpaces.getInstance();
+	ns.nameSpacesStats();
+
     	return ok(dashboard.render()); 
     }
 

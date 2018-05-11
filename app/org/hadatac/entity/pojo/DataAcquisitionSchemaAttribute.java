@@ -459,6 +459,28 @@ public class DataAcquisitionSchemaAttribute extends HADatAcThing {
         }
     }
 
+    public static int getNumberDASAs() {
+        String query = "";
+        query += NameSpaces.getInstance().printSparqlNameSpaceList();
+        query += "select distinct (COUNT(?x) AS ?tot) where {" + 
+	    " ?x a <http://hadatac.org/ont/hasco/DASchemaAttribute> } ";
+
+        //System.out.println("Study query: " + query);
+
+        try {
+            ResultSetRewindable resultsrw = SPARQLUtils.select(
+                    CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), query);
+            
+            if (resultsrw.hasNext()) {
+                QuerySolution soln = resultsrw.next();
+                return Integer.parseInt(soln.getLiteral("tot").getString());
+	    }
+	} catch (Exception e) {
+	    e.printStackTrace();
+	}
+	return -1;
+    }
+
     public static DataAcquisitionSchemaAttribute find(String dasa_uri) {
         DataAcquisitionSchemaAttribute dasa = null;
         System.out.println("Looking for data acquisition schema attribute with URI <" + dasa_uri + ">");

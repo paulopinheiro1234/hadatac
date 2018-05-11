@@ -1123,6 +1123,9 @@ public class Measurement extends HADatAcThing implements Runnable {
 
             System.out.println("Finished writing!");
             
+	    // Write harmonized code book
+	    outputHarmonizedCodebook(alignment, null);
+
             dataFile = DataFile.findByName(file.getName());
             if (dataFile != null) {
                 if (dataFile.getStatus() == DataFile.DELETED) {
@@ -1137,6 +1140,34 @@ public class Measurement extends HADatAcThing implements Runnable {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    public static void outputHarmonizedCodebook(Alignment alignment, File file) {        
+	// Write empty string to create the file
+	//FileUtils.writeStringToFile(file, "", "utf-8", true);
+
+	System.out.println("Harmonized code book");
+	System.out.println("Class, code, description");
+
+	// Wrte code book
+	/*for (String key : alignment.getCodeBook().keySet()) {
+	    Attribute attr = Attribute.find(key);
+	    if (attr != null && attr.getDasaUri() != null && !attr.getDasaUri().equals("")) {
+		System.out.print(key);
+		String code = attr.findHarmonizedCode(attr.getDasaUri());
+		if (code != null) {
+		    System.out.print(", " + code);
+		} else {
+		    System.out.print(",");
+		}
+		if (attr.getLabel() != null) {
+		    System.out.print(", " + attr.getLabel());
+		} else {
+		    System.out.print(",");
+		}
+		System.out.println();
+	    }
+	    }*/
     }
 
     public String toCSVRow(List<String> fieldNames) {

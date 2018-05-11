@@ -208,6 +208,31 @@ public class Study extends HADatAcThing {
         return Long.parseLong(this.lastId);
     }
 
+    public static int getNumberStudies() {
+        String query = "";
+        query += NameSpaces.getInstance().printSparqlNameSpaceList();
+        query += " select (count(?study) as ?tot) where { " + 
+	         " ?studyType rdfs:subClassOf* hasco:Study . " +  
+                 " ?study a ?studyType . " +
+	         " }";
+
+	//select ?obj ?collection ?objType where { ?obj hasco:isMemberOf ?collection . ?obj a ?objType . FILTER NOT EXISTS { ?objType rdfs:subClassOf* hasco:ObjectCollection . } }
+        //System.out.println("Study query: " + query);
+
+        try {
+            ResultSetRewindable resultsrw = SPARQLUtils.select(
+                    CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), query);
+            
+            if (resultsrw.hasNext()) {
+                QuerySolution soln = resultsrw.next();
+                return Integer.parseInt(soln.getLiteral("tot").getString());
+	    }
+	} catch (Exception e) {
+	    e.printStackTrace();
+	}
+	return -1;
+    }
+
     // get Start Time Methods
     public String getStartedAt() {
         DateTimeFormatter formatter = ISODateTimeFormat.dateTime();

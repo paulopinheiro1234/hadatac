@@ -220,6 +220,10 @@ public class Alignment {
         return hCodeBook.get(key);
     }
 
+    public Map<String, String> getCodeBook() {
+	return hCodeBook;
+    }
+
     /* GET LIST METHODS
      */ 
 

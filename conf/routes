@@ -117,6 +117,10 @@ POST	/hadatac/metadata/detector		       org.hadatac.console.controllers.metadata
 GET	    /hadatac/metadata/detectorlist		       org.hadatac.console.controllers.metadata.empirical.DetectorList.index()
 POST	/hadatac/metadata/detectorlist		       org.hadatac.console.controllers.metadata.empirical.DetectorList.postIndex()
 
+# Statistics
+GET	/hadatac/stats/ont		               org.hadatac.console.controllers.stats.Ontologies.index()
+POST	/hadatac/stats/ont		               org.hadatac.console.controllers.stats.Ontologies.postIndex()
+
 # Authorization URLs
 GET     /hadatac/auth                                  org.hadatac.console.controllers.AuthApplication.index
 GET     /hadatac/restricted                            org.hadatac.console.controllers.AuthApplication.restricted

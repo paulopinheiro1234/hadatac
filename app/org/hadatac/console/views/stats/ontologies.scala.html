@@ -1,0 +1,51 @@
+@()
+
+@import helper._
+@import java.net._
+@import org.hadatac.console.views.html._
+@import org.hadatac.utils._
+@import org.hadatac.utils.NameSpaces
+
+@main("Loaded Ontologies") {
+
+  <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+ 
+    <h3>Loaded Ontologies</h3>
+    
+    <div class="container-fluid">
+	
+      <div id="chart_div" style="width: 100%; height: 600px;"></div>
+      
+      <script>
+        google.charts.load('current', {packages: ['corechart', 'bar']});
+        google.charts.setOnLoadCallback(drawBasic);
+
+        function drawBasic() {
+
+	var dataArray = JSON.parse('[["Ontology", "# of triples"],' + '@NameSpaces.getInstance().jsonLoadedOntologies()'.replace(/&quot;/g,'"') + ']');
+
+        var data = google.visualization.arrayToDataTable(dataArray);
+
+        var options = {
+          title: 'Triples per Loaded Ontologies',
+          chartArea: {width: '50%'},
+          hAxis: {
+            title: 'Number of Triples',
+            minValue: 0
+          },
+          vAxis: {
+            title: 'Ontology'
+          }
+      };
+
+      var chart = new google.visualization.BarChart(document.getElementById('chart_div'));
+
+      chart.draw(data, options);
+    }
+     </script> 
+
+     @mainButton(false)
+	
+    </div>
+ 
+}
