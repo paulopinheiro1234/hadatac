@@ -213,7 +213,6 @@
     	   $("tbody tr[name='processed']").each(function(index) {
                if (options.indexOf($(this).attr("data-value")) > -1 
                        || $(this).find("[name='file_name']").text().startsWith("SDD-")) {
-                   console.log("hello: " + $(this).find("td[name='file_name']").text().startsWith("SDD-"));
                    $(this).show();
                } else {
                    $(this).hide();
