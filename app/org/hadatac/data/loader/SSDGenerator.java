@@ -79,6 +79,9 @@ public class SSDGenerator extends BasicGenerator {
     			URIUtils.replacePrefixEx(gethasScopeUri(record)),
                 getSpaceScopeUris(record),
                 getTimeScopeUris(record));
+    	
+    	setStudyUri(URIUtils.replacePrefixEx(getStudyUri(record)));
+    	
         return oc;
     }
 

@@ -41,6 +41,8 @@ public class DataFile {
 	private String fileName = "";
 	@Field("owner_email_str")
 	private String ownerEmail = "";
+	@Field("study_uri_str")
+    private String studyUri = "";
 	@Field("acquisition_uri_str")
 	private String dataAcquisitionUri = "";
 	@Field("dataset_uri_str")
@@ -79,6 +81,13 @@ public class DataFile {
 	public void setOwnerEmail(String ownerEmail) {
 		this.ownerEmail = ownerEmail;
 	}
+	
+	public String getStudyUri() {
+        return studyUri;
+    }
+    public void setStudyUri(String studyUri) {
+        this.studyUri = studyUri;
+    }
 	
 	public String getDataAcquisitionUri() {
 		return dataAcquisitionUri;
@@ -190,6 +199,7 @@ public class DataFile {
 		DataFile object = new DataFile(doc.getFieldValue("file_name").toString());
 		
 		object.setOwnerEmail(SolrUtils.getFieldValue(doc, "owner_email_str").toString());
+		object.setStudyUri(SolrUtils.getFieldValue(doc, "study_uri_str").toString());
 		object.setDataAcquisitionUri(URIUtils.replaceNameSpaceEx(SolrUtils.getFieldValue(doc, "acquisition_uri_str").toString()));
 		object.setDatasetUri(SolrUtils.getFieldValue(doc, "dataset_uri_str").toString());
 		object.setStatus(SolrUtils.getFieldValue(doc, "status_str").toString());

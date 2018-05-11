@@ -3,6 +3,7 @@ package org.hadatac.console.controllers.annotator;
 import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.Map;
 import java.util.HashMap;
@@ -58,6 +59,7 @@ public class AutoAnnotator extends Controller {
 
         List<DataFile> proc_files = null;
         List<DataFile> unproc_files = null;
+        List<String> studyURIs = new ArrayList<String>();
 
         String path_proc = ConfigProp.getPathProc();
         String path_unproc = ConfigProp.getPathUnproc();
@@ -74,13 +76,26 @@ public class AutoAnnotator extends Controller {
 
         DataFile.filterNonexistedFiles(path_proc, proc_files);
         DataFile.filterNonexistedFiles(path_unproc, unproc_files);
+        
+        for (DataFile dataFile : proc_files) {
+            if (!dataFile.getStudyUri().isEmpty() && !studyURIs.contains(dataFile.getStudyUri())) {
+                studyURIs.add(dataFile.getStudyUri());
+            }
+        }
+        
+        studyURIs.sort(new Comparator<String>() {
+            @Override
+            public int compare(String o1, String o2) {
+                return o1.compareTo(o2);
+            }
+        });
 
         boolean bStarted = false;
         if (ConfigProp.getPropertyValue("autoccsv.config", "auto").equals("on")) {
             bStarted = true;
         }
 
-        return ok(autoAnnotator.render(unproc_files, proc_files, bStarted, user.isDataManager()));
+        return ok(autoAnnotator.render(unproc_files, proc_files, studyURIs, bStarted, user.isDataManager()));
     }
 
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))

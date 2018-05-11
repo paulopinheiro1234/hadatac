@@ -2,21 +2,16 @@ package org.hadatac.data.loader;
 
 import java.lang.String;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
-import org.apache.jena.query.QueryExecution;
-import org.apache.jena.query.QueryExecutionFactory;
 import org.apache.jena.query.QuerySolution;
-import org.apache.jena.query.ResultSet;
-import org.apache.jena.query.ResultSetFactory;
 import org.apache.jena.query.ResultSetRewindable;
 import org.apache.jena.rdf.model.Literal;
 import org.hadatac.console.http.SPARQLUtils;
 import org.hadatac.entity.pojo.HADatAcThing;
 import org.hadatac.entity.pojo.ObjectCollection;
 import org.hadatac.entity.pojo.StudyObject;
+import org.hadatac.metadata.loader.URIUtils;
 import org.hadatac.utils.CollectionUtil;
 import org.hadatac.utils.ConfigProp;
 import org.hadatac.utils.NameSpaces;
@@ -203,6 +198,8 @@ public class SampleGenerator extends BasicGenerator {
                 timeScopeUris);
 
         oc.setObjectUris(objectUris);
+        
+        setStudyUri(URIUtils.replacePrefixEx(getStudyUri(record)));
 
         return oc;
     }

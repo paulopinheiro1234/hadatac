@@ -19,6 +19,8 @@ public class MotherGenerator extends BasicGenerator {
         super(file);
         file_name = file.getFile().getName();
         study_id = file.getFile().getName().replaceAll("SSD-", "").replaceAll(".xlsx", "");
+        
+        setStudyUri(URIUtils.replacePrefixEx(kbPrefix + "STD-" + study_id));
     }
 
     @Override

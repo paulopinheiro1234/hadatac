@@ -1,5 +1,6 @@
 @(unprocessedFiles : List[org.hadatac.entity.pojo.DataFile], 
   processedFiles : List[org.hadatac.entity.pojo.DataFile],
+  studyURIs : List[String],
   bStarted : Boolean,
   bAdmin : Boolean)
 
@@ -14,9 +15,6 @@
 @main("Automatic Annotator") {
 	<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
 	<script type="text/javascript" src="@controllers.routes.Assets.versioned("javascripts/resumable.js")"></script>
-	
-	<script type="text/javascript">
-    </script>
     
     <div class="container-fluid">
 	
@@ -60,6 +58,19 @@
     </div>
 
     <script type="text/javascript" src="@controllers.routes.Assets.versioned("javascripts/upload.js")"></script>
+    
+    <div class="container">
+    <div class="col-lg-12">
+        <div class="button-group">
+            <button type="button" class="btn btn-default btn-sm dropdown-toggle" data-toggle="dropdown"><span class="glyphicon glyphicon-cog"></span>Filter by Study<span class="caret"></span></button>
+            <ul class="dropdown-menu">
+                @for(study <- studyURIs){
+                    <li><a href="#" class="small" data-value="@study" tabIndex="-1"><input type="checkbox"/>&nbsp;@study</a></li>
+                }
+            </ul>
+        </div>
+    </div>
+    </div>
 	
 	<div class="container-fluid">
 	<table class="table">
@@ -77,13 +88,13 @@
     </thead>
     <tbody>
     	@for(file <- processedFiles){
-    		<tr>
+    		<tr name="processed" data-value="@file.getStudyUri()">
     		    @if(AnnotationLog.create(file.getFileName()).getLog().contains("[ERROR]")) {
-                    <td bgcolor="#FF9999">@file.getFileName()</td>
+                    <td bgcolor="#FF9999" name="file_name">@file.getFileName()</td>
                 } else { @if(AnnotationLog.create(file.getFileName()).getLog().contains("[WARNING]")) {
-                    <td bgcolor="#FFFF99">@file.getFileName()</td>
+                    <td bgcolor="#FFFF99" name="file_name">@file.getFileName()</td>
                 } else {
-                    <td>@file.getFileName()</td>
+                    <td name="file_name">@file.getFileName()</td>
                 }}
     			@if(bAdmin) {
     				<td>@file.getOwnerEmail()</td>
@@ -135,13 +146,13 @@
     </thead>
     <tbody>
     	@for(file <- unprocessedFiles) {
-    	    <tr>
+    	    <tr name="unprocessed">
     			@if(AnnotationLog.create(file.getFileName()).getLog().contains("[ERROR]")) {
-                    <td bgcolor="#FF9999">@file.getFileName()</td>
+                    <td bgcolor="#FF9999" name="file_name">@file.getFileName()</td>
                 } else { @if(AnnotationLog.create(file.getFileName()).getLog().contains("[WARNING]")) {
-                    <td bgcolor="#FFFF99">@file.getFileName()</td>
+                    <td bgcolor="#FFFF99" name="file_name">@file.getFileName()</td>
                 } else {
-                    <td>@file.getFileName()</td>
+                    <td name="file_name">@file.getFileName()</td>
                 }}
     			@if(bAdmin) {
     				<td>@file.getOwnerEmail()</td>
@@ -177,4 +188,43 @@
     <br><br>
     <a href="@org.hadatac.console.controllers.routes.Portal.index()" class="btn btn-primary" role="button">Back to Main Page</a>
 	</div>
+	
+	<script type="text/javascript">
+    var options = [];
+
+    $('.dropdown-menu a').on('click', function(event) {
+
+       var $target = $( event.currentTarget ),
+           val = $target.attr( 'data-value' ),
+           $inp = $target.find( 'input' ),
+           idx;
+
+       if ( ( idx = options.indexOf( val ) ) > -1 ) {
+          options.splice( idx, 1 );
+          setTimeout( function() { $inp.prop( 'checked', false ) }, 0);
+       } else {
+          options.push( val );
+          setTimeout( function() { $inp.prop( 'checked', true ) }, 0);
+       }
+
+       $( event.target ).blur();
+
+       if (options.length > 0) {
+    	   $("tbody tr[name='processed']").each(function(index) {
+               if (options.indexOf($(this).attr("data-value")) > -1 
+                       || $(this).find("[name='file_name']").text().startsWith("SDD-")) {
+                   $(this).show();
+               } else {
+                   $(this).hide();
+               }
+           });
+       } else {
+    	   $("tbody tr[name='processed']").each(function(index) {
+        	   $(this).show();
+           });
+       }
+       
+       return false;
+    });
+    </script>
 }

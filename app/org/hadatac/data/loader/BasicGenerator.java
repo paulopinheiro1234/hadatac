@@ -42,6 +42,7 @@ public abstract class BasicGenerator {
     protected List<HADatAcThing> objects = new ArrayList<HADatAcThing>();
 
     protected HashMap<String, String> mapCol = new HashMap<String, String>();
+    protected String studyUri = "";
     protected String fileName = "";
 
     public BasicGenerator(RecordFile file) {
@@ -59,7 +60,14 @@ public abstract class BasicGenerator {
     public String getFileName() {
         return fileName;
     }
-
+    
+    public String getStudyUri() {
+        return studyUri;
+    }
+    public void setStudyUri(String studyUri) {
+        this.studyUri = studyUri;
+    }
+    
     Map<String, Object> createRow(Record rec, int row_number) throws Exception { return null; }
 
     HADatAcThing createObject(Record rec, int row_number) throws Exception { return null; }

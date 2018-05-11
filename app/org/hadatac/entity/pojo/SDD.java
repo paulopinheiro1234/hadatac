@@ -9,11 +9,9 @@ import java.util.Map;
 
 import org.apache.commons.io.FileUtils;
 import org.hadatac.console.controllers.annotator.AnnotationLog;
-import org.hadatac.data.loader.AnnotationWorker;
 import org.hadatac.data.loader.Record;
 import org.hadatac.data.loader.RecordFile;
 import org.hadatac.metadata.loader.URIUtils;
-import org.hadatac.utils.ConfigProp;
 
 public class SDD {
 	private Map<String, String> mapCatalog = new HashMap<String, String>();

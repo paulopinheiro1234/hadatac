@@ -81,10 +81,10 @@ public class AnnotationWorker {
             }
 
             boolean bSucceed = false;
+            GeneratorChain chain = null;
             if (file_name.startsWith("DA-")) {
                 bSucceed = annotateDAFile(file, recordFile);
             } else {
-                GeneratorChain chain = null;
                 if (file_name.startsWith("PID-")) {
                 	if (recordFile.getNumberOfSheets() > 1) {
                 		log.addline(Feedback.println(Feedback.WEB, 
@@ -138,6 +138,7 @@ public class AnnotationWorker {
 
                 file.setStatus(DataFile.PROCESSED);
                 file.setCompletionTime(new SimpleDateFormat("yyyy/MM/dd HH:mm:ss").format(new Date()));
+                file.setStudyUri(chain.getStudyUri());
                 file.save();
                 File f = new File(path_unproc + "/" + file_name);
                 f.renameTo(new File(destFolder + "/" + file_name));
@@ -382,6 +383,7 @@ public class AnnotationWorker {
         int status = -1;
 
         try {
+            dataFile.setStudyUri(da.getStudyUri());
             dataFile.setDatasetUri(DataFactory.getNextDatasetURI(da.getUri()));
             da.addDatasetUri(dataFile.getDatasetUri());
 
