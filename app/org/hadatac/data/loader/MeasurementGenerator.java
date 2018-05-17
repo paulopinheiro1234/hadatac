@@ -62,6 +62,8 @@ public class MeasurementGenerator extends BasicGenerator {
         super(file);
         this.da = da;
         this.dataFile = dataFile;
+        
+        setStudyUri(da.getStudyUri());
     }
 
     @Override
