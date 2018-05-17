@@ -24,7 +24,7 @@ public class MotherGenerator extends BasicGenerator {
     }
 
     @Override
-    void initMapping() {
+    public void initMapping() {
         mapCol.clear();
         mapCol.put("subjectID", "CHEAR PID");
         mapCol.put("motherID", "originalID");

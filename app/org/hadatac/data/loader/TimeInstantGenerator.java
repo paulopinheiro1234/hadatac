@@ -23,7 +23,7 @@ public class TimeInstantGenerator extends BasicGenerator {
     }
 
     @Override
-    void initMapping() {
+    public void initMapping() {
         mapCol.clear();
         mapCol.put("originalID", "originalID");
         mapCol.put("Type", "rdf:type");

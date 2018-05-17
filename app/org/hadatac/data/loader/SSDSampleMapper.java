@@ -44,7 +44,7 @@ public class SSDSampleMapper extends BasicGenerator {
     }
 
     @Override
-    void initMapping() {
+    public void initMapping() {
         mapCol.clear();
         mapCol.put("type", "rdf:type");
         mapCol.put("originalPID", "CHEAR PID");

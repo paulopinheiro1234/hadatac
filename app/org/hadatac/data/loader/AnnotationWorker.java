@@ -82,49 +82,48 @@ public class AnnotationWorker {
 
             boolean bSucceed = false;
             GeneratorChain chain = null;
+            
             if (file_name.startsWith("DA-")) {
-                bSucceed = annotateDAFile(file, recordFile);
-            } else {
-                if (file_name.startsWith("PID-")) {
-                	if (recordFile.getNumberOfSheets() > 1) {
-                		log.addline(Feedback.println(Feedback.WEB, 
-                                "[ERROR] PID file has more than one sheet. "));
-                		return;
-                	}
-                    chain = annotateSubjectIdFile(recordFile);
-                } else if (file_name.startsWith("STD-")) {
-                    chain = annotateStudyIdFile(recordFile);
-                } else if (file_name.startsWith("MAP-")) {
-                	if (recordFile.getNumberOfSheets() > 1) {
-                		log.addline(Feedback.println(Feedback.WEB, 
-                                "[ERROR] MAP file has more than one sheet. "));
-                		return;
-                	}
-                    chain = annotateMapFile(recordFile);
-                } else if (file_name.startsWith("ACQ-")) {
-                    chain = annotateACQFile(recordFile, true);
-                } else if (file_name.startsWith("SDD-")) {
-                    if (file_name.endsWith(".xlsx")) {
-                        recordFile = new SpreadsheetRecordFile(new File(filePath), "InfoSheet");
-                        if (!recordFile.isValid()) {
-                            log.addline(Feedback.println(Feedback.WEB, 
-                                    "[ERROR] Missing InfoSheet. "));
-                            return;
-                        }
-                    }
-                    chain = annotateDataAcquisitionSchemaFile(recordFile);
-                } else if (file_name.startsWith("SSD-")) {
-                    chain = annotateSSDFile(recordFile);
-                } else {
+                chain = annotateDAFile(file, recordFile);
+            } else if (file_name.startsWith("PID-")) {
+                if (recordFile.getNumberOfSheets() > 1) {
                     log.addline(Feedback.println(Feedback.WEB, 
-                            "[ERROR] Unsupported file name prefix, only accept prefixes "
-                                    + "STD-, PID-, MAP-, SDD-, ACQ-, DA-. "));
+                            "[ERROR] PID file has more than one sheet. "));
                     return;
                 }
-
-                if (chain != null) {
-                    bSucceed = chain.generate();
+                chain = annotateSubjectIdFile(recordFile);
+            } else if (file_name.startsWith("STD-")) {
+                chain = annotateStudyIdFile(recordFile);
+            } else if (file_name.startsWith("MAP-")) {
+                if (recordFile.getNumberOfSheets() > 1) {
+                    log.addline(Feedback.println(Feedback.WEB, 
+                            "[ERROR] MAP file has more than one sheet. "));
+                    return;
                 }
+                chain = annotateMapFile(recordFile);
+            } else if (file_name.startsWith("ACQ-")) {
+                chain = annotateACQFile(recordFile, true);
+            } else if (file_name.startsWith("SDD-")) {
+                if (file_name.endsWith(".xlsx")) {
+                    recordFile = new SpreadsheetRecordFile(new File(filePath), "InfoSheet");
+                    if (!recordFile.isValid()) {
+                        log.addline(Feedback.println(Feedback.WEB, 
+                                "[ERROR] Missing InfoSheet. "));
+                        return;
+                    }
+                }
+                chain = annotateDataAcquisitionSchemaFile(recordFile);
+            } else if (file_name.startsWith("SSD-")) {
+                chain = annotateSSDFile(recordFile);
+            } else {
+                log.addline(Feedback.println(Feedback.WEB, 
+                        "[ERROR] Unsupported file name prefix, only accept prefixes "
+                                + "STD-, PID-, MAP-, SDD-, ACQ-, DA-. "));
+                return;
+            }
+
+            if (chain != null) {
+                bSucceed = chain.generate();
             }
 
             if (bSucceed) {
@@ -328,8 +327,10 @@ public class AnnotationWorker {
         return chain;
     }
 
-    public static boolean annotateDAFile(DataFile dataFile, RecordFile recordFile) {
+    public static GeneratorChain annotateDAFile(DataFile dataFile, RecordFile recordFile) {
         System.out.println("annotateDAFile: [" + dataFile.getFileName() + "]");
+        
+        GeneratorChain chain = new GeneratorChain();
 
         String file_name = dataFile.getFileName();
         AnnotationLog log = AnnotationLog.create(file_name);
@@ -345,7 +346,7 @@ public class AnnotationWorker {
                 if (!da.isComplete()) {
                     log.addline(Feedback.println(Feedback.WEB, 
                             String.format("[WARNING] Specification of associated Object Access Specification is incomplete: %s", file_name)));
-                    return false;
+                    chain.setInvalid();
                 } else {
                     log.addline(Feedback.println(Feedback.WEB, String.format("[OK] Specification of associated Object Access Specification is complete: %s", file_name)));
                 }
@@ -357,51 +358,35 @@ public class AnnotationWorker {
 
         if (da_uri == null) {
             log.addline(Feedback.println(Feedback.WEB, String.format("[ERROR] Cannot find target data acquisition: %s", file_name)));
-            return false;
+            chain.setInvalid();
         } else {
             log.addline(Feedback.println(Feedback.WEB, String.format("[OK] Found target data acquisition: %s", file_name)));
         }
         if (schema_uri == null) {
             log.addline(Feedback.println(Feedback.WEB, String.format("[ERROR] Cannot load schema specified for data acquisition: %s", file_name)));
-            return false;
+            chain.setInvalid();
         } else {
             log.addline(Feedback.println(Feedback.WEB, String.format("[OK] Schema %s specified for data acquisition: %s", schema_uri, file_name)));
         }
         if (deployment_uri == null) {
             log.addline(Feedback.println(Feedback.WEB, String.format("[ERROR] Cannot load deployment specified for data acquisition: %s", file_name)));
-            return false;
+            chain.setInvalid();
         } else {
             try {
                 deployment_uri = URLDecoder.decode(deployment_uri, "UTF-8");
             } catch (UnsupportedEncodingException e) {
                 log.addline(Feedback.println(Feedback.WEB, String.format("URL decoding error for deployment uri %s", deployment_uri)));
-                return false;
+                chain.setInvalid();
             }
             log.addline(Feedback.println(Feedback.WEB, String.format("[OK] Deployment %s specified for data acquisition %s", deployment_uri, file_name)));
         }
 
-        int status = -1;
+        dataFile.setStudyUri(da.getStudyUri());
+        dataFile.setDatasetUri(DataFactory.getNextDatasetURI(da.getUri()));
+        da.addDatasetUri(dataFile.getDatasetUri());
+        
+        chain.addGenerator(new MeasurementGenerator(recordFile, da, dataFile));
 
-        try {
-            dataFile.setStudyUri(da.getStudyUri());
-            dataFile.setDatasetUri(DataFactory.getNextDatasetURI(da.getUri()));
-            da.addDatasetUri(dataFile.getDatasetUri());
-
-            Parser parser = new Parser();
-            ParsingResult parsingResult = parser.indexMeasurements(recordFile, da, dataFile);
-            status = parsingResult.getStatus();
-        } catch (Exception e) {
-            StringWriter errors = new StringWriter();
-            e.printStackTrace(new PrintWriter(errors));
-            log.addline(Feedback.println(Feedback.WEB, String.format("[ERROR] parsing and indexing CSV file %s", errors.toString())));
-            e.printStackTrace();
-            return false;
-        }
-
-        if (status == 0) {
-            return true;
-        }
-
-        return false;
+        return chain;
     }
 }

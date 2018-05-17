@@ -23,7 +23,7 @@ public class SubjectGenerator extends BasicGenerator {
     }
 
     @Override
-    void initMapping() {
+    public void initMapping() {
         mapCol.clear();
         mapCol.put("subjectID", "CHEAR PID");
         mapCol.put("pilotNum", "CHEAR Project ID");

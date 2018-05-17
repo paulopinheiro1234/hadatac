@@ -18,7 +18,7 @@ public class SampleCollectionGenerator extends BasicGenerator {
 	}
 
 	@Override
-	void initMapping() {
+	public void initMapping() {
 		mapCol.clear();
 		if (this.fileName.startsWith("STD")){
 			mapCol.put("studyID", Templates.STUDYID);
