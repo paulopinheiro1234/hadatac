@@ -30,7 +30,7 @@ public class PVGenerator extends BasicGenerator {
 	
 	//Column	Code	Label	Class	Resource
 	@Override
-	void initMapping() {
+	public void initMapping() {
 		mapCol.clear();
 		mapCol.put("Label", "Column");
 		mapCol.put("Code", "Code");

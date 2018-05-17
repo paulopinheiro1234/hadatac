@@ -44,7 +44,7 @@ public class SSDSampleMapper extends BasicGenerator {
     }
 
     @Override
-    void initMapping() {
+    public void initMapping() {
         mapCol.clear();
         mapCol.put("type", "rdf:type");
         mapCol.put("originalPID", "CHEAR PID");
@@ -189,7 +189,9 @@ public class SSDSampleMapper extends BasicGenerator {
                 getCollectionLabel(record),
                 kbPrefix + "STD-" + getStudyId(record));
         
-        setStudyUri(URIUtils.replacePrefixEx(kbPrefix + "STD-" + getStudyId(record)));
+        if (!getStudyId(record).isEmpty()) {
+            setStudyUri(URIUtils.replacePrefixEx(kbPrefix + "STD-" + getStudyId(record)));
+        }
 
         return oc;
     }

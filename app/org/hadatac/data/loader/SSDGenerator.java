@@ -21,7 +21,7 @@ public class SSDGenerator extends BasicGenerator {
     }
 
     @Override
-    void initMapping() {
+    public void initMapping() {
         mapCol.clear();
         mapCol.put("sheet", "sheet");
         mapCol.put("uri", "hasURI");

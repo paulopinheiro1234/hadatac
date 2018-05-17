@@ -38,7 +38,7 @@ public class DataAcquisitionGenerator extends BasicGenerator {
 	}
 
 	@Override
-	void initMapping() {}
+	public void initMapping() {}
 
 	private String getDataAcquisitionName(Record rec) {
 		return rec.getValueByColumnName(Templates.DATAACQUISITIONNAME);
@@ -121,7 +121,8 @@ public class DataAcquisitionGenerator extends BasicGenerator {
 		return createDataAcquisition(row, ownerEmail, permissionUri, deploymentUri, isEpiData(rec));
 	}
 
-	ObjectAccessSpec createDataAcquisition(Map<String, Object> row, 
+	ObjectAccessSpec createDataAcquisition(
+	        Map<String, Object> row, 
 			String ownerEmail, 
 			String permissionUri, 
 			String deploymentUri,
@@ -135,6 +136,8 @@ public class DataAcquisitionGenerator extends BasicGenerator {
 		da.setSchemaUri(URIUtils.replacePrefixEx((String)row.get("hasco:hasSchema")));
 		da.setTriggeringEvent(TriggeringEvent.INITIAL_DEPLOYMENT);
 		da.setNumberDataPoints(Measurement.getNumByDataAcquisition(da));
+		
+		setStudyUri(URIUtils.replacePrefixEx((String)row.get("hasco:isDataAcquisitionOf")));
 		
 		for (ObjectCollection oc : ObjectCollection.findByStudyUri(da.getStudyUri())) {
 			if ((isEpiData && oc.getTypeUri().equals(URIUtils.replacePrefixEx("hasco:SubjectGroup")))

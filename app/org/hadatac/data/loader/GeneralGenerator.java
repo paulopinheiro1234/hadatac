@@ -13,7 +13,7 @@ public class GeneralGenerator extends BasicGenerator {
 	}
 	
 	@Override
-	void initMapping() {}
+	public void initMapping() {}
     
     public void addRow(Map<String, Object> row) {
     	rows.add(row);

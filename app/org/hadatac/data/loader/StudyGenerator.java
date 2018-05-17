@@ -16,7 +16,7 @@ public class StudyGenerator extends BasicGenerator {
 	}
 
 	@Override
-	void initMapping() {
+	public void initMapping() {
 		mapCol.clear();
 		mapCol.put("studyID", Templates.STUDYID);
 		mapCol.put("studyTitle", Templates.STUDYTITLE);

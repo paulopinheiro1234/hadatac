@@ -38,7 +38,7 @@ public class SampleSubjectMapper extends BasicGenerator {
     }
 
     @Override
-    void initMapping() {
+    public void initMapping() {
         mapCol.clear();
         mapCol.put("type", Templates.OBJECTTYPE);
         mapCol.put("originalPID", Templates.ORIGINALPID);
@@ -87,7 +87,7 @@ public class SampleSubjectMapper extends BasicGenerator {
     }
 
     private String getType(Record rec) {
-    	return "sio:Sample";
+        return "sio:Sample";
     }
 
     private String getLabel(Record rec) {
@@ -115,7 +115,7 @@ public class SampleSubjectMapper extends BasicGenerator {
     }
 
     private String getStudyId(Record rec) {
-            return getPilotNum(rec);
+        return getPilotNum(rec);
     }
 
     private String getCollectionUri(Record rec) {
@@ -139,7 +139,7 @@ public class SampleSubjectMapper extends BasicGenerator {
             scopeUris.add(kbPrefix + "SBJ-" + pid + "-" + study_id);
         }
         if (!getTimeScopeUri(record).isEmpty()){
-        	scopeUris.add(kbPrefix + "TIME-" + getTimeScopeUri(record) + "-" + study_id);
+            scopeUris.add(kbPrefix + "TIME-" + getTimeScopeUri(record) + "-" + study_id);
         }
 
         System.out.println("scopeUris :" + scopeUris);
@@ -156,9 +156,11 @@ public class SampleSubjectMapper extends BasicGenerator {
                 getCollectionLabel(record),
                 getCollectionLabel(record),
                 kbPrefix + "STD-" + getStudyId(record));
-        
-        setStudyUri(URIUtils.replacePrefixEx(kbPrefix + "STD-" + getStudyId(record)));
-        
+
+        if (!getStudyId(record).isEmpty()) {
+            setStudyUri(URIUtils.replacePrefixEx(kbPrefix + "STD-" + getStudyId(record)));
+        }
+
         AnnotationLog.println("ObjectCollection:" + getCollectionUri(record) + 
                 " has been created as a hasco:SampleCollection by createObjectCollection().", file_name);
         return oc;

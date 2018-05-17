@@ -37,6 +37,7 @@ import org.labkey.remoteapi.CommandException;
 public abstract class BasicGenerator {
 
     protected List<Record> records = null;
+    protected RecordFile file;
 
     protected List<Map<String, Object>> rows = new ArrayList<Map<String, Object>>();
     protected List<HADatAcThing> objects = new ArrayList<HADatAcThing>();
@@ -44,14 +45,15 @@ public abstract class BasicGenerator {
     protected HashMap<String, String> mapCol = new HashMap<String, String>();
     protected String studyUri = "";
     protected String fileName = "";
-
+    
     public BasicGenerator(RecordFile file) {
+        this.file = file;
         records = file.getRecords();
         fileName = file.getFile().getName();
         initMapping();
     }
 
-    abstract void initMapping();
+    public void initMapping() {}
 
     abstract public String getTableName();
 
@@ -102,13 +104,11 @@ public abstract class BasicGenerator {
             return;
         }
 
-        int counter = 0;
         int row_number = 0;
         for (Record record : records) {
             HADatAcThing obj = createObject(record, ++row_number);
             if (obj != null) {
                 objects.add(obj);
-                counter ++;
             }
         }
 
@@ -289,7 +289,7 @@ public abstract class BasicGenerator {
         return true;
     }
 
-    public boolean commitObjectsToSolr(List<HADatAcThing> objects) {
+    public boolean commitObjectsToSolr(List<HADatAcThing> objects) throws Exception {
         int count = 0;
         for (HADatAcThing obj : objects) {
             if (obj.saveToSolr()) {

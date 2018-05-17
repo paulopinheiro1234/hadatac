@@ -32,7 +32,7 @@ public class SampleGenerator extends BasicGenerator {
     }
 
     @Override
-    void initMapping() {
+    public void initMapping() {
         mapCol.clear();
         mapCol.put("sampleID", "specimen_id");
         mapCol.put("studyID", "study_id");

@@ -30,7 +30,7 @@ public class DeploymentGenerator extends BasicGenerator {
 	}
 
 	@Override
-	void initMapping() {
+	public void initMapping() {
 		mapCol.clear();
 		mapCol.put("DataAcquisitionName", Templates.DATAACQUISITIONNAME);
 		mapCol.put("Method", Templates.METHOD);

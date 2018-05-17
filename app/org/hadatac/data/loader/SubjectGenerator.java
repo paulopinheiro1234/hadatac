@@ -23,7 +23,7 @@ public class SubjectGenerator extends BasicGenerator {
     }
 
     @Override
-    void initMapping() {
+    public void initMapping() {
         mapCol.clear();
         mapCol.put("subjectID", "CHEAR PID");
         mapCol.put("pilotNum", "CHEAR Project ID");
@@ -79,7 +79,9 @@ public class SubjectGenerator extends BasicGenerator {
                 getCohortLabel(record),
                 kbPrefix + "STD-" + getStudyId(record));
 
-        setStudyUri(URIUtils.replacePrefixEx(kbPrefix + "STD-" + getStudyId(record)));
+        if (!getStudyId(record).isEmpty()) {
+            setStudyUri(URIUtils.replacePrefixEx(kbPrefix + "STD-" + getStudyId(record)));
+        }
 
         return oc;
     }

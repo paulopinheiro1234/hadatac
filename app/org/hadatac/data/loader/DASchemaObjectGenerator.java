@@ -35,7 +35,7 @@ public class DASchemaObjectGenerator extends BasicGenerator {
 
 	//Column	Attribute	attributeOf	Unit	Time	Entity	Role	Relation	inRelationTo	wasDerivedFrom	wasGeneratedBy	hasPosition	
 	@Override
-	void initMapping() {
+	public void initMapping() {
 		mapCol.clear();
 		mapCol.put("Label", "Column");
 		mapCol.put("AttributeType", "Attribute");
