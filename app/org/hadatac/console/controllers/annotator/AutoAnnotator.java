@@ -431,7 +431,9 @@ public class AutoAnnotator extends Controller {
             String resumableIdentifier,
             String resumableFilename,
             String resumableRelativePath) {
-        if (DataFile.findByName(resumableFilename) != null) {
+        
+        DataFile file = DataFile.findByName(resumableFilename);
+        if (file != null && file.existsInFileSystem(ConfigProp.getPathUnproc())) {
             return badRequest("<a style=\"color:#cc3300; font-size: x-large;\">A file with this name already exists!</a>");
         }
         

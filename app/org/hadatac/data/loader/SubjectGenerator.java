@@ -79,7 +79,9 @@ public class SubjectGenerator extends BasicGenerator {
                 getCohortLabel(record),
                 kbPrefix + "STD-" + getStudyId(record));
 
-        setStudyUri(URIUtils.replacePrefixEx(kbPrefix + "STD-" + getStudyId(record)));
+        if (!getStudyId(record).isEmpty()) {
+            setStudyUri(URIUtils.replacePrefixEx(kbPrefix + "STD-" + getStudyId(record)));
+        }
 
         return oc;
     }
