@@ -348,6 +348,8 @@ POST    /hadatac/downloader/log               org.hadatac.console.controllers.da
 # file preview
 GET	    /hadatac/annotator/csvpreview     	       org.hadatac.console.controllers.fileviewer.CSVPreview.getCSVPreview(folder : String, file_name : String, da_uri: String, oc_uri : String, numRows:Int)
 POST	/hadatac/annotator/csvpreview     	       org.hadatac.console.controllers.fileviewer.CSVPreview.getCSVPreview(folder : String, file_name : String, da_uri: String, oc_uri : String, numRows:Int)
+GET     /hadatac/annotator/excelpreview            org.hadatac.console.controllers.fileviewer.ExcelPreview.index(folder : String, file_name : String)
+POST    /hadatac/annotator/excelpreview            org.hadatac.console.controllers.fileviewer.ExcelPreview.postIndex(folder : String, file_name : String)
 #GET	/hadatac/annotator/csvpreview/selectCol        org.hadatac.console.controllers.fileviewer.CSVPreview.selectColumn(file_name : String, da_uri: String)
 #POST	/hadatac/annotator/csvpreview/selectCol        org.hadatac.console.controllers.fileviewer.CSVPreview.selectColumn(file_name : String, da_uri: String)
 
