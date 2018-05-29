@@ -1,0 +1,73 @@
+@(file : java.io.File)
+
+@import helper._
+@import org.hadatac.console.views.html._
+@import org.hadatac.console.views.html.annotator._
+@import org.hadatac.console.controllers.annotator._
+@import org.hadatac.metadata.loader._
+@import java.net._
+
+@main("Excel File Preview"){
+    <script src="@controllers.routes.Assets.versioned("sheetjs/vendor/alertify.js")"></script>
+    <script src="http://unpkg.com/canvas-datagrid/dist/canvas-datagrid.js"></script>
+
+    <link rel="stylesheet" href="@controllers.routes.Assets.versioned("sheetjs/css/sheetjs.css")">
+    <link rel="stylesheet" media="screen" href="@controllers.routes.Assets.versioned("sheetjs/vendor/alertify.css")">
+
+    <div id="body">
+      <div id="left">
+        <div id="drop">Drop a file here</div>
+        <input type="file" id="file" value=""/><label for="file">... or click here to select a file</label>
+        <h3> Choose a worksheet:</h3>
+        <div id="buttons"></div>
+      </div>
+    
+      <div id="right">
+        <div id="grid"></div>
+        <div id="footnote"></div>
+      </div>
+    </div>
+    
+    <div id="file_url" value="@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.downloadDataFile(file.getName(), true)"></div>
+
+    <script src="@controllers.routes.Assets.versioned("sheetjs/js/shim.js")"></script>
+    <script src="http://unpkg.com/xlsx/dist/xlsx.full.min.js"></script>
+    <script src="@controllers.routes.Assets.versioned("sheetjs/js/dropsheet.js")"></script>
+    <script src="@controllers.routes.Assets.versioned("sheetjs/js/load_from_server.js")"></script>
+    <script src="@controllers.routes.Assets.versioned("sheetjs/vendor/spin.js")"></script>
+    
+    <script type="text/javascript">
+    /* set up async GET request */
+    var url = "@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.downloadDataFile(file.getName(), true)";
+    var req = new XMLHttpRequest();
+    req.open("GET", url, true);
+    req.responseType = "arraybuffer";
+
+    req.onload = function(e) {
+      var data = new Uint8Array(req.response);
+      
+      // var workbook = XLSX.read(data, {type:"array"});
+      // console.log("SheetNames: " + workbook.SheetNames);
+
+      DropSheet({
+        data: data,
+        file: _file,
+        drop: _target,
+        on: {
+            workstart: _workstart,
+            workend: _workend,
+            sheet: _onsheet,
+            foo: 'bar'
+        },
+        errors: {
+            badfile: _badfile,
+            pending: _pending,
+            failed: _failed,
+            large: _large,
+            foo: 'bar'
+        }
+      });
+    }
+    req.send();
+    </script>
+}
