@@ -7,8 +7,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.hadatac.entity.pojo.SDD;
 import org.hadatac.metadata.loader.URIUtils;
 import org.hadatac.utils.ConfigProp;
+import org.hadatac.utils.NameSpaces;
 
 public class DASchemaAttrGenerator extends BasicGenerator {
 
@@ -17,6 +19,7 @@ public class DASchemaAttrGenerator extends BasicGenerator {
     String SDDName = "";
     Map<String, String> codeMap;
     Map<String, List<String>> hasEntityMap = new HashMap<String, List<String>>();
+    List<String> AttrList = new ArrayList<String>();
     Map<String, String> currentHasEntity = new HashMap<String, String>();
 
     public DASchemaAttrGenerator(RecordFile file, String SDDName, Map<String, String> codeMap) {
@@ -31,6 +34,9 @@ public class DASchemaAttrGenerator extends BasicGenerator {
             tmp.add(rec.getValueByColumnName(mapCol.get("AttributeOf")));
             tmp.add(rec.getValueByColumnName(mapCol.get("Entity")));
             hasEntityMap.put(rec.getValueByColumnName(mapCol.get("Label")), tmp);
+            if (rec.getValueByColumnName(mapCol.get("AttributeType")).length() > 0) {
+            	AttrList.add(rec.getValueByColumnName(mapCol.get("Label")));
+            }
             System.out.println(rec.getValueByColumnName(mapCol.get("Label")) + " *** " + tmp);
         }
     }
@@ -128,12 +134,69 @@ public class DASchemaAttrGenerator extends BasicGenerator {
         }
     }
 
-    private String getWasDerivedFrom(Record rec) {
-        return rec.getValueByColumnName(mapCol.get("WasDerivedFrom"));
+    private List<String> getWasDerivedFrom(Record rec) {
+    	String derivedFrom = rec.getValueByColumnName(mapCol.get("WasDerivedFrom"));
+    	List<String> tbd = new ArrayList<String>();
+        if (derivedFrom.length() == 0) {
+            return tbd;
+        } else {
+	        List<String> items = Arrays.asList(derivedFrom.split("\\s*,\\s*"));
+	        for (String item : items) {
+	        	if (AttrList.contains(item)) {
+	        		tbd.add(kbPrefix + "DASA-" + SDDName + "-" + item.replace(" ", "").replace("_","-").replace("??", ""));
+	        	}
+	        }
+	        return tbd;
+        }
     }
+    
+	public boolean checkCellUriRegistered(String str) {
+        String prefixString = NameSpaces.getInstance().printSparqlNameSpaceList();
+//        System.out.println(prefixString);
+        if (str.contains(":")){
+        	String[] split = str.split(":");
+        	String prefixname = split[0];
+    		if (!prefixString.contains(prefixname)){
+    			return false;
+    		}
+    		return true;
+        } else {
+        	return true;
+        }
+	}
+	
+	public boolean checkCellUriResolvable(String str) {
+
+        if (str.contains(":")){
+        	if (URIUtils.isValidURI(str)){
+	        	try {
+	        		URIUtils.convertToWholeURI(str);
+	        	} catch (Exception e) {
+					return false;
+				}
+        	} else {
+        		return false;
+        	}
+        }
+        return true;
+	}
 
     private String getWasGeneratedBy(Record rec) {
-        return rec.getValueByColumnName(mapCol.get("WasGeneratedBy"));
+
+    	String str = rec.getValueByColumnName(mapCol.get("WasGeneratedBy"));
+    	if (str.length() == 0) {
+            return "";
+        } else if (checkCellUriRegistered(str)) {
+        	if (checkCellUriResolvable(str)) {
+        		return str;
+        	}
+        } else if (AttrList.contains(str)) {
+        	return kbPrefix + "DASA-" + SDDName + "-" + str.replace(" ", "").replace("_","-").replace("??", "");
+        } else {
+        	return "";
+        }
+        	
+        return "";
     }
 
     private Boolean checkVirtual(Record rec) {
@@ -157,6 +220,9 @@ public class DASchemaAttrGenerator extends BasicGenerator {
                 continue;
             } else {
                 rows.add(createRow(record, ++row_number));
+                for (String item : getWasDerivedFrom(record)) {
+                	rows.add(createDerivedFromRow(item, record));
+                }
                 column_name.add(getLabel(record));
             }
         }
@@ -205,7 +271,10 @@ public class DASchemaAttrGenerator extends BasicGenerator {
         row.put("hasco:isAttributeOf", getAttributeOf(rec));
         row.put("hasco:isVirtual", checkVirtual(rec).toString());
         row.put("hasco:isPIConfirmed", "false");
-
+        if (getWasGeneratedBy(rec).length() > 0) {
+        	row.put("prov:wasGeneratedBy", getWasGeneratedBy(rec));	
+        }
+        
         return row;
     }
 
@@ -224,6 +293,14 @@ public class DASchemaAttrGenerator extends BasicGenerator {
                 row.put("sio:Relation", "sio:inRelationTo");
             }
         }
+
+        return row;
+    }
+    
+    Map<String, Object> createDerivedFromRow(String item, Record rec) throws Exception {
+        Map<String, Object> row = new HashMap<String, Object>();
+        row.put("hasURI", kbPrefix + "DASA-" + SDDName + "-" + getLabel(rec).trim().replace(" ", "").replace("_","-").replace("??", ""));
+        row.put("prov:wasDerivedFrom", item);
 
         return row;
     }
