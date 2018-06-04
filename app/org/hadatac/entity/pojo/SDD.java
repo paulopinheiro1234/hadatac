@@ -160,7 +160,6 @@ public class SDD {
 			if (answer.contains("http://hadatac.org/ont/hasco/StudyIndicator")) {
 				return true;
 			} else {
-				AnnotationLog.printException("The 'Attribute' column " + str + " is not a subclass of hasco:StudyIndicator.", sddfile.getFile().getName());
 				return false;
 			}
 		} catch (QueryExceptionHTTP e) {
@@ -169,17 +168,40 @@ public class SDD {
 		}
 		return true;
 	}
+	
+	public void printErrList(List<String> list, int num) {
+		if (list.size()>0){
+			String listString = "";
+			for (String s : list) {
+			    listString += s + "; ";
+			}
+		if (num == 1){
+			AnnotationLog.printException("The Dictionary Mapping has unresolvable uris in cells: " + listString + " .", sddfile.getFile().getName());
+		} else if (num == 2){
+			AnnotationLog.printException("The Dictionary Mapping has unregistered namespace in cells: " + listString + " .", sddfile.getFile().getName());
+		} else if (num == 3){
+			AnnotationLog.printException("The Attributes: " + listString + " NOT hasco:StudyIndicator .", sddfile.getFile().getName());
+		} else if (num == 4){
+			AnnotationLog.printException("The Dictionary Mapping has incorrect content in :" + listString + "in \"attributeOf\" column.", sddfile.getFile().getName());
+		}
+		}
+	}
 		
-	public void readDataDictionary(RecordFile file) {
+	public boolean readDataDictionary(RecordFile file) {
 		
 		if (!file.isValid()) {
-			return;
+			return false;
 		}
         AnnotationLog.println("The Dictionary Mapping has " + file.getHeaders().size() + " columns.", sddfile.getFile().getName());
         
         Boolean uriResolvable = true;
         Boolean namespaceRegisterd = true;
         Boolean isStudyIndicator = true;
+        
+		List<String> checkUriRegister = new ArrayList<String>();
+		List<String> checkCellVal = new ArrayList<String>();
+		List<String> checkUriResolve = new ArrayList<String>();
+		List<String> checkStudyIndicatePath = new ArrayList<String>();
         
 		for (Record record : file.getRecords()) {
 			if (checkCellValue(record.getValueByColumnIndex(0))){
@@ -195,19 +217,19 @@ public class SDD {
 
 							} else {
 								uriResolvable = false;
-								AnnotationLog.printException("The 'Relation' column of the Dictionary Mapping has unresolvable uris " + relationCell + " .", sddfile.getFile().getName());
+								checkUriResolve.add(relationCell);
 							}
 						} else {
 							uriResolvable = false;
-							AnnotationLog.printException("The 'Role' column of the Dictionary Mapping has unresolvable uris " + roleCell + " .", sddfile.getFile().getName());
+							checkUriResolve.add(roleCell);
 						}
 					} else {
 						uriResolvable = false;
-						AnnotationLog.printException("The 'Entity' column of the Dictionary Mapping has unresolvable uris " + entityCell + " .", sddfile.getFile().getName());
+						checkUriResolve.add(entityCell);
 					}
 				} else {
 					uriResolvable = false;
-					AnnotationLog.printException("The 'Attribute' column of the Dictionary Mapping has unresolvable uris " + attributeCell + " .", sddfile.getFile().getName());
+					checkUriResolve.add(attributeCell);
 				}
 				
 				if (checkCellUriRegistered(attributeCell)){
@@ -217,41 +239,50 @@ public class SDD {
 
 							} else {
 								namespaceRegisterd = false;
-								AnnotationLog.printException("The 'Relation' column of the Dictionary Mapping has unregistered namespace " + relationCell + " .", sddfile.getFile().getName());
+								checkUriRegister.add(relationCell);
 							}
 						} else {
 							namespaceRegisterd = false;
-							AnnotationLog.printException("The 'Role' column of the Dictionary Mapping has unregistered namespace " + roleCell + " .", sddfile.getFile().getName());
+							checkUriRegister.add(roleCell);
 						}
 					} else {
 						namespaceRegisterd = false;
-						AnnotationLog.printException("The 'Entity' column of the Dictionary Mapping has unregistered namespace " + entityCell + " .", sddfile.getFile().getName());
+						checkUriRegister.add(entityCell);
 					}
 				} else {
 					namespaceRegisterd = false;
-					AnnotationLog.printException("The 'Attribute' column of the Dictionary Mapping has unregistered namespace " + attributeCell + " .", sddfile.getFile().getName());
+					checkUriRegister.add(attributeCell);
 				}
 				
 				if (URIUtils.isValidURI(attributeCell)){
 					isStudyIndicator = checkStudyIndicatorPath(attributeCell);
+					if (!isStudyIndicator) {
+						checkStudyIndicatePath.add(attributeCell);
+					}
 				} else {
 					if (entityCell.length() == 0){
 						isStudyIndicator = false;
-						AnnotationLog.printException("The 'Attribute' column " + attributeCell + "is not a hasco:StudyIndicator .", sddfile.getFile().getName());
+						checkStudyIndicatePath.add(attributeCell);
 					}
 				}
 
 				if (checkCellValue(record.getValueByColumnName("attributeOf"))){
 					mapAttrObj.put(record.getValueByColumnIndex(0), record.getValueByColumnName("attributeOf"));
 				} else {
-					AnnotationLog.printException("The Dictionary Mapping has incorrect content " + record.getValueByColumnName("attributeOf") + "in \"attributeOf\" column.", sddfile.getFile().getName());
-					return;
+					checkCellVal.add(record.getValueByColumnName("attributeOf"));
+					return false;
 				}
 			} else {
 				AnnotationLog.printException("The Dictionary Mapping has incorrect content " + record.getValueByColumnName("Column") + "in \"Column\" column.", sddfile.getFile().getName());
-				return;
+				return false;
 			}
 		}
+		
+		printErrList(checkUriResolve, 1);
+		printErrList(checkUriRegister, 2);
+		printErrList(checkStudyIndicatePath, 3);
+		printErrList(checkCellVal, 4);	
+		
 		if (uriResolvable == true){
 			AnnotationLog.println("The Dictionary Mapping has resolvable uris.", sddfile.getFile().getName());	
 		}
@@ -264,21 +295,29 @@ public class SDD {
 		
 		AnnotationLog.println("The Dictionary Mapping has correct content under \"Column\" and \"attributeOf\" columns.", sddfile.getFile().getName());
 		System.out.println("mapAttrObj: " + mapAttrObj);
+		
+		return true;
 	}
 	
-	public void readCodeMapping(RecordFile file) {
+	public boolean readCodeMapping(RecordFile file) {
 		if (!file.isValid()) {
-			return;
+			return false;
 		}
 		
 		for (Record record : file.getRecords()) {
 			codeMappings.put(record.getValueByColumnIndex(0), record.getValueByColumnIndex(1));
 		}
+		
+		if (codeMappings.isEmpty()){
+			return false;
+		} else {
+			return true;
+		}
 	}
 	
-	public void readCodebook(RecordFile file) {
+	public boolean readCodebook(RecordFile file) {
 		if (!file.isValid()) {
-			return;
+			return false;
 		}
 		
 		for (Record record : file.getRecords()) {
@@ -303,11 +342,17 @@ public class SDD {
 				mapCodeClass.put(record.getValueByColumnIndex(1), classUri);
 			}
 		}
+		
+		if (codebook.isEmpty()){
+			return false;
+		} else {
+			return true;
+		}
 	}
 	
-	public void readTimeline(RecordFile file) {
+	public boolean readTimeline(RecordFile file) {
 		if (!file.isValid()) {
-			return;
+			return false;
 		}
 		
 		for (Record record : file.getRecords()) {
@@ -332,6 +377,12 @@ public class SDD {
 				}
 				timeline.put(primaryKey, timelineRow);
 			}
+		}
+		
+		if(timeline.isEmpty()){
+			return false;
+		} else {
+			return true;
 		}
 	}
 }
