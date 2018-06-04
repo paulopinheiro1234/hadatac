@@ -34,16 +34,19 @@ var _failed = function(e) {
 var make_buttons = function(sheetnames, cb) {
   var buttons = document.getElementById('buttons');
   buttons.innerHTML = "";
-  sheetnames.forEach(function(s,idx) {
+  sheetnames.forEach(function(s, idx) {
     var btn = document.createElement('button');
     btn.type = 'button';
-    btn.name = 'btn' + idx;
+    // btn.name = 'btn' + idx;
+    btn.name = s;
     btn.text = s;
-    var txt = document.createElement('h3'); txt.innerText = s; btn.appendChild(txt);
+    var txt = document.createElement('h5'); 
+    txt.innerText = s; 
+    btn.appendChild(txt);
     btn.addEventListener('click', function() { cb(idx); }, false);
     buttons.appendChild(btn);
-    buttons.appendChild(document.createElement('br'));
   });
+  buttons.appendChild(document.createElement('br'));
 };
 
 var cdg = canvasDatagrid({
@@ -79,21 +82,4 @@ var _onsheet = function(json, sheetnames, select_sheet_cb) {
   cdg.data = json;
 };
 
-/** Drop it like it's hot **/
-DropSheet({
-  file: _file,
-  drop: _target,
-  on: {
-    workstart: _workstart,
-    workend: _workend,
-    sheet: _onsheet,
-    foo: 'bar'
-  },
-  errors: {
-    badfile: _badfile,
-    pending: _pending,
-    failed: _failed,
-    large: _large,
-    foo: 'bar'
-  }
-})
+

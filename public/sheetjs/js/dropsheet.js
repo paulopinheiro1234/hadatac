@@ -44,13 +44,14 @@ var DropSheet = function DropSheet(opts) {
         case 'xlsx':
           pending = false;
           opts.on.workend();
-          cb(JSON.parse(e.data.d)); break;
+          cb(JSON.parse(e.data.d), 0); break;
       }
     };
     worker.postMessage({d:data,b:readtype,t:'xlsx'});
   }
 
   var last_wb;
+  var last_sheetidx;
 
   function to_json(workbook) {
     if(useworker && workbook.SSF) XLSX.SSF.load_table(workbook.SSF);
@@ -62,7 +63,12 @@ var DropSheet = function DropSheet(opts) {
     return result;
   }
 
-  function choose_sheet(sheetidx) { process_wb(last_wb, sheetidx); }
+  function choose_sheet(sheetidx) {
+	  if (typeof last_sheetidx !== 'undefined') {
+		  last_wb.Sheets[last_wb.SheetNames[last_sheetidx]] = XLSX.utils.aoa_to_sheet(cdg.data);
+	  }
+	  process_wb(last_wb, sheetidx);
+  }
 
   function process_wb(wb, sheetidx) {
     last_wb = wb;
@@ -70,6 +76,7 @@ var DropSheet = function DropSheet(opts) {
     var sheet = wb.SheetNames[sheetidx||0];
     var json = to_json(wb)[sheet];
     opts.on.sheet(json, wb.SheetNames, choose_sheet);
+    last_sheetidx = sheetidx;
   }
 
   function handleDrop(e) {
@@ -93,7 +100,7 @@ var DropSheet = function DropSheet(opts) {
           try {
             if(useworker) { sheetjsw(data, process_wb, readtype); return; }
             wb = XLSX.read(data, readtype);
-            process_wb(wb);
+            process_wb(wb, 0);
           } catch(e) { console.log(e); opts.errors.failed(e); }
         }
 
@@ -136,7 +143,7 @@ var DropSheet = function DropSheet(opts) {
           try {
             if(useworker) { sheetjsw(data, process_wb, readtype); return; }
             wb = XLSX.read(data, readtype);
-            process_wb(wb);
+            process_wb(wb, 0);
           } catch(e) { console.log(e); opts.errors.failed(e); }
         }
 
@@ -156,15 +163,37 @@ var DropSheet = function DropSheet(opts) {
       try {
         if(useworker) { sheetjsw(data, process_wb, readtype); return; }
         wb = XLSX.read(data, readtype);
-        process_wb(wb);
+        process_wb(wb, 0);
       } catch(e) { console.log(e); opts.errors.failed(e); }
     }
 
     if(data.length > 1e6) opts.errors.large(data.length, function(e) { if(e) doit(); });
     else { doit(); }
   }
+  
+  function handleFileUpload(e) {
+	  var wopts = { bookType:'xlsx', bookSST:false, type:'array' };
+	  if (typeof last_sheetidx !== 'undefined') {
+		  last_wb.Sheets[last_wb.SheetNames[last_sheetidx]] = XLSX.utils.aoa_to_sheet(cdg.data);
+	  }
+	  console.log('last_wb: ' + JSON.stringify(last_wb));
+	  var wbout = XLSX.write(last_wb, wopts);
+	  console.log("wbout: " + typeof(wbout));
+	  
+	  //XLSX.writeFile(last_wb, 'out.xlsx');
+	
+	  var req = new XMLHttpRequest();
+	  req.open("POST", opts.upload_url, true);
+	  var formdata = new FormData();
+	  formdata.append('file', new File([wbout], 'sheetjs.xlsx'));
+	  //formdata.append('file', 'test.xlsx'); // <-- server expects `file` to hold name
+	  //formdata.append('data', wbout); // <-- `data` holds the base64-encoded data
+	  req.send(formdata);
+  }
 
   if(opts.file && opts.file.addEventListener) opts.file.addEventListener('change', handleFile, false);
+  
+  if(opts.upload) opts.upload.addEventListener('click', handleFileUpload, false);
   
   if(opts.data) handleFileData(opts.data);
 };

@@ -233,6 +233,7 @@ public class DataAcquisitionSchema extends HADatAcThing {
                     System.out.println("[OK] DataAcquisitionSchema LODLabel: " + dasa.getLabel());
                 }
                 if (dasa.getAttribute().equals(URIUtils.replacePrefixEx("hasco:originalID")) 
+                        || dasa.getAttribute().equals(URIUtils.replacePrefixEx("sio:Identifier")) 
                         || Entity.getSubclasses(URIUtils.replacePrefixEx("hasco:originalID")).contains(dasa.getAttribute())) { 
                     setOriginalIdLabel(dasa.getLabel());
                     System.out.println("[OK] DataAcquisitionSchema IdLabel: " + dasa.getLabel());

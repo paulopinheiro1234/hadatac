@@ -3,11 +3,11 @@
 # ~~~~
 
 # Home page
-GET	/hadatac/					org.hadatac.console.controllers.Portal.index()
-POST    /hadatac/					org.hadatac.console.controllers.Portal.postIndex()
-GET	/hadatac                                  	org.hadatac.console.controllers.Portal.index()
+GET     /hadatac/					                    org.hadatac.console.controllers.Portal.index()
+POST    /hadatac/					                    org.hadatac.console.controllers.Portal.postIndex()
+GET	    /hadatac                                  	    org.hadatac.console.controllers.Portal.index()
 POST	/hadatac                                        org.hadatac.console.controllers.Portal.postIndex()
-GET	/hadatac/dash					org.hadatac.console.controllers.Dashboard.index()
+GET	    /hadatac/dash					                org.hadatac.console.controllers.Dashboard.index()
 POST    /hadatac/dash                                 	org.hadatac.console.controllers.Dashboard.postIndex()
 GET     /hadatac/version                                org.hadatac.console.controllers.Version.index()
 POST    /hadatac/version                                org.hadatac.console.controllers.Version.postIndex()
@@ -23,19 +23,19 @@ GET	    /hadatac/acquisitions/loadccsv		      	     org.hadatac.console.controll
 POST	/hadatac/acquisitions/loadccsv		      	     org.hadatac.console.controllers.dataacquisitionsearch.LoadCCSV.postLoadCCSV(oper: String)
 POST	/hadatac/acquisitions/loadccsv/upload	  	     org.hadatac.console.controllers.dataacquisitionsearch.LoadCCSV.uploadFile
 GET	    /hadatac/metadataacquisitions/solrsearch             org.hadatac.console.http.SolrSearchProxy.getStudyAcquisition()
-POST	/hadatac/metadataacquisitions/solrsearch   	     org.hadatac.console.http.SolrSearchProxy.getStudyAcquisition()
+POST	/hadatac/metadataacquisitions/solrsearch   	         org.hadatac.console.http.SolrSearchProxy.getStudyAcquisition()
 GET	    /hadatac/dataacquisitionbrowser/solrsearch           org.hadatac.console.http.SolrSearchProxy.getDataAcquisition()
 POST	/hadatac/dataacquisitionbrowser/solrsearch   	     org.hadatac.console.http.SolrSearchProxy.getDataAcquisition()
-GET	    /hadatac/schemaattributes/solrsearch		     org.hadatac.console.http.SolrSearchProxy.getSchemaAttributes()
-POST	/hadatac/schemaattributes/solrsearch		     org.hadatac.console.http.SolrSearchProxy.getSchemaAttributes()
+GET	    /hadatac/schemaattributes/solrsearch		         org.hadatac.console.http.SolrSearchProxy.getSchemaAttributes()
+POST	/hadatac/schemaattributes/solrsearch		         org.hadatac.console.http.SolrSearchProxy.getSchemaAttributes()
 GET	    /hadatac/metadataacquisitions/analytes/solrsearch    org.hadatac.console.http.SolrSearchProxy.getAnalytesAcquisition()
 POST	/hadatac/metadataacquisitions/analytes/solrsearch    org.hadatac.console.http.SolrSearchProxy.getAnalytesAcquisition()
 GET	    /hadatac/metadataacquisitions/download	             org.hadatac.console.http.SolrSearchProxy.getStudyAcquisitionDownload()
 GET	    /hadatac/dataacquisitions/download	             org.hadatac.console.http.SolrSearchProxy.getDataAcquisitionDownload()
 POST    /hadatac/dataacquisitions/download	             org.hadatac.console.http.SolrSearchProxy.getDataAcquisitionDownload()
 GET	    /hadatac/getIndicatorValueDownload/download	     org.hadatac.console.http.SolrSearchProxy.getIndicatorValueDownload(lm: String)
-POST    /hadatac/apiStudy/download			     org.hadatac.console.http.SolrSearchProxy.getApiStudyDownload()
-POST    /hadatac/apiStudyVariable/download		     org.hadatac.console.http.SolrSearchProxy.getApiStudyVariableDownload()
+POST    /hadatac/apiStudy/download			             org.hadatac.console.http.SolrSearchProxy.getApiStudyDownload()
+POST    /hadatac/apiStudyVariable/download		         org.hadatac.console.http.SolrSearchProxy.getApiStudyVariableDownload()
 POST    /hadatac/apiStudyVariableData/download		     org.hadatac.console.http.SolrSearchProxy.getApiStudyVariableDataDownload()
 
 # Metadata
@@ -350,6 +350,9 @@ GET	    /hadatac/annotator/csvpreview     	       org.hadatac.console.controller
 POST	/hadatac/annotator/csvpreview     	       org.hadatac.console.controllers.fileviewer.CSVPreview.getCSVPreview(folder : String, file_name : String, da_uri: String, oc_uri : String, numRows:Int)
 GET     /hadatac/annotator/excelpreview            org.hadatac.console.controllers.fileviewer.ExcelPreview.index(folder : String, file_name : String)
 POST    /hadatac/annotator/excelpreview            org.hadatac.console.controllers.fileviewer.ExcelPreview.postIndex(folder : String, file_name : String)
+GET     /hadatac/annotator/sddeditor               org.hadatac.console.controllers.fileviewer.SDDEditor.index()
+POST    /hadatac/annotator/sddeditor               org.hadatac.console.controllers.fileviewer.SDDEditor.postIndex()
+POST    /hadatac/annotator/sddeditor/upload        org.hadatac.console.controllers.fileviewer.SDDEditor.uploadSDDFile()
 #GET	/hadatac/annotator/csvpreview/selectCol        org.hadatac.console.controllers.fileviewer.CSVPreview.selectColumn(file_name : String, da_uri: String)
 #POST	/hadatac/annotator/csvpreview/selectCol        org.hadatac.console.controllers.fileviewer.CSVPreview.selectColumn(file_name : String, da_uri: String)
 
