@@ -251,10 +251,18 @@ public class AnnotationWorker {
 
         codeMappingRecordFile = new CSVRecordFile(codeMappingFile);
 
-        sdd.readCodeMapping(codeMappingRecordFile);
-        sdd.readDataDictionary(dictionaryRecordFile);
-        sdd.readCodebook(codeBookRecordFile);
-        sdd.readTimeline(timelineRecordFile);
+        if(!sdd.readCodeMapping(codeMappingRecordFile)){
+            AnnotationLog.printException("The CodeMapping of this SDD is either invalid or empty. ", file.getFile().getName());
+        }
+        if(!sdd.readDataDictionary(dictionaryRecordFile)){
+            AnnotationLog.printException("The DataDictionary of this SDD is either invalid or incomplete, check any Incorrect Content msg in this LOG.", file.getFile().getName());        	
+        }
+        if(!sdd.readCodebook(codeBookRecordFile)){
+            AnnotationLog.printException("The Codebook of this SDD is either invalid or empty.", file.getFile().getName());
+        }
+        if(!sdd.readTimeline(timelineRecordFile)){
+            AnnotationLog.printException("The TimeLine of this SDD is either invalid or empty.", file.getFile().getName());
+        }
 
         GeneratorChain chain = new GeneratorChain();
         if (codeBookRecordFile.isValid()) {
