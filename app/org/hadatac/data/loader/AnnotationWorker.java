@@ -94,6 +94,8 @@ public class AnnotationWorker {
                 chain = annotateSubjectIdFile(recordFile);
             } else if (file_name.startsWith("STD-")) {
                 chain = annotateStudyIdFile(recordFile);
+            } else if (file_name.startsWith("DPL-")) {
+                chain = annotateDPLFile(recordFile);
             } else if (file_name.startsWith("MAP-")) {
                 if (recordFile.getNumberOfSheets() > 1) {
                     log.addline(Feedback.println(Feedback.WEB, 
@@ -118,7 +120,7 @@ public class AnnotationWorker {
             } else {
                 log.addline(Feedback.println(Feedback.WEB, 
                         "[ERROR] Unsupported file name prefix, only accept prefixes "
-                                + "STD-, PID-, MAP-, SDD-, ACQ-, DA-. "));
+                                + "STD-, DPL-, PID-, MAP-, SDD-, ACQ-, DA-. "));
                 return;
             }
 
@@ -160,6 +162,18 @@ public class AnnotationWorker {
 
         return chain;
     }
+
+
+    public static GeneratorChain annotateDPLFile(RecordFile file) {
+        GeneratorChain chain = new GeneratorChain();
+        DateFormat isoFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
+        String startTime = isoFormat.format(new Date());
+        chain.addGenerator(new DeploymentGenerator(file, startTime));
+        chain.generate();
+
+        return chain;
+    }
+
 
     public static GeneratorChain annotateSampleIdFile(RecordFile file) {
         GeneratorChain chain = new GeneratorChain();

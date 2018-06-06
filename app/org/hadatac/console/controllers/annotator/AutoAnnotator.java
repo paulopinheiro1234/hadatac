@@ -376,6 +376,8 @@ public class AutoAnnotator extends Controller {
             chain = AnnotationWorker.annotateSubjectIdFile(recordFile);
         } else if (file_name.startsWith("STD")) {
             chain = AnnotationWorker.annotateStudyIdFile(recordFile);
+        } else if (file_name.startsWith("DPL")) {
+            chain = AnnotationWorker.annotateDPLFile(recordFile);
         } else if (file_name.startsWith("MAP")) {
             chain = AnnotationWorker.annotateMapFile(recordFile);
         } else if (file_name.startsWith("ACQ")) {
