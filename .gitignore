@@ -24,3 +24,5 @@ processed_csv/
 unprocessed_csv/
 downloaded_csv/
 sddtmp/
+dpltmp/
+*.swp

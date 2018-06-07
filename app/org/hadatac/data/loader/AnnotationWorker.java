@@ -1,5 +1,6 @@
 package org.hadatac.data.loader;
 
+import java.lang.String;
 import java.io.File;
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -11,6 +12,8 @@ import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.Map;
 
 import org.hadatac.console.controllers.annotator.AnnotationLog;
@@ -18,6 +21,7 @@ import org.hadatac.data.api.DataFactory;
 import org.hadatac.data.model.ParsingResult;
 import org.hadatac.entity.pojo.ObjectAccessSpec;
 import org.hadatac.entity.pojo.DataFile;
+import org.hadatac.entity.pojo.DPL;
 import org.hadatac.entity.pojo.SDD;
 import org.hadatac.metadata.loader.URIUtils;
 import org.hadatac.utils.ConfigProp;
@@ -95,6 +99,14 @@ public class AnnotationWorker {
             } else if (file_name.startsWith("STD-")) {
                 chain = annotateStudyIdFile(recordFile);
             } else if (file_name.startsWith("DPL-")) {
+                if (file_name.endsWith(".xlsx")) {
+                    recordFile = new SpreadsheetRecordFile(new File(filePath), "InfoSheet");
+                    if (!recordFile.isValid()) {
+                        log.addline(Feedback.println(Feedback.WEB, 
+                                "[ERROR] Missing InfoSheet. "));
+                        return;
+                    }
+                }
                 chain = annotateDPLFile(recordFile);
             } else if (file_name.startsWith("MAP-")) {
                 if (recordFile.getNumberOfSheets() > 1) {
@@ -165,15 +177,49 @@ public class AnnotationWorker {
 
 
     public static GeneratorChain annotateDPLFile(RecordFile file) {
-        GeneratorChain chain = new GeneratorChain();
-        DateFormat isoFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
-        String startTime = isoFormat.format(new Date());
-        chain.addGenerator(new DeploymentGenerator(file, startTime));
-        chain.generate();
 
+	System.out.println("Processing DPL file...");
+
+	DPL dpl = new DPL(file);
+        String file_name = file.getFile().getName();
+        Map<String, String> mapCatalog = dpl.getCatalog();
+
+	ArrayList<RecordFile> recordFiles = new ArrayList<RecordFile>();
+	Iterator it = mapCatalog.entrySet().iterator();
+	if(file.getFile().getName().endsWith(".csv")) {
+		String prefix = "dpltmp/" + file.getFile().getName().replace(".csv", "" + "-");
+		while(it.hasNext()) {
+			Map.Entry pair = (Map.Entry) it.next();
+			File tFile = dpl.downloadFile(mapCatalog.get(pair.getKey()), prefix + pair.getKey() + ".csv");
+			recordFiles.add(new CSVRecordFile(tFile));
+			it.remove();
+		}
+	} else if(file.getFile().getName().endsWith(".xlsx")) {
+		while(it.hasNext()) {
+			Map.Entry pair = (Map.Entry) it.next();
+			recordFiles.add(new SpreadsheetRecordFile(file.getFile(), mapCatalog.get(pair.getKey()).replace("#", "")));
+			it.remove();
+		}
+	}
+
+	it = recordFiles.iterator();
+	while(it.hasNext()) {
+		RecordFile next = (RecordFile) it.next();
+		if(!dpl.readSheet(next)) {
+			AnnotationLog.printException("The " + next.getFile().getName() + " of this DPL is either invalid or empty. ", file.getFile().getName()); 
+		}
+	}
+
+        GeneratorChain chain = new GeneratorChain();
+	it = recordFiles.iterator();
+	while(it.hasNext()) {
+		RecordFile next = (RecordFile) it.next();
+		if(next.isValid()) {
+			// TODO: Add generator to chain
+		}
+	}
         return chain;
     }
-
 
     public static GeneratorChain annotateSampleIdFile(RecordFile file) {
         GeneratorChain chain = new GeneratorChain();

@@ -377,6 +377,9 @@ public class AutoAnnotator extends Controller {
         } else if (file_name.startsWith("STD")) {
             chain = AnnotationWorker.annotateStudyIdFile(recordFile);
         } else if (file_name.startsWith("DPL")) {
+            if (file_name.endsWith(".xlsx")) {
+                recordFile = new SpreadsheetRecordFile(file, "InfoSheet");
+            }
             chain = AnnotationWorker.annotateDPLFile(recordFile);
         } else if (file_name.startsWith("MAP")) {
             chain = AnnotationWorker.annotateMapFile(recordFile);
