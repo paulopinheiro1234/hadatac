@@ -42,7 +42,7 @@ public class DPL {
 	*/
 	
 	public String getNameFromFileName() {
-	    return (dplfile.getFile().getName().split("\\.")[0]).replace("_", "-").replace("SDD-", "");
+	    return (dplfile.getFile().getName().split("\\.")[0]).replace("_", "-").replace("DPL-", "");
     }
 	
 	public String getFileName() {
