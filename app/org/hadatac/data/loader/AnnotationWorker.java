@@ -215,7 +215,7 @@ public class AnnotationWorker {
 	while(it.hasNext()) {
 		RecordFile next = (RecordFile) it.next();
 		if(next.isValid()) {
-			// TODO: Add generator to chain
+			chain.addGenerator(new GeneralGenerator(next, next.getFile().getName()));
 		}
 	}
         return chain;
