@@ -12,7 +12,6 @@ import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
-import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Map;
 
@@ -184,39 +183,42 @@ public class AnnotationWorker {
         String file_name = file.getFile().getName();
         Map<String, String> mapCatalog = dpl.getCatalog();
 
-	ArrayList<RecordFile> recordFiles = new ArrayList<RecordFile>();
+	HashMap<String, RecordFile> recordFiles = new HashMap<String, RecordFile>();
 	Iterator it = mapCatalog.entrySet().iterator();
 	if(file.getFile().getName().endsWith(".csv")) {
 		String prefix = "dpltmp/" + file.getFile().getName().replace(".csv", "" + "-");
 		while(it.hasNext()) {
 			Map.Entry pair = (Map.Entry) it.next();
 			File tFile = dpl.downloadFile(mapCatalog.get(pair.getKey()), prefix + pair.getKey() + ".csv");
-			recordFiles.add(new CSVRecordFile(tFile));
+			recordFiles.put("temp", new CSVRecordFile(tFile));
 			it.remove();
 		}
 	} else if(file.getFile().getName().endsWith(".xlsx")) {
 		while(it.hasNext()) {
 			Map.Entry pair = (Map.Entry) it.next();
-			recordFiles.add(new SpreadsheetRecordFile(file.getFile(), mapCatalog.get(pair.getKey()).replace("#", "")));
+			String sheetName = mapCatalog.get(pair.getKey()).replace("#", "");
+			recordFiles.put(sheetName, new SpreadsheetRecordFile(file.getFile(), sheetName));
 			it.remove();
 		}
 	}
 
-	it = recordFiles.iterator();
+	it = recordFiles.entrySet().iterator();
 	while(it.hasNext()) {
-		RecordFile next = (RecordFile) it.next();
-		if(!dpl.readSheet(next)) {
-			AnnotationLog.printException("The " + next.getFile().getName() + " of this DPL is either invalid or empty. ", file.getFile().getName()); 
+		Map.Entry next = (Map.Entry) it.next();
+		if(!dpl.readSheet((RecordFile) next.getValue())) {
+			AnnotationLog.printException("The " + next.getKey() + " sheet of this DPL is either invalid or empty. ", file.getFile().getName()); 
 		}
+		it.remove();
 	}
 
         GeneratorChain chain = new GeneratorChain();
-	it = recordFiles.iterator();
+	it = recordFiles.entrySet().iterator();
 	while(it.hasNext()) {
-		RecordFile next = (RecordFile) it.next();
-		if(next.isValid()) {
-			chain.addGenerator(new GeneralGenerator(next, next.getFile().getName()));
+		Map.Entry next = (Map.Entry) it.next();
+		if(((RecordFile) next.getValue()).isValid()) {
+			chain.addGenerator(new GeneralGenerator((RecordFile) next.getValue(), (String) next.getKey()));
 		}
+		it.remove();
 	}
         return chain;
     }
