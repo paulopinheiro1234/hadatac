@@ -5,6 +5,7 @@ import java.io.File;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
+import java.io.IOException;
 import java.net.URLDecoder;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -15,6 +16,9 @@ import java.util.List;
 import java.util.Iterator;
 import java.util.Map;
 
+import org.apache.commons.io.FileUtils;
+import org.apache.jena.rdf.model.Model;
+import org.apache.jena.riot.RDFDataMgr;
 import org.hadatac.console.controllers.annotator.AnnotationLog;
 import org.hadatac.data.api.DataFactory;
 import org.hadatac.data.model.ParsingResult;
@@ -23,8 +27,10 @@ import org.hadatac.entity.pojo.DataFile;
 import org.hadatac.entity.pojo.DPL;
 import org.hadatac.entity.pojo.SDD;
 import org.hadatac.metadata.loader.URIUtils;
+import org.hadatac.metadata.model.SpreadsheetParsingResult;
 import org.hadatac.utils.ConfigProp;
 import org.hadatac.utils.Feedback;
+import org.hadatac.utils.NameSpaces;
 
 public class AnnotationWorker {
 
@@ -190,7 +196,7 @@ public class AnnotationWorker {
 		while(it.hasNext()) {
 			Map.Entry pair = (Map.Entry) it.next();
 			File tFile = dpl.downloadFile(mapCatalog.get(pair.getKey()), prefix + pair.getKey() + ".csv");
-			recordFiles.put("temp", new CSVRecordFile(tFile));
+			recordFiles.put("temp", new CSVRecordFile(tFile)); // TODO: Replace temp with sheet/file name
 			it.remove();
 		}
 	} else if(file.getFile().getName().endsWith(".xlsx")) {
@@ -208,18 +214,35 @@ public class AnnotationWorker {
 		if(!dpl.readSheet((RecordFile) next.getValue())) {
 			AnnotationLog.printException("The " + next.getKey() + " sheet of this DPL is either invalid or empty. ", file.getFile().getName()); 
 		}
-		it.remove();
 	}
 
-        GeneratorChain chain = new GeneratorChain();
+	String ttl = NameSpaces.getInstance().printTurtleNameSpaceList();
 	it = recordFiles.entrySet().iterator();
 	while(it.hasNext()) {
 		Map.Entry next = (Map.Entry) it.next();
-		if(((RecordFile) next.getValue()).isValid()) {
-			chain.addGenerator(new GeneralGenerator((RecordFile) next.getValue(), (String) next.getKey()));
-		}
+
+                SpreadsheetParsingResult spr = ((SpreadsheetRecordFile) next.getValue()).processSheet((String) next.getKey());
+
+                ttl += "\n# concept: " + next.getKey() + "\n" + spr.getTurtle() + "\n";
 		it.remove();
 	}
+
+	String tempFile = "";
+	try {
+		String timeStamp = new SimpleDateFormat("yyyMMdd-HHmmss").format(new Date());
+		tempFile = "tmp/ttl/DPL-" + timeStamp + ".ttl";
+		FileUtils.writeStringToFile(new File(tempFile), ttl, "utf-8");
+	} catch (IOException e) {
+		
+	}
+
+	try {
+		Model model = RDFDataMgr.loadModel(tempFile);
+	} catch (Exception e) {
+
+	}
+
+        GeneratorChain chain = new GeneratorChain();
         return chain;
     }
 
