@@ -17,6 +17,8 @@ import java.util.Iterator;
 import java.util.Map;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.jena.query.DatasetAccessor;
+import org.apache.jena.query.DatasetAccessorFactory;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.riot.RDFDataMgr;
 import org.hadatac.console.controllers.annotator.AnnotationLog;
@@ -28,6 +30,7 @@ import org.hadatac.entity.pojo.DPL;
 import org.hadatac.entity.pojo.SDD;
 import org.hadatac.metadata.loader.URIUtils;
 import org.hadatac.metadata.model.SpreadsheetParsingResult;
+import org.hadatac.utils.CollectionUtil;
 import org.hadatac.utils.ConfigProp;
 import org.hadatac.utils.Feedback;
 import org.hadatac.utils.NameSpaces;
@@ -224,6 +227,7 @@ public class AnnotationWorker {
                 SpreadsheetParsingResult spr = ((SpreadsheetRecordFile) next.getValue()).processSheet((String) next.getKey());
 
                 ttl += "\n# concept: " + next.getKey() + "\n" + spr.getTurtle() + "\n";
+
 		it.remove();
 	}
 
@@ -237,7 +241,10 @@ public class AnnotationWorker {
 	}
 
 	try {
+		DatasetAccessor accessor = DatasetAccessorFactory.createHTTP(CollectionUtil.getCollectionsName(CollectionUtil.METADATA_GRAPH));
 		Model model = RDFDataMgr.loadModel(tempFile);
+		accessor.add(model);
+		AnnotationLog.println(Feedback.println(Feedback.WEB, String.format("[OK] %d triple(s) have been committed to triple store", model.size())), file_name);
 	} catch (Exception e) {
 
 	}
