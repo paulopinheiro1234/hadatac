@@ -2,10 +2,7 @@ package org.hadatac.data.loader;
 
 import java.lang.String;
 import java.io.File;
-import java.io.PrintWriter;
-import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
-import java.io.IOException;
 import java.net.URLDecoder;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -13,27 +10,17 @@ import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Iterator;
 import java.util.Map;
 
-import org.apache.commons.io.FileUtils;
-import org.apache.jena.query.DatasetAccessor;
-import org.apache.jena.query.DatasetAccessorFactory;
-import org.apache.jena.rdf.model.Model;
-import org.apache.jena.riot.RDFDataMgr;
 import org.hadatac.console.controllers.annotator.AnnotationLog;
 import org.hadatac.data.api.DataFactory;
-import org.hadatac.data.model.ParsingResult;
 import org.hadatac.entity.pojo.ObjectAccessSpec;
 import org.hadatac.entity.pojo.DataFile;
 import org.hadatac.entity.pojo.DPL;
 import org.hadatac.entity.pojo.SDD;
 import org.hadatac.metadata.loader.URIUtils;
-import org.hadatac.metadata.model.SpreadsheetParsingResult;
-import org.hadatac.utils.CollectionUtil;
 import org.hadatac.utils.ConfigProp;
 import org.hadatac.utils.Feedback;
-import org.hadatac.utils.NameSpaces;
 
 public class AnnotationWorker {
 
@@ -189,65 +176,8 @@ public class AnnotationWorker {
 	System.out.println("Processing DPL file...");
 
 	DPL dpl = new DPL(file);
-        String file_name = file.getFile().getName();
+        String file_name = dpl.getFileName();
         Map<String, String> mapCatalog = dpl.getCatalog();
-
-	HashMap<String, RecordFile> recordFiles = new HashMap<String, RecordFile>();
-	Iterator it = mapCatalog.entrySet().iterator();
-	if(file.getFile().getName().endsWith(".csv")) {
-		String prefix = "dpltmp/" + file.getFile().getName().replace(".csv", "" + "-");
-		while(it.hasNext()) {
-			Map.Entry pair = (Map.Entry) it.next();
-			File tFile = dpl.downloadFile(mapCatalog.get(pair.getKey()), prefix + pair.getKey() + ".csv");
-			recordFiles.put("temp", new CSVRecordFile(tFile)); // TODO: Replace temp with sheet/file name
-			it.remove();
-		}
-	} else if(file.getFile().getName().endsWith(".xlsx")) {
-		while(it.hasNext()) {
-			Map.Entry pair = (Map.Entry) it.next();
-			String sheetName = mapCatalog.get(pair.getKey()).replace("#", "");
-			recordFiles.put(sheetName, new SpreadsheetRecordFile(file.getFile(), sheetName));
-			it.remove();
-		}
-	}
-
-	it = recordFiles.entrySet().iterator();
-	while(it.hasNext()) {
-		Map.Entry next = (Map.Entry) it.next();
-		if(!dpl.readSheet((RecordFile) next.getValue())) {
-			AnnotationLog.printException("The " + next.getKey() + " sheet of this DPL is either invalid or empty. ", file.getFile().getName()); 
-		}
-	}
-
-	String ttl = NameSpaces.getInstance().printTurtleNameSpaceList();
-	it = recordFiles.entrySet().iterator();
-	while(it.hasNext()) {
-		Map.Entry next = (Map.Entry) it.next();
-
-                SpreadsheetParsingResult spr = ((SpreadsheetRecordFile) next.getValue()).processSheet((String) next.getKey());
-
-                ttl += "\n# concept: " + next.getKey() + "\n" + spr.getTurtle() + "\n";
-
-		it.remove();
-	}
-
-	String tempFile = "";
-	try {
-		String timeStamp = new SimpleDateFormat("yyyMMdd-HHmmss").format(new Date());
-		tempFile = "tmp/ttl/DPL-" + timeStamp + ".ttl";
-		FileUtils.writeStringToFile(new File(tempFile), ttl, "utf-8");
-	} catch (IOException e) {
-		
-	}
-
-	try {
-		DatasetAccessor accessor = DatasetAccessorFactory.createHTTP(CollectionUtil.getCollectionsName(CollectionUtil.METADATA_GRAPH));
-		Model model = RDFDataMgr.loadModel(tempFile);
-		accessor.add(model);
-		AnnotationLog.println(Feedback.println(Feedback.WEB, String.format("[OK] %d triple(s) have been committed to triple store", model.size())), file_name);
-	} catch (Exception e) {
-
-	}
 
         GeneratorChain chain = new GeneratorChain();
         return chain;
