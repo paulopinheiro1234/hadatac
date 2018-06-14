@@ -202,14 +202,25 @@ public class SDD {
 		List<String> checkCellVal = new ArrayList<String>();
 		List<String> checkUriResolve = new ArrayList<String>();
 		List<String> checkStudyIndicatePath = new ArrayList<String>();
-        
+		List<String> dasaList = new ArrayList<String>();		
+		List<String> dasoList = new ArrayList<String>();
+		Map<String, String> sa2so = new HashMap<String, String>();
+		Map<String, String> so2so2 = new HashMap<String, String>();
+		Map<String, String> so2type = new HashMap<String, String>();
+		Map<String, String> so2role = new HashMap<String, String>();
+		Map<String, String> so2df = new HashMap<String, String>();
+		
 		for (Record record : file.getRecords()) {
+			
 			if (checkCellValue(record.getValueByColumnIndex(0))){
 				String attributeCell = record.getValueByColumnName("Attribute");
 				String entityCell = record.getValueByColumnName("Entity");
 				String roleCell = record.getValueByColumnName("Role");
 				String relationCell = record.getValueByColumnName("Relation");
-				
+				String inRelationToCell = record.getValueByColumnName("inRelationTo");
+				String attributeOfCell = record.getValueByColumnName("attributeOf");
+				String dfCell = record.getValueByColumnName("wasDerivedFrom");				
+			
 				if (checkCellUriResolvable(attributeCell)){
 					if (checkCellUriResolvable(entityCell)){
 						if (checkCellUriResolvable(roleCell)){
@@ -265,6 +276,38 @@ public class SDD {
 						checkStudyIndicatePath.add(attributeCell);
 					}
 				}
+				
+				if (attributeCell.length()>0) {
+					dasaList.add(record.getValueByColumnIndex(0));
+					if (attributeOfCell.length()>0) {
+						sa2so.put(record.getValueByColumnIndex(0), attributeOfCell);
+					} else {
+						AnnotationLog.printException("Attribute " + record.getValueByColumnIndex(0) + "is not attributeOf any object.", sddfile.getFile().getName());
+					}
+				}
+				
+				if (entityCell.length()>0) {
+					dasoList.add(record.getValueByColumnIndex(0));
+					if (inRelationToCell.length()>0) {
+						so2so2.put(record.getValueByColumnIndex(0), inRelationToCell);
+					} else {
+						
+					}
+
+					so2type.put(record.getValueByColumnIndex(0), entityCell);
+
+					if (roleCell.length()>0) {
+						so2role.put(record.getValueByColumnIndex(0), roleCell);
+					} else {
+						
+					}
+					
+					if (dfCell.length()>0) {
+						so2df.put(record.getValueByColumnIndex(0), dfCell);
+					} else {
+						
+					}
+				}
 
 				if (checkCellValue(record.getValueByColumnName("attributeOf"))){
 					mapAttrObj.put(record.getValueByColumnIndex(0), record.getValueByColumnName("attributeOf"));
@@ -273,7 +316,7 @@ public class SDD {
 					return false;
 				}
 			} else {
-				AnnotationLog.printException("The Dictionary Mapping has incorrect content " + record.getValueByColumnName("Column") + "in \"Column\" column.", sddfile.getFile().getName());
+				AnnotationLog.printException("The Dictionary Mapping has incorrect content " + record.getValueByColumnName("Column") + " in \"Column\" column.", sddfile.getFile().getName());
 				return false;
 			}
 		}
@@ -282,6 +325,74 @@ public class SDD {
 		printErrList(checkUriRegister, 2);
 		printErrList(checkStudyIndicatePath, 3);
 		printErrList(checkCellVal, 4);	
+		
+		for (String a : dasaList) {
+			String path = "";
+			List<String> pathList = new ArrayList<String>();
+			String o1 = sa2so.get(a);
+			if (o1.length() > 0) {
+				if (dasoList.contains(o1)) {
+					path += o1;
+					pathList.add(o1);
+					if (so2role.containsKey(o1)){
+						path += " (" + so2role.get(o1) + ") ";
+					} else if (so2so2.containsKey(o1)) {
+						String o2 = so2so2.get(o1);
+						if (!pathList.contains(o2)){
+							path += " -- ";
+							path += o2;
+							if (so2role.containsKey(o2)){
+								path += " (" + so2role.get(o2) + ") ";
+							} else if (so2so2.containsKey(o2)) {
+								if (!pathList.contains(so2so2.get(o2))){
+									path += " -- ";
+									path += so2so2.get(o2);
+									if (so2role.containsKey(so2so2.get(o2))){
+										path += " (" + so2role.get(so2so2.get(o2)) + ") ";
+									} else if (so2so2.containsKey(so2so2.get(o2))) {
+										path += " -- ";
+										path += so2so2.get(so2so2.get(o2));
+										if (so2role.containsKey(so2so2.get(so2so2.get(o2)))){
+											path += " (" + so2role.get(so2so2.get(so2so2.get(o2))) + ") ";
+										}
+									}
+								}
+							}
+						}
+					} else if (so2df.containsKey(o1)) {
+						String o2 = so2df.get(o1);
+						if (!pathList.contains(o2)){
+							path += " -- ";
+							path += o2;
+							if (so2role.containsKey(o2)){
+								path += " (" + so2role.get(o2) + ") ";
+							} else if (so2so2.containsKey(o2)) {
+								if (!pathList.contains(so2so2.get(o2))){
+									path += " -- ";
+									path += so2so2.get(o2);
+									if (so2role.containsKey(so2so2.get(o2))){
+										path += " (" + so2role.get(so2so2.get(o2)) + ") ";
+									} else if (so2so2.containsKey(so2so2.get(o2))) {
+										path += " -- ";										
+										path += so2so2.get(so2so2.get(o2));
+										if (so2role.containsKey(so2so2.get(so2so2.get(o2)))){
+											path += " (" + so2role.get(so2so2.get(so2so2.get(o2))) + ") ";
+										}
+									}
+								}
+							}
+						}
+					}
+				} else {
+					AnnotationLog.printException(o1 + " is not defined in the DM.", sddfile.getFile().getName());
+				}
+			}
+			if (path.length()>0) {
+				AnnotationLog.println(a + " has study object path : -- " + path, sddfile.getFile().getName());
+			} else {
+				AnnotationLog.printException(a + " has no study object path !", sddfile.getFile().getName());
+			}
+		}
 		
 		if (uriResolvable == true){
 			AnnotationLog.println("The Dictionary Mapping has resolvable uris.", sddfile.getFile().getName());	

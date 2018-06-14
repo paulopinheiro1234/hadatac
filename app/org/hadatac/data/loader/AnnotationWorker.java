@@ -19,6 +19,7 @@ import org.hadatac.data.model.ParsingResult;
 import org.hadatac.entity.pojo.ObjectAccessSpec;
 import org.hadatac.entity.pojo.DataFile;
 import org.hadatac.entity.pojo.SDD;
+import org.hadatac.entity.pojo.SSD;
 import org.hadatac.metadata.loader.URIUtils;
 import org.hadatac.utils.ConfigProp;
 import org.hadatac.utils.Feedback;
@@ -291,46 +292,33 @@ public class AnnotationWorker {
     public static GeneratorChain annotateSSDFile(RecordFile file) {
         String Pilot_Num = file.getFile().getName().replaceAll("SSD-", "");
         System.out.println("Processing SSD file of " + Pilot_Num + "...");
+        
+        SSD ssd = new SSD(file);
+        String file_name = file.getFile().getName();
+        String ssdName = ssd.getNameFromFileName();
+        Map<String, String> mapCatalog = ssd.getCatalog();
+        Map<String, List<String>> mapContent = ssd.getMapContent();
 
         RecordFile SSDsheet = new SpreadsheetRecordFile(file.getFile(), "SSD");
-        RecordFile SBJsheet = new SpreadsheetRecordFile(file.getFile(), "SOC-SUBJECTS");
-        RecordFile MOMsheet = new SpreadsheetRecordFile(file.getFile(), "SOC-MOTHERS");
-        RecordFile SSAPsheet = new SpreadsheetRecordFile(file.getFile(), "SOC-SSAMPLES");
-        RecordFile MSAPsheet = new SpreadsheetRecordFile(file.getFile(), "SOC-MSAMPLES");
-        RecordFile TIMEsheet = new SpreadsheetRecordFile(file.getFile(), "SOC-VISITS");
-
+        
+        System.out.println(file_name);
+        System.out.println(ssdName);
+        
         GeneratorChain chain = new GeneratorChain();
+        
+        for ( String i : mapCatalog.keySet()) {
+        	if (mapCatalog.get(i).length()>0){
+            	System.out.println(mapCatalog.get(i));	
+            	RecordFile SOsheet = new SpreadsheetRecordFile(file.getFile(), mapCatalog.get(i).replace("#", ""));
+            	chain.addGenerator(new StudyObjectGenerator(SOsheet, mapContent.get(i), mapContent));
+        	}
+        }
+        
         if (SSDsheet.isValid()) {
             chain.addGenerator(new SSDGenerator(SSDsheet));
         } else {
             //chain.setInvalid();
             AnnotationLog.printException("Cannot sheet SSD ", file.getFile().getName());
-        }
-        if (SBJsheet.isValid()) {
-            chain.addGenerator(new SubjectGenerator(SBJsheet));
-        } else {
-            //chain.setInvalid();
-            AnnotationLog.printException("Cannot sheet SOC-SUBJECTS ", file.getFile().getName());
-        }
-        if (SSAPsheet.isValid()) {
-            chain.addGenerator(new SSDSampleMapper(SSAPsheet));
-        } 
-        else {
-            //chain.setInvalid();
-            AnnotationLog.printException("Cannot sheet SOC-SSAMPLES ", file.getFile().getName());
-        }
-        if (MOMsheet.isValid()) {
-            MotherGenerator motherGenerator = new MotherGenerator(MOMsheet);
-            chain.addGenerator(motherGenerator);
-            chain.addGenerator(new SSDSampleMapper(MSAPsheet, motherGenerator));
-        } else {
-            //chain.setInvalid();
-            AnnotationLog.printException("Cannot sheet SOC-MOTHERS ", file.getFile().getName());
-        }
-        if (TIMEsheet.isValid()) {
-        	chain.addGenerator(new TimeInstantGenerator(TIMEsheet));
-        } else {
-        	AnnotationLog.printException("Cannot sheet SOC-VISITS ", file.getFile().getName());
         }
         return chain;
     }
