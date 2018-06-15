@@ -26,21 +26,12 @@ public class SSDSampleMapper extends BasicGenerator {
     private Map<String, String> mapIdUriCache = new HashMap<String, String>();
     String study_id;
     String file_name;
-    MotherGenerator motherGenerator = null;
 
     public SSDSampleMapper(RecordFile file) {
         super(file);
         mapIdUriCache = getMapIdUri();
         file_name = file.getFile().getName();
         study_id = file.getFile().getName().replaceAll("SSD-", "").replaceAll(".xlsx", "").replaceAll(".csv", "");
-    }
-
-    public SSDSampleMapper(RecordFile file, MotherGenerator motherGenerator) {
-        super(file);
-        file_name = file.getFile().getName();
-        study_id = file.getFile().getName().replaceAll("SSD-", "").replaceAll(".xlsx", "").replaceAll(".csv", "");
-        this.motherGenerator = motherGenerator;
-        mapIdUriCache = getMapIdUri(motherGenerator);
     }
 
     @Override
@@ -61,16 +52,6 @@ public class SSDSampleMapper extends BasicGenerator {
             e.printStackTrace();
             System.out.println("This sheet or MAP file contains no timeScopeID column");
         }
-    }
-
-    private Map<String, String> getMapIdUri(MotherGenerator generator) {
-        Map<String, String> mapIdUri = new HashMap<String, String>();
-        for (HADatAcThing obj : generator.getObjects()) {
-            StudyObject studyObj = (StudyObject)obj;
-            mapIdUri.put(studyObj.getOriginalId(), studyObj.getUri());
-        }
-
-        return mapIdUri;
     }
 
     private Map<String, String> getMapIdUri() {
@@ -198,11 +179,8 @@ public class SSDSampleMapper extends BasicGenerator {
 
     @Override
     public void preprocess() throws Exception {
-        if (motherGenerator != null) {
-            mapIdUriCache = getMapIdUri(motherGenerator);
-        } else {
-        	mapIdUriCache = getMapIdUri();
-        }
+        
+    	mapIdUriCache = getMapIdUri();
 
         if (!records.isEmpty()) {
             objects.add(createObjectCollection(records.get(0)));

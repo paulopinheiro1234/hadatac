@@ -28,7 +28,6 @@ public class SampleSubjectMapper extends BasicGenerator {
     private Map<String, String> mapIdUriCache = new HashMap<String, String>();
     String study_id;
     String file_name;
-    MotherGenerator motherGenerator = null;
 
     public SampleSubjectMapper(RecordFile file) {
         super(file);
