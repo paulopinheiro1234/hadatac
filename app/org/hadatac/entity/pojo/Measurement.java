@@ -83,7 +83,9 @@ public class Measurement extends HADatAcThing implements Runnable {
     @Field("entity_uri_str")
     private String entityUri;
     @Field("characteristic_uri_str")
-    private String characteristicUri;	
+    private String characteristicUri;
+    @Field("characteristic_uri_str_multi")
+    private List<String> characteristicUris;
     @Field("location_latlong")
     private String location;
     @Field("elevation_double")
@@ -100,6 +102,10 @@ public class Measurement extends HADatAcThing implements Runnable {
     private String instrumentModel;
     private String instrumentUri;
     private String strTimestamp;
+
+    public Measurement() {
+    	characteristicUris = new ArrayList<String>();
+    }
 
     public String getOwnerUri() {
         return ownerUri;
@@ -342,6 +348,18 @@ public class Measurement extends HADatAcThing implements Runnable {
 
     public void setCharacteristicUri(String characteristicUri) {
         this.characteristicUri = characteristicUri;
+    }
+
+    public List<String> getCharacteristicUris() {
+        return characteristicUris;
+    }
+
+    public void addCharacteristicUris(String characteristicUri) {
+        this.characteristicUris.add(characteristicUri);
+    }
+    
+    public void setCharacteristicUris(List<String> characteristicUris) {
+        this.characteristicUris = characteristicUris;
     }
 
     public String getLocation() {
@@ -871,6 +889,7 @@ public class Measurement extends HADatAcThing implements Runnable {
         m.setOriginalValue(SolrUtils.getFieldValue(doc, "original_value_str"));
         m.setEntityUri(SolrUtils.getFieldValue(doc, "entity_uri_str"));
         m.setCharacteristicUri(SolrUtils.getFieldValue(doc, "characteristic_uri_str"));
+        m.setCharacteristicUris(SolrUtils.getFieldValues(doc, "characteristic_uri_str_multi"));
         m.setUnitUri(SolrUtils.getFieldValue(doc, "unit_uri_str"));
 
         String value = SolrUtils.getFieldValue(doc, "value_str");
