@@ -345,6 +345,10 @@ public class AutoAnnotator extends Controller {
         		deleteAddedTriples(file);
         	} catch (Exception e) {
             	System.out.print("Can not delete triples ingested by " + fileName + " ..");
+                file.delete();
+                dataFile.delete();
+                AnnotationLog.delete(fileName);
+                return redirect(routes.AutoAnnotator.index());
             }
         }
         file.delete();

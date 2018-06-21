@@ -109,7 +109,7 @@ public class AnnotationWorker {
                     recordFile = new SpreadsheetRecordFile(new File(filePath), "InfoSheet");
                     if (!recordFile.isValid()) {
                         log.addline(Feedback.println(Feedback.WEB, 
-                                "[ERROR] Missing InfoSheet. "));
+                                "[ERROR] The Info sheet is missing in this SDD file. "));
                         return;
                     }
                 }
@@ -253,16 +253,16 @@ public class AnnotationWorker {
         codeMappingRecordFile = new CSVRecordFile(codeMappingFile);
 
         if(!sdd.readCodeMapping(codeMappingRecordFile)){
-            AnnotationLog.printException("The CodeMapping of this SDD is either invalid or empty. ", file.getFile().getName());
+            AnnotationLog.printException("The CodeMapping of this SDD is empty. ", file.getFile().getName());
         }
         if(!sdd.readDataDictionary(dictionaryRecordFile)){
-            AnnotationLog.printException("The DataDictionary of this SDD is either invalid or incomplete, check any Incorrect Content msg in this LOG.", file.getFile().getName());        	
+            AnnotationLog.printException("Read Data Dictionary failed, please refer to the error msg above.", file.getFile().getName());        	
         }
         if(!sdd.readCodebook(codeBookRecordFile)){
             AnnotationLog.printException("The Codebook of this SDD is either invalid or empty.", file.getFile().getName());
         }
         if(!sdd.readTimeline(timelineRecordFile)){
-            AnnotationLog.printException("The TimeLine of this SDD is either invalid or empty.", file.getFile().getName());
+            AnnotationLog.println("The TimeLine of this SDD is empty.", file.getFile().getName());
         }
 
         GeneratorChain chain = new GeneratorChain();

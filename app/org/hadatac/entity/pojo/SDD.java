@@ -139,6 +139,11 @@ public class SDD {
 	}
 	
 	public boolean checkStudyIndicatorPath(String str) {
+		
+		if (str.equals("hasco:originalID")) {
+			return true;
+		}
+		
 		String indvIndicatorQuery = "";
 		indvIndicatorQuery += NameSpaces.getInstance().printSparqlNameSpaceList();
 		indvIndicatorQuery += " SELECT ?a ?b WHERE { "
@@ -192,7 +197,12 @@ public class SDD {
 		if (!file.isValid()) {
 			return false;
 		}
-        AnnotationLog.println("The Dictionary Mapping has " + file.getHeaders().size() + " columns.", sddfile.getFile().getName());
+		
+		if (file.getHeaders().size() > 0){
+	        AnnotationLog.println("The Dictionary Mapping has " + file.getHeaders().size() + " columns.", sddfile.getFile().getName());	
+		} else {
+	        AnnotationLog.printException("The Dictionary Mapping has " + file.getHeaders().size() + " columns.", sddfile.getFile().getName());
+		}
         
         Boolean uriResolvable = true;
         Boolean namespaceRegisterd = true;
@@ -282,7 +292,7 @@ public class SDD {
 					if (attributeOfCell.length()>0) {
 						sa2so.put(record.getValueByColumnIndex(0), attributeOfCell);
 					} else {
-						AnnotationLog.printException("Attribute " + record.getValueByColumnIndex(0) + "is not attributeOf any object.", sddfile.getFile().getName());
+						AnnotationLog.printException("Attribute " + record.getValueByColumnIndex(0) + "is not attributeOf any object. Please fix the content.", sddfile.getFile().getName());
 					}
 				}
 				
@@ -316,7 +326,7 @@ public class SDD {
 					return false;
 				}
 			} else {
-				AnnotationLog.printException("The Dictionary Mapping has incorrect content " + record.getValueByColumnName("Column") + " in \"Column\" column.", sddfile.getFile().getName());
+				AnnotationLog.printException("The Dictionary Mapping conatins illegal content in \"" + record.getValueByColumnName("Column") + "\" in the \"Column\" column. Check if it contains characters such as \",\" and blank space.", sddfile.getFile().getName());
 				return false;
 			}
 		}
