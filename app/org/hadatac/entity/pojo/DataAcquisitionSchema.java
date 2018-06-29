@@ -533,7 +533,7 @@ public class DataAcquisitionSchema extends HADatAcThing {
                 + " } \n"
                 + " } \n";
         
-        System.out.println("findIdUriMappings() queryString: " + queryString);
+        //System.out.println("findIdUriMappings() queryString: " + queryString);
 
         ResultSetRewindable resultsrw = SPARQLUtils.select(
                 CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), queryString);

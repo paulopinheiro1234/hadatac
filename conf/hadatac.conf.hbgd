@@ -42,7 +42,7 @@ hadatac {
 	triplestore="http://127.0.0.1:9999/blazegraph/namespace"
         # triplestore="http://127.0.0.1:8080/blazegraph/namespace/store"
         # For blazegraph in the vm
-        # triplestore="http://127.0.0.1:8080/bigdata/namespace/store"
+        # triplestore="http://127.0.0.1:8080/bigdata/namespace"
 	    
         # URL for user management collection
         users="http://127.0.0.1:8983/solr"
@@ -54,7 +54,7 @@ hadatac {
         permissions="http://127.0.0.1:9999/blazegraph/namespace/store_users"
 	#permissions="http://127.0.0.1:8080/blazegraph/namespace/store_users"
         # For blazegraph in the vm
-         #permissions="http://127.0.0.1:8080/bigdata/namespace/store_users"
+        # permissions="http://127.0.0.1:9999/bigdata/namespace"
     }
 
     # activity flags are used to verify if HADatAc knowledge base contains 

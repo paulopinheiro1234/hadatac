@@ -7,10 +7,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.hadatac.entity.pojo.SDD;
 import org.hadatac.metadata.loader.URIUtils;
 import org.hadatac.utils.ConfigProp;
 import org.hadatac.utils.NameSpaces;
+import org.hadatac.utils.Templates;
+
 
 public class DASchemaAttrGenerator extends BasicGenerator {
 
@@ -45,17 +46,17 @@ public class DASchemaAttrGenerator extends BasicGenerator {
     @Override
     public void initMapping() {
         mapCol.clear();
-        mapCol.put("Label", "Column");
-        mapCol.put("AttributeType", "Attribute");
-        mapCol.put("AttributeOf", "attributeOf");
-        mapCol.put("Unit", "Unit");
-        mapCol.put("Time", "Time");
-        mapCol.put("Entity", "Entity");
-        mapCol.put("Role", "Role");
-        mapCol.put("Relation", "Relation");
-        mapCol.put("InRelationTo", "inRelationTo");
-        mapCol.put("WasDerivedFrom", "wasDerivedFrom");       
-        mapCol.put("WasGeneratedBy", "wasGeneratedBy");
+        mapCol.put("Label", Templates.LABEL);
+        mapCol.put("AttributeType", Templates.ATTRIBUTETYPE);
+        mapCol.put("AttributeOf", Templates.ATTTRIBUTEOF);
+        mapCol.put("Unit", Templates.UNIT);
+        mapCol.put("Time", Templates.TIME);
+        mapCol.put("Entity", Templates.ENTITY);
+        mapCol.put("Role", Templates.ROLE);
+        mapCol.put("Relation", Templates.RELATION);
+        mapCol.put("InRelationTo", Templates.INRELATIONTO);
+        mapCol.put("WasDerivedFrom", Templates.WASDERIVEDFROM);       
+        mapCol.put("WasGeneratedBy", Templates.WASGENERATEDBY);
     }
 
     private String getLabel(Record rec) {

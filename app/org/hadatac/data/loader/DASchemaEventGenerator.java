@@ -170,7 +170,7 @@ public class DASchemaEventGenerator extends BasicGenerator {
         dase.addType(URIUtils.replacePrefixEx("hasco:DASchemaEvent"));
         dase.addType(URIUtils.replacePrefixEx(entry.getValue().get("Type").trim().replace(" ", "")));
         dase.setLabel(entry.getValue().get("Label"));
-        dase.setComment(entry.getValue().get("Label"));
+        dase.setComment(entry.getValue().get("Comment"));
         dase.setPartOfSchema(URIUtils.replacePrefixEx(kbPrefix + "DAS-" + SDDName));
         dase.setUnit(URIUtils.replacePrefixEx(entry.getValue().get("Unit").trim().replace(" ", "")));
         dase.setInRelationToUri(URIUtils.replacePrefixEx(kbPrefix + "DASO-" + SDDName + "-" + entry.getValue().get("inRelationTo").trim().replace(" ","").replace("_","-").replace("??", "").replace(":", "-")));
@@ -203,7 +203,7 @@ public class DASchemaEventGenerator extends BasicGenerator {
 		row.put("hasURI", kbPrefix + "DASE-" + SDDName + "-" + entry.getKey().trim().replace(" ","").replace("_","-").replace("??", "").replace(":", "-"));
 		row.put("a", "hasco:DASchemaEvent");
 		row.put("rdfs:label", entry.getValue().get("Label"));
-		row.put("rdfs:comment", entry.getValue().get("Label"));
+		row.put("rdfs:comment", entry.getValue().get("Comment"));
 		row.put("hasco:partOfSchema", kbPrefix + "DAS-" + SDDName);
 		row.put("a", entry.getValue().get("Type").trim().replace(" ", ""));
 		row.put("hasco:hasUnit", entry.getValue().get("Unit").trim().replace(" ",""));

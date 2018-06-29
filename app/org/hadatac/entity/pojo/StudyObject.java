@@ -463,6 +463,7 @@ public class StudyObject extends HADatAcThing {
     @Override
     public boolean saveToTripleStore() {
         System.out.println("Saving study object " + getUri() + " to triple store");
+        //System.out.println("[StudyObject] uri: " + uri);
 
         if (uri == null || uri.equals("")) {
             System.out.println("[ERROR] Trying to save OBJ without assigning an URI");
