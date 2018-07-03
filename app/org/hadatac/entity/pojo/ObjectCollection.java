@@ -56,6 +56,7 @@ public class ObjectCollection extends HADatAcThing implements Comparable<ObjectC
     public static String LINE_LAST = "}  ";
     private String studyUri = "";
     private String hasScopeUri = "";    
+    private String hasGroundingLabel = "";
     private List<String> spaceScopeUris = null;
     private List<String> timeScopeUris = null;
     private List<String> objectUris = new ArrayList<String>();
@@ -67,6 +68,7 @@ public class ObjectCollection extends HADatAcThing implements Comparable<ObjectC
         this.comment = "";
         this.studyUri = "";
         this.hasScopeUri = "";
+        this.hasGroundingLabel = "";
         this.spaceScopeUris = new ArrayList<String>();
         this.timeScopeUris = new ArrayList<String>();
     }
@@ -77,6 +79,7 @@ public class ObjectCollection extends HADatAcThing implements Comparable<ObjectC
             String comment,
             String studyUri,
             String hasScopeUri,
+            String hasGroundingLabel,
             List<String> spaceScopeUris,
             List<String> timeScopeUris) {
         this.setUri(uri);
@@ -85,6 +88,7 @@ public class ObjectCollection extends HADatAcThing implements Comparable<ObjectC
         this.setComment(comment);
         this.setStudyUri(studyUri);
         this.setHasScopeUri(hasScopeUri);
+        this.setGroundingLabel(hasGroundingLabel);
         this.setSpaceScopeUris(spaceScopeUris);
         this.setTimeScopeUris(timeScopeUris);
     }
@@ -213,6 +217,14 @@ public class ObjectCollection extends HADatAcThing implements Comparable<ObjectC
 
     public void setHasScopeUri(String hasScopeUri) {
         this.hasScopeUri = hasScopeUri;
+    }
+    
+    public void setGroundingLabel(String hasGroundingLabel) {
+    	this.hasGroundingLabel = hasGroundingLabel;
+    }
+    
+    public String getGroundingLabel() {
+    	return hasGroundingLabel;
     }
 
     public List<String> getSpaceScopeUris() {
@@ -354,11 +366,12 @@ public class ObjectCollection extends HADatAcThing implements Comparable<ObjectC
         ObjectCollection oc = null;
 
         String queryString = NameSpaces.getInstance().printSparqlNameSpaceList() + 
-                "SELECT ?ocType ?comment ?studyUri ?hasScopeUri ?spaceScopeUri ?timeScopeUri WHERE { \n" + 
+                "SELECT ?ocType ?comment ?studyUri ?hasScopeUri ?hasGroundingLabel ?spaceScopeUri ?timeScopeUri WHERE { \n" + 
                 "    <" + oc_uri + "> a ?ocType . \n" + 
                 "    <" + oc_uri + "> hasco:isMemberOf ?studyUri . \n" + 
                 "    OPTIONAL { <" + oc_uri + "> rdfs:comment ?comment } . \n" + 
                 "    OPTIONAL { <" + oc_uri + "> hasco:hasScope ?hasScopeUri } . \n" + 
+                "    OPTIONAL { <" + oc_uri + "> hasco:hasGroundingLabel ?hasGroundingLabel } . \n" + 
                 "}";
 
         ResultSetRewindable resultsrw = SPARQLUtils.select(
@@ -374,6 +387,7 @@ public class ObjectCollection extends HADatAcThing implements Comparable<ObjectC
         String studyUriStr = "";
         String commentStr = "";
         String hasScopeUriStr = "";
+        String hasGroundingLabelStr = "";
         List<String> spaceScopeUrisStr = new ArrayList<String>();
         List<String> timeScopeUrisStr = new ArrayList<String>();
 
@@ -414,12 +428,20 @@ public class ObjectCollection extends HADatAcThing implements Comparable<ObjectC
                 } catch (Exception e1) {
                     hasScopeUriStr = "";
                 }
+                
+                try {
+                    if (soln.getLiteral("hasGroundingLabel") != null && soln.getLiteral("hasGroundingLabel").getString() != null) {
+                    	hasGroundingLabelStr = soln.getLiteral("hasGroundingLabel").getString();
+                    }
+                } catch (Exception e1) {
+                	hasGroundingLabelStr = "";
+                }               
 
                 spaceScopeUrisStr = retrieveSpaceScope(oc_uri);
 
                 timeScopeUrisStr = retrieveTimeScope(oc_uri);
 
-                oc = new ObjectCollection(oc_uri, typeStr, labelStr, commentStr, studyUriStr, hasScopeUriStr, spaceScopeUrisStr, timeScopeUrisStr);
+                oc = new ObjectCollection(oc_uri, typeStr, labelStr, commentStr, studyUriStr, hasScopeUriStr, hasGroundingLabelStr, spaceScopeUrisStr, timeScopeUrisStr);
             }
         }
 
@@ -658,6 +680,7 @@ public class ObjectCollection extends HADatAcThing implements Comparable<ObjectC
                 insert += oc_uri + " hasco:hasScope  " + this.getHasScopeUri() + " . ";
             }
         }
+        insert += oc_uri + " hasco:hasGroundingLabel  \"" + this.getGroundingLabel() + "\" . ";
         if (this.getSpaceScopeUris() != null && this.getSpaceScopeUris().size() > 0) {
             for (String spaceScope : this.getSpaceScopeUris()) {
                 if (spaceScope.length() > 0){

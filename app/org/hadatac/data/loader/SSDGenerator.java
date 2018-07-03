@@ -29,6 +29,7 @@ public class SSDGenerator extends BasicGenerator {
         mapCol.put("label", "label");
         mapCol.put("studyUri", "isMemberOf");
         mapCol.put("hasScopeUri", "hasScope");
+        mapCol.put("groundingLabel", "groundingLabel");
         mapCol.put("spaceScopeUris", "hasSpaceScope");
         mapCol.put("timeScopeUris", "hasTimeScope");
     }
@@ -51,6 +52,10 @@ public class SSDGenerator extends BasicGenerator {
 
     private String gethasScopeUri(Record rec) {
         return rec.getValueByColumnName(mapCol.get("hasScopeUri"));
+    }
+    
+    private String getGroundingLabel(Record rec) {
+        return rec.getValueByColumnName(mapCol.get("groundingLabel"));
     }
 
     private List<String> getSpaceScopeUris(Record rec) {
@@ -77,6 +82,7 @@ public class SSDGenerator extends BasicGenerator {
     			getLabel(record),
     			URIUtils.replacePrefixEx(getStudyUri(record)),
     			URIUtils.replacePrefixEx(gethasScopeUri(record)),
+    			getGroundingLabel(record),
                 getSpaceScopeUris(record),
                 getTimeScopeUris(record));
     	
