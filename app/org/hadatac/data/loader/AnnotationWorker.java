@@ -1,8 +1,7 @@
 package org.hadatac.data.loader;
 
+import java.lang.String;
 import java.io.File;
-import java.io.PrintWriter;
-import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.text.DateFormat;
@@ -15,9 +14,9 @@ import java.util.Map;
 
 import org.hadatac.console.controllers.annotator.AnnotationLog;
 import org.hadatac.data.api.DataFactory;
-import org.hadatac.data.model.ParsingResult;
 import org.hadatac.entity.pojo.ObjectAccessSpec;
 import org.hadatac.entity.pojo.DataFile;
+import org.hadatac.entity.pojo.DPL;
 import org.hadatac.entity.pojo.SDD;
 import org.hadatac.entity.pojo.SSD;
 import org.hadatac.metadata.loader.URIUtils;
@@ -95,6 +94,16 @@ public class AnnotationWorker {
                 chain = annotateSubjectIdFile(recordFile);
             } else if (file_name.startsWith("STD-")) {
                 chain = annotateStudyIdFile(recordFile);
+            } else if (file_name.startsWith("DPL-")) {
+                if (file_name.endsWith(".xlsx")) {
+                    recordFile = new SpreadsheetRecordFile(new File(filePath), "InfoSheet");
+                    if (!recordFile.isValid()) {
+                        log.addline(Feedback.println(Feedback.WEB, 
+                                "[ERROR] Missing InfoSheet. "));
+                        return;
+                    }
+                }
+                chain = annotateDPLFile(recordFile);
             } else if (file_name.startsWith("MAP-")) {
                 if (recordFile.getNumberOfSheets() > 1) {
                     log.addline(Feedback.println(Feedback.WEB, 
@@ -119,7 +128,7 @@ public class AnnotationWorker {
             } else {
                 log.addline(Feedback.println(Feedback.WEB, 
                         "[ERROR] Unsupported file name prefix, only accept prefixes "
-                                + "STD-, PID-, MAP-, SDD-, ACQ-, DA-. "));
+                                + "STD-, DPL-, PID-, MAP-, SDD-, ACQ-, DA-. "));
                 return;
             }
 
@@ -158,6 +167,31 @@ public class AnnotationWorker {
         GeneratorChain chain = new GeneratorChain();
         chain.addGenerator(new StudyGenerator(file));
         chain.addGenerator(new AgentGenerator(file));
+
+        return chain;
+    }
+
+
+    public static GeneratorChain annotateDPLFile(RecordFile file) {
+
+	System.out.println("Processing DPL file...");
+
+	DPL dpl = new DPL(file);
+        String file_name = dpl.getFileName();
+        Map<String, String> mapCatalog = dpl.getCatalog();
+
+	String sheetName = "";
+	RecordFile sheet = null;
+        GeneratorChain chain = new GeneratorChain();
+
+	// Deployment Generator
+	if(mapCatalog.containsKey("Deployments")) {
+
+		sheetName = mapCatalog.get("Deployments").replace("#", "");
+		sheet = new SpreadsheetRecordFile(file.getFile(), sheetName);
+		chain.addGenerator(new DeploymentGenerator(sheet));
+
+	}
 
         return chain;
     }
