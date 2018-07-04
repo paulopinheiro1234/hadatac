@@ -10,6 +10,7 @@ public class ObjectCollectionForm {
     public String newLabel;
     public String newComment;
     public String newHasScopeUri;
+    public String newHasGroundingLabel;
     public List<String> spaceUri;
     public List<String> timeUri;
 
@@ -55,6 +56,10 @@ public class ObjectCollectionForm {
     
     public String getNewHasScopeUri() {
 	return newHasScopeUri;
+    }
+    
+    public String getNewHasGroundingLabel() {
+    return newHasGroundingLabel;
     }
     
     public void setNewHasScopeUri(String hasScopeUri) {

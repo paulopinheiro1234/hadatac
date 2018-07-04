@@ -93,6 +93,7 @@ public class EditOC extends Controller {
 		String newLabel = data.getNewLabel();
 		String newComment = data.getNewComment();
 		String newHasScopeUri = data.getNewHasScopeUri();
+		String newHasGroundingLabel = data.getNewHasGroundingLabel();
 		List<String> newSpaceScopeUris = data.getSpaceUri();
 		List<String> newTimeScopeUris = data.getTimeUri();
 
@@ -137,6 +138,9 @@ public class EditOC extends Controller {
 		if (oldOc.getHasScopeUri() == null || !oldOc.getHasScopeUri().equals(newHasScopeUri)) {
 			changedInfos.add(newHasScopeUri);
 		}
+		if (oldOc.getGroundingLabel() == null || !oldOc.getGroundingLabel().equals(newHasGroundingLabel)) {
+			changedInfos.add(newHasGroundingLabel);
+		}
 		//if (oldOc.getSpaceScopeUris() == null || !oldOc.getSpaceScopeUris().equals(newSpaceScopeUris)) {
 		//    changedInfos.add(newSpaceScopeUri);
 		//}
@@ -151,6 +155,7 @@ public class EditOC extends Controller {
 				newComment,
 				newStudyUri,
 				newHasScopeUri,
+				newHasGroundingLabel,
 				newSpaceScopeUris,
 				newTimeScopeUris);
 		newOc.setObjectUris(oldOc.getObjectUris());
