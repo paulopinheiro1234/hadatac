@@ -11,8 +11,15 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
+import org.hadatac.metadata.model.SpreadsheetParsingResult;
+import org.hadatac.metadata.loader.SheetProcessing;
+import org.hadatac.utils.Feedback;
+
+
 import org.apache.poi.EncryptedDocumentException;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
+import org.apache.poi.xssf.usermodel.XSSFSheet;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
@@ -154,6 +161,24 @@ public class SpreadsheetRecordFile implements RecordFile {
         }
 
         return true;
+    }
+
+    public SpreadsheetParsingResult processSheet(String sheetName) {
+
+      System.out.println("Processing sheet " + sheetName + "...");
+
+      try {
+          XSSFWorkbook workbook = new XSSFWorkbook(file);
+
+          SpreadsheetParsingResult result = SheetProcessing.generateTTL(Feedback.WEB, workbook.getSheet(sheetName));
+
+          return result;
+        } catch (IOException | InvalidFormatException e) {
+
+            e.printStackTrace();
+            return null;
+        }
+
     }
 
     private List<String> getRowValues(Row row) {
