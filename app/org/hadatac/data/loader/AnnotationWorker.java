@@ -104,7 +104,9 @@ public class AnnotationWorker {
                 chain = annotateMapFile(recordFile);
             } else if (file_name.startsWith("ACQ-")) {
                 chain = annotateACQFile(recordFile, true);
-            } else if (file_name.startsWith("SDD-")) {
+            } else if (file_name.startsWith("OAS-")) {
+                chain = annotateOASFile(recordFile, true);
+	    }else if (file_name.startsWith("SDD-")) {
                 if (file_name.endsWith(".xlsx")) {
                     recordFile = new SpreadsheetRecordFile(new File(filePath), "InfoSheet");
                     if (!recordFile.isValid()) {
@@ -209,6 +211,15 @@ public class AnnotationWorker {
 
         GeneratorChain chain = new GeneratorChain();
         chain.addGenerator(new DataAcquisitionGenerator(file, startTime));
+
+        return chain;
+    }
+
+    public static GeneratorChain annotateOASFile(RecordFile file, boolean bGenerate) {
+        GeneratorChain chain = new GeneratorChain();
+        DateFormat isoFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
+        String startTime = isoFormat.format(new Date());
+        chain.addGenerator(new OASGenerator(file, startTime));
 
         return chain;
     }
