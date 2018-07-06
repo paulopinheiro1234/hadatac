@@ -88,9 +88,15 @@ public class SpreadsheetRecordFile implements RecordFile {
         }
         return 1;
     }
+    
+    @Override
+    public String getSheetName() {
+    	return sheetName;
+    }
 
     @Override
     public List<String> getHeaders() {
+
         try {
             Workbook workbook = WorkbookFactory.create(new FileInputStream(file));
             Sheet sheet = null;
