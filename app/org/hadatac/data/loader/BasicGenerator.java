@@ -106,6 +106,7 @@ public abstract class BasicGenerator {
 
         int row_number = 0;
         for (Record record : records) {
+        	System.out.println(record.toString());
             HADatAcThing obj = createObject(record, ++row_number);
             if (obj != null) {
                 objects.add(obj);

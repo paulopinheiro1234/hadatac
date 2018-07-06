@@ -29,26 +29,28 @@ public class StudyObjectGenerator extends BasicGenerator {
     public StudyObjectGenerator(RecordFile file, List<String> listContent, Map<String, List<String>> mapContent) {
         super(file);
         file_name = file.getFile() .getName();
-        System.out.println(file_name);
+        System.out.println("We are in StudyObject Generator!");
         study_id = file.getFile().getName().replaceAll("SSD-", "").replaceAll(".xlsx", "");
         
         setStudyUri(URIUtils.replacePrefixEx(kbPrefix + "STD-" + study_id));
         
         this.listCache = listContent;
+        System.out.println(listContent);
         this.mapContent = mapContent;
         this.oc_uri = listContent.get(0);
-//        System.out.println("oc_uri : " + oc_uri);
+        System.out.println("oc_uri : " + oc_uri);
         this.oc_type = listContent.get(1);
-//        System.out.println("oc_type : " + oc_type);
+        System.out.println("oc_type : " + oc_type);
         this.oc_scope = listContent.get(2);
-//        System.out.println("oc_scope : " + oc_scope);
+        System.out.println("oc_scope : " + oc_scope);
         this.oc_timescope = listContent.get(3);
-//        System.out.println("oc_timescope : " + oc_timescope);
+        System.out.println("oc_timescope : " + oc_timescope);
         this.role = listContent.get(4);
-//        System.out.println("role : " + role);
+        System.out.println("role : " + role);
         uriMap.put("hasco:SubjectGroup", "SBJ-");
         uriMap.put("hasco:SampleCollection", "SPL-");
-        uriMap.put("hasco:TimeCollection", "TIME-");   
+        uriMap.put("hasco:TimeCollection", "TIME-");
+        uriMap.put("hasco:LocationCollection", "LOC-");
     }
 
     @Override
@@ -91,6 +93,7 @@ public class StudyObjectGenerator extends BasicGenerator {
     }
 //
     public StudyObject createStudyObject(Record record) throws Exception {
+    	System.out.println(getUri(record));
         StudyObject obj = new StudyObject(getUri(record), getType(record), 
                 getOriginalID(record), getLabel(record), 
                 getCohortUri(record), getLabel(record));
