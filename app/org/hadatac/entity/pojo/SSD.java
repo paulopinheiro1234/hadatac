@@ -65,12 +65,12 @@ public class SSD {
 	    
 	    for (Record record : file.getRecords()) {
 	    	List<String> tmp = new ArrayList<String>();
-	    	tmp.add(record.getValueByColumnIndex(1));
-	    	tmp.add(record.getValueByColumnIndex(2));
-	    	tmp.add(record.getValueByColumnIndex(7));
-	    	tmp.add(record.getValueByColumnIndex(8));
-	    	tmp.add(record.getValueByColumnIndex(11));
-	        mapContent.put(record.getValueByColumnIndex(1), tmp);
+	    	tmp.add(record.getValueByColumnName("hasURI"));
+	    	tmp.add(record.getValueByColumnName("type"));
+	    	tmp.add(record.getValueByColumnName("hasScope"));
+	    	tmp.add(record.getValueByColumnName("hasTimeScope"));
+	    	tmp.add(record.getValueByColumnName("role"));
+	        mapContent.put(record.getValueByColumnName("hasURI"), tmp);
 	    }
 	}
 	
