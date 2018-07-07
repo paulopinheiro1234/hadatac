@@ -351,20 +351,26 @@ public class AnnotationWorker {
         
         GeneratorChain chain = new GeneratorChain();
         
-        for ( String i : mapCatalog.keySet()) {
-        	if (mapCatalog.get(i).length()>0){
-            	System.out.println(mapCatalog.get(i));	
-            	RecordFile SOsheet = new SpreadsheetRecordFile(file.getFile(), mapCatalog.get(i).replace("#", ""));
-            	chain.addGenerator(new StudyObjectGenerator(SOsheet, mapContent.get(i), mapContent));
-        	}
-        }
-        
         if (SSDsheet.isValid()) {
             chain.addGenerator(new SSDGenerator(SSDsheet));
         } else {
             //chain.setInvalid();
             AnnotationLog.printException("Cannot sheet SSD ", file.getFile().getName());
         }
+        
+        for ( String i : mapCatalog.keySet()) {
+        	if (mapCatalog.get(i).length()>0){
+            	RecordFile SOsheet = new SpreadsheetRecordFile(file.getFile(), mapCatalog.get(i).replace("#", ""));
+            	System.out.println(SOsheet.getSheetName() + " is parsed!");
+            	chain.addGenerator(new StudyObjectGenerator(SOsheet, mapContent.get(i), mapContent));
+            	System.out.println(SOsheet.getNumberOfSheets() + " number of sheets!");
+            	System.out.println(SOsheet.getHeaders() + " number of sheets!");            	
+            	for (Record ii : SOsheet.getRecords()){
+                	System.out.println(ii.getValueByColumnIndex(0) + " is added to chain!");	
+            	}
+        	}
+        }
+        
         return chain;
     }
 

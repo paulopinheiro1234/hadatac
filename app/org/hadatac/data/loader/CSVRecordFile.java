@@ -66,6 +66,11 @@ public class CSVRecordFile implements RecordFile {
     public File getFile() {
         return file;
     }
+    
+    @Override
+    public String getSheetName() {
+        return "";
+    }
 
     @Override
     public boolean isValid() {
