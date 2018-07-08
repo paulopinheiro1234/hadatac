@@ -323,31 +323,45 @@ public class MeasurementGenerator extends BasicGenerator {
             measurement.setPID("");
             measurement.setSID("");
 
-            String id = "";
-            if (!schema.getOriginalIdLabel().equals("")) {
-                id = record.getValueByColumnIndex(posOriginalId);
-            } else if (!schema.getIdLabel().equals("")) {
-                id = record.getValueByColumnIndex(posId);
-            }
+	    if (da.hasCellScope()) {
 
-            if (!id.equals("")) {
-                if (dasa.getEntity().equals(URIUtils.replacePrefixEx("sio:Human"))) {
-                    if (mapIDStudyObjects.containsKey(id)) {
-                        measurement.setStudyObjectUri(mapIDStudyObjects.get(id).get(0));
-                        measurement.setObjectUri(mapIDStudyObjects.get(id).get(0));
-                    }
-                    measurement.setObjectCollectionType(URIUtils.replacePrefixEx("hasco:SubjectGroup"));
-                    measurement.setPID(id);
-                } else if (dasa.getEntity().equals(URIUtils.replacePrefixEx("sio:Sample"))) {
-                    if (mapIDStudyObjects.containsKey(id)) {
-                        measurement.setStudyObjectUri(mapIDStudyObjects.get(id).get(0));
-                        measurement.setObjectUri(mapIDStudyObjects.get(id).get(2));
-                        measurement.setPID(mapIDStudyObjects.get(id).get(1));
-                    }
-                    measurement.setObjectCollectionType(URIUtils.replacePrefixEx("hasco:SampleCollection"));
-                    measurement.setSID(id);
-                }
-            }
+		// Objects defined by Cell Scope
+		if (da.getCellScopeName().get(0).equals("*")) {
+		    measurement.setStudyObjectUri(URIUtils.replacePrefixEx(da.getCellScopeUri().get(0)));
+		    measurement.setObjectUri(URIUtils.replacePrefixEx(da.getCellScopeUri().get(0)));
+		} else {
+		    // TO DO: implement rest of cell scope
+		}
+		
+	    } else {
+		
+		// Objects defined by Row Scope
+		String id = "";
+		if (!schema.getOriginalIdLabel().equals("")) {
+		    id = record.getValueByColumnIndex(posOriginalId);
+		} else if (!schema.getIdLabel().equals("")) {
+		    id = record.getValueByColumnIndex(posId);
+		}
+
+		if (!id.equals("")) {
+		    if (dasa.getEntity().equals(URIUtils.replacePrefixEx("sio:Human"))) {
+			if (mapIDStudyObjects.containsKey(id)) {
+			    measurement.setStudyObjectUri(mapIDStudyObjects.get(id).get(0));
+			    measurement.setObjectUri(mapIDStudyObjects.get(id).get(0));
+			}
+			measurement.setObjectCollectionType(URIUtils.replacePrefixEx("hasco:SubjectGroup"));
+			measurement.setPID(id);
+		    } else if (dasa.getEntity().equals(URIUtils.replacePrefixEx("sio:Sample"))) {
+			if (mapIDStudyObjects.containsKey(id)) {
+			    measurement.setStudyObjectUri(mapIDStudyObjects.get(id).get(0));
+			    measurement.setObjectUri(mapIDStudyObjects.get(id).get(2));
+			    measurement.setPID(mapIDStudyObjects.get(id).get(1));
+			}
+			measurement.setObjectCollectionType(URIUtils.replacePrefixEx("hasco:SampleCollection"));
+			measurement.setSID(id);
+		    }
+		}
+	    }
 
             /*=============================*
              *                             *

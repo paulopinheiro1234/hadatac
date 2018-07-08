@@ -142,8 +142,8 @@ public class DataAcquisitionGenerator extends BasicGenerator {
 		for (ObjectCollection oc : ObjectCollection.findByStudyUri(da.getStudyUri())) {
 			if ((isEpiData && oc.getTypeUri().equals(URIUtils.replacePrefixEx("hasco:SubjectGroup")))
 					|| (!isEpiData && oc.getTypeUri().equals(URIUtils.replacePrefixEx("hasco:SampleCollection")))) {
-				da.setGlobalScopeUri(oc.getUri());
-				System.out.println("Set GlobalScopeUri to: " + oc.getUri());
+				da.setRowScopeUri(oc.getUri());
+				System.out.println("Set RowScopeUri to: " + oc.getUri());
 				break;
 			}
 		}

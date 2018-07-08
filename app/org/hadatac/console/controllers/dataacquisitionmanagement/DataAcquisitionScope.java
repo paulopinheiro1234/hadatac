@@ -144,18 +144,18 @@ public class DataAcquisitionScope extends Controller {
 	    }
 	}
 
-	List<String> localScopeUri = da.getLocalScopeUri();
-	System.out.println("Size Local Scope URI: " + localScopeUri.size());
-	for (String str : localScopeUri) {
+	List<String> cellScopeUri = da.getCellScopeUri();
+	System.out.println("Size Cell Scope URI: " + cellScopeUri.size());
+	for (String str : cellScopeUri) {
 	    System.out.println("  - uri : " + str);
 	}
-	List<String> localScopeName = da.getLocalScopeName();
-	System.out.println("Size Local Scope URI: " + localScopeName.size());
-	for (String str : localScopeName) {
+	List<String> cellScopeName = da.getCellScopeName();
+	System.out.println("Size Cell Scope URI: " + cellScopeName.size());
+	for (String str : cellScopeName) {
 	    System.out.println("  - name : " + str);
 	}
 	
-	return ok(viewScope.render(file_name, da_uri, da.getGlobalScopeName(), da.getGlobalScopeUri(), localScopeName, localScopeUri));
+	return ok(viewScope.render(file_name, da_uri, da.getRowScopeName(), da.getRowScopeUri(), cellScopeName, cellScopeUri));
     }
 	
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))

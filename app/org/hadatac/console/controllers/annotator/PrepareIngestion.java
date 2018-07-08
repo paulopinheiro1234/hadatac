@@ -61,7 +61,7 @@ public class PrepareIngestion extends Controller {
         // Load associated DA
         if (da_uri != null && !da_uri.equals("")) {
             da = ObjectAccessSpec.findByUri(URIUtils.replacePrefixEx(da_uri));
-            System.out.println("Global scope: [" + da.getGlobalScopeUri() + "]  hasScope: " + da.hasScope());
+            System.out.println("Row scope: [" + da.getRowScopeUri() + "]  hasScope: " + da.hasScope());
 
             if (da != null) {
                 return ok(prepareIngestion.render(file_name, da, "DA associated with file has been retrieved"));
@@ -168,10 +168,10 @@ public class PrepareIngestion extends Controller {
         }
 
         String[] fields = null;
-        String globalScope = null;
-        String globalScopeUri = null;
-        List<String> localScope = null;
-        List<String> localScopeUri = null;
+        String rowScope = null;
+        String rowScopeUri = null;
+        List<String> cellScope = null;
+        List<String> cellScopeUri = null;
         String path = "";
         String labels = "";
 
@@ -201,11 +201,11 @@ public class PrepareIngestion extends Controller {
         System.out.println("selectScope: labels = <" + labels + ">");
         if (labels != null && !labels.equals("")) {
             fields = FileProcessing.extractFields(labels);
-            localScope = new ArrayList<String>();
-            localScopeUri = new ArrayList<String>();
+            cellScope = new ArrayList<String>();
+            cellScopeUri = new ArrayList<String>();
             for (String str : fields) {
-                localScope.add("no mapping");
-                localScopeUri.add("");
+                cellScope.add("no mapping");
+                cellScopeUri.add("");
             }
             System.out.println("# of fields: " + fields.length);
         }
@@ -217,7 +217,7 @@ public class PrepareIngestion extends Controller {
         System.out.println("Collection list size: " + ocList.size());
 
         return ok(selectScope.render(file_name, da_uri, ocList, Arrays.asList(fields), 
-                globalScope, globalScopeUri, localScope, localScopeUri));
+                rowScope, rowScopeUri, cellScope, cellScopeUri));
     }
 
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
@@ -277,20 +277,20 @@ public class PrepareIngestion extends Controller {
         Form<SelectScopeForm> form = formFactory.form(SelectScopeForm.class).bindFromRequest();
         String message = "";
         SelectScopeForm data = form.get();
-        String globalScopeUri = data.getNewGlobalScopeUri();
-        String localScopeUri = data.getNewLocalScopeUri();
-        System.out.println("Showing returned GlobalScope: [" + globalScopeUri + "]");
-        System.out.println("Showing returned LocalScope: [" + localScopeUri + "]");
-        String[] localUriStr = null;
-        List<String> localScopeUriList = new ArrayList<String>();
-        if (localScopeUri != null) {
-            localUriStr = localScopeUri.split(",");
-            System.out.println("List of local scope uris:");
-            for (int i=0; i < localUriStr.length; i++) {
-                localUriStr[i] = localUriStr[i].trim();
-                System.out.println("local scope: [" + localUriStr[i] + "]");
+        String rowScopeUri = data.getNewRowScopeUri();
+        String cellScopeUri = data.getNewCellScopeUri();
+        System.out.println("Showing returned RowScope: [" + rowScopeUri + "]");
+        System.out.println("Showing returned CellScope: [" + cellScopeUri + "]");
+        String[] cellUriStr = null;
+        List<String> cellScopeUriList = new ArrayList<String>();
+        if (cellScopeUri != null) {
+            cellUriStr = cellScopeUri.split(",");
+            System.out.println("List of cell scope uris:");
+            for (int i=0; i < cellUriStr.length; i++) {
+                cellUriStr[i] = cellUriStr[i].trim();
+                System.out.println("cell scope: [" + cellUriStr[i] + "]");
             }
-            localScopeUriList = Arrays.asList(localUriStr);
+            cellScopeUriList = Arrays.asList(cellUriStr);
         }
 
         ObjectAccessSpec da = ObjectAccessSpec.findByUri(da_uri);
@@ -299,8 +299,8 @@ public class PrepareIngestion extends Controller {
             return refine(file_name, da_uri, message);
         }
 
-        da.setGlobalScopeUri(globalScopeUri);
-        da.setLocalScopeUri(localScopeUriList);
+        da.setRowScopeUri(rowScopeUri);
+        da.setCellScopeUri(cellScopeUriList);
 
         da.saveToSolr();
         da.saveToLabKey(session().get("LabKeyUserName"), session().get("LabKeyPassword"));
@@ -391,17 +391,17 @@ public class PrepareIngestion extends Controller {
         // removing a study's relationship also removes scope information
         case "Study":  
             da.setStudyUri("");
-            da.setGlobalScopeUri("");
-            da.setGlobalScopeName("");
-            da.setLocalScopeUri(new ArrayList<String>());
-            da.setLocalScopeName(new ArrayList<String>());
+            da.setRowScopeUri("");
+            da.setRowScopeName("");
+            da.setCellScopeUri(new ArrayList<String>());
+            da.setCellScopeName(new ArrayList<String>());
             break;
 
         case "Scope":  
-            da.setGlobalScopeUri("");
-            da.setGlobalScopeName("");
-            da.setLocalScopeUri(new ArrayList<String>());
-            da.setLocalScopeName(new ArrayList<String>());
+            da.setRowScopeUri("");
+            da.setRowScopeName("");
+            da.setCellScopeUri(new ArrayList<String>());
+            da.setCellScopeName(new ArrayList<String>());
             break;
 
         case "Deployment":  

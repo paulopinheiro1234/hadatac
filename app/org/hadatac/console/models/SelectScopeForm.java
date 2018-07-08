@@ -2,26 +2,26 @@ package org.hadatac.console.models;
 
 public class SelectScopeForm {
 
-    public String newGlobalScopeUri;
-    public String newLocalScopeUri;
+    public String newRowScopeUri;
+    public String newCellScopeUri;
  
     public SelectScopeForm () {
     }
 
-    public String getNewGlobalScopeUri() {
-    	return newGlobalScopeUri;
+    public String getNewRowScopeUri() {
+    	return newRowScopeUri;
     }
     
-    public void setNewGlobalScopeUri(String newGlobalScopeUri) {
-    	this.newGlobalScopeUri = newGlobalScopeUri;
+    public void setNewRowScopeUri(String newRowScopeUri) {
+    	this.newRowScopeUri = newRowScopeUri;
     }
 
-    public String getNewLocalScopeUri() {
-    	return newLocalScopeUri;
+    public String getNewCellScopeUri() {
+    	return newCellScopeUri;
     }
     
-    public void setNewLocalScopeUri(String newLocalScopeUri) {
-    	this.newLocalScopeUri = newLocalScopeUri;
+    public void setNewCellScopeUri(String newCellScopeUri) {
+    	this.newCellScopeUri = newCellScopeUri;
     }
 
 }
