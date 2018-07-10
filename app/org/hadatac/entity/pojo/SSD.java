@@ -70,6 +70,8 @@ public class SSD {
 	    	tmp.add(record.getValueByColumnName("hasScope"));
 	    	tmp.add(record.getValueByColumnName("hasTimeScope"));
 	    	tmp.add(record.getValueByColumnName("role"));
+	    	tmp.add(record.getValueByColumnName("hasSOCReference"));
+	    	tmp.add(record.getValueByColumnName("groundingLabel"));
 	        mapContent.put(record.getValueByColumnName("hasURI"), tmp);
 	    }
 	}

@@ -15,9 +15,12 @@ public class SSDGenerator extends BasicGenerator {
 
     final String kbPrefix = ConfigProp.getKbPrefix();
     String studyUri = "";
+    String SDDName = ""; //used for reference column uri
     
     public SSDGenerator(RecordFile file) {
         super(file);
+        String str = file.getFile().getName().replaceAll("SSD-", "");
+        this.SDDName = str.substring(0, str.lastIndexOf('.'));
     }
 
     @Override
@@ -26,6 +29,7 @@ public class SSDGenerator extends BasicGenerator {
         mapCol.put("sheet", "sheet");
         mapCol.put("uri", "hasURI");
         mapCol.put("typeUri", "type");
+        mapCol.put("hasSOCReference", "hasSOCReference");
         mapCol.put("label", "label");
         mapCol.put("studyUri", "isMemberOf");
         mapCol.put("hasScopeUri", "hasScope");
@@ -48,6 +52,11 @@ public class SSDGenerator extends BasicGenerator {
 
     private String getStudyUri(Record rec) {
         return rec.getValueByColumnName(mapCol.get("studyUri"));
+    }
+    
+    private String getSOCReference(Record rec) {
+        String ref = rec.getValueByColumnName(mapCol.get("hasSOCReference"));
+        return kbPrefix + "DASO-" + SDDName + "-" + ref.trim().replace(" ","").replace("_","-").replace("??", "");
     }
 
     private String gethasScopeUri(Record rec) {
@@ -83,6 +92,7 @@ public class SSDGenerator extends BasicGenerator {
     			URIUtils.replacePrefixEx(getStudyUri(record)),
     			URIUtils.replacePrefixEx(gethasScopeUri(record)),
     			getGroundingLabel(record),
+    			getSOCReference(record),
                 getSpaceScopeUris(record),
                 getTimeScopeUris(record));
     	

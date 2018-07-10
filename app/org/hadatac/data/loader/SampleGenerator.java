@@ -23,6 +23,7 @@ public class SampleGenerator extends BasicGenerator {
     private int counter = 1;
     private String hasScopeUri = "";    
     private String hasGroundingLabel = "";
+    private String hasSOCReference = "";
     private List<String> scopeUris = new ArrayList<String>();
     private List<String> spaceScopeUris = new ArrayList<String>();
     private List<String> timeScopeUris = new ArrayList<String>();
@@ -196,6 +197,7 @@ public class SampleGenerator extends BasicGenerator {
                 getStudyUri(record),
                 hasScopeUri,
                 hasGroundingLabel,
+                hasSOCReference,
                 spaceScopeUris,
                 timeScopeUris);
 

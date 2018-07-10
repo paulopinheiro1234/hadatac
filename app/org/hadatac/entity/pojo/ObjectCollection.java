@@ -57,6 +57,7 @@ public class ObjectCollection extends HADatAcThing implements Comparable<ObjectC
     private String studyUri = "";
     private String hasScopeUri = "";    
     private String hasGroundingLabel = "";
+    private String hasSOCReference = "";
     private List<String> spaceScopeUris = null;
     private List<String> timeScopeUris = null;
     private List<String> objectUris = new ArrayList<String>();
@@ -69,6 +70,7 @@ public class ObjectCollection extends HADatAcThing implements Comparable<ObjectC
         this.studyUri = "";
         this.hasScopeUri = "";
         this.hasGroundingLabel = "";
+        this.hasSOCReference = "";
         this.spaceScopeUris = new ArrayList<String>();
         this.timeScopeUris = new ArrayList<String>();
     }
@@ -80,6 +82,7 @@ public class ObjectCollection extends HADatAcThing implements Comparable<ObjectC
             String studyUri,
             String hasScopeUri,
             String hasGroundingLabel,
+            String hasSOCReference,
             List<String> spaceScopeUris,
             List<String> timeScopeUris) {
         this.setUri(uri);
@@ -89,6 +92,7 @@ public class ObjectCollection extends HADatAcThing implements Comparable<ObjectC
         this.setStudyUri(studyUri);
         this.setHasScopeUri(hasScopeUri);
         this.setGroundingLabel(hasGroundingLabel);
+        this.setSOCReference(hasSOCReference);
         this.setSpaceScopeUris(spaceScopeUris);
         this.setTimeScopeUris(timeScopeUris);
     }
@@ -217,6 +221,14 @@ public class ObjectCollection extends HADatAcThing implements Comparable<ObjectC
 
     public void setHasScopeUri(String hasScopeUri) {
         this.hasScopeUri = hasScopeUri;
+    }
+    
+    public void setSOCReference(String hasSOCReference) {
+    	this.hasSOCReference = hasSOCReference;
+    }
+    
+    public String getSOCReference() {
+    	return hasSOCReference;
     }
     
     public void setGroundingLabel(String hasGroundingLabel) {
@@ -366,11 +378,12 @@ public class ObjectCollection extends HADatAcThing implements Comparable<ObjectC
         ObjectCollection oc = null;
 
         String queryString = NameSpaces.getInstance().printSparqlNameSpaceList() + 
-                "SELECT ?ocType ?comment ?studyUri ?hasScopeUri ?hasGroundingLabel ?spaceScopeUri ?timeScopeUri WHERE { \n" + 
+                "SELECT ?ocType ?comment ?studyUri ?hasScopeUri ?hasSOCReference ?hasGroundingLabel ?spaceScopeUri ?timeScopeUri WHERE { \n" + 
                 "    <" + oc_uri + "> a ?ocType . \n" + 
                 "    <" + oc_uri + "> hasco:isMemberOf ?studyUri . \n" + 
                 "    OPTIONAL { <" + oc_uri + "> rdfs:comment ?comment } . \n" + 
                 "    OPTIONAL { <" + oc_uri + "> hasco:hasScope ?hasScopeUri } . \n" + 
+                "    OPTIONAL { <" + oc_uri + "> hasco:hasSOCReference ?hasSOCReference } . \n" + 
                 "    OPTIONAL { <" + oc_uri + "> hasco:hasGroundingLabel ?hasGroundingLabel } . \n" + 
                 "}";
 
@@ -388,6 +401,7 @@ public class ObjectCollection extends HADatAcThing implements Comparable<ObjectC
         String commentStr = "";
         String hasScopeUriStr = "";
         String hasGroundingLabelStr = "";
+        String hasSOCReferenceStr = "";
         List<String> spaceScopeUrisStr = new ArrayList<String>();
         List<String> timeScopeUrisStr = new ArrayList<String>();
 
@@ -435,13 +449,21 @@ public class ObjectCollection extends HADatAcThing implements Comparable<ObjectC
                     }
                 } catch (Exception e1) {
                 	hasGroundingLabelStr = "";
-                }               
+                }
+
+                try {
+                    if (soln.getLiteral("hasSOCReference") != null && soln.getLiteral("hasSOCReference").getString() != null) {
+                    	hasSOCReferenceStr = soln.getLiteral("hasSOCReference").getString();
+                    }
+                } catch (Exception e1) {
+                	hasSOCReferenceStr = "";
+                }
 
                 spaceScopeUrisStr = retrieveSpaceScope(oc_uri);
 
                 timeScopeUrisStr = retrieveTimeScope(oc_uri);
 
-                oc = new ObjectCollection(oc_uri, typeStr, labelStr, commentStr, studyUriStr, hasScopeUriStr, hasGroundingLabelStr, spaceScopeUrisStr, timeScopeUrisStr);
+                oc = new ObjectCollection(oc_uri, typeStr, labelStr, commentStr, studyUriStr, hasScopeUriStr, hasGroundingLabelStr, hasSOCReferenceStr, spaceScopeUrisStr, timeScopeUrisStr);
             }
         }
 
@@ -681,6 +703,7 @@ public class ObjectCollection extends HADatAcThing implements Comparable<ObjectC
             }
         }
         insert += oc_uri + " hasco:hasGroundingLabel  \"" + this.getGroundingLabel() + "\" . ";
+        insert += oc_uri + " hasco:hasSOCReference  \"" + this.getSOCReference() + "\" . ";
         if (this.getSpaceScopeUris() != null && this.getSpaceScopeUris().size() > 0) {
             for (String spaceScope : this.getSpaceScopeUris()) {
                 if (spaceScope.length() > 0){
