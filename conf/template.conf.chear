@@ -39,7 +39,6 @@ PermissionURI=permission uri
 
 # OAS Template
 DeploymentUri=deployment uri
-RowScope=row scope
 CellScope=cell scope
 
 # DASA, DASE, DASO Template (Part of SDD)

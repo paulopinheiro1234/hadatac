@@ -161,12 +161,7 @@
 
        } else {
 
-	       <center><b>Associated scope</b> : Row : 
-               @if(da.getRowScopeUri() == null || da.getRowScopeUri().equals("")) { 
-                   none
-               } else {
-	           @da.getRowScopeName() [@URIUtils.replaceNameSpaceEx(da.getRowScopeUri())]
-               } 
+	       <center><b>Associated scope</b> : 
                 <br> Cell:  
                @if(da.getCellScopeUri() == null || da.getCellScopeUri().size() <= 0) { 
                    none

@@ -44,7 +44,7 @@ public class Templates {
 
     // OAS Template                                                                              
     public static String DEPLOYMENTURI = ConfigProp.getPropertyValue(TEMPLATE_FILE, "DeploymentUri");
-    public static String ROWSCOPE = ConfigProp.getPropertyValue(TEMPLATE_FILE, "RowScope");
+    //public static String ROWSCOPE = ConfigProp.getPropertyValue(TEMPLATE_FILE, "RowScope");
     public static String CELLSCOPE = ConfigProp.getPropertyValue(TEMPLATE_FILE, "CellScope");
 
     // DASA, DASE, DASO Template (Part of SDD)                                                                       

@@ -139,14 +139,16 @@ public class DataAcquisitionGenerator extends BasicGenerator {
 		
 		setStudyUri(URIUtils.replacePrefixEx((String)row.get("hasco:isDataAcquisitionOf")));
 		
+		/*
 		for (ObjectCollection oc : ObjectCollection.findByStudyUri(da.getStudyUri())) {
 			if ((isEpiData && oc.getTypeUri().equals(URIUtils.replacePrefixEx("hasco:SubjectGroup")))
 					|| (!isEpiData && oc.getTypeUri().equals(URIUtils.replacePrefixEx("hasco:SampleCollection")))) {
-				da.setRowScopeUri(oc.getUri());
+			        da.setRowScopeUri(oc.getUri());
 				System.out.println("Set RowScopeUri to: " + oc.getUri());
 				break;
 			}
 		}
+                */
 		
 		SysUser user = SysUser.findByEmail(ownerEmail);
 		if (null == user) {

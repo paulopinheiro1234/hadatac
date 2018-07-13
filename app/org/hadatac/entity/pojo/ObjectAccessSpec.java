@@ -101,10 +101,10 @@ public class ObjectAccessSpec extends HADatAcThing {
     private String elevation;
     @Field("dataset_uri_str_multi")
     private List<String> datasetURIs;
-    @Field("globalscope_uri_str")
-    private String rowScopeUri;
-    @Field("globalscope_name_str")
-    private String rowScopeName;
+    //@Field("globalscope_uri_str")
+    //private String rowScopeUri;
+    //@Field("globalscope_name_str")
+    //private String rowScopeName;
     @Field("localscope_uri_str_multi")
     private List<String> cellScopeUri;
     @Field("localscope_name_str_multi")
@@ -143,8 +143,8 @@ public class ObjectAccessSpec extends HADatAcThing {
         typeURIs = new ArrayList<String>();
         associatedURIs = new ArrayList<String>();
         deployment = null;
-        rowScopeUri = null;
-        rowScopeName = null;
+        //rowScopeUri = null;
+        //rowScopeName = null;
         cellScopeUri = new ArrayList<String>();
         cellScopeName = new ArrayList<String>();
     }
@@ -501,12 +501,13 @@ public class ObjectAccessSpec extends HADatAcThing {
     }
 
     public boolean hasScope() {
-	return (hasRowScope() || hasCellScope()); 
+	return (hasCellScope()); 
+	//return (hasRowScope() || hasCellScope()); 
     }
     
-    public boolean hasRowScope() {
-        return (rowScopeUri != null && !rowScopeUri.equals(""));
-    }
+    //public boolean hasRowScope() {
+    //    return (rowScopeUri != null && !rowScopeUri.equals(""));
+    //}
 
     public boolean hasCellScope() {
         if (cellScopeUri != null && cellScopeUri.size() > 0) {
@@ -519,6 +520,7 @@ public class ObjectAccessSpec extends HADatAcThing {
         return false;
     }
     
+    /*
     public String getRowScopeUri() {
         return rowScopeUri;
     }
@@ -547,6 +549,7 @@ public class ObjectAccessSpec extends HADatAcThing {
     public void setRowScopeName(String rowScopeName) {
         this.rowScopeName = rowScopeName;
     }
+    */
 
     public List<String> getCellScopeUri() {
         return cellScopeUri;
@@ -883,12 +886,12 @@ public class ObjectAccessSpec extends HADatAcThing {
                     dataAcquisition.addDatasetUri(i.next().toString());
                 }
             }
-            if (doc.getFieldValue("globalscope_uri_str") != null) {
-                dataAcquisition.setRowScopeUri(doc.getFieldValue("globalscope_uri_str").toString());
-            }
-            if (doc.getFieldValue("globalscope_name_str") != null) {
-                dataAcquisition.setRowScopeName(doc.getFieldValue("globalscope_name_str").toString());
-            }
+            //if (doc.getFieldValue("globalscope_uri_str") != null) {
+            //    dataAcquisition.setRowScopeUri(doc.getFieldValue("globalscope_uri_str").toString());
+            //}
+            //if (doc.getFieldValue("globalscope_name_str") != null) {
+            //    dataAcquisition.setRowScopeName(doc.getFieldValue("globalscope_name_str").toString());
+            //}
             if (doc.getFieldValues("localscope_uri_str_multi") != null) {
                 i = doc.getFieldValues("localscope_uri_str_multi").iterator();
                 while (i.hasNext()) {
@@ -1209,8 +1212,8 @@ public class ObjectAccessSpec extends HADatAcThing {
         builder.append("platform_uri: " + this.platformUri + "\n");
         builder.append("location: " + this.location + "\n");
         builder.append("elevation: " + this.elevation + "\n");
-        builder.append("rowScopeUri: " + this.rowScopeUri + "\n");
-        builder.append("rowScopeName: " + this.rowScopeName + "\n");
+        //builder.append("rowScopeUri: " + this.rowScopeUri + "\n");
+        //builder.append("rowScopeName: " + this.rowScopeName + "\n");
         for (String cellUri : cellScopeUri) {
             builder.append("cellScopeUri: " + cellUri + "\n");
         }
@@ -1259,7 +1262,7 @@ public class ObjectAccessSpec extends HADatAcThing {
         row.put("hasco:hasDeployment", URIUtils.replaceNameSpaceEx(getDeploymentUri()));
         row.put("hasco:isDataAcquisitionOf", URIUtils.replaceNameSpaceEx(getStudyUri()));
         row.put("hasco:hasSchema", URIUtils.replaceNameSpaceEx(getSchemaUri()));
-        row.put("hasco:hasRowScope", URIUtils.replaceNameSpaceEx(getRowScopeUri()));
+        //row.put("hasco:hasRowScope", URIUtils.replaceNameSpaceEx(getRowScopeUri()));
         row.put("hasco:hasCellScope", cellUri); 
         row.put("hasco:hasTriggeringEvent", getTriggeringEventName());
         row.put("prov:endedAtTime", getEndedAt().startsWith("9999")? "" : getEndedAt());

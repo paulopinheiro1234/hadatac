@@ -64,9 +64,9 @@ public class OASGenerator extends BasicGenerator {
 	    return rec.getValueByColumnName(Templates.DEPLOYMENTURI);
 	}
     
-        private String getRowScope(Record rec) {
-	    return rec.getValueByColumnName(Templates.ROWSCOPE);
-	}
+        //private String getRowScope(Record rec) {
+	//    return rec.getValueByColumnName(Templates.ROWSCOPE);
+	//}
 
 	private String getCellScope(Record rec) {
 	    return rec.getValueByColumnName(Templates.CELLSCOPE);
@@ -120,11 +120,11 @@ public class OASGenerator extends BasicGenerator {
 
 		String deploymentUri = URIUtils.replacePrefixEx(getDeployment(rec));
 		
-		String rowScopeStr = getRowScope(rec);
+		//String rowScopeStr = getRowScope(rec);
 
 		String cellScopeStr = getCellScope(rec);
 
-		return createDataAcquisition(row, ownerEmail, permissionUri, deploymentUri, rowScopeStr, cellScopeStr);
+		return createDataAcquisition(row, ownerEmail, permissionUri, deploymentUri, /*rowScopeStr,*/ cellScopeStr);
 	}
 
 	ObjectAccessSpec createDataAcquisition(
@@ -132,7 +132,7 @@ public class OASGenerator extends BasicGenerator {
 			String ownerEmail, 
 			String permissionUri, 
 			String deploymentUri,
-		        String rowScopeStr,
+		        //String rowScopeStr,
 			String cellScopeStr) throws Exception {
 
 	    ObjectAccessSpec da = new ObjectAccessSpec();

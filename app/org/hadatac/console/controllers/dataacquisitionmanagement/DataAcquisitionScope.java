@@ -155,7 +155,7 @@ public class DataAcquisitionScope extends Controller {
 	    System.out.println("  - name : " + str);
 	}
 	
-	return ok(viewScope.render(file_name, da_uri, da.getRowScopeName(), da.getRowScopeUri(), cellScopeName, cellScopeUri));
+	return ok(viewScope.render(file_name, da_uri, cellScopeName, cellScopeUri));
     }
 	
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))

@@ -61,7 +61,7 @@ public class PrepareIngestion extends Controller {
         // Load associated DA
         if (da_uri != null && !da_uri.equals("")) {
             da = ObjectAccessSpec.findByUri(URIUtils.replacePrefixEx(da_uri));
-            System.out.println("Row scope: [" + da.getRowScopeUri() + "]  hasScope: " + da.hasScope());
+            //System.out.println("Row scope: [" + da.getRowScopeUri() + "]  hasScope: " + da.hasScope());
 
             if (da != null) {
                 return ok(prepareIngestion.render(file_name, da, "DA associated with file has been retrieved"));
@@ -299,7 +299,7 @@ public class PrepareIngestion extends Controller {
             return refine(file_name, da_uri, message);
         }
 
-        da.setRowScopeUri(rowScopeUri);
+        //da.setRowScopeUri(rowScopeUri);
         da.setCellScopeUri(cellScopeUriList);
 
         da.saveToSolr();
@@ -391,15 +391,15 @@ public class PrepareIngestion extends Controller {
         // removing a study's relationship also removes scope information
         case "Study":  
             da.setStudyUri("");
-            da.setRowScopeUri("");
-            da.setRowScopeName("");
+            //da.setRowScopeUri("");
+            //da.setRowScopeName("");
             da.setCellScopeUri(new ArrayList<String>());
             da.setCellScopeName(new ArrayList<String>());
             break;
 
         case "Scope":  
-            da.setRowScopeUri("");
-            da.setRowScopeName("");
+            //da.setRowScopeUri("");
+            //da.setRowScopeName("");
             da.setCellScopeUri(new ArrayList<String>());
             da.setCellScopeName(new ArrayList<String>());
             break;
