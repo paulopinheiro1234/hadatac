@@ -222,12 +222,12 @@ public class RestApi extends Controller {
         String sparqlQueryString = NameSpaces.getInstance().printSparqlNameSpaceList() + 
                 "select distinct ?class ?label ?dasa ?unit ?shortname ?unitlabel ?itype ?itypelabel where {" + 
                 "?class rdfs:label ?label ." +
-                "?class dcterms:identifier ?shortname ." + 
                 "?dasa hasco:hasAttribute ?class ." + 
                 "?dasa hasco:hasUnit ?unit . " + 
+                "OPTIONAL { ?dasa rdfs:label ?shortname .} " + 
                 "OPTIONAL { ?unit rdfs:label ?unitlabel . } " +
                 "OPTIONAL { ?class rdfs:subClassOf+ ?itype . " +
-                "           ?itype rdfs:subClassOf <hasco:StudyIndicator> . " +
+                "           ?itype rdfs:subClassOf hasco:StudyIndicator . " +
                 "           ?itype rdfs:label ?itypelabel . }" +
                 "} values ?class { " + classes + "} ";
         
@@ -287,10 +287,10 @@ public class RestApi extends Controller {
         String sparqlQueryString = NameSpaces.getInstance().printSparqlNameSpaceList() + 
                 "select distinct ?indicator ?label where {" + 
                 "?class rdfs:subClassOf+ ?indicator . " + 
-                "?indicator rdfs:subClassOf <hasco:StudyIndicator> ." +
+                "?indicator rdfs:subClassOf hasco:StudyIndicator ." +
                 "?indicator rdfs:label ?label ." + 
                 "} values ?class { " + classes + "} ";
-        //System.out.println("[VariableQuery] sparql query\n" + sparqlQueryString);
+        System.out.println("[VariableQuery] sparql query\n" + sparqlQueryString);
 		
 		ResultSetRewindable resultsrw = SPARQLUtils.select(
                 CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), sparqlQueryString);
