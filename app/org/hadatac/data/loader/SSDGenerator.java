@@ -56,7 +56,8 @@ public class SSDGenerator extends BasicGenerator {
     
     private String getSOCReference(Record rec) {
         String ref = rec.getValueByColumnName(mapCol.get("hasSOCReference"));
-        return kbPrefix + "DASO-" + SDDName + "-" + ref.trim().replace(" ","").replace("_","-").replace("??", "");
+//        return kbPrefix + "DASO-" + SDDName + "-" + ref.trim().replace(" ","").replace("_","-").replace("??", "");
+        return ref.trim().replace(" ","").replace("_","-");
     }
 
     private String gethasScopeUri(Record rec) {

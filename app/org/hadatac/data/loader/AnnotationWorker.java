@@ -6,6 +6,7 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
@@ -17,6 +18,8 @@ import org.hadatac.data.api.DataFactory;
 import org.hadatac.entity.pojo.ObjectAccessSpec;
 import org.hadatac.entity.pojo.DataFile;
 import org.hadatac.entity.pojo.DPL;
+import org.hadatac.entity.pojo.DataAcquisitionSchema;
+import org.hadatac.entity.pojo.DataAcquisitionSchemaObject;
 import org.hadatac.entity.pojo.SDD;
 import org.hadatac.entity.pojo.SSD;
 import org.hadatac.metadata.loader.URIUtils;
@@ -33,7 +36,7 @@ public class AnnotationWorker {
                 ConfigProp.getDefaultOwnerEmail());
     }
 
-    public static void autoAnnotate() {
+	public static void autoAnnotate() {
         if(ConfigProp.getPropertyValue("autoccsv.config", "auto").equals("off")){
             return;
         }
@@ -42,6 +45,7 @@ public class AnnotationWorker {
         String path_unproc = ConfigProp.getPathUnproc();
         List<DataFile> proc_files = DataFile.findAll(DataFile.PROCESSED);
         List<DataFile> unproc_files = DataFile.findAll(DataFile.UNPROCESSED);
+        List<String> proc_sdds = new ArrayList<String>();
         DataFile.filterNonexistedFiles(path_proc, proc_files);
         DataFile.filterNonexistedFiles(path_unproc, unproc_files);
         
@@ -59,6 +63,7 @@ public class AnnotationWorker {
             String file_name = file.getFileName();
             String filePath = path_unproc + "/" + file_name;
             AnnotationLog log = new AnnotationLog(file_name);
+            
             
             if (proc_files.contains(file)) {
                 log.addline(Feedback.println(Feedback.WEB, String.format(
@@ -114,8 +119,49 @@ public class AnnotationWorker {
             } else if (file_name.startsWith("ACQ-")) {
                 chain = annotateACQFile(recordFile, true);
             } else if (file_name.startsWith("OAS-")) {
-                chain = annotateOASFile(recordFile, true);
-	    }else if (file_name.startsWith("SDD-")) {
+            		Record record = recordFile.getRecords().get(0);
+                    String das_uri = URIUtils.convertToWholeURI(ConfigProp.getKbPrefix() + "DAS-" + record.getValueByColumnName("Study ID"));
+                    System.out.println("das_uri " + das_uri);
+                    DataAcquisitionSchema das = DataAcquisitionSchema.find(das_uri);
+                    if (das == null) {
+                    	log.addline(Feedback.println(Feedback.WEB, 
+                                "[ERROR] The SDD of study " + record.getValueByColumnName("Study ID") + " can not be found. Check if it is already ingested."));
+                    } else {
+                    	List<DataAcquisitionSchemaObject> loo = das.getObjects();
+                    	Map<String, String> maploo = new HashMap<String, String>(); 
+                    	Map<String, DataAcquisitionSchemaObject> maploo2 = new HashMap<String, DataAcquisitionSchemaObject>(); 
+                    	for (DataAcquisitionSchemaObject i : loo) {
+                    		try {
+                    			maploo.put(i.getLabel(), i.getInRelationToLabel());
+                    		} catch (Exception e) {
+                    			maploo.put(i.getLabel(), "");
+                    		}
+                    		
+                    		maploo2.put(i.getLabel(), i);
+                    	}
+
+                    	for (DataAcquisitionSchemaObject i : loo) {
+                    		if (i.getLabel().equals("??child") || i.getLabel().equals("??mother")){
+                        		log.addline(Feedback.println(Feedback.WEB, 
+                                        "[LOG] object " + i.getLabel() + " has path label: " + i.getLabel().replace("??", "")));
+                    		} else {
+                    			if (i.getInRelationToLabel().length() > 0) {
+                            		if (i.getInRelationToLabel().equals("??child") || i.getLabel().equals("??mother")){
+                                		log.addline(Feedback.println(Feedback.WEB, 
+                                                "[LOG] object " + i.getLabel() + " has path label: " + i.getInRelationToLabel().replace("??", "") + " " + i.getEntityLabel()));
+                            		} else {
+                                		log.addline(Feedback.println(Feedback.WEB, 
+                                                "[LOG] object " + i.getLabel() + " has path label: " + maploo.get(i.getInRelationToLabel()).replace("??", "") + " " + i.getInRelationToLabel().replace("??", "") + " " + i.getEntityLabel()));
+                            		}
+                    			} else {
+                            		log.addline(Feedback.println(Feedback.WEB, 
+                                            "[ERROR] object " + i.getLabel() + " has no inRelationToLabel filled"));
+                    			}
+                    		}
+                    	}
+                    }
+            		chain = annotateOASFile(recordFile, true);
+            } else if (file_name.startsWith("SDD-")) {
                 if (file_name.endsWith(".xlsx")) {
                     recordFile = new SpreadsheetRecordFile(new File(filePath), "InfoSheet");
                     if (!recordFile.isValid()) {
@@ -125,6 +171,7 @@ public class AnnotationWorker {
                     }
                 }
                 chain = annotateDataAcquisitionSchemaFile(recordFile);
+                
             } else if (file_name.startsWith("SSD-")) {
                 chain = annotateSSDFile(recordFile);
             } else {
