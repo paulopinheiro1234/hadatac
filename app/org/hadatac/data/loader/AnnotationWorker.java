@@ -45,7 +45,6 @@ public class AnnotationWorker {
         String path_unproc = ConfigProp.getPathUnproc();
         List<DataFile> proc_files = DataFile.findAll(DataFile.PROCESSED);
         List<DataFile> unproc_files = DataFile.findAll(DataFile.UNPROCESSED);
-        List<String> proc_sdds = new ArrayList<String>();
         DataFile.filterNonexistedFiles(path_proc, proc_files);
         DataFile.filterNonexistedFiles(path_unproc, unproc_files);
         
@@ -128,16 +127,18 @@ public class AnnotationWorker {
                                 "[ERROR] The SDD of study " + record.getValueByColumnName("Study ID") + " can not be found. Check if it is already ingested."));
                     } else {
                     	List<DataAcquisitionSchemaObject> loo = das.getObjects();
-                    	Map<String, String> maploo = new HashMap<String, String>(); 
-                    	Map<String, DataAcquisitionSchemaObject> maploo2 = new HashMap<String, DataAcquisitionSchemaObject>(); 
+                    	Map<String, String> map2InRelationTo = new HashMap<String, String>(); 
+                    	Map<String, String> map2DerivedFrom = new HashMap<String, String>(); 
+                    	Map<String, DataAcquisitionSchemaObject> map2DASO = new HashMap<String, DataAcquisitionSchemaObject>(); 
                     	for (DataAcquisitionSchemaObject i : loo) {
                     		try {
-                    			maploo.put(i.getLabel(), i.getInRelationToLabel());
+                    			map2InRelationTo.put(i.getLabel(), i.getInRelationToLabel());
+                    			map2DerivedFrom.put(i.getLabel(), i.getInRelationTo());
                     		} catch (Exception e) {
-                    			maploo.put(i.getLabel(), "");
+                    			map2InRelationTo.put(i.getLabel(), "");
                     		}
                     		
-                    		maploo2.put(i.getLabel(), i);
+                    		map2DASO.put(i.getLabel(), i);
                     	}
 
                     	for (DataAcquisitionSchemaObject i : loo) {
@@ -151,11 +152,16 @@ public class AnnotationWorker {
                                                 "[LOG] object " + i.getLabel() + " has path label: " + i.getInRelationToLabel().replace("??", "") + " " + i.getEntityLabel()));
                             		} else {
                                 		log.addline(Feedback.println(Feedback.WEB, 
-                                                "[LOG] object " + i.getLabel() + " has path label: " + maploo.get(i.getInRelationToLabel()).replace("??", "") + " " + i.getInRelationToLabel().replace("??", "") + " " + i.getEntityLabel()));
+                                                "[LOG] object " + i.getLabel() + " has path label: " + map2InRelationTo.get(i.getInRelationToLabel()).replace("??", "") + " " + i.getInRelationToLabel().replace("??", "") + " " + i.getEntityLabel()));
                             		}
                     			} else {
-                            		log.addline(Feedback.println(Feedback.WEB, 
-                                            "[ERROR] object " + i.getLabel() + " has no inRelationToLabel filled"));
+                    				if (i.getWasDerivedFrom().length() > 0){
+                                		log.addline(Feedback.println(Feedback.WEB, 
+                                                "[LOG] object " + i.getLabel() + " has path label: " + i.getWasDerivedFrom().replace("??", "")));
+                    				} else {
+                                		log.addline(Feedback.println(Feedback.WEB, 
+                                                "[ERROR] object " + i.getLabel() + " has no inRelationToLabel"));	
+                    				}
                     			}
                     		}
                     	}

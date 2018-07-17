@@ -8,6 +8,7 @@ public class DASOForm {
     public String newEntity;
     public String newInRelationTo;
     public String newRelation;
+    public String newWasDerivedFrom;
     
     public String getNewUri() {
 	return newUri;
@@ -43,6 +44,10 @@ public class DASOForm {
     
     public String getNewInRelationTo() {
 	return newInRelationTo;
+    }
+    
+    public String getNewWasDerivedFrom() {
+	return newWasDerivedFrom;
     }
 
     public void setNewInRelationTo(String newInRelationTo) {
