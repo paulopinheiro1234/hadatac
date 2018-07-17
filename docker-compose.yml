@@ -47,8 +47,11 @@ services:
         networks:
             hadatac:
                 aliases:
-                    - hadatac.org
                     - hadatac
+        volumes:
+            - ./volumes/unprocessed_csv:/root/app/unprocessed_csv
+            - ./volumes/processed_csv:/root/app/processed_csv
+            - ./volumes/downloaded_csv:/root/app/downloaded_csv
         links:
             - blazegraph
             - solr
