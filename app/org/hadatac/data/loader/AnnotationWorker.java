@@ -119,7 +119,7 @@ public class AnnotationWorker {
                 chain = annotateACQFile(recordFile, true);
             } else if (file_name.startsWith("OAS-")) {
             		Record record = recordFile.getRecords().get(0);
-                    String das_uri = URIUtils.convertToWholeURI(ConfigProp.getKbPrefix() + "DAS-" + record.getValueByColumnName("Study ID"));
+                    String das_uri = URIUtils.convertToWholeURI(ConfigProp.getKbPrefix() + "DAS-" + record.getValueByColumnName("data dict").replace("SDD-", ""));
                     System.out.println("das_uri " + das_uri);
                     DataAcquisitionSchema das = DataAcquisitionSchema.find(das_uri);
                     if (das == null) {
@@ -129,7 +129,10 @@ public class AnnotationWorker {
                     	List<DataAcquisitionSchemaObject> loo = das.getObjects();
                     	Map<String, String> map2InRelationTo = new HashMap<String, String>(); 
                     	Map<String, String> map2DerivedFrom = new HashMap<String, String>(); 
-                    	Map<String, DataAcquisitionSchemaObject> map2DASO = new HashMap<String, DataAcquisitionSchemaObject>(); 
+                    	Map<String, DataAcquisitionSchemaObject> map2DASO = new HashMap<String, DataAcquisitionSchemaObject>();
+                        Map<String, String> codeMappings = new HashMap<String, String>();
+                        codeMappings.put("uberon:0000033", "Head");
+                        codeMappings.put("chebi:18231", "Arsenic Acid");
                     	for (DataAcquisitionSchemaObject i : loo) {
                     		try {
                     			map2InRelationTo.put(i.getLabel(), i.getInRelationToLabel());
@@ -142,22 +145,27 @@ public class AnnotationWorker {
                     	}
 
                     	for (DataAcquisitionSchemaObject i : loo) {
-                    		if (i.getLabel().equals("??child") || i.getLabel().equals("??mother")){
+                    		if (i.getLabel().contains("child") || i.getLabel().contains("mother")){
                         		log.addline(Feedback.println(Feedback.WEB, 
-                                        "[LOG] object " + i.getLabel() + " has path label: " + i.getLabel().replace("??", "")));
+                                        "[LOG] object " + i.getLabel() + " has path label: " + i.getLabel().replace("??", "").replace("child", "Child ").replace("mother", "Mother ")));
                     		} else {
                     			if (i.getInRelationToLabel().length() > 0) {
-                            		if (i.getInRelationToLabel().equals("??child") || i.getLabel().equals("??mother")){
+                            		if (i.getInRelationToLabel().contains("child") || i.getLabel().contains("mother")){
                                 		log.addline(Feedback.println(Feedback.WEB, 
-                                                "[LOG] object " + i.getLabel() + " has path label: " + i.getInRelationToLabel().replace("??", "") + " " + i.getEntityLabel()));
+                                                "[LOG] object " + i.getLabel() + " has path label: " + i.getInRelationToLabel().replace("??", "").replace("child", "Child ").replace("mother", "Mother ") + " " + i.getEntityLabel(codeMappings)));
                             		} else {
-                                		log.addline(Feedback.println(Feedback.WEB, 
-                                                "[LOG] object " + i.getLabel() + " has path label: " + map2InRelationTo.get(i.getInRelationToLabel()).replace("??", "") + " " + i.getInRelationToLabel().replace("??", "") + " " + i.getEntityLabel()));
+                            			if (map2InRelationTo.get(i.getInRelationToLabel()) != null){
+                                       		log.addline(Feedback.println(Feedback.WEB, 
+                                                    "[LOG] object " + i.getLabel() + " has path label: " + map2InRelationTo.get(i.getInRelationToLabel()).replace("??", "").replace("child", "Child ").replace("mother", "Mother ") + " " + i.getInRelationToLabel().replace("??", "").replace("child", "Child ").replace("mother", "Mother ") + " " + i.getEntityLabel(codeMappings)));
+                            			} else {
+                                       		log.addline(Feedback.println(Feedback.WEB, 
+                                                    "[ERROR] object " + i.getLabel() + " has incomplete path label: " + i.getInRelationToLabel().replace("??", "").replace("child", "Child ").replace("mother", "Mother ") + " " + i.getEntityLabel(codeMappings)));
+                            			}
                             		}
                     			} else {
                     				if (i.getWasDerivedFrom().length() > 0){
                                 		log.addline(Feedback.println(Feedback.WEB, 
-                                                "[LOG] object " + i.getLabel() + " has path label: " + i.getWasDerivedFrom().replace("??", "")));
+                                                "[LOG] object " + i.getLabel() + " has path label: " + i.getWasDerivedFrom().replace("??", "").replace("child", "Child ").replace("mother", "Mother ")));
                     				} else {
                                 		log.addline(Feedback.println(Feedback.WEB, 
                                                 "[ERROR] object " + i.getLabel() + " has no inRelationToLabel"));	

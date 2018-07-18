@@ -147,9 +147,26 @@ public class DataAcquisitionSchemaObject extends HADatAcThing {
         return URIUtils.replaceNameSpaceEx(entity);
     }
 
+    public String getEntityLabel(Map<String, String> codeMappings) {
+        if (entity == null || entityLabel.equals("")) {
+        	String newLabel = URIUtils.replaceNameSpaceEx(entity);
+        	if (newLabel.contains(":")) {
+    			if (codeMappings.containsKey(newLabel)){
+    				return codeMappings.get(newLabel);
+    			} else {
+    				return newLabel.split("\\:")[1];
+    			}
+        	} else {
+        		return newLabel;
+        	}
+        } else {
+        	return entityLabel;
+        }
+    }
+    
     public String getEntityLabel() {
         if (entity == null || entityLabel.equals("")) {
-            return URIUtils.replaceNameSpaceEx(entity);
+        	return URIUtils.replaceNameSpaceEx(entity);
         }
         return entityLabel;
     }
