@@ -279,7 +279,7 @@ public class DataAcquisitionSchema extends HADatAcThing {
             this.objects = objects;
             for (DataAcquisitionSchemaObject daso : objects) {
                 System.out.println("[OK] DataAcquisitionSchemaObject <" + daso.getUri() + "> is defined in the knowledge base. " + 
-                        "Role: \""  + daso.getRole() + "\"");
+                        "Role: \""  + daso.getRole() + " InRelationTo: \""  + daso.getInRelationToLabel() + "\"");
             }
         }
     }

@@ -50,6 +50,7 @@ public class DataAcquisitionSchemaObject extends HADatAcThing {
     private String inRelationToLabel;
     private String relation;
     private String relationLabel;
+    private String wasDerivedFrom;
 
     public DataAcquisitionSchemaObject(String uri, 
             String label, 
@@ -58,6 +59,8 @@ public class DataAcquisitionSchemaObject extends HADatAcThing {
             String entity, 
             String role, 
             String inRelationTo, 
+            String inRelationToLabel,
+            String wasDerivedFrom,
             String relation) {
         this.uri = uri;
         this.label = label;
@@ -72,10 +75,10 @@ public class DataAcquisitionSchemaObject extends HADatAcThing {
         } catch (Exception e) {
             positionInt = -1;
         }
-        System.out.println("positionInt: " + positionInt);
         this.setEntity(entity);
         this.setRole(role);
         this.setInRelationTo(inRelationTo);
+        this.setWasDerivedFrom(wasDerivedFrom);
         this.setRelation(relation);
     }
 
@@ -144,9 +147,26 @@ public class DataAcquisitionSchemaObject extends HADatAcThing {
         return URIUtils.replaceNameSpaceEx(entity);
     }
 
+    public String getEntityLabel(Map<String, String> codeMappings) {
+        if (entity == null || entityLabel.equals("")) {
+        	String newLabel = URIUtils.replaceNameSpaceEx(entity);
+        	if (newLabel.contains(":")) {
+    			if (codeMappings.containsKey(newLabel)){
+    				return codeMappings.get(newLabel);
+    			} else {
+    				return newLabel.split("\\:")[1];
+    			}
+        	} else {
+        		return newLabel;
+        	}
+        } else {
+        	return entityLabel;
+        }
+    }
+    
     public String getEntityLabel() {
         if (entity == null || entityLabel.equals("")) {
-            return URIUtils.replaceNameSpaceEx(entity);
+        	return URIUtils.replaceNameSpaceEx(entity);
         }
         return entityLabel;
     }
@@ -192,6 +212,14 @@ public class DataAcquisitionSchemaObject extends HADatAcThing {
     public String getInRelationTo() {
         return inRelationTo;
     }
+    
+    public String getWasDerivedFrom() {
+        return wasDerivedFrom;
+    }
+    
+    public void setWasDerivedFrom(String wasDerivedFrom) {
+        this.wasDerivedFrom = wasDerivedFrom;
+    }
 
     public String getInRelationToNamespace() {
         return URIUtils.replaceNameSpaceEx(inRelationTo);
@@ -207,10 +235,6 @@ public class DataAcquisitionSchemaObject extends HADatAcThing {
     }
 
     public String getInRelationToLabel() {
-        if (inRelationTo == null || inRelationToLabel.equals("")) {
-            String str = URIUtils.replaceNameSpaceEx(inRelationTo);
-            return str.substring(str.indexOf(":") + 1);
-        }
         return inRelationToLabel;
     }
 
@@ -247,13 +271,16 @@ public class DataAcquisitionSchemaObject extends HADatAcThing {
 
         DataAcquisitionSchemaObject object = null;
         String queryString = NameSpaces.getInstance().printSparqlNameSpaceList() + 
-                "SELECT ?entity ?partOfSchema ?role ?inRelationTo ?relation WHERE { \n" + 
+                "SELECT ?entity ?partOfSchema ?role ?inRelationTo ?relation ?inRelationToStr ?wasDerivedFrom WHERE { \n" + 
                 "   <" + uri + "> a hasco:DASchemaObject . \n" + 
                 "   <" + uri + "> hasco:partOfSchema ?partOfSchema . \n" + 
                 "   OPTIONAL { <" + uri + "> hasco:hasEntity ?entity } . \n" + 
                 "   OPTIONAL { <" + uri + "> hasco:hasRole ?role } .  \n" + 
-                "   OPTIONAL { <" + uri + "> sio:inRelationTo ?inRelationTo } . \n" + 
-                "   OPTIONAL { <" + uri + "> sio:Relation ?relation } . \n" + 
+                "   OPTIONAL { <" + uri + "> sio:inRelationTo ?inRelationTo } . \n" +
+                "   OPTIONAL { <" + uri + "> sio:Relation ?relation } . \n" +
+                "   OPTIONAL { <" + uri + "> ?relation ?inRelationTo } . \n" +
+                "   OPTIONAL { <" + uri + "> hasco:inRelationToLabel ?inRelationToStr } . \n" +
+                "   OPTIONAL { <" + uri + "> <http://hadatac.org/ont/hasco/wasDerivedFrom> ?wasDerivedFrom } . \n" +
                 "}";
 
         //System.out.println("DataAcquisitionSchemaObject find(String uri) query: " + queryString);
@@ -273,7 +300,9 @@ public class DataAcquisitionSchemaObject extends HADatAcThing {
         String entityStr = "";
         String roleStr = "";
         String inRelationToStr = "";
+        String inRelationToLabelStr = "";
         String relationStr = "";
+        String wasDerivedFromStr = "";
 
         try {
             if (soln != null) {
@@ -311,6 +340,22 @@ public class DataAcquisitionSchemaObject extends HADatAcThing {
                 } catch (Exception e1) {
                     inRelationToStr = "";
                 }
+                
+                try {
+                    if (soln.getResource("inRelationToStr") != null) {
+                    	inRelationToLabelStr = soln.getResource("inRelationToStr").toString();
+                    }
+                } catch (Exception e1) {
+                	inRelationToLabelStr = "";
+                }
+                
+                try {
+                    if (soln.getLiteral("wasDerivedFrom") != null) {
+                    	wasDerivedFromStr = soln.getLiteral("wasDerivedFrom").toString();
+                    }
+                } catch (Exception e1) {
+                	wasDerivedFromStr = "";
+                }
 
                 try {
                     if (soln.getResource("relation") != null && soln.getResource("relation").getURI() != null) {
@@ -327,6 +372,8 @@ public class DataAcquisitionSchemaObject extends HADatAcThing {
                         entityStr,
                         roleStr,
                         inRelationToStr,
+                        inRelationToLabelStr,
+                        wasDerivedFromStr,
                         relationStr);
             }
         } catch (Exception e) {

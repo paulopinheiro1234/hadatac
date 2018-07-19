@@ -13,7 +13,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.jena.query.QuerySolution;
+import org.apache.jena.query.ResultSetRewindable;
 import org.hadatac.console.controllers.annotator.AnnotationLog;
+import org.hadatac.console.http.SPARQLUtils;
 import org.hadatac.data.api.DataFactory;
 import org.hadatac.entity.pojo.ObjectAccessSpec;
 import org.hadatac.entity.pojo.DataFile;
@@ -23,8 +26,11 @@ import org.hadatac.entity.pojo.DataAcquisitionSchemaObject;
 import org.hadatac.entity.pojo.SDD;
 import org.hadatac.entity.pojo.SSD;
 import org.hadatac.metadata.loader.URIUtils;
+import org.hadatac.utils.CollectionUtil;
 import org.hadatac.utils.ConfigProp;
 import org.hadatac.utils.Feedback;
+import org.hadatac.utils.FirstLabel;
+import org.hadatac.utils.NameSpaces;
 
 public class AnnotationWorker {
 
@@ -45,7 +51,6 @@ public class AnnotationWorker {
         String path_unproc = ConfigProp.getPathUnproc();
         List<DataFile> proc_files = DataFile.findAll(DataFile.PROCESSED);
         List<DataFile> unproc_files = DataFile.findAll(DataFile.UNPROCESSED);
-        List<String> proc_sdds = new ArrayList<String>();
         DataFile.filterNonexistedFiles(path_proc, proc_files);
         DataFile.filterNonexistedFiles(path_unproc, unproc_files);
         
@@ -119,8 +124,90 @@ public class AnnotationWorker {
             } else if (file_name.startsWith("ACQ-")) {
                 chain = annotateACQFile(recordFile, true);
             } else if (file_name.startsWith("OAS-")) {
+            	
+	                Map<String, String> refLabel = new HashMap<String, String>();
+	                Map<String, String> refScope = new HashMap<String, String>();
+	                Map<String, String> scopeLabel = new HashMap<String, String>();
+            		
+	                String queryString = NameSpaces.getInstance().printSparqlNameSpaceList() + 
+	                        "SELECT ?oc ?ref ?label ?scope WHERE { \n" + 
+	                        "?oc <http://hadatac.org/ont/hasco/hasSOCReference> ?ref . \n" + 
+	                        "	OPTIONAL {?oc hasco:hasGroundingLabel ?label} .  \n" + 
+	                        "	OPTIONAL {?oc hasco:hasScope ?scope } " +
+	                        "}";
+	                
+	                ResultSetRewindable resultsrw = SPARQLUtils.select(CollectionUtil.getCollectionsName(
+	                        CollectionUtil.METADATA_SPARQL), queryString);
+	
+	                if (!resultsrw.hasNext()) {
+	                    System.out.println("[WARNING] OAS ingestion: Could not find triples on OCs, SSD is probably not correctly ingested.");
+	                    return;
+	                }
+	                
+	                while (resultsrw.hasNext()) {
+	                    QuerySolution soln = resultsrw.next();
+//                    	log.addline(Feedback.println(Feedback.WEB, 
+//                                "[QUERY] " + soln.toString()));
+		                String ocStr = "";
+		                String refStr = "";
+		                String labelStr = "";
+		                String scopeStr = "";
+	
+		                try {
+		                    if (soln != null) {
+		                        try {
+		                            if (soln.getResource("oc") != null) {
+		                            	ocStr = soln.getResource("oc").toString();
+		                            }
+		                        } catch (Exception e1) {
+		                        	ocStr = "";
+		                        }
+		                        
+		                        try {
+		                            if (soln.getLiteral("ref") != null) {
+		                            	refStr = soln.getLiteral("ref").toString();
+		                            }
+		                        } catch (Exception e1) {
+		                        	refStr = "";
+		                        }
+		                        
+		                        try {
+		                            if (soln.getLiteral("label") != null) {
+		                            	labelStr = soln.getLiteral("label").toString();
+		                            }
+		                        } catch (Exception e1) {
+		                        	labelStr = "";
+		                        }
+		                        
+		                        try {
+		                            if (soln.getResource("scope") != null) {
+		                            	scopeStr = soln.getResource("scope").toString();
+		                            }
+		                        } catch (Exception e1) {
+		                        	scopeStr = "";
+		                        }
+		                        
+		                        if (refStr.length() > 0 && labelStr.length() > 0) {
+			                        refLabel.put(refStr, labelStr);
+//			                    	log.addline(Feedback.println(Feedback.WEB, 
+//			                                "[refLabel] " + refStr + " " + labelStr));                      	
+		                        }
+		                        
+		                        if (refStr.length() > 0 && scopeStr.length() > 0) {
+			                        refScope.put(refStr, scopeStr);	
+		                        }
+		                        
+		                        if (ocStr.length() > 0 && labelStr.length() > 0) {
+			                        scopeLabel.put(ocStr, labelStr);	
+		                        }
+		                    }
+		                } catch (Exception e) {
+		                    System.out.println("[ERROR] : " + e.getMessage());	                  
+		                }
+	                }
+            	
             		Record record = recordFile.getRecords().get(0);
-                    String das_uri = URIUtils.convertToWholeURI(ConfigProp.getKbPrefix() + "DAS-" + record.getValueByColumnName("Study ID"));
+                    String das_uri = URIUtils.convertToWholeURI(ConfigProp.getKbPrefix() + "DAS-" + record.getValueByColumnName("data dict").replace("SDD-", ""));
                     System.out.println("das_uri " + das_uri);
                     DataAcquisitionSchema das = DataAcquisitionSchema.find(das_uri);
                     if (das == null) {
@@ -128,34 +215,67 @@ public class AnnotationWorker {
                                 "[ERROR] The SDD of study " + record.getValueByColumnName("Study ID") + " can not be found. Check if it is already ingested."));
                     } else {
                     	List<DataAcquisitionSchemaObject> loo = das.getObjects();
-                    	Map<String, String> maploo = new HashMap<String, String>(); 
-                    	Map<String, DataAcquisitionSchemaObject> maploo2 = new HashMap<String, DataAcquisitionSchemaObject>(); 
+                    	Map<String, String> map2InRelationTo = new HashMap<String, String>(); 
+                    	Map<String, String> map2DerivedFrom = new HashMap<String, String>(); 
+                    	Map<String, DataAcquisitionSchemaObject> map2DASO = new HashMap<String, DataAcquisitionSchemaObject>();
+                        Map<String, String> codeMappings = new HashMap<String, String>();
+                        codeMappings.put("uberon:0000033", "Head");
+                        codeMappings.put("chebi:18231", "Arsenic Acid");
                     	for (DataAcquisitionSchemaObject i : loo) {
                     		try {
-                    			maploo.put(i.getLabel(), i.getInRelationToLabel());
+                    			map2InRelationTo.put(i.getLabel(), i.getInRelationToLabel());
+                    			map2DerivedFrom.put(i.getLabel(), i.getInRelationTo());
                     		} catch (Exception e) {
-                    			maploo.put(i.getLabel(), "");
+                    			map2InRelationTo.put(i.getLabel(), "");
                     		}
                     		
-                    		maploo2.put(i.getLabel(), i);
+                    		map2DASO.put(i.getLabel(), i);
                     	}
 
                     	for (DataAcquisitionSchemaObject i : loo) {
-                    		if (i.getLabel().equals("??child") || i.getLabel().equals("??mother")){
+                    		
+                    		System.out.println("VAVAVA :" + i.getLabel());
+                    		if (i.getLabel().contains("child") || i.getLabel().contains("mother")){
                         		log.addline(Feedback.println(Feedback.WEB, 
-                                        "[LOG] object " + i.getLabel() + " has path label: " + i.getLabel().replace("??", "")));
+                                        "[LOG] object " + i.getLabel() + " has path label: " + i.getLabel().replace("??", "").replace("child", "Child ").replace("mother", "Mother ")));
                     		} else {
                     			if (i.getInRelationToLabel().length() > 0) {
-                            		if (i.getInRelationToLabel().equals("??child") || i.getLabel().equals("??mother")){
+                    				System.out.println("VAVAVA2 :" + i.getLabel());
+                            		if (refLabel.containsKey(i.getInRelationToLabel())){
                                 		log.addline(Feedback.println(Feedback.WEB, 
-                                                "[LOG] object " + i.getLabel() + " has path label: " + i.getInRelationToLabel().replace("??", "") + " " + i.getEntityLabel()));
+                                                "[LOG] object " + i.getLabel() + " has path label: " + refLabel.get(i.getInRelationToLabel()) + " " + i.getEntityLabel(codeMappings)));
                             		} else {
-                                		log.addline(Feedback.println(Feedback.WEB, 
-                                                "[LOG] object " + i.getLabel() + " has path label: " + maploo.get(i.getInRelationToLabel()).replace("??", "") + " " + i.getInRelationToLabel().replace("??", "") + " " + i.getEntityLabel()));
+                            			if (refScope.containsKey(i.getInRelationToLabel())){
+                                       		log.addline(Feedback.println(Feedback.WEB, 
+                                                    "[LOG] object " + i.getLabel() + " has path label: " + scopeLabel.get(refScope.get(i.getInRelationToLabel())) + " " + i.getInRelationToLabel().replace("??", "").replace("child", "Child ").replace("mother", "Mother ") + " " + i.getEntityLabel(codeMappings)));
+
+                            			} else {
+                                			if (map2InRelationTo.get(i.getInRelationToLabel()) != null){
+                                				System.out.println("VAVAVA3 :" + i.getLabel() + " " + i.getInRelationToLabel() + " " + map2InRelationTo.get(i.getInRelationToLabel()));
+                                				if (refLabel.containsKey(map2InRelationTo.get(i.getInRelationToLabel()))) {
+                                               		log.addline(Feedback.println(Feedback.WEB, 
+                                                            "[LOG] object " + i.getLabel() + " has path label: " + refLabel.get(map2InRelationTo.get(i.getInRelationToLabel())) + " " + i.getInRelationToLabel().replace("??", "").replace("child", "Child ").replace("mother", "Mother ") + " " + i.getEntityLabel(codeMappings)));
+                                				} else if (refScope.containsKey(map2InRelationTo.get(i.getInRelationToLabel()))) {
+                                               		log.addline(Feedback.println(Feedback.WEB, 
+                                                            "[LOG] object " + i.getLabel() + " has path label: " + scopeLabel.get(refScope.get(i.getInRelationToLabel())) + " " + i.getInRelationToLabel().replace("??", "").replace("child", "Child ").replace("mother", "Mother ") + " " + i.getEntityLabel(codeMappings)));
+                                				}
+                                				
+                                			} else {
+                                				System.out.println("VAVAVA4 :" + i.getLabel());
+                                           		log.addline(Feedback.println(Feedback.WEB, 
+                                                        "[ERROR] object " + i.getLabel() + " has incomplete path label: " + i.getInRelationToLabel().replace("??", "").replace("child", "Child ").replace("mother", "Mother ") + " " + i.getEntityLabel(codeMappings)));
+                                			}	
+                            			}
                             		}
                     			} else {
-                            		log.addline(Feedback.println(Feedback.WEB, 
-                                            "[ERROR] object " + i.getLabel() + " has no inRelationToLabel filled"));
+                    				System.out.println("VAVAVA5 :" + i.getLabel());
+                    				if (i.getWasDerivedFrom().length() > 0){
+                                		log.addline(Feedback.println(Feedback.WEB, 
+                                                "[LOG] object " + i.getLabel() + " has path label: " + i.getWasDerivedFrom().replace("??", "").replace("child", "Child ").replace("mother", "Mother ")));
+                    				} else {
+                                		log.addline(Feedback.println(Feedback.WEB, 
+                                                "[ERROR] object " + i.getLabel() + " has no path to any object that has grounding label."));	
+                    				}
                     			}
                     		}
                     	}
