@@ -23,12 +23,6 @@ RUNNING_PID
 ./processed_csv/
 ./unprocessed_csv/
 ./downloaded_csv/
-./volumes/processed_csv/*
-./volumes/unprocessed_csv/*
-./volumes/downloaded_csv/*
-!./volumes/processed_csv/.gitkeep
-!./volumes/unprocessed_csv/.gitkeep
-!./volumes/downloaded_csv/.gitkeep
 sddtmp/
 dpltmp/
 *.swp
