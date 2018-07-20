@@ -33,14 +33,22 @@ COPY . /root/app/
 # Copy the Docker hadatac.conf file over the original
 COPY ./conf/hadatac-docker.conf /root/app/conf/hadatac.conf
 
+# Copy the Docker version of the autoccsv.config file over
+COPY ./conf/autoccsv-docker.config /root/app/conf/autoccsv.config
+
 # Change the working dir to the app to compile
 WORKDIR /root/app
 
 # Test compile the app (this can take a long time ~30 minutes or longer depending on the computer and its internet connection speed)
 RUN sbt compile && sbt test:compile
 
+# Create the csv folders so we can copy data into them right away
+RUN mkdir -p /root/app/csvs/processed_csv /root/app/csvs/unprocessed_csv /root/app/csvs/downloaded_csv
+
 # Expose the port the play app runs on
 EXPOSE 9000
+
+VOLUME ["/root/app/csvs"]
 
 # Run the app when starting up the Docker container
 ENTRYPOINT ["sbt"]
