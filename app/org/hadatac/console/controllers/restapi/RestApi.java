@@ -381,7 +381,7 @@ public class RestApi extends Controller {
                 "   <" + ocUri + "> hasco:isMemberOf  ?studyUri . " +
                 " } ";
 
-        //System.out.println("[ocQuery] sparql query\n" + sparqlQueryString);
+        System.out.println("[ocQuery] sparql query\n" + sparqlQueryString);
 		
 		ResultSetRewindable resultsrw = SPARQLUtils.select(
                 CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), sparqlQueryString);
@@ -593,7 +593,6 @@ public class RestApi extends Controller {
     }// /getUnitsInStudy
 
 
-
     // ******************
     // ObjectCollections!
     // ******************
@@ -642,7 +641,6 @@ public class RestApi extends Controller {
             return ok(ApiUtil.createResponse(jsonObject, true));
         }
     }// /getOCsInStudy
-
  
 //*************
 //GET SPECIFIC: 
@@ -689,7 +687,6 @@ public class RestApi extends Controller {
             return ok(ApiUtil.createResponse(jsonObject, true));
         }
     }// /getObjectCollection
-
 
     public Result getOCSize(String ocUri){
         ObjectMapper mapper = new ObjectMapper();
@@ -760,6 +757,7 @@ public class RestApi extends Controller {
             temp.put("unituri", SolrUtils.getFieldValue(doc, "unit_uri_str"));
             temp.put("timeValue", SolrUtils.getFieldValue(doc, "time_value_double"));
             temp.put("timeUnit", SolrUtils.getFieldValue(doc, "time_value_unit_uri_str"));
+            temp.put("timestamp", SolrUtils.getFieldValue(doc, "timestamp_date"));
 
             anode.add(temp);
         }// /parse solr results
@@ -799,6 +797,7 @@ public class RestApi extends Controller {
             temp.put("unituri", SolrUtils.getFieldValue(doc, "unit_uri_str"));
             temp.put("timeValue", SolrUtils.getFieldValue(doc, "time_value_double"));
             temp.put("timeUnit", SolrUtils.getFieldValue(doc, "time_value_unit_uri_str"));
+            temp.put("timestamp", SolrUtils.getFieldValue(doc, "timestamp_date"));
 
             anode.add(temp);
         }// /parse solr results

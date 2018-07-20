@@ -327,8 +327,10 @@ public class MeasurementGenerator extends BasicGenerator {
 
 		// Objects defined by Cell Scope
 		if (da.getCellScopeName().get(0).equals("*")) {
-		    measurement.setStudyObjectUri(URIUtils.replacePrefixEx(da.getCellScopeUri().get(0)));
-		    measurement.setObjectUri(URIUtils.replacePrefixEx(da.getCellScopeUri().get(0)));
+		    measurement.setStudyObjectUri(URIUtils.replacePrefixEx(da.getCellScopeUri().get(0).trim()));
+		    measurement.setObjectUri(URIUtils.replacePrefixEx(da.getCellScopeUri().get(0).trim()));
+		    //System.out.println("Measurement: ObjectURI (before replace): <" + da.getCellScopeUri().get(0).trim() + ">");
+		    //System.out.println("Measurement: ObjectURI (after replace): <" + URIUtils.replacePrefixEx(da.getCellScopeUri().get(0).trim()) + ">");
 		} else {
 		    // TO DO: implement rest of cell scope
 		}

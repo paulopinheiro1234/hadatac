@@ -71,6 +71,8 @@
   @if(mode.equals("location") && oc.getTypeUri().equals("http://hadatac.org/ont/hasco/LocationCollection")) {
   <tr>
      <td>@if(oc.getLabel() != null) { @oc.getLabel() }</td>
+     <td>@if(oc.getGroundingLabel() != null) { @oc.getGroundingLabel() }</td>
+     <td>@if(oc.getSOCReference() != null) { @oc.getSOCReference() }</td>
      <td>@if(oc.getComment() != null) { @oc.getComment() }</td>
      <td>@if(oc.getSpaceScopes() != null) { 
        @for(scope <- oc.getSpaceScopes()) {
