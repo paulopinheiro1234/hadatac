@@ -112,9 +112,10 @@ public class StudyObjectGenerator extends BasicGenerator {
         if (getOriginalID(rec).length() > 0) {
             Map<String, Object> row = new HashMap<String, Object>();
             row.put("hasURI", getUri(rec));
-            if (role.length() > 0){
-            	row.put("a", role);	
-            }
+            /*if (role.length() > 0){
+            	//row.put("a", role);	
+            	//row.put(role, OBJECT THAT THIS OBJECT IS A ROLE OF);	
+		}*/
             return row;
         }
         return null;
