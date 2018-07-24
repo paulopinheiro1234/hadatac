@@ -264,11 +264,14 @@ public class MeasurementGenerator extends BasicGenerator {
             if(dasa.getLabel() == schema.getTimestampLabel()) {
                 // full-row regular (Epoch) timemestamp
                 String sTime = record.getValueByColumnIndex(posTimestamp);
+		//System.out.println("Timestamp received: " + sTime);
                 int timeStamp = new BigDecimal(sTime).intValue();
+		//System.out.println("Tmestamp recorded: " + Instant.ofEpochSecond(timeStamp).toString());
                 measurement.setTimestamp(Instant.ofEpochSecond(timeStamp).toString());
             } else if (!schema.getTimeInstantLabel().equals("")) {
                 // full-row regular (XSD) time interval
                 String timeValue = record.getValueByColumnIndex(posTimeInstant);
+		//System.out.println("Timestamp received: " + timeValue);
                 if (timeValue != null) {
                     try {
                         measurement.setTimestamp(timeValue);

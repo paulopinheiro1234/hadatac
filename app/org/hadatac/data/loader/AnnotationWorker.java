@@ -108,11 +108,10 @@ public class AnnotationWorker {
                 if (file_name.endsWith(".xlsx")) {
                     recordFile = new SpreadsheetRecordFile(new File(filePath), "InfoSheet");
                     if (!recordFile.isValid()) {
-                        log.addline(Feedback.println(Feedback.WEB, 
-                                "[ERROR] Missing InfoSheet. "));
+                        log.addline(Feedback.println(Feedback.WEB, "[ERROR] Missing InfoSheet. "));
                         return;
                     }
-                }
+		}
                 chain = annotateDPLFile(recordFile);
             } else if (file_name.startsWith("MAP-")) {
                 if (recordFile.getNumberOfSheets() > 1) {

@@ -447,8 +447,8 @@ GET     /hadatac/api/objectcollections/:ocuri/all         org.hadatac.console.co
 GET     /hadatac/api/objectcollections/:ocuri/:offset     org.hadatac.console.controllers.restapi.RestApi.getObjectsInCollection(ocuri: String, offset: Integer)
 GET     /hadatac/api/indicators/all                       org.hadatac.console.controllers.restapi.RestApi.getAllIndicators()
 GET     /hadatac/api/measurements/:studyuri/:variableuri/:objuri     org.hadatac.console.controllers.restapi.RestApi.getMeasurementsForObj(studyuri: String, variableuri: String, objuri: String)
+GET     /hadatac/api/measurements/:studyuri/:variableuri/:objuri/:fromdatetime/:todatetime     org.hadatac.console.controllers.restapi.RestApi.getMeasurementsForObjInPeriod(studyuri: String, variableuri: String, objuri: String, fromdatetime: String, todatetime: String)
 GET     /hadatac/api/measurements/:studyuri/:variableuri     org.hadatac.console.controllers.restapi.RestApi.getMeasurements(studyuri: String, variableuri: String)
-
 
 
 # Map static resources from the /public folder to the /assets URL path
