@@ -15,6 +15,7 @@ import org.hadatac.entity.pojo.Measurement;
 import org.hadatac.entity.pojo.ObjectCollection;
 import org.hadatac.entity.pojo.DataAcquisitionSchema;
 import org.hadatac.entity.pojo.DataAcquisitionSchemaAttribute;
+import org.hadatac.entity.pojo.ObjectAccessSpec;
 import org.hadatac.utils.State;
 import org.hadatac.utils.CollectionUtil;
 import org.hadatac.console.models.Pivot;
@@ -442,6 +443,14 @@ public class RestApi extends Controller {
         return anode;
     }// /getAllOCs
 
+    private ObjectAccessSpec getOAS(String oasUri) {
+	if (oasUri == null || oasUri.equals("")) {
+	    return null;
+	}
+	ObjectAccessSpec oas = ObjectAccessSpec.findByUri(oasUri);
+	return oas;
+    }// /getOAS
+
 // ********
 // GET ALL:
 // ********
@@ -538,6 +547,7 @@ public class RestApi extends Controller {
             return ok(ApiUtil.createResponse(jsonObject, true));
         }
     }// /getAllUnits
+
 
 
 // ********
@@ -756,25 +766,27 @@ public class RestApi extends Controller {
     // Measurements!
     // *************
 
-    // :study_uri/:variable_uri/
-    public Result getMeasurements(String studyUri, String variableUri){
+    private JsonNode parseMeasurements(SolrDocumentList solrResults) {
+
         ObjectMapper mapper = new ObjectMapper();
-        if(variableUri == null){
-            return badRequest(ApiUtil.createResponse("No variable specified", false));
-        }
-        if(studyUri == null){
-            return badRequest(ApiUtil.createResponse("No study specified", false));
-        }
-        // Solr query
-        SolrDocumentList solrResults = getSolrMeasurements(studyUri, variableUri);
-        if(solrResults.size() < 1){
-            return notFound(ApiUtil.createResponse("Solr Error: no measurements found", false));
-        }
+	Map<String, ObjectAccessSpec> oasMap = new HashMap<String, ObjectAccessSpec>();
+
         // parse results
         ArrayNode anode = mapper.createArrayNode();
         Iterator<SolrDocument> i = solrResults.iterator();
         while (i.hasNext()) {
+
             SolrDocument doc = i.next();
+	    ObjectAccessSpec oas = null;
+	    String oasUri = SolrUtils.getFieldValue(doc, "acquisition_uri_str");
+	    if (!oasMap.containsKey(oasUri)) {
+		oas = getOAS(oasUri);
+		if (oas != null) {
+		    oasMap.put(oasUri, oas);
+		}
+	    } else {
+		oas = oasMap.get(oasUri);
+	    }
             ObjectNode temp = mapper.createObjectNode();
             temp.put("measurementuri", SolrUtils.getFieldValue(doc, "uri"));
             temp.put("studyuri", SolrUtils.getFieldValue(doc, "study_uri_str"));
@@ -785,20 +797,65 @@ public class RestApi extends Controller {
             temp.put("timeValue", SolrUtils.getFieldValue(doc, "time_value_double"));
             temp.put("timeUnit", SolrUtils.getFieldValue(doc, "time_value_unit_uri_str"));
             temp.put("timestamp", SolrUtils.getFieldValue(doc, "timestamp_date"));
+	    if (oas == null || oas.getDeployment() == null) {
+		temp.put("platform", "");
+		temp.put("instrument", "");
+	    } else {
+		if (oas.getDeployment() != null && oas.getDeployment().getPlatform() != null) {
+		    if (oas.getDeployment().getPlatform().getLabel() != null) {
+			temp.put("platform", oas.getDeployment().getPlatform().getLabel());
+		    } else {
+			temp.put("platform", oas.getDeployment().getPlatform().getUri());
+		    }
+		} else {
+		    temp.put("platform", "");
+		}
+		if (oas.getDeployment() != null && oas.getDeployment().getInstrument() != null) {
+		    if (oas.getDeployment().getInstrument().getLabel() != null) {
+			temp.put("instrument", oas.getDeployment().getInstrument().getLabel());
+		    } else {
+			temp.put("instrument", oas.getDeployment().getInstrument().getUri());
+		    }
+		} else {
+		    temp.put("instrument", "");
+		}
+	    }
 
             anode.add(temp);
         }// /parse solr results
+
         if(anode == null){
+            return null;
+        } else {
+            return mapper.convertValue(anode, JsonNode.class);
+        }
+    }
+
+    // :study_uri/:variable_uri/
+    public Result getMeasurements(String studyUri, String variableUri){
+        if(variableUri == null){
+            return badRequest(ApiUtil.createResponse("No variable specified", false));
+        }
+        if(studyUri == null){
+            return badRequest(ApiUtil.createResponse("No study specified", false));
+        }
+        // Solr query
+        SolrDocumentList solrResults = getSolrMeasurements(studyUri, variableUri);
+        if(solrResults.size() < 1){
+            return notFound(ApiUtil.createResponse("Solr Message: no measurements found", false));
+        }
+
+        JsonNode jsonObject = parseMeasurements(solrResults);
+
+        if(jsonObject == null){
             return internalServerError(ApiUtil.createResponse("Error parsing measurments", false));
         } else {
-            JsonNode jsonObject = mapper.convertValue(anode, JsonNode.class);
             return ok(ApiUtil.createResponse(jsonObject, true));
         }
     }// /getMeasurements()
 
     // :study_uri/:variable_uri/:object_uri
     public Result getMeasurementsForObj(String studyUri, String variableUri, String objUri){
-        ObjectMapper mapper = new ObjectMapper();
         if(variableUri == null){
             return badRequest(ApiUtil.createResponse("No variable specified", false));
         }
@@ -809,37 +866,20 @@ public class RestApi extends Controller {
         System.out.println("[RestAPI] Getting measurements for " + objUri);
         SolrDocumentList solrResults = getSolrMeasurements(studyUri, variableUri, objUri);
         if(solrResults.size() < 1){
-            return notFound(ApiUtil.createResponse("Solr Error: no measurements found", false));
+            return notFound(ApiUtil.createResponse("Solr Message: no measurements found", false));
         }
-        // parse results
-        ArrayNode anode = mapper.createArrayNode();
-        Iterator<SolrDocument> i = solrResults.iterator();
-        while (i.hasNext()) {
-            SolrDocument doc = i.next();
-            ObjectNode temp = mapper.createObjectNode();
-            temp.put("measurementuri", SolrUtils.getFieldValue(doc, "uri"));
-            temp.put("studyuri", SolrUtils.getFieldValue(doc, "study_uri_str"));
-            temp.put("studyobjecturi", SolrUtils.getFieldValue(doc, "study_object_uri_str"));
-            temp.put("variableuri", SolrUtils.getFieldValue(doc, "characteristic_uri_str"));
-            temp.put("value", SolrUtils.getFieldValue(doc, "value_str"));
-            temp.put("unituri", SolrUtils.getFieldValue(doc, "unit_uri_str"));
-            temp.put("timeValue", SolrUtils.getFieldValue(doc, "time_value_double"));
-            temp.put("timeUnit", SolrUtils.getFieldValue(doc, "time_value_unit_uri_str"));
-            temp.put("timestamp", SolrUtils.getFieldValue(doc, "timestamp_date"));
 
-            anode.add(temp);
-        }// /parse solr results
-        if(anode == null){
+        JsonNode jsonObject = parseMeasurements(solrResults);
+
+        if(jsonObject == null){
             return internalServerError(ApiUtil.createResponse("Error parsing measurments", false));
         } else {
-            JsonNode jsonObject = mapper.convertValue(anode, JsonNode.class);
             return ok(ApiUtil.createResponse(jsonObject, true));
         }
     }// /getMeasurementsForObj()
 
     // :study_uri/:variable_uri/:object_uri/:fromdatetime/:todatetime
     public Result getMeasurementsForObjInPeriod(String studyUri, String variableUri, String objUri, String fromdatetime, String todatetime){
-        ObjectMapper mapper = new ObjectMapper();
         if(variableUri == null){
             return badRequest(ApiUtil.createResponse("No variable specified", false));
         }
@@ -856,30 +896,14 @@ public class RestApi extends Controller {
         System.out.println("[RestAPI] Getting measurements for " + objUri);
         SolrDocumentList solrResults = getSolrMeasurements(studyUri, variableUri, objUri, fromdatetime, todatetime);
         if(solrResults.size() < 1){
-            return notFound(ApiUtil.createResponse("Solr Error: no measurements found", false));
+            return notFound(ApiUtil.createResponse("Solr Message: no measurements found", false));
         }
-        // parse results
-        ArrayNode anode = mapper.createArrayNode();
-        Iterator<SolrDocument> i = solrResults.iterator();
-        while (i.hasNext()) {
-            SolrDocument doc = i.next();
-            ObjectNode temp = mapper.createObjectNode();
-            temp.put("measurementuri", SolrUtils.getFieldValue(doc, "uri"));
-            temp.put("studyuri", SolrUtils.getFieldValue(doc, "study_uri_str"));
-            temp.put("studyobjecturi", SolrUtils.getFieldValue(doc, "study_object_uri_str"));
-            temp.put("variableuri", SolrUtils.getFieldValue(doc, "characteristic_uri_str"));
-            temp.put("value", SolrUtils.getFieldValue(doc, "value_str"));
-            temp.put("unituri", SolrUtils.getFieldValue(doc, "unit_uri_str"));
-            temp.put("timeValue", SolrUtils.getFieldValue(doc, "time_value_double"));
-            temp.put("timeUnit", SolrUtils.getFieldValue(doc, "time_value_unit_uri_str"));
-            temp.put("timestamp", SolrUtils.getFieldValue(doc, "timestamp_date"));
 
-            anode.add(temp);
-        }// /parse solr results
-        if(anode == null){
+        JsonNode jsonObject = parseMeasurements(solrResults);
+
+        if(jsonObject == null){
             return internalServerError(ApiUtil.createResponse("Error parsing measurments", false));
         } else {
-            JsonNode jsonObject = mapper.convertValue(anode, JsonNode.class);
             return ok(ApiUtil.createResponse(jsonObject, true));
         }
     }// /getMeasurementsForObjInPeriod()
