@@ -386,8 +386,9 @@ public class MeasurementGenerator extends BasicGenerator {
              *=============================*/
 
             measurement.setUri(URIUtils.replacePrefixEx(measurement.getStudyUri()) + "/" + 
-                    URIUtils.replaceNameSpaceEx(da.getUri()).split(":")[1] + "/" +
-                    dasa.getLocalName() + "-" + totalCount++);
+			       URIUtils.replaceNameSpaceEx(da.getUri()).split(":")[1] + "/" +
+			       dasa.getLabel() + "/" + 
+			       dataFile.getFileName() + "-" + totalCount++);
             measurement.setOwnerUri(da.getOwnerUri());
             measurement.setAcquisitionUri(da.getUri());
 
