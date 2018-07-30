@@ -153,18 +153,23 @@ public class EntityRole extends HADatAcThing implements Comparable<EntityRole> {
     public static Map<String, String> findObjRoleMappings(String studyUri) {
         Map<String, String> results = new HashMap<String, String>();        
         String queryString = NameSpaces.getInstance().printSparqlNameSpaceList() 
-                + "SELECT ?studyObj ?roleUri WHERE { \n"
-                + "{ "
-                + "?studyObj hasco:isMemberOf ?soc . \n"
-                + "?soc a hasco:SubjectGroup . \n"
-                + "?soc hasco:isMemberOf <" + studyUri + "> . \n"
-                + "?studyObj hasco:hasRole ?roleUri . \n"
-                + "} UNION { \n"
-                + "?studyObj hasco:isMemberOf ?soc . \n"
-                + "?soc a hasco:SampleCollection . \n"
-                + "?soc hasco:isMemberOf <" + studyUri + "> . \n"
-                + "?studyObj a ?roleUri . \n"
-                + "}}";
+	    + " SELECT ?studyObj ?label WHERE { " 
+	    + " ?studyObj hasco:isMemberOf ?soc . " 
+	    + " ?soc hasco:hasGroundingLabel ?label . "  
+	    + " ?soc hasco:isMemberOf <" + studyUri + "> . "   
+	    + " }";
+	    //        + "SELECT ?studyObj ?roleUri WHERE { \n"
+            //    + "{ "
+            //    + "?studyObj hasco:isMemberOf ?soc . \n"
+            //    + "?soc a hasco:SubjectGroup . \n"
+            //    + "?soc hasco:isMemberOf <" + studyUri + "> . \n"
+            //    + "?studyObj hasco:hasRole ?roleUri . \n"
+            //    + "} UNION { \n"
+            //    + "?studyObj hasco:isMemberOf ?soc . \n"
+            //    + "?soc a hasco:SampleCollection . \n"
+            //    + "?soc hasco:isMemberOf <" + studyUri + "> . \n"
+            //    + "?studyObj a ?roleUri . \n"
+            //    + "}}";
 
         // System.out.println("findObjRoleMappings query: " + queryString);
 
@@ -174,7 +179,7 @@ public class EntityRole extends HADatAcThing implements Comparable<EntityRole> {
         try {
             while (resultsrw.hasNext()) {
                 QuerySolution soln = resultsrw.next();
-                results.put(soln.get("studyObj").toString(), soln.get("roleUri").toString());
+                results.put(soln.get("studyObj").toString(), soln.get("label").toString());
             }
         } catch (Exception e) {
             System.out.println("EntityRole.findObjRoleMappings() Error: " + e.getMessage());

@@ -15,8 +15,8 @@ import org.hadatac.console.controllers.annotator.AnnotationLog;
 import org.hadatac.console.http.SPARQLUtils;
 import org.hadatac.entity.pojo.HADatAcThing;
 import org.hadatac.entity.pojo.ObjectCollection;
+import org.hadatac.entity.pojo.Study;
 import org.hadatac.metadata.loader.URIUtils;
-
 
 public class SSDGenerator extends BasicGenerator {
 
@@ -115,25 +115,26 @@ public class SSDGenerator extends BasicGenerator {
         List<String> lstr = new ArrayList<String>();
         studyUri = getUri(records.get(0));
         String studyUriFull = URIUtils.convertToWholeURI(getUri(records.get(0)));
-        String queryString = NameSpaces.getInstance().printSparqlNameSpaceList() + 
-                "SELECT ?s WHERE { " + 
-                "?s a <http://hadatac.org/ont/hasco/Study> . " + 
-                "}";
+	Study study = Study.find(studyUriFull);
+        //String queryString = NameSpaces.getInstance().printSparqlNameSpaceList() + 
+	//    "SELECT ?s WHERE { " + 
+	//    "?s a <http://hadatac.org/ont/hasco/Study> . " + 
+	//    "}";
         
-        ResultSetRewindable resultsrw = SPARQLUtils.select(CollectionUtil.getCollectionsName(
-                CollectionUtil.METADATA_SPARQL), queryString);
-
-        if (!resultsrw.hasNext()) {
-            AnnotationLog.printException("SSD ingestion: Could not find the study uri in the TS, check the study uri in the SSD sheet.", file.getFile().getName());
-            return;
-        }
+        //ResultSetRewindable resultsrw = SPARQLUtils.select(CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), queryString);
+	
+        //if (!resultsrw.hasNext()) {
+        //    AnnotationLog.printException("SSD ingestion: Could not find the study uri in the TS, check the study uri in the SSD sheet.", file.getFile().getName());
+        //    return;
+        //}
         
-        while (resultsrw.hasNext()) {
-            QuerySolution soln = resultsrw.next();
-            lstr.add(soln.getResource("s").toString());
-        }
+        //while (resultsrw.hasNext()) {
+        //    QuerySolution soln = resultsrw.next();
+        //    lstr.add(soln.getResource("s").toString());
+        //}
         
-        if (lstr.contains(studyUriFull)) {
+        //if (lstr.contains(studyUriFull)) {
+        if (study != null) {
             AnnotationLog.println("SSD ingestion: The study uri :" + studyUriFull + " is in the TS.", file.getFile().getName());
         } else {
             AnnotationLog.printException("SSD ingestion: Could not find the study uri : " + studyUriFull + " in the TS, check the study uri in the SSD sheet.", file.getFile().getName());
@@ -141,14 +142,14 @@ public class SSDGenerator extends BasicGenerator {
     }
     
     @Override
-    HADatAcThing createObject(Record rec, int row_number) throws Exception {
+	HADatAcThing createObject(Record rec, int row_number) throws Exception {
         if (!getUri(rec).equals(studyUri)) {
             return createObjectCollection(rec);
         }
         
         return null;
     }
-
+    
     @Override
     public String getErrorMsg(Exception e) {
         return "Error in SSDGenerator: " + e.getMessage();

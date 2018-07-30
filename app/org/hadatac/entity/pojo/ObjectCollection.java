@@ -555,6 +555,23 @@ public class ObjectCollection extends HADatAcThing implements Comparable<ObjectC
         return ocList;
     }
 
+    public static Map<String, String> labelsByStudyUri(String studyUri) {
+        if (studyUri == null) {
+            return null;
+        }
+        Map<String, String> labelsMap = new HashMap<String, String>();
+        List<ObjectCollection> ocList = findByStudyUri(studyUri);
+
+	for (ObjectCollection oc : ocList) {
+	    if (oc.getGroundingLabel() != null && !oc.getGroundingLabel().equals("")) {
+		labelsMap.put(oc.getSOCReference(), oc.getGroundingLabel());
+	    } else {
+	    }
+	}
+
+        return labelsMap;
+    }
+
     public static String findByStudyUriJSON(String studyUri) {
         if (studyUri == null) {
             return null;

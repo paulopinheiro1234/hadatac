@@ -332,6 +332,7 @@ public class MeasurementGenerator extends BasicGenerator {
 		if (da.getCellScopeName().get(0).equals("*")) {
 		    measurement.setStudyObjectUri(URIUtils.replacePrefixEx(da.getCellScopeUri().get(0).trim()));
 		    measurement.setObjectUri(URIUtils.replacePrefixEx(da.getCellScopeUri().get(0).trim()));
+		    measurement.setObjectCollectionType(URIUtils.replacePrefixEx("hasco:SampleCollection"));
 		    //System.out.println("Measurement: ObjectURI (before replace): <" + da.getCellScopeUri().get(0).trim() + ">");
 		    //System.out.println("Measurement: ObjectURI (after replace): <" + URIUtils.replacePrefixEx(da.getCellScopeUri().get(0).trim()) + ">");
 		} else {

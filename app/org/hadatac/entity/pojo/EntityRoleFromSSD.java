@@ -98,7 +98,9 @@ public class EntityRoleFromSSD extends HADatAcThing implements Comparable<Entity
         for (Pivot pivot_ent : pivot.children) {
             EntityRoleFromSSD role = new EntityRoleFromSSD();
             role.setUri(pivot_ent.getValue());
-            role.setLabel(WordUtils.capitalize(Entity.find(pivot_ent.getValue()).getLabel()));
+            //role.setLabel(WordUtils.capitalize(Entity.find(pivot_ent.getValue()).getLabel()));
+            //Comment from PP: this is a temporary hack since role_uri has changed to be the label itself
+            role.setLabel(pivot_ent.getValue());
             role.setCount(pivot_ent.getCount());
             role.setField("role_uri_str");
 
