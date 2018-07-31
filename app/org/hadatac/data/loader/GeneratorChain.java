@@ -9,6 +9,7 @@ public class GeneratorChain {
 
     private List<BasicGenerator> chain = new ArrayList<BasicGenerator>();
     private String studyUri = "";
+    private RecordFile file = null;
     private boolean bValid = true;
     
     public String getStudyUri() {
@@ -17,6 +18,14 @@ public class GeneratorChain {
     
     public void setStudyUri(String studyUri) {
         this.studyUri = studyUri;
+    }
+    
+    public RecordFile getRecordFile() {
+        return file;
+    }
+    
+    public void setRecordFile(RecordFile file) {
+        this.file = file;
     }
     
     public boolean isValid() {
@@ -73,6 +82,8 @@ public class GeneratorChain {
             }
         }
 
+	postprocess();
+
         return true;
     }
 
@@ -97,4 +108,8 @@ public class GeneratorChain {
             }
         }
     }
+
+    public void postprocess() {
+    }
+
 }

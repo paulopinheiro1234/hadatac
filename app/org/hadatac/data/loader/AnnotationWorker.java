@@ -125,7 +125,6 @@ public class AnnotationWorker {
                 chain = annotateACQFile(recordFile, true);
             } else if (file_name.startsWith("OAS-")) {
             	
-		System.out.println("OAS HERE!");
 		Record record = recordFile.getRecords().get(0);
 		String studyName = record.getValueByColumnName("Study ID");
 		String studyUri = ConfigProp.getKbPrefix() + "STD-" + studyName;
@@ -226,7 +225,7 @@ public class AnnotationWorker {
 		}
 		
 		String das_uri = URIUtils.convertToWholeURI(ConfigProp.getKbPrefix() + "DAS-" + record.getValueByColumnName("data dict").replace("SDD-", ""));
-		System.out.println("das_uri " + das_uri);
+		//System.out.println("das_uri " + das_uri);
 		DataAcquisitionSchema das = DataAcquisitionSchema.find(das_uri);
 		if (das == null) {
 		    log.addline(Feedback.println(Feedback.WEB, 
@@ -256,13 +255,13 @@ public class AnnotationWorker {
 			    log.addline(Feedback.println(Feedback.WEB, "[LOG] object " + i.getLabel() + " has path label: " + labelList.get(i.getLabel())));
 			} else {
 
-			System.out.println("VAVAVA :" + i.getLabel());
+			    //System.out.println("VAVAVA :" + i.getLabel());
 			if (i.getLabel().contains("child") || i.getLabel().contains("mother")){
 			    log.addline(Feedback.println(Feedback.WEB, "[LOG] object " + i.getLabel() + " has path label: " + 
 							 i.getLabel().replace("??", "").replace("child", "Child ").replace("mother", "Mother ")));
 			} else {
 			    if (i.getInRelationToLabel().length() > 0) {
-				System.out.println("VAVAVA2 :" + i.getLabel());
+				//System.out.println("VAVAVA2 :" + i.getLabel());
 				if (refLabel.containsKey(i.getInRelationToLabel())){
 				    log.addline(Feedback.println(Feedback.WEB, 
 								 "[LOG] object " + i.getLabel() + " has path label: " + 
@@ -276,8 +275,8 @@ public class AnnotationWorker {
 								     " " + i.getEntityLabel(codeMappings)));
 				    } else {
 					if (map2InRelationTo.get(i.getInRelationToLabel()) != null){
-					    System.out.println("VAVAVA3 :" + i.getLabel() + " " + i.getInRelationToLabel() + " " + 
-							       map2InRelationTo.get(i.getInRelationToLabel()));
+					    //System.out.println("VAVAVA3 :" + i.getLabel() + " " + i.getInRelationToLabel() + " " + 
+					    //	       map2InRelationTo.get(i.getInRelationToLabel()));
 					    if (refLabel.containsKey(map2InRelationTo.get(i.getInRelationToLabel()))) {
 						log.addline(Feedback.println(Feedback.WEB, 
 									     "[LOG] object " + i.getLabel() + " has path label: " + 
@@ -292,7 +291,7 @@ public class AnnotationWorker {
 									     i.getEntityLabel(codeMappings)));
 					    }
 					} else {
-					    System.out.println("VAVAVA4 :" + i.getLabel());
+					//System.out.println("VAVAVA4 :" + i.getLabel());
 					    log.addline(Feedback.println(Feedback.WEB, 
 									 "[ERROR] object " + i.getLabel() + " has incomplete path label: " + 
 									 i.getInRelationToLabel().replace("??", "").replace("child", "Child ").replace("mother", "Mother ") + 
@@ -301,7 +300,7 @@ public class AnnotationWorker {
 				    }
 				}
 			    } else {
-				System.out.println("VAVAVA5 :" + i.getLabel());
+			    //System.out.println("VAVAVA5 :" + i.getLabel());
 				if (i.getWasDerivedFrom().length() > 0){
 				    log.addline(Feedback.println(Feedback.WEB, 
 								 "[LOG] object " + i.getLabel() + " has path label: " + 
@@ -548,28 +547,32 @@ public class AnnotationWorker {
 
         RecordFile SSDsheet = new SpreadsheetRecordFile(file.getFile(), "SSD");
         
-        System.out.println(file_name);
-        System.out.println(ssdName);
+        //System.out.println(file_name);
+        //System.out.println(ssdName);
         
-        GeneratorChain chain = new GeneratorChain();
+        SSDGeneratorChain chain = new SSDGeneratorChain();
         
         if (SSDsheet.isValid()) {
-            chain.addGenerator(new SSDGenerator(SSDsheet));
+	    SSDGenerator gen = new SSDGenerator(SSDsheet);
+            chain.addGenerator(gen);
+	    chain.setStudyUri(gen.getStudyUri());
+	    chain.setRecordFile(file);
         } else {
             //chain.setInvalid();
             AnnotationLog.printException("Cannot locate SSD's sheet ", file.getFile().getName());
         }
         
-        for ( String i : mapCatalog.keySet()) {
+	String study_uri = chain.getStudyUri();
+        for (String i : mapCatalog.keySet()) {
 	    if (mapCatalog.get(i).length()>0){
             	RecordFile SOsheet = new SpreadsheetRecordFile(file.getFile(), mapCatalog.get(i).replace("#", ""));
-            	System.out.println(SOsheet.getSheetName() + " is parsed!");
-            	chain.addGenerator(new StudyObjectGenerator(SOsheet, mapContent.get(i), mapContent));
-            	System.out.println(SOsheet.getNumberOfSheets() + " number of sheets!");
-            	System.out.println(SOsheet.getHeaders() + " number of sheets!");            	
-            	for (Record ii : SOsheet.getRecords()){
-		    System.out.println(ii.getValueByColumnIndex(0) + " is added to chain!");	
-            	}
+            	//System.out.println(SOsheet.getSheetName() + " is parsed!");
+            	chain.addGenerator(new StudyObjectGenerator(SOsheet, mapContent.get(i), mapContent, study_uri));
+            	//System.out.println(SOsheet.getNumberOfSheets() + " number of sheets!");
+            	//System.out.println(SOsheet.getHeaders() + " number of sheets!");            	
+            	//for (Record ii : SOsheet.getRecords()){
+		//    System.out.println(ii.getValueByColumnIndex(0) + " is added to chain!");	
+            	//}
 	    }
         }
         

@@ -26,13 +26,13 @@ public class StudyObjectGenerator extends BasicGenerator {
     private Map<String, String> uriMap = new HashMap<String, String>();
     private Map<String, List<String>> mapContent = new HashMap<String, List<String>>();
 
-    public StudyObjectGenerator(RecordFile file, List<String> listContent, Map<String, List<String>> mapContent) {
+    public StudyObjectGenerator(RecordFile file, List<String> listContent, Map<String, List<String>> mapContent, String study_uri) {
         super(file);
-        file_name = file.getFile() .getName();
+	this.study_id = study_id; 
+        file_name = file.getFile().getName();
         System.out.println("We are in StudyObject Generator!");
         study_id = file.getFile().getName().replaceAll("SSD-", "").replaceAll(".xlsx", "");
-        
-        setStudyUri(URIUtils.replacePrefixEx(kbPrefix + "STD-" + study_id));
+        setStudyUri(study_uri);
         
         this.listCache = listContent;
         System.out.println(listContent);
@@ -93,10 +93,10 @@ public class StudyObjectGenerator extends BasicGenerator {
     }
 //
     public StudyObject createStudyObject(Record record) throws Exception {
-    	System.out.println(getUri(record));
+    	//System.out.println(getUri(record));
         StudyObject obj = new StudyObject(getUri(record), getType(record), 
-                getOriginalID(record), getLabel(record), 
-                getCohortUri(record), getLabel(record));
+					  getOriginalID(record), getLabel(record), 
+					  getCohortUri(record), getLabel(record));
         obj.setRoleUri(URIUtils.replacePrefixEx(role));
         obj.addScopeUri(getScopeUri(record));
         return obj;

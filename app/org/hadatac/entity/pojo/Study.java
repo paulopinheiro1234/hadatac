@@ -557,7 +557,10 @@ public class Study extends HADatAcThing {
             ResultSetRewindable resultsrw = SPARQLUtils.select(
                     CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), studyQueryString);
             
-            if (resultsrw.hasNext()) {
+            if (!resultsrw.hasNext()) {
+		System.out.println("[ERROR] STUDY_URI " + study_uri + " does not retrieve a study object");
+		return null;
+	    } else {
                 QuerySolution soln = resultsrw.next();
                 returnStudy.setUri(prefixedUri);
                 if (soln.contains("studyLabel")) {

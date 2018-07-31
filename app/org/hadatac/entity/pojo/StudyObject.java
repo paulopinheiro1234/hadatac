@@ -389,7 +389,7 @@ public class StudyObject extends HADatAcThing {
     }
 
     public long getNumberFromSolr(Facet facet, FacetHandler facetHandler) {
-        System.out.println("\nStudyObject facet: " + facet.toSolrQuery());
+        //System.out.println("\nStudyObject facet: " + facet.toSolrQuery());
 
         SolrQuery query = new SolrQuery();
         String strQuery = facetHandler.getTempSolrQuery(facet);
@@ -462,7 +462,7 @@ public class StudyObject extends HADatAcThing {
 
     @Override
     public boolean saveToTripleStore() {
-        System.out.println("Saving study object " + getUri() + " to triple store");
+        //System.out.println("Saving study object " + getUri() + " to triple store");
         //System.out.println("[StudyObject] uri: " + uri);
 
         if (uri == null || uri.equals("")) {
@@ -535,7 +535,7 @@ public class StudyObject extends HADatAcThing {
 
     @Override
     public int saveToLabKey(String user_name, String password) {
-        System.out.println("Saving study object " + getUri() + " to LabKey");
+        //System.out.println("Saving study object " + getUri() + " to LabKey");
 
         LabkeyDataHandler loader = LabkeyDataHandler.createDefault(user_name, password);
         List< Map<String, Object> > rows = new ArrayList< Map<String, Object> >();
@@ -575,7 +575,7 @@ public class StudyObject extends HADatAcThing {
 
     @Override
     public int deleteFromLabKey(String user_name, String password) {
-        System.out.println("Deleting study object " + getUri() + " from LabKey");
+        //System.out.println("Deleting study object " + getUri() + " from LabKey");
 
         LabkeyDataHandler loader = LabkeyDataHandler.createDefault(user_name, password);
         List< Map<String, Object> > rows = new ArrayList< Map<String, Object> >();

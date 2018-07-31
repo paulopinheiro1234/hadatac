@@ -21,13 +21,15 @@ import org.hadatac.metadata.loader.URIUtils;
 public class SSDGenerator extends BasicGenerator {
 
     final String kbPrefix = ConfigProp.getKbPrefix();
-    String studyUri = "";
     String SDDName = ""; //used for reference column uri
     
     public SSDGenerator(RecordFile file) {
         super(file);
         String str = file.getFile().getName().replaceAll("SSD-", "");
         this.SDDName = str.substring(0, str.lastIndexOf('.'));
+	if (records.get(0) != null) {
+	    studyUri = URIUtils.convertToWholeURI(getUri(records.get(0)));
+	}
     }
 
     @Override
@@ -60,10 +62,9 @@ public class SSDGenerator extends BasicGenerator {
     private String getStudyUri(Record rec) {
         return rec.getValueByColumnName(mapCol.get("studyUri"));
     }
-    
+
     private String getSOCReference(Record rec) {
         String ref = rec.getValueByColumnName(mapCol.get("hasSOCReference"));
-//        return kbPrefix + "DASO-" + SDDName + "-" + ref.trim().replace(" ","").replace("_","-").replace("??", "");
         return ref.trim().replace(" ","").replace("_","-");
     }
 
@@ -92,61 +93,37 @@ public class SSDGenerator extends BasicGenerator {
     }
 
     public ObjectCollection createObjectCollection(Record record) throws Exception {
-    	ObjectCollection oc = new ObjectCollection(
-    	        URIUtils.replacePrefixEx(getUri(record)),
-    	        URIUtils.replacePrefixEx(getTypeUri(record)),
-    			getLabel(record),
-    			getLabel(record),
-    			URIUtils.replacePrefixEx(getStudyUri(record)),
-    			URIUtils.replacePrefixEx(gethasScopeUri(record)),
-    			getGroundingLabel(record),
-    			getSOCReference(record),
-                getSpaceScopeUris(record),
-                getTimeScopeUris(record));
-    	
-    	setStudyUri(URIUtils.replacePrefixEx(getStudyUri(record)));
+    	ObjectCollection oc = 
+	    new ObjectCollection(URIUtils.replacePrefixEx(getUri(record)),
+				 URIUtils.replacePrefixEx(getTypeUri(record)),
+				 getLabel(record),
+				 getLabel(record),
+				 this.studyUri,
+				 URIUtils.replacePrefixEx(gethasScopeUri(record)),
+				 getGroundingLabel(record),
+				 getSOCReference(record),
+				 getSpaceScopeUris(record),
+				 getTimeScopeUris(record));
     	
         return oc;
     }
 
     @Override
     public void preprocess() throws Exception {
-    	
         List<String> lstr = new ArrayList<String>();
-        studyUri = getUri(records.get(0));
-        String studyUriFull = URIUtils.convertToWholeURI(getUri(records.get(0)));
-	Study study = Study.find(studyUriFull);
-        //String queryString = NameSpaces.getInstance().printSparqlNameSpaceList() + 
-	//    "SELECT ?s WHERE { " + 
-	//    "?s a <http://hadatac.org/ont/hasco/Study> . " + 
-	//    "}";
-        
-        //ResultSetRewindable resultsrw = SPARQLUtils.select(CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), queryString);
-	
-        //if (!resultsrw.hasNext()) {
-        //    AnnotationLog.printException("SSD ingestion: Could not find the study uri in the TS, check the study uri in the SSD sheet.", file.getFile().getName());
-        //    return;
-        //}
-        
-        //while (resultsrw.hasNext()) {
-        //    QuerySolution soln = resultsrw.next();
-        //    lstr.add(soln.getResource("s").toString());
-        //}
-        
-        //if (lstr.contains(studyUriFull)) {
+	Study study = Study.find(studyUri);
         if (study != null) {
-            AnnotationLog.println("SSD ingestion: The study uri :" + studyUriFull + " is in the TS.", file.getFile().getName());
+            AnnotationLog.println("SSD ingestion: The study uri :" + studyUri + " is in the TS.", file.getFile().getName());
         } else {
-            AnnotationLog.printException("SSD ingestion: Could not find the study uri : " + studyUriFull + " in the TS, check the study uri in the SSD sheet.", file.getFile().getName());
+            AnnotationLog.printException("SSD ingestion: Could not find the study uri : " + studyUri + " in the TS, check the study uri in the SSD sheet.", file.getFile().getName());
         }
     }
     
     @Override
-	HADatAcThing createObject(Record rec, int row_number) throws Exception {
-        if (!getUri(rec).equals(studyUri)) {
+    HADatAcThing createObject(Record rec, int row_number) throws Exception {
+        if (!URIUtils.replacePrefixEx(getUri(rec)).equals(studyUri)) {
             return createObjectCollection(rec);
         }
-        
         return null;
     }
     
@@ -155,9 +132,9 @@ public class SSDGenerator extends BasicGenerator {
         return "Error in SSDGenerator: " + e.getMessage();
     }
 
-	@Override
-	public String getTableName() {
-		// TODO Auto-generated method stub
-		return null;
-	}
+    @Override
+    public String getTableName() {
+	// TODO Auto-generated method stub
+	return null;
+    }
 }

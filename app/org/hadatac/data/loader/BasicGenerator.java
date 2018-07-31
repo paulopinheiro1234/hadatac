@@ -63,6 +63,10 @@ public abstract class BasicGenerator {
         return fileName;
     }
     
+    public RecordFile getRecordFile() {
+        return file;
+    }
+    
     public String getStudyUri() {
         return studyUri;
     }
