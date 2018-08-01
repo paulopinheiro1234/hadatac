@@ -238,6 +238,56 @@ public class RestApi extends Controller {
         return results;
     }// /getSolrMeasurements()
 
+    private String getSolrMeasurementsTimeRange(String studyUri, String variableUri, String objUri){
+	String firstTime = null;
+	String lastTime = null;
+        SolrDocumentList results = null;
+        // build first Solr query!
+        SolrQuery solrQuery = new SolrQuery();
+        solrQuery.setQuery("study_uri_str:\"" + studyUri + "\"" +
+                           "AND study_object_uri_str:\"" + objUri + "\"" +
+                           "AND characteristic_uri_str:\"" + variableUri + "\"" );
+        solrQuery.setRows(1);
+	solrQuery.setSort("timestamp_date",SolrQuery.ORDER.asc);
+        System.out.println("[RestAPI] solr query: " + solrQuery);
+	SolrClient solr = null;
+        QueryResponse queryResponse = null;
+        // make Solr queries!
+        try {
+            solr = new HttpSolrClient.Builder(
+                    ConfigFactory.load().getString("hadatac.solr.data") 
+                    + CollectionUtil.DATA_ACQUISITION).build();
+            queryResponse = solr.query(solrQuery, SolrRequest.METHOD.POST);
+            //System.out.println("[getSolrMeasurements] res: " + queryResponse);
+            solr.close();
+
+            results = queryResponse.getResults();
+        } catch (Exception e) {
+            System.out.println("[RestAPI.getMeasurements] ERROR: " + e.getMessage());
+	    return "ERROR: no initial time for selection";
+        }
+        firstTime = parseMeasurementTimeStamp(results);
+	solrQuery.setSort("timestamp_date",SolrQuery.ORDER.desc);
+        try {
+            solr = new HttpSolrClient.Builder(
+                    ConfigFactory.load().getString("hadatac.solr.data") 
+                    + CollectionUtil.DATA_ACQUISITION).build();
+            queryResponse = solr.query(solrQuery, SolrRequest.METHOD.POST);
+            //System.out.println("[getSolrMeasurements] res: " + queryResponse);
+            solr.close();
+
+            results = queryResponse.getResults();
+        } catch (Exception e) {
+            System.out.println("[RestAPI.getMeasurements] ERROR: " + e.getMessage());
+	    return "ERROR: no final time for selection";
+        }
+        lastTime = parseMeasurementTimeStamp(results);
+	if (firstTime != null && !firstTime.equals("") && lastTime != null && !lastTime.equals("")) {
+	    return "[" + firstTime + ";" + lastTime + "]";
+	}
+	return "ERROR";
+    }// /getSolrMeasurementsTimeRange()
+
 //*************************
 // BLAZEGRAPH QUERY METHODS
 //*************************
@@ -831,6 +881,15 @@ public class RestApi extends Controller {
         }
     }
 
+    private String parseMeasurementTimeStamp(SolrDocumentList solrResults) {
+        Iterator<SolrDocument> i = solrResults.iterator();
+        if (i.hasNext()) {
+            SolrDocument doc = i.next();
+            return SolrUtils.getFieldValue(doc, "timestamp_date");
+        }
+	return null;
+    }
+
     // :study_uri/:variable_uri/
     public Result getMeasurements(String studyUri, String variableUri){
         if(variableUri == null){
@@ -907,5 +966,23 @@ public class RestApi extends Controller {
             return ok(ApiUtil.createResponse(jsonObject, true));
         }
     }// /getMeasurementsForObjInPeriod()
+
+    // :study_uri/:variable_uri/:object_uri/timerange
+    public Result getMeasurementsForObjTimeRange(String studyUri, String variableUri, String objUri){
+        if(variableUri == null){
+            return badRequest(ApiUtil.createResponse("No variable specified", false));
+        }
+        if(studyUri == null){
+            return badRequest(ApiUtil.createResponse("No study specified", false));
+        }
+        // Solr query
+        System.out.println("[RestAPI] Getting time range for measurements for " + objUri);
+        String timerange = getSolrMeasurementsTimeRange(studyUri, variableUri, objUri);
+        if(timerange == null){
+            return internalServerError(ApiUtil.createResponse("Error retrieving time range for  measurements", false));
+        } else {
+            return ok(timerange);
+        }
+    }// /getMeasurementsForObjTimeRange()
 
 }// /RestApi
