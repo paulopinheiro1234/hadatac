@@ -200,7 +200,7 @@ public class AnnotationWorker {
         													    if (tarList.contains(soln.getResource("x").toString())) {							    	
         													    	answer.add(das.getObject(soln.getResource("x").toString()).getEntityLabel());
         														    log.addline(Feedback.println(Feedback.WEB, 
-        																	 "[PATH] DASO: " + i.getLabel() + " " + answer.toString()));
+        																	 "[PATH] DASO: " + i.getLabel() + ": \"" + answer.get(1) + " " + answer.get(0) + "\""));
         														    found = true;
         														    break;
         													    } else {
@@ -209,7 +209,7 @@ public class AnnotationWorker {
         																    if (tarList.contains(soln.getResource("o").toString())) {
         																    	answer.add(das.getObject(soln.getResource("o").toString()).getEntityLabel());
         																	    log.addline(Feedback.println(Feedback.WEB, 
-        																				 "[PATH] DASO: " + i.getLabel() + " " + answer.toString()));
+        																				 "[PATH] DASO: " + i.getLabel() + ": \"" + answer.get(1) + " " + answer.get(0) + "\""));
         																	    found = true;
         																	    break;
         																    }
@@ -219,7 +219,7 @@ public class AnnotationWorker {
         													    			if (refList.containsKey(soln.getLiteral("o").toString())) {
         													    				answer.add(refList.get(soln.getLiteral("o").toString()));
         																	    log.addline(Feedback.println(Feedback.WEB, 
-        																				 "[PATH] DASO: " + i.getLabel() + " " + answer.toString()));
+        																				 "[PATH] DASO: " + i.getLabel() + ": \"" + answer.get(1) + " " + answer.get(0) + "\""));
         																	    found = true;
         																	    break;
         													    			}
@@ -232,7 +232,7 @@ public class AnnotationWorker {
         													    if (refList.containsKey(soln.getLiteral("x").toString())) {
         													    	answer.add(refList.get(soln.getLiteral("x").toString()));
         														    log.addline(Feedback.println(Feedback.WEB, 
-        																	 "[PATH] DASO: " + i.getLabel() + " " + answer.toString()));
+        																	 "[PATH] DASO: " + i.getLabel() + ": \"" + answer.get(1) + " " + answer.get(0) + "\""));
         														    found = true;
         														    break;
         													    }
