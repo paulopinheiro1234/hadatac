@@ -137,10 +137,12 @@ public class AnnotationWorker {
 
                 List<ObjectCollection> ocList = ObjectCollection.findByStudyUri(studyUri);
                 Map<String, String> refList = new HashMap<String, String>();
+                List<String> tarList = new ArrayList<String>();
                 
                 for (ObjectCollection oc: ocList) {
         			if (oc.getGroundingLabel().length() > 0) {
         				refList.put(oc.getSOCReference(), oc.getGroundingLabel());
+        				tarList.add(kbPrefix + "DASO-" + studyName + "-" + oc.getSOCReference().trim().replace(" ","").replace("_","-").replace("??", ""));
         				System.out.println("========================= " + oc.getGroundingLabel());
         			}
         		}
@@ -177,7 +179,7 @@ public class AnnotationWorker {
         							String queryString = NameSpaces.getInstance().printSparqlNameSpaceList() + 
         								    "SELECT ?x ?o WHERE { \n" + 
         								    "<" + i.getUri() + "> ?p ?x . \n" + 
-        								    "	OPTIONAL {?x ?p1 ?o } .  \n" + 
+        								    "	?x ?p1 ?o .  \n" + 
         								    "	OPTIONAL {?o ?p2 " + target + " } " +
         								    "}";
         								
@@ -189,30 +191,38 @@ public class AnnotationWorker {
         							}
         							        
         							while (resultsrw.hasNext()) {
-        								    QuerySolution soln = resultsrw.next();							    
+        								    QuerySolution soln = resultsrw.next();					    
         								    try {
         										if (soln != null) {
         										    try {								    	
         										    	if (soln.get("x").isResource()){
         													if (soln.getResource("x") != null) {
-        													    if (target.equals(soln.getResource("x").toString())) {
-        													    	System.out.println("!!!!!!!!!!!!!" + soln.getResource("x").toString());
-        													    	answer.add(j.trim().replace(" ","").replace("_","-").replace("??", ""));
+        													    if (tarList.contains(soln.getResource("x").toString())) {							    	
+        													    	answer.add(das.getObject(soln.getResource("x").toString()).getEntityLabel());
         														    log.addline(Feedback.println(Feedback.WEB, 
         																	 "[PATH] DASO: " + i.getLabel() + " " + answer.toString()));
         														    found = true;
         														    break;
         													    } else {
-        													    	answer.add(soln.getResource("x").toString());
         													    	if (soln.get("o").isResource()){
         													    		if (soln.getResource("o") != null) {
-        																    if (target.equals(soln.getResource("o").toString())) {
-        																    	answer.add(j.trim().replace(" ","").replace("_","-").replace("??", ""));
+        																    if (tarList.contains(soln.getResource("o").toString())) {
+        																    	answer.add(das.getObject(soln.getResource("o").toString()).getEntityLabel());
         																	    log.addline(Feedback.println(Feedback.WEB, 
         																				 "[PATH] DASO: " + i.getLabel() + " " + answer.toString()));
         																	    found = true;
         																	    break;
         																    }
+        													    		}
+        													    	} else if (soln.get("o").isLiteral()) {
+        													    		if (soln.getLiteral("o") != null) {
+        													    			if (refList.containsKey(soln.getLiteral("o").toString())) {
+        													    				answer.add(refList.get(soln.getLiteral("o").toString()));
+        																	    log.addline(Feedback.println(Feedback.WEB, 
+        																				 "[PATH] DASO: " + i.getLabel() + " " + answer.toString()));
+        																	    found = true;
+        																	    break;
+        													    			}
         													    		}
         													    	}
         													    }
@@ -240,10 +250,14 @@ public class AnnotationWorker {
         			    		}
         			  
         			    	}
+        			    	if (found == false) {
+							    log.addline(Feedback.println(Feedback.WEB, 
+										 "[PATH] DASO: " + i.getLabel() + " Path connections can not be found ! check the SDD definition. "));
+        			    	}
         		    	}
         		    	
         		    }
-        		}              	
+        		}           	
 		chain = annotateOASFile(recordFile, true);
 		
             } else if (file_name.startsWith("SDD-")) {
@@ -395,6 +409,7 @@ public class AnnotationWorker {
 
         SDD sdd = new SDD(file);
         String file_name = file.getFile().getName();
+        AnnotationLog log = AnnotationLog.create(file_name);
         String sddName = sdd.getName();
         if (sddName == ""){
             AnnotationLog.printException("This SDD has no Study_ID filled.", file_name);
@@ -430,13 +445,15 @@ public class AnnotationWorker {
         codeMappingRecordFile = new CSVRecordFile(codeMappingFile);
 
         if(!sdd.readCodeMapping(codeMappingRecordFile)){
-            AnnotationLog.printException("The CodeMapping of this SDD is empty. ", file.getFile().getName());
+            log.addline(Feedback.println(Feedback.WEB, 
+                    String.format("[WARNING] The CodeMapping of this SDD is empty. ", file_name)));
         }
         if(!sdd.readDataDictionary(dictionaryRecordFile)){
             AnnotationLog.printException("Read Data Dictionary failed, please refer to the error msg above.", file.getFile().getName());        	
         }
         if(!sdd.readCodebook(codeBookRecordFile)){
-            AnnotationLog.printException("The Codebook of this SDD is either invalid or empty.", file.getFile().getName());
+            log.addline(Feedback.println(Feedback.WEB, 
+                    String.format("[WARNING] The Codebook of this SDD is either invalid or empty. ", file_name)));
         }
         if(!sdd.readTimeline(timelineRecordFile)){
             AnnotationLog.println("The TimeLine of this SDD is empty.", file.getFile().getName());
