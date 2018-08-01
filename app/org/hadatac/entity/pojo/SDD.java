@@ -336,75 +336,7 @@ public class SDD {
         printErrList(checkUriResolve, 1);
         printErrList(checkUriRegister, 2);
         printErrList(checkStudyIndicatePath, 3);
-        printErrList(checkCellVal, 4);	
-
-        for (String a : dasaList) {
-            String path = "";
-            List<String> pathList = new ArrayList<String>();
-            String o1 = sa2so.get(a);
-            if (o1.length() > 0) {
-                if (dasoList.contains(o1)) {
-                    path += o1;
-                    pathList.add(o1);
-                    if (so2role.containsKey(o1)){
-                        path += " (" + so2role.get(o1) + ") ";
-                    } else if (so2so2.containsKey(o1)) {
-                        String o2 = so2so2.get(o1);
-                        if (!pathList.contains(o2)){
-                            path += " -- ";
-                            path += o2;
-                            if (so2role.containsKey(o2)){
-                                path += " (" + so2role.get(o2) + ") ";
-                            } else if (so2so2.containsKey(o2)) {
-                                if (!pathList.contains(so2so2.get(o2))){
-                                    path += " -- ";
-                                    path += so2so2.get(o2);
-                                    if (so2role.containsKey(so2so2.get(o2))){
-                                        path += " (" + so2role.get(so2so2.get(o2)) + ") ";
-                                    } else if (so2so2.containsKey(so2so2.get(o2))) {
-                                        path += " -- ";
-                                        path += so2so2.get(so2so2.get(o2));
-                                        if (so2role.containsKey(so2so2.get(so2so2.get(o2)))){
-                                            path += " (" + so2role.get(so2so2.get(so2so2.get(o2))) + ") ";
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    } else if (so2df.containsKey(o1)) {
-                        String o2 = so2df.get(o1);
-                        if (!pathList.contains(o2)){
-                            path += " -- ";
-                            path += o2;
-                            if (so2role.containsKey(o2)){
-                                path += " (" + so2role.get(o2) + ") ";
-                            } else if (so2so2.containsKey(o2)) {
-                                if (!pathList.contains(so2so2.get(o2))){
-                                    path += " -- ";
-                                    path += so2so2.get(o2);
-                                    if (so2role.containsKey(so2so2.get(o2))){
-                                        path += " (" + so2role.get(so2so2.get(o2)) + ") ";
-                                    } else if (so2so2.containsKey(so2so2.get(o2))) {
-                                        path += " -- ";										
-                                        path += so2so2.get(so2so2.get(o2));
-                                        if (so2role.containsKey(so2so2.get(so2so2.get(o2)))){
-                                            path += " (" + so2role.get(so2so2.get(so2so2.get(o2))) + ") ";
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                } else {
-                    AnnotationLog.printException(o1 + " is not defined in the DM.", sddfile.getFile().getName());
-                }
-            }
-            if (path.length()>0) {
-                AnnotationLog.println(a + " has study object path : -- " + path, sddfile.getFile().getName());
-            } else {
-                AnnotationLog.printException(a + " has no study object path !", sddfile.getFile().getName());
-            }
-        }
+        printErrList(checkCellVal, 4);
 
         if (uriResolvable == true){
             AnnotationLog.println("The Dictionary Mapping has resolvable uris.", sddfile.getFile().getName());	
