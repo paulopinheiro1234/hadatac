@@ -13,6 +13,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.jena.query.QueryParseException;
 import org.apache.jena.query.QuerySolution;
 import org.apache.jena.query.ResultSetRewindable;
 import org.hadatac.console.controllers.annotator.AnnotationLog;
@@ -32,6 +33,10 @@ import org.hadatac.utils.ConfigProp;
 import org.hadatac.utils.Feedback;
 import org.hadatac.utils.FirstLabel;
 import org.hadatac.utils.NameSpaces;
+import org.apache.jena.update.UpdateExecutionFactory;
+import org.apache.jena.update.UpdateFactory;
+import org.apache.jena.update.UpdateProcessor;
+import org.apache.jena.update.UpdateRequest;
 
 public class AnnotationWorker {
 
@@ -160,6 +165,7 @@ public class AnnotationWorker {
         						 "[ERROR] The SDD of study " + record.getValueByColumnName("Study ID") + " can not be found. Check if it is already ingested."));
         		} else {
         		    List<DataAcquisitionSchemaObject> loo = das.getObjects();
+        		    Map<String, String> dasoPL = new HashMap<String, String>();
 
         		    for (DataAcquisitionSchemaObject i : loo) {
         		    	
@@ -201,6 +207,7 @@ public class AnnotationWorker {
         													    	answer.add(das.getObject(soln.getResource("x").toString()).getEntityLabel());
         														    log.addline(Feedback.println(Feedback.WEB, 
         																	 "[PATH] DASO: " + i.getLabel() + ": \"" + answer.get(1) + " " + answer.get(0) + "\""));
+        														    dasoPL.put(i.getUri(), answer.get(1) + " " + answer.get(0));
         														    found = true;
         														    break;
         													    } else {
@@ -210,6 +217,7 @@ public class AnnotationWorker {
         																    	answer.add(das.getObject(soln.getResource("o").toString()).getEntityLabel());
         																	    log.addline(Feedback.println(Feedback.WEB, 
         																				 "[PATH] DASO: " + i.getLabel() + ": \"" + answer.get(1) + " " + answer.get(0) + "\""));
+        																	    dasoPL.put(i.getUri(), answer.get(1) + " " + answer.get(0));
         																	    found = true;
         																	    break;
         																    }
@@ -220,6 +228,7 @@ public class AnnotationWorker {
         													    				answer.add(refList.get(soln.getLiteral("o").toString()));
         																	    log.addline(Feedback.println(Feedback.WEB, 
         																				 "[PATH] DASO: " + i.getLabel() + ": \"" + answer.get(1) + " " + answer.get(0) + "\""));
+        																	    dasoPL.put(i.getUri(), answer.get(1) + " " + answer.get(0));
         																	    found = true;
         																	    break;
         													    			}
@@ -233,6 +242,7 @@ public class AnnotationWorker {
         													    	answer.add(refList.get(soln.getLiteral("x").toString()));
         														    log.addline(Feedback.println(Feedback.WEB, 
         																	 "[PATH] DASO: " + i.getLabel() + ": \"" + answer.get(1) + " " + answer.get(0) + "\""));
+        														    dasoPL.put(i.getUri(), answer.get(1) + " " + answer.get(0));
         														    found = true;
         														    break;
         													    }
@@ -254,11 +264,30 @@ public class AnnotationWorker {
 							    log.addline(Feedback.println(Feedback.WEB, 
 										 "[PATH] DASO: " + i.getLabel() + " Path connections can not be found ! check the SDD definition. "));
         			    	}
-        		    	}
-        		    	
+        		    	}    		    	
         		    }
-        		}           	
-		chain = annotateOASFile(recordFile, true);
+        		    //insert the triples
+        		    
+        		    for (String uri : dasoPL.keySet()) {
+            	        String insert = "";
+            	        insert += NameSpaces.getInstance().printSparqlNameSpaceList();
+            	        insert += "INSERT DATA {  ";
+            	        insert += "<" + uri + ">" + " hasco:hasRoleLabel  \"" + dasoPL.get(uri) + "\" . ";
+            	        insert += "} ";
+
+            	        try {
+            	            UpdateRequest request = UpdateFactory.create(insert);
+            	            UpdateProcessor processor = UpdateExecutionFactory.createRemote(
+            	                    request, CollectionUtil.getCollectionsName(CollectionUtil.METADATA_UPDATE));
+            	            processor.execute();
+            	        } catch (QueryParseException e) {
+            	            System.out.println("QueryParseException due to update query: " + insert);
+            	            throw e;
+            	        }
+        		    }
+        	        
+        		}        	
+        		chain = annotateOASFile(recordFile, true);
 		
             } else if (file_name.startsWith("SDD-")) {
                 if (file_name.endsWith(".xlsx")) {
