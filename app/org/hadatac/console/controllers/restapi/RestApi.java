@@ -56,6 +56,10 @@ import play.mvc.Controller;
 import play.libs.Json;
 
 public class RestApi extends Controller {
+
+    private final static int OBJ = 0;
+    private final static int DPL = 1;
+
 //****************
 // UTILITY METHODS
 //****************
@@ -184,14 +188,27 @@ public class RestApi extends Controller {
     }// /getSolrMeasurements()
 
     // getting measurements from solr for a particular study object
-    private SolrDocumentList getSolrMeasurements(String studyUri, String variableUri, String objUri){
-        //List<Measurement> listMeasurement = new ArrayList<Measurement>();
+    private SolrDocumentList getSolrMeasurements(int obj_dpl, String studyUri, String variableUri, String objUri){
         SolrDocumentList results = null;
         // build Solr query!
         SolrQuery solrQuery = new SolrQuery();
-        solrQuery.setQuery("study_uri_str:\"" + studyUri + "\"" +
-                           "AND study_object_uri_str:\"" + objUri + "\"" +
-                           "AND characteristic_uri_str:\"" + variableUri + "\"");
+	if (obj_dpl == OBJ) {
+	    solrQuery.setQuery("study_uri_str:\"" + studyUri + "\"" +
+			       "AND study_object_uri_str:\"" + objUri + "\"" +
+			       "AND characteristic_uri_str:\"" + variableUri + "\"");
+	} else {
+	    SolrDocumentList oasResult = getSolrOASs(objUri);
+	    if (oasResult == null) {
+		return null;
+	    } 
+	    String oasStr = parseOASs(oasResult);
+	    if (oasStr == null || oasStr.equals("")) {
+		return null;
+	    }
+	    solrQuery.setQuery("study_uri_str:\"" + studyUri + "\"" +
+			       "AND " +  oasStr + " " + 
+			       "AND characteristic_uri_str:\"" + variableUri + "\"");
+	}
         solrQuery.setRows(10000);
         System.out.println("[RestAPI] solr query: " + solrQuery);
         // make Solr query!
@@ -211,15 +228,30 @@ public class RestApi extends Controller {
     }// /getSolrMeasurements()
 
     // getting measurements from solr for a particular study object
-    private SolrDocumentList getSolrMeasurements(String studyUri, String variableUri, String objUri, String fromdatetime, String todatetime){
+    private SolrDocumentList getSolrMeasurements(int obj_dpl, String studyUri, String variableUri, String objUri, String fromdatetime, String todatetime){
         //List<Measurement> listMeasurement = new ArrayList<Measurement>();
         SolrDocumentList results = null;
         // build Solr query!
         SolrQuery solrQuery = new SolrQuery();
-        solrQuery.setQuery("study_uri_str:\"" + studyUri + "\"" +
-                           "AND study_object_uri_str:\"" + objUri + "\"" +
-                           "AND characteristic_uri_str:\"" + variableUri + "\"" + 
-                           "AND timestamp_date:[" + fromdatetime + " TO " + todatetime + "]");
+	if (obj_dpl == OBJ) {
+	    solrQuery.setQuery("study_uri_str:\"" + studyUri + "\"" +
+			       "AND study_object_uri_str:\"" + objUri + "\"" +
+			       "AND characteristic_uri_str:\"" + variableUri + "\"" + 
+			       "AND timestamp_date:[" + fromdatetime + " TO " + todatetime + "]");
+	} else {
+	    SolrDocumentList oasResult = getSolrOASs(objUri);
+	    if (oasResult == null) {
+		return null;
+	    } 
+	    String oasStr = parseOASs(oasResult);
+	    if (oasStr == null || oasStr.equals("")) {
+		return null;
+	    }
+	    solrQuery.setQuery("study_uri_str:\"" + studyUri + "\"" +
+			       "AND " + oasStr  + " " + 
+			       "AND characteristic_uri_str:\"" + variableUri + "\"" + 
+			       "AND timestamp_date:[" + fromdatetime + " TO " + todatetime + "]");
+	}
         solrQuery.setRows(10000);
         System.out.println("[RestAPI] solr query: " + solrQuery);
         // make Solr query!
@@ -238,15 +270,29 @@ public class RestApi extends Controller {
         return results;
     }// /getSolrMeasurements()
 
-    private String getSolrMeasurementsTimeRange(String studyUri, String variableUri, String objUri){
+    private String getSolrMeasurementsTimeRange(int obj_dpl, String studyUri, String variableUri, String objUri){
 	String firstTime = null;
 	String lastTime = null;
         SolrDocumentList results = null;
         // build first Solr query!
         SolrQuery solrQuery = new SolrQuery();
-        solrQuery.setQuery("study_uri_str:\"" + studyUri + "\"" +
-                           "AND study_object_uri_str:\"" + objUri + "\"" +
-                           "AND characteristic_uri_str:\"" + variableUri + "\"" );
+	if (obj_dpl == OBJ) {
+	    solrQuery.setQuery("study_uri_str:\"" + studyUri + "\"" +
+			       "AND study_object_uri_str:\"" + objUri + "\"" +
+			       "AND characteristic_uri_str:\"" + variableUri + "\"" );
+	} else {
+	    SolrDocumentList oasResult = getSolrOASs(objUri);
+	    if (oasResult == null) {
+		return null;
+	    } 
+	    String oasStr = parseOASs(oasResult);
+	    if (oasStr == null || oasStr.equals("")) {
+		return null;
+	    }
+	    solrQuery.setQuery("study_uri_str:\"" + studyUri + "\"" +
+			       "AND " +  oasStr + " " + 
+			       "AND characteristic_uri_str:\"" + variableUri + "\"");
+	}
         solrQuery.setRows(1);
 	solrQuery.setSort("timestamp_date",SolrQuery.ORDER.asc);
         System.out.println("[RestAPI] solr query: " + solrQuery);
@@ -287,6 +333,28 @@ public class RestApi extends Controller {
 	}
 	return "ERROR";
     }// /getSolrMeasurementsTimeRange()
+
+    // getting OASs from solr!
+    private SolrDocumentList getSolrOASs(String dplUri){
+        SolrDocumentList results = null;
+        // build Solr query!
+        SolrQuery solrQuery = new SolrQuery();
+        solrQuery.setQuery("deployment_uri_str:\"" + dplUri + "\"");
+        solrQuery.setRows(10000);
+        // make Solr query!
+        try {
+            SolrClient solr = new HttpSolrClient.Builder(
+                    ConfigFactory.load().getString("hadatac.solr.data") 
+                    + CollectionUtil.DATA_COLLECTION).build();
+            QueryResponse queryResponse = solr.query(solrQuery, SolrRequest.METHOD.POST);
+            solr.close();
+
+            results = queryResponse.getResults();
+        } catch (Exception e) {
+            System.out.println("[RestAPI.getSolrOASs] ERROR: " + e.getMessage());
+        }
+        return results;
+    }// /getSolrOASs()
 
 //*************************
 // BLAZEGRAPH QUERY METHODS
@@ -448,6 +516,48 @@ public class RestApi extends Controller {
         return anode;
     }// /unitsQuery
 
+    // handles blazegraph query and result parsing for deployment details
+    private ArrayNode deploymentsQuery(){
+        String sparqlQueryString = NameSpaces.getInstance().printSparqlNameSpaceList() + 
+	    "select ?dpl ?plt ?ins where { " + 
+	    "?dpl a vstoi:Deployment . " + 
+	    "?dpl vstoi:hasPlatform ?plt . " + 
+	    "?dpl hasco:hasInstrument ?ins . " +
+	    "}";
+        //System.out.println("[deploymentsQuery] sparql query\n" + sparqlQueryString);
+	
+	ResultSetRewindable resultsrw = SPARQLUtils.select(
+		  CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), sparqlQueryString);
+
+        if (resultsrw.size() == 0) {
+            System.out.println("[deploymentsQuery] No deployments found in blazegraph!");
+            return null;
+        }
+        
+        ObjectMapper mapper = new ObjectMapper();
+        ArrayNode anode = mapper.createArrayNode();
+
+        while(resultsrw.hasNext()){
+            ObjectNode temp = mapper.createObjectNode();
+	    QuerySolution soln = resultsrw.next();
+	    if (soln.get("dpl") != null) {
+		temp.put("uri", soln.get("dpl").toString());
+	    } else {
+                System.out.println("[deploymentsQuery] ERROR: Result returned without URI? Skipping....");
+                continue;
+            }
+	    if (soln.get("plt") != null) {
+		temp.put("platform", soln.get("plt").toString());
+	    }
+	    if (soln.get("ins") != null) {
+		temp.put("instrument", soln.get("ins").toString());
+	    }
+            anode.add(temp);
+        }// /parse sparql results
+        System.out.println("[deploymentsQuery] parsed " + anode.size() + " results into array");
+        return anode;
+    }// /deploymentsQuery
+    
     private ArrayNode ocQuery(String ocUri){
         if(ocUri == null){
             return null; 
@@ -576,6 +686,23 @@ public class RestApi extends Controller {
             return ok(ApiUtil.createResponse(jsonObject, true));
         }
     }// /getAllUnits
+
+    // ************
+    // Deployments!
+    // ************
+    public Result getAllDeployments(){
+        ObjectMapper mapper = new ObjectMapper();
+        // 1. Query Blazegraph for deployments
+        ArrayNode anode = deploymentsQuery();
+        // 2. Construct response
+        if (anode == null){
+            return notFound(ApiUtil.createResponse("Encountered Blazegraph error!", false));
+        } else{
+            JsonNode jsonObject = mapper.convertValue(anode, JsonNode.class);
+            System.out.println("[getAllDeployments] Done");
+            return ok(ApiUtil.createResponse(jsonObject, true));
+        }
+    }// /getAllDeployments
 
     // ***********
     // Indicators!
@@ -890,6 +1017,34 @@ public class RestApi extends Controller {
 	return null;
     }
 
+    private String parseOASs(SolrDocumentList solrResults) {
+        Iterator<SolrDocument> i = solrResults.iterator();
+	List<String> uris = new ArrayList<String>();
+        while (i.hasNext()) {
+            SolrDocument doc = i.next();
+	    uris.add(SolrUtils.getFieldValue(doc, "uri"));
+        }
+	String oas = "";
+	if (uris.size() == 1) {
+	    oas = "acquisition_uri_str:\"" + uris.get(0) + "\"";
+	    return oas;
+	} 
+
+	if (uris.size() > 0) {
+	    oas = "( ";
+	    for (int uri = 0; uri < uris.size(); uri++) {
+		oas += "acquisition_uri_str:\"" + uris.get(uri) + "\"";
+		if (uri < (uris.size() - 1)) {
+		    oas += " OR ";
+		}
+	    }
+	    oas += ")";
+	    return oas;
+	}
+
+	return null;
+    }
+
     // :study_uri/:variable_uri/
     public Result getMeasurements(String studyUri, String variableUri){
         if(variableUri == null){
@@ -923,7 +1078,7 @@ public class RestApi extends Controller {
         }
         // Solr query
         System.out.println("[RestAPI] Getting measurements for " + objUri);
-        SolrDocumentList solrResults = getSolrMeasurements(studyUri, variableUri, objUri);
+        SolrDocumentList solrResults = getSolrMeasurements(OBJ, studyUri, variableUri, objUri);
         if(solrResults.size() < 1){
             return notFound(ApiUtil.createResponse("Solr Message: no measurements found", false));
         }
@@ -953,7 +1108,7 @@ public class RestApi extends Controller {
         }
         // Solr query
         System.out.println("[RestAPI] Getting measurements for " + objUri);
-        SolrDocumentList solrResults = getSolrMeasurements(studyUri, variableUri, objUri, fromdatetime, todatetime);
+        SolrDocumentList solrResults = getSolrMeasurements(OBJ, studyUri, variableUri, objUri, fromdatetime, todatetime);
         if(solrResults.size() < 1){
             return notFound(ApiUtil.createResponse("Solr Message: no measurements found", false));
         }
@@ -977,12 +1132,84 @@ public class RestApi extends Controller {
         }
         // Solr query
         System.out.println("[RestAPI] Getting time range for measurements for " + objUri);
-        String timerange = getSolrMeasurementsTimeRange(studyUri, variableUri, objUri);
+        String timerange = getSolrMeasurementsTimeRange(OBJ, studyUri, variableUri, objUri);
         if(timerange == null){
             return internalServerError(ApiUtil.createResponse("Error retrieving time range for  measurements", false));
         } else {
             return ok(timerange);
         }
     }// /getMeasurementsForObjTimeRange()
+
+    // :study_uri/:variable_uri/:deployment_uri
+    public Result getMeasurementsForDpl(String studyUri, String variableUri, String dplUri){
+        if(variableUri == null){
+            return badRequest(ApiUtil.createResponse("No variable specified", false));
+        }
+        if(studyUri == null){
+            return badRequest(ApiUtil.createResponse("No study specified", false));
+        }
+        // Solr query
+        System.out.println("[RestAPI] Getting measurements for " + dplUri);
+        SolrDocumentList solrResults = getSolrMeasurements(DPL, studyUri, variableUri, dplUri);
+        if(solrResults == null || solrResults.size() < 1){
+            return notFound(ApiUtil.createResponse("Solr Message: no measurements found", false));
+        }
+
+        JsonNode jsonObject = parseMeasurements(solrResults);
+
+        if(jsonObject == null){
+            return internalServerError(ApiUtil.createResponse("Error parsing measurments", false));
+        } else {
+            return ok(ApiUtil.createResponse(jsonObject, true));
+        }
+    }// /getMeasurementsForDlp()
+
+    // :study_uri/:variable_uri/:deployment_uri/:fromdatetime/:todatetime
+    public Result getMeasurementsForDplInPeriod(String studyUri, String variableUri, String dplUri, String fromdatetime, String todatetime){
+        if(variableUri == null){
+            return badRequest(ApiUtil.createResponse("No variable specified", false));
+        }
+        if(studyUri == null){
+            return badRequest(ApiUtil.createResponse("No study specified", false));
+        }
+        if(fromdatetime == null){
+            return badRequest(ApiUtil.createResponse("No fromdatetime specified", false));
+        }
+        if(todatetime == null){
+            return badRequest(ApiUtil.createResponse("No todatetime specified", false));
+        }
+        // Solr query
+        System.out.println("[RestAPI] Getting measurements for " + dplUri);
+        SolrDocumentList solrResults = getSolrMeasurements(DPL, studyUri, variableUri, dplUri, fromdatetime, todatetime);
+        if(solrResults == null || solrResults.size() < 1){
+            return notFound(ApiUtil.createResponse("Solr Message: no measurements found", false));
+        }
+
+        JsonNode jsonObject = parseMeasurements(solrResults);
+
+        if(jsonObject == null){
+            return internalServerError(ApiUtil.createResponse("Error parsing measurments", false));
+        } else {
+            return ok(ApiUtil.createResponse(jsonObject, true));
+        }
+    }// /getMeasurementsForDplInPeriod()
+
+    // :study_uri/:variable_uri/:deployment_uri/timerange
+    public Result getMeasurementsForDplTimeRange(String studyUri, String variableUri, String dplUri){
+        if(variableUri == null){
+            return badRequest(ApiUtil.createResponse("No variable specified", false));
+        }
+        if(studyUri == null){
+            return badRequest(ApiUtil.createResponse("No study specified", false));
+        }
+        // Solr query
+        System.out.println("[RestAPI] Getting time range for measurements for deployment " + dplUri);
+        String timerange = getSolrMeasurementsTimeRange(DPL, studyUri, variableUri, dplUri);
+        if(timerange == null){
+            return internalServerError(ApiUtil.createResponse("Error retrieving time range for  measurements", false));
+        } else {
+            return ok(timerange);
+        }
+    }// /getMeasurementsForDplTimeRange()
 
 }// /RestApi

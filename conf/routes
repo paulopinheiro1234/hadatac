@@ -442,6 +442,7 @@ GET     /hadatac/api/studies/units/:studyuri              org.hadatac.console.co
 GET     /hadatac/api/variables/all                        org.hadatac.console.controllers.restapi.RestApi.getAllVariables()
 GET     /hadatac/api/variables/:variableuri               org.hadatac.console.controllers.restapi.RestApi.getVariable(variableuri: String)
 GET     /hadatac/api/units/all                            org.hadatac.console.controllers.restapi.RestApi.getAllUnits()
+GET     /hadatac/api/deployments/all                      org.hadatac.console.controllers.restapi.RestApi.getAllDeployments()
 GET     /hadatac/api/objectcollections/size/:ocuri        org.hadatac.console.controllers.restapi.RestApi.getOCSize(ocuri: String)
 GET     /hadatac/api/objectcollections/:ocuri/all         org.hadatac.console.controllers.restapi.RestApi.getObjectCollection(ocuri: String)
 GET     /hadatac/api/objectcollections/:ocuri/:offset     org.hadatac.console.controllers.restapi.RestApi.getObjectsInCollection(ocuri: String, offset: Integer)
@@ -449,6 +450,9 @@ GET     /hadatac/api/indicators/all                       org.hadatac.console.co
 GET     /hadatac/api/measurements/:studyuri/:variableuri/:objuri     org.hadatac.console.controllers.restapi.RestApi.getMeasurementsForObj(studyuri: String, variableuri: String, objuri: String)
 GET     /hadatac/api/measurements/:studyuri/:variableuri/:objuri/timerange   org.hadatac.console.controllers.restapi.RestApi.getMeasurementsForObjTimeRange(studyuri: String, variableuri: String, objuri: String)
 GET     /hadatac/api/measurements/:studyuri/:variableuri/:objuri/:fromdatetime/:todatetime     org.hadatac.console.controllers.restapi.RestApi.getMeasurementsForObjInPeriod(studyuri: String, variableuri: String, objuri: String, fromdatetime: String, todatetime: String)
+GET     /hadatac/api/measurements/dpl/:studyuri/:variableuri/:dpluri     org.hadatac.console.controllers.restapi.RestApi.getMeasurementsForDpl(studyuri: String, variableuri: String, dpluri: String)
+GET     /hadatac/api/measurements/dpl/:studyuri/:variableuri/:dpluri/timerange   org.hadatac.console.controllers.restapi.RestApi.getMeasurementsForDplTimeRange(studyuri: String, variableuri: String, dpluri: String)
+GET     /hadatac/api/measurements/dpl/:studyuri/:variableuri/:dpluri/:fromdatetime/:todatetime     org.hadatac.console.controllers.restapi.RestApi.getMeasurementsForDplInPeriod(studyuri: String, variableuri: String, dpluri: String, fromdatetime: String, todatetime: String)
 GET     /hadatac/api/measurements/:studyuri/:variableuri     org.hadatac.console.controllers.restapi.RestApi.getMeasurements(studyuri: String, variableuri: String)
 
 
