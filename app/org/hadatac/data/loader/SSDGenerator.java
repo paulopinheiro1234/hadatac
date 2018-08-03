@@ -29,6 +29,8 @@ public class SSDGenerator extends BasicGenerator {
         this.SDDName = str.substring(0, str.lastIndexOf('.'));
 	if (records.get(0) != null) {
 	    studyUri = URIUtils.convertToWholeURI(getUri(records.get(0)));
+	} else {
+		studyUri = "";
 	}
     }
 
