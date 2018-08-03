@@ -23,6 +23,7 @@ import org.hadatac.entity.pojo.ObjectAccessSpec;
 import org.hadatac.entity.pojo.DataFile;
 import org.hadatac.entity.pojo.DPL;
 import org.hadatac.entity.pojo.DataAcquisitionSchema;
+import org.hadatac.entity.pojo.DataAcquisitionSchemaAttribute;
 import org.hadatac.entity.pojo.DataAcquisitionSchemaObject;
 import org.hadatac.entity.pojo.SDD;
 import org.hadatac.entity.pojo.SSD;
@@ -164,11 +165,23 @@ public class AnnotationWorker {
         		    log.addline(Feedback.println(Feedback.WEB, 
         						 "[ERROR] The SDD of study " + record.getValueByColumnName("Study ID") + " can not be found. Check if it is already ingested."));
         		} else {
-        		    List<DataAcquisitionSchemaObject> loo = das.getObjects();
+//        		    List<DataAcquisitionSchemaObject> loo = das.getObjects();
         		    Map<String, String> dasoPL = new HashMap<String, String>();
+        		    List<DataAcquisitionSchemaObject> loo = new ArrayList<DataAcquisitionSchemaObject>();
+        		    List<String> loo2 = new ArrayList<String>();
+        		    for (DataAcquisitionSchemaAttribute attr : das.getAttributes()) {
+        		    	System.out.println(" +++++++ " + attr.getLabel() + " --- " + attr.getObjectViewLabel());
+        		    	if (attr.getObjectViewLabel().length() > 0) {
+            		    	if (!loo2.contains(attr.getObjectViewLabel())) {
+                		    	loo2.add(attr.getObjectViewLabel());
+                		    	loo.add(attr.getObject());
+            		    	}
+        		    	}
+        		    }
+				    log.addline(Feedback.println(Feedback.WEB, 
+							 "[PATH COMPUTATION] The number of DASOs to be computed: " + loo2.toString()));
 
         		    for (DataAcquisitionSchemaObject i : loo) {
-        		    	
         		    	if (i.getEntityLabel() == null || i.getEntityLabel().length() == 0) {
         				    log.addline(Feedback.println(Feedback.WEB, 
         							 "[ERROR] The Entity Label of DASO : " + i.getLabel() + " can not be found. Check SDD."));
@@ -203,7 +216,7 @@ public class AnnotationWorker {
         										    try {								    	
         										    	if (soln.get("x").isResource()){
         													if (soln.getResource("x") != null) {
-        													    if (tarList.contains(soln.getResource("x").toString())) {							    	
+        													    if (tarList.contains(soln.getResource("x").toString())) {					    	
         													    	answer.add(das.getObject(soln.getResource("x").toString()).getEntityLabel());
         														    log.addline(Feedback.println(Feedback.WEB, 
         																	 "[PATH] DASO: " + i.getLabel() + ": \"" + answer.get(1) + " " + answer.get(0) + "\""));
@@ -264,7 +277,10 @@ public class AnnotationWorker {
 							    log.addline(Feedback.println(Feedback.WEB, 
 										 "[PATH] DASO: " + i.getLabel() + " Path connections can not be found ! check the SDD definition. "));
         			    	}
-        		    	}    		    	
+        		    	} else {
+        				    log.addline(Feedback.println(Feedback.WEB, 
+          							 "[PATH] Skipped :" + i.getLabel()));
+        		    	}
         		    }
         		    //insert the triples
         		    

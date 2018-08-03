@@ -139,8 +139,26 @@ public class SDD {
     }
 
     public boolean checkStudyIndicatorPath(String str) {
+    	
+    	List<String> list = new ArrayList<String>();
+    	list.add("sio:TimeStamp");
+    	list.add("sio:TimeInstant");
+    	list.add("hasco:namedTime");
+    	list.add("hasco:originalID");
+    	list.add("hasco:uriId");
+    	list.add("hasco:hasMetaEntity");
+    	list.add("hasco:hasMetaEntityURI");
+    	list.add("hasco:hasMetaAttribute");
+    	list.add("hasco:hasMetaAttributeURI");
+    	list.add("hasco:hasMetaUnit");
+    	list.add("hasco:hasMetaUnitURI");
+    	list.add("sio:InRelationTo");
+    	list.add("hasco:hasLOD");
+    	list.add("hasco:hasCalibration");
+    	list.add("hasco:hasElevation");
+    	list.add("hasco:hasLocation");
 
-        if (str.equals("hasco:originalID")) {
+        if (list.contains(str)) {
             return true;
         }
 
