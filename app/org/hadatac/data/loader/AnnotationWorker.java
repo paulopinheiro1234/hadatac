@@ -499,7 +499,8 @@ public class AnnotationWorker {
                     String.format("[WARNING] The CodeMapping of this SDD is empty. ", file_name)));
         }
         if(!sdd.readDataDictionary(dictionaryRecordFile)){
-            AnnotationLog.printException("Read Data Dictionary failed, please refer to the error msg above.", file.getFile().getName());        	
+            AnnotationLog.printException("Read Data Dictionary failed, please refer to the error msg above.", file.getFile().getName());
+            return null;
         }
         if(!sdd.readCodebook(codeBookRecordFile)){
             log.addline(Feedback.println(Feedback.WEB, 
