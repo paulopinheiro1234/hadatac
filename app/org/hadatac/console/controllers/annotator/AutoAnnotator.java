@@ -67,11 +67,13 @@ public class AutoAnnotator extends Controller {
         if (user.isDataManager()) {
             proc_files = DataFile.findAll(DataFile.PROCESSED);
             unproc_files = DataFile.findAll(DataFile.UNPROCESSED);
+            unproc_files.addAll(DataFile.findAll(DataFile.FREEZED));
             DataFile.includeUnrecognizedFiles(path_unproc, unproc_files);
             DataFile.includeUnrecognizedFiles(path_proc, proc_files);
         } else {
             proc_files = DataFile.find(user.getEmail(), DataFile.PROCESSED);
             unproc_files = DataFile.find(user.getEmail(), DataFile.UNPROCESSED);
+            unproc_files.addAll(DataFile.find(user.getEmail(), DataFile.FREEZED));
         }
 
         DataFile.filterNonexistedFiles(path_proc, proc_files);
@@ -313,6 +315,26 @@ public class AutoAnnotator extends Controller {
 
         AnnotationLog log = new AnnotationLog(fileName);
         log.addline(Feedback.println(Feedback.WEB, String.format("[OK] Moved file %s to unprocessed folder", fileName)));
+
+        return redirect(routes.AutoAnnotator.index());
+    }
+    
+    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
+    public Result activateDataFile(String fileName) {           
+        final SysUser user = AuthApplication.getLocalUser(session());
+        DataFile dataFile = null;
+        if (user.isDataManager()) {
+            dataFile = DataFile.findByName(null, fileName);
+        }
+        else {
+            dataFile = DataFile.findByName(user.getEmail(), fileName);
+        }
+        if (null == dataFile) {
+            return badRequest("You do NOT have the permission to operate this file!");
+        }
+
+        dataFile.setStatus(DataFile.UNPROCESSED);
+        dataFile.save();
 
         return redirect(routes.AutoAnnotator.index());
     }

@@ -31,6 +31,7 @@ public class DataFile {
     // Process status for auto-annotator
     public static final String UNPROCESSED = "UNPROCESSED";
     public static final String PROCESSED = "PROCESSED";
+    public static final String FREEZED = "FREEZED";
 
     // Process status for downloader
     public static final String CREATING = "CREATING";

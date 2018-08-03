@@ -32,7 +32,6 @@ import org.hadatac.metadata.loader.URIUtils;
 import org.hadatac.utils.CollectionUtil;
 import org.hadatac.utils.ConfigProp;
 import org.hadatac.utils.Feedback;
-import org.hadatac.utils.FirstLabel;
 import org.hadatac.utils.NameSpaces;
 import org.apache.jena.update.UpdateExecutionFactory;
 import org.apache.jena.update.UpdateFactory;
@@ -49,7 +48,7 @@ public class AnnotationWorker {
                 ConfigProp.getDefaultOwnerEmail());
     }
 
-	public static void autoAnnotate() {
+    public static void autoAnnotate() {
         if(ConfigProp.getPropertyValue("autoccsv.config", "auto").equals("off")){
             return;
         }
@@ -60,7 +59,7 @@ public class AnnotationWorker {
         List<DataFile> unproc_files = DataFile.findAll(DataFile.UNPROCESSED);
         DataFile.filterNonexistedFiles(path_proc, proc_files);
         DataFile.filterNonexistedFiles(path_unproc, unproc_files);
-        
+
         unproc_files.sort(new Comparator<DataFile>() {
             @Override
             public int compare(DataFile o1, DataFile o2) {
@@ -71,16 +70,15 @@ public class AnnotationWorker {
         for (DataFile file : unproc_files) {
             file.setLastProcessTime(new SimpleDateFormat("yyyy/MM/dd HH:mm:ss").format(new Date()));
             file.save();
-            
+
             String file_name = file.getFileName();
             String filePath = path_unproc + "/" + file_name;
             AnnotationLog log = new AnnotationLog(file_name);
-            
-            
+
             if (proc_files.contains(file)) {
                 log.addline(Feedback.println(Feedback.WEB, String.format(
                         "[ERROR] Already processed a file with the same name %s . "
-                        + "Please delete the old file before moving forward ", file_name)));
+                                + "Please delete the old file before moving forward ", file_name)));
                 return;
             }
 
@@ -99,7 +97,7 @@ public class AnnotationWorker {
 
             boolean bSucceed = false;
             GeneratorChain chain = null;
-            
+
             if (file_name.startsWith("DA-")) {
                 chain = annotateDAFile(file, recordFile);
             } else if (file_name.startsWith("PID-")) {
@@ -118,7 +116,7 @@ public class AnnotationWorker {
                         log.addline(Feedback.println(Feedback.WEB, "[ERROR] Missing InfoSheet. "));
                         return;
                     }
-		}
+                }
                 chain = annotateDPLFile(recordFile);
             } else if (file_name.startsWith("MAP-")) {
                 if (recordFile.getNumberOfSheets() > 1) {
@@ -130,205 +128,32 @@ public class AnnotationWorker {
             } else if (file_name.startsWith("ACQ-")) {
                 chain = annotateACQFile(recordFile, true);
             } else if (file_name.startsWith("OAS-")) {
-            	
-        		System.out.println("OAS HERE!");
-        		final String kbPrefix = ConfigProp.getKbPrefix();
-				Record record = recordFile.getRecords().get(0);
-				String studyName = record.getValueByColumnName("Study ID");
-				String studyUri = ConfigProp.getKbPrefix() + "STD-" + studyName;
-				studyUri = URIUtils.replacePrefixEx(studyUri);
-		
-				log.addline(Feedback.println(Feedback.WEB, "[OK] Study ID found: " + studyName));
-				log.addline(Feedback.println(Feedback.WEB, "[OK] Study URI found: " + studyUri));
-
-                List<ObjectCollection> ocList = ObjectCollection.findByStudyUri(studyUri);
-                Map<String, String> refList = new HashMap<String, String>();
-                List<String> tarList = new ArrayList<String>();
-                
-                for (ObjectCollection oc: ocList) {
-        			if (oc.getGroundingLabel().length() > 0) {
-        				refList.put(oc.getSOCReference(), oc.getGroundingLabel());
-        				tarList.add(kbPrefix + "DASO-" + studyName + "-" + oc.getSOCReference().trim().replace(" ","").replace("_","-").replace("??", ""));
-        				System.out.println("========================= " + oc.getGroundingLabel());
-        			}
-        		}
-
-        		Map<String, String> labelList = ObjectCollection.labelsByStudyUri(studyUri);
-//        		for (Map.Entry entry : labelList.entrySet()) {
-//        		    log.addline(Feedback.println(Feedback.WEB, "[OK] Label(s) found: " + entry.getKey() + ", " + entry.getValue()));
-//        		}
-        		
-        		String das_uri = URIUtils.convertToWholeURI(ConfigProp.getKbPrefix() + "DAS-" + record.getValueByColumnName("data dict").replace("SDD-", ""));
-        		System.out.println("das_uri " + das_uri);
-        		DataAcquisitionSchema das = DataAcquisitionSchema.find(das_uri);
-        		if (das == null) {
-        		    log.addline(Feedback.println(Feedback.WEB, 
-        						 "[ERROR] The SDD of study " + record.getValueByColumnName("Study ID") + " can not be found. Check if it is already ingested."));
-        		} else {
-//        		    List<DataAcquisitionSchemaObject> loo = das.getObjects();
-        		    Map<String, String> dasoPL = new HashMap<String, String>();
-        		    List<DataAcquisitionSchemaObject> loo = new ArrayList<DataAcquisitionSchemaObject>();
-        		    List<String> loo2 = new ArrayList<String>();
-        		    for (DataAcquisitionSchemaAttribute attr : das.getAttributes()) {
-        		    	System.out.println(" +++++++ " + attr.getLabel() + " --- " + attr.getObjectViewLabel());
-        		    	if (attr.getObjectViewLabel().length() > 0) {
-            		    	if (!loo2.contains(attr.getObjectViewLabel())) {
-                		    	loo2.add(attr.getObjectViewLabel());
-                		    	loo.add(attr.getObject());
-            		    	}
-        		    	}
-        		    }
-				    log.addline(Feedback.println(Feedback.WEB, 
-							 "[PATH COMPUTATION] The number of DASOs to be computed: " + loo2.toString()));
-
-        		    for (DataAcquisitionSchemaObject i : loo) {
-        		    	if (i.getEntityLabel() == null || i.getEntityLabel().length() == 0) {
-        				    log.addline(Feedback.println(Feedback.WEB, 
-        							 "[ERROR] The Entity Label of DASO : " + i.getLabel() + " can not be found. Check SDD."));
-        		    	} else if (!refList.containsKey(i.getLabel())) {
-        		    	
-        			    	List<String> answer = new ArrayList<String>();
-        			    	answer.add(i.getEntityLabel());
-        			    	Boolean found = false;
-        			    	
-        			    	for (String j : refList.keySet()) {
-        			    		
-        			    		if (found == false) {
-        				    		String target = kbPrefix + "DASO-" + studyName + "-" + j.trim().replace(" ","").replace("_","-").replace("??", "");
-        							String queryString = NameSpaces.getInstance().printSparqlNameSpaceList() + 
-        								    "SELECT ?x ?o WHERE { \n" + 
-        								    "<" + i.getUri() + "> ?p ?x . \n" + 
-        								    "	?x ?p1 ?o .  \n" + 
-        								    "	OPTIONAL {?o ?p2 " + target + " } " +
-        								    "}";
-        								
-        							ResultSetRewindable resultsrw = SPARQLUtils.select(CollectionUtil.getCollectionsName(
-        																		     CollectionUtil.METADATA_SPARQL), queryString);
-        								
-        							if (!resultsrw.hasNext()) {
-        								    System.out.println("[WARNING] OAS ingestion: Could not find triples on OCs, SSD is probably not correctly ingested.");
-        							}
-        							        
-        							while (resultsrw.hasNext()) {
-        								    QuerySolution soln = resultsrw.next();					    
-        								    try {
-        										if (soln != null) {
-        										    try {								    	
-        										    	if (soln.get("x").isResource()){
-        													if (soln.getResource("x") != null) {
-        													    if (tarList.contains(soln.getResource("x").toString())) {					    	
-        													    	answer.add(das.getObject(soln.getResource("x").toString()).getEntityLabel());
-        														    log.addline(Feedback.println(Feedback.WEB, 
-        																	 "[PATH] DASO: " + i.getLabel() + ": \"" + answer.get(1) + " " + answer.get(0) + "\""));
-        														    dasoPL.put(i.getUri(), answer.get(1) + " " + answer.get(0));
-        														    found = true;
-        														    break;
-        													    } else {
-        													    	if (soln.get("o").isResource()){
-        													    		if (soln.getResource("o") != null) {
-        																    if (tarList.contains(soln.getResource("o").toString())) {
-        																    	answer.add(das.getObject(soln.getResource("o").toString()).getEntityLabel());
-        																	    log.addline(Feedback.println(Feedback.WEB, 
-        																				 "[PATH] DASO: " + i.getLabel() + ": \"" + answer.get(1) + " " + answer.get(0) + "\""));
-        																	    dasoPL.put(i.getUri(), answer.get(1) + " " + answer.get(0));
-        																	    found = true;
-        																	    break;
-        																    }
-        													    		}
-        													    	} else if (soln.get("o").isLiteral()) {
-        													    		if (soln.getLiteral("o") != null) {
-        													    			if (refList.containsKey(soln.getLiteral("o").toString())) {
-        													    				answer.add(refList.get(soln.getLiteral("o").toString()));
-        																	    log.addline(Feedback.println(Feedback.WEB, 
-        																				 "[PATH] DASO: " + i.getLabel() + ": \"" + answer.get(1) + " " + answer.get(0) + "\""));
-        																	    dasoPL.put(i.getUri(), answer.get(1) + " " + answer.get(0));
-        																	    found = true;
-        																	    break;
-        													    			}
-        													    		}
-        													    	}
-        													    }
-        													}
-        										    	} else if (soln.get("x").isLiteral()) {
-        											    	if (soln.getLiteral("x") != null) {
-        													    if (refList.containsKey(soln.getLiteral("x").toString())) {
-        													    	answer.add(refList.get(soln.getLiteral("x").toString()));
-        														    log.addline(Feedback.println(Feedback.WEB, 
-        																	 "[PATH] DASO: " + i.getLabel() + ": \"" + answer.get(1) + " " + answer.get(0) + "\""));
-        														    dasoPL.put(i.getUri(), answer.get(1) + " " + answer.get(0));
-        														    found = true;
-        														    break;
-        													    }
-        												    }
-        										    	}
-        												
-        										    } catch (Exception e1) {
-        												return;
-        										    }
-        										}
-        								    } catch (Exception e) {
-        								    	System.out.println("[ERROR] : " + e.getMessage());
-        								    }
-        							}
-        			    		}
-        			  
-        			    	}
-        			    	if (found == false) {
-							    log.addline(Feedback.println(Feedback.WEB, 
-										 "[PATH] DASO: " + i.getLabel() + " Path connections can not be found ! check the SDD definition. "));
-        			    	}
-        		    	} else {
-        				    log.addline(Feedback.println(Feedback.WEB, 
-          							 "[PATH] Skipped :" + i.getLabel()));
-        		    	}
-        		    }
-        		    //insert the triples
-        		    
-        		    for (String uri : dasoPL.keySet()) {
-            	        String insert = "";
-            	        insert += NameSpaces.getInstance().printSparqlNameSpaceList();
-            	        insert += "INSERT DATA {  ";
-            	        insert += "<" + uri + ">" + " hasco:hasRoleLabel  \"" + dasoPL.get(uri) + "\" . ";
-            	        insert += "} ";
-
-            	        try {
-            	            UpdateRequest request = UpdateFactory.create(insert);
-            	            UpdateProcessor processor = UpdateExecutionFactory.createRemote(
-            	                    request, CollectionUtil.getCollectionsName(CollectionUtil.METADATA_UPDATE));
-            	            processor.execute();
-            	        } catch (QueryParseException e) {
-            	            System.out.println("QueryParseException due to update query: " + insert);
-            	            throw e;
-            	        }
-        		    }
-        	        
-        		}        	
-        		chain = annotateOASFile(recordFile, true);
-		
+                checkOASFile(recordFile);
+                chain = annotateOASFile(recordFile, true);
             } else if (file_name.startsWith("SDD-")) {
                 if (file_name.endsWith(".xlsx")) {
                     recordFile = new SpreadsheetRecordFile(new File(filePath), "InfoSheet");
                     if (!recordFile.isValid()) {
                         log.addline(Feedback.println(Feedback.WEB, 
-			       "[ERROR] The Info sheet is missing in this SDD file. "));
+                                "[ERROR] The Info sheet is missing in this SDD file. "));
                         return;
                     }
                 }
                 chain = annotateDataAcquisitionSchemaFile(recordFile);
-                
+
             } else if (file_name.startsWith("SSD-")) {
                 chain = annotateSSDFile(recordFile);
             } else {
                 log.addline(Feedback.println(Feedback.WEB, 
                         "[ERROR] Unsupported file name prefix, only accept prefixes "
-					     + "STD-, DPL-, PID-, MAP-, SDD-, ACQ-, DA-. "));
+                                + "STD-, DPL-, PID-, MAP-, SDD-, ACQ-, DA-. "));
                 return;
             }
-	    
+
             if (chain != null) {
                 bSucceed = chain.generate();
             }
-	    
+
             if (bSucceed) {
                 //Move the file to the folder for processed files
                 File destFolder = new File(path_proc);
@@ -345,8 +170,188 @@ public class AnnotationWorker {
                 File f = new File(path_unproc + "/" + file_name);
                 f.renameTo(new File(destFolder + "/" + file_name));
                 f.delete();
+            } else {
+                // Freeze file
+                file.setStatus(DataFile.FREEZED);
+                file.save();
             }
         }
+    }
+    
+    public static void checkOASFile(RecordFile recordFile) {
+        System.out.println("OAS HERE!");
+        final String kbPrefix = ConfigProp.getKbPrefix();
+        Record record = recordFile.getRecords().get(0);
+        String studyName = record.getValueByColumnName("Study ID");
+        String studyUri = ConfigProp.getKbPrefix() + "STD-" + studyName;
+        studyUri = URIUtils.replacePrefixEx(studyUri);
+        
+        AnnotationLog log = AnnotationLog.create(recordFile.getFile().getName());
+
+        log.addline(Feedback.println(Feedback.WEB, "[OK] Study ID found: " + studyName));
+        log.addline(Feedback.println(Feedback.WEB, "[OK] Study URI found: " + studyUri));
+
+        List<ObjectCollection> ocList = ObjectCollection.findByStudyUri(studyUri);
+        Map<String, String> refList = new HashMap<String, String>();
+        List<String> tarList = new ArrayList<String>();
+
+        for (ObjectCollection oc: ocList) {
+            if (oc.getGroundingLabel().length() > 0) {
+                refList.put(oc.getSOCReference(), oc.getGroundingLabel());
+                tarList.add(kbPrefix + "DASO-" + studyName + "-" + oc.getSOCReference().trim().replace(" ","").replace("_","-").replace("??", ""));
+                System.out.println("========================= " + oc.getGroundingLabel());
+            }
+        }
+
+        Map<String, String> labelList = ObjectCollection.labelsByStudyUri(studyUri);
+        //              for (Map.Entry entry : labelList.entrySet()) {
+        //                  log.addline(Feedback.println(Feedback.WEB, "[OK] Label(s) found: " + entry.getKey() + ", " + entry.getValue()));
+        //              }
+
+        String das_uri = URIUtils.convertToWholeURI(ConfigProp.getKbPrefix() + "DAS-" + record.getValueByColumnName("data dict").replace("SDD-", ""));
+        System.out.println("das_uri " + das_uri);
+        DataAcquisitionSchema das = DataAcquisitionSchema.find(das_uri);
+        if (das == null) {
+            log.addline(Feedback.println(Feedback.WEB, 
+                    "[ERROR] The SDD of study " + record.getValueByColumnName("Study ID") + " can not be found. Check if it is already ingested."));
+        } else {
+            //                  List<DataAcquisitionSchemaObject> loo = das.getObjects();
+            Map<String, String> dasoPL = new HashMap<String, String>();
+            List<DataAcquisitionSchemaObject> loo = new ArrayList<DataAcquisitionSchemaObject>();
+            List<String> loo2 = new ArrayList<String>();
+            for (DataAcquisitionSchemaAttribute attr : das.getAttributes()) {
+                System.out.println(" +++++++ " + attr.getLabel() + " --- " + attr.getObjectViewLabel());
+                if (attr.getObjectViewLabel().length() > 0) {
+                    if (!loo2.contains(attr.getObjectViewLabel())) {
+                        loo2.add(attr.getObjectViewLabel());
+                        loo.add(attr.getObject());
+                    }
+                }
+            }
+            log.addline(Feedback.println(Feedback.WEB, 
+                    "[PATH COMPUTATION] The number of DASOs to be computed: " + loo2.toString()));
+
+            for (DataAcquisitionSchemaObject i : loo) {
+                if (i.getEntityLabel() == null || i.getEntityLabel().length() == 0) {
+                    log.addline(Feedback.println(Feedback.WEB, 
+                            "[ERROR] The Entity Label of DASO : " + i.getLabel() + " can not be found. Check SDD."));
+                } else if (!refList.containsKey(i.getLabel())) {
+
+                    List<String> answer = new ArrayList<String>();
+                    answer.add(i.getEntityLabel());
+                    Boolean found = false;
+
+                    for (String j : refList.keySet()) {
+
+                        if (found == false) {
+                            String target = kbPrefix + "DASO-" + studyName + "-" + j.trim().replace(" ","").replace("_","-").replace("??", "");
+                            String queryString = NameSpaces.getInstance().printSparqlNameSpaceList() + 
+                                    "SELECT ?x ?o WHERE { \n" + 
+                                    "<" + i.getUri() + "> ?p ?x . \n" + 
+                                    "   ?x ?p1 ?o .  \n" + 
+                                    "   OPTIONAL {?o ?p2 " + target + " } " +
+                                    "}";
+
+                            ResultSetRewindable resultsrw = SPARQLUtils.select(CollectionUtil.getCollectionsName(
+                                    CollectionUtil.METADATA_SPARQL), queryString);
+
+                            if (!resultsrw.hasNext()) {
+                                System.out.println("[WARNING] OAS ingestion: Could not find triples on OCs, SSD is probably not correctly ingested.");
+                            }
+
+                            while (resultsrw.hasNext()) {
+                                QuerySolution soln = resultsrw.next();                      
+                                try {
+                                    if (soln != null) {
+                                        try {                                       
+                                            if (soln.get("x").isResource()){
+                                                if (soln.getResource("x") != null) {
+                                                    if (tarList.contains(soln.getResource("x").toString())) {                           
+                                                        answer.add(das.getObject(soln.getResource("x").toString()).getEntityLabel());
+                                                        log.addline(Feedback.println(Feedback.WEB, 
+                                                                "[PATH] DASO: " + i.getLabel() + ": \"" + answer.get(1) + " " + answer.get(0) + "\""));
+                                                        dasoPL.put(i.getUri(), answer.get(1) + " " + answer.get(0));
+                                                        found = true;
+                                                        break;
+                                                    } else {
+                                                        if (soln.get("o").isResource()){
+                                                            if (soln.getResource("o") != null) {
+                                                                if (tarList.contains(soln.getResource("o").toString())) {
+                                                                    answer.add(das.getObject(soln.getResource("o").toString()).getEntityLabel());
+                                                                    log.addline(Feedback.println(Feedback.WEB, 
+                                                                            "[PATH] DASO: " + i.getLabel() + ": \"" + answer.get(1) + " " + answer.get(0) + "\""));
+                                                                    dasoPL.put(i.getUri(), answer.get(1) + " " + answer.get(0));
+                                                                    found = true;
+                                                                    break;
+                                                                }
+                                                            }
+                                                        } else if (soln.get("o").isLiteral()) {
+                                                            if (soln.getLiteral("o") != null) {
+                                                                if (refList.containsKey(soln.getLiteral("o").toString())) {
+                                                                    answer.add(refList.get(soln.getLiteral("o").toString()));
+                                                                    log.addline(Feedback.println(Feedback.WEB, 
+                                                                            "[PATH] DASO: " + i.getLabel() + ": \"" + answer.get(1) + " " + answer.get(0) + "\""));
+                                                                    dasoPL.put(i.getUri(), answer.get(1) + " " + answer.get(0));
+                                                                    found = true;
+                                                                    break;
+                                                                }
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                            } else if (soln.get("x").isLiteral()) {
+                                                if (soln.getLiteral("x") != null) {
+                                                    if (refList.containsKey(soln.getLiteral("x").toString())) {
+                                                        answer.add(refList.get(soln.getLiteral("x").toString()));
+                                                        log.addline(Feedback.println(Feedback.WEB, 
+                                                                "[PATH] DASO: " + i.getLabel() + ": \"" + answer.get(1) + " " + answer.get(0) + "\""));
+                                                        dasoPL.put(i.getUri(), answer.get(1) + " " + answer.get(0));
+                                                        found = true;
+                                                        break;
+                                                    }
+                                                }
+                                            }
+
+                                        } catch (Exception e1) {
+                                            return;
+                                        }
+                                    }
+                                } catch (Exception e) {
+                                    System.out.println("[ERROR] : " + e.getMessage());
+                                }
+                            }
+                        }
+
+                    }
+                    if (found == false) {
+                        log.addline(Feedback.println(Feedback.WEB, 
+                                "[PATH] DASO: " + i.getLabel() + " Path connections can not be found ! check the SDD definition. "));
+                    }
+                } else {
+                    log.addline(Feedback.println(Feedback.WEB, 
+                            "[PATH] Skipped :" + i.getLabel()));
+                }
+            }
+            //insert the triples
+
+            for (String uri : dasoPL.keySet()) {
+                String insert = "";
+                insert += NameSpaces.getInstance().printSparqlNameSpaceList();
+                insert += "INSERT DATA {  ";
+                insert += "<" + uri + ">" + " hasco:hasRoleLabel  \"" + dasoPL.get(uri) + "\" . ";
+                insert += "} ";
+
+                try {
+                    UpdateRequest request = UpdateFactory.create(insert);
+                    UpdateProcessor processor = UpdateExecutionFactory.createRemote(
+                            request, CollectionUtil.getCollectionsName(CollectionUtil.METADATA_UPDATE));
+                    processor.execute();
+                } catch (QueryParseException e) {
+                    System.out.println("QueryParseException due to update query: " + insert);
+                    throw e;
+                }
+            }
+        } 
     }
 
     public static GeneratorChain annotateMapFile(RecordFile file) {
@@ -367,24 +372,24 @@ public class AnnotationWorker {
 
     public static GeneratorChain annotateDPLFile(RecordFile file) {
 
-	System.out.println("Processing DPL file...");
+        System.out.println("Processing DPL file...");
 
-	DPL dpl = new DPL(file);
+        DPL dpl = new DPL(file);
         String file_name = dpl.getFileName();
         Map<String, String> mapCatalog = dpl.getCatalog();
 
-	String sheetName = "";
-	RecordFile sheet = null;
+        String sheetName = "";
+        RecordFile sheet = null;
         GeneratorChain chain = new GeneratorChain();
 
-	// Deployment Generator
-	if(mapCatalog.containsKey("Deployments")) {
+        // Deployment Generator
+        if(mapCatalog.containsKey("Deployments")) {
 
-		sheetName = mapCatalog.get("Deployments").replace("#", "");
-		sheet = new SpreadsheetRecordFile(file.getFile(), sheetName);
-		chain.addGenerator(new DeploymentGenerator(sheet));
+            sheetName = mapCatalog.get("Deployments").replace("#", "");
+            sheet = new SpreadsheetRecordFile(file.getFile(), sheetName);
+            chain.addGenerator(new DeploymentGenerator(sheet));
 
-	}
+        }
 
         return chain;
     }
@@ -531,7 +536,7 @@ public class AnnotationWorker {
     public static GeneratorChain annotateSSDFile(RecordFile file) {
         String Pilot_Num = file.getFile().getName().replaceAll("SSD-", "");
         System.out.println("Processing SSD file of " + Pilot_Num + "...");
-        
+
         SSD ssd = new SSD(file);
         String file_name = file.getFile().getName();
         String ssdName = ssd.getNameFromFileName();
@@ -539,42 +544,42 @@ public class AnnotationWorker {
         Map<String, List<String>> mapContent = ssd.getMapContent();
 
         RecordFile SSDsheet = new SpreadsheetRecordFile(file.getFile(), "SSD");
-        
+
         //System.out.println(file_name);
         //System.out.println(ssdName);
-        
+
         SSDGeneratorChain chain = new SSDGeneratorChain();
-        
+
         if (SSDsheet.isValid()) {
-	    SSDGenerator gen = new SSDGenerator(SSDsheet);
+            SSDGenerator gen = new SSDGenerator(SSDsheet);
             chain.addGenerator(gen);
-	    chain.setStudyUri(gen.getStudyUri());
-	    chain.setRecordFile(file);
+            chain.setStudyUri(gen.getStudyUri());
+            chain.setRecordFile(file);
         } else {
             //chain.setInvalid();
             AnnotationLog.printException("Cannot locate SSD's sheet ", file.getFile().getName());
         }
-        
-	String study_uri = chain.getStudyUri();
+
+        String study_uri = chain.getStudyUri();
         for (String i : mapCatalog.keySet()) {
-	    if (mapCatalog.get(i).length()>0){
-            	RecordFile SOsheet = new SpreadsheetRecordFile(file.getFile(), mapCatalog.get(i).replace("#", ""));
-            	//System.out.println(SOsheet.getSheetName() + " is parsed!");
-            	chain.addGenerator(new StudyObjectGenerator(SOsheet, mapContent.get(i), mapContent, study_uri));
-            	//System.out.println(SOsheet.getNumberOfSheets() + " number of sheets!");
-            	//System.out.println(SOsheet.getHeaders() + " number of sheets!");            	
-            	//for (Record ii : SOsheet.getRecords()){
-		//    System.out.println(ii.getValueByColumnIndex(0) + " is added to chain!");	
-            	//}
-	    }
+            if (mapCatalog.get(i).length()>0){
+                RecordFile SOsheet = new SpreadsheetRecordFile(file.getFile(), mapCatalog.get(i).replace("#", ""));
+                //System.out.println(SOsheet.getSheetName() + " is parsed!");
+                chain.addGenerator(new StudyObjectGenerator(SOsheet, mapContent.get(i), mapContent, study_uri));
+                //System.out.println(SOsheet.getNumberOfSheets() + " number of sheets!");
+                //System.out.println(SOsheet.getHeaders() + " number of sheets!");            	
+                //for (Record ii : SOsheet.getRecords()){
+                //    System.out.println(ii.getValueByColumnIndex(0) + " is added to chain!");	
+                //}
+            }
         }
-        
+
         return chain;
     }
 
     public static GeneratorChain annotateDAFile(DataFile dataFile, RecordFile recordFile) {
         System.out.println("annotateDAFile: [" + dataFile.getFileName() + "]");
-        
+
         GeneratorChain chain = new GeneratorChain();
 
         String file_name = dataFile.getFileName();
@@ -629,7 +634,7 @@ public class AnnotationWorker {
         dataFile.setStudyUri(oas.getStudyUri());
         dataFile.setDatasetUri(DataFactory.getNextDatasetURI(oas.getUri()));
         oas.addDatasetUri(dataFile.getDatasetUri());
-        
+
         chain.addGenerator(new MeasurementGenerator(recordFile, oas, dataFile));
 
         return chain;

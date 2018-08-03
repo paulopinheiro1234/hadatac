@@ -163,10 +163,14 @@
     			<td>@file.getDataAcquisitionUri()</td>
     			<td>@file.getSubmissionTime()</td>
     			<td>
-                        @if(file.getFileName().startsWith("DA")) {
-    			    <a href="@org.hadatac.console.controllers.annotator.routes.PrepareIngestion.create(file.getFileName(),file.getDataAcquisitionUri())" 
+    			@if(file.getStatus().equals("FREEZED")) {
+                   <a href="@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.activateDataFile(file.getFileName())" 
+                   class="btn-xs btn-success" role="button">Activate</a>
+                }
+                @if(file.getFileName().startsWith("DA")) {
+    			   <a href="@org.hadatac.console.controllers.annotator.routes.PrepareIngestion.create(file.getFileName(),file.getDataAcquisitionUri())" 
 			       class="btn-xs btn-success" role="button">Prepare Ingestion</a>
-			}
+			    }
 			@if(file.getFileName().endsWith(".csv")) {
 			@defining("") { da_uri => @defining("") { oc_uri => 
     	                     <a href="@org.hadatac.console.controllers.fileviewer.routes.CSVPreview.getCSVPreview("unproc", file.getFileName(), da_uri, oc_uri, 10)" 
