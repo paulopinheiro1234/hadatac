@@ -27,6 +27,7 @@ import org.hadatac.entity.pojo.DataAcquisitionSchemaAttribute;
 import org.hadatac.entity.pojo.DataAcquisitionSchemaObject;
 import org.hadatac.entity.pojo.SDD;
 import org.hadatac.entity.pojo.SSD;
+import org.hadatac.entity.pojo.Study;
 import org.hadatac.entity.pojo.ObjectCollection;
 import org.hadatac.metadata.loader.URIUtils;
 import org.hadatac.utils.CollectionUtil;
@@ -553,12 +554,21 @@ public class AnnotationWorker {
 
         if (SSDsheet.isValid()) {
             SSDGenerator gen = new SSDGenerator(SSDsheet);
+            String studyUri = gen.getStudyUri();
             chain.addGenerator(gen);
-            if (gen.getStudyUri() == null || gen.getStudyUri() == "") {
+            if (studyUri == null || studyUri == "") {
             	return null;
             } else {
-                chain.setStudyUri(gen.getStudyUri());
+                chain.setStudyUri(studyUri);
+                Study study = Study.find(studyUri);
+                if (study != null) {
+                    AnnotationLog.println("SSD ingestion: The study uri :" + studyUri + " is in the TS.", file_name);
+                } else {
+                    AnnotationLog.printException("SSD ingestion: Could not find the study uri : " + studyUri + " in the TS, check the study uri in the SSD sheet.", file_name);
+                    return null;
+                }
             }
+
             chain.setRecordFile(file);
         } else {
             //chain.setInvalid();
