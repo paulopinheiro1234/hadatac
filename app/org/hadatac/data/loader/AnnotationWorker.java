@@ -555,9 +555,9 @@ public class AnnotationWorker {
             SSDGenerator gen = new SSDGenerator(SSDsheet);
             chain.addGenerator(gen);
             if (gen.getStudyUri() == null || gen.getStudyUri() == "") {
-                chain.setStudyUri(gen.getStudyUri());
-            } else {
             	return null;
+            } else {
+                chain.setStudyUri(gen.getStudyUri());
             }
             chain.setRecordFile(file);
         } else {
