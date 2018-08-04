@@ -27,11 +27,11 @@ public class SSDGenerator extends BasicGenerator {
         super(file);
         String str = file.getFile().getName().replaceAll("SSD-", "");
         this.SDDName = str.substring(0, str.lastIndexOf('.'));
-	if (records.get(0) != null) {
-	    studyUri = URIUtils.convertToWholeURI(getUri(records.get(0)));
-	} else {
-		studyUri = "";
-	}
+		if (records.get(0) != null) {
+		    studyUri = URIUtils.convertToWholeURI(getUri(records.get(0)));
+		} else {
+			studyUri = "";
+		}
     }
 
     @Override
@@ -113,11 +113,12 @@ public class SSDGenerator extends BasicGenerator {
     @Override
     public void preprocess() throws Exception {
         List<String> lstr = new ArrayList<String>();
-	Study study = Study.find(studyUri);
+        Study study = Study.find(studyUri);
         if (study != null) {
             AnnotationLog.println("SSD ingestion: The study uri :" + studyUri + " is in the TS.", file.getFile().getName());
         } else {
             AnnotationLog.printException("SSD ingestion: Could not find the study uri : " + studyUri + " in the TS, check the study uri in the SSD sheet.", file.getFile().getName());
+            return;
         }
     }
     
