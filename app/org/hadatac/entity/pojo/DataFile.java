@@ -24,6 +24,7 @@ import org.hadatac.console.http.SolrUtils;
 import org.hadatac.metadata.loader.URIUtils;
 import org.hadatac.utils.CollectionUtil;
 
+import com.avaje.ebeaninternal.server.lib.util.Str;
 import com.typesafe.config.ConfigFactory;
 
 public class DataFile {
@@ -271,15 +272,10 @@ public class DataFile {
     }
 
     public static List<DataFile> findAll(String status) {
-        if (status == UNPROCESSED || status == PROCESSED || status == CREATING || status == CREATED) {
-            SolrQuery query = new SolrQuery();
-            query.set("q", "status_str:\"" + status + "\"");
-            query.set("rows", "10000000");
-            return findByQuery(query);
-        }
-        else {
-            return new ArrayList<DataFile>();
-        }
+        SolrQuery query = new SolrQuery();
+        query.set("q", "status_str:\"" + status + "\"");
+        query.set("rows", "10000000");
+        return findByQuery(query);
     }
 
     public static DataFile findByName(String ownerEmail, String fileName) {		
@@ -346,8 +342,9 @@ public class DataFile {
         if (!folder.exists()) {
             folder.mkdirs();
         }
-
+        
         List<DataFile> unproc_files = DataFile.findAll(DataFile.UNPROCESSED);
+        unproc_files.addAll(DataFile.findAll(DataFile.FREEZED));
 
         File[] listOfFiles = folder.listFiles();
         for (int i = 0; i < listOfFiles.length; i++) {

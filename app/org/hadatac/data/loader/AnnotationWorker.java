@@ -172,6 +172,7 @@ public class AnnotationWorker {
                 f.delete();
             } else {
                 // Freeze file
+                System.out.println("Freezed file " + file.getFileName());
                 file.setStatus(DataFile.FREEZED);
                 file.save();
             }
@@ -368,7 +369,6 @@ public class AnnotationWorker {
 
         return chain;
     }
-
 
     public static GeneratorChain annotateDPLFile(RecordFile file) {
 
@@ -603,6 +603,10 @@ public class AnnotationWorker {
                 oas_uri = oas.getUri();
                 deployment_uri = oas.getDeploymentUri();
                 schema_uri = oas.getSchemaUri();
+            } else {
+                log.addline(Feedback.println(Feedback.WEB, 
+                        String.format("[WARNING] Cannot find associated Object Access Specification: %s", file_name)));
+                chain.setInvalid();
             }
         }
 
@@ -631,11 +635,13 @@ public class AnnotationWorker {
             log.addline(Feedback.println(Feedback.WEB, String.format("[OK] Deployment %s specified for data acquisition %s", deployment_uri, file_name)));
         }
 
-        dataFile.setStudyUri(oas.getStudyUri());
-        dataFile.setDatasetUri(DataFactory.getNextDatasetURI(oas.getUri()));
-        oas.addDatasetUri(dataFile.getDatasetUri());
+        if (oas != null) {
+            dataFile.setStudyUri(oas.getStudyUri());
+            dataFile.setDatasetUri(DataFactory.getNextDatasetURI(oas.getUri()));
+            oas.addDatasetUri(dataFile.getDatasetUri());
 
-        chain.addGenerator(new MeasurementGenerator(recordFile, oas, dataFile));
+            chain.addGenerator(new MeasurementGenerator(recordFile, oas, dataFile));
+        }
 
         return chain;
     }
