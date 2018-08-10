@@ -2,6 +2,7 @@ package org.hadatac.entity.pojo;
 
 import java.util.List;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
@@ -59,8 +60,8 @@ public class DataAcquisitionSchemaAttribute extends HADatAcThing {
     private int    tempPositionInt;
     private String entity;
     private String entityLabel;
-    private String attribute;
-    private String attributeLabel;
+    private List<String> attribute;
+    private List<String> attributeLabel;
     private String unit;
     private String unitLabel;
     private String daseUri;
@@ -77,7 +78,7 @@ public class DataAcquisitionSchemaAttribute extends HADatAcThing {
         this.position = "";
         this.positionInt = -1;
         this.setEntity("");
-        this.setAttribute("");
+        this.setAttribute(Arrays.asList(""));
         this.setUnit("");
         this.daseUri = "";
         this.dasoUri = "";
@@ -90,7 +91,7 @@ public class DataAcquisitionSchemaAttribute extends HADatAcThing {
             String partOfSchema,
             String position, 
             String entity, 
-            String attribute, 
+            List<String> attribute, 
             String unit, 
             String daseUri, 
             String dasoUri) {
@@ -251,51 +252,68 @@ public class DataAcquisitionSchemaAttribute extends HADatAcThing {
         return annotation;
     }
 
-    public String getAttribute() {
+    public List<String> getAttribute() {
         if (attribute == null) {
-            return "";
+            return Arrays.asList("");
         } else {
             return attribute;
         }
-    }
+    }    
 
-    public String getAttributeNamespace() {
-        if (attribute == "") {
-            return "";
+    public List<String> getAttributeNamespace() {
+        if (attribute == Arrays.asList("")) {
+            return attribute;
         }
-        return URIUtils.replaceNameSpaceEx(attribute.replace("<","").replace(">",""));
+        List<String> answer = new ArrayList<String>();
+        for (String attr : attribute) {
+            answer.add(URIUtils.replaceNameSpaceEx(attr.replace("<","").replace(">","")));
+        }
+        return answer;
     }
 
-    public void setAttribute(String attribute) {
+    public void setAttribute(List<String> attribute) {
         this.attribute = attribute;
-        if (attribute == null || attribute.equals("")) {
-            this.attributeLabel =  "";
+        if (attribute == null || attribute.size() < 1 ) {
+            this.attributeLabel = Arrays.asList("");
         } else {
-            this.attributeLabel = FirstLabel.getLabel(attribute);
+        	List<String> answer = new ArrayList<String>();
+        	for (String attr : attribute) {
+        		answer.add(FirstLabel.getLabel(attr));
+        	}
+            this.attributeLabel = answer;
         }
-        this.isMeta = (DataAcquisitionSchema.METADASA.contains(URIUtils.replaceNameSpaceEx(attribute)));
+        
+        this.isMeta = true;
+        
+        for (String attr : attribute) {
+        	if (!DataAcquisitionSchema.METADASA.contains(URIUtils.replaceNameSpaceEx(attr))) {
+        		this.isMeta = false;
+        	}
+        }      
     }
 
-    public String getAttributeLabel() {
-        if (attributeLabel.equals("")) {
-            return URIUtils.replaceNameSpaceEx(attribute);
+    public List<String> getAttributeLabel() {
+        if (attributeLabel.equals(Arrays.asList(""))) {
+            return Arrays.asList("");
         }
         return attributeLabel;
     }
 
-    public String getAnnotatedAttribute() {
-        String annotation;
-        if (attributeLabel.equals("")) {
-            if (attribute == null || attribute.equals("")) {
-                return "";
+    public List<String> getAnnotatedAttribute() {
+        List<String> annotation;
+        if (attributeLabel.equals(Arrays.asList(""))) {
+            if (attribute == null || attribute.equals(Arrays.asList(""))) {
+                return Arrays.asList("");
             }
-            annotation = URIUtils.replaceNameSpaceEx(attribute);
+            annotation = Arrays.asList("");
         } else {
             annotation = attributeLabel;
         }
-        if (!getAttributeNamespace().equals("")) {
-            annotation += " [" + getAttributeNamespace() + "]";
-        } 
+        if (!getAttributeNamespace().equals(Arrays.asList(""))) {
+        	for (String anno : annotation) {
+        		anno += " [" + URIUtils.replaceNameSpaceEx(anno.replace("<","").replace(">","")) + "]";	
+        	}
+        }
         return annotation;
     }
 
@@ -518,6 +536,7 @@ public class DataAcquisitionSchemaAttribute extends HADatAcThing {
         String positionStr = "";
         String entityStr = "";
         String attributeStr = "";
+        List<String> attributeList = new ArrayList<String>();
         String unitStr = "";
         String dasoUriStr = "";
         String daseUriStr = "";
@@ -536,6 +555,7 @@ public class DataAcquisitionSchemaAttribute extends HADatAcThing {
             }
             if (soln.get("hasAttribute") != null) {
                 attributeStr = soln.get("hasAttribute").toString();
+                attributeList.add(attributeStr);
             }
             if (soln.get("hasUnit") != null) {
                 unitStr = soln.get("hasUnit").toString();
@@ -561,7 +581,7 @@ public class DataAcquisitionSchemaAttribute extends HADatAcThing {
                         partOfSchemaStr,
                         positionStr,
                         entityStr,
-                        attributeStr,
+                        attributeList,
                         unitStr,
                         daseUriStr,
                         dasoUriStr);

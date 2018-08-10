@@ -209,6 +209,101 @@ public class SDD {
             }
         }
     }
+    
+    public Map<String, List<String>> readDDforEAmerge(RecordFile file) {
+    	
+    	Map<String, List<String>> mapEAmerge = new HashMap<String, List<String>>();
+        List<String> l_dase = new ArrayList<String>();
+        List<String> l_dasa = new ArrayList<String>();
+    
+        if (!file.isValid()) {
+            return mapEAmerge;
+        }
+        
+        for (Record record : file.getRecords()) {
+        	if (checkCellValue(record.getValueByColumnIndex(0))){
+        		if(record.getValueByColumnName("Time").length()>0) {
+        			if (!l_dase.contains(record.getValueByColumnName("Time"))) {
+        				l_dase.add(record.getValueByColumnName("Time"));
+        			}
+        		}
+        		
+                if (record.getValueByColumnName("Attribute").length()>0) {
+                	if (!l_dasa.contains(record.getValueByColumnIndex(0))) {
+                		l_dasa.add(record.getValueByColumnIndex(0));
+                	}
+                }
+        	}
+        }
+        
+        for (Record record : file.getRecords()) {
+        	
+            if (checkCellValue(record.getValueByColumnIndex(0))){
+            	
+            	String columnCell = record.getValueByColumnIndex(0);
+                String labelCell = record.getValueByColumnName("Label");
+                String defCell = record.getValueByColumnName("Definition");
+                String unitCell = record.getValueByColumnName("Unit");
+                String timeCell = record.getValueByColumnName("Time");
+                String entityCell = record.getValueByColumnName("Entity");
+                String inRelationToCell = record.getValueByColumnName("inRelationTo");
+                String attributeOfCell = record.getValueByColumnName("attributeOf");
+                String dfCell = record.getValueByColumnName("wasDerivedFrom");	
+            	
+            	if (l_dase.contains(columnCell)) {
+            		
+            		System.out.println("listEAmergeTrigger: " + columnCell + " " + attributeOfCell);
+            		
+                    List<String> listEAmerge = new ArrayList<String>();
+                    
+            		if (l_dasa.contains(attributeOfCell) || l_dasa.contains(inRelationToCell) || l_dasa.contains(dfCell)) {
+            			
+            			System.out.println("listEAmergeTrigger2! ");
+            			
+            			if (columnCell != null) {
+            				listEAmerge.add(columnCell);
+            			} else {
+            				listEAmerge.add("");
+            			}
+            			if (labelCell != null) {
+            				listEAmerge.add(labelCell);
+            			} else {
+            				listEAmerge.add("");
+            			}
+            			if (unitCell != null) {
+            				listEAmerge.add(unitCell);
+            			} else {
+            				listEAmerge.add("");
+            			}
+            			if (timeCell != null) {
+            				listEAmerge.add(timeCell);
+            			} else {
+            				listEAmerge.add("");
+            			}
+            			if (entityCell != null) {
+            				listEAmerge.add(entityCell);
+            			} else {
+            				listEAmerge.add("");
+            			}
+            			
+            			mapEAmerge.put(columnCell, listEAmerge);
+            		}
+                    System.out.println("listEAmerge :" + listEAmerge);
+            	}
+            	
+
+                
+            }
+        }
+        System.out.println("l_dasa :" + l_dasa);
+        System.out.println("l_dase :" + l_dase);
+        System.out.println("mapEAmerge :" + mapEAmerge.keySet());
+        if (mapEAmerge.keySet().size() > 0) {
+        	System.out.println("0 " + mapEAmerge.get("daysfeverclear").get(0) + "1 " + mapEAmerge.get("daysfeverclear").get(1) + "2 " + mapEAmerge.get("daysfeverclear").get(2) + "3 " + mapEAmerge.get("daysfeverclear").get(3));
+        }
+        return mapEAmerge;
+    }
+    
 
     public boolean readDataDictionary(RecordFile file) {
 
@@ -340,13 +435,15 @@ public class SDD {
                         return false;
                 	}
                 }
-
+                
                 if (checkCellValue(record.getValueByColumnName("attributeOf"))){
                     mapAttrObj.put(record.getValueByColumnIndex(0), record.getValueByColumnName("attributeOf"));
                 } else {
                     checkCellVal.add(record.getValueByColumnName("attributeOf"));
+                	AnnotationLog.printException("\"" + record.getValueByColumnName("attributeOf") + "\" in the attribute of column contains illegal content.", sddfile.getFile().getName());
                     return false;
                 }
+                
             } else {
                 AnnotationLog.printException("The Dictionary Mapping conatins illegal content in \"" + record.getValueByColumnName("Column") + "\" in the \"Column\" column. Check if it contains characters such as \",\" and blank space.", sddfile.getFile().getName());
                 return false;
@@ -383,7 +480,7 @@ public class SDD {
         }
 
         for (Record record : file.getRecords()) {
-            codeMappings.put(record.getValueByColumnName(Templates.CODE), record.getValueByColumnName(Templates.CLASS));
+            codeMappings.put(record.getValueByColumnName("code"), record.getValueByColumnName("uri"));
         }
 
         if (codeMappings.isEmpty()){

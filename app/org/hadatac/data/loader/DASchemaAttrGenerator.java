@@ -20,13 +20,15 @@ public class DASchemaAttrGenerator extends BasicGenerator {
     String SDDName = "";
     Map<String, String> codeMap;
     Map<String, List<String>> hasEntityMap = new HashMap<String, List<String>>();
+    Map<String, List<String>> mergedEA = new HashMap<String, List<String>>();
     List<String> AttrList = new ArrayList<String>();
     Map<String, String> currentHasEntity = new HashMap<String, String>();
 
-    public DASchemaAttrGenerator(RecordFile file, String SDDName, Map<String, String> codeMap) {
+    public DASchemaAttrGenerator(RecordFile file, String SDDName, Map<String, String> codeMap, Map<String, List<String>> mergeEA) {
         super(file);
         this.codeMap = codeMap;
         this.SDDName = SDDName;
+        this.mergedEA = mergeEA;
 
         initMapping();
 
@@ -34,6 +36,7 @@ public class DASchemaAttrGenerator extends BasicGenerator {
             List<String> tmp = new ArrayList<String>();
             tmp.add(rec.getValueByColumnName(mapCol.get("AttributeOf")));
             tmp.add(rec.getValueByColumnName(mapCol.get("Entity")));
+            tmp.add(rec.getValueByColumnName(mapCol.get("InRelationTo")));
             hasEntityMap.put(rec.getValueByColumnName(mapCol.get("Label")), tmp);
             if (rec.getValueByColumnName(mapCol.get("AttributeType")).length() > 0) {
             	AttrList.add(rec.getValueByColumnName(mapCol.get("Label")));
@@ -131,7 +134,7 @@ public class DASchemaAttrGenerator extends BasicGenerator {
             for (String item : Arrays.asList(inRelationTo.split("\\s*,\\s*"))) {
                 items.add(kbPrefix + "DASO-" + SDDName + "-" + item.replace(" ", "").replace("_","-").replace("??", ""));
             }
-            return String.join(" & ", items);
+            return items.get(0);
         }
     }
 
@@ -245,37 +248,71 @@ public class DASchemaAttrGenerator extends BasicGenerator {
     @Override
     Map<String, Object> createRow(Record rec, int row_number) throws Exception {
         Map<String, Object> row = new HashMap<String, Object>();
-        row.put("hasURI", kbPrefix + "DASA-" + SDDName + "-" + getLabel(rec).trim().replace(" ", "").replace("_","-").replace("??", ""));
-        row.put("a", "hasco:DASchemaAttribute");
-        row.put("rdfs:label", getLabel(rec));
-        row.put("rdfs:comment", getLabel(rec));
-        row.put("hasco:partOfSchema", kbPrefix + "DAS-" + SDDName);
-        if (!currentHasEntity.containsKey(getLabel(rec))){
-            row.put("hasco:hasEntity", getEntity(rec));
-        }
-        if (getRelation(rec).length() > 0) {
-            row.put(getRelation(rec), getInRelationTo(rec));
-        } else {
-            row.put("sio:inRelationTo", getInRelationTo(rec));
-        }
-        if (getInRelationTo(rec).length() > 0) {
-            if (getRelation(rec).length() > 0) {
-                row.put("sio:Relation", getRelation(rec));
-            } else {
-                row.put("sio:Relation", "sio:inRelationTo");
+        String timelabel = rec.getValueByColumnName(mapCol.get("Time"));
+    	if (mergedEA.containsKey(timelabel)) {
+            row.put("hasURI", kbPrefix + "DASA-" + SDDName + "-" + timelabel.trim().replace(" ", "").replace("_","-").replace("??", ""));
+            row.put("a", "hasco:DASchemaAttribute");
+            row.put("rdfs:label", mergedEA.get(timelabel).get(1));
+            row.put("rdfs:comment", getLabel(rec));
+            row.put("hasco:partOfSchema", kbPrefix + "DAS-" + SDDName);
+            if (!currentHasEntity.containsKey(getLabel(rec))){
+                row.put("hasco:hasEntity", getEntity(rec));
             }
-        }
-        row.put("hasco:hasAttribute", getAttribute(rec));
-        row.put("hasco:hasUnit", getUnit(rec));
-        row.put("hasco:hasEvent", getTime(rec));
-        row.put("hasco:hasSource", "");
-        row.put("hasco:isAttributeOf", getAttributeOf(rec));
-        row.put("hasco:isVirtual", checkVirtual(rec).toString());
-        row.put("hasco:isPIConfirmed", "false");
-        if (getWasGeneratedBy(rec).length() > 0) {
-        	row.put("prov:wasGeneratedBy", getWasGeneratedBy(rec));	
-        }
-        
+            if (getRelation(rec).length() > 0) {
+                row.put(getRelation(rec), getInRelationTo(rec));
+            } else {
+                row.put("sio:inRelationTo", getInRelationTo(rec));
+            }
+            if (getInRelationTo(rec).length() > 0) {
+                if (getRelation(rec).length() > 0) {
+                    row.put("sio:Relation", getRelation(rec));
+                } else {
+                    row.put("sio:Relation", "sio:inRelationTo");
+                }
+            }
+            row.put("hasco:hasAttribute", getAttribute(rec));
+            row.put("hasco:hasUnit", getUnit(rec));
+            row.put("hasco:hasEvent", getTime(rec));
+            row.put("hasco:hasSource", "");
+            row.put("hasco:isAttributeOf", getAttributeOf(rec));
+            row.put("hasco:isVirtual", checkVirtual(rec).toString());
+            row.put("hasco:isPIConfirmed", "false");
+            if (getWasGeneratedBy(rec).length() > 0) {
+            	row.put("prov:wasGeneratedBy", getWasGeneratedBy(rec));	
+            }
+    	} 
+    	else {
+            row.put("hasURI", kbPrefix + "DASA-" + SDDName + "-" + getLabel(rec).trim().replace(" ", "").replace("_","-").replace("??", ""));
+            row.put("a", "hasco:DASchemaAttribute");
+            row.put("rdfs:label", getLabel(rec));
+            row.put("rdfs:comment", getLabel(rec));
+            row.put("hasco:partOfSchema", kbPrefix + "DAS-" + SDDName);
+            if (!currentHasEntity.containsKey(getLabel(rec))){
+                row.put("hasco:hasEntity", getEntity(rec));
+            }
+            if (getRelation(rec).length() > 0) {
+                row.put(getRelation(rec), getInRelationTo(rec));
+            } else {
+                row.put("sio:inRelationTo", getInRelationTo(rec));
+            }
+            if (getInRelationTo(rec).length() > 0) {
+                if (getRelation(rec).length() > 0) {
+                    row.put("sio:Relation", getRelation(rec));
+                } else {
+                    row.put("sio:Relation", "sio:inRelationTo");
+                }
+            }
+            row.put("hasco:hasAttribute", getAttribute(rec));
+            row.put("hasco:hasUnit", getUnit(rec));
+            row.put("hasco:hasEvent", getTime(rec));
+            row.put("hasco:hasSource", "");
+            row.put("hasco:isAttributeOf", getAttributeOf(rec));
+            row.put("hasco:isVirtual", checkVirtual(rec).toString());
+            row.put("hasco:isPIConfirmed", "false");
+            if (getWasGeneratedBy(rec).length() > 0) {
+            	row.put("prov:wasGeneratedBy", getWasGeneratedBy(rec));	
+            }
+    	}
         return row;
     }
 

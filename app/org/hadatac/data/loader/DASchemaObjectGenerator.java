@@ -98,7 +98,7 @@ public class DASchemaObjectGenerator extends BasicGenerator {
 				items.add(kbPrefix + "DASO-" + SDDName + "-" + item.replace("_","-").replace("??", ""));
 			}
 			System.out.println(getLabel(rec) + String.join(" & ", items)); 
-			return String.join(" & ", items);
+			return items.get(0);
 //			return inRelationTo;
 		}
 	}

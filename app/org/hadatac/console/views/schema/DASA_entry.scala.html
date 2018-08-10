@@ -5,11 +5,14 @@
 @import org.hadatac.entity.pojo.DataAcquisitionSchema
 @import org.hadatac.metadata.loader.URIUtils
 
-@if(DataAcquisitionSchema.METADASA.contains(URIUtils.replaceNameSpaceEx(dasa.getAttribute()))){
-  <tr bgcolor='#FCEBDD'>
+@for(attr <- dasa.getAttribute()) {
+	@if(!DataAcquisitionSchema.METADASA.contains(URIUtils.replaceNameSpaceEx(attr))){
+  		<tr>
 } else {
-  <tr>
+  <tr bgcolor='#FCEBDD'>
 }
+}
+
    <td>@if(dasa != null && dasa.getLabel() != null) { <b> @dasa.getLabel() </b> }</td> 
    <td>@if(dasa != null && dasa.getPosition() != null) { 
      @if(dasa.getPosition().equals("-1")) {

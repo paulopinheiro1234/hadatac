@@ -1107,8 +1107,12 @@ public class ObjectAccessSpec extends HADatAcThing {
             Iterator<DataAcquisitionSchemaAttribute> i = schema.getAttributes().iterator();
             while (i.hasNext()) {
                 DataAcquisitionSchemaAttribute dasa = i.next();
-                dataAcquisition.addCharacteristic(dasa.getAttributeLabel());
-                dataAcquisition.addCharacteristicUri(dasa.getAttribute());
+                for (String attr : dasa.getAttributeLabel()) {
+                    dataAcquisition.addCharacteristic(attr);
+                }
+                for (String attr : dasa.getAttribute()) {
+                    dataAcquisition.addCharacteristicUri(attr);
+                }
                 dataAcquisition.addEntity(dasa.getEntityLabel());
                 dataAcquisition.addEntityUri(dasa.getEntity());
                 dataAcquisition.addUnit(dasa.getUnitLabel());

@@ -498,6 +498,9 @@ public class AnnotationWorker {
         if(!sdd.readCodeMapping(codeMappingRecordFile)){
             log.addline(Feedback.println(Feedback.WEB, 
                     String.format("[WARNING] The CodeMapping of this SDD is empty. ", file_name)));
+        } else {
+            log.addline(Feedback.println(Feedback.WEB, 
+                    String.format("[Codemappings] " + sdd.getCodeMapping().get("U"), file_name)));
         }
         if(!sdd.readDataDictionary(dictionaryRecordFile)){
             AnnotationLog.printException("Read Data Dictionary failed, please refer to the error msg above.", file.getFile().getName());
@@ -517,7 +520,7 @@ public class AnnotationWorker {
         }
 
         if (dictionaryRecordFile.isValid()) {
-            chain.addGenerator(new DASchemaAttrGenerator(dictionaryRecordFile, sddName, sdd.getCodeMapping()));
+            chain.addGenerator(new DASchemaAttrGenerator(dictionaryRecordFile, sddName, sdd.getCodeMapping(), sdd.readDDforEAmerge(dictionaryRecordFile)));
             chain.addGenerator(new DASchemaObjectGenerator(dictionaryRecordFile, sddName, sdd.getCodeMapping()));
             chain.addGenerator(new DASchemaEventGenerator(dictionaryRecordFile, sdd.getTimeLine(), sddName, sdd.getCodeMapping()));
         }

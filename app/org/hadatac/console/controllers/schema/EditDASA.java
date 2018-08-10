@@ -4,6 +4,7 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.util.List;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 import play.mvc.Controller;
 import play.mvc.Result;
@@ -83,7 +84,7 @@ public class EditDASA extends Controller {
 		String newLabel = data.getNewLabel();
 		String newPosition = data.getNewPosition();
 		String newEntity = getUriFromNew(data.getNewEntity());
-		String newAttribute = getUriFromNew(data.getNewAttribute());
+		List<String> newAttribute = getUriListFromNew(data.getNewAttribute());
 		String newUnit = getUriFromNew(data.getNewUnit());
 		String newObject = data.getNewObject();
 		String newEvent = data.getNewEvent();
@@ -108,7 +109,7 @@ public class EditDASA extends Controller {
 				changedInfos.add(newEntity);
 			}
 			if (olddasa.getAttribute() == null || !olddasa.getAttribute().equals(newAttribute)) {
-				changedInfos.add(newAttribute);
+				changedInfos.add(newAttribute.get(0));
 			}
 			if (olddasa.getUnit() == null || !olddasa.getUnit().equals(newUnit)) {
 				changedInfos.add(newUnit);
@@ -163,6 +164,18 @@ public class EditDASA extends Controller {
 			return "";
 		}
 		String response = newStr.substring(newStr.indexOf("[") + 1).replace("]","");
+		return response;
+	}
+	
+	private static List<String> getUriListFromNew(List<String> newStrList) {
+		if (newStrList == null) {
+			return Arrays.asList("");
+		}
+		List<String> response = new ArrayList<String>();
+		for (String str : newStrList) {
+			response.add(str.substring(str.indexOf("[") + 1).replace("]",""));
+		}
+
 		return response;
 	}
 
