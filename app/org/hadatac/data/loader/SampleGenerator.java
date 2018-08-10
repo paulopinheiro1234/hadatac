@@ -181,7 +181,7 @@ public class SampleGenerator extends BasicGenerator {
 
     public StudyObject createStudyObject(Record record) throws Exception {
         StudyObject obj = new StudyObject(getUri(record), "sio:Sample", getOriginalID(record), 
-                getLabel(record), getCollectionUri(record), getLabel(record), scopeUris);
+                getLabel(record), getCollectionUri(record), getLabel(record), scopeUris, timeScopeUris, spaceScopeUris);
 
         objectUris.add(getUri(record));
         

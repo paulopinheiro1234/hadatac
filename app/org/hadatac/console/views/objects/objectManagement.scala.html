@@ -4,9 +4,12 @@
   oc         : org.hadatac.entity.pojo.ObjectCollection,
   objUriList : List[String],
   objList    : List[org.hadatac.entity.pojo.StudyObject],
+  page       : Integer,
+  total      : Integer,
   message    : String)
 
-@import helper._
+@import org.hadatac.console.controllers.objects.ObjectManagement
+@import helper._; var current = (page + 1); var next = (page + 1); var prev = (page - 1); var last = (total / ObjectManagement.PAGESIZE); var lastpage = (last + 1)
 @import org.hadatac.console.views.html._
 @import org.hadatac.utils._
 @import java.net.URLEncoder
@@ -25,17 +28,17 @@
     <div class="container-fluid">
       <div class="row">
          <div class="navbar-collapse collapse navbar-secondary">
-           <a href="@org.hadatac.console.controllers.objects.routes.NewObjectsFromScratch.index(filename, da_uri, URLEncoder.encode(study.getUri(),"UTF-8"),URLEncoder.encode(oc.getUri(),"UTF-8"))" 
+           <a href="@org.hadatac.console.controllers.objects.routes.NewObjectsFromScratch.index(filename, da_uri, URLEncoder.encode(study.getUri(),"UTF-8"),URLEncoder.encode(oc.getUri(),"UTF-8"), page)" 
 	      class="btn btn-primary" role="button">Create Objects From Scratch</a>
 	   @if(objList == null || objList.size() == 0) {
-               <a href="@org.hadatac.console.controllers.objects.routes.ObjectManagement.deleteCollectionObjects(filename, da_uri, URLEncoder.encode(study.getUri(),"UTF-8"),URLEncoder.encode(oc.getUri(),"UTF-8"),objUriList)" 
+               <a href="@org.hadatac.console.controllers.objects.routes.ObjectManagement.deleteCollectionObjects(filename, da_uri, URLEncoder.encode(study.getUri(),"UTF-8"),URLEncoder.encode(oc.getUri(),"UTF-8"),objUriList, page)" 
 		  class="btn btn-primary disabled" role="button">Delete Objects in Collection</a>
 	   } else {
-               <a href="@org.hadatac.console.controllers.objects.routes.ObjectManagement.deleteCollectionObjects(filename, da_uri, URLEncoder.encode(study.getUri(),"UTF-8"),URLEncoder.encode(oc.getUri(),"UTF-8"),objUriList)" 
+               <a href="@org.hadatac.console.controllers.objects.routes.ObjectManagement.deleteCollectionObjects(filename, da_uri, URLEncoder.encode(study.getUri(),"UTF-8"),URLEncoder.encode(oc.getUri(),"UTF-8"),objUriList, page)" 
 		  class="btn btn-primary" role="button">Delete Objects in Collection</a>
 	   }
 	   @if(filename != null && !filename.equals("")) {
-               <a href="@org.hadatac.console.controllers.fileviewer.routes.CSVPreview.getCSVPreview("unproc", filename, da_uri, oc.getUri(), 10)"
+               <a href="@org.hadatac.console.controllers.fileviewer.routes.CSVPreview.getCSVPreview("unproc", filename, da_uri, oc.getUri(), 10, page)"
 		  class="btn btn-primary" role="button">Create Multiple Objects From File</a>
 	   }
          </div>
@@ -46,8 +49,39 @@
 
    <h4>Objects</h4>
    
+	@if(prev >= 0) {
+    	<a href="@org.hadatac.console.controllers.objects.routes.ObjectManagement.indexNomsg(filename, da_uri, URLEncoder.encode(study.getUri(),"UTF-8"), URLEncoder.encode(oc.getUri(),"UTF-8"), 0)" class="btn btn-primary" 
+	       role="button">&lt;&lt;</a>
+	   
+	    <a href="@org.hadatac.console.controllers.objects.routes.ObjectManagement.indexNomsg(filename, da_uri, URLEncoder.encode(study.getUri(),"UTF-8"), URLEncoder.encode(oc.getUri(),"UTF-8"), prev)" class="btn btn-primary" 
+	       role="button">&lt;</a>
+	} else {
+    	<a href="@org.hadatac.console.controllers.objects.routes.ObjectManagement.indexNomsg(filename, da_uri, URLEncoder.encode(study.getUri(),"UTF-8"), URLEncoder.encode(oc.getUri(),"UTF-8"), 0)" class="btn btn-primary disabled" 
+	       role="button">&lt;&lt;</a>
+	   
+	    <a href="@org.hadatac.console.controllers.objects.routes.ObjectManagement.indexNomsg(filename, da_uri, URLEncoder.encode(study.getUri(),"UTF-8"), URLEncoder.encode(oc.getUri(),"UTF-8"), prev)" class="btn btn-primary disabled" 
+	       role="button">&lt;</a>
+	}
+
+	@current of @lastpage   
+	   
+	@if(next < last) {
+	    <a href="@org.hadatac.console.controllers.objects.routes.ObjectManagement.indexNomsg(filename, da_uri, URLEncoder.encode(study.getUri(),"UTF-8"), URLEncoder.encode(oc.getUri(),"UTF-8"), next)" class="btn btn-primary" 
+	       role="button">&gt;</a>
+
+	    <a href="@org.hadatac.console.controllers.objects.routes.ObjectManagement.indexNomsg(filename, da_uri, URLEncoder.encode(study.getUri(),"UTF-8"), URLEncoder.encode(oc.getUri(),"UTF-8"), last)" class="btn btn-primary" 
+	       role="button">&gt;&gt;</a>
+	   
+	} else {
+	    <a href="@org.hadatac.console.controllers.objects.routes.ObjectManagement.indexNomsg(filename, da_uri, URLEncoder.encode(study.getUri(),"UTF-8"), URLEncoder.encode(oc.getUri(),"UTF-8"), next)" class="btn btn-primary disabled" 
+	       role="button">&gt;</a>
+
+	    <a href="@org.hadatac.console.controllers.objects.routes.ObjectManagement.indexNomsg(filename, da_uri, URLEncoder.encode(study.getUri(),"UTF-8"), URLEncoder.encode(oc.getUri(),"UTF-8"), last)" class="btn btn-primary disabled" 
+	       role="button">&gt;&gt;</a>	   
+	}
+
     <form class="form-horizontal" name="newObjects" method="post" 
-	  action="@org.hadatac.console.controllers.objects.routes.ObjectManagement.updateCollectionObjects(filename, da_uri, URLEncoder.encode(study.getUri(),"UTF-8"),URLEncoder.encode(oc.getUri(),"UTF-8"),objUriList)">
+	  action="@org.hadatac.console.controllers.objects.routes.ObjectManagement.updateCollectionObjects(filename, da_uri, URLEncoder.encode(study.getUri(),"UTF-8"),URLEncoder.encode(oc.getUri(),"UTF-8"),objUriList, page, total)">
     <div class="container-fluid">
         <table class="table">
             <thead>
@@ -55,20 +89,26 @@
                 <th>Name</th>
                 <th>Type</th>
                 <th>Original ID</th>
-		@if(objList.size() > 0) {
-		   @for(scope <- objList.get(0).getScopeUris()) {
-		      <th>hasScope</th>
+		        @if(objList.size() > 0) {
+		           @for(scope <- objList.get(0).getScopeUris()) {
+		              <th>hasScope</th>
+                   }
+		           @for(timeScope <- objList.get(0).getTimeScopeUris()) {
+		              <th>hasTimeScope</th>
+                   }
+		           @for(spaceScope <- objList.get(0).getSpaceScopeUris()) {
+		              <th>hasSpaceScope</th>
                    }
                 }  
                 <th>Operations</th>
               </tr>
             </thead>
             <tbody>
-	    @if(objList != null) {
+	        @if(objList != null) {
                  @for(obj <- objList){
-	            @obj_entry(study, oc, obj)
+	                 @obj_entry(study, oc, obj)
                  }
-              } 
+            } 
             </tbody>
         </table>
 

@@ -56,6 +56,8 @@ public class StudyObject extends HADatAcThing {
     String isMemberOf;
     String roleUri = "";
     List<String> scopeUris = new ArrayList<String>();
+    List<String> timeScopeUris = new ArrayList<String>();
+    List<String> spaceScopeUris = new ArrayList<String>();
 
     public StudyObject() {
         this("", "");
@@ -76,7 +78,9 @@ public class StudyObject extends HADatAcThing {
             String label,
             String isMemberOf,
             String comment,
-            List<String> scopeUris) {
+            List<String> scopeUris,
+            List<String> timeScopeUris,
+            List<String> spaceScopeUris) {
         setUri(uri);
         setTypeUri(typeUri);
         setOriginalId(originalId);
@@ -84,6 +88,8 @@ public class StudyObject extends HADatAcThing {
         setIsMemberOf(isMemberOf);
         setComment(comment);
         setScopeUris(scopeUris);
+        setTimeScopeUris(timeScopeUris);
+        setSpaceScopeUris(spaceScopeUris);
     }
 
     public StudyObject(String uri,
@@ -157,6 +163,30 @@ public class StudyObject extends HADatAcThing {
         this.scopeUris.add(scopeUri);
     }
 
+    public List<String> getTimeScopeUris() {
+        return timeScopeUris;
+    }
+
+    public void setTimeScopeUris(List<String> timeScopeUris) {
+        this.timeScopeUris = timeScopeUris;
+    }
+
+    public void addTimeScopeUri(String timeScopeUri) {
+        this.timeScopeUris.add(timeScopeUri);
+    }
+
+    public List<String> getSpaceScopeUris() {
+        return spaceScopeUris;
+    }
+
+    public void setSpaceScopeUris(List<String> spaceScopeUris) {
+        this.spaceScopeUris = spaceScopeUris;
+    }
+
+    public void addSpaceScopeUri(String spaceScopeUri) {
+        this.spaceScopeUris.add(spaceScopeUri);
+    }
+
     public static int getNumberStudyObjects() {
         String query = "";
         query += NameSpaces.getInstance().printSparqlNameSpaceList();
@@ -164,6 +194,27 @@ public class StudyObject extends HADatAcThing {
 	         " { ?obj hasco:isMemberOf ?collection . ?obj a ?objType . " + 
                  " FILTER NOT EXISTS { ?objType rdfs:subClassOf* hasco:ObjectCollection . } " + 
 	         "}";
+        try {
+            ResultSetRewindable resultsrw = SPARQLUtils.select(
+                    CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), query);
+            
+            if (resultsrw.hasNext()) {
+                QuerySolution soln = resultsrw.next();
+                return Integer.parseInt(soln.getLiteral("tot").getString());
+	    }
+	} catch (Exception e) {
+	    e.printStackTrace();
+	}
+	return -1;
+    }
+
+    public static int getNumberStudyObjectsByCollection(String oc_uri) {
+        String query = "";
+        query += NameSpaces.getInstance().printSparqlNameSpaceList();
+        query += " select (count(?obj) as ?tot) where " + 
+	             " { ?obj hasco:isMemberOf <" + oc_uri + "> . ?obj a ?objType . " + 
+                 " FILTER NOT EXISTS { ?objType rdfs:subClassOf* hasco:ObjectCollection . } " + 
+	             "}";
         try {
             ResultSetRewindable resultsrw = SPARQLUtils.select(
                     CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), query);
@@ -199,6 +250,64 @@ public class StudyObject extends HADatAcThing {
                 try {
                     if (soln.getResource("scopeUri") != null && soln.getResource("scopeUri").getURI() != null) {
                         retrievedUris.add(soln.getResource("scopeUri").getURI());
+                    }
+                } catch (Exception e1) {
+                }
+            }
+        }
+        return retrievedUris;
+    }
+
+    public static List<String> retrieveTimeScopeUris(String obj_uri) {
+        List<String> retrievedUris = new ArrayList<String>();
+        String queryString = NameSpaces.getInstance().printSparqlNameSpaceList() + 
+                "SELECT  ?timeScopeUri WHERE { " + 
+                " <" + obj_uri + "> hasco:hasTimeObjectScope ?timeScopeUri . " + 
+                "}";
+
+        //System.out.println("Study.retrieveTimeScopeUris() queryString: \n" + queryString);
+
+        ResultSetRewindable resultsrw = SPARQLUtils.select(
+                CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), queryString);
+        
+        if (!resultsrw.hasNext()) {
+            return retrievedUris;
+        }
+        while (resultsrw.hasNext()) {
+            QuerySolution soln = resultsrw.next();
+            if (soln != null) {
+                try {
+                    if (soln.getResource("timeScopeUri") != null && soln.getResource("timeScopeUri").getURI() != null) {
+                        retrievedUris.add(soln.getResource("timeScopeUri").getURI());
+                    }
+                } catch (Exception e1) {
+                }
+            }
+        }
+        return retrievedUris;
+    }
+
+    public static List<String> retrieveSpaceScopeUris(String obj_uri) {
+        List<String> retrievedUris = new ArrayList<String>();
+        String queryString = NameSpaces.getInstance().printSparqlNameSpaceList() + 
+                "SELECT  ?spaceScopeUri WHERE { " + 
+                " <" + obj_uri + "> hasco:hasSpaceObjectScope ?spaceScopeUri . " + 
+                "}";
+
+        //System.out.println("Study.retrieveSpaceScopeUris() queryString: \n" + queryString);
+
+        ResultSetRewindable resultsrw = SPARQLUtils.select(
+                CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), queryString);
+        
+        if (!resultsrw.hasNext()) {
+            return retrievedUris;
+        }
+        while (resultsrw.hasNext()) {
+            QuerySolution soln = resultsrw.next();
+            if (soln != null) {
+                try {
+                    if (soln.getResource("spaceScopeUri") != null && soln.getResource("spaceScopeUri").getURI() != null) {
+                        retrievedUris.add(soln.getResource("spaceScopeUri").getURI());
                     }
                 } catch (Exception e1) {
                 }
@@ -280,7 +389,9 @@ public class StudyObject extends HADatAcThing {
                         FirstLabel.getLabel(obj_uri),
                         isMemberOfStr,
                         commentStr,
-                        retrieveScopeUris(obj_uri));
+                        retrieveScopeUris(obj_uri),
+                        retrieveTimeScopeUris(obj_uri),
+                        retrieveSpaceScopeUris(obj_uri));
             }
         }
 
@@ -518,6 +629,30 @@ public class StudyObject extends HADatAcThing {
                 }
             } 
         }
+        if (timeScopeUris != null && timeScopeUris.size() > 0) {
+            for (String scope : timeScopeUris) {
+                if (!scope.equals("")) {
+                    if (scope.startsWith("http")) {
+                        insert += obj_uri + " hasco:hasTimeObjectScope <" + scope + "> .  "; 
+                    } else {
+                        insert += obj_uri + " hasco:hasTimeObjectScope " + scope + " .  "; 
+                    }
+                }
+            } 
+        }
+
+        if (spaceScopeUris != null && spaceScopeUris.size() > 0) {
+            for (String scope : spaceScopeUris) {
+                if (!scope.equals("")) {
+                    if (scope.startsWith("http")) {
+                        insert += obj_uri + " hasco:hasSpaceObjectScope <" + scope + "> .  "; 
+                    } else {
+                        insert += obj_uri + " hasco:hasSpaceObjectScope " + scope + " .  "; 
+                    }
+                }
+            } 
+        }
+
 
         insert += LINE_LAST;
         try {
@@ -556,6 +691,24 @@ public class StudyObject extends HADatAcThing {
             }
         }
         row.put("hasco:hasObjectScope",scopeStr);
+        String timeScopeStr = "";
+        for (int i=0; i <  timeScopeUris.size(); i++) {
+            String timeScope = timeScopeUris.get(i);
+            scopeStr += URIUtils.replaceNameSpaceEx(timeScope);
+            if (i < timeScopeUris.size() - 1) {
+                timeScopeStr += " , ";
+            }
+        }
+        row.put("hasco:hasTimeObjectScope",timeScopeStr);
+        String spaceScopeStr = "";
+        for (int i=0; i <  spaceScopeUris.size(); i++) {
+            String spaceScope = spaceScopeUris.get(i);
+            scopeStr += URIUtils.replaceNameSpaceEx(spaceScope);
+            if (i < spaceScopeUris.size() - 1) {
+                spaceScopeStr += " , ";
+            }
+        }
+        row.put("hasco:hasSpaceObjectScope",spaceScopeStr);
         rows.add(row);
         int totalChanged = 0;
         try {

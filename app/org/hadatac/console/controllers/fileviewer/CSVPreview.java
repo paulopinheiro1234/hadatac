@@ -83,11 +83,11 @@ public class CSVPreview extends Controller{
 		return previewList;
 	}
 
-	public Result getCSVPreview(String folder, String fileName, String da_uri, String oc_uri, int numRows){
+	public Result getCSVPreview(String folder, String fileName, String da_uri, String oc_uri, int numRows, int page){
 		if (da_uri != null && !da_uri.equals("")) {
-			return ok(csv_preview.render("selectCol", fileName, da_uri, oc_uri, getCSVHeaders(folder, fileName), getCSVPreview(folder, fileName, numRows)));
+			return ok(csv_preview.render("selectCol", fileName, da_uri, oc_uri, getCSVHeaders(folder, fileName), getCSVPreview(folder, fileName, numRows), page));
 		}
-		return ok(csv_preview.render("preview", fileName, da_uri, oc_uri, getCSVHeaders(folder, fileName), getCSVPreview(folder, fileName, numRows)));
+		return ok(csv_preview.render("preview", fileName, da_uri, oc_uri, getCSVHeaders(folder, fileName), getCSVPreview(folder, fileName, numRows), page));
 	}
 
 	public static ArrayList<String> getColumn(String ownerEmail, String fileName, int selectedCol){

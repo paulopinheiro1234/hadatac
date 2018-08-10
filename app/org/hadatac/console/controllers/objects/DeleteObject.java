@@ -40,10 +40,10 @@ import be.objectify.deadbolt.java.actions.Restrict;
 public class DeleteObject extends Controller {
 
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    public Result index(String filename, String da_uri, String std_uri, String oc_uri, String obj_id) {
+    public Result index(String filename, String da_uri, String std_uri, String oc_uri, String obj_id, int page) {
         if (session().get("LabKeyUserName") == null && session().get("LabKeyPassword") == null) {
             return redirect(org.hadatac.console.controllers.triplestore.routes.LoadKB.logInLabkey(
-                    org.hadatac.console.controllers.objects.routes.DeleteObject.index(filename, da_uri, std_uri, oc_uri, obj_id).url()));
+                    org.hadatac.console.controllers.objects.routes.DeleteObject.index(filename, da_uri, std_uri, oc_uri, obj_id, page).url()));
         }
         
         try {
@@ -56,23 +56,23 @@ public class DeleteObject extends Controller {
 
         Study study = Study.find(std_uri);
         if (study == null) {
-            return badRequest(objectConfirm.render("Error editing object: Study URI did not return valid URI", filename, da_uri, std_uri, oc_uri));
+            return badRequest(objectConfirm.render("Error editing object: Study URI did not return valid URI", filename, da_uri, std_uri, oc_uri, page));
         } 
 
         ObjectCollection oc = ObjectCollection.find(oc_uri);
         if (oc == null) {
-            return badRequest(objectConfirm.render("Error editing object: ObjectCollection URI did not return valid object", filename, da_uri, std_uri, oc_uri));
+            return badRequest(objectConfirm.render("Error editing object: ObjectCollection URI did not return valid object", filename, da_uri, std_uri, oc_uri, page));
         } 
 
-        List<StudyObject> objects = StudyObject.findByCollection(oc);
+        List<StudyObject> objects = StudyObject.findByCollectionWithPages(oc, ObjectManagement.PAGESIZE, page);
 
         //return ok(editObject.render(study, oc, objects));
-        return badRequest(objectConfirm.render("PLACEHOLDER", filename, da_uri, std_uri, oc_uri));
+        return badRequest(objectConfirm.render("PLACEHOLDER", filename, da_uri, std_uri, oc_uri, page));
     }
 
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    public Result postIndex(String filename, String da_uri, String std_uri, String oc_uri, String obj_id) {
-        return index(filename, da_uri, std_uri, oc_uri, obj_id);
+    public Result postIndex(String filename, String da_uri, String std_uri, String oc_uri, String obj_id, int page) {
+        return index(filename, da_uri, std_uri, oc_uri, obj_id, page);
     }
 
 }

@@ -143,21 +143,31 @@ public class SSDSampleMapper extends BasicGenerator {
         return ans;
     }
 
+    private String getSpaceScopeUri(Record rec) {
+        String ans = rec.getValueByColumnName(mapCol.get("spaceScopeID"));
+        return ans;
+    }
+
 
     public StudyObject createStudyObject(Record record) throws Exception {
         List<String> scopeUris = new ArrayList<String>();
+        List<String> timeScopeUris = new ArrayList<String>();
+        List<String> spaceScopeUris = new ArrayList<String>();
         String pid = getOriginalPID(record);
         if (!pid.isEmpty()) {
             scopeUris.add(kbPrefix + "SBJ-" + pid + "-" + study_id);
         }
         if (!getTimeScopeUri(record).isEmpty()){
-        	scopeUris.add(kbPrefix + "TIME-" + getTimeScopeUri(record) + "-" + study_id);
+        	timeScopeUris.add(kbPrefix + "TIME-" + getTimeScopeUri(record) + "-" + study_id);
+        }
+        if (!getSpaceScopeUri(record).isEmpty()){
+        	timeScopeUris.add(kbPrefix + "LOC-" + getSpaceScopeUri(record) + "-" + study_id);
         }
 
         System.out.println("scopeUris :" + scopeUris);
 
         StudyObject obj = new StudyObject(getUri(record), getType(record), getOriginalSID(record), 
-                getLabel(record), getCollectionUri(record), getLabel(record), scopeUris);
+                getLabel(record), getCollectionUri(record), getLabel(record), scopeUris, timeScopeUris, spaceScopeUris);
 
         return obj;
     }

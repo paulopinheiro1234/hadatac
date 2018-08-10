@@ -7,9 +7,11 @@ import java.util.List;
 import java.util.Map;
 
 import org.hadatac.utils.ConfigProp;
-import org.hadatac.entity.pojo.StudyObject;
 import org.hadatac.metadata.loader.URIUtils;
 import org.hadatac.entity.pojo.HADatAcThing;
+import org.hadatac.entity.pojo.Study;
+import org.hadatac.entity.pojo.StudyObject;
+import org.hadatac.entity.pojo.ObjectCollection;
 
 
 public class StudyObjectGenerator extends BasicGenerator {
@@ -28,12 +30,19 @@ public class StudyObjectGenerator extends BasicGenerator {
 
     public StudyObjectGenerator(RecordFile file, List<String> listContent, Map<String, List<String>> mapContent, String study_uri) {
         super(file);
-	this.study_id = study_id; 
+        //this.study_id = study_id; 
         file_name = file.getFile().getName();
         System.out.println("We are in StudyObject Generator!");
-        study_id = file.getFile().getName().replaceAll("SSD-", "").replaceAll(".xlsx", "");
-        setStudyUri(study_uri);
-        
+        System.out.println("Study URI: " + study_uri);
+        //if (study_uri != null && !study_uri.equals("")) {
+        	//study = Study.find(study_uri);
+            //if (study != null) {
+            	//study_id = study.getLabel();
+            //} else {
+                study_id = file.getFile().getName().replaceAll("SSD-", "").replaceAll(".xlsx", "");
+            //}
+        //}
+        setStudyUri(study_uri);       
         this.listCache = listContent;
         System.out.println(listContent);
         this.mapContent = mapContent;
@@ -47,6 +56,9 @@ public class StudyObjectGenerator extends BasicGenerator {
         System.out.println("oc_timescope : " + oc_timescope);
         this.role = listContent.get(4);
         System.out.println("role : " + role);
+        //if (oc_uri != null && !oc_uri.equals("")) {
+        //	oc = oc.find(URIUtils.replacePrefixEx(oc_uri));
+        //}        
         uriMap.put("hasco:SubjectGroup", "SBJ-");
         uriMap.put("hasco:SampleCollection", "SPL-");
         uriMap.put("hasco:TimeCollection", "TIME-");
@@ -71,7 +83,7 @@ public class StudyObjectGenerator extends BasicGenerator {
     }
     
     private String getLabel(Record rec) {
-        return "Study Object ID " + getOriginalID(rec) + " - " + study_id;
+        return uriMap.get(oc_type).replaceAll("-", "") + " " + getOriginalID(rec) + " - " + study_id;
     }
 
     private String getOriginalID(Record rec) {
@@ -91,6 +103,16 @@ public class StudyObjectGenerator extends BasicGenerator {
     		return "";
     	}
     }
+
+    private String getTimeScopeUri(Record rec) {
+    	
+    	if (oc_timescope.length() > 0){
+        	String timeScopeOCtype = mapContent.get(oc_timescope).get(1);
+            return kbPrefix + uriMap.get(timeScopeOCtype) + rec.getValueByColumnName(mapCol.get("timeScopeID")).replaceAll("(?<=^\\d+)\\.0*$", "") + "-" + study_id;
+    	} else {
+    		return "";
+    	}
+    }
 //
     public StudyObject createStudyObject(Record record) throws Exception {
     	//System.out.println(getUri(record));
@@ -99,6 +121,7 @@ public class StudyObjectGenerator extends BasicGenerator {
 					  getCohortUri(record), getLabel(record));
         obj.setRoleUri(URIUtils.replacePrefixEx(role));
         obj.addScopeUri(getScopeUri(record));
+        obj.addTimeScopeUri(getTimeScopeUri(record));
         return obj;
     }
     

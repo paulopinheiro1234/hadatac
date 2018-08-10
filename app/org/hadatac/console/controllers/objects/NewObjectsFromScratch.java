@@ -34,10 +34,10 @@ public class NewObjectsFromScratch extends Controller {
     private FormFactory formFactory;
 
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    public Result index(String filename, String da_uri, String std_uri, String oc_uri) {
+    public Result index(String filename, String da_uri, String std_uri, String oc_uri, int page) {
         if (session().get("LabKeyUserName") == null && session().get("LabKeyPassword") == null) {
             return redirect(org.hadatac.console.controllers.triplestore.routes.LoadKB.logInLabkey(
-                    org.hadatac.console.controllers.objects.routes.NewObjectsFromScratch.index(filename, da_uri, std_uri, oc_uri).url()));
+                    org.hadatac.console.controllers.objects.routes.NewObjectsFromScratch.index(filename, da_uri, std_uri, oc_uri, page).url()));
         }
 
         try {
@@ -61,16 +61,16 @@ public class NewObjectsFromScratch extends Controller {
             }
         }
 
-        return ok(newObjectsFromScratch.render(filename, da_uri, study, oc, typeList));
+        return ok(newObjectsFromScratch.render(filename, da_uri, study, oc, typeList, page));
     }
 
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    public Result postIndex(String filename, String da_uri, String std_uri, String oc_uri) {
-        return index(filename, da_uri, std_uri, oc_uri);
+    public Result postIndex(String filename, String da_uri, String std_uri, String oc_uri, int page) {
+        return index(filename, da_uri, std_uri, oc_uri, page);
     }
 
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    public Result processForm(String filename, String da_uri, String std_uri, String oc_uri) {
+    public Result processForm(String filename, String da_uri, String std_uri, String oc_uri, int page) {
         final SysUser sysUser = AuthApplication.getLocalUser(session());
 
         Study std = Study.find(std_uri);
@@ -131,7 +131,9 @@ public class NewObjectsFromScratch extends Controller {
                         newLabel,
                         newObjectCollectionUri,
                         newComment,
-                        new ArrayList<String>() 
+                        new ArrayList<String>(),
+                        new ArrayList<String>(),
+                        new ArrayList<String>()
                         );
 
                 // insert the new OC content inside of the triplestore regardless of any change -- the previous content has already been deleted
@@ -149,11 +151,11 @@ public class NewObjectsFromScratch extends Controller {
             }
         }
         String message = "A total of " + quantity + " new object(s) have been Generated";
-        return ok(objectConfirm.render(message, filename, da_uri, std_uri, oc_uri));
+        return ok(objectConfirm.render(message, filename, da_uri, std_uri, oc_uri, page));
     }
 
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    public Result processScopeForm(String filename, String da_uri, String std_uri, String oc_uri) {
+    public Result processScopeForm(String filename, String da_uri, String std_uri, String oc_uri, int page) {
         try {
             oc_uri = URLDecoder.decode(oc_uri, "utf-8");
         } catch (UnsupportedEncodingException e) {
@@ -307,8 +309,11 @@ public class NewObjectsFromScratch extends Controller {
                     newComment = newLabel;
 
                     List<String> scopeUris = new ArrayList<String>();
+                    List<String> timeScopeUris = new ArrayList<String>();
+                    List<String> spaceScopeUris = new ArrayList<String>();
                     for (StudyObject so : soCol) {
                         scopeUris.add(so.getUri());
+                        // TODO: needs to add to timeScopeUris and spaceScopeUris too
                         System.out.println("   - Scope: [" + so.getUri() + "]");
                     }
 
@@ -319,7 +324,9 @@ public class NewObjectsFromScratch extends Controller {
                             newLabel,
                             newObjectCollectionUri,
                             newComment,
-                            scopeUris 
+                            scopeUris,
+                            timeScopeUris,
+                            spaceScopeUris
                             );
 
                     // insert the new OC content inside of the triplestore regardless of any change -- the previous content has already been deleted
@@ -344,7 +351,7 @@ public class NewObjectsFromScratch extends Controller {
             std.increaseLastId(quantity);
         }
 
-        return ok(objectConfirm.render(message, filename, da_uri, std_uri, oc_uri));
+        return ok(objectConfirm.render(message, filename, da_uri, std_uri, oc_uri, page));
     }
 
     private static void cartesianProduct(StudyObject[][] arr, int level, StudyObject[] cp, List<String> gens, List<List<StudyObject>> genOS) {

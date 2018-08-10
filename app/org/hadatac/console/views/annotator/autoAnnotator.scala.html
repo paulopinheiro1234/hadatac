@@ -104,7 +104,7 @@
     			<td>@file.getCompletionTime()</td>
     			<td>@if(file.getFileName().endsWith(".csv")) {
                         @defining("") { da_uri =>  @defining("") { oc_uri => 
-    			    <a href="@org.hadatac.console.controllers.fileviewer.routes.CSVPreview.getCSVPreview("proc", file.getFileName(), da_uri, oc_uri, 10)" 
+    			    <a href="@org.hadatac.console.controllers.fileviewer.routes.CSVPreview.getCSVPreview("proc", file.getFileName(), da_uri, oc_uri, 10, 1)" 
 			       class="btn-xs btn-primary" role="button">Preview File</a>
                         }}}
                 @if(file.getFileName().endsWith(".xlsx") || file.getFileName().endsWith(".xls")) {
@@ -173,7 +173,7 @@
 			    }
 			@if(file.getFileName().endsWith(".csv")) {
 			@defining("") { da_uri => @defining("") { oc_uri => 
-    	                     <a href="@org.hadatac.console.controllers.fileviewer.routes.CSVPreview.getCSVPreview("unproc", file.getFileName(), da_uri, oc_uri, 10)" 
+    	                     <a href="@org.hadatac.console.controllers.fileviewer.routes.CSVPreview.getCSVPreview("unproc", file.getFileName(), da_uri, oc_uri, 10, 1)" 
 				class="btn-xs btn-primary" role="button">Preview File</a>
                         }}}
             @if(file.getFileName().endsWith(".xlsx") || file.getFileName().endsWith(".xls")) {

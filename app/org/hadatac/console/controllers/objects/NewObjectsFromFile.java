@@ -39,7 +39,7 @@ public class NewObjectsFromFile extends Controller {
     private FormFactory formFactory;
 
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    public Result processForm(String filename, String da_uri, String oc_uri) {
+    public Result processForm(String filename, String da_uri, String oc_uri, int page) {
         final SysUser sysUser = AuthApplication.getLocalUser(session());
 
         ObjectCollection oc = ObjectCollection.find(oc_uri);
@@ -84,6 +84,8 @@ public class NewObjectsFromFile extends Controller {
             Iterator it = parser.iterator();
             CSVRecord currentRow;
             List<String> scopeUris = new ArrayList<String>();
+            List<String> timeScopeUris = new ArrayList<String>();
+            List<String> spaceScopeUris = new ArrayList<String>();
             while(it.hasNext()){
 
                 // retrieve original ID
@@ -107,7 +109,9 @@ public class NewObjectsFromFile extends Controller {
                         newLabel,
                         newObjectCollectionUri,
                         newComment,
-                        scopeUris 
+                        scopeUris,
+                        timeScopeUris,
+                        spaceScopeUris
                         );
 
                 // insert the new OC content inside of the triplestore regardless of any change -- the previous content has already been deleted
@@ -128,7 +132,7 @@ public class NewObjectsFromFile extends Controller {
         }
 
         String message = "Total objects created: " + rowCount;
-        return ok(objectConfirm.render(message, filename, da_uri, study.getUri(), oc_uri));
+        return ok(objectConfirm.render(message, filename, da_uri, study.getUri(), oc_uri, page));
     }
 
     static private String formattedCounter (long value) {
