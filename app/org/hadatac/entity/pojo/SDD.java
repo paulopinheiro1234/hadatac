@@ -430,6 +430,29 @@ public class SDD {
 	                    } else {
 	
 	                    }
+                	} else if (codeMappings.containsKey(entityCell)) {
+                    	if (URIUtils.isValidURI(codeMappings.get(entityCell))) {
+    	                    dasoList.add(record.getValueByColumnIndex(0));
+    	                    if (inRelationToCell.length()>0) {
+    	                        so2so2.put(record.getValueByColumnIndex(0), inRelationToCell);
+    	                    } else {
+    	
+    	                    }
+    	
+    	                    so2type.put(record.getValueByColumnIndex(0), codeMappings.get(entityCell));
+    	
+    	                    if (roleCell.length()>0) {
+    	                        so2role.put(record.getValueByColumnIndex(0), roleCell);
+    	                    } else {
+    	
+    	                    }
+    	
+    	                    if (dfCell.length()>0) {
+    	                        so2df.put(record.getValueByColumnIndex(0), dfCell);
+    	                    } else {
+    	
+    	                    }
+                    	}
                 	} else {
                         AnnotationLog.printException("The Entity Cell \"" + entityCell + "\" in the \"Entity\" column is either not valid uri or it can not be resolved by replaceNameSpaceEx().", sddfile.getFile().getName());
                         return false;
