@@ -591,7 +591,7 @@ public class Measurement extends HADatAcThing implements Runnable {
         retFacetHandler.loadFacets(facets);
 
         //System.out.println("\nfacetHandler before: " + facetHandler.toSolrQuery());
-        System.out.println("\nfacetHandler before: " + facetHandler.toJSON());
+        //System.out.println("\nfacetHandler before: " + facetHandler.toJSON());
 
         // Run one time
         // getAllFacetStats(facetHandler, retFacetHandler, result, false);
@@ -601,7 +601,7 @@ public class Measurement extends HADatAcThing implements Runnable {
         getAllFacetStats(facetHandler, retFacetHandler, result, true);
 
         //System.out.println("\n\n\nfacetHandler after: " + retFacetHandler.bottommostFacetsToSolrQuery());
-        System.out.println("\n\n\nfacetHandler after: " + retFacetHandler.toJSON());
+        //System.out.println("\n\n\nfacetHandler after: " + retFacetHandler.toJSON());
 
         // Get documents
         long docSize = 0;
@@ -609,7 +609,7 @@ public class Measurement extends HADatAcThing implements Runnable {
         //String q = buildQuery(ownedDAs, retFacetHandler);
         String q = buildQuery(ownedDAs, facetHandler);
 
-        System.out.println("measurement solr query: " + q);
+        //System.out.println("measurement solr query: " + q);
         
         SolrQuery query = new SolrQuery();
         query.setQuery(q);
@@ -643,13 +643,13 @@ public class Measurement extends HADatAcThing implements Runnable {
             docSize = docs.getNumFound();
             System.out.println("Num of results: " + docSize);
 
-            System.out.println("\n\n\nqueryResponse: " + queryResponse);
+            //System.out.println("\n\n\nqueryResponse: " + queryResponse);
             Pivot pivot = Pivot.parseQueryResponse(queryResponse);
             
-        	System.out.println("PRINTING PIVOT");
-            for (Pivot p : pivot.children) {
-            	System.out.println("Field: " + p.getField() + "   Value: " + p.getValue());
-            }
+        	//System.out.println("PRINTING PIVOT");
+            //for (Pivot p : pivot.children) {
+            //	System.out.println("Field: " + p.getField() + "   Value: " + p.getValue());
+            //}
             
             result.extra_facets.put(FacetHandler.SUBJECT_CHARACTERISTIC_FACET, pivot);
 
@@ -899,7 +899,7 @@ public class Measurement extends HADatAcThing implements Runnable {
             setCharacteristic(cache.get(getCharacteristicUri()));
         }*/
         if (cache.containsKey(getCharacteristicUris().get(0))) {
-        	System.out.println("In setLabel: characteristic at get(0) is " + getCharacteristicUris().get(0) + " and label is " + cache.get(getCharacteristicUris().get(0)));
+        	//System.out.println("In setLabel: characteristic at get(0) is " + getCharacteristicUris().get(0) + " and label is " + cache.get(getCharacteristicUris().get(0)));
         	setCharacteristic(cache.get(getCharacteristicUris().get(0)));
         }
         if (cache.containsKey(getUnitUri())) {
@@ -1143,7 +1143,7 @@ public class Measurement extends HADatAcThing implements Runnable {
                     return o1.toString().compareTo(o2.toString());
                 }
             });
-            System.out.println("aligned attributes size: " + aaList.size());
+            //System.out.println("aligned attributes size: " + aaList.size());
             boolean first = true;
             for (AlignmentAttribute aa : aaList) {
                 if (first) {
@@ -1163,7 +1163,7 @@ public class Measurement extends HADatAcThing implements Runnable {
                     return o1.getOriginalId().compareTo(o2.getOriginalId());
                 }
             });
-            System.out.println("objects size: " + objects.size());
+            //System.out.println("objects size: " + objects.size());
 
             // Write rows: traverse collected object. From these objects, traverse alignment objects
             for (StudyObject obj : objects) {
@@ -1182,7 +1182,7 @@ public class Measurement extends HADatAcThing implements Runnable {
                 }
             }
 
-            System.out.println("Finished writing!");
+            //System.out.println("Finished writing!");
             
 	    // Write harmonized code book
 	    outputHarmonizedCodebook(alignment, null);
@@ -1207,8 +1207,8 @@ public class Measurement extends HADatAcThing implements Runnable {
 	// Write empty string to create the file
 	//FileUtils.writeStringToFile(file, "", "utf-8", true);
 
-	System.out.println("Harmonized code book");
-	System.out.println("Class, code, description");
+	//System.out.println("Harmonized code book");
+	//System.out.println("Class, code, description");
 
 	// Wrte code book
 	/*for (String key : alignment.getCodeBook().keySet()) {
