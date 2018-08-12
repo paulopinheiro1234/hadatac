@@ -120,7 +120,7 @@ public class Alignment {
 
         String mRole = inferRole(m);
 
-        String mKey =  mRole + m.getEntityUri() + m.getCharacteristicUri() + mInRelationTo + mUnit + mAbstractTime;
+        String mKey =  mRole + m.getEntityUri() + m.getCharacteristicUris().get(0) + mInRelationTo + mUnit + mAbstractTime;
 
         //System.out.println("Measurement: " + mKey);
         //System.out.println("Vector: " + alignAttrs); 
@@ -139,16 +139,16 @@ public class Alignment {
         }
         AlignmentEntityRole newRole = new AlignmentEntityRole(entity,mRole);
 
-        Attribute attribute = Attribute.find(m.getCharacteristicUri());
+        Attribute attribute = Attribute.find(m.getCharacteristicUris().get(0));
         if (attribute == null) {
-            System.out.println("[ERROR] retrieving attribute " + m.getCharacteristicUri());
+            System.out.println("[ERROR] retrieving attribute " + m.getCharacteristicUris().get(0));
             return null;
         }
 	if (m.getDasaUri() != null && !m.getDasaUri().equals("")) {
 	    if (!containsCode(m.getDasaUri())) {
 		String code = Attribute.findHarmonizedCode(m.getDasaUri());
 		if (code != null && !code.equals("")) {
-		    addCode(m.getCharacteristicUri(), code);
+		    addCode(m.getCharacteristicUris().get(0), code);
 		}
 	    }
 	}
@@ -273,7 +273,7 @@ public class Alignment {
                 " <" + m.getDasaUri() + "> hasco:isAttributeOf <" + m.getDasoUri() + "> . \n" +
                 " <" + m.getDasoUri() + "> hasco:hasRole ?roleUri . \n" +
                 " <" + m.getDasaUri() + "> hasco:hasEntity <" + m.getEntityUri() + "> . \n" +
-                " <" + m.getDasaUri() + "> hasco:hasAttribute <" + m.getCharacteristicUri() + "> .  \n" +
+                " <" + m.getDasaUri() + "> hasco:hasAttribute <" + m.getCharacteristicUris().get(0) + "> .  \n" +
                 " ?roleUri rdfs:label ?roleLabel . \n" +
                 "} \n"; 
 

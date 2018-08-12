@@ -71,9 +71,9 @@ public class AttributeInstance extends HADatAcThing implements Comparable<Attrib
         query.setFacet(true);
         query.setFacetLimit(-1);
         query.setParam("json.facet", "{ "
-                + "characteristic_uri_str:{ "
+                + "characteristic_uri_str_multi:{ "
                 + "type: terms, "
-                + "field: characteristic_uri_str, "
+                + "field: characteristic_uri_str_multi, "
                 + "limit: 1000}}");
 
         try {
@@ -98,7 +98,7 @@ public class AttributeInstance extends HADatAcThing implements Comparable<Attrib
             attrib.setUri(pivot_ent.getValue());
             attrib.setLabel(WordUtils.capitalize(Attribute.find(pivot_ent.getValue()).getLabel()));
             attrib.setCount(pivot_ent.getCount());
-            attrib.setField("characteristic_uri_str");
+            attrib.setField("characteristic_uri_str_multi");
 
             if (!results.containsKey(attrib)) {
                 List<HADatAcThing> children = new ArrayList<HADatAcThing>();
@@ -106,7 +106,7 @@ public class AttributeInstance extends HADatAcThing implements Comparable<Attrib
             }
 
             Facet subFacet = facet.getChildById(attrib.getUri());
-            subFacet.putFacet("characteristic_uri_str", attrib.getUri());
+            subFacet.putFacet("characteristic_uri_str_multi", attrib.getUri());
         }
 
         return results;

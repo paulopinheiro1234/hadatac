@@ -133,6 +133,8 @@ public class DataAcquisitionSearch extends Controller {
 
         ObjectDetails objDetails = getObjectDetails(results);
 
+        System.out.println("\n\n\n\nresults to JSON: " + results.toJSON());        
+        
         if (mode == 0) {
             return ok(facetOnlyBrowser.render(page, rows, ownerUri, facets, results.getDocumentSize(), 
                     results, results.toJSON(), facetHandler, objDetails.toJSON(), 

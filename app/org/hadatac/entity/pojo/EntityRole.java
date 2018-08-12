@@ -49,9 +49,9 @@ public class EntityRole extends HADatAcThing implements Comparable<EntityRole> {
                     facet.getFacetValuesByField("entity_role_uri_str"), true) + " } \n ";
         }
 
-        if (!facet.getFacetValuesByField("characteristic_uri_str").isEmpty()) {
+        if (!facet.getFacetValuesByField("characteristic_uri_str_multi").isEmpty()) {
             valueConstraint += " VALUES ?attributeUri { " + stringify(
-                    facet.getFacetValuesByField("characteristic_uri_str"), true) + " } \n ";
+                    facet.getFacetValuesByField("characteristic_uri_str_multi"), true) + " } \n ";
         }
 
         if (!facet.getFacetValuesByField("dasa_uri_str").isEmpty()) {
@@ -104,7 +104,7 @@ public class EntityRole extends HADatAcThing implements Comparable<EntityRole> {
                 facet.getChildById(role.getUri());
             } else {
                 facet.clearFieldValues("entity_uri_str");
-                facet.clearFieldValues("characteristic_uri_str");
+                facet.clearFieldValues("characteristic_uri_str_multi");
                 facet.clearFieldValues("daso_uri_str");
                 facet.clearFieldValues("dasa_uri_str");
 
@@ -124,7 +124,7 @@ public class EntityRole extends HADatAcThing implements Comparable<EntityRole> {
                     AttributeInstance attrib = new AttributeInstance();
                     attrib.setUri(soln.get("attributeUri").toString());
                     attrib.setLabel(WordUtils.capitalize(soln.get("attributeLabel").toString()));
-                    attrib.setField("characteristic_uri_str");
+                    attrib.setField("characteristic_uri_str_multi");
 
                     if (!results.containsKey(role)) {
                         List<HADatAcThing> facets = new ArrayList<HADatAcThing>();

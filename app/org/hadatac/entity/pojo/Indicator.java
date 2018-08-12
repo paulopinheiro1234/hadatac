@@ -231,9 +231,9 @@ public class Indicator extends HADatAcThing implements Comparable<Indicator> {
                     facet.getFacetValuesByField("indicator_uri_str"), true) + " } \n ";
         }
 
-        if (!facet.getFacetValuesByField("characteristic_uri_str").isEmpty()) {
+        if (!facet.getFacetValuesByField("characteristic_uri_str_multi").isEmpty()) {
             valueConstraint += " VALUES ?attributeUri { " + stringify(
-                    facet.getFacetValuesByField("characteristic_uri_str"), true) + " } \n ";
+                    facet.getFacetValuesByField("characteristic_uri_str_multi"), true) + " } \n ";
         }
 
         if (!facet.getFacetValuesByField("dasa_uri_str").isEmpty()) {
