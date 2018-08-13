@@ -272,7 +272,7 @@ public class DASchemaAttrGenerator extends BasicGenerator {
         	AnnotationLog.println("[Merged Attribute] : " + getLabel(rec) + " ---> " + mergedEA.get(getLabel(rec)), file.getFile().getName());
         	row.put("hasURI", kbPrefix + "DASA-" + SDDName + "-" + mergedEA.get(getLabel(rec)).get(0).trim().replace(" ", "").replace("_","-").replace("??", ""));
             row.put("a", "hasco:DASchemaAttribute");
-            row.put("rdfs:label", mergedEA.get(getLabel(rec)).get(1));
+            row.put("rdfs:label", mergedEA.get(getLabel(rec)).get(0));
             row.put("rdfs:comment", mergedEA.get(getLabel(rec)).get(1));
             row.put("hasco:partOfSchema", kbPrefix + "DAS-" + SDDName);
             if (!currentHasEntity.containsKey(getLabel(rec))){
@@ -292,7 +292,9 @@ public class DASchemaAttrGenerator extends BasicGenerator {
             }
             row.put("hasco:hasAttribute", getAttribute(rec));
             row.put("hasco:hasUnit", mergedEA.get(getLabel(rec)).get(2));
-            row.put("hasco:hasEvent", mergedEA.get(getLabel(rec)).get(3));
+            if (mergedEA.get(getLabel(rec)).get(3).length()>0){
+                row.put("hasco:hasEvent", kbPrefix + "DASE-" + SDDName + "-" + mergedEA.get(getLabel(rec)).get(3).trim().replace(" ","").replace("_","-").replace("??", "").replace(":", "-"));
+            }
             row.put("hasco:hasSource", "");
             row.put("hasco:isAttributeOf", getAttributeOf(rec));
             row.put("hasco:isVirtual", checkVirtual(rec).toString());
