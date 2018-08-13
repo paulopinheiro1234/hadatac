@@ -258,7 +258,7 @@ public class DataAcquisitionSchemaAttribute extends HADatAcThing {
         } else {
             return attribute;
         }
-    }    
+    }
 
     public List<String> getAttributeNamespace() {
         if (attribute == Arrays.asList("")) {
@@ -278,7 +278,11 @@ public class DataAcquisitionSchemaAttribute extends HADatAcThing {
         } else {
         	List<String> answer = new ArrayList<String>();
         	for (String attr : attribute) {
-        		answer.add(FirstLabel.getLabel(attr));
+        		if (FirstLabel.getLabel(attr).equals("")) {
+        			answer.add(attr);
+        		} else {
+        			answer.add(FirstLabel.getLabel(attr));
+        		}
         	}
             this.attributeLabel = answer;
         }
@@ -554,8 +558,8 @@ public class DataAcquisitionSchemaAttribute extends HADatAcThing {
                 entityStr = soln.get("hasEntity").toString();
             }
             if (soln.get("hasAttribute") != null) {
-                attributeStr = soln.get("hasAttribute").toString();
-                attributeList.add(attributeStr);
+                attributeList.add(soln.get("hasAttribute").toString());
+                System.out.println("print-solrhasAttribute : " + attributeList);
             }
             if (soln.get("hasUnit") != null) {
                 unitStr = soln.get("hasUnit").toString();

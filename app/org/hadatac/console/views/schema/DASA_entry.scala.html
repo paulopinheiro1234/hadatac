@@ -1,4 +1,5 @@
-@(mode: String, dasa : org.hadatac.entity.pojo.DataAcquisitionSchemaAttribute)
+@(mode: String,
+  dasa : org.hadatac.entity.pojo.DataAcquisitionSchemaAttribute)
 
 @import java.net._
 @import org.hadatac.utils._
@@ -23,7 +24,7 @@
    }</td> 
    <td>@if(dasa != null && dasa.getObjectViewLabel() != null) { @dasa.getObjectViewLabel() }</td> 
    <td>@if(dasa != null && dasa.getEntityViewLabel() != null) { @dasa.getEntityViewLabel() }</td> 
-   <td>@if(dasa != null && dasa.getAttributeLabel() != null) { @dasa.getAttributeLabel() }</td> 
+   <td>@if(dasa != null && dasa.getAttribute() != null) { @dasa.getAttribute() }</td> 
    <td>@if(dasa != null && dasa.getInRelationToLabel() != null) { @dasa.getInRelationToLabel() }</td> 
    <td>@if(dasa != null && dasa.getUnitLabel() != null) { @dasa.getUnitLabel() }</td> 
    <td>@if(dasa != null && dasa.getEventViewLabel() != null) { @dasa.getEventViewLabel() }</td> 
