@@ -62,7 +62,7 @@ public class MeasurementGenerator extends BasicGenerator {
         super(file);
         this.da = da;
         this.dataFile = dataFile;
-        
+
         setStudyUri(da.getStudyUri());
     }
 
@@ -264,14 +264,14 @@ public class MeasurementGenerator extends BasicGenerator {
             if(dasa.getLabel() == schema.getTimestampLabel()) {
                 // full-row regular (Epoch) timemestamp
                 String sTime = record.getValueByColumnIndex(posTimestamp);
-		//System.out.println("Timestamp received: " + sTime);
+                //System.out.println("Timestamp received: " + sTime);
                 int timeStamp = new BigDecimal(sTime).intValue();
-		//System.out.println("Tmestamp recorded: " + Instant.ofEpochSecond(timeStamp).toString());
+                //System.out.println("Tmestamp recorded: " + Instant.ofEpochSecond(timeStamp).toString());
                 measurement.setTimestamp(Instant.ofEpochSecond(timeStamp).toString());
             } else if (!schema.getTimeInstantLabel().equals("")) {
                 // full-row regular (XSD) time interval
                 String timeValue = record.getValueByColumnIndex(posTimeInstant);
-		//System.out.println("Timestamp received: " + timeValue);
+                //System.out.println("Timestamp received: " + timeValue);
                 if (timeValue != null) {
                     try {
                         measurement.setTimestamp(timeValue);
@@ -326,48 +326,48 @@ public class MeasurementGenerator extends BasicGenerator {
             measurement.setPID("");
             measurement.setSID("");
 
-	    if (da.hasCellScope()) {
+            if (da.hasCellScope()) {
 
-		// Objects defined by Cell Scope
-		if (da.getCellScopeName().get(0).equals("*")) {
-		    measurement.setStudyObjectUri(URIUtils.replacePrefixEx(da.getCellScopeUri().get(0).trim()));
-		    measurement.setObjectUri(URIUtils.replacePrefixEx(da.getCellScopeUri().get(0).trim()));
-		    measurement.setObjectCollectionType(URIUtils.replacePrefixEx("hasco:SampleCollection"));
-		    //System.out.println("Measurement: ObjectURI (before replace): <" + da.getCellScopeUri().get(0).trim() + ">");
-		    //System.out.println("Measurement: ObjectURI (after replace): <" + URIUtils.replacePrefixEx(da.getCellScopeUri().get(0).trim()) + ">");
-		} else {
-		    // TO DO: implement rest of cell scope
-		}
-		
-	    } else {
-		
-		// Objects defined by Row Scope
-		String id = "";
-		if (!schema.getOriginalIdLabel().equals("")) {
-		    id = record.getValueByColumnIndex(posOriginalId);
-		} else if (!schema.getIdLabel().equals("")) {
-		    id = record.getValueByColumnIndex(posId);
-		}
+                // Objects defined by Cell Scope
+                if (da.getCellScopeName().get(0).equals("*")) {
+                    measurement.setStudyObjectUri(URIUtils.replacePrefixEx(da.getCellScopeUri().get(0).trim()));
+                    measurement.setObjectUri(URIUtils.replacePrefixEx(da.getCellScopeUri().get(0).trim()));
+                    measurement.setObjectCollectionType(URIUtils.replacePrefixEx("hasco:SampleCollection"));
+                    //System.out.println("Measurement: ObjectURI (before replace): <" + da.getCellScopeUri().get(0).trim() + ">");
+                    //System.out.println("Measurement: ObjectURI (after replace): <" + URIUtils.replacePrefixEx(da.getCellScopeUri().get(0).trim()) + ">");
+                } else {
+                    // TO DO: implement rest of cell scope
+                }
 
-		if (!id.equals("")) {
-		    if (dasa.getEntity().equals(URIUtils.replacePrefixEx("sio:Human"))) {
-			if (mapIDStudyObjects.containsKey(id)) {
-			    measurement.setStudyObjectUri(mapIDStudyObjects.get(id).get(0));
-			    measurement.setObjectUri(mapIDStudyObjects.get(id).get(0));
-			}
-			measurement.setObjectCollectionType(URIUtils.replacePrefixEx("hasco:SubjectGroup"));
-			measurement.setPID(id);
-		    } else if (dasa.getEntity().equals(URIUtils.replacePrefixEx("sio:Sample"))) {
-			if (mapIDStudyObjects.containsKey(id)) {
-			    measurement.setStudyObjectUri(mapIDStudyObjects.get(id).get(0));
-			    measurement.setObjectUri(mapIDStudyObjects.get(id).get(2));
-			    measurement.setPID(mapIDStudyObjects.get(id).get(1));
-			}
-			measurement.setObjectCollectionType(URIUtils.replacePrefixEx("hasco:SampleCollection"));
-			measurement.setSID(id);
-		    }
-		}
-	    }
+            } else {
+
+                // Objects defined by Row Scope
+                String id = "";
+                if (!schema.getOriginalIdLabel().equals("")) {
+                    id = record.getValueByColumnIndex(posOriginalId);
+                } else if (!schema.getIdLabel().equals("")) {
+                    id = record.getValueByColumnIndex(posId);
+                }
+
+                if (!id.equals("")) {
+                    if (dasa.getEntity().equals(URIUtils.replacePrefixEx("sio:Human"))) {
+                        if (mapIDStudyObjects.containsKey(id)) {
+                            measurement.setStudyObjectUri(mapIDStudyObjects.get(id).get(0));
+                            measurement.setObjectUri(mapIDStudyObjects.get(id).get(0));
+                        }
+                        measurement.setObjectCollectionType(URIUtils.replacePrefixEx("hasco:SubjectGroup"));
+                        measurement.setPID(id);
+                    } else if (dasa.getEntity().equals(URIUtils.replacePrefixEx("sio:Sample"))) {
+                        if (mapIDStudyObjects.containsKey(id)) {
+                            measurement.setStudyObjectUri(mapIDStudyObjects.get(id).get(0));
+                            measurement.setObjectUri(mapIDStudyObjects.get(id).get(2));
+                            measurement.setPID(mapIDStudyObjects.get(id).get(1));
+                        }
+                        measurement.setObjectCollectionType(URIUtils.replacePrefixEx("hasco:SampleCollection"));
+                        measurement.setSID(id);
+                    }
+                }
+            }
 
             /*=============================*
              *                             *
@@ -387,9 +387,9 @@ public class MeasurementGenerator extends BasicGenerator {
              *=============================*/
 
             measurement.setUri(URIUtils.replacePrefixEx(measurement.getStudyUri()) + "/" + 
-			       URIUtils.replaceNameSpaceEx(da.getUri()).split(":")[1] + "/" +
-			       dasa.getLabel() + "/" + 
-			       dataFile.getFileName() + "-" + totalCount++);
+                    URIUtils.replaceNameSpaceEx(da.getUri()).split(":")[1] + "/" +
+                    dasa.getLabel() + "/" + 
+                    dataFile.getFileName() + "-" + totalCount++);
             measurement.setOwnerUri(da.getOwnerUri());
             measurement.setAcquisitionUri(da.getUri());
 

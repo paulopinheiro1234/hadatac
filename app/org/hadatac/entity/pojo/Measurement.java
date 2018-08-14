@@ -659,10 +659,9 @@ public class Measurement extends HADatAcThing implements Runnable {
             Map<String, String> mapClassLabel = generateCodeClassLabel();
             while (iterDoc.hasNext()) {
                 Measurement measurement = convertFromSolr(iterDoc.next(), cachedDA, mapClassLabel);
-                System.out.println("Measurement characterist uri: " + measurement.getCharacteristicUris().get(0));
                 result.addDocument(measurement);
                 uri_set.add(measurement.getEntityUri());
-                uri_set.add(measurement.getCharacteristicUris().get(0));
+                uri_set.addAll(measurement.getCharacteristicUris());
                 uri_set.add(measurement.getUnitUri());
             }
 
@@ -895,13 +894,19 @@ public class Measurement extends HADatAcThing implements Runnable {
         if (cache.containsKey(getEntityUri())) {
             setEntity(cache.get(getEntityUri()));
         }
-        /*if (cache.containsKey(getCharacteristicUri())) {
-            setCharacteristic(cache.get(getCharacteristicUri()));
-        }*/
-        if (cache.containsKey(getCharacteristicUris().get(0))) {
-        	//System.out.println("In setLabel: characteristic at get(0) is " + getCharacteristicUris().get(0) + " and label is " + cache.get(getCharacteristicUris().get(0)));
-        	setCharacteristic(cache.get(getCharacteristicUris().get(0)));
+        
+        List<String> attributes = new ArrayList<String>();
+        for (String attributeUri : getCharacteristicUris()) {
+            if (cache.containsKey(attributeUri)) {
+                attributes.add(cache.get(attributeUri));
+            } else {
+                attributes.add(attributeUri);
+            }
         }
+        if (attributes.size() > 0) {
+            setCharacteristic(String.join("; ", attributes));
+        }
+        
         if (cache.containsKey(getUnitUri())) {
             setUnit(cache.get(getUnitUri()));
         }

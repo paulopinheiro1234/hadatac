@@ -97,7 +97,9 @@
  			@if(indicatorValueResults.isEmpty()){
  				NULL
  			}else{
- 				<b>@indicatorValueResults.get(0).getCharacteristicUris().get(0)</b>
+ 			    @for(char_uri <- indicatorValueResults.get(0).getCharacteristicUris()) {
+ 			        <b>@char_uri</b>
+ 			    }
  				<h3><b>Name:</b>@indicatorValueResults.get(0).getCharacteristic()</h3>
  				
 				<table class="paginated">
