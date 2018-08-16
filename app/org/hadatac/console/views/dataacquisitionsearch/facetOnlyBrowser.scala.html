@@ -38,8 +38,8 @@
 		        }
 			    <button type="button" class="btn btn-primary" onClick="showData(1);">Show Data</button>
 			    <button type="button" class="btn btn-primary" id="toggleCharts">Hide Charts</button>
-	
-			    <div id="download_url" style="visibility: hidden ;">@org.hadatac.console.http.routes.SolrSearchProxy.getDataAcquisitionDownload()</div>
+			    
+			    <div id="panel_options"></div>
 		    
 		        @if(ownerUri != "Public") {
 		            @downloadDialog(page, rows, facets, resultsSize, results, documentJson, objDetails, objFields, objOCs)
@@ -68,45 +68,43 @@
            </div>
 	    </div>
 	    
-		<div class="row">
-			<div class="col-md-2 sidebar">
+		<div class="row" id="panels">
+			<div class="col-md-2 sidebar" id="Studies_and_Data_Acquisitions">
 				<div width="100%" style="background-color:#dddddd">
 					<label class="col-md-offset-1 control-label">Studies and Data Acquisitions</label>
 				</div>
 				<div id="treeStudyBox" style="width:100%; height:400px; background-color:#f5f5f5; border :1px solid Silver; overflow:auto;"></div>
 			</div>
 			
-			<div class="col-md-2 sidebar">
+			<div class="col-md-2 sidebar" id="Object_Collections_and_Roles">
                 <div width="100%" style="background-color:#dddddd">
                     <label class="col-md-offset-1 control-label">Object Collections and Roles</label>
                 </div>
                 <div id="treeObjectCollectionBox" style="width:100%; height:400px; background-color:#f5f5f5; border :1px solid Silver; overflow:auto;"></div>
             </div>
             
-			<div class="col-md-2 sidebar">
+			<div class="col-md-2 sidebar" id="Entities_and_Attributes">
 				<div width="100%" style="background-color:#dddddd">
-					<!--<label class="col-md-offset-1 control-label">Entities and Attributes</label>-->
 					<a href="@org.hadatac.console.controllers.metadata.routes.BrowseOntology.index("ent")">Entities and Attributes</a>
 				</div>
 				<div id="treeEntityCharacteristicBox" style="width:100%; height:400px; background-color:#f5f5f5; border :1px solid Silver; overflow:auto;"></div>
 			</div>
 			
-			<div class="col-md-2 sidebar">
+			<div class="col-md-2 sidebar" id="Units">
 				<div width="100%" style="background-color:#dddddd">
-					<!--<label class="col-md-offset-1 control-label">Units</label>-->
 					<a href="@org.hadatac.console.controllers.metadata.routes.BrowseOntology.index("unit")">Units</a>
 				</div>
 				<div id="treeUnitBox" style="width:100%; height:400px; background-color:#f5f5f5; border :1px solid Silver; overflow:auto;"></div>
 			</div>
 			
-			<div class="col-md-2 sidebar">
+			<div class="col-md-2 sidebar" id="Times">
 				<div width="100%" style="background-color:#dddddd">
 					<label class="col-md-offset-1 control-label">Times</label>
 				</div>
 				<div id="treeTimeBox" style="width:100%; height:400px; background-color:#f5f5f5; border :1px solid Silver; overflow:auto;"></div>
 			</div>
 			
-			<div class="col-md-2 sidebar">
+			<div class="col-md-2 sidebar" id="Platforms_and_Instruments">
 				<div width="100%" style="background-color:#dddddd">
 					<label class="col-md-offset-1 control-label">Platforms and Instruments</label>
 				</div>
@@ -116,4 +114,46 @@
 	</div>
 	
 	@facetTree(page, rows, facets, resultsSize, results, documentJson, handler, objDetails)
+	
+	<script>
+	$(document).ready(function() {
+		$("#panels").children().each(function () {
+			$("#panel_options").append($('<label/>').html(this.id.replace(/_/g, ' ') + '&nbsp;&nbsp;').prepend($('<input/>').attr(
+					{ type: 'checkbox', name: this.id, 'checked': true}).change(function () {
+		        if (this.checked) {
+		            $("#" + this.name).show();
+		        } else {
+		        	$("#" + this.name).hide();
+		        }
+		        updatePanelWidths();
+		    })));
+		});
+	});
+	
+	function updatePanelWidths() {
+		var num_visible = $('#panels .sidebar:visible').length;
+		$("#panels").children().each(function () {
+			if ($(this).is(':visible')) {
+				if (num_visible == 1) {
+					$(this).removeClass().addClass('col-md-12').addClass('sidebar');	
+				}
+				if (num_visible == 2) {
+                    $(this).removeClass().addClass('col-md-6').addClass('sidebar'); 
+                }
+				if (num_visible == 3) {
+                    $(this).removeClass().addClass('col-md-4').addClass('sidebar'); 
+                }
+				if (num_visible == 4) {
+                    $(this).removeClass().addClass('col-md-3').addClass('sidebar'); 
+                }
+				if (num_visible == 5) {
+                    $(this).removeClass().addClass('col-md-2').addClass('sidebar'); 
+                }
+				if (num_visible == 6) {
+                    $(this).removeClass().addClass('col-md-2').addClass('sidebar'); 
+                }
+			}
+		});
+	}
+	</script>
 }
