@@ -1,6 +1,7 @@
 package org.hadatac.console.controllers.annotator;
 
 import java.io.File;
+import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -279,7 +280,7 @@ public class AutoAnnotator extends Controller {
     }
 
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    public Result moveDataFile(String fileName) {			
+    public Result moveDataFile(String fileName) {        
         final SysUser user = AuthApplication.getLocalUser(session());
         DataFile dataFile = null;
         if (user.isDataManager()) {
@@ -288,6 +289,7 @@ public class AutoAnnotator extends Controller {
         else {
             dataFile = DataFile.findByName(user.getEmail(), fileName);
         }
+        
         if (null == dataFile) {
             return badRequest("You do NOT have the permission to operate this file!");
         }
@@ -296,13 +298,15 @@ public class AutoAnnotator extends Controller {
         String path_unproc = ConfigProp.getPathUnproc();
         File file = new File(path_proc + "/" + fileName);
 
-        if (fileName.startsWith("DA-")) {
+        String pureFileName = Paths.get(fileName).getFileName().toString();
+        if (pureFileName.startsWith("DA-")) {
             Measurement.delete(dataFile.getDatasetUri());
         } else {
             deleteAddedTriples(file);
         }
 
         dataFile.setStatus(DataFile.UNPROCESSED);
+        dataFile.setFileName(pureFileName);
         dataFile.setSubmissionTime(new SimpleDateFormat("yyyy/MM/dd HH:mm:ss").format(new Date()));
         dataFile.setCompletionTime("");
         dataFile.save();
@@ -311,10 +315,17 @@ public class AutoAnnotator extends Controller {
         if (!destFolder.exists()){
             destFolder.mkdirs();
         }
-        file.renameTo(new File(destFolder + "/" + fileName));
+        file.renameTo(new File(destFolder + "/" + pureFileName));
+        file.delete();
+        
+        AnnotationLog log = AnnotationLog.find(fileName);
+        if (null != log) {
+            log.delete();
+        }
 
-        AnnotationLog log = new AnnotationLog(fileName);
-        log.addline(Feedback.println(Feedback.WEB, String.format("[OK] Moved file %s to unprocessed folder", fileName)));
+        AnnotationLog new_log = new AnnotationLog(pureFileName);
+        new_log.addline(Feedback.println(Feedback.WEB, 
+                String.format("[OK] Moved file %s to unprocessed folder", pureFileName)));
 
         return redirect(routes.AutoAnnotator.index());
     }

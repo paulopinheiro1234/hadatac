@@ -69,6 +69,10 @@ public class AnnotationLog {
 		}
 	}
 	
+	public int delete() {
+	    return AnnotationLog.delete(getFileName());
+    }
+	
 	public static void printException(Exception exception, String fileName) {
 		AnnotationLog log = AnnotationLog.create(fileName);
         log.addline(Feedback.println(Feedback.WEB, "[ERROR] " + exception.getMessage()));

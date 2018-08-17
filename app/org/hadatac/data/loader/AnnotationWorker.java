@@ -4,6 +4,8 @@ import java.lang.String;
 import java.io.File;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -157,7 +159,9 @@ public class AnnotationWorker {
 
             if (bSucceed) {
                 //Move the file to the folder for processed files
-                File destFolder = new File(path_proc);
+                String study = URIUtils.getBaseName(chain.getStudyUri());
+                String new_path = path_proc + "/" + study;
+                File destFolder = new File(new_path);
                 if (!destFolder.exists()){
                     destFolder.mkdirs();
                 }
@@ -166,11 +170,21 @@ public class AnnotationWorker {
 
                 file.setStatus(DataFile.PROCESSED);
                 file.setCompletionTime(new SimpleDateFormat("yyyy/MM/dd HH:mm:ss").format(new Date()));
+                file.setFileName(study + "/" + file.getFileName());
                 file.setStudyUri(chain.getStudyUri());
                 file.save();
+                
                 File f = new File(path_unproc + "/" + file_name);
                 f.renameTo(new File(destFolder + "/" + file_name));
                 f.delete();
+                
+                log = AnnotationLog.find(file_name);
+                if (null != log) {
+                    AnnotationLog new_log = new AnnotationLog(file.getFileName());
+                    new_log.setLog(log.getLog());
+                    new_log.save();
+                    log.delete();
+                }
             } else {
                 // Freeze file
                 System.out.println("Freezed file " + file.getFileName());

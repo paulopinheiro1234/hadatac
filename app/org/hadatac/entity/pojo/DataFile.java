@@ -2,6 +2,9 @@ package org.hadatac.entity.pojo;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -24,7 +27,6 @@ import org.hadatac.console.http.SolrUtils;
 import org.hadatac.metadata.loader.URIUtils;
 import org.hadatac.utils.CollectionUtil;
 
-import com.avaje.ebeaninternal.server.lib.util.Str;
 import com.typesafe.config.ConfigFactory;
 
 public class DataFile {
@@ -357,25 +359,15 @@ public class DataFile {
     }
 
     public static void filterNonexistedFiles(String path, List<DataFile> files) {
-        File folder = new File(path);
-        if (!folder.exists()) {
-            folder.mkdirs();
-        }
-
-        File[] listOfFiles = folder.listFiles();
         Iterator<DataFile> iterFile = files.iterator();
         while (iterFile.hasNext()) {
             DataFile file = iterFile.next();
-            boolean isExisted = false;
-            for (int i = 0; i < listOfFiles.length; i++) {
-                if (listOfFiles[i].isFile()) {
-                    if(file.getFileName().equals(listOfFiles[i].getName())) {
-                        isExisted = true;
-                        break;
-                    }
+            try {
+                Path p = Paths.get(path + "/" + file.getFileName());
+                if (!Files.exists(p) || Files.isHidden(p)) {
+                    iterFile.remove();
                 }
-            }
-            if (!isExisted) {
+            } catch (IOException e) {
                 iterFile.remove();
             }
         }
