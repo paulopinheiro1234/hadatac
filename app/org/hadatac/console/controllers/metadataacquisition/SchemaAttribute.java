@@ -69,7 +69,7 @@ public class SchemaAttribute extends Controller {
 				+ " }";
 		
 		ResultSetRewindable resultsrwStudy = SPARQLUtils.select(
-                CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), strQuery);
+                CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), strQuery);
 		
 		while (resultsrwStudy.hasNext()) {
 			QuerySolution soln = resultsrwStudy.next();
@@ -121,7 +121,7 @@ public class SchemaAttribute extends Controller {
 				+ " }";
 		
 		ResultSetRewindable resultsrwStudy = SPARQLUtils.select(
-                CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), strQuery);
+                CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), strQuery);
 		
 		HashMap<String, HashMap<String, Object>> mapDAInfo = new HashMap<String, HashMap<String, Object>>();
 		while (resultsrwStudy.hasNext()) {
@@ -209,15 +209,13 @@ public class SchemaAttribute extends Controller {
 		}
 		
 		return SolrUtils.commitJsonDataToSolr(
-				ConfigFactory.load().getString("hadatac.solr.data") 
-				+ CollectionUtil.SA_ACQUISITION, results.toString());
+		        CollectionUtil.getCollectionPath(CollectionUtil.Collection.SA_ACQUISITION), results.toString());
 	}
 	
 	public static int deleteFromSolr() {
 		try {
 			SolrClient solr = new HttpSolrClient.Builder(
-					ConfigFactory.load().getString("hadatac.solr.data") 
-					+ CollectionUtil.SA_ACQUISITION).build();
+					CollectionUtil.getCollectionPath(CollectionUtil.Collection.SA_ACQUISITION)).build();
 			UpdateResponse response = solr.deleteByQuery("*:*");
 			solr.commit();
 			solr.close();

@@ -39,7 +39,7 @@ public class Unit extends HADatAcClass implements Comparable<Unit> {
 				"} ";
 
 		ResultSetRewindable resultsrw = SPARQLUtils.select(
-                CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), queryString);
+                CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), queryString);
 
 		while (resultsrw.hasNext()) {
 			QuerySolution soln = resultsrw.next();
@@ -70,8 +70,7 @@ public class Unit extends HADatAcClass implements Comparable<Unit> {
 		try {
 		    Query query = QueryFactory.create(queryString);
 		    QueryExecution qexec = QueryExecutionFactory.sparqlService(
-					   ConfigFactory.load().getString("hadatac.solr.triplestore") 
-					   + CollectionUtil.METADATA_SPARQL, query);
+		            CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), query);
 		    model = qexec.execDescribe();
 		} catch (Exception e) {
 		    System.out.println("[ERROR] Unit.find(uri) failed to execute descrive query");

@@ -162,7 +162,7 @@ public class User implements Comparable<User> {
         try {
             UpdateRequest request = UpdateFactory.create(insert);
             UpdateProcessor processor = UpdateExecutionFactory.createRemote(request, 
-                    CollectionUtil.getCollectionsName(CollectionUtil.PERMISSIONS_UPDATE));
+                    CollectionUtil.getCollectionPath(CollectionUtil.Collection.PERMISSIONS_UPDATE));
             processor.execute();
         } catch (QueryParseException e) {
             System.out.println("QueryParseException due to update query: " + insert);
@@ -180,7 +180,7 @@ public class User implements Comparable<User> {
         Query query = QueryFactory.create(queryString);
 
         QueryExecution qexec = QueryExecutionFactory.sparqlService(
-                CollectionUtil.getCollectionsName(CollectionUtil.PERMISSIONS_SPARQL), query);
+                CollectionUtil.getCollectionPath(CollectionUtil.Collection.PERMISSIONS_SPARQL), query);
         Model model = qexec.execConstruct();
 
         File ttl_file = new File(UserManagement.getTurtlePath());
@@ -231,7 +231,7 @@ public class User implements Comparable<User> {
                         "} ";
         
         ResultSetRewindable resultsrw = SPARQLUtils.select(
-                CollectionUtil.getCollectionsName(CollectionUtil.PERMISSIONS_SPARQL), queryString);
+                CollectionUtil.getCollectionPath(CollectionUtil.Collection.PERMISSIONS_SPARQL), queryString);
 
         while (resultsrw.hasNext()) {
             QuerySolution soln = resultsrw.next();
@@ -258,7 +258,7 @@ public class User implements Comparable<User> {
         RDFNode object;
 
         QueryExecution qexecPrivate = QueryExecutionFactory.sparqlService(
-                CollectionUtil.getCollectionsName(CollectionUtil.PERMISSIONS_SPARQL), query);
+                CollectionUtil.getCollectionPath(CollectionUtil.Collection.PERMISSIONS_SPARQL), query);
         modelPrivate = qexecPrivate.execDescribe();
         if (!modelPrivate.isEmpty()) {
             user = new User();
@@ -307,7 +307,7 @@ public class User implements Comparable<User> {
         }
 
         QueryExecution qexecPublic = QueryExecutionFactory.sparqlService(
-                CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), query);
+                CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), query);
         modelPublic = qexecPublic.execDescribe();
         if (!modelPublic.isEmpty() && user == null) {
             user = new User();
@@ -354,7 +354,7 @@ public class User implements Comparable<User> {
 
         UpdateRequest req = UpdateFactory.create(command);
         UpdateProcessor processor = UpdateExecutionFactory.createRemote(
-                req, CollectionUtil.getCollectionsName(CollectionUtil.PERMISSIONS_UPDATE));
+                req, CollectionUtil.getCollectionPath(CollectionUtil.Collection.PERMISSIONS_UPDATE));
         processor.execute();
     }
 
@@ -383,7 +383,7 @@ public class User implements Comparable<User> {
         queryString += "DELETE WHERE { <" + uri + "> ?p ?o . } ";
         UpdateRequest req = UpdateFactory.create(queryString);
         UpdateProcessor processor = UpdateExecutionFactory.createRemote(
-                req, CollectionUtil.getCollectionsName(CollectionUtil.PERMISSIONS_UPDATE));
+                req, CollectionUtil.getCollectionPath(CollectionUtil.Collection.PERMISSIONS_UPDATE));
         processor.execute();
     }
 

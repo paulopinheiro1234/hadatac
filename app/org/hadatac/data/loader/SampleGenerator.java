@@ -49,7 +49,7 @@ public class SampleGenerator extends BasicGenerator {
                 + "}";
         
         ResultSetRewindable resultsrwSample = SPARQLUtils.select(
-                CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), sampleCountQuery);
+                CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), sampleCountQuery);
         
         if (resultsrwSample.hasNext()) {
             QuerySolution soln = resultsrwSample.next();
@@ -99,7 +99,7 @@ public class SampleGenerator extends BasicGenerator {
                 + " ?subjectURI hasco:originalID \"" + rec.getValueByColumnName(mapCol.get("subjectID")) + "\" . }";
         
         ResultSetRewindable resultsrwSubject = SPARQLUtils.select(
-                CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), subjectQuery);
+                CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), subjectQuery);
         
         if (resultsrwSubject.hasNext()) {
             QuerySolution soln = resultsrwSubject.next();

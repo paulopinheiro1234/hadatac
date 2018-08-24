@@ -74,8 +74,7 @@ public class Parser {
         int batch_size = 10000;
 
         SolrClient solr = new HttpSolrClient.Builder(
-                ConfigFactory.load().getString("hadatac.solr.data") 
-                + CollectionUtil.DATA_ACQUISITION).build();
+                CollectionUtil.getCollectionPath(CollectionUtil.Collection.DATA_ACQUISITION)).build();
 
         // ASSIGN values for tempPositionInt
         List<String> unknownHeaders = schema.defineTemporaryPositions(file.getHeaders());

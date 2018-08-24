@@ -93,7 +93,7 @@ public class Sample extends StudyObject {
                 "}";
         
         ResultSetRewindable resultsrw = SPARQLUtils.select(
-                CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), queryString);
+                CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), queryString);
 
         if (!resultsrw.hasNext()) {
             System.out.println("[WARNING] Sample. Could not find SP with URI: " + sp_uri);
@@ -178,7 +178,7 @@ public class Sample extends StudyObject {
         System.out.println("Sample findByCollection: " + queryString);
         
         ResultSetRewindable resultsrw = SPARQLUtils.select(
-                CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), queryString);
+                CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), queryString);
         
         while (resultsrw.hasNext()) {
             QuerySolution soln = resultsrw.next();
@@ -248,7 +248,7 @@ public class Sample extends StudyObject {
         try {
             UpdateRequest request = UpdateFactory.create(insert);
             UpdateProcessor processor = UpdateExecutionFactory.createRemote(
-                    request, CollectionUtil.getCollectionsName(CollectionUtil.METADATA_UPDATE));
+                    request, CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_UPDATE));
             processor.execute();
         } catch (QueryParseException e) {
             System.out.println("QueryParseException due to update query: " + insert);
@@ -324,7 +324,7 @@ public class Sample extends StudyObject {
         query += LINE_LAST;
         UpdateRequest request = UpdateFactory.create(query);
         UpdateProcessor processor = UpdateExecutionFactory.createRemote(
-                request, CollectionUtil.getCollectionsName(CollectionUtil.METADATA_UPDATE));
+                request, CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_UPDATE));
         processor.execute();
     }
 }

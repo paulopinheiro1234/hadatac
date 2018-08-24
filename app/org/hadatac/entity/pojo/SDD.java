@@ -171,7 +171,7 @@ public class SDD {
 
         try {		
             ResultSetRewindable resultsrwIndvInd = SPARQLUtils.select(
-                    CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), indvIndicatorQuery);
+                    CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), indvIndicatorQuery);
 
             List<String> answer = new ArrayList<String>();
             while (resultsrwIndvInd.hasNext()) {

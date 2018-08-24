@@ -112,7 +112,7 @@ public class DynamicFunctions extends Controller {
         Map<String, String> indicatorMap = new HashMap<String, String>();
         try {			
             ResultSetRewindable resultsrwIndc = SPARQLUtils.select(
-                    CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), indicatorQuery);
+                    CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), indicatorQuery);
 
             String indicatorLabel = "";
             while (resultsrwIndc.hasNext()) {
@@ -147,7 +147,7 @@ public class DynamicFunctions extends Controller {
                     "} GROUP BY ?indicator ?label";
             try {				
                 ResultSetRewindable resultsrwIndvInd = SPARQLUtils.select(
-                        CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), indvIndicatorQuery);
+                        CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), indvIndicatorQuery);
 
                 while (resultsrwIndvInd.hasNext()) {
                     QuerySolution soln = resultsrwIndvInd.next();
@@ -187,7 +187,7 @@ public class DynamicFunctions extends Controller {
                     + " GROUP BY ?indicator ?label";
             try {				
                 ResultSetRewindable resultsrwIndvInd = SPARQLUtils.select(
-                        CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), indvIndicatorQuery);
+                        CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), indvIndicatorQuery);
 
                 while (resultsrwIndvInd.hasNext()) {
                     QuerySolution soln = resultsrwIndvInd.next();
@@ -225,7 +225,7 @@ public class DynamicFunctions extends Controller {
                     "} GROUP BY ?indicator ?label";
             try {				
                 ResultSetRewindable resultsrwIndvInd = SPARQLUtils.select(
-                        CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), indvIndicatorQuery);
+                        CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), indvIndicatorQuery);
 
                 while (resultsrwIndvInd.hasNext()) {
                     QuerySolution soln = resultsrwIndvInd.next();
@@ -266,7 +266,7 @@ public class DynamicFunctions extends Controller {
 
         try {
             ResultSetRewindable resultsrw = SPARQLUtils.select(
-                    CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), studyQueryString);
+                    CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), studyQueryString);
 
             while (resultsrw.hasNext()) {
                 QuerySolution soln = resultsrw.next();
@@ -310,7 +310,7 @@ public class DynamicFunctions extends Controller {
                 "                             }" ;
         try {			
             ResultSetRewindable resultsrw = SPARQLUtils.select(
-                    CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), studyQueryString);
+                    CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), studyQueryString);
 
             while (resultsrw.hasNext()) {
                 QuerySolution soln = resultsrw.next();
@@ -351,7 +351,7 @@ public class DynamicFunctions extends Controller {
                 "			                             }";
         try {
             ResultSetRewindable resultsrw = SPARQLUtils.select(
-                    CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), subjectQueryString);
+                    CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), subjectQueryString);
 
             while (resultsrw.hasNext()) {
                 QuerySolution soln = resultsrw.next();
@@ -391,7 +391,7 @@ public class DynamicFunctions extends Controller {
                 "			                             }";
         try {
             ResultSetRewindable resultsrw = SPARQLUtils.select(
-                    CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), subjectQueryString);
+                    CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), subjectQueryString);
 
             while (resultsrw.hasNext()) {
                 QuerySolution soln = resultsrw.next();

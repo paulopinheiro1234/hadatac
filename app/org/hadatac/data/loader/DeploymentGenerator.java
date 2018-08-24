@@ -46,7 +46,7 @@ public class DeploymentGenerator extends BasicGenerator {
 				+ " }";
 
 		ResultSetRewindable resultsrw = SPARQLUtils.select(
-                CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), strQuery);
+                CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), strQuery);
 		
 		if (resultsrw.hasNext()) {
 			QuerySolution soln = resultsrw.next();
@@ -67,7 +67,7 @@ public class DeploymentGenerator extends BasicGenerator {
 				+ " }";
 		
 		ResultSetRewindable resultsrw = SPARQLUtils.select(
-                CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), strQuery);
+                CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), strQuery);
 		
 		if (resultsrw.hasNext()) {
 			QuerySolution soln = resultsrw.next();

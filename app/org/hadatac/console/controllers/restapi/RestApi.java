@@ -111,8 +111,7 @@ public class RestApi extends Controller {
         List<String> uris = new ArrayList<String>();
         try {
             SolrClient solr = new HttpSolrClient.Builder(
-                    ConfigFactory.load().getString("hadatac.solr.data") 
-                    + CollectionUtil.DATA_ACQUISITION).build();
+                    CollectionUtil.getCollectionPath(CollectionUtil.Collection.DATA_ACQUISITION)).build();
             QueryResponse queryResponse = solr.query(solrQuery, SolrRequest.METHOD.POST);
             solr.close();
             Pivot pivot = Pivot.parseQueryResponse(queryResponse);
@@ -144,8 +143,7 @@ public class RestApi extends Controller {
         List<String> uris = new ArrayList<String>();
         try {
             SolrClient solr = new HttpSolrClient.Builder(
-                    ConfigFactory.load().getString("hadatac.solr.data") 
-                    + CollectionUtil.DATA_ACQUISITION).build();
+                    CollectionUtil.getCollectionPath(CollectionUtil.Collection.DATA_ACQUISITION)).build();
             QueryResponse queryResponse = solr.query(solrQuery, SolrRequest.METHOD.POST);
             //System.out.println("[getAllUsedVars] res: " + queryResponse);
             solr.close();
@@ -174,8 +172,7 @@ public class RestApi extends Controller {
         // make Solr query!
         try {
             SolrClient solr = new HttpSolrClient.Builder(
-                    ConfigFactory.load().getString("hadatac.solr.data") 
-                    + CollectionUtil.DATA_ACQUISITION).build();
+                    CollectionUtil.getCollectionPath(CollectionUtil.Collection.DATA_ACQUISITION)).build();
             QueryResponse queryResponse = solr.query(solrQuery, SolrRequest.METHOD.POST);
             //System.out.println("[getSolrMeasurements] res: " + queryResponse);
             solr.close();
@@ -214,8 +211,7 @@ public class RestApi extends Controller {
         // make Solr query!
         try {
             SolrClient solr = new HttpSolrClient.Builder(
-                    ConfigFactory.load().getString("hadatac.solr.data") 
-                    + CollectionUtil.DATA_ACQUISITION).build();
+                    CollectionUtil.getCollectionPath(CollectionUtil.Collection.DATA_ACQUISITION)).build();
             QueryResponse queryResponse = solr.query(solrQuery, SolrRequest.METHOD.POST);
             //System.out.println("[getSolrMeasurements] res: " + queryResponse);
             solr.close();
@@ -257,8 +253,7 @@ public class RestApi extends Controller {
         // make Solr query!
         try {
             SolrClient solr = new HttpSolrClient.Builder(
-                    ConfigFactory.load().getString("hadatac.solr.data") 
-                    + CollectionUtil.DATA_ACQUISITION).build();
+                    CollectionUtil.getCollectionPath(CollectionUtil.Collection.DATA_ACQUISITION)).build();
             QueryResponse queryResponse = solr.query(solrQuery, SolrRequest.METHOD.POST);
             //System.out.println("[getSolrMeasurements] res: " + queryResponse);
             solr.close();
@@ -301,8 +296,7 @@ public class RestApi extends Controller {
         // make Solr queries!
         try {
             solr = new HttpSolrClient.Builder(
-                    ConfigFactory.load().getString("hadatac.solr.data") 
-                    + CollectionUtil.DATA_ACQUISITION).build();
+                    CollectionUtil.getCollectionPath(CollectionUtil.Collection.DATA_ACQUISITION)).build();
             queryResponse = solr.query(solrQuery, SolrRequest.METHOD.POST);
             //System.out.println("[getSolrMeasurements] res: " + queryResponse);
             solr.close();
@@ -316,8 +310,7 @@ public class RestApi extends Controller {
 	solrQuery.setSort("timestamp_date",SolrQuery.ORDER.desc);
         try {
             solr = new HttpSolrClient.Builder(
-                    ConfigFactory.load().getString("hadatac.solr.data") 
-                    + CollectionUtil.DATA_ACQUISITION).build();
+                    CollectionUtil.getCollectionPath(CollectionUtil.Collection.DATA_ACQUISITION)).build();
             queryResponse = solr.query(solrQuery, SolrRequest.METHOD.POST);
             //System.out.println("[getSolrMeasurements] res: " + queryResponse);
             solr.close();
@@ -344,8 +337,7 @@ public class RestApi extends Controller {
         // make Solr query!
         try {
             SolrClient solr = new HttpSolrClient.Builder(
-                    ConfigFactory.load().getString("hadatac.solr.data") 
-                    + CollectionUtil.DATA_COLLECTION).build();
+                    CollectionUtil.getCollectionPath(CollectionUtil.Collection.DATA_COLLECTION)).build();
             QueryResponse queryResponse = solr.query(solrQuery, SolrRequest.METHOD.POST);
             solr.close();
 
@@ -380,7 +372,7 @@ public class RestApi extends Controller {
         System.out.println("[VariableQuery] sparql query\n" + sparqlQueryString);
 		
 		ResultSetRewindable resultsrw = SPARQLUtils.select(
-                CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), sparqlQueryString);
+                CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), sparqlQueryString);
 
         if (resultsrw.size() == 0) {
             System.out.println("[VariableQuery] No variables found in blazegraph!");
@@ -439,7 +431,7 @@ public class RestApi extends Controller {
         System.out.println("[VariableQuery] sparql query\n" + sparqlQueryString);
 		
 		ResultSetRewindable resultsrw = SPARQLUtils.select(
-                CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), sparqlQueryString);
+                CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), sparqlQueryString);
 
         if(resultsrw.size() == 0){
             System.out.println("[IndicatorQuery] No indicators found in blazegraph!");
@@ -485,7 +477,7 @@ public class RestApi extends Controller {
         //System.out.println("[unitsQuery] sparql query\n" + sparqlQueryString);
 		
 		ResultSetRewindable resultsrw = SPARQLUtils.select(
-                CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), sparqlQueryString);
+                CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), sparqlQueryString);
 
         if (resultsrw.size() == 0) {
             System.out.println("[unitsQuery] No units found in blazegraph!");
@@ -527,7 +519,7 @@ public class RestApi extends Controller {
         //System.out.println("[deploymentsQuery] sparql query\n" + sparqlQueryString);
 	
 	ResultSetRewindable resultsrw = SPARQLUtils.select(
-		  CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), sparqlQueryString);
+		  CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), sparqlQueryString);
 
         if (resultsrw.size() == 0) {
             System.out.println("[deploymentsQuery] No deployments found in blazegraph!");
@@ -572,7 +564,7 @@ public class RestApi extends Controller {
         System.out.println("[ocQuery] sparql query\n" + sparqlQueryString);
 		
 		ResultSetRewindable resultsrw = SPARQLUtils.select(
-                CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), sparqlQueryString);
+                CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), sparqlQueryString);
 
         if (resultsrw.size() == 0) {
             System.out.println("[ocQuery] No objects found in collection " + ocUri);
@@ -828,7 +820,7 @@ public class RestApi extends Controller {
                 " } ";
         
         ResultSetRewindable resultsrw = SPARQLUtils.select(
-                CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), queryString);
+                CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), queryString);
         
         ArrayNode anode = mapper.createArrayNode();
 

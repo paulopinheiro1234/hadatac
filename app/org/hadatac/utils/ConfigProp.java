@@ -64,14 +64,23 @@ public class ConfigProp {
 	}
 	
 	public static String getPathUnproc() {
+	    if (CollectionUtil.isSandboxMode()) {
+	        return getPropertyValue(AUTOANNOTATOR_CONFIG_FILE, "path_unproc") + "_sandbox";
+	    }
 		return getPropertyValue(AUTOANNOTATOR_CONFIG_FILE, "path_unproc");
 	}
 	
 	public static String getPathProc() {
-		return getPropertyValue(AUTOANNOTATOR_CONFIG_FILE, "path_proc");
+	    if (CollectionUtil.isSandboxMode()) {
+	        return getPropertyValue(AUTOANNOTATOR_CONFIG_FILE, "path_proc") + "_sandbox";
+	    }
+	    return getPropertyValue(AUTOANNOTATOR_CONFIG_FILE, "path_proc");
 	}
 	
 	public static String getPathDownload() {
+	    if (CollectionUtil.isSandboxMode()) {
+	        return getPropertyValue(AUTOANNOTATOR_CONFIG_FILE, "path_download") + "_sandbox";
+	    }
 		return getPropertyValue(AUTOANNOTATOR_CONFIG_FILE, "path_download");
 	}
 	

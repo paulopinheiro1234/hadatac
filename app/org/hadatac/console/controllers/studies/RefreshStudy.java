@@ -63,7 +63,7 @@ public class RefreshStudy extends Controller {
     				session().get("LabKeyPassword"),
     				study_uri);
     		DatasetAccessor accessor = DatasetAccessorFactory.createHTTP(
-    				CollectionUtil.getCollectionsName(CollectionUtil.METADATA_GRAPH));
+    				CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_GRAPH));
     		accessor.add(model);
     		
     		Model refModel = Study.findModel(URIUtils.replaceNameSpaceEx(study_uri));

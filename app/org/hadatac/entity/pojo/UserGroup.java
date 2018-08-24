@@ -30,7 +30,7 @@ public class UserGroup extends User {
 		RDFNode object;
 		
 		QueryExecution qexecPrivate = QueryExecutionFactory.sparqlService(
-				CollectionUtil.getCollectionsName(CollectionUtil.PERMISSIONS_SPARQL), query);
+				CollectionUtil.getCollectionPath(CollectionUtil.Collection.PERMISSIONS_SPARQL), query);
 		modelPrivate = qexecPrivate.execDescribe();
 		if (!modelPrivate.isEmpty()) {
 			user = new User();
@@ -72,7 +72,7 @@ public class UserGroup extends User {
 		    }
 		}
 		
-		QueryExecution qexecPublic = QueryExecutionFactory.sparqlService(CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), query);
+		QueryExecution qexecPublic = QueryExecutionFactory.sparqlService(CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), query);
 		modelPublic = qexecPublic.execDescribe();
 		if (!modelPublic.isEmpty()) {
 			user = new User();
@@ -103,7 +103,7 @@ public class UserGroup extends User {
 				"} ";
 		
 		ResultSetRewindable resultsrw = SPARQLUtils.select(
-                CollectionUtil.getCollectionsName(CollectionUtil.PERMISSIONS_SPARQL), queryString);
+                CollectionUtil.getCollectionPath(CollectionUtil.Collection.PERMISSIONS_SPARQL), queryString);
 		
 		while (resultsrw.hasNext()) {
 			QuerySolution soln = resultsrw.next();
@@ -130,7 +130,7 @@ public class UserGroup extends User {
 				"} ";
 		
 		ResultSetRewindable resultsrw = SPARQLUtils.select(
-                CollectionUtil.getCollectionsName(CollectionUtil.PERMISSIONS_SPARQL), queryString);
+                CollectionUtil.getCollectionPath(CollectionUtil.Collection.PERMISSIONS_SPARQL), queryString);
 		
 		while (resultsrw.hasNext()) {
 			QuerySolution soln = resultsrw.next();

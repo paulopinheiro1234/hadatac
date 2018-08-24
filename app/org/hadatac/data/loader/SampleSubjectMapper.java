@@ -66,7 +66,7 @@ public class SampleSubjectMapper extends BasicGenerator {
 
         try {
             ResultSetRewindable resultsrw = SPARQLUtils.select(
-                    CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), queryString);
+                    CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), queryString);
 
             while (resultsrw.hasNext()) {
                 QuerySolution soln = resultsrw.next();

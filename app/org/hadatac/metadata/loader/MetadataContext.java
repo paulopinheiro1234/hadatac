@@ -61,7 +61,7 @@ public class MetadataContext implements RDFContext {
                     "SELECT (COUNT(*) as ?tot) WHERE { ?s ?p ?o . }";
             
             ResultSetRewindable resultsrw = SPARQLUtils.select(
-                    CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), queryString);
+                    CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), queryString);
 
             QuerySolution soln = resultsrw.next();
 
@@ -81,7 +81,7 @@ public class MetadataContext implements RDFContext {
         queryString += "DELETE WHERE { ?s ?p ?o . } ";
         UpdateRequest req = UpdateFactory.create(queryString);
         UpdateProcessor processor = UpdateExecutionFactory.createRemote(req, 
-                CollectionUtil.getCollectionsName(CollectionUtil.METADATA_UPDATE));
+                CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_UPDATE));
         try {
             processor.execute();
         } catch (Exception e) {
@@ -331,7 +331,7 @@ public class MetadataContext implements RDFContext {
 
         UpdateRequest req = UpdateFactory.create(queryString);
         UpdateProcessor processor = UpdateExecutionFactory.createRemote(req, 
-                CollectionUtil.getCollectionsName(CollectionUtil.METADATA_UPDATE));
+                CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_UPDATE));
         try {
             processor.execute();
         } catch (Exception e) {
@@ -363,7 +363,7 @@ public class MetadataContext implements RDFContext {
     public Long loadLocalFile(int mode, String filePath, String contentType) {
         Model model = ModelFactory.createDefaultModel();
         DatasetAccessor accessor = DatasetAccessorFactory.createHTTP(
-                kbURL + CollectionUtil.METADATA_GRAPH);
+                kbURL + CollectionUtil.getCollectionName(CollectionUtil.Collection.METADATA_GRAPH.get()));
 
         loadFileMessage = "";
         Long total = totalTriples();

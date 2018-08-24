@@ -409,8 +409,7 @@ public class Measurement extends HADatAcThing implements Runnable {
     @Override
     public boolean saveToSolr() {
         SolrClient solr = new HttpSolrClient.Builder(
-                ConfigFactory.load().getString("hadatac.solr.data") 
-                + CollectionUtil.DATA_ACQUISITION).build();
+                CollectionUtil.getCollectionPath(CollectionUtil.Collection.DATA_ACQUISITION)).build();
         try {
             solr.addBean(this).getStatus();
             solr.commit();
@@ -425,8 +424,7 @@ public class Measurement extends HADatAcThing implements Runnable {
 
     public static int delete(String datasetUri) {
         SolrClient solr = new HttpSolrClient.Builder(
-                ConfigFactory.load().getString("hadatac.solr.data") 
-                + CollectionUtil.DATA_ACQUISITION).build();
+                CollectionUtil.getCollectionPath(CollectionUtil.Collection.DATA_ACQUISITION)).build();
         try {
             UpdateResponse response = solr.deleteByQuery("dataset_uri_str:\"" + datasetUri + "\"");
             solr.commit();
@@ -545,8 +543,7 @@ public class Measurement extends HADatAcThing implements Runnable {
 
         try {
             SolrClient solr = new HttpSolrClient.Builder(
-                    ConfigFactory.load().getString("hadatac.solr.data") 
-                    + CollectionUtil.DATA_ACQUISITION).build();
+                    CollectionUtil.getCollectionPath(CollectionUtil.Collection.DATA_ACQUISITION)).build();
             QueryResponse queryResponse = solr.query(query, SolrRequest.METHOD.POST);
             solr.close();
             SolrDocumentList results = queryResponse.getResults();
@@ -635,8 +632,7 @@ public class Measurement extends HADatAcThing implements Runnable {
 
         try {
             SolrClient solr = new HttpSolrClient.Builder(
-                    ConfigFactory.load().getString("hadatac.solr.data") +
-                    CollectionUtil.DATA_ACQUISITION).build();
+                    CollectionUtil.getCollectionPath(CollectionUtil.Collection.DATA_ACQUISITION)).build();
             QueryResponse queryResponse = solr.query(query, SolrRequest.METHOD.POST);
             solr.close();
             SolrDocumentList docs = queryResponse.getResults();
@@ -761,8 +757,7 @@ public class Measurement extends HADatAcThing implements Runnable {
 
     public static long getNumByDataAcquisition(ObjectAccessSpec dataAcquisition) {
         SolrClient solr = new HttpSolrClient.Builder(
-                ConfigFactory.load().getString("hadatac.solr.data") 
-                + CollectionUtil.DATA_ACQUISITION).build();
+                CollectionUtil.getCollectionPath(CollectionUtil.Collection.DATA_ACQUISITION)).build();
         SolrQuery query = new SolrQuery();
         query.set("q", "acquisition_uri_str:\"" + dataAcquisition.getUri() + "\"");
         query.set("rows", "10000000");
@@ -791,8 +786,7 @@ public class Measurement extends HADatAcThing implements Runnable {
         List<Measurement> listMeasurement = new ArrayList<Measurement>();
 
         SolrClient solr = new HttpSolrClient.Builder(
-                ConfigFactory.load().getString("hadatac.solr.data") 
-                + CollectionUtil.DATA_ACQUISITION).build();
+                CollectionUtil.getCollectionPath(CollectionUtil.Collection.DATA_ACQUISITION)).build();
         SolrQuery query = new SolrQuery();
         query.set("q", "acquisition_uri_str:\"" + acquisition_uri + "\"");
         query.set("rows", "10000000");
@@ -844,7 +838,7 @@ public class Measurement extends HADatAcThing implements Runnable {
 
         try {
             ResultSetRewindable resultsrw = SPARQLUtils.select(
-                    CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), query);
+                    CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), query);
 
             while (resultsrw.hasNext()) {
                 QuerySolution soln = resultsrw.next();
@@ -873,7 +867,7 @@ public class Measurement extends HADatAcThing implements Runnable {
 
         try {
             ResultSetRewindable resultsrw = SPARQLUtils.select(
-                    CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), query);
+                    CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), query);
 
             while (resultsrw.hasNext()) {
                 QuerySolution soln = resultsrw.next();

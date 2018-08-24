@@ -77,7 +77,7 @@ public class Instrument extends HADatAcThing implements Comparable<Instrument> {
 		Map<HADatAcThing, List<HADatAcThing>> results = new HashMap<HADatAcThing, List<HADatAcThing>>();
 		try {
 		    ResultSetRewindable resultsrw = SPARQLUtils.select(
-	                CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), query);
+	                CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), query);
 		    
 			while (resultsrw.hasNext()) {
 				QuerySolution soln = resultsrw.next();
@@ -119,7 +119,7 @@ public class Instrument extends HADatAcThing implements Comparable<Instrument> {
 		    "} ";
 		
 		ResultSetRewindable resultsrw = SPARQLUtils.select(
-                CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), queryString);
+                CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), queryString);
 			
 		while (resultsrw.hasNext()) {
 		    QuerySolution soln = resultsrw.next();
@@ -146,7 +146,7 @@ public class Instrument extends HADatAcThing implements Comparable<Instrument> {
 		    "ORDER BY DESC(?datetime) ";
 		
 		ResultSetRewindable resultsrw = SPARQLUtils.select(
-                CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), queryString);
+                CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), queryString);
 		
 		while (resultsrw.hasNext()) {
 		    QuerySolution soln = resultsrw.next();
@@ -172,7 +172,7 @@ public class Instrument extends HADatAcThing implements Comparable<Instrument> {
 		    "ORDER BY DESC(?datetime) ";
 		
 		ResultSetRewindable resultsrw = SPARQLUtils.select(
-                CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), queryString);
+                CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), queryString);
 		
 		while (resultsrw.hasNext()) {
 		    QuerySolution soln = resultsrw.next();
@@ -193,8 +193,7 @@ public class Instrument extends HADatAcThing implements Comparable<Instrument> {
 	    String queryString = "DESCRIBE <" + uri + ">";
 		Query query = QueryFactory.create(queryString);
 		QueryExecution qexec = QueryExecutionFactory.sparqlService(
-				ConfigFactory.load().getString("hadatac.solr.triplestore") + 
-				CollectionUtil.METADATA_SPARQL, query);
+				CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), query);
 		model = qexec.execDescribe();
 		
 		instrument = new Instrument();

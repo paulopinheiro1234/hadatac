@@ -44,7 +44,7 @@ public class ExportKB extends Controller {
             Query query = QueryFactory.create(queryString);
 
             QueryExecution qexec = QueryExecutionFactory.sparqlService(
-                    CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), query);
+                    CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), query);
             Model model = qexec.execConstruct();
             qexec.close();
             

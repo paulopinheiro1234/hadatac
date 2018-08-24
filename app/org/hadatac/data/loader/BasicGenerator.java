@@ -245,7 +245,7 @@ public abstract class BasicGenerator {
 
     public boolean commitRowsToTripleStore(List<Map<String, Object>> rows) {
         DatasetAccessor accessor = DatasetAccessorFactory.createHTTP(
-                CollectionUtil.getCollectionsName(CollectionUtil.METADATA_GRAPH));
+                CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_GRAPH));
         Model model = createModel(rows);
         accessor.add(model);
 
@@ -331,7 +331,7 @@ public abstract class BasicGenerator {
         try {
             UpdateRequest request = UpdateFactory.create(query);
             UpdateProcessor processor = UpdateExecutionFactory.createRemote(
-                    request, CollectionUtil.getCollectionsName(CollectionUtil.METADATA_UPDATE));
+                    request, CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_UPDATE));
             processor.execute();
         } catch (Exception e) {
             System.out.println("[ERROR] " + e.getMessage());

@@ -39,7 +39,7 @@ public class PlatformType extends HADatAcClass implements Comparable<PlatformTyp
                 "} ";
 
         ResultSetRewindable resultsrw = SPARQLUtils.select(
-                CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), queryString);
+                CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), queryString);
 
         while (resultsrw.hasNext()) {
             QuerySolution soln = resultsrw.next();
@@ -68,8 +68,7 @@ public class PlatformType extends HADatAcClass implements Comparable<PlatformTyp
         String queryString = "DESCRIBE <" + uri + ">";
         Query query = QueryFactory.create(queryString);
         QueryExecution qexec = QueryExecutionFactory.sparqlService(
-                ConfigFactory.load().getString("hadatac.solr.triplestore") 
-                + CollectionUtil.METADATA_SPARQL, query);
+                CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), query);
         model = qexec.execDescribe();
 
         platformType = new PlatformType();

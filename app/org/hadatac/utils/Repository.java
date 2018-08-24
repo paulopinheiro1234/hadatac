@@ -28,6 +28,7 @@ public class Repository {
 						(DataContext.playTotalMeasurements() != -1));
 			}
 		} catch (QueryExceptionHTTP | RemoteSolrException e) {
+		    e.printStackTrace();
 			return false;
 		}
 		

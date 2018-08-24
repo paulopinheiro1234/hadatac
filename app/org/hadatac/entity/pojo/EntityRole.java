@@ -84,7 +84,7 @@ public class EntityRole extends HADatAcThing implements Comparable<EntityRole> {
         Map<HADatAcThing, List<HADatAcThing>> results = new HashMap<HADatAcThing, List<HADatAcThing>>();
         try {
             ResultSetRewindable resultsrw = SPARQLUtils.select(
-                    CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), query);
+                    CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), query);
 
             if (resultsrw.size() == 0) {
                 EntityRole role = new EntityRole();
@@ -174,7 +174,7 @@ public class EntityRole extends HADatAcThing implements Comparable<EntityRole> {
         // System.out.println("findObjRoleMappings query: " + queryString);
 
         ResultSetRewindable resultsrw = SPARQLUtils.select(
-                CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), queryString);
+                CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), queryString);
 
         try {
             while (resultsrw.hasNext()) {

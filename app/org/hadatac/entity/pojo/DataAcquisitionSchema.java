@@ -400,7 +400,7 @@ public class DataAcquisitionSchema extends HADatAcThing {
         Query query = QueryFactory.create(queryString);
 
         QueryExecution qexec = QueryExecutionFactory.sparqlService(
-                CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), query);
+                CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), query);
         boolean uriExist = qexec.execAsk();
         qexec.close();
 
@@ -431,7 +431,7 @@ public class DataAcquisitionSchema extends HADatAcThing {
                 "   ?uri a hasco:DASchema . } ";
         
         ResultSetRewindable resultsrw = SPARQLUtils.select(
-                CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), queryString);
+                CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), queryString);
         
         while (resultsrw.hasNext()) {
             QuerySolution soln = resultsrw.next();
@@ -459,7 +459,7 @@ public class DataAcquisitionSchema extends HADatAcThing {
         // System.out.println("findPossibleValues query: " + queryString);
 
         ResultSetRewindable resultsrw = SPARQLUtils.select(
-                CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), queryString);
+                CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), queryString);
 
         try {
             while (resultsrw.hasNext()) {
@@ -502,7 +502,7 @@ public class DataAcquisitionSchema extends HADatAcThing {
                 + " }";
 
         ResultSetRewindable resultsrw = SPARQLUtils.select(
-                CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), queryString);
+                CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), queryString);
 
         if (resultsrw.hasNext()) {
             QuerySolution soln = resultsrw.next();
@@ -536,7 +536,7 @@ public class DataAcquisitionSchema extends HADatAcThing {
         //System.out.println("findIdUriMappings() queryString: " + queryString);
 
         ResultSetRewindable resultsrw = SPARQLUtils.select(
-                CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), queryString);
+                CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), queryString);
 
         try {
             while (resultsrw.hasNext()) {			
@@ -639,7 +639,7 @@ public class DataAcquisitionSchema extends HADatAcThing {
         try {
             UpdateRequest request = UpdateFactory.create(insert);
             UpdateProcessor processor = UpdateExecutionFactory.createRemote(
-                    request, CollectionUtil.getCollectionsName(CollectionUtil.METADATA_UPDATE));
+                    request, CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_UPDATE));
             processor.execute();
         } catch (QueryParseException e) {
             System.out.println("QueryParseException due to update query: " + insert);
@@ -659,7 +659,7 @@ public class DataAcquisitionSchema extends HADatAcThing {
         query += LINE_LAST;
         UpdateRequest request = UpdateFactory.create(query);
         UpdateProcessor processor = UpdateExecutionFactory.createRemote(
-                request, CollectionUtil.getCollectionsName(CollectionUtil.METADATA_UPDATE));
+                request, CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_UPDATE));
         processor.execute();
     }
 

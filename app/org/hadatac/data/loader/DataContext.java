@@ -10,6 +10,7 @@ import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.impl.HttpSolrClient;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.hadatac.utils.CollectionUtil;
+import org.hadatac.utils.CollectionUtil.Collection;
 import org.hadatac.utils.Command;
 import org.hadatac.utils.Feedback;
 
@@ -67,22 +68,22 @@ public class DataContext {
 	}
 	
 	public Long totalMeasurements() {
-		return totalDocuments(CollectionUtil.DATA_ACQUISITION);
+		return totalDocuments(CollectionUtil.getCollectionName(Collection.DATA_ACQUISITION.get()));
 	}
 	
 	public Long totalUsers() {
-		return totalDocuments(CollectionUtil.AUTHENTICATE_USERS);
+		return totalDocuments(CollectionUtil.getCollectionName(Collection.AUTHENTICATE_USERS.get()));
 	}
 	
 	public Long totalDataAcquisitions() {
-		return totalDocuments(CollectionUtil.DATA_COLLECTION);
+		return totalDocuments(CollectionUtil.getCollectionName(Collection.DATA_COLLECTION.get()));
 	}
 	
-	private String cleanAllDocuments(int mode, String solrCoreName) {
+	private String cleanAllDocuments(int mode, Collection solrCoreName) {
 		String message = "";
 	    String straux = "";
 	    
-        message += Feedback.println(mode,"   Documents before [clean]: " + totalDocuments(solrCoreName));
+        message += Feedback.println(mode, "   Documents before [clean]: " + totalDocuments(CollectionUtil.getCollectionPath(solrCoreName)));
         message += Feedback.println(mode, " ");
 
 	    String query1 = "<delete><query>*:*</query></delete>";
@@ -91,8 +92,8 @@ public class DataContext {
 	    String url1;
 	    String url2;
 		try {
-		    url1 = CollectionUtil.getCollectionsName(solrCoreName) + "/update?stream.body=" + URLEncoder.encode(query1, "UTF-8");
-		    url2 = CollectionUtil.getCollectionsName(solrCoreName) + "/update?stream.body=" + URLEncoder.encode(query2, "UTF-8");
+		    url1 = CollectionUtil.getCollectionPath(solrCoreName) + "/update?stream.body=" + URLEncoder.encode(query1, "UTF-8");
+		    url2 = CollectionUtil.getCollectionPath(solrCoreName) + "/update?stream.body=" + URLEncoder.encode(query2, "UTF-8");
 
 		    if (verbose) {
 		        message += Feedback.println(mode, url1);
@@ -113,7 +114,7 @@ public class DataContext {
 		    }
 		    message += Feedback.println(mode," ");
 		    message += Feedback.println(mode," ");
-			message += Feedback.print(mode,"   Triples after [clean]: " + totalDocuments(solrCoreName));                
+			message += Feedback.print(mode, "   Triples after [clean]: " + totalDocuments(CollectionUtil.getCollectionPath(solrCoreName)));                
 		} catch (UnsupportedEncodingException e) {
 		    System.out.println("[DataManagement] - ERROR encoding URLs");
 		    return message;
@@ -123,11 +124,11 @@ public class DataContext {
 	}
 	
 	private String cleanSpecifiedStudy(int mode, String studyURI) {
-		String solrCoreName = CollectionUtil.STUDIES;
+		Collection solrCoreName = Collection.STUDIES;
 		String message = "";
 	    String straux = "";
 	    
-        message += Feedback.println(mode,"   Documents before [clean]: " + totalDocuments(solrCoreName));
+        message += Feedback.println(mode,"   Documents before [clean]: " + totalDocuments(CollectionUtil.getCollectionPath(solrCoreName)));
         message += Feedback.println(mode, " ");
 
 	    String query1 = "<delete><query>studyUri:\"" + studyURI +"\"</query></delete>";
@@ -136,8 +137,8 @@ public class DataContext {
 	    String url1;
 	    String url2;
 		try {
-		    url1 = CollectionUtil.getCollectionsName(solrCoreName) + "/update?stream.body=" + URLEncoder.encode(query1, "UTF-8");
-		    url2 = CollectionUtil.getCollectionsName(solrCoreName) + "/update?stream.body=" + URLEncoder.encode(query2, "UTF-8");
+		    url1 = CollectionUtil.getCollectionPath(solrCoreName) + "/update?stream.body=" + URLEncoder.encode(query1, "UTF-8");
+		    url2 = CollectionUtil.getCollectionPath(solrCoreName) + "/update?stream.body=" + URLEncoder.encode(query2, "UTF-8");
 
 		    if (verbose) {
 		        message += Feedback.println(mode, url1);
@@ -158,7 +159,7 @@ public class DataContext {
 		    }
 		    message += Feedback.println(mode," ");
 		    message += Feedback.println(mode," ");
-			message += Feedback.print(mode,"   Triples after [clean]: " + totalDocuments(solrCoreName));                
+			message += Feedback.print(mode,"   Triples after [clean]: " + totalDocuments(CollectionUtil.getCollectionPath(solrCoreName)));                
 		} catch (UnsupportedEncodingException e) {
 		    System.out.println("[DataManagement] - ERROR encoding URLs");
 		    return message;
@@ -168,19 +169,19 @@ public class DataContext {
 	}
 	
 	public String cleanDataAcquisitions(int mode) {
-		return cleanAllDocuments(mode, CollectionUtil.DATA_COLLECTION);
+		return cleanAllDocuments(mode, Collection.DATA_COLLECTION);
 	}
 	
 	public String cleanDataUsers(int mode) {
-		return cleanAllDocuments(mode, CollectionUtil.AUTHENTICATE_USERS);
+		return cleanAllDocuments(mode, Collection.AUTHENTICATE_USERS);
 	}
 	
 	public String cleanDataAccounts(int mode) {
-		return cleanAllDocuments(mode, CollectionUtil.AUTHENTICATE_ACCOUNTS);
+		return cleanAllDocuments(mode, Collection.AUTHENTICATE_ACCOUNTS);
 	}
 	
 	public String cleanAcquisitionData(int mode) {
-		return cleanAllDocuments(mode, CollectionUtil.DATA_ACQUISITION);
+		return cleanAllDocuments(mode, Collection.DATA_ACQUISITION);
 	}
 	
 	public String cleanStudy(int mode, String studyURI) {

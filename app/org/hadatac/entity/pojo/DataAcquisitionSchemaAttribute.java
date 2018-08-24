@@ -492,7 +492,7 @@ public class DataAcquisitionSchemaAttribute extends HADatAcThing {
 
         try {
             ResultSetRewindable resultsrw = SPARQLUtils.select(
-                    CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), query);
+                    CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), query);
             
             if (resultsrw.hasNext()) {
                 QuerySolution soln = resultsrw.next();
@@ -527,7 +527,7 @@ public class DataAcquisitionSchemaAttribute extends HADatAcThing {
         //System.out.println("DataAcquisitionSchemaAttribute find() queryString: \n" + queryString);
 
         ResultSetRewindable resultsrw = SPARQLUtils.select(
-                CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), queryString);
+                CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), queryString);
 
         if (!resultsrw.hasNext()) {
             System.out.println("[WARNING] DataAcquisitionSchemaAttribute. Could not find DASA with URI: <" + dasa_uri + ">");
@@ -613,7 +613,7 @@ public class DataAcquisitionSchemaAttribute extends HADatAcThing {
         System.out.println("[DASA] query string = \n" + queryString);
         
         ResultSetRewindable resultsrw = SPARQLUtils.select(
-                CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), queryString);
+                CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), queryString);
 
         if (!resultsrw.hasNext()) {
             System.out.println("[WARNING] DataAcquisitionSchemaAttribute. Could not find DASA's with attribute: " + attributeUri);
@@ -663,7 +663,7 @@ public class DataAcquisitionSchemaAttribute extends HADatAcThing {
         System.out.println("[DASA] query string = \n" + queryString);
         
         ResultSetRewindable resultsrw = SPARQLUtils.select(
-                CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), queryString);
+                CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), queryString);
 
         if (!resultsrw.hasNext()) {
             System.out.println("[WARNING] DataAcquisitionSchemaAttribute. Could not find DASA's with attribute: " + studyUri);
@@ -704,7 +704,7 @@ public class DataAcquisitionSchemaAttribute extends HADatAcThing {
                 "} ";
         
         ResultSetRewindable resultsrw = SPARQLUtils.select(
-                CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), queryString);
+                CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), queryString);
 
         if (!resultsrw.hasNext()) {
             System.out.println("[WARNING] DataAcquisitionSchemaAttribute. Could not find attributes for schema: <" + schemaUri + ">");
@@ -836,7 +836,7 @@ public class DataAcquisitionSchemaAttribute extends HADatAcThing {
         try {
             UpdateRequest request = UpdateFactory.create(insert);
             UpdateProcessor processor = UpdateExecutionFactory.createRemote(
-                    request, CollectionUtil.getCollectionsName(CollectionUtil.METADATA_UPDATE));
+                    request, CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_UPDATE));
             processor.execute();
         } catch (QueryParseException e) {
             System.out.println("QueryParseException due to update query: " + insert);
@@ -864,7 +864,7 @@ public class DataAcquisitionSchemaAttribute extends HADatAcThing {
 
         UpdateRequest request = UpdateFactory.create(query);
         UpdateProcessor processor = UpdateExecutionFactory.createRemote(
-                request, CollectionUtil.getCollectionsName(CollectionUtil.METADATA_UPDATE));
+                request, CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_UPDATE));
         processor.execute();
     }
 

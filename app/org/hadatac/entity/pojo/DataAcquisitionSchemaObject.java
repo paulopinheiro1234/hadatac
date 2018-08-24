@@ -285,8 +285,8 @@ public class DataAcquisitionSchemaObject extends HADatAcThing {
 
         //System.out.println("DataAcquisitionSchemaObject find(String uri) query: " + queryString);
         
-        ResultSetRewindable resultsrw = SPARQLUtils.select(CollectionUtil.getCollectionsName(
-                CollectionUtil.METADATA_SPARQL), queryString);
+        ResultSetRewindable resultsrw = SPARQLUtils.select(CollectionUtil.getCollectionPath(
+                CollectionUtil.Collection.METADATA_SPARQL), queryString);
 
         if (!resultsrw.hasNext()) {
             System.out.println("[WARNING] DataAcquisitionSchemaObject. Could not find object with uri: " + uri);
@@ -394,7 +394,7 @@ public class DataAcquisitionSchemaObject extends HADatAcThing {
                 "}";
         
         ResultSetRewindable resultsrw = SPARQLUtils.select(
-                CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), queryString);
+                CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), queryString);
 
         if (!resultsrw.hasNext()) {
             System.out.println("[WARNING] DataAcquisitionSchemaObject. Could not find objects for schema: " + schemaUri);
@@ -532,7 +532,7 @@ public class DataAcquisitionSchemaObject extends HADatAcThing {
         try {
             UpdateRequest request = UpdateFactory.create(insert);
             UpdateProcessor processor = UpdateExecutionFactory.createRemote(
-                    request, CollectionUtil.getCollectionsName(CollectionUtil.METADATA_UPDATE));
+                    request, CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_UPDATE));
             processor.execute();
         } catch (QueryParseException e) {
             System.out.println("QueryParseException due to update query: " + insert);
@@ -559,7 +559,7 @@ public class DataAcquisitionSchemaObject extends HADatAcThing {
         query += LINE_LAST;
         UpdateRequest request = UpdateFactory.create(query);
         UpdateProcessor processor = UpdateExecutionFactory.createRemote(
-                request, CollectionUtil.getCollectionsName(CollectionUtil.METADATA_UPDATE));
+                request, CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_UPDATE));
         processor.execute();
     }
 

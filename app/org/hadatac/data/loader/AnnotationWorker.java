@@ -268,8 +268,8 @@ public class AnnotationWorker {
                                     "   OPTIONAL {?o ?p2 " + target + " } " +
                                     "}";
 
-                            ResultSetRewindable resultsrw = SPARQLUtils.select(CollectionUtil.getCollectionsName(
-                                    CollectionUtil.METADATA_SPARQL), queryString);
+                            ResultSetRewindable resultsrw = SPARQLUtils.select(CollectionUtil.getCollectionPath(
+                                    CollectionUtil.Collection.METADATA_SPARQL), queryString);
 
                             if (!resultsrw.hasNext()) {
                                 System.out.println("[WARNING] OAS ingestion: Could not find triples on OCs, SSD is probably not correctly ingested.");
@@ -360,7 +360,7 @@ public class AnnotationWorker {
                 try {
                     UpdateRequest request = UpdateFactory.create(insert);
                     UpdateProcessor processor = UpdateExecutionFactory.createRemote(
-                            request, CollectionUtil.getCollectionsName(CollectionUtil.METADATA_UPDATE));
+                            request, CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_UPDATE));
                     processor.execute();
                 } catch (QueryParseException e) {
                     System.out.println("QueryParseException due to update query: " + insert);

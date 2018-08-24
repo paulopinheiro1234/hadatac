@@ -17,7 +17,7 @@ public class UserNetwork extends Controller {
 
 	@Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
     public Result index() {
-    	ForceFieldQuery ffq = new ForceFieldQuery(CollectionUtil.PERMISSIONS_SPARQL);
+    	ForceFieldQuery ffq = new ForceFieldQuery(CollectionUtil.Collection.PERMISSIONS_SPARQL);
         return ok(userNetwork.render(ffq.getQueryResult().replace("\n", " ")));
     }
 

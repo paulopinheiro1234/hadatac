@@ -47,7 +47,7 @@ public class ViewSubject extends Controller {
 				+ "?subjectIndicator rdfs:comment ?comment . }";
 		
 		ResultSetRewindable resultsrwIndc = SPARQLUtils.select(
-                CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), indicatorQuery);
+                CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), indicatorQuery);
 
 		Map<String, String> indicatorMap = new HashMap<String, String>();
 		String indicatorLabel = "";
@@ -73,7 +73,7 @@ public class ViewSubject extends Controller {
 			
 			try {		
 				ResultSetRewindable resultsrwIndvInd = SPARQLUtils.select(
-		                CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), indvIndicatorQuery);
+		                CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), indvIndicatorQuery);
 				
 				List<String> listIndicatorLabel = new ArrayList<String>();
 				while (resultsrwIndvInd.hasNext()) {
@@ -167,7 +167,7 @@ public class ViewSubject extends Controller {
 				+ "}";
 		
 		ResultSetRewindable resultsrw = SPARQLUtils.select(
-                CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), subjectQueryString);
+                CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), subjectQueryString);
 		
 		return resultsrw;
 	}		
@@ -214,7 +214,7 @@ public class ViewSubject extends Controller {
 		String indicatorLabel = "";
 		try {			
 			ResultSetRewindable resultsrwIndc = SPARQLUtils.select(
-                    CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), indicatorQuery);
+                    CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), indicatorQuery);
 			
 			while (resultsrwIndc.hasNext()) {
 				QuerySolution soln = resultsrwIndc.next();
@@ -241,7 +241,7 @@ public class ViewSubject extends Controller {
 
 			try {				
 				ResultSetRewindable resultsrwIndvInd = SPARQLUtils.select(
-		                CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), indvIndicatorQuery);
+		                CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), indvIndicatorQuery);
 				
 				while (resultsrwIndvInd.hasNext()) {
 					QuerySolution soln = resultsrwIndvInd.next();
@@ -274,7 +274,7 @@ public class ViewSubject extends Controller {
 				+ "}";
 		
 		ResultSetRewindable resultsrw = SPARQLUtils.select(
-                CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), sampleQueryString);
+                CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), sampleQueryString);
 
 		Map<String, List<String>> sampleResult = new HashMap<String, List<String>>();
 		List<String> values = new ArrayList<String>();
@@ -301,7 +301,7 @@ public class ViewSubject extends Controller {
 				+ "}";
 		
 		ResultSetRewindable resultsrw = SPARQLUtils.select(
-                CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), sampleQueryString);
+                CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), sampleQueryString);
 
 		List<String> sampleResult = new ArrayList<String>();
 

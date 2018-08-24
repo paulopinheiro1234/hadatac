@@ -285,8 +285,7 @@ public class SysUser implements Subject {
 	private static List<SysUser> getAuthUserFindSolr(
 			final AuthUserIdentity identity) {
 		SolrClient solrClient = new HttpSolrClient.Builder(
-				ConfigFactory.load().getString("hadatac.solr.users") 
-				+ CollectionUtil.AUTHENTICATE_USERS).build();
+		        CollectionUtil.getCollectionPath(CollectionUtil.Collection.AUTHENTICATE_USERS)).build();
 		String query = "active_bool:true AND provider_user_id_str:" + identity.getId() + " AND provider_key_str:" + identity.getProvider();
 		SolrQuery solrQuery = new SolrQuery(query);
 		List<SysUser> users = new ArrayList<SysUser>();
@@ -344,8 +343,7 @@ public class SysUser implements Subject {
 
 	public static SysUser findByIdSolr(final String id) {
 		SolrClient solrClient = new HttpSolrClient.Builder(
-				ConfigFactory.load().getString("hadatac.solr.users") 
-				+ CollectionUtil.AUTHENTICATE_USERS).build();
+		        CollectionUtil.getCollectionPath(CollectionUtil.Collection.AUTHENTICATE_USERS)).build();
 
 		SolrQuery solrQuery = new SolrQuery("id_str:" + id);
 		SysUser user = null;
@@ -471,8 +469,7 @@ public class SysUser implements Subject {
 
 	public static boolean existsSolr() {
 		SolrClient solrClient = new HttpSolrClient.Builder(
-				ConfigFactory.load().getString("hadatac.solr.users") 
-				+ CollectionUtil.AUTHENTICATE_USERS).build();
+		        CollectionUtil.getCollectionPath(CollectionUtil.Collection.AUTHENTICATE_USERS)).build();
 		SolrQuery solrQuery = new SolrQuery("*:*");
 
 		try {
@@ -550,8 +547,7 @@ public class SysUser implements Subject {
 
 	public void save() {
 		SolrClient solrClient = new HttpSolrClient.Builder(
-				ConfigFactory.load().getString("hadatac.solr.users") 
-				+ CollectionUtil.AUTHENTICATE_USERS).build();
+		        CollectionUtil.getCollectionPath(CollectionUtil.Collection.AUTHENTICATE_USERS)).build();
 
 		try {
 			solrClient.addBean(this);
@@ -572,8 +568,7 @@ public class SysUser implements Subject {
 	public int delete() {
 		try {
 			SolrClient solr = new HttpSolrClient.Builder(
-					ConfigFactory.load().getString("hadatac.solr.users") 
-					+ CollectionUtil.AUTHENTICATE_USERS).build();
+			        CollectionUtil.getCollectionPath(CollectionUtil.Collection.AUTHENTICATE_USERS)).build();
 			UpdateResponse response = solr.deleteById(this.getEmail());
 			solr.commit();
 			solr.close();
@@ -643,8 +638,7 @@ public class SysUser implements Subject {
 
 	private static List<SysUser> getEmailUserFindSolr(final String email, final String providerKey) {
 		SolrClient solrClient = new HttpSolrClient.Builder(
-				ConfigFactory.load().getString("hadatac.solr.users") 
-				+ CollectionUtil.AUTHENTICATE_USERS).build();
+		        CollectionUtil.getCollectionPath(CollectionUtil.Collection.AUTHENTICATE_USERS)).build();
 		String query = "email:" + email + " AND active_bool:true";
 		SolrQuery solrQuery = new SolrQuery(query);
 		List<SysUser> users = new ArrayList<SysUser>();
@@ -674,8 +668,7 @@ public class SysUser implements Subject {
 
 	public static String outputAsJson() {
 		SolrClient solrClient = new HttpSolrClient.Builder(
-				ConfigFactory.load().getString("hadatac.solr.users") 
-				+ CollectionUtil.AUTHENTICATE_USERS).build();
+		        CollectionUtil.getCollectionPath(CollectionUtil.Collection.AUTHENTICATE_USERS)).build();
 		String query = "*:*";
 		SolrQuery solrQuery = new SolrQuery(query);
 

@@ -92,7 +92,7 @@ public class SolrSearchProxy extends Controller {
             }
             System.out.println("Request: " + request_encoding);
         }
-        String path = CollectionUtil.getCollectionsName(CollectionUtil.DATA_ACQUISITION) 
+        String path = CollectionUtil.getCollectionPath(CollectionUtil.Collection.DATA_ACQUISITION) 
                 + "/select" + "?" + request_encoding;
 
         return getSolrSearch(path).as("text/csv");
@@ -100,7 +100,7 @@ public class SolrSearchProxy extends Controller {
 
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
     public Result getStudyAcquisitionDownload() {
-        String path = CollectionUtil.getCollectionsName(CollectionUtil.STUDY_ACQUISITION) 
+        String path = CollectionUtil.getCollectionPath(CollectionUtil.Collection.STUDY_ACQUISITION) 
                 + request().toString().split((request().path()))[1];
 
         return getSolrSearch(path).as("text/csv");
@@ -108,28 +108,28 @@ public class SolrSearchProxy extends Controller {
 
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
     public Result getStudyAcquisition() {
-        String path = CollectionUtil.getCollectionsName(CollectionUtil.STUDY_ACQUISITION) + 
+        String path = CollectionUtil.getCollectionPath(CollectionUtil.Collection.STUDY_ACQUISITION) + 
                 request().toString().split((request().path()))[1];
         return getSolrSearch(path);
     }
 
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
     public Result getAnalytesAcquisition() {
-        String path = CollectionUtil.getCollectionsName(CollectionUtil.ANALYTES_ACQUISITION) + 
+        String path = CollectionUtil.getCollectionPath(CollectionUtil.Collection.ANALYTES_ACQUISITION) + 
                 request().toString().split((request().path()))[1];
         return getSolrSearch(path);
     }
 
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
     public Result getMetadataDataAcquisition() {
-        String path = CollectionUtil.getCollectionsName(CollectionUtil.DATA_COLLECTION) + "/select" +
+        String path = CollectionUtil.getCollectionPath(CollectionUtil.Collection.DATA_COLLECTION) + "/select" +
                 request().toString().split((request().path()))[1];
         return getSolrSearch(path);
     }
 
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
     public Result getDataAcquisition() {
-        String path = CollectionUtil.getCollectionsName(CollectionUtil.METADATA_AQUISITION) + "/select" +
+        String path = CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_AQUISITION) + "/select" +
                 request().toString().split((request().path()))[1];
         System.out.println("Solr Search Path: " + path);
         return getSolrSearch(path);
@@ -137,7 +137,7 @@ public class SolrSearchProxy extends Controller {
 
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
     public Result getSchemaAttributes() {
-        String path = CollectionUtil.getCollectionsName(CollectionUtil.SA_ACQUISITION) + "/select" +
+        String path = CollectionUtil.getCollectionPath(CollectionUtil.Collection.SA_ACQUISITION) + "/select" +
                 request().toString().split((request().path()))[1];
         return getSolrSearch(path);
     }

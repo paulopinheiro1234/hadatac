@@ -221,7 +221,7 @@ public class Study extends HADatAcThing {
 
         try {
             ResultSetRewindable resultsrw = SPARQLUtils.select(
-                    CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), query);
+                    CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), query);
             
             if (resultsrw.hasNext()) {
                 QuerySolution soln = resultsrw.next();
@@ -413,7 +413,7 @@ public class Study extends HADatAcThing {
         Map<HADatAcThing, List<HADatAcThing>> results = new HashMap<HADatAcThing, List<HADatAcThing>>();
         try {
             ResultSetRewindable resultsrw = SPARQLUtils.select(
-                    CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), query);
+                    CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), query);
             
             while (resultsrw.hasNext()) {
                 QuerySolution soln = resultsrw.next();
@@ -487,7 +487,7 @@ public class Study extends HADatAcThing {
                 " } ";
         try {
             ResultSetRewindable resultsrw = SPARQLUtils.select(
-                    CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), queryString);
+                    CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), queryString);
             
             while (resultsrw.hasNext()) {
                 QuerySolution soln = resultsrw.next();
@@ -510,7 +510,7 @@ public class Study extends HADatAcThing {
                 " } ";
         try {
             ResultSetRewindable resultsrw = SPARQLUtils.select(
-                    CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), queryString);
+                    CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), queryString);
             
             while (resultsrw.hasNext()) {
                 QuerySolution soln = resultsrw.next();
@@ -555,7 +555,7 @@ public class Study extends HADatAcThing {
             //System.out.println("Study's find() query: " + studyQueryString);
             
             ResultSetRewindable resultsrw = SPARQLUtils.select(
-                    CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), studyQueryString);
+                    CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), studyQueryString);
             
             if (!resultsrw.hasNext()) {
 		System.out.println("[ERROR] STUDY_URI " + study_uri + " does not retrieve a study object");
@@ -630,7 +630,7 @@ public class Study extends HADatAcThing {
 
         try {            
             ResultSetRewindable resultsrw = SPARQLUtils.select(
-                    CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), studyQueryString);
+                    CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), studyQueryString);
             
             if (resultsrw.hasNext()) {
                 QuerySolution soln = resultsrw.next();
@@ -892,7 +892,7 @@ public class Study extends HADatAcThing {
         Model model = ModelFactory.createDefaultModel();
         try {
             ResultSetRewindable resultsrw = SPARQLUtils.select(
-                    CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), studyQueryString);
+                    CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), studyQueryString);
 
             while (resultsrw.hasNext()) {
                 QuerySolution soln = resultsrw.next();
@@ -920,7 +920,7 @@ public class Study extends HADatAcThing {
                 " }";
 
         ResultSetRewindable resultsrw = SPARQLUtils.select(
-                CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), queryString);
+                CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), queryString);
 
         Study study = null;
         while (resultsrw.hasNext()) {
@@ -937,8 +937,7 @@ public class Study extends HADatAcThing {
 
     public int deleteDataAcquisitions() {
         SolrClient study_solr = new HttpSolrClient.Builder(
-                ConfigFactory.load().getString("hadatac.solr.data")
-                + CollectionUtil.DATA_COLLECTION).build();
+                CollectionUtil.getCollectionPath(CollectionUtil.Collection.DATA_COLLECTION)).build();
         try {
             UpdateResponse response = study_solr.deleteByQuery("study_uri:\"" + studyUri + "\"");
             study_solr.commit();
@@ -957,8 +956,7 @@ public class Study extends HADatAcThing {
 
     public int deleteMeasurements() {
         SolrClient study_solr = new HttpSolrClient.Builder(
-                ConfigFactory.load().getString("hadatac.solr.data")
-                + CollectionUtil.DATA_ACQUISITION).build();
+                CollectionUtil.getCollectionPath(CollectionUtil.Collection.DATA_ACQUISITION)).build();
         try {
             UpdateResponse response = study_solr.deleteByQuery("study_uri:\"" + DynamicFunctions.replaceURLWithPrefix(studyUri) + "\"");
             study_solr.commit();
@@ -1015,8 +1013,7 @@ public class Study extends HADatAcThing {
     @Override
     public int deleteFromSolr() {
         SolrClient study_solr = new HttpSolrClient.Builder(
-                ConfigFactory.load().getString("hadatac.solr.data") +
-                CollectionUtil.STUDIES).build();
+                CollectionUtil.getCollectionPath(CollectionUtil.Collection.STUDIES)).build();
         try {
             UpdateResponse response = study_solr.deleteByQuery("studyUri:\"" + studyUri + "\"");
             study_solr.commit();
@@ -1109,7 +1106,7 @@ public class Study extends HADatAcThing {
         try {
             UpdateRequest request = UpdateFactory.create(insert);
             UpdateProcessor processor = UpdateExecutionFactory.createRemote(
-                    request, CollectionUtil.getCollectionsName(CollectionUtil.METADATA_UPDATE));
+                    request, CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_UPDATE));
             processor.execute();
         } catch (QueryParseException e) {
             System.out.println("QueryParseException due to update query: " + insert);
@@ -1137,7 +1134,7 @@ public class Study extends HADatAcThing {
 
         UpdateRequest request = UpdateFactory.create(query);
         UpdateProcessor processor = UpdateExecutionFactory.createRemote(
-                request, CollectionUtil.getCollectionsName(CollectionUtil.METADATA_UPDATE));
+                request, CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_UPDATE));
         processor.execute();
     }
 
@@ -1145,8 +1142,7 @@ public class Study extends HADatAcThing {
     public boolean saveToSolr() {
         try {
             SolrClient solr = new HttpSolrClient.Builder(
-                    ConfigFactory.load().getString("hadatac.solr.data") +
-                    CollectionUtil.STUDIES).build();
+                    CollectionUtil.getCollectionPath(CollectionUtil.Collection.STUDIES)).build();
             if (endedAt.toString().startsWith("9999")) {
                 endedAt = DateTime.parse("9999-12-31T23:59:59.999Z");
             }

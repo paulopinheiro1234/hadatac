@@ -42,8 +42,7 @@ public class EntityCharacteristic {
 		solrQuery.set("rows", "0");
 
 		SolrClient solr = new HttpSolrClient.Builder(
-				ConfigFactory.load().getString("hadatac.solr.data") 
-				+ CollectionUtil.DATA_ACQUISITION).build();
+		        CollectionUtil.getCollectionPath(CollectionUtil.Collection.DATA_ACQUISITION)).build();
 		
 		try {
 			QueryResponse response = solr.query(solrQuery);

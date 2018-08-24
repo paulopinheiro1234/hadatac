@@ -1,77 +1,142 @@
 package org.hadatac.utils;
 
+import java.util.Arrays;
+import java.util.List;
+
+import org.hadatac.entity.pojo.OperationMode;
+
 import com.typesafe.config.ConfigFactory;
 
 public class CollectionUtil {
+ 
+    public enum Collection {
+        // data and auxiliary data 
+        DATA_COLLECTION ("/sdc"), 
+        DATA_ACQUISITION ("/measurement"),
+        METADATA_AQUISITION ("/data_acquisitions"),
+        SA_ACQUISITION ("/schema_attributes"),
+        CONSOLE_STORE ("/console_store"),
+        STUDIES ("/studies"),
+        ANALYTES ("/analytes"),
+        ANNOTATION_LOG ("/annotation_log"),
+        CSV_DATASET ("/csv"),
+        OPERATION_MODE ("/operation_mode"),
+        LABKEY_CREDENTIAL ("/labkey"),
+        URI_GENERATOR ("/uri_generator"),
+        STUDY_ACQUISITION ("/studies/select"),
+        METADATA_DA ("/data_acquisitions/select"),
+        ANALYTES_ACQUISITION ("/analytes/select"),
+        SCHEMA_ATTRIBUTES ("/schema_attributes/select"),
+        
+        // triplestore
+        METADATA_SPARQL ("/store/query"),
+        METADATA_UPDATE ("/store/update"),
+        METADATA_GRAPH ("/store/data"),
 
-	// data and auxiliary data 
-	public static final String DATA_COLLECTION             = "/sdc";
-	public static final String DATA_ACQUISITION            = "/measurement";
-	public static final String METADATA_AQUISITION	       = "/data_acquisitions";
-	public static final String SA_ACQUISITION              = "/schema_attributes";
-	public static final String CONSOLE_STORE               = "/console_store";
-	public static final String STUDIES                     = "/studies";
-	public static final String ANALYTES                    = "/analytes";
-	public static final String ANNOTATION_LOG              = "/annotation_log";
-	public static final String CSV_DATASET                 = "/csv";
-	public static final String LABKEY_CREDENTIAL           = "/labkey";
-	public static final String URI_GENERATOR               = "/uri_generator";
-	public static final String STUDY_ACQUISITION           = "/studies/select";
-	public static final String METADATA_DA                 = "/data_acquisitions/select";
-	public static final String ANALYTES_ACQUISITION        = "/analytes/select";
-	public static final String SCHEMA_ATTRIBUTES           = "/schema_attributes/select";
+        // users 
+        AUTHENTICATE_USERS ("/users"),
+        AUTHENTICATE_ACCOUNTS ("/linked_account"),
+        AUTHENTICATE_ROLES ("/security_role"),
+        AUTHENTICATE_TOKENS ("/token_action"),
+        AUTHENTICATE_PERMISSIONS ("/user_permission"),
 
-	// triplestore
-	public static final String METADATA_SPARQL             = "/store/query";
-	public static final String METADATA_UPDATE             = "/store/update";
-	public static final String METADATA_GRAPH              = "/store/data";
+        // permissions
+        PERMISSIONS_SPARQL ("/store_users/query"),
+        PERMISSIONS_UPDATE ("/store_users/update"),
+        PERMISSIONS_GRAPH ("/store_users/data")
+        ;
+        
+        private final String collectionString;
 
-	// users 
-	public static final String AUTHENTICATE_USERS          = "/users";
-	public static final String AUTHENTICATE_ACCOUNTS       = "/linked_account";
-	public static final String AUTHENTICATE_ROLES          = "/security_role";
-	public static final String AUTHENTICATE_TOKENS         = "/token_action";
-	public static final String AUTHENTICATE_PERMISSIONS    = "/user_permission";
+        private Collection(String collectionString) {
+            this.collectionString = collectionString;
+        }
+        
+        public String get() {
+            return collectionString;
+        }
+    }
+    
+    public static String getCollectionName(String collection) {
+        if (Arrays.asList(
+                Collection.OPERATION_MODE.get(),
+                Collection.AUTHENTICATE_ACCOUNTS.get(), 
+                Collection.AUTHENTICATE_USERS.get(), 
+                Collection.AUTHENTICATE_ROLES.get(),
+                Collection.AUTHENTICATE_TOKENS.get(),
+                Collection.AUTHENTICATE_PERMISSIONS.get(),
+                Collection.PERMISSIONS_SPARQL.get(),
+                Collection.PERMISSIONS_UPDATE.get(),
+                Collection.PERMISSIONS_GRAPH.get()).contains(collection)) {
+            return collection;
+        }
+        
+        if (isSandboxMode()) {
+            if (Arrays.asList(
+                    Collection.METADATA_SPARQL.get(), 
+                    Collection.METADATA_UPDATE.get(), 
+                    Collection.METADATA_GRAPH.get()).contains(collection)) {
+                return collection.replace("store", "store_sandbox");
+            } else {
+                return collection + "_sandbox";
+            }
+        }
 
-	// permissions
-	public static final String PERMISSIONS_SPARQL          = "/store_users/query";
-	public static final String PERMISSIONS_UPDATE          = "/store_users/update";
-	public static final String PERMISSIONS_GRAPH           = "/store_users/data";
+        return collection;
+    }
+    
+    public static boolean isSandboxMode() {
+        List<OperationMode> modes = OperationMode.findAll();
+        if (modes.size() > 0) {
+            OperationMode mode = modes.get(0);
+            if (mode.getOperationMode().equals(OperationMode.SANDBOX)) {
+                return true;
+            }
+        }
+        
+        return false;
+    }
 
-	public static String getCollectionsName(String request) {
-
-		String collectionName = null;
-		switch (request) {
-		case DATA_COLLECTION:
-		case DATA_ACQUISITION:
-		case METADATA_AQUISITION:
-		case SA_ACQUISITION :
-		case CONSOLE_STORE:
-		case URI_GENERATOR :           collectionName = ConfigFactory.load().getString("hadatac.solr.data") + request;
-		break;
-		case METADATA_SPARQL:
-		case METADATA_UPDATE:
-		case METADATA_GRAPH :          collectionName = ConfigFactory.load().getString("hadatac.solr.triplestore") + request;
-		break;
-		case AUTHENTICATE_USERS:
-		case AUTHENTICATE_ACCOUNTS: 
-		case AUTHENTICATE_ROLES: 
-		case AUTHENTICATE_TOKENS:
-		case AUTHENTICATE_PERMISSIONS: collectionName = ConfigFactory.load().getString("hadatac.solr.data") + request;
-		break;
-		case PERMISSIONS_SPARQL:
-		case PERMISSIONS_UPDATE:
-		case PERMISSIONS_GRAPH :       collectionName = ConfigFactory.load().getString("hadatac.solr.permissions") + request;
-		break;
-		case STUDY_ACQUISITION:
-		case ANALYTES_ACQUISITION:
-		case METADATA_DA:
-		case STUDIES:
-		case SCHEMA_ATTRIBUTES:        collectionName = ConfigFactory.load().getString("hadatac.solr.data") + request;
-		break;
-
-		}
-		return collectionName;
-	}
-
+    public static String getCollectionPath(Collection collection) {
+        String collectionName = null;
+        switch (collection) {
+        case METADATA_SPARQL:
+        case METADATA_UPDATE:
+        case METADATA_GRAPH :          
+            collectionName = ConfigFactory.load().getString("hadatac.solr.triplestore") + getCollectionName(collection.get());
+        break;
+        case AUTHENTICATE_USERS:
+        case AUTHENTICATE_ACCOUNTS: 
+        case AUTHENTICATE_ROLES: 
+        case AUTHENTICATE_TOKENS:
+        case AUTHENTICATE_PERMISSIONS: 
+            collectionName = ConfigFactory.load().getString("hadatac.solr.users") + collection.get();
+        break;
+        case PERMISSIONS_SPARQL:
+        case PERMISSIONS_UPDATE:
+        case PERMISSIONS_GRAPH :       
+            collectionName = ConfigFactory.load().getString("hadatac.solr.permissions") + collection.get();
+        break;
+        case DATA_COLLECTION:
+        case DATA_ACQUISITION:
+        case METADATA_AQUISITION:
+        case SA_ACQUISITION :
+        case CONSOLE_STORE:
+        case STUDIES:
+        case ANALYTES:
+        case ANNOTATION_LOG:
+        case OPERATION_MODE:
+        case CSV_DATASET:
+        case LABKEY_CREDENTIAL:
+        case URI_GENERATOR :
+        case STUDY_ACQUISITION:
+        case METADATA_DA:
+        case ANALYTES_ACQUISITION:
+        case SCHEMA_ATTRIBUTES:        
+            collectionName = ConfigFactory.load().getString("hadatac.solr.data") + getCollectionName(collection.get());
+        break;
+        }
+        
+        return collectionName;
+    }
 }

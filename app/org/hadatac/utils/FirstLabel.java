@@ -25,7 +25,7 @@ public class FirstLabel {
 		 //System.out.println("[FirstLabel] getLabel() queryString: \n" + queryString);
 		
 		ResultSetRewindable resultsrw = SPARQLUtils.select(
-		        CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), queryString);
+		        CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), queryString);
 
 		String labelStr = "";
 		while (resultsrw.hasNext()) {

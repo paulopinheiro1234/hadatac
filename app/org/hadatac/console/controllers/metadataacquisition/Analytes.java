@@ -9,11 +9,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.List;
 
-import org.apache.jena.query.QueryExecution;
-import org.apache.jena.query.QueryExecutionFactory;
+
 import org.apache.jena.query.QuerySolution;
-import org.apache.jena.query.ResultSet;
-import org.apache.jena.query.ResultSetFactory;
 import org.apache.jena.query.ResultSetRewindable;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrServerException;
@@ -68,7 +65,7 @@ public class Analytes extends Controller {
                 + " }";
 
         ResultSetRewindable resultsrwStudy = SPARQLUtils.select(
-                CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), queryString);
+                CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), queryString);
 
         List<String> results = new ArrayList<String>();
         while (resultsrwStudy.hasNext()) {
@@ -108,7 +105,7 @@ public class Analytes extends Controller {
         System.out.println("updateAnalytes strQuery: " + strQuery);
         
         ResultSetRewindable resultsrwStudy = SPARQLUtils.select(
-                CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), strQuery);
+                CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), strQuery);
 
         Map<String, Map<String, Object>> mapStudyInfo = new HashMap<String, Map<String, Object>>();
         while (resultsrwStudy.hasNext()) {
@@ -171,15 +168,14 @@ public class Analytes extends Controller {
         }
 
         return SolrUtils.commitJsonDataToSolr(
-                ConfigFactory.load().getString("hadatac.solr.data") 
-                + CollectionUtil.ANALYTES, results.toString());
+                CollectionUtil.getCollectionPath(CollectionUtil.Collection.ANALYTES), 
+                results.toString());
     }
 
     public static int deleteFromSolr() {
         try {
             SolrClient solr = new HttpSolrClient.Builder(
-                    ConfigFactory.load().getString("hadatac.solr.data") 
-                    + CollectionUtil.ANALYTES).build();
+                    CollectionUtil.getCollectionPath(CollectionUtil.Collection.ANALYTES)).build();
             UpdateResponse response = solr.deleteByQuery("*:*");
             solr.commit();
             solr.close();

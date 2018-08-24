@@ -279,7 +279,7 @@ public class Alignment {
 
         try {
             ResultSetRewindable resultsrw = SPARQLUtils.select(
-                    CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), query);
+                    CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), query);
 
             if (resultsrw.hasNext()) {
                 QuerySolution soln = resultsrw.next();

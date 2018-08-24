@@ -53,8 +53,7 @@ public class ConsoleStore extends HADatAcThing {
 		ConsoleStore consoleStore = null;
 		
 		SolrClient client = new HttpSolrClient.Builder(
-				ConfigFactory.load().getString("hadatac.solr.data") 
-				+ CollectionUtil.CONSOLE_STORE).build();
+				CollectionUtil.getCollectionPath(CollectionUtil.Collection.CONSOLE_STORE)).build();
         SolrQuery query = new SolrQuery();
         query.set("q", "*:*");
         query.set("sort", "last_dynamic_metadata_id_long desc");
@@ -92,8 +91,7 @@ public class ConsoleStore extends HADatAcThing {
     public boolean saveToSolr() {
         try {
             SolrClient client = new HttpSolrClient.Builder(
-                    ConfigFactory.load().getString("hadatac.solr.data") 
-                    + CollectionUtil.CONSOLE_STORE).build();
+                    CollectionUtil.getCollectionPath(CollectionUtil.Collection.CONSOLE_STORE)).build();
             client.addBean(this).getStatus();
             client.commit();
             client.close();

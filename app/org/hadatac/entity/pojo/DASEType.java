@@ -68,7 +68,7 @@ public class DASEType extends HADatAcThing implements Comparable<DASEType> {
         Map<HADatAcThing, List<HADatAcThing>> mapTypeToInstanceList = new HashMap<HADatAcThing, List<HADatAcThing>>();
         try {
             ResultSetRewindable resultsrw = SPARQLUtils.select(
-                    CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), query);
+                    CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), query);
             while (resultsrw.hasNext()) {
                 QuerySolution soln = resultsrw.next();
                 DASEType daseType = new DASEType();

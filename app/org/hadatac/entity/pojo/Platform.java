@@ -142,7 +142,7 @@ public class Platform extends HADatAcThing implements Comparable<Platform> {
         Map<HADatAcThing, List<HADatAcThing>> results = new HashMap<HADatAcThing, List<HADatAcThing>>();
         try {
             ResultSetRewindable resultsrw = SPARQLUtils.select(
-                    CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), query);
+                    CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), query);
             
             while (resultsrw.hasNext()) {
                 QuerySolution soln = resultsrw.next();
@@ -189,8 +189,7 @@ public class Platform extends HADatAcThing implements Comparable<Platform> {
         String queryString = "DESCRIBE <" + uri + ">";
         Query query = QueryFactory.create(queryString);
         QueryExecution qexec = QueryExecutionFactory.sparqlService(
-                ConfigFactory.load().getString("hadatac.solr.triplestore") 
-                + CollectionUtil.METADATA_SPARQL, query);
+                CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), query);
         model = qexec.execDescribe();
 
         platform = new Platform();
@@ -230,7 +229,7 @@ public class Platform extends HADatAcThing implements Comparable<Platform> {
                 "} ";
 
         ResultSetRewindable resultsrw = SPARQLUtils.select(
-                CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), queryString);
+                CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), queryString);
 
         while (resultsrw.hasNext()) {
             QuerySolution soln = resultsrw.next();
@@ -321,7 +320,7 @@ public class Platform extends HADatAcThing implements Comparable<Platform> {
         try {
             UpdateRequest request = UpdateFactory.create(insert);
             UpdateProcessor processor = UpdateExecutionFactory.createRemote(
-                    request, CollectionUtil.getCollectionsName(CollectionUtil.METADATA_UPDATE));
+                    request, CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_UPDATE));
             processor.execute();
         } catch (QueryParseException e) {
             System.out.println("QueryParseException due to update query: " + insert);
@@ -372,7 +371,7 @@ public class Platform extends HADatAcThing implements Comparable<Platform> {
         query += LINE_LAST;
         UpdateRequest request = UpdateFactory.create(query);
         UpdateProcessor processor = UpdateExecutionFactory.createRemote(
-                request, CollectionUtil.getCollectionsName(CollectionUtil.METADATA_UPDATE));
+                request, CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_UPDATE));
         processor.execute();
     }
 

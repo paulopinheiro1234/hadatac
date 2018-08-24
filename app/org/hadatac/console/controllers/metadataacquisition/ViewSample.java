@@ -70,7 +70,7 @@ public class ViewSample extends Controller {
          				+ "}";
     	
 		ResultSetRewindable resultsrw = SPARQLUtils.select(
-                CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), sampleQueryString);
+                CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), sampleQueryString);
 		
 		Map<String, List<String>> sampleResult = new HashMap<String, List<String>>();
 		List<String> values = new ArrayList<String>();

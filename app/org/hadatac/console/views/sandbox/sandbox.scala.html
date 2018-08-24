@@ -1,0 +1,38 @@
+@(canOperate : Boolean,
+  userInMode : String,
+  mode : String,
+  Message : String,
+  postAction : String)
+
+@import helper._
+@import org.hadatac.console.views.html._
+@import org.hadatac.console.controllers.sandbox._
+@import java.net._
+
+@main("Sandbox Management") {
+	
+	<div class="container-fluid">
+   	<div id="end-process-box" style="display:none;">
+		<h4>Sandbox Management</h4>
+  	</div>
+	
+	<p style='font-family: "Lucida Console", Monaco, monospace;' id='msgarea'></p>
+	
+	<script>
+		var msg = '@Message';
+		var msg2 = decodeURIComponent(msg);
+       	$('#msgarea').html(msg2.replace(/&amp;lt;br&amp;gt;/g, '<br>').replace(/&amp;lt;/g, '&lt;').replace(/&amp;gt;/g, '&gt;'));
+      	document.getElementById('end-process-box').style.display = 'inline';
+	</script>
+	
+    <br><br>
+    @if(canOperate) {
+        @if(mode == "sandbox") {
+            <a href="@org.hadatac.console.controllers.sandbox.routes.Sandbox.exitSandboxMode()" class="btn btn-primary" role="button">Exit Mode</a>
+        } else {
+            <a href="@org.hadatac.console.controllers.sandbox.routes.Sandbox.startSandboxMode()" class="btn btn-primary" role="button">Start Mode</a>
+        }
+    }
+    <a href="@postAction" class="btn btn-primary" role="button">Back</a>
+	</div>
+}

@@ -119,7 +119,7 @@ public class DPL {
 			tempFile = "tmp/ttl/DPL-" + timeStamp + ".ttl";
 			FileUtils.writeStringToFile(new File(tempFile), ttl, "utf-8");
 
-			DatasetAccessor accessor = DatasetAccessorFactory.createHTTP(CollectionUtil.getCollectionsName(CollectionUtil.METADATA_GRAPH));
+			DatasetAccessor accessor = DatasetAccessorFactory.createHTTP(CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_GRAPH));
 			Model model = RDFDataMgr.loadModel(tempFile);
 			accessor.add(model);
 			AnnotationLog.println(Feedback.println(Feedback.WEB, String.format("[OK] %d triple(s) have been committed to triple store", model.size())), getFileName());

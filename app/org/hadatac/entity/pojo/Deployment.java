@@ -196,7 +196,7 @@ public class Deployment extends HADatAcThing {
             insert += END_TIME_PREDICATE + "\"" + this.getEndedAt() + TIME_XMLS + "  ";
             insert += LINE_LAST;
             UpdateRequest request = UpdateFactory.create(insert);
-            UpdateProcessor processor = UpdateExecutionFactory.createRemote(request,CollectionUtil.getCollectionsName(CollectionUtil.METADATA_UPDATE)); 
+            UpdateProcessor processor = UpdateExecutionFactory.createRemote(request,CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_UPDATE)); 
             processor.execute();
         }
     }
@@ -301,8 +301,7 @@ public class Deployment extends HADatAcThing {
         //System.out.println("FIND DEPLOYMENT (queryString): " + queryString);
         Query query = QueryFactory.create(queryString);
         QueryExecution qexec = QueryExecutionFactory.sparqlService(
-                ConfigFactory.load().getString("hadatac.solr.triplestore") 
-                + CollectionUtil.METADATA_SPARQL, query);
+                CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), query);
         Model model = qexec.execDescribe();
 
         StmtIterator stmtIterator = model.listStatements();
@@ -365,7 +364,7 @@ public class Deployment extends HADatAcThing {
         }
         
         ResultSetRewindable resultsrw = SPARQLUtils.select(
-                CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), queryString);
+                CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), queryString);
 
         Deployment dep = null;
         while (resultsrw.hasNext()) {
@@ -463,7 +462,7 @@ public class Deployment extends HADatAcThing {
         try {
             UpdateRequest request = UpdateFactory.create(insert);
             UpdateProcessor processor = UpdateExecutionFactory.createRemote(
-                    request, CollectionUtil.getCollectionsName(CollectionUtil.METADATA_UPDATE));
+                    request, CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_UPDATE));
             processor.execute();
         } catch (QueryParseException e) {
             System.out.println("QueryParseException due to update query: " + insert);
@@ -483,7 +482,7 @@ public class Deployment extends HADatAcThing {
         query += LINE_LAST;
         UpdateRequest request = UpdateFactory.create(query);
         UpdateProcessor processor = UpdateExecutionFactory.createRemote(
-                request, CollectionUtil.getCollectionsName(CollectionUtil.METADATA_UPDATE));
+                request, CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_UPDATE));
         processor.execute();
     }
 

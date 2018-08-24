@@ -54,7 +54,7 @@ public class PermissionsContext implements RDFContext {
     				"SELECT (COUNT(*) as ?tot) WHERE { ?s ?p ?o . }";
     		
     		ResultSetRewindable resultsrw = SPARQLUtils.select(
-                    CollectionUtil.getCollectionsName(CollectionUtil.PERMISSIONS_SPARQL), queryString);
+                    CollectionUtil.getCollectionPath(CollectionUtil.Collection.PERMISSIONS_SPARQL), queryString);
     		
     		QuerySolution soln = resultsrw.next();
     		return Long.valueOf(soln.getLiteral("tot").getValue().toString()).longValue();
@@ -74,7 +74,7 @@ public class PermissionsContext implements RDFContext {
 		queryString += "DELETE WHERE { ?s ?p ?o . } ";
 		UpdateRequest req = UpdateFactory.create(queryString);
 		UpdateProcessor processor = UpdateExecutionFactory.createRemote(req, 
-				CollectionUtil.getCollectionsName(CollectionUtil.PERMISSIONS_UPDATE));
+				CollectionUtil.getCollectionPath(CollectionUtil.Collection.PERMISSIONS_UPDATE));
 		processor.execute();
 		
 		message += Feedback.println(mode, " ");
@@ -102,7 +102,7 @@ public class PermissionsContext implements RDFContext {
 	public Long loadLocalFile(int mode, String filePath, String contentType) {
 		Model model = ModelFactory.createDefaultModel();
 		DatasetAccessor accessor = DatasetAccessorFactory.createHTTP(
-				CollectionUtil.getCollectionsName(CollectionUtil.PERMISSIONS_GRAPH));		
+				CollectionUtil.getCollectionPath(CollectionUtil.Collection.PERMISSIONS_GRAPH));		
 
 		loadFileMessage = "";
 		Long total = totalTriples();

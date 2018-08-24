@@ -521,8 +521,7 @@ public class MeasurementGenerator extends BasicGenerator {
     @Override
     public boolean commitObjectsToSolr(List<HADatAcThing> objects) throws Exception {
         SolrClient solr = new HttpSolrClient.Builder(
-                ConfigFactory.load().getString("hadatac.solr.data") 
-                + CollectionUtil.DATA_ACQUISITION).build();
+                CollectionUtil.getCollectionPath(CollectionUtil.Collection.DATA_ACQUISITION)).build();
 
         int count = 0;
         int batchSize = 10000;

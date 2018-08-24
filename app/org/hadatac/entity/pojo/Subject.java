@@ -17,7 +17,7 @@ public class Subject extends StudyObject {
 				+ "}";
 
 		ResultSetRewindable resultsrw = SPARQLUtils.select(
-                CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), queryString);
+                CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), queryString);
 
 		if (resultsrw.size() >= 1) {
 			return true;
@@ -35,7 +35,7 @@ public class Subject extends StudyObject {
 				+ "}";
 
 		ResultSetRewindable resultsrw = SPARQLUtils.select(
-                CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), queryString);
+                CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), queryString);
 
 		if (resultsrw.size() >= 1) {
 			Subject subject = new Subject();
@@ -57,7 +57,7 @@ public class Subject extends StudyObject {
 				+ "}";
 
 		ResultSetRewindable resultsrw = SPARQLUtils.select(
-                CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), queryString);
+                CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), queryString);
 
 		if (resultsrw.size() >= 1) {
 			QuerySolution soln = resultsrw.next();
