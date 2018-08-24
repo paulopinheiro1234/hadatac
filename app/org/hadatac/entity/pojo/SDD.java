@@ -140,6 +140,7 @@ public class SDD {
 
     public boolean checkStudyIndicatorPath(String str) {
     	
+
     	List<String> list = new ArrayList<String>();
     	list.add("sio:TimeStamp");
     	list.add("sio:TimeInstant");
@@ -179,8 +180,9 @@ public class SDD {
                 answer.add(soln.get("a").toString());
                 answer.add(soln.get("b").toString());
             }
+//            AnnotationLog.println("The 'Attribute' column " + str + " get: " + answer, sddfile.getFile().getName());
             //			System.out.println(answer);
-            if (answer.contains("http://hadatac.org/ont/hasco/StudyIndicator")) {
+            if (answer.contains("http://hadatac.org/ont/hasco#StudyIndicator")) {
                 return true;
             } else {
                 return false;
