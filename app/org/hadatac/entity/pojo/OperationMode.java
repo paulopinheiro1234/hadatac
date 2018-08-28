@@ -19,17 +19,16 @@ import org.hadatac.utils.CollectionUtil;
 
 public class OperationMode {
 	@Field("user_email")
-	private String userEmail;
+	private String userEmail = "";
 	@Field("operation_mode_str")
-	private String operationMode;
+	private String operationMode = "";
+	@Field("last_enter_time_str")
+    private String lastEnterTime = "";
 	
 	public static final String REGULAR = "regular";
 	public static final String SANDBOX = "sandbox";
 	
-	public OperationMode() {
-	    userEmail = "";
-	    operationMode = "";
-	}
+	public OperationMode() {}
 
 	public String getUserEmail() {
 		return userEmail;
@@ -44,6 +43,13 @@ public class OperationMode {
 	public void setOperationMode(String operationMode) {
 		this.operationMode = operationMode;
 	}
+	
+	public String getLastEnterTime() {
+        return lastEnterTime;
+    }
+    public void setLastEnterTime(String lastEnterTime) {
+        this.lastEnterTime = lastEnterTime;
+    }
 	
 	public int save() {		
 		try {
@@ -83,6 +89,7 @@ public class OperationMode {
 		OperationMode object = new OperationMode();
 		object.setUserEmail(doc.getFieldValue("user_email").toString());
 		object.setOperationMode(doc.getFieldValue("operation_mode_str").toString());
+		object.setLastEnterTime(doc.getFieldValue("last_enter_time_str").toString());
 		
 		return object;
 	}
