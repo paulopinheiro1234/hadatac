@@ -88,7 +88,7 @@ public class Sandbox extends Controller {
             SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
             try {
                 Date enterTime = sdf.parse(mode.getLastEnterTime());
-                Date expirationTime = DateUtils.addHours(enterTime, 8);
+                Date expirationTime = DateUtils.addHours(enterTime, 2);
                 Date currentTime = new Date();
                 if (currentTime.after(expirationTime)) {
                     mode.delete();
