@@ -140,6 +140,7 @@ public class SDD {
 
     public boolean checkStudyIndicatorPath(String str) {
     	
+
     	List<String> list = new ArrayList<String>();
     	list.add("sio:TimeStamp");
     	list.add("sio:TimeInstant");
@@ -157,6 +158,10 @@ public class SDD {
     	list.add("hasco:hasCalibration");
     	list.add("hasco:hasElevation");
     	list.add("hasco:hasLocation");
+    	list.add("chear:AnalysisMode");
+    	list.add("chear:LabHubAccession");
+    	list.add("chear:LevelOfDetection");
+    	list.add("chear:ReplicateNumber");
 
         if (list.contains(str)) {
             return true;
@@ -164,27 +169,24 @@ public class SDD {
 
         String indvIndicatorQuery = "";
         indvIndicatorQuery += NameSpaces.getInstance().printSparqlNameSpaceList();
-        indvIndicatorQuery += " SELECT ?a ?b WHERE { "
-                +  str + "  rdfs:subClassOf ?a ."
-                + " ?a rdfs:subClassOf ?b . "
+        indvIndicatorQuery += " SELECT * WHERE { "
+                +  str + "  (<>|!<>)* hasco:StudyIndicator ."
                 +	" } ";
 
-        try {		
+        try {
             ResultSetRewindable resultsrwIndvInd = SPARQLUtils.select(
                     CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), indvIndicatorQuery);
 
             List<String> answer = new ArrayList<String>();
             while (resultsrwIndvInd.hasNext()) {
-                QuerySolution soln = resultsrwIndvInd.next();
-                answer.add(soln.get("a").toString());
-                answer.add(soln.get("b").toString());
+            	if (resultsrwIndvInd.size() > 0) {
+            		return true;
+            	} else {
+            		return false;
+            	}
             }
-            //			System.out.println(answer);
-            if (answer.contains("http://hadatac.org/ont/hasco/StudyIndicator")) {
-                return true;
-            } else {
-                return false;
-            }
+        	System.out.println("The " + str + " get: " + answer);
+            return false;
         } catch (QueryExceptionHTTP e) {
             e.printStackTrace();
             AnnotationLog.printException("The 'Attribute' column " + str + " formed a bad query to the KG.", sddfile.getFile().getName());
