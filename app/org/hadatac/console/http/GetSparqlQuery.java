@@ -136,7 +136,7 @@ public class GetSparqlQuery {
             		"  ?agent a foaf:Group . " + 
             		"  OPTIONAL { ?agent foaf:name ?name . } " + 
             		"  OPTIONAL { ?agent foaf:homepage ?page . } " + 
-            		"  OPTIONAL { ?agent hadatac:isMemberOfGroup ?group . } " + 
+            		"  OPTIONAL { ?agent sio:isMemberOf ?group . } " + 
             		"}";
                 break;
             case "PeopleH" : 
@@ -147,7 +147,7 @@ public class GetSparqlQuery {
             		"  ?agent a foaf:Person . " + 
             		"  OPTIONAL { ?agent foaf:name ?name . } " + 
             		"  OPTIONAL { ?agent foaf:mbox ?email . } " + 
-            		"  OPTIONAL { ?agent hadatac:isMemberOfGroup ?group . } " + 
+            		"  OPTIONAL { ?agent sio:isMemberOf ?group . } " + 
             		"}";
                 break;
             case "DetectorModels" : 

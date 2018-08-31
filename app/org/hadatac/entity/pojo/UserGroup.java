@@ -14,6 +14,7 @@ import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Statement;
 import org.apache.jena.rdf.model.StmtIterator;
 import org.hadatac.console.http.SPARQLUtils;
+import org.hadatac.metadata.loader.URIUtils;
 import org.hadatac.utils.CollectionUtil;
 
 public class UserGroup extends User {
@@ -47,11 +48,10 @@ public class UserGroup extends User {
 			object = statement.getObject();
 			if (statement.getPredicate().getURI().equals("http://www.w3.org/2000/01/rdf-schema#comment")) {
 				user.setComment(object.asLiteral().getString());
-		    } else if (statement.getPredicate().getURI().equals("http://hadatac.org/ont/hadatac#isMemberOfGroup")) {
-				if(object.toString().equals("Public") || object.toString().equals("")){
+		    } else if (statement.getPredicate().getURI().equals(URIUtils.replacePrefixEx("sio:isMemberOf"))) {
+				if(object.toString().equals("Public") || object.toString().equals("")) {
 					user.setImmediateGroupUri("Public");
-				}
-				else{
+				} else {
 					user.setImmediateGroupUri(object.asResource().toString());
 				}
 			} else if (statement.getPredicate().getURI().equals("http://xmlns.com/foaf/0.1/givenName")) {
@@ -64,7 +64,7 @@ public class UserGroup extends User {
 				user.setEmail(object.asLiteral().getString());
 			} else if (statement.getPredicate().getURI().equals("http://xmlns.com/foaf/0.1/homepage")) {
 				String homepage = object.asLiteral().getString();
-				if(homepage.startsWith("<") && homepage.endsWith(">")){
+				if (homepage.startsWith("<") && homepage.endsWith(">")) {
 					homepage = homepage.replace("<", "");
 					homepage = homepage.replace(">", "");
 				}
@@ -126,7 +126,7 @@ public class UserGroup extends User {
         		"PREFIX hadatac: <http://hadatac.org/ont/hadatac#> " + 
 				"SELECT ?uri WHERE { " +
 				"  ?uri a foaf:Person . " +
-				"  ?uri hadatac:isMemberOfGroup <" + group_uri + "> . " +
+				"  ?uri sio:isMemberOf <" + group_uri + "> . " +
 				"} ";
 		
 		ResultSetRewindable resultsrw = SPARQLUtils.select(

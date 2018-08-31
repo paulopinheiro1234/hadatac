@@ -34,6 +34,7 @@ import org.hadatac.console.controllers.triplestore.UserManagement;
 import org.hadatac.console.http.SPARQLUtils;
 import org.hadatac.console.models.LinkedAccount;
 import org.hadatac.console.models.SysUser;
+import org.hadatac.metadata.loader.URIUtils;
 import org.hadatac.utils.CollectionUtil;
 import org.hadatac.utils.NameSpaces;
 
@@ -155,7 +156,7 @@ public class User implements Comparable<User> {
         insert += "<" + this.getUri() + ">  ";
         insert += " foaf:mbox " + "\"" + this.email + "\" . ";
         insert += "<" + this.getUri() + ">  ";
-        insert += " hadatac:isMemberOfGroup " + "\"Public\" . ";
+        insert += " sio:isMemberOf " + "\"Public\" . ";
         insert += "}  ";
         System.out.println("!!!! INSERT USER");
 
@@ -275,7 +276,7 @@ public class User implements Comparable<User> {
             if (statement.getPredicate().getURI().equals("http://www.w3.org/2000/01/rdf-schema#comment")) {
                 user.setComment(object.asLiteral().getString());
             }
-            else if (statement.getPredicate().getURI().equals("http://hadatac.org/ont/hadatac#isMemberOfGroup")) {
+            else if (statement.getPredicate().getURI().equals(URIUtils.replacePrefixEx("sio:isMemberOf"))) {
                 if(object.toString().equals("Public") || object.toString().equals("")){
                     user.setImmediateGroupUri("Public");
                 }
@@ -340,15 +341,15 @@ public class User implements Comparable<User> {
             e.printStackTrace();
         }
 
-        String command = "";
+        String command = NameSpaces.getInstance().printSparqlNameSpaceList();
         if(group_uri.equals("Public")){
-            command = "DELETE { <" + uri + "> <http://hadatac.org/ont/hadatac#isMemberOfGroup> \"" + group_uri + "\" .  } \n"
-                    + "INSERT { <" + uri + "> <http://hadatac.org/ont/hadatac#isMemberOfGroup> \"" + group_uri + "\" . } \n "
+            command += "DELETE { <" + uri + "> sio:isMemberOf \"" + group_uri + "\" .  } \n"
+                    + "INSERT { <" + uri + "> sio:isMemberOf \"" + group_uri + "\" . } \n "
                     + "WHERE { } \n";
         }
         else{
-            command = "DELETE { <" + uri + "> <http://hadatac.org/ont/hadatac#isMemberOfGroup> <" + group_uri + "> .  } \n"
-                    + "INSERT { <" + uri + "> <http://hadatac.org/ont/hadatac#isMemberOfGroup> <" + group_uri + "> . } \n "
+            command += "DELETE { <" + uri + "> sio:isMemberOf <" + group_uri + "> .  } \n"
+                    + "INSERT { <" + uri + "> sio:isMemberOf <" + group_uri + "> . } \n "
                     + "WHERE { } \n";
         }
 
