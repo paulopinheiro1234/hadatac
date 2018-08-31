@@ -147,10 +147,15 @@ public class URIUtils {
 	}
 	
 	public static String getBaseName(String str) {
+	    if (str.isEmpty()) {
+	        return "";
+	    }
+	    
         String uri = replaceNameSpaceEx(str);
         if (uri.split(":").length == 2) {
             return uri.split(":")[1];
         }
+        
         return "";
     }
 	
