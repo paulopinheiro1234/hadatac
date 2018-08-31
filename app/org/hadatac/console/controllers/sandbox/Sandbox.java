@@ -1,10 +1,14 @@
 package org.hadatac.console.controllers.sandbox;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 
 import play.mvc.*;
 import play.mvc.Result;
 
+import org.apache.commons.lang3.time.DateUtils;
 import org.hadatac.console.controllers.AuthApplication;
 import org.hadatac.console.models.SysUser;
 import org.hadatac.console.controllers.routes;
@@ -58,6 +62,7 @@ public class Sandbox extends Controller {
             OperationMode mode = new OperationMode();
             mode.setUserEmail(user.getEmail());
             mode.setOperationMode(OperationMode.SANDBOX);
+            mode.setLastEnterTime(new SimpleDateFormat("yyyy/MM/dd HH:mm:ss").format(new Date()));
             mode.save();
         }
 
@@ -74,5 +79,23 @@ public class Sandbox extends Controller {
         }
 
         return redirect(org.hadatac.console.controllers.sandbox.routes.Sandbox.index());
+    }
+    
+    public static void checkSandboxExpiration() {
+        List<OperationMode> modes = OperationMode.findAll();
+        if (modes.size() > 0) {
+            OperationMode mode = modes.get(0);
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+            try {
+                Date enterTime = sdf.parse(mode.getLastEnterTime());
+                Date expirationTime = DateUtils.addHours(enterTime, 2);
+                Date currentTime = new Date();
+                if (currentTime.after(expirationTime)) {
+                    mode.delete();
+                }
+            } catch (ParseException e) {
+                System.out.println("Cannot parse enter time!");
+            }
+        }
     }
 }

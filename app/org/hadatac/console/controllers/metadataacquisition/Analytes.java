@@ -9,7 +9,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.List;
 
-
 import org.apache.jena.query.QuerySolution;
 import org.apache.jena.query.ResultSetRewindable;
 import org.apache.solr.client.solrj.SolrClient;
