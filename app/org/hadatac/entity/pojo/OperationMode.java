@@ -70,7 +70,7 @@ public class OperationMode {
 		try {
 			SolrClient client = new HttpSolrClient.Builder(
 			        CollectionUtil.getCollectionPath(CollectionUtil.Collection.OPERATION_MODE)).build();
-			UpdateResponse response = client.deleteById(this.getUserEmail());
+			UpdateResponse response = client.deleteById(getUserEmail());
 			client.commit();
 			client.close();
 			return response.getStatus();

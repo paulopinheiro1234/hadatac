@@ -122,7 +122,7 @@ GET	    /hadatac/metadata/detectorlist		       org.hadatac.console.controllers.m
 POST	/hadatac/metadata/detectorlist		       org.hadatac.console.controllers.metadata.empirical.DetectorList.postIndex()
 
 # Statistics
-GET	/hadatac/stats/ont		               org.hadatac.console.controllers.stats.Ontologies.index()
+GET	    /hadatac/stats/ont		               org.hadatac.console.controllers.stats.Ontologies.index()
 POST	/hadatac/stats/ont		               org.hadatac.console.controllers.stats.Ontologies.postIndex()
 
 # Authorization URLs
@@ -388,6 +388,8 @@ POST    /hadatac/ts/startstop                          org.hadatac.console.contr
 GET     /hadatac/ts/loadont                            org.hadatac.console.controllers.triplestore.LoadOnt.loadOnt(oper: String)
 POST    /hadatac/ts/loadont                            org.hadatac.console.controllers.triplestore.LoadOnt.postLoadOnt(oper: String)
 GET     /hadatac/ts/loadont/cache                      org.hadatac.console.controllers.triplestore.LoadOnt.eraseCache()
+POST    /hadatac/ts/loadont/savenamespaces             org.hadatac.console.controllers.triplestore.LoadOnt.saveNamespaces()
+GET     /hadatac/ts/loadont/exportnamespaces           org.hadatac.console.controllers.triplestore.LoadOnt.exportNamespaces()
 GET     /hadatac/ts/loadkb                             org.hadatac.console.controllers.triplestore.LoadKB.loadKB(oper: String)
 POST    /hadatac/ts/loadkb                             org.hadatac.console.controllers.triplestore.LoadKB.postLoadKB(oper: String)
 POST    /hadatac/ts/loadkb/upload                      org.hadatac.console.controllers.triplestore.LoadKB.uploadFile(oper: String)
