@@ -83,7 +83,7 @@ public class DataContext {
 		String message = "";
 	    String straux = "";
 	    
-        message += Feedback.println(mode, "   Documents before [clean]: " + totalDocuments(CollectionUtil.getCollectionPath(solrCoreName)));
+        message += Feedback.println(mode, "   Documents before [clean]: " + totalDocuments(CollectionUtil.getCollectionName(solrCoreName.get())));
         message += Feedback.println(mode, " ");
 
 	    String query1 = "<delete><query>*:*</query></delete>";
@@ -114,7 +114,7 @@ public class DataContext {
 		    }
 		    message += Feedback.println(mode," ");
 		    message += Feedback.println(mode," ");
-			message += Feedback.print(mode, "   Triples after [clean]: " + totalDocuments(CollectionUtil.getCollectionPath(solrCoreName)));                
+			message += Feedback.print(mode, "   Triples after [clean]: " + totalDocuments(CollectionUtil.getCollectionName(solrCoreName.get())));                
 		} catch (UnsupportedEncodingException e) {
 		    System.out.println("[DataManagement] - ERROR encoding URLs");
 		    return message;
@@ -128,7 +128,7 @@ public class DataContext {
 		String message = "";
 	    String straux = "";
 	    
-        message += Feedback.println(mode,"   Documents before [clean]: " + totalDocuments(CollectionUtil.getCollectionPath(solrCoreName)));
+        message += Feedback.println(mode,"   Documents before [clean]: " + totalDocuments(CollectionUtil.getCollectionName(solrCoreName.get())));
         message += Feedback.println(mode, " ");
 
 	    String query1 = "<delete><query>studyUri:\"" + studyURI +"\"</query></delete>";
@@ -159,7 +159,7 @@ public class DataContext {
 		    }
 		    message += Feedback.println(mode," ");
 		    message += Feedback.println(mode," ");
-			message += Feedback.print(mode,"   Triples after [clean]: " + totalDocuments(CollectionUtil.getCollectionPath(solrCoreName)));                
+			message += Feedback.print(mode,"   Triples after [clean]: " + totalDocuments(CollectionUtil.getCollectionName(solrCoreName.get())));                
 		} catch (UnsupportedEncodingException e) {
 		    System.out.println("[DataManagement] - ERROR encoding URLs");
 		    return message;

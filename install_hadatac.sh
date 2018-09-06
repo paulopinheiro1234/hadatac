@@ -54,6 +54,9 @@ echo "=== Uncompressing JTS Topology Suite 1.14..."
 unzip -o -qq $HADATAC_DOWNLOAD/jts-1.14.zip -d $HADATAC_DOWNLOAD/jts-1.14
 wait $!
 
+mv $HADATAC_SOLR/solr/* $HADATAC_SOLR
+rm -rf $HADATAC_SOLR/solr
+
 echo "HADATAC_SOLR=$HADATAC_SOLR" >> $HADATAC_SOLR/hadatac_solr.sh
 cat $HADATAC_SOLR/solr6.in.sh >> $HADATAC_SOLR/hadatac_solr.sh
 mv $HADATAC_SOLR/hadatac_solr.sh $HADATAC_SOLR/solr6.in.sh
@@ -70,4 +73,3 @@ wait $!
 cp $HADATAC_DOWNLOAD/jts-1.14/lib/* $HADATAC_SOLR/solr-6.5.0/server/solr-webapp/webapp/WEB-INF/lib/
 
 sh $HADATAC_SOLR/run_solr6.sh restart
-

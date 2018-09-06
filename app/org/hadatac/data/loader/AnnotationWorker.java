@@ -159,7 +159,13 @@ public class AnnotationWorker {
             if (bSucceed) {
                 //Move the file to the folder for processed files
                 String study = URIUtils.getBaseName(chain.getStudyUri());
-                String new_path = path_proc + "/" + study;
+                String new_path = "";
+                if (study.isEmpty()) {
+                    new_path = path_proc;
+                } else {
+                    new_path = path_proc + "/" + study;
+                }
+                
                 File destFolder = new File(new_path);
                 if (!destFolder.exists()){
                     destFolder.mkdirs();
@@ -169,8 +175,13 @@ public class AnnotationWorker {
 
                 file.setStatus(DataFile.PROCESSED);
                 file.setCompletionTime(new SimpleDateFormat("yyyy/MM/dd HH:mm:ss").format(new Date()));
-                file.setFileName(study + "/" + file.getFileName());
-                file.setStudyUri(chain.getStudyUri());
+                if (study.isEmpty()) {
+                    file.setFileName(file.getFileName());
+                    file.setStudyUri("");
+                } else {
+                    file.setFileName(study + "/" + file.getFileName());
+                    file.setStudyUri(chain.getStudyUri());
+                }
                 file.save();
                 
                 File f = new File(path_unproc + "/" + file_name);

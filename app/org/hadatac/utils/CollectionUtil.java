@@ -21,6 +21,7 @@ public class CollectionUtil {
         ANNOTATION_LOG ("/annotation_log"),
         CSV_DATASET ("/csv"),
         OPERATION_MODE ("/operation_mode"),
+        NAMESPACE ("/namespace"),
         LABKEY_CREDENTIAL ("/labkey"),
         URI_GENERATOR ("/uri_generator"),
         STUDY_ACQUISITION ("/studies/select"),
@@ -126,6 +127,7 @@ public class CollectionUtil {
         case ANALYTES:
         case ANNOTATION_LOG:
         case OPERATION_MODE:
+        case NAMESPACE:
         case CSV_DATASET:
         case LABKEY_CREDENTIAL:
         case URI_GENERATOR :

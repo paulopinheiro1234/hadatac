@@ -375,7 +375,7 @@ public class UserManagement extends Controller {
 			pred_value_map.put("rdfs:comment", comment);
 			pred_value_map.put("foaf:mbox", email);
 			pred_value_map.put("foaf:homepage", "<" + homepage + ">");
-			pred_value_map.put("hadatac:isMemberOfGroup", group_uri);
+			pred_value_map.put("sio:isMemberOf", group_uri);
 			
 			User.deleteUser(usr_uri, false, false);
 			message = generateTTL(mode, oper, rdf, usr_uri, pred_value_map);
@@ -412,7 +412,7 @@ public class UserManagement extends Controller {
 			pred_value_map.put("foaf:name", group_name);
 			pred_value_map.put("rdfs:comment", comment);
 			pred_value_map.put("foaf:homepage", "<" + homepage + ">");
-			pred_value_map.put("hadatac:isMemberOfGroup", parent_group_uri);
+			pred_value_map.put("sio:isMemberOf", parent_group_uri);
 			
 			User.deleteUser(group_uri, false, false);
 			
