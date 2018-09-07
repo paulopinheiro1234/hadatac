@@ -389,6 +389,7 @@ GET     /hadatac/ts/loadont                            org.hadatac.console.contr
 POST    /hadatac/ts/loadont                            org.hadatac.console.controllers.triplestore.LoadOnt.postLoadOnt(oper: String)
 GET     /hadatac/ts/loadont/cache                      org.hadatac.console.controllers.triplestore.LoadOnt.eraseCache()
 POST    /hadatac/ts/loadont/savenamespaces             org.hadatac.console.controllers.triplestore.LoadOnt.saveNamespaces()
+POST    /hadatac/ts/loadont/importnamespaces           org.hadatac.console.controllers.triplestore.LoadOnt.importNamespaces()
 GET     /hadatac/ts/loadont/exportnamespaces           org.hadatac.console.controllers.triplestore.LoadOnt.exportNamespaces()
 GET     /hadatac/ts/loadkb                             org.hadatac.console.controllers.triplestore.LoadKB.loadKB(oper: String)
 POST    /hadatac/ts/loadkb                             org.hadatac.console.controllers.triplestore.LoadKB.postLoadKB(oper: String)

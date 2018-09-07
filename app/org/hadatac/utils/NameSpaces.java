@@ -39,7 +39,8 @@ public class NameSpaces {
         
         List<NameSpace> namespaces = NameSpace.findAll();
         if (namespaces.isEmpty()) {
-            namespaces = loadFromFile();
+            InputStream inputStream = getClass().getClassLoader().getResourceAsStream("namespaces.properties");
+            namespaces = loadFromFile(inputStream);
         }
         
         for (NameSpace ns : namespaces) {
@@ -47,13 +48,12 @@ public class NameSpaces {
         }
     }
     
-    private List<NameSpace> loadFromFile() {
+    public static List<NameSpace> loadFromFile(InputStream inputStream) {
         List<NameSpace> namespaces = new ArrayList<NameSpace>();
         
         try {
             Properties prop = new Properties();
-            InputStream input = getClass().getClassLoader().getResourceAsStream("namespaces.properties");
-            prop.load(input);
+            prop.load(inputStream);
             for (Map.Entry<Object, Object> nsEntry : prop.entrySet()) {
                 String nsAbbrev = ((String)nsEntry.getKey());
                 if (nsAbbrev != null) {
