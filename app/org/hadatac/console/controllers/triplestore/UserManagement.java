@@ -15,6 +15,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.ArrayList;
 
 import play.data.Form;
 import play.data.FormFactory;
@@ -86,7 +87,8 @@ public class UserManagement extends Controller {
 
 	@Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
 	public Result index(String oper) {
-		return ok(users.render(oper, "", User.find(), UserGroup.find(), ""));
+		//return ok(users.render(oper, "", User.find(), UserGroup.find(), ""));
+		return ok(users.render(oper, "", (new ArrayList<User>()), (new ArrayList<User>()), ""));
 	}
 
 	@Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))

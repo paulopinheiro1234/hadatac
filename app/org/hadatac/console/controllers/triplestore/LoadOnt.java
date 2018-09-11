@@ -2,16 +2,22 @@ package org.hadatac.console.controllers.triplestore;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.InputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
+
 import play.mvc.*;
 import play.data.Form;
 import play.data.FormFactory;
+import play.mvc.Http.MultipartFormData.FilePart;
 
 import javax.inject.Inject;
 
@@ -26,7 +32,6 @@ import org.hadatac.console.models.NamespaceForm;
 
 import com.typesafe.config.ConfigFactory;
 
-import akka.stream.Attributes.Name;
 import be.objectify.deadbolt.java.actions.Group;
 import be.objectify.deadbolt.java.actions.Restrict;
 
@@ -123,6 +128,34 @@ public class LoadOnt extends Controller {
             ns.save();
         }
 
+        return redirect(routes.LoadOnt.loadOnt("init"));
+    }
+    
+    @Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
+    @BodyParser.Of(value = BodyParser.MultipartFormData.class)
+    public Result importNamespaces() {
+        System.out.println("importNamespaces is called");
+        
+        FilePart uploadedfile = request().body().asMultipartFormData().getFile("ttl");
+        if (uploadedfile != null) {
+            File file = (File)uploadedfile.getFile();
+            FileInputStream inputStream;
+            try {
+                inputStream = new FileInputStream(file);
+                List<NameSpace> namespaces = NameSpaces.loadFromFile(inputStream);
+                inputStream.close();
+                
+                NameSpace.deleteAll();
+                for (NameSpace ns : namespaces) {
+                    ns.save();
+                }
+            } catch (Exception e) {
+                return badRequest("Could not find uploaded file");
+            }
+        } else {
+            return badRequest("Error uploading file. Please try again.");
+        }
+        
         return redirect(routes.LoadOnt.loadOnt("init"));
     }
     
