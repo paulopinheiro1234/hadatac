@@ -1,18 +1,11 @@
 package org.hadatac.metadata.loader;
 
+import java.io.File;
 import java.util.Map;
-import org.apache.jena.query.DatasetAccessor;
-import org.apache.jena.query.DatasetAccessorFactory;
-import org.apache.jena.query.Query;
-import org.apache.jena.query.QueryExecution;
-import org.apache.jena.query.QueryExecutionFactory;
-import org.apache.jena.query.QueryFactory;
+
 import org.apache.jena.query.QuerySolution;
-import org.apache.jena.query.ResultSet;
-import org.apache.jena.query.ResultSetFactory;
 import org.apache.jena.query.ResultSetRewindable;
 import org.apache.jena.rdf.model.Model;
-import org.apache.jena.rdf.model.ModelFactory;
 import org.apache.jena.rdf.model.Statement;
 import org.apache.jena.rdf.model.StmtIterator;
 import org.apache.jena.riot.RiotNotFoundException;
@@ -21,6 +14,12 @@ import org.apache.jena.update.UpdateExecutionFactory;
 import org.apache.jena.update.UpdateFactory;
 import org.apache.jena.update.UpdateProcessor;
 import org.apache.jena.update.UpdateRequest;
+import org.eclipse.rdf4j.model.Resource;
+import org.eclipse.rdf4j.model.ValueFactory;
+import org.eclipse.rdf4j.repository.Repository;
+import org.eclipse.rdf4j.repository.RepositoryConnection;
+import org.eclipse.rdf4j.repository.sparql.SPARQLRepository;
+import org.eclipse.rdf4j.rio.RDFFormat;
 import org.hadatac.console.http.SPARQLUtils;
 import org.hadatac.entity.pojo.Study;
 import org.hadatac.utils.CollectionUtil;
@@ -29,6 +28,7 @@ import org.hadatac.utils.NameSpace;
 import org.hadatac.utils.NameSpaces;
 
 import com.typesafe.config.ConfigFactory;
+
 
 public class MetadataContext implements RDFContext {
 
@@ -59,7 +59,7 @@ public class MetadataContext implements RDFContext {
         try {
             String queryString = NameSpaces.getInstance().printSparqlNameSpaceList() + 
                     "SELECT (COUNT(*) as ?tot) WHERE { ?s ?p ?o . }";
-            
+
             ResultSetRewindable resultsrw = SPARQLUtils.select(
                     CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), queryString);
 
@@ -71,7 +71,7 @@ public class MetadataContext implements RDFContext {
         }
     }
 
-    public String clean(int mode) {	
+    public String clean(int mode) {
         String message = "";
         message += Feedback.println(mode,"   Triples before [clean]: " + totalTriples());
         message += Feedback.println(mode, " ");
@@ -87,8 +87,6 @@ public class MetadataContext implements RDFContext {
         } catch (Exception e) {
             e.printStackTrace();
         }
-
-	NameSpaces.getInstance().loadedOntologies.clear();
 
         message += Feedback.println(mode, " ");
         message += Feedback.println(mode, " ");
@@ -360,16 +358,15 @@ public class MetadataContext implements RDFContext {
      *   used to process rdf/xml content.
      *   
      */
-    public Long loadLocalFile(int mode, String filePath, String contentType) {
-        Model model = ModelFactory.createDefaultModel();
-        DatasetAccessor accessor = DatasetAccessorFactory.createHTTP(
-                kbURL + CollectionUtil.getCollectionName(CollectionUtil.Collection.METADATA_GRAPH.get()));
-
-        loadFileMessage = "";
+    public Long loadLocalFile(int mode, String filePath, String contentType, String graphUri) {
         Long total = totalTriples();
-        try {
-            model.read(filePath, getLang(contentType));
-            accessor.add(model);
+        try {            
+            Repository repo = new SPARQLRepository(
+                    kbURL + CollectionUtil.getCollectionName(CollectionUtil.Collection.METADATA_GRAPH.get()));
+            repo.initialize();
+            RepositoryConnection con = repo.getConnection();
+            ValueFactory factory = repo.getValueFactory();
+            con.add(new File(filePath), "", NameSpace.getRioFormat(contentType), (Resource)factory.createIRI(graphUri));
         } catch (NotFoundException e) {
             System.out.println("NotFoundException: file " + filePath);
             System.out.println("NotFoundException: " + e.getMessage());
@@ -411,11 +408,8 @@ public class MetadataContext implements RDFContext {
                     for (int i = filePath.length(); i < 50; i++) {
                         message += Feedback.print(mode, ".");
                     }
-                    loadLocalFile(mode, filePath, entry.getValue().getType());
-                    message += loadFileMessage;
+                    loadLocalFile(mode, filePath, entry.getValue().getType(), entry.getValue().getName());
                     Long newTotal = totalTriples();
-		    Long newAddition = newTotal - total;
-		    NameSpaces.getInstance().loadedOntologies.put(abbrev, Integer.valueOf(newAddition.intValue()));
                     message += Feedback.println(mode, "   Added " + (newTotal - total) + " triples.");
 
                     total = newTotal;

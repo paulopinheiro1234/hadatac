@@ -160,10 +160,6 @@
                 <div id='submit-div' style="display:none;" >
                     <input type="submit" class="btn-sm btn-success" value="Parse and Load">
                 </div>
-                <br>
-                <div>
-                <button type="button" class="btn btn-info add-new"><i class="fa fa-plus"></i> Add New</button>
-                </div>
                </form>
                </div>
            </div>
@@ -176,7 +172,8 @@
               <th style="word-wrap: break-word;" scope="col">Definition (mandatory)</th>
               <th style="width: 150px;" scope="col">Mime Type (only for loaded ontologies)</th>
               <th scope="col" style="word-wrap: break-word;">Loading URL (only for loaded ontologies)</th>
-              <th scope="col">Actions</th>
+              <th style="width: 100px;" scope="col">No. of Triples Loaded</th>
+              <th style="width: 200px;" scope="col">Actions</th>
             </tr>
           </thead>
           <tbody id="ns-table-body">
@@ -187,15 +184,23 @@
                 <td axis="nsName@(i+1)">@ns.getName()</td>
                 <td axis="nsType@(i+1)">@ns.getType()</td>
                 <td axis="nsURL@(i+1)">@ns.getURL()</td>
+                <td axis="nsTripleSize@(i+1)">@ns.getNumberOfLoadedTriples()</td>
                 <td>
 	                <a class="add" title="Add" data-toggle="tooltip"><i class="material-icons">&#xE03B;</i></a>
 	                <a class="edit" title="Edit" data-toggle="tooltip"><i class="material-icons">&#xE254;</i></a>
 	                <a class="delete" title="Delete" data-toggle="tooltip"><i class="material-icons">&#xE872;</i></a>
+	                @if(ns.getNumberOfLoadedTriples() > 0) {
+	                    <a href="@org.hadatac.console.controllers.triplestore.routes.LoadOnt.deleteNamedGraph(ns.getAbbreviation())" class="delete-triples" title="Delete Triples" data-toggle="tooltip" onclick="return confirm('Do you really want to delete triples of the namespace in this row?')" ><i class="material-icons">&#xe92b;</i></a>
+	                }
+	                <a href="@org.hadatac.console.controllers.triplestore.routes.LoadOnt.reloadNamedGraph(ns.getAbbreviation())" class="reload-triples" title="Reload Triples" data-toggle="tooltip" onclick="return confirm('Do you really want to reload triples of the namespace in this row?')" ><i class="material-icons">&#xe5d5;</i></a>
                 </td>
               </tr>
           }
           </tbody>
          </table>
+         <div>
+            <button type="button" class="btn btn-info add-new"><i class="fa fa-plus"></i> Add New</button>
+         </div><br>
          <div id="ns-oper">
            <a class="btn btn-primary" role="button" id="save-changes" onclick="submitTableAsForm()" disabled>Save Changes</a>
            <a href="@org.hadatac.console.controllers.triplestore.routes.LoadOnt.exportNamespaces()" class="btn btn-primary" role="button">Export Namespace</a>
@@ -216,14 +221,16 @@ $(document).ready(function() {
         var index = $("table tbody tr:last-child").index();
         var row = '<tr>' +
             '<td>' + (index + 2) + '</td>' +
-            '<td><input type="text" class="form-control" name="nsAbbrev" id="abbreviation"></td>' +
-            '<td><input type="text" class="form-control" name="nsName" id="definition"></td>' +
-            '<td><input type="text" class="form-control" name="nsType" id="mime_type"></td>' +
-            '<td><input type="text" class="form-control" name="nsURL" id="loading_url"></td>' +
+            '<td axis="nsAbbrev' + (index + 2) + '"><input type="text" class="form-control"</td>' +
+            '<td axis="nsName' + (index + 2) + '"><input type="text" class="form-control"></td>' +
+            '<td axis="nsType' + (index + 2) + '"><input type="text" class="form-control"></td>' +
+            '<td axis="nsURL' + (index + 2) + '"><input type="text" class="form-control"></td>' +
+            '<td></td>' +
             '<td>' + actions + '</td>' +
         '</tr>';
         $("table").append(row);     
-        $("table tbody tr").eq(index + 1).find(".add, .edit").toggle();
+        $("table tbody tr").eq(index + 1).find(".add, .delete").show();
+        $("table tbody tr").eq(index + 1).find(".edit, .delete-triples, .reload-triples").hide();
         $('[data-toggle="tooltip"]').tooltip();
     });
     // Add row on add button click
@@ -236,13 +243,14 @@ $(document).ready(function() {
                 $(this).parent("td").html($(this).val());
             });         
             $(this).parents("tr").find(".add, .edit").toggle();
+            $(this).parents("tr").find(".reload-triples").show();
             $(".add-new").removeAttr("disabled");
             $("#save-changes").removeAttr("disabled");
         }   
     });
     // Edit row on edit button click
     $(document).on("click", ".edit", function(){        
-        $(this).parents("tr").find("td:not(:first-child, :last-child)").each(function(){
+        $(this).parents("tr").find("td:not(:first-child, :nth-child(6), :last-child)").each(function(){
             $(this).html('<input type="text" class="form-control" value="' + $(this).text() + '">');
         });     
         $(this).parents("tr").find(".add, .edit").toggle();
@@ -261,12 +269,12 @@ function submitTableAsForm() {
 	form.method = "post";
 	form.action = "@org.hadatac.console.controllers.triplestore.routes.LoadOnt.saveNamespaces()";
 	$("#ns-table-body").find("tr").each(function() {
-	   $(this).find("td:not(:first-child, :last-child)").each(function() {
-	   var input = document.createElement("input");
-	   input.type = "text";
-	   input.name = this.axis;
-	   input.value = $(this).html();
-	   form.appendChild(input);
+	   $(this).find("td:not(:first-child, :nth-child(6), :last-child)").each(function() {
+		   var input = document.createElement("input");
+		   input.type = "text";
+		   input.name = this.axis;
+		   input.value = $(this).html();
+		   form.appendChild(input);
        });
     });
     document.body.appendChild(form);
