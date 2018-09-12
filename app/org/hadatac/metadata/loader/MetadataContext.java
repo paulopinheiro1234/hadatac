@@ -418,6 +418,8 @@ public class MetadataContext implements RDFContext {
             message += Feedback.println(mode," ");
             message += Feedback.println(mode, "   Triples after [loadOntologies]: " + totalTriples());
         }
+        NameSpaces.reload();
+        
         return message;
     }
 }	
