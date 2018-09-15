@@ -48,7 +48,8 @@ RUN mkdir -p /root/app/csvs/processed_csv /root/app/csvs/unprocessed_csv /root/a
 # Expose the port the play app runs on
 EXPOSE 9000
 
-VOLUME ["/root/app/csvs"]
+# Create the volume mount points
+VOLUME ["/root/app/csvs", "/root/app/conf"]
 
 # Run the app when starting up the Docker container
 ENTRYPOINT ["sbt"]
