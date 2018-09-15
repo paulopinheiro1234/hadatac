@@ -1,3 +1,6 @@
+# You can use this docker compose file to pre-seed the solr and blazegraph instances with data
+#   usage: docker-compose -f docker-compose.yml -f docker-compose.data.yml <command>
+
 version: '3'
 
 services:
@@ -7,14 +10,8 @@ services:
             args:
                 # Change the initial seed data.
                 # NOTE: The file must be in the build context directory i.e. ./solr
+                # In the zip file, there should be a head directory called hadatac_solr with the solr data inside of it
                 - SEED=solr.zip
-        # Override production restart value to default
-        restart: "no"
-        environment:
-            - VERBOSE=yes
-        # Map the solr admin port to the localhost in dev mode
-        ports:
-            - "8983:8983"
 
     blazegraph:
         build:
@@ -22,13 +19,5 @@ services:
             args:
                 # Change the initial seed data.
                 # NOTE: The file must be in the build context directory i.e. ./blazegraph
+                # In the zip file, there should be a file called blazegraph.jnl that contains the database
                 - SEED=blazegraph.zip
-        # Override production restart value to default
-        restart: "no"
-        # Map the 9999 blazegraph port to localhost in dev mode
-        ports:
-            - "9999:9999"
-
-    hadatac:
-        # Override production restart value to default
-        restart: "no"
