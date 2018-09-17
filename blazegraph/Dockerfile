@@ -9,4 +9,8 @@ COPY store_users.properties /tmp/import/store_users.properties
 
 RUN java -cp /usr/bin/blazegraph.jar com.bigdata.rdf.store.DataLoader -quiet -namespace store_users /tmp/import/store_users.properties
 
+COPY store_sandbox.properties /tmp/import/store_sandbox.properties
+
+RUN java -cp /usr/bin/blazegraph.jar com.bigdata.rdf.store.DataLoader -quiet -namespace store_sandbox /tmp/import/store_sandbox.properties
+
 RUN rm -rf /tmp/import

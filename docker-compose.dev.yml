@@ -5,16 +5,9 @@ version: '3'
 # docker-compose -f docker-compose.yml -f docker-compose.dev.yml [command]
 
 services:
-    solr:
-        # Override production restart value to default
-        restart: "no"
-        environment:
-            - VERBOSE=yes
-
-    blazegraph:
-        # Override production restart value to default
-        restart: "no"
-
+    # The primary hadatac web app
     hadatac:
-        # Override production restart value to default
-        restart: "no"
+        volumes:
+            # Mounts the local app directory to the app directory in the Docker container
+            # Any changes made locally automatically show up in the Docker container.
+            - ./app:/root/app/app
