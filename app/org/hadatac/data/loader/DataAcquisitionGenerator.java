@@ -12,7 +12,6 @@ import org.hadatac.entity.pojo.DataAcquisitionSchema;
 import org.hadatac.entity.pojo.Deployment;
 import org.hadatac.entity.pojo.HADatAcThing;
 import org.hadatac.entity.pojo.Measurement;
-import org.hadatac.entity.pojo.ObjectCollection;
 import org.hadatac.entity.pojo.TriggeringEvent;
 import org.hadatac.metadata.loader.URIUtils;
 import org.joda.time.DateTime;
@@ -38,7 +37,7 @@ public class DataAcquisitionGenerator extends BasicGenerator {
 	}
 
 	@Override
-	void initMapping() {}
+	public void initMapping() {}
 
 	private String getDataAcquisitionName(Record rec) {
 		return rec.getValueByColumnName(Templates.DATAACQUISITIONNAME);
@@ -121,7 +120,8 @@ public class DataAcquisitionGenerator extends BasicGenerator {
 		return createDataAcquisition(row, ownerEmail, permissionUri, deploymentUri, isEpiData(rec));
 	}
 
-	ObjectAccessSpec createDataAcquisition(Map<String, Object> row, 
+	ObjectAccessSpec createDataAcquisition(
+	        Map<String, Object> row, 
 			String ownerEmail, 
 			String permissionUri, 
 			String deploymentUri,
@@ -136,14 +136,18 @@ public class DataAcquisitionGenerator extends BasicGenerator {
 		da.setTriggeringEvent(TriggeringEvent.INITIAL_DEPLOYMENT);
 		da.setNumberDataPoints(Measurement.getNumByDataAcquisition(da));
 		
+		setStudyUri(URIUtils.replacePrefixEx((String)row.get("hasco:isDataAcquisitionOf")));
+		
+		/*
 		for (ObjectCollection oc : ObjectCollection.findByStudyUri(da.getStudyUri())) {
 			if ((isEpiData && oc.getTypeUri().equals(URIUtils.replacePrefixEx("hasco:SubjectGroup")))
 					|| (!isEpiData && oc.getTypeUri().equals(URIUtils.replacePrefixEx("hasco:SampleCollection")))) {
-				da.setGlobalScopeUri(oc.getUri());
-				System.out.println("Set GlobalScopeUri to: " + oc.getUri());
+			        da.setRowScopeUri(oc.getUri());
+				System.out.println("Set RowScopeUri to: " + oc.getUri());
 				break;
 			}
 		}
+                */
 		
 		SysUser user = SysUser.findByEmail(ownerEmail);
 		if (null == user) {

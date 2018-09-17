@@ -35,6 +35,7 @@ import org.labkey.remoteapi.CommandException;
 
 import com.typesafe.config.ConfigFactory;
 
+import org.hadatac.console.http.SPARQLUtils;
 import org.hadatac.console.models.Facet;
 import org.hadatac.console.models.FacetHandler;
 import org.hadatac.console.models.Pivot;
@@ -55,6 +56,9 @@ public class ObjectCollection extends HADatAcThing implements Comparable<ObjectC
     public static String LINE_LAST = "}  ";
     private String studyUri = "";
     private String hasScopeUri = "";    
+    private String hasGroundingLabel = "";
+    private String hasSOCReference = "";
+    private String hasRoleLabel = "";
     private List<String> spaceScopeUris = null;
     private List<String> timeScopeUris = null;
     private List<String> objectUris = new ArrayList<String>();
@@ -66,6 +70,8 @@ public class ObjectCollection extends HADatAcThing implements Comparable<ObjectC
         this.comment = "";
         this.studyUri = "";
         this.hasScopeUri = "";
+        this.hasGroundingLabel = "";
+        this.hasSOCReference = "";
         this.spaceScopeUris = new ArrayList<String>();
         this.timeScopeUris = new ArrayList<String>();
     }
@@ -76,6 +82,8 @@ public class ObjectCollection extends HADatAcThing implements Comparable<ObjectC
             String comment,
             String studyUri,
             String hasScopeUri,
+            String hasGroundingLabel,
+            String hasSOCReference,
             List<String> spaceScopeUris,
             List<String> timeScopeUris) {
         this.setUri(uri);
@@ -84,6 +92,8 @@ public class ObjectCollection extends HADatAcThing implements Comparable<ObjectC
         this.setComment(comment);
         this.setStudyUri(studyUri);
         this.setHasScopeUri(hasScopeUri);
+        this.setGroundingLabel(hasGroundingLabel);
+        this.setSOCReference(hasSOCReference);
         this.setSpaceScopeUris(spaceScopeUris);
         this.setTimeScopeUris(timeScopeUris);
     }
@@ -213,7 +223,31 @@ public class ObjectCollection extends HADatAcThing implements Comparable<ObjectC
     public void setHasScopeUri(String hasScopeUri) {
         this.hasScopeUri = hasScopeUri;
     }
+    
+    public void setSOCReference(String hasSOCReference) {
+    	this.hasSOCReference = hasSOCReference;
+    }
+    
+    public String getSOCReference() {
+    	return hasSOCReference;
+    }
+    
+    public void setGroundingLabel(String hasGroundingLabel) {
+    	this.hasGroundingLabel = hasGroundingLabel;
+    }
+    
+    public String getGroundingLabel() {
+    	return hasGroundingLabel;
+    }
 
+    public void setRoleLabel(String roleLabel) {
+    	this.hasRoleLabel = roleLabel;
+    }
+    
+    public String getRoleLabel() {
+    	return hasRoleLabel;
+    }
+    
     public List<String> getSpaceScopeUris() {
         return spaceScopeUris;
     }
@@ -258,6 +292,45 @@ public class ObjectCollection extends HADatAcThing implements Comparable<ObjectC
         this.timeScopeUris = timeScopeUris;
     }
 
+    public boolean isConnected(ObjectCollection oc) {
+	
+	// Check if oc is valid
+	if (oc.getUri() == null || oc.getUri().equals("")) {
+	    return false;
+	}
+
+	// Check if oc is in scope of current object collection
+	if (this.hasScopeUri != null && !this.hasScopeUri.equals("")) {
+	    ObjectCollection domainScope = ObjectCollection.find(this.hasScopeUri);
+	    if (oc.equals(domainScope)) {
+		return true;
+	    }
+	}
+	if (this.getTimeScopes() != null && this.getTimeScopes().size() > 0) {
+	    List<ObjectCollection> timeScopes = this.getTimeScopes();
+	    if (timeScopes.contains(oc)) {
+		return true;
+	    }
+	}
+
+	// Check if current is in scope of oc
+	if (oc.getHasScopeUri() != null && !oc.getHasScopeUri().equals("")) {
+	    ObjectCollection ocDomainScope = ObjectCollection.find(oc.hasScopeUri);
+	    if (this.equals(ocDomainScope)) {
+		return true;
+	    }
+	}
+	if (oc.getTimeScopes() != null && oc.getTimeScopes().size() > 0) {
+	    List<ObjectCollection> ocTimeScopes = oc.getTimeScopes();
+	    if (ocTimeScopes.contains(this)) {
+		return true;
+	    }
+	}
+
+	// otherwise there is no connection
+	return false;
+    }
+
     public boolean inUriList(List<String> selected) {
         String uriAdjusted = uri.replace("<","").replace(">","");
         for (String str : selected) {
@@ -274,12 +347,8 @@ public class ObjectCollection extends HADatAcThing implements Comparable<ObjectC
                 "   ?uri hasco:isMemberOf  <" + this.getUri() + "> . " +
                 " } ";
 
-        Query query = QueryFactory.create(queryString);
-        QueryExecution qexec = QueryExecutionFactory.sparqlService(
-                CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), query);
-        ResultSet results = qexec.execSelect();
-        ResultSetRewindable resultsrw = ResultSetFactory.copyResults(results);
-        qexec.close();
+        ResultSetRewindable resultsrw = SPARQLUtils.select(
+                CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), queryString);
 
         int count = 0;
         while (resultsrw.hasNext()) {
@@ -302,13 +371,9 @@ public class ObjectCollection extends HADatAcThing implements Comparable<ObjectC
                 "SELECT ?spaceScopeUri WHERE { \n" + 
                 " <" + oc_uri + "> hasco:hasSpaceScope ?spaceScopeUri . \n" + 
                 "}";
-        Query query = QueryFactory.create(queryString);
 
-        QueryExecution qexec = QueryExecutionFactory.sparqlService(
-                CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), query);
-        ResultSet results = qexec.execSelect();
-        ResultSetRewindable resultsrw = ResultSetFactory.copyResults(results);
-        qexec.close();
+        ResultSetRewindable resultsrw = SPARQLUtils.select(
+                CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), queryString);
 
         while (resultsrw.hasNext()) {
             QuerySolution soln = resultsrw.next();
@@ -335,13 +400,9 @@ public class ObjectCollection extends HADatAcThing implements Comparable<ObjectC
                 "SELECT  ?timeScopeUri WHERE { " + 
                 " <" + oc_uri + "> hasco:hasTimeScope ?timeScopeUri . " + 
                 "}";
-        Query query = QueryFactory.create(queryString);
 
-        QueryExecution qexec = QueryExecutionFactory.sparqlService(
-                CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), query);
-        ResultSet results = qexec.execSelect();
-        ResultSetRewindable resultsrw = ResultSetFactory.copyResults(results);
-        qexec.close();
+        ResultSetRewindable resultsrw = SPARQLUtils.select(
+                CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), queryString);
 
         while (resultsrw.hasNext()) {
             QuerySolution soln = resultsrw.next();
@@ -365,19 +426,17 @@ public class ObjectCollection extends HADatAcThing implements Comparable<ObjectC
         ObjectCollection oc = null;
 
         String queryString = NameSpaces.getInstance().printSparqlNameSpaceList() + 
-                "SELECT ?ocType ?comment ?studyUri ?hasScopeUri ?spaceScopeUri ?timeScopeUri WHERE { \n" + 
+                "SELECT ?ocType ?comment ?studyUri ?hasScopeUri ?hasSOCReference ?hasGroundingLabel ?spaceScopeUri ?timeScopeUri WHERE { \n" + 
                 "    <" + oc_uri + "> a ?ocType . \n" + 
                 "    <" + oc_uri + "> hasco:isMemberOf ?studyUri . \n" + 
                 "    OPTIONAL { <" + oc_uri + "> rdfs:comment ?comment } . \n" + 
                 "    OPTIONAL { <" + oc_uri + "> hasco:hasScope ?hasScopeUri } . \n" + 
+                "    OPTIONAL { <" + oc_uri + "> hasco:hasSOCReference ?hasSOCReference } . \n" + 
+                "    OPTIONAL { <" + oc_uri + "> hasco:hasGroundingLabel ?hasGroundingLabel } . \n" + 
                 "}";
-        Query query = QueryFactory.create(queryString);
 
-        QueryExecution qexec = QueryExecutionFactory.sparqlService(
-                CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), query);
-        ResultSet results = qexec.execSelect();
-        ResultSetRewindable resultsrw = ResultSetFactory.copyResults(results);
-        qexec.close();
+        ResultSetRewindable resultsrw = SPARQLUtils.select(
+                CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), queryString);
 
         if (!resultsrw.hasNext()) {
             System.out.println("[WARNING] ObjectCollection. Could not find OC with URI: <" + oc_uri + ">");
@@ -389,6 +448,8 @@ public class ObjectCollection extends HADatAcThing implements Comparable<ObjectC
         String studyUriStr = "";
         String commentStr = "";
         String hasScopeUriStr = "";
+        String hasGroundingLabelStr = "";
+        String hasSOCReferenceStr = "";
         List<String> spaceScopeUrisStr = new ArrayList<String>();
         List<String> timeScopeUrisStr = new ArrayList<String>();
 
@@ -429,12 +490,28 @@ public class ObjectCollection extends HADatAcThing implements Comparable<ObjectC
                 } catch (Exception e1) {
                     hasScopeUriStr = "";
                 }
+                
+                try {
+                    if (soln.getLiteral("hasGroundingLabel") != null && soln.getLiteral("hasGroundingLabel").getString() != null) {
+                    	hasGroundingLabelStr = soln.getLiteral("hasGroundingLabel").getString();
+                    }
+                } catch (Exception e1) {
+                	hasGroundingLabelStr = "";
+                }
+
+                try {
+                    if (soln.getLiteral("hasSOCReference") != null && soln.getLiteral("hasSOCReference").getString() != null) {
+                    	hasSOCReferenceStr = soln.getLiteral("hasSOCReference").getString();
+                    }
+                } catch (Exception e1) {
+                	hasSOCReferenceStr = "";
+                }
 
                 spaceScopeUrisStr = retrieveSpaceScope(oc_uri);
 
                 timeScopeUrisStr = retrieveTimeScope(oc_uri);
 
-                oc = new ObjectCollection(oc_uri, typeStr, labelStr, commentStr, studyUriStr, hasScopeUriStr, spaceScopeUrisStr, timeScopeUrisStr);
+                oc = new ObjectCollection(oc_uri, typeStr, labelStr, commentStr, studyUriStr, hasScopeUriStr, hasGroundingLabelStr, hasSOCReferenceStr, spaceScopeUrisStr, timeScopeUrisStr);
             }
         }
 
@@ -444,12 +521,8 @@ public class ObjectCollection extends HADatAcThing implements Comparable<ObjectC
                 "    ?uriMember hasco:isMemberOf <" + oc_uri + "> . \n" + 
                 "}";
 
-        Query queryMember = QueryFactory.create(queryMemberStr);
-        QueryExecution qexecMember = QueryExecutionFactory.sparqlService(
-                CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), queryMember);
-        ResultSet resultsMember = qexecMember.execSelect();
-        ResultSetRewindable resultsrwMember = ResultSetFactory.copyResults(resultsMember);
-        qexecMember.close();
+        ResultSetRewindable resultsrwMember = SPARQLUtils.select(
+                CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), queryMemberStr);
 
         if (resultsrwMember.hasNext()) {
             String uriMemberStr = "";
@@ -479,12 +552,10 @@ public class ObjectCollection extends HADatAcThing implements Comparable<ObjectC
                 "SELECT ?uri WHERE { " + 
                 "   ?ocType rdfs:subClassOf+ hasco:ObjectCollection . " +
                 "   ?uri a ?ocType . } ";
-        Query query = QueryFactory.create(queryString);
-        QueryExecution qexec = QueryExecutionFactory.sparqlService(
-                CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), query);
-        ResultSet results = qexec.execSelect();
-        ResultSetRewindable resultsrw = ResultSetFactory.copyResults(results);
-        qexec.close();
+
+        ResultSetRewindable resultsrw = SPARQLUtils.select(
+                CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), queryString);
+
         while (resultsrw.hasNext()) {
             QuerySolution soln = resultsrw.next();
             if (soln != null && soln.getResource("uri").getURI() != null) { 
@@ -492,6 +563,7 @@ public class ObjectCollection extends HADatAcThing implements Comparable<ObjectC
                 oc_list.add(sc);
             }
         }
+
         return oc_list;
     }
 
@@ -517,12 +589,10 @@ public class ObjectCollection extends HADatAcThing implements Comparable<ObjectC
                 "   ?uri a ?ocType . \n" +
                 "   ?uri hasco:isMemberOf <" + studyUri + "> . \n" +
                 " } ";
-        Query query = QueryFactory.create(queryString);
-        QueryExecution qexec = QueryExecutionFactory.sparqlService(
-                CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), query);
-        ResultSet results = qexec.execSelect();
-        ResultSetRewindable resultsrw = ResultSetFactory.copyResults(results);
-        qexec.close();
+
+        ResultSetRewindable resultsrw = SPARQLUtils.select(
+                CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), queryString);
+
         while (resultsrw.hasNext()) {
             QuerySolution soln = resultsrw.next();
             if (soln != null && soln.getResource("uri").getURI() != null) { 
@@ -531,6 +601,23 @@ public class ObjectCollection extends HADatAcThing implements Comparable<ObjectC
             }
         }
         return ocList;
+    }
+
+    public static Map<String, String> labelsByStudyUri(String studyUri) {
+        if (studyUri == null) {
+            return null;
+        }
+        Map<String, String> labelsMap = new HashMap<String, String>();
+        List<ObjectCollection> ocList = findByStudyUri(studyUri);
+
+	for (ObjectCollection oc : ocList) {
+	    if (oc.getGroundingLabel() != null && !oc.getGroundingLabel().equals("")) {
+		labelsMap.put(oc.getSOCReference(), oc.getGroundingLabel());
+	    } else {
+	    }
+	}
+
+        return labelsMap;
     }
 
     public static String findByStudyUriJSON(String studyUri) {
@@ -544,10 +631,11 @@ public class ObjectCollection extends HADatAcThing implements Comparable<ObjectC
                 "   ?uri hasco:isMemberOf <" + studyUri + "> . \n" +
                 "   OPTIONAL { ?uri rdfs:label ?label } . \n" +
                 " } ";
+
         Query query = QueryFactory.create(queryString);
 
         QueryExecution qexec = QueryExecutionFactory.sparqlService(
-                CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), query);
+                CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), query);
         ResultSet results = qexec.execSelect();
 
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
@@ -580,8 +668,7 @@ public class ObjectCollection extends HADatAcThing implements Comparable<ObjectC
 
         try {
             SolrClient solr = new HttpSolrClient.Builder(
-                    ConfigFactory.load().getString("hadatac.solr.data") 
-                    + CollectionUtil.DATA_ACQUISITION).build();
+                    CollectionUtil.getCollectionPath(CollectionUtil.Collection.DATA_ACQUISITION)).build();
             QueryResponse queryResponse = solr.query(query, SolrRequest.METHOD.POST);
             solr.close();
             Pivot pivot = Pivot.parseQueryResponse(queryResponse);
@@ -602,7 +689,13 @@ public class ObjectCollection extends HADatAcThing implements Comparable<ObjectC
 
             ObjectCollection oc = new ObjectCollection();
             oc.setUri(child.getValue());
-            oc.setLabel(WordUtils.capitalize(Entity.find(child.getValue()).getLabel()));
+            Entity entity = Entity.find(child.getValue());
+            System.out.println("child.getValue(): " + child.getValue());
+            if (entity == null || entity.getLabel().isEmpty()) {
+                oc.setLabel(WordUtils.capitalize(URIUtils.getBaseName(child.getValue())));
+            } else {
+                oc.setLabel(WordUtils.capitalize(entity.getLabel())); 
+            }
             oc.setCount(child.getCount());
             oc.setField("object_collection_type_str");
 
@@ -639,7 +732,7 @@ public class ObjectCollection extends HADatAcThing implements Comparable<ObjectC
         insert += LINE_LAST;
         UpdateRequest request = UpdateFactory.create(insert);
         UpdateProcessor processor = UpdateExecutionFactory.createRemote(
-                request, CollectionUtil.getCollectionsName(CollectionUtil.METADATA_UPDATE));
+                request, CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_UPDATE));
         processor.execute();
     }
 
@@ -673,6 +766,8 @@ public class ObjectCollection extends HADatAcThing implements Comparable<ObjectC
                 insert += oc_uri + " hasco:hasScope  " + this.getHasScopeUri() + " . ";
             }
         }
+        insert += oc_uri + " hasco:hasGroundingLabel  \"" + this.getGroundingLabel() + "\" . ";
+        insert += oc_uri + " hasco:hasSOCReference  \"" + this.getSOCReference() + "\" . ";
         if (this.getSpaceScopeUris() != null && this.getSpaceScopeUris().size() > 0) {
             for (String spaceScope : this.getSpaceScopeUris()) {
                 if (spaceScope.length() > 0){
@@ -701,7 +796,7 @@ public class ObjectCollection extends HADatAcThing implements Comparable<ObjectC
         try {
             UpdateRequest request = UpdateFactory.create(insert);
             UpdateProcessor processor = UpdateExecutionFactory.createRemote(
-                    request, CollectionUtil.getCollectionsName(CollectionUtil.METADATA_UPDATE));
+                    request, CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_UPDATE));
             processor.execute();
         } catch (QueryParseException e) {
             System.out.println("QueryParseException due to update query: " + insert);
@@ -711,6 +806,28 @@ public class ObjectCollection extends HADatAcThing implements Comparable<ObjectC
         saveObjectUris(oc_uri);
 
         return true;
+    }
+
+    public void saveRoleLabel(String label) {
+        if (uri == null || uri.equals("")) {
+            return;
+        }
+
+        String insert = "";
+
+        insert += NameSpaces.getInstance().printSparqlNameSpaceList();
+        insert += INSERT_LINE1;
+	if (uri.startsWith("http")) {
+	    insert += "  <" + uri + "> hasco:hasRoleLabel \"" + label + "\" . ";
+
+	} else {
+	    insert += "  " + uri + " hasco:hasRoleLabel \"" + label + "\" . ";
+	}
+        insert += LINE_LAST;
+        UpdateRequest request = UpdateFactory.create(insert);
+        UpdateProcessor processor = UpdateExecutionFactory.createRemote(
+                request, CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_UPDATE));
+        processor.execute();
     }
 
     @Override
@@ -773,7 +890,7 @@ public class ObjectCollection extends HADatAcThing implements Comparable<ObjectC
 
         UpdateRequest request = UpdateFactory.create(query);
         UpdateProcessor processor = UpdateExecutionFactory.createRemote(
-                request, CollectionUtil.getCollectionsName(CollectionUtil.METADATA_UPDATE));
+                request, CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_UPDATE));
         processor.execute();
     }
 
@@ -786,4 +903,65 @@ public class ObjectCollection extends HADatAcThing implements Comparable<ObjectC
     public int deleteFromSolr() {
         return 0;
     }
+
+    public static String computeRouteLabel (ObjectCollection oc, List<ObjectCollection> studyOCs) {
+	if (oc.getGroundingLabel() != null && !oc.getGroundingLabel().equals("")) {
+	    return oc.getGroundingLabel();
+	} else {
+	    List<ObjectCollection> ocList = new ArrayList<ObjectCollection>();
+	    List<ObjectCollection> allList = new ArrayList<ObjectCollection>();
+	    List<ObjectCollection> inspectedList = new ArrayList<ObjectCollection>();
+	    ocList.add(oc);
+	    for (ObjectCollection receivedOC : studyOCs) {
+		if (!receivedOC.equals(oc)) {
+		    allList.add(receivedOC);
+		    inspectedList.add(receivedOC);
+		}
+	    } 
+	    return traverseRouteLabel(ocList, allList, inspectedList);
+	}
+    }
+
+    private static String traverseRouteLabel(List<ObjectCollection> path, List<ObjectCollection> inspectedList, List<ObjectCollection> allList) {
+	//System.out.println("Path " + path);
+	//System.out.println("StudyOCs " + inspectedList);
+	for (ObjectCollection oc : inspectedList) {
+	    //System.out.println("    - oc " + oc.getUri());
+	    //System.out.println("    - current.domain " + path.get(path.size() - 1).getHasScopeUri());
+	    //System.out.println("    - current.time " + path.get(path.size() - 1).getTimeScopes());
+	    //System.out.println("    - oc.domain " + oc.getHasScopeUri());
+	    //System.out.println("    - oc.time " + oc.getTimeScopes());
+	    if (path.get(path.size() - 1).isConnected(oc)) {
+                System.out.println(oc.getUri() + " is connected to " + path.get(path.size() - 1).getUri());
+		if (oc.getGroundingLabel() != null && !oc.getGroundingLabel().equals("")) {
+		    String finalLabel = oc.getGroundingLabel();
+		    for (int i = path.size() - 1; i >= 0; i--) {
+			finalLabel = finalLabel + " " + path.get(i).getLabel();
+		    }
+		    //System.out.println(" final label ==> <" + finalLabel + ">");
+		    return finalLabel;
+		} else {
+		    path.add(oc);
+		    List<ObjectCollection> newList = new ArrayList<ObjectCollection>();
+		    for (ObjectCollection ocFromAllList : allList) {
+			if (!path.contains(ocFromAllList)) {
+			    newList.add(ocFromAllList);
+			}
+		    }
+		    return traverseRouteLabel(path, newList, allList);
+		}
+	    } else {
+		//System.out.println("next iteration of traverseRouteLabel");
+		inspectedList.remove(oc);
+		return traverseRouteLabel(path, inspectedList, allList);
+	    }
+	}
+	System.out.println("Could not find path for " + path.get(0).getSOCReference());
+	return null;
+    }
+    
+    public String toString() {
+	return this.getUri();
+    } 
+
 }

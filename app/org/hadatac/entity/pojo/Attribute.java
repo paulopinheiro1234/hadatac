@@ -18,6 +18,7 @@ import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Statement;
 import org.apache.jena.rdf.model.StmtIterator;
+import org.hadatac.console.http.SPARQLUtils;
 import org.hadatac.metadata.loader.URIUtils;
 import org.hadatac.utils.CollectionUtil;
 import org.hadatac.utils.NameSpaces;
@@ -40,12 +41,8 @@ public class Attribute extends HADatAcClass implements Comparable<Attribute> {
 				"} ";
 
 		//System.out.println("Query: " + queryString);
-		Query query = QueryFactory.create(queryString);
-
-		QueryExecution qexec = QueryExecutionFactory.sparqlService(CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), query);
-		ResultSet results = qexec.execSelect();
-		ResultSetRewindable resultsrw = ResultSetFactory.copyResults(results);
-		qexec.close();
+		ResultSetRewindable resultsrw = SPARQLUtils.select(
+                CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), queryString);
 
 		while (resultsrw.hasNext()) {
 			QuerySolution soln = resultsrw.next();
@@ -57,6 +54,36 @@ public class Attribute extends HADatAcClass implements Comparable<Attribute> {
 		return attributes;
 	}
 
+	public static String findHarmonizedCode(String dasa_uri) {
+		String queryString = NameSpaces.getInstance().printSparqlNameSpaceList()
+				+ " SELECT ?code WHERE {"
+				+ " <" + dasa_uri + "> skos:notation ?code . "
+				+ " }";
+
+		Query query = QueryFactory.create(queryString);
+		QueryExecution qexec = QueryExecutionFactory.sparqlService(
+				CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), query);
+		ResultSet results = qexec.execSelect();
+		ResultSetRewindable resultsrw = ResultSetFactory.copyResults(results);
+		qexec.close();
+
+		if (resultsrw.size() > 0) {
+			QuerySolution soln = resultsrw.next();
+			try {
+				if (null != soln.getResource("code")) {
+					String answer = soln.getResource("code").toString();
+					if (answer.length() != 0) {
+						return answer;
+					}
+				}
+			} catch (Exception e1) {
+				return null;
+			}
+		}
+
+		return null;
+	}
+	
 	public static String findCodeValue(String dasa_uri, String code) {
 		String queryString = NameSpaces.getInstance().printSparqlNameSpaceList()
 				+ " SELECT ?codeClass ?codeResource WHERE {"
@@ -64,15 +91,11 @@ public class Attribute extends HADatAcClass implements Comparable<Attribute> {
 				+ " ?possibleValue hasco:isPossibleValueOf <" + dasa_uri + "> . "
 				+ " ?possibleValue hasco:hasCode ?code . "
 				+ " ?possibleValue hasco:hasClass ?codeClass . "
-				+ " FILTER (lcase(str(?code)) = \"" + code.toLowerCase() + "\") "
+				+ " FILTER (lcase(str(?code)) = \"" + code + "\") "
 				+ " }";
 
-		Query query = QueryFactory.create(queryString);
-		QueryExecution qexec = QueryExecutionFactory.sparqlService(
-				CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), query);
-		ResultSet results = qexec.execSelect();
-		ResultSetRewindable resultsrw = ResultSetFactory.copyResults(results);
-		qexec.close();
+		ResultSetRewindable resultsrw = SPARQLUtils.select(
+                CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), queryString);
 
 		if (resultsrw.size() > 0) {
 			QuerySolution soln = resultsrw.next();
@@ -108,8 +131,7 @@ public class Attribute extends HADatAcClass implements Comparable<Attribute> {
 		String queryString = "DESCRIBE <" + uri + ">";
 		Query query = QueryFactory.create(queryString);
 		QueryExecution qexec = QueryExecutionFactory.sparqlService(
-				ConfigFactory.load().getString("hadatac.solr.triplestore") 
-				+ CollectionUtil.METADATA_SPARQL, query);
+		        CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), query);
 		model = qexec.execDescribe();
 
 		attribute = new Attribute();

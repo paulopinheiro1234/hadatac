@@ -35,7 +35,7 @@
            } else {
                 <li><b>Existing Entity:</b> @dasa.getEntityNamespace()</li>
            }
-           @if(changedInfo.contains(dasa.getAttribute())) {
+           @if(changedInfo.contains(dasa.getAttribute().get(0))) {
                 <li><b>New Attribute:</b> <b><font color="blue">@dasa.getAttributeNamespace()</font></b></li>
            } else {
            	<li><b>Existing Attribute:</b> @dasa.getAttributeNamespace()</li>

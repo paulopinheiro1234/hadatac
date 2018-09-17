@@ -74,8 +74,7 @@ public class Parser {
         int batch_size = 10000;
 
         SolrClient solr = new HttpSolrClient.Builder(
-                ConfigFactory.load().getString("hadatac.solr.data") 
-                + CollectionUtil.DATA_ACQUISITION).build();
+                CollectionUtil.getCollectionPath(CollectionUtil.Collection.DATA_ACQUISITION)).build();
 
         // ASSIGN values for tempPositionInt
         List<String> unknownHeaders = schema.defineTemporaryPositions(file.getHeaders());
@@ -93,6 +92,7 @@ public class Parser {
         int posEntity = -1;
         int posUnit = -1;
         int posInRelation = -1;
+        int posLOD = -1;
         if (!schema.getTimestampLabel().equals("")) {
             posTimestamp = schema.tempPositionOfLabel(schema.getTimestampLabel());
             System.out.println("posTimestamp: " + posTimestamp);
@@ -125,12 +125,18 @@ public class Parser {
             posInRelation = schema.tempPositionOfLabel(schema.getInRelationToLabel());
             System.out.println("posInRelation: " + posInRelation);
         }
+        if (!schema.getLODLabel().equals("")) {
+            posLOD = schema.tempPositionOfLabel(schema.getLODLabel());
+            System.out.println("posLOD: " + posLOD);
+        }
 
         // Store necessary information before hand to avoid frequent SPARQL queries
         Map<String, String> objRoleMappings = EntityRole.findObjRoleMappings(da.getStudyUri());
         Map<String, Map<String, String>> possibleValues = DataAcquisitionSchema.findPossibleValues(da.getSchemaUri());
         Map<String, List<String>> mapIDStudyObjects = DataAcquisitionSchema.findIdUriMappings(da.getStudyUri());
         String dasoUnitUri = DataAcquisitionSchema.findByLabel(da.getSchemaUri(), schema.getUnitLabel());
+
+        //System.out.println("[Parser] mapIDStudyObjects = " + mapIDStudyObjects);
 
         //System.out.println("possibleValues: " + possibleValues);
 
@@ -191,6 +197,9 @@ public class Parser {
                 if (dasa.getLabel().equals(schema.getInRelationToLabel())) {
                     continue;
                 }
+                if (dasa.getLabel().equals(schema.getLODLabel())) {
+                    continue;
+                }
 
                 Measurement measurement = new Measurement();
                 /*===================*
@@ -216,6 +225,16 @@ public class Parser {
                     } else {
                         measurement.setValue(originalValue);
                     }
+                }
+                
+                /*========================*
+                 *                        *
+                 * SET LEVEL OF DETECTION *
+                 *                        *
+                 *========================*/
+                measurement.setLevelOfDetection("");
+                if (!schema.getLODLabel().equals("") && posLOD >= 0) {
+                    measurement.setLevelOfDetection(record.getValueByColumnIndex(posLOD));
                 }
 
                 /*============================*
@@ -251,6 +270,7 @@ public class Parser {
                 } else if (!schema.getNamedTimeLabel().equals("")) {
                     // full-row named time
                     String timeValue = record.getValueByColumnIndex(posNamedTime);
+                    System.out.println("[Parser] timeValue: " + timeValue);
                     if (timeValue != null) {
                         measurement.setAbstractTime(timeValue);
                     } else {
@@ -259,9 +279,12 @@ public class Parser {
                 } else if (dasa.getEventUri() != null && !dasa.getEventUri().equals("")) {
                     DataAcquisitionSchemaEvent dase = null;
                     String daseUri = dasa.getEventUri();
+                    //System.out.println("[Parser] Using a DASE....");
                     if (mapSchemaEvents.containsKey(daseUri)) {
+                        //System.out.println("[Parser] DASE in mapSchemaEvents");
                         dase = mapSchemaEvents.get(daseUri);
                     } else {
+                        //System.out.println("[Parser] DASE in schema, adding to mapSchemaEvents");
                         dase = schema.getEvent(daseUri);
                         if (dase != null) {
                             mapSchemaEvents.put(daseUri, dase);
@@ -270,9 +293,22 @@ public class Parser {
                     if (dase != null) {
                         if (!dase.getEntity().equals("")) {
                             measurement.setAbstractTime(dase.getEntity());
+                            System.out.println("[Parser] abstract time set to getEntity");
                         } else {
                             measurement.setAbstractTime(dase.getUri());
+                            System.out.println("[Parser] abstract time set to getUri");
                         }
+                        String columnName = dase.getLabel();
+                        String sTimeValue = record.getValueByColumnName(columnName);
+                        if (sTimeValue != null && sTimeValue.length() > 0) {
+                            measurement.setTimeValue(sTimeValue);
+                            System.out.println("[Parser] Extracted time value "+sTimeValue+ " from column "+columnName);
+                            String unitURI = dase.getUnit();
+                            if (unitURI != null && unitURI.length() > 0) {
+                                measurement.setTimeValueUnitUri(unitURI);
+                            }
+                        }
+                        System.out.println("[Parser] Did the time value work?"); 
                     }
                 }
 
@@ -302,21 +338,32 @@ public class Parser {
                 }
 
                 if (!id.equals("")) {
-                    if (dasa.getEntity().equals(URIUtils.replacePrefixEx("sio:Sample"))) {
-                        if (mapIDStudyObjects.containsKey(id)) {
-                            measurement.setStudyObjectUri(mapIDStudyObjects.get(id).get(0));
-                            measurement.setObjectUri(mapIDStudyObjects.get(id).get(2));
-                            measurement.setPID(mapIDStudyObjects.get(id).get(1));
-                        }
-                        measurement.setObjectCollectionType(URIUtils.replacePrefixEx("hasco:SampleCollection"));
-                        measurement.setSID(id);
-                    } else if (dasa.getEntity().equals(URIUtils.replacePrefixEx("sio:Human"))) {
+                    if (dasa.getEntity().equals(URIUtils.replacePrefixEx("sio:Human"))) {
                         if (mapIDStudyObjects.containsKey(id)) {
                             measurement.setStudyObjectUri(mapIDStudyObjects.get(id).get(0));
                             measurement.setObjectUri(mapIDStudyObjects.get(id).get(0));
                         }
                         measurement.setObjectCollectionType(URIUtils.replacePrefixEx("hasco:SubjectGroup"));
                         measurement.setPID(id);
+                    } else if (dasa.getEntity().equals(URIUtils.replacePrefixEx("sio:Sample"))) {
+                        if (mapIDStudyObjects.containsKey(id)) {
+                            measurement.setStudyObjectUri(mapIDStudyObjects.get(id).get(0));
+                            measurement.setObjectUri(mapIDStudyObjects.get(id).get(2));
+                            measurement.setPID(mapIDStudyObjects.get(id).get(1));
+                            //System.out.println("[Parser] mapIDStudyObjects contains an ID for a Sample");
+                        }
+                        measurement.setObjectCollectionType(URIUtils.replacePrefixEx("hasco:SampleCollection"));
+                        measurement.setSID(id);
+                    } else {
+                // Added this capability for other entities that may be represented in 
+                //   the data which are neither humans nor samples
+                        //System.out.println("[Parser] DASA.getEntity: " + dasa.getEntity());
+                        if (mapIDStudyObjects.containsKey(id)) {
+                            measurement.setStudyObjectUri(mapIDStudyObjects.get(id).get(0));
+                            measurement.setObjectUri(mapIDStudyObjects.get(id).get(0));
+                            //System.out.println("[Parser] mapIDStudyObjects contains an ID for a something else");
+                        }
+                        measurement.setSID(id);
                     }
                 }
                 
@@ -395,7 +442,7 @@ public class Parser {
                 } else {
                     measurement.setEntityUri(dasa.getObjectUri());
                 }
-                measurement.setCharacteristicUri(dasa.getAttribute());
+                measurement.setCharacteristicUris(dasa.getAttribute());
 
                 /*======================================*
                  *                                      *
@@ -406,6 +453,7 @@ public class Parser {
 
                 DataAcquisitionSchemaObject inRelationToDaso = null;
                 String inRelationToUri = dasa.getInRelationToUri(URIUtils.replacePrefixEx("sio:inRelationTo"));
+                //System.out.println("[Parser] dasa.getInRelationToUri = " + dasa.getInRelationToUri(URIUtils.replacePrefixEx("sio:inRelationTo")));
                 if (mapSchemaObjects.containsKey(inRelationToUri)) {
                     inRelationToDaso = mapSchemaObjects.get(inRelationToUri);
                 } else {

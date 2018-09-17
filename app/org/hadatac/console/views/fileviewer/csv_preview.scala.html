@@ -3,7 +3,8 @@
   da_uri      : String,
   oc_uri      : String,
   headers     : List[String],
-  preview     : ArrayList[ArrayList[String]]
+  preview     : ArrayList[ArrayList[String]], 
+  page        : Integer
 )
 
 @import helper._
@@ -60,7 +61,7 @@
 
 	    <input type="submit" id="colSelector" name="colSelector" class="btn btn-primary" disabled="disabled"
  		   role="button" value="Generate Objects" formmethod="post"
-		   formaction="@org.hadatac.console.controllers.objects.routes.NewObjectsFromFile.processForm(fileName, da_uri, oc_uri)">
+		   formaction="@org.hadatac.console.controllers.objects.routes.NewObjectsFromFile.processForm(fileName, da_uri, oc_uri, page)">
             </input>
 	    <a href=""  id="reset" name="reset" class="btn btn-primary"
  	       role="button">Reset</a>

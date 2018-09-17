@@ -113,8 +113,7 @@ public class TokenAction {
 	
 	public static TokenAction findByTokenSolr(final String token, final Type type) {
 		SolrClient solrClient = new HttpSolrClient.Builder(
-				ConfigFactory.load().getString("hadatac.solr.users")
-				+ CollectionUtil.AUTHENTICATE_TOKENS).build();
+		        CollectionUtil.getCollectionPath(CollectionUtil.Collection.AUTHENTICATE_TOKENS)).build();
     	SolrQuery solrQuery = new SolrQuery("token_str:" + token + " AND type_str:" + type.name());
     	TokenAction tokenAction = null;
 		
@@ -148,8 +147,7 @@ public class TokenAction {
 	
 	public static void deleteByUserSolr(final SysUser u, final Type type) {
 		SolrClient solrClient = new HttpSolrClient.Builder(
-				ConfigFactory.load().getString("hadatac.solr.users") 
-				+ CollectionUtil.AUTHENTICATE_TOKENS).build();
+		        CollectionUtil.getCollectionPath(CollectionUtil.Collection.AUTHENTICATE_TOKENS)).build();
 		try {
 			solrClient.deleteByQuery("target_user_id_str:" + u.getId() + " AND type_str:" + type.name());
 			solrClient.commit();
@@ -182,8 +180,7 @@ public class TokenAction {
 	
 	public void save() {
 		SolrClient solrClient = new HttpSolrClient.Builder(
-				ConfigFactory.load().getString("hadatac.solr.users") 
-				+ CollectionUtil.AUTHENTICATE_TOKENS).build();
+		        CollectionUtil.getCollectionPath(CollectionUtil.Collection.AUTHENTICATE_TOKENS)).build();
         
         try {
         	solrClient.addBean(this);
@@ -196,8 +193,7 @@ public class TokenAction {
 	
 	public static String outputAsJson() {
 		SolrClient solrClient = new HttpSolrClient.Builder(
-				ConfigFactory.load().getString("hadatac.solr.users")
-				+ CollectionUtil.AUTHENTICATE_TOKENS).build();
+		        CollectionUtil.getCollectionPath(CollectionUtil.Collection.AUTHENTICATE_TOKENS)).build();
 		String query = "*:*";
     	SolrQuery solrQuery = new SolrQuery(query);
     	

@@ -16,63 +16,63 @@ import be.objectify.deadbolt.java.actions.Restrict;
 
 public class Clean extends Controller {
 
-	@Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
+    @Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
     public Result clean(String oper) {
-		return ok(clean.render(oper));
+        return ok(clean.render(oper));
     }
 
-	@Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
+    @Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
     public Result postClean(String oper) {
-		return ok(clean.render(oper));
+        return ok(clean.render(oper));
     }
 
     public static String playClean(String oper) {
-    	String result = "";
-    	if (oper.equals("metadata")) {
-    		MetadataContext metadata = new 
-	    		 MetadataContext("user", 
-	    		                 "password",
-	    		                 ConfigFactory.load().getString("hadatac.solr.triplestore"), 
-	    		                 false);
-    		result = metadata.clean(Feedback.WEB);
-    	} else if (oper.equals("usergraph")) {
-    		PermissionsContext permission = new 
-	    		 PermissionsContext("user", 
-	    		                 	"password",
-	    		                 	ConfigFactory.load().getString("hadatac.solr.permissions"), 
-	    		                 	false);
-    		result = permission.clean(Feedback.WEB);
-    		
-    		DataContext userCollection = new 
-    				DataContext("user", 
-   	    		             	"password",
-   	    		             	ConfigFactory.load().getString("hadatac.solr.users"), 
-   	    		             	false);
-       		result = userCollection.cleanDataUsers(Feedback.WEB);
-       		
-       		DataContext linkedCollection = new 
-       				DataContext("user", 
-      	    		            "password",
-      	    		            ConfigFactory.load().getString("hadatac.solr.data"), 
-      	    		            false);
-          	result = linkedCollection.cleanDataAccounts(Feedback.WEB);
-    	} else if (oper.equals("collections")) {
-    		DataContext collection = new 
-	    		 DataContext("user", 
-	    		             "password",
-	    		             ConfigFactory.load().getString("hadatac.solr.data"), 
-	    		             false);
-    		result = collection.cleanDataAcquisitions(Feedback.WEB);
-    	} else if (oper.equals("acquisitions")) {
-    		DataContext acquisition = new 
-	    		 DataContext("user", 
-	    		             "password",
-	    		             ConfigFactory.load().getString("hadatac.solr.data"), 
-	    		             false);
-    		result = acquisition.cleanAcquisitionData(Feedback.WEB);
-    	} 
-	    
-    	return result;
-   }
+        String result = "";
+        if (oper.equals("metadata")) {
+            MetadataContext metadata = new 
+                    MetadataContext("user", 
+                            "password",
+                            ConfigFactory.load().getString("hadatac.solr.triplestore"), 
+                            false);
+            result = metadata.clean(Feedback.WEB);
+        } else if (oper.equals("usergraph")) {
+            PermissionsContext permission = new 
+                    PermissionsContext("user", 
+                            "password",
+                            ConfigFactory.load().getString("hadatac.solr.permissions"), 
+                            false);
+            result = permission.clean(Feedback.WEB);
+
+            DataContext userCollection = new 
+                    DataContext("user", 
+                            "password",
+                            ConfigFactory.load().getString("hadatac.solr.users"), 
+                            false);
+            result = userCollection.cleanDataUsers(Feedback.WEB);
+
+            DataContext linkedCollection = new 
+                    DataContext("user", 
+                            "password",
+                            ConfigFactory.load().getString("hadatac.solr.data"), 
+                            false);
+            result = linkedCollection.cleanDataAccounts(Feedback.WEB);
+        } else if (oper.equals("collections")) {
+            DataContext collection = new 
+                    DataContext("user", 
+                            "password",
+                            ConfigFactory.load().getString("hadatac.solr.data"), 
+                            false);
+            result = collection.cleanDataAcquisitions(Feedback.WEB);
+        } else if (oper.equals("acquisitions")) {
+            DataContext acquisition = new 
+                    DataContext("user", 
+                            "password",
+                            ConfigFactory.load().getString("hadatac.solr.data"), 
+                            false);
+            result = acquisition.cleanAcquisitionData(Feedback.WEB);
+        } 
+
+        return result;
+    }
 
 }

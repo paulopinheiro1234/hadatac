@@ -2,7 +2,8 @@
   filename  : String,
   da_uri    : String,
   study_uri : String, 
-  oc_uri    : String)
+  oc_uri    : String,
+  page      : Integer)
 
 @import org.hadatac.console.views.html._
 @import org.hadatac.utils._
@@ -20,7 +21,7 @@
               <li><b>Collection:</b> @URIUtils.replaceNameSpaceEx(oc_uri)</li>
            </ul>
 
-        <a href="@org.hadatac.console.controllers.objects.routes.ObjectManagement.indexNomsg(filename, da_uri, study_uri, oc_uri)" 
+        <a href="@org.hadatac.console.controllers.objects.routes.ObjectManagement.indexNomsg(filename, da_uri, study_uri, oc_uri, page)" 
            class="btn btn-primary" role="button">Back to Object Management</a>
     </div>
 }

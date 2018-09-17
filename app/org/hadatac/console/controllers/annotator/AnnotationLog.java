@@ -57,8 +57,7 @@ public class AnnotationLog {
 	public int save() {
 		try {
 			SolrClient client = new HttpSolrClient.Builder(
-					ConfigFactory.load().getString("hadatac.solr.data")
-					+ CollectionUtil.ANNOTATION_LOG).build();
+					CollectionUtil.getCollectionPath(CollectionUtil.Collection.ANNOTATION_LOG)).build();
 			int status = client.addBean(this).getStatus();
 			client.commit();
 			client.close();
@@ -69,6 +68,10 @@ public class AnnotationLog {
 		}
 	}
 	
+	public int delete() {
+	    return AnnotationLog.delete(getFileName());
+    }
+	
 	public static void printException(Exception exception, String fileName) {
 		AnnotationLog log = AnnotationLog.create(fileName);
         log.addline(Feedback.println(Feedback.WEB, "[ERROR] " + exception.getMessage()));
@@ -77,6 +80,11 @@ public class AnnotationLog {
 	public static void printException(String message, String fileName) {
         AnnotationLog log = AnnotationLog.create(fileName);
         log.addline(Feedback.println(Feedback.WEB, "[ERROR] " + message));
+    }
+	
+	public static void println(String message, String fileName) {
+        AnnotationLog log = AnnotationLog.create(fileName);
+        log.addline(Feedback.println(Feedback.WEB, "[LOG] " + message));
     }
 	
 	public static AnnotationLog convertFromSolr(SolrDocument doc) {
@@ -93,8 +101,7 @@ public class AnnotationLog {
 	
 	public static AnnotationLog find(String fileName) {
 		SolrClient solr = new HttpSolrClient.Builder(
-				ConfigFactory.load().getString("hadatac.solr.data")
-				+ CollectionUtil.ANNOTATION_LOG).build();
+		        CollectionUtil.getCollectionPath(CollectionUtil.Collection.ANNOTATION_LOG)).build();
 		SolrQuery query = new SolrQuery();
 		query.set("q", "file_name:\"" + fileName + "\"");
 		query.set("rows", "10000000");
@@ -127,8 +134,7 @@ public class AnnotationLog {
 	
 	public static int delete(String file_name) {
 		SolrClient solr = new HttpSolrClient.Builder(
-				ConfigFactory.load().getString("hadatac.solr.data")
-				+ CollectionUtil.ANNOTATION_LOG).build();
+		        CollectionUtil.getCollectionPath(CollectionUtil.Collection.ANNOTATION_LOG)).build();
 		try {	
 			UpdateResponse response = solr.deleteByQuery("file_name:\"" + file_name + "\"");
 			solr.commit();

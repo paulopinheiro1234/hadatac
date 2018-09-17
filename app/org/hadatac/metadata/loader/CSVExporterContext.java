@@ -108,8 +108,8 @@ public class CSVExporterContext{
 		ResultSetFormatter.outputAsCSV(outStream, final_results);
 	}
 	
-	public ResultSetRewindable getSelectQueryResult(String query){
-		String service = kbURL + CollectionUtil.METADATA_SPARQL;
+	public ResultSetRewindable getSelectQueryResult(String query) {
+		String service = kbURL + CollectionUtil.getCollectionName(CollectionUtil.Collection.METADATA_SPARQL.get());
 		QueryExecution qe = QueryExecutionFactory.sparqlService(service, query);
 		ResultSet results = qe.execSelect();
 		ResultSetRewindable resultsrw = ResultSetFactory.copyResults(results);
@@ -117,8 +117,8 @@ public class CSVExporterContext{
 		return resultsrw;
 	}
 	
-	public void getDescribeQueryResult(String query, Set<String> properties){
-		String service = kbURL + CollectionUtil.METADATA_SPARQL;
+	public void getDescribeQueryResult(String query, Set<String> properties) {
+		String service = kbURL + CollectionUtil.getCollectionName(CollectionUtil.Collection.METADATA_SPARQL.get());
 		QueryExecution qe = QueryExecutionFactory.sparqlService(service, query);
 		
 		Model model = qe.execDescribe();

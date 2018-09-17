@@ -2,20 +2,16 @@ package org.hadatac.data.loader;
 
 import java.lang.String;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
-import org.apache.jena.query.QueryExecution;
-import org.apache.jena.query.QueryExecutionFactory;
 import org.apache.jena.query.QuerySolution;
-import org.apache.jena.query.ResultSet;
-import org.apache.jena.query.ResultSetFactory;
 import org.apache.jena.query.ResultSetRewindable;
 import org.apache.jena.rdf.model.Literal;
+import org.hadatac.console.http.SPARQLUtils;
 import org.hadatac.entity.pojo.HADatAcThing;
 import org.hadatac.entity.pojo.ObjectCollection;
 import org.hadatac.entity.pojo.StudyObject;
+import org.hadatac.metadata.loader.URIUtils;
 import org.hadatac.utils.CollectionUtil;
 import org.hadatac.utils.ConfigProp;
 import org.hadatac.utils.NameSpaces;
@@ -26,6 +22,8 @@ public class SampleGenerator extends BasicGenerator {
     
     private int counter = 1;
     private String hasScopeUri = "";    
+    private String hasGroundingLabel = "";
+    private String hasSOCReference = "";
     private List<String> scopeUris = new ArrayList<String>();
     private List<String> spaceScopeUris = new ArrayList<String>();
     private List<String> timeScopeUris = new ArrayList<String>();
@@ -36,7 +34,7 @@ public class SampleGenerator extends BasicGenerator {
     }
 
     @Override
-    void initMapping() {
+    public void initMapping() {
         mapCol.clear();
         mapCol.put("sampleID", "specimen_id");
         mapCol.put("studyID", "study_id");
@@ -49,11 +47,10 @@ public class SampleGenerator extends BasicGenerator {
                 + " SELECT (count(DISTINCT ?sampleURI) as ?sampleCount) WHERE { \n"
                 + " ?sampleURI hasco:isMemberOf* chear-kb:STD-" + studyID + " . \n"
                 + "}";
-        QueryExecution qexecSample = QueryExecutionFactory.sparqlService(
-                CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), sampleCountQuery);
-        ResultSet sampleResults = qexecSample.execSelect();
-        ResultSetRewindable resultsrwSample = ResultSetFactory.copyResults(sampleResults);
-        qexecSample.close();
+        
+        ResultSetRewindable resultsrwSample = SPARQLUtils.select(
+                CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), sampleCountQuery);
+        
         if (resultsrwSample.hasNext()) {
             QuerySolution soln = resultsrwSample.next();
             Literal countLiteral = (Literal) soln.get("sampleCount");
@@ -100,12 +97,10 @@ public class SampleGenerator extends BasicGenerator {
         String subjectQuery = NameSpaces.getInstance().printSparqlNameSpaceList() 
                 + " SELECT ?subjectURI WHERE { "
                 + " ?subjectURI hasco:originalID \"" + rec.getValueByColumnName(mapCol.get("subjectID")) + "\" . }";
-
-        QueryExecution qexecSubject = QueryExecutionFactory.sparqlService(
-                CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), subjectQuery);
-        ResultSet subjectResults = qexecSubject.execSelect();
-        ResultSetRewindable resultsrwSubject = ResultSetFactory.copyResults(subjectResults);
-        qexecSubject.close();
+        
+        ResultSetRewindable resultsrwSubject = SPARQLUtils.select(
+                CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), subjectQuery);
+        
         if (resultsrwSubject.hasNext()) {
             QuerySolution soln = resultsrwSubject.next();
             subject = soln.get("subjectURI").toString();
@@ -186,7 +181,7 @@ public class SampleGenerator extends BasicGenerator {
 
     public StudyObject createStudyObject(Record record) throws Exception {
         StudyObject obj = new StudyObject(getUri(record), "sio:Sample", getOriginalID(record), 
-                getLabel(record), getCollectionUri(record), getLabel(record), scopeUris);
+                getLabel(record), getCollectionUri(record), getLabel(record), scopeUris, timeScopeUris, spaceScopeUris);
 
         objectUris.add(getUri(record));
         
@@ -201,10 +196,14 @@ public class SampleGenerator extends BasicGenerator {
                 getCollectionLabel(record),
                 getStudyUri(record),
                 hasScopeUri,
+                hasGroundingLabel,
+                hasSOCReference,
                 spaceScopeUris,
                 timeScopeUris);
 
         oc.setObjectUris(objectUris);
+        
+        setStudyUri(URIUtils.replacePrefixEx(getStudyUri(record)));
 
         return oc;
     }

@@ -7,6 +7,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.apache.jena.query.DatasetAccessor;
 import org.apache.jena.query.DatasetAccessorFactory;
@@ -36,20 +37,23 @@ import org.labkey.remoteapi.CommandException;
 public abstract class BasicGenerator {
 
     protected List<Record> records = null;
+    protected RecordFile file;
 
     protected List<Map<String, Object>> rows = new ArrayList<Map<String, Object>>();
     protected List<HADatAcThing> objects = new ArrayList<HADatAcThing>();
 
     protected HashMap<String, String> mapCol = new HashMap<String, String>();
+    protected String studyUri = "";
     protected String fileName = "";
-
+    
     public BasicGenerator(RecordFile file) {
+        this.file = file;
         records = file.getRecords();
         fileName = file.getFile().getName();
         initMapping();
     }
 
-    abstract void initMapping();
+    public void initMapping() {}
 
     abstract public String getTableName();
 
@@ -58,7 +62,18 @@ public abstract class BasicGenerator {
     public String getFileName() {
         return fileName;
     }
-
+    
+    public RecordFile getRecordFile() {
+        return file;
+    }
+    
+    public String getStudyUri() {
+        return studyUri;
+    }
+    public void setStudyUri(String studyUri) {
+        this.studyUri = studyUri;
+    }
+    
     Map<String, Object> createRow(Record rec, int row_number) throws Exception { return null; }
 
     HADatAcThing createObject(Record rec, int row_number) throws Exception { return null; }
@@ -99,6 +114,22 @@ public abstract class BasicGenerator {
             if (obj != null) {
                 objects.add(obj);
             }
+        }
+
+        Map<String, Integer> mapStats = new HashMap<String, Integer>();
+        for (HADatAcThing obj : objects) {
+            String clsName = obj.getClass().getSimpleName();
+            if (mapStats.containsKey(clsName)) {
+                mapStats.put(clsName, mapStats.get(clsName) + 1);
+            } else {
+                mapStats.put(clsName, 1);
+            }
+        }
+        String results = String.join(" and ", mapStats.entrySet().stream()
+                .map(e -> e.getValue() + " " + e.getKey() + "(s)")
+                .collect(Collectors.toList()));
+        if (!results.isEmpty()) {
+            AnnotationLog.println(results + " have been created. ", fileName);
         }
     }
 
@@ -214,7 +245,7 @@ public abstract class BasicGenerator {
 
     public boolean commitRowsToTripleStore(List<Map<String, Object>> rows) {
         DatasetAccessor accessor = DatasetAccessorFactory.createHTTP(
-                CollectionUtil.getCollectionsName(CollectionUtil.METADATA_GRAPH));
+                CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_GRAPH));
         Model model = createModel(rows);
         accessor.add(model);
 
@@ -262,7 +293,7 @@ public abstract class BasicGenerator {
         return true;
     }
 
-    public boolean commitObjectsToSolr(List<HADatAcThing> objects) {
+    public boolean commitObjectsToSolr(List<HADatAcThing> objects) throws Exception {
         int count = 0;
         for (HADatAcThing obj : objects) {
             if (obj.saveToSolr()) {
@@ -300,7 +331,7 @@ public abstract class BasicGenerator {
         try {
             UpdateRequest request = UpdateFactory.create(query);
             UpdateProcessor processor = UpdateExecutionFactory.createRemote(
-                    request, CollectionUtil.getCollectionsName(CollectionUtil.METADATA_UPDATE));
+                    request, CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_UPDATE));
             processor.execute();
         } catch (Exception e) {
             System.out.println("[ERROR] " + e.getMessage());
@@ -311,7 +342,7 @@ public abstract class BasicGenerator {
         if (rows.isEmpty()) {
             return;
         }
-        
+
         AnnotationLog log = AnnotationLog.create(fileName);
 
         checkRows(rows, "hasURI");

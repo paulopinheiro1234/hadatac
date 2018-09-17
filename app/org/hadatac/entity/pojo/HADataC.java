@@ -114,7 +114,7 @@ public class HADataC {
 	}
 	
 	public String getStaticMetadataSparqlURL() {
-		return CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL);
+		return CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL);
 	}
 	
 	public String getDynamicMetadataURL() {

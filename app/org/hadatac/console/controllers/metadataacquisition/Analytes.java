@@ -9,17 +9,14 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.List;
 
-import org.apache.jena.query.QueryExecution;
-import org.apache.jena.query.QueryExecutionFactory;
 import org.apache.jena.query.QuerySolution;
-import org.apache.jena.query.ResultSet;
-import org.apache.jena.query.ResultSetFactory;
 import org.apache.jena.query.ResultSetRewindable;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.impl.HttpSolrClient;
 import org.apache.solr.client.solrj.response.UpdateResponse;
 import org.hadatac.console.controllers.AuthApplication;
+import org.hadatac.console.http.SPARQLUtils;
 import org.hadatac.console.http.SolrUtils;
 import org.hadatac.console.models.SysUser;
 import org.hadatac.console.views.html.metadataacquisition.*;
@@ -66,11 +63,8 @@ public class Analytes extends Controller {
                 + " ?attribute rdfs:label ?attributeLabel . "
                 + " }";
 
-        QueryExecution qexecStudy = QueryExecutionFactory.sparqlService(
-                CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), queryString);
-        ResultSet resultSet = qexecStudy.execSelect();
-        ResultSetRewindable resultsrwStudy = ResultSetFactory.copyResults(resultSet);
-        qexecStudy.close();
+        ResultSetRewindable resultsrwStudy = SPARQLUtils.select(
+                CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), queryString);
 
         List<String> results = new ArrayList<String>();
         while (resultsrwStudy.hasNext()) {
@@ -108,12 +102,9 @@ public class Analytes extends Controller {
                 + " } ";
 
         System.out.println("updateAnalytes strQuery: " + strQuery);
-
-        QueryExecution qexecStudy = QueryExecutionFactory.sparqlService(
-                CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), strQuery);
-        ResultSet resultSet = qexecStudy.execSelect();
-        ResultSetRewindable resultsrwStudy = ResultSetFactory.copyResults(resultSet);
-        qexecStudy.close();
+        
+        ResultSetRewindable resultsrwStudy = SPARQLUtils.select(
+                CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), strQuery);
 
         Map<String, Map<String, Object>> mapStudyInfo = new HashMap<String, Map<String, Object>>();
         while (resultsrwStudy.hasNext()) {
@@ -176,15 +167,14 @@ public class Analytes extends Controller {
         }
 
         return SolrUtils.commitJsonDataToSolr(
-                ConfigFactory.load().getString("hadatac.solr.data") 
-                + CollectionUtil.ANALYTES, results.toString());
+                CollectionUtil.getCollectionPath(CollectionUtil.Collection.ANALYTES), 
+                results.toString());
     }
 
     public static int deleteFromSolr() {
         try {
             SolrClient solr = new HttpSolrClient.Builder(
-                    ConfigFactory.load().getString("hadatac.solr.data") 
-                    + CollectionUtil.ANALYTES).build();
+                    CollectionUtil.getCollectionPath(CollectionUtil.Collection.ANALYTES)).build();
             UpdateResponse response = solr.deleteByQuery("*:*");
             solr.commit();
             solr.close();

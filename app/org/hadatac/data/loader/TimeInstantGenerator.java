@@ -1,7 +1,6 @@
 package org.hadatac.data.loader;
 
 import java.lang.String;
-import java.util.HashMap;
 import java.util.Map;
 
 import org.hadatac.utils.ConfigProp;
@@ -19,10 +18,12 @@ public class TimeInstantGenerator extends BasicGenerator {
         super(file);
         file_name = file.getFile().getName();
         study_id = file.getFile().getName().replaceAll("SSD-", "").replaceAll(".xlsx", "");
+        
+        setStudyUri(URIUtils.replacePrefixEx(kbPrefix + "STD-" + study_id));
     }
 
     @Override
-    void initMapping() {
+    public void initMapping() {
         mapCol.clear();
         mapCol.put("originalID", "originalID");
         mapCol.put("Type", "rdf:type");
@@ -46,8 +47,9 @@ public class TimeInstantGenerator extends BasicGenerator {
 
     public StudyObject createStudyObject(Record record) throws Exception {
         StudyObject obj = new StudyObject(getUri(record), getType(record), 
-                getOriginalID(record), "", 
+                getOriginalID(record), "TIME-" + getOriginalID(record) + "-" + study_id, 
                 getCollectionUri(record), "");
+        
         return obj;
     }
     

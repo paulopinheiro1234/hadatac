@@ -16,11 +16,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.apache.commons.io.FileUtils;
-import org.apache.jena.query.QueryExecution;
-import org.apache.jena.query.QueryExecutionFactory;
 import org.apache.jena.query.QuerySolution;
-import org.apache.jena.query.ResultSet;
-import org.apache.jena.query.ResultSetFactory;
 import org.apache.jena.query.ResultSetRewindable;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrQuery;
@@ -33,6 +29,7 @@ import org.apache.solr.client.solrj.beans.Field;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
 import org.hadatac.console.controllers.dataacquisitionsearch.FacetTree;
+import org.hadatac.console.http.SPARQLUtils;
 import org.hadatac.console.http.SolrUtils;
 import org.hadatac.console.models.Facet;
 import org.hadatac.console.models.FacetHandler;
@@ -63,10 +60,16 @@ public class Measurement extends HADatAcThing implements Runnable {
     private Date timestamp;
     @Field("named_time_str")
     private String abstractTime;
+    @Field("time_value_double")
+    private String timeValue;
+    @Field("time_value_unit_uri_str")
+    private String timeValueUnitUri;
     @Field("value_str")
     private String value;
     @Field("original_value_str")
     private String originalValue;
+    @Field("lod_str")
+    private String levelOfDetection;
     @Field("pid_str")
     private String pid;
     @Field("sid_str")
@@ -83,8 +86,10 @@ public class Measurement extends HADatAcThing implements Runnable {
     private String inRelationToUri;
     @Field("entity_uri_str")
     private String entityUri;
-    @Field("characteristic_uri_str")
-    private String characteristicUri;	
+    //@Field("characteristic_uri_str")
+    //private String characteristicUri;
+    @Field("characteristic_uri_str_multi")
+    private List<String> characteristicUris;
     @Field("location_latlong")
     private String location;
     @Field("elevation_double")
@@ -101,6 +106,10 @@ public class Measurement extends HADatAcThing implements Runnable {
     private String instrumentModel;
     private String instrumentUri;
     private String strTimestamp;
+
+    public Measurement() {
+    	characteristicUris = new ArrayList<String>();
+    }
 
     public String getOwnerUri() {
         return ownerUri;
@@ -249,6 +258,22 @@ public class Measurement extends HADatAcThing implements Runnable {
         this.abstractTime = abstractTime;
     }
 
+    public String getTimeValue() {
+        return this.timeValue;
+    }
+
+    public void setTimeValue(String timeValue) {
+        this.timeValue = timeValue;
+    }
+
+    public String getTimeValueUnitUri() {
+        return platformUri;
+    }
+
+    public void setTimeValueUnitUri(String uri) {
+        this.timeValueUnitUri = uri;
+    }
+
     public String getValue() {
         return value;
     }
@@ -263,6 +288,14 @@ public class Measurement extends HADatAcThing implements Runnable {
 
     public void setOriginalValue(String originalValue) {
         this.originalValue = originalValue;
+    }
+    
+    public String getLevelOfDetection() {
+        return levelOfDetection;
+    }
+
+    public void setLevelOfDetection(String levelOfDetection) {
+        this.levelOfDetection = levelOfDetection;
     }
 
     public String getUnit() {
@@ -329,12 +362,24 @@ public class Measurement extends HADatAcThing implements Runnable {
         this.characteristic = characteristic;
     }
 
-    public String getCharacteristicUri() {
+    /*public String getCharacteristicUri() {
         return characteristicUri;
     }
 
     public void setCharacteristicUri(String characteristicUri) {
         this.characteristicUri = characteristicUri;
+    }*/
+
+    public List<String> getCharacteristicUris() {
+        return characteristicUris;
+    }
+
+    public void addCharacteristicUris(String characteristicUri) {
+        this.characteristicUris.add(characteristicUri);
+    }
+    
+    public void setCharacteristicUris(List<String> characteristicUris) {
+        this.characteristicUris = characteristicUris;
     }
 
     public String getLocation() {
@@ -364,8 +409,7 @@ public class Measurement extends HADatAcThing implements Runnable {
     @Override
     public boolean saveToSolr() {
         SolrClient solr = new HttpSolrClient.Builder(
-                ConfigFactory.load().getString("hadatac.solr.data") 
-                + CollectionUtil.DATA_ACQUISITION).build();
+                CollectionUtil.getCollectionPath(CollectionUtil.Collection.DATA_ACQUISITION)).build();
         try {
             solr.addBean(this).getStatus();
             solr.commit();
@@ -380,8 +424,7 @@ public class Measurement extends HADatAcThing implements Runnable {
 
     public static int delete(String datasetUri) {
         SolrClient solr = new HttpSolrClient.Builder(
-                ConfigFactory.load().getString("hadatac.solr.data") 
-                + CollectionUtil.DATA_ACQUISITION).build();
+                CollectionUtil.getCollectionPath(CollectionUtil.Collection.DATA_ACQUISITION)).build();
         try {
             UpdateResponse response = solr.deleteByQuery("dataset_uri_str:\"" + datasetUri + "\"");
             solr.commit();
@@ -439,7 +482,7 @@ public class Measurement extends HADatAcThing implements Runnable {
             if (!study_uri.equals("") || !subject_uri.equals("")) {
                 facet_query += " AND ";
             }
-            facet_query += "characteristic_uri_str" + ":\"" + char_uri + "\"";
+            facet_query += "characteristic_uri_str_multi" + ":\"" + char_uri + "\"";
         }
 
         if (facet_query.trim().equals("")) {
@@ -500,8 +543,7 @@ public class Measurement extends HADatAcThing implements Runnable {
 
         try {
             SolrClient solr = new HttpSolrClient.Builder(
-                    ConfigFactory.load().getString("hadatac.solr.data") 
-                    + CollectionUtil.DATA_ACQUISITION).build();
+                    CollectionUtil.getCollectionPath(CollectionUtil.Collection.DATA_ACQUISITION)).build();
             QueryResponse queryResponse = solr.query(query, SolrRequest.METHOD.POST);
             solr.close();
             SolrDocumentList results = queryResponse.getResults();
@@ -537,13 +579,16 @@ public class Measurement extends HADatAcThing implements Runnable {
             return result;
         }
 
+        System.out.println("facets for measurement's find(); " + facets);
+        
         FacetHandler facetHandler = new FacetHandler();
         facetHandler.loadFacets(facets);
 
         FacetHandler retFacetHandler = new FacetHandler();
         retFacetHandler.loadFacets(facets);
 
-        // System.out.println("\nfacetHandler before: " + facetHandler.toSolrQuery());
+        //System.out.println("\nfacetHandler before: " + facetHandler.toSolrQuery());
+        //System.out.println("\nfacetHandler before: " + facetHandler.toJSON());
 
         // Run one time
         // getAllFacetStats(facetHandler, retFacetHandler, result, false);
@@ -552,7 +597,8 @@ public class Measurement extends HADatAcThing implements Runnable {
         // getAllFacetStats(retFacetHandler, retFacetHandler, result, true);
         getAllFacetStats(facetHandler, retFacetHandler, result, true);
 
-        // System.out.println("\n\n\nfacetHandler after: " + retFacetHandler.bottommostFacetsToSolrQuery());
+        //System.out.println("\n\n\nfacetHandler after: " + retFacetHandler.bottommostFacetsToSolrQuery());
+        //System.out.println("\n\n\nfacetHandler after: " + retFacetHandler.toJSON());
 
         // Get documents
         long docSize = 0;
@@ -560,6 +606,8 @@ public class Measurement extends HADatAcThing implements Runnable {
         //String q = buildQuery(ownedDAs, retFacetHandler);
         String q = buildQuery(ownedDAs, facetHandler);
 
+        //System.out.println("measurement solr query: " + q);
+        
         SolrQuery query = new SolrQuery();
         query.setQuery(q);
         if (page != -1) {
@@ -575,17 +623,16 @@ public class Measurement extends HADatAcThing implements Runnable {
                 + "type: terms, "
                 + "field: object_uri_str, "
                 + "limit: 100000000 }, "
-                + "characteristic_uri_str: { "
+                + "characteristic_uri_str_multi: { "
                 + "type: terms, "
-                + "field: characteristic_uri_str, "
+                + "field: characteristic_uri_str_multi, "
                 + "limit: 10000 } }");
         //query.set("group.field", "study_uri_str");
         //query.set("group", "true");
 
         try {
             SolrClient solr = new HttpSolrClient.Builder(
-                    ConfigFactory.load().getString("hadatac.solr.data") 
-                    + CollectionUtil.DATA_ACQUISITION).build();
+                    CollectionUtil.getCollectionPath(CollectionUtil.Collection.DATA_ACQUISITION)).build();
             QueryResponse queryResponse = solr.query(query, SolrRequest.METHOD.POST);
             solr.close();
             SolrDocumentList docs = queryResponse.getResults();
@@ -594,6 +641,12 @@ public class Measurement extends HADatAcThing implements Runnable {
 
             //System.out.println("\n\n\nqueryResponse: " + queryResponse);
             Pivot pivot = Pivot.parseQueryResponse(queryResponse);
+            
+        	//System.out.println("PRINTING PIVOT");
+            //for (Pivot p : pivot.children) {
+            //	System.out.println("Field: " + p.getField() + "   Value: " + p.getValue());
+            //}
+            
             result.extra_facets.put(FacetHandler.SUBJECT_CHARACTERISTIC_FACET, pivot);
 
             Set<String> uri_set = new HashSet<String>();
@@ -604,7 +657,7 @@ public class Measurement extends HADatAcThing implements Runnable {
                 Measurement measurement = convertFromSolr(iterDoc.next(), cachedDA, mapClassLabel);
                 result.addDocument(measurement);
                 uri_set.add(measurement.getEntityUri());
-                uri_set.add(measurement.getCharacteristicUri());
+                uri_set.addAll(measurement.getCharacteristicUris());
                 uri_set.add(measurement.getUnitUri());
             }
 
@@ -640,7 +693,9 @@ public class Measurement extends HADatAcThing implements Runnable {
                 facetHandler);
 
         FacetTree fTreeOC = new FacetTree();
-        fTreeOC.setTargetFacet(ObjectCollection.class);
+        fTreeOC.setTargetFacet(EntityRoleFromSSD.class);
+        fTreeOC.addUpperFacet(ObjectCollection.class);
+        //fTreeOC.setTargetFacet(ObjectCollection.class);
         //fTreeOC.setTargetFacet(StudyObject.class);
         //fTreeOC.addUpperFacet(ObjectCollection.class);
         Pivot pivotOC = getFacetStats(fTreeOC, 
@@ -651,6 +706,7 @@ public class Measurement extends HADatAcThing implements Runnable {
         fTreeEC.setTargetFacet(AttributeInstance.class);
         fTreeEC.addUpperFacet(Indicator.class);
         fTreeEC.addUpperFacet(EntityRole.class);
+        //fTreeEC.addUpperFacet(EntityRoleFromSSD.class);
         fTreeEC.addUpperFacet(EntityInstance.class);
         fTreeEC.addUpperFacet(InRelationToInstance.class);
         Pivot pivotEC = getFacetStats(fTreeEC, 
@@ -701,8 +757,7 @@ public class Measurement extends HADatAcThing implements Runnable {
 
     public static long getNumByDataAcquisition(ObjectAccessSpec dataAcquisition) {
         SolrClient solr = new HttpSolrClient.Builder(
-                ConfigFactory.load().getString("hadatac.solr.data") 
-                + CollectionUtil.DATA_ACQUISITION).build();
+                CollectionUtil.getCollectionPath(CollectionUtil.Collection.DATA_ACQUISITION)).build();
         SolrQuery query = new SolrQuery();
         query.set("q", "acquisition_uri_str:\"" + dataAcquisition.getUri() + "\"");
         query.set("rows", "10000000");
@@ -731,8 +786,7 @@ public class Measurement extends HADatAcThing implements Runnable {
         List<Measurement> listMeasurement = new ArrayList<Measurement>();
 
         SolrClient solr = new HttpSolrClient.Builder(
-                ConfigFactory.load().getString("hadatac.solr.data") 
-                + CollectionUtil.DATA_ACQUISITION).build();
+                CollectionUtil.getCollectionPath(CollectionUtil.Collection.DATA_ACQUISITION)).build();
         SolrQuery query = new SolrQuery();
         query.set("q", "acquisition_uri_str:\"" + acquisition_uri + "\"");
         query.set("rows", "10000000");
@@ -777,17 +831,14 @@ public class Measurement extends HADatAcThing implements Runnable {
 
         String query = "";
         query += NameSpaces.getInstance().printSparqlNameSpaceList();
-        query += "SELECT ?uri ?label WHERE { "
-                + valueConstraint
-                + " ?uri rdfs:label ?label . "
+        query += "SELECT ?uri ?label WHERE { \n"
+                + valueConstraint + " \n"
+                + " ?uri rdfs:label ?label . \n"
                 + "}";
 
         try {
-            QueryExecution qe = QueryExecutionFactory.sparqlService(
-                    CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), query);
-            ResultSet resultSet = qe.execSelect();
-            ResultSetRewindable resultsrw = ResultSetFactory.copyResults(resultSet);
-            qe.close();
+            ResultSetRewindable resultsrw = SPARQLUtils.select(
+                    CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), query);
 
             while (resultsrw.hasNext()) {
                 QuerySolution soln = resultsrw.next();
@@ -815,11 +866,8 @@ public class Measurement extends HADatAcThing implements Runnable {
                 + "}";
 
         try {
-            QueryExecution qe = QueryExecutionFactory.sparqlService(
-                    CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), query);
-            ResultSet resultSet = qe.execSelect();
-            ResultSetRewindable resultsrw = ResultSetFactory.copyResults(resultSet);
-            qe.close();
+            ResultSetRewindable resultsrw = SPARQLUtils.select(
+                    CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), query);
 
             while (resultsrw.hasNext()) {
                 QuerySolution soln = resultsrw.next();
@@ -840,9 +888,19 @@ public class Measurement extends HADatAcThing implements Runnable {
         if (cache.containsKey(getEntityUri())) {
             setEntity(cache.get(getEntityUri()));
         }
-        if (cache.containsKey(getCharacteristicUri())) {
-            setCharacteristic(cache.get(getCharacteristicUri()));
+        
+        List<String> attributes = new ArrayList<String>();
+        for (String attributeUri : getCharacteristicUris()) {
+            if (cache.containsKey(attributeUri)) {
+                attributes.add(cache.get(attributeUri));
+            } else {
+                attributes.add(attributeUri);
+            }
         }
+        if (attributes.size() > 0) {
+            setCharacteristic(String.join("; ", attributes));
+        }
+        
         if (cache.containsKey(getUnitUri())) {
             setUnit(cache.get(getUnitUri()));
         }
@@ -864,9 +922,12 @@ public class Measurement extends HADatAcThing implements Runnable {
         m.setPID(SolrUtils.getFieldValue(doc, "pid_str"));
         m.setSID(SolrUtils.getFieldValue(doc, "sid_str"));
         m.setAbstractTime(SolrUtils.getFieldValue(doc, "named_time_str"));
+        m.setTimeValue(SolrUtils.getFieldValue(doc, "time_value_double"));
+        m.setTimeValueUnitUri(SolrUtils.getFieldValue(doc, "time_value_unit_uri_str"));
         m.setOriginalValue(SolrUtils.getFieldValue(doc, "original_value_str"));
         m.setEntityUri(SolrUtils.getFieldValue(doc, "entity_uri_str"));
-        m.setCharacteristicUri(SolrUtils.getFieldValue(doc, "characteristic_uri_str"));
+        //m.setCharacteristicUri(SolrUtils.getFieldValue(doc, "characteristic_uri_str"));
+        m.setCharacteristicUris(SolrUtils.getFieldValues(doc, "characteristic_uri_str_multi"));
         m.setUnitUri(SolrUtils.getFieldValue(doc, "unit_uri_str"));
 
         String value = SolrUtils.getFieldValue(doc, "value_str");
@@ -1035,11 +1096,20 @@ public class Measurement extends HADatAcThing implements Runnable {
 
                     String key = alignment.measurementKey(m);
                     if (key != null) {
-                        results.get(alignment.replaceUri(m.getObjectUri())).put(key, m.getValue());
+			String finalValue = "";
+			/*if (alignment.containsCode(m.getCharacteristicUri())) {
+			    finalValue = alignment.getCode(m.getCharacteristicUri()); */
+			if (alignment.containsCode(m.getCharacteristicUris().get(0))) {
+				finalValue = alignment.getCode(m.getCharacteristicUris().get(0));
+			} else {
+			    finalValue = m.getValue();
+			}
+                        results.get(alignment.replaceUri(m.getObjectUri())).put(key, finalValue);
                     } else {
                         System.out.println("[ERROR] the following measurement could not match any alignment attribute (and no alignment " + 
                                 "attribute could be created for this measurement): " + 
-                                m.getEntityUri() + " " + m.getCharacteristicUri());
+                                //m.getEntityUri() + " " + m.getCharacteristicUri());
+                                m.getEntityUri() + " " + m.getCharacteristicUris().get(0));
                     }
                 }
 
@@ -1072,7 +1142,7 @@ public class Measurement extends HADatAcThing implements Runnable {
                     return o1.toString().compareTo(o2.toString());
                 }
             });
-            System.out.println("aligned attributes size: " + aaList.size());
+            //System.out.println("aligned attributes size: " + aaList.size());
             boolean first = true;
             for (AlignmentAttribute aa : aaList) {
                 if (first) {
@@ -1092,7 +1162,7 @@ public class Measurement extends HADatAcThing implements Runnable {
                     return o1.getOriginalId().compareTo(o2.getOriginalId());
                 }
             });
-            System.out.println("objects size: " + objects.size());
+            //System.out.println("objects size: " + objects.size());
 
             // Write rows: traverse collected object. From these objects, traverse alignment objects
             for (StudyObject obj : objects) {
@@ -1111,8 +1181,11 @@ public class Measurement extends HADatAcThing implements Runnable {
                 }
             }
 
-            System.out.println("Finished writing!");
+            //System.out.println("Finished writing!");
             
+	    // Write harmonized code book
+	    outputHarmonizedCodebook(alignment, null);
+
             dataFile = DataFile.findByName(file.getName());
             if (dataFile != null) {
                 if (dataFile.getStatus() == DataFile.DELETED) {
@@ -1127,6 +1200,34 @@ public class Measurement extends HADatAcThing implements Runnable {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    public static void outputHarmonizedCodebook(Alignment alignment, File file) {        
+	// Write empty string to create the file
+	//FileUtils.writeStringToFile(file, "", "utf-8", true);
+
+	//System.out.println("Harmonized code book");
+	//System.out.println("Class, code, description");
+
+	// Wrte code book
+	/*for (String key : alignment.getCodeBook().keySet()) {
+	    Attribute attr = Attribute.find(key);
+	    if (attr != null && attr.getDasaUri() != null && !attr.getDasaUri().equals("")) {
+		System.out.print(key);
+		String code = attr.findHarmonizedCode(attr.getDasaUri());
+		if (code != null) {
+		    System.out.print(", " + code);
+		} else {
+		    System.out.print(",");
+		}
+		if (attr.getLabel() != null) {
+		    System.out.print(", " + attr.getLabel());
+		} else {
+		    System.out.print(",");
+		}
+		System.out.println();
+	    }
+	    }*/
     }
 
     public String toCSVRow(List<String> fieldNames) {

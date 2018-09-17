@@ -46,13 +46,11 @@ public class Credential {
 	
 	public int save() {
 		// Delete other credentials before saving a new one
-		SolrUtils.clearCollection(ConfigFactory.load().getString("hadatac.solr.data") 
-				+ CollectionUtil.LABKEY_CREDENTIAL);
+		SolrUtils.clearCollection(CollectionUtil.getCollectionPath(CollectionUtil.Collection.LABKEY_CREDENTIAL));
 		
 		try {
 			SolrClient client = new HttpSolrClient.Builder(
-					ConfigFactory.load().getString("hadatac.solr.data") 
-					+ CollectionUtil.LABKEY_CREDENTIAL).build();
+					CollectionUtil.getCollectionPath(CollectionUtil.Collection.LABKEY_CREDENTIAL)).build();
 			
 			int status = client.addBean(this).getStatus();
 			client.commit();
@@ -67,8 +65,7 @@ public class Credential {
 	public int delete() {
 		try {
 			SolrClient client = new HttpSolrClient.Builder(
-					ConfigFactory.load().getString("hadatac.solr.data") 
-					+ CollectionUtil.LABKEY_CREDENTIAL).build();
+					CollectionUtil.getCollectionPath(CollectionUtil.Collection.LABKEY_CREDENTIAL)).build();
 			UpdateResponse response = client.deleteById(this.getUserName());
 			client.commit();
 			client.close();
@@ -96,8 +93,7 @@ public class Credential {
 		List<Credential> list = new ArrayList<Credential>();
 		
 		SolrClient solr = new HttpSolrClient.Builder(
-				ConfigFactory.load().getString("hadatac.solr.data") 
-				+ CollectionUtil.LABKEY_CREDENTIAL).build();
+		        CollectionUtil.getCollectionPath(CollectionUtil.Collection.LABKEY_CREDENTIAL)).build();
 
 		try {
 			QueryResponse response = solr.query(query);

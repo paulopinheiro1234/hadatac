@@ -2,7 +2,8 @@
   da_uri      : String,
   study       : org.hadatac.entity.pojo.Study,
   oc          : org.hadatac.entity.pojo.ObjectCollection,
-  objTypeList : List[org.hadatac.entity.pojo.StudyObjectType])
+  objTypeList : List[org.hadatac.entity.pojo.StudyObjectType],
+  page        : Integer)
 
 @import helper._
 @import org.hadatac.utils._
@@ -78,7 +79,7 @@
      }
   </script>
 
-    <form class="form-horizontal" name="newObjects" method="post" action="@org.hadatac.console.controllers.objects.routes.NewObjectsFromScratch.processForm(filename, da_uri, study.getUri(),oc.getUri())">
+    <form class="form-horizontal" name="newObjects" method="post" action="@org.hadatac.console.controllers.objects.routes.NewObjectsFromScratch.processForm(filename, da_uri, study.getUri(),oc.getUri(), page)">
 	
 	<div class="form-group">
 		<label>Study:</label>
@@ -163,7 +164,7 @@
  		    <input type="text" class="form-control col-sm-6" name="newMultiplier" id="newMultiplier" onchange="checkform()" >
  		</div>
 
-		<input formaction="@org.hadatac.console.controllers.objects.routes.NewObjectsFromScratch.processScopeForm(filename, da_uri, URLEncoder.encode(study.getUri(),"UTF-8"),URLEncoder.encode(oc.getUri(),"UTF-8"))" 
+		<input formaction="@org.hadatac.console.controllers.objects.routes.NewObjectsFromScratch.processScopeForm(filename, da_uri, URLEncoder.encode(study.getUri(),"UTF-8"),URLEncoder.encode(oc.getUri(),"UTF-8"), page)" 
 		       class="btn btn-success btn-sm" role="button" type="submit" id="submitScope" value="Create Objects using Scopes" disabled />
 
              </div>
@@ -171,7 +172,7 @@
 	<br>
 	<div class="form-group">
 	    <br>
-	    <a href="@org.hadatac.console.controllers.objects.routes.ObjectManagement.indexNomsg(filename, da_uri, study.getUri(),oc.getUri())" 
+	    <a href="@org.hadatac.console.controllers.objects.routes.ObjectManagement.indexNomsg(filename, da_uri, study.getUri(),oc.getUri(), page)" 
 	       class="btn btn-primary" role="button">Back to Object Management</a>
 	</div>
     </form>

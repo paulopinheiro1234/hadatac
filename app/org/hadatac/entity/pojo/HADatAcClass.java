@@ -11,7 +11,6 @@ import org.apache.jena.query.QueryExecutionFactory;
 import org.apache.jena.query.QueryFactory;
 import org.apache.jena.query.QuerySolution;
 import org.apache.jena.query.ResultSet;
-import org.apache.jena.query.ResultSetFactory;
 import org.apache.jena.query.ResultSetRewindable;
 import org.apache.jena.query.ResultSetFormatter;
 import org.hadatac.utils.NameSpaces;
@@ -20,6 +19,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import org.hadatac.utils.CollectionUtil;
+import org.hadatac.console.http.SPARQLUtils;
 import org.hadatac.console.models.TreeNode;
 
 public class HADatAcClass {
@@ -97,7 +97,32 @@ public class HADatAcClass {
 		this.comment = comment;
 	}
 
-	@JsonIgnore
+        public static int getNumberClasses() {
+	    String query = "";
+	    query += NameSpaces.getInstance().printSparqlNameSpaceList();
+	    query += "select (COUNT(?categ) as ?tot) where " +  
+		     " { SELECT ?c (COUNT(?c) as ?categ) " +
+		     "     WHERE {" + 
+                     "             [] a ?c . " +
+	             "     } " +
+                     " GROUP BY ?c " + 
+		     " }";
+	    
+	    try {
+		ResultSetRewindable resultsrw = SPARQLUtils.select(
+						CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), query);
+		
+		if (resultsrw.hasNext()) {
+		    QuerySolution soln = resultsrw.next();
+		    return Integer.parseInt(soln.getLiteral("tot").getString());
+		}
+	    } catch (Exception e) {
+		e.printStackTrace();
+	    }
+	    return -1;
+	}
+    
+        @JsonIgnore
 	public String getHierarchyJson() {
 		//System.out.println("Inside HADatAcClass's getHierarchyJson: [" + className + "]");
 		String q = 
@@ -112,12 +137,10 @@ public class HADatAcClass {
 			String queryString = NameSpaces.getInstance().printSparqlNameSpaceList() + q;
 			Query query = QueryFactory.create(queryString);
 			QueryExecution qexec = QueryExecutionFactory.sparqlService(CollectionUtil.
-					getCollectionsName(CollectionUtil.METADATA_SPARQL), query);
+					getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), query);
 			ResultSet results = qexec.execSelect();
 			ResultSetFormatter.outputAsJSON(outputStream, results);
 			qexec.close();
-
-			//System.out.println(outputStream.toString("UTF-8"));
 
 			return outputStream.toString("UTF-8");
 		} catch (Exception e) {
@@ -140,12 +163,9 @@ public class HADatAcClass {
 						"}";
 		try {
 			String queryString = NameSpaces.getInstance().printSparqlNameSpaceList() + q;
-			Query query = QueryFactory.create(queryString);
-			QueryExecution qexec = QueryExecutionFactory.sparqlService(CollectionUtil.
-					getCollectionsName(CollectionUtil.METADATA_SPARQL), query);
-			ResultSet results = qexec.execSelect();
-			ResultSetRewindable resultsrw = ResultSetFactory.copyResults(results);
-			qexec.close();
+			
+			ResultSetRewindable resultsrw = SPARQLUtils.select(
+	                CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), queryString);
 
 			while (resultsrw.hasNext()) {
 				QuerySolution soln = resultsrw.next();
@@ -165,7 +185,6 @@ public class HADatAcClass {
 				currentBranch.addChild(node);
 				branchCollection.add(currentBranch);
 			}
-			qexec.close();
 
 			TreeNode result = buildTree(branchCollection);
 			return result.getChildren().get(0);
@@ -173,6 +192,7 @@ public class HADatAcClass {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+		
 		return new TreeNode("");
 	}
 	

@@ -37,6 +37,10 @@ Epi/Lab=epi/lab
 OwnerEmail=owner email
 PermissionURI=permission uri
 
+# OAS Template
+DeploymentUri=deployment uri
+CellScope=cell scope
+
 # DASA, DASE, DASO Template (Part of SDD)
 Label=Column
 AttributeType=Attribute
@@ -70,6 +74,9 @@ storageTemp=sample_storage_temp
 FTcount=sample_freeze_thaw_cycles
 
 # MAP Template
-originalPID=patient_id
-originalSID=specimen_id
+originalPID=CHEAR PID
+originalSID=Full SID
+objectype=rdf:type
+studyId=CHEAR_Project_ID
+timeScope=timeScopeID
 

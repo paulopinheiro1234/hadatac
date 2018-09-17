@@ -6,13 +6,10 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.jena.query.QueryExecution;
-import org.apache.jena.query.QueryExecutionFactory;
 import org.apache.jena.query.QuerySolution;
-import org.apache.jena.query.ResultSet;
-import org.apache.jena.query.ResultSetFactory;
 import org.apache.jena.query.ResultSetRewindable;
 import org.apache.jena.rdf.model.RDFNode;
+import org.hadatac.console.http.SPARQLUtils;
 import org.hadatac.metadata.loader.URIUtils;
 import org.hadatac.utils.CollectionUtil;
 import org.hadatac.utils.ConfigProp;
@@ -33,7 +30,7 @@ public class DeploymentGenerator extends BasicGenerator {
 	}
 
 	@Override
-	void initMapping() {
+	public void initMapping() {
 		mapCol.clear();
 		mapCol.put("DataAcquisitionName", Templates.DATAACQUISITIONNAME);
 		mapCol.put("Method", Templates.METHOD);
@@ -48,11 +45,9 @@ public class DeploymentGenerator extends BasicGenerator {
 				+ " ?cohort hasco:isCohortOf " + getStudy(rec) + " . "
 				+ " }";
 
-		QueryExecution qe = QueryExecutionFactory.sparqlService(
-				CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), strQuery);
-		ResultSet resultSet = qe.execSelect();
-		ResultSetRewindable resultsrw = ResultSetFactory.copyResults(resultSet);
-		qe.close();
+		ResultSetRewindable resultsrw = SPARQLUtils.select(
+                CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), strQuery);
+		
 		if (resultsrw.hasNext()) {
 			QuerySolution soln = resultsrw.next();
 			RDFNode node = soln.get("cohort");
@@ -70,12 +65,10 @@ public class DeploymentGenerator extends BasicGenerator {
 				+ " SELECT ?sampleCollection WHERE { "
 				+ " ?sampleCollection hasco:isMemberOf " + getStudy(rec) + " . "
 				+ " }";
-
-		QueryExecution qe = QueryExecutionFactory.sparqlService(
-				CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), strQuery);
-		ResultSet resultSet = qe.execSelect();
-		ResultSetRewindable resultsrw = ResultSetFactory.copyResults(resultSet);
-		qe.close();
+		
+		ResultSetRewindable resultsrw = SPARQLUtils.select(
+                CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), strQuery);
+		
 		if (resultsrw.hasNext()) {
 			QuerySolution soln = resultsrw.next();
 			RDFNode node = soln.get("sampleCollection");
@@ -170,6 +163,8 @@ public class DeploymentGenerator extends BasicGenerator {
 		else {
 			row.put("prov:startedAtTime", startTime);
 		}
+		
+		setStudyUri(URIUtils.replacePrefixEx(getStudy(rec)));
 
 		return row;
 	}

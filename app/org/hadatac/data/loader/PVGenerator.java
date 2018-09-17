@@ -30,7 +30,7 @@ public class PVGenerator extends BasicGenerator {
 	
 	//Column	Code	Label	Class	Resource
 	@Override
-	void initMapping() {
+	public void initMapping() {
 		mapCol.clear();
 		mapCol.put("Label", "Column");
 		mapCol.put("Code", "Code");
@@ -63,8 +63,8 @@ public class PVGenerator extends BasicGenerator {
 				return cls;
 			}
 		} else {
-			if (codeMappings.containsKey(getCode(rec).toLowerCase())) {
-				return codeMappings.get(getCode(rec).toLowerCase());
+			if (codeMappings.containsKey(getCode(rec))) {
+				return codeMappings.get(getCode(rec));
 			}
 		}
 

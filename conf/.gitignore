@@ -1,4 +1,5 @@
 hadatac.conf
+hadatac-docker.conf
 labkey.config
 template.conf*
 play-authenticate/smtp.conf

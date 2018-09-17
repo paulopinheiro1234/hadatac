@@ -15,6 +15,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.ArrayList;
 
 import play.data.Form;
 import play.data.FormFactory;
@@ -86,7 +87,8 @@ public class UserManagement extends Controller {
 
 	@Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
 	public Result index(String oper) {
-		return ok(users.render(oper, "", User.find(), UserGroup.find(), ""));
+		//return ok(users.render(oper, "", User.find(), UserGroup.find(), ""));
+		return ok(users.render(oper, "", (new ArrayList<User>()), (new ArrayList<User>()), ""));
 	}
 
 	@Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
@@ -266,31 +268,31 @@ public class UserManagement extends Controller {
 	public String recoverUserAuthentication() {
 		System.out.println("Recovering User Authentication ...");
 		try {
-			if (!SolrUtils.clearCollection(ConfigFactory.load().getString("hadatac.solr.users") 
-					+ CollectionUtil.AUTHENTICATE_USERS)) {
+			if (!SolrUtils.clearCollection(
+			        CollectionUtil.getCollectionPath(CollectionUtil.Collection.AUTHENTICATE_USERS))) {
 				return "Failed to clear original \"users\" collection! ";
 			}
-			if (!SolrUtils.clearCollection(ConfigFactory.load().getString("hadatac.solr.users") 
-					+ CollectionUtil.AUTHENTICATE_ACCOUNTS)) {
+			if (!SolrUtils.clearCollection(
+			        CollectionUtil.getCollectionPath(CollectionUtil.Collection.AUTHENTICATE_ACCOUNTS))) {
 				return "Failed to clear original \"linked_account\" collection! ";
 			}
-			if (!SolrUtils.clearCollection(ConfigFactory.load().getString("hadatac.solr.users") 
-					+ CollectionUtil.AUTHENTICATE_TOKENS)) {
+			if (!SolrUtils.clearCollection(
+			        CollectionUtil.getCollectionPath(CollectionUtil.Collection.AUTHENTICATE_TOKENS))) {
 				return "Failed to clear original \"token_action\" collection! ";
 			}
 			
 			JSONObject combined = (JSONObject) JSONValue.parse(new FileReader(UPLOAD_NAME_JSON));
 			
-			if (!SolrUtils.commitJsonDataToSolr(ConfigFactory.load().getString("hadatac.solr.users") 
-					+ CollectionUtil.AUTHENTICATE_USERS, combined.get("sys_user").toString())) {
+			if (!SolrUtils.commitJsonDataToSolr(
+			        CollectionUtil.getCollectionPath(CollectionUtil.Collection.AUTHENTICATE_USERS), combined.get("sys_user").toString())) {
 				return "Failed to recover \"users\" collection! ";
 			}
-			if (!SolrUtils.commitJsonDataToSolr(ConfigFactory.load().getString("hadatac.solr.users") 
-					+ CollectionUtil.AUTHENTICATE_ACCOUNTS, combined.get("linked_account").toString())) {
+			if (!SolrUtils.commitJsonDataToSolr(
+			        CollectionUtil.getCollectionPath(CollectionUtil.Collection.AUTHENTICATE_ACCOUNTS), combined.get("linked_account").toString())) {
 				return "Failed to recover \"linked_account\" collection! ";
 			}
-			if (!SolrUtils.commitJsonDataToSolr(ConfigFactory.load().getString("hadatac.solr.users") 
-					+ CollectionUtil.AUTHENTICATE_TOKENS, combined.get("token").toString())) {
+			if (!SolrUtils.commitJsonDataToSolr(
+			        CollectionUtil.getCollectionPath(CollectionUtil.Collection.AUTHENTICATE_TOKENS), combined.get("token").toString())) {
 				return "Failed to recover \"token_action\" collection! ";
 			}
 		} catch (FileNotFoundException e) {
@@ -375,7 +377,7 @@ public class UserManagement extends Controller {
 			pred_value_map.put("rdfs:comment", comment);
 			pred_value_map.put("foaf:mbox", email);
 			pred_value_map.put("foaf:homepage", "<" + homepage + ">");
-			pred_value_map.put("hadatac:isMemberOfGroup", group_uri);
+			pred_value_map.put("sio:isMemberOf", group_uri);
 			
 			User.deleteUser(usr_uri, false, false);
 			message = generateTTL(mode, oper, rdf, usr_uri, pred_value_map);
@@ -412,7 +414,7 @@ public class UserManagement extends Controller {
 			pred_value_map.put("foaf:name", group_name);
 			pred_value_map.put("rdfs:comment", comment);
 			pred_value_map.put("foaf:homepage", "<" + homepage + ">");
-			pred_value_map.put("hadatac:isMemberOfGroup", parent_group_uri);
+			pred_value_map.put("sio:isMemberOf", parent_group_uri);
 			
 			User.deleteUser(group_uri, false, false);
 			
@@ -449,7 +451,7 @@ public class UserManagement extends Controller {
 		}
 		
 		message += Feedback.print(mode, "   Uploading generated file.");
-		rdf.loadLocalFile(mode, UPLOAD_NAME_TTL, SpreadsheetProcessing.KB_FORMAT);
+		rdf.loadLocalFile(mode, UPLOAD_NAME_TTL, SpreadsheetProcessing.KB_FORMAT, "");
 		message += Feedback.println(mode, "");
 		message += Feedback.println(mode, " ");
 		message += Feedback.println(mode, "   Triples after [preregistration]: " + rdf.totalTriples());
@@ -519,7 +521,7 @@ public class UserManagement extends Controller {
 
 		if (oper.equals("load")) {
 		    message += Feedback.print(mode, "   Uploading generated file.");
-		    rdf.loadLocalFile(mode, fileName, SpreadsheetProcessing.KB_FORMAT);
+		    rdf.loadLocalFile(mode, fileName, SpreadsheetProcessing.KB_FORMAT, "");
 		    message += Feedback.println(mode, "");
 		    message += Feedback.println(mode, " ");
 		    message += Feedback.println(mode, "   Triples after [preregistration]: " + rdf.totalTriples());

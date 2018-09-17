@@ -29,6 +29,7 @@ import org.labkey.remoteapi.CommandException;
 import be.objectify.deadbolt.java.actions.Group;
 import be.objectify.deadbolt.java.actions.Restrict;
 import org.hadatac.console.controllers.AuthApplication;
+import org.hadatac.console.http.SPARQLUtils;
 
 
 public class DataAcquisitionSchemaEvent extends HADatAcThing {
@@ -223,12 +224,9 @@ public class DataAcquisitionSchemaEvent extends HADatAcThing {
                 "   OPTIONAL { <" + uri + ">  hasco:hasEntity ?entity } ." + 
                 "   OPTIONAL { <" + uri + "> hasco:hasUnit ?unit } ." + 
                 "}";
-        Query query = QueryFactory.create(queryString);
-
-        QueryExecution qexec = QueryExecutionFactory.sparqlService(CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), query);
-        ResultSet results = qexec.execSelect();
-        ResultSetRewindable resultsrw = ResultSetFactory.copyResults(results);
-        qexec.close();
+        
+        ResultSetRewindable resultsrw = SPARQLUtils.select(
+                CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), queryString);
 
         if (!resultsrw.hasNext()) {
             System.out.println("[WARNING] DataAcquisitionSchemaEvent. Could not find event for uri: " + uri);
@@ -289,12 +287,9 @@ public class DataAcquisitionSchemaEvent extends HADatAcThing {
                 "   ?uri a hasco:DASchemaEvent . " + 
                 "   ?uri hasco:partOfSchema <" + schemaUri + "> .  " + 
                 "}";
-        Query query = QueryFactory.create(queryString);
-
-        QueryExecution qexec = QueryExecutionFactory.sparqlService(CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), query);
-        ResultSet results = qexec.execSelect();
-        ResultSetRewindable resultsrw = ResultSetFactory.copyResults(results);
-        qexec.close();
+        
+        ResultSetRewindable resultsrw = SPARQLUtils.select(
+                CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), queryString);
 
         if (!resultsrw.hasNext()) {
             System.out.println("[WARNING] DataAcquisitionSchemaEvent. Could not find events for schema: " + schemaUri);
@@ -329,7 +324,7 @@ public class DataAcquisitionSchemaEvent extends HADatAcThing {
                 .map(uri -> URIUtils.replaceNameSpaceEx(uri))
                 .collect(Collectors.toList())));
         row.put("rdfs:label", getLabel());
-        row.put("rdfs:comment", getLabel());
+        row.put("rdfs:comment", getComment());
         row.put("hasco:partOfSchema", URIUtils.replaceNameSpaceEx(getPartOfSchema()));
         row.put("hasco:hasEntity", URIUtils.replaceNameSpaceEx(getEntity()));
         row.put("hasco:hasUnit", URIUtils.replaceNameSpaceEx(getUnit()));
@@ -393,7 +388,7 @@ public class DataAcquisitionSchemaEvent extends HADatAcThing {
         if (!getPartOfSchema().equals("")) {
             insert += " <" + getUri() + "> hasco:partOfSchema <" + getPartOfSchema() + "> .  ";
         }
-        if (!getComment().equals("")) {
+        if (getComment() != null && !getComment().equals("")) {
             insert += " <" + getUri() + "> rdfs:comment \""  + getComment() + "\" .  ";
         }
         if (!getEntity().equals("")) {
@@ -420,7 +415,7 @@ public class DataAcquisitionSchemaEvent extends HADatAcThing {
         try {
             UpdateRequest request = UpdateFactory.create(insert);
             UpdateProcessor processor = UpdateExecutionFactory.createRemote(
-                    request, CollectionUtil.getCollectionsName(CollectionUtil.METADATA_UPDATE));
+                    request, CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_UPDATE));
             processor.execute();
         } catch (QueryParseException e) {
             System.out.println("QueryParseException due to update query: " + insert);
@@ -447,7 +442,7 @@ public class DataAcquisitionSchemaEvent extends HADatAcThing {
         query += LINE_LAST;                                        
         UpdateRequest request = UpdateFactory.create(query);
         UpdateProcessor processor = UpdateExecutionFactory.createRemote(
-                request, CollectionUtil.getCollectionsName(CollectionUtil.METADATA_UPDATE));
+                request, CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_UPDATE));
         processor.execute();
     }
 

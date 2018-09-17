@@ -32,6 +32,24 @@
         }
      }
 
+     @if(obj.getTimeScopeUris().size() > 0) {
+        @for(timeScope <- obj.getTimeScopeUris()) {
+            <td>
+	        <input type="text" class="form-control" name="newIsFrom[]" id="newIsFrom@if(obj.getUri() != null) {-@obj.getUri() }" 
+	               value="@if(timeScope != null) { @StudyObject.find(timeScope).getLabel() }" onchange="checkform()" readonly>
+            </td>
+        }
+     }
+
+     @if(obj.getSpaceScopeUris().size() > 0) {
+        @for(spaceScope <- obj.getSpaceScopeUris()) {
+            <td>
+	        <input type="text" class="form-control" name="newIsFrom[]" id="newIsFrom@if(obj.getUri() != null) {-@obj.getUri() }" 
+	               value="@if(spaceScope != null) { @StudyObject.find(spaceScope).getLabel() }" onchange="checkform()" readonly>
+            </td>
+        }
+     }
+
      <td>
         <a href="" class="btn-xs btn-primary" role="button">Delete</a>
      </td>

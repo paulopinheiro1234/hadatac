@@ -24,6 +24,12 @@ public class Portal extends Controller {
     						+ "HADatAC Solr is down now. Ask Administrator for further information. "
     						+ "</h4></div>")));
     	}
+    	if (!Repository.checkNamespaceWithQuads()) {
+            return ok(main.render("Results", "", 
+                    new Html("<div class=\"container-fluid\"><h4>"
+                            + "The namespace store is set to be without quads. Ask Administrator for further information. "
+                            + "</h4></div>")));
+        }
     	
     	return ok(portal.render()); 
     }

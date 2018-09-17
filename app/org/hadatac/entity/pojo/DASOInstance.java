@@ -173,7 +173,7 @@ public class DASOInstance {
 		query += LINE_LAST;
 		System.out.println("[DASOI] SPARQL query inside delete(): " + query);
 		UpdateRequest request = UpdateFactory.create(query);
-		UpdateProcessor processor = UpdateExecutionFactory.createRemote(request, CollectionUtil.getCollectionsName(CollectionUtil.METADATA_UPDATE));
+		UpdateProcessor processor = UpdateExecutionFactory.createRemote(request, CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_UPDATE));
 		processor.execute();
 	}// /delete()
 	

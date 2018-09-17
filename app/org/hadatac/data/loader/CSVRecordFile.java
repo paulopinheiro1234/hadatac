@@ -11,7 +11,7 @@ import java.util.stream.Collectors;
 
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVRecord;
-import org.apache.jena.sparql.function.library.print;
+
 
 public class CSVRecordFile implements RecordFile {
 
@@ -35,6 +35,10 @@ public class CSVRecordFile implements RecordFile {
         return records.stream().map(rec -> {
             return new CSVFileRecord(rec);
         }).collect(Collectors.toList());
+    }
+    
+    public int getNumberOfSheets() {
+        return 1;
     }
 
     @Override
@@ -61,6 +65,11 @@ public class CSVRecordFile implements RecordFile {
     @Override
     public File getFile() {
         return file;
+    }
+    
+    @Override
+    public String getSheetName() {
+        return "";
     }
 
     @Override

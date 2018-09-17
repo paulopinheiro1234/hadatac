@@ -76,6 +76,8 @@ public class NewDASO extends Controller {
 		String newEntity = getUriFromNew(data.getNewEntity());
 		String newRole = data.getNewRole();
 		String newInRelationTo = getUriFromInRelationTo(data.getNewInRelationTo(),das.getObjects());
+		String newInRelationToLabel = data.getNewInRelationTo();
+		String newWasDerivedFrom = data.getNewWasDerivedFrom();
 		String newRelation = data.getNewRelation();
 		String newPosition = "-1";
 
@@ -87,6 +89,8 @@ public class NewDASO extends Controller {
 				newEntity,
 				newRole,
 				newInRelationTo,
+				newInRelationToLabel,
+				newWasDerivedFrom,
 				newRelation);
 
 		// insert the new DASO content inside of the triplestore regardless of any change -- the previous content has already been deleted

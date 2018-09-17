@@ -13,6 +13,7 @@ import org.apache.jena.query.ResultSet;
 import org.apache.jena.query.ResultSetFactory;
 import org.apache.jena.query.ResultSetRewindable;
 import org.apache.jena.sparql.engine.http.QueryExceptionHTTP;
+import org.hadatac.console.http.SPARQLUtils;
 import org.hadatac.console.models.Facet;
 import org.hadatac.console.models.FacetHandler;
 import org.hadatac.utils.CollectionUtil;
@@ -66,11 +67,8 @@ public class DASEType extends HADatAcThing implements Comparable<DASEType> {
         
         Map<HADatAcThing, List<HADatAcThing>> mapTypeToInstanceList = new HashMap<HADatAcThing, List<HADatAcThing>>();
         try {
-            QueryExecution qe = QueryExecutionFactory.sparqlService(
-                    CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), query);
-            ResultSet resultSet = qe.execSelect();
-            ResultSetRewindable resultsrw = ResultSetFactory.copyResults(resultSet);
-            qe.close();
+            ResultSetRewindable resultsrw = SPARQLUtils.select(
+                    CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), query);
             while (resultsrw.hasNext()) {
                 QuerySolution soln = resultsrw.next();
                 DASEType daseType = new DASEType();

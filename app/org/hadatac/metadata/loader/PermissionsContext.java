@@ -18,6 +18,7 @@ import org.apache.jena.update.UpdateExecutionFactory;
 import org.apache.jena.update.UpdateFactory;
 import org.apache.jena.update.UpdateProcessor;
 import org.apache.jena.update.UpdateRequest;
+import org.hadatac.console.http.SPARQLUtils;
 import org.hadatac.utils.CollectionUtil;
 import org.hadatac.utils.Feedback;
 import org.hadatac.utils.NameSpaces;
@@ -52,12 +53,8 @@ public class PermissionsContext implements RDFContext {
     		String queryString = NameSpaces.getInstance().printSparqlNameSpaceList() + 
     				"SELECT (COUNT(*) as ?tot) WHERE { ?s ?p ?o . }";
     		
-    		Query query = QueryFactory.create(queryString);
-    			
-    		QueryExecution qexec = QueryExecutionFactory.sparqlService(CollectionUtil.getCollectionsName(CollectionUtil.PERMISSIONS_SPARQL), query);
-    		ResultSet results = qexec.execSelect();
-    		ResultSetRewindable resultsrw = ResultSetFactory.copyResults(results);
-    		qexec.close();
+    		ResultSetRewindable resultsrw = SPARQLUtils.select(
+                    CollectionUtil.getCollectionPath(CollectionUtil.Collection.PERMISSIONS_SPARQL), queryString);
     		
     		QuerySolution soln = resultsrw.next();
     		return Long.valueOf(soln.getLiteral("tot").getValue().toString()).longValue();
@@ -77,7 +74,7 @@ public class PermissionsContext implements RDFContext {
 		queryString += "DELETE WHERE { ?s ?p ?o . } ";
 		UpdateRequest req = UpdateFactory.create(queryString);
 		UpdateProcessor processor = UpdateExecutionFactory.createRemote(req, 
-				CollectionUtil.getCollectionsName(CollectionUtil.PERMISSIONS_UPDATE));
+				CollectionUtil.getCollectionPath(CollectionUtil.Collection.PERMISSIONS_UPDATE));
 		processor.execute();
 		
 		message += Feedback.println(mode, " ");
@@ -102,10 +99,10 @@ public class PermissionsContext implements RDFContext {
 	 *   used to process rdf/xml content.
 	 *   
 	 */
-	public Long loadLocalFile(int mode, String filePath, String contentType) {
+	public Long loadLocalFile(int mode, String filePath, String contentType, String graphUri) {
 		Model model = ModelFactory.createDefaultModel();
 		DatasetAccessor accessor = DatasetAccessorFactory.createHTTP(
-				CollectionUtil.getCollectionsName(CollectionUtil.PERMISSIONS_GRAPH));		
+				CollectionUtil.getCollectionPath(CollectionUtil.Collection.PERMISSIONS_GRAPH));		
 
 		loadFileMessage = "";
 		Long total = totalTriples();

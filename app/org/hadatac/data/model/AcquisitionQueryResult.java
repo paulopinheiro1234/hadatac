@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
+import org.hadatac.console.controllers.metadata.DynamicFunctions;
 import org.hadatac.console.models.Pivot;
 import org.hadatac.entity.pojo.Measurement;
 
@@ -18,6 +19,7 @@ public class AcquisitionQueryResult {
 	public Map<String, Map<String, Map<String, String>>> date_facets;
 	public Map<String, List<Pivot>> pivot_facets;
 	public Map<String, Pivot> extra_facets;
+	public List<String> indicators;
 
 	public long getDocumentSize(){
 		return this.nDocSize;
@@ -41,6 +43,7 @@ public class AcquisitionQueryResult {
 		date_facets = new TreeMap<String, Map<String, Map<String, String>>>();
 		pivot_facets = new HashMap<String, List<Pivot>>();
 		extra_facets = new HashMap<String, Pivot>();
+		indicators = DynamicFunctions.getIndicatorURIs();
 	}
 
 	public String toJSON() {

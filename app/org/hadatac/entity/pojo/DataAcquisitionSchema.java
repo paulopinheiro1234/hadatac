@@ -12,8 +12,6 @@ import org.apache.jena.query.QueryExecutionFactory;
 import org.apache.jena.query.QueryFactory;
 import org.apache.jena.query.QueryParseException;
 import org.apache.jena.query.QuerySolution;
-import org.apache.jena.query.ResultSet;
-import org.apache.jena.query.ResultSetFactory;
 import org.apache.jena.query.ResultSetRewindable;
 import org.apache.jena.update.UpdateExecutionFactory;
 import org.apache.jena.update.UpdateFactory;
@@ -23,6 +21,7 @@ import org.hadatac.utils.CollectionUtil;
 import org.hadatac.utils.NameSpaces;
 import org.hadatac.utils.FirstLabel;
 import org.hadatac.metadata.loader.URIUtils;
+import org.hadatac.console.http.SPARQLUtils;
 import org.hadatac.entity.pojo.DataAcquisitionSchemaAttribute;
 import org.hadatac.entity.pojo.DataAcquisitionSchemaObject;
 import org.labkey.remoteapi.CommandException;
@@ -57,36 +56,24 @@ public class DataAcquisitionSchema extends HADatAcThing {
 
     private String uri = "";
     private String label = "";
-    private List<DataAcquisitionSchemaAttribute> attributes = null;
-    private List<DataAcquisitionSchemaObject> objects = null;
-    private List<DataAcquisitionSchemaEvent> events = null;
-    private String timestampLabel;
-    private String timeInstantLabel;
-    private String namedTimeLabel;
-    private String idLabel;
-    private String originalIdLabel;
-    private String elevationLabel;
-    private String entityLabel;
-    private String unitLabel;
-    private String inRelationToLabel;
+    private String timestampLabel = "";
+    private String timeInstantLabel = "";
+    private String namedTimeLabel = "";
+    private String idLabel = "";
+    private String originalIdLabel = "";
+    private String elevationLabel = "";
+    private String entityLabel = "";
+    private String unitLabel = "";
+    private String inRelationToLabel = "";
+    private String lodLabel = "";
+    private List<DataAcquisitionSchemaAttribute> attributes = new ArrayList<DataAcquisitionSchemaAttribute>();
+    private List<DataAcquisitionSchemaObject> objects = new ArrayList<DataAcquisitionSchemaObject>();
+    private List<DataAcquisitionSchemaEvent> events = new ArrayList<DataAcquisitionSchemaEvent>();
 
     public DataAcquisitionSchema() {
-        this.timestampLabel = "";
-        this.timeInstantLabel = "";
-        this.namedTimeLabel = "";
-        this.elevationLabel = "";
-        this.idLabel = "";
-        this.originalIdLabel = "";
-        this.entityLabel = "";
-        this.unitLabel = "";
-        this.inRelationToLabel = "";
-        this.attributes = new ArrayList<DataAcquisitionSchemaAttribute>();
-        this.objects = new ArrayList<DataAcquisitionSchemaObject>();
-        this.events = new ArrayList<DataAcquisitionSchemaEvent>();
     }
 
     public DataAcquisitionSchema(String uri, String label) {
-        this();
         this.uri = uri;
         this.label = label;
     }
@@ -149,6 +136,14 @@ public class DataAcquisitionSchema extends HADatAcThing {
 
     public void setOriginalIdLabel(String originalIdLabel) {
         this.originalIdLabel = originalIdLabel;
+    }
+    
+    public String getLODLabel() {
+        return lodLabel;
+    }
+
+    public void setLODLabel(String lodLabel) {
+        this.lodLabel = lodLabel;
     }
 
     public String getElevationLabel() {
@@ -233,7 +228,12 @@ public class DataAcquisitionSchema extends HADatAcThing {
                     setIdLabel(dasa.getLabel());
                     System.out.println("[OK] DataAcquisitionSchema IdLabel: " + dasa.getLabel());
                 }
+                if (dasa.getAttribute().equals(URIUtils.replacePrefixEx("chear:LevelOfDetection"))) {
+                    setLODLabel(dasa.getLabel());
+                    System.out.println("[OK] DataAcquisitionSchema LODLabel: " + dasa.getLabel());
+                }
                 if (dasa.getAttribute().equals(URIUtils.replacePrefixEx("hasco:originalID")) 
+                        || dasa.getAttribute().equals(URIUtils.replacePrefixEx("sio:Identifier")) 
                         || Entity.getSubclasses(URIUtils.replacePrefixEx("hasco:originalID")).contains(dasa.getAttribute())) { 
                     setOriginalIdLabel(dasa.getLabel());
                     System.out.println("[OK] DataAcquisitionSchema IdLabel: " + dasa.getLabel());
@@ -279,7 +279,7 @@ public class DataAcquisitionSchema extends HADatAcThing {
             this.objects = objects;
             for (DataAcquisitionSchemaObject daso : objects) {
                 System.out.println("[OK] DataAcquisitionSchemaObject <" + daso.getUri() + "> is defined in the knowledge base. " + 
-                        "Role: \""  + daso.getRole() + "\"");
+                        "Role: \""  + daso.getRole() + " InRelationTo: \""  + daso.getInRelationToLabel() + "\"");
             }
         }
     }
@@ -400,7 +400,7 @@ public class DataAcquisitionSchema extends HADatAcThing {
         Query query = QueryFactory.create(queryString);
 
         QueryExecution qexec = QueryExecutionFactory.sparqlService(
-                CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), query);
+                CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), query);
         boolean uriExist = qexec.execAsk();
         qexec.close();
 
@@ -429,12 +429,10 @@ public class DataAcquisitionSchema extends HADatAcThing {
         String queryString = NameSpaces.getInstance().printSparqlNameSpaceList() + 
                 "SELECT ?uri WHERE { " + 
                 "   ?uri a hasco:DASchema . } ";
-        Query query = QueryFactory.create(queryString);
-        QueryExecution qexec = QueryExecutionFactory.sparqlService(
-                CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), query);
-        ResultSet results = qexec.execSelect();
-        ResultSetRewindable resultsrw = ResultSetFactory.copyResults(results);
-        qexec.close();
+        
+        ResultSetRewindable resultsrw = SPARQLUtils.select(
+                CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), queryString);
+        
         while (resultsrw.hasNext()) {
             QuerySolution soln = resultsrw.next();
             if (soln != null && soln.getResource("uri").getURI() != null) { 
@@ -460,12 +458,8 @@ public class DataAcquisitionSchema extends HADatAcThing {
 
         // System.out.println("findPossibleValues query: " + queryString);
 
-        Query query = QueryFactory.create(queryString);
-        QueryExecution qexec = QueryExecutionFactory.sparqlService(
-                CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), query);
-        ResultSet results = qexec.execSelect();
-        ResultSetRewindable resultsrw = ResultSetFactory.copyResults(results);
-        qexec.close();
+        ResultSetRewindable resultsrw = SPARQLUtils.select(
+                CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), queryString);
 
         try {
             while (resultsrw.hasNext()) {
@@ -507,12 +501,8 @@ public class DataAcquisitionSchema extends HADatAcThing {
                 + " ?daso_or_dasa hasco:partOfSchema <" + schemaUri + "> . "
                 + " }";
 
-        Query query = QueryFactory.create(queryString);
-        QueryExecution qexec = QueryExecutionFactory.sparqlService(
-                CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), query);
-        ResultSet results = qexec.execSelect();
-        ResultSetRewindable resultsrw = ResultSetFactory.copyResults(results);
-        qexec.close();
+        ResultSetRewindable resultsrw = SPARQLUtils.select(
+                CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), queryString);
 
         if (resultsrw.hasNext()) {
             QuerySolution soln = resultsrw.next();
@@ -529,24 +519,24 @@ public class DataAcquisitionSchema extends HADatAcThing {
         String queryString = NameSpaces.getInstance().printSparqlNameSpaceList()
                 + " SELECT ?subj_or_sample ?id ?obj ?subj_id WHERE { \n"
                 + " { \n"
-                + "		?subj_or_sample a sio:Human . \n"
                 + " 	?subj_or_sample hasco:originalID ?id . \n"
-                + " 	?subj_or_sample hasco:isMemberOf* <" + studyUri + "> . \n"
+                + "     ?subj_or_sample hasco:isMemberOf ?soc . \n"
+                + "     ?soc a hasco:SubjectGroup . \n"
+                + "     ?soc hasco:isMemberOf* <" + studyUri + "> . \n"
                 + " } UNION { \n"
-                + "     ?subj_or_sample a sio:Sample . \n"
                 + " 	?subj_or_sample hasco:originalID ?id . \n"
-                + " 	?subj_or_sample hasco:isMemberOf* <" + studyUri + "> . \n"
+                + "     ?subj_or_sample hasco:isMemberOf ?soc . \n"
+                + "     ?soc a hasco:SampleCollection . \n"
+                + " 	?soc hasco:isMemberOf* <" + studyUri + "> . \n"
                 + " 	?subj_or_sample hasco:hasObjectScope ?obj . \n"
                 + " 	?obj hasco:originalID ?subj_id . \n"
                 + " } \n"
                 + " } \n";
+        
+        //System.out.println("findIdUriMappings() queryString: " + queryString);
 
-        Query query = QueryFactory.create(queryString);
-        QueryExecution qexec = QueryExecutionFactory.sparqlService(
-                CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), query);
-        ResultSet results = qexec.execSelect();
-        ResultSetRewindable resultsrw = ResultSetFactory.copyResults(results);
-        qexec.close();
+        ResultSetRewindable resultsrw = SPARQLUtils.select(
+                CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), queryString);
 
         try {
             while (resultsrw.hasNext()) {			
@@ -649,7 +639,7 @@ public class DataAcquisitionSchema extends HADatAcThing {
         try {
             UpdateRequest request = UpdateFactory.create(insert);
             UpdateProcessor processor = UpdateExecutionFactory.createRemote(
-                    request, CollectionUtil.getCollectionsName(CollectionUtil.METADATA_UPDATE));
+                    request, CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_UPDATE));
             processor.execute();
         } catch (QueryParseException e) {
             System.out.println("QueryParseException due to update query: " + insert);
@@ -669,7 +659,7 @@ public class DataAcquisitionSchema extends HADatAcThing {
         query += LINE_LAST;
         UpdateRequest request = UpdateFactory.create(query);
         UpdateProcessor processor = UpdateExecutionFactory.createRemote(
-                request, CollectionUtil.getCollectionsName(CollectionUtil.METADATA_UPDATE));
+                request, CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_UPDATE));
         processor.execute();
     }
 

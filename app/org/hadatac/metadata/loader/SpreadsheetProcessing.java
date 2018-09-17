@@ -135,7 +135,7 @@ public class SpreadsheetProcessing {
 
         if (oper.equals("load")) {
             message += Feedback.print(mode, "   Uploading generated file.");
-            rdf.loadLocalFile(mode, fileName, KB_FORMAT);
+            rdf.loadLocalFile(mode, fileName, KB_FORMAT, "");
             message += Feedback.println(mode, "");
             message += Feedback.println(mode, " ");
             message += Feedback.println(mode, "   Triples after [loadXLS]: " + rdf.totalTriples());

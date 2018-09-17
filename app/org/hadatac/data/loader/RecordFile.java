@@ -11,4 +11,8 @@ public interface RecordFile {
 	public File getFile();
 	
 	public boolean isValid();
+	
+    public int getNumberOfSheets();
+
+	public String getSheetName();
 }

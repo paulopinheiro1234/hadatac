@@ -25,6 +25,7 @@ import org.apache.jena.update.UpdateExecutionFactory;
 import org.apache.jena.update.UpdateFactory;
 import org.apache.jena.update.UpdateProcessor;
 import org.apache.jena.update.UpdateRequest;
+import org.hadatac.console.http.SPARQLUtils;
 import org.hadatac.metadata.loader.LabkeyDataHandler;
 import org.hadatac.metadata.loader.URIUtils;
 import org.hadatac.utils.CollectionUtil;
@@ -195,7 +196,7 @@ public class Deployment extends HADatAcThing {
             insert += END_TIME_PREDICATE + "\"" + this.getEndedAt() + TIME_XMLS + "  ";
             insert += LINE_LAST;
             UpdateRequest request = UpdateFactory.create(insert);
-            UpdateProcessor processor = UpdateExecutionFactory.createRemote(request,CollectionUtil.getCollectionsName(CollectionUtil.METADATA_UPDATE)); 
+            UpdateProcessor processor = UpdateExecutionFactory.createRemote(request,CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_UPDATE)); 
             processor.execute();
         }
     }
@@ -235,13 +236,8 @@ public class Deployment extends HADatAcThing {
                 + "  OPTIONAL { <" + hadatac.getDataAcquisition().getDeploymentUri() + "> hasco:hasDetector ?detector . }\n"
                 + "  OPTIONAL { <" + hadatac.getDataAcquisition().getDeploymentUri() + "> prov:endedAtTime ?endedAt . }\n"
                 + "}";
-
-        Query query = QueryFactory.create(queryString);
-
-        QueryExecution qexec = QueryExecutionFactory.sparqlService(hadatac.getStaticMetadataSparqlURL(), query);
-        ResultSet results = qexec.execSelect();
-        ResultSetRewindable resultsrw = ResultSetFactory.copyResults(results);
-        qexec.close();
+        
+        ResultSetRewindable resultsrw = SPARQLUtils.select(hadatac.getStaticMetadataSparqlURL(), queryString);
 
         if (resultsrw.size() >= 1) {
             QuerySolution soln = resultsrw.next();
@@ -273,13 +269,8 @@ public class Deployment extends HADatAcThing {
                 + "  <" + hadatac.getDeploymentUri() + "> vstoi:hasPlatform ?platform .\n"
                 + "  OPTIONAL { <" + hadatac.getDeploymentUri() + "> prov:endedAtTime ?endedAt . }\n"
                 + "}";
-
-        Query query = QueryFactory.create(queryString);
-
-        QueryExecution qexec = QueryExecutionFactory.sparqlService(hadatac.getStaticMetadataSparqlURL(), query);
-        ResultSet results = qexec.execSelect();
-        ResultSetRewindable resultsrw = ResultSetFactory.copyResults(results);
-        qexec.close();
+        
+        ResultSetRewindable resultsrw = SPARQLUtils.select(hadatac.getStaticMetadataSparqlURL(), queryString);
 
         if (resultsrw.size() >= 1) {
             QuerySolution soln = resultsrw.next();
@@ -310,8 +301,7 @@ public class Deployment extends HADatAcThing {
         //System.out.println("FIND DEPLOYMENT (queryString): " + queryString);
         Query query = QueryFactory.create(queryString);
         QueryExecution qexec = QueryExecutionFactory.sparqlService(
-                ConfigFactory.load().getString("hadatac.solr.triplestore") 
-                + CollectionUtil.METADATA_SPARQL, query);
+                CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), query);
         Model model = qexec.execDescribe();
 
         StmtIterator stmtIterator = model.listStatements();
@@ -372,13 +362,9 @@ public class Deployment extends HADatAcThing {
                 }
             }
         }
-        Query query = QueryFactory.create(queryString);
-
-        QueryExecution qexec = QueryExecutionFactory.sparqlService(
-                CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), query);
-        ResultSet results = qexec.execSelect();
-        ResultSetRewindable resultsrw = ResultSetFactory.copyResults(results);
-        qexec.close();
+        
+        ResultSetRewindable resultsrw = SPARQLUtils.select(
+                CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), queryString);
 
         Deployment dep = null;
         while (resultsrw.hasNext()) {
@@ -476,7 +462,7 @@ public class Deployment extends HADatAcThing {
         try {
             UpdateRequest request = UpdateFactory.create(insert);
             UpdateProcessor processor = UpdateExecutionFactory.createRemote(
-                    request, CollectionUtil.getCollectionsName(CollectionUtil.METADATA_UPDATE));
+                    request, CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_UPDATE));
             processor.execute();
         } catch (QueryParseException e) {
             System.out.println("QueryParseException due to update query: " + insert);
@@ -496,7 +482,7 @@ public class Deployment extends HADatAcThing {
         query += LINE_LAST;
         UpdateRequest request = UpdateFactory.create(query);
         UpdateProcessor processor = UpdateExecutionFactory.createRemote(
-                request, CollectionUtil.getCollectionsName(CollectionUtil.METADATA_UPDATE));
+                request, CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_UPDATE));
         processor.execute();
     }
 

@@ -19,7 +19,7 @@ import com.typesafe.config.ConfigFactory;
 public class JsonHandler {
 
     private String field_count_url = ConfigFactory.load().getString("hadatac.solr.data") 
-            + CollectionUtil.DATA_ACQUISITION 
+            + CollectionUtil.Collection.DATA_ACQUISITION.get() 
             + "/browse?wt=json&facet=true&facet.field=characteristic&facet.field=entity"
             + "&facet.field=unit&facet.field=platform_name&facet.field=instrument_model&rows=0";
     public Map<String, HashMap<String, String>> categories_facets_and_counts = new HashMap<String, HashMap<String, String>>();

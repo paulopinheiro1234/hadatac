@@ -2,7 +2,7 @@ package org.hadatac.utils;
 
 public class Templates {
 	
-    private static String TEMPLATE_FILE = ConfigProp.getTemplateFileName();
+    public static String TEMPLATE_FILE = ConfigProp.getTemplateFileName();
 
     // STD Template (Study and SampleCollection)                                                                     
     public static String STUDYID = ConfigProp.getPropertyValue(TEMPLATE_FILE, "studyID"); // also in ACQ, PID and SID
@@ -34,13 +34,18 @@ public class Templates {
     public static String EXTSRC = ConfigProp.getPropertyValue(TEMPLATE_FILE, "externalSource");
 	    
     // ACQ (DA and DEPLOYMENT) Template                                                                              
-    public static String DATAACQUISITIONNAME = ConfigProp.getPropertyValue(TEMPLATE_FILE, "DataAcquisitionName");
+    public static String DATAACQUISITIONNAME = ConfigProp.getPropertyValue(TEMPLATE_FILE, "DataAcquisitionName"); // also OAS
     public static String METHOD = ConfigProp.getPropertyValue(TEMPLATE_FILE, "Method");
-    public static String DATADICTIONARYNAME = ConfigProp.getPropertyValue(TEMPLATE_FILE, "DataDictionaryName");
-    public static String DASTUDYID = ConfigProp.getPropertyValue(TEMPLATE_FILE, "DAStudyName");
+    public static String DATADICTIONARYNAME = ConfigProp.getPropertyValue(TEMPLATE_FILE, "DataDictionaryName");   // also OAS
+    public static String DASTUDYID = ConfigProp.getPropertyValue(TEMPLATE_FILE, "DAStudyName");  
     public static String EPILAB = ConfigProp.getPropertyValue(TEMPLATE_FILE, "Epi/Lab");
-    public static String OWNEREMAIL = ConfigProp.getPropertyValue(TEMPLATE_FILE, "OwnerEmail");
-    public static String PERMISSIONURI = ConfigProp.getPropertyValue(TEMPLATE_FILE, "PermissionURI");
+    public static String OWNEREMAIL = ConfigProp.getPropertyValue(TEMPLATE_FILE, "OwnerEmail");                   // also OAS
+    public static String PERMISSIONURI = ConfigProp.getPropertyValue(TEMPLATE_FILE, "PermissionURI");             // also OAS
+
+    // OAS Template                                                                              
+    public static String DEPLOYMENTURI = ConfigProp.getPropertyValue(TEMPLATE_FILE, "DeploymentUri");
+    //public static String ROWSCOPE = ConfigProp.getPropertyValue(TEMPLATE_FILE, "RowScope");
+    public static String CELLSCOPE = ConfigProp.getPropertyValue(TEMPLATE_FILE, "CellScope");
 
     // DASA, DASE, DASO Template (Part of SDD)                                                                       
     public static String LABEL = ConfigProp.getPropertyValue(TEMPLATE_FILE, "Label");     // also in PV                                                                                   
@@ -75,4 +80,7 @@ public class Templates {
     // MAP Template                                                                                                  
     public static String ORIGINALPID = ConfigProp.getPropertyValue(TEMPLATE_FILE, "originalPID");
     public static String ORIGINALSID = ConfigProp.getPropertyValue(TEMPLATE_FILE, "originalSID");
+    public static String OBJECTTYPE = ConfigProp.getPropertyValue(TEMPLATE_FILE, "objecttype");
+    public static String MAPSTUDYID = ConfigProp.getPropertyValue(TEMPLATE_FILE, "studyId");
+    public static String TIMESCOPEID = ConfigProp.getPropertyValue(TEMPLATE_FILE, "timeScope");
 }

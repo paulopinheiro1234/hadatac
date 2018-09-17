@@ -57,7 +57,7 @@ public class PermissionQueries {
     		Query query = QueryFactory.create(queryString);
     			
     		QueryExecution qexec = QueryExecutionFactory.sparqlService(
-    				CollectionUtil.getCollectionsName(CollectionUtil.PERMISSIONS_SPARQL), query);
+    				CollectionUtil.getCollectionPath(CollectionUtil.Collection.PERMISSIONS_SPARQL), query);
     		ResultSet results = qexec.execSelect();
     		
     		ResultSetFormatter.outputAsJSON(outputStream, results);

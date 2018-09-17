@@ -1,5 +1,6 @@
 @(unprocessedFiles : List[org.hadatac.entity.pojo.DataFile], 
   processedFiles : List[org.hadatac.entity.pojo.DataFile],
+  studyURIs : List[String],
   bStarted : Boolean,
   bAdmin : Boolean)
 
@@ -14,9 +15,6 @@
 @main("Automatic Annotator") {
 	<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
 	<script type="text/javascript" src="@controllers.routes.Assets.versioned("javascripts/resumable.js")"></script>
-	
-	<script type="text/javascript">
-    </script>
     
     <div class="container-fluid">
 	
@@ -60,6 +58,19 @@
     </div>
 
     <script type="text/javascript" src="@controllers.routes.Assets.versioned("javascripts/upload.js")"></script>
+    
+    <div class="container">
+    <div class="col-lg-12">
+        <div class="button-group">
+            <button type="button" class="btn btn-default btn-sm dropdown-toggle" data-toggle="dropdown"><span class="glyphicon glyphicon-cog"></span>Filter by Study<span class="caret"></span></button>
+            <ul class="dropdown-menu">
+                @for(study <- studyURIs){
+                    <li><a href="#" class="small" data-value="@study" tabIndex="-1"><input type="checkbox"/>&nbsp;@study</a></li>
+                }
+            </ul>
+        </div>
+    </div>
+    </div>
 	
 	<div class="container-fluid">
 	<table class="table">
@@ -77,8 +88,14 @@
     </thead>
     <tbody>
     	@for(file <- processedFiles){
-    		<tr>
-    			<td>@file.getFileName()</td>
+    		<tr name="processed" data-value="@file.getStudyUri()">
+    		    @if(AnnotationLog.create(file.getFileName()).getLog().contains("[ERROR]")) {
+                    <td bgcolor="#FF9999" name="file_name">@file.getFileName()</td>
+                } else { @if(AnnotationLog.create(file.getFileName()).getLog().contains("[WARNING]")) {
+                    <td bgcolor="#FFFF99" name="file_name">@file.getFileName()</td>
+                } else {
+                    <td name="file_name">@file.getFileName()</td>
+                }}
     			@if(bAdmin) {
     				<td>@file.getOwnerEmail()</td>
     			}
@@ -87,9 +104,12 @@
     			<td>@file.getCompletionTime()</td>
     			<td>@if(file.getFileName().endsWith(".csv")) {
                         @defining("") { da_uri =>  @defining("") { oc_uri => 
-    			    <a href="@org.hadatac.console.controllers.fileviewer.routes.CSVPreview.getCSVPreview("proc", file.getFileName(), da_uri, oc_uri, 10)" 
+    			    <a href="@org.hadatac.console.controllers.fileviewer.routes.CSVPreview.getCSVPreview("proc", file.getFileName(), da_uri, oc_uri, 10, 1)" 
 			       class="btn-xs btn-primary" role="button">Preview File</a>
                         }}}
+                @if(file.getFileName().endsWith(".xlsx") || file.getFileName().endsWith(".xls")) {
+                    <a href="@org.hadatac.console.controllers.fileviewer.routes.ExcelPreview.index("proc", file.getFileName())" class="btn-xs btn-primary" role="button">Preview File</a>
+                }
     			<a href="@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.moveDataFile(file.getFileName())" 
 			   class="btn-xs btn-primary" role="button" onclick="return confirm('Are you sure to move? If so, the ingested data from this file will be deleted as well!')" >Move to Unprocessed Folder</a>
     			<a href="@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.deleteDataFile(file.getFileName(), true)" 
@@ -128,24 +148,37 @@
          </tr>
     </thead>
     <tbody>
-    	@for(file <- unprocessedFiles){
-    		<tr>
-    			<td>@file.getFileName()</td>
+    	@for(file <- unprocessedFiles) {
+    	    <tr name="unprocessed">
+    			@if(AnnotationLog.create(file.getFileName()).getLog().contains("[ERROR]")) {
+                    <td bgcolor="#FF9999" name="file_name">@file.getFileName()</td>
+                } else { @if(AnnotationLog.create(file.getFileName()).getLog().contains("[WARNING]")) {
+                    <td bgcolor="#FFFF99" name="file_name">@file.getFileName()</td>
+                } else {
+                    <td name="file_name">@file.getFileName()</td>
+                }}
     			@if(bAdmin) {
     				<td>@file.getOwnerEmail()</td>
     			}
     			<td>@file.getDataAcquisitionUri()</td>
     			<td>@file.getSubmissionTime()</td>
     			<td>
-                        @if(file.getFileName().startsWith("DA")) {
-    			    <a href="@org.hadatac.console.controllers.annotator.routes.PrepareIngestion.create(file.getFileName(),file.getDataAcquisitionUri())" 
+    			@if(file.getStatus().equals("FREEZED")) {
+                   <a href="@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.activateDataFile(file.getFileName())" 
+                   class="btn-xs btn-success" role="button">Activate</a>
+                }
+                @if(file.getFileName().startsWith("DA")) {
+    			   <a href="@org.hadatac.console.controllers.annotator.routes.PrepareIngestion.create(file.getFileName(),file.getDataAcquisitionUri())" 
 			       class="btn-xs btn-success" role="button">Prepare Ingestion</a>
-			}
+			    }
 			@if(file.getFileName().endsWith(".csv")) {
 			@defining("") { da_uri => @defining("") { oc_uri => 
-    	                     <a href="@org.hadatac.console.controllers.fileviewer.routes.CSVPreview.getCSVPreview("unproc", file.getFileName(), da_uri, oc_uri, 10)" 
+    	                     <a href="@org.hadatac.console.controllers.fileviewer.routes.CSVPreview.getCSVPreview("unproc", file.getFileName(), da_uri, oc_uri, 10, 1)" 
 				class="btn-xs btn-primary" role="button">Preview File</a>
                         }}}
+            @if(file.getFileName().endsWith(".xlsx") || file.getFileName().endsWith(".xls")) {
+                <a href="@org.hadatac.console.controllers.fileviewer.routes.ExcelPreview.index("proc", file.getFileName())" class="btn-xs btn-primary" role="button">Preview File</a>
+            }
     			<a href="@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.deleteDataFile(file.getFileName(), false)" class="btn-xs btn-primary" role="button" id="delete" onclick="return confirm('Are you sure to delete?')">Delete</a>
     			@if(bAdmin) {
     				<a href="@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.assignFileOwner(file.getOwnerEmail(), file.getFileName())" class="btn-xs btn-primary" role="button">Assign Owner</a>
@@ -165,4 +198,43 @@
     <br><br>
     <a href="@org.hadatac.console.controllers.routes.Portal.index()" class="btn btn-primary" role="button">Back to Main Page</a>
 	</div>
+	
+	<script type="text/javascript">
+    var options = [];
+
+    $('.dropdown-menu a').on('click', function(event) {
+
+       var $target = $( event.currentTarget ),
+           val = $target.attr( 'data-value' ),
+           $inp = $target.find( 'input' ),
+           idx;
+
+       if ( ( idx = options.indexOf( val ) ) > -1 ) {
+          options.splice( idx, 1 );
+          setTimeout( function() { $inp.prop( 'checked', false ) }, 0);
+       } else {
+          options.push( val );
+          setTimeout( function() { $inp.prop( 'checked', true ) }, 0);
+       }
+
+       $( event.target ).blur();
+
+       if (options.length > 0) {
+    	   $("tbody tr[name='processed']").each(function(index) {
+               if (options.indexOf($(this).attr("data-value")) > -1 
+                       || $(this).find("[name='file_name']").text().startsWith("SDD-")) {
+                   $(this).show();
+               } else {
+                   $(this).hide();
+               }
+           });
+       } else {
+    	   $("tbody tr[name='processed']").each(function(index) {
+        	   $(this).show();
+           });
+       }
+       
+       return false;
+    });
+    </script>
 }

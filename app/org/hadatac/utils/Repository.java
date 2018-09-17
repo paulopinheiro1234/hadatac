@@ -2,6 +2,7 @@ package org.hadatac.utils;
 
 import org.apache.jena.sparql.engine.http.QueryExceptionHTTP;
 import org.apache.solr.client.solrj.impl.HttpSolrClient.RemoteSolrException;
+import org.hadatac.console.http.SPARQLUtils;
 import org.hadatac.data.loader.DataContext;
 import org.hadatac.metadata.loader.MetadataContext;
 import org.hadatac.metadata.loader.PermissionsContext;
@@ -28,6 +29,7 @@ public class Repository {
 						(DataContext.playTotalMeasurements() != -1));
 			}
 		} catch (QueryExceptionHTTP | RemoteSolrException e) {
+		    e.printStackTrace();
 			return false;
 		}
 		
@@ -57,6 +59,20 @@ public class Repository {
 		message += Feedback.print(Feedback.WEB, "Requested " + oper + " " + repository + " repository.");                
 		message += Command.exec(Feedback.WEB, false, cmd);
 		return message;
+	}
+	
+	public static boolean checkNamespaceWithQuads() {
+	    try {
+            String queryString = NameSpaces.getInstance().printSparqlNameSpaceList() + 
+                    "SELECT ?s ?p ?o ?g WHERE { GRAPH ?g { ?s ?p ?o . } } LIMIT 10";
+
+            SPARQLUtils.select(CollectionUtil.getCollectionPath(
+                    CollectionUtil.Collection.METADATA_SPARQL), queryString);
+        } catch (QueryExceptionHTTP e) {
+            return false;
+        }
+	    
+	    return true;
 	}
 }
 

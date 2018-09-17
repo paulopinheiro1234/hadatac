@@ -5,6 +5,7 @@ import java.util.concurrent.TimeUnit;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
+import org.hadatac.console.controllers.sandbox.Sandbox;
 import org.hadatac.data.loader.AnnotationWorker;
 
 import akka.actor.ActorSystem;
@@ -38,6 +39,13 @@ public class MyActorSystem {
                 AnnotationWorker.autoAnnotate();
             }
         };
+        
+        Runnable sandbox = new Runnable() {
+            @Override
+            public void run() {
+                Sandbox.checkSandboxExpiration();
+            }
+        };
 
         system.scheduler().schedule(
                 FiniteDuration.create(0, TimeUnit.SECONDS), 
@@ -48,5 +56,10 @@ public class MyActorSystem {
 		        FiniteDuration.create(0, TimeUnit.SECONDS), 
                 FiniteDuration.create(15, TimeUnit.SECONDS),
                 annotation, system.dispatcher());
+		
+		system.scheduler().schedule(
+                FiniteDuration.create(0, TimeUnit.SECONDS), 
+                FiniteDuration.create(60, TimeUnit.SECONDS),
+                sandbox, system.dispatcher());
 	}
 }

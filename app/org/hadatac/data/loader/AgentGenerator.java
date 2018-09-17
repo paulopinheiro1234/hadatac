@@ -2,10 +2,8 @@ package org.hadatac.data.loader;
 
 import java.lang.String;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
-import org.hadatac.entity.pojo.HADatAcThing;
 import org.hadatac.utils.ConfigProp;
 import org.hadatac.utils.Templates;
 
@@ -18,7 +16,7 @@ public class AgentGenerator extends BasicGenerator {
 	}
 	
 	@Override
-	void initMapping() {
+	public void initMapping() {
 		mapCol.clear();
         mapCol.put("studyID", Templates.STUDYID);
 		mapCol.put("studyTitle", Templates.STUDYTITLE);
@@ -304,9 +302,9 @@ public class AgentGenerator extends BasicGenerator {
 	public String getTableName() {
 		return "Agent";
 	}
-
+	
 	@Override
-	public String getErrorMsg(Exception e) {
-		return "";
-	}
+    public String getErrorMsg(Exception e) {
+        return "Error in AgentGenerator: " + e.getMessage();
+    }
 }

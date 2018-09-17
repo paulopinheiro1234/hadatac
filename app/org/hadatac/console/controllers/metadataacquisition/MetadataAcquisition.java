@@ -11,6 +11,7 @@ import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.impl.HttpSolrClient;
 import org.apache.solr.client.solrj.response.UpdateResponse;
 import org.hadatac.console.controllers.AuthApplication;
+import org.hadatac.console.http.SPARQLUtils;
 import org.hadatac.console.http.SolrUtils;
 import org.hadatac.console.models.SysUser;
 
@@ -65,11 +66,8 @@ public class MetadataAcquisition extends Controller {
 				+ " ?attribute rdfs:label ?attributeLabel . "
 				+ " }";
 		
-		QueryExecution qexecStudy = QueryExecutionFactory.sparqlService(
-				CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), initStudyQuery);
-		ResultSet resultSet = qexecStudy.execSelect();
-		ResultSetRewindable resultsrwStudy = ResultSetFactory.copyResults(resultSet);
-		qexecStudy.close();
+		ResultSetRewindable resultsrwStudy = SPARQLUtils.select(
+                CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), initStudyQuery);
 		
 		List<String> results = new ArrayList<String>();
 		while (resultsrwStudy.hasNext()) {
@@ -125,11 +123,8 @@ public class MetadataAcquisition extends Controller {
 		
 		System.out.println("strQuery: " + strQuery);
 		
-		QueryExecution qexecStudy = QueryExecutionFactory.sparqlService(
-				CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), strQuery);
-		ResultSet resultSet = qexecStudy.execSelect();
-		ResultSetRewindable resultsrwStudy = ResultSetFactory.copyResults(resultSet);
-		qexecStudy.close();
+		ResultSetRewindable resultsrwStudy = SPARQLUtils.select(
+                CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), strQuery);
 		
 		HashMap<String, HashMap<String, Object>> mapStudyInfo = new HashMap<String, HashMap<String, Object>>();
 		while (resultsrwStudy.hasNext()) {
@@ -236,15 +231,13 @@ public class MetadataAcquisition extends Controller {
 		}
 		
 		return SolrUtils.commitJsonDataToSolr(
-				ConfigFactory.load().getString("hadatac.solr.data") 
-				+ CollectionUtil.STUDIES, results.toString());
+		        CollectionUtil.getCollectionPath(CollectionUtil.Collection.STUDIES), results.toString());
 	}
 	
 	public static int deleteFromSolr() {
 		try {
 			SolrClient solr = new HttpSolrClient.Builder(
-					ConfigFactory.load().getString("hadatac.solr.data") 
-					+ CollectionUtil.STUDIES).build();
+					CollectionUtil.getCollectionPath(CollectionUtil.Collection.STUDIES)).build();
 			UpdateResponse response = solr.deleteByQuery("*:*");
 			solr.commit();
 			solr.close();

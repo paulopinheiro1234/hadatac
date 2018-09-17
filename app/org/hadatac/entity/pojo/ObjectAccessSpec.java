@@ -101,14 +101,14 @@ public class ObjectAccessSpec extends HADatAcThing {
     private String elevation;
     @Field("dataset_uri_str_multi")
     private List<String> datasetURIs;
-    @Field("globalscope_uri_str")
-    private String globalScopeUri;
-    @Field("globalscope_name_str")
-    private String globalScopeName;
+    //@Field("globalscope_uri_str")
+    //private String rowScopeUri;
+    //@Field("globalscope_name_str")
+    //private String rowScopeName;
     @Field("localscope_uri_str_multi")
-    private List<String> localScopeUri;
+    private List<String> cellScopeUri;
     @Field("localscope_name_str_multi")
-    private List<String> localScopeName;
+    private List<String> cellScopeName;
     @Field("status_int")
     private int status;
     /*
@@ -143,10 +143,10 @@ public class ObjectAccessSpec extends HADatAcThing {
         typeURIs = new ArrayList<String>();
         associatedURIs = new ArrayList<String>();
         deployment = null;
-        globalScopeUri = null;
-        globalScopeName = null;
-        localScopeUri = new ArrayList<String>();
-        localScopeName = new ArrayList<String>();
+        //rowScopeUri = null;
+        //rowScopeName = null;
+        cellScopeUri = new ArrayList<String>();
+        cellScopeName = new ArrayList<String>();
     }
 
     @Override
@@ -501,11 +501,17 @@ public class ObjectAccessSpec extends HADatAcThing {
     }
 
     public boolean hasScope() {
-        if (globalScopeUri != null && !globalScopeUri.equals("")) {
-            return true;
-        }
-        if (localScopeUri != null && localScopeUri.size() > 0) {
-            for (String tmpUri : localScopeUri) {
+	return (hasCellScope()); 
+	//return (hasRowScope() || hasCellScope()); 
+    }
+    
+    //public boolean hasRowScope() {
+    //    return (rowScopeUri != null && !rowScopeUri.equals(""));
+    //}
+
+    public boolean hasCellScope() {
+        if (cellScopeUri != null && cellScopeUri.size() > 0) {
+            for (String tmpUri : cellScopeUri) {
                 if (tmpUri != null && !tmpUri.equals("")) {
                     return true;
                 }
@@ -513,65 +519,67 @@ public class ObjectAccessSpec extends HADatAcThing {
         }
         return false;
     }
-
-    public String getGlobalScopeUri() {
-        return globalScopeUri;
+    
+    /*
+    public String getRowScopeUri() {
+        return rowScopeUri;
     }
-    public void setGlobalScopeUri(String globalScopeUri) {
-        this.globalScopeUri = globalScopeUri;
-        if (globalScopeUri == null || globalScopeUri.equals("")) {
+    public void setRowScopeUri(String rowScopeUri) {
+        this.rowScopeUri = rowScopeUri;
+        if (rowScopeUri == null || rowScopeUri.equals("")) {
             return;
         }
-        ObjectCollection oc = ObjectCollection.find(globalScopeUri);
+        ObjectCollection oc = ObjectCollection.find(rowScopeUri);
         if (oc != null) {
-            if (oc.getUri().equals(globalScopeUri)) {
-                globalScopeName = oc.getLabel();
+            if (oc.getUri().equals(rowScopeUri)) {
+                rowScopeName = oc.getLabel();
                 return;
             }
         } else {
-            StudyObject obj = StudyObject.find(globalScopeUri);
-            if (obj != null && obj.getUri().equals(globalScopeUri)) {
-                globalScopeName = obj.getLabel();
+            StudyObject obj = StudyObject.find(rowScopeUri);
+            if (obj != null && obj.getUri().equals(rowScopeUri)) {
+                rowScopeName = obj.getLabel();
                 return;
             }
         }
     }
-    public String getGlobalScopeName() {
-        return globalScopeName;
+    public String getRowScopeName() {
+        return rowScopeName;
     }
-    public void setGlobalScopeName(String globalScopeName) {
-        this.globalScopeName = globalScopeName;
+    public void setRowScopeName(String rowScopeName) {
+        this.rowScopeName = rowScopeName;
     }
+    */
 
-    public List<String> getLocalScopeUri() {
-        return localScopeUri;
+    public List<String> getCellScopeUri() {
+        return cellScopeUri;
     }
-    public void setLocalScopeUri(List<String> localScopeUri) {
-        this.localScopeUri = localScopeUri;
-        if (localScopeUri == null || localScopeUri.size() == 0) {
+    public void setCellScopeUri(List<String> cellScopeUri) {
+        this.cellScopeUri = cellScopeUri;
+        if (cellScopeUri == null || cellScopeUri.size() == 0) {
             return;
         }
-        localScopeName = new ArrayList<String>();
-        for (String objUri : localScopeUri) {
+        cellScopeName = new ArrayList<String>();
+        for (String objUri : cellScopeUri) {
             StudyObject obj = StudyObject.find(objUri);
             if (obj != null && obj.getUri().equals(objUri)) {
-                localScopeName.add(obj.getLabel());
+                cellScopeName.add(obj.getLabel());
             } else {
-                localScopeName.add("");
+                cellScopeName.add("");
             }
         }
     }
-    public void addLocalScopeUri(String localScopeUri) {
-        this.localScopeUri.add(localScopeUri);
+    public void addCellScopeUri(String cellScopeUri) {
+        this.cellScopeUri.add(cellScopeUri);
     }
-    public List<String> getLocalScopeName() {
-        return localScopeName;
+    public List<String> getCellScopeName() {
+        return cellScopeName;
     }
-    public void setLocalScopeName(List<String> localScopeName) {
-        this.localScopeName = localScopeName;
+    public void setCellScopeName(List<String> cellScopeName) {
+        this.cellScopeName = cellScopeName;
     }
-    public void addLocalScopeName(String localScopeName) {
-        this.localScopeName.add(localScopeName);
+    public void addCellScopeName(String cellScopeName) {
+        this.cellScopeName.add(cellScopeName);
     }
     public List<String> getDatasetUri() {
         return datasetURIs;
@@ -646,8 +654,7 @@ public class ObjectAccessSpec extends HADatAcThing {
     public boolean saveToSolr() {
         try {
             SolrClient client = new HttpSolrClient.Builder(
-                    ConfigFactory.load().getString("hadatac.solr.data") 
-                    + CollectionUtil.DATA_COLLECTION).build();
+                    CollectionUtil.getCollectionPath(CollectionUtil.Collection.DATA_COLLECTION)).build();
             if (null == endedAt) {
                 endedAt = DateTime.parse("9999-12-31T23:59:59.999Z");
             }
@@ -671,8 +678,7 @@ public class ObjectAccessSpec extends HADatAcThing {
             deleteMeasurementData();
 
             SolrClient solr = new HttpSolrClient.Builder(
-                    ConfigFactory.load().getString("hadatac.solr.data") 
-                    + CollectionUtil.DATA_COLLECTION).build();
+                    CollectionUtil.getCollectionPath(CollectionUtil.Collection.DATA_COLLECTION)).build();
             UpdateResponse response = solr.deleteById(this.uri);
             solr.commit();
             solr.close();
@@ -697,8 +703,7 @@ public class ObjectAccessSpec extends HADatAcThing {
 
         try {
             SolrClient solr = new HttpSolrClient.Builder(
-                    ConfigFactory.load().getString("hadatac.solr.data") 
-                    + CollectionUtil.DATA_ACQUISITION).build();
+                    CollectionUtil.getCollectionPath(CollectionUtil.Collection.DATA_ACQUISITION)).build();
             QueryResponse queryResponse = solr.query(query, SolrRequest.METHOD.POST);
             solr.close();
             SolrDocumentList results = queryResponse.getResults();
@@ -728,8 +733,7 @@ public class ObjectAccessSpec extends HADatAcThing {
 
         try {
             SolrClient solr = new HttpSolrClient.Builder(
-                    ConfigFactory.load().getString("hadatac.solr.data") 
-                    + CollectionUtil.DATA_ACQUISITION).build();
+                    CollectionUtil.getCollectionPath(CollectionUtil.Collection.DATA_ACQUISITION)).build();
             QueryResponse queryResponse = solr.query(query, SolrRequest.METHOD.POST);
             solr.close();
             Pivot pivot = Pivot.parseQueryResponse(queryResponse);
@@ -878,22 +882,22 @@ public class ObjectAccessSpec extends HADatAcThing {
                     dataAcquisition.addDatasetUri(i.next().toString());
                 }
             }
-            if (doc.getFieldValue("globalscope_uri_str") != null) {
-                dataAcquisition.setGlobalScopeUri(doc.getFieldValue("globalscope_uri_str").toString());
-            }
-            if (doc.getFieldValue("globalscope_name_str") != null) {
-                dataAcquisition.setGlobalScopeName(doc.getFieldValue("globalscope_name_str").toString());
-            }
+            //if (doc.getFieldValue("globalscope_uri_str") != null) {
+            //    dataAcquisition.setRowScopeUri(doc.getFieldValue("globalscope_uri_str").toString());
+            //}
+            //if (doc.getFieldValue("globalscope_name_str") != null) {
+            //    dataAcquisition.setRowScopeName(doc.getFieldValue("globalscope_name_str").toString());
+            //}
             if (doc.getFieldValues("localscope_uri_str_multi") != null) {
                 i = doc.getFieldValues("localscope_uri_str_multi").iterator();
                 while (i.hasNext()) {
-                    dataAcquisition.addLocalScopeUri(i.next().toString());
+                    dataAcquisition.addCellScopeUri(i.next().toString());
                 }
             }
             if (doc.getFieldValues("localscope_name_str_multi") != null) {
                 i = doc.getFieldValues("localscope_name_str_multi").iterator();
                 while (i.hasNext()) {
-                    dataAcquisition.addLocalScopeName(i.next().toString());
+                    dataAcquisition.addCellScopeName(i.next().toString());
                 }
             }
             if (doc.getFieldValue("status_int") != null) {
@@ -989,8 +993,7 @@ public class ObjectAccessSpec extends HADatAcThing {
     public static ObjectAccessSpec findDataAcquisition(SolrQuery query) {
         ObjectAccessSpec dataAcquisition = null;
         SolrClient solr = new HttpSolrClient.Builder(
-                ConfigFactory.load().getString("hadatac.solr.data") 
-                + CollectionUtil.DATA_COLLECTION).build();
+                CollectionUtil.getCollectionPath(CollectionUtil.Collection.DATA_COLLECTION)).build();
 
         try {
             QueryResponse queryResponse = solr.query(query);
@@ -1040,8 +1043,7 @@ public class ObjectAccessSpec extends HADatAcThing {
         List<ObjectAccessSpec> results = new ArrayList<ObjectAccessSpec>();
 
         SolrClient solr = new HttpSolrClient.Builder(
-                ConfigFactory.load().getString("hadatac.solr.data") 
-                + CollectionUtil.DATA_COLLECTION).build();
+                CollectionUtil.getCollectionPath(CollectionUtil.Collection.DATA_COLLECTION)).build();
 
         try {
             QueryResponse response = solr.query(query);
@@ -1099,8 +1101,12 @@ public class ObjectAccessSpec extends HADatAcThing {
             Iterator<DataAcquisitionSchemaAttribute> i = schema.getAttributes().iterator();
             while (i.hasNext()) {
                 DataAcquisitionSchemaAttribute dasa = i.next();
-                dataAcquisition.addCharacteristic(dasa.getAttributeLabel());
-                dataAcquisition.addCharacteristicUri(dasa.getAttribute());
+                for (String attr : dasa.getAttributeLabel()) {
+                    dataAcquisition.addCharacteristic(attr);
+                }
+                for (String attr : dasa.getAttribute()) {
+                    dataAcquisition.addCharacteristicUri(attr);
+                }
                 dataAcquisition.addEntity(dasa.getEntityLabel());
                 dataAcquisition.addEntityUri(dasa.getEntity());
                 dataAcquisition.addUnit(dasa.getUnitLabel());
@@ -1204,13 +1210,13 @@ public class ObjectAccessSpec extends HADatAcThing {
         builder.append("platform_uri: " + this.platformUri + "\n");
         builder.append("location: " + this.location + "\n");
         builder.append("elevation: " + this.elevation + "\n");
-        builder.append("globalScopeUri: " + this.globalScopeUri + "\n");
-        builder.append("globalScopeName: " + this.globalScopeName + "\n");
-        for (String localUri : localScopeUri) {
-            builder.append("localScopeUri: " + localUri + "\n");
+        //builder.append("rowScopeUri: " + this.rowScopeUri + "\n");
+        //builder.append("rowScopeName: " + this.rowScopeName + "\n");
+        for (String cellUri : cellScopeUri) {
+            builder.append("cellScopeUri: " + cellUri + "\n");
         }
-        for (String localName : localScopeName) {
-            builder.append("localScopeName: " + localName + "\n");
+        for (String cellName : cellScopeName) {
+            builder.append("cellScopeName: " + cellName + "\n");
         }
         i = datasetURIs.iterator();
         while (i.hasNext()) {
@@ -1233,13 +1239,13 @@ public class ObjectAccessSpec extends HADatAcThing {
             abbrevAssociatedURIs.add(URIUtils.replaceNameSpaceEx(uri));
         }
 
-        String localUri = "";
+        String cellUri = "";
         int totalChanged = 0;
-        Iterator<String> i = getLocalScopeUri().iterator();
+        Iterator<String> i = getCellScopeUri().iterator();
         while (i.hasNext()) {
-            localUri += URIUtils.replaceNameSpaceEx(i.next());
+            cellUri += URIUtils.replaceNameSpaceEx(i.next());
             if (i.hasNext()) {
-                localUri += " , ";
+                cellUri += " , ";
             }
         }
         List< Map<String, Object> > rows = new ArrayList< Map<String, Object> >();
@@ -1254,8 +1260,8 @@ public class ObjectAccessSpec extends HADatAcThing {
         row.put("hasco:hasDeployment", URIUtils.replaceNameSpaceEx(getDeploymentUri()));
         row.put("hasco:isDataAcquisitionOf", URIUtils.replaceNameSpaceEx(getStudyUri()));
         row.put("hasco:hasSchema", URIUtils.replaceNameSpaceEx(getSchemaUri()));
-        row.put("hasco:hasGlobalScope", URIUtils.replaceNameSpaceEx(getGlobalScopeUri()));
-        row.put("hasco:hasLocalScope", localUri); 
+        //row.put("hasco:hasRowScope", URIUtils.replaceNameSpaceEx(getRowScopeUri()));
+        row.put("hasco:hasCellScope", cellUri); 
         row.put("hasco:hasTriggeringEvent", getTriggeringEventName());
         row.put("prov:endedAtTime", getEndedAt().startsWith("9999")? "" : getEndedAt());
         rows.add(row);

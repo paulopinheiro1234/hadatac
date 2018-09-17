@@ -15,7 +15,7 @@
       <div class="row">
           <div class="col-md-1 col-xs-0"></div>
           <div class="col-md-8 col-xs-0">
-             <h3><font color="darkBlue">@ConfigFactory.load().getString("hadatac.community.shortname") 's Human-Aware Data Acquisition Framework</font></h3>
+             <h3><font color="darkBlue">@ConfigFactory.load().getString("hadatac.community.shortname")'s Human-Aware Data Acquisition Framework</font></h3>
              @ConfigFactory.load().getString("hadatac.community.description") 
              <hr>
           </div>
@@ -43,13 +43,15 @@
 		<a href="@org.hadatac.console.controllers.studies.routes.StudyManagement.index()" 
 		   id="studies" class="btn btn-primary btn-block" role="button">Manage Studies</a>
 		<a href="@org.hadatac.console.controllers.deployments.routes.DeploymentManagement.index(State.ACTIVE, filename, da_uri)" 
-		   id="deployments" class="btn btn-primary btn-block" role="button">Manage Deployments (Platforms, Instruments)</a>
+		   id="deployments" class="btn btn-primary btn-block" role="button">Manage DPLs</a>
 		<a href="@org.hadatac.console.controllers.dataacquisitionmanagement.routes.DataAcquisitionManagement.index(State.ACTIVE)"  
-		   id="dataacquisitions" class="btn btn-primary btn-block" role="button">Manage Data Acquisitions</a>
+		   id="dataacquisitions" class="btn btn-primary btn-block" role="button">Manage OASs</a>
 		<a href="@org.hadatac.console.controllers.schema.routes.DASManagement.index()" 
-		   id="DAS" class="btn btn-primary btn-block" role="button">Manage Data Acquisition Schemas</a>
+		   id="DAS" class="btn btn-primary btn-block" role="button">Manage SDDs</a>
 		<a href="@org.hadatac.console.controllers.indicators.routes.IndicatorManagement.index()" 
 		   id="indicators" class="btn btn-primary btn-block" role="button">Manage Indicators</a>
+		<a href="@org.hadatac.console.controllers.fileviewer.routes.SDDEditor.index()" 
+           id="sddeditor" class="btn btn-primary btn-block" role="button">SDD Editor</a>
 	   }}
         </div>
         @restrict(roles = anyOf(allOf("data_manager"))) {
@@ -136,6 +138,7 @@
               $('#autoannotate').attr( 'class', 'btn btn-primary btn-block' );
               $('#studies').attr( 'class', 'btn btn-primary btn-block' );
               $('#indicators').attr( 'class', 'btn btn-primary btn-block' );
+              $('#sddeditor').attr( 'class', 'btn btn-primary btn-block' );
               $('#deployments').attr( 'class', 'btn btn-primary btn-block' );
               $('#dataacquisitions').attr( 'class', 'btn btn-primary btn-block' );
               $('#annotator').attr( 'class', 'btn btn-primary btn-block' );
@@ -152,6 +155,7 @@
               $('#autoannotate').attr( 'class', 'btn btn-primary btn-block disabled' );
               $('#studies').attr( 'class', 'btn btn-primary btn-block disabled' );
               $('#indicators').attr( 'class', 'btn btn-primary btn-block disabled' );
+              $('#sddeditor').attr( 'class', 'btn btn-primary btn-block disabled' );
               $('#deployments').attr( 'class', 'btn btn-primary btn-block disabled' );
               $('#dataacquisitions').attr( 'class', 'btn btn-primary btn-block disabled' );
               $('#annotator').attr( 'class', 'btn btn-primary btn-block disabled' );

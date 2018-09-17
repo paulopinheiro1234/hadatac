@@ -41,14 +41,18 @@ services:
     hadatac:
         build: ./
         restart: always
+        container_name: hadatac
         tty: true
         ports:
             - "9000:9000"
         networks:
             hadatac:
                 aliases:
-                    - hadatac.org
                     - hadatac
+        # Creates a volume to store the various csv files. This allows you to copy data into them.
+        # Example command: docker cp <filename> hadatac:/root/app/csvs/unprocessed_csv
+        volumes:
+            - hadatac-csvs:/root/app/csvs
         links:
             - blazegraph
             - solr
@@ -59,6 +63,7 @@ services:
 volumes:
     hadatac-solr:
     hadatac-blazegraph:
+    hadatac-csvs:
 
 networks:
     hadatac:

@@ -1,6 +1,10 @@
 package org.hadatac.console.http;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.List;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
@@ -45,6 +49,19 @@ public class SolrUtils {
 		}
 		
 		return "";
+	}
+	
+	public static List<String> getFieldValues(SolrDocument doc, String field) {
+		Collection<Object> values = doc.getFieldValues(field);
+		List<String> results = new ArrayList<String>();
+		if (null != values) {
+			Iterator<Object> i = values.iterator();
+			while (i.hasNext()) {
+				results.add(i.next().toString());
+			}
+		}
+		
+		return results;
 	}
 	
 	public static boolean clearCollection(String solrCollection) {

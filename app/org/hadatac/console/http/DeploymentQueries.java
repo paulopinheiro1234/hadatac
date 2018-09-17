@@ -153,7 +153,7 @@ public class DeploymentQueries {
     		Query query = QueryFactory.create(queryString);
     			
     		QueryExecution qexec = QueryExecutionFactory.sparqlService(
-    				CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), query);
+    				CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), query);
     		ResultSet results = qexec.execSelect();
     		
     		ResultSetFormatter.outputAsJSON(outputStream, results);

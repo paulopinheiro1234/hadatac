@@ -29,8 +29,7 @@ public class Characteristic extends HADatAcClass implements Comparable<Character
 		String queryString = "DESCRIBE <" + uri + ">";
 		Query query = QueryFactory.create(queryString);
 		QueryExecution qexec = QueryExecutionFactory.sparqlService(
-				ConfigFactory.load().getString("hadatac.solr.triplestore") 
-				+ CollectionUtil.METADATA_SPARQL, query);
+		        CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), query);
 		model = qexec.execDescribe();
 
 		characteristic = new Characteristic();

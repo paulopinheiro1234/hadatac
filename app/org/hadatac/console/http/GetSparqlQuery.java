@@ -4,6 +4,7 @@ import java.io.ByteArrayOutputStream;
 
 import org.hadatac.console.models.SparqlQuery;
 import org.hadatac.utils.CollectionUtil;
+import org.hadatac.utils.CollectionUtil.Collection;
 import org.hadatac.utils.NameSpaces;
 import org.apache.jena.query.Query;
 import org.apache.jena.query.QueryExecution;
@@ -18,20 +19,20 @@ public class GetSparqlQuery {
     public GetSparqlQuery () {} 
 
     public GetSparqlQuery (SparqlQuery query) {
-    	this(CollectionUtil.METADATA_SPARQL, query);
+    	this(CollectionUtil.Collection.METADATA_SPARQL, query);
     }
     
-    public GetSparqlQuery (String collectionSource, SparqlQuery query) {
-        this.collection = CollectionUtil.getCollectionsName(collectionSource);
+    public GetSparqlQuery (Collection collectionSource, SparqlQuery query) {
+        collection = CollectionUtil.getCollectionPath(collectionSource);
         System.out.println("Collection: " + collection);
     }
 
     public GetSparqlQuery (SparqlQuery query, String tabName) {
-    	this(CollectionUtil.METADATA_SPARQL, query, tabName);
+    	this(CollectionUtil.Collection.METADATA_SPARQL, query, tabName);
     }
 
-    public GetSparqlQuery (String collectionSource, SparqlQuery query, String tabName) {
-    	this.collection = CollectionUtil.getCollectionsName(collectionSource);
+    public GetSparqlQuery (Collection collectionSource, SparqlQuery query, String tabName) {
+        collection = CollectionUtil.getCollectionPath(collectionSource);;
         System.out.println("Collection: " + collection);
     }
     
@@ -135,7 +136,7 @@ public class GetSparqlQuery {
             		"  ?agent a foaf:Group . " + 
             		"  OPTIONAL { ?agent foaf:name ?name . } " + 
             		"  OPTIONAL { ?agent foaf:homepage ?page . } " + 
-            		"  OPTIONAL { ?agent hadatac:isMemberOfGroup ?group . } " + 
+            		"  OPTIONAL { ?agent sio:isMemberOf ?group . } " + 
             		"}";
                 break;
             case "PeopleH" : 
@@ -146,7 +147,7 @@ public class GetSparqlQuery {
             		"  ?agent a foaf:Person . " + 
             		"  OPTIONAL { ?agent foaf:name ?name . } " + 
             		"  OPTIONAL { ?agent foaf:mbox ?email . } " + 
-            		"  OPTIONAL { ?agent hadatac:isMemberOfGroup ?group . } " + 
+            		"  OPTIONAL { ?agent sio:isMemberOf ?group . } " + 
             		"}";
                 break;
             case "DetectorModels" : 

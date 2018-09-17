@@ -1,12 +1,14 @@
 package org.hadatac.console.models;
 
+import java.util.List;
+
 public class DASAForm {
 
     public String newUri;
     public String newLabel;
     public String newPosition;
     public String newEntity;
-    public String newAttribute;
+    public List<String> newAttribute;
     public String newUnit;
     public String newObject;
     public String newEvent;
@@ -43,11 +45,11 @@ public class DASAForm {
 	this.newEntity = newEntity;
     }
     
-    public String getNewAttribute() {
+    public List<String> getNewAttribute() {
 	return newAttribute;
     }
 
-    public void setNewAttribute(String newAttribute) {
+    public void setNewAttribute(List<String> newAttribute) {
 	this.newAttribute = newAttribute;
     }
 	

@@ -53,8 +53,7 @@ public class InRelationToInstance extends HADatAcThing implements Comparable<InR
 
         try {
             SolrClient solr = new HttpSolrClient.Builder(
-                    ConfigFactory.load().getString("hadatac.solr.data") 
-                    + CollectionUtil.DATA_ACQUISITION).build();
+                    CollectionUtil.getCollectionPath(CollectionUtil.Collection.DATA_ACQUISITION)).build();
             QueryResponse queryResponse = solr.query(query, SolrRequest.METHOD.POST);
             solr.close();
             Pivot pivot = Pivot.parseQueryResponse(queryResponse);

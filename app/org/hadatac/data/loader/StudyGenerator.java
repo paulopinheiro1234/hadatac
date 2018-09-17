@@ -4,19 +4,22 @@ import java.lang.String;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.hadatac.console.controllers.annotator.AnnotationLog;
+import org.hadatac.metadata.loader.URIUtils;
 import org.hadatac.utils.ConfigProp;
 import org.hadatac.utils.Templates;
 
 public class StudyGenerator extends BasicGenerator {
 	final String kbPrefix = ConfigProp.getKbPrefix();
-	private int counter = 1; //starting index number
+	String file_name;
 
 	public StudyGenerator(RecordFile file) {
 		super(file);
+		this.file_name = file.getFile().getName();
 	}
 
 	@Override
-	void initMapping() {
+	public void initMapping() {
 		mapCol.clear();
 		mapCol.put("studyID", Templates.STUDYID);
 		mapCol.put("studyTitle", Templates.STUDYTITLE);
@@ -47,8 +50,9 @@ public class StudyGenerator extends BasicGenerator {
 		mapCol.put("externalSource", Templates.EXTSRC);
 	}
 
-	private String getUri(Record rec) { 
-		return kbPrefix + "STD-" + rec.getValueByColumnName(mapCol.get("studyID"));
+	private String getUri(Record rec) {
+		String str = rec.getValueByColumnName(mapCol.get("studyID"));
+		return kbPrefix + "STD-" + str;
 	}
 
 	private String getType() {
@@ -82,22 +86,27 @@ public class StudyGenerator extends BasicGenerator {
 	@Override
 	public Map<String, Object> createRow(Record rec, int row_number) throws Exception {
 		Map<String, Object> row = new HashMap<String, Object>();
-		row.put("hasURI", getUri(rec));
-		row.put("a", getType());
-		row.put("rdfs:label", getTitle(rec));
-		row.put("skos:definition", getAims(rec));
-		row.put("rdfs:comment", getSignificance(rec));
-		if(rec.getValueByColumnName(mapCol.get("PI")).length() > 0) {
-			row.put("hasco:hasAgent", getAgentUri(rec));
-		}
-		if(rec.getValueByColumnName(mapCol.get("institution")).length() > 0) {
-			row.put("hasco:hasInstitution", getInstitutionUri(rec));
-		}
-		if(rec.getValueByColumnName(mapCol.get("externalSource")).length() > 0) {
-			row.put("hasco:hasExternalSource", getExtSource(rec));
-		}
-		counter++;
+		if (getUri(rec).length()>0) {
+			AnnotationLog.println("This STD has Study_ID : " + kbPrefix + "STD-" + getUri(rec) +".", file_name);
+			row.put("hasURI", getUri(rec));
+			row.put("a", getType());
+			row.put("rdfs:label", getTitle(rec));
+			row.put("skos:definition", getAims(rec));
+			row.put("rdfs:comment", getSignificance(rec));
+			if(rec.getValueByColumnName(mapCol.get("PI")).length() > 0) {
+				row.put("hasco:hasAgent", getAgentUri(rec));
+			}
+			if(rec.getValueByColumnName(mapCol.get("institution")).length() > 0) {
+				row.put("hasco:hasInstitution", getInstitutionUri(rec));
+			}
+			if(rec.getValueByColumnName(mapCol.get("externalSource")).length() > 0) {
+				row.put("hasco:hasExternalSource", getExtSource(rec));
+			}
+			setStudyUri(URIUtils.replacePrefixEx(getUri(rec)));
 
+		} else {
+			AnnotationLog.printException("This STD has no Study_ID filled.", file_name);
+		}
 		return row;
 	}
 
@@ -108,7 +117,7 @@ public class StudyGenerator extends BasicGenerator {
 
 	@Override
 	public String getErrorMsg(Exception e) {
-		return "";
+		return "Error in StudyGenerator: " + e.getMessage();
 	}
 }
 

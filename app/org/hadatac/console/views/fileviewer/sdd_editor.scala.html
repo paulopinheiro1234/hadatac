@@ -1,0 +1,65 @@
+@()
+
+@import helper._
+@import org.hadatac.console.views.html._
+@import org.hadatac.console.views.html.annotator._
+@import org.hadatac.console.controllers.annotator._
+@import org.hadatac.metadata.loader._
+@import java.net._
+
+@main("SDD Editor"){
+    <script src="@controllers.routes.Assets.versioned("sheetjs/vendor/alertify.js")"></script>
+    <script src="http://unpkg.com/canvas-datagrid/dist/canvas-datagrid.js"></script>
+
+    <link rel="stylesheet" href="@controllers.routes.Assets.versioned("sheetjs/css/sheetjs.css")">
+    <link rel="stylesheet" media="screen" href="@controllers.routes.Assets.versioned("sheetjs/vendor/alertify.css")">
+
+    <div id="body">
+      <div id="left">
+        <h3>SDD Editor</h3>
+        <div id="drop">Drop a file here</div>
+        <input type="file" id="file" value=""/>
+        <input type="button" id="upload" value="Submit"/>
+      </div>
+    
+      <div id="right">
+        <div id="grid"></div>
+        <div id="buttons"></div>
+        <div id="footnote"></div>
+      </div>
+    </div>
+    
+    <script src="@controllers.routes.Assets.versioned("sheetjs/js/shim.js")"></script>
+    <script src="http://unpkg.com/xlsx/dist/xlsx.full.min.js"></script>
+    <script src="@controllers.routes.Assets.versioned("sheetjs/js/dropsheet.js")"></script>
+    <script src="@controllers.routes.Assets.versioned("sheetjs/js/main.js")"></script>
+    <script src="@controllers.routes.Assets.versioned("sheetjs/vendor/spin.js")"></script>
+    
+    <script>
+    var _upload = document.getElementById('upload');
+    var _onupload = function(e) {
+        console.log('Uploading');
+    };
+
+    DropSheet({
+      file: _file,
+      drop: _target,
+      upload: _upload,
+      upload_url: "@org.hadatac.console.controllers.fileviewer.routes.SDDEditor.uploadSDDFile()",
+      on: {
+        workstart: _workstart,
+        workend: _workend,
+        sheet: _onsheet,
+        upload: _onupload,
+        foo: 'bar'
+      },
+      errors: {
+        badfile: _badfile,
+        pending: _pending,
+        failed: _failed,
+        large: _large,
+        foo: 'bar'
+      }
+    });
+    </script>
+}

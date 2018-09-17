@@ -22,6 +22,7 @@ import org.hadatac.utils.NameSpaces;
 
 import com.typesafe.config.ConfigFactory;
 
+import org.hadatac.console.http.SPARQLUtils;
 import org.hadatac.metadata.loader.URIUtils;
 
 public class ObjectCollectionType extends HADatAcClass implements Comparable<ObjectCollectionType> {
@@ -77,12 +78,9 @@ public class ObjectCollectionType extends HADatAcClass implements Comparable<Obj
 				"} ";
 
 		// System.out.println("Query: " + queryString);
-		Query query = QueryFactory.create(queryString);
-
-		QueryExecution qexec = QueryExecutionFactory.sparqlService(CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), query);
-		ResultSet results = qexec.execSelect();
-		ResultSetRewindable resultsrw = ResultSetFactory.copyResults(results);
-		qexec.close();
+		
+		ResultSetRewindable resultsrw = SPARQLUtils.select(
+                CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), queryString);
 
 		while (resultsrw.hasNext()) {
 			QuerySolution soln = resultsrw.next();
@@ -112,8 +110,7 @@ public class ObjectCollectionType extends HADatAcClass implements Comparable<Obj
 		String queryString = "DESCRIBE <" + uri + ">";
 		Query query = QueryFactory.create(queryString);
 		QueryExecution qexec = QueryExecutionFactory.sparqlService(
-				ConfigFactory.load().getString("hadatac.solr.triplestore") 
-				+ CollectionUtil.METADATA_SPARQL, query);
+		        CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), query);
 		model = qexec.execDescribe();
 
 		objectCollectionType = new ObjectCollectionType();

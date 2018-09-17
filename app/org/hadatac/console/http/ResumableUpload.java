@@ -66,7 +66,7 @@ public class ResumableUpload {
         
         //Here we add a ".temp" to every upload file to indicate NON-FINISHED
         File folder = new File(base_dir);
- 		if (!folder.exists()){
+ 		if (!folder.exists()) {
  			folder.mkdirs();
  	    }
         String resumableFilePath = new File(base_dir, resumableFilename).getAbsolutePath() + ".temp";

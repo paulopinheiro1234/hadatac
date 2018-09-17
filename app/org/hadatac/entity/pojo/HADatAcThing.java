@@ -8,6 +8,17 @@ import org.apache.commons.lang3.NotImplementedException;
 import org.hadatac.console.models.Facet;
 import org.hadatac.console.models.FacetHandler;
 import org.hadatac.metadata.loader.URIUtils;
+import org.apache.jena.query.Query;
+import org.apache.jena.query.QueryExecution;
+import org.apache.jena.query.QueryExecutionFactory;
+import org.apache.jena.query.QueryFactory;
+import org.apache.jena.query.QuerySolution;
+import org.apache.jena.query.ResultSet;
+import org.apache.jena.query.ResultSetRewindable;
+import org.apache.jena.query.ResultSetFormatter;
+import org.hadatac.utils.NameSpaces;
+import org.hadatac.utils.CollectionUtil;
+import org.hadatac.console.http.SPARQLUtils;
 
 public abstract class HADatAcThing {
 	String uri;
@@ -105,6 +116,31 @@ public abstract class HADatAcThing {
 		this.comment = comment;
 	}
 	
+        public static int getNumberInstances() {
+	    String query = "";
+	    query += NameSpaces.getInstance().printSparqlNameSpaceList();
+	    query += "select (COUNT(?categ) as ?tot) where " +  
+		     " { SELECT ?i (COUNT(?i) as ?categ) " +
+		     "     WHERE {" + 
+                     "             ?i a ?c . " +
+	             "     } " +
+                     " GROUP BY ?i " + 
+		     " }";
+	    
+	    try {
+		ResultSetRewindable resultsrw = SPARQLUtils.select(
+						CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), query);
+		
+		if (resultsrw.hasNext()) {
+		    QuerySolution soln = resultsrw.next();
+		    return Integer.parseInt(soln.getLiteral("tot").getString());
+		}
+	    } catch (Exception e) {
+		e.printStackTrace();
+	    }
+	    return -1;
+	}
+    
 	public void save() { throw new NotImplementedException("Used unimplemented HADatAcThing.save() method"); }
 	public void delete() { throw new NotImplementedException("Used unimplemented HADatAcThing.delete() method"); }
 	

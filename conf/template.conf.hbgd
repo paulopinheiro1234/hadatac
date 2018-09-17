@@ -36,6 +36,11 @@ DAStudyName=Study ID
 DataDictionaryName=data dict
 Epi/Lab=epi/lab
 OwnerEmail=owner email
+PermissionURI=permission uri
+
+# OAS Template
+DeploymentUri=deployment uri
+CellScope=cell scope
 
 # DASA, DASE, DASO Template (Part of SDD)
 Label=Column 
@@ -70,4 +75,7 @@ FTcount=sample_freeze_thaw_cycles
 # MAP Template
 originalPID=patient_id
 originalSID=specimen_id
+objectype=rdf:type
+studyId=study_id
+timeScope=timeScopeID
 

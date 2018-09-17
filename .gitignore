@@ -20,7 +20,9 @@ RUNNING_PID
 .cache-main
 .cache-tests
 ~
-processed_csv/
-unprocessed_csv/
-downloaded_csv/
+./processed_csv/
+./unprocessed_csv/
+./downloaded_csv/
 sddtmp/
+dpltmp/
+*.swp

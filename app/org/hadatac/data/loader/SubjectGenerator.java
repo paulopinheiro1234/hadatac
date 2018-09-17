@@ -4,6 +4,7 @@ import java.lang.String;
 
 import org.hadatac.utils.ConfigProp;
 import org.hadatac.entity.pojo.StudyObject;
+import org.hadatac.metadata.loader.URIUtils;
 import org.hadatac.entity.pojo.HADatAcThing;
 import org.hadatac.entity.pojo.ObjectCollection;
 
@@ -14,7 +15,7 @@ public class SubjectGenerator extends BasicGenerator {
     String study_id;
 
     final String kbPrefix = ConfigProp.getKbPrefix();
-    
+
     public SubjectGenerator(RecordFile file) {
         super(file);
         file_name = file.getFile().getName();
@@ -22,18 +23,18 @@ public class SubjectGenerator extends BasicGenerator {
     }
 
     @Override
-    void initMapping() {
+    public void initMapping() {
         mapCol.clear();
         mapCol.put("subjectID", "CHEAR PID");
         mapCol.put("pilotNum", "CHEAR Project ID");
     }
 
     private String getUri(Record rec) {
-    		return kbPrefix + "SBJ-" + getOriginalID(rec) + "-" + getStudyUri(rec);
+        return kbPrefix + "SBJ-" + getOriginalID(rec) + "-" + getStudyId(rec);
     }
 
     private String getLabel(Record rec) {
-            return "Subject ID " + getOriginalID(rec) + " - " + getStudyUri(rec);
+        return "Subject ID " + getOriginalID(rec) + " - " + getStudyId(rec);
     }
 
     private String getOriginalID(Record rec) {
@@ -44,29 +45,29 @@ public class SubjectGenerator extends BasicGenerator {
         return rec.getValueByColumnName(mapCol.get("pilotNum"));
     }
 
-    private String getStudyUri(Record rec) {
-    	if (file_name.startsWith("PID-")){
-    		return getPilotNum(rec);
-    	} else if (file_name.startsWith("SSD-")){
+    private String getStudyId(Record rec) {
+        if (file_name.startsWith("PID-")) {
+            return getPilotNum(rec);
+        } else if (file_name.startsWith("SSD-")) {
             return study_id;
-    	}
-		return null;
+        }
+        return null;
     }
-    
+
     private String getSSDCohortUri(Record rec) {
-    	return kbPrefix + "SOC-" + getStudyUri(rec) + "-SUBJECTS";
+        return kbPrefix + "SOC-" + getStudyId(rec) + "-SUBJECTS";
     }
 
 
     private String getCohortLabel(Record rec) {
-    	return "Study Population of " + getStudyUri(rec);
+        return "Study Population of " + getStudyId(rec);
     }
 
     public StudyObject createStudyObject(Record record) throws Exception {
         StudyObject obj = new StudyObject(getUri(record), "sio:Human", 
                 getOriginalID(record), getLabel(record), 
                 getSSDCohortUri(record), getLabel(record));
-        
+
         return obj;
     }
 
@@ -76,11 +77,15 @@ public class SubjectGenerator extends BasicGenerator {
                 "http://hadatac.org/ont/hasco/SubjectGroup",
                 getCohortLabel(record),
                 getCohortLabel(record),
-                kbPrefix + "STD-" + getStudyUri(record));
-        
+                kbPrefix + "STD-" + getStudyId(record));
+
+        if (!getStudyId(record).isEmpty()) {
+            setStudyUri(URIUtils.replacePrefixEx(kbPrefix + "STD-" + getStudyId(record)));
+        }
+
         return oc;
     }
-    
+
     @Override
     HADatAcThing createObject(Record rec, int row_number) throws Exception {
         return createStudyObject(rec);
@@ -89,9 +94,9 @@ public class SubjectGenerator extends BasicGenerator {
     @Override
     public void preprocess() throws Exception {
         if (!records.isEmpty()) {
-        	if (file_name.startsWith("PID-")){
-        		objects.add(createObjectCollection(records.get(0)));
-        	}
+            if (file_name.startsWith("PID-")) {
+                objects.add(createObjectCollection(records.get(0)));
+            }
         }
     }
 

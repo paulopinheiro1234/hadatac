@@ -17,8 +17,6 @@ import org.apache.jena.query.QueryExecutionFactory;
 import org.apache.jena.query.QueryFactory;
 import org.apache.jena.query.QueryParseException;
 import org.apache.jena.query.QuerySolution;
-import org.apache.jena.query.ResultSet;
-import org.apache.jena.query.ResultSetFactory;
 import org.apache.jena.query.ResultSetRewindable;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.RDFNode;
@@ -31,8 +29,10 @@ import org.apache.jena.update.UpdateFactory;
 import org.apache.jena.update.UpdateProcessor;
 import org.apache.jena.update.UpdateRequest;
 import org.hadatac.console.controllers.triplestore.UserManagement;
+import org.hadatac.console.http.SPARQLUtils;
 import org.hadatac.console.models.LinkedAccount;
 import org.hadatac.console.models.SysUser;
+import org.hadatac.metadata.loader.URIUtils;
 import org.hadatac.utils.CollectionUtil;
 import org.hadatac.utils.NameSpaces;
 
@@ -154,14 +154,14 @@ public class User implements Comparable<User> {
         insert += "<" + this.getUri() + ">  ";
         insert += " foaf:mbox " + "\"" + this.email + "\" . ";
         insert += "<" + this.getUri() + ">  ";
-        insert += " hadatac:isMemberOfGroup " + "\"Public\" . ";
+        insert += " sio:isMemberOf " + "\"Public\" . ";
         insert += "}  ";
         System.out.println("!!!! INSERT USER");
 
         try {
             UpdateRequest request = UpdateFactory.create(insert);
             UpdateProcessor processor = UpdateExecutionFactory.createRemote(request, 
-                    CollectionUtil.getCollectionsName(CollectionUtil.PERMISSIONS_UPDATE));
+                    CollectionUtil.getCollectionPath(CollectionUtil.Collection.PERMISSIONS_UPDATE));
             processor.execute();
         } catch (QueryParseException e) {
             System.out.println("QueryParseException due to update query: " + insert);
@@ -179,7 +179,7 @@ public class User implements Comparable<User> {
         Query query = QueryFactory.create(queryString);
 
         QueryExecution qexec = QueryExecutionFactory.sparqlService(
-                CollectionUtil.getCollectionsName(CollectionUtil.PERMISSIONS_SPARQL), query);
+                CollectionUtil.getCollectionPath(CollectionUtil.Collection.PERMISSIONS_SPARQL), query);
         Model model = qexec.execConstruct();
 
         File ttl_file = new File(UserManagement.getTurtlePath());
@@ -228,14 +228,9 @@ public class User implements Comparable<User> {
                         "SELECT ?uri WHERE { " +
                         "  ?uri a foaf:Person . " +
                         "} ";
-
-        Query query = QueryFactory.create(queryString);
-
-        QueryExecution qexec = QueryExecutionFactory.sparqlService(
-                CollectionUtil.getCollectionsName(CollectionUtil.PERMISSIONS_SPARQL), query);
-        ResultSet results = qexec.execSelect();
-        ResultSetRewindable resultsrw = ResultSetFactory.copyResults(results);
-        qexec.close();
+        
+        ResultSetRewindable resultsrw = SPARQLUtils.select(
+                CollectionUtil.getCollectionPath(CollectionUtil.Collection.PERMISSIONS_SPARQL), queryString);
 
         while (resultsrw.hasNext()) {
             QuerySolution soln = resultsrw.next();
@@ -262,7 +257,7 @@ public class User implements Comparable<User> {
         RDFNode object;
 
         QueryExecution qexecPrivate = QueryExecutionFactory.sparqlService(
-                CollectionUtil.getCollectionsName(CollectionUtil.PERMISSIONS_SPARQL), query);
+                CollectionUtil.getCollectionPath(CollectionUtil.Collection.PERMISSIONS_SPARQL), query);
         modelPrivate = qexecPrivate.execDescribe();
         if (!modelPrivate.isEmpty()) {
             user = new User();
@@ -279,7 +274,7 @@ public class User implements Comparable<User> {
             if (statement.getPredicate().getURI().equals("http://www.w3.org/2000/01/rdf-schema#comment")) {
                 user.setComment(object.asLiteral().getString());
             }
-            else if (statement.getPredicate().getURI().equals("http://hadatac.org/ont/hadatac#isMemberOfGroup")) {
+            else if (statement.getPredicate().getURI().equals(URIUtils.replacePrefixEx("sio:isMemberOf"))) {
                 if(object.toString().equals("Public") || object.toString().equals("")){
                     user.setImmediateGroupUri("Public");
                 }
@@ -311,7 +306,7 @@ public class User implements Comparable<User> {
         }
 
         QueryExecution qexecPublic = QueryExecutionFactory.sparqlService(
-                CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), query);
+                CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), query);
         modelPublic = qexecPublic.execDescribe();
         if (!modelPublic.isEmpty() && user == null) {
             user = new User();
@@ -344,21 +339,21 @@ public class User implements Comparable<User> {
             e.printStackTrace();
         }
 
-        String command = "";
+        String command = NameSpaces.getInstance().printSparqlNameSpaceList();
         if(group_uri.equals("Public")){
-            command = "DELETE { <" + uri + "> <http://hadatac.org/ont/hadatac#isMemberOfGroup> \"" + group_uri + "\" .  } \n"
-                    + "INSERT { <" + uri + "> <http://hadatac.org/ont/hadatac#isMemberOfGroup> \"" + group_uri + "\" . } \n "
+            command += "DELETE { <" + uri + "> sio:isMemberOf \"" + group_uri + "\" .  } \n"
+                    + "INSERT { <" + uri + "> sio:isMemberOf \"" + group_uri + "\" . } \n "
                     + "WHERE { } \n";
         }
         else{
-            command = "DELETE { <" + uri + "> <http://hadatac.org/ont/hadatac#isMemberOfGroup> <" + group_uri + "> .  } \n"
-                    + "INSERT { <" + uri + "> <http://hadatac.org/ont/hadatac#isMemberOfGroup> <" + group_uri + "> . } \n "
+            command += "DELETE { <" + uri + "> sio:isMemberOf <" + group_uri + "> .  } \n"
+                    + "INSERT { <" + uri + "> sio:isMemberOf <" + group_uri + "> . } \n "
                     + "WHERE { } \n";
         }
 
         UpdateRequest req = UpdateFactory.create(command);
         UpdateProcessor processor = UpdateExecutionFactory.createRemote(
-                req, CollectionUtil.getCollectionsName(CollectionUtil.PERMISSIONS_UPDATE));
+                req, CollectionUtil.getCollectionPath(CollectionUtil.Collection.PERMISSIONS_UPDATE));
         processor.execute();
     }
 
@@ -387,7 +382,7 @@ public class User implements Comparable<User> {
         queryString += "DELETE WHERE { <" + uri + "> ?p ?o . } ";
         UpdateRequest req = UpdateFactory.create(queryString);
         UpdateProcessor processor = UpdateExecutionFactory.createRemote(
-                req, CollectionUtil.getCollectionsName(CollectionUtil.PERMISSIONS_UPDATE));
+                req, CollectionUtil.getCollectionPath(CollectionUtil.Collection.PERMISSIONS_UPDATE));
         processor.execute();
     }
 

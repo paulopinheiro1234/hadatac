@@ -2,6 +2,9 @@ package org.hadatac.console.controllers.schema;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 import play.mvc.Controller;
 import play.mvc.Result;
@@ -71,7 +74,7 @@ public class NewDASA extends Controller {
 		String newLabel = data.getNewLabel();
 		String newPosition = data.getNewPosition();
 		String newEntity = getUriFromNew(data.getNewEntity());
-		String newAttribute = getUriFromNew(data.getNewAttribute());
+		List<String> newAttribute = getUriListFromNew(data.getNewAttribute());
 		String newUnit = getUriFromNew(data.getNewUnit());
 		String newObject = data.getNewObject();
 		String newEvent = data.getNewEvent();
@@ -113,6 +116,18 @@ public class NewDASA extends Controller {
 		}
 		String response = newStr.substring(newStr.indexOf("[") + 1).replace("]","");
 		//response = URIUtils.replacePrefix(response);
+		return response;
+	}
+	
+	private static List<String> getUriListFromNew(List<String> newStrList) {
+		if (newStrList == null) {
+			return Arrays.asList("");
+		}
+		List<String> response = new ArrayList<String>();
+		for (String str : newStrList) {
+			response.add(str.substring(str.indexOf("[") + 1).replace("]",""));
+		}
+
 		return response;
 	}
 

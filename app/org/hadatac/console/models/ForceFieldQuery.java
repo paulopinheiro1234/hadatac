@@ -1,7 +1,7 @@
 package org.hadatac.console.models;
 
 import org.hadatac.console.http.GetSparqlQuery;
-import org.hadatac.utils.CollectionUtil;
+import org.hadatac.utils.CollectionUtil.Collection;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -14,14 +14,14 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class ForceFieldQuery {
-	String collectionSource = CollectionUtil.METADATA_SPARQL;
+	Collection collectionSource = Collection.METADATA_SPARQL;
 	List<AgentNode> agents = new ArrayList<AgentNode>();
 	
 	public ForceFieldQuery() {
-		this(CollectionUtil.METADATA_SPARQL);
+		this(Collection.METADATA_SPARQL);
 	}
 
-	public ForceFieldQuery(String source) {
+	public ForceFieldQuery(Collection source) {
 		collectionSource = source;
 		System.out.println("Collection source in use: " + collectionSource);
 		agents.add(new AgentNode("prov:Agent", "Public", AgentNode.AGENT, "", ""));

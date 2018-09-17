@@ -44,8 +44,7 @@ public class UserPermission implements Permission {
 	public static UserPermission findByValueSolr(String value) {
 		UserPermission permission = null;
 		SolrClient solrClient = new HttpSolrClient.Builder(
-				ConfigFactory.load().getString("hadatac.solr.users") 
-				+ CollectionUtil.AUTHENTICATE_PERMISSIONS).build();
+		        CollectionUtil.getCollectionPath(CollectionUtil.Collection.AUTHENTICATE_PERMISSIONS)).build();
     	SolrQuery solrQuery = new SolrQuery("value_str:" + value);
     	
     	try {
@@ -65,8 +64,7 @@ public class UserPermission implements Permission {
 	public static UserPermission findByIdSolr(String id) {
 		UserPermission permission = null;
 		SolrClient solrClient = new HttpSolrClient.Builder(
-				ConfigFactory.load().getString("hadatac.solr.users") 
-				+ CollectionUtil.AUTHENTICATE_PERMISSIONS).build();
+		        CollectionUtil.getCollectionPath(CollectionUtil.Collection.AUTHENTICATE_PERMISSIONS)).build();
     	SolrQuery solrQuery = new SolrQuery("id:" + id);
     	
     	try {
@@ -85,8 +83,7 @@ public class UserPermission implements Permission {
 	
 	public void save() {
 		SolrClient solrClient = new HttpSolrClient.Builder(
-				ConfigFactory.load().getString("hadatac.solr.users") 
-				+ CollectionUtil.AUTHENTICATE_PERMISSIONS).build();
+		        CollectionUtil.getCollectionPath(CollectionUtil.Collection.AUTHENTICATE_PERMISSIONS)).build();
 		
 		if (this.id_s == null) {
 			this.id_s = UUID.randomUUID().toString();

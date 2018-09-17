@@ -1,9 +1,7 @@
 @(file_name      : String,
   da_uri         : String,
-  globalScope    : String,
-  globalScopeUri : String,
-  localScope     : List[String],
-  localScopeUri  : List[String])
+  cellScope     : List[String],
+  cellScopeUri  : List[String])
 
 @import helper._
 @import java.net.URLDecoder
@@ -27,26 +25,14 @@
               <li>@URIUtils.replaceNameSpaceEx(da_uri)</li>
            </ul>
     
-        <h4>Global Scope</h4> 
-	   @if(globalScope == null || globalScope.equals("") || globalScopeUri == null || globalScopeUri.equals("")) {
+        <h4>Cell Scope</h4> 
+           @if(cellScope == null || cellScopeUri == null || cellScope.size() <= 0 || cellScopeUri.size() <= 0) {
                <ul>
-                  <li><b>NO DEFINED GLOBAL SCOPE OBJECT</b></li>
-               </ul>
-	   } else {
-               <ul>
-                  <li><b>Name of object scope:</b> @globalScope</li>
-                  <li><b>Uri of object scope:</b> @URIUtils.replaceNameSpaceEx(globalScopeUri)</li>
-               </ul>
-	   }    
-        
-        <h4>Local Scope</h4> 
-           @if(localScope == null || localScopeUri == null || localScope.size() <= 0 || localScopeUri.size() <= 0) {
-               <ul>
-                  <li><b>NO DEFINED LOCAL SCOPE OBJECTS</b></li>
+                  <li><b>NO DEFINED CELL SCOPE OBJECTS</b></li>
                </ul>
            } else {
             <table class="table">
-                Local scope is positional.
+                Cell scope is positional.
                 <thead>
                     <tr>
                        <th>Position</th>
@@ -55,11 +41,11 @@
                     </tr>
                 </thead>
                 <tbody>
-		    @for(index <- 0 until localScopeUri.size) {
+		    @for(index <- 0 until cellScopeUri.size) {
 		        <tr>
 	                   <td>@index</td>
-         	           <td>@if(localScope != null && localScope(index) != null) { @localScope(index) }</td>
-	                   <td>@if(localScopeUri != null && localScopeUri(index) != null) { @URIUtils.replaceNameSpaceEx(localScopeUri(index)) }</td> 
+         	           <td>@if(cellScope != null && cellScope(index) != null) { @cellScope(index) }</td>
+	                   <td>@if(cellScopeUri != null && cellScopeUri(index) != null) { @URIUtils.replaceNameSpaceEx(cellScopeUri(index)) }</td> 
            	        </tr>
                     }
                 </tbody>

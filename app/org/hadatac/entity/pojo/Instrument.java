@@ -18,6 +18,7 @@ import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Statement;
 import org.apache.jena.rdf.model.StmtIterator;
 import org.apache.jena.sparql.engine.http.QueryExceptionHTTP;
+import org.hadatac.console.http.SPARQLUtils;
 import org.hadatac.console.models.Facet;
 import org.hadatac.console.models.FacetHandler;
 import org.hadatac.utils.CollectionUtil;
@@ -75,11 +76,9 @@ public class Instrument extends HADatAcThing implements Comparable<Instrument> {
 		
 		Map<HADatAcThing, List<HADatAcThing>> results = new HashMap<HADatAcThing, List<HADatAcThing>>();
 		try {
-			QueryExecution qe = QueryExecutionFactory.sparqlService(
-					CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), query);
-			ResultSet resultSet = qe.execSelect();
-			ResultSetRewindable resultsrw = ResultSetFactory.copyResults(resultSet);
-			qe.close();
+		    ResultSetRewindable resultsrw = SPARQLUtils.select(
+	                CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), query);
+		    
 			while (resultsrw.hasNext()) {
 				QuerySolution soln = resultsrw.next();
 				Instrument instrument = new Instrument();
@@ -119,12 +118,8 @@ public class Instrument extends HADatAcThing implements Comparable<Instrument> {
 		    " ?uri a ?instModel ." + 
 		    "} ";
 		
-		Query query = QueryFactory.create(queryString);
-		
-		QueryExecution qexec = QueryExecutionFactory.sparqlService(CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), query);
-		ResultSet results = qexec.execSelect();
-		ResultSetRewindable resultsrw = ResultSetFactory.copyResults(results);
-		qexec.close();
+		ResultSetRewindable resultsrw = SPARQLUtils.select(
+                CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), queryString);
 			
 		while (resultsrw.hasNext()) {
 		    QuerySolution soln = resultsrw.next();
@@ -134,7 +129,6 @@ public class Instrument extends HADatAcThing implements Comparable<Instrument> {
 		
 		java.util.Collections.sort((List<Instrument>) instruments);
 		return instruments;
-		
 	}
 	
 	public static List<Instrument> findAvailable() {
@@ -151,12 +145,8 @@ public class Instrument extends HADatAcThing implements Comparable<Instrument> {
 		    "} " + 
 		    "ORDER BY DESC(?datetime) ";
 		
-		Query query = QueryFactory.create(queryString);
-		
-		QueryExecution qexec = QueryExecutionFactory.sparqlService(CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), query);
-		ResultSet results = qexec.execSelect();
-		ResultSetRewindable resultsrw = ResultSetFactory.copyResults(results);
-		qexec.close();
+		ResultSetRewindable resultsrw = SPARQLUtils.select(
+                CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), queryString);
 		
 		while (resultsrw.hasNext()) {
 		    QuerySolution soln = resultsrw.next();
@@ -181,12 +171,8 @@ public class Instrument extends HADatAcThing implements Comparable<Instrument> {
 		    "} " + 
 		    "ORDER BY DESC(?datetime) ";
 		
-		Query query = QueryFactory.create(queryString);
-			
-		QueryExecution qexec = QueryExecutionFactory.sparqlService(CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), query);
-		ResultSet results = qexec.execSelect();
-		ResultSetRewindable resultsrw = ResultSetFactory.copyResults(results);
-		qexec.close();
+		ResultSetRewindable resultsrw = SPARQLUtils.select(
+                CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), queryString);
 		
 		while (resultsrw.hasNext()) {
 		    QuerySolution soln = resultsrw.next();
@@ -207,8 +193,7 @@ public class Instrument extends HADatAcThing implements Comparable<Instrument> {
 	    String queryString = "DESCRIBE <" + uri + ">";
 		Query query = QueryFactory.create(queryString);
 		QueryExecution qexec = QueryExecutionFactory.sparqlService(
-				ConfigFactory.load().getString("hadatac.solr.triplestore") + 
-				CollectionUtil.METADATA_SPARQL, query);
+				CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), query);
 		model = qexec.execDescribe();
 		
 		instrument = new Instrument();
@@ -241,12 +226,7 @@ public class Instrument extends HADatAcThing implements Comparable<Instrument> {
 		    + "  OPTIONAL { ?instrument rdfs:comment ?comment . }\n"
 		    + "}";
 		
-		Query query = QueryFactory.create(queryString);
-		
-		QueryExecution qexec = QueryExecutionFactory.sparqlService(hadatac.getStaticMetadataSparqlURL(), query);
-		ResultSet results = qexec.execSelect();
-		ResultSetRewindable resultsrw = ResultSetFactory.copyResults(results);
-		qexec.close();
+		ResultSetRewindable resultsrw = SPARQLUtils.select(hadatac.getStaticMetadataSparqlURL(), queryString);
 		
 		if (resultsrw.size() >= 1) {
 		    QuerySolution soln = resultsrw.next();

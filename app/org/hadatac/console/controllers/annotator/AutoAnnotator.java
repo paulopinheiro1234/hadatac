@@ -1,8 +1,10 @@
 package org.hadatac.console.controllers.annotator;
 
 import java.io.File;
+import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.Map;
 import java.util.HashMap;
@@ -58,6 +60,7 @@ public class AutoAnnotator extends Controller {
 
         List<DataFile> proc_files = null;
         List<DataFile> unproc_files = null;
+        List<String> studyURIs = new ArrayList<String>();
 
         String path_proc = ConfigProp.getPathProc();
         String path_unproc = ConfigProp.getPathUnproc();
@@ -65,22 +68,37 @@ public class AutoAnnotator extends Controller {
         if (user.isDataManager()) {
             proc_files = DataFile.findAll(DataFile.PROCESSED);
             unproc_files = DataFile.findAll(DataFile.UNPROCESSED);
+            unproc_files.addAll(DataFile.findAll(DataFile.FREEZED));
             DataFile.includeUnrecognizedFiles(path_unproc, unproc_files);
             DataFile.includeUnrecognizedFiles(path_proc, proc_files);
         } else {
             proc_files = DataFile.find(user.getEmail(), DataFile.PROCESSED);
             unproc_files = DataFile.find(user.getEmail(), DataFile.UNPROCESSED);
+            unproc_files.addAll(DataFile.find(user.getEmail(), DataFile.FREEZED));
         }
 
         DataFile.filterNonexistedFiles(path_proc, proc_files);
         DataFile.filterNonexistedFiles(path_unproc, unproc_files);
+        
+        for (DataFile dataFile : proc_files) {
+            if (!dataFile.getStudyUri().isEmpty() && !studyURIs.contains(dataFile.getStudyUri())) {
+                studyURIs.add(dataFile.getStudyUri());
+            }
+        }
+        
+        studyURIs.sort(new Comparator<String>() {
+            @Override
+            public int compare(String o1, String o2) {
+                return o1.compareTo(o2);
+            }
+        });
 
         boolean bStarted = false;
         if (ConfigProp.getPropertyValue("autoccsv.config", "auto").equals("on")) {
             bStarted = true;
         }
 
-        return ok(auto_ccsv.render(unproc_files, proc_files, bStarted, user.isDataManager()));
+        return ok(autoAnnotator.render(unproc_files, proc_files, studyURIs, bStarted, user.isDataManager()));
     }
 
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
@@ -262,7 +280,58 @@ public class AutoAnnotator extends Controller {
     }
 
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    public Result moveDataFile(String fileName) {			
+    public Result moveDataFile(String fileName) {        
+        final SysUser user = AuthApplication.getLocalUser(session());
+        DataFile dataFile = null;
+        if (user.isDataManager()) {
+            dataFile = DataFile.findByName(null, fileName);
+        }
+        else {
+            dataFile = DataFile.findByName(user.getEmail(), fileName);
+        }
+        
+        if (null == dataFile) {
+            return badRequest("You do NOT have the permission to operate this file!");
+        }
+
+        String path_proc = ConfigProp.getPathProc();
+        String path_unproc = ConfigProp.getPathUnproc();
+        File file = new File(path_proc + "/" + fileName);
+
+        String pureFileName = Paths.get(fileName).getFileName().toString();
+        if (pureFileName.startsWith("DA-")) {
+            Measurement.delete(dataFile.getDatasetUri());
+        } else {
+            deleteAddedTriples(file);
+        }
+
+        dataFile.setStatus(DataFile.UNPROCESSED);
+        dataFile.setFileName(pureFileName);
+        dataFile.setSubmissionTime(new SimpleDateFormat("yyyy/MM/dd HH:mm:ss").format(new Date()));
+        dataFile.setCompletionTime("");
+        dataFile.save();
+
+        File destFolder = new File(path_unproc);
+        if (!destFolder.exists()){
+            destFolder.mkdirs();
+        }
+        file.renameTo(new File(destFolder + "/" + pureFileName));
+        file.delete();
+        
+        AnnotationLog log = AnnotationLog.find(fileName);
+        if (null != log) {
+            log.delete();
+        }
+
+        AnnotationLog new_log = new AnnotationLog(pureFileName);
+        new_log.addline(Feedback.println(Feedback.WEB, 
+                String.format("[OK] Moved file %s to unprocessed folder", pureFileName)));
+
+        return redirect(routes.AutoAnnotator.index());
+    }
+    
+    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
+    public Result activateDataFile(String fileName) {           
         final SysUser user = AuthApplication.getLocalUser(session());
         DataFile dataFile = null;
         if (user.isDataManager()) {
@@ -275,29 +344,8 @@ public class AutoAnnotator extends Controller {
             return badRequest("You do NOT have the permission to operate this file!");
         }
 
-        String path_proc = ConfigProp.getPathProc();
-        String path_unproc = ConfigProp.getPathUnproc();
-        File file = new File(path_proc + "/" + fileName);
-
-        if (fileName.startsWith("DA-")) {
-            Measurement.delete(dataFile.getDatasetUri());
-        } else {
-            deleteAddedTriples(file);
-        }
-
         dataFile.setStatus(DataFile.UNPROCESSED);
-        dataFile.setSubmissionTime(new SimpleDateFormat("yyyy/MM/dd HH:mm:ss").format(new Date()));
-        dataFile.setCompletionTime("");
         dataFile.save();
-
-        File destFolder = new File(path_unproc);
-        if (!destFolder.exists()){
-            destFolder.mkdirs();
-        }
-        file.renameTo(new File(destFolder + "/" + fileName));
-
-        AnnotationLog log = new AnnotationLog(fileName);
-        log.addline(Feedback.println(Feedback.WEB, String.format("[OK] Moved file %s to unprocessed folder", fileName)));
 
         return redirect(routes.AutoAnnotator.index());
     }
@@ -322,15 +370,23 @@ public class AutoAnnotator extends Controller {
             path = ConfigProp.getPathUnproc();
         }
 
-        AnnotationLog.delete(fileName);
         File file = new File(path + "/" + fileName);
         if (fileName.startsWith("DA-")) {
             Measurement.delete(dataFile.getDatasetUri());
         } else {
-            deleteAddedTriples(file);
+        	try{
+        		deleteAddedTriples(file);
+        	} catch (Exception e) {
+            	System.out.print("Can not delete triples ingested by " + fileName + " ..");
+                file.delete();
+                dataFile.delete();
+                AnnotationLog.delete(fileName);
+                return redirect(routes.AutoAnnotator.index());
+            }
         }
         file.delete();
         dataFile.delete();
+        AnnotationLog.delete(fileName);
 
         return redirect(routes.AutoAnnotator.index());
     }
@@ -357,11 +413,19 @@ public class AutoAnnotator extends Controller {
             chain = AnnotationWorker.annotateSubjectIdFile(recordFile);
         } else if (file_name.startsWith("STD")) {
             chain = AnnotationWorker.annotateStudyIdFile(recordFile);
+        } else if (file_name.startsWith("DPL")) {
+            if (file_name.endsWith(".xlsx")) {
+                recordFile = new SpreadsheetRecordFile(file, "InfoSheet");
+            }
+            chain = AnnotationWorker.annotateDPLFile(recordFile);
         } else if (file_name.startsWith("MAP")) {
             chain = AnnotationWorker.annotateMapFile(recordFile);
         } else if (file_name.startsWith("ACQ")) {
             chain = AnnotationWorker.annotateACQFile(recordFile, false);
         } else if (file_name.startsWith("SDD")) {
+            if (file_name.endsWith(".xlsx")) {
+                recordFile = new SpreadsheetRecordFile(file, "InfoSheet");
+            }
             chain = AnnotationWorker.annotateDataAcquisitionSchemaFile(recordFile);
         }
 
@@ -409,6 +473,12 @@ public class AutoAnnotator extends Controller {
             String resumableIdentifier,
             String resumableFilename,
             String resumableRelativePath) {
+        
+        DataFile file = DataFile.findByName(resumableFilename);
+        if (file != null && file.existsInFileSystem(ConfigProp.getPathUnproc())) {
+            return badRequest("<a style=\"color:#cc3300; font-size: x-large;\">A file with this name already exists!</a>");
+        }
+        
         if (ResumableUpload.postUploadFileByChunking(request(), ConfigProp.getPathUnproc())) {
             DataFile.create(resumableFilename, AuthApplication.getLocalUser(session()).getEmail());
             return(ok("Upload finished"));

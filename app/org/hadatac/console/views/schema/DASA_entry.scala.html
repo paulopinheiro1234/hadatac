@@ -1,15 +1,19 @@
-@(mode: String, dasa : org.hadatac.entity.pojo.DataAcquisitionSchemaAttribute)
+@(mode: String,
+  dasa : org.hadatac.entity.pojo.DataAcquisitionSchemaAttribute)
 
 @import java.net._
 @import org.hadatac.utils._
 @import org.hadatac.entity.pojo.DataAcquisitionSchema
 @import org.hadatac.metadata.loader.URIUtils
 
-@if(DataAcquisitionSchema.METADASA.contains(URIUtils.replaceNameSpaceEx(dasa.getAttribute()))){
-  <tr bgcolor='#FCEBDD'>
+@for(attr <- dasa.getAttribute()) {
+	@if(!DataAcquisitionSchema.METADASA.contains(URIUtils.replaceNameSpaceEx(attr))){
+  		<tr>
 } else {
-  <tr>
+  <tr bgcolor='#FCEBDD'>
 }
+}
+
    <td>@if(dasa != null && dasa.getLabel() != null) { <b> @dasa.getLabel() </b> }</td> 
    <td>@if(dasa != null && dasa.getPosition() != null) { 
      @if(dasa.getPosition().equals("-1")) {
@@ -20,7 +24,8 @@
    }</td> 
    <td>@if(dasa != null && dasa.getObjectViewLabel() != null) { @dasa.getObjectViewLabel() }</td> 
    <td>@if(dasa != null && dasa.getEntityViewLabel() != null) { @dasa.getEntityViewLabel() }</td> 
-   <td>@if(dasa != null && dasa.getAttributeLabel() != null) { @dasa.getAttributeLabel() }</td> 
+   <td>@if(dasa != null && dasa.getAttribute() != null) { @dasa.getAttribute() }</td> 
+   <td>@if(dasa != null && dasa.getInRelationToLabel() != null) { @dasa.getInRelationToLabel() }</td> 
    <td>@if(dasa != null && dasa.getUnitLabel() != null) { @dasa.getUnitLabel() }</td> 
    <td>@if(dasa != null && dasa.getEventViewLabel() != null) { @dasa.getEventViewLabel() }</td> 
    @if(mode == "edit") {

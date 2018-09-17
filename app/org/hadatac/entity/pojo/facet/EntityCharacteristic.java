@@ -38,18 +38,17 @@ public class EntityCharacteristic {
 		SolrQuery solrQuery = new SolrQuery();
 		solrQuery.set("q", dataAcquisitionQuery);
 		solrQuery.setFacet(true);
-		solrQuery.set("facet.pivot", "entity_uri_str,characteristic_uri_str");
+		solrQuery.set("facet.pivot", "entity_uri_str,characteristic_uri_str_multi");
 		solrQuery.set("rows", "0");
 
 		SolrClient solr = new HttpSolrClient.Builder(
-				ConfigFactory.load().getString("hadatac.solr.data") 
-				+ CollectionUtil.DATA_ACQUISITION).build();
+		        CollectionUtil.getCollectionPath(CollectionUtil.Collection.DATA_ACQUISITION)).build();
 		
 		try {
 			QueryResponse response = solr.query(solrQuery);
 			solr.close();
 			
-			List<PivotField> pivotFields1 = response.getFacetPivot().get("entity_uri_str,characteristic_uri_str");
+			List<PivotField> pivotFields1 = response.getFacetPivot().get("entity_uri_str,characteristic_uri_str_multi");
 			Iterator<PivotField> i_pivotFields1 = pivotFields1.iterator();
 			while (i_pivotFields1.hasNext()) {
 				PivotField field1 = i_pivotFields1.next();

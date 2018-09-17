@@ -35,7 +35,7 @@ public class DASchemaObjectGenerator extends BasicGenerator {
 
 	//Column	Attribute	attributeOf	Unit	Time	Entity	Role	Relation	inRelationTo	wasDerivedFrom	wasGeneratedBy	hasPosition	
 	@Override
-	void initMapping() {
+	public void initMapping() {
 		mapCol.clear();
 		mapCol.put("Label", "Column");
 		mapCol.put("AttributeType", "Attribute");
@@ -65,7 +65,7 @@ public class DASchemaObjectGenerator extends BasicGenerator {
 	private String getTime(Record rec) {
 		return rec.getValueByColumnName(mapCol.get("Time"));
 	}
-
+	
 	private String getEntity(Record rec) {
 		String entity = rec.getValueByColumnName(mapCol.get("Entity"));
 		if (entity.length() == 0) {
@@ -84,11 +84,11 @@ public class DASchemaObjectGenerator extends BasicGenerator {
 		return rec.getValueByColumnName(mapCol.get("Role"));
 	}
 
-	private String getRelation(Record rec) {
+	public String getRelation(Record rec) {
 		return rec.getValueByColumnName(mapCol.get("Relation"));
 	}
 
-	private String getInRelationTo(Record rec) {
+	public String getInRelationTo(Record rec) {
 		String inRelationTo = rec.getValueByColumnName(mapCol.get("InRelationTo"));
 		if (inRelationTo.length() == 0) {
 			return "";
@@ -97,7 +97,18 @@ public class DASchemaObjectGenerator extends BasicGenerator {
 			for (String item : Arrays.asList(inRelationTo.split("\\s*,\\s*"))) {
 				items.add(kbPrefix + "DASO-" + SDDName + "-" + item.replace("_","-").replace("??", ""));
 			}
-			return String.join(" & ", items);
+			System.out.println(getLabel(rec) + String.join(" & ", items)); 
+			return items.get(0);
+//			return inRelationTo;
+		}
+	}
+	
+	public String getInRelationToString(Record rec) {
+		String inRelationTo = rec.getValueByColumnName(mapCol.get("InRelationTo"));
+		if (inRelationTo.length() == 0) {
+			return "";
+		} else {
+			return inRelationTo;
 		}
 	}
 
@@ -136,7 +147,6 @@ public class DASchemaObjectGenerator extends BasicGenerator {
 				if (column_name.contains(getLabel(record))){
 					rows.add(createRelationRow(record, ++row_number));
 				}
-				continue;
 			} else {
                 //System.out.println("[DASOGenerator] creating a row....");
 				rows.add(createRow(record, ++row_number));
@@ -171,20 +181,22 @@ public class DASchemaObjectGenerator extends BasicGenerator {
 		row.put("hasco:hasEntity", getEntity(rec));
 		row.put("hasco:hasRole", getRole(rec));
 		if (getRelation(rec).length() > 0) {
-			row.put(getRelation(rec), getInRelationTo(rec));
-		} else {
-			row.put("sio:inRelationTo", getInRelationTo(rec));
-		}
-		if (getInRelationTo(rec).length() > 0) {
-			if (getRelation(rec).length() > 0) {
+			if (getInRelationTo(rec).length() > 0) {
+				row.put(getRelation(rec), getInRelationTo(rec));
+				row.put("hasco:inRelationToLabel", getInRelationToString(rec));
 				row.put("sio:Relation", getRelation(rec));
-			} else {
+			}
+		} else {
+			if (getInRelationTo(rec).length() > 0) {
+				row.put("sio:inRelationTo", getInRelationTo(rec));
+				row.put("hasco:inRelationToLabel", getInRelationToString(rec));
 				row.put("sio:Relation", "sio:inRelationTo");
 			}
 		}
 		row.put("hasco:hasUnit", getUnit(rec));
 		row.put("hasco:isVirtual", checkVirtual(rec).toString());
 		row.put("hasco:isPIConfirmed", "false");
+		row.put("hasco:wasDerivedFrom", getWasDerivedFrom(rec));
 
 		// Also generate a DASVirtualObject for each virtual column
 		if(checkVirtual(rec)) {
@@ -203,14 +215,15 @@ public class DASchemaObjectGenerator extends BasicGenerator {
 		Map<String, Object> row = new HashMap<String, Object>();
 		row.put("hasURI", kbPrefix + "DASO-" + SDDName + "-" + getLabel(rec).trim().replace(" ","").replace("_","-").replace("??", ""));
 		if (getRelation(rec).length() > 0) {
-			row.put(getRelation(rec), getInRelationTo(rec));
-		} else {
-			row.put("sio:inRelationTo", getInRelationTo(rec));
-		}
-		if (getInRelationTo(rec).length() > 0) {
-			if (getRelation(rec).length() > 0) {
+			if (getInRelationTo(rec).length() > 0) {
+				row.put(getRelation(rec), getInRelationTo(rec));
+				row.put("hasco:inRelationToLabel", getInRelationToString(rec));
 				row.put("sio:Relation", getRelation(rec));
-			} else {
+			}
+		} else {
+			if (getInRelationTo(rec).length() > 0) {
+				row.put("sio:inRelationTo", getInRelationTo(rec));
+				row.put("hasco:inRelationToLabel", getInRelationToString(rec));
 				row.put("sio:Relation", "sio:inRelationTo");
 			}
 		}

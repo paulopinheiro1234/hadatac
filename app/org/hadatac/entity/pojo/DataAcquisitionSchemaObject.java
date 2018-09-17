@@ -21,6 +21,7 @@ import org.apache.jena.update.UpdateRequest;
 import org.hadatac.utils.CollectionUtil;
 import org.hadatac.utils.NameSpaces;
 import org.hadatac.utils.FirstLabel;
+import org.hadatac.console.http.SPARQLUtils;
 import org.hadatac.metadata.loader.LabkeyDataHandler;
 import org.hadatac.metadata.loader.URIUtils;
 import org.labkey.remoteapi.CommandException;
@@ -44,10 +45,12 @@ public class DataAcquisitionSchemaObject extends HADatAcThing {
     private String entity;
     private String entityLabel;
     private String role;
+    private String roleLabel;
     private String inRelationTo;
     private String inRelationToLabel;
     private String relation;
     private String relationLabel;
+    private String wasDerivedFrom;
 
     public DataAcquisitionSchemaObject(String uri, 
             String label, 
@@ -56,6 +59,8 @@ public class DataAcquisitionSchemaObject extends HADatAcThing {
             String entity, 
             String role, 
             String inRelationTo, 
+            String inRelationToLabel,
+            String wasDerivedFrom,
             String relation) {
         this.uri = uri;
         this.label = label;
@@ -70,10 +75,10 @@ public class DataAcquisitionSchemaObject extends HADatAcThing {
         } catch (Exception e) {
             positionInt = -1;
         }
-        System.out.println("positionInt: " + positionInt);
         this.setEntity(entity);
-        this.role = role;
+        this.setRole(role);
         this.setInRelationTo(inRelationTo);
+        this.setWasDerivedFrom(wasDerivedFrom);
         this.setRelation(relation);
     }
 
@@ -142,11 +147,35 @@ public class DataAcquisitionSchemaObject extends HADatAcThing {
         return URIUtils.replaceNameSpaceEx(entity);
     }
 
+    public String getEntityLabel(Map<String, String> codeMappings) {
+        if (entity == null || entityLabel.equals("")) {
+        	String newLabel = URIUtils.replaceNameSpaceEx(entity);
+        	if (newLabel.contains(":")) {
+    			if (codeMappings.containsKey(newLabel)){
+    				return codeMappings.get(newLabel);
+    			} else {
+    				return newLabel.split("\\:")[1];
+    			}
+        	} else {
+        		return newLabel;
+        	}
+        } else {
+        	return entityLabel;
+        }
+    }
+    
     public String getEntityLabel() {
         if (entity == null || entityLabel.equals("")) {
-            return URIUtils.replaceNameSpaceEx(entity);
+        	return URIUtils.replaceNameSpaceEx(entity);
         }
         return entityLabel;
+    }
+    
+    public String getRoleLabel() {
+        if (role == null || roleLabel.equals("")) {
+            return URIUtils.replaceNameSpaceEx(role);
+        }
+        return roleLabel;
     }
 
     public String getAnnotatedEntity() {
@@ -166,15 +195,30 @@ public class DataAcquisitionSchemaObject extends HADatAcThing {
     }
 
     public String getRole() {
-        return role;
+        return this.role;
     }
 
     public void setRole(String role) {
-        this.role = role;
+        //this.role = role;
+    	this.role = role;
+        System.out.println("New ROLE : " + role);
+        if (role == null || role.equals("")) {
+            this.roleLabel = "";
+        } else {
+            this.roleLabel = FirstLabel.getLabel(role);
+        }
     }
 
     public String getInRelationTo() {
         return inRelationTo;
+    }
+    
+    public String getWasDerivedFrom() {
+        return wasDerivedFrom;
+    }
+    
+    public void setWasDerivedFrom(String wasDerivedFrom) {
+        this.wasDerivedFrom = wasDerivedFrom;
     }
 
     public String getInRelationToNamespace() {
@@ -191,10 +235,6 @@ public class DataAcquisitionSchemaObject extends HADatAcThing {
     }
 
     public String getInRelationToLabel() {
-        if (inRelationTo == null || inRelationToLabel.equals("")) {
-            String str = URIUtils.replaceNameSpaceEx(inRelationTo);
-            return str.substring(str.indexOf(":") + 1);
-        }
         return inRelationToLabel;
     }
 
@@ -231,23 +271,22 @@ public class DataAcquisitionSchemaObject extends HADatAcThing {
 
         DataAcquisitionSchemaObject object = null;
         String queryString = NameSpaces.getInstance().printSparqlNameSpaceList() + 
-                "SELECT ?entity ?partOfSchema ?role ?inRelationTo ?relation WHERE { \n" + 
+                "SELECT ?entity ?partOfSchema ?role ?inRelationTo ?relation ?inRelationToStr ?wasDerivedFrom WHERE { \n" + 
                 "   <" + uri + "> a hasco:DASchemaObject . \n" + 
                 "   <" + uri + "> hasco:partOfSchema ?partOfSchema . \n" + 
                 "   OPTIONAL { <" + uri + "> hasco:hasEntity ?entity } . \n" + 
                 "   OPTIONAL { <" + uri + "> hasco:hasRole ?role } .  \n" + 
-                "   OPTIONAL { <" + uri + "> sio:inRelationTo ?inRelationTo } . \n" + 
-                "   OPTIONAL { <" + uri + "> sio:relation ?relation } . \n" + 
+                "   OPTIONAL { <" + uri + "> sio:inRelationTo ?inRelationTo } . \n" +
+                "   OPTIONAL { <" + uri + "> sio:Relation ?relation } . \n" +
+                "   OPTIONAL { <" + uri + "> ?relation ?inRelationTo } . \n" +
+                "   OPTIONAL { <" + uri + "> hasco:inRelationToLabel ?inRelationToStr } . \n" +
+                "   OPTIONAL { <" + uri + "> <http://hadatac.org/ont/hasco/wasDerivedFrom> ?wasDerivedFrom } . \n" +
                 "}";
 
         //System.out.println("DataAcquisitionSchemaObject find(String uri) query: " + queryString);
-
-        Query query = QueryFactory.create(queryString);
-        QueryExecution qexec = QueryExecutionFactory.sparqlService(
-                CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), query);
-        ResultSet results = qexec.execSelect();
-        ResultSetRewindable resultsrw = ResultSetFactory.copyResults(results);
-        qexec.close();
+        
+        ResultSetRewindable resultsrw = SPARQLUtils.select(CollectionUtil.getCollectionPath(
+                CollectionUtil.Collection.METADATA_SPARQL), queryString);
 
         if (!resultsrw.hasNext()) {
             System.out.println("[WARNING] DataAcquisitionSchemaObject. Could not find object with uri: " + uri);
@@ -261,7 +300,9 @@ public class DataAcquisitionSchemaObject extends HADatAcThing {
         String entityStr = "";
         String roleStr = "";
         String inRelationToStr = "";
+        String inRelationToLabelStr = "";
         String relationStr = "";
+        String wasDerivedFromStr = "";
 
         try {
             if (soln != null) {
@@ -285,8 +326,8 @@ public class DataAcquisitionSchemaObject extends HADatAcThing {
                 }
 
                 try {
-                    if (soln.getLiteral("role") != null && soln.getLiteral("role").getString() != null) {
-                        roleStr = soln.getLiteral("role").getString();
+                    if (soln.getResource("role") != null && soln.getResource("role").getURI() != null) {
+                    	roleStr = soln.getResource("role").getURI();
                     } 
                 } catch (Exception e1) {
                     roleStr = "";
@@ -298,6 +339,22 @@ public class DataAcquisitionSchemaObject extends HADatAcThing {
                     }
                 } catch (Exception e1) {
                     inRelationToStr = "";
+                }
+                
+                try {
+                    if (soln.getResource("inRelationToStr") != null) {
+                    	inRelationToLabelStr = soln.getResource("inRelationToStr").toString();
+                    }
+                } catch (Exception e1) {
+                	inRelationToLabelStr = "";
+                }
+                
+                try {
+                    if (soln.getLiteral("wasDerivedFrom") != null) {
+                    	wasDerivedFromStr = soln.getLiteral("wasDerivedFrom").toString();
+                    }
+                } catch (Exception e1) {
+                	wasDerivedFromStr = "";
                 }
 
                 try {
@@ -315,11 +372,14 @@ public class DataAcquisitionSchemaObject extends HADatAcThing {
                         entityStr,
                         roleStr,
                         inRelationToStr,
+                        inRelationToLabelStr,
+                        wasDerivedFromStr,
                         relationStr);
             }
         } catch (Exception e) {
-            System.out.println("[ERROR] DataAcquisitionSchemaObject. uri: e.Message: " + e.getMessage());
+            System.out.println("[ERROR] DataAcquisitionSchemaObject.find() e.Message: " + e.getMessage());
         }
+        
         return object;
     }
 
@@ -332,13 +392,9 @@ public class DataAcquisitionSchemaObject extends HADatAcThing {
                 "   ?uri a hasco:DASchemaObject . \n" + 
                 "   ?uri hasco:partOfSchema <" + schemaUri + "> . \n" + 
                 "}";
-        Query query = QueryFactory.create(queryString);
-
-        QueryExecution qexec = QueryExecutionFactory.sparqlService(
-                CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), query);
-        ResultSet results = qexec.execSelect();
-        ResultSetRewindable resultsrw = ResultSetFactory.copyResults(results);
-        qexec.close();
+        
+        ResultSetRewindable resultsrw = SPARQLUtils.select(
+                CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), queryString);
 
         if (!resultsrw.hasNext()) {
             System.out.println("[WARNING] DataAcquisitionSchemaObject. Could not find objects for schema: " + schemaUri);
@@ -356,9 +412,8 @@ public class DataAcquisitionSchemaObject extends HADatAcThing {
                     }
                 }
             }  catch (Exception e) {
-                System.out.println("[ERROR] DataAcquisitionSchemaObject. uri: e.Message: " + e.getMessage());
+                System.out.println("[ERROR] DataAcquisitionSchemaObject.findBySchema() e.Message: " + e.getMessage());
             }
-
         }
 
         return objects;
@@ -477,7 +532,7 @@ public class DataAcquisitionSchemaObject extends HADatAcThing {
         try {
             UpdateRequest request = UpdateFactory.create(insert);
             UpdateProcessor processor = UpdateExecutionFactory.createRemote(
-                    request, CollectionUtil.getCollectionsName(CollectionUtil.METADATA_UPDATE));
+                    request, CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_UPDATE));
             processor.execute();
         } catch (QueryParseException e) {
             System.out.println("QueryParseException due to update query: " + insert);
@@ -504,7 +559,7 @@ public class DataAcquisitionSchemaObject extends HADatAcThing {
         query += LINE_LAST;
         UpdateRequest request = UpdateFactory.create(query);
         UpdateProcessor processor = UpdateExecutionFactory.createRemote(
-                request, CollectionUtil.getCollectionsName(CollectionUtil.METADATA_UPDATE));
+                request, CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_UPDATE));
         processor.execute();
     }
 

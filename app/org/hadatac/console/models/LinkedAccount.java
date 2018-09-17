@@ -57,8 +57,7 @@ public class LinkedAccount {
 	public static LinkedAccount findByProviderKeySolr(final SysUser user, String key) {
 		LinkedAccount account = null;
 		SolrClient solrClient = new HttpSolrClient.Builder(
-				ConfigFactory.load().getString("hadatac.solr.users") 
-				+ CollectionUtil.AUTHENTICATE_ACCOUNTS).build();
+		        CollectionUtil.getCollectionPath(CollectionUtil.Collection.AUTHENTICATE_ACCOUNTS)).build();
     	SolrQuery solrQuery = new SolrQuery("user_id_str:" + user.getId() + " AND provider_key_str:" + key);
     	
     	try {
@@ -79,8 +78,7 @@ public class LinkedAccount {
 	public static List<LinkedAccount> findByIdSolr(final SysUser user) {
 		List<LinkedAccount> accounts = new ArrayList<LinkedAccount>(); 
 		SolrClient solrClient = new HttpSolrClient.Builder(
-				ConfigFactory.load().getString("hadatac.solr.users")
-				+ CollectionUtil.AUTHENTICATE_ACCOUNTS).build();
+		        CollectionUtil.getCollectionPath(CollectionUtil.Collection.AUTHENTICATE_ACCOUNTS)).build();
     	SolrQuery solrQuery = new SolrQuery("user_id_str:" + user.getId());
     	
     	try {
@@ -103,8 +101,7 @@ public class LinkedAccount {
 	
 	public static String outputAsJson() {
 		SolrClient solrClient = new HttpSolrClient.Builder(
-				ConfigFactory.load().getString("hadatac.solr.users")
-				+ CollectionUtil.AUTHENTICATE_ACCOUNTS).build();
+		        CollectionUtil.getCollectionPath(CollectionUtil.Collection.AUTHENTICATE_ACCOUNTS)).build();
 		String query = "*:*";
     	SolrQuery solrQuery = new SolrQuery(query);
     	
@@ -143,8 +140,7 @@ public class LinkedAccount {
 	
 	public void save() {
 		SolrClient solrClient = new HttpSolrClient.Builder(
-				ConfigFactory.load().getString("hadatac.solr.users") 
-				+ CollectionUtil.AUTHENTICATE_ACCOUNTS).build();
+		        CollectionUtil.getCollectionPath(CollectionUtil.Collection.AUTHENTICATE_ACCOUNTS)).build();
         try {
         	solrClient.addBean(this);
 			solrClient.commit();
@@ -157,8 +153,7 @@ public class LinkedAccount {
 	public int delete() {
 		try {
 			SolrClient solr = new HttpSolrClient.Builder(
-					ConfigFactory.load().getString("hadatac.solr.users") 
-					+ CollectionUtil.AUTHENTICATE_ACCOUNTS).build();
+			        CollectionUtil.getCollectionPath(CollectionUtil.Collection.AUTHENTICATE_ACCOUNTS)).build();
 			UpdateResponse response = solr.deleteById(this.id_s);
 			solr.commit();
 			solr.close();

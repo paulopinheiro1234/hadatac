@@ -227,7 +227,7 @@ public class LoadKB extends Controller {
     			});
     		}
     	} catch(CommandException e) {
-    		if(e.getMessage().equals("Unauthorized")){
+    		if(e.getMessage().equals("Unauthorized")) {
     			return ok(syncLabkey.render("login_failed", 
     					routes.LoadKB.playLoadLabkeyFolders("init", content).url(), ""));
     		}

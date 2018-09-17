@@ -8,27 +8,24 @@ import org.apache.jena.query.QuerySolution;
 import org.apache.jena.query.ResultSet;
 import org.apache.jena.query.ResultSetFactory;
 import org.apache.jena.query.ResultSetRewindable;
+import org.hadatac.console.http.SPARQLUtils;
 import org.hadatac.utils.CollectionUtil;
 
 public class FirstLabel {
 	
 	public static String getLabel(String uri) {
 		if (uri.startsWith("http")) {
-			uri = "<" + uri + ">";
+			uri = "<" + uri.trim() + ">";
 		}
 		String queryString = NameSpaces.getInstance().printSparqlNameSpaceList() + 
 				"SELECT ?label WHERE { \n" + 
 				"  " + uri + " rdfs:label ?label . \n" + 
 				"}";
 		
-		//System.out.println("getLabel() queryString: \n" + queryString);
+		 //System.out.println("[FirstLabel] getLabel() queryString: \n" + queryString);
 		
-		Query query = QueryFactory.create(queryString);
-		QueryExecution qexec = QueryExecutionFactory.sparqlService(
-				CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), query);
-		ResultSet results = qexec.execSelect();
-		ResultSetRewindable resultsrw = ResultSetFactory.copyResults(results);
-		qexec.close();
+		ResultSetRewindable resultsrw = SPARQLUtils.select(
+		        CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), queryString);
 
 		String labelStr = "";
 		while (resultsrw.hasNext()) {

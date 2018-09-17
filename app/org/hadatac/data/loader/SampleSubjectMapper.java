@@ -6,22 +6,19 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.jena.query.Query;
-import org.apache.jena.query.QueryExecution;
-import org.apache.jena.query.QueryExecutionFactory;
-import org.apache.jena.query.QueryFactory;
 import org.apache.jena.query.QuerySolution;
-import org.apache.jena.query.ResultSet;
-import org.apache.jena.query.ResultSetFactory;
 import org.apache.jena.query.ResultSetRewindable;
-import org.apache.jena.rdf.model.Literal;
 import org.apache.jena.sparql.engine.http.QueryExceptionHTTP;
 import org.hadatac.utils.CollectionUtil;
 import org.hadatac.utils.ConfigProp;
 import org.hadatac.utils.NameSpaces;
+import org.hadatac.utils.Templates;
+import org.hadatac.console.controllers.annotator.AnnotationLog;
+import org.hadatac.console.http.SPARQLUtils;
 import org.hadatac.entity.pojo.HADatAcThing;
 import org.hadatac.entity.pojo.ObjectCollection;
 import org.hadatac.entity.pojo.StudyObject;
+import org.hadatac.metadata.loader.URIUtils;
 
 
 public class SampleSubjectMapper extends BasicGenerator {
@@ -31,50 +28,32 @@ public class SampleSubjectMapper extends BasicGenerator {
     private Map<String, String> mapIdUriCache = new HashMap<String, String>();
     String study_id;
     String file_name;
-    MotherGenerator motherGenerator = null;
 
     public SampleSubjectMapper(RecordFile file) {
         super(file);
         mapIdUriCache = getMapIdUri();
         file_name = file.getFile().getName();
-        study_id = file.getFile().getName().replaceAll("MAP-", "").replaceAll("SSD-", "").replaceAll(".xlsx", "").replaceAll(".csv", "");
-    }
-
-    public SampleSubjectMapper(RecordFile file, MotherGenerator motherGenerator) {
-        super(file);
-        file_name = file.getFile().getName();
-        study_id = file.getFile().getName().replaceAll("MAP-", "").replaceAll("SSD-", "").replaceAll(".xlsx", "").replaceAll(".csv", "");
-        this.motherGenerator = motherGenerator;
+        study_id = file.getFile().getName().replaceAll("MAP-", "").replaceAll(".xlsx", "").replaceAll(".csv", "");
     }
 
     @Override
-    void initMapping() {
+    public void initMapping() {
         mapCol.clear();
-        mapCol.put("type", "rdf:type");
-        mapCol.put("originalPID", "CHEAR PID");
-        mapCol.put("originalSID", "originalID");
+        mapCol.put("type", Templates.OBJECTTYPE);
+        mapCol.put("originalPID", Templates.ORIGINALPID);
+        mapCol.put("originalSID", Templates.ORIGINALSID);
         try{
-            mapCol.put("pilotNum", "CHEAR_Project_ID");
+            mapCol.put("pilotNum", Templates.MAPSTUDYID);
         } catch (QueryExceptionHTTP e) {
             e.printStackTrace();
             System.out.println("This sheet or MAP file contains no CHEAR_Project_ID column");
         }
         try{
-            mapCol.put("timeScopeID", "timeScopeID");
+            mapCol.put("timeScopeID", Templates.TIMESCOPEID);
         } catch (QueryExceptionHTTP e) {
             e.printStackTrace();
             System.out.println("This sheet or MAP file contains no timeScopeID column");
         }
-    }
-
-    private Map<String, String> getMapIdUri(MotherGenerator generator) {
-        Map<String, String> mapIdUri = new HashMap<String, String>();
-        for (HADatAcThing obj : generator.getObjects()) {
-            StudyObject studyObj = (StudyObject)obj;
-            mapIdUri.put(studyObj.getOriginalId(), studyObj.getUri());
-        }
-
-        return mapIdUri;
     }
 
     private Map<String, String> getMapIdUri() {
@@ -86,12 +65,8 @@ public class SampleSubjectMapper extends BasicGenerator {
                 "}";
 
         try {
-            Query sampleQuery = QueryFactory.create(queryString);
-            QueryExecution qexec = QueryExecutionFactory.sparqlService(
-                    CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), sampleQuery);
-            ResultSet results = qexec.execSelect();
-            ResultSetRewindable resultsrw = ResultSetFactory.copyResults(results);
-            qexec.close();
+            ResultSetRewindable resultsrw = SPARQLUtils.select(
+                    CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), queryString);
 
             while (resultsrw.hasNext()) {
                 QuerySolution soln = resultsrw.next();
@@ -106,68 +81,12 @@ public class SampleSubjectMapper extends BasicGenerator {
         return mapIdUri;
     }
 
-    private String getSubjectType(String sbj) {
-        String answer = "";
-
-        String queryString = NameSpaces.getInstance().printSparqlNameSpaceList() +
-                "SELECT ?o WHERE { " +
-                "<" + sbj + ">" + " <http://hadatac.org/ont/hasco/hasRole>	?o ." +
-                "}";
-
-        try {
-            Query sampleQuery = QueryFactory.create(queryString);
-            QueryExecution qexec = QueryExecutionFactory.sparqlService(
-                    CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), sampleQuery);
-            ResultSet results = qexec.execSelect();
-            ResultSetRewindable resultsrw = ResultSetFactory.copyResults(results);
-            qexec.close();
-
-            while (resultsrw.hasNext()) {
-                QuerySolution soln = resultsrw.next();
-                if(soln.get("o") != null) {
-                    answer = soln.get("o").toString();
-                }
-            }
-        } catch (QueryExceptionHTTP e) {
-            e.printStackTrace();
-        }
-
-        return answer;
-    }
-
-    private int getSampleCount(String studyID) {
-        int count = 0;
-        String sampleCountQuery = NameSpaces.getInstance().printSparqlNameSpaceList() 
-                + " SELECT (count(DISTINCT ?sampleURI) as ?sampleCount) WHERE { \n"
-                + " ?sampleURI hasco:isMemberOf* chear-kb:STD-" + studyID + " . \n"
-                + "}";
-        QueryExecution qexecSample = QueryExecutionFactory.sparqlService(
-                CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), sampleCountQuery);
-        ResultSet sampleResults = qexecSample.execSelect();
-        ResultSetRewindable resultsrwSample = ResultSetFactory.copyResults(sampleResults);
-        qexecSample.close();
-        if (resultsrwSample.hasNext()) {
-            QuerySolution soln = resultsrwSample.next();
-            Literal countLiteral = (Literal) soln.get("sampleCount");
-            if(countLiteral != null){ 
-                count += countLiteral.getInt();
-            }
-        }
-
-        return count;
-    }
-
     private String getUri(Record rec) {
         return kbPrefix + "SPL-" + getOriginalSID(rec);
     }
 
     private String getType(Record rec) {
-    	if (file_name.startsWith("MAP-")){
-    		return "sio:Sample";
-    	} else if (file_name.startsWith("SSD-")){
-    		return rec.getValueByColumnName(mapCol.get("type"));
-    	}
-    	return "sio:Sample";
+        return "sio:Sample";
     }
 
     private String getLabel(Record rec) {
@@ -194,30 +113,16 @@ public class SampleSubjectMapper extends BasicGenerator {
         return rec.getValueByColumnName(mapCol.get("pilotNum"));
     }
 
-    private String getStudyUri(Record rec) {
-        if (file_name.startsWith("MAP-")){
-            return getPilotNum(rec);
-        } else if (file_name.startsWith("SSD-")){
-            return study_id;
-        }
-        return null;
+    private String getStudyId(Record rec) {
+        return getPilotNum(rec);
     }
 
     private String getCollectionUri(Record rec) {
-        String pid = getOriginalPID(rec);
-        if (file_name.startsWith("SSD-")){
-	        if (mapIdUriCache.containsKey(pid)) {
-	            return kbPrefix + "SOC-" + getStudyUri(rec) + "-MSAMPLES";
-	        } else {
-	            return kbPrefix + "SOC-" + getStudyUri(rec) + "-SSAMPLES";
-	        }
-        } else {
-        	return kbPrefix + "SOC-" + getStudyUri(rec) + "-SSAMPLES";
-        }
+        return kbPrefix + "SOC-" + getStudyId(rec) + "-SSAMPLES";
     }
 
     private String getCollectionLabel(Record rec) {
-        return "Sample Collection of Study " + getStudyUri(rec);
+        return "Sample Collection of Study " + getStudyId(rec);
     }
 
     private String getTimeScopeUri(Record rec) {
@@ -225,22 +130,30 @@ public class SampleSubjectMapper extends BasicGenerator {
         return ans;
     }
 
+    private String getSpaceScopeUri(Record rec) {
+        String ans = rec.getValueByColumnName(mapCol.get("spaceScopeID"));
+        return ans;
+    }
 
     public StudyObject createStudyObject(Record record) throws Exception {
         List<String> scopeUris = new ArrayList<String>();
+        List<String> timeScopeUris = new ArrayList<String>();
+        List<String> spaceScopeUris = new ArrayList<String>();
         String pid = getOriginalPID(record);
         if (!pid.isEmpty()) {
             scopeUris.add(kbPrefix + "SBJ-" + pid + "-" + study_id);
         }
         if (!getTimeScopeUri(record).isEmpty()){
-        	scopeUris.add(kbPrefix + "TIME-" + getTimeScopeUri(record) + "-" + study_id);
+            timeScopeUris.add(kbPrefix + "TIME-" + getTimeScopeUri(record) + "-" + study_id);
+        }
+        if (!getSpaceScopeUri(record).isEmpty()){
+            timeScopeUris.add(kbPrefix + "LOC-" + getTimeScopeUri(record) + "-" + study_id);
         }
 
         System.out.println("scopeUris :" + scopeUris);
 
         StudyObject obj = new StudyObject(getUri(record), getType(record), getOriginalSID(record), 
-                getLabel(record), getCollectionUri(record), getLabel(record), scopeUris);
-
+                getLabel(record), getCollectionUri(record), getLabel(record), scopeUris, timeScopeUris, spaceScopeUris);
         return obj;
     }
 
@@ -250,18 +163,20 @@ public class SampleSubjectMapper extends BasicGenerator {
                 "http://hadatac.org/ont/hasco/SampleCollection",
                 getCollectionLabel(record),
                 getCollectionLabel(record),
-                kbPrefix + "STD-" + getStudyUri(record));
+                kbPrefix + "STD-" + getStudyId(record));
 
+        if (!getStudyId(record).isEmpty()) {
+            setStudyUri(URIUtils.replacePrefixEx(kbPrefix + "STD-" + getStudyId(record)));
+        }
+
+        AnnotationLog.println("ObjectCollection:" + getCollectionUri(record) + 
+                " has been created as a hasco:SampleCollection by createObjectCollection().", file_name);
         return oc;
     }
 
     @Override
     public void preprocess() throws Exception {
-        if (motherGenerator != null) {
-            mapIdUriCache = getMapIdUri(motherGenerator);
-        } else {
-        	mapIdUriCache = getMapIdUri();
-        }
+        mapIdUriCache = getMapIdUri();
 
         if (!records.isEmpty()) {
             objects.add(createObjectCollection(records.get(0)));
@@ -271,7 +186,6 @@ public class SampleSubjectMapper extends BasicGenerator {
     @Override
     public HADatAcThing createObject(Record rec, int row_number) throws Exception {
         System.out.println("counter: " + counter);
-
         counter++;
         return createStudyObject(rec);
     }

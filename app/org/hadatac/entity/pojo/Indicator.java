@@ -25,6 +25,7 @@ import org.apache.jena.update.UpdateFactory;
 import org.apache.jena.update.UpdateProcessor;
 import org.apache.jena.update.UpdateRequest;
 import org.hadatac.console.controllers.metadata.DynamicFunctions;
+import org.hadatac.console.http.SPARQLUtils;
 import org.hadatac.console.models.Facet;
 import org.hadatac.console.models.FacetHandler;
 import org.hadatac.metadata.loader.LabkeyDataHandler;
@@ -120,12 +121,8 @@ public class Indicator extends HADatAcThing implements Comparable<Indicator> {
                 " ?uri rdfs:subClassOf hasco:Indicator . " + 
                 "} ";
 
-        Query query = QueryFactory.create(queryString);
-
-        QueryExecution qexec = QueryExecutionFactory.sparqlService(CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), query);
-        ResultSet results = qexec.execSelect();
-        ResultSetRewindable resultsrw = ResultSetFactory.copyResults(results);
-        qexec.close();
+        ResultSetRewindable resultsrw = SPARQLUtils.select(
+                CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), queryString);
 
         while (resultsrw.hasNext()) {
             QuerySolution soln = resultsrw.next();
@@ -146,8 +143,7 @@ public class Indicator extends HADatAcThing implements Comparable<Indicator> {
         String queryString = "DESCRIBE <" + uri + ">";
         Query query = QueryFactory.create(queryString);
         QueryExecution qexec = QueryExecutionFactory.sparqlService(
-                ConfigFactory.load().getString("hadatac.solr.triplestore") 
-                + CollectionUtil.METADATA_SPARQL, query);
+                CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), query);
         model = qexec.execDescribe();
 
         indicator = new Indicator();
@@ -176,12 +172,8 @@ public class Indicator extends HADatAcThing implements Comparable<Indicator> {
                 " ?uri rdfs:subClassOf hasco:Indicator+ . " + 
                 "} ";
 
-        Query query = QueryFactory.create(queryString);
-
-        QueryExecution qexec = QueryExecutionFactory.sparqlService(CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), query);
-        ResultSet results = qexec.execSelect();
-        ResultSetRewindable resultsrw = ResultSetFactory.copyResults(results);
-        qexec.close();
+        ResultSetRewindable resultsrw = SPARQLUtils.select(
+                CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), queryString);
 
         while (resultsrw.hasNext()) {
             QuerySolution soln = resultsrw.next();
@@ -210,14 +202,12 @@ public class Indicator extends HADatAcThing implements Comparable<Indicator> {
                 + " ?attribute rdfs:label ?attributeLabel . "
                 + " }";
 
-        QueryExecution qexecStudy = QueryExecutionFactory.sparqlService(
-                CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), query);
-        ResultSet resultSet = qexecStudy.execSelect();
-        ResultSetRewindable resultsrwStudy = ResultSetFactory.copyResults(resultSet);
-        qexecStudy.close();
+        ResultSetRewindable resultsrw = SPARQLUtils.select(
+                CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), query);
+        
         Indicator indicator = null;
-        while (resultsrwStudy.hasNext()) {
-            QuerySolution soln = resultsrwStudy.next();
+        while (resultsrw.hasNext()) {
+            QuerySolution soln = resultsrw.next();
             indicator = new Indicator();
             indicator.setUri(soln.getResource("indicator").getURI());
             indicator.setLabel(soln.get("indicatorLabel").toString());
@@ -226,6 +216,7 @@ public class Indicator extends HADatAcThing implements Comparable<Indicator> {
             }
             indicators.add(indicator);
         }
+        
         java.util.Collections.sort(indicators);
         return indicators; 
     }
@@ -239,9 +230,9 @@ public class Indicator extends HADatAcThing implements Comparable<Indicator> {
                     facet.getFacetValuesByField("indicator_uri_str"), true) + " } \n ";
         }
 
-        if (!facet.getFacetValuesByField("characteristic_uri_str").isEmpty()) {
+        if (!facet.getFacetValuesByField("characteristic_uri_str_multi").isEmpty()) {
             valueConstraint += " VALUES ?attributeUri { " + stringify(
-                    facet.getFacetValuesByField("characteristic_uri_str"), true) + " } \n ";
+                    facet.getFacetValuesByField("characteristic_uri_str_multi"), true) + " } \n ";
         }
 
         if (!facet.getFacetValuesByField("dasa_uri_str").isEmpty()) {
@@ -270,11 +261,9 @@ public class Indicator extends HADatAcThing implements Comparable<Indicator> {
 
         Map<HADatAcThing, List<HADatAcThing>> mapIndicatorToCharList = new HashMap<HADatAcThing, List<HADatAcThing>>();
         try {
-            QueryExecution qe = QueryExecutionFactory.sparqlService(
-                    CollectionUtil.getCollectionsName(CollectionUtil.METADATA_SPARQL), query);
-            ResultSet resultSet = qe.execSelect();
-            ResultSetRewindable resultsrw = ResultSetFactory.copyResults(resultSet);
-            qe.close();
+            ResultSetRewindable resultsrw = SPARQLUtils.select(
+                    CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), query);
+            
             while (resultsrw.hasNext()) {
                 QuerySolution soln = resultsrw.next();
                 Indicator indicator = new Indicator();
@@ -288,7 +277,6 @@ public class Indicator extends HADatAcThing implements Comparable<Indicator> {
                 attrib.setField("characteristic_uri_str");
 
                 if (!mapIndicatorToCharList.containsKey(indicator)) {
-                    System.out.println("!mapIndicatorToCharList.containsKey(indicator): " + indicator.getUri());
                     List<HADatAcThing> attributes = new ArrayList<HADatAcThing>();
                     mapIndicatorToCharList.put(indicator, attributes);
                 }
@@ -390,7 +378,7 @@ public class Indicator extends HADatAcThing implements Comparable<Indicator> {
         try {
             UpdateRequest request = UpdateFactory.create(insert);
             UpdateProcessor processor = UpdateExecutionFactory.createRemote(
-                    request, CollectionUtil.getCollectionsName(CollectionUtil.METADATA_UPDATE));
+                    request, CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_UPDATE));
             processor.execute();
         } catch (QueryParseException e) {
             System.out.println("QueryParseException due to update query: " + insert);
@@ -416,7 +404,7 @@ public class Indicator extends HADatAcThing implements Comparable<Indicator> {
         query += DELETE_LINE3;
         query += LINE_LAST;
         UpdateRequest request = UpdateFactory.create(query);
-        UpdateProcessor processor = UpdateExecutionFactory.createRemote(request, CollectionUtil.getCollectionsName(CollectionUtil.METADATA_UPDATE));
+        UpdateProcessor processor = UpdateExecutionFactory.createRemote(request, CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_UPDATE));
         processor.execute();
     }
 

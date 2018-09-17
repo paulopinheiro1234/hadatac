@@ -24,17 +24,19 @@ public class ObjectManagement extends Controller {
 
     @Inject
     private FormFactory formFactory;
+    
+    public static int PAGESIZE = 20;
 
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    public Result indexNomsg(String filename, String da_uri, String std_uri, String oc_uri) {
-        return index(filename, da_uri, std_uri, oc_uri, "");
+    public Result indexNomsg(String filename, String da_uri, String std_uri, String oc_uri, int page) {
+        return index(filename, da_uri, std_uri, oc_uri, page, "");
     }
 
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    public Result index(String filename, String da_uri, String std_uri, String oc_uri, String message) {
+    public Result index(String filename, String da_uri, String std_uri, String oc_uri, int page, String message) {
         if (session().get("LabKeyUserName") == null && session().get("LabKeyPassword") == null) {
             return redirect(org.hadatac.console.controllers.triplestore.routes.LoadKB.logInLabkey(
-                    org.hadatac.console.controllers.objects.routes.ObjectManagement.index(filename, da_uri, std_uri, oc_uri, message).url()));
+                    org.hadatac.console.controllers.objects.routes.ObjectManagement.index(filename, da_uri, std_uri, oc_uri, page, message).url()));
         }
         
         try {
@@ -47,30 +49,32 @@ public class ObjectManagement extends Controller {
 
         Study study = Study.find(std_uri);
         if (study == null) {
-            return badRequest(objectConfirm.render("Error listing object collection: Study URI did not return valid URI", filename, da_uri, std_uri, oc_uri));
+            return badRequest(objectConfirm.render("Error listing object collection: Study URI did not return valid URI", filename, da_uri, std_uri, oc_uri, page));
         } 
 
         ObjectCollection oc = ObjectCollection.find(oc_uri);
         if (oc == null) {
-            return badRequest(objectConfirm.render("Error listing objectn: ObjectCollection URI did not return valid object", filename, da_uri, std_uri, oc_uri));
+            return badRequest(objectConfirm.render("Error listing objectn: ObjectCollection URI did not return valid object", filename, da_uri, std_uri, oc_uri, page));
         } 
 
         List<String> objUriList = new ArrayList<String>(); 
-        List<StudyObject> objects = StudyObject.findByCollection(oc);
+        List<StudyObject> objects = StudyObject.findByCollectionWithPages(oc, PAGESIZE, page * PAGESIZE);
+        int total = StudyObject.getNumberStudyObjectsByCollection(oc_uri);
+        
         for (StudyObject obj : objects) {
             objUriList.add(obj.getUri());
         }
 
-        return ok(objectManagement.render(filename, da_uri, study, oc, objUriList, objects, message));
+        return ok(objectManagement.render(filename, da_uri, study, oc, objUriList, objects, page, total, message));
     }
 
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    public Result postIndex(String filename, String da_uri, String std_uri, String oc_uri, String message) {
-        return index(filename, da_uri, std_uri, oc_uri, message);
+    public Result postIndex(String filename, String da_uri, String std_uri, String oc_uri, int page, String message) {
+        return index(filename, da_uri, std_uri, oc_uri, page, message);
     }
 
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    public Result updateCollectionObjects(String filename, String da_uri, String std_uri, String oc_uri, List<String> objUriList) {
+    public Result updateCollectionObjects(String filename, String da_uri, String std_uri, String oc_uri, List<String> objUriList, int page, int total) {
         final SysUser sysUser = AuthApplication.getLocalUser(session());
 
         try {
@@ -145,7 +149,9 @@ public class ObjectManagement extends Controller {
                         newLabels.get(i),
                         oldObj.getIsMemberOf(),
                         oldObj.getComment(),
-                        oldObj.getScopeUris() 
+                        oldObj.getScopeUris(),
+                        oldObj.getTimeScopeUris(),
+                        oldObj.getSpaceScopeUris()
                         );
 
                 nRowsAffected = newObj.deleteFromLabKey(session().get("LabKeyUserName"), session().get("LabKeyPassword"));
@@ -178,14 +184,14 @@ public class ObjectManagement extends Controller {
 
         System.out.println("Study URI leaving EditObject: " + study.getUri());
 
-        return ok(objectManagement.render(filename, da_uri, study, oc, objUriList, newObjList, message));
+        return ok(objectManagement.render(filename, da_uri, study, oc, objUriList, newObjList, page, total, message));
     }
 
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    public Result deleteCollectionObjects(String filename, String da_uri, String std_uri, String oc_uri, List<String> objUriList) {
+    public Result deleteCollectionObjects(String filename, String da_uri, String std_uri, String oc_uri, List<String> objUriList, int page) {
         if (session().get("LabKeyUserName") == null && session().get("LabKeyPassword") == null) {
             return redirect(org.hadatac.console.controllers.triplestore.routes.LoadKB.logInLabkey(
-                    org.hadatac.console.controllers.objects.routes.ObjectManagement.deleteCollectionObjects(filename, da_uri, std_uri, oc_uri, objUriList).url()));
+                    org.hadatac.console.controllers.objects.routes.ObjectManagement.deleteCollectionObjects(filename, da_uri, std_uri, oc_uri, objUriList, page).url()));
         }
 
         final SysUser sysUser = AuthApplication.getLocalUser(session());
@@ -256,6 +262,6 @@ public class ObjectManagement extends Controller {
             message = " no object was deleted";
         }
 
-        return index(filename, da_uri, study.getUri(), oc.getUri(), message);
+        return index(filename, da_uri, study.getUri(), oc.getUri(), page, message);
     }
 }

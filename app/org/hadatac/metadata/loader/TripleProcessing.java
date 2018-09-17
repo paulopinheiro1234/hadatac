@@ -551,7 +551,7 @@ public class TripleProcessing {
 
 		if (oper.equals("load")) {
 		    message += Feedback.print(mode, "   Uploading generated file.");
-		    rdf.loadLocalFile(mode, filePath, KB_FORMAT);
+		    rdf.loadLocalFile(mode, filePath, KB_FORMAT, "");
 		    message += Feedback.println(mode, "");
 		    message += Feedback.println(mode, " ");
 		    message += Feedback.println(mode, "   Triples after [loading from LABKEY]: " + rdf.totalTriples());
@@ -596,7 +596,7 @@ public class TripleProcessing {
 		}
 
 	    message += Feedback.print(mode, "   Uploading generated file.");
-	    rdf.loadLocalFile(mode, fileName, KB_FORMAT);
+	    rdf.loadLocalFile(mode, fileName, KB_FORMAT, "");
 	    message += Feedback.println(mode, "");
 	    message += Feedback.println(mode, " ");
 	    message += Feedback.println(mode, "   Triples after [loading]: " + rdf.totalTriples());

@@ -8,14 +8,45 @@ import org.hadatac.console.controllers.annotator.AnnotationLog;
 public class GeneratorChain {
 
     private List<BasicGenerator> chain = new ArrayList<BasicGenerator>();
+    private String studyUri = "";
+    private RecordFile file = null;
+    private boolean bValid = true;
+    
+    public String getStudyUri() {
+        return studyUri;
+    }
+    
+    public void setStudyUri(String studyUri) {
+        this.studyUri = studyUri;
+    }
+    
+    public RecordFile getRecordFile() {
+        return file;
+    }
+    
+    public void setRecordFile(RecordFile file) {
+        this.file = file;
+    }
+    
+    public boolean isValid() {
+        return bValid;
+    }
+    
+    public void setInvalid() {
+        bValid = false;
+    }
 
     public void addGenerator(BasicGenerator generator) {
         chain.add(generator);
     }
 
     public boolean generate() {
+        if (!isValid()) {
+            return false;
+        }
+        
         for (BasicGenerator generator : chain) {
-            try {			
+            try {
                 generator.preprocess();
                 generator.createRows();
                 generator.createObjects();
@@ -44,6 +75,14 @@ public class GeneratorChain {
                 return false;
             }
         }
+        
+        for (BasicGenerator generator : chain) {
+            if (!generator.getStudyUri().equals("")) {
+                setStudyUri(generator.getStudyUri());
+            }
+        }
+
+	postprocess();
 
         return true;
     }
@@ -69,4 +108,8 @@ public class GeneratorChain {
             }
         }
     }
+
+    public void postprocess() {
+    }
+
 }
