@@ -16,6 +16,12 @@ RUN apk add --update git bash curl openssl ca-certificates && \
     ln -s /opt/sbt/sbt/bin/sbt /usr/bin/sbt && \
     rm -rf /tmp/* /var/cache/apk/*
 
+# Copy the Docker hadatac.conf file over the original
+COPY ./conf/hadatac-docker.conf /root/app/conf/hadatac.conf
+
+# Copy the Docker version of the autoccsv.config file over
+COPY ./conf/autoccsv-docker.config /root/app/conf/autoccsv.config
+
 WORKDIR /tmp/build
 
 # Copy over the basic configuration files
@@ -29,12 +35,6 @@ RUN (sbt compile || sbt compile || sbt compile) && \
 
 # Copy all of the code needed
 COPY . /root/app/
-
-# Copy the Docker hadatac.conf file over the original
-COPY ./conf/hadatac-docker.conf /root/app/conf/hadatac.conf
-
-# Copy the Docker version of the autoccsv.config file over
-COPY ./conf/autoccsv-docker.config /root/app/conf/autoccsv.config
 
 # Change the working dir to the app to compile
 WORKDIR /root/app
