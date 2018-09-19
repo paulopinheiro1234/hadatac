@@ -22,6 +22,7 @@ HADATAC_CONF=$CONF_DIR/hadatac.conf
 LABKEY=$CONF_DIR/labkey.config
 NAMESPACES=$CONF_DIR/namespaces.properties
 TEMPLATE=$CONF_DIR/templace.conf
+AUTOCCSV=$CONF_DIR/autoccsv.config
 
 echo ""
 echo "testing " $HADATAC_CONF.$1
@@ -40,6 +41,10 @@ fi
 if [ -f $TEMPLATE.$1 ]; then
     echo "Copying $TEMPLATE.$1 to $TEMPLATE"
     cp -f $TEMPLATE.$1 $TEMPLATE
+fi
+if [ -f $AUTOCCSV.$1 ]; then
+    echo "Copying $AUTOCCSV.$1 to $AUTOCCSV"
+    cp -f $AUTOCCSV.$1 $AUTOCCSV
 fi
 wait $!
 
