@@ -441,6 +441,11 @@ public class Deployment extends HADatAcThing {
         String insert = "";
         insert += NameSpaces.getInstance().printSparqlNameSpaceList();
         insert += INSERT_LINE1;
+        
+        if (!getNamedGraph().isEmpty()) {
+            insert += " GRAPH <" + getNamedGraph() + "> { ";
+        }
+        
         insert += "<" + this.getUri() + ">  ";
         if (this.isLegacy()) {
             insert += LINE3_LEGACY;
@@ -457,6 +462,11 @@ public class Deployment extends HADatAcThing {
         if (this.endedAt != null) {
             insert += END_TIME_PREDICATE + "\"" + this.getEndedAt() + TIME_XMLS + "  ";
         }
+        
+        if (!getNamedGraph().isEmpty()) {
+            insert += " } ";
+        }
+        
         insert += LINE_LAST;
 
         try {

@@ -171,11 +171,14 @@ public class NameSpace {
     }
 	
 	public void deleteTriples() {
-        String graphUri = getName();
-        if (!graphUri.isEmpty()) {
+	    deleteTriplesByNamedGraph(getName());
+	}
+	
+	public static void deleteTriplesByNamedGraph(String namedGraphUri) {
+        if (!namedGraphUri.isEmpty()) {
             String queryString = "";
             queryString += NameSpaces.getInstance().printSparqlNameSpaceList();
-            queryString += "WITH <" + graphUri + "> ";
+            queryString += "WITH <" + namedGraphUri + "> ";
             queryString += "DELETE { ?s ?p ?o } WHERE { ?s ?p ?o . } ";
             
             UpdateRequest req = UpdateFactory.create(queryString);

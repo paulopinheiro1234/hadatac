@@ -800,6 +800,11 @@ public class DataAcquisitionSchemaAttribute extends HADatAcThing {
         String insert = "";
         insert += NameSpaces.getInstance().printSparqlNameSpaceList();
         insert += INSERT_LINE1;
+        
+        if (!getNamedGraph().isEmpty()) {
+            insert += " GRAPH <" + getNamedGraph() + "> { ";
+        }
+        
         insert += this.getUri() + " a hasco:DASchemaAttribute . ";
         insert += this.getUri() + " rdfs:label  \"" + label + "\" . ";
         if (partOfSchema.startsWith("http")) {

@@ -8,16 +8,8 @@ import java.util.Map;
 
 import org.labkey.remoteapi.CommandException;
 
-import com.typesafe.config.ConfigFactory;
-
-import org.apache.jena.query.Query;
-import org.apache.jena.query.QueryExecution;
-import org.apache.jena.query.QueryExecutionFactory;
-import org.apache.jena.query.QueryFactory;
 import org.apache.jena.query.QueryParseException;
 import org.apache.jena.query.QuerySolution;
-import org.apache.jena.query.ResultSet;
-import org.apache.jena.query.ResultSetFactory;
 import org.apache.jena.query.ResultSetRewindable;
 import org.apache.jena.update.UpdateExecutionFactory;
 import org.apache.jena.update.UpdateFactory;
@@ -49,6 +41,7 @@ import org.joda.time.DateTimeZone;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 import org.joda.time.format.ISODateTimeFormat;
+
 
 public class Study extends HADatAcThing {
 
@@ -1066,6 +1059,11 @@ public class Study extends HADatAcThing {
         }
         insert += NameSpaces.getInstance().printSparqlNameSpaceList();
         insert += INSERT_LINE1;
+        
+        if (!getNamedGraph().isEmpty()) {
+            insert += " GRAPH <" + getNamedGraph() + "> { ";
+        }
+        
         if (studyType.startsWith("<")) {
             insert += std_uri + " a " + studyType + " . ";
         } else {
@@ -1101,6 +1099,11 @@ public class Study extends HADatAcThing {
         if (lastId != null) {
             insert += std_uri + " hasco:hasLastId  \"" + lastId + "\" .  ";
         }
+        
+        if (!getNamedGraph().isEmpty()) {
+            insert += " } ";
+        }
+        
         insert += LINE_LAST;
 
         try {

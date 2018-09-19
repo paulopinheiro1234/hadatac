@@ -14,7 +14,6 @@ import org.apache.jena.query.QueryFactory;
 import org.apache.jena.query.QueryParseException;
 import org.apache.jena.query.QuerySolution;
 import org.apache.jena.query.ResultSet;
-import org.apache.jena.query.ResultSetFactory;
 import org.apache.jena.query.ResultSetRewindable;
 import org.apache.jena.query.ResultSetFormatter;
 import org.apache.jena.update.UpdateExecutionFactory;
@@ -32,8 +31,6 @@ import org.hadatac.utils.FirstLabel;
 import org.hadatac.metadata.loader.URIUtils;
 import org.hadatac.entity.pojo.ObjectCollection;
 import org.labkey.remoteapi.CommandException;
-
-import com.typesafe.config.ConfigFactory;
 
 import org.hadatac.console.http.SPARQLUtils;
 import org.hadatac.console.models.Facet;
@@ -223,31 +220,31 @@ public class ObjectCollection extends HADatAcThing implements Comparable<ObjectC
     public void setHasScopeUri(String hasScopeUri) {
         this.hasScopeUri = hasScopeUri;
     }
-    
+
     public void setSOCReference(String hasSOCReference) {
-    	this.hasSOCReference = hasSOCReference;
+        this.hasSOCReference = hasSOCReference;
     }
-    
+
     public String getSOCReference() {
-    	return hasSOCReference;
+        return hasSOCReference;
     }
-    
+
     public void setGroundingLabel(String hasGroundingLabel) {
-    	this.hasGroundingLabel = hasGroundingLabel;
+        this.hasGroundingLabel = hasGroundingLabel;
     }
-    
+
     public String getGroundingLabel() {
-    	return hasGroundingLabel;
+        return hasGroundingLabel;
     }
 
     public void setRoleLabel(String roleLabel) {
-    	this.hasRoleLabel = roleLabel;
+        this.hasRoleLabel = roleLabel;
     }
-    
+
     public String getRoleLabel() {
-    	return hasRoleLabel;
+        return hasRoleLabel;
     }
-    
+
     public List<String> getSpaceScopeUris() {
         return spaceScopeUris;
     }
@@ -293,42 +290,42 @@ public class ObjectCollection extends HADatAcThing implements Comparable<ObjectC
     }
 
     public boolean isConnected(ObjectCollection oc) {
-	
-	// Check if oc is valid
-	if (oc.getUri() == null || oc.getUri().equals("")) {
-	    return false;
-	}
 
-	// Check if oc is in scope of current object collection
-	if (this.hasScopeUri != null && !this.hasScopeUri.equals("")) {
-	    ObjectCollection domainScope = ObjectCollection.find(this.hasScopeUri);
-	    if (oc.equals(domainScope)) {
-		return true;
-	    }
-	}
-	if (this.getTimeScopes() != null && this.getTimeScopes().size() > 0) {
-	    List<ObjectCollection> timeScopes = this.getTimeScopes();
-	    if (timeScopes.contains(oc)) {
-		return true;
-	    }
-	}
+        // Check if oc is valid
+        if (oc.getUri() == null || oc.getUri().equals("")) {
+            return false;
+        }
 
-	// Check if current is in scope of oc
-	if (oc.getHasScopeUri() != null && !oc.getHasScopeUri().equals("")) {
-	    ObjectCollection ocDomainScope = ObjectCollection.find(oc.hasScopeUri);
-	    if (this.equals(ocDomainScope)) {
-		return true;
-	    }
-	}
-	if (oc.getTimeScopes() != null && oc.getTimeScopes().size() > 0) {
-	    List<ObjectCollection> ocTimeScopes = oc.getTimeScopes();
-	    if (ocTimeScopes.contains(this)) {
-		return true;
-	    }
-	}
+        // Check if oc is in scope of current object collection
+        if (this.hasScopeUri != null && !this.hasScopeUri.equals("")) {
+            ObjectCollection domainScope = ObjectCollection.find(this.hasScopeUri);
+            if (oc.equals(domainScope)) {
+                return true;
+            }
+        }
+        if (this.getTimeScopes() != null && this.getTimeScopes().size() > 0) {
+            List<ObjectCollection> timeScopes = this.getTimeScopes();
+            if (timeScopes.contains(oc)) {
+                return true;
+            }
+        }
 
-	// otherwise there is no connection
-	return false;
+        // Check if current is in scope of oc
+        if (oc.getHasScopeUri() != null && !oc.getHasScopeUri().equals("")) {
+            ObjectCollection ocDomainScope = ObjectCollection.find(oc.hasScopeUri);
+            if (this.equals(ocDomainScope)) {
+                return true;
+            }
+        }
+        if (oc.getTimeScopes() != null && oc.getTimeScopes().size() > 0) {
+            List<ObjectCollection> ocTimeScopes = oc.getTimeScopes();
+            if (ocTimeScopes.contains(this)) {
+                return true;
+            }
+        }
+
+        // otherwise there is no connection
+        return false;
     }
 
     public boolean inUriList(List<String> selected) {
@@ -490,21 +487,21 @@ public class ObjectCollection extends HADatAcThing implements Comparable<ObjectC
                 } catch (Exception e1) {
                     hasScopeUriStr = "";
                 }
-                
+
                 try {
                     if (soln.getLiteral("hasGroundingLabel") != null && soln.getLiteral("hasGroundingLabel").getString() != null) {
-                    	hasGroundingLabelStr = soln.getLiteral("hasGroundingLabel").getString();
+                        hasGroundingLabelStr = soln.getLiteral("hasGroundingLabel").getString();
                     }
                 } catch (Exception e1) {
-                	hasGroundingLabelStr = "";
+                    hasGroundingLabelStr = "";
                 }
 
                 try {
                     if (soln.getLiteral("hasSOCReference") != null && soln.getLiteral("hasSOCReference").getString() != null) {
-                    	hasSOCReferenceStr = soln.getLiteral("hasSOCReference").getString();
+                        hasSOCReferenceStr = soln.getLiteral("hasSOCReference").getString();
                     }
                 } catch (Exception e1) {
-                	hasSOCReferenceStr = "";
+                    hasSOCReferenceStr = "";
                 }
 
                 spaceScopeUrisStr = retrieveSpaceScope(oc_uri);
@@ -610,12 +607,12 @@ public class ObjectCollection extends HADatAcThing implements Comparable<ObjectC
         Map<String, String> labelsMap = new HashMap<String, String>();
         List<ObjectCollection> ocList = findByStudyUri(studyUri);
 
-	for (ObjectCollection oc : ocList) {
-	    if (oc.getGroundingLabel() != null && !oc.getGroundingLabel().equals("")) {
-		labelsMap.put(oc.getSOCReference(), oc.getGroundingLabel());
-	    } else {
-	    }
-	}
+        for (ObjectCollection oc : ocList) {
+            if (oc.getGroundingLabel() != null && !oc.getGroundingLabel().equals("")) {
+                labelsMap.put(oc.getSOCReference(), oc.getGroundingLabel());
+            } else {
+            }
+        }
 
         return labelsMap;
     }
@@ -749,6 +746,11 @@ public class ObjectCollection extends HADatAcThing implements Comparable<ObjectC
 
         insert += NameSpaces.getInstance().printSparqlNameSpaceList();
         insert += INSERT_LINE1;
+
+        if (!getNamedGraph().isEmpty()) {
+            insert += " GRAPH <" + getNamedGraph() + "> { ";
+        }
+
         insert += oc_uri + " a <" + typeUri + "> . ";
         insert += oc_uri + " rdfs:label  \"" + this.getLabel() + "\" . ";
         if (this.getStudyUri().startsWith("http")) {
@@ -791,6 +793,11 @@ public class ObjectCollection extends HADatAcThing implements Comparable<ObjectC
                 }
             }
         }
+
+        if (!getNamedGraph().isEmpty()) {
+            insert += " } ";
+        }
+
         insert += LINE_LAST;
 
         try {
@@ -817,12 +824,12 @@ public class ObjectCollection extends HADatAcThing implements Comparable<ObjectC
 
         insert += NameSpaces.getInstance().printSparqlNameSpaceList();
         insert += INSERT_LINE1;
-	if (uri.startsWith("http")) {
-	    insert += "  <" + uri + "> hasco:hasRoleLabel \"" + label + "\" . ";
+        if (uri.startsWith("http")) {
+            insert += "  <" + uri + "> hasco:hasRoleLabel \"" + label + "\" . ";
 
-	} else {
-	    insert += "  " + uri + " hasco:hasRoleLabel \"" + label + "\" . ";
-	}
+        } else {
+            insert += "  " + uri + " hasco:hasRoleLabel \"" + label + "\" . ";
+        }
         insert += LINE_LAST;
         UpdateRequest request = UpdateFactory.create(insert);
         UpdateProcessor processor = UpdateExecutionFactory.createRemote(
@@ -905,63 +912,63 @@ public class ObjectCollection extends HADatAcThing implements Comparable<ObjectC
     }
 
     public static String computeRouteLabel (ObjectCollection oc, List<ObjectCollection> studyOCs) {
-	if (oc.getGroundingLabel() != null && !oc.getGroundingLabel().equals("")) {
-	    return oc.getGroundingLabel();
-	} else {
-	    List<ObjectCollection> ocList = new ArrayList<ObjectCollection>();
-	    List<ObjectCollection> allList = new ArrayList<ObjectCollection>();
-	    List<ObjectCollection> inspectedList = new ArrayList<ObjectCollection>();
-	    ocList.add(oc);
-	    for (ObjectCollection receivedOC : studyOCs) {
-		if (!receivedOC.equals(oc)) {
-		    allList.add(receivedOC);
-		    inspectedList.add(receivedOC);
-		}
-	    } 
-	    return traverseRouteLabel(ocList, allList, inspectedList);
-	}
+        if (oc.getGroundingLabel() != null && !oc.getGroundingLabel().equals("")) {
+            return oc.getGroundingLabel();
+        } else {
+            List<ObjectCollection> ocList = new ArrayList<ObjectCollection>();
+            List<ObjectCollection> allList = new ArrayList<ObjectCollection>();
+            List<ObjectCollection> inspectedList = new ArrayList<ObjectCollection>();
+            ocList.add(oc);
+            for (ObjectCollection receivedOC : studyOCs) {
+                if (!receivedOC.equals(oc)) {
+                    allList.add(receivedOC);
+                    inspectedList.add(receivedOC);
+                }
+            } 
+            return traverseRouteLabel(ocList, allList, inspectedList);
+        }
     }
 
     private static String traverseRouteLabel(List<ObjectCollection> path, List<ObjectCollection> inspectedList, List<ObjectCollection> allList) {
-	//System.out.println("Path " + path);
-	//System.out.println("StudyOCs " + inspectedList);
-	for (ObjectCollection oc : inspectedList) {
-	    //System.out.println("    - oc " + oc.getUri());
-	    //System.out.println("    - current.domain " + path.get(path.size() - 1).getHasScopeUri());
-	    //System.out.println("    - current.time " + path.get(path.size() - 1).getTimeScopes());
-	    //System.out.println("    - oc.domain " + oc.getHasScopeUri());
-	    //System.out.println("    - oc.time " + oc.getTimeScopes());
-	    if (path.get(path.size() - 1).isConnected(oc)) {
+        //System.out.println("Path " + path);
+        //System.out.println("StudyOCs " + inspectedList);
+        for (ObjectCollection oc : inspectedList) {
+            //System.out.println("    - oc " + oc.getUri());
+            //System.out.println("    - current.domain " + path.get(path.size() - 1).getHasScopeUri());
+            //System.out.println("    - current.time " + path.get(path.size() - 1).getTimeScopes());
+            //System.out.println("    - oc.domain " + oc.getHasScopeUri());
+            //System.out.println("    - oc.time " + oc.getTimeScopes());
+            if (path.get(path.size() - 1).isConnected(oc)) {
                 System.out.println(oc.getUri() + " is connected to " + path.get(path.size() - 1).getUri());
-		if (oc.getGroundingLabel() != null && !oc.getGroundingLabel().equals("")) {
-		    String finalLabel = oc.getGroundingLabel();
-		    for (int i = path.size() - 1; i >= 0; i--) {
-			finalLabel = finalLabel + " " + path.get(i).getLabel();
-		    }
-		    //System.out.println(" final label ==> <" + finalLabel + ">");
-		    return finalLabel;
-		} else {
-		    path.add(oc);
-		    List<ObjectCollection> newList = new ArrayList<ObjectCollection>();
-		    for (ObjectCollection ocFromAllList : allList) {
-			if (!path.contains(ocFromAllList)) {
-			    newList.add(ocFromAllList);
-			}
-		    }
-		    return traverseRouteLabel(path, newList, allList);
-		}
-	    } else {
-		//System.out.println("next iteration of traverseRouteLabel");
-		inspectedList.remove(oc);
-		return traverseRouteLabel(path, inspectedList, allList);
-	    }
-	}
-	System.out.println("Could not find path for " + path.get(0).getSOCReference());
-	return null;
+                if (oc.getGroundingLabel() != null && !oc.getGroundingLabel().equals("")) {
+                    String finalLabel = oc.getGroundingLabel();
+                    for (int i = path.size() - 1; i >= 0; i--) {
+                        finalLabel = finalLabel + " " + path.get(i).getLabel();
+                    }
+                    //System.out.println(" final label ==> <" + finalLabel + ">");
+                    return finalLabel;
+                } else {
+                    path.add(oc);
+                    List<ObjectCollection> newList = new ArrayList<ObjectCollection>();
+                    for (ObjectCollection ocFromAllList : allList) {
+                        if (!path.contains(ocFromAllList)) {
+                            newList.add(ocFromAllList);
+                        }
+                    }
+                    return traverseRouteLabel(path, newList, allList);
+                }
+            } else {
+                //System.out.println("next iteration of traverseRouteLabel");
+                inspectedList.remove(oc);
+                return traverseRouteLabel(path, inspectedList, allList);
+            }
+        }
+        System.out.println("Could not find path for " + path.get(0).getSOCReference());
+        return null;
     }
-    
+
     public String toString() {
-	return this.getUri();
+        return this.getUri();
     } 
 
 }

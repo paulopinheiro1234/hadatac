@@ -498,6 +498,11 @@ public class DataAcquisitionSchemaObject extends HADatAcThing {
         String insert = "";
         insert += NameSpaces.getInstance().printSparqlNameSpaceList();
         insert += INSERT_LINE1;
+        
+        if (!getNamedGraph().isEmpty()) {
+            insert += " GRAPH <" + getNamedGraph() + "> { ";
+        }
+        
         insert += this.getUri() + " a hasco:DASchemaObject . ";
         insert += this.getUri() + " rdfs:label  \"" + label + "\" . ";
         if (partOfSchema.startsWith("http")) {
@@ -527,6 +532,11 @@ public class DataAcquisitionSchemaObject extends HADatAcThing {
                 insert += this.getUri() + " sio:relation <" + relationStr + "> .  ";
             }
         }
+        
+        if (!getNamedGraph().isEmpty()) {
+            insert += " } ";
+        }
+        
         insert += LINE_LAST;
 
         try {

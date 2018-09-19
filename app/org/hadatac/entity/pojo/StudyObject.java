@@ -13,7 +13,6 @@ import org.apache.jena.query.QueryFactory;
 import org.apache.jena.query.QueryParseException;
 import org.apache.jena.query.QuerySolution;
 import org.apache.jena.query.ResultSet;
-import org.apache.jena.query.ResultSetFactory;
 import org.apache.jena.query.ResultSetRewindable;
 import org.apache.jena.query.ResultSetFormatter;
 import org.apache.jena.update.UpdateExecutionFactory;
@@ -37,7 +36,6 @@ import org.hadatac.metadata.loader.LabkeyDataHandler;
 import org.hadatac.metadata.loader.URIUtils;
 import org.labkey.remoteapi.CommandException;
 
-import com.typesafe.config.ConfigFactory;
 
 public class StudyObject extends HADatAcThing {
 
@@ -571,9 +569,6 @@ public class StudyObject extends HADatAcThing {
 
     @Override
     public boolean saveToTripleStore() {
-        //System.out.println("Saving study object " + getUri() + " to triple store");
-        //System.out.println("[StudyObject] uri: " + uri);
-
         if (uri == null || uri.equals("")) {
             System.out.println("[ERROR] Trying to save OBJ without assigning an URI");
             return false;
@@ -588,12 +583,17 @@ public class StudyObject extends HADatAcThing {
 
         insert += NameSpaces.getInstance().printSparqlNameSpaceList();
         insert += INSERT_LINE1;
+        
+        if (!getNamedGraph().isEmpty()) {
+            insert += " GRAPH <" + getNamedGraph() + "> { ";
+        }
+        
         if (typeUri.startsWith("http")) {
             insert += obj_uri + " a <" + typeUri + "> . ";
         } else {
             insert += obj_uri + " a " + typeUri + " . ";
         }
-        if(!roleUri.isEmpty()){
+        if(!roleUri.isEmpty()) {
             if (roleUri.startsWith("http")) {
                 insert += obj_uri + " hasco:hasRole <" + roleUri + "> . ";
             } else {
@@ -651,7 +651,10 @@ public class StudyObject extends HADatAcThing {
             } 
         }
 
-
+        if (!getNamedGraph().isEmpty()) {
+            insert += " } ";
+        }
+        
         insert += LINE_LAST;
         try {
             UpdateRequest request = UpdateFactory.create(insert);
@@ -668,8 +671,6 @@ public class StudyObject extends HADatAcThing {
 
     @Override
     public int saveToLabKey(String user_name, String password) {
-        //System.out.println("Saving study object " + getUri() + " to LabKey");
-
         LabkeyDataHandler loader = LabkeyDataHandler.createDefault(user_name, password);
         List< Map<String, Object> > rows = new ArrayList< Map<String, Object> >();
         Map<String, Object> row = new HashMap<String, Object>();
@@ -726,8 +727,6 @@ public class StudyObject extends HADatAcThing {
 
     @Override
     public int deleteFromLabKey(String user_name, String password) {
-        //System.out.println("Deleting study object " + getUri() + " from LabKey");
-
         LabkeyDataHandler loader = LabkeyDataHandler.createDefault(user_name, password);
         List< Map<String, Object> > rows = new ArrayList< Map<String, Object> >();
         Map<String, Object> row = new HashMap<String, Object>();
