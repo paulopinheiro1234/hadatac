@@ -1,10 +1,20 @@
 package org.hadatac.utils;
 
+import java.io.File;
 import java.io.IOException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import org.apache.jena.query.QuerySolution;
+import org.apache.jena.query.ResultSetRewindable;
+import org.apache.jena.riot.RiotNotFoundException;
+import org.apache.jena.shared.NotFoundException;
+import org.apache.jena.update.UpdateExecutionFactory;
+import org.apache.jena.update.UpdateFactory;
+import org.apache.jena.update.UpdateProcessor;
+import org.apache.jena.update.UpdateRequest;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServerException;
@@ -14,6 +24,13 @@ import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.client.solrj.response.UpdateResponse;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
+import org.eclipse.rdf4j.model.Resource;
+import org.eclipse.rdf4j.model.ValueFactory;
+import org.eclipse.rdf4j.repository.Repository;
+import org.eclipse.rdf4j.repository.RepositoryConnection;
+import org.eclipse.rdf4j.repository.sparql.SPARQLRepository;
+import org.eclipse.rdf4j.rio.RDFFormat;
+import org.hadatac.console.http.SPARQLUtils;
 
 
 public class NameSpace {
@@ -45,6 +62,8 @@ public class NameSpace {
 	private String nsType = "";
 	@Field("url_str")
 	private String nsURL = "";
+	@Field("number_of_loaded_triples_int")
+    private int numberOfLoadedTriples = 0;
 	
 	public NameSpace () {
 	}
@@ -88,6 +107,14 @@ public class NameSpace {
 		nsURL = url;
 	}
 	
+	public int getNumberOfLoadedTriples() {
+	    return numberOfLoadedTriples;
+    }
+	
+	public void setNumberOfLoadedTriples(int numberOfLoadedTriples) {
+	    this.numberOfLoadedTriples = numberOfLoadedTriples;
+    }
+	
 	public String toString() {
 		if (nsAbbrev == null) {
 			return "null";
@@ -100,6 +127,70 @@ public class NameSpace {
 		else 
 			return "<" + nsAbbrev + ":> " + nsName + " (" + showType + ", " + nsURL + ")";
 	}
+	
+	public void updateLoadedTripleSize() {
+        try {
+            String queryString = "SELECT (COUNT(*) as ?tot) \n"
+                    + "FROM <" + getName() + "> \n"
+                    + "WHERE { ?s ?p ?o . } \n";
+
+            ResultSetRewindable resultsrw = SPARQLUtils.select(CollectionUtil.getCollectionPath(
+                    CollectionUtil.Collection.METADATA_SPARQL), queryString);
+
+            QuerySolution soln = resultsrw.next();
+
+            setNumberOfLoadedTriples(Integer.valueOf(soln.getLiteral("tot").getValue().toString()).intValue());
+            save();
+        } catch (Exception e) {
+            System.out.println("Error in updateLoadedTripleSize()");
+        }
+    }
+	
+	public void loadTriples(String address, boolean fromRemote) {
+        try {
+            Repository repo = new SPARQLRepository(
+                    CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_GRAPH));
+            repo.initialize();
+            RepositoryConnection con = repo.getConnection();
+            ValueFactory factory = repo.getValueFactory();
+            if (fromRemote) {
+                con.add(new URL(address), "", getRioFormat(getType()), (Resource)factory.createIRI(getName()));
+            } else {
+                con.add(new File(address), "", getRioFormat(getType()), (Resource)factory.createIRI(getName()));
+            }
+        } catch (NotFoundException e) {
+            System.out.println("NotFoundException: address " + address);
+            System.out.println("NotFoundException: " + e.getMessage());
+        } catch (RiotNotFoundException e) {
+            System.out.println("RiotNotFoundException: address " + address);
+            System.out.println("RiotNotFoundException: " + e.getMessage());
+        } catch (Exception e) {
+            System.out.println("Exception: address " + address);
+            System.out.println("Exception: " + e.getMessage());
+        }
+    }
+	
+	public void deleteTriples() {
+	    deleteTriplesByNamedGraph(getName());
+	}
+	
+	public static void deleteTriplesByNamedGraph(String namedGraphUri) {
+        if (!namedGraphUri.isEmpty()) {
+            String queryString = "";
+            queryString += NameSpaces.getInstance().printSparqlNameSpaceList();
+            queryString += "WITH <" + namedGraphUri + "> ";
+            queryString += "DELETE { ?s ?p ?o } WHERE { ?s ?p ?o . } ";
+            
+            UpdateRequest req = UpdateFactory.create(queryString);
+            UpdateProcessor processor = UpdateExecutionFactory.createRemote(req, 
+                    CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_UPDATE));
+            try {
+                processor.execute();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+    }
 	
 	public int save() {        
         try {
@@ -160,6 +251,7 @@ public class NameSpace {
         object.setName(doc.getFieldValue("name_str").toString());
         object.setType(doc.getFieldValue("mime_type_str").toString());
         object.setURL(doc.getFieldValue("url_str").toString());
+        object.setNumberOfLoadedTriples(Integer.valueOf(doc.getFieldValue("number_of_loaded_triples_int").toString()).intValue());
         
         return object;
     }
@@ -180,7 +272,7 @@ public class NameSpace {
             }
         } catch (Exception e) {
             list.clear();
-            System.out.println("[ERROR] OperationMode.find(SolrQuery) - Exception message: " + e.getMessage());
+            System.out.println("[ERROR] OperationMode.findByQuery(SolrQuery) - Exception message: " + e.getMessage());
         }
         
         return list;
@@ -204,5 +296,15 @@ public class NameSpace {
         }
         
         return namespaces.get(0);
+    }
+    
+    public static RDFFormat getRioFormat(String contentType) {
+        if (contentType.contains("turtle")) {
+            return RDFFormat.TURTLE;
+        } else if (contentType.contains("rdf+xml")) {
+            return RDFFormat.RDFXML;
+        } else {
+            return RDFFormat.NTRIPLES;
+        }
     }
 }

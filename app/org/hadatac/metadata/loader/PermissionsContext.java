@@ -99,7 +99,7 @@ public class PermissionsContext implements RDFContext {
 	 *   used to process rdf/xml content.
 	 *   
 	 */
-	public Long loadLocalFile(int mode, String filePath, String contentType) {
+	public Long loadLocalFile(int mode, String filePath, String contentType, String graphUri) {
 		Model model = ModelFactory.createDefaultModel();
 		DatasetAccessor accessor = DatasetAccessorFactory.createHTTP(
 				CollectionUtil.getCollectionPath(CollectionUtil.Collection.PERMISSIONS_GRAPH));		

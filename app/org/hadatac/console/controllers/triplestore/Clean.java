@@ -8,6 +8,8 @@ import org.hadatac.data.loader.DataContext;
 import org.hadatac.metadata.loader.MetadataContext;
 import org.hadatac.metadata.loader.PermissionsContext;
 import org.hadatac.utils.Feedback;
+import org.hadatac.utils.NameSpace;
+import org.hadatac.utils.NameSpaces;
 
 import com.typesafe.config.ConfigFactory;
 
@@ -35,6 +37,7 @@ public class Clean extends Controller {
                             ConfigFactory.load().getString("hadatac.solr.triplestore"), 
                             false);
             result = metadata.clean(Feedback.WEB);
+            NameSpaces.reload();
         } else if (oper.equals("usergraph")) {
             PermissionsContext permission = new 
                     PermissionsContext("user", 

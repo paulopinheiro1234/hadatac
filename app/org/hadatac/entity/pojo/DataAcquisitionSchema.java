@@ -632,8 +632,26 @@ public class DataAcquisitionSchema extends HADatAcThing {
         String insert = "";
         insert += NameSpaces.getInstance().printSparqlNameSpaceList();
         insert += INSERT_LINE1;
+        
+        if (!getNamedGraph().isEmpty()) {
+            insert += " GRAPH <" + getNamedGraph() + "> { ";
+        }
+        
         insert += this.getUri() + " a hasco:DASchema . ";
         insert += this.getUri() + " rdfs:label  \"" + this.getLabel() + "\" . ";
+        
+        if (!getNamedGraph().isEmpty()) {
+            insert += " } ";
+        }
+        
+        if (!getNamedGraph().isEmpty()) {
+            insert += " } ";
+        }
+        
+        if (!getNamedGraph().isEmpty()) {
+            insert += " } ";
+        }
+        
         insert += LINE_LAST;
 
         try {

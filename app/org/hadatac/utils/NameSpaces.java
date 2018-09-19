@@ -44,6 +44,16 @@ public class NameSpaces {
         }
         
         for (NameSpace ns : namespaces) {
+            ns.updateLoadedTripleSize();
+            table.put(ns.getAbbreviation(), ns);
+        }
+    }
+    
+    public static void reload() {
+        table.clear();
+        List<NameSpace> namespaces = NameSpace.findAll();
+        for (NameSpace ns : namespaces) {
+            ns.updateLoadedTripleSize();
             table.put(ns.getAbbreviation(), ns);
         }
     }
@@ -196,5 +206,4 @@ public class NameSpaces {
         NameSpaces ns = new NameSpaces();
         System.out.println(ns.printTurtleNameSpaceList());
     }
-
 }

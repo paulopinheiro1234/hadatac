@@ -9,17 +9,9 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.io.FileUtils;
-import org.apache.jena.query.QuerySolution;
-import org.apache.jena.query.ResultSetRewindable;
-import org.apache.jena.sparql.engine.http.QueryExceptionHTTP;
-import org.hadatac.console.controllers.annotator.AnnotationLog;
-import org.hadatac.console.controllers.triplestore.UserManagement;
-import org.hadatac.console.http.SPARQLUtils;
 import org.hadatac.data.loader.Record;
 import org.hadatac.data.loader.RecordFile;
-import org.hadatac.metadata.loader.URIUtils;
-import org.hadatac.utils.CollectionUtil;
-import org.hadatac.utils.NameSpaces;
+
 
 public class SSD {
 

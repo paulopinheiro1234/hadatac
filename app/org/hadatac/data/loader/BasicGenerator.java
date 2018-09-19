@@ -9,19 +9,17 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import org.apache.jena.query.DatasetAccessor;
-import org.apache.jena.query.DatasetAccessorFactory;
-import org.apache.jena.rdf.model.Literal;
-import org.apache.jena.rdf.model.Model;
-import org.apache.jena.rdf.model.ModelFactory;
-import org.apache.jena.rdf.model.Property;
-import org.apache.jena.rdf.model.Resource;
-import org.apache.jena.rdf.model.Statement;
-import org.apache.jena.rdf.model.StmtIterator;
-import org.apache.jena.update.UpdateExecutionFactory;
-import org.apache.jena.update.UpdateFactory;
-import org.apache.jena.update.UpdateProcessor;
-import org.apache.jena.update.UpdateRequest;
+import org.eclipse.rdf4j.model.IRI;
+import org.eclipse.rdf4j.model.Literal;
+import org.eclipse.rdf4j.model.Model;
+import org.eclipse.rdf4j.model.ModelFactory;
+import org.eclipse.rdf4j.model.Resource;
+import org.eclipse.rdf4j.model.ValueFactory;
+import org.eclipse.rdf4j.model.impl.LinkedHashModelFactory;
+import org.eclipse.rdf4j.model.impl.SimpleValueFactory;
+import org.eclipse.rdf4j.repository.Repository;
+import org.eclipse.rdf4j.repository.RepositoryConnection;
+import org.eclipse.rdf4j.repository.sparql.SPARQLRepository;
 import org.hadatac.console.controllers.annotator.AnnotationLog;
 import org.hadatac.entity.pojo.Credential;
 import org.hadatac.entity.pojo.HADatAcThing;
@@ -30,7 +28,6 @@ import org.hadatac.metadata.loader.URIUtils;
 import org.hadatac.utils.CollectionUtil;
 import org.hadatac.utils.Feedback;
 import org.hadatac.utils.LabKeyException;
-import org.hadatac.utils.NameSpaces;
 import org.labkey.remoteapi.CommandException;
 
 
@@ -151,32 +148,49 @@ public abstract class BasicGenerator {
             result += "\n";
             result += String.join(",", values);
         }
+        
         return result;
     }
 
-    public static Model createModel(List<Map<String, Object>> rows) {
-        Model model = ModelFactory.createDefaultModel();
+    public Model createModel(List<Map<String, Object>> rows, String namedGraphUri) {        
+        ModelFactory modelFactory = new LinkedHashModelFactory();
+        Model model = modelFactory.createEmptyModel();
+
+        ValueFactory factory = SimpleValueFactory.getInstance();
+        IRI namedGraph = null;
+        if (!namedGraphUri.isEmpty()) {
+            namedGraph = factory.createIRI(namedGraphUri);
+        }
+        
         for (Map<String, Object> row : rows) {
-            Resource sub = model.createResource(URIUtils.replacePrefixEx((String)row.get("hasURI")));
+            IRI sub = factory.createIRI(URIUtils.replacePrefixEx((String)row.get("hasURI")));
             for (String key : row.keySet()) {
                 if (!key.equals("hasURI")) {
-                    Property pred = null;
+                    IRI pred = null;
                     if (key.equals("a")) {
-                        pred = model.createProperty(URIUtils.replacePrefixEx("rdf:type"));
-                    }
-                    else {
-                        pred = model.createProperty(URIUtils.replacePrefixEx(key));
+                        pred = factory.createIRI(URIUtils.replacePrefixEx("rdf:type"));
+                    } else {
+                        pred = factory.createIRI(URIUtils.replacePrefixEx(key));
                     }
 
                     String cellValue = (String)row.get(key);
                     if (URIUtils.isValidURI(cellValue)) {
-                        Resource obj = model.createResource(URIUtils.replacePrefixEx(cellValue));
-                        model.add(sub, pred, obj);
-                    }
-                    else {
-                        Literal obj = model.createLiteral(
+                        IRI obj = factory.createIRI(URIUtils.replacePrefixEx(cellValue));
+                        
+                        if (namedGraph == null) {
+                            model.add(sub, pred, obj);
+                        } else {
+                            model.add(sub, pred, obj, (Resource)namedGraph);
+                        }
+                    } else {
+                        Literal obj = factory.createLiteral(
                                 cellValue.replace("\n", " ").replace("\r", " ").replace("\"", "''"));
-                        model.add(sub, pred, obj);
+                        
+                        if (namedGraph == null) {
+                            model.add(sub, pred, obj);
+                        } else {
+                            model.add(sub, pred, obj, (Resource)namedGraph);
+                        }
                     }
                 }
             }
@@ -244,10 +258,14 @@ public abstract class BasicGenerator {
     }
 
     public boolean commitRowsToTripleStore(List<Map<String, Object>> rows) {
-        DatasetAccessor accessor = DatasetAccessorFactory.createHTTP(
+        Model model = createModel(rows, getStudyUri());
+        
+        Repository repo = new SPARQLRepository(
                 CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_GRAPH));
-        Model model = createModel(rows);
-        accessor.add(model);
+        repo.initialize();
+        
+        RepositoryConnection con = repo.getConnection();
+        con.add(model);
 
         if (model.size() > 0) {
             AnnotationLog log = AnnotationLog.create(fileName);
@@ -279,6 +297,8 @@ public abstract class BasicGenerator {
     public boolean commitObjectsToTripleStore(List<HADatAcThing> objects) {
         int count = 0;
         for (HADatAcThing obj : objects) {
+            obj.setNamedGraph(getStudyUri());
+            
             if (obj.saveToTripleStore()) {
                 count++;
             }
@@ -311,8 +331,16 @@ public abstract class BasicGenerator {
     }
 
     public void deleteRowsFromTripleStore(List<Map<String, Object>> rows) {
-        Model model = createModel(rows);
-
+        Model model = createModel(rows, "");
+        
+        Repository repo = new SPARQLRepository(
+                CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_UPDATE));
+        repo.initialize();
+        
+        RepositoryConnection con = repo.getConnection();
+        con.remove(model);
+        
+        /*
         String query = NameSpaces.getInstance().printSparqlNameSpaceList();
         query += "DELETE WHERE { \n";
         StmtIterator iter = model.listStatements();
@@ -336,6 +364,7 @@ public abstract class BasicGenerator {
         } catch (Exception e) {
             System.out.println("[ERROR] " + e.getMessage());
         }
+        */
     }
 
     public void deleteRowsFromLabKey(List<Map<String, Object>> rows) throws Exception {

@@ -1,18 +1,11 @@
 package org.hadatac.metadata.loader;
 
+import java.io.File;
 import java.util.Map;
-import org.apache.jena.query.DatasetAccessor;
-import org.apache.jena.query.DatasetAccessorFactory;
-import org.apache.jena.query.Query;
-import org.apache.jena.query.QueryExecution;
-import org.apache.jena.query.QueryExecutionFactory;
-import org.apache.jena.query.QueryFactory;
+
 import org.apache.jena.query.QuerySolution;
-import org.apache.jena.query.ResultSet;
-import org.apache.jena.query.ResultSetFactory;
 import org.apache.jena.query.ResultSetRewindable;
 import org.apache.jena.rdf.model.Model;
-import org.apache.jena.rdf.model.ModelFactory;
 import org.apache.jena.rdf.model.Statement;
 import org.apache.jena.rdf.model.StmtIterator;
 import org.apache.jena.riot.RiotNotFoundException;
@@ -21,6 +14,11 @@ import org.apache.jena.update.UpdateExecutionFactory;
 import org.apache.jena.update.UpdateFactory;
 import org.apache.jena.update.UpdateProcessor;
 import org.apache.jena.update.UpdateRequest;
+import org.eclipse.rdf4j.model.Resource;
+import org.eclipse.rdf4j.model.ValueFactory;
+import org.eclipse.rdf4j.repository.Repository;
+import org.eclipse.rdf4j.repository.RepositoryConnection;
+import org.eclipse.rdf4j.repository.sparql.SPARQLRepository;
 import org.hadatac.console.http.SPARQLUtils;
 import org.hadatac.entity.pojo.Study;
 import org.hadatac.utils.CollectionUtil;
@@ -29,6 +27,7 @@ import org.hadatac.utils.NameSpace;
 import org.hadatac.utils.NameSpaces;
 
 import com.typesafe.config.ConfigFactory;
+
 
 public class MetadataContext implements RDFContext {
 
@@ -59,7 +58,7 @@ public class MetadataContext implements RDFContext {
         try {
             String queryString = NameSpaces.getInstance().printSparqlNameSpaceList() + 
                     "SELECT (COUNT(*) as ?tot) WHERE { ?s ?p ?o . }";
-            
+
             ResultSetRewindable resultsrw = SPARQLUtils.select(
                     CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), queryString);
 
@@ -71,7 +70,7 @@ public class MetadataContext implements RDFContext {
         }
     }
 
-    public String clean(int mode) {	
+    public String clean(int mode) {
         String message = "";
         message += Feedback.println(mode,"   Triples before [clean]: " + totalTriples());
         message += Feedback.println(mode, " ");
@@ -88,8 +87,6 @@ public class MetadataContext implements RDFContext {
             e.printStackTrace();
         }
 
-	NameSpaces.getInstance().loadedOntologies.clear();
-
         message += Feedback.println(mode, " ");
         message += Feedback.println(mode, " ");
         message += Feedback.print(mode, "   Triples after [clean]: " + totalTriples());
@@ -97,253 +94,14 @@ public class MetadataContext implements RDFContext {
         return message; 
     }
 
-    public String cleanStudy(int mode, String study) {	
+    public String cleanStudy(int mode, String study) {
         String message = "";
-        message += Feedback.println(mode,"   Triples before [clean]: " + totalTriples());
-        message += Feedback.println(mode, " ");
-        message += Feedback.println(mode, "      Deleted the following triples: ");
-
-        Model model = Study.findModel(study);
-        StmtIterator iter = model.listStatements();
-        while (iter.hasNext()) {
-            Statement stmt = iter.nextStatement();
-            System.out.println(stmt.toString());
-            message += Feedback.println(mode, stmt.toString());
-        }
-
-        String queryString = "";
-        queryString += NameSpaces.getInstance().printSparqlNameSpaceList();
-        queryString += "DELETE {?s ?p ?o } " +
-                "WHERE " +
-                "{  " +
-                "  { " +
-                "	{  " +
-                // Study 
-                "   ?subUri rdfs:subClassOf* hasco:Study . " + 
-                "  	?s a ?subUri . " +
-                "  	?s ?p ?o . " +
-                "  	FILTER (?s = " + study + ") " +
-                "  	} " +
-                "    MINUS " +
-                "    { " +
-                // Other Studies 
-                "   ?subUri rdfs:subClassOf* hasco:Study . " + 
-                "  	?s a ?subUri . " +
-                "  	?s ?p ?o . " +
-                "  	FILTER (?s != " + study + ") " +
-                "    }  " +
-                "  } " +
-                "  UNION " + 
-                "  { " +
-                "	{  " +
-                //  Data Acquisitions, Cohort
-                "  	?subUri rdfs:subClassOf* hasco:Study . " + 
-                "  	?study a ?subUri . " +
-                "  	?s hasco:isDataAcquisitionOf|hasco:isCohortOf ?study . " + 
-                "  	?s ?p ?o . " +
-                "  	FILTER (?study = " + study + ") " +
-                "  	} " +
-                "    MINUS " +
-                "    {  " +
-                // Other Data Acquisitions, Cohort
-                "  	?subUri rdfs:subClassOf* hasco:Study . " + 
-                "  	?study a ?subUri . " +
-                "  	?s hasco:isDataAcquisitionOf|hasco:isCohortOf ?study . " + 
-                "  	?s ?p ?o . " +
-                "  	FILTER (?study != " + study + ") " +
-                "  	} " +
-                "  } " +
-                "  UNION " + 
-                "  { " +
-                "	{  " +
-                //  Cohort Subjects
-                "  	?subUri rdfs:subClassOf* hasco:Study . " + 
-                "  	?study a ?subUri . " +
-                "  	?cohort hasco:isCohortOf ?study . " +
-                "	?s hasco:isSubjectOf ?cohort . " +
-                "  	?s ?p ?o . " +
-                "  	FILTER (?study = " + study + ") " +
-                "  	} " +
-                "    MINUS " +
-                "    {  " +
-                // Other Cohort Subjects
-                "  	?subUri rdfs:subClassOf* hasco:Study . " + 
-                "  	?study a ?subUri . " +
-                "  	?cohort hasco:isCohortOf ?study . " +
-                "	?s hasco:isSubjectOf ?cohort . " +
-                "  	?s ?p ?o . " +
-                "  	FILTER (?study != " + study + ") " +
-                "  	} " +
-                "  } " +
-                "  UNION " + 
-                "  { " +
-                "	{  " +
-                //  Data Acquisition Schema and Deployment
-                "  	?subUri rdfs:subClassOf* hasco:Study . " + 
-                "  	?study a ?subUri . " +
-                "  	?da hasco:isDataAcquisitionOf ?study . " + 
-                "   ?da hasco:hasSchema|hasco:hasDeployment ?s . " +
-                "  	?s ?p ?o . " +
-                "  	FILTER (?study = " + study + ") " +
-                "  	} " +
-                "    MINUS " +
-                "    {  " +
-                // Other Data Acquisition Schema and Deployment
-                "  	?subUri rdfs:subClassOf* hasco:Study . " + 
-                "  	?study a ?subUri . " +
-                "  	?da hasco:isDataAcquisitionOf ?study . " + 
-                "   ?da hasco:hasSchema|hasco:hasDeployment ?s . " +
-                "  	?s ?p ?o . " +
-                "  	FILTER (?study != " + study + ") " +
-                "  	} " +
-                "  } " +
-                "  UNION " + 
-                "  { " +
-                "    { " +
-                // Sample Collections
-                "  	?subUri rdfs:subClassOf* hasco:Study . " + 
-                "  	?study a ?subUri . " +
-                "   ?s hasco:isMemberOf ?study . " + 
-                "   ?s ?p ?o . " +
-                "  FILTER (?study = " + study + ") " +
-                "    } " +
-                "    MINUS " +
-                "    { " +
-                // Other Sample Collections
-                "  	?subUri rdfs:subClassOf* hasco:Study . " + 
-                "  	?study a ?subUri . " +
-                "   ?s hasco:isMemberOf ?study . " + 
-                "   ?s ?p ?o . " +
-                "  	FILTER (?study != " + study + ") " +
-                "    } " +
-                "  } "  +
-                "  UNION " + 
-                "  { " +
-                "    { " +
-                // Sample Collection Samples
-                "  	?subUri rdfs:subClassOf* hasco:Study . " + 
-                "  	?study a ?subUri . " +
-                "   ?s hasco:isMemberOf* ?study . " + 
-                "   ?s ?p ?o . " +
-                "  FILTER (?study = " + study + ") " +
-                "    } " +
-                "    MINUS " +
-                "    { " +
-                // Other Sample Collection Samples
-                "  	?subUri rdfs:subClassOf* hasco:Study . " + 
-                "  	?study a ?subUri . " +
-                "   ?s hasco:isMemberOf* ?study . " + 
-                "   ?s ?p ?o . " +
-                "  	FILTER (?study != " + study + ") " +
-                "    } " +
-                "  } "  +
-                "  UNION " + 
-                "  { " +
-                "    { " +
-                // Deployment - Platform, Instrument, detector
-                "  	?subUri rdfs:subClassOf* hasco:Study .  " + 
-                "  	?study a ?subUri . " +
-                "   ?da hasco:isDataAcquisitionOf ?study . " + 
-                "  	?da hasco:hasDeployment ?deploy .  " +
-                "	?deploy vstoi:hasPlatform|hasco:hasInstrument|hasco:hasDetector ?s . " +
-                "  	?s ?p ?o . " +
-                "  FILTER (?study = " + study + ") " +
-                "    } " +
-                "    MINUS " +
-                "    { " +
-                // Other Deployment - Platform, Instrument, detector
-                "  	?subUri rdfs:subClassOf* hasco:Study .  " + 
-                "  	?study a ?subUri . " +
-                "   ?da hasco:isDataAcquisitionOf ?study . " + 
-                "  	?da hasco:hasDeployment ?deploy .  " +
-                "	?deploy vstoi:hasPlatform|hasco:hasInstrument|hasco:hasDetector ?s . " +
-                "  	?s ?p ?o . " +
-                "  	FILTER (?study != " + study + ") " +
-                "    } " +
-                "  } " +
-                "  UNION " + 
-                "  { " +
-                "    { " +
-                // DA Schema Attribute
-                "  	?subUri rdfs:subClassOf* hasco:Study .  " + 
-                "  	?study a ?subUri . " +
-                "  	?da hasco:isDataAcquisitionOf ?study . " +
-                "   ?da hasco:hasSchema ?schema . " +
-                "   ?s hasco:partOfSchema ?schema . " +
-                "  	?s ?p ?o . " +
-                "  	FILTER (?study = " + study + ") " +
-                "    } " +
-                "    MINUS " +
-                "    { " +
-                // Other DA Schema Attribute
-                "  	?subUri rdfs:subClassOf* hasco:Study .  " + 
-                "  	?study a ?subUri . " +
-                "  	?da hasco:isDataAcquisitionOf ?study . " +
-                "   ?da hasco:hasSchema ?schema . " +
-                "   ?s hasco:partOfSchema ?schema . " +
-                "  	?s ?p ?o . " +
-                "  FILTER (?study != " + study + ") " +
-                "    } " +
-                "  } " +
-                "  UNION  " +
-                "  { " +
-                "  	 {  " +
-                // Datasets
-                "   ?subUri rdfs:subClassOf* hasco:Study . " + 
-                "   ?study a ?subUri . " +
-                "   ?s hasco:isDatasetOf ?study . " +
-                "   ?s ?p ?o . " +
-                "   FILTER (?study = " + study + ") " +
-                "    } " +
-                "    MINUS " +
-                "    {  " +
-                // Other Datasets
-                "   ?subUri rdfs:subClassOf* hasco:Study . " + 
-                "   ?study a ?subUri . " +
-                "   ?s hasco:isDatasetOf ?study . " +
-                "   ?s ?p ?o . " +
-                "   FILTER (?study != " + study + ") " +
-                "     } " +
-                "   } " +
-                "   UNION " + 
-                "   { " +
-                "  	  {  " +
-                // Attribute References 
-                "    ?subUri rdfs:subClassOf* hasco:Study . " + 
-                "    ?study a ?subUri . " +
-                "    ?data hasco:isDatasetOf ?study . " +
-                "    ?s hasco:isAttributeReferenceOf ?data . " +
-                "    ?s ?p ?o . " +
-                "    FILTER (?study = " + study + ") " +
-                "    } " +
-                "    MINUS " +
-                "    {  " +
-                // Other Attribute References
-                "    ?subUri rdfs:subClassOf* hasco:Study . " + 
-                "    ?study a ?subUri . " +
-                "    ?data hasco:isDatasetOf ?study . " +
-                "     ?s hasco:isAttributeReferenceOf ?data . " +
-                "    ?s ?p ?o . " +
-                "    FILTER (?study != " + study + ") " +
-                "    } " +
-                "  } " +
-                "} ";
-
-        UpdateRequest req = UpdateFactory.create(queryString);
-        UpdateProcessor processor = UpdateExecutionFactory.createRemote(req, 
-                CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_UPDATE));
-        try {
-            processor.execute();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        message += Feedback.println(mode, " ");
-        message += Feedback.println(mode, " ");
+        message += Feedback.println(mode,"   Triples before [clean]: " + totalTriples());        
+        NameSpace.deleteTriplesByNamedGraph(study);
         message += Feedback.print(mode, "   Triples after [clean]: " + totalTriples());
 
         return message; 
     }
-
 
     public String getLang(String contentType) {
         if (contentType.contains("turtle")) {
@@ -360,16 +118,15 @@ public class MetadataContext implements RDFContext {
      *   used to process rdf/xml content.
      *   
      */
-    public Long loadLocalFile(int mode, String filePath, String contentType) {
-        Model model = ModelFactory.createDefaultModel();
-        DatasetAccessor accessor = DatasetAccessorFactory.createHTTP(
-                kbURL + CollectionUtil.getCollectionName(CollectionUtil.Collection.METADATA_GRAPH.get()));
-
-        loadFileMessage = "";
+    public Long loadLocalFile(int mode, String filePath, String contentType, String graphUri) {
         Long total = totalTriples();
-        try {
-            model.read(filePath, getLang(contentType));
-            accessor.add(model);
+        try {            
+            Repository repo = new SPARQLRepository(
+                    kbURL + CollectionUtil.getCollectionName(CollectionUtil.Collection.METADATA_GRAPH.get()));
+            repo.initialize();
+            RepositoryConnection con = repo.getConnection();
+            ValueFactory factory = repo.getValueFactory();
+            con.add(new File(filePath), "", NameSpace.getRioFormat(contentType), (Resource)factory.createIRI(graphUri));
         } catch (NotFoundException e) {
             System.out.println("NotFoundException: file " + filePath);
             System.out.println("NotFoundException: " + e.getMessage());
@@ -411,11 +168,8 @@ public class MetadataContext implements RDFContext {
                     for (int i = filePath.length(); i < 50; i++) {
                         message += Feedback.print(mode, ".");
                     }
-                    loadLocalFile(mode, filePath, entry.getValue().getType());
-                    message += loadFileMessage;
+                    loadLocalFile(mode, filePath, entry.getValue().getType(), entry.getValue().getName());
                     Long newTotal = totalTriples();
-		    Long newAddition = newTotal - total;
-		    NameSpaces.getInstance().loadedOntologies.put(abbrev, Integer.valueOf(newAddition.intValue()));
                     message += Feedback.println(mode, "   Added " + (newTotal - total) + " triples.");
 
                     total = newTotal;
@@ -424,6 +178,8 @@ public class MetadataContext implements RDFContext {
             message += Feedback.println(mode," ");
             message += Feedback.println(mode, "   Triples after [loadOntologies]: " + totalTriples());
         }
+        NameSpaces.reload();
+        
         return message;
     }
 }	

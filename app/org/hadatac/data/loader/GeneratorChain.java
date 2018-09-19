@@ -5,33 +5,35 @@ import java.util.List;
 
 import org.hadatac.console.controllers.annotator.AnnotationLog;
 
+import com.sun.org.apache.xpath.internal.operations.And;
+
 public class GeneratorChain {
 
     private List<BasicGenerator> chain = new ArrayList<BasicGenerator>();
     private String studyUri = "";
     private RecordFile file = null;
     private boolean bValid = true;
-    
+
     public String getStudyUri() {
         return studyUri;
     }
-    
+
     public void setStudyUri(String studyUri) {
         this.studyUri = studyUri;
     }
-    
+
     public RecordFile getRecordFile() {
         return file;
     }
-    
+
     public void setRecordFile(RecordFile file) {
         this.file = file;
     }
-    
+
     public boolean isValid() {
         return bValid;
     }
-    
+
     public void setInvalid() {
         bValid = false;
     }
@@ -44,7 +46,7 @@ public class GeneratorChain {
         if (!isValid()) {
             return false;
         }
-        
+
         for (BasicGenerator generator : chain) {
             try {
                 generator.preprocess();
@@ -58,9 +60,17 @@ public class GeneratorChain {
                 return false;
             }
         }
-        
+
         // Commit if no errors occurred
         for (BasicGenerator generator : chain) {
+            if (!generator.getStudyUri().isEmpty()) {
+                setStudyUri(generator.getStudyUri());
+            }
+            
+            if (generator.getStudyUri().isEmpty() && !getStudyUri().isEmpty()) {
+                generator.setStudyUri(getStudyUri());
+            }
+            
             try {
                 generator.commitRowsToTripleStore(generator.getRows());
                 //generator.commitRowsToLabKey(generator.getRows());
@@ -75,14 +85,14 @@ public class GeneratorChain {
                 return false;
             }
         }
-        
+
         for (BasicGenerator generator : chain) {
             if (!generator.getStudyUri().equals("")) {
                 setStudyUri(generator.getStudyUri());
             }
         }
 
-	postprocess();
+        postprocess();
 
         return true;
     }
@@ -109,7 +119,5 @@ public class GeneratorChain {
         }
     }
 
-    public void postprocess() {
-    }
-
+    public void postprocess() {}
 }

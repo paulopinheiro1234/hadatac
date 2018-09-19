@@ -6,14 +6,8 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.HashMap;
 
-import org.apache.jena.query.Query;
-import org.apache.jena.query.QueryExecution;
-import org.apache.jena.query.QueryExecutionFactory;
-import org.apache.jena.query.QueryFactory;
 import org.apache.jena.query.QueryParseException;
 import org.apache.jena.query.QuerySolution;
-import org.apache.jena.query.ResultSet;
-import org.apache.jena.query.ResultSetFactory;
 import org.apache.jena.query.ResultSetRewindable;
 import org.apache.jena.update.UpdateExecutionFactory;
 import org.apache.jena.update.UpdateFactory;
@@ -380,6 +374,11 @@ public class DataAcquisitionSchemaEvent extends HADatAcThing {
         String insert = "";
         insert += NameSpaces.getInstance().printSparqlNameSpaceList();
         insert += INSERT_LINE1;
+        
+        if (!getNamedGraph().isEmpty()) {
+            insert += " GRAPH <" + getNamedGraph() + "> { ";
+        }
+        
         insert += " <" + getUri() + "> a hasco:DASchemaEvent . ";
         for (String type : getTypes()) {
             insert += " <" + getUri() + "> a <" + type + "> . ";
@@ -408,6 +407,10 @@ public class DataAcquisitionSchemaEvent extends HADatAcThing {
         }
         if (!getIsPIConfirmed().equals("")) {
             insert += " <" + getUri() + "> hasco:isPIConfirmed \"" + getIsPIConfirmed() + "\" . ";
+        }
+        
+        if (!getNamedGraph().isEmpty()) {
+            insert += " } ";
         }
 
         insert += LINE_LAST;
