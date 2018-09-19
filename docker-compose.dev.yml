@@ -1,22 +1,13 @@
 version: '3'
 
+# Use this file to override default, primary configuration in the docker-compose.yml file
+# Example use:
+# docker-compose -f docker-compose.yml -f docker-compose.dev.yml [command]
+
 services:
-    solr:
-        # Override production restart value to default
-        restart: "no"
-        environment:
-            - VERBOSE=yes
-        # Map the solr admin port to the localhost in dev mode
-        ports:
-            - "8983:8983"
-
-    blazegraph:
-        # Override production restart value to default
-        restart: "no"
-        # Map the 9999 blazegraph port to localhost in dev mode
-        ports:
-            - "9999:9999"
-
+    # The primary hadatac web app
     hadatac:
-        # Override production restart value to default
-        restart: "no"
+        volumes:
+            # Mounts the local app directory to the app directory in the Docker container
+            # Any changes made locally automatically show up in the Docker container.
+            - ./app:/root/app/app
