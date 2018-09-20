@@ -141,7 +141,7 @@ public class AnnotationWorker {
                         return;
                     }
                 }
-                chain = annotateDataAcquisitionSchemaFile(recordFile);
+                chain = annotateSDDFile(recordFile);
 
             } else if (file_name.startsWith("SSD-")) {
                 chain = annotateSSDFile(recordFile);
@@ -479,14 +479,14 @@ public class AnnotationWorker {
         return chain;
     }
 
-    public static GeneratorChain annotateDataAcquisitionSchemaFile(RecordFile file) {
+    public static GeneratorChain annotateSDDFile(RecordFile file) {
         System.out.println("Processing data acquisition schema file ...");
 
         SDD sdd = new SDD(file);
         String file_name = file.getFile().getName();
         AnnotationLog log = AnnotationLog.create(file_name);
         String sddName = sdd.getName();
-        if (sddName == ""){
+        if (sddName == "") {
             AnnotationLog.printException("This SDD has no Study_ID filled.", file_name);
         }
         Map<String, String> mapCatalog = sdd.getCatalog();
@@ -550,14 +550,16 @@ public class AnnotationWorker {
         }
 
         GeneralGenerator generalGenerator = new GeneralGenerator(file, "DASchema");
+        String sddUri = ConfigProp.getKbPrefix() + "DAS-" + sddName;
         Map<String, Object> row = new HashMap<String, Object>();
-        row.put("hasURI", ConfigProp.getKbPrefix() + "DAS-" + sddName);
-        AnnotationLog.println("This SDD is assigned with uri: " + ConfigProp.getKbPrefix() + "DAS-" + sddName + " and is of type hasco:DASchema", file.getFile().getName());
+        row.put("hasURI", sddUri);
+        AnnotationLog.println("This SDD is assigned with uri: " + sddUri + " and is of type hasco:DASchema", file.getFile().getName());
         row.put("a", "hasco:DASchema");
         row.put("rdfs:label", "Schema for " + sddName);
         row.put("rdfs:comment", "");
         generalGenerator.addRow(row);
         chain.addGenerator(generalGenerator);
+        chain.setNamedGraphUri(URIUtils.replacePrefixEx(sddUri));
 
         return chain;
     }

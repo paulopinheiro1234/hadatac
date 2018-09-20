@@ -11,3 +11,5 @@ folder=GHAP Development
 # Configure the key for encryption on LabKey authority
 encryption_key=yourkey
 #encryption_key=labkeykeylab
+
+login_required=false

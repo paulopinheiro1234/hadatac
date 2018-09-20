@@ -5,14 +5,14 @@ import java.util.List;
 
 import org.hadatac.console.controllers.annotator.AnnotationLog;
 
-import com.sun.org.apache.xpath.internal.operations.And;
-
 public class GeneratorChain {
 
     private List<BasicGenerator> chain = new ArrayList<BasicGenerator>();
-    private String studyUri = "";
     private RecordFile file = null;
     private boolean bValid = true;
+    
+    private String studyUri = "";
+    private String namedGraphUri = "";
 
     public String getStudyUri() {
         return studyUri;
@@ -20,6 +20,14 @@ public class GeneratorChain {
 
     public void setStudyUri(String studyUri) {
         this.studyUri = studyUri;
+    }
+    
+    public String getNamedGraphUri() {
+        return namedGraphUri;
+    }
+
+    public void setNamedGraphUri(String namedGraphUri) {
+        this.namedGraphUri = namedGraphUri;
     }
 
     public RecordFile getRecordFile() {
@@ -69,6 +77,12 @@ public class GeneratorChain {
             
             if (generator.getStudyUri().isEmpty() && !getStudyUri().isEmpty()) {
                 generator.setStudyUri(getStudyUri());
+            }
+            
+            if (!getNamedGraphUri().isEmpty()) {
+                generator.setNamedGraphUri(getNamedGraphUri());
+            } else if (!generator.getStudyUri().isEmpty()) {
+                generator.setNamedGraphUri(generator.getStudyUri());
             }
             
             try {

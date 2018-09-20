@@ -95,4 +95,14 @@ public class ConfigProp {
 	public static String getLabKeyProjectPath() {
         return "/" + getPropertyValue(LABKEY_CONFIG_FILE, "folder");
     }
+	
+	public static boolean getLabKeyLoginRequired() {
+        String flag = getPropertyValue(LABKEY_CONFIG_FILE, "login_required");
+        
+        if (flag.equalsIgnoreCase("true")) {
+            return true;
+        }
+        
+        return false;
+    }
 }

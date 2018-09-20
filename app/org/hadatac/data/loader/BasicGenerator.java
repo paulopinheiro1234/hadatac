@@ -40,8 +40,10 @@ public abstract class BasicGenerator {
     protected List<HADatAcThing> objects = new ArrayList<HADatAcThing>();
 
     protected HashMap<String, String> mapCol = new HashMap<String, String>();
-    protected String studyUri = "";
     protected String fileName = "";
+    
+    protected String studyUri = "";
+    protected String namedGraphUri = "";
     
     public BasicGenerator(RecordFile file) {
         this.file = file;
@@ -69,6 +71,14 @@ public abstract class BasicGenerator {
     }
     public void setStudyUri(String studyUri) {
         this.studyUri = studyUri;
+    }
+    
+    public String getNamedGraphUri() {
+        return namedGraphUri;
+    }
+
+    public void setNamedGraphUri(String namedGraphUri) {
+        this.namedGraphUri = namedGraphUri;
     }
     
     Map<String, Object> createRow(Record rec, int row_number) throws Exception { return null; }
@@ -258,7 +268,7 @@ public abstract class BasicGenerator {
     }
 
     public boolean commitRowsToTripleStore(List<Map<String, Object>> rows) {
-        Model model = createModel(rows, getStudyUri());
+        Model model = createModel(rows, getNamedGraphUri());
         
         Repository repo = new SPARQLRepository(
                 CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_GRAPH));
@@ -297,7 +307,7 @@ public abstract class BasicGenerator {
     public boolean commitObjectsToTripleStore(List<HADatAcThing> objects) {
         int count = 0;
         for (HADatAcThing obj : objects) {
-            obj.setNamedGraph(getStudyUri());
+            obj.setNamedGraph(getNamedGraphUri());
             
             if (obj.saveToTripleStore()) {
                 count++;
@@ -339,32 +349,6 @@ public abstract class BasicGenerator {
         
         RepositoryConnection con = repo.getConnection();
         con.remove(model);
-        
-        /*
-        String query = NameSpaces.getInstance().printSparqlNameSpaceList();
-        query += "DELETE WHERE { \n";
-        StmtIterator iter = model.listStatements();
-        while (iter.hasNext()) {
-            Statement stmt = iter.nextStatement();
-            query += " <" + stmt.getSubject().getURI() + "> ";
-            query += " <" + stmt.getPredicate().getURI() + "> ";
-            if (stmt.getObject().isLiteral()) {
-                query += " \"" + stmt.getObject().toString() + "\" . \n";
-            } else {
-                query += " <" + stmt.getObject().toString() + "> . \n";
-            }
-        }
-        query += " } \n";
-
-        try {
-            UpdateRequest request = UpdateFactory.create(query);
-            UpdateProcessor processor = UpdateExecutionFactory.createRemote(
-                    request, CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_UPDATE));
-            processor.execute();
-        } catch (Exception e) {
-            System.out.println("[ERROR] " + e.getMessage());
-        }
-        */
     }
 
     public void deleteRowsFromLabKey(List<Map<String, Object>> rows) throws Exception {

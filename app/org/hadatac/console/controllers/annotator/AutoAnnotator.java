@@ -428,7 +428,7 @@ public class AutoAnnotator extends Controller {
             if (file_name.endsWith(".xlsx")) {
                 recordFile = new SpreadsheetRecordFile(file, "InfoSheet");
             }
-            chain = AnnotationWorker.annotateDataAcquisitionSchemaFile(recordFile);
+            chain = AnnotationWorker.annotateSDDFile(recordFile);
         }
 
         if (chain != null) {
