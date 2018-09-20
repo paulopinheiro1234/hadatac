@@ -5,8 +5,11 @@ FROM solr:6.5
 # Change directory so that our commands run inside this new directory
 WORKDIR /opt/solr/server
 
-# Unzips JTS library & moves JTS Libs to SOLR Libs and deletes intermediate files and directories
-RUN wget https://sourceforge.net/projects/jts-topo-suite/files/jts/1.14/jts-1.14.zip \
+# Downloads and unzips JTS library & moves JTS Libs to SOLR Libs and deletes intermediate files and directories
+# Tries to download it three times before failing. Sometimes on slow networks, the download fails.
+RUN (wget https://sourceforge.net/projects/jts-topo-suite/files/jts/1.14/jts-1.14.zip || \
+    wget https://sourceforge.net/projects/jts-topo-suite/files/jts/1.14/jts-1.14.zip || \
+    wget https://sourceforge.net/projects/jts-topo-suite/files/jts/1.14/jts-1.14.zip) \
     && unzip -o jts-1.14.zip -d jtsio \
     && cp -r jtsio/lib/. solr-webapp/webapp/WEB-INF/lib \
     && rm -rf jts-1.14.zip ./jtsio

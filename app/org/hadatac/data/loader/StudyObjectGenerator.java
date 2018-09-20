@@ -83,11 +83,22 @@ public class StudyObjectGenerator extends BasicGenerator {
     }
     
     private String getLabel(Record rec) {
-        return uriMap.get(oc_type).replaceAll("-", "") + " " + getOriginalID(rec) + " - " + study_id;
+	String auxstr = uriMap.get(oc_type);
+	if (auxstr == null) {
+	    auxstr = "";
+	} else {
+	    auxstr = auxstr.replaceAll("-","");
+	}
+        return auxstr + " " + getOriginalID(rec) + " - " + study_id;
     }
 
     private String getOriginalID(Record rec) {
-        return rec.getValueByColumnName(mapCol.get("originalID")).replaceAll("(?<=^\\d+)\\.0*$", "");
+	String auxstr = rec.getValueByColumnName(mapCol.get("originalID"));
+	if (auxstr == null) {
+	    return "";
+	} 
+	auxstr = auxstr.replaceAll("\\s+","");
+        return auxstr.replaceAll("(?<=^\\d+)\\.0*$", "");
     }
     
     private String getCohortUri(Record rec) {

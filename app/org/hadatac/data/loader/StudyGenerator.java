@@ -51,6 +51,7 @@ public class StudyGenerator extends BasicGenerator {
 	}
 
 	private String getUri(Record rec) {
+		System.out.println("Study Generator: template for STUDYID: [" +  Templates.STUDYID + "]");
 		String str = rec.getValueByColumnName(mapCol.get("studyID"));
 		return kbPrefix + "STD-" + str;
 	}

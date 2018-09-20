@@ -4,7 +4,7 @@ public class Templates {
 	
     public static String TEMPLATE_FILE = ConfigProp.getTemplateFileName();
 
-    // STD Template (Study and SampleCollection)                                                                     
+    // STD Template (Study)                                                                     
     public static String STUDYID = ConfigProp.getPropertyValue(TEMPLATE_FILE, "studyID"); // also in ACQ, PID and SID
     public static String STUDYTITLE = ConfigProp.getPropertyValue(TEMPLATE_FILE, "studyTitle");
     public static String STUDYAIMS = ConfigProp.getPropertyValue(TEMPLATE_FILE, "studyAims");
