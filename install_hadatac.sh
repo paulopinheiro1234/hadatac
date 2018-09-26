@@ -29,6 +29,13 @@ then HADATAC_HOME=~/hadatac-solr
 else HADATAC_HOME=$response
 fi
 
+echo ""
+read -r -p "Directory of installation [~/hadatac-blazegraph]: " response
+if [ "$response" == "" ]
+then BLAZEGRAPH_HOME=~/hadatac-blazegraph
+else BLAZEGRAPH_HOME=$response
+fi
+
 HADATAC_DOWNLOAD=$HADATAC_HOME/download
 HADATAC_SOLR=$HADATAC_HOME/solr
 SOLR6_HOME=$HADATAC_SOLR/solr-6.5.0
@@ -36,6 +43,7 @@ SOLR6_HOME=$HADATAC_SOLR/solr-6.5.0
 mkdir $HADATAC_HOME
 mkdir $HADATAC_DOWNLOAD
 mkdir $HADATAC_SOLR
+mkdir $BLAZEGRAPH_HOME
 
 cp -R solr/ $HADATAC_SOLR
 
@@ -72,4 +80,13 @@ wait $!
 
 cp $HADATAC_DOWNLOAD/jts-1.14/lib/* $HADATAC_SOLR/solr-6.5.0/server/solr-webapp/webapp/WEB-INF/lib/
 
+echo "=== Starting Apache Solr 6.5.0..."
 sh $HADATAC_SOLR/run_solr6.sh restart
+
+echo "=== Downloading Blazegraph ..."
+wget -O $BLAZEGRAPH_HOME/blazegraph.jar https://sourceforge.net/projects/bigdata/files/bigdata/2.1.4/blazegraph.jar/download
+
+echo "=== Starting Blazegraph ..."
+java -server -Xmx4g -Djetty.port=8080 -jar $BLAZEGRAPH_HOME/blazegraph.jar
+
+echo "=== Installation is finished ..."
