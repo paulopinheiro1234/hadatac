@@ -89,21 +89,23 @@ wait $!
 echo ""
 
 echo "=== Starting Blazegraph ..."
-java -server -Xmx4g -Djetty.port=8080 -jar $BLAZEGRAPH_HOME/blazegraph.jar
+DIR="$PWD"
+cd $BLAZEGRAPH_HOME/
+java -server -Xmx4g -Djetty.port=8080 -jar $BLAZEGRAPH_HOME/blazegraph.jar &
+echo ""
+sleep 5
 
+cd $DIR
 echo "=== Creating store namespace..."
 curl -X POST --data-binary @blazegraph/store.properties -H 'Content-Type:text/plain' http://localhost:8080/blazegraph/namespace
-wait $!
 echo ""
 
 echo "=== Creating store_sandbox namespace..."
 curl -X POST --data-binary @blazegraph/store_sandbox.properties -H 'Content-Type:text/plain' http://localhost:8080/blazegraph/namespace
-wait $!
 echo ""
 
 echo "=== Creating store_users namespace..."
 curl -X POST --data-binary @blazegraph/store_users.properties -H 'Content-Type:text/plain' http://localhost:8080/blazegraph/namespace
-wait $!
 echo ""
 
 echo "=== Installation is finished ..."
