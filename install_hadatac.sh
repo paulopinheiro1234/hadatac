@@ -85,8 +85,25 @@ sh $HADATAC_SOLR/run_solr6.sh restart
 
 echo "=== Downloading Blazegraph ..."
 wget -O $BLAZEGRAPH_HOME/blazegraph.jar https://sourceforge.net/projects/bigdata/files/bigdata/2.1.4/blazegraph.jar/download
+wait $!
+echo ""
 
 echo "=== Starting Blazegraph ..."
 java -server -Xmx4g -Djetty.port=8080 -jar $BLAZEGRAPH_HOME/blazegraph.jar
+
+echo "=== Creating store namespace..."
+curl -X POST --data-binary @blazegraph/store.properties -H 'Content-Type:text/plain' http://localhost:8080/blazegraph/namespace
+wait $!
+echo ""
+
+echo "=== Creating store_sandbox namespace..."
+curl -X POST --data-binary @blazegraph/store_sandbox.properties -H 'Content-Type:text/plain' http://localhost:8080/blazegraph/namespace
+wait $!
+echo ""
+
+echo "=== Creating store_users namespace..."
+curl -X POST --data-binary @blazegraph/store_users.properties -H 'Content-Type:text/plain' http://localhost:8080/blazegraph/namespace
+wait $!
+echo ""
 
 echo "=== Installation is finished ..."
