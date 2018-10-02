@@ -14,6 +14,7 @@ import org.hadatac.console.controllers.AuthApplication;
 import org.hadatac.console.models.DASAForm;
 import org.hadatac.entity.pojo.DataAcquisitionSchema;
 import org.hadatac.entity.pojo.DataAcquisitionSchemaAttribute;
+import org.hadatac.utils.ConfigProp;
 
 import be.objectify.deadbolt.java.actions.Group;
 import be.objectify.deadbolt.java.actions.Restrict;
@@ -26,7 +27,7 @@ public class MainEntity extends Controller {
 	@Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
 	public Result index(String das_uri) {
 
-		if (session().get("LabKeyUserName") == null && session().get("LabKeyPassword") == null) {
+		if (ConfigProp.getLabKeyLoginRequired() && session().get("LabKeyUserName") == null && session().get("LabKeyPassword") == null) {
 			return redirect(org.hadatac.console.controllers.triplestore.routes.LoadKB.logInLabkey(
 					routes.EditDASA.index(das_uri).url()));
 		}
@@ -91,11 +92,13 @@ public class MainEntity extends Controller {
 		olddasa.save();
 
 		// update/create new DASA in LabKey
-		int nRowsAffected = olddasa.saveToLabKey(session().get("LabKeyUserName"), session().get("LabKeyPassword"));
-		if (nRowsAffected <= 0) {
-			return badRequest("Failed to update DASA to LabKey!\n");
+		if (ConfigProp.getLabKeyLoginRequired()) {
+		    int nRowsAffected = olddasa.saveToLabKey(session().get("LabKeyUserName"), session().get("LabKeyPassword"));
+		    if (nRowsAffected <= 0) {
+		        return badRequest("Failed to update DASA to LabKey!\n");
+		    }
 		}
-		//return ok(editDASAConfirm.render(olddasa, changedInfos));
+		
 		return ok("");
 	}
 

@@ -73,7 +73,7 @@ public class PrepareIngestion extends Controller {
 
         // OR create a new DA if the file is not associated with any existing DA
         
-        if (session().get("LabKeyUserName") == null && session().get("LabKeyPassword") == null) {
+        if (ConfigProp.getLabKeyLoginRequired() && session().get("LabKeyUserName") == null && session().get("LabKeyPassword") == null) {
             return redirect(org.hadatac.console.controllers.triplestore.routes.LoadKB.logInLabkey(
                     routes.PrepareIngestion.create(file_name,da_uri).url()));
         }
@@ -103,7 +103,9 @@ public class PrepareIngestion extends Controller {
         }
 
         da.saveToSolr();
-        da.saveToLabKey(session().get("LabKeyUserName"), session().get("LabKeyPassword"));
+        if (ConfigProp.getLabKeyLoginRequired()) {
+            da.saveToLabKey(session().get("LabKeyUserName"), session().get("LabKeyPassword"));
+        }
 
         file.setDataAcquisitionUri(da.getUri());
         file.save();
@@ -150,7 +152,7 @@ public class PrepareIngestion extends Controller {
 
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
     public Result selectStudy(String file_name, String da_uri) {
-        if (session().get("LabKeyUserName") == null && session().get("LabKeyPassword") == null) {
+        if (ConfigProp.getLabKeyLoginRequired() && session().get("LabKeyUserName") == null && session().get("LabKeyPassword") == null) {
             return redirect(org.hadatac.console.controllers.triplestore.routes.LoadKB.logInLabkey(
                     routes.PrepareIngestion.selectStudy(file_name,da_uri).url()));
         }
@@ -162,7 +164,7 @@ public class PrepareIngestion extends Controller {
 
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
     public Result selectScope(String file_name, String da_uri, String std_uri) {
-        if (session().get("LabKeyUserName") == null && session().get("LabKeyPassword") == null) {
+        if (ConfigProp.getLabKeyLoginRequired() && session().get("LabKeyUserName") == null && session().get("LabKeyPassword") == null) {
             return redirect(org.hadatac.console.controllers.triplestore.routes.LoadKB.logInLabkey(
                     routes.PrepareIngestion.selectScope(file_name,da_uri, std_uri).url()));
         }
@@ -263,7 +265,9 @@ public class PrepareIngestion extends Controller {
             da.setStudyUri(std_uri);
 
             da.saveToSolr();
-            da.saveToLabKey(session().get("LabKeyUserName"), session().get("LabKeyPassword"));
+            if (ConfigProp.getLabKeyLoginRequired()) {
+                da.saveToLabKey(session().get("LabKeyUserName"), session().get("LabKeyPassword"));
+            }
 
             return ok(prepareIngestion.render(file_name, da, "Updated Object Access Specification with deployment information"));
         }
@@ -303,7 +307,9 @@ public class PrepareIngestion extends Controller {
         da.setCellScopeUri(cellScopeUriList);
 
         da.saveToSolr();
-        da.saveToLabKey(session().get("LabKeyUserName"), session().get("LabKeyPassword"));
+        if (ConfigProp.getLabKeyLoginRequired()) {
+            da.saveToLabKey(session().get("LabKeyUserName"), session().get("LabKeyPassword"));
+        }
 
         return ok(prepareIngestion.render(file_name, da, "Updated Object Access Specification with scope information"));
     }
@@ -333,7 +339,9 @@ public class PrepareIngestion extends Controller {
             da.setDeploymentUri(dep_uri);
 
             da.saveToSolr();
-            da.saveToLabKey(session().get("LabKeyUserName"), session().get("LabKeyPassword"));
+            if (ConfigProp.getLabKeyLoginRequired()) {
+                da.saveToLabKey(session().get("LabKeyUserName"), session().get("LabKeyPassword"));
+            }
             
             return ok(prepareIngestion.render(file_name, da, "Updated Object Access Specification with deployment information"));
         }
@@ -367,7 +375,9 @@ public class PrepareIngestion extends Controller {
             da.setSchemaUri(das_uri);
 
             da.saveToSolr();
-            da.saveToLabKey(session().get("LabKeyUserName"), session().get("LabKeyPassword"));
+            if (ConfigProp.getLabKeyLoginRequired()) {
+                da.saveToLabKey(session().get("LabKeyUserName"), session().get("LabKeyPassword"));
+            }
             
             return ok(prepareIngestion.render(file_name, da, "Updated Object Access Specification with data acquisition schema information"));
         }
@@ -413,7 +423,9 @@ public class PrepareIngestion extends Controller {
         }
 
         da.saveToSolr();
-        da.saveToLabKey(session().get("LabKeyUserName"), session().get("LabKeyPassword"));
+        if (ConfigProp.getLabKeyLoginRequired()) {
+            da.saveToLabKey(session().get("LabKeyUserName"), session().get("LabKeyPassword"));
+        }
             
         message = "Association with " + daComponent + " removed from the Object Access Specification.";
         return ok(prepareIngestion.render(file_name, da, message));
@@ -421,7 +433,6 @@ public class PrepareIngestion extends Controller {
 
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
     public Result completeDataAcquisition(String file_name, String da_uri) {
-
         String message = "";
         ObjectAccessSpec da = ObjectAccessSpec.findByUri(da_uri);
         if (da == null) {
@@ -432,7 +443,9 @@ public class PrepareIngestion extends Controller {
         da.setStatus(9999);
         
         da.saveToSolr();
-        da.saveToLabKey(session().get("LabKeyUserName"), session().get("LabKeyPassword"));
+        if (ConfigProp.getLabKeyLoginRequired()) {
+            da.saveToLabKey(session().get("LabKeyUserName"), session().get("LabKeyPassword"));
+        }
         
         message = "Object Access Specification set as complete";
         return ok(prepareIngestion.render(file_name, da, message));

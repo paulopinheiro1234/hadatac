@@ -43,147 +43,149 @@ import org.hadatac.console.models.SysUser;
 import org.hadatac.console.controllers.AuthApplication;
 
 public class EditStudy extends Controller {
-	
-	@Inject
-	private FormFactory formFactory;
-	
+
+    @Inject
+    private FormFactory formFactory;
+
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-	public Result index(String filename, String da_uri, String std_uri) {
-    	if (session().get("LabKeyUserName") == null && session().get("LabKeyPassword") == null) {
-    		return redirect(org.hadatac.console.controllers.triplestore.routes.LoadKB.logInLabkey(
-				routes.EditStudy.index(filename, da_uri, std_uri).url()));
-    	}
-    	
-    	Study std = null;
-	StudyType stdType = null;
-	List<Agent> organizations = null;
-	List<Agent> persons = null;
+    public Result index(String filename, String da_uri, String std_uri) {
+        if (ConfigProp.getLabKeyLoginRequired() && session().get("LabKeyUserName") == null && session().get("LabKeyPassword") == null) {
+            return redirect(org.hadatac.console.controllers.triplestore.routes.LoadKB.logInLabkey(
+                    routes.EditStudy.index(filename, da_uri, std_uri).url()));
+        }
 
-    	try {
-	    if (std_uri != null) {
-		std_uri = URLDecoder.decode(std_uri, "UTF-8");
-	    } else {
-		std_uri = "";
-	    }
-	} catch (UnsupportedEncodingException e) {
-	    e.printStackTrace();
-	}
-	
-    	if (!std_uri.equals("")) {
-	    std = Study.find(std_uri);
-	    organizations = Agent.findOrganizations();
-	    persons = Agent.findPersons();
-	    stdType = new StudyType();
+        Study std = null;
+        StudyType stdType = null;
+        List<Agent> organizations = null;
+        List<Agent> persons = null;
 
-    	} else {
+        try {
+            if (std_uri != null) {
+                std_uri = URLDecoder.decode(std_uri, "UTF-8");
+            } else {
+                std_uri = "";
+            }
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
+
+        if (!std_uri.equals("")) {
+            std = Study.find(std_uri);
+            organizations = Agent.findOrganizations();
+            persons = Agent.findPersons();
+            stdType = new StudyType();
+
+        } else {
             return badRequest("No URI is provided to retrieve Study");
-    	}
+        }
 
-	return ok(editStudy.render(filename, da_uri, std, stdType, organizations, persons));
+        return ok(editStudy.render(filename, da_uri, std, stdType, organizations, persons));
     }
-    
+
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
     public Result postIndex(String filename, String da_uri, String std_uri) {
-    	return index(filename, da_uri, std_uri);
+        return index(filename, da_uri, std_uri);
     }
-    
+
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
     public Result processForm(String std_uri) {
-    	final SysUser sysUser = AuthApplication.getLocalUser(session());
-	
+        final SysUser sysUser = AuthApplication.getLocalUser(session());
+
         Form<StudyForm> form = formFactory.form(StudyForm.class).bindFromRequest();
         StudyForm data = form.get();
         List<String> changedInfos = new ArrayList<String>();
-        
+
         if (form.hasErrors()) {
             return badRequest("The submitted form has errors!");
         }
-        
-	// store new values
-	String newURI = URIUtils.replacePrefixEx(data.getNewUri());
-	if (newURI == null || newURI.equals("")) {
-            return badRequest("[ERROR] New URI cannot be empty.");
-	}
-	String newStudyType = URIUtils.replacePrefixEx(data.getNewType());
-	String newLabel = data.getNewLabel();
-	String newTitle = data.getNewTitle();
-	String newProject = data.getNewProject();
-	String newComment = data.getNewComment();
-	String newExternalSource = data.getNewExternalSource();
-	String newInstitution = data.getNewInstitution();
-	String newAgent = data.getNewAgent();
-	String newStartDateTime = data.getNewStartDateTime();
-	String newEndDateTime = data.getNewEndDateTime();
 
-	// retrieve old Study and corresponding DAS
+        // store new values
+        String newURI = URIUtils.replacePrefixEx(data.getNewUri());
+        if (newURI == null || newURI.equals("")) {
+            return badRequest("[ERROR] New URI cannot be empty.");
+        }
+        String newStudyType = URIUtils.replacePrefixEx(data.getNewType());
+        String newLabel = data.getNewLabel();
+        String newTitle = data.getNewTitle();
+        String newProject = data.getNewProject();
+        String newComment = data.getNewComment();
+        String newExternalSource = data.getNewExternalSource();
+        String newInstitution = data.getNewInstitution();
+        String newAgent = data.getNewAgent();
+        String newStartDateTime = data.getNewStartDateTime();
+        String newEndDateTime = data.getNewEndDateTime();
+
+        // retrieve old Study and corresponding DAS
         Study oldStudy = Study.find(std_uri);
 
-	// set changes
-	if (oldStudy != null) {
-	    
-	    if (oldStudy.getUri() != null && !oldStudy.getUri().equals(newURI)) {
-		changedInfos.add(newURI);
-	    }
-	    if (oldStudy.getType() != null && !oldStudy.getType().equals(newStudyType)) {
-		changedInfos.add(newStudyType);
-	    }
-	    if (oldStudy.getLabel() != null && !oldStudy.getLabel().equals(newLabel)) {
-		changedInfos.add(newLabel);
-	    }
-	    if (oldStudy.getTitle() != null && !oldStudy.getTitle().equals(newTitle)) {
-		changedInfos.add(newTitle);
-	    }
-	    if (oldStudy.getProject() != null && !oldStudy.getProject().equals(newProject)) {
-		changedInfos.add(newProject);
-	    }
-	    if (oldStudy.getComment() == null || !oldStudy.getComment().equals(newComment)) {
-		changedInfos.add(newComment);
-	    }
-	    if (oldStudy.getExternalSource() == null || !oldStudy.getExternalSource().equals(newExternalSource)) {
-		changedInfos.add(newExternalSource);
-	    }
-	    if (oldStudy.getInstitution() == null || !oldStudy.getInstitution().equals(newInstitution)) {
-		changedInfos.add(newInstitution);
-	    }
-	    if (oldStudy.getAgent() == null || !oldStudy.getAgent().equals(newAgent)) {
-		changedInfos.add(newAgent);
-	    }
-	    if (oldStudy.getStartedAt() == null || !oldStudy.getStartedAt().equals(newStartDateTime)) {
-		changedInfos.add(newStartDateTime);
-	    }
-	    if (oldStudy.getEndedAt() == null || !oldStudy.getEndedAt().equals(newEndDateTime)) {
-		changedInfos.add(newEndDateTime);
-	    }
+        // set changes
+        if (oldStudy != null) {
 
-	    // delete previous state of the Study in the triplestore
-	    if (oldStudy != null) {
-		oldStudy.delete();
-	    }
-	} else {
-	    return badRequest("[ERRO] Failed locating existing Study.\n");
-	}
+            if (oldStudy.getUri() != null && !oldStudy.getUri().equals(newURI)) {
+                changedInfos.add(newURI);
+            }
+            if (oldStudy.getType() != null && !oldStudy.getType().equals(newStudyType)) {
+                changedInfos.add(newStudyType);
+            }
+            if (oldStudy.getLabel() != null && !oldStudy.getLabel().equals(newLabel)) {
+                changedInfos.add(newLabel);
+            }
+            if (oldStudy.getTitle() != null && !oldStudy.getTitle().equals(newTitle)) {
+                changedInfos.add(newTitle);
+            }
+            if (oldStudy.getProject() != null && !oldStudy.getProject().equals(newProject)) {
+                changedInfos.add(newProject);
+            }
+            if (oldStudy.getComment() == null || !oldStudy.getComment().equals(newComment)) {
+                changedInfos.add(newComment);
+            }
+            if (oldStudy.getExternalSource() == null || !oldStudy.getExternalSource().equals(newExternalSource)) {
+                changedInfos.add(newExternalSource);
+            }
+            if (oldStudy.getInstitution() == null || !oldStudy.getInstitution().equals(newInstitution)) {
+                changedInfos.add(newInstitution);
+            }
+            if (oldStudy.getAgent() == null || !oldStudy.getAgent().equals(newAgent)) {
+                changedInfos.add(newAgent);
+            }
+            if (oldStudy.getStartedAt() == null || !oldStudy.getStartedAt().equals(newStartDateTime)) {
+                changedInfos.add(newStartDateTime);
+            }
+            if (oldStudy.getEndedAt() == null || !oldStudy.getEndedAt().equals(newEndDateTime)) {
+                changedInfos.add(newEndDateTime);
+            }
+
+            // delete previous state of the Study in the triplestore
+            if (oldStudy != null) {
+                oldStudy.delete();
+            }
+        } else {
+            return badRequest("[ERRO] Failed locating existing Study.\n");
+        }
 
         // insert current state of the Study
-	oldStudy.setUri(newURI);
-	oldStudy.setType(newStudyType);
-	oldStudy.setLabel(newLabel);
-	oldStudy.setTitle(newTitle);
-	oldStudy.setProject(newProject);
-	oldStudy.setComment(newComment);
-	oldStudy.setExternalSource(newExternalSource);
-	oldStudy.setInstitutionUri(newInstitution);
-	oldStudy.setAgentUri(newAgent);
-	oldStudy.setStartedAt(newStartDateTime);
-	oldStudy.setEndedAt(newEndDateTime);
-	
-	// insert the new Study content inside of the triplestore regardless of any change -- the previous content has already been deleted
-	oldStudy.save();
-	
-	// update/create new Study in LabKey
-	int nRowsAffected = oldStudy.saveToLabKey(session().get("LabKeyUserName"), session().get("LabKeyPassword"));
-	if (nRowsAffected <= 0) {
-	    return badRequest("Failed to insert edited Study to LabKey!\n");
-	}
+        oldStudy.setUri(newURI);
+        oldStudy.setType(newStudyType);
+        oldStudy.setLabel(newLabel);
+        oldStudy.setTitle(newTitle);
+        oldStudy.setProject(newProject);
+        oldStudy.setComment(newComment);
+        oldStudy.setExternalSource(newExternalSource);
+        oldStudy.setInstitutionUri(newInstitution);
+        oldStudy.setAgentUri(newAgent);
+        oldStudy.setStartedAt(newStartDateTime);
+        oldStudy.setEndedAt(newEndDateTime);
+
+        // insert the new Study content inside of the triplestore regardless of any change -- the previous content has already been deleted
+        oldStudy.save();
+
+        // update/create new Study in LabKey
+        if (ConfigProp.getLabKeyLoginRequired()) {
+            int nRowsAffected = oldStudy.saveToLabKey(session().get("LabKeyUserName"), session().get("LabKeyPassword"));
+            if (nRowsAffected <= 0) {
+                return badRequest("Failed to insert edited Study to LabKey!\n");
+            }
+        }
 
         return ok(studyConfirm.render("Edit Study", oldStudy));
     }

@@ -15,6 +15,7 @@ import org.hadatac.entity.pojo.Study;
 import org.hadatac.entity.pojo.ObjectCollection;
 import org.hadatac.entity.pojo.ObjectCollectionType;
 import org.hadatac.metadata.loader.URIUtils;
+import org.hadatac.utils.ConfigProp;
 import org.hadatac.console.views.html.objectcollections.*;
 import org.hadatac.console.models.ObjectCollectionForm;
 import org.hadatac.console.models.SysUser;
@@ -31,10 +32,11 @@ public class EditOC extends Controller {
 
 	@Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
 	public Result index(String filename, String da_uri, String std_uri, String oc_uri) {
-		if (session().get("LabKeyUserName") == null && session().get("LabKeyPassword") == null) {
+		if (ConfigProp.getLabKeyLoginRequired() && session().get("LabKeyUserName") == null && session().get("LabKeyPassword") == null) {
 			return redirect(org.hadatac.console.controllers.triplestore.routes.LoadKB.logInLabkey(
 					org.hadatac.console.controllers.objectcollections.routes.EditOC.index(filename, da_uri, std_uri, oc_uri).url()));
 		}
+		
 		try {
 			std_uri = URLDecoder.decode(std_uri, "UTF-8");
 			oc_uri = URLDecoder.decode(oc_uri, "UTF-8");
@@ -170,10 +172,13 @@ public class EditOC extends Controller {
 		newOc.save();
 
 		// update/create new OC in LabKey
-		int nRowsAffected = newOc.saveToLabKey(session().get("LabKeyUserName"), session().get("LabKeyPassword"));
-		if (nRowsAffected <= 0) {
-			return badRequest("Failed to edit OC into LabKey!\n");
+		if (ConfigProp.getLabKeyLoginRequired()) {
+		    int nRowsAffected = newOc.saveToLabKey(session().get("LabKeyUserName"), session().get("LabKeyPassword"));
+		    if (nRowsAffected <= 0) {
+		        return badRequest("Failed to edit OC into LabKey!\n");
+		    }
 		}
+		
 		return ok(objectCollectionConfirm.render("New Object Collection has been Edited", filename, da_uri, std_uri, newOc));
 	}
 

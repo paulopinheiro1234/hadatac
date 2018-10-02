@@ -14,6 +14,7 @@ import org.hadatac.console.views.html.indicators.*;
 import org.hadatac.console.controllers.indicators.routes;
 import org.hadatac.entity.pojo.Indicator;
 import org.hadatac.metadata.loader.URIUtils;
+import org.hadatac.utils.ConfigProp;
 
 import be.objectify.deadbolt.java.actions.Group;
 import be.objectify.deadbolt.java.actions.Restrict;
@@ -29,7 +30,7 @@ public class EditIndicator extends Controller {
 
 	@Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
 	public Result index(String ind_uri) {
-		if (session().get("LabKeyUserName") == null && session().get("LabKeyPassword") == null) {
+		if (ConfigProp.getLabKeyLoginRequired() && session().get("LabKeyUserName") == null && session().get("LabKeyPassword") == null) {
 			return redirect(org.hadatac.console.controllers.triplestore.routes.LoadKB.logInLabkey(
 					routes.EditIndicator.index(ind_uri).url()));
 		}
@@ -109,11 +110,13 @@ public class EditIndicator extends Controller {
 		oldIndicator.setComment(newComment);
 		// insert the new Indicator content inside of the triplestore regardless of any change -- the previous content has already been deleted
 		oldIndicator.save();
-
+		
 		// update/create new Indicator in LabKey
-		int nRowsAffected = oldIndicator.saveToLabKey(session().get("LabKeyUserName"), session().get("LabKeyPassword"));
-		if (nRowsAffected <= 0) {
-			return badRequest("Failed to insert edited Indicator to LabKey!\n");
+		if (ConfigProp.getLabKeyLoginRequired()) {
+		    int nRowsAffected = oldIndicator.saveToLabKey(session().get("LabKeyUserName"), session().get("LabKeyPassword"));
+		    if (nRowsAffected <= 0) {
+		        return badRequest("Failed to insert edited Indicator to LabKey!\n");
+		    }
 		}
 
 		return ok(indicatorConfirm.render("Edit Indicator", oldIndicator));

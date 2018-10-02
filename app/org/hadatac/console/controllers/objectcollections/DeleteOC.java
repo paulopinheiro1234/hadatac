@@ -7,6 +7,7 @@ import play.mvc.Result;
 
 import org.hadatac.console.views.html.objectcollections.*;
 import org.hadatac.entity.pojo.Study;
+import org.hadatac.utils.ConfigProp;
 import org.hadatac.entity.pojo.ObjectCollection;
 import org.labkey.remoteapi.CommandException;
 
@@ -20,7 +21,7 @@ public class DeleteOC extends Controller {
 
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
     public Result index(String filename, String da_uri, String std_uri, String oc_uri) {
-        if (session().get("LabKeyUserName") == null && session().get("LabKeyPassword") == null) {
+        if (ConfigProp.getLabKeyLoginRequired() && session().get("LabKeyUserName") == null && session().get("LabKeyPassword") == null) {
             return redirect(org.hadatac.console.controllers.triplestore.routes.LoadKB.logInLabkey(
                     org.hadatac.console.controllers.objectcollections.routes.DeleteOC.index(filename, da_uri, std_uri, oc_uri).url()));
         }
@@ -61,12 +62,15 @@ public class DeleteOC extends Controller {
 
         int deletedRows = -1;
         if (oc != null) {
-            System.out.println("calling oc.deleteFromLabKey() from DeleteObjectCollection"); 
-            deletedRows = oc.deleteFromLabKey(session().get("LabKeyUserName"),session().get("LabKeyPassword"));
-            if (deletedRows > 0) {
+            System.out.println("calling oc.deleteFromLabKey() from DeleteObjectCollection");
+            
+            if (ConfigProp.getLabKeyLoginRequired()) {
+                deletedRows = oc.deleteFromLabKey(session().get("LabKeyUserName"),session().get("LabKeyPassword"));
+            }
+            
+            if (!ConfigProp.getLabKeyLoginRequired() || deletedRows > 0) {
                 oc.delete();
             } else {
-                String message = "Number of deleted rows: " + deletedRows;
                 return badRequest(objectCollectionConfirm.render("Error deleting object collection: zero deleted rows", filename, da_uri, std_uri, oc));
             }
         }

@@ -17,6 +17,7 @@ import org.hadatac.entity.pojo.ObjectCollection;
 import org.hadatac.entity.pojo.ObjectCollectionType;
 import org.hadatac.entity.pojo.StudyObjectType;
 import org.hadatac.metadata.loader.URIUtils;
+import org.hadatac.utils.ConfigProp;
 import org.hadatac.console.views.html.*;
 import org.hadatac.console.views.html.objects.*;
 import org.hadatac.console.models.NewObjectsFromScratchForm;
@@ -35,7 +36,7 @@ public class NewObjectsFromScratch extends Controller {
 
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
     public Result index(String filename, String da_uri, String std_uri, String oc_uri, int page) {
-        if (session().get("LabKeyUserName") == null && session().get("LabKeyPassword") == null) {
+        if (ConfigProp.getLabKeyLoginRequired() && session().get("LabKeyUserName") == null && session().get("LabKeyPassword") == null) {
             return redirect(org.hadatac.console.controllers.triplestore.routes.LoadKB.logInLabkey(
                     org.hadatac.console.controllers.objects.routes.NewObjectsFromScratch.index(filename, da_uri, std_uri, oc_uri, page).url()));
         }
@@ -140,9 +141,11 @@ public class NewObjectsFromScratch extends Controller {
                 obj.saveToTripleStore();
 
                 // update/create new OBJ in LabKey
-                int nRowsAffected = obj.saveToLabKey(session().get("LabKeyUserName"), session().get("LabKeyPassword"));
-                if (nRowsAffected <= 0) {
-                    return badRequest("Failed to insert new OBJ to LabKey!\n");
+                if (ConfigProp.getLabKeyLoginRequired()) {
+                    int nRowsAffected = obj.saveToLabKey(session().get("LabKeyUserName"), session().get("LabKeyPassword"));
+                    if (nRowsAffected <= 0) {
+                        return badRequest("Failed to insert new OBJ to LabKey!\n");
+                    }
                 }
 
                 oc.getObjectUris().add(obj.getUri());
@@ -333,10 +336,13 @@ public class NewObjectsFromScratch extends Controller {
                     obj.saveToTripleStore();
 
                     // update/create new OBJ in LabKey
-                    int nRowsAffected = obj.saveToLabKey(session().get("LabKeyUserName"), session().get("LabKeyPassword"));
-                    if (nRowsAffected <= 0) {
-                        System.out.println("[ERROR] Failed to insert new OBJ to LabKey!");
+                    if (ConfigProp.getLabKeyLoginRequired()) {
+                        int nRowsAffected = obj.saveToLabKey(session().get("LabKeyUserName"), session().get("LabKeyPassword"));
+                        if (nRowsAffected <= 0) {
+                            System.out.println("[ERROR] Failed to insert new OBJ to LabKey!");
+                        }
                     }
+                    
                     oc.getObjectUris().add(obj.getUri());
 
                     nextId++;
