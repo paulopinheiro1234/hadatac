@@ -606,7 +606,7 @@ public class AnnotationWorker {
 
         String study_uri = chain.getStudyUri();
         for (String i : mapCatalog.keySet()) {
-            if (mapCatalog.get(i).length()>0){
+            if (mapCatalog.get(i).length() > 0) {
                 RecordFile SOsheet = new SpreadsheetRecordFile(file.getFile(), mapCatalog.get(i).replace("#", ""));
                 //System.out.println(SOsheet.getSheetName() + " is parsed!");
                 chain.addGenerator(new StudyObjectGenerator(SOsheet, mapContent.get(i), mapContent, study_uri));

@@ -189,42 +189,42 @@ public class StudyObject extends HADatAcThing {
         String query = "";
         query += NameSpaces.getInstance().printSparqlNameSpaceList();
         query += " select (count(?obj) as ?tot) where " + 
-	         " { ?obj hasco:isMemberOf ?collection . ?obj a ?objType . " + 
-                 " FILTER NOT EXISTS { ?objType rdfs:subClassOf* hasco:ObjectCollection . } " + 
-	         "}";
+                " { ?obj hasco:isMemberOf ?collection . ?obj a ?objType . " + 
+                " FILTER NOT EXISTS { ?objType rdfs:subClassOf* hasco:ObjectCollection . } " + 
+                "}";
         try {
             ResultSetRewindable resultsrw = SPARQLUtils.select(
                     CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), query);
-            
+
             if (resultsrw.hasNext()) {
                 QuerySolution soln = resultsrw.next();
                 return Integer.parseInt(soln.getLiteral("tot").getString());
-	    }
-	} catch (Exception e) {
-	    e.printStackTrace();
-	}
-	return -1;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return -1;
     }
 
     public static int getNumberStudyObjectsByCollection(String oc_uri) {
         String query = "";
         query += NameSpaces.getInstance().printSparqlNameSpaceList();
         query += " select (count(?obj) as ?tot) where " + 
-	             " { ?obj hasco:isMemberOf <" + oc_uri + "> . ?obj a ?objType . " + 
-                 " FILTER NOT EXISTS { ?objType rdfs:subClassOf* hasco:ObjectCollection . } " + 
-	             "}";
+                " { ?obj hasco:isMemberOf <" + oc_uri + "> . ?obj a ?objType . " + 
+                " FILTER NOT EXISTS { ?objType rdfs:subClassOf* hasco:ObjectCollection . } " + 
+                "}";
         try {
             ResultSetRewindable resultsrw = SPARQLUtils.select(
                     CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), query);
-            
+
             if (resultsrw.hasNext()) {
                 QuerySolution soln = resultsrw.next();
                 return Integer.parseInt(soln.getLiteral("tot").getString());
-	    }
-	} catch (Exception e) {
-	    e.printStackTrace();
-	}
-	return -1;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return -1;
     }
 
     public static List<String> retrieveScopeUris(String obj_uri) {
@@ -238,7 +238,7 @@ public class StudyObject extends HADatAcThing {
 
         ResultSetRewindable resultsrw = SPARQLUtils.select(
                 CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), queryString);
-        
+
         if (!resultsrw.hasNext()) {
             return retrievedUris;
         }
@@ -267,7 +267,7 @@ public class StudyObject extends HADatAcThing {
 
         ResultSetRewindable resultsrw = SPARQLUtils.select(
                 CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), queryString);
-        
+
         if (!resultsrw.hasNext()) {
             return retrievedUris;
         }
@@ -296,7 +296,7 @@ public class StudyObject extends HADatAcThing {
 
         ResultSetRewindable resultsrw = SPARQLUtils.select(
                 CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), queryString);
-        
+
         if (!resultsrw.hasNext()) {
             return retrievedUris;
         }
@@ -401,7 +401,7 @@ public class StudyObject extends HADatAcThing {
                 "SELECT  ?objuri WHERE { " + 
                 "	?objuri hasco:originalID \"" + original_id + "\" . " + 
                 "}";
-        
+
         ResultSetRewindable resultsrw = SPARQLUtils.select(
                 CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), queryString);
 
@@ -433,7 +433,7 @@ public class StudyObject extends HADatAcThing {
 
         ResultSetRewindable resultsrw = SPARQLUtils.select(
                 CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), queryString);
-        
+
         while (resultsrw.hasNext()) {
             QuerySolution soln = resultsrw.next();
             if (soln != null && soln.getResource("uri").getURI() != null) {
@@ -456,10 +456,10 @@ public class StudyObject extends HADatAcThing {
                 " } ORDER BY ASC (?id)" + 
                 " LIMIT " + pageSize + 
                 " OFFSET " + offset;
-        
+
         ResultSetRewindable resultsrw = SPARQLUtils.select(
                 CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), queryString);
-        
+
         while (resultsrw.hasNext()) {
             QuerySolution soln = resultsrw.next();
             if (soln != null && soln.getResource("uri").getURI() != null) {
@@ -583,15 +583,17 @@ public class StudyObject extends HADatAcThing {
 
         insert += NameSpaces.getInstance().printSparqlNameSpaceList();
         insert += INSERT_LINE1;
-        
+
         if (!getNamedGraph().isEmpty()) {
             insert += " GRAPH <" + getNamedGraph() + "> { ";
         }
-        
-        if (typeUri.startsWith("http")) {
-            insert += obj_uri + " a <" + typeUri + "> . ";
-        } else {
-            insert += obj_uri + " a " + typeUri + " . ";
+
+        if(!typeUri.isEmpty()) {
+            if (typeUri.startsWith("http")) {
+                insert += obj_uri + " a <" + typeUri + "> . ";
+            } else {
+                insert += obj_uri + " a " + typeUri + " . ";
+            }
         }
         if(!roleUri.isEmpty()) {
             if (roleUri.startsWith("http")) {
@@ -654,7 +656,7 @@ public class StudyObject extends HADatAcThing {
         if (!getNamedGraph().isEmpty()) {
             insert += " } ";
         }
-        
+
         insert += LINE_LAST;
         try {
             UpdateRequest request = UpdateFactory.create(insert);

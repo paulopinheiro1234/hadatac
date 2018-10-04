@@ -32,17 +32,15 @@ public class Templates {
     public static String UPDATEDDATE = ConfigProp.getPropertyValue(TEMPLATE_FILE, "updatedDate");
     public static String DCACCESSBOOL = ConfigProp.getPropertyValue(TEMPLATE_FILE, "DCAccessBool");
     public static String EXTSRC = ConfigProp.getPropertyValue(TEMPLATE_FILE, "externalSource");
-	    
-    // ACQ (DA and DEPLOYMENT) Template                                                                              
-    public static String DATAACQUISITIONNAME = ConfigProp.getPropertyValue(TEMPLATE_FILE, "DataAcquisitionName"); // also OAS
+    
+    // OAS Template
+    public static String DATAACQUISITIONNAME = ConfigProp.getPropertyValue(TEMPLATE_FILE, "DataAcquisitionName");
     public static String METHOD = ConfigProp.getPropertyValue(TEMPLATE_FILE, "Method");
-    public static String DATADICTIONARYNAME = ConfigProp.getPropertyValue(TEMPLATE_FILE, "DataDictionaryName");   // also OAS
-    public static String DASTUDYID = ConfigProp.getPropertyValue(TEMPLATE_FILE, "DAStudyName");  
+    public static String DATADICTIONARYNAME = ConfigProp.getPropertyValue(TEMPLATE_FILE, "DataDictionaryName");
+    public static String DASTUDYID = ConfigProp.getPropertyValue(TEMPLATE_FILE, "DAStudyName");
     public static String EPILAB = ConfigProp.getPropertyValue(TEMPLATE_FILE, "Epi/Lab");
-    public static String OWNEREMAIL = ConfigProp.getPropertyValue(TEMPLATE_FILE, "OwnerEmail");                   // also OAS
-    public static String PERMISSIONURI = ConfigProp.getPropertyValue(TEMPLATE_FILE, "PermissionURI");             // also OAS
-
-    // OAS Template                                                                              
+    public static String OWNEREMAIL = ConfigProp.getPropertyValue(TEMPLATE_FILE, "OwnerEmail");
+    public static String PERMISSIONURI = ConfigProp.getPropertyValue(TEMPLATE_FILE, "PermissionURI");
     public static String DEPLOYMENTURI = ConfigProp.getPropertyValue(TEMPLATE_FILE, "DeploymentUri");
     //public static String ROWSCOPE = ConfigProp.getPropertyValue(TEMPLATE_FILE, "RowScope");
     public static String CELLSCOPE = ConfigProp.getPropertyValue(TEMPLATE_FILE, "CellScope");
