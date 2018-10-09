@@ -15,4 +15,8 @@ public class BrowseOntology extends Controller {
 	return index(oper);
     }
 
+    public Result graphIndex(String oper) {
+    return ok(browseKnowledgeGraph.render(oper, EditingOptions.getHierarchy()));
+    }
+
 }
