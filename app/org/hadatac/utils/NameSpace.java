@@ -149,7 +149,7 @@ public class NameSpace {
 	public void loadTriples(String address, boolean fromRemote) {
         try {
             Repository repo = new SPARQLRepository(
-                    CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_GRAPH));
+                    CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_UPDATE));
             repo.initialize();
             RepositoryConnection con = repo.getConnection();
             ValueFactory factory = repo.getValueFactory();
@@ -165,6 +165,7 @@ public class NameSpace {
             System.out.println("RiotNotFoundException: address " + address);
             System.out.println("RiotNotFoundException: " + e.getMessage());
         } catch (Exception e) {
+            e.printStackTrace();
             System.out.println("Exception: address " + address);
             System.out.println("Exception: " + e.getMessage());
         }

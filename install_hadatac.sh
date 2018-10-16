@@ -39,6 +39,7 @@ fi
 HADATAC_DOWNLOAD=$HADATAC_HOME/download
 HADATAC_SOLR=$HADATAC_HOME/solr
 SOLR6_HOME=$HADATAC_SOLR/solr-6.5.0
+JETTY_NAME=jetty-distribution-9.4.12.v20180830
 
 mkdir $HADATAC_HOME
 mkdir $HADATAC_DOWNLOAD
@@ -83,29 +84,22 @@ cp $HADATAC_DOWNLOAD/jts-1.14/lib/* $HADATAC_SOLR/solr-6.5.0/server/solr-webapp/
 echo "=== Starting Apache Solr 6.5.0..."
 sh $HADATAC_SOLR/run_solr6.sh restart
 
-echo "=== Downloading Blazegraph ..."
-wget -O $BLAZEGRAPH_HOME/blazegraph.jar https://sourceforge.net/projects/bigdata/files/bigdata/2.1.4/blazegraph.jar/download
+echo "=== Downloading Jetty ..."
+wget -O $BLAZEGRAPH_HOME/$JETTY_NAME.zip https://repo1.maven.org/maven2/org/eclipse/jetty/jetty-distribution/9.4.12.v20180830/jetty-distribution-9.4.12.v20180830.zip
 wait $!
 echo ""
 
-echo "=== Starting Blazegraph ..."
-DIR="$PWD"
-cd $BLAZEGRAPH_HOME/
-java -server -Xmx4g -Djetty.port=8080 -jar $BLAZEGRAPH_HOME/blazegraph.jar &
-echo ""
-sleep 5
+unzip $BLAZEGRAPH_HOME/$JETTY_NAME.zip -d $BLAZEGRAPH_HOME/
 
-cd $DIR
-echo "=== Creating store namespace..."
-curl -X POST --data-binary @blazegraph/store.properties -H 'Content-Type:text/plain' http://localhost:8080/blazegraph/namespace
+echo "=== Downloading Blazegraph ..."
+wget -O $BLAZEGRAPH_HOME/blazegraph.war https://sourceforge.net/projects/bigdata/files/bigdata/2.0.0/bigdata.war/download
+wait $!
 echo ""
 
-echo "=== Creating store_sandbox namespace..."
-curl -X POST --data-binary @blazegraph/store_sandbox.properties -H 'Content-Type:text/plain' http://localhost:8080/blazegraph/namespace
-echo ""
+mkdir $BLAZEGRAPH_HOME/$JETTY_NAME/webapps/blazegraph
+mv $BLAZEGRAPH_HOME/blazegraph.war $BLAZEGRAPH_HOME/$JETTY_NAME/webapps/blazegraph/
+unzip $BLAZEGRAPH_HOME/$JETTY_NAME/webapps/blazegraph/blazegraph.war -d $BLAZEGRAPH_HOME/$JETTY_NAME/webapps/blazegraph/
 
-echo "=== Creating store_users namespace..."
-curl -X POST --data-binary @blazegraph/store_users.properties -H 'Content-Type:text/plain' http://localhost:8080/blazegraph/namespace
-echo ""
+cp ./blazegraph/jetty-webapp.xml $BLAZEGRAPH_HOME/$JETTY_NAME/etc/
 
 echo "=== Installation is finished ..."
