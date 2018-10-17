@@ -1,0 +1,58 @@
+@(map		: java.util.Map[java.lang.String,java.util.List[org.hadatac.utils.OntologyTerm]])
+
+@import org.hadatac.console.views.html._
+@import org.hadatac.entity.pojo.DataAcquisitionSchema
+@import org.hadatac.utils._
+@import org.hadatac.metadata.loader.URIUtils
+
+@main("Browse Overlapping Terms") {
+
+<style>
+
+     .node rect {
+         cursor: pointer;
+         fill: #fff;
+         fill-opacity: .5;
+         stroke: #3182bd;
+         stroke-width: 1.5px;
+      }
+
+      .node text {
+         font: 10px sans-serif;
+          pointer-events: none;
+      }
+
+      path.link {
+          fill: none;
+          stroke: #9ecae1;
+          stroke-width: 1.5px;
+      }
+
+      .tab-content {
+         border-left: 1px solid #ddd;
+         border-right: 1px solid #ddd;
+         padding: 10px;
+      }
+
+</style>
+
+
+   <div class="container-fluid">
+      <h2>Browse Overlapping Terms</h2>
+      <li>Cluster Key
+			<ul>
+				Actual Label(Term IRI)
+			</ul>
+		</li>
+      @for(key <- map.keySet()){
+      	<li>@key.toString
+			<ul>
+				@for(term <- map.get(key)) {
+					<li>@term.toString</li>
+				}
+			</ul>
+		</li>
+      }
+
+   </div>
+}
