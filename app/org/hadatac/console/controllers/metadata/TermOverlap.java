@@ -20,20 +20,7 @@ public class TermOverlap extends Controller {
     public Result index() {
     
     	Map<String, List<OntologyTerm>> t = new TermClusteror().getTermClusters();
-        System.out.println("TermOverlap index() was called!");
         return ok(searchTermOverlap.render(t));
         
     }// /index()
-
-
-    // for /metadata HTTP POST requests
-    public Result postIndex() {
-        
-    	
-    	Map<String, List<OntologyTerm>> t = new TermClusteror().getTermClusters();
-		
-        System.out.println("TermOverlap index() was called!");
-        return ok(searchTermOverlap.render(t));
-        
-    }// /postIndex()
 }

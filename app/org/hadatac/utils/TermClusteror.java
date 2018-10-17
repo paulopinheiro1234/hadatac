@@ -17,9 +17,6 @@ import com.google.refine.clustering.binning.FingerprintKeyer;
 public class TermClusteror {
 
    private final String ontologyTermQuery = "" +
-	         "prefix owl:  <http://www.w3.org/2002/07/owl#>\n" +
-	         "prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#>\n" +
-	         "\n" +
 	         "select distinct ?class ?label\n" +
 	         "where{\n" +
 	         "  ?class a owl:Class .\n" +
@@ -32,16 +29,13 @@ public class TermClusteror {
 		final FingerprintKeyer fp = new FingerprintKeyer();
 		QueryExecution qexec = null;
 		try {
-			String queryString = NameSpaces.getInstance().printSparqlNameSpaceList() + ontologyTermQuery;
-			
-			System.out.println("queryString: \n" + queryString);
-			
-			Query query = QueryFactory.create(queryString);
+			final String queryString = NameSpaces.getInstance().printSparqlNameSpaceList() + ontologyTermQuery;
+					
+			final Query query = QueryFactory.create(queryString);
 			qexec = QueryExecutionFactory
 					.sparqlService(CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), query);
-			ResultSet response = qexec.execSelect();
+			final ResultSet response = qexec.execSelect();
 
-			int count = 0;
 			while (response.hasNext()) {
 				// Get class term and generate cluster
 				final QuerySolution result = response.next();
@@ -60,10 +54,7 @@ public class TermClusteror {
 				if (!clusters.get(clusterLabel).contains(term)) {
 					clusters.get(clusterLabel).add(term);
 				}
-
-				count++;
 			}
-			System.out.println("Label count = " + count);
 
 		} catch (Exception e) {
 			System.err.println("Ran into error when Term Clustering :" + e.getMessage());
