@@ -29,13 +29,13 @@ services:
                 aliases:
                     - blazegraph
         ports:
-            - "9999:9999"
+            - "8080:8080"
         restart: always
         environment:
             JAVA_XMS: 512m
             JAVA_XMX: 4g
         volumes:
-            - hadatac-blazegraph:/var/lib/blazegraph
+            - hadatac-blazegraph:/var/lib/jetty
 
     # The primary hadatac web app
     hadatac:
