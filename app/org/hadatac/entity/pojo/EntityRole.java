@@ -153,12 +153,12 @@ public class EntityRole extends HADatAcThing implements Comparable<EntityRole> {
     public static Map<String, String> findObjRoleMappings(String studyUri) {
         Map<String, String> results = new HashMap<String, String>();        
         String queryString = NameSpaces.getInstance().printSparqlNameSpaceList() 
-	    + " SELECT ?studyObj ?label WHERE { " 
-	    + " ?studyObj hasco:isMemberOf ?soc . " 
-	    + " ?soc hasco:hasGroundingLabel ?label . "  
-	    + " ?soc hasco:isMemberOf <" + studyUri + "> . "   
-	    + " }";
-	    //        + "SELECT ?studyObj ?roleUri WHERE { \n"
+                + " SELECT ?studyObj ?label WHERE { \n" 
+                + " ?studyObj hasco:isMemberOf ?soc . \n" 
+                + " ?soc hasco:hasGroundingLabel ?label . \n" 
+                + " ?soc hasco:isMemberOf <" + studyUri + "> . \n" 
+                + " } \n";
+	        //    + "SELECT ?studyObj ?roleUri WHERE { \n"
             //    + "{ "
             //    + "?studyObj hasco:isMemberOf ?soc . \n"
             //    + "?soc a hasco:SubjectGroup . \n"
@@ -171,7 +171,7 @@ public class EntityRole extends HADatAcThing implements Comparable<EntityRole> {
             //    + "?studyObj a ?roleUri . \n"
             //    + "}}";
 
-        // System.out.println("findObjRoleMappings query: " + queryString);
+        System.out.println("findObjRoleMappings query: " + queryString);
 
         ResultSetRewindable resultsrw = SPARQLUtils.select(
                 CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), queryString);
