@@ -490,7 +490,12 @@ public class SDD {
         }
 
         for (Record record : file.getRecords()) {
-            codeMappings.put(record.getValueByColumnName("code"), record.getValueByColumnName("uri"));
+            String code = record.getValueByColumnName("code");
+            String uri = record.getValueByColumnName("uri");
+            if (uri.startsWith("obo:UO_")) {
+                uri = uri.replace("obo:UO_", "uo:");
+            }
+            codeMappings.put(code, uri);
         }
 
         if (codeMappings.isEmpty()){
