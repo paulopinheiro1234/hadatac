@@ -347,11 +347,6 @@ public class MeasurementGenerator extends BasicGenerator {
                 } else if (!schema.getIdLabel().equals("")) {
                     id = record.getValueByColumnIndex(posId);
                 }
-
-                System.out.println("id: " + id);
-                System.out.println("posOriginalId: " + posOriginalId);
-                System.out.println("posId: " + posId);
-                System.out.println("\n");
                 
                 if (!id.equals("")) {
                     if (dasa.getEntity().equals(URIUtils.replacePrefixEx("sio:Human"))) {
@@ -378,7 +373,6 @@ public class MeasurementGenerator extends BasicGenerator {
              *   SET ROLE URI              *
              *                             *
              *=============================*/
-            System.out.println("measurement.getStudyObjectUri(): " + measurement.getStudyObjectUri());
             if (objRoleMappings.containsKey(measurement.getStudyObjectUri())) {
                 measurement.setRoleUri(objRoleMappings.get(measurement.getStudyObjectUri()));
             } else {
