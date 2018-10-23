@@ -36,15 +36,12 @@ public class GetSparqlQuery {
         System.out.println("Collection: " + collection);
     }
     
-    public String querySelector(String tabName){
+    public String querySelector(String tabName) {
+        String prefixes = NameSpaces.getInstance().printSparqlNameSpaceList();
         String q = "SELECT * WHERE { ?s ?p ?o } LIMIT 10";
         switch (tabName){
             case "Platforms" : 
-                q = "PREFIX rdfs:<http://www.w3.org/2000/01/rdf-schema#> " + 
-                    "PREFIX owl: <http://www.w3.org/2002/07/owl#> " + 
-                    "PREFIX vstoi: <http://hadatac.org/ont/vstoi#> " + 
-                    "PREFIX hasneto: <http://hadatac.org/ont/hasneto#> " + 
-                    "SELECT ?platURI ?name ?modelName ?sn ?lat ?lng WHERE {" +
+                q = "SELECT ?platURI ?name ?modelName ?sn ?lat ?lng WHERE {" +
                     "    ?platModel rdfs:subClassOf+" + 
                     "    vstoi:Platform  ." + 
                     "    ?platURI a ?platModel ." +
@@ -56,10 +53,7 @@ public class GetSparqlQuery {
                     "}";
                 break;
             case "Instruments" : 
-                q = "PREFIX rdfs:<http://www.w3.org/2000/01/rdf-schema#>" +
-                    "PREFIX owl: <http://www.w3.org/2002/07/owl#>" +
-                    "PREFIX vstoi: <http://hadatac.org/ont/vstoi#>" +
-                    "SELECT ?instURI ?name ?modelName ?sn WHERE {" +
+                q = "SELECT ?instURI ?name ?modelName ?sn WHERE {" +
                     " ?instModel rdfs:subClassOf+" +
                     " vstoi:Instrument ." +
                     " ?instURI a ?instModel ." +
@@ -69,10 +63,7 @@ public class GetSparqlQuery {
                     "}";
                 break;
             case "Detectors" : 
-                q = "PREFIX rdfs:<http://www.w3.org/2000/01/rdf-schema#>" +
-                    "PREFIX owl: <http://www.w3.org/2002/07/owl#>" +
-                    "PREFIX vstoi: <http://hadatac.org/ont/vstoi#>" +
-                    "SELECT ?detURI ?name ?modelName ?instName ?sn ?instSN WHERE {" +
+                q = "SELECT ?detURI ?name ?modelName ?instName ?sn ?instSN WHERE {" +
                     " ?model rdfs:subClassOf+" +
                     " vstoi:Detector ." +
                     " ?model rdfs:label ?modelName ." + 
@@ -85,11 +76,7 @@ public class GetSparqlQuery {
                     "}";
                 break;
             case "InstrumentModels" : 
-                q = "PREFIX rdfs:<http://www.w3.org/2000/01/rdf-schema#>" + 
-                    "PREFIX foaf:<http://xmlns.com/foaf/0.1/>" + 
-                    "PREFIX owl: <http://www.w3.org/2002/07/owl#>" + 
-                    "PREFIX vstoi: <http://hadatac.org/ont/vstoi#>" +
-                    "SELECT ?model ?modelName ?superModelName ?maker ?desc ?page ?minTemp ?maxTemp ?tempUnit ?docLink ?numAtt ?numDet ?maxLog WHERE {" +
+                q = "SELECT ?model ?modelName ?superModelName ?maker ?desc ?page ?minTemp ?maxTemp ?tempUnit ?docLink ?numAtt ?numDet ?maxLog WHERE {" +
                     "   ?model rdfs:subClassOf* vstoi:Instrument . " + 
                     "   ?model rdfs:label ?modelName ." + 
                     "   OPTIONAL { ?model rdfs:subClassOf ?superModel .  " + 
@@ -108,11 +95,7 @@ public class GetSparqlQuery {
                     "}";
                 break;
             case "Entities" : 
-                q = "PREFIX rdfs:<http://www.w3.org/2000/01/rdf-schema#>" + 
-                    "PREFIX owl: <http://www.w3.org/2002/07/owl#>" + 
-                    "PREFIX oboe: <http://ecoinformatics.org/oboe/oboe.1.0/oboe-core.owl#>" + 
-                    "PREFIX sio: <http://semanticscience.org/resource/>" +
-                    "SELECT ?id ?superId ?label ?chara WHERE { " + 
+                q = "SELECT ?id ?superId ?label ?chara WHERE { " + 
                     "   ?id rdfs:subClassOf* sio:Object . " + 
                     "   ?id rdfs:subClassOf ?superId .  " + 
                     "   OPTIONAL { ?id rdfs:label ?label . } " + 
@@ -120,19 +103,14 @@ public class GetSparqlQuery {
                     "}";
                 break;
             case "OrganizationsH" : 
-            	q = "PREFIX prov: <http://www.w3.org/ns/prov#> " + 
-            		"PREFIX foaf: <http://xmlns.com/foaf/0.1/> " +
-            		"SELECT * WHERE { " +
+            	q = "SELECT * WHERE { " +
             		"  ?agent a foaf:Organization . " + 
             		"  OPTIONAL { ?agent foaf:name ?name . } " + 
             		"  OPTIONAL { ?agent foaf:mbox ?email . } " + 
             		"}";
                 break;
             case "GroupsH" : 
-            	q = "PREFIX prov: <http://www.w3.org/ns/prov#> " + 
-            		"PREFIX foaf: <http://xmlns.com/foaf/0.1/> " +
-            		"PREFIX hadatac: <http://hadatac.org/ont/hadatac#> " + 
-            		"SELECT * WHERE { " +
+            	q = "SELECT * WHERE { " +
             		"  ?agent a foaf:Group . " + 
             		"  OPTIONAL { ?agent foaf:name ?name . } " + 
             		"  OPTIONAL { ?agent foaf:homepage ?page . } " + 
@@ -140,10 +118,7 @@ public class GetSparqlQuery {
             		"}";
                 break;
             case "PeopleH" : 
-            	q = "PREFIX prov: <http://www.w3.org/ns/prov#> " + 
-            		"PREFIX foaf: <http://xmlns.com/foaf/0.1/> " + 
-            		"PREFIX hadatac: <http://hadatac.org/ont/hadatac#> " + 
-            		"SELECT * WHERE { " +
+            	q = "SELECT * WHERE { " +
             		"  ?agent a foaf:Person . " + 
             		"  OPTIONAL { ?agent foaf:name ?name . } " + 
             		"  OPTIONAL { ?agent foaf:mbox ?email . } " + 
@@ -151,11 +126,7 @@ public class GetSparqlQuery {
             		"}";
                 break;
             case "DetectorModels" : 
-                q = "PREFIX rdfs:<http://www.w3.org/2000/01/rdf-schema#>" + 
-                    "PREFIX foaf:<http://xmlns.com/foaf/0.1/>" + 
-                    "PREFIX owl: <http://www.w3.org/2002/07/owl#>" + 
-                    "PREFIX vstoi: <http://hadatac.org/ont/vstoi#>" +
-                    "SELECT ?model ?modelName ?superModelName ?maker ?desc ?page WHERE { " + 
+                q = "SELECT ?model ?modelName ?superModelName ?maker ?desc ?page WHERE { " + 
                     "    ?model rdfs:subClassOf* vstoi:Detector . " + 
                 	"    ?model rdfs:subClassOf ?superModel .  " + 
                 	"    OPTIONAL { ?model rdfs:label ?modelName }  " + 
@@ -168,12 +139,7 @@ public class GetSparqlQuery {
                 	"}";
                 break;
             case "Characteristics" : 
-                q = "PREFIX rdfs:<http://www.w3.org/2000/01/rdf-schema#>" + 
-                    "PREFIX owl: <http://www.w3.org/2002/07/owl#>" + 
-                    "PREFIX hasneto: <http://hadatac.org/ont/hasneto#> " +
-                    "PREFIX chear: <http://hadatac.org/ont/chear#>" + 
-                    "PREFIX sio: <http://semanticscience.org/resource/>" +
-                	"SELECT DISTINCT ?modelName ?superModelName ?label ?comment WHERE { " + 
+                q = "SELECT DISTINCT ?modelName ?superModelName ?label ?comment WHERE { " + 
                     "   ?modelName rdfs:subClassOf* sio:Attribute . " +
                     "   ?modelName rdfs:subClassOf ?superModelName .  " + 
                     "   OPTIONAL { ?modelName rdfs:label ?label } . " + 
@@ -181,11 +147,7 @@ public class GetSparqlQuery {
                 	"}";
                 break;
             case "PlatformModels" : 
-                q = "PREFIX rdfs:<http://www.w3.org/2000/01/rdf-schema#>" + 
-                    "PREFIX foaf:<http://xmlns.com/foaf/0.1/>" + 
-                    "PREFIX owl: <http://www.w3.org/2002/07/owl#>" + 
-                    "PREFIX vstoi: <http://hadatac.org/ont/vstoi#>" +
-                	"SELECT ?model ?modelName ?superModelName ?maker ?desc ?page WHERE { " + 
+                q = "SELECT ?model ?modelName ?superModelName ?maker ?desc ?page WHERE { " + 
                     "   ?model rdfs:subClassOf* vstoi:Platform . " + 
                 	"   ?model rdfs:subClassOf ?superModel .  " + 
                 	"   OPTIONAL { ?model rdfs:label ?modelName }  " + 
@@ -197,22 +159,15 @@ public class GetSparqlQuery {
                 	"}";
                 break;
             case "Units" : 
-                q = "PREFIX rdfs:<http://www.w3.org/2000/01/rdf-schema#>" + 
-                    "PREFIX owl: <http://www.w3.org/2002/07/owl#>" + 
-                    "PREFIX obo: <http://geneontology.org/GO.format.obo-1_2.shtml#>" +
-                    "SELECT ?id ?superModelName ?comment ?label WHERE { " + 
-                    "   ?id rdfs:subClassOf* obo:UO_0000000 . " + 
+                q = "SELECT ?id ?superModelName ?comment ?label WHERE { " + 
+                    "   ?id rdfs:subClassOf* uo:0000000 . " + 
                     "   ?id rdfs:subClassOf ?superModelName .  " + 
                     "   OPTIONAL { ?id rdfs:label ?label } ." +
                     "   OPTIONAL { ?id rdfs:comment ?comment } . " +
                     "}";
                 break;
             case "SensingPerspectives" : 
-                q = "PREFIX rdfs:<http://www.w3.org/2000/01/rdf-schema#>" +
-                    "PREFIX owl: <http://www.w3.org/2002/07/owl#>" +
-                    "PREFIX vstoi: <http://hadatac.org/ont/vstoi#>" +
-                    "PREFIX hasneto: <http://hadatac.org/ont/hasneto#>  " +
-                    "SELECT ?sp ?ofModelName ?chara ?accpercent ?accrtwo ?outputres ?maxresponse ?timeunit ?low ?high WHERE {" +
+                q = "SELECT ?sp ?ofModelName ?chara ?accpercent ?accrtwo ?outputres ?maxresponse ?timeunit ?low ?high WHERE {" +
                     " ?sp a vstoi:SensingPerspective . " +
                     " ?sp vstoi:perspectiveOf ?ofModel . " +
                     " ?ofModel rdfs:label ?ofModelName . " +
@@ -227,10 +182,7 @@ public class GetSparqlQuery {
                     "}";
                 break;
             case "EntityCharacteristics" : 
-                q = "PREFIX rdfs:<http://www.w3.org/2000/01/rdf-schema#>" + 
-                    "PREFIX owl: <http://www.w3.org/2002/07/owl#>" + 
-                    "PREFIX hasneto: <http://hadatac.org/ont/hasneto#> " + 
-                    "SELECT ?ecName ?entity ?chara WHERE { " + 
+                q = "SELECT ?ecName ?entity ?chara WHERE { " + 
                     "   ?ec a hasneto:EntityCharacteristic . " + 
                     "   ?ec rdfs:label ?ecName .  " + 
                     "   ?ec hasneto:ofEntity ?entity .  " + 
@@ -238,12 +190,7 @@ public class GetSparqlQuery {
                     "}";
                 break;
             case "Deployments" : 
-                q = "PREFIX rdfs:<http://www.w3.org/2000/01/rdf-schema#>" + 
-                    "PREFIX owl: <http://www.w3.org/2002/07/owl#>" +
-                    "PREFIX prov: <http://www.w3.org/ns/prov#>  " +
-        	        "PREFIX vstoi: <http://hadatac.org/ont/vstoi#>  " +
-        	        "PREFIX hasneto: <http://hadatac.org/ont/hasneto#>  " +
-                    "SELECT ?uri ?platform ?platformName ?instrument ?instrumentName ?date WHERE { " + 
+                q = "SELECT ?uri ?platform ?platformName ?instrument ?instrumentName ?date WHERE { " + 
                     "   ?uri a vstoi:Deployment . " + 
                     "   ?uri vstoi:hasPlatform ?platform .  " + 
                     "   ?uri hasco:hasInstrument ?instrument .  " + 
@@ -253,15 +200,7 @@ public class GetSparqlQuery {
                     "}";
                 break;
             case "Demographics" :
-            	q = "PREFIX sio: <http://semanticscience.org/resource/>" + 
-            		"PREFIX chear: <http://hadatac.org/ont/chear#>" + 
-            		"PREFIX prov: <http://www.w3.org/ns/prov#>" + 
-            		"PREFIX hasco: <http://hadatac.org/ont/hasco/>" + 
-            		"PREFIX hasneto: <http://hadatac.org/ont/hasneto#>" + 
-            		"PREFIX dcterms: <http://purl.org/dc/terms/>" + 
-            		"PREFIX rdfs:<http://www.w3.org/2000/01/rdf-schema#>" + 
-            		"PREFIX skos: <http://www.w3.org/2004/02/skos/core#>" +
-            		"SELECT ?id ?superId ?label ?comment WHERE { " + 
+            	q = "SELECT ?id ?superId ?label ?comment WHERE { " + 
                     "   ?id rdfs:subClassOf* chear:Demographic . " + 
                     "   ?id rdfs:subClassOf ?superId .  " + 
                     "   OPTIONAL { ?id rdfs:label ?label } . " + 
@@ -270,15 +209,7 @@ public class GetSparqlQuery {
                     "}";
                 break;
             case "BirthOutcomes" :
-            	q = "PREFIX sio: <http://semanticscience.org/resource/>" + 
-            		"PREFIX chear: <http://hadatac.org/ont/chear#>" + 
-            		"PREFIX prov: <http://www.w3.org/ns/prov#>" + 
-            		"PREFIX hasco: <http://hadatac.org/ont/hasco/>" + 
-            		"PREFIX hasneto: <http://hadatac.org/ont/hasneto#>" + 
-            		"PREFIX dcterms: <http://purl.org/dc/terms/>" + 
-            		"PREFIX rdfs:<http://www.w3.org/2000/01/rdf-schema#>" + 
-            		"PREFIX skos: <http://www.w3.org/2004/02/skos/core#>" +
-            		"SELECT ?id ?superId ?label ?comment WHERE { " + 
+            	q = "SELECT ?id ?superId ?label ?comment WHERE { " + 
                     "   ?id rdfs:subClassOf* chear:BirthOutcome . " + 
                     "   ?id rdfs:subClassOf ?superId .  " + 
                     "   OPTIONAL { ?id rdfs:label ?label } . " + 
@@ -287,15 +218,7 @@ public class GetSparqlQuery {
                     "}";
                 break;
             case "HousingCharacteristic" :
-            	q = "PREFIX sio: <http://semanticscience.org/resource/>" + 
-            		"PREFIX chear: <http://hadatac.org/ont/chear#>" + 
-            		"PREFIX prov: <http://www.w3.org/ns/prov#>" + 
-            		"PREFIX hasco: <http://hadatac.org/ont/hasco/>" + 
-            		"PREFIX hasneto: <http://hadatac.org/ont/hasneto#>" + 
-            		"PREFIX dcterms: <http://purl.org/dc/terms/>" + 
-            		"PREFIX rdfs:<http://www.w3.org/2000/01/rdf-schema#>" + 
-            		"PREFIX skos: <http://www.w3.org/2004/02/skos/core#>" +
-            		"SELECT ?id ?superId ?label ?comment WHERE { " + 
+            	q = "SELECT ?id ?superId ?label ?comment WHERE { " + 
                     "   ?id rdfs:subClassOf* chear:HousingCharacteristic . " + 
                     "   ?id rdfs:subClassOf ?superId .  " + 
                     "   OPTIONAL { ?id rdfs:label ?label } . " + 
@@ -304,15 +227,7 @@ public class GetSparqlQuery {
                     "}";
                 break;
             case "ATIDU" :
-            	q = "PREFIX sio: <http://semanticscience.org/resource/>" + 
-            		"PREFIX chear: <http://hadatac.org/ont/chear#>" + 
-            		"PREFIX prov: <http://www.w3.org/ns/prov#>" + 
-            		"PREFIX hasco: <http://hadatac.org/ont/hasco/>" + 
-            		"PREFIX hasneto: <http://hadatac.org/ont/hasneto#>" + 
-            		"PREFIX dcterms: <http://purl.org/dc/terms/>" + 
-            		"PREFIX rdfs:<http://www.w3.org/2000/01/rdf-schema#>" + 
-            		"PREFIX skos: <http://www.w3.org/2004/02/skos/core#>" +
-            		"SELECT ?id ?superId ?label ?comment WHERE { " + 
+            	q = "SELECT ?id ?superId ?label ?comment WHERE { " + 
                     "   ?id rdfs:subClassOf* chear:ATIDU . " + 
                     "   ?id rdfs:subClassOf ?superId .  " + 
                     "   OPTIONAL { ?id rdfs:label ?label } . " + 
@@ -321,15 +236,7 @@ public class GetSparqlQuery {
                     "}";
                 break;
             case "Anthropometry" :
-            	q = "PREFIX sio: <http://semanticscience.org/resource/>" + 
-            		"PREFIX chear: <http://hadatac.org/ont/chear#>" + 
-            		"PREFIX prov: <http://www.w3.org/ns/prov#>" + 
-            		"PREFIX hasco: <http://hadatac.org/ont/hasco/>" + 
-            		"PREFIX hasneto: <http://hadatac.org/ont/hasneto#>" + 
-            		"PREFIX dcterms: <http://purl.org/dc/terms/>" + 
-            		"PREFIX rdfs:<http://www.w3.org/2000/01/rdf-schema#>" + 
-            		"PREFIX skos: <http://www.w3.org/2004/02/skos/core#>" +
-            		"SELECT ?id ?superId ?label ?comment WHERE { " + 
+            	q = "SELECT ?id ?superId ?label ?comment WHERE { " + 
                     "   ?id rdfs:subClassOf* chear:Anthropometry . " + 
                     "   ?id rdfs:subClassOf ?superId .  " + 
                     "   OPTIONAL { ?id rdfs:label ?label } . " + 
@@ -338,15 +245,7 @@ public class GetSparqlQuery {
                     "}";
                 break;
             case "PregnancyCharacteristic" :
-            	q = "PREFIX sio: <http://semanticscience.org/resource/>" + 
-            		"PREFIX chear: <http://hadatac.org/ont/chear#>" + 
-            		"PREFIX prov: <http://www.w3.org/ns/prov#>" + 
-            		"PREFIX hasco: <http://hadatac.org/ont/hasco/>" + 
-            		"PREFIX hasneto: <http://hadatac.org/ont/hasneto#>" + 
-            		"PREFIX dcterms: <http://purl.org/dc/terms/>" + 
-            		"PREFIX rdfs:<http://www.w3.org/2000/01/rdf-schema#>" + 
-            		"PREFIX skos: <http://www.w3.org/2004/02/skos/core#>" +
-            		"SELECT ?id ?superId ?label ?comment WHERE { " + 
+            	q = "SELECT ?id ?superId ?label ?comment WHERE { " + 
                     "   ?id rdfs:subClassOf* chear:PregnancyCharacteristic . " + 
                     "   ?id rdfs:subClassOf ?superId .  " + 
                     "   OPTIONAL { ?id rdfs:label ?label } . " + 
@@ -355,15 +254,7 @@ public class GetSparqlQuery {
                     "}";
                 break;
             case "Analytes" :
-            	q = "PREFIX sio: <http://semanticscience.org/resource/>" + 
-            		"PREFIX chear: <http://hadatac.org/ont/chear#>" + 
-            		"PREFIX prov: <http://www.w3.org/ns/prov#>" + 
-            		"PREFIX hasco: <http://hadatac.org/ont/hasco/>" + 
-            		"PREFIX hasneto: <http://hadatac.org/ont/hasneto#>" + 
-            		"PREFIX dcterms: <http://purl.org/dc/terms/>" + 
-            		"PREFIX rdfs:<http://www.w3.org/2000/01/rdf-schema#>" + 
-            		"PREFIX skos: <http://www.w3.org/2004/02/skos/core#>" +
-            		"SELECT ?id ?superId ?label ?comment WHERE { " + 
+            	q = "SELECT ?id ?superId ?label ?comment WHERE { " + 
                     "   ?id rdfs:subClassOf* chear:Analyte . " + 
                     "   ?id rdfs:subClassOf ?superId .  " + 
                     "   OPTIONAL { ?id rdfs:label ?label } . " + 
@@ -371,15 +262,7 @@ public class GetSparqlQuery {
                     "}";
                 break;
             case "Alkaloids" :
-            	q = "PREFIX sio: <http://semanticscience.org/resource/>" + 
-            		"PREFIX chear: <http://hadatac.org/ont/chear#>" + 
-            		"PREFIX prov: <http://www.w3.org/ns/prov#>" + 
-            		"PREFIX hasco: <http://hadatac.org/ont/hasco/>" + 
-            		"PREFIX hasneto: <http://hadatac.org/ont/hasneto#>" + 
-            		"PREFIX dcterms: <http://purl.org/dc/terms/>" + 
-            		"PREFIX rdfs:<http://www.w3.org/2000/01/rdf-schema#>" + 
-            		"PREFIX skos: <http://www.w3.org/2004/02/skos/core#>" +
-            		"SELECT ?id ?superId ?label ?comment WHERE { " + 
+            	q = "SELECT ?id ?superId ?label ?comment WHERE { " + 
                     "   ?id rdfs:subClassOf* chear:AlkylPhosphatePesticideMetabolite . " + 
                     "   ?id rdfs:subClassOf ?superId .  " + 
                     "   OPTIONAL { ?id rdfs:label ?label } . " + 
@@ -387,15 +270,7 @@ public class GetSparqlQuery {
                     "}";
                 break;
             case "Arsenic" :
-            	q = "PREFIX sio: <http://semanticscience.org/resource/>" + 
-            		"PREFIX chear: <http://hadatac.org/ont/chear#>" + 
-            		"PREFIX prov: <http://www.w3.org/ns/prov#>" + 
-            		"PREFIX hasco: <http://hadatac.org/ont/hasco/>" + 
-            		"PREFIX hasneto: <http://hadatac.org/ont/hasneto#>" + 
-            		"PREFIX dcterms: <http://purl.org/dc/terms/>" + 
-            		"PREFIX rdfs:<http://www.w3.org/2000/01/rdf-schema#>" + 
-            		"PREFIX skos: <http://www.w3.org/2004/02/skos/core#>" +
-            		"SELECT ?id ?superId ?label ?comment WHERE { " + 
+            	q = "SELECT ?id ?superId ?label ?comment WHERE { " + 
                     "   ?id rdfs:subClassOf* chear:ArsenicSpecies . " + 
                     "   ?id rdfs:subClassOf ?superId .  " + 
                     "   OPTIONAL { ?id rdfs:label ?label } . " + 
@@ -403,15 +278,7 @@ public class GetSparqlQuery {
                     "}";
                 break;
             case "Elements" :
-            	q = "PREFIX sio: <http://semanticscience.org/resource/>" + 
-            		"PREFIX chear: <http://hadatac.org/ont/chear#>" + 
-            		"PREFIX prov: <http://www.w3.org/ns/prov#>" + 
-            		"PREFIX hasco: <http://hadatac.org/ont/hasco/>" + 
-            		"PREFIX hasneto: <http://hadatac.org/ont/hasneto#>" + 
-            		"PREFIX dcterms: <http://purl.org/dc/terms/>" + 
-            		"PREFIX rdfs:<http://www.w3.org/2000/01/rdf-schema#>" + 
-            		"PREFIX skos: <http://www.w3.org/2004/02/skos/core#>" +
-            		"SELECT ?id ?superId ?label ?comment WHERE { " + 
+            	q = "SELECT ?id ?superId ?label ?comment WHERE { " + 
                     "   ?id rdfs:subClassOf* chear:Element . " + 
                     "   ?id rdfs:subClassOf ?superId .  " + 
                     "   OPTIONAL { ?id rdfs:label ?label } . " + 
@@ -419,15 +286,7 @@ public class GetSparqlQuery {
                     "}";
                 break;
             case "OrganicAromatic" :
-            	q = "PREFIX sio: <http://semanticscience.org/resource/>" + 
-            		"PREFIX chear: <http://hadatac.org/ont/chear#>" + 
-            		"PREFIX prov: <http://www.w3.org/ns/prov#>" + 
-            		"PREFIX hasco: <http://hadatac.org/ont/hasco/>" + 
-            		"PREFIX hasneto: <http://hadatac.org/ont/hasneto#>" + 
-            		"PREFIX dcterms: <http://purl.org/dc/terms/>" + 
-            		"PREFIX rdfs:<http://www.w3.org/2000/01/rdf-schema#>" + 
-            		"PREFIX skos: <http://www.w3.org/2004/02/skos/core#>" +
-            		"SELECT ?id ?superId ?label ?comment WHERE { " + 
+            	q = "SELECT ?id ?superId ?label ?comment WHERE { " + 
                     "   ?id rdfs:subClassOf* chear:OrganicAromaticCompound . " + 
                     "   ?id rdfs:subClassOf ?superId .  " + 
                     "   OPTIONAL { ?id rdfs:label ?label } . " + 
@@ -435,23 +294,19 @@ public class GetSparqlQuery {
                     "}";
                 break;
             case "Indicators" :
-            	q = "PREFIX rdfs:<http://www.w3.org/2000/01/rdf-schema#>" + 
-                        "PREFIX owl: <http://www.w3.org/2002/07/owl#>" + 
-                        "PREFIX hasneto: <http://hadatac.org/ont/hasneto#> " +
-                        "PREFIX chear: <http://hadatac.org/ont/chear#>" + 
-                        "PREFIX sio: <http://semanticscience.org/resource/>" +
-                    	"SELECT DISTINCT ?modelName ?superModelName ?label ?comment WHERE { " + 
+            	q = "SELECT DISTINCT ?modelName ?superModelName ?label ?comment WHERE { " + 
                         "   ?modelName rdfs:subClassOf* hasco:Indicator . " +
                         "   ?modelName rdfs:subClassOf ?superModelName .  " + 
                         "   OPTIONAL { ?modelName rdfs:label ?label } . " + 
                         " 	OPTIONAL { ?modelName rdfs:comment ?comment } . " +
                     	"}";
                 break;
-            default :
+            default:
             	q = "";
             	System.out.println("WARNING: no query for tab " + tabName);
         }
-        return q;
+        
+        return prefixes + " " + q;
     }
     
     public String executeQuery(String tab) {

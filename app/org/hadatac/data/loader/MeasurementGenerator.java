@@ -26,8 +26,6 @@ import org.hadatac.metadata.loader.URIUtils;
 import org.hadatac.utils.CollectionUtil;
 import org.hadatac.utils.Feedback;
 
-import com.typesafe.config.ConfigFactory;
-
 
 public class MeasurementGenerator extends BasicGenerator {
 
@@ -92,7 +90,7 @@ public class MeasurementGenerator extends BasicGenerator {
                 System.out.println(item);
             }
         }
-         */
+        */
 
         // ASSIGN values for tempPositionInt
         List<String> unknownHeaders = schema.defineTemporaryPositions(file.getHeaders());
@@ -327,7 +325,8 @@ public class MeasurementGenerator extends BasicGenerator {
             measurement.setSID("");
 
             if (da.hasCellScope()) {
-
+                System.out.println("da.hasCellScope() ===============");
+                
                 // Objects defined by Cell Scope
                 if (da.getCellScopeName().get(0).equals("*")) {
                     measurement.setStudyObjectUri(URIUtils.replacePrefixEx(da.getCellScopeUri().get(0).trim()));
@@ -349,6 +348,11 @@ public class MeasurementGenerator extends BasicGenerator {
                     id = record.getValueByColumnIndex(posId);
                 }
 
+                System.out.println("id: " + id);
+                System.out.println("posOriginalId: " + posOriginalId);
+                System.out.println("posId: " + posId);
+                System.out.println("\n");
+                
                 if (!id.equals("")) {
                     if (dasa.getEntity().equals(URIUtils.replacePrefixEx("sio:Human"))) {
                         if (mapIDStudyObjects.containsKey(id)) {
@@ -374,6 +378,7 @@ public class MeasurementGenerator extends BasicGenerator {
              *   SET ROLE URI              *
              *                             *
              *=============================*/
+            System.out.println("measurement.getStudyObjectUri(): " + measurement.getStudyObjectUri());
             if (objRoleMappings.containsKey(measurement.getStudyObjectUri())) {
                 measurement.setRoleUri(objRoleMappings.get(measurement.getStudyObjectUri()));
             } else {
@@ -445,7 +450,7 @@ public class MeasurementGenerator extends BasicGenerator {
             } else {
                 measurement.setEntityUri(dasa.getObjectUri());
             }
-            measurement.setCharacteristicUris(dasa.getAttribute());
+            measurement.setCharacteristicUris(dasa.getAttributes());
 
             /*======================================*
              *                                      *

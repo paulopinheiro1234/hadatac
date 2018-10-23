@@ -138,8 +138,6 @@ public class SDD {
     }
 
     public boolean checkStudyIndicatorPath(String str) {
-    	
-
     	List<String> list = new ArrayList<String>();
     	list.add("sio:TimeStamp");
     	list.add("sio:TimeInstant");

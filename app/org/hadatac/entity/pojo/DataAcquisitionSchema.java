@@ -211,34 +211,33 @@ public class DataAcquisitionSchema extends HADatAcThing {
             for (DataAcquisitionSchemaAttribute dasa : attributes) {
                 dasa.setDataAcquisitionSchema(this);
 
-                System.out.println("dasa.getAttribute(): " + dasa.getAttribute());
-                if (dasa.getAttribute().equals(URIUtils.replacePrefixEx("sio:TimeStamp"))) {
+                if (dasa.getAttributes().contains(URIUtils.replacePrefixEx("sio:TimeStamp"))) {
                     setTimestampLabel(dasa.getLabel());
                     System.out.println("[OK] DataAcquisitionSchema TimeStampLabel: " + dasa.getLabel());
                 }
-                if (dasa.getAttribute().equals(URIUtils.replacePrefixEx("sio:TimeInstant"))) {
+                if (dasa.getAttributes().contains(URIUtils.replacePrefixEx("sio:TimeInstant"))) {
                     setTimeInstantLabel(dasa.getLabel());
                     System.out.println("[OK] DataAcquisitionSchema TimeInstantLabel: " + dasa.getLabel());
                 }
-                if (dasa.getAttribute().equals(URIUtils.replacePrefixEx("hasco:namedTime"))) {
+                if (dasa.getAttributes().contains(URIUtils.replacePrefixEx("hasco:namedTime"))) {
                     setNamedTimeLabel(dasa.getLabel());
                     System.out.println("[OK] DataAcquisitionSchema NamedTimeLabel: " + dasa.getLabel());
                 }
-                if (dasa.getAttribute().equals(URIUtils.replacePrefixEx("hasco:uriId"))) {
+                if (dasa.getAttributes().contains(URIUtils.replacePrefixEx("hasco:uriId"))) {
                     setIdLabel(dasa.getLabel());
                     System.out.println("[OK] DataAcquisitionSchema IdLabel: " + dasa.getLabel());
                 }
-                if (dasa.getAttribute().equals(URIUtils.replacePrefixEx("chear:LevelOfDetection"))) {
+                if (dasa.getAttributes().contains(URIUtils.replacePrefixEx("chear:LevelOfDetection"))) {
                     setLODLabel(dasa.getLabel());
                     System.out.println("[OK] DataAcquisitionSchema LODLabel: " + dasa.getLabel());
                 }
-                if (dasa.getAttribute().equals(URIUtils.replacePrefixEx("hasco:originalID")) 
-                        || dasa.getAttribute().equals(URIUtils.replacePrefixEx("sio:Identifier")) 
-                        || Entity.getSubclasses(URIUtils.replacePrefixEx("hasco:originalID")).contains(dasa.getAttribute())) { 
+                if (dasa.getAttributes().contains(URIUtils.replacePrefixEx("hasco:originalID")) 
+                        || dasa.getAttributes().equals(URIUtils.replacePrefixEx("sio:Identifier")) 
+                        || Entity.getSubclasses(URIUtils.replacePrefixEx("hasco:originalID")).contains(dasa.getAttributes())) { 
                     setOriginalIdLabel(dasa.getLabel());
                     System.out.println("[OK] DataAcquisitionSchema IdLabel: " + dasa.getLabel());
                 }
-                if (dasa.getAttribute().equals(URIUtils.replacePrefixEx("hasco:hasEntity"))) {
+                if (dasa.getAttributes().contains(URIUtils.replacePrefixEx("hasco:hasEntity"))) {
                     setEntityLabel(dasa.getLabel());
                     System.out.println("[OK] DataAcquisitionSchema EntityLabel: " + dasa.getLabel());
                 }
@@ -256,7 +255,7 @@ public class DataAcquisitionSchema extends HADatAcThing {
                     }
                     System.out.println("[OK] DataAcquisitionSchema UnitLabel: " + getUnitLabel());
                 }
-                if (dasa.getAttribute().equals(URIUtils.replacePrefixEx("sio:InRelationTo"))) {
+                if (dasa.getAttributes().contains(URIUtils.replacePrefixEx("sio:InRelationTo"))) {
                     setInRelationToLabel(dasa.getLabel());
                     System.out.println("[OK] DataAcquisitionSchema InRelationToLabel: " + dasa.getLabel());
                 }

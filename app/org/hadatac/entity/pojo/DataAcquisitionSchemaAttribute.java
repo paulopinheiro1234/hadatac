@@ -7,14 +7,8 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.jena.query.Query;
-import org.apache.jena.query.QueryExecution;
-import org.apache.jena.query.QueryExecutionFactory;
-import org.apache.jena.query.QueryFactory;
 import org.apache.jena.query.QueryParseException;
 import org.apache.jena.query.QuerySolution;
-import org.apache.jena.query.ResultSet;
-import org.apache.jena.query.ResultSetFactory;
 import org.apache.jena.query.ResultSetRewindable;
 import org.apache.jena.update.UpdateExecutionFactory;
 import org.apache.jena.update.UpdateFactory;
@@ -60,8 +54,8 @@ public class DataAcquisitionSchemaAttribute extends HADatAcThing {
     private int    tempPositionInt;
     private String entity;
     private String entityLabel;
-    private List<String> attribute;
-    private List<String> attributeLabel;
+    private List<String> attributes;
+    private List<String> attributeLabels;
     private String unit;
     private String unitLabel;
     private String daseUri;
@@ -78,7 +72,7 @@ public class DataAcquisitionSchemaAttribute extends HADatAcThing {
         this.position = "";
         this.positionInt = -1;
         this.setEntity("");
-        this.setAttribute(Arrays.asList(""));
+        this.setAttributes(Arrays.asList(""));
         this.setUnit("");
         this.daseUri = "";
         this.dasoUri = "";
@@ -91,7 +85,7 @@ public class DataAcquisitionSchemaAttribute extends HADatAcThing {
             String partOfSchema,
             String position, 
             String entity, 
-            List<String> attribute, 
+            List<String> attributes, 
             String unit, 
             String daseUri, 
             String dasoUri) {
@@ -110,7 +104,7 @@ public class DataAcquisitionSchemaAttribute extends HADatAcThing {
             positionInt = -1;
         }
         this.setEntity(entity);
-        this.setAttribute(attribute);
+        this.setAttributes(attributes);
         this.setUnit(unit);
         this.daseUri = daseUri;
         this.dasoUri = dasoUri;
@@ -252,44 +246,44 @@ public class DataAcquisitionSchemaAttribute extends HADatAcThing {
         return annotation;
     }
 
-    public List<String> getAttribute() {
-        if (attribute == null) {
+    public List<String> getAttributes() {
+        if (attributes == null) {
             return Arrays.asList("");
         } else {
-            return attribute;
+            return attributes;
         }
     }
 
     public List<String> getAttributeNamespace() {
-        if (attribute == Arrays.asList("")) {
-            return attribute;
+        if (attributes == Arrays.asList("")) {
+            return attributes;
         }
         List<String> answer = new ArrayList<String>();
-        for (String attr : attribute) {
+        for (String attr : attributes) {
             answer.add(URIUtils.replaceNameSpaceEx(attr.replace("<","").replace(">","")));
         }
         return answer;
     }
 
-    public void setAttribute(List<String> attribute) {
-        this.attribute = attribute;
-        if (attribute == null || attribute.size() < 1 ) {
-            this.attributeLabel = Arrays.asList("");
+    public void setAttributes(List<String> attributes) {
+        this.attributes = attributes;
+        if (attributes == null || attributes.size() < 1 ) {
+            this.attributeLabels = Arrays.asList("");
         } else {
         	List<String> answer = new ArrayList<String>();
-        	for (String attr : attribute) {
+        	for (String attr : attributes) {
         		if (FirstLabel.getLabel(attr).equals("")) {
         			answer.add(attr);
         		} else {
         			answer.add(FirstLabel.getLabel(attr));
         		}
         	}
-            this.attributeLabel = answer;
+            this.attributeLabels = answer;
         }
         
         this.isMeta = true;
         
-        for (String attr : attribute) {
+        for (String attr : attributes) {
         	if (!DataAcquisitionSchema.METADASA.contains(URIUtils.replaceNameSpaceEx(attr))) {
         		this.isMeta = false;
         	}
@@ -297,21 +291,21 @@ public class DataAcquisitionSchemaAttribute extends HADatAcThing {
     }
 
     public List<String> getAttributeLabel() {
-        if (attributeLabel.equals(Arrays.asList(""))) {
+        if (attributeLabels.equals(Arrays.asList(""))) {
             return Arrays.asList("");
         }
-        return attributeLabel;
+        return attributeLabels;
     }
 
     public List<String> getAnnotatedAttribute() {
         List<String> annotation;
-        if (attributeLabel.equals(Arrays.asList(""))) {
-            if (attribute == null || attribute.equals(Arrays.asList(""))) {
+        if (attributeLabels.equals(Arrays.asList(""))) {
+            if (attributes == null || attributes.equals(Arrays.asList(""))) {
                 return Arrays.asList("");
             }
             annotation = Arrays.asList("");
         } else {
-            annotation = attributeLabel;
+            annotation = attributeLabels;
         }
         if (!getAttributeNamespace().equals(Arrays.asList(""))) {
         	for (String anno : annotation) {
@@ -422,7 +416,7 @@ public class DataAcquisitionSchemaAttribute extends HADatAcThing {
     }
 
     public String getObjectViewLabel() {
-        if (attribute.equals(URIUtils.replaceNameSpaceEx("hasco:originalID"))) {
+        if (attributes.equals(URIUtils.replaceNameSpaceEx("hasco:originalID"))) {
             return "[DefaultObject]";
         }
         if (isMeta) {
@@ -559,7 +553,6 @@ public class DataAcquisitionSchemaAttribute extends HADatAcThing {
             }
             if (soln.get("hasAttribute") != null) {
                 attributeList.add(soln.get("hasAttribute").toString());
-                System.out.println("print-solrhasAttribute : " + attributeList);
             }
             if (soln.get("hasUnit") != null) {
                 unitStr = soln.get("hasUnit").toString();
@@ -745,7 +738,7 @@ public class DataAcquisitionSchemaAttribute extends HADatAcThing {
         row.put("rdfs:comment", getLabel());
         row.put("hasco:partOfSchema", URIUtils.replaceNameSpaceEx(getPartOfSchema()));
         row.put("hasco:hasEntity", this.getEntity());
-        row.put("hasco:hasAttribute", this.getAttribute());
+        row.put("hasco:hasAttribute", this.getAttributes());
         row.put("hasco:hasUnit", this.getUnit());
         row.put("hasco:hasEvent", URIUtils.replaceNameSpaceEx(daseUri));
         row.put("hasco:hasSource", "");
@@ -815,8 +808,8 @@ public class DataAcquisitionSchemaAttribute extends HADatAcThing {
         if (!entity.equals("")) {
             insert += this.getUri() + " hasco:hasEntity "  + entity + " .  ";
         }   
-        if (!attribute.equals("")) {
-            insert += this.getUri() + " hasco:hasAttribute " + attribute + " .  ";
+        if (!attributes.equals("")) {
+            insert += this.getUri() + " hasco:hasAttribute " + attributes + " .  ";
         }
         if (!unit.equals("")) {
             insert += this.getUri() + " hasco:hasUnit " + unit + " .  ";

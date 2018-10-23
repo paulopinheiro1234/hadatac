@@ -1101,7 +1101,7 @@ public class ObjectAccessSpec extends HADatAcThing {
                 for (String attr : dasa.getAttributeLabel()) {
                     dataAcquisition.addCharacteristic(attr);
                 }
-                for (String attr : dasa.getAttribute()) {
+                for (String attr : dasa.getAttributes()) {
                     dataAcquisition.addCharacteristicUri(attr);
                 }
                 dataAcquisition.addEntity(dasa.getEntityLabel());

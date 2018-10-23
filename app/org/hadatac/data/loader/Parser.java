@@ -442,7 +442,7 @@ public class Parser {
                 } else {
                     measurement.setEntityUri(dasa.getObjectUri());
                 }
-                measurement.setCharacteristicUris(dasa.getAttribute());
+                measurement.setCharacteristicUris(dasa.getAttributes());
 
                 /*======================================*
                  *                                      *

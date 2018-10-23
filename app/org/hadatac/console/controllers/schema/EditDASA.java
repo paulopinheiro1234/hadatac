@@ -85,7 +85,7 @@ public class EditDASA extends Controller {
 		String newLabel = data.getNewLabel();
 		String newPosition = data.getNewPosition();
 		String newEntity = getUriFromNew(data.getNewEntity());
-		List<String> newAttribute = getUriListFromNew(data.getNewAttribute());
+		List<String> newAttributes = getUriListFromNew(data.getNewAttribute());
 		String newUnit = getUriFromNew(data.getNewUnit());
 		String newObject = data.getNewObject();
 		String newEvent = data.getNewEvent();
@@ -109,8 +109,8 @@ public class EditDASA extends Controller {
 			if (olddasa.getEntity() != null && !olddasa.getEntity().equals(newEntity)) {
 				changedInfos.add(newEntity);
 			}
-			if (olddasa.getAttribute() == null || !olddasa.getAttribute().equals(newAttribute)) {
-				changedInfos.add(newAttribute.get(0));
+			if (olddasa.getAttributes() == null || !olddasa.getAttributes().equals(newAttributes)) {
+				changedInfos.add(newAttributes.get(0));
 			}
 			if (olddasa.getUnit() == null || !olddasa.getUnit().equals(newUnit)) {
 				changedInfos.add(newUnit);
@@ -139,7 +139,7 @@ public class EditDASA extends Controller {
 		olddasa.setLabel(newLabel);
 		olddasa.setPosition(newPosition);
 		olddasa.setEntity(newEntity);
-		olddasa.setAttribute(newAttribute);
+		olddasa.setAttributes(newAttributes);
 		olddasa.setUnit(newUnit);
 		olddasa.setObjectUri(DataAcquisitionSchemaObject.findUriFromRole(data.getNewObject(),das.getObjects()));
 		olddasa.setEventUri(newEvent);
