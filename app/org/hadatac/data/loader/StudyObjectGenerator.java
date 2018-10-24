@@ -48,7 +48,7 @@ public class StudyObjectGenerator extends BasicGenerator {
         this.oc_timescope = listContent.get(3);
         System.out.println("oc_timescope : " + oc_timescope);
         this.role = listContent.get(4);
-        System.out.println("role : " + role);     
+        System.out.println("role : " + role);
         uriMap.put("hasco:SubjectGroup", "SBJ-");
         uriMap.put("hasco:SampleCollection", "SPL-");
         uriMap.put("hasco:TimeCollection", "TIME-");
@@ -85,7 +85,12 @@ public class StudyObjectGenerator extends BasicGenerator {
             auxstr = auxstr.replaceAll("-","");
         }
         
-        return auxstr + " " + getOriginalID(rec) + " - " + study_id;
+        String originalID = getOriginalID(rec);
+        if (URIUtils.isValidURI(originalID)) {
+            return URIUtils.getBaseName(originalID);
+        }
+        
+        return auxstr + " " + originalID + " - " + study_id;
     }
 
     private String getOriginalID(Record rec) {

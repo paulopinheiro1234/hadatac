@@ -576,9 +576,6 @@ public class AnnotationWorker {
 
         RecordFile SSDsheet = new SpreadsheetRecordFile(file.getFile(), "SSD");
 
-        //System.out.println(file_name);
-        //System.out.println(ssdName);
-
         SSDGeneratorChain chain = new SSDGeneratorChain();
 
         if (SSDsheet.isValid()) {
@@ -608,13 +605,7 @@ public class AnnotationWorker {
         for (String i : mapCatalog.keySet()) {
             if (mapCatalog.get(i).length() > 0) {
                 RecordFile SOsheet = new SpreadsheetRecordFile(file.getFile(), mapCatalog.get(i).replace("#", ""));
-                //System.out.println(SOsheet.getSheetName() + " is parsed!");
                 chain.addGenerator(new StudyObjectGenerator(SOsheet, mapContent.get(i), mapContent, study_uri));
-                //System.out.println(SOsheet.getNumberOfSheets() + " number of sheets!");
-                //System.out.println(SOsheet.getHeaders() + " number of sheets!");            	
-                //for (Record ii : SOsheet.getRecords()){
-                //    System.out.println(ii.getValueByColumnIndex(0) + " is added to chain!");	
-                //}
             }
         }
 
