@@ -46,8 +46,8 @@ public class EditingOptions extends Controller {
 		return units;
 	}
 	
-	public static OtMSparqlQueryResults getHierarchy() {
-		Hierarchy hierarchy = new Hierarchy();
+	public static OtMSparqlQueryResults getHierarchy(String className) {
+		Hierarchy hierarchy = new Hierarchy(className);
 		String json = hierarchy.getHierarchyJson();
 		OtMSparqlQueryResults hierarchies = new OtMSparqlQueryResults(json);
 		return hierarchies;

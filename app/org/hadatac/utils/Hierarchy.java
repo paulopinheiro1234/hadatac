@@ -30,8 +30,11 @@ public class Hierarchy {
 	public  String label = "";
     public  String comment = "";
     
-    public Hierarchy () {
-		this.className = "owl:Thing"; 
+    public Hierarchy (String className) {
+        if(className.isEmpty())
+            this.className = "owl:Thing";
+        else
+		    this.className = className; 
     }
     
     @JsonIgnore

@@ -1,5 +1,7 @@
 @(oper       : String,
-  hierarchy   : org.hadatac.console.models.OtMSparqlQueryResults)
+  className : String,
+  hierarchy   : org.hadatac.console.models.OtMSparqlQueryResults,
+  cacheList : List[String])
 
 @import org.hadatac.console.views.html._
 @import org.hadatac.entity.pojo.DataAcquisitionSchema
@@ -60,50 +62,53 @@
 
    <div class="container-fluid">
 
-      <h2>Browse Ontology</h2>
-    
-      <div class="col-md-2 col-xs-2">
-
-        <form class="form-horizontal" name="editForm" method="post" action="">
-        
-            <label>Operations</label><br>
-            <div class="form-group">
-                <button type="button" class="btn btn-info btn-sm" role="button" type="expand" id="expand">
-                    <span class="glyphicon glyphicon-zoom-in">  </span> Expand All
-                </button>
-                <button type="button" class="btn btn-info btn-sm" role="button" type="collapse" id="collapse">    
-                    <span class="glyphicon glyphicon-zoom-out"> </span> Collapse All
-                </button>
-                <button type="button" class="btn btn-info btn-sm" role="button" type="reset" id="reset">       
-                    <span class="glyphicon glyphicon-refresh">  </span> Reset
-                </button>
-                <div>
-                    <button type="button" class="btn btn-info btn-sm" role="button" type="findTerm" id="findTerm">    
-                        <span class="glyphicon glyphicon-search">   </span> Find Term
-                    </button> 
-                    <input type="text"  id="searchValue" name="searchValue" value="">
+      <h2>Browse Loaded Ontologies</h2>
+      <div class="col-md-12 col-sm-12" style="margin-bottom:0px;">
+            <form class="form-horizontal" name="editForm" method="post" action="" onkeypress="return event.keyCode != 13;" style="float:right;margin-right:15px;">
+                <div class="form-group">
+                    <div style="display: inline-block;">
+                        <input type="text"  id="searchValue" name="searchValue" value="">
+                        <button type="button" class="btn btn-info btn-sm" role="button" type="findTerm" id="findTerm">    
+                            <span class="glyphicon glyphicon-search">   </span> Find Term
+                        </button> 
+                    </div>
+                    <button type="button" class="btn btn-info btn-sm" role="button" type="expand" id="expand" style="display: inline-block;">
+                        <span class="glyphicon glyphicon-zoom-in">  </span> Expand All
+                    </button>
+                    <button type="button" class="btn btn-info btn-sm" role="button" type="collapse" id="collapse" style="display: inline-block;">    
+                        <span class="glyphicon glyphicon-zoom-out"> </span> Collapse All
+                    </button>
+                    <button type="button" class="btn btn-info btn-sm" role="button" type="reset" id="reset" style="display: inline-block;">       
+                        <span class="glyphicon glyphicon-refresh">  </span> Reset
+                    </button>
+                    
                 </div>
-            </div>
-
-            <div class="form-group">
-                <input type="hidden" class="form-control col-sm-6" id="newEntity" name="newEntity" value="" readonly>
-            </div> 
+    
+                <div class="form-group" style="display:none">
+                    <input type="hidden" class="form-control col-sm-6" id="newEntity" name="newEntity" value="" readonly>
+                </div> 
+                
+                <div class="form-group" style="display:none">
+                    <input type="hidden" class="form-control col-sm-6" id="newAttribute" name="newAttribute" value="" readonly>
+                </div>
             
-            <div class="form-group">
-                <input type="hidden" class="form-control col-sm-6" id="newAttribute" name="newAttribute" value="" readonly>
-            </div>
+            
+                <div class="form-group" style="display:none">
+                    <input type="hidden" class="form-control col-sm-6" id="newUnit" name="newUnit" value="" readonly>
+                </div>
+            
+                <div class="form-group" style="display:none">
+                    <input class="btn btn-success btn-sm" role="button" type="hidden" id="submit" value="Update DASA" />
+                    <input class="btn btn-success btn-sm" role="button" type="hidden" id="copyvalue" value="Copy Selected Value" /> <br>
+                </div> 
         
-        
-            <div class="form-group">
-                <input type="hidden" class="form-control col-sm-6" id="newUnit" name="newUnit" value="" readonly>
-            </div>
-        
-            <div class="form-group">
-                <input class="btn btn-success btn-sm" role="button" type="hidden" id="submit" value="Update DASA" />
-                <input class="btn btn-success btn-sm" role="button" type="hidden" id="copyvalue" value="Copy Selected Value" /> <br>
-            </div> 
-
-        </form>
+            </form>
+      </div>
+      <div class="col-md-2 col-xs-2">
+        <h4>Cached Ontologies</h4>
+        @for(cachedFile <- cacheList) {
+            <button class="btn btn-info btn-md" style="display:block;margin-bottom:10px">@cachedFile</button>
+        }
       </div>
       <div class="col-md-10 col-xs-6">
 
