@@ -9,9 +9,7 @@ import java.util.Map;
 import org.hadatac.utils.ConfigProp;
 import org.hadatac.metadata.loader.URIUtils;
 import org.hadatac.entity.pojo.HADatAcThing;
-import org.hadatac.entity.pojo.Study;
 import org.hadatac.entity.pojo.StudyObject;
-import org.hadatac.entity.pojo.ObjectCollection;
 
 
 public class StudyObjectGenerator extends BasicGenerator {
@@ -34,14 +32,9 @@ public class StudyObjectGenerator extends BasicGenerator {
         file_name = file.getFile().getName();
         System.out.println("We are in StudyObject Generator!");
         System.out.println("Study URI: " + study_uri);
-        //if (study_uri != null && !study_uri.equals("")) {
-        	//study = Study.find(study_uri);
-            //if (study != null) {
-            	//study_id = study.getLabel();
-            //} else {
-                study_id = file.getFile().getName().replaceAll("SSD-", "").replaceAll(".xlsx", "");
-            //}
-        //}
+
+        study_id = file.getFile().getName().replaceAll("SSD-", "").replaceAll(".xlsx", "");
+
         setStudyUri(study_uri);       
         this.listCache = listContent;
         System.out.println(listContent);
@@ -55,10 +48,7 @@ public class StudyObjectGenerator extends BasicGenerator {
         this.oc_timescope = listContent.get(3);
         System.out.println("oc_timescope : " + oc_timescope);
         this.role = listContent.get(4);
-        System.out.println("role : " + role);
-        //if (oc_uri != null && !oc_uri.equals("")) {
-        //	oc = oc.find(URIUtils.replacePrefixEx(oc_uri));
-        //}        
+        System.out.println("role : " + role);     
         uriMap.put("hasco:SubjectGroup", "SBJ-");
         uriMap.put("hasco:SampleCollection", "SPL-");
         uriMap.put("hasco:TimeCollection", "TIME-");
@@ -75,78 +65,90 @@ public class StudyObjectGenerator extends BasicGenerator {
     }
 
     private String getUri(Record rec) {
-        return kbPrefix + uriMap.get(oc_type) + getOriginalID(rec) + "-" + study_id;
+        String originalID = getOriginalID(rec);
+        if (URIUtils.isValidURI(originalID)) {
+            return URIUtils.replaceNameSpaceEx(originalID);
+        }
+        
+        return kbPrefix + uriMap.get(oc_type) + originalID + "-" + study_id;
     }
 
     private String getType(Record rec) {
         return rec.getValueByColumnName(mapCol.get("rdf:type"));
     }
-    
+
     private String getLabel(Record rec) {
-        return uriMap.get(oc_type).replaceAll("-", "") + " " + getOriginalID(rec) + " - " + study_id;
+        String auxstr = uriMap.get(oc_type);
+        if (auxstr == null) {
+            auxstr = "";
+        } else {
+            auxstr = auxstr.replaceAll("-","");
+        }
+        
+        return auxstr + " " + getOriginalID(rec) + " - " + study_id;
     }
 
     private String getOriginalID(Record rec) {
-        return rec.getValueByColumnName(mapCol.get("originalID")).replaceAll("(?<=^\\d+)\\.0*$", "");
+        String auxstr = rec.getValueByColumnName(mapCol.get("originalID"));
+        if (auxstr == null) {
+            return "";
+        } 
+        auxstr = auxstr.replaceAll("\\s+","");
+        
+        return auxstr.replaceAll("(?<=^\\d+)\\.0*$", "");
     }
-    
+
     private String getCohortUri(Record rec) {
         return oc_uri;
     }
-    
+
     private String getScopeUri(Record rec) {
-    	
-    	if (oc_scope.length() > 0){
-        	String scopeOCtype = mapContent.get(oc_scope).get(1);
+        if (oc_scope.length() > 0){
+            String scopeOCtype = mapContent.get(oc_scope).get(1);
             return kbPrefix + uriMap.get(scopeOCtype) + rec.getValueByColumnName(mapCol.get("scopeID")).replaceAll("(?<=^\\d+)\\.0*$", "") + "-" + study_id;
-    	} else {
-    		return "";
-    	}
+        } else {
+            return "";
+        }
     }
 
     private String getTimeScopeUri(Record rec) {
-    	
-    	if (oc_timescope.length() > 0){
-        	String timeScopeOCtype = mapContent.get(oc_timescope).get(1);
+        if (oc_timescope.length() > 0){
+            String timeScopeOCtype = mapContent.get(oc_timescope).get(1);
             return kbPrefix + uriMap.get(timeScopeOCtype) + rec.getValueByColumnName(mapCol.get("timeScopeID")).replaceAll("(?<=^\\d+)\\.0*$", "") + "-" + study_id;
-    	} else {
-    		return "";
-    	}
+        } else {
+            return "";
+        }
     }
-//
+    
     public StudyObject createStudyObject(Record record) throws Exception {
-    	//System.out.println(getUri(record));
+        //System.out.println(getUri(record));
         StudyObject obj = new StudyObject(getUri(record), getType(record), 
-					  getOriginalID(record), getLabel(record), 
-					  getCohortUri(record), getLabel(record));
+                getOriginalID(record), getLabel(record), 
+                getCohortUri(record), getLabel(record));
         obj.setRoleUri(URIUtils.replacePrefixEx(role));
         obj.addScopeUri(getScopeUri(record));
         obj.addTimeScopeUri(getTimeScopeUri(record));
         return obj;
     }
-    
+
     @Override
     HADatAcThing createObject(Record rec, int row_number) throws Exception {
         return createStudyObject(rec);
     }
-	
+
     @Override
     Map<String, Object> createRow(Record rec, int row_number) throws Exception {
         if (getOriginalID(rec).length() > 0) {
             Map<String, Object> row = new HashMap<String, Object>();
             row.put("hasURI", getUri(rec));
-            /*if (role.length() > 0){
-            	//row.put("a", role);	
-            	//row.put(role, OBJECT THAT THIS OBJECT IS A ROLE OF);	
-		}*/
             return row;
         }
+        
         return null;
     }
 
     @Override
-    public void preprocess() throws Exception {
-    }
+    public void preprocess() throws Exception {}
 
     @Override
     public String getTableName() {

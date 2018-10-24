@@ -16,5 +16,5 @@ uo=http://purl.obolibrary.org/obo/UO_,application/rdf+xml,http://purl.obolibrary
 obo=http://geneontology.org/GO.format.obo-1_2.shtml#,,
 chebi=http://purl.obolibrary.org/obo/CHEBI_,,
 skos=http://www.w3.org/2004/02/skos/core#,,
-envo=http://purl.obolibrary.org/obo/ENVO_,application/rdf+xml,https://raw.githubusercontent.com/EnvironmentOntology/envo/master/envo.owl
+envo=http://purl.obolibrary.org/obo/ENVO_,application/rdf+xml,https://raw.githubusercontent.com/environmentontology/envo/master/envo.owl
 pato=http://purl.obolibrary.org/obo/PATO_,application/rdf+xml,https://raw.githubusercontent.com/pato-ontology/pato/master/pato.owl

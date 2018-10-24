@@ -7,9 +7,7 @@ import play.mvc.Controller;
 import play.mvc.Result;
 import play.data.*;
 
-import org.hadatac.console.views.html.*;
 import org.hadatac.console.views.html.studies.*;
-import org.hadatac.console.views.html.annotator.*;
 import org.hadatac.console.controllers.studies.routes;
 import org.hadatac.entity.pojo.Agent;
 import org.hadatac.entity.pojo.ObjectAccessSpec;
@@ -17,7 +15,7 @@ import org.hadatac.entity.pojo.DataFile;
 import org.hadatac.entity.pojo.Study;
 import org.hadatac.entity.pojo.StudyType;
 import org.hadatac.metadata.loader.URIUtils;
-import org.labkey.remoteapi.CommandException;
+import org.hadatac.utils.ConfigProp;
 
 import be.objectify.deadbolt.java.actions.Group;
 import be.objectify.deadbolt.java.actions.Restrict;
@@ -34,7 +32,7 @@ public class NewStudy extends Controller {
 
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
     public Result index() {
-        if (session().get("LabKeyUserName") == null && session().get("LabKeyPassword") == null) {
+        if (ConfigProp.getLabKeyLoginRequired() && session().get("LabKeyUserName") == null && session().get("LabKeyPassword") == null) {
             return redirect(org.hadatac.console.controllers.triplestore.routes.LoadKB.logInLabkey(
                     routes.NewStudy.index().url()));
         }
@@ -48,7 +46,7 @@ public class NewStudy extends Controller {
 
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
     public Result indexFromFile(String filename) {
-        if (session().get("LabKeyUserName") == null && session().get("LabKeyPassword") == null) {
+        if (ConfigProp.getLabKeyLoginRequired() && session().get("LabKeyUserName") == null && session().get("LabKeyPassword") == null) {
             return redirect(org.hadatac.console.controllers.triplestore.routes.LoadKB.logInLabkey(
                     routes.NewStudy.indexFromFile(filename).url()));
         }
@@ -117,13 +115,16 @@ public class NewStudy extends Controller {
         std.save();
 
         // update/create new STD in LabKey
-        int nRowsAffected = std.saveToLabKey(session().get("LabKeyUserName"), session().get("LabKeyPassword"));
-        if (nRowsAffected <= 0) {
-            return badRequest("Failed to insert new STD to LabKey!\n");
+        if (ConfigProp.getLabKeyLoginRequired()) {
+            int nRowsAffected = std.saveToLabKey(session().get("LabKeyUserName"), session().get("LabKeyPassword"));
+            if (nRowsAffected <= 0) {
+                return badRequest("Failed to insert new STD to LabKey!\n");
+            }
         }
 
         System.out.println("Inserting new Study from file. filename:  " + filename + "   da : [" + URIUtils.replacePrefixEx(da_uri) + "]");
         System.out.println("Inserting new Study from file. Study URI : [" + std.getUri() + "]");
+        
         // when a new study is created in the scope of a datafile, the new study needs to be associated to the datafile's DA 
         if (filename != null && !filename.equals("") && da_uri != null && !da_uri.equals("")) {
             ObjectAccessSpec da = ObjectAccessSpec.findByUri(URIUtils.replacePrefixEx(da_uri));
@@ -131,7 +132,7 @@ public class NewStudy extends Controller {
                 da.setStudyUri(std.getUri());
                 
                 System.out.println("Inserting new Study from file. Found DA");
-                if (da.saveToLabKey(session().get("LabKeyUserName"), session().get("LabKeyPassword")) > 0) {
+                if (!ConfigProp.getLabKeyLoginRequired() || da.saveToLabKey(session().get("LabKeyUserName"), session().get("LabKeyPassword")) > 0) {
                     da.save();
                 } else {
                     System.out.println("[WARNING] Could not update DA from associated DataFile when creating a new study");
@@ -140,6 +141,7 @@ public class NewStudy extends Controller {
                 System.out.println("[WARNING] DA from associated DataFile not found when creating a new study");
             }
         }
+        
         return ok(newStudyConfirm.render(std, filename, da_uri));
     }
 }

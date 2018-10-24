@@ -28,16 +28,14 @@ createdDate=Project Created Date
 updatedDate=Project Last Updated Date
 DCAccessBool=DC Access?
 
-# ACQ (DA and DEPLOYMENT) Template
-DataAcquisitionName=name
+# OAS Template
+DataAcquisitionName=da name
 Method=method
-DAStudyName=study
+DAStudyName=Study ID
 DataDictionaryName=data dict
 Epi/Lab=epi/lab
 OwnerEmail=owner email
 PermissionURI=permission uri
-
-# OAS Template
 DeploymentUri=deployment uri
 CellScope=cell scope
 

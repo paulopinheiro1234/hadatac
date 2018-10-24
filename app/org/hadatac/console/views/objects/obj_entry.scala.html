@@ -23,29 +23,29 @@
 	       value="@if(obj.getOriginalId() != null) { @obj.getOriginalId() }" onchange="checkform()">
      </td>
 
-     @if(obj.getScopeUris().size() > 0) {
+     @if(obj.getScopeUris() != null && obj.getScopeUris().size() > 0) {
         @for(scope <- obj.getScopeUris()) {
             <td>
 	        <input type="text" class="form-control" name="newIsFrom[]" id="newIsFrom@if(obj.getUri() != null) {-@obj.getUri() }" 
-	               value="@if(scope != null) { @StudyObject.find(scope).getLabel() }" onchange="checkform()" readonly>
+	               value="@if(scope != null && StudyObject.find(scope) != null) { @StudyObject.find(scope).getLabel() }" onchange="checkform()" readonly>
             </td>
         }
      }
 
-     @if(obj.getTimeScopeUris().size() > 0) {
+     @if(obj.getTimeScopeUris() != null && obj.getTimeScopeUris().size() > 0) {
         @for(timeScope <- obj.getTimeScopeUris()) {
             <td>
 	        <input type="text" class="form-control" name="newIsFrom[]" id="newIsFrom@if(obj.getUri() != null) {-@obj.getUri() }" 
-	               value="@if(timeScope != null) { @StudyObject.find(timeScope).getLabel() }" onchange="checkform()" readonly>
+	               value="@if(timeScope != null && StudyObject.find(timeScope) != null) { @StudyObject.find(timeScope).getLabel() }" onchange="checkform()" readonly>
             </td>
         }
      }
 
-     @if(obj.getSpaceScopeUris().size() > 0) {
+     @if(obj.getSpaceScopeUris() != null && obj.getSpaceScopeUris().size() > 0) {
         @for(spaceScope <- obj.getSpaceScopeUris()) {
             <td>
 	        <input type="text" class="form-control" name="newIsFrom[]" id="newIsFrom@if(obj.getUri() != null) {-@obj.getUri() }" 
-	               value="@if(spaceScope != null) { @StudyObject.find(spaceScope).getLabel() }" onchange="checkform()" readonly>
+	               value="@if(spaceScope != null && StudyObject.find(spaceScope) != null) { @StudyObject.find(spaceScope).getLabel() }" onchange="checkform()" readonly>
             </td>
         }
      }

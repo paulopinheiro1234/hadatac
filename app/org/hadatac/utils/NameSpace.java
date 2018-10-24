@@ -149,7 +149,7 @@ public class NameSpace {
 	public void loadTriples(String address, boolean fromRemote) {
         try {
             Repository repo = new SPARQLRepository(
-                    CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_GRAPH));
+                    CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_UPDATE));
             repo.initialize();
             RepositoryConnection con = repo.getConnection();
             ValueFactory factory = repo.getValueFactory();
@@ -165,17 +165,21 @@ public class NameSpace {
             System.out.println("RiotNotFoundException: address " + address);
             System.out.println("RiotNotFoundException: " + e.getMessage());
         } catch (Exception e) {
+            e.printStackTrace();
             System.out.println("Exception: address " + address);
             System.out.println("Exception: " + e.getMessage());
         }
     }
 	
 	public void deleteTriples() {
-        String graphUri = getName();
-        if (!graphUri.isEmpty()) {
+	    deleteTriplesByNamedGraph(getName());
+	}
+	
+	public static void deleteTriplesByNamedGraph(String namedGraphUri) {
+        if (!namedGraphUri.isEmpty()) {
             String queryString = "";
             queryString += NameSpaces.getInstance().printSparqlNameSpaceList();
-            queryString += "WITH <" + graphUri + "> ";
+            queryString += "WITH <" + namedGraphUri + "> ";
             queryString += "DELETE { ?s ?p ?o } WHERE { ?s ?p ?o . } ";
             
             UpdateRequest req = UpdateFactory.create(queryString);

@@ -11,6 +11,7 @@ import org.hadatac.console.controllers.indicators.routes;
 import org.hadatac.console.controllers.metadata.DynamicFunctions;
 import org.hadatac.entity.pojo.Indicator;
 import org.hadatac.metadata.loader.URIUtils;
+import org.hadatac.utils.ConfigProp;
 
 import be.objectify.deadbolt.java.actions.Group;
 import be.objectify.deadbolt.java.actions.Restrict;
@@ -26,14 +27,14 @@ public class NewIndicator extends Controller {
 
 	@Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
 	public Result index() {
-		if (session().get("LabKeyUserName") == null && session().get("LabKeyPassword") == null) {
+		if (ConfigProp.getLabKeyLoginRequired() && session().get("LabKeyUserName") == null && session().get("LabKeyPassword") == null) {
 			return redirect(org.hadatac.console.controllers.triplestore.routes.LoadKB.logInLabkey(
 					routes.NewIndicator.index().url()));
 		}
 		// may need addressing
 		Indicator indicator = new Indicator();
+		
 		return ok(newIndicator.render(indicator));
-
 	}
 
 	@Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
@@ -69,9 +70,11 @@ public class NewIndicator extends Controller {
 		ind.save();
 
 		// update/create new indicator in LabKey
-		int nRowsAffected = ind.saveToLabKey(session().get("LabKeyUserName"), session().get("LabKeyPassword"));
-		if (nRowsAffected <= 0) {
-			return badRequest("Failed to insert new indicator to LabKey!\n");
+		if (ConfigProp.getLabKeyLoginRequired()) {
+		    int nRowsAffected = ind.saveToLabKey(session().get("LabKeyUserName"), session().get("LabKeyPassword"));
+		    if (nRowsAffected <= 0) {
+		        return badRequest("Failed to insert new indicator to LabKey!\n");
+		    }
 		}
 
 		return ok(newIndicatorConfirm.render(ind));

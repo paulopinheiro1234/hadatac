@@ -29,13 +29,22 @@ then HADATAC_HOME=~/hadatac-solr
 else HADATAC_HOME=$response
 fi
 
+echo ""
+read -r -p "Directory of installation [~/hadatac-blazegraph]: " response
+if [ "$response" == "" ]
+then BLAZEGRAPH_HOME=~/hadatac-blazegraph
+else BLAZEGRAPH_HOME=$response
+fi
+
 HADATAC_DOWNLOAD=$HADATAC_HOME/download
 HADATAC_SOLR=$HADATAC_HOME/solr
 SOLR6_HOME=$HADATAC_SOLR/solr-6.5.0
+JETTY_NAME=jetty-distribution-9.4.12.v20180830
 
 mkdir $HADATAC_HOME
 mkdir $HADATAC_DOWNLOAD
 mkdir $HADATAC_SOLR
+mkdir $BLAZEGRAPH_HOME
 
 cp -R solr/ $HADATAC_SOLR
 
@@ -72,4 +81,25 @@ wait $!
 
 cp $HADATAC_DOWNLOAD/jts-1.14/lib/* $HADATAC_SOLR/solr-6.5.0/server/solr-webapp/webapp/WEB-INF/lib/
 
+echo "=== Starting Apache Solr 6.5.0..."
 sh $HADATAC_SOLR/run_solr6.sh restart
+
+echo "=== Downloading Jetty ..."
+wget -O $BLAZEGRAPH_HOME/$JETTY_NAME.zip https://repo1.maven.org/maven2/org/eclipse/jetty/jetty-distribution/9.4.12.v20180830/jetty-distribution-9.4.12.v20180830.zip
+wait $!
+echo ""
+
+unzip $BLAZEGRAPH_HOME/$JETTY_NAME.zip -d $BLAZEGRAPH_HOME/
+
+echo "=== Downloading Blazegraph ..."
+wget -O $BLAZEGRAPH_HOME/blazegraph.war https://sourceforge.net/projects/bigdata/files/bigdata/2.0.0/bigdata.war/download
+wait $!
+echo ""
+
+mkdir $BLAZEGRAPH_HOME/$JETTY_NAME/webapps/blazegraph
+mv $BLAZEGRAPH_HOME/blazegraph.war $BLAZEGRAPH_HOME/$JETTY_NAME/webapps/blazegraph/
+unzip $BLAZEGRAPH_HOME/$JETTY_NAME/webapps/blazegraph/blazegraph.war -d $BLAZEGRAPH_HOME/$JETTY_NAME/webapps/blazegraph/
+
+cp ./blazegraph/jetty-webapp.xml $BLAZEGRAPH_HOME/$JETTY_NAME/etc/
+
+echo "=== Installation is finished ..."

@@ -23,6 +23,7 @@ import org.hadatac.entity.pojo.Instrument;
 import org.hadatac.entity.pojo.Platform;
 import org.hadatac.entity.pojo.TriggeringEvent;
 import org.hadatac.metadata.loader.URIUtils;
+import org.hadatac.utils.ConfigProp;
 import org.labkey.remoteapi.CommandException;
 
 import be.objectify.deadbolt.java.actions.Group;
@@ -56,7 +57,7 @@ public class NewDeployment extends Controller {
 
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
     public Result index(String type, String filename, String da_uri ) {
-        if (session().get("LabKeyUserName") == null && session().get("LabKeyPassword") == null) {
+        if (ConfigProp.getLabKeyLoginRequired() && session().get("LabKeyUserName") == null && session().get("LabKeyPassword") == null) {
             return redirect(org.hadatac.console.controllers.triplestore.routes.LoadKB.logInLabkey(
                     routes.NewDeployment.index(type, filename, da_uri).url()));
         }
@@ -135,8 +136,10 @@ public class NewDeployment extends Controller {
             String user_name = session().get("LabKeyUserName");
             String password = session().get("LabKeyPassword");
             if (user_name != null && password != null) {
-                nRowsOfDeployment = deployment.saveToLabKey(session().get("LabKeyUserName"), session().get("LabKeyPassword"));
-                nRowsOfDA = da.saveToLabKey(session().get("LabKeyUserName"), session().get("LabKeyPassword"));
+                if (ConfigProp.getLabKeyLoginRequired()) {
+                    nRowsOfDeployment = deployment.saveToLabKey(session().get("LabKeyUserName"), session().get("LabKeyPassword"));
+                    nRowsOfDA = da.saveToLabKey(session().get("LabKeyUserName"), session().get("LabKeyPassword"));
+                }
                 deployment.saveToTripleStore();
                 da.save();
             }
@@ -169,12 +172,15 @@ public class NewDeployment extends Controller {
             String user_name = session().get("LabKeyUserName");
             String password = session().get("LabKeyPassword");
             if (user_name != null && password != null) {
-                nRowsOfDeployment = deployment.saveToLabKey(session().get("LabKeyUserName"), session().get("LabKeyPassword"));
-                nRowsOfDA = dataAcquisition.saveToLabKey(session().get("LabKeyUserName"), session().get("LabKeyPassword"));
+                if (ConfigProp.getLabKeyLoginRequired()) {
+                    nRowsOfDeployment = deployment.saveToLabKey(session().get("LabKeyUserName"), session().get("LabKeyPassword"));
+                    nRowsOfDA = dataAcquisition.saveToLabKey(session().get("LabKeyUserName"), session().get("LabKeyPassword"));
+                }
                 deployment.saveToTripleStore();
                 dataAcquisition.save();
             }
-        }	    
+        }
+        
         return ok(deploymentConfirm.render("New Deployment created.", data, filename, da_uri));
     }
 }

@@ -13,6 +13,8 @@ import org.hadatac.console.controllers.metadata.empirical.routes;
 import org.hadatac.entity.pojo.Platform;
 import org.hadatac.entity.pojo.PlatformType;
 import org.hadatac.metadata.loader.URIUtils;
+import org.hadatac.utils.ConfigProp;
+
 import be.objectify.deadbolt.java.actions.Group;
 import be.objectify.deadbolt.java.actions.Restrict;
 import org.hadatac.console.models.PlatformForm;
@@ -26,7 +28,7 @@ public class NewPlatform extends Controller {
 
 	@Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
 	public Result index(String filename, String da_uri) {
-		if (session().get("LabKeyUserName") == null && session().get("LabKeyPassword") == null) {
+		if (ConfigProp.getLabKeyLoginRequired() && session().get("LabKeyUserName") == null && session().get("LabKeyPassword") == null) {
 			return redirect(org.hadatac.console.controllers.triplestore.routes.LoadKB.logInLabkey(
 					routes.NewPlatform.index(filename, da_uri).url()));
 		}
@@ -34,7 +36,6 @@ public class NewPlatform extends Controller {
 		PlatformType platformType = new PlatformType();
 
 		return ok(newPlatform.render(filename, da_uri, platformType));
-
 	}
 
 	@Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
@@ -72,9 +73,11 @@ public class NewPlatform extends Controller {
 		plt.save();
 
 		// update/create new PLT in LabKey
-		int nRowsAffected = plt.saveToLabKey(session().get("LabKeyUserName"), session().get("LabKeyPassword"));
-		if (nRowsAffected <= 0) {
-			return badRequest("Failed to insert new PLT to LabKey!\n");
+		if (ConfigProp.getLabKeyLoginRequired()) {
+		    int nRowsAffected = plt.saveToLabKey(session().get("LabKeyUserName"), session().get("LabKeyPassword"));
+		    if (nRowsAffected <= 0) {
+		        return badRequest("Failed to insert new PLT to LabKey!\n");
+		    }
 		}
 
 		System.out.println("Inserting new Platform from file. filename:  " + filename + "   da : [" + URIUtils.replacePrefixEx(da_uri) + "]");

@@ -5,14 +5,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.jena.query.Query;
-import org.apache.jena.query.QueryExecution;
-import org.apache.jena.query.QueryExecutionFactory;
-import org.apache.jena.query.QueryFactory;
 import org.apache.jena.query.QueryParseException;
 import org.apache.jena.query.QuerySolution;
-import org.apache.jena.query.ResultSet;
-import org.apache.jena.query.ResultSetFactory;
 import org.apache.jena.query.ResultSetRewindable;
 import org.apache.jena.update.UpdateExecutionFactory;
 import org.apache.jena.update.UpdateFactory;
@@ -21,11 +15,11 @@ import org.apache.jena.update.UpdateRequest;
 import org.hadatac.utils.CollectionUtil;
 import org.hadatac.utils.NameSpaces;
 import org.hadatac.utils.FirstLabel;
-import org.hadatac.utils.ConfigProp;
 import org.hadatac.console.http.SPARQLUtils;
 import org.hadatac.metadata.loader.LabkeyDataHandler;
 import org.hadatac.metadata.loader.URIUtils;
 import org.labkey.remoteapi.CommandException;
+
 
 public class Sample extends StudyObject {
 
@@ -215,6 +209,11 @@ public class Sample extends StudyObject {
         String insert = "";
         insert += NameSpaces.getInstance().printSparqlNameSpaceList();
         insert += INSERT_LINE1;
+        
+        if (!getNamedGraph().isEmpty()) {
+            insert += " GRAPH <" + getNamedGraph() + "> { ";
+        }
+        
         if (typeUri.startsWith("http")) {
             insert += sp_uri + " a <" + typeUri + "> . ";
         } else {
@@ -243,6 +242,11 @@ public class Sample extends StudyObject {
                 insert += sp_uri + " hasco:isFrom " + isFrom + " .  "; 
             } 
         }
+        
+        if (!getNamedGraph().isEmpty()) {
+            insert += " } ";
+        }
+        
         insert += LINE_LAST;
 
         try {

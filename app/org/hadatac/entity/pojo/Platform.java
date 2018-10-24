@@ -306,6 +306,11 @@ public class Platform extends HADatAcThing implements Comparable<Platform> {
         }
         insert += NameSpaces.getInstance().printSparqlNameSpaceList();
         insert += INSERT_LINE1;
+        
+        if (!getNamedGraph().isEmpty()) {
+            insert += " GRAPH <" + getNamedGraph() + "> { ";
+        }
+        
         if (typeUri.startsWith("<")) {
             insert += plt_uri + " a " + typeUri + " . ";
         } else {
@@ -315,6 +320,11 @@ public class Platform extends HADatAcThing implements Comparable<Platform> {
         if (comment != null && !comment.equals("")) {
             insert += plt_uri + " rdfs:comment \"" + comment + "\" .  ";
         }
+        
+        if (!getNamedGraph().isEmpty()) {
+            insert += " } ";
+        }
+        
         insert += LINE_LAST;
 
         try {

@@ -47,10 +47,11 @@ public class NewDAS extends Controller {
 
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
     public Result index() {
-        if (session().get("LabKeyUserName") == null && session().get("LabKeyPassword") == null) {
+        if (ConfigProp.getLabKeyLoginRequired() && session().get("LabKeyUserName") == null && session().get("LabKeyPassword") == null) {
             return redirect(org.hadatac.console.controllers.triplestore.routes.LoadKB.logInLabkey(
                     org.hadatac.console.controllers.schema.routes.NewDAS.index().url()));
         }
+        
         return ok(newDAS.render());
     }
 
@@ -74,8 +75,13 @@ public class NewDAS extends Controller {
         String user_name = session().get("LabKeyUserName");
         String password = session().get("LabKeyPassword");
         if (user_name != null && password != null) {
-            int nRowsOfSchema = das.saveToLabKey(session().get("LabKeyUserName"), session().get("LabKeyPassword"));
-            if (nRowsOfSchema > 0) {
+            int nRowsOfSchema = 0;
+            
+            if (ConfigProp.getLabKeyLoginRequired()) {
+                nRowsOfSchema = das.saveToLabKey(session().get("LabKeyUserName"), session().get("LabKeyPassword"));
+            }
+            
+            if (!ConfigProp.getLabKeyLoginRequired() || nRowsOfSchema > 0) {
                 das.save();
                 return ok(DASConfirm.render("New Data Acquisition Schema", 
                         String.format("%d row(s) have been inserted in Table \"DataAcquisitionSchema\" \n", 
@@ -120,14 +126,12 @@ public class NewDAS extends Controller {
             das.getAttributes().add(dasa);
             pos++;
         }
-
         
-
         String user_name = session().get("LabKeyUserName");
         String password = session().get("LabKeyPassword");
         if (user_name != null && password != null) {
             System.out.println("Saving DAS in Labkey");
-            if (das.saveToLabKey(session().get("LabKeyUserName"), session().get("LabKeyPassword")) > 0) {
+            if (!ConfigProp.getLabKeyLoginRequired() || das.saveToLabKey(session().get("LabKeyUserName"), session().get("LabKeyPassword")) > 0) {
                 das.save();
             } else {
                 return badRequest("Failed to insert DA Schema to LabKey!\n");
@@ -135,7 +139,6 @@ public class NewDAS extends Controller {
         }
 
         return ok(editDAS.render(das));
-
     }
 
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
@@ -174,7 +177,7 @@ public class NewDAS extends Controller {
         String password = session().get("LabKeyPassword");
         if (user_name != null && password != null) {
             System.out.println("Saving DAS in Labkey");
-            if (das.saveToLabKey(session().get("LabKeyUserName"), session().get("LabKeyPassword")) > 0) {
+            if (!ConfigProp.getLabKeyLoginRequired() || das.saveToLabKey(session().get("LabKeyUserName"), session().get("LabKeyPassword")) > 0) {
                 das.save();
             } else {
                 return badRequest("Failed to insert DA Schema to LabKey!\n");

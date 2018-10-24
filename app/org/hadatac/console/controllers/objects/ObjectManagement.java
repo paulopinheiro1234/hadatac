@@ -12,6 +12,7 @@ import play.data.*;
 import org.hadatac.entity.pojo.Study;
 import org.hadatac.entity.pojo.ObjectCollection;
 import org.hadatac.entity.pojo.StudyObject;
+import org.hadatac.utils.ConfigProp;
 import org.hadatac.console.views.html.objects.*;
 import org.hadatac.console.models.ObjectsForm;
 import org.hadatac.console.models.SysUser;
@@ -34,7 +35,7 @@ public class ObjectManagement extends Controller {
 
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
     public Result index(String filename, String da_uri, String std_uri, String oc_uri, int page, String message) {
-        if (session().get("LabKeyUserName") == null && session().get("LabKeyPassword") == null) {
+        if (ConfigProp.getLabKeyLoginRequired() && session().get("LabKeyUserName") == null && session().get("LabKeyPassword") == null) {
             return redirect(org.hadatac.console.controllers.triplestore.routes.LoadKB.logInLabkey(
                     org.hadatac.console.controllers.objects.routes.ObjectManagement.index(filename, da_uri, std_uri, oc_uri, page, message).url()));
         }
@@ -154,16 +155,22 @@ public class ObjectManagement extends Controller {
                         oldObj.getSpaceScopeUris()
                         );
 
-                nRowsAffected = newObj.deleteFromLabKey(session().get("LabKeyUserName"), session().get("LabKeyPassword"));
-                if (nRowsAffected <= 0) {
-                    message = "Failed to delete object from LabKey";
+                if (ConfigProp.getLabKeyLoginRequired()) {
+                    nRowsAffected = newObj.deleteFromLabKey(session().get("LabKeyUserName"), session().get("LabKeyPassword"));
+                    if (nRowsAffected <= 0) {
+                        message = "Failed to delete object from LabKey";
+                    }
                 }
 
                 newObj.saveToTripleStore();
-                nRowsAffected = newObj.saveToLabKey(session().get("LabKeyUserName"), session().get("LabKeyPassword"));
-                if (nRowsAffected <= 0) {
-                    message = "Failed to insert object into LabKey";
+
+                if (ConfigProp.getLabKeyLoginRequired()) {
+                    nRowsAffected = newObj.saveToLabKey(session().get("LabKeyUserName"), session().get("LabKeyPassword"));
+                    if (nRowsAffected <= 0) {
+                        message = "Failed to insert object into LabKey";
+                    }
                 }
+                
                 newObjList.add(newObj);
                 totUpdates++;
 
@@ -189,7 +196,7 @@ public class ObjectManagement extends Controller {
 
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
     public Result deleteCollectionObjects(String filename, String da_uri, String std_uri, String oc_uri, List<String> objUriList, int page) {
-        if (session().get("LabKeyUserName") == null && session().get("LabKeyPassword") == null) {
+        if (ConfigProp.getLabKeyLoginRequired() && session().get("LabKeyUserName") == null && session().get("LabKeyPassword") == null) {
             return redirect(org.hadatac.console.controllers.triplestore.routes.LoadKB.logInLabkey(
                     org.hadatac.console.controllers.objects.routes.ObjectManagement.deleteCollectionObjects(filename, da_uri, std_uri, oc_uri, objUriList, page).url()));
         }
@@ -248,9 +255,11 @@ public class ObjectManagement extends Controller {
         for (int i = 0; i < oldObjList.size(); i++) {
             oldObj = oldObjList.get(i);
 
-            nRowsAffected = oldObj.deleteFromLabKey(session().get("LabKeyUserName"), session().get("LabKeyPassword"));
-            if (nRowsAffected <= 0) {
-                message = "Failed to delete object from LabKey";
+            if (ConfigProp.getLabKeyLoginRequired()) {
+                nRowsAffected = oldObj.deleteFromLabKey(session().get("LabKeyUserName"), session().get("LabKeyPassword"));
+                if (nRowsAffected <= 0) {
+                    message = "Failed to delete object from LabKey";
+                }
             }
 
             oldObj.delete();

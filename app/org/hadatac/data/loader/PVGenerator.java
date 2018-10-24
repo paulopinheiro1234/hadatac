@@ -57,8 +57,8 @@ public class PVGenerator extends BasicGenerator {
 	}
 
 	private String getClass(Record rec) {
-		String cls = rec.getValueByColumnName(mapCol.get("Class"));		
-		if (cls.length() > 0){
+		String cls = rec.getValueByColumnName(mapCol.get("Class"));
+		if (cls.length() > 0) {
 			if (URIUtils.isValidURI(cls)) {
 				return cls;
 			}

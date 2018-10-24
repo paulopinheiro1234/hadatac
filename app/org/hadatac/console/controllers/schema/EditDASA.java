@@ -19,6 +19,7 @@ import org.hadatac.entity.pojo.DataAcquisitionSchema;
 import org.hadatac.entity.pojo.DataAcquisitionSchemaAttribute;
 import org.hadatac.entity.pojo.DataAcquisitionSchemaObject;
 import org.hadatac.metadata.loader.URIUtils;
+import org.hadatac.utils.ConfigProp;
 
 import be.objectify.deadbolt.java.actions.Group;
 import be.objectify.deadbolt.java.actions.Restrict;
@@ -30,7 +31,7 @@ public class EditDASA extends Controller {
 	@Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
 	public Result index(String dasa_uri) {
 
-		if (session().get("LabKeyUserName") == null && session().get("LabKeyPassword") == null) {
+		if (ConfigProp.getLabKeyLoginRequired() && session().get("LabKeyUserName") == null && session().get("LabKeyPassword") == null) {
 			return redirect(org.hadatac.console.controllers.triplestore.routes.LoadKB.logInLabkey(
 					routes.EditDASA.index(dasa_uri).url()));
 		}
@@ -84,7 +85,7 @@ public class EditDASA extends Controller {
 		String newLabel = data.getNewLabel();
 		String newPosition = data.getNewPosition();
 		String newEntity = getUriFromNew(data.getNewEntity());
-		List<String> newAttribute = getUriListFromNew(data.getNewAttribute());
+		List<String> newAttributes = getUriListFromNew(data.getNewAttribute());
 		String newUnit = getUriFromNew(data.getNewUnit());
 		String newObject = data.getNewObject();
 		String newEvent = data.getNewEvent();
@@ -108,8 +109,8 @@ public class EditDASA extends Controller {
 			if (olddasa.getEntity() != null && !olddasa.getEntity().equals(newEntity)) {
 				changedInfos.add(newEntity);
 			}
-			if (olddasa.getAttribute() == null || !olddasa.getAttribute().equals(newAttribute)) {
-				changedInfos.add(newAttribute.get(0));
+			if (olddasa.getAttributes() == null || !olddasa.getAttributes().equals(newAttributes)) {
+				changedInfos.add(newAttributes.get(0));
 			}
 			if (olddasa.getUnit() == null || !olddasa.getUnit().equals(newUnit)) {
 				changedInfos.add(newUnit);
@@ -138,7 +139,7 @@ public class EditDASA extends Controller {
 		olddasa.setLabel(newLabel);
 		olddasa.setPosition(newPosition);
 		olddasa.setEntity(newEntity);
-		olddasa.setAttribute(newAttribute);
+		olddasa.setAttributes(newAttributes);
 		olddasa.setUnit(newUnit);
 		olddasa.setObjectUri(DataAcquisitionSchemaObject.findUriFromRole(data.getNewObject(),das.getObjects()));
 		olddasa.setEventUri(newEvent);
@@ -147,10 +148,13 @@ public class EditDASA extends Controller {
 		olddasa.save();
 
 		// update/create new DASA in LabKey
-		int nRowsAffected = olddasa.saveToLabKey(session().get("LabKeyUserName"), session().get("LabKeyPassword"));
-		if (nRowsAffected <= 0) {
-			return badRequest("Failed to insert new DASA to LabKey!\n");
+		if (ConfigProp.getLabKeyLoginRequired()) {
+		    int nRowsAffected = olddasa.saveToLabKey(session().get("LabKeyUserName"), session().get("LabKeyPassword"));
+		    if (nRowsAffected <= 0) {
+		        return badRequest("Failed to insert new DASA to LabKey!\n");
+		    }
 		}
+		
 		return ok(editDASAConfirm.render(olddasa, changedInfos));
 	}
 

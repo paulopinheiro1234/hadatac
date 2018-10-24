@@ -9,6 +9,7 @@ import play.mvc.Result;
 import org.hadatac.console.controllers.AuthApplication;
 import org.hadatac.console.views.html.schema.*;
 import org.hadatac.entity.pojo.DataAcquisitionSchemaAttribute;
+import org.hadatac.utils.ConfigProp;
 import org.labkey.remoteapi.CommandException;
 
 import be.objectify.deadbolt.java.actions.Group;
@@ -18,7 +19,7 @@ public class DeleteDASA extends Controller {
 
 	@Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
 	public Result index(String dasa_uri) {
-		if (session().get("LabKeyUserName") == null && session().get("LabKeyPassword") == null) {
+		if (ConfigProp.getLabKeyLoginRequired() && session().get("LabKeyUserName") == null && session().get("LabKeyPassword") == null) {
 			return redirect(org.hadatac.console.controllers.triplestore.routes.LoadKB.logInLabkey(
 					routes.DeleteDASA.index(dasa_uri).url()));
 		}
@@ -50,7 +51,7 @@ public class DeleteDASA extends Controller {
 
 	@Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
 	public Result processForm(String dasa_uri) {
-		if (session().get("LabKeyUserName") == null && session().get("LabKeyPassword") == null) {
+		if (ConfigProp.getLabKeyLoginRequired() && session().get("LabKeyUserName") == null && session().get("LabKeyPassword") == null) {
 			return redirect(org.hadatac.console.controllers.triplestore.routes.LoadKB.logInLabkey(
 					routes.DeleteDASA.processForm(dasa_uri).url()));
 		}
@@ -73,9 +74,12 @@ public class DeleteDASA extends Controller {
 
 		int deletedRows = -1;
 		if (dasa != null) {
-		    System.out.println("calling dasa.deleteFromLabKey() from DeleteDASA"); 
-            deletedRows = dasa.deleteFromLabKey(session().get("LabKeyUserName"),session().get("LabKeyPassword"));
-            if (deletedRows > 0) {
+		    if (ConfigProp.getLabKeyLoginRequired()) {
+		        System.out.println("calling dasa.deleteFromLabKey() from DeleteDASA"); 
+		        deletedRows = dasa.deleteFromLabKey(session().get("LabKeyUserName"),session().get("LabKeyPassword"));
+		    }
+		    
+            if (!ConfigProp.getLabKeyLoginRequired() || deletedRows > 0) {
                 dasa.delete();
             } else {
                 String message = "Number of deleted rows: " + deletedRows;

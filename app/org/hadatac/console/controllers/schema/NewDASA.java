@@ -18,6 +18,7 @@ import org.hadatac.console.models.DASAForm;
 import org.hadatac.entity.pojo.DataAcquisitionSchema;
 import org.hadatac.entity.pojo.DataAcquisitionSchemaAttribute;
 import org.hadatac.metadata.loader.URIUtils;
+import org.hadatac.utils.ConfigProp;
 
 import be.objectify.deadbolt.java.actions.Group;
 import be.objectify.deadbolt.java.actions.Restrict;
@@ -30,7 +31,7 @@ public class NewDASA extends Controller {
 	@Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
 	public Result index(String das_uri) {
 
-		if (session().get("LabKeyUserName") == null && session().get("LabKeyPassword") == null) {
+		if (ConfigProp.getLabKeyLoginRequired() && session().get("LabKeyUserName") == null && session().get("LabKeyPassword") == null) {
 			return redirect(org.hadatac.console.controllers.triplestore.routes.LoadKB.logInLabkey(
 					org.hadatac.console.controllers.schema.routes.NewDASA.index(das_uri).url()));
 		}
@@ -83,7 +84,8 @@ public class NewDASA extends Controller {
 		localName = localName.substring(localName.indexOf(":") + 1);
 
 		// insert current state of the DASA
-		DataAcquisitionSchemaAttribute dasa = new DataAcquisitionSchemaAttribute(newURI,
+		DataAcquisitionSchemaAttribute dasa = new DataAcquisitionSchemaAttribute(
+		        newURI,
 				localName,
 				newLabel,
 				das_uri,
@@ -98,10 +100,13 @@ public class NewDASA extends Controller {
 		dasa.save();
 
 		// update/create new DASA in LabKey
-		int nRowsAffected = dasa.saveToLabKey(session().get("LabKeyUserName"), session().get("LabKeyPassword"));
-		if (nRowsAffected <= 0) {
-			return badRequest("Failed to insert new DASA to LabKey!\n");
+		if (ConfigProp.getLabKeyLoginRequired()) {
+		    int nRowsAffected = dasa.saveToLabKey(session().get("LabKeyUserName"), session().get("LabKeyPassword"));
+		    if (nRowsAffected <= 0) {
+		        return badRequest("Failed to insert new DASA to LabKey!\n");
+		    }
 		}
+		
 		return ok(newDASAConfirm.render(dasa));
 	}
 

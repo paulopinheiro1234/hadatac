@@ -6,7 +6,7 @@
 @import org.hadatac.entity.pojo.DataAcquisitionSchema
 @import org.hadatac.metadata.loader.URIUtils
 
-@for(attr <- dasa.getAttribute()) {
+@for(attr <- dasa.getAttributes()) {
 	@if(!DataAcquisitionSchema.METADASA.contains(URIUtils.replaceNameSpaceEx(attr))){
   		<tr>
 } else {
@@ -24,7 +24,7 @@
    }</td> 
    <td>@if(dasa != null && dasa.getObjectViewLabel() != null) { @dasa.getObjectViewLabel() }</td> 
    <td>@if(dasa != null && dasa.getEntityViewLabel() != null) { @dasa.getEntityViewLabel() }</td> 
-   <td>@if(dasa != null && dasa.getAttribute() != null) { @dasa.getAttribute() }</td> 
+   <td>@if(dasa != null && dasa.getAttributes() != null) { @dasa.getAttributes() }</td> 
    <td>@if(dasa != null && dasa.getInRelationToLabel() != null) { @dasa.getInRelationToLabel() }</td> 
    <td>@if(dasa != null && dasa.getUnitLabel() != null) { @dasa.getUnitLabel() }</td> 
    <td>@if(dasa != null && dasa.getEventViewLabel() != null) { @dasa.getEventViewLabel() }</td> 

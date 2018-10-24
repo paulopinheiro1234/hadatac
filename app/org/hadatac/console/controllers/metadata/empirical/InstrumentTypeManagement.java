@@ -15,6 +15,7 @@ import org.hadatac.console.models.SysUser;
 import org.hadatac.console.models.ConceptForm;
 import org.hadatac.console.models.OtMSparqlQueryResults;
 import org.hadatac.entity.pojo.InstrumentType;
+import org.hadatac.utils.ConfigProp;
 
 import be.objectify.deadbolt.java.actions.Group;
 import be.objectify.deadbolt.java.actions.Restrict;
@@ -27,7 +28,7 @@ public class InstrumentTypeManagement extends Controller {
 	@Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
 	public Result index(String filename, String da_uri) {
 
-		if (session().get("LabKeyUserName") == null && session().get("LabKeyPassword") == null) {
+		if (ConfigProp.getLabKeyLoginRequired() && session().get("LabKeyUserName") == null && session().get("LabKeyPassword") == null) {
 			return redirect(org.hadatac.console.controllers.triplestore.routes.LoadKB.logInLabkey(
 					org.hadatac.console.controllers.metadata.empirical.routes.InstrumentTypeManagement.index(filename, da_uri).url()));
 		}

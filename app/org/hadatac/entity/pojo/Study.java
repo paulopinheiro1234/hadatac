@@ -8,16 +8,8 @@ import java.util.Map;
 
 import org.labkey.remoteapi.CommandException;
 
-import com.typesafe.config.ConfigFactory;
-
-import org.apache.jena.query.Query;
-import org.apache.jena.query.QueryExecution;
-import org.apache.jena.query.QueryExecutionFactory;
-import org.apache.jena.query.QueryFactory;
 import org.apache.jena.query.QueryParseException;
 import org.apache.jena.query.QuerySolution;
-import org.apache.jena.query.ResultSet;
-import org.apache.jena.query.ResultSetFactory;
 import org.apache.jena.query.ResultSetRewindable;
 import org.apache.jena.update.UpdateExecutionFactory;
 import org.apache.jena.update.UpdateFactory;
@@ -49,6 +41,7 @@ import org.joda.time.DateTimeZone;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 import org.joda.time.format.ISODateTimeFormat;
+
 
 public class Study extends HADatAcThing {
 
@@ -212,25 +205,25 @@ public class Study extends HADatAcThing {
         String query = "";
         query += NameSpaces.getInstance().printSparqlNameSpaceList();
         query += " select (count(?study) as ?tot) where { " + 
-	         " ?studyType rdfs:subClassOf* hasco:Study . " +  
-                 " ?study a ?studyType . " +
-	         " }";
+                " ?studyType rdfs:subClassOf* hasco:Study . " +  
+                " ?study a ?studyType . " +
+                " }";
 
-	//select ?obj ?collection ?objType where { ?obj hasco:isMemberOf ?collection . ?obj a ?objType . FILTER NOT EXISTS { ?objType rdfs:subClassOf* hasco:ObjectCollection . } }
+        //select ?obj ?collection ?objType where { ?obj hasco:isMemberOf ?collection . ?obj a ?objType . FILTER NOT EXISTS { ?objType rdfs:subClassOf* hasco:ObjectCollection . } }
         //System.out.println("Study query: " + query);
 
         try {
             ResultSetRewindable resultsrw = SPARQLUtils.select(
                     CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), query);
-            
+
             if (resultsrw.hasNext()) {
                 QuerySolution soln = resultsrw.next();
                 return Integer.parseInt(soln.getLiteral("tot").getString());
-	    }
-	} catch (Exception e) {
-	    e.printStackTrace();
-	}
-	return -1;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return -1;
     }
 
     // get Start Time Methods
@@ -414,7 +407,7 @@ public class Study extends HADatAcThing {
         try {
             ResultSetRewindable resultsrw = SPARQLUtils.select(
                     CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), query);
-            
+
             while (resultsrw.hasNext()) {
                 QuerySolution soln = resultsrw.next();
                 Study study = new Study();
@@ -488,7 +481,7 @@ public class Study extends HADatAcThing {
         try {
             ResultSetRewindable resultsrw = SPARQLUtils.select(
                     CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), queryString);
-            
+
             while (resultsrw.hasNext()) {
                 QuerySolution soln = resultsrw.next();
                 if (soln.contains("oc_uri")) {
@@ -511,7 +504,7 @@ public class Study extends HADatAcThing {
         try {
             ResultSetRewindable resultsrw = SPARQLUtils.select(
                     CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), queryString);
-            
+
             while (resultsrw.hasNext()) {
                 QuerySolution soln = resultsrw.next();
                 if (soln.contains("da_uri")) {
@@ -537,30 +530,29 @@ public class Study extends HADatAcThing {
         }
         String studyQueryString = NameSpaces.getInstance().printSparqlNameSpaceList() +
                 "SELECT DISTINCT ?studyType ?studyLabel ?title ?proj ?studyComment ?external ?agentUri ?institutionUri ?lastId" + 
-                " WHERE {  " + 
-                "      ?studyType rdfs:subClassOf* hasco:Study . " + 
-                "      " + adjustedUri + " a ?studyType . " + 
-                "      OPTIONAL { " + adjustedUri + " rdfs:label ?studyLabel } . " + 
-                "	   OPTIONAL { " + adjustedUri + " hasco:hasTitle ?title } . " +
-                "	   OPTIONAL { " + adjustedUri + " hasco:hasProject ?proj } . " +
-                "      OPTIONAL { " + adjustedUri + " rdfs:comment ?studyComment } . " + 
-                "      OPTIONAL { " + adjustedUri + " hasco:hasExternalSource ?external } . " + 
-                "      OPTIONAL { " + adjustedUri + " hasco:hasAgent ?agentUri } .  " +
-                "      OPTIONAL { " + adjustedUri + " hasco:hasInstitution ?institutionUri } . " + 
-                "      OPTIONAL { " + adjustedUri + " hasco:hasLastId ?lastId } . " + 
-                " } " + 
-                " GROUP BY ?studyType ?studyLabel ?title ?proj ?studyComment ?external ?agentUri ?institutionUri ?lastId ";
+                " WHERE {  \n" + 
+                "      ?studyType rdfs:subClassOf* hasco:Study . \n" + 
+                "      " + adjustedUri + " a ?studyType . \n" + 
+                "      OPTIONAL { " + adjustedUri + " rdfs:label ?studyLabel } . \n" + 
+                "	   OPTIONAL { " + adjustedUri + " hasco:hasTitle ?title } . \n" +
+                "	   OPTIONAL { " + adjustedUri + " hasco:hasProject ?proj } . \n" +
+                "      OPTIONAL { " + adjustedUri + " rdfs:comment ?studyComment } . \n" + 
+                "      OPTIONAL { " + adjustedUri + " hasco:hasExternalSource ?external } . \n" + 
+                "      OPTIONAL { " + adjustedUri + " hasco:hasAgent ?agentUri } . \n" +
+                "      OPTIONAL { " + adjustedUri + " hasco:hasInstitution ?institutionUri } . \n" + 
+                "      OPTIONAL { " + adjustedUri + " hasco:hasLastId ?lastId } . \n" + 
+                " } \n";
 
         try {
-            //System.out.println("Study's find() query: " + studyQueryString);
-            
+            // System.out.println("Study's find() query: " + studyQueryString);
+
             ResultSetRewindable resultsrw = SPARQLUtils.select(
                     CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), studyQueryString);
-            
+
             if (!resultsrw.hasNext()) {
-		System.out.println("[ERROR] STUDY_URI " + study_uri + " does not retrieve a study object");
-		return null;
-	    } else {
+                System.out.println("[ERROR] STUDY_URI " + study_uri + " does not retrieve a study object");
+                return null;
+            } else {
                 QuerySolution soln = resultsrw.next();
                 returnStudy.setUri(prefixedUri);
                 if (soln.contains("studyLabel")) {
@@ -631,7 +623,7 @@ public class Study extends HADatAcThing {
         try {            
             ResultSetRewindable resultsrw = SPARQLUtils.select(
                     CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), studyQueryString);
-            
+
             if (resultsrw.hasNext()) {
                 QuerySolution soln = resultsrw.next();
                 returnStudy.setUri(queryUri);
@@ -1066,6 +1058,11 @@ public class Study extends HADatAcThing {
         }
         insert += NameSpaces.getInstance().printSparqlNameSpaceList();
         insert += INSERT_LINE1;
+
+        if (!getNamedGraph().isEmpty()) {
+            insert += " GRAPH <" + getNamedGraph() + "> { ";
+        }
+
         if (studyType.startsWith("<")) {
             insert += std_uri + " a " + studyType + " . ";
         } else {
@@ -1101,6 +1098,11 @@ public class Study extends HADatAcThing {
         if (lastId != null) {
             insert += std_uri + " hasco:hasLastId  \"" + lastId + "\" .  ";
         }
+
+        if (!getNamedGraph().isEmpty()) {
+            insert += " } ";
+        }
+
         insert += LINE_LAST;
 
         try {

@@ -29,13 +29,13 @@ services:
                 aliases:
                     - blazegraph
         ports:
-            - "9999:9999"
+            - "8080:8080"
         restart: always
         environment:
             JAVA_XMS: 512m
             JAVA_XMX: 4g
         volumes:
-            - hadatac-blazegraph:/var/lib/blazegraph
+            - hadatac-blazegraph:/var/lib/jetty
 
     # The primary hadatac web app
     hadatac:
@@ -49,10 +49,14 @@ services:
             hadatac:
                 aliases:
                     - hadatac
-        # Creates a volume to store the various csv files. This allows you to copy data into them.
-        # Example command: docker cp <filename> hadatac:/root/app/csvs/unprocessed_csv
         volumes:
+            # Creates a volume to store the various csv files. This allows the data
+            #   to be persisted when the container is removed or when Hadatac is rebuilt.
+            # Example command: docker cp <filename> hadatac:/root/app/csvs/unprocessed_csv
             - hadatac-csvs:/root/app/csvs
+            # Creates a volume for the config files. This way configuration file changes
+            #   are persisted when the container is removed or rebuilt.
+            - hadatac-conf:/root/app/conf
         links:
             - blazegraph
             - solr
@@ -64,6 +68,7 @@ volumes:
     hadatac-solr:
     hadatac-blazegraph:
     hadatac-csvs:
+    hadatac-conf:
 
 networks:
     hadatac:

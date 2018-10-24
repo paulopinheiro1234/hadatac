@@ -39,7 +39,6 @@ import org.hadatac.metadata.loader.URIUtils;
 import org.hadatac.utils.CollectionUtil;
 import org.hadatac.utils.NameSpaces;
 
-import com.typesafe.config.ConfigFactory;
 
 public class Measurement extends HADatAcThing implements Runnable {
     @Field("uri")

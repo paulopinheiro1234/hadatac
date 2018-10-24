@@ -4,36 +4,20 @@ Set of HADatAc Solr collections
 ## Running with Docker Compose
 You can create a running Solr instance with the correct configuration settings using Docker and Docker Compose now.
 
-### Development Mode
+### Building and Starting the Service
 From the parent directory (i.e. ./hadatac) run these commands in a shell for development:
 
 ```bash
-# Create an alias for convenience
-alias comp_dev='docker-compose -f docker-compose.yml -f docker-compose.dev.yml'
 # Build only the solr service
-comp_dev build solr
+docker-compose build solr
 # Start the solr service in daemon mode
-comp_dev up -d solr
+docker-compose up -d solr
 ```
 
 Now, if you access http://localhost:8983 you will see a running Solr Admin page with the schemas imported from `./hadatac/solr/solr-home` and the JTS Topology library loaded.
 
-### Production Mode
-From the parent directory (i.e. ./hadatac) run these commands in a shell for development:
-
-```bash
-# Create an alias for convenience
-alias comp='docker-compose -f docker-compose.yml'
-# Build only the solr service
-comp build solr
-# Start the solr service in daemon mode
-comp up -d solr
-```
-
-This will spin up the same Solr instance, but the port in the container is not forwarded to the localhost for security.
-
 ### Stopping the Service
-In either production or development mode, to stop the service you should run `comp stop solr` or `comp_dev stop solr`, respectively.
+To stop the service you should run `docker-compose stop solr`.
 
 This will stop the Docker container, but will persist the data that was ingested as described in the next section.
 
@@ -46,7 +30,7 @@ When you have the volume name, type `docker inspect VOLUME_NAME`. It will list t
 
 ### Tearing Down the Service
 
-To completely remove the Docker Compose Solr service and its volume data, run `[comp_dev OR comp] down -v --remove-orphans`. To tear it down, but keep the volume data run `[comp_dev OR comp] down --remove-orphans`.
+To completely remove the Docker Compose Solr service and its volume data, run `docker-compose down -v --remove-orphans`. To tear it down, but keep the volume data run `docker-compose down --remove-orphans`. Please note that this will also tear down the other services as well.
 
 ## Acknowledgements
 

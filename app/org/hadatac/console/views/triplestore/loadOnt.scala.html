@@ -169,9 +169,9 @@
             <tr>
               <th style="width: 50px;" scope="col">#</th>
               <th style="width: 100px;" scope="col">Abbreviation</th>
-              <th style="word-wrap: break-word;" scope="col">Definition (mandatory)</th>
+              <th style="width: 300px;" scope="col">Definition (mandatory)</th>
               <th style="width: 150px;" scope="col">Mime Type (only for loaded ontologies)</th>
-              <th scope="col" style="word-wrap: break-word;">Loading URL (only for loaded ontologies)</th>
+              <th style="width: 300px; scope="col">Loading URL (only for loaded ontologies)</th>
               <th style="width: 100px;" scope="col">No. of Triples Loaded</th>
               <th style="width: 200px;" scope="col">Actions</th>
             </tr>
@@ -179,13 +179,13 @@
           <tbody id="ns-table-body">
           @for(((k, ns), i) <- namespaces.toList.zipWithIndex) {
               <tr>
-                <td>@(i+1)</td>
-                <td axis="nsAbbrev@(i+1)">@ns.getAbbreviation()</td>
-                <td axis="nsName@(i+1)">@ns.getName()</td>
-                <td axis="nsType@(i+1)">@ns.getType()</td>
-                <td axis="nsURL@(i+1)">@ns.getURL()</td>
-                <td axis="nsTripleSize@(i+1)">@ns.getNumberOfLoadedTriples()</td>
-                <td>
+                <td style="word-break: break-all;">@(i+1)</td>
+                <td style="word-break: break-all;" axis="nsAbbrev@(i+1)">@ns.getAbbreviation()</td>
+                <td style="word-break: break-all;" axis="nsName@(i+1)">@ns.getName()</td>
+                <td style="word-break: break-all;" axis="nsType@(i+1)">@ns.getType()</td>
+                <td style="word-break: break-all;" axis="nsURL@(i+1)">@ns.getURL()</td>
+                <td style="word-break: break-all;" axis="nsTripleSize@(i+1)">@ns.getNumberOfLoadedTriples()</td>
+                <td style="word-break: break-all;">
 	                <a class="add" title="Add" data-toggle="tooltip"><i class="material-icons">&#xE03B;</i></a>
 	                <a class="edit" title="Edit" data-toggle="tooltip"><i class="material-icons">&#xE254;</i></a>
 	                <a class="delete" title="Delete" data-toggle="tooltip"><i class="material-icons">&#xE872;</i></a>

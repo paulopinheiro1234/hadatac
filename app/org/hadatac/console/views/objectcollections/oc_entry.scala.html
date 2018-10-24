@@ -11,6 +11,7 @@
 @import org.hadatac.utils._
 
 @if(oc != null) {
+
   @if(mode.equals("subject") && oc.getTypeUri().equals("http://hadatac.org/ont/hasco/SubjectGroup")) {
   <tr>
      <td>@if(oc.getLabel() != null) { @oc.getLabel() }</td>

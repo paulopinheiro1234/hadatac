@@ -26,8 +26,6 @@ import org.hadatac.metadata.loader.URIUtils;
 import org.hadatac.utils.CollectionUtil;
 import org.hadatac.utils.Feedback;
 
-import com.typesafe.config.ConfigFactory;
-
 
 public class MeasurementGenerator extends BasicGenerator {
 
@@ -92,7 +90,7 @@ public class MeasurementGenerator extends BasicGenerator {
                 System.out.println(item);
             }
         }
-         */
+        */
 
         // ASSIGN values for tempPositionInt
         List<String> unknownHeaders = schema.defineTemporaryPositions(file.getHeaders());
@@ -327,7 +325,8 @@ public class MeasurementGenerator extends BasicGenerator {
             measurement.setSID("");
 
             if (da.hasCellScope()) {
-
+                System.out.println("da.hasCellScope() ===============");
+                
                 // Objects defined by Cell Scope
                 if (da.getCellScopeName().get(0).equals("*")) {
                     measurement.setStudyObjectUri(URIUtils.replacePrefixEx(da.getCellScopeUri().get(0).trim()));
@@ -348,7 +347,7 @@ public class MeasurementGenerator extends BasicGenerator {
                 } else if (!schema.getIdLabel().equals("")) {
                     id = record.getValueByColumnIndex(posId);
                 }
-
+                
                 if (!id.equals("")) {
                     if (dasa.getEntity().equals(URIUtils.replacePrefixEx("sio:Human"))) {
                         if (mapIDStudyObjects.containsKey(id)) {
@@ -445,7 +444,7 @@ public class MeasurementGenerator extends BasicGenerator {
             } else {
                 measurement.setEntityUri(dasa.getObjectUri());
             }
-            measurement.setCharacteristicUris(dasa.getAttribute());
+            measurement.setCharacteristicUris(dasa.getAttributes());
 
             /*======================================*
              *                                      *

@@ -73,7 +73,7 @@ public class DeleteDataAcquisition extends Controller {
     		 */
     		
     		dc = ObjectAccessSpec.findByUri(uri);
-    		dc.delete();
+    		dc.deleteFromSolr();
     		
             return "Object Access Specification deleted.";
     	}

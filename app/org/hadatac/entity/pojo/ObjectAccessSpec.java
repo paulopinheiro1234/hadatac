@@ -25,7 +25,6 @@ import org.hadatac.console.models.FacetHandler;
 import org.hadatac.console.models.Pivot;
 import org.hadatac.metadata.loader.LabkeyDataHandler;
 import org.hadatac.metadata.loader.URIUtils;
-import org.hadatac.entity.pojo.ObjectCollection;
 import org.hadatac.entity.pojo.StudyObject;
 import org.hadatac.utils.CollectionUtil;
 import org.hadatac.utils.State;
@@ -34,8 +33,6 @@ import org.joda.time.DateTimeZone;
 import org.joda.time.format.DateTimeFormatter;
 import org.joda.time.format.ISODateTimeFormat;
 import org.labkey.remoteapi.CommandException;
-
-import com.typesafe.config.ConfigFactory;
 
 
 public class ObjectAccessSpec extends HADatAcThing {
@@ -684,11 +681,11 @@ public class ObjectAccessSpec extends HADatAcThing {
             solr.close();
             return response.getStatus();
         } catch (SolrServerException e) {
-            System.out.println("[ERROR] DataAcquisition.delete() - SolrServerException message: " + e.getMessage());
+            System.out.println("[ERROR] ObjectAccessSpec.delete() - SolrServerException message: " + e.getMessage());
         } catch (IOException e) {
-            System.out.println("[ERROR] DataAcquisition.delete() - IOException message: " + e.getMessage());
+            System.out.println("[ERROR] ObjectAccessSpec.delete() - IOException message: " + e.getMessage());
         } catch (Exception e) {
-            System.out.println("[ERROR] DataAcquisition.delete() - Exception message: " + e.getMessage());
+            System.out.println("[ERROR] ObjectAccessSpec.delete() - Exception message: " + e.getMessage());
         }
 
         return -1;
@@ -1104,7 +1101,7 @@ public class ObjectAccessSpec extends HADatAcThing {
                 for (String attr : dasa.getAttributeLabel()) {
                     dataAcquisition.addCharacteristic(attr);
                 }
-                for (String attr : dasa.getAttribute()) {
+                for (String attr : dasa.getAttributes()) {
                     dataAcquisition.addCharacteristicUri(attr);
                 }
                 dataAcquisition.addEntity(dasa.getEntityLabel());
@@ -1128,12 +1125,23 @@ public class ObjectAccessSpec extends HADatAcThing {
     public static String getProperDataAcquisitionUri(String fileName) {
         String base_name = FilenameUtils.getBaseName(fileName);
         List<ObjectAccessSpec> da_list = findAll();
-        for(ObjectAccessSpec da : da_list){
+        
+        // Use the longest match
+        String daUri = "";
+        int matchedQNameLength = 0;
+        for(ObjectAccessSpec da : da_list) {
             String abbrevUri = URIUtils.replaceNameSpaceEx(da.getUri());
             String qname = abbrevUri.split(":")[1];
-            if(base_name.startsWith(qname)){
-                return da.getUri();
+            if(base_name.startsWith(qname)) {
+                if (qname.length() > matchedQNameLength) {
+                    matchedQNameLength = qname.length();
+                    daUri = da.getUri();
+                }
             }
+        }
+        
+        if (!daUri.isEmpty()) {
+            return daUri;
         }
 
         return null;

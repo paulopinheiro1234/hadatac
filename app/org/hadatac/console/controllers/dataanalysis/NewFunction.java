@@ -12,6 +12,7 @@ import org.hadatac.entity.pojo.Aggregate;
 import org.hadatac.entity.pojo.Indicator;
 import org.hadatac.entity.pojo.facet.EntityCharacteristic;
 import org.hadatac.metadata.loader.URIUtils;
+import org.hadatac.utils.ConfigProp;
 
 import com.google.inject.Inject;
 
@@ -70,11 +71,12 @@ public class NewFunction extends Controller {
 		ind.save();
 		
 		// update/create new indicator in LabKey
-		int nRowsAffected = ind.saveToLabKey(session().get("LabKeyUserName"), session().get("LabKeyPassword"));
-		if (nRowsAffected <= 0) {
-		    return badRequest("Failed to insert new indicator to LabKey!\n");
+		if (ConfigProp.getLabKeyLoginRequired()) {
+		    int nRowsAffected = ind.saveToLabKey(session().get("LabKeyUserName"), session().get("LabKeyPassword"));
+		    if (nRowsAffected <= 0) {
+		        return badRequest("Failed to insert new indicator to LabKey!\n");
+		    }
 		}
-		
 		
 		return ok(newFunctionConfirm.render(ind));
     }

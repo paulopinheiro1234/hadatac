@@ -14,6 +14,7 @@ import org.hadatac.console.models.DASOForm;
 import org.hadatac.entity.pojo.DataAcquisitionSchema;
 import org.hadatac.entity.pojo.DataAcquisitionSchemaObject;
 import org.hadatac.metadata.loader.URIUtils;
+import org.hadatac.utils.ConfigProp;
 
 import be.objectify.deadbolt.java.actions.Group;
 import be.objectify.deadbolt.java.actions.Restrict;
@@ -25,7 +26,7 @@ public class NewDASO extends Controller {
 	
 	@Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
 	public Result index(String das_uri) {
-		if (session().get("LabKeyUserName") == null && session().get("LabKeyPassword") == null) {
+		if (ConfigProp.getLabKeyLoginRequired() && session().get("LabKeyUserName") == null && session().get("LabKeyPassword") == null) {
 			return redirect(org.hadatac.console.controllers.triplestore.routes.LoadKB.logInLabkey(
 					org.hadatac.console.controllers.schema.routes.NewDASO.index(das_uri).url()));
 		}
@@ -97,10 +98,13 @@ public class NewDASO extends Controller {
 		daso.save();
 
 		// update/create new DASO in LabKey
-		int nRowsAffected = daso.saveToLabKey(session().get("LabKeyUserName"), session().get("LabKeyPassword"));
-		if (nRowsAffected <= 0) {
-			return badRequest("Failed to insert new DASO to LabKey!\n");
+		if (ConfigProp.getLabKeyLoginRequired()) {
+		    int nRowsAffected = daso.saveToLabKey(session().get("LabKeyUserName"), session().get("LabKeyPassword"));
+		    if (nRowsAffected <= 0) {
+		        return badRequest("Failed to insert new DASO to LabKey!\n");
+		    }
 		}
+		
 		return ok(newDASOConfirm.render(daso));
 	}
 

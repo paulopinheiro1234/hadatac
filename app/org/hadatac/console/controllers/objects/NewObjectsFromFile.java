@@ -118,10 +118,13 @@ public class NewObjectsFromFile extends Controller {
                 obj.saveToTripleStore();
 
                 // update/create new OBJ in LabKey
-                int nRowsAffected = obj.saveToLabKey(session().get("LabKeyUserName"), session().get("LabKeyPassword"));
-                if (nRowsAffected <= 0) {
-                    System.out.println("[ERROR] Failed to insert new OBJ to LabKey!");
+                if (ConfigProp.getLabKeyLoginRequired()) {
+                    int nRowsAffected = obj.saveToLabKey(session().get("LabKeyUserName"), session().get("LabKeyPassword"));
+                    if (nRowsAffected <= 0) {
+                        System.out.println("[ERROR] Failed to insert new OBJ to LabKey!");
+                    }
                 }
+                
                 oc.getObjectUris().add(obj.getUri());
 
                 nextId++;

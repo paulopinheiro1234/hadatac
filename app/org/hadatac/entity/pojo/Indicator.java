@@ -364,6 +364,11 @@ public class Indicator extends HADatAcThing implements Comparable<Indicator> {
         }
         insert += NameSpaces.getInstance().printSparqlNameSpaceList();
         insert += INSERT_LINE1;
+        
+        if (!getNamedGraph().isEmpty()) {
+            insert += " GRAPH <" + getNamedGraph() + "> { ";
+        }
+        
         if (label != null && !label.equals("")) {
             insert += ind_uri + " rdfs:label \"" + label + "\" .  ";
         }
@@ -373,6 +378,11 @@ public class Indicator extends HADatAcThing implements Comparable<Indicator> {
         if (superUri != null && !superUri.equals("")) {
             insert += ind_uri + " rdfs:subClassOf <" + DynamicFunctions.replacePrefixWithURL(superUri) + "> .  ";
         }
+        
+        if (!getNamedGraph().isEmpty()) {
+            insert += " } ";
+        }
+        
         insert += LINE_LAST;
 
         try {
