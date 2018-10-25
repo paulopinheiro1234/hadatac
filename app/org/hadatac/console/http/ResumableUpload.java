@@ -4,6 +4,9 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.RandomAccessFile;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+
 import play.mvc.Http.Request;
 
 public class ResumableUpload {
@@ -64,11 +67,19 @@ public class ResumableUpload {
         String resumableFilename = request.getQueryString("resumableFilename");
         String resumableRelativePath = request.getQueryString("resumableRelativePath");
         
-        //Here we add a ".temp" to every upload file to indicate NON-FINISHED
+        // Here we add a ".temp" to every upload file to indicate NON-FINISHED
         File folder = new File(base_dir);
  		if (!folder.exists()) {
  			folder.mkdirs();
  	    }
+ 		
+ 		Path path = Paths.get(resumableFilename);
+        if (path == null) {
+            resumableFilename = "default.csv";
+        } else {
+            resumableFilename = path.getFileName().toString();
+        }
+        
         String resumableFilePath = new File(base_dir, resumableFilename).getAbsolutePath() + ".temp";
         ResumableInfoStorage storage = ResumableInfoStorage.getInstance();
         ResumableInfo info = storage.get(resumableChunkSize, resumableTotalSize,

@@ -1,6 +1,7 @@
 package org.hadatac.console.controllers.annotator;
 
 import java.io.File;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -476,13 +477,19 @@ public class AutoAnnotator extends Controller {
             String resumableFilename,
             String resumableRelativePath) {
         
-        DataFile file = DataFile.findByName(resumableFilename);
+        Path path = Paths.get(resumableFilename);
+        if (path == null) {
+            return badRequest("<a style=\"color:#cc3300; font-size: x-large;\">Could not get file path!</a>");
+        }
+        
+        String filename = path.getFileName().toString();
+        DataFile file = DataFile.findByName(filename);
         if (file != null && file.existsInFileSystem(ConfigProp.getPathUnproc())) {
             return badRequest("<a style=\"color:#cc3300; font-size: x-large;\">A file with this name already exists!</a>");
         }
         
         if (ResumableUpload.postUploadFileByChunking(request(), ConfigProp.getPathUnproc())) {
-            DataFile.create(resumableFilename, AuthApplication.getLocalUser(session()).getEmail());
+            DataFile.create(filename, AuthApplication.getLocalUser(session()).getEmail());
             return(ok("Upload finished"));
         } else {
             return(ok("Upload"));
