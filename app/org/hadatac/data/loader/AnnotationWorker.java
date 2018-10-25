@@ -400,7 +400,6 @@ public class AnnotationWorker {
         System.out.println("Processing DPL file...");
 
         DPL dpl = new DPL(file);
-        String file_name = dpl.getFileName();
         Map<String, String> mapCatalog = dpl.getCatalog();
 
         String sheetName = "";

@@ -80,13 +80,13 @@ public class AutoAnnotator extends Controller {
 
         DataFile.filterNonexistedFiles(path_proc, proc_files);
         DataFile.filterNonexistedFiles(path_unproc, unproc_files);
-        
+
         for (DataFile dataFile : proc_files) {
             if (!dataFile.getStudyUri().isEmpty() && !studyURIs.contains(dataFile.getStudyUri())) {
                 studyURIs.add(dataFile.getStudyUri());
             }
         }
-        
+
         studyURIs.sort(new Comparator<String>() {
             @Override
             public int compare(String o1, String o2) {
@@ -262,7 +262,7 @@ public class AutoAnnotator extends Controller {
     public Result getAnnotationStatus(String fileName) {
         DataFile dataFile = DataFile.findByName(fileName);
         Map<String, Object> result = new HashMap<String, Object>();
-        
+
         if (dataFile == null) {
             result.put("File Name", fileName);
             result.put("Status", "Unknown");
@@ -290,7 +290,7 @@ public class AutoAnnotator extends Controller {
         else {
             dataFile = DataFile.findByName(user.getEmail(), fileName);
         }
-        
+
         if (null == dataFile) {
             return badRequest("You do NOT have the permission to operate this file!");
         }
@@ -318,7 +318,7 @@ public class AutoAnnotator extends Controller {
         }
         file.renameTo(new File(destFolder + "/" + pureFileName));
         file.delete();
-        
+
         AnnotationLog log = AnnotationLog.find(fileName);
         if (null != log) {
             log.delete();
@@ -330,7 +330,7 @@ public class AutoAnnotator extends Controller {
 
         return redirect(routes.AutoAnnotator.index());
     }
-    
+
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
     public Result activateDataFile(String fileName) {           
         final SysUser user = AuthApplication.getLocalUser(session());
@@ -372,15 +372,15 @@ public class AutoAnnotator extends Controller {
         }
 
         File file = new File(path + "/" + fileName);
-        
+
         String pureFileName = Paths.get(fileName).getFileName().toString();
         if (pureFileName.startsWith("DA-")) {
             Measurement.delete(dataFile.getDatasetUri());
         } else {
-        	try {
-        		deleteAddedTriples(file);
-        	} catch (Exception e) {
-            	System.out.print("Can not delete triples ingested by " + fileName + " ..");
+            try {
+                deleteAddedTriples(file);
+            } catch (Exception e) {
+                System.out.print("Can not delete triples ingested by " + fileName + " ..");
                 file.delete();
                 dataFile.delete();
                 AnnotationLog.delete(fileName);
@@ -412,6 +412,7 @@ public class AutoAnnotator extends Controller {
 
         String file_name = file.getName();
         GeneratorChain chain = null;
+        
         if (file_name.startsWith("PID")) {
             chain = AnnotationWorker.annotateSubjectIdFile(recordFile);
         } else if (file_name.startsWith("STD")) {
@@ -425,6 +426,8 @@ public class AutoAnnotator extends Controller {
             chain = AnnotationWorker.annotateMapFile(recordFile);
         } else if (file_name.startsWith("ACQ")) {
             chain = AnnotationWorker.annotateACQFile(recordFile, false);
+        } else if (file_name.startsWith("OAS")) {
+            chain = AnnotationWorker.annotateOASFile(recordFile, false);
         } else if (file_name.startsWith("SDD")) {
             if (file_name.endsWith(".xlsx")) {
                 recordFile = new SpreadsheetRecordFile(file, "InfoSheet");
@@ -476,18 +479,18 @@ public class AutoAnnotator extends Controller {
             String resumableIdentifier,
             String resumableFilename,
             String resumableRelativePath) {
-        
+
         Path path = Paths.get(resumableFilename);
         if (path == null) {
             return badRequest("<a style=\"color:#cc3300; font-size: x-large;\">Could not get file path!</a>");
         }
-        
+
         String filename = path.getFileName().toString();
         DataFile file = DataFile.findByName(filename);
         if (file != null && file.existsInFileSystem(ConfigProp.getPathUnproc())) {
             return badRequest("<a style=\"color:#cc3300; font-size: x-large;\">A file with this name already exists!</a>");
         }
-        
+
         if (ResumableUpload.postUploadFileByChunking(request(), ConfigProp.getPathUnproc())) {
             DataFile.create(filename, AuthApplication.getLocalUser(session()).getEmail());
             return(ok("Upload finished"));

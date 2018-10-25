@@ -34,7 +34,6 @@ import org.joda.time.format.DateTimeFormatter;
 import org.joda.time.format.ISODateTimeFormat;
 import org.labkey.remoteapi.CommandException;
 
-
 public class ObjectAccessSpec extends HADatAcThing {
     private static final String className = "hasco:DataAcquisition";
 
@@ -98,10 +97,10 @@ public class ObjectAccessSpec extends HADatAcThing {
     private String elevation;
     @Field("dataset_uri_str_multi")
     private List<String> datasetURIs;
-    //@Field("globalscope_uri_str")
-    //private String rowScopeUri;
-    //@Field("globalscope_name_str")
-    //private String rowScopeName;
+    // @Field("globalscope_uri_str")
+    // private String rowScopeUri;
+    // @Field("globalscope_name_str")
+    // private String rowScopeName;
     @Field("localscope_uri_str_multi")
     private List<String> cellScopeUri;
     @Field("localscope_name_str_multi")
@@ -109,15 +108,16 @@ public class ObjectAccessSpec extends HADatAcThing {
     @Field("status_int")
     private int status;
     /*
-     * 0 - DataAcquisition is a new one, its details on the preamble
-     * 		It should not exist inside the KB
-     * 		Preamble must contain deployment link and deployment must exists on the KB
-     * 1 - DataAcquisition already exists, only a reference present on the preamble
-     * 		It should exist inside the KB as not finished yet 
-     * 2 - DataAcquisition already exists, the preamble states its termination with endedAtTime information
-     * 		It should exist inside the KB as not finished yet
+     * 0 - DataAcquisition is a new one, its details on the preamble It should
+     * not exist inside the KB Preamble must contain deployment link and
+     * deployment must exists on the KB 1 - DataAcquisition already exists, only
+     * a reference present on the preamble It should exist inside the KB as not
+     * finished yet 2 - DataAcquisition already exists, the preamble states its
+     * termination with endedAtTime information It should exist inside the KB as
+     * not finished yet
      *
-     * 9999 - Object Access Specification is complete (anything else diferent than 9999 is considered incomplete
+     * 9999 - Object Access Specification is complete (anything else diferent
+     * than 9999 is considered incomplete
      *
      */
 
@@ -125,6 +125,7 @@ public class ObjectAccessSpec extends HADatAcThing {
     private String ccsvUri;
     private String localName;
     private Deployment deployment;
+
     public ObjectAccessSpec() {
         startedAt = null;
         endedAt = null;
@@ -140,15 +141,15 @@ public class ObjectAccessSpec extends HADatAcThing {
         typeURIs = new ArrayList<String>();
         associatedURIs = new ArrayList<String>();
         deployment = null;
-        //rowScopeUri = null;
-        //rowScopeName = null;
+        // rowScopeUri = null;
+        // rowScopeName = null;
         cellScopeUri = new ArrayList<String>();
         cellScopeName = new ArrayList<String>();
     }
 
     @Override
     public boolean equals(Object o) {
-        if((o instanceof ObjectAccessSpec) && (((ObjectAccessSpec)o).getUri().equals(this.getUri()))) {
+        if ((o instanceof ObjectAccessSpec) && (((ObjectAccessSpec) o).getUri().equals(this.getUri()))) {
             return true;
         } else {
             return false;
@@ -214,6 +215,7 @@ public class ObjectAccessSpec extends HADatAcThing {
     public String getUri() {
         return uri;
     }
+
     public void setUri(String uri) {
         if (uri == null || uri.equals("")) {
             this.uri = "";
@@ -225,6 +227,7 @@ public class ObjectAccessSpec extends HADatAcThing {
     public String getParameter() {
         return parameter;
     }
+
     public void setParameter(String parameter) {
         this.parameter = parameter;
     }
@@ -232,6 +235,7 @@ public class ObjectAccessSpec extends HADatAcThing {
     public String getLabel() {
         return label;
     }
+
     public void setLabel(String label) {
         this.label = label;
     }
@@ -239,6 +243,7 @@ public class ObjectAccessSpec extends HADatAcThing {
     public String getComment() {
         return comment;
     }
+
     public void setComment(String comment) {
         this.comment = comment;
     }
@@ -246,6 +251,7 @@ public class ObjectAccessSpec extends HADatAcThing {
     public String getUsedUri() {
         return used_uri;
     }
+
     public void setUsedUri(String used_uri) {
         this.used_uri = used_uri;
     }
@@ -253,12 +259,14 @@ public class ObjectAccessSpec extends HADatAcThing {
     public String getStudyUri() {
         return studyUri;
     }
+
     public Study getStudy() {
-        if (studyUri == null || studyUri.equals(""))  
+        if (studyUri == null || studyUri.equals(""))
             return null;
         Study study = Study.find(studyUri);
         return study;
     }
+
     public void setStudyUri(String study_uri) {
         this.studyUri = study_uri;
     }
@@ -266,6 +274,7 @@ public class ObjectAccessSpec extends HADatAcThing {
     public String getOwnerUri() {
         return ownerUri;
     }
+
     public void setOwnerUri(String ownerUri) {
         this.ownerUri = ownerUri;
     }
@@ -273,6 +282,7 @@ public class ObjectAccessSpec extends HADatAcThing {
     public String getPermissionUri() {
         return permissionUri;
     }
+
     public void setPermissionUri(String permissionUri) {
         this.permissionUri = permissionUri;
     }
@@ -280,6 +290,7 @@ public class ObjectAccessSpec extends HADatAcThing {
     public boolean getIsComplete() {
         return isComplete;
     }
+
     public void setIsComplete(boolean isComplete) {
         this.isComplete = isComplete;
     }
@@ -287,6 +298,7 @@ public class ObjectAccessSpec extends HADatAcThing {
     public int getTriggeringEvent() {
         return triggeringEvent;
     }
+
     public void setTriggeringEvent(int triggeringEvent) {
         this.triggeringEvent = triggeringEvent;
     }
@@ -310,6 +322,7 @@ public class ObjectAccessSpec extends HADatAcThing {
         }
         return "";
     }
+
     public int getTriggeringEventByName(String name) {
         switch (name) {
         case TriggeringEvent.INITIAL_DEPLOYMENT_NAME:
@@ -335,123 +348,156 @@ public class ObjectAccessSpec extends HADatAcThing {
         DateTimeFormatter formatter = ISODateTimeFormat.dateTime();
         return formatter.withZone(DateTimeZone.UTC).print(startedAt);
     }
+
     public String getStartedAtXsd() {
         DateTimeFormatter formatter = ISODateTimeFormat.dateTimeNoMillis();
         return formatter.withZone(DateTimeZone.UTC).print(startedAt);
     }
+
     @Field("started_at_date")
     public void setStartedAt(DateTime startedAt) {
         this.startedAt = startedAt;
     }
+
     public void setStartedAtXsd(String startedAt) {
         DateTimeFormatter formatter = ISODateTimeFormat.dateTimeNoMillis();
         this.startedAt = formatter.parseDateTime(startedAt);
     }
+
     public void setStartedAtXsdWithMillis(String startedAt) {
         DateTimeFormatter formatter = ISODateTimeFormat.dateTime();
         this.startedAt = formatter.parseDateTime(startedAt);
     }
+
     public String getEndedAt() {
         DateTimeFormatter formatter = ISODateTimeFormat.dateTime();
         return formatter.withZone(DateTimeZone.UTC).print(endedAt);
     }
+
     public String getEndedAtXsd() {
         DateTimeFormatter formatter = ISODateTimeFormat.dateTimeNoMillis();
         return formatter.withZone(DateTimeZone.UTC).print(endedAt);
     }
+
     @Field("ended_at_date")
     public void setEndedAt(DateTime endedAt) {
         this.endedAt = endedAt;
     }
+
     public void setEndedAtXsd(String endedAt) {
         DateTimeFormatter formatter = ISODateTimeFormat.dateTimeNoMillis();
         this.endedAt = formatter.parseDateTime(endedAt);
     }
+
     public void setEndedAtXsdWithMillis(String endedAt) {
         DateTimeFormatter formatter = ISODateTimeFormat.dateTime();
         this.endedAt = formatter.parseDateTime(endedAt);
     }
+
     public List<String> getUnit() {
         return unit;
     }
+
     public void setUnit(List<String> unit) {
         this.unit = unit;
     }
+
     public void addUnit(String unit) {
         if (this.unit.contains(unit) == false) {
             this.unit.add(unit);
         }
     }
+
     public List<String> getUnitUri() {
         return unitUri;
     }
+
     public void setUnitUri(List<String> unitUri) {
         this.unitUri = unitUri;
     }
+
     public void addUnitUri(String unitUri) {
         if (this.unitUri.contains(unitUri) == false) {
             this.unitUri.add(unitUri);
         }
     }
+
     public List<String> getEntity() {
         return entity;
     }
+
     public void setEntity(List<String> entity) {
         this.entity = entity;
     }
+
     public void addEntity(String entity) {
         if (this.entity.contains(entity) == false) {
             this.entity.add(entity);
         }
     }
+
     public List<String> getEntityUri() {
         return entityUri;
     }
+
     public void setEntityUri(List<String> entityUri) {
         this.entityUri = entityUri;
     }
+
     public void addEntityUri(String entityUri) {
         if (this.entityUri.contains(entityUri) == false) {
             this.entityUri.add(entityUri);
         }
     }
+
     public List<String> getCharacteristic() {
         return characteristic;
     }
+
     public void setCharacteristic(List<String> characteristic) {
         this.characteristic = characteristic;
     }
+
     public void addCharacteristic(String characteristic) {
         if (this.characteristic.contains(characteristic) == false) {
             this.characteristic.add(characteristic);
         }
     }
+
     public List<String> getCharacteristicUri() {
         return characteristicUri;
     }
+
     public void setCharacteristicUri(List<String> characteristicUri) {
         this.characteristicUri = characteristicUri;
     }
+
     public void addCharacteristicUri(String characteristicUri) {
         if (this.characteristicUri.contains(characteristicUri) == false) {
             this.characteristicUri.add(characteristicUri);
         }
     }
+
     public String getMethodUri() {
         return methodUri;
     }
+
     public void setMethodUri(String methodUri) {
         this.methodUri = methodUri;
     }
+
     public String getSchemaUri() {
         return schemaUri;
     }
+
     public void setSchemaUri(String schemaUri) {
         this.schemaUri = schemaUri;
     }
+
     public String getDeploymentUri() {
         return deploymentUri;
     }
+
     public Deployment getDeployment() {
         if (deploymentUri == null || deploymentUri.equals("")) {
             return null;
@@ -463,48 +509,59 @@ public class ObjectAccessSpec extends HADatAcThing {
         }
         return deployment = Deployment.find(deploymentUri);
     }
+
     public void setDeploymentUri(String deploymentUri) {
         this.deploymentUri = deploymentUri;
     }
+
     public String getInstrumentModel() {
         return instrumentModel;
     }
+
     public void setInstrumentModel(String instrumentModel) {
         this.instrumentModel = instrumentModel;
     }
+
     public String getInstrumentUri() {
         return instrumentUri;
     }
+
     public void setInstrumentUri(String instrumentUri) {
         this.instrumentUri = instrumentUri;
     }
+
     public String getPlatformName() {
         return platformName;
     }
+
     public void setPlatformName(String platformName) {
         this.platformName = platformName;
     }
+
     public String getPlatformUri() {
         return platformUri;
     }
+
     public void setPlatformUri(String platformUri) {
         this.platformUri = platformUri;
     }
+
     public String getLocation() {
         return location;
     }
+
     public void setLocation(String location) {
         this.location = location;
     }
 
     public boolean hasScope() {
-	return (hasCellScope()); 
-	//return (hasRowScope() || hasCellScope()); 
+        return (hasCellScope());
+        // return (hasRowScope() || hasCellScope());
     }
-    
-    //public boolean hasRowScope() {
-    //    return (rowScopeUri != null && !rowScopeUri.equals(""));
-    //}
+
+    // public boolean hasRowScope() {
+    // return (rowScopeUri != null && !rowScopeUri.equals(""));
+    // }
 
     public boolean hasCellScope() {
         if (cellScopeUri != null && cellScopeUri.size() > 0) {
@@ -516,41 +573,24 @@ public class ObjectAccessSpec extends HADatAcThing {
         }
         return false;
     }
-    
+
     /*
-    public String getRowScopeUri() {
-        return rowScopeUri;
-    }
-    public void setRowScopeUri(String rowScopeUri) {
-        this.rowScopeUri = rowScopeUri;
-        if (rowScopeUri == null || rowScopeUri.equals("")) {
-            return;
-        }
-        ObjectCollection oc = ObjectCollection.find(rowScopeUri);
-        if (oc != null) {
-            if (oc.getUri().equals(rowScopeUri)) {
-                rowScopeName = oc.getLabel();
-                return;
-            }
-        } else {
-            StudyObject obj = StudyObject.find(rowScopeUri);
-            if (obj != null && obj.getUri().equals(rowScopeUri)) {
-                rowScopeName = obj.getLabel();
-                return;
-            }
-        }
-    }
-    public String getRowScopeName() {
-        return rowScopeName;
-    }
-    public void setRowScopeName(String rowScopeName) {
-        this.rowScopeName = rowScopeName;
-    }
-    */
+     * public String getRowScopeUri() { return rowScopeUri; } public void
+     * setRowScopeUri(String rowScopeUri) { this.rowScopeUri = rowScopeUri; if
+     * (rowScopeUri == null || rowScopeUri.equals("")) { return; }
+     * ObjectCollection oc = ObjectCollection.find(rowScopeUri); if (oc != null)
+     * { if (oc.getUri().equals(rowScopeUri)) { rowScopeName = oc.getLabel();
+     * return; } } else { StudyObject obj = StudyObject.find(rowScopeUri); if
+     * (obj != null && obj.getUri().equals(rowScopeUri)) { rowScopeName =
+     * obj.getLabel(); return; } } } public String getRowScopeName() { return
+     * rowScopeName; } public void setRowScopeName(String rowScopeName) {
+     * this.rowScopeName = rowScopeName; }
+     */
 
     public List<String> getCellScopeUri() {
         return cellScopeUri;
     }
+
     public void setCellScopeUri(List<String> cellScopeUri) {
         this.cellScopeUri = cellScopeUri;
         if (cellScopeUri == null || cellScopeUri.size() == 0) {
@@ -566,40 +606,50 @@ public class ObjectAccessSpec extends HADatAcThing {
             }
         }
     }
+
     public void addCellScopeUri(String cellScopeUri) {
         this.cellScopeUri.add(cellScopeUri);
     }
+
     public List<String> getCellScopeName() {
         return cellScopeName;
     }
+
     public void setCellScopeName(List<String> cellScopeName) {
         this.cellScopeName = cellScopeName;
     }
+
     public void addCellScopeName(String cellScopeName) {
         this.cellScopeName.add(cellScopeName);
     }
+
     public List<String> getDatasetUri() {
         return datasetURIs;
     }
+
     public void setDatasetUri(List<String> datasetURIs) {
         this.datasetURIs = datasetURIs;
     }
+
     public void addDatasetUri(String dataset_uri) {
         if (!datasetURIs.contains(dataset_uri)) {
             datasetURIs.add(dataset_uri);
         }
     }
+
     public void deleteDatasetUri(String dataset_uri) {
         Iterator<String> iter = datasetURIs.iterator();
-        while (iter.hasNext()){
+        while (iter.hasNext()) {
             if (iter.next().equals(dataset_uri)) {
                 iter.remove();
             }
         }
     }
+
     public void deleteAllDatasetURIs() {
         datasetURIs.clear();
     }
+
     public boolean containsDataset(String uri) {
         return datasetURIs.contains(uri);
     }
@@ -607,9 +657,11 @@ public class ObjectAccessSpec extends HADatAcThing {
     public List<String> getTypeURIs() {
         return typeURIs;
     }
+
     public void setTypeURIs(List<String> typeURIs) {
         this.typeURIs = typeURIs;
     }
+
     public void addTypeUri(String type_uri) {
         if (!typeURIs.contains(type_uri)) {
             typeURIs.add(type_uri);
@@ -623,6 +675,7 @@ public class ObjectAccessSpec extends HADatAcThing {
     public void setAssociatedURIs(List<String> associatedURIs) {
         this.associatedURIs = associatedURIs;
     }
+
     public void addAssociatedUri(String associated_uri) {
         if (!associatedURIs.contains(associated_uri)) {
             associatedURIs.add(associated_uri);
@@ -654,14 +707,13 @@ public class ObjectAccessSpec extends HADatAcThing {
                     CollectionUtil.getCollectionPath(CollectionUtil.Collection.DATA_COLLECTION)).build();
             if (null == endedAt) {
                 endedAt = DateTime.parse("9999-12-31T23:59:59.999Z");
-            }
-            else if (endedAt.toString().startsWith("9999")) {
+            } else if (endedAt.toString().startsWith("9999")) {
                 endedAt = DateTime.parse("9999-12-31T23:59:59.999Z");
             }
             client.addBean(this).getStatus();
             client.commit();
             client.close();
-            
+
             return true;
         } catch (IOException | SolrServerException e) {
             System.out.println("[ERROR] DataAcquisition.save() - e.Message: " + e.getMessage());
@@ -712,21 +764,17 @@ public class ObjectAccessSpec extends HADatAcThing {
         return -1;
     }
 
-    public Map<HADatAcThing, List<HADatAcThing>> getTargetFacets(
-            Facet facet, FacetHandler facetHandler) {
+    public Map<HADatAcThing, List<HADatAcThing>> getTargetFacets(Facet facet, FacetHandler facetHandler) {
 
         SolrQuery query = new SolrQuery();
         String strQuery = facetHandler.getTempSolrQuery(facet);
-        //System.out.println("strQuery: " + strQuery);
+        // System.out.println("strQuery: " + strQuery);
         query.setQuery(strQuery);
         query.setRows(0);
         query.setFacet(true);
         query.setFacetLimit(-1);
-        query.setParam("json.facet", "{ "
-                + "acquisition_uri_str:{ "
-                + "type: terms, "
-                + "field: acquisition_uri_str, "
-                + "limit: 1000}}");
+        query.setParam("json.facet",
+                "{ " + "acquisition_uri_str:{ " + "type: terms, " + "field: acquisition_uri_str, " + "limit: 1000}}");
 
         try {
             SolrClient solr = new HttpSolrClient.Builder(
@@ -785,17 +833,19 @@ public class ObjectAccessSpec extends HADatAcThing {
                 dataAcquisition.setStudyUri(doc.getFieldValue("study_uri_str").toString());
             }
             if (doc.getFieldValue("triggering_event_int") != null) {
-                dataAcquisition.setTriggeringEvent(Integer.parseInt(doc.getFieldValue("triggering_event_int").toString()));
+                dataAcquisition
+                        .setTriggeringEvent(Integer.parseInt(doc.getFieldValue("triggering_event_int").toString()));
             }
             if (doc.getFieldValue("nr_data_points_long") != null) {
-                dataAcquisition.setNumberDataPoints(Long.parseLong(doc.getFieldValue("nr_data_points_long").toString()));
+                dataAcquisition
+                        .setNumberDataPoints(Long.parseLong(doc.getFieldValue("nr_data_points_long").toString()));
             }
             if (doc.getFieldValue("started_at_date") != null) {
-                date = new DateTime((Date)doc.getFieldValue("started_at_date"));
+                date = new DateTime((Date) doc.getFieldValue("started_at_date"));
                 dataAcquisition.setStartedAt(date.withZone(DateTimeZone.UTC));
             }
             if (doc.getFieldValue("ended_at_date") != null) {
-                date = new DateTime((Date)doc.getFieldValue("ended_at_date"));
+                date = new DateTime((Date) doc.getFieldValue("ended_at_date"));
                 dataAcquisition.setEndedAt(date.withZone(DateTimeZone.UTC));
             }
             if (doc.getFieldValues("method_uri_str") != null) {
@@ -879,12 +929,12 @@ public class ObjectAccessSpec extends HADatAcThing {
                     dataAcquisition.addDatasetUri(i.next().toString());
                 }
             }
-            //if (doc.getFieldValue("globalscope_uri_str") != null) {
-            //    dataAcquisition.setRowScopeUri(doc.getFieldValue("globalscope_uri_str").toString());
-            //}
-            //if (doc.getFieldValue("globalscope_name_str") != null) {
-            //    dataAcquisition.setRowScopeName(doc.getFieldValue("globalscope_name_str").toString());
-            //}
+            // if (doc.getFieldValue("globalscope_uri_str") != null) {
+            // dataAcquisition.setRowScopeUri(doc.getFieldValue("globalscope_uri_str").toString());
+            // }
+            // if (doc.getFieldValue("globalscope_name_str") != null) {
+            // dataAcquisition.setRowScopeName(doc.getFieldValue("globalscope_name_str").toString());
+            // }
             if (doc.getFieldValues("localscope_uri_str_multi") != null) {
                 i = doc.getFieldValues("localscope_uri_str_multi").iterator();
                 while (i.hasNext()) {
@@ -913,22 +963,19 @@ public class ObjectAccessSpec extends HADatAcThing {
         if (state.getCurrent() == State.ALL) {
             if (null == ownerUri) {
                 query.set("q", "owner_uri_str:*");
-            }
-            else {
+            } else {
                 query.set("q", "owner_uri_str:\"" + ownerUri + "\"");
             }
         } else if (state.getCurrent() == State.ACTIVE) {
             if (null == ownerUri) {
                 query.set("q", "owner_uri_str:* AND ended_at_date:\"9999-12-31T23:59:59.999Z\"");
-            }
-            else {
+            } else {
                 query.set("q", "owner_uri_str:\"" + ownerUri + "\" AND ended_at_date:\"9999-12-31T23:59:59.999Z\"");
             }
-        } else {  // it is assumed that state is CLOSED
+        } else { // it is assumed that state is CLOSED
             if (null == ownerUri) {
                 query.set("q", "owner_uri_str:* AND -ended_at_date:\"9999-12-31T23:59:59.999Z\"");
-            }
-            else {
+            } else {
                 query.set("q", "owner_uri_str:\"" + ownerUri + "\" AND -ended_at_date:\"9999-12-31T23:59:59.999Z\"");
             }
         }
@@ -947,10 +994,9 @@ public class ObjectAccessSpec extends HADatAcThing {
             user.getGroupNames(accessLevels);
         }
 
-        for(ObjectAccessSpec acquisition : findAll()) {
-            if(acquisition.getPermissionUri().equals("Public")
-                    || acquisition.getPermissionUri().equals(user_uri)
-                    || acquisition.getOwnerUri().equals(user_uri)){
+        for (ObjectAccessSpec acquisition : findAll()) {
+            if (acquisition.getPermissionUri().equals("Public") || acquisition.getPermissionUri().equals(user_uri)
+                    || acquisition.getOwnerUri().equals(user_uri)) {
                 results.add(acquisition.getUri());
                 continue;
             }
@@ -1125,21 +1171,21 @@ public class ObjectAccessSpec extends HADatAcThing {
     public static String getProperDataAcquisitionUri(String fileName) {
         String base_name = FilenameUtils.getBaseName(fileName);
         List<ObjectAccessSpec> da_list = findAll();
-        
+
         // Use the longest match
         String daUri = "";
         int matchedQNameLength = 0;
-        for(ObjectAccessSpec da : da_list) {
+        for (ObjectAccessSpec da : da_list) {
             String abbrevUri = URIUtils.replaceNameSpaceEx(da.getUri());
             String qname = abbrevUri.split(":")[1];
-            if(base_name.startsWith(qname)) {
+            if (base_name.startsWith(qname)) {
                 if (qname.length() > matchedQNameLength) {
                     matchedQNameLength = qname.length();
                     daUri = da.getUri();
                 }
             }
         }
-        
+
         if (!daUri.isEmpty()) {
             return daUri;
         }
@@ -1218,8 +1264,8 @@ public class ObjectAccessSpec extends HADatAcThing {
         builder.append("platform_uri: " + this.platformUri + "\n");
         builder.append("location: " + this.location + "\n");
         builder.append("elevation: " + this.elevation + "\n");
-        //builder.append("rowScopeUri: " + this.rowScopeUri + "\n");
-        //builder.append("rowScopeName: " + this.rowScopeName + "\n");
+        // builder.append("rowScopeUri: " + this.rowScopeUri + "\n");
+        // builder.append("rowScopeName: " + this.rowScopeName + "\n");
         for (String cellUri : cellScopeUri) {
             builder.append("cellScopeUri: " + cellUri + "\n");
         }
@@ -1256,7 +1302,7 @@ public class ObjectAccessSpec extends HADatAcThing {
                 cellUri += " , ";
             }
         }
-        List< Map<String, Object> > rows = new ArrayList< Map<String, Object> >();
+        List<Map<String, Object>> rows = new ArrayList<Map<String, Object>>();
         Map<String, Object> row = new HashMap<String, Object>();
         row.put("a", String.join(", ", abbrevTypeURIs));
         row.put("hasURI", URIUtils.replaceNameSpaceEx(getUri()));
@@ -1268,10 +1314,11 @@ public class ObjectAccessSpec extends HADatAcThing {
         row.put("hasco:hasDeployment", URIUtils.replaceNameSpaceEx(getDeploymentUri()));
         row.put("hasco:isDataAcquisitionOf", URIUtils.replaceNameSpaceEx(getStudyUri()));
         row.put("hasco:hasSchema", URIUtils.replaceNameSpaceEx(getSchemaUri()));
-        //row.put("hasco:hasRowScope", URIUtils.replaceNameSpaceEx(getRowScopeUri()));
-        row.put("hasco:hasCellScope", cellUri); 
+        // row.put("hasco:hasRowScope",
+        // URIUtils.replaceNameSpaceEx(getRowScopeUri()));
+        row.put("hasco:hasCellScope", cellUri);
         row.put("hasco:hasTriggeringEvent", getTriggeringEventName());
-        row.put("prov:endedAtTime", getEndedAt().startsWith("9999")? "" : getEndedAt());
+        row.put("prov:endedAtTime", getEndedAt().startsWith("9999") ? "" : getEndedAt());
         rows.add(row);
 
         try {
@@ -1291,7 +1338,7 @@ public class ObjectAccessSpec extends HADatAcThing {
     public int deleteFromLabKey(String userName, String password) {
         LabkeyDataHandler loader = LabkeyDataHandler.createDefault(userName, password);
 
-        List< Map<String, Object> > rows = new ArrayList< Map<String, Object> >();
+        List<Map<String, Object>> rows = new ArrayList<Map<String, Object>>();
         Map<String, Object> row = new HashMap<String, Object>();
         row.put("hasURI", URIUtils.replaceNameSpaceEx(getUri()));
         rows.add(row);
@@ -1311,6 +1358,6 @@ public class ObjectAccessSpec extends HADatAcThing {
     }
 
     @Override
-    public void deleteFromTripleStore() {}
+    public void deleteFromTripleStore() {
+    }
 }
-

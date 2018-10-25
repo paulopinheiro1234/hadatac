@@ -54,10 +54,7 @@ public class OASGenerator extends BasicGenerator {
         return DDName.replace("SDD-","");
     }
 
-    private String getDeployment(Record rec) {
-        //System.out.println("Value template file: [" + Templates.TEMPLATE_FILE + "]");
-        //System.out.println("Value template for deployment: [" + Templates.DEPLOYMENTURI + "]");
-        //System.out.println("Value for deployment: [" + rec.getValueByColumnName(Templates.DEPLOYMENTURI) + "]");	    
+    private String getDeployment(Record rec) { 
         return rec.getValueByColumnName(Templates.DEPLOYMENTURI);
     }
 
