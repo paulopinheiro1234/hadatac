@@ -8,7 +8,7 @@ import org.apache.jena.update.UpdateFactory;
 import org.apache.jena.update.UpdateProcessor;
 import org.apache.jena.update.UpdateRequest;
 
-import org.apache.commons.text.StrSubstitutor;
+import org.apache.commons.text.StringSubstitutor;
 import org.hadatac.metadata.loader.URIUtils;
 import org.hadatac.utils.CollectionUtil;
 import org.hadatac.utils.NameSpaces;
@@ -98,7 +98,7 @@ public class DASOInstance {
 		} else {
 			templateValues.put("modifier", "");
 		}
-		StrSubstitutor sub = new StrSubstitutor(templateValues);
+		StringSubstitutor sub = new StringSubstitutor(templateValues);
 		String generatedURI = sub.replace(URI_TEMPLATE);
 		//generatedURI = kbPrefix + generatedURI;
 		return generatedURI;

@@ -134,7 +134,7 @@ public class LoadOnt extends Controller {
         int original_size = NameSpace.findAll().size();
 
         Form form = formFactory.form().bindFromRequest();
-        Map<String, String> data = form.data();
+        Map<String, String> data = form.rawData();
 
         NameSpace.deleteAll();
         for (int i = 0; i < Math.max(original_size, data.size() / 3); ++i) {

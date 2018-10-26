@@ -8,6 +8,7 @@ import com.feth.play.module.pa.user.AuthUserIdentity;
 import com.feth.play.module.pa.service.AbstractUserService;
 import javax.inject.Inject;
 
+
 public class MyUserService extends AbstractUserService {
 
 	@Inject

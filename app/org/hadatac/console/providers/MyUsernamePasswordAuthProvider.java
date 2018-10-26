@@ -242,14 +242,14 @@ public class MyUsernamePasswordAuthProvider extends
 	@Override
 	protected MyUsernamePasswordAuthProvider.MyLogin getLogin(final Context ctx) {
 		Context.current.set(ctx);
-		final Form<MyLogin> filledForm = LOGIN_FORM.bindFromRequest();
+		final Form<MyLogin> filledForm = getLoginForm().bindFromRequest();
 		return filledForm.get();
 	}
 	
 	@Override
 	protected MyUsernamePasswordAuthProvider.MySignup getSignup(final Context ctx) {
 		Context.current.set(ctx);
-		final Form<MySignup> filledForm = SIGNUP_FORM.bindFromRequest();
+		final Form<MySignup> filledForm = getSignupForm().bindFromRequest();
 		return filledForm.get();
 	}
 

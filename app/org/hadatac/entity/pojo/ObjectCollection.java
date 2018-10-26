@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.Map;
 import java.io.ByteArrayOutputStream;
 
-import org.apache.commons.lang3.text.WordUtils;
+import org.apache.commons.text.WordUtils;
 import org.apache.jena.query.Query;
 import org.apache.jena.query.QueryExecution;
 import org.apache.jena.query.QueryExecutionFactory;

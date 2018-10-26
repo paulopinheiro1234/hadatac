@@ -12,7 +12,7 @@ import java.util.HashMap;
 import java.util.List;
 import javax.inject.Inject;
 
-import javax.servlet.http.HttpServletResponse;
+import org.apache.http.HttpStatus;
 
 import org.hadatac.entity.pojo.Credential;
 import org.hadatac.console.controllers.AuthApplication;
@@ -465,7 +465,7 @@ public class AutoAnnotator extends Controller {
                 ConfigProp.getPathUnproc())) {
             return ok("Uploaded."); //This Chunk has been Uploaded.
         } else {
-            return status(HttpServletResponse.SC_NOT_FOUND);
+            return status(HttpStatus.SC_NOT_FOUND);
         }
     }
 

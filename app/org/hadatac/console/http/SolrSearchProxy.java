@@ -79,7 +79,7 @@ public class SolrSearchProxy extends Controller {
         String request_q;
         String request_encoding = "";
 
-        if (form.data().size() == 0) {
+        if (form.rawData().size() == 0) {
             return badRequest("[ERROR] getDataAcuisitionDownload expects some data");
         } else {
             request_fl = form.get("fl");
@@ -146,7 +146,7 @@ public class SolrSearchProxy extends Controller {
         DynamicForm form = formFactory.form().bindFromRequest();
         String request_token;
 
-        if (form.data().size() == 0) {
+        if (form.rawData().size() == 0) {
             return badRequest("[ERROR] getApiStudyDownload expects some data");
         } else {
             request_token = form.get("token");
@@ -161,7 +161,7 @@ public class SolrSearchProxy extends Controller {
         DynamicForm form = formFactory.form().bindFromRequest();
         String request_token;
 
-        if (form.data().size() == 0) {
+        if (form.rawData().size() == 0) {
             return badRequest("[ERROR] getApiStudyVariableDownload expects some data");
         } else {
             request_token = form.get("token");
@@ -176,7 +176,7 @@ public class SolrSearchProxy extends Controller {
         DynamicForm form = formFactory.form().bindFromRequest();
         String request_token;
 
-        if (form.data().size() == 0) {
+        if (form.rawData().size() == 0) {
             return badRequest("[ERROR] getApiStudyVariableDataDownload expects some data");
         } else {
             request_token = form.get("token");

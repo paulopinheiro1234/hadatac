@@ -2,14 +2,16 @@ organization := "org.hadatac"
 
 name := "hadatac"
 
-scalaVersion := "2.11.8"
+scalaVersion := "2.12.6"
 
 version := "1.0-SNAPSHOT"
 
 val appDependencies = Seq(
-  "be.objectify" %% "deadbolt-java" % "2.5.0",
-  "com.feth" %% "play-authenticate" % "0.8.3",
-  cache,
+  "be.objectify" %% "deadbolt-java" % "2.6.4",
+  "be.objectify" %% "deadbolt-java-gs" % "2.6.0",
+  "com.feth" %% "play-authenticate" % "0.9.0",
+  cacheApi,
+  ehcache,
   evolutions,
   javaWs,
   javaJdbc,
@@ -21,7 +23,7 @@ val appDependencies = Seq(
   //"com.fasterxml.jackson.core" % "jackson-annotations" % "2.7.2",
   //"commons-io" % "commons-io" % "2.4",
   //"org.apache.commons" % "commons-csv" % "1.2",
-  "org.apache.commons" % "commons-text" % "1.1",
+  "org.apache.commons" % "commons-text" % "1.6",
   "commons-validator" % "commons-validator" % "1.5.0",
   //"org.apache.httpcomponents" % "httpclient" % "4.5.2",
   //"org.apache.httpcomponents" % "fluent-hc" % "4.5.2",
@@ -37,6 +39,9 @@ val appDependencies = Seq(
   "joda-time" % "joda-time" % "2.9.2",
   "org.jasypt" % "jasypt" % "1.9.2",
   "org.labkey" % "labkey-client-api" % "16.2.0",
+  "com.typesafe.play" %% "play-json" % "2.6.0",
+  "com.typesafe.play" %% "play-iteratees" % "2.6.1",
+  "com.typesafe.play" %% "play-iteratees-reactive-streams" % "2.6.1",
   "com.googlecode.json-simple" % "json-simple" % "1.1.1",
   "com.google.code.gson" % "gson" % "2.8.2"
 )
@@ -49,7 +54,6 @@ javacOptions ++= Seq("-Xlint:unchecked")
 
 lazy val root = project.in(file("."))
   .enablePlugins(PlayJava, PlayEbean)
-  .enablePlugins(GitVersioning)
   .settings(
     libraryDependencies ++= appDependencies
   )
@@ -57,9 +61,4 @@ lazy val root = project.in(file("."))
 //libraryDependencies += guice
 //libraryDependencies += openId
 
-//dependencyOverrides += "com.typesafe.play" % "twirl-api_2.11" % "1.3.2"
-//dependencyOverrides += "com.typesafe.play" % "play-logback_2.11" % "2.6.0"
-//dependencyOverrides += "com.typesafe.play" % "play-server_2.11" % "2.6.0"
-
-useJGit
 

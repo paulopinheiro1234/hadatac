@@ -15,6 +15,7 @@ import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionStage;
 
+
 public class MyDeadboltHandler extends AbstractDeadboltHandler {
 	
 	private final PlayAuthenticate auth;
@@ -26,7 +27,7 @@ public class MyDeadboltHandler extends AbstractDeadboltHandler {
 	}
 
 	@Override
-	public CompletionStage<Optional<Result>> beforeAuthCheck(final Http.Context context) {
+	public CompletionStage<Optional<Result>> beforeAuthCheck(final Http.Context context, final Optional<String> content) {
 		if (this.auth.isLoggedIn(context.session())) {
 			// user is logged in
 			return CompletableFuture.completedFuture(Optional.empty());
@@ -37,8 +38,7 @@ public class MyDeadboltHandler extends AbstractDeadboltHandler {
 			// was requested before sending him to the login page
 			// if you don't call this, the user will get redirected to the page
 			// defined by your resolver
-			final String originalUrl = this.auth
-					.storeOriginalUrl(context);
+			final String originalUrl = this.auth.storeOriginalUrl(context);
 
 			context.flash().put("error",
 					"You need to log in first, to view '" + originalUrl + "'");
