@@ -201,7 +201,7 @@ public class Indicator extends HADatAcThing implements Comparable<Indicator> {
 
         ResultSetRewindable resultsrw = SPARQLUtils.select(
                 CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), query);
-        
+
         Indicator indicator = null;
         while (resultsrw.hasNext()) {
             QuerySolution soln = resultsrw.next();
@@ -213,7 +213,7 @@ public class Indicator extends HADatAcThing implements Comparable<Indicator> {
             }
             indicators.add(indicator);
         }
-        
+
         java.util.Collections.sort(indicators);
         return indicators; 
     }
@@ -223,7 +223,7 @@ public class Indicator extends HADatAcThing implements Comparable<Indicator> {
 
         String valueConstraint = "";
         if (!facet.getFacetValuesByField("indicator_uri_str").isEmpty()) {
-            valueConstraint += " VALUES ?studyIndicator { " + stringify(
+            valueConstraint += " VALUES ?indicator { " + stringify(
                     facet.getFacetValuesByField("indicator_uri_str"), true) + " } \n ";
         }
 
@@ -239,7 +239,7 @@ public class Indicator extends HADatAcThing implements Comparable<Indicator> {
 
         String query = "";
         query += NameSpaces.getInstance().printSparqlNameSpaceList();
-        query += "SELECT ?studyIndicator ?indicatorLabel ?dataAcq ?schemaAttribute ?attributeUri ?attributeLabel WHERE { \n"
+        query += "SELECT ?indicator ?indicatorLabel ?dataAcq ?schemaAttribute ?attributeUri ?attributeLabel WHERE { \n"
                 + valueConstraint + " \n"
                 + "?subTypeUri rdfs:subClassOf* hasco:Study . \n"
                 + "?studyUri a ?subTypeUri . \n"
@@ -247,11 +247,10 @@ public class Indicator extends HADatAcThing implements Comparable<Indicator> {
                 + "?dataAcq hasco:hasSchema ?schemaUri . \n"
                 + "?schemaAttribute hasco:partOfSchema ?schemaUri . \n"
                 + "?schemaAttribute hasco:hasAttribute ?attributeUri . \n" 
-                + "?attributeUri rdfs:subClassOf* ?studyIndicator . \n"
+                + "?attributeUri rdfs:subClassOf* ?indicator . \n"
                 + "?attributeUri rdfs:label ?attributeLabel . \n"
-                + "?studyIndicator rdfs:subClassOf hasco:StudyIndicator . \n"
-                //+ " { { ?studyIndicator rdfs:subClassOf hasco:StudyIndicator } UNION { ?studyIndicator rdfs:subClassOf hasco:ScienceIndicator } } . \n"
-                + "?studyIndicator rdfs:label ?indicatorLabel . \n"
+                + " { ?indicator rdfs:subClassOf hasco:SampleIndicator } UNION { ?indicator rdfs:subClassOf hasco:StudyIndicator } . \n"
+                + "?indicator rdfs:label ?indicatorLabel . \n"
                 + "}";
 
         System.out.println("Indicator query: " + query);
@@ -260,11 +259,11 @@ public class Indicator extends HADatAcThing implements Comparable<Indicator> {
         try {
             ResultSetRewindable resultsrw = SPARQLUtils.select(
                     CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), query);
-            
+
             while (resultsrw.hasNext()) {
                 QuerySolution soln = resultsrw.next();
                 Indicator indicator = new Indicator();
-                indicator.setUri(soln.get("studyIndicator").toString());
+                indicator.setUri(soln.get("indicator").toString());
                 indicator.setLabel(WordUtils.capitalize(soln.get("indicatorLabel").toString()));
                 indicator.setField("indicator_uri_str");
 
@@ -361,11 +360,11 @@ public class Indicator extends HADatAcThing implements Comparable<Indicator> {
         }
         insert += NameSpaces.getInstance().printSparqlNameSpaceList();
         insert += INSERT_LINE1;
-        
+
         if (!getNamedGraph().isEmpty()) {
             insert += " GRAPH <" + getNamedGraph() + "> { ";
         }
-        
+
         if (label != null && !label.equals("")) {
             insert += ind_uri + " rdfs:label \"" + label + "\" .  ";
         }
@@ -375,11 +374,11 @@ public class Indicator extends HADatAcThing implements Comparable<Indicator> {
         if (superUri != null && !superUri.equals("")) {
             insert += ind_uri + " rdfs:subClassOf <" + DynamicFunctions.replacePrefixWithURL(superUri) + "> .  ";
         }
-        
+
         if (!getNamedGraph().isEmpty()) {
             insert += " } ";
         }
-        
+
         insert += LINE_LAST;
 
         try {
