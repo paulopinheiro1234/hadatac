@@ -800,20 +800,33 @@ public class DataAcquisitionSchemaAttribute extends HADatAcThing {
         
         insert += this.getUri() + " a hasco:DASchemaAttribute . ";
         insert += this.getUri() + " rdfs:label  \"" + label + "\" . ";
+        
         if (partOfSchema.startsWith("http")) {
             insert += this.getUri() + " hasco:partOfSchema <" + partOfSchema + "> .  "; 
         } else {
             insert += this.getUri() + " hasco:partOfSchema " + partOfSchema + " .  "; 
-        } 
-        if (!entity.equals("")) {
-            insert += this.getUri() + " hasco:hasEntity "  + entity + " .  ";
-        }   
-        if (!attributes.equals("")) {
-            insert += this.getUri() + " hasco:hasAttribute " + attributes + " .  ";
         }
-        if (!unit.equals("")) {
+        
+        if (entity.startsWith("http")) {
+            insert += this.getUri() + " hasco:hasEntity <" + entity + "> .  ";
+        } else {
+            insert += this.getUri() + " hasco:hasEntity " + entity + " .  ";
+        }
+        
+        for (String attribute : attributes) {
+            if (attribute.startsWith("http")) {
+                insert += this.getUri() + " hasco:hasAttribute <" + attribute + "> .  ";
+            } else {
+                insert += this.getUri() + " hasco:hasAttribute " + attribute + " . ";
+            }
+        }
+        
+        if (unit.startsWith("http")) {
+            insert += this.getUri() + " hasco:hasUnit <" + unit + "> .  ";
+        } else {
             insert += this.getUri() + " hasco:hasUnit " + unit + " .  ";
         }
+        
         if (daseUri != null && !daseUri.equals("")) {
             if (daseUri.startsWith("http")) {
                 insert += this.getUri() + " hasco:hasEvent <" + daseUri + "> .  ";

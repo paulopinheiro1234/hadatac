@@ -12,8 +12,6 @@ import org.apache.jena.query.QueryExecutionFactory;
 import org.apache.jena.query.QueryFactory;
 import org.apache.jena.query.QueryParseException;
 import org.apache.jena.query.QuerySolution;
-import org.apache.jena.query.ResultSet;
-import org.apache.jena.query.ResultSetFactory;
 import org.apache.jena.query.ResultSetRewindable;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.RDFNode;
@@ -34,7 +32,6 @@ import org.hadatac.utils.CollectionUtil;
 import org.hadatac.utils.NameSpaces;
 import org.labkey.remoteapi.CommandException;
 
-import com.typesafe.config.ConfigFactory;
 
 public class Indicator extends HADatAcThing implements Comparable<Indicator> {
 
