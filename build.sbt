@@ -58,7 +58,7 @@ lazy val root = project.in(file("."))
     libraryDependencies ++= appDependencies
   )
 
-//libraryDependencies += guice
-//libraryDependencies += openId
+libraryDependencies += guice
+libraryDependencies += openId
 
 
