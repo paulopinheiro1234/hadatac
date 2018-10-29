@@ -201,7 +201,7 @@ public class Facet {
 	public String toSolrQuery() {
 		List<String> fieldQueries = new ArrayList<>();
 		for (String field : getFieldValues().keySet()) {
-			if (!getIgnoredFields().contains(field)) {
+			if (!getIgnoredFields().contains(field) && !field.isEmpty()) {
 				fieldQueries.add(field + ":(" + String.join(", ", getFieldValues().get(field).stream().map(
                         p -> "\"" + p + "\"").collect(Collectors.toList())) + ")");
 			}

@@ -61,7 +61,7 @@ public class EntityRole extends HADatAcThing implements Comparable<EntityRole> {
 
         String query = "";
         query += NameSpaces.getInstance().printSparqlNameSpaceList();
-        query += "SELECT ?roleUri ?daso ?dasoSub ?dasa ?relation ?entityUri ?attributeUri ?attributeLabel WHERE { \n"
+        query += "SELECT DISTINCT ?roleUri ?daso ?dasoSub ?dasa ?relation ?entityUri ?attributeUri ?attributeLabel WHERE { \n"
                 + valueConstraint
                 + "{ \n"
                 + "?dasa hasco:isAttributeOf ?daso . \n"
@@ -71,13 +71,15 @@ public class EntityRole extends HADatAcThing implements Comparable<EntityRole> {
                 + "?attributeUri rdfs:label ?attributeLabel . \n"
                 + "} UNION { \n"
                 + "?dasa hasco:isAttributeOf ?dasoSub . \n"
-                + "?dasoSub sio:inRelationTo ?daso . \n"
+                + "?dasoSub ?relation ?daso . \n"
                 + "?dasoSub sio:Relation ?relation . \n"
                 + "?daso hasco:hasRole ?roleUri . \n"
                 + "?dasa hasco:hasEntity ?entityUri . \n"
                 + "?dasa hasco:hasAttribute ?attributeUri . \n"
                 + "?attributeUri rdfs:label ?attributeLabel . \n"
-                + "}} \n";
+                + "} \n"
+                + "FILTER (?daso != ?dasoSub) \n"
+                + "} \n";
 
         System.out.println("EntityRole query: " + query);
 
@@ -87,10 +89,15 @@ public class EntityRole extends HADatAcThing implements Comparable<EntityRole> {
                     CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), query);
 
             if (resultsrw.size() == 0) {
+                System.out.println("resultsrw.size() == 0!");
+
                 EntityRole role = new EntityRole();
+
+                /*
                 role.setUri(URIUtils.replacePrefixEx("sio:Sample"));
                 role.setLabel("Sample");
                 role.setField("entity_role_uri_str");
+                 */
 
                 AttributeInstance attrib = new AttributeInstance();				
                 if (!results.containsKey(role)) {
@@ -116,9 +123,12 @@ public class EntityRole extends HADatAcThing implements Comparable<EntityRole> {
                         role.setLabel(WordUtils.capitalize(URIUtils.getBaseName(soln.get("roleUri").toString())));
                         role.setField("entity_role_uri_str");
                     } else {
+                        System.out.println("soln.get(\"roleUri\") == null");
+                        /*
                         role.setUri(URIUtils.replacePrefixEx("sio:Sample"));
                         role.setLabel("Sample");
                         role.setField("entity_role_uri_str");
+                         */
                     }
 
                     AttributeInstance attrib = new AttributeInstance();
@@ -136,11 +146,18 @@ public class EntityRole extends HADatAcThing implements Comparable<EntityRole> {
 
                     Facet subFacet = facet.getChildById(role.getUri());
                     subFacet.putFacet("entity_role_uri_str", role.getUri());
-                    subFacet.putFacet("daso_uri_str", soln.get("daso").toString());
+                    if (soln.get("dasoSub") != null) {
+                        subFacet.putFacet("daso_uri_str", soln.get("dasoSub").toString());
+                    } else {
+                        subFacet.putFacet("daso_uri_str", soln.get("daso").toString());
+                    }
                     subFacet.putFacet("dasa_uri_str", soln.get("dasa").toString());
+
+                    /*
                     if (!role.getUri().equals(URIUtils.replacePrefixEx("sio:Sample"))) {
                         subFacet.putFacet("entity_uri_str", soln.get("entityUri").toString());
                     }
+                     */
                 }
             }
         } catch (Exception e) {
@@ -158,18 +175,18 @@ public class EntityRole extends HADatAcThing implements Comparable<EntityRole> {
                 + " ?soc hasco:hasRoleLabel ?label . \n" 
                 + " ?soc hasco:isMemberOf <" + studyUri + "> . \n" 
                 + " } \n";
-	        //    + "SELECT ?studyObj ?roleUri WHERE { \n"
-            //    + "{ "
-            //    + "?studyObj hasco:isMemberOf ?soc . \n"
-            //    + "?soc a hasco:SubjectGroup . \n"
-            //    + "?soc hasco:isMemberOf <" + studyUri + "> . \n"
-            //    + "?studyObj hasco:hasRole ?roleUri . \n"
-            //    + "} UNION { \n"
-            //    + "?studyObj hasco:isMemberOf ?soc . \n"
-            //    + "?soc a hasco:SampleCollection . \n"
-            //    + "?soc hasco:isMemberOf <" + studyUri + "> . \n"
-            //    + "?studyObj a ?roleUri . \n"
-            //    + "}}";
+        //    + "SELECT ?studyObj ?roleUri WHERE { \n"
+        //    + "{ "
+        //    + "?studyObj hasco:isMemberOf ?soc . \n"
+        //    + "?soc a hasco:SubjectGroup . \n"
+        //    + "?soc hasco:isMemberOf <" + studyUri + "> . \n"
+        //    + "?studyObj hasco:hasRole ?roleUri . \n"
+        //    + "} UNION { \n"
+        //    + "?studyObj hasco:isMemberOf ?soc . \n"
+        //    + "?soc a hasco:SampleCollection . \n"
+        //    + "?soc hasco:isMemberOf <" + studyUri + "> . \n"
+        //    + "?studyObj a ?roleUri . \n"
+        //    + "}}";
 
         // System.out.println("findObjRoleMappings query: " + queryString);
 
@@ -185,7 +202,7 @@ public class EntityRole extends HADatAcThing implements Comparable<EntityRole> {
             System.out.println("EntityRole.findObjRoleMappings() Error: " + e.getMessage());
             e.printStackTrace();
         }
-        
+
         // System.out.println("findObjRoleMappings results: " + results);
 
         return results;
