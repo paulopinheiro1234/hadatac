@@ -12,6 +12,9 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import org.hadatac.utils.NameSpaces;
+import java.util.Map;
+import java.util.HashMap;
 
 public class BrowseOntology extends Controller {
 
@@ -54,6 +57,8 @@ public class BrowseOntology extends Controller {
                 }
             }
         }
+        //String jsonStr = NameSpaces.jsonLoadedOntologies();
+        //System.out.println(jsonStr);
         return cacheList;
     }
 

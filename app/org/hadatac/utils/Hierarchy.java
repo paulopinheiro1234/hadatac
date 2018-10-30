@@ -20,6 +20,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.hadatac.utils.CollectionUtil;
 import org.hadatac.console.http.SPARQLUtils;
 import org.hadatac.console.models.TreeNode;
+import org.hadatac.utils.NameSpaces;
 
 public class Hierarchy {
 
@@ -32,7 +33,7 @@ public class Hierarchy {
     
     public Hierarchy (String className) {
         if(className.isEmpty())
-            this.className = "owl:Thing";
+            this.className = "owl";
         else
 		    this.className = className; 
     }
@@ -40,13 +41,19 @@ public class Hierarchy {
     @JsonIgnore
 	public String getHierarchyJson() {
 		//System.out.println("Inside HADatAcClass's getHierarchyJson: [" + className + "]");
-		String q = 
-				"SELECT ?id ?superId ?label ?comment WHERE { " + 
-						"   ?id rdfs:subClassOf* " + className + " . " + 
-						"   ?id rdfs:subClassOf ?superId .  " + 
-						"   OPTIONAL { ?id rdfs:label ?label . } " + 
-						"   OPTIONAL { ?id rdfs:comment ?comment . } " +
-						"}";
+		// String q = 
+		// 		"SELECT ?id ?superId ?label ?comment WHERE { " + 
+		// 				"   ?id rdfs:subClassOf* " + className + " . " + 
+		// 				"   ?id rdfs:subClassOf ?superId .  " + 
+		// 				"   OPTIONAL { ?id rdfs:label ?label . } " + 
+		// 				"   OPTIONAL { ?id rdfs:comment ?comment . } " +
+		// 				"}";
+		String graphName = NameSpaces.getNames(className);
+		String q = "SELECT ?id ?superId ?label FROM NAMED <" + graphName + "> " +
+			"{GRAPH ?g { " + 
+				"?id rdfs:subClassOf ?superId . " + 
+				" OPTIONAL { ?id rdfs:label ?label }}}";
+		System.out.println(q);
 		ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
 		try {
 			String queryString = NameSpaces.getInstance().printSparqlNameSpaceList() + q;
@@ -56,7 +63,7 @@ public class Hierarchy {
 			ResultSet results = qexec.execSelect();
 			ResultSetFormatter.outputAsJSON(outputStream, results);
 			qexec.close();
-
+			System.out.println(outputStream.toString("UTF-8"));
 			return outputStream.toString("UTF-8");
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -70,12 +77,11 @@ public class Hierarchy {
 		String superNode = null;
 		String nodeLabel = null;
 		ArrayList<TreeNode> branchCollection = new ArrayList<TreeNode>();
-		String q = 
-				"SELECT ?id ?superId ?label WHERE { " + 
-						"   ?id rdfs:subClassOf* " + className + " . " + 
-						"   ?id rdfs:subClassOf ?superId .  " + 
-						"   ?id rdfs:label ?label .  " + 
-						"}";
+		String graphName = NameSpaces.getNames(className);
+		String q = "SELECT ?id ?superId ?label FROM NAMED <" + graphName + "> " +
+		"{GRAPH ?g { " + 
+			"?id rdfs:subClassOf ?superId . " + 
+			" OPTIONAL { ?id rdfs:label ?label }}}";
 		try {
 			String queryString = NameSpaces.getInstance().printSparqlNameSpaceList() + q;
 			

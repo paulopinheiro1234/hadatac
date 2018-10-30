@@ -34,6 +34,14 @@ public class NameSpaces {
         return instance;
     }
 
+    public static String getNames(String abbr) {
+        NameSpace ns = table.get(abbr);
+        if(ns == null)
+            return "owl";
+        else
+            return ns.getName();
+    }
+
     private NameSpaces() {
         loadedOntologies = new HashMap<String, Integer>();
         
