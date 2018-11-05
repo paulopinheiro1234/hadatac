@@ -22,7 +22,7 @@ import org.hadatac.utils.CollectionUtil;
 import org.hadatac.console.http.SPARQLUtils;
 import org.hadatac.console.models.TreeNode;
 
-public class HADatAcClass {
+public class HADatAcClass extends HADatAcThing {
 
 	private String className = "";
 	public  String uri = "";
@@ -262,5 +262,41 @@ public class HADatAcClass {
 		}
 		return "";
 	}
+
+    @Override
+    public boolean saveToTripleStore() {
+        // TODO Auto-generated method stub
+        return false;
+    }
+
+    @Override
+    public void deleteFromTripleStore() {
+        // TODO Auto-generated method stub
+        
+    }
+
+    @Override
+    public boolean saveToSolr() {
+        // TODO Auto-generated method stub
+        return false;
+    }
+
+    @Override
+    public int deleteFromSolr() {
+        // TODO Auto-generated method stub
+        return 0;
+    }
+
+    @Override
+    public int saveToLabKey(String userName, String password) {
+        // TODO Auto-generated method stub
+        return 0;
+    }
+
+    @Override
+    public int deleteFromLabKey(String userName, String password) {
+        // TODO Auto-generated method stub
+        return 0;
+    }
 }
 

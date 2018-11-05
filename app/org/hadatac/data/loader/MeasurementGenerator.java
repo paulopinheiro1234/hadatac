@@ -374,9 +374,9 @@ public class MeasurementGenerator extends BasicGenerator {
              *                             *
              *=============================*/
             if (objRoleMappings.containsKey(measurement.getStudyObjectUri())) {
-                measurement.setRoleUri(objRoleMappings.get(measurement.getStudyObjectUri()));
+                measurement.setRole(objRoleMappings.get(measurement.getStudyObjectUri()));
             } else {
-                measurement.setRoleUri("");
+                measurement.setRole("");
             }
 
             /*=============================*

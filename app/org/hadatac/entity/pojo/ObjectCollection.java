@@ -250,7 +250,7 @@ public class ObjectCollection extends HADatAcThing implements Comparable<ObjectC
     }
 
     public List<ObjectCollection> getSpaceScopes() {
-        if (spaceScopeUris == null || spaceScopeUris.equals("")) {
+        if (spaceScopeUris == null || spaceScopeUris.isEmpty()) {
             return null;
         }
         List<ObjectCollection> spaceScopes = new ArrayList<ObjectCollection>();
@@ -671,7 +671,7 @@ public class ObjectCollection extends HADatAcThing implements Comparable<ObjectC
             Pivot pivot = Pivot.parseQueryResponse(queryResponse);
             return parsePivot(pivot, facet);
         } catch (Exception e) {
-            System.out.println("[ERROR] EntityInstance.getTargetFacets() - Exception message: " + e.getMessage());
+            System.out.println("[ERROR] ObjectCollection.getTargetFacets() - Exception message: " + e.getMessage());
         }
 
         return null;

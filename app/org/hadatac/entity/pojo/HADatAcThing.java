@@ -43,6 +43,10 @@ public abstract class HADatAcThing {
     public long getNumberFromSolr(Facet facet, FacetHandler facetHandler) {
         return 0;
     }
+    
+    public long getNumberFromTripleStore(Facet facet, FacetHandler facetHandler) {
+        return 0;
+    }
 
     public String getUri() {
         return uri.replace("<","").replace(">","");

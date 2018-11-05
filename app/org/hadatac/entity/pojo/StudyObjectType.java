@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.HashMap;
 
+import org.apache.commons.text.WordUtils;
 import org.apache.jena.query.Query;
 import org.apache.jena.query.QueryExecution;
 import org.apache.jena.query.QueryExecutionFactory;
@@ -15,7 +16,10 @@ import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Statement;
 import org.apache.jena.rdf.model.StmtIterator;
+import org.apache.jena.sparql.engine.http.QueryExceptionHTTP;
 import org.hadatac.console.http.SPARQLUtils;
+import org.hadatac.console.models.Facet;
+import org.hadatac.console.models.FacetHandler;
 import org.hadatac.utils.CollectionUtil;
 import org.hadatac.utils.NameSpaces;
 
@@ -45,8 +49,8 @@ public class StudyObjectType extends HADatAcClass implements Comparable<StudyObj
         }			
 
         java.util.Collections.sort((List<StudyObjectType>) objectTypes);
+        
         return objectTypes;
-
     }
 
     public static Map<String,String> getMap() {
@@ -86,6 +90,82 @@ public class StudyObjectType extends HADatAcClass implements Comparable<StudyObj
         objectType.setLocalName(uri.substring(uri.indexOf('#') + 1));
 
         return objectType;
+    }
+    
+    @Override
+    public Map<HADatAcThing, List<HADatAcThing>> getTargetFacets(
+            Facet facet, FacetHandler facetHandler) {
+
+        String valueConstraint = "";
+        if (!facet.getFacetValuesByField("object_collection_type_str").isEmpty()) {
+            valueConstraint += " VALUES ?objectCollectionType { " + stringify(
+                    facet.getFacetValuesByField("object_collection_type_str"), true) + " } \n ";
+        }
+        if (!facet.getFacetValuesByField("study_object_type_uri_str").isEmpty()) {
+            valueConstraint += " VALUES ?studyObjType { " + stringify(
+                    facet.getFacetValuesByField("study_object_type_uri_str"), true) + " } \n ";
+        }
+
+        String query = "";
+        query += NameSpaces.getInstance().printSparqlNameSpaceList();
+        query += "SELECT ?studyObj ?studyObjType ?role ?studyObjTypeLabel WHERE { \n"
+                + valueConstraint + " \n"
+                + "?studyObj rdf:type ?studyObjType . \n"
+                + "?studyObj hasco:isMemberOf ?objectCollection . \n"
+                + "?objectCollection rdf:type ?objectCollectionType . \n"
+                + "?objectCollection hasco:hasRoleLabel ?role . \n"
+                + "?studyObjType rdfs:label ?studyObjTypeLabel . \n"
+                + "}";
+
+        System.out.println("StudyObjectType query: \n" + query);
+
+        Map<HADatAcThing, List<HADatAcThing>> results = new HashMap<HADatAcThing, List<HADatAcThing>>();
+        try {            
+            ResultSetRewindable resultsrw = SPARQLUtils.select(
+                    CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), query);
+
+            while (resultsrw.hasNext()) {
+                QuerySolution soln = resultsrw.next();
+                StudyObjectType studyObjectType = new StudyObjectType();
+                studyObjectType.setUri(soln.get("studyObjType").toString());
+                studyObjectType.setLabel(WordUtils.capitalize(soln.get("studyObjTypeLabel").toString()));
+                studyObjectType.setField("study_object_type_uri_str");
+
+                StudyObjectRole role = new StudyObjectRole();
+                role.setUri(soln.get("role").toString());
+                role.setLabel(WordUtils.capitalize(soln.get("role").toString()));
+                role.setField("role_str");
+
+                if (!results.containsKey(studyObjectType)) {
+                    System.out.println("studyObjectType: " + studyObjectType.getLabel());
+                    results.put(studyObjectType, new ArrayList<HADatAcThing>());
+                }
+                if (!results.get(studyObjectType).contains(role)) {
+                    results.get(studyObjectType).add(role);
+                }
+
+                Facet subFacet = facet.getChildById(studyObjectType.getUri());
+                subFacet.putFacet("study_object_uri_str", soln.get("studyObj").toString());
+            }
+        } catch (QueryExceptionHTTP e) {
+            e.printStackTrace();
+        }
+
+        return results;
+    }
+    
+    @Override
+    public boolean equals(Object o) {
+        if((o instanceof StudyObjectType) && (((StudyObjectType)o).getUri().equals(this.getUri()))) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+    
+    @Override
+    public int hashCode() {
+        return getUri().hashCode();
     }
 
     @Override

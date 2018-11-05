@@ -26,7 +26,8 @@ public class StudyObjectGenerator extends BasicGenerator {
     private Map<String, String> uriMap = new HashMap<String, String>();
     private Map<String, List<String>> mapContent = new HashMap<String, List<String>>();
 
-    public StudyObjectGenerator(RecordFile file, List<String> listContent, Map<String, List<String>> mapContent, String study_uri) {
+    public StudyObjectGenerator(RecordFile file, List<String> listContent, 
+            Map<String, List<String>> mapContent, String study_uri) {
         super(file);
         //this.study_id = study_id; 
         file_name = file.getFile().getName();
@@ -126,13 +127,13 @@ public class StudyObjectGenerator extends BasicGenerator {
     }
     
     public StudyObject createStudyObject(Record record) throws Exception {
-        //System.out.println(getUri(record));
         StudyObject obj = new StudyObject(getUri(record), getType(record), 
                 getOriginalID(record), getLabel(record), 
                 getCohortUri(record), getLabel(record));
         obj.setRoleUri(URIUtils.replacePrefixEx(role));
         obj.addScopeUri(getScopeUri(record));
         obj.addTimeScopeUri(getTimeScopeUri(record));
+        
         return obj;
     }
 

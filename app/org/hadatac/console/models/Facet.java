@@ -294,6 +294,7 @@ public class Facet {
 	
 	private List<String> getIgnoredFields() {
 		return Arrays.asList("indicator_uri_str", "entity_role_uri_str", 
-				"platform_uri_str", "instrument_uri_str", "dase_type_uri_str");
+				"platform_uri_str", "instrument_uri_str", "dase_type_uri_str",
+				"study_object_type_uri_str");
 	}
 }

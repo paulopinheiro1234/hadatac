@@ -73,8 +73,8 @@ public class Measurement extends HADatAcThing implements Runnable {
     private String pid;
     @Field("sid_str")
     private String sid;
-    @Field("role_uri_str")
-    private String roleUri;
+    @Field("role_str")
+    private String role;
     @Field("unit_uri_str")
     private String unitUri;
     @Field("daso_uri_str")
@@ -166,12 +166,12 @@ public class Measurement extends HADatAcThing implements Runnable {
         this.sid = objectUri;
     }
 
-    public String getRoleUri() {
-        return roleUri;
+    public String getRole() {
+        return role;
     }
 
-    public void setRoleUri(String roleUri) {
-        this.roleUri = roleUri;
+    public void setRole(String role) {
+        this.role = role;
     }
 
     public String getObjectPID() {
@@ -692,11 +692,9 @@ public class Measurement extends HADatAcThing implements Runnable {
                 facetHandler);
 
         FacetTree fTreeOC = new FacetTree();
-        fTreeOC.setTargetFacet(EntityRoleFromSSD.class);
+        fTreeOC.setTargetFacet(StudyObjectRole.class);
         fTreeOC.addUpperFacet(ObjectCollection.class);
-        //fTreeOC.setTargetFacet(ObjectCollection.class);
-        //fTreeOC.setTargetFacet(StudyObject.class);
-        //fTreeOC.addUpperFacet(ObjectCollection.class);
+        // fTreeOC.addUpperFacet(StudyObjectType.class);
         Pivot pivotOC = getFacetStats(fTreeOC, 
                 retFacetHandler.getFacetByName(FacetHandler.OBJECT_COLLECTION_FACET), 
                 facetHandler);
@@ -705,7 +703,7 @@ public class Measurement extends HADatAcThing implements Runnable {
         fTreeEC.setTargetFacet(AttributeInstance.class);
         fTreeEC.addUpperFacet(Indicator.class);
         fTreeEC.addUpperFacet(EntityRole.class);
-        //fTreeEC.addUpperFacet(EntityRoleFromSSD.class);
+        //fTreeEC.addUpperFacet(StudyObjectRole.class);
         fTreeEC.addUpperFacet(EntityInstance.class);
         fTreeEC.addUpperFacet(InRelationToInstance.class);
         Pivot pivotEC = getFacetStats(fTreeEC, 
@@ -916,7 +914,7 @@ public class Measurement extends HADatAcThing implements Runnable {
         m.setDasoUri(SolrUtils.getFieldValue(doc, "daso_uri_str"));
         m.setDasaUri(SolrUtils.getFieldValue(doc, "dasa_uri_str"));
         m.setObjectUri(SolrUtils.getFieldValue(doc, "object_uri_str"));
-        m.setRoleUri(SolrUtils.getFieldValue(doc, "role_uri_str"));
+        m.setRole(SolrUtils.getFieldValue(doc, "role_str"));
         m.setInRelationToUri(SolrUtils.getFieldValue(doc, "in_relation_to_uri_str"));
         m.setPID(SolrUtils.getFieldValue(doc, "pid_str"));
         m.setSID(SolrUtils.getFieldValue(doc, "sid_str"));
