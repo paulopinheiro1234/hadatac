@@ -356,7 +356,7 @@ public class MeasurementGenerator extends BasicGenerator {
                         }
                         measurement.setObjectCollectionType(URIUtils.replacePrefixEx("hasco:SubjectGroup"));
                         measurement.setPID(id);
-                    } else if (dasa.getEntity().equals(URIUtils.replacePrefixEx("sio:Sample"))) {
+                    } else {
                         if (mapIDStudyObjects.containsKey(id)) {
                             measurement.setStudyObjectUri(mapIDStudyObjects.get(id).get(0));
                             measurement.setObjectUri(mapIDStudyObjects.get(id).get(2));

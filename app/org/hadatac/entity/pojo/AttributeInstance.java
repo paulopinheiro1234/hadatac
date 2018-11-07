@@ -38,7 +38,13 @@ public class AttributeInstance extends HADatAcThing implements Comparable<Attrib
     public int hashCode() {
         return getUri().hashCode();
     }
+    
+    @Override
+    public long getNumber(Facet facet, FacetHandler facetHandler) {
+        return getNumberFromSolr(facet, facetHandler);
+    }
 
+    @Override
     public long getNumberFromSolr(Facet facet, FacetHandler facetHandler) {
         SolrQuery query = new SolrQuery();
         String strQuery = facetHandler.getTempSolrQuery(facet);
@@ -59,8 +65,15 @@ public class AttributeInstance extends HADatAcThing implements Comparable<Attrib
 
         return -1;
     }
-
+    
+    @Override
     public Map<HADatAcThing, List<HADatAcThing>> getTargetFacets(
+            Facet facet, FacetHandler facetHandler) {
+        return getTargetFacetsFromSolr(facet, facetHandler);
+    }
+    
+    @Override
+    public Map<HADatAcThing, List<HADatAcThing>> getTargetFacetsFromSolr(
             Facet facet, FacetHandler facetHandler) {
         
         SolrQuery query = new SolrQuery();
@@ -83,7 +96,7 @@ public class AttributeInstance extends HADatAcThing implements Comparable<Attrib
             Pivot pivot = Pivot.parseQueryResponse(queryResponse);            
             return parsePivot(pivot, facet);
         } catch (Exception e) {
-            System.out.println("[ERROR] AttributeInstance.getTargetFacets() - Exception message: " + e.getMessage());
+            System.out.println("[ERROR] AttributeInstance.getTargetFacetsFromSolr() - Exception message: " + e.getMessage());
         }
 
         return null;

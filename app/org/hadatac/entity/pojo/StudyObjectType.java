@@ -95,6 +95,12 @@ public class StudyObjectType extends HADatAcClass implements Comparable<StudyObj
     @Override
     public Map<HADatAcThing, List<HADatAcThing>> getTargetFacets(
             Facet facet, FacetHandler facetHandler) {
+        return getTargetFacetsFromTripleStore(facet, facetHandler);
+    }
+    
+    @Override
+    public Map<HADatAcThing, List<HADatAcThing>> getTargetFacetsFromTripleStore(
+            Facet facet, FacetHandler facetHandler) {
 
         String valueConstraint = "";
         if (!facet.getFacetValuesByField("object_collection_type_str").isEmpty()) {

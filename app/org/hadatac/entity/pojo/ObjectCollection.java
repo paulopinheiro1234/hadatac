@@ -15,6 +15,7 @@ import org.apache.jena.query.QueryParseException;
 import org.apache.jena.query.QuerySolution;
 import org.apache.jena.query.ResultSet;
 import org.apache.jena.query.ResultSetRewindable;
+import org.apache.jena.sparql.engine.http.QueryExceptionHTTP;
 import org.apache.jena.query.ResultSetFormatter;
 import org.apache.jena.update.UpdateExecutionFactory;
 import org.apache.jena.update.UpdateFactory;
@@ -646,8 +647,15 @@ public class ObjectCollection extends HADatAcThing implements Comparable<ObjectC
         }
         return "";
     }
-
+    
+    @Override
     public Map<HADatAcThing, List<HADatAcThing>> getTargetFacets(
+            Facet facet, FacetHandler facetHandler) {
+        return getTargetFacetsFromSolr(facet, facetHandler);
+    }
+
+    @Override
+    public Map<HADatAcThing, List<HADatAcThing>> getTargetFacetsFromSolr(
             Facet facet, FacetHandler facetHandler) {
 
         SolrQuery query = new SolrQuery();
@@ -671,7 +679,7 @@ public class ObjectCollection extends HADatAcThing implements Comparable<ObjectC
             Pivot pivot = Pivot.parseQueryResponse(queryResponse);
             return parsePivot(pivot, facet);
         } catch (Exception e) {
-            System.out.println("[ERROR] ObjectCollection.getTargetFacets() - Exception message: " + e.getMessage());
+            System.out.println("[ERROR] ObjectCollection.getTargetFacetsFromSolr() - Exception message: " + e.getMessage());
         }
 
         return null;

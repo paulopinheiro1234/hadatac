@@ -496,7 +496,13 @@ public class StudyObject extends HADatAcThing {
         }
         return "";
     }
+    
+    @Override
+    public long getNumber(Facet facet, FacetHandler facetHandler) {
+        return getNumberFromSolr(facet, facetHandler);
+    }
 
+    @Override
     public long getNumberFromSolr(Facet facet, FacetHandler facetHandler) {
         //System.out.println("\nStudyObject facet: " + facet.toSolrQuery());
 
@@ -519,8 +525,15 @@ public class StudyObject extends HADatAcThing {
 
         return -1;
     }
-
+    
+    @Override
     public Map<HADatAcThing, List<HADatAcThing>> getTargetFacets(
+            Facet facet, FacetHandler facetHandler) {
+        return getTargetFacetsFromSolr(facet, facetHandler);
+    }
+
+    @Override
+    public Map<HADatAcThing, List<HADatAcThing>> getTargetFacetsFromSolr(
             Facet facet, FacetHandler facetHandler) {
 
         SolrQuery query = new SolrQuery();
@@ -543,7 +556,7 @@ public class StudyObject extends HADatAcThing {
             Pivot pivot = Pivot.parseQueryResponse(queryResponse);            
             return parsePivot(pivot, facet);
         } catch (Exception e) {
-            System.out.println("[ERROR] StudyObject.getTargetFacets() - Exception message: " + e.getMessage());
+            System.out.println("[ERROR] StudyObject.getTargetFacetsFromSolr() - Exception message: " + e.getMessage());
         }
 
         return null;

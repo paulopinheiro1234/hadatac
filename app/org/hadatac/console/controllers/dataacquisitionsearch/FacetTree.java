@@ -71,7 +71,7 @@ public class FacetTree {
 					pivot.setValue(key.getLabel());
 					pivot.setTooltip(key.getUri());
 					if (key.getCount() == 0) {
-						pivot.setCount((int)dict.get(key).get(0).getNumberFromSolr(
+						pivot.setCount((int)dict.get(key).get(0).getNumber(
                                 facet.getChildById(key.getUri()), facetHandler));
 					} else {
 						pivot.setCount(key.getCount());

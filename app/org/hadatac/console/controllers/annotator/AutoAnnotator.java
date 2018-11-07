@@ -38,6 +38,7 @@ import org.hadatac.metadata.loader.LabkeyDataHandler;
 import org.hadatac.metadata.loader.URIUtils;
 import org.hadatac.utils.ConfigProp;
 import org.hadatac.utils.Feedback;
+import org.hadatac.utils.NameSpace;
 import org.labkey.remoteapi.CommandException;
 
 import be.objectify.deadbolt.java.actions.Group;
@@ -301,7 +302,8 @@ public class AutoAnnotator extends Controller {
 
         String pureFileName = Paths.get(fileName).getFileName().toString();
         if (pureFileName.startsWith("DA-")) {
-            Measurement.delete(dataFile.getDatasetUri());
+            Measurement.deleteFromSolr(dataFile.getDatasetUri());
+            NameSpace.deleteTriplesByNamedGraph(URIUtils.replacePrefixEx(dataFile.getDataAcquisitionUri()));
         } else {
             deleteAddedTriples(file);
         }
@@ -375,7 +377,8 @@ public class AutoAnnotator extends Controller {
 
         String pureFileName = Paths.get(fileName).getFileName().toString();
         if (pureFileName.startsWith("DA-")) {
-            Measurement.delete(dataFile.getDatasetUri());
+            Measurement.deleteFromSolr(dataFile.getDatasetUri());
+            NameSpace.deleteTriplesByNamedGraph(URIUtils.replacePrefixEx(dataFile.getDataAcquisitionUri()));
         } else {
             try {
                 deleteAddedTriples(file);

@@ -217,8 +217,14 @@ public class Indicator extends HADatAcThing implements Comparable<Indicator> {
         java.util.Collections.sort(indicators);
         return indicators; 
     }
-
+    
+    @Override
     public Map<HADatAcThing, List<HADatAcThing>> getTargetFacets(
+            Facet facet, FacetHandler facetHandler) {
+        return getTargetFacetsFromTripleStore(facet, facetHandler);
+    }
+
+    public Map<HADatAcThing, List<HADatAcThing>> getTargetFacetsFromTripleStore(
             Facet facet, FacetHandler facetHandler) {
 
         String valueConstraint = "";

@@ -16,8 +16,13 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.jena.query.QueryParseException;
 import org.apache.jena.query.QuerySolution;
 import org.apache.jena.query.ResultSetRewindable;
+import org.apache.jena.update.UpdateExecutionFactory;
+import org.apache.jena.update.UpdateFactory;
+import org.apache.jena.update.UpdateProcessor;
+import org.apache.jena.update.UpdateRequest;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrRequest;
@@ -85,8 +90,6 @@ public class Measurement extends HADatAcThing implements Runnable {
     private String inRelationToUri;
     @Field("entity_uri_str")
     private String entityUri;
-    //@Field("characteristic_uri_str")
-    //private String characteristicUri;
     @Field("characteristic_uri_str_multi")
     private List<String> characteristicUris;
     @Field("location_latlong")
@@ -107,7 +110,7 @@ public class Measurement extends HADatAcThing implements Runnable {
     private String strTimestamp;
 
     public Measurement() {
-    	characteristicUris = new ArrayList<String>();
+        characteristicUris = new ArrayList<String>();
     }
 
     public String getOwnerUri() {
@@ -288,7 +291,7 @@ public class Measurement extends HADatAcThing implements Runnable {
     public void setOriginalValue(String originalValue) {
         this.originalValue = originalValue;
     }
-    
+
     public String getLevelOfDetection() {
         return levelOfDetection;
     }
@@ -361,14 +364,6 @@ public class Measurement extends HADatAcThing implements Runnable {
         this.characteristic = characteristic;
     }
 
-    /*public String getCharacteristicUri() {
-        return characteristicUri;
-    }
-
-    public void setCharacteristicUri(String characteristicUri) {
-        this.characteristicUri = characteristicUri;
-    }*/
-
     public List<String> getCharacteristicUris() {
         return characteristicUris;
     }
@@ -376,7 +371,7 @@ public class Measurement extends HADatAcThing implements Runnable {
     public void addCharacteristicUris(String characteristicUri) {
         this.characteristicUris.add(characteristicUri);
     }
-    
+
     public void setCharacteristicUris(List<String> characteristicUris) {
         this.characteristicUris = characteristicUris;
     }
@@ -421,7 +416,7 @@ public class Measurement extends HADatAcThing implements Runnable {
         }
     }
 
-    public static int delete(String datasetUri) {
+    public static int deleteFromSolr(String datasetUri) {
         SolrClient solr = new HttpSolrClient.Builder(
                 CollectionUtil.getCollectionPath(CollectionUtil.Collection.DATA_ACQUISITION)).build();
         try {
@@ -579,7 +574,7 @@ public class Measurement extends HADatAcThing implements Runnable {
         }
 
         System.out.println("facets for measurement's find(); " + facets);
-        
+
         FacetHandler facetHandler = new FacetHandler();
         facetHandler.loadFacets(facets);
 
@@ -606,7 +601,7 @@ public class Measurement extends HADatAcThing implements Runnable {
         String q = buildQuery(ownedDAs, facetHandler);
 
         //System.out.println("measurement solr query: " + q);
-        
+
         SolrQuery query = new SolrQuery();
         query.setQuery(q);
         if (page != -1) {
@@ -640,12 +635,12 @@ public class Measurement extends HADatAcThing implements Runnable {
 
             //System.out.println("\n\n\nqueryResponse: " + queryResponse);
             Pivot pivot = Pivot.parseQueryResponse(queryResponse);
-            
-        	//System.out.println("PRINTING PIVOT");
+
+            //System.out.println("PRINTING PIVOT");
             //for (Pivot p : pivot.children) {
             //	System.out.println("Field: " + p.getField() + "   Value: " + p.getValue());
             //}
-            
+
             result.extra_facets.put(FacetHandler.SUBJECT_CHARACTERISTIC_FACET, pivot);
 
             Set<String> uri_set = new HashSet<String>();
@@ -693,8 +688,9 @@ public class Measurement extends HADatAcThing implements Runnable {
 
         FacetTree fTreeOC = new FacetTree();
         fTreeOC.setTargetFacet(StudyObjectRole.class);
-        fTreeOC.addUpperFacet(ObjectCollection.class);
-        // fTreeOC.addUpperFacet(StudyObjectType.class);
+        fTreeOC.addUpperFacet(ObjectCollectionType.class);
+        fTreeOC.addUpperFacet(StudyObjectType.class);
+        // fTreeOC.addUpperFacet(EntityInstance.class);
         Pivot pivotOC = getFacetStats(fTreeOC, 
                 retFacetHandler.getFacetByName(FacetHandler.OBJECT_COLLECTION_FACET), 
                 facetHandler);
@@ -885,7 +881,7 @@ public class Measurement extends HADatAcThing implements Runnable {
         if (cache.containsKey(getEntityUri())) {
             setEntity(cache.get(getEntityUri()));
         }
-        
+
         List<String> attributes = new ArrayList<String>();
         for (String attributeUri : getCharacteristicUris()) {
             if (cache.containsKey(attributeUri)) {
@@ -897,7 +893,7 @@ public class Measurement extends HADatAcThing implements Runnable {
         if (attributes.size() > 0) {
             setCharacteristic(String.join("; ", attributes));
         }
-        
+
         if (cache.containsKey(getUnitUri())) {
             setUnit(cache.get(getUnitUri()));
         }
@@ -1033,7 +1029,7 @@ public class Measurement extends HADatAcThing implements Runnable {
         try {
             // Write empty string to create the file
             FileUtils.writeStringToFile(file, "", "utf-8", true);
-            
+
             // Initiate Alignment and Results
             Alignment alignment = new Alignment();
             Map<String, Map<String, String>> results = new HashMap<String, Map<String, String>>();
@@ -1093,14 +1089,14 @@ public class Measurement extends HADatAcThing implements Runnable {
 
                     String key = alignment.measurementKey(m);
                     if (key != null) {
-			String finalValue = "";
-			/*if (alignment.containsCode(m.getCharacteristicUri())) {
+                        String finalValue = "";
+                        /*if (alignment.containsCode(m.getCharacteristicUri())) {
 			    finalValue = alignment.getCode(m.getCharacteristicUri()); */
-			if (alignment.containsCode(m.getCharacteristicUris().get(0))) {
-				finalValue = alignment.getCode(m.getCharacteristicUris().get(0));
-			} else {
-			    finalValue = m.getValue();
-			}
+                        if (alignment.containsCode(m.getCharacteristicUris().get(0))) {
+                            finalValue = alignment.getCode(m.getCharacteristicUris().get(0));
+                        } else {
+                            finalValue = m.getValue();
+                        }
                         results.get(alignment.replaceUri(m.getObjectUri())).put(key, finalValue);
                     } else {
                         System.out.println("[ERROR] the following measurement could not match any alignment attribute (and no alignment " + 
@@ -1115,7 +1111,7 @@ public class Measurement extends HADatAcThing implements Runnable {
                 if (current_ratio > prev_ratio) {
                     prev_ratio = current_ratio;
                     System.out.println("Progress: " + current_ratio + "%");
-                    
+
                     dataFile = DataFile.findByName(file.getName());
                     if (dataFile != null) {
                         if (dataFile.getStatus() == DataFile.DELETED) {
@@ -1179,9 +1175,9 @@ public class Measurement extends HADatAcThing implements Runnable {
             }
 
             //System.out.println("Finished writing!");
-            
-	    // Write harmonized code book
-	    outputHarmonizedCodebook(alignment, null);
+
+            // Write harmonized code book
+            outputHarmonizedCodebook(alignment, null);
 
             dataFile = DataFile.findByName(file.getName());
             if (dataFile != null) {
@@ -1200,14 +1196,14 @@ public class Measurement extends HADatAcThing implements Runnable {
     }
 
     public static void outputHarmonizedCodebook(Alignment alignment, File file) {        
-	// Write empty string to create the file
-	//FileUtils.writeStringToFile(file, "", "utf-8", true);
+        // Write empty string to create the file
+        //FileUtils.writeStringToFile(file, "", "utf-8", true);
 
-	//System.out.println("Harmonized code book");
-	//System.out.println("Class, code, description");
+        //System.out.println("Harmonized code book");
+        //System.out.println("Class, code, description");
 
-	// Wrte code book
-	/*for (String key : alignment.getCodeBook().keySet()) {
+        // Wrte code book
+        /*for (String key : alignment.getCodeBook().keySet()) {
 	    Attribute attr = Attribute.find(key);
 	    if (attr != null && attr.getDasaUri() != null && !attr.getDasaUri().equals("")) {
 		System.out.print(key);
@@ -1254,7 +1250,64 @@ public class Measurement extends HADatAcThing implements Runnable {
 
     @Override
     public boolean saveToTripleStore() {
-        return false;
+        if (uri == null || uri.equals("")) {
+            System.out.println("[ERROR] Trying to save Measurement without assigning an URI");
+            return false;
+        }
+
+        deleteFromTripleStore();
+
+        String insert = "";
+
+        insert += NameSpaces.getInstance().printSparqlNameSpaceList();
+        insert += "INSERT DATA { \n";
+
+        if (!getNamedGraph().isEmpty()) {
+            insert += " GRAPH <" + getNamedGraph() + "> { ";
+        }
+
+        insert += "<" + uri + "> hadatac:ownedByUser <" + ownerUri + "> . ";
+        insert += "<" + uri + "> hasco:isMemberOf <" + acquisitionUri + "> . ";
+        insert += "<" + uri + "> hadatac:ownedByStudyObject <" + studyObjectUri + "> . ";
+        insert += "<" + uri + "> hadatac:daso <" + dasoUri + "> . ";
+        insert += "<" + uri + "> hadatac:dasa <" + dasaUri + "> . ";
+        insert += "<" + uri + "> hadatac:dataset <" + datasetUri + "> . ";
+        insert += "<" + uri + "> hasco:hasUnit <" + unitUri + "> . ";
+        if (value.startsWith("http")) {
+            insert += "<" + uri + "> hadatac:value <" + value + "> . ";
+        } else {
+            insert += "<" + uri + "> hadatac:value \"" + value + "\" . ";
+        }
+        if (value.startsWith("http")) {
+            insert += "<" + uri + "> hadatac:originalValue <" + value + "> . ";
+        } else {
+            insert += "<" + uri + "> hadatac:originalValue \"" + value + "\" . ";
+        }
+        if (abstractTime.startsWith("http")) {
+            insert += "<" + uri + "> hadatac:namedTime <" + abstractTime + "> . ";
+        } else {
+            insert += "<" + uri + "> hadatac:namedTime \"" + abstractTime + "\" . ";
+        }
+        insert += "<" + uri + "> hadatac:elevation \"" + elevation + "\" . ";
+        insert += "<" + uri + "> hadatac:timestamp \"" + timestamp + "\" . ";
+        
+        if (!getNamedGraph().isEmpty()) {
+            insert += " } ";
+        }
+
+        insert += "} \n";
+
+        try {
+            UpdateRequest request = UpdateFactory.create(insert);
+            UpdateProcessor processor = UpdateExecutionFactory.createRemote(
+                    request, CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_UPDATE));
+            processor.execute();
+        } catch (QueryParseException e) {
+            System.out.println("QueryParseException due to update query: " + insert);
+            throw e;
+        }
+        
+        return true;
     }
 
     @Override

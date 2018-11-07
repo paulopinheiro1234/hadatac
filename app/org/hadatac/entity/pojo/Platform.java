@@ -125,8 +125,15 @@ public class Platform extends HADatAcThing implements Comparable<Platform> {
     public int hashCode() {
         return getUri().hashCode();
     }
-
+    
+    @Override
     public Map<HADatAcThing, List<HADatAcThing>> getTargetFacets(
+            Facet facet, FacetHandler facetHandler) {
+        return getTargetFacetsFromTripleStore(facet, facetHandler);
+    }
+    
+    @Override
+    public Map<HADatAcThing, List<HADatAcThing>> getTargetFacetsFromTripleStore(
             Facet facet, FacetHandler facetHandler) {
         String query = "";
         query += NameSpaces.getInstance().printSparqlNameSpaceList();

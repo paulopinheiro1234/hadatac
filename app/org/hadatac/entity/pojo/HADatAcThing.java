@@ -23,10 +23,32 @@ public abstract class HADatAcThing {
     int count = 0;
 
     String namedGraph = "";
-
+    
     public Map<HADatAcThing, List<HADatAcThing>> getTargetFacets(
             Facet facet, FacetHandler facetHandler) {
         return null;
+    }
+
+    public Map<HADatAcThing, List<HADatAcThing>> getTargetFacetsFromSolr(
+            Facet facet, FacetHandler facetHandler) {
+        return null;
+    }
+    
+    public Map<HADatAcThing, List<HADatAcThing>> getTargetFacetsFromTripleStore(
+            Facet facet, FacetHandler facetHandler) {
+        return null;
+    }
+
+    public long getNumber(Facet facet, FacetHandler facetHandler) {
+        return 0;
+    }
+    
+    public long getNumberFromSolr(Facet facet, FacetHandler facetHandler) {
+        return 0;
+    }
+    
+    public long getNumberFromTripleStore(Facet facet, FacetHandler facetHandler) {
+        return 0;
     }
 
     public static String stringify(List<String> preValues, boolean isUri) {
@@ -38,14 +60,6 @@ public abstract class HADatAcThing {
         }
 
         return String.join(" ", finalValues);
-    }
-
-    public long getNumberFromSolr(Facet facet, FacetHandler facetHandler) {
-        return 0;
-    }
-    
-    public long getNumberFromTripleStore(Facet facet, FacetHandler facetHandler) {
-        return 0;
     }
 
     public String getUri() {

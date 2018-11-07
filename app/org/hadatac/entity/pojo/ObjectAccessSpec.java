@@ -742,7 +742,13 @@ public class ObjectAccessSpec extends HADatAcThing {
 
         return -1;
     }
+    
+    @Override
+    public long getNumber(Facet facet, FacetHandler facetHandler) {
+        return getNumberFromSolr(facet, facetHandler);
+    }
 
+    @Override
     public long getNumberFromSolr(Facet facet, FacetHandler facetHandler) {
         SolrQuery query = new SolrQuery();
         String strQuery = facetHandler.getTempSolrQuery(facet);
@@ -763,8 +769,15 @@ public class ObjectAccessSpec extends HADatAcThing {
 
         return -1;
     }
+    
+    @Override
+    public Map<HADatAcThing, List<HADatAcThing>> getTargetFacets(
+            Facet facet, FacetHandler facetHandler) {
+        return getTargetFacetsFromSolr(facet, facetHandler);
+    }
 
-    public Map<HADatAcThing, List<HADatAcThing>> getTargetFacets(Facet facet, FacetHandler facetHandler) {
+    @Override
+    public Map<HADatAcThing, List<HADatAcThing>> getTargetFacetsFromSolr(Facet facet, FacetHandler facetHandler) {
 
         SolrQuery query = new SolrQuery();
         String strQuery = facetHandler.getTempSolrQuery(facet);
@@ -784,7 +797,7 @@ public class ObjectAccessSpec extends HADatAcThing {
             Pivot pivot = Pivot.parseQueryResponse(queryResponse);
             return parsePivot(pivot, facet);
         } catch (Exception e) {
-            System.out.println("[ERROR] DataAcquisition.getTargetFacets() - Exception message: " + e.getMessage());
+            System.out.println("[ERROR] DataAcquisition.getTargetFacetsFromSolr() - Exception message: " + e.getMessage());
         }
 
         return null;
@@ -1074,7 +1087,7 @@ public class ObjectAccessSpec extends HADatAcThing {
     public boolean deleteMeasurementData() {
         Iterator<String> iter = datasetURIs.iterator();
         while (iter.hasNext()) {
-            if (Measurement.delete(iter.next()) == 0) {
+            if (Measurement.deleteFromSolr(iter.next()) == 0) {
                 iter.remove();
             }
         }

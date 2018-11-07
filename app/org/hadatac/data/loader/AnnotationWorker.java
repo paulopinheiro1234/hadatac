@@ -34,6 +34,9 @@ import org.hadatac.utils.CollectionUtil;
 import org.hadatac.utils.ConfigProp;
 import org.hadatac.utils.Feedback;
 import org.hadatac.utils.NameSpaces;
+
+import akka.japi.Util;
+
 import org.apache.jena.update.UpdateExecutionFactory;
 import org.apache.jena.update.UpdateFactory;
 import org.apache.jena.update.UpdateProcessor;
@@ -675,6 +678,7 @@ public class AnnotationWorker {
             oas.addDatasetUri(dataFile.getDatasetUri());
 
             chain.addGenerator(new MeasurementGenerator(recordFile, oas, dataFile));
+            chain.setNamedGraphUri(URIUtils.replacePrefixEx(dataFile.getDataAcquisitionUri()));
         }
 
         return chain;

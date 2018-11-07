@@ -39,8 +39,15 @@ public class UnitInstance extends HADatAcThing implements Comparable<UnitInstanc
     public int hashCode() {
         return getUri().hashCode();
     }
-
+    
+    @Override
     public Map<HADatAcThing, List<HADatAcThing>> getTargetFacets(
+            Facet facet, FacetHandler facetHandler) {
+        return getTargetFacetsFromSolr(facet, facetHandler);
+    }
+
+    @Override
+    public Map<HADatAcThing, List<HADatAcThing>> getTargetFacetsFromSolr(
             Facet facet, FacetHandler facetHandler) {  
         SolrQuery query = new SolrQuery();
         String strQuery = facetHandler.getTempSolrQuery(facet);
@@ -63,7 +70,7 @@ public class UnitInstance extends HADatAcThing implements Comparable<UnitInstanc
             Pivot pivot = Pivot.parseQueryResponse(queryResponse);
             return parsePivot(pivot);
         } catch (Exception e) {
-            System.out.println("[ERROR] Unit.getTargetFacets() - Exception message: " + e.getMessage());
+            System.out.println("[ERROR] Unit.getTargetFacetsFromSolr() - Exception message: " + e.getMessage());
         }
 
         return null;

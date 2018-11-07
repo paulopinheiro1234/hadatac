@@ -25,8 +25,6 @@ import org.hadatac.console.models.Pivot;
 import org.hadatac.metadata.loader.URIUtils;
 import org.hadatac.utils.CollectionUtil;
 
-import com.typesafe.config.ConfigFactory;
-
 
 public class TimeInstance extends HADatAcThing implements Comparable<TimeInstance> {
 
@@ -46,6 +44,12 @@ public class TimeInstance extends HADatAcThing implements Comparable<TimeInstanc
         return getUri().hashCode();
     }
     
+    @Override
+    public long getNumber(Facet facet, FacetHandler facetHandler) {
+        return getNumberFromSolr(facet, facetHandler);
+    }
+    
+    @Override
     public long getNumberFromSolr(Facet facet, FacetHandler facetHandler) {        
         SolrQuery query = new SolrQuery();
         String strQuery = facetHandler.getTempSolrQuery(facet);
@@ -67,9 +71,15 @@ public class TimeInstance extends HADatAcThing implements Comparable<TimeInstanc
 
         return -1;
     }
-
+    
     @Override
     public Map<HADatAcThing, List<HADatAcThing>> getTargetFacets(
+            Facet facet, FacetHandler facetHandler) {
+        return getTargetFacetsFromSolr(facet, facetHandler);
+    }
+
+    @Override
+    public Map<HADatAcThing, List<HADatAcThing>> getTargetFacetsFromSolr(
             Facet facet, FacetHandler facetHandler) {        
         SolrQuery query = new SolrQuery();
         String queryString = facetHandler.getTempSolrQuery(facet);
@@ -119,7 +129,7 @@ public class TimeInstance extends HADatAcThing implements Comparable<TimeInstanc
             Pivot pivot = Pivot.parseQueryResponse(queryResponse);
             return parsePivot(pivot);
         } catch (Exception e) {
-            System.out.println("[ERROR] TimeInstance.getTargetFacets() - Exception message: " + e.getMessage());
+            System.out.println("[ERROR] TimeInstance.getTargetFacetsFromSolr() - Exception message: " + e.getMessage());
         }
 
         return null;
