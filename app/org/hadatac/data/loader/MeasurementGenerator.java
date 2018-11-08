@@ -339,7 +339,6 @@ public class MeasurementGenerator extends BasicGenerator {
                 }
 
             } else {
-
                 // Objects defined by Row Scope
                 String id = "";
                 if (!schema.getOriginalIdLabel().equals("")) {
@@ -350,20 +349,29 @@ public class MeasurementGenerator extends BasicGenerator {
                 
                 if (!id.equals("")) {
                     if (dasa.getEntity().equals(URIUtils.replacePrefixEx("sio:Human"))) {
+                        measurement.setObjectCollectionType(URIUtils.replacePrefixEx("hasco:SubjectGroup"));
                         if (mapIDStudyObjects.containsKey(id)) {
                             measurement.setStudyObjectUri(mapIDStudyObjects.get(id).get(0));
                             measurement.setObjectUri(mapIDStudyObjects.get(id).get(0));
                         }
-                        measurement.setObjectCollectionType(URIUtils.replacePrefixEx("hasco:SubjectGroup"));
                         measurement.setPID(id);
                     } else {
                         if (mapIDStudyObjects.containsKey(id)) {
-                            measurement.setStudyObjectUri(mapIDStudyObjects.get(id).get(0));
-                            measurement.setObjectUri(mapIDStudyObjects.get(id).get(2));
-                            measurement.setPID(mapIDStudyObjects.get(id).get(1));
+                            if (!mapIDStudyObjects.get(id).get(2).isEmpty()) {
+                                // Sample
+                                measurement.setStudyObjectUri(mapIDStudyObjects.get(id).get(0));
+                                measurement.setObjectUri(mapIDStudyObjects.get(id).get(2));
+                                measurement.setPID(mapIDStudyObjects.get(id).get(2));
+                                measurement.setSID(mapIDStudyObjects.get(id).get(1));
+                                measurement.setObjectCollectionType(URIUtils.replacePrefixEx("hasco:SampleCollection"));
+                            } else {
+                                // Subject
+                                measurement.setStudyObjectUri(mapIDStudyObjects.get(id).get(0));
+                                measurement.setObjectUri(mapIDStudyObjects.get(id).get(0));
+                                measurement.setPID(mapIDStudyObjects.get(id).get(1));
+                                measurement.setObjectCollectionType(URIUtils.replacePrefixEx("hasco:SubjectGroup"));
+                            }
                         }
-                        measurement.setObjectCollectionType(URIUtils.replacePrefixEx("hasco:SampleCollection"));
-                        measurement.setSID(id);
                     }
                 }
             }

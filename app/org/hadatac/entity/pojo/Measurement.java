@@ -689,7 +689,7 @@ public class Measurement extends HADatAcThing implements Runnable {
         FacetTree fTreeOC = new FacetTree();
         fTreeOC.setTargetFacet(StudyObjectRole.class);
         fTreeOC.addUpperFacet(ObjectCollectionType.class);
-        fTreeOC.addUpperFacet(StudyObjectType.class);
+        // fTreeOC.addUpperFacet(StudyObjectType.class);
         // fTreeOC.addUpperFacet(EntityInstance.class);
         Pivot pivotOC = getFacetStats(fTreeOC, 
                 retFacetHandler.getFacetByName(FacetHandler.OBJECT_COLLECTION_FACET), 
@@ -1250,6 +1250,7 @@ public class Measurement extends HADatAcThing implements Runnable {
 
     @Override
     public boolean saveToTripleStore() {
+        /*
         if (uri == null || uri.equals("")) {
             System.out.println("[ERROR] Trying to save Measurement without assigning an URI");
             return false;
@@ -1306,8 +1307,9 @@ public class Measurement extends HADatAcThing implements Runnable {
             System.out.println("QueryParseException due to update query: " + insert);
             throw e;
         }
+        */
         
-        return true;
+        return false;
     }
 
     @Override
