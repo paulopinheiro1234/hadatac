@@ -105,22 +105,21 @@ public class StudyObjectType extends HADatAcClass implements Comparable<StudyObj
         String valueConstraint = "";
         if (!facet.getFacetValuesByField("object_collection_type_str").isEmpty()) {
             valueConstraint += " VALUES ?objectCollectionType { " + stringify(
-                    facet.getFacetValuesByField("object_collection_type_str"), true) + " } \n ";
+                    facet.getFacetValuesByField("object_collection_type_str")) + " } \n";
         }
         if (!facet.getFacetValuesByField("study_object_type_uri_str").isEmpty()) {
             valueConstraint += " VALUES ?studyObjType { " + stringify(
-                    facet.getFacetValuesByField("study_object_type_uri_str"), true) + " } \n ";
+                    facet.getFacetValuesByField("study_object_type_uri_str")) + " } \n";
         }
 
         String query = "";
         query += NameSpaces.getInstance().printSparqlNameSpaceList();
-        query += "SELECT ?studyObj ?studyObjType ?role ?studyObjTypeLabel WHERE { \n"
+        query += "SELECT DISTINCT ?studyObjType ?role WHERE { \n"
                 + valueConstraint + " \n"
                 + "?studyObj rdf:type ?studyObjType . \n"
                 + "?studyObj hasco:isMemberOf ?objectCollection . \n"
                 + "?objectCollection rdf:type ?objectCollectionType . \n"
                 + "?objectCollection hasco:hasRoleLabel ?role . \n"
-                + "?studyObjType rdfs:label ?studyObjTypeLabel . \n"
                 + "}";
 
         System.out.println("StudyObjectType query: \n" + query);
@@ -134,7 +133,7 @@ public class StudyObjectType extends HADatAcClass implements Comparable<StudyObj
                 QuerySolution soln = resultsrw.next();
                 StudyObjectType studyObjectType = new StudyObjectType();
                 studyObjectType.setUri(soln.get("studyObjType").toString());
-                studyObjectType.setLabel(WordUtils.capitalize(soln.get("studyObjTypeLabel").toString()));
+                studyObjectType.setLabel(WordUtils.capitalize(HADatAcThing.getShortestLabel(soln.get("studyObjType").toString())));
                 studyObjectType.setField("study_object_type_uri_str");
 
                 StudyObjectRole role = new StudyObjectRole();
@@ -146,12 +145,13 @@ public class StudyObjectType extends HADatAcClass implements Comparable<StudyObj
                     System.out.println("studyObjectType: " + studyObjectType.getLabel());
                     results.put(studyObjectType, new ArrayList<HADatAcThing>());
                 }
+                
                 if (!results.get(studyObjectType).contains(role)) {
                     results.get(studyObjectType).add(role);
                 }
 
                 Facet subFacet = facet.getChildById(studyObjectType.getUri());
-                subFacet.putFacet("study_object_uri_str", soln.get("studyObj").toString());
+                subFacet.putFacet("study_object_type_uri_str", soln.get("studyObjType").toString());
             }
         } catch (QueryExceptionHTTP e) {
             e.printStackTrace();

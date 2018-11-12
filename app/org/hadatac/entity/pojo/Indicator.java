@@ -230,22 +230,22 @@ public class Indicator extends HADatAcThing implements Comparable<Indicator> {
         String valueConstraint = "";
         if (!facet.getFacetValuesByField("indicator_uri_str").isEmpty()) {
             valueConstraint += " VALUES ?indicator { " + stringify(
-                    facet.getFacetValuesByField("indicator_uri_str"), true) + " } \n ";
+                    facet.getFacetValuesByField("indicator_uri_str")) + " } \n ";
         }
 
         if (!facet.getFacetValuesByField("characteristic_uri_str_multi").isEmpty()) {
             valueConstraint += " VALUES ?attributeUri { " + stringify(
-                    facet.getFacetValuesByField("characteristic_uri_str_multi"), true) + " } \n ";
+                    facet.getFacetValuesByField("characteristic_uri_str_multi")) + " } \n ";
         }
 
         if (!facet.getFacetValuesByField("dasa_uri_str").isEmpty()) {
             valueConstraint += " VALUES ?schemaAttribute { " + stringify(
-                    facet.getFacetValuesByField("dasa_uri_str"), true) + " } \n ";
+                    facet.getFacetValuesByField("dasa_uri_str")) + " } \n ";
         }
 
         String query = "";
         query += NameSpaces.getInstance().printSparqlNameSpaceList();
-        query += "SELECT ?indicator ?indicatorLabel ?dataAcq ?schemaAttribute ?attributeUri ?attributeLabel WHERE { \n"
+        query += "SELECT ?indicator ?dataAcq ?schemaAttribute ?attributeUri ?attributeLabel WHERE { \n"
                 + valueConstraint + " \n"
                 + "?subTypeUri rdfs:subClassOf* hasco:Study . \n"
                 + "?studyUri a ?subTypeUri . \n"
@@ -256,7 +256,6 @@ public class Indicator extends HADatAcThing implements Comparable<Indicator> {
                 + "?attributeUri rdfs:subClassOf* ?indicator . \n"
                 + "?attributeUri rdfs:label ?attributeLabel . \n"
                 + " { ?indicator rdfs:subClassOf hasco:SampleIndicator } UNION { ?indicator rdfs:subClassOf hasco:StudyIndicator } . \n"
-                + "?indicator rdfs:label ?indicatorLabel . \n"
                 + "}";
 
         System.out.println("Indicator query: " + query);
@@ -270,7 +269,7 @@ public class Indicator extends HADatAcThing implements Comparable<Indicator> {
                 QuerySolution soln = resultsrw.next();
                 Indicator indicator = new Indicator();
                 indicator.setUri(soln.get("indicator").toString());
-                indicator.setLabel(WordUtils.capitalize(soln.get("indicatorLabel").toString()));
+                indicator.setLabel(WordUtils.capitalize(HADatAcThing.getShortestLabel(soln.get("indicator").toString())));
                 indicator.setField("indicator_uri_str");
 
                 AttributeInstance attrib = new AttributeInstance();

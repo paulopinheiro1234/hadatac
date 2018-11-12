@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.HashMap;
 
+import org.apache.commons.text.WordUtils;
 import org.apache.jena.query.QuerySolution;
 import org.apache.jena.query.ResultSetRewindable;
 import org.apache.jena.sparql.engine.http.QueryExceptionHTTP;
@@ -71,45 +72,6 @@ public class StudyObjectRole extends HADatAcThing implements Comparable<StudyObj
     }
 	
 	@Override
-    public long getNumberFromTripleStore(Facet facet, FacetHandler facetHandler) {
-        Map<String, List<String>> constraints = facetHandler.getTempSparqlConstraints(facet);
-        System.out.println("StudyObjectRole constraints: " + constraints);
-        
-        String valueConstraint = "";
-        for (String field : constraints.keySet()) {
-            valueConstraint += " VALUES ?" + field + " { " + stringify(constraints.get(field), true) + " } \n ";
-        }
-
-        String query = "";
-        query += NameSpaces.getInstance().printSparqlNameSpaceList();
-        query += "SELECT DISTINCT (COUNT(?role) AS ?count) WHERE { \n"
-                + valueConstraint + " \n"
-                + "?measurement hadatac:ownedByStudyObject ?studyObj . \n"
-                + "?studyObj rdf:type ?studyObjType . \n"
-                + "?studyObj hasco:isMemberOf ?objectCollection . \n"
-                + "?objectCollection rdf:type ?object_collection_type_str . \n"
-                + "?objectCollection hasco:hasRoleLabel ?role . \n"
-                + "?studyObjType rdfs:label ?studyObjTypeLabel . \n"
-                + "}";
-
-        System.out.println("StudyObjectRole query: \n" + query);
-
-        try {            
-            ResultSetRewindable resultsrw = SPARQLUtils.select(
-                    CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), query);
-
-            if (resultsrw.hasNext()) {
-                QuerySolution soln = resultsrw.next();
-                return Long.valueOf(soln.getLiteral("count").getValue().toString()).longValue();
-            }
-        } catch (QueryExceptionHTTP e) {
-            e.printStackTrace();
-        }
-
-        return 0;
-    }
-	
-	@Override
     public Map<HADatAcThing, List<HADatAcThing>> getTargetFacets(
             Facet facet, FacetHandler facetHandler) {
         return getTargetFacetsFromSolr(facet, facetHandler);
@@ -118,6 +80,8 @@ public class StudyObjectRole extends HADatAcThing implements Comparable<StudyObj
 	@Override
 	public Map<HADatAcThing, List<HADatAcThing>> getTargetFacetsFromSolr(
             Facet facet, FacetHandler facetHandler) {
+	    System.out.println("getTargetFacetsFromSolr() is called");
+	    
         SolrQuery query = new SolrQuery();
         String strQuery = facetHandler.getTempSolrQuery(facet);
         query.setQuery(strQuery);

@@ -150,11 +150,15 @@ public class ObjectCollectionType extends HADatAcClass implements Comparable<Obj
             Facet facet, FacetHandler facetHandler) {
 
         String valueConstraint = "";
+        if (!facet.getFacetValuesByField("object_collection_type_str").isEmpty()) {
+            valueConstraint += " VALUES ?objectCollectionType { " + stringify(
+                    facet.getFacetValuesByField("object_collection_type_str")) + " } \n";
+        }
+        
         String query = "";
         query += NameSpaces.getInstance().printSparqlNameSpaceList();
         query += "SELECT ?objectCollectionType ?objectCollectionTypeLabel ?role WHERE { \n"
                 + valueConstraint + " \n"
-                + "?measurement hadatac:ownedByStudyObject ?studyObject . \n"
                 + "?studyObject hasco:isMemberOf ?objectCollection . \n"
                 + "?objectCollection rdf:type ?objectCollectionType . \n"
                 + "?objectCollectionType rdfs:label ?objectCollectionTypeLabel . \n"

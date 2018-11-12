@@ -60,6 +60,8 @@ public class Measurement extends HADatAcThing implements Runnable {
     private String objectUri;
     @Field("study_object_uri_str")
     private String studyObjectUri;
+    @Field("study_object_type_uri_str")
+    private String studyObjectTypeUri;
     @Field("timestamp_date")
     private Date timestamp;
     @Field("named_time_str")
@@ -159,6 +161,14 @@ public class Measurement extends HADatAcThing implements Runnable {
 
     public void setStudyObjectUri(String studyObjectUri) {
         this.studyObjectUri = studyObjectUri;
+    }
+    
+    public String getStudyObjectTypeUri() {
+        return studyObjectTypeUri;
+    }
+
+    public void setStudyObjectTypeUri(String studyObjectTypeUri) {
+        this.studyObjectTypeUri = studyObjectTypeUri;
     }
 
     public void setPID(String objectUri) {
@@ -689,8 +699,7 @@ public class Measurement extends HADatAcThing implements Runnable {
         FacetTree fTreeOC = new FacetTree();
         fTreeOC.setTargetFacet(StudyObjectRole.class);
         fTreeOC.addUpperFacet(ObjectCollectionType.class);
-        // fTreeOC.addUpperFacet(StudyObjectType.class);
-        // fTreeOC.addUpperFacet(EntityInstance.class);
+        fTreeOC.addUpperFacet(StudyObjectType.class);
         Pivot pivotOC = getFacetStats(fTreeOC, 
                 retFacetHandler.getFacetByName(FacetHandler.OBJECT_COLLECTION_FACET), 
                 facetHandler);
@@ -819,7 +828,7 @@ public class Measurement extends HADatAcThing implements Runnable {
         if (uris.isEmpty()) {
             return results;
         } else {
-            valueConstraint = " VALUES ?uri { " + HADatAcThing.stringify(validURIs, true) + " } ";
+            valueConstraint = " VALUES ?uri { " + HADatAcThing.stringify(validURIs) + " } ";
         }
 
         String query = "";
@@ -909,6 +918,8 @@ public class Measurement extends HADatAcThing implements Runnable {
         m.setStudyUri(SolrUtils.getFieldValue(doc, "study_uri_str"));
         m.setDasoUri(SolrUtils.getFieldValue(doc, "daso_uri_str"));
         m.setDasaUri(SolrUtils.getFieldValue(doc, "dasa_uri_str"));
+        m.setStudyObjectUri(SolrUtils.getFieldValue(doc, "study_object_uri_str"));
+        m.setStudyObjectTypeUri(SolrUtils.getFieldValue(doc, "study_object_type_uri_str"));
         m.setObjectUri(SolrUtils.getFieldValue(doc, "object_uri_str"));
         m.setRole(SolrUtils.getFieldValue(doc, "role_str"));
         m.setInRelationToUri(SolrUtils.getFieldValue(doc, "in_relation_to_uri_str"));
@@ -919,7 +930,6 @@ public class Measurement extends HADatAcThing implements Runnable {
         m.setTimeValueUnitUri(SolrUtils.getFieldValue(doc, "time_value_unit_uri_str"));
         m.setOriginalValue(SolrUtils.getFieldValue(doc, "original_value_str"));
         m.setEntityUri(SolrUtils.getFieldValue(doc, "entity_uri_str"));
-        //m.setCharacteristicUri(SolrUtils.getFieldValue(doc, "characteristic_uri_str"));
         m.setCharacteristicUris(SolrUtils.getFieldValues(doc, "characteristic_uri_str_multi"));
         m.setUnitUri(SolrUtils.getFieldValue(doc, "unit_uri_str"));
 
@@ -1249,66 +1259,7 @@ public class Measurement extends HADatAcThing implements Runnable {
     }
 
     @Override
-    public boolean saveToTripleStore() {
-        /*
-        if (uri == null || uri.equals("")) {
-            System.out.println("[ERROR] Trying to save Measurement without assigning an URI");
-            return false;
-        }
-
-        deleteFromTripleStore();
-
-        String insert = "";
-
-        insert += NameSpaces.getInstance().printSparqlNameSpaceList();
-        insert += "INSERT DATA { \n";
-
-        if (!getNamedGraph().isEmpty()) {
-            insert += " GRAPH <" + getNamedGraph() + "> { ";
-        }
-
-        insert += "<" + uri + "> hadatac:ownedByUser <" + ownerUri + "> . ";
-        insert += "<" + uri + "> hasco:isMemberOf <" + acquisitionUri + "> . ";
-        insert += "<" + uri + "> hadatac:ownedByStudyObject <" + studyObjectUri + "> . ";
-        insert += "<" + uri + "> hadatac:daso <" + dasoUri + "> . ";
-        insert += "<" + uri + "> hadatac:dasa <" + dasaUri + "> . ";
-        insert += "<" + uri + "> hadatac:dataset <" + datasetUri + "> . ";
-        insert += "<" + uri + "> hasco:hasUnit <" + unitUri + "> . ";
-        if (value.startsWith("http")) {
-            insert += "<" + uri + "> hadatac:value <" + value + "> . ";
-        } else {
-            insert += "<" + uri + "> hadatac:value \"" + value + "\" . ";
-        }
-        if (value.startsWith("http")) {
-            insert += "<" + uri + "> hadatac:originalValue <" + value + "> . ";
-        } else {
-            insert += "<" + uri + "> hadatac:originalValue \"" + value + "\" . ";
-        }
-        if (abstractTime.startsWith("http")) {
-            insert += "<" + uri + "> hadatac:namedTime <" + abstractTime + "> . ";
-        } else {
-            insert += "<" + uri + "> hadatac:namedTime \"" + abstractTime + "\" . ";
-        }
-        insert += "<" + uri + "> hadatac:elevation \"" + elevation + "\" . ";
-        insert += "<" + uri + "> hadatac:timestamp \"" + timestamp + "\" . ";
-        
-        if (!getNamedGraph().isEmpty()) {
-            insert += " } ";
-        }
-
-        insert += "} \n";
-
-        try {
-            UpdateRequest request = UpdateFactory.create(insert);
-            UpdateProcessor processor = UpdateExecutionFactory.createRemote(
-                    request, CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_UPDATE));
-            processor.execute();
-        } catch (QueryParseException e) {
-            System.out.println("QueryParseException due to update query: " + insert);
-            throw e;
-        }
-        */
-        
+    public boolean saveToTripleStore() {   
         return false;
     }
 

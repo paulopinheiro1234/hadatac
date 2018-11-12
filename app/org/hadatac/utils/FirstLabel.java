@@ -1,12 +1,6 @@
 package org.hadatac.utils;
 
-import org.apache.jena.query.Query;
-import org.apache.jena.query.QueryExecution;
-import org.apache.jena.query.QueryExecutionFactory;
-import org.apache.jena.query.QueryFactory;
 import org.apache.jena.query.QuerySolution;
-import org.apache.jena.query.ResultSet;
-import org.apache.jena.query.ResultSetFactory;
 import org.apache.jena.query.ResultSetRewindable;
 import org.hadatac.console.http.SPARQLUtils;
 import org.hadatac.utils.CollectionUtil;
@@ -22,7 +16,7 @@ public class FirstLabel {
 				"  " + uri + " rdfs:label ?label . \n" + 
 				"}";
 		
-		 //System.out.println("[FirstLabel] getLabel() queryString: \n" + queryString);
+		//System.out.println("[FirstLabel] getLabel() queryString: \n" + queryString);
 		
 		ResultSetRewindable resultsrw = SPARQLUtils.select(
 		        CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), queryString);

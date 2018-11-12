@@ -51,7 +51,7 @@ public class DASEType extends HADatAcThing implements Comparable<DASEType> {
         String valueConstraint = "";
         if (!facet.getFacetValuesByField("dase_type_uri_str").isEmpty()) {
             valueConstraint += " VALUES ?daseTypeUri { " + stringify(
-                    facet.getFacetValuesByField("dase_type_uri_str"), true) + " } \n ";
+                    facet.getFacetValuesByField("dase_type_uri_str")) + " } \n ";
         }
         
         facet.clearFieldValues("dase_type_uri_str");

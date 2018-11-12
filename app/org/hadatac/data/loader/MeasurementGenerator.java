@@ -320,6 +320,7 @@ public class MeasurementGenerator extends BasicGenerator {
              *=============================*/
             measurement.setObjectCollectionType("");
             measurement.setStudyObjectUri("");
+            measurement.setStudyObjectTypeUri("");
             measurement.setObjectUri("");
             measurement.setPID("");
             measurement.setSID("");
@@ -352,6 +353,7 @@ public class MeasurementGenerator extends BasicGenerator {
                         measurement.setObjectCollectionType(URIUtils.replacePrefixEx("hasco:SubjectGroup"));
                         if (mapIDStudyObjects.containsKey(id)) {
                             measurement.setStudyObjectUri(mapIDStudyObjects.get(id).get(0));
+                            measurement.setStudyObjectTypeUri(mapIDStudyObjects.get(id).get(3));
                             measurement.setObjectUri(mapIDStudyObjects.get(id).get(0));
                         }
                         measurement.setPID(id);
@@ -360,6 +362,7 @@ public class MeasurementGenerator extends BasicGenerator {
                             if (!mapIDStudyObjects.get(id).get(2).isEmpty()) {
                                 // Sample
                                 measurement.setStudyObjectUri(mapIDStudyObjects.get(id).get(0));
+                                measurement.setStudyObjectTypeUri(mapIDStudyObjects.get(id).get(3));
                                 measurement.setObjectUri(mapIDStudyObjects.get(id).get(2));
                                 measurement.setPID(mapIDStudyObjects.get(id).get(2));
                                 measurement.setSID(mapIDStudyObjects.get(id).get(1));
@@ -367,6 +370,7 @@ public class MeasurementGenerator extends BasicGenerator {
                             } else {
                                 // Subject
                                 measurement.setStudyObjectUri(mapIDStudyObjects.get(id).get(0));
+                                measurement.setStudyObjectTypeUri(mapIDStudyObjects.get(id).get(3));
                                 measurement.setObjectUri(mapIDStudyObjects.get(id).get(0));
                                 measurement.setPID(mapIDStudyObjects.get(id).get(1));
                                 measurement.setObjectCollectionType(URIUtils.replacePrefixEx("hasco:SubjectGroup"));

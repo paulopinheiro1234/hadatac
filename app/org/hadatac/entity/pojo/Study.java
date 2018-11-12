@@ -396,7 +396,7 @@ public class Study extends HADatAcThing {
         String valueConstraint = "";
         if (!facet.getFacetValuesByField("study_uri_str").isEmpty()) {
             valueConstraint += " VALUES ?studyUri { " + stringify(
-                    facet.getFacetValuesByField("study_uri_str"), true) + " } \n";
+                    facet.getFacetValuesByField("study_uri_str")) + " } \n";
         }
 
         String query = "";

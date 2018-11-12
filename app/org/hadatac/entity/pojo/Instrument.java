@@ -62,7 +62,7 @@ public class Instrument extends HADatAcThing implements Comparable<Instrument> {
 		String valueConstraint = "";
 		if (!facet.getFacetValuesByField("platform_uri_str").isEmpty()) {
 			valueConstraint += " VALUES ?platformUri { " + stringify(
-					facet.getFacetValuesByField("platform_uri_str"), true) + " } \n ";
+					facet.getFacetValuesByField("platform_uri_str")) + " } \n ";
 		}
 		
 		String query = "";
