@@ -81,9 +81,9 @@ public abstract class BasicGenerator {
         this.namedGraphUri = namedGraphUri;
     }
     
-    Map<String, Object> createRow(Record rec, int row_number) throws Exception { return null; }
+    public Map<String, Object> createRow(Record rec, int row_number) throws Exception { return null; }
 
-    HADatAcThing createObject(Record rec, int row_number) throws Exception { return null; }
+    public HADatAcThing createObject(Record rec, int row_number) throws Exception { return null; }
 
     public List<Map<String, Object>> getRows() {
         return rows;

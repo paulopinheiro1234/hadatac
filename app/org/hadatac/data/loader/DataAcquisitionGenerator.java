@@ -83,7 +83,7 @@ public class DataAcquisitionGenerator extends BasicGenerator {
 	}
 
 	@Override
-	Map<String, Object> createRow(Record rec, int row_number) throws Exception {
+	public Map<String, Object> createRow(Record rec, int row_number) throws Exception {
 		Map<String, Object> row = new HashMap<String, Object>();
 		row.put("hasURI", kbPrefix + "DA-" + getDataAcquisitionName(rec));
 		row.put("a", "hasco:DataAcquisition");
@@ -102,7 +102,7 @@ public class DataAcquisitionGenerator extends BasicGenerator {
 	}
 	
 	@Override
-	HADatAcThing createObject(Record rec, int row_number) throws Exception {
+	public HADatAcThing createObject(Record rec, int row_number) throws Exception {
 		Map<String, Object> row = createRow(rec, row_number);
 		
 		String ownerEmail = getOwnerEmail(rec);
@@ -120,7 +120,7 @@ public class DataAcquisitionGenerator extends BasicGenerator {
 		return createDataAcquisition(row, ownerEmail, permissionUri, deploymentUri, isEpiData(rec));
 	}
 
-	ObjectAccessSpec createDataAcquisition(
+	private ObjectAccessSpec createDataAcquisition(
 	        Map<String, Object> row, 
 			String ownerEmail, 
 			String permissionUri, 

@@ -130,7 +130,7 @@ public class DASchemaEventGenerator extends BasicGenerator {
 	}
 	
 	@Override
-    HADatAcThing createObject(Record rec, int row_number) throws Exception {
+	public HADatAcThing createObject(Record rec, int row_number) throws Exception {
 	    if (timeList.contains(getLabel(rec)) && getLabel(rec).length() > 0){
 	        return createDASEObject(rec);
         }

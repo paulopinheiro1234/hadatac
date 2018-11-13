@@ -42,7 +42,7 @@ public class SampleCollectionGenerator extends BasicGenerator {
 	}
 
 	@Override
-	Map<String, Object> createRow(Record rec, int rownumber) throws Exception {
+	public Map<String, Object> createRow(Record rec, int rownumber) throws Exception {
 		Map<String, Object> row = new HashMap<String, Object>();
 		row.put("hasURI", getUri(rec));
 		row.put("a", "hasco:SampleCollection");

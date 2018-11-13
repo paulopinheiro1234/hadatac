@@ -171,7 +171,7 @@ public class DASchemaObjectGenerator extends BasicGenerator {
 
 	//Column	Attribute	attributeOf	Unit	Time	Entity	Role	Relation	inRelationTo	wasDerivedFrom	wasGeneratedBy	hasPosition   
 	@Override
-	Map<String, Object> createRow(Record rec, int row_number) throws Exception {
+	public Map<String, Object> createRow(Record rec, int row_number) throws Exception {
 		Map<String, Object> row = new HashMap<String, Object>();
 		row.put("hasURI", kbPrefix + "DASO-" + SDDName + "-" + getLabel(rec).trim().replace(" ","").replace("_","-").replace("??", ""));
 		row.put("a", "hasco:DASchemaObject");

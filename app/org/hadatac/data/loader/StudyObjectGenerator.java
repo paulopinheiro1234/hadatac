@@ -138,12 +138,12 @@ public class StudyObjectGenerator extends BasicGenerator {
     }
 
     @Override
-    HADatAcThing createObject(Record rec, int row_number) throws Exception {
+    public HADatAcThing createObject(Record rec, int row_number) throws Exception {
         return createStudyObject(rec);
     }
 
     @Override
-    Map<String, Object> createRow(Record rec, int row_number) throws Exception {
+    public Map<String, Object> createRow(Record rec, int row_number) throws Exception {
         if (getOriginalID(rec).length() > 0) {
             Map<String, Object> row = new HashMap<String, Object>();
             row.put("hasURI", getUri(rec));

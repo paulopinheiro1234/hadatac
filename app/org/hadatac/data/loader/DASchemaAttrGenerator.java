@@ -259,7 +259,7 @@ public class DASchemaAttrGenerator extends BasicGenerator {
 
     //Column	Attribute	attributeOf	Unit	Time	Entity	Role	Relation	inRelationTo	wasDerivedFrom	wasGeneratedBy	hasPosition   
     @Override
-    Map<String, Object> createRow(Record rec, int row_number) throws Exception {
+    public Map<String, Object> createRow(Record rec, int row_number) throws Exception {
     	
         Map<String, Object> row = new HashMap<String, Object>();
         List<String> tmp = new ArrayList<String>();

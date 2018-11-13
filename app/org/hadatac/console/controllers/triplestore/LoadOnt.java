@@ -127,6 +127,16 @@ public class LoadOnt extends Controller {
 
         return redirect(routes.LoadOnt.loadOnt("init"));
     }
+    
+    @Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
+    public Result deleteAllNamedGraphs() {
+        for (NameSpace ns : NameSpaces.getInstance().getNamespaces().values()) {
+            ns.deleteTriples();
+            ns.updateLoadedTripleSize();
+        }
+        
+        return redirect(routes.LoadOnt.loadOnt("init"));
+    }
 
     @SuppressWarnings("unchecked")
     @Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))

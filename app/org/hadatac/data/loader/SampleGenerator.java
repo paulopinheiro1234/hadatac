@@ -209,7 +209,7 @@ public class SampleGenerator extends BasicGenerator {
     }
     
     @Override
-    HADatAcThing createObject(Record rec, int row_number) throws Exception {
+    public HADatAcThing createObject(Record rec, int row_number) throws Exception {
         return createStudyObject(rec);
     }
     

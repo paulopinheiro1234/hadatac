@@ -200,10 +200,15 @@
          </table>
          <div>
             <button type="button" class="btn btn-info add-new"><i class="fa fa-plus"></i> Add New</button>
+            <button type="button" class="btn btn-danger delete-all"><i class="fa fa-remove"></i> Delete All Rows</button>
          </div><br>
          <div id="ns-oper">
            <a class="btn btn-primary" role="button" id="save-changes" onclick="submitTableAsForm()" disabled>Save Changes</a>
+           <a href="@org.hadatac.console.controllers.triplestore.routes.LoadOnt.deleteAllNamedGraphs()" class="btn btn-primary" role="button">Delete All Ontology Triples</a>
            <a href="@org.hadatac.console.controllers.triplestore.routes.LoadOnt.exportNamespaces()" class="btn btn-primary" role="button">Export Namespace</a>
+         </div>
+         <br>
+         <div>
            <a href="@org.hadatac.console.controllers.routes.Portal.index()" class="btn btn-primary" role="button">Back to Main Menu</a>
          </div>
          }
@@ -215,6 +220,9 @@
 $(document).ready(function() {
     $('[data-toggle="tooltip"]').tooltip();
     var actions = $("table td:last-child").html();
+    
+    checkRowCounts();
+    
     // Append table with add row form on add new button click
     $(".add-new").click(function(){
         $(this).attr("disabled", "disabled");
@@ -233,6 +241,15 @@ $(document).ready(function() {
         $("table tbody tr").eq(index + 1).find(".edit, .delete-triples, .reload-triples").hide();
         $('[data-toggle="tooltip"]').tooltip();
     });
+    
+    // Delete all rows on delete all button click
+    $(".delete-all").click(function(){
+        $(this).attr("disabled", "disabled");
+        $("table").children("tbody").remove();
+        $("#save-changes").removeAttr("disabled");
+        checkRowCounts();
+    });
+    
     // Add row on add button click
     $(document).on("click", ".add", function(){
         var empty = false;
@@ -247,7 +264,9 @@ $(document).ready(function() {
             $(".add-new").removeAttr("disabled");
             $("#save-changes").removeAttr("disabled");
         }   
+        checkRowCounts();
     });
+    
     // Edit row on edit button click
     $(document).on("click", ".edit", function(){        
         $(this).parents("tr").find("td:not(:first-child, :nth-child(6), :last-child)").each(function(){
@@ -256,11 +275,13 @@ $(document).ready(function() {
         $(this).parents("tr").find(".add, .edit").toggle();
         $(".add-new").attr("disabled", "disabled");
     });
+    
     // Delete row on delete button click
     $(document).on("click", ".delete", function(){
         $(this).parents("tr").remove();
         $(".add-new").removeAttr("disabled");
         $("#save-changes").removeAttr("disabled");
+        checkRowCounts();
     });
 });
 
@@ -285,6 +306,15 @@ function submitTableAsForm() {
 function checkform() {
     if(document.getElementById('upload').value != "") {
         document.getElementById('submit-div').style.display = 'inline';
+    }
+}
+
+function checkRowCounts() {
+    var rows = $('table tbody tr').length;
+    if (rows == 0) {
+        $(".delete-all").attr("disabled", "disabled");
+    } else {
+        $(".delete-all").removeAttr("disabled");
     }
 }
 </script>

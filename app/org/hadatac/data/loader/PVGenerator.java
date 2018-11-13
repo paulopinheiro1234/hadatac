@@ -107,7 +107,7 @@ public class PVGenerator extends BasicGenerator {
 	}
 
 	@Override
-	Map<String, Object> createRow(Record rec, int row_number) throws Exception {	
+	public Map<String, Object> createRow(Record rec, int row_number) throws Exception {	
 		Map<String, Object> row = new HashMap<String, Object>();
 		row.put("hasURI", (kbPrefix + "PV-" + getLabel(rec).replaceAll("[^a-zA-Z0-9:-]", "-") + ("-" + SDDName + "-" + getCode(rec)).replaceAll("--", "-")).replace(" ","").replaceAll("[^A-Za-z0-9:-]", "") + "-" + row_number);
 		row.put("a", "hasco:PossibleValue");
