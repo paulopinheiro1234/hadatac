@@ -451,6 +451,7 @@ public class AutoAnnotator extends Controller {
         } else {
             path = ConfigProp.getPathUnproc();
         }
+        
         return ok(new File(path + "/" + file_name));
     }
 

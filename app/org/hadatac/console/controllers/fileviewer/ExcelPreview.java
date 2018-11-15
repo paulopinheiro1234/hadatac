@@ -9,18 +9,14 @@ import play.mvc.Controller;
 import play.mvc.Result;
 
 public class ExcelPreview extends Controller {
-    private static String path_proc = ConfigProp.getPathProc();
-    private static String path_unproc = ConfigProp.getPathUnproc();
-
+    
     public Result index(String folder, String fileName) {
         File file = null;
         if (folder.equals("proc")) {
-            file = new File(path_proc + fileName);
+            return ok(excel_preview.render(fileName, true));
         } else {
-            file = new File(path_unproc + fileName);
-        }
-        
-        return ok(excel_preview.render(fileName));
+            return ok(excel_preview.render(fileName, false));
+        }        
     }
     
     public Result postIndex(String folder, String fileName) {

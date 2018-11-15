@@ -32,10 +32,10 @@ public class DeploymentGenerator extends BasicGenerator {
 	@Override
 	public void initMapping() {
 		mapCol.clear();
-		mapCol.put("DataAcquisitionName", Templates.DATAACQUISITIONNAME);
-		mapCol.put("Method", Templates.METHOD);
-		mapCol.put("Study", Templates.DASTUDYID);
-		mapCol.put("Epi/Lab", Templates.EPILAB);
+		mapCol.put("DataAcquisitionName", Templates.ACQ_DATAACQUISITIONNAME);
+		mapCol.put("Method", Templates.ACQ_METHOD);
+		mapCol.put("Study", Templates.ACQ_DASTUDYID);
+		mapCol.put("Epi/Lab", Templates.ACQ_EPILAB);
 	}
 
 	private String getCohortAsPlatform(Record rec) {

@@ -25,6 +25,7 @@ import org.hadatac.utils.CollectionUtil;
 import org.hadatac.utils.Feedback;
 import org.hadatac.utils.NameSpaces;
 
+
 public class DPL {
 
 	private RecordFile dplfile = null;
@@ -60,7 +61,6 @@ public class DPL {
 	    for (Record record : file.getRecords()) {
 	        mapCatalog.put(record.getValueByColumnIndex(0), record.getValueByColumnIndex(1));
 	    }
-
 	}
 
 	private void createRecordFiles(RecordFile file) {
@@ -83,7 +83,6 @@ public class DPL {
 				it.remove();
 			}
 		}
-
 	}
 
 	public boolean checkSheets() {
@@ -157,7 +156,6 @@ public class DPL {
 	
 	public boolean checkCellUriRegistered(String str) {
         String prefixString = NameSpaces.getInstance().printSparqlNameSpaceList();
-//        System.out.println(prefixString);
         if (str.contains(":")){
         	String[] split = str.split(":");
         	String prefixname = split[0];

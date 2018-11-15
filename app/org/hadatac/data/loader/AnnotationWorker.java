@@ -411,11 +411,9 @@ public class AnnotationWorker {
 
         // Deployment Generator
         if(mapCatalog.containsKey("Deployments")) {
-
             sheetName = mapCatalog.get("Deployments").replace("#", "");
             sheet = new SpreadsheetRecordFile(file.getFile(), sheetName);
             chain.addGenerator(new DeploymentGenerator(sheet));
-
         }
 
         return chain;

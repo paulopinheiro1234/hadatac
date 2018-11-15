@@ -177,7 +177,7 @@
 				class="btn-xs btn-primary" role="button">Preview File</a>
                         }}}
             @if(file.getFileName().endsWith(".xlsx") || file.getFileName().endsWith(".xls")) {
-                <a href="@org.hadatac.console.controllers.fileviewer.routes.ExcelPreview.index("proc", file.getFileName())" class="btn-xs btn-primary" role="button">Preview File</a>
+                <a href="@org.hadatac.console.controllers.fileviewer.routes.ExcelPreview.index("unproc", file.getFileName())" class="btn-xs btn-primary" role="button">Preview File</a>
             }
     			<a href="@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.deleteDataFile(file.getFileName(), false)" class="btn-xs btn-primary" role="button" id="delete" onclick="return confirm('Are you sure to delete?')">Delete</a>
     			@if(bAdmin) {

@@ -40,11 +40,11 @@ public class DataAcquisitionGenerator extends BasicGenerator {
 	public void initMapping() {}
 
 	private String getDataAcquisitionName(Record rec) {
-		return rec.getValueByColumnName(Templates.DATAACQUISITIONNAME);
+		return rec.getValueByColumnName(Templates.ACQ_DATAACQUISITIONNAME);
 	}
 
 	private String getOwnerEmail(Record rec) {
-		String ownerEmail = rec.getValueByColumnName(Templates.OWNEREMAIL);
+		String ownerEmail = rec.getValueByColumnName(Templates.ACQ_OWNEREMAIL);
 		if(ownerEmail.equalsIgnoreCase("NULL") || ownerEmail.isEmpty()) {
 			return "";
 		}
@@ -54,11 +54,11 @@ public class DataAcquisitionGenerator extends BasicGenerator {
 	}
 	
 	private String getPermissionUri(Record rec) {
-		return rec.getValueByColumnName(Templates.PERMISSIONURI);
+		return rec.getValueByColumnName(Templates.ACQ_PERMISSIONURI);
 	}
 
 	private String getMethod(Record rec) {
-		String method = rec.getValueByColumnName(Templates.METHOD);
+		String method = rec.getValueByColumnName(Templates.ACQ_METHOD);
 		if(method.equalsIgnoreCase("NULL") || method.isEmpty()) {
 			return "";
 		}
@@ -68,18 +68,18 @@ public class DataAcquisitionGenerator extends BasicGenerator {
 	}
 
 	private String getStudy(Record rec) {
-		return rec.getValueByColumnName(Templates.DASTUDYID).equalsIgnoreCase("NULL")? 
-				"" : rec.getValueByColumnName(Templates.DASTUDYID);
+		return rec.getValueByColumnName(Templates.ACQ_DASTUDYID).equalsIgnoreCase("NULL")? 
+				"" : rec.getValueByColumnName(Templates.ACQ_DASTUDYID);
 	}
 
 	private String getDataDictionaryName(Record rec) {
-		String DDName = rec.getValueByColumnName(Templates.DATADICTIONARYNAME).equalsIgnoreCase("NULL")? 
-				"" : rec.getValueByColumnName(Templates.DATADICTIONARYNAME);
+		String DDName = rec.getValueByColumnName(Templates.ACQ_DATADICTIONARYNAME).equalsIgnoreCase("NULL")? 
+				"" : rec.getValueByColumnName(Templates.ACQ_DATADICTIONARYNAME);
 		return DDName.replace("SDD-","");
 	}
 
 	private Boolean isEpiData(Record rec) {
-		return rec.getValueByColumnName(Templates.EPILAB).equalsIgnoreCase("EPI");
+		return rec.getValueByColumnName(Templates.ACQ_EPILAB).equalsIgnoreCase("EPI");
 	}
 
 	@Override
