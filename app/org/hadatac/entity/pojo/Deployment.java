@@ -38,7 +38,6 @@ import org.joda.time.format.DateTimeFormatter;
 import org.joda.time.format.ISODateTimeFormat;
 import org.labkey.remoteapi.CommandException;
 
-import com.typesafe.config.ConfigFactory;
 
 public class Deployment extends HADatAcThing {
 
@@ -298,7 +297,8 @@ public class Deployment extends HADatAcThing {
         } else {
             queryString += "DESCRIBE " + deployment_uri;
         }
-        //System.out.println("FIND DEPLOYMENT (queryString): " + queryString);
+        System.out.println("FIND DEPLOYMENT (queryString): " + queryString);
+        
         Query query = QueryFactory.create(queryString);
         QueryExecution qexec = QueryExecutionFactory.sparqlService(
                 CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), query);

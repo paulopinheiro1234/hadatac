@@ -16,7 +16,7 @@ import org.hadatac.utils.ConfigProp;
 import org.hadatac.utils.NameSpaces;
 import org.hadatac.utils.Templates;
 
-public class DeploymentGenerator extends BasicGenerator {
+public class DeploymentGenerator extends BaseGenerator {
 	final String kbPrefix = ConfigProp.getKbPrefix();
 	String startTime = "";
 
@@ -132,7 +132,7 @@ public class DeploymentGenerator extends BasicGenerator {
 	}
 
 	@Override
-	public Map<String, Object> createRow(Record rec, int row_number) throws Exception {
+	public Map<String, Object> createRow(Record rec, int rowNumber) throws Exception {
 		Map<String, Object> row = new HashMap<String, Object>();
 
 		String tempDA = getDataAcquisitionName(rec);

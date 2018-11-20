@@ -5,8 +5,6 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Iterator;
 
-import com.typesafe.config.ConfigFactory;
-
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServerException;
@@ -19,23 +17,24 @@ import org.apache.solr.common.SolrDocumentList;
 import org.hadatac.utils.CollectionUtil;
 import org.hadatac.utils.Feedback;
 
+
 public class AnnotationLog {
 	@Field("file_name")
-	private String file_name = "";
+	private String fileName = "";
 	@Field("log_str")
 	private String log = "";
 	
 	public AnnotationLog() {}
 	
-	public AnnotationLog(String file_name) {
-		this.file_name = file_name;
+	public AnnotationLog(String fileName) {
+		this.fileName = fileName;
 	}
 
 	public String getFileName() {
-		return file_name;
+		return fileName;
 	}
 	public void setFileName(String file_name) {
-		this.file_name = file_name;
+		this.fileName = file_name;
 	}
 	
 	public String getLog() {
@@ -49,12 +48,14 @@ public class AnnotationLog {
 		this.log = "";
 	}
 	
-	public void addline(String new_line) {
-		this.log += (new SimpleDateFormat("yyyy-MM-dd HH:mm:ss")).format(new Date()) + " " + new_line;
+	public void addline(String newLine) {
+		this.log += (new SimpleDateFormat("yyyy-MM-dd HH:mm:ss")).format(new Date()) + " " + newLine;
 		save();
 	}
 	
 	public int save() {
+	    fileName = fileName.replace("/", "[SLASH]");
+	    
 		try {
 			SolrClient client = new HttpSolrClient.Builder(
 					CollectionUtil.getCollectionPath(CollectionUtil.Collection.ANNOTATION_LOG)).build();
@@ -89,10 +90,10 @@ public class AnnotationLog {
 	
 	public static AnnotationLog convertFromSolr(SolrDocument doc) {
 		AnnotationLog annotation_log = new AnnotationLog();
-		if(doc.getFieldValue("file_name") != null){
-			annotation_log.setFileName(doc.getFieldValue("file_name").toString());
+		if (doc.getFieldValue("file_name") != null) {
+			annotation_log.setFileName(doc.getFieldValue("file_name").toString().replace("[SLASH]", "/"));
 		}
-		if(doc.getFieldValue("log_str") != null){
+		if (doc.getFieldValue("log_str") != null) {
 			annotation_log.setLog(doc.getFieldValue("log_str").toString());
 		}
 
@@ -100,6 +101,8 @@ public class AnnotationLog {
 	}
 	
 	public static AnnotationLog find(String fileName) {
+	    fileName = fileName.replace("/", "[SLASH]");
+	    
 		SolrClient solr = new HttpSolrClient.Builder(
 		        CollectionUtil.getCollectionPath(CollectionUtil.Collection.ANNOTATION_LOG)).build();
 		SolrQuery query = new SolrQuery();
@@ -132,11 +135,13 @@ public class AnnotationLog {
     	return log;
 	}
 	
-	public static int delete(String file_name) {
+	public static int delete(String fileName) {
+	    fileName = fileName.replace("/", "[SLASH]");
+	    
 		SolrClient solr = new HttpSolrClient.Builder(
 		        CollectionUtil.getCollectionPath(CollectionUtil.Collection.ANNOTATION_LOG)).build();
 		try {	
-			UpdateResponse response = solr.deleteByQuery("file_name:\"" + file_name + "\"");
+			UpdateResponse response = solr.deleteByQuery("file_name:\"" + fileName + "\"");
 			solr.commit();
 			solr.close();
 			return response.getStatus();

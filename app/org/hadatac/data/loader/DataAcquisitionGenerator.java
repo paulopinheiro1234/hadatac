@@ -22,7 +22,7 @@ import org.hadatac.utils.Templates;
 
 import java.lang.Exception;
 
-public class DataAcquisitionGenerator extends BasicGenerator {
+public class DataAcquisitionGenerator extends BaseGenerator {
 	
 	final String kbPrefix = ConfigProp.getKbPrefix();
 	String startTime = "";
@@ -83,7 +83,7 @@ public class DataAcquisitionGenerator extends BasicGenerator {
 	}
 
 	@Override
-	public Map<String, Object> createRow(Record rec, int row_number) throws Exception {
+	public Map<String, Object> createRow(Record rec, int rowNumber) throws Exception {
 		Map<String, Object> row = new HashMap<String, Object>();
 		row.put("hasURI", kbPrefix + "DA-" + getDataAcquisitionName(rec));
 		row.put("a", "hasco:DataAcquisition");
@@ -102,17 +102,17 @@ public class DataAcquisitionGenerator extends BasicGenerator {
 	}
 	
 	@Override
-	public HADatAcThing createObject(Record rec, int row_number) throws Exception {
-		Map<String, Object> row = createRow(rec, row_number);
+	public HADatAcThing createObject(Record rec, int rowNumber) throws Exception {
+		Map<String, Object> row = createRow(rec, rowNumber);
 		
 		String ownerEmail = getOwnerEmail(rec);
 		if (ownerEmail.isEmpty()) {
-			throw new Exception(String.format("Owner Email is not specified for Row %s!", row_number));
+			throw new Exception(String.format("Owner Email is not specified for Row %s!", rowNumber));
 		}
 		
 		String permissionUri = getPermissionUri(rec);
 		if (permissionUri.isEmpty()) {
-			throw new Exception(String.format("Permission URI is not specified for Row %s!", row_number));
+			throw new Exception(String.format("Permission URI is not specified for Row %s!", rowNumber));
 		}
 
 		String deploymentUri = URIUtils.replacePrefixEx(kbPrefix + "DPL-" + getDataAcquisitionName(rec));

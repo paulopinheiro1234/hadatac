@@ -9,7 +9,7 @@ import org.hadatac.utils.ConfigProp;
 import org.hadatac.utils.Templates;
 
 
-public class SampleCollectionGenerator extends BasicGenerator {
+public class SampleCollectionGenerator extends BaseGenerator {
 
 	final String kbPrefix = ConfigProp.getKbPrefix();
 

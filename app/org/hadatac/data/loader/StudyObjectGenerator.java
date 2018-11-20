@@ -12,7 +12,7 @@ import org.hadatac.entity.pojo.HADatAcThing;
 import org.hadatac.entity.pojo.StudyObject;
 
 
-public class StudyObjectGenerator extends BasicGenerator {
+public class StudyObjectGenerator extends BaseGenerator {
 
     String study_id;
     String file_name;
@@ -138,12 +138,12 @@ public class StudyObjectGenerator extends BasicGenerator {
     }
 
     @Override
-    public HADatAcThing createObject(Record rec, int row_number) throws Exception {
+    public HADatAcThing createObject(Record rec, int rowNumber) throws Exception {
         return createStudyObject(rec);
     }
 
     @Override
-    public Map<String, Object> createRow(Record rec, int row_number) throws Exception {
+    public Map<String, Object> createRow(Record rec, int rowNumber) throws Exception {
         if (getOriginalID(rec).length() > 0) {
             Map<String, Object> row = new HashMap<String, Object>();
             row.put("hasURI", getUri(rec));

@@ -11,33 +11,69 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
-import org.hadatac.metadata.model.SpreadsheetParsingResult;
-import org.hadatac.metadata.loader.SheetProcessing;
-import org.hadatac.utils.Feedback;
-
-
 import org.apache.poi.EncryptedDocumentException;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
-import org.apache.poi.xssf.usermodel.XSSFSheet;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.ss.usermodel.WorkbookFactory;
 
+
 public class SpreadsheetRecordFile implements RecordFile {
 
     private File file;
     private String sheetName;
+    private int numberOfSheets = 1;
+    private int numberOfRows;
+    private List<String> headers;
 
     public SpreadsheetRecordFile(File file, String sheetName) {
         this.file = file;
         this.sheetName = sheetName;
+        init();
     }
 
     public SpreadsheetRecordFile(File file) {
         this.file = file;
         this.sheetName = "";
+        init();
+    }
+    
+    private void init() {
+        try {
+            Workbook workbook = WorkbookFactory.create(new FileInputStream(file));
+            numberOfSheets = workbook.getNumberOfSheets();
+            
+            Sheet sheet = null;
+            if (sheetName.isEmpty()) {
+                sheet = workbook.getSheetAt(0);
+            } else {
+                sheet = workbook.getSheet(sheetName);
+            }
+            
+            if (sheet == null) {
+                return;
+            }
+            
+            numberOfRows = sheet.getLastRowNum() + 1;
+
+            Iterator<Row> rows = sheet.iterator();
+            while (rows.hasNext()) {
+                Row header = rows.next();
+                if (!isEmptyRow(header)) {
+                    headers = getRowValues(header);
+                    break;
+                }
+            }
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (EncryptedDocumentException e) {
+            e.printStackTrace();
+        } catch (InvalidFormatException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
@@ -80,13 +116,12 @@ public class SpreadsheetRecordFile implements RecordFile {
     
     @Override
     public int getNumberOfSheets() {
-        try {
-            Workbook workbook = WorkbookFactory.create(new FileInputStream(file));
-            return workbook.getNumberOfSheets();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return 1;
+        return numberOfSheets;
+    }
+    
+    @Override
+    public int getNumberOfRows() {
+        return numberOfRows;
     }
     
     @Override
@@ -96,34 +131,7 @@ public class SpreadsheetRecordFile implements RecordFile {
 
     @Override
     public List<String> getHeaders() {
-
-        try {
-            Workbook workbook = WorkbookFactory.create(new FileInputStream(file));
-            Sheet sheet = null;
-            if (sheetName.isEmpty()) {
-                sheet = workbook.getSheetAt(0);
-            } else {
-                sheet = workbook.getSheet(sheetName);
-            }
-
-            Iterator<Row> rows = sheet.iterator();
-            while (rows.hasNext()) {
-                Row header = rows.next();
-                if (!isEmptyRow(header)) {
-                    return getRowValues(header);
-                }
-            }
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } catch (EncryptedDocumentException e) {
-            e.printStackTrace();
-        } catch (InvalidFormatException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        return null;
+        return headers;
     }
 
     @Override
@@ -167,24 +175,6 @@ public class SpreadsheetRecordFile implements RecordFile {
         }
 
         return true;
-    }
-
-    public SpreadsheetParsingResult processSheet(String sheetName) {
-
-      System.out.println("Processing sheet " + sheetName + "...");
-
-      try {
-          XSSFWorkbook workbook = new XSSFWorkbook(file);
-
-          SpreadsheetParsingResult result = SheetProcessing.generateTTL(Feedback.WEB, workbook.getSheet(sheetName));
-
-          return result;
-        } catch (IOException | InvalidFormatException e) {
-
-            e.printStackTrace();
-            return null;
-        }
-
     }
 
     private List<String> getRowValues(Row row) {

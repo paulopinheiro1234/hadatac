@@ -14,7 +14,7 @@ import org.hadatac.utils.NameSpaces;
 import org.hadatac.utils.Templates;
 
 
-public class DASchemaAttrGenerator extends BasicGenerator {
+public class DASchemaAttrGenerator extends BaseGenerator {
 
     final String kbPrefix = ConfigProp.getKbPrefix();
     String startTime = "";
@@ -220,15 +220,15 @@ public class DASchemaAttrGenerator extends BasicGenerator {
     	Map<String, List<String>> mergedEA = this.mergedEA;
         rows.clear();
         List<String> column_name = new ArrayList<String>();
-        int row_number = 0;
+        int rowNumber = 0;
         for (Record record : records) {
             if (getAttribute(record)  == null || getAttribute(record).equals("")){
                 if (column_name.contains(getLabel(record))){
-                    rows.add(createRelationRow(record, ++row_number));
+                    rows.add(createRelationRow(record, ++rowNumber));
                 }
                 continue;
             } else {
-                rows.add(createRow(record, ++row_number));
+                rows.add(createRow(record, ++rowNumber));
                 for (String item : getWasDerivedFrom(record)) {
                 	rows.add(createDerivedFromRow(item, record));
                 }
@@ -259,7 +259,7 @@ public class DASchemaAttrGenerator extends BasicGenerator {
 
     //Column	Attribute	attributeOf	Unit	Time	Entity	Role	Relation	inRelationTo	wasDerivedFrom	wasGeneratedBy	hasPosition   
     @Override
-    public Map<String, Object> createRow(Record rec, int row_number) throws Exception {
+    public Map<String, Object> createRow(Record rec, int rowNumber) throws Exception {
     	
         Map<String, Object> row = new HashMap<String, Object>();
         List<String> tmp = new ArrayList<String>();
@@ -340,7 +340,7 @@ public class DASchemaAttrGenerator extends BasicGenerator {
         return row;
     }
 
-    Map<String, Object> createRelationRow(Record rec, int row_number) throws Exception {
+    Map<String, Object> createRelationRow(Record rec, int rowNumber) throws Exception {
         Map<String, Object> row = new HashMap<String, Object>();
         row.put("hasURI", kbPrefix + "DASA-" + SDDName + "-" + getLabel(rec).trim().replace(" ", "").replace("_","-").replace("??", ""));
         if (getRelation(rec).length() > 0) {

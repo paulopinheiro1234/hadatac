@@ -33,7 +33,7 @@ public class NewObjectsFromFile extends Controller {
     static final long MAX_OBJECTS = 1000;
     static final long LENGTH_CODE = 6;
 
-    private static String path_unproc = ConfigProp.getPropertyValue("autoccsv.config", "path_unproc");
+    private static String pathUnproc = ConfigProp.getPropertyValue("autoccsv.config", "pathUnproc");
 
     @Inject
     private FormFactory formFactory;
@@ -68,7 +68,7 @@ public class NewObjectsFromFile extends Controller {
         System.out.println("nextId : " + nextId);
 
         ObjectCollectionType ocType = ObjectCollectionType.find(oc.getTypeUri());
-        File  toUse = new File(path_unproc + filename);
+        File  toUse = new File(pathUnproc + filename);
         int rowCount = 0;
         String newURI = "";
         String newType = "http://semanticscience.org/resource/Human";

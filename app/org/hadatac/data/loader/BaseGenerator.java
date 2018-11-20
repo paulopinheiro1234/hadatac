@@ -31,7 +31,7 @@ import org.hadatac.utils.LabKeyException;
 import org.labkey.remoteapi.CommandException;
 
 
-public abstract class BasicGenerator {
+public abstract class BaseGenerator {
 
     protected List<Record> records = null;
     protected RecordFile file;
@@ -45,7 +45,7 @@ public abstract class BasicGenerator {
     protected String studyUri = "";
     protected String namedGraphUri = "";
     
-    public BasicGenerator(RecordFile file) {
+    public BaseGenerator(RecordFile file) {
         this.file = file;
         records = file.getRecords();
         fileName = file.getFile().getName();
@@ -81,9 +81,9 @@ public abstract class BasicGenerator {
         this.namedGraphUri = namedGraphUri;
     }
     
-    public Map<String, Object> createRow(Record rec, int row_number) throws Exception { return null; }
+    public Map<String, Object> createRow(Record rec, int rowNumber) throws Exception { return null; }
 
-    public HADatAcThing createObject(Record rec, int row_number) throws Exception { return null; }
+    public HADatAcThing createObject(Record rec, int rowNumber) throws Exception { return null; }
 
     public List<Map<String, Object>> getRows() {
         return rows;
@@ -101,9 +101,9 @@ public abstract class BasicGenerator {
             return;
         }
 
-        int row_number = 0;
+        int rowNumber = 0;
         for (Record record : records) {
-            Map<String, Object> tempRow = createRow(record, ++row_number);
+            Map<String, Object> tempRow = createRow(record, ++rowNumber);
             if (tempRow != null) {
                 rows.add(tempRow);
             }
@@ -115,9 +115,9 @@ public abstract class BasicGenerator {
             return;
         }
 
-        int row_number = 0;
+        int rowNumber = 0;
         for (Record record : records) {
-            HADatAcThing obj = createObject(record, ++row_number);
+            HADatAcThing obj = createObject(record, ++rowNumber);
             if (obj != null) {
                 objects.add(obj);
             }
@@ -140,6 +140,7 @@ public abstract class BasicGenerator {
         }
     }
 
+    @Override
     public String toString() {
         if (rows.isEmpty()) {
             return "";
@@ -161,8 +162,12 @@ public abstract class BasicGenerator {
         
         return result;
     }
+    
+    private Model createModel(List<Map<String, Object>> rows) {
+        return createModel(rows, "");
+    }
 
-    public Model createModel(List<Map<String, Object>> rows, String namedGraphUri) {        
+    private Model createModel(List<Map<String, Object>> rows, String namedGraphUri) {        
         ModelFactory modelFactory = new LinkedHashModelFactory();
         Model model = modelFactory.createEmptyModel();
 
@@ -175,9 +180,9 @@ public abstract class BasicGenerator {
         for (Map<String, Object> row : rows) {
             IRI sub = factory.createIRI(URIUtils.replacePrefixEx((String)row.get("hasURI")));
             for (String key : row.keySet()) {
-                if (!key.equals("hasURI")) {
+                if (!"hasURI".equals(key)) {
                     IRI pred = null;
-                    if (key.equals("a")) {
+                    if ("a".equals(key)) {
                         pred = factory.createIRI(URIUtils.replacePrefixEx("rdf:type"));
                     } else {
                         pred = factory.createIRI(URIUtils.replacePrefixEx(key));

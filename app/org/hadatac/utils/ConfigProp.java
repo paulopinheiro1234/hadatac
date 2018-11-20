@@ -65,16 +65,16 @@ public class ConfigProp {
 	
 	public static String getPathUnproc() {
 	    if (CollectionUtil.isSandboxMode()) {
-	        return getPropertyValue(AUTOANNOTATOR_CONFIG_FILE, "path_unproc") + "_sandbox";
+	        return getPropertyValue(AUTOANNOTATOR_CONFIG_FILE, "pathUnproc") + "_sandbox";
 	    }
-		return getPropertyValue(AUTOANNOTATOR_CONFIG_FILE, "path_unproc");
+		return getPropertyValue(AUTOANNOTATOR_CONFIG_FILE, "pathUnproc");
 	}
 	
 	public static String getPathProc() {
 	    if (CollectionUtil.isSandboxMode()) {
-	        return getPropertyValue(AUTOANNOTATOR_CONFIG_FILE, "path_proc") + "_sandbox";
+	        return getPropertyValue(AUTOANNOTATOR_CONFIG_FILE, "pathProc") + "_sandbox";
 	    }
-	    return getPropertyValue(AUTOANNOTATOR_CONFIG_FILE, "path_proc");
+	    return getPropertyValue(AUTOANNOTATOR_CONFIG_FILE, "pathProc");
 	}
 	
 	public static String getPathDownload() {

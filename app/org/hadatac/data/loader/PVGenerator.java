@@ -10,7 +10,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class PVGenerator extends BasicGenerator {
+public class PVGenerator extends BaseGenerator {
 	
 	final String kbPrefix = ConfigProp.getKbPrefix();
 	String startTime = "";
@@ -97,19 +97,19 @@ public class PVGenerator extends BasicGenerator {
 	}
 	
 	public List<String> createUris() throws Exception {
-		int row_number = 0;
+		int rowNumber = 0;
 		List<String> result = new ArrayList<String>();
 		for (Record record : records) {
-			result.add((kbPrefix + "PV-" + getLabel(record).replace("_","-").replace("??", "") + ("-" + SDDName + "-" + getCode(record)).replaceAll("--", "-")).replace(" ","") + "-" + row_number);
-			++row_number;
+			result.add((kbPrefix + "PV-" + getLabel(record).replace("_","-").replace("??", "") + ("-" + SDDName + "-" + getCode(record)).replaceAll("--", "-")).replace(" ","") + "-" + rowNumber);
+			++rowNumber;
 		}
 		return result;
 	}
 
 	@Override
-	public Map<String, Object> createRow(Record rec, int row_number) throws Exception {	
+	public Map<String, Object> createRow(Record rec, int rowNumber) throws Exception {	
 		Map<String, Object> row = new HashMap<String, Object>();
-		row.put("hasURI", (kbPrefix + "PV-" + getLabel(rec).replaceAll("[^a-zA-Z0-9:-]", "-") + ("-" + SDDName + "-" + getCode(rec)).replaceAll("--", "-")).replace(" ","").replaceAll("[^A-Za-z0-9:-]", "") + "-" + row_number);
+		row.put("hasURI", (kbPrefix + "PV-" + getLabel(rec).replaceAll("[^a-zA-Z0-9:-]", "-") + ("-" + SDDName + "-" + getCode(rec)).replaceAll("--", "-")).replace(" ","").replaceAll("[^A-Za-z0-9:-]", "") + "-" + rowNumber);
 		row.put("a", "hasco:PossibleValue");
 		row.put("hasco:hasCode", getCode(rec));
 		row.put("hasco:hasCodeLabel", getCodeLabel(rec));

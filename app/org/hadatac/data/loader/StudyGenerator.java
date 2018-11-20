@@ -9,7 +9,7 @@ import org.hadatac.metadata.loader.URIUtils;
 import org.hadatac.utils.ConfigProp;
 import org.hadatac.utils.Templates;
 
-public class StudyGenerator extends BasicGenerator {
+public class StudyGenerator extends BaseGenerator {
 	final String kbPrefix = ConfigProp.getKbPrefix();
 	String file_name;
 
@@ -85,10 +85,9 @@ public class StudyGenerator extends BasicGenerator {
 	}
 
 	@Override
-	public Map<String, Object> createRow(Record rec, int row_number) throws Exception {
+	public Map<String, Object> createRow(Record rec, int rowNumber) throws Exception {
 		Map<String, Object> row = new HashMap<String, Object>();
-		if (getUri(rec).length()>0) {
-			AnnotationLog.println("This STD has Study_ID : " + kbPrefix + "STD-" + getUri(rec) +".", file_name);
+		if (getUri(rec).length() > 0) {
 			row.put("hasURI", getUri(rec));
 			row.put("a", getType());
 			row.put("rdfs:label", getTitle(rec));
@@ -104,10 +103,8 @@ public class StudyGenerator extends BasicGenerator {
 				row.put("hasco:hasExternalSource", getExtSource(rec));
 			}
 			setStudyUri(URIUtils.replacePrefixEx(getUri(rec)));
-
-		} else {
-			AnnotationLog.printException("This STD has no Study_ID filled.", file_name);
 		}
+		
 		return row;
 	}
 

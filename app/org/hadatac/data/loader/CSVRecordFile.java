@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVRecord;
 
@@ -16,9 +17,30 @@ import org.apache.commons.csv.CSVRecord;
 public class CSVRecordFile implements RecordFile {
 
     private File file;
+    private int numberOfRows;
+    private List<String> headers;
 
     public CSVRecordFile(File file) {
         this.file = file;
+        init();
+    }
+    
+    private void init() {
+        try {
+            CSVParser parser = CSVFormat.DEFAULT.withHeader().parse(new FileReader(file));
+            Map<String, Integer> headerMap = parser.getHeaderMap();
+
+            headers = new ArrayList<String>(headerMap.size());
+            for (String key : headerMap.keySet()) {
+                headers.add(headerMap.get(key).intValue(), key);
+            }
+            
+            numberOfRows = parser.getRecords().size();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
@@ -43,23 +65,7 @@ public class CSVRecordFile implements RecordFile {
 
     @Override
     public List<String> getHeaders() {
-        try {
-            Map<String,Integer> headerMap = CSVFormat.DEFAULT.withHeader().parse(
-                    new FileReader(file)).getHeaderMap();
-
-            List<String> headerList = new ArrayList<String>(headerMap.size());
-            for (String key : headerMap.keySet()) {
-                headerList.add(headerMap.get(key).intValue(), key);
-            }
-
-            return headerList;
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        return null;
+        return headers;
     }
 
     @Override
@@ -75,5 +81,10 @@ public class CSVRecordFile implements RecordFile {
     @Override
     public boolean isValid() {
         return file != null;
+    }
+
+    @Override
+    public int getNumberOfRows() {
+        return numberOfRows;
     }
 }

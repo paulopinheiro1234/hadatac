@@ -3,7 +3,7 @@ package org.hadatac.data.loader;
 import java.lang.String;
 import java.util.Map;
 
-public class GeneralGenerator extends BasicGenerator {
+public class GeneralGenerator extends BaseGenerator {
 	
     private String tableName;
 	

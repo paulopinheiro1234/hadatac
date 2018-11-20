@@ -27,7 +27,7 @@ import org.hadatac.utils.CollectionUtil;
 import org.hadatac.utils.Feedback;
 
 
-public class MeasurementGenerator extends BasicGenerator {
+public class MeasurementGenerator extends BaseGenerator {
 
     private ObjectAccessSpec da;
     private DataFile dataFile;
@@ -155,7 +155,7 @@ public class MeasurementGenerator extends BasicGenerator {
     }
 
     @Override
-    public HADatAcThing createObject(Record record, int row_number) throws Exception {
+    public HADatAcThing createObject(Record record, int rowNumber) throws Exception {
         // Comment out row instance generation
         /*
         try{

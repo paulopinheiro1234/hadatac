@@ -150,6 +150,8 @@ public class DataFile {
     }
 
     public int save() {
+        fileName = fileName.replace("/", "[SLASH]");
+        
         try {
             SolrClient client = new HttpSolrClient.Builder(
                     CollectionUtil.getCollectionPath(CollectionUtil.Collection.CSV_DATASET)).build();
@@ -168,7 +170,7 @@ public class DataFile {
         try {
             SolrClient solr = new HttpSolrClient.Builder(
                     CollectionUtil.getCollectionPath(CollectionUtil.Collection.CSV_DATASET)).build();
-            UpdateResponse response = solr.deleteById(this.getFileName());
+            UpdateResponse response = solr.deleteById(this.getFileName().replace("/", "[SLASH]"));
             solr.commit();
             solr.close();
             return response.getStatus();
@@ -214,7 +216,7 @@ public class DataFile {
     }
 
     public static DataFile convertFromSolr(SolrDocument doc) {
-        DataFile object = new DataFile(doc.getFieldValue("file_name").toString());
+        DataFile object = new DataFile(doc.getFieldValue("file_name").toString().replace("[SLASH]", "/"));
 
         object.setOwnerEmail(SolrUtils.getFieldValue(doc, "owner_email_str").toString());
         object.setStudyUri(SolrUtils.getFieldValue(doc, "study_uri_str").toString());
@@ -277,7 +279,9 @@ public class DataFile {
         return findByQuery(query);
     }
 
-    public static DataFile findByName(String ownerEmail, String fileName) {		
+    public static DataFile findByName(String ownerEmail, String fileName) {
+        fileName = fileName.replace("/", "[SLASH]");
+        
         SolrQuery query = new SolrQuery();
         if (null == ownerEmail) {
             query.set("q", "file_name:\"" + fileName + "\"");
@@ -342,13 +346,13 @@ public class DataFile {
             folder.mkdirs();
         }
         
-        List<DataFile> unproc_files = DataFile.findAll(DataFile.UNPROCESSED);
-        unproc_files.addAll(DataFile.findAll(DataFile.FREEZED));
+        List<DataFile> unprocFiles = DataFile.findAll(DataFile.UNPROCESSED);
+        unprocFiles.addAll(DataFile.findAll(DataFile.FREEZED));
 
         File[] listOfFiles = folder.listFiles();
         for (int i = 0; i < listOfFiles.length; i++) {
             if (listOfFiles[i].isFile() && hasValidExtension(listOfFiles[i].getName())) {
-                if (!search(listOfFiles[i].getName(), unproc_files)) {
+                if (!search(listOfFiles[i].getName(), unprocFiles)) {
                     DataFile.create(listOfFiles[i].getName(), ownerEmail);
                 }
             }

@@ -9,7 +9,7 @@ import org.hadatac.metadata.loader.URIUtils;
 import org.hadatac.entity.pojo.HADatAcThing;
 
 
-public class TimeInstantGenerator extends BasicGenerator {
+public class TimeInstantGenerator extends BaseGenerator {
 
     String study_id;
     String file_name;
@@ -54,12 +54,12 @@ public class TimeInstantGenerator extends BasicGenerator {
     }
     
     @Override
-    public HADatAcThing createObject(Record rec, int row_number) throws Exception {
+    public HADatAcThing createObject(Record rec, int rowNumber) throws Exception {
         return createStudyObject(rec);
     }
 	
     @Override
-    public Map<String, Object> createRow(Record rec, int row_number) throws Exception {
+    public Map<String, Object> createRow(Record rec, int rowNumber) throws Exception {
         return null;
     }
 

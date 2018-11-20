@@ -35,8 +35,6 @@ import org.hadatac.utils.ConfigProp;
 import org.hadatac.utils.Feedback;
 import org.hadatac.utils.NameSpaces;
 
-import akka.japi.Util;
-
 import org.apache.jena.update.UpdateExecutionFactory;
 import org.apache.jena.update.UpdateFactory;
 import org.apache.jena.update.UpdateProcessor;
@@ -58,29 +56,29 @@ public class AnnotationWorker {
             return;
         }
 
-        String path_proc = ConfigProp.getPathProc();
-        String path_unproc = ConfigProp.getPathUnproc();
-        List<DataFile> proc_files = DataFile.findAll(DataFile.PROCESSED);
-        List<DataFile> unproc_files = DataFile.findAll(DataFile.UNPROCESSED);
-        DataFile.filterNonexistedFiles(path_proc, proc_files);
-        DataFile.filterNonexistedFiles(path_unproc, unproc_files);
+        String pathProc = ConfigProp.getPathProc();
+        String pathUnproc = ConfigProp.getPathUnproc();
+        List<DataFile> procFiles = DataFile.findAll(DataFile.PROCESSED);
+        List<DataFile> unprocFiles = DataFile.findAll(DataFile.UNPROCESSED);
+        DataFile.filterNonexistedFiles(pathProc, procFiles);
+        DataFile.filterNonexistedFiles(pathUnproc, unprocFiles);
 
-        unproc_files.sort(new Comparator<DataFile>() {
+        unprocFiles.sort(new Comparator<DataFile>() {
             @Override
             public int compare(DataFile o1, DataFile o2) {
                 return o1.getLastProcessTime().compareTo(o2.getLastProcessTime());
             }
         });
 
-        for (DataFile file : unproc_files) {
+        for (DataFile file : unprocFiles) {
             file.setLastProcessTime(new SimpleDateFormat("yyyy/MM/dd HH:mm:ss").format(new Date()));
             file.save();
 
             String file_name = file.getFileName();
-            String filePath = path_unproc + "/" + file_name;
+            String filePath = pathUnproc + "/" + file_name;
             AnnotationLog log = new AnnotationLog(file_name);
 
-            if (proc_files.contains(file)) {
+            if (procFiles.contains(file)) {
                 log.addline(Feedback.println(Feedback.WEB, String.format(
                         "[ERROR] Already processed a file with the same name %s . "
                                 + "Please delete the old file before moving forward ", file_name)));
@@ -164,9 +162,9 @@ public class AnnotationWorker {
                 String study = URIUtils.getBaseName(chain.getStudyUri());
                 String new_path = "";
                 if (study.isEmpty()) {
-                    new_path = path_proc;
+                    new_path = pathProc;
                 } else {
-                    new_path = path_proc + "/" + study;
+                    new_path = pathProc + "/" + study;
                 }
                 
                 File destFolder = new File(new_path);
@@ -187,7 +185,7 @@ public class AnnotationWorker {
                 }
                 file.save();
                 
-                File f = new File(path_unproc + "/" + file_name);
+                File f = new File(pathUnproc + "/" + file_name);
                 f.renameTo(new File(destFolder + "/" + file_name));
                 f.delete();
                 
@@ -195,8 +193,8 @@ public class AnnotationWorker {
                 if (null != log) {
                     AnnotationLog new_log = new AnnotationLog(file.getFileName());
                     new_log.setLog(log.getLog());
-                    new_log.save();
                     log.delete();
+                    new_log.save();
                 }
             } else {
                 // Freeze file
@@ -399,21 +397,16 @@ public class AnnotationWorker {
     }
 
     public static GeneratorChain annotateDPLFile(RecordFile file) {
-
-        System.out.println("Processing DPL file...");
-
         DPL dpl = new DPL(file);
         Map<String, String> mapCatalog = dpl.getCatalog();
-
-        String sheetName = "";
-        RecordFile sheet = null;
+        
         GeneratorChain chain = new GeneratorChain();
-
-        // Deployment Generator
-        if(mapCatalog.containsKey("Deployments")) {
-            sheetName = mapCatalog.get("Deployments").replace("#", "");
-            sheet = new SpreadsheetRecordFile(file.getFile(), sheetName);
-            chain.addGenerator(new DeploymentGenerator(sheet));
+        for (String key : mapCatalog.keySet()) {
+            if (mapCatalog.get(key).length() > 0) {
+                String sheetName = mapCatalog.get(key).replace("#", "");
+                RecordFile sheet = new SpreadsheetRecordFile(file.getFile(), sheetName);
+                chain.addGenerator(new DPLGenerator(sheet));
+            }
         }
 
         return chain;

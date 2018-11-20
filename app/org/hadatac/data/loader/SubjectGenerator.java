@@ -9,7 +9,7 @@ import org.hadatac.entity.pojo.HADatAcThing;
 import org.hadatac.entity.pojo.ObjectCollection;
 
 
-public class SubjectGenerator extends BasicGenerator {
+public class SubjectGenerator extends BaseGenerator {
 
     String file_name;
     String study_id;
@@ -87,7 +87,7 @@ public class SubjectGenerator extends BasicGenerator {
     }
 
     @Override
-    public HADatAcThing createObject(Record rec, int row_number) throws Exception {
+    public HADatAcThing createObject(Record rec, int rowNumber) throws Exception {
         return createStudyObject(rec);
     }
 

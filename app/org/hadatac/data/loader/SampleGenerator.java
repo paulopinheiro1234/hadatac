@@ -17,7 +17,7 @@ import org.hadatac.utils.ConfigProp;
 import org.hadatac.utils.NameSpaces;
 
 
-public class SampleGenerator extends BasicGenerator {
+public class SampleGenerator extends BaseGenerator {
     final String kbPrefix = ConfigProp.getKbPrefix();
     
     private int counter = 1;
@@ -209,7 +209,7 @@ public class SampleGenerator extends BasicGenerator {
     }
     
     @Override
-    public HADatAcThing createObject(Record rec, int row_number) throws Exception {
+    public HADatAcThing createObject(Record rec, int rowNumber) throws Exception {
         return createStudyObject(rec);
     }
     

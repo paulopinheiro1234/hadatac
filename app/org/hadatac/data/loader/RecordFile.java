@@ -13,6 +13,8 @@ public interface RecordFile {
 	public boolean isValid();
 	
     public int getNumberOfSheets();
+    
+    public int getNumberOfRows();
 
 	public String getSheetName();
 }

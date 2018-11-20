@@ -11,6 +11,7 @@ import java.util.Map;
 import org.apache.commons.io.FileUtils;
 import org.apache.jena.query.ResultSetRewindable;
 import org.apache.jena.sparql.engine.http.QueryExceptionHTTP;
+import org.apache.jena.sparql.function.library.print;
 import org.hadatac.console.controllers.annotator.AnnotationLog;
 import org.hadatac.console.http.SPARQLUtils;
 import org.hadatac.utils.Templates;
@@ -137,7 +138,7 @@ public class SDD {
         return true;
     }
 
-    public boolean checkStudyIndicatorPath(String str) {
+    public boolean checkIndicatorPath(String str) {
     	List<String> list = new ArrayList<String>();
     	list.add("sio:TimeStamp");
     	list.add("sio:TimeInstant");
@@ -166,9 +167,12 @@ public class SDD {
 
         String indvIndicatorQuery = "";
         indvIndicatorQuery += NameSpaces.getInstance().printSparqlNameSpaceList();
-        indvIndicatorQuery += " SELECT * WHERE { "
-                +  str + "  (<>|!<>)* hasco:StudyIndicator ."
-                +	" } ";
+        indvIndicatorQuery += " SELECT * WHERE { \n"
+                + " { " + str + " (<>|!<>)* hasco:StudyIndicator . } \n"
+                + " UNION { " + str + " (<>|!<>)* hasco:SampleIndicator . } \n"
+                + " } \n";
+        
+        // System.out.println("indvIndicatorQuery: " + indvIndicatorQuery);
 
         try {
             ResultSetRewindable resultsrwIndvInd = SPARQLUtils.select(
@@ -188,22 +192,20 @@ public class SDD {
             e.printStackTrace();
             AnnotationLog.printException("The 'Attribute' column " + str + " formed a bad query to the KG.", sddfile.getFile().getName());
         }
+        
         return true;
     }
 
-    public void printErrList(List<String> list, int num) {
-        if (list.size()>0){
-            String listString = "";
-            for (String s : list) {
-                listString += s + "; ";
-            }
-            if (num == 1){
+    public void printErrList(List<String> elements, int num) {
+        if (elements.size() > 0) {
+            String listString = String.join(", ", elements);
+            if (num == 1) {
                 AnnotationLog.printException("The Dictionary Mapping has unresolvable uris in cells: " + listString + " .", sddfile.getFile().getName());
-            } else if (num == 2){
+            } else if (num == 2) {
                 AnnotationLog.printException("The Dictionary Mapping has unregistered namespace in cells: " + listString + " .", sddfile.getFile().getName());
-            } else if (num == 3){
-                AnnotationLog.printException("The Attributes: " + listString + " NOT hasco:StudyIndicator .", sddfile.getFile().getName());
-            } else if (num == 4){
+            } else if (num == 3) {
+                AnnotationLog.printException("The Attributes: " + listString + " NOT hasco:StudyIndicator or hasco:SampleIndicator .", sddfile.getFile().getName());
+            } else if (num == 4) {
                 AnnotationLog.printException("The Dictionary Mapping has incorrect content in :" + listString + "in \"attributeOf\" column.", sddfile.getFile().getName());
             }
         }
@@ -306,12 +308,12 @@ public class SDD {
 
         Boolean uriResolvable = true;
         Boolean namespaceRegisterd = true;
-        Boolean isStudyIndicator = true;
+        Boolean isIndicator = true;
 
-        List<String> checkUriRegister = new ArrayList<String>();
-        List<String> checkCellVal = new ArrayList<String>();
-        List<String> checkUriResolve = new ArrayList<String>();
-        List<String> checkStudyIndicatePath = new ArrayList<String>();
+        List<String> checkUriRegisterResults = new ArrayList<String>();
+        List<String> checkCellValResults = new ArrayList<String>();
+        List<String> checkUriResolveResults = new ArrayList<String>();
+        List<String> checkStudyIndicatePathResults = new ArrayList<String>();
         List<String> dasaList = new ArrayList<String>();		
         List<String> dasoList = new ArrayList<String>();
         Map<String, String> sa2so = new HashMap<String, String>();
@@ -337,19 +339,19 @@ public class SDD {
 
                             } else {
                                 uriResolvable = false;
-                                checkUriResolve.add(relationCell);
+                                checkUriResolveResults.add(relationCell);
                             }
                         } else {
                             uriResolvable = false;
-                            checkUriResolve.add(roleCell);
+                            checkUriResolveResults.add(roleCell);
                         }
                     } else {
                         uriResolvable = false;
-                        checkUriResolve.add(entityCell);
+                        checkUriResolveResults.add(entityCell);
                     }
                 } else {
                     uriResolvable = false;
-                    checkUriResolve.add(attributeCell);
+                    checkUriResolveResults.add(attributeCell);
                 }
 
                 if (checkCellUriRegistered(attributeCell)){
@@ -359,34 +361,36 @@ public class SDD {
 
                             } else {
                                 namespaceRegisterd = false;
-                                checkUriRegister.add(relationCell);
+                                checkUriRegisterResults.add(relationCell);
                             }
                         } else {
                             namespaceRegisterd = false;
-                            checkUriRegister.add(roleCell);
+                            checkUriRegisterResults.add(roleCell);
                         }
                     } else {
                         namespaceRegisterd = false;
-                        checkUriRegister.add(entityCell);
+                        checkUriRegisterResults.add(entityCell);
                     }
                 } else {
                     namespaceRegisterd = false;
-                    checkUriRegister.add(attributeCell);
+                    checkUriRegisterResults.add(attributeCell);
                 }
 
-                if (URIUtils.isValidURI(attributeCell)){
-                    isStudyIndicator = checkStudyIndicatorPath(attributeCell);
-                    if (!isStudyIndicator) {
-                        checkStudyIndicatePath.add(attributeCell);
+                if (URIUtils.isValidURI(attributeCell)) {
+                    isIndicator = checkIndicatorPath(attributeCell);
+                    if (!isIndicator) {
+                        checkStudyIndicatePathResults.add(attributeCell);
                     }
                 } else {
                     if (entityCell.length() == 0){
-                        isStudyIndicator = false;
-                        checkStudyIndicatePath.add(attributeCell);
+                        isIndicator = false;
+                        if (!attributeCell.isEmpty()) {
+                            checkStudyIndicatePathResults.add(attributeCell);
+                        }
                     }
                 }
 
-                if (attributeCell.length()>0) {
+                if (attributeCell.length() > 0) {
                     dasaList.add(record.getValueByColumnIndex(0));
                     if (attributeOfCell.length()>0) {
                         sa2so.put(record.getValueByColumnIndex(0), attributeOfCell);
@@ -395,10 +399,10 @@ public class SDD {
                     }
                 }
 
-                if (entityCell.length()>0) {
+                if (entityCell.length() > 0) {
                 	if (URIUtils.isValidURI(entityCell)) {
 	                    dasoList.add(record.getValueByColumnIndex(0));
-	                    if (inRelationToCell.length()>0) {
+	                    if (inRelationToCell.length() > 0) {
 	                        so2so2.put(record.getValueByColumnIndex(0), inRelationToCell);
 	                    } else {
 	
@@ -406,13 +410,13 @@ public class SDD {
 	
 	                    so2type.put(record.getValueByColumnIndex(0), entityCell);
 	
-	                    if (roleCell.length()>0) {
+	                    if (roleCell.length() > 0) {
 	                        so2role.put(record.getValueByColumnIndex(0), roleCell);
 	                    } else {
 	
 	                    }
 	
-	                    if (dfCell.length()>0) {
+	                    if (dfCell.length() > 0) {
 	                        so2df.put(record.getValueByColumnIndex(0), dfCell);
 	                    } else {
 	
@@ -428,13 +432,13 @@ public class SDD {
     	
     	                    so2type.put(record.getValueByColumnIndex(0), codeMappings.get(entityCell));
     	
-    	                    if (roleCell.length()>0) {
+    	                    if (roleCell.length() > 0) {
     	                        so2role.put(record.getValueByColumnIndex(0), roleCell);
     	                    } else {
     	
     	                    }
     	
-    	                    if (dfCell.length()>0) {
+    	                    if (dfCell.length() > 0) {
     	                        so2df.put(record.getValueByColumnIndex(0), dfCell);
     	                    } else {
     	
@@ -449,7 +453,7 @@ public class SDD {
                 if (checkCellValue(record.getValueByColumnName("attributeOf"))){
                     mapAttrObj.put(record.getValueByColumnIndex(0), record.getValueByColumnName("attributeOf"));
                 } else {
-                    checkCellVal.add(record.getValueByColumnName("attributeOf"));
+                    checkCellValResults.add(record.getValueByColumnName("attributeOf"));
                 	AnnotationLog.printException("\"" + record.getValueByColumnName("attributeOf") + "\" in the attribute of column contains illegal content.", sddfile.getFile().getName());
                     return false;
                 }
@@ -463,10 +467,10 @@ public class SDD {
                     record.getValueByColumnName(Templates.ATTTRIBUTEOF));
         }
 
-        printErrList(checkUriResolve, 1);
-        printErrList(checkUriRegister, 2);
-        printErrList(checkStudyIndicatePath, 3);
-        printErrList(checkCellVal, 4);
+        printErrList(checkUriResolveResults, 1);
+        printErrList(checkUriRegisterResults, 2);
+        printErrList(checkStudyIndicatePathResults, 3);
+        printErrList(checkCellValResults, 4);
 
         if (uriResolvable == true){
             AnnotationLog.println("The Dictionary Mapping has resolvable uris.", sddfile.getFile().getName());	
@@ -474,8 +478,8 @@ public class SDD {
         if (namespaceRegisterd == true){
             AnnotationLog.println("The Dictionary Mapping has namespaces all registered.", sddfile.getFile().getName());	
         }
-        if (isStudyIndicator == true){
-            AnnotationLog.println("The Dictionary Mapping has all attributes being subclasses of hasco:StudyIndicator.", sddfile.getFile().getName());	
+        if (isIndicator == true){
+            AnnotationLog.println("The Dictionary Mapping has all attributes being subclasses of hasco:StudyIndicator or hasco:SampleIndicator.", sddfile.getFile().getName());	
         }
 
         AnnotationLog.println("The Dictionary Mapping has correct content under \"Column\" and \"attributeOf\" columns.", sddfile.getFile().getName());
