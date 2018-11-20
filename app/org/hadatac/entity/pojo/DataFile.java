@@ -322,7 +322,7 @@ public class DataFile {
         return false;
     }
 
-    public static void includeUnrecognizedFiles(String path, List<DataFile> ownedFiles) {		
+    public static void includeUnrecognizedFiles(String path, List<DataFile> ownedFiles) {
         File folder = new File(path);
         if (!folder.exists()) {
             folder.mkdirs();
