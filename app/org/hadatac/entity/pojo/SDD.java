@@ -43,11 +43,11 @@ public class SDD {
     }
 
     public String getNameFromFileName() {
-        return (sddfile.getFile().getName().split("\\.")[0]).replace("_", "-").replace("SDD-", "");
+        return (sddfile.getFileName().split("\\.")[0]).replace("_", "-").replace("SDD-", "");
     }
 
     public String getFileName() {
-        return sddfile.getFile().getName();
+        return sddfile.getFileName();
     }
 
     public Map<String, String> getCatalog() {
@@ -189,7 +189,7 @@ public class SDD {
             return false;
         } catch (QueryExceptionHTTP e) {
             e.printStackTrace();
-            AnnotationLog.printException("The 'Attribute' column " + str + " formed a bad query to the KG.", sddfile.getFile().getName());
+            AnnotationLog.printException("The 'Attribute' column " + str + " formed a bad query to the KG.", sddfile.getFileName());
         }
         
         return true;
@@ -199,13 +199,13 @@ public class SDD {
         if (elements.size() > 0) {
             String listString = String.join(", ", elements);
             if (num == 1) {
-                AnnotationLog.printException("The Dictionary Mapping has unresolvable uris in cells: " + listString + " .", sddfile.getFile().getName());
+                AnnotationLog.printException("The Dictionary Mapping has unresolvable uris in cells: " + listString + " .", sddfile.getFileName());
             } else if (num == 2) {
-                AnnotationLog.printException("The Dictionary Mapping has unregistered namespace in cells: " + listString + " .", sddfile.getFile().getName());
+                AnnotationLog.printException("The Dictionary Mapping has unregistered namespace in cells: " + listString + " .", sddfile.getFileName());
             } else if (num == 3) {
-                AnnotationLog.printException("The Attributes: " + listString + " NOT hasco:StudyIndicator or hasco:SampleIndicator .", sddfile.getFile().getName());
+                AnnotationLog.printException("The Attributes: " + listString + " NOT hasco:StudyIndicator or hasco:SampleIndicator .", sddfile.getFileName());
             } else if (num == 4) {
-                AnnotationLog.printException("The Dictionary Mapping has incorrect content in :" + listString + "in \"attributeOf\" column.", sddfile.getFile().getName());
+                AnnotationLog.printException("The Dictionary Mapping has incorrect content in :" + listString + "in \"attributeOf\" column.", sddfile.getFileName());
             }
         }
     }
@@ -300,9 +300,9 @@ public class SDD {
         }
 
         if (file.getHeaders().size() > 0){
-            AnnotationLog.println("The Dictionary Mapping has " + file.getHeaders().size() + " columns.", sddfile.getFile().getName());	
+            AnnotationLog.println("The Dictionary Mapping has " + file.getHeaders().size() + " columns.", sddfile.getFileName());	
         } else {
-            AnnotationLog.printException("The Dictionary Mapping has " + file.getHeaders().size() + " columns.", sddfile.getFile().getName());
+            AnnotationLog.printException("The Dictionary Mapping has " + file.getHeaders().size() + " columns.", sddfile.getFileName());
         }
 
         Boolean uriResolvable = true;
@@ -394,7 +394,7 @@ public class SDD {
                     if (attributeOfCell.length()>0) {
                         sa2so.put(record.getValueByColumnIndex(0), attributeOfCell);
                     } else {
-                        AnnotationLog.printException("Attribute " + record.getValueByColumnIndex(0) + "is not attributeOf any object. Please fix the content.", sddfile.getFile().getName());
+                        AnnotationLog.printException("Attribute " + record.getValueByColumnIndex(0) + "is not attributeOf any object. Please fix the content.", sddfile.getFileName());
                     }
                 }
 
@@ -444,21 +444,21 @@ public class SDD {
     	                    }
                     	}
                 	} else {
-                        AnnotationLog.printException("The Entity Cell \"" + entityCell + "\" in the \"Entity\" column is either not valid uri or it can not be resolved by replaceNameSpaceEx().", sddfile.getFile().getName());
+                        AnnotationLog.printException("The Entity Cell \"" + entityCell + "\" in the \"Entity\" column is either not valid uri or it can not be resolved by replaceNameSpaceEx().", sddfile.getFileName());
                         return false;
                 	}
                 }
                 
-                if (checkCellValue(record.getValueByColumnName("attributeOf"))){
+                if (checkCellValue(record.getValueByColumnName("attributeOf"))) {
                     mapAttrObj.put(record.getValueByColumnIndex(0), record.getValueByColumnName("attributeOf"));
                 } else {
                     checkCellValResults.add(record.getValueByColumnName("attributeOf"));
-                	AnnotationLog.printException("\"" + record.getValueByColumnName("attributeOf") + "\" in the attribute of column contains illegal content.", sddfile.getFile().getName());
+                	AnnotationLog.printException("\"" + record.getValueByColumnName("attributeOf") + "\" in the attribute of column contains illegal content.", sddfile.getFileName());
                     return false;
                 }
                 
             } else {
-                AnnotationLog.printException("The Dictionary Mapping conatins illegal content in \"" + record.getValueByColumnName("Column") + "\" in the \"Column\" column. Check if it contains characters such as \",\" and blank space.", sddfile.getFile().getName());
+                AnnotationLog.printException("The Dictionary Mapping conatins illegal content in \"" + record.getValueByColumnName("Column") + "\" in the \"Column\" column. Check if it contains characters such as \",\" and blank space.", sddfile.getFileName());
                 return false;
             }
 
@@ -472,16 +472,16 @@ public class SDD {
         printErrList(checkCellValResults, 4);
 
         if (uriResolvable == true){
-            AnnotationLog.println("The Dictionary Mapping has resolvable uris.", sddfile.getFile().getName());	
+            AnnotationLog.println("The Dictionary Mapping has resolvable uris.", sddfile.getFileName());	
         }
         if (namespaceRegisterd == true){
-            AnnotationLog.println("The Dictionary Mapping has namespaces all registered.", sddfile.getFile().getName());	
+            AnnotationLog.println("The Dictionary Mapping has namespaces all registered.", sddfile.getFileName());	
         }
         if (isIndicator == true){
-            AnnotationLog.println("The Dictionary Mapping has all attributes being subclasses of hasco:StudyIndicator or hasco:SampleIndicator.", sddfile.getFile().getName());	
+            AnnotationLog.println("The Dictionary Mapping has all attributes being subclasses of hasco:StudyIndicator or hasco:SampleIndicator.", sddfile.getFileName());	
         }
 
-        AnnotationLog.println("The Dictionary Mapping has correct content under \"Column\" and \"attributeOf\" columns.", sddfile.getFile().getName());
+        AnnotationLog.println("The Dictionary Mapping has correct content under \"Column\" and \"attributeOf\" columns.", sddfile.getFileName());
         System.out.println("[SDD] mapAttrObj: " + mapAttrObj);
 
         return true;

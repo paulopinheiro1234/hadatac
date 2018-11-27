@@ -22,24 +22,35 @@ import org.apache.poi.ss.usermodel.WorkbookFactory;
 public class SpreadsheetRecordFile implements RecordFile {
 
     private File file;
-    private String sheetName;
+    private String fileName = "";
+    private String sheetName = "";
     private int numberOfSheets = 1;
     private int numberOfRows;
     private List<String> headers;
+    
+    public SpreadsheetRecordFile(File file) {
+        this.file = file;
+        init();
+    }
 
     public SpreadsheetRecordFile(File file, String sheetName) {
         this.file = file;
         this.sheetName = sheetName;
         init();
     }
-
-    public SpreadsheetRecordFile(File file) {
+    
+    public SpreadsheetRecordFile(File file, String fileName, String sheetName) {
         this.file = file;
-        this.sheetName = "";
+        this.fileName = fileName;
+        this.sheetName = sheetName;
         init();
     }
     
     private void init() {
+        if (fileName.isEmpty()) {
+            fileName = file.getName();
+        }
+        
         try {
             Workbook workbook = WorkbookFactory.create(new FileInputStream(file));
             numberOfSheets = workbook.getNumberOfSheets();
@@ -137,6 +148,11 @@ public class SpreadsheetRecordFile implements RecordFile {
     @Override
     public File getFile() {
         return file;
+    }
+    
+    @Override
+    public String getFileName() {
+        return fileName;
     }
 
     @Override

@@ -213,7 +213,7 @@ public class AnnotationWorker {
         String studyUri = ConfigProp.getKbPrefix() + "STD-" + studyName;
         studyUri = URIUtils.replacePrefixEx(studyUri);
         
-        AnnotationLog log = AnnotationLog.create(recordFile.getFile().getName());
+        AnnotationLog log = AnnotationLog.create(recordFile.getFileName());
 
         log.addline(Feedback.println(Feedback.WEB, "[OK] Study ID found: " + studyName));
         log.addline(Feedback.println(Feedback.WEB, "[OK] Study URI found: " + studyUri));
@@ -476,7 +476,7 @@ public class AnnotationWorker {
         System.out.println("Processing data acquisition schema file ...");
 
         SDD sdd = new SDD(file);
-        String file_name = file.getFile().getName();
+        String file_name = file.getFileName();
         AnnotationLog log = AnnotationLog.create(file_name);
         String sddName = sdd.getName();
         if (sddName == "") {
@@ -491,8 +491,8 @@ public class AnnotationWorker {
 
         File codeMappingFile = null;
 
-        if (file.getFile().getName().endsWith(".csv")) {
-            String prefix = "sddtmp/" + file.getFile().getName().replace(".csv", "");
+        if (file.getFileName().endsWith(".csv")) {
+            String prefix = "sddtmp/" + file.getFileName().replace(".csv", "");
             File dictionaryFile = sdd.downloadFile(mapCatalog.get("Data_Dictionary"), prefix + "-dd.csv");
             File codeBookFile = sdd.downloadFile(mapCatalog.get("Codebook"), prefix + "-codebook.csv");
             File timelineFile = sdd.downloadFile(mapCatalog.get("Timeline"), prefix + "-timeline.csv");
@@ -501,9 +501,9 @@ public class AnnotationWorker {
             dictionaryRecordFile = new CSVRecordFile(dictionaryFile);
             codeBookRecordFile = new CSVRecordFile(codeBookFile);
             timelineRecordFile = new CSVRecordFile(timelineFile);
-        } else if (file.getFile().getName().endsWith(".xlsx")) {
+        } else if (file.getFileName().endsWith(".xlsx")) {
             codeMappingFile = sdd.downloadFile(mapCatalog.get("Code_Mappings"), 
-                    "sddtmp/" + file.getFile().getName().replace(".xlsx", "") + "-code-mappings.csv");
+                    "sddtmp/" + file.getFileName().replace(".xlsx", "") + "-code-mappings.csv");
 
             codeBookRecordFile = new SpreadsheetRecordFile(file.getFile(), mapCatalog.get("Codebook").replace("#", ""));
             dictionaryRecordFile = new SpreadsheetRecordFile(file.getFile(), mapCatalog.get("Data_Dictionary").replace("#", ""));
@@ -512,23 +512,23 @@ public class AnnotationWorker {
 
         codeMappingRecordFile = new CSVRecordFile(codeMappingFile);
 
-        if(!sdd.readCodeMapping(codeMappingRecordFile)){
+        if (!sdd.readCodeMapping(codeMappingRecordFile)) {
             log.addline(Feedback.println(Feedback.WEB, 
                     String.format("[WARNING] The CodeMapping of this SDD is empty. ", file_name)));
         } else {
             log.addline(Feedback.println(Feedback.WEB, 
                     String.format("[Codemappings] " + sdd.getCodeMapping().get("U"), file_name)));
         }
-        if(!sdd.readDataDictionary(dictionaryRecordFile)){
-            AnnotationLog.printException("Read Data Dictionary failed, please refer to the error msg above.", file.getFile().getName());
+        if (!sdd.readDataDictionary(dictionaryRecordFile)) {
+            AnnotationLog.printException("Read Data Dictionary failed, please refer to the error msg above.", file.getFileName());
             return null;
         }
-        if(!sdd.readCodebook(codeBookRecordFile)){
+        if (!sdd.readCodebook(codeBookRecordFile)) {
             log.addline(Feedback.println(Feedback.WEB, 
                     String.format("[WARNING] The Codebook of this SDD is either invalid or empty. ", file_name)));
         }
-        if(!sdd.readTimeline(timelineRecordFile)){
-            AnnotationLog.println("The TimeLine of this SDD is empty.", file.getFile().getName());
+        if (!sdd.readTimeline(timelineRecordFile)) {
+            AnnotationLog.println("The TimeLine of this SDD is empty.", file.getFileName());
         }
 
         GeneratorChain chain = new GeneratorChain();
@@ -546,7 +546,7 @@ public class AnnotationWorker {
         String sddUri = ConfigProp.getKbPrefix() + "DAS-" + sddName;
         Map<String, Object> row = new HashMap<String, Object>();
         row.put("hasURI", sddUri);
-        AnnotationLog.println("This SDD is assigned with uri: " + sddUri + " and is of type hasco:DASchema", file.getFile().getName());
+        AnnotationLog.println("This SDD is assigned with uri: " + sddUri + " and is of type hasco:DASchema", file.getFileName());
         row.put("a", "hasco:DASchema");
         row.put("rdfs:label", "Schema for " + sddName);
         row.put("rdfs:comment", "");
@@ -558,11 +558,11 @@ public class AnnotationWorker {
     }
 
     public static GeneratorChain annotateSSDFile(RecordFile file) {
-        String Pilot_Num = file.getFile().getName().replaceAll("SSD-", "");
+        String Pilot_Num = file.getFileName().replaceAll("SSD-", "");
         System.out.println("Processing SSD file of " + Pilot_Num + "...");
 
         SSD ssd = new SSD(file);
-        String file_name = file.getFile().getName();
+        String file_name = file.getFileName();
         String ssdName = ssd.getNameFromFileName();
         Map<String, String> mapCatalog = ssd.getCatalog();
         Map<String, List<String>> mapContent = ssd.getMapContent();
@@ -591,7 +591,7 @@ public class AnnotationWorker {
             chain.setRecordFile(file);
         } else {
             //chain.setInvalid();
-            AnnotationLog.printException("Cannot locate SSD's sheet ", file.getFile().getName());
+            AnnotationLog.printException("Cannot locate SSD's sheet ", file.getFileName());
         }
 
         String study_uri = chain.getStudyUri();

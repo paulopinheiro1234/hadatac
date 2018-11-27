@@ -172,15 +172,15 @@ var DropSheet = function DropSheet(opts) {
   }
   
   function handleFileUpload(e) {
+	  opts.on.upload();
+	  
 	  var wopts = { bookType:'xlsx', bookSST:false, type:'array' };
 	  if (typeof last_sheetidx !== 'undefined') {
 		  last_wb.Sheets[last_wb.SheetNames[last_sheetidx]] = XLSX.utils.aoa_to_sheet(cdg.data);
 	  }
-	  console.log('last_wb: ' + JSON.stringify(last_wb));
+	  // console.log('last_wb: ' + JSON.stringify(last_wb));
 	  var wbout = XLSX.write(last_wb, wopts);
-	  console.log("wbout: " + typeof(wbout));
-	  
-	  //XLSX.writeFile(last_wb, 'out.xlsx');
+	  // console.log("wbout: " + typeof(wbout));
 	
 	  var req = new XMLHttpRequest();
 	  req.open("POST", opts.upload_url, true);
@@ -188,12 +188,25 @@ var DropSheet = function DropSheet(opts) {
 	  formdata.append('file', new File([wbout], 'sheetjs.xlsx'));
 	  //formdata.append('file', 'test.xlsx'); // <-- server expects `file` to hold name
 	  //formdata.append('data', wbout); // <-- `data` holds the base64-encoded data
+	  req.onreadystatechange = opts.reponse_action;
 	  req.send(formdata);
+  }
+  
+  function handleFileDownload(e) {
+	  var fileName = opts.on.download();
+	  var wopts = { bookType:'xlsx', bookSST:false, type:'array' };
+	  if (typeof last_sheetidx !== 'undefined') {
+		  last_wb.Sheets[last_wb.SheetNames[last_sheetidx]] = XLSX.utils.aoa_to_sheet(cdg.data);
+	  }
+	  
+	  XLSX.writeFile(last_wb, fileName);
   }
 
   if(opts.file && opts.file.addEventListener) opts.file.addEventListener('change', handleFile, false);
   
   if(opts.upload) opts.upload.addEventListener('click', handleFileUpload, false);
+  
+  if(opts.download) opts.download.addEventListener('click', handleFileDownload, false);
   
   if(opts.data) handleFileData(opts.data);
 };

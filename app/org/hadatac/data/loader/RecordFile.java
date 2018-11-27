@@ -10,6 +10,8 @@ public interface RecordFile {
 	
 	public File getFile();
 	
+	public String getFileName();
+	
 	public boolean isValid();
 	
     public int getNumberOfSheets();

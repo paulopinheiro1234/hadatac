@@ -49,8 +49,12 @@ public class GeneratorChain {
     public void addGenerator(BaseGenerator generator) {
         chain.add(generator);
     }
-
+    
     public boolean generate() {
+        return generate(true);
+    }
+
+    public boolean generate(boolean bCommit) {
         if (!isValid()) {
             return false;
         }
@@ -67,6 +71,10 @@ public class GeneratorChain {
                 AnnotationLog.printException(generator.getErrorMsg(e), generator.getFileName());
                 return false;
             }
+        }
+        
+        if (!bCommit) {
+            return true;
         }
 
         // Commit if no errors occurred
