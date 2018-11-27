@@ -33,7 +33,7 @@ public class Hierarchy {
     
     public Hierarchy (String className) {
         if(className.isEmpty())
-            this.className = "owl";
+            this.className = "http://www.w3.org/2002/07/owl#";
         else
 		    this.className = className; 
     }
@@ -53,7 +53,7 @@ public class Hierarchy {
 			"{GRAPH ?g { " + 
 				"?id rdfs:subClassOf ?superId . " + 
 				" OPTIONAL { ?id rdfs:label ?label }}}";
-		System.out.println(q);
+		//System.out.println(q);
 		ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
 		try {
 			String queryString = NameSpaces.getInstance().printSparqlNameSpaceList() + q;
