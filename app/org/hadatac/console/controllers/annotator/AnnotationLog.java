@@ -83,6 +83,11 @@ public class AnnotationLog {
         log.addline(Feedback.println(Feedback.WEB, "[ERROR] " + message));
     }
 	
+	public static void printWarning(String message, String fileName) {
+        AnnotationLog log = AnnotationLog.create(fileName);
+        log.addline(Feedback.println(Feedback.WEB, "[WARNING] " + message));
+    }
+	
 	public static void println(String message, String fileName) {
         AnnotationLog log = AnnotationLog.create(fileName);
         log.addline(Feedback.println(Feedback.WEB, "[LOG] " + message));

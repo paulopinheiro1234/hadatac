@@ -194,21 +194,6 @@ public class SDD {
         
         return true;
     }
-
-    public void printErrList(List<String> elements, int num) {
-        if (elements.size() > 0) {
-            String listString = String.join(", ", elements);
-            if (num == 1) {
-                AnnotationLog.printException("The Dictionary Mapping has unresolvable uris in cells: " + listString + " .", sddfile.getFileName());
-            } else if (num == 2) {
-                AnnotationLog.printException("The Dictionary Mapping has unregistered namespace in cells: " + listString + " .", sddfile.getFileName());
-            } else if (num == 3) {
-                AnnotationLog.printException("The Attributes: " + listString + " NOT hasco:StudyIndicator or hasco:SampleIndicator .", sddfile.getFileName());
-            } else if (num == 4) {
-                AnnotationLog.printException("The Dictionary Mapping has incorrect content in :" + listString + "in \"attributeOf\" column.", sddfile.getFileName());
-            }
-        }
-    }
     
     public Map<String, List<String>> readDDforEAmerge(RecordFile file) {
     	
@@ -312,7 +297,7 @@ public class SDD {
         List<String> checkUriRegisterResults = new ArrayList<String>();
         List<String> checkCellValResults = new ArrayList<String>();
         List<String> checkUriResolveResults = new ArrayList<String>();
-        List<String> checkStudyIndicatePathResults = new ArrayList<String>();
+        List<String> checkStudyIndicatorPathResults = new ArrayList<String>();
         List<String> dasaList = new ArrayList<String>();		
         List<String> dasoList = new ArrayList<String>();
         Map<String, String> sa2so = new HashMap<String, String>();
@@ -378,13 +363,13 @@ public class SDD {
                 if (URIUtils.isValidURI(attributeCell)) {
                     isIndicator = checkIndicatorPath(attributeCell);
                     if (!isIndicator) {
-                        checkStudyIndicatePathResults.add(attributeCell);
+                        checkStudyIndicatorPathResults.add(attributeCell);
                     }
                 } else {
                     if (entityCell.length() == 0){
                         isIndicator = false;
                         if (!attributeCell.isEmpty()) {
-                            checkStudyIndicatePathResults.add(attributeCell);
+                            checkStudyIndicatorPathResults.add(attributeCell);
                         }
                     }
                 }
@@ -465,19 +450,33 @@ public class SDD {
             mapAttrObj.put(record.getValueByColumnName(Templates.LABEL), 
                     record.getValueByColumnName(Templates.ATTTRIBUTEOF));
         }
+        
+        if (checkUriResolveResults.size() > 0) {
+            AnnotationLog.printException("The Dictionary Mapping has unresolvable uris in cells: " + String.join(", ", checkUriResolveResults) + " .", sddfile.getFileName());
+            return false;
+        }
+        
+        if (checkUriRegisterResults.size() > 0) {
+            AnnotationLog.printException("The Dictionary Mapping has unregistered namespace in cells: " + String.join(", ", checkUriRegisterResults) + " .", sddfile.getFileName());
+            return false;
+        }
+        
+        if (checkStudyIndicatorPathResults.size() > 0) {
+            AnnotationLog.printWarning("The Attributes: " + String.join(", ", checkStudyIndicatorPathResults) + " NOT hasco:StudyIndicator or hasco:SampleIndicator .", sddfile.getFileName());
+        }
+        
+        if (checkCellValResults.size() > 0) {
+            AnnotationLog.printException("The Dictionary Mapping has incorrect content in :" + String.join(", ", checkCellValResults) + "in \"attributeOf\" column.", sddfile.getFileName());
+            return false;
+        }
 
-        printErrList(checkUriResolveResults, 1);
-        printErrList(checkUriRegisterResults, 2);
-        printErrList(checkStudyIndicatePathResults, 3);
-        printErrList(checkCellValResults, 4);
-
-        if (uriResolvable == true){
+        if (uriResolvable == true) {
             AnnotationLog.println("The Dictionary Mapping has resolvable uris.", sddfile.getFileName());	
         }
-        if (namespaceRegisterd == true){
+        if (namespaceRegisterd == true) {
             AnnotationLog.println("The Dictionary Mapping has namespaces all registered.", sddfile.getFileName());	
         }
-        if (isIndicator == true){
+        if (isIndicator == true) {
             AnnotationLog.println("The Dictionary Mapping has all attributes being subclasses of hasco:StudyIndicator or hasco:SampleIndicator.", sddfile.getFileName());	
         }
 

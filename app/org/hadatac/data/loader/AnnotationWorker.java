@@ -32,7 +32,6 @@ import org.hadatac.entity.pojo.ObjectCollection;
 import org.hadatac.metadata.loader.URIUtils;
 import org.hadatac.utils.CollectionUtil;
 import org.hadatac.utils.ConfigProp;
-import org.hadatac.utils.Feedback;
 import org.hadatac.utils.NameSpaces;
 
 import org.apache.jena.update.UpdateExecutionFactory;
@@ -74,82 +73,80 @@ public class AnnotationWorker {
             file.setLastProcessTime(new SimpleDateFormat("yyyy/MM/dd HH:mm:ss").format(new Date()));
             file.save();
 
-            String file_name = file.getFileName();
-            String filePath = pathUnproc + "/" + file_name;
-            AnnotationLog log = new AnnotationLog(file_name);
+            String fileName = file.getFileName();
+            String filePath = pathUnproc + "/" + fileName;
 
             if (procFiles.contains(file)) {
-                log.addline(Feedback.println(Feedback.WEB, String.format(
-                        "[ERROR] Already processed a file with the same name %s . "
-                                + "Please delete the old file before moving forward ", file_name)));
+                AnnotationLog.printException(String.format(
+                        "Already processed a file with the same name %s . "
+                        + "Please delete the old file before moving forward ", fileName), 
+                        fileName);
                 return;
             }
-
-            log.addline(Feedback.println(Feedback.WEB, String.format("[OK] Processing file: %s", file_name)));
+            
+            AnnotationLog.println(String.format("Processing file: %s", fileName), fileName);
 
             RecordFile recordFile = null;
-            if (file_name.endsWith(".csv")) {
+            if (fileName.endsWith(".csv")) {
                 recordFile = new CSVRecordFile(new File(filePath));
-            } else if (file_name.endsWith(".xlsx")) {
+            } else if (fileName.endsWith(".xlsx")) {
                 recordFile = new SpreadsheetRecordFile(new File(filePath));
             } else {
-                log.addline(Feedback.println(Feedback.WEB, String.format(
-                        "[ERROR] Unknown file format: %s", file_name)));
+                AnnotationLog.printException(
+                        String.format("Unknown file format: %s", fileName), 
+                        fileName);
                 return;
             }
 
             boolean bSucceed = false;
             GeneratorChain chain = null;
 
-            if (file_name.startsWith("DA-")) {
+            if (fileName.startsWith("DA-")) {
                 chain = annotateDAFile(file, recordFile);
-            } else if (file_name.startsWith("PID-")) {
+            } else if (fileName.startsWith("PID-")) {
                 if (recordFile.getNumberOfSheets() > 1) {
-                    log.addline(Feedback.println(Feedback.WEB, 
-                            "[ERROR] PID file has more than one sheet. "));
+                    AnnotationLog.printException("PID file has more than one sheet. ", fileName);
                     return;
                 }
                 chain = annotateSubjectIdFile(recordFile);
-            } else if (file_name.startsWith("STD-")) {
+            } else if (fileName.startsWith("STD-")) {
                 chain = annotateStudyIdFile(recordFile);
-            } else if (file_name.startsWith("DPL-")) {
-                if (file_name.endsWith(".xlsx")) {
+            } else if (fileName.startsWith("DPL-")) {
+                if (fileName.endsWith(".xlsx")) {
                     recordFile = new SpreadsheetRecordFile(new File(filePath), "InfoSheet");
                     if (!recordFile.isValid()) {
-                        log.addline(Feedback.println(Feedback.WEB, "[ERROR] Missing InfoSheet. "));
+                        AnnotationLog.printException("Missing InfoSheet. ", fileName);
                         return;
                     }
                 }
                 chain = annotateDPLFile(recordFile);
-            } else if (file_name.startsWith("MAP-")) {
+            } else if (fileName.startsWith("MAP-")) {
                 if (recordFile.getNumberOfSheets() > 1) {
-                    log.addline(Feedback.println(Feedback.WEB, 
-                            "[ERROR] MAP file has more than one sheet. "));
+                    AnnotationLog.printException("MAP file has more than one sheet. ", fileName);
                     return;
                 }
                 chain = annotateMapFile(recordFile);
-            } else if (file_name.startsWith("ACQ-")) {
+            } else if (fileName.startsWith("ACQ-")) {
                 chain = annotateACQFile(recordFile, true);
-            } else if (file_name.startsWith("OAS-")) {
+            } else if (fileName.startsWith("OAS-")) {
                 checkOASFile(recordFile);
                 chain = annotateOASFile(recordFile, true);
-            } else if (file_name.startsWith("SDD-")) {
-                if (file_name.endsWith(".xlsx")) {
+            } else if (fileName.startsWith("SDD-")) {
+                if (fileName.endsWith(".xlsx")) {
                     recordFile = new SpreadsheetRecordFile(new File(filePath), "InfoSheet");
                     if (!recordFile.isValid()) {
-                        log.addline(Feedback.println(Feedback.WEB, 
-                                "[ERROR] The Info sheet is missing in this SDD file. "));
+                        AnnotationLog.printException("The Info sheet is missing in this SDD file. ", fileName);
                         return;
                     }
                 }
                 chain = annotateSDDFile(recordFile);
 
-            } else if (file_name.startsWith("SSD-")) {
+            } else if (fileName.startsWith("SSD-")) {
                 chain = annotateSSDFile(recordFile);
             } else {
-                log.addline(Feedback.println(Feedback.WEB, 
-                        "[ERROR] Unsupported file name prefix, only accept prefixes "
-                                + "STD-, DPL-, PID-, MAP-, SDD-, ACQ-, DA-. "));
+                AnnotationLog.printException(
+                        "Unsupported file name prefix, only accept prefixes "
+                        + "STD-, DPL-, PID-, MAP-, SDD-, ACQ-, DA-. ", fileName);
                 return;
             }
 
@@ -185,16 +182,16 @@ public class AnnotationWorker {
                 }
                 file.save();
                 
-                File f = new File(pathUnproc + "/" + file_name);
-                f.renameTo(new File(destFolder + "/" + file_name));
+                File f = new File(pathUnproc + "/" + fileName);
+                f.renameTo(new File(destFolder + "/" + fileName));
                 f.delete();
                 
-                log = AnnotationLog.find(file_name);
+                AnnotationLog log = AnnotationLog.find(fileName);
                 if (null != log) {
-                    AnnotationLog new_log = new AnnotationLog(file.getFileName());
-                    new_log.setLog(log.getLog());
+                    AnnotationLog newLog = new AnnotationLog(file.getFileName());
+                    newLog.setLog(log.getLog());
                     log.delete();
-                    new_log.save();
+                    newLog.save();
                 }
             } else {
                 // Freeze file
@@ -210,13 +207,11 @@ public class AnnotationWorker {
         final String kbPrefix = ConfigProp.getKbPrefix();
         Record record = recordFile.getRecords().get(0);
         String studyName = record.getValueByColumnName("Study ID");
-        String studyUri = ConfigProp.getKbPrefix() + "STD-" + studyName;
-        studyUri = URIUtils.replacePrefixEx(studyUri);
-        
-        AnnotationLog log = AnnotationLog.create(recordFile.getFileName());
+        String studyUri = URIUtils.replacePrefixEx(ConfigProp.getKbPrefix() + "STD-" + studyName);
+        String fileName = recordFile.getFileName();
 
-        log.addline(Feedback.println(Feedback.WEB, "[OK] Study ID found: " + studyName));
-        log.addline(Feedback.println(Feedback.WEB, "[OK] Study URI found: " + studyUri));
+        AnnotationLog.println("Study ID found: " + studyName, fileName);
+        AnnotationLog.println("Study URI found: " + studyUri, fileName);
 
         List<ObjectCollection> ocList = ObjectCollection.findByStudyUri(studyUri);
         Map<String, String> refList = new HashMap<String, String>();
@@ -230,19 +225,13 @@ public class AnnotationWorker {
             }
         }
 
-        Map<String, String> labelList = ObjectCollection.labelsByStudyUri(studyUri);
-        //              for (Map.Entry entry : labelList.entrySet()) {
-        //                  log.addline(Feedback.println(Feedback.WEB, "[OK] Label(s) found: " + entry.getKey() + ", " + entry.getValue()));
-        //              }
-
         String das_uri = URIUtils.convertToWholeURI(ConfigProp.getKbPrefix() + "DAS-" + record.getValueByColumnName("data dict").replace("SDD-", ""));
         System.out.println("das_uri " + das_uri);
         DataAcquisitionSchema das = DataAcquisitionSchema.find(das_uri);
         if (das == null) {
-            log.addline(Feedback.println(Feedback.WEB, 
-                    "[ERROR] The SDD of study " + record.getValueByColumnName("Study ID") + " can not be found. Check if it is already ingested."));
+            AnnotationLog.printException("The SDD of study " + record.getValueByColumnName("Study ID") + " can not be found. Check if it is already ingested.", fileName);
         } else {
-            //                  List<DataAcquisitionSchemaObject> loo = das.getObjects();
+            // List<DataAcquisitionSchemaObject> loo = das.getObjects();
             Map<String, String> dasoPL = new HashMap<String, String>();
             List<DataAcquisitionSchemaObject> loo = new ArrayList<DataAcquisitionSchemaObject>();
             List<String> loo2 = new ArrayList<String>();
@@ -255,13 +244,11 @@ public class AnnotationWorker {
                     }
                 }
             }
-            log.addline(Feedback.println(Feedback.WEB, 
-                    "[PATH COMPUTATION] The number of DASOs to be computed: " + loo2.toString()));
+            AnnotationLog.println("PATH COMPUTATION: The number of DASOs to be computed: " + loo2.toString(), fileName);
 
             for (DataAcquisitionSchemaObject i : loo) {
                 if (i.getEntityLabel() == null || i.getEntityLabel().length() == 0) {
-                    log.addline(Feedback.println(Feedback.WEB, 
-                            "[ERROR] The Entity Label of DASO : " + i.getLabel() + " can not be found. Check SDD."));
+                    AnnotationLog.printException("The Entity Label of DASO : " + i.getLabel() + " can not be found. Check SDD.", fileName);
                 } else if (!refList.containsKey(i.getLabel())) {
 
                     List<String> answer = new ArrayList<String>();
@@ -295,8 +282,7 @@ public class AnnotationWorker {
                                                 if (soln.getResource("x") != null) {
                                                     if (tarList.contains(soln.getResource("x").toString())) {                           
                                                         answer.add(das.getObject(soln.getResource("x").toString()).getEntityLabel());
-                                                        log.addline(Feedback.println(Feedback.WEB, 
-                                                                "[PATH] DASO: " + i.getLabel() + ": \"" + answer.get(1) + " " + answer.get(0) + "\""));
+                                                        AnnotationLog.println("PATH: DASO: " + i.getLabel() + ": \"" + answer.get(1) + " " + answer.get(0) + "\"", fileName);
                                                         dasoPL.put(i.getUri(), answer.get(1) + " " + answer.get(0));
                                                         found = true;
                                                         break;
@@ -305,8 +291,6 @@ public class AnnotationWorker {
                                                             if (soln.getResource("o") != null) {
                                                                 if (tarList.contains(soln.getResource("o").toString())) {
                                                                     answer.add(das.getObject(soln.getResource("o").toString()).getEntityLabel());
-                                                                    log.addline(Feedback.println(Feedback.WEB, 
-                                                                            "[PATH] DASO: " + i.getLabel() + ": \"" + answer.get(1) + " " + answer.get(0) + "\""));
                                                                     dasoPL.put(i.getUri(), answer.get(1) + " " + answer.get(0));
                                                                     found = true;
                                                                     break;
@@ -316,8 +300,7 @@ public class AnnotationWorker {
                                                             if (soln.getLiteral("o") != null) {
                                                                 if (refList.containsKey(soln.getLiteral("o").toString())) {
                                                                     answer.add(refList.get(soln.getLiteral("o").toString()));
-                                                                    log.addline(Feedback.println(Feedback.WEB, 
-                                                                            "[PATH] DASO: " + i.getLabel() + ": \"" + answer.get(1) + " " + answer.get(0) + "\""));
+                                                                    AnnotationLog.printException("PATH: DASO: " + i.getLabel() + ": \"" + answer.get(1) + " " + answer.get(0) + "\"", fileName);
                                                                     dasoPL.put(i.getUri(), answer.get(1) + " " + answer.get(0));
                                                                     found = true;
                                                                     break;
@@ -330,8 +313,7 @@ public class AnnotationWorker {
                                                 if (soln.getLiteral("x") != null) {
                                                     if (refList.containsKey(soln.getLiteral("x").toString())) {
                                                         answer.add(refList.get(soln.getLiteral("x").toString()));
-                                                        log.addline(Feedback.println(Feedback.WEB, 
-                                                                "[PATH] DASO: " + i.getLabel() + ": \"" + answer.get(1) + " " + answer.get(0) + "\""));
+                                                        AnnotationLog.println("PATH: DASO: " + i.getLabel() + ": \"" + answer.get(1) + " " + answer.get(0) + "\"", fileName);
                                                         dasoPL.put(i.getUri(), answer.get(1) + " " + answer.get(0));
                                                         found = true;
                                                         break;
@@ -351,12 +333,10 @@ public class AnnotationWorker {
 
                     }
                     if (found == false) {
-                        log.addline(Feedback.println(Feedback.WEB, 
-                                "[PATH] DASO: " + i.getLabel() + " Path connections can not be found ! check the SDD definition. "));
+                        AnnotationLog.println("PATH: DASO: " + i.getLabel() + " Path connections can not be found ! check the SDD definition. ", fileName);
                     }
                 } else {
-                    log.addline(Feedback.println(Feedback.WEB, 
-                            "[PATH] Skipped :" + i.getLabel()));
+                    AnnotationLog.println("PATH: Skipped :" + i.getLabel(), fileName);
                 }
             }
             //insert the triples
@@ -476,11 +456,10 @@ public class AnnotationWorker {
         System.out.println("Processing data acquisition schema file ...");
 
         SDD sdd = new SDD(file);
-        String file_name = file.getFileName();
-        AnnotationLog log = AnnotationLog.create(file_name);
+        String fileName = file.getFileName();
         String sddName = sdd.getName();
         if (sddName == "") {
-            AnnotationLog.printException("This SDD has no Study_ID filled.", file_name);
+            AnnotationLog.printException("This SDD has no Study_ID filled.", fileName);
         }
         Map<String, String> mapCatalog = sdd.getCatalog();
 
@@ -510,22 +489,23 @@ public class AnnotationWorker {
             timelineRecordFile = new SpreadsheetRecordFile(file.getFile(), mapCatalog.get("Timeline").replace("#", ""));
         }
 
-        codeMappingRecordFile = new CSVRecordFile(codeMappingFile);
-
-        if (!sdd.readCodeMapping(codeMappingRecordFile)) {
-            log.addline(Feedback.println(Feedback.WEB, 
-                    String.format("[WARNING] The CodeMapping of this SDD is empty. ", file_name)));
+        if (null != codeMappingFile) {
+            codeMappingRecordFile = new CSVRecordFile(codeMappingFile);
+            if (!sdd.readCodeMapping(codeMappingRecordFile)) {
+                AnnotationLog.printWarning(String.format("The CodeMapping of this SDD is empty. ", fileName), fileName);
+            } else {
+                AnnotationLog.println(String.format("Codemappings: " + sdd.getCodeMapping().get("U"), fileName), fileName);
+            }
         } else {
-            log.addline(Feedback.println(Feedback.WEB, 
-                    String.format("[Codemappings] " + sdd.getCodeMapping().get("U"), file_name)));
+            AnnotationLog.printWarning(String.format("Failed to download the CodeMapping of this SDD.", fileName), fileName);
         }
+        
         if (!sdd.readDataDictionary(dictionaryRecordFile)) {
             AnnotationLog.printException("Read Data Dictionary failed, please refer to the error msg above.", file.getFileName());
             return null;
         }
         if (!sdd.readCodebook(codeBookRecordFile)) {
-            log.addline(Feedback.println(Feedback.WEB, 
-                    String.format("[WARNING] The Codebook of this SDD is either invalid or empty. ", file_name)));
+            AnnotationLog.printWarning(String.format("The Codebook of this SDD is either invalid or empty. ", fileName), fileName);
         }
         if (!sdd.readTimeline(timelineRecordFile)) {
             AnnotationLog.println("The TimeLine of this SDD is empty.", file.getFileName());
@@ -610,8 +590,7 @@ public class AnnotationWorker {
 
         GeneratorChain chain = new GeneratorChain();
 
-        String file_name = dataFile.getFileName();
-        AnnotationLog log = AnnotationLog.create(file_name);
+        String fileName = dataFile.getFileName();
 
         ObjectAccessSpec oas = null;
         String oas_uri = null;
@@ -622,45 +601,43 @@ public class AnnotationWorker {
             oas = ObjectAccessSpec.findByUri(URIUtils.replacePrefixEx(dataFile.getDataAcquisitionUri()));
             if (oas != null) {
                 if (!oas.isComplete()) {
-                    log.addline(Feedback.println(Feedback.WEB, 
-                            String.format("[WARNING] Specification of associated Object Access Specification is incomplete: %s", file_name)));
+                    AnnotationLog.printWarning(String.format("Specification of associated Object Access Specification is incomplete: %s", fileName), fileName);
                     chain.setInvalid();
                 } else {
-                    log.addline(Feedback.println(Feedback.WEB, String.format("[OK] Specification of associated Object Access Specification is complete: %s", file_name)));
+                    AnnotationLog.println(String.format("Specification of associated Object Access Specification is complete: %s", fileName), fileName);
                 }
                 oas_uri = oas.getUri();
                 deployment_uri = oas.getDeploymentUri();
                 schema_uri = oas.getSchemaUri();
             } else {
-                log.addline(Feedback.println(Feedback.WEB, 
-                        String.format("[WARNING] Cannot find associated Object Access Specification: %s", file_name)));
+                AnnotationLog.printWarning(String.format("Cannot find associated Object Access Specification: %s", fileName), fileName);
                 chain.setInvalid();
             }
         }
 
         if (oas_uri == null) {
-            log.addline(Feedback.println(Feedback.WEB, String.format("[ERROR] Cannot find target data acquisition: %s", file_name)));
+            AnnotationLog.printException(String.format("Cannot find target data acquisition: %s", fileName), fileName);
             chain.setInvalid();
         } else {
-            log.addline(Feedback.println(Feedback.WEB, String.format("[OK] Found target data acquisition: %s", file_name)));
+            AnnotationLog.println(String.format("Found target data acquisition: %s", fileName), fileName);
         }
         if (schema_uri == null) {
-            log.addline(Feedback.println(Feedback.WEB, String.format("[ERROR] Cannot load schema specified for data acquisition: %s", file_name)));
+            AnnotationLog.printException(String.format("Cannot load schema specified for data acquisition: %s", fileName), fileName);
             chain.setInvalid();
         } else {
-            log.addline(Feedback.println(Feedback.WEB, String.format("[OK] Schema %s specified for data acquisition: %s", schema_uri, file_name)));
+            AnnotationLog.println(String.format("Schema %s specified for data acquisition: %s", schema_uri, fileName), fileName);
         }
         if (deployment_uri == null) {
-            log.addline(Feedback.println(Feedback.WEB, String.format("[ERROR] Cannot load deployment specified for data acquisition: %s", file_name)));
+            AnnotationLog.printException(String.format("Cannot load deployment specified for data acquisition: %s", fileName), fileName);
             chain.setInvalid();
         } else {
             try {
                 deployment_uri = URLDecoder.decode(deployment_uri, "UTF-8");
             } catch (UnsupportedEncodingException e) {
-                log.addline(Feedback.println(Feedback.WEB, String.format("URL decoding error for deployment uri %s", deployment_uri)));
+                AnnotationLog.printException(String.format("URL decoding error for deployment uri %s", deployment_uri), fileName);
                 chain.setInvalid();
             }
-            log.addline(Feedback.println(Feedback.WEB, String.format("[OK] Deployment %s specified for data acquisition %s", deployment_uri, file_name)));
+            AnnotationLog.println(String.format("Deployment %s specified for data acquisition %s", deployment_uri, fileName), fileName);
         }
 
         if (oas != null) {
