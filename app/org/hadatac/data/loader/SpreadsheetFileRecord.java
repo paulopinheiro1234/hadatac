@@ -15,9 +15,9 @@ public class SpreadsheetFileRecord implements Record {
     public String getValueByColumnName(String colomnName) {
         String value = "";
         try {
-            value = row.getCell(getColomnIndexByName(colomnName)).toString();
+            value = row.getCell(getColomnIndexByName(colomnName)).toString().trim();
         } catch (Exception e) {
-            System.out.println("row " + row.getRowNum() + ", column name " + colomnName + " not found!");
+            // System.out.println("row " + row.getRowNum() + ", column name " + colomnName + " not found!");
         }
 
         return value;
@@ -27,9 +27,9 @@ public class SpreadsheetFileRecord implements Record {
     public String getValueByColumnIndex(int index) {
         String value = "";
         try {
-            value = row.getCell(index).toString();
+            value = row.getCell(index).toString().trim();
         } catch (Exception e) {
-            System.out.println("row " + row.getRowNum() + ", column index " + index + " not valid!");
+            // System.out.println("row " + row.getRowNum() + ", column index " + index + " not valid!");
         }
 
         return value;

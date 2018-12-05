@@ -46,8 +46,7 @@ public class LoadOnt extends Controller {
             System.out.println("creating directory: " + NameSpaces.CACHE_PATH);
             try{
                 folder.mkdir();
-            } 
-            catch(SecurityException se){
+            } catch(SecurityException se){
                 System.out.println("Failed to create directory.");
             }
             System.out.println("DIR created");

@@ -379,7 +379,7 @@ public class SDD {
                     if (attributeOfCell.length()>0) {
                         sa2so.put(record.getValueByColumnIndex(0), attributeOfCell);
                     } else {
-                        AnnotationLog.printException("Attribute " + record.getValueByColumnIndex(0) + "is not attributeOf any object. Please fix the content.", sddfile.getFileName());
+                        AnnotationLog.printException("Attribute " + record.getValueByColumnIndex(0) + " is not attributeOf any object. Please fix the content.", sddfile.getFileName());
                     }
                 }
 
@@ -462,7 +462,7 @@ public class SDD {
         }
         
         if (checkStudyIndicatorPathResults.size() > 0) {
-            AnnotationLog.printWarning("The Attributes: " + String.join(", ", checkStudyIndicatorPathResults) + " NOT hasco:StudyIndicator or hasco:SampleIndicator .", sddfile.getFileName());
+            AnnotationLog.printWarning("The Attributes: [" + String.join(", ", checkStudyIndicatorPathResults) + "] are NOT either hasco:StudyIndicator or hasco:SampleIndicator .", sddfile.getFileName());
         }
         
         if (checkCellValResults.size() > 0) {

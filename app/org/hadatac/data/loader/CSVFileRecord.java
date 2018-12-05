@@ -14,9 +14,9 @@ public class CSVFileRecord implements Record {
     public String getValueByColumnName(String colomnName) {
         String value = "";
         try {
-            value = rec.get(colomnName);
+            value = rec.get(colomnName).trim();
         } catch (Exception e) {
-            System.out.println("row " + rec.getRecordNumber() + ", column name " + colomnName + " not found!");
+            // System.out.println("row " + rec.getRecordNumber() + ", column name " + colomnName + " not found!");
         }
 
         return value;
@@ -26,9 +26,9 @@ public class CSVFileRecord implements Record {
     public String getValueByColumnIndex(int index) {
         String value = "";
         try {
-            value = rec.get(index);
+            value = rec.get(index).trim();
         } catch (Exception e) {
-            System.out.println("row " + rec.getRecordNumber() + ", column index " + index + " not valid!");
+            // System.out.println("row " + rec.getRecordNumber() + ", column index " + index + " not valid!");
         }
 
         return value;

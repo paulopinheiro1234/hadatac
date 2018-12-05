@@ -213,12 +213,12 @@ public class Deployment extends HADatAcThing {
     public static Deployment create(String uri) {
         Deployment deployment = new Deployment();
         deployment.setUri(uri);
+        
         return deployment;
     }
 
     public static Deployment createLegacy(String uri) {
         Deployment deployment = new Deployment();
-
         deployment.setUri(uri);
         deployment.setLegacy(true);
 
@@ -297,7 +297,7 @@ public class Deployment extends HADatAcThing {
         } else {
             queryString += "DESCRIBE " + deployment_uri;
         }
-        System.out.println("FIND DEPLOYMENT (queryString): " + queryString);
+        // System.out.println("FIND DEPLOYMENT (queryString): " + queryString);
         
         Query query = QueryFactory.create(queryString);
         QueryExecution qexec = QueryExecutionFactory.sparqlService(

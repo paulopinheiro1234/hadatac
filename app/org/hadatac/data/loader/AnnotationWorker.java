@@ -231,7 +231,6 @@ public class AnnotationWorker {
         if (das == null) {
             AnnotationLog.printException("The SDD of study " + record.getValueByColumnName("Study ID") + " can not be found. Check if it is already ingested.", fileName);
         } else {
-            // List<DataAcquisitionSchemaObject> loo = das.getObjects();
             Map<String, String> dasoPL = new HashMap<String, String>();
             List<DataAcquisitionSchemaObject> loo = new ArrayList<DataAcquisitionSchemaObject>();
             List<String> loo2 = new ArrayList<String>();
@@ -246,13 +245,17 @@ public class AnnotationWorker {
             }
             AnnotationLog.println("PATH COMPUTATION: The number of DASOs to be computed: " + loo2.toString(), fileName);
 
-            for (DataAcquisitionSchemaObject i : loo) {
-                if (i.getEntityLabel() == null || i.getEntityLabel().length() == 0) {
-                    AnnotationLog.printException("The Entity Label of DASO : " + i.getLabel() + " can not be found. Check SDD.", fileName);
-                } else if (!refList.containsKey(i.getLabel())) {
+            for (DataAcquisitionSchemaObject daso : loo) {
+                if (null == daso) {
+                    continue;
+                }
+                
+                if (daso.getEntityLabel() == null || daso.getEntityLabel().length() == 0) {
+                    AnnotationLog.printException("The Entity Label of DASO : " + daso.getLabel() + " can not be found. Check SDD.", fileName);
+                } else if (!refList.containsKey(daso.getLabel())) {
 
                     List<String> answer = new ArrayList<String>();
-                    answer.add(i.getEntityLabel());
+                    answer.add(daso.getEntityLabel());
                     Boolean found = false;
 
                     for (String j : refList.keySet()) {
@@ -261,7 +264,7 @@ public class AnnotationWorker {
                             String target = kbPrefix + "DASO-" + studyName + "-" + j.trim().replace(" ","").replace("_","-").replace("??", "");
                             String queryString = NameSpaces.getInstance().printSparqlNameSpaceList() + 
                                     "SELECT ?x ?o WHERE { \n" + 
-                                    "<" + i.getUri() + "> ?p ?x . \n" + 
+                                    "<" + daso.getUri() + "> ?p ?x . \n" + 
                                     "   ?x ?p1 ?o .  \n" + 
                                     "   OPTIONAL {?o ?p2 " + target + " } " +
                                     "}";
@@ -282,8 +285,8 @@ public class AnnotationWorker {
                                                 if (soln.getResource("x") != null) {
                                                     if (tarList.contains(soln.getResource("x").toString())) {                           
                                                         answer.add(das.getObject(soln.getResource("x").toString()).getEntityLabel());
-                                                        AnnotationLog.println("PATH: DASO: " + i.getLabel() + ": \"" + answer.get(1) + " " + answer.get(0) + "\"", fileName);
-                                                        dasoPL.put(i.getUri(), answer.get(1) + " " + answer.get(0));
+                                                        AnnotationLog.println("PATH: DASO: " + daso.getLabel() + ": \"" + answer.get(1) + " " + answer.get(0) + "\"", fileName);
+                                                        dasoPL.put(daso.getUri(), answer.get(1) + " " + answer.get(0));
                                                         found = true;
                                                         break;
                                                     } else {
@@ -291,7 +294,7 @@ public class AnnotationWorker {
                                                             if (soln.getResource("o") != null) {
                                                                 if (tarList.contains(soln.getResource("o").toString())) {
                                                                     answer.add(das.getObject(soln.getResource("o").toString()).getEntityLabel());
-                                                                    dasoPL.put(i.getUri(), answer.get(1) + " " + answer.get(0));
+                                                                    dasoPL.put(daso.getUri(), answer.get(1) + " " + answer.get(0));
                                                                     found = true;
                                                                     break;
                                                                 }
@@ -300,8 +303,8 @@ public class AnnotationWorker {
                                                             if (soln.getLiteral("o") != null) {
                                                                 if (refList.containsKey(soln.getLiteral("o").toString())) {
                                                                     answer.add(refList.get(soln.getLiteral("o").toString()));
-                                                                    AnnotationLog.printException("PATH: DASO: " + i.getLabel() + ": \"" + answer.get(1) + " " + answer.get(0) + "\"", fileName);
-                                                                    dasoPL.put(i.getUri(), answer.get(1) + " " + answer.get(0));
+                                                                    AnnotationLog.println("PATH: DASO: " + daso.getLabel() + ": \"" + answer.get(1) + " " + answer.get(0) + "\"", fileName);
+                                                                    dasoPL.put(daso.getUri(), answer.get(1) + " " + answer.get(0));
                                                                     found = true;
                                                                     break;
                                                                 }
@@ -313,8 +316,8 @@ public class AnnotationWorker {
                                                 if (soln.getLiteral("x") != null) {
                                                     if (refList.containsKey(soln.getLiteral("x").toString())) {
                                                         answer.add(refList.get(soln.getLiteral("x").toString()));
-                                                        AnnotationLog.println("PATH: DASO: " + i.getLabel() + ": \"" + answer.get(1) + " " + answer.get(0) + "\"", fileName);
-                                                        dasoPL.put(i.getUri(), answer.get(1) + " " + answer.get(0));
+                                                        AnnotationLog.println("PATH: DASO: " + daso.getLabel() + ": \"" + answer.get(1) + " " + answer.get(0) + "\"", fileName);
+                                                        dasoPL.put(daso.getUri(), answer.get(1) + " " + answer.get(0));
                                                         found = true;
                                                         break;
                                                     }
@@ -326,17 +329,17 @@ public class AnnotationWorker {
                                         }
                                     }
                                 } catch (Exception e) {
-                                    System.out.println("[ERROR] : " + e.getMessage());
+                                    AnnotationLog.printException(e.getMessage(), fileName);
                                 }
                             }
                         }
 
                     }
                     if (found == false) {
-                        AnnotationLog.println("PATH: DASO: " + i.getLabel() + " Path connections can not be found ! check the SDD definition. ", fileName);
+                        AnnotationLog.println("PATH: DASO: " + daso.getLabel() + " Path connections can not be found ! check the SDD definition. ", fileName);
                     }
                 } else {
-                    AnnotationLog.println("PATH: Skipped :" + i.getLabel(), fileName);
+                    AnnotationLog.println("PATH: Skipped :" + daso.getLabel(), fileName);
                 }
             }
             //insert the triples

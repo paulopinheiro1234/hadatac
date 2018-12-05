@@ -5,9 +5,6 @@ import java.util.Map;
 
 import org.apache.jena.query.QuerySolution;
 import org.apache.jena.query.ResultSetRewindable;
-import org.apache.jena.rdf.model.Model;
-import org.apache.jena.rdf.model.Statement;
-import org.apache.jena.rdf.model.StmtIterator;
 import org.apache.jena.riot.RiotNotFoundException;
 import org.apache.jena.shared.NotFoundException;
 import org.apache.jena.update.UpdateExecutionFactory;
@@ -20,7 +17,6 @@ import org.eclipse.rdf4j.repository.Repository;
 import org.eclipse.rdf4j.repository.RepositoryConnection;
 import org.eclipse.rdf4j.repository.sparql.SPARQLRepository;
 import org.hadatac.console.http.SPARQLUtils;
-import org.hadatac.entity.pojo.Study;
 import org.hadatac.utils.CollectionUtil;
 import org.hadatac.utils.Feedback;
 import org.hadatac.utils.NameSpace;
@@ -116,17 +112,19 @@ public class MetadataContext implements RDFContext {
     /* 
      *   contentType correspond to the mime type required for curl to process the data provided. For example, application/rdf+xml is
      *   used to process rdf/xml content.
-     *   
      */
     public Long loadLocalFile(int mode, String filePath, String contentType, String graphUri) {
         Long total = totalTriples();
-        try {            
-            Repository repo = new SPARQLRepository(
-                    kbURL + CollectionUtil.getCollectionName(CollectionUtil.Collection.METADATA_GRAPH.get()));
-            repo.initialize();
-            RepositoryConnection con = repo.getConnection();
-            ValueFactory factory = repo.getValueFactory();
-            con.add(new File(filePath), "", NameSpace.getRioFormat(contentType), (Resource)factory.createIRI(graphUri));
+        try {
+            File file = new File(filePath);
+            if (file.exists()) {
+                Repository repo = new SPARQLRepository(
+                        kbURL + CollectionUtil.getCollectionName(CollectionUtil.Collection.METADATA_GRAPH.get()));
+                repo.initialize();
+                RepositoryConnection con = repo.getConnection();
+                ValueFactory factory = repo.getValueFactory();
+                con.add(file, "", NameSpace.getRioFormat(contentType), (Resource)factory.createIRI(graphUri));
+            }
         } catch (NotFoundException e) {
             System.out.println("NotFoundException: file " + filePath);
             System.out.println("NotFoundException: " + e.getMessage());
@@ -148,38 +146,45 @@ public class MetadataContext implements RDFContext {
      *        "cache" cache ontologies from the web
      */
     public String loadOntologies(int mode, String oper) {
+        System.out.println("loadOntologies oper: " + oper);
+
         String message = "";
-        Long total = new Long(0);
-        if (!oper.equals("cache")) {
-            total = totalTriples();
+        if ("cache".equals(oper)) {
+            message += NameSpaces.getInstance().copyNameSpacesLocally(mode);
+        } else {
+            Long total = totalTriples();
             message += Feedback.println(mode, "   Triples before [loadOntologies]: " + total);
             message += Feedback.println(mode," ");
-        }
-        if (!oper.equals("confirmedCache")) {
-            message += NameSpaces.getInstance().copyNameSpacesLocally(mode);
-        }
-        if (!oper.equals("cache")) {
+
             for (Map.Entry<String, NameSpace> entry : NameSpaces.table.entrySet()) {
                 String abbrev = entry.getKey().toString();
-                String nsURL = entry.getValue().getURL();
-                if ((abbrev != null) && (nsURL != null) && (entry.getValue().getType() != null) && !nsURL.equals("")) {
-                    String filePath = NameSpaces.CACHE_PATH + "copy" + "-" + abbrev.replace(":","");
-                    message += Feedback.print(mode, "   Uploading " + filePath);
-                    for (int i = filePath.length(); i < 50; i++) {
-                        message += Feedback.print(mode, ".");
+                NameSpace ns = entry.getValue();
+                String nsURL = ns.getURL();
+                if (abbrev != null && nsURL != null && !nsURL.equals("") && ns.getType() != null) {
+                    String path = "";
+                    if ("confirmed".equals(oper)) {
+                        ns.loadTriples(nsURL, true);
+                        path = nsURL;
+                    } else if ("confirmedCache".equals(oper)) {
+                        String filePath = NameSpaces.CACHE_PATH + "copy" + "-" + abbrev.replace(":", "");
+                        message += Feedback.print(mode, "   Uploading " + filePath);
+                        for (int i = filePath.length(); i < 50; i++) {
+                            message += Feedback.print(mode, ".");
+                        }
+                        loadLocalFile(mode, filePath, ns.getType(), ns.getName());
+                        path = filePath;
                     }
-                    loadLocalFile(mode, filePath, entry.getValue().getType(), entry.getValue().getName());
-                    Long newTotal = totalTriples();
-                    message += Feedback.println(mode, "   Added " + (newTotal - total) + " triples.");
 
+                    Long newTotal = totalTriples();
+                    message += Feedback.println(mode, "   Added " + (newTotal - total) + " triples from " + path + " .");
                     total = newTotal;
-                }	          
+                }             
             }
             message += Feedback.println(mode," ");
             message += Feedback.println(mode, "   Triples after [loadOntologies]: " + totalTriples());
         }
         NameSpaces.reload();
-        
+
         return message;
     }
 }	

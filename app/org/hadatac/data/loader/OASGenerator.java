@@ -22,6 +22,7 @@ import org.hadatac.utils.Templates;
 
 import java.lang.Exception;
 
+
 public class OASGenerator extends BaseGenerator {
 
     final String kbPrefix = ConfigProp.getKbPrefix();
