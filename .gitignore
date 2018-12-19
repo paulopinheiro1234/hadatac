@@ -26,3 +26,6 @@ RUNNING_PID
 sddtmp/
 dpltmp/
 *.swp
+*.iml
+*.xlsx
+*.csv
