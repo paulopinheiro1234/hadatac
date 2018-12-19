@@ -338,7 +338,6 @@ public class MeasurementGenerator extends BaseGenerator {
                 } else {
                     // TO DO: implement rest of cell scope
                 }
-
             } else {
                 // Objects defined by Row Scope
                 String id = "";
@@ -348,7 +347,7 @@ public class MeasurementGenerator extends BaseGenerator {
                     id = record.getValueByColumnIndex(posId);
                 }
                 
-                if (!id.equals("")) {
+                if (!"".equals(id)) {
                     if (dasa.getEntity().equals(URIUtils.replacePrefixEx("sio:Human"))) {
                         measurement.setObjectCollectionType(URIUtils.replacePrefixEx("hasco:SubjectGroup"));
                         if (mapIDStudyObjects.containsKey(id)) {
@@ -493,6 +492,7 @@ public class MeasurementGenerator extends BaseGenerator {
              *   SET UNIT                  *
              *                             *
              *=============================*/
+            
             if (!schema.getUnitLabel().equals("") && posUnit >= 0) {
                 // unit exists in the columns
                 String unitValue = record.getValueByColumnIndex(posUnit);

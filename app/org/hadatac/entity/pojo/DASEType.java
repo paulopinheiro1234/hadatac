@@ -70,7 +70,7 @@ public class DASEType extends HADatAcThing implements Comparable<DASEType> {
                 + " ?daseTypeUri rdfs:label ?daseTypeLabel . \n"
                 + "}";
         
-        System.out.println("DASE query: " + query);
+        // System.out.println("DASE query: " + query);
         
         Map<HADatAcThing, List<HADatAcThing>> mapTypeToInstanceList = new HashMap<HADatAcThing, List<HADatAcThing>>();
         try {

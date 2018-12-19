@@ -157,7 +157,7 @@ public class ObjectCollectionType extends HADatAcClass implements Comparable<Obj
         
         String query = "";
         query += NameSpaces.getInstance().printSparqlNameSpaceList();
-        query += "SELECT ?objectCollectionType ?objectCollectionTypeLabel ?role WHERE { \n"
+        query += "SELECT DISTINCT ?objectCollectionType ?objectCollectionTypeLabel ?role WHERE { \n"
                 + valueConstraint + " \n"
                 + "?studyObject hasco:isMemberOf ?objectCollection . \n"
                 + "?objectCollection rdf:type ?objectCollectionType . \n"
@@ -165,7 +165,7 @@ public class ObjectCollectionType extends HADatAcClass implements Comparable<Obj
                 + "?objectCollection hasco:hasRoleLabel ?role . \n"
                 + "}";
 
-        System.out.println("ObjectCollectionType query: " + query);
+        System.out.println("ObjectCollectionType query: \n" + query);
 
         Map<HADatAcThing, List<HADatAcThing>> results = new HashMap<HADatAcThing, List<HADatAcThing>>();
         try {            

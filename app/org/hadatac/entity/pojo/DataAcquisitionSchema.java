@@ -439,6 +439,7 @@ public class DataAcquisitionSchema extends HADatAcThing {
                 schemas.add(schema);
             }
         }
+        
         return schemas;
     }
 
@@ -455,7 +456,7 @@ public class DataAcquisitionSchema extends HADatAcThing {
                 + " OPTIONAL { ?possibleValue hasco:hasCodeLabel ?codeLabel } . \n"
                 + " }";
 
-        // System.out.println("findPossibleValues query: " + queryString);
+        System.out.println("findPossibleValues query: " + queryString);
 
         ResultSetRewindable resultsrw = SPARQLUtils.select(
                 CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), queryString);
@@ -492,12 +493,11 @@ public class DataAcquisitionSchema extends HADatAcThing {
     }
 
     public static String findByLabel(String schemaUri, String label) {
-        System.out.println("findByPosIndex is called!");
-
         String queryString = NameSpaces.getInstance().printSparqlNameSpaceList()
                 + " SELECT ?daso_or_dasa WHERE { "
-                + " ?daso_or_dasa rdfs:label \"" + label + "\" . "
+                + " ?daso_or_dasa rdfs:label ?label . "
                 + " ?daso_or_dasa hasco:partOfSchema <" + schemaUri + "> . "
+                + " FILTER regex(str(?label), \"" + label + "\" ) "
                 + " }";
 
         ResultSetRewindable resultsrw = SPARQLUtils.select(
