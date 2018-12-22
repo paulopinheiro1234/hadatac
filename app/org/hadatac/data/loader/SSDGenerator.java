@@ -2,6 +2,7 @@ package org.hadatac.data.loader;
 
 import java.lang.String;
 import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -71,6 +72,9 @@ public class SSDGenerator extends BasicGenerator {
     }
 
     private List<String> getSpaceScopeUris(Record rec) {
+        if (mapCol.get("spaceScopeUris") == null || rec.getValueByColumnName(mapCol.get("spaceScopeUris")) == null) {
+	    return new ArrayList<String>();
+	}
         List<String> ans = Arrays.asList(rec.getValueByColumnName(mapCol.get("spaceScopeUris")).split(","))
                 .stream()
                 .map(s -> URIUtils.replacePrefixEx(s))
@@ -79,6 +83,9 @@ public class SSDGenerator extends BasicGenerator {
     }
 
     private List<String> getTimeScopeUris(Record rec) {
+        if (mapCol.get("timeScopeUris") == null || rec.getValueByColumnName(mapCol.get("timeScopeUris")) == null) {
+	    return new ArrayList<String>();
+	}
         List<String> ans = Arrays.asList(rec.getValueByColumnName(mapCol.get("timeScopeUris")).split(","))
                 .stream()
                 .map(s -> URIUtils.replacePrefixEx(s))

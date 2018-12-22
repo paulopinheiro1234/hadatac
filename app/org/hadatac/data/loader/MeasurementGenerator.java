@@ -364,6 +364,16 @@ public class MeasurementGenerator extends BasicGenerator {
                         }
                         measurement.setObjectCollectionType(URIUtils.replacePrefixEx("hasco:SampleCollection"));
                         measurement.setSID(id);
+                    } else {
+			//System.out.println("MeasurmentGenerator: id=[" + id + "]");
+                        if (mapIDStudyObjects.containsKey(id)) {
+			    //System.out.println("MeasurmentGenerator: id found");
+                            measurement.setStudyObjectUri(mapIDStudyObjects.get(id).get(0));
+                            measurement.setObjectUri(mapIDStudyObjects.get(id).get(0));
+                            measurement.setPID(mapIDStudyObjects.get(id).get(0));
+                        }
+                        measurement.setObjectCollectionType(URIUtils.replacePrefixEx("hasco:SubjectGroup"));
+                        measurement.setPID(id);
                     }
                 }
             }

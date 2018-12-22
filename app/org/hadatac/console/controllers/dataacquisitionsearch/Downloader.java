@@ -190,6 +190,7 @@ public class Downloader extends Controller {
 
     public static int generateCSVFileByAlignment(List<Measurement> measurements, 
             String facets, String ownerEmail) {
+        System.out.println("Invoked CSV generation with object alignment ...");
         Date date = new Date();
         String fileName = "alignment_" + new SimpleDateFormat("yyyy_MM_dd_HH_mm_ss").format(date) + ".csv";
         File file = new File(ConfigProp.getPathDownload() + "/" + fileName);

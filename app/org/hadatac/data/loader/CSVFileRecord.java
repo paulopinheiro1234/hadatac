@@ -11,12 +11,15 @@ public class CSVFileRecord implements Record {
     }
 
     @Override
-    public String getValueByColumnName(String colomnName) {
+    public String getValueByColumnName(String columnName) {
         String value = "";
         try {
-            value = rec.get(colomnName);
+            value = rec.get(columnName);
+	    //if (columnName.equals("originalID")) {
+	    //System.out.println("CSVFileRecord: getValuedByColumnName = [" + value + "]");
+	    //}
         } catch (Exception e) {
-            System.out.println("row " + rec.getRecordNumber() + ", column name " + colomnName + " not found!");
+            System.out.println("row " + rec.getRecordNumber() + ", column name " + columnName + " not found!");
         }
 
         return value;

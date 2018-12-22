@@ -28,12 +28,15 @@ public class URIUtils {
 	}
 	
 	public static boolean isValidURI(String str) {
-		if (str.length() != replaceNameSpaceEx(str).length() 
-				|| str.length() != replacePrefixEx(str).length()) {
-			return true;
-		}
-		
+	    if (str == null) {
 		return false;
+	    }
+	    if (str.length() != replaceNameSpaceEx(str).length() || 
+		str.length() != replacePrefixEx(str).length()) {
+		return true;
+	    }
+		
+	    return false;
 	}
 	
 	/*

@@ -97,6 +97,9 @@ public class SDD {
     }
 
     public boolean checkCellValue(String str) {
+	if (str == null) { 
+	    return false;
+	}
         if(str.contains(",")){
             return false;
         }
@@ -107,6 +110,9 @@ public class SDD {
     }
 
     public boolean checkCellUriRegistered(String str) {
+	if (str == null) { 
+	    return false;
+	}
         String prefixString = NameSpaces.getInstance().printSparqlNameSpaceList();
         //        System.out.println(prefixString);
         if (str.contains(":")){
@@ -122,7 +128,9 @@ public class SDD {
     }
 
     public boolean checkCellUriResolvable(String str) {
-
+	if (str == null) { 
+	    return false;
+	}
         if (str.contains(":")){
             if (URIUtils.isValidURI(str)){
                 try {
@@ -220,7 +228,7 @@ public class SDD {
         
         for (Record record : file.getRecords()) {
         	if (checkCellValue(record.getValueByColumnIndex(0))){		
-                if (record.getValueByColumnName("Attribute").length()>0) {
+                if (record.getValueByColumnName("Attribute") != null && record.getValueByColumnName("Attribute").length()>0) {
                 	if (!l_dasa.contains(record.getValueByColumnIndex(0))) {
                 		l_dasa.add(record.getValueByColumnIndex(0));
                 	}
@@ -320,7 +328,9 @@ public class SDD {
         Map<String, String> so2role = new HashMap<String, String>();
         Map<String, String> so2df = new HashMap<String, String>();
 
+	long rowNumber = 0;
         for (Record record : file.getRecords()) {
+	    rowNumber++;
             if (checkCellValue(record.getValueByColumnIndex(0))){
                 String attributeCell = record.getValueByColumnName("Attribute");
                 String entityCell = record.getValueByColumnName("Entity");
@@ -380,13 +390,13 @@ public class SDD {
                         checkStudyIndicatePath.add(attributeCell);
                     }
                 } else {
-                    if (entityCell.length() == 0){
+                    if (entityCell == null || entityCell.length() == 0){
                         isStudyIndicator = false;
                         checkStudyIndicatePath.add(attributeCell);
                     }
                 }
 
-                if (attributeCell.length()>0) {
+                if (attributeCell != null && attributeCell.length()>0) {
                     dasaList.add(record.getValueByColumnIndex(0));
                     if (attributeOfCell.length()>0) {
                         sa2so.put(record.getValueByColumnIndex(0), attributeOfCell);
@@ -395,7 +405,7 @@ public class SDD {
                     }
                 }
 
-                if (entityCell.length()>0) {
+                if (entityCell != null && entityCell.length()>0) {
                 	if (URIUtils.isValidURI(entityCell)) {
 	                    dasoList.add(record.getValueByColumnIndex(0));
 	                    if (inRelationToCell.length()>0) {
@@ -441,21 +451,27 @@ public class SDD {
     	                    }
                     	}
                 	} else {
-                        AnnotationLog.printException("The Entity Cell \"" + entityCell + "\" in the \"Entity\" column is either not valid uri or it can not be resolved by replaceNameSpaceEx().", sddfile.getFile().getName());
-                        return false;
+			    AnnotationLog.printException("The Entity Cell \"" + entityCell + "\" in the [Entity] column is either not " + 
+							 "valid uri or it can not be resolved by replaceNameSpaceEx().", sddfile.getFile().getName());
+			    return false;
                 	}
                 }
                 
                 if (checkCellValue(record.getValueByColumnName("attributeOf"))){
                     mapAttrObj.put(record.getValueByColumnIndex(0), record.getValueByColumnName("attributeOf"));
                 } else {
-                    checkCellVal.add(record.getValueByColumnName("attributeOf"));
-                	AnnotationLog.printException("\"" + record.getValueByColumnName("attributeOf") + "\" in the attribute of column contains illegal content.", sddfile.getFile().getName());
-                    return false;
+		    if (record.getValueByColumnName("attributeOf") != null && !record.getValueByColumnName("attributeOf").equals("null")) {
+			checkCellVal.add(record.getValueByColumnName("attributeOf"));
+                	AnnotationLog.printException("\"" + record.getValueByColumnName("attributeOf") + 
+						     "\" at column [attributeOf] , row [" + rowNumber + 
+						     "] contains illegal content.", sddfile.getFile().getName());
+			return false;
+		    }
                 }
                 
             } else {
-                AnnotationLog.printException("The Dictionary Mapping conatins illegal content in \"" + record.getValueByColumnName("Column") + "\" in the \"Column\" column. Check if it contains characters such as \",\" and blank space.", sddfile.getFile().getName());
+                AnnotationLog.printException("The Dictionary Mapping contains illegal content in \"" + record.getValueByColumnName("Column") + 
+					     "\" in the [Column] column. Check if it contains characters such as \",\" and blank space.", sddfile.getFile().getName());
                 return false;
             }
 
@@ -548,7 +564,7 @@ public class SDD {
         }
 
         for (Record record : file.getRecords()) {
-            if (!record.getValueByColumnName("Name").isEmpty()) {
+            if (record.getValueByColumnName("Name") != null && !record.getValueByColumnName("Name").isEmpty()) {
                 String primaryKey = record.getValueByColumnName("Name");
 
                 Map<String, String> timelineRow = new HashMap<String, String>();

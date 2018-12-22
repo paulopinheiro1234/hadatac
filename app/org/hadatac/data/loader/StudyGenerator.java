@@ -94,13 +94,16 @@ public class StudyGenerator extends BasicGenerator {
 			row.put("rdfs:label", getTitle(rec));
 			row.put("skos:definition", getAims(rec));
 			row.put("rdfs:comment", getSignificance(rec));
-			if(rec.getValueByColumnName(mapCol.get("PI")).length() > 0) {
+			if(mapCol.get("PI") != null && rec.getValueByColumnName(mapCol.get("PI")) != null && 
+                           rec.getValueByColumnName(mapCol.get("PI")).length() > 0) {
 				row.put("hasco:hasAgent", getAgentUri(rec));
 			}
-			if(rec.getValueByColumnName(mapCol.get("institution")).length() > 0) {
+			if(mapCol.get("institution") != null && rec.getValueByColumnName(mapCol.get("institution")) != null && 
+                           rec.getValueByColumnName(mapCol.get("institution")).length() > 0) {
 				row.put("hasco:hasInstitution", getInstitutionUri(rec));
 			}
-			if(rec.getValueByColumnName(mapCol.get("externalSource")).length() > 0) {
+			if(mapCol.get("externalSource") != null && rec.getValueByColumnName(mapCol.get("externalSource")) != null && 
+                           rec.getValueByColumnName(mapCol.get("externalSource")).length() > 0) {
 				row.put("hasco:hasExternalSource", getExtSource(rec));
 			}
 			setStudyUri(URIUtils.replacePrefixEx(getUri(rec)));

@@ -187,6 +187,9 @@ public class HADatAcClass {
 			}
 
 			TreeNode result = buildTree(branchCollection);
+			if (result.getChildren() == null) {
+			    return null;
+			}
 			return result.getChildren().get(0);
 
 		} catch (Exception e) {

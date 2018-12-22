@@ -40,8 +40,12 @@ public class OASGenerator extends BasicGenerator {
     public void initMapping() {}
 
     private String getStudy(Record rec) {
-        return rec.getValueByColumnName(Templates.DASTUDYID).equalsIgnoreCase("NULL")? 
-                "" : rec.getValueByColumnName(Templates.DASTUDYID);
+	System.out.println("OASGenerator: inside getStudy: STUDYID = " + Templates.STUDYID + " actual value: " +  rec.getValueByColumnName(Templates.STUDYID));
+        return rec.getValueByColumnName(Templates.STUDYID).equalsIgnoreCase("NULL")? 
+                "" : rec.getValueByColumnName(Templates.STUDYID);
+	//System.out.println("OASGenerator: inside getStudy: DASTUDYID = " + Templates.DASTUDYID + " actual value: " +  rec.getValueByColumnName(Templates.DASTUDYID));
+        //return rec.getValueByColumnName(Templates.DASTUDYID).equalsIgnoreCase("NULL")? 
+        //        "" : rec.getValueByColumnName(Templates.DASTUDYID);
     }
 
     private String getDataAcquisitionName(Record rec) {

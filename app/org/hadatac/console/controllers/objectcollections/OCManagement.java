@@ -25,9 +25,13 @@ public class OCManagement extends Controller {
 		} catch (UnsupportedEncodingException e) {
 			e.printStackTrace();
 		}
+		System.out.println("SOC management for " + std_uri);
 		Study std = Study.find(std_uri);
 
 		List<ObjectCollection> ocList = ObjectCollection.findByStudyUri(std_uri);
+		for (ObjectCollection oc : ocList) {
+		    System.out.println("SOC in " + std_uri + " : " + oc.getUri());
+		}
 
 		return ok(objectCollectionManagement.render(filename, da_uri, std, ocList));
 	}

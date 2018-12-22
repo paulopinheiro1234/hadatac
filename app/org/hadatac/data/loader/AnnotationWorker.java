@@ -511,9 +511,13 @@ public class AnnotationWorker {
             codeMappingFile = sdd.downloadFile(mapCatalog.get("Code_Mappings"), 
                     "sddtmp/" + file.getFile().getName().replace(".xlsx", "") + "-code-mappings.csv");
 
-            codeBookRecordFile = new SpreadsheetRecordFile(file.getFile(), mapCatalog.get("Codebook").replace("#", ""));
+	    if (mapCatalog.get("Codebook") != null) { 
+		codeBookRecordFile = new SpreadsheetRecordFile(file.getFile(), mapCatalog.get("Codebook").replace("#", ""));
+            }
             dictionaryRecordFile = new SpreadsheetRecordFile(file.getFile(), mapCatalog.get("Data_Dictionary").replace("#", ""));
-            timelineRecordFile = new SpreadsheetRecordFile(file.getFile(), mapCatalog.get("Timeline").replace("#", ""));
+	    if (mapCatalog.get("Timeline") != null) {
+		timelineRecordFile = new SpreadsheetRecordFile(file.getFile(), mapCatalog.get("Timeline").replace("#", ""));
+	    }
         }
 
         codeMappingRecordFile = new CSVRecordFile(codeMappingFile);
@@ -529,16 +533,16 @@ public class AnnotationWorker {
             AnnotationLog.printException("Read Data Dictionary failed, please refer to the error msg above.", file.getFile().getName());
             return null;
         }
-        if(!sdd.readCodebook(codeBookRecordFile)){
+        if(codeBookRecordFile == null || !sdd.readCodebook(codeBookRecordFile)){
             log.addline(Feedback.println(Feedback.WEB, 
                     String.format("[WARNING] The Codebook of this SDD is either invalid or empty. ", file_name)));
         }
-        if(!sdd.readTimeline(timelineRecordFile)){
+        if(timelineRecordFile == null || !sdd.readTimeline(timelineRecordFile)){
             AnnotationLog.println("The TimeLine of this SDD is empty.", file.getFile().getName());
         }
 
         GeneratorChain chain = new GeneratorChain();
-        if (codeBookRecordFile.isValid()) {
+        if (codeBookRecordFile != null && codeBookRecordFile.isValid()) {
             chain.addGenerator(new PVGenerator(codeBookRecordFile, sddName, sdd.getMapAttrObj(), sdd.getCodeMapping()));
         }
 

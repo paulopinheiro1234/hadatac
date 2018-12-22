@@ -193,6 +193,9 @@ public abstract class BasicGenerator {
                             model.add(sub, pred, obj, (Resource)namedGraph);
                         }
                     } else {
+			if (cellValue == null) {
+			    cellValue = "NULL";
+			}
                         Literal obj = factory.createLiteral(
                                 cellValue.replace("\n", " ").replace("\r", " ").replace("\"", "''"));
                         
