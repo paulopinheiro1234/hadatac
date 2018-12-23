@@ -516,17 +516,19 @@ public class DataAcquisitionSchema extends HADatAcThing {
 
         Map<String, List<String>> mapIdUriMappings = new HashMap<String, List<String>>();
         String queryString = NameSpaces.getInstance().printSparqlNameSpaceList()
-                + " SELECT ?studyObject ?studyObjectType ?id ?obj ?subj_id WHERE { \n"
+                + " SELECT ?studyObject ?studyObjectType ?id ?obj ?subj_id ?socType WHERE { \n"
                 + " { \n"
                 + " 	?studyObject hasco:originalID ?id . \n"
                 + "     ?studyObject rdf:type ?studyObjectType . \n"
                 + "     ?studyObject hasco:isMemberOf ?soc . \n"
+	        + "     ?soc rdf:type ?socType . \n"
                 + "     ?soc a hasco:SubjectGroup . \n"
                 + "     ?soc hasco:isMemberOf* <" + studyUri + "> . \n"
                 + " } UNION { \n"
                 + " 	?studyObject hasco:originalID ?id . \n"
                 + "     ?studyObject rdf:type ?studyObjectType . \n"
                 + "     ?studyObject hasco:isMemberOf ?soc . \n"
+	        + "     ?soc rdf:type ?socType . \n"
                 + "     ?soc a hasco:SampleCollection . \n"
                 + " 	?soc hasco:isMemberOf* <" + studyUri + "> . \n"
                 + " 	?studyObject hasco:hasObjectScope ?obj . \n"
@@ -560,6 +562,11 @@ public class DataAcquisitionSchema extends HADatAcThing {
                 }
                 if (soln.get("studyObjectType") != null) {
                     details.add(soln.get("studyObjectType").toString());
+                } else {
+                    details.add("");
+                }
+                if (soln.get("socType") != null) {
+                    details.add(soln.get("socType").toString());
                 } else {
                     details.add("");
                 }

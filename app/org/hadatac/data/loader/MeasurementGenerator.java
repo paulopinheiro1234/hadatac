@@ -347,9 +347,17 @@ public class MeasurementGenerator extends BaseGenerator {
                     id = record.getValueByColumnIndex(posId);
                 }
                 
+		// Within mapIdStudyObjects
+		//    0 -> studyObject (originalID)
+		//    1 -> originalID of object in the object’s scope (if any)
+		//    2 -> URI of object in the object’s scope (if any)
+                //    3 -> studyObjectType
+                //    4 -> soc's type
+
                 if (!"".equals(id)) {
                     if (dasa.getEntity().equals(URIUtils.replacePrefixEx("sio:Human"))) {
-                        measurement.setObjectCollectionType(URIUtils.replacePrefixEx("hasco:SubjectGroup"));
+                        //measurement.setObjectCollectionType(URIUtils.replacePrefixEx("hasco:SubjectGroup"));
+                        measurement.setObjectCollectionType(mapIDStudyObjects.get(id).get(4));
                         if (mapIDStudyObjects.containsKey(id)) {
                             measurement.setStudyObjectUri(mapIDStudyObjects.get(id).get(0));
                             measurement.setStudyObjectTypeUri(mapIDStudyObjects.get(id).get(3));
@@ -358,35 +366,30 @@ public class MeasurementGenerator extends BaseGenerator {
                         measurement.setPID(id);
                     } else {
                         if (mapIDStudyObjects.containsKey(id)) {
+			    // test if object is in the scope of another object
                             if (!mapIDStudyObjects.get(id).get(2).isEmpty()) {
-                                // Sample
-                                measurement.setStudyObjectUri(mapIDStudyObjects.get(id).get(0));
-                                measurement.setStudyObjectTypeUri(mapIDStudyObjects.get(id).get(3));
-                                measurement.setObjectUri(mapIDStudyObjects.get(id).get(2));
-                                measurement.setPID(mapIDStudyObjects.get(id).get(2));
-                                measurement.setSID(mapIDStudyObjects.get(id).get(1));
-                                measurement.setObjectCollectionType(URIUtils.replacePrefixEx("hasco:SampleCollection"));
-                            } else {
-                                // Subject
-                                measurement.setStudyObjectUri(mapIDStudyObjects.get(id).get(0));
-                                measurement.setStudyObjectTypeUri(mapIDStudyObjects.get(id).get(3));
-                                measurement.setObjectUri(mapIDStudyObjects.get(id).get(0));
-                                measurement.setPID(mapIDStudyObjects.get(id).get(1));
-                                measurement.setObjectCollectionType(URIUtils.replacePrefixEx("hasco:SubjectGroup"));
+                                 measurement.setStudyObjectUri(mapIDStudyObjects.get(id).get(0));
+                                 measurement.setStudyObjectTypeUri(mapIDStudyObjects.get(id).get(3));
+                                 measurement.setObjectUri(mapIDStudyObjects.get(id).get(2));
+                                 measurement.setPID(mapIDStudyObjects.get(id).get(2));
+				 // test to see if object is member of a sample collection
+				 if (URIUtils.replacePrefixEx("hasco:SampleCollection").equals(mapIDStudyObjects.get(id).get(4))) {
+				     measurement.setSID(mapIDStudyObjects.get(id).get(1));
+				 }
+				 measurement.setObjectCollectionType(mapIDStudyObjects.get(id).get(4));
+				 //measurement.setObjectCollectionType(URIUtils.replacePrefixEx("hasco:SampleCollection"));
+                            } 
+			      // assumes that the object is a subject if object is not in the scope of another object
+			      else {
+                                 // Subject
+                                 measurement.setStudyObjectUri(mapIDStudyObjects.get(id).get(0));
+                                 measurement.setStudyObjectTypeUri(mapIDStudyObjects.get(id).get(3));
+                                 measurement.setObjectUri(mapIDStudyObjects.get(id).get(0));
+                                 measurement.setPID(mapIDStudyObjects.get(id).get(1));
+				 measurement.setObjectCollectionType(mapIDStudyObjects.get(id).get(4));
+                                 //measurement.setObjectCollectionType(URIUtils.replacePrefixEx("hasco:SubjectGroup"));
                             }
                         }
-                        measurement.setObjectCollectionType(URIUtils.replacePrefixEx("hasco:SampleCollection"));
-                        measurement.setSID(id);
-			//} else {
-			//System.out.println("MeasurmentGenerator: id=[" + id + "]");
-                        //if (mapIDStudyObjects.containsKey(id)) {
-			    //System.out.println("MeasurmentGenerator: id found");
-                            //measurement.setStudyObjectUri(mapIDStudyObjects.get(id).get(0));
-                            //measurement.setObjectUri(mapIDStudyObjects.get(id).get(0));
-                            //measurement.setPID(mapIDStudyObjects.get(id).get(0));
-                        //}
-                        //measurement.setObjectCollectionType(URIUtils.replacePrefixEx("hasco:SubjectGroup"));
-                        //measurement.setPID(id);
                     }
                 }
             }
