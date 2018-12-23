@@ -43,11 +43,11 @@ public class SDD {
     }
 
     public String getNameFromFileName() {
-        return (sddfile.getFile().getName().split("\\.")[0]).replace("_", "-").replace("SDD-", "");
+        return (sddfile.getFileName().split("\\.")[0]).replace("_", "-").replace("SDD-", "");
     }
 
     public String getFileName() {
-        return sddfile.getFile().getName();
+        return sddfile.getFileName();
     }
 
     public Map<String, String> getCatalog() {
@@ -111,7 +111,7 @@ public class SDD {
 
     public boolean checkCellUriRegistered(String str) {
 	if (str == null) { 
-	    return false;
+	    return true;
 	}
         String prefixString = NameSpaces.getInstance().printSparqlNameSpaceList();
         //        System.out.println(prefixString);
@@ -129,7 +129,7 @@ public class SDD {
 
     public boolean checkCellUriResolvable(String str) {
 	if (str == null) { 
-	    return false;
+	    return true;
 	}
         if (str.contains(":")){
             if (URIUtils.isValidURI(str)){
@@ -145,7 +145,7 @@ public class SDD {
         return true;
     }
 
-    public boolean checkStudyIndicatorPath(String str) {
+    public boolean checkIndicatorPath(String str) {
     	List<String> list = new ArrayList<String>();
     	list.add("sio:TimeStamp");
     	list.add("sio:TimeInstant");
@@ -174,9 +174,12 @@ public class SDD {
 
         String indvIndicatorQuery = "";
         indvIndicatorQuery += NameSpaces.getInstance().printSparqlNameSpaceList();
-        indvIndicatorQuery += " SELECT * WHERE { "
-                +  str + "  (<>|!<>)* hasco:StudyIndicator ."
-                +	" } ";
+        indvIndicatorQuery += " SELECT * WHERE { \n"
+                + " { " + str + " (<>|!<>)* hasco:StudyIndicator . } \n"
+                + " UNION { " + str + " (<>|!<>)* hasco:SampleIndicator . } \n"
+                + " } \n";
+        
+        // System.out.println("indvIndicatorQuery: " + indvIndicatorQuery);
 
         try {
             ResultSetRewindable resultsrwIndvInd = SPARQLUtils.select(
@@ -194,27 +197,10 @@ public class SDD {
             return false;
         } catch (QueryExceptionHTTP e) {
             e.printStackTrace();
-            AnnotationLog.printException("The 'Attribute' column " + str + " formed a bad query to the KG.", sddfile.getFile().getName());
+            AnnotationLog.printException("The 'Attribute' column " + str + " formed a bad query to the KG.", sddfile.getFileName());
         }
+        
         return true;
-    }
-
-    public void printErrList(List<String> list, int num) {
-        if (list.size()>0){
-            String listString = "";
-            for (String s : list) {
-                listString += s + "; ";
-            }
-            if (num == 1){
-                AnnotationLog.printException("The Dictionary Mapping has unresolvable uris in cells: " + listString + " .", sddfile.getFile().getName());
-            } else if (num == 2){
-                AnnotationLog.printException("The Dictionary Mapping has unregistered namespace in cells: " + listString + " .", sddfile.getFile().getName());
-            } else if (num == 3){
-                AnnotationLog.printException("The Attributes: " + listString + " NOT hasco:StudyIndicator .", sddfile.getFile().getName());
-            } else if (num == 4){
-                AnnotationLog.printException("The Dictionary Mapping has incorrect content in :" + listString + "in \"attributeOf\" column.", sddfile.getFile().getName());
-            }
-        }
     }
     
     public Map<String, List<String>> readDDforEAmerge(RecordFile file) {
@@ -307,19 +293,19 @@ public class SDD {
         }
 
         if (file.getHeaders().size() > 0){
-            AnnotationLog.println("The Dictionary Mapping has " + file.getHeaders().size() + " columns.", sddfile.getFile().getName());	
+            AnnotationLog.println("The Dictionary Mapping has " + file.getHeaders().size() + " columns.", sddfile.getFileName());	
         } else {
-            AnnotationLog.printException("The Dictionary Mapping has " + file.getHeaders().size() + " columns.", sddfile.getFile().getName());
+            AnnotationLog.printException("The Dictionary Mapping has " + file.getHeaders().size() + " columns.", sddfile.getFileName());
         }
 
         Boolean uriResolvable = true;
         Boolean namespaceRegisterd = true;
-        Boolean isStudyIndicator = true;
+        Boolean isIndicator = true;
 
-        List<String> checkUriRegister = new ArrayList<String>();
-        List<String> checkCellVal = new ArrayList<String>();
-        List<String> checkUriResolve = new ArrayList<String>();
-        List<String> checkStudyIndicatePath = new ArrayList<String>();
+        List<String> checkUriRegisterResults = new ArrayList<String>();
+        List<String> checkCellValResults = new ArrayList<String>();
+        List<String> checkUriResolveResults = new ArrayList<String>();
+        List<String> checkStudyIndicatorPathResults = new ArrayList<String>();
         List<String> dasaList = new ArrayList<String>();		
         List<String> dasoList = new ArrayList<String>();
         Map<String, String> sa2so = new HashMap<String, String>();
@@ -347,19 +333,19 @@ public class SDD {
 
                             } else {
                                 uriResolvable = false;
-                                checkUriResolve.add(relationCell);
+                                checkUriResolveResults.add(relationCell);
                             }
                         } else {
                             uriResolvable = false;
-                            checkUriResolve.add(roleCell);
+                            checkUriResolveResults.add(roleCell);
                         }
                     } else {
                         uriResolvable = false;
-                        checkUriResolve.add(entityCell);
+                        checkUriResolveResults.add(entityCell);
                     }
                 } else {
                     uriResolvable = false;
-                    checkUriResolve.add(attributeCell);
+                    checkUriResolveResults.add(attributeCell);
                 }
 
                 if (checkCellUriRegistered(attributeCell)){
@@ -369,30 +355,32 @@ public class SDD {
 
                             } else {
                                 namespaceRegisterd = false;
-                                checkUriRegister.add(relationCell);
+                                checkUriRegisterResults.add(relationCell);
                             }
                         } else {
                             namespaceRegisterd = false;
-                            checkUriRegister.add(roleCell);
+                            checkUriRegisterResults.add(roleCell);
                         }
                     } else {
                         namespaceRegisterd = false;
-                        checkUriRegister.add(entityCell);
+                        checkUriRegisterResults.add(entityCell);
                     }
                 } else {
                     namespaceRegisterd = false;
-                    checkUriRegister.add(attributeCell);
+                    checkUriRegisterResults.add(attributeCell);
                 }
 
-                if (URIUtils.isValidURI(attributeCell)){
-                    isStudyIndicator = checkStudyIndicatorPath(attributeCell);
-                    if (!isStudyIndicator) {
-                        checkStudyIndicatePath.add(attributeCell);
+                if (URIUtils.isValidURI(attributeCell)) {
+                    isIndicator = checkIndicatorPath(attributeCell);
+                    if (!isIndicator) {
+                        checkStudyIndicatorPathResults.add(attributeCell);
                     }
                 } else {
                     if (entityCell == null || entityCell.length() == 0){
-                        isStudyIndicator = false;
-                        checkStudyIndicatePath.add(attributeCell);
+                        isIndicator = false;
+                        if (attributeCell != null && !attributeCell.isEmpty()) {
+                            checkStudyIndicatorPathResults.add(attributeCell);
+                        }
                     }
                 }
 
@@ -401,14 +389,14 @@ public class SDD {
                     if (attributeOfCell.length()>0) {
                         sa2so.put(record.getValueByColumnIndex(0), attributeOfCell);
                     } else {
-                        AnnotationLog.printException("Attribute " + record.getValueByColumnIndex(0) + "is not attributeOf any object. Please fix the content.", sddfile.getFile().getName());
+                        AnnotationLog.printException("Attribute " + record.getValueByColumnIndex(0) + " is not attributeOf any object. Please fix the content.", sddfile.getFileName());
                     }
                 }
 
                 if (entityCell != null && entityCell.length()>0) {
                 	if (URIUtils.isValidURI(entityCell)) {
 	                    dasoList.add(record.getValueByColumnIndex(0));
-	                    if (inRelationToCell.length()>0) {
+	                    if (inRelationToCell.length() > 0) {
 	                        so2so2.put(record.getValueByColumnIndex(0), inRelationToCell);
 	                    } else {
 	
@@ -416,13 +404,13 @@ public class SDD {
 	
 	                    so2type.put(record.getValueByColumnIndex(0), entityCell);
 	
-	                    if (roleCell.length()>0) {
+	                    if (roleCell.length() > 0) {
 	                        so2role.put(record.getValueByColumnIndex(0), roleCell);
 	                    } else {
 	
 	                    }
 	
-	                    if (dfCell.length()>0) {
+	                    if (dfCell.length() > 0) {
 	                        so2df.put(record.getValueByColumnIndex(0), dfCell);
 	                    } else {
 	
@@ -438,13 +426,13 @@ public class SDD {
     	
     	                    so2type.put(record.getValueByColumnIndex(0), codeMappings.get(entityCell));
     	
-    	                    if (roleCell.length()>0) {
+    	                    if (roleCell.length() > 0) {
     	                        so2role.put(record.getValueByColumnIndex(0), roleCell);
     	                    } else {
     	
     	                    }
     	
-    	                    if (dfCell.length()>0) {
+    	                    if (dfCell.length() > 0) {
     	                        so2df.put(record.getValueByColumnIndex(0), dfCell);
     	                    } else {
     	
@@ -457,11 +445,11 @@ public class SDD {
                 	}
                 }
                 
-                if (checkCellValue(record.getValueByColumnName("attributeOf"))){
+                if (checkCellValue(record.getValueByColumnName("attributeOf"))) {
                     mapAttrObj.put(record.getValueByColumnIndex(0), record.getValueByColumnName("attributeOf"));
                 } else {
 		    if (record.getValueByColumnName("attributeOf") != null && !record.getValueByColumnName("attributeOf").equals("null")) {
-			checkCellVal.add(record.getValueByColumnName("attributeOf"));
+			//checkCellVal.add(record.getValueByColumnName("attributeOf"));
                 	AnnotationLog.printException("\"" + record.getValueByColumnName("attributeOf") + 
 						     "\" at column [attributeOf] , row [" + rowNumber + 
 						     "] contains illegal content.", sddfile.getFile().getName());
@@ -478,23 +466,37 @@ public class SDD {
             mapAttrObj.put(record.getValueByColumnName(Templates.LABEL), 
                     record.getValueByColumnName(Templates.ATTTRIBUTEOF));
         }
-
-        printErrList(checkUriResolve, 1);
-        printErrList(checkUriRegister, 2);
-        printErrList(checkStudyIndicatePath, 3);
-        printErrList(checkCellVal, 4);
-
-        if (uriResolvable == true){
-            AnnotationLog.println("The Dictionary Mapping has resolvable uris.", sddfile.getFile().getName());	
+        
+        if (checkUriResolveResults.size() > 0) {
+            AnnotationLog.printException("The Dictionary Mapping has unresolvable uris in cells: " + String.join(", ", checkUriResolveResults) + " .", sddfile.getFileName());
+            return false;
         }
-        if (namespaceRegisterd == true){
-            AnnotationLog.println("The Dictionary Mapping has namespaces all registered.", sddfile.getFile().getName());	
+        
+        if (checkUriRegisterResults.size() > 0) {
+            AnnotationLog.printException("The Dictionary Mapping has unregistered namespace in cells: " + String.join(", ", checkUriRegisterResults) + " .", sddfile.getFileName());
+            return false;
         }
-        if (isStudyIndicator == true){
-            AnnotationLog.println("The Dictionary Mapping has all attributes being subclasses of hasco:StudyIndicator.", sddfile.getFile().getName());	
+        
+        if (checkStudyIndicatorPathResults.size() > 0) {
+            AnnotationLog.printWarning("The Attributes: [" + String.join(", ", checkStudyIndicatorPathResults) + "] are NOT either hasco:StudyIndicator or hasco:SampleIndicator .", sddfile.getFileName());
+        }
+        
+        if (checkCellValResults.size() > 0) {
+            AnnotationLog.printException("The Dictionary Mapping has incorrect content in :" + String.join(", ", checkCellValResults) + "in \"attributeOf\" column.", sddfile.getFileName());
+            return false;
         }
 
-        AnnotationLog.println("The Dictionary Mapping has correct content under \"Column\" and \"attributeOf\" columns.", sddfile.getFile().getName());
+        if (uriResolvable == true) {
+            AnnotationLog.println("The Dictionary Mapping has resolvable uris.", sddfile.getFileName());	
+        }
+        if (namespaceRegisterd == true) {
+            AnnotationLog.println("The Dictionary Mapping has namespaces all registered.", sddfile.getFileName());	
+        }
+        if (isIndicator == true) {
+            AnnotationLog.println("The Dictionary Mapping has all attributes being subclasses of hasco:StudyIndicator or hasco:SampleIndicator.", sddfile.getFileName());	
+        }
+
+        AnnotationLog.println("The Dictionary Mapping has correct content under \"Column\" and \"attributeOf\" columns.", sddfile.getFileName());
         System.out.println("[SDD] mapAttrObj: " + mapAttrObj);
 
         return true;

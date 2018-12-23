@@ -109,6 +109,23 @@ public class FacetHandler {
 		return;
 	}
 	
+	public Map<String, List<String>> getTempSparqlConstraints(Facet facet) {
+        System.out.println("getTempSparqlConstraints() facet.getFacetName(): " + facet.getFacetName());
+        
+        Map<String, List<String>> constraints = new HashMap<String, List<String>>();
+        Iterator<Map.Entry<String, Facet>> iter = facetsAll.entrySet().iterator();
+        while (iter.hasNext()) {
+            Map.Entry<String, Facet> entry = (Map.Entry<String, Facet>)iter.next();
+            if (!entry.getKey().equals(facet.getFacetName())) {
+                entry.getValue().toSparqlConstraints(constraints);
+            }
+        }
+        
+        facet.toSparqlConstraints(constraints);
+        
+        return constraints;
+    }
+	
 	public String getTempSolrQuery(Facet facet, String field, List<String> values) {
 		for (String val : values) {
 			facet.putFacet(field, val);
@@ -122,7 +139,7 @@ public class FacetHandler {
 	}
 	
 	public String getTempSolrQuery(Facet facet) {
-		System.out.println("facet.getFacetName(): " + facet.getFacetName());
+		System.out.println("getTempSolrQuery() facet.getFacetName(): " + facet.getFacetName());
 		
 		List<String> facetQueries = new ArrayList<String>();
 		Iterator<Map.Entry<String, Facet>> iter = facetsAll.entrySet().iterator();

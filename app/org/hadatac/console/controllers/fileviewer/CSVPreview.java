@@ -19,16 +19,16 @@ import play.mvc.Result;
 
 public class CSVPreview extends Controller{
 
-	private static String path_proc = ConfigProp.getPathProc();
-	private static String path_unproc = ConfigProp.getPathUnproc();
+	private static String pathProc = ConfigProp.getPathProc();
+	private static String pathUnproc = ConfigProp.getPathUnproc();
 
 	public static ArrayList<String> getCSVHeaders(String folder, String fileName) {
 		//System.out.println("filename: " + filename);
 		String fullFileName = "";
 		if (folder.equals("proc")) {
-			fullFileName = path_proc + fileName;
+			fullFileName = pathProc + fileName;
 		} else {
-			fullFileName = path_unproc + fileName;
+			fullFileName = pathUnproc + fileName;
 		}
 		File toPreview = new File(fullFileName);
 		ArrayList<String> headerList = null;
@@ -54,9 +54,9 @@ public class CSVPreview extends Controller{
 		ArrayList<ArrayList<String>> previewList = null;
 		File toPreview = null;
 		if (folder.equals("proc")) {
-			toPreview = new File(path_proc + fileName);
+			toPreview = new File(pathProc + fileName);
 		} else {
-			toPreview = new File(path_unproc + fileName);
+			toPreview = new File(pathUnproc + fileName);
 		}
 		System.out.println("fileName: " + fileName);
 		try{
@@ -91,7 +91,7 @@ public class CSVPreview extends Controller{
 	}
 
 	public static ArrayList<String> getColumn(String ownerEmail, String fileName, int selectedCol){
-		String filename = path_proc + fileName;
+		String filename = pathProc + fileName;
 		File toPreview = new File(filename);
 		ArrayList<String> theColumn = new ArrayList<String>();
 		try{

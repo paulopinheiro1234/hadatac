@@ -1,6 +1,7 @@
 package org.hadatac.entity.pojo;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 
@@ -23,25 +24,45 @@ public abstract class HADatAcThing {
     int count = 0;
 
     String namedGraph = "";
-
+    
     public Map<HADatAcThing, List<HADatAcThing>> getTargetFacets(
             Facet facet, FacetHandler facetHandler) {
         return null;
     }
 
-    public static String stringify(List<String> preValues, boolean isUri) {
-        List<String> finalValues = new ArrayList<String>();
-        if (isUri) {
-            preValues.forEach((value) -> finalValues.add("<" + value + ">"));
-        } else {
-            preValues.forEach((value) -> finalValues.add("\"" + value + "\""));
-        }
-
-        return String.join(" ", finalValues);
+    public Map<HADatAcThing, List<HADatAcThing>> getTargetFacetsFromSolr(
+            Facet facet, FacetHandler facetHandler) {
+        return null;
+    }
+    
+    public Map<HADatAcThing, List<HADatAcThing>> getTargetFacetsFromTripleStore(
+            Facet facet, FacetHandler facetHandler) {
+        return null;
     }
 
+    public long getNumber(Facet facet, FacetHandler facetHandler) {
+        return 0;
+    }
+    
     public long getNumberFromSolr(Facet facet, FacetHandler facetHandler) {
         return 0;
+    }
+    
+    public long getNumberFromTripleStore(Facet facet, FacetHandler facetHandler) {
+        return 0;
+    }
+
+    public static String stringify(List<String> preValues) {
+        List<String> finalValues = new ArrayList<String>();
+        preValues.forEach((value) -> {
+            if (value.startsWith("http")) {
+                finalValues.add("<" + value + ">");
+            } else {
+                finalValues.add("\"" + value + "\"");
+            }
+        });
+
+        return String.join(" ", finalValues);
     }
 
     public String getUri() {
@@ -118,6 +139,55 @@ public abstract class HADatAcThing {
 
     public void setNamedGraph(String namedGraph) {
         this.namedGraph = namedGraph;
+    }
+    
+    public static List<String> getLabels(String uri) {
+        List<String> results = new ArrayList<String>();
+        
+        if (uri.startsWith("http")) {
+            uri = "<" + uri.trim() + ">";
+        }
+        String queryString = NameSpaces.getInstance().printSparqlNameSpaceList() + 
+                "SELECT ?label WHERE { \n" + 
+                "  " + uri + " rdfs:label ?label . \n" + 
+                "}";
+        
+        ResultSetRewindable resultsrw = SPARQLUtils.select(
+                CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), queryString);
+
+        while (resultsrw.hasNext()) {
+            QuerySolution soln = resultsrw.next();
+            if (soln.get("label") != null && !soln.get("label").toString().isEmpty()) {
+                results.add(soln.get("label").toString().replace("@en", ""));
+            }
+        }
+        
+        return results;
+    }
+    
+    public static String getLabel(String uri) {
+        List<String> labels = getLabels(uri);
+        if (labels.size() > 0) {
+            return labels.get(0);
+        }
+        
+        return "";
+    }
+    
+    public static String getShortestLabel(String uri) {
+        List<String> labels = getLabels(uri);
+        if (labels.size() > 0) {
+            labels.sort(new Comparator<String>() {
+                @Override
+                public int compare(String o1, String o2) {
+                    return Integer.compare(o1.length(), o2.length());
+                }
+            });
+            
+            return labels.get(0);
+        }
+        
+        return "";
     }
 
     public static int getNumberInstances() {

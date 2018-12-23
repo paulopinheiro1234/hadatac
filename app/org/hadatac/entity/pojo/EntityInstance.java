@@ -16,7 +16,6 @@ import org.hadatac.console.models.FacetHandler;
 import org.hadatac.console.models.Pivot;
 import org.hadatac.utils.CollectionUtil;
 
-import com.typesafe.config.ConfigFactory;
 
 public class EntityInstance extends HADatAcThing implements Comparable<EntityInstance> {
 
@@ -37,8 +36,15 @@ public class EntityInstance extends HADatAcThing implements Comparable<EntityIns
     public int hashCode() {
         return getUri().hashCode();
     }
-
+    
+    @Override
     public Map<HADatAcThing, List<HADatAcThing>> getTargetFacets(
+            Facet facet, FacetHandler facetHandler) {
+        return getTargetFacetsFromSolr(facet, facetHandler);
+    }
+
+    @Override
+    public Map<HADatAcThing, List<HADatAcThing>> getTargetFacetsFromSolr(
             Facet facet, FacetHandler facetHandler) {
 
         SolrQuery query = new SolrQuery();
@@ -61,7 +67,7 @@ public class EntityInstance extends HADatAcThing implements Comparable<EntityIns
             Pivot pivot = Pivot.parseQueryResponse(queryResponse);
             return parsePivot(pivot, facet);
         } catch (Exception e) {
-            System.out.println("[ERROR] EntityInstance.getTargetFacets() - Exception message: " + e.getMessage());
+            System.out.println("[ERROR] EntityInstance.getTargetFacetsFromSolr() - Exception message: " + e.getMessage());
         }
 
         return null;

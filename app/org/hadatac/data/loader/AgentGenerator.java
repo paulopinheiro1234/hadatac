@@ -7,7 +7,7 @@ import java.util.Map;
 import org.hadatac.utils.ConfigProp;
 import org.hadatac.utils.Templates;
 
-public class AgentGenerator extends BasicGenerator {
+public class AgentGenerator extends BaseGenerator {
 	final String kbPrefix = ConfigProp.getKbPrefix();
 	private int counter = 1; //starting index number
 	

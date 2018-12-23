@@ -5,27 +5,33 @@ import java.util.List;
 import java.util.Map;
 import java.util.HashMap;
 
+import org.apache.commons.text.WordUtils;
+import org.apache.jena.query.QuerySolution;
+import org.apache.jena.query.ResultSetRewindable;
+import org.apache.jena.sparql.engine.http.QueryExceptionHTTP;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrRequest;
 import org.apache.solr.client.solrj.impl.HttpSolrClient;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.SolrDocumentList;
+import org.hadatac.console.http.SPARQLUtils;
 import org.hadatac.console.models.Facet;
 import org.hadatac.console.models.FacetHandler;
 import org.hadatac.console.models.Pivot;
 import org.hadatac.utils.CollectionUtil;
+import org.hadatac.utils.NameSpaces;
 
 
-public class EntityRoleFromSSD extends HADatAcThing implements Comparable<EntityRoleFromSSD> {
+public class StudyObjectRole extends HADatAcThing implements Comparable<StudyObjectRole> {
 
 	static String className = "sio:Object";
 
-	public EntityRoleFromSSD() {}
+	public StudyObjectRole() {}
 	
 	@Override
 	public boolean equals(Object o) {;
-		if((o instanceof EntityRoleFromSSD) && (((EntityRoleFromSSD)o).getUri().equals(this.getUri()))) {
+		if((o instanceof StudyObjectRole) && (((StudyObjectRole)o).getUri().equals(this.getUri()))) {
 			return true;
 		} else {
 			return false;
@@ -37,9 +43,16 @@ public class EntityRoleFromSSD extends HADatAcThing implements Comparable<Entity
 		return getUri().hashCode();
 	}
 	
+	@Override
+    public long getNumber(Facet facet, FacetHandler facetHandler) {
+        return getNumberFromSolr(facet, facetHandler);
+    }
+	
+	@Override
 	public long getNumberFromSolr(Facet facet, FacetHandler facetHandler) {
         SolrQuery query = new SolrQuery();
         String strQuery = facetHandler.getTempSolrQuery(facet);
+        System.out.println("StudyObjectRole strQuery: " + strQuery);
         query.setQuery(strQuery);
         query.setRows(0);
         query.setFacet(false);
@@ -52,15 +65,23 @@ public class EntityRoleFromSSD extends HADatAcThing implements Comparable<Entity
             SolrDocumentList results = queryResponse.getResults();
             return results.getNumFound();
         } catch (Exception e) {
-            System.out.println("[ERROR] EntityRoleFromSSD.getNumberFromSolr() - Exception message: " + e.getMessage());
+            System.out.println("[ERROR] StudyObjectRole.getNumberFromSolr() - Exception message: " + e.getMessage());
         }
 
         return -1;
     }
 	
-	public Map<HADatAcThing, List<HADatAcThing>> getTargetFacets(
+	@Override
+    public Map<HADatAcThing, List<HADatAcThing>> getTargetFacets(
             Facet facet, FacetHandler facetHandler) {
-
+        return getTargetFacetsFromSolr(facet, facetHandler);
+    }
+	
+	@Override
+	public Map<HADatAcThing, List<HADatAcThing>> getTargetFacetsFromSolr(
+            Facet facet, FacetHandler facetHandler) {
+	    System.out.println("getTargetFacetsFromSolr() is called");
+	    
         SolrQuery query = new SolrQuery();
         String strQuery = facetHandler.getTempSolrQuery(facet);
         query.setQuery(strQuery);
@@ -68,9 +89,9 @@ public class EntityRoleFromSSD extends HADatAcThing implements Comparable<Entity
         query.setFacet(true);
         query.setFacetLimit(-1);
         query.setParam("json.facet", "{ "
-                + "role_uri_str:{ "
+                + "role_str:{ "
                 + "type: terms, "
-                + "field: role_uri_str, "
+                + "field: role_str, "
                 + "limit: 1000}}");
 
         try {
@@ -81,7 +102,7 @@ public class EntityRoleFromSSD extends HADatAcThing implements Comparable<Entity
             Pivot pivot = Pivot.parseQueryResponse(queryResponse);
             return parsePivot(pivot, facet);
         } catch (Exception e) {
-            System.out.println("[ERROR] EntityRoleFromSSD.getTargetFacets() - Exception message: " + e.getMessage());
+            System.out.println("[ERROR] StudyObjectRole.getTargetFacetsFromSolr() - Exception message: " + e.getMessage());
         }
 
         return null;
@@ -92,13 +113,13 @@ public class EntityRoleFromSSD extends HADatAcThing implements Comparable<Entity
 
         Map<HADatAcThing, List<HADatAcThing>> results = new HashMap<HADatAcThing, List<HADatAcThing>>();
         for (Pivot pivot_ent : pivot.children) {
-            EntityRoleFromSSD role = new EntityRoleFromSSD();
+            StudyObjectRole role = new StudyObjectRole();
             role.setUri(pivot_ent.getValue());
             //role.setLabel(WordUtils.capitalize(Entity.find(pivot_ent.getValue()).getLabel()));
             //Comment from PP: this is a temporary hack since role_uri has changed to be the label itself
             role.setLabel(pivot_ent.getValue());
             role.setCount(pivot_ent.getCount());
-            role.setField("role_uri_str");
+            role.setField("role_str");
 
             if (!results.containsKey(role)) {
                 List<HADatAcThing> children = new ArrayList<HADatAcThing>();
@@ -106,14 +127,14 @@ public class EntityRoleFromSSD extends HADatAcThing implements Comparable<Entity
             }
 
             Facet subFacet = facet.getChildById(role.getUri());
-            subFacet.putFacet("role_uri_str", role.getUri());
+            subFacet.putFacet("role_str", role.getUri());
         }
 
         return results;
     }
 
 	@Override
-	public int compareTo(EntityRoleFromSSD another) {
+	public int compareTo(StudyObjectRole another) {
 		return this.getUri().compareTo(another.getUri());
 	}
 

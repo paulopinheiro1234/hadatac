@@ -7,7 +7,7 @@ import org.hadatac.console.controllers.annotator.AnnotationLog;
 
 public class GeneratorChain {
 
-    private List<BasicGenerator> chain = new ArrayList<BasicGenerator>();
+    private List<BaseGenerator> chain = new ArrayList<BaseGenerator>();
     private RecordFile file = null;
     private boolean bValid = true;
     
@@ -46,16 +46,20 @@ public class GeneratorChain {
         bValid = false;
     }
 
-    public void addGenerator(BasicGenerator generator) {
+    public void addGenerator(BaseGenerator generator) {
         chain.add(generator);
     }
-
+    
     public boolean generate() {
+        return generate(true);
+    }
+
+    public boolean generate(boolean bCommit) {
         if (!isValid()) {
             return false;
         }
 
-        for (BasicGenerator generator : chain) {
+        for (BaseGenerator generator : chain) {
             try {
                 generator.preprocess();
                 generator.createRows();
@@ -68,9 +72,13 @@ public class GeneratorChain {
                 return false;
             }
         }
+        
+        if (!bCommit) {
+            return true;
+        }
 
         // Commit if no errors occurred
-        for (BasicGenerator generator : chain) {
+        for (BaseGenerator generator : chain) {
             if (!generator.getStudyUri().isEmpty()) {
                 setStudyUri(generator.getStudyUri());
             }
@@ -100,7 +108,7 @@ public class GeneratorChain {
             }
         }
 
-        for (BasicGenerator generator : chain) {
+        for (BaseGenerator generator : chain) {
             if (!generator.getStudyUri().equals("")) {
                 setStudyUri(generator.getStudyUri());
             }
@@ -112,7 +120,7 @@ public class GeneratorChain {
     }
 
     public void delete() {
-        for (BasicGenerator generator : chain) {
+        for (BaseGenerator generator : chain) {
             try {
                 generator.preprocess();
                 generator.createRows();

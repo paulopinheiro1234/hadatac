@@ -11,7 +11,7 @@ import org.hadatac.entity.pojo.HADatAcThing;
 import org.hadatac.entity.pojo.ObjectCollection;
 import org.hadatac.metadata.loader.URIUtils;
 
-public class SSDGenerator extends BasicGenerator {
+public class SSDGenerator extends BaseGenerator {
 
     final String kbPrefix = ConfigProp.getKbPrefix();
     String SDDName = ""; //used for reference column uri
@@ -113,7 +113,7 @@ public class SSDGenerator extends BasicGenerator {
     public void preprocess() throws Exception {}
 
     @Override
-    HADatAcThing createObject(Record rec, int row_number) throws Exception {
+    public HADatAcThing createObject(Record rec, int rowNumber) throws Exception {
         if (!URIUtils.replacePrefixEx(getUri(rec)).equals(studyUri)) {
             return createObjectCollection(rec);
         }

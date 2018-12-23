@@ -10,7 +10,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class DASchemaObjectGenerator extends BasicGenerator {
+public class DASchemaObjectGenerator extends BaseGenerator {
 	
 	final String kbPrefix = ConfigProp.getKbPrefix();
 	String startTime = "";
@@ -97,9 +97,8 @@ public class DASchemaObjectGenerator extends BasicGenerator {
 			for (String item : Arrays.asList(inRelationTo.split("\\s*,\\s*"))) {
 				items.add(kbPrefix + "DASO-" + SDDName + "-" + item.replace("_","-").replace("??", ""));
 			}
-			System.out.println(getLabel(rec) + String.join(" & ", items)); 
+			
 			return items.get(0);
-//			return inRelationTo;
 		}
 	}
 	
@@ -139,22 +138,22 @@ public class DASchemaObjectGenerator extends BasicGenerator {
 	@Override
 	public void createRows() throws Exception {
 		rows.clear();
-		int row_number = 0;
+		int rowNumber = 0;
 		List<String> column_name = new ArrayList<String>();
 		for (Record record : records) {
 			if (getEntity(record)  == null || getEntity(record).equals("")  || timeList.contains(getLabel(record))){
                 //System.out.println("[DASOGenerator] getEntity(record) = " + getEntity(record) + ", so skipping....");
 				if (column_name.contains(getLabel(record))){
-					rows.add(createRelationRow(record, ++row_number));
+					rows.add(createRelationRow(record, ++rowNumber));
 				}
 			} else {
                 //System.out.println("[DASOGenerator] creating a row....");
-				rows.add(createRow(record, ++row_number));
+				rows.add(createRow(record, ++rowNumber));
 				column_name.add(getLabel(record));
 			}
 		}
 		
-        System.out.println("[DASOGenerator] Added " + row_number + " rows!");
+        System.out.println("[DASOGenerator] Added " + rowNumber + " rows!");
 	}
 	
 	public List<String> createUris() throws Exception {
@@ -171,7 +170,7 @@ public class DASchemaObjectGenerator extends BasicGenerator {
 
 	//Column	Attribute	attributeOf	Unit	Time	Entity	Role	Relation	inRelationTo	wasDerivedFrom	wasGeneratedBy	hasPosition   
 	@Override
-	Map<String, Object> createRow(Record rec, int row_number) throws Exception {
+	public Map<String, Object> createRow(Record rec, int rowNumber) throws Exception {
 		Map<String, Object> row = new HashMap<String, Object>();
 		row.put("hasURI", kbPrefix + "DASO-" + SDDName + "-" + getLabel(rec).trim().replace(" ","").replace("_","-").replace("??", ""));
 		row.put("a", "hasco:DASchemaObject");
@@ -211,7 +210,7 @@ public class DASchemaObjectGenerator extends BasicGenerator {
 		return row;
 	}
 	
-	Map<String, Object> createRelationRow(Record rec, int row_number) throws Exception {
+	Map<String, Object> createRelationRow(Record rec, int rowNumber) throws Exception {
 		Map<String, Object> row = new HashMap<String, Object>();
 		row.put("hasURI", kbPrefix + "DASO-" + SDDName + "-" + getLabel(rec).trim().replace(" ","").replace("_","-").replace("??", ""));
 		if (getRelation(rec).length() > 0) {

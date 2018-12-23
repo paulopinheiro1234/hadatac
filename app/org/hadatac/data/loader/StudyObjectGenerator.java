@@ -12,7 +12,7 @@ import org.hadatac.entity.pojo.HADatAcThing;
 import org.hadatac.entity.pojo.StudyObject;
 
 
-public class StudyObjectGenerator extends BasicGenerator {
+public class StudyObjectGenerator extends BaseGenerator {
 
     String study_id;
     String file_name;
@@ -26,7 +26,8 @@ public class StudyObjectGenerator extends BasicGenerator {
     private Map<String, String> uriMap = new HashMap<String, String>();
     private Map<String, List<String>> mapContent = new HashMap<String, List<String>>();
 
-    public StudyObjectGenerator(RecordFile file, List<String> listContent, Map<String, List<String>> mapContent, String study_uri) {
+    public StudyObjectGenerator(RecordFile file, List<String> listContent, 
+            Map<String, List<String>> mapContent, String study_uri) {
         super(file);
         //this.study_id = study_id; 
         file_name = file.getFile().getName();
@@ -132,23 +133,23 @@ public class StudyObjectGenerator extends BasicGenerator {
     }
     
     public StudyObject createStudyObject(Record record) throws Exception {
-        //System.out.println(getUri(record));
         StudyObject obj = new StudyObject(getUri(record), getType(record), 
                 getOriginalID(record), getLabel(record), 
                 getCohortUri(record), getLabel(record));
         obj.setRoleUri(URIUtils.replacePrefixEx(role));
         obj.addScopeUri(getScopeUri(record));
         obj.addTimeScopeUri(getTimeScopeUri(record));
+        
         return obj;
     }
 
     @Override
-    HADatAcThing createObject(Record rec, int row_number) throws Exception {
+    public HADatAcThing createObject(Record rec, int rowNumber) throws Exception {
         return createStudyObject(rec);
     }
 
     @Override
-    Map<String, Object> createRow(Record rec, int row_number) throws Exception {
+    public Map<String, Object> createRow(Record rec, int rowNumber) throws Exception {
         if (getOriginalID(rec).length() > 0) {
             Map<String, Object> row = new HashMap<String, Object>();
             row.put("hasURI", getUri(rec));

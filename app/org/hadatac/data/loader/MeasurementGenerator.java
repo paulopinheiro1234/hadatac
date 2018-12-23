@@ -27,7 +27,7 @@ import org.hadatac.utils.CollectionUtil;
 import org.hadatac.utils.Feedback;
 
 
-public class MeasurementGenerator extends BasicGenerator {
+public class MeasurementGenerator extends BaseGenerator {
 
     private ObjectAccessSpec da;
     private DataFile dataFile;
@@ -155,7 +155,7 @@ public class MeasurementGenerator extends BasicGenerator {
     }
 
     @Override
-    public HADatAcThing createObject(Record record, int row_number) throws Exception {
+    public HADatAcThing createObject(Record record, int rowNumber) throws Exception {
         // Comment out row instance generation
         /*
         try{
@@ -320,6 +320,7 @@ public class MeasurementGenerator extends BasicGenerator {
              *=============================*/
             measurement.setObjectCollectionType("");
             measurement.setStudyObjectUri("");
+            measurement.setStudyObjectTypeUri("");
             measurement.setObjectUri("");
             measurement.setPID("");
             measurement.setSID("");
@@ -337,9 +338,7 @@ public class MeasurementGenerator extends BasicGenerator {
                 } else {
                     // TO DO: implement rest of cell scope
                 }
-
             } else {
-
                 // Objects defined by Row Scope
                 String id = "";
                 if (!schema.getOriginalIdLabel().equals("")) {
@@ -348,45 +347,59 @@ public class MeasurementGenerator extends BasicGenerator {
                     id = record.getValueByColumnIndex(posId);
                 }
                 
-                if (!id.equals("")) {
+                if (!"".equals(id)) {
                     if (dasa.getEntity().equals(URIUtils.replacePrefixEx("sio:Human"))) {
+                        measurement.setObjectCollectionType(URIUtils.replacePrefixEx("hasco:SubjectGroup"));
                         if (mapIDStudyObjects.containsKey(id)) {
                             measurement.setStudyObjectUri(mapIDStudyObjects.get(id).get(0));
+                            measurement.setStudyObjectTypeUri(mapIDStudyObjects.get(id).get(3));
                             measurement.setObjectUri(mapIDStudyObjects.get(id).get(0));
                         }
-                        measurement.setObjectCollectionType(URIUtils.replacePrefixEx("hasco:SubjectGroup"));
                         measurement.setPID(id);
-                    } else if (dasa.getEntity().equals(URIUtils.replacePrefixEx("sio:Sample"))) {
+                    } else {
                         if (mapIDStudyObjects.containsKey(id)) {
-                            measurement.setStudyObjectUri(mapIDStudyObjects.get(id).get(0));
-                            measurement.setObjectUri(mapIDStudyObjects.get(id).get(2));
-                            measurement.setPID(mapIDStudyObjects.get(id).get(1));
+                            if (!mapIDStudyObjects.get(id).get(2).isEmpty()) {
+                                // Sample
+                                measurement.setStudyObjectUri(mapIDStudyObjects.get(id).get(0));
+                                measurement.setStudyObjectTypeUri(mapIDStudyObjects.get(id).get(3));
+                                measurement.setObjectUri(mapIDStudyObjects.get(id).get(2));
+                                measurement.setPID(mapIDStudyObjects.get(id).get(2));
+                                measurement.setSID(mapIDStudyObjects.get(id).get(1));
+                                measurement.setObjectCollectionType(URIUtils.replacePrefixEx("hasco:SampleCollection"));
+                            } else {
+                                // Subject
+                                measurement.setStudyObjectUri(mapIDStudyObjects.get(id).get(0));
+                                measurement.setStudyObjectTypeUri(mapIDStudyObjects.get(id).get(3));
+                                measurement.setObjectUri(mapIDStudyObjects.get(id).get(0));
+                                measurement.setPID(mapIDStudyObjects.get(id).get(1));
+                                measurement.setObjectCollectionType(URIUtils.replacePrefixEx("hasco:SubjectGroup"));
+                            }
                         }
                         measurement.setObjectCollectionType(URIUtils.replacePrefixEx("hasco:SampleCollection"));
                         measurement.setSID(id);
-                    } else {
+			//} else {
 			//System.out.println("MeasurmentGenerator: id=[" + id + "]");
-                        if (mapIDStudyObjects.containsKey(id)) {
+                        //if (mapIDStudyObjects.containsKey(id)) {
 			    //System.out.println("MeasurmentGenerator: id found");
-                            measurement.setStudyObjectUri(mapIDStudyObjects.get(id).get(0));
-                            measurement.setObjectUri(mapIDStudyObjects.get(id).get(0));
-                            measurement.setPID(mapIDStudyObjects.get(id).get(0));
-                        }
-                        measurement.setObjectCollectionType(URIUtils.replacePrefixEx("hasco:SubjectGroup"));
-                        measurement.setPID(id);
+                            //measurement.setStudyObjectUri(mapIDStudyObjects.get(id).get(0));
+                            //measurement.setObjectUri(mapIDStudyObjects.get(id).get(0));
+                            //measurement.setPID(mapIDStudyObjects.get(id).get(0));
+                        //}
+                        //measurement.setObjectCollectionType(URIUtils.replacePrefixEx("hasco:SubjectGroup"));
+                        //measurement.setPID(id);
                     }
                 }
             }
-
+	    
             /*=============================*
              *                             *
              *   SET ROLE URI              *
              *                             *
              *=============================*/
             if (objRoleMappings.containsKey(measurement.getStudyObjectUri())) {
-                measurement.setRoleUri(objRoleMappings.get(measurement.getStudyObjectUri()));
+                measurement.setRole(objRoleMappings.get(measurement.getStudyObjectUri()));
             } else {
-                measurement.setRoleUri("");
+                measurement.setRole("");
             }
 
             /*=============================*
@@ -491,6 +504,7 @@ public class MeasurementGenerator extends BasicGenerator {
              *   SET UNIT                  *
              *                             *
              *=============================*/
+            
             if (!schema.getUnitLabel().equals("") && posUnit >= 0) {
                 // unit exists in the columns
                 String unitValue = record.getValueByColumnIndex(posUnit);

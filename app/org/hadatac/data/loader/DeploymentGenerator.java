@@ -16,7 +16,7 @@ import org.hadatac.utils.ConfigProp;
 import org.hadatac.utils.NameSpaces;
 import org.hadatac.utils.Templates;
 
-public class DeploymentGenerator extends BasicGenerator {
+public class DeploymentGenerator extends BaseGenerator {
 	final String kbPrefix = ConfigProp.getKbPrefix();
 	String startTime = "";
 
@@ -32,10 +32,10 @@ public class DeploymentGenerator extends BasicGenerator {
 	@Override
 	public void initMapping() {
 		mapCol.clear();
-		mapCol.put("DataAcquisitionName", Templates.DATAACQUISITIONNAME);
-		mapCol.put("Method", Templates.METHOD);
-		mapCol.put("Study", Templates.DASTUDYID);
-		mapCol.put("Epi/Lab", Templates.EPILAB);
+		mapCol.put("DataAcquisitionName", Templates.ACQ_DATAACQUISITIONNAME);
+		mapCol.put("Method", Templates.ACQ_METHOD);
+		mapCol.put("Study", Templates.ACQ_DASTUDYID);
+		mapCol.put("Epi/Lab", Templates.ACQ_EPILAB);
 	}
 
 	private String getCohortAsPlatform(Record rec) {
@@ -132,7 +132,7 @@ public class DeploymentGenerator extends BasicGenerator {
 	}
 
 	@Override
-	Map<String, Object> createRow(Record rec, int row_number) throws Exception {
+	public Map<String, Object> createRow(Record rec, int rowNumber) throws Exception {
 		Map<String, Object> row = new HashMap<String, Object>();
 
 		String tempDA = getDataAcquisitionName(rec);

@@ -198,6 +198,26 @@ public class Facet {
 		return values;
 	}
 	
+	public void toSparqlConstraints(Map<String, List<String>> constraints) {
+        for (String field : getFieldValues().keySet()) {
+            if (!field.isEmpty()) {
+                if (!constraints.containsKey(field)) {
+                    constraints.put(field, new ArrayList<String>());
+                }
+                
+                for (String value : getFieldValues().get(field)) {
+                    if (!constraints.get(field).contains(value)) {
+                        constraints.get(field).add(value);
+                    }
+                }
+            }
+        }
+        
+        for (Facet f : getChildrenAsList()) {
+            f.toSparqlConstraints(constraints);
+        }
+    }
+	
 	public String toSolrQuery() {
 		List<String> fieldQueries = new ArrayList<>();
 		for (String field : getFieldValues().keySet()) {

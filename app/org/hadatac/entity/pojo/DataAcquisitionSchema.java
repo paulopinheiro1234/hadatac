@@ -439,6 +439,7 @@ public class DataAcquisitionSchema extends HADatAcThing {
                 schemas.add(schema);
             }
         }
+        
         return schemas;
     }
 
@@ -455,7 +456,7 @@ public class DataAcquisitionSchema extends HADatAcThing {
                 + " OPTIONAL { ?possibleValue hasco:hasCodeLabel ?codeLabel } . \n"
                 + " }";
 
-        // System.out.println("findPossibleValues query: " + queryString);
+        System.out.println("findPossibleValues query: " + queryString);
 
         ResultSetRewindable resultsrw = SPARQLUtils.select(
                 CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), queryString);
@@ -492,12 +493,11 @@ public class DataAcquisitionSchema extends HADatAcThing {
     }
 
     public static String findByLabel(String schemaUri, String label) {
-        System.out.println("findByPosIndex is called!");
-
         String queryString = NameSpaces.getInstance().printSparqlNameSpaceList()
                 + " SELECT ?daso_or_dasa WHERE { "
-                + " ?daso_or_dasa rdfs:label \"" + label + "\" . "
+                + " ?daso_or_dasa rdfs:label ?label . "
                 + " ?daso_or_dasa hasco:partOfSchema <" + schemaUri + "> . "
+                + " FILTER regex(str(?label), \"" + label + "\" ) "
                 + " }";
 
         ResultSetRewindable resultsrw = SPARQLUtils.select(
@@ -516,23 +516,25 @@ public class DataAcquisitionSchema extends HADatAcThing {
 
         Map<String, List<String>> mapIdUriMappings = new HashMap<String, List<String>>();
         String queryString = NameSpaces.getInstance().printSparqlNameSpaceList()
-                + " SELECT ?subj_or_sample ?id ?obj ?subj_id WHERE { \n"
+                + " SELECT ?studyObject ?studyObjectType ?id ?obj ?subj_id WHERE { \n"
                 + " { \n"
-                + " 	?subj_or_sample hasco:originalID ?id . \n"
-                + "     ?subj_or_sample hasco:isMemberOf ?soc . \n"
+                + " 	?studyObject hasco:originalID ?id . \n"
+                + "     ?studyObject rdf:type ?studyObjectType . \n"
+                + "     ?studyObject hasco:isMemberOf ?soc . \n"
                 + "     ?soc a hasco:SubjectGroup . \n"
                 + "     ?soc hasco:isMemberOf* <" + studyUri + "> . \n"
                 + " } UNION { \n"
-                + " 	?subj_or_sample hasco:originalID ?id . \n"
-                + "     ?subj_or_sample hasco:isMemberOf ?soc . \n"
+                + " 	?studyObject hasco:originalID ?id . \n"
+                + "     ?studyObject rdf:type ?studyObjectType . \n"
+                + "     ?studyObject hasco:isMemberOf ?soc . \n"
                 + "     ?soc a hasco:SampleCollection . \n"
                 + " 	?soc hasco:isMemberOf* <" + studyUri + "> . \n"
-                + " 	?subj_or_sample hasco:hasObjectScope ?obj . \n"
+                + " 	?studyObject hasco:hasObjectScope ?obj . \n"
                 + " 	?obj hasco:originalID ?subj_id . \n"
                 + " } \n"
                 + " } \n";
         
-        //System.out.println("findIdUriMappings() queryString: " + queryString);
+        System.out.println("findIdUriMappings() queryString: " + queryString);
 
         ResultSetRewindable resultsrw = SPARQLUtils.select(
                 CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), queryString);
@@ -541,8 +543,8 @@ public class DataAcquisitionSchema extends HADatAcThing {
             while (resultsrw.hasNext()) {			
                 QuerySolution soln = resultsrw.next();
                 List<String> details = new ArrayList<String>();
-                if (soln.get("subj_or_sample") != null) {
-                    details.add(soln.get("subj_or_sample").toString());
+                if (soln.get("studyObject") != null) {
+                    details.add(soln.get("studyObject").toString());
                 } else {
                     details.add("");
                 }
@@ -553,6 +555,11 @@ public class DataAcquisitionSchema extends HADatAcThing {
                 }
                 if (soln.get("obj") != null) {
                     details.add(soln.get("obj").toString());
+                } else {
+                    details.add("");
+                }
+                if (soln.get("studyObjectType") != null) {
+                    details.add(soln.get("studyObjectType").toString());
                 } else {
                     details.add("");
                 }

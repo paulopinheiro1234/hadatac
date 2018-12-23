@@ -146,15 +146,13 @@ public class NameSpaces {
             int triples = entry.getValue();
             json = json + " [\"" + abbrev + "\"," + triples +"]";
         }
+        
         return json;
     }
 
     public String copyNameSpacesLocally(int mode) {
-        String message = "";
-        //byte[] buffer = new byte[1024];
-        //int bytesRead;
-
         // copy supporting ontologies locally
+        String message = "";
         for (Map.Entry<String, NameSpace> entry : table.entrySet()) {
             String abbrev = entry.getKey().toString();
             String nsURL = entry.getValue().getURL();
@@ -165,40 +163,19 @@ public class NameSpaces {
                     message += Feedback.print(mode, ".");
                 }
 
-                //if (!abbrev.equals("jp-entities:") && (!abbrev.equals(":")) && (!abbrev.equals("jp-sn:"))) {
-                URL url;
-
-
                 try {
-                    url = new URL(nsURL);
+                    URL url = new URL(nsURL);
                     File f = new File(filePath);
                     FileUtils.copyURLToFile(url, f);
-
-                    /*
-		    			BufferedInputStream inputStream = null;
-						BufferedOutputStream outputStream = null;
-						URLConnection connection = url.openConnection();
-						// If you need to use a proxy for your connection, the URL class has another openConnection method.
-						// For example, to connect to my local SOCKS proxy I can use:
-						// url.openConnection(new Proxy(Proxy.Type.SOCKS, newInetSocketAddress("localhost", 5555)));
-						inputStream = new BufferedInputStream(connection.getInputStream());
-						File f = new File(filePath);
-						outputStream = new BufferedOutputStream(new FileOutputStream(f));
-						while ((bytesRead = inputStream.read(buffer)) != -1) {
-							outputStream.write(buffer, 0, bytesRead);
-						}
-						inputStream.close();
-						outputStream.close();
-                     */
                     message += Feedback.println(mode, "Local copy created.");
                 } catch (Exception e) {
                     message += Feedback.println(mode, "Failed to create local copy.");
                 }
-                //}
             }
 
         }	
         message += Feedback.println(mode," ");
+        
         return message;
     }	
 

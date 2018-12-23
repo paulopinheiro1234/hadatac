@@ -22,7 +22,7 @@ import org.hadatac.utils.Templates;
 
 import java.lang.Exception;
 
-public class DataAcquisitionGenerator extends BasicGenerator {
+public class DataAcquisitionGenerator extends BaseGenerator {
 	
 	final String kbPrefix = ConfigProp.getKbPrefix();
 	String startTime = "";
@@ -40,11 +40,11 @@ public class DataAcquisitionGenerator extends BasicGenerator {
 	public void initMapping() {}
 
 	private String getDataAcquisitionName(Record rec) {
-		return rec.getValueByColumnName(Templates.DATAACQUISITIONNAME);
+		return rec.getValueByColumnName(Templates.ACQ_DATAACQUISITIONNAME);
 	}
 
 	private String getOwnerEmail(Record rec) {
-		String ownerEmail = rec.getValueByColumnName(Templates.OWNEREMAIL);
+		String ownerEmail = rec.getValueByColumnName(Templates.ACQ_OWNEREMAIL);
 		if(ownerEmail.equalsIgnoreCase("NULL") || ownerEmail.isEmpty()) {
 			return "";
 		}
@@ -54,11 +54,11 @@ public class DataAcquisitionGenerator extends BasicGenerator {
 	}
 	
 	private String getPermissionUri(Record rec) {
-		return rec.getValueByColumnName(Templates.PERMISSIONURI);
+		return rec.getValueByColumnName(Templates.ACQ_PERMISSIONURI);
 	}
 
 	private String getMethod(Record rec) {
-		String method = rec.getValueByColumnName(Templates.METHOD);
+		String method = rec.getValueByColumnName(Templates.ACQ_METHOD);
 		if(method.equalsIgnoreCase("NULL") || method.isEmpty()) {
 			return "";
 		}
@@ -68,22 +68,22 @@ public class DataAcquisitionGenerator extends BasicGenerator {
 	}
 
 	private String getStudy(Record rec) {
-		return rec.getValueByColumnName(Templates.DASTUDYID).equalsIgnoreCase("NULL")? 
-				"" : rec.getValueByColumnName(Templates.DASTUDYID);
+		return rec.getValueByColumnName(Templates.ACQ_DASTUDYID).equalsIgnoreCase("NULL")? 
+				"" : rec.getValueByColumnName(Templates.ACQ_DASTUDYID);
 	}
 
 	private String getDataDictionaryName(Record rec) {
-		String DDName = rec.getValueByColumnName(Templates.DATADICTIONARYNAME).equalsIgnoreCase("NULL")? 
-				"" : rec.getValueByColumnName(Templates.DATADICTIONARYNAME);
+		String DDName = rec.getValueByColumnName(Templates.ACQ_DATADICTIONARYNAME).equalsIgnoreCase("NULL")? 
+				"" : rec.getValueByColumnName(Templates.ACQ_DATADICTIONARYNAME);
 		return DDName.replace("SDD-","");
 	}
 
 	private Boolean isEpiData(Record rec) {
-		return rec.getValueByColumnName(Templates.EPILAB).equalsIgnoreCase("EPI");
+		return rec.getValueByColumnName(Templates.ACQ_EPILAB).equalsIgnoreCase("EPI");
 	}
 
 	@Override
-	Map<String, Object> createRow(Record rec, int row_number) throws Exception {
+	public Map<String, Object> createRow(Record rec, int rowNumber) throws Exception {
 		Map<String, Object> row = new HashMap<String, Object>();
 		row.put("hasURI", kbPrefix + "DA-" + getDataAcquisitionName(rec));
 		row.put("a", "hasco:DataAcquisition");
@@ -102,17 +102,17 @@ public class DataAcquisitionGenerator extends BasicGenerator {
 	}
 	
 	@Override
-	HADatAcThing createObject(Record rec, int row_number) throws Exception {
-		Map<String, Object> row = createRow(rec, row_number);
+	public HADatAcThing createObject(Record rec, int rowNumber) throws Exception {
+		Map<String, Object> row = createRow(rec, rowNumber);
 		
 		String ownerEmail = getOwnerEmail(rec);
 		if (ownerEmail.isEmpty()) {
-			throw new Exception(String.format("Owner Email is not specified for Row %s!", row_number));
+			throw new Exception(String.format("Owner Email is not specified for Row %s!", rowNumber));
 		}
 		
 		String permissionUri = getPermissionUri(rec);
 		if (permissionUri.isEmpty()) {
-			throw new Exception(String.format("Permission URI is not specified for Row %s!", row_number));
+			throw new Exception(String.format("Permission URI is not specified for Row %s!", rowNumber));
 		}
 
 		String deploymentUri = URIUtils.replacePrefixEx(kbPrefix + "DPL-" + getDataAcquisitionName(rec));
@@ -120,7 +120,7 @@ public class DataAcquisitionGenerator extends BasicGenerator {
 		return createDataAcquisition(row, ownerEmail, permissionUri, deploymentUri, isEpiData(rec));
 	}
 
-	ObjectAccessSpec createDataAcquisition(
+	private ObjectAccessSpec createDataAcquisition(
 	        Map<String, Object> row, 
 			String ownerEmail, 
 			String permissionUri, 

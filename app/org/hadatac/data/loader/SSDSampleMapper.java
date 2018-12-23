@@ -19,7 +19,7 @@ import org.hadatac.entity.pojo.StudyObject;
 import org.hadatac.metadata.loader.URIUtils;
 
 
-public class SSDSampleMapper extends BasicGenerator {
+public class SSDSampleMapper extends BaseGenerator {
 
     final String kbPrefix = ConfigProp.getKbPrefix();
     private int counter = 1;
@@ -198,7 +198,7 @@ public class SSDSampleMapper extends BasicGenerator {
     }
 
     @Override
-    public HADatAcThing createObject(Record rec, int row_number) throws Exception {
+    public HADatAcThing createObject(Record rec, int rowNumber) throws Exception {
         System.out.println("counter: " + counter);
         counter++;
         return createStudyObject(rec);

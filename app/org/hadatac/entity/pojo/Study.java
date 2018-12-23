@@ -381,15 +381,22 @@ public class Study extends HADatAcThing {
     public int hashCode() {
         return getUri().hashCode();
     }
-
+    
+    @Override
     public Map<HADatAcThing, List<HADatAcThing>> getTargetFacets(
+            Facet facet, FacetHandler facetHandler) {
+        return getTargetFacetsFromTripleStore(facet, facetHandler);
+    }
+
+    @Override
+    public Map<HADatAcThing, List<HADatAcThing>> getTargetFacetsFromTripleStore(
             Facet facet, FacetHandler facetHandler) {
         System.out.println("\nStudy facet: " + facet.toSolrQuery());
 
         String valueConstraint = "";
         if (!facet.getFacetValuesByField("study_uri_str").isEmpty()) {
             valueConstraint += " VALUES ?studyUri { " + stringify(
-                    facet.getFacetValuesByField("study_uri_str"), true) + " } \n";
+                    facet.getFacetValuesByField("study_uri_str")) + " } \n";
         }
 
         String query = "";

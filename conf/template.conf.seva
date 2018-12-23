@@ -1,5 +1,6 @@
 # Configure the template labels to be used to ingest metadata CSV files
 
+[STD]
 # STD Template (Study and SampleCollection)
 studyID=Study ID
 studyTitle=Title
@@ -29,6 +30,7 @@ updatedDate=Project Last Updated Date
 DCAccessBool=DC Access?
 externalSource=kikm ID
 
+[ACQ]
 # ACQ (DA and DEPLOYMENT) Template
 DataAcquisitionName=da name
 Method=method
@@ -38,10 +40,12 @@ Epi/Lab=epi/lab
 OwnerEmail=owner email
 PermissionURI=permission uri
 
+[OAS]
 # OAS Template
 DeploymentUri=deployment uri
 CellScope=cell scope
 
+[DASA]
 # DASA, DASE, DASO Template (Part of SDD)
 Label=Column 
 AttributeType=Attribute
@@ -55,12 +59,14 @@ InRelationTo=inRelationTo
 WasDerivedFrom=wasDerivedFrom
 WasGeneratedBy=wasGeneratedBy
 
+[PV]
 # PV Template (Part of SDD)
 Label=Column
 Code=Code
 CodeValue=Label
 Class=Class
 
+[SID]
 # SID Template
 sampleID=specimen_id
 sampleSuffix=suffix
@@ -72,6 +78,7 @@ samplingVolUnit=sample_quantity_uom
 storageTemp=sample_storage_temp
 FTcount=sample_freeze_thaw_cycles
 
+[MAP]
 # MAP Template
 originalPID=patient_id
 originalSID=specimen_id

@@ -73,7 +73,7 @@ var _onsheet = function(json, sheetnames, select_sheet_cb) {
   /* set up table headers */
   var L = 0;
   json.forEach(function(r) { if(L < r.length) L = r.length; });
-  console.log(L);
+  // console.log(L);
   for(var i = json[0].length; i < L; ++i) {
     json[0][i] = "";
   }

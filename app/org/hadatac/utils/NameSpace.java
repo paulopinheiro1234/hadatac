@@ -147,6 +147,8 @@ public class NameSpace {
     }
 	
 	public void loadTriples(String address, boolean fromRemote) {
+	    System.out.println("Loading triples from " + address);
+	    
         try {
             Repository repo = new SPARQLRepository(
                     CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_UPDATE));

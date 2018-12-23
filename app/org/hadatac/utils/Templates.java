@@ -1,84 +1,96 @@
 package org.hadatac.utils;
 
+import org.apache.commons.configuration2.INIConfiguration;
+
 public class Templates {
 	
     public static String TEMPLATE_FILE = ConfigProp.getTemplateFileName();
+    public static INIConfiguration iniConfig = new MyINIConfiguration(TEMPLATE_FILE);
 
     // STD Template (Study)                                                                     
-    public static String STUDYID = ConfigProp.getPropertyValue(TEMPLATE_FILE, "studyID"); // also in ACQ, PID and SID
-    public static String STUDYTITLE = ConfigProp.getPropertyValue(TEMPLATE_FILE, "studyTitle");
-    public static String STUDYAIMS = ConfigProp.getPropertyValue(TEMPLATE_FILE, "studyAims");
-    public static String STUDYSIGNIFICANCE = ConfigProp.getPropertyValue(TEMPLATE_FILE, "studySignificance");
-    public static String NUMSUBJECTS = ConfigProp.getPropertyValue(TEMPLATE_FILE, "numSubjects");
-    public static String NUMSAMPLES = ConfigProp.getPropertyValue(TEMPLATE_FILE, "numSamples");
-    public static String INSTITUTION = ConfigProp.getPropertyValue(TEMPLATE_FILE, "institution");
-    public static String PI = ConfigProp.getPropertyValue(TEMPLATE_FILE, "PI");
-    public static String PIADDRESS = ConfigProp.getPropertyValue(TEMPLATE_FILE, "PIAddress");
-    public static String PICITY = ConfigProp.getPropertyValue(TEMPLATE_FILE, "PICity");
-    public static String PISTATE = ConfigProp.getPropertyValue(TEMPLATE_FILE, "PIState");
-    public static String PIZIPCODE = ConfigProp.getPropertyValue(TEMPLATE_FILE, "PIZipCode");
-    public static String PIEMAIL = ConfigProp.getPropertyValue(TEMPLATE_FILE, "PIEmail");
-    public static String PIPHONE = ConfigProp.getPropertyValue(TEMPLATE_FILE, "PIPhone");
-    public static String CPI1FNAME = ConfigProp.getPropertyValue(TEMPLATE_FILE, "CPI1FName");
-    public static String CPI1LNAME = ConfigProp.getPropertyValue(TEMPLATE_FILE, "CPI1LName");
-    public static String CPI1EMAIL = ConfigProp.getPropertyValue(TEMPLATE_FILE, "CPI1Email");
-    public static String CPI2FNAME = ConfigProp.getPropertyValue(TEMPLATE_FILE, "CPI2FName");
-    public static String CPI2LNAME = ConfigProp.getPropertyValue(TEMPLATE_FILE, "CPI2LName");
-    public static String CPI2EMAIL = ConfigProp.getPropertyValue(TEMPLATE_FILE, "CPI2Email");
-    public static String CONTACTFNAME = ConfigProp.getPropertyValue(TEMPLATE_FILE, "contactFName");
-    public static String CONTACTLNAME = ConfigProp.getPropertyValue(TEMPLATE_FILE, "contactLName");
-    public static String CONTACTEMAIL = ConfigProp.getPropertyValue(TEMPLATE_FILE, "contactEmail");
-    public static String CREATEDDATE = ConfigProp.getPropertyValue(TEMPLATE_FILE, "createdDate");
-    public static String UPDATEDDATE = ConfigProp.getPropertyValue(TEMPLATE_FILE, "updatedDate");
-    public static String DCACCESSBOOL = ConfigProp.getPropertyValue(TEMPLATE_FILE, "DCAccessBool");
-    public static String EXTSRC = ConfigProp.getPropertyValue(TEMPLATE_FILE, "externalSource");
+    public static String STUDYID = iniConfig.getSection("STD").getString("studyID"); // also in ACQ, PID and SID
+    public static String STUDYTITLE = iniConfig.getSection("STD").getString("studyTitle");
+    public static String STUDYAIMS = iniConfig.getSection("STD").getString("studyAims");
+    public static String STUDYSIGNIFICANCE = iniConfig.getSection("STD").getString("studySignificance");
+    public static String NUMSUBJECTS = iniConfig.getSection("STD").getString("numSubjects");
+    public static String NUMSAMPLES = iniConfig.getSection("STD").getString("numSamples");
+    public static String INSTITUTION = iniConfig.getSection("STD").getString("institution");
+    public static String PI = iniConfig.getSection("STD").getString("PI");
+    public static String PIADDRESS = iniConfig.getSection("STD").getString("PIAddress");
+    public static String PICITY = iniConfig.getSection("STD").getString("PICity");
+    public static String PISTATE = iniConfig.getSection("STD").getString("PIState");
+    public static String PIZIPCODE = iniConfig.getSection("STD").getString("PIZipCode");
+    public static String PIEMAIL = iniConfig.getSection("STD").getString("PIEmail");
+    public static String PIPHONE = iniConfig.getSection("STD").getString("PIPhone");
+    public static String CPI1FNAME = iniConfig.getSection("STD").getString("CPI1FName");
+    public static String CPI1LNAME = iniConfig.getSection("STD").getString("CPI1LName");
+    public static String CPI1EMAIL = iniConfig.getSection("STD").getString("CPI1Email");
+    public static String CPI2FNAME = iniConfig.getSection("STD").getString("CPI2FName");
+    public static String CPI2LNAME = iniConfig.getSection("STD").getString("CPI2LName");
+    public static String CPI2EMAIL = iniConfig.getSection("STD").getString("CPI2Email");
+    public static String CONTACTFNAME = iniConfig.getSection("STD").getString("contactFName");
+    public static String CONTACTLNAME = iniConfig.getSection("STD").getString("contactLName");
+    public static String CONTACTEMAIL = iniConfig.getSection("STD").getString("contactEmail");
+    public static String CREATEDDATE = iniConfig.getSection("STD").getString("createdDate");
+    public static String UPDATEDDATE = iniConfig.getSection("STD").getString("updatedDate");
+    public static String DCACCESSBOOL = iniConfig.getSection("STD").getString("DCAccessBool");
+    public static String EXTSRC = iniConfig.getSection("STD").getString("externalSource");
+    
+    // ACQ Template
+    public static String ACQ_DATAACQUISITIONNAME = iniConfig.getSection("ACQ").getString("DataAcquisitionName");
+    public static String ACQ_METHOD = iniConfig.getSection("ACQ").getString("Method");
+    public static String ACQ_DASTUDYID = iniConfig.getSection("ACQ").getString("DAStudyName");
+    public static String ACQ_DATADICTIONARYNAME = iniConfig.getSection("ACQ").getString("DataDictionaryName");
+    public static String ACQ_EPILAB = iniConfig.getSection("ACQ").getString("Epi/Lab");
+    public static String ACQ_OWNEREMAIL = iniConfig.getSection("ACQ").getString("OwnerEmail");
+    public static String ACQ_PERMISSIONURI = iniConfig.getSection("ACQ").getString("PermissionURI");
     
     // OAS Template
-    public static String DATAACQUISITIONNAME = ConfigProp.getPropertyValue(TEMPLATE_FILE, "DataAcquisitionName");
-    public static String METHOD = ConfigProp.getPropertyValue(TEMPLATE_FILE, "Method");
-    public static String DATADICTIONARYNAME = ConfigProp.getPropertyValue(TEMPLATE_FILE, "DataDictionaryName");
-    public static String DASTUDYID = ConfigProp.getPropertyValue(TEMPLATE_FILE, "DAStudyName");
-    public static String EPILAB = ConfigProp.getPropertyValue(TEMPLATE_FILE, "Epi/Lab");
-    public static String OWNEREMAIL = ConfigProp.getPropertyValue(TEMPLATE_FILE, "OwnerEmail");
-    public static String PERMISSIONURI = ConfigProp.getPropertyValue(TEMPLATE_FILE, "PermissionURI");
-    public static String DEPLOYMENTURI = ConfigProp.getPropertyValue(TEMPLATE_FILE, "DeploymentUri");
-    //public static String ROWSCOPE = ConfigProp.getPropertyValue(TEMPLATE_FILE, "RowScope");
-    public static String CELLSCOPE = ConfigProp.getPropertyValue(TEMPLATE_FILE, "CellScope");
+    public static String DATAACQUISITIONNAME = iniConfig.getSection("OAS").getString("DataAcquisitionName");
+    public static String METHOD = iniConfig.getSection("OAS").getString("Method");
+    public static String DATADICTIONARYNAME = iniConfig.getSection("OAS").getString("DataDictionaryName");
+    public static String DASTUDYID = iniConfig.getSection("OAS").getString("DAStudyName");
+    public static String EPILAB = iniConfig.getSection("OAS").getString("Epi/Lab");
+    public static String OWNEREMAIL = iniConfig.getSection("OAS").getString("OwnerEmail");
+    public static String PERMISSIONURI = iniConfig.getSection("OAS").getString("PermissionURI");
+    public static String DEPLOYMENTURI = iniConfig.getSection("OAS").getString("DeploymentUri");
+    public static String ROWSCOPE = iniConfig.getSection("OAS").getString("RowScope");
+    public static String CELLSCOPE = iniConfig.getSection("OAS").getString("CellScope");
 
-    // DASA, DASE, DASO Template (Part of SDD)                                                                       
-    public static String LABEL = ConfigProp.getPropertyValue(TEMPLATE_FILE, "Label");     // also in PV                                                                                   
-    public static String ATTRIBUTETYPE = ConfigProp.getPropertyValue(TEMPLATE_FILE, "AttributeType");
-    public static String ATTTRIBUTEOF = ConfigProp.getPropertyValue(TEMPLATE_FILE, "AttributeOf");
-    public static String UNIT = ConfigProp.getPropertyValue(TEMPLATE_FILE, "Unit");
-    public static String TIME = ConfigProp.getPropertyValue(TEMPLATE_FILE, "Time");
-    public static String ENTITY = ConfigProp.getPropertyValue(TEMPLATE_FILE, "Entity");
-    public static String ROLE = ConfigProp.getPropertyValue(TEMPLATE_FILE, "Role");
-    public static String RELATION = ConfigProp.getPropertyValue(TEMPLATE_FILE, "Relation");
-    public static String INRELATIONTO = ConfigProp.getPropertyValue(TEMPLATE_FILE, "InRelationTo");
-    public static String WASDERIVEDFROM = ConfigProp.getPropertyValue(TEMPLATE_FILE, "WasDerivedFrom");
-    public static String WASGENERATEDBY = ConfigProp.getPropertyValue(TEMPLATE_FILE, "WasGeneratedBy");
+    // DASA, DASE, DASO Template (Part of SDD)
+    public static String LABEL = iniConfig.getSection("DASA").getString("Label");     // also in PV                                                                                   
+    public static String ATTRIBUTETYPE = iniConfig.getSection("DASA").getString("AttributeType");
+    public static String ATTTRIBUTEOF = iniConfig.getSection("DASA").getString("AttributeOf");
+    public static String UNIT = iniConfig.getSection("DASA").getString("Unit");
+    public static String TIME = iniConfig.getSection("DASA").getString("Time");
+    public static String ENTITY = iniConfig.getSection("DASA").getString("Entity");
+    public static String ROLE = iniConfig.getSection("DASA").getString("Role");
+    public static String RELATION = iniConfig.getSection("DASA").getString("Relation");
+    public static String INRELATIONTO = iniConfig.getSection("DASA").getString("InRelationTo");
+    public static String WASDERIVEDFROM = iniConfig.getSection("DASA").getString("WasDerivedFrom");
+    public static String WASGENERATEDBY = iniConfig.getSection("DASA").getString("WasGeneratedBy");
     
     // PV Template (Part of SDD)                                                                                     
-    public static String CODE = ConfigProp.getPropertyValue(TEMPLATE_FILE, "Code");
-    public static String CODEVALUE = ConfigProp.getPropertyValue(TEMPLATE_FILE, "CodeValue");
-    public static String CLASS = ConfigProp.getPropertyValue(TEMPLATE_FILE, "Class");
+    public static String CODE = iniConfig.getSection("PV").getString("Code");
+    public static String CODEVALUE = iniConfig.getSection("PV").getString("CodeValue");
+    public static String CLASS = iniConfig.getSection("PV").getString("Class");
     
     // SID Template                                                                                                    
-    public static String SAMPLEID = ConfigProp.getPropertyValue(TEMPLATE_FILE, "sampleID");                      
-    public static String SAMPLESTUDYID = ConfigProp.getPropertyValue(TEMPLATE_FILE, "sampleStudyID");
-    public static String SAMPLESUFFIX = ConfigProp.getPropertyValue(TEMPLATE_FILE, "sampleSuffix");
-    public static String SUBJECTID = ConfigProp.getPropertyValue(TEMPLATE_FILE, "subjectID");  // also in PID                                                                             
-    public static String SAMPLETYPE = ConfigProp.getPropertyValue(TEMPLATE_FILE, "sampleType");
-    public static String SAMPLINGMETHOD = ConfigProp.getPropertyValue(TEMPLATE_FILE, "samplingMethod");
-    public static String SAMPLINGVOL = ConfigProp.getPropertyValue(TEMPLATE_FILE, "samplingVol");
-    public static String SAMPLINGVOLUNIT = ConfigProp.getPropertyValue(TEMPLATE_FILE, "samplingVolUnit");
-    public static String STORAGETEMP = ConfigProp.getPropertyValue(TEMPLATE_FILE, "storageTemp");
-    public static String FTCOUNT = ConfigProp.getPropertyValue(TEMPLATE_FILE, "FTcount");
+    public static String SAMPLEID = iniConfig.getSection("SID").getString("sampleID");                      
+    public static String SAMPLESTUDYID = iniConfig.getSection("SID").getString("sampleStudyID");
+    public static String SAMPLESUFFIX = iniConfig.getSection("SID").getString("sampleSuffix");
+    public static String SUBJECTID = iniConfig.getSection("SID").getString("subjectID");  // also in PID                                                                             
+    public static String SAMPLETYPE = iniConfig.getSection("SID").getString("sampleType");
+    public static String SAMPLINGMETHOD = iniConfig.getSection("SID").getString("samplingMethod");
+    public static String SAMPLINGVOL = iniConfig.getSection("SID").getString("samplingVol");
+    public static String SAMPLINGVOLUNIT = iniConfig.getSection("SID").getString("samplingVolUnit");
+    public static String STORAGETEMP = iniConfig.getSection("SID").getString("storageTemp");
+    public static String FTCOUNT = iniConfig.getSection("SID").getString("FTcount");
     
     // MAP Template                                                                                                  
-    public static String ORIGINALPID = ConfigProp.getPropertyValue(TEMPLATE_FILE, "originalPID");
-    public static String ORIGINALSID = ConfigProp.getPropertyValue(TEMPLATE_FILE, "originalSID");
-    public static String OBJECTTYPE = ConfigProp.getPropertyValue(TEMPLATE_FILE, "objecttype");
-    public static String MAPSTUDYID = ConfigProp.getPropertyValue(TEMPLATE_FILE, "studyId");
-    public static String TIMESCOPEID = ConfigProp.getPropertyValue(TEMPLATE_FILE, "timeScope");
+    public static String ORIGINALPID = iniConfig.getSection("MAP").getString("originalPID");
+    public static String ORIGINALSID = iniConfig.getSection("MAP").getString("originalSID");
+    public static String OBJECTTYPE = iniConfig.getSection("MAP").getString("objecttype");
+    public static String MAPSTUDYID = iniConfig.getSection("MAP").getString("studyId");
+    public static String TIMESCOPEID = iniConfig.getSection("MAP").getString("timeScope");
 }

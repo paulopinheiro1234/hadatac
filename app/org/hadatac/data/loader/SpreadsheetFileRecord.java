@@ -35,9 +35,9 @@ public class SpreadsheetFileRecord implements Record {
     public String getValueByColumnIndex(int index) {
         String value = "";
         try {
-            value = row.getCell(index).toString();
+            value = row.getCell(index).toString().trim();
         } catch (Exception e) {
-            System.out.println("row " + row.getRowNum() + ", column index " + index + " not valid!");
+            // System.out.println("row " + row.getRowNum() + ", column index " + index + " not valid!");
         }
 
         return value;

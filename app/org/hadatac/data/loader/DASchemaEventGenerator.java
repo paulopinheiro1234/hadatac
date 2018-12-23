@@ -15,7 +15,7 @@ import java.util.Map.Entry;
 import java.util.stream.Collectors;
 
 
-public class DASchemaEventGenerator extends BasicGenerator {
+public class DASchemaEventGenerator extends BaseGenerator {
 
 	final String kbPrefix = ConfigProp.getKbPrefix();
 	String startTime = "";
@@ -130,7 +130,7 @@ public class DASchemaEventGenerator extends BasicGenerator {
 	}
 	
 	@Override
-    HADatAcThing createObject(Record rec, int row_number) throws Exception {
+	public HADatAcThing createObject(Record rec, int rowNumber) throws Exception {
 	    if (timeList.contains(getLabel(rec)) && getLabel(rec).length() > 0){
 	        return createDASEObject(rec);
         }
@@ -198,7 +198,7 @@ public class DASchemaEventGenerator extends BasicGenerator {
 		return result;
 	}
 	
-	Map<String, Object> createTimeLineRow(Entry<String, Map<String, String>> entry, int row_number) throws Exception {
+	Map<String, Object> createTimeLineRow(Entry<String, Map<String, String>> entry, int rowNumber) throws Exception {
 		Map<String, Object> row = new HashMap<String, Object>();
 		row.put("hasURI", kbPrefix + "DASE-" + SDDName + "-" + entry.getKey().trim().replace(" ","").replace("_","-").replace("??", "").replace(":", "-"));
 		row.put("a", "hasco:DASchemaEvent");

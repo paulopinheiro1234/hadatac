@@ -38,6 +38,7 @@ import org.hadatac.metadata.loader.LabkeyDataHandler;
 import org.hadatac.metadata.loader.URIUtils;
 import org.hadatac.utils.ConfigProp;
 import org.hadatac.utils.Feedback;
+import org.hadatac.utils.NameSpace;
 import org.labkey.remoteapi.CommandException;
 
 import be.objectify.deadbolt.java.actions.Group;
@@ -59,29 +60,29 @@ public class AutoAnnotator extends Controller {
     public Result index() {		
         final SysUser user = AuthApplication.getLocalUser(session());
 
-        List<DataFile> proc_files = null;
-        List<DataFile> unproc_files = null;
+        List<DataFile> procFiles = null;
+        List<DataFile> unprocFiles = null;
         List<String> studyURIs = new ArrayList<String>();
 
-        String path_proc = ConfigProp.getPathProc();
-        String path_unproc = ConfigProp.getPathUnproc();
+        String pathProc = ConfigProp.getPathProc();
+        String pathUnproc = ConfigProp.getPathUnproc();
 
         if (user.isDataManager()) {
-            proc_files = DataFile.findAll(DataFile.PROCESSED);
-            unproc_files = DataFile.findAll(DataFile.UNPROCESSED);
-            unproc_files.addAll(DataFile.findAll(DataFile.FREEZED));
-            DataFile.includeUnrecognizedFiles(path_unproc, unproc_files);
-            DataFile.includeUnrecognizedFiles(path_proc, proc_files);
+            procFiles = DataFile.findAll(DataFile.PROCESSED);
+            unprocFiles = DataFile.findAll(DataFile.UNPROCESSED);
+            unprocFiles.addAll(DataFile.findAll(DataFile.FREEZED));
+            DataFile.includeUnrecognizedFiles(pathUnproc, unprocFiles);
+            DataFile.includeUnrecognizedFiles(pathProc, procFiles);
         } else {
-            proc_files = DataFile.find(user.getEmail(), DataFile.PROCESSED);
-            unproc_files = DataFile.find(user.getEmail(), DataFile.UNPROCESSED);
-            unproc_files.addAll(DataFile.find(user.getEmail(), DataFile.FREEZED));
+            procFiles = DataFile.find(user.getEmail(), DataFile.PROCESSED);
+            unprocFiles = DataFile.find(user.getEmail(), DataFile.UNPROCESSED);
+            unprocFiles.addAll(DataFile.find(user.getEmail(), DataFile.FREEZED));
         }
 
-        DataFile.filterNonexistedFiles(path_proc, proc_files);
-        DataFile.filterNonexistedFiles(path_unproc, unproc_files);
+        DataFile.filterNonexistedFiles(pathProc, procFiles);
+        DataFile.filterNonexistedFiles(pathUnproc, unprocFiles);
 
-        for (DataFile dataFile : proc_files) {
+        for (DataFile dataFile : procFiles) {
             if (!dataFile.getStudyUri().isEmpty() && !studyURIs.contains(dataFile.getStudyUri())) {
                 studyURIs.add(dataFile.getStudyUri());
             }
@@ -99,7 +100,7 @@ public class AutoAnnotator extends Controller {
             bStarted = true;
         }
 
-        return ok(autoAnnotator.render(unproc_files, proc_files, studyURIs, bStarted, user.isDataManager()));
+        return ok(autoAnnotator.render(unprocFiles, procFiles, studyURIs, bStarted, user.isDataManager()));
     }
 
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
@@ -239,7 +240,7 @@ public class AutoAnnotator extends Controller {
             cred.setPassword(password);
             cred.save();
         } catch(CommandException e) {
-            if(e.getMessage().equals("Unauthorized")){
+            if("Unauthorized".equals(e.getMessage())){
                 return ok(syncLabkey.render("login_failed", "", ""));
             }
         }
@@ -295,13 +296,14 @@ public class AutoAnnotator extends Controller {
             return badRequest("You do NOT have the permission to operate this file!");
         }
 
-        String path_proc = ConfigProp.getPathProc();
-        String path_unproc = ConfigProp.getPathUnproc();
-        File file = new File(path_proc + "/" + fileName);
+        String pathProc = ConfigProp.getPathProc();
+        String pathUnproc = ConfigProp.getPathUnproc();
+        File file = new File(pathProc + "/" + fileName);
 
         String pureFileName = Paths.get(fileName).getFileName().toString();
         if (pureFileName.startsWith("DA-")) {
-            Measurement.delete(dataFile.getDatasetUri());
+            Measurement.deleteFromSolr(dataFile.getDatasetUri());
+            NameSpace.deleteTriplesByNamedGraph(URIUtils.replacePrefixEx(dataFile.getDataAcquisitionUri()));
         } else {
             deleteAddedTriples(file);
         }
@@ -312,7 +314,7 @@ public class AutoAnnotator extends Controller {
         dataFile.setCompletionTime("");
         dataFile.save();
 
-        File destFolder = new File(path_unproc);
+        File destFolder = new File(pathUnproc);
         if (!destFolder.exists()){
             destFolder.mkdirs();
         }
@@ -375,7 +377,8 @@ public class AutoAnnotator extends Controller {
 
         String pureFileName = Paths.get(fileName).getFileName().toString();
         if (pureFileName.startsWith("DA-")) {
-            Measurement.delete(dataFile.getDatasetUri());
+            Measurement.deleteFromSolr(dataFile.getDatasetUri());
+            NameSpace.deleteTriplesByNamedGraph(URIUtils.replacePrefixEx(dataFile.getDataAcquisitionUri()));
         } else {
             try {
                 deleteAddedTriples(file);
@@ -448,6 +451,7 @@ public class AutoAnnotator extends Controller {
         } else {
             path = ConfigProp.getPathUnproc();
         }
+        
         return ok(new File(path + "/" + file_name));
     }
 
@@ -463,7 +467,8 @@ public class AutoAnnotator extends Controller {
             String resumableRelativePath) {
         if (ResumableUpload.uploadFileByChunking(request(), 
                 ConfigProp.getPathUnproc())) {
-            return ok("Uploaded."); //This Chunk has been Uploaded.
+            //This Chunk has been Uploaded.
+            return ok("Uploaded.");
         } else {
             return status(HttpStatus.SC_NOT_FOUND);
         }

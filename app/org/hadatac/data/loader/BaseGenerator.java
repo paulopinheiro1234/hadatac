@@ -31,7 +31,7 @@ import org.hadatac.utils.LabKeyException;
 import org.labkey.remoteapi.CommandException;
 
 
-public abstract class BasicGenerator {
+public abstract class BaseGenerator {
 
     protected List<Record> records = null;
     protected RecordFile file;
@@ -45,7 +45,7 @@ public abstract class BasicGenerator {
     protected String studyUri = "";
     protected String namedGraphUri = "";
     
-    public BasicGenerator(RecordFile file) {
+    public BaseGenerator(RecordFile file) {
         this.file = file;
         records = file.getRecords();
         fileName = file.getFile().getName();
@@ -81,9 +81,9 @@ public abstract class BasicGenerator {
         this.namedGraphUri = namedGraphUri;
     }
     
-    Map<String, Object> createRow(Record rec, int row_number) throws Exception { return null; }
+    public Map<String, Object> createRow(Record rec, int rowNumber) throws Exception { return null; }
 
-    HADatAcThing createObject(Record rec, int row_number) throws Exception { return null; }
+    public HADatAcThing createObject(Record rec, int rowNumber) throws Exception { return null; }
 
     public List<Map<String, Object>> getRows() {
         return rows;
@@ -101,9 +101,9 @@ public abstract class BasicGenerator {
             return;
         }
 
-        int row_number = 0;
+        int rowNumber = 0;
         for (Record record : records) {
-            Map<String, Object> tempRow = createRow(record, ++row_number);
+            Map<String, Object> tempRow = createRow(record, ++rowNumber);
             if (tempRow != null) {
                 rows.add(tempRow);
             }
@@ -115,9 +115,9 @@ public abstract class BasicGenerator {
             return;
         }
 
-        int row_number = 0;
+        int rowNumber = 0;
         for (Record record : records) {
-            HADatAcThing obj = createObject(record, ++row_number);
+            HADatAcThing obj = createObject(record, ++rowNumber);
             if (obj != null) {
                 objects.add(obj);
             }
@@ -140,6 +140,7 @@ public abstract class BasicGenerator {
         }
     }
 
+    @Override
     public String toString() {
         if (rows.isEmpty()) {
             return "";
@@ -161,8 +162,13 @@ public abstract class BasicGenerator {
         
         return result;
     }
+    
+    @SuppressWarnings("unused")
+    private Model createModel(List<Map<String, Object>> rows) {
+        return createModel(rows, "");
+    }
 
-    public Model createModel(List<Map<String, Object>> rows, String namedGraphUri) {        
+    private Model createModel(List<Map<String, Object>> rows, String namedGraphUri) {        
         ModelFactory modelFactory = new LinkedHashModelFactory();
         Model model = modelFactory.createEmptyModel();
 
@@ -175,9 +181,9 @@ public abstract class BasicGenerator {
         for (Map<String, Object> row : rows) {
             IRI sub = factory.createIRI(URIUtils.replacePrefixEx((String)row.get("hasURI")));
             for (String key : row.keySet()) {
-                if (!key.equals("hasURI")) {
+                if (!"hasURI".equals(key)) {
                     IRI pred = null;
-                    if (key.equals("a")) {
+                    if ("a".equals(key)) {
                         pred = factory.createIRI(URIUtils.replacePrefixEx("rdf:type"));
                     } else {
                         pred = factory.createIRI(URIUtils.replacePrefixEx(key));
@@ -232,7 +238,6 @@ public abstract class BasicGenerator {
     }
 
     public boolean commitRowsToLabKey(List<Map<String, Object>> rows) {
-        AnnotationLog log = AnnotationLog.create(fileName);
         if (rows.isEmpty()) {
             return true;
         }
@@ -240,30 +245,29 @@ public abstract class BasicGenerator {
         try {
             checkRows(rows, "hasURI");
         } catch (Exception e) {
-            log.addline(Feedback.println(Feedback.WEB, String.format(
-                    "[ERROR] Trying to commit invalid rows to LabKey Table %s: ", getTableName())
-                    + e.getMessage()));
+            AnnotationLog.printException(String.format(
+                    "Trying to commit invalid rows to LabKey Table %s: ", getTableName())
+                    + e.getMessage(), fileName);
         }
 
         Credential cred = Credential.find();
         if (null == cred) {
-            log.resetLog();
-            log.addline(Feedback.println(Feedback.WEB, "[ERROR] No LabKey credentials are provided!"));
+            AnnotationLog.printException("No LabKey credentials are provided!", fileName);
         }
 
         LabkeyDataHandler labkeyDataHandler = LabkeyDataHandler.createDefault(
                 cred.getUserName(), cred.getPassword());
         try {
             int nRows = labkeyDataHandler.insertRows(getTableName(), rows);
-            log.addline(Feedback.println(Feedback.WEB, String.format(
-                    "[OK] %d row(s) have been inserted into Table %s ", nRows, getTableName())));
+            AnnotationLog.println(String.format(
+                    "%d row(s) have been inserted into Table %s ", nRows, getTableName()), fileName);
         } catch (CommandException e1) {
             try {
                 labkeyDataHandler.deleteRows(getTableName(), rows);
                 int nRows = labkeyDataHandler.insertRows(getTableName(), rows);
-                log.addline(Feedback.println(Feedback.WEB, String.format("[OK] %d row(s) have been updated into Table %s ", nRows, getTableName())));
+                AnnotationLog.println(String.format("%d row(s) have been updated into Table %s ", nRows, getTableName()), fileName);
             } catch (CommandException e) {
-                log.addline(Feedback.println(Feedback.WEB, "[ERROR] CommitRows inside AutoAnnotator: " + e));
+                AnnotationLog.printException("CommitRows inside AutoAnnotator: " + e, fileName);
             }
         }
 
@@ -281,9 +285,7 @@ public abstract class BasicGenerator {
         con.add(model);
 
         if (model.size() > 0) {
-            AnnotationLog log = AnnotationLog.create(fileName);
-            log.addline(Feedback.println(Feedback.WEB, 
-                    String.format("[OK] %d triple(s) have been committed to triple store", model.size())));
+            AnnotationLog.println(String.format("%d triple(s) have been committed to triple store", model.size()), fileName);
         }
 
         return true;
@@ -301,9 +303,7 @@ public abstract class BasicGenerator {
         }
 
         if (count > 0) {
-            AnnotationLog log = AnnotationLog.create(fileName);
-            log.addline(Feedback.println(Feedback.WEB, 
-                    String.format("[OK] %d object(s) have been committed to LabKey", count)));
+            AnnotationLog.println(String.format("%d object(s) have been committed to LabKey", count), fileName);
         }
     }
 
@@ -318,9 +318,7 @@ public abstract class BasicGenerator {
         }
 
         if (count > 0) {
-            AnnotationLog log = AnnotationLog.create(fileName);
-            log.addline(Feedback.println(Feedback.WEB, 
-                    String.format("[OK] %d object(s) have been committed to triple store", count)));
+            AnnotationLog.println(String.format("%d object(s) have been committed to triple store", count), fileName);
         }
 
         return true;
@@ -335,9 +333,7 @@ public abstract class BasicGenerator {
         }
 
         if (count > 0) {
-            AnnotationLog log = AnnotationLog.create(fileName);
-            log.addline(Feedback.println(Feedback.WEB, 
-                    String.format("[OK] %d object(s) have been committed to solr", count)));
+            AnnotationLog.println(String.format("%d object(s) have been committed to solr", count), fileName);
         }
 
         return true;
@@ -359,8 +355,6 @@ public abstract class BasicGenerator {
             return;
         }
 
-        AnnotationLog log = AnnotationLog.create(fileName);
-
         checkRows(rows, "hasURI");
 
         Credential cred = Credential.find();
@@ -373,7 +367,7 @@ public abstract class BasicGenerator {
         try {
             labkeyDataHandler.deleteRows(getTableName(), rows);
         } catch (CommandException e) {
-            log.addline(Feedback.println(Feedback.WEB, "[ERROR] Delete rows from LabKey: " + e));
+            AnnotationLog.printException("Delete rows from LabKey: " + e, fileName);
             throw new LabKeyException("[ERROR] Delete rows from LabKey: " + e);
         }
     }

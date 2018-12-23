@@ -35,8 +35,14 @@ public class InRelationToInstance extends HADatAcThing implements Comparable<InR
     public int hashCode() {
         return getUri().hashCode();
     }
-
+    
+    @Override
     public Map<HADatAcThing, List<HADatAcThing>> getTargetFacets(
+            Facet facet, FacetHandler facetHandler) {
+        return getTargetFacetsFromSolr(facet, facetHandler);
+    }
+
+    public Map<HADatAcThing, List<HADatAcThing>> getTargetFacetsFromSolr(
             Facet facet, FacetHandler facetHandler) {
 
         SolrQuery query = new SolrQuery();
@@ -59,7 +65,7 @@ public class InRelationToInstance extends HADatAcThing implements Comparable<InR
             Pivot pivot = Pivot.parseQueryResponse(queryResponse);
             return parsePivot(pivot, facet);
         } catch (Exception e) {
-            System.out.println("[ERROR] InRelationToInstance.getTargetFacets() - Exception message: " + e.getMessage());
+            System.out.println("[ERROR] InRelationToInstance.getTargetFacetsFromSolr() - Exception message: " + e.getMessage());
         }
 
         return null;

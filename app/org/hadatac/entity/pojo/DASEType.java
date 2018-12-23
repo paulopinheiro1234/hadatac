@@ -37,14 +37,21 @@ public class DASEType extends HADatAcThing implements Comparable<DASEType> {
     public int hashCode() {
         return getUri().hashCode();
     }
-
+    
+    @Override
     public Map<HADatAcThing, List<HADatAcThing>> getTargetFacets(
+            Facet facet, FacetHandler facetHandler) {
+        return getTargetFacetsFromTripleStore(facet, facetHandler);
+    }
+
+    @Override
+    public Map<HADatAcThing, List<HADatAcThing>> getTargetFacetsFromTripleStore(
             Facet facet, FacetHandler facetHandler) {
         
         String valueConstraint = "";
         if (!facet.getFacetValuesByField("dase_type_uri_str").isEmpty()) {
             valueConstraint += " VALUES ?daseTypeUri { " + stringify(
-                    facet.getFacetValuesByField("dase_type_uri_str"), true) + " } \n ";
+                    facet.getFacetValuesByField("dase_type_uri_str")) + " } \n ";
         }
         
         facet.clearFieldValues("dase_type_uri_str");
@@ -63,7 +70,7 @@ public class DASEType extends HADatAcThing implements Comparable<DASEType> {
                 + " ?daseTypeUri rdfs:label ?daseTypeLabel . \n"
                 + "}";
         
-        System.out.println("DASE query: " + query);
+        // System.out.println("DASE query: " + query);
         
         Map<HADatAcThing, List<HADatAcThing>> mapTypeToInstanceList = new HashMap<HADatAcThing, List<HADatAcThing>>();
         try {

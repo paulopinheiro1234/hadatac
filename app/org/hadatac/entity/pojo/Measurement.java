@@ -16,8 +16,13 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.jena.query.QueryParseException;
 import org.apache.jena.query.QuerySolution;
 import org.apache.jena.query.ResultSetRewindable;
+import org.apache.jena.update.UpdateExecutionFactory;
+import org.apache.jena.update.UpdateFactory;
+import org.apache.jena.update.UpdateProcessor;
+import org.apache.jena.update.UpdateRequest;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrRequest;
@@ -55,6 +60,8 @@ public class Measurement extends HADatAcThing implements Runnable {
     private String objectUri;
     @Field("study_object_uri_str")
     private String studyObjectUri;
+    @Field("study_object_type_uri_str")
+    private String studyObjectTypeUri;
     @Field("timestamp_date")
     private Date timestamp;
     @Field("named_time_str")
@@ -73,8 +80,8 @@ public class Measurement extends HADatAcThing implements Runnable {
     private String pid;
     @Field("sid_str")
     private String sid;
-    @Field("role_uri_str")
-    private String roleUri;
+    @Field("role_str")
+    private String role;
     @Field("unit_uri_str")
     private String unitUri;
     @Field("daso_uri_str")
@@ -85,8 +92,6 @@ public class Measurement extends HADatAcThing implements Runnable {
     private String inRelationToUri;
     @Field("entity_uri_str")
     private String entityUri;
-    //@Field("characteristic_uri_str")
-    //private String characteristicUri;
     @Field("characteristic_uri_str_multi")
     private List<String> characteristicUris;
     @Field("location_latlong")
@@ -107,7 +112,7 @@ public class Measurement extends HADatAcThing implements Runnable {
     private String strTimestamp;
 
     public Measurement() {
-    	characteristicUris = new ArrayList<String>();
+        characteristicUris = new ArrayList<String>();
     }
 
     public String getOwnerUri() {
@@ -157,6 +162,14 @@ public class Measurement extends HADatAcThing implements Runnable {
     public void setStudyObjectUri(String studyObjectUri) {
         this.studyObjectUri = studyObjectUri;
     }
+    
+    public String getStudyObjectTypeUri() {
+        return studyObjectTypeUri;
+    }
+
+    public void setStudyObjectTypeUri(String studyObjectTypeUri) {
+        this.studyObjectTypeUri = studyObjectTypeUri;
+    }
 
     public void setPID(String objectUri) {
         this.pid = objectUri;
@@ -166,12 +179,12 @@ public class Measurement extends HADatAcThing implements Runnable {
         this.sid = objectUri;
     }
 
-    public String getRoleUri() {
-        return roleUri;
+    public String getRole() {
+        return role;
     }
 
-    public void setRoleUri(String roleUri) {
-        this.roleUri = roleUri;
+    public void setRole(String role) {
+        this.role = role;
     }
 
     public String getObjectPID() {
@@ -288,7 +301,7 @@ public class Measurement extends HADatAcThing implements Runnable {
     public void setOriginalValue(String originalValue) {
         this.originalValue = originalValue;
     }
-    
+
     public String getLevelOfDetection() {
         return levelOfDetection;
     }
@@ -361,14 +374,6 @@ public class Measurement extends HADatAcThing implements Runnable {
         this.characteristic = characteristic;
     }
 
-    /*public String getCharacteristicUri() {
-        return characteristicUri;
-    }
-
-    public void setCharacteristicUri(String characteristicUri) {
-        this.characteristicUri = characteristicUri;
-    }*/
-
     public List<String> getCharacteristicUris() {
         return characteristicUris;
     }
@@ -376,7 +381,7 @@ public class Measurement extends HADatAcThing implements Runnable {
     public void addCharacteristicUris(String characteristicUri) {
         this.characteristicUris.add(characteristicUri);
     }
-    
+
     public void setCharacteristicUris(List<String> characteristicUris) {
         this.characteristicUris = characteristicUris;
     }
@@ -421,7 +426,7 @@ public class Measurement extends HADatAcThing implements Runnable {
         }
     }
 
-    public static int delete(String datasetUri) {
+    public static int deleteFromSolr(String datasetUri) {
         SolrClient solr = new HttpSolrClient.Builder(
                 CollectionUtil.getCollectionPath(CollectionUtil.Collection.DATA_ACQUISITION)).build();
         try {
@@ -579,7 +584,7 @@ public class Measurement extends HADatAcThing implements Runnable {
         }
 
         System.out.println("facets for measurement's find(); " + facets);
-        
+
         FacetHandler facetHandler = new FacetHandler();
         facetHandler.loadFacets(facets);
 
@@ -606,7 +611,7 @@ public class Measurement extends HADatAcThing implements Runnable {
         String q = buildQuery(ownedDAs, facetHandler);
 
         //System.out.println("measurement solr query: " + q);
-        
+
         SolrQuery query = new SolrQuery();
         query.setQuery(q);
         if (page != -1) {
@@ -645,7 +650,7 @@ public class Measurement extends HADatAcThing implements Runnable {
             //for (Pivot p : pivot.children) {
             //	System.out.println("Field: " + p.getField() + "   Value: " + p.getValue());
             //}
-            
+
             result.extra_facets.put(FacetHandler.SUBJECT_CHARACTERISTIC_FACET, pivot);
 
             Set<String> uri_set = new HashSet<String>();
@@ -692,11 +697,9 @@ public class Measurement extends HADatAcThing implements Runnable {
                 facetHandler);
 
         FacetTree fTreeOC = new FacetTree();
-        fTreeOC.setTargetFacet(EntityRoleFromSSD.class);
-        fTreeOC.addUpperFacet(ObjectCollection.class);
-        //fTreeOC.setTargetFacet(ObjectCollection.class);
-        //fTreeOC.setTargetFacet(StudyObject.class);
-        //fTreeOC.addUpperFacet(ObjectCollection.class);
+        fTreeOC.setTargetFacet(StudyObjectRole.class);
+        fTreeOC.addUpperFacet(ObjectCollectionType.class);
+        fTreeOC.addUpperFacet(StudyObjectType.class);
         Pivot pivotOC = getFacetStats(fTreeOC, 
                 retFacetHandler.getFacetByName(FacetHandler.OBJECT_COLLECTION_FACET), 
                 facetHandler);
@@ -705,7 +708,7 @@ public class Measurement extends HADatAcThing implements Runnable {
         fTreeEC.setTargetFacet(AttributeInstance.class);
         fTreeEC.addUpperFacet(Indicator.class);
         fTreeEC.addUpperFacet(EntityRole.class);
-        //fTreeEC.addUpperFacet(EntityRoleFromSSD.class);
+        //fTreeEC.addUpperFacet(StudyObjectRole.class);
         fTreeEC.addUpperFacet(EntityInstance.class);
         fTreeEC.addUpperFacet(InRelationToInstance.class);
         Pivot pivotEC = getFacetStats(fTreeEC, 
@@ -825,7 +828,7 @@ public class Measurement extends HADatAcThing implements Runnable {
         if (uris.isEmpty()) {
             return results;
         } else {
-            valueConstraint = " VALUES ?uri { " + HADatAcThing.stringify(validURIs, true) + " } ";
+            valueConstraint = " VALUES ?uri { " + HADatAcThing.stringify(validURIs) + " } ";
         }
 
         String query = "";
@@ -887,7 +890,7 @@ public class Measurement extends HADatAcThing implements Runnable {
         if (cache.containsKey(getEntityUri())) {
             setEntity(cache.get(getEntityUri()));
         }
-        
+
         List<String> attributes = new ArrayList<String>();
         for (String attributeUri : getCharacteristicUris()) {
             if (cache.containsKey(attributeUri)) {
@@ -899,7 +902,7 @@ public class Measurement extends HADatAcThing implements Runnable {
         if (attributes.size() > 0) {
             setCharacteristic(String.join("; ", attributes));
         }
-        
+
         if (cache.containsKey(getUnitUri())) {
             setUnit(cache.get(getUnitUri()));
         }
@@ -915,8 +918,10 @@ public class Measurement extends HADatAcThing implements Runnable {
         m.setStudyUri(SolrUtils.getFieldValue(doc, "study_uri_str"));
         m.setDasoUri(SolrUtils.getFieldValue(doc, "daso_uri_str"));
         m.setDasaUri(SolrUtils.getFieldValue(doc, "dasa_uri_str"));
+        m.setStudyObjectUri(SolrUtils.getFieldValue(doc, "study_object_uri_str"));
+        m.setStudyObjectTypeUri(SolrUtils.getFieldValue(doc, "study_object_type_uri_str"));
         m.setObjectUri(SolrUtils.getFieldValue(doc, "object_uri_str"));
-        m.setRoleUri(SolrUtils.getFieldValue(doc, "role_uri_str"));
+        m.setRole(SolrUtils.getFieldValue(doc, "role_str"));
         m.setInRelationToUri(SolrUtils.getFieldValue(doc, "in_relation_to_uri_str"));
         m.setPID(SolrUtils.getFieldValue(doc, "pid_str"));
         m.setSID(SolrUtils.getFieldValue(doc, "sid_str"));
@@ -925,7 +930,6 @@ public class Measurement extends HADatAcThing implements Runnable {
         m.setTimeValueUnitUri(SolrUtils.getFieldValue(doc, "time_value_unit_uri_str"));
         m.setOriginalValue(SolrUtils.getFieldValue(doc, "original_value_str"));
         m.setEntityUri(SolrUtils.getFieldValue(doc, "entity_uri_str"));
-        //m.setCharacteristicUri(SolrUtils.getFieldValue(doc, "characteristic_uri_str"));
         m.setCharacteristicUris(SolrUtils.getFieldValues(doc, "characteristic_uri_str_multi"));
         m.setUnitUri(SolrUtils.getFieldValue(doc, "unit_uri_str"));
 
@@ -1036,7 +1040,7 @@ public class Measurement extends HADatAcThing implements Runnable {
             // Write empty string to create the file
             FileUtils.writeStringToFile(file, "", "utf-8", true);
             
-            // Initiate Alignment
+            // Initiate Alignment and Results
             Alignment alignment = new Alignment();
 
             // Initiate Results
@@ -1128,8 +1132,8 @@ public class Measurement extends HADatAcThing implements Runnable {
 		    // assign values to results
                     String key = alignment.measurementKey(m);
                     if (key != null) {
-			String finalValue = "";
-			/*if (alignment.containsCode(m.getCharacteristicUri())) {
+                        String finalValue = "";
+                        /*if (alignment.containsCode(m.getCharacteristicUri())) {
 			    finalValue = alignment.getCode(m.getCharacteristicUri()); */
 
 			if (alignment.containsCode(m.getCharacteristicUris().get(0))) {
@@ -1155,7 +1159,7 @@ public class Measurement extends HADatAcThing implements Runnable {
                 if (current_ratio > prev_ratio) {
                     prev_ratio = current_ratio;
                     System.out.println("Progress: " + current_ratio + "%");
-                    
+
                     dataFile = DataFile.findByName(file.getName());
                     if (dataFile != null) {
                         if (dataFile.getStatus() == DataFile.DELETED) {
@@ -1240,14 +1244,14 @@ public class Measurement extends HADatAcThing implements Runnable {
     }
 
     public static void outputHarmonizedCodebook(Alignment alignment, File file) {        
-	// Write empty string to create the file
-	//FileUtils.writeStringToFile(file, "", "utf-8", true);
+        // Write empty string to create the file
+        //FileUtils.writeStringToFile(file, "", "utf-8", true);
 
-	//System.out.println("Harmonized code book");
-	//System.out.println("Class, code, description");
+        //System.out.println("Harmonized code book");
+        //System.out.println("Class, code, description");
 
-	// Wrte code book
-	/*for (String key : alignment.getCodeBook().keySet()) {
+        // Wrte code book
+        /*for (String key : alignment.getCodeBook().keySet()) {
 	    Attribute attr = Attribute.find(key);
 	    if (attr != null && attr.getDasaUri() != null && !attr.getDasaUri().equals("")) {
 		System.out.print(key);
@@ -1293,7 +1297,7 @@ public class Measurement extends HADatAcThing implements Runnable {
     }
 
     @Override
-    public boolean saveToTripleStore() {
+    public boolean saveToTripleStore() {   
         return false;
     }
 

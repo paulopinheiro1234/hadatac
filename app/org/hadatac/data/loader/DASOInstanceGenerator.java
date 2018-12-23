@@ -79,7 +79,7 @@ public class DASOInstanceGenerator{
 	}// /createRows
 
 	@Override
-	public Map<String,Object> createRow(CSVRecord rec, int row_number) throws Exception {
+	public Map<String,Object> createRow(CSVRecord rec, int rowNumber) throws Exception {
 		
 	}// /createRow
 	*/

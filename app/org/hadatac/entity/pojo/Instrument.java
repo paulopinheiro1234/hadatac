@@ -51,12 +51,18 @@ public class Instrument extends HADatAcThing implements Comparable<Instrument> {
 		return getUri().hashCode();
 	}
 	
-	public Map<HADatAcThing, List<HADatAcThing>> getTargetFacets(
+	@Override
+    public Map<HADatAcThing, List<HADatAcThing>> getTargetFacets(
+            Facet facet, FacetHandler facetHandler) {
+        return getTargetFacetsFromTripleStore(facet, facetHandler);
+    }
+	
+	public Map<HADatAcThing, List<HADatAcThing>> getTargetFacetsFromTripleStore(
 			Facet facet, FacetHandler facetHandler) {
 		String valueConstraint = "";
 		if (!facet.getFacetValuesByField("platform_uri_str").isEmpty()) {
 			valueConstraint += " VALUES ?platformUri { " + stringify(
-					facet.getFacetValuesByField("platform_uri_str"), true) + " } \n ";
+					facet.getFacetValuesByField("platform_uri_str")) + " } \n ";
 		}
 		
 		String query = "";

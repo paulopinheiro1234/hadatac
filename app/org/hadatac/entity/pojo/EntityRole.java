@@ -34,29 +34,35 @@ public class EntityRole extends HADatAcThing implements Comparable<EntityRole> {
     public int hashCode() {
         return getUri().hashCode();
     }
-
+    
+    @Override
     public Map<HADatAcThing, List<HADatAcThing>> getTargetFacets(
+            Facet facet, FacetHandler facetHandler) {
+        return getTargetFacetsFromTripleStore(facet, facetHandler);
+    }
+
+    public Map<HADatAcThing, List<HADatAcThing>> getTargetFacetsFromTripleStore(
             Facet facet, FacetHandler facetHandler) {
 
         String valueConstraint = "";
         if (!facet.getFacetValuesByField("entity_uri_str").isEmpty()) {
             valueConstraint += " VALUES ?entityUri { " + stringify(
-                    facet.getFacetValuesByField("entity_uri_str"), true) + " } \n ";
+                    facet.getFacetValuesByField("entity_uri_str")) + " } \n ";
         }
 
         if (!facet.getFacetValuesByField("entity_role_uri_str").isEmpty()) {
             valueConstraint += " VALUES ?roleUri { " + stringify(
-                    facet.getFacetValuesByField("entity_role_uri_str"), true) + " } \n ";
+                    facet.getFacetValuesByField("entity_role_uri_str")) + " } \n ";
         }
 
         if (!facet.getFacetValuesByField("characteristic_uri_str_multi").isEmpty()) {
             valueConstraint += " VALUES ?attributeUri { " + stringify(
-                    facet.getFacetValuesByField("characteristic_uri_str_multi"), true) + " } \n ";
+                    facet.getFacetValuesByField("characteristic_uri_str_multi")) + " } \n ";
         }
 
         if (!facet.getFacetValuesByField("dasa_uri_str").isEmpty()) {
             valueConstraint += " VALUES ?dasa { " + stringify(
-                    facet.getFacetValuesByField("dasa_uri_str"), true) + " } \n ";
+                    facet.getFacetValuesByField("dasa_uri_str")) + " } \n ";
         }
 
         String query = "";
@@ -81,7 +87,7 @@ public class EntityRole extends HADatAcThing implements Comparable<EntityRole> {
                 + "FILTER (?daso != ?dasoSub) \n"
                 + "} \n";
 
-        System.out.println("EntityRole query: " + query);
+        // System.out.println("EntityRole query: " + query);
 
         Map<HADatAcThing, List<HADatAcThing>> results = new HashMap<HADatAcThing, List<HADatAcThing>>();
         try {

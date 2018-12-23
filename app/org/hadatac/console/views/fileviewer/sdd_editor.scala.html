@@ -9,20 +9,49 @@
 
 @main("SDD Editor"){
     <script src="@controllers.routes.Assets.versioned("sheetjs/vendor/alertify.js")"></script>
-    <script src="http://unpkg.com/canvas-datagrid/dist/canvas-datagrid.js"></script>
+    <script src="https://unpkg.com/canvas-datagrid/dist/canvas-datagrid.js"></script>
 
     <link rel="stylesheet" href="@controllers.routes.Assets.versioned("sheetjs/css/sheetjs.css")">
     <link rel="stylesheet" media="screen" href="@controllers.routes.Assets.versioned("sheetjs/vendor/alertify.css")">
+    
+<style>
+#loader {
+    border: 16px solid #f3f3f3; /* Light grey */
+    border-top: 16px solid #3498db; /* Blue */
+    border-radius: 50%;
+    width: 120px;
+    height: 120px;
+    animation: spin 2s linear infinite;
+}
 
+/* Safari */
+@@-webkit-keyframes spin {
+  0% { -webkit-transform: rotate(0deg); }
+  100% { -webkit-transform: rotate(360deg); }
+}
+
+@@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+</style>
+
+    <div id="loader" style="display:none;"></div>
     <div id="body">
-      <div id="left">
+      <div>
         <h3>SDD Editor</h3>
         <div id="drop">Drop a file here</div>
         <input type="file" id="file" value=""/>
-        <input type="button" id="upload" value="Submit"/>
+        <input class="btn btn-primary" type="button" id="upload" value="Submit" disabled/>
+        <a class="btn btn-primary" role="button" id="download" disabled>Download</a>
       </div>
-    
-      <div id="right">
+      
+      <div id="end-process-box" style="display:none;">
+        <h4>File Ingestion Results: </h4>
+        <p style='font-family: "Lucida Console", Monaco, monospace;' id='msgarea'></p>
+      </div>
+      
+      <div>
         <div id="grid"></div>
         <div id="buttons"></div>
         <div id="footnote"></div>
@@ -30,27 +59,49 @@
     </div>
     
     <script src="@controllers.routes.Assets.versioned("sheetjs/js/shim.js")"></script>
-    <script src="http://unpkg.com/xlsx/dist/xlsx.full.min.js"></script>
+    <script src="https://unpkg.com/xlsx/dist/xlsx.full.min.js"></script>
     <script src="@controllers.routes.Assets.versioned("sheetjs/js/dropsheet.js")"></script>
     <script src="@controllers.routes.Assets.versioned("sheetjs/js/main.js")"></script>
     <script src="@controllers.routes.Assets.versioned("sheetjs/vendor/spin.js")"></script>
     
     <script>
     var _upload = document.getElementById('upload');
+    var _download = document.getElementById('download');
     var _onupload = function(e) {
-        console.log('Uploading');
+        $("#loader").show();
+        $("#upload").attr("disabled", "disabled");
+        $("#download").attr("disabled", "disabled");
+    };
+    
+    var _ondownload = function(e) {
+        return $("input:file").val().replace(/.*(\/|\\)/, '');
+    };
+    
+    var _onreponse = function() {
+        if (this.readyState == 4 && this.status == 200) {
+            $("#loader").hide();
+            var msg2 = decodeURIComponent(this.responseText);
+            $('#msgarea').html(msg2.replace(/&amp;lt;br&amp;gt;/g, '<br>').replace(/&amp;lt;/g, '&lt;').replace(/&amp;gt;/g, '&gt;'));
+            document.getElementById('end-process-box').style.display = 'inline';
+            
+            $("#upload").removeAttr("disabled");
+            $("#download").removeAttr("disabled");
+        }
     };
 
     DropSheet({
       file: _file,
       drop: _target,
+      download: _download,
       upload: _upload,
       upload_url: "@org.hadatac.console.controllers.fileviewer.routes.SDDEditor.uploadSDDFile()",
+      reponse_action: _onreponse,
       on: {
         workstart: _workstart,
         workend: _workend,
         sheet: _onsheet,
         upload: _onupload,
+        download: _ondownload,
         foo: 'bar'
       },
       errors: {
@@ -60,6 +111,14 @@
         large: _large,
         foo: 'bar'
       }
+    });
+    
+    $("input:file").change(function () {
+        var fileName = $(this).val();
+        if (fileName.length > 0) {
+            $("#upload").removeAttr("disabled");
+            $("#download").removeAttr("disabled");
+        }
     });
     </script>
 }

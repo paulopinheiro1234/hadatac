@@ -5,25 +5,26 @@ import java.util.List;
 import java.util.Map;
 import java.util.HashMap;
 
+import org.apache.commons.text.WordUtils;
 import org.apache.jena.query.Query;
 import org.apache.jena.query.QueryExecution;
 import org.apache.jena.query.QueryExecutionFactory;
 import org.apache.jena.query.QueryFactory;
 import org.apache.jena.query.QuerySolution;
-import org.apache.jena.query.ResultSet;
-import org.apache.jena.query.ResultSetFactory;
 import org.apache.jena.query.ResultSetRewindable;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Statement;
 import org.apache.jena.rdf.model.StmtIterator;
+import org.apache.jena.sparql.engine.http.QueryExceptionHTTP;
 import org.hadatac.utils.CollectionUtil;
 import org.hadatac.utils.NameSpaces;
 
-import com.typesafe.config.ConfigFactory;
-
 import org.hadatac.console.http.SPARQLUtils;
+import org.hadatac.console.models.Facet;
+import org.hadatac.console.models.FacetHandler;
 import org.hadatac.metadata.loader.URIUtils;
+
 
 public class ObjectCollectionType extends HADatAcClass implements Comparable<ObjectCollectionType> {
 
@@ -89,8 +90,8 @@ public class ObjectCollectionType extends HADatAcClass implements Comparable<Obj
 		}			
 
 		java.util.Collections.sort((List<ObjectCollectionType>) objectCollectionTypes);
+		
 		return objectCollectionTypes;
-
 	}
 
 	public static Map<String,String> getMap() {
@@ -137,6 +138,84 @@ public class ObjectCollectionType extends HADatAcClass implements Comparable<Obj
 
 		return objectCollectionType;
 	}
+	
+	@Override
+    public Map<HADatAcThing, List<HADatAcThing>> getTargetFacets(
+            Facet facet, FacetHandler facetHandler) {
+	    return getTargetFacetsFromTripleStore(facet, facetHandler);
+    }
+	
+	@Override
+    public Map<HADatAcThing, List<HADatAcThing>> getTargetFacetsFromTripleStore(
+            Facet facet, FacetHandler facetHandler) {
+
+        String valueConstraint = "";
+        if (!facet.getFacetValuesByField("object_collection_type_str").isEmpty()) {
+            valueConstraint += " VALUES ?objectCollectionType { " + stringify(
+                    facet.getFacetValuesByField("object_collection_type_str")) + " } \n";
+        }
+        
+        String query = "";
+        query += NameSpaces.getInstance().printSparqlNameSpaceList();
+        query += "SELECT DISTINCT ?objectCollectionType ?objectCollectionTypeLabel ?role WHERE { \n"
+                + valueConstraint + " \n"
+                + "?studyObject hasco:isMemberOf ?objectCollection . \n"
+                + "?objectCollection rdf:type ?objectCollectionType . \n"
+                + "?objectCollectionType rdfs:label ?objectCollectionTypeLabel . \n"
+                + "?objectCollection hasco:hasRoleLabel ?role . \n"
+                + "}";
+
+        System.out.println("ObjectCollectionType query: \n" + query);
+
+        Map<HADatAcThing, List<HADatAcThing>> results = new HashMap<HADatAcThing, List<HADatAcThing>>();
+        try {            
+            ResultSetRewindable resultsrw = SPARQLUtils.select(
+                    CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), query);
+
+            while (resultsrw.hasNext()) {
+                QuerySolution soln = resultsrw.next();
+                ObjectCollectionType objectCollectionType = new ObjectCollectionType();
+                objectCollectionType.setUri(soln.get("objectCollectionType").toString());
+                objectCollectionType.setLabel(WordUtils.capitalize(soln.get("objectCollectionTypeLabel").toString()));
+                objectCollectionType.setField("object_collection_type_str");
+
+                StudyObjectRole role = new StudyObjectRole();
+                role.setUri(soln.get("role").toString());
+                role.setLabel(WordUtils.capitalize(soln.get("role").toString()));
+                role.setField("role_str");
+
+                if (!results.containsKey(objectCollectionType)) {
+                    System.out.println("objectCollectionType: " + objectCollectionType.getLabel());
+                    results.put(objectCollectionType, new ArrayList<HADatAcThing>());
+                }
+                
+                if (!results.get(objectCollectionType).contains(role)) {
+                    results.get(objectCollectionType).add(role);
+                }
+
+                Facet subFacet = facet.getChildById(objectCollectionType.getUri());
+                subFacet.putFacet("object_collection_type_str", soln.get("objectCollectionType").toString());
+            }
+        } catch (QueryExceptionHTTP e) {
+            e.printStackTrace();
+        }
+
+        return results;
+    }
+	
+	@Override
+    public boolean equals(Object o) {
+        if((o instanceof ObjectCollectionType) && (((ObjectCollectionType)o).getUri().equals(this.getUri()))) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+    
+    @Override
+    public int hashCode() {
+        return getUri().hashCode();
+    }
 
 	@Override
 	public int compareTo(ObjectCollectionType another) {
@@ -145,5 +224,4 @@ public class ObjectCollectionType extends HADatAcClass implements Comparable<Obj
 		}
 		return this.getLocalName().compareTo(another.getLocalName());
 	}
-
 }
