@@ -420,6 +420,7 @@ public class Study extends HADatAcThing {
                 Study study = new Study();
                 study.setUri(soln.get("studyUri").toString());
                 study.setLabel(soln.get("studyLabel").toString());
+                study.setQuery(query);
                 study.setField("study_uri_str");
 
                 ObjectAccessSpec da = new ObjectAccessSpec();

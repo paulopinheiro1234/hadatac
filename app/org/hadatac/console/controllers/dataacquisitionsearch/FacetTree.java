@@ -60,6 +60,7 @@ public class FacetTree {
 					pivot.setField(key.getField());
 					pivot.setValue(key.getLabel());
 					pivot.setTooltip(key.getUri());
+					pivot.setQuery(key.getQuery());
 					pivot.setCount(key.getCount());
 					
 					if (pivot.getCount() > 0) {
@@ -70,6 +71,7 @@ public class FacetTree {
 					pivot.setField(key.getField());
 					pivot.setValue(key.getLabel());
 					pivot.setTooltip(key.getUri());
+					pivot.setQuery(key.getQuery());
 					if (key.getCount() == 0) {
 						pivot.setCount((int)dict.get(key).get(0).getNumber(
                                 facet.getChildById(key.getUri()), facetHandler));

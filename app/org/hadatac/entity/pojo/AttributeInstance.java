@@ -94,7 +94,7 @@ public class AttributeInstance extends HADatAcThing implements Comparable<Attrib
             QueryResponse queryResponse = solr.query(query, SolrRequest.METHOD.POST);
             solr.close();
             Pivot pivot = Pivot.parseQueryResponse(queryResponse);            
-            return parsePivot(pivot, facet);
+            return parsePivot(pivot, facet, query.toString());
         } catch (Exception e) {
             System.out.println("[ERROR] AttributeInstance.getTargetFacetsFromSolr() - Exception message: " + e.getMessage());
         }
@@ -102,13 +102,14 @@ public class AttributeInstance extends HADatAcThing implements Comparable<Attrib
         return null;
     }
 
-    private Map<HADatAcThing, List<HADatAcThing>> parsePivot(Pivot pivot, Facet facet) {
+    private Map<HADatAcThing, List<HADatAcThing>> parsePivot(Pivot pivot, Facet facet, String query) {
         Map<HADatAcThing, List<HADatAcThing>> results = new HashMap<HADatAcThing, List<HADatAcThing>>();
         for (Pivot pivot_ent : pivot.children) {
             AttributeInstance attrib = new AttributeInstance();
             attrib.setUri(pivot_ent.getValue());
             attrib.setLabel(WordUtils.capitalize(Attribute.find(pivot_ent.getValue()).getLabel()));
             attrib.setCount(pivot_ent.getCount());
+            attrib.setQuery(query);
             attrib.setField("characteristic_uri_str_multi");
 
             if (!results.containsKey(attrib)) {

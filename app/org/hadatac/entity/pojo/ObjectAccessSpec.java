@@ -34,6 +34,8 @@ import org.joda.time.format.DateTimeFormatter;
 import org.joda.time.format.ISODateTimeFormat;
 import org.labkey.remoteapi.CommandException;
 
+import io.ebeaninternal.server.lib.util.Str;
+
 public class ObjectAccessSpec extends HADatAcThing {
     private static final String className = "hasco:DataAcquisition";
 
@@ -795,7 +797,7 @@ public class ObjectAccessSpec extends HADatAcThing {
             QueryResponse queryResponse = solr.query(query, SolrRequest.METHOD.POST);
             solr.close();
             Pivot pivot = Pivot.parseQueryResponse(queryResponse);
-            return parsePivot(pivot, facet);
+            return parsePivot(pivot, facet, query.toString());
         } catch (Exception e) {
             System.out.println("[ERROR] DataAcquisition.getTargetFacetsFromSolr() - Exception message: " + e.getMessage());
         }
@@ -803,13 +805,14 @@ public class ObjectAccessSpec extends HADatAcThing {
         return null;
     }
 
-    private Map<HADatAcThing, List<HADatAcThing>> parsePivot(Pivot pivot, Facet facet) {
+    private Map<HADatAcThing, List<HADatAcThing>> parsePivot(Pivot pivot, Facet facet, String query) {
         Map<HADatAcThing, List<HADatAcThing>> results = new HashMap<HADatAcThing, List<HADatAcThing>>();
         for (Pivot pivot_ent : pivot.children) {
             ObjectAccessSpec da = new ObjectAccessSpec();
             da.setUri(pivot_ent.getValue());
             da.setLabel(WordUtils.capitalize(ObjectAccessSpec.findByUri(pivot_ent.getValue()).getLabel()));
             da.setCount(pivot_ent.getCount());
+            da.setQuery(query);
             da.setField("acquisition_uri_str");
 
             if (!results.containsKey(da)) {

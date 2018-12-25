@@ -63,7 +63,7 @@ public class InRelationToInstance extends HADatAcThing implements Comparable<InR
             QueryResponse queryResponse = solr.query(query, SolrRequest.METHOD.POST);
             solr.close();
             Pivot pivot = Pivot.parseQueryResponse(queryResponse);
-            return parsePivot(pivot, facet);
+            return parsePivot(pivot, facet, query.toString());
         } catch (Exception e) {
             System.out.println("[ERROR] InRelationToInstance.getTargetFacetsFromSolr() - Exception message: " + e.getMessage());
         }
@@ -71,7 +71,7 @@ public class InRelationToInstance extends HADatAcThing implements Comparable<InR
         return null;
     }
 
-    private Map<HADatAcThing, List<HADatAcThing>> parsePivot(Pivot pivot, Facet facet) {
+    private Map<HADatAcThing, List<HADatAcThing>> parsePivot(Pivot pivot, Facet facet, String query) {
         facet.clearFieldValues("in_relation_to_uri_str");
 
         Map<HADatAcThing, List<HADatAcThing>> results = new HashMap<HADatAcThing, List<HADatAcThing>>();
@@ -80,6 +80,7 @@ public class InRelationToInstance extends HADatAcThing implements Comparable<InR
             object.setUri(pivot_ent.getValue());
             object.setLabel(WordUtils.capitalize(Entity.find(pivot_ent.getValue()).getLabel()));
             object.setCount(pivot_ent.getCount());
+            object.setQuery(query);
             object.setField("in_relation_to_uri_str");
 
             if (!results.containsKey(object)) {

@@ -5,22 +5,16 @@ import java.util.List;
 import java.util.Map;
 import java.util.HashMap;
 
-import org.apache.commons.text.WordUtils;
-import org.apache.jena.query.QuerySolution;
-import org.apache.jena.query.ResultSetRewindable;
-import org.apache.jena.sparql.engine.http.QueryExceptionHTTP;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrRequest;
 import org.apache.solr.client.solrj.impl.HttpSolrClient;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.SolrDocumentList;
-import org.hadatac.console.http.SPARQLUtils;
 import org.hadatac.console.models.Facet;
 import org.hadatac.console.models.FacetHandler;
 import org.hadatac.console.models.Pivot;
 import org.hadatac.utils.CollectionUtil;
-import org.hadatac.utils.NameSpaces;
 
 
 public class StudyObjectRole extends HADatAcThing implements Comparable<StudyObjectRole> {
@@ -52,7 +46,6 @@ public class StudyObjectRole extends HADatAcThing implements Comparable<StudyObj
 	public long getNumberFromSolr(Facet facet, FacetHandler facetHandler) {
         SolrQuery query = new SolrQuery();
         String strQuery = facetHandler.getTempSolrQuery(facet);
-        System.out.println("StudyObjectRole strQuery: " + strQuery);
         query.setQuery(strQuery);
         query.setRows(0);
         query.setFacet(false);
@@ -100,7 +93,7 @@ public class StudyObjectRole extends HADatAcThing implements Comparable<StudyObj
             QueryResponse queryResponse = solr.query(query, SolrRequest.METHOD.POST);
             solr.close();
             Pivot pivot = Pivot.parseQueryResponse(queryResponse);
-            return parsePivot(pivot, facet);
+            return parsePivot(pivot, facet, query.toString());
         } catch (Exception e) {
             System.out.println("[ERROR] StudyObjectRole.getTargetFacetsFromSolr() - Exception message: " + e.getMessage());
         }
@@ -108,7 +101,7 @@ public class StudyObjectRole extends HADatAcThing implements Comparable<StudyObj
         return null;
     }
 
-    private Map<HADatAcThing, List<HADatAcThing>> parsePivot(Pivot pivot, Facet facet) {
+    private Map<HADatAcThing, List<HADatAcThing>> parsePivot(Pivot pivot, Facet facet, String query) {
         facet.clearFieldValues("role_uri_str");
 
         Map<HADatAcThing, List<HADatAcThing>> results = new HashMap<HADatAcThing, List<HADatAcThing>>();
@@ -119,6 +112,7 @@ public class StudyObjectRole extends HADatAcThing implements Comparable<StudyObj
             //Comment from PP: this is a temporary hack since role_uri has changed to be the label itself
             role.setLabel(pivot_ent.getValue());
             role.setCount(pivot_ent.getCount());
+            role.setQuery(query);
             role.setField("role_str");
 
             if (!results.containsKey(role)) {

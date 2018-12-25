@@ -51,7 +51,6 @@ public class UnitInstance extends HADatAcThing implements Comparable<UnitInstanc
             Facet facet, FacetHandler facetHandler) {  
         SolrQuery query = new SolrQuery();
         String strQuery = facetHandler.getTempSolrQuery(facet);
-        // System.out.println("UnitInstance strQuery: " + strQuery);
         query.setQuery(strQuery);
         query.setRows(0);
         query.setFacet(true);
@@ -68,7 +67,7 @@ public class UnitInstance extends HADatAcThing implements Comparable<UnitInstanc
             QueryResponse queryResponse = solr.query(query, SolrRequest.METHOD.POST);
             solr.close();
             Pivot pivot = Pivot.parseQueryResponse(queryResponse);
-            return parsePivot(pivot);
+            return parsePivot(pivot, query.toString());
         } catch (Exception e) {
             System.out.println("[ERROR] Unit.getTargetFacetsFromSolr() - Exception message: " + e.getMessage());
         }
@@ -76,7 +75,7 @@ public class UnitInstance extends HADatAcThing implements Comparable<UnitInstanc
         return null;
     }
 
-    private Map<HADatAcThing, List<HADatAcThing>> parsePivot(Pivot pivot) {
+    private Map<HADatAcThing, List<HADatAcThing>> parsePivot(Pivot pivot, String query) {
         Map<HADatAcThing, List<HADatAcThing>> results = new HashMap<HADatAcThing, List<HADatAcThing>>();
         for (Pivot pivot_ent : pivot.children) {
             UnitInstance unit = new UnitInstance();
@@ -97,6 +96,7 @@ public class UnitInstance extends HADatAcThing implements Comparable<UnitInstanc
                 }
             }
             unit.setCount(pivot_ent.getCount());
+            unit.setQuery(query);
             unit.setField("unit_uri_str");
             if (!results.containsKey(unit)) {
                 List<HADatAcThing> attributes = new ArrayList<HADatAcThing>();

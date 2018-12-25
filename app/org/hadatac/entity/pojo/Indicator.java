@@ -224,6 +224,7 @@ public class Indicator extends HADatAcThing implements Comparable<Indicator> {
         return getTargetFacetsFromTripleStore(facet, facetHandler);
     }
 
+    @Override
     public Map<HADatAcThing, List<HADatAcThing>> getTargetFacetsFromTripleStore(
             Facet facet, FacetHandler facetHandler) {
 
@@ -271,6 +272,7 @@ public class Indicator extends HADatAcThing implements Comparable<Indicator> {
                 indicator.setUri(soln.get("indicator").toString());
                 indicator.setLabel(WordUtils.capitalize(HADatAcThing.getShortestLabel(soln.get("indicator").toString())));
                 indicator.setField("indicator_uri_str");
+                indicator.setQuery(query);
 
                 AttributeInstance attrib = new AttributeInstance();
                 attrib.setUri(soln.get("attributeUri").toString());

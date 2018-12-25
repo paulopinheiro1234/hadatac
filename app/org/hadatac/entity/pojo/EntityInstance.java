@@ -65,7 +65,7 @@ public class EntityInstance extends HADatAcThing implements Comparable<EntityIns
             QueryResponse queryResponse = solr.query(query, SolrRequest.METHOD.POST);
             solr.close();
             Pivot pivot = Pivot.parseQueryResponse(queryResponse);
-            return parsePivot(pivot, facet);
+            return parsePivot(pivot, facet, query.toString());
         } catch (Exception e) {
             System.out.println("[ERROR] EntityInstance.getTargetFacetsFromSolr() - Exception message: " + e.getMessage());
         }
@@ -73,7 +73,7 @@ public class EntityInstance extends HADatAcThing implements Comparable<EntityIns
         return null;
     }
 
-    private Map<HADatAcThing, List<HADatAcThing>> parsePivot(Pivot pivot, Facet facet) {
+    private Map<HADatAcThing, List<HADatAcThing>> parsePivot(Pivot pivot, Facet facet, String query) {
         facet.clearFieldValues("entity_uri_str");
 
         Map<HADatAcThing, List<HADatAcThing>> results = new HashMap<HADatAcThing, List<HADatAcThing>>();
@@ -83,6 +83,7 @@ public class EntityInstance extends HADatAcThing implements Comparable<EntityIns
             entity.setLabel(WordUtils.capitalize(Entity.find(pivot_ent.getValue()).getLabel()));
             entity.setCount(pivot_ent.getCount());
             entity.setField("entity_uri_str");
+            entity.setQuery(query);
 
             if (!results.containsKey(entity)) {
                 List<HADatAcThing> children = new ArrayList<HADatAcThing>();

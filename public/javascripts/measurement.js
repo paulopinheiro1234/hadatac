@@ -30,6 +30,7 @@ function create_item(data, selected_elems) {
 		element.userdata = [
 			{"name": "field", "content": children[i_child].field},
 			{"name": "value", "content": children[i_child].tooltip},
+			{"name": "query", "content": children[i_child].query},
 			{"name": "self_facet", "content": facet_content}];
 		
 		if (selected_elems.indexOf(element.tooltip) > -1) {
@@ -145,7 +146,8 @@ function create_merged_item(data, selected_elems, curLevel,
 			element.count = children[i_child].count;
 			element.userdata = [
 				{"name": "field", "content": children[i_child].field},
-				{"name": "value", "content": children[i_child].tooltip}];
+				{"name": "value", "content": children[i_child].tooltip},
+				{"name": "query", "content": children[i_child].query}];
 			if (selected_elems.indexOf(children[i_child].tooltip) > -1) {
 				element.checked = 1;
 			}

@@ -25,6 +25,8 @@ import org.hadatac.console.models.Pivot;
 import org.hadatac.metadata.loader.URIUtils;
 import org.hadatac.utils.CollectionUtil;
 
+import io.ebeaninternal.server.lib.util.Str;
+
 
 public class TimeInstance extends HADatAcThing implements Comparable<TimeInstance> {
 
@@ -127,7 +129,7 @@ public class TimeInstance extends HADatAcThing implements Comparable<TimeInstanc
             QueryResponse queryResponse = solr.query(query, SolrRequest.METHOD.POST);
             solr.close();
             Pivot pivot = Pivot.parseQueryResponse(queryResponse);
-            return parsePivot(pivot);
+            return parsePivot(pivot, query.toString());
         } catch (Exception e) {
             System.out.println("[ERROR] TimeInstance.getTargetFacetsFromSolr() - Exception message: " + e.getMessage());
         }
@@ -235,7 +237,7 @@ public class TimeInstance extends HADatAcThing implements Comparable<TimeInstanc
         return "+1MINUTE";
     }
 
-    private Map<HADatAcThing, List<HADatAcThing>> parsePivot(Pivot pivot) {   
+    private Map<HADatAcThing, List<HADatAcThing>> parsePivot(Pivot pivot, String query) {   
         Map<HADatAcThing, List<HADatAcThing>> results = new HashMap<HADatAcThing, List<HADatAcThing>>();
         for (Pivot pivot_ent : pivot.children) {
             if (pivot_ent.getValue().isEmpty()) {
@@ -270,6 +272,7 @@ public class TimeInstance extends HADatAcThing implements Comparable<TimeInstanc
                 time.setLabel(WordUtils.capitalize(pivot_ent.getValue()));
             }
             time.setCount(pivot_ent.getCount());
+            time.setQuery(query);
             time.setField(pivot_ent.getField());
             if (!results.containsKey(time)) {
                 List<HADatAcThing> attributes = new ArrayList<HADatAcThing>();

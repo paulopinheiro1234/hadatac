@@ -15,6 +15,7 @@ public class Pivot {
     private String field;
     private String value;
     private String tooltip;
+    private String query;
     private int count;
 
     public Pivot() {
@@ -51,6 +52,14 @@ public class Pivot {
     
     public void setCount(int count) {
         this.count = count;
+    }
+    
+    public String getQuery() {
+        return query;
+    }
+    
+    public void setQuery(String query) {
+        this.query = query;
     }
     
     public void addChild(Pivot child) {

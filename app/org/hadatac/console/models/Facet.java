@@ -11,9 +11,12 @@ import java.util.stream.Collectors;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
+
 public class Facet {
 	private String id;
 	private String facetName;
+	private String query;
+	
 	private Map<String, List<String>> mapFieldValues = new HashMap<String, List<String>>();
 	private Map<String, Facet> children = new HashMap<String, Facet>();
     
@@ -38,6 +41,14 @@ public class Facet {
 	public void setId(String id) {
 		this.id = id;
 	}
+	
+	public String getQuery() {
+        return query;
+    }
+	
+	public void setQuery(String query) {
+        this.query = query;
+    }
 	
 	public Map<String, List<String>> getFieldValues() {
 		return mapFieldValues;

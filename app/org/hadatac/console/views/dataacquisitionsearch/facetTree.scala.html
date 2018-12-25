@@ -58,6 +58,10 @@
         tree.enableThreeStateCheckboxes(false);
         tree.setImagePath("@controllers.routes.Assets.versioned("lib/dhtmlx/imgs/dhxtree_skyblue/")");
         tree.setDataMode("json");
+        tree.setOnRightClickHandler(function(id) {
+            console.log("query to retrieve this clicked node: \n\n" + this.getUserData(id, "query"));
+            return false;
+        });
         tree.attachEvent("onCheck", function(id) {
         	tree.setSubChecked(id, tree.isItemChecked(id));
             if (tree.isItemChecked(id)) {
@@ -78,13 +82,13 @@
     
     selected_elems = JSON.parse('@handler.values(FacetHandler.STUDY_FACET)'.replace(/&quot;/g,'"'));
     var dataTreeS = parseSolrFacetToTree('@FacetHandler.STUDY_FACET', selected_elems);
-    console.log("dataTree: " + JSON.stringify(dataTree));
+    // console.log("dataTree: " + JSON.stringify(dataTree));
     var treeS = new dhtmlXTreeObject("treeStudyBox", "100%", "100%", 0);
     loadTree(treeS, dataTreeS);
     
     selected_elems = JSON.parse('@handler.values(FacetHandler.OBJECT_COLLECTION_FACET)'.replace(/&quot;/g,'"'));
     var dataTreeOC = parseSolrFacetToTree('@FacetHandler.OBJECT_COLLECTION_FACET', selected_elems);
-    console.log("dataTree: " + JSON.stringify(dataTree));
+    // console.log("dataTree: " + JSON.stringify(dataTree));
     var treeOC = new dhtmlXTreeObject("treeObjectCollectionBox", "100%", "100%", 0);
     loadTree(treeOC, dataTreeOC);
     

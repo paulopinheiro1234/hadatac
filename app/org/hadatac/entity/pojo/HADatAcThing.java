@@ -12,6 +12,9 @@ import org.hadatac.metadata.loader.URIUtils;
 import org.apache.jena.query.QuerySolution;
 import org.apache.jena.query.ResultSetRewindable;
 import org.hadatac.utils.NameSpaces;
+
+import arq.query;
+
 import org.hadatac.utils.CollectionUtil;
 import org.hadatac.console.http.SPARQLUtils;
 
@@ -21,6 +24,7 @@ public abstract class HADatAcThing {
     String field = "";
     String label = "";
     String comment = "";
+    String query = "";
     int count = 0;
 
     String namedGraph = "";
@@ -123,6 +127,14 @@ public abstract class HADatAcThing {
 
     public void setCount(int count) {
         this.count = count;
+    }
+    
+    public String getQuery() {
+        return query;
+    }
+
+    public void setQuery(String query) {
+        this.query = query;
     }
 
     public String getComment() {

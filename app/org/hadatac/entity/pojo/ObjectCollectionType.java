@@ -177,6 +177,7 @@ public class ObjectCollectionType extends HADatAcClass implements Comparable<Obj
                 ObjectCollectionType objectCollectionType = new ObjectCollectionType();
                 objectCollectionType.setUri(soln.get("objectCollectionType").toString());
                 objectCollectionType.setLabel(WordUtils.capitalize(soln.get("objectCollectionTypeLabel").toString()));
+                objectCollectionType.setQuery(query);
                 objectCollectionType.setField("object_collection_type_str");
 
                 StudyObjectRole role = new StudyObjectRole();

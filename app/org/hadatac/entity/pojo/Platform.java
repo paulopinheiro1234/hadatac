@@ -157,6 +157,7 @@ public class Platform extends HADatAcThing implements Comparable<Platform> {
                 String platformUri = soln.get("platformUri").toString();
                 String platformLabel = soln.get("platformLabel").toString();
                 platform.setUri(platformUri);
+                platform.setQuery(query);
                 platform.setField("platform_uri_str");
                 if (platformLabel.isEmpty()) {
                     platform.setLabel(WordUtils.capitalize(URIUtils.getBaseName(platformUri)));

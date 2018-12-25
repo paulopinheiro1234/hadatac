@@ -128,6 +128,7 @@ public class EntityRole extends HADatAcThing implements Comparable<EntityRole> {
                         role.setUri(soln.get("roleUri").toString());
                         role.setLabel(WordUtils.capitalize(URIUtils.getBaseName(soln.get("roleUri").toString())));
                         role.setField("entity_role_uri_str");
+                        role.setQuery(query);
                     } else {
                         System.out.println("soln.get(\"roleUri\") == null");
                         /*

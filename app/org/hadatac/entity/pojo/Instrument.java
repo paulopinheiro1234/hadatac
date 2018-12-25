@@ -90,6 +90,7 @@ public class Instrument extends HADatAcThing implements Comparable<Instrument> {
 				Instrument instrument = new Instrument();
 				instrument.setUri(soln.get("instrumentUri").toString());
 				instrument.setLabel(soln.get("instrumentLabel").toString());
+				instrument.setQuery(query);
 				instrument.setField("instrument_uri_str");
 				
 				ObjectAccessSpec da = new ObjectAccessSpec();

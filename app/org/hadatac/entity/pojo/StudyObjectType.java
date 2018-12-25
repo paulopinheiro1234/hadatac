@@ -134,6 +134,7 @@ public class StudyObjectType extends HADatAcClass implements Comparable<StudyObj
                 StudyObjectType studyObjectType = new StudyObjectType();
                 studyObjectType.setUri(soln.get("studyObjType").toString());
                 studyObjectType.setLabel(WordUtils.capitalize(HADatAcThing.getShortestLabel(soln.get("studyObjType").toString())));
+                studyObjectType.setQuery(query);
                 studyObjectType.setField("study_object_type_uri_str");
 
                 StudyObjectRole role = new StudyObjectRole();

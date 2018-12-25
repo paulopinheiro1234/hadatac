@@ -81,6 +81,7 @@ public class DASEType extends HADatAcThing implements Comparable<DASEType> {
                 DASEType daseType = new DASEType();
                 daseType.setUri(soln.get("daseTypeUri").toString());
                 daseType.setLabel(WordUtils.capitalize(soln.get("daseTypeLabel").toString()));
+                daseType.setQuery(query);
                 daseType.setField("dase_type_uri_str");
                 
                 TimeInstance timeInstance = new TimeInstance();
