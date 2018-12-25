@@ -40,6 +40,13 @@ PermissionURI=permission uri
 
 [OAS]
 # OAS Template
+DataAcquisitionName=da name
+Method=method
+DAStudyName=Study ID
+DataDictionaryName=data dict
+Epi/Lab=epi/lab
+OwnerEmail=owner email
+PermissionURI=permission uri
 DeploymentUri=deployment uri
 CellScope=cell scope
 

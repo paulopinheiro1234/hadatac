@@ -36,9 +36,9 @@ public class DASchemaEventGenerator extends BaseGenerator {
 		System.out.println("mapTimeline key size : " + mapTimeline.keySet().size());
 		
 		for (Record rec : dd.getRecords()) {
-			if (!rec.getValueByColumnName("Time").isEmpty()) {
-                timeList.add(rec.getValueByColumnName("Time"));
-            }
+		    if (rec.getValueByColumnName("Time") != null && !rec.getValueByColumnName("Time").isEmpty()) {
+			timeList.add(rec.getValueByColumnName("Time"));
+		    }
 		}
 	}
 	

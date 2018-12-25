@@ -42,7 +42,7 @@ public class DASchemaAttrGenerator extends BaseGenerator {
             tmp.add(rec.getValueByColumnName(mapCol.get("Entity")));
             tmp.add(rec.getValueByColumnName(mapCol.get("InRelationTo")));
             hasEntityMap.put(rec.getValueByColumnName(mapCol.get("Label")), tmp);
-            if (rec.getValueByColumnName(mapCol.get("AttributeType")).length() > 0) {
+            if (rec.getValueByColumnName(mapCol.get("AttributeType")) != null && rec.getValueByColumnName(mapCol.get("AttributeType")).length() > 0) {
             	AttrList.add(rec.getValueByColumnName(mapCol.get("Label")));
             }
         }

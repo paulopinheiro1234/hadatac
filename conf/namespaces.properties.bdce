@@ -1,0 +1,15 @@
+rdf=http://www.w3.org/1999/02/22-rdf-syntax-ns#,text/turtle,http://www.w3.org/1999/02/22-rdf-syntax-ns#
+rdfs=http://www.w3.org/2000/01/rdf-schema#,text/turtle,http://www.w3.org/2000/01/rdf-schema#
+xsd=http://www.w3.org/2001/XMLSchema#,,
+owl=http://www.w3.org/2002/07/owl#,text/turtle,http://www.w3.org/2002/07/owl#
+vstoi=http://hadatac.org/ont/vstoi#,text/turtle,http://hadatac.org/ont/vstoi#
+prov=http://www.w3.org/ns/prov#,text/turtle,http://hadatac.org/ont/prov/
+foaf=http://xmlns.com/foaf/0.1/,,
+sio=http://semanticscience.org/resource/,application/rdf+xml,http://hadatac.org/ont/sio/
+hasco=http://hadatac.org/ont/hasco/,text/turtle,http://hadatac.org/ont/hasco/
+bdce-kb=http://hadatac.org/kb/bdce#,,
+bdce=http://hadatac.org/ont/bdce#,text/turtle,http://hadatac.org/ont/bdce/
+uo=http://purl.obolibrary.org/obo/UO_,application/rdf+xml,http://purl.obolibrary.org/obo/uo.owl
+skos=http://www.w3.org/2004/02/skos/core#,,
+schema=http://schema.org/,text/turtle,http://hadatac.org/ont/schemaorg/schemaorg.ttl
+

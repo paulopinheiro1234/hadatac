@@ -8,6 +8,13 @@ import org.hadatac.utils.CollectionUtil;
 public class FirstLabel {
 	
 	public static String getLabel(String uri) {
+
+	    if ((uri == null) || (uri.equals(""))) {
+			return "";
+		} 
+
+	        //System.out.println("[FirstLabel] getLabel() request:[" + uri + "]");
+		
 		if (uri.startsWith("http")) {
 			uri = "<" + uri.trim() + ">";
 		}

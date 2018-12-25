@@ -18,7 +18,7 @@ public class DPLGenerator extends BaseGenerator {
 		for (String header : file.getHeaders()) {
 		    if (!header.trim().isEmpty()) {
 		        String value = rec.getValueByColumnName(header);
-		        if (!value.isEmpty()) {
+		        if (value != null && !value.isEmpty()) {
 		            row.put(header, value);
 		        }
 		    }

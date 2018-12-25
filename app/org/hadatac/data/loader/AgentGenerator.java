@@ -212,7 +212,7 @@ public class AgentGenerator extends BaseGenerator {
     	rows.clear();
     	// Currently using an inefficient way to check if row already exists in the list of rows; This should be addressed in the future
     	for (Record record : records) {
-    		if(getPIFullName(record).length() > 0) {
+    		if(getPIFullName(record) != null && getPIFullName(record).length() > 0) {
     			System.out.println("Creating PI Row:" + getPIFullName(record) + ":");
     			duplicate=false;
     			for (Map<String, Object> row : rows) {
@@ -227,7 +227,7 @@ public class AgentGenerator extends BaseGenerator {
         			rows.add(createPIRow(record));
     			}
     		}
-    		if(getCPI1GivenName(record).length() > 0) {
+    		if(getCPI1GivenName(record) != null && getCPI1GivenName(record).length() > 0) {
     			System.out.println("Creating CPI1 Row:" + getCPI1GivenName(record) + ":");
     			duplicate=false;
     			for (Map<String, Object> row : rows){
@@ -244,7 +244,7 @@ public class AgentGenerator extends BaseGenerator {
         			rows.add(createCPI1Row(record));
     			}
     		}
-    		if(getCPI2GivenName(record).length() > 0) {
+    		if(getCPI2GivenName(record) != null && getCPI2GivenName(record).length() > 0) {
     			System.out.println("Creating CPI2 Row:" + getCPI2GivenName(record) + ":");
     			duplicate=false;
     			for (Map<String, Object> row : rows){
@@ -261,7 +261,7 @@ public class AgentGenerator extends BaseGenerator {
     				rows.add(createCPI2Row(record));
     			}
     		}
-    		if(getContactGivenName(record).length() > 0) {
+    		if(getContactGivenName(record) != null && getContactGivenName(record).length() > 0) {
     			System.out.println("Creating Contact Row:" + getContactGivenName(record) + ":");
     			duplicate=false;
     			for (Map<String, Object> row : rows){
@@ -278,7 +278,7 @@ public class AgentGenerator extends BaseGenerator {
     				rows.add(createContactRow(record));
     			}
     		}
-    		if(getInstitutionName(record).length() > 0) {
+    		if(getInstitutionName(record) != null && getInstitutionName(record).length() > 0) {
     			System.out.println("Creating Institution Row:" + getInstitutionName(record) + ":");
     			duplicate=false;
     			for (Map<String, Object> row : rows){

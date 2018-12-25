@@ -27,7 +27,7 @@ public class DASchemaObjectGenerator extends BaseGenerator {
 		this.SDDName = SDDName;
 		
 		for (Record rec : file.getRecords()) {
-            if (!rec.getValueByColumnName("Time").isEmpty()) {
+            if (rec.getValueByColumnName("Time") != null && !rec.getValueByColumnName("Time").isEmpty()) {
                 timeList.add(rec.getValueByColumnName("Time"));
             }
 		}
@@ -68,15 +68,15 @@ public class DASchemaObjectGenerator extends BaseGenerator {
 	
 	private String getEntity(Record rec) {
 		String entity = rec.getValueByColumnName(mapCol.get("Entity"));
-		if (entity.length() == 0) {
-			return null;
+		if (entity != null && entity.length() == 0) {
+		    return null;
 		} else {
-			if (codeMap.containsKey(entity)) {
-				System.out.println("[DASOGenerator] code matched: " + entity); 
-				return codeMap.get(entity);
-			} else {
-				return entity;
-			}
+		    if (codeMap.containsKey(entity)) {
+			System.out.println("[DASOGenerator] code matched: " + entity); 
+			return codeMap.get(entity);
+		    } else {
+			return entity;
+		    }
 		}
 	}
 
