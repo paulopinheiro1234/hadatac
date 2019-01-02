@@ -23,6 +23,7 @@ import org.apache.solr.common.SolrDocumentList;
 import org.hadatac.console.models.Facet;
 import org.hadatac.console.models.FacetHandler;
 import org.hadatac.console.models.Pivot;
+import org.hadatac.console.views.dataacquisitionsearch.Facetable;
 import org.hadatac.metadata.loader.LabkeyDataHandler;
 import org.hadatac.metadata.loader.URIUtils;
 import org.hadatac.entity.pojo.StudyObject;
@@ -773,13 +774,13 @@ public class ObjectAccessSpec extends HADatAcThing {
     }
     
     @Override
-    public Map<HADatAcThing, List<HADatAcThing>> getTargetFacets(
+    public Map<Facetable, List<Facetable>> getTargetFacets(
             Facet facet, FacetHandler facetHandler) {
         return getTargetFacetsFromSolr(facet, facetHandler);
     }
 
     @Override
-    public Map<HADatAcThing, List<HADatAcThing>> getTargetFacetsFromSolr(Facet facet, FacetHandler facetHandler) {
+    public Map<Facetable, List<Facetable>> getTargetFacetsFromSolr(Facet facet, FacetHandler facetHandler) {
 
         SolrQuery query = new SolrQuery();
         String strQuery = facetHandler.getTempSolrQuery(facet);
@@ -805,8 +806,9 @@ public class ObjectAccessSpec extends HADatAcThing {
         return null;
     }
 
-    private Map<HADatAcThing, List<HADatAcThing>> parsePivot(Pivot pivot, Facet facet, String query) {
-        Map<HADatAcThing, List<HADatAcThing>> results = new HashMap<HADatAcThing, List<HADatAcThing>>();
+    private Map<Facetable, List<Facetable>> parsePivot(Pivot pivot, Facet facet, String query) {
+        Map<Facetable, List<Facetable>> results = new HashMap<Facetable, List<Facetable>>();
+        
         for (Pivot pivot_ent : pivot.children) {
             ObjectAccessSpec da = new ObjectAccessSpec();
             da.setUri(pivot_ent.getValue());
@@ -816,7 +818,7 @@ public class ObjectAccessSpec extends HADatAcThing {
             da.setField("acquisition_uri_str");
 
             if (!results.containsKey(da)) {
-                List<HADatAcThing> children = new ArrayList<HADatAcThing>();
+                List<Facetable> children = new ArrayList<Facetable>();
                 results.put(da, children);
             }
 

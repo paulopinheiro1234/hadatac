@@ -26,6 +26,7 @@ import org.hadatac.console.controllers.metadata.DynamicFunctions;
 import org.hadatac.console.http.SPARQLUtils;
 import org.hadatac.console.models.Facet;
 import org.hadatac.console.models.FacetHandler;
+import org.hadatac.console.views.dataacquisitionsearch.Facetable;
 import org.hadatac.metadata.loader.LabkeyDataHandler;
 import org.hadatac.metadata.loader.URIUtils;
 import org.hadatac.utils.CollectionUtil;
@@ -219,13 +220,13 @@ public class Indicator extends HADatAcThing implements Comparable<Indicator> {
     }
     
     @Override
-    public Map<HADatAcThing, List<HADatAcThing>> getTargetFacets(
+    public Map<Facetable, List<Facetable>> getTargetFacets(
             Facet facet, FacetHandler facetHandler) {
         return getTargetFacetsFromTripleStore(facet, facetHandler);
     }
 
     @Override
-    public Map<HADatAcThing, List<HADatAcThing>> getTargetFacetsFromTripleStore(
+    public Map<Facetable, List<Facetable>> getTargetFacetsFromTripleStore(
             Facet facet, FacetHandler facetHandler) {
 
         String valueConstraint = "";
@@ -259,9 +260,9 @@ public class Indicator extends HADatAcThing implements Comparable<Indicator> {
                 + " { ?indicator rdfs:subClassOf hasco:SampleIndicator } UNION { ?indicator rdfs:subClassOf hasco:StudyIndicator } . \n"
                 + "}";
 
-        System.out.println("Indicator query: " + query);
+        // System.out.println("Indicator query: \n" + query);
 
-        Map<HADatAcThing, List<HADatAcThing>> mapIndicatorToCharList = new HashMap<HADatAcThing, List<HADatAcThing>>();
+        Map<Facetable, List<Facetable>> mapIndicatorToCharList = new HashMap<Facetable, List<Facetable>>();
         try {
             ResultSetRewindable resultsrw = SPARQLUtils.select(
                     CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), query);
@@ -280,7 +281,7 @@ public class Indicator extends HADatAcThing implements Comparable<Indicator> {
                 attrib.setField("characteristic_uri_str");
 
                 if (!mapIndicatorToCharList.containsKey(indicator)) {
-                    List<HADatAcThing> attributes = new ArrayList<HADatAcThing>();
+                    List<Facetable> attributes = new ArrayList<Facetable>();
                     mapIndicatorToCharList.put(indicator, attributes);
                 }
                 if (!mapIndicatorToCharList.get(indicator).contains(attrib)) {

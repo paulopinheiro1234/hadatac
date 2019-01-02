@@ -22,10 +22,9 @@ import org.apache.solr.common.SolrDocumentList;
 import org.hadatac.console.models.Facet;
 import org.hadatac.console.models.FacetHandler;
 import org.hadatac.console.models.Pivot;
+import org.hadatac.console.views.dataacquisitionsearch.Facetable;
 import org.hadatac.metadata.loader.URIUtils;
 import org.hadatac.utils.CollectionUtil;
-
-import io.ebeaninternal.server.lib.util.Str;
 
 
 public class TimeInstance extends HADatAcThing implements Comparable<TimeInstance> {
@@ -75,13 +74,13 @@ public class TimeInstance extends HADatAcThing implements Comparable<TimeInstanc
     }
     
     @Override
-    public Map<HADatAcThing, List<HADatAcThing>> getTargetFacets(
+    public Map<Facetable, List<Facetable>> getTargetFacets(
             Facet facet, FacetHandler facetHandler) {
         return getTargetFacetsFromSolr(facet, facetHandler);
     }
 
     @Override
-    public Map<HADatAcThing, List<HADatAcThing>> getTargetFacetsFromSolr(
+    public Map<Facetable, List<Facetable>> getTargetFacetsFromSolr(
             Facet facet, FacetHandler facetHandler) {        
         SolrQuery query = new SolrQuery();
         String queryString = facetHandler.getTempSolrQuery(facet);
@@ -237,8 +236,9 @@ public class TimeInstance extends HADatAcThing implements Comparable<TimeInstanc
         return "+1MINUTE";
     }
 
-    private Map<HADatAcThing, List<HADatAcThing>> parsePivot(Pivot pivot, String query) {   
-        Map<HADatAcThing, List<HADatAcThing>> results = new HashMap<HADatAcThing, List<HADatAcThing>>();
+    private Map<Facetable, List<Facetable>> parsePivot(Pivot pivot, String query) {   
+        Map<Facetable, List<Facetable>> results = new HashMap<Facetable, List<Facetable>>();
+        
         for (Pivot pivot_ent : pivot.children) {
             if (pivot_ent.getValue().isEmpty()) {
                 continue;
@@ -275,7 +275,7 @@ public class TimeInstance extends HADatAcThing implements Comparable<TimeInstanc
             time.setQuery(query);
             time.setField(pivot_ent.getField());
             if (!results.containsKey(time)) {
-                List<HADatAcThing> attributes = new ArrayList<HADatAcThing>();
+                List<Facetable> attributes = new ArrayList<Facetable>();
                 results.put(time, attributes);
             }
         }

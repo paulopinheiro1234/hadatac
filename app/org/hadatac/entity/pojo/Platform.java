@@ -32,11 +32,11 @@ import org.hadatac.console.controllers.AuthApplication;
 import org.hadatac.console.http.SPARQLUtils;
 import org.hadatac.console.models.Facet;
 import org.hadatac.console.models.FacetHandler;
+import org.hadatac.console.views.dataacquisitionsearch.Facetable;
 import org.hadatac.metadata.loader.LabkeyDataHandler;
 import org.hadatac.metadata.loader.URIUtils;
 import org.labkey.remoteapi.CommandException;
 
-import com.typesafe.config.ConfigFactory;
 
 public class Platform extends HADatAcThing implements Comparable<Platform> {
 
@@ -127,13 +127,13 @@ public class Platform extends HADatAcThing implements Comparable<Platform> {
     }
     
     @Override
-    public Map<HADatAcThing, List<HADatAcThing>> getTargetFacets(
+    public Map<Facetable, List<Facetable>> getTargetFacets(
             Facet facet, FacetHandler facetHandler) {
         return getTargetFacetsFromTripleStore(facet, facetHandler);
     }
     
     @Override
-    public Map<HADatAcThing, List<HADatAcThing>> getTargetFacetsFromTripleStore(
+    public Map<Facetable, List<Facetable>> getTargetFacetsFromTripleStore(
             Facet facet, FacetHandler facetHandler) {
         String query = "";
         query += NameSpaces.getInstance().printSparqlNameSpaceList();
@@ -146,7 +146,7 @@ public class Platform extends HADatAcThing implements Comparable<Platform> {
 
         // System.out.println("Platform getTargetFacets() query: " + query);
 
-        Map<HADatAcThing, List<HADatAcThing>> results = new HashMap<HADatAcThing, List<HADatAcThing>>();
+        Map<Facetable, List<Facetable>> results = new HashMap<Facetable, List<Facetable>>();
         try {
             ResultSetRewindable resultsrw = SPARQLUtils.select(
                     CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), query);
@@ -170,7 +170,7 @@ public class Platform extends HADatAcThing implements Comparable<Platform> {
                 oas.setLabel(soln.get("dataAcquisitionLabel").toString());
                 oas.setField("acquisition_uri_str");
                 if (!results.containsKey(platform)) {
-                    List<HADatAcThing> facets = new ArrayList<HADatAcThing>();
+                    List<Facetable> facets = new ArrayList<Facetable>();
                     results.put(platform, facets);
                 }
                 if (!results.get(platform).contains(oas)) {

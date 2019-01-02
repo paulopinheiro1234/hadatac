@@ -20,6 +20,7 @@ import org.apache.jena.sparql.engine.http.QueryExceptionHTTP;
 import org.hadatac.console.http.SPARQLUtils;
 import org.hadatac.console.models.Facet;
 import org.hadatac.console.models.FacetHandler;
+import org.hadatac.console.views.dataacquisitionsearch.Facetable;
 import org.hadatac.utils.CollectionUtil;
 import org.hadatac.utils.NameSpaces;
 
@@ -93,13 +94,13 @@ public class StudyObjectType extends HADatAcClass implements Comparable<StudyObj
     }
     
     @Override
-    public Map<HADatAcThing, List<HADatAcThing>> getTargetFacets(
+    public Map<Facetable, List<Facetable>> getTargetFacets(
             Facet facet, FacetHandler facetHandler) {
         return getTargetFacetsFromTripleStore(facet, facetHandler);
     }
     
     @Override
-    public Map<HADatAcThing, List<HADatAcThing>> getTargetFacetsFromTripleStore(
+    public Map<Facetable, List<Facetable>> getTargetFacetsFromTripleStore(
             Facet facet, FacetHandler facetHandler) {
 
         String valueConstraint = "";
@@ -122,9 +123,9 @@ public class StudyObjectType extends HADatAcClass implements Comparable<StudyObj
                 + "?objectCollection hasco:hasRoleLabel ?role . \n"
                 + "}";
 
-        System.out.println("StudyObjectType query: \n" + query);
+        // System.out.println("StudyObjectType query: \n" + query);
 
-        Map<HADatAcThing, List<HADatAcThing>> results = new HashMap<HADatAcThing, List<HADatAcThing>>();
+        Map<Facetable, List<Facetable>> results = new HashMap<Facetable, List<Facetable>>();
         try {            
             ResultSetRewindable resultsrw = SPARQLUtils.select(
                     CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), query);
@@ -144,7 +145,7 @@ public class StudyObjectType extends HADatAcClass implements Comparable<StudyObj
 
                 if (!results.containsKey(studyObjectType)) {
                     System.out.println("studyObjectType: " + studyObjectType.getLabel());
-                    results.put(studyObjectType, new ArrayList<HADatAcThing>());
+                    results.put(studyObjectType, new ArrayList<Facetable>());
                 }
                 
                 if (!results.get(studyObjectType).contains(role)) {

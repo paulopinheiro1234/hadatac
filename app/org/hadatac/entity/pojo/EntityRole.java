@@ -11,6 +11,7 @@ import org.apache.jena.query.ResultSetRewindable;
 import org.hadatac.console.http.SPARQLUtils;
 import org.hadatac.console.models.Facet;
 import org.hadatac.console.models.FacetHandler;
+import org.hadatac.console.views.dataacquisitionsearch.Facetable;
 import org.hadatac.metadata.loader.URIUtils;
 import org.hadatac.utils.CollectionUtil;
 import org.hadatac.utils.NameSpaces;
@@ -36,12 +37,12 @@ public class EntityRole extends HADatAcThing implements Comparable<EntityRole> {
     }
     
     @Override
-    public Map<HADatAcThing, List<HADatAcThing>> getTargetFacets(
+    public Map<Facetable, List<Facetable>> getTargetFacets(
             Facet facet, FacetHandler facetHandler) {
         return getTargetFacetsFromTripleStore(facet, facetHandler);
     }
 
-    public Map<HADatAcThing, List<HADatAcThing>> getTargetFacetsFromTripleStore(
+    public Map<Facetable, List<Facetable>> getTargetFacetsFromTripleStore(
             Facet facet, FacetHandler facetHandler) {
 
         String valueConstraint = "";
@@ -89,7 +90,7 @@ public class EntityRole extends HADatAcThing implements Comparable<EntityRole> {
 
         // System.out.println("EntityRole query: " + query);
 
-        Map<HADatAcThing, List<HADatAcThing>> results = new HashMap<HADatAcThing, List<HADatAcThing>>();
+        Map<Facetable, List<Facetable>> results = new HashMap<Facetable, List<Facetable>>();
         try {
             ResultSetRewindable resultsrw = SPARQLUtils.select(
                     CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), query);
@@ -107,7 +108,7 @@ public class EntityRole extends HADatAcThing implements Comparable<EntityRole> {
 
                 AttributeInstance attrib = new AttributeInstance();				
                 if (!results.containsKey(role)) {
-                    List<HADatAcThing> facets = new ArrayList<HADatAcThing>();
+                    List<Facetable> facets = new ArrayList<Facetable>();
                     results.put(role, facets);
                 }
                 if (!results.get(role).contains(attrib)) {
@@ -144,7 +145,7 @@ public class EntityRole extends HADatAcThing implements Comparable<EntityRole> {
                     attrib.setField("characteristic_uri_str_multi");
 
                     if (!results.containsKey(role)) {
-                        List<HADatAcThing> facets = new ArrayList<HADatAcThing>();
+                        List<Facetable> facets = new ArrayList<Facetable>();
                         results.put(role, facets);
                     }
                     if (!results.get(role).contains(attrib)) {

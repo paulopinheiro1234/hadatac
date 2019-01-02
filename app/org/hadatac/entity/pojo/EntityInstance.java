@@ -14,6 +14,7 @@ import org.apache.solr.client.solrj.response.QueryResponse;
 import org.hadatac.console.models.Facet;
 import org.hadatac.console.models.FacetHandler;
 import org.hadatac.console.models.Pivot;
+import org.hadatac.console.views.dataacquisitionsearch.Facetable;
 import org.hadatac.utils.CollectionUtil;
 
 
@@ -38,13 +39,13 @@ public class EntityInstance extends HADatAcThing implements Comparable<EntityIns
     }
     
     @Override
-    public Map<HADatAcThing, List<HADatAcThing>> getTargetFacets(
+    public Map<Facetable, List<Facetable>> getTargetFacets(
             Facet facet, FacetHandler facetHandler) {
         return getTargetFacetsFromSolr(facet, facetHandler);
     }
 
     @Override
-    public Map<HADatAcThing, List<HADatAcThing>> getTargetFacetsFromSolr(
+    public Map<Facetable, List<Facetable>> getTargetFacetsFromSolr(
             Facet facet, FacetHandler facetHandler) {
 
         SolrQuery query = new SolrQuery();
@@ -73,10 +74,10 @@ public class EntityInstance extends HADatAcThing implements Comparable<EntityIns
         return null;
     }
 
-    private Map<HADatAcThing, List<HADatAcThing>> parsePivot(Pivot pivot, Facet facet, String query) {
+    private Map<Facetable, List<Facetable>> parsePivot(Pivot pivot, Facet facet, String query) {
         facet.clearFieldValues("entity_uri_str");
 
-        Map<HADatAcThing, List<HADatAcThing>> results = new HashMap<HADatAcThing, List<HADatAcThing>>();
+        Map<Facetable, List<Facetable>> results = new HashMap<Facetable, List<Facetable>>();
         for (Pivot pivot_ent : pivot.children) {
             EntityInstance entity = new EntityInstance();
             entity.setUri(pivot_ent.getValue());
@@ -86,7 +87,7 @@ public class EntityInstance extends HADatAcThing implements Comparable<EntityIns
             entity.setQuery(query);
 
             if (!results.containsKey(entity)) {
-                List<HADatAcThing> children = new ArrayList<HADatAcThing>();
+                List<Facetable> children = new ArrayList<Facetable>();
                 results.put(entity, children);
             }
 

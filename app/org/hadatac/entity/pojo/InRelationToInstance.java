@@ -14,9 +14,9 @@ import org.apache.solr.client.solrj.response.QueryResponse;
 import org.hadatac.console.models.Facet;
 import org.hadatac.console.models.FacetHandler;
 import org.hadatac.console.models.Pivot;
+import org.hadatac.console.views.dataacquisitionsearch.Facetable;
 import org.hadatac.utils.CollectionUtil;
 
-import com.typesafe.config.ConfigFactory;
 
 public class InRelationToInstance extends HADatAcThing implements Comparable<InRelationToInstance> {
 
@@ -37,12 +37,12 @@ public class InRelationToInstance extends HADatAcThing implements Comparable<InR
     }
     
     @Override
-    public Map<HADatAcThing, List<HADatAcThing>> getTargetFacets(
+    public Map<Facetable, List<Facetable>> getTargetFacets(
             Facet facet, FacetHandler facetHandler) {
         return getTargetFacetsFromSolr(facet, facetHandler);
     }
 
-    public Map<HADatAcThing, List<HADatAcThing>> getTargetFacetsFromSolr(
+    public Map<Facetable, List<Facetable>> getTargetFacetsFromSolr(
             Facet facet, FacetHandler facetHandler) {
 
         SolrQuery query = new SolrQuery();
@@ -71,10 +71,10 @@ public class InRelationToInstance extends HADatAcThing implements Comparable<InR
         return null;
     }
 
-    private Map<HADatAcThing, List<HADatAcThing>> parsePivot(Pivot pivot, Facet facet, String query) {
+    private Map<Facetable, List<Facetable>> parsePivot(Pivot pivot, Facet facet, String query) {
         facet.clearFieldValues("in_relation_to_uri_str");
 
-        Map<HADatAcThing, List<HADatAcThing>> results = new HashMap<HADatAcThing, List<HADatAcThing>>();
+        Map<Facetable, List<Facetable>> results = new HashMap<Facetable, List<Facetable>>();
         for (Pivot pivot_ent : pivot.children) {
             InRelationToInstance object = new InRelationToInstance();
             object.setUri(pivot_ent.getValue());
@@ -84,7 +84,7 @@ public class InRelationToInstance extends HADatAcThing implements Comparable<InR
             object.setField("in_relation_to_uri_str");
 
             if (!results.containsKey(object)) {
-                List<HADatAcThing> children = new ArrayList<HADatAcThing>();
+                List<Facetable> children = new ArrayList<Facetable>();
                 results.put(object, children);
             }
 

@@ -7,7 +7,7 @@ import java.util.Map;
 import org.hadatac.console.models.Facet;
 import org.hadatac.console.models.FacetHandler;
 import org.hadatac.console.models.Pivot;
-import org.hadatac.entity.pojo.HADatAcThing;
+import org.hadatac.console.views.dataacquisitionsearch.Facetable;
 
 public class FacetTree {
 	
@@ -42,19 +42,19 @@ public class FacetTree {
 		System.out.println("facetName: " + facet.getFacetName());
 		
 		try {
-			HADatAcThing object = null;
+			Facetable object = null;
 			if (facets.isEmpty()) {
-				object = (HADatAcThing)targetFacet.newInstance();
+				object = (Facetable)targetFacet.newInstance();
 			} else if (level > facets.size()) {
 				return;
 			} else if (level == facets.size()) {
-				object = (HADatAcThing)targetFacet.newInstance();
+				object = (Facetable)targetFacet.newInstance();
 			} else {
-				object = (HADatAcThing)facets.get(level).newInstance();
+				object = (Facetable)facets.get(level).newInstance();
 			}
 			
-			Map<HADatAcThing, List<HADatAcThing>> dict = object.getTargetFacets(facet, facetHandler);
-			for (HADatAcThing key : dict.keySet()) {
+			Map<Facetable, List<Facetable>> dict = object.getTargetFacets(facet, facetHandler);
+			for (Facetable key : dict.keySet()) {
 				if (facets.isEmpty()) {
 					Pivot pivot = new Pivot();
 					pivot.setField(key.getField());

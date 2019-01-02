@@ -6,16 +6,13 @@ import java.util.Map;
 import java.util.HashMap;
 
 import org.apache.commons.text.WordUtils;
-import org.apache.jena.query.QueryExecution;
-import org.apache.jena.query.QueryExecutionFactory;
 import org.apache.jena.query.QuerySolution;
-import org.apache.jena.query.ResultSet;
-import org.apache.jena.query.ResultSetFactory;
 import org.apache.jena.query.ResultSetRewindable;
 import org.apache.jena.sparql.engine.http.QueryExceptionHTTP;
 import org.hadatac.console.http.SPARQLUtils;
 import org.hadatac.console.models.Facet;
 import org.hadatac.console.models.FacetHandler;
+import org.hadatac.console.views.dataacquisitionsearch.Facetable;
 import org.hadatac.utils.CollectionUtil;
 import org.hadatac.utils.NameSpaces;
 
@@ -39,13 +36,13 @@ public class DASEType extends HADatAcThing implements Comparable<DASEType> {
     }
     
     @Override
-    public Map<HADatAcThing, List<HADatAcThing>> getTargetFacets(
+    public Map<Facetable, List<Facetable>> getTargetFacets(
             Facet facet, FacetHandler facetHandler) {
         return getTargetFacetsFromTripleStore(facet, facetHandler);
     }
 
     @Override
-    public Map<HADatAcThing, List<HADatAcThing>> getTargetFacetsFromTripleStore(
+    public Map<Facetable, List<Facetable>> getTargetFacetsFromTripleStore(
             Facet facet, FacetHandler facetHandler) {
         
         String valueConstraint = "";
@@ -72,7 +69,7 @@ public class DASEType extends HADatAcThing implements Comparable<DASEType> {
         
         // System.out.println("DASE query: " + query);
         
-        Map<HADatAcThing, List<HADatAcThing>> mapTypeToInstanceList = new HashMap<HADatAcThing, List<HADatAcThing>>();
+        Map<Facetable, List<Facetable>> mapTypeToInstanceList = new HashMap<Facetable, List<Facetable>>();
         try {
             ResultSetRewindable resultsrw = SPARQLUtils.select(
                     CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), query);
@@ -90,7 +87,7 @@ public class DASEType extends HADatAcThing implements Comparable<DASEType> {
                 timeInstance.setField("named_time_str");
                 
                 if (!mapTypeToInstanceList.containsKey(daseType)) {
-                    List<HADatAcThing> timeInstances = new ArrayList<HADatAcThing>();
+                    List<Facetable> timeInstances = new ArrayList<Facetable>();
                     mapTypeToInstanceList.put(daseType, timeInstances);
                 }
                 if (!mapTypeToInstanceList.get(daseType).contains(timeInstance)) {

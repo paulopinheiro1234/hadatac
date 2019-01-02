@@ -23,6 +23,7 @@ import org.hadatac.utils.NameSpaces;
 import org.hadatac.console.http.SPARQLUtils;
 import org.hadatac.console.models.Facet;
 import org.hadatac.console.models.FacetHandler;
+import org.hadatac.console.views.dataacquisitionsearch.Facetable;
 import org.hadatac.metadata.loader.URIUtils;
 
 
@@ -140,13 +141,13 @@ public class ObjectCollectionType extends HADatAcClass implements Comparable<Obj
 	}
 	
 	@Override
-    public Map<HADatAcThing, List<HADatAcThing>> getTargetFacets(
+    public Map<Facetable, List<Facetable>> getTargetFacets(
             Facet facet, FacetHandler facetHandler) {
 	    return getTargetFacetsFromTripleStore(facet, facetHandler);
     }
 	
 	@Override
-    public Map<HADatAcThing, List<HADatAcThing>> getTargetFacetsFromTripleStore(
+    public Map<Facetable, List<Facetable>> getTargetFacetsFromTripleStore(
             Facet facet, FacetHandler facetHandler) {
 
         String valueConstraint = "";
@@ -165,9 +166,9 @@ public class ObjectCollectionType extends HADatAcClass implements Comparable<Obj
                 + "?objectCollection hasco:hasRoleLabel ?role . \n"
                 + "}";
 
-        System.out.println("ObjectCollectionType query: \n" + query);
+        // System.out.println("ObjectCollectionType query: \n" + query);
 
-        Map<HADatAcThing, List<HADatAcThing>> results = new HashMap<HADatAcThing, List<HADatAcThing>>();
+        Map<Facetable, List<Facetable>> results = new HashMap<Facetable, List<Facetable>>();
         try {            
             ResultSetRewindable resultsrw = SPARQLUtils.select(
                     CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), query);
@@ -187,7 +188,7 @@ public class ObjectCollectionType extends HADatAcClass implements Comparable<Obj
 
                 if (!results.containsKey(objectCollectionType)) {
                     System.out.println("objectCollectionType: " + objectCollectionType.getLabel());
-                    results.put(objectCollectionType, new ArrayList<HADatAcThing>());
+                    results.put(objectCollectionType, new ArrayList<Facetable>());
                 }
                 
                 if (!results.get(objectCollectionType).contains(role)) {

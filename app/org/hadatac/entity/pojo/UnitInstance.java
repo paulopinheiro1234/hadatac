@@ -15,6 +15,7 @@ import org.apache.solr.client.solrj.response.QueryResponse;
 import org.hadatac.console.models.Facet;
 import org.hadatac.console.models.FacetHandler;
 import org.hadatac.console.models.Pivot;
+import org.hadatac.console.views.dataacquisitionsearch.Facetable;
 import org.hadatac.metadata.loader.URIUtils;
 import org.hadatac.utils.CollectionUtil;
 
@@ -41,13 +42,13 @@ public class UnitInstance extends HADatAcThing implements Comparable<UnitInstanc
     }
     
     @Override
-    public Map<HADatAcThing, List<HADatAcThing>> getTargetFacets(
+    public Map<Facetable, List<Facetable>> getTargetFacets(
             Facet facet, FacetHandler facetHandler) {
         return getTargetFacetsFromSolr(facet, facetHandler);
     }
 
     @Override
-    public Map<HADatAcThing, List<HADatAcThing>> getTargetFacetsFromSolr(
+    public Map<Facetable, List<Facetable>> getTargetFacetsFromSolr(
             Facet facet, FacetHandler facetHandler) {  
         SolrQuery query = new SolrQuery();
         String strQuery = facetHandler.getTempSolrQuery(facet);
@@ -75,8 +76,9 @@ public class UnitInstance extends HADatAcThing implements Comparable<UnitInstanc
         return null;
     }
 
-    private Map<HADatAcThing, List<HADatAcThing>> parsePivot(Pivot pivot, String query) {
-        Map<HADatAcThing, List<HADatAcThing>> results = new HashMap<HADatAcThing, List<HADatAcThing>>();
+    private Map<Facetable, List<Facetable>> parsePivot(Pivot pivot, String query) {
+        Map<Facetable, List<Facetable>> results = new HashMap<Facetable, List<Facetable>>();
+        
         for (Pivot pivot_ent : pivot.children) {
             UnitInstance unit = new UnitInstance();
             unit.setUri(pivot_ent.getValue());
@@ -99,7 +101,7 @@ public class UnitInstance extends HADatAcThing implements Comparable<UnitInstanc
             unit.setQuery(query);
             unit.setField("unit_uri_str");
             if (!results.containsKey(unit)) {
-                List<HADatAcThing> attributes = new ArrayList<HADatAcThing>();
+                List<Facetable> attributes = new ArrayList<Facetable>();
                 results.put(unit, attributes);
             }
         }

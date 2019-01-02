@@ -10,8 +10,6 @@ import org.apache.jena.query.QueryExecution;
 import org.apache.jena.query.QueryExecutionFactory;
 import org.apache.jena.query.QueryFactory;
 import org.apache.jena.query.QuerySolution;
-import org.apache.jena.query.ResultSet;
-import org.apache.jena.query.ResultSetFactory;
 import org.apache.jena.query.ResultSetRewindable;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.RDFNode;
@@ -21,10 +19,10 @@ import org.apache.jena.sparql.engine.http.QueryExceptionHTTP;
 import org.hadatac.console.http.SPARQLUtils;
 import org.hadatac.console.models.Facet;
 import org.hadatac.console.models.FacetHandler;
+import org.hadatac.console.views.dataacquisitionsearch.Facetable;
 import org.hadatac.utils.CollectionUtil;
 import org.hadatac.utils.NameSpaces;
 
-import com.typesafe.config.ConfigFactory;
 
 public class Instrument extends HADatAcThing implements Comparable<Instrument> {
 
@@ -52,12 +50,12 @@ public class Instrument extends HADatAcThing implements Comparable<Instrument> {
 	}
 	
 	@Override
-    public Map<HADatAcThing, List<HADatAcThing>> getTargetFacets(
+    public Map<Facetable, List<Facetable>> getTargetFacets(
             Facet facet, FacetHandler facetHandler) {
         return getTargetFacetsFromTripleStore(facet, facetHandler);
     }
 	
-	public Map<HADatAcThing, List<HADatAcThing>> getTargetFacetsFromTripleStore(
+	public Map<Facetable, List<Facetable>> getTargetFacetsFromTripleStore(
 			Facet facet, FacetHandler facetHandler) {
 		String valueConstraint = "";
 		if (!facet.getFacetValuesByField("platform_uri_str").isEmpty()) {
@@ -80,7 +78,7 @@ public class Instrument extends HADatAcThing implements Comparable<Instrument> {
 		
 		facet.clearFieldValues("acquisition_uri_str");
 		
-		Map<HADatAcThing, List<HADatAcThing>> results = new HashMap<HADatAcThing, List<HADatAcThing>>();
+		Map<Facetable, List<Facetable>> results = new HashMap<Facetable, List<Facetable>>();
 		try {
 		    ResultSetRewindable resultsrw = SPARQLUtils.select(
 	                CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), query);
@@ -99,7 +97,7 @@ public class Instrument extends HADatAcThing implements Comparable<Instrument> {
 				da.setField("acquisition_uri_str");
 				
 				if (!results.containsKey(instrument)) {
-					List<HADatAcThing> facets = new ArrayList<HADatAcThing>();
+					List<Facetable> facets = new ArrayList<Facetable>();
 					results.put(instrument, facets);
 				}
 				if (!results.get(instrument).contains(da)) {

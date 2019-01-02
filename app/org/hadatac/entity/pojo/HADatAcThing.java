@@ -8,17 +8,17 @@ import java.util.Map;
 import org.apache.commons.lang3.NotImplementedException;
 import org.hadatac.console.models.Facet;
 import org.hadatac.console.models.FacetHandler;
+import org.hadatac.console.views.dataacquisitionsearch.Facetable;
 import org.hadatac.metadata.loader.URIUtils;
 import org.apache.jena.query.QuerySolution;
 import org.apache.jena.query.ResultSetRewindable;
 import org.hadatac.utils.NameSpaces;
 
-import arq.query;
-
 import org.hadatac.utils.CollectionUtil;
 import org.hadatac.console.http.SPARQLUtils;
 
-public abstract class HADatAcThing {
+
+public abstract class HADatAcThing implements Facetable {
     String uri = "";
     String typeUri = "";
     String field = "";
@@ -29,17 +29,17 @@ public abstract class HADatAcThing {
 
     String namedGraph = "";
     
-    public Map<HADatAcThing, List<HADatAcThing>> getTargetFacets(
+    public Map<Facetable, List<Facetable>> getTargetFacets(
             Facet facet, FacetHandler facetHandler) {
         return null;
     }
 
-    public Map<HADatAcThing, List<HADatAcThing>> getTargetFacetsFromSolr(
+    public Map<Facetable, List<Facetable>> getTargetFacetsFromSolr(
             Facet facet, FacetHandler facetHandler) {
         return null;
     }
     
-    public Map<HADatAcThing, List<HADatAcThing>> getTargetFacetsFromTripleStore(
+    public Map<Facetable, List<Facetable>> getTargetFacetsFromTripleStore(
             Facet facet, FacetHandler facetHandler) {
         return null;
     }

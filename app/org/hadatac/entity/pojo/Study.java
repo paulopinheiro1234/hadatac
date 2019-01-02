@@ -31,6 +31,7 @@ import org.hadatac.console.controllers.metadata.DynamicFunctions;
 import org.hadatac.console.http.SPARQLUtils;
 import org.hadatac.console.models.Facet;
 import org.hadatac.console.models.FacetHandler;
+import org.hadatac.console.views.dataacquisitionsearch.Facetable;
 import org.hadatac.utils.CollectionUtil;
 import org.hadatac.utils.NameSpaces;
 import org.hadatac.utils.ConfigProp;
@@ -383,13 +384,13 @@ public class Study extends HADatAcThing {
     }
     
     @Override
-    public Map<HADatAcThing, List<HADatAcThing>> getTargetFacets(
+    public Map<Facetable, List<Facetable>> getTargetFacets(
             Facet facet, FacetHandler facetHandler) {
         return getTargetFacetsFromTripleStore(facet, facetHandler);
     }
 
     @Override
-    public Map<HADatAcThing, List<HADatAcThing>> getTargetFacetsFromTripleStore(
+    public Map<Facetable, List<Facetable>> getTargetFacetsFromTripleStore(
             Facet facet, FacetHandler facetHandler) {
         System.out.println("\nStudy facet: " + facet.toSolrQuery());
 
@@ -410,7 +411,7 @@ public class Study extends HADatAcThing {
 
         //System.out.println("Study query: " + query);
 
-        Map<HADatAcThing, List<HADatAcThing>> results = new HashMap<HADatAcThing, List<HADatAcThing>>();
+        Map<Facetable, List<Facetable>> results = new HashMap<Facetable, List<Facetable>>();
         try {
             ResultSetRewindable resultsrw = SPARQLUtils.select(
                     CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), query);
@@ -429,7 +430,7 @@ public class Study extends HADatAcThing {
                 da.setField("acquisition_uri_str");
 
                 if (!results.containsKey(study)) {
-                    List<HADatAcThing> facets = new ArrayList<HADatAcThing>();
+                    List<Facetable> facets = new ArrayList<Facetable>();
                     results.put(study, facets);
                 }
                 if (!results.get(study).contains(da)) {

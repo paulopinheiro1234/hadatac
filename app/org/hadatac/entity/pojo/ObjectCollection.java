@@ -15,7 +15,6 @@ import org.apache.jena.query.QueryParseException;
 import org.apache.jena.query.QuerySolution;
 import org.apache.jena.query.ResultSet;
 import org.apache.jena.query.ResultSetRewindable;
-import org.apache.jena.sparql.engine.http.QueryExceptionHTTP;
 import org.apache.jena.query.ResultSetFormatter;
 import org.apache.jena.update.UpdateExecutionFactory;
 import org.apache.jena.update.UpdateFactory;
@@ -37,6 +36,7 @@ import org.hadatac.console.http.SPARQLUtils;
 import org.hadatac.console.models.Facet;
 import org.hadatac.console.models.FacetHandler;
 import org.hadatac.console.models.Pivot;
+import org.hadatac.console.views.dataacquisitionsearch.Facetable;
 import org.hadatac.metadata.loader.LabkeyDataHandler;
 
 public class ObjectCollection extends HADatAcThing implements Comparable<ObjectCollection> {
@@ -649,13 +649,13 @@ public class ObjectCollection extends HADatAcThing implements Comparable<ObjectC
     }
     
     @Override
-    public Map<HADatAcThing, List<HADatAcThing>> getTargetFacets(
+    public Map<Facetable, List<Facetable>> getTargetFacets(
             Facet facet, FacetHandler facetHandler) {
         return getTargetFacetsFromSolr(facet, facetHandler);
     }
 
     @Override
-    public Map<HADatAcThing, List<HADatAcThing>> getTargetFacetsFromSolr(
+    public Map<Facetable, List<Facetable>> getTargetFacetsFromSolr(
             Facet facet, FacetHandler facetHandler) {
 
         SolrQuery query = new SolrQuery();
@@ -685,8 +685,9 @@ public class ObjectCollection extends HADatAcThing implements Comparable<ObjectC
         return null;
     }
 
-    private Map<HADatAcThing, List<HADatAcThing>> parsePivot(Pivot pivot, Facet facet) {
-        Map<HADatAcThing, List<HADatAcThing>> results = new HashMap<HADatAcThing, List<HADatAcThing>>();
+    private Map<Facetable, List<Facetable>> parsePivot(Pivot pivot, Facet facet) {
+        Map<Facetable, List<Facetable>> results = new HashMap<Facetable, List<Facetable>>();
+        
         for (Pivot child : pivot.children) {
             if (child.getValue().isEmpty()) {
                 continue;
@@ -705,7 +706,7 @@ public class ObjectCollection extends HADatAcThing implements Comparable<ObjectC
             oc.setField("object_collection_type_str");
 
             if (!results.containsKey(oc)) {
-                List<HADatAcThing> children = new ArrayList<HADatAcThing>();
+                List<Facetable> children = new ArrayList<Facetable>();
                 results.put(oc, children);
             }
 

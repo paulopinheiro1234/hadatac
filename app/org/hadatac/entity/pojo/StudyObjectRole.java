@@ -14,6 +14,7 @@ import org.apache.solr.common.SolrDocumentList;
 import org.hadatac.console.models.Facet;
 import org.hadatac.console.models.FacetHandler;
 import org.hadatac.console.models.Pivot;
+import org.hadatac.console.views.dataacquisitionsearch.Facetable;
 import org.hadatac.utils.CollectionUtil;
 
 
@@ -65,13 +66,13 @@ public class StudyObjectRole extends HADatAcThing implements Comparable<StudyObj
     }
 	
 	@Override
-    public Map<HADatAcThing, List<HADatAcThing>> getTargetFacets(
+    public Map<Facetable, List<Facetable>> getTargetFacets(
             Facet facet, FacetHandler facetHandler) {
         return getTargetFacetsFromSolr(facet, facetHandler);
     }
 	
 	@Override
-	public Map<HADatAcThing, List<HADatAcThing>> getTargetFacetsFromSolr(
+	public Map<Facetable, List<Facetable>> getTargetFacetsFromSolr(
             Facet facet, FacetHandler facetHandler) {
 	    System.out.println("getTargetFacetsFromSolr() is called");
 	    
@@ -101,10 +102,10 @@ public class StudyObjectRole extends HADatAcThing implements Comparable<StudyObj
         return null;
     }
 
-    private Map<HADatAcThing, List<HADatAcThing>> parsePivot(Pivot pivot, Facet facet, String query) {
+    private Map<Facetable, List<Facetable>> parsePivot(Pivot pivot, Facet facet, String query) {
         facet.clearFieldValues("role_uri_str");
 
-        Map<HADatAcThing, List<HADatAcThing>> results = new HashMap<HADatAcThing, List<HADatAcThing>>();
+        Map<Facetable, List<Facetable>> results = new HashMap<Facetable, List<Facetable>>();
         for (Pivot pivot_ent : pivot.children) {
             StudyObjectRole role = new StudyObjectRole();
             role.setUri(pivot_ent.getValue());
@@ -116,7 +117,7 @@ public class StudyObjectRole extends HADatAcThing implements Comparable<StudyObj
             role.setField("role_str");
 
             if (!results.containsKey(role)) {
-                List<HADatAcThing> children = new ArrayList<HADatAcThing>();
+                List<Facetable> children = new ArrayList<Facetable>();
                 results.put(role, children);
             }
 

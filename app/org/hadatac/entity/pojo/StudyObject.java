@@ -32,6 +32,7 @@ import org.hadatac.console.http.SPARQLUtils;
 import org.hadatac.console.models.Facet;
 import org.hadatac.console.models.FacetHandler;
 import org.hadatac.console.models.Pivot;
+import org.hadatac.console.views.dataacquisitionsearch.Facetable;
 import org.hadatac.metadata.loader.LabkeyDataHandler;
 import org.hadatac.metadata.loader.URIUtils;
 import org.labkey.remoteapi.CommandException;
@@ -527,13 +528,13 @@ public class StudyObject extends HADatAcThing {
     }
     
     @Override
-    public Map<HADatAcThing, List<HADatAcThing>> getTargetFacets(
+    public Map<Facetable, List<Facetable>> getTargetFacets(
             Facet facet, FacetHandler facetHandler) {
         return getTargetFacetsFromSolr(facet, facetHandler);
     }
 
     @Override
-    public Map<HADatAcThing, List<HADatAcThing>> getTargetFacetsFromSolr(
+    public Map<Facetable, List<Facetable>> getTargetFacetsFromSolr(
             Facet facet, FacetHandler facetHandler) {
 
         SolrQuery query = new SolrQuery();
@@ -562,8 +563,9 @@ public class StudyObject extends HADatAcThing {
         return null;
     }
 
-    private Map<HADatAcThing, List<HADatAcThing>> parsePivot(Pivot pivot, Facet facet) {
-        Map<HADatAcThing, List<HADatAcThing>> results = new HashMap<HADatAcThing, List<HADatAcThing>>();
+    private Map<Facetable, List<Facetable>> parsePivot(Pivot pivot, Facet facet) {
+        Map<Facetable, List<Facetable>> results = new HashMap<Facetable, List<Facetable>>();
+        
         for (Pivot child : pivot.children) {
             StudyObject studyObject = new StudyObject();
             studyObject.setUri(child.getValue());
@@ -572,7 +574,7 @@ public class StudyObject extends HADatAcThing {
             studyObject.setField("study_object_uri_str");
 
             if (!results.containsKey(studyObject)) {
-                List<HADatAcThing> children = new ArrayList<HADatAcThing>();
+                List<Facetable> children = new ArrayList<Facetable>();
                 results.put(studyObject, children);
             }
         }
