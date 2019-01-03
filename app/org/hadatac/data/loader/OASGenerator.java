@@ -41,12 +41,8 @@ public class OASGenerator extends BaseGenerator {
     public void initMapping() {}
 
     private String getStudy(Record rec) {
-	System.out.println("OASGenerator: inside getStudy: STUDYID = " + Templates.STUDYID + " actual value: " +  rec.getValueByColumnName(Templates.STUDYID));
-        return rec.getValueByColumnName(Templates.STUDYID).equalsIgnoreCase("NULL")? 
-                "" : rec.getValueByColumnName(Templates.STUDYID);
-	//System.out.println("OASGenerator: inside getStudy: DASTUDYID = " + Templates.DASTUDYID + " actual value: " +  rec.getValueByColumnName(Templates.DASTUDYID));
-        //return rec.getValueByColumnName(Templates.DASTUDYID).equalsIgnoreCase("NULL")? 
-        //        "" : rec.getValueByColumnName(Templates.DASTUDYID);
+        return rec.getValueByColumnName(Templates.DASTUDYID).equalsIgnoreCase("NULL")? 
+                "" : rec.getValueByColumnName(Templates.DASTUDYID);
     }
 
     private String getDataAcquisitionName(Record rec) {
@@ -72,7 +68,7 @@ public class OASGenerator extends BaseGenerator {
     }
 
     private String getOwnerEmail(Record rec) {
-	System.out.println("OASGenerator: owner email's label is [" + Templates.OWNEREMAIL + "]");
+        System.out.println("OASGenerator: owner email's label is [" + Templates.OWNEREMAIL + "]");
         String ownerEmail = rec.getValueByColumnName(Templates.OWNEREMAIL);
         if(ownerEmail.equalsIgnoreCase("NULL") || ownerEmail.isEmpty()) {
             return "";

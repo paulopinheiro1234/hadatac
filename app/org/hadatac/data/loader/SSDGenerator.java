@@ -60,7 +60,7 @@ public class SSDGenerator extends BaseGenerator {
 
     private String getSOCReference(Record rec) {
         String ref = rec.getValueByColumnName(mapCol.get("hasSOCReference"));
-        return ref.trim().replace(" ","").replace("_","-");
+        return ref.trim().replace(" ", "").replace("_", "-");
     }
 
     private String getHasScopeUri(Record rec) {

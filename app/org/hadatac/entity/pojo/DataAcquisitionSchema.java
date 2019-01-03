@@ -137,7 +137,7 @@ public class DataAcquisitionSchema extends HADatAcThing {
     public void setOriginalIdLabel(String originalIdLabel) {
         this.originalIdLabel = originalIdLabel;
     }
-    
+
     public String getLODLabel() {
         return lodLabel;
     }
@@ -428,10 +428,10 @@ public class DataAcquisitionSchema extends HADatAcThing {
         String queryString = NameSpaces.getInstance().printSparqlNameSpaceList() + 
                 "SELECT ?uri WHERE { " + 
                 "   ?uri a hasco:DASchema . } ";
-        
+
         ResultSetRewindable resultsrw = SPARQLUtils.select(
                 CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), queryString);
-        
+
         while (resultsrw.hasNext()) {
             QuerySolution soln = resultsrw.next();
             if (soln != null && soln.getResource("uri").getURI() != null) { 
@@ -439,7 +439,7 @@ public class DataAcquisitionSchema extends HADatAcThing {
                 schemas.add(schema);
             }
         }
-        
+
         return schemas;
     }
 
@@ -456,7 +456,7 @@ public class DataAcquisitionSchema extends HADatAcThing {
                 + " OPTIONAL { ?possibleValue hasco:hasCodeLabel ?codeLabel } . \n"
                 + " }";
 
-        System.out.println("findPossibleValues query: " + queryString);
+        System.out.println("findPossibleValues query: \n" + queryString);
 
         ResultSetRewindable resultsrw = SPARQLUtils.select(
                 CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), queryString);
@@ -509,75 +509,6 @@ public class DataAcquisitionSchema extends HADatAcThing {
         }
 
         return "";
-    }
-
-    public static Map<String, List<String>> findIdUriMappings(String studyUri) {
-        System.out.println("findIdUriMappings is called!");
-
-        Map<String, List<String>> mapIdUriMappings = new HashMap<String, List<String>>();
-        String queryString = NameSpaces.getInstance().printSparqlNameSpaceList()
-                + " SELECT ?studyObject ?studyObjectType ?id ?obj ?subj_id ?socType WHERE { \n"
-                + " { \n"
-                + " 	?studyObject hasco:originalID ?id . \n"
-                + "     ?studyObject rdf:type ?studyObjectType . \n"
-                + "     ?studyObject hasco:isMemberOf ?soc . \n"
-	        + "     ?soc rdf:type ?socType . \n"
-                + "     ?soc a hasco:SubjectGroup . \n"
-                + "     ?soc hasco:isMemberOf* <" + studyUri + "> . \n"
-                + " } UNION { \n"
-                + " 	?studyObject hasco:originalID ?id . \n"
-                + "     ?studyObject rdf:type ?studyObjectType . \n"
-                + "     ?studyObject hasco:isMemberOf ?soc . \n"
-	        + "     ?soc rdf:type ?socType . \n"
-                + "     ?soc a hasco:SampleCollection . \n"
-                + " 	?soc hasco:isMemberOf* <" + studyUri + "> . \n"
-                + " 	?studyObject hasco:hasObjectScope ?obj . \n"
-                + " 	?obj hasco:originalID ?subj_id . \n"
-                + " } \n"
-                + " } \n";
-        
-        System.out.println("findIdUriMappings() queryString: " + queryString);
-
-        ResultSetRewindable resultsrw = SPARQLUtils.select(
-                CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), queryString);
-
-        try {
-            while (resultsrw.hasNext()) {			
-                QuerySolution soln = resultsrw.next();
-                List<String> details = new ArrayList<String>();
-                if (soln.get("studyObject") != null) {
-                    details.add(soln.get("studyObject").toString());
-                } else {
-                    details.add("");
-                }
-                if (soln.get("subj_id") != null) {
-                    details.add(soln.get("subj_id").toString());
-                } else {
-                    details.add("");
-                }
-                if (soln.get("obj") != null) {
-                    details.add(soln.get("obj").toString());
-                } else {
-                    details.add("");
-                }
-                if (soln.get("studyObjectType") != null) {
-                    details.add(soln.get("studyObjectType").toString());
-                } else {
-                    details.add("");
-                }
-                if (soln.get("socType") != null) {
-                    details.add(soln.get("socType").toString());
-                } else {
-                    details.add("");
-                }
-                mapIdUriMappings.put(soln.get("id").toString(), details);
-            }
-        } catch (Exception e) {
-            System.out.println("Error in findIdUriMappings(): " + e.getMessage());
-        }
-
-        System.out.println("mapIdUriMappings: " + mapIdUriMappings.keySet().size());
-        return mapIdUriMappings;
     }
 
     public static DataAcquisitionSchema create(String uri) {
@@ -645,26 +576,26 @@ public class DataAcquisitionSchema extends HADatAcThing {
         String insert = "";
         insert += NameSpaces.getInstance().printSparqlNameSpaceList();
         insert += INSERT_LINE1;
-        
+
         if (!getNamedGraph().isEmpty()) {
             insert += " GRAPH <" + getNamedGraph() + "> { ";
         }
-        
+
         insert += this.getUri() + " a hasco:DASchema . ";
         insert += this.getUri() + " rdfs:label  \"" + this.getLabel() + "\" . ";
-        
+
         if (!getNamedGraph().isEmpty()) {
             insert += " } ";
         }
-        
+
         if (!getNamedGraph().isEmpty()) {
             insert += " } ";
         }
-        
+
         if (!getNamedGraph().isEmpty()) {
             insert += " } ";
         }
-        
+
         insert += LINE_LAST;
 
         try {

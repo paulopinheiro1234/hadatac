@@ -613,8 +613,9 @@ public class Study extends HADatAcThing {
         if (queryUri.startsWith("http")) {
             queryUri = "<" + queryUri + ">";
         }
+        
         String studyQueryString = NameSpaces.getInstance().printSparqlNameSpaceList() +
-                "SELECT DISTINCT ?studyType ?studyLabel ?title ?proj ?studyComment ?external ?agentUri ?institutionUri ?lastId" + 
+                " SELECT DISTINCT ?studyType ?studyLabel ?title ?proj ?studyComment ?external ?agentUri ?institutionUri ?lastId" + 
                 " WHERE {  " + 
                 "      ?studyType rdfs:subClassOf* hasco:Study . " + 
                 "      " + queryUri + " a ?studyType . " + 

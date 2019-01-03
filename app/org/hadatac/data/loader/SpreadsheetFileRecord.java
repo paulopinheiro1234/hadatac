@@ -18,14 +18,9 @@ public class SpreadsheetFileRecord implements Record {
         String value = "";
         try {
             Cell c = row.getCell(getColumnIndexByName(columnName));
-	    value = getCellValueAsString(c);
-	    //if (columnName.equals("originalID")) {
-	    //System.out.println("SpreadsheetFileRecord: getCell = [" + c.getStringCellValue() + "]");
-	    //System.out.println("SpreadsheetFileRecord: getCellType = [" + c.getCellType() + "]");
-	    //System.out.println("SpreadsheetFileRecord: getValuedByColumnName = [" + value + "]");
-	    //}
+            value = getCellValueAsString(c);
         } catch (Exception e) {
-            System.out.println("row " + row.getRowNum() + ", column name " + columnName + " not found!");
+            // System.out.println("row " + row.getRowNum() + ", column name " + columnName + " not found!");
         }
 
         return value;
@@ -62,33 +57,35 @@ public class SpreadsheetFileRecord implements Record {
     }
 
     public static String getCellValueAsString(Cell cell) {
-        String strCellValue = null;
-        if (cell != null) {
-            switch (cell.getCellType()) {
-            case Cell.CELL_TYPE_STRING:
-                strCellValue = cell.toString();
-                break;
-            case Cell.CELL_TYPE_NUMERIC:
-                if (DateUtil.isCellDateFormatted(cell)) {
-                    SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
-                    strCellValue = dateFormat.format(cell.getDateCellValue());
-                } else {
-                    Double value = cell.getNumericCellValue();
-                    Long longValue = value.longValue();
-                    strCellValue = new String(longValue.toString());
-                }
-                break;
-            case Cell.CELL_TYPE_BOOLEAN:
-                strCellValue = new String(new Boolean(cell.getBooleanCellValue()).toString());
-                break;
-            case Cell.CELL_TYPE_BLANK:
-                strCellValue = "";
-                break;
-            }
+        if (cell == null) {
+            return "";
         }
+        
+        String strCellValue = "";
+        switch (cell.getCellType()) {
+        case Cell.CELL_TYPE_STRING:
+            strCellValue = cell.toString();
+            break;
+        case Cell.CELL_TYPE_NUMERIC:
+            if (DateUtil.isCellDateFormatted(cell)) {
+                SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+                strCellValue = dateFormat.format(cell.getDateCellValue());
+            } else {
+                Double value = cell.getNumericCellValue();
+                Long longValue = value.longValue();
+                strCellValue = new String(longValue.toString());
+            }
+            break;
+        case Cell.CELL_TYPE_BOOLEAN:
+            strCellValue = new String(new Boolean(cell.getBooleanCellValue()).toString());
+            break;
+        case Cell.CELL_TYPE_BLANK:
+            strCellValue = "";
+            break;
+        }
+        
         return strCellValue;
     }
-
 }
 
 

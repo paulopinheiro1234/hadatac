@@ -349,6 +349,8 @@ public class AutoAnnotator extends Controller {
 
         dataFile.setStatus(DataFile.UNPROCESSED);
         dataFile.save();
+        
+        AnnotationLog.delete(fileName);
 
         return redirect(routes.AutoAnnotator.index());
     }

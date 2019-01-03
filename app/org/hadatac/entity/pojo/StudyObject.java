@@ -50,6 +50,18 @@ public class StudyObject extends HADatAcThing {
     public static String DELETE_LINE3 = " ?p ?o . ";
     public static String LINE_LAST = "}  ";
     public static String PREFIX = "OBJ-";
+    
+    // Within mapIdStudyObjects
+    //    0 -> studyObject URI
+    public static final String STUDY_OBJECT_URI = "STUDY_OBJECT_URI";
+    //    1 -> originalID of object in the object’s scope (if any)
+    public static final String SUBJECT_ID = "SUBJECT_ID";
+    //    2 -> URI of object in the object’s scope (if any)
+    public static final String OBJECT_SCOPE_URI = "OBJECT_SCOPE_URI";
+    //    3 -> studyObjectType
+    public static final String STUDY_OBJECT_TYPE = "STUDY_OBJECT_TYPE";
+    //    4 -> soc's type
+    public static final String SOC_TYPE = "SOC_TYPE";
 
     String originalId;
     String isMemberOf;
@@ -496,6 +508,76 @@ public class StudyObject extends HADatAcThing {
             e.printStackTrace();
         }
         return "";
+    }
+    
+    public static Map<String, Map<String, String>> findIdUriMappings(String studyUri) {
+        System.out.println("findIdUriMappings is called!");
+
+        Map<String, Map<String, String>> mapIdUriMappings = new HashMap<String, Map<String, String>>();
+        String queryString = NameSpaces.getInstance().printSparqlNameSpaceList()
+                + " SELECT ?studyObject ?studyObjectType ?id ?obj ?subj_id ?socType WHERE { \n"
+                + " { \n"
+                + "     ?studyObject hasco:originalID ?id . \n"
+                + "     ?studyObject rdf:type ?studyObjectType . \n"
+                + "     ?studyObject hasco:isMemberOf ?soc . \n"
+                + "     ?soc rdf:type ?socType . \n"
+                + "     ?soc a hasco:SubjectGroup . \n"
+                + "     ?soc hasco:isMemberOf* <" + studyUri + "> . \n"
+                + " } UNION { \n"
+                + "     ?studyObject hasco:originalID ?id . \n"
+                + "     ?studyObject rdf:type ?studyObjectType . \n"
+                + "     ?studyObject hasco:isMemberOf ?soc . \n"
+                + "     ?soc rdf:type ?socType . \n"
+                + "     ?soc a hasco:SampleCollection . \n"
+                + "     ?soc hasco:isMemberOf* <" + studyUri + "> . \n"
+                + "     ?studyObject hasco:hasObjectScope ?obj . \n"
+                + "     ?obj hasco:originalID ?subj_id . \n"
+                + " } \n"
+                + " } \n";
+
+        System.out.println("findIdUriMappings() query: \n" + queryString);
+
+        ResultSetRewindable resultsrw = SPARQLUtils.select(
+                CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), queryString);
+
+        try {
+            while (resultsrw.hasNext()) {           
+                QuerySolution soln = resultsrw.next();
+                Map<String, String> details = new HashMap<String, String>();
+                if (soln.get("studyObject") != null) {
+                    details.put(STUDY_OBJECT_URI, soln.get("studyObject").toString());
+                } else {
+                    details.put(STUDY_OBJECT_URI, "");
+                }
+                if (soln.get("subj_id") != null) {
+                    details.put(SUBJECT_ID, soln.get("subj_id").toString());
+                } else {
+                    details.put(SUBJECT_ID, "");
+                }
+                if (soln.get("obj") != null) {
+                    details.put(OBJECT_SCOPE_URI, soln.get("obj").toString());
+                } else {
+                    details.put(OBJECT_SCOPE_URI, "");
+                }
+                if (soln.get("studyObjectType") != null) {
+                    details.put(STUDY_OBJECT_TYPE, soln.get("studyObjectType").toString());
+                } else {
+                    details.put(STUDY_OBJECT_TYPE, "");
+                }
+                if (soln.get("socType") != null) {
+                    details.put(SOC_TYPE, soln.get("socType").toString());
+                } else {
+                    details.put(SOC_TYPE, "");
+                }
+                mapIdUriMappings.put(soln.get("id").toString(), details);
+            }
+        } catch (Exception e) {
+            System.out.println("Error in findIdUriMappings(): " + e.getMessage());
+        }
+
+        System.out.println("mapIdUriMappings: " + mapIdUriMappings.keySet().size());
+        
+        return mapIdUriMappings;
     }
     
     @Override

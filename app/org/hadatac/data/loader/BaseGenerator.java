@@ -26,7 +26,6 @@ import org.hadatac.entity.pojo.HADatAcThing;
 import org.hadatac.metadata.loader.LabkeyDataHandler;
 import org.hadatac.metadata.loader.URIUtils;
 import org.hadatac.utils.CollectionUtil;
-import org.hadatac.utils.Feedback;
 import org.hadatac.utils.LabKeyException;
 import org.labkey.remoteapi.CommandException;
 
