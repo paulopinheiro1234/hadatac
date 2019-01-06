@@ -51,7 +51,7 @@ public class EditingOptions extends Controller {
 		String json = hierarchy.getHierarchyJson();
 		//System.out.println("JSON results" + json);
 		OtMSparqlQueryResults hierarchies = new OtMSparqlQueryResults(json);
-		System.out.println("tree results:" + hierarchies.treeResults);
+		//System.out.println("tree results:" + hierarchies.treeResults);
 		return hierarchies;
 	}
 

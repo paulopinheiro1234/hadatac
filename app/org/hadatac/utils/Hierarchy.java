@@ -51,7 +51,7 @@ public class Hierarchy {
 		String graphName = NameSpaces.getNames(className);
 		String q = "SELECT ?id ?superId ?label FROM NAMED <" + graphName + "> " +
 			"{GRAPH ?g { " + 
-				"?id rdfs:subClassOf ?superId . " + 
+				"?id rdfs:subClassOf ?superId . FILTER isIRI(?superId) . " + 
 				" OPTIONAL { ?id rdfs:label ?label }}}";
 		//System.out.println(q);
 		ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
@@ -80,7 +80,7 @@ public class Hierarchy {
 		String graphName = NameSpaces.getNames(className);
 		String q = "SELECT ?id ?superId ?label FROM NAMED <" + graphName + "> " +
 		"{GRAPH ?g { " + 
-			"?id rdfs:subClassOf ?superId . " + 
+			"?id rdfs:subClassOf ?superId . FILTER isIRI(?superId) ." + 
 			" OPTIONAL { ?id rdfs:label ?label }}}";
 		try {
 			String queryString = NameSpaces.getInstance().printSparqlNameSpaceList() + q;

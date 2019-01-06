@@ -113,65 +113,31 @@
       <div class="col-md-10 col-xs-6">
 
             <ul class="nav nav-tabs">
-	       @if(oper.equals("ent")) {
-                    <li class="active"><a class="entitytab" href="#entity_tab" data-toggle="tab">Entity Hierachy</a></li>
-                    <li><a class="attributetab" href="#attribute_tab" data-toggle="tab">Attribute Hierarchy</a></li>
-		} else {
-                    <li><a class="unittab" href="#unit_tab" data-toggle="tab">Unit Hierarchy</a></li> 
-		}
+                <li class="active"><a class="entitytab" href="#entity_tab" data-toggle="tab">Entity Hierachy</a></li>
             </ul>
             <div class="tab-content">
                 <treecontent></treecontent>
-	       @if(oper.equals("ent")) {
-                    <div class="tab-pane" id="entity_tab">
-               <div id="entityquery" data-results="@hierarchy.treeResults"></div>
-                    </div>
-                    <div class="tab-pane" id="attribute_tab">
-		       <div id="attributequery" data-results="@hierarchy.treeResults"></div>
-                    </div>
-                } else {
-                    <div class="tab-pane" id="unit_tab">
-		       <div id="unitquery" data-results="@hierarchy.treeResults"></div>
-                    </div>
-                }
+                <div class="tab-pane" id="entity_tab">
+                    <div id="entityquery" data-results="@hierarchy.treeResults"></div>
+                </div>
             </div>
 
             <script src="/hadatac/assets/javascripts/jquery.min.js"></script>
             <script src="/hadatac/assets/javascripts/d3.v3.min.js"></script>
             <script src="/hadatac/assets/javascripts/bootstrap.min.js"></script>
 
-	    @if(oper.equals("ent")) {
-                <script>
-                   $.ajaxSetup ({
-                      // Disable caching of AJAX responses
-                      // Used when debugging
-                      cache: false
-                   });
+            <script>
+                $.ajaxSetup ({
+                    // Disable caching of AJAX responses
+                    // Used when debugging
+                    cache: false
+                });
 
-                   $.getScript("/hadatac/assets/javascripts/treeEntity.js");
-                   $(".entitytab").click(function() {
-                       $.getScript("/hadatac/assets/javascripts/treeEntity.js");
-                   })
-                </script>
-                <script>
-                   $(".attributetab").click(function() {
-                       $.getScript("/hadatac/assets/javascripts/treeAttribute.js");
-                   })
-                </script>
-	    } else {
-                <script>
-                   $.ajaxSetup ({
-                       // Disable caching of AJAX responses
-                       // Used when debugging
-                       cache: false
-                   });
-
-                   $.getScript("/hadatac/assets/javascripts/treeUnit.js");
-                   $(".unittab").click(function() {
-                        $.getScript("/hadatac/assets/javascripts/treeUnit.js");
-                   })
-                </script>
-	    }
+                $.getScript("/hadatac/assets/javascripts/treeEntity.js");
+                $(".entitytab").click(function() {
+                    $.getScript("/hadatac/assets/javascripts/treeEntity.js");
+                })
+            </script>
 
             <script>
 	      function dasachange() {

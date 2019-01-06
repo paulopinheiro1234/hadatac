@@ -226,7 +226,7 @@ public class OtMSparqlQueryResults{
 		    		labelMap.put(modelN, binding.findPath("label").get("value").asText());
 				}
 	    	}
-	    	JsonNode superNameNode = binding.findPath("superId");
+			JsonNode superNameNode = binding.findPath("superId");
             if (superNameNode != null && superNameNode.get("value") != null) {
                 superN = superNameNode.get("value").asText();
             }
@@ -246,11 +246,10 @@ public class OtMSparqlQueryResults{
 		TreeNode superTree = new TreeNode("Empty");
         ArrayList<TreeNode> assignedBranches = new ArrayList<TreeNode>();
         int numIterations = 0;
-        int maxIterations = 20;
-        while (assignedBranches.size()!= branchCollection.size() && numIterations<maxIterations){
-	    	numIterations++;
+		int maxIterations = 20;
+        while (assignedBranches.size() < branchCollection.size() && numIterations<maxIterations){
+			numIterations++;
 	    	for (TreeNode tn : branchCollection){
-				//System.out.println("tree node get name:" + tn.getName());
 				if (!assignedBranches.contains(tn)){
 		    		if (resultsTree.getName().equals("Empty")) {
 						resultsTree = new TreeNode(tn.getName());
@@ -258,20 +257,17 @@ public class OtMSparqlQueryResults{
 						superTree.addChild(resultsTree);
 						assignedBranches.add(tn);
 					} else {
-						System.out.println("A"); //all things get here after first node
 						if (superTree.hasValue(tn.getName())!=null){
-							System.out.println("B");
 							TreeNode branchOfInterest = superTree.hasValue(tn.getName());
 							branchOfInterest.addChild(tn.getChildren().get(0));
 							assignedBranches.add(tn);
 						} else {
-							System.out.println("C"); //most things get here
 							resultsTree = new TreeNode(tn.getName());
 							resultsTree.addChild(tn.getChildren().get(0));
 							superTree.addChild(resultsTree);
 							assignedBranches.add(tn);
 							// if (tn.hasValue(resultsTree.getName())!=null) {
-							// 	System.out.println("D");
+							// 	System.out.println("here");
 							// 	TreeNode newBranch = new TreeNode(tn.getName());
 							// 	newBranch.addChild(resultsTree);
 							// 	resultsTree = newBranch;
@@ -282,6 +278,7 @@ public class OtMSparqlQueryResults{
 				}
 	    	}
 		}
+		System.out.println("assigned: " + assignedBranches.size());
 		addLabels(superTree,true);
 		addLabels(superTree,false);
 		this.treeResults = superTree.toJson(0);
