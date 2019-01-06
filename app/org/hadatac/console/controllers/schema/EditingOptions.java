@@ -9,6 +9,7 @@ import org.hadatac.console.models.OtMSparqlQueryResults;
 import org.hadatac.entity.pojo.Entity;
 import org.hadatac.entity.pojo.Attribute;
 import org.hadatac.entity.pojo.Unit;
+import org.hadatac.utils.Hierarchy;
 
 import be.objectify.deadbolt.java.actions.Group;
 import be.objectify.deadbolt.java.actions.Restrict;
@@ -43,6 +44,15 @@ public class EditingOptions extends Controller {
 		String json = unit.getHierarchyJson();
 		OtMSparqlQueryResults units = new OtMSparqlQueryResults(json);
 		return units;
+	}
+	
+	public static OtMSparqlQueryResults getHierarchy(String className) {
+		Hierarchy hierarchy = new Hierarchy(className);
+		String json = hierarchy.getHierarchyJson();
+		//System.out.println("JSON results" + json);
+		OtMSparqlQueryResults hierarchies = new OtMSparqlQueryResults(json);
+		//System.out.println("tree results:" + hierarchies.treeResults);
+		return hierarchies;
 	}
 
 }

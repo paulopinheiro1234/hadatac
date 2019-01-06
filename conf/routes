@@ -77,6 +77,8 @@ GET	    /hadatac/metadataacquisitions/viewValue	       org.hadatac.console.contr
 POST	/hadatac/metadataacquisitions/viewValue	       org.hadatac.console.controllers.metadataacquisition.ViewValue.postIndex(user_uri: String, study_uri: String, subject_uri: String, char_uri: String)
 GET	    /hadatac/metadata/ont	                       org.hadatac.console.controllers.metadata.BrowseOntology.index(oper : String)
 POST	/hadatac/metadataa/ont	                       org.hadatac.console.controllers.metadata.BrowseOntology.postIndex(oper : String)
+GET     /hadatac/metadata/graph                        org.hadatac.console.controllers.metadata.BrowseOntology.graphIndex(oper : String, className : String)
+GET     /hadatac/metadata/termOverlap	               org.hadatac.console.controllers.metadata.TermOverlap.index()
 
 # Metadata concepts
 GET	    /hadatac/metadata/entity		               org.hadatac.console.controllers.metadata.concepts.Entity.index()

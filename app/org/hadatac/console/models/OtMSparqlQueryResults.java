@@ -27,38 +27,37 @@ public class OtMSparqlQueryResults{
     public OtMSparqlQueryResults() {}
     
     public OtMSparqlQueryResults(String json_result){
-        
         this.json = json_result;
         ObjectMapper mapper = new ObjectMapper();
         JsonNode node = null;
-	try {
-	    node = mapper.readTree(json);
-	} catch (IOException e) {
-	    e.printStackTrace();
-	}
-	JsonNode header = node.get("head");
-	header = header.get("vars");
-	JsonNode bindings = node.get("results");
-	bindings = bindings.get("bindings");
+		try {
+			node = mapper.readTree(json);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		JsonNode header = node.get("head");
+		header = header.get("vars");
+		JsonNode bindings = node.get("results");
+		bindings = bindings.get("bindings");
 	
-	Iterator<JsonNode> parseHead = header.iterator();
-	String var = "";
-	try{
-	    while(parseHead.hasNext()){
-		var = parseHead.next().asText();
-		vars.add(var);
-	    }
-	} catch (Exception e){
-	    e.printStackTrace();
-	}
+		Iterator<JsonNode> parseHead = header.iterator();
+		String var = "";
+		try{
+			while(parseHead.hasNext()){
+			var = parseHead.next().asText();
+			vars.add(var);
+			}
+		} catch (Exception e){
+			e.printStackTrace();
+		}
 	
-	Iterator<JsonNode> parseResults = bindings.iterator();
-	numVars = vars.size();
+		Iterator<JsonNode> parseResults = bindings.iterator();
+		numVars = vars.size();
 
         if(vars.contains("id") && vars.contains("superId"))
             buildTreeQueryResults(bindings);
-	else 
-	    this.treeResults = "";
+		else 
+	    	this.treeResults = "";
         this.sparqlResults = new TreeMap<String,OtMTripleDocument>();
         while (parseResults.hasNext()){
             try {
@@ -77,9 +76,9 @@ public class OtMSparqlQueryResults{
                 else
                     this.sparqlResults.put(triple.generateID(), triple);
             } catch (Exception e){
-		e.printStackTrace();
-	    }
-	}
+				e.printStackTrace();
+	    	}
+		}
     }
     
     public OtMSparqlQueryResults(String json_result, boolean usingURIs){
@@ -211,23 +210,23 @@ public class OtMSparqlQueryResults{
     }// /constructor
     
     private void buildTreeQueryResults(JsonNode bindings){
-	this.newTree = null;
+		this.newTree = null;
         Iterator<JsonNode> elements = bindings.elements();
         String modelN = null;
         String superN = null;
         ArrayList<TreeNode> branchCollection = new ArrayList<TreeNode>();
         while (elements.hasNext()){
             modelN = "";
-	    superN = "";
+	    	superN = "";
             JsonNode binding = elements.next();
             JsonNode modelNameNode = binding.findPath("id");
             if (modelNameNode != null && modelNameNode.get("value") != null) {
                 modelN = modelNameNode.get("value").asText();
-		if (binding.findPath("label") != null && binding.findPath("label").get("value") != null) {
-		    labelMap.put(modelN, binding.findPath("label").get("value").asText());
-		}
-	    }
-	    JsonNode superNameNode = binding.findPath("superId");
+				if (binding.findPath("label") != null && binding.findPath("label").get("value") != null) {
+		    		labelMap.put(modelN, binding.findPath("label").get("value").asText());
+				}
+	    	}
+			JsonNode superNameNode = binding.findPath("superId");
             if (superNameNode != null && superNameNode.get("value") != null) {
                 superN = superNameNode.get("value").asText();
             }
@@ -242,39 +241,47 @@ public class OtMSparqlQueryResults{
             TreeNode currentBranch = new TreeNode(superN);
             currentBranch.addChild(modelN);
             branchCollection.add(currentBranch);
-	}
-        TreeNode resultsTree = new TreeNode("Empty");
+		}
+		TreeNode resultsTree = new TreeNode("Empty");
+		TreeNode superTree = new TreeNode("Empty");
         ArrayList<TreeNode> assignedBranches = new ArrayList<TreeNode>();
         int numIterations = 0;
-        int maxIterations = 20;
-        while (assignedBranches.size()!=branchCollection.size() && numIterations<maxIterations){
-	    numIterations++;
-	    for (TreeNode tn : branchCollection){
-		if (!assignedBranches.contains(tn)){
-		    if (resultsTree.getName().equals("Empty")) {
-			resultsTree = new TreeNode(tn.getName());
-			resultsTree.addChild(tn.getChildren().get(0));
-			assignedBranches.add(tn);
-		    } else {
-			if (resultsTree.hasValue(tn.getName())!=null){
-			    TreeNode branchOfInterest = resultsTree.hasValue(tn.getName());
-			    branchOfInterest.addChild(tn.getChildren().get(0));
-			    assignedBranches.add(tn);
-			} else {
-			    if (tn.hasValue(resultsTree.getName())!=null) {
-				TreeNode newBranch = new TreeNode(tn.getName());
-				newBranch.addChild(resultsTree);
-				resultsTree = newBranch;
-				assignedBranches.add(tn);
-			    } 
-			}
-		    }
+		int maxIterations = 20;
+        while (assignedBranches.size() < branchCollection.size() && numIterations<maxIterations){
+			numIterations++;
+	    	for (TreeNode tn : branchCollection){
+				if (!assignedBranches.contains(tn)){
+		    		if (resultsTree.getName().equals("Empty")) {
+						resultsTree = new TreeNode(tn.getName());
+						resultsTree.addChild(tn.getChildren().get(0));
+						superTree.addChild(resultsTree);
+						assignedBranches.add(tn);
+					} else {
+						if (superTree.hasValue(tn.getName())!=null){
+							TreeNode branchOfInterest = superTree.hasValue(tn.getName());
+							branchOfInterest.addChild(tn.getChildren().get(0));
+							assignedBranches.add(tn);
+						} else {
+							resultsTree = new TreeNode(tn.getName());
+							resultsTree.addChild(tn.getChildren().get(0));
+							superTree.addChild(resultsTree);
+							assignedBranches.add(tn);
+							// if (tn.hasValue(resultsTree.getName())!=null) {
+							// 	System.out.println("here");
+							// 	TreeNode newBranch = new TreeNode(tn.getName());
+							// 	newBranch.addChild(resultsTree);
+							// 	resultsTree = newBranch;
+							// 	assignedBranches.add(tn);
+							// } 
+						}
+					}
+				}
+	    	}
 		}
-	    }
-	}
-	addLabels(resultsTree,true);
-	addLabels(resultsTree,false);
-	this.treeResults = resultsTree.toJson(0);
+		System.out.println("assigned: " + assignedBranches.size());
+		addLabels(superTree,true);
+		addLabels(superTree,false);
+		this.treeResults = superTree.toJson(0);
     }
     
     public void addLabels(TreeNode aNode, boolean isReset) {
