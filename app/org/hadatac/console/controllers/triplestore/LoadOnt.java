@@ -158,7 +158,7 @@ public class LoadOnt extends Controller {
             ns.setURL(data.get("nsURL" + String.valueOf(i + 1)));
             ns.save();
         }
-        NameSpaces.reload();
+        NameSpaces.getInstance().reload();
 
         return redirect(routes.LoadOnt.loadOnt("init"));
     }
@@ -187,7 +187,7 @@ public class LoadOnt extends Controller {
         } else {
             return badRequest("Error uploading file. Please try again.");
         }
-        NameSpaces.reload();
+        NameSpaces.getInstance().reload();
 
         return redirect(routes.LoadOnt.loadOnt("init"));
     }

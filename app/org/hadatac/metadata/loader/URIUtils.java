@@ -86,7 +86,7 @@ public class URIUtils {
 	 */
 	public static String replaceNameSpace(String str) {
 		String resp = str;
-	    for (Map.Entry<String, NameSpace> entry : NameSpaces.getInstance().table.entrySet()) {
+	    for (Map.Entry<String, NameSpace> entry : NameSpaces.getInstance().getTable().entrySet()) {
 	        String abbrev = entry.getKey().toString();
 	        String nsString = entry.getValue().getName();
 	        if (str.startsWith(nsString)) {
@@ -102,7 +102,7 @@ public class URIUtils {
 			return "";
 		}
 		String resp = str;
-	    for (Map.Entry<String, NameSpace> entry : NameSpaces.getInstance().table.entrySet()) {
+	    for (Map.Entry<String, NameSpace> entry : NameSpaces.getInstance().getTable().entrySet()) {
 	        String abbrev = entry.getKey().toString();
 	        String nsString = entry.getValue().getName();
 	        if (str.startsWith(nsString)) {
@@ -120,7 +120,7 @@ public class URIUtils {
 	 */
 	public static String replacePrefix(String str) {
 		String resp = str;
-	    for (Map.Entry<String, NameSpace> entry : NameSpaces.table.entrySet()) {
+	    for (Map.Entry<String, NameSpace> entry : NameSpaces.getInstance().getTable().entrySet()) {
 	        String abbrev = entry.getKey().toString();
 	        String nsString = entry.getValue().getName();
 	        if (str.startsWith(abbrev + ":")) {
@@ -138,7 +138,7 @@ public class URIUtils {
 	 */
 	public static String replacePrefixEx(String str) {
 		String resp = str;
-	    for (Map.Entry<String, NameSpace> entry : NameSpaces.table.entrySet()) {
+	    for (Map.Entry<String, NameSpace> entry : NameSpaces.getInstance().getTable().entrySet()) {
 	        String abbrev = entry.getKey().toString();
 	        String nsString = entry.getValue().getName();
 	        if (str.startsWith(abbrev + ":")) {
@@ -173,7 +173,7 @@ public class URIUtils {
 			return;
 		String abbrev = "";
 		String nsName = str.substring(0,(str.indexOf(':') + 1));
-	    for (Map.Entry<String, NameSpace> entry : NameSpaces.table.entrySet()) {
+	    for (Map.Entry<String, NameSpace> entry : NameSpaces.getInstance().getTable().entrySet()) {
 	        abbrev = entry.getKey().toString() + ":";
 	        if (abbrev.equals(nsName)) {
 	        	return;
@@ -214,7 +214,7 @@ public class URIUtils {
     	if (isAbbreviatedURI(object)) {
     		validateNameSpace(object);
     		String resp = object;
-    	    for (Map.Entry<String, NameSpace> entry : NameSpaces.table.entrySet()) {
+    	    for (Map.Entry<String, NameSpace> entry : NameSpaces.getInstance().getTable().entrySet()) {
     	        String abbrev = entry.getKey().toString();
     	        String nsString = entry.getValue().getName();
     	        if (object.startsWith(abbrev + ":")) {

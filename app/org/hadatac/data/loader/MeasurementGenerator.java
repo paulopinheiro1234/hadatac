@@ -14,7 +14,6 @@ import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.impl.HttpSolrClient;
 import org.hadatac.console.controllers.annotator.AnnotationLog;
 import org.hadatac.entity.pojo.ObjectAccessSpec;
-import org.hadatac.entity.pojo.Study;
 import org.hadatac.entity.pojo.StudyObject;
 import org.hadatac.entity.pojo.DataAcquisitionSchema;
 import org.hadatac.entity.pojo.DataAcquisitionSchemaAttribute;
