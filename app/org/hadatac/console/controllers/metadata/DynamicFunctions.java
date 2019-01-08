@@ -144,7 +144,7 @@ public class DynamicFunctions extends Controller {
                     "(MIN(?label_) AS ?label)" +
                     "WHERE { ?indicator rdfs:subClassOf " + indicatorType + " . " +
                     "?indicator rdfs:label ?label_ . " + 
-                    "} GROUP BY ?indicator ?label";
+"} GROUP BY ?indicator ?label_"; 
             try {				
                 ResultSetRewindable resultsrwIndvInd = SPARQLUtils.select(
                         CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), indvIndicatorQuery);
@@ -184,7 +184,7 @@ public class DynamicFunctions extends Controller {
                     + " ?indicator rdfs:subClassOf " + indicatorType + " . "
                     + " ?indicator rdfs:label ?label_ . "
                     + " } "
-                    + " GROUP BY ?indicator ?label";
+                    + " GROUP BY ?indicator ?label_";
             try {				
                 ResultSetRewindable resultsrwIndvInd = SPARQLUtils.select(
                         CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), indvIndicatorQuery);

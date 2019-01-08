@@ -45,7 +45,7 @@ public class GetSparqlQueryDynamic {
 
         System.out.println("In Query Selector: " + indicator);
         String q = DynamicFunctions.getPrefixes() + 
-                "SELECT ?id ?superId ?label ?iden ?comment ?def ?unit ?note ?attrTo ?assocWith " + 
+                "SELECT DISTINCT ?id ?superId ?label ?iden ?comment ?def ?unit ?note ?attrTo ?assocWith " + 
                 "WHERE { " + 
                 "  ?id rdfs:subClassOf* " + indicator + ". " + 
                 "  ?id rdfs:subClassOf ?superId . " + 
@@ -69,7 +69,7 @@ public class GetSparqlQueryDynamic {
         
         try {
             String queryString = NameSpaces.getInstance().printSparqlNameSpaceList() 
-                    + "SELECT ?id ?superId ?label ?iden ?comment ?def ?unit ?note ?attrTo ?assocWith WHERE { \n" 
+                    + "SELECT DISTINCT ?id ?superId ?label ?iden ?comment ?def ?unit ?note ?attrTo ?assocWith WHERE { \n" 
                     + "  ?id rdfs:subClassOf* " + indicatorUri + " . \n"
                     + "  ?id rdfs:subClassOf ?superId . \n"
                     + "  ?id rdfs:label ?label . \n"
