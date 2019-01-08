@@ -41,7 +41,7 @@ public class DynamicFunctions extends Controller {
     public static Map<String,String> getPrefixMap() {
         NameSpaces.getInstance();
         Map<String,String> prefixMap = new HashMap<String,String>();
-        for (Map.Entry<String, NameSpace> entry : NameSpaces.table.entrySet()) {
+        for (Map.Entry<String, NameSpace> entry : NameSpaces.getInstance().getTable().entrySet()) {
             String abbrev = entry.getKey().toString();
             NameSpace ns = entry.getValue();
             prefixMap.put(abbrev, ns.getName());

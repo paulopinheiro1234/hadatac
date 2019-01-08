@@ -48,7 +48,7 @@ public class Hierarchy {
 		// 				"   OPTIONAL { ?id rdfs:label ?label . } " + 
 		// 				"   OPTIONAL { ?id rdfs:comment ?comment . } " +
 		// 				"}";
-		String graphName = NameSpaces.getNames(className);
+		String graphName = NameSpaces.getInstance().getNameByAbbreviation(className);
 		String q = "SELECT ?id ?superId ?label FROM NAMED <" + graphName + "> " +
 			"{GRAPH ?g { " + 
 				"?id rdfs:subClassOf ?superId . FILTER isIRI(?superId) . " + 
@@ -77,7 +77,7 @@ public class Hierarchy {
 		String superNode = null;
 		String nodeLabel = null;
 		ArrayList<TreeNode> branchCollection = new ArrayList<TreeNode>();
-		String graphName = NameSpaces.getNames(className);
+		String graphName = NameSpaces.getInstance().getNameByAbbreviation(className);
 		String q = "SELECT ?id ?superId ?label FROM NAMED <" + graphName + "> " +
 		"{GRAPH ?g { " + 
 			"?id rdfs:subClassOf ?superId . FILTER isIRI(?superId) ." + 

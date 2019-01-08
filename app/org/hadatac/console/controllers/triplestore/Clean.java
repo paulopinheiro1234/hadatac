@@ -37,7 +37,7 @@ public class Clean extends Controller {
                             ConfigFactory.load().getString("hadatac.solr.triplestore"), 
                             false);
             result = metadata.clean(Feedback.WEB);
-            NameSpaces.reload();
+            NameSpaces.getInstance().reload();
         } else if (oper.equals("usergraph")) {
             PermissionsContext permission = new 
                     PermissionsContext("user", 

@@ -21,9 +21,12 @@ public class NameSpaces {
     public static String CACHE_PATH   = "tmp/cache/";
     public static String CACHE_PREFIX = "copy-";
 
-    public static Map<String, NameSpace> table = new HashMap<String, NameSpace>();
+    private Map<String, NameSpace> table = new HashMap<String, NameSpace>();
 
-    public Map<String, Integer> loadedOntologies; 
+    private Map<String, Integer> loadedOntologies = new HashMap<String, Integer>();
+    
+    private String turtleNameSpaceList = "";
+    private String sparqlNameSpaceList = "";
 
     private static NameSpaces instance = null;
 
@@ -33,21 +36,12 @@ public class NameSpaces {
         }
         return instance;
     }
-
-    public static String getNames(String abbr) {
-        NameSpace ns = table.get(abbr);
-        if(ns == null)
-            return "owl";
-        else
-            return ns.getName();
-    }
-
-    private NameSpaces() {
-        loadedOntologies = new HashMap<String, Integer>();
-        
+    
+    private NameSpaces() {        
         List<NameSpace> namespaces = NameSpace.findAll();
         if (namespaces.isEmpty()) {
-            InputStream inputStream = getClass().getClassLoader().getResourceAsStream("namespaces.properties");
+            InputStream inputStream = getClass().getClassLoader()
+                    .getResourceAsStream("namespaces.properties");
             namespaces = loadFromFile(inputStream);
         }
         
@@ -56,14 +50,34 @@ public class NameSpaces {
             table.put(ns.getAbbreviation(), ns);
         }
     }
+
+    public String getNameByAbbreviation(String abbr) {
+        NameSpace ns = table.get(abbr);
+        if (ns == null) {
+            return "owl";
+        } else {
+            return ns.getName();
+        }
+    }
     
-    public static void reload() {
+    public Map<String, NameSpace> getTable() {
+        return table;
+    }
+    
+    public Map<String, Integer> getLoadedOntologies() {
+        return loadedOntologies;
+    }
+    
+    public void reload() {
         table.clear();
         List<NameSpace> namespaces = NameSpace.findAll();
         for (NameSpace ns : namespaces) {
             ns.updateLoadedTripleSize();
             table.put(ns.getAbbreviation(), ns);
         }
+        
+        sparqlNameSpaceList = getSparqlNameSpaceList();
+        turtleNameSpaceList = getTurtleNameSpaceList();
     }
     
     public static List<NameSpace> loadFromFile(InputStream inputStream) {
@@ -106,31 +120,50 @@ public class NameSpaces {
     public Map<String, NameSpace> getNamespaces() {
         return table;
     }
-
-    public String printTurtleNameSpaceList() {
-        String ttl = "";
+    
+    private String getTurtleNameSpaceList() {
+        String namespaces = "";
         for (Map.Entry<String, NameSpace> entry : table.entrySet()) {
             String abbrev = entry.getKey().toString();;
             NameSpace ns = entry.getValue();
-            ttl = ttl + "@prefix " + abbrev + ": <" + ns.getName() + "> . \n";
+            namespaces = namespaces + "@prefix " + abbrev + ": <" + ns.getName() + "> . \n";
         }
-        return ttl;
+        
+        return namespaces;
+    }
+    
+    private String getSparqlNameSpaceList() {
+        String namespaces = "";
+        for (Map.Entry<String, NameSpace> entry : table.entrySet()) {
+            String abbrev = entry.getKey().toString();;
+            NameSpace ns = entry.getValue();
+            namespaces = namespaces + "PREFIX " + abbrev + ": <" + ns.getName() + "> \n";
+        }
+        
+        return namespaces;
+    }
+
+    public String printTurtleNameSpaceList() {
+        if (!"".equals(turtleNameSpaceList)) {
+            return turtleNameSpaceList;
+        }
+        
+        return getTurtleNameSpaceList();
     }
 
     public String printSparqlNameSpaceList() {
-        String ttl = "";
-        for (Map.Entry<String, NameSpace> entry : table.entrySet()) {
-            String abbrev = entry.getKey().toString();;
-            NameSpace ns = entry.getValue();
-            ttl = ttl + "PREFIX " + abbrev + ": <" + ns.getName() + "> \n";
+        if (!"".equals(sparqlNameSpaceList)) {
+            return sparqlNameSpaceList;
         }
-        return ttl;
+        
+        return getSparqlNameSpaceList();
     }
 
-    public int getNumberNameSpaces() {
+    public int getNumOfNameSpaces() {
         if (table == null) {  
             return 0;
         }
+        
         return table.size();
     }
 

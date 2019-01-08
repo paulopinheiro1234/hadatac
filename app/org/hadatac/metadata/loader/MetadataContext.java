@@ -156,7 +156,7 @@ public class MetadataContext implements RDFContext {
             message += Feedback.println(mode, "   Triples before [loadOntologies]: " + total);
             message += Feedback.println(mode," ");
 
-            for (Map.Entry<String, NameSpace> entry : NameSpaces.table.entrySet()) {
+            for (Map.Entry<String, NameSpace> entry : NameSpaces.getInstance().getTable().entrySet()) {
                 String abbrev = entry.getKey().toString();
                 NameSpace ns = entry.getValue();
                 String nsURL = ns.getURL();
@@ -183,7 +183,7 @@ public class MetadataContext implements RDFContext {
             message += Feedback.println(mode," ");
             message += Feedback.println(mode, "   Triples after [loadOntologies]: " + totalTriples());
         }
-        NameSpaces.reload();
+        NameSpaces.getInstance().reload();
 
         return message;
     }
