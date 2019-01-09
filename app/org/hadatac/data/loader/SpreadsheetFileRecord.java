@@ -73,18 +73,18 @@ public class SpreadsheetFileRecord implements Record {
             } else {
                 Double value = cell.getNumericCellValue();
                 Long longValue = value.longValue();
-                strCellValue = new String(longValue.toString());
+                strCellValue = longValue.toString();
             }
             break;
         case Cell.CELL_TYPE_BOOLEAN:
-            strCellValue = new String(new Boolean(cell.getBooleanCellValue()).toString());
+            strCellValue = new Boolean(cell.getBooleanCellValue()).toString();
             break;
         case Cell.CELL_TYPE_BLANK:
             strCellValue = "";
             break;
         }
         
-        return strCellValue;
+        return strCellValue.trim();
     }
 }
 

@@ -84,11 +84,11 @@ public class EntityRole extends HADatAcThing implements Comparable<EntityRole> {
                 + "?dasa hasco:hasEntity ?entityUri . \n"
                 + "?dasa hasco:hasAttribute ?attributeUri . \n"
                 + "?attributeUri rdfs:label ?attributeLabel . \n"
-                + "} \n"
                 + "FILTER (?daso != ?dasoSub) \n"
+                + "} \n"
                 + "} \n";
 
-        // System.out.println("EntityRole query: " + query);
+        // System.out.println("EntityRole query: \n" + query);
 
         Map<Facetable, List<Facetable>> results = new HashMap<Facetable, List<Facetable>>();
         try {
@@ -122,14 +122,38 @@ public class EntityRole extends HADatAcThing implements Comparable<EntityRole> {
                 facet.clearFieldValues("daso_uri_str");
                 facet.clearFieldValues("dasa_uri_str");
 
+                boolean hasEmptyDasoSub = false;
+                while (resultsrw.hasNext()) {
+                    QuerySolution soln = resultsrw.next();
+                    if (soln.get("dasoSub") == null) {
+                        hasEmptyDasoSub = true;
+                    }
+                }
+                
+                boolean allowRoleWithEmptyUri = true;
+                resultsrw.reset();
+                while (resultsrw.hasNext()) {
+                    QuerySolution soln = resultsrw.next();
+                    if (soln.get("roleUri") != null && !soln.get("roleUri").toString().isEmpty()) {
+                        if ((hasEmptyDasoSub && soln.get("dasoSub") == null) || 
+                                (!hasEmptyDasoSub && soln.get("dasoSub") != null)) {
+                            allowRoleWithEmptyUri = false;
+                        }
+                    }
+                }
+                
+                resultsrw.reset();
                 while (resultsrw.hasNext()) {
                     QuerySolution soln = resultsrw.next();
                     EntityRole role = new EntityRole();
                     if (soln.get("roleUri") != null && !soln.get("roleUri").toString().isEmpty()) {
-                        role.setUri(soln.get("roleUri").toString());
-                        role.setLabel(WordUtils.capitalize(URIUtils.getBaseName(soln.get("roleUri").toString())));
-                        role.setField("entity_role_uri_str");
-                        role.setQuery(query);
+                        if ((hasEmptyDasoSub && soln.get("dasoSub") == null) || 
+                                (!hasEmptyDasoSub && soln.get("dasoSub") != null)) {
+                            role.setUri(soln.get("roleUri").toString());
+                            role.setLabel(WordUtils.capitalize(URIUtils.getBaseName(soln.get("roleUri").toString())));
+                            role.setField("entity_role_uri_str");
+                            role.setQuery(query);
+                        }
                     } else {
                         System.out.println("soln.get(\"roleUri\") == null");
                         /*
@@ -144,20 +168,27 @@ public class EntityRole extends HADatAcThing implements Comparable<EntityRole> {
                     attrib.setLabel(WordUtils.capitalize(soln.get("attributeLabel").toString()));
                     attrib.setField("characteristic_uri_str_multi");
 
-                    if (!results.containsKey(role)) {
+                    if (!results.containsKey(role) && (allowRoleWithEmptyUri || (!allowRoleWithEmptyUri && !role.getUri().isEmpty()))) {
                         List<Facetable> facets = new ArrayList<Facetable>();
                         results.put(role, facets);
                     }
-                    if (!results.get(role).contains(attrib)) {
-                        results.get(role).add(attrib);
+                    
+                    if (results.containsKey(role)) {
+                        if (!results.get(role).contains(attrib)) {
+                            results.get(role).add(attrib);
+                        }
                     }
 
                     Facet subFacet = facet.getChildById(role.getUri());
                     subFacet.putFacet("entity_role_uri_str", role.getUri());
-                    if (soln.get("dasoSub") != null) {
-                        subFacet.putFacet("daso_uri_str", soln.get("dasoSub").toString());
+                    if (hasEmptyDasoSub) {
+                        if (soln.get("dasoSub") == null) {
+                            subFacet.putFacet("daso_uri_str", soln.get("daso").toString());
+                        }
                     } else {
-                        subFacet.putFacet("daso_uri_str", soln.get("daso").toString());
+                        if (soln.get("dasoSub") != null) {
+                            subFacet.putFacet("daso_uri_str", soln.get("dasoSub").toString());
+                        }
                     }
                     subFacet.putFacet("dasa_uri_str", soln.get("dasa").toString());
 
