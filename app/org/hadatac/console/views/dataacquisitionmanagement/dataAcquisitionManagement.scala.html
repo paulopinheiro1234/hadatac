@@ -17,26 +17,26 @@
       <div class="row">
          <div class="navbar-collapse collapse navbar-secondary">
         	@if(state.getCurrent() == State.ACTIVE) {
-            	<a href='@org.hadatac.console.controllers.dataacquisitionmanagement.routes.DataAcquisitionManagement.index(State.ACTIVE)' class="btn-sm btn-warning disabled" role="button">Active Acquisitions</a>
+            	<a href='@org.hadatac.console.controllers.dataacquisitionmanagement.routes.DataAcquisitionManagement.index(State.ACTIVE)' class="btn-sm btn-warning disabled" role="button">Active OASs</a>
             } else {
-            	<a href='@org.hadatac.console.controllers.dataacquisitionmanagement.routes.DataAcquisitionManagement.index(State.ACTIVE)' class="btn-sm btn-primary" role="button">Active Acquisitions</a>
+            	<a href='@org.hadatac.console.controllers.dataacquisitionmanagement.routes.DataAcquisitionManagement.index(State.ACTIVE)' class="btn-sm btn-primary" role="button">Active OASs</a>
             }
             @if(state.getCurrent() == State.CHANGED) {
-            	<a href='@org.hadatac.console.controllers.dataacquisitionmanagement.routes.DataAcquisitionManagement.index(State.CHANGED)' class="btn-sm btn-warning disabled" role="button">Changed Acquisitions</a>
+            	<a href='@org.hadatac.console.controllers.dataacquisitionmanagement.routes.DataAcquisitionManagement.index(State.CHANGED)' class="btn-sm btn-warning disabled" role="button">Changed OASs</a>
             } else {
-            	<a href='@org.hadatac.console.controllers.dataacquisitionmanagement.routes.DataAcquisitionManagement.index(State.CHANGED)' class="btn-sm btn-primary" role="button">Changed Acquisitions</a>
+            	<a href='@org.hadatac.console.controllers.dataacquisitionmanagement.routes.DataAcquisitionManagement.index(State.CHANGED)' class="btn-sm btn-primary" role="button">Changed OASs</a>
             }
         	@if(state.getCurrent() == State.CLOSED) {
-             	<a href='@org.hadatac.console.controllers.dataacquisitionmanagement.routes.DataAcquisitionManagement.index(State.CLOSED)' class="btn-sm btn-warning disabled" role="button">Closed Acquisitions</a>
+             	<a href='@org.hadatac.console.controllers.dataacquisitionmanagement.routes.DataAcquisitionManagement.index(State.CLOSED)' class="btn-sm btn-warning disabled" role="button">Closed OASs</a>
             } else {
-             	<a href='@org.hadatac.console.controllers.dataacquisitionmanagement.routes.DataAcquisitionManagement.index(State.CLOSED)' class="btn-sm btn-primary" role="button">Closed Acquisitions</a>
+             	<a href='@org.hadatac.console.controllers.dataacquisitionmanagement.routes.DataAcquisitionManagement.index(State.CLOSED)' class="btn-sm btn-primary" role="button">Closed OASs</a>
             }
         	@if(state.getCurrent() == State.ALL) {
-             	<a href='@org.hadatac.console.controllers.dataacquisitionmanagement.routes.DataAcquisitionManagement.index(State.ALL)' class="btn-sm btn-warning disabled" role="button">All Acquisitions</a>
+             	<a href='@org.hadatac.console.controllers.dataacquisitionmanagement.routes.DataAcquisitionManagement.index(State.ALL)' class="btn-sm btn-warning disabled" role="button">All OASs</a>
             } else {
-             	<a href='@org.hadatac.console.controllers.dataacquisitionmanagement.routes.DataAcquisitionManagement.index(State.ALL)' class="btn-sm btn-primary" role="button">All Acquisitions</a>
+             	<a href='@org.hadatac.console.controllers.dataacquisitionmanagement.routes.DataAcquisitionManagement.index(State.ALL)' class="btn-sm btn-primary" role="button">All OASs</a>
             }
-            <a href='@org.hadatac.console.controllers.dataacquisitionmanagement.routes.DataAcquisitionManagement.newDataAcquisition()' class="btn-sm btn-primary" role="button">Create New Acquisition</a>
+            <a href='@org.hadatac.console.controllers.dataacquisitionmanagement.routes.DataAcquisitionManagement.newDataAcquisition()' class="btn-sm btn-primary" role="button">Create New OAS</a>
          </div>
       </div>
    </div>
@@ -44,13 +44,13 @@
    <hr>
    
    @if(state.getCurrent() == State.ACTIVE) {
-        <h3>@AuthApplication.getAuthApplication.getUserProvider().getUser(session()).getName()'s Active Data Acquisitions</h3>
+        <h3>@AuthApplication.getAuthApplication.getUserProvider().getUser(session()).getName()'s Active OASs</h3>
    } 
    @if(state.getCurrent() == State.CLOSED) {
-        <h3>@AuthApplication.getAuthApplication.getUserProvider().getUser(session()).getName()'s Closed Data Acquisitions</h3>
+        <h3>@AuthApplication.getAuthApplication.getUserProvider().getUser(session()).getName()'s Closed OASs</h3>
    } 
    @if(state.getCurrent() == State.ALL) {
-        <h3>@AuthApplication.getAuthApplication.getUserProvider().getUser(session()).getName()'s Active and Closed Data Acquisitions</h3>
+        <h3>@AuthApplication.getAuthApplication.getUserProvider().getUser(session()).getName()'s Active and Closed OASs</h3>
    } 
 
    

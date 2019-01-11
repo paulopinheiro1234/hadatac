@@ -116,8 +116,13 @@ public class StudyObjectGenerator extends BaseGenerator {
 
     private String getScopeUri(Record rec) {
         if (oc_scope != null && oc_scope.length() > 0){
-            String scopeOCtype = mapContent.get(oc_scope).get(1);
-            return kbPrefix + uriMap.get(scopeOCtype) + rec.getValueByColumnName(mapCol.get("scopeID")).replaceAll("(?<=^\\d+)\\.0*$", "") + "-" + study_id;
+	    if (mapContent.get(oc_scope) != null) {
+		String scopeOCtype = mapContent.get(oc_scope).get(1);
+		return kbPrefix + uriMap.get(scopeOCtype) + rec.getValueByColumnName(mapCol.get("scopeID")).replaceAll("(?<=^\\d+)\\.0*$", "") + "-" + study_id;
+	    } else {
+		System.out.println("StudyObjectGenerator: no mapping for [" + oc_scope + "] in getScopeUri()");
+		return "";
+	    }
         } else {
             return "";
         }
@@ -125,8 +130,13 @@ public class StudyObjectGenerator extends BaseGenerator {
 
     private String getTimeScopeUri(Record rec) {
         if (oc_timescope != null && oc_timescope.length() > 0){
-            String timeScopeOCtype = mapContent.get(oc_timescope).get(1);
-            return kbPrefix + uriMap.get(timeScopeOCtype) + rec.getValueByColumnName(mapCol.get("timeScopeID")).replaceAll("(?<=^\\d+)\\.0*$", "") + "-" + study_id;
+	    if (mapContent.get(oc_timescope) != null) {
+		String timeScopeOCtype = mapContent.get(oc_timescope).get(1);
+		return kbPrefix + uriMap.get(timeScopeOCtype) + rec.getValueByColumnName(mapCol.get("timeScopeID")).replaceAll("(?<=^\\d+)\\.0*$", "") + "-" + study_id;
+	    } else {
+		System.out.println("StudyObjectGenerator: no mapContent for [" + oc_timescope + "] in getTimeScopeUri(). Record is " + rec);
+		return "";
+	    }
         } else {
             return "";
         }
@@ -134,10 +144,18 @@ public class StudyObjectGenerator extends BaseGenerator {
     
     public StudyObject createStudyObject(Record record) throws Exception {
         StudyObject obj = new StudyObject(getUri(record), getType(record), 
-                getOriginalID(record), getLabel(record), 
-                getCohortUri(record), getLabel(record));
+					  getOriginalID(record), getLabel(record), 
+					  getCohortUri(record), getLabel(record));
         obj.setRoleUri(URIUtils.replacePrefixEx(role));
         obj.addScopeUri(getScopeUri(record));
+	System.out.println("StudyObjectGenerator: createStudyObject calling getTimeScopeUri. original ID [" + getOriginalID(record) + "]");
+	System.out.println("StudyObjectGenerator: value of time scope [" + record.getValueByColumnName(mapCol.get("timeScopeID")).replaceAll("(?<=^\\d+)\\.0*$", "") + "]");
+	System.out.println("StudyObjectGenerator: value of oc_timescope [" + oc_timescope + "]");
+	System.out.println("StudyObjectGenerator: value of mapContent.get(oc_timescope) [" + mapContent.get(oc_timescope) + "]");
+	List<String> l = new ArrayList<String>(mapContent.keySet());
+	for (String str : l) {
+	    System.out.println("StudyObjectGenerator: mapContent's key [" + str + "]");
+	}
         obj.addTimeScopeUri(getTimeScopeUri(record));
         
         return obj;
