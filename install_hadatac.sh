@@ -46,7 +46,7 @@ else
 fi
 echo ""
 if [ "$#" -gt 2 ]; then
-  BLAZEGRAPH_HOME=$2
+  BLAZEGRAPH_HOME=$3
 else
   read -r -p "Directory of installation [~/hadatac-blazegraph]: " response
   if [ "$response" == "" ]
