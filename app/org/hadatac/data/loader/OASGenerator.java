@@ -9,6 +9,7 @@ import java.util.Map;
 import org.hadatac.console.models.SysUser;
 import org.hadatac.entity.pojo.ObjectAccessSpec;
 import org.hadatac.entity.pojo.DataAcquisitionSchema;
+import org.hadatac.entity.pojo.DataFile;
 import org.hadatac.entity.pojo.Deployment;
 import org.hadatac.entity.pojo.HADatAcThing;
 import org.hadatac.entity.pojo.Measurement;
@@ -106,12 +107,28 @@ public class OASGenerator extends BaseGenerator {
 
         String ownerEmail = getOwnerEmail(rec);
         if (ownerEmail.isEmpty()) {
-            throw new Exception(String.format("Owner Email is not specified for Row %s!", rowNumber));
+            DataFile dataFile = DataFile.findByName(getFileName());
+            if (null != dataFile) {
+                ownerEmail = dataFile.getOwnerEmail();
+                if (ownerEmail.isEmpty()) {
+                    throw new Exception(String.format("Owner Email is empty from records for the uploaded file!"));
+                }
+            } else {
+                throw new Exception(String.format("Owner Email is not specified for Row %s!", rowNumber));
+            }
         }
 
         String permissionUri = getPermissionUri(rec);
         if (permissionUri.isEmpty()) {
-            throw new Exception(String.format("Permission URI is not specified for Row %s!", rowNumber));
+            SysUser user = SysUser.findByEmail(ownerEmail);
+            if (null != user) {
+                permissionUri = user.getUri();
+                if (permissionUri.isEmpty()) {
+                    throw new Exception(String.format("URI is empty for the user with email %s", ownerEmail));
+                }
+            } else {
+                throw new Exception(String.format("Permission URI is not specified for Row %s!", rowNumber));
+            }
         }
 
         String deploymentUri = URIUtils.replacePrefixEx(getDeployment(rec));
