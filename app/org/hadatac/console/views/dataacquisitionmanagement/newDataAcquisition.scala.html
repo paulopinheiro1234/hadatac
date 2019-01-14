@@ -1,45 +1,54 @@
 @(theDeployments : List[org.hadatac.entity.pojo.Deployment],
-  theSchemas : List[org.hadatac.entity.pojo.DataAcquisitionSchema],
-  permissions : Map[String, String],
-  ownerOptions : List[String],
+  permissions : Map[String, String], 
+  ownerOptions : List[String], 
   bAdmin : Boolean)
 
-@import helper._
-@import org.hadatac.utils._
+@import helper._ 
+@import org.hadatac.utils._ 
 @import org.hadatac.console.views.html._
 @import org.hadatac.console.views.html.deployments._
-@import org.hadatac.console.controllers.deployments._
-@import org.hadatac.console.controllers._
+@import org.hadatac.console.controllers.deployments._ 
+@import org.hadatac.console.controllers._ 
+@import org.hadatac.metadata.loader.URIUtils; 
+
 
 @main("New DataAcquisition") {
 
-	<script type="text/javascript">
+<script type="text/javascript">
 	   function checkform() {
 	      var cansubmit = true;
+	      
+	      if (document.getElementById('studyId').value.length == 0) {
+              cansubmit = false;
+          }
 	
-	      if (document.getElementById('newUri').value.length == 0) {
+	      if (document.getElementById('daName').value.length == 0) {
 	          cansubmit = false;
 	      }
 	
-	      if (document.getElementById('newDeployment').value.length == 0) {
-	          cansubmit = false;
-	      }
-	      else {
-	    	  document.getElementById('newUri').value = document.getElementById('newDeployment').value.replace("DPL", "DA");
-	      }
-
-	      if (document.getElementById('newSchema').value.length == 0) {
+	      if (document.getElementById('deploymentUri').value.length == 0) {
 	          cansubmit = false;
 	      }
 
-	      if (document.getElementById('newPermission').value.length == 0) {
+	      if (document.getElementById('sddName').value.length == 0) {
 	          cansubmit = false;
 	      }
+
+	      @*
+	      if (document.getElementById('cellScope').value.length == 0) {
+	          cansubmit = false;
+	      }
+	      *@
 	                
-	      if (document.getElementById('newStartDate').value.length == 0) {
-	         cansubmit = false;
+	      if (document.getElementById('ownerEmail').value.length == 0) {
+	    	  cansubmit = false;
 	      }
-	
+	      
+	      if (document.getElementById('permissionUri').value.length == 0) {
+	    	  cansubmit = false;
+	      }
+	      
+	      console.log("cansubmit: " + cansubmit);
 	      if (cansubmit) {
 	          document.getElementById('submitbutton').disabled = false;
 	      } else {
@@ -48,116 +57,144 @@
 	   }
 	</script>
 
-	<div class="container">
-	  <h2>New Object Access Specification</h2>
-	
-	<form class="form-horizontal" name="newDataAcquisition" method="post" action="@org.hadatac.console.controllers.dataacquisitionmanagement.routes.DataAcquisitionManagement.processForm()">
-	
-	<div class="form-group">
-	       <label>Deployment</label> 
-	       <select class="form-control col-sm-6" id="newDeployment" name="newDeployment" onchange="checkform()" >
-	          <option value=""></option>
-	          @for(deployment <- theDeployments) {
-	              <option value="@deployment.getUri()">@deployment.getUri()</option>
-	          }
-	       </select>
-	</div>
-	
-	<div class="form-group">
-	<label>Object Access Specification URI</label>
-		<input type="text" class="form-control col-sm-6" name="newUri" id="newUri" onchange="checkform()" >
-	</div>
-	  
-	<div class="form-group">
-	       <label>Schema</label> 
-	       <select class="form-control col-sm-6" id="newSchema" name="newSchema" onchange="checkform()" >
-	          <option value=""></option>
-	          @for(schema <- theSchemas) {
-	              <option value="@schema.getUri()">@schema.getUri()</option>
-	          }
-	       </select>
-	  </div>
-	
-	<div class="form-group">
-	<label>Parameters: (optional)</label>
-		<input type="text" class="form-control col-sm-6" name="newParameter" id="newParameter" onchange="checkform()" >
-	</div>
-	
-	@if(bAdmin) {
-	  <div class="form-group">
-          <label>Owner</label>
-          <select class="form-control col-sm-6" id="newOwner" name="newOwner" >
-          	<option value=""></option>
-        	@for(opt <- ownerOptions) {
-            	<option value="@opt">@opt</option>
-        	}
-          </select>
-	  </div>
-	}
-	        
-    <div class="form-group">
-       <label>Permission</label>
-       <select class="form-control col-sm-6" id="newPermission" name="newPermission" >
-       <option value="Public">Public</option>       
-          @for((permUri, permName) <- permissions){
-          	<option value="@permUri">@permName</option>
-          }
-       </select>
-    </div>
-	         
-	  <div class="form-group">
-	        <label for="startdate">Start Date/Time</label><br> 
-	        <div class="container">
-	           <div class="row">
-	              <div class='col-sm-3'>
-	                <div class="form-group">
-	                   <div class='input-group date' id='startdate' onchange="checkform()" >
-	                      <input type='text' name="newStartDate" id="newStartDate" class="form-control" />
-	                      <span class="input-group-addon">
-	                         <span class="glyphicon glyphicon-calendar"></span>
-	                      </span>
-	                   </div>
-	                </div>
-	              </div>
-	              <script type="text/javascript">
+<div class="container">
+	<h2>New Object Access Specification</h2>
+
+	<form class="form-horizontal" name="newDataAcquisition" method="post"
+		action="@org.hadatac.console.controllers.dataacquisitionmanagement.routes.DataAcquisitionManagement.generateOASFileFromForm()">
+
+		<div class="form-group">
+			<label>Study ID</label> <input type="text"
+				class="form-control col-sm-6" name="studyId" id="studyId"
+				onchange="checkform()">
+		</div>
+
+		<div class="form-group">
+			<label>Data Acquisition Name</label> <input type="text"
+				class="form-control col-sm-6" name="daName" id="daName"
+				onchange="checkform()">
+		</div>
+
+		<div class="form-group">
+			<label>SDD Name</label> <input type="text"
+				class="form-control col-sm-6" name="sddName" id="sddName"
+				onchange="checkform()">
+		</div>
+
+		<div class="form-group">
+			<label>Deployment URI</label> <select class="form-control col-sm-6"
+				id="deploymentUri" name="deploymentUri" onchange="checkform()">
+				<option value=""></option> @for(deployment <- theDeployments) {
+				<option value="@deployment.getUri()">@URIUtils.replaceNameSpaceEx(deployment.getUri())</option>
+				}
+			</select>
+		</div>
+
+		<div class="form-group">
+			<label>Cell Scope</label> <input type="text"
+				class="form-control col-sm-6" name="cellScope" id="cellScope"
+				onchange="checkform()">
+		</div>
+		
+		@*
+		<div class="form-group">
+			<label>Object Access Specification URI</label> <input type="text"
+				class="form-control col-sm-6" name="newUri" id="newUri"
+				onchange="checkform()">
+		</div>
+
+		<div class="form-group">
+			<label>Schema</label> <select class="form-control col-sm-6"
+				id="newSchema" name="newSchema" onchange="checkform()">
+				<option value=""></option> @for(schema <- theSchemas) {
+				<option value="@schema.getUri()">@schema.getUri()</option> }
+			</select>
+		</div>
+
+		<div class="form-group">
+			<label>Parameters: (optional)</label> <input type="text"
+				class="form-control col-sm-6" name="newParameter" id="newParameter"
+				onchange="checkform()">
+		</div>
+		*@
+
+		<div class="form-group">
+			<label>Owner Email</label> <select class="form-control col-sm-6"
+				id="ownerEmail" name="ownerEmail" onchange="checkform()">
+				<option value=""></option> @for(opt <- ownerOptions) {
+				<option value="@opt">@opt</option> }
+			</select>
+		</div>
+
+		<div class="form-group">
+			<label>Permission URI</label> <select class="form-control col-sm-6"
+				id="permissionUri" name="permissionUri" onchange="checkform()">
+				<option value=""></option>
+				<option value="Public">Public</option> @for((permUri, permName) <-
+				permissions){
+				<option value="@permUri">@permName</option> }
+			</select>
+		</div>
+
+        @*
+		<div class="form-group">
+			<label for="startdate">Start Date/Time</label><br>
+			<div class="container">
+				<div class="row">
+					<div class='col-sm-3'>
+						<div class="form-group">
+							<div class='input-group date' id='startdate'
+								onchange="checkform()">
+								<input type='text' name="newStartDate" id="newStartDate"
+									class="form-control" /> <span class="input-group-addon">
+									<span class="glyphicon glyphicon-calendar"></span>
+								</span>
+							</div>
+						</div>
+					</div>
+					<script type="text/javascript">
 	               $(function () {
 	                   $('#startdate').datetimepicker();
 	                   $('#startdate').on('dp.change', function (e) { checkform(); });
 	               });
 	             </script>
-	          </div>
-	       </div>
-	  </div>
-	  
-	  <div class="form-group">
-	        <label for="enddate">End Date/Time</label><br> 
-	        <div class="container">
-	           <div class="row">
-	              <div class='col-sm-3'>
-	                <div class="form-group">
-	                   <div class='input-group date' id='enddate' onchange="checkform()" >
-	                      <input type='text' name="newEndDate" id="newEndDate" class="form-control" />
-	                      <span class="input-group-addon">
-	                         <span class="glyphicon glyphicon-calendar"></span>
-	                      </span>
-	                   </div>
-	                </div>
-	              </div>
-	              <script type="text/javascript">
+				</div>
+			</div>
+		</div>
+
+		<div class="form-group">
+			<label for="enddate">End Date/Time</label><br>
+			<div class="container">
+				<div class="row">
+					<div class='col-sm-3'>
+						<div class="form-group">
+							<div class='input-group date' id='enddate' onchange="checkform()">
+								<input type='text' name="newEndDate" id="newEndDate"
+									class="form-control" /> <span class="input-group-addon">
+									<span class="glyphicon glyphicon-calendar"></span>
+								</span>
+							</div>
+						</div>
+					</div>
+					<script type="text/javascript">
 	               $(function () {
 	                   $('#enddate').datetimepicker();
 	                   $('#enddate').on('dp.change', function (e) { checkform(); });
 	               });
 	             </script>
-	          </div>
-	       </div>
-	  </div>
-	
-	  <div class="form-group" class="col-sm-6 col-offset-3">
-	      <input class="btn btn-success" role="button" id="submitbutton" type="submit" value="Create" disabled="disabled" />
-	      <a href="@org.hadatac.console.controllers.dataacquisitionmanagement.routes.DataAcquisitionManagement.index(State.ACTIVE)" class="btn btn-primary" role="button">Cancel</a>
-	 	  <p> The created deployment will be saved in LabKey</p>
-	  </div>
+				</div>
+			</div>
+		</div>
+		*@
+
+		<div class="form-group" class="col-sm-6 col-offset-3">
+			<input class="btn btn-primary" role="button" id="submitbutton"
+				type="submit" value="Create OAS file and Submit to Auto-Annotator"
+				disabled="disabled" /> <a
+				href="@org.hadatac.console.controllers.dataacquisitionmanagement.routes.DataAcquisitionManagement.index(State.ACTIVE)"
+				class="btn btn-primary" role="button">Cancel</a>
+			@*<p>The created deployment will be saved in LabKey</p>*@
+		</div>
 	</form>
-	</div>
+</div>
 }

@@ -27,7 +27,6 @@ import org.hadatac.console.http.SolrUtils;
 import org.hadatac.metadata.loader.URIUtils;
 import org.hadatac.utils.CollectionUtil;
 
-import com.typesafe.config.ConfigFactory;
 
 public class DataFile {
 
@@ -201,7 +200,7 @@ public class DataFile {
         return false;
     }
 
-    public static void create(String fileName, String ownerEmail) {
+    public static DataFile create(String fileName, String ownerEmail) {
         DataFile dataFile = new DataFile(fileName);
         dataFile.setOwnerEmail(ownerEmail);
         dataFile.setStatus(DataFile.UNPROCESSED);
@@ -213,6 +212,8 @@ public class DataFile {
         }
 
         dataFile.save();
+        
+        return dataFile;
     }
 
     public static DataFile convertFromSolr(SolrDocument doc) {
