@@ -63,6 +63,7 @@ public class DataAcquisitionSchemaAttribute extends HADatAcThing {
     private Map<String, String> relations = new HashMap<String, String>();
     private boolean isMeta;
     private DataAcquisitionSchema das;
+    private String socUri;
 
     public DataAcquisitionSchemaAttribute(String uri, String partOfSchema) {
         this.uri = uri;

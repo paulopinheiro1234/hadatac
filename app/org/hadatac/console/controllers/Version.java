@@ -7,7 +7,7 @@ import play.twirl.api.Html;
 public class Version extends Controller {
 	
     public Result index() {
-        String version = "1.0.39";
+        String version = "1.0.40";
         
         return ok(new Html("<div class=\"container-fluid\"><h4>"
                 + "Version: " + version
