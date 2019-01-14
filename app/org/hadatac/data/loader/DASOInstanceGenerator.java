@@ -28,7 +28,7 @@ public class DASOInstanceGenerator{
 	}
 
 	//
-	private String resolveVirtualEntity(DASVirtualObject workingObj, String workingField, CSVRecord rec) {
+      	private String resolveVirtualEntity(DASVirtualObject workingObj, String workingField, CSVRecord rec) {
 		//System.out.println("[DASOInstanceGen]: resolving " + workingField  + " for " + workingObj.getTemplateUri());
 		if(workingField.contains("DASO") || workingField.startsWith("??")){
 			if(codebook.containsKey(workingField)){
@@ -87,7 +87,8 @@ public class DASOInstanceGenerator{
 	// private String studyId;
 	// private String templateUri;
 	// private Map<String,String> objRelations;
-	public HashMap<String,DASOInstance> generateRowInstances(CSVRecord rec){
+
+        public HashMap<String,DASOInstance> generateRowInstances(CSVRecord rec){
 		//System.out.println("[DASOInstanceGenerator] Inside generateRowInstances!");
 		HashMap<String, DASOInstance> instances = new HashMap<String,DASOInstance>();
 		String tempLabel = "";
@@ -128,7 +129,6 @@ public class DASOInstanceGenerator{
 		}// /iterate over templates
 		return instances;
 	}// /generateRowInstances
-	
 
 
 }// /class

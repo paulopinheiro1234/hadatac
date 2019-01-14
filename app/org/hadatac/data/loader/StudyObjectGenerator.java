@@ -132,7 +132,15 @@ public class StudyObjectGenerator extends BaseGenerator {
         if (oc_timescope != null && oc_timescope.length() > 0){
 	    if (mapContent.get(oc_timescope) != null) {
 		String timeScopeOCtype = mapContent.get(oc_timescope).get(1);
-		return kbPrefix + uriMap.get(timeScopeOCtype) + rec.getValueByColumnName(mapCol.get("timeScopeID")).replaceAll("(?<=^\\d+)\\.0*$", "") + "-" + study_id;
+		String returnedValue = rec.getValueByColumnName(mapCol.get("timeScopeID"));
+	        // the value returned by getValueByColumnName may be an URI or an original.
+		if (URIUtils.isValidURI(returnedValue)) {
+		    // if returned value is an URI, this function returns the URI with expanded namespace 
+		    return URIUtils.replacePrefixEx(returnedValue);
+		} else {
+		    // if returned value is not an URI, this function composes an URI according to SDD convention 
+		    return kbPrefix + uriMap.get(timeScopeOCtype) + returnedValue.replaceAll("(?<=^\\d+)\\.0*$", "") + "-" + study_id;
+		}
 	    } else {
 		System.out.println("StudyObjectGenerator: no mapContent for [" + oc_timescope + "] in getTimeScopeUri(). Record is " + rec);
 		return "";

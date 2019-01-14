@@ -139,7 +139,7 @@ public class DataAcquisitionSchemaObject extends HADatAcThing {
         if (entity == null || entity.equals("")) {
             this.entityLabel = "";
         } else {
-            this.entityLabel = FirstLabel.getLabel(entity);
+            this.entityLabel = FirstLabel.getPrettyLabel(entity);
         }
     }
 
@@ -205,7 +205,7 @@ public class DataAcquisitionSchemaObject extends HADatAcThing {
         if (role == null || role.equals("")) {
             this.roleLabel = "";
         } else {
-            this.roleLabel = FirstLabel.getLabel(role);
+            this.roleLabel = FirstLabel.getPrettyLabel(role);
         }
     }
 
@@ -230,7 +230,7 @@ public class DataAcquisitionSchemaObject extends HADatAcThing {
         if (inRelationTo == null || inRelationTo.equals("")) {
             this.inRelationToLabel = "";
         } else {
-            this.inRelationToLabel = FirstLabel.getLabel(inRelationTo);
+            this.inRelationToLabel = FirstLabel.getPrettyLabel(inRelationTo);
         }
     }
 
@@ -252,7 +252,7 @@ public class DataAcquisitionSchemaObject extends HADatAcThing {
         if (relation == null || relation.equals("")) {
             this.relationLabel = "";
         } else {
-            this.relationLabel = FirstLabel.getLabel(relation);
+            this.relationLabel = FirstLabel.getPrettyLabel(relation);
         }
     }
 
@@ -307,7 +307,7 @@ public class DataAcquisitionSchemaObject extends HADatAcThing {
         try {
             if (soln != null) {
 
-                labelStr = FirstLabel.getLabel(uri);
+                labelStr = FirstLabel.getPrettyLabel(uri);
 
                 try {
                     if (soln.getResource("entity") != null && soln.getResource("entity").getURI() != null) {

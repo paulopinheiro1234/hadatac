@@ -146,7 +146,7 @@ public class DataAcquisitionSchemaEvent extends HADatAcThing {
         if (entity == null || entity.equals("")) {
             this.entityLabel = "";
         } else {
-            this.entityLabel = FirstLabel.getLabel(entity);
+            this.entityLabel = FirstLabel.getPrettyLabel(entity);
         }
     }
 
@@ -181,7 +181,7 @@ public class DataAcquisitionSchemaEvent extends HADatAcThing {
         if (unit == null || unit.equals("")) {
             this.unitLabel = "";
         } else {
-            this.unitLabel = FirstLabel.getLabel(unit);
+            this.unitLabel = FirstLabel.getPrettyLabel(unit);
         }
     }
 
@@ -235,7 +235,7 @@ public class DataAcquisitionSchemaEvent extends HADatAcThing {
         try {
             if (soln != null) {
 
-                labelStr = FirstLabel.getLabel(uri);
+                labelStr = FirstLabel.getPrettyLabel(uri);
 
                 try {
                     if (soln.getResource("partOfSchema") != null && soln.getResource("partOfSchema").getURI() != null) {
