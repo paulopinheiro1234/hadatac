@@ -6,6 +6,7 @@ import java.math.BigDecimal;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
+import java.util.ArrayList;
 import java.util.Map;
 import java.util.HashMap;
 
@@ -19,6 +20,8 @@ import org.hadatac.entity.pojo.DataAcquisitionSchema;
 import org.hadatac.entity.pojo.DataAcquisitionSchemaAttribute;
 import org.hadatac.entity.pojo.DataAcquisitionSchemaEvent;
 import org.hadatac.entity.pojo.DataAcquisitionSchemaObject;
+import org.hadatac.entity.pojo.DASVirtualObject;
+import org.hadatac.entity.pojo.DASOInstance;
 import org.hadatac.entity.pojo.DataFile;
 import org.hadatac.entity.pojo.EntityRole;
 import org.hadatac.entity.pojo.HADatAcThing;
@@ -56,7 +59,7 @@ public class MeasurementGenerator extends BaseGenerator {
     
     private String dasoUnitUri = "";
 
-    // private List<DASVirtualObject> templateList = new ArrayList<DASVirtualObject>();
+    private List<DASVirtualObject> templateList = new ArrayList<DASVirtualObject>();
 
     public MeasurementGenerator(RecordFile file, ObjectAccessSpec da, DataFile dataFile) {
         super(file);
@@ -148,12 +151,13 @@ public class MeasurementGenerator extends BaseGenerator {
         //System.out.println("possibleValues: " + possibleValues);
 
         // Comment out row instance generation
-        /*
+        
         // Need to be fixed here by getting codeMap and codebook from sparql query
         DASOInstanceGenerator dasoiGen = new DASOInstanceGenerator(da.getStudy().getUri(), 
-                templateList, AnnotationWorker.codeMappings, AnnotationWorker.codebook_K);
-        Map<String, DASOInstance> rowInstances = new HashMap<String,DASOInstance>();
-         */
+								   //                templateList, AnnotationWorker.codeMappings, AnnotationWorker.codebook_K);
+								   templateList, null, null);
+	Map<String, DASOInstance> rowInstances = new HashMap<String,DASOInstance>();
+        
     }
 
     @Override

@@ -83,32 +83,37 @@ public class SSDGenerator extends BaseGenerator {
     }
 
     private List<String> getTimeScopeUris(Record rec) {
+	System.out.println("getTimeScopeUris:  timeScopeUris is [" + mapCol.get("timeScopeUris") + "]");
         if (mapCol.get("timeScopeUris") == null || rec.getValueByColumnName(mapCol.get("timeScopeUris")) == null) {
 	    return new ArrayList<String>();
 	}
+	System.out.println("getTimeScopeUris: getValueByColumnName: [" + rec.getValueByColumnName(mapCol.get("timeScopeUris")) + "]");
         List<String> ans = Arrays.asList(rec.getValueByColumnName(mapCol.get("timeScopeUris")).split(","))
                 .stream()
                 .map(s -> URIUtils.replacePrefixEx(s))
                 .collect(Collectors.toList());
+	System.out.println("getTimeScopeUris:");
+	for (String str : ans) {
+	    System.out.println("value: [" + str + "]");
+	}
         return ans;
     }
 
     public ObjectCollection createObjectCollection(Record record) throws Exception {
-        ObjectCollection oc = new ObjectCollection(
-                URIUtils.replacePrefixEx(getUri(record)),
-                URIUtils.replacePrefixEx(getTypeUri(record)),
-                getLabel(record),
-                getLabel(record),
-                this.studyUri,
-                URIUtils.replacePrefixEx(getHasScopeUri(record)),
-                getGroundingLabel(record),
-                getSOCReference(record),
-                getSpaceScopeUris(record),
-                getTimeScopeUris(record));
-
+        ObjectCollection oc = new ObjectCollection(URIUtils.replacePrefixEx(getUri(record)),
+						   URIUtils.replacePrefixEx(getTypeUri(record)),
+						   getLabel(record),
+						   getLabel(record),
+						   this.studyUri,
+						   URIUtils.replacePrefixEx(getHasScopeUri(record)),
+						   getGroundingLabel(record),
+						   getSOCReference(record),
+						   getSpaceScopeUris(record),
+						   getTimeScopeUris(record));
+	
         return oc;
     }
-
+    
     @Override
     public void preprocess() throws Exception {}
 

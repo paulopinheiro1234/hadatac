@@ -7,35 +7,53 @@ echo "instance of HADataC on your machine. Please refer to"
 echo "https://github.com/paulopinheiro1234/hadatac/wiki if you have any"
 echo "questions about this installation."
 echo ""
+echo "Note: This script can be automated by specifying install parameters."
+echo "Usage: bash install_hadatac.sh [Y/N] [solr_install_dir] [blazegraph_install_dir]"
+echo ""
 echo "  ATTENTION:"
 echo "  1) This script downloads and install Apache Solr. This takes around"
 echo "     300Mbytes of data. Make sure you have a decent connection and"
 echo "     this data availability."
 echo ""
 
-read -r -p "Proceed with installation? [y/N] " response
-case $response in
+if [ "$#" -gt 0 ]; then
+  case $1 in
+    [yY][eE][sS]|[yY])
+        ;;
+    *)
+        exit
+        ;;
+  esac
+else
+  read -r -p "Proceed with installation? [y/N] " response
+  case $response in
     [yY][eE][sS]|[yY]) 
         ;;
     *)
         exit
         ;;
-esac
-
-echo ""
-read -r -p "Directory of installation [~/hadatac-solr]: " response
-if [ "$response" == "" ]
-then HADATAC_HOME=~/hadatac-solr
-else HADATAC_HOME=$response
+  esac
 fi
-
 echo ""
-read -r -p "Directory of installation [~/hadatac-blazegraph]: " response
-if [ "$response" == "" ]
-then BLAZEGRAPH_HOME=~/hadatac-blazegraph
-else BLAZEGRAPH_HOME=$response
+if [ "$#" -gt 1 ]; then
+  HADATAC_HOME=$2
+else
+  read -r -p "Directory of installation [~/hadatac-solr]: " response
+  if [ "$response" == "" ]
+  then HADATAC_HOME=~/hadatac-solr
+  else HADATAC_HOME=$response
+  fi
 fi
-
+echo ""
+if [ "$#" -gt 2 ]; then
+  BLAZEGRAPH_HOME=$3
+else
+  read -r -p "Directory of installation [~/hadatac-blazegraph]: " response
+  if [ "$response" == "" ]
+  then BLAZEGRAPH_HOME=~/hadatac-blazegraph
+  else BLAZEGRAPH_HOME=$response
+  fi
+fi
 HADATAC_DOWNLOAD=$HADATAC_HOME/download
 HADATAC_SOLR=$HADATAC_HOME/solr
 SOLR6_HOME=$HADATAC_SOLR/solr-6.5.0

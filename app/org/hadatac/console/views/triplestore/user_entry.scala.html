@@ -2,19 +2,20 @@
 
 @import java.net._
 
-<tr>
+@if(user != null) {
+    <tr>
    	<td>@user.getName()</td> 
    	<td>@user.getUri()</td> 
-   	<td>@if(user.getImmediateGroupUri().equals("Public")) {
-   		Public
-   	} else {
+   	<td>@if("Public".equals(user.getImmediateGroupUri())) {
+   	        Public
+   	    } else {
    		@if(org.hadatac.entity.pojo.UserGroup.find(user.getImmediateGroupUri()) != null) { 
-   			@org.hadatac.entity.pojo.UserGroup.find(user.getImmediateGroupUri()).getName() 
+   		    @org.hadatac.entity.pojo.UserGroup.find(user.getImmediateGroupUri()).getName() 
    		} else {
-   			null
+   		    null
    		}
-   	}
-   	</td>
+   	    }
+    	</td>
    	<td>@if(user.isAdministrator()) { YES } else { NO }</td>
    	<td>@if(user.isValidated()) { Validated } else { Pending }</td>
    	<td>
@@ -27,4 +28,5 @@
       	<a href="@org.hadatac.console.controllers.triplestore.routes.UserManagement.deleteUser(URLEncoder.encode(user.getUri(),"UTF-8"), true, true)" class="btn-xs btn-primary" role="button">Delete</a>
       	<a href="@org.hadatac.console.controllers.triplestore.routes.UserManagement.sendInvitationEmail(user.getGivenName(), user.getEmail())" class="btn-xs btn-primary" role="button">Send Validation Email</a>
    	</td>
-</tr>
+    </tr>
+}

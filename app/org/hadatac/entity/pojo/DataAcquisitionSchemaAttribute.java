@@ -63,6 +63,7 @@ public class DataAcquisitionSchemaAttribute extends HADatAcThing {
     private Map<String, String> relations = new HashMap<String, String>();
     private boolean isMeta;
     private DataAcquisitionSchema das;
+    private String socUri;
 
     public DataAcquisitionSchemaAttribute(String uri, String partOfSchema) {
         this.uri = uri;
@@ -142,7 +143,7 @@ public class DataAcquisitionSchemaAttribute extends HADatAcThing {
         if (label == null) {
             return "";
         } else {
-            return label;
+	    return label;
         }
     }
 
@@ -202,7 +203,7 @@ public class DataAcquisitionSchemaAttribute extends HADatAcThing {
         if (entity == null || entity.equals("")) {
             this.entityLabel = "";
         } else {
-            this.entityLabel = FirstLabel.getLabel(entity);
+            this.entityLabel = FirstLabel.getPrettyLabel(entity);
         }
     }
 
@@ -272,10 +273,10 @@ public class DataAcquisitionSchemaAttribute extends HADatAcThing {
         } else {
         	List<String> answer = new ArrayList<String>();
         	for (String attr : attributes) {
-        		if (FirstLabel.getLabel(attr).equals("")) {
+        		if (FirstLabel.getPrettyLabel(attr).equals("")) {
         			answer.add(attr);
         		} else {
-        			answer.add(FirstLabel.getLabel(attr));
+        			answer.add(FirstLabel.getPrettyLabel(attr));
         		}
         	}
             this.attributeLabels = answer;
@@ -329,7 +330,7 @@ public class DataAcquisitionSchemaAttribute extends HADatAcThing {
         if (inRelationTo == null || inRelationTo.equals("")) {
             return "";
         } else {
-            return FirstLabel.getLabel(inRelationTo);
+            return FirstLabel.getPrettyLabel(inRelationTo);
         }
     }
 
@@ -366,7 +367,7 @@ public class DataAcquisitionSchemaAttribute extends HADatAcThing {
         if (unit == null || unit.equals("")) {
             this.unitLabel = "";
         } else {
-            this.unitLabel = FirstLabel.getLabel(unit);
+            this.unitLabel = FirstLabel.getPrettyLabel(unit);
         }
     }
 
@@ -543,7 +544,7 @@ public class DataAcquisitionSchemaAttribute extends HADatAcThing {
 
         while (resultsrw.hasNext()) {
             QuerySolution soln = resultsrw.next();
-            labelStr = FirstLabel.getLabel(dasa_uri);
+            labelStr = FirstLabel.getPrettyLabel(dasa_uri);
 
             if (soln.get("partOfSchema") != null) {
                 partOfSchemaStr = soln.get("partOfSchema").toString();

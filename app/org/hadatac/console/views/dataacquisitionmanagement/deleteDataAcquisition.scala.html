@@ -32,7 +32,7 @@
  
     @if(oper=="init") {
         <div id="question-box">
-           Are your sure you want to delete this data collection? 
+           Are your sure you want to delete this OAS? 
            <a href="@org.hadatac.console.controllers.dataacquisitionmanagement.routes.DeleteDataAcquisition.index("confirmed", da.getUri())" class="btn btn-success" role="button">Confirm</a>
            <a href="@org.hadatac.console.controllers.dataacquisitionmanagement.routes.DeleteDataAcquisition.index("cancelled", da.getUri())" class="btn btn-danger" role="button">Cancel</a>
         </div>

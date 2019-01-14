@@ -42,4 +42,18 @@ public class FirstLabel {
 		
 		return labelStr;
 	}
+
+        public static String getPrettyLabel(String uri) {
+	    String prettyLabel = getLabel(uri).replace("@en","");
+	    if (!prettyLabel.equals("")) {
+		String c0 = prettyLabel.substring(0,1).toUpperCase();
+		if (prettyLabel.length() == 1) {
+		    prettyLabel = c0;
+		} else {
+		    prettyLabel = c0 + prettyLabel.substring(1);
+		}
+	    }
+	    return prettyLabel;
+	}
+
 }
