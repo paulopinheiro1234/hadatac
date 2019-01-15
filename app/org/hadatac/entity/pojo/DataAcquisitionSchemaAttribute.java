@@ -417,12 +417,14 @@ public class DataAcquisitionSchemaAttribute extends HADatAcThing {
     }
 
     public String getObjectViewLabel() {
+	/*
         if (attributes.equals(URIUtils.replaceNameSpaceEx("hasco:originalID"))) {
             return "[DefaultObject]";
         }
         if (isMeta) {
             return "";
         }
+	*/
         if (dasoUri == null || dasoUri.equals("")) {
             if (das != null && (!das.getIdLabel().equals("") || !das.getOriginalIdLabel().equals(""))) {
                 return "[DefaultObject]";

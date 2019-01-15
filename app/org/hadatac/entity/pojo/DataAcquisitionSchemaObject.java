@@ -201,7 +201,7 @@ public class DataAcquisitionSchemaObject extends HADatAcThing {
     public void setRole(String role) {
         //this.role = role;
     	this.role = role;
-        System.out.println("New ROLE : " + role);
+        //System.out.println("New ROLE : " + role);
         if (role == null || role.equals("")) {
             this.roleLabel = "";
         } else {
@@ -248,7 +248,7 @@ public class DataAcquisitionSchemaObject extends HADatAcThing {
 
     public void setRelation(String relation) {
         this.relation = relation;
-        System.out.println("New RELATION : " + relation);
+        //System.out.println("New RELATION : " + relation);
         if (relation == null || relation.equals("")) {
             this.relationLabel = "";
         } else {
@@ -258,16 +258,16 @@ public class DataAcquisitionSchemaObject extends HADatAcThing {
 
     public String getRelationLabel() {
         if (relationLabel == null || relationLabel.equals("")) {
-            System.out.println("RELATION label -- just relation : <" + relation + ">");
-            System.out.println("RELATION label -- just relation : <" + URIUtils.replaceNameSpaceEx(relation) + ">");
+            //System.out.println("RELATION label -- just relation : <" + relation + ">");
+            //System.out.println("RELATION label -- just relation : <" + URIUtils.replaceNameSpaceEx(relation) + ">");
             return URIUtils.replaceNameSpaceEx(relation);
         }
-        System.out.println("RELATION label : <" + relationLabel + ">");
+        //System.out.println("RELATION label : <" + relationLabel + ">");
         return relationLabel;
     }
 
     public static DataAcquisitionSchemaObject find(String uri) {
-        System.out.println("Looking for data acquisition schema objects with uri: " + uri);
+        //System.out.println("Looking for data acquisition schema objects with uri: " + uri);
 
         DataAcquisitionSchemaObject object = null;
         String queryString = NameSpaces.getInstance().printSparqlNameSpaceList() + 
@@ -384,7 +384,7 @@ public class DataAcquisitionSchemaObject extends HADatAcThing {
     }
 
     public static List<DataAcquisitionSchemaObject> findBySchema(String schemaUri) {
-        System.out.println("Looking for data acquisition schema objects for <" + schemaUri + ">");
+        //System.out.println("Looking for data acquisition schema objects for <" + schemaUri + ">");
 
         List<DataAcquisitionSchemaObject> objects = new ArrayList<DataAcquisitionSchemaObject>();
         String queryString = NameSpaces.getInstance().printSparqlNameSpaceList() + 
@@ -417,6 +417,18 @@ public class DataAcquisitionSchemaObject extends HADatAcThing {
         }
 
         return objects;
+    }
+
+    public static DataAcquisitionSchemaObject findByLabelInSchema(String schemaUri, String label) {
+	//System.out.println("DataAcquisitionSchemaObject: label = [" + label + "]");
+	List<DataAcquisitionSchemaObject> schemaList = findBySchema(schemaUri);
+	for (DataAcquisitionSchemaObject daso : schemaList) {
+	    //System.out.println("DataAcquisitionSchemaObject: label in daso = [" + daso.getLabel() + "]");
+	    if (daso.getLabel() != null && daso.getLabel().equals(label)) {
+		return daso;
+	    }
+	}
+	return null;
     }
 
     public static String findUriFromRole(String newInRelationTo, List<DataAcquisitionSchemaObject> objects) {

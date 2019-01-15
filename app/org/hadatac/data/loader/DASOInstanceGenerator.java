@@ -1,23 +1,36 @@
 package org.hadatac.data.loader;
 
 import org.hadatac.entity.pojo.DASOInstance;
+import org.hadatac.entity.pojo.DataAcquisitionSchema;
+import org.hadatac.entity.pojo.DataAcquisitionSchemaAttribute;
 import org.hadatac.entity.pojo.DataAcquisitionSchemaObject;
+import org.hadatac.entity.pojo.StudyObject;
 import org.hadatac.entity.pojo.DASVirtualObject;
 import org.hadatac.metadata.loader.URIUtils;
 import java.lang.String;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.HashMap;
 import java.util.List;
+import java.util.ArrayList;
 import java.util.Map;
+import java.util.Iterator;
 import org.apache.commons.csv.CSVRecord;
 
 public class DASOInstanceGenerator{
-	private String studyId;
-	private List<DASVirtualObject> templateList;
 
-	public Map<String,String> codeMappings = null;
-	public Map<String, Map<String,String>> codebook = null;
+        private DataAcquisitionSchema das;
+        private List<StudyObject> objList;
+        private String mainLabel;
+        private String mainUri;
+        private DataAcquisitionSchemaObject mainDaso;
+        private Map<String, DataAcquisitionSchemaObject> dasos = new ConcurrentHashMap<String, DataAcquisitionSchemaObject>();  
+        private Map<String, List<String>> socPaths = new HashMap<String, List<String>>(); 
 
-	public DASOInstanceGenerator(String studyId, 
+        //private String studyId;
+        //public Map<String,String> codeMappings = null;
+        //public Map<String, Map<String,String>> codebook = null;
+
+	/*public DASOInstanceGenerator(String studyId, 
 			List<DASVirtualObject> objs,
 			Map<String, String> codeMappings, 
 			Map<String, Map<String,String>> codebook) {
@@ -25,9 +38,140 @@ public class DASOInstanceGenerator{
 		this.templateList = objs;
 		this.codeMappings = codeMappings;
 		this.codebook = codebook;
+	}*/
+
+        public DASOInstanceGenerator(DataAcquisitionSchema das) {
+	    this.das = das;
+	    this.socPaths.clear();
+	    
+	    /* 
+	     *  IDENTIFY MAIN DASO FROM DASAs (the DASO that has an identifier)
+             */
+
+	    mainLabel = "";
+	    String origId = das.getOriginalIdLabel(); 
+	    String id = das.getIdLabel(); 
+	    if (origId != null && !origId.equals("")) {
+		mainLabel = origId;
+	    } else if (id != null && !id.equals("")) {
+		mainLabel = id;
+	    }
+	    
+	    if (mainLabel.equals("")) {
+		System.out.println("DASOInstanceGenerator: NO IDENTIFIER");
+		return;
+	    } else {
+		System.out.println("DASOInstanceGenerator: Label of main DASO: " + mainLabel);
+	    }
+		
+	    /* 
+	     *  IDENTIFY URI of MAIN DASO and SUPORTING DADOS FROM DASAs
+             */
+
+	    mainUri = "";
+	    Iterator<DataAcquisitionSchemaAttribute> iterAttributes = das.getAttributes().iterator();
+	    while (iterAttributes.hasNext()) {
+		DataAcquisitionSchemaAttribute dasa = iterAttributes.next();
+		String dasoUri = dasa.getObjectUri(); 
+		DataAcquisitionSchemaObject tmpDaso = DataAcquisitionSchemaObject.find(dasoUri);
+		if (dasa.getLabel().equals(mainLabel)) {
+		    mainUri = dasoUri;
+		    mainDaso = tmpDaso;
+		    if (mainDaso == null) {
+			System.out.println("DASOInstanceGenerator: FAILED TO LOAD MAIN DASO");
+			return;
+		    }
+		} 
+		if (dasoUri != null && !dasoUri.equals("") && !dasos.containsKey(dasoUri)) {
+		    if (tmpDaso != null) {
+			dasos.put(dasoUri, tmpDaso);
+		    }
+		}
+		
+	    }
+
+	    /* 
+	     *  IDENTIFY URIs of TARGET DASOs
+             */
+
+	    System.out.println("DASOInstanceGenerator: Main DASO: " + mainUri);
+	    System.out.println("DASOInstanceGenerator: ======== DASO LIST ========");
+	    for (Map.Entry<String, DataAcquisitionSchemaObject> entry : dasos.entrySet()) {
+		String key = entry.getKey();
+		DataAcquisitionSchemaObject daso = entry.getValue();
+		String toUri = targetUri(daso);
+		System.out.println("DASOInstanceGenerator: DASO: " + daso.getUri() + "   From : " + daso.getLabel() + "  To: " + toUri);
+		
+		/*
+                 *  LOAD each TARGET DASO into DASOs, if TARGET DASO is not loaded yet
+                 */
+		
+		while (!dasos.containsKey(toUri)) {
+		    System.out.println("DASOInstanceGenerator: Loading " + toUri);
+		    DataAcquisitionSchemaObject newDaso = DataAcquisitionSchemaObject.find(toUri);
+		    if (newDaso == null) {
+			System.out.println("DASOInstanceGenerator: [ERROR] Could not find DASO with following URI : " + toUri);
+			break;
+		    }
+		    dasos.put(toUri, newDaso);
+		    toUri = targetUri(newDaso);
+		    System.out.println("DASOInstanceGenerator: DASO: " + newDaso.getUri() + "   From : " + newDaso.getLabel() + "  To: " + toUri);
+		    
+		}
+
+	    }
+	    
+	    /* 
+	     *  COMPUTE PATH for each TARGET DASO
+             */
+
+	    System.out.println("DASOInstanceGenerator: ======== BUILD DASO PATHS ========");
+	    for (Map.Entry<String, DataAcquisitionSchemaObject> entry : dasos.entrySet()) {
+		String key = entry.getKey();
+		DataAcquisitionSchemaObject daso = entry.getValue();
+		String toUri = targetUri(daso);
+		System.out.println("DASOInstanceGenerator: START: " + daso.getUri());
+		System.out.print("DASOInstanceGenerator: PATH: ");
+		
+		DataAcquisitionSchemaObject nextTarget = daso;
+		List<String> socs = new ArrayList<String>();
+		System.out.print(nextTarget.getUri() + "  ");
+		socs.add(nextTarget.getUri());
+		while (!nextTarget.getUri().equals(mainUri)) {
+		    String nextTargetUri = targetUri(nextTarget);
+		    nextTarget = dasos.get(nextTargetUri);
+		    if (nextTarget == null) {
+			System.out.println("DASOInstanceGenerator: [ERROR] Could not complete path for " + toUri);
+			break;
+		    }
+		    System.out.print(nextTarget.getUri() + "  ");
+		    socs.add(nextTarget.getUri());
+		}
+		System.out.println();
+		socPaths.put(daso.getUri(),socs);
+
+	    }
+	    
+	}
+    
+        private String targetUri(DataAcquisitionSchemaObject daso) {
+	   if (!daso.getWasDerivedFrom().equals("")) {
+	       String toLabel = daso.getWasDerivedFrom();
+	       DataAcquisitionSchemaObject tmpDaso = DataAcquisitionSchemaObject.findByLabelInSchema(das.getUri(), toLabel);
+	       if (tmpDaso == null) {
+		   return "";
+	       } else {
+		   
+		   return tmpDaso.getUri();
+	       }
+	   } else if (!daso.getInRelationTo().equals("")) {
+	       return daso.getInRelationTo();
+	   }
+	   return "";
 	}
 
-	//
+        /*
+        //
       	private String resolveVirtualEntity(DASVirtualObject workingObj, String workingField, CSVRecord rec) {
 		//System.out.println("[DASOInstanceGen]: resolving " + workingField  + " for " + workingObj.getTemplateUri());
 		if(workingField.contains("DASO") || workingField.startsWith("??")){
@@ -64,6 +208,7 @@ public class DASOInstanceGenerator{
 		}
 		return "";
 	}// resolveVirtualEntities()
+        */
 
 
 	// for each
@@ -88,9 +233,48 @@ public class DASOInstanceGenerator{
 	// private String templateUri;
 	// private Map<String,String> objRelations;
 
-        public HashMap<String,DASOInstance> generateRowInstances(CSVRecord rec){
-		//System.out.println("[DASOInstanceGenerator] Inside generateRowInstances!");
-		HashMap<String, DASOInstance> instances = new HashMap<String,DASOInstance>();
+        public Map<String,String> generateRowInstances(CSVRecord rec){
+
+            /* Returns : First String : DASO's Label
+             *           Object URI   : The actual URI of the object that was retrieved/created for the identifier in CSV Record
+             */
+
+	    Map<String,String> objList = new HashMap<String,String>();
+
+	    /*
+	     *   FIND IDENTIFIER
+	     */
+
+	    /*
+	     *   RETRIEVE MAIN OBJECT
+	     */
+
+	    /*
+	     *   TRAVERSE list of objects for current record
+	     */
+
+	    for (Map.Entry<String, List<String>> entry : socPaths.entrySet()) {
+		String key = entry.getKey();
+		List<String> path = entry.getValue();
+
+		/*
+		 *   TRAVERSE SOC's PATH
+		 */
+
+		for (String objUri : path) {
+		    
+		    /*
+		     *   RETRIEVE OR CREATE next object in the path
+		     */
+
+		}
+	    
+	    }
+
+	        //System.out.println("[DASOInstanceGenerator] Inside generateRowInstances!");
+		//HashMap<String, DASOInstance> instances = new HashMap<String,DASOInstance>();
+
+		/*
 		String tempLabel = "";
 		String tempType = "";
 		String tempKey = "";
@@ -127,7 +311,10 @@ public class DASOInstanceGenerator{
 				System.out.println("[DASOInstanceGen] WARN: row instance missing uri or type info!");
 			}
 		}// /iterate over templates
-		return instances;
+                */
+	    
+	    return objList;
+
 	}// /generateRowInstances
 
 

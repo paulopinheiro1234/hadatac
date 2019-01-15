@@ -153,9 +153,7 @@ public class MeasurementGenerator extends BaseGenerator {
         // Comment out row instance generation
         
         // Need to be fixed here by getting codeMap and codebook from sparql query
-        DASOInstanceGenerator dasoiGen = new DASOInstanceGenerator(da.getStudy().getUri(), 
-								   //                templateList, AnnotationWorker.codeMappings, AnnotationWorker.codebook_K);
-								   templateList, null, null);
+        DASOInstanceGenerator dasoiGen = new DASOInstanceGenerator(schema); 
 	Map<String, DASOInstance> rowInstances = new HashMap<String,DASOInstance>();
         
     }
