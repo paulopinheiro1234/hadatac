@@ -369,7 +369,7 @@ public class AutoAnnotator extends Controller {
         }
 
         String path = "";
-        if(isProcessed){
+        if (isProcessed) {
             path = ConfigProp.getPathProc();
         } else{
             path = ConfigProp.getPathUnproc();

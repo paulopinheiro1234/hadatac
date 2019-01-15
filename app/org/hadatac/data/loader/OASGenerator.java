@@ -107,7 +107,7 @@ public class OASGenerator extends BaseGenerator {
 
         String ownerEmail = getOwnerEmail(rec);
         if (ownerEmail.isEmpty()) {
-            DataFile dataFile = DataFile.findByName(getFileName());
+            DataFile dataFile = DataFile.findByName(getRelativePath());
             if (null != dataFile) {
                 ownerEmail = dataFile.getOwnerEmail();
                 if (ownerEmail.isEmpty()) {

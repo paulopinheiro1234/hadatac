@@ -26,6 +26,7 @@ import org.hadatac.entity.pojo.HADatAcThing;
 import org.hadatac.metadata.loader.LabkeyDataHandler;
 import org.hadatac.metadata.loader.URIUtils;
 import org.hadatac.utils.CollectionUtil;
+import org.hadatac.utils.ConfigProp;
 import org.hadatac.utils.LabKeyException;
 import org.labkey.remoteapi.CommandException;
 
@@ -40,6 +41,7 @@ public abstract class BaseGenerator {
 
     protected HashMap<String, String> mapCol = new HashMap<String, String>();
     protected String fileName = "";
+    protected String relativePath = "";
     
     protected String studyUri = "";
     protected String namedGraphUri = "";
@@ -48,6 +50,17 @@ public abstract class BaseGenerator {
         this.file = file;
         records = file.getRecords();
         fileName = file.getFile().getName();
+        
+        String parentDir = file.getFile().getParent();
+        parentDir = parentDir.replace(ConfigProp.getPathUnproc().replace("/", ""), "")
+                .replace(ConfigProp.getPathProc().replace("/", ""), "")
+                .replace("/", "");
+        if (parentDir.trim().isEmpty()) {
+            relativePath = fileName;
+        } else {
+            relativePath = parentDir + "/" + fileName;
+        }
+        
         initMapping();
     }
 
@@ -59,6 +72,10 @@ public abstract class BaseGenerator {
 
     public String getFileName() {
         return fileName;
+    }
+    
+    public String getRelativePath() {
+        return relativePath;
     }
     
     public RecordFile getRecordFile() {
