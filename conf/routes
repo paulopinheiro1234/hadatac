@@ -292,6 +292,7 @@ POST	/hadatac/dataacquisitions/     		       org.hadatac.console.controllers.dat
 GET	    /hadatac/dataacquisitions/new		       org.hadatac.console.controllers.dataacquisitionmanagement.DataAcquisitionManagement.newDataAcquisition()
 POST	/hadatac/dataacquisitions/new     	       org.hadatac.console.controllers.dataacquisitionmanagement.DataAcquisitionManagement.postNewDataAcquisition()
 POST	/hadatac/dataacquisitions/new/form             org.hadatac.console.controllers.dataacquisitionmanagement.DataAcquisitionManagement.processForm()
+POST    /hadatac/dataacquisitions/new/form/oas     org.hadatac.console.controllers.dataacquisitionmanagement.DataAcquisitionManagement.generateOASFileFromForm()
 GET	    /hadatac/dataacquisitions/create	       org.hadatac.console.controllers.dataacquisitionmanagement.DataAcquisitionScope.create(filename: String, da_uri: String)
 POST	/hadatac/dataacquisitions/create     	       org.hadatac.console.controllers.dataacquisitionmanagement.DataAcquisitionScope.postCreate(filename: String, da_uri: String)
 GET	    /hadatac/dataacquisitions/view		       org.hadatac.console.controllers.dataacquisitionmanagement.DataAcquisitionScope.view(filename: String, da_uri: String)

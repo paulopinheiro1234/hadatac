@@ -1,14 +1,24 @@
 package org.hadatac.console.models;
 
+
 public class DataAcquisitionForm {
 
-	public String newUri;
+    public String newUri;
     public String newPermission;
     public String newOwner;
     public String newParameter;
     public String newSchema;
     public String newStartDate;
     public String newEndDate;
+    
+    ////////////////////////
+    public String studyId;
+    public String daName;
+    public String sddName;
+    public String deploymentUri;
+    public String cellScope;
+    public String ownerEmail;
+    public String permissionUri;
  
 	public String getNewDataAcquisitionUri() {
 		return newUri;
@@ -58,4 +68,34 @@ public class DataAcquisitionForm {
 	public void setNewEndDate(String newEndDate) {
 		this.newEndDate = newEndDate;
 	}
+	
+	////////////////////////
+	
+	public String getStudyId() {
+        return studyId;
+    }
+
+	public String getDaName() {
+        return daName;
+    }
+	
+	public String getSddName() {
+        return sddName;
+    }
+	
+	public String getDeploymentUri() {
+        return deploymentUri;
+    }
+	
+	public String getCellScope() {
+        return cellScope;
+    }
+	
+	public String getOwnerEmail() {
+        return ownerEmail;
+    }
+	
+	public String getPermissionUri() {
+        return permissionUri;
+    }
 }
