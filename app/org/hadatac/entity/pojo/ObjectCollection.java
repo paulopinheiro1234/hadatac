@@ -142,8 +142,7 @@ public class ObjectCollection extends HADatAcThing implements Comparable<ObjectC
     }
     
     public long getNextCounter() {
-        hasLastCounter = new Integer(objectUris.size()).longValue();
-        return hasLastCounter;
+        return getNumOfObjects();
     }
 
     public String getStudyUri() {
@@ -296,6 +295,23 @@ public class ObjectCollection extends HADatAcThing implements Comparable<ObjectC
 
     public void setTimeScopeUris(List<String> timeScopeUris) {
         this.timeScopeUris = timeScopeUris;
+    }
+    
+    public long getNumOfObjects() {
+        String queryString = NameSpaces.getInstance().printSparqlNameSpaceList() +
+                " SELECT (COUNT(?obj) AS ?count) WHERE { \n" 
+                + " ?obj hasco:isMemberOf <" + getUri() + "> . \n" 
+                + "} \n";
+
+        ResultSetRewindable resultsrw = SPARQLUtils.select(
+                CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), queryString);
+
+        if (resultsrw.hasNext()) {
+            QuerySolution soln = resultsrw.next();
+            return soln.getLiteral("count").getLong();
+        }
+        
+        return 0;
     }
 
     public boolean isConnected(ObjectCollection oc) {
