@@ -8,13 +8,16 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Map;
+import java.util.stream.Collectors;
 import java.util.HashMap;
 
+import org.apache.commons.text.WordUtils;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.impl.HttpSolrClient;
 import org.hadatac.console.controllers.annotator.AnnotationLog;
 import org.hadatac.entity.pojo.ObjectAccessSpec;
+import org.hadatac.entity.pojo.ObjectCollection;
 import org.hadatac.entity.pojo.StudyObject;
 import org.hadatac.entity.pojo.DataAcquisitionSchema;
 import org.hadatac.entity.pojo.DataAcquisitionSchemaAttribute;
@@ -28,6 +31,7 @@ import org.hadatac.entity.pojo.HADatAcThing;
 import org.hadatac.entity.pojo.Measurement;
 import org.hadatac.metadata.loader.URIUtils;
 import org.hadatac.utils.CollectionUtil;
+import org.hadatac.utils.ConfigProp;
 import org.hadatac.utils.Feedback;
 
 
@@ -68,6 +72,40 @@ public class MeasurementGenerator extends BaseGenerator {
 
         setStudyUri(da.getStudyUri());
     }
+    
+    private void createVirtualObjectCollections(DataAcquisitionSchema schema) {
+        GeneratorChain chain = new GeneratorChain();
+        GeneralGenerator generator = new GeneralGenerator(file, "Virtual Object Collections");
+        
+        List<String> socRefs = ObjectCollection.findAll().stream()
+                .map(x -> x.getSOCReference()).collect(Collectors.toList());
+        for (DataAcquisitionSchemaObject daso : schema.getObjects()) {
+            
+            // TO DO: for the following if clause, use the correct criteria for 
+            // adding new SOC
+            if (!socRefs.contains(daso.getAlternativeName())
+                    && !daso.getWasDerivedFrom().isEmpty()) {
+                Map<String, Object> row = new HashMap<String, Object>();
+                row.put("hasURI", ConfigProp.getKbPrefix() + "SOC-" 
+                        + URIUtils.getBaseName(getStudyUri()).replace("STD-", "") + "-" 
+                        + daso.getAlternativeName().replace("??", "").toUpperCase());
+                row.put("hasco:isMemberOf", URIUtils.replaceNameSpaceEx(getStudyUri()));
+                
+                String label = WordUtils.capitalize(daso.getAlternativeName().replace("??", ""));
+                row.put("hasco:hasGroundingLabel", label);
+                row.put("hasco:hasRoleLabel", label);
+                row.put("rdfs:comment", label);
+                row.put("rdfs:label", label);
+                row.put("hasco:hasSOCReference", daso.getAlternativeName());
+                
+                // TO DO: add type and hasScope property for SOC
+                
+                generator.addRow(row);
+            }
+        }
+        chain.addGenerator(generator);
+        chain.generate();
+    }
 
     @Override
     public void preprocess() throws Exception {
@@ -79,7 +117,9 @@ public class MeasurementGenerator extends BaseGenerator {
         if (schema == null) {
             throw new Exception(da.getSchemaUri() + " cannot be found!");
         }
-
+        
+        createVirtualObjectCollections(schema);
+        
         /*
         if(!AnnotationWorker.templateLibrary.containsKey(da.getSchemaUri())){
             System.out.println("[Parser] [WARN] no DASVirtualObject templates for this DataAcquisition. Is this correct?");

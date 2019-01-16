@@ -5,14 +5,8 @@ import java.util.ArrayList;
 import java.util.Map;
 import java.util.HashMap;
 
-import org.apache.jena.query.Query;
-import org.apache.jena.query.QueryExecution;
-import org.apache.jena.query.QueryExecutionFactory;
-import org.apache.jena.query.QueryFactory;
 import org.apache.jena.query.QueryParseException;
 import org.apache.jena.query.QuerySolution;
-import org.apache.jena.query.ResultSet;
-import org.apache.jena.query.ResultSetFactory;
 import org.apache.jena.query.ResultSetRewindable;
 import org.apache.jena.update.UpdateExecutionFactory;
 import org.apache.jena.update.UpdateFactory;
@@ -25,6 +19,7 @@ import org.hadatac.console.http.SPARQLUtils;
 import org.hadatac.metadata.loader.LabkeyDataHandler;
 import org.hadatac.metadata.loader.URIUtils;
 import org.labkey.remoteapi.CommandException;
+
 
 public class DataAcquisitionSchemaObject extends HADatAcThing {
 
@@ -51,6 +46,7 @@ public class DataAcquisitionSchemaObject extends HADatAcThing {
     private String relation;
     private String relationLabel;
     private String wasDerivedFrom;
+    private String alternativeName = "";
 
     public DataAcquisitionSchemaObject(String uri, 
             String label, 
@@ -220,6 +216,14 @@ public class DataAcquisitionSchemaObject extends HADatAcThing {
     public void setWasDerivedFrom(String wasDerivedFrom) {
         this.wasDerivedFrom = wasDerivedFrom;
     }
+    
+    public String getAlternativeName() {
+        return alternativeName;
+    }
+    
+    public void setAlternativeName(String alternativeName) {
+        this.alternativeName = alternativeName;
+    }
 
     public String getInRelationToNamespace() {
         return URIUtils.replaceNameSpaceEx(inRelationTo);
@@ -271,7 +275,7 @@ public class DataAcquisitionSchemaObject extends HADatAcThing {
 
         DataAcquisitionSchemaObject object = null;
         String queryString = NameSpaces.getInstance().printSparqlNameSpaceList() + 
-                "SELECT ?entity ?partOfSchema ?role ?inRelationTo ?relation ?inRelationToStr ?wasDerivedFrom WHERE { \n" + 
+                "SELECT ?entity ?partOfSchema ?role ?inRelationTo ?relation ?inRelationToStr ?wasDerivedFrom ?alternativeName WHERE { \n" + 
                 "   <" + uri + "> a hasco:DASchemaObject . \n" + 
                 "   <" + uri + "> hasco:partOfSchema ?partOfSchema . \n" + 
                 "   OPTIONAL { <" + uri + "> hasco:hasEntity ?entity } . \n" + 
@@ -280,7 +284,8 @@ public class DataAcquisitionSchemaObject extends HADatAcThing {
                 "   OPTIONAL { <" + uri + "> sio:Relation ?relation } . \n" +
                 "   OPTIONAL { <" + uri + "> ?relation ?inRelationTo } . \n" +
                 "   OPTIONAL { <" + uri + "> hasco:inRelationToLabel ?inRelationToStr } . \n" +
-                "   OPTIONAL { <" + uri + "> <http://hadatac.org/ont/hasco/wasDerivedFrom> ?wasDerivedFrom } . \n" +
+                "   OPTIONAL { <" + uri + "> hasco:wasDerivedFrom ?wasDerivedFrom } . \n" +
+                "   OPTIONAL { <" + uri + "> dcterms:alternativeName ?alternativeName } . \n" +
                 "}";
 
         //System.out.println("DataAcquisitionSchemaObject find(String uri) query: " + queryString);
@@ -303,6 +308,7 @@ public class DataAcquisitionSchemaObject extends HADatAcThing {
         String inRelationToLabelStr = "";
         String relationStr = "";
         String wasDerivedFromStr = "";
+        String alternativeName = "";
 
         try {
             if (soln != null) {
@@ -356,6 +362,14 @@ public class DataAcquisitionSchemaObject extends HADatAcThing {
                 } catch (Exception e1) {
                 	wasDerivedFromStr = "";
                 }
+                
+                try {
+                    if (soln.getLiteral("alternativeName") != null) {
+                        alternativeName = soln.getLiteral("alternativeName").toString();
+                    }
+                } catch (Exception e1) {
+                    alternativeName = "";
+                }
 
                 try {
                     if (soln.getResource("relation") != null && soln.getResource("relation").getURI() != null) {
@@ -375,6 +389,7 @@ public class DataAcquisitionSchemaObject extends HADatAcThing {
                         inRelationToLabelStr,
                         wasDerivedFromStr,
                         relationStr);
+                object.setAlternativeName(alternativeName);
             }
         } catch (Exception e) {
             System.out.println("[ERROR] DataAcquisitionSchemaObject.find() e.Message: " + e.getMessage());
