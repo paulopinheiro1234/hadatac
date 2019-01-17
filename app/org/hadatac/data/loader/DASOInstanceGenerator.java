@@ -4,6 +4,7 @@ import org.hadatac.entity.pojo.DASOInstance;
 import org.hadatac.entity.pojo.DataAcquisitionSchema;
 import org.hadatac.entity.pojo.DataAcquisitionSchemaAttribute;
 import org.hadatac.entity.pojo.DataAcquisitionSchemaObject;
+import org.hadatac.entity.pojo.ObjectCollection;
 import org.hadatac.entity.pojo.StudyObject;
 import org.hadatac.entity.pojo.DASVirtualObject;
 import org.hadatac.metadata.loader.URIUtils;
@@ -24,6 +25,8 @@ public class DASOInstanceGenerator{
         private String mainUri;
         private DataAcquisitionSchemaObject mainDaso;
         private Map<String, DataAcquisitionSchemaObject> dasos = new ConcurrentHashMap<String, DataAcquisitionSchemaObject>();  
+        private Map<String, ObjectCollection> socs = new ConcurrentHashMap<String, ObjectCollection>();  
+        private List<ObjectCollection> socsList = new ArrayList<ObjectCollection>();  
         private Map<String, List<String>> socPaths = new HashMap<String, List<String>>(); 
 
         //private String studyId;
@@ -40,10 +43,10 @@ public class DASOInstanceGenerator{
 		this.codebook = codebook;
 	}*/
 
-        public DASOInstanceGenerator(DataAcquisitionSchema das) {
+    public DASOInstanceGenerator(String studyUri, DataAcquisitionSchema das) {
 	    this.das = das;
 	    this.socPaths.clear();
-	    
+
 	    /* 
 	     *  IDENTIFY MAIN DASO FROM DASAs (the DASO that has an identifier)
              */
@@ -91,6 +94,16 @@ public class DASOInstanceGenerator{
 	    }
 
 	    /* 
+	     *  AVAILABLE SOCs
+             */
+
+	    System.out.println("DASOInstanceGenerator: ======== AVAILABLE SOCs ========");
+	    socsList = ObjectCollection.findByStudyUri(studyUri);
+	    for (ObjectCollection soc : socsList) {
+		System.out.println("DASOInstanceGenerator: SOC: " + soc.getUri() + "   Reference : " + soc.getSOCReference());
+	    }
+	    
+	    /* 
 	     *  IDENTIFY URIs of TARGET DASOs
              */
 
@@ -115,6 +128,11 @@ public class DASOInstanceGenerator{
 		    }
 		    dasos.put(toUri, newDaso);
 		    toUri = targetUri(newDaso);
+
+		    /*
+		     *  Associate a SOC to each DASO (DASO's labels are SOC's hasSOCReference
+		     */
+		    
 		    System.out.println("DASOInstanceGenerator: DASO: " + newDaso.getUri() + "   From : " + newDaso.getLabel() + "  To: " + toUri);
 		    
 		}
@@ -151,7 +169,6 @@ public class DASOInstanceGenerator{
 		socPaths.put(daso.getUri(),socs);
 
 	    }
-	    
 	}
     
         private String targetUri(DataAcquisitionSchemaObject daso) {
@@ -169,6 +186,46 @@ public class DASOInstanceGenerator{
 	   }
 	   return "";
 	}
+
+        public Map<String,String> generateRowInstances(String id){
+            /* Returns : First String : DASO's Label
+             *           Object URI   : The actual URI of the object that was retrieved/created for the identifier in CSV Record
+             */
+
+	    System.out.println("DASOInstanceGenerator: generate row instances for : " + id);
+
+	    Map<String,String> objList = new HashMap<String,String>();
+
+	    /*
+	     *   RETRIEVE MAIN OBJECT
+	     */
+
+	    /*
+	     *   TRAVERSE list of objects for current record
+	     */
+
+	    for (Map.Entry<String, List<String>> entry : socPaths.entrySet()) {
+		String key = entry.getKey();
+		List<String> path = entry.getValue();
+
+		/*
+		 *   TRAVERSE SOC's PATH
+		 */
+
+		for (String objUri : path) {
+		    
+		    /*
+		     *   RETRIEVE OR CREATE next object in the path
+		     */
+
+		}
+	    
+	    }
+
+	    return objList;
+
+	}// /generateRowInstances
+
 
         /*
         //
@@ -233,44 +290,6 @@ public class DASOInstanceGenerator{
 	// private String templateUri;
 	// private Map<String,String> objRelations;
 
-        public Map<String,String> generateRowInstances(CSVRecord rec){
-
-            /* Returns : First String : DASO's Label
-             *           Object URI   : The actual URI of the object that was retrieved/created for the identifier in CSV Record
-             */
-
-	    Map<String,String> objList = new HashMap<String,String>();
-
-	    /*
-	     *   FIND IDENTIFIER
-	     */
-
-	    /*
-	     *   RETRIEVE MAIN OBJECT
-	     */
-
-	    /*
-	     *   TRAVERSE list of objects for current record
-	     */
-
-	    for (Map.Entry<String, List<String>> entry : socPaths.entrySet()) {
-		String key = entry.getKey();
-		List<String> path = entry.getValue();
-
-		/*
-		 *   TRAVERSE SOC's PATH
-		 */
-
-		for (String objUri : path) {
-		    
-		    /*
-		     *   RETRIEVE OR CREATE next object in the path
-		     */
-
-		}
-	    
-	    }
-
 	        //System.out.println("[DASOInstanceGenerator] Inside generateRowInstances!");
 		//HashMap<String, DASOInstance> instances = new HashMap<String,DASOInstance>();
 
@@ -313,9 +332,4 @@ public class DASOInstanceGenerator{
 		}// /iterate over templates
                 */
 	    
-	    return objList;
-
-	}// /generateRowInstances
-
-
 }// /class
