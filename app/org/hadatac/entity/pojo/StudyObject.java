@@ -433,6 +433,57 @@ public class StudyObject extends HADatAcThing {
         return "";
     }
 
+    public static String findUriBySocAndOriginalId(String socUri, String original_id) {
+        String queryString = NameSpaces.getInstance().printSparqlNameSpaceList() + 
+                "SELECT  ?objuri WHERE { " + 
+                "	?objuri hasco:originalID \"" + original_id + "\" . " + 
+                "	?objuri hasco:isMemberOf <" + socUri + "> . " + 
+                "}";
+
+        ResultSetRewindable resultsrw = SPARQLUtils.select(
+                CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), queryString);
+
+        if (resultsrw.size() >= 1) {
+            QuerySolution soln = resultsrw.next();
+            if (soln != null) {
+                if (soln.getResource("objuri") != null) {
+                    return soln.getResource("objuri").toString();
+                }
+            }
+        } else {
+            System.out.println("[WARNING] StudyObject. Could not find OBJ URI for: " + original_id);
+            return "";
+        }
+
+        return "";
+    }
+
+    public static String findUriBySocAndScopeUri(String socUri, String scopeUri) {
+        String queryString = NameSpaces.getInstance().printSparqlNameSpaceList() + 
+                "SELECT  ?objuri WHERE { " + 
+	        "      VALUES ?scopeuri { <" + scopeUri + "> } . " + 
+		"      ?objuri hasco:hasObjectScope ?scopeuri .  " + 
+		"      ?objuri hasco:isMemberOf <" + socUri + "> . " +
+                "}";
+
+        ResultSetRewindable resultsrw = SPARQLUtils.select(
+                CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), queryString);
+
+        if (resultsrw.size() >= 1) {
+            QuerySolution soln = resultsrw.next();
+            if (soln != null) {
+                if (soln.getResource("objuri") != null) {
+                    return soln.getResource("objuri").toString();
+                }
+            }
+        } else {
+            System.out.println("[WARNING] StudyObject. Could not find OBJ URI for Scope URI I: " + scopeUri);
+            return "";
+        }
+
+        return "";
+    }
+
     public static List<StudyObject> findByCollection(ObjectCollection oc) {
         if (oc == null) {
             return null;

@@ -39,7 +39,6 @@ import org.hadatac.console.models.Pivot;
 import org.hadatac.console.views.dataacquisitionsearch.Facetable;
 import org.hadatac.metadata.loader.LabkeyDataHandler;
 
-
 public class ObjectCollection extends HADatAcThing implements Comparable<ObjectCollection> {
 
     public static String SUBJECT_COLLECTION = "http://hadatac.org/ont/hasco/SubjectGroup";

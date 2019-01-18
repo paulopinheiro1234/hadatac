@@ -64,6 +64,7 @@ public class MeasurementGenerator extends BaseGenerator {
     private String dasoUnitUri = "";
 
     private List<DASVirtualObject> templateList = new ArrayList<DASVirtualObject>();
+    private DASOInstanceGenerator dasoiGen = null; 
 
     public MeasurementGenerator(RecordFile file, ObjectAccessSpec da, DataFile dataFile) {
         super(file);
@@ -193,8 +194,8 @@ public class MeasurementGenerator extends BaseGenerator {
         // Comment out row instance generation
         
         // Need to be fixed here by getting codeMap and codebook from sparql query
-        DASOInstanceGenerator dasoiGen = new DASOInstanceGenerator(schema); 
-	Map<String, DASOInstance> rowInstances = new HashMap<String,DASOInstance>();
+        dasoiGen = new DASOInstanceGenerator(da.getStudyUri(),schema); 
+	//Map<String, DASOInstance> rowInstances = new HashMap<String,DASOInstance>();
         
     }
 
@@ -216,6 +217,26 @@ public class MeasurementGenerator extends BaseGenerator {
             System.out.println("[Parser] Made an instance for " + instance.getKey() + " :\n\t" + instance.getValue());
         }
          */
+
+	if (da.hasCellScope()) {
+	    // Objects defined by Cell Scope
+	    //if (da.getCellScopeName().get(0).equals("*")) {
+	    //	measurement.setStudyObjectUri(URIUtils.replacePrefixEx(da.getCellScopeUri().get(0).trim()));
+	    //measurement.setObjectUri(URIUtils.replacePrefixEx(da.getCellScopeUri().get(0).trim()));
+	    //measurement.setObjectCollectionType(URIUtils.replacePrefixEx("hasco:SampleCollection"));
+	    //} else {
+		// TO DO: implement rest of cell scope
+	    //}
+	} else {
+	    // Objects defined by Row Scope
+	    String id = "";
+	    if (!schema.getOriginalIdLabel().equals("")) {
+		id = record.getValueByColumnIndex(posOriginalId);
+	    } else if (!schema.getIdLabel().equals("")) {
+		id = record.getValueByColumnIndex(posId);
+	    }
+	    dasoiGen.generateRowInstances(id);
+	}
 
         Iterator<DataAcquisitionSchemaAttribute> iterAttributes = schema.getAttributes().iterator();
         while (iterAttributes.hasNext()) {
