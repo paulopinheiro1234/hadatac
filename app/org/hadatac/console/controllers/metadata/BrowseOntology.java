@@ -12,7 +12,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import org.hadatac.utils.NameSpaces;
 import java.util.Map;
 import java.util.HashMap;
 

@@ -214,7 +214,10 @@ public class OtMSparqlQueryResults{
         Iterator<JsonNode> elements = bindings.elements();
         String modelN = null;
         String superN = null;
-        ArrayList<TreeNode> branchCollection = new ArrayList<TreeNode>();
+		HashMap<String, String> map = new HashMap<String, String>();
+		ArrayList<TreeNode> branchCollection = new ArrayList<TreeNode>();
+		ArrayList<TreeNode> nodes = new ArrayList<TreeNode>();
+		ArrayList<String> uris = new ArrayList<String>(); 
         while (elements.hasNext()){
             modelN = "";
 	    	superN = "";
@@ -237,48 +240,50 @@ public class OtMSparqlQueryResults{
             //if (!superN.equals("")) {
             //    superN = prettyFromURI(superN);
             //    superN = DynamicFunctions.replaceURLWithPrefix(superN);
-            //}
-            TreeNode currentBranch = new TreeNode(superN);
-            currentBranch.addChild(modelN);
-            branchCollection.add(currentBranch);
+			//}
+			
+			if(!map.containsKey(modelN)) {
+				nodes.add(new TreeNode(modelN));
+				uris.add(modelN);
+			}
+			//If we find this node is no longer a root node it gets overwritten
+			map.put(modelN, superN); 
+			
+			if(!map.containsKey(superN)) {
+				nodes.add(new TreeNode(superN));
+				map.put(superN, null);
+				uris.add(superN);
+			}
 		}
-		TreeNode resultsTree = new TreeNode("Empty");
-		TreeNode superTree = new TreeNode("Empty");
-        ArrayList<TreeNode> assignedBranches = new ArrayList<TreeNode>();
-        int numIterations = 0;
-		int maxIterations = 20;
-        while (assignedBranches.size() < branchCollection.size() && numIterations<maxIterations){
-			numIterations++;
-	    	for (TreeNode tn : branchCollection){
-				if (!assignedBranches.contains(tn)){
-		    		if (resultsTree.getName().equals("Empty")) {
-						resultsTree = new TreeNode(tn.getName());
-						resultsTree.addChild(tn.getChildren().get(0));
-						superTree.addChild(resultsTree);
-						assignedBranches.add(tn);
-					} else {
-						if (superTree.hasValue(tn.getName())!=null){
-							TreeNode branchOfInterest = superTree.hasValue(tn.getName());
-							branchOfInterest.addChild(tn.getChildren().get(0));
-							assignedBranches.add(tn);
-						} else {
-							resultsTree = new TreeNode(tn.getName());
-							resultsTree.addChild(tn.getChildren().get(0));
-							superTree.addChild(resultsTree);
-							assignedBranches.add(tn);
-							// if (tn.hasValue(resultsTree.getName())!=null) {
-							// 	System.out.println("here");
-							// 	TreeNode newBranch = new TreeNode(tn.getName());
-							// 	newBranch.addChild(resultsTree);
-							// 	resultsTree = newBranch;
-							// 	assignedBranches.add(tn);
-							// } 
-						}
-					}
-				}
-	    	}
+
+		//DEBUG CODE - can be removed
+		for(Map.Entry<String, String> entry : map.entrySet()) {
+			System.out.println("node " + entry.getKey());
+			if(entry.getValue() != null)
+				System.out.println("parent " + entry.getValue());
+			else
+				System.out.println("parent null");
 		}
-		System.out.println("assigned: " + assignedBranches.size());
+		System.out.println("map size " + map.keySet().size());
+		System.out.println("nodes size " + nodes.size());
+		System.out.println("uri size " + uris.size());
+		//END DEBUG CODE
+
+		TreeNode superTree = new TreeNode("");
+		for(TreeNode node : nodes) {
+			String parent = map.get(node.getName());
+			if(parent != null) {
+				nodes.get(uris.indexOf(parent)).addChild(node);
+			}
+			else {
+				branchCollection.add(node);
+			}	
+		}
+
+		for(TreeNode tn : branchCollection) {
+			superTree.addChild(tn);
+		}
+        
 		addLabels(superTree,true);
 		addLabels(superTree,false);
 		this.treeResults = superTree.toJson(0);

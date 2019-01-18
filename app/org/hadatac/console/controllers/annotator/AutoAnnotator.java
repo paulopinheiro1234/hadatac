@@ -33,6 +33,7 @@ import org.hadatac.console.views.html.*;
 import org.hadatac.entity.pojo.DataFile;
 import org.hadatac.entity.pojo.Measurement;
 import org.hadatac.entity.pojo.ObjectAccessSpec;
+import org.hadatac.entity.pojo.ObjectCollection;
 import org.hadatac.entity.pojo.User;
 import org.hadatac.metadata.loader.LabkeyDataHandler;
 import org.hadatac.metadata.loader.URIUtils;
@@ -57,7 +58,7 @@ public class AutoAnnotator extends Controller {
     FormFactory formFactory;
 
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    public Result index() {		
+    public Result index() {        
         final SysUser user = AuthApplication.getLocalUser(session());
 
         List<DataFile> procFiles = null;
@@ -369,7 +370,7 @@ public class AutoAnnotator extends Controller {
         }
 
         String path = "";
-        if(isProcessed){
+        if (isProcessed) {
             path = ConfigProp.getPathProc();
         } else{
             path = ConfigProp.getPathUnproc();

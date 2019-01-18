@@ -49,7 +49,7 @@ public class Hierarchy {
 		// 				"   OPTIONAL { ?id rdfs:comment ?comment . } " +
 		// 				"}";
 		String graphName = NameSpaces.getInstance().getNameByAbbreviation(className);
-		String q = "SELECT ?id ?superId ?label FROM NAMED <" + graphName + "> " +
+		String q = "SELECT DISTINCT ?id ?superId ?label FROM NAMED <" + graphName + "> " +
 			"{GRAPH ?g { " + 
 				"?id rdfs:subClassOf ?superId . FILTER isIRI(?superId) . " + 
 				" OPTIONAL { ?id rdfs:label ?label }}}";

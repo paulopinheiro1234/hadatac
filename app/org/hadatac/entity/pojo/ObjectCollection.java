@@ -52,11 +52,13 @@ public class ObjectCollection extends HADatAcThing implements Comparable<ObjectC
     public static String LINE3 = INDENT1 + "a         hasco:ObjectCollection;  ";
     public static String DELETE_LINE3 = INDENT1 + " ?p ?o . ";
     public static String LINE_LAST = "}  ";
+    
     private String studyUri = "";
     private String hasScopeUri = "";    
     private String hasGroundingLabel = "";
     private String hasSOCReference = "";
     private String hasRoleLabel = "";
+    private long hasLastCounter = 0;
     private List<String> spaceScopeUris = null;
     private List<String> timeScopeUris = null;
     private List<String> objectUris = new ArrayList<String>();
@@ -136,6 +138,10 @@ public class ObjectCollection extends HADatAcThing implements Comparable<ObjectC
         }
         ObjectCollectionType ocType = ObjectCollectionType.find(typeUri);
         return ocType;    
+    }
+    
+    public long getNextCounter() {
+        return getNumOfObjects();
     }
 
     public String getStudyUri() {
@@ -288,6 +294,23 @@ public class ObjectCollection extends HADatAcThing implements Comparable<ObjectC
 
     public void setTimeScopeUris(List<String> timeScopeUris) {
         this.timeScopeUris = timeScopeUris;
+    }
+    
+    public long getNumOfObjects() {
+        String queryString = NameSpaces.getInstance().printSparqlNameSpaceList() +
+                " SELECT (COUNT(?obj) AS ?count) WHERE { \n" 
+                + " ?obj hasco:isMemberOf <" + getUri() + "> . \n" 
+                + "} \n";
+
+        ResultSetRewindable resultsrw = SPARQLUtils.select(
+                CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), queryString);
+
+        if (resultsrw.hasNext()) {
+            QuerySolution soln = resultsrw.next();
+            return soln.getLiteral("count").getLong();
+        }
+        
+        return 0;
     }
 
     public boolean isConnected(ObjectCollection oc) {
