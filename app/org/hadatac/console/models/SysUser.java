@@ -437,7 +437,7 @@ public class SysUser implements Subject {
 					.findByRoleNameSolr(AuthApplication.DATA_MANAGER_ROLE));
 			sys_user.emailValidated = true;
 
-			String admin_uri = "http://localhost/users#admin";
+			String admin_uri = ConfigFactory.load().getString("hadatac.console.kb") + "/users#admin";
 			User user = new User();
 			user.setName(sys_user.name);
 			user.setEmail(sys_user.email);
@@ -536,7 +536,7 @@ public class SysUser implements Subject {
 			sys_user.roles.add(SecurityRole
 					.findByRoleNameSolr(AuthApplication.DATA_MANAGER_ROLE));
 			sys_user.emailValidated = true;
-			user.setUri("http://localhost/users#admin");
+			user.setUri(ConfigFactory.load().getString("hadatac.console.kb") + "/users#admin");
 		}
 
 		user.save();
