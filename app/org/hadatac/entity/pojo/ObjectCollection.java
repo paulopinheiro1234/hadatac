@@ -51,6 +51,7 @@ public class ObjectCollection extends HADatAcThing implements Comparable<ObjectC
     public static String DELETE_LINE1 = "DELETE WHERE {  ";
     public static String LINE3 = INDENT1 + "a         hasco:ObjectCollection;  ";
     public static String DELETE_LINE3 = INDENT1 + " ?p ?o . ";
+    public static String DELETE_LINE4 = "  hasco:hasLastCounter ?o . ";
     public static String LINE_LAST = "}  ";
     
     private String studyUri = "";
@@ -58,7 +59,7 @@ public class ObjectCollection extends HADatAcThing implements Comparable<ObjectC
     private String hasGroundingLabel = "";
     private String hasSOCReference = "";
     private String hasRoleLabel = "";
-    private long hasLastCounter = 0;
+    private String hasLastCounter = "0";
     private List<String> spaceScopeUris = null;
     private List<String> timeScopeUris = null;
     private List<String> objectUris = new ArrayList<String>();
@@ -71,7 +72,9 @@ public class ObjectCollection extends HADatAcThing implements Comparable<ObjectC
         this.studyUri = "";
         this.hasScopeUri = "";
         this.hasGroundingLabel = "";
+        this.hasRoleLabel = "";
         this.hasSOCReference = "";
+        this.hasLastCounter = "0";
         this.spaceScopeUris = new ArrayList<String>();
         this.timeScopeUris = new ArrayList<String>();
     }
@@ -83,6 +86,7 @@ public class ObjectCollection extends HADatAcThing implements Comparable<ObjectC
             String studyUri,
             String hasScopeUri,
             String hasGroundingLabel,
+            String hasRoleLabel,
             String hasSOCReference,
             List<String> spaceScopeUris,
             List<String> timeScopeUris) {
@@ -93,7 +97,9 @@ public class ObjectCollection extends HADatAcThing implements Comparable<ObjectC
         this.setStudyUri(studyUri);
         this.setHasScopeUri(hasScopeUri);
         this.setGroundingLabel(hasGroundingLabel);
+        this.setRoleLabel(hasRoleLabel);
         this.setSOCReference(hasSOCReference);
+        this.hasLastCounter = "0";
         this.setSpaceScopeUris(spaceScopeUris);
         this.setTimeScopeUris(timeScopeUris);
     }
@@ -109,8 +115,12 @@ public class ObjectCollection extends HADatAcThing implements Comparable<ObjectC
         this.setComment(comment);
         this.setStudyUri(studyUri);
         this.setHasScopeUri("");
+        this.setSOCReference("");
+        this.setRoleLabel("");
         this.setSpaceScopeUris(spaceScopeUris);
         this.setTimeScopeUris(timeScopeUris);
+        this.hasLastCounter = "0";
+
     }
 
     @Override
@@ -140,8 +150,64 @@ public class ObjectCollection extends HADatAcThing implements Comparable<ObjectC
         return ocType;    
     }
     
-    public long getNextCounter() {
-        return getNumOfObjects();
+    public String getNextCounter() {
+	increaseNextCounter();
+	return hasLastCounter;
+    }
+
+    private void increaseNextCounter() {
+	long longCounter = Long.parseLong(hasLastCounter) + 1;
+	hasLastCounter = String.valueOf(longCounter);
+
+	// in triple store, delete existing counter
+        String query = "";
+
+        String oc_uri = "";
+        if (this.getUri().startsWith("<")) {
+            oc_uri = this.getUri();
+        } else {
+            oc_uri = "<" + this.getUri() + ">";
+        }
+
+        query += NameSpaces.getInstance().printSparqlNameSpaceList();
+        query += DELETE_LINE1;
+        query += " " + oc_uri + "  ";
+        query += DELETE_LINE4;
+        query += LINE_LAST;
+
+        UpdateRequest request = UpdateFactory.create(query);
+        UpdateProcessor processor = UpdateExecutionFactory.createRemote(
+	       request, CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_UPDATE));
+        processor.execute();
+
+	// in triple store, add new counter 
+        String insert = "";
+
+        insert += NameSpaces.getInstance().printSparqlNameSpaceList();
+        insert += INSERT_LINE1;
+
+        if (!getNamedGraph().isEmpty()) {
+            insert += " GRAPH <" + getNamedGraph() + "> { ";
+        }
+
+        insert += oc_uri + " hasco:hasLastCounter  \"" + this.hasLastCounter + "\" . ";
+
+        if (!getNamedGraph().isEmpty()) {
+            insert += " } ";
+        }
+
+        insert += LINE_LAST;
+
+        try {
+            request = UpdateFactory.create(insert);
+            processor = UpdateExecutionFactory.createRemote(
+                    request, CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_UPDATE));
+            processor.execute();
+        } catch (QueryParseException e) {
+            System.out.println("QueryParseException due to update query: " + insert);
+            throw e;
+        }
+
     }
 
     public String getStudyUri() {
@@ -447,13 +513,15 @@ public class ObjectCollection extends HADatAcThing implements Comparable<ObjectC
         ObjectCollection oc = null;
 
         String queryString = NameSpaces.getInstance().printSparqlNameSpaceList() + 
-                "SELECT ?ocType ?comment ?studyUri ?hasScopeUri ?hasSOCReference ?hasGroundingLabel ?spaceScopeUri ?timeScopeUri WHERE { \n" + 
+                "SELECT ?ocType ?comment ?studyUri ?hasScopeUri ?hasSOCReference ?hasRoleLabel ?hasGroundingLabel ?spaceScopeUri ?timeScopeUri ?lastCounter WHERE { \n" + 
                 "    <" + oc_uri + "> a ?ocType . \n" + 
                 "    <" + oc_uri + "> hasco:isMemberOf ?studyUri . \n" + 
                 "    OPTIONAL { <" + oc_uri + "> rdfs:comment ?comment } . \n" + 
                 "    OPTIONAL { <" + oc_uri + "> hasco:hasScope ?hasScopeUri } . \n" + 
                 "    OPTIONAL { <" + oc_uri + "> hasco:hasSOCReference ?hasSOCReference } . \n" + 
+                "    OPTIONAL { <" + oc_uri + "> hasco:hasRoleLabel ?hasRoleLabel } . \n" + 
                 "    OPTIONAL { <" + oc_uri + "> hasco:hasGroundingLabel ?hasGroundingLabel } . \n" + 
+                "    OPTIONAL { <" + oc_uri + "> hasco:hasLastCounter ?lastCounter } . \n" + 
                 "}";
 
         ResultSetRewindable resultsrw = SPARQLUtils.select(
@@ -470,7 +538,9 @@ public class ObjectCollection extends HADatAcThing implements Comparable<ObjectC
         String commentStr = "";
         String hasScopeUriStr = "";
         String hasGroundingLabelStr = "";
+        String hasRoleLabelStr = "";
         String hasSOCReferenceStr = "";
+        String lastCounterStr = "0";
         List<String> spaceScopeUrisStr = new ArrayList<String>();
         List<String> timeScopeUrisStr = new ArrayList<String>();
 
@@ -521,6 +591,14 @@ public class ObjectCollection extends HADatAcThing implements Comparable<ObjectC
                 }
 
                 try {
+                    if (soln.getLiteral("hasRoleLabel") != null && soln.getLiteral("hasRoleLabel").getString() != null) {
+                        hasRoleLabelStr = soln.getLiteral("hasRoleLabel").getString();
+                    }
+                } catch (Exception e1) {
+                    hasRoleLabelStr = "";
+                }
+
+                try {
                     if (soln.getLiteral("hasSOCReference") != null && soln.getLiteral("hasSOCReference").getString() != null) {
                         hasSOCReferenceStr = soln.getLiteral("hasSOCReference").getString();
                     }
@@ -528,11 +606,19 @@ public class ObjectCollection extends HADatAcThing implements Comparable<ObjectC
                     hasSOCReferenceStr = "";
                 }
 
+                try {
+                    if (soln.getLiteral("lastCounter") != null && soln.getLiteral("lastCounter").getString() != null) {
+                        lastCounterStr = soln.getLiteral("lastCounter").getString();
+                    }
+                } catch (Exception e1) {
+                    lastCounterStr = "";
+                }
+
                 spaceScopeUrisStr = retrieveSpaceScope(oc_uri);
 
                 timeScopeUrisStr = retrieveTimeScope(oc_uri);
 
-                oc = new ObjectCollection(oc_uri, typeStr, labelStr, commentStr, studyUriStr, hasScopeUriStr, hasGroundingLabelStr, hasSOCReferenceStr, spaceScopeUrisStr, timeScopeUrisStr);
+                oc = new ObjectCollection(oc_uri, typeStr, labelStr, commentStr, studyUriStr, hasScopeUriStr, hasGroundingLabelStr, hasRoleLabelStr, hasSOCReferenceStr, spaceScopeUrisStr, timeScopeUrisStr);
             }
         }
 
@@ -800,8 +886,16 @@ public class ObjectCollection extends HADatAcThing implements Comparable<ObjectC
                 insert += oc_uri + " hasco:hasScope  " + this.getHasScopeUri() + " . ";
             }
         }
-        insert += oc_uri + " hasco:hasGroundingLabel  \"" + this.getGroundingLabel() + "\" . ";
-        insert += oc_uri + " hasco:hasSOCReference  \"" + this.getSOCReference() + "\" . ";
+        if (this.getGroundingLabel() != null && !this.getGroundingLabel().equals("")) {
+	    insert += oc_uri + " hasco:hasGroundingLabel  \"" + this.getGroundingLabel() + "\" . ";
+	}
+        if (this.getSOCReference() != null && !this.getSOCReference().equals("")) {
+	    insert += oc_uri + " hasco:hasSOCReference  \"" + this.getSOCReference() + "\" . ";
+	}
+        if (this.getRoleLabel() != null && !this.getRoleLabel().equals("")) {
+	    insert += oc_uri + " hasco:hasRoleLabel  \"" + this.getRoleLabel() + "\" . ";
+	}
+        insert += oc_uri + " hasco:hasLastCounter  \"" + this.hasLastCounter + "\" . ";
         if (this.getSpaceScopeUris() != null && this.getSpaceScopeUris().size() > 0) {
             for (String spaceScope : this.getSpaceScopeUris()) {
                 if (spaceScope.length() > 0){
@@ -852,6 +946,7 @@ public class ObjectCollection extends HADatAcThing implements Comparable<ObjectC
             return;
         }
 
+	this.hasRoleLabel = label;
         String insert = "";
 
         insert += NameSpaces.getInstance().printSparqlNameSpaceList();

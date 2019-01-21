@@ -60,10 +60,12 @@ public class Pivot {
     
     public void setQuery(String query) {
         this.query = query;
+	//System.out.println("Pivot: query set: [" + query + "]");
     }
     
     public void addChild(Pivot child) {
-        children.add(child);
+        children
+.add(child);
     }
 
     public int recomputeStats() {

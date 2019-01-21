@@ -11,6 +11,7 @@ public class ObjectCollectionForm {
     public String newComment;
     public String newHasScopeUri;
     public String newHasGroundingLabel;
+    public String newHasRoleLabel;
     public String newHasSOCReference;
     public List<String> spaceUri;
     public List<String> timeUri;
@@ -61,6 +62,10 @@ public class ObjectCollectionForm {
     
     public String getNewHasGroundingLabel() {
     return newHasGroundingLabel;
+    }
+    
+    public String getNewHasRoleLabel() {
+    return newHasRoleLabel;
     }
     
     public String getNewHasSOCReference() {

@@ -92,7 +92,7 @@ public class FacetHandler {
 			facetsAll.put(STUDY_FACET, facet);
 			
 			facet = Facet.loadFacet(obj.get(OBJECT_COLLECTION_FACET), OBJECT_COLLECTION_FACET);
-            facetsAll.put(OBJECT_COLLECTION_FACET, facet);
+			facetsAll.put(OBJECT_COLLECTION_FACET, facet);
 			
 			facet = Facet.loadFacet(obj.get(UNIT_FACET), UNIT_FACET);
 			facetsAll.put(UNIT_FACET, facet);

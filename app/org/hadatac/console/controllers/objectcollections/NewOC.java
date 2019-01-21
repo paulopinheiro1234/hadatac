@@ -87,6 +87,7 @@ public class NewOC extends Controller {
 		String newComment = data.getNewComment();
 		String newHasScopeUri = data.getNewHasScopeUri();
 		String newHasGroundingLabel = data.getNewHasGroundingLabel();
+		String newHasRoleLabel = data.getNewHasRoleLabel();
 		String newHasSOCReferenceLabel = data.getNewHasSOCReference();
 		List<String> newSpaceScopeUris = data.getSpaceUri();
 		List<String> newTimeScopeUris = data.getTimeUri();
@@ -99,6 +100,7 @@ public class NewOC extends Controller {
 				newStudyUri,
 				newHasScopeUri,
 				newHasGroundingLabel,
+				newHasRoleLabel,
 				newHasSOCReferenceLabel,
 				newSpaceScopeUris,
 				newTimeScopeUris);

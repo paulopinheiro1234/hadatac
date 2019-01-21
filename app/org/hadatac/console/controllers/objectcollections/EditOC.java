@@ -96,6 +96,7 @@ public class EditOC extends Controller {
 		String newComment = data.getNewComment();
 		String newHasScopeUri = data.getNewHasScopeUri();
 		String newHasGroundingLabel = data.getNewHasGroundingLabel();
+		String newHasRoleLabel = data.getNewHasRoleLabel();
 		String newHasSOCReference = data.getNewHasSOCReference();
 		List<String> newSpaceScopeUris = data.getSpaceUri();
 		List<String> newTimeScopeUris = data.getTimeUri();
@@ -144,6 +145,9 @@ public class EditOC extends Controller {
 		if (oldOc.getGroundingLabel() == null || !oldOc.getGroundingLabel().equals(newHasGroundingLabel)) {
 			changedInfos.add(newHasGroundingLabel);
 		}
+		if (oldOc.getRoleLabel() == null || !oldOc.getRoleLabel().equals(newHasRoleLabel)) {
+			changedInfos.add(newHasRoleLabel);
+		}
 		if (oldOc.getSOCReference() == null || !oldOc.getSOCReference().equals(newHasSOCReference)) {
 			changedInfos.add(newHasSOCReference);
 		}
@@ -162,6 +166,7 @@ public class EditOC extends Controller {
 				newStudyUri,
 				newHasScopeUri,
 				newHasGroundingLabel,
+				newHasRoleLabel,
 				newHasSOCReference,
 				newSpaceScopeUris,
 				newTimeScopeUris);

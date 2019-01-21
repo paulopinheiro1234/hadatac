@@ -34,6 +34,7 @@ public class SSDGenerator extends BaseGenerator {
         mapCol.put("uri", "hasURI");
         mapCol.put("typeUri", "type");
         mapCol.put("hasSOCReference", "hasSOCReference");
+        mapCol.put("hasRoleLabel", "hasRoleLabel");
         mapCol.put("label", "label");
         mapCol.put("studyUri", "isMemberOf");
         mapCol.put("hasScopeUri", "hasScope");
@@ -60,6 +61,17 @@ public class SSDGenerator extends BaseGenerator {
 
     private String getSOCReference(Record rec) {
         String ref = rec.getValueByColumnName(mapCol.get("hasSOCReference"));
+        return ref.trim().replace(" ", "").replace("_", "-");
+    }
+
+    private String getRoleLabel(Record rec) {
+	if (mapCol.get("hasRoleLabel") == null) {
+	    return "";
+	}
+        String ref = rec.getValueByColumnName(mapCol.get("hasRoleLabel"));
+	if (ref == null) {
+	    return "";
+	}
         return ref.trim().replace(" ", "").replace("_", "-");
     }
 
@@ -107,6 +119,7 @@ public class SSDGenerator extends BaseGenerator {
 						   this.studyUri,
 						   URIUtils.replacePrefixEx(getHasScopeUri(record)),
 						   getGroundingLabel(record),
+						   getRoleLabel(record),
 						   getSOCReference(record),
 						   getSpaceScopeUris(record),
 						   getTimeScopeUris(record));

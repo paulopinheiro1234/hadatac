@@ -35,7 +35,7 @@ public class FacetTree {
 		}
 	}
 	
-	public void retrieveFacetData(int level, Facet facet, 
+        public void retrieveFacetData(int level, Facet facet, 
 			FacetHandler facetHandler, 
 			Pivot curPivot) {
 		System.out.println("\n\n\nlevel " + level);
@@ -91,6 +91,6 @@ public class FacetTree {
 		} catch (IllegalAccessException e) {
 			e.printStackTrace();
 		}
-	}
+	} 
 }
 

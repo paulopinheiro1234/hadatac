@@ -112,6 +112,7 @@ public class DataAcquisitionSearch extends Controller {
         if (request().body().asFormUrlEncoded() != null) {
             facets = request().body().asFormUrlEncoded().get("facets")[0];
         }
+
         System.out.println("\n\n\n\n\nfacets: " + facets);
 
         FacetHandler facetHandler = new FacetHandler();
@@ -129,6 +130,7 @@ public class DataAcquisitionSearch extends Controller {
                 ownerUri = "Public";
             }
         }
+
         results = Measurement.find(ownerUri, page, rows, facets);
 
         ObjectDetails objDetails = getObjectDetails(results);

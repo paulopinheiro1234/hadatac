@@ -123,7 +123,7 @@ public class StudyObjectType extends HADatAcClass implements Comparable<StudyObj
                 + "?objectCollection hasco:hasRoleLabel ?role . \n"
                 + "}";
 
-        // System.out.println("StudyObjectType query: \n" + query);
+        //System.out.println("StudyObjectType query: \n" + query);
 
         Map<Facetable, List<Facetable>> results = new HashMap<Facetable, List<Facetable>>();
         try {            
@@ -137,6 +137,7 @@ public class StudyObjectType extends HADatAcClass implements Comparable<StudyObj
                 studyObjectType.setLabel(WordUtils.capitalize(HADatAcThing.getShortestLabel(soln.get("studyObjType").toString())));
                 studyObjectType.setQuery(query);
                 studyObjectType.setField("study_object_type_uri_str");
+                //studyObjectType.setField("entity_uri_str");
 
                 StudyObjectRole role = new StudyObjectRole();
                 role.setUri(soln.get("role").toString());
@@ -153,7 +154,8 @@ public class StudyObjectType extends HADatAcClass implements Comparable<StudyObj
                 }
 
                 Facet subFacet = facet.getChildById(studyObjectType.getUri());
-                subFacet.putFacet("study_object_type_uri_str", soln.get("studyObjType").toString());
+                //subFacet.putFacet("study_object_type_uri_str", soln.get("studyObjType").toString());
+                subFacet.putFacet("entity_uri_str", soln.get("studyObjType").toString());
             }
         } catch (QueryExceptionHTTP e) {
             e.printStackTrace();

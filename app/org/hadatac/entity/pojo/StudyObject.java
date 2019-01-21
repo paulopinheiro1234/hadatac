@@ -62,6 +62,8 @@ public class StudyObject extends HADatAcThing {
     public static final String STUDY_OBJECT_TYPE = "STUDY_OBJECT_TYPE";
     //    4 -> soc's type
     public static final String SOC_TYPE = "SOC_TYPE";
+    //         soc's label
+    public static final String SOC_LABEL = "SOC_LABEL";
 
     String originalId;
     String isMemberOf;
@@ -349,7 +351,7 @@ public class StudyObject extends HADatAcThing {
                 CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), queryString);
 
         if (!resultsrw.hasNext()) {
-            System.out.println("[WARNING] StudyObject. Could not find OBJ with URI: <" + obj_uri + ">");
+            //System.out.println("[WARNING] StudyObject. Could not find OBJ with URI: <" + obj_uri + ">");
             return obj;
         }
 
