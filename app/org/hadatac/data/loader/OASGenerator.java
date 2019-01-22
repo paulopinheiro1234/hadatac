@@ -15,6 +15,7 @@ import org.hadatac.entity.pojo.HADatAcThing;
 import org.hadatac.entity.pojo.Measurement;
 import org.hadatac.entity.pojo.TriggeringEvent;
 import org.hadatac.metadata.loader.URIUtils;
+import org.hadatac.data.loader.DASOInstanceGenerator;
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
 
@@ -246,6 +247,8 @@ public class OASGenerator extends BaseGenerator {
         } else {
             throw new Exception(String.format("SDD <%s> cannot be found. Please ingest proper SDD file first. ", da.getSchemaUri()));
         }
+
+	DASOInstanceGenerator dasoInstGen = new DASOInstanceGenerator(da.getStudyUri(), schema, this.getRecordFile().getFileName()); 
 
         return da;
     }

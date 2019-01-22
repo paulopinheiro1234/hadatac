@@ -6,11 +6,18 @@
 @main("Browse Metadata") {
     <div class="container-fluid">
     
-        <h2>Browse Metadata</h2>
+        <h3>Browse Ontologies</h3>
+        <div id="rcorners">  
+           ADD ONTOLOGY LIST HERE
+        </div>
+
+        <h3>Browse Metadata</h3>
         
         @for(indicatorKey <- indicatorMap.keySet()){
-        <div class="row">
-            @indicator_navigation("",indicatorMap,indicatorKey)
+        <div id="rcorners">  
+            <div class="row">
+               @indicator_navigation("",indicatorMap,indicatorKey)
+            </div>
         </div>
         <hr>
         }
