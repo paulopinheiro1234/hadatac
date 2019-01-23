@@ -1,4 +1,5 @@
-@(indicatorMap : Map[String,List[String]])
+@(indicatorMap : Map[String,List[String]],
+  loadedList: List[String])
 
 @import helper._
 @import org.hadatac.console.views.html._
@@ -8,7 +9,9 @@
     
         <h3>Browse Ontologies</h3>
         <div id="rcorners">  
-           ADD ONTOLOGY LIST HERE
+            @for(loadedFile <- loadedList) {
+                <a href="/hadatac/metadata/graph?oper=ent&className=@loadedFile"><button class="btn btn-info btn-md" style="margin-right:10px">@loadedFile</button></a>
+            }
         </div>
 
         <h3>Browse Metadata</h3>
