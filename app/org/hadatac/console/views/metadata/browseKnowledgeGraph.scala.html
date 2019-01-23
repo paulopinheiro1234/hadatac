@@ -1,7 +1,7 @@
 @(oper       : String,
   graphName : String,
   hierarchy   : org.hadatac.console.models.OtMSparqlQueryResults,
-  cacheList : List[String])
+  loadedList : List[String])
 
 @import org.hadatac.console.views.html._
 @import org.hadatac.entity.pojo.DataAcquisitionSchema
@@ -106,9 +106,9 @@
             </form>
       </div>
       <div class="col-md-2 col-xs-2">
-        <h4>Cached Ontologies</h4>
-        @for(cachedFile <- cacheList) {
-            <a href="/hadatac/metadata/graph?oper=ent&className=@cachedFile"><button class="btn btn-info btn-md" style="display:block;margin-bottom:10px">@cachedFile</button></a>
+        <h4>Loaded Ontologies</h4>
+        @for(loadedFile <- loadedList) {
+            <a href="/hadatac/metadata/graph?oper=ent&className=@loadedFile"><button class="btn btn-info btn-md" style="display:block;margin-bottom:10px">@loadedFile</button></a>
         }
       </div>
       <div class="col-md-10 col-xs-6">

@@ -67,7 +67,7 @@ public class NameSpaces {
     public Map<String, Integer> getLoadedOntologies() {
         return loadedOntologies;
     }
-    
+
     public void reload() {
         table.clear();
         List<NameSpace> namespaces = NameSpace.findAll();
@@ -189,6 +189,15 @@ public class NameSpaces {
         }
         
         return json;
+    }
+
+    public List<String> listLoadedOntologies() {
+        List<String> loadedList = new ArrayList<String>();
+        for(Map.Entry<String, NameSpace> entry : table.entrySet()) {
+            if(entry.getValue().getNumberOfLoadedTriples() >= 1)
+                loadedList.add(entry.getKey());
+        }
+        return loadedList;
     }
 
     public String copyNameSpacesLocally(int mode) {
