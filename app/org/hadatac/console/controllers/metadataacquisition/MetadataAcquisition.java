@@ -198,12 +198,14 @@ public class MetadataAcquisition extends Controller {
 				
 				if ((!arrValues.contains(value))&&(value!="")) {
 					boolean dupl=false;
+					int valueCharVal = 0;
+					int valCharVal = 0;
 					for(String val : arrValues){
 						if(val.toLowerCase().equals(value.toLowerCase())){
 							dupl=true;
 							//System.out.println("Value: " + value + (int)value.charAt(0) + "\tVal: " + val + (int)val.charAt(0) + "\n" );
-							int valueCharVal = 0;
-							int valCharVal = 0;
+							valueCharVal = 0;
+							valCharVal = 0;
 							for(int i=0;i<value.length();i++){
 								valueCharVal += (int)value.charAt(i);
 							}
@@ -211,8 +213,8 @@ public class MetadataAcquisition extends Controller {
 								valCharVal += (int)val.charAt(i);
 							}
 							if(valueCharVal<valCharVal){
-								arrValues.remove(val);
-								arrValues.add(value);
+								//arrValues.remove(val);
+								//arrValues.add(value);
 							}
 						}
 					}
