@@ -4,7 +4,6 @@ import play.mvc.Controller;
 import play.mvc.Result;
 import org.hadatac.console.views.html.metadata.*;
 import org.hadatac.console.controllers.schema.EditingOptions;
-import org.hadatac.utils.NameSpace;
 import org.hadatac.utils.NameSpaces;
 import java.util.List;
 import java.util.ArrayList;
@@ -26,7 +25,7 @@ public class BrowseOntology extends Controller {
     }
 
     public Result graphIndex(String oper, String className) {
-    return ok(browseKnowledgeGraph.render(oper, className, EditingOptions.getHierarchy(className), getCacheList(oper)));
+    return ok(browseKnowledgeGraph.render(oper, className, EditingOptions.getHierarchy(className), getLoadedList()));
     }
 
     private List<String> getCacheList(String oper) {
@@ -59,6 +58,11 @@ public class BrowseOntology extends Controller {
         //String jsonStr = NameSpaces.jsonLoadedOntologies();
         //System.out.println(jsonStr);
         return cacheList;
+    }
+
+    private List<String> getLoadedList() {
+        NameSpaces ns = NameSpaces.getInstance();
+        return ns.listLoadedOntologies();
     }
 
 }

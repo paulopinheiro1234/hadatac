@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.hadatac.console.views.html.metadata.metadata;
+import org.hadatac.utils.NameSpaces;
 
 
 public class Metadata extends Controller {
@@ -15,7 +16,7 @@ public class Metadata extends Controller {
     public Result index() {
     	Map<String,String> indicators = DynamicFunctions.getIndicatorTypes();
         Map<String,List<String>> values = DynamicFunctions.getIndicatorValuesJustLabels(indicators);
-        return ok(metadata.render(values));
+        return ok(metadata.render(values, getLoadedList()));
         
     }// /index()
 
@@ -26,5 +27,10 @@ public class Metadata extends Controller {
          return index();
         
     }// /postIndex()
+
+    private List<String> getLoadedList() {
+        NameSpaces ns = NameSpaces.getInstance();
+        return ns.listLoadedOntologies();
+    }
 
 }
