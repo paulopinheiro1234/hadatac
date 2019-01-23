@@ -103,12 +103,6 @@ public class AnnotationWorker {
 
             if (fileName.startsWith("DA-")) {
                 chain = annotateDAFile(file, recordFile);
-            } else if (fileName.startsWith("PID-")) {
-                if (recordFile.getNumberOfSheets() > 1) {
-                    AnnotationLog.printException("PID file has more than one sheet. ", fileName);
-                    return;
-                }
-                chain = annotateSubjectIdFile(recordFile);
             } else if (fileName.startsWith("STD-")) {
                 chain = annotateStudyIdFile(recordFile);
             } else if (fileName.startsWith("DPL-")) {
@@ -120,12 +114,6 @@ public class AnnotationWorker {
                     }
                 }
                 chain = annotateDPLFile(recordFile);
-            } else if (fileName.startsWith("MAP-")) {
-                if (recordFile.getNumberOfSheets() > 1) {
-                    AnnotationLog.printException("MAP file has more than one sheet. ", fileName);
-                    return;
-                }
-                chain = annotateMapFile(recordFile);
             } else if (fileName.startsWith("ACQ-")) {
                 chain = annotateACQFile(recordFile, true);
             } else if (fileName.startsWith("OAS-")) {
@@ -364,13 +352,6 @@ public class AnnotationWorker {
         } 
     }
 
-    public static GeneratorChain annotateMapFile(RecordFile file) {
-        GeneratorChain chain = new GeneratorChain();
-        chain.addGenerator(new SampleSubjectMapper(file));
-
-        return chain;
-    }
-
     public static GeneratorChain annotateStudyIdFile(RecordFile file) {
         GeneratorChain chain = new GeneratorChain();
         chain.addGenerator(new StudyGenerator(file));
@@ -395,19 +376,6 @@ public class AnnotationWorker {
         return chain;
     }
 
-    public static GeneratorChain annotateSampleIdFile(RecordFile file) {
-        GeneratorChain chain = new GeneratorChain();
-        chain.addGenerator(new SampleGenerator(file));
-
-        return chain;
-    }
-
-    public static GeneratorChain annotateSubjectIdFile(RecordFile file) {
-        GeneratorChain chain = new GeneratorChain();
-        chain.addGenerator(new SubjectGenerator(file));
-
-        return chain;
-    }
 
     public static GeneratorChain annotateACQFile(RecordFile file, boolean bGenerate) {
         GeneratorChain chainForInstrument = new GeneratorChain();

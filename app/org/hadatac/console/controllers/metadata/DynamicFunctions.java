@@ -21,8 +21,6 @@ import org.hadatac.console.http.SPARQLUtils;
 import org.hadatac.console.models.SysUser;
 import org.hadatac.console.views.html.metadata.*;
 import org.hadatac.console.views.html.metadataacquisition.*;
-import org.hadatac.data.loader.SampleGenerator;
-import org.hadatac.data.loader.SubjectGenerator;
 import org.hadatac.metadata.loader.*;
 import org.hadatac.utils.CollectionUtil;
 import org.hadatac.utils.NameSpace;

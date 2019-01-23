@@ -419,17 +419,13 @@ public class AutoAnnotator extends Controller {
         String file_name = file.getName();
         GeneratorChain chain = null;
         
-        if (file_name.startsWith("PID")) {
-            chain = AnnotationWorker.annotateSubjectIdFile(recordFile);
-        } else if (file_name.startsWith("STD")) {
+        if (file_name.startsWith("STD")) {
             chain = AnnotationWorker.annotateStudyIdFile(recordFile);
         } else if (file_name.startsWith("DPL")) {
             if (file_name.endsWith(".xlsx")) {
                 recordFile = new SpreadsheetRecordFile(file, "InfoSheet");
             }
             chain = AnnotationWorker.annotateDPLFile(recordFile);
-        } else if (file_name.startsWith("MAP")) {
-            chain = AnnotationWorker.annotateMapFile(recordFile);
         } else if (file_name.startsWith("ACQ")) {
             chain = AnnotationWorker.annotateACQFile(recordFile, false);
         } else if (file_name.startsWith("OAS")) {
@@ -447,7 +443,7 @@ public class AutoAnnotator extends Controller {
     }
 
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    public Result downloadDataFile(String file_name, boolean isProcessed) {		
+    public Result downloadDataFile(String file_name, boolean isProcessed) {
         String path = ""; 
         if(isProcessed){
             path = ConfigProp.getPathProc();
