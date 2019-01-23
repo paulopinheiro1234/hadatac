@@ -11,6 +11,7 @@ import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrRequest;
 import org.apache.solr.client.solrj.impl.HttpSolrClient;
 import org.apache.solr.client.solrj.response.QueryResponse;
+import org.apache.solr.common.SolrDocumentList;
 import org.hadatac.console.models.Facet;
 import org.hadatac.console.models.FacetHandler;
 import org.hadatac.console.models.Pivot;
@@ -36,6 +37,33 @@ public class EntityInstance extends HADatAcThing implements Comparable<EntityIns
     @Override
     public int hashCode() {
         return getUri().hashCode();
+    }
+    
+    @Override
+    public long getNumber(Facet facet, FacetHandler facetHandler) {
+        return getNumberFromSolr(facet, facetHandler);
+    }
+
+    @Override
+    public long getNumberFromSolr(Facet facet, FacetHandler facetHandler) {
+        SolrQuery query = new SolrQuery();
+        String strQuery = facetHandler.getTempSolrQuery(facet);
+        query.setQuery(strQuery);
+        query.setRows(0);
+        query.setFacet(false);
+
+        try {
+            SolrClient solr = new HttpSolrClient.Builder(
+                    CollectionUtil.getCollectionPath(CollectionUtil.Collection.DATA_ACQUISITION)).build();
+            QueryResponse queryResponse = solr.query(query, SolrRequest.METHOD.POST);
+            solr.close();
+            SolrDocumentList results = queryResponse.getResults();
+            return results.getNumFound();
+        } catch (Exception e) {
+            System.out.println("[ERROR] EntityInstance.getNumberFromSolr() - Exception message: " + e.getMessage());
+        }
+
+        return -1;
     }
     
     @Override
@@ -81,7 +109,7 @@ public class EntityInstance extends HADatAcThing implements Comparable<EntityIns
         for (Pivot pivot_ent : pivot.children) {
             EntityInstance entity = new EntityInstance();
             entity.setUri(pivot_ent.getValue());
-            entity.setLabel(WordUtils.capitalize(Entity.find(pivot_ent.getValue()).getLabel()));
+            entity.setLabel("[" + WordUtils.capitalize(Entity.find(pivot_ent.getValue()).getLabel()) + "]");
             entity.setCount(pivot_ent.getCount());
             entity.setField("entity_uri_str");
             entity.setQuery(query);

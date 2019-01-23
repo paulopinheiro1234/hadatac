@@ -8,9 +8,15 @@ import java.util.HashMap;
 import org.apache.commons.text.WordUtils;
 import org.apache.jena.query.QuerySolution;
 import org.apache.jena.query.ResultSetRewindable;
+import org.apache.solr.client.solrj.SolrClient;
+import org.apache.solr.client.solrj.SolrQuery;
+import org.apache.solr.client.solrj.SolrRequest;
+import org.apache.solr.client.solrj.impl.HttpSolrClient;
+import org.apache.solr.client.solrj.response.QueryResponse;
 import org.hadatac.console.http.SPARQLUtils;
 import org.hadatac.console.models.Facet;
 import org.hadatac.console.models.FacetHandler;
+import org.hadatac.console.models.Pivot;
 import org.hadatac.console.views.dataacquisitionsearch.Facetable;
 import org.hadatac.metadata.loader.URIUtils;
 import org.hadatac.utils.CollectionUtil;
@@ -39,7 +45,7 @@ public class EntityRole extends HADatAcThing implements Comparable<EntityRole> {
     @Override
     public Map<Facetable, List<Facetable>> getTargetFacets(
             Facet facet, FacetHandler facetHandler) {
-        return getTargetFacetsFromTripleStore(facet, facetHandler);
+        return getTargetFacetsFromSolr(facet, facetHandler);
     }
 
     public Map<Facetable, List<Facetable>> getTargetFacetsFromTripleStore(
@@ -205,6 +211,61 @@ public class EntityRole extends HADatAcThing implements Comparable<EntityRole> {
 
         return results;
     }
+    
+    public Map<Facetable, List<Facetable>> getTargetFacetsFromSolr(
+            Facet facet, FacetHandler facetHandler) {
+        SolrQuery query = new SolrQuery();
+        String strQuery = facetHandler.getTempSolrQuery(facet);
+        query.setQuery(strQuery);
+        query.setRows(0);
+        query.setFacet(true);
+        query.setFacetLimit(-1);
+        query.setParam("json.facet", "{ "
+                + "role_str:{ "
+                + "type: terms, "
+                + "field: role_str, "
+                + "limit: 1000}}");
+
+        try {
+            SolrClient solr = new HttpSolrClient.Builder(
+                    CollectionUtil.getCollectionPath(CollectionUtil.Collection.DATA_ACQUISITION)).build();
+            QueryResponse queryResponse = solr.query(query, SolrRequest.METHOD.POST);
+            solr.close();
+            Pivot pivot = Pivot.parseQueryResponse(queryResponse);
+            return parsePivot(pivot, facet);
+        } catch (Exception e) {
+            System.out.println("[ERROR] EntityRole.getTargetFacetsFromSolr() - Exception message: " + e.getMessage());
+        }
+
+        return null;
+    }
+    
+    private Map<Facetable, List<Facetable>> parsePivot(Pivot pivot, Facet facet) {
+        Map<Facetable, List<Facetable>> results = new HashMap<Facetable, List<Facetable>>();
+        
+        for (Pivot child : pivot.children) {
+            if (child.getValue().isEmpty()) {
+                continue;
+            }
+
+            EntityRole role = new EntityRole();
+            role.setUri(child.getValue());
+            
+            role.setLabel(WordUtils.capitalize(child.getValue()));
+            role.setCount(child.getCount());
+            role.setField("role_str");
+
+            if (!results.containsKey(role)) {
+                List<Facetable> children = new ArrayList<Facetable>();
+                results.put(role, children);
+            }
+
+            Facet subFacet = facet.getChildById(role.getUri());
+            subFacet.putFacet("role_str", role.getUri());
+        }
+
+        return results;
+    }
 
     public static Map<String, String> findObjRoleMappings(String studyUri) {
         Map<String, String> results = new HashMap<String, String>();        
@@ -214,18 +275,6 @@ public class EntityRole extends HADatAcThing implements Comparable<EntityRole> {
                 + " ?soc hasco:hasRoleLabel ?label . \n" 
                 + " ?soc hasco:isMemberOf <" + studyUri + "> . \n" 
                 + " } \n";
-        //    + "SELECT ?studyObj ?roleUri WHERE { \n"
-        //    + "{ "
-        //    + "?studyObj hasco:isMemberOf ?soc . \n"
-        //    + "?soc a hasco:SubjectGroup . \n"
-        //    + "?soc hasco:isMemberOf <" + studyUri + "> . \n"
-        //    + "?studyObj hasco:hasRole ?roleUri . \n"
-        //    + "} UNION { \n"
-        //    + "?studyObj hasco:isMemberOf ?soc . \n"
-        //    + "?soc a hasco:SampleCollection . \n"
-        //    + "?soc hasco:isMemberOf <" + studyUri + "> . \n"
-        //    + "?studyObj a ?roleUri . \n"
-        //    + "}}";
 
         // System.out.println("findObjRoleMappings query: " + queryString);
 

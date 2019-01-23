@@ -157,7 +157,7 @@ public class Measurement extends HADatAcThing implements Runnable {
     public void setStudyObjectUri(String studyObjectUri) {
         this.studyObjectUri = studyObjectUri;
     }
-    
+
     public String getStudyObjectTypeUri() {
         return studyObjectTypeUri;
     }
@@ -640,8 +640,8 @@ public class Measurement extends HADatAcThing implements Runnable {
 
             //System.out.println("\n\n\nqueryResponse: " + queryResponse);
             Pivot pivot = Pivot.parseQueryResponse(queryResponse);
-            
-	    //System.out.println("PRINTING PIVOT");
+
+            //System.out.println("PRINTING PIVOT");
             //for (Pivot p : pivot.children) {
             //	System.out.println("Field: " + p.getField() + "   Value: " + p.getValue());
             //}
@@ -700,12 +700,13 @@ public class Measurement extends HADatAcThing implements Runnable {
                 facetHandler);
 
         FacetTree fTreeEC = new FacetTree();
-        fTreeEC.setTargetFacet(AttributeInstance.class);
+        // fTreeEC.setTargetFacet(AttributeInstance.class);
+        fTreeEC.setTargetFacet(EntityInstance.class);
         fTreeEC.addUpperFacet(Indicator.class);
         fTreeEC.addUpperFacet(EntityRole.class);
-        //fTreeEC.addUpperFacet(StudyObjectRole.class);
-        fTreeEC.addUpperFacet(EntityInstance.class);
+        // fTreeEC.addUpperFacet(EntityInstance.class);
         fTreeEC.addUpperFacet(InRelationToInstance.class);
+        fTreeEC.addUpperFacet(AttributeInstance.class);
         Pivot pivotEC = getFacetStats(fTreeEC, 
                 retFacetHandler.getFacetByName(FacetHandler.ENTITY_CHARACTERISTIC_FACET), 
                 facetHandler);
@@ -1034,7 +1035,7 @@ public class Measurement extends HADatAcThing implements Runnable {
         try {
             // Write empty string to create the file
             FileUtils.writeStringToFile(file, "", "utf-8", true);
-            
+
             // Initiate Alignment and Results
             Alignment alignment = new Alignment();
 
@@ -1049,18 +1050,18 @@ public class Measurement extends HADatAcThing implements Runnable {
             int i = 1;
             int prev_ratio = 0;
             int total = measurements.size();
-	    //System.out.println("Align-Debug: Measurement size is " + total);
+            //System.out.println("Align-Debug: Measurement size is " + total);
             DataFile dataFile = null;
             for (Measurement m : measurements) {
                 StudyObject obj = null;
 
                 String replacementUri = null;
                 StudyObject replacementObj = null;
- 
-		//System.out.println("Align-Debug: measurment's object URI is [" + m.getObjectUri() + "]");
+
+                //System.out.println("Align-Debug: measurment's object URI is [" + m.getObjectUri() + "]");
                 if (m.getObjectUri() != null && !m.getObjectUri().equals("")) {
 
-		    // Perform following actions required if the object of the measurement has not been processed yet
+                    // Perform following actions required if the object of the measurement has not been processed yet
                     //   - identify aligning object (replacement object)
                     //   - add a row in the result set for aligning object, if such row does not exist
                     //   - add entity-role to the collection of entity-roles of the alignment
@@ -1101,17 +1102,17 @@ public class Measurement extends HADatAcThing implements Runnable {
                             }
 
                             //System.out.println("Align-Debug: adding object");
-			    // add object identifiers to the results
+                            // add object identifiers to the results
                             if (!alignment.containsObject(obj.getUri())) {
                                 alignment.addObject(obj);
-				//System.out.println("Align-Debug: adding object STEP 2 Object URI [" + m.getObjectUri() + "]");
+                                //System.out.println("Align-Debug: adding object STEP 2 Object URI [" + m.getObjectUri() + "]");
                                 results.put(obj.getUri(), new HashMap<String, String>());
-				//System.out.println("Align-Debug: adding object STEP 3 EntRole: [" + alignment.objectKey(entRole) +  "] PID: [" + m.getObjectPID() + "]");
-				//System.out.println("Align-Debug: adding object STEP 3 Show Object URI [" + results.get(m.getObjectUri()) + "]");                                
+                                //System.out.println("Align-Debug: adding object STEP 3 EntRole: [" + alignment.objectKey(entRole) +  "] PID: [" + m.getObjectPID() + "]");
+                                //System.out.println("Align-Debug: adding object STEP 3 Show Object URI [" + results.get(m.getObjectUri()) + "]");                                
                                 //results.get(m.getObjectUri()).put(alignment.objectKey(entRole), m.getObjectPID());
                                 if (results.get(obj.getUri()) != null && alignment.objectKey(entRole) != null && m.getObjectPID() != null) {
-				    results.get(obj.getUri()).put(alignment.objectKey(entRole), m.getObjectPID());
-				}
+                                    results.get(obj.getUri()).put(alignment.objectKey(entRole), m.getObjectPID());
+                                }
                             }
 
                             //System.out.println("Align-Debug: show SID");
@@ -1124,20 +1125,20 @@ public class Measurement extends HADatAcThing implements Runnable {
                         }
                     }
 
-		    // assign values to results
+                    // assign values to results
                     String key = alignment.measurementKey(m);
                     if (key != null) {
                         String finalValue = "";
                         /*if (alignment.containsCode(m.getCharacteristicUri())) {
 			    finalValue = alignment.getCode(m.getCharacteristicUri()); */
 
-			if (alignment.containsCode(m.getCharacteristicUris().get(0))) {
-			    // get code for qualitative variables
-			    finalValue = alignment.getCode(m.getCharacteristicUris().get(0));
-			} else {
-			    // get actual value for quantitative variables
-			    finalValue = m.getValue();
-			}
+                        if (alignment.containsCode(m.getCharacteristicUris().get(0))) {
+                            // get code for qualitative variables
+                            finalValue = alignment.getCode(m.getCharacteristicUris().get(0));
+                        } else {
+                            // get actual value for quantitative variables
+                            finalValue = m.getValue();
+                        }
 
                         results.get(alignment.replaceUri(m.getObjectUri())).put(key, finalValue);
                     } else {
@@ -1148,7 +1149,7 @@ public class Measurement extends HADatAcThing implements Runnable {
                     }
                 }
 
-		// compute and show progress 
+                // compute and show progress 
                 double ratio = (double)i / total * 100;
                 int current_ratio = (int)ratio;
                 if (current_ratio > prev_ratio) {
@@ -1218,9 +1219,9 @@ public class Measurement extends HADatAcThing implements Runnable {
             }
 
             System.out.println("Finished writing!");
-            
-	    // Write harmonized code book
-	    outputHarmonizedCodebook(alignment, null);
+
+            // Write harmonized code book
+            outputHarmonizedCodebook(alignment, null);
 
             dataFile = DataFile.findByName(file.getName());
             if (dataFile != null) {
