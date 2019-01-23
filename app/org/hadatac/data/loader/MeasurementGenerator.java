@@ -417,10 +417,14 @@ public class MeasurementGenerator extends BaseGenerator {
                 if (!"".equals(id)) {
 		    String reference = dasa.getObjectViewLabel();
 		    if (reference != null && !reference.equals("")) {
-			measurement.setObjectUri(objList.get(reference).get(StudyObject.STUDY_OBJECT_URI));
-			measurement.setObjectCollectionType(objList.get(reference).get(StudyObject.SOC_TYPE));
-			measurement.setRole(objList.get(reference).get(StudyObject.SOC_LABEL));
-			measurement.setPID(objList.get(reference).get(StudyObject.OBJECT_SCOPE_URI));
+			if (objList.get(reference) == null) {
+			    System.out.println("MeasurementGenerator: [ERROR] Processing objList for reference [" + reference + "]");
+			} else {
+			    measurement.setObjectUri(objList.get(reference).get(StudyObject.STUDY_OBJECT_URI));
+			    measurement.setObjectCollectionType(objList.get(reference).get(StudyObject.SOC_TYPE));
+			    measurement.setRole(objList.get(reference).get(StudyObject.SOC_LABEL));
+			    measurement.setPID(objList.get(reference).get(StudyObject.OBJECT_SCOPE_URI));
+			}
 			//System.out.println("[MeasurementGenerator] For Id=[" + id + "] and reference=[" + reference + "] it was assigned Obj URI=[" + measurement.getObjectUri() + "]");
 		    } else {
 			System.out.println("[MeasurementGenerator] [ERROR]: could not find DASA reference for ID=[" + id + "]");

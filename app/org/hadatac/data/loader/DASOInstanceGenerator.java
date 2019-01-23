@@ -213,27 +213,25 @@ public class DASOInstanceGenerator{
 		AnnotationLog.println("DASOInstanceGenerator:       " + soc.getUri(), fileName);
 		socs.add(soc);
 		socPaths.put(key,socs);
-		break;
-	    }
-	    String toUri = soc.getHasScope().getUri();
-	    
-	    ObjectCollection nextTarget = soc;
-	    AnnotationLog.println("DASOInstanceGenerator:       " + nextTarget.getUri(), fileName);
-	    socs.add(nextTarget);
-	    while (!nextTarget.getUri().equals(mainSocUri)) {
-		String nextTargetUri = nextTarget.getHasScopeUri();
-		nextTarget =  requiredSocs.get(nextTargetUri);
-		if (nextTarget == null) {
-		    AnnotationLog.println("DASOInstanceGenerator: [ERROR] Could not complete path for " + toUri, fileName);
-		    return;
-		}
+	    } else {
+		String toUri = soc.getHasScope().getUri();
+		ObjectCollection nextTarget = soc;
 		AnnotationLog.println("DASOInstanceGenerator:       " + nextTarget.getUri(), fileName);
 		socs.add(nextTarget);
-	    }
-	    socPaths.put(key,socs);
-	    
+		while (!nextTarget.getUri().equals(mainSocUri)) {
+		    String nextTargetUri = nextTarget.getHasScopeUri();
+		    nextTarget =  requiredSocs.get(nextTargetUri);
+		    if (nextTarget == null) {
+			AnnotationLog.println("DASOInstanceGenerator: [ERROR] Could not complete path for " + toUri, fileName);
+			return;
+		    }
+		    AnnotationLog.println("DASOInstanceGenerator:       " + nextTarget.getUri(), fileName);
+		    socs.add(nextTarget);
+		}
+		socPaths.put(key,socs);
+	    } 
 	}
-
+	
 	/* 
 	 *  (8/8) COMPUTE LABEL for each TARGET SOC
 	 */

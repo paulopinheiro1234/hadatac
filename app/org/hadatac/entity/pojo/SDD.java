@@ -10,6 +10,7 @@ import java.util.Map;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.jena.query.ResultSetRewindable;
+import org.apache.jena.query.QuerySolution;
 import org.apache.jena.sparql.engine.http.QueryExceptionHTTP;
 import org.hadatac.console.controllers.annotator.AnnotationLog;
 import org.hadatac.console.http.SPARQLUtils;
@@ -171,35 +172,39 @@ public class SDD {
         if (list.contains(str)) {
             return true;
         }
-
+	
+	String expanded = URIUtils.replacePrefixEx(str);
         String indvIndicatorQuery = "";
+	String STUDY_INDICATOR = URIUtils.replacePrefixEx("hasco:StudyIndicator");
+	String SAMPLE_INDICATOR = URIUtils.replacePrefixEx("hasco:SampleIndicator");
+
         indvIndicatorQuery += NameSpaces.getInstance().printSparqlNameSpaceList();
-        indvIndicatorQuery += " SELECT * WHERE { \n" + " { " + str + " (<>|!<>)* hasco:StudyIndicator . } \n"
-                + " UNION { " + str + " (<>|!<>)* hasco:SampleIndicator . } \n" + " } \n";
+        indvIndicatorQuery += " SELECT * WHERE {  <" + expanded + "> rdfs:subClassOf*  ?super . }";
 
-        // System.out.println("indvIndicatorQuery: " + indvIndicatorQuery);
+        ResultSetRewindable resultsrw = SPARQLUtils.select(
+                CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), indvIndicatorQuery);
 
-        try {
-            ResultSetRewindable resultsrwIndvInd = SPARQLUtils.select(
-                    CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), indvIndicatorQuery);
-
-            List<String> answer = new ArrayList<String>();
-            while (resultsrwIndvInd.hasNext()) {
-                if (resultsrwIndvInd.size() > 0) {
-                    return true;
-                } else {
-                    return false;
-                }
-            }
-            System.out.println("The " + str + " get: " + answer);
+        if (!resultsrw.hasNext()) {
+            System.out.println("SDD: [WARNING] " + str + " is not an indicator");
             return false;
-        } catch (QueryExceptionHTTP e) {
-            e.printStackTrace();
-            AnnotationLog.printException("The 'Attribute' column " + str + " formed a bad query to the KG.",
-                    sddfile.getFileName());
         }
 
-        return true;
+        String superStr = "";
+
+        while (resultsrw.hasNext()) {
+            QuerySolution soln = resultsrw.next();
+            if (soln.get("super") != null) {
+                superStr = soln.get("super").toString();
+		System.out.println("SDD:  Response for [" + expanded + "] is [" + superStr + "]");
+		if (superStr.equals(STUDY_INDICATOR) || superStr.equals(SAMPLE_INDICATOR)) {
+		    return true;
+		}
+            }
+
+	}
+
+	System.out.println("SDD: [WARNING] " + expanded + " is not an indicator");
+	return false;
     }
 
     public Map<String, List<String>> readDDforEAmerge(RecordFile file) {

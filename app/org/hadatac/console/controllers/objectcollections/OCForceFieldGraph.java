@@ -33,21 +33,21 @@ public class OCForceFieldGraph {
 			if ((mode.equals("full")  || mode.equals("space") || mode.equals("collections")) && (oc.isLocationCollection())) {
 				type = OCNode.SPACECOLLECTION;
 				objects.add(new OCNode(oc.getUri(), oc.getLabel(), type, study.getUri()));
-				if (!mode.equals("collections")) {
-					addObjectNodes(oc);
-				}
+				//if (!mode.equals("collections")) {
+				//	addObjectNodes(oc);
+				//}
 			} else if ((mode.equals("full")  || mode.equals("time") || mode.equals("collections")) && oc.isTimeCollection()) {
 				type = OCNode.TIMECOLLECTION;
 				objects.add(new OCNode(oc.getUri(), oc.getLabel(), type, study.getUri()));
-				if (!mode.equals("collections")) {
-					addObjectNodes(oc);
-				}
+				//if (!mode.equals("collections")) {
+				//	addObjectNodes(oc);
+				//}
 			} else if (mode.equals("full") || mode.equals("collections")) {
 				type = OCNode.COLLECTION;
 				objects.add(new OCNode(oc.getUri(), oc.getLabel(), type, study.getUri()));
-				if (!mode.equals("collections")) {
-					addObjectNodes(oc);
-				}
+				//if (!mode.equals("collections")) {
+				//	addObjectNodes(oc);
+				//}
 			}
 		}
 	}
