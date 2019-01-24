@@ -108,9 +108,9 @@ public class StudyObjectType extends HADatAcClass implements Comparable<StudyObj
             valueConstraint += " VALUES ?objectCollectionType { " + stringify(
                     facet.getFacetValuesByField("object_collection_type_str")) + " } \n";
         }
-        if (!facet.getFacetValuesByField("study_object_type_uri_str").isEmpty()) {
+        if (!facet.getFacetValuesByField("entity_uri_str").isEmpty()) {
             valueConstraint += " VALUES ?studyObjType { " + stringify(
-                    facet.getFacetValuesByField("study_object_type_uri_str")) + " } \n";
+                    facet.getFacetValuesByField("entity_uri_str")) + " } \n";
         }
 
         String query = "";
@@ -136,8 +136,7 @@ public class StudyObjectType extends HADatAcClass implements Comparable<StudyObj
                 studyObjectType.setUri(soln.get("studyObjType").toString());
                 studyObjectType.setLabel(WordUtils.capitalize(HADatAcThing.getShortestLabel(soln.get("studyObjType").toString())));
                 studyObjectType.setQuery(query);
-                studyObjectType.setField("study_object_type_uri_str");
-                //studyObjectType.setField("entity_uri_str");
+                studyObjectType.setField("entity_uri_str");
 
                 StudyObjectRole role = new StudyObjectRole();
                 role.setUri(soln.get("role").toString());
@@ -145,7 +144,6 @@ public class StudyObjectType extends HADatAcClass implements Comparable<StudyObj
                 role.setField("role_str");
 
                 if (!results.containsKey(studyObjectType)) {
-                    System.out.println("studyObjectType: " + studyObjectType.getLabel());
                     results.put(studyObjectType, new ArrayList<Facetable>());
                 }
                 
@@ -154,7 +152,6 @@ public class StudyObjectType extends HADatAcClass implements Comparable<StudyObj
                 }
 
                 Facet subFacet = facet.getChildById(studyObjectType.getUri());
-                //subFacet.putFacet("study_object_type_uri_str", soln.get("studyObjType").toString());
                 subFacet.putFacet("entity_uri_str", soln.get("studyObjType").toString());
             }
         } catch (QueryExceptionHTTP e) {

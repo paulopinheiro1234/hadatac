@@ -53,7 +53,7 @@ public class ObjectCollection extends HADatAcThing implements Comparable<ObjectC
     public static String DELETE_LINE3 = INDENT1 + " ?p ?o . ";
     public static String DELETE_LINE4 = "  hasco:hasLastCounter ?o . ";
     public static String LINE_LAST = "}  ";
-    
+
     private String studyUri = "";
     private String hasScopeUri = "";    
     private String hasGroundingLabel = "";
@@ -149,17 +149,17 @@ public class ObjectCollection extends HADatAcThing implements Comparable<ObjectC
         ObjectCollectionType ocType = ObjectCollectionType.find(typeUri);
         return ocType;    
     }
-    
+
     public String getNextCounter() {
-	increaseNextCounter();
-	return hasLastCounter;
+        increaseNextCounter();
+        return hasLastCounter;
     }
 
     private void increaseNextCounter() {
-	long longCounter = Long.parseLong(hasLastCounter) + 1;
-	hasLastCounter = String.valueOf(longCounter);
+        long longCounter = Long.parseLong(hasLastCounter) + 1;
+        hasLastCounter = String.valueOf(longCounter);
 
-	// in triple store, delete existing counter
+        // in triple store, delete existing counter
         String query = "";
 
         String oc_uri = "";
@@ -177,10 +177,10 @@ public class ObjectCollection extends HADatAcThing implements Comparable<ObjectC
 
         UpdateRequest request = UpdateFactory.create(query);
         UpdateProcessor processor = UpdateExecutionFactory.createRemote(
-	       request, CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_UPDATE));
+                request, CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_UPDATE));
         processor.execute();
 
-	// in triple store, add new counter 
+        // in triple store, add new counter 
         String insert = "";
 
         insert += NameSpaces.getInstance().printSparqlNameSpaceList();
@@ -361,7 +361,7 @@ public class ObjectCollection extends HADatAcThing implements Comparable<ObjectC
     public void setTimeScopeUris(List<String> timeScopeUris) {
         this.timeScopeUris = timeScopeUris;
     }
-    
+
     public long getNumOfObjects() {
         String queryString = NameSpaces.getInstance().printSparqlNameSpaceList() +
                 " SELECT (COUNT(?obj) AS ?count) WHERE { \n" 
@@ -375,7 +375,7 @@ public class ObjectCollection extends HADatAcThing implements Comparable<ObjectC
             QuerySolution soln = resultsrw.next();
             return soln.getLiteral("count").getLong();
         }
-        
+
         return 0;
     }
 
@@ -756,7 +756,7 @@ public class ObjectCollection extends HADatAcThing implements Comparable<ObjectC
         }
         return "";
     }
-    
+
     @Override
     public Map<Facetable, List<Facetable>> getTargetFacets(
             Facet facet, FacetHandler facetHandler) {
@@ -796,7 +796,7 @@ public class ObjectCollection extends HADatAcThing implements Comparable<ObjectC
 
     private Map<Facetable, List<Facetable>> parsePivot(Pivot pivot, Facet facet) {
         Map<Facetable, List<Facetable>> results = new HashMap<Facetable, List<Facetable>>();
-        
+
         for (Pivot child : pivot.children) {
             if (child.getValue().isEmpty()) {
                 continue;
@@ -887,14 +887,14 @@ public class ObjectCollection extends HADatAcThing implements Comparable<ObjectC
             }
         }
         if (this.getGroundingLabel() != null && !this.getGroundingLabel().equals("")) {
-	    insert += oc_uri + " hasco:hasGroundingLabel  \"" + this.getGroundingLabel() + "\" . ";
-	}
+            insert += oc_uri + " hasco:hasGroundingLabel  \"" + this.getGroundingLabel() + "\" . ";
+        }
         if (this.getSOCReference() != null && !this.getSOCReference().equals("")) {
-	    insert += oc_uri + " hasco:hasSOCReference  \"" + this.getSOCReference() + "\" . ";
-	}
+            insert += oc_uri + " hasco:hasSOCReference  \"" + this.getSOCReference() + "\" . ";
+        }
         if (this.getRoleLabel() != null && !this.getRoleLabel().equals("")) {
-	    insert += oc_uri + " hasco:hasRoleLabel  \"" + this.getRoleLabel() + "\" . ";
-	}
+            insert += oc_uri + " hasco:hasRoleLabel  \"" + this.getRoleLabel() + "\" . ";
+        }
         insert += oc_uri + " hasco:hasLastCounter  \"" + this.hasLastCounter + "\" . ";
         if (this.getSpaceScopeUris() != null && this.getSpaceScopeUris().size() > 0) {
             for (String spaceScope : this.getSpaceScopeUris()) {
@@ -946,7 +946,7 @@ public class ObjectCollection extends HADatAcThing implements Comparable<ObjectC
             return;
         }
 
-	this.hasRoleLabel = label;
+        this.hasRoleLabel = label;
         String insert = "";
 
         insert += NameSpaces.getInstance().printSparqlNameSpaceList();
