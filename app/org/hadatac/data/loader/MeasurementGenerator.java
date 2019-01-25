@@ -544,7 +544,13 @@ public class MeasurementGenerator extends BaseGenerator {
             } else {
                 measurement.setEntityUri(dasa.getObjectUri());
             }
-            measurement.setCharacteristicUris(dasa.getAttributes());
+	    //if (dasa.getAttributes().size() <= 1) {
+		measurement.setCharacteristicUris(dasa.getAttributes());
+		//} else {
+		//List<String> strList = new ArrayList<String>();
+		//strList.add(dasa.getAttributesString());
+		//measurement.setCharacteristicUris(strList);
+		//}
 
             /*======================================*
              *                                      *

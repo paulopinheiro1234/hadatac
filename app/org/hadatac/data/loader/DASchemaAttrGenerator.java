@@ -269,8 +269,8 @@ public class DASchemaAttrGenerator extends BaseGenerator {
         }
         
         if (mergedEA.containsKey(getLabel(rec))) {
-        	AnnotationLog.println("[Merged Attribute] : " + getLabel(rec) + " ---> " + mergedEA.get(getLabel(rec)), file.getFile().getName());
-        	row.put("hasURI", kbPrefix + "DASA-" + SDDName + "-" + mergedEA.get(getLabel(rec)).get(0).trim().replace(" ", "").replace("_","-").replace("??", ""));
+	    AnnotationLog.println("[Merged Attribute] : " + getLabel(rec) + " ---> " + mergedEA.get(getLabel(rec)), file.getFile().getName());
+	    row.put("hasURI", kbPrefix + "DASA-" + SDDName + "-" + mergedEA.get(getLabel(rec)).get(0).trim().replace(" ", "").replace("_","-").replace("??", ""));
             row.put("a", "hasco:DASchemaAttribute");
             row.put("rdfs:label", mergedEA.get(getLabel(rec)).get(0));
             row.put("rdfs:comment", mergedEA.get(getLabel(rec)).get(1));
@@ -303,7 +303,7 @@ public class DASchemaAttrGenerator extends BaseGenerator {
             	row.put("prov:wasGeneratedBy", getWasGeneratedBy(rec));	
             }
         } else if (!tmp.contains(getLabel(rec))) {
-        	row.put("hasURI", kbPrefix + "DASA-" + SDDName + "-" + getLabel(rec).trim().replace(" ", "").replace("_","-").replace("??", ""));
+	    row.put("hasURI", kbPrefix + "DASA-" + SDDName + "-" + getLabel(rec).trim().replace(" ", "").replace("_","-").replace("??", ""));
             row.put("a", "hasco:DASchemaAttribute");
             row.put("rdfs:label", getLabel(rec));
             row.put("rdfs:comment", getLabel(rec));

@@ -255,6 +255,24 @@ public class DataAcquisitionSchemaAttribute extends HADatAcThing {
         }
     }
 
+    public String getAttributesString() {
+        if (attributes == null) {
+            return "";
+	}
+	if (attributes.size() == 1) {
+            return attributes.get(0);
+        }
+	String concat = "";
+	for (String str : attributes) {
+	    if (concat.equals("")) {
+		concat = str;
+	    } else {
+		concat = str + "; " + concat;
+	    }
+	}
+	return concat;
+    }
+
     public List<String> getAttributeNamespace() {
         if (attributes == Arrays.asList("")) {
             return attributes;
@@ -296,6 +314,21 @@ public class DataAcquisitionSchemaAttribute extends HADatAcThing {
             return Arrays.asList("");
         }
         return attributeLabels;
+    }
+
+    public String getConcatAttributeLabel() {
+        if (attributeLabels.size() == 0 || attributeLabels.equals(Arrays.asList(""))) {
+            return "";
+        }
+	String concat = "";
+	for (String str : attributeLabels) {
+	    if (concat.equals("")) {
+		concat = str;
+	    } else {
+		concat = str + " " + concat;
+	    }
+	}
+        return concat;
     }
 
     public List<String> getAnnotatedAttribute() {
@@ -547,7 +580,7 @@ public class DataAcquisitionSchemaAttribute extends HADatAcThing {
         while (resultsrw.hasNext()) {
             QuerySolution soln = resultsrw.next();
             labelStr = FirstLabel.getPrettyLabel(dasa_uri);
-
+	    
             if (soln.get("partOfSchema") != null) {
                 partOfSchemaStr = soln.get("partOfSchema").toString();
             }
@@ -572,24 +605,23 @@ public class DataAcquisitionSchemaAttribute extends HADatAcThing {
             if (soln.get("relation") != null) {
                 relationUri = soln.get("relation").toString();
             }
-
-            if (dasa == null) {
-                dasa = new DataAcquisitionSchemaAttribute(
-                        dasa_uri,
-                        localNameStr,
-                        labelStr,
-                        partOfSchemaStr,
-                        positionStr,
-                        entityStr,
-                        attributeList,
-                        unitStr,
-                        daseUriStr,
-                        dasoUriStr);
-            }
-
-            dasa.addRelation(relationUri, inRelationToUri);
+	    
         }
-
+	
+	dasa = new DataAcquisitionSchemaAttribute(
+		     dasa_uri,
+		     localNameStr,
+		     labelStr,
+		     partOfSchemaStr,
+		     positionStr,
+		     entityStr,
+		     attributeList,
+		     unitStr,
+		     daseUriStr,
+		     dasoUriStr);
+	
+	dasa.addRelation(relationUri, inRelationToUri);
+	
         return dasa;
     }
 

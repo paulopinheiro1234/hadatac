@@ -209,6 +209,7 @@ public class SDD {
 
     public Map<String, List<String>> readDDforEAmerge(RecordFile file) {
 
+        System.out.println("SDD: initiating readDDforEAmerge()");
         Map<String, List<String>> mapEAmerge = new HashMap<String, List<String>>();
         List<String> l_dasa = new ArrayList<String>();
 
@@ -285,8 +286,8 @@ public class SDD {
                 }
             }
         }
-        // System.out.println("l_dasa :" + l_dasa);
-        // System.out.println("mapEAmerge :" + mapEAmerge.keySet());
+        System.out.println("SDD: l_dasa :" + l_dasa);
+        System.out.println("SDD: mapEAmerge :" + mapEAmerge.keySet());
         return mapEAmerge;
     }
 
