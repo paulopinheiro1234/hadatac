@@ -66,9 +66,13 @@ public class DataAcquisitionSchema extends HADatAcThing {
     private String unitLabel = "";
     private String inRelationToLabel = "";
     private String lodLabel = "";
-    private List<DataAcquisitionSchemaAttribute> attributes = new ArrayList<DataAcquisitionSchemaAttribute>();
-    private List<DataAcquisitionSchemaObject> objects = new ArrayList<DataAcquisitionSchemaObject>();
-    private List<DataAcquisitionSchemaEvent> events = new ArrayList<DataAcquisitionSchemaEvent>();
+    //private List<DataAcquisitionSchemaAttribute> attributes = new ArrayList<DataAcquisitionSchemaAttribute>();
+    //private List<DataAcquisitionSchemaObject> objects = new ArrayList<DataAcquisitionSchemaObject>();
+    //private List<DataAcquisitionSchemaEvent> events = new ArrayList<DataAcquisitionSchemaEvent>();
+    private List<String> attributes = new ArrayList<String>();
+    private List<String> objects = new ArrayList<String>();
+    private List<String> events = new ArrayList<String>();
+    private boolean isRefreshed = false;
 
     public DataAcquisitionSchema() {
     }
@@ -76,6 +80,7 @@ public class DataAcquisitionSchema extends HADatAcThing {
     public DataAcquisitionSchema(String uri, String label) {
         this.uri = uri;
         this.label = label;
+	isRefreshed = false;
     }
 
     public String getUri() {
@@ -200,15 +205,26 @@ public class DataAcquisitionSchema extends HADatAcThing {
     }
 
     public List<DataAcquisitionSchemaAttribute> getAttributes() {
-        return attributes;
+        return DataAcquisitionSchemaAttribute.findBySchema(this.getUri());
     }
 
-    public void setAttributes(List<DataAcquisitionSchemaAttribute> attributes) {
+    public void setAttributes(List<String> attributes) {
+        if (attributes == null) {
+            System.out.println("[WARNING] No DataAcquisitionSchemaObject for " + uri + " is defined in the knowledge base. ");
+        } else {
+            this.attributes = attributes;
+	    if (!isRefreshed) {
+		refreshAttributes();
+	    }
+        }
+    }
+
+    public void refreshAttributes() {
+	List<DataAcquisitionSchemaAttribute> attributeList = DataAcquisitionSchemaAttribute.findBySchema(this.getUri());
         if (attributes == null) {
             System.out.println("[ERROR] No DataAcquisitionSchemaAttribute for " + uri + " is defined in the knowledge base. ");
         } else {
-            this.attributes = attributes;
-            for (DataAcquisitionSchemaAttribute dasa : attributes) {
+            for (DataAcquisitionSchemaAttribute dasa : attributeList) {
                 dasa.setDataAcquisitionSchema(this);
 
                 if (dasa.getAttributes().contains(URIUtils.replacePrefixEx("sio:TimeStamp"))) {
@@ -268,50 +284,50 @@ public class DataAcquisitionSchema extends HADatAcThing {
     }
 
     public List<DataAcquisitionSchemaObject> getObjects() {
-        return objects;
+        return DataAcquisitionSchemaObject.findBySchema(this.getUri());
     }
 
-    public void setObjects(List<DataAcquisitionSchemaObject> objects) {
+    public void setObjects(List<String> objects) {
         if (objects == null) {
             System.out.println("[WARNING] No DataAcquisitionSchemaObject for " + uri + " is defined in the knowledge base. ");
         } else {
             this.objects = objects;
-            for (DataAcquisitionSchemaObject daso : objects) {
-                System.out.println("[OK] DataAcquisitionSchemaObject <" + daso.getUri() + "> is defined in the knowledge base. " + 
-                        "Role: \""  + daso.getRole() + " InRelationTo: \""  + daso.getInRelationToLabel() + "\"");
-            }
+            //for (DataAcquisitionSchemaObject daso : objects) {
+            //    System.out.println("[OK] DataAcquisitionSchemaObject <" + daso.getUri() + "> is defined in the knowledge base. " + 
+            //            "Role: \""  + daso.getRole() + " InRelationTo: \""  + daso.getInRelationToLabel() + "\"");
+            //}
         }
     }
 
     public DataAcquisitionSchemaObject getObject(String dasoUri) {
-        for (DataAcquisitionSchemaObject daso : objects) {
-            if (daso.getUri().equals(dasoUri)) {
-                return daso;
+        for (String daso : objects) {
+            if (daso.equals(dasoUri)) {
+                return DataAcquisitionSchemaObject.find(daso);
             }
         }
         return null;
     }
 
     public List<DataAcquisitionSchemaEvent> getEvents() {
-        return events;
+        return DataAcquisitionSchemaEvent.findBySchema(this.getUri());
     }
 
-    public void setEvents(List<DataAcquisitionSchemaEvent> events) {
+    public void setEvents(List<String> events) {
         if (events == null) {
             System.out.println("[WARNING] No DataAcquisitionSchemaEvent for " + uri + " is defined in the knowledge base. ");
         } else {
             this.events = events;
-            for (DataAcquisitionSchemaEvent dase : events) {
-                System.out.println("[OK] DataAcquisitionSchemaEvent <" + dase.getUri() + "> is defined in the knowledge base. " + 
-                        "Label: \""  + dase.getLabel() + "\"");
-            }
+            //for (DataAcquisitionSchemaEvent dase : events) {
+            //    System.out.println("[OK] DataAcquisitionSchemaEvent <" + dase.getUri() + "> is defined in the knowledge base. " + 
+            //            "Label: \""  + dase.getLabel() + "\"");
+	    //}
         }
     }
-
+    
     public DataAcquisitionSchemaEvent getEvent(String daseUri) {
-        for (DataAcquisitionSchemaEvent dase : events) {
-            if (dase.getUri().equals(daseUri)) {
-                return dase;
+        for (String dase : events) {
+            if (dase.equals(daseUri)) {
+                return DataAcquisitionSchemaEvent.find(dase);
             }
         }
         return null;
@@ -386,7 +402,7 @@ public class DataAcquisitionSchema extends HADatAcThing {
         return position;
     }
 
-    public static DataAcquisitionSchema find(String schemaUri) {
+	public static DataAcquisitionSchema find(String schemaUri) {
         System.out.println("Looking for data acquisition schema " + schemaUri);
 
         if (schemaUri == null || schemaUri.equals("")) {
@@ -411,13 +427,16 @@ public class DataAcquisitionSchema extends HADatAcThing {
         DataAcquisitionSchema schema = new DataAcquisitionSchema();
         schema.setUri(schemaUri);
         schema.setLabel(FirstLabel.getLabel(schemaUri));
-        schema.setAttributes(DataAcquisitionSchemaAttribute.findBySchema(schemaUri));
-        schema.setObjects(DataAcquisitionSchemaObject.findBySchema(schemaUri));
-        schema.setEvents(DataAcquisitionSchemaEvent.findBySchema(schemaUri));
-        System.out.println("[OK] DataAcquisitionSchema <" + schemaUri + "> exists. " + 
-                "It has " + schema.getAttributes().size() + " attributes, " + 
-                schema.getObjects().size() + " objects, and " + 
-                schema.getEvents().size() + " events.");
+	//schema.setAttributes(DataAcquisitionSchemaAttribute.findBySchema(schemaUri));
+	schema.setAttributes(DataAcquisitionSchemaAttribute.findUriBySchema(schemaUri));
+	//schema.setObjects(DataAcquisitionSchemaObject.findBySchema(schemaUri));
+	schema.setObjects(DataAcquisitionSchemaObject.findUriBySchema(schemaUri));
+	//schema.setEvents(DataAcquisitionSchemaEvent.findBySchema(schemaUri));
+	schema.setEvents(DataAcquisitionSchemaEvent.findUriBySchema(schemaUri));
+        //System.out.println("[OK] DataAcquisitionSchema <" + schemaUri + "> exists. " + 
+        //        "It has " + schema.getAttributes().size() + " attributes, " + 
+        //        schema.getObjects().size() + " objects, and " + 
+        //        schema.getEvents().size() + " events.");
 
         return schema;
     }
@@ -520,7 +539,7 @@ public class DataAcquisitionSchema extends HADatAcThing {
     @Override
     public int saveToLabKey(String user_name, String password) {
         // SAVING DAS's DASAs
-        for (DataAcquisitionSchemaAttribute dasa : attributes) {
+        for (DataAcquisitionSchemaAttribute dasa : DataAcquisitionSchemaAttribute.findBySchema(this.getUri())) {
             dasa.saveToLabKey(user_name, password);
         }
 
@@ -545,7 +564,7 @@ public class DataAcquisitionSchema extends HADatAcThing {
     @Override
     public int deleteFromLabKey(String user_name, String password) {
         // DELETING DAS's DASAs
-        for (DataAcquisitionSchemaAttribute dasa : attributes) {
+        for (DataAcquisitionSchemaAttribute dasa : DataAcquisitionSchemaAttribute.findBySchema(this.getUri())) {
             dasa.deleteFromLabKey(user_name, password);
         }
 
@@ -568,7 +587,7 @@ public class DataAcquisitionSchema extends HADatAcThing {
     @Override
     public boolean saveToTripleStore() {
         // SAVING DAS's DASAs
-        for (DataAcquisitionSchemaAttribute dasa : attributes) {
+        for (DataAcquisitionSchemaAttribute dasa : DataAcquisitionSchemaAttribute.findBySchema(this.getUri())) {
             dasa.saveToTripleStore();
         }
 

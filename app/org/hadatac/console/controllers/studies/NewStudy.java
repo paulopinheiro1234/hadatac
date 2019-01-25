@@ -88,6 +88,7 @@ public class NewStudy extends Controller {
             return badRequest("[ERROR] New URI cannot be empty.");
         }
         String newStudyType = URIUtils.replacePrefixEx(data.getNewType());
+        String newId = data.getNewId();
         String newLabel = data.getNewLabel();
         String newTitle = data.getNewTitle();
         String newProject = data.getNewProject();
@@ -99,18 +100,19 @@ public class NewStudy extends Controller {
         String newEndDateTime = data.getNewEndDateTime();
 
         // insert current state of the STD
-        Study std = new Study(newURI,
-                newStudyType,
-                newLabel,
-                newTitle,
-                newProject,
-                newComment,
-                newExternalSource,
-                newInstitution,
-                newAgent,
-                newStartDateTime,
-                newStartDateTime);
-
+        Study std = new Study(newId,
+			      newURI,
+			      newStudyType,
+			      newLabel,
+			      newTitle,
+			      newProject,
+			      newComment,
+			      newExternalSource,
+			      newInstitution,
+			      newAgent,
+			      newStartDateTime,
+			      newStartDateTime);
+	
         // insert the new STD content inside of the triplestore regardless of any change -- the previous content has already been deleted
         std.save();
 

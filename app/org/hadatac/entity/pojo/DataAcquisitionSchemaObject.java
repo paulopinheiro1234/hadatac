@@ -398,6 +398,41 @@ public class DataAcquisitionSchemaObject extends HADatAcThing {
         return object;
     }
 
+    public static List<String> findUriBySchema(String schemaUri) {
+        //System.out.println("Looking for data acquisition schema objects for <" + schemaUri + ">");
+
+        List<String> objectUris = new ArrayList<String>();
+        String queryString = NameSpaces.getInstance().printSparqlNameSpaceList() + 
+                "SELECT ?uri WHERE { \n" + 
+                "   ?uri a hasco:DASchemaObject . \n" + 
+                "   ?uri hasco:partOfSchema <" + schemaUri + "> . \n" + 
+                "}";
+        
+        ResultSetRewindable resultsrw = SPARQLUtils.select(
+                CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), queryString);
+
+        if (!resultsrw.hasNext()) {
+            System.out.println("[WARNING] DataAcquisitionSchemaObject. Could not find objects for schema: " + schemaUri);
+            return objectUris;
+        }
+
+        while (resultsrw.hasNext()) {
+            QuerySolution soln = resultsrw.next();
+            try {
+                if (soln != null && soln.getResource("uri") != null && soln.getResource("uri").getURI() != null) {
+		    String uriStr = soln.getResource("uri").getURI();
+                    if (uriStr != null) {
+                        objectUris.add(uriStr);
+                    }
+                }
+            }  catch (Exception e) {
+                System.out.println("[ERROR] DataAcquisitionSchemaObject.findBySchema() e.Message: " + e.getMessage());
+            }
+        }
+
+        return objectUris;
+    }
+
     public static List<DataAcquisitionSchemaObject> findBySchema(String schemaUri) {
         //System.out.println("Looking for data acquisition schema objects for <" + schemaUri + ">");
 

@@ -105,6 +105,7 @@ public class EditStudy extends Controller {
             return badRequest("[ERROR] New URI cannot be empty.");
         }
         String newStudyType = URIUtils.replacePrefixEx(data.getNewType());
+        String newId = data.getNewId();
         String newLabel = data.getNewLabel();
         String newTitle = data.getNewTitle();
         String newProject = data.getNewProject();
@@ -126,6 +127,9 @@ public class EditStudy extends Controller {
             }
             if (oldStudy.getType() != null && !oldStudy.getType().equals(newStudyType)) {
                 changedInfos.add(newStudyType);
+            }
+            if (oldStudy.getId() != null && !oldStudy.getId().equals(newId)) {
+                changedInfos.add(newId);
             }
             if (oldStudy.getLabel() != null && !oldStudy.getLabel().equals(newLabel)) {
                 changedInfos.add(newLabel);
@@ -166,6 +170,7 @@ public class EditStudy extends Controller {
         // insert current state of the Study
         oldStudy.setUri(newURI);
         oldStudy.setType(newStudyType);
+        oldStudy.setId(newId);
         oldStudy.setLabel(newLabel);
         oldStudy.setTitle(newTitle);
         oldStudy.setProject(newProject);
@@ -175,10 +180,10 @@ public class EditStudy extends Controller {
         oldStudy.setAgentUri(newAgent);
         oldStudy.setStartedAt(newStartDateTime);
         oldStudy.setEndedAt(newEndDateTime);
-
+	
         // insert the new Study content inside of the triplestore regardless of any change -- the previous content has already been deleted
         oldStudy.save();
-
+	
         // update/create new Study in LabKey
         if (ConfigProp.getLabKeyLoginRequired()) {
             int nRowsAffected = oldStudy.saveToLabKey(session().get("LabKeyUserName"), session().get("LabKeyPassword"));
@@ -186,7 +191,7 @@ public class EditStudy extends Controller {
                 return badRequest("Failed to insert edited Study to LabKey!\n");
             }
         }
-
+	
         return ok(studyConfirm.render("Edit Study", oldStudy));
     }
 }

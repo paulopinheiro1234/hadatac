@@ -7,6 +7,7 @@ public class StudyForm {
 
     public String newStudyUri;
     public String newStudyType;
+    public String newId;
     public String newLabel;
     public String newTitle;
     public String newProject;
@@ -34,6 +35,14 @@ public class StudyForm {
     
     public void setNewType(String type) {
 	this.newStudyType = type;
+    }
+    
+    public String getNewId() {
+	return newId;
+    }
+    
+    public void setNewId(String id) {
+	this.newId = id;
     }
     
     public String getNewLabel() {

@@ -688,6 +688,39 @@ public class DataAcquisitionSchemaAttribute extends HADatAcThing {
         return attributes;
     }
 
+    public static List<String> findUriBySchema(String schemaUri) {
+        //System.out.println("Looking for data acquisition schema attribute URIs for <" + schemaUri + ">");
+
+        List<String> attributeUris = new ArrayList<String>();
+        String queryString = NameSpaces.getInstance().printSparqlNameSpaceList() + 
+                "SELECT ?uri  WHERE { \n" + 
+                " ?uri a hasco:DASchemaAttribute . \n" + 
+                " ?uri hasco:partOfSchema <" + schemaUri + "> . \n" + 
+                "} ";
+        
+        ResultSetRewindable resultsrw = SPARQLUtils.select(
+                CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), queryString);
+
+        if (!resultsrw.hasNext()) {
+            System.out.println("[WARNING] DataAcquisitionSchemaAttribute. Could not find attributes for schema: <" + schemaUri + ">");
+            return attributeUris;
+        }
+
+        while (resultsrw.hasNext()) {
+            QuerySolution soln = resultsrw.next();
+            try {
+                if (soln.getResource("uri") != null && soln.getResource("uri").getURI() != null) {
+                    String uri = soln.getResource("uri").getURI();
+                    attributeUris.add(uri);
+                }
+            } catch (Exception e1) {
+                System.out.println("[ERROR] DataAcquisitionSchemaAttribute.findBySchema() URI: <" + schemaUri + ">");
+                e1.printStackTrace();
+            }
+        }
+        return attributeUris;
+    }
+
     public static List<DataAcquisitionSchemaAttribute> findBySchema(String schemaUri) {
         System.out.println("Looking for data acquisition schema attributes for <" + schemaUri + ">");
 

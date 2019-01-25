@@ -56,6 +56,8 @@ public class Study extends HADatAcThing {
     public static String LINE_LAST = "}  ";
     public static String PREFIX = "STD-";
 
+    private String id;
+
     @Field("studyUri")
     private String studyUri;
 
@@ -95,17 +97,19 @@ public class Study extends HADatAcThing {
 
     private String lastId;
 
-    public Study(String studyUri,
-            String studyType,
-            String label,
-            String title,
-            String project,
-            String comment,
-            String externalSource,
-            String institutionUri,
-            String agentUri,
-            String startDateTime,
-            String endDateTime) {
+    public Study(String id,
+		 String studyUri,
+		 String studyType,
+		 String label,
+		 String title,
+		 String project,
+		 String comment,
+		 String externalSource,
+		 String institutionUri,
+		 String agentUri,
+		 String startDateTime,
+		 String endDateTime) {
+        this.id = id;
         this.studyUri = studyUri;
         this.studyType = studyType;
         this.label = label;
@@ -123,6 +127,7 @@ public class Study extends HADatAcThing {
     }
 
     public Study() {
+        this.id = "";
         this.studyUri = "";
         this.studyType = "";
         this.label = "";
@@ -137,6 +142,10 @@ public class Study extends HADatAcThing {
         this.dataAcquisitionUris = new ArrayList<String>();
         this.objectCollectionUris = new ArrayList<String>();
         this.lastId = "0";
+    }
+
+    public String getId() {
+        return id;
     }
 
     public String getUri() {
@@ -248,6 +257,10 @@ public class Study extends HADatAcThing {
     }    
 
     // set Methods
+    public void setId(String id) {
+        this.id = id;
+    }
+
     public void setUri(String uri) {
         this.studyUri = uri;
     }
@@ -451,6 +464,7 @@ public class Study extends HADatAcThing {
         Study study = new Study();
         // URI
         study.setUri(doc.getFieldValue("studyUri").toString());
+
         // label
         if (doc.getFieldValue("studyLabel_str") != null) {
             study.setLabel(doc.getFieldValue("studyLabel_str").toString());
@@ -480,8 +494,8 @@ public class Study extends HADatAcThing {
     }
 
     private static List<String> findObjectCollectionUris(String study_uri) {
-        System.out.println("findObjectCollectionUris() is called");
-        System.out.println("study_uri: " + study_uri);
+        //System.out.println("findObjectCollectionUris() is called");
+        //System.out.println("study_uri: " + study_uri);
         List<String> ocList = new ArrayList<String>();
         String queryString = NameSpaces.getInstance().printSparqlNameSpaceList() +
                 "SELECT ?oc_uri  WHERE {  " + 
@@ -538,13 +552,14 @@ public class Study extends HADatAcThing {
             adjustedUri = "<" + adjustedUri + ">";
         }
         String studyQueryString = NameSpaces.getInstance().printSparqlNameSpaceList() +
-                "SELECT DISTINCT ?studyType ?studyLabel ?title ?proj ?studyComment ?external ?agentUri ?institutionUri ?lastId" + 
+                "SELECT DISTINCT ?id ?studyType ?studyLabel ?title ?proj ?studyComment ?external ?agentUri ?institutionUri ?lastId" + 
                 " WHERE {  \n" + 
                 "      ?studyType rdfs:subClassOf* hasco:Study . \n" + 
                 "      " + adjustedUri + " a ?studyType . \n" + 
+                "      OPTIONAL { " + adjustedUri + " hasco:hasId ?id } . \n" + 
                 "      OPTIONAL { " + adjustedUri + " rdfs:label ?studyLabel } . \n" + 
-                "	   OPTIONAL { " + adjustedUri + " hasco:hasTitle ?title } . \n" +
-                "	   OPTIONAL { " + adjustedUri + " hasco:hasProject ?proj } . \n" +
+                "      OPTIONAL { " + adjustedUri + " hasco:hasTitle ?title } . \n" +
+                "      OPTIONAL { " + adjustedUri + " hasco:hasProject ?proj } . \n" +
                 "      OPTIONAL { " + adjustedUri + " rdfs:comment ?studyComment } . \n" + 
                 "      OPTIONAL { " + adjustedUri + " hasco:hasExternalSource ?external } . \n" + 
                 "      OPTIONAL { " + adjustedUri + " hasco:hasAgent ?agentUri } . \n" +
@@ -564,6 +579,10 @@ public class Study extends HADatAcThing {
             } else {
                 QuerySolution soln = resultsrw.next();
                 returnStudy.setUri(prefixedUri);
+
+                if (soln.contains("id")) {
+                    returnStudy.setId(soln.get("id").toString());
+                }
                 if (soln.contains("studyLabel")) {
                     returnStudy.setLabel(soln.get("studyLabel").toString());
                 }
@@ -615,13 +634,14 @@ public class Study extends HADatAcThing {
         }
         
         String studyQueryString = NameSpaces.getInstance().printSparqlNameSpaceList() +
-                " SELECT DISTINCT ?studyType ?studyLabel ?title ?proj ?studyComment ?external ?agentUri ?institutionUri ?lastId" + 
+                " SELECT DISTINCT ?id ?studyType ?studyLabel ?title ?proj ?studyComment ?external ?agentUri ?institutionUri ?lastId" + 
                 " WHERE {  " + 
                 "      ?studyType rdfs:subClassOf* hasco:Study . " + 
                 "      " + queryUri + " a ?studyType . " + 
+                "      OPTIONAL { " + queryUri + " hasco:hasId ?id } . " + 
                 "      OPTIONAL { " + queryUri + " rdfs:label ?studyLabel } . " + 
-                "	   OPTIONAL { " + queryUri + " hasco:hasTitle ?title } . " +
-                "	   OPTIONAL { " + queryUri + " hasco:hasProject ?proj } . " +
+                "      OPTIONAL { " + queryUri + " hasco:hasTitle ?title } . " +
+                "      OPTIONAL { " + queryUri + " hasco:hasProject ?proj } . " +
                 "      OPTIONAL { " + queryUri + " rdfs:comment ?studyComment } . " + 
                 "      OPTIONAL { " + queryUri + " hasco:hasExternalSource ?external } . " + 
                 "      OPTIONAL { " + queryUri + " hasco:hasAgent ?agentUri } .  " +
@@ -637,6 +657,10 @@ public class Study extends HADatAcThing {
             if (resultsrw.hasNext()) {
                 QuerySolution soln = resultsrw.next();
                 returnStudy.setUri(queryUri);
+
+                if (soln.contains("id")) {
+                    returnStudy.setId(soln.get("id").toString());
+                }
                 if (soln.contains("studyLabel")) {
                     returnStudy.setLabel(soln.get("studyLabel").toString());
                 }
@@ -1072,12 +1096,14 @@ public class Study extends HADatAcThing {
         if (!getNamedGraph().isEmpty()) {
             insert += " GRAPH <" + getNamedGraph() + "> { ";
         }
-
         if (studyType.startsWith("<")) {
             insert += std_uri + " a " + studyType + " . ";
         } else {
             insert += std_uri + " a <" + studyType + "> . ";
         }
+        if (id != null && !id.equals("")) {
+            insert += std_uri + " hasco:hasId \"" + id + "\" .  "; 
+        } 
         insert += std_uri + " rdfs:label  \"" + label + "\" . ";
         if (title != null && !title.equals("")) {
             insert += std_uri + " hasco:hasTitle \"" + title + "\" .  "; 

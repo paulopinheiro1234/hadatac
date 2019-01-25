@@ -148,8 +148,8 @@ public class DASOInstanceGenerator{
 	    String key = entry.getKey();
 	    DataAcquisitionSchemaObject daso = entry.getValue();
 	    if (!findCreateAssociatedSOC(daso)) {
-		AnnotationLog.println("DASOInstanceGenerator: [ERROR] Cannot create SOC for the following daso: " + daso.getUri(), fileName);
-		return;
+		AnnotationLog.println("DASOInstanceGenerator: [WARNING] Cannot create SOC for the following daso: " + daso.getUri(), fileName);
+		//return;
 	    }
 	}  
 	
@@ -305,7 +305,7 @@ public class DASOInstanceGenerator{
 	AnnotationLog.println("DASOInstanceGenerator: DASO: " + daso.getUri() + "   From : " + daso.getLabel() + "  To: " + toUri, fileName);
 	
 	//  LOAD each TARGET DASO into DASOs, if TARGET DASO is not loaded yet
-	if (!dasos.containsKey(toUri)) {
+	if (toUri != null && !toUri.equals("") && !dasos.containsKey(toUri)) {
 	    AnnotationLog.println("DASOInstanceGenerator: Loading " + toUri, fileName);
 	    DataAcquisitionSchemaObject newDaso = DataAcquisitionSchemaObject.find(toUri);
 	    if (newDaso == null) {
@@ -417,7 +417,7 @@ public class DASOInstanceGenerator{
 		if (scopeObj != null && scopeObj.getUri() != null) {
 		    scopeUri = scopeObj.getUri();
 		} else {
-		    AnnotationLog.println("DASOInstanceGenerator:       SOC association temporarily suspended.", fileName);
+		    AnnotationLog.println("DASOInstanceGenerator:       [WARNING] SOC association ignored for " + daso.getUri(), fileName);
 		    return false;
 		} 
 	    }

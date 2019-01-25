@@ -274,6 +274,39 @@ public class DataAcquisitionSchemaEvent extends HADatAcThing {
         return event;
     }
 
+    public static List<String> findUriBySchema(String schemaUri) {
+        List<String> eventUris = new ArrayList<String>();
+        String queryString = NameSpaces.getInstance().printSparqlNameSpaceList() + 
+                "SELECT ?uri WHERE { " + 
+                "   ?uri a hasco:DASchemaEvent . " + 
+                "   ?uri hasco:partOfSchema <" + schemaUri + "> .  " + 
+                "}";
+        
+        ResultSetRewindable resultsrw = SPARQLUtils.select(
+                CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), queryString);
+
+        if (!resultsrw.hasNext()) {
+            System.out.println("[WARNING] DataAcquisitionSchemaEvent. Could not find events for schema: " + schemaUri);
+            return eventUris;
+        }
+
+        while (resultsrw.hasNext()) {
+            QuerySolution soln = resultsrw.next();
+            try {
+                if (soln != null && soln.getResource("uri") != null && soln.getResource("uri").getURI() != null) {
+                    String uriStr = soln.getResource("uri").getURI();
+                    if (uriStr != null) {
+                        eventUris.add(uriStr);
+                    }
+                }
+            }  catch (Exception e) {
+                System.out.println("[ERROR] DataAcquisitionSchemaEvent. uri: e.Message: " + e.getMessage());
+            }
+
+        }
+        return eventUris;
+    }
+
     public static List<DataAcquisitionSchemaEvent> findBySchema(String schemaUri) {
         List<DataAcquisitionSchemaEvent> events = new ArrayList<DataAcquisitionSchemaEvent>();
         String queryString = NameSpaces.getInstance().printSparqlNameSpaceList() + 

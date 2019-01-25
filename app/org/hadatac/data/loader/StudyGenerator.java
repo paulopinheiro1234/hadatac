@@ -10,115 +10,121 @@ import org.hadatac.utils.ConfigProp;
 import org.hadatac.utils.Templates;
 
 public class StudyGenerator extends BaseGenerator {
-	final String kbPrefix = ConfigProp.getKbPrefix();
-	String file_name;
 
-	public StudyGenerator(RecordFile file) {
-		super(file);
-		this.file_name = file.getFile().getName();
-	}
-
-	@Override
+    final String kbPrefix = ConfigProp.getKbPrefix();
+    String file_name;
+    
+    public StudyGenerator(RecordFile file) {
+	super(file);
+	this.file_name = file.getFile().getName();
+    }
+    
+    @Override
 	public void initMapping() {
-		mapCol.clear();
-		mapCol.put("studyID", Templates.STUDYID);
-		mapCol.put("studyTitle", Templates.STUDYTITLE);
-		mapCol.put("studyAims", Templates.STUDYAIMS);
-		mapCol.put("studySignificance", Templates.STUDYSIGNIFICANCE);
-		mapCol.put("numSubjects", Templates.NUMSUBJECTS);
-		mapCol.put("numSamples", Templates.NUMSAMPLES);
-		mapCol.put("institution", Templates.INSTITUTION);
-		mapCol.put("PI", Templates.PI);
-		mapCol.put("PIAddress", Templates.PIADDRESS);
-		mapCol.put("PICity", Templates.PICITY);
-		mapCol.put("PIState", Templates.PISTATE);
-		mapCol.put("PIZipCode", Templates.PIZIPCODE);
-		mapCol.put("PIEmail", Templates.PIEMAIL);
-		mapCol.put("PIPhone", Templates.PIPHONE);
-		mapCol.put("CPI1FName", Templates.CPI1FNAME);
-		mapCol.put("CPI1LName", Templates.CPI1LNAME);
-		mapCol.put("CPI1Email", Templates.CPI1EMAIL);
-		mapCol.put("CPI2FName", Templates.CPI2FNAME);
-		mapCol.put("CPI2LName", Templates.CPI2LNAME);
-		mapCol.put("CPI2Email", Templates.CPI2EMAIL);
-		mapCol.put("contactFName", Templates.CONTACTFNAME);
-		mapCol.put("contactLName", Templates.CONTACTLNAME);
-		mapCol.put("contactEmail", Templates.CONTACTEMAIL);
-		mapCol.put("createdDate", Templates.CREATEDDATE);
-		mapCol.put("updatedDate", Templates.UPDATEDDATE);
-		mapCol.put("DCAccessBool", Templates.DCACCESSBOOL);
-		mapCol.put("externalSource", Templates.EXTSRC);
+	mapCol.clear();
+	mapCol.put("studyID", Templates.STUDYID);
+	mapCol.put("studyTitle", Templates.STUDYTITLE);
+	mapCol.put("studyAims", Templates.STUDYAIMS);
+	mapCol.put("studySignificance", Templates.STUDYSIGNIFICANCE);
+	mapCol.put("numSubjects", Templates.NUMSUBJECTS);
+	mapCol.put("numSamples", Templates.NUMSAMPLES);
+	mapCol.put("institution", Templates.INSTITUTION);
+	mapCol.put("PI", Templates.PI);
+	mapCol.put("PIAddress", Templates.PIADDRESS);
+	mapCol.put("PICity", Templates.PICITY);
+	mapCol.put("PIState", Templates.PISTATE);
+	mapCol.put("PIZipCode", Templates.PIZIPCODE);
+	mapCol.put("PIEmail", Templates.PIEMAIL);
+	mapCol.put("PIPhone", Templates.PIPHONE);
+	mapCol.put("CPI1FName", Templates.CPI1FNAME);
+	mapCol.put("CPI1LName", Templates.CPI1LNAME);
+	mapCol.put("CPI1Email", Templates.CPI1EMAIL);
+	mapCol.put("CPI2FName", Templates.CPI2FNAME);
+	mapCol.put("CPI2LName", Templates.CPI2LNAME);
+	mapCol.put("CPI2Email", Templates.CPI2EMAIL);
+	mapCol.put("contactFName", Templates.CONTACTFNAME);
+	mapCol.put("contactLName", Templates.CONTACTLNAME);
+	mapCol.put("contactEmail", Templates.CONTACTEMAIL);
+	mapCol.put("createdDate", Templates.CREATEDDATE);
+	mapCol.put("updatedDate", Templates.UPDATEDDATE);
+	mapCol.put("DCAccessBool", Templates.DCACCESSBOOL);
+	mapCol.put("externalSource", Templates.EXTSRC);
+    }
+    
+        private String getId(Record rec) {
+	    return rec.getValueByColumnName(mapCol.get("studyID"));
 	}
-
-	private String getUri(Record rec) {
-		System.out.println("Study Generator: template for STUDYID: [" +  Templates.STUDYID + "]");
-		String str = rec.getValueByColumnName(mapCol.get("studyID"));
-		return kbPrefix + "STD-" + str;
+    
+        private String getUri(Record rec) {
+	    //System.out.println("Study Generator: template for STUDYID: [" +  Templates.STUDYID + "]");
+	    String str = rec.getValueByColumnName(mapCol.get("studyID"));
+	    return kbPrefix + "STD-" + str;
 	}
 
 	private String getType() {
-		return "hasco:Study";
+	    return "hasco:Study";
 	}
 
 	private String getTitle(Record rec) {
-		return rec.getValueByColumnName(mapCol.get("studyTitle"));
+	    return rec.getValueByColumnName(mapCol.get("studyTitle"));
 	}
 
 	private String getAims(Record rec) {
-		return rec.getValueByColumnName(mapCol.get("studyAims"));
+	    return rec.getValueByColumnName(mapCol.get("studyAims"));
 	}
 
 	private String getSignificance(Record rec) {
-		return rec.getValueByColumnName(mapCol.get("studySignificance"));
+	    return rec.getValueByColumnName(mapCol.get("studySignificance"));
 	}
 
 	private String getInstitutionUri(Record rec) {
-		return kbPrefix + "ORG-" + rec.getValueByColumnName(mapCol.get("institution")).replaceAll(" ", "-").replaceAll(",", "").replaceAll("'", ""); 
+	    return kbPrefix + "ORG-" + rec.getValueByColumnName(mapCol.get("institution")).replaceAll(" ", "-").replaceAll(",", "").replaceAll("'", ""); 
 	}
 
 	private String getAgentUri(Record rec) {
-		return kbPrefix + "PER-" + rec.getValueByColumnName(mapCol.get("PI")).replaceAll(" ", "-"); 
+	    return kbPrefix + "PER-" + rec.getValueByColumnName(mapCol.get("PI")).replaceAll(" ", "-"); 
 	}
 
 	private String getExtSource(Record rec) {
-		return rec.getValueByColumnName(mapCol.get("externalSource")); 
+	    return rec.getValueByColumnName(mapCol.get("externalSource")); 
 	}
 
-	@Override
+    @Override
 	public Map<String, Object> createRow(Record rec, int rowNumber) throws Exception {
-		Map<String, Object> row = new HashMap<String, Object>();
-		if (getUri(rec).length() > 0) {
-			row.put("hasURI", getUri(rec));
-			row.put("a", getType());
-			row.put("rdfs:label", getTitle(rec));
-			row.put("skos:definition", getAims(rec));
-			row.put("rdfs:comment", getSignificance(rec));
-			if(mapCol.get("PI") != null && rec.getValueByColumnName(mapCol.get("PI")) != null && 
-                           rec.getValueByColumnName(mapCol.get("PI")).length() > 0) {
-				row.put("hasco:hasAgent", getAgentUri(rec));
-			}
-			if(mapCol.get("institution") != null && rec.getValueByColumnName(mapCol.get("institution")) != null && 
-                           rec.getValueByColumnName(mapCol.get("institution")).length() > 0) {
-				row.put("hasco:hasInstitution", getInstitutionUri(rec));
-			}
-			if(mapCol.get("externalSource") != null && rec.getValueByColumnName(mapCol.get("externalSource")) != null && 
-                           rec.getValueByColumnName(mapCol.get("externalSource")).length() > 0) {
-				row.put("hasco:hasExternalSource", getExtSource(rec));
-			}
-			setStudyUri(URIUtils.replacePrefixEx(getUri(rec)));
-		}
-		
-		return row;
+	Map<String, Object> row = new HashMap<String, Object>();
+	if (getUri(rec).length() > 0) {
+	    row.put("hasco:hasId", getId(rec));
+	    row.put("hasURI", getUri(rec));
+	    row.put("a", getType());
+	    row.put("rdfs:label", getTitle(rec));
+	    row.put("skos:definition", getAims(rec));
+	    row.put("rdfs:comment", getSignificance(rec));
+	    if(mapCol.get("PI") != null && rec.getValueByColumnName(mapCol.get("PI")) != null && 
+	       rec.getValueByColumnName(mapCol.get("PI")).length() > 0) {
+		row.put("hasco:hasAgent", getAgentUri(rec));
+	    }
+	    if(mapCol.get("institution") != null && rec.getValueByColumnName(mapCol.get("institution")) != null && 
+	       rec.getValueByColumnName(mapCol.get("institution")).length() > 0) {
+		row.put("hasco:hasInstitution", getInstitutionUri(rec));
+	    }
+	    if(mapCol.get("externalSource") != null && rec.getValueByColumnName(mapCol.get("externalSource")) != null && 
+	       rec.getValueByColumnName(mapCol.get("externalSource")).length() > 0) {
+		row.put("hasco:hasExternalSource", getExtSource(rec));
+	    }
+	    setStudyUri(URIUtils.replacePrefixEx(getUri(rec)));
 	}
-
-	@Override
+	
+	return row;
+    }
+    
+    @Override
 	public String getTableName() {
-		return "Study";
-	}
-
-	@Override
+	return "Study";
+    }
+    
+    @Override
 	public String getErrorMsg(Exception e) {
-		return "Error in StudyGenerator: " + e.getMessage();
-	}
+	return "Error in StudyGenerator: " + e.getMessage();
+    }
 }
 
