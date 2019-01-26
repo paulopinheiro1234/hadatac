@@ -514,7 +514,7 @@ public class MeasurementGenerator extends BaseGenerator {
                 measurement.setEntityUri(dasa.getObjectUri());
             }
             
-            measurement.setCharacteristicUris(Arrays.asList(String.join("; ", dasa.getAttributes())));
+            measurement.setCharacteristicUris(Arrays.asList(dasa.getReversedAttributeString()));
             
             /*======================================*
              *                                      *

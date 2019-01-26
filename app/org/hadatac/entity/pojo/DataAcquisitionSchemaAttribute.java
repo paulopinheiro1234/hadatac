@@ -254,13 +254,30 @@ public class DataAcquisitionSchemaAttribute extends HADatAcThing {
             return attributes;
         }
     }
-
-    public String getAttributesString() {
+    
+    public String getAttributeString() {
+        if (attributes == null) {
+            return "";
+        }
+        
+        return String.join("; ", attributes);
+    }
+    
+    public String getReversedAttributeString() {
         if (attributes == null) {
             return "";
         }
 
-        return String.join("; ", attributes);
+        String result = "";
+        for (String attrib : attributes) {
+            if (result.equals("")) {
+                result = attrib;
+            } else {
+                result = attrib + "; " + result;
+            }
+        }
+        
+        return result;
     }
 
     public List<String> getAttributeNamespace() {
