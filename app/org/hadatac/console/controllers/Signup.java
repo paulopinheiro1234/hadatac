@@ -5,6 +5,8 @@ import org.hadatac.console.models.TokenAction.Type;
 import org.hadatac.console.models.SysUser;
 import play.data.Form;
 import play.data.FormFactory;
+import play.data.validation.Constraints.Validate;
+import play.data.validation.Constraints.Validatable;
 import play.i18n.MessagesApi;
 import play.mvc.Controller;
 import play.mvc.Result;
@@ -22,7 +24,8 @@ import javax.inject.Inject;
 
 public class Signup extends Controller {
 
-	public static class PasswordReset extends Account.PasswordChange {
+    @Validate
+	public static class PasswordReset extends Account.PasswordChange implements Validatable<String> {
 	    
 	    public PasswordReset() {}
 
@@ -44,6 +47,11 @@ public class Signup extends Controller {
 		public void setToken(String token) {
 			this.token = token;
 		}
+		
+		@Override
+	    public String validate() {
+		    return null;
+	    }
 	}
 
 	private final Form<PasswordReset> PASSWORD_RESET_FORM;
