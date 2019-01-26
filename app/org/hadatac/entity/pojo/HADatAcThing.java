@@ -1,11 +1,14 @@
 package org.hadatac.entity.pojo;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.NotImplementedException;
+import org.apache.commons.text.WordUtils;
 import org.hadatac.console.models.Facet;
 import org.hadatac.console.models.FacetHandler;
 import org.hadatac.console.views.dataacquisitionsearch.Facetable;
@@ -60,7 +63,13 @@ public abstract class HADatAcThing implements Facetable {
         List<String> finalValues = new ArrayList<String>();
         preValues.forEach((value) -> {
             if (value.startsWith("http")) {
-                finalValues.add("<" + value + ">");
+                if (value.contains("; ")) {
+                    finalValues.addAll(Arrays.asList(value.split("; ")).stream()
+                            .map(s -> "<" + s + ">")
+                            .collect(Collectors.toList()));
+                } else {
+                    finalValues.add("<" + value + ">");
+                }
             } else {
                 finalValues.add("\"" + value + "\"");
             }

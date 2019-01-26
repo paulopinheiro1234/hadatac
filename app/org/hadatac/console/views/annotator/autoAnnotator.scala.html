@@ -63,7 +63,7 @@
     <div class="col-lg-12">
         <div class="button-group">
             <button type="button" class="btn btn-default btn-sm dropdown-toggle" data-toggle="dropdown"><span class="glyphicon glyphicon-cog"></span>Filter by Study<span class="caret"></span></button>
-            <ul class="dropdown-menu">
+            <ul class="dropdown-menu" id="study-filter">
                 @for(study <- studyURIs){
                     <li><a href="#" class="small" data-value="@study" tabIndex="-1"><input type="checkbox"/>&nbsp;@study</a></li>
                 }
@@ -171,14 +171,15 @@
     			   <a href="@org.hadatac.console.controllers.annotator.routes.PrepareIngestion.create(file.getFileName(),file.getDataAcquisitionUri())" 
 			       class="btn-xs btn-success" role="button">Prepare Ingestion</a>
 			    }
-			@if(file.getFileName().endsWith(".csv")) {
-			@defining("") { da_uri => @defining("") { oc_uri => 
+			    
+			    @if(file.getFileName().endsWith(".csv")) {
+			        @defining("") { da_uri => @defining("") { oc_uri => 
     	                     <a href="@org.hadatac.console.controllers.fileviewer.routes.CSVPreview.getCSVPreview("unproc", file.getFileName(), da_uri, oc_uri, 10, 1)" 
 				class="btn-xs btn-primary" role="button">Preview File</a>
                         }}}
-            @if(file.getFileName().endsWith(".xlsx") || file.getFileName().endsWith(".xls")) {
-                <a href="@org.hadatac.console.controllers.fileviewer.routes.ExcelPreview.index("unproc", file.getFileName())" class="btn-xs btn-primary" role="button">Preview File</a>
-            }
+                @if(file.getFileName().endsWith(".xlsx") || file.getFileName().endsWith(".xls")) {
+                    <a href="@org.hadatac.console.controllers.fileviewer.routes.ExcelPreview.index("unproc", file.getFileName())" class="btn-xs btn-primary" role="button">Preview File</a>
+                }
     			<a href="@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.deleteDataFile(file.getFileName(), false)" class="btn-xs btn-primary" role="button" id="delete" onclick="return confirm('Are you sure to delete?')">Delete</a>
     			@if(bAdmin) {
     				<a href="@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.assignFileOwner(file.getOwnerEmail(), file.getFileName())" class="btn-xs btn-primary" role="button">Assign Owner</a>
@@ -202,7 +203,7 @@
 	<script type="text/javascript">
     var options = [];
 
-    $('.dropdown-menu a').on('click', function(event) {
+    $('#study-filter a').on('click', function(event) {
 
        var $target = $( event.currentTarget ),
            val = $target.attr( 'data-value' ),

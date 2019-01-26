@@ -143,7 +143,7 @@ public class DataAcquisitionSchemaAttribute extends HADatAcThing {
         if (label == null) {
             return "";
         } else {
-	    return label;
+            return label;
         }
     }
 
@@ -249,7 +249,7 @@ public class DataAcquisitionSchemaAttribute extends HADatAcThing {
 
     public List<String> getAttributes() {
         if (attributes == null) {
-            return Arrays.asList("");
+            return new ArrayList<String>();
         } else {
             return attributes;
         }
@@ -258,19 +258,9 @@ public class DataAcquisitionSchemaAttribute extends HADatAcThing {
     public String getAttributesString() {
         if (attributes == null) {
             return "";
-	}
-	if (attributes.size() == 1) {
-            return attributes.get(0);
         }
-	String concat = "";
-	for (String str : attributes) {
-	    if (concat.equals("")) {
-		concat = str;
-	    } else {
-		concat = str + "; " + concat;
-	    }
-	}
-	return concat;
+
+        return String.join("; ", attributes);
     }
 
     public List<String> getAttributeNamespace() {
@@ -289,46 +279,32 @@ public class DataAcquisitionSchemaAttribute extends HADatAcThing {
         if (attributes == null || attributes.size() < 1 ) {
             this.attributeLabels = Arrays.asList("");
         } else {
-        	List<String> answer = new ArrayList<String>();
-        	for (String attr : attributes) {
-        		if (FirstLabel.getPrettyLabel(attr).equals("")) {
-        			answer.add(attr);
-        		} else {
-        			answer.add(FirstLabel.getPrettyLabel(attr));
-        		}
-        	}
+            List<String> answer = new ArrayList<String>();
+            for (String attr : attributes) {
+                if (FirstLabel.getPrettyLabel(attr).equals("")) {
+                    answer.add(attr);
+                } else {
+                    answer.add(FirstLabel.getPrettyLabel(attr));
+                }
+            }
             this.attributeLabels = answer;
         }
-        
+
         this.isMeta = true;
-        
+
         for (String attr : attributes) {
-        	if (!DataAcquisitionSchema.METADASA.contains(URIUtils.replaceNameSpaceEx(attr))) {
-        		this.isMeta = false;
-        	}
+            if (!DataAcquisitionSchema.METADASA.contains(URIUtils.replaceNameSpaceEx(attr))) {
+                this.isMeta = false;
+            }
         }      
     }
 
-    public List<String> getAttributeLabel() {
-        if (attributeLabels.equals(Arrays.asList(""))) {
-            return Arrays.asList("");
-        }
+    public List<String> getAttributeLabels() {
         return attributeLabels;
     }
 
     public String getConcatAttributeLabel() {
-        if (attributeLabels.size() == 0 || attributeLabels.equals(Arrays.asList(""))) {
-            return "";
-        }
-	String concat = "";
-	for (String str : attributeLabels) {
-	    if (concat.equals("")) {
-		concat = str;
-	    } else {
-		concat = str + " " + concat;
-	    }
-	}
-        return concat;
+        return String.join(" ", attributeLabels);
     }
 
     public List<String> getAnnotatedAttribute() {
@@ -342,9 +318,9 @@ public class DataAcquisitionSchemaAttribute extends HADatAcThing {
             annotation = attributeLabels;
         }
         if (!getAttributeNamespace().equals(Arrays.asList(""))) {
-        	for (String anno : annotation) {
-        		anno += " [" + URIUtils.replaceNameSpaceEx(anno.replace("<","").replace(">","")) + "]";	
-        	}
+            for (String anno : annotation) {
+                anno += " [" + URIUtils.replaceNameSpaceEx(anno.replace("<","").replace(">","")) + "]";	
+            }
         }
         return annotation;
     }
@@ -359,7 +335,7 @@ public class DataAcquisitionSchemaAttribute extends HADatAcThing {
     }
 
     public String getInRelationToLabel() {
-	String inRelationTo = getInRelationToUri();
+        String inRelationTo = getInRelationToUri();
         if (inRelationTo == null || inRelationTo.equals("")) {
             return "";
         } else {
@@ -450,14 +426,14 @@ public class DataAcquisitionSchemaAttribute extends HADatAcThing {
     }
 
     public String getObjectViewLabel() {
-	/*
+        /*
         if (attributes.equals(URIUtils.replaceNameSpaceEx("hasco:originalID"))) {
             return "[DefaultObject]";
         }
         if (isMeta) {
             return "";
         }
-	*/
+         */
         if (dasoUri == null || dasoUri.equals("")) {
             if (das != null && (!das.getIdLabel().equals("") || !das.getOriginalIdLabel().equals(""))) {
                 return "[DefaultObject]";
@@ -516,22 +492,22 @@ public class DataAcquisitionSchemaAttribute extends HADatAcThing {
         String query = "";
         query += NameSpaces.getInstance().printSparqlNameSpaceList();
         query += "select distinct (COUNT(?x) AS ?tot) where {" + 
-	    " ?x a <http://hadatac.org/ont/hasco/DASchemaAttribute> } ";
+                " ?x a <http://hadatac.org/ont/hasco/DASchemaAttribute> } ";
 
         //System.out.println("Study query: " + query);
 
         try {
             ResultSetRewindable resultsrw = SPARQLUtils.select(
                     CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), query);
-            
+
             if (resultsrw.hasNext()) {
                 QuerySolution soln = resultsrw.next();
                 return Integer.parseInt(soln.getLiteral("tot").getString());
-	    }
-	} catch (Exception e) {
-	    e.printStackTrace();
-	}
-	return -1;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return -1;
     }
 
     public static DataAcquisitionSchemaAttribute find(String dasa_uri) {
@@ -580,7 +556,7 @@ public class DataAcquisitionSchemaAttribute extends HADatAcThing {
         while (resultsrw.hasNext()) {
             QuerySolution soln = resultsrw.next();
             labelStr = FirstLabel.getPrettyLabel(dasa_uri);
-	    
+
             if (soln.get("partOfSchema") != null) {
                 partOfSchemaStr = soln.get("partOfSchema").toString();
             }
@@ -605,23 +581,23 @@ public class DataAcquisitionSchemaAttribute extends HADatAcThing {
             if (soln.get("relation") != null) {
                 relationUri = soln.get("relation").toString();
             }
-	    
+
         }
-	
-	dasa = new DataAcquisitionSchemaAttribute(
-		     dasa_uri,
-		     localNameStr,
-		     labelStr,
-		     partOfSchemaStr,
-		     positionStr,
-		     entityStr,
-		     attributeList,
-		     unitStr,
-		     daseUriStr,
-		     dasoUriStr);
-	
-	dasa.addRelation(relationUri, inRelationToUri);
-	
+
+        dasa = new DataAcquisitionSchemaAttribute(
+                dasa_uri,
+                localNameStr,
+                labelStr,
+                partOfSchemaStr,
+                positionStr,
+                entityStr,
+                attributeList,
+                unitStr,
+                daseUriStr,
+                dasoUriStr);
+
+        dasa.addRelation(relationUri, inRelationToUri);
+
         return dasa;
     }
 
@@ -639,7 +615,7 @@ public class DataAcquisitionSchemaAttribute extends HADatAcThing {
                 "    ?uri hasco:partOfSchema ?schemaUri .  " + 
                 "} ";
         System.out.println("[DASA] query string = \n" + queryString);
-        
+
         ResultSetRewindable resultsrw = SPARQLUtils.select(
                 CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), queryString);
 
@@ -689,7 +665,7 @@ public class DataAcquisitionSchemaAttribute extends HADatAcThing {
                 "    ?uri hasco:hasAttribute ?attrUri . " +
                 "} ";
         System.out.println("[DASA] query string = \n" + queryString);
-        
+
         ResultSetRewindable resultsrw = SPARQLUtils.select(
                 CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), queryString);
 
@@ -729,7 +705,7 @@ public class DataAcquisitionSchemaAttribute extends HADatAcThing {
                 " ?uri a hasco:DASchemaAttribute . \n" + 
                 " ?uri hasco:partOfSchema <" + schemaUri + "> . \n" + 
                 "} ";
-        
+
         ResultSetRewindable resultsrw = SPARQLUtils.select(
                 CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), queryString);
 
@@ -763,7 +739,7 @@ public class DataAcquisitionSchemaAttribute extends HADatAcThing {
                 " ?uri a hasco:DASchemaAttribute . \n" + 
                 " ?uri hasco:partOfSchema <" + schemaUri + "> . \n" + 
                 "} ";
-        
+
         ResultSetRewindable resultsrw = SPARQLUtils.select(
                 CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), queryString);
 
@@ -861,26 +837,26 @@ public class DataAcquisitionSchemaAttribute extends HADatAcThing {
         String insert = "";
         insert += NameSpaces.getInstance().printSparqlNameSpaceList();
         insert += INSERT_LINE1;
-        
+
         if (!getNamedGraph().isEmpty()) {
             insert += " GRAPH <" + getNamedGraph() + "> { ";
         }
-        
+
         insert += this.getUri() + " a hasco:DASchemaAttribute . ";
         insert += this.getUri() + " rdfs:label  \"" + label + "\" . ";
-        
+
         if (partOfSchema.startsWith("http")) {
             insert += this.getUri() + " hasco:partOfSchema <" + partOfSchema + "> .  "; 
         } else {
             insert += this.getUri() + " hasco:partOfSchema " + partOfSchema + " .  "; 
         }
-        
+
         if (entity.startsWith("http")) {
             insert += this.getUri() + " hasco:hasEntity <" + entity + "> .  ";
         } else {
             insert += this.getUri() + " hasco:hasEntity " + entity + " .  ";
         }
-        
+
         for (String attribute : attributes) {
             if (attribute.startsWith("http")) {
                 insert += this.getUri() + " hasco:hasAttribute <" + attribute + "> .  ";
@@ -888,13 +864,13 @@ public class DataAcquisitionSchemaAttribute extends HADatAcThing {
                 insert += this.getUri() + " hasco:hasAttribute " + attribute + " . ";
             }
         }
-        
+
         if (unit.startsWith("http")) {
             insert += this.getUri() + " hasco:hasUnit <" + unit + "> .  ";
         } else {
             insert += this.getUri() + " hasco:hasUnit " + unit + " .  ";
         }
-        
+
         if (daseUri != null && !daseUri.equals("")) {
             if (daseUri.startsWith("http")) {
                 insert += this.getUri() + " hasco:hasEvent <" + daseUri + "> .  ";

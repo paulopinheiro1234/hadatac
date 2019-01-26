@@ -277,7 +277,7 @@ public class DataAcquisitionSchema extends HADatAcThing {
                 }
                 System.out.println("[OK] DataAcquisitionSchemaAttribute <" + dasa.getUri() + "> is defined in the knowledge base. " + 
                         "Entity: \""    + dasa.getEntityLabel()     + "\"; " + 
-                        "Attribute: \"" + dasa.getAttributeLabel() + "\"; " + 
+                        "Attribute: \"" + dasa.getAttributeLabels() + "\"; " + 
                         "Unit: \""      + dasa.getUnitLabel()       + "\"");
             }
         }

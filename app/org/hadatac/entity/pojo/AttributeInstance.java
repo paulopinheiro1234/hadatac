@@ -1,9 +1,11 @@
 package org.hadatac.entity.pojo;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.apache.commons.text.WordUtils;
 import org.apache.solr.client.solrj.SolrClient;
@@ -108,7 +110,15 @@ public class AttributeInstance extends HADatAcThing implements Comparable<Attrib
         for (Pivot pivot_ent : pivot.children) {
             AttributeInstance attrib = new AttributeInstance();
             attrib.setUri(pivot_ent.getValue());
-            attrib.setLabel(WordUtils.capitalize(Attribute.find(pivot_ent.getValue()).getLabel()));
+            if (pivot_ent.getValue().contains("; ")) {
+                List<String> uris = Arrays.asList(pivot_ent.getValue().split("; "));
+                String label = String.join(" ", uris.stream()
+                        .map(s -> WordUtils.capitalize(Attribute.find(s).getLabel()))
+                        .collect(Collectors.toList()));
+                attrib.setLabel(label);
+            } else {
+                attrib.setLabel(WordUtils.capitalize(Attribute.find(pivot_ent.getValue()).getLabel()));
+            }
             attrib.setCount(pivot_ent.getCount());
             attrib.setQuery(query);
             attrib.setField("characteristic_uri_str_multi");

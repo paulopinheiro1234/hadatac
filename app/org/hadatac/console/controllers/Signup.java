@@ -19,9 +19,12 @@ import com.feth.play.module.pa.PlayAuthenticate;
 
 import javax.inject.Inject;
 
+
 public class Signup extends Controller {
 
 	public static class PasswordReset extends Account.PasswordChange {
+	    
+	    public PasswordReset() {}
 
 		public PasswordReset(MessagesApi messagesApi) {
 			super(messagesApi);

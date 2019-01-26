@@ -3,10 +3,10 @@ package org.hadatac.data.loader;
 import java.time.Instant;
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
-import java.util.ArrayList;
 import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.HashMap;
@@ -23,8 +23,6 @@ import org.hadatac.entity.pojo.DataAcquisitionSchema;
 import org.hadatac.entity.pojo.DataAcquisitionSchemaAttribute;
 import org.hadatac.entity.pojo.DataAcquisitionSchemaEvent;
 import org.hadatac.entity.pojo.DataAcquisitionSchemaObject;
-//import org.hadatac.entity.pojo.DASVirtualObject;
-//import org.hadatac.entity.pojo.DASOIntance;
 import org.hadatac.entity.pojo.DataFile;
 import org.hadatac.entity.pojo.EntityRole;
 import org.hadatac.entity.pojo.HADatAcThing;
@@ -57,10 +55,9 @@ public class MeasurementGenerator extends BaseGenerator {
 
     private int totalCount = 0;
 
-    private Map<String, String> objRoleMappings = null;
     private Map<String, Map<String, String>> possibleValues = null;
     private Map<String, Map<String, String>> mapIDStudyObjects = null;
-    
+
     private String dasoUnitUri = "";
 
     //private List<DASVirtualObject> templateList = new ArrayList<DASVirtualObject>();
@@ -73,15 +70,15 @@ public class MeasurementGenerator extends BaseGenerator {
 
         setStudyUri(da.getStudyUri());
     }
-    
+
     private void createVirtualObjectCollections(DataAcquisitionSchema schema) {
         GeneratorChain chain = new GeneratorChain();
         GeneralGenerator generator = new GeneralGenerator(file, "Virtual Object Collections");
-        
+
         List<String> socRefs = ObjectCollection.findAll().stream()
                 .map(x -> x.getSOCReference()).collect(Collectors.toList());
         for (DataAcquisitionSchemaObject daso : schema.getObjects()) {
-            
+
             // TO DO: for the following if clause, use the correct criteria for 
             // adding new SOC
             if (!socRefs.contains(daso.getAlternativeName())
@@ -91,16 +88,16 @@ public class MeasurementGenerator extends BaseGenerator {
                         + URIUtils.getBaseName(getStudyUri()).replace("STD-", "") + "-" 
                         + daso.getAlternativeName().replace("??", "").toUpperCase());
                 row.put("hasco:isMemberOf", URIUtils.replaceNameSpaceEx(getStudyUri()));
-                
+
                 String label = WordUtils.capitalize(daso.getAlternativeName().replace("??", ""));
                 row.put("hasco:hasGroundingLabel", label);
                 row.put("hasco:hasRoleLabel", label);
                 row.put("rdfs:comment", label);
                 row.put("rdfs:label", label);
                 row.put("hasco:hasSOCReference", daso.getAlternativeName());
-                
+
                 // TO DO: add type and hasScope property for SOC
-                
+
                 generator.addRow(row);
             }
         }
@@ -118,9 +115,9 @@ public class MeasurementGenerator extends BaseGenerator {
         if (schema == null) {
             throw new Exception(da.getSchemaUri() + " cannot be found!");
         }
-        
+
         createVirtualObjectCollections(schema);
-        
+
         /*
         if(!AnnotationWorker.templateLibrary.containsKey(da.getSchemaUri())){
             System.out.println("[Parser] [WARN] no DASVirtualObject templates for this DataAcquisition. Is this correct?");
@@ -184,7 +181,6 @@ public class MeasurementGenerator extends BaseGenerator {
         }
 
         // Store necessary information before hand to avoid frequent SPARQL queries
-        objRoleMappings = EntityRole.findObjRoleMappings(da.getStudyUri());
         possibleValues = DataAcquisitionSchema.findPossibleValues(da.getSchemaUri());
         mapIDStudyObjects = StudyObject.findIdUriMappings(da.getStudyUri());
         dasoUnitUri = DataAcquisitionSchema.findByLabel(da.getSchemaUri(), schema.getUnitLabel());
@@ -192,11 +188,11 @@ public class MeasurementGenerator extends BaseGenerator {
         //System.out.println("possibleValues: " + possibleValues);
 
         // Comment out row instance generation
-        
+
         // Need to be fixed here by getting codeMap and codebook from sparql query
         dasoiGen = new DASOInstanceGenerator(da.getStudyUri(),schema, dataFile.getFileName()); 
-	//Map<String, DASOInstance> rowInstances = new HashMap<String,DASOInstance>();
-        
+        //Map<String, DASOInstance> rowInstances = new HashMap<String,DASOInstance>();
+
     }
 
     @Override
@@ -218,26 +214,26 @@ public class MeasurementGenerator extends BaseGenerator {
         }
          */
 
-	Map<String, Map<String,String>> objList = null;
-	if (da.hasCellScope()) {
-	    // Objects defined by Cell Scope
-	    //if (da.getCellScopeName().get(0).equals("*")) {
-	    //	measurement.setStudyObjectUri(URIUtils.replacePrefixEx(da.getCellScopeUri().get(0).trim()));
-	    //measurement.setObjectUri(URIUtils.replacePrefixEx(da.getCellScopeUri().get(0).trim()));
-	    //measurement.setObjectCollectionType(URIUtils.replacePrefixEx("hasco:SampleCollection"));
-	    //} else {
-		// TO DO: implement rest of cell scope
-	    //}
-	} else {
-	    // Objects defined by Row Scope
-	    String id = "";
-	    if (!schema.getOriginalIdLabel().equals("")) {
-		id = record.getValueByColumnIndex(posOriginalId);
-	    } else if (!schema.getIdLabel().equals("")) {
-		id = record.getValueByColumnIndex(posId);
-	    }
-	    objList = dasoiGen.generateRowInstances(id);
-	}
+        Map<String, Map<String,String>> objList = null;
+        if (da.hasCellScope()) {
+            // Objects defined by Cell Scope
+            //if (da.getCellScopeName().get(0).equals("*")) {
+            //	measurement.setStudyObjectUri(URIUtils.replacePrefixEx(da.getCellScopeUri().get(0).trim()));
+            //measurement.setObjectUri(URIUtils.replacePrefixEx(da.getCellScopeUri().get(0).trim()));
+            //measurement.setObjectCollectionType(URIUtils.replacePrefixEx("hasco:SampleCollection"));
+            //} else {
+            // TO DO: implement rest of cell scope
+            //}
+        } else {
+            // Objects defined by Row Scope
+            String id = "";
+            if (!schema.getOriginalIdLabel().equals("")) {
+                id = record.getValueByColumnIndex(posOriginalId);
+            } else if (!schema.getIdLabel().equals("")) {
+                id = record.getValueByColumnIndex(posId);
+            }
+            objList = dasoiGen.generateRowInstances(id);
+        }
 
         Iterator<DataAcquisitionSchemaAttribute> iterAttributes = schema.getAttributes().iterator();
         while (iterAttributes.hasNext()) {
@@ -415,20 +411,20 @@ public class MeasurementGenerator extends BaseGenerator {
                 }
 
                 if (!"".equals(id)) {
-		    String reference = dasa.getObjectViewLabel();
-		    if (reference != null && !reference.equals("")) {
-			if (objList.get(reference) == null) {
-			    System.out.println("MeasurementGenerator: [ERROR] Processing objList for reference [" + reference + "]");
-			} else {
-			    measurement.setObjectUri(objList.get(reference).get(StudyObject.STUDY_OBJECT_URI));
-			    measurement.setObjectCollectionType(objList.get(reference).get(StudyObject.SOC_TYPE));
-			    measurement.setRole(objList.get(reference).get(StudyObject.SOC_LABEL));
-			    measurement.setPID(objList.get(reference).get(StudyObject.OBJECT_SCOPE_URI));
-			}
-			//System.out.println("[MeasurementGenerator] For Id=[" + id + "] and reference=[" + reference + "] it was assigned Obj URI=[" + measurement.getObjectUri() + "]");
-		    } else {
-			System.out.println("[MeasurementGenerator] [ERROR]: could not find DASA reference for ID=[" + id + "]");
-		    }
+                    String reference = dasa.getObjectViewLabel();
+                    if (reference != null && !reference.equals("")) {
+                        if (objList.get(reference) == null) {
+                            System.out.println("MeasurementGenerator: [ERROR] Processing objList for reference [" + reference + "]");
+                        } else {
+                            measurement.setObjectUri(objList.get(reference).get(StudyObject.STUDY_OBJECT_URI));
+                            measurement.setObjectCollectionType(objList.get(reference).get(StudyObject.SOC_TYPE));
+                            measurement.setRole(objList.get(reference).get(StudyObject.SOC_LABEL));
+                            measurement.setPID(objList.get(reference).get(StudyObject.OBJECT_SCOPE_URI));
+                        }
+                        //System.out.println("[MeasurementGenerator] For Id=[" + id + "] and reference=[" + reference + "] it was assigned Obj URI=[" + measurement.getObjectUri() + "]");
+                    } else {
+                        System.out.println("[MeasurementGenerator] [ERROR]: could not find DASA reference for ID=[" + id + "]");
+                    }
                     if (dasa.getEntity().equals(URIUtils.replacePrefixEx("sio:Human"))) {
                         //measurement.setObjectCollectionType(URIUtils.replacePrefixEx("hasco:SubjectGroup"));
                         if (mapIDStudyObjects.containsKey(id)) {
@@ -467,17 +463,6 @@ public class MeasurementGenerator extends BaseGenerator {
                     }
                 }
             }
-
-            /*=============================*
-             *                             *
-             *   SET ROLE URI              *
-             *                             *
-             *=============================*/
-            //if (objRoleMappings.containsKey(measurement.getStudyObjectUri())) {
-            //    measurement.setRole(objRoleMappings.get(measurement.getStudyObjectUri()));
-            //} else {
-            //    measurement.setRole("");
-            //}
 
             /*=============================*
              *                             *
@@ -523,35 +508,14 @@ public class MeasurementGenerator extends BaseGenerator {
                         measurement.setEntityUri(dasoValue);
                     }
                 } else {
-                    if (!schema.getOriginalIdLabel().equals("")) {
-                        String originalId = record.getValueByColumnIndex(posOriginalId);
-                        // values of daso might exist in the triple store
-                        if (daso.getEntity().equals(URIUtils.replacePrefixEx("sio:Human"))) {
-                            //if (mapIDStudyObjects.containsKey(originalId)) {
-                            //    measurement.setObjectUri(mapIDStudyObjects.get(originalId).get(0));
-                            //}
-                            //measurement.setPID(originalId);
-                        } else if (daso.getEntity().equals(URIUtils.replacePrefixEx("sio:Sample"))) {
-                            //if (mapIDStudyObjects.containsKey(originalId)) {
-                            //    measurement.setObjectUri(mapIDStudyObjects.get(originalId).get(2));
-                            //    measurement.setPID(mapIDStudyObjects.get(originalId).get(1));
-                            //}
-                            //measurement.setSID(originalId);
-                        }
-                    }
                     measurement.setEntityUri(daso.getEntity());
                 }
             } else {
                 measurement.setEntityUri(dasa.getObjectUri());
             }
-	    //if (dasa.getAttributes().size() <= 1) {
-		measurement.setCharacteristicUris(dasa.getAttributes());
-		//} else {
-		//List<String> strList = new ArrayList<String>();
-		//strList.add(dasa.getAttributesString());
-		//measurement.setCharacteristicUris(strList);
-		//}
-
+            
+            measurement.setCharacteristicUris(Arrays.asList(String.join("; ", dasa.getAttributes())));
+            
             /*======================================*
              *                                      *
              *   SET IN RELATION TO URI             *

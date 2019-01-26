@@ -55,6 +55,8 @@ public class Account extends Controller {
 		public String repeatPassword;
 		
 		private MessagesApi messagesApi;
+		
+		public PasswordChange() {}
 
 	    @Inject
 	    public PasswordChange(MessagesApi messagesApi) {
@@ -77,12 +79,14 @@ public class Account extends Controller {
 			this.repeatPassword = repeatPassword;
 		}
 
+		/*
 		public String validate() {
 			if (password == null || !password.equals(repeatPassword)) {
 				return this.messagesApi.preferred(request()).at("playauthenticate.change_password.error.passwords_not_same");
 			}
 			return null;
 		}
+		*/
 	}
 
 	private final Form<Accept> ACCEPT_FORM;
