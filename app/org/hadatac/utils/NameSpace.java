@@ -31,7 +31,7 @@ import org.eclipse.rdf4j.repository.RepositoryConnection;
 import org.eclipse.rdf4j.repository.sparql.SPARQLRepository;
 import org.eclipse.rdf4j.rio.RDFFormat;
 import org.hadatac.console.http.SPARQLUtils;
-
+import org.hadatac.entity.pojo.DataAcquisitionSchema;
 
 public class NameSpace {
 
@@ -177,24 +177,25 @@ public class NameSpace {
 	    deleteTriplesByNamedGraph(getName());
 	}
 	
-	public static void deleteTriplesByNamedGraph(String namedGraphUri) {
-        if (!namedGraphUri.isEmpty()) {
-            String queryString = "";
-            queryString += NameSpaces.getInstance().printSparqlNameSpaceList();
-            queryString += "WITH <" + namedGraphUri + "> ";
-            queryString += "DELETE { ?s ?p ?o } WHERE { ?s ?p ?o . } ";
-            
-            UpdateRequest req = UpdateFactory.create(queryString);
-            UpdateProcessor processor = UpdateExecutionFactory.createRemote(req, 
-                    CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_UPDATE));
-            try {
-                processor.execute();
+        public static void deleteTriplesByNamedGraph(String namedGraphUri) {
+	    if (!namedGraphUri.isEmpty()) {
+		String queryString = "";
+		queryString += NameSpaces.getInstance().printSparqlNameSpaceList();
+		queryString += "WITH <" + namedGraphUri + "> ";
+		queryString += "DELETE { ?s ?p ?o } WHERE { ?s ?p ?o . } ";
+		
+		UpdateRequest req = UpdateFactory.create(queryString);
+		UpdateProcessor processor = UpdateExecutionFactory.createRemote(req, 
+					    CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_UPDATE));
+		try {
+		    processor.execute();
+		    DataAcquisitionSchema.resetCache();
             } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
-    }
-	
+		    e.printStackTrace();
+		}
+	    }
+	}
+    
 	public int save() {        
         try {
             SolrClient client = new HttpSolrClient.Builder(

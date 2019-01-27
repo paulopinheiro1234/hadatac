@@ -54,6 +54,8 @@ public class DataAcquisitionSchema extends HADatAcThing {
             "hasco:hasElevation",
             "hasco:hasLocation");
 
+    private static Map<String, DataAcquisitionSchema> DASCache;
+
     private String uri = "";
     private String label = "";
     private String timestampLabel = "";
@@ -66,21 +68,34 @@ public class DataAcquisitionSchema extends HADatAcThing {
     private String unitLabel = "";
     private String inRelationToLabel = "";
     private String lodLabel = "";
-    //private List<DataAcquisitionSchemaAttribute> attributes = new ArrayList<DataAcquisitionSchemaAttribute>();
-    //private List<DataAcquisitionSchemaObject> objects = new ArrayList<DataAcquisitionSchemaObject>();
-    //private List<DataAcquisitionSchemaEvent> events = new ArrayList<DataAcquisitionSchemaEvent>();
     private List<String> attributes = new ArrayList<String>();
     private List<String> objects = new ArrayList<String>();
     private List<String> events = new ArrayList<String>();
     private boolean isRefreshed = false;
 
+    private static Map<String, DataAcquisitionSchema> getCache() {
+	if (DASCache == null) {
+	    DASCache = new HashMap<String, DataAcquisitionSchema>(); 
+	}
+	return DASCache;
+    }
+
+    public static void resetCache() {
+	DataAcquisitionSchemaAttribute.resetCache();
+	DataAcquisitionSchemaEvent.resetCache();
+	DataAcquisitionSchemaObject.resetCache();
+	DASCache = null;
+    }
+
     public DataAcquisitionSchema() {
+	DataAcquisitionSchema.getCache();
     }
 
     public DataAcquisitionSchema(String uri, String label) {
         this.uri = uri;
         this.label = label;
 	isRefreshed = false;
+	DataAcquisitionSchema.getCache();
     }
 
     public String getUri() {
@@ -403,44 +418,49 @@ public class DataAcquisitionSchema extends HADatAcThing {
     }
 
 	public static DataAcquisitionSchema find(String schemaUri) {
-        System.out.println("Looking for data acquisition schema " + schemaUri);
-
-        if (schemaUri == null || schemaUri.equals("")) {
-            System.out.println("[ERROR] DataAcquisitionSchema URI blank or null.");
-            return null;
-        }
-
-        String queryString = NameSpaces.getInstance().printSparqlNameSpaceList() + 
+	    if (DataAcquisitionSchema.getCache().get(schemaUri) != null) {
+		return DataAcquisitionSchema.getCache().get(schemaUri);
+	    }
+	    
+	    System.out.println("Looking for data acquisition schema " + schemaUri);
+	    
+	    if (schemaUri == null || schemaUri.equals("")) {
+		System.out.println("[ERROR] DataAcquisitionSchema URI blank or null.");
+		return null;
+	    }
+	    
+	    String queryString = NameSpaces.getInstance().printSparqlNameSpaceList() + 
                 " ASK { <" + schemaUri + "> a hasco:DASchema . } ";
-        Query query = QueryFactory.create(queryString);
-
-        QueryExecution qexec = QueryExecutionFactory.sparqlService(
-                CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), query);
-        boolean uriExist = qexec.execAsk();
-        qexec.close();
-
-        if (!uriExist) {
-            System.out.println("[WARNING] DataAcquisitionSchema. Could not find schema for uri: <" + schemaUri + ">");
-            return null;
-        }
-
-        DataAcquisitionSchema schema = new DataAcquisitionSchema();
-        schema.setUri(schemaUri);
-        schema.setLabel(FirstLabel.getLabel(schemaUri));
-	//schema.setAttributes(DataAcquisitionSchemaAttribute.findBySchema(schemaUri));
-	schema.setAttributes(DataAcquisitionSchemaAttribute.findUriBySchema(schemaUri));
-	//schema.setObjects(DataAcquisitionSchemaObject.findBySchema(schemaUri));
-	schema.setObjects(DataAcquisitionSchemaObject.findUriBySchema(schemaUri));
-	//schema.setEvents(DataAcquisitionSchemaEvent.findBySchema(schemaUri));
-	schema.setEvents(DataAcquisitionSchemaEvent.findUriBySchema(schemaUri));
-        //System.out.println("[OK] DataAcquisitionSchema <" + schemaUri + "> exists. " + 
-        //        "It has " + schema.getAttributes().size() + " attributes, " + 
-        //        schema.getObjects().size() + " objects, and " + 
-        //        schema.getEvents().size() + " events.");
-
-        return schema;
-    }
-
+	    Query query = QueryFactory.create(queryString);
+	    
+	    QueryExecution qexec = QueryExecutionFactory.sparqlService(
+				   CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), query);
+	    boolean uriExist = qexec.execAsk();
+	    qexec.close();
+	    
+	    if (!uriExist) {
+		System.out.println("[WARNING] DataAcquisitionSchema. Could not find schema for uri: <" + schemaUri + ">");
+		return null;
+	    }
+	    
+	    DataAcquisitionSchema schema = new DataAcquisitionSchema();
+	    schema.setUri(schemaUri);
+	    schema.setLabel(FirstLabel.getLabel(schemaUri));
+	    //schema.setAttributes(DataAcquisitionSchemaAttribute.findBySchema(schemaUri));
+	    schema.setAttributes(DataAcquisitionSchemaAttribute.findUriBySchema(schemaUri));
+	    //schema.setObjects(DataAcquisitionSchemaObject.findBySchema(schemaUri));
+	    schema.setObjects(DataAcquisitionSchemaObject.findUriBySchema(schemaUri));
+	    //schema.setEvents(DataAcquisitionSchemaEvent.findBySchema(schemaUri));
+	    schema.setEvents(DataAcquisitionSchemaEvent.findUriBySchema(schemaUri));
+	    //System.out.println("[OK] DataAcquisitionSchema <" + schemaUri + "> exists. " + 
+	    //        "It has " + schema.getAttributes().size() + " attributes, " + 
+	    //        schema.getObjects().size() + " objects, and " + 
+	    //        schema.getEvents().size() + " events.");
+	   
+	    DataAcquisitionSchema.getCache().put(schemaUri,schema);
+	    return schema;
+	}
+    
     public static List<DataAcquisitionSchema> findAll() {
         List<DataAcquisitionSchema> schemas = new ArrayList<DataAcquisitionSchema>();
 
@@ -632,6 +652,7 @@ public class DataAcquisitionSchema extends HADatAcThing {
 
     @Override
     public void deleteFromTripleStore() {
+ 
         String query = "";
         query += NameSpaces.getInstance().printSparqlNameSpaceList();
         query += DELETE_LINE1;
@@ -642,6 +663,7 @@ public class DataAcquisitionSchema extends HADatAcThing {
         UpdateProcessor processor = UpdateExecutionFactory.createRemote(
                 request, CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_UPDATE));
         processor.execute();
+	DataAcquisitionSchema.resetCache();
     }
 
     @Override

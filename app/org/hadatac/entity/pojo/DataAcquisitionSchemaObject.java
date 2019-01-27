@@ -31,6 +31,8 @@ public class DataAcquisitionSchemaObject extends HADatAcThing {
     public static String LINE_LAST = "}  ";
     public static String PREFIX = "DASO-";
 
+    private static Map<String, DataAcquisitionSchemaObject> DASOCache;
+
     private String uri;
     private String label;
     private String partOfSchema;
@@ -47,6 +49,17 @@ public class DataAcquisitionSchemaObject extends HADatAcThing {
     private String relationLabel;
     private String wasDerivedFrom;
     private String alternativeName = "";
+
+    private static Map<String, DataAcquisitionSchemaObject> getCache() {
+	if (DASOCache == null) {
+	    DASOCache = new HashMap<String, DataAcquisitionSchemaObject>(); 
+	}
+	return DASOCache;
+    }
+
+    public static void resetCache() {
+	DASOCache = null;
+    }
 
     public DataAcquisitionSchemaObject(String uri, 
             String label, 
@@ -76,6 +89,7 @@ public class DataAcquisitionSchemaObject extends HADatAcThing {
         this.setInRelationTo(inRelationTo);
         this.setWasDerivedFrom(wasDerivedFrom);
         this.setRelation(relation);
+	DataAcquisitionSchemaObject.getCache();
     }
 
     public String getUri() {
@@ -145,18 +159,18 @@ public class DataAcquisitionSchemaObject extends HADatAcThing {
 
     public String getEntityLabel(Map<String, String> codeMappings) {
         if (entity == null || entityLabel.equals("")) {
-        	String newLabel = URIUtils.replaceNameSpaceEx(entity);
-        	if (newLabel.contains(":")) {
-    			if (codeMappings.containsKey(newLabel)){
-    				return codeMappings.get(newLabel);
-    			} else {
-    				return newLabel.split("\\:")[1];
-    			}
-        	} else {
-        		return newLabel;
-        	}
+	    String newLabel = URIUtils.replaceNameSpaceEx(entity);
+	    if (newLabel.contains(":")) {
+		if (codeMappings.containsKey(newLabel)){
+		    return codeMappings.get(newLabel);
+		} else {
+		    return newLabel.split("\\:")[1];
+		}
+	    } else {
+		return newLabel;
+	    }
         } else {
-        	return entityLabel;
+	    return entityLabel;
         }
     }
     
@@ -271,6 +285,9 @@ public class DataAcquisitionSchemaObject extends HADatAcThing {
     }
 
     public static DataAcquisitionSchemaObject find(String uri) {
+	if (DataAcquisitionSchemaObject.getCache().get(uri) != null) {
+	    return DataAcquisitionSchemaObject.getCache().get(uri);
+	}
         //System.out.println("Looking for data acquisition schema objects with uri: " + uri);
 
         DataAcquisitionSchemaObject object = null;
@@ -395,6 +412,7 @@ public class DataAcquisitionSchemaObject extends HADatAcThing {
             System.out.println("[ERROR] DataAcquisitionSchemaObject.find() e.Message: " + e.getMessage());
         }
         
+	DataAcquisitionSchemaObject.getCache().put(uri, object);
         return object;
     }
 
@@ -633,6 +651,7 @@ public class DataAcquisitionSchemaObject extends HADatAcThing {
         UpdateProcessor processor = UpdateExecutionFactory.createRemote(
                 request, CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_UPDATE));
         processor.execute();
+	DataAcquisitionSchemaObject.resetCache();
     }
 
     @Override

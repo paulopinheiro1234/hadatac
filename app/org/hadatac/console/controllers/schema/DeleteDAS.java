@@ -93,7 +93,7 @@ public class DeleteDAS extends Controller {
             if (ConfigProp.getLabKeyLoginRequired() && das.deleteFromLabKey(session().get("LabKeyUserName"), session().get("LabKeyPassword")) <= 0) {
                 return badRequest(DASConfirm.render("ERROR Deleting Data Acquisition Schema ", "Error from das.deleteFromLabKey()", data.getLabel()));
             }
-            das.delete();
+            //das.delete();
             NameSpace.deleteTriplesByNamedGraph(das_uri);
         }
 

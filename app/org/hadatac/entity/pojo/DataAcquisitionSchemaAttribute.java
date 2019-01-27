@@ -38,6 +38,8 @@ public class DataAcquisitionSchemaAttribute extends HADatAcThing {
     public static String LINE_LAST = "}  ";
     public static String PREFIX = "DASA-";
 
+    private static Map<String, DataAcquisitionSchemaAttribute> DASACache;
+
     private String uri;
     private String localName;
     private String label;
@@ -65,6 +67,17 @@ public class DataAcquisitionSchemaAttribute extends HADatAcThing {
     private DataAcquisitionSchema das;
     private String socUri;
 
+    private static Map<String, DataAcquisitionSchemaAttribute> getCache() {
+	if (DASACache == null) {
+	    DASACache = new HashMap<String, DataAcquisitionSchemaAttribute>(); 
+	}
+	return DASACache;
+    }
+
+    public static void resetCache() {
+	DASACache = null;
+    }
+
     public DataAcquisitionSchemaAttribute(String uri, String partOfSchema) {
         this.uri = uri;
         this.partOfSchema = partOfSchema;
@@ -78,6 +91,7 @@ public class DataAcquisitionSchemaAttribute extends HADatAcThing {
         this.daseUri = "";
         this.dasoUri = "";
         this.isMeta = false;
+	DataAcquisitionSchemaAttribute.getCache();
     }
 
     public DataAcquisitionSchemaAttribute(String uri, 
@@ -109,6 +123,7 @@ public class DataAcquisitionSchemaAttribute extends HADatAcThing {
         this.setUnit(unit);
         this.daseUri = daseUri;
         this.dasoUri = dasoUri;
+	DataAcquisitionSchemaAttribute.getCache();
     }
 
     public String getUri() {
@@ -511,6 +526,9 @@ public class DataAcquisitionSchemaAttribute extends HADatAcThing {
     }
 
     public static DataAcquisitionSchemaAttribute find(String dasa_uri) {
+	if (DataAcquisitionSchemaAttribute.getCache().get(dasa_uri) != null) {
+	    return DataAcquisitionSchemaAttribute.getCache().get(dasa_uri);
+	}
         DataAcquisitionSchemaAttribute dasa = null;
         System.out.println("Looking for data acquisition schema attribute with URI <" + dasa_uri + ">");
 
@@ -598,6 +616,7 @@ public class DataAcquisitionSchemaAttribute extends HADatAcThing {
 
         dasa.addRelation(relationUri, inRelationToUri);
 
+	DataAcquisitionSchemaAttribute.getCache().put(dasa_uri,dasa);
         return dasa;
     }
 
@@ -921,6 +940,7 @@ public class DataAcquisitionSchemaAttribute extends HADatAcThing {
         UpdateProcessor processor = UpdateExecutionFactory.createRemote(
                 request, CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_UPDATE));
         processor.execute();
+	DataAcquisitionSchemaAttribute.resetCache();
     }
 
     @Override

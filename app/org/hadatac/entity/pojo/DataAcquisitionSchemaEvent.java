@@ -36,6 +36,8 @@ public class DataAcquisitionSchemaEvent extends HADatAcThing {
     public static String LINE_LAST = "}  ";
     public static String PREFIX = "DASE-";
 
+    private static Map<String, DataAcquisitionSchemaEvent> DASECache;
+
     private String uri = "";
     private List<String> types = new ArrayList<String>();
     private String label = "";
@@ -48,6 +50,17 @@ public class DataAcquisitionSchemaEvent extends HADatAcThing {
     private String entityLabel = "";
     private String unit = "";
     private String unitLabel = "";
+
+    private static Map<String, DataAcquisitionSchemaEvent> getCache() {
+	if (DASECache == null) {
+	    DASECache = new HashMap<String, DataAcquisitionSchemaEvent>(); 
+	}
+	return DASECache;
+    }
+
+    public static void resetCache() {
+	DASECache = null;
+    }
 
     public DataAcquisitionSchemaEvent() {
     }
@@ -63,6 +76,7 @@ public class DataAcquisitionSchemaEvent extends HADatAcThing {
         this.partOfSchema = partOfSchema;
         this.setEntity(entity);
         this.setUnit(unit);
+	getCache();
     }
 
     public String getUri() {
@@ -146,7 +160,8 @@ public class DataAcquisitionSchemaEvent extends HADatAcThing {
         if (entity == null || entity.equals("")) {
             this.entityLabel = "";
         } else {
-            this.entityLabel = FirstLabel.getPrettyLabel(entity);
+	    this.entityLabel = entity;
+	    // this.entityLabel = FirstLabel.getPrettyLabel(entity);
         }
     }
 
@@ -210,6 +225,9 @@ public class DataAcquisitionSchemaEvent extends HADatAcThing {
     }
 
     public static DataAcquisitionSchemaEvent find(String uri) {
+	if (getCache().get(uri) != null) {
+	    return getCache().get(uri);
+	}
         DataAcquisitionSchemaEvent event = null;
         String queryString = NameSpaces.getInstance().printSparqlNameSpaceList() + 
                 "SELECT ?partOfSchema ?entity ?unit WHERE { " + 
@@ -271,6 +289,7 @@ public class DataAcquisitionSchemaEvent extends HADatAcThing {
             System.out.println("[ERROR] DataAcquisitionSchemaEvent. uri: e.Message: " + e.getMessage());
         }
 
+	getCache().put(uri,event);
         return event;
     }
 
@@ -480,6 +499,7 @@ public class DataAcquisitionSchemaEvent extends HADatAcThing {
         UpdateProcessor processor = UpdateExecutionFactory.createRemote(
                 request, CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_UPDATE));
         processor.execute();
+	DataAcquisitionSchemaEvent.resetCache();
     }
 
     @Override

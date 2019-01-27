@@ -508,7 +508,7 @@ public class DASOInstanceGenerator{
 		}
 		
 		if (nextObjUri == null || nextObjUri.equals("")) {
-		    System.out.println("DASOInstanceGenerator:          [ERROR] Path generation stopped. Error ocurred retrieving/creating objects in path. See log above.");
+		    //System.out.println("DASOInstanceGenerator:          [ERROR] Path generation stopped. Error ocurred retrieving/creating objects in path. See log above.");
 		    currentSoc = nextSoc;
 		    currentObjUri = nextObjUri;
 		    break;
@@ -575,7 +575,7 @@ public class DASOInstanceGenerator{
 	    return "";
 	} else {
 	    newObj.saveToTripleStore();
-	    System.out.println("DASOInstanceGenerator:          Created Obj with URI=[" + newUri + "]   Type=[" + newTypeUri + "]");
+	    //System.out.println("DASOInstanceGenerator:          Created Obj with URI=[" + newUri + "]   Type=[" + newTypeUri + "]");
 	} 
 	return newObj.getUri();
     }
